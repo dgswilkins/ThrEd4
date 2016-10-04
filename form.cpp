@@ -2104,7 +2104,7 @@ BOOL ritlin(FLPNT strt,FLPNT fin)
 
 BOOL minrng(unsigned strt,unsigned fin)
 {
-	if(abs(fin-strt)<sids>>1||frmpnt->typ==LIN)
+	if(((fin > strt) ? (fin - strt) : (strt - fin))<sids>>1||frmpnt->typ==LIN)
 		return 0;
 	else
 		return 1;
@@ -3326,7 +3326,7 @@ unsigned short regclos(unsigned rg0,unsigned rg1){
 			return 1;
 		}
 	}
-	if(abs(grp0s-grp1s)<2){
+	if(((grp0s > grp1s) ? (grp0s - grp1s) : (grp1s - grp0s))<2){
 
 		if(isclos(pnt0s,pnt1s)){
 
@@ -3334,7 +3334,7 @@ unsigned short regclos(unsigned rg0,unsigned rg1){
 			return 1;
 		}
 	}
-	if(abs(grp0s-grp1e)<2){
+	if(((grp0s > grp1e) ? (grp0s - grp1e) : (grp1e - grp0s))<2){
 
 		if(isclos(pnt0s,pnt1e)){
 
@@ -3342,7 +3342,7 @@ unsigned short regclos(unsigned rg0,unsigned rg1){
 			return 1;
 		}
 	}
-	if(abs(grp0e-grp1s)<2){
+	if(((grp0e > grp1s) ? (grp0e - grp1s) : (grp1s - grp0e))<2){
 
 		if(isclos(pnt0e,pnt1s)){
 
@@ -3350,7 +3350,7 @@ unsigned short regclos(unsigned rg0,unsigned rg1){
 			return 1;
 		}
 	}
-	if(abs(grp0e-grp1e)<2){
+	if(((grp0e > grp1e) ? (grp0e - grp1e) : (grp1e - grp0e))<2){
 
 		if(isclos(pnt0e,pnt1e)){
 
@@ -3690,7 +3690,7 @@ void durgn(unsigned pthi){
 				mindif=0xffffffff;
 				for(ind=seqs;ind<=seqe;ind++){
 
-					gdif=abs(seq[ind]->grp-lastgrp);
+					gdif= ((seq[ind]->grp > lastgrp) ? (seq[ind]->grp - lastgrp) : (lastgrp - seq[ind]->grp));
 					if(gdif<mindif){
 
 						mindif=gdif;
@@ -3713,7 +3713,7 @@ void durgn(unsigned pthi){
 				mindif=0xffffffff;
 				for(ind=seqs;ind<=seqe;ind++){
 
-					gdif=abs(seq[ind]->grp-grpn);
+					gdif= ((seq[ind]->grp > grpn) ? (seq[ind]->grp - grpn) : (grpn - seq[ind]->grp));
 					if(gdif<mindif){
 
 						mindif=gdif;
@@ -5490,8 +5490,8 @@ void satfn(unsigned astrt,unsigned afin,unsigned bstrt,unsigned bfin){
 			cnt=fabs(blen)/stspace;
 		else
 			cnt=fabs(alen)/stspace;
-		asegs=abs(afin-astrt);
-		bsegs=abs(bstrt-bfin);
+		asegs= ((afin > astrt) ? (afin - astrt) : (astrt - afin));
+		bsegs= ((bstrt > bfin) ? (bstrt - bfin) : (bfin - bstrt));
 		acnts=new unsigned[asegs];
 		bcnts=new unsigned[bsegs];
 		ine=astrt;
@@ -14508,7 +14508,7 @@ void dufxlen(){
 		sins[ind]=sin(angs[ind]);
 		cosins[ind]=cos(angs[ind]);
 	}
-	sins[ind]=sin(abs(angs[0]-angs[ind]));
+	sins[ind]=sin((angs[0] > angs[ind]) ? (angs[0] - angs[ind]) : (angs[ind] - angs[0]));
 	fxlen();
 }
 

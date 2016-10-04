@@ -3599,13 +3599,13 @@ unsigned coldis(COLORREF acol,COLORREF bcol){
 
 	unsigned dis;
 
-	dis=abs((acol&0xff)-(bcol&0xff));
+	dis= ((acol & 0xff) > (bcol & 0xff)) ? ((acol & 0xff) - (bcol & 0xff)) : ((bcol & 0xff) - (acol & 0xff));
 	acol>>=8;
 	bcol>>=8;
-	dis+=abs((acol&0xff)-(bcol&0xff));
+	dis+= ((acol & 0xff) > (bcol & 0xff)) ? ((acol & 0xff) - (bcol & 0xff)) : ((bcol & 0xff) - (acol & 0xff));
 	acol>>=8;
 	bcol>>=8;
-	dis+=abs((acol&0xff)-(bcol&0xff));
+	dis+= ((acol & 0xff) > (bcol & 0xff)) ? ((acol & 0xff) - (bcol & 0xff)) : ((bcol & 0xff) - (acol & 0xff));
 	return dis;
 }
 
@@ -7195,8 +7195,8 @@ void duClos(unsigned strt,unsigned cnt){
 
 	for(ind=strt;ind<strt+cnt;ind++){
 
-		cx=abs(stchs[ind].x-sPnt.x);
-		cy=abs(stchs[ind].y-sPnt.y);
+		cx= ((stchs[ind].x > sPnt.x) ? (stchs[ind].x - sPnt.x) : (sPnt.x - stchs[ind].x));
+		cy= ((stchs[ind].y > sPnt.y) ? (stchs[ind].y - sPnt.y) : (sPnt.y - stchs[ind].y));
 		sum=hypot(cx,cy);
 		tind0=ind;
 		for(ine=0;ine<NERCNT;ine++){
@@ -7297,8 +7297,8 @@ unsigned closPnt1(unsigned* clo){
 						stchs[ine].y>=zRct.bottom&&
 						stchs[ine].y<=zRct.top){
 
-						cx=abs(stchs[ine].x-sPnt.x);
-						cy=abs(stchs[ine].y-sPnt.y);
+						cx= ((stchs[ine].x > sPnt.x) ? (stchs[ine].x - sPnt.x) : (sPnt.x - stchs[ine].x));
+						cy= ((stchs[ine].y > sPnt.y) ? (stchs[ine].y - sPnt.y) : (sPnt.y - stchs[ine].y));
 						tsum=hypot(cx,cy);
 						if(tsum<cloSum){
 
@@ -7623,7 +7623,7 @@ unsigned closlin(){
 							//stitch is horizontal
 							ipnt.x=chkpnt.x;
 							ipnt.y=pstch[ind].y;
-							tsum=abs(pstch[ind].y-chkpnt.y);
+							tsum= ((pstch[ind].y > chkpnt.y) ? (pstch[ind].y - chkpnt.y) : (chkpnt.y - pstch[ind].y));
 							goto gotsum;
 						}
 						if(xba==0){
@@ -7663,18 +7663,18 @@ gotsum:;
 						if(ipnt.x<trct.left){
 			
 							if(ipnt.y<trct.bottom)
-								tsum=sqrt(abs(chkpnt.x-trct.left)+abs(chkpnt.y-trct.bottom));
+								tsum=sqrt(((chkpnt.x > trct.left) ? (chkpnt.x - trct.left) : (trct.left - chkpnt.x)) + ((chkpnt.y > trct.bottom) ? (chkpnt.y - trct.bottom) : (trct.bottom - chkpnt.y)));
 							else
-								tsum=sqrt(abs(chkpnt.x-trct.left)+abs(chkpnt.y-trct.top));
+								tsum=sqrt(((chkpnt.x > trct.left) ? (chkpnt.x - trct.left) : (trct.left - chkpnt.x)) + ((chkpnt.y > trct.top) ? (chkpnt.y - trct.top) : (chkpnt.y - trct.top)));
 						}
 						else{
 						
 							if(ipnt.x>trct.right){
 			
 								if(ipnt.y<trct.bottom)
-									tsum=sqrt(abs(chkpnt.x-trct.right)+abs(chkpnt.y-trct.bottom));
+									tsum=sqrt(((chkpnt.x > trct.right) ? (chkpnt.x - trct.right) : (trct.right - chkpnt.x)) + ((chkpnt.y > trct.bottom) ? (chkpnt.y - trct.bottom) : (trct.bottom - chkpnt.y)));
 								else
-									tsum=sqrt(abs(chkpnt.x-trct.right)+abs(chkpnt.y-trct.top));
+									tsum=sqrt(((chkpnt.x > trct.right) ? (chkpnt.x - trct.right) : (trct.right - chkpnt.x)) + ((chkpnt.y > trct.top) ? (chkpnt.y - trct.top) : (trct.top - chkpnt.y)));
 							}
 						}
 gotal:;
@@ -8414,11 +8414,14 @@ void rotang1(SHRTPNT rpnt,FLPNT* tpnt){
 	}
 	else{
 
-		len=abs(dy);
-		if(dy>0)
-			ang0=PI/2+ang;
-		else
-			ang0=ang-PI/2;
+		if (dy > 0) {
+			len = dy;
+			ang0 = PI / 2 + ang;
+		}
+		else {
+			len = -dy;
+			ang0 = ang - PI / 2;
+		}
 	}
 	tpnt->y=rotcntr.y+len*sin(ang0);
 	tpnt->x=rotcntr.x+len*cos(ang0);
@@ -8439,11 +8442,14 @@ void rotangf(FLPNT rpnt,FLPNT* tpnt){
 	}
 	else{
 
-		len=abs(dy);
-		if(dy>0)
-			ang0=PI/2+ang;
-		else
-			ang0=ang-PI/2;
+		if (dy > 0) {
+			len = dy;
+			ang0 = PI / 2 + ang;
+		}
+		else {
+			len = -dy;
+			ang0 = ang - PI / 2;
+		}
 	}
 	tpnt->y=rotcntr.y+len*sin(ang0);
 	tpnt->x=rotcntr.x+len*cos(ang0);
@@ -8479,11 +8485,14 @@ void rotflt(FLPNT* pnt){
 	}
 	else{
 
-		len=abs(dy);
-		if(dy>0)
-			ang0=PI/2+ang;
-		else
-			ang0=ang-PI/2;
+		if (dy > 0) {
+			len = dy;
+			ang0 = PI / 2 + ang;
+		}
+		else {
+			len = -dy;
+			ang0 = ang - PI / 2;
+		}
 	}
 	pnt->y=rotcntr.y+len*sin(ang0);
 	pnt->x=rotcntr.x+len*cos(ang0);
@@ -8504,11 +8513,14 @@ void rotstch(SHRTPNT* pnt){
 	}
 	else{
 
-		len=abs(dy);
-		if(dy>0)
-			ang0=PI/2+ang;
-		else
-			ang0=ang-PI/2;
+		if (dy > 0) {
+			len = dy;
+			ang0 = PI / 2 + ang;
+		}
+		else {
+			len = -dy;
+			ang0 = ang - PI / 2;
+		}
 	}
 	pnt->y=rotcntr.y+len*sin(ang0);
 	pnt->x=rotcntr.x+len*cos(ang0);
@@ -9447,10 +9459,10 @@ unsigned srchknot(unsigned src){
 	while(knotab[xpnt]<src&&xpnt<knotcnt)
 		xpnt++;
 	xpnt--;
-	if(abs(knotab[xpnt]-src)<5){
+	if(((knotab[xpnt] > src) ? (knotab[xpnt] - src) : (src - knotab[xpnt]))<5){
 
 		xpnt++;
-		if(abs(knotab[xpnt]-src)<5)
+		if(((knotab[xpnt] > src) ? (knotab[xpnt] - src) : (src - knotab[xpnt]))<5)
 			return 0;
 		else
 			return 2;
@@ -9458,7 +9470,7 @@ unsigned srchknot(unsigned src){
 	else{
 
 		xpnt++;
-		if(abs(knotab[xpnt]-src)<5)
+		if(((knotab[xpnt] > src) ? (knotab[xpnt] - src) : (src - knotab[xpnt]))<5)
 			return 1;
 		else
 			return 3;
@@ -14611,7 +14623,7 @@ unsigned trsum(){
 
 	rsum=0;
 	for(ind=1;ind<9;ind++)
-		rsum+=abs(tradj[ind]-tradj[0]);
+		rsum+= ((tradj[ind] > tradj[0]) ? (tradj[ind] - tradj[0]) : (tradj[0] - tradj[ind]));
 	return rsum;
 }
 
