@@ -12067,7 +12067,7 @@ BOOL isthr(TCHAR* nam){
 	if(pchr){
 
 		pchr++;
-		if(!strnicmp(pchr,"th",2))
+		if(!_strnicmp(pchr,"th",2))
 			return 1;
 		else
 			return 0;
@@ -14713,7 +14713,7 @@ void trcnum(unsigned shft,COLORREF col,unsigned ind){
 
 	col>>=shft;
 	col&=0xff;
-	itoa(col,trbuf,10);
+	_itoa(col,trbuf,10);
 	len=strlen(trbuf);
 	nwid=numwid*(3-len)+1;
 	SetBkColor(ds->hDC,trgb[ind]);	
