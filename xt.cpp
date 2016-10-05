@@ -413,7 +413,7 @@ void savtxt()
 			phst->spac=tscr.spac;
 			if(phst->txp)
 			{
-				delete(phst->txp);
+				delete[] (phst->txp);
 				phst->txp=0;
 			}
 			phst->txp=new TXPNT[phst->cnt];
@@ -4418,7 +4418,7 @@ int txcmp(const void *arg1, const void *arg2)
 	}
 	else
 		return p0->lin-p1->lin;
-	return 0;
+//	return 0;
 }
 
 void txpar()

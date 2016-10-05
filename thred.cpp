@@ -607,7 +607,7 @@ TCHAR				fildes[50];		//file designer name in clear
 HWND				fwnd;			//first window not destroyed for exiting enumerate loop
 RANG				selrang;		//range of selected forms
 unsigned			bakfrm;			//saved form index
-unsigned char		amsk;			//cursor and mask
+unsigned char		amsk[128];		//cursor and mask
 double				zumflor;		//minimum allowed zoom value
 FLRCT				chkhuprct;		//for checking the hoop size
 unsigned			daz;			//days untill a merchant key expires
@@ -879,9 +879,9 @@ MENUITEMINFO filinfo={
 	13,					
 };
 
-const TCHAR			fltr[MAX_PATH]=			"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0\0";
-const TCHAR			bfltr[MAX_PATH]="Microsoft (BMP)\0*.bmp\0\0";
-TCHAR				cstFltr[MAX_PATH]=	"";
+const TCHAR			fltr[MAX_PATH]=		"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
+const TCHAR			bfltr[MAX_PATH]=	"Microsoft (BMP)\0*.bmp\0";
+TCHAR				cstFltr[MAX_PATH]=	"Thredworks (THR)\0*.thr\0";
 TCHAR				filnam[MAX_PATH]={0};
 TCHAR				thrnam[MAX_PATH];
 TCHAR				auxnam[MAX_PATH];
@@ -920,7 +920,7 @@ OPENFILENAME		ofn={
 	MAX_PATH,				//nMaxFile 
 	0,						//lpstrFileTitle 
 	0,						//nMaxFileTitle 
-	defDir,					//lpstr	ialDir 
+	defDir,					//lpstrInitialDir
 	0,						//lpstrTitle
 	OFN_OVERWRITEPROMPT,	//Flags
 	0,						//nFileOffset
@@ -2249,7 +2249,7 @@ void chkmen()
 {
 	int ind,cod;
 
-	for(ind=0;ind<sizeof(datcod);ind++)
+	for (ind = 0; ind<(sizeof(datcod) / sizeof(int)); ind++)
 	{
 		cod=MF_UNCHECKED;
 		if(ind==ini.dchk)
@@ -2662,8 +2662,10 @@ void redfils(){
 	WIN32_FIND_DATA		fdat;
 	HANDLE				hndl;
 
-	for(ind=0;ind<OLDNUM;ind++)
-		DeleteMenu(hfileMen,fmenid[ind],MF_BYCOMMAND);
+	for (ind = 0; ind < OLDNUM; ind++) {
+		if (GetMenuState(hfileMen, fmenid[ind], MF_BYCOMMAND) != -1)
+			DeleteMenu(hfileMen, fmenid[ind], MF_BYCOMMAND);
+	}
 	for(ind=0;ind<OLDNUM;ind++){
 
 		if(ini.oldnams[ind][0]){
@@ -2773,9 +2775,10 @@ void mvstch(SHRTPNT* dst, SHRTPNT* src){
 
 void duzero(){
 
-	unsigned	ind,dst;
-	double		len;
-	SHRTPNT*	lpnt;
+	unsigned		ind;
+	unsigned short	dst;
+	double			len;
+	SHRTPNT*		lpnt;
 
 	if(fselpnt){
 
@@ -5101,7 +5104,7 @@ BOOL binv(unsigned cnt){
 				ncnt++;
 			else{
 
-				if(bcpnt[ine]==0xff)
+				if(bcpnt[ine]==(TCHAR)0xff)
 					icnt++;
 			}
 		}
@@ -5299,7 +5302,7 @@ void bfil(){
 			BitBlt(bitdc,0,0,bwid,bhi,tdc,0,0,SRCCOPY);
 			DeleteObject(tbit);
 			ReleaseDC(hWnd,tdc);
-			delete bpnt;
+			delete[] bpnt;
 		}
 		else{
 
@@ -5376,7 +5379,7 @@ void dstran(){
 	HANDLE			hcol;
 	unsigned*		pcol;
 	unsigned		fsiz,colind;
-	unsigned long	hisiz;
+	DWORD			hisiz;
 
 	pcol=0;
 	if(colfil()){
@@ -5397,7 +5400,7 @@ void dstran(){
 
 				if(pcol){
 					
-					delete pcol;
+					delete[] pcol;
 					pcol=0;
 				}
 			}
@@ -5447,7 +5450,7 @@ void dstran(){
 		}
 	}
 	if(pcol)
-		delete pcol;
+		delete[] pcol;
 	hed.stchs=ine;
 	siz.x=max.x-min.x;
 	siz.y=max.y-min.y;
@@ -5596,7 +5599,7 @@ void nuFil(){
 
 	unsigned		siz,stind;
 	unsigned		vervar;
-	unsigned long	sizh;
+	DWORD			sizh;
 	unsigned		ind,inf,ing,inh,tcol;
 	unsigned		cPnt;
 	TCHAR*			pext;
@@ -5921,7 +5924,7 @@ void nuFil(){
 							hed.stchs=stind;
 							tnam=(TCHAR*)&filBuf[ind];
 							strcpy(bnam,tnam);
-							delete filBuf;
+							delete[] filBuf;
 							strcpy(pext,"thr");
 							ini.auxfil=AUXPCS;
 							if(hed.hup!=LARGHUP&&hed.hup!=SMALHUP)
@@ -6053,7 +6056,7 @@ void nuFil(){
 							drecs=new DSTREC[dstcnt];
 							ReadFile(hFil,(DSTREC*)drecs,sizeof(DSTREC)*dstcnt,&red,0);
 							dstran();
-							delete drecs;
+							delete[] drecs;
 							ini.auxfil=AUXDST;
 						}
 					}
@@ -6494,10 +6497,10 @@ BOOL chkattr(TCHAR* nam){
 
 	unsigned		attr,ind;
 	TCHAR			driv[MAX_PATH];
-	unsigned long	sec;
-	unsigned long	byt;
-	unsigned long	fclst;
-	unsigned long	tclst;
+	DWORD			sec;
+	DWORD			byt;
+	DWORD			fclst;
+	DWORD			tclst;
 
 	if(rstMap(NOTFREE))
 		return 1;
@@ -6776,7 +6779,7 @@ void sav(){
 					return;
 				}
 			}
-			delete filBuf;
+			delete[] filBuf;
 		}
 		defNam(filnam);
 		CloseHandle(hPcs);
@@ -9668,7 +9671,8 @@ unsigned duth(TCHAR* nam){
 
 void duver(TCHAR* nam){
 
-	unsigned ind,chr;
+	unsigned	ind;
+	int			chr;
 
 	ind=duth(nam);
 	if(ind){
@@ -9808,10 +9812,10 @@ void dubuf(){
 		durit(spnts,slen*sizeof(SATCON));
 		durit(epnts,elen*sizeof(FLPNT));
 		durit(txpnts,txad*sizeof(TXPNT));
-		delete theds;
-		delete tpnts;
-		delete spnts;
-		delete epnts;
+		delete[] theds;
+		delete[] tpnts;
+		delete[] spnts;
+		delete[] epnts;
 	}
 }
 
@@ -16160,7 +16164,7 @@ gotcur:;
 					movStch();
 				return 1;
 			}
-			rstMap(BZUMIN);
+//			rstMap(BZUMIN);
 		}
 	}
 	if(msg.message==WM_RBUTTONDOWN||msg.message==WM_LBUTTONDOWN){
@@ -18153,7 +18157,7 @@ didskip:;
 							drwLin(cloInd-1,3,bakPen);
 						}
 					}
-					delete plin;
+					delete[] plin;
 					mlin0[1].x=mlin1[0].x=msg.pt.x-stOrg.x;
 					mlin0[1].y=mlin1[0].y=msg.pt.y-stOrg.y;
 					if(cloInd<=0)
@@ -18466,7 +18470,7 @@ didskip:;
 		}
 		if(chkMap(FILMSG)){
 
-			if(cod=VK_RETURN||cod==0xc0){
+			if(cod==VK_RETURN||cod==0xc0){
 					
 				savdo();
 				unfil();
@@ -21321,7 +21325,7 @@ void ritloc(){
 	TCHAR*			penv;
 	TCHAR			locnam[MAX_PATH];
 	HANDLE			hloc;
-	unsigned long	rot;
+	DWORD			rot;
 
 	penv=getenv("COMSPEC");
 	if(penv)
@@ -21532,13 +21536,13 @@ void crtcurs(){
 
 	duamsk();
 	ducurs(curs.frm);
-	hfrm=CreateCursor(hInst,16,16,32,32,(void*)&amsk,(void*)&curs.frm);
-	hdlin=CreateCursor(hInst,16,16,32,32,(void*)&amsk,(void*)&curs.dlin);
-	hnedu=CreateCursor(hInst,16,32,32,32,(void*)&amsk,(void*)&curs.uned);
-	hnedrd=CreateCursor(hInst,1,31,32,32,(void*)&amsk,(void*)&curs.rdned);
-	hnedru=CreateCursor(hInst,1,1,32,32,(void*)&amsk,(void*)&curs.runed);
-	hnedld=CreateCursor(hInst,30,30,32,32,(void*)&amsk,(void*)&curs.ldned);
-	hnedlu=CreateCursor(hInst,32,1,32,32,(void*)&amsk,(void*)&curs.luned);
+	hfrm=CreateCursor(hInst,16,16,32,32,(void*)amsk,(void*)&curs.frm);
+	hdlin=CreateCursor(hInst,16,16,32,32,(void*)amsk,(void*)&curs.dlin);
+	hnedu=CreateCursor(hInst,16,32,32,32,(void*)amsk,(void*)&curs.uned);
+	hnedrd=CreateCursor(hInst,1,31,32,32,(void*)amsk,(void*)&curs.rdned);
+	hnedru=CreateCursor(hInst,1,1,32,32,(void*)amsk,(void*)&curs.runed);
+	hnedld=CreateCursor(hInst,30,30,32,32,(void*)amsk,(void*)&curs.ldned);
+	hnedlu=CreateCursor(hInst,32,1,32,32,(void*)amsk,(void*)&curs.luned);
 }
 
 void dstcurs(){
@@ -22703,7 +22707,7 @@ skip:;
 			duclp();
 		if(chkMap(ROTAT)||chkMap(ROTCAPT)||chkMap(MOVCNTR))
 			ritrot();
-		delete plin;
+		delete[] plin;
 	}
 	if(formpnt&&!chkMap(FRMOF))
 		drwfrm();
@@ -22900,13 +22904,13 @@ void ritbak(TCHAR* nam,DRAWITEMSTRUCT* ds){
 					}
 					DeleteObject(tbr);
 					DeleteObject(pen);
-					delete tstch;
-					delete plin;
+					delete[] tstch;
+					delete[] plin;
 				}
 				else{
 
-					delete tstch;
-					delete plin;
+					delete[] tstch;
+					delete[] plin;
 					CloseHandle(thfil);
 					return;
 				}
@@ -22963,9 +22967,9 @@ void ritbak(TCHAR* nam,DRAWITEMSTRUCT* ds){
 					SetROP2(sdc,R2_COPYPEN);
 				}
 bakskp:;
-				delete flst;
-				delete tflt;
-				delete plin;
+				delete[] flst;
+				delete[] tflt;
+				delete[] plin;
 			}
 		}
 		CloseHandle(thfil);
@@ -23172,7 +23176,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam){
 
 		switch((int)LOWORD(wParam)){
 
-		unpat();
+//		unpat();
 		case SB_LINEDOWN:
 
 			scPnt.y=(zRct.top-zRct.bottom)*LINSCROL;

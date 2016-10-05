@@ -3409,7 +3409,7 @@ void dunseq(unsigned strt,unsigned fin){
 	miny/=2;
 	lin0=&*seq[strt];
 	lin1=&*seq[fin];
-	if(miny=1e30/2)
+	if(miny==1e30/2)
 		miny=0;
 	rspnt(lin0->x,lin0->y+miny);
 	rspnt(lin1->x,lin1->y+miny);
@@ -4220,7 +4220,7 @@ lconskip:;
 			mpath[0].grpn=seq[rgns[0].end]->grp;
 			mpath[0].skp=0;
 			durgn(0);
-			delete mpath;
+			delete[] mpath;
 		}
 //skip:;
 
@@ -4228,15 +4228,15 @@ lconskip:;
 
 seqskip:;
 #endif
-		delete seq;
-		delete lins;
-		delete rgns;
-		delete minds;
-		delete visit;
-		delete pmap;
-		delete grinds;
-		delete seqmap;
-		delete srgns;
+		delete[] seq;
+		delete[] lins;
+		delete[] rgns;
+		delete[] minds;
+		delete[] visit;
+		delete[] pmap;
+		delete[] grinds;
+		delete[] seqmap;
+		delete[] srgns;
 	}
 }
 
@@ -4541,8 +4541,8 @@ void fnvrt(){
 	for(ind=0;ind<grindpnt;ind++)
 		grinds[ind]=tgrinds[ind];
 	grpind--;
-	delete jpts;
-	delete pjpts;
+	delete[] jpts;
+	delete[] pjpts;
 }
 
 void fnhor(){
@@ -5663,8 +5663,8 @@ nuseg:;
 			if((acnt||bcnt)&&acnt<MAXSEQ&&bcnt<MAXSEQ)
 				goto nuseg;
 		}
-		delete acnts;
-		delete bcnts;
+		delete[] acnts;
+		delete[] bcnts;
 	}
 }
 
@@ -5800,7 +5800,7 @@ void satfil(){
 	satfn(0,ind,sids,ind);
 satdun:;
 
-	delete lens;
+	delete[] lens;
 	stspace=tspac;
 }
 
@@ -6222,9 +6222,9 @@ void rotfrm(unsigned nu0){
 		frmpnt->strt=(frmpnt->strt+sids-nu0)%sids;
 	if(frmpnt->xat&AT_END)
 		frmpnt->end=(frmpnt->end+sids-nu0)%sids;
-	delete flt1;
-	delete nsac;
-	delete psac;
+	delete[] flt1;
+	delete[] nsac;
+	delete[] psac;
 }
 
 
@@ -6651,8 +6651,8 @@ void clpbrd(unsigned short strtlin){
 			strtlin=nlin;
 		}
 	}
-	delete filclp;
-	delete clprev;
+	delete[] filclp;
+	delete[] clprev;
 }
 
 void outfn(unsigned strt,unsigned fin,double satwid){
@@ -7257,7 +7257,7 @@ void sapliq()
 	frmpnt->bcol=actcol|(apcol<<4);
 	if(frmpnt->typ!=LIN)
 	{
-		if(frmpnt->ftyp=SAT&&frmpnt->stpt)
+		if(frmpnt->ftyp==SAT&&frmpnt->stpt)
 			delsac(clofind);
 	}
 	frmpnt->ftyp=0;
@@ -8565,7 +8565,7 @@ void prfmsg(){
 	sprintf(msgbuf,"%.2f mm",ini.grdsiz/PFGRAN);
 	prflin(STR_PRF20);
 	sethup();
-	sprintf(msgbuf,stab[STR_HUP0+ini.hup-1]);
+	sprintf(msgbuf,"%s",stab[STR_HUP0+ini.hup-1]);
 	prflin(STR_PRF17);
 	sprintf(msgbuf,"%.0f mm",ini.hupy/PFGRAN);
 	prflin(STR_PRF27);
@@ -8878,8 +8878,8 @@ void duspir(unsigned nsids){
 	setmfrm();
 	setMap(SHOFRM);
 	mdufrm();
-	delete tflt;
-	delete tdif;
+	delete[] tflt;
+	delete[] tdif;
 }
 
 void duhart(unsigned nsids){
@@ -10255,7 +10255,7 @@ void snp(unsigned strt,unsigned fin){
 	chkrng(&rsiz);
 	xpnts=(unsigned*)bseq;
 	ZeroMemory(bseq,65536*sizeof(unsigned));
-	xhst=txhst=new unsigned[rsiz.x+1];
+	xhst=txhst=new unsigned[static_cast<int>(rsiz.x)+1];
 	for(ind=0;ind<rsiz.x;ind++)
 		xhst[ind]=0;
 	if(chkMap(FORMSEL)){
@@ -10314,7 +10314,7 @@ void snp(unsigned strt,unsigned fin){
 		nxtim();
 	}
 	DestroyWindow(htim);
-	delete txhst;
+	delete[] txhst;
 }
 
 void snap(){
@@ -11521,7 +11521,7 @@ void clpic(unsigned short strtlin){
 		oseq[seqpnt].x=flt[strtlin].x;
 		oseq[seqpnt++].y=flt[strtlin].y;
 	}
-	delete filclp;
+	delete[] filclp;
 }
 
 void fspic(){
@@ -12764,7 +12764,7 @@ void spltfrm(){
 		}
 		else{
 
-			if(frmpnt->typ=LIN){
+			if(frmpnt->typ==LIN){
 
 				if(spltlin()){
 				
@@ -13613,10 +13613,10 @@ clp1skp:;
 
 #endif
 
-	delete lens;
-	delete clplens;
-	delete clpsrt;
-	delete pclpsrt;
+	delete[] lens;
+	delete[] clplens;
+	delete[] clpsrt;
+	delete[] pclpsrt;
 
 	if(pcseg){
 
