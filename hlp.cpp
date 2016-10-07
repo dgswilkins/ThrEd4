@@ -235,10 +235,12 @@ TCHAR	hlpbuf[HBUFSIZ];	//message formatting buffer
 
 void adbad(unsigned cod,unsigned cnt)
 {
+	//not sure that sdat has been initialized when this is called
+	//what does this function do?
 	LoadString(hInst,cod,sdat,HBUFSIZ);
 	sdat=&sdat[strlen(sdat)];
 	LoadString(hInst,IDS_NOTREP,hlpbuf,HBUFSIZ);
-	sprintf(sdat,hlpbuf,cnt);
+	sprintf_s(sdat,strlen(sdat),hlpbuf,cnt);
 	sdat=&sdat[strlen(sdat)];
 }
 
