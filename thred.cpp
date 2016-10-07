@@ -2115,6 +2115,8 @@ unsigned dumsk(unsigned pnt){
 
 BOOL CALLBACK dnamproc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam)
 {
+	UNREFERENCED_PARAMETER(lparam);
+
 	HWND hwnd;
 	switch(umsg)
 	{
@@ -3956,7 +3958,7 @@ void sidmsg(HWND hndl,TCHAR** pstr,unsigned cnt){
 
 	RECT		chkrct;
 	RECT		mrct;
-	unsigned	ind,ine=0,cnt1=cnt;
+	unsigned	ind,cnt1=cnt;
 
 	FillMemory(&thDat,sizeof(int)*LASTLIN,0);
 	sidsiz.x=sidsiz.y=0;
@@ -5226,12 +5228,22 @@ blup1:		mov		[edi],edx
 			loop	blup
 	}
 #else
-	//check translation
-	for (unsigned i = 0; i < bwid; i++) {
-		unsigned bit = i ^ 0x7;
-		bit &= 31;
+	//correct
+	union {
+		struct {
+			unsigned char byte0;
+			unsigned char byte1;
+			unsigned char byte2;
+			unsigned char byte3;
+		} bytes;
+		unsigned dword0;
+	} bit;
 
-		*dst = (_bittest((long *)src, bit)) ? fgnd : bgnd;
+	for (unsigned i = 0; i < bwid; i++) {
+		bit.dword0 = i;
+		bit.bytes.byte0 = bit.bytes.byte0 ^ 0x07;
+
+		*dst = (_bittest((long *)src, bit.dword0)) ? fgnd : bgnd;
 
 		dst++;
 	}
@@ -8277,6 +8289,7 @@ BOOL oldwnd(HWND hwnd){
 }
 
 BOOL CALLBACK EnumChildProc(HWND hwnd,LPARAM lParam){
+	UNREFERENCED_PARAMETER(lParam);
 
 	if(oldwnd(hwnd))
 		return DestroyWindow(hwnd);
@@ -9795,7 +9808,8 @@ void lodbmp(){
 				
 		untrace();
 		pchr=strrchr(lbnam,'\\')+1;
-		strcpy(bnam,pchr);
+		// PCS file can only store a 16 character filename?
+		strncpy(bnam,pchr, sizeof(bnam));
 		defbNam();
 		bfil();
 		setMap(RESTCH);
@@ -10091,9 +10105,9 @@ void thrsav(){
 	unsigned			ind,len;
 	int					tind;
 	unsigned long		wrot;
-	unsigned			flind=0;
-	unsigned			slind=0;
-	unsigned			elind=0;
+	//unsigned			flind=0;
+	//unsigned			slind=0;
+	//unsigned			elind=0;
 	WIN32_FIND_DATA		fdat; 
 	HANDLE				hndl;
 	TCHAR				nunam[MAX_PATH];
@@ -13813,6 +13827,7 @@ void rngord(unsigned rng0,unsigned rng1){
 }
 
 BOOL CALLBACK LockPrc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
+	UNREFERENCED_PARAMETER(lparam);
 
 	WIN32_FIND_DATA*	pdat;
 	HANDLE				srch;
@@ -24195,6 +24210,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPSTR     lpCmdLine,
                      int       nCmdShow){
+	UNREFERENCED_PARAMETER(nCmdShow);
 
 	WNDCLASSEX		wc;
 	LOGBRUSH		br;

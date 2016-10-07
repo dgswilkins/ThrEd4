@@ -43,7 +43,7 @@ extern			void		dasyfrm();
 extern			FLPNT*		uflt;
 extern			void		chkwlk();
 extern			void		chkund();
-extern			void		dubdel(unsigned cod);
+//extern			void		dubdel(unsigned cod);
 extern			void		srtcol();
 extern			void*		bakdat[16];
 extern			unsigned	dupnt0;

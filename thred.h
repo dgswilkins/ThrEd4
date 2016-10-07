@@ -1477,7 +1477,7 @@ typedef struct _grdcod{
 //form types
 enum{
 
-	LIN=1,
+	LIN=1u,
 	POLI,
 	RPOLI,
 	STAR,

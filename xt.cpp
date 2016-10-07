@@ -1286,7 +1286,7 @@ void fnwlk(unsigned find)
 	unsigned	strt,cnt;
 	FLPNT*		wpnt;
 
-	fvars(clofind);
+	fvars(find);
 	if(frmpnt->typ==LIN)
 		frmpnt->typ=POLI;
 	if(frmpnt->xat&AT_STRT&&frmpnt->typ!=LIN)
@@ -1363,11 +1363,11 @@ void fnund(unsigned find)
 	angclpfn();
 	opnt=seqpnt;
 	ritund();
-	fvars(clofind);
+	fvars(find);
 	usesiz=baksiz;
 }
 
-void fncwlk(unsigned find)
+void fncwlk()
 {
 	unsigned	ind,ine,strt,fin;
 	SATCON*		sac;
@@ -1425,6 +1425,7 @@ void fncwlk(unsigned find)
 }
 
 BOOL CALLBACK fthdefprc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
+	UNREFERENCED_PARAMETER(lparam);
 
 	TCHAR		buf[HBUFSIZ];
 	TCHAR		buf1[HBUFSIZ];
@@ -1544,12 +1545,14 @@ void srtcol(){
 	MoveMemory(&stchs,phi,sizeof(SHRTPNT)*hed.stchs);
 }
 
+/*
 void dubdel(unsigned cod){
 
 	if(chkMap(WASDEL))
 		return;
 	delpnt=hed.stchs;
 }
+*/
 
 void dubit(unsigned bit)
 {
@@ -1609,7 +1612,7 @@ void setulen()
 void chkcwlk()
 {
 	if(frmpnt->xat&AT_CWLK)
-		fncwlk(clofind);
+		fncwlk();
 	else
 		delwlk((clofind<<FRMSHFT)|CWLKMSK);
 }
@@ -1668,6 +1671,8 @@ void dazdef()
 
 BOOL CALLBACK dasyproc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam)
 {
+	UNREFERENCED_PARAMETER(lparam);
+
 	TCHAR		buf[HBUFSIZ];
 	TCHAR		buf1[HBUFSIZ];
 	unsigned	ind;
@@ -5283,6 +5288,8 @@ BOOL chkasp(FLPNT* flt)
 
 BOOL CALLBACK setsprc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam)
 {
+	UNREFERENCED_PARAMETER(lparam);
+
 	FLPNT	tflt;
 
 	sizdlg=hwndlg;
@@ -5528,6 +5535,8 @@ void setclpspac()
 
 BOOL CALLBACK enumch(HWND hwnd,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	DestroyWindow(hwnd);
 	return 1;
 }
@@ -5559,7 +5568,7 @@ void txdun()
 	HANDLE hnam;
 	unsigned long rot;
 	int ind;
-	char* sig="txh";
+	//char* sig="txh";
 
 	if(thsts[0].cnt)
 	{
