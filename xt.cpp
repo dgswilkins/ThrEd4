@@ -1952,11 +1952,16 @@ void durec(OREC* prec)
 
 OREC*	recref(const void* arg)
 {
+#if defined(__UseASM__)
 	_asm
 	{
 			mov		eax,arg
 			mov		eax,[eax]
 	}
+#else
+	// Check translation
+	return *(OREC **)arg;
+#endif
 }
 
 int recmp(const void *arg1, const void *arg2)
@@ -2326,6 +2331,7 @@ srtskp:;
 
 unsigned dutyp(unsigned tat)
 {
+#if defined(__UseASM__)
 	_asm
 	{
 			xor		eax,eax
@@ -2341,6 +2347,20 @@ unsigned dutyp(unsigned tat)
 			mov		al,1
 dutypx:		and		eax,0xf
 	}
+#else
+	//check translation
+	tat &= SRTYPMSK;
+
+	if (tat == 0)
+		return 0;
+
+	unsigned long bit = _BitScanReverse(&bit, tat) - 18;
+
+	if (((bit & 0xff) != 12) || ((bit & 0x20000000) == 0))
+		return bit & 0xf;
+
+	return 1;
+#endif
 }
 
 void filim(FRMLIM* flim,unsigned * lmap)
@@ -2414,6 +2434,7 @@ void filim(FRMLIM* flim,unsigned * lmap)
 
 unsigned frstmap(unsigned* map)
 {
+#if defined(__UseASM__)
 	_asm
 	{
 			xor		eax,eax
@@ -2425,6 +2446,17 @@ unsigned frstmap(unsigned* map)
 			mov		[ecx],ebx
 fmapx:
 	}
+#else
+	//check translation
+	if (*map == 0)
+		return 0;
+	
+	unsigned long bit = _BitScanForward(&bit, *map);
+
+	_bittestandreset((long *)map, bit);
+
+	return bit;
+#endif
 }
 
 #ifdef _DEBUG
@@ -2720,7 +2752,7 @@ void chkend(unsigned off,unsigned cod)
 
 void intlv()
 {
-	unsigned	ind,ine,cod,off;
+	unsigned	ind,ine,cod=0,off;
 	FLPNT		cpnt;
 
 	rstMap(ISEND);

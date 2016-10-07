@@ -2006,6 +2006,7 @@ void cpymap(unsigned dst,unsigned src){
 cpx:
 	}
 #else
+	// check translation
 	if (_bittest((long *)map, src)) {
 		_bittestandset((long *)map, dst);
 	} else {
@@ -2586,7 +2587,7 @@ void stchcpy(unsigned siz,SHRTPNT* dst){
 			rep		movsd
 	}
 #else
-	memcpy(dst, stchs, siz * 4); //check - should this really be siz * 4?
+	memcpy(dst, stchs, siz * 4); 
 #endif
 }
 
@@ -3595,6 +3596,7 @@ void ritini(){
 	CloseHandle(hIni);
 }
 
+/* not used
 BOOL gcmp(void* pnt,unsigned cnt){
 
 #if defined(__UseASM__)
@@ -3613,7 +3615,9 @@ gcmpx:
 	return memcmp(bseq, pnt, cnt * 4) == 0 ? 0 : 1;
 #endif
 }
+*/
 
+/* not used
 BOOL gcmpw(short wrd,unsigned ofst){
 
 #if defined(__UseASM__)
@@ -3633,7 +3637,9 @@ gcmpwx:
 	return (*(short *)ptr == wrd) ? 0 : 1;
 #endif
 }
+*/
 
+/* not used
 BOOL bufcmp(TCHAR* tbuf,unsigned siz){
 
 #if defined(__UseASM__)
@@ -3649,9 +3655,11 @@ BOOL bufcmp(TCHAR* tbuf,unsigned siz){
 bufcmp1:
 	}
 #else
-	return memcpy(bseq, tbuf, siz) != 0 ? 1 : 0;
+	//Correct
+	return memcmp(bseq, tbuf, siz) != 0 ? 1 : 0;
 #endif
 }
+*/
 
 BOOL savcmp(){
 
@@ -5019,7 +5027,7 @@ void stchred(unsigned siz,SHRTPNT* src){
 			rep		movsd
 	}
 #else
-	memcpy(stchs, src, siz * 4); //check - should this really be siz * 4?
+	memcpy(stchs, src, siz * 4); 
 #endif
 }
 
@@ -5218,6 +5226,7 @@ blup1:		mov		[edi],edx
 			loop	blup
 	}
 #else
+	//check translation
 	for (unsigned i = 0; i < bwid; i++) {
 		unsigned bit = i ^ 0x7;
 		bit &= 31;
@@ -5277,6 +5286,7 @@ movlup:		mov		eax,[esi]
 			loop	movlup
 	}
 #else
+	//check translation
 	unsigned *src = tracbits;
 	char *dst = (char *) bseq;
 
@@ -6277,7 +6287,7 @@ void clrfbuf(unsigned siz){
 			rep		stosd
 	}
 #else
-	memset(filBuf, 0, siz * 4);//check - should this really be siz * 4?
+	memset(filBuf, 0, siz * 4);
 #endif
 }
 
@@ -6294,6 +6304,7 @@ unsigned xbits(unsigned src,unsigned dst){
 			shl		eax,cl
 	}
 #else
+	//check translation
 	unsigned bits = trinum;
 
 	bits >>= src & 0xFF;
@@ -8390,6 +8401,7 @@ CLPSTCH* deref(void* pnt){
 			mov		eax,[eax]
 	}
 #else
+	//check translation
 	return *(CLPSTCH **)pnt;
 #endif
 }
@@ -12074,8 +12086,9 @@ lup1:		mov		[ecx],al
 lupx:		mov		[ecx],al
 	}
 #else
+	//Correct
 	for (;;) {
-		TCHAR chr = *(dst++);
+		TCHAR chr = *(src++);
 
 		if (chr == 0)
 			break;
@@ -13988,7 +14001,7 @@ BOOL getrac(unsigned bpnt){
 getracx:
 	}
 #else
-	return _bittest((long *)oseq, bpnt) ? 0 : 1;
+	return _bittest((long *)oseq, bpnt);
 #endif
 }
 
@@ -14100,6 +14113,7 @@ void trcols(COLORREF col){
 			mov		[ecx],ebx
 	}
 #else
+	//Check translation
 	pxcols[0] = col & 0xff;
 	pxcols[1] = (col & 0xff00) >> 8;
 	pxcols[2] = (col & 0xff0000) >> 16;
@@ -14278,7 +14292,7 @@ BOOL chkedg(unsigned bpnt){
 chkedgx:
 	}
 #else
-	return _bittest((long *)edgmap, bpnt) ? 1 : 0;
+	return _bittest((long *)edgmap, bpnt);
 #endif
 }
 
@@ -14739,6 +14753,7 @@ chklup3:	rol		eax,16
 			mov		dref,ebx
 	}
 #else
+	//check translation
 	union {
 		COLORREF cr;
 		struct {
@@ -14997,6 +15012,7 @@ difbts:		mov		esi,bpnt
 			call	difsub		//8
 	}
 #else
+	//check translation
 	unsigned *dst = tradj;
 
 	difsub(bpnt, shft, dst);
@@ -19891,9 +19907,13 @@ thumout:;
 						ratsr();
 						for(opnt=0;opnt<(unsigned)funscnt;opnt++){
 
+#if defined(__UseASM__)
 							_asm push ebp
-							fselrct(opnt+formpnt);
+							fselrct(opnt+ formpnt);
 							_asm pop ebp
+#else
+							fselrct(opnt+formpnt);
+#endif
 							selist[opnt]=opnt+formpnt;
 						}
 						fselpnt=funscnt;
@@ -22682,6 +22702,7 @@ void setCol(unsigned ind){
 			mov		cbit,eax
 	}
 #else
+	// mask ind for sanity
 	_bittestandset((long *)&cbit, ind & 31);
 #endif
 }
@@ -23314,7 +23335,7 @@ chk1:
 	}
 #pragma warning(disable:4035;once:)
 #else
-	return _bittest((long *)&cbit, ind) ? -1 : 0;
+	return _bittest((long *)&cbit, ind) ? 0xffffffff : 0;
 #endif
 }
 

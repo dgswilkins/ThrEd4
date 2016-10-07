@@ -1,4 +1,5 @@
 //compile switches
+//#define		__UseASM__	1
 #define		PESACT		0		//compile pes code
 #define		BUGBAK		0		//turn bakseq off
 
@@ -616,7 +617,7 @@ enum{
 	WASWROT,	//texture clipboard form was written
 	DESCHG,		//design size change 0=x, 1=y 
 	CMPDO,		//design has been changed
-	ISUND,		//doing underaly fill
+	ISUND,		//doing underlay fill
 	CHKTX,		//user has changed the texture fill window size, check the points
 	FSETFIND,	//user is setting the indent for a group of forms
 	TXBOX,		//user is importing stitches for textured fill

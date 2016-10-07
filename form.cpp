@@ -473,7 +473,7 @@ double*			clplens;				//lengths of form sides for vertical clipboard fill
 CLIPSORT*		clpsrt;					//intersect points for vertical clipboard fill
 CLIPSORT**		pclpsrt;				//pointers to line intersect points
 CLIPNT*			clipnts;				//points for vertical clipboard fills
-VCLPX*			vclpx;					//region crossing data for vertical clipboard fills
+VCLPX			vclpx[MAXFRMLINS];		//region crossing data for vertical clipboard fills
 unsigned*		iclpx;					//indices into region crossing data for vertical clipboard fills
 unsigned		vlim;					//wrap limit for vertical clipboard fills
 unsigned		clplim;					//vertical clipboard search limit
@@ -618,8 +618,9 @@ void duinf(FRMHED* hed){
 			mov		[ebx],eax
 	}
 #else
-	finfo.typ = hed->typ; 
-	finfo.at = hed->at;
+	//Correct
+	finfo.typ = hed->at & 0xf; 
+	finfo.at = (hed->at >> 4)& 0xf;
 	finfo.sids = hed->sids;
 #endif
 }
@@ -5231,6 +5232,7 @@ prvc1:		btr		ecx,eax
 prvcx:
 	}
 #else
+	//Check translation
 	if (chkmap[ind] == 0)
 		 return 0xffffffff;
 
@@ -6453,7 +6455,7 @@ void bdrlin(unsigned strt,unsigned fin,double siz){
 	double		len,tang;
 	unsigned	cnt;
 
-	_asm finit;
+	//_asm finit;
 	dif.x=flt[fin].x-flt[strt].x;
 	dif.y=flt[fin].y-flt[strt].y;
 	len=hypot(dif.x,dif.y);
@@ -11089,7 +11091,7 @@ BOOL chkr(unsigned pbit){
 chkrx:
 	}
 #else
-	return _bittest((long *)rmap, pbit) ? 1 : 0;
+	return _bittest((long *)rmap, pbit);
 #endif
 }
 
@@ -13044,15 +13046,16 @@ lcmp2:		dec		eax
 lcmpx:
 	}
 #else
-	double double1 = **(double **)arg1, double2 = **(double **)arg2;
+	//Correct
+	float local1 = **(float **)arg1, local2 = **(float **)arg2;
 	
-	if (double1 == double2)
-		return 0;
+	if (local1 < local2)
+		return -1;
 
-	if (double2 < double1)
+	if (local1 > local2)
 		return 1;
 
-	return -1;
+	return 0;
 #endif
 }
 
@@ -13152,10 +13155,11 @@ unsigned lenref(float* pflt){
 lrefx:
 	}
 #else
+	//Correct
 	unsigned eax = (unsigned) pflt - (unsigned) clpsegs;
 
-	unsigned edx = eax / 29;
-	eax %= 29;
+	unsigned edx = eax % 29;
+	eax /= 29;
 
 	eax <<= 1;
 
@@ -13665,7 +13669,8 @@ void clpcon(){
 
 //	clipnts=(CLIPNT*)&stchs[MAXSEQ];
 	clipnts=(CLIPNT*)&bseq;
-	vclpx=(VCLPX*)&opnt;
+	//This is no longer required as vclpx is now defined as an array
+	//vclpx=(VCLPX*)opnts;
 	segxs=0;
 	for(ind=0;ind<sids;ind++){
 
