@@ -3709,7 +3709,7 @@ void bal2thr(unsigned dst,unsigned src,unsigned cod){
 
 unsigned colmatch(COLORREF col){
 
-	unsigned ind,dis,mindis,pdis;
+	unsigned ind,dis,mindis,pdis=0;
 
 	if(colCnt<16){
 
@@ -12427,7 +12427,7 @@ void insfil(){
 	FLPNT		tsiz;
 	POINT		tpnt;
 	PCSTCH*		tbuf;
-	double		homscor;
+	double		homscor=0;
 	double		filscor;
 	unsigned	vervar;
 	FRMHEDO*	frmlstx;
@@ -12690,7 +12690,7 @@ void gotbox(){
 void rngal(){
 
 	unsigned	ind,ine,in;
-	unsigned	pmax,maxlen,len;
+	unsigned	pmax=0,maxlen,len;
 	RANG*		prng;
 
 	if(!rstMap(WASFPNT)){
@@ -15063,7 +15063,7 @@ unsigned trsum(){
 
 void trdif(){
 
-	unsigned	ind,ine,inf,bpnt,rsum,rmax,rmin;
+	unsigned	ind,ine,inf,bpnt=0,rsum,rmax,rmin;
 	double		rat;
 
 	if(!*bnam){
@@ -23403,6 +23403,8 @@ void ritbak(TCHAR* nam,DRAWITEMSTRUCT* ds){
 		OPEN_EXISTING,0,0);
 	siz.x=ds->rcItem.right-ds->rcItem.left;
 	siz.y=ds->rcItem.bottom-ds->rcItem.top;
+	rsiz.x = rsiz.y = 1;
+
 	if(thfil!=INVALID_HANDLE_VALUE){
 
 		ReadFile(thfil,(STRHED*)&sthed,sizeof(STRHED),&red,NULL);

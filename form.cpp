@@ -757,7 +757,7 @@ unsigned findclp(unsigned fpnt){
 
 	int ind;
 
-	for(ind=clofind-1;ind>=0;ind--){
+	for(ind=fpnt-1;ind>=0;ind--){
 
 		if(iseclp(ind))
 			return formlst[ind].clp-clps+formlst[ind].nclp;
@@ -966,24 +966,24 @@ void delsac(unsigned fpnt){
 
 	if(satkad){
 
-		if(formlst[clofind].typ==SAT&&formlst[clofind].stpt){
+		if(formlst[fpnt].typ==SAT&&formlst[fpnt].stpt){
 
-			dst=satind(formlst[clofind].sacang.sac);
-			src=dst+formlst[clofind].stpt;
+			dst=satind(formlst[fpnt].sacang.sac);
+			src=dst+formlst[fpnt].stpt;
 			while(src<satkad){
 
 				satks[dst].strt=satks[src].strt;
 				satks[dst++].fin=satks[src++].fin;
 			}
-			for(ind=clofind+1;ind<formpnt;ind++){
+			for(ind=fpnt+1;ind<formpnt;ind++){
 
 				if(formlst[ind].typ==SAT&&formlst[ind].stpt)
-					formlst[ind].sacang.sac-=formlst[clofind].stpt;
+					formlst[ind].sacang.sac-=formlst[fpnt].stpt;
 			}
-			satkad-=formlst[clofind].stpt;
+			satkad-=formlst[fpnt].stpt;
 		}
 	}
-	formlst[clofind].stpt=0;
+	formlst[fpnt].stpt=0;
 }
 
 void delflt(unsigned fpnt){
@@ -991,18 +991,18 @@ void delflt(unsigned fpnt){
 	unsigned	ind;
 	unsigned	src,dst;
 
-	if(formlst[clofind].sids){
+	if(formlst[fpnt].sids){
 
-		dst=fltind(formlst[clofind].flt);
-		src=dst+formlst[clofind].sids;
+		dst=fltind(formlst[fpnt].flt);
+		src=dst+formlst[fpnt].sids;
 		while(src<fltad){
 
 			flts[dst].x=flts[src].x;
 			flts[dst++].y=flts[src++].y;
 		}
-		for(ind=clofind+1;ind<formpnt;ind++)
-			formlst[ind].flt-=formlst[clofind].sids;
-		fltad-=formlst[clofind].sids;
+		for(ind=fpnt+1;ind<formpnt;ind++)
+			formlst[ind].flt-=formlst[fpnt].sids;
+		fltad-=formlst[fpnt].sids;
 		if(fltad&0x8000000)
 			fltad=0;
 	}
@@ -1087,7 +1087,7 @@ void fsizpar(){
 
 void chkcont(){
 
-	unsigned ind,ine,len,minlen=10000;
+	unsigned ind,ine=0,len,minlen=10000;
 
 	delmclp(clofind);
 	deleclp(clofind);
@@ -1775,6 +1775,7 @@ void setzig(){
 }
 
 BOOL CALLBACK tearprc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
+	UNREFERENCED_PARAMETER(lparam);
 
 	TCHAR		buf[HBUFSIZ];
 
@@ -2151,7 +2152,7 @@ BOOL ritlin(FLPNT strt,FLPNT fin)
 
 BOOL minrng(unsigned strt,unsigned fin)
 {
-	if(((fin > strt) ? (fin - strt) : (strt - fin))<sids>>1||frmpnt->typ==LIN)
+	if (((fin > strt) ? (fin - strt) : (strt - fin)) < sids >> 1 || frmpnt->typ == LIN)
 		return 0;
 	else
 		return 1;
@@ -2160,7 +2161,7 @@ BOOL minrng(unsigned strt,unsigned fin)
 unsigned closflt(float px,float py)
 {
 	double		len,minlen;
-	unsigned	ind,ine;
+	unsigned	ind,ine=0;
 
 	minlen=1e99;
 	for(ind=0;ind<sids;ind++)
@@ -2710,7 +2711,7 @@ void bold(double siz){
 	unsigned short	nlin,tlin;
 	double			len;
 
-	tlin=getlast();
+	nlin = tlin=getlast();
 	seqpnt=0;
 	oseq[seqpnt].x=flt[tlin].x;
 	oseq[seqpnt++].y=flt[tlin].y;
@@ -3075,9 +3076,9 @@ unsigned proj(DUBPNT pnt,double slop,FLPNT pnt0,FLPNT pnt1,DUBPNT* ipnt){
 	double	slopl,con,conl,xmin,xmax,ymin,ymax,tdub;
 
 	difl.x=pnt1.x-pnt0.x;
+	difl.y = pnt1.y - pnt0.y;
 	if(difl.x){
 
-		difl.y=pnt1.y-pnt0.y;
 		slopl=difl.y/difl.x;
 		conl=pnt0.y-slopl*pnt0.x;
 		con=pnt.y-slop*pnt.x;
@@ -3595,7 +3596,7 @@ void duseq(unsigned strt,unsigned fin){
 
 void brkseq(unsigned strt,unsigned fin){
 
-	SMALPNTL*	lin=0;
+	//SMALPNTL*	lin=0;
 	unsigned	ind,bgrp=0;
 
 	rstMap(SEQDUN);
@@ -3663,7 +3664,7 @@ void brkdun(unsigned strt,unsigned fin){
 
 void durgn(unsigned pthi){
 
-	unsigned	dun,gdif,mindif,ind,fdif,bdif;
+	unsigned	dun,gdif,mindif=0,ind,fdif,bdif;
 	unsigned	seql,seqn;
 	unsigned	seqs,seqe;
 	unsigned	grpn,grps,grpe;
@@ -4382,7 +4383,7 @@ void bakseq(){
 	DUBPNT		dif,pnt,stp;
 	double		len,rslop;
 	double		usesiz2=usesiz*2;
-	double		usesizh=usesiz/2;
+	//double		usesizh=usesiz/2;
 	double		usesiz9=usesiz/9;
 	double		stspac2=stspace*2;
 
@@ -6457,6 +6458,8 @@ void bdrlin(unsigned strt,unsigned fin,double siz){
 	unsigned	cnt;
 
 	//_asm finit;
+	stp.x = 0;
+	stp.y = 0;
 	dif.x=flt[fin].x-flt[strt].x;
 	dif.y=flt[fin].y-flt[strt].y;
 	len=hypot(dif.x,dif.y);
@@ -7527,6 +7530,7 @@ void nxtlin(){
 }
 
 BOOL CALLBACK chenum(HWND hwnd,LPARAM lParam){
+	UNREFERENCED_PARAMETER(lParam);
 
 	return DestroyWindow(hwnd);
 }
@@ -9751,7 +9755,7 @@ void plfn(double spac,VRCT2* prct){
 	duromb(prct[sids-2].bipnt,prct[sids-2].dipnt,prct[sids-2].bopnt,prct[sids-2].dopnt);
 }*/
 
-void plfn(double spac,VRCT2* prct){
+void plfn(VRCT2* prct){
 
 	unsigned	ind;
 
@@ -9856,10 +9860,11 @@ void prebrd()
 void plbrd(double spac){
 
 	double			tspac;
-	unsigned short	slin=getlast();
+	unsigned short	slin;
 	unsigned bpnt;
 	unsigned ind;
 
+	slin = getlast(); 
 	prebrd();
 	tspac=stspace;
 	pvrct=(VRCT2*)bseq;
@@ -9896,13 +9901,13 @@ void plbrd(double spac){
 		plen=frmpnt->esiz*URAT;
 		setMap(UNDPHAS);
 		rstMap(FILDIR);
-		plfn(USPAC,&uvrct[0]);
+		plfn(&uvrct[0]);
 		bpnt=seqpnt;
 		rstMap(UNDPHAS);
 		sPnt.x=flt[0].x;
 		sPnt.y=flt[0].y;
 		setMap(FILDIR);
-		plfn(USPAC,&uvrct[0]);
+		plfn(&uvrct[0]);
 		plbak(bpnt);
 		prsmal();
 		sPnt.x=oseq[seqpnt-1].x;
@@ -9910,7 +9915,7 @@ void plbrd(double spac){
 	}
 	rstMap(UND);
 	stspace=frmpnt->espac;
-	plfn(stspace,&pvrct[0]);
+	plfn(&pvrct[0]);
 	stspace=spac;
 	fvars(clofind);
 }
@@ -11816,6 +11821,11 @@ void contf(){
 	loflts=(FLPNT*)&pols[selins];
 
 	lolen=loind=0;
+	lostp.x = lostp.y = 0;
+	lopnt.x = lopnt.y = 0;
+	histp.x = histp.y = 0;
+	hipnt.x = hipnt.y = 0;
+
 	for(ind=lolins;ind;ind--){
 
 		loflts[loind].x=flt[ind].x;
@@ -12176,7 +12186,7 @@ void bakdup(){
 	dupfn();
 }
 
-void shrnks(unsigned find){
+void shrnks(){
 
 	unsigned	ind,ine,cnt;
 	DUBPNT		dif;
@@ -12218,7 +12228,7 @@ void shrnk(){
 	fvars(clofind);
 	if(chkMap(FORMSEL)&&frmpnt->etyp==EGCLP){
 
-		shrnks(clofind);
+		shrnks();
 		coltab();
 		setMap(RESTCH);
 	}
@@ -13565,6 +13575,9 @@ void inspnt()
 	xpnt++;
 }
 
+//pragma to disable ptx unintialized warning
+#pragma warning(push)
+#pragma warning(disable : 4701 4703)
 void clpcon(){
 
 	RECT		nrct;
@@ -13774,6 +13787,7 @@ void clpcon(){
 					vpnt1.x=ploc.x+clpnu[inf].x;
 					vpnt1.y=ploc.y+clpnu[inf].y;
 				}
+
 				clipnts[xpnt].x=vpnt0.x;
 				clipnts[xpnt].y=vpnt0.y;
 				if(isin(vpnt0.x,vpnt0.y))
@@ -13970,6 +13984,7 @@ clp1skp:;
 #endif
 	}
 }
+#pragma warning(pop)
 
 void vrtsclp(){
 
@@ -14586,9 +14601,9 @@ void fxlen(){
 	xpnt=2;
 	return;
 fxlab:;
-	adjspac=frmpnt->espac;
+	adjspac=minspac=frmpnt->espac;
 	spac2=adjspac/2;
-	ter=1e9;
+	ter=minter=1e9;
 	lupcnt=inicnt=0;
 	loval=0;
 	hival=1;
@@ -15080,6 +15095,7 @@ void filclpx(){
 }
 
 BOOL CALLBACK wavprc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
+	UNREFERENCED_PARAMETER(lparam);
 
 	TCHAR	buf[HBUFSIZ];
 

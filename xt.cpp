@@ -1778,7 +1778,7 @@ void dasyfrm(){
 	double		dangp;
 	double		pangp;
 	unsigned	bcnt,ind,ine,inf,dtyp,dcnt,cnt2,fref,pcnt;
-	double		dlen;
+	double		dlen=0;
 	double		len;
 	double		elen;
 	double		ilen;
@@ -1816,7 +1816,7 @@ void dasyfrm(){
 	elen*=drat;
 	ilen*=drat;
 	frmpnt->typ=POLI;
-	inf=0;
+	inf=fref=0;
 	if(chku(DAZHOL))
 	{
 		pang=PI2;
@@ -2198,7 +2198,7 @@ BOOL srtchk(OREC** pfrec,unsigned cnt,unsigned* badfrm)
 
 void fsort()
 {
-	unsigned		ind,ine,pind,at,cfrm,rind,mind,mindir;
+	unsigned		ind,ine,pind,at,cfrm,rind,mind=0,mindir=0;
 	unsigned		typcnt,jmps,minjmps;
 	OREC*			recs;
 	RANG*			prngs;
