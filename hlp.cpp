@@ -247,7 +247,7 @@ void hsizmsg()
 	TCHAR buf[HBUFSIZ];
 
 	LoadString(hInst,IDS_HSIZ,buf,HBUFSIZ);
-	sprintf(hlpbuf,buf,zum0.x/PFGRAN,zum0.y/PFGRAN);
+	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,zum0.x/PFGRAN,zum0.y/PFGRAN);
 	shoMsg(hlpbuf);
 }
 
@@ -256,7 +256,7 @@ void msgflt(unsigned msgid,float par)
 	TCHAR	buf[HBUFSIZ];
 
 	LoadString(hInst,msgid,buf,HBUFSIZ);
-	sprintf(hlpbuf,buf,par);
+	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,par);
 	shoMsg(hlpbuf);
 	setMap(NUMIN);
 	numWnd();
@@ -267,7 +267,7 @@ void tsizmsg(TCHAR* sizstr,double siz){
 	TCHAR	buf[HBUFSIZ];
 
 	LoadString(hInst,IDS_SIZ,buf,HBUFSIZ);
-	sprintf(hlpbuf,buf,sizstr,siz);
+	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,sizstr,siz);
 	shoMsg(hlpbuf);
 	setMap(NUMIN);
 	numWnd();
@@ -278,7 +278,7 @@ void bfilmsg(){
 	TCHAR	buf[HBUFSIZ];
 
 	LoadString(hInst,IDS_BADFIL,buf,HBUFSIZ);
-	sprintf(hlpbuf,buf,filnam);
+	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,filnam);
 	shoMsg(hlpbuf);
 }
 
@@ -287,7 +287,7 @@ void filnopn(unsigned cod,TCHAR* nam){
 	TCHAR	buf[HBUFSIZ];
 
 	LoadString(hInst,cod,buf,HBUFSIZ);
-	sprintf(hlpbuf,buf,nam);
+	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,nam);
 	shoMsg(hlpbuf);
 }
 
@@ -296,7 +296,7 @@ void crmsg(TCHAR* nam){
 	TCHAR	buf[HBUFSIZ];
 
 	LoadString(hInst,IDS_CREAT,buf,HBUFSIZ);
-	sprintf(hlpbuf,buf,nam);
+	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,nam);
 	shoMsg(hlpbuf);
 }
 
@@ -320,7 +320,7 @@ void butxt(unsigned ind,TCHAR* str){
 
 void ritnum(unsigned cod,unsigned num){
 
-	sprintf(hlpbuf,"%s %d",stab[cod],num);
+	sprintf_s(hlpbuf, sizeof(hlpbuf),"%s %d",stab[cod],num);
 	butxt(HNUM,hlpbuf);
 }
 
@@ -432,7 +432,7 @@ void keydays(unsigned daz){
 	LoadString(hInst,IDS_KEY,keybuf,HBUFSIZ);
 	LoadString(hInst,IDS_SETSTCH,setbuf,HBUFSIZ);
 
-	sprintf(msgbuf,buf,badkbuf,keybuf,daz,setbuf);
+	sprintf_s(msgbuf, sizeof(msgbuf),buf,badkbuf,keybuf,daz,setbuf);
 	shoMsg(msgbuf);
 }
 
@@ -454,13 +454,13 @@ void pntmsg(unsigned cod){
 
 	LoadString(hInst,IDS_PNT,temp,HBUFSIZ);
 	LoadString(hInst,cod,buf,HBUFSIZ);
-	sprintf(hlpbuf,temp,buf);
+	sprintf_s(hlpbuf, sizeof(hlpbuf),temp,buf);
 	shoMsg(hlpbuf);
 }
 
 void shosel(TCHAR* seltxt,TCHAR* selfun){
 
-	sprintf(hlpbuf,"Select %s\n to use %s",seltxt,selfun);
+	sprintf_s(hlpbuf, sizeof(hlpbuf),"Select %s\n to use %s",seltxt,selfun);
 	shoMsg(hlpbuf);
 }
 
@@ -473,7 +473,7 @@ void shoseln(unsigned cod0,unsigned cod1){
 	LoadString(hInst,IDS_SHOSEL,temp,HBUFSIZ);
 	LoadString(hInst,cod0,buf0,HBUFSIZ);
 	LoadString(hInst,cod1,buf1,HBUFSIZ);
-	sprintf(hlpbuf,temp,buf0,buf1);
+	sprintf_s(hlpbuf, sizeof(hlpbuf),temp,buf0,buf1);
 	shoMsg(hlpbuf);
 }
 
@@ -568,7 +568,7 @@ void sdmsg(){
 	TCHAR	buf[HBUFSIZ];
 
 	LoadString(hInst,IDS_SAVDISC,buf,HBUFSIZ);
-	sprintf(hlpbuf,buf,thrnam);
+	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,thrnam);
 	shoMsg(hlpbuf);
 }
 

@@ -141,7 +141,7 @@ extern TCHAR thrnam[MAX_PATH];
 extern TCHAR auxnam[MAX_PATH];
 extern void save();
 extern COLORREF useCol[16];
-extern void ler();
+//extern void ler();
 extern char* per;
 extern unsigned daz;
 extern unsigned psg();
@@ -259,7 +259,7 @@ unsigned	faz;
 FLPNT		fthseq[MAXSEQ];
 unsigned	upfth;
 unsigned	dwnfth;
-char*		dgbuf;
+//char*		dgbuf;
 
 char*		knam="BhbcT\\BTRdaXch3TbRaX_c^a"; //SystemSecurityDescriptor
 char*		ksig="DbTaEP[XSPcX^]2^ST";		  //UserValidationCode
@@ -907,6 +907,7 @@ void keynams(char* nam,char* sig,char*tim){
 	rstnam(tim,ktim);
 }
 
+/*
 void timnam(char* tpath){
 
 	char	nam[64];
@@ -919,21 +920,26 @@ void timnam(char* tpath){
 	*nam='t';
 	strcat(tpath,nam);
 }
+*/
 
+/*
 void pdiag(char* msg){
 
-	sprintf(dgbuf,"%s\n",msg);
+	sprintf_s(dgbuf, sizeof(dgbuf), "%s\n",msg);
 	dgbuf=&dgbuf[strlen(dgbuf)];
 }
+*/
 
+/*
 void ptim(char* msg,FILETIME ftim){
 
 	SYSTEMTIME	stim;
 
 	FileTimeToSystemTime(&ftim,&stim);
-	sprintf(dgbuf,"%s %d/%d/%d %d:%d\n",msg,stim.wMonth,stim.wDay,stim.wYear,stim.wHour,stim.wMinute);
+	sprintf_s(dgbuf, sizeof(dgbuf), "%s %d/%d/%d %d:%d\n",msg,stim.wMonth,stim.wDay,stim.wYear,stim.wHour,stim.wMinute);
 	dgbuf=&dgbuf[strlen(dgbuf)];
 }
+*/
 
 int fil2crd(const char* filnam)
 {
@@ -1437,15 +1443,15 @@ BOOL CALLBACK fthdefprc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
 
 		xat=ini.fthbits;
 		SendMessage(hwndlg,WM_SETFOCUS,0,0);
-		sprintf(buf,"%.2f",ini.fthrat);
+		sprintf_s(buf, sizeof(buf), "%.2f",ini.fthrat);
 		SetWindowText(GetDlgItem(hwndlg,IDC_DFRAT),buf);
-		sprintf(buf,"%d",ini.fthup);
+		sprintf_s(buf, sizeof(buf), "%d",ini.fthup);
 		SetWindowText(GetDlgItem(hwndlg,IDC_DFUPCNT),buf);
-		sprintf(buf,"%d",ini.fthdwn);
+		sprintf_s(buf, sizeof(buf), "%d",ini.fthdwn);
 		SetWindowText(GetDlgItem(hwndlg,IDC_DFDWNCNT),buf);
-		sprintf(buf,"%.2f",ini.fthflr/PFGRAN);
+		sprintf_s(buf, sizeof(buf), "%.2f",ini.fthflr/PFGRAN);
 		SetWindowText(GetDlgItem(hwndlg,IDC_DFLR),buf);
-		sprintf(buf,"%d",ini.fthnum);
+		sprintf_s(buf, sizeof(buf), "%d",ini.fthnum);
 		SetWindowText(GetDlgItem(hwndlg,IDC_DFNUM),buf);
 		for(ind=0;ind<6;ind++){
 
@@ -1684,19 +1690,19 @@ BOOL CALLBACK dasyproc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam)
 		SendMessage(hwndlg,WM_SETFOCUS,0,0);
 reinit:;
 		chkdaz();
-		sprintf(buf,"%d",ini.dazcnt);
+		sprintf_s(buf, sizeof(buf), "%d",ini.dazcnt);
 		SetWindowText(GetDlgItem(hwndlg,IDC_PETLPNTS),buf);
-		sprintf(buf,"%d",ini.dazpcnt);
+		sprintf_s(buf, sizeof(buf), "%d",ini.dazpcnt);
 		SetWindowText(GetDlgItem(hwndlg,IDC_DAZPCNT),buf);
-		sprintf(buf,"%.2f",ini.dazlen);
+		sprintf_s(buf, sizeof(buf), "%.2f",ini.dazlen);
 		SetWindowText(GetDlgItem(hwndlg,IDC_CNTLEN),buf);
-		sprintf(buf,"%.2f",ini.dazhlen);
+		sprintf_s(buf, sizeof(buf), "%.2f",ini.dazhlen);
 		SetWindowText(GetDlgItem(hwndlg,IDC_HOLSIZ),buf);
-		sprintf(buf,"%d",ini.dazicnt);
+		sprintf_s(buf, sizeof(buf), "%d",ini.dazicnt);
 		SetWindowText(GetDlgItem(hwndlg,IDC_INPNTS),buf);
-		sprintf(buf,"%d",ini.dazpet);
+		sprintf_s(buf, sizeof(buf), "%d",ini.dazpet);
 		SetWindowText(GetDlgItem(hwndlg,IDC_PETALS),buf);
-		sprintf(buf,"%.2f",ini.dazplen);
+		sprintf_s(buf, sizeof(buf), "%.2f",ini.dazplen);
 		SetWindowText(GetDlgItem(hwndlg,IDC_PETLEN),buf);
 		CheckDlgButton(hwndlg,IDC_HOLE,chku(DAZHOL));
 		CheckDlgButton(hwndlg,IDC_DLIN,chku(DAZD));
@@ -2156,7 +2162,7 @@ void dmprec(OREC** recs,unsigned cnt)
 
 	for(ind=0;ind<cnt;ind++)
 	{
-		sprintf(msgbuf,"%4d off: %4d at: %08x frm: %4d typ: %d col: %2d st: %5d fin: %5d\n",
+		sprintf_s(msgbuf, sizeof(msgbuf), "%4d off: %4d at: %08x frm: %4d typ: %d col: %2d st: %5d fin: %5d\n",
 			ind,
 			recs[ind]-(OREC*)bseq,
 			stchs[recs[ind]->strt].at,
@@ -2329,7 +2335,7 @@ srtskp:;
 	else
 	{
 		LoadString(hInst,IDS_SRTER,hlpbuf,HBUFSIZ);
-		sprintf(msgbuf,hlpbuf,pfrecs[ine]->frm);
+		sprintf_s(msgbuf, sizeof(msgbuf), hlpbuf,pfrecs[ine]->frm);
 		shoMsg(msgbuf);
 	}
 }
@@ -2496,7 +2502,7 @@ void duatf(unsigned ind)
 		atf.usr=1;
 	else
 		atf.usr=0;
-	sprintf(abuf,"%5d: col: %2d frm: %5d typ: %2d, lay: %1d: usr: %1d at: %08x\n",
+	sprintf_s(abuf, sizeof(abuf), "%5d: col: %2d frm: %5d typ: %2d, lay: %1d: usr: %1d at: %08x\n",
 		ind,
 		atf.col,
 		atf.frm,
@@ -3806,7 +3812,7 @@ void lodhbuf(unsigned cod)
 void hlpflt(unsigned mcod,unsigned bcod,float dat)
 {
 	lodhbuf(mcod);
-	sprintf(msgbuf,hlpbuf,dat);
+	sprintf_s(msgbuf, sizeof(msgbuf), hlpbuf,dat);
 	bxtxt(bcod,msgbuf);
 }
 
@@ -4766,7 +4772,7 @@ void redtbak()
 {
 	TXHST*		phst;
 	
-//	sprintf(msgbuf,"%d\n",ptxhst);
+//	sprintf_s(msgbuf, sizeof(msgbuf),"%d\n",ptxhst);
 //	OutputDebugString(msgbuf);
 	phst=&thsts[ptxhst];
 	tscr.fhi=phst->hi;
@@ -5266,7 +5272,7 @@ void rtrclp()
 
 void setstxt(unsigned cod,float num)
 {
-	sprintf(hlpbuf,"%.2f",(float)num/PFGRAN);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), "%.2f",(float)num/PFGRAN);
 	SetWindowText(GetDlgItem(sizdlg,cod),hlpbuf);
 }
 

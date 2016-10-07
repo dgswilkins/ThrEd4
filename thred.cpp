@@ -185,7 +185,7 @@ extern void setulen();
 extern void setwlkind();
 extern void dubit(unsigned bit);
 extern void abstim();
-extern char* dgbuf;
+//extern char* dgbuf;
 extern void pes2crd();
 extern void fritfil();
 extern void tst();
@@ -2142,7 +2142,7 @@ BOOL CALLBACK dnamproc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam)
 			hwnd=GetDlgItem(hwndlg,IDC_DESED);
 			GetWindowText(hwnd,ini.desnam,50);
 			EndDialog(hwndlg,0);
-			sprintf(msgbuf,stab[STR_THRED],ini.desnam);
+			sprintf_s(msgbuf,sizeof(msgbuf),stab[STR_THRED],ini.desnam);
 			SetWindowText(hWnd,msgbuf);
 			return TRUE;
 		}
@@ -2155,10 +2155,12 @@ void getdes()
  	DialogBox(hInst,MAKEINTRESOURCE(IDD_DESNAM),hWnd,(DLGPROC)dnamproc);
 }
 
+/*
 void ler(){
 
 	per=strerror(GetLastError());
 }
+*/
 
 BOOL isclp(unsigned find){
 
@@ -2491,7 +2493,7 @@ double unthrsh(unsigned lev){
 
 void ritfcor(FLPNT* pnt){
 
-	sprintf(msgbuf,"x%.0f y%.0f",pnt->x/PFGRAN,pnt->y/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf), "x%.0f y%.0f",pnt->x/PFGRAN,pnt->y/PFGRAN);
 	butxt(HCOR,msgbuf);
 }
 
@@ -2773,7 +2775,7 @@ void nunams(){
 
 	case AUXDST:
 
-		strcpy(pext,"dst");
+		strcpy_s(pext,sizeof(auxnam)-ind,"dst");
 		break;
 
 #if PESACT
@@ -2787,21 +2789,21 @@ void nunams(){
 
 	default:
 
-		strcpy(pext,"pcs");
+		strcpy_s(pext, sizeof(auxnam) - ind,"pcs");
 	}
 	pext=thrnam+ind;
-	strcpy(pext,"thr");
+	strcpy_s(pext, sizeof(thrnam) - ind,"thr");
 	pext=genam+ind;
-	strcpy(pext,"th*");
+	strcpy_s(pext, sizeof(genam) - ind,"th*");
 	for(ind=0;ind<OLDNUM;ind++){
 
 		if(!strcmp(ini.oldnams[ind],thrnam)){
 
 			if(ind){
 
-				strcpy(tnam,ini.oldnams[0]);
-				strcpy(ini.oldnams[0],ini.oldnams[ind]);
-				strcpy(ini.oldnams[ind],tnam);
+				strcpy_s(tnam,sizeof(tnam),ini.oldnams[0]);
+				strcpy_s(ini.oldnams[0],sizeof(ini.oldnams[0]),ini.oldnams[ind]);
+				strcpy_s(ini.oldnams[ind],sizeof(ini.oldnams[ind]),tnam);
 				goto mendun;
 			}
 			else
@@ -3081,9 +3083,9 @@ void lenfn(unsigned strt,unsigned fin){
 			minpnt=ind;
 		}
 	}
-	sprintf(buf,"max %.2f",maxlen/PFGRAN);
+	sprintf_s(buf, sizeof(buf), "max %.2f",maxlen/PFGRAN);
 	butxt(HMAXLEN,buf);
-	sprintf(buf,"min %.2f",minlen/PFGRAN);
+	sprintf_s(buf, sizeof(buf), "min %.2f",minlen/PFGRAN);
 	butxt(HMINLEN,buf);
 }
 
@@ -3116,12 +3118,12 @@ void frmcalc(){
 		}
 		if(fabs(maxlen<10000)){
 		
-			sprintf(msgbuf,"max %.2f",maxlen/PFGRAN);
+			sprintf_s(msgbuf, sizeof(msgbuf), "max %.2f",maxlen/PFGRAN);
 			butxt(HMAXLEN,msgbuf);
 		}
 		if(fabs(minlen<10000)){
 
-			sprintf(msgbuf,"min %.2f",minlen/PFGRAN);
+			sprintf_s(msgbuf, sizeof(msgbuf), "min %.2f",minlen/PFGRAN);
 			butxt(HMINLEN,msgbuf);
 		}
 	}
@@ -3136,7 +3138,7 @@ void lenCalc(){
 
 	if(chkMap(LENSRCH)){
 
-		sprintf(msgbuf,"%.2f",hypot(stchs[cloInd+1].x-stchs[cloInd].x,stchs[cloInd+1].y-stchs[cloInd].y)/PFGRAN);
+		sprintf_s(msgbuf, sizeof(msgbuf), "%.2f",hypot(stchs[cloInd+1].x-stchs[cloInd].x,stchs[cloInd+1].y-stchs[cloInd].y)/PFGRAN);
 		butxt(HMINLEN,msgbuf);
 		msgstr(IDS_SRCH);
 		butxt(HMAXLEN,msgbuf);
@@ -3269,7 +3271,7 @@ void ritot(unsigned num){
 
 	TCHAR buf[64];
 
-	sprintf(buf,stab[STR_TOT],num);
+	sprintf_s(buf, sizeof(buf), stab[STR_TOT],num);
 	stchdigs=strlen(buf);
 	butxt(HTOT,buf);
 }
@@ -3291,7 +3293,7 @@ void ritlayr(){
 		butxt(HLAYR,"");
 	else{
 
-		sprintf(buf,stab[STR_LAYR],layr);
+		sprintf_s(buf, sizeof(buf), stab[STR_LAYR],layr);
 		stchdigs=strlen(buf);
 		butxt(HLAYR,buf);
 	}
@@ -3892,7 +3894,7 @@ void savmsg(){
 	TCHAR	buf[HBUFSIZ];
 
 	LoadString(hInst,IDS_SAVFIL,buf,HBUFSIZ);
-	sprintf(msgbuf,buf,thrnam);
+	sprintf_s(msgbuf, sizeof(msgbuf), buf,thrnam);
 }
 
 void reldun()
@@ -4597,7 +4599,7 @@ void chknum(){
 				case PEG:
 
 					ini.egrat=tdub;
-					sprintf(msgbuf,"%.2f",tdub);
+					sprintf_s(msgbuf, sizeof(msgbuf), "%.2f",tdub);
 					SetWindowText(thDat[PEG],msgbuf);
 					break;
 
@@ -4605,42 +4607,42 @@ void chknum(){
 
 					ini.nudg=tdub;
 					ini.nudgpix=pxchk(tdub);
-					sprintf(msgbuf,"%.2f",tdub);
+					sprintf_s(msgbuf, sizeof(msgbuf), "%.2f",tdub);
 					SetWindowText(thDat[PNUDG],msgbuf);
 					break;
 
 				case PPIC:
 
 					picspac=tdub*PFGRAN;
-					sprintf(msgbuf,"%.2f",tdub);
+					sprintf_s(msgbuf, sizeof(msgbuf), "%.2f",tdub);
 					SetWindowText(thDat[PPIC],msgbuf);
 					break;
 
 				case PCLPOF:
 
 					ini.clpof=tdub*PFGRAN;
-					sprintf(msgbuf,"%.2f mm",tdub);
+					sprintf_s(msgbuf, sizeof(msgbuf), "%.2f mm",tdub);
 					SetWindowText(thDat[PCLPOF],msgbuf);
 					break;
 
 				case PFAZ:
 
 					ini.faz=floor(tdub);
-					sprintf(msgbuf,"%d",ini.faz);
+					sprintf_s(msgbuf, sizeof(msgbuf), "%d",ini.faz);
 					SetWindowText(thDat[PFAZ],msgbuf);
 					break;
 
 				case PCHRAT:
 
 					ini.chrat=tdub;
-					sprintf(msgbuf,"%.2f",ini.chrat);
+					sprintf_s(msgbuf, sizeof(msgbuf), "%.2f",ini.chrat);
 					SetWindowText(thDat[PCHRAT],msgbuf);
 					break;
 
 				case PMIN:
 
 					minsiz=tdub*PFGRAN;
-					sprintf(msgbuf,"%.2f",tdub);
+					sprintf_s(msgbuf, sizeof(msgbuf), "%.2f",tdub);
 					SetWindowText(thDat[PMIN],msgbuf);
 					break;
 
@@ -4648,7 +4650,7 @@ void chknum(){
 
 					if(tdub){
 
-						sprintf(msgbuf,"%.2f",tdub);
+						sprintf_s(msgbuf, sizeof(msgbuf), "%.2f",tdub);
 						switch(prfind-1){
 
 						case PSPAC:
@@ -4691,7 +4693,7 @@ void chknum(){
 						case PAP:
 
 							apcol=(unsigned)(tdub-1)%16;
-							sprintf(msgbuf,"%d",apcol+1);
+							sprintf_s(msgbuf, sizeof(msgbuf), "%d",apcol+1);
 							SetWindowText(thDat[PAP],msgbuf);
 							break;
 
@@ -4708,7 +4710,7 @@ void chknum(){
 								starat=1;
 							if(starat<0.05)
 								starat=0.05;
-							sprintf(msgbuf,"%.2f",starat);
+							sprintf_s(msgbuf, sizeof(msgbuf), "%.2f",starat);
 							SetWindowText(thDat[PSTAR],msgbuf);
 							break;
 
@@ -4719,21 +4721,21 @@ void chknum(){
 								starat=20.;
 							if(starat<0.3)
 								starat=0.3;
-							sprintf(msgbuf,"%.2f",spirwrap);
+							sprintf_s(msgbuf, sizeof(msgbuf), "%.2f",spirwrap);
 							SetWindowText(thDat[PSPIR],msgbuf);
 							break;
 
 						case PBUT:
 
 							bfclen=tdub*PFGRAN;
-							sprintf(msgbuf,"%.2f",tdub);
+							sprintf_s(msgbuf, sizeof(msgbuf), "%.2f",tdub);
 							SetWindowText(thDat[PBUT],msgbuf);
 							break;
 
 						case PHUPX:
 
 							ini.hupx=tdub*PFGRAN;
-							sprintf(msgbuf,"%.0f mm",tdub);
+							sprintf_s(msgbuf, sizeof(msgbuf), "%.0f mm",tdub);
 							SetWindowText(thDat[PHUPX],msgbuf);
 							sethup();
 							prfmsg();
@@ -4743,7 +4745,7 @@ void chknum(){
 						case PHUPY:
 
 							ini.hupy=tdub*PFGRAN;
-							sprintf(msgbuf,"%.0f mm",tdub);
+							sprintf_s(msgbuf, sizeof(msgbuf), "%.0f mm",tdub);
 							SetWindowText(thDat[PHUPY],msgbuf);
 							sethup();
 							prfmsg();
@@ -4753,14 +4755,14 @@ void chknum(){
 						case PGRD:
 
 							ini.grdsiz=tdub*PFGRAN;
-							sprintf(msgbuf,"%.2f mm",tdub);
+							sprintf_s(msgbuf, sizeof(msgbuf), "%.2f mm",tdub);
 							SetWindowText(thDat[PGRD],msgbuf);
 							break;
 
 						case PCHN:
 
 							ini.chspac=tdub*PFGRAN;
-							sprintf(msgbuf,"%.2f",tdub);
+							sprintf_s(msgbuf, sizeof(msgbuf), "%.2f",tdub);
 							SetWindowText(thDat[PCHN],msgbuf);
 							break;
 						}
@@ -5359,7 +5361,7 @@ void bfil(){
 	hBmp=CreateFile(lbnam,GENERIC_READ,0,0,OPEN_EXISTING,0,0);
 	if(hBmp==INVALID_HANDLE_VALUE){
 
-		sprintf(msgbuf,"Couldn't open bitmap file: %s\n",lbnam);
+		sprintf_s(msgbuf, sizeof(msgbuf), "Couldn't open bitmap file: %s\n",lbnam);
 		shoMsg(msgbuf);
 		CloseHandle(hBmp);
 		hBmp=0;
@@ -5376,7 +5378,7 @@ void bfil(){
 	}
 	else{
 
-		sprintf(msgbuf,"%s is not a Windows Bitmap\n",lbnam);
+		sprintf_s(msgbuf, sizeof(msgbuf), "%s is not a Windows Bitmap\n",lbnam);
 		CloseHandle(hBmp);
 		hBmp=0;
 		*bnam=0;
@@ -5619,7 +5621,7 @@ void auxmen(){
 
 	case AUXDST:
 
-		sprintf(msgbuf,stab[STR_AUXTXT],"DST");
+		sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_AUXTXT],"DST");
 		CheckMenuItem(hMen,ID_AUXDST,MF_CHECKED);
 		CheckMenuItem(hMen,ID_AUXPCS,MF_UNCHECKED);
 		break;
@@ -5628,7 +5630,7 @@ void auxmen(){
 
 		CheckMenuItem(hMen,ID_AUXDST,MF_UNCHECKED);
 		CheckMenuItem(hMen,ID_AUXPCS,MF_CHECKED);
-		sprintf(msgbuf,stab[STR_AUXTXT],"PCS");
+		sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_AUXTXT],"PCS");
 	}
 	SetMenuItemInfo(hfileMen,ID_OPNPCD,MF_BYCOMMAND,&filinfo);
 	setMap(DUMEN);
@@ -6136,7 +6138,7 @@ void nuFil(){
 						peschr=(TCHAR*)&bseq;
 						if(strncmp(peshed->led,"#PES00",6)){
 
-							sprintf(msgbuf,"Not a PES file: %s\n",filnam);
+							sprintf_s(msgbuf, sizeof(msgbuf),"Not a PES file: %s\n",filnam);
 							shoMsg(msgbuf);
 							return;
 						}
@@ -6274,7 +6276,7 @@ void nuFil(){
 			auxmen();
 		}
 		lenCalc();
-		sprintf(msgbuf,stab[STR_THRDBY],filnam,fildes);
+		sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY],filnam,fildes);
 		SetWindowText(hWnd,msgbuf);
 		CloseHandle(hFil);
 		setMap(INIT);
@@ -6749,7 +6751,7 @@ BOOL chkattr(TCHAR* nam){
 	attr=GetFileAttributes(nam);
 	if(attr&FILE_ATTRIBUTE_READONLY&&attr!=0xffffffff){
 
-		sprintf(msgbuf,stab[STR_OVRLOK],nam);
+		sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_OVRLOK],nam);
 		ind=MessageBox(hWnd,msgbuf,stab[STR_OVRIT],MB_YESNO);
 		if(ind==IDYES)
 			SetFileAttributes(nam,attr&(0xffffffff^FILE_ATTRIBUTE_READONLY));
@@ -6846,16 +6848,16 @@ void sav(){
 			}
 			dsthed.desc[16]=0xd;
 			strncpy(dsthed.recshed,"ST:",3);
-			sprintf(dsthed.recs,"%7d\r",dstcnt);
+			sprintf_s(dsthed.recs,sizeof(dsthed.recs),"%7d\r",dstcnt);
 			strncpy(dsthed.cohed,"CO:  0",6);
 			strncpy(dsthed.xplushed-1,"\xd+X:",4);
-			sprintf(dsthed.xplus,"%5d\xd",dstmin.x);
+			sprintf_s(dsthed.xplus,sizeof(dsthed.xplus),"%5d\xd",dstmin.x);
 			strncpy(dsthed.xminhed,"-X:",3);
-			sprintf(dsthed.xmin,"%5d\xd",dstplus.x);
+			sprintf_s(dsthed.xmin,sizeof(dsthed.xmin),"%5d\xd",dstplus.x);
 			strncpy(dsthed.yplushed,"+Y:",3);
-			sprintf(dsthed.yplus,"%5d\xd",dstplus.y);
+			sprintf_s(dsthed.yplus,sizeof(dsthed.yplus),"%5d\xd",dstplus.y);
 			strncpy(dsthed.yminhed,"-Y:",3);
-			sprintf(dsthed.ymin,"%5d\xd",dstmin.y);
+			sprintf_s(dsthed.ymin,sizeof(dsthed.ymin),"%5d\xd",dstmin.y);
 			strncpy(dsthed.axhed,"AX:-    0\r",10);
 			strncpy(dsthed.ayhed,"AY:+    0\r",10);
 			strncpy(dsthed.mxhed,"MX:+    0\r",10);
@@ -8130,7 +8132,7 @@ void newFil(){
 		DeleteObject(hBmp);
 		ReleaseDC(hWnd,bitdc);
 	}
-	sprintf(msgbuf,stab[STR_THRED],ini.desnam);
+	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRED],ini.desnam);
 	deldu();
 	SetWindowText(hWnd,msgbuf);
 	strcpy(thrnam,stab[STR_NUFIL]);
@@ -10154,7 +10156,7 @@ void thrsav(){
 		WriteFile(hFil,bseq,bufref(),&wrot,0);
 		if(wrot!=(unsigned long)bufref()){
 
-			sprintf(msgbuf,"File Write Error: %s\n",thrnam);
+			sprintf_s(msgbuf, sizeof(msgbuf), "File Write Error: %s\n",thrnam);
 			shoMsg(msgbuf);
 		}
 		CloseHandle(hFil);
@@ -10270,7 +10272,7 @@ void deltot(){
 	coltab();
 	zumhom();
 	strcpy(fildes,ini.desnam);
-	sprintf(msgbuf,stab[STR_THRDBY],thrnam,fildes);
+	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY],thrnam,fildes);
 	SetWindowText(hWnd,msgbuf);
 }
 
@@ -10570,7 +10572,7 @@ void redclp(){
 
 #if CLPBUG
 
-		sprintf(msgbuf,"ind: 0 x: %6.2f,y: %6.2f\n",clpnu[0].x,clpnu[0].y);
+		sprintf_s(msgbuf, sizeof(msgbuf),"ind: 0 x: %6.2f,y: %6.2f\n",clpnu[0].x,clpnu[0].y);
 		OutputDebugString(msgbuf);
 #endif
 	clprct.left=clprct.right=clpnu[0].x;
@@ -10583,7 +10585,7 @@ void redclp(){
 
 #if CLPBUG
 
-		sprintf(msgbuf,"ind: %d x: %6.2f,y: %6.2f\n",ind,clpnu[ind].x,clpnu[ind].y);
+		sprintf_s(msgbuf, sizeof(msgbuf),"ind: %d x: %6.2f,y: %6.2f\n",ind,clpnu[ind].x,clpnu[ind].y);
 		OutputDebugString(msgbuf);
 #endif
 		if(clpnu[ind].x<clprct.left)
@@ -10791,7 +10793,7 @@ void purg(){
 void purgdir(){
 
 	setMap(PRGMSG);
-	sprintf(msgbuf,"Delete all backups in %s\n",defDir);
+	sprintf_s(msgbuf, sizeof(msgbuf), "Delete all backups in %s\n",defDir);
 	shoMsg(msgbuf);
 	okcan();
 }
@@ -11841,7 +11843,7 @@ void shorter(){
 			ine=ind;
 		}
 	}
-	sprintf(msgbuf,"%.2f",hypot(stchs[ind+1].x-stchs[ind].x,stchs[ind+1].y-stchs[ind].y));
+	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f",hypot(stchs[ind+1].x-stchs[ind].x,stchs[ind+1].y-stchs[ind].y));
 	butxt(HMINLEN,msgbuf);
 short1:;
 	srchpnt=ine;
@@ -12207,7 +12209,7 @@ void thumnail(){
 	shndl=FindFirstFile(srchnam,&fdat);
 	if(shndl==INVALID_HANDLE_VALUE){
 		
-		sprintf(msgbuf,"Can't find %s\n",srchnam);
+		sprintf_s(msgbuf, sizeof(msgbuf), "Can't find %s\n",srchnam);
 		shoMsg(msgbuf);
 		unthum();
 	}
@@ -12580,7 +12582,7 @@ void insfil(){
 							for(ind=0;ind<50;ind++)
 								hedx.crtnam[ind]=thedx.crtnam[ind];
 							redfnam(fildes);
-							sprintf(msgbuf,stab[STR_THRDBY],thrnam,fildes);
+							sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY],thrnam,fildes);
 							SetWindowText(hWnd,msgbuf);
 						}
 					}
@@ -12869,7 +12871,7 @@ void desiz(){
 		}
 #if LANG==ENG||LANG==HNG
 
-		sprintf(pmsg,
+		sprintf_s(pmsg, sizeof(msgbuf),
 			stab[STR_STCHS],
 			hed.stchs,
 			sizx,sizx/25.4,
@@ -12878,7 +12880,7 @@ void desiz(){
 
 #if LANG==GRM
 
-		sprintf(pmsg,
+		sprintf_s(pmsg, sizeof(msgbuf),
 			stab[STR_STCHS],
 			hed.stchs,
 			sizx,
@@ -12893,7 +12895,7 @@ void desiz(){
 		sizy=(trct.top-trct.bottom)/PFGRAN;
 #if LANG==ENG||LANG==HNG
 		
-		sprintf(pmsg,stab[STR_FORMS],
+		sprintf_s(pmsg, sizeof(msgbuf), stab[STR_FORMS],
 			formpnt,
 			sizx,sizx/25.4,
 			sizy,sizy/25.4);
@@ -12901,20 +12903,20 @@ void desiz(){
 
 #if LANG==GRM
 		
-		sprintf(pmsg,stab[STR_FORMS],
+		sprintf_s(pmsg, sizeof(msgbuf), stab[STR_FORMS],
 			formpnt,
 			sizx,
 			sizy);
 #endif
 		pmsg=&pmsg[strlen(pmsg)];
 	}	
-	sprintf(pmsg,stab[STR_HUPWID],
+	sprintf_s(pmsg, sizeof(msgbuf),stab[STR_HUPWID],
 		   ini.hupx/PFGRAN,
 		   ini.hupy/PFGRAN);
 	pmsg=&pmsg[strlen(pmsg)];
 	if(hed.stchs){
 
-		sprintf(pmsg,stab[STR_CREATBY],
+		sprintf_s(pmsg, sizeof(msgbuf),stab[STR_CREATBY],
 			 fildes,
 			 hedx.modnam);
 	}
@@ -13217,8 +13219,8 @@ void rotmrk(){
 		tang=hiang-loang;
 		cnt=2*PI/tang;
 		ini.rotang=2*PI/cnt;
-		sprintf(msgbuf,	"Rotation Angle: %.2f\n"
-						"Segmets: %d\n",ini.angl*180/PI,cnt);
+		sprintf_s(msgbuf, sizeof(msgbuf), "Rotation Angle: %.2f\n"
+						"Segments: %d\n",ini.angl*180/PI,cnt);
 		shoMsg(msgbuf);
 	}
 	else
@@ -13229,7 +13231,7 @@ void segentr(){
 
 	if(!ang)
 		ang=PI/180;
-	sprintf(msgbuf,stab[STR_ENTROT],2*PI/ang);
+	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_ENTROT],2*PI/ang);
 	shoMsg(msgbuf);
 	setMap(NUMIN);
 	numWnd();
@@ -13848,7 +13850,7 @@ BOOL CALLBACK LockPrc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
 		srch=FindFirstFile(snam,&pdat[0]);
 		if(srch==INVALID_HANDLE_VALUE){
 
-			sprintf(msgbuf,"Directory: %s has no .thr files\n",defDir);
+			sprintf_s(msgbuf, sizeof(msgbuf), "Directory: %s has no .thr files\n",defDir);
 			shoMsg(msgbuf);
 			EndDialog(hwndlg,wparam); 
 			return TRUE;
@@ -13928,7 +13930,7 @@ BOOL CALLBACK LockPrc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
 			}
 			if(ine){
 
-				sprintf(msgbuf,"%d files could not be locked or unlocked\n",ine);
+				sprintf_s(msgbuf, sizeof(msgbuf), "%d files could not be locked or unlocked\n",ine);
 				shoMsg(msgbuf);
 			}
 			EndDialog(hwndlg,wparam); 
@@ -14067,13 +14069,13 @@ void untrace(){
 
 void trcstpnum(){
 	
-	sprintf(msgbuf,"len: %.2f",ini.trlen/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf), "len: %.2f",ini.trlen/PFGRAN);
 	SetWindowText(hstep,msgbuf);
 }
 
 void trcratnum(){
 
-	sprintf(msgbuf,"pnts: %.2f",-log10(ini.trcrat-1));
+	sprintf_s(msgbuf, sizeof(msgbuf), "pnts: %.2f",-log10(ini.trcrat-1));
 	butxt(HLIN,msgbuf);
 }
 
@@ -15216,7 +15218,7 @@ void dutrnum1(){
 	rstMap(NUMIN);
 	rstMap(TRNIN1);
 	tdub=atof(msgbuf);
-	sprintf(msgbuf,"%.2f",tdub);
+	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f",tdub);
 	if(tdub>9)
 		tdub=9;
 	if(chkMap(TRNUP)){
@@ -15431,7 +15433,7 @@ void delmap(){
 void closfn(){
 
 	deltot();
-	sprintf(msgbuf,stab[STR_THRED],ini.desnam);
+	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRED],ini.desnam);
 	knotcnt=0;
 	*filnam=0;
 	*bnam=0;
@@ -15572,7 +15574,7 @@ void nudgfn(float dx,float dy){
 
 void pixmsg(unsigned cod,unsigned pix){
 
-	sprintf(msgbuf,stab[cod],pix);
+	sprintf_s(msgbuf, sizeof(msgbuf), stab[cod],pix);
 	shoMsg(msgbuf);
 }
 
@@ -17061,7 +17063,7 @@ frmskip:;
 						ini.xcust=ini.hupx;
 						ini.ycust=ini.hupy;
 						setMap(MSGOF);
-						sprintf(msgbuf,stab[STR_CUSTHUP],ini.hupx/PFGRAN,ini.hupy/PFGRAN);
+						sprintf_s(msgbuf, sizeof(msgbuf),stab[STR_CUSTHUP],ini.hupx/PFGRAN,ini.hupy/PFGRAN);
 						shoMsg(msgbuf);
 						break;
 
@@ -17529,7 +17531,7 @@ chkcolx:;
 		}
 		if(prfind==PAP+1&&chkMsgs(msg.pt,hDef[0],hDef[15])){
 
-			sprintf(msgbuf,"%d",vind);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%d",vind);
 			apcol=vind;
 			SetWindowText(thDat[PAP],msgbuf);
 			unsid();
@@ -19209,7 +19211,7 @@ didskip:;
 			cloInd=atoi(numbuf);
 			if(cloInd>(unsigned)hed.stchs-1){
 
-				sprintf(numbuf,"%d",hed.stchs-1);
+				sprintf_s(numbuf, sizeof(numbuf),"%d",hed.stchs-1);
 				cloInd=hed.stchs-1;
 			}
 			butxt(HNUM,numbuf);
@@ -22683,7 +22685,7 @@ void init(){
 	chkmen();
 	//check command line-should be last item in init
 	ducmd();
-	sprintf(msgbuf,stab[STR_THRED],ini.desnam);
+	sprintf_s(msgbuf, sizeof(msgbuf),stab[STR_THRED],ini.desnam);
 	SetWindowText(hWnd,msgbuf);
 }
 
@@ -23907,7 +23909,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam){
 			if(chkMap(TXTRED))
 			{
 				LoadString(hInst,IDS_TXWID,nam,MAX_PATH);
-				sprintf(hlpbuf,nam,tscr.wid/PFGRAN);
+				sprintf_s(hlpbuf, sizeof(hlpbuf),nam,tscr.wid/PFGRAN);
 				TextOut(ds->hDC,ind,1,hlpbuf,strlen(hlpbuf));;
 			}
 			else
@@ -23973,7 +23975,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam){
 
 						SetBkColor(ds->hDC,defCol[ind]);
 						SetTextColor(ds->hDC,defTxt(ind));
-						sprintf(buf,"%d",ind+1);
+						sprintf_s(buf, sizeof(buf),"%d",ind+1);
 						len=strlen(buf);
 						GetTextExtentPoint32(ds->hDC,buf,len,&txSiz);
 						TextOut(ds->hDC,(buttonWid-txSiz.cx)>>1,0,buf,len);

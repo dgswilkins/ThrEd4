@@ -122,7 +122,7 @@ extern			void		tabmsg(unsigned cod);
 extern			void		frm1pnt();
 extern			void		shoseln(unsigned cod0,unsigned cod1);
 extern			void		durpoli(unsigned nsids);
-extern			void		ler();
+//extern			void		ler();
 extern			void		clpxadj();
 
 extern			POINT		pselfin;
@@ -1785,13 +1785,13 @@ BOOL CALLBACK tearprc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
 
 		SendMessage(hwndlg,WM_SETFOCUS,0,0);
 reinit:;
-		sprintf(buf,"%d",ini.nsids);
+		sprintf_s(buf, sizeof(buf),"%d",ini.nsids);
 		SetWindowText(GetDlgItem(hwndlg,IDC_TEARSIDS),buf);
-		sprintf(buf,"%.3f",ini.tearat);
+		sprintf_s(buf, sizeof(buf),"%.3f",ini.tearat);
 		SetWindowText(GetDlgItem(hwndlg,IDC_TEARAT),buf);
-		sprintf(buf,"%.3f",ini.twststp/PFGRAN);
+		sprintf_s(buf, sizeof(buf),"%.3f",ini.twststp/PFGRAN);
 		SetWindowText(GetDlgItem(hwndlg,IDC_TWSTSTP),buf);
-		sprintf(buf,"%.3f",ini.twstrat);
+		sprintf_s(buf, sizeof(buf),"%.3f",ini.twstrat);
 		SetWindowText(GetDlgItem(hwndlg,IDC_TWSTRAT),buf);
 		break;
 
@@ -4281,7 +4281,7 @@ lconskip:;
 			lastgrp=0;
 			for(ind=0;ind<mpath0;ind++){
 
-//				sprintf(msgbuf,"ind %d,vrt %d,grpn %d\n",ind,pmap[ind].vrt,pmap[ind].grpn);
+//				sprintf_s(msgbuf, sizeof(msgbuf),"ind %d,vrt %d,grpn %d\n",ind,pmap[ind].vrt,pmap[ind].grpn);
 //				OutputDebugString(msgbuf);
 				if(!unvis())
 					break;
@@ -7432,7 +7432,7 @@ void setap(){
 
 	apcol=actcol;
 	LoadString(hInst,IDS_APCOL,buf,HBUFSIZ);
-	sprintf(msgbuf,buf,apcol+1);
+	sprintf_s(msgbuf, sizeof(msgbuf),buf,apcol+1);
 	shoMsg(msgbuf);
 }
 
@@ -7555,7 +7555,7 @@ void refrmfn()
 		thDat[LFRM]=txtrwin(stab[STR_FREH],loc1);
 	nxtlin();
 	thTxt[LLAYR]=txtwin(stab[STR_TXT1],loc0);
-	sprintf(msgbuf,"%d",(frmpnt->at&FRMLMSK)>>1);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%d",(frmpnt->at&FRMLMSK)>>1);
 	thDat[LLAYR]=txtrwin(msgbuf,loc1);
 	nxtlin();
 	if(frmpnt->typ!=LIN)
@@ -7581,26 +7581,26 @@ void refrmfn()
 		if(frmpnt->xat&(AT_WALK|AT_UND|AT_CWLK))
 		{
 			thTxt[LUNDCOL]=txtwin(stab[STR_UNDCOL],loc0);
-			sprintf(msgbuf,"%d",frmpnt->ucol+1);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%d",frmpnt->ucol+1);
 			thDat[LUNDCOL]=txtrwin(msgbuf,loc1);
 			nxtlin();
 			thTxt[LULEN]=txtwin(stab[STR_ULEN],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->ulen/PFGRAN);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->ulen/PFGRAN);
 			thDat[LULEN]=txtrwin(msgbuf,loc1);
 			nxtlin();
 		}
 		thTxt[LWLKIND]=txtwin(stab[STR_UWLKIND],loc0);
-		sprintf(msgbuf,"%.2f",frmpnt->wind/PFGRAN);
+		sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->wind/PFGRAN);
 		thDat[LWLKIND]=txtrwin(msgbuf,loc1);
 		nxtlin();
 		if(frmpnt->xat&AT_UND)
 		{
 			thTxt[LUSPAC]=txtwin(stab[STR_FUSPAC],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->uspac/PFGRAN);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->uspac/PFGRAN);
 			thDat[LUSPAC]=txtrwin(msgbuf,loc1);
 			nxtlin();
 			thTxt[LUANG]=txtwin(stab[STR_FUANG],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->uang*180/PI);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->uang*180/PI);
 			thDat[LUANG]=txtrwin(msgbuf,loc1);
 			nxtlin();
 		}
@@ -7611,13 +7611,13 @@ void refrmfn()
 	if(frmpnt->ftyp){
 
 		thTxt[LFRMCOL]=txtwin(stab[STR_TXT3],loc0);
-		sprintf(msgbuf,"%d",frmpnt->fcol+1);
+		sprintf_s(msgbuf, sizeof(msgbuf),"%d",frmpnt->fcol+1);
 		thDat[LFRMCOL]=numwin(msgbuf,loc1);
 		nxtlin();
 		if(frmpnt->ftyp==FTHF){
 
 			thTxt[LFTHCOL]=txtwin(stab[STR_FTHCOL],loc0);
-			sprintf(msgbuf,"%d",frmpnt->dhx.fth.fthcol+1);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%d",frmpnt->dhx.fth.fthcol+1);
 			thDat[LFTHCOL]=numwin(msgbuf,loc1);
 			nxtlin();
 			thTxt[LFTHTYP]=txtwin(stab[STR_FTHTYP],loc0);
@@ -7651,76 +7651,76 @@ void refrmfn()
 				}
 			}
 			thTxt[LFTHUPCNT]=txtwin(stab[STR_FTHUPCNT],loc0);
-			sprintf(msgbuf,"%d",frmpnt->dhx.fth.fthup);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%d",frmpnt->dhx.fth.fthup);
 			thDat[LFTHUPCNT]=numwin(msgbuf,loc1);
 			nxtlin();
 			thTxt[LFTHDWNCNT]=txtwin(stab[STR_FTHDWNCNT],loc0);
-			sprintf(msgbuf,"%d",frmpnt->dhx.fth.fthdwn);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%d",frmpnt->dhx.fth.fthdwn);
 			thDat[LFTHDWNCNT]=numwin(msgbuf,loc1);
 			nxtlin();
 			thTxt[LFTHSIZ]=txtwin(stab[STR_FTHSIZ],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->dhx.fth.fthrat);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->dhx.fth.fthrat);
 			thDat[LFTHSIZ]=numwin(msgbuf,loc1);
 			nxtlin();
 			if(frmpnt->dhx.fth.fthtyp==FTHPSG){
 
 				thTxt[LFTHNUM]=txtwin(stab[STR_FTHNUM],loc0);
-				sprintf(msgbuf,"%d",frmpnt->dhx.fth.fthnum);
+				sprintf_s(msgbuf, sizeof(msgbuf),"%d",frmpnt->dhx.fth.fthnum);
 				thDat[LFTHNUM]=numwin(msgbuf,loc1);
 				nxtlin();
 			}
 			thTxt[LFTHFLR]=txtwin(stab[STR_FTHFLR],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->dhx.fth.fthflr/PFGRAN);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->dhx.fth.fthflr/PFGRAN);
 			thDat[LFTHFLR]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		if(frmpnt->ftyp!=CLPF){
 
 			thTxt[LFRMSPAC]=txtwin(stab[STR_TXT4],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->fspac/PFGRAN);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->fspac/PFGRAN);
 			thDat[LFRMSPAC]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		if(istx(clofind))
 		{
 			thTxt[LTXOF]=txtwin(stab[STR_TXOF],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->txof/PFGRAN);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->txof/PFGRAN);
 			thDat[LTXOF]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		thTxt[LMAXFIL]=txtwin(stab[STR_TXT20],loc0);
-		sprintf(msgbuf,"%.2f",frmpnt->fmax/PFGRAN);
+		sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->fmax/PFGRAN);
 		thDat[LMAXFIL]=numwin(msgbuf,loc1);
 		nxtlin();
 		if(!isclp(clofind)&&!istx(clofind)){
 
 			thTxt[LFRMLEN]=txtwin(stab[STR_TXT5],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->flencnt.flen/PFGRAN);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->flencnt.flen/PFGRAN);
 			thDat[LFRMLEN]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		thTxt[LMINFIL]=txtwin(stab[STR_TXT21],loc0);
-		sprintf(msgbuf,"%.2f",frmpnt->fmin/PFGRAN);
+		sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->fmin/PFGRAN);
 		thDat[LMINFIL]=numwin(msgbuf,loc1);
 		nxtlin();
 		if(frmpnt->ftyp==ANGF||frmpnt->ftyp==TXANGF){
 
 			thTxt[LFRMANG]=txtwin(stab[STR_TXT6],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->angclp.fang*180/PI);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->angclp.fang*180/PI);
 			thDat[LFRMANG]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		if(frmpnt->ftyp==ANGCLPF){
 
 			thTxt[LSACANG]=txtwin(stab[STR_TXT6],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->sacang.ang*180/PI);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->sacang.ang*180/PI);
 			thDat[LSACANG]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		if(frmpnt->ftyp==VCLPF||frmpnt->ftyp==HCLPF||frmpnt->ftyp==ANGCLPF){
 
 			thTxt[LFRMFAZ]=txtwin(stab[STR_TXT18],loc0);
-			sprintf(msgbuf,"%d",frmpnt->wpar);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%d",frmpnt->wpar);
 			thDat[LFRMFAZ]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
@@ -7745,7 +7745,7 @@ void refrmfn()
 	if(frmpnt->xat&AT_STRT)
 	{
 		thTxt[LDSTRT]=txtwin(stab[STR_FSTRT],loc0);
-		sprintf(msgbuf,"%d",frmpnt->strt);
+		sprintf_s(msgbuf, sizeof(msgbuf),"%d",frmpnt->strt);
 		thDat[LDSTRT]=numwin(msgbuf,loc1);
 		nxtlin();
 	}
@@ -7759,7 +7759,7 @@ void refrmfn()
 	if(frmpnt->xat&AT_END)
 	{
 		thTxt[LDEND]=txtwin(stab[STR_FEND],loc0);
-		sprintf(msgbuf,"%d",frmpnt->end);
+		sprintf_s(msgbuf, sizeof(msgbuf),"%d",frmpnt->end);
 		thDat[LDEND]=numwin(msgbuf,loc1);
 		nxtlin();
 	}
@@ -7769,72 +7769,72 @@ void refrmfn()
 	if(cod){
 
 		thTxt[LBRDCOL]=txtwin(stab[STR_TXT8],loc0);
-		sprintf(msgbuf,"%d",(frmpnt->bcol&0xf)+1);
+		sprintf_s(msgbuf, sizeof(msgbuf),"%d",(frmpnt->bcol&0xf)+1);
 		thDat[LBRDCOL]=numwin(msgbuf,loc1);
 		nxtlin();
 		if(egaray[fpnt]&BESPAC){
 
 			thTxt[LBRDSPAC]=txtwin(stab[STR_TXT9],loc0);
 			if(cod==EGPRP||cod==EGCHNH||cod==EGCHNL)
-				sprintf(msgbuf,"%.2f",frmpnt->espac/PFGRAN);
+				sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->espac/PFGRAN);
 			else
-				sprintf(msgbuf,"%.2f",frmpnt->espac/PFGRAN*2);
+				sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->espac/PFGRAN*2);
 			thDat[LBRDSPAC]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		if(egaray[fpnt]&BPICSPAC){
 
 			thTxt[LBRDPIC]=txtwin(stab[STR_TXT16],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->espac/PFGRAN);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->espac/PFGRAN);
 			thDat[LBRDPIC]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		if(egaray[fpnt]&BEMAX){
 
 			thTxt[LMAXBRD]=txtwin(stab[STR_TXT22],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->emax/PFGRAN);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->emax/PFGRAN);
 			thDat[LMAXBRD]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		if(egaray[fpnt]&BELEN){
 
 			thTxt[LBRDLEN]=txtwin(stab[STR_TXT10],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->elen/PFGRAN);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->elen/PFGRAN);
 			thDat[LBRDLEN]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		if(egaray[fpnt]&BEMIN){
 
 			thTxt[LMINBRD]=txtwin(stab[STR_TXT23],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->emin/PFGRAN);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->emin/PFGRAN);
 			thDat[LMINBRD]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		if(egaray[fpnt]&BESIZ){
 
 			thTxt[LBRDSIZ]=txtwin(stab[STR_TXT11],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->esiz/PFGRAN);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->esiz/PFGRAN);
 			thDat[LBRDSIZ]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		if(egaray[fpnt]&BRDPOS){
 
 			thTxt[LBRDPOS]=txtwin(stab[STR_TXT18],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->elen);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->elen);
 			thDat[LBRDPOS]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		if(egaray[fpnt]&CHNPOS){
 
 			thTxt[LBRDPOS]=txtwin(stab[STR_TXT19],loc0);
-			sprintf(msgbuf,"%.2f",frmpnt->elen);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",frmpnt->elen);
 			thDat[LBRDPOS]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
 		if(cod==EGAP){
 
 			thTxt[LAPCOL]=txtwin(stab[STR_TXT12],loc0);
-			sprintf(msgbuf,"%d",(frmpnt->bcol>>4)+1);
+			sprintf_s(msgbuf, sizeof(msgbuf),"%d",(frmpnt->bcol>>4)+1);
 			thDat[LAPCOL]=numwin(msgbuf,loc1);
 			nxtlin();
 		}
@@ -7850,9 +7850,9 @@ void refrmfn()
 		if(egaray[fpnt]&BCNRSIZ){
 
 			if(frmpnt->etyp==EGHOL)
-				sprintf(msgbuf,"%.2f",getblen()/PFGRAN);
+				sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",getblen()/PFGRAN);
 			else
-				sprintf(msgbuf,"%.2f",getplen()/PFGRAN);
+				sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",getplen()/PFGRAN);
 			thTxt[LBCSIZ]=txtwin(stab[STR_TXT13],loc0);
 			thDat[LBCSIZ]=numwin(msgbuf,loc1);
 			nxtlin();
@@ -8659,45 +8659,45 @@ void prfmsg(){
 	loc0.right=3+siz0.x;
 	loc1.left=6+siz0.x;
 	loc1.right=6+siz0.x+siz1.x+6;
-	sprintf(msgbuf,"%d",apcol+1);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%d",apcol+1);
 	prflin(STR_PRF10);
-	sprintf(msgbuf,"%.2f",brdwid/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",brdwid/PFGRAN);
 	prflin(STR_PRF3);
-	sprintf(msgbuf,"%.2f",bfclen/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",bfclen/PFGRAN);
 	prflin(STR_PRF14);
-	sprintf(msgbuf,"%.2f",ini.chspac/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",ini.chspac/PFGRAN);
 	prflin(STR_PRF23);
-	sprintf(msgbuf,"%.2f",ini.chrat);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",ini.chrat);
 	prflin(STR_PRF24);
-	sprintf(msgbuf,"%.2f mm",ini.clpof/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f mm",ini.clpof/PFGRAN);
 	prflin(STR_PRF21);
-	sprintf(msgbuf,"%d",ini.faz);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%d",ini.faz);
 	prflin(STR_PRF22);
-	sprintf(msgbuf,"%.2f",ini.egrat);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",ini.egrat);
 	prflin(STR_PRF26);
-	sprintf(msgbuf,"%.2f",ini.angl/PI*180);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",ini.angl/PI*180);
 	prflin(STR_PRF1);
 	if(chku(SQRFIL))
 		strcpy(msgbuf,stab[STR_SQR]);
 	else
 		strcpy(msgbuf,stab[STR_PNTD]);
 	prflin(STR_PRF2);
-	sprintf(msgbuf,"%.2f",stspace/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",stspace/PFGRAN);
 	prflin(STR_PRF0);
-	sprintf(msgbuf,"%d",duthrsh(shopnts));
+	sprintf_s(msgbuf, sizeof(msgbuf),"%d",duthrsh(shopnts));
 	prflin(STR_PRF7);
-	sprintf(msgbuf,"%.2f mm",ini.grdsiz/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f mm",ini.grdsiz/PFGRAN);
 	prflin(STR_PRF20);
 	sethup();
-	sprintf(msgbuf,"%s",stab[STR_HUP0+ini.hup-1]);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%s",stab[STR_HUP0+ini.hup-1]);
 	prflin(STR_PRF17);
-	sprintf(msgbuf,"%.0f mm",ini.hupy/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.0f mm",ini.hupy/PFGRAN);
 	prflin(STR_PRF27);
-	sprintf(msgbuf,"%.0f mm",ini.hupx/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.0f mm",ini.hupx/PFGRAN);
 	prflin(STR_PRF18);
-	sprintf(msgbuf,"%.2f",ini.nudg);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",ini.nudg);
 	prflin(STR_PRF25);
-	sprintf(msgbuf,"%.2f",picspac/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",picspac/PFGRAN);
 	prflin(STR_PRF16);
 	if(chku(BLUNT))
 		strcpy(msgbuf,stab[STR_BLUNT]);
@@ -8709,21 +8709,21 @@ void prfmsg(){
 	else
 		strcpy(msgbuf,stab[STR_OFF]);
 	prflin(STR_PRF19);
-	sprintf(msgbuf,"%.2f",smalsiz/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",smalsiz/PFGRAN);
 	prflin(STR_PRF9);
-	sprintf(msgbuf,"%.2f",snplen/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",snplen/PFGRAN);
 	prflin(STR_PRF11);
-	sprintf(msgbuf,"%.2f",spirwrap);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",spirwrap);
 	prflin(STR_PRF13);
-	sprintf(msgbuf,"%.2f",starat);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",starat);
 	prflin(STR_PRF12);
-	sprintf(msgbuf,"%d",duthrsh(stchboxs));
+	sprintf_s(msgbuf, sizeof(msgbuf),"%d",duthrsh(stchboxs));
 	prflin(STR_PRF8);
-	sprintf(msgbuf,"%.2f",ini.maxsiz/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",ini.maxsiz/PFGRAN);
 	prflin(STR_PRF4);
-	sprintf(msgbuf,"%.2f",usesiz/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",usesiz/PFGRAN);
 	prflin(STR_PRF5);
-	sprintf(msgbuf,"%.2f",minsiz/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",minsiz/PFGRAN);
 	prflin(STR_PRF6);
 	setMap(PRFACT);
 	ReleaseDC(hWnd,prfdc);
@@ -8776,24 +8776,24 @@ void prfmsg(){
 	loc0.right=3+siz0.x;
 	loc1.left=6+siz0.x;
 	loc1.right=6+siz0.x+siz1.x+6;
-	sprintf(msgbuf,"%.2f",usesiz/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",usesiz/PFGRAN);
 	prflin(STR_PRF5);
-	sprintf(msgbuf,"%.2f",ini.maxsiz/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",ini.maxsiz/PFGRAN);
 	prflin(STR_PRF4);
-	sprintf(msgbuf,"%.2f",minsiz/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",minsiz/PFGRAN);
 	prflin(STR_PRF6);
-	sprintf(msgbuf,"%.2f",smalsiz/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",smalsiz/PFGRAN);
 	prflin(STR_PRF9);
-	sprintf(msgbuf,"%.2f",ini.angl/PI*180);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",ini.angl/PI*180);
 	prflin(STR_PRF1);
-	sprintf(msgbuf,"%.2f",stspace/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",stspace/PFGRAN);
 	prflin(STR_PRF0);
 	if(chku(SQRFIL))
 		strcpy(msgbuf,stab[STR_SQR]);
 	else
 		strcpy(msgbuf,stab[STR_PNTD]);
 	prflin(STR_PRF2);
-	sprintf(msgbuf,"%.2f",brdwid/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",brdwid/PFGRAN);
 	prflin(STR_PRF3);
 	if(chku(BLUNT))
 		strcpy(msgbuf,stab[STR_BLUNT]);
@@ -8805,42 +8805,42 @@ void prfmsg(){
 	else
 		strcpy(msgbuf,stab[STR_OFF]);
 	prflin(STR_PRF19);
-	sprintf(msgbuf,"%.2f",bfclen/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",bfclen/PFGRAN);
 	prflin(STR_PRF14);
-	sprintf(msgbuf,"%.2f",ini.chspac/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",ini.chspac/PFGRAN);
 	prflin(STR_PRF23);
-	sprintf(msgbuf,"%.2f",ini.chrat);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",ini.chrat);
 	prflin(STR_PRF24);
-	sprintf(msgbuf,"%.2f mm",ini.clpof/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f mm",ini.clpof/PFGRAN);
 	prflin(STR_PRF21);
-	sprintf(msgbuf,"%d",ini.faz);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%d",ini.faz);
 	prflin(STR_PRF22);
-	sprintf(msgbuf,"%.2f",picspac/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",picspac/PFGRAN);
 	prflin(STR_PRF16);
 	sethup();
-	sprintf(msgbuf,stab[STR_HUP0+ini.hup-1]);
+	sprintf_s(msgbuf, sizeof(msgbuf),stab[STR_HUP0+ini.hup-1]);
 	prflin(STR_PRF17);
-	sprintf(msgbuf,"%.0f mm",ini.hupy/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.0f mm",ini.hupy/PFGRAN);
 	prflin(STR_PRF27);
-	sprintf(msgbuf,"%.0f mm",ini.hupx/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.0f mm",ini.hupx/PFGRAN);
 	prflin(STR_PRF18);
-	sprintf(msgbuf,"%.2f mm",ini.grdsiz/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f mm",ini.grdsiz/PFGRAN);
 	prflin(STR_PRF20);
-	sprintf(msgbuf,"%d",duthrsh(shopnts));
+	sprintf_s(msgbuf, sizeof(msgbuf),"%d",duthrsh(shopnts));
 	prflin(STR_PRF7);
-	sprintf(msgbuf,"%.2f",ini.nudg);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",ini.nudg);
 	prflin(STR_PRF25);
-	sprintf(msgbuf,"%.2f",snplen/PFGRAN);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",snplen/PFGRAN);
 	prflin(STR_PRF11);
-	sprintf(msgbuf,"%d",duthrsh(stchboxs));
+	sprintf_s(msgbuf, sizeof(msgbuf),"%d",duthrsh(stchboxs));
 	prflin(STR_PRF8);
-	sprintf(msgbuf,"%.2f",ini.egrat);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",ini.egrat);
 	prflin(STR_PRF26);
-	sprintf(msgbuf,"%.2f",spirwrap);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",spirwrap);
 	prflin(STR_PRF13);
-	sprintf(msgbuf,"%.2f",starat);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",starat);
 	prflin(STR_PRF12);
-	sprintf(msgbuf,"%d",apcol+1);
+	sprintf_s(msgbuf, sizeof(msgbuf),"%d",apcol+1);
 	prflin(STR_PRF10);
 	setMap(PRFACT);
 	ReleaseDC(hWnd,prfdc);
@@ -10652,7 +10652,7 @@ void rotentr(){
 	TCHAR buf[HBUFSIZ];
 
 	LoadString(hInst,IDS_ROTA,buf,HBUFSIZ);
-	sprintf(msgbuf,buf,ang/PI*180);
+	sprintf_s(msgbuf, sizeof(msgbuf),buf,ang/PI*180);
 	shoMsg(msgbuf);
 	setMap(NUMIN);
 	numWnd();
@@ -12372,7 +12372,7 @@ void frmnum(){
 	if(formpnt&&chkMap(FORMSEL)){
 
 		LoadString(hInst,IDS_FRML,buf,HBUFSIZ);
-		sprintf(msgbuf,buf,formpnt);
+		sprintf_s(msgbuf, sizeof(msgbuf),buf,formpnt);
 		shoMsg(msgbuf);
 		setMap(NUMIN);
 		setMap(ENTRFNUM);
@@ -14489,7 +14489,7 @@ void col2frm(){
 		}
 	}
 	LoadString(hInst,IDS_NCOLCHG,buf,HBUFSIZ);
-	sprintf(msgbuf,buf,chngcnt);
+	sprintf_s(msgbuf, sizeof(msgbuf),buf,chngcnt);
 	shoMsg(msgbuf);
 }
 
@@ -15105,13 +15105,13 @@ BOOL CALLBACK wavprc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
 
 		SendMessage(hwndlg,WM_SETFOCUS,0,0);
 reinit:;
-		sprintf(buf,"%d",ini.wavpnts);
+		sprintf_s(buf, sizeof(buf),"%d",ini.wavpnts);
 		SetWindowText(GetDlgItem(hwndlg,IDC_WAVPNTS),buf);
-		sprintf(buf,"%d",ini.wavstrt);
+		sprintf_s(buf, sizeof(buf),"%d",ini.wavstrt);
 		SetWindowText(GetDlgItem(hwndlg,IDC_WAVSTRT),buf);
-		sprintf(buf,"%d",ini.wavend);
+		sprintf_s(buf, sizeof(buf),"%d",ini.wavend);
 		SetWindowText(GetDlgItem(hwndlg,IDC_WAVEND),buf);
-		sprintf(buf,"%d",ini.wavs);
+		sprintf_s(buf, sizeof(buf),"%d",ini.wavs);
 		SetWindowText(GetDlgItem(hwndlg,IDC_WAVS),buf);
 		break;
 
