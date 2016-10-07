@@ -2348,16 +2348,20 @@ unsigned dutyp(unsigned tat)
 dutypx:		and		eax,0xf
 	}
 #else
-	//check translation
-	tat &= SRTYPMSK;
+	//correct
+	char result;
+	DWORD bit;
+	unsigned lat = tat & SRTYPMSK;
 
-	if (tat == 0)
+	_BitScanReverse(&bit, lat);
+
+	if (bit == 0)
 		return 0;
 
-	unsigned long bit = _BitScanReverse(&bit, tat) - 18;
+	result = ((bit & 0xff) - 18);
 
-	if (((bit & 0xff) != 12) || ((bit & 0x20000000) == 0))
-		return bit & 0xf;
+	if ((result != 12) || ((lat & TYPATMSK) == 0))
+		return result & 0xf;
 
 	return 1;
 #endif
@@ -2448,14 +2452,16 @@ fmapx:
 	}
 #else
 	//check translation
-	if (*map == 0)
+	DWORD bit;
+
+	_BitScanForward(&bit, *map);
+
+	if (bit == 0)
 		return 0;
-	
-	unsigned long bit = _BitScanForward(&bit, *map);
-
-	_bittestandreset((long *)map, bit);
-
-	return bit;
+	else {
+		_bittestandreset((long *)map, bit);
+		return bit;
+	}
 #endif
 }
 

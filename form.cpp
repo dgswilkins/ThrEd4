@@ -5205,7 +5205,7 @@ nxtcx:
 	if (chkmap[ind] == 0)
 		 return 0xffffffff;
 
-	unsigned long bit;
+	DWORD bit;
 
 	_BitScanForward(&bit, chkmap[ind]);
 	_bittestandreset((long *)(chkmap + ind), bit);
@@ -5233,10 +5233,11 @@ prvcx:
 	}
 #else
 	//Check translation
+	DWORD bit;
+
 	if (chkmap[ind] == 0)
 		 return 0xffffffff;
 
-	unsigned long bit;
 	_BitScanReverse(&bit, chkmap[ind]);
 	_bittestandreset((long *)(chkmap + ind), bit);
 
@@ -10482,7 +10483,7 @@ nxtcolx:	btc		ebx,eax
 			mov		colmap,ebx
 	}
 #else
-	unsigned long col;
+	DWORD col;
 	if (_bittest((long *)&colmap, apcol)) {
 		col = apcol;
 	} else {
@@ -10542,7 +10543,7 @@ unsigned isrt(unsigned bpnt){
 isrtx:
 	}
 #else
-	return _bittest((long *)&srtmsk, bpnt) ? 1 : 0;
+	return _bittest((long *)&srtmsk, bpnt);
 #endif
 }
 
