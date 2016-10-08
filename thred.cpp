@@ -21786,9 +21786,11 @@ void ritloc(){
 	penv=strrchr(locnam,'\\')+1;
 	strcpy(penv,"thredloc.txt");
 	hloc=CreateFile(locnam,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,0,NULL);
-	*phom=0;
-	WriteFile(hloc,(TCHAR*)homdir,strlen(homdir)+1,&rot,0);
-	CloseHandle(hloc);
+	if (hloc != INVALID_HANDLE_VALUE) {
+		*phom = 0;
+		WriteFile(hloc, (TCHAR*)homdir, strlen(homdir) + 1, &rot, 0);
+		CloseHandle(hloc);
+	}
 }
 
 void renam(){

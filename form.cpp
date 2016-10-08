@@ -1484,7 +1484,7 @@ void fselrct(unsigned fpnt){
 
 	FRMHED*		tpnt=&formlst[fpnt];
 	FLPNT		tlin[5];
-	POINT		sqrlin[5];
+	POINT		sqrlin[6];
 	unsigned	ind;
 
 	tlin[0].x=tlin[3].x=tlin[4].x=tpnt->rct.left;

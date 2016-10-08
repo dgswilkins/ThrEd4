@@ -552,14 +552,13 @@ void grpmsg1(){
 }
 
 void help(){
-
+	strcpy(hlpnam,homdir);
 #if LANG==ENG||LANG==HNG
-	strcpy(phom,"thred.chm");
+	strcat(hlpnam, "thred.chm");
 #endif
 #if LANG==GRM
-	strcpy(phom,"aladin.chm");
+	strcat(hlpnam, "aladin.chm");
 #endif
-	strcpy(hlpnam,homdir);
 	hlpwnd=HtmlHelp(hWnd,hlpnam,HH_DISPLAY_TOPIC,0);
 	if(!hlpwnd)
 		tabmsg(IDS_NOHLP);
