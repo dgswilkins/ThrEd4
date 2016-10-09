@@ -711,7 +711,7 @@ typedef struct _iniFil{
 	unsigned		umap;			//bitmap
 	double			brdwid;			//border width
 	unsigned		apcol;			//applique color
-	TCHAR			oldnams[OLDNUM][MAX_PATH];	//last file names
+	TCHAR			oldnams[OLDNUM][_MAX_PATH];	//last file names
 	double			snplen;			//snap together length
 	double			starat;			//star ratio
 	double			spirwrap;		//sprial wrap
@@ -754,7 +754,7 @@ typedef struct _iniFil{
 	float			fthrat;			//feather ratio
 	float			fthflr;			//feather floor
 	unsigned short	fthnum;			//feather fill psg granularity
-	TCHAR			p2cnam[MAX_PATH];	//pes2card file
+	TCHAR			p2cnam[_MAX_PATH];	//pes2card file
 	float			wind;			//edge walk/underlay indent
 	float			uang;			//underlay angle
 	float			uspac;			//underlay spacing

@@ -230,7 +230,7 @@ extern			unsigned	dunmap[MAXFRMLINS/32+1];
 extern			void		rotflt(FLPNT* pnt);
 extern			FLPNT		bigsiz;
 extern			unsigned	toglu(unsigned bPnt);
-extern			TCHAR		thrnam[MAX_PATH];
+extern			TCHAR		thrnam[_MAX_PATH];
 extern			POINT		sizlin[5];
 extern			INIFIL		ini;
 extern			POINT		pPnt;
@@ -7728,18 +7728,18 @@ void refrmfn()
 
 			thTxt[LBFILSQR]=txtwin(stab[STR_PRF2],loc0);
 			if(frmpnt->xat&AT_SQR)
-				strcpy(msgbuf,stab[STR_SQR]);
+				strcpy_s(msgbuf,stab[STR_SQR]);
 			else
-				strcpy(msgbuf,stab[STR_PNTD]);
+				strcpy_s(msgbuf,stab[STR_PNTD]);
 			thDat[LBFILSQR]=txtrwin(msgbuf,loc1);
 			nxtlin();
 		}
 	}
 	thTxt[LFSTRT]=txtwin(stab[STR_FSTRT],loc0);
 	if(frmpnt->xat&AT_STRT)
-		strcpy(msgbuf,stab[STR_ON]);
+		strcpy_s(msgbuf,stab[STR_ON]);
 	else
-		strcpy(msgbuf,stab[STR_OFF]);
+		strcpy_s(msgbuf,stab[STR_OFF]);
 	thDat[LFSTRT]=txtrwin(msgbuf,loc1);
 	nxtlin();
 	if(frmpnt->xat&AT_STRT)
@@ -7751,9 +7751,9 @@ void refrmfn()
 	}
 	thTxt[LFEND]=txtwin(stab[STR_FEND],loc0);
 	if(frmpnt->xat&AT_END)
-		strcpy(msgbuf,stab[STR_ON]);
+		strcpy_s(msgbuf,stab[STR_ON]);
 	else
-		strcpy(msgbuf,stab[STR_OFF]);
+		strcpy_s(msgbuf,stab[STR_OFF]);
 	thDat[LFEND]=txtrwin(msgbuf,loc1);
 	nxtlin();
 	if(frmpnt->xat&AT_END)
@@ -8678,9 +8678,9 @@ void prfmsg(){
 	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",ini.angl/PI*180);
 	prflin(STR_PRF1);
 	if(chku(SQRFIL))
-		strcpy(msgbuf,stab[STR_SQR]);
+		strcpy_s(msgbuf,stab[STR_SQR]);
 	else
-		strcpy(msgbuf,stab[STR_PNTD]);
+		strcpy_s(msgbuf,stab[STR_PNTD]);
 	prflin(STR_PRF2);
 	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",stspace/PFGRAN);
 	prflin(STR_PRF0);
@@ -8700,14 +8700,14 @@ void prfmsg(){
 	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",picspac/PFGRAN);
 	prflin(STR_PRF16);
 	if(chku(BLUNT))
-		strcpy(msgbuf,stab[STR_BLUNT]);
+		strcpy_s(msgbuf,stab[STR_BLUNT]);
 	else
-		strcpy(msgbuf,stab[STR_TAPR]);
+		strcpy_s(msgbuf,stab[STR_TAPR]);
 	prflin(STR_PRF15);
 	if(chku(DUND))
-		strcpy(msgbuf,stab[STR_ON]);
+		strcpy_s(msgbuf,stab[STR_ON]);
 	else
-		strcpy(msgbuf,stab[STR_OFF]);
+		strcpy_s(msgbuf,stab[STR_OFF]);
 	prflin(STR_PRF19);
 	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",smalsiz/PFGRAN);
 	prflin(STR_PRF9);
@@ -8789,21 +8789,21 @@ void prfmsg(){
 	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",stspace/PFGRAN);
 	prflin(STR_PRF0);
 	if(chku(SQRFIL))
-		strcpy(msgbuf,stab[STR_SQR]);
+		strcpy_s(msgbuf,stab[STR_SQR]);
 	else
-		strcpy(msgbuf,stab[STR_PNTD]);
+		strcpy_s(msgbuf,stab[STR_PNTD]);
 	prflin(STR_PRF2);
 	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",brdwid/PFGRAN);
 	prflin(STR_PRF3);
 	if(chku(BLUNT))
-		strcpy(msgbuf,stab[STR_BLUNT]);
+		strcpy_s(msgbuf,stab[STR_BLUNT]);
 	else
-		strcpy(msgbuf,stab[STR_TAPR]);
+		strcpy_s(msgbuf,stab[STR_TAPR]);
 	prflin(STR_PRF15);
 	if(chku(DUND))
-		strcpy(msgbuf,stab[STR_ON]);
+		strcpy_s(msgbuf,stab[STR_ON]);
 	else
-		strcpy(msgbuf,stab[STR_OFF]);
+		strcpy_s(msgbuf,stab[STR_OFF]);
 	prflin(STR_PRF19);
 	sprintf_s(msgbuf, sizeof(msgbuf),"%.2f",bfclen/PFGRAN);
 	prflin(STR_PRF14);
@@ -10028,10 +10028,10 @@ void tglfrm(){
 		satfix();
 	rstMap(HIDSTCH);
 	if(toglMap(FRMOF))
-		strcpy(oftxt,stab[STR_FRMPLUS]);
+		strcpy_s(oftxt,stab[STR_FRMPLUS]);
 	else{
 
-		strcpy(oftxt,stab[STR_FRMINUS]);
+		strcpy_s(oftxt,stab[STR_FRMINUS]);
 		rstMap(FORMSEL);
 		rstMap(FORMIN);
 		rstMap(MOVFRM);
@@ -10054,7 +10054,7 @@ void frmon(){
 
 	unbsho();
 	rstMap(FRMOF);
-	strcpy(oftxt,stab[STR_FRMPLUS]);
+	strcpy_s(oftxt,stab[STR_FRMPLUS]);
 	SetMenuItemInfo(hMen,ID_FRMOF,FALSE,&meninfo);
 	setMap(DUMEN);
 }

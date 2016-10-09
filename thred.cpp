@@ -590,7 +590,7 @@ unsigned			sidtyp=0;		//data type for form data form numerical entry
 DUBPNT				mrkpnt;			//stitch coordinates of the zoom mark
 unsigned			prfind=0;		//index to the active preference window
 unsigned			fmenid[]={FM_ONAM0,FM_ONAM1,FM_ONAM2,FM_ONAM3};	//recently used file menu ID's
-TCHAR				vernams[OLDVER][MAX_PATH];	//temporary storage for old file version names
+TCHAR				vernams[OLDVER][_MAX_PATH];	//temporary storage for old file version names
 unsigned			baknum;			//points to old version to be read
 unsigned			actl=0;			//active layer
 unsigned			laycod;			//active layer code
@@ -623,8 +623,8 @@ TCHAR*				per;			//pointer to the error string
 unsigned			loksel;			//selection for lock list box
 unsigned			unloksel;		//eslection for unlock list box
 RANG				selrng;			//select range for locking
-TCHAR				colnam[MAX_PATH];//.thw file name
-TCHAR				rgbnam[MAX_PATH];//.rgb file name
+TCHAR				colnam[_MAX_PATH];//.thw file name
+TCHAR				rgbnam[_MAX_PATH];//.rgb file name
 DUBPNT				rcel;			//size of an rmap cell for drawing stitch boxes
 unsigned			wcol;			//color being dragged
 unsigned			prfsiz;			//size of the text part of the preference window
@@ -879,20 +879,20 @@ MENUITEMINFO filinfo={
 	13,					
 };
 
-const TCHAR			fltr[MAX_PATH]=		"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
-const TCHAR			bfltr[MAX_PATH]=	"Microsoft (BMP)\0*.bmp\0";
-TCHAR				cstFltr[MAX_PATH]=	"Thredworks (THR)\0*.thr\0";
-TCHAR				filnam[MAX_PATH]={0};
-TCHAR				thrnam[MAX_PATH];
-TCHAR				auxnam[MAX_PATH];
-TCHAR				genam[MAX_PATH];
-TCHAR				defDir[MAX_PATH]="c:\\";
-TCHAR				defbmp[MAX_PATH]="c:\\";
-TCHAR				balnam0[MAX_PATH]={0};	//balarad semaphore file
-TCHAR				balnam1[MAX_PATH]={0};	//balarad data file
-TCHAR				balnam2[MAX_PATH];
-TCHAR				srchnam[MAX_PATH];
-TCHAR				homdir[MAX_PATH];	//directory from which thred was executed
+const TCHAR			fltr[_MAX_PATH]=		"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
+const TCHAR			bfltr[_MAX_PATH]=	"Microsoft (BMP)\0*.bmp\0";
+TCHAR				cstFltr[_MAX_PATH]=	"Thredworks (THR)\0*.thr\0";
+TCHAR				filnam[_MAX_PATH]={0};
+TCHAR				thrnam[_MAX_PATH];
+TCHAR				auxnam[_MAX_PATH];
+TCHAR				genam[_MAX_PATH];
+TCHAR				defDir[_MAX_PATH]="c:\\";
+TCHAR				defbmp[_MAX_PATH]="c:\\";
+TCHAR				balnam0[_MAX_PATH]={0};	//balarad semaphore file
+TCHAR				balnam1[_MAX_PATH]={0};	//balarad data file
+TCHAR				balnam2[_MAX_PATH];
+TCHAR				srchnam[_MAX_PATH];
+TCHAR				homdir[_MAX_PATH];	//directory from which thred was executed
 TCHAR*				phom;			//pointer to the home file name
 PCSTCH*				filBuf;
 HANDLE				hFil=0;
@@ -903,10 +903,10 @@ HANDLE				hBmp;			//bitmap handle
 unsigned			siz;			//size of file
 unsigned long		red;			//bytes actually read from file
 unsigned			colCnt;			//number of color changes
-TCHAR				iniNam[MAX_PATH];	//.ini file name
+TCHAR				iniNam[_MAX_PATH];	//.ini file name
 unsigned			savcol;			//for saving files
 TCHAR				bnam[16];		//bitmap file name from pcs file
-TCHAR				lbnam[MAX_PATH];//bitmap file name from user load
+TCHAR				lbnam[_MAX_PATH];//bitmap file name from user load
 OPENFILENAME		ofn={
 
 	sizeof(OPENFILENAME),	//lStructsize
@@ -914,10 +914,10 @@ OPENFILENAME		ofn={
 	hInst,					//hInstance 
 	fltr,					//lpstrFilter 
 	cstFltr,				//lpstrCustomFilter 
-	MAX_PATH,				//nMaxCustFilter 
+	_MAX_PATH,				//nMaxCustFilter 
 	0,						//nFilterIndex 
 	filnam,					//lpstrFile 
-	MAX_PATH,				//nMaxFile 
+	_MAX_PATH,				//nMaxFile 
 	0,						//lpstrFileTitle 
 	0,						//nMaxFileTitle 
 	defDir,					//lpstrInitialDir
@@ -937,7 +937,7 @@ unsigned			thumcnt;				//number of thumbnail file names
 unsigned			thumdcnt;				//number of thumbnail file names selected for display
 unsigned			thumind;				//index into the thumbnail filname table
 TCHAR				thumsrch[32];			//storage for the thumnail search string
-TCHAR				insnam[MAX_PATH]={0};	//insert file name
+TCHAR				insnam[_MAX_PATH]={0};	//insert file name
 unsigned			insflt;					//saved float pointer for inserting files
 unsigned			insfpnt;				//saved form pointer for inserting files
 unsigned			insfstch;				//saved stitch pointer for inserting files
@@ -948,10 +948,10 @@ OPENFILENAME obn={
 	hInst,					//hInstance 
 	bfltr,					//lpstrFilter 
 	cstFltr,				//lpstrCustomFilter 
-	MAX_PATH,				//nMaxCustFilter 
+	_MAX_PATH,				//nMaxCustFilter 
 	0,						//nFilterIndex 
 	lbnam,					//lpstrFile 
-	MAX_PATH,				//nMaxFile 
+	_MAX_PATH,				//nMaxFile 
 	0,						//lpstrFileTitle 
 	0,						//nMaxFileTitle 
 	defbmp,					//lpstr	ialDir 
@@ -2758,18 +2758,18 @@ void nunams(){
 
 	TCHAR*		pext;
 	unsigned	ind;
-	TCHAR		tnam[MAX_PATH];
+	TCHAR		tnam[_MAX_PATH];
 
-	_strlwr(filnam);
+	_strlwr_s(filnam);
 	pext=strrchr(filnam,'.');
 	if(pext)
 		pext++;
 	else
 		pext=&filnam[strlen(filnam)];
 	ind=pext-filnam;
-	strncpy(auxnam,filnam,ind);
-	strncpy(thrnam,filnam,ind);
-	strncpy(genam,filnam,ind);
+	strncpy_s(auxnam,filnam,ind);
+	strncpy_s(thrnam,filnam,ind);
+	strncpy_s(genam,filnam,ind);
 	pext=auxnam+ind;
 	switch(ini.auxfil){
 
@@ -2782,7 +2782,7 @@ void nunams(){
 
 	case AUXPES:
 
-		strcpy(pext,"pes");
+		strcpy_s(pext,"pes");
 		break;
 
 #endif
@@ -2814,14 +2814,14 @@ void nunams(){
 
 		if(!ini.oldnams[ind][0]){
 
-			strcpy(ini.oldnams[ind],thrnam);
+			strcpy_s(ini.oldnams[ind],thrnam);
 			goto mendun;
 		}
 	}
-	strcpy(ini.oldnams[3],ini.oldnams[2]);
-	strcpy(ini.oldnams[2],ini.oldnams[1]);
-	strcpy(ini.oldnams[1],ini.oldnams[0]);
-	strcpy(ini.oldnams[0],thrnam);
+	strcpy_s(ini.oldnams[3],ini.oldnams[2]);
+	strcpy_s(ini.oldnams[2],ini.oldnams[1]);
+	strcpy_s(ini.oldnams[1],ini.oldnams[0]);
+	strcpy_s(ini.oldnams[0],thrnam);
 mendun:;
 	redfils();
 nomen:;
@@ -3529,7 +3529,7 @@ void defNam(TCHAR* fNam){
 
 	if(fNam[0]){
 
-		strcpy(defDir,fNam);
+		strcpy_s(defDir,fNam);
 		last=strrchr(defDir,'\\');
 		if(last-defDir==2)
 			last[1]=0;
@@ -3544,7 +3544,7 @@ void defbNam(){
 
 	if(lbnam[0]){
 
-		strcpy(defbmp,lbnam);
+		strcpy_s(defbmp,lbnam);
 		last=strrchr(defbmp,'\\');
 		if(last-defbmp==2)
 			last[1]=0;
@@ -3558,7 +3558,7 @@ void ritini(){
 	unsigned	ind;
 	RECT		wrct;
 
-	strcpy(ini.defDir,defDir);
+	strcpy_s(ini.defDir,defDir);
 	for(ind=0;ind<16;ind++){
 
 		ini.stchCols[ind]=	useCol[ind];
@@ -3814,22 +3814,22 @@ void ritbal(){
 	unsigned		ind,ine,col;
 	HANDLE			bfil;
 	TCHAR*			pbchr;
-	TCHAR			onam[MAX_PATH];
+	TCHAR			onam[_MAX_PATH];
 	unsigned long	wrot;
 
 	if(*balnam0&&*balnam1&&hed.stchs){
 
 		if(!*filnam){
 
-			strcpy(filnam,defDir);
-			strcat(filnam,"\\balfil.thr");
+			strcpy_s(filnam,defDir);
+			strcat_s(filnam,"\\balfil.thr");
 		}
-		strcpy(onam,filnam);
+		strcpy_s(onam,filnam);
 		pbchr=strrchr(onam,'.');
 		if(pbchr)
-			strcpy(pbchr,".thv");
+			strcpy_s(pbchr,sizeof(onam)-(pbchr-onam),".thv");
 		else
-			strcat(pbchr,".thv");
+			strcat_s(onam,sizeof(onam)-strlen(onam),".thv");
 		bfil=CreateFile(onam,GENERIC_WRITE,0,0,CREATE_ALWAYS,0,0);
 		if(bfil==INVALID_HANDLE_VALUE)
 			return;
@@ -5487,16 +5487,16 @@ BOOL colfil(){
 
 	TCHAR*	pext;
 
-	strcpy(colnam,filnam);
-	strcpy(rgbnam,filnam);
+	strcpy_s(colnam,filnam);
+	strcpy_s(rgbnam,filnam);
 	pext=strrchr(colnam,'.');
 	if(pext){
 
 		pext++;
-		strcpy(pext,"thw");
+		strcpy_s(pext,sizeof(colnam)-(pext-colnam),"thw");
 		pext=strrchr(rgbnam,'.');
 		pext++;
-		strcpy(pext,"rgb");
+		strcpy_s(pext, sizeof(rgbnam) - (pext - rgbnam),"rgb");
 		return 1;
 	}
 	else
@@ -5831,7 +5831,7 @@ void nuFil(){
 			txad=0;
 			EnableMenuItem(hMen,M_REDO,MF_BYPOSITION|MF_GRAYED);
 			deldu();
-			strcpy(fildes,ini.desnam);
+			strcpy_s(fildes,ini.desnam);
 			unbsho();
 			rstMap(MOVSET);
 			frmon();
@@ -5870,7 +5870,7 @@ void nuFil(){
 				pext++;
 			else{
 
-				strcat(filnam,".thr");
+				strcat_s(filnam,".thr");
 				pext=strrchr(filnam,'.')+1;
 			}
 			tchr=tolower(pext[0]);
@@ -5901,8 +5901,8 @@ void nuFil(){
 							hed.hup=LARGHUP;
 						}
 						ritfnam(ini.desnam);
-						strcpy(fildes,ini.desnam);
-						strcpy(hedx.modnam,ini.desnam);
+						strcpy_s(fildes,ini.desnam);
+						strcpy_s(hedx.modnam,ini.desnam);
 						break;
 
 					case 1:
@@ -6091,9 +6091,9 @@ void nuFil(){
 							}
 							hed.stchs=stind;
 							tnam=(TCHAR*)&filBuf[ind];
-							strcpy(bnam,tnam);
+							strcpy_s(bnam,tnam);
 							delete[] filBuf;
-							strcpy(pext,"thr");
+							strcpy_s(pext,sizeof(filnam)-(pext-filnam),"thr");
 							ini.auxfil=AUXPCS;
 							if(hed.hup!=LARGHUP&&hed.hup!=SMALHUP)
 								hed.hup=LARGHUP;
@@ -6239,7 +6239,7 @@ void nuFil(){
 			if(bnam[0]){
 						
 				SetCurrentDirectory(defDir);
-				strcpy(lbnam,bnam);
+				strcpy_s(lbnam,bnam);
 				bfil();
 			}
 			ritot(hed.stchs);
@@ -6256,7 +6256,7 @@ void nuFil(){
 
 				uPen[ind]=nuPen(uPen[ind],1,useCol[ind]);
 				hbrUseCol[ind]=nuBrush(hbrUseCol[ind],useCol[ind]);
-				strncpy(buf,thrdSiz[ind],2);
+				strncpy_s(buf,thrdSiz[ind],2);
 				SetWindowText(hSiz[ind],buf);
 			}
 			for(ind=0;ind<16;ind++)
@@ -6584,7 +6584,7 @@ unsigned pesnam(){
 #if defined(__UseASM__)
 	_asm{
 			mov		ebx,offset auxnam
-			mov		ecx,MAX_PATH
+			mov		ecx,_MAX_PATH
 			mov		edx,ebx
 peslup0:	mov		al,[ebx]
 			or		al,al
@@ -6616,7 +6616,7 @@ pesnamx:	mov		eax,edi
 #else
 	_asm{
 			mov		ebx,offset auxnam
-			mov		ecx,MAX_PATH
+			mov		ecx,_MAX_PATH
 			mov		edx,ebx
 peslup0:	mov		al,[ebx]
 			or		al,al
@@ -6740,7 +6740,7 @@ void chk1col(){
 BOOL chkattr(TCHAR* nam){
 
 	unsigned		attr,ind;
-	TCHAR			driv[MAX_PATH];
+	TCHAR			driv[_MAX_PATH];
 	DWORD			sec;
 	DWORD			byt;
 	DWORD			fclst;
@@ -6758,7 +6758,7 @@ BOOL chkattr(TCHAR* nam){
 		else
 			return 1;
 	}
-	strcpy(driv,homdir);
+	strcpy_s(driv,homdir);
 	driv[3]=0;
 	if(!GetDiskFreeSpace(driv,&sec,&byt,&fclst,&tclst)){
 
@@ -6837,7 +6837,7 @@ void sav(){
 			pchr=(TCHAR*)&dsthed;
 			for(ind=0;ind<sizeof(DSTHED);ind++)
 				pchr[ind]=' ';
-			strcpy(dsthed.desched,"LA:");
+			strcpy_s(dsthed.desched,"LA:");
 			pchr=strrchr(auxnam,'\\')+1;
 			for(ind=0;ind<sizeof(dsthed.desc);ind++){
 
@@ -6847,22 +6847,22 @@ void sav(){
 					break;
 			}
 			dsthed.desc[16]=0xd;
-			strncpy(dsthed.recshed,"ST:",3);
+			strncpy_s(dsthed.recshed,"ST:",3);
 			sprintf_s(dsthed.recs,sizeof(dsthed.recs),"%7d\r",dstcnt);
-			strncpy(dsthed.cohed,"CO:  0",6);
-			strncpy(dsthed.xplushed-1,"\xd+X:",4);
+			strncpy_s(dsthed.cohed,"CO:  0",6);
+			strncpy_s(dsthed.xplushed-1,sizeof(dsthed.xplushed),"\xd+X:",4);
 			sprintf_s(dsthed.xplus,sizeof(dsthed.xplus),"%5d\xd",dstmin.x);
-			strncpy(dsthed.xminhed,"-X:",3);
+			strncpy_s(dsthed.xminhed,"-X:",3);
 			sprintf_s(dsthed.xmin,sizeof(dsthed.xmin),"%5d\xd",dstplus.x);
-			strncpy(dsthed.yplushed,"+Y:",3);
+			strncpy_s(dsthed.yplushed,"+Y:",3);
 			sprintf_s(dsthed.yplus,sizeof(dsthed.yplus),"%5d\xd",dstplus.y);
-			strncpy(dsthed.yminhed,"-Y:",3);
+			strncpy_s(dsthed.yminhed,"-Y:",3);
 			sprintf_s(dsthed.ymin,sizeof(dsthed.ymin),"%5d\xd",dstmin.y);
-			strncpy(dsthed.axhed,"AX:-    0\r",10);
-			strncpy(dsthed.ayhed,"AY:+    0\r",10);
-			strncpy(dsthed.mxhed,"MX:+    0\r",10);
-			strncpy(dsthed.myhed,"MY:+    0\r",10);
-			strncpy(dsthed.pdhed,"PD******\r\x1a",10);
+			strncpy_s(dsthed.axhed,"AX:-    0\r",10);
+			strncpy_s(dsthed.ayhed,"AY:+    0\r",10);
+			strncpy_s(dsthed.mxhed,"MX:+    0\r",10);
+			strncpy_s(dsthed.myhed,"MY:+    0\r",10);
+			strncpy_s(dsthed.pdhed,"PD******\r\x1a",10);
 			pchr=(TCHAR*)&dsthed;
 			WriteFile(hPcs,(DSTHED*)&dsthed,sizeof(DSTHED),&wrot,0);
 			WriteFile(hPcs,(DSTREC*)drecs,sizeof(DSTREC)*dstcnt,&wrot,0);
@@ -6875,9 +6875,9 @@ void sav(){
 			pchr=(TCHAR*)&peshed;
 			for(ind=0;ind<sizeof(PESHED);ind++)
 				pchr[ind]=0;
-			strcpy(peshed.led,"#PES0001");
-			strcpy(peshed.ce,"CEmbOne");
-			strcpy(peshed.cs,"CSewSeg");
+			strcpy_s(peshed.led,"#PES0001");
+			strcpy_s(peshed.ce,"CEmbOne");
+			strcpy_s(peshed.cs,"CSewSeg");
 			pestch=(PESTCH*)&bseq;
 			for(ind=0;ind<16;ind++){
 
@@ -7041,7 +7041,7 @@ void savAs(){
 		ofn.nFilterIndex=0;
 		if(GetSaveFileName(&ofn)){
 
-			_strlwr(filnam);
+			_strlwr_s(filnam);
 			pchr=strrchr(filnam,'.');
 			if(!pchr)
 				pchr=&filnam[strlen(filnam)];
@@ -7049,19 +7049,19 @@ void savAs(){
 
 			case 1:
 
-				strcpy(pchr,".thr");
+				strcpy_s(pchr, sizeof(filnam) - (pchr - filnam),".thr");
 				break;
 
 			case 2:
 
-				strcpy(pchr,".pcs");
+				strcpy_s(pchr, sizeof(filnam) - (pchr - filnam), ".pcs");
 				ini.auxfil=AUXPCS;
 				auxmen();
 				break;
 
 			case 3:
 
-				strcpy(pchr,".dst");
+				strcpy_s(pchr, sizeof(filnam) - (pchr - filnam), ".dst");
 				ini.auxfil=AUXDST;
 				auxmen();
 				break;
@@ -7090,7 +7090,7 @@ void save(){
 			pchr++;
 		else{
 
-			strcat(filnam,".thr");
+			strcat_s(filnam,".thr");
 			pchr=strrchr(filnam,'.')+1;
 		}
 		tchr=pchr[0]|0x20;
@@ -8135,9 +8135,9 @@ void newFil(){
 	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRED],ini.desnam);
 	deldu();
 	SetWindowText(hWnd,msgbuf);
-	strcpy(thrnam,stab[STR_NUFIL]);
+	strcpy_s(thrnam,stab[STR_NUFIL]);
 	ritfnam(ini.desnam);
-	strcpy(hedx.modnam,ini.desnam);
+	strcpy_s(hedx.modnam,ini.desnam);
 	rstdu();
 	rstAll();
 	clrhbut(3);
@@ -9811,7 +9811,7 @@ void lodbmp(){
 		untrace();
 		pchr=strrchr(lbnam,'\\')+1;
 		// PCS file can only store a 16 character filename?
-		strncpy(bnam,pchr, sizeof(bnam));
+		strncpy_s(bnam,pchr, sizeof(bnam));
 		defbNam();
 		bfil();
 		setMap(RESTCH);
@@ -9952,9 +9952,9 @@ void duver(TCHAR* nam){
 	if(ind){
 
 		chr=tolower(nam[ind])-'r';
-		nam[MAX_PATH-1]=0;
+		nam[_MAX_PATH-1]=0;
 		if(chr>=0&&chr<=3)
-			strcpy(vernams[chr],nam);
+			strcpy_s(vernams[chr],nam);
 	}
 }
 
@@ -10006,7 +10006,7 @@ void dubuf(){
 	sthed.stchs=hed.stchs;
 	sthed.hup=ini.hup;
 	len=0;slen=0;elen=0;
-	strcpy(hedx.modnam,ini.desnam);
+	strcpy_s(hedx.modnam,ini.desnam);
 	if(formpnt){
 	
 		for(ind=0;ind<formpnt;ind++){
@@ -10112,7 +10112,7 @@ void thrsav(){
 	//unsigned			elind=0;
 	WIN32_FIND_DATA		fdat; 
 	HANDLE				hndl;
-	TCHAR				nunam[MAX_PATH];
+	TCHAR				nunam[_MAX_PATH];
 
 	if(chkattr(filnam))
 		return;
@@ -10134,8 +10134,8 @@ void thrsav(){
 
 				if(vernams[tind][0]){
 
-					vernams[tind][MAX_PATH-1]=0;
-					strcpy(nunam,vernams[tind]);
+					vernams[tind][_MAX_PATH-1]=0;
+					strcpy_s(nunam,vernams[tind]);
 					len=duth(nunam);
 					nunam[len]=tind+'s';
 					MoveFile(vernams[tind],nunam);
@@ -10265,13 +10265,13 @@ void frmdel(){
 	
 void deltot(){
 
-	strcpy(fildes,ini.desnam);
+	strcpy_s(fildes,ini.desnam);
 	formpnt=hed.stchs=fltad=clpad=satkad=txad=0;
 	rstMap(GMRK);
 	rstAll();
 	coltab();
 	zumhom();
-	strcpy(fildes,ini.desnam);
+	strcpy_s(fildes,ini.desnam);
 	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY],thrnam,fildes);
 	SetWindowText(hWnd,msgbuf);
 }
@@ -10694,7 +10694,7 @@ void getbak(){
 
 			if(chkMap(RBUT)){
 
-				strcpy(insnam,thumsel[baknum]);
+				strcpy_s(insnam,thumsel[baknum]);
 				setMap(IGNORINS);
 				unthum();
 				setMap(FRMOF);
@@ -10710,14 +10710,14 @@ void getbak(){
 			}
 			else{
 
-				strcpy(filnam,defDir);
+				strcpy_s(filnam,defDir);
 				pchr=&filnam[strlen(filnam)-1];
 				if(pchr[0]!='\\'){
 
 					pchr[1]='\\';
 					pchr[2]=0;
 				}
-				strcat(filnam,thumsel[baknum]);
+				strcat_s(filnam,thumsel[baknum]);
 				setMap(REDOLD);
 				nuFil();
 			}
@@ -10730,20 +10730,20 @@ void getbak(){
 void rebak(){
 
 	unsigned	ind;
-	TCHAR		tnaml[MAX_PATH];
-	TCHAR		tnamx[MAX_PATH];
+	TCHAR		tnaml[_MAX_PATH];
+	TCHAR		tnamx[_MAX_PATH];
 
 	for(ind=0;ind<OLDVER;ind++)
 		DestroyWindow(hvu[ind]);
-	strcpy(tnaml,thrnam);
-	strcpy(tnamx,thrnam);
+	strcpy_s(tnaml,thrnam);
+	strcpy_s(tnamx,thrnam);
 	ind=duth(tnaml);
 	tnaml[ind]=baknum+'s';
 	tnamx[ind]='x';
 	MoveFile(thrnam,tnamx);
 	MoveFile(tnaml,thrnam);
 	MoveFile(tnamx,tnaml);
-	strcpy(filnam,thrnam);
+	strcpy_s(filnam,thrnam);
 	setMap(REDOLD);
 	nuFil();
 	DeleteFile(tnamx);
@@ -10760,13 +10760,13 @@ void thumbak(){
 
 void movbak(TCHAR src,TCHAR dst){
 
-	TCHAR	strsrc[MAX_PATH];
-	TCHAR	strdst[MAX_PATH];
+	TCHAR	strsrc[_MAX_PATH];
+	TCHAR	strdst[_MAX_PATH];
 	
 	unsigned ind=duth(thrnam);
 
-	strcpy(strsrc,thrnam);
-	strcpy(strdst,thrnam);
+	strcpy_s(strsrc,thrnam);
+	strcpy_s(strdst,thrnam);
 	strsrc[ind]=(TCHAR)src;
 	strdst[ind]=(TCHAR)dst;
 	DeleteFile(strdst);
@@ -10775,12 +10775,12 @@ void movbak(TCHAR src,TCHAR dst){
 
 void purg(){
 
-	TCHAR		tnam[MAX_PATH];
+	TCHAR		tnam[_MAX_PATH];
 	unsigned	pind,ind;
 
 	if(hFil){
 
-		strcpy(tnam,thrnam);
+		strcpy_s(tnam,thrnam);
 		pind=duth(tnam);
 		for(ind=1;ind<6;ind++){
 
@@ -10801,16 +10801,16 @@ void purgdir(){
 void deldir(){
 
 	unsigned			ind;
-	TCHAR				tnam[MAX_PATH];
+	TCHAR				tnam[_MAX_PATH];
 	TCHAR*				pchr;
 	WIN32_FIND_DATA		fdat;
 	HANDLE				hndl;
 
 	unmsg();
 	tabmsg(IDS_BAKDEL);
-	strcpy(tnam,defDir);
+	strcpy_s(tnam,defDir);
 	pchr=&tnam[strlen(tnam)];
-	strcpy(pchr,"\\*.th0");
+	strcpy_s(pchr, sizeof(tnam) - (pchr - tnam), "\\*.th0");
 	for(ind=1;ind<6;ind++){
 
 		pchr[5]=(TCHAR)ind+'r';
@@ -12143,12 +12143,12 @@ lchrx:
 
 void barnam(HWND hndl,unsigned fpnt){
 
-	TCHAR		buf[MAX_PATH];
+	TCHAR		buf[_MAX_PATH];
 	TCHAR*		pchr;
 
 	if(fpnt<thumdcnt&&thumsel[fpnt]){
 
-		strcpy(buf,thumsel[fpnt]);
+		strcpy_s(buf,thumsel[fpnt]);
 		pchr=strrchr(buf,'.');
 		if(pchr)
 			pchr[0]=0;
@@ -12184,6 +12184,8 @@ void rthumnam(unsigned ind){
 	}
 }
 
+#pragma warning(push)
+#pragma warning(disable : 4996)
 void thumnail(){
 
 	WIN32_FIND_DATA	fdat;
@@ -12194,18 +12196,19 @@ void thumnail(){
 	unbsho();
 	undat();
 	untrace();
+	// is this correct? types do not match
 	thumnams=(TCHAR*)oseq;
 	pthums=(TCHAR**)&oseq[MAXSEQ>>1];
 
 	SetCurrentDirectory(defDir);
-	strcpy(srchnam,defDir);
+	strcpy_s(srchnam,defDir);
 	pchr=&srchnam[strlen(srchnam)-1];
 	if(pchr[0]!='\\'){
 
 		pchr[1]='\\';
 		pchr[2]=0;
 	}
-	strcat(srchnam,"*.thr");
+	strcat_s(srchnam,"*.thr");
 	shndl=FindFirstFile(srchnam,&fdat);
 	if(shndl==INVALID_HANDLE_VALUE){
 		
@@ -12247,6 +12250,7 @@ void thumnail(){
 		setMap(RESTCH);
 	}
 }
+#pragma warning(pop)
 
 void nuthsel(){
 
@@ -12419,10 +12423,10 @@ void insfil(){
 		hInst,					//hInstance 
 		"THR files\0*.thr\0\0",	//lpstrFilter 
 		cstFltr,				//lpstrCustomFilter 
-		MAX_PATH,				//nMaxCustFilter 
+		_MAX_PATH,				//nMaxCustFilter 
 		0,						//nFilterIndex 
 		insnam,					//lpstrFile 
-		MAX_PATH,				//nMaxFile 
+		_MAX_PATH,				//nMaxFile 
 		0,						//lpstrFileTitle 
 		0,						//nMaxFileTitle 
 		defDir,					//lpstr	ialDir 
@@ -12866,7 +12870,7 @@ void desiz(){
 		sizy=(trct.top-trct.bottom)/PFGRAN;
 		if((trct.left<0)||(trct.bottom<0)||(trct.right>ini.hupx)||(trct.top>ini.hupy)){
 		
-			strcpy(msgbuf,stab[STR_STCHOUT]);
+			strcpy_s(msgbuf,stab[STR_STCHOUT]);
 			pmsg=&msgbuf[strlen(msgbuf)];
 		}
 #if LANG==ENG||LANG==HNG
@@ -13784,14 +13788,14 @@ void gsnap(){
 void lodpes(){
 
 	setMap(REDOLD);
-	strcpy(filnam,"u:\\mrd\\t.pes");
+	strcpy_s(filnam,"u:\\mrd\\t.pes");
 	nuFil();
 }
 
 void savpes(){
 
 	ini.auxfil=AUXPES;
-	strcpy(filnam,"u:\\mrd\\t1.thr");
+	strcpy_s(filnam,"u:\\mrd\\t1.thr");
 	nunams();
 	sav();
 }
@@ -13833,8 +13837,8 @@ BOOL CALLBACK LockPrc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
 
 	WIN32_FIND_DATA*	pdat;
 	HANDLE				srch;
-	TCHAR				snam[MAX_PATH];
-	TCHAR				tnam[MAX_PATH];
+	TCHAR				snam[_MAX_PATH];
+	TCHAR				tnam[_MAX_PATH];
 	unsigned			ind,ine;
 	HWND				hlok,hunlok;
 
@@ -13845,8 +13849,8 @@ BOOL CALLBACK LockPrc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
 
 		loksel=unloksel=0xffffffff;
 		SendMessage(hwndlg,WM_SETFOCUS,0,0);
-		strcpy(snam,defDir);
-		strcat(snam,"\\*.thr");
+		strcpy_s(snam,defDir);
+		strcat_s(snam,"\\*.thr");
 		srch=FindFirstFile(snam,&pdat[0]);
 		if(srch==INVALID_HANDLE_VALUE){
 
@@ -13918,13 +13922,13 @@ BOOL CALLBACK LockPrc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
 
 		case IDOK:
 
-			strcpy(snam,defDir);
-			strcat(snam,"\\");
+			strcpy_s(snam,defDir);
+			strcat_s(snam,"\\");
 			ine=0;
 			for(ind=0;ind<xpnt;ind++){
 
-				strcpy(tnam,snam);
-				strcat(tnam,pdat[ind].cFileName);
+				strcpy_s(tnam,snam);
+				strcat_s(tnam,pdat[ind].cFileName);
 				if(!SetFileAttributes(tnam,pdat[ind].dwFileAttributes))
 					ine++;
 			}
@@ -15164,7 +15168,7 @@ void trcnum(unsigned shft,COLORREF col,unsigned ind){
 
 	col>>=shft;
 	col&=0xff;
-	_itoa(col,trbuf,10);
+	_itoa_s(col,trbuf,10);
 	len=strlen(trbuf);
 	nwid=numwid*(3-len)+1;
 	SetBkColor(ds->hDC,trgb[ind]);	
@@ -17477,7 +17481,7 @@ chkcolx:;
 				vind-=13;
 				thrdSiz[thrdSel][0]=cmap[vind];
 				sizInd[thrdSel]=vind;
-				strncpy(buf,thrdSiz[thrdSel],2);
+				strncpy_s(buf,thrdSiz[thrdSel],2);
 				buf[2]=0;
 				SetWindowText(hSiz[thrdSel],buf);
 				setMap(RESTCH);
@@ -19303,7 +19307,7 @@ thumout:;
 			else{
 #if PESACT
 //				ini.auxfil=AUXPES;
-//				strcpy(filnam,"u:\\mrd\\t.thr");
+//				strcpy_s(filnam,"u:\\mrd\\t.thr");
 //				setMap(REDOLD);
 //				nuFil();
 //				lodpes();
@@ -20461,7 +20465,7 @@ thumout:;
 
 			if(msg.wParam==fmenid[ind]){
 
-				strcpy(filnam,ini.oldnams[ind]);
+				strcpy_s(filnam,ini.oldnams[ind]);
 				setMap(REDOLD);
 				nuFil();
 			}
@@ -21774,20 +21778,25 @@ void int2tim(ULARGE_INTEGER num,FILETIME* tim){
 void ritloc(){
 
 	TCHAR*			penv;
-	TCHAR			locnam[MAX_PATH];
+	TCHAR			locnam[_MAX_PATH];
 	HANDLE			hloc;
 	DWORD			rot;
+	size_t			len;
+	errno_t			err;
+	err = _dupenv_s(&penv, &len, "COMSPEC");
 
-	penv=getenv("COMSPEC");
-	if(penv)
-		strcpy(locnam,penv);
-	else
+	if (err) {
+		free(penv);
 		return;
+	}
+	else {
+		strcpy_s(locnam, penv);
+		free(penv);
+	}
 	penv=strrchr(locnam,'\\')+1;
-	strcpy(penv,"thredloc.txt");
+	strcpy_s(penv, sizeof(locnam) - (penv - locnam),"thredloc.txt");
 	hloc=CreateFile(locnam,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,0,NULL);
 	if (hloc != INVALID_HANDLE_VALUE) {
-		*phom = 0;
 		WriteFile(hloc, (TCHAR*)homdir, strlen(homdir) + 1, &rot, 0);
 		CloseHandle(hloc);
 	}
@@ -22144,22 +22153,22 @@ void duhom(){
 
 	unsigned ind;
 
-	strcpy(homdir,__argv[0]);
+	strcpy_s(homdir,__argv[0]);
 	phom=strrchr(homdir,'\\');
 	if(phom)
 		phom++;
 	else{
 
-		ind=GetCurrentDirectory(MAX_PATH,homdir);
+		ind=GetCurrentDirectory(_MAX_PATH,homdir);
 		homdir[ind++]='\\';
 		phom=&homdir[ind];
 	}
 	*phom=0;
 }
 
+#if defined(__UseASM__)
 void bcpy(TCHAR* dst,TCHAR* src){
 
-#if defined(__UseASM__)
 	_asm{
 
 			mov		ebx,src
@@ -22174,10 +22183,11 @@ blup:		mov		al,[ebx]
 			jmp		blup
 blupx:		
 	}
-#else
-	strcpy(dst, src);
-#endif
+//#else
+//	strcpy(dst, src);
+//#endif
 }
+#endif
 
 void ducmd(){
 
@@ -22186,7 +22196,11 @@ void ducmd(){
 
 	if(__argc>1){
 
+#if defined(__UseASM__)
 		bcpy(filnam,__argv[1]);
+#else
+		strcpy_s(filnam, __argv[1]);
+#endif
 		if(!strncmp(filnam,"/F1:",4)){
  
 			balpnt=&filnam[4];
@@ -22194,20 +22208,32 @@ void ducmd(){
 			CloseHandle(balfil);
 			if(balfil!=INVALID_HANDLE_VALUE){
 
+#if defined(__UseASM__)
 				bcpy(balnam0,balpnt);
+#else
+				strcpy_s(balnam0, balpnt);
+#endif
 				if(__argc>2){
 
+#if defined(__UseASM__)
 					bcpy(filnam,__argv[2]);
+#else
+					strcpy_s(filnam, __argv[2]);
+#endif
 					if(!strncmp(filnam,"/F2:",4)){
 
 						balpnt=&filnam[4];
 						balfil=CreateFile(balpnt,GENERIC_READ,0,0,OPEN_EXISTING,0,0);
 						if(balfil!=INVALID_HANDLE_VALUE){
 
+#if defined(__UseASM__)
 							bcpy(balnam1,balpnt);
+#else
+							strcpy_s(balnam1, balpnt);
+#endif
 							balpnt=(TCHAR*)&bseq;
 							ReadFile(balfil,(void*)&balnam2,10000,&red,0);
-							strcat(balnam2,"");
+							strcat_s(balnam2,"");
 							if(red)
 								redbal();
 						}
@@ -22223,8 +22249,8 @@ void ducmd(){
 
 			for(ind=2;ind<__argc;ind++){
 
-				strcat(filnam," ");
-				strcat(filnam,__argv[ind]);
+				strcat_s(filnam," ");
+				strcat_s(filnam,__argv[ind]);
 			}
 			setMap(REDOLD);
 			nuFil();
@@ -22243,8 +22269,8 @@ void redini(){
 	for(ind=0;ind<OLDNUM;ind++)
 		ini.oldnams[ind][0]=0;
 	duhom();
-	strcpy(iniNam,homdir);
-	strcat(iniNam,"thred.ini");
+	strcpy_s(iniNam,homdir);
+	strcat_s(iniNam,"thred.ini");
 	hIni=CreateFile(iniNam,GENERIC_READ,0,NULL,
 				OPEN_EXISTING,0,NULL);
 	if(hIni==INVALID_HANDLE_VALUE)
@@ -22254,8 +22280,8 @@ void redini(){
 		ReadFile(hIni,&ini,sizeof(ini),&wrot,0);
 		if(wrot<2061)
 			ini.frmbpix=DEFBPIX;
-		strcpy(defDir,ini.defDir);
-		strcpy(defbmp,ini.defDir);
+		strcpy_s(defDir,ini.defDir);
+		strcpy_s(defbmp,ini.defDir);
 		for(ind=0;ind<16;ind++){
 
 			useCol[ind]=	ini.stchCols[ind];
@@ -22667,7 +22693,7 @@ void init(){
 	auxmen();
 	fnamtabs();
 	ritfnam(ini.desnam);
-	strcpy(hedx.modnam,ini.desnam);
+	strcpy_s(hedx.modnam,ini.desnam);
 	hedx.stgran=0;
 	for(ind=0;ind<31;ind++)
 		hedx.res[ind]=0;
@@ -23659,7 +23685,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam){
 	POINT				lin[2];
 	long				twid;
 	double				tdub;
-	TCHAR				nam[MAX_PATH];
+	TCHAR				nam[_MAX_PATH];
 
 	switch(message){
 
@@ -23910,7 +23936,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam){
 				FillRect(ds->hDC,&ds->rcItem,(HBRUSH)(COLOR_BTNFACE+1));
 			if(chkMap(TXTRED))
 			{
-				LoadString(hInst,IDS_TXWID,nam,MAX_PATH);
+				LoadString(hInst,IDS_TXWID,nam,_MAX_PATH);
 				sprintf_s(hlpbuf, sizeof(hlpbuf),nam,tscr.wid/PFGRAN);
 				TextOut(ds->hDC,ind,1,hlpbuf,strlen(hlpbuf));;
 			}
@@ -23943,13 +23969,13 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam){
 				if(ds->hwndItem==hstrc[ind]){
 
 					tbrsh=hblk;
-					strcpy(buf,stab[STR_OFF]);
+					strcpy_s(buf,stab[STR_OFF]);
 					SetBkColor(ds->hDC,0);
 					SetTextColor(ds->hDC,trgb[ind]);
 					if(chkMap(trbits[ind])){
 
 						tbrsh=trbrsh[ind];
-						strcpy(buf,stab[STR_ON]);
+						strcpy_s(buf,stab[STR_ON]);
 						SetTextColor(ds->hDC,0);
 						SetBkColor(ds->hDC,trgb[ind]);	
 					}
@@ -24025,7 +24051,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam){
 
 					if(ds->hwndItem==hvu[ind]){
 
-						strcpy(nam,thrnam);
+						strcpy_s(nam,thrnam);
 						ine=duth(nam);
 						nam[ine]=(TCHAR)ind+'s';
 						ritbak(nam,ds);
@@ -24202,9 +24228,9 @@ fltex1:
 #else
 	if (cod != 0x10) 
 		return 0;
-
-	_controlfp(ALL_FPU_EX, _MCW_EM);
-	_controlfp(_RC_NEAR, _MCW_RC);
+	unsigned int current_word = 0;
+	_controlfp_s(&current_word, ALL_FPU_EX, _MCW_EM);
+	_controlfp_s(&current_word, _RC_NEAR, _MCW_RC);
 
 	return -1;
 #endif

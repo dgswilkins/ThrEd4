@@ -17,8 +17,8 @@ extern void				okcan();
 extern POINT			zum0;
 extern HED				hed;
 extern unsigned			delpnt;
-extern TCHAR			homdir[MAX_PATH];
-extern TCHAR			filnam[MAX_PATH];
+extern TCHAR			homdir[_MAX_PATH];
+extern TCHAR			filnam[_MAX_PATH];
 extern unsigned			setMap(unsigned bPnt);
 extern HWND				hStch;
 extern HINSTANCE		hInst;
@@ -45,14 +45,14 @@ extern BSEQPNT			bseq[BSEQLEN];
 extern INIFIL			ini;
 extern HWND				hBar;
 extern TCHAR*			phom;
-extern TCHAR			thrnam[MAX_PATH];
+extern TCHAR			thrnam[_MAX_PATH];
 extern HDC				sdc;
 extern long				prfwid;
 extern HWND				hbuts[9];
 extern void				numWnd();
 
 HANDLE					hlpfil;						//handle to the help file
-TCHAR					hlpnam[MAX_PATH];			//help file name
+TCHAR					hlpnam[_MAX_PATH];			//help file name
 unsigned				fhlplen;					//help file length
 HWND					hlpwnd;						//help window
 HWND					hMsg=0;						//message window
@@ -552,12 +552,12 @@ void grpmsg1(){
 }
 
 void help(){
-	strcpy(hlpnam,homdir);
+	strcpy_s(hlpnam,homdir);
 #if LANG==ENG||LANG==HNG
-	strcat(hlpnam, "thred.chm");
+	strcat_s(hlpnam, "thred.chm");
 #endif
 #if LANG==GRM
-	strcat(hlpnam, "aladin.chm");
+	strcat_s(hlpnam, "aladin.chm");
 #endif
 	hlpwnd=HtmlHelp(hWnd,hlpnam,HH_DISPLAY_TOPIC,0);
 	if(!hlpwnd)

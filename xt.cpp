@@ -76,7 +76,7 @@ extern HDC sdc;
 extern HDC rsdc;
 extern RECT scRct;
 extern HBRUSH hStchBak;
-extern TCHAR filnam[MAX_PATH];
+extern TCHAR filnam[_MAX_PATH];
 extern void movStch();
 extern void shoseln(unsigned cod0,unsigned cod1);
 extern unsigned clofine;
@@ -137,8 +137,8 @@ extern void satout(double satwid);
 extern void tabmsg(unsigned cod);
 extern unsigned auth;
 extern void frmout(unsigned ind);
-extern TCHAR thrnam[MAX_PATH];
-extern TCHAR auxnam[MAX_PATH];
+extern TCHAR thrnam[_MAX_PATH];
+extern TCHAR auxnam[_MAX_PATH];
 extern void save();
 extern COLORREF useCol[16];
 //extern void ler();
@@ -914,11 +914,11 @@ void timnam(char* tpath){
 	char*	srut;
 
 	srut=getenv("windir");
-	strcpy(tpath,srut);
-	strcat(tpath,"\\");
+	strcpy_s(tpath,srut);
+	strcat_s(tpath,"\\");
 	keynam(TIMSED,nam);
 	*nam='t';
-	strcat(tpath,nam);
+	strcat_s(tpath,nam);
 }
 */
 
@@ -946,13 +946,13 @@ int fil2crd(const char* filnam)
 	STARTUPINFO			sinfo;
 	PROCESS_INFORMATION	pinfo;
 	int					erc = 0;
-	char				cmd[MAX_PATH*2+1+4];
+	char				cmd[_MAX_PATH*2+1+4];
 	
-	strcpy(cmd, "\"");
-	strcat(cmd, ini.p2cnam);
-	strcat(cmd, "\" \"");
-	strcat(cmd, filnam);
-	strcat(cmd, "\""); 
+	strcpy_s(cmd,"\"");
+	strcat_s(cmd, ini.p2cnam);
+	strcat_s(cmd, "\" \"");
+	strcat_s(cmd, filnam);
+	strcat_s(cmd, "\""); 
 	memset(&sinfo,0,sizeof(STARTUPINFO));
 	sinfo.cb=sizeof(STARTUPINFO);
 	if (!CreateProcess(0,cmd,0,0,0,NORMAL_PRIORITY_CLASS,0,0,&sinfo,&pinfo))
@@ -979,7 +979,7 @@ void pes2crd(){
 
 	HKEY			hkey;
 	unsigned long	typ,siz;
-	TCHAR			prgnam[MAX_PATH];
+	TCHAR			prgnam[_MAX_PATH];
 	char			tfltr[]="ComputerService (Lind2PC.exe)\0LinkP2C.exe\0\0";
 	TCHAR			mbuf[P2CBUFSIZ];
 	TCHAR			tbuf[P2CBUFSIZ];
@@ -993,7 +993,7 @@ void pes2crd(){
 		0,					//nMaxCustFilter 
 		0,					//nFilterIndex 
 		prgnam,				//lpstrFile 
-		MAX_PATH,			//nMaxFile 
+		_MAX_PATH,			//nMaxFile 
 		0,					//lpstrFileTitle 
 		0,					//nMaxFileTitle 
 		"C:\\",				//lpstr	ialDir 
@@ -1023,11 +1023,11 @@ void pes2crd(){
 	if(!RegOpenKeyEx(HKEY_LOCAL_MACHINE,"SOFTWARE\\Microsoft\\Windows\\CurrentVersion",
 		0,KEY_READ,&hkey)){
 
-		siz=MAX_PATH;
+		siz=_MAX_PATH;
 		typ=REG_SZ;
 		if(!RegQueryValueEx(hkey,"ProgramFilesDir",0,&typ,(unsigned char*)prgnam,&siz)){
 
-			strcat(prgnam,"\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
+			strcat_s(prgnam,"\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
 			if(!chkp2cnam(prgnam))
 				*prgnam=0;
 		}
@@ -1049,7 +1049,7 @@ void pes2crd(){
 		else
 			return;
 	}
-	strcpy(ini.p2cnam,prgnam);
+	strcpy_s(ini.p2cnam,prgnam);
 	fil2crd(auxnam);
 }
 
@@ -3661,8 +3661,8 @@ void duauxnam()
 {
 	TCHAR* pext;
 
-	_strlwr(filnam);
-	strcpy(auxnam,filnam);
+	_strlwr_s(filnam);
+	strcpy_s(auxnam,filnam);
 	pext=strrchr(auxnam,'.');
 	if(pext)
 		pext++;
@@ -3673,21 +3673,21 @@ void duauxnam()
 
 	case AUXDST:
 
-		strcat(auxnam,"dst");
+		strcat_s(auxnam,"dst");
 		break;
 
 #if PESACT
 
 	case AUXPES:
 
-		strcat(auxnam,"pes");
+		strcat_s(auxnam,"pes");
 		break;
 
 #endif
 
 	default:
 
-		strcat(pext,"pcs");
+		strcat_s(auxnam,"pcs");
 	}
 }
 
@@ -5552,16 +5552,16 @@ void clrstch()
 	while(EnumChildWindows(hStch,enumch,0));
 }
 
-BOOL txnam(char* nam)
+BOOL txnam(char *nam, int sizeNam )
 {
 	char* pchr;
 
-	strcpy(nam,__argv[0]);
+	strcpy_s(nam,sizeNam, __argv[0]);
 	pchr=strrchr(nam,'\\');
 	if(pchr)
 	{
 		pchr++;
-		strcpy(pchr,"thred.txr");
+		strcpy_s(pchr,sizeNam-(pchr-nam),"thred.txr");
 		return 1;
 	}
 	else
@@ -5570,7 +5570,7 @@ BOOL txnam(char* nam)
 
 void txdun()
 {
-	char nam[MAX_PATH];
+	char nam[_MAX_PATH];
 	HANDLE hnam;
 	unsigned long rot;
 	int ind;
@@ -5578,7 +5578,7 @@ void txdun()
 
 	if(thsts[0].cnt)
 	{
-		if(txnam(nam))
+		if(txnam(nam,sizeof(nam)))
 		{
 			hnam=CreateFile(nam,GENERIC_WRITE,0,0,CREATE_ALWAYS,0,0);
 			if(hnam!=INVALID_HANDLE_VALUE)
@@ -5599,7 +5599,7 @@ void txdun()
 
 void redtx()
 {
-	char nam[MAX_PATH];
+	char nam[_MAX_PATH];
 	HANDLE hnam;
 	unsigned long red;
 	int ind;
@@ -5607,7 +5607,7 @@ void redtx()
 
 	ptxhst=15;
 	ZeroMemory(&thsts,sizeof(TXHST)*16);
-	if(txnam(nam))
+	if(txnam(nam,sizeof(nam)))
 	{
 		hnam=CreateFile(nam,GENERIC_READ,0,0,OPEN_EXISTING,0,0);
 		if(hnam!=INVALID_HANDLE_VALUE)
@@ -6088,7 +6088,7 @@ void repar()
 
 void tst()
 {
-	strcpy(ini.desnam,"Mr");
-	strcpy(thrnam,ini.desnam);
+	strcpy_s(ini.desnam,"Mr");
+	strcpy_s(thrnam,ini.desnam);
 	setMap(RESTCH);
 }
