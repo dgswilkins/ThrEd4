@@ -595,12 +595,12 @@ void frmclr(FRMHED* dst){
 #endif
 }
 
-void duinf(FRMHED* hed){
+void duinf(FRMHED* p_hed){
 
 #if defined(__UseASM__)
 	_asm{
 
-			mov		ebx,hed
+			mov		ebx,p_hed
 			mov		eax,[ebx]
 			mov		ebx,offset finfo
 			xor		ecx,ecx
@@ -619,9 +619,9 @@ void duinf(FRMHED* hed){
 	}
 #else
 	//Correct
-	finfo.typ = hed->at & 0xf; 
-	finfo.at = (hed->at >> 4)& 0xf;
-	finfo.sids = hed->sids;
+	finfo.typ = p_hed->at & 0xf; 
+	finfo.at = (p_hed->at >> 4)& 0xf;
+	finfo.sids = p_hed->sids;
 #endif
 }
 
@@ -1324,7 +1324,7 @@ void frmsqr(unsigned ind){
 	float	len;
 	FLPNT	off;
 	FLPNT	fpnt;
-	FLPNT	dpnt;
+	FLPNT	l_dpnt;
 	DUBPNT	dif;
 	POINT	sqlin[4];
 
@@ -1344,32 +1344,32 @@ void frmsqr(unsigned ind){
 	len/=2;
 	off.x=len*cos(lang);
 	off.y=len*sin(lang);
-	dpnt.x=fpnt.x+off.x;
-	dpnt.y=fpnt.y+off.y;
-	stch2pxr(dpnt);
+	l_dpnt.x=fpnt.x+off.x;
+	l_dpnt.y=fpnt.y+off.y;
+	stch2pxr(l_dpnt);
 	sqlin[0].x=sqlin[3].x=pPnt.x;
 	sqlin[0].y=sqlin[3].y=pPnt.y;
-	dpnt.x=fpnt.x-off.x;
-	dpnt.y=fpnt.y-off.y;
-	stch2pxr(dpnt);
+	l_dpnt.x=fpnt.x-off.x;
+	l_dpnt.y=fpnt.y-off.y;
+	stch2pxr(l_dpnt);
 	sqlin[2].x=pPnt.x;
 	sqlin[2].y=pPnt.y;
 	Polyline(sdc,sqlin,4);
 }
 
-void selsqr(POINT cpnt,HDC dc){
+void selsqr(POINT p_cpnt,HDC dc){
 
 	POINT	sqlin[5];
 
-	sqlin[0].x=sqlin[3].x=sqlin[4].x=cpnt.x-ini.frmpix;
-	sqlin[0].y=sqlin[1].y=cpnt.y-ini.frmpix;
-	sqlin[1].x=sqlin[2].x=cpnt.x+ini.frmpix;
-	sqlin[2].y=sqlin[3].y=cpnt.y+ini.frmpix;
-	sqlin[4].y=cpnt.y-ini.frmpix;
+	sqlin[0].x=sqlin[3].x=sqlin[4].x=p_cpnt.x-ini.frmpix;
+	sqlin[0].y=sqlin[1].y=p_cpnt.y-ini.frmpix;
+	sqlin[1].x=sqlin[2].x=p_cpnt.x+ini.frmpix;
+	sqlin[2].y=sqlin[3].y=p_cpnt.y+ini.frmpix;
+	sqlin[4].y=p_cpnt.y-ini.frmpix;
 	Polyline(dc,sqlin,5);
 }
 
-void frmsqr0(POINT cpnt){
+void frmsqr0(POINT p_cpnt){
 
 	POINT		sqlin[5];
 	unsigned	pix;
@@ -1377,27 +1377,27 @@ void frmsqr0(POINT cpnt){
 	pix=ini.frmbpix;
 	if(pix)
 	{
-		sqlin[0].x=sqlin[3].x=sqlin[4].x=cpnt.x-pix;
-		sqlin[0].y=sqlin[1].y=cpnt.y-pix;
-		sqlin[1].x=sqlin[2].x=cpnt.x+pix+1;
-		sqlin[2].y=sqlin[3].y=cpnt.y+pix+1;
-		sqlin[4].y=cpnt.y-1;
+		sqlin[0].x=sqlin[3].x=sqlin[4].x=p_cpnt.x-pix;
+		sqlin[0].y=sqlin[1].y=p_cpnt.y-pix;
+		sqlin[1].x=sqlin[2].x=p_cpnt.x+pix+1;
+		sqlin[2].y=sqlin[3].y=p_cpnt.y+pix+1;
+		sqlin[4].y=p_cpnt.y-1;
 		Polyline(sdc,sqlin,5);
 	}
 }
 
-void frmx(POINT cpnt,HDC dc){
+void frmx(POINT p_cpnt,HDC dc){
 
 	POINT	xlin[2];
 
 	SelectObject(dc,fsPen);
-	xlin[0].x=xlin[1].x=cpnt.x;
-	xlin[0].y=cpnt.y+8;
-	xlin[1].y=cpnt.y-8;
+	xlin[0].x=xlin[1].x=p_cpnt.x;
+	xlin[0].y=p_cpnt.y+8;
+	xlin[1].y=p_cpnt.y-8;
 	Polyline(dc,xlin,2);
-	xlin[0].y=xlin[1].y=cpnt.y;
-	xlin[0].x=cpnt.x-8;
-	xlin[1].x=cpnt.x+8;
+	xlin[0].y=xlin[1].y=p_cpnt.y;
+	xlin[0].x=p_cpnt.x-8;
+	xlin[1].x=p_cpnt.x+8;
 	Polyline(dc,xlin,2);
 	SelectObject(dc,fPen);
 }
@@ -1517,14 +1517,14 @@ void fselrct(unsigned fpnt){
 	Polyline(sdc,sqrlin,5);
 }
 
-void rct2sel(RECT rct,POINT* lin){
+void rct2sel(RECT rct,POINT* p_lin){
 
-	lin[0].x=lin[6].x=lin[7].x=lin[8].x=rct.left;
-	lin[1].x=lin[5].x=((rct.right-rct.left)>>1)+rct.left;
-	lin[2].x=lin[3].x=lin[4].x=rct.right;
-	lin[0].y=lin[1].y=lin[2].y=lin[8].y=rct.top;
-	lin[3].y=lin[7].y=((rct.bottom-rct.top)>>1)+rct.top;
-	lin[4].y=lin[5].y=lin[6].y=rct.bottom;
+	p_lin[0].x=p_lin[6].x=p_lin[7].x=p_lin[8].x=rct.left;
+	p_lin[1].x=p_lin[5].x=((rct.right-rct.left)>>1)+rct.left;
+	p_lin[2].x=p_lin[3].x=p_lin[4].x=rct.right;
+	p_lin[0].y=p_lin[1].y=p_lin[2].y=p_lin[8].y=rct.top;
+	p_lin[3].y=p_lin[7].y=((rct.bottom-rct.top)>>1)+rct.top;
+	p_lin[4].y=p_lin[5].y=p_lin[6].y=rct.bottom;
 }
 
 void dubig(){
@@ -1538,14 +1538,14 @@ void dubig(){
 		selsqr(biglin[ind],sdc);
 }
 
-void frmpoly(POINT* lin,unsigned cnt){
+void frmpoly(POINT* p_lin,unsigned cnt){
 
 	unsigned ind;
 
 	if(cnt){
 
 		for(ind=0;ind<cnt-1;ind++)
-			Polyline(sdc,&lin[ind],2);
+			Polyline(sdc,&p_lin[ind],2);
 	}
 }
 
@@ -1571,13 +1571,13 @@ void unpsel(){
 void drwfrm(){
 
 	unsigned	ind,ine,inf,layr;
-	POINT		lin[2];
+	POINT		l_lin[2];
 	DUBPNT		tpnt;
 
 	rstMap(SHOMOV);
 	rstMap(SHOPSEL);
-	lin[0].x=lin[0].y=lin[1].x=lin[1].y=0;
-	Polyline(sdc,lin,2);
+	l_lin[0].x=l_lin[0].y=l_lin[1].x=l_lin[1].y=0;
+	Polyline(sdc,l_lin,2);
 	SetROP2(sdc,R2_XORPEN);
 	ratsr();
 	duzrat();
@@ -1608,10 +1608,10 @@ void drwfrm(){
 				}
 				for(ine=0;ine<formlst[ind].stpt;ine++){
 
-					sfCor2px(flt[sac[ine].strt],&lin[0]);
-					sfCor2px(flt[sac[ine].fin],&lin[1]);
+					sfCor2px(flt[sac[ine].strt],&l_lin[0]);
+					sfCor2px(flt[sac[ine].fin],&l_lin[1]);
 					SelectObject(sdc,fPen);
-					Polyline(sdc,lin,2);
+					Polyline(sdc,l_lin,2);
 				}
 			}
 			SelectObject(sdc,ypen[layr]);
@@ -1622,11 +1622,11 @@ void drwfrm(){
 
 					tpnt.x=flt[frmpnt->angclp.sat.strt].x;
 					tpnt.y=flt[frmpnt->angclp.sat.strt].y;
-					sCor2px(tpnt,&lin[0]);
+					sCor2px(tpnt,&l_lin[0]);
 					tpnt.x=flt[frmpnt->angclp.sat.fin].x;
 					tpnt.y=flt[frmpnt->angclp.sat.fin].y;
-					sCor2px(tpnt,&lin[1]);
-					Polyline(sdc,lin,2);
+					sCor2px(tpnt,&l_lin[1]);
+					Polyline(sdc,l_lin,2);
 				}
 			}
 			else
@@ -2424,10 +2424,10 @@ unsigned getlast(){
 		return 0;
 }
 
-void flt2dub(FLPNT ipnt,DUBPNT* opnt){
+void flt2dub(FLPNT ipnt,DUBPNT* p_opnt){
 
-	opnt->x=ipnt.x;
-	opnt->y=ipnt.y;
+	p_opnt->x=ipnt.x;
+	p_opnt->y=ipnt.y;
 }
 
 void linrutf(unsigned strt){
@@ -2466,20 +2466,20 @@ void linrutb(unsigned strt){
 	stspace=tspac;
 }
 
-void oclp(FLPNT* clp,unsigned nclp){
+void oclp(FLPNT* p_clp,unsigned p_nclp){
 
 	unsigned	ind;
 
 	if(!chkMap(NOCLP))
 	{
-		for(ind=0;ind<nclp;ind++){
+		for(ind=0;ind<p_nclp;ind++){
 
-			clpnu[ind].x=clp[ind].x;
-			clpnu[ind].y=clp[ind].y;
+			clpnu[ind].x=p_clp[ind].x;
+			clpnu[ind].y=p_clp[ind].y;
 		}
 		clprct.left=clprct.right=clpnu[0].x;
 		clprct.bottom=clprct.top=clpnu[0].y;
-		for(ind=1;ind<(unsigned)nclp;ind++){
+		for(ind=1;ind<(unsigned)p_nclp;ind++){
 
 			if(clpnu[ind].x<clprct.left)
 				clprct.left=clpnu[ind].x;
@@ -2492,7 +2492,7 @@ void oclp(FLPNT* clp,unsigned nclp){
 		}
 		clpsiz.cx=clprct.right-clprct.left;
 		clpsiz.cy=clprct.top-clprct.bottom;
-		clplen=nclp;
+		clplen=p_nclp;
 	}
 }
 
@@ -3035,15 +3035,15 @@ void refil(){
 void setfpnt(){
 
 	POINT		stchpx;
-	FLPNT*		dpnt;
+	FLPNT*		l_dpnt;
 
 	unfrm();
 	fvars(clofind);
-	dpnt=&frmpnt->flt[0];
+	l_dpnt=&frmpnt->flt[0];
 	stchpx.x=msg.pt.x-stOrg.x;
 	stchpx.y=msg.pt.y-stOrg.y;
 	rats();
-	px2stchf(stchpx,&dpnt[clofine]);
+	px2stchf(stchpx,&l_dpnt[clofine]);
 	frmout(clofind);
 	refil();
 	setMap(WASFPNT);
@@ -3070,7 +3070,7 @@ unsigned short prv(unsigned ind){
 	return ind;
 }
 
-unsigned proj(DUBPNT pnt,double slop,FLPNT pnt0,FLPNT pnt1,DUBPNT* ipnt){
+unsigned proj(DUBPNT pnt,double p_slop,FLPNT pnt0,FLPNT pnt1,DUBPNT* ipnt){
 
 	DUBPNT	difl;
 	double	slopl,con,conl,xmin,xmax,ymin,ymax,tdub;
@@ -3081,15 +3081,15 @@ unsigned proj(DUBPNT pnt,double slop,FLPNT pnt0,FLPNT pnt1,DUBPNT* ipnt){
 
 		slopl=difl.y/difl.x;
 		conl=pnt0.y-slopl*pnt0.x;
-		con=pnt.y-slop*pnt.x;
-		ipnt->x=(conl-con)/(slop-slopl);
-		ipnt->y=ipnt->x*slop+con;
+		con=pnt.y-p_slop*pnt.x;
+		ipnt->x=(conl-con)/(p_slop-slopl);
+		ipnt->y=ipnt->x*p_slop+con;
 	}
 	else{
 
 		ipnt->x=pnt0.x;
-		con=pnt.y-slop*pnt.x;
-		ipnt->y=ipnt->x*slop+con;
+		con=pnt.y-p_slop*pnt.x;
+		ipnt->y=ipnt->x*p_slop+con;
 	}
 	xmin=pnt0.x;
 	xmax=pnt1.x;
@@ -3125,14 +3125,14 @@ unsigned proj(DUBPNT pnt,double slop,FLPNT pnt0,FLPNT pnt1,DUBPNT* ipnt){
 
 unsigned projv(double pntx,FLPNT pnt0,FLPNT pnt1,DUBPNT* ipnt){
 
-	double tdub,slop,dx;
+	double tdub,l_slop,dx;
 
 	ipnt->x=pntx;
 	dx=pnt1.x-pnt0.x;
 	if(dx){
 
-		slop=(pnt1.y-pnt0.y)/dx;
-		ipnt->y=(pntx-pnt0.x)*slop+pnt0.y;
+		l_slop=(pnt1.y-pnt0.y)/dx;
+		ipnt->y=(pntx-pnt0.x)*l_slop+pnt0.y;
 		if(pnt0.x>pnt1.x){
 			tdub=pnt0.x;
 			pnt0.x=pnt1.x;
@@ -3149,7 +3149,7 @@ unsigned projv(double pntx,FLPNT pnt0,FLPNT pnt1,DUBPNT* ipnt){
 
 unsigned projh(double pnty,FLPNT pnt0,FLPNT pnt1,DUBPNT* ipnt){
 
-	double tdub,slop,dx,dy;
+	double tdub,l_slop,dx,dy;
 
 	ipnt->y=pnty;
 	dx=pnt1.x-pnt0.x;
@@ -3158,8 +3158,8 @@ unsigned projh(double pnty,FLPNT pnt0,FLPNT pnt1,DUBPNT* ipnt){
 		dy=pnt1.y-pnt0.y;
 		if(dy){
 
-			slop=dy/dx;
-			ipnt->x=(pnty-pnt0.y)/slop+pnt0.x;
+			l_slop=dy/dx;
+			ipnt->x=(pnty-pnt0.y)/l_slop+pnt0.x;
 		}
 		else
 			return 0;
@@ -3348,7 +3348,7 @@ unsigned short regclos(unsigned rg0,unsigned rg1){
 	unsigned 	grp1e;
 	unsigned	grps;
 	unsigned	grpe;
-	unsigned	lins,line;
+	unsigned	l_lins,line;
 	unsigned	prlin,polin;
 
 	pnt0s=&*seq[rgns[rg0].strt];
@@ -3358,16 +3358,16 @@ unsigned short regclos(unsigned rg0,unsigned rg1){
 	if(grp0s>grp1s){
 
 		grps=grp0s;
-		lins=pnt0s->lin;
+		l_lins=pnt0s->lin;
 		prlin=pnt1s->lin;
 	}
 	else{
 
 		grps=grp1s;
-		lins=pnt1s->lin;
+		l_lins=pnt1s->lin;
 		prlin=pnt0s->lin;
 	}
-	if(grps&&lnclos(grps-1,prlin,grps,lins)){
+	if(grps&&lnclos(grps-1,prlin,grps,l_lins)){
 
 		nxtgrp=grps;
 		return 1;
@@ -3467,42 +3467,42 @@ void rspnt(float fx,float fy){
 
 void dunseq(unsigned strt,unsigned fin){
 
-	SMALPNTL*	lin0;
-	SMALPNTL*	lin1;
+	SMALPNTL*	l_lin0;
+	SMALPNTL*	l_lin1;
 	unsigned	ind;
 	double		dy,miny;
 
 	miny=1e30;
 	for(ind=strt;ind<=fin;ind++){
 
-		lin0=&*seq[ind];
-		dy=lin0[1].y-lin0->y;
+		l_lin0=&*seq[ind];
+		dy=l_lin0[1].y-l_lin0->y;
 		if(dy<miny)
 			miny=dy;
 	}
 	miny/=2;
-	lin0=&*seq[strt];
-	lin1=&*seq[fin];
+	l_lin0=&*seq[strt];
+	l_lin1=&*seq[fin];
 	if(miny==1e30/2)
 		miny=0;
-	rspnt(lin0->x,lin0->y+miny);
-	rspnt(lin1->x,lin1->y+miny);
-	lastgrp=lin1->grp;
+	rspnt(l_lin0->x,l_lin0->y+miny);
+	rspnt(l_lin1->x,l_lin1->y+miny);
+	lastgrp=l_lin1->grp;
 }
 
 void movseq(unsigned ind){
 
-	SMALPNTL* lin;
+	SMALPNTL* l_lin;
 
-	lin=&*seq[ind];
+	l_lin=&*seq[ind];
 	bseq[opnt].attr=SEQBOT;
-	bseq[opnt].x=lin->x;
-	bseq[opnt].y=lin->y;
+	bseq[opnt].x=l_lin->x;
+	bseq[opnt].y=l_lin->y;
 	opnt++;
-	lin++;
+	l_lin++;
 	bseq[opnt].attr=SEQTOP;
-	bseq[opnt].x=lin->x;
-	bseq[opnt].y=lin->y;
+	bseq[opnt].x=l_lin->x;
+	bseq[opnt].y=l_lin->y;
 	opnt++;
 }
 
@@ -4950,15 +4950,15 @@ void clrfills(){
 
 void dusat(){
 
-	POINT* plin=&flin[satpt-1];
+	POINT* l_plin=&flin[satpt-1];
 
 	SetROP2(rsdc,R2_XORPEN);
 	SelectObject(rsdc,fPen);
-	Polyline(rsdc,plin,2);
+	Polyline(rsdc,l_plin,2);
 	SetROP2(rsdc,R2_COPYPEN);
 //	SetROP2(sdc,R2_XORPEN);
 //	SelectObject(sdc,fPen);
-//	Polyline(sdc,plin,2);
+//	Polyline(sdc,l_plin,2);
 //	SetROP2(sdc,R2_COPYPEN);
 }
 
@@ -5024,15 +5024,15 @@ void satfix(){
 	setMap(RESTCH);
 }
 
-void delcon(unsigned cpnt)
+void delcon(unsigned p_cpnt)
 {
 	unsigned ind;
 	unsigned loc;
 	SATCON* tp;
 	FRMHED* fp;
 
-	tp=&frmpnt->sacang.sac[cpnt];
-	loc=&frmpnt->sacang.sac[cpnt]-satks;
+	tp=&frmpnt->sacang.sac[p_cpnt];
+	loc=&frmpnt->sacang.sac[p_cpnt]-satks;
 	if(satkad>loc)
 		MoveMemory(tp,&tp[1],(satkad-loc+1)*sizeof(SATCON));
 	for(ind=clofind+1;ind<formpnt;ind++)
@@ -5249,8 +5249,8 @@ prvcx:
 void satadj()
 {
 	unsigned	ind,ine,inf,psac,mapsiz,prstpt;
-	SATCON*		spnt;
-	SATCON*		dpnt;
+	SATCON*		l_spnt;
+	SATCON*		l_dpnt;
 	unsigned short bstpt;
 	FRMHED*		fp;
 
@@ -5263,7 +5263,7 @@ void satadj()
 		if(sac[ind].strt>sids-1)
 			sac[ind].strt=sids-1;
 	}
-	spnt=(SATCON*)bseq;
+	l_spnt=(SATCON*)bseq;
 	mapsiz=(sids>>5)+1;
 	chkmap=(unsigned*)oseq;
 	psac=0;
@@ -5297,8 +5297,8 @@ void satadj()
 		{
 			if(chkchk(sac[ind].strt)&&chkchk(sac[ind].fin))
 			{
-				spnt[ine].strt=sac[ind].strt;
-				spnt[ine].fin=sac[ind].fin;
+				l_spnt[ine].strt=sac[ind].strt;
+				l_spnt[ine].fin=sac[ind].fin;
 				ine++;
 			}
 		}
@@ -5310,8 +5310,8 @@ void satadj()
 			{
 				if(sac[ind].strt<wpar)
 				{
-					spnt[ine].strt=sac[ind].strt;
-					spnt[ine++].fin=sac[ind].fin;
+					l_spnt[ine].strt=sac[ind].strt;
+					l_spnt[ine++].fin=sac[ind].fin;
 				}
 			}
 			stpt=frmpnt->stpt=ine;
@@ -5321,8 +5321,8 @@ void satadj()
 	{
 		for(ind=0;ind<stpt;ind++)
 		{
-			spnt[ind].strt=sac[ind].strt;
-			spnt[ind].fin=sac[ind].fin;
+			l_spnt[ind].strt=sac[ind].strt;
+			l_spnt[ind].fin=sac[ind].fin;
 		}
 	}
 	if(stpt)
@@ -5433,10 +5433,10 @@ void satadj()
 	if(frmpnt->stpt<bstpt)
 	{
 		ine=bstpt-stpt;
-		spnt=dpnt=frmpnt->sacang.sac;
-		dpnt+=frmpnt->stpt;
-		spnt+=bstpt;
-		MoveMemory(dpnt,spnt,sizeof(SATCON)*(&satks[satkad]-spnt+1));
+		l_spnt=l_dpnt=frmpnt->sacang.sac;
+		l_dpnt+=frmpnt->stpt;
+		l_spnt+=bstpt;
+		MoveMemory(l_dpnt,l_spnt,sizeof(SATCON)*(&satks[satkad]-l_spnt+1));
 		for(ind=clofind+1;ind<formpnt;ind++)
 		{
 			fp=&formlst[ind];
@@ -6113,7 +6113,7 @@ BOOL chkdel(){
 void delspnt(){
 
 	unsigned	ind,ine;
-	SATCON*		sac;
+	SATCON*		l_sac;
 	FLPNT*		tflt;
 	FRMHED*	fp;
 
@@ -6133,16 +6133,16 @@ void delspnt(){
 			frmpnt->wpar--;
 		if(frmpnt->stpt){
 
-			sac=frmpnt->sacang.sac;
+			l_sac=frmpnt->sacang.sac;
 			ind=0;
-			while(sac[ind].strt!=clofine&&sac[ind].fin!=clofine&&ind<frmpnt->stpt)
+			while(l_sac[ind].strt!=clofine&&l_sac[ind].fin!=clofine&&ind<frmpnt->stpt)
 				ind++;
-			if(ind<frmpnt->stpt&&(sac[ind].strt==clofine||sac[ind].fin==clofine)){
+			if(ind<frmpnt->stpt&&(l_sac[ind].strt==clofine||l_sac[ind].fin==clofine)){
 
 				while(ind<frmpnt->stpt){
 
-					sac[ind].strt=sac[ind+1].strt;
-					sac[ind].fin=sac[ind+1].fin;
+					l_sac[ind].strt=l_sac[ind+1].strt;
+					l_sac[ind].fin=l_sac[ind+1].fin;
 					ind++;
 				}
 				frmpnt->stpt--;
@@ -6156,10 +6156,10 @@ void delspnt(){
 			}
 			for(ind=0;ind<frmpnt->stpt;ind++){
 
-				if(sac[ind].strt>clofine)
-					sac[ind].strt--;
-				if(sac[ind].fin>clofine)
-					sac[ind].fin--;
+				if(l_sac[ind].strt>clofine)
+					l_sac[ind].strt--;
+				if(l_sac[ind].fin>clofine)
+					l_sac[ind].fin--;
 			}
 		}
 	}
@@ -6284,7 +6284,7 @@ void rotfrm(unsigned nu0){
 	FLPNT*			flt1;
 	SATCON*			nsac;
 	SATCON**		psac;
-	unsigned		ind,ine,xpnt=nu0;
+	unsigned		ind,ine,l_xpnt=nu0;
 	unsigned short	tlin;
 
 	fvars(clofind);
@@ -6298,9 +6298,9 @@ void rotfrm(unsigned nu0){
 	}
 	for(ind=0;ind<sids;ind++){
 
-		flt0[ind].x=flt1[xpnt].x;
-		flt0[ind].y=flt1[xpnt].y;
-		xpnt=nxt(xpnt);
+		flt0[ind].x=flt1[l_xpnt].x;
+		flt0[ind].y=flt1[l_xpnt].y;
+		l_xpnt=nxt(l_xpnt);
 	}
 	ine=0;
 	if(frmpnt->typ==SAT){
@@ -6780,7 +6780,7 @@ void clpbrd(unsigned short strtlin){
 
 void outfn(unsigned strt,unsigned fin,double satwid){
 
-	double		ang;
+	double		l_ang;
 	double		len;
 	double		xof,yof;
 
@@ -6793,15 +6793,15 @@ void outfn(unsigned strt,unsigned fin,double satwid){
 
 #define SATHRESH 10
 
-		ang=(angs[fin]-angs[strt])/2;
-		len=satwid/cos(ang);
+		l_ang=(angs[fin]-angs[strt])/2;
+		len=satwid/cos(l_ang);
 		if(len<-satwid*SATHRESH)
 			len=-satwid*SATHRESH;
 		if(len>satwid*SATHRESH)
 			len=satwid*SATHRESH;
-		ang+=angs[strt]+PI/2;
-		xof=len*cos(ang);
-		yof=len*sin(ang);
+		l_ang+=angs[strt]+PI/2;
+		xof=len*cos(l_ang);
+		yof=len*sin(l_ang);
 	}
 	ipnts[fin].x=flt[fin].x-xof;
 	ipnts[fin].y=flt[fin].y-yof;
@@ -6989,27 +6989,27 @@ BOOL chkbak(DUBPNT pnt){
 	return 0;
 }
 
-BOOL linx(FLPNT* flt,unsigned strt,unsigned fin,DUBPNT* npnt){
+BOOL linx(FLPNT* p_flt,unsigned strt,unsigned fin,DUBPNT* npnt){
 
 	DUBPNT	dif;
 	DUBPNT	tdub;
 
-	dif.x=opnts[strt].x-flt[strt].x;
-	dif.y=opnts[strt].y-flt[strt].y;
+	dif.x=opnts[strt].x-p_flt[strt].x;
+	dif.y=opnts[strt].y-p_flt[strt].y;
 	if(!dif.x&&!dif.y)
 		return 0;
-	tdub.x=flt[strt].x;
-	tdub.y=flt[strt].y;
+	tdub.x=p_flt[strt].x;
+	tdub.y=p_flt[strt].y;
 	if(dif.x){
 
-		if(proj(tdub,dif.y/dif.x,opnts[fin],flt[fin],npnt))
+		if(proj(tdub,dif.y/dif.x,opnts[fin],p_flt[fin],npnt))
 			return 1;
 		else
 			return 0;
 	}
 	else{
 
-		if(projv(tdub.x,flt[fin],opnts[fin],npnt))
+		if(projv(tdub.x,p_flt[fin],opnts[fin],npnt))
 			return 1;
 		else
 			return 0;
@@ -7024,9 +7024,9 @@ void filinsbw(DUBPNT pnt){
 	filinsb(pnt);
 }
 
-void sbfn(FLPNT* flt,unsigned strt,unsigned fin){
+void sbfn(FLPNT* p_flt,unsigned strt,unsigned fin){
 
-	DUBPNT		idif,odif,istp,ostp,opnt,ipnt;
+	DUBPNT		idif,odif,istp,ostp,l_opnt,ipnt;
 	DUBPNT		bdif,bstp,bpnt;
 	DUBPNT		npnt;
 	double		ilen,olen,blen;
@@ -7034,19 +7034,19 @@ void sbfn(FLPNT* flt,unsigned strt,unsigned fin){
 
 	if(!setMap(SAT1)){
 
-		sPnt.x=flt[strt].x;
-		sPnt.y=flt[strt].y;
+		sPnt.x=p_flt[strt].x;
+		sPnt.y=p_flt[strt].y;
 	}
-	idif.x=flt[fin].x-flt[strt].x;
-	idif.y=flt[fin].y-flt[strt].y;
+	idif.x=p_flt[fin].x-p_flt[strt].x;
+	idif.y=p_flt[fin].y-p_flt[strt].y;
 	odif.x=opnts[fin].x-opnts[strt].x;
 	odif.y=opnts[fin].y-opnts[strt].y;
 	ilen=hypot(idif.x,idif.y);
 	olen=hypot(odif.x,odif.y);
-	ipnt.x=flt[strt].x;
-	ipnt.y=flt[strt].y;
-	opnt.x=opnts[strt].x;
-	opnt.y=opnts[strt].y;
+	ipnt.x=p_flt[strt].x;
+	ipnt.y=p_flt[strt].y;
+	l_opnt.x=opnts[strt].x;
+	l_opnt.y=opnts[strt].y;
 	xflg=pfbak=iflg=oflg=bcnt=0;
 	for(ind=0;ind<8;ind++){
 
@@ -7057,7 +7057,7 @@ void sbfn(FLPNT* flt,unsigned strt,unsigned fin){
 
 		cnt=olen/stspace;
 		iflg=1;
-		if(linx(flt,strt,fin,&npnt)){
+		if(linx(p_flt,strt,fin,&npnt)){
 
 			xflg=1;
 			idif.x=idif.y=ilen=0;
@@ -7069,12 +7069,12 @@ void sbfn(FLPNT* flt,unsigned strt,unsigned fin){
 
 		cnt=ilen/stspace;
 		oflg=1;
-		if(linx(flt,strt,fin,&npnt)){
+		if(linx(p_flt,strt,fin,&npnt)){
 
 			xflg=1;
 			odif.x=odif.y=olen=0;
-			opnt.x=npnt.x;
-			opnt.y=npnt.y;
+			l_opnt.x=npnt.x;
+			l_opnt.y=npnt.y;
 		}
 	}
 	if(!cnt)
@@ -7089,8 +7089,8 @@ void sbfn(FLPNT* flt,unsigned strt,unsigned fin){
 
 		ipnt.x+=istp.x;
 		ipnt.y+=istp.y;
-		opnt.x+=ostp.x;
-		opnt.y+=ostp.y;
+		l_opnt.x+=ostp.x;
+		l_opnt.y+=ostp.y;
 		if(toglMap(FILDIR)){
 
 			if(iflg){
@@ -7117,14 +7117,14 @@ void sbfn(FLPNT* flt,unsigned strt,unsigned fin){
 
 			if(oflg){
 
-				bdif.x=opnt.x-sPnt.x;
-				bdif.y=opnt.y-sPnt.y;
+				bdif.x=l_opnt.x-sPnt.x;
+				bdif.y=l_opnt.y-sPnt.y;
 				blen=hypot(bdif.x,bdif.y);
 				bcnt=blen/stspace;
 				bstp.x=bdif.x/bcnt;
 				bstp.y=bdif.y/bcnt;
-				bpnt.x=opnt.x;
-				bpnt.y=opnt.y;
+				bpnt.x=l_opnt.x;
+				bpnt.y=l_opnt.y;
 				while(chkbak(bpnt)){
 
 					bpnt.x-=bstp.x;
@@ -7133,7 +7133,7 @@ void sbfn(FLPNT* flt,unsigned strt,unsigned fin){
 				filinsbw(bpnt);
 			}
 			else
-				filinsb(opnt);
+				filinsb(l_opnt);
 		}
 	}
 }
@@ -8190,8 +8190,8 @@ void setexpand(){
 	DUBPNT		ref;
 	POINT		tref;
 	FLPNT		sref;
-	DUBPNT		siz0;
-	DUBPNT		siz1;
+	DUBPNT		l_siz0;
+	DUBPNT		l_siz1;
 	DUBPNT		rat;
 	double		aspect;
 	unsigned	ind,ine;
@@ -8206,7 +8206,7 @@ void setexpand(){
 		rct.top=bigrct.top;
 		sPnt.x=msg.pt.x-stOrg.x;
 		sPnt.y=msg.pt.y-stOrg.y;
-		siz0.y=rct.bottom-rct.top;
+		l_siz0.y=rct.bottom-rct.top;
 	}
 	else{
 
@@ -8221,30 +8221,30 @@ void setexpand(){
 			rct.right=rngrct.right;
 			rct.left=rngrct.left;
 		}
-		siz0.y=rct.top-rct.bottom;
+		l_siz0.y=rct.top-rct.bottom;
 	}
 	rat.x=rat.y=1;
 	ref.x=ref.y=0;
-	siz0.x=rct.right-rct.left;
+	l_siz0.x=rct.right-rct.left;
 	switch(cntrl){
 
 	case 0:
 
 		ref.x=rct.right;
 		ref.y=rct.bottom;
-		siz1.x=fabs(sPnt.x-ref.x);
-		siz1.y=fabs(sPnt.y-ref.y);
-		aspect=siz1.x/siz1.y;
+		l_siz1.x=fabs(sPnt.x-ref.x);
+		l_siz1.y=fabs(sPnt.y-ref.y);
+		aspect=l_siz1.x/l_siz1.y;
 		if(aspect<xpct)
-			siz1.x=siz1.y*xpct;
+			l_siz1.x=l_siz1.y*xpct;
 		else
-			siz1.y=siz1.x/xpct;
-		rat.x=siz1.x/siz0.x;
-		rat.y=siz1.y/siz0.y;
+			l_siz1.y=l_siz1.x/xpct;
+		rat.x=l_siz1.x/l_siz0.x;
+		rat.y=l_siz1.y/l_siz0.y;
 		if(!fselpnt&&chkMap(FORMSEL)){
 
-			frmpnt->rct.left=rct.right-siz1.x;
-			frmpnt->rct.top=rct.bottom+siz1.y;
+			frmpnt->rct.left=rct.right-l_siz1.x;
+			frmpnt->rct.top=rct.bottom+l_siz1.y;
 		}
 		break;
 
@@ -8252,19 +8252,19 @@ void setexpand(){
 		
 		ref.x=rct.left;
 		ref.y=rct.bottom;
-		siz1.x=fabs(sPnt.x-ref.x);
-		siz1.y=fabs(sPnt.y-ref.y);
-		aspect=siz1.x/siz1.y;
+		l_siz1.x=fabs(sPnt.x-ref.x);
+		l_siz1.y=fabs(sPnt.y-ref.y);
+		aspect=l_siz1.x/l_siz1.y;
 		if(aspect<xpct)
-			siz1.x=siz1.y*xpct;
+			l_siz1.x=l_siz1.y*xpct;
 		else
-			siz1.y=siz1.x/xpct;
-		rat.x=siz1.x/siz0.x;
-		rat.y=siz1.y/siz0.y;
+			l_siz1.y=l_siz1.x/xpct;
+		rat.x=l_siz1.x/l_siz0.x;
+		rat.y=l_siz1.y/l_siz0.y;
 		if(!fselpnt&&chkMap(FORMSEL)){
 
-			frmpnt->rct.right=rct.left+siz1.x;
-			frmpnt->rct.top=rct.bottom+siz1.y;
+			frmpnt->rct.right=rct.left+l_siz1.x;
+			frmpnt->rct.top=rct.bottom+l_siz1.y;
 		}
 		break;
 
@@ -8272,19 +8272,19 @@ void setexpand(){
 
 		ref.x=rct.left;
 		ref.y=rct.top;
-		siz1.x=fabs(sPnt.x-ref.x);
-		siz1.y=fabs(sPnt.y-ref.y);
-		aspect=siz1.x/siz1.y;
+		l_siz1.x=fabs(sPnt.x-ref.x);
+		l_siz1.y=fabs(sPnt.y-ref.y);
+		aspect=l_siz1.x/l_siz1.y;
 		if(aspect<xpct)
-			siz1.x=siz1.y*xpct;
+			l_siz1.x=l_siz1.y*xpct;
 		else
-			siz1.y=siz1.x/xpct;
-		rat.x=siz1.x/siz0.x;
-		rat.y=siz1.y/siz0.y;
+			l_siz1.y=l_siz1.x/xpct;
+		rat.x=l_siz1.x/l_siz0.x;
+		rat.y=l_siz1.y/l_siz0.y;
 		if(!fselpnt&&chkMap(FORMSEL)){
 		
-			frmpnt->rct.right=rct.left+siz1.x;
-			frmpnt->rct.bottom=rct.top-siz1.y;
+			frmpnt->rct.right=rct.left+l_siz1.x;
+			frmpnt->rct.bottom=rct.top-l_siz1.y;
 		}
 		break;
 
@@ -8292,19 +8292,19 @@ void setexpand(){
 
 		ref.x=rct.right;
 		ref.y=rct.top;
-		siz1.x=fabs(sPnt.x-ref.x);
-		siz1.y=fabs(sPnt.y-ref.y);
-		aspect=siz1.x/siz1.y;
+		l_siz1.x=fabs(sPnt.x-ref.x);
+		l_siz1.y=fabs(sPnt.y-ref.y);
+		aspect=l_siz1.x/l_siz1.y;
 		if(aspect<xpct)
-			siz1.x=siz1.y*xpct;
+			l_siz1.x=l_siz1.y*xpct;
 		else
-			siz1.y=siz1.x/xpct;
-		rat.x=siz1.x/siz0.x;
-		rat.y=siz1.y/siz0.y;
+			l_siz1.y=l_siz1.x/xpct;
+		rat.x=l_siz1.x/l_siz0.x;
+		rat.y=l_siz1.y/l_siz0.y;
 		if(!fselpnt&&chkMap(FORMSEL)){
 
-			frmpnt->rct.left=rct.right-siz1.x;
-			frmpnt->rct.bottom=rct.top-siz1.y;
+			frmpnt->rct.left=rct.right-l_siz1.x;
+			frmpnt->rct.bottom=rct.top-l_siz1.y;
 		}
 		break;
 	}
@@ -8583,10 +8583,10 @@ HWND prfnwin(TCHAR* str){
 		NULL);
 }
 
-void prflin(unsigned lin){
+void prflin(unsigned p_lin){
 
-	prftwin(stab[lin]);
-	thDat[lin-STR_PRF0]=prfnwin(msgbuf);
+	prftwin(stab[p_lin]);
+	thDat[p_lin-STR_PRF0]=prfnwin(msgbuf);
 	nxtlin();
 }
 
@@ -8850,7 +8850,7 @@ void prfmsg(){
 void durpoli(unsigned nsids){
 
 	double		dang;
-	double		ang=0;
+	double		l_ang=0;
 	double		len;
 	unsigned	ind;
 	DUBPNT		pnt;
@@ -8875,9 +8875,9 @@ void durpoli(unsigned nsids){
 
 		flt[ind].x=pnt.x;
 		flt[ind].y=pnt.y;
-		pnt.x+=len*cos(ang);
-		pnt.y+=len*sin(ang);
-		ang+=dang;
+		pnt.x+=len*cos(l_ang);
+		pnt.y+=len*sin(l_ang);
+		l_ang+=dang;
 	}
 	frmpnt->typ=POLI;
 	clofind=formpnt;
@@ -8893,7 +8893,7 @@ void durpoli(unsigned nsids){
 void dustar(unsigned nsids,double len){
 
 	double		dang;
-	double		ang;
+	double		l_ang;
 	unsigned	ind,tsid;
 	DUBPNT		pnt,cntr;
 	
@@ -8902,7 +8902,7 @@ void dustar(unsigned nsids,double len){
 	if(nsids>100)
 		nsids=100;
 	dang=PI/nsids;
-	ang=dang/2+PI;
+	l_ang=dang/2+PI;
 	tsid=nsids<<1;
 	frmpnt=&formlst[formpnt];
 	clofind=formpnt;
@@ -8919,9 +8919,9 @@ void dustar(unsigned nsids,double len){
 
 		flt[ind].x=pnt.x;
 		flt[ind].y=pnt.y;
-		pnt.x+=len*cos(ang);
-		pnt.y+=len*sin(ang);
-		ang+=dang;
+		pnt.x+=len*cos(l_ang);
+		pnt.y+=len*sin(l_ang);
+		l_ang+=dang;
 	}
 	cntr.x=(flt[nsids].x-flt[0].x)/2+flt[0].x;
 	cntr.y=(flt[nsids].y-flt[0].y)/2+flt[0].y;
@@ -8943,7 +8943,7 @@ void dustar(unsigned nsids,double len){
 void duspir(unsigned nsids){
 
 	double		dang;
-	double		ang=0;
+	double		l_ang=0;
 	double		len,drat,rat;
 	unsigned	ind,ine,num;
 	DUBPNT		pnt;
@@ -8974,9 +8974,9 @@ void duspir(unsigned nsids){
 
 		tflt[ind].x=pnt.x;
 		tflt[ind].y=pnt.y;
-		pnt.x+=len*cos(ang);
-		pnt.y+=len*sin(ang);
-		ang+=dang;
+		pnt.x+=len*cos(l_ang);
+		pnt.y+=len*sin(l_ang);
+		l_ang+=dang;
 	}
 	cntr.x=(tflt[nsids>>1].x-tflt[0].x)/2+tflt[0].x;
 	cntr.y=(tflt[nsids>>1].y-tflt[0].y)/2+tflt[0].y;
@@ -9009,7 +9009,7 @@ void duspir(unsigned nsids){
 void duhart(unsigned nsids){
 
 	double		dang;
-	double		ang;
+	double		l_ang;
 	double		len;
 	unsigned	ind,ine,bind;
 	float		av;
@@ -9029,18 +9029,18 @@ void duhart(unsigned nsids){
 	pnt.y=sPnt.y;
 	dang=PI*2/nsids;
 	len=300/nsids*zumFct*(zum0.x+zum0.y)/(LHUPX+LHUPY);
-	ang=PI*0.28;
+	l_ang=PI*0.28;
 	ind=0;
 	av=0;
-	while(ang>-PI*0.7){
+	while(l_ang>-PI*0.7){
 
 		if(pnt.x>av)
 			av=pnt.x;
 		flt[ind].x=pnt.x;
 		flt[ind++].y=pnt.y;
-		pnt.x+=len*cos(ang);
-		pnt.y+=len*sin(ang);
-		ang-=dang;
+		pnt.x+=len*cos(l_ang);
+		pnt.y+=len*sin(l_ang);
+		l_ang-=dang;
 	}
 	dang/=4.5;
 	bind=ind;
@@ -9048,9 +9048,9 @@ void duhart(unsigned nsids){
 
 		flt[ind].x=pnt.x;
 		flt[ind++].y=pnt.y;
-		pnt.x+=len*cos(ang);
-		pnt.y+=len*sin(ang);
-		ang-=dang;
+		pnt.x+=len*cos(l_ang);
+		pnt.y+=len*sin(l_ang);
+		l_ang-=dang;
 	}
 	bind--;
 	rat=(flt[bind].x-flt[0].x)/(flt[bind].x-flt[ind-1].x);
@@ -9079,7 +9079,7 @@ void duhart(unsigned nsids){
 void dulens(unsigned nsids){
 
 	double		dang;
-	double		ang;
+	double		l_ang;
 	double		len;
 	unsigned	ind,ine,bind,cnt;
 	float		av;
@@ -9092,7 +9092,7 @@ void dulens(unsigned nsids){
 	nsids<<=1;
 	dang=PI*2/nsids;
 	cnt=nsids/2*0.3;
-	ang=cnt*dang;
+	l_ang=cnt*dang;
 	len=500/nsids*zumFct*(zum0.x+zum0.y)/(LHUPX+LHUPY);
 	frmpnt=&formlst[formpnt];
 	clofind=formpnt;
@@ -9109,9 +9109,9 @@ void dulens(unsigned nsids){
 
 		flt[ind].x=pnt.x;
 		flt[ind++].y=pnt.y;
-		pnt.x+=len*cos(ang);
-		pnt.y+=len*sin(ang);
-		ang+=dang;
+		pnt.x+=len*cos(l_ang);
+		pnt.y+=len*sin(l_ang);
+		l_ang+=dang;
 	}
 	bind=ind-2;
 	ine=ind;
@@ -9533,12 +9533,12 @@ void sprct(unsigned strt,unsigned fin){
 	}
 }
 
-void spurfn(DUBPNT* ipnt,DUBPNT* opnt,DUBPNT* uipnt,DUBPNT* uopnt){
+void spurfn(DUBPNT* ipnt,DUBPNT* p_opnt,DUBPNT* uipnt,DUBPNT* uopnt){
 
 	DUBPNT	dif;
 
-	dif.x=opnt->x-ipnt->x;
-	dif.y=opnt->y-ipnt->y;
+	dif.x=p_opnt->x-ipnt->x;
+	dif.y=p_opnt->y-ipnt->y;
 	uipnt->x=dif.x*DIURAT+ipnt->x;
 	uipnt->y=dif.y*DIURAT+ipnt->y;
 	uopnt->x=dif.x*DOURAT+ipnt->x;
@@ -9619,7 +9619,7 @@ void spend(unsigned strt,unsigned fin){
 	DUBPNT		piv;
 	double		rad,arc,irad;
 	unsigned	ind,cnt,lvl;
-	DUBPNT		ipnt,opnt;
+	DUBPNT		ipnt,l_opnt;
 
 	idif.x=pvrct[fin].cipnt.x-pvrct[strt].bipnt.x;
 	idif.y=pvrct[fin].cipnt.y-pvrct[strt].bipnt.y;
@@ -9662,9 +9662,9 @@ void spend(unsigned strt,unsigned fin){
 		cnt=1;
 	for(ind=0;ind<cnt;ind++){
 
-		opnt.x=piv.x+cos(sang)*rad;
-		opnt.y=piv.y+sin(sang)*rad;
-		filinsb(opnt);
+		l_opnt.x=piv.x+cos(sang)*rad;
+		l_opnt.y=piv.y+sin(sang)*rad;
+		filinsb(l_opnt);
 		if(cnt&0xfffffff0)
 			lvl=psg()%cnt;
 		else
@@ -9813,14 +9813,14 @@ void plbak(unsigned bpnt){
 
 void plvct(unsigned pind,DUBPNT* vp0,DUBPNT* vp1,double len)
 {
-	double angl;
+	double l_angl;
 	double len2;
 	FLPNT vct;
 
 	len2=len/2;
-	angl=atan2(flt[pind+1].y-flt[pind].y,flt[pind+1].x-flt[pind].x)+PI/2;
-	vct.x=cos(angl)*len2;
-	vct.y=sin(angl)*len2;
+	l_angl=atan2(flt[pind+1].y-flt[pind].y,flt[pind+1].x-flt[pind].x)+PI/2;
+	vct.x=cos(l_angl)*len2;
+	vct.y=sin(l_angl)*len2;
 	vp0->x=flt[pind].x+vct.x;
 	vp0->y=flt[pind].y+vct.y;
 	vp1->x=flt[pind].x-vct.x;
@@ -10187,7 +10187,7 @@ void trfrm(DUBPNT lpnt0,DUBPNT lpnt1,DUBPNT rpnt0,DUBPNT rpnt1){
 void clpfm(){
 
 	unsigned	ind,ine,cnt;
-	double		lsiz,rsiz;
+	double		lsiz,l_rsiz;
 	DUBPNT		ldif,rdif;
 	DUBPNT		lstp,rstp;
 	DUBPNT		lpnt0,rpnt0;
@@ -10197,15 +10197,15 @@ void clpfm(){
 	for(ind=0;ind<seqpnt-2;ind+=2){
 
 		lsiz=hypot(bseq[ind+1].x-bseq[ind].x,bseq[ind+1].y-bseq[ind].y);
-		rsiz=hypot(bseq[ind+3].x-bseq[ind+2].x,bseq[ind+3].y-bseq[ind+2].y);
+		l_rsiz=hypot(bseq[ind+3].x-bseq[ind+2].x,bseq[ind+3].y-bseq[ind+2].y);
 		ldif.x=bseq[ind+1].x-bseq[ind].x;
 		ldif.y=bseq[ind+1].y-bseq[ind].y;
 		rdif.x=bseq[ind+2].x-bseq[ind+3].x;
 		rdif.y=bseq[ind+2].y-bseq[ind+3].y;
-		if(rsiz>lsiz)
+		if(l_rsiz>lsiz)
 			cnt=lsiz/clpsiz.cy;
 		else
-			cnt=rsiz/clpsiz.cy;
+			cnt=l_rsiz/clpsiz.cy;
 		if(!cnt)
 			cnt=1;
 		lstp.x=ldif.x/cnt;
@@ -10374,14 +10374,14 @@ void nxtim(){
 void snp(unsigned strt,unsigned fin){
 
 	unsigned	ind,tuns,acc,chklen,at=0;
-	FLPNT		rsiz;
+	FLPNT		l_rsiz;
 	unsigned*	txhst;
 
-	chkrng(&rsiz);
+	chkrng(&l_rsiz);
 	xpnts=(unsigned*)bseq;
 	ZeroMemory(bseq,65536*sizeof(unsigned));
-	xhst=txhst=new unsigned[static_cast<int>(rsiz.x)+1];
-	for(ind=0;ind<rsiz.x;ind++)
+	xhst=txhst=new unsigned[static_cast<int>(l_rsiz.x)+1];
+	for(ind=0;ind<l_rsiz.x;ind++)
 		xhst[ind]=0;
 	if(chkMap(FORMSEL)){
 
@@ -10404,7 +10404,7 @@ void snp(unsigned strt,unsigned fin){
 		}
 	}
 	acc=0;
-	for(ind=0;ind<rsiz.x;ind++){
+	for(ind=0;ind<l_rsiz.x;ind++){
 
 		tuns=xhst[ind];
 		xhst[ind]=acc;
@@ -10432,8 +10432,8 @@ void snp(unsigned strt,unsigned fin){
 	}
 	xhst=&xhst[1];
 	chklen=snplen*2+1;
-	nutim(rsiz.x);
-	for(ind=0;ind<rsiz.x-chklen;ind++){
+	nutim(l_rsiz.x);
+	for(ind=0;ind<l_rsiz.x-chklen;ind++){
 
 		snpfn(ind,chklen);
 		nxtim();
@@ -10753,13 +10753,13 @@ void duprot(){
 
 void duprotfs(){
 
-	unsigned	bakpnt,ind;
+	unsigned	l_bakpnt,ind;
 
-	bakpnt=formpnt;
+	l_bakpnt=formpnt;
 	rotpar();
 	for(ind=0;ind<fselpnt;ind++)
 		adfrm(selist[ind]);
-	formpnt=bakpnt;
+	formpnt=l_bakpnt;
 	for(ind=0;ind<fselpnt;ind++)
 		selist[ind]=formpnt++;
 	fnagain();
@@ -10789,18 +10789,18 @@ void duprots(){
 
 void cplayfn(unsigned fpnt,unsigned play){
 
-	FRMHED*		spnt;
+	FRMHED*		l_spnt;
 
-	spnt=&formlst[fpnt];
+	l_spnt=&formlst[fpnt];
 	fvars(formpnt);
-	frmcpy(frmpnt,spnt);
+	frmcpy(frmpnt,l_spnt);
 	fvars(formpnt);
 	frmpnt->flt=adflt(frmpnt->sids);
-	MoveMemory(frmpnt->flt,spnt->flt,sids*sizeof(FLPNT));
+	MoveMemory(frmpnt->flt,l_spnt->flt,sids*sizeof(FLPNT));
 	if(frmpnt->typ==SAT&&frmpnt->stpt)
 	{
 		frmpnt->sacang.sac=adsatk(frmpnt->stpt);
-		MoveMemory(frmpnt->sacang.sac,spnt->sacang.sac,frmpnt->stpt*sizeof(SATCON));
+		MoveMemory(frmpnt->sacang.sac,l_spnt->sacang.sac,frmpnt->stpt*sizeof(SATCON));
 	}
 	frmpnt->nclp=0;
 	frmpnt->ftyp=0;
@@ -10912,17 +10912,17 @@ void movlayr(unsigned play){
 
 void join(){
 
-	unsigned	bakpnt,ind,sids;
+	unsigned	l_bakpnt,ind,l_sids;
 	FLPNT*		tflt;
 	FLPNT*		ipnt;
 
-	bakpnt=clofind;
+	l_bakpnt=clofind;
 	setMap(FRMSAM);
 	if(formpnt>1&&chkMap(FORMSEL)&&closfrm()){
 
-		sids=formlst[clofind].sids;
+		l_sids=formlst[clofind].sids;
 		tflt=(FLPNT*)&bseq;
-		for(ind=0;ind<sids;ind++){
+		for(ind=0;ind<l_sids;ind++){
 
 			tflt[ind].x=formlst[clofind].flt[clofine].x;
 			tflt[ind].y=formlst[clofind].flt[clofine].y;
@@ -10930,19 +10930,19 @@ void join(){
 		}
 		setMap(DELTO);
 		frmdel();
-		if(bakpnt>clofind)
-			clofind=bakpnt-1;
+		if(l_bakpnt>clofind)
+			clofind=l_bakpnt-1;
 		else
-			clofind=bakpnt;
+			clofind=l_bakpnt;
 		ipnt=&formlst[clofind].flt[formlst[clofind].sids];
-		fltspac(ipnt,sids);
-		for(ind=0;ind<sids;ind++){
+		fltspac(ipnt,l_sids);
+		for(ind=0;ind<l_sids;ind++){
 
 			ipnt[ind].x=tflt[ind].x;
 			ipnt[ind].y=tflt[ind].y;
 		}
 		frmpnt=&formlst[clofind];
-		frmpnt->sids+=sids;
+		frmpnt->sids+=l_sids;
 		frmpnt->rct.left=frmpnt->rct.right=frmpnt->flt[0].x;
 		frmpnt->rct.top=frmpnt->rct.bottom=frmpnt->flt[0].y;
 		for(ind=1;ind<frmpnt->sids;ind++){
@@ -10982,13 +10982,13 @@ BOOL chkbfil(){
 
 void refilal(){
 
-	unsigned bakpnt;
+	unsigned l_bakpnt;
 
 	savdo();
-	bakpnt=clofind;
+	l_bakpnt=clofind;
 	for(clofind=0;clofind<formpnt;clofind++)
 		refilfn();
-	clofind=bakpnt;
+	clofind=l_bakpnt;
 	fvars(clofind);
 	coltab();
 	setMap(RESTCH);
@@ -11121,18 +11121,18 @@ void frmsadj(){
 void stchrct2px(FLRCT srct,RECT* prct){
 
 	DUBPNT	ipnt;
-	POINT	opnt;
+	POINT	l_opnt;
 
 	ipnt.x=srct.left;
 	ipnt.y=srct.top;
-	sCor2px(ipnt,&opnt);
-	prct->left=opnt.x;
-	prct->top=opnt.y;
+	sCor2px(ipnt,&l_opnt);
+	prct->left=l_opnt.x;
+	prct->top=l_opnt.y;
 	ipnt.x=srct.right;
 	ipnt.y=srct.bottom;
-	sCor2px(ipnt,&opnt);
-	prct->right=opnt.x;
-	prct->bottom=opnt.y;
+	sCor2px(ipnt,&l_opnt);
+	prct->right=l_opnt.x;
+	prct->bottom=l_opnt.y;
 }
 
 void getbig(){
@@ -11362,9 +11362,9 @@ void bhfn(unsigned strt,unsigned fin,double spac){
 	}
 }
 
-void bhcrnr(unsigned lin){
+void bhcrnr(unsigned p_lin){
 
-	unsigned	tlin=nxt(lin);
+	unsigned	tlin=nxt(p_lin);
 	DUBPNT		dif,pnt;
 	double		len,rat;
 
@@ -11536,9 +11536,9 @@ void boxsel(){
 	}
 }
 
-void clpcrnr(unsigned lin){
+void clpcrnr(unsigned p_lin){
 
-	unsigned	tlin=nxt(lin);
+	unsigned	tlin=nxt(p_lin);
 	unsigned	ind;
 	DUBPNT		dif,pnt;
 	FLPNT		tpnt;

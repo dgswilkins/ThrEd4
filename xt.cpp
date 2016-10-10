@@ -941,7 +941,7 @@ void ptim(char* msg,FILETIME ftim){
 }
 */
 
-int fil2crd(const char* filnam)
+int fil2crd(const char* p_filnam)
 {
 	STARTUPINFO			sinfo;
 	PROCESS_INFORMATION	pinfo;
@@ -951,7 +951,7 @@ int fil2crd(const char* filnam)
 	strcpy_s(cmd,"\"");
 	strcat_s(cmd, ini.p2cnam);
 	strcat_s(cmd, "\" \"");
-	strcat_s(cmd, filnam);
+	strcat_s(cmd, p_filnam);
 	strcat_s(cmd, "\""); 
 	memset(&sinfo,0,sizeof(STARTUPINFO));
 	sinfo.cb=sizeof(STARTUPINFO);
@@ -1435,13 +1435,13 @@ BOOL CALLBACK fthdefprc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
 
 	TCHAR		buf[HBUFSIZ];
 	TCHAR		buf1[HBUFSIZ];
-	unsigned	ind,stat,xat;
+	unsigned	ind,stat,l_xat;
 
 	switch(umsg){
 
 	case WM_INITDIALOG:
 
-		xat=ini.fthbits;
+		l_xat=ini.fthbits;
 		SendMessage(hwndlg,WM_SETFOCUS,0,0);
 		sprintf_s(buf, sizeof(buf), "%.2f",ini.fthrat);
 		SetWindowText(GetDlgItem(hwndlg,IDC_DFRAT),buf);
@@ -1459,17 +1459,17 @@ BOOL CALLBACK fthdefprc(HWND hwndlg,UINT umsg,WPARAM wparam,LPARAM lparam){
 			SendMessage(GetDlgItem(hwndlg,IDC_FDTYP),CB_ADDSTRING,0,(long)buf);
 		}
 		SendMessage(GetDlgItem(hwndlg,IDC_FDTYP),CB_SETCURSEL,ini.fthtyp-1,0);
-		if(xat&AT_FTHBLND)
+		if(l_xat&AT_FTHBLND)
 			stat=BST_CHECKED;
 		else
 			stat=BST_UNCHECKED;
 		CheckDlgButton(hwndlg,IDC_FDBLND,stat);
-		if(xat&AT_FTHUP)
+		if(l_xat&AT_FTHUP)
 			stat=BST_CHECKED;
 		else
 			stat=BST_UNCHECKED;
 		CheckDlgButton(hwndlg,IDC_FDUP,stat);
-		if(xat&AT_FTHDWN)
+		if(l_xat&AT_FTHDWN)
 			stat=BST_CHECKED;
 		else
 			stat=BST_UNCHECKED;
@@ -2213,7 +2213,7 @@ void fsort()
 	unsigned		typcnt,jmps,minjmps;
 	OREC*			recs;
 	RANG*			prngs;
-	unsigned*		frmcnts;
+	unsigned*		l_frmcnts;
 	SRTREC			srec;
 	FILETIME		ftim;
 	ULARGE_INTEGER	stim;
@@ -2268,7 +2268,7 @@ void fsort()
 		cfrm=0xffffffff;
 		typcnt=0;
 		pind=0;
-		frmcnts=(unsigned*)&oseq;
+		l_frmcnts=(unsigned*)&oseq;
 		for(ind=0;ind<rind;ind++)
 		{
 			if(at!=precs[ind]->col)
@@ -3027,30 +3027,30 @@ void uspac()
 	numWnd();
 }
 
-void uangfn(unsigned find,float ang)
+void uangfn(unsigned find,float p_ang)
 {
 	clofind=find;
 	fvars(clofind);
 	if(frmpnt->xat&AT_UND)
 	{
-		frmpnt->uang=ang;
+		frmpnt->uang=p_ang;
 		refilfn();
 	}
 }
 
-void dufang(float ang)
+void dufang(float p_ang)
 {
 	unsigned ind;
 
 	savdo();
-	ang*=(float)PI/180;
+	p_ang*=(float)PI/180;
 	if(fselpnt)
 	{
 		for(ind=0;ind<fselpnt;ind++)
-			uangfn(selist[ind],ang);
+			uangfn(selist[ind],p_ang);
 	}
 	if(chkMap(FORMSEL))
-		uangfn(clofind,ang);
+		uangfn(clofind,p_ang);
 	coltab();
 	setMap(RESTCH);
 }
@@ -3164,7 +3164,7 @@ void dufind(float idnt)
 	setMap(RESTCH);
 }
 
-void fangfn(unsigned find,float ang)
+void fangfn(unsigned find,float p_ang)
 {
 	clofind=find;
 	fvars(clofind);
@@ -3177,7 +3177,7 @@ void fangfn(unsigned find,float ang)
 		case ANGF:
 
 			frmpnt->ftyp=ANGF;
-			frmpnt->angclp.fang=ang;
+			frmpnt->angclp.fang=p_ang;
 			break;
 
 		case	VCLPF:
@@ -3185,26 +3185,26 @@ void fangfn(unsigned find,float ang)
 		case	ANGCLPF:
 
 			frmpnt->ftyp=ANGCLPF;
-			frmpnt->sacang.ang=ang;
+			frmpnt->sacang.ang=p_ang;
 			break;
 		}
 		refilfn();
 	}
 }
 
-void dufxang(float ang)
+void dufxang(float p_ang)
 {
 	unsigned ind;
 
 	savdo();
-	ang*=(float)PI/180;
+	p_ang*=(float)PI/180;
 	if(fselpnt)
 	{
 		for(ind=0;ind<fselpnt;ind++)
-			fangfn(selist[ind],ang);
+			fangfn(selist[ind],p_ang);
 	}
 	if(chkMap(FORMSEL))
-		fangfn(clofind,ang);
+		fangfn(clofind,p_ang);
 	coltab();
 	setMap(RESTCH);
 }
@@ -5282,11 +5282,11 @@ float getstxt(unsigned cod)
 	return atof(hlpbuf)*PFGRAN;
 }
 
-BOOL chkasp(FLPNT* flt)
+BOOL chkasp(FLPNT* p_flt)
 {
-	flt->x=getstxt(IDC_DESWID);
-	flt->y=getstxt(IDC_DESHI);
-	if(flt->y/flt->x==daspct)
+	p_flt->x=getstxt(IDC_DESWID);
+	p_flt->y=getstxt(IDC_DESHI);
+	if(p_flt->y/p_flt->x==daspct)
 		return 1;
 	else
 		return 0;
