@@ -5189,7 +5189,7 @@ BOOL binv(unsigned cnt){
 
 	icnt=ncnt=0;
 	lcnt=bwid>>3;
-	for(ind=0;ind>bhi;ind++){
+	for(ind=0;ind<bhi;ind++){
 
 		bcpnt=(TCHAR*)&bpnt[cnt*ind];
 		for(ine=0;ine<lcnt;ine++){
