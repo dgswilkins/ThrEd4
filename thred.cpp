@@ -879,20 +879,20 @@ MENUITEMINFO filinfo={
 	13,					
 };
 
-const TCHAR			fltr[_MAX_PATH]=		"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
-const TCHAR			bfltr[_MAX_PATH]=	"Microsoft (BMP)\0*.bmp\0";
-TCHAR				cstFltr[_MAX_PATH]=	"Thredworks (THR)\0*.thr\0";
-TCHAR				filnam[_MAX_PATH]={0};
-TCHAR				thrnam[_MAX_PATH];
-TCHAR				auxnam[_MAX_PATH];
-TCHAR				genam[_MAX_PATH];
-TCHAR				defDir[_MAX_PATH]="c:\\";
-TCHAR				defbmp[_MAX_PATH]="c:\\";
-TCHAR				balnam0[_MAX_PATH]={0};	//balarad semaphore file
-TCHAR				balnam1[_MAX_PATH]={0};	//balarad data file
-TCHAR				balnam2[_MAX_PATH];
-TCHAR				srchnam[_MAX_PATH];
-TCHAR				homdir[_MAX_PATH];	//directory from which thred was executed
+const TCHAR			fltr[_MAX_PATH + 1]=		"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
+const TCHAR			bfltr[_MAX_PATH + 1]=	"Microsoft (BMP)\0*.bmp\0";
+TCHAR				cstFltr[_MAX_PATH + 1]=	"Thredworks (THR)\0*.thr\0";
+TCHAR				filnam[_MAX_PATH + 1]={0};
+TCHAR				thrnam[_MAX_PATH + 1];
+TCHAR				auxnam[_MAX_PATH + 1];
+TCHAR				genam[_MAX_PATH + 1];
+TCHAR				defDir[_MAX_PATH + 1]="c:\\";
+TCHAR				defbmp[_MAX_PATH + 1]="c:\\";
+TCHAR				balnam0[_MAX_PATH + 1]={0};	//balarad semaphore file
+TCHAR				balnam1[_MAX_PATH + 1]={0};	//balarad data file
+TCHAR				balnam2[_MAX_PATH + 1];
+TCHAR				srchnam[_MAX_PATH + 1];
+TCHAR				homdir[_MAX_PATH + 1];	//directory from which thred was executed
 TCHAR*				phom;			//pointer to the home file name
 PCSTCH*				filBuf;
 HANDLE				hFil=0;
@@ -10049,9 +10049,9 @@ void dubuf(){
 	if(formpnt){
 
 		theds=new FRMHED[formpnt];
-		tpnts=new FLPNT[len];
+		tpnts=new FLPNT[len+1];
 		spnts=new SATCON[slen];
-		epnts=new FLPNT[elen];
+		epnts=new FLPNT[elen+1];
 		for(ind=0;ind<formpnt;ind++){
 
 			frmcpy(&theds[ind],&formlst[ind]);
@@ -10084,9 +10084,10 @@ void dubuf(){
 
 				theds[ind].clp=(FLPNT*)(&epnts[elind]-&epnts[0]);
 				for(ine=0;ine<formlst[ind].nclp;ine++){
-
-					epnts[elind].x=formlst[ind].clp[ine].x;
-					epnts[elind++].y=formlst[ind].clp[ine].y;
+					if (elind < elen) {
+						epnts[elind].x = formlst[ind].clp[ine].x;
+						epnts[elind++].y = formlst[ind].clp[ine].y;
+					}
 				}
 			}
 		}
@@ -22162,8 +22163,10 @@ void duhom(){
 	else{
 
 		ind=GetCurrentDirectory(_MAX_PATH,homdir);
-		homdir[ind++]='\\';
-		phom=&homdir[ind];
+		if (ind) {
+			homdir[ind++] = '\\';
+			phom = &homdir[ind];
+		}
 	}
 	*phom=0;
 }

@@ -532,6 +532,7 @@ unsigned short egaray[]={
 	MEGCHNH,
 	MEGCHNL,
 	MEGCLPX,
+	0
 };
 
 unsigned char lvl00=0;
@@ -4569,7 +4570,7 @@ void fnvrt(){
 			maxlins=inf;
 	}
 	maxlins=(maxlins>>1);
-	lins=new SMALPNTL[lincnt];
+	lins=new SMALPNTL[lincnt+1];
 	spnt=0;grpind=0;
 	tgrinds=(unsigned*)bseq;
 	grindpnt=0;
@@ -4603,15 +4604,16 @@ void fnvrt(){
 			ine=0;
 			tind=spnt;
 			while(ine<inf){
-
-				lins[spnt].lin=pjpts[ine]->lin;
-				lins[spnt].grp=grpind;
-				lins[spnt].x=pjpts[ine]->x;
-				lins[spnt++].y=pjpts[ine++]->y;
-				lins[spnt].lin=pjpts[ine]->lin;
-				lins[spnt].grp=grpind;
-				lins[spnt].x=pjpts[ine]->x;
-				lins[spnt++].y=pjpts[ine++]->y;
+				if (spnt < lincnt) {
+					lins[spnt].lin = pjpts[ine]->lin;
+					lins[spnt].grp = grpind;
+					lins[spnt].x = pjpts[ine]->x;
+					lins[spnt++].y = pjpts[ine++]->y;
+					lins[spnt].lin = pjpts[ine]->lin;
+					lins[spnt].grp = grpind;
+					lins[spnt].x = pjpts[ine]->x;
+					lins[spnt++].y = pjpts[ine++]->y;
+				}
 			}
 			if(spnt!=tind)
 				grpind++;
@@ -5614,7 +5616,7 @@ void satfn(unsigned astrt,unsigned afin,unsigned bstrt,unsigned bfin){
 		asegs= ((afin > astrt) ? (afin - astrt) : (astrt - afin));
 		bsegs= ((bstrt > bfin) ? (bstrt - bfin) : (bfin - bstrt));
 		acnts=new unsigned[asegs];
-		bcnts=new unsigned[bsegs];
+		bcnts=new unsigned[bsegs+1];
 		ine=astrt;
 		tcnt=0;
 		for(ind=0;ind<asegs-1;ind++){
@@ -5837,7 +5839,7 @@ void satfil(){
 	rstMap(SAT1);
 	rstMap(FILDIR);
 	frmpnt->ftyp=SATF;
-	lens=new double[sids+1];
+	lens=new double[sids+2];
 	len=0;
 	for(ind=0;ind<(unsigned)sids-1;ind++){
 
@@ -7541,7 +7543,10 @@ void refrmfn()
 	unsigned	cod,fpnt;
 
 	cod=frmpnt->etyp&NEGUND;
-	fpnt=cod-1;
+	if (cod >= EGLAST) {
+		cod = EGLAST - 1;
+	}
+	fpnt = cod - 1;
 	loc0.top=loc1.top=3;
 	loc0.bottom=loc1.bottom=3+siz0.y;
 	loc0.left=3;
@@ -14747,10 +14752,12 @@ void duch(){
 			bak=8;
 			if(chkMap(LINCHN))
 				bak--;
-			oseq[seqpnt-bak].x=chpnts[ind+1].x;
-			oseq[seqpnt-bak].y=chpnts[ind+1].y;
-			oseq[seqpnt].x=chpnts[ind+1].x;
-			oseq[seqpnt++].y=chpnts[ind+1].y;
+			if ((seqpnt >= bak)) {
+				oseq[seqpnt - bak].x = chpnts[ind + 1].x;
+				oseq[seqpnt - bak].y = chpnts[ind + 1].y;
+			}
+			oseq[seqpnt].x = chpnts[ind + 1].x;
+			oseq[seqpnt++].y = chpnts[ind + 1].y;
 		}
 		else{
 

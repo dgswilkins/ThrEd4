@@ -1569,6 +1569,7 @@ enum{
 	EGCHNL,
 	EGCHNH,
 	EGCLPX,
+	EGLAST //must always be the last value
 };
 
 //edge underlay bit

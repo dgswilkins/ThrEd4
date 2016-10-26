@@ -223,7 +223,7 @@ unsigned short ldlst[]={	//strings to load into memory at init time
 	IDS_TXOF,
 };
 
-TCHAR*	stab[STR_LEN];		//memory string pointers
+TCHAR*	stab[256];		//memory string pointers
 TCHAR*	sdat;				//string storage
 
 #if PESACT
