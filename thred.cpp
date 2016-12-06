@@ -11829,11 +11829,13 @@ void shorter(){
 	if(cloInd==minpnt)
 		return;
 	curmax=hypot(stchs[cloInd+1].x-stchs[cloInd].x,stchs[cloInd+1].y-stchs[cloInd].y);
-	for(ine=cloInd-1;ine<selfrng.fin;ine--){
+	for (ine = cloInd; ine != 0; ine--) {
 
-			len=hypot(stchs[ine+1].x-stchs[ine].x,stchs[ine+1].y-stchs[ine].y);
-			if(len==curmax)
-				goto short1;
+		len = hypot(stchs[ine].x - stchs[ine - 1].x, stchs[ine].y - stchs[ine - 1].y);
+		if (len == curmax) {
+			ine--;
+			goto short1;
+		}
 	}
 	for(ind=selfrng.strt;ind<selfrng.fin-1;ind++){
 
@@ -11940,11 +11942,11 @@ void ungrphi(){
 
 		if(chkMap(FORMSEL)){
 
-			for(ind=hed.stchs-1;ind<hed.stchs;ind--){
+			for (ind = hed.stchs; ind != 0; ind--) {
 
-				if(!(stchs[ind].at&NOTFRM)&&((stchs[ind].at&FRMSK)>>FRMSHFT)==clofind){
+				if (!(stchs[ind - 1].at&NOTFRM) && ((stchs[ind - 1].at&FRMSK) >> FRMSHFT) == clofind) {
 
-					cloInd=ind;
+					cloInd = ind - 1;
 					setMap(SELBOX);
 					setMap(RESTCH);
 					goto dwngrpdun;

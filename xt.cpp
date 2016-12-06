@@ -1390,10 +1390,10 @@ void fncwlk()
 			opnt++;
 		}
 		sac=frmpnt->sacang.sac;
-		for(ind=frmpnt->stpt-1;ind<frmpnt->stpt;ind--)
+		for (ind = frmpnt->stpt; ind != 0; ind--)
 		{
-			oseq[opnt].x=midl(flt[sac[ind].fin].x,flt[sac[ind].strt].x);
-			oseq[opnt].y=midl(flt[sac[ind].fin].y,flt[sac[ind].strt].y);
+			oseq[opnt].x = midl(flt[sac[ind - 1].fin].x, flt[sac[ind - 1].strt].x);
+			oseq[opnt].y = midl(flt[sac[ind - 1].fin].y, flt[sac[ind - 1].strt].y);
 			opnt++;
 		}
 		if(frmpnt->at&FRMEND)

@@ -2431,6 +2431,7 @@ void flt2dub(FLPNT ipnt,DUBPNT* p_opnt){
 	p_opnt->y=ipnt.y;
 }
 
+/*
 void linrutf(unsigned strt){
 
 	double		tspac;
@@ -2447,6 +2448,7 @@ void linrutf(unsigned strt){
 	}
 	stspace=tspac;
 }
+*/
 
 void linrutb(unsigned strt){
 
@@ -5411,14 +5413,14 @@ void satadj()
 			}
 		}
 		inf=0;
-		for(ind=mapsiz-1;ind<mapsiz;ind--)
+		for (ind = mapsiz; ind != 0; ind--)
 		{
 			do
 			{
-				ine=prvchk(ind);
-				if(ine<sids)
-					sac[inf++].fin=ine+(ind<<5);
-			}while(ine<sids);
+				ine = prvchk(ind - 1);
+				if (ine < sids)
+					sac[inf++].fin = ine + ((ind - 1) << 5);
+			} while (ine < sids);
 		}
 		if(inf<stpt)
 			inf=stpt;
@@ -9118,13 +9120,13 @@ void dulens(unsigned nsids){
 		pnt.y+=len*sin(l_ang);
 		l_ang+=dang;
 	}
-	bind=ind-2;
-	ine=ind;
-	av=flt[0].x;
-	for(ind=bind;ind<nsids-3;ind--){
+	bind = ind - 1;
+	ine = ind;
+	av = flt[0].x;
+	for (ind = bind; ind != 0; ind--) {
 
-		flt[ine].y=flt[ind].y;
-		flt[ine].x=av+av-flt[ind].x;
+		flt[ine].y = flt[ind - 1].y;
+		flt[ine].x = av + av - flt[ind - 1].x;
 		ine++;
 	}
 	nuflen=ine;
@@ -11952,12 +11954,12 @@ void contf(){
 				oseq[seqpnt].x=hipnt.x;
 				oseq[seqpnt].y=hipnt.y;
 				seqpnt++;
-				for(ind=selins-2;ind<=selins;ind--){
+				for (ind = selins - 1; ind != 0; ind--) {
 
-					ang=pols[ind].ang+poldif.ang;
-					len=pols[ind].len*poldif.len;
-					oseq[seqpnt].x=lopnt.x+cos(ang)*len;
-					oseq[seqpnt].y=lopnt.y+sin(ang)*len;
+					ang = pols[ind - 1].ang + poldif.ang;
+					len = pols[ind - 1].len*poldif.len;
+					oseq[seqpnt].x = lopnt.x + cos(ang)*len;
+					oseq[seqpnt].y = lopnt.y + sin(ang)*len;
 					seqpnt++;
 				}
 			}
@@ -12815,12 +12817,12 @@ void stchadj(){
 	}
 	refilfn();
 	lo=clofind<<FRMSHFT;
-	for(ind=hed.stchs-1;ind<hed.stchs;ind--){
+	for (ind = hed.stchs; ind != 0; ind--) {
 
-		hi=stchs[ind].at&FRMSK;
-		if((stchs[ind].at&FRMSK)==lo){
+		hi = stchs[ind - 1].at&FRMSK;
+		if ((stchs[ind - 1].at&FRMSK) == lo) {
 
-			delpnt=ind+1;
+			delpnt = ind;
 			break;
 		}
 	}
@@ -14313,10 +14315,9 @@ void dubfn(){
 
 	brdfil(frmpnt->elen);
 	ine=seqpnt;
-	for(ind=seqpnt-1;ind<seqpnt;ind--){
-
-		oseq[ine].x=oseq[ind].x;
-		oseq[ine++].y=oseq[ind].y;
+	for (ind = seqpnt; ind != 0; ind--) {
+		oseq[ine].x = oseq[ind - 1].x;
+		oseq[ine++].y = oseq[ind - 1].y;
 	}
 	seqpnt=ine;
 }
@@ -15212,13 +15213,12 @@ void wavfrm(){
 			}
 			else{
 
-				for(ind=cnt-1;ind<cnt;ind--){
-
-					flt[ine].x=pos.x;
-					flt[ine].y=pos.y;
+				for (ind = cnt; ind != 0; ind--) {
+					flt[ine].x = pos.x;
+					flt[ine].y = pos.y;
 					ine++;
-					pos.x+=tflt[ind].x;
-					pos.y+=tflt[ind].y;
+					pos.x += tflt[ind - 1].x;
+					pos.y += tflt[ind - 1].y;
 				}
 			}
 		}
