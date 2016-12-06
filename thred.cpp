@@ -21790,7 +21790,7 @@ void int2tim(ULARGE_INTEGER num,FILETIME* tim){
 void ritloc(){
 
 	TCHAR*			penv;
-	TCHAR			locnam[_MAX_PATH];
+	TCHAR			locnam[_MAX_PATH] = { 0 };
 	HANDLE			hloc;
 	DWORD			rot;
 	size_t			len;
