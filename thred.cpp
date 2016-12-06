@@ -5429,12 +5429,14 @@ void bfil(){
 			for(ind=0;ind<bhi;ind++)
 				bitlin(&bpnt[ind*bwidw],&pbits[ind*bwid],bgnd,fgnd);
 			tdc=CreateCompatibleDC(rsdc);
-			SelectObject(tdc,tbit);
-			hBmp=CreateCompatibleBitmap(rsdc,bwid,bhi);
-			SelectObject(bitdc,hBmp);
-			BitBlt(bitdc,0,0,bwid,bhi,tdc,0,0,SRCCOPY);
-			DeleteObject(tbit);
-			ReleaseDC(hWnd,tdc);
+			if (tbit && tdc) {
+				SelectObject(tdc, tbit);
+				hBmp = CreateCompatibleBitmap(rsdc, bwid, bhi);
+				SelectObject(bitdc, hBmp);
+				BitBlt(bitdc, 0, 0, bwid, bhi, tdc, 0, 0, SRCCOPY);
+				DeleteObject(tbit);
+				ReleaseDC(hWnd, tdc);
+			}
 			delete[] bpnt;
 		}
 		else{
@@ -14194,15 +14196,17 @@ void getrmap(){
 	l_binf.bmiHeader=l_binfh;
 	tracebit=CreateDIBSection(bitdc,&l_binf,DIB_RGB_COLORS,(void**)&tracbits,0,0);	
 	tracedc=CreateCompatibleDC(rsdc);
-	SelectObject(tracedc,tracebit);
-	BitBlt(tracedc,0,0,bwid,bhi,bitdc,0,0,SRCCOPY);
-	setMap(WASTRAC);
-	tracmap=(unsigned*)oseq;
-	trmapsiz=((bwid*bhi)>>5)+1;
-	for(ind=0;ind<trmapsiz;ind++)
-		tracmap[ind]=0;
-	StretchBlt(sdc,bdrct.left,bdrct.top,bdrct.right-bdrct.left,bdrct.bottom-bdrct.top,
-	   bitdc,bsrct.left,bsrct.top,bsrct.right-bsrct.left,bsrct.bottom-bsrct.top,SRCCOPY);
+	if (tracebit && tracedc) {
+		SelectObject(tracedc, tracebit);
+		BitBlt(tracedc, 0, 0, bwid, bhi, bitdc, 0, 0, SRCCOPY);
+		setMap(WASTRAC);
+		tracmap = (unsigned*)oseq;
+		trmapsiz = ((bwid*bhi) >> 5) + 1;
+		for (ind = 0; ind < trmapsiz; ind++)
+			tracmap[ind] = 0;
+		StretchBlt(sdc, bdrct.left, bdrct.top, bdrct.right - bdrct.left, bdrct.bottom - bdrct.top,
+			bitdc, bsrct.left, bsrct.top, bsrct.right - bsrct.left, bsrct.bottom - bsrct.top, SRCCOPY);
+	}
 }
 
 void trace(){
@@ -21798,8 +21802,10 @@ void ritloc(){
 		return;
 	}
 	else {
-		strcpy_s(locnam, penv);
-		free(penv);
+		if (penv) {
+			strcpy_s(locnam, penv);
+			free(penv);
+		}
 	}
 	penv=strrchr(locnam,'\\')+1;
 	strcpy_s(penv, sizeof(locnam) - (penv - locnam),"thredloc.txt");
