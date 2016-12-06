@@ -2650,8 +2650,8 @@ void dudat(){
 	unsigned	l_siz;
 	BAKHED*		bdat;
 //	unsigned	ind;
-	unsigned	addr;
-	unsigned	chksiz;
+//	unsigned	addr;
+//	unsigned	chksiz;
 
 	if(bakdat[dupnt0])
 		free(bakdat[dupnt0]);

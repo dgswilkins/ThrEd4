@@ -5604,7 +5604,7 @@ void redtx()
 	HANDLE hnam;
 	unsigned long red;
 	int ind;
-	char sig[4];
+	char sig[4] = { 0 };
 
 	ptxhst=15;
 	ZeroMemory(&thsts,sizeof(TXHST)*16);
