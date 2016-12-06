@@ -3524,7 +3524,7 @@ void duseq(unsigned strt,unsigned fin){
 
 	unsigned	ind,topbak;
 
-	seqlin=0;
+	seqlin=nullptr;
 	rstMap(SEQDUN);
 	topbak=seq[strt][1].lin;
 	if(strt>fin){
@@ -3556,7 +3556,7 @@ void duseq(unsigned strt,unsigned fin){
 		}
 		if(rstMap(SEQDUN))
 			duseq2(ind+1);
-		lastgrp=seqlin->grp;
+		if (seqlin != nullptr) { lastgrp = seqlin->grp; }
 	}
 	else{
 	
@@ -3593,7 +3593,7 @@ void duseq(unsigned strt,unsigned fin){
 			if(ind)
 				duseq2(ind-1);
 		}
-		lastgrp=seqlin->grp;
+		if (seqlin != nullptr) { lastgrp = seqlin->grp; }
 	}
 }
 

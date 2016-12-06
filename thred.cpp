@@ -2696,8 +2696,9 @@ void dudat(){
 		if(txad)
 			MoveMemory(bdat->txp,&txpnts,sizeof(TXPNT)*txad);
 	}
-	addr=(unsigned)&bdat->txp[txad];
-	chksiz=addr-(unsigned)bakdat[dupnt0];
+	// ToDo removed until I can see a purpose for them
+	//	addr=(unsigned)&bdat->txp[txad];
+	//	chksiz=addr-(unsigned)bakdat[dupnt0];
 }
 
 void savdo(){
@@ -10566,52 +10567,54 @@ void redclp(){
 	playcod=actl<<LAYSHFT;
 	clpvoid=GlobalLock(hClpMem);
 	clpdat=(CLPSTCH*)clpvoid;
-	clplen=clpdat[0].led;
-	clpnu[0].x=clpdat[0].x+(float)clpdat[0].fx/256;
-	clpnu[0].y=clpdat[0].y+(float)clpdat[0].fy/256;
-	clpnu[0].at=0;
+	if (clpvoid) {
+		clplen = clpdat[0].led;
+		clpnu[0].x = clpdat[0].x + (float)clpdat[0].fx / 256;
+		clpnu[0].y = clpdat[0].y + (float)clpdat[0].fy / 256;
+		clpnu[0].at = 0;
 
 #if CLPBUG
 
-		sprintf_s(msgbuf, sizeof(msgbuf),"ind: 0 x: %6.2f,y: %6.2f\n",clpnu[0].x,clpnu[0].y);
+		sprintf_s(msgbuf, sizeof(msgbuf), "ind: 0 x: %6.2f,y: %6.2f\n", clpnu[0].x, clpnu[0].y);
 		OutputDebugString(msgbuf);
 #endif
-	clprct.left=clprct.right=clpnu[0].x;
-	clprct.bottom=clprct.top=clpnu[0].y;
-	for(ind=1;ind<(long)clplen;ind++){
+		clprct.left = clprct.right = clpnu[0].x;
+		clprct.bottom = clprct.top = clpnu[0].y;
+		for (ind = 1; ind < (long)clplen; ind++) {
 
-		clpnu[ind].x=clpdat[ind].x+(float)clpdat[ind].fx/256;
-		clpnu[ind].y=clpdat[ind].y+(float)clpdat[ind].fy/256;
-		clpnu[ind].at=(clpdat[ind].led&0xf)|playcod;
+			clpnu[ind].x = clpdat[ind].x + (float)clpdat[ind].fx / 256;
+			clpnu[ind].y = clpdat[ind].y + (float)clpdat[ind].fy / 256;
+			clpnu[ind].at = (clpdat[ind].led & 0xf) | playcod;
 
 #if CLPBUG
 
-		sprintf_s(msgbuf, sizeof(msgbuf),"ind: %d x: %6.2f,y: %6.2f\n",ind,clpnu[ind].x,clpnu[ind].y);
-		OutputDebugString(msgbuf);
+			sprintf_s(msgbuf, sizeof(msgbuf), "ind: %d x: %6.2f,y: %6.2f\n", ind, clpnu[ind].x, clpnu[ind].y);
+			OutputDebugString(msgbuf);
 #endif
-		if(clpnu[ind].x<clprct.left)
-			clprct.left=clpnu[ind].x;
-		if(clpnu[ind].x>clprct.right)
-			clprct.right=clpnu[ind].x;
-		if(clpnu[ind].y<clprct.bottom)
-			clprct.bottom=clpnu[ind].y;
-		if(clpnu[ind].y>clprct.top)
-			clprct.top=clpnu[ind].y;
-	}
-	clpnu[0].at=actcol|playcod;
-	clpsiz.cx=clprct.right-clprct.left;
-	clpsiz.cy=clprct.top-clprct.bottom;
-	GlobalUnlock(hClpMem);
-	if(clprct.left||clprct.bottom){
-
-		for(ind=0;ind<(int)clplen;ind++){
-
-			clpnu[ind].x-=clprct.left;
-			clpnu[ind].y-=clprct.bottom;
+			if (clpnu[ind].x < clprct.left)
+				clprct.left = clpnu[ind].x;
+			if (clpnu[ind].x > clprct.right)
+				clprct.right = clpnu[ind].x;
+			if (clpnu[ind].y < clprct.bottom)
+				clprct.bottom = clpnu[ind].y;
+			if (clpnu[ind].y > clprct.top)
+				clprct.top = clpnu[ind].y;
 		}
-		clprct.top-=clprct.bottom;
-		clprct.right-=clprct.left;
-		clprct.bottom=clprct.left=0;
+		clpnu[0].at = actcol | playcod;
+		clpsiz.cx = clprct.right - clprct.left;
+		clpsiz.cy = clprct.top - clprct.bottom;
+		GlobalUnlock(hClpMem);
+		if (clprct.left || clprct.bottom) {
+
+			for (ind = 0; ind < (int)clplen; ind++) {
+
+				clpnu[ind].x -= clprct.left;
+				clpnu[ind].y -= clprct.bottom;
+			}
+			clprct.top -= clprct.bottom;
+			clprct.right -= clprct.left;
+			clprct.bottom = clprct.left = 0;
+		}
 	}
 }
 
@@ -22170,7 +22173,7 @@ void duhom(){
 			phom = &homdir[ind];
 		}
 	}
-	*phom=0;
+	if (phom) { *phom = 0; }
 }
 
 #if defined(__UseASM__)

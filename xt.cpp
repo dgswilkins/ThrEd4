@@ -4362,20 +4362,21 @@ void txtclp()
 	if(hClpMem)
 	{
 		frmclpdat=(FRMCLP*)GlobalLock(hClpMem);
-		if(frmclpdat->led==CLP_FRM)
-		{
-			frmpnt=&frmclpdat->frm;
-			frmcpy(&angfrm,frmpnt);
-			MoveMemory(&angflt,&frmpnt[1],sizeof(FLPNT)*frmpnt->sids);
-			angfrm.flt=angflt;
-			rstMap(TXTLIN);
-			setMap(TXTCLP);
-			setMap(TXTMOV);
-			setxfrm();
-			txtloc.x=msg.pt.x-stOrg.x;
-			txtloc.y=msg.pt.y-stOrg.y;
+		if (frmclpdat) {
+			if (frmclpdat->led == CLP_FRM) {
+				frmpnt = &frmclpdat->frm;
+				frmcpy(&angfrm, frmpnt);
+				MoveMemory(&angflt, &frmpnt[1], sizeof(FLPNT)*frmpnt->sids);
+				angfrm.flt = angflt;
+				rstMap(TXTLIN);
+				setMap(TXTCLP);
+				setMap(TXTMOV);
+				setxfrm();
+				txtloc.x = msg.pt.x - stOrg.x;
+				txtloc.y = msg.pt.y - stOrg.y;
+			}
+			GlobalUnlock(hClpMem);
 		}
-		GlobalUnlock(hClpMem);
 	}
 	setMap(RESTCH);
 	rstMap(WASWROT);
