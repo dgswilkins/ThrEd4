@@ -2356,7 +2356,7 @@ void ritfnam(TCHAR* nam){
 			tnam[49]=psg()&0xff;
 	}
 	for(ind=0;ind<50;ind++)
-		hedx.crtnam[fnamord[ind]]=tnam[ind];
+		if (fnamord[ind]<50) { hedx.crtnam[fnamord[ind]] = tnam[ind]; }
 }
 
 void redfnam(TCHAR* nam){
