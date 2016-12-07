@@ -5199,7 +5199,7 @@ BOOL binv(unsigned cnt){
 				ncnt++;
 			else{
 
-				if(bcpnt[ine]==(TCHAR)0xff)
+				if(bcpnt[ine]==(TBYTE)0xff)
 					icnt++;
 			}
 		}
@@ -6464,7 +6464,7 @@ void ritdst(){
 		}
 	}
 	drecs[dstcnt].led=drecs[dstcnt].mid=0;
-	drecs[dstcnt++].nd=(TCHAR)0xf3;
+	drecs[dstcnt++].nd=(TBYTE)0xf3;
 
 	if(colfil()){
 
