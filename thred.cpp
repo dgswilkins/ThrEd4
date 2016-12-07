@@ -704,7 +704,7 @@ HPEN				grdPen;			//pen for stitch grid
 HPEN				bakPen;			//background color pen
 HPEN				bitPen;			//bitmap pen
 HPEN				fPen;			//form pen
-HPEN				ypen[5];		//layer pens
+HPEN				ypen[6];		//layer pens
 HPEN				fPen3;			//three-pixel form pen
 HPEN				fsPen;			//form select pen
 HPEN				mrkPen;			//zoom mark pen
@@ -22711,7 +22711,7 @@ void init(){
 	ritfnam(ini.desnam);
 	strcpy_s(hedx.modnam,ini.desnam);
 	hedx.stgran=0;
-	for(ind=0;ind<31;ind++)
+	for(ind=0;ind<26;ind++)
 		hedx.res[ind]=0;
 	chkhup();
 	nedmen();
