@@ -959,7 +959,13 @@ int fil2crd(const char* p_filnam)
 	{
 		erc=GetLastError();
 	}
-    return erc;
+	else {
+		WaitForSingleObject(pinfo.hProcess, INFINITE);
+	}
+	CloseHandle(pinfo.hProcess);
+	CloseHandle(pinfo.hThread);
+
+	return erc;
 }
 
 BOOL chkp2cnam(char* nam){

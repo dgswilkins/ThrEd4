@@ -13378,7 +13378,8 @@ BOOL isect(unsigned find0,unsigned find1,FLPNT* ipnt,float* len){
 	ipnt->x=(float)tipnt.x;
 	ipnt->y=(float)tipnt.y;
 	*len=hypot(tipnt.x-vpnt0.x,tipnt.y-vpnt0.y);
-		 hypot(tipnt.x-vpnt1.x,tipnt.y-vpnt1.y);
+	// ToDo - Why is this line here?
+	//	 hypot(tipnt.x-vpnt1.x,tipnt.y-vpnt1.y);
 	return flg;
 }
 
