@@ -2365,10 +2365,10 @@ void redfnam(TCHAR* nam){
 	unsigned char tnam[50];
 
 	for(ind=0;ind<50;ind++)
-		if(fnamord[ind]>50)
-			tnam[ind]=111;
+		if (fnamord[ind]<50)
+			tnam[ind] = hedx.crtnam[fnamord[ind]];
 		else
-			tnam[ind]=hedx.crtnam[fnamord[ind]];
+			tnam[ind] = 111;
 	for(ind=0;ind<50;ind++){
 	
 		nam[ind]=frencod[tnam[ind]];
@@ -5517,8 +5517,10 @@ void dstran(){
 	FLPNT			dif;
 	HANDLE			hcol;
 	unsigned*		pcol;
-	unsigned		fsiz,colind;
+	unsigned		colind;
 	DWORD			hisiz;
+	LARGE_INTEGER	fisiz;
+	boolean			retval;
 
 	pcol=0;
 	if(colfil()){
@@ -5526,14 +5528,17 @@ void dstran(){
 		hcol=CreateFile(colnam,GENERIC_READ,0,0,OPEN_EXISTING,0,0);
 		if(hcol!=INVALID_HANDLE_VALUE){
 
-			fsiz=GetFileSize(hcol,&hisiz);
-			pcol=new unsigned[fsiz];
-			ReadFile(hcol,(unsigned*)pcol,fsiz,&hisiz,0);
+			retval=GetFileSizeEx(hcol,&fisiz);
+			// ToDo - check HighPart is non-zero
+			pcol=new unsigned[fisiz.u.LowPart];
+			ReadFile(hcol,(unsigned*)pcol, fisiz.u.LowPart,&hisiz,0);
 			CloseHandle(hcol);
-			if(hisiz&&pcol&&pcol[0]==COLVER){
+			if (hisiz>1) {
+				if (hisiz&&pcol&&pcol[0]==COLVER){
 
-				stchBak=pcol[1];
-				colCnt=0;
+					stchBak = pcol[1];
+					colCnt = 0;
+				}
 			}
 			else{
 
@@ -10077,7 +10082,7 @@ void dubuf(){
 			if(isclp(ind)){
 
 				theds[ind].angclp.clp=(FLPNT*)(&epnts[elind]-&epnts[0]);
-				for(ine=0;ine<formlst[ind].flencnt.nclp;ine++){
+				for(ine=0;(ine<formlst[ind].flencnt.nclp)&&(elind<elen);ine++){
 
 					epnts[elind].x=formlst[ind].angclp.clp[ine].x;
 					epnts[elind++].y=formlst[ind].angclp.clp[ine].y;
@@ -10086,11 +10091,9 @@ void dubuf(){
 			if(iseclpx(ind)){
 
 				theds[ind].clp=(FLPNT*)(&epnts[elind]-&epnts[0]);
-				for(ine=0;ine<formlst[ind].nclp;ine++){
-					if (elind < elen) {
-						epnts[elind].x = formlst[ind].clp[ine].x;
-						epnts[elind++].y = formlst[ind].clp[ine].y;
-					}
+				for(ine=0;(ine<formlst[ind].nclp)&&((elind < elen));ine++){
+					epnts[elind].x = formlst[ind].clp[ine].x;
+					epnts[elind++].y = formlst[ind].clp[ine].y;
 				}
 			}
 		}
@@ -11671,7 +11674,7 @@ void colchk(){
 
 		if(col!=(stchs[ind].at&COLMSK)){
 
-			if(ind-cind==1)
+			if((ind-cind==1)&&(cind))
 				stchs[ind-1].at=stchs[ind].at&NCOLMSK|(stchs[cind-1].at&COLMSK);
 			col=stchs[ind].at&COLMSK;
 			cind=ind;
@@ -23600,7 +23603,7 @@ void ritbak(TCHAR* nam,DRAWITEMSTRUCT* p_ds){
 				for(ind=0;ind<sthed.fpnt;ind++){
 
 					lind=inf;
-					for(ine=0;ine<flst[ind].sids;ine++){
+					for(ine=0;(ine<flst[ind].sids)&&(inf<sthed.fcnt);ine++){
 
 						l_plin[ine].x=tflt[inf].x*rat;
 						l_plin[ine].y=l_siz.y-tflt[inf++].y*rat;

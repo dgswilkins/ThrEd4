@@ -4668,8 +4668,12 @@ void dutxmir()
 	ine=ind+1;
 	if(tscr.lins&1)
 	{
-		while(txtmp[ind].lin==lin&&ind>=0)
-			ind--;
+		while (ind >= 0) {
+			if (txtmp[ind].lin == lin) {
+				ind--;
+			}
+			else { break; }
+		}
 	}
 	while(ind>=0)
 	{
@@ -5530,7 +5534,7 @@ void setshft()
 				lin++;
 		}
 	}
-	lin=txtmp[tscr.ind-1].lin;
+	if (tscr.ind) { lin = txtmp[tscr.ind - 1].lin; }
 	tscr.spac=(srct.right-srct.left)/lin;
 	tscr.fhi=srct.top-srct.bottom;
 	tscr.wid=tscr.spac*lin+tscr.spac/2;
@@ -5608,8 +5612,8 @@ void redtx()
 {
 	char nam[_MAX_PATH];
 	HANDLE hnam;
-	unsigned long red;
-	int ind;
+	DWORD red;
+	unsigned int ind;
 	char sig[4] = { 0 };
 
 	ptxhst=15;
@@ -5624,7 +5628,7 @@ void redtx()
 			{
 				ReadFile(hnam,(int*)&ptxhst,4,&red,0);
 				ReadFile(hnam,(TXHST*)&thsts,sizeof(TXHST)*16,&red,0);
-				for(ind=0;ind<16;ind++)
+				for(ind=0;ind<(red/sizeof(TXHST));ind++)
 				{
 					if(thsts[ind].cnt)
 					{

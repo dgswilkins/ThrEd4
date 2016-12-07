@@ -5892,7 +5892,7 @@ void satfil(){
 					oseq[0].y=sPnt.y=flt[1].y;
 					seqpnt=1;
 				}
-				while(len>lens[ind])
+				while((len>lens[ind]) && (ind < (sids+1)))
 					ind++;
 				dx=lens[ind]-len;
 				dy=len-lens[ind-1];
@@ -9917,8 +9917,10 @@ void plbrd(double spac){
 		plfn(&uvrct[0]);
 		plbak(bpnt);
 		prsmal();
-		sPnt.x=oseq[seqpnt-1].x;
-		sPnt.y=oseq[seqpnt-1].y;
+		if (seqpnt) { //ensure that we can do a valid read from oseq
+			sPnt.x = oseq[seqpnt - 1].x;
+			sPnt.y = oseq[seqpnt - 1].y;
+		}
 	}
 	rstMap(UND);
 	stspace=frmpnt->espac;
@@ -11204,7 +11206,12 @@ void frmpnts(unsigned typ){
 	while(ind<hed.stchs&&(stchs[ind].at&(ALTYPMSK|FRMSK))!=trg)
 		ind++;
 	cloInd=ind;
-	ind=hed.stchs-1;
+	if (hed.stchs > 0) {
+		ind = hed.stchs - 1;
+	}
+	else {
+		ind = 0;
+	}
 	while(ind>cloInd&&(stchs[ind].at&(ALTYPMSK|FRMSK))!=trg)
 		ind--;
 	grpInd=ind;
@@ -13620,7 +13627,7 @@ void clpcon(){
 	lens=new double[sids+1];
 	clplens=new double[sids];
 	clpsrt=new CLIPSORT[sids];
-	pclpsrt=new CLIPSORT*[sids];
+	pclpsrt=new CLIPSORT*[sids+1];
 	ine=leftsid();
 	tlen=0;
 	lens[ine]=0;
