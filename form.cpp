@@ -2152,6 +2152,7 @@ BOOL ritlin(FLPNT strt,FLPNT fin)
 	return 1;
 }
 
+/*
 BOOL minrng(unsigned strt,unsigned fin)
 {
 	if (((fin > strt) ? (fin - strt) : (strt - fin)) < sids >> 1 || frmpnt->typ == LIN)
@@ -2159,6 +2160,7 @@ BOOL minrng(unsigned strt,unsigned fin)
 	else
 		return 1;
 }
+*/
 
 unsigned closflt(float px,float py)
 {
@@ -5892,7 +5894,7 @@ void satfil(){
 					oseq[0].y=sPnt.y=flt[1].y;
 					seqpnt=1;
 				}
-				while((len>lens[ind]) && (ind < (sids+1)))
+				while((len>lens[ind]) && (ind < (unsigned int)(sids+1)))
 					ind++;
 				dx=lens[ind]-len;
 				dy=len-lens[ind-1];
