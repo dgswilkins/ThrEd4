@@ -12451,7 +12451,7 @@ void insfil(){
 		0,						//lpTemplateName
 	};
 	STRHED		thed;
-	STREX		thedx;
+	STREX		thedx = { 0 };
 	HED			tphed;
 	unsigned	ind,ine,cod,codof;
 	FLRCT		trct;
@@ -15296,7 +15296,7 @@ void trinit(){
 	unsigned	hst[3][256];
 	unsigned*	phst;
 	unsigned	hi[3];
-	unsigned	col[3];
+	unsigned	col[3] = { 0 };
 	COLORREF	tcol;
 	
 	if(*bnam){
@@ -23460,7 +23460,7 @@ void ritbak(TCHAR* nam,DRAWITEMSTRUCT* p_ds){
 	FRMHED*		flst;
 	FLPNT*		tflt;
 	STREX		thedx;
-	unsigned	vervar;
+	unsigned	vervar=0;
 	FRMHEDO*	frmlstx;
 
 	thfil=CreateFile(nam,GENERIC_READ,0,0,

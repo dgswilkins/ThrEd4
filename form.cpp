@@ -13605,7 +13605,7 @@ void clpcon(){
 	float		fnof;
 	unsigned	clpnof;
 	double		clpvof;
-	TXPNT*		ptx;
+	TXPNT*		ptx = nullptr;
 
 	duflt();
 	clpwid=clpsiz.cx+frmpnt->fspac;
@@ -13627,7 +13627,7 @@ void clpcon(){
 	lens=new double[sids+1];
 	clplens=new double[sids];
 	clpsrt=new CLIPSORT[sids];
-	pclpsrt=new CLIPSORT*[sids+1];
+	pclpsrt=new CLIPSORT*[sids+1]();
 	ine=leftsid();
 	tlen=0;
 	lens[ine]=0;
@@ -13794,8 +13794,10 @@ void clpcon(){
 
 				if(chkMap(TXFIL))
 				{
-					vpnt1.x=ploc.x;
-					vpnt1.y=ploc.y+ptx[inf].y;
+					if (ptx != nullptr) {
+						vpnt1.x = ploc.x;
+						vpnt1.y = ploc.y + ptx[inf].y;
+					}
 				}
 				else
 				{
@@ -13822,14 +13824,15 @@ void clpcon(){
 				if(cnt)
 				{
 					for(ing=0;ing<cnt;ing++){
-
-						clipnts[xpnt].sid=pclpsrt[ing]->lin;
-						clipnts[xpnt].x=pclpsrt[ing]->pnt.x;
-						clipnts[xpnt].y=pclpsrt[ing]->pnt.y;
-						clipnts[xpnt].flg=1;
-						xpnt++;
-						if(xpnt>MAXSEQ<<2)
-							goto clpskp;
+						if (pclpsrt != nullptr) {
+							clipnts[xpnt].sid=pclpsrt[ing]->lin;
+							clipnts[xpnt].x=pclpsrt[ing]->pnt.x;
+							clipnts[xpnt].y=pclpsrt[ing]->pnt.y;
+							clipnts[xpnt].flg=1;
+							xpnt++;
+							if(xpnt>MAXSEQ<<2)
+								goto clpskp;
+						}
 					}
 				}
 				vpnt0.x=vpnt1.x;
