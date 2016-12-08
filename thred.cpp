@@ -7,7 +7,10 @@
 #include "resource.h"
 #include "thred.h"
 
+// Suppress C4244: conversion from 'type1' to 'type2', possible loss of data
 #pragma warning(disable:4244)
+// Suppress C6031: return value ignored
+#pragma warning(disable:6031)
 
 void clrhbut(unsigned strt);
 void delsfrms(unsigned cod);
