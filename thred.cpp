@@ -2783,7 +2783,7 @@ void nunams(){
 
 	case AUXPES:
 
-		strcpy_s(pext,"pes");
+		strcpy_s(pext, sizeof(auxnam) - ind,"pes");
 		break;
 
 #endif
@@ -5680,7 +5680,7 @@ unsigned dupcol(){
 
 	unsigned	ind;
 	COLORREF	col;
-	unsigned	mat,matm,pmatm;
+	unsigned	mat,matm,pmatm=0;
 
 	col=pestrn[pescols[pcolind++]];
 	for(ind=0;ind<xpnt;ind++){
@@ -6790,7 +6790,7 @@ void sav(){
 	PESHED			peshed;
 	PESTCH*			pestch;
 	unsigned		match;
-	unsigned		mtchind;
+	unsigned		mtchind=0;
 	unsigned		mtchmin;
 	unsigned char	pescol;
 	FLRCT			srct;
