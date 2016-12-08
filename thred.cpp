@@ -7,6 +7,8 @@
 #include "resource.h"
 #include "thred.h"
 
+#pragma warning(disable:4244)
+
 void clrhbut(unsigned strt);
 void delsfrms(unsigned cod);
 void renam();
@@ -1913,7 +1915,6 @@ unsigned setMap(unsigned bPnt){
 			dec		eax
 setx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittestandset((long *)map, bPnt) ? 0xffffffff : 0;
 #endif
@@ -1947,7 +1948,6 @@ unsigned rstMap(unsigned bPnt){
 			dec		eax
 rstx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittestandreset((long *)map, bPnt) ? 0xffffffff : 0;
 #endif
@@ -1965,7 +1965,6 @@ unsigned toglMap(unsigned bPnt){
 			jnc		short toglx
 			dec		eax
 toglx:
-#pragma warning(disable:4035;once:)
 	}
 #else
 	return _bittestandcomplement((long *)map, bPnt) ? 0xffffffff : 0;
@@ -1984,7 +1983,6 @@ unsigned chkMap(unsigned bPnt){
 			jnc		short chkx
 			dec		eax
 chkx:
-#pragma warning(disable:4035;once:)
 	}
 #else
 	return _bittest((long *)map, bPnt) ? 0xffffffff : 0;
@@ -2029,7 +2027,6 @@ unsigned setu(unsigned bPnt){
 			dec		eax
 setx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittestandset((long *)&umap, bPnt) ? 0xffffffff : 0;
 #endif
@@ -2048,7 +2045,6 @@ unsigned rstu(unsigned bPnt){
 			dec		eax
 rstx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittestandreset((long *)&umap, bPnt) ? 0xffffffff : 0;
 #endif
@@ -2066,7 +2062,6 @@ unsigned chku(unsigned bPnt){
 			jnc		short chkx
 			dec		eax
 chkx:
-#pragma warning(disable:4035;once:)
 	}
 #else
 	return _bittest((long *)&umap, bPnt) ? 0xffffffff : 0;
@@ -2085,7 +2080,6 @@ unsigned toglu(unsigned bPnt){
 			jnc		short toglx
 			dec		eax
 toglx:
-#pragma warning(disable:4035;once:)
 	}
 #else
 	return _bittestandcomplement((long *)&umap, bPnt) ? 0xffffffff : 0;
@@ -2911,7 +2905,6 @@ void pgdwn(){
 
 	if(chkMap(ZUMED)){
 
-#pragma warning(disable:4244;once:)
 		scPnt.y=(zRct.top-zRct.bottom)*PAGSCROL;
 		scPnt.x=0;
 		rshft(scPnt);
@@ -2924,7 +2917,6 @@ void pgup(){
 
 	if(chkMap(ZUMED)){
 
-#pragma warning(disable:4244;once:)
 		scPnt.y=-(zRct.top-zRct.bottom)*PAGSCROL;
 		scPnt.x=0;
 		rshft(scPnt);
@@ -2937,7 +2929,6 @@ void pglft(){
 
 	if(chkMap(ZUMED)){
 
-#pragma warning(disable:4244;once:)
 		scPnt.x=(zRct.right-zRct.left)*PAGSCROL;
 		scPnt.y=0;
 		rshft(scPnt);
@@ -2950,7 +2941,6 @@ void pgrit(){
 
 	if(chkMap(ZUMED)){
 
-#pragma warning(disable:4244;once:)
 		scPnt.x=-(zRct.right-zRct.left)*PAGSCROL;
 		scPnt.y=0;
 		rshft(scPnt);
@@ -3477,9 +3467,7 @@ void redraw(HWND dWnd){
 
 unsigned stch2px(unsigned p_stind){
 
-#pragma warning(disable:4244;once:)
 	pPnt.x=(stchs[p_stind].x-zRct.left)*zrat.x+0.5;
-#pragma warning(disable:4244;once:)
 	pPnt.y=scRct.bottom-(stchs[p_stind].y-zRct.bottom)*zrat.y+0.5;
 	if(	pPnt.x>=0&&
 		pPnt.x<=scRct.right&&
@@ -3493,17 +3481,13 @@ unsigned stch2px(unsigned p_stind){
 
 void stch2px1(unsigned p_stind){
 
-#pragma warning(disable:4244;once:)		
 	pPnt.x=(stchs[p_stind].x-zRct.left)*zrat.x+0.5;
-#pragma warning(disable:4244;once:)
 	pPnt.y=scRct.bottom-(stchs[p_stind].y-zRct.bottom)*zrat.y+0.5;
 }
 
 void stch2pxr(FLPNT stpnt){
 
-#pragma warning(disable:4244;once:)		
 	pPnt.x=(stpnt.x-zRct.left)*zrat.x+0.5;
-#pragma warning(disable:4244;once:)
 	pPnt.y=scRct.bottom-(stpnt.y-zRct.bottom)*zrat.y+0.5;
 }
 
@@ -4100,7 +4084,6 @@ void sidmsg(HWND hndl,TCHAR** pstr,unsigned cnt){
 void stchPars(){
 
 	aspct=(double)zum0.x/zum0.y;
-#pragma warning(disable:4244;once:)
 	if(chkMap(RUNPAT)||chkMap(WASPAT))
 		stchSiz.x=(long)(mRct.bottom-(SCROLSIZ<<1))*aspct;
 	else
@@ -4115,7 +4098,6 @@ void stchPars(){
 	}
 	else{
 
-#pragma warning(disable:4244;once:)
 		stchSiz.x=(mRct.right-buttonWid3-COLSIZ);
 		stchSiz.y=mRct.bottom-mRct.top;
 		if((double)stchSiz.x/stchSiz.y>aspct)
@@ -5520,7 +5502,7 @@ void dstran(){
 	unsigned		colind;
 	DWORD			hisiz;
 	LARGE_INTEGER	fisiz;
-	boolean			retval;
+	BOOL			retval;
 
 	pcol=0;
 	if(colfil()){
@@ -8476,9 +8458,7 @@ void clpbox(){
 	tdub=(double)scRct.right/(zRct.right-zRct.left);
 	clpx.cx=clpsiz.cx*tdub+0.5;
 	clpx.cy=clpsiz.cy*tdub+0.5;
-#pragma warning(disable:4244;once:)	
 	pPnt.x=(sPnt.x-zRct.left)*tdub+0.5;
-#pragma warning(disable:4244;once:)	
 	pPnt.y=scRct.bottom-(sPnt.y-zRct.bottom)*tdub+0.5-clpx.cy;
 	clplin[0].x=clplin[3].x=clplin[4].x=pPnt.x;
 	clplin[0].y=clplin[1].y=clplin[4].y=pPnt.y;
@@ -8540,9 +8520,7 @@ void rSelbox(){
 	tdub=(double)scRct.right/(zRct.right-zRct.left);
 	selx.cx=selsiz.cx*tdub+0.5;
 	selx.cy=selsiz.cy*tdub+0.5;
-#pragma warning(disable:4244;once:)	
 	pPnt.x=(sPnt.x-zRct.left-selof.x)*tdub+0.5;
-#pragma warning(disable:4244;once:)	
 	pPnt.y=scRct.bottom-(sPnt.y-zRct.bottom-selof.y)*tdub+0.5-selx.cy;
 	rctlin[0].x=rctlin[6].x=rctlin[7].x=rctlin[8].x=pPnt.x;
 	rctlin[1].x=rctlin[5].x=pPnt.x+selx.cx/2;
@@ -8589,17 +8567,13 @@ void stchbox(unsigned ind,HDC dc){
 
 void sCor2px(DUBPNT stpnt,POINT* pxpnt){
 
-#pragma warning(disable:4244;once:)		
 	pxpnt->x=(stpnt.x-zRct.left)*zrat.x+0.5;
-#pragma warning(disable:4244;once:)
 	pxpnt->y=scRct.bottom+(zRct.bottom-stpnt.y)*zrat.y+0.5;
 }
 
 void sdCor2px(SHRTPNT stpnt,POINT* pxpnt){
 
-#pragma warning(disable:4244;once:)		
 	pxpnt->x=(stpnt.x-zRct.left)*zrat.x+0.5;
-#pragma warning(disable:4244;once:)
 	pxpnt->y=scRct.bottom+(zRct.bottom-stpnt.y)*zrat.y+0.5;
 }
 
@@ -13681,6 +13655,8 @@ void frmcursel(unsigned stat){
 	setMap(DUMEN);
 }
 
+#pragma warning (push)
+#pragma warning (disable : 4725)
 void stchsnap(unsigned strt,unsigned fin){
 
 #if defined(__UseASM__)
@@ -13719,16 +13695,19 @@ stchsnapx:
 	}
 #endif
 }
+#pragma warning (pop)
 
+#pragma warning (push)
+#pragma warning (disable : 4725)
 void frmsnap(FLPNT* strt,unsigned cnt){
 
 #if defined(__UseASM__)
 	_asm{
-			mov		eax,strt
-			mov		ecx,cnt
-			shl		ecx,1
-			je		short frmsnapx
-			fld		ini.grdsiz
+		mov		eax,strt
+		mov		ecx,cnt
+		shl		ecx,1
+		je		short frmsnapx
+		fld		ini.grdsiz
 snpflup:	fld		dword ptr[eax]
 			fdiv	st,st(1)
 			frndint
@@ -13747,6 +13726,7 @@ frmsnapx:
 	}
 #endif
 }
+#pragma warning (pop)
 
 void gsnap(){
 
@@ -19944,9 +19924,7 @@ thumout:;
 						for(opnt=0;opnt<(unsigned)funscnt;opnt++){
 
 #if defined(__UseASM__)
-							_asm push ebp
 							fselrct(opnt+ formpnt);
-							_asm pop ebp
 #else
 							fselrct(opnt+formpnt);
 #endif
@@ -22544,7 +22522,6 @@ void init(){
 	selbox=txtWid("0");
 	for(ind=0;ind<NERCNT;ind++)
 		boxOff[ind]=selbox+selbox*ind;
-#pragma warning(disable:4244;once:)
 	GetClientRect(hWnd,&mRct);
 	stchWnd();
 	lodstr();
@@ -22749,7 +22726,6 @@ COLORREF defTxt(unsigned colInd){
 			mov		eax,0xffffff
 defx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittest((long *)&defMap, colInd) ? 0xffffff : 0;
 #endif
@@ -22795,7 +22771,6 @@ unsigned setRmp(unsigned pbit){
 			dec		eax
 setrm:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittestandset((long *)rmap, pbit) ? 0 : 0xffffffff;
 #endif
@@ -23397,7 +23372,6 @@ unsigned chkCol(unsigned ind){
 			dec		eax
 chk1:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittest((long *)&cbit, ind) ? 0xffffffff : 0;
 #endif

@@ -6,6 +6,8 @@
 #include "resource.h"
 #include "thred.h"
 
+#pragma warning(disable:4244)
+
 void flipv();
 void duangs();
 void dufxlen();
@@ -558,7 +560,6 @@ unsigned char* lvls[]={
 &lvl09[0],&lvl10[0],&lvl11[0],&lvl12[0],&lvl13[0],&lvl14[0],&lvl15[0]
 };
 
-#pragma warning(disable:4244)
 
 void frmcpy(FRMHED* dst,FRMHED* src){
 
@@ -665,7 +666,6 @@ cmpg:		xor		eax,eax
 			inc		eax
 cmpx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	const DUBPNTL **pnts1 = (const DUBPNTL **)arg1, **pnts2 = (const DUBPNTL **)arg2;
 
@@ -5146,7 +5146,6 @@ int scomp(const void *arg1, const void *arg2){
 scmp1:		inc		eax
 scmpx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	unsigned short **s1 = (unsigned short **) arg1, **s2 = (unsigned short **) arg2;
 	if (**s2 == **s1) return 0;
@@ -13590,9 +13589,6 @@ void inspnt()
 	xpnt++;
 }
 
-//pragma to disable ptx unintialized warning
-#pragma warning(push)
-#pragma warning(disable : 4701 4703)
 void clpcon(){
 
 	RECT		nrct;
@@ -14002,7 +13998,6 @@ clp1skp:;
 #endif
 	}
 }
-#pragma warning(pop)
 
 void vrtsclp(){
 
@@ -15307,4 +15302,3 @@ void srtfrm(){
 	}
 }
 
-#pragma warning(default:4244)

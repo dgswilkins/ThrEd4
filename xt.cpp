@@ -6,6 +6,8 @@
 #include "resource.h"
 #include "thred.h"
 
+#pragma warning(disable:4244)
+
 void repar();
 void tst();
 void chktxnum();
@@ -275,7 +277,6 @@ float		fltrat;
 OREC**		precs;
 OREC**		pfrecs;
 
-#pragma warning(disable:4244)
 
 char ftyps[]=
 {
@@ -1965,7 +1966,6 @@ void durec(OREC* prec)
 	prec->frm=(at&FRMSK)>>FRMSHFT;
 }
 
-#pragma warning(disable:4035;once:)
 
 OREC*	recref(const void* arg)
 {
