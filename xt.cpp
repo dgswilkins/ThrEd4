@@ -6,6 +6,9 @@
 #include "resource.h"
 #include "thred.h"
 
+// Suppress C4244: conversion from 'type1' to 'type2', possible loss of data
+#pragma warning(disable:4244)
+
 void repar();
 void tst();
 void chktxnum();
@@ -275,7 +278,6 @@ float		fltrat;
 OREC**		precs;
 OREC**		pfrecs;
 
-#pragma warning(disable:4244)
 
 char ftyps[]=
 {
@@ -959,7 +961,13 @@ int fil2crd(const char* p_filnam)
 	{
 		erc=GetLastError();
 	}
-    return erc;
+	else {
+		WaitForSingleObject(pinfo.hProcess, INFINITE);
+	}
+	CloseHandle(pinfo.hProcess);
+	CloseHandle(pinfo.hThread);
+
+	return erc;
 }
 
 BOOL chkp2cnam(char* nam){
@@ -1390,10 +1398,10 @@ void fncwlk()
 			opnt++;
 		}
 		sac=frmpnt->sacang.sac;
-		for(ind=frmpnt->stpt-1;ind<frmpnt->stpt;ind--)
+		for (ind = frmpnt->stpt; ind != 0; ind--)
 		{
-			oseq[opnt].x=midl(flt[sac[ind].fin].x,flt[sac[ind].strt].x);
-			oseq[opnt].y=midl(flt[sac[ind].fin].y,flt[sac[ind].strt].y);
+			oseq[opnt].x = midl(flt[sac[ind - 1].fin].x, flt[sac[ind - 1].strt].x);
+			oseq[opnt].y = midl(flt[sac[ind - 1].fin].y, flt[sac[ind - 1].strt].y);
 			opnt++;
 		}
 		if(frmpnt->at&FRMEND)
@@ -1959,7 +1967,6 @@ void durec(OREC* prec)
 	prec->frm=(at&FRMSK)>>FRMSHFT;
 }
 
-#pragma warning(disable:4035;once:)
 
 OREC*	recref(const void* arg)
 {
@@ -4362,20 +4369,21 @@ void txtclp()
 	if(hClpMem)
 	{
 		frmclpdat=(FRMCLP*)GlobalLock(hClpMem);
-		if(frmclpdat->led==CLP_FRM)
-		{
-			frmpnt=&frmclpdat->frm;
-			frmcpy(&angfrm,frmpnt);
-			MoveMemory(&angflt,&frmpnt[1],sizeof(FLPNT)*frmpnt->sids);
-			angfrm.flt=angflt;
-			rstMap(TXTLIN);
-			setMap(TXTCLP);
-			setMap(TXTMOV);
-			setxfrm();
-			txtloc.x=msg.pt.x-stOrg.x;
-			txtloc.y=msg.pt.y-stOrg.y;
+		if (frmclpdat) {
+			if (frmclpdat->led == CLP_FRM) {
+				frmpnt = &frmclpdat->frm;
+				frmcpy(&angfrm, frmpnt);
+				MoveMemory(&angflt, &frmpnt[1], sizeof(FLPNT)*frmpnt->sids);
+				angfrm.flt = angflt;
+				rstMap(TXTLIN);
+				setMap(TXTCLP);
+				setMap(TXTMOV);
+				setxfrm();
+				txtloc.x = msg.pt.x - stOrg.x;
+				txtloc.y = msg.pt.y - stOrg.y;
+			}
+			GlobalUnlock(hClpMem);
 		}
-		GlobalUnlock(hClpMem);
 	}
 	setMap(RESTCH);
 	rstMap(WASWROT);
@@ -4661,8 +4669,12 @@ void dutxmir()
 	ine=ind+1;
 	if(tscr.lins&1)
 	{
-		while(txtmp[ind].lin==lin&&ind>=0)
-			ind--;
+		while (ind >= 0) {
+			if (txtmp[ind].lin == lin) {
+				ind--;
+			}
+			else { break; }
+		}
 	}
 	while(ind>=0)
 	{
@@ -5523,7 +5535,7 @@ void setshft()
 				lin++;
 		}
 	}
-	lin=txtmp[tscr.ind-1].lin;
+	if (tscr.ind) { lin = txtmp[tscr.ind - 1].lin; }
 	tscr.spac=(srct.right-srct.left)/lin;
 	tscr.fhi=srct.top-srct.bottom;
 	tscr.wid=tscr.spac*lin+tscr.spac/2;
@@ -5597,13 +5609,16 @@ void txdun()
 	}
 }
 
+// Suppress C6031: return value ignored
+#pragma warning(push)
+#pragma warning(disable : 6031)
 void redtx()
 {
 	char nam[_MAX_PATH];
 	HANDLE hnam;
-	unsigned long red;
-	int ind;
-	char sig[4];
+	DWORD red;
+	unsigned int ind;
+	char sig[4] = { 0 };
 
 	ptxhst=15;
 	ZeroMemory(&thsts,sizeof(TXHST)*16);
@@ -5617,7 +5632,7 @@ void redtx()
 			{
 				ReadFile(hnam,(int*)&ptxhst,4,&red,0);
 				ReadFile(hnam,(TXHST*)&thsts,sizeof(TXHST)*16,&red,0);
-				for(ind=0;ind<16;ind++)
+				for(ind=0;ind<(red/sizeof(TXHST));ind++)
 				{
 					if(thsts[ind].cnt)
 					{
@@ -5632,6 +5647,7 @@ void redtx()
 	}
 	redtbak();
 }
+#pragma warning(pop)
 
 void setangf(double tang)
 {

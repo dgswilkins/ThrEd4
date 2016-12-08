@@ -6,6 +6,9 @@
 #include "resource.h"
 #include "thred.h"
 
+// Suppress C4244: conversion from 'type1' to 'type2', possible loss of data
+#pragma warning(disable:4244)
+
 void flipv();
 void duangs();
 void dufxlen();
@@ -532,6 +535,7 @@ unsigned short egaray[]={
 	MEGCHNH,
 	MEGCHNL,
 	MEGCLPX,
+	0
 };
 
 unsigned char lvl00=0;
@@ -557,7 +561,6 @@ unsigned char* lvls[]={
 &lvl09[0],&lvl10[0],&lvl11[0],&lvl12[0],&lvl13[0],&lvl14[0],&lvl15[0]
 };
 
-#pragma warning(disable:4244)
 
 void frmcpy(FRMHED* dst,FRMHED* src){
 
@@ -664,7 +667,6 @@ cmpg:		xor		eax,eax
 			inc		eax
 cmpx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	const DUBPNTL **pnts1 = (const DUBPNTL **)arg1, **pnts2 = (const DUBPNTL **)arg2;
 
@@ -2150,6 +2152,7 @@ BOOL ritlin(FLPNT strt,FLPNT fin)
 	return 1;
 }
 
+/*
 BOOL minrng(unsigned strt,unsigned fin)
 {
 	if (((fin > strt) ? (fin - strt) : (strt - fin)) < sids >> 1 || frmpnt->typ == LIN)
@@ -2157,6 +2160,7 @@ BOOL minrng(unsigned strt,unsigned fin)
 	else
 		return 1;
 }
+*/
 
 unsigned closflt(float px,float py)
 {
@@ -2430,6 +2434,7 @@ void flt2dub(FLPNT ipnt,DUBPNT* p_opnt){
 	p_opnt->y=ipnt.y;
 }
 
+/*
 void linrutf(unsigned strt){
 
 	double		tspac;
@@ -2446,6 +2451,7 @@ void linrutf(unsigned strt){
 	}
 	stspace=tspac;
 }
+*/
 
 void linrutb(unsigned strt){
 
@@ -3521,7 +3527,7 @@ void duseq(unsigned strt,unsigned fin){
 
 	unsigned	ind,topbak;
 
-	seqlin=0;
+	seqlin=nullptr;
 	rstMap(SEQDUN);
 	topbak=seq[strt][1].lin;
 	if(strt>fin){
@@ -3553,7 +3559,7 @@ void duseq(unsigned strt,unsigned fin){
 		}
 		if(rstMap(SEQDUN))
 			duseq2(ind+1);
-		lastgrp=seqlin->grp;
+		if (seqlin != nullptr) { lastgrp = seqlin->grp; }
 	}
 	else{
 	
@@ -3590,7 +3596,7 @@ void duseq(unsigned strt,unsigned fin){
 			if(ind)
 				duseq2(ind-1);
 		}
-		lastgrp=seqlin->grp;
+		if (seqlin != nullptr) { lastgrp = seqlin->grp; }
 	}
 }
 
@@ -4569,7 +4575,7 @@ void fnvrt(){
 			maxlins=inf;
 	}
 	maxlins=(maxlins>>1);
-	lins=new SMALPNTL[lincnt];
+	lins=new SMALPNTL[lincnt+1];
 	spnt=0;grpind=0;
 	tgrinds=(unsigned*)bseq;
 	grindpnt=0;
@@ -4603,15 +4609,16 @@ void fnvrt(){
 			ine=0;
 			tind=spnt;
 			while(ine<inf){
-
-				lins[spnt].lin=pjpts[ine]->lin;
-				lins[spnt].grp=grpind;
-				lins[spnt].x=pjpts[ine]->x;
-				lins[spnt++].y=pjpts[ine++]->y;
-				lins[spnt].lin=pjpts[ine]->lin;
-				lins[spnt].grp=grpind;
-				lins[spnt].x=pjpts[ine]->x;
-				lins[spnt++].y=pjpts[ine++]->y;
+				if (spnt < lincnt) {
+					lins[spnt].lin = pjpts[ine]->lin;
+					lins[spnt].grp = grpind;
+					lins[spnt].x = pjpts[ine]->x;
+					lins[spnt++].y = pjpts[ine++]->y;
+					lins[spnt].lin = pjpts[ine]->lin;
+					lins[spnt].grp = grpind;
+					lins[spnt].x = pjpts[ine]->x;
+					lins[spnt++].y = pjpts[ine++]->y;
+				}
 			}
 			if(spnt!=tind)
 				grpind++;
@@ -5142,7 +5149,6 @@ int scomp(const void *arg1, const void *arg2){
 scmp1:		inc		eax
 scmpx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	unsigned short **s1 = (unsigned short **) arg1, **s2 = (unsigned short **) arg2;
 	if (**s2 == **s1) return 0;
@@ -5409,14 +5415,14 @@ void satadj()
 			}
 		}
 		inf=0;
-		for(ind=mapsiz-1;ind<mapsiz;ind--)
+		for (ind = mapsiz; ind != 0; ind--)
 		{
 			do
 			{
-				ine=prvchk(ind);
-				if(ine<sids)
-					sac[inf++].fin=ine+(ind<<5);
-			}while(ine<sids);
+				ine = prvchk(ind - 1);
+				if (ine < sids)
+					sac[inf++].fin = ine + ((ind - 1) << 5);
+			} while (ine < sids);
 		}
 		if(inf<stpt)
 			inf=stpt;
@@ -5614,7 +5620,7 @@ void satfn(unsigned astrt,unsigned afin,unsigned bstrt,unsigned bfin){
 		asegs= ((afin > astrt) ? (afin - astrt) : (astrt - afin));
 		bsegs= ((bstrt > bfin) ? (bstrt - bfin) : (bfin - bstrt));
 		acnts=new unsigned[asegs];
-		bcnts=new unsigned[bsegs];
+		bcnts=new unsigned[bsegs+1];
 		ine=astrt;
 		tcnt=0;
 		for(ind=0;ind<asegs-1;ind++){
@@ -5837,7 +5843,7 @@ void satfil(){
 	rstMap(SAT1);
 	rstMap(FILDIR);
 	frmpnt->ftyp=SATF;
-	lens=new double[sids+1];
+	lens=new double[sids+2];
 	len=0;
 	for(ind=0;ind<(unsigned)sids-1;ind++){
 
@@ -5888,7 +5894,7 @@ void satfil(){
 					oseq[0].y=sPnt.y=flt[1].y;
 					seqpnt=1;
 				}
-				while(len>lens[ind])
+				while((len>lens[ind]) && (ind < (unsigned int)(sids+1)))
 					ind++;
 				dx=lens[ind]-len;
 				dy=len-lens[ind-1];
@@ -7541,7 +7547,10 @@ void refrmfn()
 	unsigned	cod,fpnt;
 
 	cod=frmpnt->etyp&NEGUND;
-	fpnt=cod-1;
+	if (cod >= EGLAST) {
+		cod = EGLAST - 1;
+	}
+	fpnt = cod - 1;
 	loc0.top=loc1.top=3;
 	loc0.bottom=loc1.bottom=3+siz0.y;
 	loc0.left=3;
@@ -9113,13 +9122,13 @@ void dulens(unsigned nsids){
 		pnt.y+=len*sin(l_ang);
 		l_ang+=dang;
 	}
-	bind=ind-2;
-	ine=ind;
-	av=flt[0].x;
-	for(ind=bind;ind<nsids-3;ind--){
+	bind = ind - 1;
+	ine = ind;
+	av = flt[0].x;
+	for (ind = bind; ind != 0; ind--) {
 
-		flt[ine].y=flt[ind].y;
-		flt[ine].x=av+av-flt[ind].x;
+		flt[ine].y = flt[ind - 1].y;
+		flt[ine].x = av + av - flt[ind - 1].x;
 		ine++;
 	}
 	nuflen=ine;
@@ -9910,8 +9919,10 @@ void plbrd(double spac){
 		plfn(&uvrct[0]);
 		plbak(bpnt);
 		prsmal();
-		sPnt.x=oseq[seqpnt-1].x;
-		sPnt.y=oseq[seqpnt-1].y;
+		if (seqpnt) { //ensure that we can do a valid read from oseq
+			sPnt.x = oseq[seqpnt - 1].x;
+			sPnt.y = oseq[seqpnt - 1].y;
+		}
 	}
 	rstMap(UND);
 	stspace=frmpnt->espac;
@@ -11197,7 +11208,12 @@ void frmpnts(unsigned typ){
 	while(ind<hed.stchs&&(stchs[ind].at&(ALTYPMSK|FRMSK))!=trg)
 		ind++;
 	cloInd=ind;
-	ind=hed.stchs-1;
+	if (hed.stchs > 0) {
+		ind = hed.stchs - 1;
+	}
+	else {
+		ind = 0;
+	}
 	while(ind>cloInd&&(stchs[ind].at&(ALTYPMSK|FRMSK))!=trg)
 		ind--;
 	grpInd=ind;
@@ -11947,12 +11963,12 @@ void contf(){
 				oseq[seqpnt].x=hipnt.x;
 				oseq[seqpnt].y=hipnt.y;
 				seqpnt++;
-				for(ind=selins-2;ind<=selins;ind--){
+				for (ind = selins - 1; ind != 0; ind--) {
 
-					ang=pols[ind].ang+poldif.ang;
-					len=pols[ind].len*poldif.len;
-					oseq[seqpnt].x=lopnt.x+cos(ang)*len;
-					oseq[seqpnt].y=lopnt.y+sin(ang)*len;
+					ang = pols[ind - 1].ang + poldif.ang;
+					len = pols[ind - 1].len*poldif.len;
+					oseq[seqpnt].x = lopnt.x + cos(ang)*len;
+					oseq[seqpnt].y = lopnt.y + sin(ang)*len;
 					seqpnt++;
 				}
 			}
@@ -12810,12 +12826,12 @@ void stchadj(){
 	}
 	refilfn();
 	lo=clofind<<FRMSHFT;
-	for(ind=hed.stchs-1;ind<hed.stchs;ind--){
+	for (ind = hed.stchs; ind != 0; ind--) {
 
-		hi=stchs[ind].at&FRMSK;
-		if((stchs[ind].at&FRMSK)==lo){
+		hi = stchs[ind - 1].at&FRMSK;
+		if ((stchs[ind - 1].at&FRMSK) == lo) {
 
-			delpnt=ind+1;
+			delpnt = ind;
 			break;
 		}
 	}
@@ -13371,7 +13387,8 @@ BOOL isect(unsigned find0,unsigned find1,FLPNT* ipnt,float* len){
 	ipnt->x=(float)tipnt.x;
 	ipnt->y=(float)tipnt.y;
 	*len=hypot(tipnt.x-vpnt0.x,tipnt.y-vpnt0.y);
-		 hypot(tipnt.x-vpnt1.x,tipnt.y-vpnt1.y);
+	// ToDo - Why is this line here?
+	//	 hypot(tipnt.x-vpnt1.x,tipnt.y-vpnt1.y);
 	return flg;
 }
 
@@ -13575,9 +13592,6 @@ void inspnt()
 	xpnt++;
 }
 
-//pragma to disable ptx unintialized warning
-#pragma warning(push)
-#pragma warning(disable : 4701 4703)
 void clpcon(){
 
 	RECT		nrct;
@@ -13590,7 +13604,7 @@ void clpcon(){
 	float		fnof;
 	unsigned	clpnof;
 	double		clpvof;
-	TXPNT*		ptx;
+	TXPNT*		ptx = nullptr;
 
 	duflt();
 	clpwid=clpsiz.cx+frmpnt->fspac;
@@ -13612,7 +13626,7 @@ void clpcon(){
 	lens=new double[sids+1];
 	clplens=new double[sids];
 	clpsrt=new CLIPSORT[sids];
-	pclpsrt=new CLIPSORT*[sids];
+	pclpsrt=new CLIPSORT*[sids+1]();
 	ine=leftsid();
 	tlen=0;
 	lens[ine]=0;
@@ -13779,8 +13793,10 @@ void clpcon(){
 
 				if(chkMap(TXFIL))
 				{
-					vpnt1.x=ploc.x;
-					vpnt1.y=ploc.y+ptx[inf].y;
+					if (ptx != nullptr) {
+						vpnt1.x = ploc.x;
+						vpnt1.y = ploc.y + ptx[inf].y;
+					}
 				}
 				else
 				{
@@ -13807,14 +13823,15 @@ void clpcon(){
 				if(cnt)
 				{
 					for(ing=0;ing<cnt;ing++){
-
-						clipnts[xpnt].sid=pclpsrt[ing]->lin;
-						clipnts[xpnt].x=pclpsrt[ing]->pnt.x;
-						clipnts[xpnt].y=pclpsrt[ing]->pnt.y;
-						clipnts[xpnt].flg=1;
-						xpnt++;
-						if(xpnt>MAXSEQ<<2)
-							goto clpskp;
+						if (pclpsrt != nullptr) {
+							clipnts[xpnt].sid=pclpsrt[ing]->lin;
+							clipnts[xpnt].x=pclpsrt[ing]->pnt.x;
+							clipnts[xpnt].y=pclpsrt[ing]->pnt.y;
+							clipnts[xpnt].flg=1;
+							xpnt++;
+							if(xpnt>MAXSEQ<<2)
+								goto clpskp;
+						}
 					}
 				}
 				vpnt0.x=vpnt1.x;
@@ -13984,7 +14001,6 @@ clp1skp:;
 #endif
 	}
 }
-#pragma warning(pop)
 
 void vrtsclp(){
 
@@ -14308,10 +14324,9 @@ void dubfn(){
 
 	brdfil(frmpnt->elen);
 	ine=seqpnt;
-	for(ind=seqpnt-1;ind<seqpnt;ind--){
-
-		oseq[ine].x=oseq[ind].x;
-		oseq[ine++].y=oseq[ind].y;
+	for (ind = seqpnt; ind != 0; ind--) {
+		oseq[ine].x = oseq[ind - 1].x;
+		oseq[ine++].y = oseq[ind - 1].y;
 	}
 	seqpnt=ine;
 }
@@ -14747,10 +14762,12 @@ void duch(){
 			bak=8;
 			if(chkMap(LINCHN))
 				bak--;
-			oseq[seqpnt-bak].x=chpnts[ind+1].x;
-			oseq[seqpnt-bak].y=chpnts[ind+1].y;
-			oseq[seqpnt].x=chpnts[ind+1].x;
-			oseq[seqpnt++].y=chpnts[ind+1].y;
+			if ((seqpnt >= bak)) {
+				oseq[seqpnt - bak].x = chpnts[ind + 1].x;
+				oseq[seqpnt - bak].y = chpnts[ind + 1].y;
+			}
+			oseq[seqpnt].x = chpnts[ind + 1].x;
+			oseq[seqpnt++].y = chpnts[ind + 1].y;
 		}
 		else{
 
@@ -15205,13 +15222,12 @@ void wavfrm(){
 			}
 			else{
 
-				for(ind=cnt-1;ind<cnt;ind--){
-
-					flt[ine].x=pos.x;
-					flt[ine].y=pos.y;
+				for (ind = cnt; ind != 0; ind--) {
+					flt[ine].x = pos.x;
+					flt[ine].y = pos.y;
 					ine++;
-					pos.x+=tflt[ind].x;
-					pos.y+=tflt[ind].y;
+					pos.x += tflt[ind - 1].x;
+					pos.y += tflt[ind - 1].y;
 				}
 			}
 		}
@@ -15289,4 +15305,3 @@ void srtfrm(){
 	}
 }
 
-#pragma warning(default:4244)

@@ -7,6 +7,11 @@
 #include "resource.h"
 #include "thred.h"
 
+// Suppress C4244: conversion from 'type1' to 'type2', possible loss of data
+#pragma warning(disable:4244)
+// Suppress C6031: return value ignored
+#pragma warning(disable:6031)
+
 void clrhbut(unsigned strt);
 void delsfrms(unsigned cod);
 void renam();
@@ -704,7 +709,7 @@ HPEN				grdPen;			//pen for stitch grid
 HPEN				bakPen;			//background color pen
 HPEN				bitPen;			//bitmap pen
 HPEN				fPen;			//form pen
-HPEN				ypen[5];		//layer pens
+HPEN				ypen[6];		//layer pens
 HPEN				fPen3;			//three-pixel form pen
 HPEN				fsPen;			//form select pen
 HPEN				mrkPen;			//zoom mark pen
@@ -879,20 +884,20 @@ MENUITEMINFO filinfo={
 	13,					
 };
 
-const TCHAR			fltr[_MAX_PATH]=		"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
-const TCHAR			bfltr[_MAX_PATH]=	"Microsoft (BMP)\0*.bmp\0";
-TCHAR				cstFltr[_MAX_PATH]=	"Thredworks (THR)\0*.thr\0";
-TCHAR				filnam[_MAX_PATH]={0};
-TCHAR				thrnam[_MAX_PATH];
-TCHAR				auxnam[_MAX_PATH];
-TCHAR				genam[_MAX_PATH];
-TCHAR				defDir[_MAX_PATH]="c:\\";
-TCHAR				defbmp[_MAX_PATH]="c:\\";
-TCHAR				balnam0[_MAX_PATH]={0};	//balarad semaphore file
-TCHAR				balnam1[_MAX_PATH]={0};	//balarad data file
-TCHAR				balnam2[_MAX_PATH];
-TCHAR				srchnam[_MAX_PATH];
-TCHAR				homdir[_MAX_PATH];	//directory from which thred was executed
+const TCHAR			fltr[_MAX_PATH + 1]=		"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
+const TCHAR			bfltr[_MAX_PATH + 1]=	"Microsoft (BMP)\0*.bmp\0";
+TCHAR				cstFltr[_MAX_PATH + 1]=	"Thredworks (THR)\0*.thr\0";
+TCHAR				filnam[_MAX_PATH + 1]={0};
+TCHAR				thrnam[_MAX_PATH + 1];
+TCHAR				auxnam[_MAX_PATH + 1];
+TCHAR				genam[_MAX_PATH + 1];
+TCHAR				defDir[_MAX_PATH + 1]="c:\\";
+TCHAR				defbmp[_MAX_PATH + 1]="c:\\";
+TCHAR				balnam0[_MAX_PATH + 1]={0};	//balarad semaphore file
+TCHAR				balnam1[_MAX_PATH + 1]={0};	//balarad data file
+TCHAR				balnam2[_MAX_PATH + 1];
+TCHAR				srchnam[_MAX_PATH + 1];
+TCHAR				homdir[_MAX_PATH + 1];	//directory from which thred was executed
 TCHAR*				phom;			//pointer to the home file name
 PCSTCH*				filBuf;
 HANDLE				hFil=0;
@@ -1913,7 +1918,6 @@ unsigned setMap(unsigned bPnt){
 			dec		eax
 setx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittestandset((long *)map, bPnt) ? 0xffffffff : 0;
 #endif
@@ -1947,7 +1951,6 @@ unsigned rstMap(unsigned bPnt){
 			dec		eax
 rstx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittestandreset((long *)map, bPnt) ? 0xffffffff : 0;
 #endif
@@ -1965,7 +1968,6 @@ unsigned toglMap(unsigned bPnt){
 			jnc		short toglx
 			dec		eax
 toglx:
-#pragma warning(disable:4035;once:)
 	}
 #else
 	return _bittestandcomplement((long *)map, bPnt) ? 0xffffffff : 0;
@@ -1984,7 +1986,6 @@ unsigned chkMap(unsigned bPnt){
 			jnc		short chkx
 			dec		eax
 chkx:
-#pragma warning(disable:4035;once:)
 	}
 #else
 	return _bittest((long *)map, bPnt) ? 0xffffffff : 0;
@@ -2029,7 +2030,6 @@ unsigned setu(unsigned bPnt){
 			dec		eax
 setx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittestandset((long *)&umap, bPnt) ? 0xffffffff : 0;
 #endif
@@ -2048,7 +2048,6 @@ unsigned rstu(unsigned bPnt){
 			dec		eax
 rstx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittestandreset((long *)&umap, bPnt) ? 0xffffffff : 0;
 #endif
@@ -2066,7 +2065,6 @@ unsigned chku(unsigned bPnt){
 			jnc		short chkx
 			dec		eax
 chkx:
-#pragma warning(disable:4035;once:)
 	}
 #else
 	return _bittest((long *)&umap, bPnt) ? 0xffffffff : 0;
@@ -2085,7 +2083,6 @@ unsigned toglu(unsigned bPnt){
 			jnc		short toglx
 			dec		eax
 toglx:
-#pragma warning(disable:4035;once:)
 	}
 #else
 	return _bittestandcomplement((long *)&umap, bPnt) ? 0xffffffff : 0;
@@ -2356,7 +2353,7 @@ void ritfnam(TCHAR* nam){
 			tnam[49]=psg()&0xff;
 	}
 	for(ind=0;ind<50;ind++)
-		hedx.crtnam[fnamord[ind]]=tnam[ind];
+		if (fnamord[ind]<50) { hedx.crtnam[fnamord[ind]] = tnam[ind]; }
 }
 
 void redfnam(TCHAR* nam){
@@ -2365,10 +2362,10 @@ void redfnam(TCHAR* nam){
 	unsigned char tnam[50];
 
 	for(ind=0;ind<50;ind++)
-		if(fnamord[ind]>50)
-			tnam[ind]=111;
+		if (fnamord[ind]<50)
+			tnam[ind] = hedx.crtnam[fnamord[ind]];
 		else
-			tnam[ind]=hedx.crtnam[fnamord[ind]];
+			tnam[ind] = 111;
 	for(ind=0;ind<50;ind++){
 	
 		nam[ind]=frencod[tnam[ind]];
@@ -2650,8 +2647,8 @@ void dudat(){
 	unsigned	l_siz;
 	BAKHED*		bdat;
 //	unsigned	ind;
-	unsigned	addr;
-	unsigned	chksiz;
+//	unsigned	addr;
+//	unsigned	chksiz;
 
 	if(bakdat[dupnt0])
 		free(bakdat[dupnt0]);
@@ -2696,8 +2693,9 @@ void dudat(){
 		if(txad)
 			MoveMemory(bdat->txp,&txpnts,sizeof(TXPNT)*txad);
 	}
-	addr=(unsigned)&bdat->txp[txad];
-	chksiz=addr-(unsigned)bakdat[dupnt0];
+	// ToDo removed until I can see a purpose for them
+	//	addr=(unsigned)&bdat->txp[txad];
+	//	chksiz=addr-(unsigned)bakdat[dupnt0];
 }
 
 void savdo(){
@@ -2782,7 +2780,7 @@ void nunams(){
 
 	case AUXPES:
 
-		strcpy_s(pext,"pes");
+		strcpy_s(pext, sizeof(auxnam) - ind,"pes");
 		break;
 
 #endif
@@ -2910,7 +2908,6 @@ void pgdwn(){
 
 	if(chkMap(ZUMED)){
 
-#pragma warning(disable:4244;once:)
 		scPnt.y=(zRct.top-zRct.bottom)*PAGSCROL;
 		scPnt.x=0;
 		rshft(scPnt);
@@ -2923,7 +2920,6 @@ void pgup(){
 
 	if(chkMap(ZUMED)){
 
-#pragma warning(disable:4244;once:)
 		scPnt.y=-(zRct.top-zRct.bottom)*PAGSCROL;
 		scPnt.x=0;
 		rshft(scPnt);
@@ -2936,7 +2932,6 @@ void pglft(){
 
 	if(chkMap(ZUMED)){
 
-#pragma warning(disable:4244;once:)
 		scPnt.x=(zRct.right-zRct.left)*PAGSCROL;
 		scPnt.y=0;
 		rshft(scPnt);
@@ -2949,7 +2944,6 @@ void pgrit(){
 
 	if(chkMap(ZUMED)){
 
-#pragma warning(disable:4244;once:)
 		scPnt.x=-(zRct.right-zRct.left)*PAGSCROL;
 		scPnt.y=0;
 		rshft(scPnt);
@@ -3476,9 +3470,7 @@ void redraw(HWND dWnd){
 
 unsigned stch2px(unsigned p_stind){
 
-#pragma warning(disable:4244;once:)
 	pPnt.x=(stchs[p_stind].x-zRct.left)*zrat.x+0.5;
-#pragma warning(disable:4244;once:)
 	pPnt.y=scRct.bottom-(stchs[p_stind].y-zRct.bottom)*zrat.y+0.5;
 	if(	pPnt.x>=0&&
 		pPnt.x<=scRct.right&&
@@ -3492,17 +3484,13 @@ unsigned stch2px(unsigned p_stind){
 
 void stch2px1(unsigned p_stind){
 
-#pragma warning(disable:4244;once:)		
 	pPnt.x=(stchs[p_stind].x-zRct.left)*zrat.x+0.5;
-#pragma warning(disable:4244;once:)
 	pPnt.y=scRct.bottom-(stchs[p_stind].y-zRct.bottom)*zrat.y+0.5;
 }
 
 void stch2pxr(FLPNT stpnt){
 
-#pragma warning(disable:4244;once:)		
 	pPnt.x=(stpnt.x-zRct.left)*zrat.x+0.5;
-#pragma warning(disable:4244;once:)
 	pPnt.y=scRct.bottom-(stpnt.y-zRct.bottom)*zrat.y+0.5;
 }
 
@@ -4099,7 +4087,6 @@ void sidmsg(HWND hndl,TCHAR** pstr,unsigned cnt){
 void stchPars(){
 
 	aspct=(double)zum0.x/zum0.y;
-#pragma warning(disable:4244;once:)
 	if(chkMap(RUNPAT)||chkMap(WASPAT))
 		stchSiz.x=(long)(mRct.bottom-(SCROLSIZ<<1))*aspct;
 	else
@@ -4114,7 +4101,6 @@ void stchPars(){
 	}
 	else{
 
-#pragma warning(disable:4244;once:)
 		stchSiz.x=(mRct.right-buttonWid3-COLSIZ);
 		stchSiz.y=mRct.bottom-mRct.top;
 		if((double)stchSiz.x/stchSiz.y>aspct)
@@ -5198,7 +5184,7 @@ BOOL binv(unsigned cnt){
 				ncnt++;
 			else{
 
-				if(bcpnt[ine]==(TCHAR)0xff)
+				if(bcpnt[ine]==(TBYTE)0xff)
 					icnt++;
 			}
 		}
@@ -5428,12 +5414,14 @@ void bfil(){
 			for(ind=0;ind<bhi;ind++)
 				bitlin(&bpnt[ind*bwidw],&pbits[ind*bwid],bgnd,fgnd);
 			tdc=CreateCompatibleDC(rsdc);
-			SelectObject(tdc,tbit);
-			hBmp=CreateCompatibleBitmap(rsdc,bwid,bhi);
-			SelectObject(bitdc,hBmp);
-			BitBlt(bitdc,0,0,bwid,bhi,tdc,0,0,SRCCOPY);
-			DeleteObject(tbit);
-			ReleaseDC(hWnd,tdc);
+			if (tbit && tdc) {
+				SelectObject(tdc, tbit);
+				hBmp = CreateCompatibleBitmap(rsdc, bwid, bhi);
+				SelectObject(bitdc, hBmp);
+				BitBlt(bitdc, 0, 0, bwid, bhi, tdc, 0, 0, SRCCOPY);
+				DeleteObject(tbit);
+				ReleaseDC(hWnd, tdc);
+			}
 			delete[] bpnt;
 		}
 		else{
@@ -5514,8 +5502,10 @@ void dstran(){
 	FLPNT			dif;
 	HANDLE			hcol;
 	unsigned*		pcol;
-	unsigned		fsiz,colind;
+	unsigned		colind;
 	DWORD			hisiz;
+	LARGE_INTEGER	fisiz;
+	BOOL			retval;
 
 	pcol=0;
 	if(colfil()){
@@ -5523,14 +5513,17 @@ void dstran(){
 		hcol=CreateFile(colnam,GENERIC_READ,0,0,OPEN_EXISTING,0,0);
 		if(hcol!=INVALID_HANDLE_VALUE){
 
-			fsiz=GetFileSize(hcol,&hisiz);
-			pcol=new unsigned[fsiz];
-			ReadFile(hcol,(unsigned*)pcol,fsiz,&hisiz,0);
+			retval=GetFileSizeEx(hcol,&fisiz);
+			// ToDo - check HighPart is non-zero
+			pcol=new unsigned[fisiz.u.LowPart];
+			ReadFile(hcol,(unsigned*)pcol, fisiz.u.LowPart,&hisiz,0);
 			CloseHandle(hcol);
-			if(hisiz&&pcol&&pcol[0]==COLVER){
+			if (hisiz>1) {
+				if (hisiz&&pcol&&pcol[0]==COLVER){
 
-				stchBak=pcol[1];
-				colCnt=0;
+					stchBak = pcol[1];
+					colCnt = 0;
+				}
 			}
 			else{
 
@@ -5672,7 +5665,7 @@ unsigned dupcol(){
 
 	unsigned	ind;
 	COLORREF	col;
-	unsigned	mat,matm,pmatm;
+	unsigned	mat,matm,pmatm=0;
 
 	col=pestrn[pescols[pcolind++]];
 	for(ind=0;ind<xpnt;ind++){
@@ -6456,7 +6449,7 @@ void ritdst(){
 		}
 	}
 	drecs[dstcnt].led=drecs[dstcnt].mid=0;
-	drecs[dstcnt++].nd=(TCHAR)0xf3;
+	drecs[dstcnt++].nd=(TBYTE)0xf3;
 
 	if(colfil()){
 
@@ -6782,7 +6775,7 @@ void sav(){
 	PESHED			peshed;
 	PESTCH*			pestch;
 	unsigned		match;
-	unsigned		mtchind;
+	unsigned		mtchind=0;
 	unsigned		mtchmin;
 	unsigned char	pescol;
 	FLRCT			srct;
@@ -8468,9 +8461,7 @@ void clpbox(){
 	tdub=(double)scRct.right/(zRct.right-zRct.left);
 	clpx.cx=clpsiz.cx*tdub+0.5;
 	clpx.cy=clpsiz.cy*tdub+0.5;
-#pragma warning(disable:4244;once:)	
 	pPnt.x=(sPnt.x-zRct.left)*tdub+0.5;
-#pragma warning(disable:4244;once:)	
 	pPnt.y=scRct.bottom-(sPnt.y-zRct.bottom)*tdub+0.5-clpx.cy;
 	clplin[0].x=clplin[3].x=clplin[4].x=pPnt.x;
 	clplin[0].y=clplin[1].y=clplin[4].y=pPnt.y;
@@ -8532,9 +8523,7 @@ void rSelbox(){
 	tdub=(double)scRct.right/(zRct.right-zRct.left);
 	selx.cx=selsiz.cx*tdub+0.5;
 	selx.cy=selsiz.cy*tdub+0.5;
-#pragma warning(disable:4244;once:)	
 	pPnt.x=(sPnt.x-zRct.left-selof.x)*tdub+0.5;
-#pragma warning(disable:4244;once:)	
 	pPnt.y=scRct.bottom-(sPnt.y-zRct.bottom-selof.y)*tdub+0.5-selx.cy;
 	rctlin[0].x=rctlin[6].x=rctlin[7].x=rctlin[8].x=pPnt.x;
 	rctlin[1].x=rctlin[5].x=pPnt.x+selx.cx/2;
@@ -8581,17 +8570,13 @@ void stchbox(unsigned ind,HDC dc){
 
 void sCor2px(DUBPNT stpnt,POINT* pxpnt){
 
-#pragma warning(disable:4244;once:)		
 	pxpnt->x=(stpnt.x-zRct.left)*zrat.x+0.5;
-#pragma warning(disable:4244;once:)
 	pxpnt->y=scRct.bottom+(zRct.bottom-stpnt.y)*zrat.y+0.5;
 }
 
 void sdCor2px(SHRTPNT stpnt,POINT* pxpnt){
 
-#pragma warning(disable:4244;once:)		
 	pxpnt->x=(stpnt.x-zRct.left)*zrat.x+0.5;
-#pragma warning(disable:4244;once:)
 	pxpnt->y=scRct.bottom+(zRct.bottom-stpnt.y)*zrat.y+0.5;
 }
 
@@ -10049,9 +10034,9 @@ void dubuf(){
 	if(formpnt){
 
 		theds=new FRMHED[formpnt];
-		tpnts=new FLPNT[len];
+		tpnts=new FLPNT[len+1];
 		spnts=new SATCON[slen];
-		epnts=new FLPNT[elen];
+		epnts=new FLPNT[elen+1];
 		for(ind=0;ind<formpnt;ind++){
 
 			frmcpy(&theds[ind],&formlst[ind]);
@@ -10074,7 +10059,7 @@ void dubuf(){
 			if(isclp(ind)){
 
 				theds[ind].angclp.clp=(FLPNT*)(&epnts[elind]-&epnts[0]);
-				for(ine=0;ine<formlst[ind].flencnt.nclp;ine++){
+				for(ine=0;(ine<formlst[ind].flencnt.nclp)&&(elind<elen);ine++){
 
 					epnts[elind].x=formlst[ind].angclp.clp[ine].x;
 					epnts[elind++].y=formlst[ind].angclp.clp[ine].y;
@@ -10083,10 +10068,9 @@ void dubuf(){
 			if(iseclpx(ind)){
 
 				theds[ind].clp=(FLPNT*)(&epnts[elind]-&epnts[0]);
-				for(ine=0;ine<formlst[ind].nclp;ine++){
-
-					epnts[elind].x=formlst[ind].clp[ine].x;
-					epnts[elind++].y=formlst[ind].clp[ine].y;
+				for(ine=0;(ine<formlst[ind].nclp)&&((elind < elen));ine++){
+					epnts[elind].x = formlst[ind].clp[ine].x;
+					epnts[elind++].y = formlst[ind].clp[ine].y;
 				}
 			}
 		}
@@ -10565,52 +10549,54 @@ void redclp(){
 	playcod=actl<<LAYSHFT;
 	clpvoid=GlobalLock(hClpMem);
 	clpdat=(CLPSTCH*)clpvoid;
-	clplen=clpdat[0].led;
-	clpnu[0].x=clpdat[0].x+(float)clpdat[0].fx/256;
-	clpnu[0].y=clpdat[0].y+(float)clpdat[0].fy/256;
-	clpnu[0].at=0;
+	if (clpvoid) {
+		clplen = clpdat[0].led;
+		clpnu[0].x = clpdat[0].x + (float)clpdat[0].fx / 256;
+		clpnu[0].y = clpdat[0].y + (float)clpdat[0].fy / 256;
+		clpnu[0].at = 0;
 
 #if CLPBUG
 
-		sprintf_s(msgbuf, sizeof(msgbuf),"ind: 0 x: %6.2f,y: %6.2f\n",clpnu[0].x,clpnu[0].y);
+		sprintf_s(msgbuf, sizeof(msgbuf), "ind: 0 x: %6.2f,y: %6.2f\n", clpnu[0].x, clpnu[0].y);
 		OutputDebugString(msgbuf);
 #endif
-	clprct.left=clprct.right=clpnu[0].x;
-	clprct.bottom=clprct.top=clpnu[0].y;
-	for(ind=1;ind<(long)clplen;ind++){
+		clprct.left = clprct.right = clpnu[0].x;
+		clprct.bottom = clprct.top = clpnu[0].y;
+		for (ind = 1; ind < (long)clplen; ind++) {
 
-		clpnu[ind].x=clpdat[ind].x+(float)clpdat[ind].fx/256;
-		clpnu[ind].y=clpdat[ind].y+(float)clpdat[ind].fy/256;
-		clpnu[ind].at=(clpdat[ind].led&0xf)|playcod;
+			clpnu[ind].x = clpdat[ind].x + (float)clpdat[ind].fx / 256;
+			clpnu[ind].y = clpdat[ind].y + (float)clpdat[ind].fy / 256;
+			clpnu[ind].at = (clpdat[ind].led & 0xf) | playcod;
 
 #if CLPBUG
 
-		sprintf_s(msgbuf, sizeof(msgbuf),"ind: %d x: %6.2f,y: %6.2f\n",ind,clpnu[ind].x,clpnu[ind].y);
-		OutputDebugString(msgbuf);
+			sprintf_s(msgbuf, sizeof(msgbuf), "ind: %d x: %6.2f,y: %6.2f\n", ind, clpnu[ind].x, clpnu[ind].y);
+			OutputDebugString(msgbuf);
 #endif
-		if(clpnu[ind].x<clprct.left)
-			clprct.left=clpnu[ind].x;
-		if(clpnu[ind].x>clprct.right)
-			clprct.right=clpnu[ind].x;
-		if(clpnu[ind].y<clprct.bottom)
-			clprct.bottom=clpnu[ind].y;
-		if(clpnu[ind].y>clprct.top)
-			clprct.top=clpnu[ind].y;
-	}
-	clpnu[0].at=actcol|playcod;
-	clpsiz.cx=clprct.right-clprct.left;
-	clpsiz.cy=clprct.top-clprct.bottom;
-	GlobalUnlock(hClpMem);
-	if(clprct.left||clprct.bottom){
-
-		for(ind=0;ind<(int)clplen;ind++){
-
-			clpnu[ind].x-=clprct.left;
-			clpnu[ind].y-=clprct.bottom;
+			if (clpnu[ind].x < clprct.left)
+				clprct.left = clpnu[ind].x;
+			if (clpnu[ind].x > clprct.right)
+				clprct.right = clpnu[ind].x;
+			if (clpnu[ind].y < clprct.bottom)
+				clprct.bottom = clpnu[ind].y;
+			if (clpnu[ind].y > clprct.top)
+				clprct.top = clpnu[ind].y;
 		}
-		clprct.top-=clprct.bottom;
-		clprct.right-=clprct.left;
-		clprct.bottom=clprct.left=0;
+		clpnu[0].at = actcol | playcod;
+		clpsiz.cx = clprct.right - clprct.left;
+		clpsiz.cy = clprct.top - clprct.bottom;
+		GlobalUnlock(hClpMem);
+		if (clprct.left || clprct.bottom) {
+
+			for (ind = 0; ind < (int)clplen; ind++) {
+
+				clpnu[ind].x -= clprct.left;
+				clpnu[ind].y -= clprct.bottom;
+			}
+			clprct.top -= clprct.bottom;
+			clprct.right -= clprct.left;
+			clprct.bottom = clprct.left = 0;
+		}
 	}
 }
 
@@ -11665,7 +11651,7 @@ void colchk(){
 
 		if(col!=(stchs[ind].at&COLMSK)){
 
-			if(ind-cind==1)
+			if((ind-cind==1)&&(cind))
 				stchs[ind-1].at=stchs[ind].at&NCOLMSK|(stchs[cind-1].at&COLMSK);
 			col=stchs[ind].at&COLMSK;
 			cind=ind;
@@ -11828,11 +11814,13 @@ void shorter(){
 	if(cloInd==minpnt)
 		return;
 	curmax=hypot(stchs[cloInd+1].x-stchs[cloInd].x,stchs[cloInd+1].y-stchs[cloInd].y);
-	for(ine=cloInd-1;ine<selfrng.fin;ine--){
+	for (ine = cloInd; ine != 0; ine--) {
 
-			len=hypot(stchs[ine+1].x-stchs[ine].x,stchs[ine+1].y-stchs[ine].y);
-			if(len==curmax)
-				goto short1;
+		len = hypot(stchs[ine].x - stchs[ine - 1].x, stchs[ine].y - stchs[ine - 1].y);
+		if (len == curmax) {
+			ine--;
+			goto short1;
+		}
 	}
 	for(ind=selfrng.strt;ind<selfrng.fin-1;ind++){
 
@@ -11939,11 +11927,11 @@ void ungrphi(){
 
 		if(chkMap(FORMSEL)){
 
-			for(ind=hed.stchs-1;ind<hed.stchs;ind--){
+			for (ind = hed.stchs; ind != 0; ind--) {
 
-				if(!(stchs[ind].at&NOTFRM)&&((stchs[ind].at&FRMSK)>>FRMSHFT)==clofind){
+				if (!(stchs[ind - 1].at&NOTFRM) && ((stchs[ind - 1].at&FRMSK) >> FRMSHFT) == clofind) {
 
-					cloInd=ind;
+					cloInd = ind - 1;
 					setMap(SELBOX);
 					setMap(RESTCH);
 					goto dwngrpdun;
@@ -12440,7 +12428,7 @@ void insfil(){
 		0,						//lpTemplateName
 	};
 	STRHED		thed;
-	STREX		thedx;
+	STREX		thedx = { 0 };
 	HED			tphed;
 	unsigned	ind,ine,cod,codof;
 	FLRCT		trct;
@@ -13670,6 +13658,8 @@ void frmcursel(unsigned stat){
 	setMap(DUMEN);
 }
 
+#pragma warning (push)
+#pragma warning (disable : 4725)
 void stchsnap(unsigned strt,unsigned fin){
 
 #if defined(__UseASM__)
@@ -13708,16 +13698,19 @@ stchsnapx:
 	}
 #endif
 }
+#pragma warning (pop)
 
+#pragma warning (push)
+#pragma warning (disable : 4725)
 void frmsnap(FLPNT* strt,unsigned cnt){
 
 #if defined(__UseASM__)
 	_asm{
-			mov		eax,strt
-			mov		ecx,cnt
-			shl		ecx,1
-			je		short frmsnapx
-			fld		ini.grdsiz
+		mov		eax,strt
+		mov		ecx,cnt
+		shl		ecx,1
+		je		short frmsnapx
+		fld		ini.grdsiz
 snpflup:	fld		dword ptr[eax]
 			fdiv	st,st(1)
 			frndint
@@ -13736,6 +13729,7 @@ frmsnapx:
 	}
 #endif
 }
+#pragma warning (pop)
 
 void gsnap(){
 
@@ -14188,15 +14182,17 @@ void getrmap(){
 	l_binf.bmiHeader=l_binfh;
 	tracebit=CreateDIBSection(bitdc,&l_binf,DIB_RGB_COLORS,(void**)&tracbits,0,0);	
 	tracedc=CreateCompatibleDC(rsdc);
-	SelectObject(tracedc,tracebit);
-	BitBlt(tracedc,0,0,bwid,bhi,bitdc,0,0,SRCCOPY);
-	setMap(WASTRAC);
-	tracmap=(unsigned*)oseq;
-	trmapsiz=((bwid*bhi)>>5)+1;
-	for(ind=0;ind<trmapsiz;ind++)
-		tracmap[ind]=0;
-	StretchBlt(sdc,bdrct.left,bdrct.top,bdrct.right-bdrct.left,bdrct.bottom-bdrct.top,
-	   bitdc,bsrct.left,bsrct.top,bsrct.right-bsrct.left,bsrct.bottom-bsrct.top,SRCCOPY);
+	if (tracebit && tracedc) {
+		SelectObject(tracedc, tracebit);
+		BitBlt(tracedc, 0, 0, bwid, bhi, bitdc, 0, 0, SRCCOPY);
+		setMap(WASTRAC);
+		tracmap = (unsigned*)oseq;
+		trmapsiz = ((bwid*bhi) >> 5) + 1;
+		for (ind = 0; ind < trmapsiz; ind++)
+			tracmap[ind] = 0;
+		StretchBlt(sdc, bdrct.left, bdrct.top, bdrct.right - bdrct.left, bdrct.bottom - bdrct.top,
+			bitdc, bsrct.left, bsrct.top, bsrct.right - bsrct.left, bsrct.bottom - bsrct.top, SRCCOPY);
+	}
 }
 
 void trace(){
@@ -15283,7 +15279,7 @@ void trinit(){
 	unsigned	hst[3][256];
 	unsigned*	phst;
 	unsigned	hi[3];
-	unsigned	col[3];
+	unsigned	col[3] = { 0 };
 	COLORREF	tcol;
 	
 	if(*bnam){
@@ -19931,9 +19927,7 @@ thumout:;
 						for(opnt=0;opnt<(unsigned)funscnt;opnt++){
 
 #if defined(__UseASM__)
-							_asm push ebp
 							fselrct(opnt+ formpnt);
-							_asm pop ebp
 #else
 							fselrct(opnt+formpnt);
 #endif
@@ -21780,7 +21774,7 @@ void int2tim(ULARGE_INTEGER num,FILETIME* tim){
 void ritloc(){
 
 	TCHAR*			penv;
-	TCHAR			locnam[_MAX_PATH];
+	TCHAR			locnam[_MAX_PATH] = { 0 };
 	HANDLE			hloc;
 	DWORD			rot;
 	size_t			len;
@@ -21792,8 +21786,10 @@ void ritloc(){
 		return;
 	}
 	else {
-		strcpy_s(locnam, penv);
-		free(penv);
+		if (penv) {
+			strcpy_s(locnam, penv);
+			free(penv);
+		}
 	}
 	penv=strrchr(locnam,'\\')+1;
 	strcpy_s(penv, sizeof(locnam) - (penv - locnam),"thredloc.txt");
@@ -22162,10 +22158,12 @@ void duhom(){
 	else{
 
 		ind=GetCurrentDirectory(_MAX_PATH,homdir);
-		homdir[ind++]='\\';
-		phom=&homdir[ind];
+		if (ind) {
+			homdir[ind++] = '\\';
+			phom = &homdir[ind];
+		}
 	}
-	*phom=0;
+	if (phom) { *phom = 0; }
 }
 
 #if defined(__UseASM__)
@@ -22527,7 +22525,6 @@ void init(){
 	selbox=txtWid("0");
 	for(ind=0;ind<NERCNT;ind++)
 		boxOff[ind]=selbox+selbox*ind;
-#pragma warning(disable:4244;once:)
 	GetClientRect(hWnd,&mRct);
 	stchWnd();
 	lodstr();
@@ -22697,7 +22694,7 @@ void init(){
 	ritfnam(ini.desnam);
 	strcpy_s(hedx.modnam,ini.desnam);
 	hedx.stgran=0;
-	for(ind=0;ind<31;ind++)
+	for(ind=0;ind<26;ind++)
 		hedx.res[ind]=0;
 	chkhup();
 	nedmen();
@@ -22732,7 +22729,6 @@ COLORREF defTxt(unsigned colInd){
 			mov		eax,0xffffff
 defx:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittest((long *)&defMap, colInd) ? 0xffffff : 0;
 #endif
@@ -22778,7 +22774,6 @@ unsigned setRmp(unsigned pbit){
 			dec		eax
 setrm:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittestandset((long *)rmap, pbit) ? 0 : 0xffffffff;
 #endif
@@ -23380,7 +23375,6 @@ unsigned chkCol(unsigned ind){
 			dec		eax
 chk1:
 	}
-#pragma warning(disable:4035;once:)
 #else
 	return _bittest((long *)&cbit, ind) ? 0xffffffff : 0;
 #endif
@@ -23443,7 +23437,7 @@ void ritbak(TCHAR* nam,DRAWITEMSTRUCT* p_ds){
 	FRMHED*		flst;
 	FLPNT*		tflt;
 	STREX		thedx;
-	unsigned	vervar;
+	unsigned	vervar=0;
 	FRMHEDO*	frmlstx;
 
 	thfil=CreateFile(nam,GENERIC_READ,0,0,
@@ -23586,7 +23580,7 @@ void ritbak(TCHAR* nam,DRAWITEMSTRUCT* p_ds){
 				for(ind=0;ind<sthed.fpnt;ind++){
 
 					lind=inf;
-					for(ine=0;ine<flst[ind].sids;ine++){
+					for(ine=0;(ine<flst[ind].sids)&&(inf<sthed.fcnt);ine++){
 
 						l_plin[ine].x=tflt[inf].x*rat;
 						l_plin[ine].y=l_siz.y-tflt[inf++].y*rat;
@@ -24238,10 +24232,10 @@ fltex1:
 #endif
 }
 
-int APIENTRY WinMain(HINSTANCE hInstance,
-                     HINSTANCE hPrevInstance,
-                     LPSTR     lpCmdLine,
-                     int       nCmdShow){
+int APIENTRY WinMain(_In_     HINSTANCE hInstance,
+                     _In_opt_ HINSTANCE hPrevInstance,
+					 _In_     LPSTR     lpCmdLine,
+	                 _In_     int       nCmdShow){
 	UNREFERENCED_PARAMETER(nCmdShow);
 
 	WNDCLASSEX		wc;

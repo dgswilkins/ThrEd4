@@ -74,7 +74,7 @@
 #define		MAXSIZ		9.0		//default maximum stitch size
 #define		PFAFGRAN	6		//pfaf stitch points per millimeter
 #define		RMAPSIZ		65536	//a bit for each stitch
-#define		RMAPBITS	RMAPSIZ<<5	//a bit for each stitch
+const unsigned long	RMAPBITS = RMAPSIZ << 5;	//a bit for each stitch
 #define		MINZUM		5	    //minimum zoom in stitch points
 #define		MAXZLEV		9		//maximum levels of zoom
 #define		SHOPNTS		0.00	//show stitch points when zoom below this
@@ -1569,6 +1569,7 @@ enum{
 	EGCHNL,
 	EGCHNH,
 	EGCLPX,
+	EGLAST //must always be the last value
 };
 
 //edge underlay bit
