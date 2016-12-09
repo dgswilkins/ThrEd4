@@ -5715,7 +5715,7 @@ void nuFil() {
 
 	unsigned		ine;
 	PESHED*			peshed;
-	TCHAR*			peschr;
+	TCHAR*			l_peschr;
 	unsigned		pecof;
 	unsigned char*	pcolcnt;
 	DUBPNT			loc;
@@ -6057,7 +6057,7 @@ void nuFil() {
 
 						ReadFile(hFil, (BSEQPNT*)&bseq, sizeof(bseq), &red, 0);
 						peshed = (PESHED*)&bseq;
-						peschr = (TCHAR*)&bseq;
+						l_peschr = (TCHAR*)&bseq;
 						if (strncmp(peshed->led, "#PES00", 6)) {
 
 							sprintf_s(msgbuf, sizeof(msgbuf), "Not a PES file: %s\n", filnam);
@@ -6065,9 +6065,9 @@ void nuFil() {
 							return;
 						}
 						pecof = tripl(peshed->off);
-						pestch = (unsigned char*)&peschr[pecof + 532];
+						pestch = (unsigned char*)&l_peschr[pecof + 532];
 						xpnt = 0;
-						pcolcnt = (unsigned char*)&peschr[pecof + 48];
+						pcolcnt = (unsigned char*)&l_peschr[pecof + 48];
 						pescols = &pcolcnt[1];
 						rmap[0] = rmap[1] = 0;
 						xpnt = 0;
@@ -6086,7 +6086,7 @@ void nuFil() {
 						pabind = ind = ine = 0;
 						rstMap(FILDIR);
 						ind = 0;
-						pabstch = (PESTCH*)&peschr[sizeof(PESHED) + 4];
+						pabstch = (PESTCH*)&l_peschr[sizeof(PESHED) + 4];
 						ind = 0;
 						ine = 1;
 						stchs[0].x = stchs[0].y;
@@ -6455,10 +6455,10 @@ BOOL pcshup() {
 
 #if PESACT
 
-void ritpes(unsigned stind) {
+void ritpes(unsigned p_stind) {
 
-	pestchs[opnt].x = -stchsr[stind].x * 3 / 5 + sof.x;
-	pestchs[opnt++].y = stchsr[stind].y * 3 / 5 - sof.y;
+	pestchs[opnt].x = -stchsr[p_stind].x * 3 / 5 + sof.x;
+	pestchs[opnt++].y = stchsr[p_stind].y * 3 / 5 - sof.y;
 }
 
 void ritpcol(unsigned char col) {
@@ -6611,9 +6611,9 @@ void pecdat() {
 		if ((stchs[ind].at&COLMSK) != col) {
 
 			col = stchs[ind].at&COLMSK;
-			peschr[opnt] = (TCHAR)254;
+			peschr[opnt] = (TBYTE)254;
 			opnt++;
-			peschr[opnt] = (TCHAR)176;
+			peschr[opnt] = (TBYTE)176;
 			opnt++;
 			peschr[opnt] = pcol;
 			opnt++;
@@ -6623,7 +6623,7 @@ void pecdat() {
 		rpcrd(stchs[ind + 1].x - stchs[ind].x);
 		rpcrd(-stchs[ind + 1].y + stchs[ind].y);
 	}
-	peschr[opnt++] = (TCHAR)0xff;
+	peschr[opnt++] = (TBYTE)0xff;
 	peschr[opnt++] = 0;
 }
 
@@ -6693,7 +6693,7 @@ void sav() {
 #if PESACT
 
 	PESHED			peshed;
-	PESTCH*			pestch;
+	PESTCH*			l_pestch;
 	unsigned		match;
 	unsigned		mtchind = 0;
 	unsigned		mtchmin;
@@ -6792,10 +6792,10 @@ void sav() {
 			pchr = (TCHAR*)&peshed;
 			for (ind = 0; ind < sizeof(PESHED); ind++)
 				pchr[ind] = 0;
-			strcpy_s(peshed.led, "#PES0001");
-			strcpy_s(peshed.ce, "CEmbOne");
-			strcpy_s(peshed.cs, "CSewSeg");
-			pestch = (PESTCH*)&bseq;
+			strncpy(peshed.led, "#PES0001",sizeof(peshed.led));
+			strncpy(peshed.ce, "CEmbOne", sizeof(peshed.ce));
+			strncpy(peshed.cs, "CSewSeg", sizeof(peshed.cs));
+			l_pestch = (PESTCH*)&bseq;
 			for (ind = 0; ind < 16; ind++) {
 
 				mtchmin = 0xffffffff;
@@ -6820,7 +6820,7 @@ void sav() {
 			opnt = 0;
 			pestchs = (PESTCH*)&bseq;
 			ritpes(0);
-			pestchs[opnt].x = (short)0x8003;
+			pestchs[opnt].x = -32765; // 0x8003
 			pestchs[opnt++].y = 0;
 			ritpcol(pescolrs[tcol]);
 			ritpes(0);
@@ -6832,13 +6832,13 @@ void sav() {
 				else {
 
 					ritpes(ind);
-					pestchs[opnt].x = (short)0x8001;
+					pestchs[opnt].x = -32767; // 0x8001
 					pestchs[opnt++].y = 0;
 					ritpcol(pescolrs[tcol]);
 					tcol = stchs[ind].at&COLMSK;
 					ritpes(ind++);
 					ritpes(ind);
-					pestchs[opnt].x = (short)0x8003;
+					pestchs[opnt].x = -32765; // 0x8003
 					pestchs[opnt++].y = 0;
 					ritpcol(pescolrs[tcol]);
 					ritpes(ind);
@@ -6880,12 +6880,12 @@ void sav() {
 			//			pchr[528]=(TCHAR)0x90;
 			//			pchr[529]=(TCHAR)0x0;
 			//			pchr[530]=(TCHAR)0x8f;
-			pchr[527] = (TCHAR)0x00;
-			pchr[528] = (TCHAR)0x80;	//hor	msb
-			pchr[529] = (TCHAR)0x80; //hor lsb
-			pchr[530] = (TCHAR)0x82; //vert msb
-			pchr[531] = (TCHAR)0xff; //vert lsb
-			WriteFile(hPcs, (TCHAR*)&bseq, opnt, &wrot, 0);
+			pchr[527] = (TBYTE)0x00;
+			pchr[528] = (TBYTE)0x80;	//hor	msb
+			pchr[529] = (TBYTE)0x80; //hor lsb
+			pchr[530] = (TBYTE)0x82; //vert msb
+			pchr[531] = (TBYTE)0xff; //vert lsb
+			WriteFile(hPcs, (TBYTE*)&bseq, opnt, &wrot, 0);
 			break;
 #endif
 		default:
