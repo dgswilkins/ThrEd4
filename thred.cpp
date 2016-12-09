@@ -6761,6 +6761,9 @@ BOOL chkattr(TCHAR* nam){
 	return 0;
 }
 
+// Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
+#pragma warning(push)
+#pragma warning(disable : 4996)
 void sav(){
 
 	unsigned		ind,l_stind;
@@ -6830,7 +6833,7 @@ void sav(){
 			pchr=(TCHAR*)&dsthed;
 			for(ind=0;ind<sizeof(DSTHED);ind++)
 				pchr[ind]=' ';
-			strcpy_s(dsthed.desched,"LA:");
+			strncpy(dsthed.desched,"LA:",3);
 			pchr=strrchr(auxnam,'\\')+1;
 			for(ind=0;ind<sizeof(dsthed.desc);ind++){
 
@@ -6840,23 +6843,29 @@ void sav(){
 					break;
 			}
 			dsthed.desc[16]=0xd;
-			strncpy_s(dsthed.recshed,"ST:",3);
-			sprintf_s(dsthed.recs,sizeof(dsthed.recs),"%7d\r",dstcnt);
-			strncpy_s(dsthed.cohed,"CO:  0",6);
-			strncpy_s(dsthed.xplushed-1,sizeof(dsthed.xplushed),"\xd+X:",4);
-			sprintf_s(dsthed.xplus,sizeof(dsthed.xplus),"%5d\xd",dstmin.x);
-			strncpy_s(dsthed.xminhed,"-X:",3);
-			sprintf_s(dsthed.xmin,sizeof(dsthed.xmin),"%5d\xd",dstplus.x);
-			strncpy_s(dsthed.yplushed,"+Y:",3);
-			sprintf_s(dsthed.yplus,sizeof(dsthed.yplus),"%5d\xd",dstplus.y);
-			strncpy_s(dsthed.yminhed,"-Y:",3);
-			sprintf_s(dsthed.ymin,sizeof(dsthed.ymin),"%5d\xd",dstmin.y);
-			strncpy_s(dsthed.axhed,"AX:-    0\r",10);
-			strncpy_s(dsthed.ayhed,"AY:+    0\r",10);
-			strncpy_s(dsthed.mxhed,"MX:+    0\r",10);
-			strncpy_s(dsthed.myhed,"MY:+    0\r",10);
-			strncpy_s(dsthed.pdhed,"PD******\r\x1a",10);
-			pchr=(TCHAR*)&dsthed;
+			strncpy(dsthed.recshed,"ST:",3);
+			sprintf(dsthed.recs,"%7d\r",dstcnt);
+			strncpy(dsthed.cohed, "CO:", 3);
+			strncpy(dsthed.co, "  0\xd", 4);
+			strncpy(dsthed.xplushed,"+X:",3);
+			sprintf(dsthed.xplus,"%5d\xd",dstmin.x);
+			strncpy(dsthed.xminhed,"-X:",3);
+			sprintf(dsthed.xmin,"%5d\xd",dstplus.x);
+			strncpy(dsthed.yplushed,"+Y:",3);
+			sprintf(dsthed.yplus,"%5d\xd",dstplus.y);
+			strncpy(dsthed.yminhed,"-Y:",3);
+			sprintf(dsthed.ymin,"%5d\xd",dstmin.y);
+			strncpy(dsthed.axhed, "AX:", 3);
+			strncpy(dsthed.ax, "-    0\r", 7);
+			strncpy(dsthed.ayhed, "AY:", 3);
+			strncpy(dsthed.ay, "+    0\r", 7);
+			strncpy(dsthed.mxhed, "MX:", 3);
+			strncpy(dsthed.mx, "+    0\r", 7);
+			strncpy(dsthed.myhed, "MY:", 3);
+			strncpy(dsthed.my, "+    0\r", 7);
+			strncpy(dsthed.pdhed, "PD", 2);
+			strncpy(dsthed.pd, "******\r", 7);
+			strncpy(dsthed.eof, "\x1a", 1);
 			WriteFile(hPcs,(DSTHED*)&dsthed,sizeof(DSTHED),&wrot,0);
 			WriteFile(hPcs,(DSTREC*)drecs,sizeof(DSTREC)*dstcnt,&wrot,0);
 			break;
@@ -7024,6 +7033,7 @@ void sav(){
 			filnopn(IDS_FILROT,auxnam);
 	}
 }
+#pragma warning(pop)
 
 void savAs(){
 
