@@ -1970,7 +1970,7 @@ void durec(OREC* prec)
 
 OREC*	recref(const void* arg)
 {
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm
 	{
 			mov		eax,arg
@@ -2349,7 +2349,7 @@ srtskp:;
 
 unsigned dutyp(unsigned tat)
 {
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm
 	{
 			xor		eax,eax
@@ -2456,7 +2456,7 @@ void filim(FRMLIM* flim,unsigned * lmap)
 
 unsigned frstmap(unsigned* map)
 {
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm
 	{
 			xor		eax,eax

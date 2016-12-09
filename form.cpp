@@ -564,7 +564,7 @@ unsigned char* lvls[]={
 
 void frmcpy(FRMHED* dst,FRMHED* src){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	unsigned ind=sizeof(FRMHED);
 
 	_asm{
@@ -582,7 +582,7 @@ void frmcpy(FRMHED* dst,FRMHED* src){
 
 void frmclr(FRMHED* dst){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	unsigned ind=sizeof(FRMHED);
 
 	_asm{
@@ -600,7 +600,7 @@ void frmclr(FRMHED* dst){
 
 void duinf(FRMHED* p_hed){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		ebx,p_hed
@@ -630,7 +630,7 @@ void duinf(FRMHED* p_hed){
 
 int comp(const void *arg1, const void *arg2){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			mov		ebx,arg2
 			mov		ebx,[ebx]
@@ -691,7 +691,7 @@ void getfinfo(unsigned ind){
 
 unsigned satind(SATCON* pnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,pnt
@@ -902,7 +902,7 @@ FLPNT* numclp(){
 
 unsigned fltind(FLPNT* pnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,pnt
@@ -916,7 +916,7 @@ unsigned fltind(FLPNT* pnt){
 
 unsigned sacind(SATCON* pnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,pnt
@@ -930,7 +930,7 @@ unsigned sacind(SATCON* pnt){
 
 unsigned clpind(FLPNT* pnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,pnt
@@ -2504,7 +2504,7 @@ void oclp(FLPNT* p_clp,unsigned p_nclp){
 
 float getblen(){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	float		len;
 	unsigned	tlen;
 
@@ -2529,7 +2529,7 @@ float getblen(){
 
 void savblen(float len){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	unsigned short nclp;
 	unsigned short res;
 
@@ -3449,7 +3449,7 @@ BOOL unvis(){
 
 unsigned setseq(unsigned bpnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			xor		eax,eax
 			mov		ebx,seqmap
@@ -4008,7 +4008,7 @@ void nxtrgn(){
 	dunrgn=pmap[rgpth[ind-1].pcon].vrt;
 }
 
-#if defined(__UseASM__)
+#if  __UseASM__
 SMALPNTL* srtref(const void* arg){
 
 	_asm{
@@ -4024,7 +4024,7 @@ int sqcomp(const void *arg1, const void *arg2){
 	SMALPNTL* pnt0;
 	SMALPNTL* pnt1;
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	pnt0 = srtref(arg1);
 	pnt1 = srtref(arg2);
 #else
@@ -5131,7 +5131,7 @@ void drwcon(){
 
 int scomp(const void *arg1, const void *arg2){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -5159,7 +5159,7 @@ scmpx:
 
 unsigned setchk(unsigned bPnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			xor		eax,eax
 			mov		ebx,chkmap
@@ -5176,7 +5176,7 @@ setcx:
 
 unsigned chkchk(unsigned ind){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			xor		eax,eax
 			mov		ebx,chkmap
@@ -5193,7 +5193,7 @@ ccx:
 
 unsigned nxtchk(unsigned ind){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			xor		eax,eax
 			mov		ebx,ind
@@ -5223,7 +5223,7 @@ nxtcx:
 
 unsigned prvchk(unsigned ind){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			xor		eax,eax
 			mov		ebx,ind
@@ -10469,7 +10469,7 @@ void snap(){
 
 void setcmap(unsigned bpnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			mov		eax,colmap
 			mov		ebx,bpnt
@@ -10483,7 +10483,7 @@ void setcmap(unsigned bpnt){
 
 unsigned nxtcol(){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			xor		eax,eax
 			mov		ebx,colmap
@@ -10518,7 +10518,7 @@ nxtcolx:	btc		ebx,eax
 
 unsigned chkdun(unsigned bpnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -10534,7 +10534,7 @@ chkdunx:
 #endif
 }
 
-#if defined(__UseASM__)
+#if  __UseASM__
 unsigned setdun(unsigned bpnt){
 
 	_asm{
@@ -10547,7 +10547,7 @@ unsigned setdun(unsigned bpnt){
 
 unsigned isrt(unsigned bpnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -11045,7 +11045,7 @@ void frmadj(unsigned find){
 
 void setr(unsigned pbit){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		ebx,offset rmap
@@ -11059,7 +11059,7 @@ void setr(unsigned pbit){
 
 void clRmap(unsigned len){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -11076,7 +11076,7 @@ void clRmap(unsigned len){
 
 BOOL setrc(unsigned pbit){
 
-#if defined(__UseASM__)
+#if  __UseASM__
   	_asm{
 
 			xor		eax,eax
@@ -11096,7 +11096,7 @@ setrcx:
 
 BOOL chkr(unsigned pbit){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -11252,7 +11252,7 @@ void selfil(unsigned typ){
 /*
 BOOL notfstch(unsigned at){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			xor		eax,eax
 			mov		ebx,at
@@ -12254,7 +12254,7 @@ void shrnk(){
 
 void mvfrms(FRMHED* dst,FRMHED* src,unsigned cnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		esi,src
@@ -12303,7 +12303,7 @@ void dufdat(unsigned find){
 
 void stchfrm(unsigned fnum,unsigned* at){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,fnum
@@ -12400,7 +12400,7 @@ void frmnum(){
 
 unsigned duat(unsigned at){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,at
@@ -12765,7 +12765,7 @@ void debean(){
 
 void mvfrmsb(FRMHED* dst,FRMHED* src,unsigned cnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			std
@@ -12786,7 +12786,7 @@ void mvfrmsb(FRMHED* dst,FRMHED* src,unsigned cnt){
 
 void mvfltsb(FLPNT* dst,FLPNT* src,unsigned cnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			std
@@ -13051,7 +13051,7 @@ void stchs2frm(){
 
 int lencmp(const void *arg1,const void *arg2){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			mov		ebx,arg1
 			mov		ebx,[ebx]
@@ -13166,7 +13166,7 @@ void ritseg(){
 
 unsigned lenref(float* pflt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,pflt
@@ -13243,7 +13243,7 @@ BOOL nucseg(){
 
 void mvpclp(unsigned dst,unsigned src){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			mov		edi,dst
 			shl		edi,2
@@ -13290,7 +13290,7 @@ unsigned leftsid(){
 
 int clpcmp(const void* arg1,const void* arg2){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -13526,7 +13526,7 @@ unsigned vclpbak(unsigned ind){
 
 BOOL vscmp(unsigned ind,unsigned ine){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax

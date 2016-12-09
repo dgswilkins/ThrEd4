@@ -1907,7 +1907,7 @@ unsigned			fthtyps[]={FTHSIN,FTHSIN2,FTHLIN,FTHPSG,FTHRMP,FTHFAZ};
 //bitmap functions
 unsigned setMap(unsigned bPnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -1925,7 +1925,7 @@ setx:
 
 void clrMap(unsigned len){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		edi,offset map
@@ -1940,7 +1940,7 @@ void clrMap(unsigned len){
 
 unsigned rstMap(unsigned bPnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -1958,7 +1958,7 @@ rstx:
 
 unsigned toglMap(unsigned bPnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -1976,7 +1976,7 @@ toglx:
 
 unsigned chkMap(unsigned bPnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -1994,7 +1994,7 @@ chkx:
 
 void cpymap(unsigned dst,unsigned src){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		ebx,offset map
@@ -2019,7 +2019,7 @@ cpx:
 //user bitmap functions
 unsigned setu(unsigned bPnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -2037,7 +2037,7 @@ setx:
 
 unsigned rstu(unsigned bPnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -2055,7 +2055,7 @@ rstx:
 
 unsigned chku(unsigned bPnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -2073,7 +2073,7 @@ chkx:
 
 unsigned toglu(unsigned bPnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -2091,7 +2091,7 @@ toglx:
 
 unsigned dumsk(unsigned pnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,pnt
@@ -2579,7 +2579,7 @@ void ladj(){
 
 void stchcpy(unsigned p_siz,SHRTPNT* dst){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		esi,offset stchs
@@ -2611,7 +2611,7 @@ void deldu(){
 
 TCHAR* mvflpnt(FLPNT* dst,FLPNT* src,unsigned cnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		ecx,cnt
@@ -2629,7 +2629,7 @@ TCHAR* mvflpnt(FLPNT* dst,FLPNT* src,unsigned cnt){
 
 void mvsatk(SATCON* dst,SATCON* src,unsigned cnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		ecx,cnt
@@ -2827,7 +2827,7 @@ nomen:;
 
 void mvstch(SHRTPNT* dst, SHRTPNT* src){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		esi,src
@@ -3591,7 +3591,7 @@ void ritini(){
 /* not used
 BOOL gcmp(void* pnt,unsigned cnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -3612,7 +3612,7 @@ gcmpx:
 /* not used
 BOOL gcmpw(short wrd,unsigned ofst){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -3634,7 +3634,7 @@ gcmpwx:
 /* not used
 BOOL bufcmp(TCHAR* tbuf,unsigned siz){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -5008,7 +5008,7 @@ void delstch1(unsigned ind){
 
 void stchred(unsigned p_siz,SHRTPNT* src){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		edi,offset stchs
@@ -5197,7 +5197,7 @@ BOOL binv(unsigned cnt){
 
 void bitlin(unsigned* src,unsigned* dst,COLORREF fgnd,COLORREF bgnd){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		esi,src
@@ -5240,7 +5240,7 @@ blup1:		mov		[edi],edx
 
 COLORREF fswap(COLORREF tcol){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,tcol
@@ -5273,7 +5273,7 @@ BOOL gudtyp(WORD bcnt){
 
 void movmap(unsigned cnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		ecx,cnt
@@ -5460,7 +5460,7 @@ void prtred(){
 
 unsigned dtrn(DSTREC* dpnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,dpnt
@@ -5633,7 +5633,7 @@ void auxmen(){
 
 unsigned tripl(TCHAR* dat){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,dat
@@ -5689,7 +5689,7 @@ unsigned dupcol(){
 
 double dubl(unsigned char* pnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	unsigned tdat;
 
 	_asm{
@@ -6285,7 +6285,7 @@ void nuFil(){
 
 void clrfbuf(unsigned p_siz){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		edi,filBuf
@@ -6300,7 +6300,7 @@ void clrfbuf(unsigned p_siz){
 
 unsigned xbits(unsigned src,unsigned dst){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,trinum
@@ -6330,7 +6330,7 @@ unsigned dudbits(POINT dif){
 
 void savdst(unsigned dat){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			xor		eax,eax
 			mov		al,3
@@ -6543,7 +6543,7 @@ void ritpes(unsigned stind){
 
 void ritpcol(unsigned char col){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		ebx,opnt
@@ -6574,7 +6574,7 @@ void ritpcol(unsigned char col){
 
 unsigned pesnam(){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			mov		ebx,offset auxnam
 			mov		ecx,_MAX_PATH
@@ -8412,7 +8412,7 @@ void rstdu(){
 
 CLPSTCH* deref(void* pnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,pnt
@@ -8911,7 +8911,7 @@ void rtclpfn(unsigned dst,unsigned src){
 
 FRMCLP* frmref(void* pnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,pnt
@@ -8924,7 +8924,7 @@ FRMCLP* frmref(void* pnt){
 
 FRMSCLP* frmsref(void* pnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,pnt
@@ -8937,7 +8937,7 @@ FRMSCLP* frmsref(void* pnt){
 
 FPCLP* fpref(void* pnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,pnt
@@ -9492,7 +9492,7 @@ void delsmal(unsigned ind,unsigned fin){
 
 BOOL cmpstch(unsigned ind0,unsigned ind1){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			mov		eax,ind0
 			xor		ecx,ecx
@@ -9527,7 +9527,7 @@ doscmpx:
 
 void mvstch(unsigned dst,unsigned src){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			mov		eax,dst
 			xor		ecx,ecx
@@ -9955,7 +9955,7 @@ void duver(TCHAR* nam){
 
 void durit(void* src,unsigned cnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		esi,src
@@ -9972,7 +9972,7 @@ void durit(void* src,unsigned cnt){
 
 unsigned bufref(){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,opnt
@@ -10612,7 +10612,7 @@ void redclp(){
 
 unsigned nxtcrnr(unsigned ind){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,ind
@@ -11529,7 +11529,7 @@ void seldwn(){
 
 void mvstchs(unsigned dst,unsigned src,unsigned cnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		ecx,ecx
@@ -12079,7 +12079,7 @@ int strcomp( const void *arg1, const void *arg2 ){
 
 void strlcpy(TCHAR* dst,TCHAR* src){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		ebx,offset upmap
@@ -12121,7 +12121,7 @@ lupx:		mov		[ecx],al
 
 TCHAR lchr(int op){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		ebx,offset upmap
@@ -13343,7 +13343,7 @@ void srchk(){
 
 unsigned duswap(unsigned dat){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 		mov		eax,dat
@@ -13672,7 +13672,7 @@ void frmcursel(unsigned stat){
 #pragma warning (disable : 4725)
 void stchsnap(unsigned strt,unsigned fin){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			xor		eax,eax
 			mov		al,12
@@ -13714,7 +13714,7 @@ stchsnapx:
 #pragma warning (disable : 4725)
 void frmsnap(FLPNT* strt,unsigned cnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 		mov		eax,strt
 		mov		ecx,cnt
@@ -13986,7 +13986,7 @@ unsigned icolsum(COLORREF col){
 
 COLORREF dwnshft(COLORREF col){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,col
@@ -14000,7 +14000,7 @@ COLORREF dwnshft(COLORREF col){
 
 void setrac(unsigned p_bpnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,p_bpnt
@@ -14014,7 +14014,7 @@ void setrac(unsigned p_bpnt){
 
 BOOL getrac(unsigned p_bpnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -14122,7 +14122,7 @@ void tracwnd(){
 
 void trcols(COLORREF col){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,col
@@ -14293,7 +14293,7 @@ void trace(){
 
 void setedg(unsigned p_bpnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		eax,p_bpnt
@@ -14307,7 +14307,7 @@ void setedg(unsigned p_bpnt){
 
 BOOL chkedg(unsigned p_bpnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -14753,7 +14753,7 @@ unsigned ducolm(){
 
 void chkref(){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			mov		eax,uref
 			mov		ebx,dref
@@ -15003,7 +15003,7 @@ static inline void difsub(unsigned *src, unsigned shft, unsigned *&dst) {
 
 void difbits(unsigned shft,unsigned* p_bpnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			jmp		short difbts
@@ -19936,7 +19936,7 @@ thumout:;
 						ratsr();
 						for(opnt=0;opnt<(unsigned)funscnt;opnt++){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 							fselrct(opnt+ formpnt);
 #else
 							fselrct(opnt+formpnt);
@@ -21858,7 +21858,7 @@ static inline void delsubt(unsigned *&dst,
 
 void ducurs(unsigned char* pnt){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			jmp		short delups
@@ -22118,7 +22118,7 @@ delsubt(dst, rdcurfin, 5);
 
 void duamsk(){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -22176,7 +22176,7 @@ void duhom(){
 	if (phom) { *phom = 0; }
 }
 
-#if defined(__UseASM__)
+#if  __UseASM__
 void bcpy(TCHAR* dst,TCHAR* src){
 
 	_asm{
@@ -22206,7 +22206,7 @@ void ducmd(){
 
 	if(__argc>1){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 		bcpy(filnam,__argv[1]);
 #else
 		strcpy_s(filnam, __argv[1]);
@@ -22218,14 +22218,14 @@ void ducmd(){
 			CloseHandle(balfil);
 			if(balfil!=INVALID_HANDLE_VALUE){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 				bcpy(balnam0,balpnt);
 #else
 				strcpy_s(balnam0, balpnt);
 #endif
 				if(__argc>2){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 					bcpy(filnam,__argv[2]);
 #else
 					strcpy_s(filnam, __argv[2]);
@@ -22236,7 +22236,7 @@ void ducmd(){
 						balfil=CreateFile(balpnt,GENERIC_READ,0,0,OPEN_EXISTING,0,0);
 						if(balfil!=INVALID_HANDLE_VALUE){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 							bcpy(balnam1,balpnt);
 #else
 							strcpy_s(balnam1, balpnt);
@@ -22728,7 +22728,7 @@ void init(){
 
 COLORREF defTxt(unsigned colInd){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			xor		eax,eax
@@ -22746,7 +22746,7 @@ defx:
 
 void setCol(unsigned ind){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		ebx,ind
@@ -22774,7 +22774,7 @@ void relin(){
 
 unsigned setRmp(unsigned pbit){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 			xor		eax,eax
 			mov		ebx,offset rmap
@@ -23374,7 +23374,7 @@ skip:;
 	
 unsigned chkCol(unsigned ind){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	_asm{
 
 			mov		ebx,ind
@@ -24210,7 +24210,7 @@ void sachk(){
 		shoMsg(msgbuf);
 }
 
-#if !defined(__UseASM__)
+#if !__UseASM__
 #define BAD_FPU_EX (_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID)
 #define COMMON_FPU_EX (_EM_INEXACT | _EM_UNDERFLOW | _EM_DENORMAL)
 #define ALL_FPU_EX (BAD_FPU_EX | COMMON_FPU_EX)
@@ -24218,7 +24218,7 @@ void sachk(){
 
 int	fltex(int cod){
 
-#if defined(__UseASM__)
+#if  __UseASM__
 	short	cw;
 
 	_asm{
