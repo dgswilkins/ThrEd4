@@ -144,7 +144,6 @@ extern TCHAR thrnam[_MAX_PATH];
 extern TCHAR auxnam[_MAX_PATH];
 extern void save();
 extern COLORREF useCol[16];
-//extern void ler();
 extern char* per;
 extern unsigned daz;
 extern unsigned psg();
