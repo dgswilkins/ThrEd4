@@ -14,8 +14,6 @@
 
 void clrhbut(unsigned strt);
 void delsfrms(unsigned cod);
-void renam();
-BOOL chkchksum();
 void fthrfn();
 void dufdef();
 void delet();
@@ -374,7 +372,6 @@ extern void selsqr(POINT cpnt, HDC dc);
 extern void msgstr(unsigned cod);
 extern void shoseln(unsigned cod0, unsigned cod1);
 extern void	tabmsg(unsigned cod);
-extern void keydays(unsigned daz);
 extern void lodstr();
 extern TCHAR* stab[STR_LEN];
 extern void butxt(unsigned ind, TCHAR* str);
@@ -21477,22 +21474,6 @@ void ritloc() {
 	}
 }
 
-void renam() {
-
-	unsigned	ind;
-	TCHAR		chr;
-
-	for (ind = 0; ind < 50; ind++) {
-
-		chr = rencod[(unsigned char)cryptkey[namloc[ind]] - 120];
-		if (chr)
-			ini.desnam[ind] = chr;
-		else
-			break;
-	}
-	ini.desnam[ind] = 0;
-}
-
 #if __UseASM__ == 0
 static inline void delsubl(unsigned *&dst,
 	unsigned val,
@@ -23298,34 +23279,6 @@ void dublk(HDC dc) {
 		FillRect(dc, &hirct, hblk);
 	if (chkMap(DULO))
 		FillRect(dc, &lorct, hblk);
-}
-
-BOOL chkchksum() {
-
-	unsigned		ind;
-	__int64			chkacc;
-	__int64			chksum;
-	__int64*		pchk;
-	unsigned char*	pkchr;
-	unsigned char*	ptchr;
-	unsigned char*	pchr;
-
-	pkchr = (unsigned char*)&cryptkey;
-	pchr = (unsigned char*)&chksum;
-	for (ind = 0; ind < 8; ind++)
-	{
-		ptchr = &pkchr[chk1loc[ind]];
-		pchr[ind] = *ptchr;
-		*ptchr = 0;
-	}
-	pchk = (__int64*)&cryptkey;
-	chkacc = 0;
-	for (ind = 0; ind < 512; ind++)
-		chkacc += pchk[ind];
-	if (chkacc == chksum)
-		return 0;
-	else
-		return 1;
 }
 
 LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) {

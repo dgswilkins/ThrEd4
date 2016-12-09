@@ -417,25 +417,6 @@ void shoMsg(TCHAR* str) {
 	delete[] lens;
 }
 
-void keydays(unsigned daz) {
-
-	TCHAR buf[HBUFSIZ];
-	TCHAR keybuf[HBUFSIZ];
-	TCHAR setbuf[HBUFSIZ];
-	TCHAR badkbuf[HBUFSIZ];
-
-	if (rstMap(BADVER))
-		LoadString(hInst, IDS_KEYVER, badkbuf, HBUFSIZ);
-	else
-		*badkbuf = 0;
-	LoadString(hInst, IDS_DAYKEY, buf, HBUFSIZ);
-	LoadString(hInst, IDS_KEY, keybuf, HBUFSIZ);
-	LoadString(hInst, IDS_SETSTCH, setbuf, HBUFSIZ);
-
-	sprintf_s(msgbuf, sizeof(msgbuf), buf, badkbuf, keybuf, daz, setbuf);
-	shoMsg(msgbuf);
-}
-
 void tabmsg(unsigned cod) {
 
 	LoadString(hInst, cod, hlpbuf, HBUFSIZ);
