@@ -55,10 +55,9 @@ HANDLE					hlpfil;						//handle to the help file
 TCHAR					hlpnam[_MAX_PATH];			//help file name
 unsigned				fhlplen;					//help file length
 HWND					hlpwnd;						//help window
-HWND					hMsg=0;						//message window
+HWND					hMsg = 0;						//message window
 
-unsigned short ldlst[]={	//strings to load into memory at init time
-
+unsigned short ldlst[] = {	//strings to load into memory at init time
 	IDS_PIKOL,
 	IDS_UPON,
 	IDS_UPOF,
@@ -143,16 +142,16 @@ unsigned short ldlst[]={	//strings to load into memory at init time
 	IDS_EDG10,
 	IDS_EDG11,
 	IDS_EDG12,
-	IDS_PRF0, 
-	IDS_PRF1, 
-	IDS_PRF2, 
-	IDS_PRF3, 
-	IDS_PRF4, 
-	IDS_PRF5, 
-	IDS_PRF6, 
-	IDS_PRF7, 
-	IDS_PRF8, 
-	IDS_PRF9, 
+	IDS_PRF0,
+	IDS_PRF1,
+	IDS_PRF2,
+	IDS_PRF3,
+	IDS_PRF4,
+	IDS_PRF5,
+	IDS_PRF6,
+	IDS_PRF7,
+	IDS_PRF8,
+	IDS_PRF9,
 	IDS_PRF10,
 	IDS_PRF11,
 	IDS_PRF12,
@@ -224,193 +223,192 @@ unsigned short ldlst[]={	//strings to load into memory at init time
 };
 
 TCHAR*	stab[256];		//memory string pointers
-TCHAR*	sdat;				//string storage
+TCHAR*	sdat;			//string storage
 
 #if PESACT
-
-TCHAR*	shrtmsg=	"PES file header to short: %s\n";
+TCHAR*	shrtmsg = "PES file header to short: %s\n";
 #endif
 
 TCHAR	hlpbuf[HBUFSIZ];	//message formatting buffer
 
-void adbad(unsigned cod,unsigned cnt)
+void adbad(unsigned cod, unsigned cnt)
 {
-	//not sure that sdat has been initialized when this is called
+	// ToDo - not sure that sdat has been initialized when this is called
 	//what does this function do?
-	LoadString(hInst,cod,sdat,HBUFSIZ);
-	sdat=&sdat[strlen(sdat)];
-	LoadString(hInst,IDS_NOTREP,hlpbuf,HBUFSIZ);
-	sprintf_s(sdat,strlen(sdat),hlpbuf,cnt);
-	sdat=&sdat[strlen(sdat)];
+	LoadString(hInst, cod, sdat, HBUFSIZ);
+	sdat = &sdat[strlen(sdat)];
+	LoadString(hInst, IDS_NOTREP, hlpbuf, HBUFSIZ);
+	sprintf_s(sdat, strlen(sdat), hlpbuf, cnt);
+	sdat = &sdat[strlen(sdat)];
 }
 
 void hsizmsg()
 {
 	TCHAR buf[HBUFSIZ];
 
-	LoadString(hInst,IDS_HSIZ,buf,HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,zum0.x/PFGRAN,zum0.y/PFGRAN);
+	LoadString(hInst, IDS_HSIZ, buf, HBUFSIZ);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, zum0.x / PFGRAN, zum0.y / PFGRAN);
 	shoMsg(hlpbuf);
 }
 
-void msgflt(unsigned msgid,float par)
+void msgflt(unsigned msgid, float par)
 {
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst,msgid,buf,HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,par);
+	LoadString(hInst, msgid, buf, HBUFSIZ);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, par);
 	shoMsg(hlpbuf);
 	setMap(NUMIN);
 	numWnd();
 }
 
-void tsizmsg(TCHAR* sizstr,double siz){
+void tsizmsg(TCHAR* sizstr, double siz) {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst,IDS_SIZ,buf,HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,sizstr,siz);
+	LoadString(hInst, IDS_SIZ, buf, HBUFSIZ);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, sizstr, siz);
 	shoMsg(hlpbuf);
 	setMap(NUMIN);
 	numWnd();
 }
 
-void bfilmsg(){
+void bfilmsg() {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst,IDS_BADFIL,buf,HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,filnam);
+	LoadString(hInst, IDS_BADFIL, buf, HBUFSIZ);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, filnam);
 	shoMsg(hlpbuf);
 }
 
-void filnopn(unsigned cod,TCHAR* nam){
+void filnopn(unsigned cod, TCHAR* nam) {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst,cod,buf,HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,nam);
+	LoadString(hInst, cod, buf, HBUFSIZ);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, nam);
 	shoMsg(hlpbuf);
 }
 
-void crmsg(TCHAR* nam){
+void crmsg(TCHAR* nam) {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst,IDS_CREAT,buf,HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,nam);
+	LoadString(hInst, IDS_CREAT, buf, HBUFSIZ);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, nam);
 	shoMsg(hlpbuf);
 }
 
-void butxt(unsigned ind,TCHAR* str){
+void butxt(unsigned ind, TCHAR* str) {
 
-	if(chkMap(WASTRAC)&&ind>HNUM){
+	if (chkMap(WASTRAC) && ind > HNUM) {
 
-		if(ind==5){
+		if (ind == 5) {
 
-			if(chkMap(HIDMAP))
-				SetWindowText(hbuts[ind],stab[STR_TRC1H]);
+			if (chkMap(HIDMAP))
+				SetWindowText(hbuts[ind], stab[STR_TRC1H]);
 			else
-				SetWindowText(hbuts[ind],stab[STR_TRC1S]);
+				SetWindowText(hbuts[ind], stab[STR_TRC1S]);
 		}
 		else
-			SetWindowText(hbuts[ind],stab[ind-4+STR_TRC0]);
+			SetWindowText(hbuts[ind], stab[ind - 4 + STR_TRC0]);
 	}
 	else
-		SetWindowText(hbuts[ind],str);
+		SetWindowText(hbuts[ind], str);
 }
 
-void ritnum(unsigned cod,unsigned num){
+void ritnum(unsigned cod, unsigned num) {
 
-	sprintf_s(hlpbuf, sizeof(hlpbuf),"%s %d",stab[cod],num);
-	butxt(HNUM,hlpbuf);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), "%s %d", stab[cod], num);
+	butxt(HNUM, hlpbuf);
 }
 
-void msgstr(unsigned cod){
+void msgstr(unsigned cod) {
 
-	LoadString(hInst,cod,msgbuf,MSGSIZ);
+	LoadString(hInst, cod, msgbuf, MSGSIZ);
 }
 
-void lodstr(){
+void lodstr() {
 
-	unsigned	ind,ine,cnt;
+	unsigned	ind, ine, cnt;
 	TCHAR*		pchr;
-	
-	stab[0]=pchr=(TCHAR*)bseq;
-	for(ind=0;ind<STR_LEN;ind++){
 
-		cnt=LoadString(hInst,ldlst[ind],pchr,1000)+1;
-		pchr+=cnt;
+	stab[0] = pchr = (TCHAR*)bseq;
+	for (ind = 0; ind < STR_LEN; ind++) {
+
+		cnt = LoadString(hInst, ldlst[ind], pchr, 1000) + 1;
+		pchr += cnt;
 	}
-	cnt=pchr-stab[0];
-	sdat=new TCHAR[cnt];
-	MoveMemory(sdat,stab[0],cnt);
-	stab[0]=sdat;
-	ine=1;
-	for(ind=0;ind<=cnt;ind++){
+	cnt = pchr - stab[0];
+	sdat = new TCHAR[cnt];
+	MoveMemory(sdat, stab[0], cnt);
+	stab[0] = sdat;
+	ine = 1;
+	for (ind = 0; ind <= cnt; ind++) {
 
-		if(!sdat[ind]){
+		if (!sdat[ind]) {
 
 			ind++;
-			stab[ine]=&sdat[ind];
+			stab[ine] = &sdat[ind];
 			ine++;
 		}
 	}
 }
 
-void shoMsg(TCHAR* str){
+void shoMsg(TCHAR* str) {
 
-	SIZE		tsiz,msgsiz;
+	SIZE		tsiz, msgsiz;
 	TCHAR**		strs;
 	unsigned*	lens;
-	unsigned	cnt=0,ind=0,ine=0,bak=0;
+	unsigned	cnt = 0, ind = 0, ine = 0, bak = 0;
 	long		off;
 
-	while(str[ind]){
+	while (str[ind]) {
 
-		if(str[ind++]==10)
+		if (str[ind++] == 10)
 			cnt++;
 	}
 	cnt++;
-	strs=new TCHAR*[cnt+1];
-	lens=new unsigned[cnt+1];
-	ind=0;
-	strs[0]=str;
-	while(str[ind]){
+	strs = new TCHAR*[cnt + 1];
+	lens = new unsigned[cnt + 1];
+	ind = 0;
+	strs[0] = str;
+	while (str[ind]) {
 
-		if(str[ind]==10){
+		if (str[ind] == 10) {
 
-			lens[ine]=ind-bak;
-			strs[++ine]=&str[ind++];
-			bak=ind;
+			lens[ine] = ind - bak;
+			strs[++ine] = &str[ind++];
+			bak = ind;
 		}
 		else
 			ind++;
 	}
-	lens[ine]=ind-bak;
+	lens[ine] = ind - bak;
 	ine++;
-	tsiz.cx=tsiz.cy=msgsiz.cy=msgsiz.cx=0;
-	for(ind=0;ind<ine;ind++){
+	tsiz.cx = tsiz.cy = msgsiz.cy = msgsiz.cx = 0;
+	for (ind = 0; ind < ine; ind++) {
 
-		GetTextExtentPoint32(sdc,strs[ind],lens[ind],&tsiz);
-		if(tsiz.cx>msgsiz.cx)
-			msgsiz.cx=tsiz.cx;
-		if(tsiz.cy>msgsiz.cy)
-			msgsiz.cy=tsiz.cy;
+		GetTextExtentPoint32(sdc, strs[ind], lens[ind], &tsiz);
+		if (tsiz.cx > msgsiz.cx)
+			msgsiz.cx = tsiz.cx;
+		if (tsiz.cy > msgsiz.cy)
+			msgsiz.cy = tsiz.cy;
 	}
-	msgsiz.cy*=cnt;
-	if(rstMap(MSGOF))
-		off=prfwid+6;
+	msgsiz.cy *= cnt;
+	if (rstMap(MSGOF))
+		off = prfwid + 6;
 	else
-		off=3;
-	hMsg=CreateWindow(
+		off = 3;
+	hMsg = CreateWindow(
 		"STATIC",
 		str,
-		SS_CENTER|WS_CHILD|WS_VISIBLE|WS_BORDER,
+		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		off,
 		3,
-		msgsiz.cx+20,
-		msgsiz.cy+6,
+		msgsiz.cx + 20,
+		msgsiz.cy + 6,
 		hStch,
 		NULL,
 		hInst,
@@ -419,70 +417,70 @@ void shoMsg(TCHAR* str){
 	delete[] lens;
 }
 
-void keydays(unsigned daz){
+void keydays(unsigned daz) {
 
 	TCHAR buf[HBUFSIZ];
 	TCHAR keybuf[HBUFSIZ];
 	TCHAR setbuf[HBUFSIZ];
 	TCHAR badkbuf[HBUFSIZ];
 
-	if(rstMap(BADVER))
-		LoadString(hInst,IDS_KEYVER,badkbuf,HBUFSIZ);
+	if (rstMap(BADVER))
+		LoadString(hInst, IDS_KEYVER, badkbuf, HBUFSIZ);
 	else
-		*badkbuf=0;
-	LoadString(hInst,IDS_DAYKEY,buf,HBUFSIZ);
-	LoadString(hInst,IDS_KEY,keybuf,HBUFSIZ);
-	LoadString(hInst,IDS_SETSTCH,setbuf,HBUFSIZ);
+		*badkbuf = 0;
+	LoadString(hInst, IDS_DAYKEY, buf, HBUFSIZ);
+	LoadString(hInst, IDS_KEY, keybuf, HBUFSIZ);
+	LoadString(hInst, IDS_SETSTCH, setbuf, HBUFSIZ);
 
-	sprintf_s(msgbuf, sizeof(msgbuf),buf,badkbuf,keybuf,daz,setbuf);
+	sprintf_s(msgbuf, sizeof(msgbuf), buf, badkbuf, keybuf, daz, setbuf);
 	shoMsg(msgbuf);
 }
 
-void tabmsg(unsigned cod){
+void tabmsg(unsigned cod) {
 
-	LoadString(hInst,cod,hlpbuf,HBUFSIZ);
+	LoadString(hInst, cod, hlpbuf, HBUFSIZ);
 	shoMsg(hlpbuf);
 }
 
-void riter(){
+void riter() {
 
 	tabmsg(IDS_RITER);
 }
 
-void pntmsg(unsigned cod){
+void pntmsg(unsigned cod) {
 
 	TCHAR	temp[HBUFSIZ];
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst,IDS_PNT,temp,HBUFSIZ);
-	LoadString(hInst,cod,buf,HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf),temp,buf);
+	LoadString(hInst, IDS_PNT, temp, HBUFSIZ);
+	LoadString(hInst, cod, buf, HBUFSIZ);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), temp, buf);
 	shoMsg(hlpbuf);
 }
 
-void shosel(TCHAR* seltxt,TCHAR* selfun){
+void shosel(TCHAR* seltxt, TCHAR* selfun) {
 
-	sprintf_s(hlpbuf, sizeof(hlpbuf),"Select %s\n to use %s",seltxt,selfun);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), "Select %s\n to use %s", seltxt, selfun);
 	shoMsg(hlpbuf);
 }
 
-void shoseln(unsigned cod0,unsigned cod1){
+void shoseln(unsigned cod0, unsigned cod1) {
 
 	TCHAR	temp[HBUFSIZ];
 	TCHAR	buf0[HBUFSIZ];
 	TCHAR	buf1[HBUFSIZ];
 
-	LoadString(hInst,IDS_SHOSEL,temp,HBUFSIZ);
-	LoadString(hInst,cod0,buf0,HBUFSIZ);
-	LoadString(hInst,cod1,buf1,HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf),temp,buf0,buf1);
+	LoadString(hInst, IDS_SHOSEL, temp, HBUFSIZ);
+	LoadString(hInst, cod0, buf0, HBUFSIZ);
+	LoadString(hInst, cod1, buf1, HBUFSIZ);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), temp, buf0, buf1);
 	shoMsg(hlpbuf);
 }
 
-BOOL clpmsgs(unsigned cod){
+BOOL clpmsgs(unsigned cod) {
 
 	ispcdclp();
-	if((cod==FML_CLP||cod==FMM_CLP||cod==FML_PIC)&&!chkMap(WASPCDCLP)){
+	if ((cod == FML_CLP || cod == FMM_CLP || cod == FML_PIC) && !chkMap(WASPCDCLP)) {
 
 		tabmsg(IDS_CLPS);
 		return 1;
@@ -490,36 +488,36 @@ BOOL clpmsgs(unsigned cod){
 	return 0;
 }
 
-void frm1pnt(){
+void frm1pnt() {
 
-	if(formpnt==1){
+	if (formpnt == 1) {
 
 		setMap(FORMSEL);
-		clofind=0;
+		clofind = 0;
 	}
 }
 
-BOOL filmsgs(unsigned cod){
+BOOL filmsgs(unsigned cod) {
 
-	if(fselpnt)
+	if (fselpnt)
 		return clpmsgs(cod);
-	if(formpnt){
+	if (formpnt) {
 
-		delpnt=hed.stchs;
+		delpnt = hed.stchs;
 		frm1pnt();
-		if(chkMap(FORMSEL)){
+		if (chkMap(FORMSEL)) {
 
-			frmpnt=&formlst[clofind];
-			if(frmpnt->sids==2){
+			frmpnt = &formlst[clofind];
+			if (frmpnt->sids == 2) {
 
-				if(cod<FML_LIN){
+				if (cod < FML_LIN) {
 
 					tabmsg(IDS_FRM3X);
 					return 1;
 				}
-				else{
+				else {
 
-					if(cod==FML_PRPS){
+					if (cod == FML_PRPS) {
 
 						tabmsg(IDS_ANGS);
 						return 1;
@@ -528,93 +526,93 @@ BOOL filmsgs(unsigned cod){
 			}
 			return clpmsgs(cod);
 		}
-		else{
+		else {
 
 			tabmsg(IDS_FILSEL);
 			return 1;
 		}
 	}
-	else{
+	else {
 
 		tabmsg(IDS_FILCR);
 		return 1;
 	}
 }
 
-void grpmsg(){
+void grpmsg() {
 
-	shoseln(IDS_FGRPS,IDS_UNGRP);
+	shoseln(IDS_FGRPS, IDS_UNGRP);
 }
 
-void grpmsg1(){
+void grpmsg1() {
 
 	tabmsg(IDS_NOGRP);
 }
 
-void help(){
-	strcpy_s(hlpnam,homdir);
+void help() {
+	strcpy_s(hlpnam, homdir);
 #if LANG==ENG||LANG==HNG
 	strcat_s(hlpnam, "thred.chm");
 #endif
 #if LANG==GRM
 	strcat_s(hlpnam, "aladin.chm");
 #endif
-	hlpwnd=HtmlHelp(hWnd,hlpnam,HH_DISPLAY_TOPIC,0);
-	if(!hlpwnd)
+	hlpwnd = HtmlHelp(hWnd, hlpnam, HH_DISPLAY_TOPIC, 0);
+	if (!hlpwnd)
 		tabmsg(IDS_NOHLP);
 }
 
-void sdmsg(){
+void sdmsg() {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst,IDS_SAVDISC,buf,HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf),buf,thrnam);
+	LoadString(hInst, IDS_SAVDISC, buf, HBUFSIZ);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, thrnam);
 	shoMsg(hlpbuf);
 }
 
-void alrotmsg(){
+void alrotmsg() {
 
-	shoseln(IDS_ALLX,IDS_ROTAGIN);
+	shoseln(IDS_ALLX, IDS_ROTAGIN);
 }
 
-void shord(){
+void shord() {
 
-	shoseln(IDS_FGRPF,IDS_ROTDUP);
+	shoseln(IDS_FGRPF, IDS_ROTDUP);
 }
 
-void spltmsg(){
+void spltmsg() {
 
-	shoseln(IDS_FRMGUID,IDS_SPLT);
+	shoseln(IDS_FRMGUID, IDS_SPLT);
 }
 
 void datmsg(unsigned cod)
 {
 	TCHAR*	pchr;
 
-	pchr=msgbuf;
-	if(cod&BADFLT)
+	pchr = msgbuf;
+	if (cod&BADFLT)
 	{
-		LoadString(hInst,IDS_BADFLT,pchr,HBUFSIZ);
-		pchr=&pchr[strlen(pchr)];
+		LoadString(hInst, IDS_BADFLT, pchr, HBUFSIZ);
+		pchr = &pchr[strlen(pchr)];
 	}
-	if(cod&BADCLP)
+	if (cod&BADCLP)
 	{
-		LoadString(hInst,IDS_BADCLP,pchr,HBUFSIZ);
-		pchr=&pchr[strlen(pchr)];
+		LoadString(hInst, IDS_BADCLP, pchr, HBUFSIZ);
+		pchr = &pchr[strlen(pchr)];
 	}
-	if(cod&BADSAT)
+	if (cod&BADSAT)
 	{
-		LoadString(hInst,IDS_BADSAT,pchr,HBUFSIZ);
-		pchr=&pchr[strlen(pchr)];
+		LoadString(hInst, IDS_BADSAT, pchr, HBUFSIZ);
+		pchr = &pchr[strlen(pchr)];
 	}
-	if(cod&BADTX)
+	if (cod&BADTX)
 	{
-		LoadString(hInst,IDS_BADTX,pchr,HBUFSIZ);
-		pchr=&pchr[strlen(pchr)];
+		LoadString(hInst, IDS_BADTX, pchr, HBUFSIZ);
+		pchr = &pchr[strlen(pchr)];
 	}
 	pchr--;
-	*pchr=0;
+	*pchr = 0;
 	shoMsg(msgbuf);
 
 }
