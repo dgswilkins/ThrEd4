@@ -391,243 +391,243 @@ enum {
 	CAPT,		//screen capture in effect
 	VCAPT,		//keep screen capture as long as the mouse cursor
 				// is in the edit window
-				SELBOX,		//the select box is showing
-				ILIN,		//insert line is showing on the screen
-				INIT,		//set when a stitch is entered in the stitch buffer,a form is entered, or the mark is set
-				LIN1,		//drawing only one line in stitch insert mode
-				ILIN1,		//one insert line showing on screen
-				GRPSEL,		//group select mode
-				SCROS,		//start group cross has been drawn
-				ECROS,		//end group cross has been drawn
-				ELIN,		//group select line has been drawn
-				BAKEND,		//insert data should be appended to the end of the file
-				CLPSHO,		//display the clipboard insert rectangle
-				SELSHO,		//display the select rectangle
-				ROTAT,		//rotate state
-				ROTSHO,		//rotate rectangle is showing
-				ROTUSHO,	//rotate indicator line is showing
-				ROTCAPT,	//rotate capture mode
-				MOVCNTR,	//user is moving the rotate center
-				GETMIN,		//user is entering a minimum stitch length
-				NUMIN,		//user in entering a number
-				MOVFRM,		//user is moving a form point
-				MOVMSG,		//user tried to move an edited form
-				SHOFRM,		//form is currently written to the screen
-				STHR,		//user is entering a new stitch box threshold
-				ENTAR,		//user is adjusting a number with the up and down arrow keys
-				ENTR30,		//user is entering a new thread size for #30 thread
-				ENTR40,		//user is entering a new thread size for #40 thread
-				ENTR60,		//user is entering a new thread size for #60 thread
-				FORMSEL,	//a form is selected
-				FRMPMOV,	//user is moving a point on a form
-				IGNOR,		//user may elect to ignore a message about losing edits when resizing a form
-				FRMOV,		//user is moving a form
-				RUNPAT,		//user is runing a pattern
-				WASPAT,		//user ran a pattern, but hasn't done anything else yet
-				FILDIR,		//direction lines in angle fill
-				SHOSAT,		//the satin stitch form is on the screen
-				SHOCON,		//connect point line is visible
-				FENDIN,		//user is selecting fill ends
-				DELFRM,		//user wants to delete a form
-				BAKACT,		//there are entries in the undo buffer
-				BAKWRAP,	//undo buffer pointer has wrapped
-				BAKING,		//user has called the undo function
-				REDUSHO,	//redo menu item is active
-				UNDUSHO,	//undo menu item is active
-				FUNCLP,		//user is loading a form from the clipboard
-				FRMPSEL,	//user has selected a point in a form
-				SHOINSF,	//the form insert line has been drawn
-				SAT1,		//set when the first stitch is entered in a satin fill
-				FILMSG,		//set when user tries to unfil a form with edited stitches
-				CLPBAK,		//set when the first clipboard fill item has been entered
-				STRTCH,		//user is stretching a form horizontally or vertically
-				SHOSTRTCH,	//stretch box is written to the screen
-				EXPAND,		//user is expanding a form horizontally and vertically
-				SIDACT,		//side message window is active
-				BRDACT,		//border data in side message window
-				FILTYP,		//0=main fill, 1=border fill, used in side message display
-				GMRK,		//draw the mark on the screen
-				SIDCOL,		//user is selecting a fill color for a form
-				BRDSID,		//user is selecting a border fill color for a form
-				ENTRPOL,	//user is entering sides for a regular polygon
-				FRMROT,		//user is rotating a form
-				DELTO,		//user is deleting a form and the associated stitches
-				REDOLD,		//user is opening a file from the old file list
-				BAKSHO,		//user is looking at bakup files
-				DUBAK,		//user has chosen a backup file to load, but may want to save changes
-				IGNAM,		//save the thred file without making backups
-				PRGMSG,		//delete all backups message is displayed
-				NEWBAK,		//user is starting a new file, but may want to save changes
-				SAVEX,		//user is exiting, may want to save changes
-				OSAV,		//user wants to load a new file, may want to save changes
-				FRMOF,		//forms are not displayed and can't be selected
-				SHOMOV,		//user moving form line shown on screen
-				BARSAT,		//doing a bare satin fill to be filled in with clipboard data
-				ENTRSTAR,	//user in entering the number of points for a star
-				ENTROT,		//user is entering a rotate number for command rotate;
-				ENTRDUP,	//user is entering a rotate angle for rotate and duplicate
-				ENTRSPIR,	//user is entering the number of points for a spiral
-				ENTRHART,	//user is entering the number of points for a heart
-				ENTRLENS,	//user is entering the number of points for a lens
-				SEQDUN,		//last stitch seqenced was already done
-				WASEL,		//a form was selected when the user hit control-right-click
-				MOVFRMS,	//user is moving a group of forms
-				FRMSROT,	//user is rotating group of forms
-				FUNSCLP,	//user is pasting a group of forms
-				DELSFRMS,	//user is deleting a group of forms
-				BIGBOX,		//user has selected all forms and stitches
-				MOVSET,		//the move point has been selected
-				UPTO,		//show points upto the selected point
-				LENSRCH,	//user has hit the max or min button
-				BOXSLCT,	//user is making a select box
-				THUMSHO,	//thumbnail mode
-				INSFIL,		//user is inserting a file
-				IGNORINS,	//don't use the open file dialog box to get the insert file name
-				RBUT,		//user pressed the right mouse button selecting a thumbnail 
-				UND,		//stitching a perp satin underlay
-				UNDPHAS,	//perp satin underlay phase
-				SAVAS,		//user is saving a file under a new name
-				SHOSIZ,		//design size box is displayed
-				HUPMSG,		//user is selecting a hoop size
-				IGNTHR,		//ignore the close enough threshold for 'C' hotkey
-				MONOMAP,	//set if a color bitmap is loaded
-				THUMON,		//user is loading a thumnail
-				CLPOVR,		//can't fit another clipboard fill on the current line
-				CONTIG,		//contiguous point flag
-				NUROT,		//user is entering a rotate angle
-				APSID,		//user is enter a new applique color
-				FRMSAM,		//don't find an already selected form
-				ENTRSEG,	//user is entering rotation segments
-				ENTRFNUM,	//user is entering a form number
-				WASFRMFRM,	//need to restore the form-form
-				SAVACT,		//activate the undo save
-				CNTRH,		//for centering horizontally
-				CNTRV,		//for centering vertically
-				RESTCH,		//redraw the stitch window
-				WASGRP,		//group of stitches selecter when entering length search
-				REFILMSG,	//refill all message is up
-				PRELIN,		//user is inserting form points before the 0 point in a line form
-				WASRT,		//insert was active when preferences activated
-				WASDIR,		//last minimum direction for sequencing
-				BRKFIX,		//last line sequenced was from the end of a break of an already done region
-				RELAYR,		//need to write the layer in the layer button
-				HIDSTCH,	//don't display the stitches
-				WASIN,		//placing stitches inside the form for vertical clipboard fill
-				LTRACE,		//line trace funtion active
-				HUPEX,		//set when points are outside the hoop
-				HUPCHNG,	//hoop size has been changed
-				SIZED,		//window has been resized
-				ROTAL,		//user is rotating all stitches
-				ZUMACT,		//zoom to actual size
-				WASREFIL,	//last fill was a refil
-				DUMEN,		//menu needs to be refilled
-				WASNEG,		//form had a point less than the size of the clipboard fill
-				FCLOS,		//user is closing a file
-				NOTFREE,	//no free space on the drive
-				PIXIN,		//user in inputting nudge pixels
-				STPXIN,		//user is inputting stitch point pixels
-				FRMPXIN,	//user is inputting form point pixels
-				WASMRK,		//user has set a mark
-				RESIZ,		//need to change the size of the main window
-				MSGOF,		//offset the message box
-				WASMOV,		//mouse move capture flag
-				WASCOL,		//mouse move started in a color box
-				ENTREG,		//user is entering an egg form
-				BADFIL,		//loaded file is corrupted
-				WASTRAC,	//traace bitmap loaded
-				LANDSCAP,	//trace bitmap is landscape position
-				WASEDG,		//trace edge map was created
-				TRCUP,		//trace the up limit
-				TRCRED,		//red trace on
-				TRCGRN,		//green trace on
-				TRCBLU,		//blue trace on
-				DUHI,		//paint the high trace rectangle
-				DULO,		//paint the low trace rectangle
-				WASDIF,		//found edges on bitmap
-				WASDSEL,	//color selected bitmap
-				TRNIN0,		//trace color number input
-				TRNUP,		//trace up number input
-				WASTRCOL,	//trace color entered from keyboard
-				TRNIN1,		//trace paramater number input
-				TRSET,		//trace numbers have been set
-				WASESC,		//user hit escape
-				HIDMAP,		//hide the bitmap
-				WASBLAK,	//bitmap form pixels set to black
-				LINCHN,		//chain stich has line in middle
-				ENTRZIG,	//user is creating a zig-zag form
-				FOLFRM,		//form-form is displaying a follower form
-				DUREFRM,	//display the form-form
-				SIDX,		//display the extra fills
-				WASLED,		//lead form found in frmchk
-				FPSEL,		//form points selected
-				SHOPSEL,	//form points selected rectangle is showing
-				PSELDIR,	//direction of form point select
-				FPUNCLP,	//user is retrieving cliped form points into a form
-				SHOP,		//clipboard from points are showing
-				WASPCDCLP,	//there is pcd data on the clipboard
-				FTHR,		//feather fill flag
-				FBOTH,		//do both sides of a feather fill
-				ENTRFTHUP,	//user is entering the feather up number
-				FTHSID,		//user is entering a feather color
-				CNV2FTH,	//converting a form to feather ribbon
-				WASFPNT,	//user is moving a form point
-				WASDO,		//backup has been made before refil
-				NOSEL,		//left button down didn't select anything
-				WASDEL,		//stitches were deleted
-				FLPBLND,	//flip the feather blend bit before refilling
-				GTWLKIND,	//get the edge walk/underlay offset
-				GTWLKLEN,	//get the edge walk/underlay stitch length
-				GTUANG,		//get the underlay angle
-				GTUSPAC,	//get the underaly spacing
-				BADVER,		//key version does not match
-				DUSRT,		//write sort info
-				WLKDIR,		//edge walk direction, 0=forward
-				INDIR,		//inner border switched with outer
-				DIDSTRT,	//start stitches have been written
-				REFCNT,		//counting the form-form lines
-				UNDCOL,		//user is entrering an underlay color
-				FSETULEN,	//user is setting the underlay stitch length for a group of forms
-				ISEND,		//writing the end stitches
-				FSETUSPAC,	//user is setting the underlay spacing for a group of forms
-				FSETUANG,	//user is setting the underlay angle for a group of forms
-				FSETFLEN,	//user is setting the fill stitch length for a group of forms
-				FSETFSPAC,	//user is setting the fill spacing for a group of forms
-				FSETFANG,	//user is setting the fill angle for a group of forms
-				FSETUCOL,	//user is setting the underlay coler for a group of forms
-				FSETFCOL,	//user is setting the fill coler for a group of forms
-				FSETBCOL,	//user is setting the border coler for a group of forms
-				FSETBLEN,	//user is setting the border coler for a group of forms
-				FSETBSPAC,	//user is setting the border spacing for a group of forms
-				FSETBMIN,	//user is setting the minimum border stitch length for a group of forms
-				FSETBMAX,	//user is setting the maximum border stitch length for a group of forms
-				FSETFMIN,	//user is setting the minimum fill stitch length for a group of forms
-				FSETFMAX,	//user is setting the maximum fill stitch length for a group of forms
-				FSETFWID,	//user is setting the width for a group of forms
-				FSETFHI,	//user is setting the height for a group of forms
-				TXTRED,		//displaying the texture fill editor
-				FRMBOXIN,	//user is setting the form box pixels
-				TXTMOV,		//user is moving a texture editor point
-				TXTCLP,		//user is setting texture points with a clipboard form
-				TXTLIN,		//user is setting texture pints in a line
-				WASTXBAK,	//texture fill editor history active
-				LASTXBAK,	//last key was a texture back key
-				TXBDIR,		//texture backup direction
-				TXHCNTR,	//texture center on
-				TXFIL,		//texture fill in progress
-				WASWROT,	//texture clipboard form was written
-				DESCHG,		//design size change 0=x, 1=y 
-				CMPDO,		//design has been changed
-				ISUND,		//doing underlay fill
-				CHKTX,		//user has changed the texture fill window size, check the points
-				FSETFIND,	//user is setting the indent for a group of forms
-				TXBOX,		//user is importing stitches for textured fill
-				TXIN,		//last stitch point was in stitch select box
-				SCLPSPAC,	//user is setting the clipbard fill spacing
-				FCHK,		//check the forms
-				NOCLP,		//don't load clipboard data from forms
-				NOTHRFIL,	//loaded file wasn't a Thred file
+	SELBOX,		//the select box is showing
+	ILIN,		//insert line is showing on the screen
+	INIT,		//set when a stitch is entered in the stitch buffer,a form is entered, or the mark is set
+	LIN1,		//drawing only one line in stitch insert mode
+	ILIN1,		//one insert line showing on screen
+	GRPSEL,		//group select mode
+	SCROS,		//start group cross has been drawn
+	ECROS,		//end group cross has been drawn
+	ELIN,		//group select line has been drawn
+	BAKEND,		//insert data should be appended to the end of the file
+	CLPSHO,		//display the clipboard insert rectangle
+	SELSHO,		//display the select rectangle
+	ROTAT,		//rotate state
+	ROTSHO,		//rotate rectangle is showing
+	ROTUSHO,	//rotate indicator line is showing
+	ROTCAPT,	//rotate capture mode
+	MOVCNTR,	//user is moving the rotate center
+	GETMIN,		//user is entering a minimum stitch length
+	NUMIN,		//user in entering a number
+	MOVFRM,		//user is moving a form point
+	MOVMSG,		//user tried to move an edited form
+	SHOFRM,		//form is currently written to the screen
+	STHR,		//user is entering a new stitch box threshold
+	ENTAR,		//user is adjusting a number with the up and down arrow keys
+	ENTR30,		//user is entering a new thread size for #30 thread
+	ENTR40,		//user is entering a new thread size for #40 thread
+	ENTR60,		//user is entering a new thread size for #60 thread
+	FORMSEL,	//a form is selected
+	FRMPMOV,	//user is moving a point on a form
+	IGNOR,		//user may elect to ignore a message about losing edits when resizing a form
+	FRMOV,		//user is moving a form
+	RUNPAT,		//user is runing a pattern
+	WASPAT,		//user ran a pattern, but hasn't done anything else yet
+	FILDIR,		//direction lines in angle fill
+	SHOSAT,		//the satin stitch form is on the screen
+	SHOCON,		//connect point line is visible
+	FENDIN,		//user is selecting fill ends
+	DELFRM,		//user wants to delete a form
+	BAKACT,		//there are entries in the undo buffer
+	BAKWRAP,	//undo buffer pointer has wrapped
+	BAKING,		//user has called the undo function
+	REDUSHO,	//redo menu item is active
+	UNDUSHO,	//undo menu item is active
+	FUNCLP,		//user is loading a form from the clipboard
+	FRMPSEL,	//user has selected a point in a form
+	SHOINSF,	//the form insert line has been drawn
+	SAT1,		//set when the first stitch is entered in a satin fill
+	FILMSG,		//set when user tries to unfil a form with edited stitches
+	CLPBAK,		//set when the first clipboard fill item has been entered
+	STRTCH,		//user is stretching a form horizontally or vertically
+	SHOSTRTCH,	//stretch box is written to the screen
+	EXPAND,		//user is expanding a form horizontally and vertically
+	SIDACT,		//side message window is active
+	BRDACT,		//border data in side message window
+	FILTYP,		//0=main fill, 1=border fill, used in side message display
+	GMRK,		//draw the mark on the screen
+	SIDCOL,		//user is selecting a fill color for a form
+	BRDSID,		//user is selecting a border fill color for a form
+	ENTRPOL,	//user is entering sides for a regular polygon
+	FRMROT,		//user is rotating a form
+	DELTO,		//user is deleting a form and the associated stitches
+	REDOLD,		//user is opening a file from the old file list
+	BAKSHO,		//user is looking at bakup files
+	DUBAK,		//user has chosen a backup file to load, but may want to save changes
+	IGNAM,		//save the thred file without making backups
+	PRGMSG,		//delete all backups message is displayed
+	NEWBAK,		//user is starting a new file, but may want to save changes
+	SAVEX,		//user is exiting, may want to save changes
+	OSAV,		//user wants to load a new file, may want to save changes
+	FRMOF,		//forms are not displayed and can't be selected
+	SHOMOV,		//user moving form line shown on screen
+	BARSAT,		//doing a bare satin fill to be filled in with clipboard data
+	ENTRSTAR,	//user in entering the number of points for a star
+	ENTROT,		//user is entering a rotate number for command rotate;
+	ENTRDUP,	//user is entering a rotate angle for rotate and duplicate
+	ENTRSPIR,	//user is entering the number of points for a spiral
+	ENTRHART,	//user is entering the number of points for a heart
+	ENTRLENS,	//user is entering the number of points for a lens
+	SEQDUN,		//last stitch seqenced was already done
+	WASEL,		//a form was selected when the user hit control-right-click
+	MOVFRMS,	//user is moving a group of forms
+	FRMSROT,	//user is rotating group of forms
+	FUNSCLP,	//user is pasting a group of forms
+	DELSFRMS,	//user is deleting a group of forms
+	BIGBOX,		//user has selected all forms and stitches
+	MOVSET,		//the move point has been selected
+	UPTO,		//show points upto the selected point
+	LENSRCH,	//user has hit the max or min button
+	BOXSLCT,	//user is making a select box
+	THUMSHO,	//thumbnail mode
+	INSFIL,		//user is inserting a file
+	IGNORINS,	//don't use the open file dialog box to get the insert file name
+	RBUT,		//user pressed the right mouse button selecting a thumbnail 
+	UND,		//stitching a perp satin underlay
+	UNDPHAS,	//perp satin underlay phase
+	SAVAS,		//user is saving a file under a new name
+	SHOSIZ,		//design size box is displayed
+	HUPMSG,		//user is selecting a hoop size
+	IGNTHR,		//ignore the close enough threshold for 'C' hotkey
+	MONOMAP,	//set if a color bitmap is loaded
+	THUMON,		//user is loading a thumnail
+	CLPOVR,		//can't fit another clipboard fill on the current line
+	CONTIG,		//contiguous point flag
+	NUROT,		//user is entering a rotate angle
+	APSID,		//user is enter a new applique color
+	FRMSAM,		//don't find an already selected form
+	ENTRSEG,	//user is entering rotation segments
+	ENTRFNUM,	//user is entering a form number
+	WASFRMFRM,	//need to restore the form-form
+	SAVACT,		//activate the undo save
+	CNTRH,		//for centering horizontally
+	CNTRV,		//for centering vertically
+	RESTCH,		//redraw the stitch window
+	WASGRP,		//group of stitches selecter when entering length search
+	REFILMSG,	//refill all message is up
+	PRELIN,		//user is inserting form points before the 0 point in a line form
+	WASRT,		//insert was active when preferences activated
+	WASDIR,		//last minimum direction for sequencing
+	BRKFIX,		//last line sequenced was from the end of a break of an already done region
+	RELAYR,		//need to write the layer in the layer button
+	HIDSTCH,	//don't display the stitches
+	WASIN,		//placing stitches inside the form for vertical clipboard fill
+	LTRACE,		//line trace funtion active
+	HUPEX,		//set when points are outside the hoop
+	HUPCHNG,	//hoop size has been changed
+	SIZED,		//window has been resized
+	ROTAL,		//user is rotating all stitches
+	ZUMACT,		//zoom to actual size
+	WASREFIL,	//last fill was a refil
+	DUMEN,		//menu needs to be refilled
+	WASNEG,		//form had a point less than the size of the clipboard fill
+	FCLOS,		//user is closing a file
+	NOTFREE,	//no free space on the drive
+	PIXIN,		//user in inputting nudge pixels
+	STPXIN,		//user is inputting stitch point pixels
+	FRMPXIN,	//user is inputting form point pixels
+	WASMRK,		//user has set a mark
+	RESIZ,		//need to change the size of the main window
+	MSGOF,		//offset the message box
+	WASMOV,		//mouse move capture flag
+	WASCOL,		//mouse move started in a color box
+	ENTREG,		//user is entering an egg form
+	BADFIL,		//loaded file is corrupted
+	WASTRAC,	//traace bitmap loaded
+	LANDSCAP,	//trace bitmap is landscape position
+	WASEDG,		//trace edge map was created
+	TRCUP,		//trace the up limit
+	TRCRED,		//red trace on
+	TRCGRN,		//green trace on
+	TRCBLU,		//blue trace on
+	DUHI,		//paint the high trace rectangle
+	DULO,		//paint the low trace rectangle
+	WASDIF,		//found edges on bitmap
+	WASDSEL,	//color selected bitmap
+	TRNIN0,		//trace color number input
+	TRNUP,		//trace up number input
+	WASTRCOL,	//trace color entered from keyboard
+	TRNIN1,		//trace paramater number input
+	TRSET,		//trace numbers have been set
+	WASESC,		//user hit escape
+	HIDMAP,		//hide the bitmap
+	WASBLAK,	//bitmap form pixels set to black
+	LINCHN,		//chain stich has line in middle
+	ENTRZIG,	//user is creating a zig-zag form
+	FOLFRM,		//form-form is displaying a follower form
+	DUREFRM,	//display the form-form
+	SIDX,		//display the extra fills
+	WASLED,		//lead form found in frmchk
+	FPSEL,		//form points selected
+	SHOPSEL,	//form points selected rectangle is showing
+	PSELDIR,	//direction of form point select
+	FPUNCLP,	//user is retrieving cliped form points into a form
+	SHOP,		//clipboard from points are showing
+	WASPCDCLP,	//there is pcd data on the clipboard
+	FTHR,		//feather fill flag
+	FBOTH,		//do both sides of a feather fill
+	ENTRFTHUP,	//user is entering the feather up number
+	FTHSID,		//user is entering a feather color
+	CNV2FTH,	//converting a form to feather ribbon
+	WASFPNT,	//user is moving a form point
+	WASDO,		//backup has been made before refil
+	NOSEL,		//left button down didn't select anything
+	WASDEL,		//stitches were deleted
+	FLPBLND,	//flip the feather blend bit before refilling
+	GTWLKIND,	//get the edge walk/underlay offset
+	GTWLKLEN,	//get the edge walk/underlay stitch length
+	GTUANG,		//get the underlay angle
+	GTUSPAC,	//get the underaly spacing
+	BADVER,		//key version does not match
+	DUSRT,		//write sort info
+	WLKDIR,		//edge walk direction, 0=forward
+	INDIR,		//inner border switched with outer
+	DIDSTRT,	//start stitches have been written
+	REFCNT,		//counting the form-form lines
+	UNDCOL,		//user is entrering an underlay color
+	FSETULEN,	//user is setting the underlay stitch length for a group of forms
+	ISEND,		//writing the end stitches
+	FSETUSPAC,	//user is setting the underlay spacing for a group of forms
+	FSETUANG,	//user is setting the underlay angle for a group of forms
+	FSETFLEN,	//user is setting the fill stitch length for a group of forms
+	FSETFSPAC,	//user is setting the fill spacing for a group of forms
+	FSETFANG,	//user is setting the fill angle for a group of forms
+	FSETUCOL,	//user is setting the underlay coler for a group of forms
+	FSETFCOL,	//user is setting the fill coler for a group of forms
+	FSETBCOL,	//user is setting the border coler for a group of forms
+	FSETBLEN,	//user is setting the border coler for a group of forms
+	FSETBSPAC,	//user is setting the border spacing for a group of forms
+	FSETBMIN,	//user is setting the minimum border stitch length for a group of forms
+	FSETBMAX,	//user is setting the maximum border stitch length for a group of forms
+	FSETFMIN,	//user is setting the minimum fill stitch length for a group of forms
+	FSETFMAX,	//user is setting the maximum fill stitch length for a group of forms
+	FSETFWID,	//user is setting the width for a group of forms
+	FSETFHI,	//user is setting the height for a group of forms
+	TXTRED,		//displaying the texture fill editor
+	FRMBOXIN,	//user is setting the form box pixels
+	TXTMOV,		//user is moving a texture editor point
+	TXTCLP,		//user is setting texture points with a clipboard form
+	TXTLIN,		//user is setting texture pints in a line
+	WASTXBAK,	//texture fill editor history active
+	LASTXBAK,	//last key was a texture back key
+	TXBDIR,		//texture backup direction
+	TXHCNTR,	//texture center on
+	TXFIL,		//texture fill in progress
+	WASWROT,	//texture clipboard form was written
+	DESCHG,		//design size change 0=x, 1=y 
+	CMPDO,		//design has been changed
+	ISUND,		//doing underlay fill
+	CHKTX,		//user has changed the texture fill window size, check the points
+	FSETFIND,	//user is setting the indent for a group of forms
+	TXBOX,		//user is importing stitches for textured fill
+	TXIN,		//last stitch point was in stitch select box
+	SCLPSPAC,	//user is setting the clipbard fill spacing
+	FCHK,		//check the forms
+	NOCLP,		//don't load clipboard data from forms
+	NOTHRFIL,	//loaded file wasn't a Thred file
 
-				LASTBIT,	//must be the last entry in the enum
+	LASTBIT,	//must be the last entry in the enum
 };
 
 #define	MAPLEN (LASTBIT>>5)+1 //length of the state bitmap in 32 bit words
@@ -691,90 +691,90 @@ typedef struct _pcsheader {
 //ini file structure
 typedef struct _iniFil {
 
-	TCHAR			defDir[180];	//default directory
-	COLORREF		stitchColors[16];	//colors
+	TCHAR			defDir[180];			//default directory
+	COLORREF		stitchColors[16];		//colors
 	COLORREF		stitchPreferredColors[16];	//stich preference colors
 	COLORREF		backgroundPreferredColors[16];		//background preference colors
 	COLORREF		backgroundColor;		//background color
 	COLORREF		bitmapColor;			//bitmap color
-	double			minStitchLength;			//minimum stitch length
+	double			minStitchLength;		//minimum stitch length
 	double			showStitchPoints;		//show stitch points 
 	double			threadSize30;			//millimeter size of 30 weight thread
 	double			threadSize40;			//millimeter size of 40 weight thread
 	double			threadSize60;			//millimeter size of 60 weight thread
-	double			userStitchLength;			//user stitch length
-	double			maxStitchLength;			//maximum stitch length
+	double			userStitchLength;		//user stitch length
+	double			maxStitchLength;		//maximum stitch length
 	double			smallStitchLength;		//small stitch size
-	double			StitchBoxesThreshold;		//show sitch box level
-	double			StitchSpace;		//stitch spacing between lines of stitches
-	double			fillAngle;			//fill angle
-	unsigned		binaryVariableBitmap;			//bitmap
+	double			StitchBoxesThreshold;	//show sitch box level
+	double			StitchSpace;			//stitch spacing between lines of stitches
+	double			fillAngle;				//fill angle
+	unsigned		binaryVariableBitmap;	//bitmap
 	double			borderWidth;			//border width
 	unsigned		underlayColor;			//applique color
 	TCHAR			oldnams[OLDNUM][_MAX_PATH];	//last file names
-	double			snapLength;			//snap together length
-	double			starRatio;			//star ratio
-	double			spiralWrap;		//sprial wrap
-	COLORREF		bitmapBackgroundColors[16];		//bitmap background color preferences
-	double			buttonholeFillCornerLength;			//buttonhole fill corner length		
-	float			picotSpace;		//space between border picots
-	TCHAR			hoopType;			//hoop type
-	TCHAR			auxfil;			//machine file type
-	float			hoopSizeX;			//hoop x size
-	float			hoopSizeY;			//hoop y size
+	double			snapLength;				//snap together length
+	double			starRatio;				//star ratio
+	double			spiralWrap;				//spiral wrap
+	COLORREF		bitmapBackgroundColors[16];	//bitmap background color preferences
+	double			buttonholeFillCornerLength;	//buttonhole fill corner length		
+	float			picotSpace;				//space between border picots
+	TCHAR			hoopType;				//hoop type
+	TCHAR			auxfil;					//machine file type
+	float			hoopSizeX;				//hoop x size
+	float			hoopSizeY;				//hoop y size
 	double			rotationAngle;			//rotation angle
-	float			gridSize;			//grid size
-	float			clipboardOffset;			//clipboard offset
-	RECT			initialWindowCoords;			//initial window coordinates
-	COLORREF		gridColor;			//grid color
-	unsigned		fillPhase;			//clipboard fill phase
+	float			gridSize;				//grid size
+	float			clipboardOffset;		//clipboard offset
+	RECT			initialWindowCoords;	//initial window coordinates
+	COLORREF		gridColor;				//grid color
+	unsigned		fillPhase;				//clipboard fill phase
 	float			customHoopX;			//custom hoop width
 	float			customHoopY;			//custom hoop heigth
-	float			trlen;			//lens points
-	double			traceRatio;			//trace ratio
-	float			chainSpace;			//chain space
-	float			chainRatio;			//chain ratio
-	float			cursorNudgeStep;			//cursor nudge step
-	unsigned short  nudgePixels;		//nudge pixels
-	float			eggRatio;			//egg ratio
+	float			trlen;					//lens points
+	double			traceRatio;				//trace ratio
+	float			chainSpace;				//chain space
+	float			chainRatio;				//chain ratio
+	float			cursorNudgeStep;		//cursor nudge step
+	unsigned short  nudgePixels;			//nudge pixels
+	float			eggRatio;				//egg ratio
 	unsigned short	stitchSizePixels;		//size of stitch points in pixels
-	unsigned short	formPointSizePixels;			//size of form points in pixels
-	unsigned short	formSides;			//sides of a created form
+	unsigned short	formPointSizePixels;	//size of form points in pixels
+	unsigned short	formSides;				//sides of a created form
 	float			tearTailLength;			//length of the tear tail
-	float			tearTwistStep;		//tear twist step
-	float			tearTwistRatio;		//tear twist ratio
-	unsigned short	wavePoints;		//wave points
-	unsigned short	waveStart;		//wave strting point
-	unsigned short	waveEnd;			//wave ending point;
-	unsigned short	waveLobes;			//wave lobes
-	unsigned char	featherFillType;			//feather fill type
+	float			tearTwistStep;			//tear twist step
+	float			tearTwistRatio;			//tear twist ratio
+	unsigned short	wavePoints;				//wave points
+	unsigned short	waveStart;				//wave strting point
+	unsigned short	waveEnd;				//wave ending point;
+	unsigned short	waveLobes;				//wave lobes
+	unsigned char	featherFillType;		//feather fill type
 	unsigned char	featherUpCount;			//feather up count
-	unsigned char	featherDownCount;			//feather down count
-	unsigned char	featherType;		//feather bits
+	unsigned char	featherDownCount;		//feather down count
+	unsigned char	featherType;			//feather bits
 	float			featherRatio;			//feather ratio
-	float			featherMinStitchSize;			//feather floor
+	float			featherMinStitchSize;	//feather floor
 	unsigned short	featherCount;			//feather fill psg granularity
-	TCHAR			p2cnam[_MAX_PATH];	//pes2card file
+	TCHAR			p2cnam[_MAX_PATH];		//pes2card file
 	float			underlayIndent;			//edge walk/underlay indent
 	float			underlayAngle;			//underlay angle
-	float			underlaySpacing;			//underlay spacing
-	float			underlayStitchLen;			//underlay stitch length
+	float			underlaySpacing;		//underlay spacing
+	float			underlayStitchLen;		//underlay stitch length
 	float			daisyDiameter;			//daisy diameter
-	float			daisyPetalLen;		//daisy petal length
+	float			daisyPetalLen;			//daisy petal length
 	float			daisyHoleDiameter;		//daisy hole diameter
-	unsigned		daisyPetalCount;			//daisy petals
-	unsigned		dazcnt;			//daisy petal points
-	unsigned		dazicnt;		//daisy inner count
-	unsigned char	daisyBorderType;			//daisy border type
-	unsigned char	dataCheck;			//data check
+	unsigned		daisyPetalCount;		//daisy petals
+	unsigned		dazcnt;					//daisy petal points
+	unsigned		dazicnt;				//daisy inner count
+	unsigned char	daisyBorderType;		//daisy border type
+	unsigned char	dataCheck;				//data check
 	float			textureHeight;			//textured fill height
 	float			textureWidth;			//textured fill width
-	float			textureSpacing;		//textured fill spacing
+	float			textureSpacing;			//textured fill spacing
 	unsigned short	formBoxSizePixels;		//form box pixels
-	unsigned short	dazpcnt;		//daisy heart count
-	unsigned short  textureEditorSizePixels;			//texture editor pixels
-	float			clpspc;			//clipboard fill spacing
-	TCHAR			desnam[50];		//designer name
+	unsigned short	dazpcnt;				//daisy heart count
+	unsigned short  textureEditorSizePixels;	//texture editor pixels
+	float			clpspc;					//clipboard fill spacing
+	TCHAR			desnam[50];				//designer name
 }INIFILE;
 
 enum {
@@ -1039,10 +1039,10 @@ typedef struct _featherInfo {
 	unsigned char	fillType;	//feather fill type
 	unsigned char	upCount;	//feather up count
 	unsigned char	downCount;	//feather down count
-	unsigned char	color;	//feather blend col
-	float			ratio;	//feather ratio
+	unsigned char	color;		//feather blend col
+	float			ratio;		//feather ratio
 	float			minStitchSize;	//feather floor
-	unsigned short	count; //feather fill psg granularity
+	unsigned short	count;		//feather fill psg granularity
 }FTHINFO;
 
 typedef struct _textureInfo {
@@ -1060,43 +1060,43 @@ typedef union _tfhed
 
 typedef struct _frmhed {
 
-	unsigned char	attribute;		//attribute
-	unsigned short	sides;	//number of sides
-	unsigned char	type;	//type
-	unsigned char	fillColor;	//fill color
-	unsigned char	borderColor;	//border color
-	unsigned short	nclp;	//number of border clipboard entries
-	fPOINT*			vertices;	//points
-	SATINANGLE		satinOrAngle;	//satin guidlines or angle clipboard fill angle
+	unsigned char	attribute;			//attribute
+	unsigned short	sides;				//number of sides
+	unsigned char	type;				//type
+	unsigned char	fillColor;			//fill color
+	unsigned char	borderColor;		//border color
+	unsigned short	nclp;				//number of border clipboard entries
+	fPOINT*			vertices;			//points
+	SATINANGLE		satinOrAngle;		//satin guidlines or angle clipboard fill angle
 	fPOINT*			borderClipboardData;	//border clipboard data
 	unsigned short	satinGuideCount;	//number of satin guidlines
-	unsigned short	wpar;	//clipboard/textured fill phase or satin connect end
-	fRECTANGLE		rectangle;	//rectangle
-	unsigned char	fillType;	//fill type
-	unsigned char	edgeType;	//edge type
-	float			fillSpacing;	//fill spacing
-	FLENCNT			lengthOrCount;//fill stitch length or clpboard count
+	unsigned short	wpar;				//clipboard/textured fill phase or satin connect end
+	fRECTANGLE		rectangle;			//rectangle
+	unsigned char	fillType;			//fill type
+	unsigned char	edgeType;			//edge type
+	float			fillSpacing;		//fill spacing
+	FLENCNT			lengthOrCount;		//fill stitch length or clpboard count
 	FANGCLP			angleOrClipData;	//fill angle or clpboard data pointer
-	float			borderSize;	//border size
-	float			edgeSpacing;	//edge spacing
-	float			edgeStitchLen;	//edge stitch length
-	unsigned short	picoLength;	//pico length
+	float			borderSize;			//border size
+	float			edgeSpacing;		//edge spacing
+	float			edgeStitchLen;		//edge stitch length
+	unsigned short	picoLength;			//pico length
 
 	unsigned		extendedAttribute;	//attribute extension
 	float			maxFillStitchLen;	//maximum fill stitch length
 	float			minFillStitchLen;	//minimum fill stitch length
 	float			maxBorderStitchLen;	//maximum border stitch length
 	float			minBorderStitchLen;	//minimum border stitch length
-	TFINFO			fillInfo;	//feather/texture info
-	unsigned short	fillStart;	//fill start point
-	unsigned short	fillEnd;	//fill end point
+	TFINFO			fillInfo;			//feather/texture info
+	unsigned short	fillStart;			//fill start point
+	unsigned short	fillEnd;			//fill end point
 	float			underlaySpacing;	//underlay spacing
 	float			underlayStitchLen;	//underlay stitch length
 	float			underlayStitchAngle;	//underlay stitch angle
-	float			underlayIndent;	//underlay/edge walk indent
-	float			txof;	//gradient end density
-	unsigned char	underlayColor;	//underlay color
-	unsigned char	cres;	//reserved
+	float			underlayIndent;		//underlay/edge walk indent
+	float			txof;				//gradient end density
+	unsigned char	underlayColor;		//underlay color
+	unsigned char	cres;				//reserved
 }FRMHED;
 
 //frmhed extended attribute bits
@@ -1112,49 +1112,43 @@ typedef struct _frmhed {
 #define AT_CWLK 256		//center walk
 
 typedef struct _frmclp {
-
 	unsigned	clipType;
 	unsigned	reserved;
 	FRMHED		form;
 }FORMCLIP; //form data clipboard header
 
 typedef struct _frmsclp {
-
 	unsigned		clipType;
 	unsigned short	formCount;
 	unsigned short	reserved;
 }FORMSCLIP; //multiple forms clipboard header
 
 typedef struct _fpclp {
-
 	unsigned		clipType;
 	unsigned short	pointCount;
 	BOOL			direction;
 }FORMPOINTCLIP; // form points clipboard header
 
 typedef struct _strhed {		//thred file header
-
 	unsigned		headerType;
-	unsigned		fileLength;	//length of strhed + length of stitch data
+	unsigned		fileLength;		//length of strhed + length of stitch data
 	unsigned short	stitchCount;	//number of stitches
-	unsigned short	hoopType;	//size of hup
-	unsigned short	formCount;	//number of forms
+	unsigned short	hoopType;		//size of hup
+	unsigned short	formCount;		//number of forms
 	unsigned short	FormPointsLen;	//points to form points
-	unsigned short	pointCount;	//number of form points
-	unsigned short	dlineLen;	//points to dline data
-	unsigned short	dlineCount;	//dline data count
+	unsigned short	pointCount;		//number of form points
+	unsigned short	dlineLen;		//points to dline data
+	unsigned short	dlineCount;		//dline data count
 	unsigned short	clipboardDataLen;	//points to clipboard data
 	unsigned short	clipboardDataCount;	//clipboard data count
 }STRHED;
 
-typedef struct _txpnt		//textured fill point
-{
+typedef struct _txpnt {	//textured fill point
 	float	y;
 	short	line;
 }TXPNT;
 
 typedef struct _strex {		//thred v1.0 file header extension
-
 	float		xhup;		//hoop size x dimension
 	float		yhup;		//hoop size y dimension
 	float		stgran;		//stitches per millimeter
@@ -1167,7 +1161,6 @@ typedef struct _strex {		//thred v1.0 file header extension
 }STREX;
 
 typedef struct _dsthed {		//dst file header
-
 	TCHAR desched	[3];	// 0 0		description
 	TCHAR desc		[17];	// 3 3
 	TCHAR recshed	[3];	// 20 14	redord count
@@ -1202,15 +1195,13 @@ typedef struct _dsthed {		//dst file header
 #define COLTYP 0x630000
 #define REGTYP 0x030000
 
-typedef struct _dstrec {		//dst stitch record
-
+typedef struct _dstrec {	//dst stitch record
 	TCHAR	led;
 	TCHAR	mid;
 	TCHAR	nd;
 }DSTREC;
 
 typedef struct _smalpntl {
-
 	unsigned short	lin;	//lin and grp must remain in this order for sort to work
 	unsigned short	grp;
 	float			x;
@@ -1218,7 +1209,6 @@ typedef struct _smalpntl {
 }SMALPNTL;
 
 typedef struct _pcstch {
-
 	unsigned char	fx;
 	short	x;
 	unsigned char	nx;
@@ -1229,7 +1219,6 @@ typedef struct _pcstch {
 }PCSTCH;
 
 typedef struct _clpstch {
-
 	unsigned short	led;
 	unsigned char	fx;
 	unsigned short	x;
@@ -1242,7 +1231,6 @@ typedef struct _clpstch {
 }CLPSTCH;
 
 typedef struct _bakhed {
-
 	unsigned	fcnt;
 	FRMHED*		frmp;
 	unsigned	scnt;
@@ -1260,25 +1248,21 @@ typedef struct _bakhed {
 }BAKHED;
 
 typedef struct _flsiz {
-
 	float	cx;
 	float	cy;
 }FLSIZ;
 
 typedef struct _range {
-
 	unsigned start;
 	unsigned finish;
 }RANGE;
 
 typedef struct _secnds {
-
 	unsigned ind;
 	unsigned flg;
 }SECNDS;
 
 typedef struct _region {	//region for sequencing vertical fills
-
 	unsigned start;		//start line of region
 	unsigned end;		//end line of region
 	unsigned brk;
@@ -1286,21 +1270,18 @@ typedef struct _region {	//region for sequencing vertical fills
 }REGION;
 
 typedef struct _rcon {		//pmap: path map for sequencing
-
 	unsigned short	vrt;
 	unsigned short	con;
 	unsigned short	grpn;
 }RCON;
 
 typedef struct _rgseq {		//tmpath: temporary path connections
-
 	unsigned	pcon;		//pointer to pmap entry
 	int			cnt;
 	TCHAR		skp;		//path not found
 }RGSEQ;
 
 typedef struct _fseq {		//mpath: path of sequenced regions
-
 	unsigned short	vrt;
 	unsigned short	grpn;
 	TCHAR			skp;	//path not found
@@ -1310,20 +1291,17 @@ typedef struct _fseq {		//mpath: path of sequenced regions
 #define SEQBOT 3
 
 typedef struct _bseqpnt {
-
 	float			x;
 	float			y;
 	char			attr;
 }BSEQPNT;
 
 typedef struct _pvec {
-
 	double	ang;
 	double	len;
 }PVEC;
 
 typedef struct _vrct2 {
-
 	dPOINT	aipnt;
 	dPOINT	aopnt;
 	dPOINT	bipnt;
@@ -1335,7 +1313,6 @@ typedef struct _vrct2 {
 }VRCT2;
 
 typedef struct _curs {
-
 	unsigned char frm[128];
 	unsigned char dlin[128];
 	unsigned char uned[128];
@@ -1347,7 +1324,6 @@ typedef struct _curs {
 
 //balarad file header
 typedef struct _balhed {
-
 	COLORREF		col[256];
 	unsigned		sig;
 	unsigned short	ver;
@@ -1359,7 +1335,6 @@ typedef struct _balhed {
 
 //balarad stitch
 typedef struct _balstch {
-
 	unsigned char	cod;
 	unsigned char	flg;
 	float			x;
@@ -1367,7 +1342,6 @@ typedef struct _balstch {
 }BALSTCH;
 
 typedef struct _clpseg {
-
 	unsigned		start;
 	float			blen;
 	unsigned		bind;
@@ -1380,7 +1354,6 @@ typedef struct _clpseg {
 }CLPSEG;
 
 typedef struct _clipsort {
-
 	float		seglen;
 	float		sidlen;
 	unsigned	lin;
@@ -1388,7 +1361,6 @@ typedef struct _clipsort {
 }CLIPSORT;
 
 typedef struct _clipnt {
-
 	float			x;
 	float			y;
 	unsigned short	sid;
@@ -1396,7 +1368,6 @@ typedef struct _clipnt {
 }CLIPNT;
 
 typedef struct _vclpx {
-
 	unsigned seg;
 	unsigned sid;
 }VCLPX;
@@ -1404,13 +1375,11 @@ typedef struct _vclpx {
 #if PESACT
 
 typedef struct _pesled {
-
 	TCHAR			ver[8];
 	unsigned		pec;
 }PESLED;
 
 typedef struct _peshed {
-
 	TCHAR	led[8];
 	TCHAR	off[3];
 	TCHAR	m1[13];
@@ -1426,7 +1395,6 @@ typedef struct _peshed {
 }PESHED;
 
 typedef struct _pestch {
-
 	short x;
 	short y;
 }PESTCH;
@@ -1434,19 +1402,16 @@ typedef struct _pestch {
 #endif
 
 typedef struct _trcpnt {
-
 	SHORT x;
 	SHORT y;
 }TRCPNT;
 
 typedef struct _txtmsg {
-
 	unsigned	cod;
 	TCHAR*		str;
 }TXTMSG;
 
 typedef struct _grdcod {
-
 	unsigned id;
 	unsigned col;
 }GRDCOD;
@@ -1455,7 +1420,6 @@ typedef struct _grdcod {
 
 //form types
 enum {
-
 	LIN = 1u,
 	POLI,
 	RPOLI,
@@ -1473,7 +1437,6 @@ enum {
 
 //main menu items
 enum {
-
 	M_FILE,
 	M_VIEW,
 	M_FORM,
@@ -1497,7 +1460,6 @@ enum {
 
 //fill menu items
 enum {
-
 	MFIL_SAT,
 	MFIL_VERT,
 	MFIL_HOR,
@@ -1510,7 +1472,6 @@ enum {
 
 //view menu items
 enum {
-
 	MVU_MOV,
 	MVU_SET,
 	MVU_BAK,
@@ -1526,7 +1487,6 @@ enum {
 
 //clipboard data types
 enum {
-
 	CLP_STCH = 1,
 	CLP_FRM,
 	CLP_FRMS,
@@ -1535,7 +1495,6 @@ enum {
 
 //edge fill types
 enum {
-
 	EGLIN = 1,
 	EGBLD,
 	EGCLP,
@@ -1557,7 +1516,6 @@ enum {
 
 //form data lines
 enum {
-
 	LFRM,			//form 0
 	LLAYR,			//layer 1
 	LFRMFIL,		//form fill 2	
@@ -1612,7 +1570,6 @@ enum {
 
 //fill types
 enum {
-
 	VRTF = 1,
 	HORF,
 	ANGF,
@@ -1634,7 +1591,6 @@ enum {
 
 //preference window
 enum {
-
 	PSPAC,	//0
 	PANGL,	//1
 	PSQR,	//2
@@ -1667,7 +1623,6 @@ enum {
 
 //file menu items
 enum {
-
 	FM_NEW,
 	FM_OPEN,
 	FM_CLOS,
@@ -1691,7 +1646,6 @@ enum {
 
 //fill message codes
 enum {
-
 	FMM_FAN,
 	FMM_VRT,
 	FMM_HOR,
@@ -1713,7 +1667,6 @@ enum {
 
 //button windows
 enum {
-
 	HBOXSEL,
 	HUPTO,
 	HHID,
@@ -1725,8 +1678,7 @@ enum {
 	HLAYR
 };
 
-enum	//text button windows
-{
+enum	{ //text button windows
 	HTXCLR,
 	HTXHI,
 	HTXWID,
@@ -1739,8 +1691,7 @@ enum	//text button windows
 
 #define HLIN  HNUM
 
-typedef struct _orec
-{
+typedef struct _orec {
 	unsigned 	start;
 	unsigned 	finish;
 	fPOINTATTRIBUTE*	spnt;
@@ -1751,8 +1702,7 @@ typedef struct _orec
 	unsigned	otyp;
 }OREC;
 
-typedef struct _srtrec
-{
+typedef struct _srtrec	{
 	unsigned start;
 	unsigned finish;
 	unsigned cnt;
@@ -1760,8 +1710,7 @@ typedef struct _srtrec
 	BOOL	 dir;
 }SRTREC;
 
-typedef struct _fstrts
-{
+typedef struct _fstrts	{
 	unsigned apl;
 	unsigned fil;
 	unsigned fth;
@@ -1784,8 +1733,7 @@ typedef struct _fstrts
 #define M_FTHCOL 1024
 #define M_ECOL   2048
 
-typedef struct _frmlim
-{
+typedef struct _frmlim	{
 	unsigned apstrt;
 	unsigned apend;
 	unsigned cstrt;
@@ -1800,24 +1748,21 @@ typedef struct _frmlim
 	unsigned bend;
 }FRMLIM;
 
-typedef struct _insrec
-{
+typedef struct _insrec	{
 	unsigned cod;
 	unsigned col;
 	unsigned ind;
 	unsigned seq;
 }INSREC;
 
-enum	//interleave sequence identifiers
-{
+enum	{	//interleave sequence identifiers
 	I_AP,
 	I_FIL,
 	I_FTH,
 	I_BRD,
 };
 
-typedef struct _intinf
-{
+typedef struct _intinf {
 	unsigned pins;
 	unsigned coloc;
 	unsigned laycod;
@@ -1826,8 +1771,7 @@ typedef struct _intinf
 	fPOINTATTRIBUTE* histch;
 }INTINF;
 
-typedef struct _txtscr
-{
+typedef struct _txtscr	{
 	int		top;	//pixel top line
 	int		bot;	//pixel bottom line
 	int		hi;		//pixel height of area
@@ -1845,16 +1789,14 @@ typedef struct _txtscr
 }TXTSCR;
 
 
-typedef struct _txtrct
-{
+typedef struct _txtrct	{
 	short lft;
 	short rit;
 	float top;
 	float bot;
 }TXTRCT;
 
-typedef struct _txhst
-{
+typedef struct _txhst	{
 	TXPNT*	txp;
 	int		cnt;
 	float	hi;
@@ -1862,8 +1804,7 @@ typedef struct _txhst
 	float	spac;
 }TXHST;
 
-typedef struct _rngcnt
-{
+typedef struct _rngcnt	{
 	int	lin;
 	int	cnt;
 }RNGCNT;
@@ -1873,8 +1814,7 @@ typedef struct _rngcnt
 #define BADSAT	  4
 #define BADTX	  8
 
-typedef struct _badcnts
-{
+typedef struct _badcnts	{
 	unsigned at;
 	int flt;
 	int clp;
