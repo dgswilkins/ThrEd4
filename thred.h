@@ -679,103 +679,103 @@ enum {			//feather fill types
 #pragma pack(1)
 
 //pcs file header structure
-typedef struct _hed {
+typedef struct _pcsheader {
 
 	TCHAR			ledIn;
-	TCHAR			hup;
-	unsigned short	fColCnt;
-	COLORREF		fCols[16];
-	unsigned short	stchs;
-}HED;
+	TCHAR			hoopType;
+	unsigned short	colorCount;
+	COLORREF		colors[16];
+	unsigned short	stitchCount;
+}PCSHEADER;
 
 //ini file structure
 typedef struct _iniFil {
 
 	TCHAR			defDir[180];	//default directory
-	COLORREF		stchCols[16];	//colors
-	COLORREF		selStch[16];	//stich preference colors
-	COLORREF		bakCol[16];		//background preference colors
-	COLORREF		stchBak;		//background color
-	COLORREF		bitCol;			//bitmap color
-	double			minsiz;			//minimum stitch length
-	double			shopnts;		//show stitch points 
-	double			tsiz30;			//millimeter size of 30 weight thread
-	double			tsiz40;			//millimeter size of 40 weight thread
-	double			tsiz60;			//millimeter size of 60 weight thread
-	double			usesiz;			//user stitch length
-	double			maxsiz;			//maximum stitch length
-	double			smalsiz;		//small stitch size
-	double			stchboxs;		//show sitch box level
-	double			stspace;		//stitch spacing between lines of stitches
-	double			angl;			//fill angle
-	unsigned		umap;			//bitmap
-	double			brdwid;			//border width
-	unsigned		apcol;			//applique color
+	COLORREF		stitchColors[16];	//colors
+	COLORREF		stitchPreferredColors[16];	//stich preference colors
+	COLORREF		backgroundPreferredColors[16];		//background preference colors
+	COLORREF		backgroundColor;		//background color
+	COLORREF		bitmapColor;			//bitmap color
+	double			minStitchLength;			//minimum stitch length
+	double			showStitchPoints;		//show stitch points 
+	double			threadSize30;			//millimeter size of 30 weight thread
+	double			threadSize40;			//millimeter size of 40 weight thread
+	double			threadSize60;			//millimeter size of 60 weight thread
+	double			userStitchLength;			//user stitch length
+	double			maxStitchLength;			//maximum stitch length
+	double			smallStitchLength;		//small stitch size
+	double			StitchBoxesThreshold;		//show sitch box level
+	double			StitchSpace;		//stitch spacing between lines of stitches
+	double			fillAngle;			//fill angle
+	unsigned		binaryVariableBitmap;			//bitmap
+	double			borderWidth;			//border width
+	unsigned		underlayColor;			//applique color
 	TCHAR			oldnams[OLDNUM][_MAX_PATH];	//last file names
-	double			snplen;			//snap together length
-	double			starat;			//star ratio
-	double			spirwrap;		//sprial wrap
-	COLORREF		bakBit[16];		//bitmap background color preferences
-	double			bfclen;			//buttonhole fill corner length		
-	float			picspac;		//space between border picots
-	TCHAR			hup;			//hoop type
+	double			snapLength;			//snap together length
+	double			starRatio;			//star ratio
+	double			spiralWrap;		//sprial wrap
+	COLORREF		bitmapBackgroundColors[16];		//bitmap background color preferences
+	double			buttonholeFillCornerLength;			//buttonhole fill corner length		
+	float			picotSpace;		//space between border picots
+	TCHAR			hoopType;			//hoop type
 	TCHAR			auxfil;			//machine file type
-	float			hupx;			//hoop x size
-	float			hupy;			//hoop y size
-	double			rotang;			//rotation angle
-	float			grdsiz;			//grid size
-	float			clpof;			//clipboard offset
-	RECT			irct;			//initial window coordinates
-	COLORREF		grdbak;			//grid color
-	unsigned		faz;			//clipboard fill phase
-	float			xcust;			//custom hoop width
-	float			ycust;			//custom hoop heigth
+	float			hoopSizeX;			//hoop x size
+	float			hoopSizeY;			//hoop y size
+	double			rotationAngle;			//rotation angle
+	float			gridSize;			//grid size
+	float			clipboardOffset;			//clipboard offset
+	RECT			initialWindowCoords;			//initial window coordinates
+	COLORREF		gridColor;			//grid color
+	unsigned		fillPhase;			//clipboard fill phase
+	float			customHoopX;			//custom hoop width
+	float			customHoopY;			//custom hoop heigth
 	float			trlen;			//lens points
-	double			trcrat;			//trace ratio
-	float			chspac;			//chain space
-	float			chrat;			//chain ratio
-	float			nudg;			//cursor nudge step
-	unsigned short  nudgpix;		//nudge pixels
-	float			egrat;			//egg ratio
-	unsigned short	stchpix;		//size of stitch points in pixels
-	unsigned short	frmpix;			//size of form points in pixels
-	unsigned short	nsids;			//sides of a created form
-	float			tearat;			//length of the tear tail
-	float			twststp;		//tear twist step
-	float			twstrat;		//tear twist ratio
-	unsigned short	wavpnts;		//wave points
-	unsigned short	wavstrt;		//wave strting point
-	unsigned short	wavend;			//wave ending point;
-	unsigned short	wavs;			//wave lobes
-	unsigned char	fthtyp;			//feather fill type
-	unsigned char	fthup;			//feather up count
-	unsigned char	fthdwn;			//feather down count
-	unsigned char	fthbits;		//feather bits
-	float			fthrat;			//feather ratio
-	float			fthflr;			//feather floor
-	unsigned short	fthnum;			//feather fill psg granularity
+	double			traceRatio;			//trace ratio
+	float			chainSpace;			//chain space
+	float			chainRatio;			//chain ratio
+	float			cursorNudgeStep;			//cursor nudge step
+	unsigned short  nudgePixels;		//nudge pixels
+	float			eggRatio;			//egg ratio
+	unsigned short	stitchSizePixels;		//size of stitch points in pixels
+	unsigned short	formPointSizePixels;			//size of form points in pixels
+	unsigned short	formSides;			//sides of a created form
+	float			tearTailLength;			//length of the tear tail
+	float			tearTwistStep;		//tear twist step
+	float			tearTwistRatio;		//tear twist ratio
+	unsigned short	wavePoints;		//wave points
+	unsigned short	waveStart;		//wave strting point
+	unsigned short	waveEnd;			//wave ending point;
+	unsigned short	waveLobes;			//wave lobes
+	unsigned char	featherFillType;			//feather fill type
+	unsigned char	featherUpCount;			//feather up count
+	unsigned char	featherDownCount;			//feather down count
+	unsigned char	featherType;		//feather bits
+	float			featherRatio;			//feather ratio
+	float			featherMinStitchSize;			//feather floor
+	unsigned short	featherCount;			//feather fill psg granularity
 	TCHAR			p2cnam[_MAX_PATH];	//pes2card file
-	float			wind;			//edge walk/underlay indent
-	float			uang;			//underlay angle
-	float			uspac;			//underlay spacing
-	float			ulen;			//underlay stitch length
-	float			dazlen;			//daisy diameter
-	float			dazplen;		//daisy petal length
-	float			dazhlen;		//daisy hole diameter
-	unsigned		dazpet;			//daisy petals
+	float			underlayIndent;			//edge walk/underlay indent
+	float			underlayAngle;			//underlay angle
+	float			underlaySpacing;			//underlay spacing
+	float			underlayStitchLen;			//underlay stitch length
+	float			daisyDiameter;			//daisy diameter
+	float			daisyPetalLen;		//daisy petal length
+	float			daisyHoleDiameter;		//daisy hole diameter
+	unsigned		daisyPetalCount;			//daisy petals
 	unsigned		dazcnt;			//daisy petal points
 	unsigned		dazicnt;		//daisy inner count
-	unsigned char	daztyp;			//daisy border type
-	unsigned char	dchk;			//data check
-	float			txthi;			//textured fill height
-	float			txtwid;			//textured fill width
-	float			txtspac;		//textured fill spacing
-	unsigned short	frmbpix;		//form box pixels
+	unsigned char	daisyBorderType;			//daisy border type
+	unsigned char	dataCheck;			//data check
+	float			textureHeight;			//textured fill height
+	float			textureWidth;			//textured fill width
+	float			textureSpacing;		//textured fill spacing
+	unsigned short	formBoxSizePixels;		//form box pixels
 	unsigned short	dazpcnt;		//daisy heart count
-	unsigned short  txtx;			//texture editor pixels
+	unsigned short  textureEditorSizePixels;			//texture editor pixels
 	float			clpspc;			//clipboard fill spacing
 	TCHAR			desnam[50];		//designer name
-}INIFIL;
+}INIFILE;
 
 enum {
 
@@ -784,50 +784,50 @@ enum {
 	AUXPES
 };
 
-typedef struct _rngc {
+typedef struct _formPoints {
 
-	unsigned strt;
-	unsigned cnt;
-	unsigned fin;
-	unsigned frm;
-}RNGC;
+	unsigned start;
+	unsigned pointCount;
+	unsigned finish;
+	unsigned form;
+}FORMPOINTS;
 
-typedef struct _dubpnt {
+typedef struct _doublePoint {
 
 	double x;
 	double y;
 
-}DUBPNT;
+}dPOINT;
 
-typedef struct _dubpntl {
+typedef struct _doublePointLine {
 
 	double			x;
 	double			y;
 	unsigned short lin;
 
-}DUBPNTL;
+}dPOINTLINE;
 
-typedef struct _frct {
+typedef struct _doublerectangle {
 
 	double top;
 	double bottom;
 	double left;
 	double right;
 
-}FRCT;
+}dRECTANGLE;
 
 typedef struct _colChng {
 
-	unsigned short stind;	//stich index
-	unsigned short colind;	//color index
+	unsigned short stitchIndex;	//stich index
+	unsigned short colorIndex;	//color index
 }COLCHNG;
 
-typedef struct _SHRTPNT {
+typedef struct _fPointAttribute {
 
 	float		x;
 	float		y;
-	unsigned	at;
-}SHRTPNT;
+	unsigned	attribute;
+}fPOINTATTRIBUTE;
 
 #define COLMSK		0x0000000f
 #define NCOLMSK		0xfffffff0
@@ -871,7 +871,7 @@ typedef struct _SHRTPNT {
 #define NOTFRM		0x00080000
 
 /*
-bit definitions for SHRTPNT.at
+bit definitions for fPOINTATTRIBUTE.at
 0-3		stitch color
 4-14	form pointer
 15-18	spares
@@ -891,71 +891,63 @@ bit definitions for SHRTPNT.at
 #define FRMBFIL		0x40000000
 #define FRMAPFIL	0x60000000
 
-typedef struct _flpnt {
+typedef struct _floatPoint {
 
 	float x;
 	float y;
-}FLPNT;
+}fPOINT;
 
-typedef struct _flrct {
+typedef struct _floatRectangle {
 
 	float top;
 	float left;
 	float right;
 	float bottom;
-}FLRCT;
+}fRECTANGLE;
 
-typedef struct _dubct {
+typedef struct _forminfo {
 
-	double top;
-	double left;
-	double right;
-	double bottom;
-}DUBRCT;
-
-typedef struct _frminfo {
-
-	unsigned	typ;
-	unsigned	at;
-	unsigned	sids;
-}FRMINFO;
+	unsigned	type;
+	unsigned	attribute;
+	unsigned	sideCount;
+}FORMINFO;
 
 typedef struct _satcon {
 
-	unsigned short strt;
-	unsigned short fin;
+	unsigned short start;
+	unsigned short finish;
 }SATCON;
 
 typedef union _fangclp {
 
 	float		fang;
-	FLPNT*		clp;
+	fPOINT*		clp;
 	SATCON		sat;
 }FANGCLP;
 
 typedef union _flencnt {
 
-	float		flen;
-	unsigned	nclp;
+	float		stitchLength;
+	unsigned	clipCount;
 }FLENCNT;
 
-typedef union _sacang {
+typedef union _satinOrAngle {
 
 	SATCON*	sac;
-	float	ang;
-}SACANG;
+	float	angle;
+}SATINANGLE;
 
 /*
-	fill	elen	espac	esiz	nclp	picspac		crnrsiz		brdend
+	fill	elen	espac	esiz	clipCount	picspac		crnrsiz		brdend
 
 	EGLIN	elen
 	EGBLD	elen
-	EGCLP							nclp
+	EGCLP							clipCount
 	EGSAT	elen	espac	esiz									at
 	EGAP	elen	espac	esiz									at
 	EGPRP	elen	espac	esiz									at
-	EGHOL	elen	espac	esiz						nclp,res
-	EGPIC	elen			esiz	nclp	espac		res
+	EGHOL	elen	espac	esiz						clipCount,res
+	EGPIC	elen			esiz	clipCount	espac		res
 */
 
 #define	BELEN		1
@@ -993,6 +985,7 @@ typedef union _sacang {
 #define EGPIC_LINS	7
 #define EGCHN_LINS	6
 
+// ToDo - Is this structure valid and should it be used?
 typedef struct _frmhedo {
 
 	unsigned char	at;		//attribute
@@ -1001,12 +994,12 @@ typedef struct _frmhedo {
 	unsigned char	fcol;	//fill color
 	unsigned char	bcol;	//border color
 	unsigned short	nclp;	//number of border clipboard entries
-	FLPNT*			flt;	//points
-	SACANG			sacang;	//satin guidlines or angle clipboard fill angle
-	FLPNT*			clp;	//border clipboard data
+	fPOINT*			flt;	//points
+	SATINANGLE		sacang;	//satin guidlines or angle clipboard fill angle
+	fPOINT*			clp;	//border clipboard data
 	unsigned short	stpt;	//number of satin guidlines
 	unsigned short	wpar;	//word parameter
-	FLRCT			rct;	//rectangle
+	fRECTANGLE		rct;	//rectangle
 	unsigned char	ftyp;	//fill type
 	unsigned char	etyp;	//edge type
 	float			fspac;	//fill spacing
@@ -1042,69 +1035,67 @@ typedef struct _frmhedo {
 #define FRECONT		0x80
 #define NFRECONT	0x7f
 
-typedef struct _fthed
-{
-	unsigned char	fthtyp;	//feather fill type
-	unsigned char	fthup;	//feather up count
-	unsigned char	fthdwn;	//feather down count
-	unsigned char	fthcol;	//feather blend col
-	float			fthrat;	//feather ratio
-	float			fthflr;	//feather floor
-	unsigned short	fthnum; //feather fill psg granularity
-}FTHED;
+typedef struct _featherInfo {
+	unsigned char	fillType;	//feather fill type
+	unsigned char	upCount;	//feather up count
+	unsigned char	downCount;	//feather down count
+	unsigned char	color;	//feather blend col
+	float			ratio;	//feather ratio
+	float			minStitchSize;	//feather floor
+	unsigned short	count; //feather fill psg granularity
+}FTHINFO;
 
-typedef struct _txhed
-{
-	short			lins;
-	unsigned short	ind;
-	unsigned short	cnt;
-	float			hi;
-}TXHED;
+typedef struct _textureInfo {
+	short			lines;
+	unsigned short	index;
+	unsigned short	count;
+	float			height;
+}TXTRINFO;
 
 typedef union _tfhed
 {
-	FTHED	fth;
-	TXHED	txt;
-}TFHED;
+	FTHINFO	feather;
+	TXTRINFO	texture;
+}TFINFO;
 
 typedef struct _frmhed {
 
-	unsigned char	at;		//attribute
-	unsigned short	sids;	//number of sides
-	unsigned char	typ;	//type
-	unsigned char	fcol;	//fill color
-	unsigned char	bcol;	//border color
+	unsigned char	attribute;		//attribute
+	unsigned short	sides;	//number of sides
+	unsigned char	type;	//type
+	unsigned char	fillColor;	//fill color
+	unsigned char	borderColor;	//border color
 	unsigned short	nclp;	//number of border clipboard entries
-	FLPNT*			flt;	//points
-	SACANG			sacang;	//satin guidlines or angle clipboard fill angle
-	FLPNT*			clp;	//border clipboard data
-	unsigned short	stpt;	//number of satin guidlines
+	fPOINT*			vertices;	//points
+	SATINANGLE		satinOrAngle;	//satin guidlines or angle clipboard fill angle
+	fPOINT*			borderClipboardData;	//border clipboard data
+	unsigned short	satinGuideCount;	//number of satin guidlines
 	unsigned short	wpar;	//clipboard/textured fill phase or satin connect end
-	FLRCT			rct;	//rectangle
-	unsigned char	ftyp;	//fill type
-	unsigned char	etyp;	//edge type
-	float			fspac;	//fill spacing
-	FLENCNT			flencnt;//fill stitch length or clpboard count
-	FANGCLP			angclp;	//fill angle or clpboard data pointer
-	float			esiz;	//border size
-	float			espac;	//edge spacing
-	float			elen;	//edge stitch length
-	unsigned short	res;	//pico length
+	fRECTANGLE		rectangle;	//rectangle
+	unsigned char	fillType;	//fill type
+	unsigned char	edgeType;	//edge type
+	float			fillSpacing;	//fill spacing
+	FLENCNT			lengthOrCount;//fill stitch length or clpboard count
+	FANGCLP			angleOrClipData;	//fill angle or clpboard data pointer
+	float			borderSize;	//border size
+	float			edgeSpacing;	//edge spacing
+	float			edgeStitchLen;	//edge stitch length
+	unsigned short	picoLength;	//pico length
 
-	unsigned		xat;	//attribute extension
-	float			fmax;	//maximum fill stitch length
-	float			fmin;	//minimum fill stitch length
-	float			emax;	//maximum border stitch length
-	float			emin;	//minimum border stitch length
-	TFHED			dhx;	//feather/texture info
-	unsigned short	strt;	//fill strt point
-	unsigned short	end;	//fill end point
-	float			uspac;	//underlay spacing
-	float			ulen;	//underlay stitch length
-	float			uang;	//underlay stitch angle
-	float			wind;	//underlay/edge walk indent
+	unsigned		extendedAttribute;	//attribute extension
+	float			maxFillStitchLen;	//maximum fill stitch length
+	float			minFillStitchLen;	//minimum fill stitch length
+	float			maxBorderStitchLen;	//maximum border stitch length
+	float			minBorderStitchLen;	//minimum border stitch length
+	TFINFO			fillInfo;	//feather/texture info
+	unsigned short	fillStart;	//fill start point
+	unsigned short	fillEnd;	//fill end point
+	float			underlaySpacing;	//underlay spacing
+	float			underlayStitchLen;	//underlay stitch length
+	float			underlayStitchAngle;	//underlay stitch angle
+	float			underlayIndent;	//underlay/edge walk indent
 	float			txof;	//gradient end density
-	unsigned char	ucol;	//underlay color
+	unsigned char	underlayColor;	//underlay color
 	unsigned char	cres;	//reserved
 }FRMHED;
 
@@ -1122,44 +1113,44 @@ typedef struct _frmhed {
 
 typedef struct _frmclp {
 
-	unsigned	led;
-	unsigned	res;
-	FRMHED		frm;
-}FRMCLP;
+	unsigned	clipType;
+	unsigned	reserved;
+	FRMHED		form;
+}FORMCLIP; //form data clipboard header
 
 typedef struct _frmsclp {
 
-	unsigned		led;
-	unsigned short	cnt;
-	unsigned short	res;
-}FRMSCLP;
+	unsigned		clipType;
+	unsigned short	formCount;
+	unsigned short	reserved;
+}FORMSCLIP; //multiple forms clipboard header
 
 typedef struct _fpclp {
 
-	unsigned		led;
-	unsigned short	cnt;
-	BOOL			dir;
-}FPCLP;
+	unsigned		clipType;
+	unsigned short	pointCount;
+	BOOL			direction;
+}FORMPOINTCLIP; // form points clipboard header
 
 typedef struct _strhed {		//thred file header
 
-	unsigned		led;
-	unsigned		len;	//length of strhed + length of stitch data
-	unsigned short	stchs;	//number of stitches
-	unsigned short	hup;	//size of hup
-	unsigned short	fpnt;	//number of forms
-	unsigned short	fpnts;	//points to form points
-	unsigned short	fcnt;	//number of form points
-	unsigned short	spnts;	//points to dline data
-	unsigned short	scnt;	//dline data count
-	unsigned short	epnts;	//points to clipboard data
-	unsigned short	ecnt;	//clipboard data count
+	unsigned		headerType;
+	unsigned		fileLength;	//length of strhed + length of stitch data
+	unsigned short	stitchCount;	//number of stitches
+	unsigned short	hoopType;	//size of hup
+	unsigned short	formCount;	//number of forms
+	unsigned short	FormPointsLen;	//points to form points
+	unsigned short	pointCount;	//number of form points
+	unsigned short	dlineLen;	//points to dline data
+	unsigned short	dlineCount;	//dline data count
+	unsigned short	clipboardDataLen;	//points to clipboard data
+	unsigned short	clipboardDataCount;	//clipboard data count
 }STRHED;
 
 typedef struct _txpnt		//textured fill point
 {
 	float	y;
-	short	lin;
+	short	line;
 }TXPNT;
 
 typedef struct _strex {		//thred v1.0 file header extension
@@ -1177,32 +1168,32 @@ typedef struct _strex {		//thred v1.0 file header extension
 
 typedef struct _dsthed {		//dst file header
 
-	TCHAR desched[3];	// 0 0		description
-	TCHAR desc[17];	// 3 3
-	TCHAR recshed[3];	// 20 14	redord count
-	TCHAR recs[8];	// 23 17
-	TCHAR cohed[3];	// 31 1F
-	TCHAR co[4];	// 34 22
-	TCHAR xplushed[3];	// 38 26	x+ size
-	TCHAR xplus[6];	// 41 29
-	TCHAR xminhed[3];	// 47 2F	x- size
-	TCHAR xmin[6];	// 50 32
-	TCHAR yplushed[3];	// 56 38
-	TCHAR yplus[6];	// 59 3B	y+ size
-	TCHAR yminhed[3];	// 65 41
-	TCHAR ymin[6];	// 68 44	y- size
-	TCHAR axhed[3];	// 74 4A
-	TCHAR ax[7];	// 77 4D
-	TCHAR ayhed[3];	// 84 54
-	TCHAR ay[7];	// 87 57
-	TCHAR mxhed[3];	// 94 5E
-	TCHAR mx[7];	// 97 61
-	TCHAR myhed[3];	// 104 68
-	TCHAR my[7];	// 107 6B
-	TCHAR pdhed[2];	// 114 72
-	TCHAR pd[7];	// 116 74
-	TCHAR eof[1];	// 123 7B
-	TCHAR res[388];	// 124 7C
+	TCHAR desched	[3];	// 0 0		description
+	TCHAR desc		[17];	// 3 3
+	TCHAR recshed	[3];	// 20 14	redord count
+	TCHAR recs		[8];	// 23 17
+	TCHAR cohed		[3];	// 31 1F
+	TCHAR co		[4];	// 34 22
+	TCHAR xplushed	[3];	// 38 26	x+ size
+	TCHAR xplus		[6];	// 41 29
+	TCHAR xminhed	[3];	// 47 2F	x- size
+	TCHAR xmin		[6];	// 50 32
+	TCHAR yplushed	[3];	// 56 38
+	TCHAR yplus		[6];	// 59 3B	y+ size
+	TCHAR yminhed	[3];	// 65 41
+	TCHAR ymin		[6];	// 68 44	y- size
+	TCHAR axhed		[3];	// 74 4A
+	TCHAR ax		[7];	// 77 4D
+	TCHAR ayhed		[3];	// 84 54
+	TCHAR ay		[7];	// 87 57
+	TCHAR mxhed		[3];	// 94 5E
+	TCHAR mx		[7];	// 97 61
+	TCHAR myhed		[3];	// 104 68
+	TCHAR my		[7];	// 107 6B
+	TCHAR pdhed		[2];	// 114 72
+	TCHAR pd		[7];	// 116 74
+	TCHAR eof		[1];	// 123 7B
+	TCHAR res		[388];	// 124 7C
 }DSTHED;
 
 //dst type masks
@@ -1255,13 +1246,13 @@ typedef struct _bakhed {
 	unsigned	fcnt;
 	FRMHED*		frmp;
 	unsigned	scnt;
-	SHRTPNT*	stch;
+	fPOINTATTRIBUTE*	stch;
 	unsigned	fltcnt;
-	FLPNT*		flt;
+	fPOINT*		flt;
 	unsigned	sacnt;
 	SATCON*		sac;
 	unsigned	nclp;
-	FLPNT*		clp;
+	fPOINT*		clp;
 	COLORREF*	cols;
 	TXPNT*		txp;
 	unsigned	ntx;
@@ -1274,17 +1265,11 @@ typedef struct _flsiz {
 	float	cy;
 }FLSIZ;
 
-typedef struct _ord {
+typedef struct _range {
 
-	unsigned ind;
-	unsigned strt;
-}ORD;
-
-typedef struct _rang {
-
-	unsigned strt;
-	unsigned fin;
-}RANG;
+	unsigned start;
+	unsigned finish;
+}RANGE;
 
 typedef struct _secnds {
 
@@ -1292,13 +1277,13 @@ typedef struct _secnds {
 	unsigned flg;
 }SECNDS;
 
-typedef struct _rgn {	//region for sequencing vertical fills
+typedef struct _region {	//region for sequencing vertical fills
 
-	unsigned strt;		//start line of region
+	unsigned start;		//start line of region
 	unsigned end;		//end line of region
 	unsigned brk;
 	unsigned cntbrk;
-}RGN;
+}REGION;
 
 typedef struct _rcon {		//pmap: path map for sequencing
 
@@ -1339,14 +1324,14 @@ typedef struct _pvec {
 
 typedef struct _vrct2 {
 
-	DUBPNT	aipnt;
-	DUBPNT	aopnt;
-	DUBPNT	bipnt;
-	DUBPNT	bopnt;
-	DUBPNT	cipnt;
-	DUBPNT	copnt;
-	DUBPNT	dipnt;
-	DUBPNT	dopnt;
+	dPOINT	aipnt;
+	dPOINT	aopnt;
+	dPOINT	bipnt;
+	dPOINT	bopnt;
+	dPOINT	cipnt;
+	dPOINT	copnt;
+	dPOINT	dipnt;
+	dPOINT	dopnt;
 }VRCT2;
 
 typedef struct _curs {
@@ -1383,11 +1368,11 @@ typedef struct _balstch {
 
 typedef struct _clpseg {
 
-	unsigned		strt;
+	unsigned		start;
 	float			blen;
 	unsigned		bind;
 	unsigned short	asid;
-	unsigned		fin;
+	unsigned		finish;
 	float			elen;
 	unsigned		eind;
 	unsigned short	zsid;
@@ -1399,7 +1384,7 @@ typedef struct _clipsort {
 	float		seglen;
 	float		sidlen;
 	unsigned	lin;
-	FLPNT		pnt;
+	fPOINT		pnt;
 }CLIPSORT;
 
 typedef struct _clipnt {
@@ -1453,12 +1438,6 @@ typedef struct _trcpnt {
 	SHORT x;
 	SHORT y;
 }TRCPNT;
-
-typedef struct _trcseg {
-
-	unsigned	strt;
-	unsigned	clos;
-}TRCSEG;
 
 typedef struct _txtmsg {
 
@@ -1762,10 +1741,10 @@ enum	//text button windows
 
 typedef struct _orec
 {
-	unsigned 	strt;
-	unsigned 	fin;
-	SHRTPNT*	spnt;
-	SHRTPNT*	epnt;
+	unsigned 	start;
+	unsigned 	finish;
+	fPOINTATTRIBUTE*	spnt;
+	fPOINTATTRIBUTE*	epnt;
 	unsigned 	col;
 	unsigned 	typ;
 	unsigned 	frm;
@@ -1774,8 +1753,8 @@ typedef struct _orec
 
 typedef struct _srtrec
 {
-	unsigned strt;
-	unsigned fin;
+	unsigned start;
+	unsigned finish;
 	unsigned cnt;
 	unsigned loc;
 	BOOL	 dir;
@@ -1844,7 +1823,7 @@ typedef struct _intinf
 	unsigned laycod;
 	unsigned sloc;
 	unsigned oloc;
-	SHRTPNT* histch;
+	fPOINTATTRIBUTE* histch;
 }INTINF;
 
 typedef struct _txtscr
@@ -1862,7 +1841,7 @@ typedef struct _txtscr
 	float	spac;	//edit space between lines
 	short	lins;	//number of lines
 	double	ed2px;	//edit to pixel ratio
-	FLPNT	mid;	//middle of the form
+	fPOINT	mid;	//middle of the form
 }TXTSCR;
 
 

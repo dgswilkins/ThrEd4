@@ -14,39 +14,35 @@ extern void				movStch();
 extern void				rstAll();
 extern void				okcan();
 
-extern POINT			zum0;
-extern HED				hed;
+extern POINT			unzoomedRect;
+extern PCSHEADER				hed;
 extern unsigned			delpnt;
 extern TCHAR			homdir[_MAX_PATH];
 extern TCHAR			filnam[_MAX_PATH];
 extern unsigned			setMap(unsigned bPnt);
 extern HWND				hStch;
 extern HINSTANCE		hInst;
-extern RECT				sRct;
 extern HWND				hWnd;
 extern TCHAR			msgbuf[MSGSIZ];
 extern unsigned			buttonWid3;
 extern MSG				msg;
 extern unsigned			buttonHi;
-extern POINT			stOrg;
-extern unsigned			formpnt;
-extern unsigned			fselpnt;
+extern unsigned			formIndex;
+extern unsigned			selectedFormCount;
 extern FRMHED*			frmpnt;
-extern FRMHED			formlst[MAXFORMS];
-extern unsigned			clofind;
-extern HDC				rsdc;
+extern FRMHED			formList[MAXFORMS];
+extern unsigned			closestFormToCursor;
 extern RECT				scRct;
 extern HWND				hVrt;
-extern double			zumFct;
 extern unsigned			rstMap(unsigned bPnt);
 extern DRAWITEMSTRUCT	*ds;
-extern FLPNT			oseq[OSEQLEN];
+extern fPOINT			oseq[OSEQLEN];
 extern BSEQPNT			bseq[BSEQLEN];
-extern INIFIL			ini;
+extern INIFILE			ini;
 extern HWND				hBar;
 extern TCHAR*			phom;
 extern TCHAR			thrnam[_MAX_PATH];
-extern HDC				sdc;
+extern HDC				StitchWindowMemDC;
 extern long				prfwid;
 extern HWND				hbuts[9];
 extern void				numWnd();
@@ -247,7 +243,7 @@ void hsizmsg()
 	TCHAR buf[HBUFSIZ];
 
 	LoadString(hInst, IDS_HSIZ, buf, HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, zum0.x / PFGRAN, zum0.y / PFGRAN);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, unzoomedRect.x / PFGRAN, unzoomedRect.y / PFGRAN);
 	shoMsg(hlpbuf);
 }
 
@@ -390,7 +386,7 @@ void shoMsg(TCHAR* str) {
 	tsiz.cx = tsiz.cy = msgsiz.cy = msgsiz.cx = 0;
 	for (ind = 0; ind < ine; ind++) {
 
-		GetTextExtentPoint32(sdc, strs[ind], lens[ind], &tsiz);
+		GetTextExtentPoint32(StitchWindowMemDC, strs[ind], lens[ind], &tsiz);
 		if (tsiz.cx > msgsiz.cx)
 			msgsiz.cx = tsiz.cx;
 		if (tsiz.cy > msgsiz.cy)
@@ -471,25 +467,25 @@ BOOL clpmsgs(unsigned cod) {
 
 void frm1pnt() {
 
-	if (formpnt == 1) {
+	if (formIndex == 1) {
 
 		setMap(FORMSEL);
-		clofind = 0;
+		closestFormToCursor = 0;
 	}
 }
 
 BOOL filmsgs(unsigned cod) {
 
-	if (fselpnt)
+	if (selectedFormCount)
 		return clpmsgs(cod);
-	if (formpnt) {
+	if (formIndex) {
 
-		delpnt = hed.stchs;
+		delpnt = hed.stitchCount;
 		frm1pnt();
 		if (chkMap(FORMSEL)) {
 
-			frmpnt = &formlst[clofind];
-			if (frmpnt->sids == 2) {
+			frmpnt = &formList[closestFormToCursor];
+			if (frmpnt->sides == 2) {
 
 				if (cod < FML_LIN) {
 
