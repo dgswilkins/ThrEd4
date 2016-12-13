@@ -559,16 +559,16 @@ unsigned*			ptrBitmap;			//monochrome bitmap data
 unsigned			bitmapColor = BITCOL;	//bitmap color
 TCHAR				msgbuf[MSGSIZ];	//for user messages
 unsigned			msgpnt;			//pointer to the message buffer
-double				showStitchPoints = SHOPNTS;//show stitch grid below this zoom level
+double				showStitchThreshold = SHOPNTS;//show stitch grid below this zoom level
 double				threadSize30 = TSIZ30;	//#30 thread size
 double				threadSize40 = TSIZ40;	//#40 thread size
 double				threadSize60 = TSIZ60;	//#40 thread size
-unsigned			runpnt;			//point for animating stitchout
-unsigned			runum;			//number of stitches to draw in each frame
+unsigned			runPoint;		//point for animating stitchout
+unsigned			stitchesPerFrame;	//number of stitches to draw in each frame
 int					delay;			//time delay for stitchout
 double				StitchBoxesThreshold = STCHBOX;//threshold for drawing stitch boxes
 //WARNING the size of the following array must be changed if the maximum movie speed is changed
-POINT				movilin[100];	//line for movie stitch draw
+POINT				movieLine[100];	//line for movie stitch draw
 RECT				msgRct;			//rectangle containing the text message
 void*				bakdat[16];		//backup data
 unsigned			dupnt0 = 0;		//undo storage pointer
@@ -3515,7 +3515,7 @@ void ritini() {
 	ini.backgroundColor = backgroundColor;
 	ini.bitmapColor = bitmapColor;
 	ini.minStitchLength = minStitchLength;
-	ini.showStitchPoints = showStitchPoints;
+	ini.showStitchThreshold = showStitchThreshold;
 	ini.threadSize30 = threadSize30;
 	ini.threadSize40 = threadSize40;
 	ini.threadSize60 = threadSize60;
@@ -7106,7 +7106,7 @@ gotc:;
 	if (chkMap(RUNPAT)) {
 
 		FillRect(StitchWindowMemDC, &stitchWindowClientRect, hStchBak);
-		runpnt = 0;
+		runPoint = 0;
 	}
 	duzrat();
 	movins();
@@ -7127,7 +7127,7 @@ void zumhom() {
 	if (chkMap(RUNPAT)) {
 
 		FillRect(StitchWindowMemDC, &stitchWindowClientRect, hStchBak);
-		runpnt = 0;
+		runPoint = 0;
 	}
 	setMap(RESTCH);
 	if (chkMap(SELBOX))
@@ -7153,7 +7153,7 @@ void zumshft() {
 			if (chkMap(RUNPAT)) {
 
 				FillRect(StitchWindowMemDC, &stitchWindowClientRect, hStchBak);
-				runpnt = 0;
+				runPoint = 0;
 			}
 			setMap(RESTCH);
 		}
@@ -7233,7 +7233,7 @@ void zumout() {
 		if (chkMap(RUNPAT)) {
 
 			FillRect(StitchWindowMemDC, &stitchWindowClientRect, hStchBak);
-			runpnt = 0;
+			runPoint = 0;
 		}
 		setMap(RESTCH);
 		duzrat();
@@ -9601,75 +9601,75 @@ void drwlstch(unsigned fin) {
 	unsigned	col, ind, prepnt;
 	unsigned	flg;
 
-	prepnt = runpnt;
+	prepnt = runPoint;
 	if (chkMap(HID)) {
 
-		while ((stchs[runpnt].attribute&COLMSK) != actcol&&runpnt < fin - 1)
-			runpnt++;
+		while ((stchs[runPoint].attribute&COLMSK) != actcol&&runPoint < fin - 1)
+			runPoint++;
 	}
 	if (chkMap(ZUMED)) {
 
 		ind = 1;
-		while (runpnt < runum + 1 && runpnt < fin - 2 && !stch2px(runpnt))
-			runpnt++;
-		prepnt = runpnt - 1;
-		col = stchs[runpnt].attribute&COLMSK;
+		while (runPoint < stitchesPerFrame + 1 && runPoint < fin - 2 && !stch2px(runPoint))
+			runPoint++;
+		prepnt = runPoint - 1;
+		col = stchs[runPoint].attribute&COLMSK;
 		flg = 1;
-		while (ind < runum + 1 && runpnt < fin - 2 && (stchs[runpnt].attribute&COLMSK) == col) {
+		while (ind < stitchesPerFrame + 1 && runPoint < fin - 2 && (stchs[runPoint].attribute&COLMSK) == col) {
 
-			if (stch2px(runpnt)) {
+			if (stch2px(runPoint)) {
 
-				movilin[ind].x = stitchSizePixels.x;
-				movilin[ind++].y = stitchSizePixels.y;
+				movieLine[ind].x = stitchSizePixels.x;
+				movieLine[ind++].y = stitchSizePixels.y;
 				if (flg) {
 
 					flg = 0;
-					if (stch2px(runpnt - 1)) {
+					if (stch2px(runPoint - 1)) {
 
-						movilin[0].x = movilin[1].x;
-						movilin[0].y = movilin[1].y;
+						movieLine[0].x = movieLine[1].x;
+						movieLine[0].y = movieLine[1].y;
 					} else {
 
-						movilin[0].x = stitchSizePixels.x;
-						movilin[0].y = stitchSizePixels.y;
+						movieLine[0].x = stitchSizePixels.x;
+						movieLine[0].y = stitchSizePixels.y;
 					}
 				}
 			}
-			runpnt++;
+			runPoint++;
 		}
-		if (prepnt == runpnt)
-			runpnt++;
-		if (!stch2px(runpnt)) {
+		if (prepnt == runPoint)
+			runPoint++;
+		if (!stch2px(runPoint)) {
 
-			if ((stchs[runpnt].attribute&COLMSK) == col) {
+			if ((stchs[runPoint].attribute&COLMSK) == col) {
 
-				movilin[ind].x = stitchSizePixels.x;
-				movilin[ind++].y = stitchSizePixels.y;
-				runpnt++;
+				movieLine[ind].x = stitchSizePixels.x;
+				movieLine[ind++].y = stitchSizePixels.y;
+				runPoint++;
 			}
 		}
 		SelectObject(StitchWindowDC, uPen[col]);
-		Polyline(StitchWindowDC, movilin, ind);
+		Polyline(StitchWindowDC, movieLine, ind);
 		if (!flg)
-			runpnt--;
+			runPoint--;
 	} else {
 
 		ind = 0;
-		col = stchs[runpnt].attribute&COLMSK;
+		col = stchs[runPoint].attribute&COLMSK;
 		SelectObject(StitchWindowDC, uPen[col]);
-		while (ind < runum && (runpnt + 1 < fin - 1) && ((stchs[runpnt].attribute&COLMSK) == col)) {
+		while (ind < stitchesPerFrame && (runPoint + 1 < fin - 1) && ((stchs[runPoint].attribute&COLMSK) == col)) {
 
-			stch2px1(runpnt++);
-			movilin[ind].x = stitchSizePixels.x;
-			movilin[ind++].y = stitchSizePixels.y;
+			stch2px1(runPoint++);
+			movieLine[ind].x = stitchSizePixels.x;
+			movieLine[ind++].y = stitchSizePixels.y;
 		}
-		runpnt--;
-		Polyline(StitchWindowDC, movilin, ind);
+		runPoint--;
+		Polyline(StitchWindowDC, movieLine, ind);
 	}
-	if ((stchs[runpnt + 1].attribute & 0xf) != col)
-		runpnt++;
-	ritnum(STR_NUMSEL, runpnt);
-	if (runpnt + 3 > fin - 1)
+	if ((stchs[runPoint + 1].attribute & 0xf) != col)
+		runPoint++;
+	ritnum(STR_NUMSEL, runPoint);
+	if (runPoint + 3 > fin - 1)
 		patdun();
 }
 
@@ -9922,16 +9922,16 @@ void setsped() {
 	if (tdub < 10) {
 
 		len = 100;
-		runum = (unsigned)len / tdub;
-		if (runum > 99)
-			runum = 99;
+		stitchesPerFrame = (unsigned)len / tdub;
+		if (stitchesPerFrame > 99)
+			stitchesPerFrame = 99;
 	} else {
 
 		len = (unsigned)tdub;
-		runum = 2;
+		stitchesPerFrame = 2;
 	}
-	if (runum < 2)
-		runum = 2;
+	if (stitchesPerFrame < 2)
+		stitchesPerFrame = 2;
 	SetTimer(hWnd, 0, len, 0);
 }
 
@@ -10257,9 +10257,9 @@ void movi() {
 		if (chkMap(GRPSEL)) {
 
 			rngadj();
-			runpnt = groupStartStitch;
+			runPoint = groupStartStitch;
 		} else
-			runpnt = 0;
+			runPoint = 0;
 		movStch();
 		if (!chkMap(WASPAT)) {
 
@@ -12784,7 +12784,7 @@ void defpref() {
 	ini.fillAngle = DEFANG;
 	rstu(SQRFIL);
 	StitchSpace = DEFSPACE*PFGRAN;
-	showStitchPoints = SHOPNTS;
+	showStitchThreshold = SHOPNTS;
 	ini.gridSize = 12;
 	ini.hoopType = LARGHUP;
 	ini.hoopSizeX = LHUPX;
@@ -18667,7 +18667,7 @@ unsigned chkMsg() {
 					msgbuf[1] = 0;
 					if (prfind == PSHO + 1) {
 
-						showStitchPoints = unthrsh(numcod - 0x30);
+						showStitchThreshold = unthrsh(numcod - 0x30);
 						SetWindowText(thDat[PSHO], msgbuf);
 					} else {
 
@@ -21832,7 +21832,7 @@ void redini() {
 		backgroundColor = ini.backgroundColor;
 		bitmapColor = ini.bitmapColor;
 		minStitchLength = ini.minStitchLength;
-		showStitchPoints = ini.showStitchPoints;
+		showStitchThreshold = ini.showStitchThreshold;
 		if (ini.threadSize30)
 			threadSize30 = ini.threadSize30;
 		if (ini.threadSize40)
@@ -22496,7 +22496,7 @@ void dugrid() {
 	RECT		grdrct;
 	unsigned	ind;
 
-	if (zoomFactor < showStitchPoints || !showStitchPoints) {
+	if (zoomFactor < showStitchThreshold || !showStitchThreshold) {
 
 		SetROP2(StitchWindowMemDC, R2_XORPEN);
 		SelectObject(StitchWindowMemDC, grdPen);
@@ -23613,9 +23613,9 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 			FillRect(StitchWindowMemDC, &stitchWindowClientRect, hStchBak);
 			if (chkMap(ZUMED))
-				runpnt = groupStartStitch;
+				runPoint = groupStartStitch;
 			else
-				runpnt = 0;
+				runPoint = 0;
 		}
 		return 1;
 
@@ -23636,7 +23636,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		if (chkMap(RUNPAT)) {
 
 			duzrat();
-			runpnt = 0;
+			runPoint = 0;
 			FillRect(StitchWindowDC, &stitchWindowClientRect, hStchBak);
 		}
 		return 1;

@@ -163,7 +163,7 @@ const unsigned long	RMAPBITS = RMAPSIZ << 5;	//a bit for each stitch
 #define		FDEFFLR		9			//default feather floor
 #define		FDEFNUM		10			//default feather number
 #define		FDEFTYP		FTHPSG		//default feather type
-#define		ITXHI		9*PFGRAN	//default texture editor heigth
+#define		ITXHI		9*PFGRAN	//default texture editor height
 #define		ITXWID		9*PFGRAN	//default texture editor width
 #define		ITXSPAC		0.40*PFGRAN	//default texture editor spacing
 #define		ITXPIX		5			//default texture editor cross pixels
@@ -689,7 +689,7 @@ typedef struct _iniFil {
 	COLORREF		backgroundColor;		//background color
 	COLORREF		bitmapColor;			//bitmap color
 	double			minStitchLength;		//minimum stitch length
-	double			showStitchPoints;		//show stitch points 
+	double			showStitchThreshold;	//show stitch points 
 	double			threadSize30;			//millimeter size of 30 weight thread
 	double			threadSize40;			//millimeter size of 40 weight thread
 	double			threadSize60;			//millimeter size of 60 weight thread
@@ -720,7 +720,7 @@ typedef struct _iniFil {
 	COLORREF		gridColor;				//grid color
 	unsigned		fillPhase;				//clipboard fill phase
 	float			customHoopX;			//custom hoop width
-	float			customHoopY;			//custom hoop heigth
+	float			customHoopY;			//custom hoop height
 	float			traceLength;			//lens points
 	double			traceRatio;				//trace ratio
 	float			chainSpace;				//chain space
@@ -1772,8 +1772,8 @@ typedef struct _txtscr	{
 	float	xOffset;	//edit x offset of area
 	float	yOffset;	//edit y offset of area
 	int		index;		//index into temporay texture fill point table
-	float	areaHeight;	//edit heigth of area
-	float	screenHeight;	//edit heigth of screen
+	float	areaHeight;	//edit height of area
+	float	screenHeight;	//edit height of screen
 	float	width;		//edit width of area
 	float	spacing;	//edit space between lines
 	short	lines;		//number of lines

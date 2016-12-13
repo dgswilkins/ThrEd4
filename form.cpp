@@ -149,7 +149,7 @@ extern			double		userStitchLength;
 extern			double		minStitchLength;
 extern			double		smallStitchLength;
 extern			double		rotationAngle;
-extern			double		showStitchPoints;
+extern			double		showStitchThreshold;
 extern			double		StitchBoxesThreshold;
 extern			double		zoomFactor;
 extern			unsigned	buttonWid;
@@ -7723,7 +7723,7 @@ void prfmsg() {
 	prflin(STR_PRF2);
 	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", StitchSpace / PFGRAN);
 	prflin(STR_PRF0);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%d", duthrsh(showStitchPoints));
+	sprintf_s(msgbuf, sizeof(msgbuf), "%d", duthrsh(showStitchThreshold));
 	prflin(STR_PRF7);
 	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f mm", ini.gridSize / PFGRAN);
 	prflin(STR_PRF20);
@@ -7863,7 +7863,7 @@ void prfmsg() {
 	prflin(STR_PRF18);
 	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f mm", ini.gridSize / PFGRAN);
 	prflin(STR_PRF20);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%d", duthrsh(showStitchPoints));
+	sprintf_s(msgbuf, sizeof(msgbuf), "%d", duthrsh(showStitchThreshold));
 	prflin(STR_PRF7);
 	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", ini.cursorNudgeStep);
 	prflin(STR_PRF25);
