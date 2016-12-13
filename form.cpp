@@ -343,7 +343,7 @@ fPOINT*			clp;					//pointer to the clipboard data for clipboard fills
 unsigned short	nclp;					//number of clipboard data points
 double			plen;					//horizontal length of a clipboard fill/2
 double			plen2;					//horizontal length of a clipboard fill
-fPOINT			lastpnt;				//last point written by lin connect routine
+fPOINT			lastpnt;				//last point written by line connect routine
 double			bac;					//border accumular for filling
 fPOINT			opntlst[MAXFRMLINS];	//list of outside outline points for satin or clipboard fills
 fPOINT			ipntlst[MAXFRMLINS];	//list of inside outline points for satin or clipboard fills
@@ -427,7 +427,7 @@ double			cosang;					//cosine for clipboard fill
 double			sinang;					//sine for clipboard fill
 fPOINT			rclpref;				//reference for clipboard line border
 unsigned		clpstrt;				//active form point for line clipboard fill
-dPOINT			vct0;					//x size of the clipbord fill at the fill angle
+dPOINT			vct0;					//x size of the clipbord fill attribute the fill angle
 FRMHED*			rfrmlst;				//temporary form header storage for reordering forms
 fPOINT*			rflts;					//temporary form point storage for reording forms
 SATCON*			rsats;					//temporary satin guidline storage for reording forms
@@ -448,7 +448,7 @@ unsigned		minotl;					//index to the minimum distance line
 CLPSEG*			clpsegs;				//clipboard segments for virtual clipboard fill
 unsigned		pcseg;					//clipboard segment pointer
 unsigned		pcseg2;					//clipboard segment pointer * 2
-unsigned short	vclpsid;				//clipboard intersect sid;
+unsigned short	vclpsid;				//clipboard intersect side;
 float**			plens;					//array of sorted side lengths for verticoal clipboard fill
 fPOINT			vpnt0;					//vertical clipboard line segement start
 fPOINT			vpnt1;					//vertical clipboard line segement end
@@ -719,9 +719,9 @@ unsigned findclp(unsigned fpnt) {
 
 	for (ind = fpnt - 1; ind >= 0; ind--) {
 		if (iseclp(ind))
-			return formList[ind].borderClipboardData - clipboardPoints + formList[ind].nclp;
+			return formList[ind].borderClipData - clipboardPoints + formList[ind].clipEntries;
 		if (isclp(ind))
-			return formList[ind].angleOrClipData.clp - clipboardPoints + formList[ind].lengthOrCount.clipCount;
+			return formList[ind].angleOrClipData.clip - clipboardPoints + formList[ind].lengthOrCount.clipCount;
 	}
 	return 0;
 }
@@ -741,9 +741,9 @@ void clpsub(unsigned fpnt, unsigned cnt) {
 
 	for (ind = fpnt + 1; ind < formIndex; ind++) {
 		if (isclpx(ind))
-			formList[ind].angleOrClipData.clp -= cnt;
+			formList[ind].angleOrClipData.clip -= cnt;
 		if (iseclpx(fpnt))
-			formList[ind].borderClipboardData -= cnt;
+			formList[ind].borderClipData -= cnt;
 	}
 }
 
@@ -756,7 +756,7 @@ void delmclp(unsigned fpnt) {
 			src = dst + formList[fpnt].lengthOrCount.clipCount;
 			MoveMemory(&clipboardPoints[dst], &clipboardPoints[src], sizeof(fPOINT)*(clpad - src));
 			if (iseclp(fpnt))
-				formList[fpnt].borderClipboardData -= formList[fpnt].lengthOrCount.clipCount;
+				formList[fpnt].borderClipData -= formList[fpnt].lengthOrCount.clipCount;
 			clpsub(fpnt, formList[fpnt].lengthOrCount.clipCount);
 			if (clpad > formList[fpnt].lengthOrCount.clipCount)
 				clpad -= formList[fpnt].lengthOrCount.clipCount;
@@ -773,17 +773,17 @@ void deleclp(unsigned fpnt) {
 	if (clpad) {
 		if (iseclpx(fpnt)) {
 			dst = findclp(fpnt);
-			src = dst + formList[fpnt].nclp;
+			src = dst + formList[fpnt].clipEntries;
 			while (src < clpad) {
 				clipboardPoints[dst].x = clipboardPoints[src].x;
 				clipboardPoints[dst++].y = clipboardPoints[src++].y;
 			}
-			clpsub(fpnt, formList[fpnt].nclp);
-			if (clpad > formList[fpnt].nclp)
-				clpad -= formList[fpnt].nclp;
+			clpsub(fpnt, formList[fpnt].clipEntries);
+			if (clpad > formList[fpnt].clipEntries)
+				clpad -= formList[fpnt].clipEntries;
 			else
 				clpad = 0;
-			formList[fpnt].nclp = 0;
+			formList[fpnt].clipEntries = 0;
 		}
 	}
 }
@@ -802,14 +802,14 @@ fPOINT* nueclp(unsigned pfrm, unsigned cnt) {
 		clipboardPoints[dst].x = clipboardPoints[src].x;
 		clipboardPoints[dst--].y = clipboardPoints[src--].y;
 	}
-	formList[find].borderClipboardData = &clipboardPoints[find];
+	formList[find].borderClipData = &clipboardPoints[find];
 	for (ind = pfrm; ind < formIndex; ind++) {
 		if (iseclpx(ind))
-			formList[ind].borderClipboardData += cnt;
+			formList[ind].borderClipData += cnt;
 	}
 	for (ind = pfrm + 1; ind < formIndex; ind++) {
 		if (isclp(ind))
-			formList[ind].angleOrClipData.clp += cnt;
+			formList[ind].angleOrClipData.clip += cnt;
 	}
 	clpad += cnt;
 	return &clipboardPoints[find];
@@ -827,14 +827,14 @@ fPOINT* numclp() {
 		clipboardPoints[dst].x = clipboardPoints[src].x;
 		clipboardPoints[dst--].y = clipboardPoints[src--].y;
 	}
-	formList[closestFormToCursor].angleOrClipData.clp = &clipboardPoints[find];
+	formList[closestFormToCursor].angleOrClipData.clip = &clipboardPoints[find];
 	if (iseclpx(closestFormToCursor))
-		formList[closestFormToCursor].borderClipboardData += clipboardStitchCount;
+		formList[closestFormToCursor].borderClipData += clipboardStitchCount;
 	for (ind = closestFormToCursor + 1; ind < formIndex; ind++) {
 		if (isclpx(ind))
-			formList[ind].angleOrClipData.clp += clipboardStitchCount;
+			formList[ind].angleOrClipData.clip += clipboardStitchCount;
 		if (iseclpx(ind))
-			formList[ind].borderClipboardData += clipboardStitchCount;
+			formList[ind].borderClipData += clipboardStitchCount;
 	}
 	clpad += clipboardStitchCount;
 	return &clipboardPoints[find];
@@ -1305,8 +1305,8 @@ void fvars(unsigned ind) {
 	currentFormConnections = formList[ind].satinOrAngle.sac;
 	currentFormConnectionsCount = formList[ind].satinGuideCount;
 	wpar = formList[ind].wpar;
-	clp = formList[ind].borderClipboardData;
-	nclp = formList[ind].nclp;
+	clp = formList[ind].borderClipData;
+	nclp = formList[ind].clipEntries;
 }
 
 void ritfrct(unsigned ind, HDC dc) {
@@ -2228,7 +2228,7 @@ float getblen() {
 	float		fileLength;
 	unsigned	tlen;
 
-	tlen = (formList[closestFormToCursor].clipCount << 16) | formList[closestFormToCursor].picoLength;
+	tlen = (formList[closestFormToCursor].clipEntries << 16) | formList[closestFormToCursor].picoLength;
 
 	_asm {
 		mov		eax, tlen
@@ -2241,7 +2241,7 @@ float getblen() {
 		unsigned	tlen;
 	} x;
 
-	x.tlen = (formList[closestFormToCursor].nclp << 16) | formList[closestFormToCursor].picoLength;
+	x.tlen = (formList[closestFormToCursor].clipEntries << 16) | formList[closestFormToCursor].picoLength;
 	return x.len;
 #endif
 }
@@ -2257,7 +2257,7 @@ void savblen(float len) {
 		shr		eax, 16
 		mov		l_nclp, ax
 	}
-	formList[closestFormToCursor].clipCount = l_nclp;
+	formList[closestFormToCursor].clipEntries = l_nclp;
 	formList[closestFormToCursor].picoLength = picoLength;
 #else
 	union {
@@ -2267,7 +2267,7 @@ void savblen(float len) {
 
 	x.f = len;
 
-	formList[closestFormToCursor].nclp = x.i >> 16;
+	formList[closestFormToCursor].clipEntries = x.i >> 16;
 	formList[closestFormToCursor].picoLength = x.i & 0xFFFF;
 #endif
 }
@@ -2309,13 +2309,13 @@ void chkbrd() {
 
 		case EGCLP:
 
-			oclp(frmpnt->borderClipboardData, frmpnt->nclp);
+			oclp(frmpnt->borderClipData, frmpnt->clipEntries);
 			clpbrd(getlast());
 			break;
 
 		case EGCLPX:
 
-			oclp(frmpnt->borderClipboardData, frmpnt->nclp);
+			oclp(frmpnt->borderClipData, frmpnt->clipEntries);
 			duxclp();
 			break;
 
@@ -2352,7 +2352,7 @@ void chkbrd() {
 
 		case EGPIC:
 
-			oclp(frmpnt->borderClipboardData, frmpnt->nclp);
+			oclp(frmpnt->borderClipData, frmpnt->clipEntries);
 			clpic(0);
 			break;
 
@@ -2495,7 +2495,7 @@ void refilfn() {
 
 		case EGCLP:
 
-			oclp(frmpnt->borderClipboardData, frmpnt->nclp);
+			oclp(frmpnt->borderClipData, frmpnt->clipEntries);
 			clpout();
 			seqpnt = 0;
 			clpbrd(0);
@@ -2540,7 +2540,7 @@ void refilfn() {
 
 		case EGPIC:
 
-			oclp(frmpnt->borderClipboardData, frmpnt->nclp);
+			oclp(frmpnt->borderClipData, frmpnt->clipEntries);
 			seqpnt = 0;
 			tlen = buttonholeFillCornerLength;
 			buttonholeFillCornerLength = getplen();
@@ -2572,7 +2572,7 @@ void refilfn() {
 
 		case EGCLPX:
 
-			oclp(frmpnt->borderClipboardData, frmpnt->nclp);
+			oclp(frmpnt->borderClipData, frmpnt->clipEntries);
 			duxclp();
 			ritbrd();
 			break;
@@ -2607,14 +2607,14 @@ void refilfn() {
 
 			case ANGF:
 
-				rotationAngle = PI / 2 - frmpnt->angleOrClipData.fang;
+				rotationAngle = PI / 2 - frmpnt->angleOrClipData.angle;
 				filang();
 				lconflt = angfrm.vertices;
 				break;
 
 			case VCLPF:
 
-				oclp(frmpnt->angleOrClipData.clp, frmpnt->lengthOrCount.clipCount);
+				oclp(frmpnt->angleOrClipData.clip, frmpnt->lengthOrCount.clipCount);
 				setangf(0);
 				fvars(closestFormToCursor);
 				clpcon();
@@ -2622,13 +2622,13 @@ void refilfn() {
 
 			case HCLPF:
 
-				oclp(frmpnt->angleOrClipData.clp, frmpnt->lengthOrCount.clipCount);
+				oclp(frmpnt->angleOrClipData.clip, frmpnt->lengthOrCount.clipCount);
 				horclpfn();
 				goto skpfil;
 
 			case ANGCLPF:
 
-				oclp(frmpnt->angleOrClipData.clp, frmpnt->lengthOrCount.clipCount);
+				oclp(frmpnt->angleOrClipData.clip, frmpnt->lengthOrCount.clipCount);
 				rstMap(ISUND);
 				angclpfn();
 				goto skpfil;
@@ -2685,7 +2685,7 @@ void refilfn() {
 
 		case CLPF:
 
-			oclp(frmpnt->angleOrClipData.clp, frmpnt->lengthOrCount.clipCount);
+			oclp(frmpnt->angleOrClipData.clip, frmpnt->lengthOrCount.clipCount);
 			fmclp();
 			ritfil();
 			break;
@@ -2978,7 +2978,7 @@ BOOL lnclos(unsigned gp0, unsigned ln0, unsigned gp1, unsigned ln1) {
 	cnt0 = (grinds[gp0 + 1] - grinds[gp0]) >> 1;
 	ind0 = 0;
 	pnt0 = &lins[grinds[gp0]];
-	while (cnt0&&pnt0[ind0].lin != ln0) {
+	while (cnt0&&pnt0[ind0].line != ln0) {
 		cnt0--;
 		ind0 += 2;
 	}
@@ -2986,7 +2986,7 @@ BOOL lnclos(unsigned gp0, unsigned ln0, unsigned gp1, unsigned ln1) {
 		cnt1 = (grinds[gp1 + 1] - grinds[gp1]) >> 1;
 		ind1 = 0;
 		pnt1 = &lins[grinds[gp1]];
-		while (cnt1&&pnt1[ind1].lin != ln1) {
+		while (cnt1&&pnt1[ind1].line != ln1) {
 			cnt1--;
 			ind1 += 2;
 		}
@@ -3016,17 +3016,17 @@ unsigned short regclos(unsigned rg0, unsigned rg1) {
 
 	pnt0s = &*seq[rgns[rg0].start];
 	pnt1s = &*seq[rgns[rg1].start];
-	grp1s = pnt1s->grp;
-	grp0s = pnt0s->grp;
+	grp1s = pnt1s->group;
+	grp0s = pnt0s->group;
 	if (grp0s > grp1s) {
 		grps = grp0s;
-		l_lins = pnt0s->lin;
-		prlin = pnt1s->lin;
+		l_lins = pnt0s->line;
+		prlin = pnt1s->line;
 	}
 	else {
 		grps = grp1s;
-		l_lins = pnt1s->lin;
-		prlin = pnt0s->lin;
+		l_lins = pnt1s->line;
+		prlin = pnt0s->line;
 	}
 	if (grps&&lnclos(grps - 1, prlin, grps, l_lins)) {
 		nxtgrp = grps;
@@ -3035,17 +3035,17 @@ unsigned short regclos(unsigned rg0, unsigned rg1) {
 	else {
 		pnt0e = &*seq[rgns[rg0].end];
 		pnt1e = &*seq[rgns[rg1].end];
-		grp1e = pnt1e->grp;
-		grp0e = pnt0e->grp;
+		grp1e = pnt1e->group;
+		grp0e = pnt0e->group;
 		if (grp0e < grp1e) {
 			grpe = grp0e;
-			line = pnt0e->lin;
-			polin = pnt1e->lin;
+			line = pnt0e->line;
+			polin = pnt1e->line;
 		}
 		else {
 			grpe = grp1e;
-			line = pnt1e->lin;
-			polin = pnt0e->lin;
+			line = pnt1e->line;
+			polin = pnt0e->line;
 		}
 		if (lnclos(grpe, line, grpe + 1, polin)) {
 			nxtgrp = grpe;
@@ -3106,7 +3106,7 @@ unsigned setseq(unsigned bpnt) {
 void rspnt(float fx, float fy) {
 	bseq[opnt].x = fx;
 	bseq[opnt].y = fy;
-	bseq[opnt++].attr = 0;
+	bseq[opnt++].attribute = 0;
 }
 
 void dunseq(unsigned strt, unsigned fin) {
@@ -3129,19 +3129,19 @@ void dunseq(unsigned strt, unsigned fin) {
 		miny = 0;
 	rspnt(l_lin0->x, l_lin0->y + miny);
 	rspnt(l_lin1->x, l_lin1->y + miny);
-	lastgrp = l_lin1->grp;
+	lastgrp = l_lin1->group;
 }
 
 void movseq(unsigned ind) {
 	SMALPNTL* l_lin;
 
 	l_lin = &*seq[ind];
-	bseq[opnt].attr = SEQBOT;
+	bseq[opnt].attribute = SEQBOT;
 	bseq[opnt].x = l_lin->x;
 	bseq[opnt].y = l_lin->y;
 	opnt++;
 	l_lin++;
-	bseq[opnt].attr = SEQTOP;
+	bseq[opnt].attribute = SEQTOP;
 	bseq[opnt].x = l_lin->x;
 	bseq[opnt].y = l_lin->y;
 	opnt++;
@@ -3161,18 +3161,18 @@ void duseq(unsigned strt, unsigned fin) {
 
 	seqlin = nullptr;
 	rstMap(SEQDUN);
-	topbak = seq[strt][1].lin;
+	topbak = seq[strt][1].line;
 	if (strt > fin) {
 		for (ind = strt; (int)ind >= (int)fin; ind--) {
 			if (setseq(ind)) {
 				if (!setMap(SEQDUN))
 					duseq2(ind);
 				else {
-					if (topbak != seq[ind][1].lin) {
+					if (topbak != seq[ind][1].line) {
 						if (ind)
 							duseq2(ind + 1);
 						duseq2(ind);
-						topbak = seqlin[1].lin;
+						topbak = seqlin[1].line;
 					}
 				}
 			}
@@ -3185,7 +3185,7 @@ void duseq(unsigned strt, unsigned fin) {
 		}
 		if (rstMap(SEQDUN))
 			duseq2(ind + 1);
-		if (seqlin != nullptr) { lastgrp = seqlin->grp; }
+		if (seqlin != nullptr) { lastgrp = seqlin->group; }
 	}
 	else {
 		for (ind = strt; ind <= fin; ind++) {
@@ -3193,11 +3193,11 @@ void duseq(unsigned strt, unsigned fin) {
 				if (!setMap(SEQDUN))
 					duseq2(ind);
 				else {
-					if (topbak != seq[ind][1].lin) {
+					if (topbak != seq[ind][1].line) {
 						if (ind)
 							duseq2(ind - 1);
 						duseq2(ind);
-						topbak = seqlin[1].lin;
+						topbak = seqlin[1].line;
 					}
 				}
 			}
@@ -3214,24 +3214,24 @@ void duseq(unsigned strt, unsigned fin) {
 			if (ind)
 				duseq2(ind - 1);
 		}
-		if (seqlin != nullptr) { lastgrp = seqlin->grp; }
+		if (seqlin != nullptr) { lastgrp = seqlin->group; }
 	}
 }
 
 void brkseq(unsigned strt, unsigned fin) {
-	//SMALPNTL* lin=0;
+	//SMALPNTL* line=0;
 	unsigned	ind, bgrp = 0;
 
 	rstMap(SEQDUN);
 	if (strt > fin) {
-		bgrp = seq[strt]->grp + 1;
+		bgrp = seq[strt]->group + 1;
 		for (ind = strt; (int)ind >= (int)fin; ind--) {
 			bgrp--;
-			if (seq[ind]->grp != bgrp) {
+			if (seq[ind]->group != bgrp) {
 				rspnt(seqlin[0].x, seqlin[0].y);
 				seqlin = &*seq[ind];
 				rspnt(seqlin[0].x, seqlin[0].y);
-				bgrp = seqlin[0].grp;
+				bgrp = seqlin[0].group;
 			}
 			else
 				seqlin = &*seq[ind];
@@ -3242,17 +3242,17 @@ void brkseq(unsigned strt, unsigned fin) {
 			else
 				movseq(ind);
 		}
-		lastgrp = seqlin->grp;
+		lastgrp = seqlin->group;
 	}
 	else {
-		bgrp = seq[strt]->grp - 1;
+		bgrp = seq[strt]->group - 1;
 		for (ind = strt; ind <= fin; ind++) {
 			bgrp++;
-			if (seq[ind]->grp != bgrp) {
+			if (seq[ind]->group != bgrp) {
 				rspnt(seqlin[0].x, seqlin[0].y);
 				seqlin = &*seq[ind];
 				rspnt(seqlin[0].x, seqlin[0].y);
-				bgrp = seqlin[0].grp;
+				bgrp = seqlin[0].group;
 			}
 			else
 				seqlin = &*seq[ind];
@@ -3263,7 +3263,7 @@ void brkseq(unsigned strt, unsigned fin) {
 			else
 				movseq(ind);
 		}
-		lastgrp = seqlin->grp;
+		lastgrp = seqlin->group;
 	}
 	if (rstMap(SEQDUN))
 		duseq1();
@@ -3272,7 +3272,7 @@ void brkseq(unsigned strt, unsigned fin) {
 void brkdun(unsigned strt, unsigned fin) {
 	rspnt(seq[strt]->x, seq[strt]->y);
 	rspnt(seq[fin]->x, seq[fin]->y);
-	rspnt(lconflt[seq[strt]->lin].x, lconflt[seq[strt]->lin].y);
+	rspnt(lconflt[seq[strt]->line].x, lconflt[seq[strt]->line].y);
 	setMap(BRKFIX);
 }
 
@@ -3293,10 +3293,10 @@ void durgn(unsigned pthi) {
 	seqs = durpnt->start;
 	seqe = durpnt->end;
 	if (mpath[pthi].skp || rstMap(BRKFIX)) {
-		if (bseq[opnt - 1].attr != SEQBOT)
+		if (bseq[opnt - 1].attribute != SEQBOT)
 			rspnt(bseq[opnt - 2].x, bseq[opnt - 2].y);
 		pnts = &*seq[rgind];
-		dun = seq[seqs]->lin;
+		dun = seq[seqs]->line;
 		bpnt = &bseq[opnt - 1];
 		minlen = 1e99;
 		for (ind = 0; ind < sides; ind++) {
@@ -3335,8 +3335,8 @@ void durgn(unsigned pthi) {
 	}
 	pnts = &*seq[durpnt->start];
 	pnte = &*seq[durpnt->end];
-	grps = pnts->grp;
-	grpe = pnte->grp;
+	grps = pnts->group;
+	grpe = pnte->group;
 	if (grpe != grps)
 		seql = (double)(lastgrp - grps) / (grpe - grps)*(seqe - seqs) + seqs;
 	else
@@ -3356,16 +3356,16 @@ void durgn(unsigned pthi) {
 		seqn = seqs;
 	if (seqn > seqe)
 		seqn = seqe;
-	if (seq[seql]->grp != lastgrp) {
-		if (seql < seqe&&seq[seql + 1]->grp == lastgrp)
+	if (seq[seql]->group != lastgrp) {
+		if (seql < seqe&&seq[seql + 1]->group == lastgrp)
 			seql++;
 		else {
-			if (seql > seqs&&seq[seql - 1]->grp == lastgrp)
+			if (seql > seqs&&seq[seql - 1]->group == lastgrp)
 				seql--;
 			else {
 				mindif = 0xffffffff;
 				for (ind = seqs; ind <= seqe; ind++) {
-					gdif = ((seq[ind]->grp > lastgrp) ? (seq[ind]->grp - lastgrp) : (lastgrp - seq[ind]->grp));
+					gdif = ((seq[ind]->group > lastgrp) ? (seq[ind]->group - lastgrp) : (lastgrp - seq[ind]->group));
 					if (gdif < mindif) {
 						mindif = gdif;
 						seql = ind;
@@ -3374,16 +3374,16 @@ void durgn(unsigned pthi) {
 			}
 		}
 	}
-	if (seq[seqn]->grp != grpn) {
-		if (seqn < seqe&&seq[seqn + 1]->grp == grpn)
+	if (seq[seqn]->group != grpn) {
+		if (seqn < seqe&&seq[seqn + 1]->group == grpn)
 			seqn++;
 		else {
-			if (seqn > seqs&&seq[seqn - 1]->grp == grpn)
+			if (seqn > seqs&&seq[seqn - 1]->group == grpn)
 				seqn--;
 			else {
 				mindif = 0xffffffff;
 				for (ind = seqs; ind <= seqe; ind++) {
-					gdif = ((seq[ind]->grp > grpn) ? (seq[ind]->grp - grpn) : (grpn - seq[ind]->grp));
+					gdif = ((seq[ind]->group > grpn) ? (seq[ind]->group - grpn) : (grpn - seq[ind]->group));
 					if (gdif < mindif) {
 						mindif = gdif;
 						seqn = ind;
@@ -3585,8 +3585,8 @@ int sqcomp(const void *arg1, const void *arg2) {
 	pnt1 = (SMALPNTL*)arg2;
 #endif
 
-	if (pnt0->lin == pnt1->lin) {
-		if (pnt0->grp == pnt1->grp) {
+	if (pnt0->line == pnt1->line) {
+		if (pnt0->group == pnt1->group) {
 			if (pnt0->y == pnt1->y)return 0;
 			else {
 				if (pnt0->y > pnt1->y)
@@ -3596,14 +3596,14 @@ int sqcomp(const void *arg1, const void *arg2) {
 			}
 		}
 		else {
-			if (pnt0->grp > pnt1->grp)
+			if (pnt0->group > pnt1->group)
 				return 1;
 			else
 				return -1;
 		}
 	}
 	else {
-		if (pnt0->lin > pnt1->lin)
+		if (pnt0->line > pnt1->line)
 			return 1;
 		else
 			return -1;
@@ -3647,12 +3647,12 @@ void lcon() {
 		rgcnt = 0;
 		trgns = (REGION*)oseq;
 		trgns[0].start = 0;
-		blin = seq[0]->lin;
+		blin = seq[0]->line;
 		for (ind = 0; ind < lpnt; ind++) {
-			if (blin != seq[ind]->lin) {
+			if (blin != seq[ind]->line) {
 				trgns[rgcnt++].end = ind - 1;
 				trgns[rgcnt].start = ind;
-				blin = seq[ind]->lin;
+				blin = seq[ind]->line;
 			}
 		}
 		trgns[rgcnt++].end = ind - 1;
@@ -3669,14 +3669,14 @@ void lcon() {
 		for (ind = 0; ind < rgcnt; ind++) {
 			cnt = 0;
 			if ((rgns[ind].end - rgns[ind].start) > 1) {
-				sgrp = seq[rgns[ind].start]->grp;
+				sgrp = seq[rgns[ind].start]->group;
 				for (ine = rgns[ind].start + 1; ine <= rgns[ind].end; ine++) {
 					sgrp++;
-					if (seq[ine]->grp != sgrp) {
+					if (seq[ine]->group != sgrp) {
 						if (!cnt)
 							rgns[ind].brk = sind;
 						cnt++;
-						sgrp = seq[ine]->grp;
+						sgrp = seq[ine]->group;
 						tsrgns[sind++] = ine;
 					}
 				}
@@ -3752,8 +3752,8 @@ void lcon() {
 			sgrp = 0xffffffff; ine = 0;
 			for (ind = 0; ind < rgcnt; ind++) {
 				tpnt = &*seq[rgns[ind].start];
-				if (tpnt->grp < sgrp) {
-					sgrp = tpnt->grp;
+				if (tpnt->group < sgrp) {
+					sgrp = tpnt->group;
 					ine = ind;
 				}
 			}
@@ -3820,7 +3820,7 @@ void lcon() {
 				seqmap[ind] = 0;
 			lastgrp = 0;
 			mpath[0].vrt = 0;
-			mpath[0].grpn = seq[rgns[0].end]->grp;
+			mpath[0].grpn = seq[rgns[0].end]->group;
 			mpath[0].skp = 0;
 			durgn(0);
 			delete[] mpath;
@@ -3923,7 +3923,7 @@ void bakseq() {
 			rslop = dif.x / dif.y;
 		else
 			rslop = 1e99;
-		switch (bseq[ind].attr) {
+		switch (bseq[ind].attribute) {
 		case SEQTOP:
 
 			if (frmpnt->extendedAttribute&AT_SQR) {
@@ -4078,7 +4078,7 @@ void fnvrt() {
 		for (ine = 0; ine < (unsigned)sides - 1; ine++) {
 			if (projv(mx0, currentFillVertices[ine], currentFillVertices[ine + 1], &tpnt)) {
 				pjpts[inf] = &jpts[inf];
-				jpts[inf].lin = ine;
+				jpts[inf].line = ine;
 				jpts[inf].x = tpnt.x;
 				jpts[inf++].y = tpnt.y;
 
@@ -4086,7 +4086,7 @@ void fnvrt() {
 		}
 		if (projv(mx0, currentFillVertices[ine], currentFillVertices[0], &tpnt)) {
 			pjpts[inf] = &jpts[inf];
-			jpts[inf].lin = ine;
+			jpts[inf].line = ine;
 			jpts[inf].x = tpnt.x;
 			jpts[inf++].y = tpnt.y;
 		}
@@ -4098,12 +4098,12 @@ void fnvrt() {
 			tind = stitchLineCount;
 			while (ine < inf) {
 				if (stitchLineCount < lincnt) {
-					lins[stitchLineCount].lin = pjpts[ine]->lin;
-					lins[stitchLineCount].grp = grpind;
+					lins[stitchLineCount].line = pjpts[ine]->line;
+					lins[stitchLineCount].group = grpind;
 					lins[stitchLineCount].x = pjpts[ine]->x;
 					lins[stitchLineCount++].y = pjpts[ine++]->y;
-					lins[stitchLineCount].lin = pjpts[ine]->lin;
-					lins[stitchLineCount].grp = grpind;
+					lins[stitchLineCount].line = pjpts[ine]->line;
+					lins[stitchLineCount].group = grpind;
 					lins[stitchLineCount].x = pjpts[ine]->x;
 					lins[stitchLineCount++].y = pjpts[ine++]->y;
 				}
@@ -4189,7 +4189,7 @@ void fshor() {
 	frmpnt->fillColor = actcol;
 	fsizpar();
 	frmpnt->fillSpacing = StitchSpace;
-	frmpnt->angleOrClipData.fang = (float)PI / 2;
+	frmpnt->angleOrClipData.angle = (float)PI / 2;
 	frmpnt->type = POLI;
 	dusqr();
 	refil();
@@ -4230,7 +4230,7 @@ void fsangl() {
 	makpoli();
 	frmpnt->fillType = ANGF;
 	rotationAngle = PI / 2 - rotationAngle;
-	frmpnt->angleOrClipData.fang = (float)ini.fillAngle;
+	frmpnt->angleOrClipData.angle = (float)ini.fillAngle;
 	frmpnt->fillColor = actcol;
 	fsizpar();
 	frmpnt->fillSpacing = StitchSpace;
@@ -4393,7 +4393,7 @@ void clrfills() {
 	unsigned ind;
 
 	for (ind = 0; ind < formIndex; ind++) {
-		formList[ind].nclp = 0;
+		formList[ind].clipEntries = 0;
 		formList[ind].lengthOrCount.clipCount = 0;
 		formList[ind].edgeType = 0;
 		formList[ind].fillType = 0;
@@ -4987,7 +4987,7 @@ void satfn(unsigned astrt, unsigned afin, unsigned bstrt, unsigned bfin) {
 	if (astrt != afin&&bstrt != bfin) {
 		if (!setMap(SAT1)) {
 			if (chkMap(FTHR)) {
-				bseq[seqpnt].attr = 0;
+				bseq[seqpnt].attribute = 0;
 				ritseq1(astrt%sides);
 			}
 			else {
@@ -5069,12 +5069,12 @@ void satfn(unsigned astrt, unsigned afin, unsigned bstrt, unsigned bfin) {
 				bpnt.x += bstp.x;
 				bpnt.y += bstp.y;
 				if (toglMap(FILDIR)) {
-					bseq[seqpnt].attr = 0;
+					bseq[seqpnt].attribute = 0;
 					bseq[seqpnt].x = apnt.x;
 					bseq[seqpnt++].y = apnt.y;
 				}
 				else {
-					bseq[seqpnt].attr = 1;
+					bseq[seqpnt].attribute = 1;
 					bseq[seqpnt].x = bpnt.x;
 					bseq[seqpnt++].y = bpnt.y;
 				}
@@ -5094,18 +5094,18 @@ void satfn(unsigned astrt, unsigned afin, unsigned bstrt, unsigned bfin) {
 					bpnt.x += bstp.x;
 					bpnt.y += bstp.y;
 					if (toglMap(FILDIR)) {
-						bseq[seqpnt].attr = 0;
+						bseq[seqpnt].attribute = 0;
 						bseq[seqpnt].x = apnt.x;
 						bseq[seqpnt++].y = apnt.y;
-						bseq[seqpnt].attr = 1;
+						bseq[seqpnt].attribute = 1;
 						bseq[seqpnt].x = bpnt.x;
 						bseq[seqpnt++].y = bpnt.y;
 					}
 					else {
-						bseq[seqpnt].attr = 2;
+						bseq[seqpnt].attribute = 2;
 						bseq[seqpnt].x = bpnt.x;
 						bseq[seqpnt++].y = bpnt.y;
-						bseq[seqpnt].attr = 3;
+						bseq[seqpnt].attribute = 3;
 						bseq[seqpnt].x = apnt.x;
 						bseq[seqpnt++].y = apnt.y;
 					}
@@ -6109,15 +6109,15 @@ void fsclp() {
 
 	deleclp(closestFormToCursor);
 	frmpnt->edgeType = EGCLP;
-	frmpnt->nclp = clipboardStitchCount;
-	frmpnt->borderClipboardData = nueclp(closestFormToCursor, clipboardStitchCount);
+	frmpnt->clipEntries = clipboardStitchCount;
+	frmpnt->borderClipData = nueclp(closestFormToCursor, clipboardStitchCount);
 	frmpnt->borderSize = clipboardRectangleSize.cy;
 	frmpnt->edgeSpacing = clipboardRectangleSize.cx;
 	frmpnt->borderColor = actcol;
 	bsizpar();
 	for (ind = 0; ind < clipboardStitchCount; ind++) {
-		frmpnt->borderClipboardData[ind].x = clpnu[ind].x;
-		frmpnt->borderClipboardData[ind].y = clpnu[ind].y;
+		frmpnt->borderClipData[ind].x = clpnu[ind].x;
+		frmpnt->borderClipData[ind].y = clpnu[ind].y;
 	}
 	plen = clipboardRectangleSize.cy / 2;
 	clpout();
@@ -6867,7 +6867,7 @@ void refrmfn()
 		nxtlin();
 		if (frmpnt->fillType == ANGF || frmpnt->fillType == TXANGF) {
 			thTxt[LFRMANG] = txtwin(stab[STR_TXT6], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", frmpnt->angleOrClipData.fang * 180 / PI);
+			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", frmpnt->angleOrClipData.angle * 180 / PI);
 			thDat[LFRMANG] = numwin(msgbuf, rightWindowCoords);
 			nxtlin();
 		}
@@ -9155,11 +9155,11 @@ void filsclp() {
 		frmpnt->wpar = 0;
 	frmpnt->type = SAT;
 	frmpnt->fillType = CLPF;
-	frmpnt->angleOrClipData.clp = numclp();
+	frmpnt->angleOrClipData.clip = numclp();
 	frmpnt->lengthOrCount.clipCount = clipboardStitchCount;
 	for (ind = 0; ind < clipboardStitchCount; ind++) {
-		frmpnt->angleOrClipData.clp[ind].x = clpnu[ind].x;
-		frmpnt->angleOrClipData.clp[ind].y = clpnu[ind].y;
+		frmpnt->angleOrClipData.clip[ind].x = clpnu[ind].x;
+		frmpnt->angleOrClipData.clip[ind].y = clpnu[ind].y;
 	}
 	refilfn();
 }
@@ -9563,12 +9563,12 @@ void adfrm(unsigned fpnt) {
 		mvsatk(nupnt->satinOrAngle.sac, frmpnt->satinOrAngle.sac, frmpnt->satinGuideCount);
 	}
 	if (iseclpx(formIndex)) {
-		nupnt->borderClipboardData = adclp(nupnt->nclp);
-		mvflpnt(nupnt->borderClipboardData, frmpnt->borderClipboardData, frmpnt->nclp);
+		nupnt->borderClipData = adclp(nupnt->clipEntries);
+		mvflpnt(nupnt->borderClipData, frmpnt->borderClipData, frmpnt->clipEntries);
 	}
 	if (isclpx(formIndex)) {
-		nupnt->angleOrClipData.clp = adclp(nupnt->lengthOrCount.clipCount);
-		mvflpnt(nupnt->angleOrClipData.clp, frmpnt->angleOrClipData.clp, frmpnt->lengthOrCount.clipCount);
+		nupnt->angleOrClipData.clip = adclp(nupnt->lengthOrCount.clipCount);
+		mvflpnt(nupnt->angleOrClipData.clip, frmpnt->angleOrClipData.clip, frmpnt->lengthOrCount.clipCount);
 	}
 	formIndex++;
 }
@@ -9628,7 +9628,7 @@ void cplayfn(unsigned fpnt, unsigned play) {
 		frmpnt->satinOrAngle.sac = adsatk(frmpnt->satinGuideCount);
 		MoveMemory(frmpnt->satinOrAngle.sac, l_spnt->satinOrAngle.sac, frmpnt->satinGuideCount * sizeof(SATCON));
 	}
-	frmpnt->nclp = 0;
+	frmpnt->clipEntries = 0;
 	frmpnt->fillType = 0;
 	frmpnt->lengthOrCount.clipCount = 0;;
 	frmpnt->edgeType = 0;
@@ -10424,16 +10424,16 @@ void fspic() {
 
 	deleclp(closestFormToCursor);
 	frmpnt->edgeType = EGPIC;
-	frmpnt->nclp = clipboardStitchCount;
-	frmpnt->borderClipboardData = nueclp(closestFormToCursor, clipboardStitchCount);
+	frmpnt->clipEntries = clipboardStitchCount;
+	frmpnt->borderClipData = nueclp(closestFormToCursor, clipboardStitchCount);
 	frmpnt->borderSize = clipboardRectangleSize.cy;
 	frmpnt->edgeSpacing = picotSpace;
 	frmpnt->borderColor = actcol;
 	bsizpar();
 	savplen(buttonholeFillCornerLength);
 	for (ind = 0; ind < clipboardStitchCount; ind++) {
-		frmpnt->borderClipboardData[ind].x = clpnu[ind].x;
-		frmpnt->borderClipboardData[ind].y = clpnu[ind].y;
+		frmpnt->borderClipData[ind].x = clpnu[ind].x;
+		frmpnt->borderClipData[ind].y = clpnu[ind].y;
 	}
 	plen = clipboardRectangleSize.cy / 2;
 	refilfn();
@@ -10546,8 +10546,8 @@ void contf() {
 	for (ind = strt + 1; ind <= fin; ind++) {
 		dif.x = currentFormVertices[ind].x - sels[0].x;
 		dif.y = currentFormVertices[ind].y - sels[0].y;
-		pols[selind].len = hypot(dif.x, dif.y);
-		pols[selind].ang = atan2(dif.y, dif.x);
+		pols[selind].length = hypot(dif.x, dif.y);
+		pols[selind].angle = atan2(dif.y, dif.x);
 		selind++;
 	}
 	hind = 0; hilen = 0;
@@ -10588,8 +10588,8 @@ void contf() {
 	locnt = hicnt = 0;
 	dif.x = currentFormVertices[fin].x - currentFormVertices[strt].x;
 	dif.y = currentFormVertices[fin].y - currentFormVertices[strt].y;
-	polref.len = hypot(dif.x, dif.y);
-	polref.ang = atan2(dif.y, dif.x);
+	polref.length = hypot(dif.x, dif.y);
+	polref.angle = atan2(dif.y, dif.x);
 	while (locnt || (loind < lolins&&hind < hilins)) {
 		if (locnt)
 			locnt--;
@@ -10617,18 +10617,18 @@ void contf() {
 		}
 		dif.x = hipnt.x - lopnt.x;
 		dif.y = hipnt.y - lopnt.y;
-		polin.ang = atan2(dif.y, dif.x);
-		polin.len = hypot(dif.x, dif.y);
-		poldif.ang = polin.ang - polref.ang;
-		if (polref.len > 0.9*StitchSpace) {
-			poldif.len = polin.len / polref.len;
+		polin.angle = atan2(dif.y, dif.x);
+		polin.length = hypot(dif.x, dif.y);
+		poldif.angle = polin.angle - polref.angle;
+		if (polref.length > 0.9*StitchSpace) {
+			poldif.length = polin.length / polref.length;
 			if (toglMap(FILDIR)) {
 				oseq[seqpnt].x = lopnt.x;
 				oseq[seqpnt].y = lopnt.y;
 				seqpnt++;
 				for (ind = 0; ind < (selins - 1); ind++) {
-					rotationAngle = pols[ind].ang + poldif.ang;
-					len = pols[ind].len*poldif.len;
+					rotationAngle = pols[ind].angle + poldif.angle;
+					len = pols[ind].length*poldif.length;
 					oseq[seqpnt].x = lopnt.x + cos(rotationAngle)*len;
 					oseq[seqpnt].y = lopnt.y + sin(rotationAngle)*len;
 					seqpnt++;
@@ -10639,8 +10639,8 @@ void contf() {
 				oseq[seqpnt].y = hipnt.y;
 				seqpnt++;
 				for (ind = selins - 1; ind != 0; ind--) {
-					rotationAngle = pols[ind - 1].ang + poldif.ang;
-					len = pols[ind - 1].len*poldif.len;
+					rotationAngle = pols[ind - 1].angle + poldif.angle;
+					len = pols[ind - 1].length*poldif.length;
 					oseq[seqpnt].x = lopnt.x + cos(rotationAngle)*len;
 					oseq[seqpnt].y = lopnt.y + sin(rotationAngle)*len;
 					seqpnt++;
@@ -10857,7 +10857,7 @@ void shrnks() {
 	dPOINT		dif;
 	double		len, rat, dlen, adif;
 
-	oclp(frmpnt->borderClipboardData, frmpnt->nclp);
+	oclp(frmpnt->borderClipData, frmpnt->clipEntries);
 	for (ind = 0; ind < (unsigned)sides - 1; ind++) {
 		dif.x = currentFormVertices[ind + 1].x - currentFormVertices[ind].x;
 		dif.y = currentFormVertices[ind + 1].y - currentFormVertices[ind].y;
@@ -10930,14 +10930,14 @@ void dufdat(unsigned find) {
 	}
 	if (iseclpx(find))
 	{
-		mvflpnt(&rclps[clpad], dst->borderClipboardData, dst->nclp);
-		dst->borderClipboardData = &clipboardPoints[clpad];
-		clpad += dst->nclp;
+		mvflpnt(&rclps[clpad], dst->borderClipData, dst->clipEntries);
+		dst->borderClipData = &clipboardPoints[clpad];
+		clpad += dst->clipEntries;
 	}
 	if (isclpx(find))
 	{
-		mvflpnt(&rclps[clpad], dst->angleOrClipData.clp, dst->lengthOrCount.clipCount);
-		dst->angleOrClipData.clp = &clipboardPoints[clpad];
+		mvflpnt(&rclps[clpad], dst->angleOrClipData.clip, dst->lengthOrCount.clipCount);
+		dst->angleOrClipData.clip = &clipboardPoints[clpad];
 		clpad += dst->lengthOrCount.clipCount;
 	}
 }
@@ -11492,9 +11492,9 @@ void spltsat(SATCON tsac) {
 	for (ind = closestFormToCursor + 2; ind < formIndex; ind++)
 		formList[ind].satinOrAngle.sac--;
 	if (iseclp(closestFormToCursor)) {
-		clpspac(frmpnt->borderClipboardData, frmpnt->nclp);
+		clpspac(frmpnt->borderClipData, frmpnt->clipEntries);
 		for (ind = closestFormToCursor + 1; ind < formIndex; ind++)
-			formList[ind].borderClipboardData += frmpnt->nclp;
+			formList[ind].borderClipData += frmpnt->clipEntries;
 	}
 	stchadj();
 }
@@ -11512,9 +11512,9 @@ BOOL spltlin() {
 	frmout(closestFormToCursor);
 	frmout(closestFormToCursor + 1);
 	if (iseclp(closestFormToCursor)) {
-		clpspac(frmpnt->borderClipboardData, frmpnt->nclp);
+		clpspac(frmpnt->borderClipData, frmpnt->clipEntries);
 		for (ind = closestFormToCursor + 1; ind < formIndex; ind++)
-			formList[ind].borderClipboardData += frmpnt->nclp;
+			formList[ind].borderClipData += frmpnt->clipEntries;
 	}
 	stchadj();
 	return 1;
@@ -11752,7 +11752,7 @@ BOOL nucseg() {
 	unsigned	ind;
 
 	if (chkMap(FILDIR))
-		ind = clpsegs[xpnt].eind;
+		ind = clpsegs[xpnt].edgeIndex;
 	else
 		ind = clpsegs[xpnt].bind;
 	if (clpnxt(ind))
@@ -11787,10 +11787,10 @@ void mvpclp(unsigned dst, unsigned src) {
 }
 
 float getlen(unsigned ind) {
-	clipnts[ind].sid %= sides;
-	return	lens[clipnts[ind].sid] +
-		hypot(currentFormVertices[clipnts[ind].sid].x - clipnts[ind].x,
-			currentFormVertices[clipnts[ind].sid].y - clipnts[ind].y);
+	clipnts[ind].side %= sides;
+	return	lens[clipnts[ind].side] +
+		hypot(currentFormVertices[clipnts[ind].side].x - clipnts[ind].x,
+			currentFormVertices[clipnts[ind].side].y - clipnts[ind].y);
 }
 
 unsigned leftsid() {
@@ -11933,13 +11933,13 @@ unsigned insect() {
 	for (ind = vstrt; ind < vfin; ind++) {
 		svrt = vclpx[ind].sid;
 		nvrt = nxt(svrt);
-		if (isect(svrt, nvrt, &clpsrt[ine].pnt, &clpsrt[ine].sidlen)) {
-			ipnt = &clpsrt[ine].pnt;
+		if (isect(svrt, nvrt, &clpsrt[ine].point, &clpsrt[ine].sidlen)) {
+			ipnt = &clpsrt[ine].point;
 			if (ipnt->x >= lrct.left&&
 				ipnt->x <= lrct.right&&
 				ipnt->y >= lrct.bottom&&
 				ipnt->y <= lrct.top) {
-				clpsrt[ine].seglen = hypot(clpsrt[ine].pnt.x - vpnt0.x, clpsrt[ine].pnt.y - vpnt0.y);
+				clpsrt[ine].seglen = hypot(clpsrt[ine].point.x - vpnt0.x, clpsrt[ine].point.y - vpnt0.y);
 				clpsrt[ine].lin = svrt;
 				pclpsrt[ine] = &clpsrt[ine];
 				ine++;
@@ -12004,23 +12004,23 @@ BOOL isin(float pntx, float pnty) {
 
 unsigned clpnseg(unsigned strt, unsigned fin) {
 	clpsegs[pcseg].start = strt;
-	clpsegs[pcseg].blen = getlen(strt);
-	clpsegs[pcseg].asid = clipnts[strt].sid;
-	clpsegs[pcseg].elen = getlen(fin);
-	clpsegs[pcseg].zsid = clipnts[fin].sid;
+	clpsegs[pcseg].borderLength = getlen(strt);
+	clpsegs[pcseg].asid = clipnts[strt].side;
+	clpsegs[pcseg].edgeLength = getlen(fin);
+	clpsegs[pcseg].zsid = clipnts[fin].side;
 	clpsegs[pcseg].finish = fin;
 	clpsegs[pcseg++].dun = 0;
 	return fin + 1;
 }
 
 unsigned vclpfor(unsigned ind) {
-	while (!clipnts[ind].flg&&ind < xpnt)
+	while (!clipnts[ind].flag&&ind < xpnt)
 		ind++;
 	return ind;
 }
 
 unsigned vclpbak(unsigned ind) {
-	while (!clipnts[ind].flg&&ind)
+	while (!clipnts[ind].flag&&ind)
 		ind--;
 	return ind;
 }
@@ -12084,7 +12084,7 @@ void inspnt()
 	clipnts[xpnt + 1].y = clipnts[xpnt].y;
 	clipnts[xpnt].x = midl(clipnts[xpnt + 1].x, clipnts[xpnt - 1].x);
 	clipnts[xpnt].y = midl(clipnts[xpnt + 1].y, clipnts[xpnt - 1].y);
-	clipnts[xpnt].flg = 1;
+	clipnts[xpnt].flag = 1;
 	xpnt++;
 }
 
@@ -12223,8 +12223,8 @@ void clpcon() {
 		if (chkMap(TXFIL))
 		{
 			tine = (ind + nrct.left) % frmpnt->fillInfo.texture.lines;
-			clipboardStitchCount = txsegs[tine].cnt;
-			ptx = &txpnts[frmpnt->fillInfo.texture.index + txsegs[tine].lin];
+			clipboardStitchCount = txsegs[tine].stitchCount;
+			ptx = &txpnts[frmpnt->fillInfo.texture.index + txsegs[tine].line];
 			vpnt0.x = ploc.x;
 			if (frmpnt->txof)
 			{
@@ -12267,15 +12267,15 @@ void clpcon() {
 				clipnts[xpnt].y = vpnt0.y;
 				if (isin(vpnt0.x, vpnt0.y))
 				{
-					if (xpnt&&clipnts[xpnt - 1].flg == 2)
+					if (xpnt&&clipnts[xpnt - 1].flag == 2)
 						inspnt();
-					clipnts[xpnt].flg = 0;
+					clipnts[xpnt].flag = 0;
 				}
 				else
 				{
-					if (xpnt && !clipnts[xpnt - 1].flg)
+					if (xpnt && !clipnts[xpnt - 1].flag)
 						inspnt();
-					clipnts[xpnt].flg = 2;
+					clipnts[xpnt].flag = 2;
 				}
 				xpnt++;
 				cnt = insect();
@@ -12283,10 +12283,10 @@ void clpcon() {
 				{
 					for (ing = 0; ing < cnt; ing++) {
 						if (pclpsrt != nullptr) {
-							clipnts[xpnt].sid = pclpsrt[ing]->lin;
-							clipnts[xpnt].x = pclpsrt[ing]->pnt.x;
-							clipnts[xpnt].y = pclpsrt[ing]->pnt.y;
-							clipnts[xpnt].flg = 1;
+							clipnts[xpnt].side = pclpsrt[ing]->lin;
+							clipnts[xpnt].x = pclpsrt[ing]->point.x;
+							clipnts[xpnt].y = pclpsrt[ing]->point.y;
+							clipnts[xpnt].flag = 1;
 							xpnt++;
 							if (xpnt > MAXSEQ << 2)
 								goto clpskp;
@@ -12297,11 +12297,11 @@ void clpcon() {
 				vpnt0.y = vpnt1.y;
 			}
 		}
-		clipnts[xpnt - 1].flg = 2;
+		clipnts[xpnt - 1].flag = 2;
 	}
 clpskp:;
 
-	clipnts[xpnt].flg = 2;
+	clipnts[xpnt].flag = 2;
 	if (nof) {
 		fnof = nof*clipboardRectangleSize.cy;
 		for (ind = 0; ind < xpnt; ind++)
@@ -12325,7 +12325,7 @@ clpskp:;
 	if (xpnt)
 	{
 		for (ind = 0; ind < xpnt - 1; ind++) {
-			switch (clipnts[ind].flg)
+			switch (clipnts[ind].flag)
 			{
 			case 0:		//inside
 
@@ -12369,8 +12369,8 @@ clpskp:;
 				plens = (float**)&clpsegs[pcseg];
 				ine = 0;
 				for (ind = 0; ind < pcseg; ind++) {
-					plens[ine++] = &clpsegs[ind].blen;
-					plens[ine++] = &clpsegs[ind].elen;
+					plens[ine++] = &clpsegs[ind].borderLength;
+					plens[ine++] = &clpsegs[ind].edgeLength;
 				}
 				qsort((void*)plens, ine, 4, lencmp);
 				ind = sizeof(CLPSEG);
@@ -12378,7 +12378,7 @@ clpskp:;
 					inf = lenref(plens[ind]);
 					ing = inf >> 1;
 					if (inf & 1)
-						clpsegs[ing].eind = ind;
+						clpsegs[ing].edgeIndex = ind;
 					else
 						clpsegs[ing].bind = ind;
 				}
@@ -12416,7 +12416,7 @@ clpskp:;
 				seqpnt = 0;
 				pcseg2 = pcseg << 1;
 				vclpsid = clpsegs[0].asid;
-				strtlen = clpsegs[0].elen;
+				strtlen = clpsegs[0].edgeLength;
 				ritseg();
 				while (nucseg()) {
 					if (seqpnt > MAXSEQ - 3)
@@ -12456,13 +12456,13 @@ void vrtsclp() {
 	delmclp(closestFormToCursor);
 	deltx();
 	frmpnt->lengthOrCount.clipCount = clipboardStitchCount;
-	frmpnt->angleOrClipData.clp = numclp();
+	frmpnt->angleOrClipData.clip = numclp();
 	frmpnt->wpar = ini.fillPhase;
 	makpoli();
 	frmpnt->fillSpacing = ini.clipboardOffset;
 	for (ind = 0; ind < clipboardStitchCount; ind++) {
-		frmpnt->angleOrClipData.clp[ind].x = clpnu[ind].x;
-		frmpnt->angleOrClipData.clp[ind].y = clpnu[ind].y;
+		frmpnt->angleOrClipData.clip[ind].x = clpnu[ind].x;
+		frmpnt->angleOrClipData.clip[ind].y = clpnu[ind].y;
 	}
 	frmpnt->fillType = VCLPF;
 	frmpnt->fillColor = actcol;
@@ -12564,14 +12564,14 @@ void horsclp() {
 	delmclp(closestFormToCursor);
 	deltx();
 	frmpnt->lengthOrCount.clipCount = clipboardStitchCount;
-	frmpnt->angleOrClipData.clp = numclp();
+	frmpnt->angleOrClipData.clip = numclp();
 	frmpnt->lengthOrCount.clipCount = clipboardStitchCount;
 	frmpnt->wpar = ini.fillPhase;
 	makpoli();
 	frmpnt->fillSpacing = ini.clipboardOffset;
 	for (ind = 0; ind < clipboardStitchCount; ind++) {
-		frmpnt->angleOrClipData.clp[ind].x = clpnu[ind].x;
-		frmpnt->angleOrClipData.clp[ind].y = clpnu[ind].y;
+		frmpnt->angleOrClipData.clip[ind].x = clpnu[ind].x;
+		frmpnt->angleOrClipData.clip[ind].y = clpnu[ind].y;
 	}
 	frmpnt->fillType = HCLPF;
 	frmpnt->fillColor = actcol;
@@ -12646,7 +12646,7 @@ void angclpfn()
 	else
 	{
 		if (chkMap(TXFIL))
-			rotationAngle = PI / 2 - frmpnt->angleOrClipData.fang;
+			rotationAngle = PI / 2 - frmpnt->angleOrClipData.angle;
 		else
 			rotationAngle = PI / 2 - frmpnt->satinOrAngle.angle;
 		for (ind = 0; ind < angfrm.sides; ind++)
@@ -12671,15 +12671,15 @@ void angsclp() {
 	fvars(closestFormToCursor);
 	delmclp(closestFormToCursor);
 	deltx();
-	frmpnt->angleOrClipData.clp = numclp();
+	frmpnt->angleOrClipData.clip = numclp();
 	frmpnt->lengthOrCount.clipCount = clipboardStitchCount;
 	frmpnt->wpar = ini.fillPhase;
 	makpoli();
 	frmpnt->satinOrAngle.angle = ini.fillAngle;
 	frmpnt->fillSpacing = ini.clipboardOffset;
 	for (ind = 0; ind < clipboardStitchCount; ind++) {
-		frmpnt->angleOrClipData.clp[ind].x = clpnu[ind].x;
-		frmpnt->angleOrClipData.clp[ind].y = clpnu[ind].y;
+		frmpnt->angleOrClipData.clip[ind].x = clpnu[ind].x;
+		frmpnt->angleOrClipData.clip[ind].y = clpnu[ind].y;
 	}
 	frmpnt->fillType = ANGCLPF;
 	frmpnt->fillColor = actcol;
@@ -13358,15 +13358,15 @@ void fsclpx() {
 
 	deleclp(closestFormToCursor);
 	frmpnt->edgeType = EGCLPX;
-	frmpnt->nclp = clipboardStitchCount;
-	frmpnt->borderClipboardData = nueclp(closestFormToCursor, clipboardStitchCount);
+	frmpnt->clipEntries = clipboardStitchCount;
+	frmpnt->borderClipData = nueclp(closestFormToCursor, clipboardStitchCount);
 	frmpnt->borderSize = clipboardRectangleSize.cy;
 	frmpnt->edgeSpacing = clipboardRectangleSize.cx;
 	frmpnt->borderColor = actcol;
 	bsizpar();
 	for (ind = 0; ind < clipboardStitchCount; ind++) {
-		frmpnt->borderClipboardData[ind].x = clpnu[ind].x;
-		frmpnt->borderClipboardData[ind].y = clpnu[ind].y;
+		frmpnt->borderClipData[ind].x = clpnu[ind].x;
+		frmpnt->borderClipData[ind].y = clpnu[ind].y;
 	}
 	rotcntr.x = rotcntr.y = 0;
 	duxclp();

@@ -375,19 +375,19 @@ BOOL chktxh(TXHST* phst)
 {
 	int ind;
 
-	if (phst->cnt != tscr.ind)
+	if (phst->count != tscr.index)
 		return 1;
-	if (phst->hi != tscr.fhi)
+	if (phst->height != tscr.areaHeight)
 		return 1;
-	if (phst->spac != tscr.spac)
+	if (phst->spacing != tscr.spacing)
 		return 1;
-	if (phst->wid != tscr.wid)
+	if (phst->width != tscr.width)
 		return 1;
-	for (ind = 0; ind < tscr.ind; ind++)
+	for (ind = 0; ind < tscr.index; ind++)
 	{
-		if (txtmp[ind].line != phst->txp[ind].line)
+		if (txtmp[ind].line != phst->texturePoint[ind].line)
 			return 1;
-		if (txtmp[ind].y != phst->txp[ind].y)
+		if (txtmp[ind].y != phst->texturePoint[ind].y)
 			return 1;
 	}
 	return 0;
@@ -397,7 +397,7 @@ void savtxt()
 {
 	TXHST*	 phst;
 
-	if (tscr.ind)
+	if (tscr.index)
 	{
 		phst = &thsts[ptxhst];
 		if (chktxh(phst))
@@ -407,17 +407,17 @@ void savtxt()
 			rstMap(LASTXBAK);
 			txrfor();
 			phst = &thsts[ptxhst];
-			phst->cnt = tscr.ind;
-			phst->hi = tscr.fhi;
-			phst->wid = tscr.wid;
-			phst->spac = tscr.spac;
-			if (phst->txp)
+			phst->count = tscr.index;
+			phst->height = tscr.areaHeight;
+			phst->width = tscr.width;
+			phst->spacing = tscr.spacing;
+			if (phst->texturePoint)
 			{
-				delete[](phst->txp);
-				phst->txp = 0;
+				delete[](phst->texturePoint);
+				phst->texturePoint = 0;
 			}
-			phst->txp = new TXPNT[phst->cnt];
-			MoveMemory(phst->txp, txtmp, phst->cnt * sizeof(TXPNT));
+			phst->texturePoint = new TXPNT[phst->count];
+			MoveMemory(phst->texturePoint, txtmp, phst->count * sizeof(TXPNT));
 		}
 	}
 }
@@ -707,8 +707,8 @@ void fthrfn() {
 	bakspac = StitchSpace;
 	StitchSpace = frmpnt->fillSpacing;
 	satfil();
-	bseq[0].attr = 0;
-	bseq[1].attr = 1;
+	bseq[0].attribute = 0;
+	bseq[1].attribute = 1;
 	if (!faznum)
 		faznum = 1;
 	ind = seqpnt / (faznum << 2);
@@ -725,16 +725,16 @@ void fthrfn() {
 	faz = 1;
 	bseq[seqpnt].x = bseq[seqpnt - 2].x;
 	bseq[seqpnt].y = bseq[seqpnt - 2].y;
-	bseq[seqpnt].attr = bseq[seqpnt - 2].attr;
+	bseq[seqpnt].attribute = bseq[seqpnt - 2].attribute;
 	bseq[seqpnt + 1].x = bseq[seqpnt - 1].x;
 	bseq[seqpnt + 1].y = bseq[seqpnt - 1].y;
-	bseq[seqpnt + 1].attr = bseq[seqpnt - 1].attr;
+	bseq[seqpnt + 1].attribute = bseq[seqpnt - 1].attribute;
 	if (xat&AT_FTHBLND) {
 
 		opnt = xpnt = 0;
 		for (ind = 0; ind < seqpnt; ind++)
 		{
-			if (!bseq[ind].attr)
+			if (!bseq[ind].attribute)
 				fthrbfn(ind);
 		}
 	}
@@ -744,7 +744,7 @@ void fthrfn() {
 
 			for (ind = 0; ind <= seqpnt; ind++) {
 
-				if (!bseq[ind].attr)
+				if (!bseq[ind].attribute)
 					fthdfn(ind);
 			}
 			ind--;
@@ -753,7 +753,7 @@ void fthrfn() {
 
 			for (ind = 0; ind <= seqpnt; ind++) {
 
-				if (bseq[ind].attr) {
+				if (bseq[ind].attribute) {
 
 					if (xat&AT_FTHUP)
 						fthfn(ind);
@@ -916,7 +916,7 @@ int fil2crd(const char* p_filnam)
 	char				cmd[_MAX_PATH * 2 + 1 + 4];
 
 	strcpy_s(cmd, "\"");
-	strcat_s(cmd, ini.p2cnam);
+	strcat_s(cmd, ini.p2cName);
 	strcat_s(cmd, "\" \"");
 	strcat_s(cmd, p_filnam);
 	strcat_s(cmd, "\"");
@@ -987,12 +987,12 @@ void pes2crd() {
 		tabmsg(IDS_P2CNODAT);
 		return;
 	}
-	if (chkp2cnam(ini.p2cnam)) {
+	if (chkp2cnam(ini.p2cName)) {
 
 		fil2crd(thrnam);
 		return;
 	}
-	*ini.p2cnam = 0;
+	*ini.p2cName = 0;
 	if (!RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion",
 		0, KEY_READ, &hkey)) {
 
@@ -1022,7 +1022,7 @@ void pes2crd() {
 		else
 			return;
 	}
-	strcpy_s(ini.p2cnam, prgnam);
+	strcpy_s(ini.p2cName, prgnam);
 	fil2crd(auxnam);
 }
 
@@ -1192,7 +1192,7 @@ unsigned gucon(fPOINT pstrt, fPOINT pfin, unsigned dst, unsigned cod)
 	if (strt == fin)
 		return 0;
 	//	if(chkMap(ISEND))
-	//		ipnt=flt;
+	//		ipnt=vertices;
 	//	else
 	ipnt = insid();
 	up = dwn = strt;
@@ -1614,26 +1614,26 @@ void chkdaz()
 {
 	float	len;
 
-	if (!ini.dazcnt)
-		ini.dazcnt = 1;
-	if (!ini.dazicnt)
-		ini.dazicnt = 1;
+	if (!ini.daisyPetalPoints)
+		ini.daisyPetalPoints = 1;
+	if (!ini.daisyInnerCount)
+		ini.daisyInnerCount = 1;
 	if (!ini.daisyPetalCount)
 		ini.daisyPetalCount = 1;
 	len = ini.daisyDiameter*0.999;
-	if (ini.dazpcnt > ini.dazcnt)
-		ini.dazpcnt = ini.dazcnt;
+	if (ini.daisyHeartCount > ini.daisyPetalPoints)
+		ini.daisyHeartCount = ini.daisyPetalPoints;
 }
 
 void dazdef()
 {
-	ini.dazcnt = DAZCNT;
+	ini.daisyPetalPoints = DAZCNT;
 	ini.daisyHoleDiameter = DAZHLEN;
-	ini.dazicnt = DAZICNT;
+	ini.daisyInnerCount = DAZICNT;
 	ini.daisyDiameter = DAZLEN;
 	ini.daisyPetalCount = DAZPETS;
 	ini.daisyPetalLen = DAZPLEN;
-	ini.dazpcnt = DAZMCNT;
+	ini.daisyHeartCount = DAZMCNT;
 	setu(DAZHOL);
 	setu(DAZD);
 	ini.daisyBorderType = DAZTYP;
@@ -1654,15 +1654,15 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 	reinit:;
 		chkdaz();
-		sprintf_s(buf, sizeof(buf), "%d", ini.dazcnt);
+		sprintf_s(buf, sizeof(buf), "%d", ini.daisyPetalPoints);
 		SetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buf);
-		sprintf_s(buf, sizeof(buf), "%d", ini.dazpcnt);
+		sprintf_s(buf, sizeof(buf), "%d", ini.daisyHeartCount);
 		SetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buf);
 		sprintf_s(buf, sizeof(buf), "%.2f", ini.daisyDiameter);
 		SetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buf);
 		sprintf_s(buf, sizeof(buf), "%.2f", ini.daisyHoleDiameter);
 		SetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buf);
-		sprintf_s(buf, sizeof(buf), "%d", ini.dazicnt);
+		sprintf_s(buf, sizeof(buf), "%d", ini.daisyInnerCount);
 		SetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buf);
 		sprintf_s(buf, sizeof(buf), "%d", ini.daisyPetalCount);
 		SetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buf);
@@ -1690,15 +1690,15 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		case IDOK:
 
 			GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buf, HBUFSIZ);
-			ini.dazcnt = atoi(buf);
+			ini.daisyPetalPoints = atoi(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buf, HBUFSIZ);
-			ini.dazpcnt = atoi(buf);
+			ini.daisyHeartCount = atoi(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buf, HBUFSIZ);
 			ini.daisyDiameter = atof(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buf, HBUFSIZ);
 			ini.daisyHoleDiameter = atof(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buf, HBUFSIZ);
-			ini.dazicnt = atoi(buf);
+			ini.daisyInnerCount = atoi(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buf, HBUFSIZ);
 			ini.daisyPetalCount = atoi(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buf, HBUFSIZ);
@@ -1780,7 +1780,7 @@ void dasyfrm() {
 	frmpnt->vertices = &formPoints[fltad];
 	frmpnt->attribute = activeLayer << 1;
 	fvars(formIndex);
-	cnt2 = ini.dazcnt >> 1;
+	cnt2 = ini.daisyPetalPoints >> 1;
 	maxcor = zoomRect.right - zoomRect.left;
 	drat = zoomRect.top - zoomRect.bottom;
 	if (drat > maxcor)
@@ -1795,7 +1795,7 @@ void dasyfrm() {
 	if (chku(DAZHOL))
 	{
 		pang = PI2;
-		bcnt = ini.daisyPetalCount*ini.dazicnt;
+		bcnt = ini.daisyPetalCount*ini.daisyInnerCount;
 		dang = PI2 / bcnt;
 		currentFormVertices[inf].x = ref.x + len*cos(pang);
 		currentFormVertices[inf].y = ref.y + len*sin(pang);
@@ -1810,19 +1810,19 @@ void dasyfrm() {
 		fref = inf;
 	}
 	pang = 0;
-	bcnt = ini.daisyPetalCount*ini.dazcnt;
-	pcnt = ini.dazcnt;
+	bcnt = ini.daisyPetalCount*ini.daisyPetalPoints;
+	pcnt = ini.daisyPetalPoints;
 	if (dtyp == DHART)
 	{
-		pcnt = (ini.dazpcnt + 1) << 1;
+		pcnt = (ini.daisyHeartCount + 1) << 1;
 		bcnt = ini.daisyPetalCount*pcnt;
 	}
 	dang = PI2 / bcnt;
-	dangp = PI / ini.dazcnt;
+	dangp = PI / ini.daisyPetalPoints;
 	if (chku(DAZD))
 	{
 		frmpnt->satinGuideCount = ini.daisyPetalCount - 1;
-		frmpnt->wpar = ini.daisyPetalCount*ini.dazicnt + 1;
+		frmpnt->wpar = ini.daisyPetalCount*ini.daisyInnerCount + 1;
 		frmpnt->satinOrAngle.sac = adsatk(ini.daisyPetalCount - 1);
 	}
 	for (ind = 0; ind < ini.daisyPetalCount; ind++)
@@ -1841,21 +1841,21 @@ void dasyfrm() {
 
 			case DRAMP:
 
-				dlen = len + (double)ine / ini.dazcnt*elen;
+				dlen = len + (double)ine / ini.daisyPetalPoints*elen;
 				break;
 
 			case DSAW:
 
 				if (ine > cnt2)
-					dcnt = ini.dazcnt - ine;
+					dcnt = ini.daisyPetalPoints - ine;
 				else
 					dcnt = ine;
-				dlen = len + (double)dcnt / ini.dazcnt*elen;
+				dlen = len + (double)dcnt / ini.daisyPetalPoints*elen;
 				break;
 
 			case DRAG:
 
-				dlen = len + (double)(psg() % ini.dazcnt) / ini.dazcnt*elen;
+				dlen = len + (double)(psg() % ini.daisyPetalPoints) / ini.daisyPetalPoints*elen;
 				break;
 
 			case DCOG:
@@ -1868,7 +1868,7 @@ void dasyfrm() {
 			case DHART:
 
 				dlen = len + sin(pangp)*elen;
-				if (ine > ini.dazpcnt)
+				if (ine > ini.daisyHeartCount)
 					pangp -= dangp;
 				else
 					pangp += dangp;
@@ -1880,7 +1880,7 @@ void dasyfrm() {
 			pang += dang;
 			if (chku(DAZD) && ind != ini.daisyPetalCount - 1)
 			{
-				frmpnt->satinOrAngle.sac[ind].start = (ini.daisyPetalCount - ind - 1)*ini.dazicnt + 1;
+				frmpnt->satinOrAngle.sac[ind].start = (ini.daisyPetalCount - ind - 1)*ini.daisyInnerCount + 1;
 				frmpnt->satinOrAngle.sac[ind].finish = inf;
 			}
 		}
@@ -3107,7 +3107,7 @@ void fangfn(unsigned find, float p_ang)
 		case ANGF:
 
 			frmpnt->fillType = ANGF;
-			frmpnt->angleOrClipData.fang = p_ang;
+			frmpnt->angleOrClipData.angle = p_ang;
 			break;
 
 		case	VCLPF:
@@ -3599,7 +3599,7 @@ void duauxnam()
 	else
 		pext = &filnam[strlen(filnam)];
 	*pext = 0;
-	switch (ini.auxfil) {
+	switch (ini.auxFileType) {
 
 	case AUXDST:
 
@@ -3646,29 +3646,29 @@ void dutxtfil()
 	if (chkMap(WASTXBAK))
 	{
 		redtbak();
-		if (!tscr.fhi)
-			tscr.fhi = ini.textureHeight;
-		if (!tscr.spac)
-			tscr.spac = ini.underlaySpacing;
-		if (!tscr.wid)
-			tscr.wid = ini.textureWidth;
+		if (!tscr.areaHeight)
+			tscr.areaHeight = ini.textureHeight;
+		if (!tscr.spacing)
+			tscr.spacing = ini.underlaySpacing;
+		if (!tscr.width)
+			tscr.width = ini.textureWidth;
 		setMap(LASTXBAK);
 		rstMap(TXBDIR);
 	}
 	else
 	{
-		tscr.ind = 0;
-		tscr.fhi = ini.textureHeight;
-		tscr.wid = ini.textureWidth;
-		tscr.spac = ini.textureSpacing;
+		tscr.index = 0;
+		tscr.areaHeight = ini.textureHeight;
+		tscr.width = ini.textureWidth;
+		tscr.spacing = ini.textureSpacing;
 	}
 	setMap(RESTCH);
 }
 
 void txt2pix(TXPNT txp, POINT* pixp)
 {
-	pixp->y = tscr.hi - txp.y / tscr.fhi*tscr.hi + tscr.top;
-	pixp->x = (txp.line*tscr.spac + tscr.xof) / tscr.ed2px;
+	pixp->y = tscr.height - txp.y / tscr.areaHeight*tscr.height + tscr.top;
+	pixp->x = (txp.line*tscr.spacing + tscr.xOffset) / tscr.editToPixelRatio;
 }
 
 void txtxfn(POINT ref, int pix)
@@ -3691,10 +3691,10 @@ void dutxtx(int ind, int pix)
 
 	txt2pix(txtmp[ind], &ref);
 	txtxfn(ref, pix);
-	if (ref.y > tscr.mhi)
-		ref.y -= tscr.hi;
+	if (ref.y > tscr.halfHeight)
+		ref.y -= tscr.height;
 	else
-		ref.y += tscr.hi;
+		ref.y += tscr.height;
 	txtxfn(ref, pix);
 }
 
@@ -3705,13 +3705,13 @@ void txrct2rct(TXTRCT txr, RECT* rct)
 	int		bh2;
 
 	bh2 = buttonHi >> 1;
-	txp.line = txr.lft;
+	txp.line = txr.left;
 	txp.y = txr.top;
 	txt2pix(txp, &tpnt);
 	rct->left = tpnt.x - ini.textureEditorSizePixels;
 	rct->top = tpnt.y - ini.textureEditorSizePixels;
-	txp.line = txr.rit;
-	txp.y = txr.bot;
+	txp.line = txr.right;
+	txp.y = txr.bottom;
 	txt2pix(txp, &tpnt);
 	rct->right = tpnt.x + ini.textureEditorSizePixels;
 	rct->bottom = tpnt.y + ini.textureEditorSizePixels;
@@ -3719,14 +3719,14 @@ void txrct2rct(TXTRCT txr, RECT* rct)
 
 void ed2px(fPOINT ped, POINT* px)
 {
-	px->x = ped.x / tscr.ed2px;
-	px->y = stitchWindowClientRect.bottom - ped.y / tscr.ed2px;
+	px->x = ped.x / tscr.editToPixelRatio;
+	px->y = stitchWindowClientRect.bottom - ped.y / tscr.editToPixelRatio;
 }
 
 void px2ed(POINT px, fPOINT* ped)
 {
-	ped->x = px.x*tscr.ed2px;
-	ped->y = tscr.ehi - px.y*tscr.ed2px;
+	ped->x = px.x*tscr.editToPixelRatio;
+	ped->y = tscr.screenHeight - px.y*tscr.editToPixelRatio;
 }
 
 void bxtxt(unsigned cod, TCHAR* str)
@@ -3750,9 +3750,9 @@ void drwtxbut()
 {
 	lodhbuf(IDS_CLEAR);
 	bxtxt(HTXCLR, hlpbuf);
-	hlpflt(IDS_TXHI, HTXHI, tscr.fhi / PFGRAN);
+	hlpflt(IDS_TXHI, HTXHI, tscr.areaHeight / PFGRAN);
 	redraw(hbuts[HTXWID]);
-	hlpflt(IDS_TXSPAC, HTXSPAC, tscr.spac / PFGRAN);
+	hlpflt(IDS_TXSPAC, HTXSPAC, tscr.spacing / PFGRAN);
 	lodhbuf(IDS_TXVRT);
 	bxtxt(HTXVRT, hlpbuf);
 	lodhbuf(IDS_TXHOR);
@@ -3769,16 +3769,16 @@ void chktx()
 	int ind, ine;
 
 	ine = 0;
-	for (ind = 0; ind < tscr.ind; ind++)
+	for (ind = 0; ind < tscr.index; ind++)
 	{
-		if (txtmp[ind].line <= tscr.lins&&txtmp[ind].y < tscr.fhi)
+		if (txtmp[ind].line <= tscr.lines&&txtmp[ind].y < tscr.areaHeight)
 		{
 			txtmp[ine].line = txtmp[ind].line;
 			txtmp[ine].y = txtmp[ind].y;
 			ine++;
 		}
 	}
-	tscr.ind = ine;
+	tscr.index = ine;
 }
 
 void drwtxtr()
@@ -3795,33 +3795,33 @@ void drwtxtr()
 	float		wid2;
 
 	FillRect(StitchWindowMemDC, &stitchWindowClientRect, hStchBak);
-	edsp = tscr.fhi * 2 / (tscr.spac*(tscr.lins + 2));
+	edsp = tscr.areaHeight * 2 / (tscr.spacing*(tscr.lines + 2));
 	pxsp = (double)stitchWindowClientRect.bottom / stitchWindowClientRect.right;
-	tscr.lins = floor(tscr.wid / tscr.spac);
-	wid2 = tscr.spac*(tscr.lins + 2);
+	tscr.lines = floor(tscr.width / tscr.spacing);
+	wid2 = tscr.spacing*(tscr.lines + 2);
 	if (rstMap(CHKTX))
 		chktx();
 	if (pxsp > edsp)
 	{
-		tscr.xof = 0;
-		tscr.ed2px = wid2 / stitchWindowClientRect.bottom;
-		ofy = (stitchWindowClientRect.bottom - tscr.fhi / tscr.ed2px) / 2;
+		tscr.xOffset = 0;
+		tscr.editToPixelRatio = wid2 / stitchWindowClientRect.bottom;
+		ofy = (stitchWindowClientRect.bottom - tscr.areaHeight / tscr.editToPixelRatio) / 2;
 	}
 	else
 	{
-		tscr.ed2px = tscr.fhi * 2 / stitchWindowClientRect.bottom;
+		tscr.editToPixelRatio = tscr.areaHeight * 2 / stitchWindowClientRect.bottom;
 		ofy = stitchWindowClientRect.bottom >> 2;
-		tscr.xof = (stitchWindowClientRect.right*tscr.ed2px - (tscr.lins + 2)*tscr.spac) / 2;
+		tscr.xOffset = (stitchWindowClientRect.right*tscr.editToPixelRatio - (tscr.lines + 2)*tscr.spacing) / 2;
 	}
 	tscr.top = ofy;
-	tscr.bot = stitchWindowClientRect.bottom - ofy;
-	tscr.hi = tscr.bot - tscr.top;
-	tscr.mhi = stitchWindowClientRect.bottom >> 1;
-	tscr.ehi = stitchWindowClientRect.bottom*tscr.ed2px;
-	tscr.yof = (tscr.ehi - tscr.fhi) / 2;
+	tscr.bottom = stitchWindowClientRect.bottom - ofy;
+	tscr.height = tscr.bottom - tscr.top;
+	tscr.halfHeight = stitchWindowClientRect.bottom >> 1;
+	tscr.screenHeight = stitchWindowClientRect.bottom*tscr.editToPixelRatio;
+	tscr.yOffset = (tscr.screenHeight - tscr.areaHeight) / 2;
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	SelectObject(StitchWindowMemDC, grdPen);
-	cnt = tscr.fhi / ini.gridSize + 1;
+	cnt = tscr.areaHeight / ini.gridSize + 1;
 	txp.line = 0;
 	xlin[0].x = 0;
 	xlin[1].x = stitchWindowClientRect.right;
@@ -3839,23 +3839,23 @@ void drwtxtr()
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	xlin[0].y = 0;
 	xlin[1].y = stitchWindowClientRect.bottom;
-	for (ind = 1; ind < tscr.lins + 1; ind++)
+	for (ind = 1; ind < tscr.lines + 1; ind++)
 	{
-		xlin[0].x = xlin[1].x = (ind*tscr.spac + tscr.xof) / tscr.ed2px;
+		xlin[0].x = xlin[1].x = (ind*tscr.spacing + tscr.xOffset) / tscr.editToPixelRatio;
 		Polyline(StitchWindowMemDC, xlin, 2);
 	}
 	xlin[0].x = 0;
 	xlin[1].x = stitchWindowClientRect.right;
 	xlin[0].y = xlin[1].y = tscr.top;
 	Polyline(StitchWindowMemDC, xlin, 2);
-	xlin[0].y = xlin[1].y = tscr.bot;
+	xlin[0].y = xlin[1].y = tscr.bottom;
 	Polyline(StitchWindowMemDC, xlin, 2);
 	DeleteObject(xpen);
 	xpen = CreatePen(PS_SOLID, 1, 0xffffff);
 	SelectObject(StitchWindowMemDC, xpen);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	col = useCol[actcol];
-	for (ind = 0; ind < tscr.ind; ind++)
+	for (ind = 0; ind < tscr.index; ind++)
 	{
 		dutxtx(ind, ini.textureEditorSizePixels);
 	}
@@ -3890,17 +3890,17 @@ BOOL px2txt(POINT pof, TXPNT* txrec)
 	fPOINT epnt;
 
 	px2ed(pof, &epnt);
-	txrec->line = (epnt.x - tscr.xof) / tscr.spac + 0.5;
-	if (txrec->line > tscr.lins)
+	txrec->line = (epnt.x - tscr.xOffset) / tscr.spacing + 0.5;
+	if (txrec->line > tscr.lines)
 		return 0;
 	if (txrec->line < 1)
 		return 0;
 	if (pof.y > tscr.top)
 	{
-		if (pof.y > tscr.bot)
+		if (pof.y > tscr.bottom)
 			return 0;
 		else
-			txrec->y = (float)tscr.fhi - (float)(pof.y - tscr.top) / tscr.hi*tscr.fhi;
+			txrec->y = (float)tscr.areaHeight - (float)(pof.y - tscr.top) / tscr.height*tscr.areaHeight;
 	}
 	else
 		return 0;
@@ -3917,10 +3917,10 @@ BOOL txbutfn(TXPNT* txrec)
 
 void txtrbut()
 {
-	if (txbutfn(&txtmp[tscr.ind]))
+	if (txbutfn(&txtmp[tscr.index]))
 	{
 		savtxt();
-		tscr.ind++;
+		tscr.index++;
 		setMap(RESTCH);
 	}
 	else
@@ -3939,7 +3939,7 @@ BOOL txtclos(unsigned* pclo)
 	ref.y = msg.pt.y - stitchWindowOrigin.y;
 	minlen = 1e99;
 	*pclo = 0;
-	for (ind = 0; ind < tscr.ind; ind++)
+	for (ind = 0; ind < tscr.index; ind++)
 	{
 		txt2pix(txtmp[ind], &tpnt);
 		len = hypot(tpnt.x - ref.x, tpnt.y - ref.y);
@@ -4005,29 +4005,29 @@ void dutxrct(TXTRCT* rct)
 	if (cloxcnt)
 	{
 		txp = &txtmp[cloxlst[0]];
-		rct->lft = rct->rit = txp->line;
-		rct->top = rct->bot = txp->y;
+		rct->left = rct->right = txp->line;
+		rct->top = rct->bottom = txp->y;
 		for (ind = 1; ind < cloxcnt; ind++)
 		{
 			txp = &txtmp[cloxlst[ind]];
 			if (txp->y > rct->top)
 				rct->top = txp->y;
-			if (txp->y < rct->bot)
-				rct->bot = txp->y;
-			if (txp->line < rct->lft)
-				rct->lft = txp->line;
-			if (txp->line > rct->rit)
-				rct->rit = txp->line;
+			if (txp->y < rct->bottom)
+				rct->bottom = txp->y;
+			if (txp->line < rct->left)
+				rct->left = txp->line;
+			if (txp->line > rct->right)
+				rct->right = txp->line;
 		}
 	}
 	else
-		rct->lft = rct->rit = rct->top = rct->bot;
+		rct->left = rct->right = rct->top = rct->bottom;
 }
 
 void ed2stch(fPOINT* pt)
 {
-	pt->x -= tscr.xof;
-	pt->y -= tscr.yof;
+	pt->x -= tscr.xOffset;
+	pt->y -= tscr.yOffset;
 }
 
 void dutxlin(fPOINT pt0, fPOINT pt1)
@@ -4051,20 +4051,20 @@ void dutxlin(fPOINT pt0, fPOINT pt1)
 		strt = fin;
 		fin = tflt;
 	}
-	istrt = ceil(strt / tscr.spac);
-	ifin = floor(fin / tscr.spac);
+	istrt = ceil(strt / tscr.spacing);
+	ifin = floor(fin / tscr.spacing);
 	if (istrt < 1)
 		istrt = 1;
-	if (ifin > tscr.lins)
-		ifin = tscr.lins;
+	if (ifin > tscr.lines)
+		ifin = tscr.lines;
 	while (istrt <= ifin)
 	{
-		tflt = slop*(-pt0.x + istrt*tscr.spac) + pt0.y;
-		if (tflt > 0 && tflt < tscr.fhi)
+		tflt = slop*(-pt0.x + istrt*tscr.spacing) + pt0.y;
+		if (tflt > 0 && tflt < tscr.areaHeight)
 		{
-			txtmp[tscr.ind].line = istrt;
-			txtmp[tscr.ind].y = tflt;
-			tscr.ind++;
+			txtmp[tscr.index].line = istrt;
+			txtmp[tscr.index].y = tflt;
+			tscr.index++;
 		}
 		istrt++;
 	}
@@ -4079,10 +4079,10 @@ void setxclp()
 	deorg(&of);
 	px2ed(of, &fof);
 	if (rstMap(TXHCNTR))
-		fof.x = (tscr.lins*tscr.spac) / 2 + tscr.xof - tscr.mid.x + tscr.spac / 2;
+		fof.x = (tscr.lines*tscr.spacing) / 2 + tscr.xOffset - tscr.formCenter.x + tscr.spacing / 2;
 	else
-		fof.x -= tscr.mid.x;
-	fof.y -= tscr.mid.y;
+		fof.x -= tscr.formCenter.x;
+	fof.y -= tscr.formCenter.y;
 	for (ind = 0; ind < angfrm.sides; ind++)
 	{
 		angflt[ind].x += fof.x;
@@ -4118,8 +4118,8 @@ void ed2txp(POINT pof, TXPNT* txrec)
 	fPOINT epnt;
 
 	px2ed(pof, &epnt);
-	txrec->line = (epnt.x - tscr.xof) / tscr.spac + 0.5;
-	txrec->y = (float)tscr.fhi - (float)(pof.y - tscr.top) / tscr.hi*tscr.fhi;
+	txrec->line = (epnt.x - tscr.xOffset) / tscr.spacing + 0.5;
+	txrec->y = (float)tscr.areaHeight - (float)(pof.y - tscr.top) / tscr.height*tscr.areaHeight;
 }
 
 int	hitxlin()
@@ -4153,20 +4153,20 @@ void txtrup()
 		of.x -= cloxref.x;
 		of.y -= cloxref.y;
 		bakp = abs(of.x);
-		tof.line = bakp*tscr.ed2px / tscr.spac + 0.5;
+		tof.line = bakp*tscr.editToPixelRatio / tscr.spacing + 0.5;
 		if (of.x < 0)
 			tof.line = -tof.line;
-		tof.y = (float)-of.y / tscr.hi*tscr.fhi;
-		tflt = txrct.top + tof.y - tscr.fhi;
+		tof.y = (float)-of.y / tscr.height*tscr.areaHeight;
+		tflt = txrct.top + tof.y - tscr.areaHeight;
 		if (tflt > 0)
 			tof.y -= tflt;
-		tflt = txrct.bot + tof.y;
+		tflt = txrct.bottom + tof.y;
 		if (tflt < 0)
 			tof.y -= tflt;
-		ind = txrct.lft + tof.line - 1;
+		ind = txrct.left + tof.line - 1;
 		if (ind < 0)
 			tof.line -= ind;
-		ind = txrct.rit + tof.line - tscr.lins;
+		ind = txrct.right + tof.line - tscr.lines;
 		if (ind > 0)
 			tof.line -= ind;
 		for (ind = 0; ind < cloxcnt; ind++)
@@ -4197,7 +4197,7 @@ void txtrup()
 				lo.y = tflt;
 			}
 			cloxcnt = 0;
-			for (ind = 0; ind < tscr.ind; ind++)
+			for (ind = 0; ind < tscr.index; ind++)
 			{
 				if (txtmp[ind].y<hi.y&&
 					txtmp[ind].y>lo.y&&
@@ -4270,9 +4270,9 @@ void setxfrm()
 	}
 	angrct(&arct);
 	hi = arct.top - arct.bottom;
-	if (hi > tscr.fhi)
+	if (hi > tscr.areaHeight)
 	{
-		rat = tscr.fhi / hi*0.95;
+		rat = tscr.areaHeight / hi*0.95;
 		for (ind = 0; ind < angfrm.sides; ind++)
 		{
 			angflt[ind].x *= rat;
@@ -4280,9 +4280,9 @@ void setxfrm()
 		}
 		angrct(&arct);
 	}
-	tscr.mid.x = midl(arct.right, arct.left);
-	tscr.mid.y = midl(arct.top, arct.bottom);
-	ed2px(tscr.mid, &cloxref);
+	tscr.formCenter.x = midl(arct.right, arct.left);
+	tscr.formCenter.y = midl(arct.top, arct.bottom);
+	ed2px(tscr.formCenter, &cloxref);
 }
 
 void txtclp()
@@ -4404,9 +4404,9 @@ int txcmp(const void *arg1, const void *arg2)
 void txpar()
 {
 	frmpnt->type = POLI;
-	frmpnt->fillInfo.texture.lines = tscr.lins;
-	frmpnt->fillInfo.texture.height = tscr.fhi;
-	frmpnt->fillSpacing = tscr.spac;
+	frmpnt->fillInfo.texture.lines = tscr.lines;
+	frmpnt->fillInfo.texture.height = tscr.areaHeight;
+	frmpnt->fillSpacing = tscr.spacing;
 	frmpnt->lengthOrCount.stitchLength = ini.userStitchLength;
 	frmpnt->maxFillStitchLen = ini.maxStitchLength;
 	frmpnt->minFillStitchLen = ini.minStitchLength;
@@ -4416,7 +4416,7 @@ void txpar()
 
 void txvrt()
 {
-	if (tscr.ind)
+	if (tscr.index)
 	{
 		if (chkMap(FORMSEL))
 		{
@@ -4429,7 +4429,7 @@ void txvrt()
 
 void txhor()
 {
-	if (tscr.ind)
+	if (tscr.index)
 	{
 		if (chkMap(FORMSEL))
 		{
@@ -4442,13 +4442,13 @@ void txhor()
 
 void txang()
 {
-	if (tscr.ind)
+	if (tscr.index)
 	{
 		if (chkMap(FORMSEL))
 		{
 			fvars(closestFormToCursor);
 			frmpnt->fillType = TXANGF;
-			frmpnt->angleOrClipData.fang = (float)ini.fillAngle;
+			frmpnt->angleOrClipData.angle = (float)ini.fillAngle;
 			txpar();
 		}
 	}
@@ -4478,7 +4478,7 @@ void nutx()
 	int			ind, ins;
 	FRMHED*		pf;
 
-	qsort((void*)&txtmp, tscr.ind, 6, txcmp);
+	qsort((void*)&txtmp, tscr.index, 6, txcmp);
 	ins = 0;
 	if (formIndex)
 	{
@@ -4501,10 +4501,10 @@ void nutx()
 		nutskp:;
 		}
 	}
-	txspac(ins, tscr.ind);
-	MoveMemory(&txpnts[ins], &txtmp, tscr.ind * sizeof(TXPNT));
+	txspac(ins, tscr.index);
+	MoveMemory(&txpnts[ins], &txtmp, tscr.index * sizeof(TXPNT));
 	frmpnt->fillInfo.texture.index = ins;
-	frmpnt->fillInfo.texture.count = tscr.ind;
+	frmpnt->fillInfo.texture.count = tscr.index;
 }
 
 void altx()
@@ -4514,17 +4514,17 @@ void altx()
 
 	if (chkMap(FORMSEL))
 	{
-		hi2 = tscr.fhi / 2;
-		clRmap((tscr.lins >> 5) + 1);
-		for (ind = 0; ind < tscr.ind; ind++)
+		hi2 = tscr.areaHeight / 2;
+		clRmap((tscr.lines >> 5) + 1);
+		for (ind = 0; ind < tscr.index; ind++)
 			setr(txtmp[ind].line);
-		for (ind = 1; ind <= tscr.lins; ind++)
+		for (ind = 1; ind <= tscr.lines; ind++)
 		{
 			if (!chkr(ind))
 			{
-				txtmp[tscr.ind].line = ind;
-				txtmp[tscr.ind].y = hi2;
-				tscr.ind++;
+				txtmp[tscr.index].line = ind;
+				txtmp[tscr.index].y = hi2;
+				tscr.index++;
 			}
 		}
 	}
@@ -4576,7 +4576,7 @@ void dutxfn(unsigned typ)
 
 void txsrt()
 {
-	qsort((void*)txtmp, tscr.ind, 6, txcmp);
+	qsort((void*)txtmp, tscr.index, 6, txcmp);
 }
 
 void dutxmir()
@@ -4585,12 +4585,12 @@ void dutxmir()
 
 	savtxt();
 	txsrt();
-	lin = (tscr.lins + 1) >> 1;
-	ind = tscr.ind - 1;
+	lin = (tscr.lines + 1) >> 1;
+	ind = tscr.index - 1;
 	while (txtmp[ind].line > lin&&ind >= 0)
 		ind--;
 	ine = ind + 1;
-	if (tscr.lins & 1)
+	if (tscr.lines & 1)
 	{
 		while (ind >= 0) {
 			if (txtmp[ind].line == lin) {
@@ -4601,12 +4601,12 @@ void dutxmir()
 	}
 	while (ind >= 0)
 	{
-		txtmp[ine].line = tscr.lins - txtmp[ind].line + 1;
+		txtmp[ine].line = tscr.lines - txtmp[ind].line + 1;
 		txtmp[ine].y = txtmp[ind].y;
 		ine++;
 		ind--;
 	}
-	tscr.ind = ine;
+	tscr.index = ine;
 	setMap(RESTCH);
 }
 
@@ -4710,11 +4710,11 @@ void redtbak()
 	//	sprintf_s(msgbuf, sizeof(msgbuf),"%d\n",ptxhst);
 	//	OutputDebugString(msgbuf);
 	phst = &thsts[ptxhst];
-	tscr.fhi = phst->hi;
-	tscr.wid = phst->wid;
-	tscr.spac = phst->spac;
-	tscr.ind = phst->cnt;
-	MoveMemory(txtmp, phst->txp, phst->cnt * sizeof(TXPNT));
+	tscr.areaHeight = phst->height;
+	tscr.width = phst->width;
+	tscr.spacing = phst->spacing;
+	tscr.index = phst->count;
+	MoveMemory(txtmp, phst->texturePoint, phst->count * sizeof(TXPNT));
 	setMap(RESTCH);
 }
 
@@ -4727,7 +4727,7 @@ void txbak()
 		cloxcnt = 0;
 		for (ind = 0; ind < 16; ind++)
 		{
-			if (thsts[ptxhst].wid)
+			if (thsts[ptxhst].width)
 				goto txbak1;
 			txrbak();
 		}
@@ -4747,7 +4747,7 @@ void nxbak()
 		for (ind = 0; ind < 16; ind++)
 		{
 			txrfor();
-			if (thsts[ptxhst].wid)
+			if (thsts[ptxhst].width)
 				goto nxbak1;
 		}
 		return;
@@ -4768,7 +4768,7 @@ void txtdel()
 		for (ind = 0; ind < cloxcnt; ind++)
 			setr(cloxlst[ind]);
 		ine = 0;
-		for (ind = 0; ind < tscr.ind; ind++)
+		for (ind = 0; ind < tscr.index; ind++)
 		{
 			if (!chkr(ind))
 			{
@@ -4778,14 +4778,14 @@ void txtdel()
 			}
 		}
 		cloxcnt = 0;
-		tscr.ind = ine;
+		tscr.index = ine;
 		setMap(RESTCH);
 		return;
 	}
-	if (tscr.ind&&txtclos(&clo))
+	if (tscr.index&&txtclos(&clo))
 	{
-		MoveMemory(&txtmp[clo], &txtmp[clo + 1], (tscr.ind - clo) * sizeof(TXPNT));
-		tscr.ind--;
+		MoveMemory(&txtmp[clo], &txtmp[clo + 1], (tscr.index - clo) * sizeof(TXPNT));
+		tscr.index--;
 		setMap(RESTCH);
 	}
 }
@@ -4794,7 +4794,7 @@ void txdelal()
 {
 	chktxnum();
 	savtxt();
-	tscr.ind = 0;
+	tscr.index = 0;
 	rstxt();
 	setMap(RESTCH);
 }
@@ -4812,7 +4812,7 @@ void chktxnum()
 		case HTXHI:
 
 			savtxt();
-			tscr.fhi = tflt;
+			tscr.areaHeight = tflt;
 			ini.textureHeight = tflt;
 			setMap(CHKTX);
 			break;
@@ -4820,7 +4820,7 @@ void chktxnum()
 		case HTXWID:
 
 			savtxt();
-			tscr.wid = tflt;
+			tscr.width = tflt;
 			ini.textureWidth = tflt;
 			setMap(CHKTX);
 			break;
@@ -4828,9 +4828,9 @@ void chktxnum()
 		case HTXSPAC:
 
 			savtxt();
-			tscr.spac = tflt;
+			tscr.spacing = tflt;
 			ini.textureSpacing = tflt;
-			tscr.wid = tflt*tscr.lins + tflt / 2;
+			tscr.width = tflt*tscr.lines + tflt / 2;
 			setMap(CHKTX);
 			break;
 		}
@@ -4887,9 +4887,9 @@ void txsiz(double rat)
 		angflt[ind].y *= rat;
 	}
 	angrct(&arct);
-	tscr.mid.x = midl(arct.right, arct.left);
-	tscr.mid.y = midl(arct.top, arct.bottom);
-	ed2px(tscr.mid, &cloxref);
+	tscr.formCenter.x = midl(arct.right, arct.left);
+	tscr.formCenter.y = midl(arct.top, arct.bottom);
+	ed2px(tscr.formCenter, &cloxref);
 	ritxfrm();
 }
 
@@ -4933,13 +4933,13 @@ void txnudg(int dx, float dy)
 	{
 		if (dy)
 		{
-			fdy = dy*tscr.ed2px;
+			fdy = dy*tscr.editToPixelRatio;
 			for (ind = 0; ind < cloxcnt; ind++)
 			{
 				tflt = txtmp[cloxlst[ind]].y + fdy;
 				if (tflt < 0)
 					return;
-				if (tflt > tscr.fhi)
+				if (tflt > tscr.areaHeight)
 					return;
 			}
 			for (ind = 0; ind < cloxcnt; ind++)
@@ -4952,7 +4952,7 @@ void txnudg(int dx, float dy)
 				tlin = txtmp[cloxlst[ind]].line + dx;
 				if (tlin < 1)
 					return;
-				if (tlin > tscr.lins)
+				if (tlin > tscr.lines)
 					return;
 			}
 			for (ind = 0; ind < cloxcnt; ind++)
@@ -4969,7 +4969,7 @@ void txsnap()
 	float siz2;
 	TXPNT*	tp;
 
-	if (tscr.ind)
+	if (tscr.index)
 	{
 		savtxt();
 		siz2 = ini.gridSize / 2;
@@ -4984,7 +4984,7 @@ void txsnap()
 		}
 		else
 		{
-			for (ind = 0; ind < tscr.ind; ind++)
+			for (ind = 0; ind < tscr.index; ind++)
 			{
 				tp = &txtmp[ind];
 				cnt = (tp->y + siz2) / ini.gridSize;
@@ -5172,8 +5172,8 @@ void setxt()
 	{
 		for (ind = cnt - 1; ind >= 0; ind--)
 		{
-			txsegs[pbak[ind].line - 1].lin = ind;
-			txsegs[pbak[ind].line - 1].cnt++;
+			txsegs[pbak[ind].line - 1].line = ind;
+			txsegs[pbak[ind].line - 1].stitchCount++;
 		}
 	}
 }
@@ -5184,12 +5184,12 @@ void rtrtx()
 
 	fvars(closestFormToCursor);
 	tps = &txpnts[frmpnt->fillInfo.texture.index];
-	tscr.ind = frmpnt->fillInfo.texture.count;
-	MoveMemory(txtmp, tps, sizeof(TXPNT)*tscr.ind);
-	tscr.fhi = frmpnt->fillInfo.texture.height;
-	tscr.spac = frmpnt->fillSpacing;
-	tscr.lins = frmpnt->fillInfo.texture.lines;
-	tscr.wid = tscr.lins*tscr.spac + tscr.spac / 2;
+	tscr.index = frmpnt->fillInfo.texture.count;
+	MoveMemory(txtmp, tps, sizeof(TXPNT)*tscr.index);
+	tscr.areaHeight = frmpnt->fillInfo.texture.height;
+	tscr.spacing = frmpnt->fillSpacing;
+	tscr.lines = frmpnt->fillInfo.texture.lines;
+	tscr.width = tscr.lines*tscr.spacing + tscr.spacing / 2;
 	savtxt();
 }
 
@@ -5441,16 +5441,16 @@ void setshft()
 	srct.bottom = sPnt.y;
 	srct.right = sPnt.x;
 	rstMap(TXIN);
-	tscr.ind = 0;
+	tscr.index = 0;
 	lin = 1;
 	for (ind = 0; ind < hed.stitchCount; ind++)
 	{
 		if (inrct(srct, stchs[ind]))
 		{
 			setMap(TXIN);
-			txtmp[tscr.ind].line = lin;
-			txtmp[tscr.ind].y = stchs[ind].y - srct.bottom;
-			tscr.ind++;
+			txtmp[tscr.index].line = lin;
+			txtmp[tscr.index].y = stchs[ind].y - srct.bottom;
+			tscr.index++;
 		}
 		else
 		{
@@ -5458,10 +5458,10 @@ void setshft()
 				lin++;
 		}
 	}
-	if (tscr.ind) { lin = txtmp[tscr.ind - 1].line; }
-	tscr.spac = (srct.right - srct.left) / lin;
-	tscr.fhi = srct.top - srct.bottom;
-	tscr.wid = tscr.spac*lin + tscr.spac / 2;
+	if (tscr.index) { lin = txtmp[tscr.index - 1].line; }
+	tscr.spacing = (srct.right - srct.left) / lin;
+	tscr.areaHeight = srct.top - srct.bottom;
+	tscr.width = tscr.spacing*lin + tscr.spacing / 2;
 	setMap(TXTRED);
 	setMap(RESTCH);
 }
@@ -5509,9 +5509,9 @@ void txdun()
 	HANDLE hnam;
 	unsigned long rot;
 	int ind;
-	//char* sig="txh";
+	//char* signature="txh";
 
-	if (thsts[0].cnt)
+	if (thsts[0].count)
 	{
 		if (txnam(nam, sizeof(nam)))
 		{
@@ -5523,8 +5523,8 @@ void txdun()
 				WriteFile(hnam, (TXHST*)&thsts, sizeof(TXHST) * 16, &rot, 0);
 				for (ind = 0; ind < 16; ind++)
 				{
-					if (thsts[ind].cnt)
-						WriteFile(hnam, (TXPNT*)thsts[ind].txp, thsts[ind].cnt * sizeof(TXPNT), &rot, 0);
+					if (thsts[ind].count)
+						WriteFile(hnam, (TXPNT*)thsts[ind].texturePoint, thsts[ind].count * sizeof(TXPNT), &rot, 0);
 				}
 			}
 			CloseHandle(hnam);
@@ -5557,10 +5557,10 @@ void redtx()
 				ReadFile(hnam, (TXHST*)&thsts, sizeof(TXHST) * 16, &red, 0);
 				for (ind = 0; ind < (red / sizeof(TXHST)); ind++)
 				{
-					if (thsts[ind].cnt)
+					if (thsts[ind].count)
 					{
-						thsts[ind].txp = new TXPNT[thsts[ind].cnt];
-						ReadFile((TXPNT*)hnam, thsts[ind].txp, sizeof(TXPNT)*thsts[ind].cnt, &red, 0);
+						thsts[ind].texturePoint = new TXPNT[thsts[ind].count];
+						ReadFile((TXPNT*)hnam, thsts[ind].texturePoint, sizeof(TXPNT)*thsts[ind].count, &red, 0);
 					}
 				}
 				setMap(WASTXBAK);
@@ -5664,18 +5664,18 @@ void lodchk()
 
 void chkclp(FRMHED* fp, BADCNTS* bc)
 {
-	if (bc->clp == fp->angleOrClipData.clp - clipboardPoints)
+	if (bc->clp == fp->angleOrClipData.clip - clipboardPoints)
 		bc->clp += fp->lengthOrCount.clipCount;
 	else
-		bc->at |= BADCLP;
+		bc->attribute |= BADCLP;
 }
 
 void chkeclp(FRMHED* fp, BADCNTS* bc)
 {
-	if (bc->clp == fp->borderClipboardData - clipboardPoints)
-		bc->clp += fp->nclp;
+	if (bc->clp == fp->borderClipData - clipboardPoints)
+		bc->clp += fp->clipEntries;
 	else
-		bc->at |= BADCLP;
+		bc->attribute |= BADCLP;
 }
 
 unsigned frmchkfn()
@@ -5690,16 +5690,16 @@ unsigned frmchkfn()
 		for (ind = 0; ind < formIndex; ind++)
 		{
 			fp = &formList[ind];
-			if (!(bc.at&BADFLT))
+			if (!(bc.attribute&BADFLT))
 			{
 				if (!fp->sides)
-					bc.at |= BADFLT;
+					bc.attribute |= BADFLT;
 				if (bc.flt == fp->vertices - formPoints)
 					bc.flt += fp->sides;
 				else
-					bc.at |= BADFLT;
+					bc.attribute |= BADFLT;
 			}
-			if (!(bc.at&BADCLP))
+			if (!(bc.attribute&BADCLP))
 			{
 				if (isclp(ind))
 					chkclp(fp, &bc);
@@ -5708,37 +5708,37 @@ unsigned frmchkfn()
 			}
 			if (fp->type == SAT&&fp->satinGuideCount)
 			{
-				if (!(bc.at&BADSAT))
+				if (!(bc.attribute&BADSAT))
 				{
 					if (bc.sat == fp->satinOrAngle.sac - satks)
 						bc.sat += fp->satinGuideCount;
 					else
-						bc.at |= BADSAT;
+						bc.attribute |= BADSAT;
 				}
 			}
 			if (istx(ind))
 			{
-				if (!(bc.at&BADTX))
+				if (!(bc.attribute&BADTX))
 				{
 					if (bc.tx == fp->fillInfo.texture.index)
 						bc.tx += fp->fillInfo.texture.count;
 					else
-						bc.at |= BADTX;
+						bc.attribute |= BADTX;
 				}
 			}
-			if (bc.at == (BADFLT | BADCLP | BADSAT | BADTX))
+			if (bc.attribute == (BADFLT | BADCLP | BADSAT | BADTX))
 				break;
 		}
 		if (bc.flt != (int)fltad)
-			bc.at |= BADFLT;
+			bc.attribute |= BADFLT;
 		if (bc.clp != (int)clpad)
-			bc.at |= BADCLP;
+			bc.attribute |= BADCLP;
 		if (bc.sat != (int)satkad)
-			bc.at |= BADSAT;
+			bc.attribute |= BADSAT;
 		if (bc.tx != txad)
-			bc.at |= BADTX;
+			bc.attribute |= BADTX;
 	}
-	return bc.at;
+	return bc.attribute;
 }
 
 void frmchkx()
@@ -5781,7 +5781,7 @@ void bcup(unsigned find, BADCNTS* bc)
 	if (isclp(find))
 		bc->clp += fp->lengthOrCount.clipCount;
 	if (iseclp(find))
-		bc->clp += fp->nclp;
+		bc->clp += fp->clipEntries;
 	if (fp->type == SAT)
 		bc->sat += fp->satinGuideCount;
 	if (istx(find))
@@ -5867,11 +5867,11 @@ void repclp()
 		fp = &formList[ind];
 		if (isclp(ind))
 		{
-			loc = fp->angleOrClipData.clp - clipboardPoints;
+			loc = fp->angleOrClipData.clip - clipboardPoints;
 			if (loc + fp->lengthOrCount.clipCount < clpad)
 			{
-				MoveMemory(&tclps[cnt], fp->angleOrClipData.clp, sizeof(fPOINT)*fp->lengthOrCount.clipCount);
-				fp->angleOrClipData.clp = &clipboardPoints[cnt];
+				MoveMemory(&tclps[cnt], fp->angleOrClipData.clip, sizeof(fPOINT)*fp->lengthOrCount.clipCount);
+				fp->angleOrClipData.clip = &clipboardPoints[cnt];
 				cnt += fp->lengthOrCount.clipCount;
 			}
 			else
@@ -5879,8 +5879,8 @@ void repclp()
 				if (loc < clpad)
 				{
 					fp->lengthOrCount.clipCount = fltad - loc;
-					MoveMemory(&tclps[cnt], fp->angleOrClipData.clp, sizeof(fPOINT)*fp->lengthOrCount.clipCount);
-					fp->angleOrClipData.clp = &clipboardPoints[cnt];
+					MoveMemory(&tclps[cnt], fp->angleOrClipData.clip, sizeof(fPOINT)*fp->lengthOrCount.clipCount);
+					fp->angleOrClipData.clip = &clipboardPoints[cnt];
 					cnt += fp->lengthOrCount.clipCount;
 				}
 				else
@@ -5892,21 +5892,21 @@ void repclp()
 		}
 		if (iseclp(ind))
 		{
-			loc = fp->borderClipboardData - clipboardPoints;
-			if (loc + fp->nclp < clpad)
+			loc = fp->borderClipData - clipboardPoints;
+			if (loc + fp->clipEntries < clpad)
 			{
-				MoveMemory(&tclps[cnt], fp->borderClipboardData, sizeof(fPOINT)*fp->nclp);
-				fp->borderClipboardData = &clipboardPoints[cnt];
-				cnt += fp->nclp;
+				MoveMemory(&tclps[cnt], fp->borderClipData, sizeof(fPOINT)*fp->clipEntries);
+				fp->borderClipData = &clipboardPoints[cnt];
+				cnt += fp->clipEntries;
 			}
 			else
 			{
 				if (loc < clpad)
 				{
-					fp->nclp = fltad - loc;
-					MoveMemory(&tclps[cnt], fp->borderClipboardData, sizeof(fPOINT)*fp->nclp);
-					fp->borderClipboardData = &clipboardPoints[cnt];
-					cnt += fp->nclp;
+					fp->clipEntries = fltad - loc;
+					MoveMemory(&tclps[cnt], fp->borderClipData, sizeof(fPOINT)*fp->clipEntries);
+					fp->borderClipData = &clipboardPoints[cnt];
+					cnt += fp->clipEntries;
 				}
 				else
 				{
@@ -6027,7 +6027,7 @@ void repar()
 
 void tst()
 {
-	strcpy_s(ini.desnam, "Mr");
-	strcpy_s(thrnam, ini.desnam);
+	strcpy_s(ini.designerName, "Mr");
+	strcpy_s(thrnam, ini.designerName);
 	setMap(RESTCH);
 }

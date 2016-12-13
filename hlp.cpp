@@ -53,7 +53,7 @@ unsigned				fhlplen;					//help file length
 HWND					hlpwnd;						//help window
 HWND					hMsg = 0;						//message window
 
-unsigned short ldlst[] = {	//strings to load into memory at init time
+unsigned short ldlst[] = {	//strings to load into memory attribute init time
 	IDS_PIKOL,
 	IDS_UPON,
 	IDS_UPOF,
