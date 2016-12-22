@@ -1304,7 +1304,7 @@ typedef struct _vrct2 {
 	dPOINT	dopnt;
 }VRCT2;
 
-typedef struct _curs {
+typedef struct _cursorMask {
 	unsigned char form[128];
 	unsigned char dline[128];
 	unsigned char uprightNeedle[128];
@@ -1312,7 +1312,7 @@ typedef struct _curs {
 	unsigned char leftDownNeedle[128];
 	unsigned char rightUpNeedle[128];
 	unsigned char rightDownNeedle[128];
-}CURS;
+}CURSORMASK;
 
 //balarad file header
 typedef struct _balhed {
@@ -1758,7 +1758,7 @@ enum	{	//interleave sequence identifiers
 typedef struct _intinf {
 	unsigned pins;
 	unsigned coloc;
-	unsigned laycod;
+	unsigned layerIndex;
 	unsigned sloc;
 	unsigned oloc;
 	fPOINTATTRIBUTE* histch;

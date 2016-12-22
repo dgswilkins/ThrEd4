@@ -29,7 +29,7 @@ extern MSG				msg;
 extern unsigned			buttonHi;
 extern unsigned			formIndex;
 extern unsigned			selectedFormCount;
-extern FRMHED*			frmpnt;
+extern FRMHED*			ptrSelectedForm;
 extern FRMHED			formList[MAXFORMS];
 extern unsigned			closestFormToCursor;
 extern RECT				scRct;
@@ -484,8 +484,8 @@ BOOL filmsgs(unsigned cod) {
 		frm1pnt();
 		if (chkMap(FORMSEL)) {
 
-			frmpnt = &formList[closestFormToCursor];
-			if (frmpnt->sides == 2) {
+			ptrSelectedForm = &formList[closestFormToCursor];
+			if (ptrSelectedForm->sides == 2) {
 
 				if (cod < FML_LIN) {
 
