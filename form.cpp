@@ -117,17 +117,16 @@ extern			void		clpxadj();
 
 extern			POINT		pselfin;
 extern			unsigned	fsizeof;
-extern			FORMPOINTS		selectedFormPoints;
-extern			HWND		hStch;
+extern			FORMPOINTS	selectedFormPoints;
+extern			HWND		hMainStitchWin;
 extern			HWND		hMsg;
 extern			HWND		hsidWnd[11];
-extern			HWND		hPrf;
-extern			HWND		hfdat;
+extern			HWND		hPreferencesWindow;
+extern			HWND		hFormData;
 extern			HWND		hto;
-extern			RECT		mRct;
-extern			PCSHEADER			hed;
+extern			PCSHEADER	hed;
 extern			RECT		stitchWindowClientRect;
-extern			dRECTANGLE		zoomRect;
+extern			dRECTANGLE	zoomRect;
 
 extern			HDC			StitchWindowMemDC;
 extern			HDC			StitchWindowDC;
@@ -152,8 +151,8 @@ extern			double		rotationAngle;
 extern			double		showStitchThreshold;
 extern			double		StitchBoxesThreshold;
 extern			double		zoomFactor;
-extern			unsigned	buttonWid;
-extern			unsigned	actcol;
+extern			unsigned	buttonWidth;
+extern			unsigned	activeColor;
 extern			unsigned	closestPointIndex;
 extern			unsigned	groupStartStitch;
 extern			unsigned	groupEndStitch;
@@ -167,20 +166,20 @@ extern			unsigned	selCnt;
 extern			unsigned	groupStitchIndex;
 extern			dPOINT		zoomRatio;
 extern			HWND		hWnd;
-extern			HMENU		hMen;
-extern			HMENU		hfilMen;
-extern			HWND		hok;
-extern			HWND		hcan;
-extern			HWND		hdsc;
+extern			HMENU		hMainMenu;
+extern			HMENU		hfillMenu;
+extern			HWND		hOKButton;
+extern			HWND		hCancelButton;
+extern			HWND		hDiscardButton;
 extern			RECT		msgRct;
 extern			HGLOBAL		hClipMem;
-extern			unsigned	buttonWid3;
-extern			unsigned	buttonHi;
+extern			unsigned	buttonWidthX3;
+extern			unsigned	buttonHeight;
 extern			HINSTANCE	hInst;
 extern			void		mvstch(fPOINTATTRIBUTE* dst, fPOINTATTRIBUTE* src);
 extern			void		delfstchs();
 extern			BOOL		isfclp();
-extern			fRECTANGLE		selectedPointsRect;
+extern			fRECTANGLE	selectedPointsRect;
 extern			RECT		selectedPixelsRect;
 
 extern			dPOINT		zoomMarkPoint;
@@ -195,23 +194,23 @@ extern			TCHAR*		pcdClipFormat;
 extern			void		sCor2px(dPOINT stpnt, POINT* pxpnt);
 extern			void*		ptrClipVoid;
 extern			CLPSTCH*	clipboardStitchData;
-extern			fRECTANGLE		clipboardRect;
+extern			fRECTANGLE	clipboardRect;
 extern			FLSIZ		clipboardRectSize;
 extern			FRMHED*		ptrSelectedForm;			//pointer to selected form
-extern			HWND		hSid;
+extern			HWND		hSideMessageWin;
 extern			unsigned	numpnt;
 extern			unsigned	markedStitchMap[RMAPSIZ];
-extern			POINT		stchSiz;
+extern			POINT		StitchWinSize;
 extern			HPEN		userPen[16];
 extern			HPEN		multiFormPen;
 extern			HPEN		selectAllPen;
-extern			fRECTANGLE		rotationRect;
+extern			fRECTANGLE	rotationRect;
 extern			unsigned	activeLayer;
 extern			unsigned	layerIndex;
-extern			fRECTANGLE		rngrct;
+extern			fRECTANGLE	stitchRangeRect;
 extern			unsigned	dunmap[MAXFRMLINS / 32 + 1];
 extern			void		rotflt(fPOINT* pnt);
-extern			fPOINT		bigsiz;
+extern			fPOINT		selectedFormsSize;
 extern			unsigned	toglu(unsigned bPnt);
 extern			TCHAR		thrnam[_MAX_PATH];
 extern			POINT		sizlin[5];
@@ -222,7 +221,6 @@ extern			POINT		scend;
 extern			unsigned	bitmapWidth;
 extern			unsigned	bitmapHeight;
 extern			TCHAR*		stab[STR_LEN];
-//extern			unsigned	prfsiz;
 
 void			lcon();
 void			filvrt();
@@ -1521,8 +1519,8 @@ void drwfrm() {
 		selectedFormsRectangle.bottom = selectedFormsRectangle.right = 0;
 		for (ind = 0; ind < selectedFormCount; ind++)
 			fselrct(selectedFormList[ind]);
-		bigsiz.x = selectedFormsRectangle.right - selectedFormsRectangle.left;
-		bigsiz.y = selectedFormsRectangle.bottom - selectedFormsRectangle.top;
+		selectedFormsSize.x = selectedFormsRectangle.right - selectedFormsRectangle.left;
+		selectedFormsSize.y = selectedFormsRectangle.bottom - selectedFormsRectangle.top;
 		dubig();
 	}
 	else {
@@ -2064,28 +2062,28 @@ void ritfil() {
 void okcan() {
 	GetClientRect(hMsg, &msgRct);
 
-	hok = CreateWindow(
+	hOKButton = CreateWindow(
 		"STATIC",
 		stab[STR_OKENT],
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		5,
 		msgRct.bottom + 15,
-		buttonWid << 2,
-		buttonHi,
-		hStch,
+		buttonWidth << 2,
+		buttonHeight,
+		hMainStitchWin,
 		NULL,
 		hInst,
 		NULL);
 
-	hcan = CreateWindow(
+	hCancelButton = CreateWindow(
 		"STATIC",
 		stab[STR_CANCEL],
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		buttonWid * 5,
+		buttonWidth * 5,
 		msgRct.bottom + 15,
-		buttonWid3,
-		buttonHi,
-		hStch,
+		buttonWidthX3,
+		buttonHeight,
+		hMainStitchWin,
 		NULL,
 		hInst,
 		NULL);
@@ -2100,42 +2098,42 @@ void savdisc() {
 	GetClientRect(hMsg, &msgRct);
 
 	LoadString(hInst, IDS_SAV, buf, HBUFSIZ);
-	hok = CreateWindow(
+	hOKButton = CreateWindow(
 		"STATIC",
 		buf,
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		5,
 		msgRct.bottom + 15,
-		buttonWid3,
-		buttonHi,
-		hStch,
+		buttonWidthX3,
+		buttonHeight,
+		hMainStitchWin,
 		NULL,
 		hInst,
 		NULL);
 
 	LoadString(hInst, IDS_DISC, buf, HBUFSIZ);
-	hdsc = CreateWindow(
+	hDiscardButton = CreateWindow(
 		"STATIC",
 		buf,
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		buttonWid3 + 15,
+		buttonWidthX3 + 15,
 		msgRct.bottom + 15,
-		buttonWid3,
-		buttonHi,
-		hStch,
+		buttonWidthX3,
+		buttonHeight,
+		hMainStitchWin,
 		NULL,
 		hInst,
 		NULL);
 
-	hcan = CreateWindow(
+	hCancelButton = CreateWindow(
 		"STATIC",
 		stab[STR_CANCEL],
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		2 * buttonWid3 + 25,
+		2 * buttonWidthX3 + 25,
 		msgRct.bottom + 15,
-		buttonWid3,
-		buttonHi,
-		hStch,
+		buttonWidthX3,
+		buttonHeight,
+		hMainStitchWin,
 		NULL,
 		hInst,
 		NULL);
@@ -2716,7 +2714,7 @@ void refil() {
 		for (ind = 0; ind < hed.stitchCount; ind++) {
 			at = stitchBuffer[ind].attribute;
 			if (!(at&NOTFRM) && (at&(USMSK | FRMSK)) == trg) {
-				if (hfdat)
+				if (hFormData)
 					setMap(WASFRMFRM);
 				undat();
 				tabmsg(IDS_REFIL);
@@ -4145,7 +4143,7 @@ void fsvrt() {
 	makpoli();
 	ptrSelectedForm->fillType = VRTF;
 	ptrSelectedForm->type = POLI;
-	ptrSelectedForm->fillColor = actcol;
+	ptrSelectedForm->fillColor = activeColor;
 	fsizpar();
 	ptrSelectedForm->fillSpacing = StitchSpace;
 	ptrSelectedForm->type = POLI;
@@ -4186,7 +4184,7 @@ void fshor() {
 	deltx();
 	makpoli();
 	ptrSelectedForm->fillType = HORF;
-	ptrSelectedForm->fillColor = actcol;
+	ptrSelectedForm->fillColor = activeColor;
 	fsizpar();
 	ptrSelectedForm->fillSpacing = StitchSpace;
 	ptrSelectedForm->angleOrClipData.angle = (float)PI / 2;
@@ -4231,7 +4229,7 @@ void fsangl() {
 	ptrSelectedForm->fillType = ANGF;
 	rotationAngle = PI / 2 - rotationAngle;
 	ptrSelectedForm->angleOrClipData.angle = (float)ini.fillAngle;
-	ptrSelectedForm->fillColor = actcol;
+	ptrSelectedForm->fillColor = activeColor;
 	fsizpar();
 	ptrSelectedForm->fillSpacing = StitchSpace;
 	ptrSelectedForm->type = POLI;
@@ -5291,7 +5289,7 @@ void filsfn() {
 	ptrSelectedForm->type = SAT;
 	fsizpar();
 	ptrSelectedForm->fillType = SATF;
-	ptrSelectedForm->fillColor = actcol;
+	ptrSelectedForm->fillColor = activeColor;
 	ptrSelectedForm->fillSpacing = StitchSpace;
 	ptrSelectedForm->type = SAT;
 	refilfn();
@@ -5827,7 +5825,7 @@ void bord() {
 		for (ind = 0; ind < selectedFormCount; ind++) {
 			closestFormToCursor = selectedFormList[ind];
 			fvars(closestFormToCursor);
-			ptrSelectedForm->borderColor = actcol;
+			ptrSelectedForm->borderColor = activeColor;
 			sbord();
 		}
 		setMap(INIT);
@@ -5836,7 +5834,7 @@ void bord() {
 	}
 	else {
 		if (chkMap(FORMSEL)) {
-			ptrSelectedForm->borderColor = actcol;
+			ptrSelectedForm->borderColor = activeColor;
 			sbord();
 			coltab();
 			setMap(INIT);
@@ -6113,7 +6111,7 @@ void fsclp() {
 	ptrSelectedForm->borderClipData = nueclp(closestFormToCursor, clipboardStitchCount);
 	ptrSelectedForm->borderSize = clipboardRectSize.cy;
 	ptrSelectedForm->edgeSpacing = clipboardRectSize.cx;
-	ptrSelectedForm->borderColor = actcol;
+	ptrSelectedForm->borderColor = activeColor;
 	bsizpar();
 	for (ind = 0; ind < clipboardStitchCount; ind++) {
 		ptrSelectedForm->borderClipData[ind].x = clipBuffer[ind].x;
@@ -6478,7 +6476,7 @@ void satsbrd() {
 	bsizpar();
 	ptrSelectedForm->borderSize = borderWidth;
 	ptrSelectedForm->edgeSpacing = StitchSpace / 2;
-	ptrSelectedForm->borderColor = actcol;
+	ptrSelectedForm->borderColor = activeColor;
 	refilfn();
 }
 
@@ -6555,7 +6553,7 @@ void sapliq()
 	ptrSelectedForm->edgeSpacing = StitchSpace / 2;
 	ptrSelectedForm->borderSize = ini.borderWidth;
 	bsizpar();
-	ptrSelectedForm->borderColor = actcol | (underlayColor << 4);
+	ptrSelectedForm->borderColor = activeColor | (underlayColor << 4);
 	if (ptrSelectedForm->type != LIN)
 	{
 		if (ptrSelectedForm->fillType == SAT&&ptrSelectedForm->satinGuideCount)
@@ -6602,7 +6600,7 @@ void apliq() {
 void setap() {
 	TCHAR	buf[HBUFSIZ];
 
-	underlayColor = actcol;
+	underlayColor = activeColor;
 	LoadString(hInst, IDS_APCOL, buf, HBUFSIZ);
 	sprintf_s(msgbuf, sizeof(msgbuf), buf, underlayColor + 1);
 	shoMsg(msgbuf);
@@ -6641,7 +6639,7 @@ HWND txtwin(TCHAR* str, RECT loc) {
 		loc.top,
 		loc.right - loc.left,
 		loc.bottom - loc.top,
-		hfdat,
+		hFormData,
 		NULL,
 		hInst,
 		NULL);
@@ -6661,7 +6659,7 @@ HWND txtrwin(TCHAR* str, RECT loc) {
 		loc.top,
 		loc.right - loc.left,
 		loc.bottom - loc.top,
-		hfdat,
+		hFormData,
 		NULL,
 		hInst,
 		NULL);
@@ -6681,7 +6679,7 @@ HWND numwin(TCHAR* str, RECT loc) {
 		loc.top,
 		loc.right - loc.left,
 		loc.bottom - loc.top,
-		hfdat,
+		hFormData,
 		NULL,
 		hInst,
 		NULL);
@@ -7023,24 +7021,24 @@ void refrmfn()
 void refrm() {
 	ptrSelectedForm = &formList[closestFormToCursor];
 	if (rstMap(PRFACT)) {
-		DestroyWindow(hPrf);
+		DestroyWindow(hPreferencesWindow);
 		rstMap(WASRT);
 	}
 	leftWindowSize.x = leftWindowSize.y = rightWindowSize.x = rightWindowSize.y = 0;
 	setMap(REFCNT);
 	refmcnt = 0;
 	refrmfn();
-	if (hfdat) {
-		while (EnumChildWindows(hfdat, chenum, 0));
-		MoveWindow(hfdat, buttonWid3 + 3, 3, leftWindowSize.x + rightWindowSize.x + 18, leftWindowSize.y*refmcnt + 12, TRUE);
-		redraw(hfdat);
+	if (hFormData) {
+		while (EnumChildWindows(hFormData, chenum, 0));
+		MoveWindow(hFormData, buttonWidthX3 + 3, 3, leftWindowSize.x + rightWindowSize.x + 18, leftWindowSize.y*refmcnt + 12, TRUE);
+		redraw(hFormData);
 	}
 	else {
-		hfdat = CreateWindow(
+		hFormData = CreateWindow(
 			"STATIC",
 			0,
 			WS_CHILD | WS_VISIBLE | WS_BORDER,
-			buttonWid3 + 3,
+			buttonWidthX3 + 3,
 			3,
 			leftWindowSize.x + rightWindowSize.x + 18,
 			leftWindowSize.y*refmcnt + 12,
@@ -7109,8 +7107,8 @@ void setstrtch() {
 				ptrSelectedForm->rectangle.top = sPnt.y;
 			}
 			else {
-				ref = rngrct.bottom;
-				rat = (double)(sPnt.y - ref) / (rngrct.top - ref);
+				ref = stitchRangeRect.bottom;
+				rat = (double)(sPnt.y - ref) / (stitchRangeRect.top - ref);
 			}
 		}
 		break;
@@ -7129,8 +7127,8 @@ void setstrtch() {
 				ptrSelectedForm->rectangle.right = sPnt.x;
 			}
 			else {
-				ref = rngrct.left;
-				rat = (double)(sPnt.x - ref) / (rngrct.right - ref);
+				ref = stitchRangeRect.left;
+				rat = (double)(sPnt.x - ref) / (stitchRangeRect.right - ref);
 			}
 		}
 		break;
@@ -7149,8 +7147,8 @@ void setstrtch() {
 				ptrSelectedForm->rectangle.bottom = sPnt.y;
 			}
 			else {
-				ref = rngrct.top;
-				rat = (double)(sPnt.y - ref) / (rngrct.bottom - ref);
+				ref = stitchRangeRect.top;
+				rat = (double)(sPnt.y - ref) / (stitchRangeRect.bottom - ref);
 			}
 		}
 		break;
@@ -7169,8 +7167,8 @@ void setstrtch() {
 				ptrSelectedForm->rectangle.left = sPnt.x;
 			}
 			else {
-				ref = rngrct.right;
-				rat = (double)(sPnt.x - ref) / (rngrct.left - ref);
+				ref = stitchRangeRect.right;
+				rat = (double)(sPnt.x - ref) / (stitchRangeRect.left - ref);
 			}
 		}
 		break;
@@ -7307,10 +7305,10 @@ void setexpand() {
 		if (chkMap(FORMSEL))
 			rct = ptrSelectedForm->rectangle;
 		else {
-			rct.bottom = rngrct.bottom;
-			rct.top = rngrct.top;
-			rct.right = rngrct.right;
-			rct.left = rngrct.left;
+			rct.bottom = stitchRangeRect.bottom;
+			rct.top = stitchRangeRect.top;
+			rct.right = stitchRangeRect.right;
+			rct.left = stitchRangeRect.left;
 		}
 		l_siz0.y = rct.top - rct.bottom;
 	}
@@ -7528,14 +7526,14 @@ void sidwnd(HWND wnd) {
 	unsid();
 	formMenuChoice = baksid;
 	GetWindowRect(wnd, &wrct);
-	GetWindowRect(hfdat, &msgRct);
-	hSid = CreateWindow(
+	GetWindowRect(hFormData, &msgRct);
+	hSideMessageWin = CreateWindow(
 		"STATIC",
 		0,
 		WS_BORDER | WS_CHILD | WS_VISIBLE,
 		msgRct.right - mainWindowOrigin.x + 3,
 		wrct.top - mainWindowOrigin.y - 3,
-		buttonWid3,
+		buttonWidthX3,
 		wrct.bottom - wrct.top + 3,
 		hWnd,
 		NULL,
@@ -7550,8 +7548,8 @@ void prfsid(HWND wnd) {
 	sideWindowEntryBuffer[0] = 0;
 	unsid();
 	GetWindowRect(wnd, &wrct);
-	GetClientRect(hPrf, &msgRct);
-	hSid = CreateWindow(
+	GetClientRect(hPreferencesWindow, &msgRct);
+	hSideMessageWin = CreateWindow(
 		"STATIC",
 		0,
 		WS_BORDER | WS_CHILD | WS_VISIBLE,
@@ -7569,7 +7567,7 @@ void sbold() {
 	fvars(closestFormToCursor);
 	deleclp(closestFormToCursor);
 	ptrSelectedForm->edgeType = EGBLD;
-	ptrSelectedForm->borderColor = actcol;
+	ptrSelectedForm->borderColor = activeColor;
 	refilfn();
 }
 
@@ -7608,7 +7606,7 @@ void prftwin(TCHAR* str) {
 		leftWindowCoords.top,
 		leftWindowCoords.right - leftWindowCoords.left,
 		leftWindowCoords.bottom - leftWindowCoords.top,
-		hPrf,
+		hPreferencesWindow,
 		NULL,
 		hInst,
 		NULL);
@@ -7623,7 +7621,7 @@ HWND prfnwin(TCHAR* str) {
 		rightWindowCoords.top,
 		rightWindowCoords.right - rightWindowCoords.left,
 		rightWindowCoords.bottom - rightWindowCoords.top,
-		hPrf,
+		hPreferencesWindow,
 		NULL,
 		hInst,
 		NULL);
@@ -7661,7 +7659,7 @@ void prfmsg() {
 		setMap(WASRT);
 	rstMap(BIGBOX);
 	selectedFormCount = 0;
-	if (hfdat) {
+	if (hFormData) {
 		undat();
 		unsid();
 		formMenuChoice = 0;
@@ -7675,13 +7673,13 @@ void prfmsg() {
 #if LANG==HNG
 	leftWindowSize.x += 10;
 #endif
-	DestroyWindow(hPrf);
+	DestroyWindow(hPreferencesWindow);
 	prfwid = leftWindowSize.x + rightWindowSize.x + 18;
-	hPrf = CreateWindow(
+	hPreferencesWindow = CreateWindow(
 		"STATIC",
 		0,
 		WS_CHILD | WS_VISIBLE | WS_BORDER,
-		buttonWid3 + 3,
+		buttonWidthX3 + 3,
 		3,
 		prfwid,
 		leftWindowSize.y*PRFLINS + 12,
@@ -7689,8 +7687,8 @@ void prfmsg() {
 		NULL,
 		hInst,
 		NULL);
-	prfdc = GetDC(hPrf);
-	GetClientRect(hPrf, &prfrct);
+	prfdc = GetDC(hPreferencesWindow);
+	GetClientRect(hPreferencesWindow, &prfrct);
 	FillRect(prfdc, &prfrct, (HBRUSH)(COLOR_WINDOW + 1));
 	leftWindowCoords.top = rightWindowCoords.top = 3;
 	leftWindowCoords.bottom = rightWindowCoords.bottom = 3 + leftWindowSize.y;
@@ -7779,7 +7777,7 @@ void prfmsg() {
 		setMap(WASRT);
 	rstMap(BIGBOX);
 	selectedFormCount = 0;
-	if (hfdat) {
+	if (hFormData) {
 		undat();
 		unsid();
 		formMenuChoice = 0;
@@ -7790,13 +7788,13 @@ void prfmsg() {
 	maxtsiz(stab[STR_BLUNT], &rightWindowSize);
 	leftWindowSize.x = prfsiz;
 	rightWindowSize.x += 4;
-	DestroyWindow(hPrf);
+	DestroyWindow(hPreferencesWindow);
 	prfwid = leftWindowSize.x + rightWindowSize.x + 18;
-	hPrf = CreateWindow(
+	hPreferencesWindow = CreateWindow(
 		"STATIC",
 		0,
 		WS_CHILD | WS_VISIBLE | WS_BORDER,
-		buttonWid3 + 3,
+		buttonWidthX3 + 3,
 		3,
 		prfwid,
 		leftWindowSize.y*PRFLINS + 12,
@@ -7804,8 +7802,8 @@ void prfmsg() {
 		NULL,
 		hInst,
 		NULL);
-	prfdc = GetDC(hPrf);
-	GetClientRect(hPrf, &prfrct);
+	prfdc = GetDC(hPreferencesWindow);
+	GetClientRect(hPreferencesWindow, &prfrct);
 	FillRect(prfdc, &prfrct, (HBRUSH)(COLOR_WINDOW + 1));
 	leftWindowCoords.top = rightWindowCoords.top = 3;
 	leftWindowCoords.bottom = rightWindowCoords.bottom = 3 + leftWindowSize.y;
@@ -8380,7 +8378,7 @@ void tomsg() {
 	RECT	okrct;
 	SIZE	tsiz;
 
-	GetWindowRect(hok, &okrct);
+	GetWindowRect(hOKButton, &okrct);
 	GetTextExtentPoint32(StitchWindowMemDC, stab[STR_DELST2], strlen(stab[STR_DELST2]), &tsiz);
 	hto = CreateWindow(
 		"STATIC",
@@ -8390,7 +8388,7 @@ void tomsg() {
 		okrct.bottom - stitchWindowOrigin.y + 6 + tsiz.cy,
 		tsiz.cx + 6,
 		tsiz.cy + 6,
-		hStch,
+		hMainStitchWin,
 		NULL,
 		hInst,
 		NULL);
@@ -8899,7 +8897,7 @@ void prpsbrd() {
 		bsizpar();
 		ptrSelectedForm->borderSize = borderWidth;
 		ptrSelectedForm->edgeSpacing = StitchSpace;
-		ptrSelectedForm->borderColor = actcol;
+		ptrSelectedForm->borderColor = activeColor;
 		refilfn();
 	}
 }
@@ -8964,7 +8962,7 @@ void tglfrm() {
 		rstMap(FRMPSEL);
 		rstMap(INSFRM);
 	}
-	SetMenuItemInfo(hMen, ID_FRMOF, FALSE, &meninfo);
+	SetMenuItemInfo(hMainMenu, ID_FRMOF, FALSE, &meninfo);
 	setMap(DUMEN);
 	setMap(RESTCH);
 }
@@ -8973,7 +8971,7 @@ void frmon() {
 	unbsho();
 	rstMap(FRMOF);
 	strcpy_s(oftxt, stab[STR_FRMPLUS]);
-	SetMenuItemInfo(hMen, ID_FRMOF, FALSE, &meninfo);
+	SetMenuItemInfo(hMainMenu, ID_FRMOF, FALSE, &meninfo);
 	setMap(DUMEN);
 }
 
@@ -9230,19 +9228,19 @@ void nutim(double siz) {
 		"STATIC",
 		0,
 		WS_CHILD | WS_VISIBLE | WS_BORDER,
-		buttonWid3,
+		buttonWidthX3,
 		0,
-		stchSiz.x,
-		buttonHi,
+		StitchWinSize.x,
+		buttonHeight,
 		hWnd,
 		NULL,
 		hInst,
 		NULL);
 	timdc = GetDC(htim);
-	timstp = (double)stchSiz.x / siz;
+	timstp = (double)StitchWinSize.x / siz;
 	timpos = 0;
 	flin[0].y = 0;
-	flin[1].y = buttonHi;
+	flin[1].y = buttonHeight;
 	flin[0].x = flin[1].x = 0;
 	SelectObject(timdc, userPen[0]);
 }
@@ -10181,7 +10179,7 @@ void bholbrd() {
 	bsizpar();
 	ptrSelectedForm->edgeType = EGHOL;
 	ptrSelectedForm->edgeSpacing = StitchSpace;
-	ptrSelectedForm->borderColor = actcol;
+	ptrSelectedForm->borderColor = activeColor;
 	savblen(buttonholeFillCornerLength);
 	refilfn();
 }
@@ -10428,7 +10426,7 @@ void fspic() {
 	ptrSelectedForm->borderClipData = nueclp(closestFormToCursor, clipboardStitchCount);
 	ptrSelectedForm->borderSize = clipboardRectSize.cy;
 	ptrSelectedForm->edgeSpacing = picotSpace;
-	ptrSelectedForm->borderColor = actcol;
+	ptrSelectedForm->borderColor = activeColor;
 	bsizpar();
 	savplen(buttonholeFillCornerLength);
 	for (ind = 0; ind < clipboardStitchCount; ind++) {
@@ -10674,7 +10672,7 @@ BOOL contsf(unsigned find)
 		deltx();
 		chkcont();
 		ptrSelectedForm->fillSpacing = StitchSpace;
-		ptrSelectedForm->fillColor = actcol;
+		ptrSelectedForm->fillColor = activeColor;
 		fsizpar();
 		ptrSelectedForm->attribute |= (activeLayer << 1);
 		refilfn();
@@ -10775,7 +10773,7 @@ void ribon() {
 				}
 			}
 			tfrm->type = SAT;
-			tfrm->fillColor = actcol;
+			tfrm->fillColor = activeColor;
 			tfrm->fillSpacing = StitchSpace;
 			tfrm->lengthOrCount.stitchLength = ini.maxStitchLength;
 			tfrm->sides = fpnt;
@@ -10792,7 +10790,7 @@ void ribon() {
 				tfrm->fillInfo.feather.minStitchSize = ini.featherMinStitchSize;
 				tfrm->extendedAttribute = ini.featherType;
 				tfrm->fillInfo.feather.count = ini.featherCount;
-				tfrm->fillInfo.feather.color = (actcol + 1)&COLMSK;
+				tfrm->fillInfo.feather.color = (activeColor + 1)&COLMSK;
 			}
 			else
 				tfrm->fillType = SATF;
@@ -12465,7 +12463,7 @@ void vrtsclp() {
 		ptrSelectedForm->angleOrClipData.clip[ind].y = clipBuffer[ind].y;
 	}
 	ptrSelectedForm->fillType = VCLPF;
-	ptrSelectedForm->fillColor = actcol;
+	ptrSelectedForm->fillColor = activeColor;
 	ptrSelectedForm->type = POLI;
 	refilfn();
 }
@@ -12574,7 +12572,7 @@ void horsclp() {
 		ptrSelectedForm->angleOrClipData.clip[ind].y = clipBuffer[ind].y;
 	}
 	ptrSelectedForm->fillType = HCLPF;
-	ptrSelectedForm->fillColor = actcol;
+	ptrSelectedForm->fillColor = activeColor;
 	ptrSelectedForm->type = POLI;
 	currentFormVertices = ptrSelectedForm->vertices;
 	refilfn();
@@ -12682,7 +12680,7 @@ void angsclp() {
 		ptrSelectedForm->angleOrClipData.clip[ind].y = clipBuffer[ind].y;
 	}
 	ptrSelectedForm->fillType = ANGCLPF;
-	ptrSelectedForm->fillColor = actcol;
+	ptrSelectedForm->fillColor = activeColor;
 	ptrSelectedForm->type = POLI;
 	refilfn();
 }
@@ -12747,7 +12745,7 @@ void dubsfil() {
 	deleclp(closestFormToCursor);
 	ptrSelectedForm->edgeType = EGDUB;
 	seqpnt = 0;
-	ptrSelectedForm->borderColor = actcol;
+	ptrSelectedForm->borderColor = activeColor;
 	dubfn();
 	bsizpar();
 	refilfn();
@@ -13154,7 +13152,7 @@ void chnfn() {
 }
 
 void chan() {
-	ptrSelectedForm->borderColor = actcol;
+	ptrSelectedForm->borderColor = activeColor;
 	ptrSelectedForm->edgeSpacing = ini.chainSpace;
 	ptrSelectedForm->borderSize = borderWidth;
 	ptrSelectedForm->edgeStitchLen = ini.chainRatio;
@@ -13362,7 +13360,7 @@ void fsclpx() {
 	ptrSelectedForm->borderClipData = nueclp(closestFormToCursor, clipboardStitchCount);
 	ptrSelectedForm->borderSize = clipboardRectSize.cy;
 	ptrSelectedForm->edgeSpacing = clipboardRectSize.cx;
-	ptrSelectedForm->borderColor = actcol;
+	ptrSelectedForm->borderColor = activeColor;
 	bsizpar();
 	for (ind = 0; ind < clipboardStitchCount; ind++) {
 		ptrSelectedForm->borderClipData[ind].x = clipBuffer[ind].x;

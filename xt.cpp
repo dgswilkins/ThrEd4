@@ -34,7 +34,7 @@ extern fPOINT clipboardPoints[MAXCLPNTS];
 extern unsigned toglu(unsigned bPnt);
 extern void wrnmen();
 extern unsigned markedStitchMap[RMAPSIZ];
-extern fPOINT zBoxo;
+extern fPOINT zoomBoxOrigin;
 extern void ritfil();
 extern void angclpfn();
 extern unsigned clipboardStitchCount;
@@ -52,17 +52,17 @@ extern void rtrclpfn();
 extern fPOINT sPnt;
 extern void butxt(unsigned ind, TCHAR* str);
 extern void unthum();
-extern HWND hStch;
-extern unsigned buttonWid3;
+extern HWND hMainStitchWin;
+extern unsigned buttonWidthX3;
 extern void redraw(HWND dWnd);
-extern HWND hbuts[9];
+extern HWND hButtonWin[9];
 extern BOOL chkr(unsigned pbit);
 extern void setr(unsigned pbit);
 extern void clRmap(unsigned len);
 extern void zumhom();
-extern unsigned buttonHi;
+extern unsigned buttonHeight;
 extern POINT flin[MAXFRMLINS];
-extern unsigned htclp;
+extern unsigned hThrEdClip;
 extern TCHAR* thrEdClipFormat;
 extern HGLOBAL hClipMem;
 extern FRMHED angfrm;
@@ -73,8 +73,8 @@ extern POINT blin[5];
 extern MSG msg;
 extern POINT stitchWindowOrigin;
 extern unsigned px2stch();
-extern HWND hVrt;
-extern HWND hHor;
+extern HWND hVerticalScrollBar;
+extern HWND hHorizontalScrollBar;
 extern HDC StitchWindowMemDC;
 extern HDC StitchWindowDC;
 extern RECT stitchWindowClientRect;
@@ -142,7 +142,7 @@ extern void frmout(unsigned ind);
 extern TCHAR thrnam[_MAX_PATH];
 extern TCHAR auxnam[_MAX_PATH];
 extern void save();
-extern COLORREF useCol[16];
+extern COLORREF userColor[16];
 extern unsigned psg();
 extern unsigned psgacc;
 extern void setknots();
@@ -154,7 +154,7 @@ extern double StitchSpace;
 extern void savdo();
 extern void delmfil(unsigned col);
 extern double userStitchLength;
-extern unsigned actcol;
+extern unsigned activeColor;
 extern void rseq(unsigned strt, unsigned fin, unsigned ostrt, unsigned at);
 extern unsigned delpnt;
 extern void makspac(unsigned strt, unsigned cnt);
@@ -826,8 +826,8 @@ void fethrf() {
 		ptrSelectedForm->fillInfo.feather.count = ini.featherCount;
 		ptrSelectedForm->lengthOrCount.stitchLength = userStitchLength;
 		ptrSelectedForm->fillSpacing = StitchSpace;
-		ptrSelectedForm->fillColor = actcol;
-		ptrSelectedForm->fillInfo.feather.color = (actcol + 1)&COLMSK;
+		ptrSelectedForm->fillColor = activeColor;
+		ptrSelectedForm->fillInfo.feather.color = (activeColor + 1)&COLMSK;
 		ptrSelectedForm->fillType = FTHF;
 		refilfn();
 	}
@@ -1535,7 +1535,7 @@ void dubit(unsigned bit)
 		if (ptrSelectedForm->fillType)
 			ptrSelectedForm->underlayColor = ptrSelectedForm->fillColor;
 		else
-			ptrSelectedForm->underlayColor = actcol;
+			ptrSelectedForm->underlayColor = activeColor;
 		ptrSelectedForm->underlayStitchLen = ini.underlayStitchLen;
 	}
 	if (!(ptrSelectedForm->extendedAttribute&AT_UND) && bit&AT_UND)
@@ -3635,8 +3635,8 @@ void dutxtfil()
 	rstMap(WASPAT);
 	rstMap(RUNPAT);
 	movStch();
-	ShowWindow(hVrt, FALSE);
-	ShowWindow(hHor, FALSE);
+	ShowWindow(hVerticalScrollBar, FALSE);
+	ShowWindow(hHorizontalScrollBar, FALSE);
 	cloxlst = (unsigned*)&oseq;
 	cloxcnt = 0;
 	setMap(INIT);
@@ -3702,7 +3702,7 @@ void txrct2rct(TXTRCT txr, RECT* rct)
 	POINT	tpnt;
 	int		bh2;
 
-	bh2 = buttonHi >> 1;
+	bh2 = buttonHeight >> 1;
 	txp.line = txr.left;
 	txp.y = txr.top;
 	txt2pix(txp, &tpnt);
@@ -3729,7 +3729,7 @@ void px2ed(POINT px, fPOINT* ped)
 
 void bxtxt(unsigned cod, TCHAR* str)
 {
-	SetWindowText(hbuts[cod], str);
+	SetWindowText(hButtonWin[cod], str);
 }
 
 void lodhbuf(unsigned cod)
@@ -3749,7 +3749,7 @@ void drwtxbut()
 	lodhbuf(IDS_CLEAR);
 	bxtxt(HTXCLR, hlpbuf);
 	hlpflt(IDS_TXHI, HTXHI, tscr.areaHeight / PFGRAN);
-	redraw(hbuts[HTXWID]);
+	redraw(hButtonWin[HTXWID]);
 	hlpflt(IDS_TXSPAC, HTXSPAC, tscr.spacing / PFGRAN);
 	lodhbuf(IDS_TXVRT);
 	bxtxt(HTXVRT, hlpbuf);
@@ -3759,7 +3759,7 @@ void drwtxbut()
 	bxtxt(HTXANG, hlpbuf);
 	lodhbuf(IDS_TXMIR);
 	bxtxt(HTXMIR, hlpbuf);
-	SetWindowText(hbuts[HTXMIR + 1], "");
+	SetWindowText(hButtonWin[HTXMIR + 1], "");
 }
 
 void chktx()
@@ -3832,7 +3832,7 @@ void drwtxtr()
 		txp.y += ini.gridSize;
 	}
 	DeleteObject(xpen);
-	xpen = CreatePen(PS_SOLID, 1, useCol[actcol]);
+	xpen = CreatePen(PS_SOLID, 1, userColor[activeColor]);
 	SelectObject(StitchWindowMemDC, xpen);
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	xlin[0].y = 0;
@@ -3852,7 +3852,7 @@ void drwtxtr()
 	xpen = CreatePen(PS_SOLID, 1, 0xffffff);
 	SelectObject(StitchWindowMemDC, xpen);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
-	col = useCol[actcol];
+	col = userColor[activeColor];
 	for (ind = 0; ind < tscr.index; ind++)
 	{
 		dutxtx(ind, ini.textureEditorSizePixels);
@@ -4285,8 +4285,8 @@ void setxfrm()
 
 void txtclp()
 {
-	htclp = RegisterClipboardFormat(thrEdClipFormat);
-	hClipMem = GetClipboardData(htclp);
+	hThrEdClip = RegisterClipboardFormat(thrEdClipFormat);
+	hClipMem = GetClipboardData(hThrEdClip);
 	if (hClipMem)
 	{
 		clipboardFormData = (FORMCLIP*)GlobalLock(hClipMem);
@@ -4360,16 +4360,16 @@ void butsid(unsigned cod)
 
 	chktxnum();
 	txsidtyp = cod;
-	GetWindowRect(hbuts[cod], &brct);
+	GetWindowRect(hButtonWin[cod], &brct);
 	hbsid = CreateWindow(
 		"STATIC",
 		0,
 		SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		brct.left + buttonWid3 - stitchWindowOrigin.x,
+		brct.left + buttonWidthX3 - stitchWindowOrigin.x,
 		brct.top - stitchWindowOrigin.y,
-		buttonWid3,
-		buttonHi,
-		hStch,
+		buttonWidthX3,
+		buttonHeight,
+		hMainStitchWin,
 		NULL,
 		hInst,
 		NULL);
@@ -4408,7 +4408,7 @@ void txpar()
 	ptrSelectedForm->lengthOrCount.stitchLength = ini.userStitchLength;
 	ptrSelectedForm->maxFillStitchLen = ini.maxStitchLength;
 	ptrSelectedForm->minFillStitchLen = ini.minStitchLength;
-	ptrSelectedForm->fillColor = actcol;
+	ptrSelectedForm->fillColor = activeColor;
 	refilfn();
 }
 
@@ -4610,42 +4610,42 @@ void dutxmir()
 
 BOOL chkbut()
 {
-	if (msg.hwnd == hbuts[HTXCLR])
+	if (msg.hwnd == hButtonWin[HTXCLR])
 	{
 		txdelal();
 		return 1;
 	}
-	if (msg.hwnd == hbuts[HTXHI])
+	if (msg.hwnd == hButtonWin[HTXHI])
 	{
 		butsid(HTXHI);
 		return 1;
 	}
-	if (msg.hwnd == hbuts[HTXWID])
+	if (msg.hwnd == hButtonWin[HTXWID])
 	{
 		butsid(HTXWID);
 		return 1;
 	}
-	if (msg.hwnd == hbuts[HTXSPAC])
+	if (msg.hwnd == hButtonWin[HTXSPAC])
 	{
 		butsid(HTXSPAC);
 		return 1;
 	}
-	if (msg.hwnd == hbuts[HTXVRT])
+	if (msg.hwnd == hButtonWin[HTXVRT])
 	{
 		dutxfn(VRTYP);
 		return 1;
 	}
-	if (msg.hwnd == hbuts[HTXHOR])
+	if (msg.hwnd == hButtonWin[HTXHOR])
 	{
 		dutxfn(HORTYP);
 		return 1;
 	}
-	if (msg.hwnd == hbuts[HTXANG])
+	if (msg.hwnd == hButtonWin[HTXANG])
 	{
 		dutxfn(ANGTYP);
 		return 1;
 	}
-	if (msg.hwnd == hbuts[HTXMIR])
+	if (msg.hwnd == hButtonWin[HTXMIR])
 	{
 		dutxmir();
 		return 1;
@@ -4853,12 +4853,12 @@ void txcntrv()
 void txof()
 {
 	butxt(HBOXSEL, stab[STR_BOXSEL]);
-	redraw(hbuts[HHID]);
+	redraw(hButtonWin[HHID]);
 	if (chkMap(UPTO))
 		butxt(HUPTO, stab[STR_UPON]);
 	else
 		butxt(HUPTO, stab[STR_UPOF]);
-	SetWindowText(hbuts[HTXSPAC], "");
+	SetWindowText(hButtonWin[HTXSPAC], "");
 	savtxt();
 	zumhom();
 	rstMap(TXTRED);
@@ -5383,8 +5383,8 @@ void dushft()
 	blin[0].y = blin[1].y = msg.pt.y - stitchWindowOrigin.y;
 	blin[4].y = blin[0].y - 1;
 	px2stch();
-	zBoxo.x = sPnt.x;
-	zBoxo.y = sPnt.y;
+	zoomBoxOrigin.x = sPnt.x;
+	zoomBoxOrigin.y = sPnt.y;
 }
 
 extern void unbBox();
@@ -5482,7 +5482,7 @@ BOOL CALLBACK enumch(HWND hwnd, LPARAM lParam)
 
 void clrstch()
 {
-	while (EnumChildWindows(hStch, enumch, 0));
+	while (EnumChildWindows(hMainStitchWin, enumch, 0));
 }
 
 BOOL txnam(char *nam, int sizeNam)

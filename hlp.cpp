@@ -20,31 +20,29 @@ extern unsigned			delpnt;
 extern TCHAR			homdir[_MAX_PATH];
 extern TCHAR			filnam[_MAX_PATH];
 extern unsigned			setMap(unsigned bPnt);
-extern HWND				hStch;
+extern HWND				hMainStitchWin;
 extern HINSTANCE		hInst;
 extern HWND				hWnd;
 extern TCHAR			msgbuf[MSGSIZ];
-extern unsigned			buttonWid3;
+extern unsigned			buttonWidthX3;
 extern MSG				msg;
-extern unsigned			buttonHi;
+extern unsigned			buttonHeight;
 extern unsigned			formIndex;
 extern unsigned			selectedFormCount;
 extern FRMHED*			ptrSelectedForm;
 extern FRMHED			formList[MAXFORMS];
 extern unsigned			closestFormToCursor;
 extern RECT				scRct;
-extern HWND				hVrt;
 extern unsigned			rstMap(unsigned bPnt);
 extern DRAWITEMSTRUCT	*ds;
 extern fPOINT			oseq[OSEQLEN];
 extern BSEQPNT			bseq[BSEQLEN];
 extern INIFILE			ini;
-extern HWND				hBar;
 extern TCHAR*			phom;
 extern TCHAR			thrnam[_MAX_PATH];
 extern HDC				StitchWindowMemDC;
 extern long				prfwid;
-extern HWND				hbuts[9];
+extern HWND				hButtonWin[9];
 extern void				numWnd();
 
 HANDLE					hlpfil;						//handle to the help file
@@ -303,15 +301,15 @@ void butxt(unsigned ind, TCHAR* str) {
 		if (ind == 5) {
 
 			if (chkMap(HIDMAP))
-				SetWindowText(hbuts[ind], stab[STR_TRC1H]);
+				SetWindowText(hButtonWin[ind], stab[STR_TRC1H]);
 			else
-				SetWindowText(hbuts[ind], stab[STR_TRC1S]);
+				SetWindowText(hButtonWin[ind], stab[STR_TRC1S]);
 		}
 		else
-			SetWindowText(hbuts[ind], stab[ind - 4 + STR_TRC0]);
+			SetWindowText(hButtonWin[ind], stab[ind - 4 + STR_TRC0]);
 	}
 	else
-		SetWindowText(hbuts[ind], str);
+		SetWindowText(hButtonWin[ind], str);
 }
 
 void ritnum(unsigned cod, unsigned num) {
@@ -405,7 +403,7 @@ void shoMsg(TCHAR* str) {
 		3,
 		msgsiz.cx + 20,
 		msgsiz.cy + 6,
-		hStch,
+		hMainStitchWin,
 		NULL,
 		hInst,
 		NULL);
