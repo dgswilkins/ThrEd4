@@ -656,7 +656,6 @@ unsigned			traceRGBMask[]	= { REDMSK,GRNMSK,BLUMSK };	//trace masks
 unsigned			traceRGB[]		= { BLUCOL,GRNCOL,REDCOL };	//trace colors
 unsigned			traceAdjacentColors[9];	//separated colors for adjacent pixels
 unsigned*			differenceBitmap;		//difference bitmap
-TCHAR				trbuf[4];				//for composing color numbers
 TCHAR				trinbuf[4];				//for user input color numbers
 unsigned			columnColor;			//trace color column
 POINT				bitpnt;					//a point on the bitmap
@@ -14762,8 +14761,9 @@ void chkbit() {
 
 void trcnum(unsigned shft, COLORREF col, unsigned ind) {
 
-	unsigned len;
-	unsigned nwid;
+	unsigned	len;
+	unsigned	nwid;
+	TCHAR		trbuf[4];
 
 	col >>= shft;
 	col &= 0xff;
