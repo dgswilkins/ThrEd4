@@ -137,7 +137,7 @@ extern			HPEN		formPen3px;
 extern			HPEN		formSelectedPen;
 extern			HPEN		layerPen[5];
 
-extern			fPOINT		sPnt;
+extern			fPOINT		selectedPoint;
 extern			POINT		unzoomedRect;
 extern			POINT		stitchWindowOrigin;
 extern			dPOINT		rotationCenter;
@@ -163,7 +163,7 @@ extern			unsigned	msgIndex;
 extern			unsigned	preferenceIndex;
 extern			unsigned	formMenuChoice;
 extern			unsigned	slpnt;
-extern			unsigned	selCnt;
+extern			unsigned	nearestCount;
 extern			unsigned	groupStitchIndex;
 extern			dPOINT		zoomRatio;
 extern			HWND		hWnd;
@@ -2184,8 +2184,8 @@ void linrutb(unsigned strt) {
 	dPOINT		tpnt;
 
 	tspac = StitchSpace;
-	sPnt.x = currentFormVertices[strt].x;
-	sPnt.y = currentFormVertices[strt].y;
+	selectedPoint.x = currentFormVertices[strt].x;
+	selectedPoint.y = currentFormVertices[strt].y;
 	for (ind = strt + 1; ind < sides; ind++) {
 		flt2dub(currentFormVertices[ind], &tpnt);
 		filinsb(tpnt);
@@ -2888,10 +2888,10 @@ void filinu(float pntx, float pnty) {
 	double		len;
 	dPOINT		ipnt, stp, dif;
 
-	ipnt.x = sPnt.x;
-	ipnt.y = sPnt.y;
-	dif.x = pntx - sPnt.x;
-	dif.y = pnty - sPnt.y;
+	ipnt.x = selectedPoint.x;
+	ipnt.y = selectedPoint.y;
+	dif.x = pntx - selectedPoint.x;
+	dif.y = pnty - selectedPoint.y;
 	len = hypot(dif.x, dif.y);
 	cnt = len / userStitchLength;
 	if (chkmax(cnt, seqpnt) || cnt + seqpnt > MAXSEQ - 3)
@@ -2913,8 +2913,8 @@ void filinu(float pntx, float pnty) {
 		oseq[seqpnt].x = pntx;
 		oseq[seqpnt++].y = pnty;
 	}
-	sPnt.x = pntx;
-	sPnt.y = pnty;
+	selectedPoint.x = pntx;
+	selectedPoint.y = pnty;
 }
 
 void filin(dPOINT pnt) {
@@ -2922,11 +2922,11 @@ void filin(dPOINT pnt) {
 	double len;
 	int cnt;
 
-	dif.x = pnt.x - sPnt.x;
-	dif.y = pnt.y - sPnt.y;
+	dif.x = pnt.x - selectedPoint.x;
+	dif.y = pnt.y - selectedPoint.y;
 	len = hypot(dif.x, dif.y);
-	ipnt.x = sPnt.x;
-	ipnt.y = sPnt.y;
+	ipnt.x = selectedPoint.x;
+	ipnt.y = selectedPoint.y;
 	cnt = len / userStitchLength;
 	if (chkmax(cnt, seqpnt) || (cnt + seqpnt) > MAXSEQ - 3)
 		return;
@@ -2947,8 +2947,8 @@ void filin(dPOINT pnt) {
 		oseq[seqpnt].x = pnt.x;
 		oseq[seqpnt++].y = pnt.y;
 	}
-	sPnt.x = pnt.x;
-	sPnt.y = pnt.y;
+	selectedPoint.x = pnt.x;
+	selectedPoint.y = pnt.y;
 }
 
 unsigned short isclos(SMALPNTL* pnt0, SMALPNTL* pnt1) {
@@ -3906,8 +3906,8 @@ void bakseq() {
 	oseq[seqpnt].x = bseq[ind].x;
 	oseq[seqpnt].y = bseq[ind].y;
 	seqpnt++;
-	sPnt.x = bseq[ind].x;
-	sPnt.y = bseq[ind].y;
+	selectedPoint.x = bseq[ind].x;
+	selectedPoint.y = bseq[ind].y;
 	ind--;
 	while (ind > 0) {
 		rcnt = ind%RITSIZ;
@@ -4370,8 +4370,8 @@ void rstfrm() {
 	tpnt.x = msg.pt.x + fmovdif.x;
 	tpnt.y = msg.pt.y + fmovdif.y;
 	pxCor2stch(tpnt);
-	pof.x = sPnt.x - ptrSelectedForm->vertices[0].x;
-	pof.y = sPnt.y - ptrSelectedForm->vertices[0].y;
+	pof.x = selectedPoint.x - ptrSelectedForm->vertices[0].x;
+	pof.y = selectedPoint.y - ptrSelectedForm->vertices[0].y;
 	for (ind = 0; ind < ptrSelectedForm->sides; ind++) {
 		ptrSelectedForm->vertices[ind].x += pof.x;
 		ptrSelectedForm->vertices[ind].y += pof.y;
@@ -4429,8 +4429,8 @@ void satpnt0() {
 	px2stch();
 	flin[0].x = msg.pt.x - stitchWindowOrigin.x;
 	flin[0].y = msg.pt.y - stitchWindowOrigin.y;
-	tpoly[0].x = sPnt.x;
-	tpoly[0].y = sPnt.y;
+	tpoly[0].x = selectedPoint.x;
+	tpoly[0].y = selectedPoint.y;
 	satpt = 1;
 	setMap(SATPNT);
 }
@@ -4441,8 +4441,8 @@ void satpnt1() {
 	flin[satpt].x = msg.pt.x - stitchWindowOrigin.x;
 	flin[satpt].y = msg.pt.y - stitchWindowOrigin.y;
 	dusat();
-	tpoly[satpt].x = sPnt.x;
-	tpoly[satpt].y = sPnt.y;
+	tpoly[satpt].x = selectedPoint.x;
+	tpoly[satpt].y = selectedPoint.y;
 	satpt++;
 	setMap(RESTCH);
 }
@@ -4504,8 +4504,8 @@ BOOL satselfn() {
 		playcod = (formList[ind].attribute&FRMLMSK) >> 1;
 		if (!activeLayer || !playcod || playcod == activeLayer) {
 			for (ine = 0; ine < formList[ind].sides; ine++) {
-				dx = sPnt.x - formList[ind].vertices[ine].x;
-				dy = sPnt.y - formList[ind].vertices[ine].y;
+				dx = selectedPoint.x - formList[ind].vertices[ine].x;
+				dy = selectedPoint.y - formList[ind].vertices[ine].y;
 				tlen = hypot(dx, dy);
 				if (tlen < len) {
 					len = tlen;
@@ -4882,8 +4882,8 @@ void satclos() {
 	tsac = ptrSelectedForm->satinOrAngle.sac;
 	clos = startPoint;
 	for (ind = 0; ind < ptrSelectedForm->sides; ind++) {
-		dx = sPnt.x - ptrSelectedForm->vertices[ind].x;
-		dy = sPnt.y - ptrSelectedForm->vertices[ind].y;
+		dx = selectedPoint.x - ptrSelectedForm->vertices[ind].x;
+		dy = selectedPoint.y - ptrSelectedForm->vertices[ind].y;
 		tlen = hypot(dx, dy);
 		if (tlen < len) {
 			len = tlen;
@@ -4995,10 +4995,10 @@ void satfn(unsigned astrt, unsigned afin, unsigned bstrt, unsigned bfin) {
 					ritseq1(bstrt%sides);
 				}
 				else {
-					sPnt.x = currentFormVertices[astrt].x;
-					sPnt.y = currentFormVertices[astrt].y;
-					oseq[seqpnt].x = sPnt.x;
-					oseq[seqpnt++].y = sPnt.y;
+					selectedPoint.x = currentFormVertices[astrt].x;
+					selectedPoint.y = currentFormVertices[astrt].y;
+					oseq[seqpnt].x = selectedPoint.x;
+					oseq[seqpnt++].y = selectedPoint.y;
 				}
 			}
 		}
@@ -5245,8 +5245,8 @@ void satfil() {
 				len = (len - lens[1]) / 2;
 				ind = 1;
 				if (!chkMap(BARSAT)) {
-					oseq[0].x = sPnt.x = currentFormVertices[1].x;
-					oseq[0].y = sPnt.y = currentFormVertices[1].y;
+					oseq[0].x = selectedPoint.x = currentFormVertices[1].x;
+					oseq[0].y = selectedPoint.y = currentFormVertices[1].y;
 					seqpnt = 1;
 				}
 				while ((len > lens[ind]) && (ind < (unsigned int)(sides + 1)))
@@ -5267,8 +5267,8 @@ void satfil() {
 	len /= 2;
 	ind = 0;
 	if (!chkMap(BARSAT) && !chkMap(FTHR)) {
-		oseq[0].x = sPnt.x = currentFormVertices[0].x;
-		oseq[0].y = sPnt.y = currentFormVertices[0].y;
+		oseq[0].x = selectedPoint.x = currentFormVertices[0].x;
+		oseq[0].y = selectedPoint.y = currentFormVertices[0].y;
 		seqpnt = 1;
 	}
 	while (len > lens[ind])
@@ -5333,8 +5333,8 @@ unsigned closat() {
 		if (!activeLayer || (unsigned)((formList[ind].attribute&FRMLMSK) >> 1) == activeLayer || !(formList[ind].attribute&FRMLMSK)) {
 			currentFormVertices = formList[ind].vertices;
 			for (ine = 0; ine < formList[ind].sides; ine++) {
-				dx = sPnt.x - currentFormVertices[ine].x;
-				dy = sPnt.y - currentFormVertices[ine].y;
+				dx = selectedPoint.x - currentFormVertices[ine].x;
+				dy = selectedPoint.y - currentFormVertices[ine].y;
 				tlen = hypot(dx, dy);
 				if (tlen < len) {
 					len = tlen;
@@ -5355,8 +5355,8 @@ void nufpnt(unsigned pnu) {
 
 	pnu++;
 	fltspac(&finspnt->vertices[pnu], 1);
-	finspnt->vertices[pnu].x = sPnt.x;
-	finspnt->vertices[pnu].y = sPnt.y;
+	finspnt->vertices[pnu].x = selectedPoint.x;
+	finspnt->vertices[pnu].y = selectedPoint.y;
 	finspnt->sides++;
 	for (ind = 0; ind < finspnt->satinGuideCount; ind++) {
 		if (finspnt->satinOrAngle.sac[ind].start > pnu - 1)
@@ -5387,13 +5387,13 @@ unsigned upsat() {
 
 	sides = finspnt->sides;
 	currentFormVertices = finspnt->vertices;
-	p2clos = p2p(sPnt, currentFormVertices[closestVertexToCursor]);
+	p2clos = p2p(selectedPoint, currentFormVertices[closestVertexToCursor]);
 	ind = prv(closestVertexToCursor);
 	dwnlen = p2p(currentFormVertices[ind], currentFormVertices[closestVertexToCursor]);
-	p2dwn = p2p(currentFormVertices[ind], sPnt);
+	p2dwn = p2p(currentFormVertices[ind], selectedPoint);
 	ind = nxt(closestVertexToCursor);
 	uplen = p2p(currentFormVertices[ind], currentFormVertices[closestVertexToCursor]);
-	p2up = p2p(currentFormVertices[ind], sPnt);
+	p2up = p2p(currentFormVertices[ind], selectedPoint);
 	if ((p2dwn + p2clos) / dwnlen > (p2up + p2clos) / uplen)
 		return 0;
 	else {
@@ -5414,12 +5414,12 @@ void insat() {
 				closestVertexToCursor = prv(closestVertexToCursor);
 			nufpnt(closestVertexToCursor);
 			if (rstMap(PRELIN)) {
-				sPnt.x = finspnt->vertices[0].x;
-				sPnt.y = finspnt->vertices[0].y;
+				selectedPoint.x = finspnt->vertices[0].x;
+				selectedPoint.y = finspnt->vertices[0].y;
 				finspnt->vertices[0].x = finspnt->vertices[1].x;
 				finspnt->vertices[0].y = finspnt->vertices[1].y;
-				finspnt->vertices[1].x = sPnt.x;
-				finspnt->vertices[1].y = sPnt.y;
+				finspnt->vertices[1].x = selectedPoint.x;
+				finspnt->vertices[1].y = selectedPoint.y;
 			}
 		}
 		else
@@ -5719,12 +5719,12 @@ void setins() {
 	px2stch();
 	nufpnt(fgpnt0);
 	if (chkMap(PRELIN)) {
-		sPnt.x = finspnt->vertices[0].x;
-		sPnt.y = finspnt->vertices[0].y;
+		selectedPoint.x = finspnt->vertices[0].x;
+		selectedPoint.y = finspnt->vertices[0].y;
 		finspnt->vertices[0].x = finspnt->vertices[1].x;
 		finspnt->vertices[0].y = finspnt->vertices[1].y;
-		finspnt->vertices[1].x = sPnt.x;
-		finspnt->vertices[1].y = sPnt.y;
+		finspnt->vertices[1].x = selectedPoint.x;
+		finspnt->vertices[1].y = selectedPoint.y;
 	}
 	else {
 		sides = finspnt->sides;
@@ -5903,8 +5903,8 @@ void linsid() {
 	unsigned	cnt, ind;
 	double		len;
 
-	dif.x = currentFormVertices[clpstrt + 1].x - sPnt.x;
-	dif.y = currentFormVertices[clpstrt + 1].y - sPnt.y;
+	dif.x = currentFormVertices[clpstrt + 1].x - selectedPoint.x;
+	dif.y = currentFormVertices[clpstrt + 1].y - selectedPoint.y;
 	len = hypot(dif.x, dif.y);
 	cnt = len / clipboardRectSize.cx;
 	if (cnt) {
@@ -5913,9 +5913,9 @@ void linsid() {
 		for (ind = 0; ind < clipboardStitchCount; ind++)
 			rotangf(clprev[ind], &clipFillData[ind]);
 		for (ind = 0; ind < cnt; ind++) {
-			ritclp(sPnt);
-			sPnt.x += vct0.x;
-			sPnt.y += vct0.y;
+			ritclp(selectedPoint);
+			selectedPoint.x += vct0.x;
+			selectedPoint.y += vct0.y;
 		}
 	}
 }
@@ -5926,10 +5926,10 @@ BOOL nupnt() {
 
 	mvpnt.x = currentFormVertices[clpstrt + 2].x;
 	mvpnt.y = currentFormVertices[clpstrt + 2].y;
-	len = hypot(mvpnt.x - sPnt.x, mvpnt.y - sPnt.y);
+	len = hypot(mvpnt.x - selectedPoint.x, mvpnt.y - selectedPoint.y);
 	if (len > clipboardRectSize.cx) {
 		for (ind = 0; ind < 10; ind++) {
-			len = hypot(mvpnt.x - sPnt.x, mvpnt.y - sPnt.y);
+			len = hypot(mvpnt.x - selectedPoint.x, mvpnt.y - selectedPoint.y);
 			dif = clipboardRectSize.cx - len;
 			mvpnt.x += dif*cosang;
 			mvpnt.y += dif*sinang;
@@ -5948,15 +5948,15 @@ void lincrnr() {
 	sinang = sin(clpang);
 	cosang = cos(clpang);
 	if (nupnt()) {
-		dif.x = mvpnt.x - sPnt.x;
-		dif.y = mvpnt.y - sPnt.y;
+		dif.x = mvpnt.x - selectedPoint.x;
+		dif.y = mvpnt.y - selectedPoint.y;
 		rotationAngle = atan2(dif.y, dif.x);
 		rotangf(rclpref, &clpref);
 		for (ind = 0; ind < clipboardStitchCount; ind++)
 			rotangf(clprev[ind], &clipFillData[ind]);
-		ritclp(sPnt);
-		sPnt.x = mvpnt.x;
-		sPnt.y = mvpnt.y;
+		ritclp(selectedPoint);
+		selectedPoint.x = mvpnt.x;
+		selectedPoint.y = mvpnt.y;
 	}
 }
 
@@ -6002,8 +6002,8 @@ void clpbrd(unsigned short strtlin) {
 	durev();
 	ref = 0;
 	if (ptrSelectedForm->type == LIN) {
-		sPnt.x = currentFormVertices[0].x;
-		sPnt.y = currentFormVertices[0].y;
+		selectedPoint.x = currentFormVertices[0].x;
+		selectedPoint.y = currentFormVertices[0].y;
 		setvct(0, 1);
 		rclpref.y = (clipboardRect.top - clipboardRect.bottom) / 2 + clipboardRect.bottom;
 		rclpref.x = (clipboardRect.top = clipboardRect.left) / 2 + clipboardRect.left;
@@ -6169,8 +6169,8 @@ void filinsb(dPOINT pnt) {
 	dPOINT		dif, stp;
 	unsigned	cnt;
 
-	dif.x = pnt.x - sPnt.x;
-	dif.y = pnt.y - sPnt.y;
+	dif.x = pnt.x - selectedPoint.x;
+	dif.y = pnt.y - selectedPoint.y;
 	len = hypot(dif.x, dif.y);
 	if (len > MAXSTCH) {
 		cnt = len / MAXSTCH + 1;
@@ -6180,10 +6180,10 @@ void filinsb(dPOINT pnt) {
 		if (chkmax(cnt, seqpnt))
 			return;
 		while (cnt) {
-			sPnt.x += stp.x;
-			sPnt.y += stp.y;
-			oseq[seqpnt].x = sPnt.x;
-			oseq[seqpnt++].y = sPnt.y;
+			selectedPoint.x += stp.x;
+			selectedPoint.y += stp.y;
+			oseq[seqpnt].x = selectedPoint.x;
+			oseq[seqpnt++].y = selectedPoint.y;
 			cnt--;
 		}
 	}
@@ -6191,8 +6191,8 @@ void filinsb(dPOINT pnt) {
 		return;
 	oseq[seqpnt].x = pnt.x;
 	oseq[seqpnt++].y = pnt.y;
-	sPnt.x = pnt.x;
-	sPnt.y = pnt.y;
+	selectedPoint.x = pnt.x;
+	selectedPoint.y = pnt.y;
 }
 
 BOOL chkbak(dPOINT pnt) {
@@ -6246,8 +6246,8 @@ void sbfn(fPOINT* p_flt, unsigned strt, unsigned fin) {
 	unsigned	cnt, iflg, oflg, bcnt, ind, xflg;
 
 	if (!setMap(SAT1)) {
-		sPnt.x = p_flt[strt].x;
-		sPnt.y = p_flt[strt].y;
+		selectedPoint.x = p_flt[strt].x;
+		selectedPoint.y = p_flt[strt].y;
 	}
 	idif.x = p_flt[fin].x - p_flt[strt].x;
 	idif.y = p_flt[fin].y - p_flt[strt].y;
@@ -6299,8 +6299,8 @@ void sbfn(fPOINT* p_flt, unsigned strt, unsigned fin) {
 		l_opnt.y += ostp.y;
 		if (toglMap(FILDIR)) {
 			if (iflg) {
-				bdif.x = ipnt.x - sPnt.x;
-				bdif.y = ipnt.y - sPnt.y;
+				bdif.x = ipnt.x - selectedPoint.x;
+				bdif.y = ipnt.y - selectedPoint.y;
 				blen = hypot(bdif.x, bdif.y);
 				bcnt = blen / StitchSpace;
 				bstp.x = bdif.x / bcnt;
@@ -6318,8 +6318,8 @@ void sbfn(fPOINT* p_flt, unsigned strt, unsigned fin) {
 		}
 		else {
 			if (oflg) {
-				bdif.x = l_opnt.x - sPnt.x;
-				bdif.y = l_opnt.y - sPnt.y;
+				bdif.x = l_opnt.x - selectedPoint.x;
+				bdif.y = l_opnt.y - selectedPoint.y;
 				blen = hypot(bdif.x, bdif.y);
 				bcnt = blen / StitchSpace;
 				bstp.x = bdif.x / bcnt;
@@ -7058,13 +7058,13 @@ void pxrct2stch(RECT pxr, fRECTANGLE* str) {
 	tpnt.x = pxr.left + stitchWindowOrigin.x;
 	tpnt.y = pxr.top + stitchWindowOrigin.y;
 	pxCor2stch(tpnt);
-	str->left = sPnt.x;
-	str->top = sPnt.y;
+	str->left = selectedPoint.x;
+	str->top = selectedPoint.y;
 	tpnt.x = pxr.right + stitchWindowOrigin.x;
 	tpnt.y = pxr.bottom + stitchWindowOrigin.y;
 	pxCor2stch(tpnt);
-	str->right = sPnt.x;
-	str->bottom = sPnt.y;
+	str->right = selectedPoint.x;
+	str->bottom = selectedPoint.y;
 }
 
 unsigned pdir(unsigned ind) {
@@ -7104,12 +7104,12 @@ void setstrtch() {
 		else {
 			if (chkMap(FORMSEL)) {
 				ref = ptrSelectedForm->rectangle.bottom;
-				rat = (double)(sPnt.y - ref) / (ptrSelectedForm->rectangle.top - ref);
-				ptrSelectedForm->rectangle.top = sPnt.y;
+				rat = (double)(selectedPoint.y - ref) / (ptrSelectedForm->rectangle.top - ref);
+				ptrSelectedForm->rectangle.top = selectedPoint.y;
 			}
 			else {
 				ref = stitchRangeRect.bottom;
-				rat = (double)(sPnt.y - ref) / (stitchRangeRect.top - ref);
+				rat = (double)(selectedPoint.y - ref) / (stitchRangeRect.top - ref);
 			}
 		}
 		break;
@@ -7124,12 +7124,12 @@ void setstrtch() {
 		else {
 			if (chkMap(FORMSEL)) {
 				ref = ptrSelectedForm->rectangle.left;
-				rat = (double)(sPnt.x - ref) / (ptrSelectedForm->rectangle.right - ref);
-				ptrSelectedForm->rectangle.right = sPnt.x;
+				rat = (double)(selectedPoint.x - ref) / (ptrSelectedForm->rectangle.right - ref);
+				ptrSelectedForm->rectangle.right = selectedPoint.x;
 			}
 			else {
 				ref = stitchRangeRect.left;
-				rat = (double)(sPnt.x - ref) / (stitchRangeRect.right - ref);
+				rat = (double)(selectedPoint.x - ref) / (stitchRangeRect.right - ref);
 			}
 		}
 		break;
@@ -7144,12 +7144,12 @@ void setstrtch() {
 		else {
 			if (chkMap(FORMSEL)) {
 				ref = ptrSelectedForm->rectangle.top;
-				rat = (double)(sPnt.y - ref) / (ptrSelectedForm->rectangle.bottom - ref);
-				ptrSelectedForm->rectangle.bottom = sPnt.y;
+				rat = (double)(selectedPoint.y - ref) / (ptrSelectedForm->rectangle.bottom - ref);
+				ptrSelectedForm->rectangle.bottom = selectedPoint.y;
 			}
 			else {
 				ref = stitchRangeRect.top;
-				rat = (double)(sPnt.y - ref) / (stitchRangeRect.bottom - ref);
+				rat = (double)(selectedPoint.y - ref) / (stitchRangeRect.bottom - ref);
 			}
 		}
 		break;
@@ -7164,12 +7164,12 @@ void setstrtch() {
 		else {
 			if (chkMap(FORMSEL)) {
 				ref = ptrSelectedForm->rectangle.right;
-				rat = (double)(sPnt.x - ref) / (ptrSelectedForm->rectangle.left - ref);
-				ptrSelectedForm->rectangle.left = sPnt.x;
+				rat = (double)(selectedPoint.x - ref) / (ptrSelectedForm->rectangle.left - ref);
+				ptrSelectedForm->rectangle.left = selectedPoint.x;
 			}
 			else {
 				ref = stitchRangeRect.right;
-				rat = (double)(sPnt.x - ref) / (stitchRangeRect.left - ref);
+				rat = (double)(selectedPoint.x - ref) / (stitchRangeRect.left - ref);
 			}
 		}
 		break;
@@ -7296,8 +7296,8 @@ void setexpand() {
 		rct.left = selectedFormsRectangle.left;
 		rct.right = selectedFormsRectangle.right;
 		rct.top = selectedFormsRectangle.top;
-		sPnt.x = msg.pt.x - stitchWindowOrigin.x;
-		sPnt.y = msg.pt.y - stitchWindowOrigin.y;
+		selectedPoint.x = msg.pt.x - stitchWindowOrigin.x;
+		selectedPoint.y = msg.pt.y - stitchWindowOrigin.y;
 		l_siz0.y = rct.bottom - rct.top;
 	}
 	else {
@@ -7321,8 +7321,8 @@ void setexpand() {
 
 		ref.x = rct.right;
 		ref.y = rct.bottom;
-		l_siz1.x = fabs(sPnt.x - ref.x);
-		l_siz1.y = fabs(sPnt.y - ref.y);
+		l_siz1.x = fabs(selectedPoint.x - ref.x);
+		l_siz1.y = fabs(selectedPoint.y - ref.y);
 		aspect = l_siz1.x / l_siz1.y;
 		if (aspect < xyRatio)
 			l_siz1.x = l_siz1.y*xyRatio;
@@ -7340,8 +7340,8 @@ void setexpand() {
 
 		ref.x = rct.left;
 		ref.y = rct.bottom;
-		l_siz1.x = fabs(sPnt.x - ref.x);
-		l_siz1.y = fabs(sPnt.y - ref.y);
+		l_siz1.x = fabs(selectedPoint.x - ref.x);
+		l_siz1.y = fabs(selectedPoint.y - ref.y);
 		aspect = l_siz1.x / l_siz1.y;
 		if (aspect < xyRatio)
 			l_siz1.x = l_siz1.y*xyRatio;
@@ -7359,8 +7359,8 @@ void setexpand() {
 
 		ref.x = rct.left;
 		ref.y = rct.top;
-		l_siz1.x = fabs(sPnt.x - ref.x);
-		l_siz1.y = fabs(sPnt.y - ref.y);
+		l_siz1.x = fabs(selectedPoint.x - ref.x);
+		l_siz1.y = fabs(selectedPoint.y - ref.y);
 		aspect = l_siz1.x / l_siz1.y;
 		if (aspect < xyRatio)
 			l_siz1.x = l_siz1.y*xyRatio;
@@ -7378,8 +7378,8 @@ void setexpand() {
 
 		ref.x = rct.right;
 		ref.y = rct.top;
-		l_siz1.x = fabs(sPnt.x - ref.x);
-		l_siz1.y = fabs(sPnt.y - ref.y);
+		l_siz1.x = fabs(selectedPoint.x - ref.x);
+		l_siz1.y = fabs(selectedPoint.y - ref.y);
 		aspect = l_siz1.x / l_siz1.y;
 		if (aspect < xyRatio)
 			l_siz1.x = l_siz1.y*xyRatio;
@@ -7904,8 +7904,8 @@ void durpoli(unsigned nsids) {
 	ptrSelectedForm->attribute = activeLayer << 1;
 	fvars(formIndex);
 	px2stch();
-	pnt.x = sPnt.x;
-	pnt.y = sPnt.y;
+	pnt.x = selectedPoint.x;
+	pnt.y = selectedPoint.y;
 	for (ind = 0; ind < sides; ind++) {
 		currentFormVertices[ind].x = pnt.x;
 		currentFormVertices[ind].y = pnt.y;
@@ -7945,8 +7945,8 @@ void dustar(unsigned nsids, double len) {
 	ptrSelectedForm->attribute = (activeLayer << 1);
 	fvars(formIndex);
 	px2stch();
-	pnt.x = sPnt.x;
-	pnt.y = sPnt.y;
+	pnt.x = selectedPoint.x;
+	pnt.y = selectedPoint.y;
 	setMap(FILDIR);
 	for (ind = 0; ind < tsid; ind++) {
 		currentFormVertices[ind].x = pnt.x;
@@ -7998,8 +7998,8 @@ void duspir(unsigned nsids) {
 	ptrSelectedForm->attribute = (activeLayer << 1);
 	fvars(formIndex);
 	px2stch();
-	pnt.x = sPnt.x;
-	pnt.y = sPnt.y;
+	pnt.x = selectedPoint.x;
+	pnt.y = selectedPoint.y;
 	for (ind = 0; ind < nsids; ind++) {
 		tflt[ind].x = pnt.x;
 		tflt[ind].y = pnt.y;
@@ -8051,8 +8051,8 @@ void duhart(unsigned nsids) {
 	ptrSelectedForm->attribute = activeLayer << 1;
 	currentFormVertices = &formPoints[fltad];
 	px2stch();
-	pnt.x = sPnt.x;
-	pnt.y = sPnt.y;
+	pnt.x = selectedPoint.x;
+	pnt.y = selectedPoint.y;
 	dang = PI * 2 / nsids;
 	len = 300 / nsids*zoomFactor*(unzoomedRect.x + unzoomedRect.y) / (LHUPX + LHUPY);
 	l_ang = PI*0.28;
@@ -8123,11 +8123,11 @@ void dulens(unsigned nsids) {
 	ptrSelectedForm->attribute = activeLayer << 1;
 	fvars(formIndex);
 	px2stch();
-	pnt.x = sPnt.x;
-	pnt.y = sPnt.y;
+	pnt.x = selectedPoint.x;
+	pnt.y = selectedPoint.y;
 	ind = 0;
-	sPnt.x -= (float)0.0001;
-	while (pnt.x >= sPnt.x) {
+	selectedPoint.x -= (float)0.0001;
+	while (pnt.x >= selectedPoint.x) {
 		currentFormVertices[ind].x = pnt.x;
 		currentFormVertices[ind++].y = pnt.y;
 		pnt.x += len*cos(l_ang);
@@ -8196,18 +8196,18 @@ void duzig(unsigned nsids) {
 	ptrSelectedForm->attribute = activeLayer << 1;
 	fvars(formIndex);
 	px2stch();
-	sPnt.x;
-	sPnt.y;
+	selectedPoint.x;
+	selectedPoint.y;
 	off.x = unzoomedRect.x / 6;
 	off.y = unzoomedRect.y / (6 * nsids);
 	for (ind = 0; ind < nsids; ind++) {
-		currentFormVertices[ind].x = sPnt.x;
-		currentFormVertices[ind].y = sPnt.y;
-		sPnt.y -= off.y;
+		currentFormVertices[ind].x = selectedPoint.x;
+		currentFormVertices[ind].y = selectedPoint.y;
+		selectedPoint.y -= off.y;
 		if (ind & 1)
-			sPnt.x += off.x;
+			selectedPoint.x += off.x;
 		else
-			sPnt.x -= off.x;
+			selectedPoint.x -= off.x;
 	}
 	ptrSelectedForm->type = LIN;
 	closestFormToCursor = formIndex;
@@ -8539,10 +8539,10 @@ void duromb(dPOINT strt0, dPOINT fin0, dPOINT strt1, dPOINT fin1) {
 	unsigned	cnt, ind;
 
 	if (!chkMap(UND)) {
-		dif0.x = sPnt.x - strt0.x;
-		dif0.y = sPnt.y - strt0.y;
-		dif1.x = sPnt.x - strt1.x;
-		dif1.y = sPnt.y - strt1.y;
+		dif0.x = selectedPoint.x - strt0.x;
+		dif0.y = selectedPoint.y - strt0.y;
+		dif1.x = selectedPoint.x - strt1.x;
+		dif1.y = selectedPoint.y - strt1.y;
 		len0 = hypot(dif0.x, dif0.y);
 		len1 = hypot(dif1.x, dif1.y);
 		if (len0 > len1)
@@ -8606,7 +8606,7 @@ void spend(unsigned strt, unsigned fin) {
 		fdif.x = pvrct[fin].bipnt.x - piv.x;
 		fdif.y = pvrct[fin].bipnt.y - piv.y;
 	}
-	if (hypot(sPnt.x - piv.x, sPnt.y - piv.y) > 2 * PI)
+	if (hypot(selectedPoint.x - piv.x, selectedPoint.y - piv.y) > 2 * PI)
 		filinsb(piv);
 	sang = atan2(sdif.y, sdif.x);
 	fang = atan2(fdif.y, fdif.x);
@@ -8681,8 +8681,8 @@ void pfn(unsigned strtlin, VRCT2* vrct) {
 	unsigned		ind;
 	unsigned short	nlin;
 
-	sPnt.x = currentFormVertices[strtlin].x;
-	sPnt.y = currentFormVertices[strtlin].y;
+	selectedPoint.x = currentFormVertices[strtlin].x;
+	selectedPoint.y = currentFormVertices[strtlin].y;
 	nlin = nxt(strtlin);
 	for (ind = 0; ind < ptrSelectedForm->sides; ind++) {
 		duromb(vrct[strtlin].bipnt, vrct[strtlin].cipnt, vrct[strtlin].bopnt, vrct[strtlin].copnt);
@@ -8821,8 +8821,8 @@ void plbrd(double spac) {
 		pvrct[sides - 4].dipnt.y = pvrct[sides - 4].dopnt.y = uvrct[sides - 4].dipnt.y = uvrct[sides - 4].dopnt.y = ptrSelectedForm->vertices[sides - 1].y;
 	}
 	seqpnt = 0;
-	sPnt.x = currentFormVertices[0].x;
-	sPnt.y = currentFormVertices[0].y;
+	selectedPoint.x = currentFormVertices[0].x;
+	selectedPoint.y = currentFormVertices[0].y;
 	if (ptrSelectedForm->edgeType&EGUND) {
 		StitchSpace = USPAC;
 		setMap(UND);
@@ -8832,15 +8832,15 @@ void plbrd(double spac) {
 		plfn(&uvrct[0]);
 		bpnt = seqpnt;
 		rstMap(UNDPHAS);
-		sPnt.x = currentFormVertices[0].x;
-		sPnt.y = currentFormVertices[0].y;
+		selectedPoint.x = currentFormVertices[0].x;
+		selectedPoint.y = currentFormVertices[0].y;
 		setMap(FILDIR);
 		plfn(&uvrct[0]);
 		plbak(bpnt);
 		prsmal();
 		if (seqpnt) { //ensure that we can do a valid read from oseq
-			sPnt.x = oseq[seqpnt - 1].x;
-			sPnt.y = oseq[seqpnt - 1].y;
+			selectedPoint.x = oseq[seqpnt - 1].x;
+			selectedPoint.y = oseq[seqpnt - 1].y;
 		}
 	}
 	rstMap(UND);
@@ -9959,7 +9959,7 @@ void selal() {
 	zoomFactor = 1;
 	rstMap(ZUMED);
 	movStch();
-	selCnt = 0;
+	nearestCount = 0;
 	rstMap(RUNPAT);
 	duzrat();
 	stchrct2px(allItemsRectangle, &selectedFormsRectangle);
@@ -12895,10 +12895,10 @@ BOOL fxpnt() {
 
 	mvpnt.x = currentFormVertices[nextStart].x;
 	mvpnt.y = currentFormVertices[nextStart].y;
-	len = hypot(mvpnt.x - sPnt.x, mvpnt.y - sPnt.y);
+	len = hypot(mvpnt.x - selectedPoint.x, mvpnt.y - selectedPoint.y);
 	if (len > adjustedSpace) {
 		for (ind = 0; ind < 10; ind++) {
-			len = hypot(mvpnt.x - sPnt.x, mvpnt.y - sPnt.y);
+			len = hypot(mvpnt.x - selectedPoint.x, mvpnt.y - selectedPoint.y);
 			dif = adjustedSpace - len;
 			mvpnt.x += dif*listCOSINEs[clpstrt];
 			mvpnt.y += dif*listSINEs[clpstrt];
@@ -12916,15 +12916,15 @@ void fxlit() {
 	dPOINT		dif;
 
 	if (fxpnt()) {
-		sPnt.x = mvpnt.x;
-		sPnt.y = mvpnt.y;
+		selectedPoint.x = mvpnt.x;
+		selectedPoint.y = mvpnt.y;
 		beancnt++;
-		len = hypot(currentFormVertices[nextStart].x - sPnt.x, currentFormVertices[nextStart].y - sPnt.y);
+		len = hypot(currentFormVertices[nextStart].x - selectedPoint.x, currentFormVertices[nextStart].y - selectedPoint.y);
 		cnt = floor(len / adjustedSpace);
 		dif.x = adjustedSpace*listCOSINEs[clpstrt];
 		dif.y = adjustedSpace*listSINEs[clpstrt];
-		sPnt.x += dif.x*cnt;
-		sPnt.y += dif.y*cnt;
+		selectedPoint.x += dif.x*cnt;
+		selectedPoint.y += dif.y*cnt;
 		beancnt += cnt;
 	}
 }
@@ -12936,18 +12936,18 @@ void fxlin() {
 	dPOINT		dif;
 
 	if (fxpnt()) {
-		chainEndPoints[xpnt].x = sPnt.x = mvpnt.x;
-		chainEndPoints[xpnt].y = sPnt.y = mvpnt.y;
+		chainEndPoints[xpnt].x = selectedPoint.x = mvpnt.x;
+		chainEndPoints[xpnt].y = selectedPoint.y = mvpnt.y;
 		xpnt++;
-		len = hypot(currentFormVertices[nextStart].x - sPnt.x, currentFormVertices[nextStart].y - sPnt.y);
+		len = hypot(currentFormVertices[nextStart].x - selectedPoint.x, currentFormVertices[nextStart].y - selectedPoint.y);
 		cnt = floor(len / adjustedSpace);
 		dif.x = adjustedSpace*listCOSINEs[clpstrt];
 		dif.y = adjustedSpace*listSINEs[clpstrt];
 		for (ind = 0; ind < cnt; ind++) {
-			sPnt.x += dif.x;
-			sPnt.y += dif.y;
-			chainEndPoints[xpnt].x = sPnt.x;
-			chainEndPoints[xpnt].y = sPnt.y;
+			selectedPoint.x += dif.x;
+			selectedPoint.y += dif.y;
+			chainEndPoints[xpnt].x = selectedPoint.x;
+			chainEndPoints[xpnt].y = selectedPoint.y;
 			xpnt++;
 		}
 	}
@@ -12993,11 +12993,11 @@ fxlab:;
 	hival = 1;
 	while (lupcnt<100 && (hival - loval)>TINY) {
 		beancnt = 0;
-		sPnt.x = currentFormVertices[0].x;
-		sPnt.y = currentFormVertices[0].y;
+		selectedPoint.x = currentFormVertices[0].x;
+		selectedPoint.y = currentFormVertices[0].y;
 		xpnt = 1;
-		chainEndPoints[0].x = sPnt.x;
-		chainEndPoints[0].y = sPnt.y;
+		chainEndPoints[0].x = selectedPoint.x;
+		chainEndPoints[0].y = selectedPoint.y;
 		for (clpstrt = 0; clpstrt < (unsigned)sides - 1; clpstrt++) {
 			nextStart = clpstrt + 1;
 			fxlit();
@@ -13011,14 +13011,14 @@ fxlab:;
 		if (!inicnt) {
 			inicnt = beancnt;
 			loval = adjustedSpace;
-			minter = ter = (double)hypot(currentFormVertices[nextStart].x - sPnt.x, currentFormVertices[nextStart].y - sPnt.y);
+			minter = ter = (double)hypot(currentFormVertices[nextStart].x - selectedPoint.x, currentFormVertices[nextStart].y - selectedPoint.y);
 			minspac = adjustedSpace;
 			ter /= inicnt;
 			adjustedSpace += ter / 2;
 			hival = loval + ter;
 		}
 		else {
-			ter = hypot(currentFormVertices[nextStart].x - sPnt.x, currentFormVertices[nextStart].y - sPnt.y);
+			ter = hypot(currentFormVertices[nextStart].x - selectedPoint.x, currentFormVertices[nextStart].y - selectedPoint.y);
 			if (ter > spac2)
 				ter = ptrSelectedForm->edgeSpacing - ter;
 			if (ter < minter) {
@@ -13037,8 +13037,8 @@ fxlab:;
 		}
 		lupcnt++;
 	}
-	sPnt.x = currentFormVertices[0].x;
-	sPnt.y = currentFormVertices[0].y;
+	selectedPoint.x = currentFormVertices[0].x;
+	selectedPoint.y = currentFormVertices[0].y;
 	opnt = 1;
 	adjustedSpace = minspac;
 	for (clpstrt = 0; clpstrt < (unsigned)sides - 1; clpstrt++) {
@@ -13049,7 +13049,7 @@ fxlab:;
 		nextStart = 0;
 		fxlin();
 	}
-	ter = hypot(currentFormVertices[nextStart].x - sPnt.x, currentFormVertices[nextStart].y - sPnt.y);
+	ter = hypot(currentFormVertices[nextStart].x - selectedPoint.x, currentFormVertices[nextStart].y - selectedPoint.y);
 	if (ter < spac2)
 		xpnt--;
 	chainEndPoints[xpnt].x = currentFormVertices[nextStart].x;

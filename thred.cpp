@@ -656,7 +656,7 @@ unsigned			traceRGBMask[]	= { REDMSK,GRNMSK,BLUMSK };	//trace masks
 unsigned			traceRGB[]		= { BLUCOL,GRNCOL,REDCOL };	//trace colors
 unsigned			traceAdjacentColors[9];	//separated colors for adjacent pixels
 unsigned*			differenceBitmap;		//difference bitmap
-TCHAR				trinbuf[4];				//for user input color numbers
+TCHAR				traceInputBuffer[4];	//for user input color numbers
 unsigned			columnColor;			//trace color column
 POINT				bitpnt;					//a point on the bitmap
 
@@ -767,7 +767,7 @@ unsigned			DiplayedColorBitmap;	//color bitmap for recording colors on screen
 double				gapToNearest[NERCNT];	//distances of the closest points
 											//to a mouse click
 long				nearestPoint[NERCNT];	//indices of the closest points
-unsigned			selCnt;					//number of boxes selected
+unsigned			nearestCount;			//number of boxes selected
 unsigned			slpnt = 0;				//pointer for drawing stitch select lines
 fRECTANGLE			stitchRangeRect;		//stitch range rectangle
 fPOINT				stitchRangeSize;		//from check ranges
@@ -775,17 +775,17 @@ fPOINT				selectedFormsSize;		//size of multiple select rectangle
 unsigned			moveAnchor;				//for resequencing stitches
 double				rotateAnglePixels;		//angle for pixel rotate
 SIZE				pickColorMsgSize;		//size of the pick color message
-POINT				inspnt;			//size of file insert window
-fPOINT				inscntr;		//center point in inserted file
-unsigned			numcod;			//keyboard numerical input
-double				loang;			//low angle for angle from mark
-double				organg;			//original angle for angle from mark
-double				hiang;			//hi angle for angle from mark
+POINT				insertSize;				//size of file insert window
+fPOINT				insertCenter;			//center point in inserted file
+unsigned			numericCode;			//keyboard numerical input
+double				lowestAngle;			//low angle for angle from mark
+double				originalAngle;			//original angle for angle from mark
+double				highestAngle;			//hi angle for angle from mark
 unsigned			knots[MAXKNOTS];		//pointers to knots
 unsigned			knotCount;				//number of knots in the design
 unsigned			knotAttribute;			//knot stitch attribute
 fPOINT				knotStep;				//knot step
-TCHAR				knotAtStartOrder[] = { 2,3,1,4,0 };	//knot spacings
+TCHAR				knotAtStartOrder[] = { 2,3,1,4,0 };		//knot spacings
 TCHAR				knotAtEndOrder[] = { -2,-3,-1,-4,0 };	//reverse knot spacings
 TCHAR				knotAtLastOrder[] = { 0,-4,-1,-3,-2 };	//reverse knot spacings
 fRECTANGLE			clipRectAdjusted;		//rectangle for adjust range ends for clipboard fills
@@ -796,9 +796,8 @@ HANDLE				hBalaradFile;			//balarad file handle
 double				aspectRatio = (double)LHUPX / LHUPY;	//aspect ratio of the stich window
 SCROLLINFO			scrollInfo;				//scroll bar i/o structure
 POINT				StitchWinSize;			//size of the stich window in pixels
-fPOINT				sPnt;			//for converting pixels coordinates
-									// to stitch cordinates
-//POINT				cPnt;			//closest point to a mouse click
+fPOINT				selectedPoint;			//for converting pixels coordinates
+											// to stitch cordinates
 fPOINT				zoomBoxOrigin;			//zoom box origin
 
 COLORREF defCol[] = {
@@ -821,8 +820,7 @@ COLORREF defCol[] = {
 	0xFFFFFF
 };
 
-long				selbox;
-long				boxOff[4];
+long				boxOffset[4];
 
 unsigned			defMap = 0xaf;		//bitmap for color number colors
 unsigned			verticalIndex;		//vertical index, calculated from mouse click
@@ -903,8 +901,8 @@ unsigned			thumbnailIndex;			//index into the thumbnail filname table
 TCHAR				thumbnailSearchString[32];	//storage for the thumnail search string
 TCHAR				insertFileName[_MAX_PATH] = { 0 };	//insert file name
 unsigned			insflt;					//saved float pointer for inserting files
-unsigned			insfpnt;				//saved form pointer for inserting files
-unsigned			insfstch;				//saved stitch pointer for inserting files
+unsigned			insertFileFormIndex;	//saved form pointer for inserting files
+unsigned			insertFileStitchCount;	//saved stitch pointer for inserting files
 
 OPENFILENAME obn = {
 	sizeof(OPENFILENAME),	//lStructsize
@@ -3161,9 +3159,9 @@ void grpAdj() {
 				zoomRect.right = zoomRect.left + (nusiz.x);
 				zoomFactor = (double)nusiz.x / unzoomedRect.x;
 				zoomRect.top = zoomRect.bottom + (nusiz.y);
-				sPnt.x = ((stitchRangeRect.right - stitchRangeRect.left) / 2) + stitchRangeRect.left;
-				sPnt.y = ((stitchRangeRect.top - stitchRangeRect.bottom) / 2) + stitchRangeRect.bottom;
-				shft(sPnt);
+				selectedPoint.x = ((stitchRangeRect.right - stitchRangeRect.left) / 2) + stitchRangeRect.left;
+				selectedPoint.y = ((stitchRangeRect.top - stitchRangeRect.bottom) / 2) + stitchRangeRect.bottom;
+				shft(selectedPoint);
 			}
 		}
 	}
@@ -3183,9 +3181,9 @@ void lensadj() {
 	if (stitchRangeRect.top > zoomRect.top - 1 || stitchRangeRect.bottom < zoomRect.bottom - 1
 		|| stitchRangeRect.left<zoomRect.left + 1 || stitchRangeRect.right>zoomRect.right - 1) {
 
-		sPnt.x = ((stitchRangeRect.right - stitchRangeRect.left) / 2) + stitchRangeRect.left;
-		sPnt.y = ((stitchRangeRect.top - stitchRangeRect.bottom) / 2) + stitchRangeRect.bottom;
-		shft(sPnt);
+		selectedPoint.x = ((stitchRangeRect.right - stitchRangeRect.left) / 2) + stitchRangeRect.left;
+		selectedPoint.y = ((stitchRangeRect.top - stitchRangeRect.bottom) / 2) + stitchRangeRect.bottom;
+		shft(selectedPoint);
 	}
 	nuAct(groupStartStitch);
 	setMap(RESTCH);
@@ -3272,7 +3270,7 @@ HBRUSH nuBrush(HBRUSH brsh, COLORREF col) {
 
 void box(unsigned ind, HDC dc) {
 
-	long pwid = boxOff[ind];
+	long pwid = boxOffset[ind];
 	POINT lin[5];
 
 	lin[0].x = pxNer[ind].x - pwid;
@@ -3293,7 +3291,7 @@ void boxs() {
 	unsigned	ind;
 
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	for (ind = 0; ind < selCnt; ind++) {
+	for (ind = 0; ind < nearestCount; ind++) {
 
 		SelectObject(StitchWindowDC, boxPen[ind]);
 		box(ind, StitchWindowDC);
@@ -3304,7 +3302,7 @@ void boxs() {
 void dubx() {
 
 	POINT lin[5];
-	long pwid = boxOff[0];
+	long pwid = boxOffset[0];
 
 	SelectObject(StitchWindowMemDC, boxPen[0]);
 	SelectObject(StitchWindowDC, boxPen[0]);
@@ -3374,10 +3372,10 @@ void unbox() {
 
 void unboxs() {
 
-	if (selCnt) {
+	if (nearestCount) {
 
 		boxs();
-		selCnt = 0;
+		nearestCount = 0;
 	}
 }
 
@@ -4062,8 +4060,8 @@ void centr() {
 	l_siz.y = zoomRect.right - zoomRect.left;
 	l_siz.x >>= 1;
 	l_siz.y >>= 1;
-	sPnt.x = zoomRect.left + l_siz.x;
-	sPnt.y = zoomRect.bottom + l_siz.y;
+	selectedPoint.x = zoomRect.left + l_siz.x;
+	selectedPoint.y = zoomRect.bottom + l_siz.y;
 }
 
 double pxchk(double dub) {
@@ -5665,7 +5663,7 @@ void nuFil() {
 			zoomFactor = 1;
 			setMap(RESTCH);
 			defNam(fileName);
-			selCnt = 0;
+			nearestCount = 0;
 			if (rstMap(WASPAT))
 				DestroyWindow(hSpeedScrollBar);
 			ind = 0;
@@ -6918,9 +6916,9 @@ void pxCor2stch(POINT pnt) {
 	double	tdub;
 
 	tdub = (double)(pnt.x - stitchWindowAbsRect.left) / stitchWindowClientRect.right;
-	sPnt.x = tdub*(zoomRect.right - zoomRect.left) + zoomRect.left;
+	selectedPoint.x = tdub*(zoomRect.right - zoomRect.left) + zoomRect.left;
 	tdub = (double)(stitchWindowAbsRect.bottom - pnt.y) / stitchWindowClientRect.bottom;
-	sPnt.y = tdub*(zoomRect.top - zoomRect.bottom) + zoomRect.bottom;
+	selectedPoint.y = tdub*(zoomRect.top - zoomRect.bottom) + zoomRect.bottom;
 }
 
 unsigned px2stch() {
@@ -6931,9 +6929,9 @@ unsigned px2stch() {
 		&&msg.pt.y >= stitchWindowAbsRect.top&&msg.pt.y <= stitchWindowAbsRect.bottom) {
 
 		tdub = (double)(msg.pt.x - stitchWindowAbsRect.left) / stitchWindowClientRect.right;
-		sPnt.x = tdub*(zoomRect.right - zoomRect.left) + zoomRect.left;
+		selectedPoint.x = tdub*(zoomRect.right - zoomRect.left) + zoomRect.left;
 		tdub = (double)(stitchWindowAbsRect.bottom - msg.pt.y) / stitchWindowClientRect.bottom;
-		sPnt.y = tdub*(zoomRect.top - zoomRect.bottom) + zoomRect.bottom;
+		selectedPoint.y = tdub*(zoomRect.top - zoomRect.bottom) + zoomRect.bottom;
 		return 1;
 	} else
 		return 0;
@@ -6941,9 +6939,9 @@ unsigned px2stch() {
 
 void shft2box() {
 
-	sPnt.x = stitchBuffer[closestPointIndex].x;
-	sPnt.y = stitchBuffer[closestPointIndex].y;
-	shft(sPnt);
+	selectedPoint.x = stitchBuffer[closestPointIndex].x;
+	selectedPoint.y = stitchBuffer[closestPointIndex].y;
+	shft(selectedPoint);
 	stch2px1(closestPointIndex);
 }
 
@@ -6964,34 +6962,34 @@ void zumin() {
 
 		if (chkMap(GMRK)) {
 
-			sPnt.x = zoomMarkPoint.x;
-			sPnt.y = zoomMarkPoint.y;
+			selectedPoint.x = zoomMarkPoint.x;
+			selectedPoint.y = zoomMarkPoint.y;
 			goto gotc;
 		}
 		if (chkMap(FORMSEL)) {
 
 			trct = &formList[closestFormToCursor].rectangle;
-			sPnt.x = ((trct->right - trct->left) / 2) + trct->left;
-			sPnt.y = ((trct->top - trct->bottom) / 2) + trct->bottom;
+			selectedPoint.x = ((trct->right - trct->left) / 2) + trct->left;
+			selectedPoint.y = ((trct->top - trct->bottom) / 2) + trct->bottom;
 			goto gotc;
 		}
 		if (chkMap(FRMPSEL)) {
 
-			sPnt.x = formList[closestFormToCursor].vertices[closestVertexToCursor].x;
-			sPnt.y = formList[closestFormToCursor].vertices[closestVertexToCursor].y;
+			selectedPoint.x = formList[closestFormToCursor].vertices[closestVertexToCursor].x;
+			selectedPoint.y = formList[closestFormToCursor].vertices[closestVertexToCursor].y;
 			goto gotc;
 		}
 		if (chkMap(SELBOX)) {
 
-			sPnt.x = stitchBuffer[closestPointIndex].x;
-			sPnt.y = stitchBuffer[closestPointIndex].y;
+			selectedPoint.x = stitchBuffer[closestPointIndex].x;
+			selectedPoint.y = stitchBuffer[closestPointIndex].y;
 			goto gotc;
 		}
 		if (chkMap(GRPSEL)) {
 
 			selRct(&srct);
-			sPnt.x = ((srct.right - srct.left) / 2) + srct.left;
-			sPnt.y = ((srct.top - srct.bottom) / 2) + srct.bottom;
+			selectedPoint.x = ((srct.right - srct.left) / 2) + srct.left;
+			selectedPoint.y = ((srct.top - srct.bottom) / 2) + srct.bottom;
 			goto gotc;
 		}
 		if (chkMap(INSRT)) {
@@ -7000,17 +6998,17 @@ void zumin() {
 
 				if (chkMap(BAKEND)) {
 
-					sPnt.x = stitchBuffer[header.stitchCount - 1].x;
-					sPnt.y = stitchBuffer[header.stitchCount - 1].y;
+					selectedPoint.x = stitchBuffer[header.stitchCount - 1].x;
+					selectedPoint.y = stitchBuffer[header.stitchCount - 1].y;
 				} else {
 
-					sPnt.x = stitchBuffer[0].x;
-					sPnt.y = stitchBuffer[0].y;
+					selectedPoint.x = stitchBuffer[0].x;
+					selectedPoint.y = stitchBuffer[0].y;
 				}
 			} else {
 
-				sPnt.x = (stitchBuffer[closestPointIndex + 1].x - stitchBuffer[closestPointIndex].x) / 2 + stitchBuffer[closestPointIndex].x;
-				sPnt.y = (stitchBuffer[closestPointIndex + 1].y - stitchBuffer[closestPointIndex].y) / 2 + stitchBuffer[closestPointIndex].y;
+				selectedPoint.x = (stitchBuffer[closestPointIndex + 1].x - stitchBuffer[closestPointIndex].x) / 2 + stitchBuffer[closestPointIndex].x;
+				selectedPoint.y = (stitchBuffer[closestPointIndex + 1].y - stitchBuffer[closestPointIndex].y) / 2 + stitchBuffer[closestPointIndex].y;
 			}
 			goto gotc;
 		}
@@ -7031,8 +7029,8 @@ void zumin() {
 				if (formList[selectedFormList[ind]].rectangle.right > selectedFormsRectangle.right)
 					selectedFormsRectangle.right = formList[selectedFormList[ind]].rectangle.right;
 			}
-			sPnt.x = (selectedFormsRectangle.right - selectedFormsRectangle.left) / 2 + selectedFormsRectangle.left;
-			sPnt.y = (selectedFormsRectangle.top - selectedFormsRectangle.bottom) / 2 + selectedFormsRectangle.bottom;
+			selectedPoint.x = (selectedFormsRectangle.right - selectedFormsRectangle.left) / 2 + selectedFormsRectangle.left;
+			selectedPoint.y = (selectedFormsRectangle.top - selectedFormsRectangle.bottom) / 2 + selectedFormsRectangle.bottom;
 			goto gotc;
 		}
 		if (!px2stch())
@@ -7044,8 +7042,8 @@ gotc:;
 	zoomRect.left = zoomRect.bottom = 0;
 	zoomRect.right = nusiz.x;
 	zoomRect.top = nusiz.y;
-	shft(sPnt);
-	selCnt = 0;
+	shft(selectedPoint);
+	nearestCount = 0;
 	if (!chkMap(GMRK) && chkMap(SELBOX))
 		shft2box();
 	if (chkMap(RUNPAT)) {
@@ -7068,7 +7066,7 @@ void zumhom() {
 	zoomFactor = 1;
 	rstMap(ZUMED);
 	movStch();
-	selCnt = 0;
+	nearestCount = 0;
 	if (chkMap(RUNPAT)) {
 
 		FillRect(StitchWindowMemDC, &stitchWindowClientRect, hBackgroundBrush);
@@ -7090,10 +7088,10 @@ void zumshft() {
 
 		unboxs();
 		if (px2stch()) {
-			selCnt = 0;
-			shft(sPnt);
-			spnt.x = sPnt.x;
-			spnt.y = sPnt.y;
+			nearestCount = 0;
+			shft(selectedPoint);
+			spnt.x = selectedPoint.x;
+			spnt.y = selectedPoint.y;
 			sCor2px(spnt, &pnt);
 			if (chkMap(RUNPAT)) {
 
@@ -7117,34 +7115,34 @@ void zumout() {
 
 		if (chkMap(GMRK)) {
 
-			sPnt.x = zoomMarkPoint.x;
-			sPnt.y = zoomMarkPoint.y;
+			selectedPoint.x = zoomMarkPoint.x;
+			selectedPoint.y = zoomMarkPoint.y;
 			goto gots;
 		}
 		if (chkMap(FORMSEL)) {
 
 			trct = &formList[closestFormToCursor].rectangle;
-			sPnt.x = ((trct->right - trct->left) / 2) + trct->left;
-			sPnt.y = ((trct->top - trct->bottom) / 2) + trct->bottom;
+			selectedPoint.x = ((trct->right - trct->left) / 2) + trct->left;
+			selectedPoint.y = ((trct->top - trct->bottom) / 2) + trct->bottom;
 			goto gots;
 		}
 		if (chkMap(FRMPSEL)) {
 
-			sPnt.x = formList[closestFormToCursor].vertices[closestVertexToCursor].x;
-			sPnt.y = formList[closestFormToCursor].vertices[closestVertexToCursor].y;
+			selectedPoint.x = formList[closestFormToCursor].vertices[closestVertexToCursor].x;
+			selectedPoint.y = formList[closestFormToCursor].vertices[closestVertexToCursor].y;
 			goto gots;
 		}
 		if (chkMap(SELBOX) || chkMap(INSRT)) {
 
-			sPnt.x = stitchBuffer[closestPointIndex].x;
-			sPnt.y = stitchBuffer[closestPointIndex].y;
+			selectedPoint.x = stitchBuffer[closestPointIndex].x;
+			selectedPoint.y = stitchBuffer[closestPointIndex].y;
 			goto gots;
 		}
 		if (chkMap(GRPSEL)) {
 
 			selRct(&srct);
-			sPnt.x = ((srct.right - srct.left) / 2) + srct.left;
-			sPnt.y = ((srct.top - srct.bottom) / 2) + srct.bottom;
+			selectedPoint.x = ((srct.right - srct.left) / 2) + srct.left;
+			selectedPoint.y = ((srct.top - srct.bottom) / 2) + srct.bottom;
 			goto gots;
 		}
 		if (chkMap(SELBOX)) {
@@ -7165,7 +7163,7 @@ void zumout() {
 			zoomRect.right = unzoomedRect.x;
 			zoomRect.top = unzoomedRect.y;
 			movStch();
-			selCnt = 0;
+			nearestCount = 0;
 		} else {
 
 			nusiz.x = unzoomedRect.x*zoomFactor;
@@ -7173,7 +7171,7 @@ void zumout() {
 			zoomRect.left = zoomRect.bottom = 0;
 			zoomRect.top = nusiz.y;
 			zoomRect.right = nusiz.x;
-			shft(sPnt);
+			shft(selectedPoint);
 		}
 		if (chkMap(RUNPAT)) {
 
@@ -7194,8 +7192,8 @@ void duClos(unsigned strt, unsigned cnt) {
 
 	for (ind = strt; ind < strt + cnt; ind++) {
 
-		cx = ((stitchBuffer[ind].x > sPnt.x) ? (stitchBuffer[ind].x - sPnt.x) : (sPnt.x - stitchBuffer[ind].x));
-		cy = ((stitchBuffer[ind].y > sPnt.y) ? (stitchBuffer[ind].y - sPnt.y) : (sPnt.y - stitchBuffer[ind].y));
+		cx = ((stitchBuffer[ind].x > selectedPoint.x) ? (stitchBuffer[ind].x - selectedPoint.x) : (selectedPoint.x - stitchBuffer[ind].x));
+		cy = ((stitchBuffer[ind].y > selectedPoint.y) ? (stitchBuffer[ind].y - selectedPoint.y) : (selectedPoint.y - stitchBuffer[ind].y));
 		sum = hypot(cx, cy);
 		tind0 = ind;
 		for (ine = 0; ine < NERCNT; ine++) {
@@ -7241,9 +7239,9 @@ void closPnt() {
 
 		if (stch2px(nearestPoint[ind])) {
 
-			nearestPoint[selCnt] = nearestPoint[ind];
-			pxNer[selCnt].x = stitchSizePixels.x;
-			pxNer[selCnt++].y = stitchSizePixels.y;
+			nearestPoint[nearestCount] = nearestPoint[ind];
+			pxNer[nearestCount].x = stitchSizePixels.x;
+			pxNer[nearestCount++].y = stitchSizePixels.y;
 		}
 	}
 	boxs();
@@ -7268,9 +7266,9 @@ unsigned closPnt1(unsigned* clo) {
 			return 1;
 		}
 	}
-	for (ind = 0; ind < selCnt; ind++) {
+	for (ind = 0; ind < nearestCount; ind++) {
 
-		nerSid = boxOff[ind];
+		nerSid = boxOffset[ind];
 		if (chkPnt.x >= pxNer[ind].x - nerSid&&
 			chkPnt.x <= pxNer[ind].x + nerSid&&
 			chkPnt.y >= pxNer[ind].y - nerSid&&
@@ -7295,8 +7293,8 @@ unsigned closPnt1(unsigned* clo) {
 						stitchBuffer[ine].y >= zoomRect.bottom&&
 						stitchBuffer[ine].y <= zoomRect.top) {
 
-						cx = ((stitchBuffer[ine].x > sPnt.x) ? (stitchBuffer[ine].x - sPnt.x) : (sPnt.x - stitchBuffer[ine].x));
-						cy = ((stitchBuffer[ine].y > sPnt.y) ? (stitchBuffer[ine].y - sPnt.y) : (sPnt.y - stitchBuffer[ine].y));
+						cx = ((stitchBuffer[ine].x > selectedPoint.x) ? (stitchBuffer[ine].x - selectedPoint.x) : (selectedPoint.x - stitchBuffer[ine].x));
+						cy = ((stitchBuffer[ine].y > selectedPoint.y) ? (stitchBuffer[ine].y - selectedPoint.y) : (selectedPoint.y - stitchBuffer[ine].y));
 						tsum = hypot(cx, cy);
 						if (tsum < distanceToClick) {
 
@@ -7319,8 +7317,8 @@ unsigned closPnt1(unsigned* clo) {
 					stitchBuffer[ind].y >= zoomRect.bottom&&
 					stitchBuffer[ind].y <= zoomRect.top) {
 
-					cx = stitchBuffer[ind].x - sPnt.x;
-					cy = stitchBuffer[ind].y - sPnt.y;
+					cx = stitchBuffer[ind].x - selectedPoint.x;
+					cy = stitchBuffer[ind].y - selectedPoint.y;
 					tsum = hypot(cx, cy);
 					if (tsum < distanceToClick) {
 
@@ -7493,7 +7491,7 @@ This function attempts to find the stitch the user is trying to select.
 A rectangle is created that is slightly larger than the stitch.
 If the mouse position is outside this rectangle, the stitch is disqualified.
 If the mouse position is inside the rectangle, the distance from the stitch
- to the select point (sPnt) is calculated.
+ to the select point (selectedPoint) is calculated.
 
 Find the equation for the line by solving the linear parametric eauations
 
@@ -7520,9 +7518,9 @@ back substituting into stitchBuffer[ind].x+slop*stitchBuffer[ind].y=off
   off=stitchBuffer[ind].x+slop*stitchBuffer[ind].y
 
 The equation for a point vertical to the equation for the line and running
- through sPnt is:
+ through selectedPoint is:
 
-  sPnt.x-sPnt.y/slop=poff
+  selectedPoint.x-selectedPoint.y/slop=poff
 
 If ipnt is the intersections between the two lines then
 
@@ -7745,7 +7743,7 @@ void istch() {
 		if (closestPointIndex&&closestPointIndex != (unsigned)header.stitchCount - 1) {
 
 			px2stch();
-			angt = atan2(stitchBuffer[closestPointIndex].y - sPnt.y, stitchBuffer[closestPointIndex].x - sPnt.x);
+			angt = atan2(stitchBuffer[closestPointIndex].y - selectedPoint.y, stitchBuffer[closestPointIndex].x - selectedPoint.x);
 			angb = atan2(stitchBuffer[closestPointIndex].y - stitchBuffer[closestPointIndex - 1].y, stitchBuffer[closestPointIndex].x - stitchBuffer[closestPointIndex - 1].x);
 			angf = atan2(stitchBuffer[closestPointIndex].y - stitchBuffer[closestPointIndex + 1].y, stitchBuffer[closestPointIndex].x - stitchBuffer[closestPointIndex + 1].x);
 			if (fabs(angf - angt) > fabs(angb - angt))
@@ -7771,7 +7769,7 @@ void istch() {
 
 void cros(unsigned ind) {
 
-	long pwid = boxOff[0];
+	long pwid = boxOffset[0];
 
 	stch2px1(ind);
 	insertLine[0].x = stitchSizePixels.x - pwid;
@@ -8194,17 +8192,17 @@ void clpbox() {
 	double	tdub;
 
 	px2stch();
-	if (sPnt.x + clipboardRectSize.cx > unzoomedRect.x)
-		sPnt.x = unzoomedRect.x - clipboardRectSize.cx;
-	if (sPnt.y + clipboardRectSize.cy > unzoomedRect.y)
-		sPnt.y = unzoomedRect.y - clipboardRectSize.cy;
-	clipboardOrigin.x = sPnt.x;
-	clipboardOrigin.y = sPnt.y;
+	if (selectedPoint.x + clipboardRectSize.cx > unzoomedRect.x)
+		selectedPoint.x = unzoomedRect.x - clipboardRectSize.cx;
+	if (selectedPoint.y + clipboardRectSize.cy > unzoomedRect.y)
+		selectedPoint.y = unzoomedRect.y - clipboardRectSize.cy;
+	clipboardOrigin.x = selectedPoint.x;
+	clipboardOrigin.y = selectedPoint.y;
 	tdub = (double)stitchWindowClientRect.right / (zoomRect.right - zoomRect.left);
 	clpx.cx = clipboardRectSize.cx*tdub + 0.5;
 	clpx.cy = clipboardRectSize.cy*tdub + 0.5;
-	stitchSizePixels.x = (sPnt.x - zoomRect.left)*tdub + 0.5;
-	stitchSizePixels.y = stitchWindowClientRect.bottom - (sPnt.y - zoomRect.bottom)*tdub + 0.5 - clpx.cy;
+	stitchSizePixels.x = (selectedPoint.x - zoomRect.left)*tdub + 0.5;
+	stitchSizePixels.y = stitchWindowClientRect.bottom - (selectedPoint.y - zoomRect.bottom)*tdub + 0.5 - clpx.cy;
 	clipInsertBoxLine[0].x = clipInsertBoxLine[3].x = clipInsertBoxLine[4].x = stitchSizePixels.x;
 	clipInsertBoxLine[0].y = clipInsertBoxLine[1].y = clipInsertBoxLine[4].y = stitchSizePixels.y;
 	clipInsertBoxLine[1].x = clipInsertBoxLine[2].x = clipInsertBoxLine[0].x + clpx.cx;
@@ -8254,19 +8252,19 @@ void rSelbox() {
 
 	unsel();
 	px2stch();
-	if (sPnt.x - selectBoxOffset.x + selectBoxSize.cx >= unzoomedRect.x)
-		sPnt.x = unzoomedRect.x - selectBoxSize.cx + selectBoxOffset.x;
-	if (sPnt.y - selectBoxOffset.y + selectBoxSize.cy >= unzoomedRect.y)
-		sPnt.y = unzoomedRect.y - selectBoxSize.cy + selectBoxOffset.y;
-	if (sPnt.x - selectBoxOffset.x < 0)
-		sPnt.x = selectBoxOffset.x;
-	if (sPnt.y - selectBoxOffset.y < 0)
-		sPnt.y = selectBoxOffset.y;
+	if (selectedPoint.x - selectBoxOffset.x + selectBoxSize.cx >= unzoomedRect.x)
+		selectedPoint.x = unzoomedRect.x - selectBoxSize.cx + selectBoxOffset.x;
+	if (selectedPoint.y - selectBoxOffset.y + selectBoxSize.cy >= unzoomedRect.y)
+		selectedPoint.y = unzoomedRect.y - selectBoxSize.cy + selectBoxOffset.y;
+	if (selectedPoint.x - selectBoxOffset.x < 0)
+		selectedPoint.x = selectBoxOffset.x;
+	if (selectedPoint.y - selectBoxOffset.y < 0)
+		selectedPoint.y = selectBoxOffset.y;
 	tdub = (double)stitchWindowClientRect.right / (zoomRect.right - zoomRect.left);
 	selx.cx = selectBoxSize.cx*tdub + 0.5;
 	selx.cy = selectBoxSize.cy*tdub + 0.5;
-	stitchSizePixels.x = (sPnt.x - zoomRect.left - selectBoxOffset.x)*tdub + 0.5;
-	stitchSizePixels.y = stitchWindowClientRect.bottom - (sPnt.y - zoomRect.bottom - selectBoxOffset.y)*tdub + 0.5 - selx.cy;
+	stitchSizePixels.x = (selectedPoint.x - zoomRect.left - selectBoxOffset.x)*tdub + 0.5;
+	stitchSizePixels.y = stitchWindowClientRect.bottom - (selectedPoint.y - zoomRect.bottom - selectBoxOffset.y)*tdub + 0.5 - selx.cy;
 	formOutlineRectangle[0].x = formOutlineRectangle[6].x = formOutlineRectangle[7].x = formOutlineRectangle[8].x = stitchSizePixels.x;
 	formOutlineRectangle[1].x = formOutlineRectangle[5].x = stitchSizePixels.x + selx.cx / 2;
 	formOutlineRectangle[0].y = formOutlineRectangle[1].y = formOutlineRectangle[2].y = formOutlineRectangle[8].y = stitchSizePixels.y;
@@ -8282,8 +8280,8 @@ void duSelbox() {
 	px2stch();
 	selectBoxSize.cx = stitchRangeRect.right - stitchRangeRect.left;
 	selectBoxSize.cy = stitchRangeRect.top - stitchRangeRect.bottom;
-	selectBoxOffset.x = sPnt.x - stitchRangeRect.left;
-	selectBoxOffset.y = sPnt.y - stitchRangeRect.bottom;
+	selectBoxOffset.x = selectedPoint.x - stitchRangeRect.left;
+	selectBoxOffset.y = selectedPoint.y - stitchRangeRect.bottom;
 }
 
 void setbak(unsigned wid) {
@@ -9160,25 +9158,25 @@ void delsmal(unsigned ind, unsigned fin) {
 	} else {
 
 		ine = ind + 1;
-		sPnt.x = stitchBuffer[ind].x;
-		sPnt.y = stitchBuffer[ind].y;
+		selectedPoint.x = stitchBuffer[ind].x;
+		selectedPoint.y = stitchBuffer[ind].y;
 		for (inf = ine; inf < fin; inf++) {
 
 			if (stitchBuffer[ine].attribute&KNOTMSK) {
 
-				sPnt.x = stitchBuffer[ine].x;
-				sPnt.y = stitchBuffer[ine].y;
+				selectedPoint.x = stitchBuffer[ine].x;
+				selectedPoint.y = stitchBuffer[ine].y;
 				mvstch(ine++, inf);
 			} else {
 
-				dx = stitchBuffer[inf].x - sPnt.x;
-				dy = stitchBuffer[inf].y - sPnt.y;
+				dx = stitchBuffer[inf].x - selectedPoint.x;
+				dy = stitchBuffer[inf].y - selectedPoint.y;
 				l_siz = hypot(dx, dy);
 				if (l_siz > smallStitchLength) {
 
 					mvstch(ine++, inf);
-					sPnt.x = stitchBuffer[inf].x;
-					sPnt.y = stitchBuffer[inf].y;
+					selectedPoint.x = stitchBuffer[inf].x;
+					selectedPoint.y = stitchBuffer[inf].y;
 				}
 			}
 		}
@@ -12020,8 +12018,8 @@ void insflin(POINT ipnt) {
 
 	POINT off;
 
-	off.x = inspnt.x >> 1;
-	off.y = inspnt.y >> 1;
+	off.x = insertSize.x >> 1;
+	off.y = insertSize.y >> 1;
 
 	flin[0].x = flin[3].x = flin[4].x = ipnt.x - off.x;
 	flin[1].x = flin[2].x = ipnt.x + off.x;
@@ -12108,7 +12106,7 @@ void insfil() {
 			CloseHandle(hInsertedFile);
 		} else {
 
-			insfstch = header.stitchCount;
+			insertFileStitchCount = header.stitchCount;
 			if (isthr(insertFileName)) {
 
 				ReadFile(hInsertedFile, (STRHED*)&thed, sizeof(STRHED), &bytesRead, NULL);
@@ -12136,7 +12134,7 @@ void insfil() {
 					trct.left = trct.bottom = (float)1e9;
 					trct.top = trct.right = (float)1e-9;
 					codof = formIndex << FRMSHFT;
-					insflt = fltad; insfpnt = formIndex;
+					insflt = fltad; insertFileFormIndex = formIndex;
 					if (thed.pointCount) {
 
 						if (vervar < 2) {
@@ -12233,14 +12231,14 @@ void insfil() {
 							SetWindowText(hWnd, msgbuf);
 						}
 					}
-					inscntr.x = (trct.right - trct.left) / 2 + trct.left;
-					inscntr.y = (trct.top - trct.bottom) / 2 + trct.bottom;
+					insertCenter.x = (trct.right - trct.left) / 2 + trct.left;
+					insertCenter.y = (trct.top - trct.bottom) / 2 + trct.bottom;
 					header.stitchCount += thed.stitchCount;
 					tsiz.x = trct.right - trct.left;
 					tsiz.y = trct.top - trct.bottom;
 					ratsr();
-					inspnt.x = tsiz.x*horizontalRatio;
-					inspnt.y = tsiz.y*horizontalRatio;
+					insertSize.x = tsiz.x*horizontalRatio;
+					insertSize.y = tsiz.y*horizontalRatio;
 					tpnt.x = stitchWindowClientRect.right >> 1;
 					tpnt.y = stitchWindowClientRect.bottom >> 1;
 					insflin(tpnt);
@@ -12285,14 +12283,14 @@ void insfil() {
 							trct.top = stitchBuffer[ind].y;
 						ind++;
 					}
-					inscntr.x = (trct.right - trct.left) / 2 + trct.left;
-					inscntr.y = (trct.top - trct.bottom) / 2 + trct.bottom;
+					insertCenter.x = (trct.right - trct.left) / 2 + trct.left;
+					insertCenter.y = (trct.top - trct.bottom) / 2 + trct.bottom;
 					header.stitchCount = ine;
 					tsiz.x = trct.right - trct.left;
 					tsiz.y = trct.top - trct.bottom;
 					ratsr();
-					inspnt.x = tsiz.x*horizontalRatio;
-					inspnt.y = tsiz.y*horizontalRatio;
+					insertSize.x = tsiz.x*horizontalRatio;
+					insertSize.y = tsiz.y*horizontalRatio;
 					tpnt.x = stitchWindowClientRect.right >> 1;
 					tpnt.y = stitchWindowClientRect.bottom >> 1;
 					insflin(tpnt);
@@ -12315,9 +12313,9 @@ void duinsfil() {
 	fRECTANGLE*		trct;
 
 	px2stch();
-	off.x = sPnt.x - inscntr.x;
-	off.y = sPnt.y - inscntr.y;
-	for (ind = insfpnt; ind < formIndex; ind++) {
+	off.x = selectedPoint.x - insertCenter.x;
+	off.y = selectedPoint.y - insertCenter.y;
+	for (ind = insertFileFormIndex; ind < formIndex; ind++) {
 
 		trct = &formList[ind].rectangle;
 		trct->bottom += off.y;
@@ -12330,7 +12328,7 @@ void duinsfil() {
 		formPoints[ind].x += off.x;
 		formPoints[ind].y += off.y;
 	}
-	for (ind = insfstch; ind < header.stitchCount; ind++) {
+	for (ind = insertFileStitchCount; ind < header.stitchCount; ind++) {
 
 		stitchBuffer[ind].x += off.x;
 		stitchBuffer[ind].y += off.y;
@@ -12442,12 +12440,12 @@ BOOL dunum(unsigned cod) {
 
 	if (cod >= '0'&&cod <= '9') {
 
-		numcod = cod;
+		numericCode = cod;
 		return 1;
 	}
-	if (cod >= VK_NUMPAD0&&cod <= VK_NUMPAD9) {
+	if (cod >= VK_NUMPAD0 && cod <= VK_NUMPAD9) {
 
-		numcod = cod - '0';
+		numericCode = cod - '0';
 		return 1;
 	}
 	return 0;
@@ -12805,7 +12803,7 @@ double nuang(double ydif, double xdif) {
 	double tang, rang;
 
 	tang = atan2(ydif, xdif);
-	rang = tang - organg;
+	rang = tang - originalAngle;
 	if (fabs(rang) > PI) {
 
 		if (rang > 0)
@@ -12818,12 +12816,12 @@ double nuang(double ydif, double xdif) {
 
 void angdif(double p_ang) {
 
-	if (p_ang > hiang)
-		hiang = p_ang;
+	if (p_ang > highestAngle)
+		highestAngle = p_ang;
 	else {
 
-		if (p_ang < loang)
-			loang = p_ang;
+		if (p_ang < lowestAngle)
+			lowestAngle = p_ang;
 	}
 }
 
@@ -12838,8 +12836,8 @@ void rotmrk() {
 
 			cod = closestFormToCursor << FRMSHFT;
 			fvars(closestFormToCursor);
-			loang = hiang = 0;
-			organg = atan2(currentFormVertices[0].y - zoomMarkPoint.y, currentFormVertices[0].x - zoomMarkPoint.x);
+			lowestAngle = highestAngle = 0;
+			originalAngle = atan2(currentFormVertices[0].y - zoomMarkPoint.y, currentFormVertices[0].x - zoomMarkPoint.x);
 			for (ind = 1; ind < sides; ind++)
 				angdif(nuang(currentFormVertices[ind].y - zoomMarkPoint.y, currentFormVertices[ind].x - zoomMarkPoint.x));
 			for (ind = 0; ind < header.stitchCount; ind++) {
@@ -12850,12 +12848,12 @@ void rotmrk() {
 		} else {
 
 			rngadj();
-			loang = hiang = 0;
-			organg = atan2(stitchBuffer[groupStartStitch].y - zoomMarkPoint.y, stitchBuffer[groupStartStitch].x - zoomMarkPoint.x);
+			lowestAngle = highestAngle = 0;
+			originalAngle = atan2(stitchBuffer[groupStartStitch].y - zoomMarkPoint.y, stitchBuffer[groupStartStitch].x - zoomMarkPoint.x);
 			for (ind = groupStartStitch + 1; ind <= groupEndStitch; ind++)
 				angdif(nuang(stitchBuffer[ind].y - zoomMarkPoint.y, stitchBuffer[ind].x - zoomMarkPoint.x));
 		}
-		tang = hiang - loang;
+		tang = highestAngle - lowestAngle;
 		cnt = 2 * PI / tang;
 		iniFile.rotationAngle = 2 * PI / cnt;
 		sprintf_s(msgbuf, sizeof(msgbuf), "Rotation Angle: %.2f\n"
@@ -13828,9 +13826,9 @@ void trace() {
 		if (px2stch() && !rstMap(WASTRCOL)) {
 
 			if (chkMap(LANDSCAP))
-				sPnt.y -= (unzoomedRect.y - bitmapSizeinStitches.y);
-			bitpnt.x = bmpStitchRatio.x*sPnt.x;
-			bitpnt.y = bmpStitchRatio.y*sPnt.y - 1;
+				selectedPoint.y -= (unzoomedRect.y - bitmapSizeinStitches.y);
+			bitpnt.x = bmpStitchRatio.x*selectedPoint.x;
+			bitpnt.y = bmpStitchRatio.y*selectedPoint.y - 1;
 			ind = traceBitmap[bitpnt.y*bitmapWidth + bitpnt.x] ^ 0xffffff;
 			if (chkMap(TRCUP)) {
 
@@ -14139,9 +14137,9 @@ void dutrac() {
 		}
 		savdo();
 		if (chkMap(LANDSCAP))
-			sPnt.y -= (unzoomedRect.y - bitmapSizeinStitches.y);
-		currentTracePoint.x = bmpStitchRatio.x*sPnt.x;
-		currentTracePoint.y = bmpStitchRatio.y*sPnt.y;
+			selectedPoint.y -= (unzoomedRect.y - bitmapSizeinStitches.y);
+		currentTracePoint.x = bmpStitchRatio.x*selectedPoint.x;
+		currentTracePoint.y = bmpStitchRatio.y*selectedPoint.y;
 		if (currentTracePoint.x > (long)bitmapWidth)
 			currentTracePoint.x = bitmapWidth;
 		if (currentTracePoint.y > (long)bitmapHeight)
@@ -14459,7 +14457,7 @@ void tracpar() {
 	COLORREF	tpos;
 
 	if (chkMap(TRNIN0))
-		dutrnum0(atoi(trinbuf));
+		dutrnum0(atoi(traceInputBuffer));
 	if (chkMap(TRNIN1))
 		dutrnum1();
 	traceMsgPoint.x = msg.pt.x - mainWindowOrigin.x;
@@ -14521,7 +14519,7 @@ void tracpar() {
 					setMap(NUMIN);
 					setMap(TRNIN0);
 					msgIndex = 0;
-					*trinbuf = 0;
+					*traceInputBuffer = 0;
 					if (pos < 17) {
 
 						trnumwnd0(buttonHeight * 16);
@@ -14538,7 +14536,7 @@ void tracpar() {
 						setMap(NUMIN);
 						setMap(TRNIN1);
 						msgIndex = 0;
-						*trinbuf = 0;
+						*traceInputBuffer = 0;
 						if (pos < 19) {
 
 							trnumwnd1(buttonHeight * 18);
@@ -15536,8 +15534,8 @@ void fixpclp() {
 	tpnt.x = msg.pt.x + fmovdif.x;
 	tpnt.y = msg.pt.y + fmovdif.y;
 	pxCor2stch(tpnt);
-	pof.x = sPnt.x - iseq[1].x;
-	pof.y = sPnt.y - iseq[1].y;
+	pof.x = selectedPoint.x - iseq[1].x;
+	pof.y = selectedPoint.y - iseq[1].y;
 	ine = nxt(closestVertexToCursor);
 	cnt = opnt - 2;
 	fltspac(&currentFormVertices[ine], cnt);
@@ -15621,7 +15619,7 @@ unsigned chkMsg() {
 				return 1;
 			}
 			if (GetKeyState(VK_SHIFT) & 0x8000 && px2stch())
-				ritfcor(&sPnt);
+				ritfcor(&selectedPoint);
 			if (*flagMap&(PRFACTB | FORMINB | POLIMOVB) || hFormData) {
 
 				SetCursor(hArrowCurs);
@@ -15824,15 +15822,15 @@ unsigned chkMsg() {
 				setMap(SHOMOV);
 				ritmov();
 				if (px2stch())
-					ritfcor(&sPnt);
+					ritfcor(&selectedPoint);
 				return 1;
 			}
 			if (chkMap(MOVCNTR)) {
 
 				unrot();
 				px2stch();
-				rotationCenter.x = sPnt.x;
-				rotationCenter.y = sPnt.y;
+				rotationCenter.x = selectedPoint.x;
+				rotationCenter.y = selectedPoint.y;
 				ritrot();
 				return 1;
 			}
@@ -15876,7 +15874,7 @@ unsigned chkMsg() {
 			if (chkMap(CAPT)) {
 
 				if (px2stch())
-					ritfcor(&sPnt);
+					ritfcor(&selectedPoint);
 				unlin();
 				moveLine0[1].x = moveLine1[0].x = msg.pt.x - stitchWindowOrigin.x;
 				moveLine0[1].y = moveLine1[0].y = msg.pt.y - stitchWindowOrigin.y;
@@ -15886,7 +15884,7 @@ unsigned chkMsg() {
 			if (chkMap(INSRT)) {
 
 				if (px2stch())
-					ritfcor(&sPnt);
+					ritfcor(&selectedPoint);
 				if (setMap(VCAPT))
 					SetCapture(hWnd);
 				if (chkMap(LIN1)) {
@@ -16026,8 +16024,8 @@ unsigned chkMsg() {
 			savdo();
 			ReleaseCapture();
 			unsel();
-			padj.x = (stitchRangeRect.left + selectBoxOffset.x) - sPnt.x;
-			padj.y = (stitchRangeRect.bottom + selectBoxOffset.y) - sPnt.y;
+			padj.x = (stitchRangeRect.left + selectBoxOffset.x) - selectedPoint.x;
+			padj.y = (stitchRangeRect.bottom + selectBoxOffset.y) - selectedPoint.y;
 			for (ind = groupStartStitch; ind <= (long)groupEndStitch; ind++) {
 
 				stitchBuffer[ind].x -= padj.x;
@@ -16042,8 +16040,8 @@ unsigned chkMsg() {
 			ReleaseCapture();
 			rstMap(CAPT);
 			px2stch();
-			stitchBuffer[closestPointIndex].x = sPnt.x;
-			stitchBuffer[closestPointIndex].y = sPnt.y;
+			stitchBuffer[closestPointIndex].x = selectedPoint.x;
+			stitchBuffer[closestPointIndex].y = selectedPoint.y;
 			stitchBuffer[closestPointIndex].attribute |= USMSK;
 			if (zoomFactor < STCHBOX) {
 
@@ -16064,22 +16062,22 @@ unsigned chkMsg() {
 			px2stch();
 			if (rstMap(BOXSLCT)) {
 
-				if (zoomBoxOrigin.x > sPnt.x) {
+				if (zoomBoxOrigin.x > selectedPoint.x) {
 
 					stitchRangeRect.right = zoomBoxOrigin.x;
-					stitchRangeRect.left = sPnt.x;
+					stitchRangeRect.left = selectedPoint.x;
 				} else {
 
-					stitchRangeRect.right = sPnt.x;
+					stitchRangeRect.right = selectedPoint.x;
 					stitchRangeRect.left = zoomBoxOrigin.x;
 				}
-				if (zoomBoxOrigin.y > sPnt.y) {
+				if (zoomBoxOrigin.y > selectedPoint.y) {
 
 					stitchRangeRect.top = zoomBoxOrigin.y;
-					stitchRangeRect.bottom = sPnt.y;
+					stitchRangeRect.bottom = selectedPoint.y;
 				} else {
 
-					stitchRangeRect.top = sPnt.y;
+					stitchRangeRect.top = selectedPoint.y;
 					stitchRangeRect.bottom = zoomBoxOrigin.y;
 				}
 				if (rstMap(GRPSEL)) {
@@ -16152,22 +16150,22 @@ unsigned chkMsg() {
 				return 1;
 			} else {
 
-				if (sPnt.x < zoomBoxOrigin.x) {
+				if (selectedPoint.x < zoomBoxOrigin.x) {
 
 					tdub = zoomBoxOrigin.x;
-					zoomBoxOrigin.x = sPnt.x;
-					sPnt.x = tdub;
+					zoomBoxOrigin.x = selectedPoint.x;
+					selectedPoint.x = tdub;
 				}
-				if (sPnt.y < zoomBoxOrigin.y) {
+				if (selectedPoint.y < zoomBoxOrigin.y) {
 
 					tdub = zoomBoxOrigin.y;
-					zoomBoxOrigin.y = sPnt.y;
-					sPnt.y = tdub;
+					zoomBoxOrigin.y = selectedPoint.y;
+					selectedPoint.y = tdub;
 				}
-				nusiz.x = sPnt.x - zoomBoxOrigin.x;
-				nusiz.y = sPnt.y - zoomBoxOrigin.y;
-				sPnt.x = zoomBoxOrigin.x + nusiz.x / 2;
-				sPnt.y = zoomBoxOrigin.y + nusiz.y / 2;
+				nusiz.x = selectedPoint.x - zoomBoxOrigin.x;
+				nusiz.y = selectedPoint.y - zoomBoxOrigin.y;
+				selectedPoint.x = zoomBoxOrigin.x + nusiz.x / 2;
+				selectedPoint.y = zoomBoxOrigin.y + nusiz.y / 2;
 				tdub = zoomFactor;
 				if (nusiz.x > nusiz.y) {
 
@@ -16187,7 +16185,7 @@ unsigned chkMsg() {
 				zoomRect.left = zoomRect.bottom = 0;
 				zoomRect.right = nusiz.x;
 				zoomRect.top = nusiz.y;
-				shft(sPnt);
+				shft(selectedPoint);
 				rstMap(BZUMIN);
 				setMap(RESTCH);
 				if (!setMap(ZUMED))
@@ -16334,7 +16332,7 @@ unsigned chkMsg() {
 		if (chkMap(WASTRAC)) {
 
 			if (chkMap(TRNIN0))
-				dutrnum0(atoi(trinbuf));
+				dutrnum0(atoi(traceInputBuffer));
 			if (chkMap(TRNIN1))
 				dutrnum1();
 			if (!chkMap(WASEDG))
@@ -16727,8 +16725,8 @@ unsigned chkMsg() {
 			rstMap(MOVFRMS);
 			pxrct2stch(selectedFormsRectangle, &tbig);
 			px2stch();
-			fmovdif.x = sPnt.x - ((tbig.right - tbig.left) / 2 + tbig.left);
-			fmovdif.y = sPnt.y - ((tbig.top - tbig.bottom) / 2 + tbig.bottom);
+			fmovdif.x = selectedPoint.x - ((tbig.right - tbig.left) / 2 + tbig.left);
+			fmovdif.y = selectedPoint.y - ((tbig.top - tbig.bottom) / 2 + tbig.bottom);
 			for (ind = 0; ind < clipboardFormsCount; ind++) {
 
 				closestFormToCursor = formIndex + ind;
@@ -17953,8 +17951,8 @@ unsigned chkMsg() {
 				if (hypot(padj.x, padj.y) < CLOSENUF) {
 
 					px2stch();
-					rotationCenter.x = sPnt.x;
-					rotationCenter.y = sPnt.y;
+					rotationCenter.x = selectedPoint.x;
+					rotationCenter.y = selectedPoint.y;
 					setMap(MOVCNTR);
 					unrot();
 					ritrot();
@@ -18001,8 +17999,8 @@ unsigned chkMsg() {
 				zoomBoxLine[0].y = zoomBoxLine[1].y = msg.pt.y - stitchWindowOrigin.y;
 				zoomBoxLine[4].y = zoomBoxLine[0].y - 1;
 				px2stch();
-				zoomBoxOrigin.x = sPnt.x;
-				zoomBoxOrigin.y = sPnt.y;
+				zoomBoxOrigin.x = selectedPoint.x;
+				zoomBoxOrigin.y = selectedPoint.y;
 				setMap(VCAPT);
 				return 1;
 			}
@@ -18035,8 +18033,8 @@ unsigned chkMsg() {
 
 							xlin1();
 							ind = header.stitchCount;
-							stitchBuffer[ind].x = sPnt.x;
-							stitchBuffer[ind].y = sPnt.y;
+							stitchBuffer[ind].x = selectedPoint.x;
+							stitchBuffer[ind].y = selectedPoint.y;
 							stitchBuffer[ind].attribute = cod;
 							duzrat();
 							stch2px1(ind);
@@ -18059,8 +18057,8 @@ unsigned chkMsg() {
 							}
 							stitchBuffer[0].attribute = cod;
 							stitchBuffer[ind].attribute &= (~KNOTMSK);
-							stitchBuffer[0].x = sPnt.x;
-							stitchBuffer[0].y = sPnt.y;
+							stitchBuffer[0].x = selectedPoint.x;
+							stitchBuffer[0].y = selectedPoint.y;
 							stch2px1(ind);
 							insertLine[0].x = stitchSizePixels.x;
 							insertLine[0].y = stitchSizePixels.y;
@@ -18089,8 +18087,8 @@ unsigned chkMsg() {
 						} while (ind > (long)closestPointIndex);
 						header.stitchCount++;
 						closestPointIndex++;
-						stitchBuffer[closestPointIndex].x = sPnt.x;
-						stitchBuffer[closestPointIndex].y = sPnt.y;
+						stitchBuffer[closestPointIndex].x = selectedPoint.x;
+						stitchBuffer[closestPointIndex].y = selectedPoint.y;
 						stitchBuffer[closestPointIndex].attribute = cod;
 						xlin();
 						insertLine[1].x = msg.pt.x - stitchWindowOrigin.x;
@@ -18187,8 +18185,8 @@ unsigned chkMsg() {
 					insertLine[0].x = msg.pt.x - stitchWindowOrigin.x;
 					insertLine[0].y = msg.pt.y - stitchWindowOrigin.y;
 					stitchBuffer[0].attribute = USMSK | activeColor | layerIndex | NOTFRM;
-					stitchBuffer[0].x = sPnt.x;
-					stitchBuffer[0].y = sPnt.y;
+					stitchBuffer[0].x = selectedPoint.x;
+					stitchBuffer[0].y = selectedPoint.y;
 					colorChanges = 1;
 					colorChangeTable[0].colorIndex = activeColor;
 					colorChangeTable[0].stitchIndex = 0;
@@ -18209,8 +18207,8 @@ unsigned chkMsg() {
 			zoomBoxLine[0].y = zoomBoxLine[1].y = msg.pt.y - stitchWindowOrigin.y;
 			zoomBoxLine[4].y = zoomBoxLine[0].y - 1;
 			px2stch();
-			zoomBoxOrigin.x = sPnt.x;
-			zoomBoxOrigin.y = sPnt.y;
+			zoomBoxOrigin.x = selectedPoint.x;
+			zoomBoxOrigin.y = selectedPoint.y;
 			setMap(VCAPT);
 			return 1;
 		}
@@ -18592,21 +18590,21 @@ unsigned chkMsg() {
 
 				if (preferenceIndex == PSHO + 1 || preferenceIndex == PBOX + 1) {
 
-					msgbuf[0] = (TCHAR)numcod;
+					msgbuf[0] = (TCHAR)numericCode;
 					msgbuf[1] = 0;
 					if (preferenceIndex == PSHO + 1) {
 
-						showStitchThreshold = unthrsh(numcod - 0x30);
+						showStitchThreshold = unthrsh(numericCode - 0x30);
 						SetWindowText(thDat[PSHO], msgbuf);
 					} else {
 
-						StitchBoxesThreshold = unthrsh(numcod - 0x30);
+						StitchBoxesThreshold = unthrsh(numericCode - 0x30);
 						SetWindowText(thDat[PBOX], msgbuf);
 					}
 					unsid();
 				} else {
 
-					sideWindowEntryBuffer[msgIndex++] = numcod;
+					sideWindowEntryBuffer[msgIndex++] = numericCode;
 					sideWindowEntryBuffer[msgIndex] = 0;
 					SetWindowText(hSideMessageWin, sideWindowEntryBuffer);
 				}
@@ -18662,9 +18660,9 @@ unsigned chkMsg() {
 
 				if (chkMap(TRNIN0)) {
 
-					trinbuf[msgIndex++] = numcod;
-					trinbuf[msgIndex] = 0;
-					ind = atoi(trinbuf);
+					traceInputBuffer[msgIndex++] = numericCode;
+					traceInputBuffer[msgIndex] = 0;
+					ind = atoi(traceInputBuffer);
 					switch (msgIndex) {
 
 					case 2:
@@ -18683,7 +18681,7 @@ unsigned chkMsg() {
 					redraw(hTraceNumberInput);
 				} else {
 
-					msgbuf[msgIndex++] = numcod;
+					msgbuf[msgIndex++] = numericCode;
 					msgbuf[msgIndex] = 0;
 					SetWindowText(hGeneralNumberInputBox, msgbuf);
 				}
@@ -18706,7 +18704,7 @@ unsigned chkMsg() {
 					msgIndex--;
 					if (chkMap(TRNIN0)) {
 
-						trinbuf[msgIndex] = 0;
+						traceInputBuffer[msgIndex] = 0;
 						redraw(hTraceNumberInput);
 					} else {
 
@@ -18719,7 +18717,7 @@ unsigned chkMsg() {
 			case VK_RETURN:
 
 				if (chkMap(TRNIN0))
-					dutrnum0(atoi(trinbuf));
+					dutrnum0(atoi(traceInputBuffer));
 				else {
 
 					if (chkMap(TRNIN1))
@@ -18742,7 +18740,7 @@ unsigned chkMsg() {
 				bufferIndex = 0;
 			if (stitchEntryBuffer[0] == '0'&&bufferIndex)
 				bufferIndex--;
-			stitchEntryBuffer[bufferIndex++] = numcod;
+			stitchEntryBuffer[bufferIndex++] = numericCode;
 			stitchEntryBuffer[bufferIndex] = 0;
 			closestPointIndex = atoi(stitchEntryBuffer);
 			if (closestPointIndex > (unsigned)header.stitchCount - 1) {
@@ -19916,7 +19914,7 @@ unsigned chkMsg() {
 				else {
 
 					if (px2stch())
-						dumrk(sPnt.x, sPnt.y);
+						dumrk(selectedPoint.x, selectedPoint.y);
 				}
 				setMap(RESTCH);
 			}
@@ -21938,6 +21936,7 @@ void init() {
 
 	unsigned		ind, flg;
 	unsigned long	thwid, mwid;
+	long			selbox;
 	RECT			tRct;
 	RECT			wrct;
 	HDC				totdc;
@@ -21995,7 +21994,7 @@ void init() {
 	numeralWidth = txtWid("0");
 	selbox = txtWid("0");
 	for (ind = 0; ind < NERCNT; ind++)
-		boxOff[ind] = selbox + selbox*ind;
+		boxOffset[ind] = selbox + selbox*ind;
 	GetClientRect(hWnd, &mainWindowRect);
 	stchWnd();
 	lodstr();
@@ -23400,7 +23399,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 					FillRect(ds->hDC, &ds->rcItem, hTraceBrush[columnColor]);
 					SetBkColor(ds->hDC, traceRGB[columnColor]);
-					TextOut(ds->hDC, 1, 1, trinbuf, strlen(trinbuf));
+					TextOut(ds->hDC, 1, 1, traceInputBuffer, strlen(traceInputBuffer));
 					return 1;
 				}
 			}
@@ -23536,7 +23535,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			zoomRect.right = unzoomedRect.x;
 			zoomRect.top = unzoomedRect.y;
 		}
-		selCnt = 0;
+		nearestCount = 0;
 		setMap(RESTCH);
 		if (chkMap(SELBOX))
 			shft2box();

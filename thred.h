@@ -543,7 +543,7 @@ enum {
 	TRNIN0,		//trace color number input
 	TRNUP,		//trace up number input
 	WASTRCOL,	//trace color entered from keyboard
-	TRNIN1,		//trace paramater number input
+	TRNIN1,		//trace parameter number input
 	TRSET,		//trace numbers have been set
 	WASESC,		//user hit escape
 	HIDMAP,		//hide the bitmap

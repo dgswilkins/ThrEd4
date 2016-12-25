@@ -49,7 +49,7 @@ extern void refilal();
 extern void stchrct(fRECTANGLE* rct);
 extern void frmrct(fRECTANGLE* rct);
 extern void rtrclpfn();
-extern fPOINT sPnt;
+extern fPOINT selectedPoint;
 extern void butxt(unsigned ind, TCHAR* str);
 extern void unthum();
 extern HWND hMainStitchWin;
@@ -5383,8 +5383,8 @@ void dushft()
 	zoomBoxLine[0].y = zoomBoxLine[1].y = msg.pt.y - stitchWindowOrigin.y;
 	zoomBoxLine[4].y = zoomBoxLine[0].y - 1;
 	px2stch();
-	zoomBoxOrigin.x = sPnt.x;
-	zoomBoxOrigin.y = sPnt.y;
+	zoomBoxOrigin.x = selectedPoint.x;
+	zoomBoxOrigin.y = selectedPoint.y;
 }
 
 extern void unbBox();
@@ -5433,11 +5433,11 @@ void setshft()
 	unbBox();
 	rstMap(BZUMIN);
 	pxCor2stch(zoomBoxLine[0]);
-	srct.top = sPnt.y;
-	srct.left = sPnt.x;
+	srct.top = selectedPoint.y;
+	srct.left = selectedPoint.x;
 	pxCor2stch(zoomBoxLine[2]);
-	srct.bottom = sPnt.y;
-	srct.right = sPnt.x;
+	srct.bottom = selectedPoint.y;
+	srct.right = selectedPoint.x;
 	rstMap(TXIN);
 	tscr.index = 0;
 	lin = 1;
