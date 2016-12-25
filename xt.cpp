@@ -61,7 +61,7 @@ extern void setr(unsigned pbit);
 extern void clRmap(unsigned len);
 extern void zumhom();
 extern unsigned buttonHeight;
-extern POINT flin[MAXFRMLINS];
+extern POINT formLines[MAXFRMLINS];
 extern unsigned hThrEdClip;
 extern TCHAR* thrEdClipFormat;
 extern HGLOBAL hClipMem;
@@ -162,7 +162,7 @@ extern void chkseq(BOOL brd);
 extern HWND hWnd;
 extern HINSTANCE hInst;
 extern INIFILE iniFile;
-extern unsigned xpnt;
+extern unsigned activePointIndex;
 extern fPOINT oseq[OSEQLEN];
 extern unsigned opnt;
 extern unsigned toglMap(unsigned bPnt);
@@ -502,9 +502,9 @@ void xoseq(unsigned ind) {
 
 void xpfth(unsigned ind) {
 
-	fthseq[xpnt].x = bseq[ind].x;
-	fthseq[xpnt].y = bseq[ind].y;
-	xpnt++;
+	fthseq[activePointIndex].x = bseq[ind].x;
+	fthseq[activePointIndex].y = bseq[ind].y;
+	activePointIndex++;
 }
 
 unsigned bpsg() {
@@ -659,9 +659,9 @@ void fthrbfn(unsigned ind) {
 	oseq[opnt].y = pntm.y;
 	opnt++;
 	xpfth(ind + 1);
-	fthseq[xpnt].x = pntm.x;
-	fthseq[xpnt].y = pntm.y;
-	xpnt++;
+	fthseq[activePointIndex].x = pntm.x;
+	fthseq[activePointIndex].y = pntm.y;
+	activePointIndex++;
 }
 
 void duoseq(unsigned ind) {
@@ -728,7 +728,7 @@ void fthrfn() {
 	bseq[seqpnt + 1].attribute = bseq[seqpnt - 1].attribute;
 	if (xat&AT_FTHBLND) {
 
-		opnt = xpnt = 0;
+		opnt = activePointIndex = 0;
 		for (ind = 0; ind < seqpnt; ind++)
 		{
 			if (!bseq[ind].attribute)
@@ -793,14 +793,14 @@ void fritfil() {
 			isinds[isind2].seq = I_FTH;
 			isinds[isind2].cod = FTHMSK;
 			isinds[isind2].col = ptrSelectedForm->fillInfo.feather.color;
-			ine = xpnt - 1;
-			for (ind = 0; ind < xpnt; ind++) {
+			ine = activePointIndex - 1;
+			for (ind = 0; ind < activePointIndex; ind++) {
 
 				oseq[ind].x = fthseq[ine].x;
 				oseq[ind].y = fthseq[ine].y;
 				ine--;
 			}
-			seqpnt = xpnt;
+			seqpnt = activePointIndex;
 			chkseq(0);
 			isind2++;
 		}
@@ -2002,7 +2002,7 @@ double precjmps(SRTREC* psrec)
 	BOOL			locdir;
 
 	frmcnts = (unsigned*)&oseq;
-	FillMemory(&oseq, (xpnt + 2) << 2, 0);
+	FillMemory(&oseq, (activePointIndex + 2) << 2, 0);
 	loc = psrec->loc;
 	locdir = psrec->dir;
 	totjmps = 0;
@@ -2152,7 +2152,7 @@ void fsort()
 	recs->spnt = stitchBuffer;
 	at = stitchBuffer->attribute&SRTMSK;
 	rind = 0;
-	xpnt = formIndex;
+	activePointIndex = formIndex;
 	colord[underlayColor] = 0;
 	for (ind = 0; ind < 16; ind++) {
 
@@ -4105,7 +4105,7 @@ void stxlin()
 	rstMap(TXTMOV);
 	deorg(&of);
 	px2ed(of, &pt1);
-	px2ed(flin[0], &pt0);
+	px2ed(formLines[0], &pt0);
 	dutxlin(pt0, pt1);
 	setMap(RESTCH);
 }
@@ -4239,17 +4239,17 @@ void ritxfrm()
 	of.y = txtloc.y - cloxref.y;
 	for (ind = 0; ind < angfrm.sides; ind++)
 	{
-		ed2px(angflt[ind], &flin[ind]);
-		flin[ind].x += of.x;
-		flin[ind].y += of.y;
+		ed2px(angflt[ind], &formLines[ind]);
+		formLines[ind].x += of.x;
+		formLines[ind].y += of.y;
 	}
-	flin[ind].x = flin[0].x;
-	flin[ind].y = flin[0].y;
+	formLines[ind].x = formLines[0].x;
+	formLines[ind].y = formLines[0].y;
 	cnt = angfrm.sides;
 	if (angfrm.type != LIN)
 		cnt++;
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	Polyline(StitchWindowDC, flin, cnt);
+	Polyline(StitchWindowDC, formLines, cnt);
 }
 
 void setxfrm()
@@ -4312,7 +4312,7 @@ void txtclp()
 void dutxtlin()
 {
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	Polyline(StitchWindowDC, flin, 2);
+	Polyline(StitchWindowDC, formLines, 2);
 }
 
 void txtrmov()
@@ -4320,7 +4320,7 @@ void txtrmov()
 	if (chkMap(TXTLIN))
 	{
 		dutxtlin();
-		deorg(&flin[1]);
+		deorg(&formLines[1]);
 		dutxtlin();
 		return;
 	}
@@ -4346,8 +4346,8 @@ void txtrmov()
 
 void txtlin()
 {
-	deorg(flin);
-	deorg(&flin[1]);
+	deorg(formLines);
+	deorg(&formLines[1]);
 	rstMap(TXTCLP);
 	setMap(TXTLIN);
 	setMap(TXTMOV);

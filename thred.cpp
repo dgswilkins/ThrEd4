@@ -403,7 +403,7 @@ extern	unsigned		delpnt;
 extern	unsigned		fgpnt0;
 extern	double			fillAngle;
 extern	FRMHED*			finspnt;
-extern	POINT			flin[MAXFRMLINS];
+extern	POINT			formLines[MAXFRMLINS];
 extern	unsigned		fltad;
 extern	fPOINT			fmovdif;
 extern	unsigned		formIndex;
@@ -456,7 +456,7 @@ extern	int				txad;
 extern	TXPNT			txpnts[MAXSEQ];
 extern	double			verticalRatio;
 extern	unsigned short	wpar;
-extern	unsigned		xpnt;
+extern	unsigned		activePointIndex;
 extern	double			xyRatio;
 
 unsigned char			cryptkey[4096];
@@ -5483,13 +5483,13 @@ unsigned dupcol() {
 	unsigned	mat, matm, pmatm = 0;
 
 	col = pestrn[pesColors[pesColorIndex++]];
-	for (ind = 0; ind < xpnt; ind++) {
+	for (ind = 0; ind < activePointIndex; ind++) {
 
 		if (userColor[ind] == col)
 			return ind;
 	}
 	matm = 0xffffff;
-	for (ind = 1; ind < xpnt; ind++) {
+	for (ind = 1; ind < activePointIndex; ind++) {
 
 		mat = pesmtch(col, pesColors[ind]);
 		if (mat < matm) {
@@ -5943,17 +5943,17 @@ void nuFil() {
 						}
 						pecof = tripl(peshed->off);
 						pesStitch = (unsigned char*)&l_peschr[pecof + 532];
-						xpnt = 0;
+						activePointIndex = 0;
 						pcolcnt = (unsigned char*)&l_peschr[pecof + 48];
 						pesColors = &pcolcnt[1];
 						markedStitchMap[0] = markedStitchMap[1] = 0;
-						xpnt = 0;
+						activePointIndex = 0;
 						for (ind = 0; ind < (unsigned)(*pcolcnt + 1); ind++) {
 
 							if (setRmp(pesColors[ind])) {
 
-								userColor[xpnt++] = pestrn[pesColors[ind] & PESCMSK];
-								if (xpnt >= 16)
+								userColor[activePointIndex++] = pestrn[pesColors[ind] & PESCMSK];
+								if (activePointIndex >= 16)
 									break;
 							}
 						}
@@ -9425,20 +9425,20 @@ void setknt() {
 
 unsigned srchknot(unsigned src) {
 
-	while (knots[xpnt] < src&&xpnt < knotCount)
-		xpnt++;
-	xpnt--;
-	if (((knots[xpnt] > src) ? (knots[xpnt] - src) : (src - knots[xpnt])) < 5) {
+	while (knots[activePointIndex] < src&&activePointIndex < knotCount)
+		activePointIndex++;
+	activePointIndex--;
+	if (((knots[activePointIndex] > src) ? (knots[activePointIndex] - src) : (src - knots[activePointIndex])) < 5) {
 
-		xpnt++;
-		if (((knots[xpnt] > src) ? (knots[xpnt] - src) : (src - knots[xpnt])) < 5)
+		activePointIndex++;
+		if (((knots[activePointIndex] > src) ? (knots[activePointIndex] - src) : (src - knots[activePointIndex])) < 5)
 			return 0;
 		else
 			return 2;
 	} else {
 
-		xpnt++;
-		if (((knots[xpnt] > src) ? (knots[xpnt] - src) : (src - knots[xpnt])) < 5)
+		activePointIndex++;
+		if (((knots[activePointIndex] > src) ? (knots[activePointIndex] - src) : (src - knots[activePointIndex])) < 5)
 			return 1;
 		else
 			return 3;
@@ -10752,8 +10752,8 @@ void ritmov() {
 			Polyline(StitchWindowDC, mvlin, 3);
 	} else {
 
-		mvlin[2].x = flin[1].x;
-		mvlin[2].y = flin[1].y;
+		mvlin[2].x = formLines[1].x;
+		mvlin[2].y = formLines[1].y;
 		if (ptrSelectedForm->type == LIN)
 			Polyline(StitchWindowDC, &mvlin[1], 2);
 		else
@@ -10984,11 +10984,11 @@ BOOL chkbig() {
 	}
 	for (ind = 0; ind < 4; ind++) {
 
-		flin[ind].x = selectedFormsLine[ind << 1].x;
-		flin[ind].y = selectedFormsLine[ind << 1].y;
+		formLines[ind].x = selectedFormsLine[ind << 1].x;
+		formLines[ind].y = selectedFormsLine[ind << 1].y;
 	}
-	flin[4].x = flin[0].x;
-	flin[4].y = flin[0].y;
+	formLines[4].x = formLines[0].x;
+	formLines[4].y = formLines[0].y;
 	if (minlen < CLOSENUF) {
 
 		for (ind = 0; ind < 4; ind++) {
@@ -12020,10 +12020,10 @@ void insflin(POINT ipnt) {
 	off.x = insertSize.x >> 1;
 	off.y = insertSize.y >> 1;
 
-	flin[0].x = flin[3].x = flin[4].x = ipnt.x - off.x;
-	flin[1].x = flin[2].x = ipnt.x + off.x;
-	flin[0].y = flin[1].y = flin[4].y = ipnt.y - off.y;
-	flin[2].y = flin[3].y = ipnt.y + off.y;
+	formLines[0].x = formLines[3].x = formLines[4].x = ipnt.x - off.x;
+	formLines[1].x = formLines[2].x = ipnt.x + off.x;
+	formLines[0].y = formLines[1].y = formLines[4].y = ipnt.y - off.y;
+	formLines[2].y = formLines[3].y = ipnt.y + off.y;
 }
 
 BOOL isthr(TCHAR* nam) {
@@ -13432,7 +13432,7 @@ void ritlock(HWND hwndlg) {
 	pdat = (WIN32_FIND_DATA*)&bseq;
 	SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_RESETCONTENT, 0, 0);
 	SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
-	for (ind = 0; ind < xpnt; ind++) {
+	for (ind = 0; ind < activePointIndex; ind++) {
 
 		if (pdat[ind].dwFileAttributes&FILE_ATTRIBUTE_READONLY)
 			SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_ADDSTRING, 0, (long)pdat[ind].cFileName);
@@ -13467,9 +13467,9 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			EndDialog(hwndlg, wparam);
 			return TRUE;
 		}
-		xpnt = 1;
-		while (FindNextFile(srch, &pdat[xpnt++]));
-		xpnt--;
+		activePointIndex = 1;
+		while (FindNextFile(srch, &pdat[activePointIndex++]));
+		activePointIndex--;
 		ritlock(hwndlg);
 		break;
 
@@ -13484,14 +13484,14 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 		case IDC_LOCKAL:
 
-			for (ind = 0; ind < xpnt; ind++)
+			for (ind = 0; ind < activePointIndex; ind++)
 				pdat[ind].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
 			ritlock(hwndlg);
 			break;
 
 		case IDC_UNLOCKAL:
 
-			for (ind = 0; ind < xpnt; ind++)
+			for (ind = 0; ind < activePointIndex; ind++)
 				pdat[ind].dwFileAttributes &= 0xffffffff ^ FILE_ATTRIBUTE_READONLY;
 			ritlock(hwndlg);
 			break;
@@ -13500,7 +13500,7 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 			ine = 0;
 			hunlok = GetDlgItem(hwndlg, IDC_UNLOCKED);
-			for (ind = 0; ind < xpnt; ind++) {
+			for (ind = 0; ind < activePointIndex; ind++) {
 
 				if (!(pdat[ind].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
 
@@ -13516,7 +13516,7 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 			ine = 0;
 			hlok = GetDlgItem(hwndlg, IDC_LOCKED);
-			for (ind = 0; ind < xpnt; ind++) {
+			for (ind = 0; ind < activePointIndex; ind++) {
 
 				if ((pdat[ind].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
 
@@ -13533,7 +13533,7 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			strcpy_s(snam, defaultDirectory);
 			strcat_s(snam, "\\");
 			ine = 0;
-			for (ind = 0; ind < xpnt; ind++) {
+			for (ind = 0; ind < activePointIndex; ind++) {
 
 				strcpy_s(tnam, snam);
 				strcat_s(tnam, pdat[ind].cFileName);
@@ -14095,11 +14095,11 @@ BOOL trcbit() {
 		}
 		break;
 	}
-	if (tracedPoints[xpnt - 1].x != currentTracePoint.x || tracedPoints[xpnt - 1].y != currentTracePoint.y) {
+	if (tracedPoints[activePointIndex - 1].x != currentTracePoint.x || tracedPoints[activePointIndex - 1].y != currentTracePoint.y) {
 
-		tracedPoints[xpnt].x = currentTracePoint.x;
-		tracedPoints[xpnt++].y = currentTracePoint.y;
-		if (xpnt >= 500000)
+		tracedPoints[activePointIndex].x = currentTracePoint.x;
+		tracedPoints[activePointIndex++].y = currentTracePoint.y;
+		if (activePointIndex >= 500000)
 			return 0;
 	}
 	if (traceDirection == initialDirection&&currentTracePoint.x == tracedPoints[0].x&&currentTracePoint.y == tracedPoints[0].y)
@@ -14244,22 +14244,22 @@ void dutrac() {
 		}
 		initialDirection = traceDirection;
 		l_bpnt = currentTracePoint.y*bitmapWidth + currentTracePoint.x;
-		xpnt = 1;
+		activePointIndex = 1;
 		tracedPoints = (TRCPNT*)bseq;
 		tracedPoints[0].x = currentTracePoint.x;
 		tracedPoints[0].y = currentTracePoint.y;
 		while (trcbit());
-		if (xpnt >= 500000) {
+		if (activePointIndex >= 500000) {
 
 			tabmsg(IDS_FRM2L);
 			return;
 		}
-		decimatedLine = &tracedPoints[xpnt];
+		decimatedLine = &tracedPoints[activePointIndex];
 		decimatedLine[0].x = tracedPoints[0].x;
 		decimatedLine[0].y = tracedPoints[0].y;
 		dutdif(&tracedPoints[0]);
 		opnt = 1;
-		for (ind = 1; ind < xpnt; ind++) {
+		for (ind = 1; ind < activePointIndex; ind++) {
 
 			traceDiff1.x = traceDiff0.x;
 			traceDiff1.y = traceDiff0.y;
@@ -14273,23 +14273,23 @@ void dutrac() {
 		tracedPoints[0].x = decimatedLine[0].x;
 		tracedPoints[0].y = decimatedLine[0].y;
 		ine = 0;
-		xpnt = 0;
+		activePointIndex = 0;
 		for (ind = 1; ind < opnt; ind++) {
 
 			tlen = hypot(decimatedLine[ind].x - decimatedLine[ine].x, decimatedLine[ind].y - decimatedLine[ine].y);
 			if (tlen > iniFile.traceLength) {
 
-				tracedPoints[xpnt].x = decimatedLine[ine].x;
-				tracedPoints[xpnt].y = decimatedLine[ine].y;
+				tracedPoints[activePointIndex].x = decimatedLine[ine].x;
+				tracedPoints[activePointIndex].y = decimatedLine[ine].y;
 				ine = ind;
-				xpnt++;
+				activePointIndex++;
 			}
 		}
 		for (ind = ine + 1; ind < opnt; ind++) {
 
-			tracedPoints[xpnt].x = decimatedLine[ind].x;
-			tracedPoints[xpnt].y = decimatedLine[ind].y;
-			xpnt++;
+			tracedPoints[activePointIndex].x = decimatedLine[ind].x;
+			tracedPoints[activePointIndex].y = decimatedLine[ind].y;
+			activePointIndex++;
 		}
 		ptrSelectedForm = &formList[formIndex];
 		frmclr(ptrSelectedForm);
@@ -14303,7 +14303,7 @@ void dutrac() {
 			ratof = unzoomedRect.y - bitmapSizeinStitches.y;
 		else
 			ratof = 0;
-		for (ind = 1; ind < xpnt; ind++) {
+		for (ind = 1; ind < activePointIndex; ind++) {
 
 			tlens += hypot(tracedPoints[ind].x - tracedPoints[ind - 1].x, tracedPoints[ind].y - tracedPoints[ind - 1].y);
 			tlen = hypot(tracedPoints[ind].x - tracedPoints[ine].x, tracedPoints[ind].y - tracedPoints[ine].y);
@@ -19456,10 +19456,10 @@ unsigned chkMsg() {
 						selectedFormsSize.x = selectedFormsRectangle.right - selectedFormsRectangle.left;
 						selectedFormsSize.y = selectedFormsRectangle.bottom - selectedFormsRectangle.top;
 						setMap(INIT);
-						flin[0].x = flin[3].x = flin[4].x = selectedFormsRectangle.left;
-						flin[1].x = flin[2].x = selectedFormsRectangle.right;
-						flin[0].y = flin[1].y = flin[4].y = selectedFormsRectangle.top;
-						flin[2].y = flin[3].y = selectedFormsRectangle.bottom;
+						formLines[0].x = formLines[3].x = formLines[4].x = selectedFormsRectangle.left;
+						formLines[1].x = formLines[2].x = selectedFormsRectangle.right;
+						formLines[0].y = formLines[1].y = formLines[4].y = selectedFormsRectangle.top;
+						formLines[2].y = formLines[3].y = selectedFormsRectangle.bottom;
 						setMap(SHOSTRTCH);
 						strtchbox();
 						fmovdif.x = ((selectedFormsRectangle.right - selectedFormsRectangle.left) >> 1);
