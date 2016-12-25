@@ -484,8 +484,8 @@ MSG					msg;					//main message loop message
 RECT				mainWindowRect;			//main window size
 RECT				colorBarRect;			//color bar rectangle
 //RECT				bcRct;					//color bar client rectangle
-RECT				minLenRct;				//minimum length rectangle
-RECT				maxLenRct;				//maximum length rectangle
+RECT				minLenRect;				//minimum length rectangle
+RECT				maxLenRect;				//maximum length rectangle
 unsigned			smallestStitchIndex;	//pointer to the smallest stitch in the selected range
 unsigned			largestStitchIndex;		//pointer to the largest stitch in the selected range
 unsigned			currentStitchIndex;		//pointer to the current selection for length search
@@ -589,8 +589,8 @@ RANGE				selectedRange;			//first and last stitch for min/max stitch select
 unsigned			fileNameOrder[50];		//file name order table
 unsigned char		fnamcod[128];			//file name encoding
 unsigned char		frencod[256];			//file name decode
-TCHAR				fildes[50];				//file designer name in clear
-HWND				fwnd;					//first window not destroyed for exiting enumerate loop
+TCHAR				designerName[50];		//file designer name in clear
+HWND				firstWin;				//first window not destroyed for exiting enumerate loop
 RANGE				selectedFormsRange;		//range of selected forms
 unsigned			tmpFormIndex;			//saved form index
 unsigned char		cursorMask[128];		//cursor and mask
@@ -610,7 +610,7 @@ unsigned			draggedColor;			//color being dragged
 FORMPOINTS			selectedFormPoints;		//selected form points
 fRECTANGLE			selectedPointsRect;		//rectangle enclosing selected form points
 RECT				selectedPixelsRect;		//display form point select rectangle
-POINT*				fplin;					//form point clipboard paste into form line
+POINT*				formPointsAsLine;					//form point clipboard paste into form line
 
 #if	PESACT
 unsigned char*		pesColors;				//pes colors
@@ -618,12 +618,14 @@ TCHAR*				ptrPesData;				//pes card data buffer
 fPOINT				stitchCenterOffset;		//offset for writing pes files
 PESTCH*				pesStitches;			//pes stitch buffer
 unsigned char		pesEquivColors[16];		//pes equivalent colors
-unsigned char*		pestch;					//pes stitches
+unsigned char*		pesStitch;					//pes stitches
 unsigned			pesColorIndex;			//pes color index
 #endif
 
-POINT				pselfin;				//point to draw at the end cross for form select points
+POINT				endPointCross;			//point to draw at the end cross for form select points
+#if	 __UseASM__
 unsigned			fsizeof;				//size of form header divided by 4
+#endif
 HDC					hTraceDC;				//trace device context
 HBITMAP				hTraceBitmap;			//trace bitmap
 unsigned			sref;					//brightness of reference pixel
@@ -3226,8 +3228,8 @@ void nuRct() {
 
 	GetClientRect(hWnd, &mainWindowRect);
 	GetWindowRect(hColorBar, &colorBarRect);
-	GetWindowRect(hButtonWin[HMINLEN], &minLenRct);
-	GetWindowRect(hButtonWin[HMAXLEN], &maxLenRct);
+	GetWindowRect(hButtonWin[HMINLEN], &minLenRect);
+	GetWindowRect(hButtonWin[HMAXLEN], &maxLenRect);
 	ReleaseDC(hColorBar, colorBarDC);
 	colorBarDC = GetDC(hColorBar);
 	DeleteDC(StitchWindowMemDC);
@@ -5640,7 +5642,7 @@ void nuFil() {
 			txad = 0;
 			EnableMenuItem(hMainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
 			deldu();
-			strcpy_s(fildes, iniFile.designerName);
+			strcpy_s(designerName, iniFile.designerName);
 			unbsho();
 			rstMap(MOVSET);
 			frmon();
@@ -5709,7 +5711,7 @@ void nuFil() {
 							header.hoopType = LARGHUP;
 						}
 						ritfnam(iniFile.designerName);
-						strcpy_s(fildes, iniFile.designerName);
+						strcpy_s(designerName, iniFile.designerName);
 						strcpy_s(extendedHeader.modifierName, iniFile.designerName);
 						break;
 
@@ -5724,7 +5726,7 @@ void nuFil() {
 						}
 						iniFile.hoopSizeX = unzoomedRect.x = extendedHeader.hoopSizeX;
 						iniFile.hoopSizeY = unzoomedRect.y = extendedHeader.hoopSizeY;
-						redfnam(fildes);
+						redfnam(designerName);
 						break;
 
 					default:
@@ -5944,7 +5946,7 @@ void nuFil() {
 							return;
 						}
 						pecof = tripl(peshed->off);
-						pestch = (unsigned char*)&l_peschr[pecof + 532];
+						pesStitch = (unsigned char*)&l_peschr[pecof + 532];
 						xpnt = 0;
 						pcolcnt = (unsigned char*)&l_peschr[pecof + 48];
 						pesColors = &pcolcnt[1];
@@ -5971,24 +5973,24 @@ void nuFil() {
 						stitchBuffer[0].x = stitchBuffer[0].y;
 						while (ind < bytesRead - pecof - 529) {
 
-							if (pestch[ind] == 0xff && pestch[ind + 1] == 0)
+							if (pesStitch[ind] == 0xff && pesStitch[ind + 1] == 0)
 								break;
-							if (pestch[ind] == 0xfe && pestch[ind + 1] == 0xb0) {
+							if (pesStitch[ind] == 0xfe && pesStitch[ind + 1] == 0xb0) {
 
 								tcol = dupcol();
 								ind += 2;
 							} else {
 
-								if (pestch[ind] & 0x80) {
+								if (pesStitch[ind] & 0x80) {
 
-									locof = dubl(&pestch[ind]);
+									locof = dubl(&pesStitch[ind]);
 									ind++;
 								} else {
 
-									if (pestch[ind] & 0x40)
-										locof = pestch[ind] - 128;
+									if (pesStitch[ind] & 0x40)
+										locof = pesStitch[ind] - 128;
 									else
-										locof = pestch[ind];
+										locof = pesStitch[ind];
 								}
 								locof *= 0.6;
 								if (toglMap(FILDIR)) {
@@ -6072,7 +6074,7 @@ void nuFil() {
 			auxmen();
 		}
 		lenCalc();
-		sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY], fileName, fildes);
+		sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY], fileName, designerName);
 		SetWindowText(hWnd, msgbuf);
 		CloseHandle(hFile);
 		setMap(INIT);
@@ -8032,15 +8034,15 @@ BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) {
 		return DestroyWindow(hwnd);
 	else {
 
-		if (fwnd) {
+		if (firstWin) {
 
-			if (fwnd == hwnd)
+			if (firstWin == hwnd)
 				return 0;
 			else
 				return TRUE;
 		} else {
 
-			fwnd = hwnd;
+			firstWin = hwnd;
 			return TRUE;
 		}
 	}
@@ -8127,7 +8129,7 @@ void rstAll() {
 	rstMap(FRMPSEL);
 	unmsg();
 	slpnt = selectedFormCount = 0;
-	fwnd = 0;
+	firstWin = 0;
 	while (EnumChildWindows(hMainStitchWin, EnumChildProc, 0));
 }
 
@@ -9953,14 +9955,14 @@ void frmdel() {
 
 void deltot() {
 
-	strcpy_s(fildes, iniFile.designerName);
+	strcpy_s(designerName, iniFile.designerName);
 	formIndex = header.stitchCount = fltad = clpad = satkad = txad = 0;
 	rstMap(GMRK);
 	rstAll();
 	coltab();
 	zumhom();
-	strcpy_s(fildes, iniFile.designerName);
-	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY], thrName, fildes);
+	strcpy_s(designerName, iniFile.designerName);
+	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY], thrName, designerName);
 	SetWindowText(hWnd, msgbuf);
 }
 
@@ -10798,7 +10800,7 @@ void setpsel() {
 	duprct();
 	sRct2px(selectedPointsRect, &selectedPixelsRect);
 	rct2sel(selectedPixelsRect, selectedPointsRectangle);
-	sfCor2px(currentFormVertices[selectedFormPoints.finish], &pselfin);
+	sfCor2px(currentFormVertices[selectedFormPoints.finish], &endPointCross);
 	setMap(SHOPSEL);
 	dupsel(StitchWindowDC);
 	setMap(FPSEL);
@@ -12227,8 +12229,8 @@ void insfil() {
 
 							for (ind = 0; ind < 50; ind++)
 								extendedHeader.creatorName[ind] = thedx.creatorName[ind];
-							redfnam(fildes);
-							sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY], thrName, fildes);
+							redfnam(designerName);
+							sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY], thrName, designerName);
 							SetWindowText(hWnd, msgbuf);
 						}
 					}
@@ -12561,7 +12563,7 @@ void desiz() {
 	if (header.stitchCount) {
 
 		sprintf_s(pmsg, sizeof(msgbuf), stab[STR_CREATBY],
-			fildes,
+			designerName,
 			extendedHeader.modifierName);
 	}
 	shoMsg(msgbuf);
@@ -15493,8 +15495,8 @@ void setpclp() {
 	unsigned	ind, ine;
 
 	sfCor2px(iseq[0], &tpnt);
-	fplin[0].x = tpnt.x;
-	fplin[0].y = tpnt.y;
+	formPointsAsLine[0].x = tpnt.x;
+	formPointsAsLine[0].y = tpnt.y;
 	sfCor2px(iseq[1], &tpnt);
 	tof.x = msg.pt.x - stitchWindowOrigin.x - tpnt.x;
 	tof.y = msg.pt.y - stitchWindowOrigin.y - tpnt.y;
@@ -15502,20 +15504,20 @@ void setpclp() {
 
 		ine = ind + 1;
 		sfCor2px(iseq[ine], &tpnt);
-		fplin[ine].x = tpnt.x + tof.x;
-		fplin[ine].y = tpnt.y + tof.y;
+		formPointsAsLine[ine].x = tpnt.x + tof.x;
+		formPointsAsLine[ine].y = tpnt.y + tof.y;
 	}
 	ind++;
 	sfCor2px(iseq[ind], &tpnt);
-	fplin[ind].x = tpnt.x;
-	fplin[ind].y = tpnt.y;
+	formPointsAsLine[ind].x = tpnt.x;
+	formPointsAsLine[ind].y = tpnt.y;
 }
 
 void dupclp() {
 
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, formPen);
-	Polyline(StitchWindowDC, fplin, opnt);
+	Polyline(StitchWindowDC, formPointsAsLine, opnt);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -16549,8 +16551,8 @@ unsigned chkMsg() {
 			}
 			return 1;
 		}
-		if (msg.pt.x >= minLenRct.left&&msg.pt.x <= minLenRct.right
-			&&msg.pt.y > minLenRct.top&&msg.pt.y <= minLenRct.bottom) {
+		if (msg.pt.x >= minLenRect.left&&msg.pt.x <= minLenRect.right
+			&&msg.pt.y > minLenRect.top&&msg.pt.y <= minLenRect.bottom) {
 
 			srchk();
 			setsrch(smallestStitchIndex);
@@ -16559,8 +16561,8 @@ unsigned chkMsg() {
 			setMap(RESTCH);
 			return 1;
 		}
-		if (msg.pt.x >= maxLenRct.left&&msg.pt.x <= maxLenRct.right
-			&&msg.pt.y > maxLenRct.top&&msg.pt.y <= maxLenRct.bottom) {
+		if (msg.pt.x >= maxLenRect.left&&msg.pt.x <= maxLenRect.right
+			&&msg.pt.y > maxLenRect.top&&msg.pt.y <= maxLenRect.bottom) {
 
 			srchk();
 			setsrch(largestStitchIndex);
@@ -19339,7 +19341,7 @@ unsigned chkMsg() {
 							iseq[ind].x = currentFormVertices[ine].x;
 							iseq[ind].y = currentFormVertices[ine].y;
 							opnt = ind + 1;
-							fplin = (POINT*)&iseq[opnt];
+							formPointsAsLine = (POINT*)&iseq[opnt];
 							setpclp();
 							setMap(FPUNCLP);
 							setMap(SHOP);
@@ -21942,7 +21944,9 @@ void init() {
 	TCHAR*			pchr;
 
 	txad = 0;
+#if	 __UseASM__
 	fsizeof = sizeof(FRMHED) >> 2;
+#endif
 	LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU1));
 	hMainMenu = GetMenu(hWnd);
 	totdc = GetDC(NULL);

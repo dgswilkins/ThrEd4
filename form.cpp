@@ -114,8 +114,10 @@ extern			void		shoseln(unsigned cod0, unsigned cod1);
 extern			void		durpoli(unsigned nsids);
 extern			void		clpxadj();
 
-extern			POINT		pselfin;
+extern			POINT		endPointCross;
+#if	 __UseASM__
 extern			unsigned	fsizeof;
+#endif
 extern			FORMPOINTS	selectedFormPoints;
 extern			HWND		hMainStitchWin;
 extern			HWND		hMsg;
@@ -1422,7 +1424,7 @@ void dupsel(HDC dc) {
 	ind = selectedFormPoints.start;
 	for (ind = 0; ind < 8; ind++)
 		selsqr(selectedPointsRectangle[ind], dc);
-	frmx(pselfin, dc);
+	frmx(endPointCross, dc);
 }
 
 void unpsel() {
@@ -10906,7 +10908,7 @@ void mvfrms(FRMHED* dst, FRMHED* src, unsigned cnt) {
 		rep		movsd
 	}
 #else
-	memcpy(dst, src, cnt * fsizeof * 4);
+	memcpy(dst, src, cnt * sizeof (FRMHED));
 #endif
 }
 
