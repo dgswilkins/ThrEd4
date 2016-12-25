@@ -949,7 +949,7 @@ void pes2crd() {
 #define P2CBUFSIZ 256
 
 	HKEY			hkey;
-	unsigned long	typ, siz;
+	unsigned long	typ, lul_Size;
 	TCHAR			prgnam[_MAX_PATH];
 	char			tfltr[] = "ComputerService (Lind2PC.exe)\0LinkP2C.exe\0\0";
 	TCHAR			mbuf[P2CBUFSIZ];
@@ -994,9 +994,9 @@ void pes2crd() {
 	if (!RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion",
 		0, KEY_READ, &hkey)) {
 
-		siz = _MAX_PATH;
+		lul_Size = _MAX_PATH;
 		typ = REG_SZ;
-		if (!RegQueryValueEx(hkey, "ProgramFilesDir", 0, &typ, (unsigned char*)prgnam, &siz)) {
+		if (!RegQueryValueEx(hkey, "ProgramFilesDir", 0, &typ, (unsigned char*)prgnam, &lul_Size)) {
 
 			strcat_s(prgnam, "\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
 			if (!chkp2cnam(prgnam))
@@ -3955,16 +3955,16 @@ BOOL txtclos(unsigned* pclo)
 void tritx()
 {
 	POINT	xlin[2];
-	int		siz;
+	int		li_Size;
 
-	siz = ini.textureEditorSizePixels << 2;
+	li_Size = ini.textureEditorSizePixels << 2;
 	xlin[0].x = xlin[1].x = txtloc.x;
-	xlin[0].y = txtloc.y - siz;
-	xlin[1].y = txtloc.y + siz;
+	xlin[0].y = txtloc.y - li_Size;
+	xlin[1].y = txtloc.y + li_Size;
 	Polyline(StitchWindowDC, xlin, 2);
 	xlin[0].y = xlin[1].y = txtloc.y;
-	xlin[0].x = txtloc.x - siz;
-	xlin[1].x = txtloc.x + siz;
+	xlin[0].x = txtloc.x - li_Size;
+	xlin[1].x = txtloc.x + li_Size;
 	Polyline(StitchWindowDC, xlin, 2);
 }
 
@@ -5537,7 +5537,7 @@ void redtx()
 {
 	char nam[_MAX_PATH];
 	HANDLE hnam;
-	DWORD red;
+	DWORD l_BytesRead;
 	unsigned int ind;
 	char sig[4] = { 0 };
 
@@ -5548,17 +5548,17 @@ void redtx()
 		hnam = CreateFile(nam, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 		if (hnam != INVALID_HANDLE_VALUE)
 		{
-			ReadFile(hnam, (char*)&sig, 4, &red, 0);
+			ReadFile(hnam, (char*)&sig, 4, &l_BytesRead, 0);
 			if (!strcmp(sig, "txh"))
 			{
-				ReadFile(hnam, (int*)&ptxhst, 4, &red, 0);
-				ReadFile(hnam, (TXHST*)&thsts, sizeof(TXHST) * 16, &red, 0);
-				for (ind = 0; ind < (red / sizeof(TXHST)); ind++)
+				ReadFile(hnam, (int*)&ptxhst, 4, &l_BytesRead, 0);
+				ReadFile(hnam, (TXHST*)&thsts, sizeof(TXHST) * 16, &l_BytesRead, 0);
+				for (ind = 0; ind < (l_BytesRead / sizeof(TXHST)); ind++)
 				{
 					if (thsts[ind].count)
 					{
 						thsts[ind].texturePoint = new TXPNT[thsts[ind].count];
-						ReadFile((TXPNT*)hnam, thsts[ind].texturePoint, sizeof(TXPNT)*thsts[ind].count, &red, 0);
+						ReadFile((TXPNT*)hnam, thsts[ind].texturePoint, sizeof(TXPNT)*thsts[ind].count, &l_BytesRead, 0);
 					}
 				}
 				setMap(WASTXBAK);

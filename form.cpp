@@ -231,12 +231,12 @@ void			frmsqr(unsigned ind);
 void			uncon();
 void			uninsf();
 void			rotfrm(unsigned nu0);
-void			brdfil(double siz);
+void			brdfil(double pd_Size);
 void			clpbrd(unsigned short slin);
 void			fnhor();
 void			oclp(fPOINT* clp, unsigned nclp);
 unsigned short	nxt(unsigned short ind);
-void			bdrlin(unsigned strt, unsigned fin, double siz);
+void			bdrlin(unsigned strt, unsigned fin, double pd_Size);
 void			rbrd();
 void			satout(double satwid);
 void			slbrd();
@@ -244,7 +244,7 @@ void			clpout();
 void			sbrd();
 void			lapbrd();
 void			apbrd();
-void			bold(double siz);
+void			bold(double pd_Size);
 void			plbrd(double spac);
 void			prpbrd(double spac);
 void			pbrd(double spac);
@@ -1682,7 +1682,7 @@ void setear() {
 	double		hrat;
 	double		vrat;
 	float		xstp;
-	fPOINT		siz;
+	fPOINT		lSize;
 
 	unmsg();
 	ind = DialogBox(hInst, MAKEINTRESOURCE(IDD_TEAR), hWnd, (DLGPROC)tearprc);
@@ -1726,12 +1726,12 @@ void setear() {
 		frmout(formIndex);
 		flipv();
 		rstMap(FORMSEL);
-		siz.x = ptrSelectedForm->rectangle.right - ptrSelectedForm->rectangle.left;
-		siz.y = ptrSelectedForm->rectangle.top - ptrSelectedForm->rectangle.bottom;
-		hrat = unzoomedRect.x / 4 / siz.x;
+		lSize.x = ptrSelectedForm->rectangle.right - ptrSelectedForm->rectangle.left;
+		lSize.y = ptrSelectedForm->rectangle.top - ptrSelectedForm->rectangle.bottom;
+		hrat = unzoomedRect.x / 4 / lSize.x;
 		if (hrat > 1)
 			hrat = 1;
-		vrat = unzoomedRect.y / 4 / siz.y;
+		vrat = unzoomedRect.y / 4 / lSize.y;
 		if (vrat < hrat)
 			hrat = vrat;
 		if (hrat < 1) {
@@ -2375,7 +2375,7 @@ void chkbrd() {
 	}
 }
 
-void boldlin(unsigned strt, unsigned fin, double siz) {
+void boldlin(unsigned strt, unsigned fin, double pd_Size) {
 	dPOINT		dif, stp, pnt0, pnt1;
 	double		len;
 	unsigned	cnt;
@@ -2383,7 +2383,7 @@ void boldlin(unsigned strt, unsigned fin, double siz) {
 	dif.x = currentFormVertices[fin].x - currentFormVertices[strt].x;
 	dif.y = currentFormVertices[fin].y - currentFormVertices[strt].y;
 	len = hypot(dif.x, dif.y);
-	cnt = len / siz;
+	cnt = len / pd_Size;
 	if (cnt) {
 		stp.x = dif.x / cnt;
 		stp.y = dif.y / cnt;
@@ -2417,7 +2417,7 @@ void boldlin(unsigned strt, unsigned fin, double siz) {
 	}
 }
 
-void bold(double siz) {
+void bold(double pd_Size) {
 	unsigned		ind, ine = 0;
 	unsigned short	nlin, tlin;
 	double			len;
@@ -2428,12 +2428,12 @@ void bold(double siz) {
 	oseq[seqpnt++].y = currentFormVertices[tlin].y;
 	for (ind = 0; ind < (unsigned)sides - 1; ind++) {
 		nlin = nxt(tlin);
-		boldlin(tlin, nlin, siz);
+		boldlin(tlin, nlin, pd_Size);
 		tlin = nlin;
 	}
 	if (ptrSelectedForm->type != LIN) {
 		nlin = nxt(tlin);
-		boldlin(tlin, nlin, siz);
+		boldlin(tlin, nlin, pd_Size);
 	}
 	for (ind = 0; ind < seqpnt - 1; ind++) {
 		len = hypot(oseq[ind + 1].x - oseq[ind].x, oseq[ind + 1].y - oseq[ind].y);
@@ -5740,7 +5740,7 @@ void setins() {
 	setMap(RESTCH);
 }
 
-void bdrlin(unsigned strt, unsigned fin, double siz) {
+void bdrlin(unsigned strt, unsigned fin, double pd_Size) {
 	dPOINT		dif, stp, pnt;
 	double		len, tang;
 	unsigned	cnt;
@@ -5752,17 +5752,17 @@ void bdrlin(unsigned strt, unsigned fin, double siz) {
 	dif.y = currentFormVertices[fin].y - currentFormVertices[strt].y;
 	len = hypot(dif.x, dif.y);
 	if (chku(LINSPAC)) {
-		cnt = len / siz + 0.5;
+		cnt = len / pd_Size + 0.5;
 		if (cnt) {
 			stp.x = dif.x / cnt;
 			stp.y = dif.y / cnt;
 		}
 	}
 	else {
-		cnt = (len - siz / 2) / siz + 1;
+		cnt = (len - pd_Size / 2) / pd_Size + 1;
 		tang = atan2(dif.y, dif.x);
-		stp.x = cos(tang)*siz;
-		stp.y = sin(tang)*siz;
+		stp.x = cos(tang)*pd_Size;
+		stp.y = sin(tang)*pd_Size;
 	}
 	if (cnt) {
 		pnt.x = currentFormVertices[strt].x + stp.x;
@@ -5780,7 +5780,7 @@ void bdrlin(unsigned strt, unsigned fin, double siz) {
 	oseq[seqpnt++].y = currentFormVertices[fin].y;
 }
 
-void brdfil(double siz) {
+void brdfil(double pd_Size) {
 	unsigned		ind;
 	unsigned short	nlin, tlin;
 
@@ -5793,12 +5793,12 @@ void brdfil(double siz) {
 	oseq[seqpnt++].y = currentFormVertices[tlin].y;
 	for (ind = 0; ind < (unsigned)sides - 1; ind++) {
 		nlin = nxt(tlin);
-		bdrlin(tlin, nlin, siz);
+		bdrlin(tlin, nlin, pd_Size);
 		tlin = nlin;
 	}
 	if (ptrSelectedForm->type != LIN) {
 		nlin = nxt(tlin);
-		bdrlin(tlin, nlin, siz);
+		bdrlin(tlin, nlin, pd_Size);
 	}
 }
 
@@ -8705,18 +8705,18 @@ void plfn(VRCT2* prct) {
 
 void prsmal() {
 	unsigned	ind, ine, ref;
-	double		siz, len;
+	double		lSize, len;
 	dPOINT		dif;
 
 	ref = 0; ine = 0;
-	siz = USPAC*0.8;
-	if (siz > plen)
-		siz = plen*0.9;
+	lSize = USPAC*0.8;
+	if (lSize > plen)
+		lSize = plen*0.9;
 	for (ind = 1; ind < seqpnt; ind++) {
 		dif.x = oseq[ind].x - oseq[ref].x;
 		dif.y = oseq[ind].y - oseq[ref].y;
 		len = hypot(dif.x, dif.y);
-		if (len > siz) {
+		if (len > lSize) {
 			oseq[ine].x = oseq[ind].x;
 			oseq[ine++].y = oseq[ind].y;
 			ref = ind;
@@ -9223,7 +9223,7 @@ void snpfn(unsigned xind, unsigned len) {
 	}
 }
 
-void nutim(double siz) {
+void nutim(double pl_Size) {
 	htim = CreateWindow(
 		"STATIC",
 		0,
@@ -9237,7 +9237,7 @@ void nutim(double siz) {
 		hInst,
 		NULL);
 	timdc = GetDC(htim);
-	timstp = (double)StitchWinSize.x / siz;
+	timstp = (double)StitchWinSize.x / pl_Size;
 	timpos = 0;
 	flin[0].y = 0;
 	flin[1].y = buttonHeight;
@@ -13483,7 +13483,7 @@ void wavfrm() {
 	fPOINT		pos;
 	double		hrat;
 	double		vrat;
-	fPOINT		siz;
+	fPOINT		lfp_Size;
 
 	unmsg();
 	if (DialogBox(hInst, MAKEINTRESOURCE(IDD_WAV), hWnd, (DLGPROC)wavprc)) {
@@ -13536,12 +13536,12 @@ void wavfrm() {
 		fltad += ine;
 		frmout(formIndex);
 		rstMap(FORMSEL);
-		siz.x = ptrSelectedForm->rectangle.right - ptrSelectedForm->rectangle.left;
-		siz.y = ptrSelectedForm->rectangle.top - ptrSelectedForm->rectangle.bottom;
-		hrat = unzoomedRect.x / 4 / siz.x;
+		lfp_Size.x = ptrSelectedForm->rectangle.right - ptrSelectedForm->rectangle.left;
+		lfp_Size.y = ptrSelectedForm->rectangle.top - ptrSelectedForm->rectangle.bottom;
+		hrat = unzoomedRect.x / 4 / lfp_Size.x;
 		if (hrat > 1)
 			hrat = 1;
-		vrat = unzoomedRect.y / 4 / siz.y;
+		vrat = unzoomedRect.y / 4 / lfp_Size.y;
 		if (vrat < hrat)
 			hrat = vrat;
 		if (hrat < 1) {

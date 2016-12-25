@@ -379,7 +379,7 @@ extern void riter();
 extern void crmsg(TCHAR* nam);
 extern void filnopn(unsigned cod, TCHAR* nam);
 extern void bfilmsg();
-extern void tsizmsg(TCHAR* sizstr, double siz);
+extern void tsizmsg(TCHAR* sizstr, double pd_Size);
 extern void setear();
 extern void maxwid(unsigned strt, unsigned fin);
 extern void	chain();
@@ -857,20 +857,19 @@ TCHAR				balaradName0[_MAX_PATH + 1] = { 0 };	//balarad semaphore file
 TCHAR				balaradName1[_MAX_PATH + 1] = { 0 };	//balarad data file
 TCHAR				balaradName2[_MAX_PATH + 1];
 TCHAR				searchName[_MAX_PATH + 1];
-TCHAR				homeDirectory[_MAX_PATH + 1];	//directory from which thred was executed
+TCHAR				homeDirectory[_MAX_PATH + 1];			//directory from which thred was executed
 PCSTCH*				ptrFileBuffer;
 HANDLE				hFile = 0;
 HANDLE				hPcsFile = 0;
 HANDLE				hIniFile = 0;
-HANDLE				hInsertedFile;	//insert file handle
-HANDLE				hBmp;			//bitmap handle
-unsigned			siz;			//size of file
-unsigned long		red;			//bytes actually read from file
-unsigned			colCnt;			//number of color changes
-TCHAR				iniNam[_MAX_PATH];	//.ini file name
-unsigned			savcol;			//for saving files
-TCHAR				bnam[16];		//bitmap file name from pcs file
-TCHAR				lbnam[_MAX_PATH];//bitmap file name from user load
+HANDLE				hInsertedFile;				//insert file handle
+HANDLE				hBmp;						//bitmap handle
+unsigned			fileSize;					//size of file
+unsigned long		bytesRead;					//bytes actually read from file
+unsigned			colorChanges;				//number of color changes
+TCHAR				iniFileName[_MAX_PATH];		//.ini file name
+TCHAR				pcsBMPFileName[16];			//bitmap file name from pcs file
+TCHAR				usrBMPFileName[_MAX_PATH];	//bitmap file name from user load
 OPENFILENAME		ofn = {
 
 	sizeof(OPENFILENAME),	//lStructsize
@@ -894,14 +893,14 @@ OPENFILENAME		ofn = {
 	0,						//lpfnHook
 	0,						//lpTemplateName
 };
-TCHAR*				thumnams;				//pointer to storage for thumbnail names
-TCHAR**				pthums;					//pointers to the thumbnail names
-TCHAR*				thumsel[4];				//pointers to thumbnails selectef for display
-unsigned			thumcnt;				//number of thumbnail file names
-unsigned			thumdcnt;				//number of thumbnail file names selected for display
-unsigned			thumind;				//index into the thumbnail filname table
-TCHAR				thumsrch[32];			//storage for the thumnail search string
-TCHAR				insnam[_MAX_PATH] = { 0 };	//insert file name
+TCHAR*				thumbnailNames;			//pointer to storage for thumbnail names
+TCHAR**				ptrThumbnails;			//pointers to the thumbnail names
+TCHAR*				thumbnailsSelected[4];	//pointers to thumbnails selected for display
+unsigned			thumbnailCount;			//number of thumbnail file names
+unsigned			thumbnailDisplayCount;	//number of thumbnail file names selected for display
+unsigned			thumbnailIndex;			//index into the thumbnail filname table
+TCHAR				thumbnailSearchString[32];	//storage for the thumnail search string
+TCHAR				insertFileName[_MAX_PATH] = { 0 };	//insert file name
 unsigned			insflt;					//saved float pointer for inserting files
 unsigned			insfpnt;				//saved form pointer for inserting files
 unsigned			insfstch;				//saved stitch pointer for inserting files
@@ -914,7 +913,7 @@ OPENFILENAME obn = {
 	customFilter,			//lpstrCustomFilter 
 	_MAX_PATH,				//nMaxCustFilter 
 	0,						//nFilterIndex 
-	lbnam,					//lpstrFile 
+	usrBMPFileName,			//lpstrFile 
 	_MAX_PATH,				//nMaxFile 
 	0,						//lpstrFileTitle 
 	0,						//nMaxFileTitle 
@@ -2456,7 +2455,7 @@ void coltab() {
 	dRECTANGLE		rng;
 	fPOINTATTRIBUTE*	ts;
 
-	colCnt = 0;
+	colorChanges = 0;
 	if (hed.stitchCount)
 	{
 		stitchBuffer[0].attribute &= NCOLMSK;
@@ -2501,7 +2500,7 @@ void coltab() {
 				ocol = tuns;
 			}
 		}
-		colCnt = col;
+		colorChanges = col;
 		colch[col].stitchIndex = (unsigned short)ind;
 		if (closestPointIndex > (unsigned)hed.stitchCount - 1)
 			closestPointIndex = hed.stitchCount - 1;
@@ -3462,9 +3461,9 @@ void defbNam() {
 
 	TCHAR* last;
 
-	if (lbnam[0]) {
+	if (usrBMPFileName[0]) {
 
-		strcpy_s(defaultBMPDirectory, lbnam);
+		strcpy_s(defaultBMPDirectory, usrBMPFileName);
 		last = strrchr(defaultBMPDirectory, '\\');
 		if (last - defaultBMPDirectory == 2)
 			last[1] = 0;
@@ -3513,10 +3512,10 @@ void ritini() {
 		ini.initialWindowCoords.bottom = wrct.bottom;
 		ini.initialWindowCoords.top = wrct.top;
 	}
-	hIniFile = CreateFile(iniNam, (GENERIC_WRITE | GENERIC_READ), 0, NULL,
+	hIniFile = CreateFile(iniFileName, (GENERIC_WRITE | GENERIC_READ), 0, NULL,
 		CREATE_ALWAYS, 0, NULL);
 	if (hIniFile != INVALID_HANDLE_VALUE)
-		WriteFile(hIniFile, &ini, sizeof(INIFILE), &red, NULL);
+		WriteFile(hIniFile, &ini, sizeof(INIFILE), &bytesRead, NULL);
 	CloseHandle(hIniFile);
 }
 
@@ -3570,19 +3569,19 @@ unsigned colmatch(COLORREF col) {
 
 	unsigned ind, dis, mindis, pdis = 0;
 
-	if (colCnt < 16) {
+	if (colorChanges < 16) {
 
-		for (ind = 0; ind < colCnt; ind++) {
+		for (ind = 0; ind < colorChanges; ind++) {
 
 			if (col == userColor[ind])
 				return ind;
 		}
-		userColor[colCnt++] = col;
-		return colCnt - 1;
+		userColor[colorChanges++] = col;
+		return colorChanges - 1;
 	} else {
 
 		mindis = 0xffffffff;
-		for (ind = 0; ind < colCnt; ind++) {
+		for (ind = 0; ind < colorChanges; ind++) {
 
 			dis = coldis(col, userColor[ind]);
 			if (!dis)
@@ -3630,7 +3629,7 @@ void redbal() {
 			col = 0;
 			pbcol = 1;
 			ine = 0;
-			colCnt = 1;
+			colorChanges = 1;
 			for (ind = 0; ind < bcnt; ind++) {
 
 				switch (ptrBalaradStitich[ind].code) {
@@ -3646,7 +3645,7 @@ void redbal() {
 					break;
 				}
 			}
-			for (ind = 0; ind < colCnt; ind++) {
+			for (ind = 0; ind < colorChanges; ind++) {
 
 				userPen[ind] = CreatePen(PS_SOLID, 1, userColor[ind]);
 				hUserColorBrush[ind] = nuBrush(hUserColorBrush[ind], userColor[ind]);
@@ -5132,7 +5131,7 @@ void savmap() {
 
 	unsigned long		rot;
 
-	if (*bnam) {
+	if (*pcsBMPFileName) {
 
 		if (chkMap(MONOMAP)) {
 
@@ -5146,10 +5145,10 @@ void savmap() {
 		}
 		if (GetSaveFileName(&obn)) {
 
-			hBmp = CreateFile(lbnam, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+			hBmp = CreateFile(usrBMPFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 			if (hIniFile == INVALID_HANDLE_VALUE) {
 
-				crmsg(lbnam);
+				crmsg(usrBMPFileName);
 				return;
 			}
 			WriteFile(hBmp, (BITMAPFILEHEADER*)&bhed, 14, &rot, NULL);
@@ -5173,29 +5172,29 @@ void bfil() {
 	COLORREF			bitbak;
 
 	bitbak = fswap(backgroundColor);
-	hBmp = CreateFile(lbnam, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+	hBmp = CreateFile(usrBMPFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 	if (hBmp == INVALID_HANDLE_VALUE) {
 
-		sprintf_s(msgbuf, sizeof(msgbuf), "Couldn't open bitmap file: %s\n", lbnam);
+		sprintf_s(msgbuf, sizeof(msgbuf), "Couldn't open bitmap file: %s\n", usrBMPFileName);
 		shoMsg(msgbuf);
 		CloseHandle(hBmp);
 		hBmp = 0;
-		*bnam = 0;
+		*pcsBMPFileName = 0;
 		return;
 	}
-	ReadFile(hBmp, (BITMAPFILEHEADER*)&bhed, 14, &red, NULL);
+	ReadFile(hBmp, (BITMAPFILEHEADER*)&bhed, 14, &bytesRead, NULL);
 	if (bhed.bfType == 'MB') {
 
 		bsiz = bhed.bfOffBits - 14;
 		if (bsiz > sizeof(BITMAPV4HEADER))
 			bsiz = sizeof(BITMAPV4HEADER);
-		ReadFile(hBmp, (BITMAPV4HEADER*)&b4hed, bsiz, &red, NULL);
+		ReadFile(hBmp, (BITMAPV4HEADER*)&b4hed, bsiz, &bytesRead, NULL);
 	} else {
 
-		sprintf_s(msgbuf, sizeof(msgbuf), "%s is not a Windows Bitmap\n", lbnam);
+		sprintf_s(msgbuf, sizeof(msgbuf), "%s is not a Windows Bitmap\n", usrBMPFileName);
 		CloseHandle(hBmp);
 		hBmp = 0;
-		*bnam = 0;
+		*pcsBMPFileName = 0;
 		return;
 	}
 	if (gudtyp(b4hed.bV4BitCount)) {
@@ -5218,7 +5217,7 @@ void bfil() {
 				bwidw++;
 			bsiz = bwidw*bitmapHeight;
 			ptrBitmap = new unsigned[bsiz];
-			ReadFile(hBmp, (unsigned*)ptrBitmap, bsiz << 2, &red, NULL);
+			ReadFile(hBmp, (unsigned*)ptrBitmap, bsiz << 2, &bytesRead, NULL);
 			CloseHandle(hBmp);
 			if (binv(bwidw)) {
 
@@ -5254,7 +5253,7 @@ void bfil() {
 
 			CloseHandle(hBmp);
 			rstMap(MONOMAP);
-			hBmp = (HBITMAP)LoadImage(hInst, lbnam, IMAGE_BITMAP, bitmapWidth, bitmapHeight, LR_LOADFROMFILE);
+			hBmp = (HBITMAP)LoadImage(hInst, usrBMPFileName, IMAGE_BITMAP, bitmapWidth, bitmapHeight, LR_LOADFROMFILE);
 			SelectObject(bitmapDC, hBmp);
 			setMap(RESTCH);
 		}
@@ -5268,7 +5267,7 @@ void bfil() {
 
 		CloseHandle(hBmp);
 		hBmp = 0;
-		*bnam = 0;
+		*pcsBMPFileName = 0;
 		tabmsg(IDS_BMAP);
 	}
 }
@@ -5346,7 +5345,7 @@ void dstran() {
 				if (hisiz&&pcol&&pcol[0] == COLVER) {
 
 					backgroundColor = pcol[1];
-					colCnt = 0;
+					colorChanges = 0;
 				}
 			} else {
 
@@ -5620,11 +5619,11 @@ void nuFil() {
 		rstMap(BIGBOX);
 		unthum();
 		unbsho();
-		if (bnam[0]) {
+		if (pcsBMPFileName[0]) {
 
 			DeleteObject(hBmp);
 			ReleaseDC(hWnd, bitmapDC);
-			*bnam = 0;
+			*pcsBMPFileName = 0;
 		}
 		hFile = CreateFile(fileName, GENERIC_READ, 0, NULL,
 			OPEN_EXISTING, 0, NULL);
@@ -5656,7 +5655,7 @@ void nuFil() {
 				rstMap(WASRT);
 				preferenceIndex = 0;
 			}
-			bnam[0] = 0;
+			pcsBMPFileName[0] = 0;
 			if (slpnt)
 				slpnt = 0;
 			rstMap(SCROS);
@@ -5690,10 +5689,10 @@ void nuFil() {
 			tchr = tolower(pext[0]);
 			if (tchr == 't') {
 
-				ReadFile(hFile, (STRHED*)&sthed, sizeof(STRHED), &red, NULL);
+				ReadFile(hFile, (STRHED*)&sthed, sizeof(STRHED), &bytesRead, NULL);
 				if ((sthed.headerType & 0xffffff) == 0x746872) {
 
-					if (red != sizeof(STRHED)) {
+					if (bytesRead != sizeof(STRHED)) {
 
 						tabmsg(IDS_SHRTF);
 						return;
@@ -5721,8 +5720,8 @@ void nuFil() {
 					case 1:
 					case 2:
 
-						ReadFile(hFile, (STREX*)&hedx, sizeof(STREX), &red, NULL);
-						if (red != sizeof(STREX)) {
+						ReadFile(hFile, (STREX*)&hedx, sizeof(STREX), &bytesRead, NULL);
+						if (bytesRead != sizeof(STREX)) {
 
 							tabmsg(IDS_SHRTF);
 							return;
@@ -5741,47 +5740,47 @@ void nuFil() {
 					zoomRect.right = unzoomedRect.x = ini.hoopSizeX;
 					zoomRect.top = unzoomedRect.y = ini.hoopSizeY;
 					hed.stitchCount = sthed.stitchCount;
-					ReadFile(hFile, (fPOINTATTRIBUTE*)stitchBuffer, hed.stitchCount * sizeof(fPOINTATTRIBUTE), &red, NULL);
-					if (red != hed.stitchCount * sizeof(fPOINTATTRIBUTE)) {
+					ReadFile(hFile, (fPOINTATTRIBUTE*)stitchBuffer, hed.stitchCount * sizeof(fPOINTATTRIBUTE), &bytesRead, NULL);
+					if (bytesRead != hed.stitchCount * sizeof(fPOINTATTRIBUTE)) {
 
-						hed.stitchCount = red / sizeof(fPOINTATTRIBUTE);
+						hed.stitchCount = bytesRead / sizeof(fPOINTATTRIBUTE);
 						prtred();
 						return;
 					}
-					ReadFile(hFile, (TCHAR*)bnam, 16, &red, 0);
-					tred = red;
-					if (red != 16) {
+					ReadFile(hFile, (TCHAR*)pcsBMPFileName, 16, &bytesRead, 0);
+					tred = bytesRead;
+					if (bytesRead != 16) {
 
-						bnam[0] = 0;
+						pcsBMPFileName[0] = 0;
 						prtred();
 						return;
 					}
-					ReadFile(hFile, (COLORREF*)&backgroundColor, 4, &red, 0);
-					tred += red;
-					if (red != 4) {
+					ReadFile(hFile, (COLORREF*)&backgroundColor, 4, &bytesRead, 0);
+					tred += bytesRead;
+					if (bytesRead != 4) {
 
 						backgroundColor = ini.backgroundColor;
 						prtred();
 						return;
 					}
 					hBackgroundBrush = CreateSolidBrush(backgroundColor);
-					ReadFile(hFile, (COLORREF*)userColor, 64, &red, 0);
-					tred += red;
-					if (red != 64) {
+					ReadFile(hFile, (COLORREF*)userColor, 64, &bytesRead, 0);
+					tred += bytesRead;
+					if (bytesRead != 64) {
 
 						prtred();
 						return;
 					}
-					ReadFile(hFile, (COLORREF*)customColor, 64, &red, 0);
-					tred += red;
-					if (red != 64) {
+					ReadFile(hFile, (COLORREF*)customColor, 64, &bytesRead, 0);
+					tred += bytesRead;
+					if (bytesRead != 64) {
 
 						prtred();
 						return;
 					}
-					ReadFile(hFile, (TCHAR*)msgbuf, 16, &red, 0);
-					tred += red;
-					if (red != 16) {
+					ReadFile(hFile, (TCHAR*)msgbuf, 16, &bytesRead, 0);
+					tred += bytesRead;
+					if (bytesRead != 16) {
 
 						prtred();
 						return;
@@ -5799,46 +5798,46 @@ void nuFil() {
 						if (vervar < 2) {
 
 							frmlstx = (FRMHEDO*)&bseq;
-							ReadFile(hFile, (FRMHEDO*)frmlstx, formIndex * sizeof(FRMHEDO), &red, 0);
-							if (red != formIndex * sizeof(FRMHEDO)) {
+							ReadFile(hFile, (FRMHEDO*)frmlstx, formIndex * sizeof(FRMHEDO), &bytesRead, 0);
+							if (bytesRead != formIndex * sizeof(FRMHEDO)) {
 
-								formIndex = red / sizeof(FRMHEDO);
+								formIndex = bytesRead / sizeof(FRMHEDO);
 								setMap(BADFIL);
 							}
 							xofrm();
 						} else {
 
-							ReadFile(hFile, (FRMHED*)formList, formIndex * sizeof(FRMHED), &red, 0);
+							ReadFile(hFile, (FRMHED*)formList, formIndex * sizeof(FRMHED), &bytesRead, 0);
 							rstMap(BADFIL);
-							if (red != formIndex * sizeof(FRMHED)) {
+							if (bytesRead != formIndex * sizeof(FRMHED)) {
 
-								formIndex = red / sizeof(FRMHED);
+								formIndex = bytesRead / sizeof(FRMHED);
 								setMap(BADFIL);
 							}
 						}
 						//						ind=SetFilePointer(hFile,0,0,FILE_CURRENT);  //bug
-						ReadFile(hFile, (fPOINT*)formPoints, sthed.pointCount * sizeof(fPOINT), &red, 0);
-						if (red != sizeof(fPOINT)*sthed.pointCount) {
+						ReadFile(hFile, (fPOINT*)formPoints, sthed.pointCount * sizeof(fPOINT), &bytesRead, 0);
+						if (bytesRead != sizeof(fPOINT)*sthed.pointCount) {
 
-							fltad = red / sizeof(fPOINT);
+							fltad = bytesRead / sizeof(fPOINT);
 							for (ind = fltad; ind < sthed.pointCount; ind++)
 								formPoints[ind].x = formPoints[ind].y = 0;
 							setMap(BADFIL);
 						}
-						ReadFile(hFile, (SATCON*)satks, sthed.dlineCount * sizeof(SATCON), &red, 0);
-						if (red != sthed.dlineCount * sizeof(SATCON)) {
+						ReadFile(hFile, (SATCON*)satks, sthed.dlineCount * sizeof(SATCON), &bytesRead, 0);
+						if (bytesRead != sthed.dlineCount * sizeof(SATCON)) {
 
-							satkad = red / sizeof(SATCON);
+							satkad = bytesRead / sizeof(SATCON);
 							setMap(BADFIL);
 						}
-						ReadFile(hFile, (fPOINT*)clipboardPoints, sthed.clipboardDataCount * sizeof(fPOINT), &red, 0);
-						if (red != sthed.clipboardDataCount * sizeof(fPOINT)) {
+						ReadFile(hFile, (fPOINT*)clipboardPoints, sthed.clipboardDataCount * sizeof(fPOINT), &bytesRead, 0);
+						if (bytesRead != sthed.clipboardDataCount * sizeof(fPOINT)) {
 
-							clpad = red / sizeof(fPOINT);
+							clpad = bytesRead / sizeof(fPOINT);
 							setMap(BADFIL);
 						}
-						ReadFile(hFile, (TXPNT*)txpnts, hedx.texturePointCount * sizeof(TXPNT), &red, 0);
-						txad = red / sizeof(TXPNT);
+						ReadFile(hFile, (TXPNT*)txpnts, hedx.texturePointCount * sizeof(TXPNT), &bytesRead, 0);
+						txad = bytesRead / sizeof(TXPNT);
 						if (rstMap(BADFIL))
 							bfilmsg();
 						for (ind = 0; ind < formIndex; ind++) {
@@ -5865,7 +5864,7 @@ void nuFil() {
 
 					if (tolower(pext[01]) == 'c') {
 
-						ReadFile(hFile, (PCSHEADER*)&hed, 0x46, &red, NULL);
+						ReadFile(hFile, (PCSHEADER*)&hed, 0x46, &bytesRead, NULL);
 						if (!l_siz) {
 
 							filnopn(IDS_ZEROL, fileName);
@@ -5878,7 +5877,7 @@ void nuFil() {
 							l_siz -= 0x46;
 							inf = l_siz / sizeof(PCSTCH) + 2;
 							ptrFileBuffer = new PCSTCH[inf];
-							ReadFile(hFile, ptrFileBuffer, l_siz, &red, NULL);
+							ReadFile(hFile, ptrFileBuffer, l_siz, &bytesRead, NULL);
 							l_stind = 0;
 							l_cPnt = 0;
 							tcol = 0;
@@ -5900,7 +5899,7 @@ void nuFil() {
 							}
 							hed.stitchCount = l_stind;
 							tnam = (TCHAR*)&ptrFileBuffer[ind];
-							strcpy_s(bnam, tnam);
+							strcpy_s(pcsBMPFileName, tnam);
 							delete[] ptrFileBuffer;
 							strcpy_s(pext, sizeof(fileName) - (pext - fileName), "thr");
 							ini.auxFileType = AUXPCS;
@@ -5939,7 +5938,7 @@ void nuFil() {
 #if PESACT
 					else {
 
-						ReadFile(hFile, (BSEQPNT*)&bseq, sizeof(bseq), &red, 0);
+						ReadFile(hFile, (BSEQPNT*)&bseq, sizeof(bseq), &bytesRead, 0);
 						peshed = (PESHED*)&bseq;
 						l_peschr = (TCHAR*)&bseq;
 						if (strncmp(peshed->led, "#PES00", 6)) {
@@ -5974,7 +5973,7 @@ void nuFil() {
 						ind = 0;
 						ine = 1;
 						stitchBuffer[0].x = stitchBuffer[0].y;
-						while (ind < red - pecof - 529) {
+						while (ind < bytesRead - pecof - 529) {
 
 							if (pestch[ind] == 0xff && pestch[ind + 1] == 0)
 								break;
@@ -6015,16 +6014,16 @@ void nuFil() {
 #endif
 				} else {
 
-					ReadFile(hFile, (DSTHED*)&dsthed, sizeof(DSTHED), &red, 0);
-					if (red == sizeof(DSTHED)) {
+					ReadFile(hFile, (DSTHED*)&dsthed, sizeof(DSTHED), &bytesRead, 0);
+					if (bytesRead == sizeof(DSTHED)) {
 
 						if (chkdst(&dsthed)) {
 
-							bnam[0] = 0;
-							l_siz = GetFileSize(hFile, &red) - sizeof(DSTHED);
+							pcsBMPFileName[0] = 0;
+							l_siz = GetFileSize(hFile, &bytesRead) - sizeof(DSTHED);
 							dstcnt = l_siz / sizeof(DSTREC);
 							drecs = new DSTREC[dstcnt];
-							ReadFile(hFile, (DSTREC*)drecs, sizeof(DSTREC)*dstcnt, &red, 0);
+							ReadFile(hFile, (DSTREC*)drecs, sizeof(DSTREC)*dstcnt, &bytesRead, 0);
 							dstran();
 							delete[] drecs;
 							ini.auxFileType = AUXDST;
@@ -6037,10 +6036,10 @@ void nuFil() {
 					}
 				}
 			}
-			if (bnam[0]) {
+			if (pcsBMPFileName[0]) {
 
 				SetCurrentDirectory(defaultDirectory);
-				strcpy_s(lbnam, bnam);
+				strcpy_s(usrBMPFileName, pcsBMPFileName);
 				bfil();
 			}
 			ritot(hed.stitchCount);
@@ -6519,7 +6518,7 @@ void chk1col() {
 
 	coltab();
 	setMap(RESTCH);
-	for (ind = 0; ind < colCnt; ind++) {
+	for (ind = 0; ind < colorChanges; ind++) {
 
 		if (colch[ind + 1].stitchIndex - colch[ind].stitchIndex == 1) {
 
@@ -6573,6 +6572,7 @@ void sav() {
 	DSTHED			dsthed;
 	TCHAR*			pchr;
 	POINT			loc;
+	unsigned		savcol;	
 
 #if PESACT
 
@@ -6783,8 +6783,8 @@ void sav() {
 				riter();
 				return;
 			}
-			ptrFileBuffer = new PCSTCH[hed.stitchCount + colCnt + 2];
-			clrfbuf((sizeof(PCSTCH)*(hed.stitchCount + colCnt + 1)) >> 2);
+			ptrFileBuffer = new PCSTCH[hed.stitchCount + colorChanges + 2];
+			clrfbuf((sizeof(PCSTCH)*(hed.stitchCount + colorChanges + 1)) >> 2);
 			l_stind = 0;
 			savcol = 0xff;
 			for (ind = 0; ind < hed.stitchCount; ind++) {
@@ -6817,7 +6817,7 @@ void sav() {
 				}
 			} else {
 
-				if (!WriteFile(hPcsFile, bnam, 15, &wrot, 0)) {
+				if (!WriteFile(hPcsFile, pcsBMPFileName, 15, &wrot, 0)) {
 
 					riter();
 					return;
@@ -6837,7 +6837,7 @@ void savAs() {
 
 	TCHAR*	pchr;
 
-	if (hed.stitchCount || formIndex || *bnam) {
+	if (hed.stitchCount || formIndex || *pcsBMPFileName) {
 
 		ofn.nFilterIndex = 0;
 		if (GetSaveFileName(&ofn)) {
@@ -7253,7 +7253,7 @@ void closPnt() {
 		nearestPoint[ind] = -1;
 	}
 	px2stch();
-	for (ind = 0; ind < colCnt; ind++) {
+	for (ind = 0; ind < colorChanges; ind++) {
 
 		sind0 = colch[ind].stitchIndex;
 		sind1 = colch[ind + 1].stitchIndex;
@@ -7312,7 +7312,7 @@ unsigned closPnt1(unsigned* clo) {
 	distanceToClick = 1e99;
 	if (chkMap(HID)) {
 
-		for (ind = 0; ind < colCnt; ind++) {
+		for (ind = 0; ind < colorChanges; ind++) {
 
 			if (colch[ind].colorIndex == activeColor) {
 
@@ -7384,7 +7384,7 @@ unsigned pt2colInd(unsigned pInd) {
 
 	unsigned ind;
 
-	for (ind = 0; ind < colCnt; ind++) {
+	for (ind = 0; ind < colorChanges; ind++) {
 
 		if (colch[ind].stitchIndex > pInd)
 			break;
@@ -7600,7 +7600,7 @@ unsigned closlin() {
 	chkpnt.y = (off*(zoomRect.top - zoomRect.bottom) + zoomRect.bottom);
 	off = (double)(zoomRect.right - zoomRect.left) / stitchWindowClientRect.right;
 	tol = off*TOL;
-	for (ine = 0; ine < colCnt; ine++) {
+	for (ine = 0; ine < colorChanges; ine++) {
 
 		scnt = colch[ine + 1].stitchIndex - colch[ine].stitchIndex;
 		l_pstch = &stitchBuffer[colch[ine].stitchIndex];
@@ -7892,9 +7892,9 @@ void newFil() {
 	unsigned ind;
 
 	rstMap(CMPDO);
-	if (bnam[0]) {
+	if (pcsBMPFileName[0]) {
 
-		bnam[0] = 0;
+		pcsBMPFileName[0] = 0;
 		DeleteObject(hBmp);
 		ReleaseDC(hWnd, bitmapDC);
 	}
@@ -7921,7 +7921,7 @@ void newFil() {
 	rstMap(GMRK);
 	hed.stitchCount = 0;
 	DiplayedColorBitmap = 0;
-	bnam[0] = 0;
+	pcsBMPFileName[0] = 0;
 	hed.stitchCount = 0;
 	fltad = 0;
 	clpad = 0;
@@ -7929,7 +7929,7 @@ void newFil() {
 	satkad = 0;
 	formIndex = 0;
 	fileName[0] = 0;
-	colCnt = 0;
+	colorChanges = 0;
 	knotCount = 0;
 	for (ind = 0; ind < 16; ind++) {
 
@@ -8736,20 +8736,20 @@ unsigned sizclp() {
 
 	unsigned len = 0;
 
-	len = siz = sizeof(FORMCLIP) + sides * sizeof(fPOINT);
+	len = fileSize = sizeof(FORMCLIP) + sides * sizeof(fPOINT);
 	if (ptrSelectedForm->type == SAT)
-		siz += ptrSelectedForm->satinGuideCount * sizeof(SATCON);
+		fileSize += ptrSelectedForm->satinGuideCount * sizeof(SATCON);
 	if (ptrSelectedForm->fillType || ptrSelectedForm->edgeType) {
 
 		len += frmcnt(closestFormToCursor);
-		siz += len * sizeof(fPOINTATTRIBUTE);
+		fileSize += len * sizeof(fPOINTATTRIBUTE);
 	}
 	if (iseclp(closestFormToCursor))
-		siz += ptrSelectedForm->clipEntries * sizeof(fPOINT);
+		fileSize += ptrSelectedForm->clipEntries * sizeof(fPOINT);
 	if (isclpx(closestFormToCursor))
-		siz += ptrSelectedForm->lengthOrCount.clipCount * sizeof(fPOINT);
+		fileSize += ptrSelectedForm->lengthOrCount.clipCount * sizeof(fPOINT);
 	if (istx(closestFormToCursor))
-		siz += ptrSelectedForm->fillInfo.texture.count * sizeof(TXPNT);
+		fileSize += ptrSelectedForm->fillInfo.texture.count * sizeof(TXPNT);
 	return len;
 }
 
@@ -8823,7 +8823,7 @@ void duclip() {
 					closestFormToCursor = selectedFormList[ind];
 					fvars(closestFormToCursor);
 					len += sizfclp();
-					msiz += siz;
+					msiz += fileSize;
 				}
 				ptrThrEdClipVoid = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, msiz + len);
 				clipboardFormsData = frmsref(ptrThrEdClipVoid);
@@ -8938,8 +8938,8 @@ void duclip() {
 					len = sizclp();
 					fvars(closestFormToCursor);
 					l_sac = 0; at = closestFormToCursor << 4;
-					siz += sizeof(FORMCLIP);
-					ptrThrEdClipVoid = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, siz);
+					fileSize += sizeof(FORMCLIP);
+					ptrThrEdClipVoid = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, fileSize);
 					clipboardFormData = frmref(ptrThrEdClipVoid);
 					clipboardFormData->clipType = CLP_FRM;
 					frmcpy(&clipboardFormData->form, &formList[closestFormToCursor]);
@@ -9524,7 +9524,7 @@ void lodbmp() {
 
 	TCHAR*	pchr;
 
-	if (bnam[0]) {
+	if (pcsBMPFileName[0]) {
 
 		DeleteObject(hBmp);
 		ReleaseDC(hWnd, bitmapDC);
@@ -9532,9 +9532,9 @@ void lodbmp() {
 	if (GetOpenFileName(&obn)) {
 
 		untrace();
-		pchr = strrchr(lbnam, '\\') + 1;
+		pchr = strrchr(usrBMPFileName, '\\') + 1;
 		// PCS file can only store a 16 character filename?
-		strncpy_s(bnam, pchr, sizeof(bnam));
+		strncpy_s(pcsBMPFileName, pchr, sizeof(pcsBMPFileName));
 		defbNam();
 		bfil();
 		setMap(RESTCH);
@@ -9755,12 +9755,12 @@ void dubuf() {
 	hedx.texturePointCount = txad;
 	durit(&hedx, sizeof(STREX));
 	durit(stitchBuffer, hed.stitchCount * sizeof(fPOINTATTRIBUTE));
-	if (!bnam[0]) {
+	if (!pcsBMPFileName[0]) {
 
 		for (ind = 0; ind < 16; ind++)
-			bnam[ind] = 0;
+			pcsBMPFileName[ind] = 0;
 	}
-	durit(bnam, 16);
+	durit(pcsBMPFileName, 16);
 	durit(&backgroundColor, 4);
 	durit(userColor, 64);
 	durit(customColor, 64);
@@ -10405,11 +10405,11 @@ void getbak() {
 
 	if (chkMap(THUMSHO)) {
 
-		if (thumsel[fileVersionIndex]) {
+		if (thumbnailsSelected[fileVersionIndex]) {
 
 			if (chkMap(RBUT)) {
 
-				strcpy_s(insnam, thumsel[fileVersionIndex]);
+				strcpy_s(insertFileName, thumbnailsSelected[fileVersionIndex]);
 				setMap(IGNORINS);
 				unthum();
 				setMap(FRMOF);
@@ -10431,7 +10431,7 @@ void getbak() {
 					pchr[1] = '\\';
 					pchr[2] = 0;
 				}
-				strcat_s(fileName, thumsel[fileVersionIndex]);
+				strcat_s(fileName, thumbnailsSelected[fileVersionIndex]);
 				setMap(REDOLD);
 				nuFil();
 			}
@@ -11826,9 +11826,9 @@ void barnam(HWND hndl, unsigned fpnt) {
 	TCHAR		buf[_MAX_PATH];
 	TCHAR*		pchr;
 
-	if (fpnt < thumdcnt&&thumsel[fpnt]) {
+	if (fpnt < thumbnailDisplayCount&&thumbnailsSelected[fpnt]) {
 
-		strcpy_s(buf, thumsel[fpnt]);
+		strcpy_s(buf, thumbnailsSelected[fpnt]);
 		pchr = strrchr(buf, '.');
 		if (pchr)
 			pchr[0] = 0;
@@ -11875,9 +11875,9 @@ void thumnail() {
 	unbsho();
 	undat();
 	untrace();
-	// is this correct? types do not match
-	thumnams = (TCHAR*)oseq;
-	pthums = (TCHAR**)&oseq[MAXSEQ >> 1];
+	// ToDo is this correct? types do not match
+	thumbnailNames = (TCHAR*)oseq;
+	ptrThumbnails = (TCHAR**)&oseq[MAXSEQ >> 1];
 
 	SetCurrentDirectory(defaultDirectory);
 	strcpy_s(searchName, defaultDirectory);
@@ -11897,31 +11897,31 @@ void thumnail() {
 	} else {
 
 		ine = 0;
-		pthums[0] = thumnams;
-		strcpy(pthums[0], fdat.cFileName);
+		ptrThumbnails[0] = thumbnailNames;
+		strcpy(ptrThumbnails[0], fdat.cFileName);
 		ine += strlen(fdat.cFileName) + 1;
-		pthums[1] = &thumnams[ine];
+		ptrThumbnails[1] = &thumbnailNames[ine];
 		ind = 1;
 		while (FindNextFile(shndl, &fdat)) {
 
-			strcpy(pthums[ind], fdat.cFileName);
+			strcpy(ptrThumbnails[ind], fdat.cFileName);
 			ine += strlen(fdat.cFileName) + 1;
-			pthums[++ind] = &thumnams[ine];
+			ptrThumbnails[++ind] = &thumbnailNames[ine];
 		}
 		FindClose(shndl);
-		thumcnt = ind;
-		qsort((void*)&pthums[0], ind, 4, strcomp);
-		ind = thumind = 0;
-		while (ind < 4 && thumind < thumcnt&&ind < thumcnt) {
+		thumbnailCount = ind;
+		qsort((void*)&ptrThumbnails[0], ind, 4, strcomp);
+		ind = thumbnailIndex = 0;
+		while (ind < 4 && thumbnailIndex < thumbnailCount&&ind < thumbnailCount) {
 
-			thumsel[ind] = pthums[ind];
+			thumbnailsSelected[ind] = ptrThumbnails[ind];
 			ind++;
 		}
-		thumind = thumdcnt = ind;
-		while (ind < 4 && ind < thumcnt)
+		thumbnailIndex = thumbnailDisplayCount = ind;
+		while (ind < 4 && ind < thumbnailCount)
 			rthumnam(ind++);
 		setMap(THUMSHO);
-		thumsrch[0] = 0;
+		thumbnailSearchString[0] = 0;
 		SetWindowText(hButtonWin[HBOXSEL], "");
 		butxt(HBOXSEL, "");
 		vubak();
@@ -11934,39 +11934,39 @@ void nuthsel() {
 
 	unsigned ind, len, bakind;
 
-	if (thumind < thumcnt) {
+	if (thumbnailIndex < thumbnailCount) {
 
-		bakind = thumind;
+		bakind = thumbnailIndex;
 		ind = 0;
-		len = strlen(thumsrch);
+		len = strlen(thumbnailSearchString);
 		setMap(RESTCH);
 		if (len) {
 
-			while (ind < 4 && thumind < thumcnt) {
+			while (ind < 4 && thumbnailIndex < thumbnailCount) {
 
-				if (!strncmp(thumsrch, pthums[thumind], len)) {
+				if (!strncmp(thumbnailSearchString, ptrThumbnails[thumbnailIndex], len)) {
 
-					thumsel[ind] = pthums[thumind];
+					thumbnailsSelected[ind] = ptrThumbnails[thumbnailIndex];
 					redraw(hBackupViewer[ind++]);
 				}
-				thumind++;
+				thumbnailIndex++;
 			}
 		} else {
 
-			while (ind < 4 && thumind < thumcnt) {
+			while (ind < 4 && thumbnailIndex < thumbnailCount) {
 
-				thumsel[ind] = pthums[thumind];
+				thumbnailsSelected[ind] = ptrThumbnails[thumbnailIndex];
 				redraw(hBackupViewer[ind++]);
-				thumind++;
+				thumbnailIndex++;
 			}
 		}
 		if (ind) {
 
-			thumdcnt = ind;
+			thumbnailDisplayCount = ind;
 			while (ind < 4)
 				rthumnam(ind++);
 		} else
-			thumind = bakind;
+			thumbnailIndex = bakind;
 	}
 }
 
@@ -11974,25 +11974,25 @@ void nuthbak(unsigned cnt) {
 
 	unsigned len;
 
-	if (thumind) {
+	if (thumbnailIndex) {
 
-		len = strlen(thumsrch);
+		len = strlen(thumbnailSearchString);
 		if (len) {
 
-			while (cnt&&thumind < MAXFORMS) {
+			while (cnt&&thumbnailIndex < MAXFORMS) {
 
-				if (thumind) {
+				if (thumbnailIndex) {
 
-					thumind--;
-					if (!strncmp(thumsrch, pthums[thumind], len))
+					thumbnailIndex--;
+					if (!strncmp(thumbnailSearchString, ptrThumbnails[thumbnailIndex], len))
 						cnt--;
 				} else
 					break;
 			}
 		} else
-			thumind -= cnt;
-		if (thumind > MAXFORMS)
-			thumind = 0;
+			thumbnailIndex -= cnt;
+		if (thumbnailIndex > MAXFORMS)
+			thumbnailIndex = 0;
 		nuthsel();
 	}
 }
@@ -12001,14 +12001,14 @@ void nuthum(TCHAR chr) {
 
 	unsigned ind;
 
-	ind = strlen(thumsrch);
+	ind = strlen(thumbnailSearchString);
 	if (ind < 16) {
 
 		setMap(RESTCH);
-		thumsrch[ind++] = chr;
-		thumsrch[ind] = 0;
-		butxt(HBOXSEL, thumsrch);
-		thumind = 0;
+		thumbnailSearchString[ind++] = chr;
+		thumbnailSearchString[ind] = 0;
+		butxt(HBOXSEL, thumbnailSearchString);
+		thumbnailIndex = 0;
 		nuthsel();
 	}
 }
@@ -12017,13 +12017,13 @@ void bakthum() {
 
 	unsigned ind;
 
-	ind = strlen(thumsrch);
+	ind = strlen(thumbnailSearchString);
 	if (ind) {
 
 		setMap(RESTCH);
-		thumsrch[--ind] = 0;
-		thumind = 0;
-		butxt(HBOXSEL, thumsrch);
+		thumbnailSearchString[--ind] = 0;
+		thumbnailIndex = 0;
+		butxt(HBOXSEL, thumbnailSearchString);
 		nuthsel();
 	}
 }
@@ -12098,7 +12098,7 @@ void insfil() {
 		customFilter,			//lpstrCustomFilter 
 		_MAX_PATH,				//nMaxCustFilter 
 		0,						//nFilterIndex 
-		insnam,					//lpstrFile 
+		insertFileName,			//lpstrFile 
 		_MAX_PATH,				//nMaxFile 
 		0,						//lpstrFileTitle 
 		0,						//nMaxFileTitle 
@@ -12127,19 +12127,19 @@ void insfil() {
 
 	if (chkMap(IGNORINS) || GetOpenFileName(&oin)) {
 
-		hInsertedFile = CreateFile(insnam, (GENERIC_READ), 0, NULL,
+		hInsertedFile = CreateFile(insertFileName, (GENERIC_READ), 0, NULL,
 			OPEN_EXISTING, 0, NULL);
 		if (hInsertedFile == INVALID_HANDLE_VALUE) {
 
-			filnopn(IDS_FNOPN, insnam);
+			filnopn(IDS_FNOPN, insertFileName);
 			hFile = 0;
 			CloseHandle(hInsertedFile);
 		} else {
 
 			insfstch = hed.stitchCount;
-			if (isthr(insnam)) {
+			if (isthr(insertFileName)) {
 
-				ReadFile(hInsertedFile, (STRHED*)&thed, sizeof(STRHED), &red, NULL);
+				ReadFile(hInsertedFile, (STRHED*)&thed, sizeof(STRHED), &bytesRead, NULL);
 				if ((thed.headerType & 0xffffff) != 0x746872)
 					tabmsg(IDS_NOTHR);
 				else {
@@ -12156,10 +12156,10 @@ void insfil() {
 							gethand(stitchBuffer, hed.stitchCount)*HANDW +
 							fltad*FRMPW +
 							hed.stitchCount*STCHW;
-						ReadFile(hInsertedFile, (STREX*)&thedx, sizeof(STREX), &red, 0);
+						ReadFile(hInsertedFile, (STREX*)&thedx, sizeof(STREX), &bytesRead, 0);
 					}
 					savdo();
-					ReadFile(hInsertedFile, (fPOINTATTRIBUTE*)&stitchBuffer[hed.stitchCount], thed.stitchCount * sizeof(fPOINTATTRIBUTE), &red, NULL);
+					ReadFile(hInsertedFile, (fPOINTATTRIBUTE*)&stitchBuffer[hed.stitchCount], thed.stitchCount * sizeof(fPOINTATTRIBUTE), &bytesRead, NULL);
 					SetFilePointer(hInsertedFile, 164, 0, FILE_CURRENT);
 					trct.left = trct.bottom = (float)1e9;
 					trct.top = trct.right = (float)1e-9;
@@ -12170,10 +12170,10 @@ void insfil() {
 						if (vervar < 2) {
 
 							frmlstx = (FRMHEDO*)&bseq;
-							ReadFile(hInsertedFile, (FRMHEDO*)&bseq, thed.formCount * sizeof(FRMHEDO), &red, 0);
-							if (red != thed.formCount * sizeof(FRMHEDO)) {
+							ReadFile(hInsertedFile, (FRMHEDO*)&bseq, thed.formCount * sizeof(FRMHEDO), &bytesRead, 0);
+							if (bytesRead != thed.formCount * sizeof(FRMHEDO)) {
 
-								formIndex = red / sizeof(FRMHEDO);
+								formIndex = bytesRead / sizeof(FRMHEDO);
 								setMap(BADFIL);
 							}
 							if (formIndex + thed.pointCount < MAXFORMS) {
@@ -12187,10 +12187,10 @@ void insfil() {
 								}
 							}
 						} else
-							ReadFile(hInsertedFile, (FRMHED*)&formList[formIndex], thed.formCount * sizeof(FRMHED), &red, 0);
-						ReadFile(hInsertedFile, (fPOINT*)&formPoints[fltad], thed.pointCount * sizeof(fPOINT), &red, 0);
-						ReadFile(hInsertedFile, (SATCON*)&satks[satkad], thed.dlineCount * sizeof(SATCON), &red, 0);
-						ReadFile(hInsertedFile, (fPOINT*)&clipboardPoints[clpad], thed.clipboardDataCount * sizeof(fPOINT), &red, 0);
+							ReadFile(hInsertedFile, (FRMHED*)&formList[formIndex], thed.formCount * sizeof(FRMHED), &bytesRead, 0);
+						ReadFile(hInsertedFile, (fPOINT*)&formPoints[fltad], thed.pointCount * sizeof(fPOINT), &bytesRead, 0);
+						ReadFile(hInsertedFile, (SATCON*)&satks[satkad], thed.dlineCount * sizeof(SATCON), &bytesRead, 0);
+						ReadFile(hInsertedFile, (fPOINT*)&clipboardPoints[clpad], thed.clipboardDataCount * sizeof(fPOINT), &bytesRead, 0);
 						CloseHandle(hInsertedFile);
 						hInsertedFile = 0;
 						for (ind = formIndex; ind < formIndex + thed.formCount; ind++) {
@@ -12279,12 +12279,12 @@ void insfil() {
 				}
 			} else {
 
-				ReadFile(hInsertedFile, (PCSHEADER*)&tphed, 0x46, &red, NULL);
+				ReadFile(hInsertedFile, (PCSHEADER*)&tphed, 0x46, &bytesRead, NULL);
 				if (hed.leadIn == 0x32 && hed.colorCount == 16) {
 
 					savdo();
 					tbuf = (PCSTCH*)bseq;
-					ReadFile(hInsertedFile, (PCSTCH*)tbuf, tphed.stitchCount * sizeof(PCSTCH), &red, NULL);
+					ReadFile(hInsertedFile, (PCSTCH*)tbuf, tphed.stitchCount * sizeof(PCSTCH), &bytesRead, NULL);
 					ine = hed.stitchCount;
 					cod = 0;
 					for (ind = 0; ind < tphed.stitchCount; ind++) {
@@ -13848,7 +13848,7 @@ void trace() {
 	unsigned			usum, psum, dsum;
 #endif
 
-	if (*bnam) {
+	if (*pcsBMPFileName) {
 
 		untrace();
 		tracwnd();
@@ -14713,7 +14713,7 @@ void trdif() {
 	unsigned	ind, ine, inf, l_bpnt = 0, rsum, rmax, rmin;
 	double		rat;
 
-	if (!*bnam) {
+	if (!*pcsBMPFileName) {
 
 		tabmsg(IDS_MAPLOD);
 		return;
@@ -14772,7 +14772,7 @@ void delstch() {
 	txad = 0;
 	rstAll();
 	clrfills();
-	colCnt = 0;
+	colorChanges = 0;
 	butxt(HNUM, "");
 	butxt(HTOT, "");
 	setMap(RESTCH);
@@ -14780,7 +14780,7 @@ void delstch() {
 
 void chkbit() {
 
-	if (*bnam && (chkMap(WASDIF) || chkMap(WASDSEL) || chkMap(WASBLAK))) {
+	if (*pcsBMPFileName && (chkMap(WASDIF) || chkMap(WASDSEL) || chkMap(WASBLAK))) {
 
 		setMap(WASESC);
 		bfil();
@@ -14865,7 +14865,7 @@ void trcsel() {
 
 	unsigned ind, max, xind;
 
-	if (*bnam) {
+	if (*pcsBMPFileName) {
 
 		setMap(WASTRCOL);
 		setMap(TRCRED);
@@ -14907,7 +14907,7 @@ void trinit() {
 	unsigned	col[3] = { 0 };
 	COLORREF	tcol;
 
-	if (*bnam) {
+	if (*pcsBMPFileName) {
 
 		if (!chkMap(TRSET)) {
 
@@ -15023,7 +15023,7 @@ void blak() {
 
 	unsigned ind;
 
-	if (!*bnam) {
+	if (!*pcsBMPFileName) {
 
 		tabmsg(IDS_MAPLOD);
 		return;
@@ -15050,7 +15050,7 @@ void blak() {
 
 void delmap() {
 
-	*bnam = 0;
+	*pcsBMPFileName = 0;
 	setMap(RESTCH);
 }
 
@@ -15060,7 +15060,7 @@ void closfn() {
 	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRED], ini.designerName);
 	knotCount = 0;
 	*fileName = 0;
-	*bnam = 0;
+	*pcsBMPFileName = 0;
 	deldu();
 	clrhbut(3);
 	SetWindowText(hWnd, msgbuf);
@@ -18216,7 +18216,7 @@ unsigned chkMsg() {
 					stitchBuffer[0].attribute = USMSK | activeColor | layerIndex | NOTFRM;
 					stitchBuffer[0].x = sPnt.x;
 					stitchBuffer[0].y = sPnt.y;
-					colCnt = 1;
+					colorChanges = 1;
 					colch[0].colorIndex = activeColor;
 					colch[0].stitchIndex = 0;
 					colch[1].stitchIndex = 1;
@@ -18573,13 +18573,13 @@ unsigned chkMsg() {
 
 			case VK_HOME:
 
-				thumind = 0;
+				thumbnailIndex = 0;
 				nuthsel();
 				break;
 
 			case VK_END:
 
-				thumind = thumcnt;
+				thumbnailIndex = thumbnailCount;
 				nuthbak(4);
 				break;
 
@@ -18857,7 +18857,7 @@ unsigned chkMsg() {
 				backgroundPenWidth = 1;
 				DeleteObject(hBackgroundBrush);
 				hBackgroundBrush = CreateSolidBrush(backgroundColor);
-				if (*bnam)
+				if (*pcsBMPFileName)
 					bfil();
 				setMap(RESTCH);
 			} else {
@@ -21139,7 +21139,7 @@ unsigned chkMsg() {
 				backgroundPenWidth = 1;
 				DeleteObject(hBackgroundBrush);
 				hBackgroundBrush = CreateSolidBrush(backgroundColor);
-				if (*bnam)
+				if (*pcsBMPFileName)
 					bfil();
 				zumhom();
 			}
@@ -21150,7 +21150,7 @@ unsigned chkMsg() {
 			if (nuBit()) {
 
 				bitmapColor = fswap(ccBitMapColorStruct.rgbResult);
-				if (*bnam)
+				if (*pcsBMPFileName)
 					bfil();
 				bitmapPen = nuPen(bitmapPen, 1, bitmapColor);
 				zumhom();
@@ -21767,9 +21767,9 @@ void redini() {
 	for (ind = 0; ind < OLDNUM; ind++)
 		ini.prevNames[ind][0] = 0;
 	duhom();
-	strcpy_s(iniNam, homeDirectory);
-	strcat_s(iniNam, "thred.ini");
-	hIniFile = CreateFile(iniNam, GENERIC_READ, 0, NULL,
+	strcpy_s(iniFileName, homeDirectory);
+	strcat_s(iniFileName, "thred.ini");
+	hIniFile = CreateFile(iniFileName, GENERIC_READ, 0, NULL,
 		OPEN_EXISTING, 0, NULL);
 	if (hIniFile == INVALID_HANDLE_VALUE)
 		defpref();
@@ -22527,7 +22527,7 @@ void drwStch() {
 	uncros();
 	rstMap(SHOFRM);
 	scnt = 0;
-	for (ind = 0; ind < colCnt; ind++) {
+	for (ind = 0; ind < colorChanges; ind++) {
 
 		lineIndex = colch[ind + 1].stitchIndex - colch[ind].stitchIndex;
 		if (lineIndex > scnt)
@@ -22536,7 +22536,7 @@ void drwStch() {
 	linePoints = new POINT[scnt + 2];
 	FillRect(StitchWindowMemDC, &stitchWindowClientRect, hBackgroundBrush);
 	duzrat();
-	if (*bnam && !chkMap(HIDMAP) && !chkMap(UPTO)) {
+	if (*pcsBMPFileName && !chkMap(HIDMAP) && !chkMap(UPTO)) {
 
 		if (chkMap(WASTRAC))
 			tdc = hTraceDC;
@@ -22595,7 +22595,7 @@ void drwStch() {
 			lineIndex = 0;
 			rstMap(LINED);
 			rstMap(LININ);
-			for (ind = 0; ind < colCnt; ind++) {
+			for (ind = 0; ind < colorChanges; ind++) {
 
 				if (chkMap(HID)) {
 
@@ -22741,7 +22741,7 @@ void drwStch() {
 		} else {
 
 			pwid = chkMap(HID);
-			for (ind = 0; ind < colCnt; ind++) {
+			for (ind = 0; ind < colorChanges; ind++) {
 
 				setCol(colch[ind].colorIndex);
 				scnt = colch[ind + 1].stitchIndex - colch[ind].stitchIndex;
@@ -22784,7 +22784,7 @@ void drwStch() {
 			rint();
 			if (chkMap(HID)) {
 
-				for (ind = 0; ind < colCnt; ind++) {
+				for (ind = 0; ind < colorChanges; ind++) {
 
 					if (colch[ind].colorIndex == activeColor) {
 
@@ -22875,7 +22875,7 @@ void dubar() {
 	tRct.right = ds->rcItem.right;
 	tRct.top = 0;
 	tRct.bottom = ds->rcItem.bottom;
-	for (ind = 0; ind < colCnt; ind++) {
+	for (ind = 0; ind < colorChanges; ind++) {
 
 		tdub = (double)colch[ind + 1].stitchIndex / hed.stitchCount;
 		tRct.bottom = tdub*ds->rcItem.bottom;
@@ -22932,8 +22932,8 @@ void ritbak(TCHAR* nam, DRAWITEMSTRUCT* p_ds) {
 
 	if (thfil != INVALID_HANDLE_VALUE) {
 
-		ReadFile(thfil, (STRHED*)&sthed, sizeof(STRHED), &red, NULL);
-		if (red == sizeof(STRHED)) {
+		ReadFile(thfil, (STRHED*)&sthed, sizeof(STRHED), &bytesRead, NULL);
+		if (bytesRead == sizeof(STRHED)) {
 
 			if ((sthed.headerType & 0xffffff) == 0x746872) {
 
@@ -22956,8 +22956,8 @@ void ritbak(TCHAR* nam, DRAWITEMSTRUCT* p_ds) {
 				case 1:
 				case 2:
 
-					ReadFile(thfil, (STREX*)&thedx, sizeof(STREX), &red, NULL);
-					if (red != sizeof(STREX))
+					ReadFile(thfil, (STREX*)&thedx, sizeof(STREX), &bytesRead, NULL);
+					if (bytesRead != sizeof(STREX))
 						return;
 					rsiz.x = thedx.hoopSizeX;
 					rsiz.y = thedx.hoopSizeY;
@@ -22980,12 +22980,12 @@ void ritbak(TCHAR* nam, DRAWITEMSTRUCT* p_ds) {
 				tstch = new fPOINTATTRIBUTE[sthed.stitchCount];
 				l_plin = new POINT[sthed.stitchCount];
 				redsiz = sthed.stitchCount * sizeof(fPOINTATTRIBUTE);
-				ReadFile(thfil, (fPOINTATTRIBUTE*)tstch, redsiz, &red, 0);
-				if (redsiz == red) {
+				ReadFile(thfil, (fPOINTATTRIBUTE*)tstch, redsiz, &bytesRead, 0);
+				if (redsiz == bytesRead) {
 
 					SetFilePointer(thfil, 16, 0, FILE_CURRENT);
-					ReadFile(thfil, (COLORREF*)&tbak, 4, &red, 0);
-					ReadFile(thfil, (COLORREF*)tcol, 64, &red, 0);
+					ReadFile(thfil, (COLORREF*)&tbak, 4, &bytesRead, 0);
+					ReadFile(thfil, (COLORREF*)tcol, 64, &bytesRead, 0);
 					tbr = CreateSolidBrush(tbak);
 					SelectObject(p_ds->hDC, tbr);
 					FillRect(p_ds->hDC, &p_ds->rcItem, tbr);
@@ -23035,8 +23035,8 @@ void ritbak(TCHAR* nam, DRAWITEMSTRUCT* p_ds) {
 				if (vervar < 2) {
 
 					frmlstx = (FRMHEDO*)&bseq;
-					ReadFile(thfil, (FRMHEDO*)frmlstx, sthed.formCount * sizeof(FRMHEDO), &red, 0);
-					if (red != sthed.pointCount * sizeof(FRMHEDO))
+					ReadFile(thfil, (FRMHEDO*)frmlstx, sthed.formCount * sizeof(FRMHEDO), &bytesRead, 0);
+					if (bytesRead != sthed.pointCount * sizeof(FRMHEDO))
 						goto bakskp;
 					FillMemory(&bseq, 0, sizeof(FRMHED)*formIndex);
 					for (ind = 0; ind < sthed.formCount; ind++) {
@@ -23047,13 +23047,13 @@ void ritbak(TCHAR* nam, DRAWITEMSTRUCT* p_ds) {
 				} else {
 
 					redsiz = sthed.formCount * sizeof(FRMHED);
-					ReadFile(thfil, (FRMHED*)flst, redsiz, &red, 0);
-					if (red != redsiz)
+					ReadFile(thfil, (FRMHED*)flst, redsiz, &bytesRead, 0);
+					if (bytesRead != redsiz)
 						goto bakskp;
 				}
 				redsiz = sthed.pointCount * sizeof(fPOINT);
-				ReadFile(thfil, (fPOINT*)tflt, redsiz, &red, 0);
-				if (red != redsiz)
+				ReadFile(thfil, (fPOINT*)tflt, redsiz, &bytesRead, 0);
+				if (bytesRead != redsiz)
 					goto bakskp;
 				inf = 0;
 				for (ind = 0; ind < sthed.formCount; ind++) {
@@ -23476,9 +23476,9 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 				for (ind = 0; ind < 4; ind++) {
 
-					if (ds->hwndItem == hBackupViewer[ind] && ind < thumdcnt) {
+					if (ds->hwndItem == hBackupViewer[ind] && ind < thumbnailDisplayCount) {
 
-						ritbak(thumsel[ind], ds);
+						ritbak(thumbnailsSelected[ind], ds);
 						rthumnam(ind);
 						return 1;
 					}

@@ -255,12 +255,12 @@ void msgflt(unsigned msgid, float par)
 	numWnd();
 }
 
-void tsizmsg(TCHAR* sizstr, double siz) {
+void tsizmsg(TCHAR* sizstr, double pd_Size) {
 
 	TCHAR	buf[HBUFSIZ];
 
 	LoadString(hInst, IDS_SIZ, buf, HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, sizstr, siz);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, sizstr, pd_Size);
 	shoMsg(hlpbuf);
 	setMap(NUMIN);
 	numWnd();
