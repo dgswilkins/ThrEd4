@@ -15,7 +15,7 @@ extern void				rstAll();
 extern void				okcan();
 
 extern POINT			unzoomedRect;
-extern PCSHEADER				hed;
+extern PCSHEADER		header;
 extern unsigned			delpnt;
 extern TCHAR			homeDirectory[_MAX_PATH];
 extern TCHAR			fileName[_MAX_PATH];
@@ -37,7 +37,7 @@ extern unsigned			rstMap(unsigned bPnt);
 extern DRAWITEMSTRUCT	*ds;
 extern fPOINT			oseq[OSEQLEN];
 extern BSEQPNT			bseq[BSEQLEN];
-extern INIFILE			ini;
+extern INIFILE			iniFile;
 extern TCHAR			thrName[_MAX_PATH];
 extern HDC				StitchWindowMemDC;
 extern long				prfwid;
@@ -477,7 +477,7 @@ BOOL filmsgs(unsigned cod) {
 		return clpmsgs(cod);
 	if (formIndex) {
 
-		delpnt = hed.stitchCount;
+		delpnt = header.stitchCount;
 		frm1pnt();
 		if (chkMap(FORMSEL)) {
 

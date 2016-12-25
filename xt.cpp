@@ -69,7 +69,7 @@ extern FRMHED angfrm;
 extern FORMCLIP* clipboardFormData;
 extern HPEN gridPen;
 extern unsigned satkad;
-extern POINT blin[5];
+extern POINT zoomBoxLine[5];
 extern MSG msg;
 extern POINT stitchWindowOrigin;
 extern unsigned px2stch();
@@ -121,7 +121,7 @@ extern fPOINT angflt[MAXFRMLINS];
 extern FRMHED angfrm;
 extern void frmcpy(FRMHED* dst, FRMHED* src);
 extern float midl(float hi, float lo);
-extern dPOINT rotcntr;
+extern dPOINT rotationCenter;
 extern void rotflt(fPOINT* pnt);
 extern double rotationAngle;
 extern void filang();
@@ -161,7 +161,7 @@ extern void makspac(unsigned strt, unsigned cnt);
 extern void chkseq(BOOL brd);
 extern HWND hWnd;
 extern HINSTANCE hInst;
-extern INIFILE ini;
+extern INIFILE iniFile;
 extern unsigned xpnt;
 extern fPOINT oseq[OSEQLEN];
 extern unsigned opnt;
@@ -183,7 +183,7 @@ extern void coltab();
 extern unsigned setMap(unsigned bPnt);
 extern unsigned chkMap(unsigned bPnt);
 extern unsigned short sides;
-extern PCSHEADER hed;
+extern PCSHEADER header;
 extern fPOINTATTRIBUTE stitchBuffer[MAXPCS];
 extern void mvstch(unsigned dst, unsigned src);
 extern unsigned	formIndex;
@@ -297,7 +297,7 @@ int		ptxhst;		//pointer to the next texture history buffer
 
 void setfchk()
 {
-	if (ini.dataCheck)
+	if (iniFile.dataCheck)
 		setMap(FCHK);
 }
 
@@ -816,14 +816,14 @@ void fethrf() {
 		delclps(closestFormToCursor);
 		deltx();
 		ptrSelectedForm->type = SAT;
-		ptrSelectedForm->fillInfo.feather.ratio = ini.featherRatio;
-		ptrSelectedForm->fillInfo.feather.upCount = ini.featherUpCount;
-		ptrSelectedForm->fillInfo.feather.downCount = ini.featherDownCount;
-		ptrSelectedForm->fillInfo.feather.fillType = ini.featherFillType;
-		ptrSelectedForm->fillInfo.feather.minStitchSize = ini.featherMinStitchSize;
+		ptrSelectedForm->fillInfo.feather.ratio = iniFile.featherRatio;
+		ptrSelectedForm->fillInfo.feather.upCount = iniFile.featherUpCount;
+		ptrSelectedForm->fillInfo.feather.downCount = iniFile.featherDownCount;
+		ptrSelectedForm->fillInfo.feather.fillType = iniFile.featherFillType;
+		ptrSelectedForm->fillInfo.feather.minStitchSize = iniFile.featherMinStitchSize;
 		ptrSelectedForm->extendedAttribute &= !(AT_FTHUP | AT_FTHDWN | AT_FTHBLND);
-		ptrSelectedForm->extendedAttribute |= ini.featherType;
-		ptrSelectedForm->fillInfo.feather.count = ini.featherCount;
+		ptrSelectedForm->extendedAttribute |= iniFile.featherType;
+		ptrSelectedForm->fillInfo.feather.count = iniFile.featherCount;
 		ptrSelectedForm->lengthOrCount.stitchLength = userStitchLength;
 		ptrSelectedForm->fillSpacing = StitchSpace;
 		ptrSelectedForm->fillColor = activeColor;
@@ -914,7 +914,7 @@ int fil2crd(const char* p_filnam)
 	char				cmd[_MAX_PATH * 2 + 1 + 4];
 
 	strcpy_s(cmd, "\"");
-	strcat_s(cmd, ini.p2cName);
+	strcat_s(cmd, iniFile.p2cName);
 	strcat_s(cmd, "\" \"");
 	strcat_s(cmd, p_filnam);
 	strcat_s(cmd, "\"");
@@ -978,19 +978,19 @@ void pes2crd() {
 		0,					//lpTemplateName
 	};
 
-	if (hed.stitchCount)
+	if (header.stitchCount)
 		save();
 	else {
 
 		tabmsg(IDS_P2CNODAT);
 		return;
 	}
-	if (chkp2cnam(ini.p2cName)) {
+	if (chkp2cnam(iniFile.p2cName)) {
 
 		fil2crd(thrName);
 		return;
 	}
-	*ini.p2cName = 0;
+	*iniFile.p2cName = 0;
 	if (!RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion",
 		0, KEY_READ, &hkey)) {
 
@@ -1020,7 +1020,7 @@ void pes2crd() {
 		else
 			return;
 	}
-	strcpy_s(ini.p2cName, prgnam);
+	strcpy_s(iniFile.p2cName, prgnam);
 	fil2crd(auxName);
 }
 
@@ -1060,8 +1060,8 @@ void delwlk(unsigned cod)
 	ine = 0;
 	flg = 1;
 	histch = &stitchBuffer[MAXSEQ];
-	delpnt = hed.stitchCount;
-	for (ind = 0; ind < hed.stitchCount; ind++)
+	delpnt = header.stitchCount;
+	for (ind = 0; ind < header.stitchCount; ind++)
 	{
 		if ((stitchBuffer[ind].attribute&WLKFMSK) != cod)
 		{
@@ -1078,11 +1078,11 @@ void delwlk(unsigned cod)
 		}
 	}
 	mvstchs(0, MAXSEQ, ine);
-	hed.stitchCount = ine;
+	header.stitchCount = ine;
 	if (ine)
 	{
-		if (delpnt > (unsigned)hed.stitchCount)
-			delpnt = hed.stitchCount;
+		if (delpnt > (unsigned)header.stitchCount)
+			delpnt = header.stitchCount;
 	}
 }
 
@@ -1292,8 +1292,8 @@ void fnuang() {
 	unsigned	ind;
 
 	frmcpy(&angfrm, &formList[closestFormToCursor]);
-	rotcntr.x = (double)(angfrm.rectangle.right - angfrm.rectangle.left) / 2 + angfrm.rectangle.left;
-	rotcntr.y = (double)(angfrm.rectangle.top - angfrm.rectangle.bottom) / 2 + angfrm.rectangle.bottom;
+	rotationCenter.x = (double)(angfrm.rectangle.right - angfrm.rectangle.left) / 2 + angfrm.rectangle.left;
+	rotationCenter.y = (double)(angfrm.rectangle.top - angfrm.rectangle.bottom) / 2 + angfrm.rectangle.bottom;
 	angfrm.vertices = angflt;
 	for (ind = 0; ind < angfrm.sides; ind++) {
 
@@ -1332,9 +1332,9 @@ void fnund(unsigned find)
 	baksiz = userStitchLength;
 	userStitchLength = 1e99;
 	if (!ptrSelectedForm->underlaySpacing)
-		ptrSelectedForm->underlaySpacing = ini.underlaySpacing;
+		ptrSelectedForm->underlaySpacing = iniFile.underlaySpacing;
 	if (!ptrSelectedForm->underlayStitchLen)
-		ptrSelectedForm->underlayStitchLen = ini.underlayStitchLen;
+		ptrSelectedForm->underlayStitchLen = iniFile.underlayStitchLen;
 	undclp();
 	setMap(ISUND);
 	angclpfn();
@@ -1412,24 +1412,24 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 	case WM_INITDIALOG:
 
-		l_xat = ini.featherType;
+		l_xat = iniFile.featherType;
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-		sprintf_s(buf, sizeof(buf), "%.2f", ini.featherRatio);
+		sprintf_s(buf, sizeof(buf), "%.2f", iniFile.featherRatio);
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf);
-		sprintf_s(buf, sizeof(buf), "%d", ini.featherUpCount);
+		sprintf_s(buf, sizeof(buf), "%d", iniFile.featherUpCount);
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf);
-		sprintf_s(buf, sizeof(buf), "%d", ini.featherDownCount);
+		sprintf_s(buf, sizeof(buf), "%d", iniFile.featherDownCount);
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf);
-		sprintf_s(buf, sizeof(buf), "%.2f", ini.featherMinStitchSize / PFGRAN);
+		sprintf_s(buf, sizeof(buf), "%.2f", iniFile.featherMinStitchSize / PFGRAN);
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf);
-		sprintf_s(buf, sizeof(buf), "%d", ini.featherCount);
+		sprintf_s(buf, sizeof(buf), "%d", iniFile.featherCount);
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf);
 		for (ind = 0; ind < 6; ind++) {
 
 			LoadString(hInst, IDS_FTH0 + ind, buf, HBUFSIZ);
 			SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, (long)buf);
 		}
-		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, ini.featherFillType - 1, 0);
+		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, iniFile.featherFillType - 1, 0);
 		if (l_xat&AT_FTHBLND)
 			stat = BST_CHECKED;
 		else
@@ -1458,36 +1458,36 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 		case IDOK:
 
-			ini.featherType = 0;
+			iniFile.featherType = 0;
 			if (IsDlgButtonChecked(hwndlg, IDC_FDBLND))
-				ini.featherType = AT_FTHBLND;
+				iniFile.featherType = AT_FTHBLND;
 			if (IsDlgButtonChecked(hwndlg, IDC_FDUP))
-				ini.featherType |= AT_FTHUP;
+				iniFile.featherType |= AT_FTHUP;
 			if (IsDlgButtonChecked(hwndlg, IDC_FDWN))
-				ini.featherType |= AT_FTHDWN;
+				iniFile.featherType |= AT_FTHDWN;
 			GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf, HBUFSIZ);
-			ini.featherFillType = FDEFTYP;
+			iniFile.featherFillType = FDEFTYP;
 			for (ind = 0; ind < 6; ind++) {
 
 				LoadString(hInst, IDS_FTH0 + ind, buf1, HBUFSIZ);
 				if (!strcmp(buf, buf1)) {
 
-					ini.featherFillType = ind + 1;
+					iniFile.featherFillType = ind + 1;
 					break;
 				}
 			}
 			GetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf, HBUFSIZ);
-			ini.featherRatio = atof(buf);
+			iniFile.featherRatio = atof(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf, HBUFSIZ);
-			ini.featherUpCount = atoi(buf);
+			iniFile.featherUpCount = atoi(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf, HBUFSIZ);
-			ini.featherDownCount = atoi(buf);
+			iniFile.featherDownCount = atoi(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf, HBUFSIZ);
-			ini.featherMinStitchSize = atof(buf)*PFGRAN;
+			iniFile.featherMinStitchSize = atof(buf)*PFGRAN;
 			GetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf, HBUFSIZ);
-			ini.featherCount = atoi(buf);
-			if (ini.featherCount < 1)
-				ini.featherCount = 1;
+			iniFile.featherCount = atoi(buf);
+			if (iniFile.featherCount < 1)
+				iniFile.featherCount = 1;
 			EndDialog(hwndlg, 1);
 			break;
 		}
@@ -1507,7 +1507,7 @@ void srtcol() {
 	fPOINTATTRIBUTE*		phi;
 
 	FillMemory(&hst, 64, 0);
-	for (ind = 0; ind < hed.stitchCount; ind++)
+	for (ind = 0; ind < header.stitchCount; ind++)
 		hst[stitchBuffer[ind].attribute&COLMSK]++;
 	ine = 0;
 	for (ind = 0; ind < 16; ind++) {
@@ -1517,9 +1517,9 @@ void srtcol() {
 		ine += tmp;
 	}
 	phi = &stitchBuffer[MAXSEQ];
-	for (ind = 0; ind < hed.stitchCount; ind++)
+	for (ind = 0; ind < header.stitchCount; ind++)
 		mvstch(&phi[hst[stitchBuffer[ind].attribute&COLMSK]++], &stitchBuffer[ind]);
-	MoveMemory(&stitchBuffer, phi, sizeof(fPOINTATTRIBUTE)*hed.stitchCount);
+	MoveMemory(&stitchBuffer, phi, sizeof(fPOINTATTRIBUTE)*header.stitchCount);
 }
 
 void dubit(unsigned bit)
@@ -1536,12 +1536,12 @@ void dubit(unsigned bit)
 			ptrSelectedForm->underlayColor = ptrSelectedForm->fillColor;
 		else
 			ptrSelectedForm->underlayColor = activeColor;
-		ptrSelectedForm->underlayStitchLen = ini.underlayStitchLen;
+		ptrSelectedForm->underlayStitchLen = iniFile.underlayStitchLen;
 	}
 	if (!(ptrSelectedForm->extendedAttribute&AT_UND) && bit&AT_UND)
 	{
-		ptrSelectedForm->underlayStitchAngle = ini.underlayAngle;
-		ptrSelectedForm->underlaySpacing = ini.underlaySpacing;
+		ptrSelectedForm->underlayStitchAngle = iniFile.underlayAngle;
+		ptrSelectedForm->underlaySpacing = iniFile.underlaySpacing;
 	}
 	cod = ptrSelectedForm->extendedAttribute&bit;
 	if (cod)
@@ -1556,25 +1556,25 @@ void dubit(unsigned bit)
 void setuang()
 {
 	setMap(GTUANG);
-	msgflt(IDS_UANG, ini.underlayAngle / PI * 180);
+	msgflt(IDS_UANG, iniFile.underlayAngle / PI * 180);
 }
 
 void setuspac()
 {
 	setMap(GTUSPAC);
-	msgflt(IDS_USPAC, ini.underlaySpacing / PFGRAN);
+	msgflt(IDS_USPAC, iniFile.underlaySpacing / PFGRAN);
 }
 
 void setwlkind()
 {
 	setMap(GTWLKIND);
-	msgflt(IDS_WLKIND, ini.underlayIndent / PFGRAN);
+	msgflt(IDS_WLKIND, iniFile.underlayIndent / PFGRAN);
 }
 
 void setulen()
 {
 	setMap(GTWLKLEN);
-	msgflt(IDS_WLKLEN, ini.underlayStitchLen / PFGRAN);
+	msgflt(IDS_WLKLEN, iniFile.underlayStitchLen / PFGRAN);
 }
 
 void chkcwlk()
@@ -1612,29 +1612,29 @@ void chkdaz()
 {
 	float	len;
 
-	if (!ini.daisyPetalPoints)
-		ini.daisyPetalPoints = 1;
-	if (!ini.daisyInnerCount)
-		ini.daisyInnerCount = 1;
-	if (!ini.daisyPetalCount)
-		ini.daisyPetalCount = 1;
-	len = ini.daisyDiameter*0.999;
-	if (ini.daisyHeartCount > ini.daisyPetalPoints)
-		ini.daisyHeartCount = ini.daisyPetalPoints;
+	if (!iniFile.daisyPetalPoints)
+		iniFile.daisyPetalPoints = 1;
+	if (!iniFile.daisyInnerCount)
+		iniFile.daisyInnerCount = 1;
+	if (!iniFile.daisyPetalCount)
+		iniFile.daisyPetalCount = 1;
+	len = iniFile.daisyDiameter*0.999;
+	if (iniFile.daisyHeartCount > iniFile.daisyPetalPoints)
+		iniFile.daisyHeartCount = iniFile.daisyPetalPoints;
 }
 
 void dazdef()
 {
-	ini.daisyPetalPoints = DAZCNT;
-	ini.daisyHoleDiameter = DAZHLEN;
-	ini.daisyInnerCount = DAZICNT;
-	ini.daisyDiameter = DAZLEN;
-	ini.daisyPetalCount = DAZPETS;
-	ini.daisyPetalLen = DAZPLEN;
-	ini.daisyHeartCount = DAZMCNT;
+	iniFile.daisyPetalPoints = DAZCNT;
+	iniFile.daisyHoleDiameter = DAZHLEN;
+	iniFile.daisyInnerCount = DAZICNT;
+	iniFile.daisyDiameter = DAZLEN;
+	iniFile.daisyPetalCount = DAZPETS;
+	iniFile.daisyPetalLen = DAZPLEN;
+	iniFile.daisyHeartCount = DAZMCNT;
 	setu(DAZHOL);
 	setu(DAZD);
-	ini.daisyBorderType = DAZTYP;
+	iniFile.daisyBorderType = DAZTYP;
 }
 
 BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
@@ -1652,19 +1652,19 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 	reinit:;
 		chkdaz();
-		sprintf_s(buf, sizeof(buf), "%d", ini.daisyPetalPoints);
+		sprintf_s(buf, sizeof(buf), "%d", iniFile.daisyPetalPoints);
 		SetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buf);
-		sprintf_s(buf, sizeof(buf), "%d", ini.daisyHeartCount);
+		sprintf_s(buf, sizeof(buf), "%d", iniFile.daisyHeartCount);
 		SetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buf);
-		sprintf_s(buf, sizeof(buf), "%.2f", ini.daisyDiameter);
+		sprintf_s(buf, sizeof(buf), "%.2f", iniFile.daisyDiameter);
 		SetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buf);
-		sprintf_s(buf, sizeof(buf), "%.2f", ini.daisyHoleDiameter);
+		sprintf_s(buf, sizeof(buf), "%.2f", iniFile.daisyHoleDiameter);
 		SetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buf);
-		sprintf_s(buf, sizeof(buf), "%d", ini.daisyInnerCount);
+		sprintf_s(buf, sizeof(buf), "%d", iniFile.daisyInnerCount);
 		SetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buf);
-		sprintf_s(buf, sizeof(buf), "%d", ini.daisyPetalCount);
+		sprintf_s(buf, sizeof(buf), "%d", iniFile.daisyPetalCount);
 		SetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buf);
-		sprintf_s(buf, sizeof(buf), "%.2f", ini.daisyPetalLen);
+		sprintf_s(buf, sizeof(buf), "%.2f", iniFile.daisyPetalLen);
 		SetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buf);
 		CheckDlgButton(hwndlg, IDC_HOLE, chku(DAZHOL));
 		CheckDlgButton(hwndlg, IDC_DLIN, chku(DAZD));
@@ -1673,7 +1673,7 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 			LoadString(hInst, daztab[ind], buf, HBUFSIZ);
 			SendMessage(GetDlgItem(hwndlg, IDC_DAZTYP), CB_ADDSTRING, 0, (long)buf);
 		}
-		SendMessage(GetDlgItem(hwndlg, IDC_DAZTYP), CB_SETCURSEL, ini.daisyBorderType, 0);
+		SendMessage(GetDlgItem(hwndlg, IDC_DAZTYP), CB_SETCURSEL, iniFile.daisyBorderType, 0);
 		break;
 
 	case WM_COMMAND:
@@ -1688,19 +1688,19 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		case IDOK:
 
 			GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buf, HBUFSIZ);
-			ini.daisyPetalPoints = atoi(buf);
+			iniFile.daisyPetalPoints = atoi(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buf, HBUFSIZ);
-			ini.daisyHeartCount = atoi(buf);
+			iniFile.daisyHeartCount = atoi(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buf, HBUFSIZ);
-			ini.daisyDiameter = atof(buf);
+			iniFile.daisyDiameter = atof(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buf, HBUFSIZ);
-			ini.daisyHoleDiameter = atof(buf);
+			iniFile.daisyHoleDiameter = atof(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buf, HBUFSIZ);
-			ini.daisyInnerCount = atoi(buf);
+			iniFile.daisyInnerCount = atoi(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buf, HBUFSIZ);
-			ini.daisyPetalCount = atoi(buf);
+			iniFile.daisyPetalCount = atoi(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buf, HBUFSIZ);
-			ini.daisyPetalLen = atof(buf);
+			iniFile.daisyPetalLen = atof(buf);
 			if (IsDlgButtonChecked(hwndlg, IDC_HOLE))
 				setu(DAZHOL);
 			else
@@ -1715,7 +1715,7 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 				LoadString(hInst, daztab[ind], buf1, HBUFSIZ);
 				if (!strcmp(buf, buf1))
 				{
-					ini.daisyBorderType = ind;
+					iniFile.daisyBorderType = ind;
 					break;
 				}
 			}
@@ -1765,11 +1765,11 @@ void dasyfrm() {
 		rstMap(FORMIN);
 		return;
 	}
-	ini.daisyPetalCount = ini.daisyPetalCount;
-	len = ini.daisyDiameter;
-	elen = ini.daisyPetalLen;
-	ilen = ini.daisyHoleDiameter;
-	dtyp = ini.daisyBorderType;
+	iniFile.daisyPetalCount = iniFile.daisyPetalCount;
+	len = iniFile.daisyDiameter;
+	elen = iniFile.daisyPetalLen;
+	ilen = iniFile.daisyHoleDiameter;
+	dtyp = iniFile.daisyBorderType;
 	ref.x = midl(zoomRect.right, zoomRect.left);
 	ref.y = midl(zoomRect.top, zoomRect.bottom);
 	ptrSelectedForm = &formList[formIndex];
@@ -1778,7 +1778,7 @@ void dasyfrm() {
 	ptrSelectedForm->vertices = &formPoints[fltad];
 	ptrSelectedForm->attribute = activeLayer << 1;
 	fvars(formIndex);
-	cnt2 = ini.daisyPetalPoints >> 1;
+	cnt2 = iniFile.daisyPetalPoints >> 1;
 	maxcor = zoomRect.right - zoomRect.left;
 	drat = zoomRect.top - zoomRect.bottom;
 	if (drat > maxcor)
@@ -1793,7 +1793,7 @@ void dasyfrm() {
 	if (chku(DAZHOL))
 	{
 		pang = PI2;
-		bcnt = ini.daisyPetalCount*ini.daisyInnerCount;
+		bcnt = iniFile.daisyPetalCount*iniFile.daisyInnerCount;
 		dang = PI2 / bcnt;
 		currentFormVertices[inf].x = ref.x + len*cos(pang);
 		currentFormVertices[inf].y = ref.y + len*sin(pang);
@@ -1808,22 +1808,22 @@ void dasyfrm() {
 		fref = inf;
 	}
 	pang = 0;
-	bcnt = ini.daisyPetalCount*ini.daisyPetalPoints;
-	pcnt = ini.daisyPetalPoints;
+	bcnt = iniFile.daisyPetalCount*iniFile.daisyPetalPoints;
+	pcnt = iniFile.daisyPetalPoints;
 	if (dtyp == DHART)
 	{
-		pcnt = (ini.daisyHeartCount + 1) << 1;
-		bcnt = ini.daisyPetalCount*pcnt;
+		pcnt = (iniFile.daisyHeartCount + 1) << 1;
+		bcnt = iniFile.daisyPetalCount*pcnt;
 	}
 	dang = PI2 / bcnt;
-	dangp = PI / ini.daisyPetalPoints;
+	dangp = PI / iniFile.daisyPetalPoints;
 	if (chku(DAZD))
 	{
-		ptrSelectedForm->satinGuideCount = ini.daisyPetalCount - 1;
-		ptrSelectedForm->wpar = ini.daisyPetalCount*ini.daisyInnerCount + 1;
-		ptrSelectedForm->satinOrAngle.sac = adsatk(ini.daisyPetalCount - 1);
+		ptrSelectedForm->satinGuideCount = iniFile.daisyPetalCount - 1;
+		ptrSelectedForm->wpar = iniFile.daisyPetalCount*iniFile.daisyInnerCount + 1;
+		ptrSelectedForm->satinOrAngle.sac = adsatk(iniFile.daisyPetalCount - 1);
 	}
-	for (ind = 0; ind < ini.daisyPetalCount; ind++)
+	for (ind = 0; ind < iniFile.daisyPetalCount; ind++)
 	{
 		pangp = 0;
 		psgacc = SEED;
@@ -1839,21 +1839,21 @@ void dasyfrm() {
 
 			case DRAMP:
 
-				dlen = len + (double)ine / ini.daisyPetalPoints*elen;
+				dlen = len + (double)ine / iniFile.daisyPetalPoints*elen;
 				break;
 
 			case DSAW:
 
 				if (ine > cnt2)
-					dcnt = ini.daisyPetalPoints - ine;
+					dcnt = iniFile.daisyPetalPoints - ine;
 				else
 					dcnt = ine;
-				dlen = len + (double)dcnt / ini.daisyPetalPoints*elen;
+				dlen = len + (double)dcnt / iniFile.daisyPetalPoints*elen;
 				break;
 
 			case DRAG:
 
-				dlen = len + (double)(psg() % ini.daisyPetalPoints) / ini.daisyPetalPoints*elen;
+				dlen = len + (double)(psg() % iniFile.daisyPetalPoints) / iniFile.daisyPetalPoints*elen;
 				break;
 
 			case DCOG:
@@ -1866,7 +1866,7 @@ void dasyfrm() {
 			case DHART:
 
 				dlen = len + sin(pangp)*elen;
-				if (ine > ini.daisyHeartCount)
+				if (ine > iniFile.daisyHeartCount)
 					pangp -= dangp;
 				else
 					pangp += dangp;
@@ -1876,9 +1876,9 @@ void dasyfrm() {
 			currentFormVertices[inf].y = ref.y + sin(pang)*dlen;
 			inf++;
 			pang += dang;
-			if (chku(DAZD) && ind != ini.daisyPetalCount - 1)
+			if (chku(DAZD) && ind != iniFile.daisyPetalCount - 1)
 			{
-				ptrSelectedForm->satinOrAngle.sac[ind].start = (ini.daisyPetalCount - ind - 1)*ini.daisyInnerCount + 1;
+				ptrSelectedForm->satinOrAngle.sac[ind].start = (iniFile.daisyPetalCount - ind - 1)*iniFile.daisyInnerCount + 1;
 				ptrSelectedForm->satinOrAngle.sac[ind].finish = inf;
 			}
 		}
@@ -2160,7 +2160,7 @@ void fsort()
 		if (ind != underlayColor)
 			colord[ind] = ind + 1;
 	}
-	for (ind = 1; ind < hed.stitchCount; ind++)
+	for (ind = 1; ind < header.stitchCount; ind++)
 	{
 		if ((stitchBuffer[ind].attribute&SRTMSK) != at)
 		{
@@ -2172,8 +2172,8 @@ void fsort()
 			at = stitchBuffer[ind].attribute&SRTMSK;
 		}
 	}
-	recs[rind].epnt = &stitchBuffer[hed.stitchCount - 1];
-	recs[rind].finish = hed.stitchCount;
+	recs[rind].epnt = &stitchBuffer[header.stitchCount - 1];
+	recs[rind].finish = header.stitchCount;
 	rind++;
 	precs = (OREC**)&recs[rind];
 	pfrecs = (OREC**)&recs[rind << 1];
@@ -2256,7 +2256,7 @@ void fsort()
 			precjmps(&srec);
 		}
 		mvstchs(0, MAXSEQ, opnt);
-		hed.stitchCount = opnt;
+		header.stitchCount = opnt;
 		coltab();
 		setMap(RESTCH);
 	}
@@ -2312,7 +2312,7 @@ void filim(FRMLIM* flim, unsigned * lmap)
 
 	fcod = closestFormToCursor << FRMSHFT;
 	*lmap = 0;
-	for (ind = 0; ind < hed.stitchCount; ind++)
+	for (ind = 0; ind < header.stitchCount; ind++)
 	{
 		at = stitchBuffer[ind].attribute;
 		if (fcod == (at&FRMSK))
@@ -2447,7 +2447,7 @@ void dmpat()
 
 	duatf(0);
 	at = stitchBuffer[0].attribute;
-	for (ind = 1; ind < hed.stitchCount; ind++)
+	for (ind = 1; ind < header.stitchCount; ind++)
 	{
 		if (at != stitchBuffer[ind].attribute)
 		{
@@ -2470,7 +2470,7 @@ void fdelstch()
 	ine = 0;
 	bcol = ptrSelectedForm->borderColor&COLMSK;
 	tapcol = ptrSelectedForm->borderColor >> 4;
-	for (ind = 0; ind < hed.stitchCount; ind++)
+	for (ind = 0; ind < header.stitchCount; ind++)
 	{
 		if (!chku(FIL2OF) && chkMap(SELBOX) && ind == closestPointIndex)
 			closestPointIndex = ine;
@@ -2560,14 +2560,14 @@ void fdelstch()
 	fstrts.ecol++;
 	fstrts.apcol++;
 	smap = tmap;
-	hed.stitchCount = ine;
+	header.stitchCount = ine;
 	ine = 0;
 	if (!(tmap&M_ECOL))
-		fstrts.ecol = hed.stitchCount;
+		fstrts.ecol = header.stitchCount;
 	if (!(tmap&M_FTHCOL))
-		fstrts.fthcol = hed.stitchCount;
+		fstrts.fthcol = header.stitchCount;
 	if (!(tmap&M_FCOL))
-		fstrts.fcol = hed.stitchCount;
+		fstrts.fcol = header.stitchCount;
 	if (ptrSelectedForm->edgeType)
 	{
 		if (ptrSelectedForm->edgeType == EGAP)
@@ -2577,7 +2577,7 @@ void fdelstch()
 				if (tmap&M_APCOL)
 					fstrts.apl = fstrts.apcol + 1;
 				else
-					fstrts.apl = hed.stitchCount;
+					fstrts.apl = header.stitchCount;
 			}
 		}
 		if (!(tmap&M_BRD))
@@ -2585,7 +2585,7 @@ void fdelstch()
 			if (tmap&M_ECOL)
 				fstrts.brd = fstrts.ecol + 1;
 			else
-				fstrts.brd = hed.stitchCount;
+				fstrts.brd = header.stitchCount;
 		}
 	}
 	if (ptrSelectedForm->fillType || (tmap&(M_WALK | M_UND | M_CWLK)))
@@ -2595,7 +2595,7 @@ void fdelstch()
 			if (tmap&M_FCOL)
 				fstrts.fil = fstrts.fcol + 1;
 			else
-				fstrts.fil = hed.stitchCount;
+				fstrts.fil = header.stitchCount;
 		}
 	}
 	if (ptrSelectedForm->fillType == FTHF)
@@ -2605,7 +2605,7 @@ void fdelstch()
 			if (tmap&M_FTHCOL)
 				fstrts.fth = fstrts.fthcol + 1;
 			else
-				fstrts.fth = hed.stitchCount;
+				fstrts.fth = header.stitchCount;
 		}
 	}
 	stpnt = (unsigned*)&fstrts;
@@ -2706,7 +2706,7 @@ void intlv()
 	FillMemory(&itf, sizeof(INTINF), 0);
 	itf.layerIndex = ((ptrSelectedForm->attribute&FRMLMSK) << (LAYSHFT - 1)) | (closestFormToCursor << FRMSHFT);
 	rstMap(DIDSTRT);
-	if (hed.stitchCount)
+	if (header.stitchCount)
 	{
 		off = MAXSEQ;
 		itf.histch = &stitchBuffer[MAXSEQ];
@@ -2755,9 +2755,9 @@ void intlv()
 			duint(off, cod);
 		}
 		chkend(MAXSEQ, cod);
-		if (hed.stitchCount&&itf.sloc < (unsigned)hed.stitchCount - 1)
+		if (header.stitchCount&&itf.sloc < (unsigned)header.stitchCount - 1)
 		{
-			ine = hed.stitchCount - itf.sloc;
+			ine = header.stitchCount - itf.sloc;
 			MoveMemory(&stitchBuffer[itf.oloc + MAXSEQ], &stitchBuffer[itf.sloc], sizeof(fPOINTATTRIBUTE)*ine);
 			itf.oloc += ine;
 		}
@@ -2788,7 +2788,7 @@ void intlv()
 		}
 		chkend(0, cod);
 	}
-	hed.stitchCount = itf.oloc;
+	header.stitchCount = itf.oloc;
 	coltab();
 }
 
@@ -3597,7 +3597,7 @@ void duauxnam()
 	else
 		pext = &fileName[strlen(fileName)];
 	*pext = 0;
-	switch (ini.auxFileType) {
+	switch (iniFile.auxFileType) {
 
 	case AUXDST:
 
@@ -3621,14 +3621,14 @@ void duauxnam()
 
 void dutxtfil()
 {
-	if (!ini.textureHeight)
-		ini.textureHeight = ITXHI;
-	if (!ini.textureWidth)
-		ini.textureWidth = ITXWID;
-	if (!ini.textureSpacing)
-		ini.textureSpacing = (float)ITXSPAC;
-	if (!ini.textureEditorSizePixels)
-		ini.textureEditorSizePixels = ITXPIX;
+	if (!iniFile.textureHeight)
+		iniFile.textureHeight = ITXHI;
+	if (!iniFile.textureWidth)
+		iniFile.textureWidth = ITXWID;
+	if (!iniFile.textureSpacing)
+		iniFile.textureSpacing = (float)ITXSPAC;
+	if (!iniFile.textureEditorSizePixels)
+		iniFile.textureEditorSizePixels = ITXPIX;
 	angfrm.sides = 0;
 	setMap(TXTRED);
 	setMap(ZUMED);
@@ -3645,20 +3645,20 @@ void dutxtfil()
 	{
 		redtbak();
 		if (!tscr.areaHeight)
-			tscr.areaHeight = ini.textureHeight;
+			tscr.areaHeight = iniFile.textureHeight;
 		if (!tscr.spacing)
-			tscr.spacing = ini.underlaySpacing;
+			tscr.spacing = iniFile.underlaySpacing;
 		if (!tscr.width)
-			tscr.width = ini.textureWidth;
+			tscr.width = iniFile.textureWidth;
 		setMap(LASTXBAK);
 		rstMap(TXBDIR);
 	}
 	else
 	{
 		tscr.index = 0;
-		tscr.areaHeight = ini.textureHeight;
-		tscr.width = ini.textureWidth;
-		tscr.spacing = ini.textureSpacing;
+		tscr.areaHeight = iniFile.textureHeight;
+		tscr.width = iniFile.textureWidth;
+		tscr.spacing = iniFile.textureSpacing;
 	}
 	setMap(RESTCH);
 }
@@ -3706,13 +3706,13 @@ void txrct2rct(TXTRCT txr, RECT* rct)
 	txp.line = txr.left;
 	txp.y = txr.top;
 	txt2pix(txp, &tpnt);
-	rct->left = tpnt.x - ini.textureEditorSizePixels;
-	rct->top = tpnt.y - ini.textureEditorSizePixels;
+	rct->left = tpnt.x - iniFile.textureEditorSizePixels;
+	rct->top = tpnt.y - iniFile.textureEditorSizePixels;
 	txp.line = txr.right;
 	txp.y = txr.bottom;
 	txt2pix(txp, &tpnt);
-	rct->right = tpnt.x + ini.textureEditorSizePixels;
-	rct->bottom = tpnt.y + ini.textureEditorSizePixels;
+	rct->right = tpnt.x + iniFile.textureEditorSizePixels;
+	rct->bottom = tpnt.y + iniFile.textureEditorSizePixels;
 }
 
 void ed2px(fPOINT ped, POINT* px)
@@ -3819,7 +3819,7 @@ void drwtxtr()
 	tscr.yOffset = (tscr.screenHeight - tscr.areaHeight) / 2;
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	SelectObject(StitchWindowMemDC, gridPen);
-	cnt = tscr.areaHeight / ini.gridSize + 1;
+	cnt = tscr.areaHeight / iniFile.gridSize + 1;
 	txp.line = 0;
 	xlin[0].x = 0;
 	xlin[1].x = stitchWindowClientRect.right;
@@ -3829,7 +3829,7 @@ void drwtxtr()
 		txt2pix(txp, &tpnt);
 		xlin[0].y = xlin[1].y = tpnt.y;
 		Polyline(StitchWindowMemDC, xlin, 2);
-		txp.y += ini.gridSize;
+		txp.y += iniFile.gridSize;
 	}
 	DeleteObject(xpen);
 	xpen = CreatePen(PS_SOLID, 1, userColor[activeColor]);
@@ -3855,7 +3855,7 @@ void drwtxtr()
 	col = userColor[activeColor];
 	for (ind = 0; ind < tscr.index; ind++)
 	{
-		dutxtx(ind, ini.textureEditorSizePixels);
+		dutxtx(ind, iniFile.textureEditorSizePixels);
 	}
 	if (cloxcnt)
 	{
@@ -3876,8 +3876,8 @@ void drwtxtr()
 	}
 	for (ind = 0; ind < cloxcnt; ind++)
 	{
-		dutxtx(cloxlst[ind], ini.textureEditorSizePixels);
-		dutxtx(cloxlst[ind], ini.textureEditorSizePixels << 1);
+		dutxtx(cloxlst[ind], iniFile.textureEditorSizePixels);
+		dutxtx(cloxlst[ind], iniFile.textureEditorSizePixels << 1);
 	}
 	BitBlt(StitchWindowDC, 0, 0, stitchWindowClientRect.right, stitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
 	drwtxbut();
@@ -3957,7 +3957,7 @@ void tritx()
 	POINT	xlin[2];
 	int		li_Size;
 
-	li_Size = ini.textureEditorSizePixels << 2;
+	li_Size = iniFile.textureEditorSizePixels << 2;
 	xlin[0].x = xlin[1].x = txtloc.x;
 	xlin[0].y = txtloc.y - li_Size;
 	xlin[1].y = txtloc.y + li_Size;
@@ -4180,7 +4180,7 @@ void txtrup()
 		if (rstMap(BZUMIN))
 		{
 			deorg(&of);
-			ed2txp(blin[0], &hi);
+			ed2txp(zoomBoxLine[0], &hi);
 			ed2txp(of, &lo);
 			if (hi.line < lo.line)
 			{
@@ -4405,9 +4405,9 @@ void txpar()
 	ptrSelectedForm->fillInfo.texture.lines = tscr.lines;
 	ptrSelectedForm->fillInfo.texture.height = tscr.areaHeight;
 	ptrSelectedForm->fillSpacing = tscr.spacing;
-	ptrSelectedForm->lengthOrCount.stitchLength = ini.userStitchLength;
-	ptrSelectedForm->maxFillStitchLen = ini.maxStitchLength;
-	ptrSelectedForm->minFillStitchLen = ini.minStitchLength;
+	ptrSelectedForm->lengthOrCount.stitchLength = iniFile.userStitchLength;
+	ptrSelectedForm->maxFillStitchLen = iniFile.maxStitchLength;
+	ptrSelectedForm->minFillStitchLen = iniFile.minStitchLength;
 	ptrSelectedForm->fillColor = activeColor;
 	refilfn();
 }
@@ -4446,7 +4446,7 @@ void txang()
 		{
 			fvars(closestFormToCursor);
 			ptrSelectedForm->fillType = TXANGF;
-			ptrSelectedForm->angleOrClipData.angle = (float)ini.fillAngle;
+			ptrSelectedForm->angleOrClipData.angle = (float)iniFile.fillAngle;
 			txpar();
 		}
 	}
@@ -4696,9 +4696,9 @@ void txtlbut()
 	cloxcnt = 0;
 	setMap(BZUMIN);
 	rstMap(BZUM);
-	blin[0].x = blin[3].x = blin[4].x = msg.pt.x - stitchWindowOrigin.x;
-	blin[0].y = blin[1].y = msg.pt.y - stitchWindowOrigin.y;
-	blin[4].y = blin[0].y - 1;
+	zoomBoxLine[0].x = zoomBoxLine[3].x = zoomBoxLine[4].x = msg.pt.x - stitchWindowOrigin.x;
+	zoomBoxLine[0].y = zoomBoxLine[1].y = msg.pt.y - stitchWindowOrigin.y;
+	zoomBoxLine[4].y = zoomBoxLine[0].y - 1;
 }
 
 void redtbak()
@@ -4811,7 +4811,7 @@ void chktxnum()
 
 			savtxt();
 			tscr.areaHeight = tflt;
-			ini.textureHeight = tflt;
+			iniFile.textureHeight = tflt;
 			setMap(CHKTX);
 			break;
 
@@ -4819,7 +4819,7 @@ void chktxnum()
 
 			savtxt();
 			tscr.width = tflt;
-			ini.textureWidth = tflt;
+			iniFile.textureWidth = tflt;
 			setMap(CHKTX);
 			break;
 
@@ -4827,7 +4827,7 @@ void chktxnum()
 
 			savtxt();
 			tscr.spacing = tflt;
-			ini.textureSpacing = tflt;
+			iniFile.textureSpacing = tflt;
 			tscr.width = tflt*tscr.lines + tflt / 2;
 			setMap(CHKTX);
 			break;
@@ -4970,14 +4970,14 @@ void txsnap()
 	if (tscr.index)
 	{
 		savtxt();
-		siz2 = ini.gridSize / 2;
+		siz2 = iniFile.gridSize / 2;
 		if (cloxcnt)
 		{
 			for (ind = 0; ind < cloxcnt; ind++)
 			{
 				tp = &txtmp[cloxlst[ind]];
-				cnt = (tp->y + siz2) / ini.gridSize;
-				tp->y = cnt*ini.gridSize;
+				cnt = (tp->y + siz2) / iniFile.gridSize;
+				tp->y = cnt*iniFile.gridSize;
 			}
 		}
 		else
@@ -4985,8 +4985,8 @@ void txsnap()
 			for (ind = 0; ind < tscr.index; ind++)
 			{
 				tp = &txtmp[ind];
-				cnt = (tp->y + siz2) / ini.gridSize;
-				tp->y = cnt*ini.gridSize;
+				cnt = (tp->y + siz2) / iniFile.gridSize;
+				tp->y = cnt*iniFile.gridSize;
 			}
 		}
 		setMap(RESTCH);
@@ -5135,12 +5135,12 @@ void txtkey(unsigned cod)
 
 	case VK_UP:
 
-		txnudg(0, ini.cursorNudgeStep);
+		txnudg(0, iniFile.cursorNudgeStep);
 		break;
 
 	case VK_DOWN:
 
-		txnudg(0, -ini.cursorNudgeStep);
+		txnudg(0, -iniFile.cursorNudgeStep);
 		break;
 
 	case 'S':
@@ -5311,7 +5311,7 @@ void nudfn()
 	osiz.y = sizrct.top - sizrct.bottom;
 	sizrat.x = dsgnsiz.x / osiz.x;
 	sizrat.y = dsgnsiz.y / osiz.y;
-	for (ind = 0; ind < hed.stitchCount; ind++)
+	for (ind = 0; ind < header.stitchCount; ind++)
 		sadj(&stitchBuffer[ind]);
 	for (ind = 0; ind < fltad; ind++)
 		sadj(&formPoints[ind]);
@@ -5326,7 +5326,7 @@ void nudsiz()
 
 	savdo();
 	flg = 0;
-	if (hed.stitchCount)
+	if (header.stitchCount)
 	{
 		stchrct(&sizrct);
 		flg = 1;
@@ -5346,16 +5346,16 @@ void nudsiz()
 		if (DialogBox(hInst, MAKEINTRESOURCE(IDD_SIZ), hWnd, (DLGPROC)setsprc))
 		{
 			flg = 0;
-			if (dsgnsiz.x > ini.hoopSizeX)
+			if (dsgnsiz.x > iniFile.hoopSizeX)
 			{
-				ini.hoopSizeX = dsgnsiz.x*1.05;
-				unzoomedRect.x = ini.hoopSizeX;
+				iniFile.hoopSizeX = dsgnsiz.x*1.05;
+				unzoomedRect.x = iniFile.hoopSizeX;
 				flg = 1;
 			}
-			if (dsgnsiz.y > ini.hoopSizeY)
+			if (dsgnsiz.y > iniFile.hoopSizeY)
 			{
-				ini.hoopSizeY = dsgnsiz.y*1.05;
-				unzoomedRect.y = ini.hoopSizeY;
+				iniFile.hoopSizeY = dsgnsiz.y*1.05;
+				unzoomedRect.y = iniFile.hoopSizeY;
 				flg = 1;
 			}
 			nudfn();
@@ -5379,9 +5379,9 @@ void dushft()
 	//	setMap(BOXSLCT);
 	setMap(BZUMIN);
 	//	setMap(NOSEL);
-	blin[0].x = blin[3].x = blin[4].x = msg.pt.x - stitchWindowOrigin.x;
-	blin[0].y = blin[1].y = msg.pt.y - stitchWindowOrigin.y;
-	blin[4].y = blin[0].y - 1;
+	zoomBoxLine[0].x = zoomBoxLine[3].x = zoomBoxLine[4].x = msg.pt.x - stitchWindowOrigin.x;
+	zoomBoxLine[0].y = zoomBoxLine[1].y = msg.pt.y - stitchWindowOrigin.y;
+	zoomBoxLine[4].y = zoomBoxLine[0].y - 1;
 	px2stch();
 	zoomBoxOrigin.x = sPnt.x;
 	zoomBoxOrigin.y = sPnt.y;
@@ -5402,8 +5402,8 @@ void mvshft()
 			if (setMap(VCAPT))
 				SetCapture(hWnd);
 			unbBox();
-			blin[1].x = blin[2].x = msg.pt.x - stitchWindowOrigin.x;
-			blin[2].y = blin[3].y = msg.pt.y - stitchWindowOrigin.y;
+			zoomBoxLine[1].x = zoomBoxLine[2].x = msg.pt.x - stitchWindowOrigin.x;
+			zoomBoxLine[2].y = zoomBoxLine[3].y = msg.pt.y - stitchWindowOrigin.y;
 			setMap(BZUM);
 			bBox();
 		}
@@ -5432,16 +5432,16 @@ void setshft()
 	cloxlst = (unsigned*)&oseq;
 	unbBox();
 	rstMap(BZUMIN);
-	pxCor2stch(blin[0]);
+	pxCor2stch(zoomBoxLine[0]);
 	srct.top = sPnt.y;
 	srct.left = sPnt.x;
-	pxCor2stch(blin[2]);
+	pxCor2stch(zoomBoxLine[2]);
 	srct.bottom = sPnt.y;
 	srct.right = sPnt.x;
 	rstMap(TXIN);
 	tscr.index = 0;
 	lin = 1;
-	for (ind = 0; ind < hed.stitchCount; ind++)
+	for (ind = 0; ind < header.stitchCount; ind++)
 	{
 		if (inrct(srct, stitchBuffer[ind]))
 		{
@@ -5466,7 +5466,7 @@ void setshft()
 
 void setclpspac()
 {
-	msgflt(IDS_CLPSPAC, ini.clipboardOffset / PFGRAN);
+	msgflt(IDS_CLPSPAC, iniFile.clipboardOffset / PFGRAN);
 	setMap(NUMIN);
 	setMap(SCLPSPAC);
 	numWnd();
@@ -5579,8 +5579,8 @@ void setangf(double tang)
 	rotationAngle = tang;
 	MoveMemory(&angfrm, ptrSelectedForm, sizeof(FRMHED));
 	MoveMemory(&angflt, currentFormVertices, sizeof(fPOINT)*sides);
-	rotcntr.x = (double)(angfrm.rectangle.right - angfrm.rectangle.left) / 2 + angfrm.rectangle.left;
-	rotcntr.y = (double)(angfrm.rectangle.top - angfrm.rectangle.bottom) / 2 + angfrm.rectangle.bottom;
+	rotationCenter.x = (double)(angfrm.rectangle.right - angfrm.rectangle.left) / 2 + angfrm.rectangle.left;
+	rotationCenter.y = (double)(angfrm.rectangle.top - angfrm.rectangle.bottom) / 2 + angfrm.rectangle.bottom;
 	angfrm.vertices = angflt;
 	if (rotationAngle)
 	{
@@ -5601,7 +5601,7 @@ void chgwrn()
 
 void chgchk(int cod)
 {
-	ini.dataCheck = cod;
+	iniFile.dataCheck = cod;
 	chkmen();
 	setMap(DUMEN);
 }
@@ -5629,12 +5629,12 @@ void lodchk()
 		}
 		frmout(ind);
 		if (!ptrSelectedForm->maxFillStitchLen)
-			ptrSelectedForm->maxFillStitchLen = ini.maxStitchLength;
+			ptrSelectedForm->maxFillStitchLen = iniFile.maxStitchLength;
 		if (!ptrSelectedForm->maxBorderStitchLen)
-			ptrSelectedForm->maxBorderStitchLen = ini.maxStitchLength;
+			ptrSelectedForm->maxBorderStitchLen = iniFile.maxStitchLength;
 	}
 	clRmap((MAXFORMS >> 5) + 1);
-	for (ind = 0; ind < hed.stitchCount; ind++) {
+	for (ind = 0; ind < header.stitchCount; ind++) {
 
 		at = stitchBuffer[ind].attribute;
 		if ((at&TYPMSK) == TYPFRM)
@@ -5647,7 +5647,7 @@ void lodchk()
 			formList[ind].fillType = 0;
 	}
 	clRmap((MAXFORMS >> 5) + 1);
-	for (ind = 0; ind < hed.stitchCount; ind++) {
+	for (ind = 0; ind < header.stitchCount; ind++) {
 
 		at = stitchBuffer[ind].attribute;
 		if (at&TYPBRD)
@@ -5743,10 +5743,10 @@ void frmchkx()
 {
 	unsigned cod;
 
-	if (ini.dataCheck)
+	if (iniFile.dataCheck)
 	{
 		cod = frmchkfn();
-		switch (ini.dataCheck)
+		switch (iniFile.dataCheck)
 		{
 		case 1:
 
@@ -5791,7 +5791,7 @@ void chkfstch()
 	unsigned cod, ind;
 
 	cod = formIndex << FRMSHFT;
-	for (ind = 0; ind < hed.stitchCount; ind++)
+	for (ind = 0; ind < header.stitchCount; ind++)
 	{
 		if ((stitchBuffer[ind].attribute&FRMSK) >= cod)
 			stitchBuffer[ind].attribute = NOTFRM;
@@ -6025,7 +6025,7 @@ void repar()
 
 void tst()
 {
-	strcpy_s(ini.designerName, "Mr");
-	strcpy_s(thrName, ini.designerName);
+	strcpy_s(iniFile.designerName, "Mr");
+	strcpy_s(thrName, iniFile.designerName);
 	setMap(RESTCH);
 }
