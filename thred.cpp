@@ -2761,7 +2761,7 @@ mendun:;
 nomen:;
 }
 
-void mvstch(fPOINTATTRIBUTE* dst, fPOINTATTRIBUTE* src) {
+void moveStitchPoints(fPOINTATTRIBUTE* dst, fPOINTATTRIBUTE* src) {
 
 #if  __UseASM__
 	_asm {
@@ -2802,13 +2802,13 @@ void duzero() {
 					if (len > minStitchLength) {
 
 						lpnt = &stitchBuffer[ind];
-						mvstch(&stitchBuffer[dst++], &stitchBuffer[ind]);
+						moveStitchPoints(&stitchBuffer[dst++], &stitchBuffer[ind]);
 					}
 				} else
 					lpnt = &stitchBuffer[ind];
 			} else {
 
-				mvstch(&stitchBuffer[dst++], &stitchBuffer[ind]);
+				moveStitchPoints(&stitchBuffer[dst++], &stitchBuffer[ind]);
 				rstMap(CONTIG);
 			}
 		}

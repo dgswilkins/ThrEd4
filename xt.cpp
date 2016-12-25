@@ -147,7 +147,7 @@ extern unsigned psg();
 extern unsigned psgacc;
 extern void setknots();
 extern void refil();
-extern void mvstch(fPOINTATTRIBUTE* dst, fPOINTATTRIBUTE* src);
+extern void moveStitchPoints(fPOINTATTRIBUTE* dst, fPOINTATTRIBUTE* src);
 extern BOOL filmsgs(unsigned cod);
 extern unsigned find1st();
 extern double StitchSpace;
@@ -1065,7 +1065,7 @@ void delwlk(unsigned cod)
 	{
 		if ((stitchBuffer[ind].attribute&WLKFMSK) != cod)
 		{
-			mvstch(&histch[ine], &stitchBuffer[ind]);
+			moveStitchPoints(&histch[ine], &stitchBuffer[ind]);
 			ine++;
 		}
 		else
@@ -1518,7 +1518,7 @@ void srtcol() {
 	}
 	phi = &stitchBuffer[MAXSEQ];
 	for (ind = 0; ind < header.stitchCount; ind++)
-		mvstch(&phi[hst[stitchBuffer[ind].attribute&COLMSK]++], &stitchBuffer[ind]);
+		moveStitchPoints(&phi[hst[stitchBuffer[ind].attribute&COLMSK]++], &stitchBuffer[ind]);
 	MoveMemory(&stitchBuffer, phi, sizeof(fPOINTATTRIBUTE)*header.stitchCount);
 }
 
@@ -2045,19 +2045,19 @@ double precjmps(SRTREC* psrec)
 				if (precs[loc]->start)
 				{
 					for (ind = precs[loc]->finish - 1; ind >= precs[loc]->start; ind--)
-						mvstch(&hifstch[opnt++], &stitchBuffer[ind]);
+						moveStitchPoints(&hifstch[opnt++], &stitchBuffer[ind]);
 				}
 				else
 				{
 					ind = precs[loc]->finish;
 					while (ind)
-						mvstch(&hifstch[opnt++], &stitchBuffer[--ind]);
+						moveStitchPoints(&hifstch[opnt++], &stitchBuffer[--ind]);
 				}
 			}
 			else
 			{
 				for (ind = precs[loc]->start; ind < precs[loc]->finish; ind++)
-					mvstch(&hifstch[opnt++], &stitchBuffer[ind]);
+					moveStitchPoints(&hifstch[opnt++], &stitchBuffer[ind]);
 			}
 		}
 	}
