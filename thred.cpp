@@ -1828,7 +1828,6 @@ unsigned pestrn[] = {
 
 DSTREC*		dstRecords;		//pointer to dst stitch records
 unsigned	dstRecordCount;		//number of dst stitch records
-unsigned	trinum;		//for trinary/binary translation
 POINT		dstplus;	//plus offset written into the dst file header
 POINT		dstmin;		//minus offset written into the dst file header
 
@@ -6102,31 +6101,6 @@ void clrfbuf(unsigned p_siz) {
 	}
 #else
 	memset(ptrFileBuffer, 0, p_siz * 4);
-#endif
-}
-
-unsigned xbits(unsigned src, unsigned dst) {
-
-#if  __UseASM__
-	_asm {
-
-		mov		eax, trinum
-		mov		ecx, src
-		shr		eax, cl
-		and		eax, 3
-		mov		ecx, dst
-		shl		eax, cl
-	}
-#else
-	//check translation
-	unsigned bits = trinum;
-
-	bits >>= src & 0xFF;
-	bits &= 3;
-
-	bits <<= dst & 0xFF;
-
-	return bits;
 #endif
 }
 
