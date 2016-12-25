@@ -392,7 +392,6 @@ extern	double			borderWidth;
 extern	BSEQPNT			bseq[BSEQLEN];
 extern	float			buttonholeFillCornerLength;
 extern	fPOINT			clipboardPoints[MAXCLPNTS];
-extern	unsigned		clofinx;
 extern	unsigned		closestFormToCursor;
 extern	unsigned		closestVertexToCursor;
 extern	int				cloxcnt;
@@ -609,7 +608,8 @@ unsigned			draggedColor;			//color being dragged
 FORMPOINTS			selectedFormPoints;		//selected form points
 fRECTANGLE			selectedPointsRect;		//rectangle enclosing selected form points
 RECT				selectedPixelsRect;		//display form point select rectangle
-POINT*				formPointsAsLine;					//form point clipboard paste into form line
+POINT*				formPointsAsLine;		//form point clipboard paste into form line
+unsigned			lastFormSelected;		//end point of selected range of forms
 
 #if	PESACT
 unsigned char*		pesColors;				//pes colors
@@ -11058,13 +11058,13 @@ void dufsel()
 {
 	unsigned strt, fin;
 
-	if (clofinx > closestFormToCursor)
+	if (lastFormSelected > closestFormToCursor)
 	{
 		strt = closestFormToCursor;
-		fin = clofinx;
+		fin = lastFormSelected;
 	} else
 	{
-		strt = clofinx;
+		strt = lastFormSelected;
 		fin = closestFormToCursor;
 	}
 	selectedFormCount = 0;
@@ -11088,8 +11088,8 @@ void selup() {
 			if (closestFormToCursor < formIndex - 1) {
 
 				selectedFormList[0] = closestFormToCursor;
-				clofinx = closestFormToCursor + 1;
-				selectedFormList[1] = clofinx;
+				lastFormSelected = closestFormToCursor + 1;
+				selectedFormList[1] = lastFormSelected;
 				selectedFormCount = 2;
 			} else
 				return;
@@ -11097,9 +11097,9 @@ void selup() {
 
 			if (selectedFormCount)
 			{
-				if (clofinx < formIndex - 1)
+				if (lastFormSelected < formIndex - 1)
 				{
-					clofinx++;
+					lastFormSelected++;
 					dufsel();
 				}
 			} else
@@ -11145,8 +11145,8 @@ void seldwn() {
 			if (closestFormToCursor) {
 
 				selectedFormList[0] = closestFormToCursor;
-				clofinx = closestFormToCursor - 1;
-				selectedFormList[1] = clofinx;
+				lastFormSelected = closestFormToCursor - 1;
+				selectedFormList[1] = lastFormSelected;
 				selectedFormCount = 2;
 			} else
 				return;
@@ -11154,9 +11154,9 @@ void seldwn() {
 
 			if (selectedFormCount)
 			{
-				if (clofinx)
+				if (lastFormSelected)
 				{
-					clofinx--;
+					lastFormSelected--;
 					dufsel();
 				}
 			} else

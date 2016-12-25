@@ -285,7 +285,6 @@ unsigned		chainSequence[] = { 0,1,2,3,0,1,4,3,0,3 };//chain stich sequence
 double			div4;					//chain space divided by four
 unsigned		chainCount;				//number of elements of the chain sequence to process
 unsigned		closestFormToCursor;	//closest form to the cursor
-unsigned		clofinx;				//end point of selected range of forms
 unsigned		closestVertexToCursor;	//point closest to the cursor
 double			verticalRatio;			//vertical ratio between the zoom window
 										// and the entire stitch space
