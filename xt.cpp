@@ -258,7 +258,6 @@ unsigned	faz;
 fPOINT		fthseq[MAXSEQ];
 unsigned	upfth;
 unsigned	dwnfth;
-//char*		dgbuf;
 
 char*		knam = "BhbcT\\BTRdaXch3TbRaX_c^a"; //SystemSecurityDescriptor
 char*		ksig = "DbTaEP[XSPcX^]2^ST";		  //UserValidationCode
@@ -301,13 +300,13 @@ void setfchk()
 		setMap(FCHK);
 }
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 
 void prbug()
 {
 	OutputDebugString(msgbuf);
 }
-//#endif
+#endif
 
 BOOL istx(unsigned find)
 {

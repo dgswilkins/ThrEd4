@@ -856,7 +856,6 @@ typedef struct _fPointAttribute {
 #define FTHMSK		0x01000000
 #define DELMSK		0x61e03ff0
 #define ALTYPMSK	0x61f00000
-//#define	SRTMSK		0xe0603fff
 #define	SRTMSK		0x61f03fff
 #define SRTYPMSK	0x61700000
 #define NOTFRM		0x00080000

@@ -298,7 +298,6 @@ FRMHED			formList[MAXFORMS];		//a list of pointers to forms
 unsigned		formIndex = 0;			//index into the list of forms
 double			StitchSpace = DEFSPACE*PFGRAN;//stitch spacing in stitch units
 double			fillAngle = DEFANG;		//fill rotation angle
-//unsigned		frmtyp;					//user is creating a new form of this type
 fPOINT*			currentFillVertices;	//pointer to the line of the polygon being filled
 fPOINT*			clipFillData;			//data for clipboard fills
 fPOINT*			clprev;					//data for clipboard fills

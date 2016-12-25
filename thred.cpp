@@ -483,7 +483,6 @@ HWND				hWnd;					//main window handle
 MSG					msg;					//main message loop message
 RECT				mainWindowRect;			//main window size
 RECT				colorBarRect;			//color bar rectangle
-//RECT				bcRct;					//color bar client rectangle
 RECT				minLenRect;				//minimum length rectangle
 RECT				maxLenRect;				//maximum length rectangle
 unsigned			smallestStitchIndex;	//pointer to the smallest stitch in the selected range
