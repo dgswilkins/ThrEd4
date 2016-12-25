@@ -21325,158 +21325,156 @@ void ducurs(unsigned char* pnt) {
 		jmp		short delups
 
 
-		delsubl : bswap	eax
-				  mov[edi], eax
-				  add		edi, 4
-				  bswap	eax
-				  shl		eax, 1
-				  loop	delsubl
-				  ret
+		delsubl:	bswap	eax
+					mov[edi], eax
+					add		edi, 4
+					bswap	eax
+					shl		eax, 1
+					loop	delsubl
+					ret
 
-				  delsubr : bswap	eax
-							mov[edi], eax
-							add		edi, 4
-							bswap	eax
-							shr		eax, 1
-							loop	delsubr
-							ret
+		delsubr:	bswap	eax
+					mov[edi], eax
+					add		edi, 4
+					bswap	eax
+					shr		eax, 1
+					loop	delsubr
+					ret
 
-							delsubt : mov		eax, [esi]
-									  add		esi, 4
-									  bswap	eax
-									  mov[edi], eax
-									  add		edi, 4
-									  loop	delsubt
-									  ret
+		delsubt:	mov		eax, [esi]
+					add		esi, 4
+					bswap	eax
+					mov[edi], eax
+					add		edi, 4
+					loop	delsubt
+					ret
 
-									  //form cursor
-									  delups : mov		ebx, pnt
-											   mov		edi, ebx
-											   xor		ecx, ecx
-											   mov		cl, 32
-											   mov		eax, 0x00000100
-											   rep		stosd
-											   xor		eax, eax
-											   dec		eax
-											   mov		edi, ebx
-											   add		edi, 64
-											   mov[edi], eax
-											   mov		eax, 0x00ffff00
-											   add		edi, 32
-											   mov[edi], eax
-											   sub		edi, 64
-											   mov[edi], eax
-											   mov		eax, 0x00018000
-											   mov		cl, 16
-											   dulup0: or [edi], eax
-													   add		edi, 4
-													   loop	dulup0
+		//form cursor
+		delups:		mov		ebx, pnt
+					mov		edi, ebx
+					xor		ecx, ecx
+					mov		cl, 32
+					mov		eax, 0x00000100
+					rep		stosd
+					xor		eax, eax
+					dec		eax
+					mov		edi, ebx
+					add		edi, 64
+					mov[edi], eax
+					mov		eax, 0x00ffff00
+					add		edi, 32
+					mov[edi], eax
+					sub		edi, 64
+					mov[edi], eax
+					mov		eax, 0x00018000
+					mov		cl, 16
+		dulup0:		or [edi], eax
+					add		edi, 4
+					loop	dulup0
 
-													   //dline cursor
+					//dline cursor
 
-													   add		ebx, 128
-													   mov		edi, ebx
-													   mov		ecx, 32
-													   xor edx, edx
-													   inc		edx
-													   mov		esi, edx
-													   ror		esi, 1
-													   dulup:		mov		eax, edx
-																	or eax, esi
-																	or eax, 0x80000001
-																	bswap	eax
-																	mov[edi], eax
-																	add		edi, 4
-																	shl		edx, 1
-																	shr		esi, 1
-																	loop	dulup
-																	xor		eax, eax
-																	dec		eax
-																	sub		edi, 4
-																	mov[edi], eax
-																	mov[ebx], eax
+					add		ebx, 128
+					mov		edi, ebx
+					mov		ecx, 32
+					xor edx, edx
+					inc		edx
+					mov		esi, edx
+					ror		esi, 1
+		dulup:		mov		eax, edx
+					or eax, esi
+					or eax, 0x80000001
+					bswap	eax
+					mov[edi], eax
+					add		edi, 4
+					shl		edx, 1
+					shr		esi, 1
+					loop	dulup
+					xor		eax, eax
+					dec		eax
+					sub		edi, 4
+					mov[edi], eax
+					mov[ebx], eax
 
-																	//straight up needle cursor
-																	add		ebx, 128
-																	mov		edi, ebx
-																	mov		eax, 0x0003c000
-																	bswap	eax
-																	mov		cl, 24
-																	rep		stosd
-																	mov		eax, 0x00024000
-																	bswap	eax
-																	mov		cl, 5
-																	rep		stosd
-																	mov		eax, 0x00018000
-																	bswap	eax
-																	mov		cl, 2
-																	rep		stosd
+					//straight up needle cursor
+					add		ebx, 128
+					mov		edi, ebx
+					mov		eax, 0x0003c000
+					bswap	eax
+					mov		cl, 24
+					rep		stosd
+					mov		eax, 0x00024000
+					bswap	eax
+					mov		cl, 5
+					rep		stosd
+					mov		eax, 0x00018000
+					bswap	eax
+					mov		cl, 2
+					rep		stosd
 
-																	//left up
-																	add		ebx, 128
-																	mov		edi, ebx
-																	mov		cl, 5
-																	mov		esi, offset lucurstrt
-																	call	delsubt
-																	mov		cl, 4
-																	mov		eax, 0x88
-																	call	delsubl
-																	mov		cl, 19
-																	mov		eax, 0x1f00
-																	call	delsubl
-																	mov		esi, offset lucurfin
-																	mov		cl, 3
-																	call	delsubt
+					//left up
+					add		ebx, 128
+					mov		edi, ebx
+					mov		cl, 5
+					mov		esi, offset lucurstrt
+					call	delsubt
+					mov		cl, 4
+					mov		eax, 0x88
+					call	delsubl
+					mov		cl, 19
+					mov		eax, 0x1f00
+					call	delsubl
+					mov		esi, offset lucurfin
+					mov		cl, 3
+					call	delsubt
 
-																	//left down
+					//left down
+					add		ebx, 128
+					mov		edi, ebx
+					mov		esi, offset ldcurstrt
+					mov		cl, 4
+					call	delsubt
+					mov		cl, 19
+					mov		eax, 0x7c000000
+					call	delsubr
+					mov		cl, 4
+					mov		eax, 0x440
+					call	delsubr
+					mov		cl, 5
+					mov		esi, offset ldcurfin
+					call	delsubt
 
-																	add		ebx, 128
-																	mov		edi, ebx
-																	mov		esi, offset ldcurstrt
-																	mov		cl, 4
-																	call	delsubt
-																	mov		cl, 19
-																	mov		eax, 0x7c000000
-																	call	delsubr
-																	mov		cl, 4
-																	mov		eax, 0x440
-																	call	delsubr
-																	mov		cl, 5
-																	mov		esi, offset ldcurfin
-																	call	delsubt
+					//right up
+					add		ebx, 128
+					mov		edi, ebx
+					mov		cl, 5
+					mov		esi, offset rucurstrt
+					call	delsubt
+					mov		eax, 0x9000000
+					mov		cl, 4
+					call	delsubr
+					mov		cl, 19
+					mov		eax, 0x1f00000
+					call	delsubr
+					mov		esi, offset rucurfin
+					mov		cl, 3
+					call	delsubt
 
-																	//right up
-
-																	add		ebx, 128
-																	mov		edi, ebx
-																	mov		cl, 5
-																	mov		esi, offset rucurstrt
-																	call	delsubt
-																	mov		eax, 0x9000000
-																	mov		cl, 4
-																	call	delsubr
-																	mov		cl, 19
-																	mov		eax, 0x1f00000
-																	call	delsubr
-																	mov		esi, offset rucurfin
-																	mov		cl, 3
-																	call	delsubt
-
-																	//right down
-																	add		ebx, 128
-																	mov		edi, ebx
-																	mov		esi, offset rdcurstrt
-																	mov		cl, 4
-																	call	delsubt
-																	mov		eax, 0xf8
-																	mov		cl, 19
-																	call	delsubl
-																	mov		eax, 0x8400000
-																	mov		cl, 4
-																	call	delsubl
-																	mov		esi, offset rdcurfin
-																	mov		cl, 5
-																	call	delsubt
+					//right down
+					add		ebx, 128
+					mov		edi, ebx
+					mov		esi, offset rdcurstrt
+					mov		cl, 4
+					call	delsubt
+					mov		eax, 0xf8
+					mov		cl, 19
+					call	delsubl
+					mov		eax, 0x8400000
+					mov		cl, 4
+					call	delsubl
+					mov		esi, offset rdcurfin
+					mov		cl, 5
+					call	delsubt
 
 	}
 #else
