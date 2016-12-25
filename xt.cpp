@@ -79,7 +79,7 @@ extern HDC StitchWindowMemDC;
 extern HDC StitchWindowDC;
 extern RECT stitchWindowClientRect;
 extern HBRUSH hBackgroundBrush;
-extern TCHAR filnam[_MAX_PATH];
+extern TCHAR fileName[_MAX_PATH];
 extern void movStch();
 extern void shoseln(unsigned cod0, unsigned cod1);
 extern unsigned closestVertexToCursor;
@@ -139,8 +139,8 @@ extern void satout(double satwid);
 extern void tabmsg(unsigned cod);
 extern unsigned auth;
 extern void frmout(unsigned ind);
-extern TCHAR thrnam[_MAX_PATH];
-extern TCHAR auxnam[_MAX_PATH];
+extern TCHAR thrName[_MAX_PATH];
+extern TCHAR auxName[_MAX_PATH];
 extern void save();
 extern COLORREF userColor[16];
 extern unsigned psg();
@@ -987,7 +987,7 @@ void pes2crd() {
 	}
 	if (chkp2cnam(ini.p2cName)) {
 
-		fil2crd(thrnam);
+		fil2crd(thrName);
 		return;
 	}
 	*ini.p2cName = 0;
@@ -1021,7 +1021,7 @@ void pes2crd() {
 			return;
 	}
 	strcpy_s(ini.p2cName, prgnam);
-	fil2crd(auxnam);
+	fil2crd(auxName);
 }
 
 void sidlen(unsigned strt, unsigned fin, double* ilen, double* olen)
@@ -3589,33 +3589,33 @@ void duauxnam()
 {
 	TCHAR* pext;
 
-	_strlwr_s(filnam);
-	strcpy_s(auxnam, filnam);
-	pext = strrchr(auxnam, '.');
+	_strlwr_s(fileName);
+	strcpy_s(auxName, fileName);
+	pext = strrchr(auxName, '.');
 	if (pext)
 		pext++;
 	else
-		pext = &filnam[strlen(filnam)];
+		pext = &fileName[strlen(fileName)];
 	*pext = 0;
 	switch (ini.auxFileType) {
 
 	case AUXDST:
 
-		strcat_s(auxnam, "dst");
+		strcat_s(auxName, "dst");
 		break;
 
 #if PESACT
 
 	case AUXPES:
 
-		strcat_s(auxnam, "pes");
+		strcat_s(auxName, "pes");
 		break;
 
 #endif
 
 	default:
 
-		strcat_s(auxnam, "pcs");
+		strcat_s(auxName, "pcs");
 	}
 }
 
@@ -6026,6 +6026,6 @@ void repar()
 void tst()
 {
 	strcpy_s(ini.designerName, "Mr");
-	strcpy_s(thrnam, ini.designerName);
+	strcpy_s(thrName, ini.designerName);
 	setMap(RESTCH);
 }

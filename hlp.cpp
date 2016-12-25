@@ -17,8 +17,8 @@ extern void				okcan();
 extern POINT			unzoomedRect;
 extern PCSHEADER				hed;
 extern unsigned			delpnt;
-extern TCHAR			homdir[_MAX_PATH];
-extern TCHAR			filnam[_MAX_PATH];
+extern TCHAR			homeDirectory[_MAX_PATH];
+extern TCHAR			fileName[_MAX_PATH];
 extern unsigned			setMap(unsigned bPnt);
 extern HWND				hMainStitchWin;
 extern HINSTANCE		hInst;
@@ -38,8 +38,7 @@ extern DRAWITEMSTRUCT	*ds;
 extern fPOINT			oseq[OSEQLEN];
 extern BSEQPNT			bseq[BSEQLEN];
 extern INIFILE			ini;
-extern TCHAR*			phom;
-extern TCHAR			thrnam[_MAX_PATH];
+extern TCHAR			thrName[_MAX_PATH];
 extern HDC				StitchWindowMemDC;
 extern long				prfwid;
 extern HWND				hButtonWin[9];
@@ -272,7 +271,7 @@ void bfilmsg() {
 	TCHAR	buf[HBUFSIZ];
 
 	LoadString(hInst, IDS_BADFIL, buf, HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, filnam);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, fileName);
 	shoMsg(hlpbuf);
 }
 
@@ -525,7 +524,7 @@ void grpmsg1() {
 }
 
 void help() {
-	strcpy_s(hlpnam, homdir);
+	strcpy_s(hlpnam, homeDirectory);
 #if LANG==ENG||LANG==HNG
 	strcat_s(hlpnam, "thred.chm");
 #endif
@@ -542,7 +541,7 @@ void sdmsg() {
 	TCHAR	buf[HBUFSIZ];
 
 	LoadString(hInst, IDS_SAVDISC, buf, HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, thrnam);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, thrName);
 	shoMsg(hlpbuf);
 }
 

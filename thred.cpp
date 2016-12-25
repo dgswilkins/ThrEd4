@@ -844,26 +844,25 @@ MENUITEMINFO filinfo = {
 	13,
 };
 
-const TCHAR			filenameFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
-const TCHAR			bfltr[_MAX_PATH + 1] = "Microsoft (BMP)\0*.bmp\0";
-TCHAR				cstFltr[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0";
-TCHAR				filnam[_MAX_PATH + 1] = { 0 };
-TCHAR				thrnam[_MAX_PATH + 1];
-TCHAR				auxnam[_MAX_PATH + 1];
-TCHAR				genam[_MAX_PATH + 1];
-TCHAR				defDir[_MAX_PATH + 1] = "c:\\";
-TCHAR				defbmp[_MAX_PATH + 1] = "c:\\";
-TCHAR				balnam0[_MAX_PATH + 1] = { 0 };	//balarad semaphore file
-TCHAR				balnam1[_MAX_PATH + 1] = { 0 };	//balarad data file
-TCHAR				balnam2[_MAX_PATH + 1];
-TCHAR				srchnam[_MAX_PATH + 1];
-TCHAR				homdir[_MAX_PATH + 1];	//directory from which thred was executed
-TCHAR*				phom;			//pointer to the home file name
-PCSTCH*				filBuf;
-HANDLE				hFil = 0;
-HANDLE				hPcs = 0;
-HANDLE				hIni = 0;
-HANDLE				hinsf;			//insert file handle
+const TCHAR			allFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
+const TCHAR			bmpFilter[_MAX_PATH + 1] = "Microsoft (BMP)\0*.bmp\0";
+TCHAR				customFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0";
+TCHAR				fileName[_MAX_PATH + 1] = { 0 };
+TCHAR				thrName[_MAX_PATH + 1];
+TCHAR				auxName[_MAX_PATH + 1];
+TCHAR				geName[_MAX_PATH + 1];
+TCHAR				defaultDirectory[_MAX_PATH + 1] = "c:\\";
+TCHAR				defaultBMPDirectory[_MAX_PATH + 1] = "c:\\";
+TCHAR				balaradName0[_MAX_PATH + 1] = { 0 };	//balarad semaphore file
+TCHAR				balaradName1[_MAX_PATH + 1] = { 0 };	//balarad data file
+TCHAR				balaradName2[_MAX_PATH + 1];
+TCHAR				searchName[_MAX_PATH + 1];
+TCHAR				homeDirectory[_MAX_PATH + 1];	//directory from which thred was executed
+PCSTCH*				ptrFileBuffer;
+HANDLE				hFile = 0;
+HANDLE				hPcsFile = 0;
+HANDLE				hIniFile = 0;
+HANDLE				hInsertedFile;	//insert file handle
 HANDLE				hBmp;			//bitmap handle
 unsigned			siz;			//size of file
 unsigned long		red;			//bytes actually read from file
@@ -877,15 +876,15 @@ OPENFILENAME		ofn = {
 	sizeof(OPENFILENAME),	//lStructsize
 	hWnd,					//hwndOwner 
 	hInst,					//hInstance 
-	filenameFilter,					//lpstrFilter 
-	cstFltr,				//lpstrCustomFilter 
+	allFilter,				//lpstrFilter 
+	customFilter,			//lpstrCustomFilter 
 	_MAX_PATH,				//nMaxCustFilter 
 	0,						//nFilterIndex 
-	filnam,					//lpstrFile 
+	fileName,				//lpstrFile 
 	_MAX_PATH,				//nMaxFile 
 	0,						//lpstrFileTitle 
 	0,						//nMaxFileTitle 
-	defDir,					//lpstrInitialDir
+	defaultDirectory,		//lpstrInitialDir
 	0,						//lpstrTitle
 	OFN_OVERWRITEPROMPT,	//Flags
 	0,						//nFileOffset
@@ -911,15 +910,15 @@ OPENFILENAME obn = {
 	sizeof(OPENFILENAME),	//lStructsize
 	hWnd,					//hwndOwner 
 	hInst,					//hInstance 
-	bfltr,					//lpstrFilter 
-	cstFltr,				//lpstrCustomFilter 
+	bmpFilter,				//lpstrFilter 
+	customFilter,			//lpstrCustomFilter 
 	_MAX_PATH,				//nMaxCustFilter 
 	0,						//nFilterIndex 
 	lbnam,					//lpstrFile 
 	_MAX_PATH,				//nMaxFile 
 	0,						//lpstrFileTitle 
 	0,						//nMaxFileTitle 
-	defbmp,					//lpstr	ialDir 
+	defaultBMPDirectory,	//lpstrInitialDir 
 	0,						//lpstrTitle
 	OFN_OVERWRITEPROMPT,	//Flags
 	0,						//nFileOffset
@@ -2702,44 +2701,44 @@ void nunams() {
 	unsigned	ind;
 	TCHAR		tnam[_MAX_PATH];
 
-	_strlwr_s(filnam);
-	pext = strrchr(filnam, '.');
+	_strlwr_s(fileName);
+	pext = strrchr(fileName, '.');
 	if (pext)
 		pext++;
 	else
-		pext = &filnam[strlen(filnam)];
-	ind = pext - filnam;
-	strncpy_s(auxnam, filnam, ind);
-	strncpy_s(thrnam, filnam, ind);
-	strncpy_s(genam, filnam, ind);
-	pext = auxnam + ind;
+		pext = &fileName[strlen(fileName)];
+	ind = pext - fileName;
+	strncpy_s(auxName, fileName, ind);
+	strncpy_s(thrName, fileName, ind);
+	strncpy_s(geName, fileName, ind);
+	pext = auxName + ind;
 	switch (ini.auxFileType) {
 
 	case AUXDST:
 
-		strcpy_s(pext, sizeof(auxnam) - ind, "dst");
+		strcpy_s(pext, sizeof(auxName) - ind, "dst");
 		break;
 
 #if PESACT
 
 	case AUXPES:
 
-		strcpy_s(pext, sizeof(auxnam) - ind, "pes");
+		strcpy_s(pext, sizeof(auxName) - ind, "pes");
 		break;
 
 #endif
 
 	default:
 
-		strcpy_s(pext, sizeof(auxnam) - ind, "pcs");
+		strcpy_s(pext, sizeof(auxName) - ind, "pcs");
 	}
-	pext = thrnam + ind;
-	strcpy_s(pext, sizeof(thrnam) - ind, "thr");
-	pext = genam + ind;
-	strcpy_s(pext, sizeof(genam) - ind, "th*");
+	pext = thrName + ind;
+	strcpy_s(pext, sizeof(thrName) - ind, "thr");
+	pext = geName + ind;
+	strcpy_s(pext, sizeof(geName) - ind, "th*");
 	for (ind = 0; ind < OLDNUM; ind++) {
 
-		if (!strcmp(ini.prevNames[ind], thrnam)) {
+		if (!strcmp(ini.prevNames[ind], thrName)) {
 
 			if (ind) {
 
@@ -2755,14 +2754,14 @@ void nunams() {
 
 		if (!ini.prevNames[ind][0]) {
 
-			strcpy_s(ini.prevNames[ind], thrnam);
+			strcpy_s(ini.prevNames[ind], thrName);
 			goto mendun;
 		}
 	}
 	strcpy_s(ini.prevNames[3], ini.prevNames[2]);
 	strcpy_s(ini.prevNames[2], ini.prevNames[1]);
 	strcpy_s(ini.prevNames[1], ini.prevNames[0]);
-	strcpy_s(ini.prevNames[0], thrnam);
+	strcpy_s(ini.prevNames[0], thrName);
 mendun:;
 	redfils();
 nomen:;
@@ -3450,9 +3449,9 @@ void defNam(TCHAR* fNam) {
 
 	if (fNam[0]) {
 
-		strcpy_s(defDir, fNam);
-		last = strrchr(defDir, '\\');
-		if (last - defDir == 2)
+		strcpy_s(defaultDirectory, fNam);
+		last = strrchr(defaultDirectory, '\\');
+		if (last - defaultDirectory == 2)
 			last[1] = 0;
 		else
 			last[0] = 0;
@@ -3465,9 +3464,9 @@ void defbNam() {
 
 	if (lbnam[0]) {
 
-		strcpy_s(defbmp, lbnam);
-		last = strrchr(defbmp, '\\');
-		if (last - defbmp == 2)
+		strcpy_s(defaultBMPDirectory, lbnam);
+		last = strrchr(defaultBMPDirectory, '\\');
+		if (last - defaultBMPDirectory == 2)
 			last[1] = 0;
 		else
 			last[0] = 0;
@@ -3479,7 +3478,7 @@ void ritini() {
 	unsigned	ind;
 	RECT		wrct;
 
-	strcpy_s(ini.defaultDirectory, defDir);
+	strcpy_s(ini.defaultDirectory, defaultDirectory);
 	for (ind = 0; ind < 16; ind++) {
 
 		ini.stitchColors[ind] = userColor[ind];
@@ -3514,11 +3513,11 @@ void ritini() {
 		ini.initialWindowCoords.bottom = wrct.bottom;
 		ini.initialWindowCoords.top = wrct.top;
 	}
-	hIni = CreateFile(iniNam, (GENERIC_WRITE | GENERIC_READ), 0, NULL,
+	hIniFile = CreateFile(iniNam, (GENERIC_WRITE | GENERIC_READ), 0, NULL,
 		CREATE_ALWAYS, 0, NULL);
-	if (hIni != INVALID_HANDLE_VALUE)
-		WriteFile(hIni, &ini, sizeof(INIFILE), &red, NULL);
-	CloseHandle(hIni);
+	if (hIniFile != INVALID_HANDLE_VALUE)
+		WriteFile(hIniFile, &ini, sizeof(INIFILE), &red, NULL);
+	CloseHandle(hIniFile);
 }
 
 BOOL savcmp() {
@@ -3608,7 +3607,7 @@ void redbal() {
 
 	hed.stitchCount = 0;
 	formIndex = 0;
-	btfil = CreateFile(balnam2, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+	btfil = CreateFile(balaradName2, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 	if (btfil != INVALID_HANDLE_VALUE) {
 
 		ReadFile(btfil, (BALHED*)&l_bhed, sizeof(BALHED), &l_red, 0);
@@ -3672,14 +3671,14 @@ void ritbal() {
 	TCHAR			onam[_MAX_PATH];
 	unsigned long	wrot;
 
-	if (*balnam0&&*balnam1&&hed.stitchCount) {
+	if (*balaradName0&&*balaradName1&&hed.stitchCount) {
 
-		if (!*filnam) {
+		if (!*fileName) {
 
-			strcpy_s(filnam, defDir);
-			strcat_s(filnam, "\\balfil.thr");
+			strcpy_s(fileName, defaultDirectory);
+			strcat_s(fileName, "\\balfil.thr");
 		}
-		strcpy_s(onam, filnam);
+		strcpy_s(onam, fileName);
 		pbchr = strrchr(onam, '.');
 		if (pbchr)
 			strcpy_s(pbchr, sizeof(onam) - (pbchr - onam), ".thv");
@@ -3728,19 +3727,19 @@ void ritbal() {
 		}
 		WriteFile(bfil, (BALSTCH*)ptrBalaradStitich, ine * sizeof(BALSTCH), &wrot, 0);
 		CloseHandle(bfil);
-		bfil = CreateFile(balnam1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		bfil = CreateFile(balaradName1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		WriteFile(bfil, (TCHAR*)onam, strlen(onam) + 1, &wrot, 0);
 		CloseHandle(bfil);
 	} else {
 
-		if (*balnam1) {
+		if (*balaradName1) {
 
-			bfil = CreateFile(balnam1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+			bfil = CreateFile(balaradName1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 			CloseHandle(bfil);
 		}
 	}
-	if (*balnam0)
-		DeleteFile(balnam0);
+	if (*balaradName0)
+		DeleteFile(balaradName0);
 }
 
 void savmsg() {
@@ -3748,7 +3747,7 @@ void savmsg() {
 	TCHAR	buf[HBUFSIZ];
 
 	LoadString(hInst, IDS_SAVFIL, buf, HBUFSIZ);
-	sprintf_s(msgbuf, sizeof(msgbuf), buf, thrnam);
+	sprintf_s(msgbuf, sizeof(msgbuf), buf, thrName);
 }
 
 void reldun()
@@ -3773,8 +3772,8 @@ void dun() {
 	unsid();
 	unbsho();
 	rstAll();
-	//	if(savcmp()||(*balnam0&&*balnam1&&hed.stitchCount&&!formIndex))
-	if (savcmp() || (*balnam0))
+	//	if(savcmp()||(*balaradName0&&*balaradName1&&hed.stitchCount&&!formIndex))
+	if (savcmp() || (*balaradName0))
 		reldun();
 	else {
 
@@ -5148,7 +5147,7 @@ void savmap() {
 		if (GetSaveFileName(&obn)) {
 
 			hBmp = CreateFile(lbnam, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
-			if (hIni == INVALID_HANDLE_VALUE) {
+			if (hIniFile == INVALID_HANDLE_VALUE) {
 
 				crmsg(lbnam);
 				return;
@@ -5276,7 +5275,7 @@ void bfil() {
 
 void prtred() {
 
-	CloseHandle(hFil);
+	CloseHandle(hFile);
 	rstMap(INIT);
 	formIndex = 0;
 	tabmsg(IDS_PRT);
@@ -5301,8 +5300,8 @@ BOOL colfil() {
 
 	TCHAR*	pext;
 
-	strcpy_s(colorFileName, filnam);
-	strcpy_s(rgbFileName, filnam);
+	strcpy_s(colorFileName, fileName);
+	strcpy_s(rgbFileName, fileName);
 	pext = strrchr(colorFileName, '.');
 	if (pext) {
 
@@ -5627,16 +5626,16 @@ void nuFil() {
 			ReleaseDC(hWnd, bitmapDC);
 			*bnam = 0;
 		}
-		hFil = CreateFile(filnam, GENERIC_READ, 0, NULL,
+		hFile = CreateFile(fileName, GENERIC_READ, 0, NULL,
 			OPEN_EXISTING, 0, NULL);
-		if (hFil == INVALID_HANDLE_VALUE) {
+		if (hFile == INVALID_HANDLE_VALUE) {
 
 			ind = GetLastError();
 			if (GetLastError() == 32)
-				filnopn(IDS_FNOPNA, filnam);
+				filnopn(IDS_FNOPNA, fileName);
 			else
-				filnopn(IDS_FNOPN, filnam);
-			hFil = 0;
+				filnopn(IDS_FNOPN, fileName);
+			hFile = 0;
 		} else {
 
 			rstMap(CMPDO);
@@ -5669,7 +5668,7 @@ void nuFil() {
 			rstMap(BAKWRAP);
 			zoomFactor = 1;
 			setMap(RESTCH);
-			defNam(filnam);
+			defNam(fileName);
 			selCnt = 0;
 			if (rstMap(WASPAT))
 				DestroyWindow(hSpeedScrollBar);
@@ -5679,19 +5678,19 @@ void nuFil() {
 			clrMap(MAPLEN);
 			if (ind)
 				setMap(WASTXBAK);
-			l_siz = GetFileSize(hFil, &sizh);
-			pext = strrchr(filnam, '.');
+			l_siz = GetFileSize(hFile, &sizh);
+			pext = strrchr(fileName, '.');
 			if (pext)
 				pext++;
 			else {
 
-				strcat_s(filnam, ".thr");
-				pext = strrchr(filnam, '.') + 1;
+				strcat_s(fileName, ".thr");
+				pext = strrchr(fileName, '.') + 1;
 			}
 			tchr = tolower(pext[0]);
 			if (tchr == 't') {
 
-				ReadFile(hFil, (STRHED*)&sthed, sizeof(STRHED), &red, NULL);
+				ReadFile(hFile, (STRHED*)&sthed, sizeof(STRHED), &red, NULL);
 				if ((sthed.headerType & 0xffffff) == 0x746872) {
 
 					if (red != sizeof(STRHED)) {
@@ -5722,7 +5721,7 @@ void nuFil() {
 					case 1:
 					case 2:
 
-						ReadFile(hFil, (STREX*)&hedx, sizeof(STREX), &red, NULL);
+						ReadFile(hFile, (STREX*)&hedx, sizeof(STREX), &red, NULL);
 						if (red != sizeof(STREX)) {
 
 							tabmsg(IDS_SHRTF);
@@ -5742,14 +5741,14 @@ void nuFil() {
 					zoomRect.right = unzoomedRect.x = ini.hoopSizeX;
 					zoomRect.top = unzoomedRect.y = ini.hoopSizeY;
 					hed.stitchCount = sthed.stitchCount;
-					ReadFile(hFil, (fPOINTATTRIBUTE*)stitchBuffer, hed.stitchCount * sizeof(fPOINTATTRIBUTE), &red, NULL);
+					ReadFile(hFile, (fPOINTATTRIBUTE*)stitchBuffer, hed.stitchCount * sizeof(fPOINTATTRIBUTE), &red, NULL);
 					if (red != hed.stitchCount * sizeof(fPOINTATTRIBUTE)) {
 
 						hed.stitchCount = red / sizeof(fPOINTATTRIBUTE);
 						prtred();
 						return;
 					}
-					ReadFile(hFil, (TCHAR*)bnam, 16, &red, 0);
+					ReadFile(hFile, (TCHAR*)bnam, 16, &red, 0);
 					tred = red;
 					if (red != 16) {
 
@@ -5757,7 +5756,7 @@ void nuFil() {
 						prtred();
 						return;
 					}
-					ReadFile(hFil, (COLORREF*)&backgroundColor, 4, &red, 0);
+					ReadFile(hFile, (COLORREF*)&backgroundColor, 4, &red, 0);
 					tred += red;
 					if (red != 4) {
 
@@ -5766,21 +5765,21 @@ void nuFil() {
 						return;
 					}
 					hBackgroundBrush = CreateSolidBrush(backgroundColor);
-					ReadFile(hFil, (COLORREF*)userColor, 64, &red, 0);
+					ReadFile(hFile, (COLORREF*)userColor, 64, &red, 0);
 					tred += red;
 					if (red != 64) {
 
 						prtred();
 						return;
 					}
-					ReadFile(hFil, (COLORREF*)customColor, 64, &red, 0);
+					ReadFile(hFile, (COLORREF*)customColor, 64, &red, 0);
 					tred += red;
 					if (red != 64) {
 
 						prtred();
 						return;
 					}
-					ReadFile(hFil, (TCHAR*)msgbuf, 16, &red, 0);
+					ReadFile(hFile, (TCHAR*)msgbuf, 16, &red, 0);
 					tred += red;
 					if (red != 16) {
 
@@ -5800,7 +5799,7 @@ void nuFil() {
 						if (vervar < 2) {
 
 							frmlstx = (FRMHEDO*)&bseq;
-							ReadFile(hFil, (FRMHEDO*)frmlstx, formIndex * sizeof(FRMHEDO), &red, 0);
+							ReadFile(hFile, (FRMHEDO*)frmlstx, formIndex * sizeof(FRMHEDO), &red, 0);
 							if (red != formIndex * sizeof(FRMHEDO)) {
 
 								formIndex = red / sizeof(FRMHEDO);
@@ -5809,7 +5808,7 @@ void nuFil() {
 							xofrm();
 						} else {
 
-							ReadFile(hFil, (FRMHED*)formList, formIndex * sizeof(FRMHED), &red, 0);
+							ReadFile(hFile, (FRMHED*)formList, formIndex * sizeof(FRMHED), &red, 0);
 							rstMap(BADFIL);
 							if (red != formIndex * sizeof(FRMHED)) {
 
@@ -5817,8 +5816,8 @@ void nuFil() {
 								setMap(BADFIL);
 							}
 						}
-						//						ind=SetFilePointer(hFil,0,0,FILE_CURRENT);  //bug
-						ReadFile(hFil, (fPOINT*)formPoints, sthed.pointCount * sizeof(fPOINT), &red, 0);
+						//						ind=SetFilePointer(hFile,0,0,FILE_CURRENT);  //bug
+						ReadFile(hFile, (fPOINT*)formPoints, sthed.pointCount * sizeof(fPOINT), &red, 0);
 						if (red != sizeof(fPOINT)*sthed.pointCount) {
 
 							fltad = red / sizeof(fPOINT);
@@ -5826,19 +5825,19 @@ void nuFil() {
 								formPoints[ind].x = formPoints[ind].y = 0;
 							setMap(BADFIL);
 						}
-						ReadFile(hFil, (SATCON*)satks, sthed.dlineCount * sizeof(SATCON), &red, 0);
+						ReadFile(hFile, (SATCON*)satks, sthed.dlineCount * sizeof(SATCON), &red, 0);
 						if (red != sthed.dlineCount * sizeof(SATCON)) {
 
 							satkad = red / sizeof(SATCON);
 							setMap(BADFIL);
 						}
-						ReadFile(hFil, (fPOINT*)clipboardPoints, sthed.clipboardDataCount * sizeof(fPOINT), &red, 0);
+						ReadFile(hFile, (fPOINT*)clipboardPoints, sthed.clipboardDataCount * sizeof(fPOINT), &red, 0);
 						if (red != sthed.clipboardDataCount * sizeof(fPOINT)) {
 
 							clpad = red / sizeof(fPOINT);
 							setMap(BADFIL);
 						}
-						ReadFile(hFil, (TXPNT*)txpnts, hedx.texturePointCount * sizeof(TXPNT), &red, 0);
+						ReadFile(hFile, (TXPNT*)txpnts, hedx.texturePointCount * sizeof(TXPNT), &red, 0);
 						txad = red / sizeof(TXPNT);
 						if (rstMap(BADFIL))
 							bfilmsg();
@@ -5866,10 +5865,10 @@ void nuFil() {
 
 					if (tolower(pext[01]) == 'c') {
 
-						ReadFile(hFil, (PCSHEADER*)&hed, 0x46, &red, NULL);
+						ReadFile(hFile, (PCSHEADER*)&hed, 0x46, &red, NULL);
 						if (!l_siz) {
 
-							filnopn(IDS_ZEROL, filnam);
+							filnopn(IDS_ZEROL, fileName);
 							return;
 						}
 						if (hed.leadIn == 0x32 && hed.colorCount == 16) {
@@ -5878,32 +5877,32 @@ void nuFil() {
 								userColor[ind] = hed.colors[ind];
 							l_siz -= 0x46;
 							inf = l_siz / sizeof(PCSTCH) + 2;
-							filBuf = new PCSTCH[inf];
-							ReadFile(hFil, filBuf, l_siz, &red, NULL);
+							ptrFileBuffer = new PCSTCH[inf];
+							ReadFile(hFile, ptrFileBuffer, l_siz, &red, NULL);
 							l_stind = 0;
 							l_cPnt = 0;
 							tcol = 0;
 							ind = 0;
 							while (l_stind < hed.stitchCount&&ind < inf) {
 
-								if (filBuf[ind].typ == 3) {
+								if (ptrFileBuffer[ind].typ == 3) {
 
-									colch[l_cPnt].colorIndex = filBuf[ind].fx;
+									colch[l_cPnt].colorIndex = ptrFileBuffer[ind].fx;
 									colch[l_cPnt++].stitchIndex = l_stind;
-									tcol = NOTFRM | filBuf[ind++].fx;
+									tcol = NOTFRM | ptrFileBuffer[ind++].fx;
 								} else {
 
-									stitchBuffer[l_stind].x = filBuf[ind].x + (float)filBuf[ind].fx / 256;
-									stitchBuffer[l_stind].y = filBuf[ind].y + (float)filBuf[ind].fy / 256;
+									stitchBuffer[l_stind].x = ptrFileBuffer[ind].x + (float)ptrFileBuffer[ind].fx / 256;
+									stitchBuffer[l_stind].y = ptrFileBuffer[ind].y + (float)ptrFileBuffer[ind].fy / 256;
 									stitchBuffer[l_stind++].attribute = tcol;
 									ind++;
 								}
 							}
 							hed.stitchCount = l_stind;
-							tnam = (TCHAR*)&filBuf[ind];
+							tnam = (TCHAR*)&ptrFileBuffer[ind];
 							strcpy_s(bnam, tnam);
-							delete[] filBuf;
-							strcpy_s(pext, sizeof(filnam) - (pext - filnam), "thr");
+							delete[] ptrFileBuffer;
+							strcpy_s(pext, sizeof(fileName) - (pext - fileName), "thr");
 							ini.auxFileType = AUXPCS;
 							if (hed.hoopType != LARGHUP&&hed.hoopType != SMALHUP)
 								hed.hoopType = LARGHUP;
@@ -5940,12 +5939,12 @@ void nuFil() {
 #if PESACT
 					else {
 
-						ReadFile(hFil, (BSEQPNT*)&bseq, sizeof(bseq), &red, 0);
+						ReadFile(hFile, (BSEQPNT*)&bseq, sizeof(bseq), &red, 0);
 						peshed = (PESHED*)&bseq;
 						l_peschr = (TCHAR*)&bseq;
 						if (strncmp(peshed->led, "#PES00", 6)) {
 
-							sprintf_s(msgbuf, sizeof(msgbuf), "Not a PES file: %s\n", filnam);
+							sprintf_s(msgbuf, sizeof(msgbuf), "Not a PES file: %s\n", fileName);
 							shoMsg(msgbuf);
 							return;
 						}
@@ -6016,16 +6015,16 @@ void nuFil() {
 #endif
 				} else {
 
-					ReadFile(hFil, (DSTHED*)&dsthed, sizeof(DSTHED), &red, 0);
+					ReadFile(hFile, (DSTHED*)&dsthed, sizeof(DSTHED), &red, 0);
 					if (red == sizeof(DSTHED)) {
 
 						if (chkdst(&dsthed)) {
 
 							bnam[0] = 0;
-							l_siz = GetFileSize(hFil, &red) - sizeof(DSTHED);
+							l_siz = GetFileSize(hFile, &red) - sizeof(DSTHED);
 							dstcnt = l_siz / sizeof(DSTREC);
 							drecs = new DSTREC[dstcnt];
-							ReadFile(hFil, (DSTREC*)drecs, sizeof(DSTREC)*dstcnt, &red, 0);
+							ReadFile(hFile, (DSTREC*)drecs, sizeof(DSTREC)*dstcnt, &red, 0);
 							dstran();
 							delete[] drecs;
 							ini.auxFileType = AUXDST;
@@ -6033,14 +6032,14 @@ void nuFil() {
 					} else {
 
 						tabmsg(IDS_DST2S);
-						CloseHandle(hFil);
+						CloseHandle(hFile);
 						return;
 					}
 				}
 			}
 			if (bnam[0]) {
 
-				SetCurrentDirectory(defDir);
+				SetCurrentDirectory(defaultDirectory);
 				strcpy_s(lbnam, bnam);
 				bfil();
 			}
@@ -6078,9 +6077,9 @@ void nuFil() {
 			auxmen();
 		}
 		lenCalc();
-		sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY], filnam, fildes);
+		sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY], fileName, fildes);
 		SetWindowText(hWnd, msgbuf);
-		CloseHandle(hFil);
+		CloseHandle(hFile);
 		setMap(INIT);
 		rstMap(TRSET);
 		if (chkMap(NOTHRFIL))
@@ -6097,13 +6096,13 @@ void clrfbuf(unsigned p_siz) {
 #if  __UseASM__
 	_asm {
 
-		mov		edi, filBuf
+		mov		edi, ptrFileBuffer
 		mov		ecx, p_siz
 		xor		eax, eax
 		rep		stosd
 	}
 #else
-	memset(filBuf, 0, p_siz * 4);
+	memset(ptrFileBuffer, 0, p_siz * 4);
 #endif
 }
 
@@ -6381,7 +6380,7 @@ unsigned pesnam() {
 
 #if  __UseASM__
 	_asm {
-		mov		ebx, offset auxnam
+		mov		ebx, offset auxName
 		mov		ecx, _MAX_PATH
 		mov		edx, ebx
 		peslup0 : mov		al, [ebx]
@@ -6413,7 +6412,7 @@ unsigned pesnam() {
 	}
 #else
 	_asm {
-		mov		ebx, offset auxnam
+		mov		ebx, offset auxName
 		mov		ecx, _MAX_PATH
 		mov		edx, ebx
 		peslup0 : mov		al, [ebx]
@@ -6553,7 +6552,7 @@ BOOL chkattr(TCHAR* nam) {
 		else
 			return 1;
 	}
-	strcpy_s(driv, homdir);
+	strcpy_s(driv, homeDirectory);
 	driv[3] = 0;
 	if (!GetDiskFreeSpace(driv, &sec, &byt, &fclst, &tclst)) {
 
@@ -6592,7 +6591,7 @@ void sav() {
 #endif
 
 	duauxnam();
-	if (chkattr(auxnam))
+	if (chkattr(auxName))
 		return;
 	if (!hed.stitchCount)
 		return;
@@ -6616,12 +6615,12 @@ void sav() {
 			rotatedStitches[ind].attribute = stitchBuffer[ind].attribute;
 		}
 	}
-	hPcs = CreateFile(auxnam, (GENERIC_WRITE | GENERIC_READ), 0, NULL,
+	hPcsFile = CreateFile(auxName, (GENERIC_WRITE | GENERIC_READ), 0, NULL,
 		CREATE_ALWAYS, 0, NULL);
-	if (hPcs == INVALID_HANDLE_VALUE) {
+	if (hPcsFile == INVALID_HANDLE_VALUE) {
 
-		crmsg(auxnam);
-		hPcs = 0;
+		crmsg(auxName);
+		hPcsFile = 0;
 	} else {
 
 		switch (ini.auxFileType) {
@@ -6634,7 +6633,7 @@ void sav() {
 			for (ind = 0; ind < sizeof(DSTHED); ind++)
 				pchr[ind] = ' ';
 			strncpy(dsthed.desched, "LA:", 3);
-			pchr = strrchr(auxnam, '\\') + 1;
+			pchr = strrchr(auxName, '\\') + 1;
 			for (ind = 0; ind < sizeof(dsthed.desc); ind++) {
 
 				if (pchr[ind] && pchr[ind] != '.')
@@ -6666,8 +6665,8 @@ void sav() {
 			strncpy(dsthed.pdhed, "PD", 2);
 			strncpy(dsthed.pd, "******\r", 7);
 			strncpy(dsthed.eof, "\x1a", 1);
-			WriteFile(hPcs, (DSTHED*)&dsthed, sizeof(DSTHED), &wrot, 0);
-			WriteFile(hPcs, (DSTREC*)drecs, sizeof(DSTREC)*dstcnt, &wrot, 0);
+			WriteFile(hPcsFile, (DSTHED*)&dsthed, sizeof(DSTHED), &wrot, 0);
+			WriteFile(hPcsFile, (DSTREC*)drecs, sizeof(DSTREC)*dstcnt, &wrot, 0);
 			break;
 
 #if PESACT
@@ -6739,8 +6738,8 @@ void sav() {
 			groupEndStitch = hed.stitchCount - 1;
 			peshed.xsiz = 10000;
 			peshed.ysiz = 10000;
-			WriteFile(hPcs, (PESHED*)&peshed, sizeof(PESHED), &wrot, 0);
-			WriteFile(hPcs, (PESTCH*)&bseq, opnt << 2, &wrot, 0);
+			WriteFile(hPcsFile, (PESHED*)&peshed, sizeof(PESHED), &wrot, 0);
+			WriteFile(hPcsFile, (PESTCH*)&bseq, opnt << 2, &wrot, 0);
 			ind = pesnam();
 			pchr = (TCHAR*)&bseq;
 			while (ind < 512)
@@ -6770,7 +6769,7 @@ void sav() {
 			pchr[529] = (TBYTE)0x80; //hor lsb
 			pchr[530] = (TBYTE)0x82; //vert msb
 			pchr[531] = (TBYTE)0xff; //vert lsb
-			WriteFile(hPcs, (TBYTE*)&bseq, opnt, &wrot, 0);
+			WriteFile(hPcsFile, (TBYTE*)&bseq, opnt, &wrot, 0);
 			break;
 #endif
 		default:
@@ -6779,12 +6778,12 @@ void sav() {
 				hed.colors[ind] = userColor[ind];
 			if (pcshup())
 				return;
-			if (!WriteFile(hPcs, &hed, 0x46, &wrot, 0)) {
+			if (!WriteFile(hPcsFile, &hed, 0x46, &wrot, 0)) {
 
 				riter();
 				return;
 			}
-			filBuf = new PCSTCH[hed.stitchCount + colCnt + 2];
+			ptrFileBuffer = new PCSTCH[hed.stitchCount + colCnt + 2];
 			clrfbuf((sizeof(PCSTCH)*(hed.stitchCount + colCnt + 1)) >> 2);
 			l_stind = 0;
 			savcol = 0xff;
@@ -6793,17 +6792,17 @@ void sav() {
 				if ((rotatedStitches[ind].attribute&COLMSK) != savcol) {
 
 					savcol = rotatedStitches[ind].attribute&COLMSK;
-					filBuf[l_stind].typ = 3;
-					filBuf[l_stind++].fx = savcol;
+					ptrFileBuffer[l_stind].typ = 3;
+					ptrFileBuffer[l_stind++].fx = savcol;
 				}
 				frct = modf(rotatedStitches[ind].x, &intg);
-				filBuf[l_stind].fx = frct * 256;
-				filBuf[l_stind].x = intg;
+				ptrFileBuffer[l_stind].fx = frct * 256;
+				ptrFileBuffer[l_stind].x = intg;
 				frct = modf(rotatedStitches[ind].y, &intg);
-				filBuf[l_stind].fy = frct * 256;
-				filBuf[l_stind++].y = intg;
+				ptrFileBuffer[l_stind].fy = frct * 256;
+				ptrFileBuffer[l_stind++].y = intg;
 			}
-			if (!WriteFile(hPcs, filBuf, l_stind * sizeof(PCSTCH), &wrot, 0)) {
+			if (!WriteFile(hPcsFile, ptrFileBuffer, l_stind * sizeof(PCSTCH), &wrot, 0)) {
 
 				riter();
 				return;
@@ -6811,25 +6810,25 @@ void sav() {
 			if (chku(BSAVOF)) {
 
 				*msgbuf = 0;
-				if (!WriteFile(hPcs, msgbuf, 15, &wrot, 0)) {
+				if (!WriteFile(hPcsFile, msgbuf, 15, &wrot, 0)) {
 
 					riter();
 					return;
 				}
 			} else {
 
-				if (!WriteFile(hPcs, bnam, 15, &wrot, 0)) {
+				if (!WriteFile(hPcsFile, bnam, 15, &wrot, 0)) {
 
 					riter();
 					return;
 				}
 			}
-			delete[] filBuf;
+			delete[] ptrFileBuffer;
 		}
-		defNam(filnam);
-		CloseHandle(hPcs);
+		defNam(fileName);
+		CloseHandle(hPcsFile);
 		if (chku(ROTAUX))
-			filnopn(IDS_FILROT, auxnam);
+			filnopn(IDS_FILROT, auxName);
 	}
 }
 #pragma warning(pop)
@@ -6843,27 +6842,27 @@ void savAs() {
 		ofn.nFilterIndex = 0;
 		if (GetSaveFileName(&ofn)) {
 
-			_strlwr_s(filnam);
-			pchr = strrchr(filnam, '.');
+			_strlwr_s(fileName);
+			pchr = strrchr(fileName, '.');
 			if (!pchr)
-				pchr = &filnam[strlen(filnam)];
+				pchr = &fileName[strlen(fileName)];
 			switch (ofn.nFilterIndex) {
 
 			case 1:
 
-				strcpy_s(pchr, sizeof(filnam) - (pchr - filnam), ".thr");
+				strcpy_s(pchr, sizeof(fileName) - (pchr - fileName), ".thr");
 				break;
 
 			case 2:
 
-				strcpy_s(pchr, sizeof(filnam) - (pchr - filnam), ".pcs");
+				strcpy_s(pchr, sizeof(fileName) - (pchr - fileName), ".pcs");
 				ini.auxFileType = AUXPCS;
 				auxmen();
 				break;
 
 			case 3:
 
-				strcpy_s(pchr, sizeof(filnam) - (pchr - filnam), ".dst");
+				strcpy_s(pchr, sizeof(fileName) - (pchr - fileName), ".dst");
 				ini.auxFileType = AUXDST;
 				auxmen();
 				break;
@@ -6875,7 +6874,7 @@ void savAs() {
 			rstMap(CMPDO);
 			thrsav();
 			sav();
-			SetWindowText(hWnd, thrnam);
+			SetWindowText(hWnd, thrName);
 		}
 	}
 }
@@ -6885,15 +6884,15 @@ void save() {
 	TCHAR*	pchr;
 	TCHAR	tchr;
 
-	if (filnam[0]) {
+	if (fileName[0]) {
 
-		pchr = strrchr(filnam, '.');
+		pchr = strrchr(fileName, '.');
 		if (pchr)
 			pchr++;
 		else {
 
-			strcat_s(filnam, ".thr");
-			pchr = strrchr(filnam, '.') + 1;
+			strcat_s(fileName, ".thr");
+			pchr = strrchr(fileName, '.') + 1;
 		}
 		tchr = pchr[0] | 0x20;
 		thrsav();
@@ -7902,7 +7901,7 @@ void newFil() {
 	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRED], ini.designerName);
 	deldu();
 	SetWindowText(hWnd, msgbuf);
-	strcpy_s(thrnam, stab[STR_NUFIL]);
+	strcpy_s(thrName, stab[STR_NUFIL]);
 	ritfnam(ini.designerName);
 	strcpy_s(hedx.modifierName, ini.designerName);
 	rstdu();
@@ -7929,7 +7928,7 @@ void newFil() {
 	txad = 0;
 	satkad = 0;
 	formIndex = 0;
-	filnam[0] = 0;
+	fileName[0] = 0;
 	colCnt = 0;
 	knotCount = 0;
 	for (ind = 0; ind < 16; ind++) {
@@ -9835,11 +9834,11 @@ void thrsav() {
 	HANDLE				hndl;
 	TCHAR				nunam[_MAX_PATH];
 
-	if (chkattr(filnam))
+	if (chkattr(fileName))
 		return;
 	if (!rstMap(IGNAM)) {
 
-		hndl = FindFirstFile(genam, &fdat);
+		hndl = FindFirstFile(geName, &fdat);
 		ind = 0;
 		if (hndl != INVALID_HANDLE_VALUE) {
 
@@ -9864,22 +9863,22 @@ void thrsav() {
 			}
 		}
 	}
-	hFil = CreateFile(thrnam, (GENERIC_WRITE), 0, NULL,
+	hFile = CreateFile(thrName, (GENERIC_WRITE), 0, NULL,
 		CREATE_ALWAYS, 0, NULL);
-	if (hFil == INVALID_HANDLE_VALUE) {
+	if (hFile == INVALID_HANDLE_VALUE) {
 
-		crmsg(thrnam);
-		hFil = 0;
+		crmsg(thrName);
+		hFile = 0;
 	} else {
 
 		dubuf();
-		WriteFile(hFil, bseq, bufref(), &wrot, 0);
+		WriteFile(hFile, bseq, bufref(), &wrot, 0);
 		if (wrot != (unsigned long)bufref()) {
 
-			sprintf_s(msgbuf, sizeof(msgbuf), "File Write Error: %s\n", thrnam);
+			sprintf_s(msgbuf, sizeof(msgbuf), "File Write Error: %s\n", thrName);
 			shoMsg(msgbuf);
 		}
-		CloseHandle(hFil);
+		CloseHandle(hFile);
 	}
 }
 
@@ -9990,7 +9989,7 @@ void deltot() {
 	coltab();
 	zumhom();
 	strcpy_s(fildes, ini.designerName);
-	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY], thrnam, fildes);
+	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY], thrName, fildes);
 	SetWindowText(hWnd, msgbuf);
 }
 
@@ -10370,7 +10369,7 @@ void vubak() {
 	unsigned	ind;
 	long		dx, dy, vloc;
 
-	if (hFil || chkMap(THUMSHO)) {
+	if (hFile || chkMap(THUMSHO)) {
 
 		setMap(ZUMED);
 		movStch();
@@ -10425,14 +10424,14 @@ void getbak() {
 				}
 			} else {
 
-				strcpy_s(filnam, defDir);
-				pchr = &filnam[strlen(filnam) - 1];
+				strcpy_s(fileName, defaultDirectory);
+				pchr = &fileName[strlen(fileName) - 1];
 				if (pchr[0] != '\\') {
 
 					pchr[1] = '\\';
 					pchr[2] = 0;
 				}
-				strcat_s(filnam, thumsel[fileVersionIndex]);
+				strcat_s(fileName, thumsel[fileVersionIndex]);
 				setMap(REDOLD);
 				nuFil();
 			}
@@ -10449,15 +10448,15 @@ void rebak() {
 
 	for (ind = 0; ind < OLDVER; ind++)
 		DestroyWindow(hBackupViewer[ind]);
-	strcpy_s(tnaml, thrnam);
-	strcpy_s(tnamx, thrnam);
+	strcpy_s(tnaml, thrName);
+	strcpy_s(tnamx, thrName);
 	ind = duth(tnaml);
 	tnaml[ind] = fileVersionIndex + 's';
 	tnamx[ind] = 'x';
-	MoveFile(thrnam, tnamx);
-	MoveFile(tnaml, thrnam);
+	MoveFile(thrName, tnamx);
+	MoveFile(tnaml, thrName);
 	MoveFile(tnamx, tnaml);
-	strcpy_s(filnam, thrnam);
+	strcpy_s(fileName, thrName);
 	setMap(REDOLD);
 	nuFil();
 	DeleteFile(tnamx);
@@ -10477,10 +10476,10 @@ void movbak(TCHAR src, TCHAR dst) {
 	TCHAR	strsrc[_MAX_PATH];
 	TCHAR	strdst[_MAX_PATH];
 
-	unsigned ind = duth(thrnam);
+	unsigned ind = duth(thrName);
 
-	strcpy_s(strsrc, thrnam);
-	strcpy_s(strdst, thrnam);
+	strcpy_s(strsrc, thrName);
+	strcpy_s(strdst, thrName);
 	strsrc[ind] = (TCHAR)src;
 	strdst[ind] = (TCHAR)dst;
 	DeleteFile(strdst);
@@ -10492,9 +10491,9 @@ void purg() {
 	TCHAR		tnam[_MAX_PATH];
 	unsigned	pind, ind;
 
-	if (hFil) {
+	if (hFile) {
 
-		strcpy_s(tnam, thrnam);
+		strcpy_s(tnam, thrName);
 		pind = duth(tnam);
 		for (ind = 1; ind < 6; ind++) {
 
@@ -10507,7 +10506,7 @@ void purg() {
 void purgdir() {
 
 	setMap(PRGMSG);
-	sprintf_s(msgbuf, sizeof(msgbuf), "Delete all backups in %s\n", defDir);
+	sprintf_s(msgbuf, sizeof(msgbuf), "Delete all backups in %s\n", defaultDirectory);
 	shoMsg(msgbuf);
 	okcan();
 }
@@ -10522,7 +10521,7 @@ void deldir() {
 
 	unmsg();
 	tabmsg(IDS_BAKDEL);
-	strcpy_s(tnam, defDir);
+	strcpy_s(tnam, defaultDirectory);
 	pchr = &tnam[strlen(tnam)];
 	strcpy_s(pchr, sizeof(tnam) - (pchr - tnam), "\\*.th0");
 	for (ind = 1; ind < 6; ind++) {
@@ -11880,19 +11879,19 @@ void thumnail() {
 	thumnams = (TCHAR*)oseq;
 	pthums = (TCHAR**)&oseq[MAXSEQ >> 1];
 
-	SetCurrentDirectory(defDir);
-	strcpy_s(srchnam, defDir);
-	pchr = &srchnam[strlen(srchnam) - 1];
+	SetCurrentDirectory(defaultDirectory);
+	strcpy_s(searchName, defaultDirectory);
+	pchr = &searchName[strlen(searchName) - 1];
 	if (pchr[0] != '\\') {
 
 		pchr[1] = '\\';
 		pchr[2] = 0;
 	}
-	strcat_s(srchnam, "*.thr");
-	shndl = FindFirstFile(srchnam, &fdat);
+	strcat_s(searchName, "*.thr");
+	shndl = FindFirstFile(searchName, &fdat);
 	if (shndl == INVALID_HANDLE_VALUE) {
 
-		sprintf_s(msgbuf, sizeof(msgbuf), "Can't find %s\n", srchnam);
+		sprintf_s(msgbuf, sizeof(msgbuf), "Can't find %s\n", searchName);
 		shoMsg(msgbuf);
 		unthum();
 	} else {
@@ -12096,14 +12095,14 @@ void insfil() {
 		hWnd,					//hwndOwner 
 		hInst,					//hInstance 
 		"THR files\0*.thr\0\0",	//lpstrFilter 
-		cstFltr,				//lpstrCustomFilter 
+		customFilter,			//lpstrCustomFilter 
 		_MAX_PATH,				//nMaxCustFilter 
 		0,						//nFilterIndex 
 		insnam,					//lpstrFile 
 		_MAX_PATH,				//nMaxFile 
 		0,						//lpstrFileTitle 
 		0,						//nMaxFileTitle 
-		defDir,					//lpstr	ialDir 
+		defaultDirectory,					//lpstr	ialDir 
 		0,						//lpstrTitle
 		OFN_EXPLORER | OFN_OVERWRITEPROMPT,//Flags
 		0,						//nFileOffset
@@ -12128,19 +12127,19 @@ void insfil() {
 
 	if (chkMap(IGNORINS) || GetOpenFileName(&oin)) {
 
-		hinsf = CreateFile(insnam, (GENERIC_READ), 0, NULL,
+		hInsertedFile = CreateFile(insnam, (GENERIC_READ), 0, NULL,
 			OPEN_EXISTING, 0, NULL);
-		if (hinsf == INVALID_HANDLE_VALUE) {
+		if (hInsertedFile == INVALID_HANDLE_VALUE) {
 
 			filnopn(IDS_FNOPN, insnam);
-			hFil = 0;
-			CloseHandle(hinsf);
+			hFile = 0;
+			CloseHandle(hInsertedFile);
 		} else {
 
 			insfstch = hed.stitchCount;
 			if (isthr(insnam)) {
 
-				ReadFile(hinsf, (STRHED*)&thed, sizeof(STRHED), &red, NULL);
+				ReadFile(hInsertedFile, (STRHED*)&thed, sizeof(STRHED), &red, NULL);
 				if ((thed.headerType & 0xffffff) != 0x746872)
 					tabmsg(IDS_NOTHR);
 				else {
@@ -12157,11 +12156,11 @@ void insfil() {
 							gethand(stitchBuffer, hed.stitchCount)*HANDW +
 							fltad*FRMPW +
 							hed.stitchCount*STCHW;
-						ReadFile(hinsf, (STREX*)&thedx, sizeof(STREX), &red, 0);
+						ReadFile(hInsertedFile, (STREX*)&thedx, sizeof(STREX), &red, 0);
 					}
 					savdo();
-					ReadFile(hinsf, (fPOINTATTRIBUTE*)&stitchBuffer[hed.stitchCount], thed.stitchCount * sizeof(fPOINTATTRIBUTE), &red, NULL);
-					SetFilePointer(hinsf, 164, 0, FILE_CURRENT);
+					ReadFile(hInsertedFile, (fPOINTATTRIBUTE*)&stitchBuffer[hed.stitchCount], thed.stitchCount * sizeof(fPOINTATTRIBUTE), &red, NULL);
+					SetFilePointer(hInsertedFile, 164, 0, FILE_CURRENT);
 					trct.left = trct.bottom = (float)1e9;
 					trct.top = trct.right = (float)1e-9;
 					codof = formIndex << FRMSHFT;
@@ -12171,7 +12170,7 @@ void insfil() {
 						if (vervar < 2) {
 
 							frmlstx = (FRMHEDO*)&bseq;
-							ReadFile(hinsf, (FRMHEDO*)&bseq, thed.formCount * sizeof(FRMHEDO), &red, 0);
+							ReadFile(hInsertedFile, (FRMHEDO*)&bseq, thed.formCount * sizeof(FRMHEDO), &red, 0);
 							if (red != thed.formCount * sizeof(FRMHEDO)) {
 
 								formIndex = red / sizeof(FRMHEDO);
@@ -12188,12 +12187,12 @@ void insfil() {
 								}
 							}
 						} else
-							ReadFile(hinsf, (FRMHED*)&formList[formIndex], thed.formCount * sizeof(FRMHED), &red, 0);
-						ReadFile(hinsf, (fPOINT*)&formPoints[fltad], thed.pointCount * sizeof(fPOINT), &red, 0);
-						ReadFile(hinsf, (SATCON*)&satks[satkad], thed.dlineCount * sizeof(SATCON), &red, 0);
-						ReadFile(hinsf, (fPOINT*)&clipboardPoints[clpad], thed.clipboardDataCount * sizeof(fPOINT), &red, 0);
-						CloseHandle(hinsf);
-						hinsf = 0;
+							ReadFile(hInsertedFile, (FRMHED*)&formList[formIndex], thed.formCount * sizeof(FRMHED), &red, 0);
+						ReadFile(hInsertedFile, (fPOINT*)&formPoints[fltad], thed.pointCount * sizeof(fPOINT), &red, 0);
+						ReadFile(hInsertedFile, (SATCON*)&satks[satkad], thed.dlineCount * sizeof(SATCON), &red, 0);
+						ReadFile(hInsertedFile, (fPOINT*)&clipboardPoints[clpad], thed.clipboardDataCount * sizeof(fPOINT), &red, 0);
+						CloseHandle(hInsertedFile);
+						hInsertedFile = 0;
 						for (ind = formIndex; ind < formIndex + thed.formCount; ind++) {
 
 							formList[ind].vertices = adflt(formList[ind].sides);
@@ -12258,7 +12257,7 @@ void insfil() {
 							for (ind = 0; ind < 50; ind++)
 								hedx.creatorName[ind] = thedx.creatorName[ind];
 							redfnam(fildes);
-							sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY], thrnam, fildes);
+							sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRDBY], thrName, fildes);
 							SetWindowText(hWnd, msgbuf);
 						}
 					}
@@ -12280,12 +12279,12 @@ void insfil() {
 				}
 			} else {
 
-				ReadFile(hinsf, (PCSHEADER*)&tphed, 0x46, &red, NULL);
+				ReadFile(hInsertedFile, (PCSHEADER*)&tphed, 0x46, &red, NULL);
 				if (hed.leadIn == 0x32 && hed.colorCount == 16) {
 
 					savdo();
 					tbuf = (PCSTCH*)bseq;
-					ReadFile(hinsf, (PCSTCH*)tbuf, tphed.stitchCount * sizeof(PCSTCH), &red, NULL);
+					ReadFile(hInsertedFile, (PCSTCH*)tbuf, tphed.stitchCount * sizeof(PCSTCH), &red, NULL);
 					ine = hed.stitchCount;
 					cod = 0;
 					for (ind = 0; ind < tphed.stitchCount; ind++) {
@@ -12331,8 +12330,8 @@ void insfil() {
 					dufrm();
 				}
 			}
-			if (hinsf)
-				CloseHandle(hinsf);
+			if (hInsertedFile)
+				CloseHandle(hInsertedFile);
 		}
 	}
 }
@@ -13443,14 +13442,14 @@ void gsnap() {
 void lodpes() {
 
 	setMap(REDOLD);
-	strcpy_s(filnam, "u:\\mrd\\t.pes");
+	strcpy_s(fileName, "u:\\mrd\\t.pes");
 	nuFil();
 }
 
 void savpes() {
 
 	ini.auxFileType = AUXPES;
-	strcpy_s(filnam, "u:\\mrd\\t1.thr");
+	strcpy_s(fileName, "u:\\mrd\\t1.thr");
 	nunams();
 	sav();
 }
@@ -13489,12 +13488,12 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	case WM_INITDIALOG:
 
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-		strcpy_s(snam, defDir);
+		strcpy_s(snam, defaultDirectory);
 		strcat_s(snam, "\\*.thr");
 		srch = FindFirstFile(snam, &pdat[0]);
 		if (srch == INVALID_HANDLE_VALUE) {
 
-			sprintf_s(msgbuf, sizeof(msgbuf), "Directory: %s has no .thr files\n", defDir);
+			sprintf_s(msgbuf, sizeof(msgbuf), "Directory: %s has no .thr files\n", defaultDirectory);
 			shoMsg(msgbuf);
 			EndDialog(hwndlg, wparam);
 			return TRUE;
@@ -13562,7 +13561,7 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 		case IDOK:
 
-			strcpy_s(snam, defDir);
+			strcpy_s(snam, defaultDirectory);
 			strcat_s(snam, "\\");
 			ine = 0;
 			for (ind = 0; ind < xpnt; ind++) {
@@ -15060,7 +15059,7 @@ void closfn() {
 	deltot();
 	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_THRED], ini.designerName);
 	knotCount = 0;
-	*filnam = 0;
+	*fileName = 0;
 	*bnam = 0;
 	deldu();
 	clrhbut(3);
@@ -16522,7 +16521,7 @@ unsigned chkMsg() {
 				if (rstMap(FRMPSEL))
 					setMap(RESTCH);
 			}
-			if (chkMap(INIT) || hFil) {
+			if (chkMap(INIT) || hFile) {
 
 				if (msg.wParam&MK_SHIFT) {
 
@@ -16984,16 +16983,16 @@ unsigned chkMsg() {
 
 				if (chkok()) {
 
-					ind = duth(thrnam);
-					thrnam[ind] = 't';
+					ind = duth(thrName);
+					thrName[ind] = 't';
 					setMap(IGNAM);
 					thrsav();
-					thrnam[ind] = 'r';
+					thrName[ind] = 'r';
 					if (fileVersionIndex)
-						filnam[ind] = fileVersionIndex + 0x2f;
+						fileName[ind] = fileVersionIndex + 0x2f;
 					setMap(REDOLD);
 					nuFil();
-					filnam[ind] = 'r';
+					fileName[ind] = 'r';
 					switch (fileVersionIndex) {
 
 					case 3:
@@ -17009,13 +17008,13 @@ unsigned chkMsg() {
 						movbak('r', '0');
 					}
 					movbak('t', 'r');
-					thrnam[ind] = 't';
-					DeleteFile(thrnam);
-					thrnam[ind] = 'r';
-					hFil = CreateFile(thrnam, (GENERIC_WRITE | GENERIC_READ), 0, NULL,
+					thrName[ind] = 't';
+					DeleteFile(thrName);
+					thrName[ind] = 'r';
+					hFile = CreateFile(thrName, (GENERIC_WRITE | GENERIC_READ), 0, NULL,
 						OPEN_EXISTING, 0, NULL);
-					if (hFil == INVALID_HANDLE_VALUE)
-						hFil = 0;
+					if (hFile == INVALID_HANDLE_VALUE)
+						hFile = 0;
 					return 1;
 				}
 				GetWindowRect(hCancelButton, &trct);
@@ -18864,7 +18863,7 @@ unsigned chkMsg() {
 			} else {
 #if PESACT
 				//				ini.auxFileType=AUXPES;
-				//				strcpy_s(filnam,"u:\\mrd\\t.thr");
+				//				strcpy_s(fileName,"u:\\mrd\\t.thr");
 				//				setMap(REDOLD);
 				//				nuFil();
 				//				lodpes();
@@ -19977,7 +19976,7 @@ unsigned chkMsg() {
 
 			if (msg.wParam == LRUMenuId[ind]) {
 
-				strcpy_s(filnam, ini.prevNames[ind]);
+				strcpy_s(fileName, ini.prevNames[ind]);
 				setMap(REDOLD);
 				nuFil();
 			}
@@ -21309,7 +21308,7 @@ void ritloc() {
 	strcpy_s(penv, sizeof(locnam) - (penv - locnam), "thredloc.txt");
 	hloc = CreateFile(locnam, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (hloc != INVALID_HANDLE_VALUE) {
-		WriteFile(hloc, (TCHAR*)homdir, strlen(homdir) + 1, &rot, 0);
+		WriteFile(hloc, (TCHAR*)homeDirectory, strlen(homeDirectory) + 1, &rot, 0);
 		CloseHandle(hloc);
 	}
 }
@@ -21647,18 +21646,19 @@ void dstcurs() {
 
 void duhom() {
 
-	unsigned ind;
+	unsigned	ind;
+	TCHAR*		phom;	//pointer to the home file name
 
-	strcpy_s(homdir, __argv[0]);
-	phom = strrchr(homdir, '\\');
+	strcpy_s(homeDirectory, __argv[0]);
+	phom = strrchr(homeDirectory, '\\');
 	if (phom)
 		phom++;
 	else {
 
-		ind = GetCurrentDirectory(_MAX_PATH, homdir);
+		ind = GetCurrentDirectory(_MAX_PATH, homeDirectory);
 		if (ind) {
-			homdir[ind++] = '\\';
-			phom = &homdir[ind];
+			homeDirectory[ind++] = '\\';
+			phom = &homeDirectory[ind];
 		}
 	}
 	if (phom) { *phom = 0; }
@@ -21695,44 +21695,44 @@ void ducmd() {
 	if (__argc > 1) {
 
 #if  __UseASM__
-		bcpy(filnam, __argv[1]);
+		bcpy(fileName, __argv[1]);
 #else
-		strcpy_s(filnam, __argv[1]);
+		strcpy_s(fileName, __argv[1]);
 #endif
-		if (!strncmp(filnam, "/F1:", 4)) {
+		if (!strncmp(fileName, "/F1:", 4)) {
 
-			balaradFileName = &filnam[4];
+			balaradFileName = &fileName[4];
 			hBalaradFile = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 			CloseHandle(hBalaradFile);
 			if (hBalaradFile != INVALID_HANDLE_VALUE) {
 
 #if  __UseASM__
-				bcpy(balnam0, balaradFileName);
+				bcpy(balaradName0, balaradFileName);
 #else
-				strcpy_s(balnam0, balaradFileName);
+				strcpy_s(balaradName0, balaradFileName);
 #endif
 				if (__argc > 2) {
 
 #if  __UseASM__
-					bcpy(filnam, __argv[2]);
+					bcpy(fileName, __argv[2]);
 #else
-					strcpy_s(filnam, __argv[2]);
+					strcpy_s(fileName, __argv[2]);
 #endif
-					if (!strncmp(filnam, "/F2:", 4)) {
+					if (!strncmp(fileName, "/F2:", 4)) {
 
-						balaradFileName = &filnam[4];
+						balaradFileName = &fileName[4];
 						hBalaradFile = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 						if (hBalaradFile != INVALID_HANDLE_VALUE) {
 
 #if  __UseASM__
-							bcpy(balnam1, balaradFileName);
+							bcpy(balaradName1, balaradFileName);
 #else
-							strcpy_s(balnam1, balaradFileName);
+							strcpy_s(balaradName1, balaradFileName);
 #endif
 							//ToDo - Does this line make sense?
 							balaradFileName = (TCHAR*)&bseq;
-							ReadFile(hBalaradFile, (void*)&balnam2, 10000, &l_red, 0);
-							strcat_s(balnam2, "");
+							ReadFile(hBalaradFile, (void*)&balaradName2, 10000, &l_red, 0);
+							strcat_s(balaradName2, "");
 							if (l_red)
 								redbal();
 						}
@@ -21740,15 +21740,15 @@ void ducmd() {
 				}
 				SetWindowText(hWnd, stab[STR_EMB]);
 			}
-			*filnam = 0;
+			*fileName = 0;
 			CloseHandle(hBalaradFile);
-			DeleteFile(balnam1);
+			DeleteFile(balaradName1);
 		} else {
 
 			for (ind = 2; ind < __argc; ind++) {
 
-				strcat_s(filnam, " ");
-				strcat_s(filnam, __argv[ind]);
+				strcat_s(fileName, " ");
+				strcat_s(fileName, __argv[ind]);
 			}
 			setMap(REDOLD);
 			nuFil();
@@ -21767,19 +21767,19 @@ void redini() {
 	for (ind = 0; ind < OLDNUM; ind++)
 		ini.prevNames[ind][0] = 0;
 	duhom();
-	strcpy_s(iniNam, homdir);
+	strcpy_s(iniNam, homeDirectory);
 	strcat_s(iniNam, "thred.ini");
-	hIni = CreateFile(iniNam, GENERIC_READ, 0, NULL,
+	hIniFile = CreateFile(iniNam, GENERIC_READ, 0, NULL,
 		OPEN_EXISTING, 0, NULL);
-	if (hIni == INVALID_HANDLE_VALUE)
+	if (hIniFile == INVALID_HANDLE_VALUE)
 		defpref();
 	else {
 
-		ReadFile(hIni, &ini, sizeof(ini), &wrot, 0);
+		ReadFile(hIniFile, &ini, sizeof(ini), &wrot, 0);
 		if (wrot < 2061)
 			ini.formBoxSizePixels = DEFBPIX;
-		strcpy_s(defDir, ini.defaultDirectory);
-		strcpy_s(defbmp, ini.defaultDirectory);
+		strcpy_s(defaultDirectory, ini.defaultDirectory);
+		strcpy_s(defaultBMPDirectory, ini.defaultDirectory);
 		for (ind = 0; ind < 16; ind++) {
 
 			userColor[ind] = ini.stitchColors[ind];
@@ -21896,7 +21896,7 @@ void redini() {
 	}
 	if (!ini.gridColor)
 		ini.gridColor = DEFGRD;
-	CloseHandle(hIni);
+	CloseHandle(hIniFile);
 	if (!ini.fillAngle)
 		ini.fillAngle = PI / 6;
 	tdc = GetDC(0);
@@ -22027,7 +22027,7 @@ void init() {
 	stchWnd();
 	lodstr();
 	maxwid(STR_PRF0, STR_PRF27);
-	if (!hIni) {
+	if (!hIniFile) {
 
 		//initialize the user color and thread size arrays
 		for (ind = 0; ind < 16; ind++)
@@ -23308,7 +23308,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			}
 			if (!chkMap(RUNPAT)) {
 
-				if (!chkMap(HIDSTCH) && (hFil || chkMap(INIT) || formIndex || chkMap(SATPNT)) && !chkMap(BAKSHO))
+				if (!chkMap(HIDSTCH) && (hFile || chkMap(INIT) || formIndex || chkMap(SATPNT)) && !chkMap(BAKSHO))
 					drwStch();
 				else {
 
@@ -23489,7 +23489,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 					if (ds->hwndItem == hBackupViewer[ind]) {
 
-						strcpy_s(nam, thrnam);
+						strcpy_s(nam, thrName);
 						ine = duth(nam);
 						nam[ine] = (TCHAR)ind + 's';
 						ritbak(nam, ds);

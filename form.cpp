@@ -212,7 +212,7 @@ extern			unsigned	dunmap[MAXFRMLINS / 32 + 1];
 extern			void		rotflt(fPOINT* pnt);
 extern			fPOINT		selectedFormsSize;
 extern			unsigned	toglu(unsigned bPnt);
-extern			TCHAR		thrnam[_MAX_PATH];
+extern			TCHAR		thrName[_MAX_PATH];
 extern			POINT		sizlin[5];
 extern			INIFILE		ini;
 extern			POINT		stitchSizePixels;
