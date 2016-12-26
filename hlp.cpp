@@ -39,7 +39,7 @@ extern fPOINT			oseq[OSEQLEN];
 extern BSEQPNT			bseq[BSEQLEN];
 extern INIFILE			iniFile;
 extern TCHAR			thrName[_MAX_PATH];
-extern HDC				StitchWindowMemDC;
+extern HDC				stitchWindowMemDC;
 extern long				prfwid;
 extern HWND				hButtonWin[9];
 extern void				numWnd();
@@ -383,7 +383,7 @@ void shoMsg(TCHAR* str) {
 	tsiz.cx = tsiz.cy = msgsiz.cy = msgsiz.cx = 0;
 	for (ind = 0; ind < ine; ind++) {
 
-		GetTextExtentPoint32(StitchWindowMemDC, strs[ind], lens[ind], &tsiz);
+		GetTextExtentPoint32(stitchWindowMemDC, strs[ind], lens[ind], &tsiz);
 		if (tsiz.cx > msgsiz.cx)
 			msgsiz.cx = tsiz.cx;
 		if (tsiz.cy > msgsiz.cy)

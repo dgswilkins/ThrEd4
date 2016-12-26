@@ -9,192 +9,192 @@
 // Suppress C4244: conversion from 'type1' to 'type2', possible loss of data
 #pragma warning(disable:4244)
 
-void repar();
-void tst();
-void chktxnum();
-void txof();
-void rotbak();
-void txbak();
-void redtbak();
-void txdelal();
-unsigned dutyp(unsigned tat);
-void deltx();
+void		chktxnum();
+void		deltx();
+unsigned	dutyp(unsigned tat);
+void		redtbak();
+void		repar();
+void		rotbak();
+void		tst();
+void		txbak();
+void		txdelal();
+void		txof();
 
-extern void delmclp(unsigned fpnt);
-extern void adbad(unsigned cod, unsigned cnt);
-extern TCHAR* sdat;
-extern void delclps(unsigned ind);
-extern void delsac(unsigned fpnt);
-extern void chkmen();
-extern void datmsg(unsigned cod);
-extern void delinf();
-extern unsigned clpad;
-extern SATCON satks[MAXSAC];
-extern fPOINT clipboardPoints[MAXCLPNTS];
-extern unsigned toglu(unsigned bPnt);
-extern void wrnmen();
-extern unsigned markedStitchMap[RMAPSIZ];
-extern fPOINT zoomBoxOrigin;
-extern void ritfil();
-extern void angclpfn();
-extern unsigned clipboardStitchCount;
-extern fPOINTATTRIBUTE clipBuffer[MAXFRMLINS];
-extern fRECTANGLE clipboardRect;
-extern FLSIZ clipboardRectSize;
-extern void centir();
-extern void movStch();
-extern void hsizmsg();
-extern void chkhup();
-extern void refilal();
-extern void stchrct(fRECTANGLE* rct);
-extern void frmrct(fRECTANGLE* rct);
-extern void rtrclpfn();
-extern fPOINT selectedPoint;
-extern void butxt(unsigned ind, TCHAR* str);
-extern void unthum();
-extern HWND hMainStitchWin;
-extern unsigned buttonWidthX3;
-extern void redraw(HWND dWnd);
-extern HWND hButtonWin[9];
-extern BOOL chkr(unsigned pbit);
-extern void setr(unsigned pbit);
-extern void clRmap(unsigned len);
-extern void zumhom();
-extern unsigned buttonHeight;
-extern POINT formLines[MAXFRMLINS];
-extern unsigned hThrEdClip;
-extern TCHAR* thrEdClipFormat;
-extern HGLOBAL hClipMem;
-extern FRMHED angfrm;
-extern FORMCLIP* clipboardFormData;
-extern HPEN gridPen;
-extern unsigned satkad;
-extern POINT zoomBoxLine[5];
-extern MSG msg;
-extern POINT stitchWindowOrigin;
-extern unsigned px2stch();
-extern HWND hVerticalScrollBar;
-extern HWND hHorizontalScrollBar;
-extern HDC StitchWindowMemDC;
-extern HDC StitchWindowDC;
-extern RECT stitchWindowClientRect;
-extern HBRUSH hBackgroundBrush;
-extern TCHAR fileName[_MAX_PATH];
-extern void movStch();
-extern void shoseln(unsigned cod0, unsigned cod1);
-extern unsigned closestVertexToCursor;
-extern BOOL isclp(unsigned find);
-extern BOOL iseclp(unsigned find);
-extern TCHAR hlpbuf[HBUFSIZ];
-extern unsigned selectedFormCount;
-extern BOOL isin(float pntx, float pnty);
-extern void clpfil();
-extern unsigned	underlayColor;
-extern fPOINT lastpnt;
-extern void refilfn();
-extern void filvrt();
-extern unsigned closflt(float px, float py);
-extern unsigned short prv(unsigned ind);
-extern unsigned getlast();
-extern BOOL cisin(float pntx, float pnty);
-extern fPOINTATTRIBUTE* hifstch;
-extern SATCON* adsatk(unsigned cnt);
-extern unsigned rstu(unsigned bPnt);
-extern unsigned chku(unsigned bPnt);
-extern unsigned setu(unsigned bPnt);
-extern unsigned activeLayer;
-extern fPOINT* adflt(unsigned cnt);
-extern void frmclr(FRMHED* dst);
-extern void setmfrm();
-extern void mdufrm();
-extern unsigned newFormVertexCount;
-extern fPOINT fmovdif;
-extern void dumrk(double pntx, double pnty);
-extern dRECTANGLE zoomRect;
-extern POINT unzoomedRect;
-extern void unmsg();
-extern fPOINT formPoints[MAXFRMPNTS];
-extern fPOINT* currentFormVertices;
-extern unsigned fltad;
-extern unsigned char cryptkey[4096];
-extern fPOINT angflt[MAXFRMLINS];
-extern FRMHED angfrm;
-extern void frmcpy(FRMHED* dst, FRMHED* src);
-extern float midl(float hi, float lo);
-extern dPOINT rotationCenter;
-extern void rotflt(fPOINT* pnt);
-extern double rotationAngle;
-extern void filang();
-extern void fnhor();
-extern fPOINT* lconflt;
-extern void lcon();
-extern void bakseq();
-extern BOOL chkmax(unsigned arg0, unsigned arg1);
-extern unsigned isind;
-extern void msgflt(unsigned msgid, float par);
-extern unsigned short nxt(unsigned short ind);
-extern void mvstchs(unsigned dst, unsigned src, unsigned cnt);
-extern void numWnd();
-extern void satout(double satwid);
-extern void tabmsg(unsigned cod);
-extern unsigned auth;
-extern void frmout(unsigned ind);
-extern TCHAR thrName[_MAX_PATH];
-extern TCHAR auxName[_MAX_PATH];
-extern void save();
-extern COLORREF userColor[16];
-extern unsigned psg();
-extern unsigned psgacc;
-extern void setknots();
-extern void refil();
-extern void moveStitchPoints(fPOINTATTRIBUTE* dst, fPOINTATTRIBUTE* src);
-extern BOOL filmsgs(unsigned cod);
-extern unsigned find1st();
-extern double StitchSpace;
-extern void savdo();
-extern void delmfil(unsigned col);
-extern double userStitchLength;
-extern unsigned activeColor;
-extern void rseq(unsigned strt, unsigned fin, unsigned ostrt, unsigned at);
-extern unsigned delpnt;
-extern void makspac(unsigned strt, unsigned cnt);
-extern void chkseq(BOOL brd);
-extern HWND hWnd;
-extern HINSTANCE hInst;
-extern INIFILE iniFile;
-extern unsigned activePointIndex;
-extern fPOINT oseq[OSEQLEN];
-extern unsigned opnt;
-extern unsigned toglMap(unsigned bPnt);
-extern unsigned sequenceIndex;
-extern void satfil();
-extern unsigned rstMap(unsigned bPnt);
-extern void filsat();
-extern FRMHED* ptrSelectedForm;
-extern unsigned closestFormToCursor;
-extern FRMHED formList[MAXFORMS];
-extern void fvars(unsigned ind);
-extern void satout(double satwid);
-extern fPOINT* opnts;
-extern fPOINT* ipnts;
-extern void fnvrt();
-extern void fshor();
-extern void coltab();
-extern unsigned setMap(unsigned bPnt);
-extern unsigned chkMap(unsigned bPnt);
-extern unsigned short sides;
-extern PCSHEADER header;
-extern fPOINTATTRIBUTE stitchBuffer[MAXPCS];
-extern void mvstch(unsigned dst, unsigned src);
-extern unsigned	formIndex;
-extern BSEQPNT bseq[BSEQLEN];
-extern unsigned selectedFormCount;
-extern unsigned short selectedFormList[MAXFORMS];
-extern unsigned closestPointIndex;
-extern TCHAR msgbuf[MSGSIZ];
-extern TCHAR* stab[STR_LEN];
-extern void shoMsg(TCHAR* str);
-extern void filsfn();
+extern	unsigned		activeColor;
+extern	unsigned		activeLayer;
+extern	unsigned		activePointIndex;
+extern	fPOINT			angflt[MAXFRMLINS];
+extern	FRMHED			angfrm;
+extern	FRMHED			angfrm;
+extern	unsigned		auth;
+extern	TCHAR			auxName[_MAX_PATH];
+extern	BSEQPNT			bseq[BSEQLEN];
+extern	unsigned		buttonHeight;
+extern	unsigned		buttonWidthX3;
+extern	FORMCLIP*		clipboardFormData;
+extern	fPOINT			clipboardPoints[MAXCLPNTS];
+extern	fRECTANGLE		clipboardRect;
+extern	FLSIZ			clipboardRectSize;
+extern	unsigned		clipboardStitchCount;
+extern	fPOINTATTRIBUTE	clipBuffer[MAXFRMLINS];
+extern	unsigned		closestFormToCursor;
+extern	unsigned		closestPointIndex;
+extern	unsigned		closestVertexToCursor;
+extern	unsigned		clpad;
+extern	unsigned char	cryptkey[4096];
+extern	fPOINT*			currentFormVertices;
+extern	unsigned		delpnt;
+extern	TCHAR			fileName[_MAX_PATH];
+extern	unsigned		fltad;
+extern	fPOINT			fmovdif;
+extern	unsigned		formIndex;
+extern	POINT			formLines[MAXFRMLINS];
+extern	FRMHED			formList[MAXFORMS];
+extern	fPOINT			formPoints[MAXFRMPNTS];
+extern	HPEN			gridPen;
+extern	HBRUSH			hBackgroundBrush;
+extern	HWND			hButtonWin[9];
+extern	HGLOBAL			hClipMem;
+extern	PCSHEADER		header;
+extern	HWND			hHorizontalScrollBar;
+extern	fPOINTATTRIBUTE*	hifstch;
+extern	HINSTANCE		hInst;
+extern	TCHAR			hlpbuf[HBUFSIZ];
+extern	HWND			hMainStitchWin;
+extern	unsigned		hThrEdClip;
+extern	HWND			hVerticalScrollBar;
+extern	HWND			hWnd;
+extern	INIFILE			iniFile;
+extern	fPOINT*			ipnts;
+extern	unsigned		isind;
+extern	fPOINT			lastpnt;
+extern	fPOINT*			lconflt;
+extern	unsigned		markedStitchMap[RMAPSIZ];
+extern	MSG				msg;
+extern	TCHAR			msgbuf[MSGSIZ];
+extern	unsigned		newFormVertexCount;
+extern	unsigned		opnt;
+extern	fPOINT*			opnts;
+extern	fPOINT			oseq[OSEQLEN];
+extern	unsigned		psgacc;
+extern	FRMHED*			ptrSelectedForm;
+extern	double			rotationAngle;
+extern	dPOINT			rotationCenter;
+extern	unsigned		satkad;
+extern	SATCON			satks[MAXSAC];
+extern	TCHAR*			sdat;
+extern	unsigned		selectedFormCount;
+extern	unsigned		selectedFormCount;
+extern	unsigned short	selectedFormList[MAXFORMS];
+extern	fPOINT			selectedPoint;
+extern	unsigned		sequenceIndex;
+extern	unsigned short	sides;
+extern	TCHAR*			stab[STR_LEN];
+extern	fPOINTATTRIBUTE	stitchBuffer[MAXPCS];
+extern	double			stitchSpace;
+extern	RECT			stitchWindowClientRect;
+extern	HDC				stitchWindowDC;
+extern	HDC				stitchWindowMemDC;
+extern	POINT			stitchWindowOrigin;
+extern	TCHAR*			thrEdClipFormat;
+extern	TCHAR			thrName[_MAX_PATH];
+extern	unsigned		underlayColor;
+extern	POINT			unzoomedRect;
+extern	COLORREF		userColor[16];
+extern	double			userStitchLength;
+extern	POINT			zoomBoxLine[5];
+extern	fPOINT			zoomBoxOrigin;
+extern	dRECTANGLE		zoomRect;
+
+extern	void		adbad(unsigned cod, unsigned cnt);
+extern	fPOINT*		adflt(unsigned cnt);
+extern	SATCON*		adsatk(unsigned	cnt);
+extern	void		angclpfn();
+extern	void		bakseq();
+extern	void		butxt(unsigned ind, TCHAR* str);
+extern	void		centir();
+extern	void		chkhup();
+extern	unsigned	chkMap(unsigned bPnt);
+extern	BOOL		chkmax(unsigned arg0, unsigned arg1);
+extern	void		chkmen();
+extern	BOOL		chkr(unsigned pbit);
+extern	void		chkseq(BOOL brd);
+extern	unsigned	chku(unsigned bPnt);
+extern	BOOL		cisin(float pntx, float pnty);
+extern	unsigned	closflt(float px, float py);
+extern	void		clpfil();
+extern	void		clRmap(unsigned len);
+extern	void		coltab();
+extern	void		datmsg(unsigned cod);
+extern	void		delclps(unsigned ind);
+extern	void		delinf();
+extern	void		delmclp(unsigned fpnt);
+extern	void		delmfil(unsigned col);
+extern	void		delsac(unsigned fpnt);
+extern	void		dumrk(double pntx, double pnty);
+extern	void		filang();
+extern	BOOL		filmsgs(unsigned cod);
+extern	void		filsat();
+extern	void		filsfn();
+extern	void		filvrt();
+extern	unsigned	find1st();
+extern	void		fnhor();
+extern	void		fnvrt();
+extern	void		frmclr(FRMHED* dst);
+extern	void		frmcpy(FRMHED* dst, FRMHED* src);
+extern	void		frmout(unsigned ind);
+extern	void		frmrct(fRECTANGLE* rct);
+extern	void		fshor();
+extern	void		fvars(unsigned ind);
+extern	unsigned	getlast();
+extern	void		hsizmsg();
+extern	BOOL		isclp(unsigned find);
+extern	BOOL		iseclp(unsigned find);
+extern	BOOL		isin(float pntx, float pnty);
+extern	void		lcon();
+extern	void		makspac(unsigned strt, unsigned cnt);
+extern	void		mdufrm();
+extern	float		midl(float hi, float lo);
+extern	void		moveStitchPoints(fPOINTATTRIBUTE* dst, fPOINTATTRIBUTE* src);
+extern	void		movStch();
+extern	void		movStch();
+extern	void		msgflt(unsigned msgid, float par);
+extern	void		mvstch(unsigned dst, unsigned src);
+extern	void		mvstchs(unsigned dst, unsigned src, unsigned cnt);
+extern	void		numWnd();
+extern	unsigned short	nxt(unsigned short ind);
+extern	unsigned short	prv(unsigned ind);
+extern	unsigned	psg();
+extern	unsigned	px2stch();
+extern	void		redraw(HWND dWnd);
+extern	void		refil();
+extern	void		refilal();
+extern	void		refilfn();
+extern	void		ritfil();
+extern	void		rotflt(fPOINT* pnt);
+extern	void		rseq(unsigned strt, unsigned fin, unsigned ostrt, unsigned at);
+extern	unsigned	rstMap(unsigned bPnt);
+extern	unsigned	rstu(unsigned bPnt);
+extern	void		rtrclpfn();
+extern	void		satfil();
+extern	void		satout(double satwid);
+extern	void		savdo();
+extern	void		save();
+extern	void		setknots();
+extern	unsigned	setMap(unsigned bPnt);
+extern	void		setmfrm();
+extern	void		setr(unsigned pbit);
+extern	unsigned	setu(unsigned bPnt);
+extern	void		shoMsg(TCHAR* str);
+extern	void		shoseln(unsigned cod0, unsigned cod1);
+extern	void		stchrct(fRECTANGLE* rct);
+extern	void		tabmsg(unsigned cod);
+extern	unsigned	toglMap(unsigned bPnt);
+extern	unsigned	toglu(unsigned bPnt);
+extern	void		unmsg();
+extern	void		unthum();
+extern	void		wrnmen();
+extern	void		zumhom();
 
 unsigned short daztab[] =
 {
@@ -701,8 +701,8 @@ void fthrfn() {
 
 	psgacc = FSED;
 	fthvars();
-	bakspac = StitchSpace;
-	StitchSpace = ptrSelectedForm->fillSpacing;
+	bakspac = stitchSpace;
+	stitchSpace = ptrSelectedForm->fillSpacing;
 	satfil();
 	bseq[0].attribute = 0;
 	bseq[1].attribute = 1;
@@ -771,7 +771,7 @@ void fthrfn() {
 	}
 	rstMap(FTHR);
 	rstMap(BARSAT);
-	StitchSpace = bakspac;
+	stitchSpace = bakspac;
 	sequenceIndex = opnt;
 }
 
@@ -824,7 +824,7 @@ void fethrf() {
 		ptrSelectedForm->extendedAttribute |= iniFile.featherType;
 		ptrSelectedForm->fillInfo.feather.count = iniFile.featherCount;
 		ptrSelectedForm->lengthOrCount.stitchLength = userStitchLength;
-		ptrSelectedForm->fillSpacing = StitchSpace;
+		ptrSelectedForm->fillSpacing = stitchSpace;
 		ptrSelectedForm->fillColor = activeColor;
 		ptrSelectedForm->fillInfo.feather.color = (activeColor + 1)&COLMSK;
 		ptrSelectedForm->fillType = FTHF;
@@ -3675,11 +3675,11 @@ void txtxfn(POINT ref, int pix)
 	xlin[0].x = xlin[1].x = ref.x;
 	xlin[0].y = ref.y - pix;
 	xlin[1].y = ref.y + pix;
-	Polyline(StitchWindowMemDC, xlin, 2);
+	Polyline(stitchWindowMemDC, xlin, 2);
 	xlin[0].y = xlin[1].y = ref.y;
 	xlin[0].x = ref.x - pix;
 	xlin[1].x = ref.x + pix;
-	Polyline(StitchWindowMemDC, xlin, 2);
+	Polyline(stitchWindowMemDC, xlin, 2);
 }
 
 void dutxtx(int ind, int pix)
@@ -3791,7 +3791,7 @@ void drwtxtr()
 	double		pxsp;
 	float		wid2;
 
-	FillRect(StitchWindowMemDC, &stitchWindowClientRect, hBackgroundBrush);
+	FillRect(stitchWindowMemDC, &stitchWindowClientRect, hBackgroundBrush);
 	edsp = tscr.areaHeight * 2 / (tscr.spacing*(tscr.lines + 2));
 	pxsp = (double)stitchWindowClientRect.bottom / stitchWindowClientRect.right;
 	tscr.lines = floor(tscr.width / tscr.spacing);
@@ -3816,8 +3816,8 @@ void drwtxtr()
 	tscr.halfHeight = stitchWindowClientRect.bottom >> 1;
 	tscr.screenHeight = stitchWindowClientRect.bottom*tscr.editToPixelRatio;
 	tscr.yOffset = (tscr.screenHeight - tscr.areaHeight) / 2;
-	SetROP2(StitchWindowMemDC, R2_XORPEN);
-	SelectObject(StitchWindowMemDC, gridPen);
+	SetROP2(stitchWindowMemDC, R2_XORPEN);
+	SelectObject(stitchWindowMemDC, gridPen);
 	cnt = tscr.areaHeight / iniFile.gridSize + 1;
 	txp.line = 0;
 	xlin[0].x = 0;
@@ -3827,30 +3827,30 @@ void drwtxtr()
 	{
 		txt2pix(txp, &tpnt);
 		xlin[0].y = xlin[1].y = tpnt.y;
-		Polyline(StitchWindowMemDC, xlin, 2);
+		Polyline(stitchWindowMemDC, xlin, 2);
 		txp.y += iniFile.gridSize;
 	}
 	DeleteObject(xpen);
 	xpen = CreatePen(PS_SOLID, 1, userColor[activeColor]);
-	SelectObject(StitchWindowMemDC, xpen);
-	SetROP2(StitchWindowMemDC, R2_COPYPEN);
+	SelectObject(stitchWindowMemDC, xpen);
+	SetROP2(stitchWindowMemDC, R2_COPYPEN);
 	xlin[0].y = 0;
 	xlin[1].y = stitchWindowClientRect.bottom;
 	for (ind = 1; ind < tscr.lines + 1; ind++)
 	{
 		xlin[0].x = xlin[1].x = (ind*tscr.spacing + tscr.xOffset) / tscr.editToPixelRatio;
-		Polyline(StitchWindowMemDC, xlin, 2);
+		Polyline(stitchWindowMemDC, xlin, 2);
 	}
 	xlin[0].x = 0;
 	xlin[1].x = stitchWindowClientRect.right;
 	xlin[0].y = xlin[1].y = tscr.top;
-	Polyline(StitchWindowMemDC, xlin, 2);
+	Polyline(stitchWindowMemDC, xlin, 2);
 	xlin[0].y = xlin[1].y = tscr.bottom;
-	Polyline(StitchWindowMemDC, xlin, 2);
+	Polyline(stitchWindowMemDC, xlin, 2);
 	DeleteObject(xpen);
 	xpen = CreatePen(PS_SOLID, 1, 0xffffff);
-	SelectObject(StitchWindowMemDC, xpen);
-	SetROP2(StitchWindowMemDC, R2_XORPEN);
+	SelectObject(stitchWindowMemDC, xpen);
+	SetROP2(stitchWindowMemDC, R2_XORPEN);
 	col = userColor[activeColor];
 	for (ind = 0; ind < tscr.index; ind++)
 	{
@@ -3862,23 +3862,23 @@ void drwtxtr()
 		xlin[0].y = xlin[1].y = txprct.top;
 		xlin[0].x = txprct.left;
 		xlin[1].x = txprct.right;
-		Polyline(StitchWindowMemDC, xlin, 2);
+		Polyline(stitchWindowMemDC, xlin, 2);
 		xlin[1].y = txprct.bottom;
 		xlin[1].x = txprct.left;
-		Polyline(StitchWindowMemDC, xlin, 2);
+		Polyline(stitchWindowMemDC, xlin, 2);
 		xlin[0].x = txprct.right;
 		xlin[0].y = txprct.bottom;
-		Polyline(StitchWindowMemDC, xlin, 2);
+		Polyline(stitchWindowMemDC, xlin, 2);
 		xlin[1].x = txprct.right;
 		xlin[1].y = txprct.top;
-		Polyline(StitchWindowMemDC, xlin, 2);
+		Polyline(stitchWindowMemDC, xlin, 2);
 	}
 	for (ind = 0; ind < cloxcnt; ind++)
 	{
 		dutxtx(cloxlst[ind], iniFile.textureEditorSizePixels);
 		dutxtx(cloxlst[ind], iniFile.textureEditorSizePixels << 1);
 	}
-	BitBlt(StitchWindowDC, 0, 0, stitchWindowClientRect.right, stitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
+	BitBlt(stitchWindowDC, 0, 0, stitchWindowClientRect.right, stitchWindowClientRect.bottom, stitchWindowMemDC, 0, 0, SRCCOPY);
 	drwtxbut();
 }
 
@@ -3960,11 +3960,11 @@ void tritx()
 	xlin[0].x = xlin[1].x = txtloc.x;
 	xlin[0].y = txtloc.y - li_Size;
 	xlin[1].y = txtloc.y + li_Size;
-	Polyline(StitchWindowDC, xlin, 2);
+	Polyline(stitchWindowDC, xlin, 2);
 	xlin[0].y = xlin[1].y = txtloc.y;
 	xlin[0].x = txtloc.x - li_Size;
 	xlin[1].x = txtloc.x + li_Size;
-	Polyline(StitchWindowDC, xlin, 2);
+	Polyline(stitchWindowDC, xlin, 2);
 }
 
 void setxmov()
@@ -3972,7 +3972,7 @@ void setxmov()
 	setMap(TXTMOV);
 	txtloc.x = cloxref.x = msg.pt.x - stitchWindowOrigin.x;
 	txtloc.y = cloxref.y = msg.pt.y - stitchWindowOrigin.y;
-	SetROP2(StitchWindowDC, R2_NOTXORPEN);
+	SetROP2(stitchWindowDC, R2_NOTXORPEN);
 }
 
 void ritxrct()
@@ -3991,7 +3991,7 @@ void ritxrct()
 	xlin[2].x = xlin[3].x = trct.right;
 	xlin[0].y = xlin[3].y = xlin[4].y = trct.top;
 	xlin[1].y = xlin[2].y = trct.bottom;
-	Polyline(StitchWindowDC, xlin, 5);
+	Polyline(stitchWindowDC, xlin, 5);
 }
 
 void dutxrct(TXTRCT* rct)
@@ -4248,8 +4248,8 @@ void ritxfrm()
 	cnt = angfrm.sides;
 	if (angfrm.type != LIN)
 		cnt++;
-	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	Polyline(StitchWindowDC, formLines, cnt);
+	SetROP2(stitchWindowDC, R2_NOTXORPEN);
+	Polyline(stitchWindowDC, formLines, cnt);
 }
 
 void setxfrm()
@@ -4311,8 +4311,8 @@ void txtclp()
 
 void dutxtlin()
 {
-	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	Polyline(StitchWindowDC, formLines, 2);
+	SetROP2(stitchWindowDC, R2_NOTXORPEN);
+	Polyline(stitchWindowDC, formLines, 2);
 }
 
 void txtrmov()

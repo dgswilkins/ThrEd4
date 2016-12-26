@@ -696,8 +696,8 @@ typedef struct _iniFil {
 	double			userStitchLength;		//user stitch length
 	double			maxStitchLength;		//maximum stitch length
 	double			smallStitchLength;		//small stitch size
-	double			StitchBoxesThreshold;	//show sitch box level
-	double			StitchSpace;			//stitch spacing between lines of stitches
+	double			stitchBoxesThreshold;	//show sitch box level
+	double			stitchSpace;			//stitch spacing between lines of stitches
 	double			fillAngle;				//fill angle
 	unsigned		binaryVariableBitmap;	//bitmap
 	double			borderWidth;			//border width
