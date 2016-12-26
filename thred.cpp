@@ -410,8 +410,6 @@ extern	unsigned		formIndex;
 extern	FRMHED			formList[MAXFORMS];
 extern	POINT			formOutlineRectangle[10];
 extern	fPOINT			formPoints[MAXFRMPNTS];
-extern	unsigned		frmend;
-extern	unsigned		frmstrt;
 extern	HWND			hindx;
 extern	TCHAR			hlpbuf[HBUFSIZ];
 extern	HWND			hlptxt;
@@ -434,7 +432,6 @@ extern	unsigned		psgacc;
 extern	int				ptxhst;
 extern	unsigned		satkad;
 extern	SATCON			satks[MAXSAC];
-extern	unsigned		satpt;
 extern	unsigned		selectedFormControlVertex;
 extern	unsigned		selectedFormCount;
 extern	unsigned short	selectedFormList[MAXFORMS];
@@ -594,7 +591,7 @@ unsigned			tmpFormIndex;			//saved form index
 unsigned char		cursorMask[128];		//cursor and mask
 double				zoomMin;				//minimum allowed zoom value
 fRECTANGLE			checkHoopRect;			//for checking the hoop size
-BALSTCH*			ptrBalaradStitich;		//balarad stitch pointer
+BALSTCH*			ptrBalaradStitch;		//balarad stitch pointer
 fPOINT				balaradOffset;			//balarad offset
 unsigned			clipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; //for checking if a fill is a clipboard fill
 fPOINTATTRIBUTE*	rotatedStitches;		//rotated stitches for rotate and save
@@ -1082,6 +1079,8 @@ STREX		extendedHeader;	//thred file header extension
 INIFILE		iniFile;		//initialization file
 dPOINT		rotationCenter;	//center of stitch rotation
 POINT		rotationCenterPixels;	//center of pixel rotation
+
+unsigned	frmstrt;					//points to the first stitch in a form
 
 typedef struct _dstdat {
 
@@ -2778,10 +2777,10 @@ void moveStitchPoints(fPOINTATTRIBUTE* dst, fPOINTATTRIBUTE* src) {
 
 void duzero() {
 
-	unsigned		ind;
-	unsigned short	dst;
-	double			len;
-	fPOINTATTRIBUTE*		lpnt;
+	unsigned			ind;
+	unsigned short		dst;
+	double				len;
+	fPOINTATTRIBUTE*	l_pnt;
 
 	if (selectedFormCount) {
 
@@ -2790,21 +2789,21 @@ void duzero() {
 			setr(selectedFormList[ind]);
 		rstMap(CONTIG);
 		dst = 0;
-		lpnt = stitchBuffer;
+		l_pnt = stitchBuffer;
 		for (ind = 0; ind < header.stitchCount; ind++) {
 
 			if (stitchBuffer[ind].attribute&TYPMSK&&chkr((stitchBuffer[ind].attribute&FRMSK) >> FRMSHFT)) {
 
 				if (setMap(CONTIG)) {
 
-					len = hypot(stitchBuffer[ind].x - lpnt->x, stitchBuffer[ind].y - lpnt->y);
+					len = hypot(stitchBuffer[ind].x - l_pnt->x, stitchBuffer[ind].y - l_pnt->y);
 					if (len > minStitchLength) {
 
-						lpnt = &stitchBuffer[ind];
+						l_pnt = &stitchBuffer[ind];
 						moveStitchPoints(&stitchBuffer[dst++], &stitchBuffer[ind]);
 					}
 				} else
-					lpnt = &stitchBuffer[ind];
+					l_pnt = &stitchBuffer[ind];
 			} else {
 
 				moveStitchPoints(&stitchBuffer[dst++], &stitchBuffer[ind]);
@@ -3530,10 +3529,10 @@ void thr2bal(unsigned dst, unsigned src, unsigned cod) {
 
 #define BALRAT 1.6666666666667
 
-	ptrBalaradStitich[dst].flag = 0;
-	ptrBalaradStitich[dst].code = (unsigned char)cod;
-	ptrBalaradStitich[dst].x = (stitchBuffer[src].x - balaradOffset.x)*BALRAT;
-	ptrBalaradStitich[dst].y = (stitchBuffer[src].y - balaradOffset.y)*BALRAT;
+	ptrBalaradStitch[dst].flag = 0;
+	ptrBalaradStitch[dst].code = (unsigned char)cod;
+	ptrBalaradStitch[dst].x = (stitchBuffer[src].x - balaradOffset.x)*BALRAT;
+	ptrBalaradStitch[dst].y = (stitchBuffer[src].y - balaradOffset.y)*BALRAT;
 }
 
 unsigned coldis(COLORREF acol, COLORREF bcol) {
@@ -3555,8 +3554,8 @@ void bal2thr(unsigned dst, unsigned src, unsigned cod) {
 #define IBALRAT 0.6
 
 	stitchBuffer[dst].attribute = cod;
-	stitchBuffer[dst].x = ptrBalaradStitich[src].x*IBALRAT + balaradOffset.x;
-	stitchBuffer[dst].y = ptrBalaradStitich[src].y*IBALRAT + balaradOffset.y;
+	stitchBuffer[dst].x = ptrBalaradStitch[src].x*IBALRAT + balaradOffset.x;
+	stitchBuffer[dst].y = ptrBalaradStitch[src].y*IBALRAT + balaradOffset.y;
 }
 
 unsigned colmatch(COLORREF col) {
@@ -3606,8 +3605,8 @@ void redbal() {
 		ReadFile(btfil, (BALHED*)&l_bhed, sizeof(BALHED), &l_red, 0);
 		if (l_red == sizeof(BALHED)) {
 
-			ptrBalaradStitich = (BALSTCH*)&bseq;
-			ReadFile(btfil, (BALSTCH*)ptrBalaradStitich, sizeof(bseq), &l_red, 0);
+			ptrBalaradStitch = (BALSTCH*)&bseq;
+			ReadFile(btfil, (BALSTCH*)ptrBalaradStitch, sizeof(bseq), &l_red, 0);
 			bcnt = l_red / sizeof(BALSTCH);
 			iniFile.backgroundColor = backgroundColor = l_bhed.backgroundColor;
 			backgroundPen = nuPen(backgroundPen, 1, backgroundColor);
@@ -3626,7 +3625,7 @@ void redbal() {
 			colorChanges = 1;
 			for (ind = 0; ind < bcnt; ind++) {
 
-				switch (ptrBalaradStitich[ind].code) {
+				switch (ptrBalaradStitch[ind].code) {
 
 				case BALNORM:
 
@@ -3703,10 +3702,10 @@ void ritbal() {
 		WriteFile(bfil, (BALHED*)&l_bhed, sizeof(BALHED), &wrot, 0);
 		balaradOffset.x = iniFile.hoopSizeX / 2;
 		balaradOffset.y = iniFile.hoopSizeY / 2;
-		ptrBalaradStitich = (BALSTCH*)&bseq;
+		ptrBalaradStitch = (BALSTCH*)&bseq;
 		col = stitchBuffer[0].attribute&COLMSK;
 		thr2bal(0, 0, BALJUMP);
-		ptrBalaradStitich[1].flag = (unsigned char)col;
+		ptrBalaradStitch[1].flag = (unsigned char)col;
 		ine = 1;
 		for (ind = 0; ind < header.stitchCount; ind++) {
 
@@ -3715,10 +3714,10 @@ void ritbal() {
 
 				thr2bal(ine, ind, BALSTOP);
 				col = stitchBuffer[ind].attribute&COLMSK;
-				ptrBalaradStitich[ine++].flag = (unsigned char)col;
+				ptrBalaradStitch[ine++].flag = (unsigned char)col;
 			}
 		}
-		WriteFile(bfil, (BALSTCH*)ptrBalaradStitich, ine * sizeof(BALSTCH), &wrot, 0);
+		WriteFile(bfil, (BALSTCH*)ptrBalaradStitch, ine * sizeof(BALSTCH), &wrot, 0);
 		CloseHandle(bfil);
 		bfil = CreateFile(balaradName1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		WriteFile(bfil, (TCHAR*)onam, strlen(onam) + 1, &wrot, 0);
@@ -7494,51 +7493,51 @@ If the mouse position is inside the rectangle, the distance from the stitch
 
 Find the equation for the line by solving the linear parametric eauations
 
-  stitchBuffer[ind].x+slop*stitchBuffer[ind].y=off
-  stitchBuffer[ind+1].x+slop*stitchBuffer[ind+1].y=off
+  stitchBuffer[ind].x+slope*stitchBuffer[ind].y=off
+  stitchBuffer[ind+1].x+slope*stitchBuffer[ind+1].y=off
 
 substituting:
 
-  stitchBuffer[ind].x+slop*stitchBuffer[ind].y=stitchBuffer[ind+1].x+slop*stitchBuffer[ind+1].y
+  stitchBuffer[ind].x+slope*stitchBuffer[ind].y=stitchBuffer[ind+1].x+slope*stitchBuffer[ind+1].y
 
 collecting terms:
 
-  slop*stitchBuffer[ind].y-slop*stitchBuffer[ind-1].y=stitchBuffer[ind+1].x-stitchBuffer[ind].x
-  slop*(stitchBuffer[ind].y-stitchBuffer[ind-1].y)=stitchBuffer[ind+1].x-stitchBuffer[ind].x
-  slop=(stitchBuffer[ind+1].x-stitchBuffer[ind].x)/(stitchBuffer[ind].y-stitchBuffer[ind-1].y)
+  slope*stitchBuffer[ind].y-slope*stitchBuffer[ind-1].y=stitchBuffer[ind+1].x-stitchBuffer[ind].x
+  slope*(stitchBuffer[ind].y-stitchBuffer[ind-1].y)=stitchBuffer[ind+1].x-stitchBuffer[ind].x
+  slope=(stitchBuffer[ind+1].x-stitchBuffer[ind].x)/(stitchBuffer[ind].y-stitchBuffer[ind-1].y)
 
 define xba=stitchBuffer[ind+1].x-stitchBuffer[ind].x
 define yab=stitchBuffer[ind].y-stitchBuffer[ind+1].y
 
-  slop=xba/yab;
+  slope=xba/yab;
 
-back substituting into stitchBuffer[ind].x+slop*stitchBuffer[ind].y=off
+back substituting into stitchBuffer[ind].x+slope*stitchBuffer[ind].y=off
 
-  off=stitchBuffer[ind].x+slop*stitchBuffer[ind].y
+  off=stitchBuffer[ind].x+slope*stitchBuffer[ind].y
 
 The equation for a point vertical to the equation for the line and running
  through selectedPoint is:
 
-  selectedPoint.x-selectedPoint.y/slop=poff
+  selectedPoint.x-selectedPoint.y/slope=poff
 
 If ipnt is the intersections between the two lines then
 
-  ipnt.x-slop*ipnt.y=off
-  ipnt.x+ipnt.y/slop=poff
+  ipnt.x-slope*ipnt.y=off
+  ipnt.x+ipnt.y/slope=poff
 
 Subtracting the two equations
 
-  slop*ipnt.y+ipnt.y/slop=off-poff
+  slope*ipnt.y+ipnt.y/slope=off-poff
 
-Multiply by slop
+Multiply by slope
 
-  slop*slop*ipnt.y+ipnt.y=slop(off-poff)
-  ipnt.y(slop*slop+1)=slop(off-poff)
-  ipnt.y=slop*(off-poff)/(slop*slop+1)
+  slope*slope*ipnt.y+ipnt.y=slope(off-poff)
+  ipnt.y(slope*slope+1)=slope(off-poff)
+  ipnt.y=slope*(off-poff)/(slope*slope+1)
 
-back substitute into ipnt.x+slop*ipnt.y=off
+back substitute into ipnt.x+slope*ipnt.y=off
 
-  ipnt.x=off-slop*ipnt.y
+  ipnt.x=off-slope*ipnt.y
 
 if dx=ipnt.x-spnt.x & dy=ipnt.y-spnt.y
 

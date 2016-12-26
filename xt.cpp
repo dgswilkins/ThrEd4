@@ -166,7 +166,7 @@ extern unsigned activePointIndex;
 extern fPOINT oseq[OSEQLEN];
 extern unsigned opnt;
 extern unsigned toglMap(unsigned bPnt);
-extern unsigned seqpnt;
+extern unsigned sequenceIndex;
 extern void satfil();
 extern unsigned rstMap(unsigned bPnt);
 extern void filsat();
@@ -708,28 +708,28 @@ void fthrfn() {
 	bseq[1].attribute = 1;
 	if (!faznum)
 		faznum = 1;
-	ind = seqpnt / (faznum << 2);
-	res = seqpnt % (faznum << 2);
+	ind = sequenceIndex / (faznum << 2);
+	res = sequenceIndex % (faznum << 2);
 	if (res > (faznum << 1))
 		ind++;
 	fltpos = 0;
-	fltstp = (float)4 / seqpnt*ind;
-	fltfaz = (float)seqpnt / ind;
+	fltstp = (float)4 / sequenceIndex*ind;
+	fltfaz = (float)sequenceIndex / ind;
 	fltrat = (float)upfth / faznum;
 	fltup = fltfaz*fltrat;
 	fltdwn = fltfaz - fltup;
 	ptrSelectedForm->fillType = FTHF;
 	faz = 1;
-	bseq[seqpnt].x = bseq[seqpnt - 2].x;
-	bseq[seqpnt].y = bseq[seqpnt - 2].y;
-	bseq[seqpnt].attribute = bseq[seqpnt - 2].attribute;
-	bseq[seqpnt + 1].x = bseq[seqpnt - 1].x;
-	bseq[seqpnt + 1].y = bseq[seqpnt - 1].y;
-	bseq[seqpnt + 1].attribute = bseq[seqpnt - 1].attribute;
+	bseq[sequenceIndex].x = bseq[sequenceIndex - 2].x;
+	bseq[sequenceIndex].y = bseq[sequenceIndex - 2].y;
+	bseq[sequenceIndex].attribute = bseq[sequenceIndex - 2].attribute;
+	bseq[sequenceIndex + 1].x = bseq[sequenceIndex - 1].x;
+	bseq[sequenceIndex + 1].y = bseq[sequenceIndex - 1].y;
+	bseq[sequenceIndex + 1].attribute = bseq[sequenceIndex - 1].attribute;
 	if (xat&AT_FTHBLND) {
 
 		opnt = activePointIndex = 0;
-		for (ind = 0; ind < seqpnt; ind++)
+		for (ind = 0; ind < sequenceIndex; ind++)
 		{
 			if (!bseq[ind].attribute)
 				fthrbfn(ind);
@@ -739,7 +739,7 @@ void fthrfn() {
 
 		if (ptrSelectedForm->extendedAttribute&AT_FTHDWN) {
 
-			for (ind = 0; ind <= seqpnt; ind++) {
+			for (ind = 0; ind <= sequenceIndex; ind++) {
 
 				if (!bseq[ind].attribute)
 					fthdfn(ind);
@@ -748,7 +748,7 @@ void fthrfn() {
 		}
 		else {
 
-			for (ind = 0; ind <= seqpnt; ind++) {
+			for (ind = 0; ind <= sequenceIndex; ind++) {
 
 				if (bseq[ind].attribute) {
 
@@ -772,14 +772,14 @@ void fthrfn() {
 	rstMap(FTHR);
 	rstMap(BARSAT);
 	StitchSpace = bakspac;
-	seqpnt = opnt;
+	sequenceIndex = opnt;
 }
 
 void fritfil() {
 
 	unsigned ind, ine;
 
-	if (seqpnt) {
+	if (sequenceIndex) {
 
 		isinds[isind2].ind = isind;
 		isinds[isind2].seq = I_FIL;
@@ -800,7 +800,7 @@ void fritfil() {
 				oseq[ind].y = fthseq[ine].y;
 				ine--;
 			}
-			seqpnt = activePointIndex;
+			sequenceIndex = activePointIndex;
 			chkseq(0);
 			isind2++;
 		}
@@ -1307,7 +1307,7 @@ void fnuang() {
 
 void ritund()
 {
-	if (seqpnt) {
+	if (sequenceIndex) {
 
 		isinds[isind2].ind = isind;
 		isinds[isind2].seq = I_FIL;
@@ -1337,7 +1337,7 @@ void fnund(unsigned find)
 	undclp();
 	setMap(ISUND);
 	angclpfn();
-	opnt = seqpnt;
+	opnt = sequenceIndex;
 	ritund();
 	fvars(find);
 	userStitchLength = baksiz;
@@ -4711,7 +4711,8 @@ void redtbak()
 	tscr.width = phst->width;
 	tscr.spacing = phst->spacing;
 	tscr.index = phst->count;
-	MoveMemory(txtmp, phst->texturePoint, phst->count * sizeof(TXPNT));
+	// ToDo - check texturePoint is valid first
+	MoveMemory (txtmp, phst->texturePoint, phst->count * sizeof (TXPNT));
 	setMap(RESTCH);
 }
 
@@ -5552,6 +5553,8 @@ void redtx()
 			{
 				ReadFile(hnam, (int*)&ptxhst, 4, &l_BytesRead, 0);
 				ReadFile(hnam, (TXHST*)&thsts, sizeof(TXHST) * 16, &l_BytesRead, 0);
+				//ToDo - texturePoint should be a null pointer at this point as no memory has been allocated, but it is not
+				//       because the old pointer value is read in from the file, so zero it out
 				for (ind = 0; ind < (l_BytesRead / sizeof(TXHST)); ind++)
 				{
 					if (thsts[ind].count)

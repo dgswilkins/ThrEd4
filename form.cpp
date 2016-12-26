@@ -303,18 +303,16 @@ fPOINT*			clipReversedData;		//data for clipboard fills
 unsigned		stitchLineCount;		//count of stitch lines
 SMALPNTL*		lineEndpoints;			//pairs of fill line endpoints
 unsigned		activePointIndex;		//pointer to the active point in the sequencing algorithm
-unsigned		grpind;					//pointer for groups of fill line segments
-SMALPNTL**		seq;					//sorted pointers to lineEndpoints
+unsigned		lineGroupIndex;			//pointer for groups of fill line segments
+SMALPNTL**		ptrSortedLines;			//sorted pointers to lineEndpoints
 unsigned short	sides;					//sides of the selected form to fill
-unsigned		lpnt;					//for connecting fill lines
-unsigned		seqpnt;					//sequencing pointer
+unsigned		sortedLineIndex;		//for connecting fill lines
+unsigned		sequenceIndex;			//sequencing pointer
 BSEQPNT			bseq[BSEQLEN];			//reverse sequence for polygon fills
 fPOINT			oseq[OSEQLEN];			//temporary storage for sequencing
-double			slop;					//slope of line in angle fills
-unsigned		satpt;					//pointer to next satin point to enter
+double			slope;					//slope of line in angle fills
+unsigned		satinIndex;				//pointer to next satin point to enter
 fPOINT			fmovdif;				//offset for moving forms
-unsigned		frmstrt;				//points to the first stitch in a form
-unsigned		frmend;					//points to one past the last stitch in a form
 POINT			bakpnt;					//user moved a form point to here
 fPOINT			tpoly[MAXFRMLINS];		//temporary storage when user is entering a polygon;
 unsigned short	lin0, lin1;				//from and to lines in angle fill
@@ -933,7 +931,7 @@ BOOL chk2of() {
 void rotbak() {
 	unsigned ind;
 
-	for (ind = 0; ind < seqpnt; ind++)
+	for (ind = 0; ind < sequenceIndex; ind++)
 		rotflt(&oseq[ind]);
 }
 
@@ -1924,7 +1922,7 @@ BOOL ritlin(fPOINT strt, fPOINT fin)
 			}
 		}
 		else {
-			seqpnt = MAXSEQ - 2;
+			sequenceIndex = MAXSEQ - 2;
 			return 0;
 		}
 	}
@@ -1954,12 +1952,12 @@ void chkseq(BOOL brd) {
 
 	unsigned index;
 
-	for (index = 0; index < seqpnt; index++)
+	for (index = 0; index < sequenceIndex; index++)
 	{
 		iseq[index].x = oseq[index].x;
 		iseq[index].y = oseq[index].y;
 	}
-	isind = seqpnt;
+	isind = sequenceIndex;
 #else
 
 	double		len;
@@ -1990,7 +1988,7 @@ void chkseq(BOOL brd) {
 	if (userStichLen > maxStitchLen)
 		userStichLen = maxStitchLen;
 	ine = 0;
-	for (ind = 0; ind < seqpnt - 1; ind++)
+	for (ind = 0; ind < sequenceIndex - 1; ind++)
 	{
 		if (!ritlin(oseq[ind], oseq[ind + 1]))
 			goto seqskp;
@@ -2014,7 +2012,7 @@ seqskp:;
 }
 
 void ritbrd() {
-	if (seqpnt)
+	if (sequenceIndex)
 	{
 		isinds[isind2].ind = isind;
 		isinds[isind2].seq = I_BRD;
@@ -2026,7 +2024,7 @@ void ritbrd() {
 }
 
 void ritapbrd() {
-	if (seqpnt)
+	if (sequenceIndex)
 	{
 		isinds[isind2].ind = isind;
 		isinds[isind2].seq = I_AP;
@@ -2038,7 +2036,7 @@ void ritapbrd() {
 }
 
 void ritfil() {
-	if (seqpnt)
+	if (sequenceIndex)
 	{
 		isinds[isind2].ind = isind;
 		isinds[isind2].seq = I_FIL;
@@ -2321,7 +2319,7 @@ void chkbrd() {
 
 		case EGAP:
 
-			seqpnt = 0;
+			sequenceIndex = 0;
 			apbrd();
 			ritapbrd();
 			plen = ptrSelectedForm->borderSize;
@@ -2382,28 +2380,28 @@ void boldlin(unsigned strt, unsigned fin, double pd_Size) {
 		pnt1.x = pnt0.x + stp.x;
 		pnt1.y = pnt0.y + stp.y;
 		while (cnt) {
-			oseq[seqpnt].x = pnt1.x;
-			oseq[seqpnt++].y = pnt1.y;
-			oseq[seqpnt].x = pnt0.x;
-			oseq[seqpnt++].y = pnt0.y;
-			oseq[seqpnt].x = pnt1.x;
-			oseq[seqpnt++].y = pnt1.y;
+			oseq[sequenceIndex].x = pnt1.x;
+			oseq[sequenceIndex++].y = pnt1.y;
+			oseq[sequenceIndex].x = pnt0.x;
+			oseq[sequenceIndex++].y = pnt0.y;
+			oseq[sequenceIndex].x = pnt1.x;
+			oseq[sequenceIndex++].y = pnt1.y;
 			pnt0.x += stp.x;
 			pnt0.y += stp.y;
 			pnt1.x += stp.x;
 			pnt1.y += stp.y;
 			cnt--;
 		}
-		oseq[seqpnt].x = currentFormVertices[fin].x;
-		oseq[seqpnt++].y = currentFormVertices[fin].y;
+		oseq[sequenceIndex].x = currentFormVertices[fin].x;
+		oseq[sequenceIndex++].y = currentFormVertices[fin].y;
 	}
 	else {
-		oseq[seqpnt].x = currentFormVertices[fin].x;
-		oseq[seqpnt++].y = currentFormVertices[fin].y;
-		oseq[seqpnt].x = currentFormVertices[strt].x;
-		oseq[seqpnt++].y = currentFormVertices[strt].y;
-		oseq[seqpnt].x = currentFormVertices[fin].x;
-		oseq[seqpnt++].y = currentFormVertices[fin].y;
+		oseq[sequenceIndex].x = currentFormVertices[fin].x;
+		oseq[sequenceIndex++].y = currentFormVertices[fin].y;
+		oseq[sequenceIndex].x = currentFormVertices[strt].x;
+		oseq[sequenceIndex++].y = currentFormVertices[strt].y;
+		oseq[sequenceIndex].x = currentFormVertices[fin].x;
+		oseq[sequenceIndex++].y = currentFormVertices[fin].y;
 	}
 }
 
@@ -2413,9 +2411,9 @@ void bold(double pd_Size) {
 	double			len;
 
 	nlin = tlin = getlast();
-	seqpnt = 0;
-	oseq[seqpnt].x = currentFormVertices[tlin].x;
-	oseq[seqpnt++].y = currentFormVertices[tlin].y;
+	sequenceIndex = 0;
+	oseq[sequenceIndex].x = currentFormVertices[tlin].x;
+	oseq[sequenceIndex++].y = currentFormVertices[tlin].y;
 	for (ind = 0; ind < (unsigned)sides - 1; ind++) {
 		nlin = nxt(tlin);
 		boldlin(tlin, nlin, pd_Size);
@@ -2425,7 +2423,7 @@ void bold(double pd_Size) {
 		nlin = nxt(tlin);
 		boldlin(tlin, nlin, pd_Size);
 	}
-	for (ind = 0; ind < seqpnt - 1; ind++) {
+	for (ind = 0; ind < sequenceIndex - 1; ind++) {
 		len = hypot(oseq[ind + 1].x - oseq[ind].x, oseq[ind + 1].y - oseq[ind].y);
 		if (len > TINY) {
 			oseq[ine].x = oseq[ind].x;
@@ -2434,7 +2432,7 @@ void bold(double pd_Size) {
 	}
 	oseq[ine].x = currentFormVertices[nlin].x;
 	oseq[ine++].y = currentFormVertices[nlin].y;
-	seqpnt = ine;
+	sequenceIndex = ine;
 }
 
 void refilfn() {
@@ -2485,7 +2483,7 @@ void refilfn() {
 
 			oclp(ptrSelectedForm->borderClipData, ptrSelectedForm->clipEntries);
 			clpout();
-			seqpnt = 0;
+			sequenceIndex = 0;
 			clpbrd(0);
 			ritbrd();
 			break;
@@ -2529,7 +2527,7 @@ void refilfn() {
 		case EGPIC:
 
 			oclp(ptrSelectedForm->borderClipData, ptrSelectedForm->clipEntries);
-			seqpnt = 0;
+			sequenceIndex = 0;
 			tlen = buttonholeFillCornerLength;
 			buttonholeFillCornerLength = getplen();
 			clpic(0);
@@ -2883,7 +2881,7 @@ void filinu(float pntx, float pnty) {
 	dif.y = pnty - selectedPoint.y;
 	len = hypot(dif.x, dif.y);
 	cnt = len / userStitchLength;
-	if (chkmax(cnt, seqpnt) || cnt + seqpnt > MAXSEQ - 3)
+	if (chkmax(cnt, sequenceIndex) || cnt + sequenceIndex > MAXSEQ - 3)
 		return;
 	if (cnt) {
 		if (chkMap(FILDIR))
@@ -2893,14 +2891,14 @@ void filinu(float pntx, float pnty) {
 		while (cnt > 0) {
 			ipnt.x += stp.x;
 			ipnt.y += stp.y;
-			oseq[seqpnt].x = ipnt.x;
-			oseq[seqpnt++].y = ipnt.y;
+			oseq[sequenceIndex].x = ipnt.x;
+			oseq[sequenceIndex++].y = ipnt.y;
 			cnt--;
 		}
 	}
 	else {
-		oseq[seqpnt].x = pntx;
-		oseq[seqpnt++].y = pnty;
+		oseq[sequenceIndex].x = pntx;
+		oseq[sequenceIndex++].y = pnty;
 	}
 	selectedPoint.x = pntx;
 	selectedPoint.y = pnty;
@@ -2917,7 +2915,7 @@ void filin(dPOINT pnt) {
 	ipnt.x = selectedPoint.x;
 	ipnt.y = selectedPoint.y;
 	cnt = len / userStitchLength;
-	if (chkmax(cnt, seqpnt) || (cnt + seqpnt) > MAXSEQ - 3)
+	if (chkmax(cnt, sequenceIndex) || (cnt + sequenceIndex) > MAXSEQ - 3)
 		return;
 	if (cnt) {
 		if (chkMap(FILDIR))
@@ -2927,14 +2925,14 @@ void filin(dPOINT pnt) {
 		while (cnt > 0) {
 			ipnt.x += stp.x;
 			ipnt.y += stp.y;
-			oseq[seqpnt].x = ipnt.x;
-			oseq[seqpnt++].y = ipnt.y;
+			oseq[sequenceIndex].x = ipnt.x;
+			oseq[sequenceIndex++].y = ipnt.y;
 			cnt--;
 		}
 	}
 	else {
-		oseq[seqpnt].x = pnt.x;
-		oseq[seqpnt++].y = pnt.y;
+		oseq[sequenceIndex].x = pnt.x;
+		oseq[sequenceIndex++].y = pnt.y;
 	}
 	selectedPoint.x = pnt.x;
 	selectedPoint.y = pnt.y;
@@ -3002,8 +3000,8 @@ unsigned short regclos(unsigned rg0, unsigned rg1) {
 	unsigned	l_lins, line;
 	unsigned	prlin, polin;
 
-	pnt0s = &*seq[rgns[rg0].start];
-	pnt1s = &*seq[rgns[rg1].start];
+	pnt0s = &*ptrSortedLines[rgns[rg0].start];
+	pnt1s = &*ptrSortedLines[rgns[rg1].start];
 	grp1s = pnt1s->group;
 	grp0s = pnt0s->group;
 	if (grp0s > grp1s) {
@@ -3021,8 +3019,8 @@ unsigned short regclos(unsigned rg0, unsigned rg1) {
 		return 1;
 	}
 	else {
-		pnt0e = &*seq[rgns[rg0].end];
-		pnt1e = &*seq[rgns[rg1].end];
+		pnt0e = &*ptrSortedLines[rgns[rg0].end];
+		pnt1e = &*ptrSortedLines[rgns[rg1].end];
 		grp1e = pnt1e->group;
 		grp0e = pnt0e->group;
 		if (grp0e < grp1e) {
@@ -3105,14 +3103,14 @@ void dunseq(unsigned strt, unsigned fin) {
 
 	miny = 1e30;
 	for (ind = strt; ind <= fin; ind++) {
-		l_lin0 = &*seq[ind];
+		l_lin0 = &*ptrSortedLines[ind];
 		dy = l_lin0[1].y - l_lin0->y;
 		if (dy < miny)
 			miny = dy;
 	}
 	miny /= 2;
-	l_lin0 = &*seq[strt];
-	l_lin1 = &*seq[fin];
+	l_lin0 = &*ptrSortedLines[strt];
+	l_lin1 = &*ptrSortedLines[fin];
 	if (miny == 1e30 / 2)
 		miny = 0;
 	rspnt(l_lin0->x, l_lin0->y + miny);
@@ -3123,7 +3121,7 @@ void dunseq(unsigned strt, unsigned fin) {
 void movseq(unsigned ind) {
 	SMALPNTL* l_lin;
 
-	l_lin = &*seq[ind];
+	l_lin = &*ptrSortedLines[ind];
 	bseq[opnt].attribute = SEQBOT;
 	bseq[opnt].x = l_lin->x;
 	bseq[opnt].y = l_lin->y;
@@ -3136,7 +3134,7 @@ void movseq(unsigned ind) {
 }
 
 void duseq2(unsigned ind) {
-	seqlin = &*seq[ind];
+	seqlin = &*ptrSortedLines[ind];
 	rspnt((seqlin[1].x - seqlin[0].x) / 2 + seqlin[0].x, (seqlin[1].y - seqlin[0].y) / 2 + seqlin[0].y);
 }
 
@@ -3149,14 +3147,14 @@ void duseq(unsigned strt, unsigned fin) {
 
 	seqlin = nullptr;
 	rstMap(SEQDUN);
-	topbak = seq[strt][1].line;
+	topbak = ptrSortedLines[strt][1].line;
 	if (strt > fin) {
 		for (ind = strt; (int)ind >= (int)fin; ind--) {
 			if (setseq(ind)) {
 				if (!setMap(SEQDUN))
 					duseq2(ind);
 				else {
-					if (topbak != seq[ind][1].line) {
+					if (topbak != ptrSortedLines[ind][1].line) {
 						if (ind)
 							duseq2(ind + 1);
 						duseq2(ind);
@@ -3167,7 +3165,7 @@ void duseq(unsigned strt, unsigned fin) {
 			else {
 				if (rstMap(SEQDUN))
 					duseq2(ind + 1);
-				seqlin = &*seq[ind];
+				seqlin = &*ptrSortedLines[ind];
 				movseq(ind);
 			}
 		}
@@ -3181,7 +3179,7 @@ void duseq(unsigned strt, unsigned fin) {
 				if (!setMap(SEQDUN))
 					duseq2(ind);
 				else {
-					if (topbak != seq[ind][1].line) {
+					if (topbak != ptrSortedLines[ind][1].line) {
 						if (ind)
 							duseq2(ind - 1);
 						duseq2(ind);
@@ -3194,7 +3192,7 @@ void duseq(unsigned strt, unsigned fin) {
 					if (ind)
 						duseq2(ind - 1);
 				}
-				seqlin = &*seq[ind];
+				seqlin = &*ptrSortedLines[ind];
 				movseq(ind);
 			}
 		}
@@ -3212,17 +3210,17 @@ void brkseq(unsigned strt, unsigned fin) {
 
 	rstMap(SEQDUN);
 	if (strt > fin) {
-		bgrp = seq[strt]->group + 1;
+		bgrp = ptrSortedLines[strt]->group + 1;
 		for (ind = strt; (int)ind >= (int)fin; ind--) {
 			bgrp--;
-			if (seq[ind]->group != bgrp) {
+			if (ptrSortedLines[ind]->group != bgrp) {
 				rspnt(seqlin[0].x, seqlin[0].y);
-				seqlin = &*seq[ind];
+				seqlin = &*ptrSortedLines[ind];
 				rspnt(seqlin[0].x, seqlin[0].y);
 				bgrp = seqlin[0].group;
 			}
 			else
-				seqlin = &*seq[ind];
+				seqlin = &*ptrSortedLines[ind];
 			if (setseq(ind)) {
 				if (!setMap(SEQDUN))
 					duseq1();
@@ -3233,17 +3231,17 @@ void brkseq(unsigned strt, unsigned fin) {
 		lastgrp = seqlin->group;
 	}
 	else {
-		bgrp = seq[strt]->group - 1;
+		bgrp = ptrSortedLines[strt]->group - 1;
 		for (ind = strt; ind <= fin; ind++) {
 			bgrp++;
-			if (seq[ind]->group != bgrp) {
+			if (ptrSortedLines[ind]->group != bgrp) {
 				rspnt(seqlin[0].x, seqlin[0].y);
-				seqlin = &*seq[ind];
+				seqlin = &*ptrSortedLines[ind];
 				rspnt(seqlin[0].x, seqlin[0].y);
 				bgrp = seqlin[0].group;
 			}
 			else
-				seqlin = &*seq[ind];
+				seqlin = &*ptrSortedLines[ind];
 			if (setseq(ind)) {
 				if (!setMap(SEQDUN))
 					duseq1();
@@ -3258,9 +3256,9 @@ void brkseq(unsigned strt, unsigned fin) {
 }
 
 void brkdun(unsigned strt, unsigned fin) {
-	rspnt(seq[strt]->x, seq[strt]->y);
-	rspnt(seq[fin]->x, seq[fin]->y);
-	rspnt(lconflt[seq[strt]->line].x, lconflt[seq[strt]->line].y);
+	rspnt(ptrSortedLines[strt]->x, ptrSortedLines[strt]->y);
+	rspnt(ptrSortedLines[fin]->x, ptrSortedLines[fin]->y);
+	rspnt(lconflt[ptrSortedLines[strt]->line].x, lconflt[ptrSortedLines[strt]->line].y);
 	setMap(BRKFIX);
 }
 
@@ -3283,8 +3281,8 @@ void durgn(unsigned pthi) {
 	if (mpath[pthi].skp || rstMap(BRKFIX)) {
 		if (bseq[opnt - 1].attribute != SEQBOT)
 			rspnt(bseq[opnt - 2].x, bseq[opnt - 2].y);
-		pnts = &*seq[rgind];
-		dun = seq[seqs]->line;
+		pnts = &*ptrSortedLines[rgind];
+		dun = ptrSortedLines[seqs]->line;
 		bpnt = &bseq[opnt - 1];
 		minlen = 1e99;
 		for (ind = 0; ind < sides; ind++) {
@@ -3321,15 +3319,15 @@ void durgn(unsigned pthi) {
 		dun = 0;
 		visit[rgind]++;
 	}
-	pnts = &*seq[durpnt->start];
-	pnte = &*seq[durpnt->end];
+	pnts = &*ptrSortedLines[durpnt->start];
+	pnte = &*ptrSortedLines[durpnt->end];
 	grps = pnts->group;
 	grpe = pnte->group;
 	if (grpe != grps)
 		seql = (double)(lastgrp - grps) / (grpe - grps)*(seqe - seqs) + seqs;
 	else
 		seql = 0;
-	if (seql > lpnt)
+	if (seql > sortedLineIndex)
 		seql = 0;
 	len = (double)(grpe - grps)*(seqe - seqs);
 	if (len)
@@ -3344,16 +3342,16 @@ void durgn(unsigned pthi) {
 		seqn = seqs;
 	if (seqn > seqe)
 		seqn = seqe;
-	if (seq[seql]->group != lastgrp) {
-		if (seql < seqe&&seq[seql + 1]->group == lastgrp)
+	if (ptrSortedLines[seql]->group != lastgrp) {
+		if (seql < seqe&&ptrSortedLines[seql + 1]->group == lastgrp)
 			seql++;
 		else {
-			if (seql > seqs&&seq[seql - 1]->group == lastgrp)
+			if (seql > seqs&&ptrSortedLines[seql - 1]->group == lastgrp)
 				seql--;
 			else {
 				mindif = 0xffffffff;
 				for (ind = seqs; ind <= seqe; ind++) {
-					gdif = ((seq[ind]->group > lastgrp) ? (seq[ind]->group - lastgrp) : (lastgrp - seq[ind]->group));
+					gdif = ((ptrSortedLines[ind]->group > lastgrp) ? (ptrSortedLines[ind]->group - lastgrp) : (lastgrp - ptrSortedLines[ind]->group));
 					if (gdif < mindif) {
 						mindif = gdif;
 						seql = ind;
@@ -3362,16 +3360,16 @@ void durgn(unsigned pthi) {
 			}
 		}
 	}
-	if (seq[seqn]->group != grpn) {
-		if (seqn < seqe&&seq[seqn + 1]->group == grpn)
+	if (ptrSortedLines[seqn]->group != grpn) {
+		if (seqn < seqe&&ptrSortedLines[seqn + 1]->group == grpn)
 			seqn++;
 		else {
-			if (seqn > seqs&&seq[seqn - 1]->group == grpn)
+			if (seqn > seqs&&ptrSortedLines[seqn - 1]->group == grpn)
 				seqn--;
 			else {
 				mindif = 0xffffffff;
 				for (ind = seqs; ind <= seqe; ind++) {
-					gdif = ((seq[ind]->group > grpn) ? (seq[ind]->group - grpn) : (grpn - seq[ind]->group));
+					gdif = ((ptrSortedLines[ind]->group > grpn) ? (ptrSortedLines[ind]->group - grpn) : (grpn - ptrSortedLines[ind]->group));
 					if (gdif < mindif) {
 						mindif = gdif;
 						seqn = ind;
@@ -3485,10 +3483,10 @@ double reglen(unsigned reg) {
 	unsigned	ind, ine;
 	SMALPNTL*	pnts[4];
 
-	pnts[0] = seq[rgns[reg].start];
-	pnts[1] = &seq[rgns[reg].start][1];
-	pnts[2] = seq[rgns[reg].end];
-	pnts[3] = &seq[rgns[reg].end][1];
+	pnts[0] = ptrSortedLines[rgns[reg].start];
+	pnts[1] = &ptrSortedLines[rgns[reg].start][1];
+	pnts[2] = ptrSortedLines[rgns[reg].end];
+	pnts[3] = &ptrSortedLines[rgns[reg].end][1];
 	for (ind = 0; ind < 4; ind++) {
 		for (ine = 0; ine < 4; ine++) {
 			len = hypot(dunpnts[ind].x - pnts[ine]->x, dunpnts[ind].y - pnts[ine]->y);
@@ -3508,12 +3506,12 @@ void nxtrgn() {
 	while (notdun(pthlen)) {
 		pthlen++;
 		if (pthlen > 8) {
-			tpnt = &*seq[rgns[dunrgn].start];
+			tpnt = &*ptrSortedLines[rgns[dunrgn].start];
 			dunpnts[0].x = tpnt[0].x;
 			dunpnts[0].y = tpnt[0].y;
 			dunpnts[1].x = tpnt[1].x;
 			dunpnts[1].y = tpnt[1].y;
-			tpnt = &*seq[rgns[dunrgn].end];
+			tpnt = &*ptrSortedLines[rgns[dunrgn].end];
 			dunpnts[2].x = tpnt[0].x;
 			dunpnts[2].y = tpnt[0].y;
 			dunpnts[3].x = tpnt[1].x;
@@ -3627,20 +3625,20 @@ void lcon() {
 #endif
 
 	if (stitchLineCount) {
-		seq = new SMALPNTL*[stitchLineCount >> 1];
-		lpnt = 0;
+		ptrSortedLines = new SMALPNTL*[stitchLineCount >> 1];
+		sortedLineIndex = 0;
 		for (ind = 0; ind < stitchLineCount; ind += 2)
-			seq[lpnt++] = &lineEndpoints[ind];
-		qsort((void*)seq, lpnt, 4, sqcomp);
+			ptrSortedLines[sortedLineIndex++] = &lineEndpoints[ind];
+		qsort((void*)ptrSortedLines, sortedLineIndex, 4, sqcomp);
 		rgcnt = 0;
 		trgns = (REGION*)oseq;
 		trgns[0].start = 0;
-		l_bLine = seq[0]->line;
-		for (ind = 0; ind < lpnt; ind++) {
-			if (l_bLine != seq[ind]->line) {
+		l_bLine = ptrSortedLines[0]->line;
+		for (ind = 0; ind < sortedLineIndex; ind++) {
+			if (l_bLine != ptrSortedLines[ind]->line) {
 				trgns[rgcnt++].end = ind - 1;
 				trgns[rgcnt].start = ind;
-				l_bLine = seq[ind]->line;
+				l_bLine = ptrSortedLines[ind]->line;
 			}
 		}
 		trgns[rgcnt++].end = ind - 1;
@@ -3657,14 +3655,14 @@ void lcon() {
 		for (ind = 0; ind < rgcnt; ind++) {
 			cnt = 0;
 			if ((rgns[ind].end - rgns[ind].start) > 1) {
-				sgrp = seq[rgns[ind].start]->group;
+				sgrp = ptrSortedLines[rgns[ind].start]->group;
 				for (ine = rgns[ind].start + 1; ine <= rgns[ind].end; ine++) {
 					sgrp++;
-					if (seq[ine]->group != sgrp) {
+					if (ptrSortedLines[ine]->group != sgrp) {
 						if (!cnt)
 							rgns[ind].brk = sind;
 						cnt++;
-						sgrp = seq[ine]->group;
+						sgrp = ptrSortedLines[ine]->group;
 						tsrgns[sind++] = ine;
 					}
 				}
@@ -3678,21 +3676,21 @@ void lcon() {
 		minds = new unsigned[rgcnt + 1];
 
 #if BUGSEQ
-		bugcol = 0; seqpnt = 0;
+		bugcol = 0; sequenceIndex = 0;
 		for (index = 0; index < rgcnt; index++) {
 			for (ine = rgns[index].start; ine <= rgns[index].fillEnd; ine++) {
-				tpnt = &*seq[ine];
-				stitchCount[seqpnt].attribute = bugcol;
-				stitchCount[seqpnt].x = tpnt[0].x;
-				stitchCount[seqpnt++].y = tpnt[0].y;
-				stitchCount[seqpnt].attribute = bugcol;
-				stitchCount[seqpnt].x = tpnt[1].x;
-				stitchCount[seqpnt++].y = tpnt[1].y;
+				tpnt = &*ptrSortedLines[ine];
+				stitchCount[sequenceIndex].attribute = bugcol;
+				stitchCount[sequenceIndex].x = tpnt[0].x;
+				stitchCount[sequenceIndex++].y = tpnt[0].y;
+				stitchCount[sequenceIndex].attribute = bugcol;
+				stitchCount[sequenceIndex].x = tpnt[1].x;
+				stitchCount[sequenceIndex++].y = tpnt[1].y;
 			}
 			bugcol++;
 			bugcol &= 0xf;
 		}
-		header.stitchCount = seqpnt;
+		header.stitchCount = sequenceIndex;
 		goto seqskip;
 #endif
 		opnt = 0;
@@ -3739,7 +3737,7 @@ void lcon() {
 			//find the leftmost region
 			sgrp = 0xffffffff; ine = 0;
 			for (ind = 0; ind < rgcnt; ind++) {
-				tpnt = &*seq[rgns[ind].start];
+				tpnt = &*ptrSortedLines[rgns[ind].start];
 				if (tpnt->group < sgrp) {
 					sgrp = tpnt->group;
 					ine = ind;
@@ -3784,7 +3782,7 @@ void lcon() {
 			mpathi = ind; mpath0 = 0;
 			for (ind = 0; ind < mpathi; ind++)
 				nxtseq(ind);
-			ine = (lpnt >> 5) + 1;
+			ine = (sortedLineIndex >> 5) + 1;
 			seqmap = new unsigned[ine];
 			for (ind = 0; ind < ine; ind++)
 				seqmap[ind] = 0;
@@ -3802,13 +3800,13 @@ void lcon() {
 		else {
 			pmap = new RCON[1];
 			mpath = new FSEQ[1];
-			ine = (lpnt >> 5) + 1;
+			ine = (sortedLineIndex >> 5) + 1;
 			seqmap = new unsigned[ine];
 			for (ind = 0; ind < ine; ind++)
 				seqmap[ind] = 0;
 			lastgrp = 0;
 			mpath[0].vrt = 0;
-			mpath[0].grpn = seq[rgns[0].end]->group;
+			mpath[0].grpn = ptrSortedLines[rgns[0].end]->group;
 			mpath[0].skp = 0;
 			durgn(0);
 			delete[] mpath;
@@ -3819,7 +3817,7 @@ void lcon() {
 
 		seqskip : ;
 #endif
-				  delete[] seq;
+				  delete[] ptrSortedLines;
 				  delete[] lineEndpoints;
 				  delete[] rgns;
 				  delete[] minds;
@@ -3873,10 +3871,10 @@ unsigned seqtab[] =
 void bakseq() {
 #if BUGBAK
 
-	for (seqpnt = 0; seqpnt < opnt; seqpnt++)
+	for (sequenceIndex = 0; sequenceIndex < opnt; sequenceIndex++)
 	{
-		oseq[seqpnt].x = bseq[seqpnt].x;
-		oseq[seqpnt].y = bseq[seqpnt].y;
+		oseq[sequenceIndex].x = bseq[sequenceIndex].x;
+		oseq[sequenceIndex].y = bseq[sequenceIndex].y;
 	}
 	ptrSelectedForm->maxFillStitchLen = 6000;
 #else
@@ -3889,19 +3887,19 @@ void bakseq() {
 	double		usesiz9 = userStitchLength / 9;
 	double		stspac2 = StitchSpace * 2;
 
-	seqpnt = 0;
+	sequenceIndex = 0;
 	rstMap(FILDIR);
 	ind = opnt - 1;
-	oseq[seqpnt].x = bseq[ind].x;
-	oseq[seqpnt].y = bseq[ind].y;
-	seqpnt++;
+	oseq[sequenceIndex].x = bseq[ind].x;
+	oseq[sequenceIndex].y = bseq[ind].y;
+	sequenceIndex++;
 	selectedPoint.x = bseq[ind].x;
 	selectedPoint.y = bseq[ind].y;
 	ind--;
 	while (ind > 0) {
 		rcnt = ind%RITSIZ;
-		if (seqpnt > MAXSEQ) {
-			seqpnt = MAXSEQ - 1;
+		if (sequenceIndex > MAXSEQ) {
+			sequenceIndex = MAXSEQ - 1;
 			return;
 		}
 		rit = bseq[ind].x / stspac2;
@@ -3916,52 +3914,52 @@ void bakseq() {
 
 			if (ptrSelectedForm->extendedAttribute&AT_SQR) {
 				if (toglMap(FILDIR)) {
-					oseq[seqpnt].x = bseq[ind - 1].x;
-					oseq[seqpnt++].y = bseq[ind - 1].y;
+					oseq[sequenceIndex].x = bseq[ind - 1].x;
+					oseq[sequenceIndex++].y = bseq[ind - 1].y;
 					cnt = ceil(bseq[ind].y / userStitchLength);
 				blntop:;
-					oseq[seqpnt].y = cnt*userStitchLength + (rit%seqtab[rcnt])*usesiz9;
-					if (oseq[seqpnt].y > bseq[ind].y)
+					oseq[sequenceIndex].y = cnt*userStitchLength + (rit%seqtab[rcnt])*usesiz9;
+					if (oseq[sequenceIndex].y > bseq[ind].y)
 						goto blntopx;
-					dif.y = oseq[seqpnt].y - bseq[ind].y;
-					oseq[seqpnt++].x = bseq[ind].x;
+					dif.y = oseq[sequenceIndex].y - bseq[ind].y;
+					oseq[sequenceIndex++].x = bseq[ind].x;
 					cnt++;
 					goto blntop;
 				blntopx:;
-					oseq[seqpnt].x = bseq[ind].x;
-					oseq[seqpnt++].y = bseq[ind].y;
+					oseq[sequenceIndex].x = bseq[ind].x;
+					oseq[sequenceIndex++].y = bseq[ind].y;
 				}
 				else {
-					oseq[seqpnt].x = bseq[ind].x;
-					oseq[seqpnt++].y = bseq[ind].y;
+					oseq[sequenceIndex].x = bseq[ind].x;
+					oseq[sequenceIndex++].y = bseq[ind].y;
 					cnt = floor(bseq[ind].y / userStitchLength);
 				blntbot:;
-					oseq[seqpnt].y = cnt*userStitchLength - ((rit + 2) % seqtab[rcnt])*usesiz9;
-					if (oseq[seqpnt].y < bseq[ind - 1].y)
+					oseq[sequenceIndex].y = cnt*userStitchLength - ((rit + 2) % seqtab[rcnt])*usesiz9;
+					if (oseq[sequenceIndex].y < bseq[ind - 1].y)
 						goto blntbotx;
-					dif.y = oseq[seqpnt].y - bseq[ind - 1].y;
-					oseq[seqpnt++].x = bseq[ind].x;
+					dif.y = oseq[sequenceIndex].y - bseq[ind - 1].y;
+					oseq[sequenceIndex++].x = bseq[ind].x;
 					cnt--;
 					goto blntbot;
 				blntbotx:;
-					oseq[seqpnt].x = bseq[ind - 1].x;
-					oseq[seqpnt++].y = bseq[ind - 1].y;
+					oseq[sequenceIndex].x = bseq[ind - 1].x;
+					oseq[sequenceIndex++].y = bseq[ind - 1].y;
 				}
 			}
 			else {
 				cnt = ceil(bseq[ind + 1].y / userStitchLength);
 			toplab:;
-				oseq[seqpnt].y = cnt*userStitchLength + (rit%seqtab[rcnt])*usesiz9;
-				if (oseq[seqpnt].y > bseq[ind].y)
+				oseq[sequenceIndex].y = cnt*userStitchLength + (rit%seqtab[rcnt])*usesiz9;
+				if (oseq[sequenceIndex].y > bseq[ind].y)
 					goto toplabx;
-				dif.y = oseq[seqpnt].y - bseq[ind + 1].y;
+				dif.y = oseq[sequenceIndex].y - bseq[ind + 1].y;
 				dif.x = rslop*dif.y;
-				oseq[seqpnt++].x = bseq[ind + 1].x + dif.x;
+				oseq[sequenceIndex++].x = bseq[ind + 1].x + dif.x;
 				cnt++;
 				goto toplab;
 			toplabx:;
-				oseq[seqpnt].x = bseq[ind].x;
-				oseq[seqpnt++].y = bseq[ind].y;
+				oseq[sequenceIndex].x = bseq[ind].x;
+				oseq[sequenceIndex++].y = bseq[ind].y;
 			}
 			break;
 
@@ -3970,17 +3968,17 @@ void bakseq() {
 			if (!(ptrSelectedForm->extendedAttribute&AT_SQR)) {
 				cnt = floor(bseq[ind + 1].y / userStitchLength);
 			botlab:;
-				oseq[seqpnt].y = cnt*userStitchLength - ((rit + 2) % seqtab[rcnt])*usesiz9;
-				if (oseq[seqpnt].y < bseq[ind].y)
+				oseq[sequenceIndex].y = cnt*userStitchLength - ((rit + 2) % seqtab[rcnt])*usesiz9;
+				if (oseq[sequenceIndex].y < bseq[ind].y)
 					goto botlabx;
-				dif.y = oseq[seqpnt].y - bseq[ind + 1].y;
+				dif.y = oseq[sequenceIndex].y - bseq[ind + 1].y;
 				dif.x = rslop*dif.y;
-				oseq[seqpnt++].x = bseq[ind + 1].x + dif.x;
+				oseq[sequenceIndex++].x = bseq[ind + 1].x + dif.x;
 				cnt--;
 				goto botlab;
 			botlabx:;
-				oseq[seqpnt].x = bseq[ind].x;
-				oseq[seqpnt++].y = bseq[ind].y;
+				oseq[sequenceIndex].x = bseq[ind].x;
+				oseq[sequenceIndex++].y = bseq[ind].y;
 			}
 			break;
 
@@ -3995,21 +3993,21 @@ void bakseq() {
 					pnt.x = bseq[ind + 1].x;
 					pnt.y = bseq[ind + 1].y;
 					cnt = len / userStitchLength - 1;
-					if (chkmax(cnt, seqpnt) || (cnt + seqpnt) > MAXSEQ - 3)
+					if (chkmax(cnt, sequenceIndex) || (cnt + sequenceIndex) > MAXSEQ - 3)
 						return;
 					stp.x = dif.x / cnt;
 					stp.y = dif.y / cnt;
 					while (cnt) {
 						pnt.x += stp.x;
 						pnt.y += stp.y;
-						oseq[seqpnt].x = pnt.x;
-						oseq[seqpnt++].y = pnt.y;
+						oseq[sequenceIndex].x = pnt.x;
+						oseq[sequenceIndex++].y = pnt.y;
 						cnt--;
 					}
 				}
 			}
-			oseq[seqpnt].x = bseq[ind].x;
-			oseq[seqpnt++].y = bseq[ind].y;
+			oseq[sequenceIndex].x = bseq[ind].x;
+			oseq[sequenceIndex++].y = bseq[ind].y;
 		}
 		ind--;
 	}
@@ -4057,7 +4055,7 @@ void fnvrt() {
 	}
 	maxlins = (maxlins >> 1);
 	lineEndpoints = new SMALPNTL[lincnt + 1];
-	stitchLineCount = 0; grpind = 0;
+	stitchLineCount = 0; lineGroupIndex = 0;
 	tgrinds = (unsigned*)bseq;
 	grindpnt = 0;
 	for (ind = 0; ind < cnt; ind++) {
@@ -4087,24 +4085,24 @@ void fnvrt() {
 			while (ine < inf) {
 				if (stitchLineCount < lincnt) {
 					lineEndpoints[stitchLineCount].line = pjpts[ine]->line;
-					lineEndpoints[stitchLineCount].group = grpind;
+					lineEndpoints[stitchLineCount].group = lineGroupIndex;
 					lineEndpoints[stitchLineCount].x = pjpts[ine]->x;
 					lineEndpoints[stitchLineCount++].y = pjpts[ine++]->y;
 					lineEndpoints[stitchLineCount].line = pjpts[ine]->line;
-					lineEndpoints[stitchLineCount].group = grpind;
+					lineEndpoints[stitchLineCount].group = lineGroupIndex;
 					lineEndpoints[stitchLineCount].x = pjpts[ine]->x;
 					lineEndpoints[stitchLineCount++].y = pjpts[ine++]->y;
 				}
 			}
 			if (stitchLineCount != tind)
-				grpind++;
+				lineGroupIndex++;
 		}
 	}
 	tgrinds[grindpnt++] = stitchLineCount;
 	grinds = new unsigned[grindpnt];
 	for (ind = 0; ind < grindpnt; ind++)
 		grinds[ind] = tgrinds[ind];
-	grpind--;
+	lineGroupIndex--;
 	delete[] jpts;
 	delete[] pjpts;
 }
@@ -4392,7 +4390,7 @@ void clrfills() {
 }
 
 void dusat() {
-	POINT* l_plin = &formLines[satpt - 1];
+	POINT* l_plin = &formLines[satinIndex - 1];
 
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, formPen);
@@ -4408,8 +4406,8 @@ void unsat() {
 void drwsat() {
 	unsat();
 	px2stch();
-	formLines[satpt].x = msg.pt.x - stitchWindowOrigin.x;
-	formLines[satpt].y = msg.pt.y - stitchWindowOrigin.y;
+	formLines[satinIndex].x = msg.pt.x - stitchWindowOrigin.x;
+	formLines[satinIndex].y = msg.pt.y - stitchWindowOrigin.y;
 	setMap(SHOSAT);
 	dusat();
 }
@@ -4420,32 +4418,32 @@ void satpnt0() {
 	formLines[0].y = msg.pt.y - stitchWindowOrigin.y;
 	tpoly[0].x = selectedPoint.x;
 	tpoly[0].y = selectedPoint.y;
-	satpt = 1;
+	satinIndex = 1;
 	setMap(SATPNT);
 }
 
 void satpnt1() {
 	unsat();
 	px2stch();
-	formLines[satpt].x = msg.pt.x - stitchWindowOrigin.x;
-	formLines[satpt].y = msg.pt.y - stitchWindowOrigin.y;
+	formLines[satinIndex].x = msg.pt.x - stitchWindowOrigin.x;
+	formLines[satinIndex].y = msg.pt.y - stitchWindowOrigin.y;
 	dusat();
-	tpoly[satpt].x = selectedPoint.x;
-	tpoly[satpt].y = selectedPoint.y;
-	satpt++;
+	tpoly[satinIndex].x = selectedPoint.x;
+	tpoly[satinIndex].y = selectedPoint.y;
+	satinIndex++;
 	setMap(RESTCH);
 }
 
 void satfix() {
 	unsigned ind;
 
-	if (satpt > 1) {
-		formList[formIndex].vertices = adflt(satpt);
-		for (ind = 0; ind < satpt; ind++) {
+	if (satinIndex > 1) {
+		formList[formIndex].vertices = adflt(satinIndex);
+		for (ind = 0; ind < satinIndex; ind++) {
 			formList[formIndex].vertices[ind].x = tpoly[ind].x;
 			formList[formIndex].vertices[ind].y = tpoly[ind].y;
 		}
-		formList[formIndex].sides = satpt;
+		formList[formIndex].sides = satinIndex;
 		frmout(formIndex);
 		formList[formIndex].satinGuideCount = 0;
 		formIndex++;
@@ -4959,9 +4957,9 @@ void satknkt() {
 }
 
 void ritseq1(unsigned ind) {
-	bseq[seqpnt].x = currentFormVertices[ind].x;
-	bseq[seqpnt].y = currentFormVertices[ind].y;
-	seqpnt++;
+	bseq[sequenceIndex].x = currentFormVertices[ind].x;
+	bseq[sequenceIndex].y = currentFormVertices[ind].y;
+	sequenceIndex++;
 }
 
 void satfn(unsigned astrt, unsigned afin, unsigned bstrt, unsigned bfin) {
@@ -4975,7 +4973,7 @@ void satfn(unsigned astrt, unsigned afin, unsigned bstrt, unsigned bfin) {
 	if (astrt != afin&&bstrt != bfin) {
 		if (!setMap(SAT1)) {
 			if (chkMap(FTHR)) {
-				bseq[seqpnt].attribute = 0;
+				bseq[sequenceIndex].attribute = 0;
 				ritseq1(astrt%sides);
 			}
 			else {
@@ -4986,8 +4984,8 @@ void satfn(unsigned astrt, unsigned afin, unsigned bstrt, unsigned bfin) {
 				else {
 					selectedPoint.x = currentFormVertices[astrt].x;
 					selectedPoint.y = currentFormVertices[astrt].y;
-					oseq[seqpnt].x = selectedPoint.x;
-					oseq[seqpnt++].y = selectedPoint.y;
+					oseq[sequenceIndex].x = selectedPoint.x;
+					oseq[sequenceIndex++].y = selectedPoint.y;
 				}
 			}
 		}
@@ -5057,17 +5055,17 @@ void satfn(unsigned astrt, unsigned afin, unsigned bstrt, unsigned bfin) {
 				bpnt.x += bstp.x;
 				bpnt.y += bstp.y;
 				if (toglMap(FILDIR)) {
-					bseq[seqpnt].attribute = 0;
-					bseq[seqpnt].x = apnt.x;
-					bseq[seqpnt++].y = apnt.y;
+					bseq[sequenceIndex].attribute = 0;
+					bseq[sequenceIndex].x = apnt.x;
+					bseq[sequenceIndex++].y = apnt.y;
 				}
 				else {
-					bseq[seqpnt].attribute = 1;
-					bseq[seqpnt].x = bpnt.x;
-					bseq[seqpnt++].y = bpnt.y;
+					bseq[sequenceIndex].attribute = 1;
+					bseq[sequenceIndex].x = bpnt.x;
+					bseq[sequenceIndex++].y = bpnt.y;
 				}
-				if (seqpnt > MAXSEQ - 6) {
-					seqpnt = MAXSEQ - 6;
+				if (sequenceIndex > MAXSEQ - 6) {
+					sequenceIndex = MAXSEQ - 6;
 					return;
 				}
 				acnt--;
@@ -5082,23 +5080,23 @@ void satfn(unsigned astrt, unsigned afin, unsigned bstrt, unsigned bfin) {
 					bpnt.x += bstp.x;
 					bpnt.y += bstp.y;
 					if (toglMap(FILDIR)) {
-						bseq[seqpnt].attribute = 0;
-						bseq[seqpnt].x = apnt.x;
-						bseq[seqpnt++].y = apnt.y;
-						bseq[seqpnt].attribute = 1;
-						bseq[seqpnt].x = bpnt.x;
-						bseq[seqpnt++].y = bpnt.y;
+						bseq[sequenceIndex].attribute = 0;
+						bseq[sequenceIndex].x = apnt.x;
+						bseq[sequenceIndex++].y = apnt.y;
+						bseq[sequenceIndex].attribute = 1;
+						bseq[sequenceIndex].x = bpnt.x;
+						bseq[sequenceIndex++].y = bpnt.y;
 					}
 					else {
-						bseq[seqpnt].attribute = 2;
-						bseq[seqpnt].x = bpnt.x;
-						bseq[seqpnt++].y = bpnt.y;
-						bseq[seqpnt].attribute = 3;
-						bseq[seqpnt].x = apnt.x;
-						bseq[seqpnt++].y = apnt.y;
+						bseq[sequenceIndex].attribute = 2;
+						bseq[sequenceIndex].x = bpnt.x;
+						bseq[sequenceIndex++].y = bpnt.y;
+						bseq[sequenceIndex].attribute = 3;
+						bseq[sequenceIndex].x = apnt.x;
+						bseq[sequenceIndex++].y = apnt.y;
 					}
-					if (seqpnt > MAXSEQ - 6) {
-						seqpnt = MAXSEQ - 6;
+					if (sequenceIndex > MAXSEQ - 6) {
+						sequenceIndex = MAXSEQ - 6;
 						return;
 					}
 					acnt--;
@@ -5193,7 +5191,7 @@ void satfil() {
 	satadj();
 	tspac = StitchSpace;
 	StitchSpace /= 2;
-	seqpnt = 0;
+	sequenceIndex = 0;
 	rstMap(SAT1);
 	rstMap(FILDIR);
 	ptrSelectedForm->fillType = SATF;
@@ -5236,7 +5234,7 @@ void satfil() {
 				if (!chkMap(BARSAT)) {
 					oseq[0].x = selectedPoint.x = currentFormVertices[1].x;
 					oseq[0].y = selectedPoint.y = currentFormVertices[1].y;
-					seqpnt = 1;
+					sequenceIndex = 1;
 				}
 				while ((len > lens[ind]) && (ind < (unsigned int)(sides + 1)))
 					ind++;
@@ -5258,7 +5256,7 @@ void satfil() {
 	if (!chkMap(BARSAT) && !chkMap(FTHR)) {
 		oseq[0].x = selectedPoint.x = currentFormVertices[0].x;
 		oseq[0].y = selectedPoint.y = currentFormVertices[0].y;
-		seqpnt = 1;
+		sequenceIndex = 1;
 	}
 	while (len > lens[ind])
 		ind++;
@@ -5571,11 +5569,11 @@ void unfil() {
 void satzum() {
 	rstMap(SHOSAT);
 	duzrat();
-	sides = satpt;
-	frmlin(tpoly, satpt);
+	sides = satinIndex;
+	frmlin(tpoly, satinIndex);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	SelectObject(StitchWindowMemDC, formPen);
-	Polyline(StitchWindowMemDC, formLines, satpt);
+	Polyline(StitchWindowMemDC, formLines, satinIndex);
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	drwsat();
 }
@@ -5759,15 +5757,15 @@ void bdrlin(unsigned strt, unsigned fin, double pd_Size) {
 		pnt.y = currentFormVertices[strt].y + stp.y;
 		cnt--;
 		while (cnt) {
-			oseq[seqpnt].x = pnt.x;
-			oseq[seqpnt++].y = pnt.y;
+			oseq[sequenceIndex].x = pnt.x;
+			oseq[sequenceIndex++].y = pnt.y;
 			pnt.x += stp.x;
 			pnt.y += stp.y;
 			cnt--;
 		}
 	}
-	oseq[seqpnt].x = currentFormVertices[fin].x;
-	oseq[seqpnt++].y = currentFormVertices[fin].y;
+	oseq[sequenceIndex].x = currentFormVertices[fin].x;
+	oseq[sequenceIndex++].y = currentFormVertices[fin].y;
 }
 
 void brdfil(double pd_Size) {
@@ -5778,9 +5776,9 @@ void brdfil(double pd_Size) {
 		tlin = ptrSelectedForm->fillStart;
 	else
 		tlin = getlast();
-	seqpnt = 0;
-	oseq[seqpnt].x = currentFormVertices[tlin].x;
-	oseq[seqpnt++].y = currentFormVertices[tlin].y;
+	sequenceIndex = 0;
+	oseq[sequenceIndex].x = currentFormVertices[tlin].x;
+	oseq[sequenceIndex++].y = currentFormVertices[tlin].y;
 	for (ind = 0; ind < (unsigned)sides - 1; ind++) {
 		nlin = nxt(tlin);
 		bdrlin(tlin, nlin, pd_Size);
@@ -5837,13 +5835,13 @@ BOOL ritclp(fPOINT pnt) {
 	fPOINT		adj;
 	unsigned	ind;
 
-	if (chkmax(clipboardStitchCount, seqpnt))
+	if (chkmax(clipboardStitchCount, sequenceIndex))
 		return 1;
 	adj.x = pnt.x - clpref.x;
 	adj.y = pnt.y - clpref.y;
 	for (ind = 0; ind < clipboardStitchCount; ind++) {
-		oseq[seqpnt].x = clipFillData[ind].x + adj.x;
-		oseq[seqpnt++].y = clipFillData[ind].y + adj.y;
+		oseq[sequenceIndex].x = clipFillData[ind].x + adj.x;
+		oseq[sequenceIndex++].y = clipFillData[ind].y + adj.y;
 	}
 	return 0;
 }
@@ -5979,7 +5977,7 @@ void clpbrd(unsigned short strtlin) {
 	unsigned short	nlin;
 
 	bac = 0;
-	seqpnt = 0;
+	sequenceIndex = 0;
 	rstMap(CLPBAK);
 	plen = clipboardRectSize.cx / 2;
 	plen2 = clipboardRectSize.cx;
@@ -6166,20 +6164,20 @@ void filinsb(dPOINT pnt) {
 		stp.x = dif.x / cnt;
 		stp.y = dif.y / cnt;
 		cnt--;
-		if (chkmax(cnt, seqpnt))
+		if (chkmax(cnt, sequenceIndex))
 			return;
 		while (cnt) {
 			selectedPoint.x += stp.x;
 			selectedPoint.y += stp.y;
-			oseq[seqpnt].x = selectedPoint.x;
-			oseq[seqpnt++].y = selectedPoint.y;
+			oseq[sequenceIndex].x = selectedPoint.x;
+			oseq[sequenceIndex++].y = selectedPoint.y;
 			cnt--;
 		}
 	}
-	if (seqpnt & 0xffff0000)
+	if (sequenceIndex & 0xffff0000)
 		return;
-	oseq[seqpnt].x = pnt.x;
-	oseq[seqpnt++].y = pnt.y;
+	oseq[sequenceIndex].x = pnt.x;
+	oseq[sequenceIndex++].y = pnt.y;
 	selectedPoint.x = pnt.x;
 	selectedPoint.y = pnt.y;
 }
@@ -6275,7 +6273,7 @@ void sbfn(fPOINT* p_flt, unsigned strt, unsigned fin) {
 	}
 	if (!cnt)
 		cnt = 1;
-	if (chkmax(cnt, seqpnt))
+	if (chkmax(cnt, sequenceIndex))
 		return;
 	istp.x = idif.x / cnt;
 	istp.y = idif.y / cnt;
@@ -6336,10 +6334,10 @@ void sfn(unsigned short strtlin) {
 		sbfn(ipnts, strtlin, nlin);
 		strtlin = nlin;
 	}
-	oseq[0].x = oseq[seqpnt - 1].x;
-	oseq[0].y = oseq[seqpnt - 1].y;
-	if (seqpnt > MAXSEQ - 2)
-		seqpnt = MAXSEQ - 2;
+	oseq[0].x = oseq[sequenceIndex - 1].x;
+	oseq[0].y = oseq[sequenceIndex - 1].y;
+	if (sequenceIndex > MAXSEQ - 2)
+		sequenceIndex = MAXSEQ - 2;
 }
 
 void sbrd() {
@@ -6350,7 +6348,7 @@ void sbrd() {
 	tspac = StitchSpace;
 	rstMap(SAT1);
 	rstMap(FILDIR);
-	seqpnt = 1;
+	sequenceIndex = 1;
 	if (ptrSelectedForm->edgeType&EGUND) {
 		StitchSpace = USPAC;
 		satout(plen*URAT);
@@ -6434,7 +6432,7 @@ void slbrd() {
 	unsigned	ind;
 	double		tspac = StitchSpace;
 
-	seqpnt = 0;
+	sequenceIndex = 0;
 	if (ptrSelectedForm->edgeType&EGUND) {
 		plen = ptrSelectedForm->borderSize*URAT;
 		satout(plen);
@@ -6509,7 +6507,7 @@ void lapbrd() {
 	double		tsiz;
 	unsigned	ind;
 
-	seqpnt = 0;
+	sequenceIndex = 0;
 	tsiz = userStitchLength;
 	userStitchLength = APSPAC;
 	for (ind = 0; ind < (unsigned)sides - 1; ind++)
@@ -6523,9 +6521,9 @@ void apbrd() {
 	unsigned		ind;
 	unsigned short	nlin, tlin = 0;
 
-	seqpnt = 0;
-	oseq[seqpnt].x = currentFormVertices[tlin].x;
-	oseq[seqpnt++].y = currentFormVertices[tlin].y;
+	sequenceIndex = 0;
+	oseq[sequenceIndex].x = currentFormVertices[tlin].x;
+	oseq[sequenceIndex++].y = currentFormVertices[tlin].y;
 	for (ind = 0; ind < (unsigned)sides << 1; ind++) {
 		nlin = nxt(tlin);
 		bdrlin(tlin, nlin, APSPAC);
@@ -8392,18 +8390,18 @@ void sprct(unsigned strt, unsigned fin) {
 	dif.x = opnts[fin].x - opnts[strt].x;
 	dif.y = opnts[fin].y - opnts[strt].y;
 	if (dif.x&&dif.y) {
-		slop = -dif.x / dif.y;
+		slope = -dif.x / dif.y;
 		tpnt.x = currentFormVertices[fin].x;
 		tpnt.y = currentFormVertices[fin].y;
-		proj(tpnt, slop, opnts[strt], opnts[fin], &tvrct->dopnt);
-		proj(tpnt, slop, ipnts[strt], ipnts[fin], &tvrct->dipnt);
+		proj(tpnt, slope, opnts[strt], opnts[fin], &tvrct->dopnt);
+		proj(tpnt, slope, ipnts[strt], ipnts[fin], &tvrct->dipnt);
 		tpnt.x = currentFormVertices[strt].x;
 		tpnt.y = currentFormVertices[strt].y;
-		proj(tpnt, slop, opnts[strt], opnts[fin], &tvrct->aopnt);
-		proj(tpnt, slop, ipnts[strt], ipnts[fin], &tvrct->aipnt);
+		proj(tpnt, slope, opnts[strt], opnts[fin], &tvrct->aopnt);
+		proj(tpnt, slope, ipnts[strt], ipnts[fin], &tvrct->aipnt);
 		tpnt.x = ipnts[strt].x;
 		tpnt.y = ipnts[strt].y;
-		if (proj(tpnt, slop, opnts[strt], opnts[fin], &tvrct->bopnt)) {
+		if (proj(tpnt, slope, opnts[strt], opnts[fin], &tvrct->bopnt)) {
 			tvrct->bipnt.x = ipnts[strt].x;
 			tvrct->bipnt.y = ipnts[strt].y;
 		}
@@ -8412,11 +8410,11 @@ void sprct(unsigned strt, unsigned fin) {
 			tvrct->bopnt.y = opnts[strt].y;
 			tpnt.x = opnts[strt].x;
 			tpnt.y = opnts[strt].y;
-			proj(tpnt, slop, ipnts[strt], ipnts[fin], &tvrct->bipnt);
+			proj(tpnt, slope, ipnts[strt], ipnts[fin], &tvrct->bipnt);
 		}
 		tpnt.x = ipnts[fin].x;
 		tpnt.y = ipnts[fin].y;
-		if (proj(tpnt, slop, opnts[strt], opnts[fin], &tvrct->copnt)) {
+		if (proj(tpnt, slope, opnts[strt], opnts[fin], &tvrct->copnt)) {
 			tvrct->cipnt.x = ipnts[fin].x;
 			tvrct->cipnt.y = ipnts[fin].y;
 		}
@@ -8425,7 +8423,7 @@ void sprct(unsigned strt, unsigned fin) {
 			tvrct->copnt.y = opnts[fin].y;
 			tpnt.x = opnts[fin].x;
 			tpnt.y = opnts[fin].y;
-			proj(tpnt, slop, ipnts[strt], ipnts[fin], &tvrct->cipnt);
+			proj(tpnt, slope, ipnts[strt], ipnts[fin], &tvrct->cipnt);
 		}
 	}
 	else {
@@ -8702,7 +8700,7 @@ void prsmal() {
 	lSize = USPAC*0.8;
 	if (lSize > plen)
 		lSize = plen*0.9;
-	for (ind = 1; ind < seqpnt; ind++) {
+	for (ind = 1; ind < sequenceIndex; ind++) {
 		dif.x = oseq[ind].x - oseq[ref].x;
 		dif.y = oseq[ind].y - oseq[ref].y;
 		len = hypot(dif.x, dif.y);
@@ -8712,11 +8710,11 @@ void prsmal() {
 			ref = ind;
 		}
 	}
-	seqpnt = ine;
+	sequenceIndex = ine;
 }
 
 void plbak(unsigned bpnt) {
-	unsigned	ind = seqpnt - 1;
+	unsigned	ind = sequenceIndex - 1;
 	fPOINT		tflt;
 
 	while (ind > bpnt) {
@@ -8809,7 +8807,7 @@ void plbrd(double spac) {
 		pvrct[sides - 4].dipnt.x = pvrct[sides - 4].dopnt.x = uvrct[sides - 4].dipnt.x = uvrct[sides - 4].dopnt.x = ptrSelectedForm->vertices[sides - 1].x;
 		pvrct[sides - 4].dipnt.y = pvrct[sides - 4].dopnt.y = uvrct[sides - 4].dipnt.y = uvrct[sides - 4].dopnt.y = ptrSelectedForm->vertices[sides - 1].y;
 	}
-	seqpnt = 0;
+	sequenceIndex = 0;
 	selectedPoint.x = currentFormVertices[0].x;
 	selectedPoint.y = currentFormVertices[0].y;
 	if (ptrSelectedForm->edgeType&EGUND) {
@@ -8819,7 +8817,7 @@ void plbrd(double spac) {
 		setMap(UNDPHAS);
 		rstMap(FILDIR);
 		plfn(&uvrct[0]);
-		bpnt = seqpnt;
+		bpnt = sequenceIndex;
 		rstMap(UNDPHAS);
 		selectedPoint.x = currentFormVertices[0].x;
 		selectedPoint.y = currentFormVertices[0].y;
@@ -8827,9 +8825,9 @@ void plbrd(double spac) {
 		plfn(&uvrct[0]);
 		plbak(bpnt);
 		prsmal();
-		if (seqpnt) { //ensure that we can do a valid read from oseq
-			selectedPoint.x = oseq[seqpnt - 1].x;
-			selectedPoint.y = oseq[seqpnt - 1].y;
+		if (sequenceIndex) { //ensure that we can do a valid read from oseq
+			selectedPoint.x = oseq[sequenceIndex - 1].x;
+			selectedPoint.y = oseq[sequenceIndex - 1].y;
 		}
 	}
 	rstMap(UND);
@@ -8846,7 +8844,7 @@ void pbrd(double spac) {
 
 	tspac = StitchSpace;
 	StitchSpace = ptrSelectedForm->edgeSpacing;
-	seqpnt = 0;
+	sequenceIndex = 0;
 	pvrct = (VRCT2*)bseq;
 	uvrct = &pvrct[sides];
 	strt = getlast();
@@ -9084,7 +9082,7 @@ void clpfm() {
 	dPOINT		lpnt1, rpnt1;
 
 	activePointIndex = 0;
-	for (ind = 0; ind < seqpnt - 2; ind += 2) {
+	for (ind = 0; ind < sequenceIndex - 2; ind += 2) {
 		lsiz = hypot(bseq[ind + 1].x - bseq[ind].x, bseq[ind + 1].y - bseq[ind].y);
 		l_rsiz = hypot(bseq[ind + 3].x - bseq[ind + 2].x, bseq[ind + 3].y - bseq[ind + 2].y);
 		ldif.x = bseq[ind + 1].x - bseq[ind].x;
@@ -9130,7 +9128,7 @@ void fmclp() {
 	rstMap(BARSAT);
 	clpfm();
 	ptrSelectedForm->fillType = CLPF;
-	seqpnt = activePointIndex;
+	sequenceIndex = activePointIndex;
 	StitchSpace = tspac;
 }
 
@@ -10073,29 +10071,29 @@ void bhfn(unsigned strt, unsigned fin, double spac) {
 			pntf.y = pnti.y + stp.y;
 			pnto.x = pntf.x + ostp.x;
 			pnto.y = pntf.y + ostp.y;
-			oseq[seqpnt].x = pntf.x;
-			oseq[seqpnt++].y = pntf.y;
-			oseq[seqpnt].x = pnti.x;
-			oseq[seqpnt++].y = pnti.y;
-			oseq[seqpnt].x = pntf.x;
-			oseq[seqpnt++].y = pntf.y;
-			oseq[seqpnt].x = pnto.x;
-			oseq[seqpnt++].y = pnto.y;
-			oseq[seqpnt].x = pntf.x;
-			oseq[seqpnt++].y = pntf.y;
-			oseq[seqpnt].x = pnto.x;
-			oseq[seqpnt++].y = pnto.y;
-			oseq[seqpnt].x = pntf.x;
-			oseq[seqpnt++].y = pntf.y;
+			oseq[sequenceIndex].x = pntf.x;
+			oseq[sequenceIndex++].y = pntf.y;
+			oseq[sequenceIndex].x = pnti.x;
+			oseq[sequenceIndex++].y = pnti.y;
+			oseq[sequenceIndex].x = pntf.x;
+			oseq[sequenceIndex++].y = pntf.y;
+			oseq[sequenceIndex].x = pnto.x;
+			oseq[sequenceIndex++].y = pnto.y;
+			oseq[sequenceIndex].x = pntf.x;
+			oseq[sequenceIndex++].y = pntf.y;
+			oseq[sequenceIndex].x = pnto.x;
+			oseq[sequenceIndex++].y = pnto.y;
+			oseq[sequenceIndex].x = pntf.x;
+			oseq[sequenceIndex++].y = pntf.y;
 			pnti.x += stp.x;
 			pnti.y += stp.y;
 		}
 		pntf.x = pnti.x + stp.x;
 		pntf.y = pnti.y + stp.y;
-		oseq[seqpnt].x = pntf.x;
-		oseq[seqpnt++].y = pntf.y;
-		oseq[seqpnt].x = pnti.x;
-		oseq[seqpnt++].y = pnti.y;
+		oseq[sequenceIndex].x = pntf.x;
+		oseq[sequenceIndex++].y = pntf.y;
+		oseq[sequenceIndex].x = pnti.x;
+		oseq[sequenceIndex++].y = pnti.y;
 	}
 }
 
@@ -10120,16 +10118,16 @@ void bhcrnr(unsigned p_lin) {
 	dif.y *= rat;
 	pnt.x = currentFormVertices[tlin].x + dif.x;
 	pnt.y = currentFormVertices[tlin].y + dif.y;
-	oseq[seqpnt].x = currentFormVertices[tlin].x;
-	oseq[seqpnt++].y = currentFormVertices[tlin].y;
-	oseq[seqpnt].x = pnt.x;
-	oseq[seqpnt++].y = pnt.y;
-	oseq[seqpnt].x = currentFormVertices[tlin].x;
-	oseq[seqpnt++].y = currentFormVertices[tlin].y;
-	oseq[seqpnt].x = pnt.x;
-	oseq[seqpnt++].y = pnt.y;
-	oseq[seqpnt].x = currentFormVertices[tlin].x;
-	oseq[seqpnt++].y = currentFormVertices[tlin].y;
+	oseq[sequenceIndex].x = currentFormVertices[tlin].x;
+	oseq[sequenceIndex++].y = currentFormVertices[tlin].y;
+	oseq[sequenceIndex].x = pnt.x;
+	oseq[sequenceIndex++].y = pnt.y;
+	oseq[sequenceIndex].x = currentFormVertices[tlin].x;
+	oseq[sequenceIndex++].y = currentFormVertices[tlin].y;
+	oseq[sequenceIndex].x = pnt.x;
+	oseq[sequenceIndex++].y = pnt.y;
+	oseq[sequenceIndex].x = currentFormVertices[tlin].x;
+	oseq[sequenceIndex++].y = currentFormVertices[tlin].y;
 }
 
 void bhbrd(double spac) {
@@ -10137,9 +10135,9 @@ void bhbrd(double spac) {
 	unsigned short	nlin, ind;
 
 	slin = getlast();
-	seqpnt = 0;
-	oseq[seqpnt].x = currentFormVertices[slin].x;
-	oseq[seqpnt++].y = currentFormVertices[slin].y;
+	sequenceIndex = 0;
+	oseq[sequenceIndex].x = currentFormVertices[slin].x;
+	oseq[sequenceIndex++].y = currentFormVertices[slin].y;
 	for (ind = 0; ind < sides; ind++) {
 		nlin = nxt(slin);
 		bhfn(slin, nlin, spac);
@@ -10151,16 +10149,16 @@ void bhbrd(double spac) {
 void blbrd(double spac) {
 	unsigned ind;
 
-	seqpnt = 0;
-	oseq[seqpnt].x = currentFormVertices[0].x;
-	oseq[seqpnt++].y = currentFormVertices[0].y;
+	sequenceIndex = 0;
+	oseq[sequenceIndex].x = currentFormVertices[0].x;
+	oseq[sequenceIndex++].y = currentFormVertices[0].y;
 	for (ind = 0; ind < (unsigned)sides - 2; ind++) {
 		bhfn(ind, ind + 1, spac);
 		bhcrnr(ind);
 	}
 	bhfn(ind, ind + 1, spac);
-	oseq[seqpnt].x = currentFormVertices[sides - 1].x;
-	oseq[seqpnt++].y = currentFormVertices[sides - 1].y;
+	oseq[sequenceIndex].x = currentFormVertices[sides - 1].x;
+	oseq[sequenceIndex++].y = currentFormVertices[sides - 1].y;
 }
 
 void bholbrd() {
@@ -10284,21 +10282,21 @@ void clpcrnr(unsigned p_lin) {
 	dif.y *= rat;
 	pnt.x = currentFormVertices[tlin].x + dif.x;
 	pnt.y = currentFormVertices[tlin].y + dif.y;
-	oseq[seqpnt].x = currentFormVertices[tlin].x;
-	oseq[seqpnt++].y = currentFormVertices[tlin].y;
-	oseq[seqpnt].x = pnt.x;
-	oseq[seqpnt++].y = pnt.y;
-	oseq[seqpnt].x = currentFormVertices[tlin].x;
-	oseq[seqpnt++].y = currentFormVertices[tlin].y;
-	oseq[seqpnt].x = pnt.x;
-	oseq[seqpnt++].y = pnt.y;
+	oseq[sequenceIndex].x = currentFormVertices[tlin].x;
+	oseq[sequenceIndex++].y = currentFormVertices[tlin].y;
+	oseq[sequenceIndex].x = pnt.x;
+	oseq[sequenceIndex++].y = pnt.y;
+	oseq[sequenceIndex].x = currentFormVertices[tlin].x;
+	oseq[sequenceIndex++].y = currentFormVertices[tlin].y;
+	oseq[sequenceIndex].x = pnt.x;
+	oseq[sequenceIndex++].y = pnt.y;
 	tpnt.x = pnt.x;
 	tpnt.y = pnt.y;
 	if (!ritclp(tpnt)) {
-		oseq[seqpnt].x = pnt.x;
-		oseq[seqpnt++].y = pnt.y;
-		oseq[seqpnt].x = currentFormVertices[tlin].x;
-		oseq[seqpnt++].y = currentFormVertices[tlin].y;
+		oseq[sequenceIndex].x = pnt.x;
+		oseq[sequenceIndex++].y = pnt.y;
+		oseq[sequenceIndex].x = currentFormVertices[tlin].x;
+		oseq[sequenceIndex++].y = currentFormVertices[tlin].y;
 	}
 }
 
@@ -10338,33 +10336,33 @@ void picfn(unsigned strt, unsigned fin, double spac) {
 			pntf.y = pnti.y + stp.y;
 			pnto.x = pntf.x + ostp.x;
 			pnto.y = pntf.y + ostp.y;
-			oseq[seqpnt].x = pntf.x;
-			oseq[seqpnt++].y = pntf.y;
-			oseq[seqpnt].x = pnti.x;
-			oseq[seqpnt++].y = pnti.y;
-			oseq[seqpnt].x = pntf.x;
-			oseq[seqpnt++].y = pntf.y;
-			oseq[seqpnt].x = pnto.x;
-			oseq[seqpnt++].y = pnto.y;
-			oseq[seqpnt].x = pntf.x;
-			oseq[seqpnt++].y = pntf.y;
-			oseq[seqpnt].x = pnto.x;
-			oseq[seqpnt++].y = pnto.y;
+			oseq[sequenceIndex].x = pntf.x;
+			oseq[sequenceIndex++].y = pntf.y;
+			oseq[sequenceIndex].x = pnti.x;
+			oseq[sequenceIndex++].y = pnti.y;
+			oseq[sequenceIndex].x = pntf.x;
+			oseq[sequenceIndex++].y = pntf.y;
+			oseq[sequenceIndex].x = pnto.x;
+			oseq[sequenceIndex++].y = pnto.y;
+			oseq[sequenceIndex].x = pntf.x;
+			oseq[sequenceIndex++].y = pntf.y;
+			oseq[sequenceIndex].x = pnto.x;
+			oseq[sequenceIndex++].y = pnto.y;
 			tpnt.x = pnto.x;
 			tpnt.y = pnto.y;
 			if (ritclp(tpnt))
 				goto picfnx;
-			oseq[seqpnt].x = pnto.x;
-			oseq[seqpnt++].y = pnto.y;
-			oseq[seqpnt].x = pntf.x;
-			oseq[seqpnt++].y = pntf.y;
+			oseq[sequenceIndex].x = pnto.x;
+			oseq[sequenceIndex++].y = pnto.y;
+			oseq[sequenceIndex].x = pntf.x;
+			oseq[sequenceIndex++].y = pntf.y;
 			pnti.x += stp.x;
 			pnti.y += stp.y;
 		}
-		oseq[seqpnt].x = currentFormVertices[fin].x;
-		oseq[seqpnt++].y = currentFormVertices[fin].y;
-		oseq[seqpnt].x = pnti.x;
-		oseq[seqpnt++].y = pnti.y;
+		oseq[sequenceIndex].x = currentFormVertices[fin].x;
+		oseq[sequenceIndex++].y = currentFormVertices[fin].y;
+		oseq[sequenceIndex].x = pnti.x;
+		oseq[sequenceIndex++].y = pnti.y;
 	}
 picfnx:;
 }
@@ -10374,7 +10372,7 @@ void clpic(unsigned short strtlin) {
 	unsigned short	nlin;
 
 	bac = 0;
-	seqpnt = 0;
+	sequenceIndex = 0;
 	rstMap(CLPBAK);
 	plen = clipboardRectSize.cx / 2;
 	plen2 = clipboardRectSize.cx;
@@ -10392,8 +10390,8 @@ void clpic(unsigned short strtlin) {
 	}
 	else {
 		if (!ptrSelectedForm->fillType) {
-			oseq[seqpnt].x = currentFormVertices[strtlin].x;
-			oseq[seqpnt++].y = currentFormVertices[strtlin].y;
+			oseq[sequenceIndex].x = currentFormVertices[strtlin].x;
+			oseq[sequenceIndex++].y = currentFormVertices[strtlin].y;
 		}
 		for (ind = 0; ind < sides; ind++) {
 			nlin = nxt(strtlin);
@@ -10401,8 +10399,8 @@ void clpic(unsigned short strtlin) {
 			clpcrnr(strtlin);
 			strtlin = nlin;
 		}
-		oseq[seqpnt].x = currentFormVertices[strtlin].x;
-		oseq[seqpnt++].y = currentFormVertices[strtlin].y;
+		oseq[sequenceIndex].x = currentFormVertices[strtlin].x;
+		oseq[sequenceIndex++].y = currentFormVertices[strtlin].y;
 	}
 	delete[] clipFillData;
 }
@@ -10490,7 +10488,7 @@ void contf() {
 	PVEC*		pols;
 	PVEC		polref, polin, poldif;
 
-	seqpnt = 0;
+	sequenceIndex = 0;
 	strt = ptrSelectedForm->angleOrClipData.sat.start;
 	fin = ptrSelectedForm->angleOrClipData.sat.finish;
 	hilins = sides - strt - 1;
@@ -10611,27 +10609,27 @@ void contf() {
 		if (polref.length > 0.9*StitchSpace) {
 			poldif.length = polin.length / polref.length;
 			if (toglMap(FILDIR)) {
-				oseq[seqpnt].x = lopnt.x;
-				oseq[seqpnt].y = lopnt.y;
-				seqpnt++;
+				oseq[sequenceIndex].x = lopnt.x;
+				oseq[sequenceIndex].y = lopnt.y;
+				sequenceIndex++;
 				for (ind = 0; ind < (selins - 1); ind++) {
 					rotationAngle = pols[ind].angle + poldif.angle;
 					len = pols[ind].length*poldif.length;
-					oseq[seqpnt].x = lopnt.x + cos(rotationAngle)*len;
-					oseq[seqpnt].y = lopnt.y + sin(rotationAngle)*len;
-					seqpnt++;
+					oseq[sequenceIndex].x = lopnt.x + cos(rotationAngle)*len;
+					oseq[sequenceIndex].y = lopnt.y + sin(rotationAngle)*len;
+					sequenceIndex++;
 				}
 			}
 			else {
-				oseq[seqpnt].x = hipnt.x;
-				oseq[seqpnt].y = hipnt.y;
-				seqpnt++;
+				oseq[sequenceIndex].x = hipnt.x;
+				oseq[sequenceIndex].y = hipnt.y;
+				sequenceIndex++;
 				for (ind = selins - 1; ind != 0; ind--) {
 					rotationAngle = pols[ind - 1].angle + poldif.angle;
 					len = pols[ind - 1].length*poldif.length;
-					oseq[seqpnt].x = lopnt.x + cos(rotationAngle)*len;
-					oseq[seqpnt].y = lopnt.y + sin(rotationAngle)*len;
-					seqpnt++;
+					oseq[sequenceIndex].x = lopnt.x + cos(rotationAngle)*len;
+					oseq[sequenceIndex].y = lopnt.y + sin(rotationAngle)*len;
+					sequenceIndex++;
 				}
 			}
 		}
@@ -10641,12 +10639,12 @@ void contf() {
 		hipnt.y += histp.y;
 	}
 	if (chkMap(FILDIR)) {
-		oseq[seqpnt].x = currentFormVertices[0].x;
-		oseq[seqpnt++].y = currentFormVertices[0].y;
+		oseq[sequenceIndex].x = currentFormVertices[0].x;
+		oseq[sequenceIndex++].y = currentFormVertices[0].y;
 	}
 	else {
-		oseq[seqpnt].x = currentFormVertices[sides - 1].x;
-		oseq[seqpnt++].y = currentFormVertices[sides - 1].y;
+		oseq[sequenceIndex].x = currentFormVertices[sides - 1].x;
+		oseq[sequenceIndex++].y = currentFormVertices[sides - 1].y;
 	}
 	if (ptrSelectedForm->lengthOrCount.stitchLength < minStitchLength)
 		ptrSelectedForm->lengthOrCount.stitchLength = minStitchLength;
@@ -11628,16 +11626,16 @@ void chksid(unsigned find) {
 			ind = nxt(vclpsid);
 			lim = nxt(find);
 			while (ind != lim) {
-				oseq[seqpnt].x = currentFormVertices[ind].x;
-				oseq[seqpnt++].y = currentFormVertices[ind].y;
+				oseq[sequenceIndex].x = currentFormVertices[ind].x;
+				oseq[sequenceIndex++].y = currentFormVertices[ind].y;
 				ind = nxt(ind);
 			}
 		}
 		else {
 			ind = vclpsid;
 			while (ind != find) {
-				oseq[seqpnt].x = currentFormVertices[ind].x;
-				oseq[seqpnt++].y = currentFormVertices[ind].y;
+				oseq[sequenceIndex].x = currentFormVertices[ind].x;
+				oseq[sequenceIndex++].y = currentFormVertices[ind].y;
 				ind = prv(ind);
 			}
 		}
@@ -11657,8 +11655,8 @@ void ritseg() {
 			ind++;
 		chksid(clpsegs[activePointIndex].asid);
 		while (ind <= clpsegs[activePointIndex].finish) {
-			oseq[seqpnt].x = clipnts[ind].x;
-			oseq[seqpnt++].y = clipnts[ind++].y;
+			oseq[sequenceIndex].x = clipnts[ind].x;
+			oseq[sequenceIndex++].y = clipnts[ind++].y;
 		}
 		vclpsid = clpsegs[activePointIndex].zsid;
 	}
@@ -11669,14 +11667,14 @@ void ritseg() {
 		chksid(clpsegs[activePointIndex].zsid);
 		if (clpsegs[activePointIndex].start) {
 			while (ind >= clpsegs[activePointIndex].start) {
-				oseq[seqpnt].x = clipnts[ind].x;
-				oseq[seqpnt++].y = clipnts[ind--].y;
+				oseq[sequenceIndex].x = clipnts[ind].x;
+				oseq[sequenceIndex++].y = clipnts[ind--].y;
 			}
 		}
 		else {
 			while (ind < clpsegs[activePointIndex].start) {
-				oseq[seqpnt].x = clipnts[ind].x;
-				oseq[seqpnt++].y = clipnts[ind--].y;
+				oseq[sequenceIndex].x = clipnts[ind].x;
+				oseq[sequenceIndex++].y = clipnts[ind--].y;
 			}
 		}
 		vclpsid = clpsegs[activePointIndex].asid;
@@ -12401,21 +12399,21 @@ clpskp:;
 
 				activePointIndex = 0;
 				setMap(FILDIR);
-				seqpnt = 0;
+				sequenceIndex = 0;
 				pcseg2 = pcseg << 1;
 				vclpsid = clpsegs[0].asid;
 				strtlen = clpsegs[0].edgeLength;
 				ritseg();
 				while (nucseg()) {
-					if (seqpnt > MAXSEQ - 3)
+					if (sequenceIndex > MAXSEQ - 3)
 						break;
 					ritseg();
 				}
 				chksid(0);
-				if (seqpnt > MAXSEQ - 100)
-					seqpnt = MAXSEQ - 100;
+				if (sequenceIndex > MAXSEQ - 100)
+					sequenceIndex = MAXSEQ - 100;
 				ine = 0; inf = 0;
-				for (ind = 0; ind < seqpnt; ind++) {
+				for (ind = 0; ind < sequenceIndex; ind++) {
 					if (vscmp(ind, ine)) {
 						ine++;
 						oseq[ine].x = oseq[ind].x;
@@ -12424,9 +12422,9 @@ clpskp:;
 					else
 						inf++;
 				}
-				seqpnt = ine;
+				sequenceIndex = ine;
 				if (chkMap(WASNEG)) {
-					for (ind = 0; ind < seqpnt; ind++)
+					for (ind = 0; ind < sequenceIndex; ind++)
 						oseq[ind].x -= fltof;
 					for (ind = 0; ind < sides; ind++)
 						currentFormVertices[ind].x -= fltof;
@@ -12722,19 +12720,19 @@ void dubfn() {
 	unsigned ind, ine;
 
 	brdfil(ptrSelectedForm->edgeStitchLen);
-	ine = seqpnt;
-	for (ind = seqpnt; ind != 0; ind--) {
+	ine = sequenceIndex;
+	for (ind = sequenceIndex; ind != 0; ind--) {
 		oseq[ine].x = oseq[ind - 1].x;
 		oseq[ine++].y = oseq[ind - 1].y;
 	}
-	seqpnt = ine;
+	sequenceIndex = ine;
 }
 
 void dubsfil() {
 	fvars(closestFormToCursor);
 	deleclp(closestFormToCursor);
 	ptrSelectedForm->edgeType = EGDUB;
-	seqpnt = 0;
+	sequenceIndex = 0;
 	ptrSelectedForm->borderColor = activeColor;
 	dubfn();
 	bsizpar();
@@ -13078,9 +13076,9 @@ void duchfn(unsigned strt, unsigned fin) {
 	pnts[2].x = chainEndPoints[fin].x + dif.x / 4;
 	pnts[2].y = chainEndPoints[fin].y + dif.y / 4;
 	for (ine = 0; ine < chainCount; ine++) {
-		oseq[seqpnt].x = pnts[chainSequence[ine]].x;
-		oseq[seqpnt].y = pnts[chainSequence[ine]].y;
-		seqpnt++;
+		oseq[sequenceIndex].x = pnts[chainSequence[ine]].x;
+		oseq[sequenceIndex].y = pnts[chainSequence[ine]].y;
+		sequenceIndex++;
 	}
 }
 
@@ -13088,7 +13086,7 @@ void duch() {
 	unsigned ind, bak;
 
 	div4 = adjustedSpace / 4;
-	seqpnt = 0;
+	sequenceIndex = 0;
 	if (activePointIndex > 1) {
 		for (ind = 0; ind < (unsigned)activePointIndex - 2; ind++)
 			duchfn(ind, ind + 1);
@@ -13097,18 +13095,18 @@ void duch() {
 			bak = 8;
 			if (chkMap(LINCHN))
 				bak--;
-			if ((seqpnt >= bak)) {
-				oseq[seqpnt - bak].x = chainEndPoints[ind + 1].x;
-				oseq[seqpnt - bak].y = chainEndPoints[ind + 1].y;
+			if ((sequenceIndex >= bak)) {
+				oseq[sequenceIndex - bak].x = chainEndPoints[ind + 1].x;
+				oseq[sequenceIndex - bak].y = chainEndPoints[ind + 1].y;
 			}
-			oseq[seqpnt].x = chainEndPoints[ind + 1].x;
-			oseq[seqpnt++].y = chainEndPoints[ind + 1].y;
+			oseq[sequenceIndex].x = chainEndPoints[ind + 1].x;
+			oseq[sequenceIndex++].y = chainEndPoints[ind + 1].y;
 		}
 		else {
 			duchfn(ind, 0);
-			oseq[seqpnt].x = chainEndPoints[activePointIndex - 1].x;
-			oseq[seqpnt].y = chainEndPoints[activePointIndex - 1].y;
-			seqpnt++;
+			oseq[sequenceIndex].x = chainEndPoints[activePointIndex - 1].x;
+			oseq[sequenceIndex].y = chainEndPoints[activePointIndex - 1].y;
+			sequenceIndex++;
 		}
 	}
 	else
@@ -13137,7 +13135,7 @@ void chnfn() {
 	deleclp(closestFormToCursor);
 	dufxlen();
 	dulast();
-	seqpnt = 0;
+	sequenceIndex = 0;
 	duch();
 }
 
@@ -13269,8 +13267,8 @@ void xclpfn(unsigned strt, unsigned fin) {
 		tflt[ind].x = rclps[ind].x*rat;
 		tflt[ind].y = rclps[ind].y;
 		rotflt(&tflt[ind]);
-		oseq[seqpnt].x = chainEndPoints[strt].x + tflt[ind].x;
-		oseq[seqpnt++].y = chainEndPoints[strt].y + tflt[ind].y;
+		oseq[sequenceIndex].x = chainEndPoints[strt].x + tflt[ind].x;
+		oseq[sequenceIndex++].y = chainEndPoints[strt].y + tflt[ind].y;
 	}
 }
 
@@ -13280,13 +13278,13 @@ void duxclp() {
 	duangs();
 	dufxlen();
 	clpxadj();
-	seqpnt = 0;
+	sequenceIndex = 0;
 	rotationCenter.x = rotationCenter.y = 0;
 	for (ind = 1; ind < activePointIndex; ind++)
 		xclpfn(ind - 1, ind);
 	if (ptrSelectedForm->type != LIN) {
-		oseq[seqpnt].x = chainEndPoints[0].x;
-		oseq[seqpnt++].y = chainEndPoints[0].y;
+		oseq[sequenceIndex].x = chainEndPoints[0].x;
+		oseq[sequenceIndex++].y = chainEndPoints[0].y;
 	}
 }
 
