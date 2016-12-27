@@ -588,10 +588,10 @@ enum {
 	FSETFLEN,	//user is setting the fill stitch length for a group of forms
 	FSETFSPAC,	//user is setting the fill spacing for a group of forms
 	FSETFANG,	//user is setting the fill angle for a group of forms
-	FSETUCOL,	//user is setting the underlay coler for a group of forms
-	FSETFCOL,	//user is setting the fill coler for a group of forms
-	FSETBCOL,	//user is setting the border coler for a group of forms
-	FSETBLEN,	//user is setting the border coler for a group of forms
+	FSETUCOL,	//user is setting the underlay color for a group of forms
+	FSETFCOL,	//user is setting the fill color for a group of forms
+	FSETBCOL,	//user is setting the border color for a group of forms
+	FSETBLEN,	//user is setting the border color for a group of forms
 	FSETBSPAC,	//user is setting the border spacing for a group of forms
 	FSETBMIN,	//user is setting the minimum border stitch length for a group of forms
 	FSETBMAX,	//user is setting the maximum border stitch length for a group of forms
@@ -988,13 +988,13 @@ typedef struct _frmhedo {
 	SATINANGLE		satinOrAngle;	//satin guidlines or angle clipboard fill angle
 	fPOINT*			borderClipData;	//border clipboard data
 	unsigned short	satinGuideCount;	//number of satin guidlines
-	unsigned short	wpar;			//word parameter
+	unsigned short	wordParam;		//word parameter
 	fRECTANGLE		rectangle;		//rectangle
 	unsigned char	fillType;		//fill type
 	unsigned char	edgeType;		//edge type
 	float			fillSpacing;	//fill spacing
-	FLENCNT			lengthOrCount;	//fill stitch length or clpboard count
-	FANGCLP			angleOrClipData;	//fill angle or clpboard data pointer
+	FLENCNT			lengthOrCount;	//fill stitch length or clipboard count
+	FANGCLP			angleOrClipData;	//fill angle or clipboard data pointer
 	float			borderSize;		//border size
 	float			edgeSpacing;	//edge spacing
 	float			edgeStitchLen;	//edge stitch length
@@ -1060,13 +1060,13 @@ typedef struct _frmhed {
 	SATINANGLE		satinOrAngle;		//satin guidlines or angle clipboard fill angle
 	fPOINT*			borderClipData;		//border clipboard data
 	unsigned short	satinGuideCount;	//number of satin guidlines
-	unsigned short	wpar;				//clipboard/textured fill phase or satin connect end
+	unsigned short	wordParam;			//clipboard/textured fill phase or satin connect end
 	fRECTANGLE		rectangle;			//rectangle
 	unsigned char	fillType;			//fill type
 	unsigned char	edgeType;			//edge type
 	float			fillSpacing;		//fill spacing
-	FLENCNT			lengthOrCount;		//fill stitch length or clpboard count
-	FANGCLP			angleOrClipData;	//fill angle or clpboard data pointer
+	FLENCNT			lengthOrCount;		//fill stitch length or clipboard count
+	FANGCLP			angleOrClipData;	//fill angle or clipboard data pointer
 	float			borderSize;			//border size
 	float			edgeSpacing;		//edge spacing
 	float			edgeStitchLen;		//edge stitch length
@@ -1230,11 +1230,11 @@ typedef struct _bakhed {
 	unsigned	sacnt;
 	SATCON*		sac;
 	unsigned	nclp;
-	fPOINT*		clp;
+	fPOINT*		clipData;
 	COLORREF*	cols;
 	TXPNT*		txp;
 	unsigned	ntx;
-	POINT		zum0;
+	POINT		zoomRect;
 }BAKHED;
 
 typedef struct _flsiz {
@@ -1809,7 +1809,7 @@ typedef struct _rngcnt	{
 typedef struct _badcnts	{
 	unsigned attribute;
 	int flt;
-	int clp;
+	int clip;
 	int sat;
 	int tx;
 }BADCNTS;

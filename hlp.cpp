@@ -29,7 +29,7 @@ extern MSG				msg;
 extern unsigned			buttonHeight;
 extern unsigned			formIndex;
 extern unsigned			selectedFormCount;
-extern FRMHED*			ptrSelectedForm;
+extern FRMHED*			SelectedForm;
 extern FRMHED			formList[MAXFORMS];
 extern unsigned			closestFormToCursor;
 extern RECT				scRct;
@@ -353,7 +353,7 @@ void shoMsg(TCHAR* str) {
 
 	SIZE		tsiz, msgsiz;
 	TCHAR**		strs;
-	unsigned*	lens;
+	unsigned*	l_lens;
 	unsigned	cnt = 0, ind = 0, ine = 0, bak = 0;
 	long		off;
 
@@ -364,26 +364,26 @@ void shoMsg(TCHAR* str) {
 	}
 	cnt++;
 	strs = new TCHAR*[cnt + 1];
-	lens = new unsigned[cnt + 1];
+	l_lens = new unsigned[cnt + 1];
 	ind = 0;
 	strs[0] = str;
 	while (str[ind]) {
 
 		if (str[ind] == 10) {
 
-			lens[ine] = ind - bak;
+			l_lens[ine] = ind - bak;
 			strs[++ine] = &str[ind++];
 			bak = ind;
 		}
 		else
 			ind++;
 	}
-	lens[ine] = ind - bak;
+	l_lens[ine] = ind - bak;
 	ine++;
 	tsiz.cx = tsiz.cy = msgsiz.cy = msgsiz.cx = 0;
 	for (ind = 0; ind < ine; ind++) {
 
-		GetTextExtentPoint32(stitchWindowMemDC, strs[ind], lens[ind], &tsiz);
+		GetTextExtentPoint32(stitchWindowMemDC, strs[ind], l_lens[ind], &tsiz);
 		if (tsiz.cx > msgsiz.cx)
 			msgsiz.cx = tsiz.cx;
 		if (tsiz.cy > msgsiz.cy)
@@ -407,7 +407,7 @@ void shoMsg(TCHAR* str) {
 		hInst,
 		NULL);
 	delete[] strs;
-	delete[] lens;
+	delete[] l_lens;
 }
 
 void tabmsg(unsigned cod) {
@@ -481,8 +481,8 @@ BOOL filmsgs(unsigned cod) {
 		frm1pnt();
 		if (chkMap(FORMSEL)) {
 
-			ptrSelectedForm = &formList[closestFormToCursor];
-			if (ptrSelectedForm->sides == 2) {
+			SelectedForm = &formList[closestFormToCursor];
+			if (SelectedForm->sides == 2) {
 
 				if (cod < FML_LIN) {
 
