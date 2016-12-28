@@ -10261,7 +10261,7 @@ void redclp() {
 
 #if CLPBUG
 
-			sprintf_s(msgbuf, sizeof(msgbuf), "ind: %d x: %6.2f,y: %6.2f\n", index, clipBuffer[index].x, clipBuffer[index].y);
+			sprintf_s(msgbuf, sizeof(msgbuf), "ind: %d x: %6.2f,y: %6.2f\n", ind, clipBuffer[ind].x, clipBuffer[ind].y);
 			OutputDebugString(msgbuf);
 #endif
 			if (clipBuffer[ind].x < clipboardRect.left)

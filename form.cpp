@@ -3653,15 +3653,15 @@ void lcon() {
 
 #if BUGSEQ
 		bugcol = 0; sequenceIndex = 0;
-		for (index = 0; index < regionCount; index++) {
-			for (ine = regionsList[index].start; ine <= regionsList[index].fillEnd; ine++) {
+		for (ind = 0; ind < regionCount; ind++) {
+			for (ine = regionsList[ind].start; ine <= regionsList[ind].end; ine++) {
 				tpnt = &*ptrSortedLines[ine];
-				stitchCount[sequenceIndex].attribute = bugcol;
-				stitchCount[sequenceIndex].x = tpnt[0].x;
-				stitchCount[sequenceIndex++].y = tpnt[0].y;
-				stitchCount[sequenceIndex].attribute = bugcol;
-				stitchCount[sequenceIndex].x = tpnt[1].x;
-				stitchCount[sequenceIndex++].y = tpnt[1].y;
+				stitchBuffer[sequenceIndex].attribute = bugcol;
+				stitchBuffer[sequenceIndex].x = tpnt[0].x;
+				stitchBuffer[sequenceIndex++].y = tpnt[0].y;
+				stitchBuffer[sequenceIndex].attribute = bugcol;
+				stitchBuffer[sequenceIndex].x = tpnt[1].x;
+				stitchBuffer[sequenceIndex++].y = tpnt[1].y;
 			}
 			bugcol++;
 			bugcol &= 0xf;
@@ -12219,7 +12219,7 @@ clpskp:;
 			currentFormVertices[ind].y -= fnof;
 	}
 #define CLPVU 0
-#define CLPNOP 0
+
 
 #if CLPVU==1
 
@@ -12294,10 +12294,10 @@ clpskp:;
 
 #if CLPVU==1
 
-				for (index = 0; index < activePointIndex; index++) {
-					stitchCount[index].x = clipnts[index].x;
-					stitchCount[index].y = clipnts[index].y;
-					stitchCount[index].attribute = 0;
+				for (ind = 0; ind < activePointIndex; ind++) {
+					stitchBuffer[ind].x = clipnts[ind].x;
+					stitchBuffer[ind].y = clipnts[ind].y;
+					stitchBuffer[ind].attribute = 0;
 				}
 				header.stitchCount = activePointIndex;
 #endif
@@ -12305,11 +12305,11 @@ clpskp:;
 #if CLPVU==2
 
 				inf = 0;
-				for (index = 0; index < pcseg; index++) {
-					for (ine = clpsegs[index].start; ine <= clpsegs[index].finish; ine++) {
-						stitchCount[inf].x = clipnts[ine].x;
-						stitchCount[inf].y = clipnts[ine].y;
-						stitchCount[inf++].attribute = index & 0xf;
+				for (ind = 0; ind < pcseg; ind++) {
+					for (ine = clpsegs[ind].start; ine <= clpsegs[ind].finish; ine++) {
+						stitchBuffer[inf].x = clipnts[ine].x;
+						stitchBuffer[inf].y = clipnts[ine].y;
+						stitchBuffer[inf++].attribute = ind & 0xf;
 					}
 				}
 				header.stitchCount = inf;
