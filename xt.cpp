@@ -24,8 +24,7 @@ extern	unsigned		activeColor;
 extern	unsigned		activeLayer;
 extern	unsigned		activePointIndex;
 extern	fPOINT			angflt[MAXFRMLINS];
-extern	FRMHED			angfrm;
-extern	FRMHED			angfrm;
+extern	FRMHED			angledForm;
 extern	unsigned		auth;
 extern	TCHAR			auxName[_MAX_PATH];
 extern	BSEQPNT			bseq[BSEQLEN];
@@ -1281,17 +1280,17 @@ void fnuang() {
 
 	unsigned	ind;
 
-	frmcpy(&angfrm, &formList[closestFormToCursor]);
-	rotationCenter.x = (double)(angfrm.rectangle.right - angfrm.rectangle.left) / 2 + angfrm.rectangle.left;
-	rotationCenter.y = (double)(angfrm.rectangle.top - angfrm.rectangle.bottom) / 2 + angfrm.rectangle.bottom;
-	angfrm.vertices = angflt;
-	for (ind = 0; ind < angfrm.sides; ind++) {
+	frmcpy(&angledForm, &formList[closestFormToCursor]);
+	rotationCenter.x = (double)(angledForm.rectangle.right - angledForm.rectangle.left) / 2 + angledForm.rectangle.left;
+	rotationCenter.y = (double)(angledForm.rectangle.top - angledForm.rectangle.bottom) / 2 + angledForm.rectangle.bottom;
+	angledForm.vertices = angflt;
+	for (ind = 0; ind < angledForm.sides; ind++) {
 
-		angfrm.vertices[ind].x = uflt[ind].x;
-		angfrm.vertices[ind].y = uflt[ind].y;
-		rotflt(&angfrm.vertices[ind]);
+		angledForm.vertices[ind].x = uflt[ind].x;
+		angledForm.vertices[ind].y = uflt[ind].y;
+		rotflt(&angledForm.vertices[ind]);
 	}
-	SelectedForm = &angfrm;
+	SelectedForm = &angledForm;
 	fnvrt();
 	fvars(closestFormToCursor);
 }
@@ -3619,7 +3618,7 @@ void dutxtfil()
 		iniFile.textureSpacing = (float)ITXSPAC;
 	if (!iniFile.textureEditorSizePixels)
 		iniFile.textureEditorSizePixels = ITXPIX;
-	angfrm.sides = 0;
+	angledForm.sides = 0;
 	setMap(TXTRED);
 	setMap(ZUMED);
 	rstMap(WASPAT);
@@ -4071,15 +4070,15 @@ void setxclp()
 	else
 		fof.x -= tscr.formCenter.x;
 	fof.y -= tscr.formCenter.y;
-	for (ind = 0; ind < angfrm.sides; ind++)
+	for (ind = 0; ind < angledForm.sides; ind++)
 	{
 		angflt[ind].x += fof.x;
 		angflt[ind].y += fof.y;
 	}
-	cnt = angfrm.sides - 1;
-	if (angfrm.type != LIN)
+	cnt = angledForm.sides - 1;
+	if (angledForm.type != LIN)
 		cnt++;
-	sides = angfrm.sides;
+	sides = angledForm.sides;
 	for (ind = 0; ind < cnt; ind++)
 	{
 		inx = nxt(ind);
@@ -4208,7 +4207,7 @@ void angrct(fRECTANGLE* rct)
 
 	rct->left = rct->right = angflt[0].x;
 	rct->bottom = rct->top = angflt[0].y;
-	for (ind = 1; ind < angfrm.sides; ind++)
+	for (ind = 1; ind < angledForm.sides; ind++)
 	{
 		if (angflt[ind].x < rct->left)
 			rct->left = angflt[ind].x;
@@ -4228,7 +4227,7 @@ void ritxfrm()
 
 	of.x = txtloc.x - cloxref.x;
 	of.y = txtloc.y - cloxref.y;
-	for (ind = 0; ind < angfrm.sides; ind++)
+	for (ind = 0; ind < angledForm.sides; ind++)
 	{
 		ed2px(angflt[ind], &formLines[ind]);
 		formLines[ind].x += of.x;
@@ -4236,8 +4235,8 @@ void ritxfrm()
 	}
 	formLines[ind].x = formLines[0].x;
 	formLines[ind].y = formLines[0].y;
-	cnt = angfrm.sides;
-	if (angfrm.type != LIN)
+	cnt = angledForm.sides;
+	if (angledForm.type != LIN)
 		cnt++;
 	SetROP2(stitchWindowDC, R2_NOTXORPEN);
 	Polyline(stitchWindowDC, formLines, cnt);
@@ -4251,7 +4250,7 @@ void setxfrm()
 	double		rat;
 
 	angrct(&arct);
-	for (ind = 0; ind < angfrm.sides; ind++)
+	for (ind = 0; ind < angledForm.sides; ind++)
 	{
 		angflt[ind].x -= arct.left;
 		angflt[ind].y -= arct.bottom;
@@ -4261,7 +4260,7 @@ void setxfrm()
 	if (hi > tscr.areaHeight)
 	{
 		rat = tscr.areaHeight / hi*0.95;
-		for (ind = 0; ind < angfrm.sides; ind++)
+		for (ind = 0; ind < angledForm.sides; ind++)
 		{
 			angflt[ind].x *= rat;
 			angflt[ind].y *= rat;
@@ -4283,9 +4282,9 @@ void txtclp()
 		if (clipboardFormData) {
 			if (clipboardFormData->clipType == CLP_FRM) {
 				SelectedForm = &clipboardFormData->form;
-				frmcpy(&angfrm, SelectedForm);
+				frmcpy(&angledForm, SelectedForm);
 				MoveMemory(&angflt, &SelectedForm[1], sizeof(fPOINT)*SelectedForm->sides);
-				angfrm.vertices = angflt;
+				angledForm.vertices = angflt;
 				rstMap(TXTLIN);
 				setMap(TXTCLP);
 				setMap(TXTMOV);
@@ -4870,7 +4869,7 @@ void txsiz(double rat)
 	fRECTANGLE		arct;
 
 	ritxfrm();
-	for (ind = 0; ind < angfrm.sides; ind++)
+	for (ind = 0; ind < angledForm.sides; ind++)
 	{
 		angflt[ind].x *= rat;
 		angflt[ind].y *= rat;
@@ -5571,17 +5570,17 @@ void setangf(double tang)
 
 	angbak = rotationAngle;
 	rotationAngle = tang;
-	MoveMemory(&angfrm, SelectedForm, sizeof(FRMHED));
+	MoveMemory(&angledForm, SelectedForm, sizeof(FRMHED));
 	MoveMemory(&angflt, currentFormVertices, sizeof(fPOINT)*sides);
-	rotationCenter.x = (double)(angfrm.rectangle.right - angfrm.rectangle.left) / 2 + angfrm.rectangle.left;
-	rotationCenter.y = (double)(angfrm.rectangle.top - angfrm.rectangle.bottom) / 2 + angfrm.rectangle.bottom;
-	angfrm.vertices = angflt;
+	rotationCenter.x = (double)(angledForm.rectangle.right - angledForm.rectangle.left) / 2 + angledForm.rectangle.left;
+	rotationCenter.y = (double)(angledForm.rectangle.top - angledForm.rectangle.bottom) / 2 + angledForm.rectangle.bottom;
+	angledForm.vertices = angflt;
 	if (rotationAngle)
 	{
 		for (ind = 0; ind < sides; ind++)
 			rotflt(&angflt[ind]);
 	}
-	SelectedForm = &angfrm;
+	SelectedForm = &angledForm;
 	currentFormVertices = angflt;
 	rotationAngle = angbak;
 }

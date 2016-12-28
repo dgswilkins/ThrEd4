@@ -360,18 +360,18 @@ unsigned		doneRegion;				//last region sequenced
 double			gapToClosestRegion;		//region close enough threshold for sequencing
 unsigned*		mapIndexSequence;		//pointers to sets of adjacent regions
 RGSEQ*			regionPath;				//path to a region
-unsigned		grindpnt;				//number of group indices
-unsigned*		grinds;					//array of group indices for sequencing
-unsigned		lastgrp;				//group of the last line written in the previous region;
+unsigned		groupIndexCount;		//number of group indices
+unsigned*		groupIndexSequence;		//array of group indices for sequencing
+unsigned		lastGroup;				//group of the last line written in the previous region;
 FSEQ*			mpath;					//path of sequenced regions
 RGSEQ*			tmpath;					//temporary path connections
 unsigned		mpathi;					//index to path of sequenced regions
-unsigned		nxtgrp;					//group that connects to the next region
-unsigned*		seqmap;					//a bitmap of sequenced lines
+unsigned		nextGroup;				//group that connects to the next region
+unsigned*		sequenceFlagBitmap;		//a bitmap of sequenced lines
 unsigned*		srgns;					//an array of subregion starts
-REGION*			durpnt;					//region currently being sequenced
+REGION*			currentRegion;			//region currently being sequenced
 fPOINT			dunpnts[4];				//corners of last region sequenced
-FRMHED			angfrm;					//a temporary rotated form for angle fills
+FRMHED			angledForm;				//a temporary rotated form for angle fills
 unsigned short	selectedFormList[MAXFORMS];		//a list of selected forms
 unsigned		selectedFormCount = 0;	//number of selected forms
 unsigned		previousFormIndex;		//previously selected form
@@ -2567,14 +2567,14 @@ void refilfn() {
 			case HORF:
 
 				fnhor();
-				lconflt = angfrm.vertices;
+				lconflt = angledForm.vertices;
 				break;
 
 			case ANGF:
 
 				rotationAngle = PI / 2 - SelectedForm->angleOrClipData.angle;
 				filang();
-				lconflt = angfrm.vertices;
+				lconflt = angledForm.vertices;
 				break;
 
 			case VCLPF:
@@ -2827,16 +2827,16 @@ unsigned projh(double pnty, fPOINT pnt0, fPOINT pnt1, dPOINT* ipnt) {
 void filang() {
 	unsigned	ind;
 
-	frmcpy(&angfrm, &formList[closestFormToCursor]);
-	rotationCenter.x = (double)(angfrm.rectangle.right - angfrm.rectangle.left) / 2 + angfrm.rectangle.left;
-	rotationCenter.y = (double)(angfrm.rectangle.top - angfrm.rectangle.bottom) / 2 + angfrm.rectangle.bottom;
-	angfrm.vertices = angflt;
-	for (ind = 0; ind < angfrm.sides; ind++) {
-		angfrm.vertices[ind].x = SelectedForm->vertices[ind].x;
-		angfrm.vertices[ind].y = SelectedForm->vertices[ind].y;
-		rotflt(&angfrm.vertices[ind]);
+	frmcpy(&angledForm, &formList[closestFormToCursor]);
+	rotationCenter.x = (double)(angledForm.rectangle.right - angledForm.rectangle.left) / 2 + angledForm.rectangle.left;
+	rotationCenter.y = (double)(angledForm.rectangle.top - angledForm.rectangle.bottom) / 2 + angledForm.rectangle.bottom;
+	angledForm.vertices = angflt;
+	for (ind = 0; ind < angledForm.sides; ind++) {
+		angledForm.vertices[ind].x = SelectedForm->vertices[ind].x;
+		angledForm.vertices[ind].y = SelectedForm->vertices[ind].y;
+		rotflt(&angledForm.vertices[ind]);
 	}
-	SelectedForm = &angfrm;
+	SelectedForm = &angledForm;
 	fnvrt();
 	SelectedForm = &formList[closestFormToCursor];
 }
@@ -2936,21 +2936,21 @@ BOOL lnclos(unsigned gp0, unsigned ln0, unsigned gp1, unsigned ln1) {
 	SMALPNTL*	pnt0;
 	SMALPNTL*	pnt1;
 
-	if (gp1 > grindpnt - 2)
+	if (gp1 > groupIndexCount - 2)
 		return 0;
 	if (!gp0)
 		return 0;
-	cnt0 = (grinds[gp0 + 1] - grinds[gp0]) >> 1;
+	cnt0 = (groupIndexSequence[gp0 + 1] - groupIndexSequence[gp0]) >> 1;
 	ind0 = 0;
-	pnt0 = &lineEndpoints[grinds[gp0]];
+	pnt0 = &lineEndpoints[groupIndexSequence[gp0]];
 	while (cnt0&&pnt0[ind0].line != ln0) {
 		cnt0--;
 		ind0 += 2;
 	}
 	if (cnt0) {
-		cnt1 = (grinds[gp1 + 1] - grinds[gp1]) >> 1;
+		cnt1 = (groupIndexSequence[gp1 + 1] - groupIndexSequence[gp1]) >> 1;
 		ind1 = 0;
-		pnt1 = &lineEndpoints[grinds[gp1]];
+		pnt1 = &lineEndpoints[groupIndexSequence[gp1]];
 		while (cnt1&&pnt1[ind1].line != ln1) {
 			cnt1--;
 			ind1 += 2;
@@ -2994,7 +2994,7 @@ unsigned short regclos(unsigned rg0, unsigned rg1) {
 		prlin = pnt0s->line;
 	}
 	if (grps&&lnclos(grps - 1, prlin, grps, l_lins)) {
-		nxtgrp = grps;
+		nextGroup = grps;
 		return 1;
 	}
 	else {
@@ -3013,31 +3013,31 @@ unsigned short regclos(unsigned rg0, unsigned rg1) {
 			polin = pnt0e->line;
 		}
 		if (lnclos(grpe, line, grpe + 1, polin)) {
-			nxtgrp = grpe;
+			nextGroup = grpe;
 			return 1;
 		}
 	}
 	if (((grp0s > grp1s) ? (grp0s - grp1s) : (grp1s - grp0s)) < 2) {
 		if (isclos(pnt0s, pnt1s)) {
-			nxtgrp = grp0s;
+			nextGroup = grp0s;
 			return 1;
 		}
 	}
 	if (((grp0s > grp1e) ? (grp0s - grp1e) : (grp1e - grp0s)) < 2) {
 		if (isclos(pnt0s, pnt1e)) {
-			nxtgrp = grp0s;
+			nextGroup = grp0s;
 			return 1;
 		}
 	}
 	if (((grp0e > grp1s) ? (grp0e - grp1s) : (grp1s - grp0e)) < 2) {
 		if (isclos(pnt0e, pnt1s)) {
-			nxtgrp = grp0e;
+			nextGroup = grp0e;
 			return 1;
 		}
 	}
 	if (((grp0e > grp1e) ? (grp0e - grp1e) : (grp1e - grp0e)) < 2) {
 		if (isclos(pnt0e, pnt1e)) {
-			nxtgrp = grp0e;
+			nextGroup = grp0e;
 			return 1;
 		}
 	}
@@ -3056,7 +3056,7 @@ unsigned setseq(unsigned bpnt) {
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
-		mov		ebx, seqmap
+		mov		ebx, sequenceFlagBitmap
 		mov		ecx, bpnt
 		bts[ebx], ecx
 		jnc		short setseqx
@@ -3064,7 +3064,7 @@ unsigned setseq(unsigned bpnt) {
 		setseqx :
 	}
 #else
-	return _bittestandset((long *)seqmap, bpnt);
+	return _bittestandset((long *)sequenceFlagBitmap, bpnt);
 #endif
 }
 
@@ -3094,7 +3094,7 @@ void dunseq(unsigned strt, unsigned fin) {
 		miny = 0;
 	rspnt(l_lin0->x, l_lin0->y + miny);
 	rspnt(l_lin1->x, l_lin1->y + miny);
-	lastgrp = l_lin1->group;
+	lastGroup = l_lin1->group;
 }
 
 void movseq(unsigned ind) {
@@ -3150,7 +3150,7 @@ void duseq(unsigned strt, unsigned fin) {
 		}
 		if (rstMap(SEQDUN))
 			duseq2(ind + 1);
-		if (seqlin != nullptr) { lastgrp = seqlin->group; }
+		if (seqlin != nullptr) { lastGroup = seqlin->group; }
 	}
 	else {
 		for (ind = strt; ind <= fin; ind++) {
@@ -3179,7 +3179,7 @@ void duseq(unsigned strt, unsigned fin) {
 			if (ind)
 				duseq2(ind - 1);
 		}
-		if (seqlin != nullptr) { lastgrp = seqlin->group; }
+		if (seqlin != nullptr) { lastGroup = seqlin->group; }
 	}
 }
 
@@ -3207,7 +3207,7 @@ void brkseq(unsigned strt, unsigned fin) {
 			else
 				movseq(ind);
 		}
-		lastgrp = seqlin->group;
+		lastGroup = seqlin->group;
 	}
 	else {
 		bgrp = ptrSortedLines[strt]->group - 1;
@@ -3228,7 +3228,7 @@ void brkseq(unsigned strt, unsigned fin) {
 			else
 				movseq(ind);
 		}
-		lastgrp = seqlin->group;
+		lastGroup = seqlin->group;
 	}
 	if (rstMap(SEQDUN))
 		duseq1();
@@ -3253,10 +3253,10 @@ void durgn(unsigned pthi) {
 	BSEQPNT*	bpnt;
 
 	rgind = mpath[pthi].vrt;
-	durpnt = &regionsList[rgind];
+	currentRegion = &regionsList[rgind];
 	grpn = mpath[pthi].grpn;
-	seqs = durpnt->start;
-	seqe = durpnt->end;
+	seqs = currentRegion->start;
+	seqe = currentRegion->end;
 	if (mpath[pthi].skp || rstMap(BRKFIX)) {
 		if (bseq[outputIndex - 1].attribute != SEQBOT)
 			rspnt(bseq[outputIndex - 2].x, bseq[outputIndex - 2].y);
@@ -3298,12 +3298,12 @@ void durgn(unsigned pthi) {
 		dun = 0;
 		visitedRegions[rgind]++;
 	}
-	pnts = &*ptrSortedLines[durpnt->start];
-	pnte = &*ptrSortedLines[durpnt->end];
+	pnts = &*ptrSortedLines[currentRegion->start];
+	pnte = &*ptrSortedLines[currentRegion->end];
 	grps = pnts->group;
 	grpe = pnte->group;
 	if (grpe != grps)
-		seql = (double)(lastgrp - grps) / (grpe - grps)*(seqe - seqs) + seqs;
+		seql = (double)(lastGroup - grps) / (grpe - grps)*(seqe - seqs) + seqs;
 	else
 		seql = 0;
 	if (seql > sortedLineIndex)
@@ -3321,16 +3321,16 @@ void durgn(unsigned pthi) {
 		seqn = seqs;
 	if (seqn > seqe)
 		seqn = seqe;
-	if (ptrSortedLines[seql]->group != lastgrp) {
-		if (seql < seqe&&ptrSortedLines[seql + 1]->group == lastgrp)
+	if (ptrSortedLines[seql]->group != lastGroup) {
+		if (seql < seqe&&ptrSortedLines[seql + 1]->group == lastGroup)
 			seql++;
 		else {
-			if (seql > seqs&&ptrSortedLines[seql - 1]->group == lastgrp)
+			if (seql > seqs&&ptrSortedLines[seql - 1]->group == lastGroup)
 				seql--;
 			else {
 				mindif = 0xffffffff;
 				for (ind = seqs; ind <= seqe; ind++) {
-					gdif = ((ptrSortedLines[ind]->group > lastgrp) ? (ptrSortedLines[ind]->group - lastgrp) : (lastgrp - ptrSortedLines[ind]->group));
+					gdif = ((ptrSortedLines[ind]->group > lastGroup) ? (ptrSortedLines[ind]->group - lastGroup) : (lastGroup - ptrSortedLines[ind]->group));
 					if (gdif < mindif) {
 						mindif = gdif;
 						seql = ind;
@@ -3357,12 +3357,12 @@ void durgn(unsigned pthi) {
 			}
 		}
 	}
-	if (durpnt->cntbrk) {
+	if (currentRegion->cntbrk) {
 		if (dun) {
 			brkdun(seql, seqn);
 		}
 		else {
-			if (lastgrp >= grpe) {
+			if (lastGroup >= grpe) {
 				brkseq(seqe, seqs);
 				if (pthi < mpathi - 1 && seqe != seqn)
 					brkseq(seqs, seqn);
@@ -3389,7 +3389,7 @@ void durgn(unsigned pthi) {
 		if (dun)
 			dunseq(seql, seqn);
 		else {
-			if (lastgrp >= grpe) {
+			if (lastGroup >= grpe) {
 				duseq(seqe, seqs);
 				duseq(seqs, seqn);
 			}
@@ -3685,7 +3685,7 @@ void lcon() {
 						tcon = regclos(ind, ine);
 						if (tcon) {
 							tmap[pathMapIndex].con = tcon;
-							tmap[pathMapIndex].grpn = nxtgrp;
+							tmap[pathMapIndex].grpn = nextGroup;
 							tmap[pathMapIndex++].vrt = ine;
 							cnt++;
 						}
@@ -3699,7 +3699,7 @@ void lcon() {
 							tcon = regclos(ind, ine);
 							if (tcon) {
 								tmap[pathMapIndex].con = tcon;
-								tmap[pathMapIndex].grpn = nxtgrp;
+								tmap[pathMapIndex].grpn = nextGroup;
 								tmap[pathMapIndex++].vrt = ine;
 								cnt++;
 							}
@@ -3763,12 +3763,12 @@ void lcon() {
 			for (ind = 0; ind < mpathi; ind++)
 				nxtseq(ind);
 			ine = (sortedLineIndex >> 5) + 1;
-			seqmap = new unsigned[ine];
+			sequenceFlagBitmap = new unsigned[ine];
 			for (ind = 0; ind < ine; ind++)
-				seqmap[ind] = 0;
+				sequenceFlagBitmap[ind] = 0;
 			for (ind = 0; ind < regionCount; ind++)
 				visitedRegions[ind] = 0;
-			lastgrp = 0;
+			lastGroup = 0;
 			for (ind = 0; ind < mpath0; ind++) {
 				//				sprintf_s(msgbuf, sizeof(msgbuf),"ind %d,vrt %d,grpn %d\n",ind,pathMap[ind].vrt,pathMap[ind].grpn);
 				//				OutputDebugString(msgbuf);
@@ -3781,10 +3781,10 @@ void lcon() {
 			pathMap = new RCON[1];
 			mpath = new FSEQ[1];
 			ine = (sortedLineIndex >> 5) + 1;
-			seqmap = new unsigned[ine];
+			sequenceFlagBitmap = new unsigned[ine];
 			for (ind = 0; ind < ine; ind++)
-				seqmap[ind] = 0;
-			lastgrp = 0;
+				sequenceFlagBitmap[ind] = 0;
+			lastGroup = 0;
 			mpath[0].vrt = 0;
 			mpath[0].grpn = ptrSortedLines[regionsList[0].end]->group;
 			mpath[0].skp = 0;
@@ -3803,8 +3803,8 @@ void lcon() {
 				  delete[] mapIndexSequence;
 				  delete[] visitedRegions;
 				  delete[] pathMap;
-				  delete[] grinds;
-				  delete[] seqmap;
+				  delete[] groupIndexSequence;
+				  delete[] sequenceFlagBitmap;
 				  delete[] srgns;
 	}
 }
@@ -4037,7 +4037,7 @@ void fnvrt() {
 	lineEndpoints = new SMALPNTL[lincnt + 1];
 	stitchLineCount = 0; lineGroupIndex = 0;
 	tgrinds = (unsigned*)bseq;
-	grindpnt = 0;
+	groupIndexCount = 0;
 	for (ind = 0; ind < cnt; ind++) {
 		mx0 += mstp;
 		inf = 0;
@@ -4058,7 +4058,7 @@ void fnvrt() {
 		}
 		if (inf > 1) {
 			inf &= 0xfffffffe;
-			tgrinds[grindpnt++] = stitchLineCount;
+			tgrinds[groupIndexCount++] = stitchLineCount;
 			qsort((void*)pjpts, inf, 4, comp);
 			ine = 0;
 			tind = stitchLineCount;
@@ -4078,10 +4078,10 @@ void fnvrt() {
 				lineGroupIndex++;
 		}
 	}
-	tgrinds[grindpnt++] = stitchLineCount;
-	grinds = new unsigned[grindpnt];
-	for (ind = 0; ind < grindpnt; ind++)
-		grinds[ind] = tgrinds[ind];
+	tgrinds[groupIndexCount++] = stitchLineCount;
+	groupIndexSequence = new unsigned[groupIndexCount];
+	for (ind = 0; ind < groupIndexCount; ind++)
+		groupIndexSequence[ind] = tgrinds[ind];
 	lineGroupIndex--;
 	delete[] jpts;
 	delete[] pjpts;
@@ -4090,17 +4090,17 @@ void fnvrt() {
 void fnhor() {
 	unsigned	ind;
 
-	frmcpy(&angfrm, &formList[closestFormToCursor]);
-	rotationCenter.x = (double)(angfrm.rectangle.right - angfrm.rectangle.left) / 2 + angfrm.rectangle.left;
-	rotationCenter.y = (double)(angfrm.rectangle.top - angfrm.rectangle.bottom) / 2 + angfrm.rectangle.bottom;
+	frmcpy(&angledForm, &formList[closestFormToCursor]);
+	rotationCenter.x = (double)(angledForm.rectangle.right - angledForm.rectangle.left) / 2 + angledForm.rectangle.left;
+	rotationCenter.y = (double)(angledForm.rectangle.top - angledForm.rectangle.bottom) / 2 + angledForm.rectangle.bottom;
 	rotationAngle = PI / 2;
-	angfrm.vertices = angflt;
-	for (ind = 0; ind < angfrm.sides; ind++) {
-		angfrm.vertices[ind].x = SelectedForm->vertices[ind].x;
-		angfrm.vertices[ind].y = SelectedForm->vertices[ind].y;
-		rotflt(&angfrm.vertices[ind]);
+	angledForm.vertices = angflt;
+	for (ind = 0; ind < angledForm.sides; ind++) {
+		angledForm.vertices[ind].x = SelectedForm->vertices[ind].x;
+		angledForm.vertices[ind].y = SelectedForm->vertices[ind].y;
+		rotflt(&angledForm.vertices[ind]);
 	}
-	SelectedForm = &angfrm;
+	SelectedForm = &angledForm;
 	fnvrt();
 	SelectedForm = &formList[closestFormToCursor];
 }
@@ -8736,20 +8736,20 @@ void prebrd()
 		rat = fabs(0.1 / dif.y);
 	angflt[0].x = currentFormVertices[0].x - dif.x*rat;
 	angflt[0].y = currentFormVertices[0].y - dif.y*rat;
-	MoveMemory(&angfrm, SelectedForm, sizeof(FRMHED));
-	angfrm.vertices = angflt;
-	angfrm.sides += 3;
+	MoveMemory(&angledForm, SelectedForm, sizeof(FRMHED));
+	angledForm.vertices = angflt;
+	angledForm.sides += 3;
 	dif.x = currentFormVertices[sides - 1].x - currentFormVertices[sides - 2].x;
 	dif.y = currentFormVertices[sides - 1].y - currentFormVertices[sides - 2].y;
 	if (dif.x > dif.y)
 		rat = 0.1 / dif.x;
 	else
 		rat = 0.1 / dif.y;
-	angflt[angfrm.sides - 1].x = currentFormVertices[sides - 1].x + dif.x*rat;
-	angflt[angfrm.sides - 1].y = currentFormVertices[sides - 1].y + dif.y*rat;
-	SelectedForm = &angfrm;
-	sides = angfrm.sides;
-	currentFormVertices = angfrm.vertices;
+	angflt[angledForm.sides - 1].x = currentFormVertices[sides - 1].x + dif.x*rat;
+	angflt[angledForm.sides - 1].y = currentFormVertices[sides - 1].y + dif.y*rat;
+	SelectedForm = &angledForm;
+	sides = angledForm.sides;
+	currentFormVertices = angledForm.vertices;
 }
 
 void plbrd(double spac) {
@@ -12431,12 +12431,12 @@ void angout() {
 	fRECTANGLE*		trct;
 	unsigned	ine;
 
-	if (angfrm.sides) {
-		trct = &angfrm.rectangle;
-		currentFormVertices = angfrm.vertices;
+	if (angledForm.sides) {
+		trct = &angledForm.rectangle;
+		currentFormVertices = angledForm.vertices;
 		trct->left = trct->right = currentFormVertices[0].x;
 		trct->bottom = trct->top = currentFormVertices[0].y;
-		for (ine = 1; ine < angfrm.sides; ine++) {
+		for (ine = 1; ine < angledForm.sides; ine++) {
 			if (currentFormVertices[ine].x > trct->right)
 				trct->right = currentFormVertices[ine].x;
 			if (currentFormVertices[ine].x < trct->left)
@@ -12452,19 +12452,19 @@ void angout() {
 void horclpfn() {
 	unsigned ind;
 
-	frmcpy(&angfrm, &formList[closestFormToCursor]);
-	rotationCenter.x = (double)(angfrm.rectangle.right - angfrm.rectangle.left) / 2 + angfrm.rectangle.left;
-	rotationCenter.y = (double)(angfrm.rectangle.top - angfrm.rectangle.bottom) / 2 + angfrm.rectangle.bottom;
-	angfrm.vertices = angflt;
+	frmcpy(&angledForm, &formList[closestFormToCursor]);
+	rotationCenter.x = (double)(angledForm.rectangle.right - angledForm.rectangle.left) / 2 + angledForm.rectangle.left;
+	rotationCenter.y = (double)(angledForm.rectangle.top - angledForm.rectangle.bottom) / 2 + angledForm.rectangle.bottom;
+	angledForm.vertices = angflt;
 	rotationAngle = PI / 2;
-	for (ind = 0; ind < angfrm.sides; ind++) {
-		angfrm.vertices[ind].x = SelectedForm->vertices[ind].x;
-		angfrm.vertices[ind].y = SelectedForm->vertices[ind].y;
-		rotflt(&angfrm.vertices[ind]);
+	for (ind = 0; ind < angledForm.sides; ind++) {
+		angledForm.vertices[ind].x = SelectedForm->vertices[ind].x;
+		angledForm.vertices[ind].y = SelectedForm->vertices[ind].y;
+		rotflt(&angledForm.vertices[ind]);
 	}
 	angout();
-	SelectedForm = &angfrm;
-	currentFormVertices = angfrm.vertices;
+	SelectedForm = &angledForm;
+	currentFormVertices = angledForm.vertices;
 	clpcon();
 	rotationAngle = -PI / 2;
 	rotbak();
@@ -12542,15 +12542,15 @@ void angclpfn()
 	unsigned	ind;
 	fPOINT*		tflt;
 
-	frmcpy(&angfrm, &formList[closestFormToCursor]);
-	rotationCenter.x = (double)(angfrm.rectangle.right - angfrm.rectangle.left) / 2 + angfrm.rectangle.left;
-	rotationCenter.y = (double)(angfrm.rectangle.top - angfrm.rectangle.bottom) / 2 + angfrm.rectangle.bottom;
-	angfrm.vertices = angflt;
+	frmcpy(&angledForm, &formList[closestFormToCursor]);
+	rotationCenter.x = (double)(angledForm.rectangle.right - angledForm.rectangle.left) / 2 + angledForm.rectangle.left;
+	rotationCenter.y = (double)(angledForm.rectangle.top - angledForm.rectangle.bottom) / 2 + angledForm.rectangle.bottom;
+	angledForm.vertices = angflt;
 	if (chkMap(ISUND))
 	{
 		rotationAngle = PI / 2 - SelectedForm->underlayStitchAngle;
 		tflt = insid();
-		for (ind = 0; ind < angfrm.sides; ind++)
+		for (ind = 0; ind < angledForm.sides; ind++)
 		{
 			angflt[ind].x = tflt[ind].x;
 			angflt[ind].y = tflt[ind].y;
@@ -12563,7 +12563,7 @@ void angclpfn()
 			rotationAngle = PI / 2 - SelectedForm->angleOrClipData.angle;
 		else
 			rotationAngle = PI / 2 - SelectedForm->satinOrAngle.angle;
-		for (ind = 0; ind < angfrm.sides; ind++)
+		for (ind = 0; ind < angledForm.sides; ind++)
 		{
 			angflt[ind].x = SelectedForm->vertices[ind].x;
 			angflt[ind].y = SelectedForm->vertices[ind].y;
@@ -12571,7 +12571,7 @@ void angclpfn()
 		}
 	}
 	angout();
-	SelectedForm = &angfrm;
+	SelectedForm = &angledForm;
 	currentFormVertices = angflt;
 	clpcon();
 	rotationAngle = -rotationAngle;
