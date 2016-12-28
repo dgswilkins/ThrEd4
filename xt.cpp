@@ -45,7 +45,7 @@ extern	unsigned char	cryptkey[4096];
 extern	fPOINT*			currentFormVertices;
 extern	TCHAR			fileName[_MAX_PATH];
 extern	unsigned		fltad;
-extern	fPOINT			fmovdif;
+extern	fPOINT			formMoveDelta;
 extern	unsigned		formIndex;
 extern	POINT			formLines[MAXFRMLINS];
 extern	FRMHED			formList[MAXFORMS];
@@ -1892,7 +1892,7 @@ void dasyfrm() {
 		currentFormVertices[ind].x -= SelectedForm->rectangle.left;
 		currentFormVertices[ind].y -= SelectedForm->rectangle.bottom;
 	}
-	fmovdif.x = fmovdif.y = 0;
+	formMoveDelta.x = formMoveDelta.y = 0;
 	newFormVertexCount = inf + 1;
 	setMap(POLIMOV);
 	setmfrm();
@@ -2637,7 +2637,7 @@ BOOL lastcol(unsigned ind, fPOINT* pnt)
 void duint(unsigned off, unsigned cod)
 {
 	unsigned	cnt, ind;
-	fPOINT		cpnt;
+	fPOINT		colpnt;
 
 	if (itf.coloc > itf.sloc)
 	{
@@ -2651,8 +2651,8 @@ void duint(unsigned off, unsigned cod)
 		if (!setMap(DIDSTRT))
 			itf.oloc += gucon(currentFormVertices[SelectedForm->fillStart], iseq[isinds[itf.pins].ind], itf.oloc + off, cod);
 	}
-	if (lastcol(itf.pins, &cpnt))
-		itf.oloc += gucon(cpnt, iseq[isinds[itf.pins].ind], itf.oloc + MAXSEQ, cod);
+	if (lastcol(itf.pins, &colpnt))
+		itf.oloc += gucon(colpnt, iseq[isinds[itf.pins].ind], itf.oloc + MAXSEQ, cod);
 	for (ind = isinds[itf.pins].ind; ind < isinds[itf.pins + 1].ind; ind++)
 	{
 		itf.histch[itf.oloc].x = iseq[ind].x;
@@ -2688,7 +2688,7 @@ void chkend(unsigned off, unsigned cod)
 void intlv()
 {
 	unsigned	ind, ine, cod = 0, off;
-	fPOINT		cpnt;
+	fPOINT		colpnt;
 
 	rstMap(ISEND);
 	fvars(closestFormToCursor);
@@ -2764,8 +2764,8 @@ void intlv()
 				if (!setMap(DIDSTRT))
 					itf.oloc += gucon(currentFormVertices[SelectedForm->fillStart], iseq[isinds[itf.pins].ind], itf.oloc + off, cod);
 			}
-			if (lastcol(ind, &cpnt))
-				itf.oloc += gucon(cpnt, iseq[isinds[ind].ind], itf.oloc, cod);
+			if (lastcol(ind, &colpnt))
+				itf.oloc += gucon(colpnt, iseq[isinds[ind].ind], itf.oloc, cod);
 			for (ine = isinds[ind].ind; ine < isinds[ind + 1].ind; ine++)
 			{
 				stitchBuffer[itf.oloc].x = iseq[ine].x;

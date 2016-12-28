@@ -37,7 +37,7 @@ void		endpnt ();
 void		fnamtabs ();
 void		fndknt ();
 void		frmdel ();
-void		frmx (POINT cpnt, HDC dc);
+void		frmx (POINT p_cpnt, HDC dc);
 COLORREF	fswap (COLORREF tcol);
 void		fthrfn ();
 void		hupfn ();
@@ -121,7 +121,7 @@ extern	void			crmsg (TCHAR* nam);
 extern	void			crop ();
 extern	void			dazdef ();
 extern	void			debean ();
-extern	void			delcon (unsigned cpnt);
+extern	void			delcon (unsigned p_cpnt);
 extern	void			deleclp (unsigned fpnt);
 extern	void			delflt (unsigned fpnt);
 extern	void			delfrms ();
@@ -305,7 +305,7 @@ extern	void			selal ();
 extern	void			selalfil ();
 extern	void			selalfrm ();
 extern	void			selfil (unsigned typ);
-extern	void			selsqr (POINT cpnt, HDC dc);
+extern	void			selsqr (POINT p_cpnt, HDC dc);
 extern	void			setap ();
 extern	void			setbcol ();
 extern	void			setblen ();
@@ -403,7 +403,7 @@ extern	unsigned		fgpnt0;
 extern	double			fillAngle;
 extern	POINT			formLines[MAXFRMLINS];
 extern	unsigned		fltad;
-extern	fPOINT			fmovdif;
+extern	fPOINT			formMoveDelta;
 extern	unsigned		formIndex;
 extern	FRMHED			formList[MAXFORMS];
 extern	POINT			formOutlineRectangle[10];
@@ -7466,11 +7466,11 @@ void movbox() {
 	ritcor(&stitchBuffer[closestPointIndex]);
 }
 
-BOOL chkhid(unsigned cpnt) {
+BOOL chkhid(unsigned colorToCheck) {
 
 	if (chkMap(HID)) {
 
-		if (colorChangeTable[cpnt].colorIndex == activeColor)
+		if (colorChangeTable[colorToCheck].colorIndex == activeColor)
 			return 1;
 		else
 			return 0;
@@ -11009,8 +11009,8 @@ BOOL chkbig() {
 		selectedFormsSize.x = selectedFormsRectangle.right - selectedFormsRectangle.left;
 		selectedFormsSize.y = selectedFormsRectangle.bottom - selectedFormsRectangle.top;
 		setMap(MOVFRMS);
-		fmovdif.x = tpnt.x - selectedFormsRectangle.left;
-		fmovdif.y = tpnt.y - selectedFormsRectangle.top;
+		formMoveDelta.x = tpnt.x - selectedFormsRectangle.left;
+		formMoveDelta.y = tpnt.y - selectedFormsRectangle.top;
 		setMap(SHOSTRTCH);
 		strtchbox();
 		return 1;
@@ -15523,8 +15523,8 @@ void fixpclp() {
 	fPOINT		pof;
 	unsigned	ind, ine, cnt;
 
-	tpnt.x = msg.pt.x + fmovdif.x;
-	tpnt.y = msg.pt.y + fmovdif.y;
+	tpnt.x = msg.pt.x + formMoveDelta.x;
+	tpnt.y = msg.pt.y + formMoveDelta.y;
 	pxCor2stch(tpnt);
 	pof.x = selectedPoint.x - iseq[1].x;
 	pof.y = selectedPoint.y - iseq[1].y;
@@ -15690,10 +15690,10 @@ unsigned chkMsg() {
 			if (chkMap(MOVFRMS)) {
 
 				unstrtch();
-				stretchBoxLine[0].x = stretchBoxLine[3].x = stretchBoxLine[4].x = msg.pt.x - fmovdif.x - stitchWindowOrigin.x;
-				stretchBoxLine[1].x = stretchBoxLine[2].x = msg.pt.x + selectedFormsSize.x - fmovdif.x - stitchWindowOrigin.x;
-				stretchBoxLine[0].y = stretchBoxLine[1].y = stretchBoxLine[4].y = msg.pt.y - fmovdif.y - stitchWindowOrigin.y;
-				stretchBoxLine[2].y = stretchBoxLine[3].y = msg.pt.y + selectedFormsSize.y - fmovdif.y - stitchWindowOrigin.y;
+				stretchBoxLine[0].x = stretchBoxLine[3].x = stretchBoxLine[4].x = msg.pt.x - formMoveDelta.x - stitchWindowOrigin.x;
+				stretchBoxLine[1].x = stretchBoxLine[2].x = msg.pt.x + selectedFormsSize.x - formMoveDelta.x - stitchWindowOrigin.x;
+				stretchBoxLine[0].y = stretchBoxLine[1].y = stretchBoxLine[4].y = msg.pt.y - formMoveDelta.y - stitchWindowOrigin.y;
+				stretchBoxLine[2].y = stretchBoxLine[3].y = msg.pt.y + selectedFormsSize.y - formMoveDelta.y - stitchWindowOrigin.y;
 				setMap(SHOSTRTCH);
 				strtchbox();
 				return 1;
@@ -15935,19 +15935,19 @@ unsigned chkMsg() {
 		if (rstMap(MOVFRMS)) {
 
 			savdo();
-			tpnt.x = (msg.pt.x - fmovdif.x - stitchWindowOrigin.x) - selectedFormsRectangle.left;
-			tpnt.y = (msg.pt.y - fmovdif.y - stitchWindowOrigin.y) - selectedFormsRectangle.top;
+			tpnt.x = (msg.pt.x - formMoveDelta.x - stitchWindowOrigin.x) - selectedFormsRectangle.left;
+			tpnt.y = (msg.pt.y - formMoveDelta.y - stitchWindowOrigin.y) - selectedFormsRectangle.top;
 			ratsr();
-			fmovdif.x = tpnt.x / horizontalRatio;
-			fmovdif.y = tpnt.y / verticalRatio;
+			formMoveDelta.x = tpnt.x / horizontalRatio;
+			formMoveDelta.y = tpnt.y / verticalRatio;
 			if (chkMap(FPSEL)) {
 
 				fvars(closestFormToCursor);
 				ine = selectedFormPoints.start;
 				for (ind = 0; (unsigned)ind <= selectedFormPoints.pointCount; ind++) {
 
-					currentFormVertices[ine].x += fmovdif.x;
-					currentFormVertices[ine].y -= fmovdif.y;
+					currentFormVertices[ine].x += formMoveDelta.x;
+					currentFormVertices[ine].y -= formMoveDelta.y;
 					ine = pdir(ine);
 				}
 				setpsel();
@@ -15963,8 +15963,8 @@ unsigned chkMsg() {
 						frmadj(ind);
 					for (ind = 0; ind < header.stitchCount; ind++) {
 
-						stitchBuffer[ind].x += fmovdif.x;
-						stitchBuffer[ind].y -= fmovdif.y;
+						stitchBuffer[ind].x += formMoveDelta.x;
+						stitchBuffer[ind].y -= formMoveDelta.y;
 					}
 					selal();
 				} else {
@@ -16717,16 +16717,16 @@ unsigned chkMsg() {
 			rstMap(MOVFRMS);
 			pxrct2stch(selectedFormsRectangle, &tbig);
 			px2stch();
-			fmovdif.x = selectedPoint.x - ((tbig.right - tbig.left) / 2 + tbig.left);
-			fmovdif.y = selectedPoint.y - ((tbig.top - tbig.bottom) / 2 + tbig.bottom);
+			formMoveDelta.x = selectedPoint.x - ((tbig.right - tbig.left) / 2 + tbig.left);
+			formMoveDelta.y = selectedPoint.y - ((tbig.top - tbig.bottom) / 2 + tbig.bottom);
 			for (ind = 0; ind < clipboardFormsCount; ind++) {
 
 				closestFormToCursor = formIndex + ind;
 				fvars(closestFormToCursor);
 				for (ine = 0; ine < SelectedForm->sides; ine++) {
 
-					SelectedForm->vertices[ine].x += fmovdif.x;
-					SelectedForm->vertices[ine].y += fmovdif.y;
+					SelectedForm->vertices[ine].x += formMoveDelta.x;
+					SelectedForm->vertices[ine].y += formMoveDelta.y;
 				}
 				frmout(closestFormToCursor);
 				refil();
@@ -19338,7 +19338,7 @@ unsigned chkMsg() {
 							dupclp();
 						} else {
 
-							fmovdif.x = fmovdif.y = 0;
+							formMoveDelta.x = formMoveDelta.y = 0;
 							setMap(FUNCLP);
 							closestFormToCursor = formIndex;
 							SelectedForm = &formList[formIndex];
@@ -19455,8 +19455,8 @@ unsigned chkMsg() {
 						formLines[2].y = formLines[3].y = selectedFormsRectangle.bottom;
 						setMap(SHOSTRTCH);
 						strtchbox();
-						fmovdif.x = ((selectedFormsRectangle.right - selectedFormsRectangle.left) >> 1);
-						fmovdif.y = ((selectedFormsRectangle.bottom - selectedFormsRectangle.top) >> 1);
+						formMoveDelta.x = ((selectedFormsRectangle.right - selectedFormsRectangle.left) >> 1);
+						formMoveDelta.y = ((selectedFormsRectangle.bottom - selectedFormsRectangle.top) >> 1);
 						setMap(MOVFRMS);
 						setMap(FUNSCLP);
 					} else {
@@ -19464,7 +19464,7 @@ unsigned chkMsg() {
 						clipboardFormData = (FORMCLIP*)ptrClipVoid;
 						if (clipboardFormData->clipType == CLP_FRM) {
 
-							fmovdif.x = fmovdif.y = 0;
+							formMoveDelta.x = formMoveDelta.y = 0;
 							setMap(FUNCLP);
 							closestFormToCursor = formIndex;
 							fvars(formIndex);

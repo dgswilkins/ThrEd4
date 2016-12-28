@@ -1254,14 +1254,14 @@ typedef struct _region {	//region for sequencing vertical fills
 	unsigned cntbrk;
 }REGION;
 
-typedef struct _rcon {		//pmap: path map for sequencing
+typedef struct _rcon {		//pathMap: path map for sequencing
 	unsigned short	vrt;
 	unsigned short	con;
 	unsigned short	grpn;
 }RCON;
 
 typedef struct _rgseq {		//tmpath: temporary path connections
-	unsigned	pcon;		//pointer to pmap entry
+	unsigned	pcon;		//pointer to pathMap entry
 	int			cnt;
 	TCHAR		skp;		//path not found
 }RGSEQ;

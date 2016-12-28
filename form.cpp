@@ -311,7 +311,7 @@ BSEQPNT			bseq[BSEQLEN];			//reverse sequence for polygon fills
 fPOINT			oseq[OSEQLEN];			//temporary storage for sequencing
 double			slope;					//slope of line in angle fills
 unsigned		satinIndex;				//pointer to next satin point to enter
-fPOINT			fmovdif;				//offset for moving forms
+fPOINT			formMoveDelta;			//offset for moving forms
 fPOINT			tempPolygon[MAXFRMLINS];	//temporary storage when user is entering a polygon;
 unsigned		outputIndex;			//output pointer for sequencing
 double*			lengths;				//array of cumulative lengths used in satin fills
@@ -350,17 +350,16 @@ unsigned		colorBitmap;			//bitmap of colors in a design for sort
 double			starRatio = STARAT;			//star point to body ratio
 double			spiralWrap = SPIRWRAP;		//number of revolutions in a spiral
 unsigned		srtmsk = (1 << EGSAT) | (1 << EGAP) | (1 << EGPRP);	 //mask for switchable fill types
-RCON*			pmap;					//path map for sequencing
-unsigned		cpnt;					//number of entries in the path map
-TCHAR*			visit;					//visited character map for sequencing
-unsigned		vispnt;					//next unvisited region for sequencing
-unsigned		rgcnt;					//number of regions to be sequenced
-REGION*			rgns;					//a list of regions for sequencing
-unsigned		dunrgn;					//last region sequenced
-double			rgclos;					//region close enough threshold for sequencing
-unsigned*		minds;					//pointers to sets of adjacent regions
-RGSEQ*			rgpth;					//path to a region
-unsigned		pthlen;					//length of the path to the region
+RCON*			pathMap;				//path map for sequencing
+unsigned		pathMapIndex;			//number of entries in the path map
+TCHAR*			visitedRegions;			//visited character map for sequencing
+unsigned		visitedIndex;			//next unvisited region for sequencing
+unsigned		regionCount;			//number of regions to be sequenced
+REGION*			regionsList;			//a list of regions for sequencing
+unsigned		doneRegion;				//last region sequenced
+double			gapToClosestRegion;		//region close enough threshold for sequencing
+unsigned*		mapIndexSequence;		//pointers to sets of adjacent regions
+RGSEQ*			regionPath;				//path to a region
 unsigned		grindpnt;				//number of group indices
 unsigned*		grinds;					//array of group indices for sequencing
 unsigned		lastgrp;				//group of the last line written in the previous region;
@@ -2921,10 +2920,10 @@ void filin(dPOINT pnt) {
 unsigned short isclos(SMALPNTL* pnt0, SMALPNTL* pnt1) {
 	float		lo0, hi0, lo1, hi1;
 
-	hi0 = pnt0[1].y + rgclos;
-	lo0 = pnt0[0].y - rgclos;
-	hi1 = pnt1[1].y + rgclos;
-	lo1 = pnt1[0].y - rgclos;
+	hi0 = pnt0[1].y + gapToClosestRegion;
+	lo0 = pnt0[0].y - gapToClosestRegion;
+	hi1 = pnt1[1].y + gapToClosestRegion;
+	lo1 = pnt1[0].y - gapToClosestRegion;
 	if (hi0 < lo1)
 		return 0;
 	if (hi1 < lo0)
@@ -2980,8 +2979,8 @@ unsigned short regclos(unsigned rg0, unsigned rg1) {
 	unsigned	l_lins, line;
 	unsigned	prlin, polin;
 
-	pnt0s = &*ptrSortedLines[rgns[rg0].start];
-	pnt1s = &*ptrSortedLines[rgns[rg1].start];
+	pnt0s = &*ptrSortedLines[regionsList[rg0].start];
+	pnt1s = &*ptrSortedLines[regionsList[rg1].start];
 	grp1s = pnt1s->group;
 	grp0s = pnt0s->group;
 	if (grp0s > grp1s) {
@@ -2999,8 +2998,8 @@ unsigned short regclos(unsigned rg0, unsigned rg1) {
 		return 1;
 	}
 	else {
-		pnt0e = &*ptrSortedLines[rgns[rg0].end];
-		pnt1e = &*ptrSortedLines[rgns[rg1].end];
+		pnt0e = &*ptrSortedLines[regionsList[rg0].end];
+		pnt1e = &*ptrSortedLines[regionsList[rg1].end];
 		grp1e = pnt1e->group;
 		grp0e = pnt0e->group;
 		if (grp0e < grp1e) {
@@ -3046,8 +3045,8 @@ unsigned short regclos(unsigned rg0, unsigned rg1) {
 }
 
 BOOL unvis() {
-	for (vispnt = 0; vispnt < rgcnt; vispnt++) {
-		if (!visit[vispnt])
+	for (visitedIndex = 0; visitedIndex < regionCount; visitedIndex++) {
+		if (!visitedRegions[visitedIndex])
 			return 1;
 	}
 	return 0;
@@ -3254,7 +3253,7 @@ void durgn(unsigned pthi) {
 	BSEQPNT*	bpnt;
 
 	rgind = mpath[pthi].vrt;
-	durpnt = &rgns[rgind];
+	durpnt = &regionsList[rgind];
 	grpn = mpath[pthi].grpn;
 	seqs = durpnt->start;
 	seqe = durpnt->end;
@@ -3293,11 +3292,11 @@ void durgn(unsigned pthi) {
 			rspnt(lconflt[ind].x, lconflt[ind].y);
 		}
 	}
-	if (visit[rgind])
+	if (visitedRegions[rgind])
 		dun = 1;
 	else {
 		dun = 0;
-		visit[rgind]++;
+		visitedRegions[rgind]++;
 	}
 	pnts = &*ptrSortedLines[durpnt->start];
 	pnte = &*ptrSortedLines[durpnt->end];
@@ -3418,36 +3417,36 @@ unsigned notdun(unsigned lvl) {
 	unsigned	ind;
 	int			tpiv, pivot = lvl - 1;
 
-	rgpth = &tmpath[mpathi];
-	rgpth[0].pcon = minds[dunrgn];
-	rgpth[0].cnt = minds[dunrgn + 1] - rgpth[0].pcon;
+	regionPath = &tmpath[mpathi];
+	regionPath[0].pcon = mapIndexSequence[doneRegion];
+	regionPath[0].cnt = mapIndexSequence[doneRegion + 1] - regionPath[0].pcon;
 	for (ind = 1; ind < lvl; ind++) {
-		rgpth[ind].pcon = minds[pmap[rgpth[ind - 1].pcon].vrt];
-		rgpth[ind].cnt = minds[pmap[rgpth[ind - 1].pcon].vrt + 1] - rgpth[ind].pcon;
+		regionPath[ind].pcon = mapIndexSequence[pathMap[regionPath[ind - 1].pcon].vrt];
+		regionPath[ind].cnt = mapIndexSequence[pathMap[regionPath[ind - 1].pcon].vrt + 1] - regionPath[ind].pcon;
 	}
-	while (visit[pmap[rgpth[pivot].pcon].vrt] && pivot >= 0) {
-		if (--rgpth[pivot].cnt > 0)
-			rgpth[pivot].pcon++;
+	while (visitedRegions[pathMap[regionPath[pivot].pcon].vrt] && pivot >= 0) {
+		if (--regionPath[pivot].cnt > 0)
+			regionPath[pivot].pcon++;
 		else {
 			tpiv = pivot;
 			do {
 				tpiv--;
 				if (tpiv < 0)
 					return 1;
-				rgpth[tpiv].cnt--;
-				rgpth[tpiv].pcon++;
-			} while (!rgpth[tpiv].cnt);
+				regionPath[tpiv].cnt--;
+				regionPath[tpiv].pcon++;
+			} while (!regionPath[tpiv].cnt);
 			if (tpiv < 0)
 				return 1;
 			tpiv++;
 			while (tpiv <= pivot) {
 				if (tpiv) {
-					rgpth[tpiv].pcon = minds[pmap[rgpth[tpiv - 1].pcon].vrt];
-					rgpth[tpiv].cnt = minds[pmap[rgpth[tpiv - 1].pcon].vrt + 1] - rgpth[tpiv].pcon;
+					regionPath[tpiv].pcon = mapIndexSequence[pathMap[regionPath[tpiv - 1].pcon].vrt];
+					regionPath[tpiv].cnt = mapIndexSequence[pathMap[regionPath[tpiv - 1].pcon].vrt + 1] - regionPath[tpiv].pcon;
 				}
 				else {
-					if (--rgpth[0].cnt)
-						rgpth[0].pcon++;
+					if (--regionPath[0].cnt)
+						regionPath[0].pcon++;
 					else
 						return 1;
 				}
@@ -3463,10 +3462,10 @@ double reglen(unsigned reg) {
 	unsigned	ind, ine;
 	SMALPNTL*	pnts[4];
 
-	pnts[0] = ptrSortedLines[rgns[reg].start];
-	pnts[1] = &ptrSortedLines[rgns[reg].start][1];
-	pnts[2] = ptrSortedLines[rgns[reg].end];
-	pnts[3] = &ptrSortedLines[rgns[reg].end][1];
+	pnts[0] = ptrSortedLines[regionsList[reg].start];
+	pnts[1] = &ptrSortedLines[regionsList[reg].start][1];
+	pnts[2] = ptrSortedLines[regionsList[reg].end];
+	pnts[3] = &ptrSortedLines[regionsList[reg].end][1];
 	for (ind = 0; ind < 4; ind++) {
 		for (ine = 0; ine < 4; ine++) {
 			len = hypot(dunpnts[ind].x - pnts[ine]->x, dunpnts[ind].y - pnts[ine]->y);
@@ -3478,56 +3477,57 @@ double reglen(unsigned reg) {
 }
 
 void nxtrgn() {
-	unsigned	ind, nureg;;
+	unsigned	ind, newRegion;
 	SMALPNTL*	tpnt;
 	double		len, minlen = 1e99;
+	unsigned	pathLength;					//length of the path to the region
 
-	pthlen = 1;
-	while (notdun(pthlen)) {
-		pthlen++;
-		if (pthlen > 8) {
-			tpnt = &*ptrSortedLines[rgns[dunrgn].start];
+	pathLength = 1;
+	while (notdun(pathLength)) {
+		pathLength++;
+		if (pathLength > 8) {
+			tpnt = &*ptrSortedLines[regionsList[doneRegion].start];
 			dunpnts[0].x = tpnt[0].x;
 			dunpnts[0].y = tpnt[0].y;
 			dunpnts[1].x = tpnt[1].x;
 			dunpnts[1].y = tpnt[1].y;
-			tpnt = &*ptrSortedLines[rgns[dunrgn].end];
+			tpnt = &*ptrSortedLines[regionsList[doneRegion].end];
 			dunpnts[2].x = tpnt[0].x;
 			dunpnts[2].y = tpnt[0].y;
 			dunpnts[3].x = tpnt[1].x;
 			dunpnts[3].y = tpnt[1].y;
-			nureg = 0;
-			for (ind = 0; ind < rgcnt; ind++) {
-				if (!visit[ind]) {
+			newRegion = 0;
+			for (ind = 0; ind < regionCount; ind++) {
+				if (!visitedRegions[ind]) {
 					len = reglen(ind);
 					if (len < minlen) {
 						minlen = len;
-						nureg = ind;
+						newRegion = ind;
 					}
 				}
 			}
 			tmpath[mpathi].skp = 1;
-			for (ind = 0; ind < cpnt; ind++) {
-				if (pmap[ind].vrt == nureg) {
+			for (ind = 0; ind < pathMapIndex; ind++) {
+				if (pathMap[ind].vrt == newRegion) {
 					tmpath[mpathi++].pcon = ind;
-					visit[nureg] = 1;
-					dunrgn = nureg;
+					visitedRegions[newRegion] = 1;
+					doneRegion = newRegion;
 					return;
 				}
 			}
-			tmpath[mpathi].cnt = vispnt;
+			tmpath[mpathi].cnt = visitedIndex;
 			tmpath[mpathi++].pcon = 0xffffffff;
-			visit[vispnt] = 1;
-			dunrgn = vispnt;
+			visitedRegions[visitedIndex] = 1;
+			doneRegion = visitedIndex;
 			return;
 		}
 	}
-	for (ind = 0; ind < pthlen; ind++) {
+	for (ind = 0; ind < pathLength; ind++) {
 		tmpath[mpathi].skp = 0;
-		tmpath[mpathi++].pcon = rgpth[ind].pcon;
-		visit[pmap[rgpth[ind].pcon].vrt] = 1;
+		tmpath[mpathi++].pcon = regionPath[ind].pcon;
+		visitedRegions[pathMap[regionPath[ind].pcon].vrt] = 1;
 	}
-	dunrgn = pmap[rgpth[ind - 1].pcon].vrt;
+	doneRegion = pathMap[regionPath[ind - 1].pcon].vrt;
 }
 
 #if	 __UseASM__
@@ -3579,12 +3579,12 @@ int sqcomp(const void *arg1, const void *arg2) {
 void nxtseq(unsigned pthi) {
 	unsigned nxtvrt, ind;
 
-	ind = minds[mpath[pthi].vrt];
+	ind = mapIndexSequence[mpath[pthi].vrt];
 	nxtvrt = mpath[pthi + 1].vrt;
-	while (ind < minds[mpath[pthi].vrt + 1] && pmap[ind].vrt != nxtvrt) {
+	while (ind < mapIndexSequence[mpath[pthi].vrt + 1] && pathMap[ind].vrt != nxtvrt) {
 		ind++;
 	}
-	mpath[mpath0++].grpn = pmap[ind].grpn;
+	mpath[mpath0++].grpn = pathMap[ind].grpn;
 }
 
 #define BUGSEQ 0
@@ -3610,55 +3610,55 @@ void lcon() {
 		for (ind = 0; ind < stitchLineCount; ind += 2)
 			ptrSortedLines[sortedLineIndex++] = &lineEndpoints[ind];
 		qsort((void*)ptrSortedLines, sortedLineIndex, 4, sqcomp);
-		rgcnt = 0;
+		regionCount = 0;
 		trgns = (REGION*)oseq;
 		trgns[0].start = 0;
 		l_bLine = ptrSortedLines[0]->line;
 		for (ind = 0; ind < sortedLineIndex; ind++) {
 			if (l_bLine != ptrSortedLines[ind]->line) {
-				trgns[rgcnt++].end = ind - 1;
-				trgns[rgcnt].start = ind;
+				trgns[regionCount++].end = ind - 1;
+				trgns[regionCount].start = ind;
 				l_bLine = ptrSortedLines[ind]->line;
 			}
 		}
-		trgns[rgcnt++].end = ind - 1;
-		rgns = new REGION[rgcnt];
-		visit = new char[rgcnt];
-		for (ind = 0; ind < rgcnt; ind++) {
-			rgns[ind].start = trgns[ind].start;
-			rgns[ind].end = trgns[ind].end;
-			visit[ind] = 0;
-			rgns[ind].cntbrk = 0;
+		trgns[regionCount++].end = ind - 1;
+		regionsList = new REGION[regionCount];
+		visitedRegions = new char[regionCount];
+		for (ind = 0; ind < regionCount; ind++) {
+			regionsList[ind].start = trgns[ind].start;
+			regionsList[ind].end = trgns[ind].end;
+			visitedRegions[ind] = 0;
+			regionsList[ind].cntbrk = 0;
 		}
 		tsrgns = (unsigned*)oseq;
 		sind = 0;
-		for (ind = 0; ind < rgcnt; ind++) {
+		for (ind = 0; ind < regionCount; ind++) {
 			cnt = 0;
-			if ((rgns[ind].end - rgns[ind].start) > 1) {
-				sgrp = ptrSortedLines[rgns[ind].start]->group;
-				for (ine = rgns[ind].start + 1; ine <= rgns[ind].end; ine++) {
+			if ((regionsList[ind].end - regionsList[ind].start) > 1) {
+				sgrp = ptrSortedLines[regionsList[ind].start]->group;
+				for (ine = regionsList[ind].start + 1; ine <= regionsList[ind].end; ine++) {
 					sgrp++;
 					if (ptrSortedLines[ine]->group != sgrp) {
 						if (!cnt)
-							rgns[ind].brk = sind;
+							regionsList[ind].brk = sind;
 						cnt++;
 						sgrp = ptrSortedLines[ine]->group;
 						tsrgns[sind++] = ine;
 					}
 				}
 			}
-			rgns[ind].cntbrk = cnt;
+			regionsList[ind].cntbrk = cnt;
 		}
 		srgns = new unsigned[sind];
 		for (ind = 0; ind < sind; ind++)
 			srgns[ind] = tsrgns[ind];
 		tmap = (RCON*)bseq;
-		minds = new unsigned[rgcnt + 1];
+		mapIndexSequence = new unsigned[regionCount + 1];
 
 #if BUGSEQ
 		bugcol = 0; sequenceIndex = 0;
-		for (index = 0; index < rgcnt; index++) {
-			for (ine = rgns[index].start; ine <= rgns[index].fillEnd; ine++) {
+		for (index = 0; index < regionCount; index++) {
+			for (ine = regionsList[index].start; ine <= regionsList[index].fillEnd; ine++) {
 				tpnt = &*ptrSortedLines[ine];
 				stitchCount[sequenceIndex].attribute = bugcol;
 				stitchCount[sequenceIndex].x = tpnt[0].x;
@@ -3674,50 +3674,50 @@ void lcon() {
 		goto seqskip;
 #endif
 		outputIndex = 0;
-		if (rgcnt > 1) {
-			ine = 0; cpnt = 0;
-			for (ind = 0; ind < rgcnt; ind++) {
-				pcon = &tmap[cpnt];
-				minds[ind] = cpnt;
-				cnt = 0; rgclos = 0;
-				for (ine = 0; ine < rgcnt; ine++) {
+		if (regionCount > 1) {
+			ine = 0; pathMapIndex = 0;
+			for (ind = 0; ind < regionCount; ind++) {
+				pcon = &tmap[pathMapIndex];
+				mapIndexSequence[ind] = pathMapIndex;
+				cnt = 0; gapToClosestRegion = 0;
+				for (ine = 0; ine < regionCount; ine++) {
 					if (ind != ine) {
 						tcon = regclos(ind, ine);
 						if (tcon) {
-							tmap[cpnt].con = tcon;
-							tmap[cpnt].grpn = nxtgrp;
-							tmap[cpnt++].vrt = ine;
+							tmap[pathMapIndex].con = tcon;
+							tmap[pathMapIndex].grpn = nxtgrp;
+							tmap[pathMapIndex++].vrt = ine;
 							cnt++;
 						}
 					}
 				}
 				while (!cnt) {
-					rgclos += stitchSpace;
+					gapToClosestRegion += stitchSpace;
 					cnt = 0;
-					for (ine = 0; ine < rgcnt; ine++) {
+					for (ine = 0; ine < regionCount; ine++) {
 						if (ind != ine) {
 							tcon = regclos(ind, ine);
 							if (tcon) {
-								tmap[cpnt].con = tcon;
-								tmap[cpnt].grpn = nxtgrp;
-								tmap[cpnt++].vrt = ine;
+								tmap[pathMapIndex].con = tcon;
+								tmap[pathMapIndex].grpn = nxtgrp;
+								tmap[pathMapIndex++].vrt = ine;
 								cnt++;
 							}
 						}
 					}
 				}
 			}
-			minds[ind] = cpnt;
-			pmap = new RCON[cpnt + 1];
-			for (ind = 0; ind < cpnt; ind++) {
-				pmap[ind].con = tmap[ind].con;
-				pmap[ind].vrt = tmap[ind].vrt;
-				pmap[ind].grpn = tmap[ind].grpn;
+			mapIndexSequence[ind] = pathMapIndex;
+			pathMap = new RCON[pathMapIndex + 1];
+			for (ind = 0; ind < pathMapIndex; ind++) {
+				pathMap[ind].con = tmap[ind].con;
+				pathMap[ind].vrt = tmap[ind].vrt;
+				pathMap[ind].grpn = tmap[ind].grpn;
 			}
 			//find the leftmost region
 			sgrp = 0xffffffff; ine = 0;
-			for (ind = 0; ind < rgcnt; ind++) {
-				tpnt = &*ptrSortedLines[rgns[ind].start];
+			for (ind = 0; ind < regionCount; ind++) {
+				tpnt = &*ptrSortedLines[regionsList[ind].start];
 				if (tpnt->group < sgrp) {
 					sgrp = tpnt->group;
 					ine = ind;
@@ -3725,22 +3725,22 @@ void lcon() {
 			}
 			outputIndex = 0;
 			tmpath = (RGSEQ*)oseq;
-			//find the leftmost region in pmap
+			//find the leftmost region in pathMap
 			mpathi = 1;
-			for (ind = 0; ind < cpnt; ind++) {
-				if (pmap[ind].vrt == ine)
+			for (ind = 0; ind < pathMapIndex; ind++) {
+				if (pathMap[ind].vrt == ine)
 					goto lconskip;
 			}
-			pmap[cpnt].vrt = ine;
-			pmap[cpnt].grpn = 0;
-			ind = cpnt;
+			pathMap[pathMapIndex].vrt = ine;
+			pathMap[pathMapIndex].grpn = 0;
+			ind = pathMapIndex;
 		lconskip:;
 			//set the first entry in the temporary path to the leftmost region
 			tmpath[0].pcon = ind;
 			tmpath[0].cnt = 1;
 			tmpath[0].skp = 0;
-			visit[ine] = 1;
-			dunrgn = ine;
+			visitedRegions[ine] = 1;
+			doneRegion = ine;
 			while (unvis())
 				nxtrgn();
 			ine = 0;
@@ -3755,7 +3755,7 @@ void lcon() {
 				else {
 					if (tmpath[ind].pcon != cnt) {
 						cnt = tmpath[ind].pcon;
-						mpath[ine++].vrt = pmap[tmpath[ind].pcon].vrt;
+						mpath[ine++].vrt = pathMap[tmpath[ind].pcon].vrt;
 					}
 				}
 			}
@@ -3766,11 +3766,11 @@ void lcon() {
 			seqmap = new unsigned[ine];
 			for (ind = 0; ind < ine; ind++)
 				seqmap[ind] = 0;
-			for (ind = 0; ind < rgcnt; ind++)
-				visit[ind] = 0;
+			for (ind = 0; ind < regionCount; ind++)
+				visitedRegions[ind] = 0;
 			lastgrp = 0;
 			for (ind = 0; ind < mpath0; ind++) {
-				//				sprintf_s(msgbuf, sizeof(msgbuf),"ind %d,vrt %d,grpn %d\n",ind,pmap[ind].vrt,pmap[ind].grpn);
+				//				sprintf_s(msgbuf, sizeof(msgbuf),"ind %d,vrt %d,grpn %d\n",ind,pathMap[ind].vrt,pathMap[ind].grpn);
 				//				OutputDebugString(msgbuf);
 				if (!unvis())
 					break;
@@ -3778,7 +3778,7 @@ void lcon() {
 			}
 		}
 		else {
-			pmap = new RCON[1];
+			pathMap = new RCON[1];
 			mpath = new FSEQ[1];
 			ine = (sortedLineIndex >> 5) + 1;
 			seqmap = new unsigned[ine];
@@ -3786,7 +3786,7 @@ void lcon() {
 				seqmap[ind] = 0;
 			lastgrp = 0;
 			mpath[0].vrt = 0;
-			mpath[0].grpn = ptrSortedLines[rgns[0].end]->group;
+			mpath[0].grpn = ptrSortedLines[regionsList[0].end]->group;
 			mpath[0].skp = 0;
 			durgn(0);
 			delete[] mpath;
@@ -3799,10 +3799,10 @@ void lcon() {
 #endif
 				  delete[] ptrSortedLines;
 				  delete[] lineEndpoints;
-				  delete[] rgns;
-				  delete[] minds;
-				  delete[] visit;
-				  delete[] pmap;
+				  delete[] regionsList;
+				  delete[] mapIndexSequence;
+				  delete[] visitedRegions;
+				  delete[] pathMap;
 				  delete[] grinds;
 				  delete[] seqmap;
 				  delete[] srgns;
@@ -4248,8 +4248,8 @@ void setmfrm() {
 	POINT		tof;
 
 	sfCor2px(formList[closestFormToCursor].vertices[0], &tpnt);
-	tof.x = msg.pt.x - stitchWindowOrigin.x - tpnt.x + fmovdif.x;
-	tof.y = msg.pt.y - stitchWindowOrigin.y - tpnt.y + fmovdif.y;
+	tof.x = msg.pt.x - stitchWindowOrigin.x - tpnt.x + formMoveDelta.x;
+	tof.y = msg.pt.y - stitchWindowOrigin.y - tpnt.y + formMoveDelta.y;
 	for (ind = 0; ind < formList[closestFormToCursor].sides; ind++) {
 		sfCor2px(formList[closestFormToCursor].vertices[ind], &tpnt);
 		formLines[ind].x = tpnt.x + tof.x;
@@ -4318,8 +4318,8 @@ unsigned chkfrm() {
 	if (tpnt0.x >= trct.left&&tpnt0.x <= trct.right&&
 		tpnt0.y >= trct.top&&tpnt0.y <= trct.bottom) {
 		sfCor2px(SelectedForm->vertices[0], &tpnt1);
-		fmovdif.x = tpnt1.x - tpnt0.x;
-		fmovdif.y = tpnt1.y - tpnt0.y;
+		formMoveDelta.x = tpnt1.x - tpnt0.x;
+		formMoveDelta.y = tpnt1.y - tpnt0.y;
 		setMap(FRMOV);
 		return 1;
 	}
@@ -4335,8 +4335,8 @@ void rstfrm() {
 
 	setmfrm();
 	rstMap(FRMOV);
-	tpnt.x = msg.pt.x + fmovdif.x;
-	tpnt.y = msg.pt.y + fmovdif.y;
+	tpnt.x = msg.pt.x + formMoveDelta.x;
+	tpnt.y = msg.pt.y + formMoveDelta.y;
 	pxCor2stch(tpnt);
 	pof.x = selectedPoint.x - SelectedForm->vertices[0].x;
 	pof.y = selectedPoint.y - SelectedForm->vertices[0].y;
@@ -7881,7 +7881,7 @@ void durpoli(unsigned nsids) {
 	SelectedForm->type = POLI;
 	closestFormToCursor = formIndex;
 	frmout(formIndex);
-	fmovdif.x = fmovdif.y = 0;
+	formMoveDelta.x = formMoveDelta.y = 0;
 	newFormVertexCount = nsids + 1;
 	setMap(POLIMOV);
 	setmfrm();
@@ -7928,7 +7928,7 @@ void dustar(unsigned nsids, double len) {
 	}
 	SelectedForm->type = POLI;
 	frmout(formIndex);
-	fmovdif.x = fmovdif.y = 0;
+	formMoveDelta.x = formMoveDelta.y = 0;
 	newFormVertexCount = tsid + 1;
 	setMap(POLIMOV);
 	setmfrm();
@@ -7988,7 +7988,7 @@ void duspir(unsigned nsids) {
 	}
 	SelectedForm->type = LIN;
 	frmout(formIndex);
-	fmovdif.x = fmovdif.y = 0;
+	formMoveDelta.x = formMoveDelta.y = 0;
 	newFormVertexCount = num + 1;
 	setMap(POLIMOV);
 	setmfrm();
@@ -8057,7 +8057,7 @@ void duhart(unsigned nsids) {
 	SelectedForm->type = POLI;
 	closestFormToCursor = formIndex;
 	frmout(formIndex);
-	fmovdif.x = fmovdif.y = 0;
+	formMoveDelta.x = formMoveDelta.y = 0;
 	setMap(POLIMOV);
 	setmfrm();
 	setMap(SHOFRM);
@@ -8113,7 +8113,7 @@ void dulens(unsigned nsids) {
 	SelectedForm->type = POLI;
 	closestFormToCursor = formIndex;
 	frmout(formIndex);
-	fmovdif.x = fmovdif.y = 0;
+	formMoveDelta.x = formMoveDelta.y = 0;
 	setMap(POLIMOV);
 	setmfrm();
 	setMap(SHOFRM);
@@ -8177,7 +8177,7 @@ void duzig(unsigned nsids) {
 	SelectedForm->type = LIN;
 	closestFormToCursor = formIndex;
 	frmout(formIndex);
-	fmovdif.x = fmovdif.y = 0;
+	formMoveDelta.x = formMoveDelta.y = 0;
 	newFormVertexCount = nsids + 1;
 	setMap(POLIMOV);
 	setmfrm();
@@ -9737,8 +9737,8 @@ void frmadj(unsigned find) {
 
 	fvars(find);
 	for (ind = 0; ind < SelectedForm->sides; ind++) {
-		currentFormVertices[ind].x += fmovdif.x;
-		currentFormVertices[ind].y -= fmovdif.y;
+		currentFormVertices[ind].x += formMoveDelta.x;
+		currentFormVertices[ind].y -= formMoveDelta.y;
 	}
 	frmout(find);
 }
@@ -9812,8 +9812,8 @@ void frmsadj() {
 		setr(selectedFormList[ind]);
 	for (ind = 0; ind < header.stitchCount; ind++) {
 		if (stitchBuffer[ind].attribute&ALTYPMSK&&chkr((stitchBuffer[ind].attribute&FRMSK) >> FRMSHFT)) {
-			stitchBuffer[ind].x += fmovdif.x;
-			stitchBuffer[ind].y -= fmovdif.y;
+			stitchBuffer[ind].x += formMoveDelta.x;
+			stitchBuffer[ind].y -= formMoveDelta.y;
 		}
 	}
 }
@@ -11061,12 +11061,12 @@ void cntrx() {
 		flg = 1;
 		savdo();
 		dufcntr(&selcntr);
-		fmovdif.x = mrkcntr.x - selcntr.x;
-		fmovdif.y = -mrkcntr.y + selcntr.y;
+		formMoveDelta.x = mrkcntr.x - selcntr.x;
+		formMoveDelta.y = -mrkcntr.y + selcntr.y;
 		if (chkMap(CNTRV))
-			fmovdif.y = 0;
+			formMoveDelta.y = 0;
 		if (chkMap(CNTRH))
-			fmovdif.x = 0;
+			formMoveDelta.x = 0;
 		for (ind = 0; ind < selectedFormCount; ind++)
 			frmadj(selectedFormList[ind]);
 		frmsadj();
@@ -11078,17 +11078,17 @@ void cntrx() {
 			trct = &formList[closestFormToCursor].rectangle;
 			selcntr.x = (trct->right - trct->left) / 2 + trct->left;
 			selcntr.y = (trct->top - trct->bottom) / 2 + trct->bottom;
-			fmovdif.x = mrkcntr.x - selcntr.x;
-			fmovdif.y = -mrkcntr.y + selcntr.y;
+			formMoveDelta.x = mrkcntr.x - selcntr.x;
+			formMoveDelta.y = -mrkcntr.y + selcntr.y;
 			if (chkMap(CNTRV))
-				fmovdif.y = 0;
+				formMoveDelta.y = 0;
 			if (chkMap(CNTRH))
-				fmovdif.x = 0;
+				formMoveDelta.x = 0;
 			frmadj(closestFormToCursor);
 			for (ind = 0; ind < header.stitchCount; ind++) {
 				if (stitchBuffer[ind].attribute&ALTYPMSK && (stitchBuffer[ind].attribute&FRMSK) >> FRMSHFT == closestFormToCursor) {
-					stitchBuffer[ind].x += fmovdif.x;
-					stitchBuffer[ind].y -= fmovdif.y;
+					stitchBuffer[ind].x += formMoveDelta.x;
+					stitchBuffer[ind].y -= formMoveDelta.y;
 				}
 			}
 		}
@@ -11111,15 +11111,15 @@ void cntrx() {
 				}
 				selcntr.x = (grct.right - grct.left) / 2 + grct.left;
 				selcntr.y = (grct.top - grct.bottom) / 2 + grct.bottom;
-				fmovdif.x = mrkcntr.x - selcntr.x;
-				fmovdif.y = -mrkcntr.y + selcntr.y;
+				formMoveDelta.x = mrkcntr.x - selcntr.x;
+				formMoveDelta.y = -mrkcntr.y + selcntr.y;
 				if (chkMap(CNTRV))
-					fmovdif.y = 0;
+					formMoveDelta.y = 0;
 				if (chkMap(CNTRH))
-					fmovdif.x = 0;
+					formMoveDelta.x = 0;
 				for (ind = groupStartStitch; ind <= groupEndStitch; ind++) {
-					stitchBuffer[ind].x += fmovdif.x;
-					stitchBuffer[ind].y -= fmovdif.y;
+					stitchBuffer[ind].x += formMoveDelta.x;
+					stitchBuffer[ind].y -= formMoveDelta.y;
 				}
 			}
 			else
@@ -13472,7 +13472,7 @@ void wavfrm() {
 			currentFormVertices[ind].x -= SelectedForm->rectangle.left;
 			currentFormVertices[ind].y -= SelectedForm->rectangle.bottom;
 		}
-		fmovdif.x = fmovdif.y = 0;
+		formMoveDelta.x = formMoveDelta.y = 0;
 		newFormVertexCount = ine + 1;
 		setmfrm();
 		mdufrm();
