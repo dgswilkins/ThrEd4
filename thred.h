@@ -127,7 +127,7 @@ const unsigned long	RMAPBITS = RMAPSIZ << 5;	//a bit for each stitch
 #define		NCODOF		80			//name encoding offset
 #define		CLPMIN		0.5		//if clipboard data less wide, then don't fill
 #define		CLPMINAUT	1.2		//for skinny vertical clips
-#define		BRDWID		18		//default sating border size
+#define		BRDWID		18		//default satin border size
 #define		SNPLEN		0.15	//default snap together length size
 #define		STARAT		0.4		//default star ratio
 #define		SPIRWRAP	1.52	//default spiral wrap
@@ -603,7 +603,7 @@ enum {
 	FRMBOXIN,	//user is setting the form box pixels
 	TXTMOV,		//user is moving a texture editor point
 	TXTCLP,		//user is setting texture points with a clipboard form
-	TXTLIN,		//user is setting texture pints in a line
+	TXTLIN,		//user is setting texture points in a line
 	WASTXBAK,	//texture fill editor history active
 	LASTXBAK,	//last key was a texture back key
 	TXBDIR,		//texture backup direction
@@ -1246,12 +1246,6 @@ typedef struct _range {
 	unsigned start;
 	unsigned finish;
 }RANGE;
-
-// ToDo - Remove this structure, preg and preced
-typedef struct _secnds {
-	unsigned ind;
-	unsigned flg;
-}SECNDS;
 
 typedef struct _region {	//region for sequencing vertical fills
 	unsigned start;		//start line of region

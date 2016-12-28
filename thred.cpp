@@ -425,7 +425,7 @@ extern	fPOINT			oseq[OSEQLEN];
 extern	float			picotSpace;
 extern	unsigned		previousFormIndex;
 extern	long			prfwid;
-extern	unsigned		psgacc;
+extern	unsigned		pseudoRandomValue;
 extern	int				ptxhst;
 extern	unsigned		satkad;
 extern	SATCON			satks[MAXSAC];
@@ -2268,7 +2268,7 @@ void ritfnam(TCHAR* nam) {
 
 	if (*fileNameOrder > 50)
 		fnamtabs();
-	psgacc = rsed();
+	pseudoRandomValue = rsed();
 	for (ind = 0; ind < 50; ind++)
 		tnam[ind] = psg() & 0xff;
 	for (ind = 0; ind < 50; ind++) {
@@ -2318,7 +2318,7 @@ void fnamtabs() {
 
 	for (ind = 0; ind < 50; ind++)
 		fileNameOrder[ind] = ind;
-	psgacc = NORDSED;
+	pseudoRandomValue = NORDSED;
 	for (ind = 0; ind < 100; ind++) {
 
 		src = psg() % 50;
@@ -2329,7 +2329,7 @@ void fnamtabs() {
 	}
 	for (ind = 0; ind < 128; ind++)
 		fnamcod[ind] = (unsigned char)ind + NCODOF;
-	psgacc = NCODSED;
+	pseudoRandomValue = NCODSED;
 	for (ind = 0; ind < 256; ind++) {
 
 		src = psg() & 0x7f;

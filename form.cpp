@@ -388,7 +388,7 @@ RECT			selectedFormsRectangle;	//for multiple selections;
 POINT			selectedFormsLine[9];	//line derived from the big rectangle
 POINT			selectedPointsRectangle[9];	//line derived from the point select rectangle
 fRECTANGLE		allItemsRectangle;		//rectangle enclosing all forms and stitches
-double			angs[MAXFRMLINS];		//angles of a form for satin border fills
+double			formAngles[MAXFRMLINS];	//angles of a form for satin border fills
 fPOINT			formPoints[MAXFRMPNTS];	//form points
 unsigned		fltad;					//next index to append form points
 fPOINT			clipboardPoints[MAXCLPNTS];		//main clipboard fill points for forms
@@ -397,8 +397,7 @@ SATCON			satks[MAXSAC];			//satin form connects
 unsigned		satkad;					//next index to append satin connect points
 float			buttonholeFillCornerLength = IBFCLEN;			//buttonhole corner length
 float			picotSpace = IPICSPAC;		//space between border picots
-unsigned		psgacc;					//pseudo-random sequence register
-SECNDS*			preg;					//segments for sorting colors and forms
+unsigned		pseudoRandomValue;		//pseudo-random sequence register
 unsigned		prgind;					//segment sorting index;
 dPOINT			filbak[8];				//backup stitches in satin fills
 unsigned		pfbak;					//pointer for backup stitches in satin fills
@@ -424,7 +423,7 @@ SMALPNTL*		seqlin;					//line for vertical/horizontal/angle fills
 unsigned		mpath0;					//point to the next path element for vertical fill sequencint
 fPOINT*			lconflt;				//form points for angle fills
 fPOINT			angflt[MAXFRMLINS];		//form point data for angle fills
-fPOINT*			clpseq;					//pointer to vertucal clipboard fill data
+fPOINT*			clpseq;					//pointer to vertical clipboard fill data
 double			minot;					//minimum distance from a line
 unsigned		minotl;					//index to the minimum distance line
 CLPSEG*			clpsegs;				//clipboard segments for virtual clipboard fill
@@ -6016,20 +6015,20 @@ void outfn(unsigned strt, unsigned fin, double satwid) {
 	double		len;
 	double		xof, yof;
 
-	if (fabs(angs[strt]) < TINY&&fabs(angs[fin]) < TINY) {
+	if (fabs(formAngles[strt]) < TINY&&fabs(formAngles[fin]) < TINY) {
 		xof = 0;
 		yof = satwid;
 	}
 	else {
 #define SATHRESH 10
 
-		l_ang = (angs[fin] - angs[strt]) / 2;
+		l_ang = (formAngles[fin] - formAngles[strt]) / 2;
 		len = satwid / cos(l_ang);
 		if (len < -satwid*SATHRESH)
 			len = -satwid*SATHRESH;
 		if (len > satwid*SATHRESH)
 			len = satwid*SATHRESH;
-		l_ang += angs[strt] + PI / 2;
+		l_ang += formAngles[strt] + PI / 2;
 		xof = len*cos(l_ang);
 		yof = len*sin(l_ang);
 	}
@@ -6043,8 +6042,8 @@ void duangs() {
 	unsigned ind;
 
 	for (ind = 0; ind < (unsigned)sides - 1; ind++)
-		angs[ind] = atan2(currentFormVertices[ind + 1].y - currentFormVertices[ind].y, currentFormVertices[ind + 1].x - currentFormVertices[ind].x);
-	angs[ind] = atan2(currentFormVertices[0].y - currentFormVertices[ind].y, currentFormVertices[0].x - currentFormVertices[ind].x);
+		formAngles[ind] = atan2(currentFormVertices[ind + 1].y - currentFormVertices[ind].y, currentFormVertices[ind + 1].x - currentFormVertices[ind].x);
+	formAngles[ind] = atan2(currentFormVertices[0].y - currentFormVertices[ind].y, currentFormVertices[0].x - currentFormVertices[ind].x);
 }
 
 void satout(double satwid) {
@@ -6389,8 +6388,8 @@ void satends(unsigned blnt) {
 	fPOINT		stp;
 
 	if (blnt&SBLNT) {
-		stp.x = sin(angs[0])*plen / 2;
-		stp.y = cos(angs[0])*plen / 2;
+		stp.x = sin(formAngles[0])*plen / 2;
+		stp.y = cos(formAngles[0])*plen / 2;
 		if (chkMap(INDIR))
 		{
 			stp.x = -stp.x;
@@ -6406,8 +6405,8 @@ void satends(unsigned blnt) {
 		ipnts[0].y = opnts[0].y = currentFormVertices[0].y;
 	}
 	if (blnt&FBLNT) {
-		stp.x = sin(angs[sides - 2])*plen / 2;
-		stp.y = cos(angs[sides - 2])*plen / 2;
+		stp.x = sin(formAngles[sides - 2])*plen / 2;
+		stp.y = cos(formAngles[sides - 2])*plen / 2;
 		if (chkMap(INDIR))
 		{
 			stp.x = -stp.x;
@@ -8507,13 +8506,13 @@ void spurct(unsigned ind) {
 unsigned psg() {
 	unsigned tmp;
 
-	if (!psgacc)
-		psgacc = SEED;
-	tmp = psgacc & 0x48000000;
-	psgacc <<= 1;
+	if (!pseudoRandomValue)
+		pseudoRandomValue = SEED;
+	tmp = pseudoRandomValue & 0x48000000;
+	pseudoRandomValue <<= 1;
 	if (tmp == 0x40000000 || tmp == 0x8000000)
-		psgacc++;
-	return psgacc;
+		pseudoRandomValue++;
+	return pseudoRandomValue;
 }
 
 void duromb(dPOINT strt0, dPOINT fin0, dPOINT strt1, dPOINT fin1) {
@@ -9400,28 +9399,6 @@ unsigned prgflg(unsigned ind) {
 		return isrt(formList[(stitchBuffer[ind].attribute&FRMSK) >> 4].edgeType&NEGUND);
 	else
 		return 0;
-}
-
-BOOL preced(unsigned pu_stind) {
-	unsigned fpnt, fcol, ind, ine;
-
-	if ((stitchBuffer[pu_stind].attribute&TYPMSK) == FRMBFIL) {
-		fpnt = (stitchBuffer[pu_stind].attribute&FRMSK) >> FRMSHFT;
-		fcol = stitchBuffer[pu_stind].attribute&COLMSK;
-		for (ind = 0; ind < prgind; ind++) {
-			if (chkdun(ind)) {
-				ine = preg[ind].ind;
-				if ((stitchBuffer[ine].attribute&COLMSK) == fcol &&
-					((stitchBuffer[ine].attribute&FRMSK) >> FRMSHFT) == fpnt &&
-					(stitchBuffer[ine].attribute&TYPMSK) == FRMFIL)
-
-					return 0;
-			}
-		}
-		return 1;
-	}
-	else
-		return 1;
 }
 
 void rotpar() {
@@ -12041,16 +12018,16 @@ BOOL vscmp(unsigned ind, unsigned ine) {
 
 void duflt() {
 	unsigned	ind;
-	float		lft;
+	float		leftEdge;
 
-	lft = 1e9;
+	leftEdge = 1e9;
 	for (ind = 0; ind < sides; ind++) {
-		if (currentFormVertices[ind].x < lft)
-			lft = currentFormVertices[ind].x;
+		if (currentFormVertices[ind].x < leftEdge)
+			leftEdge = currentFormVertices[ind].x;
 	}
-	if (lft < clipboardRectSize.cx) {
+	if (leftEdge < clipboardRectSize.cx) {
 		setMap(WASNEG);
-		fltof = clipboardRectSize.cx + fabs(lft) + .05;
+		fltof = clipboardRectSize.cx + fabs(leftEdge) + .05;
 		for (ind = 0; ind < sides; ind++)
 			currentFormVertices[ind].x += fltof;
 		SelectedForm->rectangle.left += fltof;
@@ -13117,10 +13094,10 @@ void dufxlen() {
 	listSINEs = (double*)angflt;
 	listCOSINEs = (double*)tempPolygon;
 	for (ind = 0; ind < (unsigned)sides; ind++) {
-		listSINEs[ind] = sin(angs[ind]);
-		listCOSINEs[ind] = cos(angs[ind]);
+		listSINEs[ind] = sin(formAngles[ind]);
+		listCOSINEs[ind] = cos(formAngles[ind]);
 	}
-	listSINEs[ind] = sin((angs[0] > angs[ind]) ? (angs[0] - angs[ind]) : (angs[ind] - angs[0]));
+	listSINEs[ind] = sin((formAngles[0] > formAngles[ind]) ? (formAngles[0] - formAngles[ind]) : (formAngles[ind] - formAngles[0]));
 	fxlen();
 }
 

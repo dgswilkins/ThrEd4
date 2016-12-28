@@ -75,7 +75,7 @@ extern	unsigned		newFormVertexCount;
 extern	unsigned		outputIndex;
 extern	fPOINT*			opnts;
 extern	fPOINT			oseq[OSEQLEN];
-extern	unsigned		psgacc;
+extern	unsigned		pseudoRandomValue;
 extern	FRMHED*			SelectedForm;
 extern	double			rotationAngle;
 extern	dPOINT			rotationCenter;
@@ -510,13 +510,13 @@ unsigned bpsg() {
 
 	unsigned tmp;
 
-	if (!psgacc)
-		psgacc = FSED;
-	tmp = psgacc & 0x40000008;
-	psgacc >>= 1;
+	if (!pseudoRandomValue)
+		pseudoRandomValue = FSED;
+	tmp = pseudoRandomValue & 0x40000008;
+	pseudoRandomValue >>= 1;
 	if (tmp == 0x8 || tmp == 0x40000000)
-		psgacc |= 0x40000000;
-	return psgacc;
+		pseudoRandomValue |= 0x40000000;
+	return pseudoRandomValue;
 }
 
 void nurat() {
@@ -542,7 +542,7 @@ void nurat() {
 					dwnfth--;
 				else {
 
-					psgacc = FSED;
+					pseudoRandomValue = FSED;
 					upfth = fthup;
 					dwnfth = fthdwn;
 				}
@@ -698,7 +698,7 @@ void fthrfn() {
 	unsigned	ind, res;
 	double		bakspac;
 
-	psgacc = FSED;
+	pseudoRandomValue = FSED;
 	fthvars();
 	bakspac = stitchSpace;
 	stitchSpace = SelectedForm->fillSpacing;
@@ -869,7 +869,7 @@ void keynam(unsigned sed, TCHAR* nam) {
 	ind = 1;
 	nam[0] = '\\';
 	nam[1] = 's';
-	psgacc = sed;
+	pseudoRandomValue = sed;
 	for (ind = 2; ind < 20; ind++)
 		nam[ind] = psg() % 26 + 0x61;
 	nam[ind] = 0;
@@ -1824,7 +1824,7 @@ void dasyfrm() {
 	for (ind = 0; ind < iniFile.daisyPetalCount; ind++)
 	{
 		pangp = 0;
-		psgacc = SEED;
+		pseudoRandomValue = SEED;
 		for (ine = 0; ine < pcnt; ine++)
 		{
 			switch (dtyp)
@@ -5070,6 +5070,7 @@ void txtkey(unsigned cod)
 
 	case 'H':
 
+		// ToDo - shouldn't this be HORTYP?
 		dutxfn(ANGTYP);
 		break;
 
