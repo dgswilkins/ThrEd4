@@ -325,13 +325,12 @@ unsigned*		checkMap;				//bitmap used by satin fill to delete illegal lines
 unsigned short	startPoint;				//starting point for a satin stitch guide-line
 double			plen;					//horizontal length of a clipboard fill/2
 double			plen2;					//horizontal length of a clipboard fill
-fPOINT			lastpnt;				//last point written by line connect routine
-double			bac;					//border accumular for filling
+fPOINT			lastPoint;				//last point written by line connect routine
 fPOINT			opntlst[MAXFRMLINS];	//list of outside outline points for satin or clipboard fills
 fPOINT			ipntlst[MAXFRMLINS];	//list of inside outline points for satin or clipboard fills
 fPOINT*			opnts;					//pointer to the list of outside outline points
 fPOINT*			ipnts;					//pointer to the list of inside outline points
-fPOINT			clpref;					//clipboard reference point
+fPOINT			clipReference;			//clipboard reference point
 double			borderWidth = BRDWID;	//border width for satin borders
 unsigned		delpnt;					//points to deleted stitches for refilling
 unsigned short	lastflt;				//last form point to be filled
@@ -1878,8 +1877,8 @@ void rseq(unsigned strt, unsigned fin, unsigned ostrt, unsigned at) {
 		stitchBuffer[strt++].y = iseq[ostrt++].y;
 	}
 	ostrt--;
-	lastpnt.x = iseq[ostrt].x;
-	lastpnt.y = iseq[ostrt].y;
+	lastPoint.x = iseq[ostrt].x;
+	lastPoint.y = iseq[ostrt].y;
 }
 
 BOOL ritlin(fPOINT strt, fPOINT fin)
@@ -2124,8 +2123,8 @@ void savdisc() {
 BOOL lastch() {
 	if (isind)
 	{
-		lastpnt.x = iseq[isind - 1].x;
-		lastpnt.y = iseq[isind - 1].y;
+		lastPoint.x = iseq[isind - 1].x;
+		lastPoint.y = iseq[isind - 1].y;
 		return 1;
 	}
 	else
@@ -2140,8 +2139,8 @@ unsigned getlast() {
 	if (SelectedForm->fillType) {
 		lastch();
 		for (ind = 0; ind < sides; ind++) {
-			dx = lastpnt.x - currentFormVertices[ind].x;
-			dy = lastpnt.y - currentFormVertices[ind].y;
+			dx = lastPoint.x - currentFormVertices[ind].x;
+			dy = lastPoint.y - currentFormVertices[ind].y;
 			len = hypot(dx, dy);
 			if (len < min) {
 				min = len;
@@ -5832,8 +5831,8 @@ BOOL ritclp(fPOINT pnt) {
 
 	if (chkmax(clipboardStitchCount, sequenceIndex))
 		return 1;
-	adj.x = pnt.x - clpref.x;
-	adj.y = pnt.y - clpref.y;
+	adj.x = pnt.x - clipReference.x;
+	adj.y = pnt.y - clipReference.y;
 	for (ind = 0; ind < clipboardStitchCount; ind++) {
 		oseq[sequenceIndex].x = clipFillData[ind].x + adj.x;
 		oseq[sequenceIndex++].y = clipFillData[ind].y + adj.y;
@@ -5855,7 +5854,7 @@ BOOL clpsid(unsigned strt, unsigned fin) {
 	dif.y = currentFormVertices[fin].y - currentFormVertices[strt].y;
 	len = hypot(dif.x, dif.y);
 	rotationAngle = atan2(dif.y, dif.x);
-	rotang1(rpnt, &clpref);
+	rotang1(rpnt, &clipReference);
 	cnt = len / clipboardRectSize.cx;
 	if (cnt) {
 		if (cnt > 1)
@@ -5891,7 +5890,7 @@ void linsid() {
 	cnt = len / clipboardRectSize.cx;
 	if (cnt) {
 		rotationAngle = clpang;
-		rotangf(rclpref, &clpref);
+		rotangf(rclpref, &clipReference);
 		for (ind = 0; ind < clipboardStitchCount; ind++)
 			rotangf(clipReversedData[ind], &clipFillData[ind]);
 		for (ind = 0; ind < cnt; ind++) {
@@ -5933,7 +5932,7 @@ void lincrnr() {
 		dif.x = mvpnt.x - selectedPoint.x;
 		dif.y = mvpnt.y - selectedPoint.y;
 		rotationAngle = atan2(dif.y, dif.x);
-		rotangf(rclpref, &clpref);
+		rotangf(rclpref, &clipReference);
 		for (ind = 0; ind < clipboardStitchCount; ind++)
 			rotangf(clipReversedData[ind], &clipFillData[ind]);
 		ritclp(selectedPoint);
@@ -5971,7 +5970,6 @@ void clpbrd(unsigned short strtlin) {
 	unsigned		ind, ref;
 	unsigned short	nlin;
 
-	bac = 0;
 	sequenceIndex = 0;
 	rstMap(CLPBAK);
 	plen = clipboardRectSize.cx / 2;
@@ -5979,8 +5977,8 @@ void clpbrd(unsigned short strtlin) {
 	clipFillData = new fPOINT[clipboardStitchCount];
 	clipReversedData = new fPOINT[clipboardStitchCount];
 	rotationCenter.x = (clipboardRect.right - clipboardRect.left) / 2 + clipboardRect.left;
-	clpref.y = rotationCenter.y = (clipboardRect.top - clipboardRect.bottom) / 2 + clipboardRect.bottom;
-	clpref.x = clipboardRect.left;
+	clipReference.y = rotationCenter.y = (clipboardRect.top - clipboardRect.bottom) / 2 + clipboardRect.bottom;
+	clipReference.x = clipboardRect.left;
 	durev();
 	ref = 0;
 	if (SelectedForm->type == LIN) {
@@ -10246,7 +10244,7 @@ void clpcrnr(unsigned p_lin) {
 		dif.y = ipnts[tlin].y - currentFormVertices[tlin].y;
 	}
 	rotationAngle = atan2(dif.y, dif.x) + PI / 2;
-	rotang1(rpnt, &clpref);
+	rotang1(rpnt, &clipReference);
 	for (ind = 0; ind < clipboardStitchCount; ind++)
 		rotang1(clipBuffer[ind], &clipFillData[ind]);
 	len = hypot(dif.x, dif.y);
@@ -10291,7 +10289,7 @@ void picfn(unsigned strt, unsigned fin, double spac) {
 	rpnt.x = (clipboardRect.right - clipboardRect.left) / 2 + clipboardRect.left;
 	rpnt.y = clipboardRect.top;
 	rotationAngle = atan2(dif.y, dif.x);
-	rotang1(rpnt, &clpref);
+	rotang1(rpnt, &clipReference);
 	pnti.x = currentFormVertices[strt].x;
 	pnti.y = currentFormVertices[strt].y;
 	if (cnt) {
@@ -10344,15 +10342,14 @@ void clpic(unsigned short strtlin) {
 	unsigned		ind;
 	unsigned short	nlin;
 
-	bac = 0;
 	sequenceIndex = 0;
 	rstMap(CLPBAK);
 	plen = clipboardRectSize.cx / 2;
 	plen2 = clipboardRectSize.cx;
 	clipFillData = new fPOINT[clipboardStitchCount];
 	rotationCenter.x = (clipboardRect.right - clipboardRect.left) / 2 + clipboardRect.left;
-	clpref.y = rotationCenter.y = (clipboardRect.top - clipboardRect.bottom) / 2 + clipboardRect.bottom;
-	clpref.x = clipboardRect.left;
+	clipReference.y = rotationCenter.y = (clipboardRect.top - clipboardRect.bottom) / 2 + clipboardRect.bottom;
+	clipReference.x = clipboardRect.left;
 	satout(20);
 	if (SelectedForm->type == LIN) {
 		for (ind = 0; ind < (unsigned)sides - 2; ind++) {
@@ -13272,7 +13269,7 @@ void dulast() {
 		minlen = 1e99;
 		mind = 0;
 		for (ind = 0; ind < activePointIndex; ind++) {
-			len = hypot(lastpnt.x - chainEndPoints[ind].x, lastpnt.y - chainEndPoints[ind].y);
+			len = hypot(lastPoint.x - chainEndPoints[ind].x, lastPoint.y - chainEndPoints[ind].y);
 			if (len < minlen) {
 				minlen = len;
 				mind = ind;
