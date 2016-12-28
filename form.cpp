@@ -112,7 +112,6 @@ extern			unsigned		clipboardStitchCount;	//number of stitchs extracted from clip
 extern			CLPSTCH*		clipboardStitchData;
 extern			fPOINTATTRIBUTE	clipBuffer[MAXFRMLINS];
 extern			unsigned		closestPointIndex;
-extern			unsigned		dunmap[MAXFRMLINS / 32 + 1];
 extern			POINT			endPointCross;
 extern			unsigned		formMenuChoice;
 extern			HPEN			formPen;
@@ -349,7 +348,6 @@ unsigned*		xHistogram;				//x histogram for snap together
 double			snapLength = SNPLEN*PFGRAN;		//snap together length
 unsigned*		xPoints;				//stitch indices sorted according to x values
 unsigned		colorBitmap;			//bitmap of colors in a design for sort
-unsigned		dunmap[MAXFRMLINS / 32 + 1];	//bitmap of sorted segments
 double			starRatio = STARAT;			//star point to body ratio
 double			spiralWrap = SPIRWRAP;		//number of revolutions in a spiral
 unsigned		srtmsk = (1 << EGSAT) | (1 << EGAP) | (1 << EGPRP);	 //mask for switchable fill types
@@ -9339,32 +9337,6 @@ unsigned nxtcol() {
 	return col;
 #endif
 }
-
-unsigned chkdun(unsigned bpnt) {
-#if	 __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, offset dunmap
-		mov		ecx, bpnt
-		bt[ebx], ecx
-		jc		short chkdunx
-		inc		eax
-		chkdunx :
-	}
-#else
-	return _bittest((long *)dunmap, bpnt) ? 0 : 1;
-#endif
-}
-
-#if	 __UseASM__
-unsigned setdun(unsigned bpnt) {
-	_asm {
-		mov		ebx, offset dunmap
-		mov		ecx, bpnt
-		bts[ebx], ecx
-	}
-}
-#endif
 
 unsigned isrt(unsigned bpnt) {
 #if	 __UseASM__
