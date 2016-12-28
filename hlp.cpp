@@ -16,7 +16,6 @@ extern void				okcan();
 
 extern POINT			unzoomedRect;
 extern PCSHEADER		header;
-extern unsigned			delpnt;
 extern TCHAR			homeDirectory[_MAX_PATH];
 extern TCHAR			fileName[_MAX_PATH];
 extern unsigned			setMap(unsigned bPnt);
@@ -477,7 +476,6 @@ BOOL filmsgs(unsigned cod) {
 		return clpmsgs(cod);
 	if (formIndex) {
 
-		delpnt = header.stitchCount;
 		frm1pnt();
 		if (chkMap(FORMSEL)) {
 

@@ -332,7 +332,6 @@ fPOINT*			opnts;					//pointer to the list of outside outline points
 fPOINT*			ipnts;					//pointer to the list of inside outline points
 fPOINT			clipReference;			//clipboard reference point
 double			borderWidth = BRDWID;	//border width for satin borders
-unsigned		delpnt;					//points to deleted stitches for refilling
 unsigned short	lastflt;				//last form point to be filled
 unsigned		selectedFormControlVertex;	//user selected form control point
 POINT			formOutlineRectangle[10];	//form control rectangle in pixel coordinates
@@ -940,7 +939,6 @@ void delfil(unsigned at) {
 		ind++;
 	ine = ind;
 	if (ind < header.stitchCount) {
-		delpnt = ind;
 		setMap(WASDEL);
 	}
 	while (ind < header.stitchCount) {
@@ -2440,7 +2438,6 @@ void refilfn() {
 	savdo();
 	fdelstch();
 	setMap(WASREFIL);
-	delpnt = header.stitchCount;
 	if (SelectedForm->fillSpacing < 0.5 && !isclp(closestFormToCursor))
 		SelectedForm->fillSpacing = 0.5;
 	if (SelectedForm->edgeSpacing < 0.5)
@@ -11364,7 +11361,6 @@ void stchadj() {
 	for (ind = header.stitchCount; ind != 0; ind--) {
 		hi = stitchBuffer[ind - 1].attribute&FRMSK;
 		if ((stitchBuffer[ind - 1].attribute&FRMSK) == lo) {
-			delpnt = ind;
 			break;
 		}
 	}

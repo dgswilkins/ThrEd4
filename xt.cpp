@@ -43,7 +43,6 @@ extern	unsigned		closestVertexToCursor;
 extern	unsigned		clpad;
 extern	unsigned char	cryptkey[4096];
 extern	fPOINT*			currentFormVertices;
-extern	unsigned		delpnt;
 extern	TCHAR			fileName[_MAX_PATH];
 extern	unsigned		fltad;
 extern	fPOINT			fmovdif;
@@ -1058,7 +1057,6 @@ void delwlk(unsigned cod)
 	ine = 0;
 	flg = 1;
 	histch = &stitchBuffer[MAXSEQ];
-	delpnt = header.stitchCount;
 	for (ind = 0; ind < header.stitchCount; ind++)
 	{
 		if ((stitchBuffer[ind].attribute&WLKFMSK) != cod)
@@ -1071,17 +1069,11 @@ void delwlk(unsigned cod)
 			if (flg)
 			{
 				flg = 0;
-				delpnt = ind;
 			}
 		}
 	}
 	mvstchs(0, MAXSEQ, ine);
 	header.stitchCount = ine;
-	if (ine)
-	{
-		if (delpnt > (unsigned)header.stitchCount)
-			delpnt = header.stitchCount;
-	}
 }
 
 void chkuseq()
