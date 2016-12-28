@@ -332,7 +332,6 @@ fPOINT*			opnts;					//pointer to the list of outside outline points
 fPOINT*			ipnts;					//pointer to the list of inside outline points
 fPOINT			clipReference;			//clipboard reference point
 double			borderWidth = BRDWID;	//border width for satin borders
-unsigned short	lastflt;				//last form point to be filled
 unsigned		selectedFormControlVertex;	//user selected form control point
 POINT			formOutlineRectangle[10];	//form control rectangle in pixel coordinates
 unsigned		fixed;					//part of form rectangle that is fixed during stretching or expanding
@@ -2272,7 +2271,6 @@ void chkbrd() {
 
 	fvars(closestFormToCursor);
 	if (SelectedForm->edgeType) {
-		lastflt = getlast();
 		switch (SelectedForm->edgeType&NEGUND) {
 		case EGLIN:
 
@@ -2457,14 +2455,12 @@ void refilfn() {
 		switch (SelectedForm->edgeType&NEGUND) {
 		case EGLIN:
 
-			lastflt = 0;
 			brdfil(SelectedForm->edgeStitchLen);
 			ritbrd();
 			break;
 
 		case EGBLD:
 
-			lastflt = 0;
 			bold(SelectedForm->edgeStitchLen);
 			ritbrd();
 			break;
@@ -2527,7 +2523,6 @@ void refilfn() {
 
 		case EGDUB:
 
-			lastflt = 0;
 			dubfn();
 			ritbrd();
 			break;
