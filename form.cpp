@@ -368,7 +368,6 @@ RGSEQ*			tmpath;					//temporary path connections
 unsigned		mpathi;					//index to path of sequenced regions
 unsigned		nextGroup;				//group that connects to the next region
 unsigned*		sequenceFlagBitmap;		//a bitmap of sequenced lines
-unsigned*		srgns;					//an array of subregion starts
 REGION*			currentRegion;			//region currently being sequenced
 fPOINT			dunpnts[4];				//corners of last region sequenced
 FRMHED			angledForm;				//a temporary rotated form for angle fills
@@ -3649,9 +3648,6 @@ void lcon() {
 			}
 			regionsList[ind].cntbrk = cnt;
 		}
-		srgns = new unsigned[sind];
-		for (ind = 0; ind < sind; ind++)
-			srgns[ind] = tsrgns[ind];
 		tmap = (RCON*)bseq;
 		mapIndexSequence = new unsigned[regionCount + 1];
 
@@ -3805,7 +3801,6 @@ void lcon() {
 				  delete[] pathMap;
 				  delete[] groupIndexSequence;
 				  delete[] sequenceFlagBitmap;
-				  delete[] srgns;
 	}
 }
 
