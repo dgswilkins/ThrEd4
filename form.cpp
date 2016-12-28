@@ -312,7 +312,6 @@ fPOINT			oseq[OSEQLEN];			//temporary storage for sequencing
 double			slope;					//slope of line in angle fills
 unsigned		satinIndex;				//pointer to next satin point to enter
 fPOINT			fmovdif;				//offset for moving forms
-POINT			bakpnt;					//user moved a form point to here
 fPOINT			tempPolygon[MAXFRMLINS];	//temporary storage when user is entering a polygon;
 unsigned		outputIndex;			//output pointer for sequencing
 double*			lengths;				//array of cumulative lengths used in satin fills
@@ -5522,8 +5521,6 @@ void unfil() {
 						setMap(FILMSG);
 						okcan();
 						setMap(IGNOR);
-						bakpnt.x = msg.pt.x;
-						bakpnt.y = msg.pt.y;
 						return;
 					}
 				}
