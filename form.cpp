@@ -334,7 +334,6 @@ fPOINT			clipReference;			//clipboard reference point
 double			borderWidth = BRDWID;	//border width for satin borders
 unsigned		selectedFormControlVertex;	//user selected form control point
 POINT			formOutlineRectangle[10];	//form control rectangle in pixel coordinates
-unsigned		fixed;					//part of form rectangle that is fixed during stretching or expanding
 double			xyRatio;				//expand form aspect ratio
 HWND			thDat[LASTLIN];			//data handles for the form data sheet
 HWND			thTxt[LASTLIN];			//text handles for the form data sheet
@@ -343,13 +342,12 @@ RECT			rightWindowCoords;		//location of right windows in the form data sheet
 POINT			leftWindowSize;			//size of the left windows in the form data sheet
 POINT			rightWindowSize;		//size of the right windows in the form data sheet
 fPOINT			lowerLeftStitch;		//lower left point in a form
-VRCT2*			pvrct;					//fill points for vertical satin fill
-VRCT2*			uvrct;					//underlay fill points for vertical satin fill
-POINT			mvlin[3];				//points to form points to be moved
-unsigned*		xhst;					//x histogram for snap together
-fPOINT			rsiz;					//hoop size
+VRCT2*			pointsVertRect;			//fill points for vertical satin fill
+VRCT2*			underlayVertRect;		//underlay fill points for vertical satin fill
+POINT			rubberBandLine[3];		//points to form points to be moved
+unsigned*		xHistogram;				//x histogram for snap together
 double			snapLength = SNPLEN*PFGRAN;		//snap together length
-unsigned*		xpnts;					//stitch indices sorted according to x values
+unsigned*		xPoints;				//stitch indices sorted according to x values
 unsigned		colorBitmap;			//bitmap of colors in a design for sort
 unsigned		dunmap[MAXFRMLINS / 32 + 1];	//bitmap of sorted segments
 double			starRatio = STARAT;			//star point to body ratio
@@ -1506,8 +1504,8 @@ void drwfrm() {
 			ritfrct(closestFormToCursor, stitchWindowMemDC);
 		if (chkMap(FRMPMOV)) {
 			ritmov();
-			mvlin[1].x = msg.pt.x - stitchWindowOrigin.x;
-			mvlin[1].y = msg.pt.y - stitchWindowOrigin.y;
+			rubberBandLine[1].x = msg.pt.x - stitchWindowOrigin.x;
+			rubberBandLine[1].y = msg.pt.y - stitchWindowOrigin.y;
 			setMap(SHOMOV);
 			ritmov();
 		}
@@ -1852,8 +1850,8 @@ void frmovlin() {
 	ine = prv(closestVertexToCursor);
 	for (ind = 0; ind < 3; ind++)
 	{
-		mvlin[ind].x = formLines[ine].x;
-		mvlin[ind].y = formLines[ine].y;
+		rubberBandLine[ind].x = formLines[ine].x;
+		rubberBandLine[ind].y = formLines[ine].y;
 		ine++;
 	}
 	ritmov();
@@ -8371,7 +8369,7 @@ void sprct(unsigned strt, unsigned fin) {
 	dPOINT	dif, tpnt;
 	VRCT2*	tvrct;
 
-	tvrct = &pvrct[strt];
+	tvrct = &pointsVertRect[strt];
 	dif.x = opnts[fin].x - opnts[strt].x;
 	dif.y = opnts[fin].y - opnts[strt].y;
 	if (dif.x&&dif.y) {
@@ -8487,10 +8485,10 @@ void spurfn(dPOINT* ipnt, dPOINT* p_opnt, dPOINT* uipnt, dPOINT* uopnt) {
 }
 
 void spurct(unsigned ind) {
-	spurfn(&pvrct[ind].aipnt, &pvrct[ind].aopnt, &uvrct[ind].aipnt, &uvrct[ind].aopnt);
-	spurfn(&pvrct[ind].bipnt, &pvrct[ind].bopnt, &uvrct[ind].bipnt, &uvrct[ind].bopnt);
-	spurfn(&pvrct[ind].cipnt, &pvrct[ind].copnt, &uvrct[ind].cipnt, &uvrct[ind].copnt);
-	spurfn(&pvrct[ind].dipnt, &pvrct[ind].dopnt, &uvrct[ind].dipnt, &uvrct[ind].dopnt);
+	spurfn(&pointsVertRect[ind].aipnt, &pointsVertRect[ind].aopnt, &underlayVertRect[ind].aipnt, &underlayVertRect[ind].aopnt);
+	spurfn(&pointsVertRect[ind].bipnt, &pointsVertRect[ind].bopnt, &underlayVertRect[ind].bipnt, &underlayVertRect[ind].bopnt);
+	spurfn(&pointsVertRect[ind].cipnt, &pointsVertRect[ind].copnt, &underlayVertRect[ind].cipnt, &underlayVertRect[ind].copnt);
+	spurfn(&pointsVertRect[ind].dipnt, &pointsVertRect[ind].dopnt, &underlayVertRect[ind].dipnt, &underlayVertRect[ind].dopnt);
 }
 
 unsigned psg() {
@@ -8556,27 +8554,27 @@ void spend(unsigned strt, unsigned fin) {
 	unsigned	ind, cnt, lvl;
 	dPOINT		ipnt, l_opnt;
 
-	idif.x = pvrct[fin].cipnt.x - pvrct[strt].bipnt.x;
-	idif.y = pvrct[fin].cipnt.y - pvrct[strt].bipnt.y;
-	odif.x = pvrct[fin].copnt.x - pvrct[strt].bopnt.x;
-	odif.y = pvrct[fin].copnt.y - pvrct[strt].bopnt.y;
+	idif.x = pointsVertRect[fin].cipnt.x - pointsVertRect[strt].bipnt.x;
+	idif.y = pointsVertRect[fin].cipnt.y - pointsVertRect[strt].bipnt.y;
+	odif.x = pointsVertRect[fin].copnt.x - pointsVertRect[strt].bopnt.x;
+	odif.y = pointsVertRect[fin].copnt.y - pointsVertRect[strt].bopnt.y;
 	ilen = hypot(idif.x, idif.y);
 	olen = hypot(odif.x, odif.y);
 	if (olen > ilen) {
-		piv.x = pvrct[strt].cipnt.x;
-		piv.y = pvrct[strt].cipnt.y;
-		sdif.x = pvrct[strt].copnt.x - piv.x;
-		sdif.y = pvrct[strt].copnt.y - piv.y;
-		fdif.x = pvrct[fin].bopnt.x - piv.x;
-		fdif.y = pvrct[fin].bopnt.y - piv.y;
+		piv.x = pointsVertRect[strt].cipnt.x;
+		piv.y = pointsVertRect[strt].cipnt.y;
+		sdif.x = pointsVertRect[strt].copnt.x - piv.x;
+		sdif.y = pointsVertRect[strt].copnt.y - piv.y;
+		fdif.x = pointsVertRect[fin].bopnt.x - piv.x;
+		fdif.y = pointsVertRect[fin].bopnt.y - piv.y;
 	}
 	else {
-		piv.x = pvrct[strt].copnt.x;
-		piv.y = pvrct[strt].copnt.y;
-		sdif.x = pvrct[strt].cipnt.x - piv.x;
-		sdif.y = pvrct[strt].cipnt.y - piv.y;
-		fdif.x = pvrct[fin].bipnt.x - piv.x;
-		fdif.y = pvrct[fin].bipnt.y - piv.y;
+		piv.x = pointsVertRect[strt].copnt.x;
+		piv.y = pointsVertRect[strt].copnt.y;
+		sdif.x = pointsVertRect[strt].cipnt.x - piv.x;
+		sdif.y = pointsVertRect[strt].cipnt.y - piv.y;
+		fdif.x = pointsVertRect[fin].bipnt.x - piv.x;
+		fdif.y = pointsVertRect[fin].bipnt.y - piv.y;
 	}
 	if (hypot(selectedPoint.x - piv.x, selectedPoint.y - piv.y) > 2 * PI)
 		filinsb(piv);
@@ -8615,34 +8613,34 @@ void duspnd(unsigned strt, unsigned fin) {
 
 	if (chkMap(UND)) {
 		if (chkMap(UNDPHAS)) {
-			filinsb(uvrct[strt].copnt);
-			filinsb(uvrct[strt].cipnt);
-			dif.x = uvrct[fin].bipnt.x - uvrct[strt].cipnt.x;
-			dif.y = uvrct[fin].bipnt.y - uvrct[strt].cipnt.y;
+			filinsb(underlayVertRect[strt].copnt);
+			filinsb(underlayVertRect[strt].cipnt);
+			dif.x = underlayVertRect[fin].bipnt.x - underlayVertRect[strt].cipnt.x;
+			dif.y = underlayVertRect[fin].bipnt.y - underlayVertRect[strt].cipnt.y;
 			len = hypot(dif.x, dif.y);
 			if (len > SelectedForm->edgeStitchLen) {
 				tang = atan2(ipnts[fin].y - opnts[fin].y, ipnts[fin].x - opnts[fin].x);
-				tpnt.x = uvrct[fin].bopnt.x + cos(tang)*plen;
-				tpnt.y = uvrct[fin].bopnt.y + sin(tang)*plen;
+				tpnt.x = underlayVertRect[fin].bopnt.x + cos(tang)*plen;
+				tpnt.y = underlayVertRect[fin].bopnt.y + sin(tang)*plen;
 				filinsb(tpnt);
 			}
-			filinsb(uvrct[fin].bipnt);
-			filinsb(uvrct[fin].bopnt);
+			filinsb(underlayVertRect[fin].bipnt);
+			filinsb(underlayVertRect[fin].bopnt);
 		}
 		else {
-			filinsb(uvrct[strt].cipnt);
-			filinsb(uvrct[strt].copnt);
-			dif.x = uvrct[fin].bopnt.x - uvrct[strt].copnt.x;
-			dif.y = uvrct[fin].bopnt.y - uvrct[strt].copnt.y;
+			filinsb(underlayVertRect[strt].cipnt);
+			filinsb(underlayVertRect[strt].copnt);
+			dif.x = underlayVertRect[fin].bopnt.x - underlayVertRect[strt].copnt.x;
+			dif.y = underlayVertRect[fin].bopnt.y - underlayVertRect[strt].copnt.y;
 			len = hypot(dif.x, dif.y);
 			if (len > SelectedForm->edgeStitchLen) {
 				tang = atan2(opnts[fin].y - ipnts[fin].y, opnts[fin].x - ipnts[fin].x);
-				tpnt.x = uvrct[fin].bipnt.x + cos(tang)*plen;
-				tpnt.y = uvrct[fin].bipnt.y + sin(tang)*plen;
+				tpnt.x = underlayVertRect[fin].bipnt.x + cos(tang)*plen;
+				tpnt.y = underlayVertRect[fin].bipnt.y + sin(tang)*plen;
 				filinsb(tpnt);
 			}
-			filinsb(uvrct[fin].bopnt);
-			filinsb(uvrct[fin].bipnt);
+			filinsb(underlayVertRect[fin].bopnt);
+			filinsb(underlayVertRect[fin].bipnt);
 		}
 	}
 	else
@@ -8768,8 +8766,8 @@ void plbrd(double spac) {
 	slin = getlast();
 	prebrd();
 	tspac = stitchSpace;
-	pvrct = (VRCT2*)bseq;
-	uvrct = &pvrct[sides];
+	pointsVertRect = (VRCT2*)bseq;
+	underlayVertRect = &pointsVertRect[sides];
 	satout(SelectedForm->borderSize);
 	ipnts[sides].x = ipnts[0].x;
 	ipnts[sides].y = ipnts[0].y;
@@ -8784,13 +8782,13 @@ void plbrd(double spac) {
 	spurct(ind);
 	if (!(SelectedForm->attribute&SBLNT))
 	{
-		pvrct[1].aipnt.x = pvrct[1].aopnt.x = uvrct[1].aipnt.x = uvrct[1].aopnt.x = SelectedForm->vertices[1].x;
-		pvrct[1].aipnt.y = pvrct[1].aopnt.y = uvrct[1].aipnt.y = uvrct[1].aopnt.y = SelectedForm->vertices[1].y;
+		pointsVertRect[1].aipnt.x = pointsVertRect[1].aopnt.x = underlayVertRect[1].aipnt.x = underlayVertRect[1].aopnt.x = SelectedForm->vertices[1].x;
+		pointsVertRect[1].aipnt.y = pointsVertRect[1].aopnt.y = underlayVertRect[1].aipnt.y = underlayVertRect[1].aopnt.y = SelectedForm->vertices[1].y;
 	}
 	if (!(SelectedForm->attribute&FBLNT))
 	{
-		pvrct[sides - 4].dipnt.x = pvrct[sides - 4].dopnt.x = uvrct[sides - 4].dipnt.x = uvrct[sides - 4].dopnt.x = SelectedForm->vertices[sides - 1].x;
-		pvrct[sides - 4].dipnt.y = pvrct[sides - 4].dopnt.y = uvrct[sides - 4].dipnt.y = uvrct[sides - 4].dopnt.y = SelectedForm->vertices[sides - 1].y;
+		pointsVertRect[sides - 4].dipnt.x = pointsVertRect[sides - 4].dopnt.x = underlayVertRect[sides - 4].dipnt.x = underlayVertRect[sides - 4].dopnt.x = SelectedForm->vertices[sides - 1].x;
+		pointsVertRect[sides - 4].dipnt.y = pointsVertRect[sides - 4].dopnt.y = underlayVertRect[sides - 4].dipnt.y = underlayVertRect[sides - 4].dopnt.y = SelectedForm->vertices[sides - 1].y;
 	}
 	sequenceIndex = 0;
 	selectedPoint.x = currentFormVertices[0].x;
@@ -8801,13 +8799,13 @@ void plbrd(double spac) {
 		plen = SelectedForm->borderSize*URAT;
 		setMap(UNDPHAS);
 		rstMap(FILDIR);
-		plfn(&uvrct[0]);
+		plfn(&underlayVertRect[0]);
 		bpnt = sequenceIndex;
 		rstMap(UNDPHAS);
 		selectedPoint.x = currentFormVertices[0].x;
 		selectedPoint.y = currentFormVertices[0].y;
 		setMap(FILDIR);
-		plfn(&uvrct[0]);
+		plfn(&underlayVertRect[0]);
 		plbak(bpnt);
 		prsmal();
 		if (sequenceIndex) { //ensure that we can do a valid read from oseq
@@ -8817,7 +8815,7 @@ void plbrd(double spac) {
 	}
 	rstMap(UND);
 	stitchSpace = SelectedForm->edgeSpacing;
-	plfn(&pvrct[0]);
+	plfn(&pointsVertRect[0]);
 	stitchSpace = spac;
 	fvars(closestFormToCursor);
 }
@@ -8830,8 +8828,8 @@ void pbrd(double spac) {
 	tspac = stitchSpace;
 	stitchSpace = SelectedForm->edgeSpacing;
 	sequenceIndex = 0;
-	pvrct = (VRCT2*)bseq;
-	uvrct = &pvrct[sides];
+	pointsVertRect = (VRCT2*)bseq;
+	underlayVertRect = &pointsVertRect[sides];
 	strt = getlast();
 	satout(SelectedForm->borderSize);
 	for (ind = 0; ind < (unsigned)sides - 1; ind++) {
@@ -8848,16 +8846,16 @@ void pbrd(double spac) {
 		satout(plen);
 		setMap(UNDPHAS);
 		setMap(FILDIR);
-		pfn(strt, &uvrct[0]);
+		pfn(strt, &underlayVertRect[0]);
 		rstMap(UNDPHAS);
 		rstMap(FILDIR);
-		pfn(strt, &uvrct[0]);
+		pfn(strt, &underlayVertRect[0]);
 		stitchSpace = spac;
 		prsmal();
 		plen = SelectedForm->borderSize;
 		rstMap(UND);
 	}
-	pfn(strt, &pvrct[0]);
+	pfn(strt, &pointsVertRect[0]);
 	stitchSpace = tspac;
 }
 
@@ -9179,13 +9177,13 @@ void snpfn(unsigned xind, unsigned len) {
 	unsigned	ind, ine, fin, ref, chk;
 	double		tlen;
 
-	fin = xhst[xind + len];
-	ind = xhst[xind];
+	fin = xHistogram[xind + len];
+	ind = xHistogram[xind];
 	if (fin - ind) {
-		for (ind = xhst[xind]; ind < xhst[xind + 1]; ind++) {
-			ref = xpnts[ind];
+		for (ind = xHistogram[xind]; ind < xHistogram[xind + 1]; ind++) {
+			ref = xPoints[ind];
 			for (ine = ind + 1; ine < fin; ine++) {
-				chk = xpnts[ine];
+				chk = xPoints[ine];
 				tlen = hypot(stitchBuffer[chk].x - stitchBuffer[ref].x, stitchBuffer[chk].y - stitchBuffer[ref].y);
 				if (tlen < snapLength) {
 					stitchBuffer[chk].x = stitchBuffer[ref].x;
@@ -9230,48 +9228,48 @@ void snp(unsigned strt, unsigned fin) {
 	unsigned*	txhst;
 
 	chkrng(&l_rsiz);
-	xpnts = (unsigned*)bseq;
+	xPoints = (unsigned*)bseq;
 	ZeroMemory(bseq, 65536 * sizeof(unsigned));
-	xhst = txhst = new unsigned[static_cast<int>(l_rsiz.x) + 1];
+	xHistogram = txhst = new unsigned[static_cast<int>(l_rsiz.x) + 1];
 	for (ind = 0; ind < l_rsiz.x; ind++)
-		xhst[ind] = 0;
+		xHistogram[ind] = 0;
 	if (chkMap(FORMSEL)) {
 		at = (closestFormToCursor << 4)&FRMSK;
 		for (ind = strt; ind < fin; ind++) {
 			if (!(stitchBuffer[ind].attribute&NOTFRM) && (stitchBuffer[ind].attribute&FRMSK) == at) {
 				tuns = stitchBuffer[ind].x;
-				xhst[tuns]++;
+				xHistogram[tuns]++;
 			}
 		}
 	}
 	else {
 		for (ind = strt; ind < fin; ind++) {
 			tuns = stitchBuffer[ind].x;
-			xhst[tuns]++;
+			xHistogram[tuns]++;
 		}
 	}
 	acc = 0;
 	for (ind = 0; ind < l_rsiz.x; ind++) {
-		tuns = xhst[ind];
-		xhst[ind] = acc;
+		tuns = xHistogram[ind];
+		xHistogram[ind] = acc;
 		acc += tuns;
 	}
-	xhst[ind] = acc;
+	xHistogram[ind] = acc;
 	if (chkMap(FORMSEL)) {
 		for (ind = 0; ind < header.stitchCount; ind++) {
 			if (!(stitchBuffer[ind].attribute&NOTFRM) && (stitchBuffer[ind].attribute&FRMSK) == at) {
 				tuns = stitchBuffer[ind].x;
-				xpnts[xhst[tuns]++] = ind;
+				xPoints[xHistogram[tuns]++] = ind;
 			}
 		}
 	}
 	else {
 		for (ind = 0; ind < header.stitchCount; ind++) {
 			tuns = stitchBuffer[ind].x;
-			xpnts[xhst[tuns]++] = ind;
+			xPoints[xHistogram[tuns]++] = ind;
 		}
 	}
-	xhst = &xhst[1];
+	xHistogram = &xHistogram[1];
 	chklen = snapLength * 2 + 1;
 	nutim(l_rsiz.x);
 	for (ind = 0; ind < l_rsiz.x - chklen; ind++) {

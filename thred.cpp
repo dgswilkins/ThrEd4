@@ -418,7 +418,7 @@ extern	HWND			hsrch;
 extern	fPOINT			iseq[MAXSEQ];
 extern	TCHAR*			laytxt[];
 extern	fPOINT			lowerLeftStitch;
-extern	POINT			mvlin[3];
+extern	POINT			rubberBandLine[3];
 extern	unsigned		newFormVertexCount;
 extern	unsigned		outputIndex;
 extern	fPOINT			oseq[OSEQLEN];
@@ -10740,17 +10740,17 @@ void ritmov() {
 	if (closestVertexToCursor) {
 
 		if (closestVertexToCursor == (unsigned)SelectedForm->sides - 1 && SelectedForm->type == LIN)
-			Polyline(stitchWindowDC, mvlin, 2);
+			Polyline(stitchWindowDC, rubberBandLine, 2);
 		else
-			Polyline(stitchWindowDC, mvlin, 3);
+			Polyline(stitchWindowDC, rubberBandLine, 3);
 	} else {
 
-		mvlin[2].x = formLines[1].x;
-		mvlin[2].y = formLines[1].y;
+		rubberBandLine[2].x = formLines[1].x;
+		rubberBandLine[2].y = formLines[1].y;
 		if (SelectedForm->type == LIN)
-			Polyline(stitchWindowDC, &mvlin[1], 2);
+			Polyline(stitchWindowDC, &rubberBandLine[1], 2);
 		else
-			Polyline(stitchWindowDC, mvlin, 3);
+			Polyline(stitchWindowDC, rubberBandLine, 3);
 	}
 	SetROP2(stitchWindowDC, R2_COPYPEN);
 }
@@ -15809,8 +15809,8 @@ unsigned chkMsg() {
 			if (chkMap(FRMPMOV)) {
 
 				unmov();
-				mvlin[1].x = msg.pt.x - stitchWindowOrigin.x;
-				mvlin[1].y = msg.pt.y - stitchWindowOrigin.y;
+				rubberBandLine[1].x = msg.pt.x - stitchWindowOrigin.x;
+				rubberBandLine[1].y = msg.pt.y - stitchWindowOrigin.y;
 				setMap(SHOMOV);
 				ritmov();
 				if (px2stch())
