@@ -6530,7 +6530,7 @@ void sav() {
 
 	unsigned		ind, l_stind;
 	unsigned long	wrot;
-	double			frct, intg;
+	double			fractionalPart, integerPart;
 	DSTHED			dsthed;
 	TCHAR*			pchr;
 	POINT			loc;
@@ -6544,7 +6544,7 @@ void sav() {
 	unsigned		mtchind = 0;
 	unsigned		mtchmin;
 	unsigned char	pescol;
-	fRECTANGLE			srct;
+	fRECTANGLE		srct;
 	unsigned		tcol, ine;
 	unsigned		pcolcnt;
 	unsigned*		pesof;
@@ -6757,12 +6757,12 @@ void sav() {
 					ptrFileBuffer[l_stind].typ = 3;
 					ptrFileBuffer[l_stind++].fx = savcol;
 				}
-				frct = modf(rotatedStitches[ind].x, &intg);
-				ptrFileBuffer[l_stind].fx = frct * 256;
-				ptrFileBuffer[l_stind].x = intg;
-				frct = modf(rotatedStitches[ind].y, &intg);
-				ptrFileBuffer[l_stind].fy = frct * 256;
-				ptrFileBuffer[l_stind++].y = intg;
+				fractionalPart = modf(rotatedStitches[ind].x, &integerPart);
+				ptrFileBuffer[l_stind].fx = fractionalPart * 256;
+				ptrFileBuffer[l_stind].x = integerPart;
+				fractionalPart = modf(rotatedStitches[ind].y, &integerPart);
+				ptrFileBuffer[l_stind].fy = fractionalPart * 256;
+				ptrFileBuffer[l_stind++].y = integerPart;
 			}
 			if (!WriteFile(hPcsFile, ptrFileBuffer, l_stind * sizeof(PCSTCH), &wrot, 0)) {
 

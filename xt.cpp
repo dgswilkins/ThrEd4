@@ -63,7 +63,7 @@ extern	unsigned		hThrEdClip;
 extern	HWND			hVerticalScrollBar;
 extern	HWND			hWnd;
 extern	INIFILE			iniFile;
-extern	fPOINT*			ipnts;
+extern	fPOINT*			insidePoints;
 extern	unsigned		isind;
 extern	fPOINT*			lconflt;
 extern	unsigned		markedStitchMap[RMAPSIZ];
@@ -71,7 +71,7 @@ extern	MSG				msg;
 extern	TCHAR			msgbuf[MSGSIZ];
 extern	unsigned		newFormVertexCount;
 extern	unsigned		outputIndex;
-extern	fPOINT*			opnts;
+extern	fPOINT*			outsidePoints;
 extern	fPOINT			oseq[OSEQLEN];
 extern	unsigned		pseudoRandomValue;
 extern	FRMHED*			SelectedForm;
@@ -1022,8 +1022,8 @@ void pes2crd() {
 
 void sidlen(unsigned strt, unsigned fin, double* ilen, double* olen)
 {
-	*ilen += hypot(ipnts[fin].x - ipnts[strt].x, ipnts[fin].x - ipnts[strt].x);
-	*olen += hypot(opnts[fin].x - opnts[strt].x, opnts[fin].x - opnts[strt].x);
+	*ilen += hypot(insidePoints[fin].x - insidePoints[strt].x, insidePoints[fin].x - insidePoints[strt].x);
+	*olen += hypot(outsidePoints[fin].x - outsidePoints[strt].x, outsidePoints[fin].x - outsidePoints[strt].x);
 }
 
 fPOINT* insid()
@@ -1035,16 +1035,16 @@ fPOINT* insid()
 	{
 		for (ind = 0; ind < sides; ind++)
 		{
-			if (!cisin(ipnts[ind].x, ipnts[ind].y))
+			if (!cisin(insidePoints[ind].x, insidePoints[ind].y))
 			{
-				ipnts[ind].x = currentFormVertices[ind].x;
-				ipnts[ind].y = currentFormVertices[ind].y;
+				insidePoints[ind].x = currentFormVertices[ind].x;
+				insidePoints[ind].y = currentFormVertices[ind].y;
 			}
 		}
-		return ipnts;
+		return insidePoints;
 	}
 	else
-		return opnts;
+		return outsidePoints;
 }
 
 void delwlk(unsigned cod)

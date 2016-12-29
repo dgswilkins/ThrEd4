@@ -324,10 +324,10 @@ unsigned short	startPoint;				//starting point for a satin stitch guide-line
 double			plen;					//horizontal length of a clipboard fill/2
 double			plen2;					//horizontal length of a clipboard fill
 fPOINT			lastPoint;				//last point written by line connect routine
-fPOINT			opntlst[MAXFRMLINS];	//list of outside outline points for satin or clipboard fills
-fPOINT			ipntlst[MAXFRMLINS];	//list of inside outline points for satin or clipboard fills
-fPOINT*			opnts;					//pointer to the list of outside outline points
-fPOINT*			ipnts;					//pointer to the list of inside outline points
+fPOINT			outsidePointList[MAXFRMLINS];	//list of outside outline points for satin or clipboard fills
+fPOINT			insidePointList[MAXFRMLINS];	//list of inside outline points for satin or clipboard fills
+fPOINT*			outsidePoints;			//pointer to the list of outside outline points
+fPOINT*			insidePoints;			//pointer to the list of inside outline points
 fPOINT			clipReference;			//clipboard reference point
 double			borderWidth = BRDWID;	//border width for satin borders
 unsigned		selectedFormControlVertex;	//user selected form control point
@@ -381,14 +381,13 @@ fRECTANGLE		allItemsRectangle;		//rectangle enclosing all forms and stitches
 double			formAngles[MAXFRMLINS];	//angles of a form for satin border fills
 fPOINT			formPoints[MAXFRMPNTS];	//form points
 unsigned		fltad;					//next index to append form points
-fPOINT			clipboardPoints[MAXCLPNTS];		//main clipboard fill points for forms
+fPOINT			clipboardPoints[MAXCLPNTS];	//main clipboard fill points for forms
 unsigned		clpad;					//next index to append main clipboard points
 SATCON			satks[MAXSAC];			//satin form connects
 unsigned		satkad;					//next index to append satin connect points
-float			buttonholeFillCornerLength = IBFCLEN;			//buttonhole corner length
-float			picotSpace = IPICSPAC;		//space between border picots
+float			buttonholeFillCornerLength = IBFCLEN;	//buttonhole corner length
+float			picotSpace = IPICSPAC;	//space between border picots
 unsigned		pseudoRandomValue;		//pseudo-random sequence register
-unsigned		prgind;					//segment sorting index;
 dPOINT			filbak[8];				//backup stitches in satin fills
 unsigned		pfbak;					//pointer for backup stitches in satin fills
 double			clpang;					//for clipboard border fill
@@ -5991,13 +5990,12 @@ void clpbrd(unsigned short strtlin) {
 void outfn(unsigned strt, unsigned fin, double satwid) {
 	double		l_ang;
 	double		len;
-	double		xof, yof;
+	double		xOffset, yOffset;
 
-	if (fabs(formAngles[strt]) < TINY&&fabs(formAngles[fin]) < TINY) {
-		xof = 0;
-		yof = satwid;
-	}
-	else {
+	if (fabs(formAngles[strt]) < TINY && fabs(formAngles[fin]) < TINY) {
+		xOffset = 0;
+		yOffset = satwid;
+	} else {
 #define SATHRESH 10
 
 		l_ang = (formAngles[fin] - formAngles[strt]) / 2;
@@ -6007,13 +6005,13 @@ void outfn(unsigned strt, unsigned fin, double satwid) {
 		if (len > satwid*SATHRESH)
 			len = satwid*SATHRESH;
 		l_ang += formAngles[strt] + PI / 2;
-		xof = len*cos(l_ang);
-		yof = len*sin(l_ang);
+		xOffset = len*cos(l_ang);
+		yOffset = len*sin(l_ang);
 	}
-	ipnts[fin].x = currentFormVertices[fin].x - xof;
-	ipnts[fin].y = currentFormVertices[fin].y - yof;
-	opnts[fin].x = currentFormVertices[fin].x + xof;
-	opnts[fin].y = currentFormVertices[fin].y + yof;
+	insidePoints[fin].x = currentFormVertices[fin].x - xOffset;
+	insidePoints[fin].y = currentFormVertices[fin].y - yOffset;
+	outsidePoints[fin].x = currentFormVertices[fin].x + xOffset;
+	outsidePoints[fin].y = currentFormVertices[fin].y + yOffset;
 }
 
 void duangs() {
@@ -6030,14 +6028,14 @@ void satout(double satwid) {
 
 	if (sides) {
 		duangs();
-		opnts = opntlst;
-		ipnts = ipntlst;
+		outsidePoints = outsidePointList;
+		insidePoints = insidePointList;
 		for (ind = 0; ind < (unsigned)sides - 1; ind++)
 			outfn(ind, ind + 1, 0.1);
 		cnt = 0;
 		for (ind = 0; ind < sides; ind++)
 		{
-			if (cisin(ipnts[ind].x, ipnts[ind].y))
+			if (cisin(insidePoints[ind].x, insidePoints[ind].y))
 				cnt++;
 		}
 		satwid /= 2;
@@ -6048,8 +6046,8 @@ void satout(double satwid) {
 		if (cnt < (unsigned)sides >> 1)
 		{
 			setMap(INDIR);
-			opnts = ipntlst;
-			ipnts = opntlst;
+			outsidePoints = insidePointList;
+			insidePoints = outsidePointList;
 		}
 	}
 }
@@ -6059,7 +6057,7 @@ void clpout() {
 		satout(plen);
 	else {
 		satout(clipboardRectSize.cy);
-		ipnts = SelectedForm->vertices;
+		insidePoints = SelectedForm->vertices;
 	}
 }
 
@@ -6171,20 +6169,20 @@ BOOL linx(fPOINT* p_flt, unsigned strt, unsigned fin, dPOINT* npnt) {
 	dPOINT	dif;
 	dPOINT	tdub;
 
-	dif.x = opnts[strt].x - p_flt[strt].x;
-	dif.y = opnts[strt].y - p_flt[strt].y;
+	dif.x = outsidePoints[strt].x - p_flt[strt].x;
+	dif.y = outsidePoints[strt].y - p_flt[strt].y;
 	if (!dif.x && !dif.y)
 		return 0;
 	tdub.x = p_flt[strt].x;
 	tdub.y = p_flt[strt].y;
 	if (dif.x) {
-		if (proj(tdub, dif.y / dif.x, opnts[fin], p_flt[fin], npnt))
+		if (proj(tdub, dif.y / dif.x, outsidePoints[fin], p_flt[fin], npnt))
 			return 1;
 		else
 			return 0;
 	}
 	else {
-		if (projv(tdub.x, p_flt[fin], opnts[fin], npnt))
+		if (projv(tdub.x, p_flt[fin], outsidePoints[fin], npnt))
 			return 1;
 		else
 			return 0;
@@ -6198,7 +6196,7 @@ void filinsbw(dPOINT pnt) {
 	filinsb(pnt);
 }
 
-void sbfn(fPOINT* p_flt, unsigned strt, unsigned fin) {
+void sbfn(fPOINT* p_flt, unsigned start, unsigned finish) {
 	dPOINT		idif, odif, istp, ostp, l_opnt, ipnt;
 	dPOINT		bdif, bstp, bpnt;
 	dPOINT		npnt;
@@ -6206,19 +6204,19 @@ void sbfn(fPOINT* p_flt, unsigned strt, unsigned fin) {
 	unsigned	cnt, iflg, oflg, bcnt, ind, xflg;
 
 	if (!setMap(SAT1)) {
-		selectedPoint.x = p_flt[strt].x;
-		selectedPoint.y = p_flt[strt].y;
+		selectedPoint.x = p_flt[start].x;
+		selectedPoint.y = p_flt[start].y;
 	}
-	idif.x = p_flt[fin].x - p_flt[strt].x;
-	idif.y = p_flt[fin].y - p_flt[strt].y;
-	odif.x = opnts[fin].x - opnts[strt].x;
-	odif.y = opnts[fin].y - opnts[strt].y;
+	idif.x = p_flt[finish].x - p_flt[start].x;
+	idif.y = p_flt[finish].y - p_flt[start].y;
+	odif.x = outsidePoints[finish].x - outsidePoints[start].x;
+	odif.y = outsidePoints[finish].y - outsidePoints[start].y;
 	ilen = hypot(idif.x, idif.y);
 	olen = hypot(odif.x, odif.y);
-	ipnt.x = p_flt[strt].x;
-	ipnt.y = p_flt[strt].y;
-	l_opnt.x = opnts[strt].x;
-	l_opnt.y = opnts[strt].y;
+	ipnt.x = p_flt[start].x;
+	ipnt.y = p_flt[start].y;
+	l_opnt.x = outsidePoints[start].x;
+	l_opnt.y = outsidePoints[start].y;
 	xflg = pfbak = iflg = oflg = bcnt = 0;
 	for (ind = 0; ind < 8; ind++) {
 		filbak[ind].x = (float)1e12;
@@ -6227,7 +6225,7 @@ void sbfn(fPOINT* p_flt, unsigned strt, unsigned fin) {
 	if (olen > ilen) {
 		cnt = olen / stitchSpace;
 		iflg = 1;
-		if (linx(p_flt, strt, fin, &npnt)) {
+		if (linx(p_flt, start, finish, &npnt)) {
 			xflg = 1;
 			idif.x = idif.y = ilen = 0;
 			ipnt.x = npnt.x;
@@ -6237,7 +6235,7 @@ void sbfn(fPOINT* p_flt, unsigned strt, unsigned fin) {
 	else {
 		cnt = ilen / stitchSpace;
 		oflg = 1;
-		if (linx(p_flt, strt, fin, &npnt)) {
+		if (linx(p_flt, start, finish, &npnt)) {
 			xflg = 1;
 			odif.x = odif.y = olen = 0;
 			l_opnt.x = npnt.x;
@@ -6298,14 +6296,14 @@ void sbfn(fPOINT* p_flt, unsigned strt, unsigned fin) {
 	}
 }
 
-void sfn(unsigned short strtlin) {
+void sfn(unsigned short startLine) {
 	unsigned ind;
-	unsigned short nlin;
+	unsigned short nextLine;
 
 	for (ind = 0; ind < SelectedForm->sides; ind++) {
-		nlin = nxt(strtlin);
-		sbfn(ipnts, strtlin, nlin);
-		strtlin = nlin;
+		nextLine = nxt(startLine);
+		sbfn(insidePoints, startLine, nextLine);
+		startLine = nextLine;
 	}
 	oseq[0].x = oseq[sequenceIndex - 1].x;
 	oseq[0].y = oseq[sequenceIndex - 1].y;
@@ -6341,7 +6339,7 @@ void rfn(unsigned tlin) {
 
 	for (ind = 0; ind < SelectedForm->sides; ind++) {
 		nlin = nxt(tlin);
-		sbfn(ipnts, tlin, nlin);
+		sbfn(insidePoints, tlin, nlin);
 		tlin = nlin;
 	}
 }
@@ -6363,41 +6361,41 @@ void rbrd() {
 }
 
 void satends(unsigned blnt) {
-	fPOINT		stp;
+	fPOINT		step;
 
 	if (blnt&SBLNT) {
-		stp.x = sin(formAngles[0])*plen / 2;
-		stp.y = cos(formAngles[0])*plen / 2;
+		step.x = sin(formAngles[0])*plen / 2;
+		step.y = cos(formAngles[0])*plen / 2;
 		if (chkMap(INDIR))
 		{
-			stp.x = -stp.x;
-			stp.y = -stp.y;
+			step.x = -step.x;
+			step.y = -step.y;
 		}
-		ipnts[0].x = SelectedForm->vertices[0].x + stp.x;
-		ipnts[0].y = SelectedForm->vertices[0].y - stp.y;
-		opnts[0].x = SelectedForm->vertices[0].x - stp.x;
-		opnts[0].y = SelectedForm->vertices[0].y + stp.y;
+		insidePoints[0].x = SelectedForm->vertices[0].x + step.x;
+		insidePoints[0].y = SelectedForm->vertices[0].y - step.y;
+		outsidePoints[0].x = SelectedForm->vertices[0].x - step.x;
+		outsidePoints[0].y = SelectedForm->vertices[0].y + step.y;
 	}
 	else {
-		ipnts[0].x = opnts[0].x = currentFormVertices[0].x;
-		ipnts[0].y = opnts[0].y = currentFormVertices[0].y;
+		insidePoints[0].x = outsidePoints[0].x = currentFormVertices[0].x;
+		insidePoints[0].y = outsidePoints[0].y = currentFormVertices[0].y;
 	}
 	if (blnt&FBLNT) {
-		stp.x = sin(formAngles[sides - 2])*plen / 2;
-		stp.y = cos(formAngles[sides - 2])*plen / 2;
+		step.x = sin(formAngles[sides - 2])*plen / 2;
+		step.y = cos(formAngles[sides - 2])*plen / 2;
 		if (chkMap(INDIR))
 		{
-			stp.x = -stp.x;
-			stp.y = -stp.y;
+			step.x = -step.x;
+			step.y = -step.y;
 		}
-		ipnts[sides - 1].x = SelectedForm->vertices[sides - 1].x + stp.x;
-		ipnts[sides - 1].y = SelectedForm->vertices[sides - 1].y - stp.y;
-		opnts[sides - 1].x = SelectedForm->vertices[sides - 1].x - stp.x;
-		opnts[sides - 1].y = SelectedForm->vertices[sides - 1].y + stp.y;
+		insidePoints[sides - 1].x = SelectedForm->vertices[sides - 1].x + step.x;
+		insidePoints[sides - 1].y = SelectedForm->vertices[sides - 1].y - step.y;
+		outsidePoints[sides - 1].x = SelectedForm->vertices[sides - 1].x - step.x;
+		outsidePoints[sides - 1].y = SelectedForm->vertices[sides - 1].y + step.y;
 	}
 	else {
-		ipnts[sides - 1].x = opnts[sides - 1].x = currentFormVertices[sides - 1].x;
-		ipnts[sides - 1].y = opnts[sides - 1].y = currentFormVertices[sides - 1].y;
+		insidePoints[sides - 1].x = outsidePoints[sides - 1].x = currentFormVertices[sides - 1].x;
+		insidePoints[sides - 1].y = outsidePoints[sides - 1].y = currentFormVertices[sides - 1].y;
 	}
 }
 
@@ -6414,10 +6412,10 @@ void slbrd() {
 		rstMap(FILDIR);
 		stitchSpace = USPAC;
 		for (ind = 0; ind < (unsigned)SelectedForm->sides - 1; ind++)
-			sbfn(ipnts, ind, ind + 1);
+			sbfn(insidePoints, ind, ind + 1);
 		toglMap(FILDIR);
 		for (ind = SelectedForm->sides - 1; ind; ind--)
-			sbfn(ipnts, ind, ind - 1);
+			sbfn(insidePoints, ind, ind - 1);
 	}
 	plen = SelectedForm->borderSize;
 	satout(plen);
@@ -6425,7 +6423,7 @@ void slbrd() {
 	stitchSpace = SelectedForm->edgeSpacing;
 	rstMap(SAT1);
 	for (ind = 0; ind < (unsigned)SelectedForm->sides - 1; ind++)
-		sbfn(ipnts, ind, ind + 1);
+		sbfn(insidePoints, ind, ind + 1);
 	stitchSpace = tspac;
 }
 
@@ -8360,104 +8358,104 @@ void sprct(unsigned strt, unsigned fin) {
 	VRCT2*	tvrct;
 
 	tvrct = &pointsVertRect[strt];
-	dif.x = opnts[fin].x - opnts[strt].x;
-	dif.y = opnts[fin].y - opnts[strt].y;
+	dif.x = outsidePoints[fin].x - outsidePoints[strt].x;
+	dif.y = outsidePoints[fin].y - outsidePoints[strt].y;
 	if (dif.x&&dif.y) {
 		slope = -dif.x / dif.y;
 		tpnt.x = currentFormVertices[fin].x;
 		tpnt.y = currentFormVertices[fin].y;
-		proj(tpnt, slope, opnts[strt], opnts[fin], &tvrct->dopnt);
-		proj(tpnt, slope, ipnts[strt], ipnts[fin], &tvrct->dipnt);
+		proj(tpnt, slope, outsidePoints[strt], outsidePoints[fin], &tvrct->dopnt);
+		proj(tpnt, slope, insidePoints[strt], insidePoints[fin], &tvrct->dipnt);
 		tpnt.x = currentFormVertices[strt].x;
 		tpnt.y = currentFormVertices[strt].y;
-		proj(tpnt, slope, opnts[strt], opnts[fin], &tvrct->aopnt);
-		proj(tpnt, slope, ipnts[strt], ipnts[fin], &tvrct->aipnt);
-		tpnt.x = ipnts[strt].x;
-		tpnt.y = ipnts[strt].y;
-		if (proj(tpnt, slope, opnts[strt], opnts[fin], &tvrct->bopnt)) {
-			tvrct->bipnt.x = ipnts[strt].x;
-			tvrct->bipnt.y = ipnts[strt].y;
+		proj(tpnt, slope, outsidePoints[strt], outsidePoints[fin], &tvrct->aopnt);
+		proj(tpnt, slope, insidePoints[strt], insidePoints[fin], &tvrct->aipnt);
+		tpnt.x = insidePoints[strt].x;
+		tpnt.y = insidePoints[strt].y;
+		if (proj(tpnt, slope, outsidePoints[strt], outsidePoints[fin], &tvrct->bopnt)) {
+			tvrct->bipnt.x = insidePoints[strt].x;
+			tvrct->bipnt.y = insidePoints[strt].y;
 		}
 		else {
-			tvrct->bopnt.x = opnts[strt].x;
-			tvrct->bopnt.y = opnts[strt].y;
-			tpnt.x = opnts[strt].x;
-			tpnt.y = opnts[strt].y;
-			proj(tpnt, slope, ipnts[strt], ipnts[fin], &tvrct->bipnt);
+			tvrct->bopnt.x = outsidePoints[strt].x;
+			tvrct->bopnt.y = outsidePoints[strt].y;
+			tpnt.x = outsidePoints[strt].x;
+			tpnt.y = outsidePoints[strt].y;
+			proj(tpnt, slope, insidePoints[strt], insidePoints[fin], &tvrct->bipnt);
 		}
-		tpnt.x = ipnts[fin].x;
-		tpnt.y = ipnts[fin].y;
-		if (proj(tpnt, slope, opnts[strt], opnts[fin], &tvrct->copnt)) {
-			tvrct->cipnt.x = ipnts[fin].x;
-			tvrct->cipnt.y = ipnts[fin].y;
+		tpnt.x = insidePoints[fin].x;
+		tpnt.y = insidePoints[fin].y;
+		if (proj(tpnt, slope, outsidePoints[strt], outsidePoints[fin], &tvrct->copnt)) {
+			tvrct->cipnt.x = insidePoints[fin].x;
+			tvrct->cipnt.y = insidePoints[fin].y;
 		}
 		else {
-			tvrct->copnt.x = opnts[fin].x;
-			tvrct->copnt.y = opnts[fin].y;
-			tpnt.x = opnts[fin].x;
-			tpnt.y = opnts[fin].y;
-			proj(tpnt, slope, ipnts[strt], ipnts[fin], &tvrct->cipnt);
+			tvrct->copnt.x = outsidePoints[fin].x;
+			tvrct->copnt.y = outsidePoints[fin].y;
+			tpnt.x = outsidePoints[fin].x;
+			tpnt.y = outsidePoints[fin].y;
+			proj(tpnt, slope, insidePoints[strt], insidePoints[fin], &tvrct->cipnt);
 		}
 	}
 	else {
 		if (dif.x) {
 			tpnt.x = currentFormVertices[fin].x;
-			projv(tpnt.x, opnts[strt], opnts[fin], &tvrct->dopnt);
-			projv(tpnt.x, ipnts[strt], ipnts[fin], &tvrct->dipnt);
+			projv(tpnt.x, outsidePoints[strt], outsidePoints[fin], &tvrct->dopnt);
+			projv(tpnt.x, insidePoints[strt], insidePoints[fin], &tvrct->dipnt);
 			tpnt.x = currentFormVertices[strt].x;
-			projv(tpnt.x, opnts[strt], opnts[fin], &tvrct->aopnt);
-			projv(tpnt.x, ipnts[strt], ipnts[fin], &tvrct->aipnt);
-			tpnt.x = ipnts[strt].x;
-			if (projv(tpnt.x, opnts[strt], opnts[fin], &tvrct->bopnt)) {
-				tvrct->bipnt.x = ipnts[strt].x;
-				tvrct->bipnt.y = ipnts[strt].y;
+			projv(tpnt.x, outsidePoints[strt], outsidePoints[fin], &tvrct->aopnt);
+			projv(tpnt.x, insidePoints[strt], insidePoints[fin], &tvrct->aipnt);
+			tpnt.x = insidePoints[strt].x;
+			if (projv(tpnt.x, outsidePoints[strt], outsidePoints[fin], &tvrct->bopnt)) {
+				tvrct->bipnt.x = insidePoints[strt].x;
+				tvrct->bipnt.y = insidePoints[strt].y;
 			}
 			else {
-				tvrct->bopnt.x = opnts[strt].x;
-				tvrct->bopnt.y = opnts[strt].y;
-				tpnt.x = opnts[strt].x;
-				projv(tpnt.x, ipnts[strt], ipnts[fin], &tvrct->bipnt);
+				tvrct->bopnt.x = outsidePoints[strt].x;
+				tvrct->bopnt.y = outsidePoints[strt].y;
+				tpnt.x = outsidePoints[strt].x;
+				projv(tpnt.x, insidePoints[strt], insidePoints[fin], &tvrct->bipnt);
 			}
-			tpnt.x = ipnts[fin].x;
-			if (projv(tpnt.x, opnts[strt], opnts[fin], &tvrct->copnt)) {
-				tvrct->cipnt.x = ipnts[fin].x;
-				tvrct->cipnt.y = ipnts[fin].y;
+			tpnt.x = insidePoints[fin].x;
+			if (projv(tpnt.x, outsidePoints[strt], outsidePoints[fin], &tvrct->copnt)) {
+				tvrct->cipnt.x = insidePoints[fin].x;
+				tvrct->cipnt.y = insidePoints[fin].y;
 			}
 			else {
-				tvrct->copnt.x = opnts[fin].x;
-				tvrct->copnt.y = opnts[fin].y;
-				tpnt.x = opnts[fin].x;
-				projv(tpnt.x, ipnts[strt], ipnts[fin], &tvrct->cipnt);
+				tvrct->copnt.x = outsidePoints[fin].x;
+				tvrct->copnt.y = outsidePoints[fin].y;
+				tpnt.x = outsidePoints[fin].x;
+				projv(tpnt.x, insidePoints[strt], insidePoints[fin], &tvrct->cipnt);
 			}
 		}
 		else {
 			tpnt.y = currentFormVertices[fin].y;
-			projh(tpnt.y, opnts[strt], opnts[fin], &tvrct->dopnt);
-			projh(tpnt.y, ipnts[strt], ipnts[fin], &tvrct->dipnt);
+			projh(tpnt.y, outsidePoints[strt], outsidePoints[fin], &tvrct->dopnt);
+			projh(tpnt.y, insidePoints[strt], insidePoints[fin], &tvrct->dipnt);
 			tpnt.y = currentFormVertices[strt].y;
-			projh(tpnt.y, opnts[strt], opnts[fin], &tvrct->aopnt);
-			projh(tpnt.y, ipnts[strt], ipnts[fin], &tvrct->aipnt);
-			tpnt.y = ipnts[strt].y;
-			if (projh(tpnt.y, opnts[strt], opnts[fin], &tvrct->bopnt)) {
-				tvrct->bipnt.x = ipnts[strt].x;
-				tvrct->bipnt.y = ipnts[strt].y;
+			projh(tpnt.y, outsidePoints[strt], outsidePoints[fin], &tvrct->aopnt);
+			projh(tpnt.y, insidePoints[strt], insidePoints[fin], &tvrct->aipnt);
+			tpnt.y = insidePoints[strt].y;
+			if (projh(tpnt.y, outsidePoints[strt], outsidePoints[fin], &tvrct->bopnt)) {
+				tvrct->bipnt.x = insidePoints[strt].x;
+				tvrct->bipnt.y = insidePoints[strt].y;
 			}
 			else {
-				tvrct->bopnt.x = opnts[strt].x;
-				tvrct->bopnt.y = opnts[strt].y;
-				tpnt.y = opnts[strt].y;
-				projh(tpnt.y, ipnts[strt], ipnts[fin], &tvrct->bipnt);
+				tvrct->bopnt.x = outsidePoints[strt].x;
+				tvrct->bopnt.y = outsidePoints[strt].y;
+				tpnt.y = outsidePoints[strt].y;
+				projh(tpnt.y, insidePoints[strt], insidePoints[fin], &tvrct->bipnt);
 			}
-			tpnt.y = ipnts[fin].y;
-			if (projh(tpnt.y, opnts[strt], opnts[fin], &tvrct->copnt)) {
-				tvrct->cipnt.x = ipnts[fin].x;
-				tvrct->cipnt.y = ipnts[fin].y;
+			tpnt.y = insidePoints[fin].y;
+			if (projh(tpnt.y, outsidePoints[strt], outsidePoints[fin], &tvrct->copnt)) {
+				tvrct->cipnt.x = insidePoints[fin].x;
+				tvrct->cipnt.y = insidePoints[fin].y;
 			}
 			else {
-				tvrct->copnt.x = opnts[fin].x;
-				tvrct->copnt.y = opnts[fin].y;
-				tpnt.y = opnts[fin].y;
-				projh(opnts[fin].y, ipnts[strt], ipnts[fin], &tvrct->cipnt);
+				tvrct->copnt.x = outsidePoints[fin].x;
+				tvrct->copnt.y = outsidePoints[fin].y;
+				tpnt.y = outsidePoints[fin].y;
+				projh(outsidePoints[fin].y, insidePoints[strt], insidePoints[fin], &tvrct->cipnt);
 			}
 		}
 	}
@@ -8609,7 +8607,7 @@ void duspnd(unsigned strt, unsigned fin) {
 			dif.y = underlayVertRect[fin].bipnt.y - underlayVertRect[strt].cipnt.y;
 			len = hypot(dif.x, dif.y);
 			if (len > SelectedForm->edgeStitchLen) {
-				tang = atan2(ipnts[fin].y - opnts[fin].y, ipnts[fin].x - opnts[fin].x);
+				tang = atan2(insidePoints[fin].y - outsidePoints[fin].y, insidePoints[fin].x - outsidePoints[fin].x);
 				tpnt.x = underlayVertRect[fin].bopnt.x + cos(tang)*plen;
 				tpnt.y = underlayVertRect[fin].bopnt.y + sin(tang)*plen;
 				filinsb(tpnt);
@@ -8624,7 +8622,7 @@ void duspnd(unsigned strt, unsigned fin) {
 			dif.y = underlayVertRect[fin].bopnt.y - underlayVertRect[strt].copnt.y;
 			len = hypot(dif.x, dif.y);
 			if (len > SelectedForm->edgeStitchLen) {
-				tang = atan2(opnts[fin].y - ipnts[fin].y, opnts[fin].x - ipnts[fin].x);
+				tang = atan2(outsidePoints[fin].y - insidePoints[fin].y, outsidePoints[fin].x - insidePoints[fin].x);
 				tpnt.x = underlayVertRect[fin].bipnt.x + cos(tang)*plen;
 				tpnt.y = underlayVertRect[fin].bipnt.y + sin(tang)*plen;
 				filinsb(tpnt);
@@ -8759,10 +8757,10 @@ void plbrd(double spac) {
 	pointsVertRect = (VRCT2*)bseq;
 	underlayVertRect = &pointsVertRect[sides];
 	satout(SelectedForm->borderSize);
-	ipnts[sides].x = ipnts[0].x;
-	ipnts[sides].y = ipnts[0].y;
-	opnts[sides].x = opnts[0].x;
-	opnts[sides].y = opnts[0].y;
+	insidePoints[sides].x = insidePoints[0].x;
+	insidePoints[sides].y = insidePoints[0].y;
+	outsidePoints[sides].x = outsidePoints[0].x;
+	outsidePoints[sides].y = outsidePoints[0].y;
 	for (ind = 0; ind < (unsigned)sides - 1; ind++)
 	{
 		sprct(ind, ind + 1);
@@ -10029,13 +10027,13 @@ void bhcrnr(unsigned p_lin) {
 
 	if (chkMap(INDIR))
 	{
-		dif.x = opnts[tlin].x - currentFormVertices[tlin].x;
-		dif.y = opnts[tlin].y - currentFormVertices[tlin].y;
+		dif.x = outsidePoints[tlin].x - currentFormVertices[tlin].x;
+		dif.y = outsidePoints[tlin].y - currentFormVertices[tlin].y;
 	}
 	else
 	{
-		dif.x = ipnts[tlin].x - currentFormVertices[tlin].x;
-		dif.y = ipnts[tlin].y - currentFormVertices[tlin].y;
+		dif.x = insidePoints[tlin].x - currentFormVertices[tlin].x;
+		dif.y = insidePoints[tlin].y - currentFormVertices[tlin].y;
 	}
 	len = hypot(dif.x, dif.y);
 	rat = buttonholeFillCornerLength / len;
@@ -10189,13 +10187,13 @@ void clpcrnr(unsigned p_lin) {
 	rpnt.y = clipboardRect.top;
 	if (chkMap(INDIR))
 	{
-		dif.x = opnts[tlin].x - currentFormVertices[tlin].x;
-		dif.y = opnts[tlin].y - currentFormVertices[tlin].y;
+		dif.x = outsidePoints[tlin].x - currentFormVertices[tlin].x;
+		dif.y = outsidePoints[tlin].y - currentFormVertices[tlin].y;
 	}
 	else
 	{
-		dif.x = ipnts[tlin].x - currentFormVertices[tlin].x;
-		dif.y = ipnts[tlin].y - currentFormVertices[tlin].y;
+		dif.x = insidePoints[tlin].x - currentFormVertices[tlin].x;
+		dif.y = insidePoints[tlin].y - currentFormVertices[tlin].y;
 	}
 	rotationAngle = atan2(dif.y, dif.x) + PI / 2;
 	rotang1(rpnt, &clipReference);
@@ -10655,33 +10653,33 @@ void ribon() {
 					ind = 0;
 				satends(ind);
 				tfrm->vertices = adflt(sides << 1);
-				tfrm->vertices[0].x = opnts[0].x;
-				tfrm->vertices[fpnt++].y = opnts[0].y;
+				tfrm->vertices[0].x = outsidePoints[0].x;
+				tfrm->vertices[fpnt++].y = outsidePoints[0].y;
 				for (ind = 0; ind < sides; ind++) {
-					tfrm->vertices[fpnt].x = ipnts[ind].x;
-					tfrm->vertices[fpnt++].y = ipnts[ind].y;
+					tfrm->vertices[fpnt].x = insidePoints[ind].x;
+					tfrm->vertices[fpnt++].y = insidePoints[ind].y;
 				}
 				for (ind = sides - 1; ind; ind--) {
-					tfrm->vertices[fpnt].x = opnts[ind].x;
-					tfrm->vertices[fpnt++].y = opnts[ind].y;
+					tfrm->vertices[fpnt].x = outsidePoints[ind].x;
+					tfrm->vertices[fpnt++].y = outsidePoints[ind].y;
 				}
 			}
 			else {
 				tfrm->vertices = adflt((sides << 1) + 2);
-				tfrm->vertices[0].x = opnts[0].x;
-				tfrm->vertices[fpnt++].y = opnts[0].y;
+				tfrm->vertices[0].x = outsidePoints[0].x;
+				tfrm->vertices[fpnt++].y = outsidePoints[0].y;
 				tfrm->underlayIndent = iniFile.underlayIndent;
 				for (ind = 0; ind < sides; ind++) {
-					tfrm->vertices[fpnt].x = ipnts[ind].x;
-					tfrm->vertices[fpnt++].y = ipnts[ind].y;
+					tfrm->vertices[fpnt].x = insidePoints[ind].x;
+					tfrm->vertices[fpnt++].y = insidePoints[ind].y;
 				}
-				tfrm->vertices[fpnt].x = ipnts[0].x;
-				tfrm->vertices[fpnt++].y = ipnts[0].y;
-				tfrm->vertices[fpnt].x = opnts[0].x;
-				tfrm->vertices[fpnt++].y = opnts[0].y;
+				tfrm->vertices[fpnt].x = insidePoints[0].x;
+				tfrm->vertices[fpnt++].y = insidePoints[0].y;
+				tfrm->vertices[fpnt].x = outsidePoints[0].x;
+				tfrm->vertices[fpnt++].y = outsidePoints[0].y;
 				for (ind = sides - 1; ind; ind--) {
-					tfrm->vertices[fpnt].x = opnts[ind].x;
-					tfrm->vertices[fpnt++].y = opnts[ind].y;
+					tfrm->vertices[fpnt].x = outsidePoints[ind].x;
+					tfrm->vertices[fpnt++].y = outsidePoints[ind].y;
 				}
 			}
 			tfrm->type = SAT;

@@ -1,9 +1,9 @@
 //compile switches
 #define		__UseASM__	0
-#define		PESACT		1		//compile pes code
-#define		BUGBAK		0		//turn bakseq off
+#define		PESACT		1			//compile pes code
+#define		BUGBAK		0			//turn bakseq off
 
-#define		TRCMTH		1		//0=brightness compard,1=color compare
+#define		TRCMTH		1			//0=brightness compare,1=color compare
 
 #define		RUTVALID	1
 #define		COMVALID	2
@@ -21,119 +21,119 @@
 //end of trial version codes
 
 //daisy codes
-#define		DAZPETS		5		//petals
-#define		DAZCNT		10		//petal points
-#define		DAZICNT		2		//petal inner points
-#define		DAZLEN		15		//diameter
-#define		DAZPLEN		20		//petal length
-#define		DAZHLEN		5		//hole size
-#define		DAZTYP		5		//border type
-#define		DAZMCNT		7		//mirror count
+#define		DAZPETS		5			//petals
+#define		DAZCNT		10			//petal points
+#define		DAZICNT		2			//petal inner points
+#define		DAZLEN		15			//diameter
+#define		DAZPLEN		20			//petal length
+#define		DAZHLEN		5			//hole size
+#define		DAZTYP		5			//border type
+#define		DAZMCNT		7			//mirror count
 //end of daisy codes
 
-#define		TXTRAT		0.95	//texture fill clipboard shrink/grow ratio
+#define		TXTRAT		0.95		//texture fill clipboard shrink/grow ratio
 #define		MAXMSK		0xffff0000	//for checking for greater than 65536
-#define		MAXSEQ		65536	//maximum number of points in the sequence list
+#define		MAXSEQ		65536		//maximum number of points in the sequence list
 
-#define		DEFBPIX		4		//default form box pixels
-#define		MAXWLK		54		//max underlay/edge walk stitch length
-#define		MINWLK		2.4		//max underlay/edge walk stitch length
-#define		DEFULEN		12;		//default underlay stitch length
-#define		DEFUSPAC	6;		//default underlay stitch spacing
+#define		DEFBPIX		4			//default form box pixels
+#define		MAXWLK		54			//max underlay/edge walk stitch length
+#define		MINWLK		2.4			//max underlay/edge walk stitch length
+#define		DEFULEN		12;			//default underlay stitch length
+#define		DEFUSPAC	6;			//default underlay stitch spacing
 
-#define		IWAVPNTS	36		//default wave points
-#define		IWAVSTRT	10		//default wave start
-#define		IWAVEND		26		//default wave end
-#define		IWAVS		5		//default wave lobes
-#define		THRLED0		0x746872 //lead dword value for thred file v 1.0
+#define		IWAVPNTS	36			//default wave points
+#define		IWAVSTRT	10			//default wave start
+#define		IWAVEND		26			//default wave end
+#define		IWAVS		5			//default wave lobes
+#define		THRLED0		0x746872	//lead dword value for thred file v 1.0
 #define		THRLED1		0x1746872	//lead dword value for thred file v 1.1
-#define		MAXFLT		65536	//maximum number of floating point items, form & clipboard points
-#define		ZUMFCT		0.65	//zoom factor
-#define		PAGSCROL	0.9		//page scroll factor
-#define		LINSCROL	0.05	//line scroll factor
-#define		TXTSIDS		6		//extra pixels in a text box
-#define		MAXPCS		131072	//maximum possible stiches in a pcs file*2
-#define		MAXCHNG		10000	//maximum number of color changes
-#define		SHUPX		480		//small hoop x size
-#define		SHUPY		480		//small hoop y size
-#define		LHUPX		719		//large hoop x size
-#define		LHUPY		690		//large hoop y size
-#define		HUP100XY	600		//100 millimeter hoop size
-#define		PFGRAN		6		//pfaf "pixels" per millimeter
-#define		TSIZ30		0.3		//#30 thread size in millimeters
-#define		TSIZ40		0.2		//#40 thread size in millimeters
-#define		TSIZ60		0.05	//#60 thread size in millimeters
-#define		SCROLSIZ	12		//width of a scroll bar
-#define		COLSIZ		12		//width of the color bar
-#define		RIGHTSIZ	24		//SCROLSIZ+COLSIZ
-#define		CLOSENUF	10		//mouse click region for select
-#define		ZMARGIN		1.25	//zoom margin for select zooms
-#define		SMALSIZ		0.25	//default small stitch size
-#define		MINSIZ		0.1		//default minimum stitch size
-#define		USESIZ		3.5		//user preferred size
-#define		MAXSIZ		9.0		//default maximum stitch size
-#define		PFAFGRAN	6		//pfaf stitch points per millimeter
-#define		RMAPSIZ		65536	//a bit for each stitch
+#define		MAXFLT		65536		//maximum number of floating point items, form & clipboard points
+#define		ZUMFCT		0.65		//zoom factor
+#define		PAGSCROL	0.9			//page scroll factor
+#define		LINSCROL	0.05		//line scroll factor
+#define		TXTSIDS		6			//extra pixels in a text box
+#define		MAXPCS		131072		//maximum possible stiches in a pcs file*2
+#define		MAXCHNG		10000		//maximum number of color changes
+#define		SHUPX		480			//small hoop x size
+#define		SHUPY		480			//small hoop y size
+#define		LHUPX		719			//large hoop x size
+#define		LHUPY		690			//large hoop y size
+#define		HUP100XY	600			//100 millimeter hoop size
+#define		PFGRAN		6			//pfaf "pixels" per millimeter
+#define		TSIZ30		0.3			//#30 thread size in millimeters
+#define		TSIZ40		0.2			//#40 thread size in millimeters
+#define		TSIZ60		0.05		//#60 thread size in millimeters
+#define		SCROLSIZ	12			//width of a scroll bar
+#define		COLSIZ		12			//width of the color bar
+#define		RIGHTSIZ	24			//SCROLSIZ+COLSIZ
+#define		CLOSENUF	10			//mouse click region for select
+#define		ZMARGIN		1.25		//zoom margin for select zooms
+#define		SMALSIZ		0.25		//default small stitch size
+#define		MINSIZ		0.1			//default minimum stitch size
+#define		USESIZ		3.5			//user preferred size
+#define		MAXSIZ		9.0			//default maximum stitch size
+#define		PFAFGRAN	6			//pfaf stitch points per millimeter
+#define		RMAPSIZ		65536		//a bit for each stitch
 const unsigned long	RMAPBITS = RMAPSIZ << 5;	//a bit for each stitch
-#define		MINZUM		5	    //minimum zoom in stitch points
-#define		MAXZLEV		9		//maximum levels of zoom
-#define		SHOPNTS		0.00	//show stitch points when zoom below this
-#define		STCHBOX		0.4226	//show stitch boxes when zoom below this
-#define		BITCOL		0xffff00//default bitmap color
-#define		MAXFORMS	1024	//maximum number of forms
-#define		FORMFCT		0.05	//new forms part of screen
-#define		MAXDELAY	600		//maximum movie delay
-#define		MINDELAY	1		//minimum movie delay
-#define		MOVITIM		12		//default movie time
-#define		DEFSPACE	0.45	//default stitch spacing
-#define		JMPSPACE	13		//default jump stitch spacing
+#define		MINZUM		5			 //minimum zoom in stitch points
+#define		MAXZLEV		9			//maximum levels of zoom
+#define		SHOPNTS		0.00		//show stitch points when zoom below this
+#define		STCHBOX		0.4226		//show stitch boxes when zoom below this
+#define		BITCOL		0xffff00	//default bitmap color
+#define		MAXFORMS	1024		//maximum number of forms
+#define		FORMFCT		0.05		//new forms part of screen
+#define		MAXDELAY	600			//maximum movie delay
+#define		MINDELAY	1			//minimum movie delay
+#define		MOVITIM		12			//default movie time
+#define		DEFSPACE	0.45		//default stitch spacing
+#define		JMPSPACE	13			//default jump stitch spacing
 #define		DEFANG		0.785398163397448 //default fill angle, 45 degrees
-#define		MAXFRMLINS	20000	//maximum lines in a form
-#define		MSGSIZ		8192	//size of the message buffer
+#define		MAXFRMLINS	20000		//maximum lines in a form
+#define		MSGSIZ		8192		//size of the message buffer
 #define		PI			3.1415926535898
 #define		PI2			6.2831853071796
-#define		MAXSTCH		54		//maximum permitted stitch length for pfaf in pfaf "stitch pixels"
-#define		USPAC		15		//underlay fill spacing
-#define		APSPAC		10.8	//applique border spacing
-#define		OSEQLEN		262144	//output sequence length
+#define		MAXSTCH		54			//maximum permitted stitch length for pfaf in pfaf "stitch pixels"
+#define		USPAC		15			//underlay fill spacing
+#define		APSPAC		10.8		//applique border spacing
+#define		OSEQLEN		262144		//output sequence length
 #define		BSEQLEN		OSEQLEN<<1	//reverse sequence length
-#define		MAXRAT		3		//maximum number of stitches in one place in satin border
-#define		URAT		0.75	//ratio of underlay stitch to satin border size
-#define		PURAT		0.6		//for perp satin corners
-#define		DIURAT		0.125	//(1-URAT)/2
-#define		DOURAT		0.8125	//(1-URAT)/2+URAT
-#define		MINRCT		12		//minimum dimension of a form select rectangle
-#define		OLDNUM		4		//number of old filenames saved on file menu
-#define		OLDVER		4		//number of old file versions kept
-#define		TINY		1e-6	//tiny number for floating point stuff
-#define		SPEDLIN		30		//speed change for line message on speed scroll bar
-#define		SPEDPAG		120		//speed change for page message on speed scroll bar
-#define		KNOTLEN		54		//set knots for stitches longer than this
-#define		MAXFRMPNTS	65536	//maximum total form points
-#define		MAXCLPNTS	65536	//maximum total cliboard storage in forms
-#define		MAXSAC		10000	//maximum number of satin guidlins
-#define		MAXKNOTS	16384	//maximum nuber of knots
-#define		IBFCLEN		4*PFGRAN //initial buttonhole fill corner length
-#define		IPICSPAC	6		//initial picot border space
-#define		PRFLINS		28		//number of lines on the prefernece menu
-#define		EDGETYPS	12		//number of border fill types
-#define		SEED		3037000499 //pseudo-random-sequence seed
-#define		FSED		1340007303 //feather seqence seed
-#define		NAMSED		2222222222 //trial version psg seed
+#define		MAXRAT		3			//maximum number of stitches in one place in satin border
+#define		URAT		0.75		//ratio of underlay stitch to satin border size
+#define		PURAT		0.6			//for perp satin corners
+#define		DIURAT		0.125		//(1-URAT)/2
+#define		DOURAT		0.8125		//(1-URAT)/2+URAT
+#define		MINRCT		12			//minimum dimension of a form select rectangle
+#define		OLDNUM		4			//number of old filenames saved on file menu
+#define		OLDVER		4			//number of old file versions kept
+#define		TINY		1e-6		//tiny number for floating point stuff
+#define		SPEDLIN		30			//speed change for line message on speed scroll bar
+#define		SPEDPAG		120			//speed change for page message on speed scroll bar
+#define		KNOTLEN		54			//set knots for stitches longer than this
+#define		MAXFRMPNTS	65536		//maximum total form points
+#define		MAXCLPNTS	65536		//maximum total cliboard storage in forms
+#define		MAXSAC		10000		//maximum number of satin guidlins
+#define		MAXKNOTS	16384		//maximum nuber of knots
+#define		IBFCLEN		4*PFGRAN	//initial buttonhole fill corner length
+#define		IPICSPAC	6			//initial picot border space
+#define		PRFLINS		28			//number of lines on the prefernece menu
+#define		EDGETYPS	12			//number of border fill types
+#define		SEED		3037000499	//pseudo-random-sequence seed
+#define		FSED		1340007303	//feather seqence seed
+#define		NAMSED		2222222222	//trial version psg seed
 #define		DSTRAT		0.8333333333333333	//ratio of dst stitch points to PFAFF stitch points
-#define		HUPS		5		//number of hoops the user can select
+#define		HUPS		5			//number of hoops the user can select
 #define		NORDSED		0x5a5a5a5a	//name order seed
 #define		NCODSED		0x73ef5a7e	//name encoding seed
 #define		NCODOF		80			//name encoding offset
-#define		CLPMIN		0.5		//if clipboard data less wide, then don't fill
-#define		CLPMINAUT	1.2		//for skinny vertical clips
-#define		BRDWID		18		//default satin border size
-#define		SNPLEN		0.15	//default snap together length size
-#define		STARAT		0.4		//default star ratio
-#define		SPIRWRAP	1.52	//default spiral wrap
-#define		BALNORM		0x80			//normal balarad stitch
-#define		BALJUMP		0x81			//balarad jump stitch
-#define		BALSTOP		0				//balarad stop
+#define		CLPMIN		0.5			//if clipboard data less wide, then don't fill
+#define		CLPMINAUT	1.2			//for skinny vertical clips
+#define		BRDWID		18			//default satin border size
+#define		SNPLEN		0.15		//default snap together length size
+#define		STARAT		0.4			//default star ratio
+#define		SPIRWRAP	1.52		//default spiral wrap
+#define		BALNORM		0x80		//normal balarad stitch
+#define		BALJUMP		0x81		//balarad jump stitch
+#define		BALSTOP		0			//balarad stop
 #define		COLVER		0x776874	//color file version
 #define		PESCMSK		0x3f		//pes color mask
 #define		REDCOL		0xff		//code for the color red
@@ -343,8 +343,8 @@ enum {
 };
 
 enum {
-	SETCUST = 1,		//set the custom hoop
-	SMALHUP = 2,		//pfaf code for small hoop
+	SETCUST = 1,	//set the custom hoop
+	SMALHUP = 2,	//pfaf code for small hoop
 	LARGHUP,		//pfaf code for large hoop
 	HUP100,			//100 millimeter hoop
 	CUSTHUP			//user defined hoop size
@@ -685,7 +685,7 @@ typedef struct _iniFil {
 	TCHAR			defaultDirectory[180];	//default directory
 	COLORREF		stitchColors[16];		//colors
 	COLORREF		stitchPreferredColors[16];	//stich preference colors
-	COLORREF		backgroundPreferredColors[16];		//background preference colors
+	COLORREF		backgroundPreferredColors[16];	//background preference colors
 	COLORREF		backgroundColor;		//background color
 	COLORREF		bitmapColor;			//bitmap color
 	double			minStitchLength;		//minimum stitch length
