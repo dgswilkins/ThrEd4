@@ -388,9 +388,9 @@ unsigned		satkad;					//next index to append satin connect points
 float			buttonholeFillCornerLength = IBFCLEN;	//buttonhole corner length
 float			picotSpace = IPICSPAC;	//space between border picots
 unsigned		pseudoRandomValue;		//pseudo-random sequence register
-dPOINT			filbak[8];				//backup stitches in satin fills
-unsigned		pfbak;					//pointer for backup stitches in satin fills
-double			clpang;					//for clipboard border fill
+dPOINT			satinFillBackup[8];		//backup stitches in satin fills
+unsigned		fillBackupIndex;		//pointer for backup stitches in satin fills
+double			clipAngle;				//for clipboard border fill
 dPOINT			mvpnt;					//moving point for clipboard fill
 fPOINTATTRIBUTE	rclpnt;					//for rotating clipboard fill
 double			cosang;					//cosine for clipboard fill
@@ -2264,12 +2264,12 @@ void chkbrd() {
 	fvars(closestFormToCursor);
 	if (SelectedForm->edgeType) {
 		switch (SelectedForm->edgeType&NEGUND) {
-		case EGLIN:
+		case EGLIN: // Line
 
 			brdfil(SelectedForm->edgeStitchLen);
 			break;
 
-		case EGBLD:
+		case EGBLD: // Bean
 
 			bold(SelectedForm->edgeStitchLen);
 			break;
@@ -2286,19 +2286,19 @@ void chkbrd() {
 			duxclp();
 			break;
 
-		case EGSAT:
+		case EGSAT: // Ang Satin
 
 			plen = SelectedForm->borderSize;
 			sbrd();
 			break;
 
-		case EGPRP:
+		case EGPRP: //Proportional Satin
 
 			plen = SelectedForm->borderSize;
 			pbrd(SelectedForm->edgeSpacing);
 			break;
 
-		case EGAP:
+		case EGAP: // Applique
 
 			sequenceIndex = 0;
 			apbrd();
@@ -2307,7 +2307,7 @@ void chkbrd() {
 			sbrd();
 			break;
 
-		case EGHOL:
+		case EGHOL: // BH Buttonhole
 
 			plen = SelectedForm->borderSize * 2;
 			tlen = buttonholeFillCornerLength;
@@ -2323,18 +2323,18 @@ void chkbrd() {
 			clpic(0);
 			break;
 
-		case EGDUB:
+		case EGDUB: // Double
 
 			dubfn();
 			break;
 
-		case EGCHNL:
+		case EGCHNL: // Lin Chain
 
 			setMap(LINCHN);
 			chnfn();
 			break;
 
-		case EGCHNH:
+		case EGCHNH: // Open Chain
 
 			rstMap(LINCHN);
 			chnfn();
@@ -5868,7 +5868,7 @@ void linsid() {
 	len = hypot(dif.x, dif.y);
 	cnt = len / clipboardRectSize.cx;
 	if (cnt) {
-		rotationAngle = clpang;
+		rotationAngle = clipAngle;
 		rotangf(rclpref, &clipReference);
 		for (ind = 0; ind < clipboardStitchCount; ind++)
 			rotangf(clipReversedData[ind], &clipFillData[ind]);
@@ -5905,8 +5905,8 @@ void lincrnr() {
 	dPOINT		dif;
 	unsigned	ind;
 
-	sinang = sin(clpang);
-	cosang = cos(clpang);
+	sinang = sin(clipAngle);
+	cosang = cos(clipAngle);
 	if (nupnt()) {
 		dif.x = mvpnt.x - selectedPoint.x;
 		dif.y = mvpnt.y - selectedPoint.y;
@@ -5940,9 +5940,9 @@ void durev() {
 }
 
 void setvct(unsigned strt, unsigned fin) {
-	clpang = atan2(currentFormVertices[fin].y - currentFormVertices[strt].y, currentFormVertices[fin].x - currentFormVertices[strt].x);
-	vct0.x = clipboardRectSize.cx*cos(clpang);
-	vct0.y = clipboardRectSize.cx*sin(clpang);
+	clipAngle = atan2(currentFormVertices[fin].y - currentFormVertices[strt].y, currentFormVertices[fin].x - currentFormVertices[strt].x);
+	vct0.x = clipboardRectSize.cx*cos(clipAngle);
+	vct0.y = clipboardRectSize.cx*sin(clipAngle);
 }
 
 void clpbrd(unsigned short strtlin) {
@@ -6158,7 +6158,7 @@ BOOL chkbak(dPOINT pnt) {
 	double		len;
 
 	for (ind = 0; ind < 8; ind++) {
-		len = hypot(filbak[ind].x - pnt.x, filbak[ind].y - pnt.y);
+		len = hypot(satinFillBackup[ind].x - pnt.x, satinFillBackup[ind].y - pnt.y);
 		if (len < stitchSpace)
 			return 1;
 	}
@@ -6190,9 +6190,9 @@ BOOL linx(fPOINT* p_flt, unsigned strt, unsigned fin, dPOINT* npnt) {
 }
 
 void filinsbw(dPOINT pnt) {
-	filbak[pfbak].x = pnt.x;
-	filbak[pfbak++].y = pnt.y;
-	pfbak &= 0x7;
+	satinFillBackup[fillBackupIndex].x = pnt.x;
+	satinFillBackup[fillBackupIndex++].y = pnt.y;
+	fillBackupIndex &= 0x7;
 	filinsb(pnt);
 }
 
@@ -6217,10 +6217,10 @@ void sbfn(fPOINT* p_flt, unsigned start, unsigned finish) {
 	ipnt.y = p_flt[start].y;
 	l_opnt.x = outsidePoints[start].x;
 	l_opnt.y = outsidePoints[start].y;
-	xflg = pfbak = iflg = oflg = bcnt = 0;
+	xflg = fillBackupIndex = iflg = oflg = bcnt = 0;
 	for (ind = 0; ind < 8; ind++) {
-		filbak[ind].x = (float)1e12;
-		filbak[ind].y = (float)1e12;
+		satinFillBackup[ind].x = (float)1e12;
+		satinFillBackup[ind].y = (float)1e12;
 	}
 	if (olen > ilen) {
 		cnt = olen / stitchSpace;
