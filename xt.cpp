@@ -1253,14 +1253,14 @@ void fnwlk(unsigned find)
 	fPOINT*		wpnt;
 
 	fvars(find);
-	if (SelectedForm->type == LIN)
-		SelectedForm->type = POLI;
-	if (SelectedForm->extendedAttribute&AT_STRT&&SelectedForm->type != LIN)
+	if (SelectedForm->type == FRMLINE)
+		SelectedForm->type = FRMFPOLY;
+	if (SelectedForm->extendedAttribute&AT_STRT&&SelectedForm->type != FRMLINE)
 		strt = SelectedForm->fillStart;
 	else
 		strt = 0;
 	cnt = sides;
-	if (SelectedForm->type != LIN)
+	if (SelectedForm->type != FRMLINE)
 		cnt++;
 	wpnt = insid();
 	outputIndex = 0;
@@ -1517,8 +1517,8 @@ void dubit(unsigned bit)
 
 	savdo();
 	setMap(WASDO);
-	if (SelectedForm->type == LIN)
-		SelectedForm->type = POLI;
+	if (SelectedForm->type == FRMLINE)
+		SelectedForm->type = FRMFPOLY;
 	if (!(SelectedForm->extendedAttribute&(AT_UND | AT_WALK | AT_CWLK)) && bit&(AT_UND | AT_WALK | AT_CWLK))
 	{
 		if (SelectedForm->fillType)
@@ -1777,7 +1777,7 @@ void dasyfrm() {
 	len *= drat;
 	elen *= drat;
 	ilen *= drat;
-	SelectedForm->type = POLI;
+	SelectedForm->type = FRMFPOLY;
 	inf = fref = 0;
 	if (chku(DAZHOL))
 	{
@@ -2559,7 +2559,7 @@ void fdelstch()
 		fstrts.fcol = header.stitchCount;
 	if (SelectedForm->edgeType)
 	{
-		if (SelectedForm->edgeType == EGAP)
+		if (SelectedForm->edgeType == EDGEAPPL)
 		{
 			if (!(tmap&M_AP))
 			{
@@ -2792,7 +2792,7 @@ void setundfn(unsigned cod)
 		{
 			closestFormToCursor = selectedFormList[ind];
 			fvars(closestFormToCursor);
-			if (SelectedForm->type == LIN)
+			if (SelectedForm->type == FRMLINE)
 				continue;
 			SelectedForm->extendedAttribute |= cod;
 			refilfn();
@@ -2838,7 +2838,7 @@ void notundfn(unsigned cod)
 		{
 			closestFormToCursor = ind;
 			fvars(closestFormToCursor);
-			if (SelectedForm->type == LIN)
+			if (SelectedForm->type == FRMLINE)
 				continue;
 			SelectedForm->extendedAttribute &= cod;
 			refilfn();
@@ -2850,7 +2850,7 @@ void notundfn(unsigned cod)
 	if (chkMap(FORMSEL))
 	{
 		fvars(closestFormToCursor);
-		if (SelectedForm->type == LIN)
+		if (SelectedForm->type == FRMLINE)
 			return;
 		SelectedForm->extendedAttribute &= cod;
 		refilfn();
@@ -3085,7 +3085,7 @@ void fangfn(unsigned find, float p_ang)
 {
 	closestFormToCursor = find;
 	fvars(closestFormToCursor);
-	if (SelectedForm->type == POLI&&SelectedForm->fillType)
+	if (SelectedForm->type == FRMFPOLY&&SelectedForm->fillType)
 	{
 		switch (SelectedForm->fillType)
 		{
@@ -4076,7 +4076,7 @@ void setxclp()
 		angflt[ind].y += fof.y;
 	}
 	cnt = angledForm.sides - 1;
-	if (angledForm.type != LIN)
+	if (angledForm.type != FRMLINE)
 		cnt++;
 	sides = angledForm.sides;
 	for (ind = 0; ind < cnt; ind++)
@@ -4236,7 +4236,7 @@ void ritxfrm()
 	formLines[ind].x = formLines[0].x;
 	formLines[ind].y = formLines[0].y;
 	cnt = angledForm.sides;
-	if (angledForm.type != LIN)
+	if (angledForm.type != FRMLINE)
 		cnt++;
 	SetROP2(stitchWindowDC, R2_NOTXORPEN);
 	Polyline(stitchWindowDC, formLines, cnt);
@@ -4390,7 +4390,7 @@ int txcmp(const void *arg1, const void *arg2)
 
 void txpar()
 {
-	SelectedForm->type = POLI;
+	SelectedForm->type = FRMFPOLY;
 	SelectedForm->fillInfo.texture.lines = tscr.lines;
 	SelectedForm->fillInfo.texture.height = tscr.areaHeight;
 	SelectedForm->fillSpacing = tscr.spacing;
@@ -5608,10 +5608,10 @@ void lodchk()
 
 		SelectedForm = &formList[ind];
 		if (!SelectedForm->type)
-			SelectedForm->type = POLI;
+			SelectedForm->type = FRMFPOLY;
 		else {
 
-			if (SelectedForm->type == LIN) {
+			if (SelectedForm->type == FRMLINE) {
 
 				if (SelectedForm->fillType != CONTF) {
 

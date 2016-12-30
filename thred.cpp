@@ -1847,7 +1847,7 @@ FRMHED*				SelectedForm;			//pointer to selected form
 unsigned			fillTypes[] =				//fill type array for side window display
 { 0,VRTF,HORF,ANGF,SATF,CLPF,CONTF,VCLPF,HCLPF,ANGCLPF,FTHF,TXVRTF,TXHORF,TXANGF };
 //edge fill type array for side window display
-unsigned			edgeFillTypes[] = { 0,EGLIN,EGBLD,EGCLP,EGSAT,EGAP,EGPRP,EGHOL,EGPIC,EGDUB,EGCHNL,EGCHNH,EGCLPX };
+unsigned			edgeFillTypes[] = { 0,EDGELINE,EDGEBEAN,EDGECLIP,EDGEANGSAT,EDGEAPPL,EDGEPROPSAT,EDGEBHOL,EDGEPICOT,EDGEDOUBLE,EDGELCHAIN,EDGEOCHAIN,EDGECLIPX };
 //feather fill types
 unsigned			featherFillTypes[] = { FTHSIN,FTHSIN2,FTHLIN,FTHPSG,FTHRMP,FTHFAZ };
 
@@ -2122,7 +2122,7 @@ BOOL isfclp() {
 
 BOOL iseclp(unsigned find) {
 
-	if (formList[find].edgeType == EGCLP || formList[find].edgeType == EGPIC || formList[find].edgeType == EGCLPX)
+	if (formList[find].edgeType == EDGECLIP || formList[find].edgeType == EDGEPICOT || formList[find].edgeType == EDGECLIPX)
 		return 1;
 	return 0;
 }
@@ -3815,7 +3815,7 @@ void sidmsg(HWND hndl, TCHAR** pstr, unsigned cnt) {
 				cnt1--;
 			else {
 
-				if (edgeFillTypes[ind] == EGCLP || edgeFillTypes[ind] == EGPIC || edgeFillTypes[ind] == EGCLPX) {
+				if (edgeFillTypes[ind] == EDGECLIP || edgeFillTypes[ind] == EDGEPICOT || edgeFillTypes[ind] == EDGECLIPX) {
 
 					if (chkMap(WASPCDCLP))
 						maxtsiz(pstr[ind], &sideWindowSize);
@@ -3841,7 +3841,7 @@ void sidmsg(HWND hndl, TCHAR** pstr, unsigned cnt) {
 
 			if ((unsigned)(SelectedForm->edgeType&NEGUND) != edgeFillTypes[ind]) {
 
-				if (edgeFillTypes[ind] == EGCLP || edgeFillTypes[ind] == EGPIC || edgeFillTypes[ind] == EGCLPX) {
+				if (edgeFillTypes[ind] == EDGECLIP || edgeFillTypes[ind] == EDGEPICOT || edgeFillTypes[ind] == EDGECLIPX) {
 
 					if (chkMap(WASPCDCLP))
 						dusid(ind);
@@ -4285,7 +4285,7 @@ void chknum() {
 			if (formMenuChoice == LBCSIZ) {
 
 				savdo();
-				if (SelectedForm->edgeType == EGHOL)
+				if (SelectedForm->edgeType == EDGEBHOL)
 					savblen((float)tdub);
 				else
 					savplen((float)tdub);
@@ -4340,13 +4340,13 @@ void chknum() {
 						tuns = SelectedForm->edgeType&NEGUND;
 						switch (tuns) {
 
-						case EGPRP:
+						case EDGEPROPSAT:
 
 							SelectedForm->edgeSpacing = tdub;
 							break;
 
-						case EGCHNH:
-						case EGCHNL:
+						case EDGEOCHAIN:
+						case EDGELCHAIN:
 
 							SelectedForm->edgeSpacing = tdub;
 							break;
@@ -10103,7 +10103,7 @@ void delet() {
 			SelectedForm = &formList[closestFormToCursor];
 			switch (SelectedForm->type) {
 
-			case LIN:
+			case FRMLINE:
 
 				if (SelectedForm->fillType == CONTF) {
 
@@ -10739,7 +10739,7 @@ void ritmov() {
 	SelectObject(stitchWindowDC, formPen);
 	if (closestVertexToCursor) {
 
-		if (closestVertexToCursor == (unsigned)SelectedForm->sides - 1 && SelectedForm->type == LIN)
+		if (closestVertexToCursor == (unsigned)SelectedForm->sides - 1 && SelectedForm->type == FRMLINE)
 			Polyline(stitchWindowDC, rubberBandLine, 2);
 		else
 			Polyline(stitchWindowDC, rubberBandLine, 3);
@@ -10747,7 +10747,7 @@ void ritmov() {
 
 		rubberBandLine[2].x = formLines[1].x;
 		rubberBandLine[2].y = formLines[1].y;
-		if (SelectedForm->type == LIN)
+		if (SelectedForm->type == FRMLINE)
 			Polyline(stitchWindowDC, &rubberBandLine[1], 2);
 		else
 			Polyline(stitchWindowDC, rubberBandLine, 3);
@@ -14317,7 +14317,7 @@ void dutrac() {
 		}
 		SelectedForm->vertices = adflt(outputIndex);
 		SelectedForm->sides = outputIndex;
-		SelectedForm->type = POLI;
+		SelectedForm->type = FRMFPOLY;
 		SelectedForm->attribute = activeLayer << 1;
 		frmout(formIndex);
 		formList[formIndex].satinGuideCount = 0;
@@ -14977,7 +14977,7 @@ void bfrm() {
 
 		for (ind = 0; ind < (unsigned)sides - 1; ind++)
 			pxlin(ind, ind + 1);
-		if (SelectedForm->type != LIN)
+		if (SelectedForm->type != FRMLINE)
 			pxlin(ind, 0);
 	}
 }
@@ -17072,13 +17072,13 @@ unsigned chkMsg() {
 					duform(ind);
 				switch (ind) {
 
-				case RPOLI - 1:
-				case STAR - 1:
-				case SPIR - 1:
-				case HART - 2:
-				case LENS - 2:
-				case EGG - 2:
-				case ZIG - 2:
+				case FRMRPOLY - 1:
+				case FRMSTAR - 1:
+				case FRMSPIRAL - 1:
+				case FRMHEART - 2:
+				case FRMLENS - 2:
+				case FRMEGG - 2:
+				case FRMZIGZAG - 2:
 
 					return 1;
 				}
@@ -17144,9 +17144,9 @@ unsigned chkMsg() {
 					if (SelectedForm->edgeType) {
 
 						cod = SelectedForm->edgeType&NEGUND;
-						if (cod == EGCLP || cod == EGSAT || cod == EGAP)
+						if (cod == EDGECLIP || cod == EDGEANGSAT || cod == EDGEAPPL)
 							bsizpar();
-						SelectedForm->edgeType = EGLIN;
+						SelectedForm->edgeType = EDGELINE;
 						goto didfil;
 					} else {
 
@@ -17161,9 +17161,9 @@ unsigned chkMsg() {
 					if (SelectedForm->edgeType) {
 
 						cod = SelectedForm->edgeType&NEGUND;
-						if (cod == EGCLP || cod == EGSAT || cod == EGAP)
+						if (cod == EDGECLIP || cod == EDGEANGSAT || cod == EDGEAPPL)
 							bsizpar();
-						SelectedForm->edgeType = EGBLD;
+						SelectedForm->edgeType = EDGEBEAN;
 						goto didfil;
 					} else {
 
@@ -17186,23 +17186,23 @@ unsigned chkMsg() {
 
 						switch (SelectedForm->edgeType) {
 
-						case EGCLP:
+						case EDGECLIP:
 
 							bsizpar();
 
-						case EGLIN:
-						case EGBLD:
+						case EDGELINE:
+						case EDGEBEAN:
 
 							SelectedForm->borderSize = borderWidth;
 							SelectedForm->edgeSpacing = stitchSpace;
 							break;
 
-						case EGPRP:
+						case EDGEPROPSAT:
 
 							SelectedForm->edgeSpacing /= 2;
 							break;
 						}
-						SelectedForm->edgeType = EGSAT;
+						SelectedForm->edgeType = EDGEANGSAT;
 						if (chku(DUND))
 							SelectedForm->edgeType |= EGUND;
 						goto didfil;
@@ -17223,14 +17223,14 @@ unsigned chkMsg() {
 					}
 					if (SelectedForm->edgeType) {
 
-						if (SelectedForm->edgeType == EGLIN || SelectedForm->edgeType == EGBLD || SelectedForm->edgeType == EGCLP) {
+						if (SelectedForm->edgeType == EDGELINE || SelectedForm->edgeType == EDGEBEAN || SelectedForm->edgeType == EDGECLIP) {
 
 							SelectedForm->borderSize = borderWidth;
 							SelectedForm->edgeSpacing = stitchSpace;
-							if (SelectedForm->edgeType == EGCLP)
+							if (SelectedForm->edgeType == EDGECLIP)
 								bsizpar();
 						}
-						SelectedForm->edgeType = EGAP;
+						SelectedForm->edgeType = EDGEAPPL;
 						if (chku(DUND))
 							SelectedForm->edgeType |= EGUND;
 						SelectedForm->borderColor |= (underlayColor << 4);
@@ -17249,21 +17249,21 @@ unsigned chkMsg() {
 
 						switch (SelectedForm->edgeType) {
 
-						case EGCLP:
+						case EDGECLIP:
 
 							bsizpar();
-						case EGLIN:
-						case EGBLD:
+						case EDGELINE:
+						case EDGEBEAN:
 
 							SelectedForm->borderSize = borderWidth;
 							SelectedForm->edgeSpacing = stitchSpace;
 							break;
 
-						case EGSAT:
+						case EDGEANGSAT:
 
 							SelectedForm->edgeSpacing *= 2;
 						}
-						SelectedForm->edgeType = EGPRP;
+						SelectedForm->edgeType = EDGEPROPSAT;
 						if (chku(DUND))
 							SelectedForm->edgeType |= EGUND;
 						goto didfil;
@@ -17279,14 +17279,14 @@ unsigned chkMsg() {
 
 					if (SelectedForm->edgeType) {
 
-						if (SelectedForm->edgeType == EGLIN || SelectedForm->edgeType == EGBLD || SelectedForm->edgeType == EGCLP) {
+						if (SelectedForm->edgeType == EDGELINE || SelectedForm->edgeType == EDGEBEAN || SelectedForm->edgeType == EDGECLIP) {
 
 							SelectedForm->borderSize = borderWidth;
 							SelectedForm->edgeSpacing = stitchSpace;
-							if (SelectedForm->edgeType == EGCLP)
+							if (SelectedForm->edgeType == EDGECLIP)
 								bsizpar();
 						}
-						SelectedForm->edgeType = EGHOL;
+						SelectedForm->edgeType = EDGEBHOL;
 						goto didfil;
 					} else {
 
@@ -17300,11 +17300,11 @@ unsigned chkMsg() {
 
 					if (SelectedForm->edgeType) {
 
-						if (SelectedForm->edgeType == EGLIN || SelectedForm->edgeType == EGBLD || SelectedForm->edgeType == EGCLP) {
+						if (SelectedForm->edgeType == EDGELINE || SelectedForm->edgeType == EDGEBEAN || SelectedForm->edgeType == EDGECLIP) {
 
 							SelectedForm->borderSize = borderWidth;
 							SelectedForm->edgeSpacing = stitchSpace;
-							if (SelectedForm->edgeType == EGCLP)
+							if (SelectedForm->edgeType == EDGECLIP)
 								bsizpar();
 						}
 						picot();
@@ -17322,9 +17322,9 @@ unsigned chkMsg() {
 					if (SelectedForm->edgeType) {
 
 						cod = SelectedForm->edgeType&NEGUND;
-						if (cod == EGCLP || cod == EGSAT || cod == EGAP)
+						if (cod == EDGECLIP || cod == EDGEANGSAT || cod == EDGEAPPL)
 							bsizpar();
-						SelectedForm->edgeType = EGDUB;
+						SelectedForm->edgeType = EDGEDOUBLE;
 						goto didfil;
 					} else {
 
@@ -17365,15 +17365,15 @@ unsigned chkMsg() {
 
 				if (SelectedForm->fillType == SAT&&SelectedForm->satinGuideCount)
 					delsac(closestFormToCursor);
-				if ((SelectedForm->edgeType&NEGUND) == EGAP) {
+				if ((SelectedForm->edgeType&NEGUND) == EDGEAPPL) {
 
-					SelectedForm->edgeType = EGSAT;
+					SelectedForm->edgeType = EDGEANGSAT;
 					if (chku(DUND))
 						SelectedForm->edgeType |= EGUND;
 				}
 				if (msg.hwnd == hsidWnd[0]) {
 
-					SelectedForm->type = POLI;
+					SelectedForm->type = FRMFPOLY;
 					delmfil(SelectedForm->fillColor);
 					SelectedForm->fillType = 0;
 					coltab();
@@ -17384,12 +17384,12 @@ unsigned chkMsg() {
 				if (msg.hwnd == hsidWnd[1]) {
 
 					savdo();
-					SelectedForm->type = POLI;
+					SelectedForm->type = FRMFPOLY;
 					if (SelectedForm->fillType) {
 
 						respac();
 						SelectedForm->fillType = VRTF;
-						SelectedForm->type = POLI;
+						SelectedForm->type = FRMFPOLY;
 						goto didfil;
 					} else {
 
@@ -17401,7 +17401,7 @@ unsigned chkMsg() {
 				}
 				if (msg.hwnd == hsidWnd[2]) {
 
-					SelectedForm->type = POLI;
+					SelectedForm->type = FRMFPOLY;
 					if (SelectedForm->fillType) {
 
 						respac();
@@ -17417,7 +17417,7 @@ unsigned chkMsg() {
 				}
 				if (msg.hwnd == hsidWnd[3]) {
 
-					SelectedForm->type = POLI;
+					SelectedForm->type = FRMFPOLY;
 					if (SelectedForm->fillType) {
 
 						respac();
@@ -17646,10 +17646,10 @@ unsigned chkMsg() {
 
 				savdo();
 				unfil();
-				if (SelectedForm->type == LIN)
-					SelectedForm->type = POLI;
+				if (SelectedForm->type == FRMLINE)
+					SelectedForm->type = FRMFPOLY;
 				else
-					SelectedForm->type = LIN;
+					SelectedForm->type = FRMLINE;
 				coltab();
 				delsac(closestFormToCursor);
 				setMap(RESTCH);
@@ -18259,7 +18259,7 @@ unsigned chkMsg() {
 								}
 								if (formList[closestFormToCursor].edgeType)
 								{
-									if (formList[closestFormToCursor].edgeType == EGAP)
+									if (formList[closestFormToCursor].edgeType == EDGEAPPL)
 									{
 										formList[closestFormToCursor].borderColor &= 0xf0;
 										formList[closestFormToCursor].borderColor |= activeColor;
@@ -18374,6 +18374,8 @@ unsigned chkMsg() {
 			}
 		}
 #endif
+		// ToDo - value passed to duform is wierd because it is dependant on order of enumeration of the form types.
+		// ToDo - and value 'SAT' throws it off
 		if (chkMap(FORMIN)) {
 
 			if (GetKeyState(VK_CONTROL) & 0X8000)
@@ -18385,64 +18387,64 @@ unsigned chkMsg() {
 
 				rstMap(FORMIN);
 				unmsg();
-				duform(LIN - 1);
+				duform(FRMLINE - 1);
 				return 1;
 
 			case 'F':
 
 				rstMap(FORMIN);
 				unmsg();
-				duform(POLI - 1);
+				duform(FRMFPOLY - 1);
 				return 1;
 
 			case 'R':
 
-				duform(RPOLI - 1);
+				duform(FRMRPOLY - 1);
 				return 1;
 
 			case 'S':
 
-				duform(STAR - 1);
+				duform(FRMSTAR - 1);
 				return 1;
 
 			case 'A':
 
-				duform(SPIR - 1);
+				duform(FRMSPIRAL - 1);
 				return 1;
 
 			case 'H':
 
-				duform(HART - 2);
+				duform(FRMHEART - 2);
 				return 1;
 
 			case 'L':
 
-				duform(LENS - 2);
+				duform(FRMLENS - 2);
 				return 1;
 
 			case 'G':
 
-				duform(EGG - 2);
+				duform(FRMEGG - 2);
 				return 1;
 
 			case 'T':
 
-				duform(TEAR - 2);
+				duform(FRMTEAR - 2);
 				return 1;
 
 			case 'Z':
 
-				duform(ZIG - 2);
+				duform(FRMZIGZAG - 2);
 				return 1;
 
 			case 'W':
 
-				duform(WAV - 2);
+				duform(FRMWAVE - 2);
 				return 1;
 
 			case 'D':
 
-				duform(DASY - 2);
+				duform(FRMDAISY - 2);
 				return 1;
 			}
 		}
@@ -19343,7 +19345,7 @@ unsigned chkMsg() {
 							closestFormToCursor = formIndex;
 							SelectedForm = &formList[formIndex];
 							FillMemory(SelectedForm, sizeof(FRMHED), 0);
-							SelectedForm->type = LIN;
+							SelectedForm->type = FRMLINE;
 							SelectedForm->sides = clipboardFormPointsData->pointCount + 1;
 							SelectedForm->vertices = adflt(SelectedForm->sides);
 							fvars(closestFormToCursor);
@@ -19506,7 +19508,7 @@ unsigned chkMsg() {
 						GlobalUnlock(hClipMem);
 						setMap(INIT);
 						newFormVertexCount = SelectedForm->sides;
-						if (SelectedForm->type != LIN)
+						if (SelectedForm->type != FRMLINE)
 							newFormVertexCount++;
 						unfrm();
 						duzrat();
@@ -23032,7 +23034,7 @@ void ritbak(TCHAR* nam, DRAWITEMSTRUCT* p_ds) {
 					l_plin[ine].y = l_siz.y - tflt[lind].y*rat;
 					SelectObject(p_ds->hDC, formPen);
 					SetROP2(p_ds->hDC, R2_XORPEN);
-					if (formList[ind].type == LIN)
+					if (formList[ind].type == FRMLINE)
 						Polyline(p_ds->hDC, l_plin, flst[ind].sides);
 					else
 						Polyline(p_ds->hDC, l_plin, flst[ind].sides + 1);

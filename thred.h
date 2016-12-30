@@ -930,14 +930,14 @@ typedef union _satinOrAngle {
 /*
 	fill	edgeStitchLen	edgeSpacing	borderSize	clipCount	picspac		crnrsiz		brdend
 
-	EGLIN	edgeStitchLen
-	EGBLD	edgeStitchLen
-	EGCLP											clipCount
-	EGSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
-	EGAP	edgeStitchLen	edgeSpacing	borderSize									attribute
-	EGPRP	edgeStitchLen	edgeSpacing	borderSize									attribute
-	EGHOL	edgeStitchLen	edgeSpacing	borderSize	clipCount,res
-	EGPIC	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
+	EDGELINE	edgeStitchLen
+	EDGEBEAN	edgeStitchLen
+	EDGECLIP											clipCount
+	EDGEANGSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
+	EDGEAPPL	edgeStitchLen	edgeSpacing	borderSize									attribute
+	EDGEPROPSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
+	EDGEBHOL	edgeStitchLen	edgeSpacing	borderSize	clipCount,res
+	EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
 */
 
 #define	BELEN		1
@@ -1406,19 +1406,19 @@ typedef struct _grdcod {
 
 //form types
 enum {
-	LIN = 1u,
-	POLI,
-	RPOLI,
-	STAR,
-	SPIR,
-	SAT,
-	HART,
-	LENS,
-	EGG,
-	TEAR,
-	ZIG,
-	WAV,
-	DASY,
+	FRMLINE = 1u,	// Line form
+	FRMFPOLY,		// Freehand polygon form
+	FRMRPOLY,		// Regular polygon form
+	FRMSTAR,		// Star form
+	FRMSPIRAL,		// Spiral Form
+	SAT,			// Used when fill is 'feather', 'fan', 'fan clip' or form is daisy
+	FRMHEART,		// Heart Form
+	FRMLENS,		// Lens form
+	FRMEGG,			// Egg form
+	FRMTEAR,		// Teardrop form
+	FRMZIGZAG,		// Zig-Zag form
+	FRMWAVE,		// Wave Form
+	FRMDAISY,		// Daisy form
 };
 
 //main menu items
@@ -1456,21 +1456,6 @@ enum {
 	MFIL_UNFIL
 };
 
-//view menu items
-enum {
-	MVU_MOV,
-	MVU_SET,
-	MVU_BAK,
-	MVU_ZUM,
-	MVU_SIZ,
-	MVU_THR,
-	MVU_THC,
-	MVU_DES,
-	MVU_NOT,
-	MVU_RMK,
-	MVU_ABO,
-};
-
 //clipboard data types
 enum {
 	CLP_STCH = 1,
@@ -1481,19 +1466,19 @@ enum {
 
 //edge fill types
 enum {
-	EGLIN = 1,
-	EGBLD,
-	EGCLP,
-	EGSAT,
-	EGAP,
-	EGPRP,
-	EGHOL,
-	EGPIC,
-	EGDUB,
-	EGCHNL,
-	EGCHNH,
-	EGCLPX,
-	EGLAST //must always be the last value
+	EDGELINE = 1,	// Line
+	EDGEBEAN,		// Bean
+	EDGECLIP,		// Clipboard
+	EDGEANGSAT,		// Angle Satin
+	EDGEAPPL,		// Applique
+	EDGEPROPSAT,	// Proportional Satin
+	EDGEBHOL,		// Buttonhole
+	EDGEPICOT,		// Picot
+	EDGEDOUBLE,		// Double
+	EDGELCHAIN,		// Line Chain
+	EDGEOCHAIN,		// Open Chain
+	EDGECLIPX,		// Even Clipboard
+	EDGELAST		//must always be the last value
 };
 
 //edge underlay bit
