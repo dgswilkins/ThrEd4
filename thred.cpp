@@ -760,7 +760,9 @@ double				gapToNearest[NERCNT];	//distances of the closest points
 											//to a mouse click
 long				nearestPoint[NERCNT];	//indices of the closest points
 unsigned			nearestCount;			//number of boxes selected
-unsigned			slpnt = 0;				//pointer for drawing stitch select lines
+//ToDo - convert slin to calloc'd local variable?
+POINT				slin[MAXSEQ];			//stitch select line 
+unsigned			searchLineIndex = 0;	//pointer for drawing stitch select lines
 fRECTANGLE			stitchRangeRect;		//stitch range rectangle
 fPOINT				stitchRangeSize;		//from check ranges
 fPOINT				selectedFormsSize;		//size of multiple select rectangle
@@ -2879,12 +2881,12 @@ void selin(unsigned strt, unsigned end, HDC dc) {
 	unsigned		ind;
 	double			tcor;
 	long			hi;
-	POINT			slin[MAXSEQ];	//stitch select line
-
+	
 	SelectObject(dc, groupSelectPen);
 	SetROP2(stitchWindowDC, R2_NOTXORPEN);
-	if (slpnt)
-		Polyline(dc, slin, slpnt);
+	//Todo - Is slin initialized at this point?
+	if (searchLineIndex)
+		Polyline(dc, slin, searchLineIndex);
 	if (strt > end) {
 
 		ind = strt;
@@ -2895,15 +2897,15 @@ void selin(unsigned strt, unsigned end, HDC dc) {
 	ind = end - strt + 1;
 	if (ind < 5)
 		ind = 5;
-	slpnt = 0;
+	searchLineIndex = 0;
 	for (ind = strt; ind <= end; ind++) {
 
 		tcor = ((stitchBuffer[ind].x - zoomRect.left)*zoomRatio.x + 0.5);
-		slin[slpnt].x = (long)tcor;
+		slin[searchLineIndex].x = (long)tcor;
 		tcor = (hi - (stitchBuffer[ind].y - zoomRect.bottom)*zoomRatio.y + 0.5);
-		slin[slpnt++].y = (long)tcor;
+		slin[searchLineIndex++].y = (long)tcor;
 	}
-	Polyline(dc, slin, slpnt);
+	Polyline(dc, slin, searchLineIndex);
 	SetROP2(dc, R2_COPYPEN);
 }
 
@@ -5642,8 +5644,8 @@ void nuFil() {
 				preferenceIndex = 0;
 			}
 			pcsBMPFileName[0] = 0;
-			if (slpnt)
-				slpnt = 0;
+			if (searchLineIndex)
+				searchLineIndex = 0;
 			rstMap(SCROS);
 			rstMap(ECROS);
 			rstMap(BZUMIN);
@@ -7929,7 +7931,7 @@ void rebox() {
 
 			rstMap(SCROS);
 			rstMap(ECROS);
-			slpnt = 0;
+			searchLineIndex = 0;
 			setMap(RESTCH);
 			for (ind = 0; ind < 16; ind++)
 				redraw(hUserColorWin[ind]);
@@ -8116,7 +8118,7 @@ void rstAll() {
 	rstMap(FORMSEL);
 	rstMap(FRMPSEL);
 	unmsg();
-	slpnt = selectedFormCount = 0;
+	searchLineIndex = selectedFormCount = 0;
 	firstWin = 0;
 	while (EnumChildWindows(hMainStitchWin, EnumChildProc, 0));
 }
@@ -14752,7 +14754,7 @@ void trcnum(unsigned shft, COLORREF col, unsigned ind) {
 
 	unsigned	len;
 	unsigned	nwid;
-	TCHAR		trbuf[4];
+	TCHAR		trbuf[11] = { 0 };
 
 	col >>= shft;
 	col &= 0xff;
@@ -22733,7 +22735,7 @@ void drwStch() {
 				cros(closestPointIndex);
 			else {
 
-				slpnt = 0;
+				searchLineIndex = 0;
 				ducros(stitchWindowMemDC);
 			}
 			selRct(&stitchRangeRect);

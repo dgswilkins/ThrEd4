@@ -178,7 +178,7 @@ extern			fPOINT			selectedPoint;
 extern			fRECTANGLE		selectedPointsRect;
 extern			double			showStitchThreshold;
 extern			TCHAR			sideWindowEntryBuffer[11];
-extern			unsigned		slpnt;
+extern			unsigned		searchLineIndex;
 extern			double			smallStitchLength;
 extern			unsigned		smap;
 extern			TCHAR*			stab[STR_LEN];
@@ -418,13 +418,10 @@ float**			sortedLengths;			//array of sorted side lengths for vertical clipboard
 fPOINT			vpnt0;					//vertical clipboard line segment start
 fPOINT			vpnt1;					//vertical clipboard line segment end
 double*			clipSideLengths;		//lengths of form sides for vertical clipboard fill
-CLIPSORT*		clpsrt;					//intersect points for vertical clipboard fill
-CLIPSORT**		pclpsrt;				//pointers to line intersect points
-CLIPNT*			clipnts;				//points for vertical clipboard fills
-VCLPX			vclpx[MAXFRMLINS];		//region crossing data for vertical clipboard fills
-unsigned*		iclpx;					//indices into region crossing data for vertical clipboard fills
-unsigned		vlim;					//wrap limit for vertical clipboard fills
-unsigned		clplim;					//vertical clipboard search limit
+CLIPSORT*		clipIntersectData;		//intersect points for vertical clipboard fill
+CLIPSORT**		ptrClipIntersectData;	//pointers to line intersect points
+CLIPNT*			clipStitchPoints;		//points for vertical clipboard fills
+VCLPX			clipFillCrossing[MAXFRMLINS];	//region crossing data for vertical clipboard fills
 float			clpcirc;				//circumference of the vertical clipboard fill form
 float			clpcirc2;				//circumference of the vertical clipboard fill form / 2
 float			strtlen;				//distance from zero point of first vertical clipboard segment
@@ -1299,7 +1296,7 @@ void ritfrct(unsigned ind, HDC dc) {
 	SetROP2(stitchWindowDC, R2_COPYPEN);
 	if (rstMap(GRPSEL)) {
 		rstMap(SELSHO);
-		slpnt = 0;
+		searchLineIndex = 0;
 		setMap(RESTCH);
 	}
 }
@@ -11575,8 +11572,8 @@ void ritseg() {
 			ind++;
 		chksid(clipSegments[activePointIndex].asid);
 		while (ind <= clipSegments[activePointIndex].finish) {
-			oseq[sequenceIndex].x = clipnts[ind].x;
-			oseq[sequenceIndex++].y = clipnts[ind++].y;
+			oseq[sequenceIndex].x = clipStitchPoints[ind].x;
+			oseq[sequenceIndex++].y = clipStitchPoints[ind++].y;
 		}
 		clipIntersectSide = clipSegments[activePointIndex].zsid;
 	}
@@ -11587,14 +11584,14 @@ void ritseg() {
 		chksid(clipSegments[activePointIndex].zsid);
 		if (clipSegments[activePointIndex].start) {
 			while (ind >= clipSegments[activePointIndex].start) {
-				oseq[sequenceIndex].x = clipnts[ind].x;
-				oseq[sequenceIndex++].y = clipnts[ind--].y;
+				oseq[sequenceIndex].x = clipStitchPoints[ind].x;
+				oseq[sequenceIndex++].y = clipStitchPoints[ind--].y;
 			}
 		}
 		else {
 			while (ind < clipSegments[activePointIndex].start) {
-				oseq[sequenceIndex].x = clipnts[ind].x;
-				oseq[sequenceIndex++].y = clipnts[ind--].y;
+				oseq[sequenceIndex].x = clipStitchPoints[ind].x;
+				oseq[sequenceIndex++].y = clipStitchPoints[ind--].y;
 			}
 		}
 		clipIntersectSide = clipSegments[activePointIndex].asid;
@@ -11679,11 +11676,11 @@ void mvpclp(unsigned dst, unsigned src) {
 	_asm {
 		mov		edi, dst
 		shl		edi, 2
-		add		edi, pclpsrt
+		add		edi, ptrClipIntersectData
 		mov		edi, [edi]
 		mov		esi, src
 		shl		esi, 2
-		add		esi, pclpsrt
+		add		esi, ptrClipIntersectData
 		mov		esi, [esi]
 		xor ecx, ecx
 		mov		cl, 5
@@ -11691,15 +11688,15 @@ void mvpclp(unsigned dst, unsigned src) {
 	}
 #else
 	//ToDo - Should '20' be sizeof(CLIPSORT)'?
-	memcpy(pclpsrt[dst], pclpsrt[src], 20);
+	memcpy(ptrClipIntersectData[dst], ptrClipIntersectData[src], 20);
 #endif
 }
 
 float getlen(unsigned ind) {
-	clipnts[ind].side %= sides;
-	return	lengths[clipnts[ind].side] +
-		hypot(currentFormVertices[clipnts[ind].side].x - clipnts[ind].x,
-			currentFormVertices[clipnts[ind].side].y - clipnts[ind].y);
+	clipStitchPoints[ind].side %= sides;
+	return	lengths[clipStitchPoints[ind].side] +
+		hypot(currentFormVertices[clipStitchPoints[ind].side].x - clipStitchPoints[ind].x,
+			currentFormVertices[clipStitchPoints[ind].side].y - clipStitchPoints[ind].y);
 }
 
 unsigned leftsid() {
@@ -11816,7 +11813,7 @@ BOOL isect(unsigned find0, unsigned find1, fPOINT* ipnt, float* len) {
 	return flg;
 }
 
-unsigned insect() {
+unsigned insect() { 
 	unsigned	ind, ine, cnt;
 	unsigned	svrt, nvrt;
 	fRECTANGLE		lrct;
@@ -11840,27 +11837,27 @@ unsigned insect() {
 	}
 	ine = cnt = 0;
 	for (ind = vstrt; ind < vfin; ind++) {
-		svrt = vclpx[ind].sid;
+		svrt = clipFillCrossing[ind].sid;
 		nvrt = nxt(svrt);
-		if (isect(svrt, nvrt, &clpsrt[ine].point, &clpsrt[ine].sidlen)) {
-			ipnt = &clpsrt[ine].point;
+		if (isect(svrt, nvrt, &clipIntersectData[ine].point, &clipIntersectData[ine].sidlen)) {
+			ipnt = &clipIntersectData[ine].point;
 			if (ipnt->x >= lrct.left&&
 				ipnt->x <= lrct.right&&
 				ipnt->y >= lrct.bottom&&
 				ipnt->y <= lrct.top) {
-				clpsrt[ine].seglen = hypot(clpsrt[ine].point.x - vpnt0.x, clpsrt[ine].point.y - vpnt0.y);
-				clpsrt[ine].lin = svrt;
-				pclpsrt[ine] = &clpsrt[ine];
+				clipIntersectData[ine].seglen = hypot(clipIntersectData[ine].point.x - vpnt0.x, clipIntersectData[ine].point.y - vpnt0.y);
+				clipIntersectData[ine].lin = svrt;
+				ptrClipIntersectData[ine] = &clipIntersectData[ine];
 				ine++;
 				cnt++;
 			}
 		}
 	}
 	if (cnt > 1) {
-		qsort((void*)pclpsrt, cnt, 4, lencmp);
+		qsort((void*)ptrClipIntersectData, cnt, 4, lencmp);
 		ine = 1;
 		for (ind = 0; ind < cnt - 1; ind++) {
-			if (fabs(pclpsrt[ind]->seglen - pclpsrt[ind + 1]->seglen) > TINY)
+			if (fabs(ptrClipIntersectData[ind]->seglen - ptrClipIntersectData[ind + 1]->seglen) > TINY)
 				mvpclp(ine++, ind + 1);
 		}
 		cnt = ine;
@@ -11884,7 +11881,7 @@ BOOL isin(float pntx, float pnty) {
 	acnt = 0;
 	for (ind = vstrt; ind < vfin; ind++)
 	{
-		svrt = vclpx[ind].sid;
+		svrt = clipFillCrossing[ind].sid;
 		nvrt = nxt(svrt);
 		if (projv(pntx, currentFormVertices[svrt], currentFormVertices[nvrt], &ipnt))
 		{
@@ -11914,22 +11911,22 @@ BOOL isin(float pntx, float pnty) {
 unsigned clpnseg(unsigned strt, unsigned fin) {
 	clipSegments[clipSegmentIndex].start = strt;
 	clipSegments[clipSegmentIndex].borderLength = getlen(strt);
-	clipSegments[clipSegmentIndex].asid = clipnts[strt].side;
+	clipSegments[clipSegmentIndex].asid = clipStitchPoints[strt].side;
 	clipSegments[clipSegmentIndex].edgeLength = getlen(fin);
-	clipSegments[clipSegmentIndex].zsid = clipnts[fin].side;
+	clipSegments[clipSegmentIndex].zsid = clipStitchPoints[fin].side;
 	clipSegments[clipSegmentIndex].finish = fin;
 	clipSegments[clipSegmentIndex++].dun = 0;
 	return fin + 1;
 }
 
 unsigned vclpfor(unsigned ind) {
-	while (!clipnts[ind].flag&&ind < activePointIndex)
+	while (!clipStitchPoints[ind].flag&&ind < activePointIndex)
 		ind++;
 	return ind;
 }
 
 unsigned vclpbak(unsigned ind) {
-	while (!clipnts[ind].flag&&ind)
+	while (!clipStitchPoints[ind].flag&&ind)
 		ind--;
 	return ind;
 }
@@ -11989,11 +11986,11 @@ void duflt() {
 
 void inspnt()
 {
-	clipnts[activePointIndex + 1].x = clipnts[activePointIndex].x;
-	clipnts[activePointIndex + 1].y = clipnts[activePointIndex].y;
-	clipnts[activePointIndex].x = midl(clipnts[activePointIndex + 1].x, clipnts[activePointIndex - 1].x);
-	clipnts[activePointIndex].y = midl(clipnts[activePointIndex + 1].y, clipnts[activePointIndex - 1].y);
-	clipnts[activePointIndex].flag = 1;
+	clipStitchPoints[activePointIndex + 1].x = clipStitchPoints[activePointIndex].x;
+	clipStitchPoints[activePointIndex + 1].y = clipStitchPoints[activePointIndex].y;
+	clipStitchPoints[activePointIndex].x = midl(clipStitchPoints[activePointIndex + 1].x, clipStitchPoints[activePointIndex - 1].x);
+	clipStitchPoints[activePointIndex].y = midl(clipStitchPoints[activePointIndex + 1].y, clipStitchPoints[activePointIndex - 1].y);
+	clipStitchPoints[activePointIndex].flag = 1;
 	activePointIndex++;
 }
 
@@ -12009,6 +12006,8 @@ void clpcon() {
 	unsigned	clpnof;
 	double		clpvof;
 	TXPNT*		ptx = nullptr;
+	unsigned*	iclpx;			//indices into region crossing data for vertical clipboard fills
+	unsigned	clplim;			//vertical clipboard search limit
 
 	duflt();
 	clpwid = clipboardRectSize.cx + SelectedForm->fillSpacing;
@@ -12029,8 +12028,8 @@ void clpcon() {
 	}
 	lengths = new double[sides + 1];
 	clipSideLengths = new double[sides];
-	clpsrt = new CLIPSORT[sides];
-	pclpsrt = new CLIPSORT*[sides + 1]();
+	clipIntersectData = new CLIPSORT[sides];
+	ptrClipIntersectData = new CLIPSORT*[sides + 1]();
 	ine = leftsid();
 	tlen = 0;
 	lengths[ine] = 0;
@@ -12072,7 +12071,7 @@ void clpcon() {
 		for (ind = 0; ind < sides; ind++)
 			currentFormVertices[ind].y += fnof;
 	}
-	clipnts = (CLIPNT*)&bseq;
+	clipStitchPoints = (CLIPNT*)&bseq;
 	segxs = 0;
 	for (ind = 0; ind < sides; ind++) {
 		strt = floor(currentFormVertices[ind].x / clpwid);
@@ -12089,18 +12088,18 @@ void clpcon() {
 		if (clpneg)
 			strt -= (float)clipboardRectSize.cx / clpwid;
 		for (ine = strt; ine <= fin; ine++) {
-			vclpx[segxs].sid = ind;
-			vclpx[segxs++].seg = ine;
+			clipFillCrossing[segxs].sid = ind;
+			clipFillCrossing[segxs++].seg = ine;
 		}
 	}
-	qsort((void*)vclpx, segxs, 8, clpcmp);
-	iclpx = (unsigned*)&vclpx[segxs];
-	ine = 1; inf = vclpx[0].seg;
+	qsort((void*)clipFillCrossing, segxs, 8, clpcmp);
+	iclpx = (unsigned*)&clipFillCrossing[segxs];
+	ine = 1; inf = clipFillCrossing[0].seg;
 	iclpx[0] = 0;
 	for (ind = 1; ind < segxs; ind++) {
-		if (vclpx[ind].seg != inf) {
+		if (clipFillCrossing[ind].seg != inf) {
 			iclpx[ine++] = ind;
-			inf = vclpx[ind].seg;
+			inf = clipFillCrossing[ind].seg;
 		}
 	}
 	iclpx[ine] = ind;
@@ -12119,7 +12118,7 @@ void clpcon() {
 	}
 	segps = ine;
 	ind = vstrt = cnt = 0;
-	seg = vclpx[0].seg;
+	seg = clipFillCrossing[0].seg;
 	clrnum = (nrct.top >> 5) + 1;
 	activePointIndex = 0;
 	for (ind = 0; ind < segps; ind++) {
@@ -12170,30 +12169,30 @@ void clpcon() {
 					vpnt1.y = ploc.y + clipBuffer[inf].y;
 				}
 
-				clipnts[activePointIndex].x = vpnt0.x;
-				clipnts[activePointIndex].y = vpnt0.y;
+				clipStitchPoints[activePointIndex].x = vpnt0.x;
+				clipStitchPoints[activePointIndex].y = vpnt0.y;
 				if (isin(vpnt0.x, vpnt0.y))
 				{
-					if (activePointIndex&&clipnts[activePointIndex - 1].flag == 2)
+					if (activePointIndex&&clipStitchPoints[activePointIndex - 1].flag == 2)
 						inspnt();
-					clipnts[activePointIndex].flag = 0;
+					clipStitchPoints[activePointIndex].flag = 0;
 				}
 				else
 				{
-					if (activePointIndex && !clipnts[activePointIndex - 1].flag)
+					if (activePointIndex && !clipStitchPoints[activePointIndex - 1].flag)
 						inspnt();
-					clipnts[activePointIndex].flag = 2;
+					clipStitchPoints[activePointIndex].flag = 2;
 				}
 				activePointIndex++;
 				cnt = insect();
 				if (cnt)
 				{
 					for (ing = 0; ing < cnt; ing++) {
-						if (pclpsrt != nullptr) {
-							clipnts[activePointIndex].side = pclpsrt[ing]->lin;
-							clipnts[activePointIndex].x = pclpsrt[ing]->point.x;
-							clipnts[activePointIndex].y = pclpsrt[ing]->point.y;
-							clipnts[activePointIndex].flag = 1;
+						if (ptrClipIntersectData != nullptr) {
+							clipStitchPoints[activePointIndex].side = ptrClipIntersectData[ing]->lin;
+							clipStitchPoints[activePointIndex].x = ptrClipIntersectData[ing]->point.x;
+							clipStitchPoints[activePointIndex].y = ptrClipIntersectData[ing]->point.y;
+							clipStitchPoints[activePointIndex].flag = 1;
 							activePointIndex++;
 							if (activePointIndex > MAXSEQ << 2)
 								goto clpskp;
@@ -12204,15 +12203,15 @@ void clpcon() {
 				vpnt0.y = vpnt1.y;
 			}
 		}
-		clipnts[activePointIndex - 1].flag = 2;
+		clipStitchPoints[activePointIndex - 1].flag = 2;
 	}
 clpskp:;
 
-	clipnts[activePointIndex].flag = 2;
+	clipStitchPoints[activePointIndex].flag = 2;
 	if (nof) {
 		fnof = nof*clipboardRectSize.cy;
 		for (ind = 0; ind < activePointIndex; ind++)
-			clipnts[ind].y -= fnof;
+			clipStitchPoints[ind].y -= fnof;
 		for (ind = 0; ind < sides; ind++)
 			currentFormVertices[ind].y -= fnof;
 	}
@@ -12226,13 +12225,13 @@ clpskp:;
 #endif
 
 	clipSegmentIndex = 0;
-	regof = vclpx[0].seg;
+	regof = clipFillCrossing[0].seg;
 	rstMap(FILDIR);
 	ine = 0;
 	if (activePointIndex)
 	{
 		for (ind = 0; ind < activePointIndex - 1; ind++) {
-			switch (clipnts[ind].flag)
+			switch (clipStitchPoints[ind].flag)
 			{
 			case 0:		//inside
 
@@ -12263,8 +12262,8 @@ clpskp:;
 
 			delete[] lengths;
 			delete[] clipSideLengths;
-			delete[] clpsrt;
-			delete[] pclpsrt;
+			delete[] clipIntersectData;
+			delete[] ptrClipIntersectData;
 
 			if (clipSegmentIndex) {
 				clplim = clipSegmentIndex >> 3;
@@ -12293,8 +12292,8 @@ clpskp:;
 #if CLPVU==1
 
 				for (ind = 0; ind < activePointIndex; ind++) {
-					stitchBuffer[ind].x = clipnts[ind].x;
-					stitchBuffer[ind].y = clipnts[ind].y;
+					stitchBuffer[ind].x = clipStitchPoints[ind].x;
+					stitchBuffer[ind].y = clipStitchPoints[ind].y;
 					stitchBuffer[ind].attribute = 0;
 				}
 				header.stitchCount = activePointIndex;
@@ -12305,8 +12304,8 @@ clpskp:;
 				inf = 0;
 				for (ind = 0; ind < clipSegmentIndex; ind++) {
 					for (ine = clipSegments[ind].start; ine <= clipSegments[ind].finish; ine++) {
-						stitchBuffer[inf].x = clipnts[ine].x;
-						stitchBuffer[inf].y = clipnts[ine].y;
+						stitchBuffer[inf].x = clipStitchPoints[ine].x;
+						stitchBuffer[inf].y = clipStitchPoints[ine].y;
 						stitchBuffer[inf++].attribute = ind & 0xf;
 					}
 				}
