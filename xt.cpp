@@ -23,7 +23,7 @@ void		txof();
 extern	unsigned		activeColor;
 extern	unsigned		activeLayer;
 extern	unsigned		activePointIndex;
-extern	fPOINT			angflt[MAXFRMLINS];
+extern	fPOINT			angledFormVertices[MAXFRMLINS];
 extern	FRMHED			angledForm;
 extern	unsigned		auth;
 extern	TCHAR			auxName[_MAX_PATH];
@@ -55,7 +55,7 @@ extern	HWND			hButtonWin[9];
 extern	HGLOBAL			hClipMem;
 extern	PCSHEADER		header;
 extern	HWND			hHorizontalScrollBar;
-extern	fPOINTATTRIBUTE*	hifstch;
+extern	fPOINTATTRIBUTE*	tmpStitchBuffer;
 extern	HINSTANCE		hInst;
 extern	TCHAR			hlpbuf[HBUFSIZ];
 extern	HWND			hMainStitchWin;
@@ -65,7 +65,6 @@ extern	HWND			hWnd;
 extern	INIFILE			iniFile;
 extern	fPOINT*			insidePoints;
 extern	unsigned		isind;
-extern	fPOINT*			lconflt;
 extern	unsigned		markedStitchMap[RMAPSIZ];
 extern	MSG				msg;
 extern	TCHAR			msgbuf[MSGSIZ];
@@ -78,7 +77,7 @@ extern	FRMHED*			SelectedForm;
 extern	double			rotationAngle;
 extern	dPOINT			rotationCenter;
 extern	unsigned		satkad;
-extern	SATCON			satks[MAXSAC];
+extern	SATCON			satinConns[MAXSAC];
 extern	TCHAR*			sdat;
 extern	unsigned		selectedFormCount;
 extern	unsigned		selectedFormCount;
@@ -1283,7 +1282,7 @@ void fnuang() {
 	frmcpy(&angledForm, &formList[closestFormToCursor]);
 	rotationCenter.x = (double)(angledForm.rectangle.right - angledForm.rectangle.left) / 2 + angledForm.rectangle.left;
 	rotationCenter.y = (double)(angledForm.rectangle.top - angledForm.rectangle.bottom) / 2 + angledForm.rectangle.bottom;
-	angledForm.vertices = angflt;
+	angledForm.vertices = angledFormVertices;
 	for (ind = 0; ind < angledForm.sides; ind++) {
 
 		angledForm.vertices[ind].x = uflt[ind].x;
@@ -2034,19 +2033,19 @@ double precjmps(SRTREC* psrec)
 				if (precs[loc]->start)
 				{
 					for (ind = precs[loc]->finish - 1; ind >= precs[loc]->start; ind--)
-						moveStitchPoints(&hifstch[outputIndex++], &stitchBuffer[ind]);
+						moveStitchPoints(&tmpStitchBuffer[outputIndex++], &stitchBuffer[ind]);
 				}
 				else
 				{
 					ind = precs[loc]->finish;
 					while (ind)
-						moveStitchPoints(&hifstch[outputIndex++], &stitchBuffer[--ind]);
+						moveStitchPoints(&tmpStitchBuffer[outputIndex++], &stitchBuffer[--ind]);
 				}
 			}
 			else
 			{
 				for (ind = precs[loc]->start; ind < precs[loc]->finish; ind++)
-					moveStitchPoints(&hifstch[outputIndex++], &stitchBuffer[ind]);
+					moveStitchPoints(&tmpStitchBuffer[outputIndex++], &stitchBuffer[ind]);
 			}
 		}
 	}
@@ -2210,7 +2209,7 @@ void fsort()
 		}
 		prngs[pind].finish = rind;
 		pind++;
-		hifstch = &stitchBuffer[MAXSEQ];
+		tmpStitchBuffer = &stitchBuffer[MAXSEQ];
 		outputIndex = 0;
 		for (ind = 0; ind < pind; ind++)
 		{
@@ -4072,8 +4071,8 @@ void setxclp()
 	fof.y -= tscr.formCenter.y;
 	for (ind = 0; ind < angledForm.sides; ind++)
 	{
-		angflt[ind].x += fof.x;
-		angflt[ind].y += fof.y;
+		angledFormVertices[ind].x += fof.x;
+		angledFormVertices[ind].y += fof.y;
 	}
 	cnt = angledForm.sides - 1;
 	if (angledForm.type != FRMLINE)
@@ -4082,7 +4081,7 @@ void setxclp()
 	for (ind = 0; ind < cnt; ind++)
 	{
 		inx = nxt(ind);
-		dutxlin(angflt[ind], angflt[inx]);
+		dutxlin(angledFormVertices[ind], angledFormVertices[inx]);
 	}
 }
 
@@ -4205,18 +4204,18 @@ void angrct(fRECTANGLE* rct)
 {
 	unsigned	ind;
 
-	rct->left = rct->right = angflt[0].x;
-	rct->bottom = rct->top = angflt[0].y;
+	rct->left = rct->right = angledFormVertices[0].x;
+	rct->bottom = rct->top = angledFormVertices[0].y;
 	for (ind = 1; ind < angledForm.sides; ind++)
 	{
-		if (angflt[ind].x < rct->left)
-			rct->left = angflt[ind].x;
-		if (angflt[ind].x > rct->right)
-			rct->right = angflt[ind].x;
-		if (angflt[ind].y > rct->top)
-			rct->top = angflt[ind].y;
-		if (angflt[ind].y < rct->bottom)
-			rct->bottom = angflt[ind].y;
+		if (angledFormVertices[ind].x < rct->left)
+			rct->left = angledFormVertices[ind].x;
+		if (angledFormVertices[ind].x > rct->right)
+			rct->right = angledFormVertices[ind].x;
+		if (angledFormVertices[ind].y > rct->top)
+			rct->top = angledFormVertices[ind].y;
+		if (angledFormVertices[ind].y < rct->bottom)
+			rct->bottom = angledFormVertices[ind].y;
 	}
 }
 
@@ -4229,7 +4228,7 @@ void ritxfrm()
 	of.y = txtloc.y - cloxref.y;
 	for (ind = 0; ind < angledForm.sides; ind++)
 	{
-		ed2px(angflt[ind], &formLines[ind]);
+		ed2px(angledFormVertices[ind], &formLines[ind]);
 		formLines[ind].x += of.x;
 		formLines[ind].y += of.y;
 	}
@@ -4252,8 +4251,8 @@ void setxfrm()
 	angrct(&arct);
 	for (ind = 0; ind < angledForm.sides; ind++)
 	{
-		angflt[ind].x -= arct.left;
-		angflt[ind].y -= arct.bottom;
+		angledFormVertices[ind].x -= arct.left;
+		angledFormVertices[ind].y -= arct.bottom;
 	}
 	angrct(&arct);
 	hi = arct.top - arct.bottom;
@@ -4262,8 +4261,8 @@ void setxfrm()
 		rat = tscr.areaHeight / hi*0.95;
 		for (ind = 0; ind < angledForm.sides; ind++)
 		{
-			angflt[ind].x *= rat;
-			angflt[ind].y *= rat;
+			angledFormVertices[ind].x *= rat;
+			angledFormVertices[ind].y *= rat;
 		}
 		angrct(&arct);
 	}
@@ -4283,8 +4282,8 @@ void txtclp()
 			if (clipboardFormData->clipType == CLP_FRM) {
 				SelectedForm = &clipboardFormData->form;
 				frmcpy(&angledForm, SelectedForm);
-				MoveMemory(&angflt, &SelectedForm[1], sizeof(fPOINT)*SelectedForm->sides);
-				angledForm.vertices = angflt;
+				MoveMemory(&angledFormVertices, &SelectedForm[1], sizeof(fPOINT)*SelectedForm->sides);
+				angledForm.vertices = angledFormVertices;
 				rstMap(TXTLIN);
 				setMap(TXTCLP);
 				setMap(TXTMOV);
@@ -4871,8 +4870,8 @@ void txsiz(double rat)
 	ritxfrm();
 	for (ind = 0; ind < angledForm.sides; ind++)
 	{
-		angflt[ind].x *= rat;
-		angflt[ind].y *= rat;
+		angledFormVertices[ind].x *= rat;
+		angledFormVertices[ind].y *= rat;
 	}
 	angrct(&arct);
 	tscr.formCenter.x = midl(arct.right, arct.left);
@@ -5571,17 +5570,17 @@ void setangf(double tang)
 	angbak = rotationAngle;
 	rotationAngle = tang;
 	MoveMemory(&angledForm, SelectedForm, sizeof(FRMHED));
-	MoveMemory(&angflt, currentFormVertices, sizeof(fPOINT)*sides);
+	MoveMemory(&angledFormVertices, currentFormVertices, sizeof(fPOINT)*sides);
 	rotationCenter.x = (double)(angledForm.rectangle.right - angledForm.rectangle.left) / 2 + angledForm.rectangle.left;
 	rotationCenter.y = (double)(angledForm.rectangle.top - angledForm.rectangle.bottom) / 2 + angledForm.rectangle.bottom;
-	angledForm.vertices = angflt;
+	angledForm.vertices = angledFormVertices;
 	if (rotationAngle)
 	{
 		for (ind = 0; ind < sides; ind++)
-			rotflt(&angflt[ind]);
+			rotflt(&angledFormVertices[ind]);
 	}
 	SelectedForm = &angledForm;
-	currentFormVertices = angflt;
+	currentFormVertices = angledFormVertices;
 	rotationAngle = angbak;
 }
 
@@ -5701,7 +5700,7 @@ unsigned frmchkfn()
 			{
 				if (!(bc.attribute&BADSAT))
 				{
-					if (bc.sat == fp->satinOrAngle.sac - satks)
+					if (bc.sat == fp->satinOrAngle.sac - satinConns)
 						bc.sat += fp->satinGuideCount;
 					else
 						bc.attribute |= BADSAT;
@@ -5926,11 +5925,11 @@ void repsat()
 		fp = &formList[ind];
 		if (fp->type == SAT)
 		{
-			dif = fp->satinOrAngle.sac - satks;
+			dif = fp->satinOrAngle.sac - satinConns;
 			if (fltad > dif + fp->sides)
 			{
-				MoveMemory(&satks[loc], fp->satinOrAngle.sac, fp->satinGuideCount * sizeof(SATCON));
-				fp->satinOrAngle.sac = &satks[loc];
+				MoveMemory(&satinConns[loc], fp->satinOrAngle.sac, fp->satinGuideCount * sizeof(SATCON));
+				fp->satinOrAngle.sac = &satinConns[loc];
 				loc += fp->satinGuideCount;
 				bcup(ind, &bc);
 			}
@@ -5939,7 +5938,7 @@ void repsat()
 				if (dif < satkad)
 				{
 					fp->satinGuideCount = satkad - dif;
-					MoveMemory(&satks[loc], fp->satinOrAngle.sac, fp->satinGuideCount * sizeof(SATCON));
+					MoveMemory(&satinConns[loc], fp->satinOrAngle.sac, fp->satinGuideCount * sizeof(SATCON));
 					bcup(ind, &bc);
 				}
 				else
@@ -5968,7 +5967,7 @@ void reptx()
 			fp = &formList[ind];
 			if (txad > fp->fillInfo.texture.index + fp->fillInfo.texture.count)
 			{
-				MoveMemory(&satks[loc], &satks[fp->fillInfo.texture.index], fp->fillInfo.texture.count * sizeof(SATCON));
+				MoveMemory(&satinConns[loc], &satinConns[fp->fillInfo.texture.index], fp->fillInfo.texture.count * sizeof(SATCON));
 				fp->fillInfo.texture.index = loc;
 				loc += fp->fillInfo.texture.count;
 				bcup(ind, &bc);
@@ -5978,7 +5977,7 @@ void reptx()
 				if (txad > fp->fillInfo.texture.index)
 				{
 					fp->fillInfo.texture.count = txad - fp->fillInfo.texture.index;
-					MoveMemory(&satks[loc], &satks[fp->fillInfo.texture.index], fp->fillInfo.texture.count * sizeof(SATCON));
+					MoveMemory(&satinConns[loc], &satinConns[fp->fillInfo.texture.index], fp->fillInfo.texture.count * sizeof(SATCON));
 					fp->fillInfo.texture.index = loc;
 					bcup(ind, &bc);
 					loc = bc.tx;

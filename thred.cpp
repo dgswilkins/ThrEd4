@@ -399,7 +399,6 @@ extern	unsigned		clpad;
 extern	TCHAR*			cpyrit;
 extern	SATCON*			currentFormConnections;
 extern	fPOINT*			currentFormVertices;
-extern	unsigned		fgpnt0;
 extern	double			fillAngle;
 extern	POINT			formLines[MAXFRMLINS];
 extern	unsigned		fltad;
@@ -428,7 +427,7 @@ extern	long			prfwid;
 extern	unsigned		pseudoRandomValue;
 extern	int				ptxhst;
 extern	unsigned		satkad;
-extern	SATCON			satks[MAXSAC];
+extern	SATCON			satinConns[MAXSAC];
 extern	unsigned		selectedFormControlVertex;
 extern	unsigned		selectedFormCount;
 extern	unsigned short	selectedFormList[MAXFORMS];
@@ -601,8 +600,8 @@ dPOINT				rcel;					//size of an markedStitchMap cell for drawing stitch boxes
 unsigned			draggedColor;			//color being dragged
 FORMPOINTS			selectedFormPoints;		//selected form points
 fRECTANGLE			selectedPointsRect;		//rectangle enclosing selected form points
-RECT				selectedPixelsRect;		//display form point select rectangle
-POINT*				formPointsAsLine;		//form point clipboard paste into form line
+RECT				selectedPixelsRect;		//display form vertex select rectangle
+POINT*				formPointsAsLine;		//form vertex clipboard paste into form line
 unsigned			lastFormSelected;		//end point of selected range of forms
 
 #if	PESACT
@@ -1840,7 +1839,7 @@ unsigned upmap[] = {
 
 unsigned			flagMap[MAPLEN];			//bitmap
 unsigned			binaryVariableBitmap = 0;	//for storage of persistent binary variables set by the user
-
+// ToDo - stitchBuffer and tmpStitichBuffer have been allocated at the same place. Should they be separate?
 fPOINTATTRIBUTE		stitchBuffer[MAXPCS];		//main stitch buffer
 fPOINTATTRIBUTE		clipBuffer[MAXSEQ];			//for temporary copy of imported clipboard data
 FRMHED*				SelectedForm;			//pointer to selected form
@@ -2379,7 +2378,7 @@ SATCON* adsatk(unsigned cnt) {
 	unsigned ind = satkad;
 
 	satkad += cnt;
-	return &satks[ind];
+	return &satinConns[ind];
 }
 
 fPOINT* adclp(unsigned cnt) {
@@ -2609,7 +2608,7 @@ void dudat() {
 		bdat->sacnt = satkad;
 		bdat->sac = (SATCON*)&bdat->flt[fltad];
 		if (satkad)
-			mvsatk(bdat->sac, &satks[0], satkad);
+			mvsatk(bdat->sac, &satinConns[0], satkad);
 		bdat->nclp = clpad;
 		bdat->clipData = (fPOINT*)&bdat->sac[satkad];
 		if (clpad) {
@@ -4864,7 +4863,7 @@ void redbak() {
 		mvflpnt(&formPoints[0], &bdat->flt[0], fltad);
 	satkad = bdat->sacnt;
 	if (satkad)
-		mvsatk(&satks[0], &bdat->sac[0], satkad);
+		mvsatk(&satinConns[0], &bdat->sac[0], satkad);
 	clpad = bdat->nclp;
 	if (clpad)
 		mvflpnt(&clipboardPoints[0], &bdat->clipData[0], clpad);
@@ -5811,7 +5810,7 @@ void nuFil() {
 								formPoints[ind].x = formPoints[ind].y = 0;
 							setMap(BADFIL);
 						}
-						ReadFile(hFile, (SATCON*)satks, sthed.dlineCount * sizeof(SATCON), &bytesRead, 0);
+						ReadFile(hFile, (SATCON*)satinConns, sthed.dlineCount * sizeof(SATCON), &bytesRead, 0);
 						if (bytesRead != sthed.dlineCount * sizeof(SATCON)) {
 
 							satkad = bytesRead / sizeof(SATCON);
@@ -12151,7 +12150,7 @@ void insfil() {
 						} else
 							ReadFile(hInsertedFile, (FRMHED*)&formList[formIndex], thed.formCount * sizeof(FRMHED), &bytesRead, 0);
 						ReadFile(hInsertedFile, (fPOINT*)&formPoints[fltad], thed.pointCount * sizeof(fPOINT), &bytesRead, 0);
-						ReadFile(hInsertedFile, (SATCON*)&satks[satkad], thed.dlineCount * sizeof(SATCON), &bytesRead, 0);
+						ReadFile(hInsertedFile, (SATCON*)&satinConns[satkad], thed.dlineCount * sizeof(SATCON), &bytesRead, 0);
 						ReadFile(hInsertedFile, (fPOINT*)&clipboardPoints[clpad], thed.clipboardDataCount * sizeof(fPOINT), &bytesRead, 0);
 						CloseHandle(hInsertedFile);
 						hInsertedFile = 0;

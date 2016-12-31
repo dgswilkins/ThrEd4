@@ -405,7 +405,7 @@ enum {
 	MOVCNTR,	//user is moving the rotate center
 	GETMIN,		//user is entering a minimum stitch length
 	NUMIN,		//user in entering a number
-	MOVFRM,		//user is moving a form point
+	MOVFRM,		//user is moving a form vertex
 	MOVMSG,		//user tried to move an edited form
 	SHOFRM,		//form is currently written to the screen
 	STHR,		//user is entering a new stitch box threshold
@@ -521,7 +521,7 @@ enum {
 	NOTFREE,	//no free space on the drive
 	PIXIN,		//user in inputting nudge pixels
 	STPXIN,		//user is inputting stitch point pixels
-	FRMPXIN,	//user is inputting form point pixels
+	FRMPXIN,	//user is inputting form vertex pixels
 	WASMRK,		//user has set a mark
 	RESIZ,		//need to change the size of the main window
 	MSGOF,		//offset the message box
@@ -556,7 +556,7 @@ enum {
 	WASLED,		//lead form found in frmchk
 	FPSEL,		//form points selected
 	SHOPSEL,	//form points selected rectangle is showing
-	PSELDIR,	//direction of form point select
+	PSELDIR,	//direction of form vertex select
 	FPUNCLP,	//user is retrieving cliped form points into a form
 	SHOP,		//clipboard from points are showing
 	WASPCDCLP,	//there is pcd data on the clipboard
@@ -565,7 +565,7 @@ enum {
 	ENTRFTHUP,	//user is entering the feather up number
 	FTHSID,		//user is entering a feather color
 	CNV2FTH,	//converting a form to feather ribbon
-	WASFPNT,	//user is moving a form point
+	WASFPNT,	//user is moving a form vertex
 	WASDO,		//backup has been made before refil
 	NOSEL,		//left button down didn't select anything
 	WASDEL,		//stitches were deleted
