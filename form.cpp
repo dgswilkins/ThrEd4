@@ -421,22 +421,18 @@ double*			clipSideLengths;		//lengths of form sides for vertical clipboard fill
 CLIPSORT*		clipIntersectData;		//intersect points for vertical clipboard fill
 CLIPSORT**		ptrClipIntersectData;	//pointers to line intersect points
 CLIPNT*			clipStitchPoints;		//points for vertical clipboard fills
-VCLPX			clipFillCrossing[MAXFRMLINS];	//region crossing data for vertical clipboard fills
-float			clpcirc;				//circumference of the vertical clipboard fill form
-float			clpcirc2;				//circumference of the vertical clipboard fill form / 2
-float			strtlen;				//distance from zero point of first vertical clipboard segment
-unsigned		vstrt;					//start of region crossing data for a particular region
-unsigned		vfin;					//end of region crossing data for a particular region
-float			clpwid;					//horizontal spacing for vertical clipboard fill
-unsigned		regof;					//starting region for vertical clipboard fill
-HWND			htim;					//prograss bar
-HDC				timdc;					//progress bar device context
-double			timstp;					//progress bar step
-double			timpos;					//progress bar postiion
-FLOAT			fltof;					//form offset for clipboard fills
-long			prfwid;					//width of the preference window
-double			egrat;					//ratio for shrinking eggs
-unsigned		prfsiz;					//size of the text part of the preference window
+VCLPX			regionCrossingData[MAXFRMLINS];	//region crossing data for vertical clipboard fills
+unsigned		regionCrossingStart;	//start of region crossing data for a particular region
+unsigned		regionCrossingEnd;		//end of region crossing data for a particular region
+float			clipWidth;				//horizontal spacing for vertical clipboard fill
+HWND			hTime;					//progress bar
+HDC				timeDC;					//progress bar device context
+double			timeStep;				//progress bar step
+double			timePosition;			//progress bar postiion
+FLOAT			formOffset;				//form offset for clipboard fills
+long			preferenceWindowWidth;	//width of the preference window
+double			eggRatio;				//ratio for shrinking eggs
+unsigned		preferenceWindowTextWidth;	//size of the text part of the preference window
 
 TCHAR*		laytxt[] = {
 	"0",
@@ -6577,7 +6573,7 @@ void maxwid(unsigned strt, unsigned fin) {
 	pnt.y = 0;
 	while (strt <= fin)
 		maxtsiz(stab[strt++], &pnt);
-	prfsiz = pnt.x + 6;
+	preferenceWindowTextWidth = pnt.x + 6;
 }
 
 HWND txtwin(TCHAR* str, RECT loc) {
@@ -7623,20 +7619,20 @@ void prfmsg() {
 	rightWindowSize.x = rightWindowSize.y = 0;
 	maxtsiz(stab[STR_PRF0 + 4], &leftWindowSize);
 	maxtsiz(stab[STR_TAPR], &rightWindowSize);
-	leftWindowSize.x = prfsiz;
+	leftWindowSize.x = preferenceWindowTextWidth;
 	leftWindowSize.x += 4;
 #if LANG==HNG
 	leftWindowSize.x += 10;
 #endif
 	DestroyWindow(hPreferencesWindow);
-	prfwid = leftWindowSize.x + rightWindowSize.x + 18;
+	preferenceWindowWidth = leftWindowSize.x + rightWindowSize.x + 18;
 	hPreferencesWindow = CreateWindow(
 		"STATIC",
 		0,
 		WS_CHILD | WS_VISIBLE | WS_BORDER,
 		buttonWidthX3 + 3,
 		3,
-		prfwid,
+		preferenceWindowWidth,
 		leftWindowSize.y*PRFLINS + 12,
 		hWnd,
 		NULL,
@@ -7741,17 +7737,17 @@ void prfmsg() {
 	rightWindowSize.x = rightWindowSize.y = 0;
 	maxtsiz(stab[STR_PRF0 + 4], &leftWindowSize);
 	maxtsiz(stab[STR_BLUNT], &rightWindowSize);
-	leftWindowSize.x = prfsiz;
+	leftWindowSize.x = preferenceWindowTextWidth;
 	rightWindowSize.x += 4;
 	DestroyWindow(hPreferencesWindow);
-	prfwid = leftWindowSize.x + rightWindowSize.x + 18;
+	preferenceWindowWidth = leftWindowSize.x + rightWindowSize.x + 18;
 	hPreferencesWindow = CreateWindow(
 		"STATIC",
 		0,
 		WS_CHILD | WS_VISIBLE | WS_BORDER,
 		buttonWidthX3 + 3,
 		3,
-		prfwid,
+		preferenceWindowWidth,
 		leftWindowSize.y*PRFLINS + 12,
 		hWnd,
 		NULL,
@@ -8110,7 +8106,7 @@ void dulens(unsigned nsids) {
 }
 
 float shreg(float hi, float ref) {
-	return (hi - ref)*egrat + ref;
+	return (hi - ref)*eggRatio + ref;
 }
 
 void dueg(unsigned nsids) {
@@ -8127,7 +8123,7 @@ void dueg(unsigned nsids) {
 		if (currentFormVertices[ind].y < ref)
 			currentFormVertices[ind].y = ref - (ref - currentFormVertices[ind].y)*iniFile.eggRatio;
 	}
-	egrat = hi / (currentFormVertices[nsids >> 2].y - currentFormVertices[0].y);
+	eggRatio = hi / (currentFormVertices[nsids >> 2].y - currentFormVertices[0].y);
 	for (ind = 1; ind < sides; ind++) {
 		currentFormVertices[ind].x = shreg(currentFormVertices[ind].x, currentFormVertices[0].x);
 		currentFormVertices[ind].y = shreg(currentFormVertices[ind].y, currentFormVertices[0].y);
@@ -9179,7 +9175,7 @@ void snpfn(unsigned xind, unsigned len) {
 }
 
 void nutim(double pl_Size) {
-	htim = CreateWindow(
+	hTime = CreateWindow(
 		"STATIC",
 		0,
 		WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -9191,19 +9187,19 @@ void nutim(double pl_Size) {
 		NULL,
 		hInst,
 		NULL);
-	timdc = GetDC(htim);
-	timstp = (double)stitchWindowSize.x / pl_Size;
-	timpos = 0;
+	timeDC = GetDC(hTime);
+	timeStep = (double)stitchWindowSize.x / pl_Size;
+	timePosition = 0;
 	formLines[0].y = 0;
 	formLines[1].y = buttonHeight;
 	formLines[0].x = formLines[1].x = 0;
-	SelectObject(timdc, userPen[0]);
+	SelectObject(timeDC, userPen[0]);
 }
 
 void nxtim() {
-	Polyline(timdc, formLines, 2);
-	timpos += timstp;
-	formLines[0].x = formLines[1].x = timpos;
+	Polyline(timeDC, formLines, 2);
+	timePosition += timeStep;
+	formLines[0].x = formLines[1].x = timePosition;
 }
 
 void snp(unsigned strt, unsigned fin) {
@@ -9260,7 +9256,7 @@ void snp(unsigned strt, unsigned fin) {
 		snpfn(ind, chklen);
 		nxtim();
 	}
-	DestroyWindow(htim);
+	DestroyWindow(hTime);
 	delete[] txhst;
 }
 
@@ -11836,8 +11832,8 @@ unsigned insect() {
 		lrct.bottom = vpnt1.y;
 	}
 	ine = cnt = 0;
-	for (ind = vstrt; ind < vfin; ind++) {
-		svrt = clipFillCrossing[ind].sid;
+	for (ind = regionCrossingStart; ind < regionCrossingEnd; ind++) {
+		svrt = regionCrossingData[ind].sid;
 		nvrt = nxt(svrt);
 		if (isect(svrt, nvrt, &clipIntersectData[ine].point, &clipIntersectData[ine].sidlen)) {
 			ipnt = &clipIntersectData[ine].point;
@@ -11879,9 +11875,9 @@ BOOL isin(float pntx, float pnty) {
 	if (pnty > isrct.top)
 		return 0;
 	acnt = 0;
-	for (ind = vstrt; ind < vfin; ind++)
+	for (ind = regionCrossingStart; ind < regionCrossingEnd; ind++)
 	{
-		svrt = clipFillCrossing[ind].sid;
+		svrt = regionCrossingData[ind].sid;
 		nvrt = nxt(svrt);
 		if (projv(pntx, currentFormVertices[svrt], currentFormVertices[nvrt], &ipnt))
 		{
@@ -11974,11 +11970,11 @@ void duflt() {
 	}
 	if (leftEdge < clipboardRectSize.cx) {
 		setMap(WASNEG);
-		fltof = clipboardRectSize.cx + fabs(leftEdge) + .05;
+		formOffset = clipboardRectSize.cx + fabs(leftEdge) + .05;
 		for (ind = 0; ind < sides; ind++)
-			currentFormVertices[ind].x += fltof;
-		SelectedForm->rectangle.left += fltof;
-		SelectedForm->rectangle.right += fltof;
+			currentFormVertices[ind].x += formOffset;
+		SelectedForm->rectangle.left += formOffset;
+		SelectedForm->rectangle.right += formOffset;
 	}
 	else
 		rstMap(WASNEG);
@@ -12010,19 +12006,19 @@ void clpcon() {
 	unsigned	clplim;			//vertical clipboard search limit
 
 	duflt();
-	clpwid = clipboardRectSize.cx + SelectedForm->fillSpacing;
+	clipWidth = clipboardRectSize.cx + SelectedForm->fillSpacing;
 	if (chkMap(ISUND))
-		clpwid = SelectedForm->underlaySpacing;
+		clipWidth = SelectedForm->underlaySpacing;
 	if (SelectedForm->fillSpacing < 0)
 		clpneg = 1;
 	else
 		clpneg = 0;
-	if (clpwid < CLPMINAUT)
-		clpwid = (float)CLPMINAUT;
+	if (clipWidth < CLPMINAUT)
+		clipWidth = (float)CLPMINAUT;
 	if (chkMap(TXFIL))
 	{
 		if (txad&&SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count <= txad)
-			clpwid = SelectedForm->fillSpacing;
+			clipWidth = SelectedForm->fillSpacing;
 		else
 			return;
 	}
@@ -12041,11 +12037,9 @@ void clpcon() {
 		tlen += clipSideLengths[ine];
 		ine = inf;
 	}
-	clpcirc = tlen;
-	clpcirc2 = tlen / 2;
 	clipSegments = (CLPSEG*)&stitchBuffer[MAXSEQ];
-	nrct.left = floor(SelectedForm->rectangle.left / clpwid);
-	nrct.right = ceil(SelectedForm->rectangle.right / clpwid);
+	nrct.left = floor(SelectedForm->rectangle.left / clipWidth);
+	nrct.right = ceil(SelectedForm->rectangle.right / clipWidth);
 	nrct.bottom = floor(SelectedForm->rectangle.bottom / clipboardRectSize.cy - 1);
 	nrct.top = ceil(SelectedForm->rectangle.top / clipboardRectSize.cy + 1) + 2;
 	nof = 0;
@@ -12057,12 +12051,12 @@ void clpcon() {
 		nrct.top++;
 		if (SelectedForm->fillSpacing < 0) {
 			nrct.bottom--;
-			nrct.left -= (float)clipboardRectSize.cx / clpwid;
-			nrct.right += (float)clipboardRectSize.cx / clpwid;
+			nrct.left -= (float)clipboardRectSize.cx / clipWidth;
+			nrct.right += (float)clipboardRectSize.cx / clipWidth;
 		}
 	}
 	if (clpneg && !clpnof)
-		nrct.left -= (float)clipboardRectSize.cx / clpwid;
+		nrct.left -= (float)clipboardRectSize.cx / clipWidth;
 	if (nrct.bottom < 0) {
 		nof = 1 - nrct.bottom;
 		nrct.bottom += nof;
@@ -12074,32 +12068,32 @@ void clpcon() {
 	clipStitchPoints = (CLIPNT*)&bseq;
 	segxs = 0;
 	for (ind = 0; ind < sides; ind++) {
-		strt = floor(currentFormVertices[ind].x / clpwid);
-		fin = floor((currentFormVertices[nxt(ind)].x) / clpwid);
+		strt = floor(currentFormVertices[ind].x / clipWidth);
+		fin = floor((currentFormVertices[nxt(ind)].x) / clipWidth);
 		if (strt > fin) {
 			ine = strt;
 			strt = fin;
 			fin = ine;
 		}
 		if (SelectedForm->fillSpacing < 0)
-			fin += clipboardRectSize.cx / clpwid;
+			fin += clipboardRectSize.cx / clipWidth;
 		if (fin > (unsigned)nrct.right)
 			fin = nrct.right;
 		if (clpneg)
-			strt -= (float)clipboardRectSize.cx / clpwid;
+			strt -= (float)clipboardRectSize.cx / clipWidth;
 		for (ine = strt; ine <= fin; ine++) {
-			clipFillCrossing[segxs].sid = ind;
-			clipFillCrossing[segxs++].seg = ine;
+			regionCrossingData[segxs].sid = ind;
+			regionCrossingData[segxs++].seg = ine;
 		}
 	}
-	qsort((void*)clipFillCrossing, segxs, 8, clpcmp);
-	iclpx = (unsigned*)&clipFillCrossing[segxs];
-	ine = 1; inf = clipFillCrossing[0].seg;
+	qsort((void*)regionCrossingData, segxs, 8, clpcmp);
+	iclpx = (unsigned*)&regionCrossingData[segxs];
+	ine = 1; inf = regionCrossingData[0].seg;
 	iclpx[0] = 0;
 	for (ind = 1; ind < segxs; ind++) {
-		if (clipFillCrossing[ind].seg != inf) {
+		if (regionCrossingData[ind].seg != inf) {
 			iclpx[ine++] = ind;
-			inf = clipFillCrossing[ind].seg;
+			inf = regionCrossingData[ind].seg;
 		}
 	}
 	iclpx[ine] = ind;
@@ -12117,14 +12111,14 @@ void clpcon() {
 			isrct.bottom = currentFormVertices[ind].y;
 	}
 	segps = ine;
-	ind = vstrt = cnt = 0;
-	seg = clipFillCrossing[0].seg;
+	ind = regionCrossingStart = cnt = 0;
+	seg = regionCrossingData[0].seg;
 	clrnum = (nrct.top >> 5) + 1;
 	activePointIndex = 0;
 	for (ind = 0; ind < segps; ind++) {
-		vstrt = iclpx[ind];
-		vfin = iclpx[ind + 1];
-		ploc.x = clpwid*(ind + nrct.left);
+		regionCrossingStart = iclpx[ind];
+		regionCrossingEnd = iclpx[ind + 1];
+		ploc.x = clipWidth*(ind + nrct.left);
 		clpvof = 0;
 		if (chkMap(TXFIL))
 		{
@@ -12225,7 +12219,6 @@ clpskp:;
 #endif
 
 	clipSegmentIndex = 0;
-	regof = clipFillCrossing[0].seg;
 	rstMap(FILDIR);
 	ine = 0;
 	if (activePointIndex)
@@ -12321,7 +12314,6 @@ clpskp:;
 				setMap(FILDIR);
 				sequenceIndex = 0;
 				clipIntersectSide = clipSegments[0].asid;
-				strtlen = clipSegments[0].edgeLength;
 				ritseg();
 				while (nucseg()) {
 					if (sequenceIndex > MAXSEQ - 3)
@@ -12344,11 +12336,11 @@ clpskp:;
 				sequenceIndex = ine;
 				if (chkMap(WASNEG)) {
 					for (ind = 0; ind < sequenceIndex; ind++)
-						oseq[ind].x -= fltof;
+						oseq[ind].x -= formOffset;
 					for (ind = 0; ind < sides; ind++)
-						currentFormVertices[ind].x -= fltof;
-					SelectedForm->rectangle.left -= fltof;
-					SelectedForm->rectangle.right -= fltof;
+						currentFormVertices[ind].x -= formOffset;
+					SelectedForm->rectangle.left -= formOffset;
+					SelectedForm->rectangle.right -= formOffset;
 				}
 #endif
 			}
@@ -13153,8 +13145,8 @@ void crop() {
 		savdo();
 		fvars(closestFormToCursor);
 		ine = 0;
-		vstrt = 0;
-		vfin = sides;
+		regionCrossingStart = 0;
+		regionCrossingEnd = sides;
 		for (ind = 0; ind < header.stitchCount; ind++) {
 			if (cisin(stitchBuffer[ind].x, stitchBuffer[ind].y)) {
 				stitchBuffer[ine].x = stitchBuffer[ind].x;

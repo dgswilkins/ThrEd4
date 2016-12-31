@@ -7,41 +7,41 @@
 #include <htmlhelp.h>
 #include <locale.h>
 
-extern void				shoMsg(TCHAR* str);
 extern unsigned			chkMap(unsigned bPnt);
 extern void				ispcdclp();
 extern void				movStch();
-extern void				rstAll();
 extern void				okcan();
+extern void				rstAll();
+extern void				shoMsg(TCHAR* str);
 
-extern POINT			unzoomedRect;
-extern PCSHEADER		header;
-extern TCHAR			homeDirectory[_MAX_PATH];
-extern TCHAR			fileName[_MAX_PATH];
-extern unsigned			setMap(unsigned bPnt);
-extern HWND				hMainStitchWin;
-extern HINSTANCE		hInst;
-extern HWND				hWnd;
-extern TCHAR			msgbuf[MSGSIZ];
-extern unsigned			buttonWidthX3;
-extern MSG				msg;
-extern unsigned			buttonHeight;
-extern unsigned			formIndex;
-extern unsigned			selectedFormCount;
-extern FRMHED*			SelectedForm;
-extern FRMHED			formList[MAXFORMS];
-extern unsigned			closestFormToCursor;
-extern RECT				scRct;
-extern unsigned			rstMap(unsigned bPnt);
-extern DRAWITEMSTRUCT	*ds;
-extern fPOINT			oseq[OSEQLEN];
-extern BSEQPNT			bseq[BSEQLEN];
-extern INIFILE			iniFile;
-extern TCHAR			thrName[_MAX_PATH];
-extern HDC				stitchWindowMemDC;
-extern long				prfwid;
-extern HWND				hButtonWin[9];
-extern void				numWnd();
+extern	BSEQPNT			bseq[BSEQLEN];
+extern	unsigned		buttonHeight;
+extern	unsigned		buttonWidthX3;
+extern	unsigned		closestFormToCursor;
+extern	DRAWITEMSTRUCT*	ds;
+extern	TCHAR			fileName[_MAX_PATH];
+extern	unsigned		formIndex;
+extern	FRMHED			formList[MAXFORMS];
+extern	HWND			hButtonWin[9];
+extern	PCSHEADER		header;
+extern	HINSTANCE		hInst;
+extern	HWND			hMainStitchWin;
+extern	TCHAR			homeDirectory[_MAX_PATH];
+extern	HWND			hWnd;
+extern	INIFILE			iniFile;
+extern	MSG				msg;
+extern	TCHAR			msgbuf[MSGSIZ];
+extern	void			numWnd();
+extern	fPOINT			oseq[OSEQLEN];
+extern	long			preferenceWindowWidth;
+extern	unsigned		rstMap(unsigned bPnt);
+extern	RECT			scRct;
+extern	FRMHED*			SelectedForm;
+extern	unsigned		selectedFormCount;
+extern	unsigned		setMap(unsigned bPnt);
+extern	HDC				stitchWindowMemDC;
+extern	TCHAR			thrName[_MAX_PATH];
+extern	POINT			unzoomedRect;
 
 HANDLE					hlpfil;						//handle to the help file
 TCHAR					hlpnam[_MAX_PATH];			//help file name
@@ -218,7 +218,7 @@ TCHAR*	stab[256];		//memory string pointers
 TCHAR*	sdat;			//string storage
 
 #if PESACT
-TCHAR*	shrtmsg = "PES file header to short: %s\n";
+TCHAR*	shrtmsg = "PES file header too short: %s\n";
 #endif
 
 TCHAR	hlpbuf[HBUFSIZ];	//message formatting buffer
@@ -390,7 +390,7 @@ void shoMsg(TCHAR* str) {
 	}
 	msgsiz.cy *= cnt;
 	if (rstMap(MSGOF))
-		off = prfwid + 6;
+		off = preferenceWindowWidth + 6;
 	else
 		off = 3;
 	hMsg = CreateWindow(
