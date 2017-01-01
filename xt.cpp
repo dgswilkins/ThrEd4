@@ -30,20 +30,20 @@ extern	TCHAR			auxName[_MAX_PATH];
 extern	BSEQPNT			bseq[BSEQLEN];
 extern	unsigned		buttonHeight;
 extern	unsigned		buttonWidthX3;
-extern	FORMCLIP*		clipboardFormData;
-extern	fPOINT			clipboardPoints[MAXCLPNTS];
-extern	fRECTANGLE		clipboardRect;
-extern	FLSIZ			clipboardRectSize;
-extern	unsigned		clipboardStitchCount;
+extern	FORMCLIP*		clipFormData;
+extern	fPOINT			clipPoints[MAXCLPNTS];
+extern	fRECTANGLE		clipRect;
+extern	FLSIZ			clipRectSize;
+extern	unsigned		clipStitchCount;
 extern	fPOINTATTRIBUTE	clipBuffer[MAXFRMLINS];
 extern	unsigned		closestFormToCursor;
 extern	unsigned		closestPointIndex;
 extern	unsigned		closestVertexToCursor;
-extern	unsigned		clpad;
+extern	unsigned		clipPointIndex;
 extern	unsigned char	cryptkey[4096];
 extern	fPOINT*			currentFormVertices;
 extern	TCHAR			fileName[_MAX_PATH];
-extern	unsigned		fltad;
+extern	unsigned		formPointIndex;
 extern	fPOINT			formMoveDelta;
 extern	unsigned		formIndex;
 extern	POINT			formLines[MAXFRMLINS];
@@ -67,7 +67,7 @@ extern	fPOINT*			insidePoints;
 extern	unsigned		isind;
 extern	unsigned		markedStitchMap[RMAPSIZ];
 extern	MSG				msg;
-extern	TCHAR			msgbuf[MSGSIZ];
+extern	TCHAR			msgBuffer[MSGSIZ];
 extern	unsigned		newFormVertexCount;
 extern	unsigned		outputIndex;
 extern	fPOINT*			outsidePoints;
@@ -76,7 +76,7 @@ extern	unsigned		pseudoRandomValue;
 extern	FRMHED*			SelectedForm;
 extern	double			rotationAngle;
 extern	dPOINT			rotationCenter;
-extern	unsigned		satkad;
+extern	unsigned		satinConnectIndex;
 extern	SATCON			satinConns[MAXSAC];
 extern	TCHAR*			sdat;
 extern	unsigned		selectedFormCount;
@@ -203,14 +203,14 @@ unsigned short daztab[] =
 };
 
 RNGCNT*		txsegs;	//txture fill groups of points
-fRECTANGLE		isrct;	//isin rectangle
+fRECTANGLE	isrct;	//isin rectangle
 dPOINT		sizrat;	//design size ratio
-fRECTANGLE		sizrct;	//design size rectangle
+fRECTANGLE	sizrct;	//design size rectangle
 float		daspct;	//design aspect ratio
 HWND		sizdlg;	//change design size dialog window
 fPOINT		dsgnsiz;	//design size
 TXPNT		txpnts[MAXSEQ];//buffer for textured fill points
-int			txad;	//next textured fill point index
+int			textureIndex;	//next textured fill point index
 unsigned	txsidtyp; //id of the window being updated
 TCHAR		txbuf[16];//texture fill number buffer
 int			txnind;	//text number pointer
@@ -300,7 +300,7 @@ void setfchk()
 
 void prbug()
 {
-	OutputDebugString(msgbuf);
+	OutputDebugString(msgBuffer);
 }
 #endif
 
@@ -320,9 +320,9 @@ BOOL istx(unsigned find)
 
 TXPNT* adtx(int cnt) {
 
-	unsigned ind = txad;
+	unsigned ind = textureIndex;
 
-	txad += cnt;
+	textureIndex += cnt;
 	return &txpnts[ind];
 }
 
@@ -330,13 +330,13 @@ void txspac(int strt, unsigned cnt)
 {
 	unsigned	ind;
 
-	MoveMemory(&txpnts[strt + cnt], &txpnts[strt], (txad - strt) & sizeof(TXPNT));
+	MoveMemory(&txpnts[strt + cnt], &txpnts[strt], (textureIndex - strt) & sizeof(TXPNT));
 	for (ind = closestFormToCursor + 1; ind < formIndex; ind++)
 	{
 		if (istx(ind))
 			formList[ind].fillInfo.texture.index += cnt;
 	}
-	txad += cnt;
+	textureIndex += cnt;
 }
 
 void rstxt()
@@ -1308,9 +1308,9 @@ void ritund()
 
 void undclp()
 {
-	clipboardRectSize.cx = clipboardRect.bottom = clipboardRect.left = clipboardRect.right = clipBuffer[0].x = clipBuffer[1].x = clipBuffer[0].y = 0;
-	clipboardRectSize.cy = clipboardRect.top = clipBuffer[1].y = SelectedForm->underlayStitchLen;
-	clipboardStitchCount = 2;
+	clipRectSize.cx = clipRect.bottom = clipRect.left = clipRect.right = clipBuffer[0].x = clipBuffer[1].x = clipBuffer[0].y = 0;
+	clipRectSize.cy = clipRect.top = clipBuffer[1].y = SelectedForm->underlayStitchLen;
+	clipStitchCount = 2;
 }
 
 void fnund(unsigned find)
@@ -1763,7 +1763,7 @@ void dasyfrm() {
 	SelectedForm = &formList[formIndex];
 	closestFormToCursor = formIndex;
 	frmclr(SelectedForm);
-	SelectedForm->vertices = &formPoints[fltad];
+	SelectedForm->vertices = &formPoints[formPointIndex];
 	SelectedForm->attribute = activeLayer << 1;
 	fvars(formIndex);
 	cnt2 = iniFile.daisyPetalPoints >> 1;
@@ -1882,7 +1882,7 @@ void dasyfrm() {
 		SelectedForm->type = SAT;
 		SelectedForm->attribute = 1;
 	}
-	fltad += inf;
+	formPointIndex += inf;
 	setMap(INIT);
 	frmout(formIndex);
 	for (ind = 0; ind < inf; ind++) {
@@ -2078,7 +2078,7 @@ void dmprec(OREC** recs, unsigned cnt)
 
 	for (ind = 0; ind < cnt; ind++)
 	{
-		sprintf_s(msgbuf, sizeof(msgbuf), "%4d off: %4d at: %08x frm: %4d typ: %d col: %2d st: %5d fin: %5d\n",
+		sprintf_s(msgBuffer, sizeof(msgBuffer), "%4d off: %4d at: %08x frm: %4d typ: %d col: %2d st: %5d fin: %5d\n",
 			ind,
 			recs[ind] - (OREC*)bseq,
 			stitchBuffer[recs[ind]->start].attribute,
@@ -2087,7 +2087,7 @@ void dmprec(OREC** recs, unsigned cnt)
 			recs[ind]->col,
 			recs[ind]->start,
 			recs[ind]->finish);
-		OutputDebugString(msgbuf);
+		OutputDebugString(msgBuffer);
 	}
 }
 #endif
@@ -2251,8 +2251,8 @@ void fsort()
 	else
 	{
 		LoadString(hInst, IDS_SRTER, hlpbuf, HBUFSIZ);
-		sprintf_s(msgbuf, sizeof(msgbuf), hlpbuf, pfrecs[ine]->frm);
-		shoMsg(msgbuf);
+		sprintf_s(msgBuffer, sizeof(msgBuffer), hlpbuf, pfrecs[ine]->frm);
+		shoMsg(msgBuffer);
 	}
 }
 
@@ -3615,8 +3615,8 @@ void dutxtfil()
 		iniFile.textureWidth = ITXWID;
 	if (!iniFile.textureSpacing)
 		iniFile.textureSpacing = (float)ITXSPAC;
-	if (!iniFile.textureEditorSizePixels)
-		iniFile.textureEditorSizePixels = ITXPIX;
+	if (!iniFile.textureEditorSize)
+		iniFile.textureEditorSize = ITXPIX;
 	angledForm.sides = 0;
 	setMap(TXTRED);
 	setMap(ZUMED);
@@ -3694,13 +3694,13 @@ void txrct2rct(TXTRCT txr, RECT* rct)
 	txp.line = txr.left;
 	txp.y = txr.top;
 	txt2pix(txp, &tpnt);
-	rct->left = tpnt.x - iniFile.textureEditorSizePixels;
-	rct->top = tpnt.y - iniFile.textureEditorSizePixels;
+	rct->left = tpnt.x - iniFile.textureEditorSize;
+	rct->top = tpnt.y - iniFile.textureEditorSize;
 	txp.line = txr.right;
 	txp.y = txr.bottom;
 	txt2pix(txp, &tpnt);
-	rct->right = tpnt.x + iniFile.textureEditorSizePixels;
-	rct->bottom = tpnt.y + iniFile.textureEditorSizePixels;
+	rct->right = tpnt.x + iniFile.textureEditorSize;
+	rct->bottom = tpnt.y + iniFile.textureEditorSize;
 }
 
 void ed2px(fPOINT ped, POINT* px)
@@ -3728,8 +3728,8 @@ void lodhbuf(unsigned cod)
 void hlpflt(unsigned mcod, unsigned bcod, float dat)
 {
 	lodhbuf(mcod);
-	sprintf_s(msgbuf, sizeof(msgbuf), hlpbuf, dat);
-	bxtxt(bcod, msgbuf);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), hlpbuf, dat);
+	bxtxt(bcod, msgBuffer);
 }
 
 void drwtxbut()
@@ -3843,7 +3843,7 @@ void drwtxtr()
 	col = userColor[activeColor];
 	for (ind = 0; ind < tscr.index; ind++)
 	{
-		dutxtx(ind, iniFile.textureEditorSizePixels);
+		dutxtx(ind, iniFile.textureEditorSize);
 	}
 	if (cloxcnt)
 	{
@@ -3864,8 +3864,8 @@ void drwtxtr()
 	}
 	for (ind = 0; ind < cloxcnt; ind++)
 	{
-		dutxtx(cloxlst[ind], iniFile.textureEditorSizePixels);
-		dutxtx(cloxlst[ind], iniFile.textureEditorSizePixels << 1);
+		dutxtx(cloxlst[ind], iniFile.textureEditorSize);
+		dutxtx(cloxlst[ind], iniFile.textureEditorSize << 1);
 	}
 	BitBlt(stitchWindowDC, 0, 0, stitchWindowClientRect.right, stitchWindowClientRect.bottom, stitchWindowMemDC, 0, 0, SRCCOPY);
 	drwtxbut();
@@ -3945,7 +3945,7 @@ void tritx()
 	POINT	xlin[2];
 	int		li_Size;
 
-	li_Size = iniFile.textureEditorSizePixels << 2;
+	li_Size = iniFile.textureEditorSize << 2;
 	xlin[0].x = xlin[1].x = txtloc.x;
 	xlin[0].y = txtloc.y - li_Size;
 	xlin[1].y = txtloc.y + li_Size;
@@ -4277,10 +4277,10 @@ void txtclp()
 	hClipMem = GetClipboardData(hThrEdClip);
 	if (hClipMem)
 	{
-		clipboardFormData = (FORMCLIP*)GlobalLock(hClipMem);
-		if (clipboardFormData) {
-			if (clipboardFormData->clipType == CLP_FRM) {
-				SelectedForm = &clipboardFormData->form;
+		clipFormData = (FORMCLIP*)GlobalLock(hClipMem);
+		if (clipFormData) {
+			if (clipFormData->clipType == CLP_FRM) {
+				SelectedForm = &clipFormData->form;
 				frmcpy(&angledForm, SelectedForm);
 				MoveMemory(&angledFormVertices, &SelectedForm[1], sizeof(fPOINT)*SelectedForm->sides);
 				angledForm.vertices = angledFormVertices;
@@ -4445,16 +4445,16 @@ void deltx()
 	unsigned ind, cnt;
 
 	cnt = SelectedForm->fillInfo.texture.count;
-	if (txad&&istx(closestFormToCursor) && cnt)
+	if (textureIndex&&istx(closestFormToCursor) && cnt)
 	{
 		ind = SelectedForm->fillInfo.texture.index;
-		MoveMemory(&txpnts[ind], &txpnts[ind + cnt], txad - (ind + cnt));
+		MoveMemory(&txpnts[ind], &txpnts[ind + cnt], textureIndex - (ind + cnt));
 		for (ind = closestFormToCursor + 1; ind < formIndex; ind++)
 		{
 			if (istx(ind))
 				formList[ind].fillInfo.texture.index -= cnt;
 		}
-		txad -= SelectedForm->fillInfo.texture.count;
+		textureIndex -= SelectedForm->fillInfo.texture.count;
 		SelectedForm->fillInfo.texture.count = 0;
 	}
 }
@@ -4693,8 +4693,8 @@ void redtbak()
 {
 	TXHST*		phst;
 
-	//	sprintf_s(msgbuf, sizeof(msgbuf),"%d\n",ptxhst);
-	//	OutputDebugString(msgbuf);
+	//	sprintf_s(msgBuffer, sizeof(msgBuffer),"%d\n",ptxhst);
+	//	OutputDebugString(msgBuffer);
 	phst = &thsts[ptxhst];
 	tscr.areaHeight = phst->height;
 	tscr.width = phst->width;
@@ -5149,8 +5149,8 @@ void setxt()
 	savtxt();
 	SelectedForm->wordParam = 0;
 	setMap(TXFIL);
-	clipboardRectSize.cx = SelectedForm->fillSpacing;
-	clipboardRectSize.cy = SelectedForm->fillInfo.texture.height;
+	clipRectSize.cx = SelectedForm->fillSpacing;
+	clipRectSize.cy = SelectedForm->fillInfo.texture.height;
 	txsegs = (RNGCNT*)&markedStitchMap;
 	pbak = &txpnts[SelectedForm->fillInfo.texture.index];
 	FillMemory(txsegs, SelectedForm->fillInfo.texture.lines * sizeof(RNGCNT), 0);
@@ -5303,7 +5303,7 @@ void nudfn()
 	sizrat.y = dsgnsiz.y / osiz.y;
 	for (ind = 0; ind < header.stitchCount; ind++)
 		sadj(&stitchBuffer[ind]);
-	for (ind = 0; ind < fltad; ind++)
+	for (ind = 0; ind < formPointIndex; ind++)
 		sadj(&formPoints[ind]);
 	frmout(closestFormToCursor);
 }
@@ -5456,7 +5456,7 @@ void setshft()
 
 void setclpspac()
 {
-	msgflt(IDS_CLPSPAC, iniFile.clipboardOffset / PFGRAN);
+	msgflt(IDS_CLPSPAC, iniFile.clipOffset / PFGRAN);
 	setMap(NUMIN);
 	setMap(SCLPSPAC);
 	numWnd();
@@ -5654,7 +5654,7 @@ void lodchk()
 
 void chkclp(FRMHED* fp, BADCNTS* bc)
 {
-	if (bc->clip == fp->angleOrClipData.clip - clipboardPoints)
+	if (bc->clip == fp->angleOrClipData.clip - clipPoints)
 		bc->clip += fp->lengthOrCount.clipCount;
 	else
 		bc->attribute |= BADCLP;
@@ -5662,7 +5662,7 @@ void chkclp(FRMHED* fp, BADCNTS* bc)
 
 void chkeclp(FRMHED* fp, BADCNTS* bc)
 {
-	if (bc->clip == fp->borderClipData - clipboardPoints)
+	if (bc->clip == fp->borderClipData - clipPoints)
 		bc->clip += fp->clipEntries;
 	else
 		bc->attribute |= BADCLP;
@@ -5719,13 +5719,13 @@ unsigned frmchkfn()
 			if (bc.attribute == (BADFLT | BADCLP | BADSAT | BADTX))
 				break;
 		}
-		if (bc.flt != (int)fltad)
+		if (bc.flt != (int)formPointIndex)
 			bc.attribute |= BADFLT;
-		if (bc.clip != (int)clpad)
+		if (bc.clip != (int)clipPointIndex)
 			bc.attribute |= BADCLP;
-		if (bc.sat != (int)satkad)
+		if (bc.sat != (int)satinConnectIndex)
 			bc.attribute |= BADSAT;
-		if (bc.tx != txad)
+		if (bc.tx != textureIndex)
 			bc.attribute |= BADTX;
 	}
 	return bc.attribute;
@@ -5811,7 +5811,7 @@ void repflt()
 	{
 		fp = &formList[ind];
 		dif = fp->vertices - formPoints;
-		if (fltad >= dif + fp->sides)
+		if (formPointIndex >= dif + fp->sides)
 		{
 			MoveMemory(&tflt[loc], fp->vertices, fp->sides * sizeof(fPOINT));
 			fp->vertices = &formPoints[loc];
@@ -5820,9 +5820,9 @@ void repflt()
 		}
 		else
 		{
-			if (dif < fltad)
+			if (dif < formPointIndex)
 			{
-				fp->sides = fltad - dif;
+				fp->sides = formPointIndex - dif;
 				delsac(ind);
 				MoveMemory(&tflt[loc], fp->vertices, fp->sides * sizeof(fPOINT));
 				bcup(ind, &bc);
@@ -5830,18 +5830,18 @@ void repflt()
 			else
 			{
 				formIndex = ind;
-				clpad = bc.clip;
-				satkad = bc.sat;
-				txad = bc.tx;
+				clipPointIndex = bc.clip;
+				satinConnectIndex = bc.sat;
+				textureIndex = bc.tx;
 				chkfstch();
 				adbad(IDS_FRMDAT, formIndex - ind + 1);
 				goto rfltskp;
 			}
 		}
 	}
-	fltad = loc;
+	formPointIndex = loc;
 rfltskp:;
-	MoveMemory(formPoints, tflt, sizeof(fPOINT)*fltad);
+	MoveMemory(formPoints, tflt, sizeof(fPOINT)*formPointIndex);
 }
 
 void repclp()
@@ -5857,20 +5857,20 @@ void repclp()
 		fp = &formList[ind];
 		if (isclp(ind))
 		{
-			loc = fp->angleOrClipData.clip - clipboardPoints;
-			if (loc + fp->lengthOrCount.clipCount < clpad)
+			loc = fp->angleOrClipData.clip - clipPoints;
+			if (loc + fp->lengthOrCount.clipCount < clipPointIndex)
 			{
 				MoveMemory(&tclps[cnt], fp->angleOrClipData.clip, sizeof(fPOINT)*fp->lengthOrCount.clipCount);
-				fp->angleOrClipData.clip = &clipboardPoints[cnt];
+				fp->angleOrClipData.clip = &clipPoints[cnt];
 				cnt += fp->lengthOrCount.clipCount;
 			}
 			else
 			{
-				if (loc < clpad)
+				if (loc < clipPointIndex)
 				{
-					fp->lengthOrCount.clipCount = fltad - loc;
+					fp->lengthOrCount.clipCount = formPointIndex - loc;
 					MoveMemory(&tclps[cnt], fp->angleOrClipData.clip, sizeof(fPOINT)*fp->lengthOrCount.clipCount);
-					fp->angleOrClipData.clip = &clipboardPoints[cnt];
+					fp->angleOrClipData.clip = &clipPoints[cnt];
 					cnt += fp->lengthOrCount.clipCount;
 				}
 				else
@@ -5882,20 +5882,20 @@ void repclp()
 		}
 		if (iseclp(ind))
 		{
-			loc = fp->borderClipData - clipboardPoints;
-			if (loc + fp->clipEntries < clpad)
+			loc = fp->borderClipData - clipPoints;
+			if (loc + fp->clipEntries < clipPointIndex)
 			{
 				MoveMemory(&tclps[cnt], fp->borderClipData, sizeof(fPOINT)*fp->clipEntries);
-				fp->borderClipData = &clipboardPoints[cnt];
+				fp->borderClipData = &clipPoints[cnt];
 				cnt += fp->clipEntries;
 			}
 			else
 			{
-				if (loc < clpad)
+				if (loc < clipPointIndex)
 				{
-					fp->clipEntries = fltad - loc;
+					fp->clipEntries = formPointIndex - loc;
 					MoveMemory(&tclps[cnt], fp->borderClipData, sizeof(fPOINT)*fp->clipEntries);
-					fp->borderClipData = &clipboardPoints[cnt];
+					fp->borderClipData = &clipPoints[cnt];
 					cnt += fp->clipEntries;
 				}
 				else
@@ -5906,8 +5906,8 @@ void repclp()
 			}
 		}
 	}
-	MoveMemory(&clipboardPoints, tclps, cnt * sizeof(fPOINT));
-	clpad = cnt;
+	MoveMemory(&clipPoints, tclps, cnt * sizeof(fPOINT));
+	clipPointIndex = cnt;
 	if (bcnt)
 		adbad(IDS_CLPDAT, bcnt);
 }
@@ -5926,7 +5926,7 @@ void repsat()
 		if (fp->type == SAT)
 		{
 			dif = fp->satinOrAngle.sac - satinConns;
-			if (fltad > dif + fp->sides)
+			if (formPointIndex > dif + fp->sides)
 			{
 				MoveMemory(&satinConns[loc], fp->satinOrAngle.sac, fp->satinGuideCount * sizeof(SATCON));
 				fp->satinOrAngle.sac = &satinConns[loc];
@@ -5935,9 +5935,9 @@ void repsat()
 			}
 			else
 			{
-				if (dif < satkad)
+				if (dif < satinConnectIndex)
 				{
-					fp->satinGuideCount = satkad - dif;
+					fp->satinGuideCount = satinConnectIndex - dif;
 					MoveMemory(&satinConns[loc], fp->satinOrAngle.sac, fp->satinGuideCount * sizeof(SATCON));
 					bcup(ind, &bc);
 				}
@@ -5949,7 +5949,7 @@ void repsat()
 			}
 		}
 	}
-	satkad = loc;
+	satinConnectIndex = loc;
 }
 
 void reptx()
@@ -5965,7 +5965,7 @@ void reptx()
 		if (istx(ind))
 		{
 			fp = &formList[ind];
-			if (txad > fp->fillInfo.texture.index + fp->fillInfo.texture.count)
+			if (textureIndex > fp->fillInfo.texture.index + fp->fillInfo.texture.count)
 			{
 				MoveMemory(&satinConns[loc], &satinConns[fp->fillInfo.texture.index], fp->fillInfo.texture.count * sizeof(SATCON));
 				fp->fillInfo.texture.index = loc;
@@ -5974,9 +5974,9 @@ void reptx()
 			}
 			else
 			{
-				if (txad > fp->fillInfo.texture.index)
+				if (textureIndex > fp->fillInfo.texture.index)
 				{
-					fp->fillInfo.texture.count = txad - fp->fillInfo.texture.index;
+					fp->fillInfo.texture.count = textureIndex - fp->fillInfo.texture.index;
 					MoveMemory(&satinConns[loc], &satinConns[fp->fillInfo.texture.index], fp->fillInfo.texture.count * sizeof(SATCON));
 					fp->fillInfo.texture.index = loc;
 					bcup(ind, &bc);
@@ -5987,7 +5987,7 @@ void reptx()
 			}
 		}
 	}
-	txad = loc;
+	textureIndex = loc;
 }
 
 void repar()
@@ -5995,7 +5995,7 @@ void repar()
 	unsigned cod;
 
 	savdo();
-	sdat = msgbuf;
+	sdat = msgBuffer;
 	cod = frmchkfn();
 	if (cod&BADFLT)
 		repflt();
@@ -6007,11 +6007,11 @@ void repar()
 		reptx();
 	lodchk();
 	setMap(RESTCH);
-	if (sdat != msgbuf)
+	if (sdat != msgBuffer)
 	{
 		sdat--;
 		*sdat = 0;
-		shoMsg(msgbuf);
+		shoMsg(msgBuffer);
 	}
 }
 

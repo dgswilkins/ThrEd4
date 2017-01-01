@@ -30,7 +30,7 @@ extern	TCHAR			homeDirectory[_MAX_PATH];
 extern	HWND			hWnd;
 extern	INIFILE			iniFile;
 extern	MSG				msg;
-extern	TCHAR			msgbuf[MSGSIZ];
+extern	TCHAR			msgBuffer[MSGSIZ];
 extern	void			numWnd();
 extern	fPOINT			oseq[OSEQLEN];
 extern	long			preferenceWindowWidth;
@@ -49,7 +49,7 @@ unsigned				fhlplen;					//help file length
 HWND					hlpwnd;						//help window
 HWND					hMsg = 0;						//message window
 
-unsigned short ldlst[] = {	//strings to load into memory attribute init time
+unsigned short ldlst[] = {	//strings to load into memory at init time
 	IDS_PIKOL,
 	IDS_UPON,
 	IDS_UPOF,
@@ -318,7 +318,7 @@ void ritnum(unsigned cod, unsigned num) {
 
 void msgstr(unsigned cod) {
 
-	LoadString(hInst, cod, msgbuf, MSGSIZ);
+	LoadString(hInst, cod, msgBuffer, MSGSIZ);
 }
 
 void lodstr() {
@@ -562,7 +562,7 @@ void datmsg(unsigned cod)
 {
 	TCHAR*	pchr;
 
-	pchr = msgbuf;
+	pchr = msgBuffer;
 	if (cod&BADFLT)
 	{
 		LoadString(hInst, IDS_BADFLT, pchr, HBUFSIZ);
@@ -585,6 +585,6 @@ void datmsg(unsigned cod)
 	}
 	pchr--;
 	*pchr = 0;
-	shoMsg(msgbuf);
+	shoMsg(msgBuffer);
 
 }

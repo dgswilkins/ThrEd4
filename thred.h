@@ -715,7 +715,7 @@ typedef struct _iniFil {
 	float			hoopSizeY;				//hoop y size
 	double			rotationAngle;			//rotation angle
 	float			gridSize;				//grid size
-	float			clipboardOffset;		//clipboard offset
+	float			clipOffset;				//clipboard offset
 	RECT			initialWindowCoords;	//initial window coordinates
 	COLORREF		gridColor;				//grid color
 	unsigned		fillPhase;				//clipboard fill phase
@@ -763,7 +763,7 @@ typedef struct _iniFil {
 	float			textureSpacing;			//textured fill spacing
 	unsigned short	formBoxSizePixels;		//form box pixels
 	unsigned short	daisyHeartCount;		//daisy heart count
-	unsigned short  textureEditorSizePixels;	//texture editor pixels
+	unsigned short  textureEditorSize;		//texture editor pixels
 	float			clpspc;					//clipboard fill spacing
 	TCHAR			designerName[50];		//designer name
 }INIFILE;
@@ -1129,8 +1129,8 @@ typedef struct _strhed {		//thred file header
 	unsigned short	pointCount;		//number of form points
 	unsigned short	dlineLen;		//points to dline data
 	unsigned short	dlineCount;		//dline data count
-	unsigned short	clipboardDataLen;	//points to clipboard data
-	unsigned short	clipboardDataCount;	//clipboard data count
+	unsigned short	clipDataLen;	//points to clipboard data
+	unsigned short	clipDataCount;	//clipboard data count
 }STRHED;
 
 typedef struct _txpnt {	//textured fill point
@@ -1266,7 +1266,7 @@ typedef struct _rgseq {		//tmpath: temporary path connections
 	TCHAR		skp;		//path not found
 }RGSEQ;
 
-typedef struct _fseq {		//mpath: path of sequenced regions
+typedef struct _fseq {		//sequencePath: path of sequenced regions
 	unsigned short	vrt;
 	unsigned short	grpn;
 	TCHAR			skp;	//path not found

@@ -106,10 +106,10 @@ extern			unsigned		bitmapWidth;
 extern			unsigned		buttonHeight;
 extern			unsigned		buttonWidth;
 extern			unsigned		buttonWidthX3;
-extern			fRECTANGLE		clipboardRect;
-extern			FLSIZ			clipboardRectSize;
-extern			unsigned		clipboardStitchCount;	//number of stitchs extracted from clipboard
-extern			CLPSTCH*		clipboardStitchData;
+extern			fRECTANGLE		clipRect;
+extern			FLSIZ			clipRectSize;
+extern			unsigned		clipStitchCount;	//number of stitchs extracted from clipboard
+extern			CLPSTCH*		clipStitchData;
 extern			fPOINTATTRIBUTE	clipBuffer[MAXFRMLINS];
 extern			unsigned		closestPointIndex;
 extern			POINT			endPointCross;
@@ -141,7 +141,7 @@ extern			HWND			hOKButton;
 extern			HWND			hPreferencesWindow;
 extern			HWND			hSideMessageWin;
 extern			HWND			hsidWnd[11];
-extern			HWND			hto;
+extern			HWND			hDlgDeleteStitches;
 extern			HWND			hWnd;
 extern			INIFILE			iniFile;
 extern			POINT			insertLine[3];
@@ -156,9 +156,9 @@ extern			POINT			mainWindowOrigin;
 extern			unsigned		markedStitchMap[RMAPSIZ];
 extern			double			minStitchLength;
 extern			MSG				msg;
-extern			TCHAR			msgbuf[MSGSIZ];
+extern			TCHAR			msgBuffer[MSGSIZ];
 extern			unsigned		msgIndex;
-extern			RECT			msgRct;
+extern			RECT			msgRect;
 extern			HPEN			multiFormPen;
 extern			unsigned		nearestCount;
 extern			unsigned		numpnt;
@@ -193,7 +193,7 @@ extern			POINT			stitchWindowOrigin;
 extern			POINT			stitchWindowSize;
 extern			POINT			stretchBoxLine[5];
 extern			TCHAR			thrName[_MAX_PATH];
-extern			int				txad;
+extern			int				textureIndex;
 extern			TXPNT			txpnts[MAXSEQ];
 extern			RNGCNT*			txsegs;
 extern			fPOINT*			uflt;
@@ -363,13 +363,13 @@ RGSEQ*			regionPath;				//path to a region
 unsigned		groupIndexCount;		//number of group indices
 unsigned*		groupIndexSequence;		//array of group indices for sequencing
 unsigned		lastGroup;				//group of the last line written in the previous region;
-FSEQ*			mpath;					//path of sequenced regions
+FSEQ*			sequencePath;			//path of sequenced regions
 RGSEQ*			tmpath;					//temporary path connections
-unsigned		mpathi;					//index to path of sequenced regions
+unsigned		sequencePathIndex;		//index to path of sequenced regions
 unsigned		nextGroup;				//group that connects to the next region
 unsigned*		sequenceFlagBitmap;		//a bitmap of sequenced lines
 REGION*			currentRegion;			//region currently being sequenced
-fPOINT			dunpnts[4];				//corners of last region sequenced
+fPOINT			lastRegionCorners[4];	//corners of last region sequenced
 FRMHED			angledForm;				//a temporary rotated form for angle fills
 unsigned short	selectedFormList[MAXFORMS];		//a list of selected forms
 unsigned		selectedFormCount = 0;	//number of selected forms
@@ -380,11 +380,11 @@ POINT			selectedPointsRectangle[9];	//line derived from the point select rectang
 fRECTANGLE		allItemsRectangle;		//rectangle enclosing all forms and stitches
 double			formAngles[MAXFRMLINS];	//angles of a form for satin border fills
 fPOINT			formPoints[MAXFRMPNTS];	//form points
-unsigned		fltad;					//next index to append form points
-fPOINT			clipboardPoints[MAXCLPNTS];	//main clipboard fill points for forms
-unsigned		clpad;					//next index to append main clipboard points
+unsigned		formPointIndex;			//next index to append form points
+fPOINT			clipPoints[MAXCLPNTS];	//main clipboard fill points for forms
+unsigned		clipPointIndex;			//next index to append main clipboard points
 SATCON			satinConns[MAXSAC];		//satin form connects
-unsigned		satkad;					//next index to append satin connect points
+unsigned		satinConnectIndex;		//next index to append satin connect points
 float			buttonholeFillCornerLength = IBFCLEN;	//buttonhole corner length
 float			picotSpace = IPICSPAC;	//space between border picots
 unsigned		pseudoRandomValue;		//pseudo-random sequence register
@@ -400,7 +400,7 @@ dPOINT			vector0;				//x size of the clipboard fill at the fill angle
 FRMHED*			tmpFormList;			//temporary form header storage for reordering forms
 fPOINT*			tmpFormPoints;			//temporary form vertex storage for reordering forms
 SATCON*			tmpSatinConns;			//temporary satin guidline storage for reordering forms
-fPOINT*			tmpClipboardPoints;		//temporary clipboard point storage for reordering forms
+fPOINT*			tmpClipPoints;			//temporary clipboard point storage for reordering forms
 unsigned		formRelocationIndex;	//form relocator pointer
 fPOINTATTRIBUTE*	tmpStitchBuffer;	//pointer to high stitch area for form sort
 unsigned		beanCount;				//number of stitches added by convert to bean
@@ -641,9 +641,9 @@ void sacspac(SATCON* strt, unsigned cnt) {
 	unsigned	ind;
 
 	strti = satind(strt);
-	cnti = satkad - strti;
-	src = satkad - 1;
-	dst = satkad + cnt - 1;
+	cnti = satinConnectIndex - strti;
+	src = satinConnectIndex - 1;
+	dst = satinConnectIndex + cnt - 1;
 	while (src >= strti) {
 		satinConns[dst].start = satinConns[src].start;
 		satinConns[dst--].finish = satinConns[src--].finish;
@@ -652,7 +652,7 @@ void sacspac(SATCON* strt, unsigned cnt) {
 		if (formList[ind].type == SAT)
 			formList[ind].satinOrAngle.sac += cnt;
 	}
-	satkad += cnt;
+	satinConnectIndex += cnt;
 }
 
 SATCON* nusac(unsigned pfrm, unsigned cnt) {
@@ -678,9 +678,9 @@ unsigned findclp(unsigned fpnt) {
 
 	for (ind = fpnt - 1; ind >= 0; ind--) {
 		if (iseclp(ind))
-			return formList[ind].borderClipData - clipboardPoints + formList[ind].clipEntries;
+			return formList[ind].borderClipData - clipPoints + formList[ind].clipEntries;
 		if (isclp(ind))
-			return formList[ind].angleOrClipData.clip - clipboardPoints + formList[ind].lengthOrCount.clipCount;
+			return formList[ind].angleOrClipData.clip - clipPoints + formList[ind].lengthOrCount.clipCount;
 	}
 	return 0;
 }
@@ -709,18 +709,18 @@ void clpsub(unsigned fpnt, unsigned cnt) {
 void delmclp(unsigned fpnt) {
 	unsigned	src, dst;
 
-	if (clpad) {
+	if (clipPointIndex) {
 		if (isclp(fpnt)) {
 			dst = findclp(fpnt);
 			src = dst + formList[fpnt].lengthOrCount.clipCount;
-			MoveMemory(&clipboardPoints[dst], &clipboardPoints[src], sizeof(fPOINT)*(clpad - src));
+			MoveMemory(&clipPoints[dst], &clipPoints[src], sizeof(fPOINT)*(clipPointIndex - src));
 			if (iseclp(fpnt))
 				formList[fpnt].borderClipData -= formList[fpnt].lengthOrCount.clipCount;
 			clpsub(fpnt, formList[fpnt].lengthOrCount.clipCount);
-			if (clpad > formList[fpnt].lengthOrCount.clipCount)
-				clpad -= formList[fpnt].lengthOrCount.clipCount;
+			if (clipPointIndex > formList[fpnt].lengthOrCount.clipCount)
+				clipPointIndex -= formList[fpnt].lengthOrCount.clipCount;
 			else
-				clpad = 0;
+				clipPointIndex = 0;
 			formList[fpnt].lengthOrCount.clipCount = 0;
 		}
 	}
@@ -729,19 +729,19 @@ void delmclp(unsigned fpnt) {
 void deleclp(unsigned fpnt) {
 	unsigned	src, dst;
 
-	if (clpad) {
+	if (clipPointIndex) {
 		if (iseclpx(fpnt)) {
 			dst = findclp(fpnt);
 			src = dst + formList[fpnt].clipEntries;
-			while (src < clpad) {
-				clipboardPoints[dst].x = clipboardPoints[src].x;
-				clipboardPoints[dst++].y = clipboardPoints[src++].y;
+			while (src < clipPointIndex) {
+				clipPoints[dst].x = clipPoints[src].x;
+				clipPoints[dst++].y = clipPoints[src++].y;
 			}
 			clpsub(fpnt, formList[fpnt].clipEntries);
-			if (clpad > formList[fpnt].clipEntries)
-				clpad -= formList[fpnt].clipEntries;
+			if (clipPointIndex > formList[fpnt].clipEntries)
+				clipPointIndex -= formList[fpnt].clipEntries;
 			else
-				clpad = 0;
+				clipPointIndex = 0;
 			formList[fpnt].clipEntries = 0;
 		}
 	}
@@ -755,13 +755,13 @@ fPOINT* nueclp(unsigned pfrm, unsigned cnt) {
 	find = findclp(closestFormToCursor);
 	if (isclp(closestFormToCursor))
 		find += formList[closestFormToCursor].lengthOrCount.clipCount;
-	src = clpad - 1;
-	dst = clpad + cnt - 1;
+	src = clipPointIndex - 1;
+	dst = clipPointIndex + cnt - 1;
 	while (src >= find) {
-		clipboardPoints[dst].x = clipboardPoints[src].x;
-		clipboardPoints[dst--].y = clipboardPoints[src--].y;
+		clipPoints[dst].x = clipPoints[src].x;
+		clipPoints[dst--].y = clipPoints[src--].y;
 	}
-	formList[find].borderClipData = &clipboardPoints[find];
+	formList[find].borderClipData = &clipPoints[find];
 	for (ind = pfrm; ind < formIndex; ind++) {
 		if (iseclpx(ind))
 			formList[ind].borderClipData += cnt;
@@ -770,8 +770,8 @@ fPOINT* nueclp(unsigned pfrm, unsigned cnt) {
 		if (isclp(ind))
 			formList[ind].angleOrClipData.clip += cnt;
 	}
-	clpad += cnt;
-	return &clipboardPoints[find];
+	clipPointIndex += cnt;
+	return &clipPoints[find];
 }
 
 fPOINT* numclp() {
@@ -780,23 +780,23 @@ fPOINT* numclp() {
 	unsigned	ind;
 
 	find = findclp(closestFormToCursor);
-	src = clpad - 1;
-	dst = clpad + clipboardStitchCount - 1;
+	src = clipPointIndex - 1;
+	dst = clipPointIndex + clipStitchCount - 1;
 	while (src >= find) {
-		clipboardPoints[dst].x = clipboardPoints[src].x;
-		clipboardPoints[dst--].y = clipboardPoints[src--].y;
+		clipPoints[dst].x = clipPoints[src].x;
+		clipPoints[dst--].y = clipPoints[src--].y;
 	}
-	formList[closestFormToCursor].angleOrClipData.clip = &clipboardPoints[find];
+	formList[closestFormToCursor].angleOrClipData.clip = &clipPoints[find];
 	if (iseclpx(closestFormToCursor))
-		formList[closestFormToCursor].borderClipData += clipboardStitchCount;
+		formList[closestFormToCursor].borderClipData += clipStitchCount;
 	for (ind = closestFormToCursor + 1; ind < formIndex; ind++) {
 		if (isclpx(ind))
-			formList[ind].angleOrClipData.clip += clipboardStitchCount;
+			formList[ind].angleOrClipData.clip += clipStitchCount;
 		if (iseclpx(ind))
-			formList[ind].borderClipData += clipboardStitchCount;
+			formList[ind].borderClipData += clipStitchCount;
 	}
-	clpad += clipboardStitchCount;
-	return &clipboardPoints[find];
+	clipPointIndex += clipStitchCount;
+	return &clipPoints[find];
 }
 
 unsigned fltind(fPOINT* pnt) {
@@ -827,11 +827,11 @@ unsigned clpind(fPOINT* pnt) {
 #if	 __UseASM__
 	_asm {
 		mov		eax, pnt
-		sub		eax, offset clipboardPoints
+		sub		eax, offset clipPoints
 		shr		eax, 3
 	}
 #else
-	return pnt - clipboardPoints;
+	return pnt - clipPoints;
 #endif
 }
 
@@ -841,26 +841,26 @@ void fltspac(fPOINT* strt, unsigned cnt) {
 	unsigned	ind;
 
 	strti = fltind(strt);
-	src = fltad - 1;
-	dst = fltad + cnt - 1;
+	src = formPointIndex - 1;
+	dst = formPointIndex + cnt - 1;
 	while (src >= strti) {
 		formPoints[dst].x = formPoints[src].x;
 		formPoints[dst--].y = formPoints[src--].y;
 	}
 	for (ind = closestFormToCursor + 1; ind < formIndex; ind++)
 		formList[ind].vertices += cnt;
-	fltad += cnt;
+	formPointIndex += cnt;
 }
 
 void delsac(unsigned fpnt) {
 	unsigned	ind;
 	unsigned	src, dst;
 
-	if (satkad) {
+	if (satinConnectIndex) {
 		if (formList[fpnt].type == SAT&&formList[fpnt].satinGuideCount) {
 			dst = satind(formList[fpnt].satinOrAngle.sac);
 			src = dst + formList[fpnt].satinGuideCount;
-			while (src < satkad) {
+			while (src < satinConnectIndex) {
 				satinConns[dst].start = satinConns[src].start;
 				satinConns[dst++].finish = satinConns[src++].finish;
 			}
@@ -868,7 +868,7 @@ void delsac(unsigned fpnt) {
 				if (formList[ind].type == SAT&&formList[ind].satinGuideCount)
 					formList[ind].satinOrAngle.sac -= formList[fpnt].satinGuideCount;
 			}
-			satkad -= formList[fpnt].satinGuideCount;
+			satinConnectIndex -= formList[fpnt].satinGuideCount;
 		}
 	}
 	formList[fpnt].satinGuideCount = 0;
@@ -881,15 +881,15 @@ void delflt(unsigned fpnt) {
 	if (formList[fpnt].sides) {
 		dst = fltind(formList[fpnt].vertices);
 		src = dst + formList[fpnt].sides;
-		while (src < fltad) {
+		while (src < formPointIndex) {
 			formPoints[dst].x = formPoints[src].x;
 			formPoints[dst++].y = formPoints[src++].y;
 		}
 		for (ind = fpnt + 1; ind < formIndex; ind++)
 			formList[ind].vertices -= formList[fpnt].sides;
-		fltad -= formList[fpnt].sides;
-		if (fltad & 0x8000000)
-			fltad = 0;
+		formPointIndex -= formList[fpnt].sides;
+		if (formPointIndex & 0x8000000)
+			formPointIndex = 0;
 	}
 }
 
@@ -1301,7 +1301,7 @@ void delfrms() {
 	unsigned ind;
 
 	savdo();
-	formIndex = fltad = satkad = clpad = 0;
+	formIndex = formPointIndex = satinConnectIndex = clipPointIndex = 0;
 	for (ind = 0; ind < header.stitchCount; ind++)
 	{
 		stitchBuffer[ind].attribute &= NFRM_NTYP;
@@ -1678,7 +1678,7 @@ void setear() {
 		currentFormVertices[0].y = vpos;
 		SelectedForm->sides++;
 		newFormVertexCount++;
-		fltad++;
+		formPointIndex++;
 		setMap(FORMSEL);
 		fvars(formIndex);
 		frmout(formIndex);
@@ -2018,14 +2018,14 @@ void ritfil() {
 }
 
 void okcan() {
-	GetClientRect(hMsg, &msgRct);
+	GetClientRect(hMsg, &msgRect);
 
 	hOKButton = CreateWindow(
 		"STATIC",
 		stab[STR_OKENT],
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		5,
-		msgRct.bottom + 15,
+		msgRect.bottom + 15,
 		buttonWidth << 2,
 		buttonHeight,
 		hMainStitchWin,
@@ -2038,7 +2038,7 @@ void okcan() {
 		stab[STR_CANCEL],
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		buttonWidth * 5,
-		msgRct.bottom + 15,
+		msgRect.bottom + 15,
 		buttonWidthX3,
 		buttonHeight,
 		hMainStitchWin,
@@ -2053,7 +2053,7 @@ void savdisc() {
 	sdmsg();
 	rstMap(BIGBOX);
 
-	GetClientRect(hMsg, &msgRct);
+	GetClientRect(hMsg, &msgRect);
 
 	LoadString(hInst, IDS_SAV, buf, HBUFSIZ);
 	hOKButton = CreateWindow(
@@ -2061,7 +2061,7 @@ void savdisc() {
 		buf,
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		5,
-		msgRct.bottom + 15,
+		msgRect.bottom + 15,
 		buttonWidthX3,
 		buttonHeight,
 		hMainStitchWin,
@@ -2075,7 +2075,7 @@ void savdisc() {
 		buf,
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		buttonWidthX3 + 15,
-		msgRct.bottom + 15,
+		msgRect.bottom + 15,
 		buttonWidthX3,
 		buttonHeight,
 		hMainStitchWin,
@@ -2088,7 +2088,7 @@ void savdisc() {
 		stab[STR_CANCEL],
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		2 * buttonWidthX3 + 25,
-		msgRct.bottom + 15,
+		msgRect.bottom + 15,
 		buttonWidthX3,
 		buttonHeight,
 		hMainStitchWin,
@@ -2161,21 +2161,21 @@ void oclp(fPOINT* p_clp, unsigned p_nclp) {
 			clipBuffer[ind].x = p_clp[ind].x;
 			clipBuffer[ind].y = p_clp[ind].y;
 		}
-		clipboardRect.left = clipboardRect.right = clipBuffer[0].x;
-		clipboardRect.bottom = clipboardRect.top = clipBuffer[0].y;
+		clipRect.left = clipRect.right = clipBuffer[0].x;
+		clipRect.bottom = clipRect.top = clipBuffer[0].y;
 		for (ind = 1; ind < (unsigned)p_nclp; ind++) {
-			if (clipBuffer[ind].x < clipboardRect.left)
-				clipboardRect.left = clipBuffer[ind].x;
-			if (clipBuffer[ind].x > clipboardRect.right)
-				clipboardRect.right = clipBuffer[ind].x;
-			if (clipBuffer[ind].y < clipboardRect.bottom)
-				clipboardRect.bottom = clipBuffer[ind].y;
-			if (clipBuffer[ind].y > clipboardRect.top)
-				clipboardRect.top = clipBuffer[ind].y;
+			if (clipBuffer[ind].x < clipRect.left)
+				clipRect.left = clipBuffer[ind].x;
+			if (clipBuffer[ind].x > clipRect.right)
+				clipRect.right = clipBuffer[ind].x;
+			if (clipBuffer[ind].y < clipRect.bottom)
+				clipRect.bottom = clipBuffer[ind].y;
+			if (clipBuffer[ind].y > clipRect.top)
+				clipRect.top = clipBuffer[ind].y;
 		}
-		clipboardRectSize.cx = clipboardRect.right - clipboardRect.left;
-		clipboardRectSize.cy = clipboardRect.top - clipboardRect.bottom;
-		clipboardStitchCount = p_nclp;
+		clipRectSize.cx = clipRect.right - clipRect.left;
+		clipRectSize.cy = clipRect.top - clipRect.bottom;
+		clipStitchCount = p_nclp;
 	}
 }
 
@@ -3238,12 +3238,12 @@ void durgn(unsigned pthi) {
 	double		len, minlen;
 	BSEQPNT*	bpnt;
 
-	rgind = mpath[pthi].vrt;
+	rgind = sequencePath[pthi].vrt;
 	currentRegion = &regionsList[rgind];
-	grpn = mpath[pthi].grpn;
+	grpn = sequencePath[pthi].grpn;
 	seqs = currentRegion->start;
 	seqe = currentRegion->end;
-	if (mpath[pthi].skp || rstMap(BRKFIX)) {
+	if (sequencePath[pthi].skp || rstMap(BRKFIX)) {
 		if (bseq[outputIndex - 1].attribute != SEQBOT)
 			rspnt(bseq[outputIndex - 2].x, bseq[outputIndex - 2].y);
 		pnts = &*ptrSortedLines[rgind];
@@ -3350,7 +3350,7 @@ void durgn(unsigned pthi) {
 		else {
 			if (lastGroup >= grpe) {
 				brkseq(seqe, seqs);
-				if (pthi < mpathi - 1 && seqe != seqn)
+				if (pthi < sequencePathIndex - 1 && seqe != seqn)
 					brkseq(seqs, seqn);
 			}
 			else {
@@ -3358,14 +3358,14 @@ void durgn(unsigned pthi) {
 					if (seql != seqs)
 						brkseq(seql, seqs);
 					brkseq(seqs, seqe);
-					if (pthi < mpathi - 1 && seqe != seqn)
+					if (pthi < sequencePathIndex - 1 && seqe != seqn)
 						brkseq(seqe, seqn);
 				}
 				else {
 					if (seql != seqe)
 						brkseq(seql, seqe);
 					brkseq(seqe, seqs);
-					if (pthi < mpathi - 1 && seqs != seqn)
+					if (pthi < sequencePathIndex - 1 && seqs != seqn)
 						brkseq(seqs, seqn);
 				}
 			}
@@ -3384,14 +3384,14 @@ void durgn(unsigned pthi) {
 					if (seql != seqs)
 						duseq(seql, seqs);
 					duseq(seqs, seqe);
-					if (pthi < mpathi - 1 && seqe != seqn)
+					if (pthi < sequencePathIndex - 1 && seqe != seqn)
 						duseq(seqe, seqn);
 				}
 				else {
 					if (seql != seqe)
 						duseq(seql, seqe);
 					duseq(seqe, seqs);
-					if (pthi < mpathi - 1 && seqs != seqn)
+					if (pthi < sequencePathIndex - 1 && seqs != seqn)
 						duseq(seqs, seqn);
 				}
 			}
@@ -3403,7 +3403,7 @@ unsigned notdun(unsigned lvl) {
 	unsigned	ind;
 	int			tpiv, pivot = lvl - 1;
 
-	regionPath = &tmpath[mpathi];
+	regionPath = &tmpath[sequencePathIndex];
 	regionPath[0].pcon = mapIndexSequence[doneRegion];
 	regionPath[0].cnt = mapIndexSequence[doneRegion + 1] - regionPath[0].pcon;
 	for (ind = 1; ind < lvl; ind++) {
@@ -3454,7 +3454,7 @@ double reglen(unsigned reg) {
 	pnts[3] = &ptrSortedLines[regionsList[reg].end][1];
 	for (ind = 0; ind < 4; ind++) {
 		for (ine = 0; ine < 4; ine++) {
-			len = hypot(dunpnts[ind].x - pnts[ine]->x, dunpnts[ind].y - pnts[ine]->y);
+			len = hypot(lastRegionCorners[ind].x - pnts[ine]->x, lastRegionCorners[ind].y - pnts[ine]->y);
 			if (len < minlen)
 				minlen = len;
 		}
@@ -3473,15 +3473,15 @@ void nxtrgn() {
 		pathLength++;
 		if (pathLength > 8) {
 			tpnt = &*ptrSortedLines[regionsList[doneRegion].start];
-			dunpnts[0].x = tpnt[0].x;
-			dunpnts[0].y = tpnt[0].y;
-			dunpnts[1].x = tpnt[1].x;
-			dunpnts[1].y = tpnt[1].y;
+			lastRegionCorners[0].x = tpnt[0].x;
+			lastRegionCorners[0].y = tpnt[0].y;
+			lastRegionCorners[1].x = tpnt[1].x;
+			lastRegionCorners[1].y = tpnt[1].y;
 			tpnt = &*ptrSortedLines[regionsList[doneRegion].end];
-			dunpnts[2].x = tpnt[0].x;
-			dunpnts[2].y = tpnt[0].y;
-			dunpnts[3].x = tpnt[1].x;
-			dunpnts[3].y = tpnt[1].y;
+			lastRegionCorners[2].x = tpnt[0].x;
+			lastRegionCorners[2].y = tpnt[0].y;
+			lastRegionCorners[3].x = tpnt[1].x;
+			lastRegionCorners[3].y = tpnt[1].y;
 			newRegion = 0;
 			for (ind = 0; ind < regionCount; ind++) {
 				if (!visitedRegions[ind]) {
@@ -3492,25 +3492,25 @@ void nxtrgn() {
 					}
 				}
 			}
-			tmpath[mpathi].skp = 1;
+			tmpath[sequencePathIndex].skp = 1;
 			for (ind = 0; ind < pathMapIndex; ind++) {
 				if (pathMap[ind].vrt == newRegion) {
-					tmpath[mpathi++].pcon = ind;
+					tmpath[sequencePathIndex++].pcon = ind;
 					visitedRegions[newRegion] = 1;
 					doneRegion = newRegion;
 					return;
 				}
 			}
-			tmpath[mpathi].cnt = visitedIndex;
-			tmpath[mpathi++].pcon = 0xffffffff;
+			tmpath[sequencePathIndex].cnt = visitedIndex;
+			tmpath[sequencePathIndex++].pcon = 0xffffffff;
 			visitedRegions[visitedIndex] = 1;
 			doneRegion = visitedIndex;
 			return;
 		}
 	}
 	for (ind = 0; ind < pathLength; ind++) {
-		tmpath[mpathi].skp = 0;
-		tmpath[mpathi++].pcon = regionPath[ind].pcon;
+		tmpath[sequencePathIndex].skp = 0;
+		tmpath[sequencePathIndex++].pcon = regionPath[ind].pcon;
 		visitedRegions[pathMap[regionPath[ind].pcon].vrt] = 1;
 	}
 	doneRegion = pathMap[regionPath[ind - 1].pcon].vrt;
@@ -3565,12 +3565,12 @@ int sqcomp(const void *arg1, const void *arg2) {
 void nxtseq(unsigned pthi) {
 	unsigned nxtvrt, ind;
 
-	ind = mapIndexSequence[mpath[pthi].vrt];
-	nxtvrt = mpath[pthi + 1].vrt;
-	while (ind < mapIndexSequence[mpath[pthi].vrt + 1] && pathMap[ind].vrt != nxtvrt) {
+	ind = mapIndexSequence[sequencePath[pthi].vrt];
+	nxtvrt = sequencePath[pthi + 1].vrt;
+	while (ind < mapIndexSequence[sequencePath[pthi].vrt + 1] && pathMap[ind].vrt != nxtvrt) {
 		ind++;
 	}
-	mpath[mPathIndex++].grpn = pathMap[ind].grpn;
+	sequencePath[mPathIndex++].grpn = pathMap[ind].grpn;
 }
 
 #define BUGSEQ 0
@@ -3709,7 +3709,7 @@ void lcon() {
 			outputIndex = 0;
 			tmpath = (RGSEQ*)oseq;
 			//find the leftmost region in pathMap
-			mpathi = 1;
+			sequencePathIndex = 1;
 			for (ind = 0; ind < pathMapIndex; ind++) {
 				if (pathMap[ind].vrt == ine)
 					goto lconskip;
@@ -3728,22 +3728,22 @@ void lcon() {
 				nxtrgn();
 			ine = 0;
 			cnt = 0xffffffff;
-			mpath = (FSEQ*)&oseq[OSEQLEN >> 1];
-			for (ind = 0; ind < mpathi; ind++) {
-				mpath[ine].skp = tmpath[ind].skp;
+			sequencePath = (FSEQ*)&oseq[OSEQLEN >> 1];
+			for (ind = 0; ind < sequencePathIndex; ind++) {
+				sequencePath[ine].skp = tmpath[ind].skp;
 				if (tmpath[ind].pcon == 0xffffffff) {
-					mpath[ine++].vrt = tmpath[ind].cnt;
+					sequencePath[ine++].vrt = tmpath[ind].cnt;
 					cnt = tmpath[ind].cnt;
 				}
 				else {
 					if (tmpath[ind].pcon != cnt) {
 						cnt = tmpath[ind].pcon;
-						mpath[ine++].vrt = pathMap[tmpath[ind].pcon].vrt;
+						sequencePath[ine++].vrt = pathMap[tmpath[ind].pcon].vrt;
 					}
 				}
 			}
-			mpathi = ind; mPathIndex = 0;
-			for (ind = 0; ind < mpathi; ind++)
+			sequencePathIndex = ind; mPathIndex = 0;
+			for (ind = 0; ind < sequencePathIndex; ind++)
 				nxtseq(ind);
 			ine = (sortedLineIndex >> 5) + 1;
 			sequenceFlagBitmap = new unsigned[ine];
@@ -3753,8 +3753,8 @@ void lcon() {
 				visitedRegions[ind] = 0;
 			lastGroup = 0;
 			for (ind = 0; ind < mPathIndex; ind++) {
-				//				sprintf_s(msgbuf, sizeof(msgbuf),"ind %d,vrt %d,grpn %d\n",ind,pathMap[ind].vrt,pathMap[ind].grpn);
-				//				OutputDebugString(msgbuf);
+				//				sprintf_s(msgBuffer, sizeof(msgBuffer),"ind %d,vrt %d,grpn %d\n",ind,pathMap[ind].vrt,pathMap[ind].grpn);
+				//				OutputDebugString(msgBuffer);
 				if (!unvis())
 					break;
 				durgn(ind);
@@ -3762,17 +3762,17 @@ void lcon() {
 		}
 		else {
 			pathMap = new RCON[1];
-			mpath = new FSEQ[1];
+			sequencePath = new FSEQ[1];
 			ine = (sortedLineIndex >> 5) + 1;
 			sequenceFlagBitmap = new unsigned[ine];
 			for (ind = 0; ind < ine; ind++)
 				sequenceFlagBitmap[ind] = 0;
 			lastGroup = 0;
-			mpath[0].vrt = 0;
-			mpath[0].grpn = ptrSortedLines[regionsList[0].end]->group;
-			mpath[0].skp = 0;
+			sequencePath[0].vrt = 0;
+			sequencePath[0].grpn = ptrSortedLines[regionsList[0].end]->group;
+			sequencePath[0].skp = 0;
 			durgn(0);
-			delete[] mpath;
+			delete[] sequencePath;
 		}
 		//skip:;
 
@@ -4351,7 +4351,7 @@ void clrfills() {
 		formList[ind].attribute &= NFRECONT;
 		formList[ind].extendedAttribute &= !(AT_UND | AT_WALK);
 	}
-	clpad = 0;
+	clipPointIndex = 0;
 }
 
 void dusat() {
@@ -4427,8 +4427,8 @@ void delcon(unsigned p_cpnt)
 
 	tp = &SelectedForm->satinOrAngle.sac[p_cpnt];
 	loc = &SelectedForm->satinOrAngle.sac[p_cpnt] - satinConns;
-	if (satkad > loc)
-		MoveMemory(tp, &tp[1], (satkad - loc + 1) * sizeof(SATCON));
+	if (satinConnectIndex > loc)
+		MoveMemory(tp, &tp[1], (satinConnectIndex - loc + 1) * sizeof(SATCON));
 	for (ind = closestFormToCursor + 1; ind < formIndex; ind++)
 	{
 		fp = &formList[ind];
@@ -4438,7 +4438,7 @@ void delcon(unsigned p_cpnt)
 	if (closestVertexToCursor < wordParam)
 		wordParam--;
 	SelectedForm->satinGuideCount--;
-	satkad--;
+	satinConnectIndex--;
 	currentFormConnectionsCount = SelectedForm->satinGuideCount;
 	if (SelectedForm->fillType == SATF)
 		refil();
@@ -4812,14 +4812,14 @@ void satadj()
 		l_spnt = l_dpnt = SelectedForm->satinOrAngle.sac;
 		l_dpnt += SelectedForm->satinGuideCount;
 		l_spnt += bstpt;
-		MoveMemory(l_dpnt, l_spnt, sizeof(SATCON)*(&satinConns[satkad] - l_spnt + 1));
+		MoveMemory(l_dpnt, l_spnt, sizeof(SATCON)*(&satinConns[satinConnectIndex] - l_spnt + 1));
 		for (ind = closestFormToCursor + 1; ind < formIndex; ind++)
 		{
 			fp = &formList[ind];
 			if (fp->type == SAT)
 				fp->satinOrAngle.sac -= ine;
 		}
-		satkad -= ine;
+		satinConnectIndex -= ine;
 	}
 }
 
@@ -5426,7 +5426,7 @@ void delspnt() {
 					ind++;
 				}
 				SelectedForm->satinGuideCount--;
-				satkad--;
+				satinConnectIndex--;
 				for (ine = closestFormToCursor + 1; ine < formIndex; ine++)
 				{
 					fp = &formList[ine];
@@ -5442,9 +5442,9 @@ void delspnt() {
 			}
 		}
 	}
-	MoveMemory(&SelectedForm->vertices[closestVertexToCursor], &SelectedForm->vertices[closestVertexToCursor + 1], (fltad - closestVertexToCursor) * sizeof(fPOINTATTRIBUTE));
+	MoveMemory(&SelectedForm->vertices[closestVertexToCursor], &SelectedForm->vertices[closestVertexToCursor + 1], (formPointIndex - closestVertexToCursor) * sizeof(fPOINTATTRIBUTE));
 	SelectedForm->sides--;
-	fltad--;
+	formPointIndex--;
 	fvars(closestFormToCursor);
 	if (closestVertexToCursor > (unsigned)SelectedForm->sides - 1)
 		closestVertexToCursor = SelectedForm->sides - 1;
@@ -5798,11 +5798,11 @@ BOOL ritclp(fPOINT pnt) {
 	fPOINT		adj;
 	unsigned	ind;
 
-	if (chkmax(clipboardStitchCount, sequenceIndex))
+	if (chkmax(clipStitchCount, sequenceIndex))
 		return 1;
 	adj.x = pnt.x - clipReference.x;
 	adj.y = pnt.y - clipReference.y;
-	for (ind = 0; ind < clipboardStitchCount; ind++) {
+	for (ind = 0; ind < clipStitchCount; ind++) {
 		oseq[sequenceIndex].x = clipFillData[ind].x + adj.x;
 		oseq[sequenceIndex++].y = clipFillData[ind].y + adj.y;
 	}
@@ -5815,8 +5815,8 @@ BOOL clpsid(unsigned strt, unsigned fin) {
 	double			len, tdub;
 	fPOINTATTRIBUTE			rpnt;
 
-	rpnt.x = clipboardRect.left;
-	rpnt.y = clipboardRect.bottom;
+	rpnt.x = clipRect.left;
+	rpnt.y = clipRect.bottom;
 	pnt.x = currentFormVertices[strt].x;
 	pnt.y = currentFormVertices[fin].y;
 	dif.x = currentFormVertices[fin].x - currentFormVertices[strt].x;
@@ -5824,18 +5824,18 @@ BOOL clpsid(unsigned strt, unsigned fin) {
 	len = hypot(dif.x, dif.y);
 	rotationAngle = atan2(dif.y, dif.x);
 	rotang1(rpnt, &clipReference);
-	cnt = len / clipboardRectSize.cx;
+	cnt = len / clipRectSize.cx;
 	if (cnt) {
 		if (cnt > 1)
-			tdub = ((len - cnt*clipboardRectSize.cx) / (cnt - 1) + clipboardRectSize.cx) / len;
+			tdub = ((len - cnt*clipRectSize.cx) / (cnt - 1) + clipRectSize.cx) / len;
 		else
-			tdub = (len - clipboardRectSize.cx) / 2;
+			tdub = (len - clipRectSize.cx) / 2;
 		stp.x = dif.x*tdub;
 		stp.y = dif.y*tdub;
 		pnt.x = currentFormVertices[strt].x;
 		pnt.y = currentFormVertices[strt].y;
 		rotationAngle = atan2(dif.y, dif.x);
-		for (ind = 0; ind < clipboardStitchCount; ind++)
+		for (ind = 0; ind < clipStitchCount; ind++)
 			rotangf(clipReversedData[ind], &clipFillData[ind]);
 		for (ind = 0; ind < cnt; ind++) {
 			if (ritclp(pnt))
@@ -5856,11 +5856,11 @@ void linsid() {
 	dif.x = currentFormVertices[currentSide + 1].x - selectedPoint.x;
 	dif.y = currentFormVertices[currentSide + 1].y - selectedPoint.y;
 	len = hypot(dif.x, dif.y);
-	cnt = len / clipboardRectSize.cx;
+	cnt = len / clipRectSize.cx;
 	if (cnt) {
 		rotationAngle = clipAngle;
 		rotangf(borderClipReference, &clipReference);
-		for (ind = 0; ind < clipboardStitchCount; ind++)
+		for (ind = 0; ind < clipStitchCount; ind++)
 			rotangf(clipReversedData[ind], &clipFillData[ind]);
 		for (ind = 0; ind < cnt; ind++) {
 			ritclp(selectedPoint);
@@ -5877,10 +5877,10 @@ BOOL nupnt() {
 	moveToPoint.x = currentFormVertices[currentSide + 2].x;
 	moveToPoint.y = currentFormVertices[currentSide + 2].y;
 	len = hypot(moveToPoint.x - selectedPoint.x, moveToPoint.y - selectedPoint.y);
-	if (len > clipboardRectSize.cx) {
+	if (len > clipRectSize.cx) {
 		for (ind = 0; ind < 10; ind++) {
 			len = hypot(moveToPoint.x - selectedPoint.x, moveToPoint.y - selectedPoint.y);
-			dif = clipboardRectSize.cx - len;
+			dif = clipRectSize.cx - len;
 			moveToPoint.x += dif*cosAngle;
 			moveToPoint.y += dif*sinAngle;
 			if (fabs(dif) < 0.01)
@@ -5902,7 +5902,7 @@ void lincrnr() {
 		dif.y = moveToPoint.y - selectedPoint.y;
 		rotationAngle = atan2(dif.y, dif.x);
 		rotangf(borderClipReference, &clipReference);
-		for (ind = 0; ind < clipboardStitchCount; ind++)
+		for (ind = 0; ind < clipStitchCount; ind++)
 			rotangf(clipReversedData[ind], &clipFillData[ind]);
 		ritclp(selectedPoint);
 		selectedPoint.x = moveToPoint.x;
@@ -5914,15 +5914,15 @@ void durev() {
 	unsigned	ind;
 	double		mid;
 
-	mid = (clipboardRect.right - clipboardRect.left) / 2 + clipboardRect.left;
+	mid = (clipRect.right - clipRect.left) / 2 + clipRect.left;
 	if (clipBuffer[0].x > mid) {
-		for (ind = 0; ind < clipboardStitchCount; ind++) {
-			clipReversedData[ind].x = clipboardRect.right - clipBuffer[ind].x;
+		for (ind = 0; ind < clipStitchCount; ind++) {
+			clipReversedData[ind].x = clipRect.right - clipBuffer[ind].x;
 			clipReversedData[ind].y = clipBuffer[ind].y;
 		}
 	}
 	else {
-		for (ind = 0; ind < clipboardStitchCount; ind++) {
+		for (ind = 0; ind < clipStitchCount; ind++) {
 			clipReversedData[ind].x = clipBuffer[ind].x;
 			clipReversedData[ind].y = clipBuffer[ind].y;
 		}
@@ -5931,9 +5931,9 @@ void durev() {
 
 void setvct(unsigned strt, unsigned fin) {
 	clipAngle = atan2(currentFormVertices[fin].y - currentFormVertices[strt].y, currentFormVertices[fin].x - currentFormVertices[strt].x);
-	vector0.x = clipboardRectSize.cx*cos(clipAngle);
+	vector0.x = clipRectSize.cx*cos(clipAngle);
 	// ToDo - is this line below correct?
-	vector0.y = clipboardRectSize.cx*sin(clipAngle);
+	vector0.y = clipRectSize.cx*sin(clipAngle);
 }
 
 void clpbrd(unsigned short strtlin) {
@@ -5942,22 +5942,22 @@ void clpbrd(unsigned short strtlin) {
 
 	sequenceIndex = 0;
 	rstMap(CLPBAK);
-	plen = clipboardRectSize.cx / 2;
-	plen2 = clipboardRectSize.cx;
-	clipFillData = new fPOINT[clipboardStitchCount];
-	clipReversedData = new fPOINT[clipboardStitchCount];
-	rotationCenter.x = (clipboardRect.right - clipboardRect.left) / 2 + clipboardRect.left;
-	clipReference.y = rotationCenter.y = (clipboardRect.top - clipboardRect.bottom) / 2 + clipboardRect.bottom;
-	clipReference.x = clipboardRect.left;
+	plen = clipRectSize.cx / 2;
+	plen2 = clipRectSize.cx;
+	clipFillData = new fPOINT[clipStitchCount];
+	clipReversedData = new fPOINT[clipStitchCount];
+	rotationCenter.x = (clipRect.right - clipRect.left) / 2 + clipRect.left;
+	clipReference.y = rotationCenter.y = (clipRect.top - clipRect.bottom) / 2 + clipRect.bottom;
+	clipReference.x = clipRect.left;
 	durev();
 	ref = 0;
 	if (SelectedForm->type == FRMLINE) {
 		selectedPoint.x = currentFormVertices[0].x;
 		selectedPoint.y = currentFormVertices[0].y;
 		setvct(0, 1);
-		borderClipReference.y = (clipboardRect.top - clipboardRect.bottom) / 2 + clipboardRect.bottom;
+		borderClipReference.y = (clipRect.top - clipRect.bottom) / 2 + clipRect.bottom;
 		// ToDo - is this line below correct?
-		borderClipReference.x = (clipboardRect.top = clipboardRect.left) / 2 + clipboardRect.left;
+		borderClipReference.x = (clipRect.top = clipRect.left) / 2 + clipRect.left;
 		for (currentSide = 0; currentSide < (unsigned)sides - 2; currentSide++) {
 			linsid();
 			setvct(currentSide + 1, currentSide + 2);
@@ -6048,7 +6048,7 @@ void clpout() {
 	if (SelectedForm->type == FRMLINE)
 		satout(plen);
 	else {
-		satout(clipboardRectSize.cy);
+		satout(clipRectSize.cy);
 		insidePoints = SelectedForm->vertices;
 	}
 }
@@ -6058,17 +6058,17 @@ void fsclp() {
 
 	deleclp(closestFormToCursor);
 	SelectedForm->edgeType = EDGECLIP;
-	SelectedForm->clipEntries = clipboardStitchCount;
-	SelectedForm->borderClipData = nueclp(closestFormToCursor, clipboardStitchCount);
-	SelectedForm->borderSize = clipboardRectSize.cy;
-	SelectedForm->edgeSpacing = clipboardRectSize.cx;
+	SelectedForm->clipEntries = clipStitchCount;
+	SelectedForm->borderClipData = nueclp(closestFormToCursor, clipStitchCount);
+	SelectedForm->borderSize = clipRectSize.cy;
+	SelectedForm->edgeSpacing = clipRectSize.cx;
 	SelectedForm->borderColor = activeColor;
 	bsizpar();
-	for (ind = 0; ind < clipboardStitchCount; ind++) {
+	for (ind = 0; ind < clipStitchCount; ind++) {
 		SelectedForm->borderClipData[ind].x = clipBuffer[ind].x;
 		SelectedForm->borderClipData[ind].y = clipBuffer[ind].y;
 	}
-	plen = clipboardRectSize.cy / 2;
+	plen = clipRectSize.cy / 2;
 	clpout();
 	refilfn();
 }
@@ -6086,7 +6086,7 @@ void fclp() {
 			savdo();
 			redclp();
 			CloseClipboard();
-			if (clipboardRectSize.cx > CLPMIN) {
+			if (clipRectSize.cx > CLPMIN) {
 				if (selectedFormCount) {
 					for (ind = 0; ind < selectedFormCount; ind++) {
 						closestFormToCursor = selectedFormList[ind];
@@ -6553,8 +6553,8 @@ void setap() {
 
 	underlayColor = activeColor;
 	LoadString(hInst, IDS_APCOL, buf, HBUFSIZ);
-	sprintf_s(msgbuf, sizeof(msgbuf), buf, underlayColor + 1);
-	shoMsg(msgbuf);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), buf, underlayColor + 1);
+	shoMsg(msgBuffer);
 }
 
 void maxtsiz(TCHAR* str, POINT* pt) {
@@ -6673,8 +6673,8 @@ void refrmfn()
 		thDat[LFRM] = txtrwin(stab[STR_FREH], rightWindowCoords);
 	nxtlin();
 	thTxt[LLAYR] = txtwin(stab[STR_TXT1], leftWindowCoords);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%d", (SelectedForm->attribute&FRMLMSK) >> 1);
-	thDat[LLAYR] = txtrwin(msgbuf, rightWindowCoords);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", (SelectedForm->attribute&FRMLMSK) >> 1);
+	thDat[LLAYR] = txtrwin(msgBuffer, rightWindowCoords);
 	nxtlin();
 	if (SelectedForm->type != FRMLINE)
 	{
@@ -6699,27 +6699,27 @@ void refrmfn()
 		if (SelectedForm->extendedAttribute&(AT_WALK | AT_UND | AT_CWLK))
 		{
 			thTxt[LUNDCOL] = txtwin(stab[STR_UNDCOL], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%d", SelectedForm->underlayColor + 1);
-			thDat[LUNDCOL] = txtrwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->underlayColor + 1);
+			thDat[LUNDCOL] = txtrwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 			thTxt[LULEN] = txtwin(stab[STR_ULEN], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->underlayStitchLen / PFGRAN);
-			thDat[LULEN] = txtrwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->underlayStitchLen / PFGRAN);
+			thDat[LULEN] = txtrwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		thTxt[LWLKIND] = txtwin(stab[STR_UWLKIND], leftWindowCoords);
-		sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->underlayIndent / PFGRAN);
-		thDat[LWLKIND] = txtrwin(msgbuf, rightWindowCoords);
+		sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->underlayIndent / PFGRAN);
+		thDat[LWLKIND] = txtrwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 		if (SelectedForm->extendedAttribute&AT_UND)
 		{
 			thTxt[LUSPAC] = txtwin(stab[STR_FUSPAC], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->underlaySpacing / PFGRAN);
-			thDat[LUSPAC] = txtrwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->underlaySpacing / PFGRAN);
+			thDat[LUSPAC] = txtrwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 			thTxt[LUANG] = txtwin(stab[STR_FUANG], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->underlayStitchAngle * 180 / PI);
-			thDat[LUANG] = txtrwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->underlayStitchAngle * 180 / PI);
+			thDat[LUANG] = txtrwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 	}
@@ -6728,13 +6728,13 @@ void refrmfn()
 	nxtlin();
 	if (SelectedForm->fillType) {
 		thTxt[LFRMCOL] = txtwin(stab[STR_TXT3], leftWindowCoords);
-		sprintf_s(msgbuf, sizeof(msgbuf), "%d", SelectedForm->fillColor + 1);
-		thDat[LFRMCOL] = numwin(msgbuf, rightWindowCoords);
+		sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillColor + 1);
+		thDat[LFRMCOL] = numwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == FTHF) {
 			thTxt[LFTHCOL] = txtwin(stab[STR_FTHCOL], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%d", SelectedForm->fillInfo.feather.color + 1);
-			thDat[LFTHCOL] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillInfo.feather.color + 1);
+			thDat[LFTHCOL] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 			thTxt[LFTHTYP] = txtwin(stab[STR_FTHTYP], leftWindowCoords);
 			thDat[LFTHTYP] = numwin(stab[STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1], rightWindowCoords);
@@ -6765,109 +6765,109 @@ void refrmfn()
 				}
 			}
 			thTxt[LFTHUPCNT] = txtwin(stab[STR_FTHUPCNT], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%d", SelectedForm->fillInfo.feather.upCount);
-			thDat[LFTHUPCNT] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillInfo.feather.upCount);
+			thDat[LFTHUPCNT] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 			thTxt[LFTHDWNCNT] = txtwin(stab[STR_FTHDWNCNT], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%d", SelectedForm->fillInfo.feather.downCount);
-			thDat[LFTHDWNCNT] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillInfo.feather.downCount);
+			thDat[LFTHDWNCNT] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 			thTxt[LFTHSIZ] = txtwin(stab[STR_FTHSIZ], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->fillInfo.feather.ratio);
-			thDat[LFTHSIZ] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->fillInfo.feather.ratio);
+			thDat[LFTHSIZ] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 			if (SelectedForm->fillInfo.feather.fillType == FTHPSG) {
 				thTxt[LFTHNUM] = txtwin(stab[STR_FTHNUM], leftWindowCoords);
-				sprintf_s(msgbuf, sizeof(msgbuf), "%d", SelectedForm->fillInfo.feather.count);
-				thDat[LFTHNUM] = numwin(msgbuf, rightWindowCoords);
+				sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillInfo.feather.count);
+				thDat[LFTHNUM] = numwin(msgBuffer, rightWindowCoords);
 				nxtlin();
 			}
 			thTxt[LFTHFLR] = txtwin(stab[STR_FTHFLR], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->fillInfo.feather.minStitchSize / PFGRAN);
-			thDat[LFTHFLR] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->fillInfo.feather.minStitchSize / PFGRAN);
+			thDat[LFTHFLR] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType != CLPF) {
 			thTxt[LFRMSPAC] = txtwin(stab[STR_TXT4], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->fillSpacing / PFGRAN);
-			thDat[LFRMSPAC] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->fillSpacing / PFGRAN);
+			thDat[LFRMSPAC] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (istx(closestFormToCursor))
 		{
 			thTxt[LTXOF] = txtwin(stab[STR_TXOF], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->txof / PFGRAN);
-			thDat[LTXOF] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->txof / PFGRAN);
+			thDat[LTXOF] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		thTxt[LMAXFIL] = txtwin(stab[STR_TXT20], leftWindowCoords);
-		sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->maxFillStitchLen / PFGRAN);
-		thDat[LMAXFIL] = numwin(msgbuf, rightWindowCoords);
+		sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->maxFillStitchLen / PFGRAN);
+		thDat[LMAXFIL] = numwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 		if (!isclp(closestFormToCursor) && !istx(closestFormToCursor)) {
 			thTxt[LFRMLEN] = txtwin(stab[STR_TXT5], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->lengthOrCount.stitchLength / PFGRAN);
-			thDat[LFRMLEN] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->lengthOrCount.stitchLength / PFGRAN);
+			thDat[LFRMLEN] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		thTxt[LMINFIL] = txtwin(stab[STR_TXT21], leftWindowCoords);
-		sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->minFillStitchLen / PFGRAN);
-		thDat[LMINFIL] = numwin(msgbuf, rightWindowCoords);
+		sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->minFillStitchLen / PFGRAN);
+		thDat[LMINFIL] = numwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
 			thTxt[LFRMANG] = txtwin(stab[STR_TXT6], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->angleOrClipData.angle * 180 / PI);
-			thDat[LFRMANG] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->angleOrClipData.angle * 180 / PI);
+			thDat[LFRMANG] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == ANGCLPF) {
 			thTxt[LSACANG] = txtwin(stab[STR_TXT6], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->satinOrAngle.angle * 180 / PI);
-			thDat[LSACANG] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->satinOrAngle.angle * 180 / PI);
+			thDat[LSACANG] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VCLPF || SelectedForm->fillType == HCLPF || SelectedForm->fillType == ANGCLPF) {
 			thTxt[LFRMFAZ] = txtwin(stab[STR_TXT18], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%d", SelectedForm->wordParam);
-			thDat[LFRMFAZ] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->wordParam);
+			thDat[LFRMFAZ] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VRTF || SelectedForm->fillType == HORF || SelectedForm->fillType == ANGF || istx(closestFormToCursor)) {
 			thTxt[LBFILSQR] = txtwin(stab[STR_PRF2], leftWindowCoords);
 			if (SelectedForm->extendedAttribute&AT_SQR)
-				strcpy_s(msgbuf, stab[STR_SQR]);
+				strcpy_s(msgBuffer, stab[STR_SQR]);
 			else
-				strcpy_s(msgbuf, stab[STR_PNTD]);
-			thDat[LBFILSQR] = txtrwin(msgbuf, rightWindowCoords);
+				strcpy_s(msgBuffer, stab[STR_PNTD]);
+			thDat[LBFILSQR] = txtrwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 	}
 	thTxt[LFSTRT] = txtwin(stab[STR_FSTRT], leftWindowCoords);
 	if (SelectedForm->extendedAttribute&AT_STRT)
-		strcpy_s(msgbuf, stab[STR_ON]);
+		strcpy_s(msgBuffer, stab[STR_ON]);
 	else
-		strcpy_s(msgbuf, stab[STR_OFF]);
-	thDat[LFSTRT] = txtrwin(msgbuf, rightWindowCoords);
+		strcpy_s(msgBuffer, stab[STR_OFF]);
+	thDat[LFSTRT] = txtrwin(msgBuffer, rightWindowCoords);
 	nxtlin();
 	if (SelectedForm->extendedAttribute&AT_STRT)
 	{
 		thTxt[LDSTRT] = txtwin(stab[STR_FSTRT], leftWindowCoords);
-		sprintf_s(msgbuf, sizeof(msgbuf), "%d", SelectedForm->fillStart);
-		thDat[LDSTRT] = numwin(msgbuf, rightWindowCoords);
+		sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillStart);
+		thDat[LDSTRT] = numwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 	}
 	thTxt[LFEND] = txtwin(stab[STR_FEND], leftWindowCoords);
 	if (SelectedForm->extendedAttribute&AT_END)
-		strcpy_s(msgbuf, stab[STR_ON]);
+		strcpy_s(msgBuffer, stab[STR_ON]);
 	else
-		strcpy_s(msgbuf, stab[STR_OFF]);
-	thDat[LFEND] = txtrwin(msgbuf, rightWindowCoords);
+		strcpy_s(msgBuffer, stab[STR_OFF]);
+	thDat[LFEND] = txtrwin(msgBuffer, rightWindowCoords);
 	nxtlin();
 	if (SelectedForm->extendedAttribute&AT_END)
 	{
 		thTxt[LDEND] = txtwin(stab[STR_FEND], leftWindowCoords);
-		sprintf_s(msgbuf, sizeof(msgbuf), "%d", SelectedForm->fillEnd);
-		thDat[LDEND] = numwin(msgbuf, rightWindowCoords);
+		sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillEnd);
+		thDat[LDEND] = numwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 	}
 	thTxt[LBRD] = txtwin(stab[STR_TXT7], leftWindowCoords);
@@ -6875,64 +6875,64 @@ void refrmfn()
 	nxtlin();
 	if (cod) {
 		thTxt[LBRDCOL] = txtwin(stab[STR_TXT8], leftWindowCoords);
-		sprintf_s(msgbuf, sizeof(msgbuf), "%d", (SelectedForm->borderColor & 0xf) + 1);
-		thDat[LBRDCOL] = numwin(msgbuf, rightWindowCoords);
+		sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", (SelectedForm->borderColor & 0xf) + 1);
+		thDat[LBRDCOL] = numwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 		if (egaray[fpnt] & BESPAC) {
 			thTxt[LBRDSPAC] = txtwin(stab[STR_TXT9], leftWindowCoords);
 			if (cod == EDGEPROPSAT || cod == EDGEOCHAIN || cod == EDGELCHAIN)
-				sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->edgeSpacing / PFGRAN);
+				sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN);
 			else
-				sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->edgeSpacing / PFGRAN * 2);
-			thDat[LBRDSPAC] = numwin(msgbuf, rightWindowCoords);
+				sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN * 2);
+			thDat[LBRDSPAC] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & BPICSPAC) {
 			thTxt[LBRDPIC] = txtwin(stab[STR_TXT16], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->edgeSpacing / PFGRAN);
-			thDat[LBRDPIC] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN);
+			thDat[LBRDPIC] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & BEMAX) {
 			thTxt[LMAXBRD] = txtwin(stab[STR_TXT22], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->maxBorderStitchLen / PFGRAN);
-			thDat[LMAXBRD] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->maxBorderStitchLen / PFGRAN);
+			thDat[LMAXBRD] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & BELEN) {
 			thTxt[LBRDLEN] = txtwin(stab[STR_TXT10], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->edgeStitchLen / PFGRAN);
-			thDat[LBRDLEN] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->edgeStitchLen / PFGRAN);
+			thDat[LBRDLEN] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & BEMIN) {
 			thTxt[LMINBRD] = txtwin(stab[STR_TXT23], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->minBorderStitchLen / PFGRAN);
-			thDat[LMINBRD] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->minBorderStitchLen / PFGRAN);
+			thDat[LMINBRD] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & BESIZ) {
 			thTxt[LBRDSIZ] = txtwin(stab[STR_TXT11], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->borderSize / PFGRAN);
-			thDat[LBRDSIZ] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->borderSize / PFGRAN);
+			thDat[LBRDSIZ] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & BRDPOS) {
 			thTxt[LBRDPOS] = txtwin(stab[STR_TXT18], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->edgeStitchLen);
-			thDat[LBRDPOS] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->edgeStitchLen);
+			thDat[LBRDPOS] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & CHNPOS) {
 			thTxt[LBRDPOS] = txtwin(stab[STR_TXT19], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", SelectedForm->edgeStitchLen);
-			thDat[LBRDPOS] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->edgeStitchLen);
+			thDat[LBRDPOS] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (cod == EDGEAPPL) {
 			thTxt[LAPCOL] = txtwin(stab[STR_TXT12], leftWindowCoords);
-			sprintf_s(msgbuf, sizeof(msgbuf), "%d", (SelectedForm->borderColor >> 4) + 1);
-			thDat[LAPCOL] = numwin(msgbuf, rightWindowCoords);
+			sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", (SelectedForm->borderColor >> 4) + 1);
+			thDat[LAPCOL] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (cod == EDGEANGSAT || cod == EDGEAPPL || cod == EDGEPROPSAT) {
@@ -6945,11 +6945,11 @@ void refrmfn()
 		}
 		if (egaray[fpnt] & BCNRSIZ) {
 			if (SelectedForm->edgeType == EDGEBHOL)
-				sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", getblen() / PFGRAN);
+				sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", getblen() / PFGRAN);
 			else
-				sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", getplen() / PFGRAN);
+				sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", getplen() / PFGRAN);
 			thTxt[LBCSIZ] = txtwin(stab[STR_TXT13], leftWindowCoords);
-			thDat[LBCSIZ] = numwin(msgbuf, rightWindowCoords);
+			thDat[LBCSIZ] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->type == FRMLINE&&egaray[fpnt] & BRDEND) {
@@ -7477,12 +7477,12 @@ void sidwnd(HWND wnd) {
 	unsid();
 	formMenuChoice = baksid;
 	GetWindowRect(wnd, &wrct);
-	GetWindowRect(hFormData, &msgRct);
+	GetWindowRect(hFormData, &msgRect);
 	hSideMessageWin = CreateWindow(
 		"STATIC",
 		0,
 		WS_BORDER | WS_CHILD | WS_VISIBLE,
-		msgRct.right - mainWindowOrigin.x + 3,
+		msgRect.right - mainWindowOrigin.x + 3,
 		wrct.top - mainWindowOrigin.y - 3,
 		buttonWidthX3,
 		wrct.bottom - wrct.top + 3,
@@ -7499,7 +7499,7 @@ void prfsid(HWND wnd) {
 	sideWindowEntryBuffer[0] = 0;
 	unsid();
 	GetWindowRect(wnd, &wrct);
-	GetClientRect(hPreferencesWindow, &msgRct);
+	GetClientRect(hPreferencesWindow, &msgRect);
 	hSideMessageWin = CreateWindow(
 		"STATIC",
 		0,
@@ -7580,7 +7580,7 @@ HWND prfnwin(TCHAR* str) {
 
 void prflin(unsigned p_lin) {
 	prftwin(stab[p_lin]);
-	thDat[p_lin - STR_PRF0] = prfnwin(msgbuf);
+	thDat[p_lin - STR_PRF0] = prfnwin(msgBuffer);
 	nxtlin();
 }
 
@@ -7647,71 +7647,71 @@ void prfmsg() {
 	leftWindowCoords.right = 3 + leftWindowSize.x;
 	rightWindowCoords.left = 6 + leftWindowSize.x;
 	rightWindowCoords.right = 6 + leftWindowSize.x + rightWindowSize.x + 6;
-	sprintf_s(msgbuf, sizeof(msgbuf), "%d", underlayColor + 1);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", underlayColor + 1);
 	prflin(STR_PRF10);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", borderWidth / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", borderWidth / PFGRAN);
 	prflin(STR_PRF3);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", buttonholeFillCornerLength / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", buttonholeFillCornerLength / PFGRAN);
 	prflin(STR_PRF14);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", iniFile.chainSpace / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", iniFile.chainSpace / PFGRAN);
 	prflin(STR_PRF23);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", iniFile.chainRatio);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", iniFile.chainRatio);
 	prflin(STR_PRF24);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f mm", iniFile.clipboardOffset / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f mm", iniFile.clipOffset / PFGRAN);
 	prflin(STR_PRF21);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%d", iniFile.fillPhase);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", iniFile.fillPhase);
 	prflin(STR_PRF22);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", iniFile.eggRatio);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", iniFile.eggRatio);
 	prflin(STR_PRF26);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", iniFile.fillAngle / PI * 180);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", iniFile.fillAngle / PI * 180);
 	prflin(STR_PRF1);
 	if (chku(SQRFIL))
-		strcpy_s(msgbuf, stab[STR_SQR]);
+		strcpy_s(msgBuffer, stab[STR_SQR]);
 	else
-		strcpy_s(msgbuf, stab[STR_PNTD]);
+		strcpy_s(msgBuffer, stab[STR_PNTD]);
 	prflin(STR_PRF2);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", stitchSpace / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", stitchSpace / PFGRAN);
 	prflin(STR_PRF0);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%d", duthrsh(showStitchThreshold));
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", duthrsh(showStitchThreshold));
 	prflin(STR_PRF7);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f mm", iniFile.gridSize / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f mm", iniFile.gridSize / PFGRAN);
 	prflin(STR_PRF20);
 	sethup();
-	sprintf_s(msgbuf, sizeof(msgbuf), "%s", stab[STR_HUP0 + iniFile.hoopType - 1]);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%s", stab[STR_HUP0 + iniFile.hoopType - 1]);
 	prflin(STR_PRF17);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.0f mm", iniFile.hoopSizeY / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.0f mm", iniFile.hoopSizeY / PFGRAN);
 	prflin(STR_PRF27);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.0f mm", iniFile.hoopSizeX / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.0f mm", iniFile.hoopSizeX / PFGRAN);
 	prflin(STR_PRF18);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", iniFile.cursorNudgeStep);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", iniFile.cursorNudgeStep);
 	prflin(STR_PRF25);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", picotSpace / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", picotSpace / PFGRAN);
 	prflin(STR_PRF16);
 	if (chku(BLUNT))
-		strcpy_s(msgbuf, stab[STR_BLUNT]);
+		strcpy_s(msgBuffer, stab[STR_BLUNT]);
 	else
-		strcpy_s(msgbuf, stab[STR_TAPR]);
+		strcpy_s(msgBuffer, stab[STR_TAPR]);
 	prflin(STR_PRF15);
 	if (chku(DUND))
-		strcpy_s(msgbuf, stab[STR_ON]);
+		strcpy_s(msgBuffer, stab[STR_ON]);
 	else
-		strcpy_s(msgbuf, stab[STR_OFF]);
+		strcpy_s(msgBuffer, stab[STR_OFF]);
 	prflin(STR_PRF19);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", smallStitchLength / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", smallStitchLength / PFGRAN);
 	prflin(STR_PRF9);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", snapLength / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", snapLength / PFGRAN);
 	prflin(STR_PRF11);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", spiralWrap);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", spiralWrap);
 	prflin(STR_PRF13);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", starRatio);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", starRatio);
 	prflin(STR_PRF12);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%d", duthrsh(stitchBoxesThreshold));
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", duthrsh(stitchBoxesThreshold));
 	prflin(STR_PRF8);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", iniFile.maxStitchLength / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", iniFile.maxStitchLength / PFGRAN);
 	prflin(STR_PRF4);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", userStitchLength / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", userStitchLength / PFGRAN);
 	prflin(STR_PRF5);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", minStitchLength / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", minStitchLength / PFGRAN);
 	prflin(STR_PRF6);
 	setMap(PRFACT);
 	ReleaseDC(hWnd, prfdc);
@@ -7762,71 +7762,71 @@ void prfmsg() {
 	leftWindowCoords.right = 3 + leftWindowSize.x;
 	rightWindowCoords.left = 6 + leftWindowSize.x;
 	rightWindowCoords.right = 6 + leftWindowSize.x + rightWindowSize.x + 6;
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", userStitchLength / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", userStitchLength / PFGRAN);
 	prflin(STR_PRF5);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", iniFile.maxStitchLength / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", iniFile.maxStitchLength / PFGRAN);
 	prflin(STR_PRF4);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", minStitchLength / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", minStitchLength / PFGRAN);
 	prflin(STR_PRF6);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", smallStitchLength / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", smallStitchLength / PFGRAN);
 	prflin(STR_PRF9);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", iniFile.fillAngle / PI * 180);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", iniFile.fillAngle / PI * 180);
 	prflin(STR_PRF1);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", stitchSpace / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", stitchSpace / PFGRAN);
 	prflin(STR_PRF0);
 	if (chku(SQRFIL))
-		strcpy_s(msgbuf, stab[STR_SQR]);
+		strcpy_s(msgBuffer, stab[STR_SQR]);
 	else
-		strcpy_s(msgbuf, stab[STR_PNTD]);
+		strcpy_s(msgBuffer, stab[STR_PNTD]);
 	prflin(STR_PRF2);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", borderWidth / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", borderWidth / PFGRAN);
 	prflin(STR_PRF3);
 	if (chku(BLUNT))
-		strcpy_s(msgbuf, stab[STR_BLUNT]);
+		strcpy_s(msgBuffer, stab[STR_BLUNT]);
 	else
-		strcpy_s(msgbuf, stab[STR_TAPR]);
+		strcpy_s(msgBuffer, stab[STR_TAPR]);
 	prflin(STR_PRF15);
 	if (chku(DUND))
-		strcpy_s(msgbuf, stab[STR_ON]);
+		strcpy_s(msgBuffer, stab[STR_ON]);
 	else
-		strcpy_s(msgbuf, stab[STR_OFF]);
+		strcpy_s(msgBuffer, stab[STR_OFF]);
 	prflin(STR_PRF19);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", buttonholeFillCornerLength / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", buttonholeFillCornerLength / PFGRAN);
 	prflin(STR_PRF14);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", iniFile.chainSpace / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", iniFile.chainSpace / PFGRAN);
 	prflin(STR_PRF23);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", iniFile.chainRatio);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", iniFile.chainRatio);
 	prflin(STR_PRF24);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f mm", iniFile.clipboardOffset / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f mm", iniFile.clipOffset / PFGRAN);
 	prflin(STR_PRF21);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%d", iniFile.fillPhase);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", iniFile.fillPhase);
 	prflin(STR_PRF22);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", picotSpace / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", picotSpace / PFGRAN);
 	prflin(STR_PRF16);
 	sethup();
-	sprintf_s(msgbuf, sizeof(msgbuf), stab[STR_HUP0 + iniFile.hoopType - 1]);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), stab[STR_HUP0 + iniFile.hoopType - 1]);
 	prflin(STR_PRF17);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.0f mm", iniFile.hoopSizeY / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.0f mm", iniFile.hoopSizeY / PFGRAN);
 	prflin(STR_PRF27);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.0f mm", iniFile.hoopSizeX / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.0f mm", iniFile.hoopSizeX / PFGRAN);
 	prflin(STR_PRF18);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f mm", iniFile.gridSize / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f mm", iniFile.gridSize / PFGRAN);
 	prflin(STR_PRF20);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%d", duthrsh(showStitchThreshold));
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", duthrsh(showStitchThreshold));
 	prflin(STR_PRF7);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", iniFile.cursorNudgeStep);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", iniFile.cursorNudgeStep);
 	prflin(STR_PRF25);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", snapLength / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", snapLength / PFGRAN);
 	prflin(STR_PRF11);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%d", duthrsh(stitchBoxesThreshold));
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", duthrsh(stitchBoxesThreshold));
 	prflin(STR_PRF8);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", iniFile.eggRatio);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", iniFile.eggRatio);
 	prflin(STR_PRF26);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", spiralWrap);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", spiralWrap);
 	prflin(STR_PRF13);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%.2f", starRatio);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", starRatio);
 	prflin(STR_PRF12);
-	sprintf_s(msgbuf, sizeof(msgbuf), "%d", underlayColor + 1);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", underlayColor + 1);
 	prflin(STR_PRF10);
 	setMap(PRFACT);
 	ReleaseDC(hWnd, prfdc);
@@ -7999,7 +7999,7 @@ void duhart(unsigned nsids) {
 	SelectedForm = &formList[formIndex];
 	frmclr(SelectedForm);
 	SelectedForm->attribute = activeLayer << 1;
-	currentFormVertices = &formPoints[fltad];
+	currentFormVertices = &formPoints[formPointIndex];
 	px2stch();
 	pnt.x = selectedPoint.x;
 	pnt.y = selectedPoint.y;
@@ -8069,7 +8069,7 @@ void dulens(unsigned nsids) {
 	SelectedForm = &formList[formIndex];
 	closestFormToCursor = formIndex;
 	frmclr(SelectedForm);
-	SelectedForm->vertices = &formPoints[fltad];
+	SelectedForm->vertices = &formPoints[formPointIndex];
 	SelectedForm->attribute = activeLayer << 1;
 	fvars(formIndex);
 	px2stch();
@@ -8189,7 +8189,7 @@ void fliph() {
 	}
 	if (chkMap(BIGBOX)) {
 		av = (allItemsRectangle.right - allItemsRectangle.left) / 2 + allItemsRectangle.left;
-		for (ind = 0; ind < fltad; ind++)
+		for (ind = 0; ind < formPointIndex; ind++)
 			formPoints[ind].x = av + av - formPoints[ind].x;
 		for (ind = 0; ind < header.stitchCount; ind++)
 			stitchBuffer[ind].x = av + av - stitchBuffer[ind].x;
@@ -8267,7 +8267,7 @@ void flipv() {
 	if (chkMap(BIGBOX)) {
 		savdo();
 		av = (allItemsRectangle.top - allItemsRectangle.bottom) / 2 + allItemsRectangle.bottom;
-		for (ind = 0; ind < fltad; ind++)
+		for (ind = 0; ind < formPointIndex; ind++)
 			formPoints[ind].y = av + av - formPoints[ind].y;
 		for (ind = 0; ind < header.stitchCount; ind++)
 			stitchBuffer[ind].y = av + av - stitchBuffer[ind].y;
@@ -8331,7 +8331,7 @@ void tomsg() {
 
 	GetWindowRect(hOKButton, &okrct);
 	GetTextExtentPoint32(stitchWindowMemDC, stab[STR_DELST2], strlen(stab[STR_DELST2]), &tsiz);
-	hto = CreateWindow(
+	hDlgDeleteStitches = CreateWindow(
 		"STATIC",
 		stab[STR_DELST2],
 		SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -9022,9 +9022,9 @@ void trfrm(dPOINT lpnt0, dPOINT lpnt1, dPOINT rpnt0, dPOINT rpnt1) {
 	dudif(lpnt0, rpnt0, &bdif);
 	dudif(lpnt0, lpnt1, &ldif);
 	dudif(rpnt0, rpnt1, &rdif);
-	for (ind = 0; ind < clipboardStitchCount; ind++) {
-		clprat.x = clipBuffer[ind].x / clipboardRectSize.cx;
-		clprat.y = clipBuffer[ind].y / clipboardRectSize.cy;
+	for (ind = 0; ind < clipStitchCount; ind++) {
+		clprat.x = clipBuffer[ind].x / clipRectSize.cx;
+		clprat.y = clipBuffer[ind].y / clipRectSize.cy;
 		tmid.x = clprat.x*(tdif.x) + lpnt1.x;
 		tmid.y = clprat.x*(tdif.y) + lpnt1.y;
 		bmid.x = clprat.x*(bdif.x) + lpnt0.x;
@@ -9053,9 +9053,9 @@ void clpfm() {
 		rdif.x = bseq[ind + 2].x - bseq[ind + 3].x;
 		rdif.y = bseq[ind + 2].y - bseq[ind + 3].y;
 		if (l_rsiz > lsiz)
-			cnt = lsiz / clipboardRectSize.cy;
+			cnt = lsiz / clipRectSize.cy;
 		else
-			cnt = l_rsiz / clipboardRectSize.cy;
+			cnt = l_rsiz / clipRectSize.cy;
 		if (!cnt)
 			cnt = 1;
 		lstp.x = ldif.x / cnt;
@@ -9075,7 +9075,7 @@ void clpfm() {
 			lpnt1.y += lstp.y;
 			rpnt1.x += rstp.x;
 			rpnt1.y += rstp.y;
-			if (activePointIndex > MAXSEQ - clipboardStitchCount - 1)
+			if (activePointIndex > MAXSEQ - clipStitchCount - 1)
 				return;
 			trfrm(lpnt0, lpnt1, rpnt0, rpnt1);
 		}
@@ -9085,7 +9085,7 @@ void clpfm() {
 void fmclp() {
 	double		tspac = stitchSpace;
 
-	stitchSpace = clipboardRectSize.cx;
+	stitchSpace = clipRectSize.cx;
 	setMap(BARSAT);
 	satfil();
 	rstMap(BARSAT);
@@ -9105,8 +9105,8 @@ void filsclp() {
 	SelectedForm->type = SAT;
 	SelectedForm->fillType = CLPF;
 	SelectedForm->angleOrClipData.clip = numclp();
-	SelectedForm->lengthOrCount.clipCount = clipboardStitchCount;
-	for (ind = 0; ind < clipboardStitchCount; ind++) {
+	SelectedForm->lengthOrCount.clipCount = clipStitchCount;
+	for (ind = 0; ind < clipStitchCount; ind++) {
 		SelectedForm->angleOrClipData.clip[ind].x = clipBuffer[ind].x;
 		SelectedForm->angleOrClipData.clip[ind].y = clipBuffer[ind].y;
 	}
@@ -9124,7 +9124,7 @@ void clpfil() {
 		if (hClipMem) {
 			redclp();
 			CloseClipboard();
-			if (clipboardRectSize.cx > CLPMIN&&clipboardRectSize.cy > CLPMIN) {
+			if (clipRectSize.cx > CLPMIN&&clipRectSize.cy > CLPMIN) {
 				if (selectedFormCount) {
 					for (ind = 0; ind < selectedFormCount; ind++) {
 						closestFormToCursor = selectedFormList[ind];
@@ -9397,8 +9397,8 @@ void rotentr() {
 	TCHAR buf[HBUFSIZ];
 
 	LoadString(hInst, IDS_ROTA, buf, HBUFSIZ);
-	sprintf_s(msgbuf, sizeof(msgbuf), buf, rotationAngle / PI * 180);
-	shoMsg(msgbuf);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), buf, rotationAngle / PI * 180);
+	shoMsg(msgBuffer);
 	setMap(NUMIN);
 	numWnd();
 }
@@ -10175,8 +10175,8 @@ void clpcrnr(unsigned p_lin) {
 	double		len, rat;
 	fPOINTATTRIBUTE		rpnt;
 
-	rpnt.x = (clipboardRect.right - clipboardRect.left) / 2 + clipboardRect.left;
-	rpnt.y = clipboardRect.top;
+	rpnt.x = (clipRect.right - clipRect.left) / 2 + clipRect.left;
+	rpnt.y = clipRect.top;
 	if (chkMap(INDIR))
 	{
 		dif.x = outsidePoints[tlin].x - currentFormVertices[tlin].x;
@@ -10189,7 +10189,7 @@ void clpcrnr(unsigned p_lin) {
 	}
 	rotationAngle = atan2(dif.y, dif.x) + PI / 2;
 	rotang1(rpnt, &clipReference);
-	for (ind = 0; ind < clipboardStitchCount; ind++)
+	for (ind = 0; ind < clipStitchCount; ind++)
 		rotang1(clipBuffer[ind], &clipFillData[ind]);
 	len = hypot(dif.x, dif.y);
 	rat = getplen() / len;
@@ -10228,10 +10228,10 @@ void picfn(unsigned strt, unsigned fin, double spac) {
 	ostp.x = SelectedForm->borderSize*cos(rotationAngle);
 	ostp.y = SelectedForm->borderSize*sin(rotationAngle);
 	len = hypot(dif.x, dif.y);
-	spac += clipboardRectSize.cx;
+	spac += clipRectSize.cx;
 	cnt = len / spac;
-	rpnt.x = (clipboardRect.right - clipboardRect.left) / 2 + clipboardRect.left;
-	rpnt.y = clipboardRect.top;
+	rpnt.x = (clipRect.right - clipRect.left) / 2 + clipRect.left;
+	rpnt.y = clipRect.top;
 	rotationAngle = atan2(dif.y, dif.x);
 	rotang1(rpnt, &clipReference);
 	pnti.x = currentFormVertices[strt].x;
@@ -10244,7 +10244,7 @@ void picfn(unsigned strt, unsigned fin, double spac) {
 			stp.x = dif.x*tdub;
 			stp.y = dif.y*tdub;
 		}
-		for (ind = 0; ind < clipboardStitchCount; ind++)
+		for (ind = 0; ind < clipStitchCount; ind++)
 			rotang1(clipBuffer[ind], &clipFillData[ind]);
 		for (ind = 0; ind < cnt - 1; ind++) {
 			pntf.x = pnti.x + stp.x;
@@ -10288,12 +10288,12 @@ void clpic(unsigned short strtlin) {
 
 	sequenceIndex = 0;
 	rstMap(CLPBAK);
-	plen = clipboardRectSize.cx / 2;
-	plen2 = clipboardRectSize.cx;
-	clipFillData = new fPOINT[clipboardStitchCount];
-	rotationCenter.x = (clipboardRect.right - clipboardRect.left) / 2 + clipboardRect.left;
-	clipReference.y = rotationCenter.y = (clipboardRect.top - clipboardRect.bottom) / 2 + clipboardRect.bottom;
-	clipReference.x = clipboardRect.left;
+	plen = clipRectSize.cx / 2;
+	plen2 = clipRectSize.cx;
+	clipFillData = new fPOINT[clipStitchCount];
+	rotationCenter.x = (clipRect.right - clipRect.left) / 2 + clipRect.left;
+	clipReference.y = rotationCenter.y = (clipRect.top - clipRect.bottom) / 2 + clipRect.bottom;
+	clipReference.x = clipRect.left;
 	satout(20);
 	if (SelectedForm->type == FRMLINE) {
 		for (ind = 0; ind < (unsigned)sides - 2; ind++) {
@@ -10324,18 +10324,18 @@ void fspic() {
 
 	deleclp(closestFormToCursor);
 	SelectedForm->edgeType = EDGEPICOT;
-	SelectedForm->clipEntries = clipboardStitchCount;
-	SelectedForm->borderClipData = nueclp(closestFormToCursor, clipboardStitchCount);
-	SelectedForm->borderSize = clipboardRectSize.cy;
+	SelectedForm->clipEntries = clipStitchCount;
+	SelectedForm->borderClipData = nueclp(closestFormToCursor, clipStitchCount);
+	SelectedForm->borderSize = clipRectSize.cy;
 	SelectedForm->edgeSpacing = picotSpace;
 	SelectedForm->borderColor = activeColor;
 	bsizpar();
 	savplen(buttonholeFillCornerLength);
-	for (ind = 0; ind < clipboardStitchCount; ind++) {
+	for (ind = 0; ind < clipStitchCount; ind++) {
 		SelectedForm->borderClipData[ind].x = clipBuffer[ind].x;
 		SelectedForm->borderClipData[ind].y = clipBuffer[ind].y;
 	}
-	plen = clipboardRectSize.cy / 2;
+	plen = clipRectSize.cy / 2;
 	refilfn();
 }
 
@@ -10352,7 +10352,7 @@ void picot() {
 		if (hClipMem) {
 			redclp();
 			CloseClipboard();
-			if (clipboardRectSize.cx > CLPMIN) {
+			if (clipRectSize.cx > CLPMIN) {
 				if (selectedFormCount) {
 					for (ind = 0; ind < selectedFormCount; ind++) {
 						closestFormToCursor = selectedFormList[ind];
@@ -10762,8 +10762,8 @@ void shrnks() {
 		dif.x = currentFormVertices[ind + 1].x - currentFormVertices[ind].x;
 		dif.y = currentFormVertices[ind + 1].y - currentFormVertices[ind].y;
 		len = hypot(dif.x, dif.y);
-		cnt = len / clipboardRectSize.cx + 0.5;
-		rat = (clipboardRectSize.cx*cnt + 0.004) / len;
+		cnt = len / clipRectSize.cx + 0.5;
+		rat = (clipRectSize.cx*cnt + 0.004) / len;
 		currentFormVertices[ind + 1].x = currentFormVertices[ind].x + dif.x*rat;
 		currentFormVertices[ind + 1].y = currentFormVertices[ind].y + dif.y*rat;
 	}
@@ -10775,8 +10775,8 @@ void shrnks() {
 		dif.x = currentFormVertices[0].x - currentFormVertices[ind].x;
 		dif.y = currentFormVertices[0].y - currentFormVertices[ind].y;
 		dlen = hypot(dif.x, dif.y);
-		cnt = dlen / clipboardRectSize.cx;
-		adif = dlen - cnt*clipboardRectSize.cx;
+		cnt = dlen / clipRectSize.cx;
+		adif = dlen - cnt*clipRectSize.cx;
 		rotationAngle -= adif / len;
 		dif.x = cos(rotationAngle)*len;
 		dif.y = sin(rotationAngle)*len;
@@ -10820,25 +10820,25 @@ void dufdat(unsigned find) {
 	dst = &tmpFormList[formRelocationIndex++];
 	src = &formList[find];
 	mvfrms(dst, src, 1);
-	mvflpnt(&tmpFormPoints[fltad], dst->vertices, dst->sides);
-	dst->vertices = &formPoints[fltad];
-	fltad += dst->sides;
+	mvflpnt(&tmpFormPoints[formPointIndex], dst->vertices, dst->sides);
+	dst->vertices = &formPoints[formPointIndex];
+	formPointIndex += dst->sides;
 	if (dst->satinGuideCount) {
-		mvsatk(&tmpSatinConns[satkad], dst->satinOrAngle.sac, dst->satinGuideCount);
-		dst->satinOrAngle.sac = &satinConns[satkad];
-		satkad += dst->satinGuideCount;
+		mvsatk(&tmpSatinConns[satinConnectIndex], dst->satinOrAngle.sac, dst->satinGuideCount);
+		dst->satinOrAngle.sac = &satinConns[satinConnectIndex];
+		satinConnectIndex += dst->satinGuideCount;
 	}
 	if (iseclpx(find))
 	{
-		mvflpnt(&tmpClipboardPoints[clpad], dst->borderClipData, dst->clipEntries);
-		dst->borderClipData = &clipboardPoints[clpad];
-		clpad += dst->clipEntries;
+		mvflpnt(&tmpClipPoints[clipPointIndex], dst->borderClipData, dst->clipEntries);
+		dst->borderClipData = &clipPoints[clipPointIndex];
+		clipPointIndex += dst->clipEntries;
 	}
 	if (isclpx(find))
 	{
-		mvflpnt(&tmpClipboardPoints[clpad], dst->angleOrClipData.clip, dst->lengthOrCount.clipCount);
-		dst->angleOrClipData.clip = &clipboardPoints[clpad];
-		clpad += dst->lengthOrCount.clipCount;
+		mvflpnt(&tmpClipPoints[clipPointIndex], dst->angleOrClipData.clip, dst->lengthOrCount.clipCount);
+		dst->angleOrClipData.clip = &clipPoints[clipPointIndex];
+		clipPointIndex += dst->lengthOrCount.clipCount;
 	}
 }
 
@@ -10875,8 +10875,8 @@ void frmnumfn(unsigned nunum) {
 		tmpFormList = (FRMHED*)&bseq;
 		tmpFormPoints = (fPOINT*)&tmpFormList[formIndex];
 		tmpSatinConns = (SATCON*)&oseq;
-		tmpClipboardPoints = (fPOINT*)&tmpSatinConns[satkad];
-		fltad = satkad = clpad = 0;
+		tmpClipPoints = (fPOINT*)&tmpSatinConns[satinConnectIndex];
+		formPointIndex = satinConnectIndex = clipPointIndex = 0;
 		for (ind = 0; ind < formIndex; ind++) {
 			if (ind == nunum)
 				dufdat(closestFormToCursor);
@@ -10887,9 +10887,9 @@ void frmnumfn(unsigned nunum) {
 			}
 		}
 		mvfrms(formList, tmpFormList, formIndex);
-		mvflpnt(formPoints, tmpFormPoints, fltad);
-		mvsatk(satinConns, tmpSatinConns, satkad);
-		mvflpnt(clipboardPoints, tmpClipboardPoints, clpad);
+		mvflpnt(formPoints, tmpFormPoints, formPointIndex);
+		mvsatk(satinConns, tmpSatinConns, satinConnectIndex);
+		mvflpnt(clipPoints, tmpClipPoints, clipPointIndex);
 		for (ind = 0; ind < header.stitchCount; ind++) {
 			if (stitchBuffer[ind].attribute&TYPMSK) {
 				cod = (stitchBuffer[ind].attribute&FRMSK) >> FRMSHFT;
@@ -10915,8 +10915,8 @@ void frmnum() {
 
 	if (formIndex&&chkMap(FORMSEL)) {
 		LoadString(hInst, IDS_FRML, buf, HBUFSIZ);
-		sprintf_s(msgbuf, sizeof(msgbuf), buf, formIndex);
-		shoMsg(msgbuf);
+		sprintf_s(msgBuffer, sizeof(msgBuffer), buf, formIndex);
+		shoMsg(msgBuffer);
 		setMap(NUMIN);
 		setMap(ENTRFNUM);
 		numWnd();
@@ -11133,7 +11133,7 @@ void centir() {
 		stitchBuffer[ind].x += dif.x;
 		stitchBuffer[ind].y += dif.y;
 	}
-	for (ind = 0; ind < fltad; ind++) {
+	for (ind = 0; ind < formPointIndex; ind++) {
 		formPoints[ind].x += dif.x;
 		formPoints[ind].y += dif.y;
 	}
@@ -11288,7 +11288,7 @@ void mvfltsb(fPOINT* dst, fPOINT* src, unsigned cnt) {
 }
 
 void clpspac(fPOINT* pins, unsigned cnt) {
-	mvfltsb(&clipboardPoints[clpad + cnt - 1], &clipboardPoints[clpad - 1], clpad - clpind(pins));
+	mvfltsb(&clipPoints[clipPointIndex + cnt - 1], &clipPoints[clipPointIndex - 1], clipPointIndex - clpind(pins));
 }
 
 void stchadj() {
@@ -11324,8 +11324,8 @@ void spltsat(SATCON tsac) {
 	mvfrmsb(&formList[formIndex], &formList[formIndex - 1], formIndex - closestFormToCursor);
 	formIndex++;
 	if (closestFormToCursor < (unsigned)formIndex - 2)
-		mvfltsb(&formPoints[fltad + 1], &formPoints[fltad - 1], fltad - fltind(formList[closestFormToCursor + 2].vertices));
-	fltad += 2;
+		mvfltsb(&formPoints[formPointIndex + 1], &formPoints[formPointIndex - 1], formPointIndex - fltind(formList[closestFormToCursor + 2].vertices));
+	formPointIndex += 2;
 	for (ind = closestFormToCursor + 2; ind < formIndex; ind++)
 		formList[ind].vertices += 2;
 	lo = 0;
@@ -11383,8 +11383,8 @@ void spltsat(SATCON tsac) {
 	}
 	if (formList[closestFormToCursor + 1].wordParam)
 		formList[closestFormToCursor + 1].wordParam -= (tsac.start - 1);
-	mvsatk(&SelectedForm->satinOrAngle.sac[lo - 1], &SelectedForm->satinOrAngle.sac[lo], satkad - sacind(&SelectedForm->satinOrAngle.sac[lo]));
-	satkad--;
+	mvsatk(&SelectedForm->satinOrAngle.sac[lo - 1], &SelectedForm->satinOrAngle.sac[lo], satinConnectIndex - sacind(&SelectedForm->satinOrAngle.sac[lo]));
+	satinConnectIndex--;
 	formList[closestFormToCursor + 1].satinOrAngle.sac = &SelectedForm->satinOrAngle.sac[activePointIndex];
 	formList[closestFormToCursor + 1].satinGuideCount = SelectedForm->satinGuideCount - activePointIndex - 1;
 	SelectedForm->satinGuideCount = activePointIndex;
@@ -11968,9 +11968,9 @@ void duflt() {
 		if (currentFormVertices[ind].x < leftEdge)
 			leftEdge = currentFormVertices[ind].x;
 	}
-	if (leftEdge < clipboardRectSize.cx) {
+	if (leftEdge < clipRectSize.cx) {
 		setMap(WASNEG);
-		formOffset = clipboardRectSize.cx + fabs(leftEdge) + .05;
+		formOffset = clipRectSize.cx + fabs(leftEdge) + .05;
 		for (ind = 0; ind < sides; ind++)
 			currentFormVertices[ind].x += formOffset;
 		SelectedForm->rectangle.left += formOffset;
@@ -12006,7 +12006,7 @@ void clpcon() {
 	unsigned	clplim;			//vertical clipboard search limit
 
 	duflt();
-	clipWidth = clipboardRectSize.cx + SelectedForm->fillSpacing;
+	clipWidth = clipRectSize.cx + SelectedForm->fillSpacing;
 	if (chkMap(ISUND))
 		clipWidth = SelectedForm->underlaySpacing;
 	if (SelectedForm->fillSpacing < 0)
@@ -12017,7 +12017,7 @@ void clpcon() {
 		clipWidth = (float)CLPMINAUT;
 	if (chkMap(TXFIL))
 	{
-		if (txad&&SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count <= txad)
+		if (textureIndex&&SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count <= textureIndex)
 			clipWidth = SelectedForm->fillSpacing;
 		else
 			return;
@@ -12040,8 +12040,8 @@ void clpcon() {
 	clipSegments = (CLPSEG*)&stitchBuffer[MAXSEQ];
 	nrct.left = floor(SelectedForm->rectangle.left / clipWidth);
 	nrct.right = ceil(SelectedForm->rectangle.right / clipWidth);
-	nrct.bottom = floor(SelectedForm->rectangle.bottom / clipboardRectSize.cy - 1);
-	nrct.top = ceil(SelectedForm->rectangle.top / clipboardRectSize.cy + 1) + 2;
+	nrct.bottom = floor(SelectedForm->rectangle.bottom / clipRectSize.cy - 1);
+	nrct.top = ceil(SelectedForm->rectangle.top / clipRectSize.cy + 1) + 2;
 	nof = 0;
 	if (SelectedForm->wordParam > 1)
 		clpnof = SelectedForm->wordParam;
@@ -12051,17 +12051,17 @@ void clpcon() {
 		nrct.top++;
 		if (SelectedForm->fillSpacing < 0) {
 			nrct.bottom--;
-			nrct.left -= (float)clipboardRectSize.cx / clipWidth;
-			nrct.right += (float)clipboardRectSize.cx / clipWidth;
+			nrct.left -= (float)clipRectSize.cx / clipWidth;
+			nrct.right += (float)clipRectSize.cx / clipWidth;
 		}
 	}
 	if (clpneg && !clpnof)
-		nrct.left -= (float)clipboardRectSize.cx / clipWidth;
+		nrct.left -= (float)clipRectSize.cx / clipWidth;
 	if (nrct.bottom < 0) {
 		nof = 1 - nrct.bottom;
 		nrct.bottom += nof;
 		nrct.top += nof;
-		fnof = clipboardRectSize.cy*nof;
+		fnof = clipRectSize.cy*nof;
 		for (ind = 0; ind < sides; ind++)
 			currentFormVertices[ind].y += fnof;
 	}
@@ -12076,11 +12076,11 @@ void clpcon() {
 			fin = ine;
 		}
 		if (SelectedForm->fillSpacing < 0)
-			fin += clipboardRectSize.cx / clipWidth;
+			fin += clipRectSize.cx / clipWidth;
 		if (fin > (unsigned)nrct.right)
 			fin = nrct.right;
 		if (clpneg)
-			strt -= (float)clipboardRectSize.cx / clipWidth;
+			strt -= (float)clipRectSize.cx / clipWidth;
 		for (ine = strt; ine <= fin; ine++) {
 			regionCrossingData[segxs].sid = ind;
 			regionCrossingData[segxs++].seg = ine;
@@ -12123,7 +12123,7 @@ void clpcon() {
 		if (chkMap(TXFIL))
 		{
 			tine = (ind + nrct.left) % SelectedForm->fillInfo.texture.lines;
-			clipboardStitchCount = txsegs[tine].stitchCount;
+			clipStitchCount = txsegs[tine].stitchCount;
 			ptx = &txpnts[SelectedForm->fillInfo.texture.index + txsegs[tine].line];
 			vpnt0.x = ploc.x;
 			if (SelectedForm->txof)
@@ -12135,21 +12135,21 @@ void clpcon() {
 		else
 		{
 			if (clpnof)
-				clpvof = (float)(ind%clpnof) / clpnof*clipboardRectSize.cy;
+				clpvof = (float)(ind%clpnof) / clpnof*clipRectSize.cy;
 			vpnt0.x = ploc.x + clipBuffer[0].x;
 		}
-		vpnt0.y = nrct.bottom*clipboardRectSize.cy;
+		vpnt0.y = nrct.bottom*clipRectSize.cy;
 		if (clpnof)
-			clpvof = (float)(ind%clpnof) / clpnof*clipboardRectSize.cy;
+			clpvof = (float)(ind%clpnof) / clpnof*clipRectSize.cy;
 		for (tine = nrct.bottom; tine < nrct.top; tine++) {
-			ploc.y = tine*clipboardRectSize.cy - clpvof;
+			ploc.y = tine*clipRectSize.cy - clpvof;
 			vpnt1.x = ploc.x + clipBuffer[0].x;
 			vpnt1.y = ploc.y + clipBuffer[0].y;
 			if (!activePointIndex) {
 				vpnt0.x = vpnt1.x;
 				vpnt0.y = vpnt1.y;
 			}
-			for (inf = 0; inf < clipboardStitchCount; inf++) {
+			for (inf = 0; inf < clipStitchCount; inf++) {
 				if (chkMap(TXFIL))
 				{
 					if (ptx != nullptr) {
@@ -12203,7 +12203,7 @@ clpskp:;
 
 	clipStitchPoints[activePointIndex].flag = 2;
 	if (nof) {
-		fnof = nof*clipboardRectSize.cy;
+		fnof = nof*clipRectSize.cy;
 		for (ind = 0; ind < activePointIndex; ind++)
 			clipStitchPoints[ind].y -= fnof;
 		for (ind = 0; ind < sides; ind++)
@@ -12352,12 +12352,12 @@ void vrtsclp() {
 	fvars(closestFormToCursor);
 	delmclp(closestFormToCursor);
 	deltx();
-	SelectedForm->lengthOrCount.clipCount = clipboardStitchCount;
+	SelectedForm->lengthOrCount.clipCount = clipStitchCount;
 	SelectedForm->angleOrClipData.clip = numclp();
 	SelectedForm->wordParam = iniFile.fillPhase;
 	makpoli();
-	SelectedForm->fillSpacing = iniFile.clipboardOffset;
-	for (ind = 0; ind < clipboardStitchCount; ind++) {
+	SelectedForm->fillSpacing = iniFile.clipOffset;
+	for (ind = 0; ind < clipStitchCount; ind++) {
 		SelectedForm->angleOrClipData.clip[ind].x = clipBuffer[ind].x;
 		SelectedForm->angleOrClipData.clip[ind].y = clipBuffer[ind].y;
 	}
@@ -12378,7 +12378,7 @@ void vrtclp() {
 		if (hClipMem) {
 			redclp();
 			CloseClipboard();
-			if (clipboardRectSize.cy > CLPMIN) {
+			if (clipRectSize.cy > CLPMIN) {
 				if (selectedFormCount) {
 					setMap(NOCLP);
 					for (ind = 0; ind < selectedFormCount; ind++) {
@@ -12460,13 +12460,13 @@ void horsclp() {
 	fvars(closestFormToCursor);
 	delmclp(closestFormToCursor);
 	deltx();
-	SelectedForm->lengthOrCount.clipCount = clipboardStitchCount;
+	SelectedForm->lengthOrCount.clipCount = clipStitchCount;
 	SelectedForm->angleOrClipData.clip = numclp();
-	SelectedForm->lengthOrCount.clipCount = clipboardStitchCount;
+	SelectedForm->lengthOrCount.clipCount = clipStitchCount;
 	SelectedForm->wordParam = iniFile.fillPhase;
 	makpoli();
-	SelectedForm->fillSpacing = iniFile.clipboardOffset;
-	for (ind = 0; ind < clipboardStitchCount; ind++) {
+	SelectedForm->fillSpacing = iniFile.clipOffset;
+	for (ind = 0; ind < clipStitchCount; ind++) {
 		SelectedForm->angleOrClipData.clip[ind].x = clipBuffer[ind].x;
 		SelectedForm->angleOrClipData.clip[ind].y = clipBuffer[ind].y;
 	}
@@ -12488,7 +12488,7 @@ void horclp() {
 		if (hClipMem) {
 			redclp();
 			CloseClipboard();
-			if (clipboardRectSize.cy > CLPMIN) {
+			if (clipRectSize.cy > CLPMIN) {
 				if (selectedFormCount) {
 					setMap(NOCLP);
 					for (ind = 0; ind < selectedFormCount; ind++) {
@@ -12569,12 +12569,12 @@ void angsclp() {
 	delmclp(closestFormToCursor);
 	deltx();
 	SelectedForm->angleOrClipData.clip = numclp();
-	SelectedForm->lengthOrCount.clipCount = clipboardStitchCount;
+	SelectedForm->lengthOrCount.clipCount = clipStitchCount;
 	SelectedForm->wordParam = iniFile.fillPhase;
 	makpoli();
 	SelectedForm->satinOrAngle.angle = iniFile.fillAngle;
-	SelectedForm->fillSpacing = iniFile.clipboardOffset;
-	for (ind = 0; ind < clipboardStitchCount; ind++) {
+	SelectedForm->fillSpacing = iniFile.clipOffset;
+	for (ind = 0; ind < clipStitchCount; ind++) {
 		SelectedForm->angleOrClipData.clip[ind].x = clipBuffer[ind].x;
 		SelectedForm->angleOrClipData.clip[ind].y = clipBuffer[ind].y;
 	}
@@ -12595,7 +12595,7 @@ void angclp() {
 		if (hClipMem) {
 			redclp();
 			CloseClipboard();
-			if (clipboardRectSize.cy > CLPMIN) {
+			if (clipRectSize.cy > CLPMIN) {
 				if (selectedFormCount) {
 					setMap(NOCLP);
 					for (ind = 0; ind < selectedFormCount; ind++) {
@@ -12783,8 +12783,8 @@ void col2frm() {
 		}
 	}
 	LoadString(hInst, IDS_NCOLCHG, buf, HBUFSIZ);
-	sprintf_s(msgbuf, sizeof(msgbuf), buf, chngcnt);
-	shoMsg(msgbuf);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), buf, chngcnt);
+	shoMsg(msgBuffer);
 }
 
 BOOL fxpnt() {
@@ -13173,11 +13173,11 @@ void xclpfn(unsigned strt, unsigned fin) {
 	dif.x = chainEndPoints[fin].x - chainEndPoints[strt].x;
 	dif.y = chainEndPoints[fin].y - chainEndPoints[strt].y;
 	len = hypot(dif.x, dif.y);
-	rat = len / clipboardRectSize.cx;
+	rat = len / clipRectSize.cx;
 	rotationAngle = atan2(dif.y, dif.x);
-	for (ind = 0; ind < clipboardStitchCount; ind++) {
-		tflt[ind].x = tmpClipboardPoints[ind].x*rat;
-		tflt[ind].y = tmpClipboardPoints[ind].y;
+	for (ind = 0; ind < clipStitchCount; ind++) {
+		tflt[ind].x = tmpClipPoints[ind].x*rat;
+		tflt[ind].y = tmpClipPoints[ind].y;
 		rotflt(&tflt[ind]);
 		oseq[sequenceIndex].x = chainEndPoints[strt].x + tflt[ind].x;
 		oseq[sequenceIndex++].y = chainEndPoints[strt].y + tflt[ind].y;
@@ -13205,7 +13205,7 @@ void dulast() {
 	double		minlen;
 	double		len;
 
-	tmpClipboardPoints = (fPOINT*)&chainEndPoints[activePointIndex];
+	tmpClipPoints = (fPOINT*)&chainEndPoints[activePointIndex];
 	if (lastch()) {
 		minlen = 1e99;
 		mind = 0;
@@ -13219,14 +13219,14 @@ void dulast() {
 		if (mind) {
 			ine = 0;
 			for (ind = mind; ind < activePointIndex - 1; ind++) {
-				tmpClipboardPoints[ine].x = chainEndPoints[ind].x;
-				tmpClipboardPoints[ine++].y = chainEndPoints[ind].y;
+				tmpClipPoints[ine].x = chainEndPoints[ind].x;
+				tmpClipPoints[ine++].y = chainEndPoints[ind].y;
 			}
 			for (ind = 0; ind <= mind; ind++) {
-				tmpClipboardPoints[ine].x = chainEndPoints[ind].x;
-				tmpClipboardPoints[ine++].y = chainEndPoints[ind].y;
+				tmpClipPoints[ine].x = chainEndPoints[ind].x;
+				tmpClipPoints[ine++].y = chainEndPoints[ind].y;
 			}
-			MoveMemory(chainEndPoints, tmpClipboardPoints, sizeof(fPOINT)*ine);
+			MoveMemory(chainEndPoints, tmpClipPoints, sizeof(fPOINT)*ine);
 		}
 	}
 }
@@ -13237,16 +13237,16 @@ void clpxadj() {
 
 	dulast();
 	if (SelectedForm->type == FRMLINE) {
-		pivot = clipboardRectSize.cy / 2;
-		for (ind = 0; ind < clipboardStitchCount; ind++) {
-			tmpClipboardPoints[ind].x = clipBuffer[ind].x;
-			tmpClipboardPoints[ind].y = -clipBuffer[ind].y + pivot;
+		pivot = clipRectSize.cy / 2;
+		for (ind = 0; ind < clipStitchCount; ind++) {
+			tmpClipPoints[ind].x = clipBuffer[ind].x;
+			tmpClipPoints[ind].y = -clipBuffer[ind].y + pivot;
 		}
 	}
 	else {
-		for (ind = 0; ind < clipboardStitchCount; ind++) {
-			tmpClipboardPoints[ind].x = clipBuffer[ind].x;
-			tmpClipboardPoints[ind].y = -clipBuffer[ind].y;
+		for (ind = 0; ind < clipStitchCount; ind++) {
+			tmpClipPoints[ind].x = clipBuffer[ind].x;
+			tmpClipPoints[ind].y = -clipBuffer[ind].y;
 		}
 	}
 }
@@ -13256,13 +13256,13 @@ void fsclpx() {
 
 	deleclp(closestFormToCursor);
 	SelectedForm->edgeType = EDGECLIPX;
-	SelectedForm->clipEntries = clipboardStitchCount;
-	SelectedForm->borderClipData = nueclp(closestFormToCursor, clipboardStitchCount);
-	SelectedForm->borderSize = clipboardRectSize.cy;
-	SelectedForm->edgeSpacing = clipboardRectSize.cx;
+	SelectedForm->clipEntries = clipStitchCount;
+	SelectedForm->borderClipData = nueclp(closestFormToCursor, clipStitchCount);
+	SelectedForm->borderSize = clipRectSize.cy;
+	SelectedForm->edgeSpacing = clipRectSize.cx;
 	SelectedForm->borderColor = activeColor;
 	bsizpar();
-	for (ind = 0; ind < clipboardStitchCount; ind++) {
+	for (ind = 0; ind < clipStitchCount; ind++) {
 		SelectedForm->borderClipData[ind].x = clipBuffer[ind].x;
 		SelectedForm->borderClipData[ind].y = clipBuffer[ind].y;
 	}
@@ -13284,7 +13284,7 @@ void filclpx() {
 			savdo();
 			redclp();
 			CloseClipboard();
-			if (clipboardRectSize.cx > CLPMIN) {
+			if (clipRectSize.cx > CLPMIN) {
 				if (selectedFormCount) {
 					for (ind = 0; ind < selectedFormCount; ind++) {
 						closestFormToCursor = selectedFormList[ind];
@@ -13387,11 +13387,11 @@ void wavfrm() {
 
 	unmsg();
 	if (DialogBox(hInst, MAKEINTRESOURCE(IDD_WAV), hWnd, (DLGPROC)wavprc)) {
-		ind = fltad;
+		ind = formPointIndex;
 		end = iniFile.waveEnd + 1;
 		durpoli(iniFile.wavePoints);
 		mdufrm();
-		fltad = ind;
+		formPointIndex = ind;
 		tflt = (fPOINT*)&bseq;
 		ine = 0;
 		ind = iniFile.waveStart;
@@ -13433,7 +13433,7 @@ void wavfrm() {
 			rotflt(&currentFormVertices[ind]);
 		SelectedForm->type = FRMLINE;
 		SelectedForm->sides = ine;
-		fltad += ine;
+		formPointIndex += ine;
 		frmout(formIndex);
 		rstMap(FORMSEL);
 		lfp_Size.x = SelectedForm->rectangle.right - SelectedForm->rectangle.left;
