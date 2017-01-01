@@ -202,8 +202,7 @@ unsigned short daztab[] =
 	IDS_DAZHART,
 };
 
-RNGCNT*		txsegs;	//txture fill groups of points
-fRECTANGLE	isrct;	//isin rectangle
+RNGCNT*		textureSegments;	//texture fill groups of points
 dPOINT		sizrat;	//design size ratio
 fRECTANGLE	sizrct;	//design size rectangle
 float		daspct;	//design aspect ratio
@@ -5151,17 +5150,17 @@ void setxt()
 	setMap(TXFIL);
 	clipRectSize.cx = SelectedForm->fillSpacing;
 	clipRectSize.cy = SelectedForm->fillInfo.texture.height;
-	txsegs = (RNGCNT*)&markedStitchMap;
+	textureSegments = (RNGCNT*)&markedStitchMap;
 	pbak = &txpnts[SelectedForm->fillInfo.texture.index];
-	FillMemory(txsegs, SelectedForm->fillInfo.texture.lines * sizeof(RNGCNT), 0);
+	FillMemory(textureSegments, SelectedForm->fillInfo.texture.lines * sizeof(RNGCNT), 0);
 	pbak = &txpnts[SelectedForm->fillInfo.texture.index];
 	cnt = SelectedForm->fillInfo.texture.count;
 	if (cnt)
 	{
 		for (ind = cnt - 1; ind >= 0; ind--)
 		{
-			txsegs[pbak[ind].line - 1].line = ind;
-			txsegs[pbak[ind].line - 1].stitchCount++;
+			textureSegments[pbak[ind].line - 1].line = ind;
+			textureSegments[pbak[ind].line - 1].stitchCount++;
 		}
 	}
 }

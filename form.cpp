@@ -149,7 +149,6 @@ extern			fPOINT			iseq[MAXSEQ];
 extern			unsigned		isind;
 extern			unsigned		isind2;
 extern			INSREC			isinds[10];
-extern			fRECTANGLE		isrct;
 extern			unsigned		layerIndex;
 extern			HPEN			layerPen[5];
 extern			POINT			mainWindowOrigin;
@@ -195,7 +194,7 @@ extern			POINT			stretchBoxLine[5];
 extern			TCHAR			thrName[_MAX_PATH];
 extern			int				textureIndex;
 extern			TXPNT			txpnts[MAXSEQ];
-extern			RNGCNT*			txsegs;
+extern			RNGCNT*			textureSegments;
 extern			fPOINT*			uflt;
 extern			unsigned		underlayColor;
 extern			void*			undoBuffer[16];
@@ -350,6 +349,7 @@ unsigned		colorBitmap;			//bitmap of colors in a design for sort
 double			starRatio = STARAT;			//star point to body ratio
 double			spiralWrap = SPIRWRAP;		//number of revolutions in a spiral
 unsigned		srtmsk = (1 << EDGEANGSAT) | (1 << EDGEAPPL) | (1 << EDGEPROPSAT);	 //mask for switchable fill types
+fRECTANGLE		boundingRect;			//isin rectangle
 RCON*			pathMap;				//path map for sequencing
 unsigned		pathMapIndex;			//number of entries in the path map
 TCHAR*			visitedRegions;			//visited character map for sequencing
@@ -11866,13 +11866,13 @@ BOOL isin(float pntx, float pnty) {
 	unsigned	svrt, nvrt;
 	dPOINT		ipnt;
 
-	if (pntx < isrct.left)
+	if (pntx < boundingRect.left)
 		return 0;
-	if (pntx > isrct.right)
+	if (pntx > boundingRect.right)
 		return 0;
-	if (pnty < isrct.bottom)
+	if (pnty < boundingRect.bottom)
 		return 0;
-	if (pnty > isrct.top)
+	if (pnty > boundingRect.top)
 		return 0;
 	acnt = 0;
 	for (ind = regionCrossingStart; ind < regionCrossingEnd; ind++)
@@ -12097,18 +12097,18 @@ void clpcon() {
 		}
 	}
 	iclpx[ine] = ind;
-	isrct.left = isrct.right = currentFormVertices[0].x;
-	isrct.top = isrct.bottom = currentFormVertices[0].y;
+	boundingRect.left = boundingRect.right = currentFormVertices[0].x;
+	boundingRect.top = boundingRect.bottom = currentFormVertices[0].y;
 	for (ind = 1; ind < sides; ind++)
 	{
-		if (currentFormVertices[ind].x > isrct.right)
-			isrct.right = currentFormVertices[ind].x;
-		if (currentFormVertices[ind].x < isrct.left)
-			isrct.left = currentFormVertices[ind].x;
-		if (currentFormVertices[ind].y > isrct.top)
-			isrct.top = currentFormVertices[ind].y;
-		if (currentFormVertices[ind].y < isrct.bottom)
-			isrct.bottom = currentFormVertices[ind].y;
+		if (currentFormVertices[ind].x > boundingRect.right)
+			boundingRect.right = currentFormVertices[ind].x;
+		if (currentFormVertices[ind].x < boundingRect.left)
+			boundingRect.left = currentFormVertices[ind].x;
+		if (currentFormVertices[ind].y > boundingRect.top)
+			boundingRect.top = currentFormVertices[ind].y;
+		if (currentFormVertices[ind].y < boundingRect.bottom)
+			boundingRect.bottom = currentFormVertices[ind].y;
 	}
 	segps = ine;
 	ind = regionCrossingStart = cnt = 0;
@@ -12123,8 +12123,8 @@ void clpcon() {
 		if (chkMap(TXFIL))
 		{
 			tine = (ind + nrct.left) % SelectedForm->fillInfo.texture.lines;
-			clipStitchCount = txsegs[tine].stitchCount;
-			ptx = &txpnts[SelectedForm->fillInfo.texture.index + txsegs[tine].line];
+			clipStitchCount = textureSegments[tine].stitchCount;
+			ptx = &txpnts[SelectedForm->fillInfo.texture.index + textureSegments[tine].line];
 			vpnt0.x = ploc.x;
 			if (SelectedForm->txof)
 			{
