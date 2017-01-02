@@ -46,7 +46,7 @@ extern BOOL		isclp (unsigned find);
 extern BOOL		isclpx (unsigned find);
 extern BOOL		isfclp ();
 extern BOOL		istx (unsigned find);
-extern void		moveStitchPoints (fPOINTATTRIBUTE* dst, fPOINTATTRIBUTE* src);
+extern void		moveStitchPoints (fPOINTATTR* dst, fPOINTATTR* src);
 extern void		movStch ();
 extern TCHAR*	mvflpnt (fPOINT* dst, fPOINT* src, unsigned cnt);
 extern void		mvsatk (SATCON* dst, SATCON* src, unsigned cnt);
@@ -64,7 +64,7 @@ extern void		ritmov ();
 extern void		ritnum (unsigned cod, unsigned num);
 extern void		ritot (unsigned num);
 extern void		rngadj ();
-extern void		rotang1 (fPOINTATTRIBUTE rpnt, fPOINT* tpnt);
+extern void		rotang1 (fPOINTATTR rpnt, fPOINT* tpnt);
 extern void		rotangf (fPOINT rpnt, fPOINT* tpnt);
 extern void		rotflt (fPOINT* pnt);
 extern void		rotfn ();
@@ -78,7 +78,7 @@ extern void		setangf (double tang);
 extern void		setfchk ();
 extern unsigned	setMap (unsigned bPnt);
 extern void		setpsel ();
-extern unsigned	setRmap (fPOINTATTRIBUTE sPnt);
+extern unsigned	setRmap (fPOINTATTR sPnt);
 extern void		setxt ();
 extern void		shft (fPOINT shPnt);
 extern void		shoMsg (TCHAR* str);
@@ -110,7 +110,7 @@ extern			fRECTANGLE		clipRect;
 extern			FLSIZ			clipRectSize;
 extern			unsigned		clipStitchCount;	//number of stitchs extracted from clipboard
 extern			CLPSTCH*		clipStitchData;
-extern			fPOINTATTRIBUTE	clipBuffer[MAXFRMLINS];
+extern			fPOINTATTR		clipBuffer[MAXFRMLINS];
 extern			unsigned		closestPointIndex;
 extern			POINT			endPointCross;
 extern			unsigned		formMenuChoice;
@@ -181,7 +181,7 @@ extern			double			smallStitchLength;
 extern			unsigned		fillStartsMap;
 extern			TCHAR*			stab[STR_LEN];
 extern			double			stitchBoxesThreshold;
-extern			fPOINTATTRIBUTE	stitchBuffer[MAXPCS];
+extern			fPOINTATTR		stitchBuffer[MAXPCS];
 extern			fRECTANGLE		stitchRangeRect;
 extern			POINT			stitchSizePixels;
 extern			RECT			stitchWindowClientRect;
@@ -401,7 +401,7 @@ fPOINT*			tmpFormPoints;			//temporary form vertex storage for reordering forms
 SATCON*			tmpSatinConns;			//temporary satin guidline storage for reordering forms
 fPOINT*			tmpClipPoints;			//temporary clipboard point storage for reordering forms
 unsigned		formRelocationIndex;	//form relocator pointer
-fPOINTATTRIBUTE*	tmpStitchBuffer;	//pointer to high stitch area for form sort
+fPOINTATTR*		tmpStitchBuffer;		//pointer to high stitch area for form sort
 unsigned		beanCount;				//number of stitches added by convert to bean
 FRMHED*			formForInsert;			//insert form vertex in this form
 unsigned		formVertexPrev;			//form vertex storage for form vertex insert
@@ -1056,7 +1056,7 @@ void sfCor2px(fPOINT stpnt, POINT* pxpnt) {
 	pxpnt->y = stitchWindowClientRect.bottom - (stpnt.y - zoomRect.bottom)*zoomRatio.y + 0.5;
 }
 
-void stCor2px(fPOINTATTRIBUTE stpnt, POINT* pxpnt) {
+void stCor2px(fPOINTATTR stpnt, POINT* pxpnt) {
 	pxpnt->x = (stpnt.x - zoomRect.left)*zoomRatio.x + 0.5;
 	pxpnt->y = stitchWindowClientRect.bottom - (stpnt.y - zoomRect.bottom)*zoomRatio.y + 0.5;
 }
@@ -1841,7 +1841,7 @@ void frmovlin() {
 void makspac(unsigned strt, unsigned cnt) {
 	if (!chkmax(header.stitchCount, cnt))
 	{
-		MoveMemory(&stitchBuffer[strt + cnt], &stitchBuffer[strt], sizeof(fPOINTATTRIBUTE)*(header.stitchCount - strt));
+		MoveMemory(&stitchBuffer[strt + cnt], &stitchBuffer[strt], sizeof(fPOINTATTR)*(header.stitchCount - strt));
 		header.stitchCount += cnt;
 	}
 }
@@ -5441,7 +5441,7 @@ void delspnt() {
 			}
 		}
 	}
-	MoveMemory(&SelectedForm->vertices[closestVertexToCursor], &SelectedForm->vertices[closestVertexToCursor + 1], (formPointIndex - closestVertexToCursor) * sizeof(fPOINTATTRIBUTE));
+	MoveMemory(&SelectedForm->vertices[closestVertexToCursor], &SelectedForm->vertices[closestVertexToCursor + 1], (formPointIndex - closestVertexToCursor) * sizeof(fPOINTATTR));
 	SelectedForm->sides--;
 	formPointIndex--;
 	fvars(closestFormToCursor);
@@ -5812,7 +5812,7 @@ BOOL clpsid(unsigned strt, unsigned fin) {
 	unsigned		ind, cnt;
 	fPOINT			dif, stp, pnt;
 	double			len, tdub;
-	fPOINTATTRIBUTE			rpnt;
+	fPOINTATTR		rpnt;
 
 	rpnt.x = clipRect.left;
 	rpnt.y = clipRect.bottom;
@@ -8927,7 +8927,7 @@ void frmon() {
 
 void fnord() {
 	int			ind;
-	fPOINTATTRIBUTE		tpnt;
+	fPOINTATTR	tpnt;
 
 	fvars(closestFormToCursor);
 	SelectedForm = &formList[closestFormToCursor];
@@ -8945,7 +8945,7 @@ void fnord() {
 void flpord() {
 	int			ind;
 	unsigned	uind, strt, fin;
-	fPOINTATTRIBUTE		tpnt;
+	fPOINTATTR	tpnt;
 
 	fvars(closestFormToCursor);
 	if (chkMap(FPSEL)) {
@@ -10172,7 +10172,7 @@ void clpcrnr(unsigned p_lin) {
 	dPOINT		dif, pnt;
 	fPOINT		tpnt;
 	double		len, rat;
-	fPOINTATTRIBUTE		rpnt;
+	fPOINTATTR	rpnt;
 
 	rpnt.x = (clipRect.right - clipRect.left) / 2 + clipRect.left;
 	rpnt.y = clipRect.top;
@@ -10218,7 +10218,7 @@ void picfn(unsigned strt, unsigned fin, double spac) {
 	double		len, tdub;
 	dPOINT		dif, stp, ostp, pnti, pntf, pnto;
 	fPOINT		tpnt;
-	fPOINTATTRIBUTE		rpnt;
+	fPOINTATTR	rpnt;
 	unsigned	cnt, ind;
 
 	dif.x = currentFormVertices[fin].x - currentFormVertices[strt].x;
@@ -13464,7 +13464,7 @@ void wavfrm() {
 void srtfrm() {
 	unsigned	ind, ine, inf, tot, sav;
 	unsigned	hst[MAXFORMS];
-	fPOINTATTRIBUTE*	hstch;
+	fPOINTATTR*	hstch;
 
 	if (header.stitchCount) {
 		savdo();
@@ -13485,7 +13485,7 @@ void srtfrm() {
 			hstch[inf].y = stitchBuffer[ind].y;
 			hstch[inf].attribute = stitchBuffer[ind].attribute;
 		}
-		MoveMemory(stitchBuffer, hstch, sizeof(fPOINTATTRIBUTE)*header.stitchCount);
+		MoveMemory(stitchBuffer, hstch, sizeof(fPOINTATTR)*header.stitchCount);
 		coltab();
 		setMap(RESTCH);
 	}

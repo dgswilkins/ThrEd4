@@ -818,7 +818,7 @@ typedef struct _fPointAttribute {
 	float		x;
 	float		y;
 	unsigned	attribute;
-}fPOINTATTRIBUTE;
+}fPOINTATTR;
 
 #define COLMSK		0x0000000f
 #define NCOLMSK		0xfffffff0
@@ -861,7 +861,7 @@ typedef struct _fPointAttribute {
 #define NOTFRM		0x00080000
 
 /*
-bit definitions for fPOINTATTRIBUTE.attribute
+bit definitions for fPOINTATTR.attribute
 0-3		stitch color
 4-14	form pointer
 15-18	spares
@@ -1224,7 +1224,7 @@ typedef struct _bakhed {
 	unsigned	fcnt;
 	FRMHED*		frmp;
 	unsigned	scnt;
-	fPOINTATTRIBUTE*	stch;
+	fPOINTATTR*	stch;
 	unsigned	fltcnt;
 	fPOINT*		flt;
 	unsigned	sacnt;
@@ -1665,8 +1665,8 @@ enum	{ //text button windows
 typedef struct _orec {
 	unsigned 	start;
 	unsigned 	finish;
-	fPOINTATTRIBUTE*	spnt;
-	fPOINTATTRIBUTE*	epnt;
+	fPOINTATTR*	spnt;
+	fPOINTATTR*	epnt;
 	unsigned 	col;
 	unsigned 	typ;
 	unsigned 	frm;
@@ -1734,12 +1734,12 @@ enum	{	//interleave sequence identifiers
 };
 
 typedef struct _intinf {
-	unsigned pins;
-	unsigned coloc;
-	unsigned layerIndex;
-	unsigned sloc;
-	unsigned oloc;
-	fPOINTATTRIBUTE* histch;
+	unsigned	pins;
+	unsigned	coloc;
+	unsigned	layerIndex;
+	unsigned	sloc;
+	unsigned	oloc;
+	fPOINTATTR* histch;
 }INTINF;
 
 typedef struct _txtscr	{

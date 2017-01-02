@@ -35,7 +35,7 @@ extern	fPOINT			clipPoints[MAXCLPNTS];
 extern	fRECTANGLE		clipRect;
 extern	FLSIZ			clipRectSize;
 extern	unsigned		clipStitchCount;
-extern	fPOINTATTRIBUTE	clipBuffer[MAXFRMLINS];
+extern	fPOINTATTR		clipBuffer[MAXFRMLINS];
 extern	unsigned		closestFormToCursor;
 extern	unsigned		closestPointIndex;
 extern	unsigned		closestVertexToCursor;
@@ -55,7 +55,7 @@ extern	HWND			hButtonWin[9];
 extern	HGLOBAL			hClipMem;
 extern	PCSHEADER		header;
 extern	HWND			hHorizontalScrollBar;
-extern	fPOINTATTRIBUTE*	tmpStitchBuffer;
+extern	fPOINTATTR*		tmpStitchBuffer;
 extern	HINSTANCE		hInst;
 extern	TCHAR			hlpbuf[HBUFSIZ];
 extern	HWND			hMainStitchWin;
@@ -85,7 +85,7 @@ extern	fPOINT			selectedPoint;
 extern	unsigned		sequenceIndex;
 extern	unsigned short	sides;
 extern	TCHAR*			stab[STR_LEN];
-extern	fPOINTATTRIBUTE	stitchBuffer[MAXPCS];
+extern	fPOINTATTR		stitchBuffer[MAXPCS];
 extern	double			stitchSpace;
 extern	RECT			stitchWindowClientRect;
 extern	HDC				stitchWindowDC;
@@ -150,7 +150,7 @@ extern	void		lcon();
 extern	void		makspac(unsigned strt, unsigned cnt);
 extern	void		mdufrm();
 extern	float		midl(float hi, float lo);
-extern	void		moveStitchPoints(fPOINTATTRIBUTE* dst, fPOINTATTRIBUTE* src);
+extern	void		moveStitchPoints(fPOINTATTR* dst, fPOINTATTR* src);
 extern	void		movStch();
 extern	void		movStch();
 extern	void		msgflt(unsigned msgid, float par);
@@ -1042,7 +1042,7 @@ fPOINT* insid()
 void delwlk(unsigned cod)
 {
 	unsigned	ind, ine;
-	fPOINTATTRIBUTE*	histch;
+	fPOINTATTR*	histch;
 	BOOL		flg;
 
 	ine = 0;
@@ -1484,7 +1484,7 @@ void srtcol() {
 
 	unsigned		hst[16];
 	unsigned		ind, ine, tmp;
-	fPOINTATTRIBUTE*		phi;
+	fPOINTATTR*		phi;
 
 	FillMemory(&hst, 64, 0);
 	for (ind = 0; ind < header.stitchCount; ind++)
@@ -1499,7 +1499,7 @@ void srtcol() {
 	phi = &stitchBuffer[MAXSEQ];
 	for (ind = 0; ind < header.stitchCount; ind++)
 		moveStitchPoints(&phi[hst[stitchBuffer[ind].attribute&COLMSK]++], &stitchBuffer[ind]);
-	MoveMemory(&stitchBuffer, phi, sizeof(fPOINTATTRIBUTE)*header.stitchCount);
+	MoveMemory(&stitchBuffer, phi, sizeof(fPOINTATTR)*header.stitchCount);
 }
 
 void dubit(unsigned bit)
@@ -1892,7 +1892,7 @@ void dasyfrm() {
 void durec(OREC* prec)
 {
 	unsigned	at;
-	fPOINTATTRIBUTE*	pstch;
+	fPOINTATTR*	pstch;
 
 	pstch = &stitchBuffer[prec->start];
 	prec->typ = ftyps[dutyp(pstch->attribute)];
@@ -1950,9 +1950,9 @@ int refcmp(const void *arg1, const void *arg2)
 	return (int)pa1->frm - pa2->frm;
 }
 
-double srtlen(fPOINTATTRIBUTE* pnt, OREC* prec, unsigned swtch)
+double srtlen(fPOINTATTR* pnt, OREC* prec, unsigned swtch)
 {
-	fPOINTATTRIBUTE* tpnt;
+	fPOINTATTR* tpnt;
 
 	if (swtch)
 		tpnt = prec->epnt;
@@ -1979,7 +1979,7 @@ double precjmps(SRTREC* psrec)
 	double			len;
 	double			minlen;
 	unsigned		ind, loc, loci;
-	fPOINTATTRIBUTE*		ploc;
+	fPOINTATTR*		ploc;
 	BOOL			locdir;
 
 	frmcnts = (unsigned*)&oseq;
@@ -2632,7 +2632,7 @@ void duint(unsigned off, unsigned cod)
 	if (interleaveData.coloc > interleaveData.sloc)
 	{
 		cnt = interleaveData.coloc - interleaveData.sloc;
-		MoveMemory(&interleaveData.histch[interleaveData.oloc], &stitchBuffer[interleaveData.sloc], sizeof(fPOINTATTRIBUTE)*cnt);
+		MoveMemory(&interleaveData.histch[interleaveData.oloc], &stitchBuffer[interleaveData.sloc], sizeof(fPOINTATTR)*cnt);
 		interleaveData.sloc += cnt;
 		interleaveData.oloc += cnt;
 	}
@@ -2738,10 +2738,10 @@ void intlv()
 		if (header.stitchCount&&interleaveData.sloc < (unsigned)header.stitchCount - 1)
 		{
 			ine = header.stitchCount - interleaveData.sloc;
-			MoveMemory(&stitchBuffer[interleaveData.oloc + MAXSEQ], &stitchBuffer[interleaveData.sloc], sizeof(fPOINTATTRIBUTE)*ine);
+			MoveMemory(&stitchBuffer[interleaveData.oloc + MAXSEQ], &stitchBuffer[interleaveData.sloc], sizeof(fPOINTATTR)*ine);
 			interleaveData.oloc += ine;
 		}
-		MoveMemory(stitchBuffer, interleaveData.histch, sizeof(fPOINTATTRIBUTE)*interleaveData.oloc);
+		MoveMemory(stitchBuffer, interleaveData.histch, sizeof(fPOINTATTR)*interleaveData.oloc);
 	}
 	else
 	{
@@ -5272,7 +5272,7 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 	return 0;
 }
 
-void sadj(fPOINTATTRIBUTE* pt)
+void sadj(fPOINTATTR* pt)
 {
 	pt->x = (pt->x - designSizeRect.left)*designSizeRatio.x + designSizeRect.left;
 	pt->y = (pt->y - designSizeRect.bottom)*designSizeRatio.y + designSizeRect.bottom;
@@ -5392,7 +5392,7 @@ void mvshft()
 	}
 }
 
-BOOL inrct(fRECTANGLE rct, fPOINTATTRIBUTE pt)
+BOOL inrct(fRECTANGLE rct, fPOINTATTR pt)
 {
 	if (pt.x < rct.left)
 		return 0;

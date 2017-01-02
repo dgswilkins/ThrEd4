@@ -357,7 +357,7 @@ extern	void			snap ();
 extern	void			spltfrm ();
 extern	void			srtbyfrm ();
 extern	void			srtfrm ();
-extern	void			stCor2px (fPOINTATTRIBUTE stpnt, POINT* pxpnt);
+extern	void			stCor2px (fPOINTATTR stpnt, POINT* pxpnt);
 extern	void			stchrct2px (fRECTANGLE srct, RECT* prct);
 extern	void			stchs2frm ();
 extern	void			strtchbox ();
@@ -470,328 +470,328 @@ unsigned short chk1loc[] =
 };
 
 //main variables
-HINSTANCE			hInst;					//main instance handle
-HWND				hWnd;					//main window handle
-MSG					msg;					//main message loop message
-RECT				mainWindowRect;			//main window size
-RECT				colorBarRect;			//color bar rectangle
-RECT				minLenRect;				//minimum length rectangle
-RECT				maxLenRect;				//maximum length rectangle
-unsigned			smallestStitchIndex;	//pointer to the smallest stitch in the selected range
-unsigned			largestStitchIndex;		//pointer to the largest stitch in the selected range
-unsigned			currentStitchIndex;		//pointer to the current selection for length search
-HDC					mainDC;					//main device context handle
-HDC					stitchWindowMemDC;		//stitch window memory device context
-HDC					stitchWindowDC;			//stitch window device context
-HDC					bitmapDC;				//bitmap device context
-HDC					colorBarDC;				//color bar device context
-HBITMAP				stitchWindowBmp;		//bitmap for the memory stitch device context
-POINT				mainWindowOrigin;		//offset origin of the main window
-POINT				stitchWindowOrigin;		//offset origin of the stitch window
-SIZE				textSize;				//used for measuring sizes of text items
-SIZE				screenSizePixels;		//screen size in pixels
-SIZE				screenSize_mm;			//screen size in millimeters
-dRECTANGLE			zoomRect;				//zoom rectangle
-RECT				stitchWindowAbsRect;	//stitch window size,absolute
-RECT				stitchWindowClientRect;	//stitch window size,client
-DRAWITEMSTRUCT*		ds;						//for owner-draw windows
-double				zoomFactor = 1;			//zoom factor
-POINT				unzoomedRect;			//size of the unzoomed stitch window
-POINT				stitchSizePixels;		//converted from stich to pixel
-POINT				pxNer[NERCNT];			//selected points
-POINT				boxPix;					//single select box point
-double				distanceToClick;		//distance of closest point to a mouse click
-unsigned			closestPointIndex;		//index of closest point
-unsigned			closestPointIndexClone;	//copy of index of closest point
-unsigned			groupStitchIndex;		//last point selected in group
-unsigned			groupStartStitch;		//lower end of selected stitches
-unsigned			groupEndStitch;			//higher end of selected stitches
-unsigned			prevGroupStartStitch;	//lower end of previous selection
-unsigned			prevGroupEndStitch;		//higher end of previous selection
-TCHAR				stitchEntryBuffer[5];	//stitch number entered by user
-TCHAR				sideWindowEntryBuffer[11];	//side window number for entering form data sheet numbers
-unsigned			bufferIndex = 0;		//pointer to the next number to be entered
-unsigned			bufferDigitCount;		//number of decimal digits in the number of stitches
-POINT*				linePoints;				//for drawing lines on the screen
-unsigned			lineIndex;				//line index for display routine
-double				stitchWindowAspectRatio;	//aspect ratio of the stitch window
-double				minStitchLength	  = MINSIZ*PFAFGRAN;	//minimum stitch size
-double				userStitchLength  = USESIZ*PFAFGRAN;	//user selected stitch size
-double				smallStitchLength = SMALSIZ*PFAFGRAN;	//user can remove stitches smaller than this
-unsigned			markedStitchMap[RMAPSIZ];	//bitmap to tell when stitches have been marked
-TCHAR*				pcdClipFormat = "PMust_Format";
-TCHAR*				thrEdClipFormat = "threditor";
-CLPSTCH*			clipStitchData;			//for pcs clipboard data
-FORMCLIP*			clipFormData;			//for thred form clipboard data
-FORMSCLIP*			clipFormsData;			//multiple form clipboard header
-FORMPOINTCLIP*		clipFormPointsData;		//form points clipboard header
-void*				ptrClipVoid;			//for memory allocation for clipboard data
-void*				ptrThrEdClipVoid;		//for memory allocation for thred format clipboard data
-FLSIZ				clipRectSize;			//clipboard rectangle size
-fRECTANGLE			clipRect;				//clipboard rectangle
-unsigned			clipStitchCount;		//number of stitchs extracted from clipboard
-POINT				clipOrigin;				//origin of clipboard box in stitch coordinates
-HGLOBAL				hClipMem;				//handle to the clipboard memory
-SIZE				selectBoxSize;			//size of the select box
-POINT				selectBoxOffset;		//offset of the spot the user selected from the lower left of the select box
-dPOINT				zoomRatio;				//zoom ratio used to draw stitch window
-double				rotationAngle;			//rotation angle
-double				rotationHandleAngle;	//angle of the rotation handle
-fRECTANGLE			rotationRect;			//rotation rectangle
-dPOINT				bmpStitchRatio;			//bitmap to stitch hoop ratios
-dPOINT				stitchBmpRatio;			//stitch hoop to bitmap ratios
-RECT				bitmapSrcRect;			//bitmap source rectangle for zoomed view
-RECT				bitmapDstRect;			//stitch window destination rectangle for zooomed view
-unsigned			bitmapWidth;			//bitmap width
-unsigned			bitmapHeight;			//bitmap height
-dPOINT				bitmapSizeinStitches;	//bitmap end points in stitch points
-unsigned*			ptrBitmap;				//monochrome bitmap data
-unsigned			bitmapColor = BITCOL;	//bitmap color
-TCHAR				msgBuffer[MSGSIZ];		//for user messages
-unsigned			msgIndex;				//pointer to the message buffer
-double				showStitchThreshold = SHOPNTS;	//show stitch grid below this zoom level
-double				threadSize30 = TSIZ30;	//#30 thread size
-double				threadSize40 = TSIZ40;	//#40 thread size
-double				threadSize60 = TSIZ60;	//#40 thread size
-unsigned			runPoint;				//point for animating stitchout
-unsigned			stitchesPerFrame;		//number of stitches to draw in each frame
-int					delay;					//time delay for stitchout
-double				stitchBoxesThreshold = STCHBOX;//threshold for drawing stitch boxes
+HINSTANCE		hInst;					//main instance handle
+HWND			hWnd;					//main window handle
+MSG				msg;					//main message loop message
+RECT			mainWindowRect;			//main window size
+RECT			colorBarRect;			//color bar rectangle
+RECT			minLenRect;				//minimum length rectangle
+RECT			maxLenRect;				//maximum length rectangle
+unsigned		smallestStitchIndex;	//pointer to the smallest stitch in the selected range
+unsigned		largestStitchIndex;		//pointer to the largest stitch in the selected range
+unsigned		currentStitchIndex;		//pointer to the current selection for length search
+HDC				mainDC;					//main device context handle
+HDC				stitchWindowMemDC;		//stitch window memory device context
+HDC				stitchWindowDC;			//stitch window device context
+HDC				bitmapDC;				//bitmap device context
+HDC				colorBarDC;				//color bar device context
+HBITMAP			stitchWindowBmp;		//bitmap for the memory stitch device context
+POINT			mainWindowOrigin;		//offset origin of the main window
+POINT			stitchWindowOrigin;		//offset origin of the stitch window
+SIZE			textSize;				//used for measuring sizes of text items
+SIZE			screenSizePixels;		//screen size in pixels
+SIZE			screenSize_mm;			//screen size in millimeters
+dRECTANGLE		zoomRect;				//zoom rectangle
+RECT			stitchWindowAbsRect;	//stitch window size,absolute
+RECT			stitchWindowClientRect;	//stitch window size,client
+DRAWITEMSTRUCT*	ds;						//for owner-draw windows
+double			zoomFactor = 1;			//zoom factor
+POINT			unzoomedRect;			//size of the unzoomed stitch window
+POINT			stitchSizePixels;		//converted from stich to pixel
+POINT			pxNer[NERCNT];			//selected points
+POINT			boxPix;					//single select box point
+double			distanceToClick;		//distance of closest point to a mouse click
+unsigned		closestPointIndex;		//index of closest point
+unsigned		closestPointIndexClone;	//copy of index of closest point
+unsigned		groupStitchIndex;		//last point selected in group
+unsigned		groupStartStitch;		//lower end of selected stitches
+unsigned		groupEndStitch;			//higher end of selected stitches
+unsigned		prevGroupStartStitch;	//lower end of previous selection
+unsigned		prevGroupEndStitch;		//higher end of previous selection
+TCHAR			stitchEntryBuffer[5];	//stitch number entered by user
+TCHAR			sideWindowEntryBuffer[11];	//side window number for entering form data sheet numbers
+unsigned		bufferIndex = 0;		//pointer to the next number to be entered
+unsigned		bufferDigitCount;		//number of decimal digits in the number of stitches
+POINT*			linePoints;				//for drawing lines on the screen
+unsigned		lineIndex;				//line index for display routine
+double			stitchWindowAspectRatio;	//aspect ratio of the stitch window
+double			minStitchLength	  = MINSIZ*PFAFGRAN;	//minimum stitch size
+double			userStitchLength  = USESIZ*PFAFGRAN;	//user selected stitch size
+double			smallStitchLength = SMALSIZ*PFAFGRAN;	//user can remove stitches smaller than this
+unsigned		markedStitchMap[RMAPSIZ];	//bitmap to tell when stitches have been marked
+TCHAR*			pcdClipFormat = "PMust_Format";
+TCHAR*			thrEdClipFormat = "threditor";
+CLPSTCH*		clipStitchData;			//for pcs clipboard data
+FORMCLIP*		clipFormData;			//for thred form clipboard data
+FORMSCLIP*		clipFormsData;			//multiple form clipboard header
+FORMPOINTCLIP*	clipFormPointsData;		//form points clipboard header
+void*			ptrClipVoid;			//for memory allocation for clipboard data
+void*			ptrThrEdClipVoid;		//for memory allocation for thred format clipboard data
+FLSIZ			clipRectSize;			//clipboard rectangle size
+fRECTANGLE		clipRect;				//clipboard rectangle
+unsigned		clipStitchCount;		//number of stitchs extracted from clipboard
+POINT			clipOrigin;				//origin of clipboard box in stitch coordinates
+HGLOBAL			hClipMem;				//handle to the clipboard memory
+SIZE			selectBoxSize;			//size of the select box
+POINT			selectBoxOffset;		//offset of the spot the user selected from the lower left of the select box
+dPOINT			zoomRatio;				//zoom ratio used to draw stitch window
+double			rotationAngle;			//rotation angle
+double			rotationHandleAngle;	//angle of the rotation handle
+fRECTANGLE		rotationRect;			//rotation rectangle
+dPOINT			bmpStitchRatio;			//bitmap to stitch hoop ratios
+dPOINT			stitchBmpRatio;			//stitch hoop to bitmap ratios
+RECT			bitmapSrcRect;			//bitmap source rectangle for zoomed view
+RECT			bitmapDstRect;			//stitch window destination rectangle for zooomed view
+unsigned		bitmapWidth;			//bitmap width
+unsigned		bitmapHeight;			//bitmap height
+dPOINT			bitmapSizeinStitches;	//bitmap end points in stitch points
+unsigned*		ptrBitmap;				//monochrome bitmap data
+unsigned		bitmapColor = BITCOL;	//bitmap color
+TCHAR			msgBuffer[MSGSIZ];		//for user messages
+unsigned		msgIndex;				//pointer to the message buffer
+double			showStitchThreshold = SHOPNTS;	//show stitch grid below this zoom level
+double			threadSize30 = TSIZ30;	//#30 thread size
+double			threadSize40 = TSIZ40;	//#40 thread size
+double			threadSize60 = TSIZ60;	//#40 thread size
+unsigned		runPoint;				//point for animating stitchout
+unsigned		stitchesPerFrame;		//number of stitches to draw in each frame
+int				delay;					//time delay for stitchout
+double			stitchBoxesThreshold = STCHBOX;//threshold for drawing stitch boxes
 //WARNING the size of the following array must be changed if the maximum movie speed is changed
-POINT				movieLine[100];			//line for movie stitch draw
-RECT				msgRect;				//rectangle containing the text message
-void*				undoBuffer[16];			//backup data
-unsigned			undoBufferWriteIndex = 0;	//undo storage pointer
-unsigned			undoBufferReadIndex = 0;	//undo retrieval pointers
-unsigned			underlayColor = 15;		//underlay color
-unsigned			lastKeyCode = 0xffff;	//last key code
-unsigned			formMenuChoice = 0;		//data type for form data form numerical entry
-dPOINT				zoomMarkPoint;			//stitch coordinates of the zoom mark
-unsigned			preferenceIndex = 0;	//index to the active preference window
-unsigned			LRUMenuId[] = { FM_ONAM0,FM_ONAM1,FM_ONAM2,FM_ONAM3 };	//recently used file menu ID's
-TCHAR				versionNames[OLDVER][_MAX_PATH];	//temporary storage for old file version names
-unsigned			fileVersionIndex;		//points to old version to be read
-unsigned			activeLayer = 0;		//active layer
-unsigned			layerIndex;				//active layer code
-long				clipFormsCount;			//number of forms the on the clipboard
-unsigned*			formIndices;			//array of form indices for delete multiple forms
-POINT				stitchArrow[3];			//arrow for selected stitch
-RANGE				selectedRange;			//first and last stitch for min/max stitch select
-unsigned			fileNameOrder[50];		//file name order table
-unsigned char		filenameEncoded[128];	//file name encoding
-unsigned char		filenameDecode[256];	//file name decode
-TCHAR				designerName[50];		//file designer name in clear
-HWND				firstWin;				//first window not destroyed for exiting enumerate loop
-RANGE				selectedFormsRange;		//range of selected forms
-unsigned			tmpFormIndex;			//saved form index
-unsigned char		cursorMask[128];		//cursor and mask
-double				zoomMin;				//minimum allowed zoom value
-fRECTANGLE			checkHoopRect;			//for checking the hoop size
-BALSTCH*			ptrBalaradStitch;		//balarad stitch pointer
-fPOINT				balaradOffset;			//balarad offset
-unsigned			clipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; //for checking if a fill is a clipboard fill
-fPOINTATTRIBUTE*	rotatedStitches;		//rotated stitches for rotate and save
-unsigned			sideWindowLocation;		//side message window location
-POINT				sideWindowSize;			//size of the side message window
-TCHAR**				ptrSideWindowsStrings;	//string array displayed in sidmsg
-TCHAR				colorFilename[_MAX_PATH];	//.thw file name
-TCHAR				rgbFilename[_MAX_PATH];	//.rgb file name
-dPOINT				cellSize;				//size of an markedStitchMap cell for drawing stitch boxes
-unsigned			draggedColor;			//color being dragged
-FORMPOINTS			selectedFormPoints;		//selected form points
-fRECTANGLE			selectedPointsRect;		//rectangle enclosing selected form points
-RECT				selectedPixelsRect;		//display form vertex select rectangle
-POINT*				formPointsAsLine;		//form vertex clipboard paste into form line
-unsigned			lastFormSelected;		//end point of selected range of forms
+POINT			movieLine[100];			//line for movie stitch draw
+RECT			msgRect;				//rectangle containing the text message
+void*			undoBuffer[16];			//backup data
+unsigned		undoBufferWriteIndex = 0;	//undo storage pointer
+unsigned		undoBufferReadIndex = 0;	//undo retrieval pointers
+unsigned		underlayColor = 15;		//underlay color
+unsigned		lastKeyCode = 0xffff;	//last key code
+unsigned		formMenuChoice = 0;		//data type for form data form numerical entry
+dPOINT			zoomMarkPoint;			//stitch coordinates of the zoom mark
+unsigned		preferenceIndex = 0;	//index to the active preference window
+unsigned		LRUMenuId[] = { FM_ONAM0,FM_ONAM1,FM_ONAM2,FM_ONAM3 };	//recently used file menu ID's
+TCHAR			versionNames[OLDVER][_MAX_PATH];	//temporary storage for old file version names
+unsigned		fileVersionIndex;		//points to old version to be read
+unsigned		activeLayer = 0;		//active layer
+unsigned		layerIndex;				//active layer code
+long			clipFormsCount;			//number of forms the on the clipboard
+unsigned*		formIndices;			//array of form indices for delete multiple forms
+POINT			stitchArrow[3];			//arrow for selected stitch
+RANGE			selectedRange;			//first and last stitch for min/max stitch select
+unsigned		fileNameOrder[50];		//file name order table
+unsigned char	filenameEncoded[128];	//file name encoding
+unsigned char	filenameDecode[256];	//file name decode
+TCHAR			designerName[50];		//file designer name in clear
+HWND			firstWin;				//first window not destroyed for exiting enumerate loop
+RANGE			selectedFormsRange;		//range of selected forms
+unsigned		tmpFormIndex;			//saved form index
+unsigned char	cursorMask[128];		//cursor and mask
+double			zoomMin;				//minimum allowed zoom value
+fRECTANGLE		checkHoopRect;			//for checking the hoop size
+BALSTCH*		ptrBalaradStitch;		//balarad stitch pointer
+fPOINT			balaradOffset;			//balarad offset
+unsigned		clipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; //for checking if a fill is a clipboard fill
+fPOINTATTR*		rotatedStitches;		//rotated stitches for rotate and save
+unsigned		sideWindowLocation;		//side message window location
+POINT			sideWindowSize;			//size of the side message window
+TCHAR**			ptrSideWindowsStrings;	//string array displayed in sidmsg
+TCHAR			colorFilename[_MAX_PATH];	//.thw file name
+TCHAR			rgbFilename[_MAX_PATH];	//.rgb file name
+dPOINT			cellSize;				//size of an markedStitchMap cell for drawing stitch boxes
+unsigned		draggedColor;			//color being dragged
+FORMPOINTS		selectedFormPoints;		//selected form points
+fRECTANGLE		selectedPointsRect;		//rectangle enclosing selected form points
+RECT			selectedPixelsRect;		//display form vertex select rectangle
+POINT*			formPointsAsLine;		//form vertex clipboard paste into form line
+unsigned		lastFormSelected;		//end point of selected range of forms
 
 #if	PESACT
-unsigned char*		pesColors;				//pes colors
-TCHAR*				ptrPesData;				//pes card data buffer
-fPOINT				stitchCenterOffset;		//offset for writing pes files
-PESTCH*				pesStitches;			//pes stitch buffer
-unsigned char		pesEquivColors[16];		//pes equivalent colors
-unsigned char*		pesStitch;					//pes stitches
-unsigned			pesColorIndex;			//pes color index
+unsigned char*	pesColors;				//pes colors
+TCHAR*			ptrPesData;				//pes card data buffer
+fPOINT			stitchCenterOffset;		//offset for writing pes files
+PESTCH*			pesStitches;			//pes stitch buffer
+unsigned char	pesEquivColors[16];		//pes equivalent colors
+unsigned char*	pesStitch;				//pes stitches
+unsigned		pesColorIndex;			//pes color index
 #endif
 
-POINT				endPointCross;			//point to draw at the end cross for form select points
+POINT			endPointCross;			//point to draw at the end cross for form select points
 #if	 __UseASM__
-unsigned			fsizeof;				//size of form header divided by 4
+unsigned		fsizeof;				//size of form header divided by 4
 #endif
-HDC					hTraceDC;				//trace device context
-HBITMAP				hTraceBitmap;			//trace bitmap
-unsigned*			traceBitmap;			//trace bitmap data
-POINT				currentTracePoint;		//current point being traced
-unsigned			traceDataSize;			//size of the trace bitmap in double words
-unsigned*			tracedPixels;			//bitmap of selected trace pixels
-unsigned*			tracedEdges;			//detected edges of trace areas
-TRCPNT*				tracedPoints;			//collection of traced points
-TRCPNT*				decimatedLine;			//differenced collection of traced points
-unsigned			traceDirection;			//trace direction
-unsigned			initialDirection;		//initial trace direction
-TRCPNT				traceDiff0;				//difference from one trace pixel to the next
-TRCPNT				traceDiff1;				//difference from one trace pixel to the next
-COLORREF			upColor;				//color of the up reference pixel
-COLORREF			downColor;				//color of the down reference pixel
-COLORREF			invertUpColor;			//complement color of the up reference pixel
-COLORREF			invertDownColor;		//complement color of the down reference pixel
-POINT				traceMsgPoint;			//message point for trace parsing
-RECT				traceHighMaskRect;		//high trace mask rectangle
-RECT				traceMiddleMaskRect;	//middle trace mask rectangle
-RECT				traceLowMaskRect;		//low trace mask rectangle
-unsigned			highColors[3];			//separated upper reference colors
-unsigned			pixelColors[3];			//separated pixel reference colors
-unsigned			lowColors[3];			//separated lower reference colors
-unsigned			traceRGBFlag[]	= { TRCRED,TRCGRN,TRCBLU };	//trace bits
-unsigned			traceRGBMask[]	= { REDMSK,GRNMSK,BLUMSK };	//trace masks
-unsigned			traceRGB[]		= { BLUCOL,GRNCOL,REDCOL };	//trace colors
-unsigned			traceAdjacentColors[9];	//separated colors for adjacent pixels
-unsigned*			differenceBitmap;		//difference bitmap
-TCHAR				traceInputBuffer[4];	//for user input color numbers
-unsigned			columnColor;			//trace color column
-POINT				bitmapPoint;			//a point on the bitmap
+HDC				hTraceDC;				//trace device context
+HBITMAP			hTraceBitmap;			//trace bitmap
+unsigned*		traceBitmap;			//trace bitmap data
+POINT			currentTracePoint;		//current point being traced
+unsigned		traceDataSize;			//size of the trace bitmap in double words
+unsigned*		tracedPixels;			//bitmap of selected trace pixels
+unsigned*		tracedEdges;			//detected edges of trace areas
+TRCPNT*			tracedPoints;			//collection of traced points
+TRCPNT*			decimatedLine;			//differenced collection of traced points
+unsigned		traceDirection;			//trace direction
+unsigned		initialDirection;		//initial trace direction
+TRCPNT			traceDiff0;				//difference from one trace pixel to the next
+TRCPNT			traceDiff1;				//difference from one trace pixel to the next
+COLORREF		upColor;				//color of the up reference pixel
+COLORREF		downColor;				//color of the down reference pixel
+COLORREF		invertUpColor;			//complement color of the up reference pixel
+COLORREF		invertDownColor;		//complement color of the down reference pixel
+POINT			traceMsgPoint;			//message point for trace parsing
+RECT			traceHighMaskRect;		//high trace mask rectangle
+RECT			traceMiddleMaskRect;	//middle trace mask rectangle
+RECT			traceLowMaskRect;		//low trace mask rectangle
+unsigned		highColors[3];			//separated upper reference colors
+unsigned		pixelColors[3];			//separated pixel reference colors
+unsigned		lowColors[3];			//separated lower reference colors
+unsigned		traceRGBFlag[]	= { TRCRED,TRCGRN,TRCBLU };	//trace bits
+unsigned		traceRGBMask[]	= { REDMSK,GRNMSK,BLUMSK };	//trace masks
+unsigned		traceRGB[]		= { BLUCOL,GRNCOL,REDCOL };	//trace colors
+unsigned		traceAdjacentColors[9];	//separated colors for adjacent pixels
+unsigned*		differenceBitmap;		//difference bitmap
+TCHAR			traceInputBuffer[4];	//for user input color numbers
+unsigned		columnColor;			//trace color column
+POINT			bitmapPoint;			//a point on the bitmap
 
 //cursors
-HCURSOR 			hArrowCurs;				//arrow
-HCURSOR 			hCrossCurs;				//cross
-HCURSOR 			hFormCurs;				//form
-HCURSOR 			hDlinCurs;				//dline
-HCURSOR				hNeedleUpCurs;			//upright needle
-HCURSOR				hNeedleLeftUpCurs;		//left up needle 
-HCURSOR				hNeedleLeftDownCurs;	//left down needle 
-HCURSOR				hNeedleRightUpCurs;		//right up needle 
-HCURSOR				hNeedleRightDownCurs;	//right down needle 
-CURSORMASK			cursorMasks;			//cursor mask structure
+HCURSOR 		hArrowCurs;				//arrow
+HCURSOR 		hCrossCurs;				//cross
+HCURSOR 		hFormCurs;				//form
+HCURSOR 		hDlinCurs;				//dline
+HCURSOR			hNeedleUpCurs;			//upright needle
+HCURSOR			hNeedleLeftUpCurs;		//left up needle 
+HCURSOR			hNeedleLeftDownCurs;	//left down needle 
+HCURSOR			hNeedleRightUpCurs;		//right up needle 
+HCURSOR			hNeedleRightDownCurs;	//right down needle 
+CURSORMASK		cursorMasks;			//cursor mask structure
 
-HPEN				linePen;				//line pen for stitch move lines			
-HPEN				boxPen[4];				//box pens
-HPEN				userPen[16];			//user color pens
-HPEN				crossPen;				//pen for crosses in color windows
-HPEN				groupSelectPen;			//pen for group select
-HPEN				gridPen;				//pen for stitch grid
-HPEN				backgroundPen;			//background color pen
-HPEN				bitmapPen;				//bitmap pen
-HPEN				formPen;				//form pen
-HPEN				layerPen[6];			//layer pens
-HPEN				formPen3px;				//three-pixel form pen
-HPEN				formSelectedPen;		//form select pen
-HPEN				zoomMarkPen;			//zoom mark pen
-HPEN				multiFormPen;			//multiple selected forms pen
-HPEN				selectAllPen;			//pen for drawing large boxes
-HPEN				knotPen;				//knot pen
-HPEN				blackPen;				//black pen
+HPEN			linePen;				//line pen for stitch move lines			
+HPEN			boxPen[4];				//box pens
+HPEN			userPen[16];			//user color pens
+HPEN			crossPen;				//pen for crosses in color windows
+HPEN			groupSelectPen;			//pen for group select
+HPEN			gridPen;				//pen for stitch grid
+HPEN			backgroundPen;			//background color pen
+HPEN			bitmapPen;				//bitmap pen
+HPEN			formPen;				//form pen
+HPEN			layerPen[6];			//layer pens
+HPEN			formPen3px;				//three-pixel form pen
+HPEN			formSelectedPen;		//form select pen
+HPEN			zoomMarkPen;			//zoom mark pen
+HPEN			multiFormPen;			//multiple selected forms pen
+HPEN			selectAllPen;			//pen for drawing large boxes
+HPEN			knotPen;				//knot pen
+HPEN			blackPen;				//black pen
 
-unsigned			backgroundPenWidth;		//width of the background pen
+unsigned		backgroundPenWidth;		//width of the background pen
 
 //brushes
-HBRUSH				hBackgroundBrush;		//background color brush
-HBRUSH				hDefaultColorBrush[16];	//default color brushes
-HBRUSH				hUserColorBrush[16];	//user color brushes
+HBRUSH			hBackgroundBrush;		//background color brush
+HBRUSH			hDefaultColorBrush[16];	//default color brushes
+HBRUSH			hUserColorBrush[16];	//user color brushes
 
 //clipboard handle
-unsigned			hClip = 0;				//pcs format
-unsigned			hThrEdClip = 0;			//thred format
+unsigned		hClip = 0;				//pcs format
+unsigned		hThrEdClip = 0;			//thred format
 
 //for the choose color dialog box
-CHOOSECOLOR			ccColorStruct;
-COLORREF			customColor[16];
+CHOOSECOLOR		ccColorStruct;
+COLORREF		customColor[16];
 //for the background color dialog box
-CHOOSECOLOR			ccBackgroundColorStruct;
-COLORREF			customBackgroundColor[16];
+CHOOSECOLOR		ccBackgroundColorStruct;
+COLORREF		customBackgroundColor[16];
 //for the bitmap color dialog box
-CHOOSECOLOR			ccBitMapColorStruct;
-COLORREF			bitmapBackgroundColors[16];
+CHOOSECOLOR		ccBitMapColorStruct;
+COLORREF		bitmapBackgroundColors[16];
 
-TCHAR				threadSize[16][2];		//user selected thread sizes
-unsigned			threadSizePixels[16];	//thread sizes in pixels
-unsigned			threadSizeIndex[16];	//thread size indices
+TCHAR			threadSize[16][2];		//user selected thread sizes
+unsigned		threadSizePixels[16];	//thread sizes in pixels
+unsigned		threadSizeIndex[16];	//thread size indices
 
-HMENU				hMainMenu;				//main menu
-HMENU				hfillMenu;				//fill submenu
-HMENU				hfileMenu;				//file submenu
-HMENU				hBorderFillMenu;		//border fill submenu
-HMENU				hViewMenu;				//view submenu
-HMENU				hViewSetMenu;			//view/set
-HMENU				hEditMenu;				//edit submenu
-HWND				hDefaultColorWin[16];	//default color windows
-HWND				hUserColorWin[16];		//user color windows
-HWND				hThreadSizeWin[16];		//thread size windows
-HWND				hChangeThreadSizeWin[3];	//thread size change windows
-HWND				hMainStitchWin;			//stitch window
-HWND				hVerticalScrollBar;		//vertical scroll bar
-HWND				hHorizontalScrollBar;	//horizontal scroll bar
-HWND				hButtonWin[9];			//button windows
-HWND				hTraceStepWin;			//trace step window
-HWND				hColorBar;				//color bar
-HWND				hOKButton;				//ok button
-HWND				hDiscardButton;			//discard button
-HWND				hCancelButton;			//cancel button
-HWND				hGeneralNumberInputBox;	//general number input box
-HWND				hSpeedScrollBar;		//speed scroll bar for movie
-HWND				hSideMessageWin = 0;	//main side message window
-HWND				hsidWnd[16];			//side message windows
-HWND				hPreferencesWindow;		//preferences window
-HWND				hFormData = 0;			//form data sheet
-HWND				hDlgDeleteStitches;		//asking user if they want to delete the sitches associated with a form
-HWND				hBackupViewer[OLDVER];	//handles of multiple file viewing windows
-HWND				hTraceUp[3];			//trace up number windows
-HWND				hTraceDown[3];			//trace down number windows
+HMENU			hMainMenu;				//main menu
+HMENU			hfillMenu;				//fill submenu
+HMENU			hfileMenu;				//file submenu
+HMENU			hBorderFillMenu;		//border fill submenu
+HMENU			hViewMenu;				//view submenu
+HMENU			hViewSetMenu;			//view/set
+HMENU			hEditMenu;				//edit submenu
+HWND			hDefaultColorWin[16];	//default color windows
+HWND			hUserColorWin[16];		//user color windows
+HWND			hThreadSizeWin[16];		//thread size windows
+HWND			hChangeThreadSizeWin[3];	//thread size change windows
+HWND			hMainStitchWin;			//stitch window
+HWND			hVerticalScrollBar;		//vertical scroll bar
+HWND			hHorizontalScrollBar;	//horizontal scroll bar
+HWND			hButtonWin[9];			//button windows
+HWND			hTraceStepWin;			//trace step window
+HWND			hColorBar;				//color bar
+HWND			hOKButton;				//ok button
+HWND			hDiscardButton;			//discard button
+HWND			hCancelButton;			//cancel button
+HWND			hGeneralNumberInputBox;	//general number input box
+HWND			hSpeedScrollBar;		//speed scroll bar for movie
+HWND			hSideMessageWin = 0;	//main side message window
+HWND			hsidWnd[16];			//side message windows
+HWND			hPreferencesWindow;		//preferences window
+HWND			hFormData = 0;			//form data sheet
+HWND			hDlgDeleteStitches;		//asking user if they want to delete the sitches associated with a form
+HWND			hBackupViewer[OLDVER];	//handles of multiple file viewing windows
+HWND			hTraceUp[3];			//trace up number windows
+HWND			hTraceDown[3];			//trace down number windows
 
-HWND				hTraceControl[3];		//trace control windows
-HWND				hTraceSelect[3];		//trace select windows
-unsigned			traceShift[] = { 0,8,16 };	//trace shift values
-HBRUSH				hTraceBrush[3];			//red,green,and blue brushes
-HWND				hTraceNumberInput;		//trace number input window
-HBRUSH				hBlackBrush;			//black brush
-HBRUSH				hTempBrush;				//temporary brush
+HWND			hTraceControl[3];		//trace control windows
+HWND			hTraceSelect[3];		//trace select windows
+unsigned		traceShift[] = { 0,8,16 };	//trace shift values
+HBRUSH			hTraceBrush[3];			//red,green,and blue brushes
+HWND			hTraceNumberInput;		//trace number input window
+HBRUSH			hBlackBrush;			//black brush
+HBRUSH			hTempBrush;				//temporary brush
 
-COLORREF			userColor[16];			//user colors
-COLORREF			backgroundColor;		//stich window background
-COLORREF			boxColor[] = { 0x404040,0x408040,0x804040,0x404080 };
-unsigned			activeColor = 0;		//active color selector
-unsigned			buttonHeight;			//button height
-unsigned			buttonWidth;			//button width
-unsigned			buttonWidthX3;			//button width times 3
-unsigned			numeralWidth;			//width of 0
-int					threadWidthPixels[3];	//thread sizes in pixels
-unsigned			DiplayedColorBitmap;	//color bitmap for recording colors on screen
-double				gapToNearest[NERCNT];	//distances of the closest points
-											//to a mouse click
-long				nearestPoint[NERCNT];	//indices of the closest points
-unsigned			nearestCount;			//number of boxes selected
+COLORREF		userColor[16];			//user colors
+COLORREF		backgroundColor;		//stich window background
+COLORREF		boxColor[] = { 0x404040,0x408040,0x804040,0x404080 };
+unsigned		activeColor = 0;		//active color selector
+unsigned		buttonHeight;			//button height
+unsigned		buttonWidth;			//button width
+unsigned		buttonWidthX3;			//button width times 3
+unsigned		numeralWidth;			//width of 0
+int				threadWidthPixels[3];	//thread sizes in pixels
+unsigned		DiplayedColorBitmap;	//color bitmap for recording colors on screen
+double			gapToNearest[NERCNT];	//distances of the closest points
+										//to a mouse click
+long			nearestPoint[NERCNT];	//indices of the closest points
+unsigned		nearestCount;			//number of boxes selected
 //ToDo - convert slin to calloc'd local variable?
-POINT				slin[MAXSEQ];			//stitch select line 
-unsigned			searchLineIndex = 0;	//pointer for drawing stitch select lines
-fRECTANGLE			stitchRangeRect;		//stitch range rectangle
-fPOINT				stitchRangeSize;		//from check ranges
-fPOINT				selectedFormsSize;		//size of multiple select rectangle
-unsigned			moveAnchor;				//for resequencing stitches
-double				rotateAnglePixels;		//angle for pixel rotate
-SIZE				pickColorMsgSize;		//size of the pick color message
-POINT				insertSize;				//size of file insert window
-fPOINT				insertCenter;			//center point in inserted file
-unsigned			numericCode;			//keyboard numerical input
-double				lowestAngle;			//low angle for angle from mark
-double				originalAngle;			//original angle for angle from mark
-double				highestAngle;			//hi angle for angle from mark
-unsigned			knots[MAXKNOTS];		//pointers to knots
-unsigned			knotCount;				//number of knots in the design
-unsigned			knotAttribute;			//knot stitch attribute
-fPOINT				knotStep;				//knot step
-TCHAR				knotAtStartOrder[] = { 2,3,1,4,0 };		//knot spacings
-TCHAR				knotAtEndOrder[] = { -2,-3,-1,-4,0 };	//reverse knot spacings
-TCHAR				knotAtLastOrder[] = { 0,-4,-1,-3,-2 };	//reverse knot spacings
-fRECTANGLE			clipRectAdjusted;		//rectangle for adjust range ends for clipboard fills
-TCHAR*				balaradFileName;		//used in the balarad interface
-HANDLE				hBalaradFile;			//balarad file handle
+POINT			slin[MAXSEQ];			//stitch select line 
+unsigned		searchLineIndex = 0;	//pointer for drawing stitch select lines
+fRECTANGLE		stitchRangeRect;		//stitch range rectangle
+fPOINT			stitchRangeSize;		//from check ranges
+fPOINT			selectedFormsSize;		//size of multiple select rectangle
+unsigned		moveAnchor;				//for resequencing stitches
+double			rotateAnglePixels;		//angle for pixel rotate
+SIZE			pickColorMsgSize;		//size of the pick color message
+POINT			insertSize;				//size of file insert window
+fPOINT			insertCenter;			//center point in inserted file
+unsigned		numericCode;			//keyboard numerical input
+double			lowestAngle;			//low angle for angle from mark
+double			originalAngle;			//original angle for angle from mark
+double			highestAngle;			//hi angle for angle from mark
+unsigned		knots[MAXKNOTS];		//pointers to knots
+unsigned		knotCount;				//number of knots in the design
+unsigned		knotAttribute;			//knot stitch attribute
+fPOINT			knotStep;				//knot step
+TCHAR			knotAtStartOrder[] = { 2,3,1,4,0 };		//knot spacings
+TCHAR			knotAtEndOrder[] = { -2,-3,-1,-4,0 };	//reverse knot spacings
+TCHAR			knotAtLastOrder[] = { 0,-4,-1,-3,-2 };	//reverse knot spacings
+fRECTANGLE		clipRectAdjusted;		//rectangle for adjust range ends for clipboard fills
+TCHAR*			balaradFileName;		//used in the balarad interface
+HANDLE			hBalaradFile;			//balarad file handle
 
 //graphics variables		
-double				aspectRatio = (double)LHUPX / LHUPY;	//aspect ratio of the stich window
-SCROLLINFO			scrollInfo;				//scroll bar i/o structure
-POINT				stitchWindowSize;		//size of the stich window in pixels
-fPOINT				selectedPoint;			//for converting pixels coordinates
+double			aspectRatio = (double)LHUPX / LHUPY;	//aspect ratio of the stich window
+SCROLLINFO		scrollInfo;				//scroll bar i/o structure
+POINT			stitchWindowSize;		//size of the stich window in pixels
+fPOINT			selectedPoint;			//for converting pixels coordinates
 											// to stitch cordinates
-fPOINT				zoomBoxOrigin;			//zoom box origin
+fPOINT			zoomBoxOrigin;			//zoom box origin
 
 COLORREF defCol[] = {
 
@@ -1841,8 +1841,8 @@ unsigned upmap[] = {
 unsigned			flagMap[MAPLEN];			//bitmap
 unsigned			binaryVariableBitmap = 0;	//for storage of persistent binary variables set by the user
 // ToDo - stitchBuffer and tmpStitichBuffer have been allocated at the same place. Should they be separate?
-fPOINTATTRIBUTE		stitchBuffer[MAXPCS];		//main stitch buffer
-fPOINTATTRIBUTE		clipBuffer[MAXSEQ];			//for temporary copy of imported clipboard data
+fPOINTATTR			stitchBuffer[MAXPCS];		//main stitch buffer
+fPOINTATTR			clipBuffer[MAXSEQ];			//for temporary copy of imported clipboard data
 FRMHED*				SelectedForm;			//pointer to selected form
 unsigned			fillTypes[] =				//fill type array for side window display
 { 0,VRTF,HORF,ANGF,SATF,CLPF,CONTF,VCLPF,HCLPF,ANGCLPF,FTHF,TXVRTF,TXHORF,TXANGF };
@@ -2429,7 +2429,7 @@ void ritfcor(fPOINT* pnt) {
 	butxt(HCOR, msgBuffer);
 }
 
-void ritcor(fPOINTATTRIBUTE* pnt) {
+void ritcor(fPOINTATTR* pnt) {
 
 	fPOINT	tpnt;
 
@@ -2442,8 +2442,8 @@ void coltab() {
 
 	unsigned	ind, col, tuns;
 	unsigned	ocol;
-	dRECTANGLE		rng;
-	fPOINTATTRIBUTE*	ts;
+	dRECTANGLE	rng;
+	fPOINTATTR*	ts;
 
 	colorChanges = 0;
 	if (header.stitchCount)
@@ -2512,7 +2512,7 @@ void ladj() {
 	setMap(DUMEN);
 }
 
-void stchcpy(unsigned p_siz, fPOINTATTRIBUTE* dst) {
+void stchcpy(unsigned p_siz, fPOINTATTR* dst) {
 
 #if  __UseASM__
 	_asm {
@@ -2584,7 +2584,7 @@ void dudat() {
 
 	if (undoBuffer[undoBufferWriteIndex])
 		free(undoBuffer[undoBufferWriteIndex]);
-	l_siz = sizeof(BAKHED) + sizeof(FRMHED)*formIndex + sizeof(fPOINTATTRIBUTE)*header.stitchCount
+	l_siz = sizeof(BAKHED) + sizeof(FRMHED)*formIndex + sizeof(fPOINTATTR)*header.stitchCount
 		+ sizeof(fPOINT)*(formPointIndex + clipPointIndex) + sizeof(SATCON)*satinConnectIndex + sizeof(COLORREF) * 16 +
 		sizeof(TXPNT)*textureIndex;
 	undoBuffer[undoBufferWriteIndex] = calloc(l_siz,sizeof(unsigned));
@@ -2599,9 +2599,9 @@ void dudat() {
 		//			frmcpy(&bdat->frmp[ind],&formList[ind]);
 		MoveMemory(bdat->frmp, &formList, sizeof(FRMHED)*formIndex);
 		bdat->scnt = header.stitchCount;
-		bdat->stch = (fPOINTATTRIBUTE*)&bdat->frmp[formIndex];
+		bdat->stch = (fPOINTATTR*)&bdat->frmp[formIndex];
 		if (header.stitchCount)
-			stchcpy((sizeof(fPOINTATTRIBUTE)*header.stitchCount) >> 2, bdat->stch);
+			stchcpy((sizeof(fPOINTATTR)*header.stitchCount) >> 2, bdat->stch);
 		bdat->fltcnt = formPointIndex;
 		bdat->flt = (fPOINT*)&bdat->stch[header.stitchCount];
 		if (formPointIndex)
@@ -2753,7 +2753,7 @@ mendun:;
 nomen:;
 }
 
-void moveStitchPoints(fPOINTATTRIBUTE* dst, fPOINTATTRIBUTE* src) {
+void moveStitchPoints(fPOINTATTR* dst, fPOINTATTR* src) {
 
 #if  __UseASM__
 	_asm {
@@ -2765,16 +2765,16 @@ void moveStitchPoints(fPOINTATTRIBUTE* dst, fPOINTATTRIBUTE* src) {
 		rep		movsd
 	}
 #else
-	memcpy(dst, src, sizeof(fPOINTATTRIBUTE));
+	memcpy(dst, src, sizeof(fPOINTATTR));
 #endif
 }
 
 void duzero() {
 
-	unsigned			ind;
-	unsigned short		dst;
-	double				len;
-	fPOINTATTRIBUTE*	l_pnt;
+	unsigned		ind;
+	unsigned short	dst;
+	double			len;
+	fPOINTATTR*		l_pnt;
 
 	if (selectedFormCount) {
 
@@ -4829,7 +4829,7 @@ void delstch1(unsigned ind) {
 	}
 }
 
-void stchred(unsigned p_siz, fPOINTATTRIBUTE* src) {
+void stchred(unsigned p_siz, fPOINTATTR* src) {
 
 #if  __UseASM__
 	_asm {
@@ -4852,7 +4852,7 @@ void redbak() {
 	bdat = (BAKHED*)undoBuffer[undoBufferWriteIndex];
 	header.stitchCount = bdat->scnt;
 	if (header.stitchCount)
-		stchred((sizeof(fPOINTATTRIBUTE)*header.stitchCount) >> 2, bdat->stch);
+		stchred((sizeof(fPOINTATTR)*header.stitchCount) >> 2, bdat->stch);
 	unzoomedRect.x = bdat->zoomRect.x;
 	unzoomedRect.y = bdat->zoomRect.y;
 	formIndex = bdat->fcnt;
@@ -5727,10 +5727,10 @@ void nuFil() {
 					zoomRect.right = unzoomedRect.x = iniFile.hoopSizeX;
 					zoomRect.top = unzoomedRect.y = iniFile.hoopSizeY;
 					header.stitchCount = sthed.stitchCount;
-					ReadFile(hFile, (fPOINTATTRIBUTE*)stitchBuffer, header.stitchCount * sizeof(fPOINTATTRIBUTE), &bytesRead, NULL);
-					if (bytesRead != header.stitchCount * sizeof(fPOINTATTRIBUTE)) {
+					ReadFile(hFile, (fPOINTATTR*)stitchBuffer, header.stitchCount * sizeof(fPOINTATTR), &bytesRead, NULL);
+					if (bytesRead != header.stitchCount * sizeof(fPOINTATTR)) {
 
-						header.stitchCount = bytesRead / sizeof(fPOINTATTRIBUTE);
+						header.stitchCount = bytesRead / sizeof(fPOINTATTR);
 						prtred();
 						return;
 					}
@@ -6129,8 +6129,8 @@ void ritdst() {
 
 	unsigned		ind, styp, col, cnt, colind;
 	POINT			loc, len, alen, dif, stp;
-	fRECTANGLE			trct;
-	fPOINTATTRIBUTE*		histch;
+	fRECTANGLE		trct;
+	fPOINTATTR*		histch;
 	unsigned*		pcol;
 	HANDLE			hcol;
 	unsigned long	wrot;
@@ -6559,7 +6559,7 @@ void sav() {
 		return;
 	chk1col();
 	coltab();
-	rotatedStitches = (fPOINTATTRIBUTE*)&bseq;
+	rotatedStitches = (fPOINTATTR*)&bseq;
 	if (chku(ROTAUX)) {
 
 		for (ind = 0; ind < header.stitchCount; ind++) {
@@ -7550,7 +7550,7 @@ unsigned closlin() {
 	double		slop, off, poff, tol, dx, dy;
 	dPOINT		ipnt;
 	dPOINT		chkpnt;
-	fPOINTATTRIBUTE*	l_pstch;
+	fPOINTATTR*	l_pstch;
 	unsigned	layr;
 
 #define		TOL	20
@@ -8306,7 +8306,7 @@ void sCor2px(dPOINT stpnt, POINT* pxpnt) {
 	pxpnt->y = stitchWindowClientRect.bottom + (zoomRect.bottom - stpnt.y)*zoomRatio.y + 0.5;
 }
 
-void sdCor2px(fPOINTATTRIBUTE stpnt, POINT* pxpnt) {
+void sdCor2px(fPOINTATTR stpnt, POINT* pxpnt) {
 
 	pxpnt->x = (stpnt.x - zoomRect.left)*zoomRatio.x + 0.5;
 	pxpnt->y = stitchWindowClientRect.bottom + (zoomRect.bottom - stpnt.y)*zoomRatio.y + 0.5;
@@ -8368,7 +8368,7 @@ void rotang(dPOINT rpnt, POINT* tpnt) {
 	sCor2px(ipnt, tpnt);
 }
 
-void rotang1(fPOINTATTRIBUTE rpnt, fPOINT* tpnt) {
+void rotang1(fPOINTATTR rpnt, fPOINT* tpnt) {
 
 	double	len, ang0;
 	double	dx, dy;
@@ -8461,7 +8461,7 @@ void rotflt(fPOINT* pnt) {
 	pnt->x = rotationCenter.x + len*cos(ang0);
 }
 
-void rotstch(fPOINTATTRIBUTE* pnt) {
+void rotstch(fPOINTATTR* pnt) {
 
 	double	len, ang0;
 	double	dx, dy;
@@ -8704,7 +8704,7 @@ unsigned sizclp() {
 	if (SelectedForm->fillType || SelectedForm->edgeType) {
 
 		len += frmcnt(closestFormToCursor);
-		fileSize += len * sizeof(fPOINTATTRIBUTE);
+		fileSize += len * sizeof(fPOINTATTR);
 	}
 	if (iseclp(closestFormToCursor))
 		fileSize += SelectedForm->clipEntries * sizeof(fPOINT);
@@ -8731,16 +8731,16 @@ unsigned lenclp()
 
 void duclip() {
 
-	unsigned	ind, ine, len = 0, inf, at, msiz = 0;
-	SATCON*		l_sac;
-	fPOINT*		l_clipData;
-	fPOINT*		mclp;
-	TXPNT*		ptx;
-	TXPNT*		ptxs;
-	FRMHED*		tfrm;
-	fPOINTATTRIBUTE*	astch;
-	FORMPOINTCLIP*		pclp;
-	fPOINT*		tflt;
+	unsigned		ind, ine, len = 0, inf, at, msiz = 0;
+	SATCON*			l_sac;
+	fPOINT*			l_clipData;
+	fPOINT*			mclp;
+	TXPNT*			ptx;
+	TXPNT*			ptxs;
+	FRMHED*			tfrm;
+	fPOINTATTR*		astch;
+	FORMPOINTCLIP*	pclp;
+	fPOINT*			tflt;
 
 	if (chkMap(FPSEL)) {
 
@@ -9685,7 +9685,7 @@ void dubuf() {
 
 	outputIndex = (unsigned)&bseq;
 	sthed.headerType = 0x2746872;
-	sthed.fileLength = header.stitchCount * sizeof(fPOINTATTRIBUTE) + sizeof(STRHED) + 16;
+	sthed.fileLength = header.stitchCount * sizeof(fPOINTATTR) + sizeof(STRHED) + 16;
 	sthed.stitchCount = header.stitchCount;
 	sthed.hoopType = iniFile.hoopType;
 	len = 0; slen = 0; elen = 0;
@@ -9707,7 +9707,7 @@ void dubuf() {
 	sthed.pointCount = len;
 	sthed.dlineCount = slen;
 	sthed.clipDataCount = elen;
-	sthed.FormPointsLen = sizeof(STRHED) + header.stitchCount * sizeof(fPOINTATTRIBUTE) + 164;
+	sthed.FormPointsLen = sizeof(STRHED) + header.stitchCount * sizeof(fPOINTATTR) + 164;
 	sthed.dlineLen = sizeof(fPOINT)*len;
 	sthed.clipDataLen = sizeof(fPOINT)*elen;
 	durit(&sthed, sizeof(STRHED));
@@ -9716,7 +9716,7 @@ void dubuf() {
 	extendedHeader.hoopSizeY = iniFile.hoopSizeY;
 	extendedHeader.texturePointCount = textureIndex;
 	durit(&extendedHeader, sizeof(STREX));
-	durit(stitchBuffer, header.stitchCount * sizeof(fPOINTATTRIBUTE));
+	durit(stitchBuffer, header.stitchCount * sizeof(fPOINTATTR));
 	if (!pcsBMPFileName[0]) {
 
 		for (ind = 0; ind < 16; ind++)
@@ -11324,8 +11324,8 @@ void colchk() {
 unsigned makbig(unsigned strt, unsigned fin) {
 
 	unsigned	dst, src, cnt, ine, adcnt = 0, at;
-	fPOINTATTRIBUTE*	tstchs0;
-	fPOINTATTRIBUTE*	tstchs1;
+	fPOINTATTR*	tstchs0;
+	fPOINTATTR*	tstchs1;
 	double		len;
 	dPOINT		dif, stp, pnt;
 
@@ -12035,7 +12035,7 @@ BOOL isthr(TCHAR* nam) {
 		return 1;
 }
 
-unsigned gethand(fPOINTATTRIBUTE* p_pstch, unsigned cnt) {
+unsigned gethand(fPOINTATTR* p_pstch, unsigned cnt) {
 
 	unsigned ind;
 	unsigned ocnt;
@@ -12121,7 +12121,7 @@ void insfil() {
 						ReadFile(hInsertedFile, (STREX*)&thedx, sizeof(STREX), &bytesRead, 0);
 					}
 					savdo();
-					ReadFile(hInsertedFile, (fPOINTATTRIBUTE*)&stitchBuffer[header.stitchCount], thed.stitchCount * sizeof(fPOINTATTRIBUTE), &bytesRead, NULL);
+					ReadFile(hInsertedFile, (fPOINTATTR*)&stitchBuffer[header.stitchCount], thed.stitchCount * sizeof(fPOINTATTR), &bytesRead, NULL);
 					SetFilePointer(hInsertedFile, 164, 0, FILE_CURRENT);
 					trct.left = trct.bottom = (float)1e9;
 					trct.top = trct.right = (float)1e-9;
@@ -12629,7 +12629,7 @@ void fop() {
 	}
 }
 
-void clpradj(fPOINTATTRIBUTE pnt) {
+void clpradj(fPOINTATTR pnt) {
 
 	if (pnt.x < clipRectAdjusted.left)
 		clipRectAdjusted.left = pnt.x;
@@ -13313,7 +13313,7 @@ void stchsnap(unsigned strt, unsigned fin) {
 				 stchsnapx :
 	}
 #else
-	fPOINTATTRIBUTE *pnt = stitchBuffer + strt;
+	fPOINTATTR *pnt = stitchBuffer + strt;
 
 	for (unsigned i = 0; i < fin - strt; i++) {
 		pnt->x = rintf(pnt->x / iniFile.gridSize) * iniFile.gridSize;
@@ -22247,7 +22247,7 @@ unsigned setRmp(unsigned pbit) {
 void drwLin(unsigned ind, unsigned len, HPEN hPen) {
 
 	unsigned	ine, layr;
-	fPOINTATTRIBUTE*	l_pstch = &stitchBuffer[ind];
+	fPOINTATTR*	l_pstch = &stitchBuffer[ind];
 
 	if (activeLayer)
 		lineIndex = 0;
@@ -22291,7 +22291,7 @@ void drwLin(unsigned ind, unsigned len, HPEN hPen) {
 
 void dumov() {
 
-	fPOINTATTRIBUTE*	tstch;
+	fPOINTATTR*	tstch;
 	POINT		arlin[8];
 	POINT		trot;
 
@@ -22461,7 +22461,7 @@ void rint() {
 	}
 }
 
-unsigned setRmap(fPOINTATTRIBUTE p_sPnt) {
+unsigned setRmap(fPOINTATTR p_sPnt) {
 
 	unsigned l_bpnt;
 
@@ -22477,7 +22477,7 @@ void drwStch() {
 	unsigned	layr;
 	double		slop, off;
 	double		dub6;
-	fPOINTATTRIBUTE*	l_pstch;
+	fPOINTATTR*	l_pstch;
 	POINT		tlin[2];
 	long		hi = ds->rcItem.bottom;
 	long		xba, yab, tlng;
@@ -22875,7 +22875,7 @@ void ritbak(TCHAR* nam, DRAWITEMSTRUCT* p_ds) {
 	unsigned	ind, ine, inf, col, lind, redsiz;
 	HANDLE		thfil;
 	POINT		l_siz;
-	fPOINTATTRIBUTE*	tstch;
+	fPOINTATTR*	tstch;
 	POINT*		l_plin;
 	STRHED		sthed;
 	fPOINT		rsiz;
@@ -22944,10 +22944,10 @@ void ritbak(TCHAR* nam, DRAWITEMSTRUCT* p_ds) {
 				rat = raty;
 			if (sthed.stitchCount) {
 
-				tstch = new fPOINTATTRIBUTE[sthed.stitchCount];
+				tstch = new fPOINTATTR[sthed.stitchCount];
 				l_plin = new POINT[sthed.stitchCount];
-				redsiz = sthed.stitchCount * sizeof(fPOINTATTRIBUTE);
-				ReadFile(thfil, (fPOINTATTRIBUTE*)tstch, redsiz, &bytesRead, 0);
+				redsiz = sthed.stitchCount * sizeof(fPOINTATTR);
+				ReadFile(thfil, (fPOINTATTR*)tstch, redsiz, &bytesRead, 0);
 				if (redsiz == bytesRead) {
 
 					SetFilePointer(thfil, 16, 0, FILE_CURRENT);
