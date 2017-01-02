@@ -247,12 +247,13 @@ fPOINT		featherSequence[MAXSEQ];
 unsigned	featherCountUp;
 unsigned	featherCountDown;
 
-float		fltstp;
-float		fltpos;
-float		fltfaz;
-float		fltup;
-float		fltdwn;
-float		fltrat;
+// ToDo - Find better names for these than using 'xt' prefix
+float		xtStep;
+float		xtPosition;
+float		xtPhase;
+float		xtUp;
+float		xtDown;
+float		xtRatio;
 
 OREC**		precs;
 OREC**		pfrecs;
@@ -507,7 +508,7 @@ void nurat() {
 
 	float	rem;
 
-	rem = fmod(fltpos, 1);
+	rem = fmod(xtPosition, 1);
 	switch (featherFillType) {
 
 	case FTHPSG:
@@ -547,28 +548,28 @@ void nurat() {
 
 	case FTHSIN:
 
-		if (rem > fltrat)
-			featherRatio = sin((1 - rem) / (1 - fltrat)*PI + PI)*0.5 + 0.5;
+		if (rem > xtRatio)
+			featherRatio = sin((1 - rem) / (1 - xtRatio)*PI + PI)*0.5 + 0.5;
 		else
-			featherRatio = sin(rem / fltrat*PI)*0.5 + 0.5;
+			featherRatio = sin(rem / xtRatio*PI)*0.5 + 0.5;
 		featherRatio *= formFeatherRatio;
 		break;
 
 	case FTHSIN2:
 
-		if (rem > fltrat)
-			featherRatio = sin((1 - rem) / (1 - fltrat)*PI);
+		if (rem > xtRatio)
+			featherRatio = sin((1 - rem) / (1 - xtRatio)*PI);
 		else
-			featherRatio = sin(rem / fltrat*PI);
+			featherRatio = sin(rem / xtRatio*PI);
 		featherRatio *= formFeatherRatio;
 		break;
 
 	case FTHRMP:
 
-		if (rem > fltrat)
-			featherRatio = (1 - rem) / (1 - fltrat);
+		if (rem > xtRatio)
+			featherRatio = (1 - rem) / (1 - xtRatio);
 		else
-			featherRatio = rem / fltrat;
+			featherRatio = rem / xtRatio;
 		featherRatio *= formFeatherRatio;
 		break;
 
@@ -578,7 +579,7 @@ void nurat() {
 		featherRatio = formFeatherRatio;
 	}
 	++featherPhase %= featherPhaseIndex;
-	fltpos += fltstp;
+	xtPosition += xtStep;
 }
 
 void fthfn(unsigned ind) {
@@ -695,12 +696,12 @@ void fthrfn() {
 	res = sequenceIndex % (featherPhaseIndex << 2);
 	if (res > (featherPhaseIndex << 1))
 		ind++;
-	fltpos = 0;
-	fltstp = (float)4 / sequenceIndex*ind;
-	fltfaz = (float)sequenceIndex / ind;
-	fltrat = (float)featherCountUp / featherPhaseIndex;
-	fltup = fltfaz*fltrat;
-	fltdwn = fltfaz - fltup;
+	xtPosition = 0;
+	xtStep = (float)4 / sequenceIndex*ind;
+	xtPhase = (float)sequenceIndex / ind;
+	xtRatio = (float)featherCountUp / featherPhaseIndex;
+	xtUp = xtPhase*xtRatio;
+	xtDown = xtPhase - xtUp;
 	SelectedForm->fillType = FTHF;
 	featherPhase = 1;
 	bseq[sequenceIndex].x = bseq[sequenceIndex - 2].x;

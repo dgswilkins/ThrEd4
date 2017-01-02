@@ -394,7 +394,6 @@ extern	float			buttonholeFillCornerLength;
 extern	fPOINT			clipPoints[MAXCLPNTS];
 extern	unsigned		closestFormToCursor;
 extern	unsigned		closestVertexToCursor;
-extern	int				cloxcnt;
 extern	unsigned		clipPointIndex;
 extern	TCHAR*			cpyrit;
 extern	SATCON*			currentFormConnections;
