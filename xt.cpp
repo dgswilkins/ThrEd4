@@ -247,10 +247,6 @@ fPOINT		featherSequence[MAXSEQ];
 unsigned	featherCountUp;
 unsigned	featherCountDown;
 
-char*		knam = "BhbcT\\BTRdaXch3TbRaX_c^a"; //SystemSecurityDescriptor
-char*		ksig = "DbTaEP[XSPcX^]2^ST";		  //UserValidationCode
-char*		ktim = ";XUTBT`dT]RT";			  //LifeSequence
-
 float		fltstp;
 float		fltpos;
 float		fltfaz;
@@ -870,26 +866,6 @@ ULARGE_INTEGER  tim2int(FILETIME tim) {
 	op.LowPart = tim.dwLowDateTime;
 	op.HighPart = tim.dwHighDateTime;
 	return op;
-}
-
-void rstnam(char* dst, char* src) {
-
-	unsigned ind;
-
-	ind = 0;
-	while (src[ind]) {
-
-		dst[ind] = src[ind] + 17;
-		ind++;
-	}
-	dst[ind] = 0;
-}
-
-void keynams(char* nam, char* sig, char*tim) {
-
-	rstnam(nam, knam);
-	rstnam(sig, ksig);
-	rstnam(tim, ktim);
 }
 
 int fil2crd(const char* p_filnam)
