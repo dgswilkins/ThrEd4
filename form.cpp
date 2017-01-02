@@ -120,7 +120,6 @@ extern			HPEN			formSelectedPen;
 #if	 __UseASM__
 extern			unsigned		fsizeof;
 #endif
-extern			FSTRTS			fstrts;
 extern			unsigned		groupEndStitch;
 extern			unsigned		groupStartStitch;
 extern			unsigned		groupStitchIndex;
@@ -145,10 +144,10 @@ extern			HWND			hDlgDeleteStitches;
 extern			HWND			hWnd;
 extern			INIFILE			iniFile;
 extern			POINT			insertLine[3];
-extern			fPOINT			iseq[MAXSEQ];
-extern			unsigned		isind;
-extern			unsigned		isind2;
-extern			INSREC			isinds[10];
+extern			fPOINT			interleaveSequence[MAXSEQ];
+extern			unsigned		interleaveSequenceIndex;
+extern			unsigned		interleaveSequenceIndex2;
+extern			INSREC			interleaveSequenceIndices[10];
 extern			unsigned		layerIndex;
 extern			HPEN			layerPen[5];
 extern			POINT			mainWindowOrigin;
@@ -179,7 +178,7 @@ extern			double			showStitchThreshold;
 extern			TCHAR			sideWindowEntryBuffer[11];
 extern			unsigned		searchLineIndex;
 extern			double			smallStitchLength;
-extern			unsigned		smap;
+extern			unsigned		fillStartsMap;
 extern			TCHAR*			stab[STR_LEN];
 extern			double			stitchBoxesThreshold;
 extern			fPOINTATTRIBUTE	stitchBuffer[MAXPCS];
@@ -193,7 +192,7 @@ extern			POINT			stitchWindowSize;
 extern			POINT			stretchBoxLine[5];
 extern			TCHAR			thrName[_MAX_PATH];
 extern			int				textureIndex;
-extern			TXPNT			txpnts[MAXSEQ];
+extern			TXPNT			texturePointsBuffer[MAXSEQ];
 extern			RNGCNT*			textureSegments;
 extern			fPOINT*			uflt;
 extern			unsigned		underlayColor;
@@ -1850,12 +1849,12 @@ void makspac(unsigned strt, unsigned cnt) {
 void rseq(unsigned strt, unsigned fin, unsigned ostrt, unsigned at) {
 	while (strt < fin) {
 		stitchBuffer[strt].attribute = at;
-		stitchBuffer[strt].x = iseq[ostrt].x;
-		stitchBuffer[strt++].y = iseq[ostrt++].y;
+		stitchBuffer[strt].x = interleaveSequence[ostrt].x;
+		stitchBuffer[strt++].y = interleaveSequence[ostrt++].y;
 	}
 	ostrt--;
-	lastPoint.x = iseq[ostrt].x;
-	lastPoint.y = iseq[ostrt].y;
+	lastPoint.x = interleaveSequence[ostrt].x;
+	lastPoint.y = interleaveSequence[ostrt].y;
 }
 
 BOOL ritlin(fPOINT strt, fPOINT fin)
@@ -1867,26 +1866,26 @@ BOOL ritlin(fPOINT strt, fPOINT fin)
 	dif.x = fin.x - strt.x;
 	dif.y = fin.y - strt.y;
 	len = hypot(dif.x, dif.y);
-	iseq[isind].x = strt.x;
-	iseq[isind++].y = strt.y;
+	interleaveSequence[interleaveSequenceIndex].x = strt.x;
+	interleaveSequence[interleaveSequenceIndex++].y = strt.y;
 	if (len > maxStitchLen) {
 		cnt = ceil(len / userStichLen);
 		if (!cnt)
 			cnt = 1;
 		while (len / cnt > maxStitchLen)
 			cnt++;
-		if (!chkmax(isind, cnt)) {
+		if (!chkmax(interleaveSequenceIndex, cnt)) {
 			stp.x = dif.x / cnt;
 			stp.y = dif.y / cnt;
 			pnt.x = strt.x + stp.x;
 			pnt.y = strt.y + stp.y;
 			for (ine = 0; ine < cnt - 1; ine++) {
-				if (isind&MAXMSK) {
-					isind = MAXSEQ - 2;
+				if (interleaveSequenceIndex&MAXMSK) {
+					interleaveSequenceIndex = MAXSEQ - 2;
 					return 0;
 				}
-				iseq[isind].x = pnt.x;
-				iseq[isind++].y = pnt.y;
+				interleaveSequence[interleaveSequenceIndex].x = pnt.x;
+				interleaveSequence[interleaveSequenceIndex++].y = pnt.y;
 				pnt.x += stp.x;
 				pnt.y += stp.y;
 			}
@@ -1924,17 +1923,17 @@ void chkseq(BOOL brd) {
 
 	for (index = 0; index < sequenceIndex; index++)
 	{
-		iseq[index].x = oseq[index].x;
-		iseq[index].y = oseq[index].y;
+		interleaveSequence[index].x = oseq[index].x;
+		interleaveSequence[index].y = oseq[index].y;
 	}
-	isind = sequenceIndex;
+	interleaveSequenceIndex = sequenceIndex;
 #else
 
 	double		len;
 	unsigned	ind, ine, bakind;
 	float		mins;
 
-	bakind = isind;
+	bakind = interleaveSequenceIndex;
 	if (brd) {
 		if (!SelectedForm->maxBorderStitchLen)
 			SelectedForm->maxBorderStitchLen = iniFile.maxStitchLength;
@@ -1963,57 +1962,57 @@ void chkseq(BOOL brd) {
 		if (!ritlin(oseq[ind], oseq[ind + 1]))
 			goto seqskp;
 	}
-	iseq[isind].x = oseq[ind].x;
-	iseq[isind++].y = oseq[ind].y;
+	interleaveSequence[interleaveSequenceIndex].x = oseq[ind].x;
+	interleaveSequence[interleaveSequenceIndex++].y = oseq[ind].y;
 seqskp:;
 	if (!mins)
 		return;
 	ine = bakind + 1;
-	for (ind = bakind + 1; ind < isind; ind++) {
-		len = hypot(iseq[ind].x - iseq[ind - 1].x, iseq[ind].y - iseq[ind - 1].y);
+	for (ind = bakind + 1; ind < interleaveSequenceIndex; ind++) {
+		len = hypot(interleaveSequence[ind].x - interleaveSequence[ind - 1].x, interleaveSequence[ind].y - interleaveSequence[ind - 1].y);
 		if (len > mins) {
-			iseq[ine].x = iseq[ind].x;
-			iseq[ine].y = iseq[ind].y;
+			interleaveSequence[ine].x = interleaveSequence[ind].x;
+			interleaveSequence[ine].y = interleaveSequence[ind].y;
 			ine++;
 		}
 	}
-	isind = ine;
+	interleaveSequenceIndex = ine;
 #endif
 }
 
 void ritbrd() {
 	if (sequenceIndex)
 	{
-		isinds[isind2].ind = isind;
-		isinds[isind2].seq = I_BRD;
-		isinds[isind2].cod = TYPBRD;
-		isinds[isind2].col = SelectedForm->borderColor&COLMSK;
+		interleaveSequenceIndices[interleaveSequenceIndex2].ind = interleaveSequenceIndex;
+		interleaveSequenceIndices[interleaveSequenceIndex2].seq = I_BRD;
+		interleaveSequenceIndices[interleaveSequenceIndex2].cod = TYPBRD;
+		interleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->borderColor&COLMSK;
 		chkseq(1);
-		isind2++;
+		interleaveSequenceIndex2++;
 	}
 }
 
 void ritapbrd() {
 	if (sequenceIndex)
 	{
-		isinds[isind2].ind = isind;
-		isinds[isind2].seq = I_AP;
-		isinds[isind2].cod = TYPMSK;
-		isinds[isind2].col = SelectedForm->borderColor >> 4;
+		interleaveSequenceIndices[interleaveSequenceIndex2].ind = interleaveSequenceIndex;
+		interleaveSequenceIndices[interleaveSequenceIndex2].seq = I_AP;
+		interleaveSequenceIndices[interleaveSequenceIndex2].cod = TYPMSK;
+		interleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->borderColor >> 4;
 		chkseq(1);
-		isind2++;
+		interleaveSequenceIndex2++;
 	}
 }
 
 void ritfil() {
 	if (sequenceIndex)
 	{
-		isinds[isind2].ind = isind;
-		isinds[isind2].seq = I_FIL;
-		isinds[isind2].cod = TYPFRM;
-		isinds[isind2].col = SelectedForm->fillColor;
+		interleaveSequenceIndices[interleaveSequenceIndex2].ind = interleaveSequenceIndex;
+		interleaveSequenceIndices[interleaveSequenceIndex2].seq = I_FIL;
+		interleaveSequenceIndices[interleaveSequenceIndex2].cod = TYPFRM;
+		interleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->fillColor;
 		chkseq(0);
-		isind2++;
+		interleaveSequenceIndex2++;
 	}
 }
 
@@ -2098,10 +2097,10 @@ void savdisc() {
 }
 
 BOOL lastch() {
-	if (isind)
+	if (interleaveSequenceIndex)
 	{
-		lastPoint.x = iseq[isind - 1].x;
-		lastPoint.y = iseq[isind - 1].y;
+		lastPoint.x = interleaveSequence[interleaveSequenceIndex - 1].x;
+		lastPoint.y = interleaveSequence[interleaveSequenceIndex - 1].y;
 		return 1;
 	}
 	else
@@ -2426,7 +2425,7 @@ void refilfn() {
 	rstMap(WASDO);
 	if (SelectedForm->extendedAttribute&(AT_UND | AT_WALK) && SelectedForm->type == FRMLINE&&SelectedForm->fillType != CONTF)
 		SelectedForm->type = FRMFPOLY;
-	isind = isind2 = 0;
+	interleaveSequenceIndex = interleaveSequenceIndex2 = 0;
 	rstMap(ISUND);
 	switch (SelectedForm->type) {
 	case FRMLINE:
@@ -12124,7 +12123,7 @@ void clpcon() {
 		{
 			tine = (ind + nrct.left) % SelectedForm->fillInfo.texture.lines;
 			clipStitchCount = textureSegments[tine].stitchCount;
-			ptx = &txpnts[SelectedForm->fillInfo.texture.index + textureSegments[tine].line];
+			ptx = &texturePointsBuffer[SelectedForm->fillInfo.texture.index + textureSegments[tine].line];
 			vpnt0.x = ploc.x;
 			if (SelectedForm->txof)
 			{

@@ -1721,7 +1721,7 @@ typedef struct _frmlim	{
 
 typedef struct _insrec	{
 	unsigned cod;
-	unsigned col;
+	unsigned color;
 	unsigned ind;
 	unsigned seq;
 }INSREC;

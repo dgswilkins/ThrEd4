@@ -414,7 +414,7 @@ extern	HWND			hMsg;
 extern	HWND			hnxt;
 extern	double			horizontalRatio;
 extern	HWND			hsrch;
-extern	fPOINT			iseq[MAXSEQ];
+extern	fPOINT			interleaveSequence[MAXSEQ];
 extern	TCHAR*			laytxt[];
 extern	fPOINT			lowerLeftStitch;
 extern	POINT			rubberBandLine[3];
@@ -444,9 +444,9 @@ extern	double			stitchSpace;
 extern	HWND			thDat[LASTLIN];
 extern	TXHST			thsts[16];
 extern	HWND			thTxt[LASTLIN];
-extern	TXTSCR			tscr;
+extern	TXTSCR			textureScreen;
 extern	int				textureIndex;
-extern	TXPNT			txpnts[MAXSEQ];
+extern	TXPNT			texturePointsBuffer[MAXSEQ];
 extern	double			verticalRatio;
 extern	unsigned short	wordParam;
 extern	unsigned		activePointIndex;
@@ -2623,7 +2623,7 @@ void dudat() {
 		bdat->txp = (TXPNT*)&bdat->cols[16];
 		bdat->ntx = textureIndex;
 		if (textureIndex)
-			MoveMemory(bdat->txp, &txpnts, sizeof(TXPNT)*textureIndex);
+			MoveMemory(bdat->txp, &texturePointsBuffer, sizeof(TXPNT)*textureIndex);
 	}
 }
 
@@ -4878,7 +4878,7 @@ void redbak() {
 		redraw(hUserColorWin[ind]);
 	textureIndex = bdat->ntx;
 	if (textureIndex)
-		MoveMemory(&txpnts, bdat->txp, sizeof(TXPNT)*textureIndex);
+		MoveMemory(&texturePointsBuffer, bdat->txp, sizeof(TXPNT)*textureIndex);
 	coltab();
 	setMap(RESTCH);
 }
@@ -5823,7 +5823,7 @@ void nuFil() {
 							clipPointIndex = bytesRead / sizeof(fPOINT);
 							setMap(BADFIL);
 						}
-						ReadFile(hFile, (TXPNT*)txpnts, extendedHeader.texturePointCount * sizeof(TXPNT), &bytesRead, 0);
+						ReadFile(hFile, (TXPNT*)texturePointsBuffer, extendedHeader.texturePointCount * sizeof(TXPNT), &bytesRead, 0);
 						textureIndex = bytesRead / sizeof(TXPNT);
 						if (rstMap(BADFIL))
 							bfilmsg();
@@ -8851,7 +8851,7 @@ void duclip() {
 					SelectedForm = &formList[selectedFormList[ind]];
 					if (istx(selectedFormList[ind]))
 					{
-						MoveMemory(&ptx[ine], &txpnts[SelectedForm->fillInfo.texture.index], SelectedForm->fillInfo.texture.count * sizeof(TXPNT));
+						MoveMemory(&ptx[ine], &texturePointsBuffer[SelectedForm->fillInfo.texture.index], SelectedForm->fillInfo.texture.count * sizeof(TXPNT));
 						tfrm[ind].fillInfo.texture.index = ine;
 						ine += SelectedForm->fillInfo.texture.count;
 					}
@@ -8942,7 +8942,7 @@ void duclip() {
 					ptx = (TXPNT*)&l_clipData[ind];
 					if (istx(closestFormToCursor))
 					{
-						ptxs = &txpnts[SelectedForm->fillInfo.texture.index];
+						ptxs = &texturePointsBuffer[SelectedForm->fillInfo.texture.index];
 						for (ind = 0; ind < SelectedForm->fillInfo.texture.count; ind++)
 						{
 							ptx[ind].line = ptxs[ind].line;
@@ -9776,7 +9776,7 @@ void dubuf() {
 		durit(tpnts, len * sizeof(fPOINT));
 		durit(spnts, slen * sizeof(SATCON));
 		durit(epnts, elen * sizeof(fPOINT));
-		durit(txpnts, textureIndex * sizeof(TXPNT));
+		durit(texturePointsBuffer, textureIndex * sizeof(TXPNT));
 		delete[] theds;
 		delete[] tpnts;
 		delete[] spnts;
@@ -15485,21 +15485,21 @@ void setpclp() {
 	POINT		tpnt;
 	unsigned	ind, ine;
 
-	sfCor2px(iseq[0], &tpnt);
+	sfCor2px(interleaveSequence[0], &tpnt);
 	formPointsAsLine[0].x = tpnt.x;
 	formPointsAsLine[0].y = tpnt.y;
-	sfCor2px(iseq[1], &tpnt);
+	sfCor2px(interleaveSequence[1], &tpnt);
 	tof.x = msg.pt.x - stitchWindowOrigin.x - tpnt.x;
 	tof.y = msg.pt.y - stitchWindowOrigin.y - tpnt.y;
 	for (ind = 0; ind < outputIndex - 2; ind++) {
 
 		ine = ind + 1;
-		sfCor2px(iseq[ine], &tpnt);
+		sfCor2px(interleaveSequence[ine], &tpnt);
 		formPointsAsLine[ine].x = tpnt.x + tof.x;
 		formPointsAsLine[ine].y = tpnt.y + tof.y;
 	}
 	ind++;
-	sfCor2px(iseq[ind], &tpnt);
+	sfCor2px(interleaveSequence[ind], &tpnt);
 	formPointsAsLine[ind].x = tpnt.x;
 	formPointsAsLine[ind].y = tpnt.y;
 }
@@ -15527,15 +15527,15 @@ void fixpclp() {
 	tpnt.x = msg.pt.x + formMoveDelta.x;
 	tpnt.y = msg.pt.y + formMoveDelta.y;
 	pxCor2stch(tpnt);
-	pof.x = selectedPoint.x - iseq[1].x;
-	pof.y = selectedPoint.y - iseq[1].y;
+	pof.x = selectedPoint.x - interleaveSequence[1].x;
+	pof.y = selectedPoint.y - interleaveSequence[1].y;
 	ine = nxt(closestVertexToCursor);
 	cnt = outputIndex - 2;
 	fltspac(&currentFormVertices[ine], cnt);
 	for (ind = 1; ind < outputIndex - 1; ind++) {
 
-		currentFormVertices[ine].x = iseq[ind].x + pof.x;
-		currentFormVertices[ine].y = iseq[ind].y + pof.y;
+		currentFormVertices[ine].x = interleaveSequence[ind].x + pof.x;
+		currentFormVertices[ine].y = interleaveSequence[ind].y + pof.y;
 		ine++;
 	}
 	SelectedForm->sides += cnt;
@@ -19321,20 +19321,20 @@ unsigned chkMsg() {
 
 							pchr = (unsigned char*)&bseq;
 							fvars(closestFormToCursor);
-							iseq[0].x = currentFormVertices[closestVertexToCursor].x;
-							iseq[0].y = currentFormVertices[closestVertexToCursor].y;
+							interleaveSequence[0].x = currentFormVertices[closestVertexToCursor].x;
+							interleaveSequence[0].y = currentFormVertices[closestVertexToCursor].y;
 							l_clipData = (fPOINT*)&clipFormPointsData[1];
 							for (ind = 0; ind <= clipFormPointsData->pointCount; ind++) {
 
-								iseq[ind + 1].x = l_clipData[ind].x;
-								iseq[ind + 1].y = l_clipData[ind].y;
+								interleaveSequence[ind + 1].x = l_clipData[ind].x;
+								interleaveSequence[ind + 1].y = l_clipData[ind].y;
 							}
 							ine = nxt(closestVertexToCursor);
 							ind++;
-							iseq[ind].x = currentFormVertices[ine].x;
-							iseq[ind].y = currentFormVertices[ine].y;
+							interleaveSequence[ind].x = currentFormVertices[ine].x;
+							interleaveSequence[ind].y = currentFormVertices[ine].y;
 							outputIndex = ind + 1;
-							formPointsAsLine = (POINT*)&iseq[outputIndex];
+							formPointsAsLine = (POINT*)&interleaveSequence[outputIndex];
 							setpclp();
 							setMap(FPUNCLP);
 							setMap(SHOP);
@@ -19422,7 +19422,7 @@ unsigned chkMsg() {
 							}
 						}
 						pts = (TXPNT*)&l_clipData[inf];
-						ptx = &txpnts[textureIndex];
+						ptx = &texturePointsBuffer[textureIndex];
 						ine = 0;
 						for (ind = 0; ind < clipFormsCount; ind++)
 						{
@@ -23345,7 +23345,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			if (chkMap(TXTRED))
 			{
 				LoadString(hInst, IDS_TXWID, nam, _MAX_PATH);
-				sprintf_s(hlpbuf, sizeof(hlpbuf), nam, tscr.width / PFGRAN);
+				sprintf_s(hlpbuf, sizeof(hlpbuf), nam, textureScreen.width / PFGRAN);
 				TextOut(ds->hDC, ind, 1, hlpbuf, strlen(hlpbuf));;
 			} else
 				TextOut(ds->hDC, ind, 1, stab[STR_PIKOL], strlen(stab[STR_PIKOL]));;
