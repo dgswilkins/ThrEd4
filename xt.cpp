@@ -235,7 +235,6 @@ fPOINT*		underlayVertices;			//underlay offset points
 unsigned	featherFillType;			//type of feather fill
 float		featherRatio;				//feather ratio
 float		featherMinStitch;			//smallest stitch allowed
-float		flr2;	//twice smallest stitch
 float		xrat;	//local feather ratio
 float		brat;	//feather ratio from form
 unsigned	xat;	//extended form attribute
@@ -433,7 +432,6 @@ void fthvars() {
 	featherFillType = SelectedForm->fillInfo.feather.fillType;
 	brat = SelectedForm->fillInfo.feather.ratio;
 	featherMinStitch = SelectedForm->fillInfo.feather.minStitchSize;
-	flr2 = featherMinStitch * 2;
 	fthnum = SelectedForm->fillInfo.feather.count;
 	xat = SelectedForm->extendedAttribute;
 	upfth = fthup = SelectedForm->fillInfo.feather.upCount;
@@ -624,7 +622,7 @@ void fthrbfn(unsigned ind) {
 
 	nurat();
 	len = hypot(bseq[ind + 1].y - bseq[ind].y, bseq[ind + 1].x - bseq[ind].x);
-	if (len < flr2)
+	if (len < (featherMinStitch * 2))
 	{
 		featherRatio = 0.5;
 		ratpnt(ind, ind + 1, &pnt0);
