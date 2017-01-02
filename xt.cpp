@@ -230,7 +230,6 @@ FSTRTS		fillStartsData;//fill start data for refill
 INSREC		interleaveSequenceIndices[10];//indices into interleave points
 unsigned	interleaveSequenceIndex2;	//index into interleave indices
 unsigned	fillStartsMap;	//fill starts bitmap
-unsigned	lastfltx;//last form point used in a fill
 unsigned*	frmcnts;//form fill type counters for sort
 fPOINT*		uflt;	//underlay offset points
 unsigned	fthtyp;	//type of feather fill
@@ -239,7 +238,7 @@ float		fthflr;	//smallest stitch allowed
 float		flr2;	//twice smallest stitch
 float		xrat;	//local feather ratio
 float		brat;	//feather ratio from form
-unsigned	xat;	//exterded form attribute
+unsigned	xat;	//extended form attribute
 unsigned	fthup;	//feather up count
 unsigned	fthdwn;	//feather down count
 unsigned	fthnum;	//up count plus down count
@@ -1265,7 +1264,6 @@ void fnwlk(unsigned find)
 		outputIndex++;
 		cnt--;
 	}
-	lastfltx = prv(strt);
 	ritwlk();
 }
 
