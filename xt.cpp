@@ -201,40 +201,40 @@ unsigned short daztab[] =
 	IDS_DAZHART,
 };
 
-RNGCNT*		textureSegments;		//texture fill groups of points
-dPOINT		designSizeRatio;		//design size ratio
-fRECTANGLE	designSizeRect;			//design size rectangle
-float		designAspectRatio;		//design aspect ratio
-HWND		hDlgDesignSize;			//change design size dialog window
-fPOINT		designSize;				//design size
+RNGCNT*		textureSegments;			//texture fill groups of points
+dPOINT		designSizeRatio;			//design size ratio
+fRECTANGLE	designSizeRect;				//design size rectangle
+float		designAspectRatio;			//design aspect ratio
+HWND		hDlgDesignSize;				//change design size dialog window
+fPOINT		designSize;					//design size
 TXPNT		texturePointsBuffer[MAXSEQ];	//buffer for textured fill points
-int			textureIndex;			//next textured fill point index
-unsigned	textureWindowId;		//id of the window being updated
-TCHAR		textureInputBuffer[16];	//texture fill number buffer
-int			textureInputIndex;		//text number pointer
-HWND		hBtnSideWindow;			//button side window
-RECT		texturePixelRect;		//screen selected texture points rectangle
-TXTRCT		textureRect;			//selected texture points rectangle
+int			textureIndex;				//next textured fill point index
+unsigned	textureWindowId;			//id of the window being updated
+TCHAR		textureInputBuffer[16];		//texture fill number buffer
+int			textureInputIndex;			//text number pointer
+HWND		hBtnSideWindow;				//button side window
+RECT		texturePixelRect;			//screen selected texture points rectangle
+TXTRCT		textureRect;				//selected texture points rectangle
 POINT		cloxref;	//original location of selected texture points
 int			cloxcnt;	//number of selected texture points
 unsigned*	cloxlst;	//list of selected points
-POINT		textureCursorLocation;	//texture editor move cursor location
-HPEN		textureCrossPen;		//texture editor cross pen
-TXTSCR		textureScreen;			//texture editor layout parameters
-TXPNT		tmpTexturePoints[16384];//temporary storage for textured fill data
-unsigned	colorOrder[16];			//color order adjusted for applique
-INTINF		interleaveData;			//interleave data
+POINT		textureCursorLocation;		//texture editor move cursor location
+HPEN		textureCrossPen;			//texture editor cross pen
+TXTSCR		textureScreen;				//texture editor layout parameters
+TXPNT		tmpTexturePoints[16384];	//temporary storage for textured fill data
+unsigned	colorOrder[16];				//color order adjusted for applique
+INTINF		interleaveData;				//interleave data
 fPOINT		interleaveSequence[MAXSEQ]; //storage for interleave points
-unsigned	interleaveSequenceIndex; //index into the interleave sequence
-FSTRTS		fillStartsData;//fill start data for refill
-INSREC		interleaveSequenceIndices[10];//indices into interleave points
+unsigned	interleaveSequenceIndex;	//index into the interleave sequence
+FSTRTS		fillStartsData;				//fill start data for refill
+INSREC		interleaveSequenceIndices[10];	//indices into interleave points
 unsigned	interleaveSequenceIndex2;	//index into interleave indices
-unsigned	fillStartsMap;	//fill starts bitmap
-unsigned*	frmcnts;//form fill type counters for sort
-fPOINT*		uflt;	//underlay offset points
-unsigned	fthtyp;	//type of feather fill
-float		fthrat;	//feather ratio
-float		fthflr;	//smallest stitch allowed
+unsigned	fillStartsMap;				//fill starts bitmap
+unsigned*	formFillCounter;			//form fill type counters for sort
+fPOINT*		underlayVertices;			//underlay offset points
+unsigned	featherFillType;			//type of feather fill
+float		featherRatio;				//feather ratio
+float		featherMinStitch;			//smallest stitch allowed
 float		flr2;	//twice smallest stitch
 float		xrat;	//local feather ratio
 float		brat;	//feather ratio from form
@@ -430,10 +430,10 @@ void fthvars() {
 
 	rstMap(BARSAT);
 	rstMap(FTHR);
-	fthtyp = SelectedForm->fillInfo.feather.fillType;
+	featherFillType = SelectedForm->fillInfo.feather.fillType;
 	brat = SelectedForm->fillInfo.feather.ratio;
-	fthflr = SelectedForm->fillInfo.feather.minStitchSize;
-	flr2 = fthflr * 2;
+	featherMinStitch = SelectedForm->fillInfo.feather.minStitchSize;
+	flr2 = featherMinStitch * 2;
 	fthnum = SelectedForm->fillInfo.feather.count;
 	xat = SelectedForm->extendedAttribute;
 	upfth = fthup = SelectedForm->fillInfo.feather.upCount;
@@ -447,7 +447,7 @@ void fthvars() {
 
 float durat(float strt, float fin) {
 
-	return (fin - strt)*fthrat + strt;
+	return (fin - strt)*featherRatio + strt;
 }
 
 float duxrat(float strt, float fin) {
@@ -467,14 +467,14 @@ void durats(unsigned ind, fPOINT* pflt) {
 	fPOINT	ipnt;
 
 	olen = hypot(bseq[ind + 1].x - bseq[ind].x, bseq[ind + 1].y - bseq[ind].y);
-	if (olen < fthflr) {
+	if (olen < featherMinStitch) {
 
 		pflt->x = bseq[ind].x;
 		pflt->y = bseq[ind].y;
 	}
 	else {
 
-		xrat = fthflr / olen;
+		xrat = featherMinStitch / olen;
 		ipnt.x = duxrat(bseq[ind + 1].x, bseq[ind].x);
 		ipnt.y = duxrat(bseq[ind + 1].y, bseq[ind].y);
 		pflt->x = durat(ipnt.x, bseq[ind].x);
@@ -514,7 +514,7 @@ void nurat() {
 	float	rem;
 
 	rem = fmod(fltpos, 1);
-	switch (fthtyp) {
+	switch (featherFillType) {
 
 	case FTHPSG:
 
@@ -522,12 +522,12 @@ void nurat() {
 
 			if (upfth) {
 
-				fthrat = (float)(fthnum - (psg() % fthnum)) / fthnum;
+				featherRatio = (float)(fthnum - (psg() % fthnum)) / fthnum;
 				upfth--;
 			}
 			else {
 
-				fthrat = (float)(fthnum - (bpsg() % fthnum)) / fthnum;
+				featherRatio = (float)(fthnum - (bpsg() % fthnum)) / fthnum;
 				if (dwnfth)
 					dwnfth--;
 				else {
@@ -539,49 +539,49 @@ void nurat() {
 			}
 		}
 		else
-			fthrat = (float)(fthnum - (psg() % fthnum)) / fthnum;
-		fthrat *= brat;
+			featherRatio = (float)(fthnum - (psg() % fthnum)) / fthnum;
+		featherRatio *= brat;
 		break;
 
 	case FTHFAZ:
 
 		if (faz >= fthup)
-			fthrat = 1;
+			featherRatio = 1;
 		else
-			fthrat = brat;
+			featherRatio = brat;
 		break;
 
 	case FTHSIN:
 
 		if (rem > fltrat)
-			fthrat = sin((1 - rem) / (1 - fltrat)*PI + PI)*0.5 + 0.5;
+			featherRatio = sin((1 - rem) / (1 - fltrat)*PI + PI)*0.5 + 0.5;
 		else
-			fthrat = sin(rem / fltrat*PI)*0.5 + 0.5;
-		fthrat *= brat;
+			featherRatio = sin(rem / fltrat*PI)*0.5 + 0.5;
+		featherRatio *= brat;
 		break;
 
 	case FTHSIN2:
 
 		if (rem > fltrat)
-			fthrat = sin((1 - rem) / (1 - fltrat)*PI);
+			featherRatio = sin((1 - rem) / (1 - fltrat)*PI);
 		else
-			fthrat = sin(rem / fltrat*PI);
-		fthrat *= brat;
+			featherRatio = sin(rem / fltrat*PI);
+		featherRatio *= brat;
 		break;
 
 	case FTHRMP:
 
 		if (rem > fltrat)
-			fthrat = (1 - rem) / (1 - fltrat);
+			featherRatio = (1 - rem) / (1 - fltrat);
 		else
-			fthrat = rem / fltrat;
-		fthrat *= brat;
+			featherRatio = rem / fltrat;
+		featherRatio *= brat;
 		break;
 
 	case FTHLIN:
 	default:
 
-		fthrat = brat;
+		featherRatio = brat;
 	}
 	++faz %= faznum;
 	fltpos += fltstp;
@@ -595,8 +595,8 @@ void fthfn(unsigned ind) {
 
 void ratpnt(unsigned pt0, unsigned pt1, fPOINT* opt) {
 
-	opt->x = (bseq[pt1].x - bseq[pt0].x)*fthrat + bseq[pt0].x;
-	opt->y = (bseq[pt1].y - bseq[pt0].y)*fthrat + bseq[pt0].y;
+	opt->x = (bseq[pt1].x - bseq[pt0].x)*featherRatio + bseq[pt0].x;
+	opt->y = (bseq[pt1].y - bseq[pt0].y)*featherRatio + bseq[pt0].y;
 }
 
 void midpnt(fPOINT pt0, fPOINT pt1, fPOINT* opt) {
@@ -626,19 +626,19 @@ void fthrbfn(unsigned ind) {
 	len = hypot(bseq[ind + 1].y - bseq[ind].y, bseq[ind + 1].x - bseq[ind].x);
 	if (len < flr2)
 	{
-		fthrat = 0.5;
+		featherRatio = 0.5;
 		ratpnt(ind, ind + 1, &pnt0);
 		ratpnt(ind + 3, ind + 2, &pnt1);
 	}
 	else
 	{
-		xrat = fthflr / len;
+		xrat = featherMinStitch / len;
 		duxrats(ind, ind + 1, &pnt0l);
 		duxrats(ind + 3, ind + 2, &pnt1l);
 		xrat = 1 - xrat;
 		duxrats(ind, ind + 1, &pnt0h);
 		duxrats(ind + 3, ind + 2, &pnt1h);
-		xrat = fthrat;
+		xrat = featherRatio;
 		xratf(pnt0l, pnt0h, &pnt0);
 		xratf(pnt1l, pnt1h, &pnt1);
 	}
@@ -670,14 +670,14 @@ void fthdfn(unsigned ind) {
 	len = hypot(bseq[ind + 1].y - bseq[ind].y, bseq[ind + 1].x - bseq[ind].x);
 	duoseq(ind);
 	duoseq(ind + 1);
-	if (len > fthflr) {
+	if (len > featherMinStitch) {
 
 		xrat = 0.5;
 		duxrats(ind + 1, ind, &mpnt);
-		xrat = fthflr / len / 2;
+		xrat = featherMinStitch / len / 2;
 		xratf(mpnt, oseq[ind], &pt0);
 		xratf(mpnt, oseq[ind + 1], &pt1);
-		xrat = fthrat;
+		xrat = featherRatio;
 		xratf(pt0, oseq[ind], &oseq[ind]);
 		xratf(pt1, oseq[ind + 1], &oseq[ind + 1]);
 	}
@@ -1277,8 +1277,8 @@ void fnuang() {
 	angledForm.vertices = angledFormVertices;
 	for (ind = 0; ind < angledForm.sides; ind++) {
 
-		angledForm.vertices[ind].x = uflt[ind].x;
-		angledForm.vertices[ind].y = uflt[ind].y;
+		angledForm.vertices[ind].x = underlayVertices[ind].x;
+		angledForm.vertices[ind].y = underlayVertices[ind].y;
 		rotflt(&angledForm.vertices[ind]);
 	}
 	SelectedForm = &angledForm;
@@ -1308,7 +1308,7 @@ void undclp()
 void fnund(unsigned find)
 {
 	float baksiz;
-	uflt = insid();
+	underlayVertices = insid();
 	baksiz = userStitchLength;
 	userStitchLength = 1e99;
 	if (!SelectedForm->underlaySpacing)
@@ -1967,7 +1967,7 @@ BOOL chkrdun(SRTREC* psrec)
 
 	for (ind = psrec->start; ind < psrec->finish; ind++)
 	{
-		if (precs[ind]->otyp == frmcnts[precs[ind]->frm])
+		if (precs[ind]->otyp == formFillCounter[precs[ind]->frm])
 			return 1;
 	}
 	return 0;
@@ -1982,7 +1982,7 @@ double precjmps(SRTREC* psrec)
 	fPOINTATTR*		ploc;
 	BOOL			locdir;
 
-	frmcnts = (unsigned*)&oseq;
+	formFillCounter = (unsigned*)&oseq;
 	FillMemory(&oseq, (activePointIndex + 2) << 2, 0);
 	loc = psrec->loc;
 	locdir = psrec->dir;
@@ -1997,7 +1997,7 @@ double precjmps(SRTREC* psrec)
 		ploc = &stitchBuffer[loci];
 		for (ind = psrec->start; ind < psrec->finish; ind++)
 		{
-			if (precs[ind]->otyp == frmcnts[precs[ind]->frm])
+			if (precs[ind]->otyp == formFillCounter[precs[ind]->frm])
 			{
 				len = hypot(precs[ind]->spnt->x - ploc->x, precs[ind]->spnt->y - ploc->y);
 				if (len < minlen)
@@ -2017,7 +2017,7 @@ double precjmps(SRTREC* psrec)
 		}
 		if (minlen > 9 * PFGRAN)
 			totjmps++;
-		frmcnts[precs[loc]->frm]++;
+		formFillCounter[precs[loc]->frm]++;
 		if (chkMap(DUSRT))
 		{
 			if (locdir)

@@ -194,7 +194,6 @@ extern			TCHAR			thrName[_MAX_PATH];
 extern			int				textureIndex;
 extern			TXPNT			texturePointsBuffer[MAXSEQ];
 extern			RNGCNT*			textureSegments;
-extern			fPOINT*			uflt;
 extern			unsigned		underlayColor;
 extern			void*			undoBuffer[16];
 extern			unsigned		undoBufferWriteIndex;
