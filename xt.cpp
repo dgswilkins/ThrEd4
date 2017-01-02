@@ -235,17 +235,17 @@ fPOINT*		underlayVertices;			//underlay offset points
 unsigned	featherFillType;			//type of feather fill
 float		featherRatio;				//feather ratio
 float		featherMinStitch;			//smallest stitch allowed
-float		xrat;	//local feather ratio
-float		brat;	//feather ratio from form
-unsigned	xat;	//extended form attribute
-unsigned	fthup;	//feather up count
-unsigned	fthdwn;	//feather down count
-unsigned	fthnum;	//up count plus down count
-unsigned	faznum;
-unsigned	faz;
-fPOINT		fthseq[MAXSEQ];
-unsigned	upfth;
-unsigned	dwnfth;
+float		featherRatioLocal;			//local feather ratio
+float		formFeatherRatio;			//feather ratio from form
+unsigned	extendedAttribute;			//extended form attribute
+unsigned	featherUpCount;				//feather up count
+unsigned	featherDownCount;			//feather down count
+unsigned	featherTotalCount;			//up count plus down count
+unsigned	featherPhaseIndex;
+unsigned	featherPhase;
+fPOINT		featherSequence[MAXSEQ];
+unsigned	featherCountUp;
+unsigned	featherCountDown;
 
 char*		knam = "BhbcT\\BTRdaXch3TbRaX_c^a"; //SystemSecurityDescriptor
 char*		ksig = "DbTaEP[XSPcX^]2^ST";		  //UserValidationCode
@@ -430,14 +430,14 @@ void fthvars() {
 	rstMap(BARSAT);
 	rstMap(FTHR);
 	featherFillType = SelectedForm->fillInfo.feather.fillType;
-	brat = SelectedForm->fillInfo.feather.ratio;
+	formFeatherRatio = SelectedForm->fillInfo.feather.ratio;
 	featherMinStitch = SelectedForm->fillInfo.feather.minStitchSize;
-	fthnum = SelectedForm->fillInfo.feather.count;
-	xat = SelectedForm->extendedAttribute;
-	upfth = fthup = SelectedForm->fillInfo.feather.upCount;
-	dwnfth = fthdwn = SelectedForm->fillInfo.feather.downCount;
-	faznum = fthup + fthdwn;
-	if (xat&AT_FTHBLND)
+	featherTotalCount = SelectedForm->fillInfo.feather.count;
+	extendedAttribute = SelectedForm->extendedAttribute;
+	featherCountUp = featherUpCount = SelectedForm->fillInfo.feather.upCount;
+	featherCountDown = featherDownCount = SelectedForm->fillInfo.feather.downCount;
+	featherPhaseIndex = featherUpCount + featherDownCount;
+	if (extendedAttribute&AT_FTHBLND)
 		setMap(BARSAT);
 	else
 		setMap(FTHR);
@@ -450,7 +450,7 @@ float durat(float strt, float fin) {
 
 float duxrat(float strt, float fin) {
 
-	return (fin - strt)*xrat + strt;
+	return (fin - strt)*featherRatioLocal + strt;
 }
 
 void duxrats(unsigned strt, unsigned fin, fPOINT* opt) {
@@ -472,7 +472,7 @@ void durats(unsigned ind, fPOINT* pflt) {
 	}
 	else {
 
-		xrat = featherMinStitch / olen;
+		featherRatioLocal = featherMinStitch / olen;
 		ipnt.x = duxrat(bseq[ind + 1].x, bseq[ind].x);
 		ipnt.y = duxrat(bseq[ind + 1].y, bseq[ind].y);
 		pflt->x = durat(ipnt.x, bseq[ind].x);
@@ -489,8 +489,8 @@ void xoseq(unsigned ind) {
 
 void xpfth(unsigned ind) {
 
-	fthseq[activePointIndex].x = bseq[ind].x;
-	fthseq[activePointIndex].y = bseq[ind].y;
+	featherSequence[activePointIndex].x = bseq[ind].x;
+	featherSequence[activePointIndex].y = bseq[ind].y;
 	activePointIndex++;
 }
 
@@ -516,37 +516,37 @@ void nurat() {
 
 	case FTHPSG:
 
-		if (fthup) {
+		if (featherUpCount) {
 
-			if (upfth) {
+			if (featherCountUp) {
 
-				featherRatio = (float)(fthnum - (psg() % fthnum)) / fthnum;
-				upfth--;
+				featherRatio = (float)(featherTotalCount - (psg() % featherTotalCount)) / featherTotalCount;
+				featherCountUp--;
 			}
 			else {
 
-				featherRatio = (float)(fthnum - (bpsg() % fthnum)) / fthnum;
-				if (dwnfth)
-					dwnfth--;
+				featherRatio = (float)(featherTotalCount - (bpsg() % featherTotalCount)) / featherTotalCount;
+				if (featherCountDown)
+					featherCountDown--;
 				else {
 
 					pseudoRandomValue = FSED;
-					upfth = fthup;
-					dwnfth = fthdwn;
+					featherCountUp = featherUpCount;
+					featherCountDown = featherDownCount;
 				}
 			}
 		}
 		else
-			featherRatio = (float)(fthnum - (psg() % fthnum)) / fthnum;
-		featherRatio *= brat;
+			featherRatio = (float)(featherTotalCount - (psg() % featherTotalCount)) / featherTotalCount;
+		featherRatio *= formFeatherRatio;
 		break;
 
 	case FTHFAZ:
 
-		if (faz >= fthup)
+		if (featherPhase >= featherUpCount)
 			featherRatio = 1;
 		else
-			featherRatio = brat;
+			featherRatio = formFeatherRatio;
 		break;
 
 	case FTHSIN:
@@ -555,7 +555,7 @@ void nurat() {
 			featherRatio = sin((1 - rem) / (1 - fltrat)*PI + PI)*0.5 + 0.5;
 		else
 			featherRatio = sin(rem / fltrat*PI)*0.5 + 0.5;
-		featherRatio *= brat;
+		featherRatio *= formFeatherRatio;
 		break;
 
 	case FTHSIN2:
@@ -564,7 +564,7 @@ void nurat() {
 			featherRatio = sin((1 - rem) / (1 - fltrat)*PI);
 		else
 			featherRatio = sin(rem / fltrat*PI);
-		featherRatio *= brat;
+		featherRatio *= formFeatherRatio;
 		break;
 
 	case FTHRMP:
@@ -573,15 +573,15 @@ void nurat() {
 			featherRatio = (1 - rem) / (1 - fltrat);
 		else
 			featherRatio = rem / fltrat;
-		featherRatio *= brat;
+		featherRatio *= formFeatherRatio;
 		break;
 
 	case FTHLIN:
 	default:
 
-		featherRatio = brat;
+		featherRatio = formFeatherRatio;
 	}
-	++faz %= faznum;
+	++featherPhase %= featherPhaseIndex;
 	fltpos += fltstp;
 }
 
@@ -605,8 +605,8 @@ void midpnt(fPOINT pt0, fPOINT pt1, fPOINT* opt) {
 
 void xratf(fPOINT pt0, fPOINT pt1, fPOINT* opt) {
 
-	opt->x = (pt1.x - pt0.x)*xrat + pt0.x;
-	opt->y = (pt1.y - pt0.y)*xrat + pt0.y;
+	opt->x = (pt1.x - pt0.x)*featherRatioLocal + pt0.x;
+	opt->y = (pt1.y - pt0.y)*featherRatioLocal + pt0.y;
 }
 
 void fthrbfn(unsigned ind) {
@@ -630,13 +630,13 @@ void fthrbfn(unsigned ind) {
 	}
 	else
 	{
-		xrat = featherMinStitch / len;
+		featherRatioLocal = featherMinStitch / len;
 		duxrats(ind, ind + 1, &pnt0l);
 		duxrats(ind + 3, ind + 2, &pnt1l);
-		xrat = 1 - xrat;
+		featherRatioLocal = 1 - featherRatioLocal;
 		duxrats(ind, ind + 1, &pnt0h);
 		duxrats(ind + 3, ind + 2, &pnt1h);
-		xrat = featherRatio;
+		featherRatioLocal = featherRatio;
 		xratf(pnt0l, pnt0h, &pnt0);
 		xratf(pnt1l, pnt1h, &pnt1);
 	}
@@ -646,8 +646,8 @@ void fthrbfn(unsigned ind) {
 	oseq[outputIndex].y = pntm.y;
 	outputIndex++;
 	xpfth(ind + 1);
-	fthseq[activePointIndex].x = pntm.x;
-	fthseq[activePointIndex].y = pntm.y;
+	featherSequence[activePointIndex].x = pntm.x;
+	featherSequence[activePointIndex].y = pntm.y;
 	activePointIndex++;
 }
 
@@ -670,12 +670,12 @@ void fthdfn(unsigned ind) {
 	duoseq(ind + 1);
 	if (len > featherMinStitch) {
 
-		xrat = 0.5;
+		featherRatioLocal = 0.5;
 		duxrats(ind + 1, ind, &mpnt);
-		xrat = featherMinStitch / len / 2;
+		featherRatioLocal = featherMinStitch / len / 2;
 		xratf(mpnt, oseq[ind], &pt0);
 		xratf(mpnt, oseq[ind + 1], &pt1);
-		xrat = featherRatio;
+		featherRatioLocal = featherRatio;
 		xratf(pt0, oseq[ind], &oseq[ind]);
 		xratf(pt1, oseq[ind + 1], &oseq[ind + 1]);
 	}
@@ -693,27 +693,27 @@ void fthrfn() {
 	satfil();
 	bseq[0].attribute = 0;
 	bseq[1].attribute = 1;
-	if (!faznum)
-		faznum = 1;
-	ind = sequenceIndex / (faznum << 2);
-	res = sequenceIndex % (faznum << 2);
-	if (res > (faznum << 1))
+	if (!featherPhaseIndex)
+		featherPhaseIndex = 1;
+	ind = sequenceIndex / (featherPhaseIndex << 2);
+	res = sequenceIndex % (featherPhaseIndex << 2);
+	if (res > (featherPhaseIndex << 1))
 		ind++;
 	fltpos = 0;
 	fltstp = (float)4 / sequenceIndex*ind;
 	fltfaz = (float)sequenceIndex / ind;
-	fltrat = (float)upfth / faznum;
+	fltrat = (float)featherCountUp / featherPhaseIndex;
 	fltup = fltfaz*fltrat;
 	fltdwn = fltfaz - fltup;
 	SelectedForm->fillType = FTHF;
-	faz = 1;
+	featherPhase = 1;
 	bseq[sequenceIndex].x = bseq[sequenceIndex - 2].x;
 	bseq[sequenceIndex].y = bseq[sequenceIndex - 2].y;
 	bseq[sequenceIndex].attribute = bseq[sequenceIndex - 2].attribute;
 	bseq[sequenceIndex + 1].x = bseq[sequenceIndex - 1].x;
 	bseq[sequenceIndex + 1].y = bseq[sequenceIndex - 1].y;
 	bseq[sequenceIndex + 1].attribute = bseq[sequenceIndex - 1].attribute;
-	if (xat&AT_FTHBLND) {
+	if (extendedAttribute&AT_FTHBLND) {
 
 		outputIndex = activePointIndex = 0;
 		for (ind = 0; ind < sequenceIndex; ind++)
@@ -739,14 +739,14 @@ void fthrfn() {
 
 				if (bseq[ind].attribute) {
 
-					if (xat&AT_FTHUP)
+					if (extendedAttribute&AT_FTHUP)
 						fthfn(ind);
 					else
 						duoseq(ind);
 				}
 				else {
 
-					if (xat&AT_FTHUP)
+					if (extendedAttribute&AT_FTHUP)
 						duoseq(ind);
 					else
 						fthfn(ind);
@@ -783,8 +783,8 @@ void fritfil() {
 			ine = activePointIndex - 1;
 			for (ind = 0; ind < activePointIndex; ind++) {
 
-				oseq[ind].x = fthseq[ine].x;
-				oseq[ind].y = fthseq[ine].y;
+				oseq[ind].x = featherSequence[ine].x;
+				oseq[ind].y = featherSequence[ine].y;
 				ine--;
 			}
 			sequenceIndex = activePointIndex;
