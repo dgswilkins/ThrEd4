@@ -20,10 +20,7 @@
 #define IDS_HUP2                        17
 #define IDS_HUP3                        18
 #define IDS_HUP4                        19
-#define IDS_KEY                         20
 #define IDS_CLP                         21
-#define IDS_EXP                         22
-#define IDS_XPIRAD                      23
 #define IDS_CNTR                        24
 #define IDS_MAPLOD                      25
 #define IDS_FRMOVR                      26
