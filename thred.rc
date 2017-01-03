@@ -58,47 +58,46 @@ IDR_MENU1 MENU DISCARDABLE
 BEGIN
     POPUP "file"
     BEGIN
-        MENUITEM "New",                         ID_FILE_NEW1
-        MENUITEM "&Open (O)",                   ID_FILE_OPEN1
-        MENUITEM "Close",                       ID_CLOSE
-        MENUITEM "Thumbnails (T)",              ID_THUM
-        MENUITEM "Open PCS file",               ID_OPNPCD
-        MENUITEM "PES2Card (W+Cntrl)",          ID_PES2CRD
-        MENUITEM "Insert",                      ID_INSFIL
-        MENUITEM "Overlay",                     ID_OVRLAY
-        MENUITEM "Save (^S, F7)",               ID_FILE_SAVE2
-        MENUITEM "Save As (F8)",                ID_FILE_SAVE3
-        MENUITEM "Load Bitmap",                 ID_LODBIT
-        MENUITEM "Save Bitmap",                 ID_SAVMAP
-        MENUITEM "Hide Bitmap (Shift+X)",       ID_HIDBITF, CHECKED
-        MENUITEM "Remove Bitmap",               ID_DELMAP
+        MENUITEM "New",									ID_FILE_NEW1
+        MENUITEM "Open (O)",							ID_FILE_OPEN1
+        MENUITEM "Close",								ID_CLOSE
+        MENUITEM "Thumbnails (T)",						ID_THUM
+        MENUITEM "Open Auxiliary file",					ID_OPNPCD
+        MENUITEM "PES2Card (Ctrl+W)",					ID_PES2CRD
+        MENUITEM "Insert",								ID_INSFIL
+        MENUITEM "Overlay",								ID_OVRLAY
+        MENUITEM "Save (Ctrl+S, F7)",					ID_FILE_SAVE2
+        MENUITEM "Save As (F8)",						ID_FILE_SAVE3
+        MENUITEM "Load Bitmap",							ID_LODBIT
+        MENUITEM "Save Bitmap",							ID_SAVMAP
+        MENUITEM "Hide Bitmap (Shift+X)",				ID_HIDBITF, CHECKED
+        MENUITEM "Remove Bitmap",						ID_DELMAP
         POPUP "Delete Backups"
         BEGIN
-            MENUITEM "Backups for the selected file", ID_PURG
+            MENUITEM "Backups for the selected file",	ID_PURG
             MENUITEM "All backups in the selected directory", ID_PURGDIR
         END
-        MENUITEM "Locking",                     ID_FLOK
+        MENUITEM "Locking",								ID_FLOK
     END
     POPUP "view"
     BEGIN
-        MENUITEM "Movie (I)",                   ID_RUNPAT
+        MENUITEM "Movie (I)",				            ID_RUNPAT
         POPUP "Set"
         BEGIN
-            MENUITEM "Applique Color",              ID_SETAP
-            MENUITEM "Background Color",            ID_VIEW_STCHBAK
-            MENUITEM "Bit Map Color",               ID_BITCOL
-            MENUITEM "Clipboard Fill  Spacing",     ID_CLPSPAC
+            MENUITEM "Applique Color",					ID_SETAP
+            MENUITEM "Background Color",				ID_VIEW_STCHBAK
+            MENUITEM "Bitmap Color",					ID_BITCOL
+            MENUITEM "Clipboard Fill Spacing",			ID_CLPSPAC
             POPUP "Data Check"
             BEGIN
                 MENUITEM "Off",                         ID_CHKOF, CHECKED
                 MENUITEM "On",                          ID_CHKON, CHECKED
                 MENUITEM "Auto Repair",                 ID_CHKREP, CHECKED
-                MENUITEM "Auto Repair with Message",    ID_CHKREPMSG
-                , CHECKED
+                MENUITEM "Auto Repair with Message",    ID_CHKREPMSG, CHECKED
                 MENUITEM "",                            ID_VIEW_SET_DATACHECK
 
             END
-            MENUITEM "Default Preferences",         ID_SETPREF
+            MENUITEM "Default Preferences",				ID_SETPREF
             POPUP "Fill at Select"
             BEGIN
                 MENUITEM "On",                          ID_FIL2SEL_ON
@@ -125,7 +124,7 @@ BEGIN
             END
             POPUP "Machine File Type"
             BEGIN
-                MENUITEM "Pfaff PCS ",                  ID_AUXPCS
+                MENUITEM "Pfaff PCS",					ID_AUXPCS
                 MENUITEM "Tajima DST",                  ID_AUXDST
             END
             POPUP "Needle Cursor"
@@ -133,7 +132,7 @@ BEGIN
                 MENUITEM "On",                          ID_SETNEDL
                 MENUITEM "Off",                         ID_RSTNEDL
             END
-            MENUITEM "Nudge Pixels",                ID_NUDGPIX
+            MENUITEM "Nudge Pixels",					ID_NUDGPIX
             POPUP "PCS Bitmap Save"
             BEGIN
                 MENUITEM "On",                          ID_BSAVON
@@ -162,258 +161,257 @@ BEGIN
                 MENUITEM "Spacing",                     ID_USPAC
                 MENUITEM "Stitch Length",               ID_USTCH
             END
-            MENUITEM "Warn if edited",              ID_WARNOF, CHECKED
+            MENUITEM "Warn if Edited",					ID_WARNOF, CHECKED
         END
-        MENUITEM "Backups",                     ID_VUBAK
-        MENUITEM "Zoom Full (X)",               VU_ZUMFUL
+        MENUITEM "Backups",								ID_VUBAK
+        MENUITEM "Zoom Full (X)",						VU_ZUMFUL
         POPUP "Thread Size"
         BEGIN
-            MENUITEM "30",                          ID_SIZ30
-            MENUITEM "40",                          ID_SIZ40
-            MENUITEM "60",                          ID_SIZ60
-            MENUITEM "Set Defaults",                ID_TSIZDEF
+            MENUITEM "30",								ID_SIZ30
+            MENUITEM "40",								ID_SIZ40
+            MENUITEM "60",								ID_SIZ60
+            MENUITEM "Set Defaults",					ID_TSIZDEF
         END
-        MENUITEM "Show Threads (F6)",           ID_VUTHRDS
-        MENUITEM "Show Threds for Selected Color", ID_VUSELTHRDS
-        MENUITEM "Design Information (')",      ID_DESIZ
+        MENUITEM "Show Threads (F6)",					ID_VUTHRDS
+        MENUITEM "Show Threads for Selected Color",		ID_VUSELTHRDS
+        MENUITEM "Design Information (')",				ID_DESIZ
         POPUP "Knots"
         BEGIN
-            MENUITEM "On",                          ID_KNOTON
-            MENUITEM "Off",                         ID_KNOTOF
+            MENUITEM "On",								ID_KNOTON
+            MENUITEM "Off",								ID_KNOTOF
         END
-        MENUITEM "Retrive Mark (B+Shift)",      ID_BAKMRK
-        MENUITEM "About Thred",                 ID_ABOUT
+        MENUITEM "Retrieve Mark (Shift+B)",				ID_BAKMRK
+        MENUITEM "About ThrEd4",						ID_ABOUT
     END
-    MENUITEM "form",                        ID_FORM
+    MENUITEM "form",									ID_FORM
     POPUP "edit"
     BEGIN
         POPUP "Center"
         BEGIN
-            MENUITEM "Horizontal (- +Shift)",       ID_CNTRH
-            MENUITEM "Vertical (- +Control)",       ID_CNTRV
-            MENUITEM "Both (-)",                    ID_CNTRX
-            MENUITEM "Entire Design",               ID_CENTIRE
-            MENUITEM "Forms (L)",                   ID_CNTR
+			MENUITEM "Both (-)",						ID_CNTRX
+			MENUITEM "Horizontal (Shift+-)",			ID_CNTRH
+            MENUITEM "Vertical (Ctrl+-)",				ID_CNTRV
+            MENUITEM "Entire Design",					ID_CENTIRE
+            MENUITEM "Forms (L)",						ID_CNTR
         END
-        MENUITEM "Check Range",                 ID_CHK
+        MENUITEM "Check Range",							ID_CHK
         POPUP "Convert"
         BEGIN
-            MENUITEM "to Feather Ribbon (F+shift)", ID_2FTHR
-            MENUITEM "to Satin Ribbon (C+shift)",   ID_RIBON
-            MENUITEM "to Bean",                     ID_DUBEAN
-            MENUITEM "from Bean to Line",           ID_UNBEAN
-            MENUITEM "Stitches to Form",            ID_STCHS2FRM
+            MENUITEM "to Feather Ribbon (Shift+F)",		ID_2FTHR
+            MENUITEM "to Satin Ribbon (Shift+C)",		ID_RIBON
+            MENUITEM "to Bean",							ID_DUBEAN
+            MENUITEM "from Bean to Line",				ID_UNBEAN
+            MENUITEM "Stitches to Form",				ID_STCHS2FRM
         END
         POPUP "Copy to Layer"
         BEGIN
-            MENUITEM "0",                           ID_LAYCPY0
-            MENUITEM "1",                           ID_LAYCPY1
-            MENUITEM "2",                           ID_LAYCPY2
-            MENUITEM "3",                           ID_LAYCPY3
-            MENUITEM "4",                           ID_LAYCPY4
+            MENUITEM "0",								ID_LAYCPY0
+            MENUITEM "1",								ID_LAYCPY1
+            MENUITEM "2",								ID_LAYCPY2
+            MENUITEM "3",								ID_LAYCPY3
+            MENUITEM "4",								ID_LAYCPY4
         END
-        MENUITEM "Crop to Form (W+Shift)",      ID_CROP
+        MENUITEM "Crop to Form (Shift+W)",				ID_CROP
         POPUP "Delete"
         BEGIN
-            MENUITEM "All Forms",                   ID_DELFRMS
-            MENUITEM "All Forms and Stitches (Delete+Cntrl+Shift)", 
-                                                    ID_DELTOT
-            MENUITEM "All Stitches (L+shift)",      ID_DELSTCH
-            MENUITEM "Free Stitches",               ID_DELFRE
-            MENUITEM "Knots",                       ID_DELKNOT
-            MENUITEM "Large Stitches (F11+shift)",  ID_REMBIG
-            MENUITEM "Select (delete)",             ID_DELETE
-            MENUITEM "Small Stitches (F11)",        ID_REMZERO
+            MENUITEM "All Forms",						ID_DELFRMS
+            MENUITEM "All Forms and Stitches (Ctrl+Shift+Delete)", 
+														ID_DELTOT
+            MENUITEM "All Stitches (Shift+L)",			ID_DELSTCH
+            MENUITEM "Free Stitches",					ID_DELFRE
+            MENUITEM "Knots",							ID_DELKNOT
+            MENUITEM "Large Stitches (Shift+F11)",		ID_REMBIG
+            MENUITEM "Selected (Delete)",				ID_DELETE
+            MENUITEM "Small Stitches (F11)",			ID_REMZERO
         END
         POPUP "Flip"
         BEGIN
-            MENUITEM "Horizontal",                  ID_FLIPH
-            MENUITEM "Vertical",                    ID_FLIPV
-            MENUITEM "Order",                       ID_FLPORD
+            MENUITEM "Horizontal",						ID_FLIPH
+            MENUITEM "Vertical",						ID_FLIPV
+            MENUITEM "Order",							ID_FLPORD
         END
-        POPUP "&Form Update"
+        POPUP "Form Update"
         BEGIN
-            POPUP "&Border"
+            POPUP "Border"
             BEGIN
-                MENUITEM "&Color",                      ID_SETBCOL
-                MENUITEM "&Maximum Stitch Length",      ID_MAXBLEN
-                MENUITEM "m&Inimum Stitch Length",      ID_MINBLEN
-                MENUITEM "&Stitch Length",              ID_SETBLEN
-                MENUITEM "s&Pacing",                    ID_SETBSPAC
+                MENUITEM "Color",						ID_SETBCOL
+                MENUITEM "Maximum Stitch Length",		ID_MAXBLEN
+                MENUITEM "Minimum Stitch Length",		ID_MINBLEN
+                MENUITEM "Stitch Length",				ID_SETBLEN
+                MENUITEM "Spacing",						ID_SETBSPAC
             END
-            POPUP "&Center Walk"
+            POPUP "Center Walk"
             BEGIN
-                MENUITEM "&On",                         ID_SETCWLK
-                MENUITEM "o&Ff",                        ID_NOTCWLK
+                MENUITEM "On",							ID_SETCWLK
+                MENUITEM "Off",							ID_NOTCWLK
             END
-            POPUP "&Edge Walk"
+            POPUP "Edge walk"
             BEGIN
-                MENUITEM "&On",                         ID_SETWLK
-                MENUITEM "o&Ff",                        ID_NOTWLK
+                MENUITEM "On",							ID_SETWLK
+                MENUITEM "Off",							ID_NOTWLK
             END
-            POPUP "&Fill"
+            POPUP "Fill"
             BEGIN
-                MENUITEM "&Ang",                        ID_SETFANG
-                MENUITEM "&Color",                      ID_SETFCOL
-                MENUITEM "&Maximum Stitch Length",      ID_MAXFLEN
-                MENUITEM "m&Inimum Stitch Length",      ID_MINFLEN
-                MENUITEM "&Stitch Length",              ID_SETFLEN
-                MENUITEM "s&Pacing",                    ID_SETFSPAC
+                MENUITEM "Angle",						ID_SETFANG
+                MENUITEM "Color",						ID_SETFCOL
+                MENUITEM "Maximum Stitch Length",		ID_MAXFLEN
+                MENUITEM "Minimum Stitch Length",		ID_MINFLEN
+                MENUITEM "Stitch length",				ID_SETFLEN
+                MENUITEM "Spacing",						ID_SETFSPAC
             END
-            MENUITEM "&Height",                     ID_FRMHI
-            MENUITEM "&Indent",                     ID_FRMIND
-            POPUP "&Underlay"
+            MENUITEM "Height",							ID_FRMHI
+			MENUITEM "Indent",							ID_FRMIND
+            POPUP "Underlay"
             BEGIN
-                MENUITEM "&On",                         ID_SETUND
-                MENUITEM "o&Ff",                        ID_NOTUND
-                MENUITEM "&Angle",                      ID_SETUANG
-                MENUITEM "&Color",                      ID_SETUCOL
-                MENUITEM "&Spacing",                    ID_SETUSPAC
-            END
-            MENUITEM "under &Stitch length",        ID_UNDLEN
-            MENUITEM "&Width",                      ID_FRMWID
-        END
+                MENUITEM "On",							ID_SETUND
+                MENUITEM "Off",							ID_NOTUND
+                MENUITEM "Angle",						ID_SETUANG
+                MENUITEM "Color",						ID_SETUCOL
+                MENUITEM "Spacing",						ID_SETUSPAC
+				MENUITEM "Stitch Length",				ID_UNDLEN
+			END
+			MENUITEM "Width",							ID_FRMWID
+		END
         POPUP "Move"
         BEGIN
-            MENUITEM "to Start",                    ID_MV2FRNT
-            MENUITEM "to Mark (;)",                 ID_MOVMRK
-            MENUITEM "to End",                      ID_MV2BAK
+            MENUITEM "to Start",						ID_MV2FRNT
+            MENUITEM "to Mark (;)",						ID_MOVMRK
+            MENUITEM "to End",							ID_MV2BAK
         END
         POPUP "Move to Layer"
         BEGIN
-            MENUITEM "0",                           ID_LAYMOV0
-            MENUITEM "1",                           ID_LAYMOV1
-            MENUITEM "2",                           ID_LAYMOV2
-            MENUITEM "3",                           ID_LAYMOV3
-            MENUITEM "4",                           ID_LAYMOV4
+            MENUITEM "0",								ID_LAYMOV0
+            MENUITEM "1",								ID_LAYMOV1
+            MENUITEM "2",								ID_LAYMOV2
+            MENUITEM "3",								ID_LAYMOV3
+            MENUITEM "4",								ID_LAYMOV4
         END
-        MENUITEM "Refill All (J)",              ID_REFILAL
-        MENUITEM "Repair Data",                 ID_REPAIR
-        MENUITEM "Reset Colors",                ID_EDIT_RESET_COL
-        MENUITEM "Retrace",                     ID_RETRACE
-        MENUITEM "Retreive Clipboard Stitches (F4)", ID_RTRVCLP
+        MENUITEM "Refill All (J)",						ID_REFILAL
+        MENUITEM "Repair Data",							ID_REPAIR
+        MENUITEM "Reset Colors",						ID_EDIT_RESET_COL
+        MENUITEM "Retrace",								ID_RETRACE
+        MENUITEM "Retrieve Clipboard Stitches (F4)",	ID_RTRVCLP
         POPUP "Rotate"
         BEGIN
-            MENUITEM "Again",                       ID_ROTAGAIN
-            MENUITEM "and Duplicate",               ID_ROTDUP
-            MENUITEM "and Duplicate  Again",        ID_DUPAGAIN
-            MENUITEM "Command",                     ID_ROTCMD
+            MENUITEM "Again",							ID_ROTAGAIN
+            MENUITEM "and Duplicate",					ID_ROTDUP
+            MENUITEM "and Duplicate again",				ID_DUPAGAIN
+            MENUITEM "Command",							ID_ROTCMD
         END
         POPUP "Select"
         BEGIN
-            MENUITEM "All Forms",                   ID_ALFRM
-            MENUITEM "All Forms and Stitches (A+Shift)", ID_SELAL
-            MENUITEM "All Stitches A+Cntrl",        ID_SELALSTCH
-            MENUITEM "Color",                       ID_EDIT_SELECTCOLOR
-            MENUITEM "Form Applique Stitches",      ID_SELAP
-            MENUITEM "Form Border Stitches",        ID_SELBRD
-            MENUITEM "Form Edge Walk Stitches",     ID_SELWLK
-            MENUITEM "Form Fill Stitches",          ID_SELFIL
-            MENUITEM "Form Stitches",               ID_SELFSTCHS
-            MENUITEM "Form Underlay Stitches",      ID_SELUND
+            MENUITEM "All Forms",						ID_ALFRM
+            MENUITEM "All Forms and Stitches (Shift+A)",ID_SELAL
+            MENUITEM "All Stitches (Ctrl+A)",			ID_SELALSTCH
+            MENUITEM "Color",							ID_EDIT_SELECTCOLOR
+            MENUITEM "Form Applique Stitches",			ID_SELAP
+            MENUITEM "Form Border Stitches",			ID_SELBRD
+            MENUITEM "Form Edge Walk Stitches",			ID_SELWLK
+            MENUITEM "Form Fill Stitches",				ID_SELFIL
+            MENUITEM "Form Stitches",					ID_SELFSTCHS
+            MENUITEM "Form Underlay Stitches",			ID_SELUND
         END
         POPUP "Set"
         BEGIN
-            MENUITEM "Designer Name",               ID_DESNAM
-            MENUITEM "Design Size",                 ID_SETSIZ
-            MENUITEM "Feather Defaults",            ID_FTHDEF
-            MENUITEM "Fill Start Point (<)",        ID_FILSTRT
-            MENUITEM "Fill End Point (>)",          ID_FILEND
-            MENUITEM "Form Number (/)",             ID_FRMNUM
-            MENUITEM "Form Color to  Stich Color",  ID_FRM2COL
-            MENUITEM "Form Zero Point",             ID_FRM0
-            MENUITEM "Knots",                       ID_KNOTS
-            MENUITEM "Knot at Selected Stitch (K+Cntrl)", ID_KNOTAT
-            MENUITEM "Order Mark (.)",              ID_SETMRK
-            MENUITEM "Range Ends for Clip Board Fills", ID_CLPADJ
+            MENUITEM "Designer Name",					ID_DESNAM
+            MENUITEM "Design Size",						ID_SETSIZ
+            MENUITEM "Feather Defaults",				ID_FTHDEF
+            MENUITEM "Fill Start Point (<)",			ID_FILSTRT
+            MENUITEM "Fill End Point (>)",			    ID_FILEND
+            MENUITEM "Form Number (/)",					ID_FRMNUM
+            MENUITEM "Form Color to  Stich Color",		ID_FRM2COL
+            MENUITEM "Form Zero Point",					ID_FRM0
+            MENUITEM "Knots",							ID_KNOTS
+            MENUITEM "Knot at Selected Stitch (Ctrl+K)",ID_KNOTAT
+            MENUITEM "Order Mark (.)",					ID_SETMRK
+            MENUITEM "Range Ends for Clipboard Fills",	ID_CLPADJ
             POPUP "Rotation"
             BEGIN
-                MENUITEM "Angle (R+Cntrl)",             ID_SETROT
-                MENUITEM "Angle from Mark (R+Shift)",   ID_ROTMRK
+                MENUITEM "Angle (Ctrl+R)",				ID_SETROT
+                MENUITEM "Angle from Mark (Shift+R)",   ID_ROTMRK
                 MENUITEM "Segments (R)",                ID_ROTSEG
             END
-            MENUITEM "Selected",                    65535
-            MENUITEM "Zoom Mark at Center (M+Shift)", ID_MRKCNTR
-            MENUITEM "Zoom Mark at Selected Point (M+Cntrl)", ID_MRKPNT
+            MENUITEM "Selected",						65535
+            MENUITEM "Zoom Mark at Center (Shift+M)",	ID_MRKCNTR
+            MENUITEM "Zoom Mark at Selected Point (Ctrl+M)", ID_MRKPNT
         END
-        MENUITEM "Shrink Clipboard Border",     ID_SHRINK
+        MENUITEM "Shrink Clipboard Border",				ID_SHRINK
         POPUP "Snap"
         BEGIN
-            MENUITEM "Together [F2]",               ID_SNAP2
-            MENUITEM "to Grid [S+shift]",           ID_SNAP2GRD
+            MENUITEM "Together (F2)",					ID_SNAP2
+            MENUITEM "to Grid (Shift+S)",				ID_SNAP2GRD
         END
         POPUP "Sort"
         BEGIN
-            MENUITEM "Auto (F3)",                   ID_SORT
-            MENUITEM "by Color then Form (F3+Shift)", ID_SRTBF
-            MENUITEM "by Form (F3+Cntrl)",          ID_SRTF
+            MENUITEM "Auto (F3)",						ID_SORT
+            MENUITEM "by Color then Form (Shift+F3)",	ID_SRTBF
+            MENUITEM "by Form (Ctrl+F3)",				ID_SRTF
         END
-        MENUITEM "Split Form",                  ID_SPLTFRM
+        MENUITEM "Split Form",							ID_SPLTFRM
         POPUP "Trace"
         BEGIN
-            MENUITEM "Find Edges (U+control)",      ID_TRDIF
-            MENUITEM "Hide Bitmap (X+shift)",       ID_HIDBIT, CHECKED
-            MENUITEM "Reset Form Pixels (H)",       ID_BLAK
-            MENUITEM "Select Colors (H+control)",   ID_TRCSEL
-            MENUITEM "Trace Mode (T+Control)",      ID_TRACE
-            MENUITEM "Show Traced Edges (right or left click)", ID_TRACEDG
+            MENUITEM "Find Edges (Ctrl+U)",				ID_TRDIF
+            MENUITEM "Hide Bitmap (Shift+X)",			ID_HIDBIT, CHECKED
+            MENUITEM "Reset Form Pixels (H)",			ID_BLAK
+            MENUITEM "Select Colors (Ctrl+H)",			ID_TRCSEL
+            MENUITEM "Trace Mode (Ctrl+T)",				ID_TRACE
+            MENUITEM "Show Traced Edges (mouse click)", ID_TRACEDG
         END
         POPUP "Ungroup"
         BEGIN
-            MENUITEM "First{[)",                    ID_UNGRPLO
-            MENUITEM "Last (])",                    ID_UNGRPHI
+            MENUITEM "First ([)",						ID_UNGRPLO
+            MENUITEM "Last (])",						ID_UNGRPHI
         END
     END
-    MENUITEM "in",                          ZUMIN
-    MENUITEM "out",                         ID_ZUMOUT
-    MENUITEM "undo",                        ID_BACK, GRAYED
-    MENUITEM "redo",                        ID_REDO, GRAYED
-    MENUITEM "rot",                         ID_ROT
-    MENUITEM "pref",                        ID_PREF
+    MENUITEM "in",										ZUMIN
+    MENUITEM "out",										ID_ZUMOUT
+    MENUITEM "undo",									ID_BACK, GRAYED
+    MENUITEM "redo",									ID_REDO, GRAYED
+    MENUITEM "rot",										ID_ROT
+    MENUITEM "pref",									ID_PREF
     POPUP "fill"
     BEGIN
-        MENUITEM "Fan",                         ID_FILSAT
-        MENUITEM "Feather",                     ID_FETHR
-        MENUITEM "Vertical",                    ID_FILL_VERT
-        MENUITEM "Horizontal",                  ID_FILL_HOR
-        MENUITEM "Angle",                       ID_FILANG
+        MENUITEM "Fan",									ID_FILSAT
+        MENUITEM "Feather",								ID_FETHR
+        MENUITEM "Vertical",							ID_FILL_VERT
+        MENUITEM "Horizontal",							ID_FILL_HOR
+        MENUITEM "Angle",								ID_FILANG
         POPUP "Clipboard"
         BEGIN
-            MENUITEM "Fan",                         ID_CLPFIL
-            MENUITEM "Vertical",                    ID_VRTCLP
-            MENUITEM "Horizontal",                  ID_HORCLP
-            MENUITEM "Angle",                       ID_ANGCLP
+            MENUITEM "Fan",								ID_CLPFIL
+            MENUITEM "Vertical",						ID_VRTCLP
+            MENUITEM "Horizontal",						ID_HORCLP
+            MENUITEM "Angle",							ID_ANGCLP
         END
-        MENUITEM "Contour",                     ID_CONTF
-        MENUITEM "Texture Editor",              ID_TXFIL
+        MENUITEM "Contour",								ID_CONTF
+        MENUITEM "Texture Editor",						ID_TXFIL
         POPUP "Border"
         BEGIN
-            MENUITEM "Line",                        ID_FILIN
-            MENUITEM "Bean",                        ID_BOLD
-            MENUITEM "Angle Satin",                 ID_SATBRD
-            MENUITEM "Perpendicular Satin",         ID_PERP
-            MENUITEM "Applique",                    ID_APLIQ
-            MENUITEM "BH",                          ID_FILBUT
-            MENUITEM "Clipboard",                   ID_FILCLP
-            MENUITEM "Clipboard, Even",             ID_FILCLPX
-            MENUITEM "Picot",                       ID_PICOT
-            MENUITEM "Double",                      ID_DUBFIL
-            MENUITEM "Line chain",                  ID_LINCHN
-            MENUITEM "Open chain",                  ID_OPNCHN
+            MENUITEM "Line",							ID_FILIN
+            MENUITEM "Bean",							ID_BOLD
+            MENUITEM "Angle Satin",						ID_SATBRD
+            MENUITEM "Perpendicular Satin",				ID_PERP
+            MENUITEM "Applique",						ID_APLIQ
+            MENUITEM "Buttonhole",						ID_FILBUT
+            MENUITEM "Clipboard",						ID_FILCLP
+            MENUITEM "Clipboard, Even",					ID_FILCLPX
+            MENUITEM "Picot",							ID_PICOT
+            MENUITEM "Double",							ID_DUBFIL
+            MENUITEM "Line chain",						ID_LINCHN
+            MENUITEM "Open chain",						ID_OPNCHN
         END
-        MENUITEM "Unfill",                      ID_UNFIL
-        MENUITEM "Refil (F5)",                  ID_REFILF
+        MENUITEM "Unfill",								ID_UNFIL
+        MENUITEM "Refill (F5)",							ID_REFILF
     END
-    MENUITEM "add",                         ID_ADEND
-    MENUITEM "frm+",                        ID_FRMOF
-    MENUITEM "all",                         ID_LA
-    MENUITEM "1",                           ID_L1
-    MENUITEM "2",                           ID_L2
-    MENUITEM "3",                           ID_L3
-    MENUITEM "4",                           ID_L4
-    MENUITEM "help",                        ID_HLP
+    MENUITEM "add",										ID_ADEND
+    MENUITEM "frm+",									ID_FRMOF
+    MENUITEM "all",										ID_LA
+    MENUITEM "1",										ID_L1
+    MENUITEM "2",										ID_L2
+    MENUITEM "3",										ID_L3
+    MENUITEM "4",										ID_L4
+    MENUITEM "help",									ID_HLP
 END
-
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
@@ -440,15 +438,15 @@ BEGIN
         BEGIN
             VALUE "Comments", "\0"
             VALUE "CompanyName", "Thredworks\0"
-            VALUE "FileDescription", "Thred\0"
-            VALUE "FileVersion", "3.092\0"
+            VALUE "FileDescription", "ThrEd\0"
+            VALUE "FileVersion", "4.000\0"
             VALUE "InternalName", "Thred\0"
             VALUE "LegalCopyright", "Copyright © 1999, 2000, 2001,2002,2003\0"
             VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "Thred3.exe\0"
+            VALUE "OriginalFilename", "ThrEd4.exe\0"
             VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "Thred\0"
-            VALUE "ProductVersion", "3.092\0"
+            VALUE "ProductName", "ThrEd\0"
+            VALUE "ProductVersion", "4.000\0"
             VALUE "SpecialBuild", "\0"
         END
     END

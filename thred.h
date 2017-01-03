@@ -1199,41 +1199,41 @@ typedef struct _smalpntl {
 }SMALPNTL;
 
 typedef struct _pcstch {
-	unsigned char	fx;
-	short			x;
+	unsigned char	fx;		// fractional part of x coord or color if tag = 3
+	short			x;		// integer part of x coord
 	unsigned char	nx;
-	unsigned char	fy;
-	short			y;
+	unsigned char	fy;		// fractional part of y coord
+	short			y;		// integer part of y coord
 	unsigned char	ny;
-	unsigned char	typ;
+	unsigned char	tag;
 }PCSTCH;
 
 typedef struct _clpstch {
-	unsigned short	led;
-	unsigned char	fx;
-	unsigned short	x;
-	unsigned char	spcx;
-	unsigned char	fy;
-	unsigned short	y;
-	unsigned char	spcy;
-	unsigned char	myst;
-	unsigned char	typ;
+	unsigned short	led;	// ????
+	unsigned char	fx;		// fractional part of x coord
+	unsigned short	x;		// integer part of x coord
+	unsigned char	spcx;	// ToDo - Is this structure member needed?
+	unsigned char	fy;		// fractional part of y coord
+	unsigned short	y;		// integer part of y coord
+	unsigned char	spcy;	// ToDo - Is this structure member needed?
+	unsigned char	myst;	// ToDo - Is this structure member needed?
+	unsigned char	tag;	// ToDo - Is this structure member needed?
 }CLPSTCH;
 
 typedef struct _bakhed {
-	unsigned	fcnt;
-	FRMHED*		frmp;
-	unsigned	scnt;
-	fPOINTATTR*	stch;
-	unsigned	fltcnt;
-	fPOINT*		flt;
-	unsigned	sacnt;
-	SATCON*		sac;
-	unsigned	nclp;
-	fPOINT*		clipData;
-	COLORREF*	cols;
-	TXPNT*		txp;
-	unsigned	ntx;
+	unsigned	formCount;
+	FRMHED*		forms;
+	unsigned	stitchCount;
+	fPOINTATTR*	stitches;
+	unsigned	formPointCount;
+	fPOINT*		formPoints;
+	unsigned	satinConnectionCount;
+	SATCON*		satinConnection;
+	unsigned	clipPointCount;
+	fPOINT*		clipPoints;
+	COLORREF*	colors;
+	TXPNT*		texturePoints;
+	unsigned	texturePointCount;
 	POINT		zoomRect;
 }BAKHED;
 
@@ -1250,7 +1250,7 @@ typedef struct _range {
 typedef struct _region {	//region for sequencing vertical fills
 	unsigned start;		//start line of region
 	unsigned end;		//end line of region
-	unsigned brk;
+	unsigned brk;		// ToDo - is this member needed?
 	unsigned cntbrk;
 }REGION;
 

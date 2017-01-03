@@ -2592,37 +2592,37 @@ void dudat() {
 
 		bdat->zoomRect.x = unzoomedRect.x;
 		bdat->zoomRect.y = unzoomedRect.y;
-		bdat->fcnt = formIndex;
-		bdat->frmp = (FRMHED*)&bdat[1];
+		bdat->formCount = formIndex;
+		bdat->forms = (FRMHED*)&bdat[1];
 		//		for(ind=0;ind<formIndex;ind++)
-		//			frmcpy(&bdat->frmp[ind],&formList[ind]);
-		MoveMemory(bdat->frmp, &formList, sizeof(FRMHED)*formIndex);
-		bdat->scnt = header.stitchCount;
-		bdat->stch = (fPOINTATTR*)&bdat->frmp[formIndex];
+		//			frmcpy(&bdat->forms[ind],&formList[ind]);
+		MoveMemory(bdat->forms, &formList, sizeof(FRMHED)*formIndex);
+		bdat->stitchCount = header.stitchCount;
+		bdat->stitches = (fPOINTATTR*)&bdat->forms[formIndex];
 		if (header.stitchCount)
-			stchcpy((sizeof(fPOINTATTR)*header.stitchCount) >> 2, bdat->stch);
-		bdat->fltcnt = formPointIndex;
-		bdat->flt = (fPOINT*)&bdat->stch[header.stitchCount];
+			stchcpy((sizeof(fPOINTATTR)*header.stitchCount) >> 2, bdat->stitches);
+		bdat->formPointCount = formPointIndex;
+		bdat->formPoints = (fPOINT*)&bdat->stitches[header.stitchCount];
 		if (formPointIndex)
-			mvflpnt(bdat->flt, &formPoints[0], formPointIndex);
-		bdat->sacnt = satinConnectIndex;
-		bdat->sac = (SATCON*)&bdat->flt[formPointIndex];
+			mvflpnt(bdat->formPoints, &formPoints[0], formPointIndex);
+		bdat->satinConnectionCount = satinConnectIndex;
+		bdat->satinConnection = (SATCON*)&bdat->formPoints[formPointIndex];
 		if (satinConnectIndex)
-			mvsatk(bdat->sac, &satinConns[0], satinConnectIndex);
-		bdat->nclp = clipPointIndex;
-		bdat->clipData = (fPOINT*)&bdat->sac[satinConnectIndex];
+			mvsatk(bdat->satinConnection, &satinConns[0], satinConnectIndex);
+		bdat->clipPointCount = clipPointIndex;
+		bdat->clipPoints = (fPOINT*)&bdat->satinConnection[satinConnectIndex];
 		if (clipPointIndex) {
 
 			if (clipPointIndex > MAXCLPNTS)
 				clipPointIndex = MAXCLPNTS;
-			mvflpnt(bdat->clipData, &clipPoints[0], clipPointIndex);
+			mvflpnt(bdat->clipPoints, &clipPoints[0], clipPointIndex);
 		}
-		bdat->cols = (COLORREF*)&bdat->clipData[clipPointIndex];
-		MoveMemory(bdat->cols, &userColor, sizeof(COLORREF) * 16);
-		bdat->txp = (TXPNT*)&bdat->cols[16];
-		bdat->ntx = textureIndex;
+		bdat->colors = (COLORREF*)&bdat->clipPoints[clipPointIndex];
+		MoveMemory(bdat->colors, &userColor, sizeof(COLORREF) * 16);
+		bdat->texturePoints = (TXPNT*)&bdat->colors[16];
+		bdat->texturePointCount = textureIndex;
 		if (textureIndex)
-			MoveMemory(bdat->txp, &texturePointsBuffer, sizeof(TXPNT)*textureIndex);
+			MoveMemory(bdat->texturePoints, &texturePointsBuffer, sizeof(TXPNT)*textureIndex);
 	}
 }
 
@@ -4849,25 +4849,25 @@ void redbak() {
 	unsigned	ind;
 
 	bdat = (BAKHED*)undoBuffer[undoBufferWriteIndex];
-	header.stitchCount = bdat->scnt;
+	header.stitchCount = bdat->stitchCount;
 	if (header.stitchCount)
-		stchred((sizeof(fPOINTATTR)*header.stitchCount) >> 2, bdat->stch);
+		stchred((sizeof(fPOINTATTR)*header.stitchCount) >> 2, bdat->stitches);
 	unzoomedRect.x = bdat->zoomRect.x;
 	unzoomedRect.y = bdat->zoomRect.y;
-	formIndex = bdat->fcnt;
+	formIndex = bdat->formCount;
 	//	for(ind=0;ind<formIndex;ind++)
-	//		frmcpy(&formList[ind],&bdat->frmp[ind]);
-	MoveMemory(&formList, bdat->frmp, sizeof(FRMHED)*formIndex);
-	formPointIndex = bdat->fltcnt;
+	//		frmcpy(&formList[ind],&bdat->forms[ind]);
+	MoveMemory(&formList, bdat->forms, sizeof(FRMHED)*formIndex);
+	formPointIndex = bdat->formPointCount;
 	if (formPointIndex)
-		mvflpnt(&formPoints[0], &bdat->flt[0], formPointIndex);
-	satinConnectIndex = bdat->sacnt;
+		mvflpnt(&formPoints[0], &bdat->formPoints[0], formPointIndex);
+	satinConnectIndex = bdat->satinConnectionCount;
 	if (satinConnectIndex)
-		mvsatk(&satinConns[0], &bdat->sac[0], satinConnectIndex);
-	clipPointIndex = bdat->nclp;
+		mvsatk(&satinConns[0], &bdat->satinConnection[0], satinConnectIndex);
+	clipPointIndex = bdat->clipPointCount;
 	if (clipPointIndex)
-		mvflpnt(&clipPoints[0], &bdat->clipData[0], clipPointIndex);
-	MoveMemory(&userColor, bdat->cols, sizeof(COLORREF) * 16);
+		mvflpnt(&clipPoints[0], &bdat->clipPoints[0], clipPointIndex);
+	MoveMemory(&userColor, bdat->colors, sizeof(COLORREF) * 16);
 	for (ind = 0; ind < 16; ind++) {
 
 		userPen[ind] = nuPen(userPen[ind], 1, userColor[ind]);
@@ -4875,9 +4875,9 @@ void redbak() {
 	}
 	for (ind = 0; ind < 16; ind++)
 		redraw(hUserColorWin[ind]);
-	textureIndex = bdat->ntx;
+	textureIndex = bdat->texturePointCount;
 	if (textureIndex)
-		MoveMemory(&texturePointsBuffer, bdat->txp, sizeof(TXPNT)*textureIndex);
+		MoveMemory(&texturePointsBuffer, bdat->texturePoints, sizeof(TXPNT)*textureIndex);
 	coltab();
 	setMap(RESTCH);
 }
@@ -5870,7 +5870,7 @@ void nuFil() {
 							ind = 0;
 							while (l_stind < header.stitchCount&&ind < inf) {
 
-								if (ptrFileBuffer[ind].typ == 3) {
+								if (ptrFileBuffer[ind].tag == 3) {
 
 									colorChangeTable[l_cPnt].colorIndex = ptrFileBuffer[ind].fx;
 									colorChangeTable[l_cPnt++].stitchIndex = l_stind;
@@ -6753,7 +6753,7 @@ void sav() {
 				if ((rotatedStitches[ind].attribute&COLMSK) != savcol) {
 
 					savcol = rotatedStitches[ind].attribute&COLMSK;
-					ptrFileBuffer[l_stind].typ = 3;
+					ptrFileBuffer[l_stind].tag = 3;
 					ptrFileBuffer[l_stind++].fx = savcol;
 				}
 				fractionalPart = modf(rotatedStitches[ind].x, &integerPart);
@@ -8588,8 +8588,9 @@ void savclp(unsigned dst, unsigned src) {
 	clipStitchData[dst].fy = frct * 256;
 	clipStitchData[dst].y = intg;
 	clipStitchData[dst].spcy = 0;
+	// ToDo - Are these structure members needed?
 	clipStitchData[dst].myst = 1;
-	clipStitchData[dst].typ = 0x14;
+	clipStitchData[dst].tag = 0x14;
 }
 
 void rtclpfn(unsigned dst, unsigned src) {
@@ -8605,8 +8606,9 @@ void rtclpfn(unsigned dst, unsigned src) {
 	clipStitchData[dst].fy = frct;
 	clipStitchData[dst].y = intg;
 	clipStitchData[dst].spcy = 0;
+	// ToDo - Are these structure members needed?
 	clipStitchData[dst].myst = 1;
-	clipStitchData[dst].typ = 0x14;
+	clipStitchData[dst].tag = 0x14;
 }
 
 FORMCLIP* frmref(void* pnt) {
@@ -12250,7 +12252,7 @@ void insfil() {
 					cod = 0;
 					for (ind = 0; ind < tphed.stitchCount; ind++) {
 
-						if (tbuf[ind].typ == 3)
+						if (tbuf[ind].tag == 3)
 							cod = tbuf[ind++].fx;
 						else {
 
@@ -19951,882 +19953,882 @@ unsigned chkMsg() {
 			undat();
 		switch (LOWORD(msg.wParam)) {
 
-		case ID_CHKOF:
+		case ID_CHKOF: // view / Set / Data check / Off
 
 			chgchk(0);
 			break;
 
-		case ID_CHKON:
+		case ID_CHKON: // view / Set / Data check / On
 
 			chgchk(1);
 			break;
 
-		case ID_CHKREP:
+		case ID_CHKREP: // view / Set / Data Check / Auto Repair on
 
 			chgchk(2);
 			break;
 
-		case ID_CHKREPMSG:
+		case ID_CHKREPMSG: // view / Set / Data Check / Auto Repair with Message
 
 			chgchk(3);
 			break;
 
-		case ID_REPAIR:
+		case ID_REPAIR: // edit / Repair Data
 
 			repar();
 			break;
 
-		case ID_WARNOF:
+		case ID_WARNOF: // set / Warn if edited
 
 			chgwrn();
 			break;
 
-		case ID_CLPSPAC:
+		case ID_CLPSPAC: // set / Clipboard Fill  Spacing
 
 			setclpspac();
 			break;
 
-		case ID_FRMIND:
+		case ID_FRMIND: // edit / Form Update / Indent
 
 			setfind();
 			break;
 
-		case ID_SETSIZ:
+		case ID_SETSIZ: // edit / Set / Design Size
 
 			nudsiz();
 			break;
 
-		case ID_TXFIL:
+		case ID_TXFIL: // Fill / Texture Editor
 
 			dutxtfil();
 			break;
 
-		case ID_FRMHI:
+		case ID_FRMHI: // edit / Form Update / Height
 
 			setfhi();
 			break;
 
-		case ID_FRMWID:
+		case ID_FRMWID: // edit / Form Update / Width
 
 			setfwid();
 			break;
 
-		case ID_MAXFLEN:
+		case ID_MAXFLEN: // edit / Form Update / Fill /  Maximum Stitch Length
 
 			setfmax();
 			break;
 
-		case ID_MINFLEN:
+		case ID_MINFLEN: // edit / Form Update / Fill /  Minimum Stitch Length
 
 			setfmin();
 			break;
 
-		case ID_MAXBLEN:
+		case ID_MAXBLEN: // edit / Form Update / Border /  Maximum Stitch Length
 
 			setbmax();
 			break;
 
-		case ID_MINBLEN:
+		case ID_MINBLEN: // edit / Form Update / Border /  Minimum Stitch Length
 
 			setbmin();
 			break;
 
-		case ID_SETBSPAC:
+		case ID_SETBSPAC: // edit / Form Update / Border /  Spacing
 
 			setbspac();
 			break;
 
-		case ID_SETBLEN:
+		case ID_SETBLEN: // edit / Form Update / Border /  Stitch Length
 
 			setblen();
 			break;
 
-		case ID_SETBCOL:
+		case ID_SETBCOL: // edit / Form Update / Border /  Color
 
 			setbcol();
 			break;
 
-		case ID_SETFCOL:
+		case ID_SETFCOL: // edit / Form Update / Fill /  Color
 
 			setfcol();
 			break;
 
-		case ID_SETUCOL:
+		case ID_SETUCOL: // edit / Form Update / Underlay /  Color
 
 			setucol();
 			break;
 
-		case ID_SETFANG:
+		case ID_SETFANG: // edit / Form Update / Fill /  Angle
 
 			setfang();
 			break;
 
-		case ID_SETFSPAC:
+		case ID_SETFSPAC: // edit / Form Update / Fill /  Spacing
 
 			setfspac();
 			break;
 
-		case ID_SETFLEN:
+		case ID_SETFLEN: // edit / Form Update / Fill /  Stitch Length
 
 			setflen();
 			break;
 
-		case ID_SETUANG:
+		case ID_SETUANG: // edit / Form Update / Underlay /  Angle
 
 			sfuang();
 			break;
 
-		case ID_SETUSPAC:
+		case ID_SETUSPAC: // edit / Form Update / Underlay /  Spacing
 
 			uspac();
 			break;
 
-		case ID_UNDLEN:
+		case ID_UNDLEN: // edit / Form Update / Underlay / Stitch Length
 
 			undlen();
 			break;
 
-		case ID_SETCWLK:
+		case ID_SETCWLK: // edit / Form Update / Center Walk / On
 
 			setcwlk();
 			break;
 
-		case ID_SETWLK:
+		case ID_SETWLK: // edit / Form Update / Edge Walk /  On
 
 			setwlk();
 			break;
 
-		case ID_SETUND:
+		case ID_SETUND: // edit / Form Update / Underlay / On
 
 			setund();
 			break;
 
-		case ID_NOTCWLK:
+		case ID_NOTCWLK: // edit / Form Update / Center Walk / Off
 
 			notcwlk();
 			break;
 
-		case ID_NOTWLK:
+		case ID_NOTWLK: // edit / Form Update / Edge Walk / Off
 
 			notwlk();
 			break;
 
-		case ID_NOTUND:
+		case ID_NOTUND: // edit / Form Update / Underlay / Off
 
 			notund();
 			break;
 
-		case ID_SELUND:
+		case ID_SELUND: // edit / Select / Form Underlay Stitches
 
 			selfil(UNDMSK);
 			break;
 
-		case ID_SELWLK:
+		case ID_SELWLK: // edit / Select / Form Edge Walk Stitches
 
 			selfil(WLKMSK);
 			break;
 
-		case ID_ALFRM:
+		case ID_ALFRM: // edit / Select / All Forms
 
 			selalfrm();
 			break;
 
-		case ID_USPAC:
+		case ID_USPAC: // view / Set / Underlay / Spacing
 
 			setuspac();
 			break;
 
-		case ID_UANG:
+		case ID_UANG: // view / Set / Underlay / Angle
 
 			setuang();
 			break;
 
-		case ID_USTCH:
+		case ID_USTCH: // view / Set / Underlay / Stitch Length
 
 			setulen();
 			break;
 
-		case ID_WIND:
+		case ID_WIND: // view / Set / Underlay / Indent
 
 			setwlkind();
 			break;
 
-		case ID_FILSTRT:
+		case ID_FILSTRT: //Edit / Set / Fill Start Point
 
 			setfilstrt();
 			break;
 
-		case ID_FILEND:
+		case ID_FILEND: //Edit / Set / Fill End Point
 
 			setfilend();
 			break;
 
-		case ID_PES2CRD:
+		case ID_PES2CRD: // file / PES2Card
 
 			pes2crd();
 			break;
 
-		case ID_2FTHR:
+		case ID_2FTHR: // edit / Convert / to Feather Ribbon
 
 			setMap(CNV2FTH);
 			ribon();
 			break;
 
-		case ID_FETHR:
+		case ID_FETHR: // fill / Feather
 
 			fethr();
 			break;
 
-		case ID_FTHDEF:
+		case ID_FTHDEF: // edit / Set / Feather Defaults
 
 			dufdef();
 			break;
 
-		case ID_SRTF:
+		case ID_SRTF: // edit / Sort / by Form
 
 			srtfrm();
 			break;
 
-		case ID_FILCLPX:
+		case ID_FILCLPX: // fill / Border / Clipboard, Even
 
 			filclpx();
 			break;
 
-		case ID_FRMX:
+		case ID_FRMX: // view / Set / Form Cursor / Cross
 
 			frmcursel(1);
 			break;
 
-		case ID_FRMBOX:
+		case ID_FRMBOX: // view / Set / Form Cursor / Box
 
 			frmcursel(0);
 			break;
 
-		case ID_KNOTAT:
+		case ID_KNOTAT: // edit / Set / Knot at Selected Stitch
 
 			set1knot();
 			break;
 
-		case ID_STCHPIX:
+		case ID_STCHPIX: // view / Set / Point Size / Stitch Point Boxes
 
 			getstpix();;
 			break;
 
-		case ID_FRMPIX:
+		case ID_FRMPIX: // view / Set / Point Size / Form Point Triangles
 
 			getfrmpix();
 			break;
 
-		case ID_FRMPBOX:
+		case ID_FRMPBOX: // view / Set / Point Size / Form Box
 
 			getfrmbox();
 			break;
 
-		case ID_CROP:
+		case ID_CROP: // edit / Crop to Form
 
 			crop();
 			break;
 
-		case ID_BAKMRK:
+		case ID_BAKMRK: // view / Retrieve Mark
 
 			bakmrk();
 			break;
 
-		case ID_MARKESC:
+		case ID_MARKESC: // view / Set / Retrieve Mark / Escape
 
 			setu(MARQ);
 			qchk();
 			break;
 
-		case ID_MARKQ:
+		case ID_MARKQ: // view / Set / Retrieve Mark / Q
 
 			rstu(MARQ);
 			qchk();
 			break;
 
-		case ID_NUDGPIX:
+		case ID_NUDGPIX: // view / Set / Nudge Pixels
 
 			getnpix();
 			break;
 
-		case ID_LINCHN:
+		case ID_LINCHN: // fill / Border / Line chain
 
 			setMap(LINCHN);
 			chain();
 			break;
 
-		case ID_OPNCHN:
+		case ID_OPNCHN: // fill / Border / Open chain
 
 			rstMap(LINCHN);
 			chain();
 			break;
 
-		case ID_CLOSE:
+		case ID_CLOSE: // file / Close
 
 			filclos();
 			break;
 
-		case ID_DELMAP:
+		case ID_DELMAP: // file / Remove Bitmap
 
 			delmap();
 			break;
 
-		case ID_BLAK:
+		case ID_BLAK: // edit / Trace / Reset Form Pixels
 
 			blak();
 			break;
 
-		case ID_SAVMAP:
+		case ID_SAVMAP: // file / Save Bitmap
 
 			savmap();
 			break;
 
-		case ID_TRDIF:
+		case ID_TRDIF: // edit / Trace / Find Edges
 
 			trdif();
 			break;
 
-		case ID_TRACEDG:
+		case ID_TRACEDG: // edit / Trace / Show Traced Edges
 
 			tracedg();
 			break;
 
-		case ID_TRCSEL:
+		case ID_TRCSEL: // edit / Trace / Select Colors
 
 			trcsel();
 			break;
 
-		case ID_TRACE:
+		case ID_TRACE: // edit / Trace / Trace Mode
 
 			trinit();
 			break;
 
-		case ID_FLOK:
+		case ID_FLOK: // file / Locking
 
 			lock();
 			break;
 
-		case ID_ROTAUXON:
+		case ID_ROTAUXON: // view / Set / Rotate Machine File / On
 
 			rotauxsel(1);
 			break;
 
-		case ID_ROTAUXOFF:
+		case ID_ROTAUXOFF: // view / Set / Rotate Machine File / Off
 
 			rotauxsel(0);
 			break;
 
-		case ID_FRM2COL:
+		case ID_FRM2COL: // edit / Set / Form Color to  Stich Color
 
 			col2frm();
 			break;
 
-		case ID_SNAP2GRD:
+		case ID_SNAP2GRD: // edit / Snap / to Grid
 
 			gsnap();
 			break;
 
-		case ID_FIL2SEL_ON:
+		case ID_FIL2SEL_ON: // view / Set / Fill at Select / On
 
 			fil2sel(1);
 			break;
 
-		case ID_FIL2SEL_OFF:
+		case ID_FIL2SEL_OFF: // view / Set / Fill at Select / Off
 
 			fil2sel(0);
 			break;
 
-		case ID_OVRLAY:
+		case ID_OVRLAY: // file / Overlay
 
 			ovrlay();
 			break;
 
-		case ID_GRDHI:
+		case ID_GRDHI: // view / Set / Grid Mask / High
 
 			setgrd(HIGRD);
 			break;
 
-		case ID_GRDMED:
+		case ID_GRDMED: // view / Set / Grid Mask / Medium
 
 			setgrd(MEDGRD);
 			break;
 
-		case ID_GRDEF:
+		case ID_GRDEF: // view / Set / Grid Mask / Default
 
 			setgrd(DEFGRD);
 			break;
 
-		case ID_GRDRED:
+		case ID_GRDRED: // view / Set / Grid Mask / UnRed
 
 			setgrd(REDGRD);
 			break;
 
-		case ID_GRDBLU:
+		case ID_GRDBLU: // view / Set / Grid Mask / UnBlue
 
 			setgrd(BLUGRD);
 			break;
 
-		case ID_GRDGRN:
+		case ID_GRDGRN: // view / Set / Grid Mask / UnGreen
 
 			setgrd(GRNGRD);
 			break;
 
-		case ID_RETRACE:
+		case ID_RETRACE: // edit / Retrace
 
 			retrac();
 			break;
 
-		case ID_DUBFIL:
+		case ID_DUBFIL: // fill / Border / Double
 
 			dubfil();
 			break;
 
-		case ID_HORCLP:
+		case ID_HORCLP: // fill / Clipboard / Horizontal
 
 			if (chkMap(FORMSEL) || selectedFormCount)
 				savdo();
 			horclp();
 			break;
 
-		case ID_ANGCLP:
+		case ID_ANGCLP: // fill / Clipboard / Angle
 
 			if (chkMap(FORMSEL) || selectedFormCount)
 				savdo();
 			angclp();
 			break;
 
-		case ID_VRTCLP:
+		case ID_VRTCLP: // fill / Clipboard / Vertical
 
 			if (chkMap(FORMSEL) || selectedFormCount)
 				savdo();
 			vrtclp();
 			break;
 
-		case ID_LINBEXACT:
+		case ID_LINBEXACT: // view / Set / Line Border Spacing / Exact
 
 			rstu(LINSPAC);
 			linbmen();
 			break;
 
-		case ID_LINBEVEN:
+		case ID_LINBEVEN: // view / Set / Line Border Spacing / Even
 
 			setu(LINSPAC);
 			linbmen();
 			break;
 
-		case ID_BSAVON:
+		case ID_BSAVON: // view / Set / PCS Bitmap Save / On
 
 			pcsbsavon();
 			break;
 
-		case ID_BSAVOF:
+		case ID_BSAVOF: // view / Set / PCS Bitmap Save / Off
 
 			pcsbsavof();
 			break;
 
-		case ID_KNOTON:
+		case ID_KNOTON: // view / Knots / On
 
 			shoknot();
 			break;
 
-		case ID_KNOTOF:
+		case ID_KNOTOF: // view / Knots / Off
 
 			hidknot();
 			break;
 
-		case ID_DELKNOT:
+		case ID_DELKNOT: // edit / Delete / Knots
 
 			delknot();
 			break;
 
-		case ID_RSTNEDL:
+		case ID_RSTNEDL: // view / Set / Needle Cursor / Off
 
 			nedof();
 			break;
 
-		case ID_SETNEDL:
+		case ID_SETNEDL: // view / Set / Needle Cursor / On
 
 			nedon();
 			break;
 
-		case ID_STCHS2FRM:
+		case ID_STCHS2FRM: // edit / Convert / Stitches to Form
 
 			stchs2frm();
 			break;
 
-		case ID_SPLTFRM:
+		case ID_SPLTFRM: // edit / Split Form
 
 			spltfrm();
 			break;
 
-		case ID_UNBEAN:
+		case ID_UNBEAN: // edit / Convert / from Bean to Line
 
 			debean();
 			break;
 
-		case ID_DUBEAN:
+		case ID_DUBEAN: // edit / Convert / to Bean
 
 			dubean();
 			break;
 
-		case ID_SRTBF:
+		case ID_SRTBF: // edit / Sort / by Color then Form
 
 			srtbyfrm();
 			break;
 
-		case ID_CENTIRE:
+		case ID_CENTIRE: // edit / Center / Entire Design
 
 			centir();
 			break;
 
-		case ID_CNTRX:
+		case ID_CNTRX: // edit / Center / Both
 
 			rstMap(CNTRH);
 			rstMap(CNTRV);
 			cntrx();
 			break;
 
-		case ID_CNTRH:
+		case ID_CNTRH: // edit / Center / Horizontal
 
 			rstMap(CNTRH);
 			setMap(CNTRV);
 			cntrx();
 			break;
 
-		case ID_CNTRV:
+		case ID_CNTRV: // edit / Center / Vertical
 
 			setMap(CNTRH);
 			rstMap(CNTRV);
 			cntrx();
 			break;
 
-		case ID_FRMNUM:
+		case ID_FRMNUM: // edit / Set / Form Number
 
 			frmnum();
 			break;
 
-		case ID_REFILF:
+		case ID_REFILF: // fill / Refill
 
 			filfrms();
 			break;
 
-		case ID_MRKPNT:
+		case ID_MRKPNT: // edit / Set / Zoom Mark at Selected Point
 
 			pntmrk();
 			break;
 
-		case ID_ROTSEG:
+		case ID_ROTSEG: // edit / Set / Rotation / Segments
 
 			rotseg();
 			break;
 
-		case ID_ROTMRK:
+		case ID_ROTMRK: // edit / Set / Rotation / Angle from Mark
 
 			rotmrk();
 			break;
 
-		case ID_MRKCNTR:
+		case ID_MRKCNTR: // edit / Set / Zoom Mark at Center
 
 			dumrk(unzoomedRect.x / 2, unzoomedRect.y / 2);
 			setMap(RESTCH);
 			break;
 
-		case ID_SETROT:
+		case ID_SETROT: // edit / Set / Rotation / Angle
 
 			setrang();
 			break;
 
-		case ID_SETPREF:
+		case ID_SETPREF: // view / Set / Default Preferences
 
 			defpref();
 			break;
 
-		case ID_SHRINK:
+		case ID_SHRINK: // edit / Shrink Clipboard Border
 
 			shrnk();
 			break;
 
-		case ID_DUPAGAIN:
+		case ID_DUPAGAIN: // edit / Rotate / and Duplicate again
 
 			redup();
 			break;
 
-		case ID_CLPADJ:
+		case ID_CLPADJ: // edit / Set / Range Ends for Clipboard Fills
 
 			clpadj();
 			break;
 
-		case ID_DELTOT:
+		case ID_DELTOT: // edit / Delete / All Forms and Stitches
 
 			deltot();
 			break;
 
-		case ID_AUXPCS:
+		case ID_AUXPCS: // view / Set / Machine File Type / Pfaff PCS
 
 			setpcs();
 			break;
 
-		case ID_AUXDST:
+		case ID_AUXDST: // view / Set / Machine File Type / Tajima DST
 
 			setdst();
 			break;
 
-		case ID_ABOUT:
+		case ID_ABOUT: // view / About ThrEd4
 
 			tabmsg(IDS_CPYRIT);
 			break;
 
-		case ID_RIBON:
+		case ID_RIBON: // edit / Convert / to Satin Ribbon
 
 			rstMap(CNV2FTH);
 			ribon();
 			break;
 
-		case ID_DESIZ:
+		case ID_DESIZ: // view / Design Information
 
 			desiz();
 			break;
 
-		case ID_HLP:
+		case ID_HLP: // help
 
 			help();
 			break;
 
-		case ID_CNTR:
+		case ID_CNTR: // edit / Center / Forms
 
 			fcntr();
 			break;
 
-		case ID_INSFIL:
+		case ID_INSFIL: // file / Insert
 
 			rstMap(IGNORINS);
 			insfil();
 			break;
 
-		case ID_SELALSTCH:
+		case ID_SELALSTCH: // edit / Select / All Stitches
 
 			selalstch();
 			break;
 
-		case ID_UNGRPLO:
+		case ID_UNGRPLO: // edit / Ungroup / First
 
 			ungrplo();
 			break;
 
-		case ID_UNGRPHI:
+		case ID_UNGRPHI: // edit / Ungroup / Last
 
 			ungrphi();
 			break;
 
-		case ID_CONTF:
+		case ID_CONTF: // fill / Contour
 
 			contfil();
 			break;
 
-		case ID_THUM:
+		case ID_THUM: // file / Thumbnails
 
 			thumnail();
 			break;
 
-		case ID_PICOT:
+		case ID_PICOT: // fill / Border / Picot
 
 			picot();
 			break;
 
-		case ID_FILBUT:
+		case ID_FILBUT: // fill / Border / Buttonhole
 
 			bhol();
 			break;
 
-		case ID_REMBIG:
+		case ID_REMBIG: // edit / Delete / Large Stitches
 
 			rembig();
 			break;
 
-		case ID_VUSELTHRDS:
+		case ID_VUSELTHRDS: // view / Show Threads for Selected Color
 
 			vuselthr();
 			break;
 
-		case ID_VUTHRDS:
+		case ID_VUTHRDS: // view / Show Threads
 
 			vuthrds();
 			break;
 
-		case ID_MOVMRK:
+		case ID_MOVMRK: // edit / Move / to Mark
 
 			movmrk();
 			break;
 
-		case ID_SELFIL:
+		case ID_SELFIL: // edit / Select / Form Fill Stitches
 
 			selfil(FRMFIL);
 			break;
 
-		case ID_SELBRD:
+		case ID_SELBRD: // edit / Select / Form Border Stitches
 
 			selfil(FRMBFIL);
 			break;
 
-		case ID_SELAP:
+		case ID_SELAP: // edit / Select / Form Applique Stitches
 
 			selfil(FRMAPFIL);
 			break;
 
-		case ID_SELFSTCHS:
+		case ID_SELFSTCHS: // edit / Select / Form Stitches
 
 			selalfil();
 			break;
 
-		case ID_SETMRK:
+		case ID_SETMRK: // edit / Set / Order Mark
 
 			setmov();
 			break;
 
-		case ID_DELFRE:
+		case ID_DELFRE: // edit / Delete / Free Stitches
 
 			delfre();
 			break;
 
-		case ID_SELAL:
+		case ID_SELAL: // edit / Select / All Forms and Stitches
 
 			selal();
 			break;
 
-		case ID_REFILAL:
+		case ID_REFILAL: // edit / Refill All
 
 			refilal();
 			break;
 
-		case ID_CHK:
+		case ID_CHK: // edit / Check Range
 
 			chkrng(&stitchRangeSize);
 			setMap(RESTCH);
 			break;
 
-		case ID_RTRVCLP:
+		case ID_RTRVCLP: // edit / Retrieve Clipboard Stitches
 
 			rtrclp();
 			break;
 
-		case ID_SORT:
+		case ID_SORT: // edit / Sort / Auto
 
 			fsort();
 			break;
 
-		case ID_LAYMOV0:
+		case ID_LAYMOV0: // edit / Move to Layer / 0
 
 			movlayr(0);
 			break;
 
-		case ID_LAYMOV1:
+		case ID_LAYMOV1: // edit / Move to Layer / 1
 
 			movlayr(2);
 			break;
 
-		case ID_LAYMOV2:
+		case ID_LAYMOV2: // edit / Move to Layer / 2
 
 			movlayr(4);
 			break;
 
-		case ID_LAYMOV3:
+		case ID_LAYMOV3: // edit / Move to Layer / 3
 
 			movlayr(6);
 			break;
 
-		case ID_LAYMOV4:
+		case ID_LAYMOV4: // edit / Move to Layer / 4
 
 			movlayr(8);
 			break;
 
-		case ID_LAYCPY0:
+		case ID_LAYCPY0: // edit / Copy to Layer / 0
 
 			cpylayr(0);
 			break;
 
-		case ID_LAYCPY1:
+		case ID_LAYCPY1: // edit / Copy to Layer / 1
 
 			cpylayr(2);
 			break;
 
-		case ID_LAYCPY2:
+		case ID_LAYCPY2: // edit / Copy to Layer / 2
 
 			cpylayr(4);
 			break;
 
-		case ID_LAYCPY3:
+		case ID_LAYCPY3: // edit / Copy to Layer / 3
 
 			cpylayr(6);
 			break;
 
-		case ID_LAYCPY4:
+		case ID_LAYCPY4: // edit / Copy to Layer / 4
 
 			cpylayr(8);
 			break;
 
-		case ID_LA:
+		case ID_LA: // all (Show all layers)
 
 			nulayr(0);
 			break;
 
-		case ID_L1:
+		case ID_L1: // 1 (Show layer 1 only)
 
 			nulayr(1);
 			break;
 
-		case ID_L2:
+		case ID_L2: // 2 (Show layer 2 only)
 
 			nulayr(2);
 			break;
 
-		case ID_L3:
+		case ID_L3: // 3 (Show layer 3 only)
 
 			nulayr(3);
 			break;
 
-		case ID_L4:
+		case ID_L4: // 4 (Show layer 4 only)
 
 			nulayr(4);
 			break;
 
-		case ID_ROTDUP:
+		case ID_ROTDUP: // edit / Rotate / and Duplicate
 
 			rotdup();
 			break;
 
-		case ID_ROTAGAIN:
+		case ID_ROTAGAIN: // edit / Rotate / Again
 
 			rotagain();
 			break;
 
-		case ID_ROTCMD:
+		case ID_ROTCMD: // edit / Rotate / Command
 
 			rotcmd();
 			break;
 
-		case ID_DELFRMS:
+		case ID_DELFRMS: // edit / Delete / All Forms
 
 			delfrms();
 			rstAll();
 			setMap(RESTCH);
 			break;
 
-		case ID_SNAP2:
+		case ID_SNAP2: // edit / Snap / Together
 
 			snap();
 			break;
 
-		case ID_CLPFIL:
+		case ID_CLPFIL: // fill / Clipboard / Fan
 
 			clpfil();
 			break;
 
-		case ID_FLPORD:
+		case ID_FLPORD: // edit / Flip / Order
 
 			flpord();
 			break;
 
-		case ID_FRMOF:
+		case ID_FRMOF: // frm+
 
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				tglhid();
@@ -20834,73 +20836,73 @@ unsigned chkMsg() {
 				tglfrm();
 			break;
 
-		case ID_MV2BAK:
+		case ID_MV2BAK: // edit / move / to End
 
 			mv2b();
 			break;
 
-		case ID_MV2FRNT:
+		case ID_MV2FRNT: // edit / move / to Start
 
 			mv2f();
 			break;
 
-		case ID_PERP:
+		case ID_PERP: // fill / Border / Perpendicular Satin
 
 			if (chkMap(FORMSEL) || selectedFormCount)
 				savdo();
 			prpbrd(stitchSpace);
 			break;
 
-		case ID_PURGDIR:
+		case ID_PURGDIR: // file / Delete Backups / All backups in the selected directory
 
 			purgdir();
 			break;
 
-		case ID_PURG:
+		case ID_PURG: // file / Delete Backups / Backups for the selected file
 
 			purg();
 			break;
 
-		case ID_VUBAK:
+		case ID_VUBAK: // view / Backups
 
 			vubak();
 			break;
 
-		case ID_DELETE:
+		case ID_DELETE: // edit / Delete / Selected
 
 			delet();
 			break;
 
-		case ID_FLIPH:
+		case ID_FLIPH: // edit / Flip / Horizontal
 
 			fliph();
 			break;
 
-		case ID_FLIPV:
+		case ID_FLIPV: // edit / Flip / Vertical
 
 			flipv();
 			break;
 
-		case ID_FILANG:
+		case ID_FILANG: // fil/ / Angle 
 
 			if (chkMap(FORMSEL))
 				savdo();
 			filangl();
 			break;
 
-		case ID_PREF:
+		case ID_PREF: // pref
 
 			prfmsg();
 			break;
 
-		case ID_BOLD:
+		case ID_BOLD: // fill / Border / Bean
 
 			if (chkMap(FORMSEL) || selectedFormCount)
 				savdo();
 			dubold();
 			break;
 
-		case ID_ADEND:
+		case ID_ADEND: // add
 
 			stch2px1(header.stitchCount - 1);
 			endpnt();
@@ -20908,48 +20910,48 @@ unsigned chkMsg() {
 			setMap(RESTCH);
 			break;
 
-		case ID_SETAP:
+		case ID_SETAP: // view / Set / Applique Color
 
 			setap();
 			break;
 
-		case ID_APLIQ:
+		case ID_APLIQ: // fill / Border / Applique
 
 			if (chkMap(FORMSEL))
 				savdo();
 			apliq();
 			break;
 
-		case ID_SATBRD:
+		case ID_SATBRD: // fill / Border / Angle Satin
 
 			if (chkMap(FORMSEL))
 				savdo();
 			satbrd();
 			break;
 
-		case ID_FILCLP:
+		case ID_FILCLP: // fill / Border / Clipboard
 
 			fclp();
 			break;
 
-		case ID_FILIN:
+		case ID_FILIN: // fill / Border / Line
 
 			if (chkMap(FORMSEL))
 				savdo();
 			bord();
 			break;
 
-		case ID_FRM0:
+		case ID_FRM0: // edit / Set / Form Zero Point
 
 			frm0();
 			break;
 
-		case ID_REDO:
+		case ID_REDO: // redo
 
 			redo();
 			break;
 
-		case ID_UNFIL:
+		case ID_UNFIL: // fill / Unfill
 
 			savdo();
 			unfil();
@@ -20957,7 +20959,7 @@ unsigned chkMsg() {
 			setMap(RESTCH);
 			break;
 
-		case ID_FORM:
+		case ID_FORM: // Form
 
 			frmon();
 			if (chkMap(FORMSEL))
@@ -20966,13 +20968,13 @@ unsigned chkMsg() {
 				form();
 			break;
 
-		case ID_FILSAT:
+		case ID_FILSAT: // fill / Fan
 
 			rstMap(FTHR);
 			filsat();
 			break;
 
-		case ID_OPNPCD:
+		case ID_OPNPCD: // file / Open Auxiliary file
 
 			switch (iniFile.auxFileType) {
 
@@ -20989,89 +20991,89 @@ unsigned chkMsg() {
 			nulayr(0);
 			break;
 
-		case ID_DELSTCH:
+		case ID_DELSTCH: // edit / Delete / All Stitches
 
 			delstch();
 			break;
 
-		case ID_FILL_VERT:
+		case ID_FILL_VERT: // fill / Vertical
 
 			if (chkMap(FORMSEL) || selectedFormCount)
 				savdo();
 			filvrt();
 			break;
 
-		case ID_FILL_HOR:
+		case ID_FILL_HOR: // fill / Horizontal
 
 			if (chkMap(FORMSEL))
 				savdo();
 			filhor();
 			break;
 
-		case ID_RUNPAT:
+		case ID_RUNPAT: // view / Movie
 
 			movi();
 			break;
 
-		case ID_LENDEF:
+		case ID_LENDEF: // Todo - No menu item in thred.rc for this option
 
 			iniFile.maxStitchLength = MAXSIZ*PFGRAN;
 			userStitchLength = USESIZ*PFGRAN;
 			minStitchLength = MINSIZ*PFGRAN;
 			break;
 
-		case ID_TSIZDEF:
+		case ID_TSIZDEF: // view / Thread Size / Set Defaults
 
 			threadSize30 = TSIZ30;
 			threadSize40 = TSIZ40;
 			threadSize60 = TSIZ60;
 			break;
 
-		case ID_SIZ30:
+		case ID_SIZ30: // view / Thread Size / 30
 
 			tsizmsg("30", threadSize30);
 			setMap(ENTR30);
 			break;
 
-		case ID_SIZ40:
+		case ID_SIZ40: // view / Thread Size / 40
 
 			tsizmsg("40", threadSize40);
 			setMap(ENTR40);
 			break;
 
-		case ID_SIZ60:
+		case ID_SIZ60: // view / Thread Size / 60
 
 			tsizmsg("60", threadSize60);
 			setMap(ENTR60);
 			break;
 
-		case ID_HIDBITF:
-		case ID_HIDBIT:
+		case ID_HIDBITF: // file / Hide Bitmap
+		case ID_HIDBIT:  // edit / Trace / Hide Bitmap
 
 			hidbit();
 			break;
 
-		case ID_LODBIT:
+		case ID_LODBIT: // file / Load Bitmap
 
 			lodbmp();
 			break;
 
-		case ID_KNOTS:
+		case ID_KNOTS: // edit / Set / Knots
 
 			setknots();
 			break;
 
-		case ID_REMZERO:
+		case ID_REMZERO: // edit / Delete / Small Stitches
 
 			duzero();
 			break;
 
-		case ID_ROT:
+		case ID_ROT: // rot
 
 			rot();
 			break;
 
-		case ZUMIN:
+		case ZUMIN: // in
 
 			if (chkMap(GMRK) || chkMap(SELBOX) || chkMap(INSRT) || chkMap(GRPSEL) || chkMap(FORMSEL))
 				zumin();
@@ -21085,17 +21087,17 @@ unsigned chkMsg() {
 			}
 			break;
 
-		case ID_ZUMOUT:
+		case ID_ZUMOUT: // out
 
 			zumout();
 			break;
 
-		case ID_FILE_OPEN1:
+		case ID_FILE_OPEN1: // file / Open
 
 			fop();
 			break;
 
-		case ID_VIEW_STCHBAK:
+		case ID_VIEW_STCHBAK: // view / Set / Background Color
 
 			if (nuBak()) {
 
@@ -21110,7 +21112,7 @@ unsigned chkMsg() {
 			}
 			break;
 
-		case ID_BITCOL:
+		case ID_BITCOL: // view / Set / Bitmap Color
 
 			if (nuBit()) {
 
@@ -21122,13 +21124,13 @@ unsigned chkMsg() {
 			}
 			break;
 
-		case ID_FILE_SAVE3:
+		case ID_FILE_SAVE3: // file / Save As
 
 			colchk();
 			savAs();
 			break;
 
-		case ID_EDIT_RESET_COL:
+		case ID_EDIT_RESET_COL: // edit / Reset Colors
 
 			for (ind = 0; ind < 16; ind++) {
 
@@ -21140,23 +21142,23 @@ unsigned chkMsg() {
 			setMap(RESTCH);
 			break;
 
-		case ID_FILE_SAVE2:
+		case ID_FILE_SAVE2: // file / Save
 
 			colchk();
 			save();
 			break;
 
-		case VU_ZUMFUL:
+		case VU_ZUMFUL: // view / Zoom Full
 
 			zumhom();
 			break;
 
-		case ID_EDIT_SELECTCOLOR:
+		case ID_EDIT_SELECTCOLOR: // edit / Select / Color
 
 			selCol();
 			break;
 
-		case ID_FILE_NEW1:
+		case ID_FILE_NEW1: // file / New
 
 			if (!savcmp()) {
 
@@ -21171,12 +21173,12 @@ unsigned chkMsg() {
 			}
 			break;
 
-		case ID_BACK:
+		case ID_BACK: // undo
 
 			bak();
 			break;
 
-		case ID_DESNAM:
+		case ID_DESNAM: // edit / Set / Designer Name
 
 			getdes();
 			break;
