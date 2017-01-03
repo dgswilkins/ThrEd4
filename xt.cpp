@@ -276,8 +276,8 @@ char ftyps[] =
 	7,	//12 border
 };
 
-TXHST	thsts[16];	//txt editor history headers
-int		ptxhst;		//pointer to the next texture history buffer
+TXHST	textureHistory[16];		//text editor history headers
+int		textureHistoryIndex;	//pointer to the next texture history buffer
 
 void setfchk()
 {
@@ -343,14 +343,14 @@ void rstxt()
 
 void txrbak()
 {
-	ptxhst--;
-	ptxhst &= 0xf;
+	textureHistoryIndex--;
+	textureHistoryIndex &= 0xf;
 }
 
 void txrfor()
 {
-	ptxhst++;
-	ptxhst &= 0xf;
+	textureHistoryIndex++;
+	textureHistoryIndex &= 0xf;
 }
 
 BOOL chktxh(TXHST* phst)
@@ -377,29 +377,29 @@ BOOL chktxh(TXHST* phst)
 
 void savtxt()
 {
-	TXHST*	 phst;
+	TXHST*	 currentTextureHistory;
 
 	if (textureScreen.index)
 	{
-		phst = &thsts[ptxhst];
-		if (chktxh(phst))
+		currentTextureHistory = &textureHistory[textureHistoryIndex];
+		if (chktxh(currentTextureHistory))
 		{
 			setMap(WASTXBAK);
 			rstMap(TXBDIR);
 			rstMap(LASTXBAK);
 			txrfor();
-			phst = &thsts[ptxhst];
-			phst->count = textureScreen.index;
-			phst->height = textureScreen.areaHeight;
-			phst->width = textureScreen.width;
-			phst->spacing = textureScreen.spacing;
-			if (phst->texturePoint)
+			currentTextureHistory = &textureHistory[textureHistoryIndex];
+			currentTextureHistory->count = textureScreen.index;
+			currentTextureHistory->height = textureScreen.areaHeight;
+			currentTextureHistory->width = textureScreen.width;
+			currentTextureHistory->spacing = textureScreen.spacing;
+			if (currentTextureHistory->texturePoint)
 			{
-				delete[](phst->texturePoint);
-				phst->texturePoint = 0;
+				delete[](currentTextureHistory->texturePoint);
+				currentTextureHistory->texturePoint = 0;
 			}
-			phst->texturePoint = new TXPNT[phst->count];
-			MoveMemory(phst->texturePoint, tmpTexturePoints, phst->count * sizeof(TXPNT));
+			currentTextureHistory->texturePoint = new TXPNT[currentTextureHistory->count];
+			MoveMemory(currentTextureHistory->texturePoint, tmpTexturePoints, currentTextureHistory->count * sizeof(TXPNT));
 		}
 	}
 }
@@ -408,18 +408,6 @@ void deorg(POINT* pt)
 {
 	pt->x = msg.pt.x - stitchWindowOrigin.x;
 	pt->y = msg.pt.y - stitchWindowOrigin.y;
-}
-
-BOOL chkrypt(unsigned arg0, unsigned arg1, unsigned arg2, unsigned arg3) {
-
-	if (cryptkey[100] == arg0&&
-		cryptkey[25] == arg1&&
-		cryptkey[104] == arg2&&
-		cryptkey[2074] == arg3) {
-		return 1;
-	} else {
-		return 0;
-	}
 }
 
 void fthvars() {
@@ -4660,9 +4648,9 @@ void redtbak()
 {
 	TXHST*		phst;
 
-	//	sprintf_s(msgBuffer, sizeof(msgBuffer),"%d\n",ptxhst);
+	//	sprintf_s(msgBuffer, sizeof(msgBuffer),"%d\n",textureHistoryIndex);
 	//	OutputDebugString(msgBuffer);
-	phst = &thsts[ptxhst];
+	phst = &textureHistory[textureHistoryIndex];
 	textureScreen.areaHeight = phst->height;
 	textureScreen.width = phst->width;
 	textureScreen.spacing = phst->spacing;
@@ -4681,7 +4669,7 @@ void txbak()
 		cloxcnt = 0;
 		for (ind = 0; ind < 16; ind++)
 		{
-			if (thsts[ptxhst].width)
+			if (textureHistory[textureHistoryIndex].width)
 				goto txbak1;
 			txrbak();
 		}
@@ -4701,7 +4689,7 @@ void nxbak()
 		for (ind = 0; ind < 16; ind++)
 		{
 			txrfor();
-			if (thsts[ptxhst].width)
+			if (textureHistory[textureHistoryIndex].width)
 				goto nxbak1;
 		}
 		return;
@@ -5466,7 +5454,7 @@ void txdun()
 	int ind;
 	//char* signature="txh";
 
-	if (thsts[0].count)
+	if (textureHistory[0].count)
 	{
 		if (txnam(nam, sizeof(nam)))
 		{
@@ -5474,12 +5462,12 @@ void txdun()
 			if (hnam != INVALID_HANDLE_VALUE)
 			{
 				WriteFile(hnam, (char*)"txh", 4, &rot, 0);
-				WriteFile(hnam, (int*)&ptxhst, 4, &rot, 0);
-				WriteFile(hnam, (TXHST*)&thsts, sizeof(TXHST) * 16, &rot, 0);
+				WriteFile(hnam, (int*)&textureHistoryIndex, 4, &rot, 0);
+				WriteFile(hnam, (TXHST*)&textureHistory, sizeof(TXHST) * 16, &rot, 0);
 				for (ind = 0; ind < 16; ind++)
 				{
-					if (thsts[ind].count)
-						WriteFile(hnam, (TXPNT*)thsts[ind].texturePoint, thsts[ind].count * sizeof(TXPNT), &rot, 0);
+					if (textureHistory[ind].count)
+						WriteFile(hnam, (TXPNT*)textureHistory[ind].texturePoint, textureHistory[ind].count * sizeof(TXPNT), &rot, 0);
 				}
 			}
 			CloseHandle(hnam);
@@ -5498,8 +5486,8 @@ void redtx()
 	unsigned int ind;
 	char sig[4] = { 0 };
 
-	ptxhst = 15;
-	ZeroMemory(&thsts, sizeof(TXHST) * 16);
+	textureHistoryIndex = 15;
+	ZeroMemory(&textureHistory, sizeof(TXHST) * 16);
 	if (txnam(nam, sizeof(nam)))
 	{
 		hnam = CreateFile(nam, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
@@ -5508,16 +5496,16 @@ void redtx()
 			ReadFile(hnam, (char*)&sig, 4, &l_BytesRead, 0);
 			if (!strcmp(sig, "txh"))
 			{
-				ReadFile(hnam, (int*)&ptxhst, 4, &l_BytesRead, 0);
-				ReadFile(hnam, (TXHST*)&thsts, sizeof(TXHST) * 16, &l_BytesRead, 0);
+				ReadFile(hnam, (int*)&textureHistoryIndex, 4, &l_BytesRead, 0);
+				ReadFile(hnam, (TXHST*)&textureHistory, sizeof(TXHST) * 16, &l_BytesRead, 0);
 				//ToDo - texturePoint should be a null pointer at this point as no memory has been allocated, but it is not
 				//       because the old pointer value is read in from the file, so zero it out
 				for (ind = 0; ind < (l_BytesRead / sizeof(TXHST)); ind++)
 				{
-					if (thsts[ind].count)
+					if (textureHistory[ind].count)
 					{
-						thsts[ind].texturePoint = new TXPNT[thsts[ind].count];
-						ReadFile((TXPNT*)hnam, thsts[ind].texturePoint, sizeof(TXPNT)*thsts[ind].count, &l_BytesRead, 0);
+						textureHistory[ind].texturePoint = new TXPNT[textureHistory[ind].count];
+						ReadFile((TXPNT*)hnam, textureHistory[ind].texturePoint, sizeof(TXPNT)*textureHistory[ind].count, &l_BytesRead, 0);
 					}
 				}
 				setMap(WASTXBAK);
