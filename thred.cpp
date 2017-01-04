@@ -450,22 +450,8 @@ extern	unsigned short	wordParam;
 extern	unsigned		activePointIndex;
 extern	double			xyRatio;
 
-unsigned char			cryptkey[4096];
-
 //select box
 #define				NERCNT		4		//number of entries in the near array
-
-unsigned short chk1loc[] =
-{
-	3632,
-	3168,
-	393,
-	2246,
-	802,
-	1817,
-	3175,
-	2254
-};
 
 //main variables
 HINSTANCE		hInst;					//main instance handle

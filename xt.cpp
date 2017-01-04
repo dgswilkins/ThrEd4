@@ -40,7 +40,6 @@ extern	unsigned		closestFormToCursor;
 extern	unsigned		closestPointIndex;
 extern	unsigned		closestVertexToCursor;
 extern	unsigned		clipPointIndex;
-extern	unsigned char	cryptkey[4096];
 extern	fPOINT*			currentFormVertices;
 extern	TCHAR			fileName[_MAX_PATH];
 extern	unsigned		formPointIndex;
