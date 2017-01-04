@@ -482,7 +482,7 @@ DRAWITEMSTRUCT*	ds;						//for owner-draw windows
 double			zoomFactor = 1;			//zoom factor
 POINT			unzoomedRect;			//size of the unzoomed stitch window
 POINT			stitchSizePixels;		//converted from stich to pixel
-POINT			pxNer[NERCNT];			//selected points
+POINT			nearestPixel[NERCNT];	//selected points
 POINT			boxPix;					//single select box point
 double			distanceToClick;		//distance of closest point to a mouse click
 unsigned		closestPointIndex;		//index of closest point
@@ -3249,16 +3249,16 @@ void box(unsigned ind, HDC dc) {
 	long pwid = boxOffset[ind];
 	POINT lin[5];
 
-	lin[0].x = pxNer[ind].x - pwid;
-	lin[0].y = pxNer[ind].y - pwid;
-	lin[1].x = pxNer[ind].x + pwid;
-	lin[1].y = pxNer[ind].y - pwid;
-	lin[2].x = pxNer[ind].x + pwid;
-	lin[2].y = pxNer[ind].y + pwid;
-	lin[3].x = pxNer[ind].x - pwid;
-	lin[3].y = pxNer[ind].y + pwid;
-	lin[4].x = pxNer[ind].x - pwid;
-	lin[4].y = pxNer[ind].y - pwid;
+	lin[0].x = nearestPixel[ind].x - pwid;
+	lin[0].y = nearestPixel[ind].y - pwid;
+	lin[1].x = nearestPixel[ind].x + pwid;
+	lin[1].y = nearestPixel[ind].y - pwid;
+	lin[2].x = nearestPixel[ind].x + pwid;
+	lin[2].y = nearestPixel[ind].y + pwid;
+	lin[3].x = nearestPixel[ind].x - pwid;
+	lin[3].y = nearestPixel[ind].y + pwid;
+	lin[4].x = nearestPixel[ind].x - pwid;
+	lin[4].y = nearestPixel[ind].y - pwid;
 	Polyline(dc, lin, 5);
 }
 
@@ -3284,6 +3284,7 @@ void dubx() {
 	SelectObject(stitchWindowDC, boxPen[0]);
 	SetROP2(stitchWindowMemDC, R2_NOTXORPEN);
 	SetROP2(stitchWindowDC, R2_NOTXORPEN);
+	// ToDo - is boxPix initialized at this point
 	lin[0].x = boxPix.x - pwid;
 	lin[0].y = boxPix.y - pwid;
 	lin[1].x = boxPix.x + pwid;
@@ -7216,8 +7217,8 @@ void closPnt() {
 		if (stch2px(nearestPoint[ind])) {
 
 			nearestPoint[nearestCount] = nearestPoint[ind];
-			pxNer[nearestCount].x = stitchSizePixels.x;
-			pxNer[nearestCount++].y = stitchSizePixels.y;
+			nearestPixel[nearestCount].x = stitchSizePixels.x;
+			nearestPixel[nearestCount++].y = stitchSizePixels.y;
 		}
 	}
 	boxs();
@@ -7245,10 +7246,10 @@ unsigned closPnt1(unsigned* clo) {
 	for (ind = 0; ind < nearestCount; ind++) {
 
 		nerSid = boxOffset[ind];
-		if (chkPnt.x >= pxNer[ind].x - nerSid&&
-			chkPnt.x <= pxNer[ind].x + nerSid&&
-			chkPnt.y >= pxNer[ind].y - nerSid&&
-			chkPnt.y <= pxNer[ind].y + nerSid) {
+		if (chkPnt.x >= nearestPixel[ind].x - nerSid&&
+			chkPnt.x <= nearestPixel[ind].x + nerSid&&
+			chkPnt.y >= nearestPixel[ind].y - nerSid&&
+			chkPnt.y <= nearestPixel[ind].y + nerSid) {
 
 			*clo = nearestPoint[ind];
 			return 1;
