@@ -144,7 +144,6 @@
 #define IDS_THRED                       138
 #define IDS_NUFIL                       139
 #define IDS_SIZ                         140
-#define IDS_TRIAL                       141
 #define IDS_EMB                         142
 #define IDS_ON                          143
 #define IDS_OFF                         144
@@ -291,7 +290,6 @@
 #define IDS_ULEN                        292
 #define IDS_FUANG                       293
 #define IDS_FUSPAC                      294
-#define IDS_KEYVER                      295
 #define IDC_LOCKAL                      1001
 #define IDC_UNLOCKAL                    1002
 #define IDC_LOCKED                      1003

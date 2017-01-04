@@ -78,7 +78,6 @@ unsigned short ldlst[] = {	//strings to load into memory at init time
 	IDS_OVRIT,
 	IDS_THRED,
 	IDS_NUFIL,
-	IDS_TRIAL,
 	IDS_EMB,
 	IDS_ON,
 	IDS_OFF,
