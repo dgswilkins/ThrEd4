@@ -408,7 +408,7 @@ extern	fPOINT			formPoints[MAXFRMPNTS];
 extern	HWND			hindx;
 extern	TCHAR			hlpbuf[HBUFSIZ];
 extern	HWND			hlptxt;
-extern	HWND			hMsg;
+extern	HWND			hMsgWindow;
 extern	HWND			hnxt;
 extern	double			horizontalRatio;
 extern	HWND			hsrch;
@@ -4712,8 +4712,8 @@ void chknum() {
 
 void noMsg() {
 
-	if (DestroyWindow(hMsg))
-		hMsg = 0;
+	if (DestroyWindow(hMsgWindow))
+		hMsgWindow = 0;
 	DestroyWindow(hOKButton);
 	DestroyWindow(hDiscardButton);
 	DestroyWindow(hCancelButton);
@@ -9057,7 +9057,7 @@ void numWnd() {
 
 	RECT l_msgRct;
 
-	GetClientRect(hMsg, &l_msgRct);
+	GetClientRect(hMsgWindow, &l_msgRct);
 	hGeneralNumberInputBox = CreateWindow(
 		"STATIC",
 		0,
@@ -9076,7 +9076,7 @@ void numWnd() {
 
 void unmsg() {
 
-	if (hMsg)
+	if (hMsgWindow)
 		noMsg();
 }
 
@@ -10181,10 +10181,10 @@ void movi() {
 	rstAll();
 	if (header.stitchCount) {
 
-		if (hMsg) {
+		if (hMsgWindow) {
 
-			DestroyWindow(hMsg);
-			hMsg = 0;
+			DestroyWindow(hMsgWindow);
+			hMsgWindow = 0;
 		}
 		setMap(RUNPAT);
 		if (chkMap(GRPSEL)) {
@@ -16287,7 +16287,7 @@ unsigned chkMsg() {
 	}
 	if (msg.message == WM_RBUTTONDOWN) {
 
-		if (chkMap(TXTRED) && !hMsg)
+		if (chkMap(TXTRED) && !hMsgWindow)
 		{
 			txtrbut();
 			return 1;
@@ -17058,7 +17058,7 @@ unsigned chkMsg() {
 		}
 		if (rstMap(FORMIN)) {
 
-			GetWindowRect(hMsg, &trct);
+			GetWindowRect(hMsgWindow, &trct);
 			if (msg.pt.x >= trct.left&&msg.pt.x <= trct.right
 				&&msg.pt.y >= trct.top&&msg.pt.y <= trct.bottom) {
 

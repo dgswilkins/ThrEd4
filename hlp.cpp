@@ -43,11 +43,11 @@ extern	HDC				stitchWindowMemDC;
 extern	TCHAR			thrName[_MAX_PATH];
 extern	POINT			unzoomedRect;
 
-HANDLE					hlpfil;						//handle to the help file
-TCHAR					hlpnam[_MAX_PATH];			//help file name
-unsigned				fhlplen;					//help file length
-HWND					hlpwnd;						//help window
-HWND					hMsg = 0;						//message window
+HANDLE					hHelpFile;					//handle to the help file
+TCHAR					helpFilename[_MAX_PATH];	//help file name
+unsigned				helpFileLength;				//help file length
+HWND					hHelpWindow;				//help window
+HWND					hMsgWindow = 0;				//message window
 
 unsigned short ldlst[] = {	//strings to load into memory at init time
 	IDS_PIKOL,
@@ -392,7 +392,7 @@ void shoMsg(TCHAR* str) {
 		off = preferenceWindowWidth + 6;
 	else
 		off = 3;
-	hMsg = CreateWindow(
+	hMsgWindow = CreateWindow(
 		"STATIC",
 		str,
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -521,15 +521,15 @@ void grpmsg1() {
 }
 
 void help() {
-	strcpy_s(hlpnam, homeDirectory);
+	strcpy_s(helpFilename, homeDirectory);
 #if LANG==ENG||LANG==HNG
-	strcat_s(hlpnam, "thred.chm");
+	strcat_s(helpFilename, "thred.chm");
 #endif
 #if LANG==GRM
-	strcat_s(hlpnam, "aladin.chm");
+	strcat_s(helpFilename, "aladin.chm");
 #endif
-	hlpwnd = HtmlHelp(hWnd, hlpnam, HH_DISPLAY_TOPIC, 0);
-	if (!hlpwnd)
+	hHelpWindow = HtmlHelp(hWnd, helpFilename, HH_DISPLAY_TOPIC, 0);
+	if (!hHelpWindow)
 		tabmsg(IDS_NOHLP);
 }
 
