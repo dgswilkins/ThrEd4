@@ -41,8 +41,8 @@ extern	unsigned		closestPointIndex;
 extern	unsigned		closestVertexToCursor;
 extern	unsigned		clipPointIndex;
 extern	fPOINT*			currentFormVertices;
-extern	TCHAR			fileName[_MAX_PATH];
-extern	unsigned		formPointIndex;
+extern	TCHAR			workingFileName[_MAX_PATH];
+extern	unsigned		FormVertexIndex;
 extern	fPOINT			formMoveDelta;
 extern	unsigned		formIndex;
 extern	POINT			formLines[MAXFRMLINS];
@@ -149,7 +149,7 @@ extern	void		lcon();
 extern	void		makspac(unsigned strt, unsigned cnt);
 extern	void		mdufrm();
 extern	float		midl(float hi, float lo);
-extern	void		moveStitchPoints(fPOINTATTR* dst, fPOINTATTR* src);
+extern	void		moveStitch(fPOINTATTR* dst, fPOINTATTR* src);
 extern	void		movStch();
 extern	void		movStch();
 extern	void		msgflt(unsigned msgid, float par);
@@ -1014,7 +1014,7 @@ void delwlk(unsigned cod)
 	{
 		if ((stitchBuffer[ind].attribute&WLKFMSK) != cod)
 		{
-			moveStitchPoints(&histch[ine], &stitchBuffer[ind]);
+			moveStitch(&histch[ine], &stitchBuffer[ind]);
 			ine++;
 		}
 		else
@@ -1460,7 +1460,7 @@ void srtcol() {
 	}
 	phi = &stitchBuffer[MAXSEQ];
 	for (ind = 0; ind < header.stitchCount; ind++)
-		moveStitchPoints(&phi[hst[stitchBuffer[ind].attribute&COLMSK]++], &stitchBuffer[ind]);
+		moveStitch(&phi[hst[stitchBuffer[ind].attribute&COLMSK]++], &stitchBuffer[ind]);
 	MoveMemory(&stitchBuffer, phi, sizeof(fPOINTATTR)*header.stitchCount);
 }
 
@@ -1717,7 +1717,7 @@ void dasyfrm() {
 	SelectedForm = &formList[formIndex];
 	closestFormToCursor = formIndex;
 	frmclr(SelectedForm);
-	SelectedForm->vertices = &formPoints[formPointIndex];
+	SelectedForm->vertices = &formPoints[FormVertexIndex];
 	SelectedForm->attribute = activeLayer << 1;
 	fvars(formIndex);
 	cnt2 = iniFile.daisyPetalPoints >> 1;
@@ -1836,7 +1836,7 @@ void dasyfrm() {
 		SelectedForm->type = SAT;
 		SelectedForm->attribute = 1;
 	}
-	formPointIndex += inf;
+	FormVertexIndex += inf;
 	setMap(INIT);
 	frmout(formIndex);
 	for (ind = 0; ind < inf; ind++) {
@@ -1987,19 +1987,19 @@ double precjmps(SRTREC* psrec)
 				if (precs[loc]->start)
 				{
 					for (ind = precs[loc]->finish - 1; ind >= precs[loc]->start; ind--)
-						moveStitchPoints(&tmpStitchBuffer[outputIndex++], &stitchBuffer[ind]);
+						moveStitch(&tmpStitchBuffer[outputIndex++], &stitchBuffer[ind]);
 				}
 				else
 				{
 					ind = precs[loc]->finish;
 					while (ind)
-						moveStitchPoints(&tmpStitchBuffer[outputIndex++], &stitchBuffer[--ind]);
+						moveStitch(&tmpStitchBuffer[outputIndex++], &stitchBuffer[--ind]);
 				}
 			}
 			else
 			{
 				for (ind = precs[loc]->start; ind < precs[loc]->finish; ind++)
-					moveStitchPoints(&tmpStitchBuffer[outputIndex++], &stitchBuffer[ind]);
+					moveStitch(&tmpStitchBuffer[outputIndex++], &stitchBuffer[ind]);
 			}
 		}
 	}
@@ -3531,13 +3531,13 @@ void duauxnam()
 {
 	TCHAR* pext;
 
-	_strlwr_s(fileName);
-	strcpy_s(auxName, fileName);
+	_strlwr_s(workingFileName);
+	strcpy_s(auxName, workingFileName);
 	pext = strrchr(auxName, '.');
 	if (pext)
 		pext++;
 	else
-		pext = &fileName[strlen(fileName)];
+		pext = &workingFileName[strlen(workingFileName)];
 	*pext = 0;
 	switch (iniFile.auxFileType) {
 
@@ -5257,7 +5257,7 @@ void nudfn()
 	designSizeRatio.y = designSize.y / osiz.y;
 	for (ind = 0; ind < header.stitchCount; ind++)
 		sadj(&stitchBuffer[ind]);
-	for (ind = 0; ind < formPointIndex; ind++)
+	for (ind = 0; ind < FormVertexIndex; ind++)
 		sadj(&formPoints[ind]);
 	frmout(closestFormToCursor);
 }
@@ -5673,7 +5673,7 @@ unsigned frmchkfn()
 			if (bc.attribute == (BADFLT | BADCLP | BADSAT | BADTX))
 				break;
 		}
-		if (bc.flt != (int)formPointIndex)
+		if (bc.flt != (int)FormVertexIndex)
 			bc.attribute |= BADFLT;
 		if (bc.clip != (int)clipPointIndex)
 			bc.attribute |= BADCLP;
@@ -5765,7 +5765,7 @@ void repflt()
 	{
 		fp = &formList[ind];
 		dif = fp->vertices - formPoints;
-		if (formPointIndex >= dif + fp->sides)
+		if (FormVertexIndex >= dif + fp->sides)
 		{
 			MoveMemory(&tflt[loc], fp->vertices, fp->sides * sizeof(fPOINT));
 			fp->vertices = &formPoints[loc];
@@ -5774,9 +5774,9 @@ void repflt()
 		}
 		else
 		{
-			if (dif < formPointIndex)
+			if (dif < FormVertexIndex)
 			{
-				fp->sides = formPointIndex - dif;
+				fp->sides = FormVertexIndex - dif;
 				delsac(ind);
 				MoveMemory(&tflt[loc], fp->vertices, fp->sides * sizeof(fPOINT));
 				bcup(ind, &bc);
@@ -5793,9 +5793,9 @@ void repflt()
 			}
 		}
 	}
-	formPointIndex = loc;
+	FormVertexIndex = loc;
 rfltskp:;
-	MoveMemory(formPoints, tflt, sizeof(fPOINT)*formPointIndex);
+	MoveMemory(formPoints, tflt, sizeof(fPOINT)*FormVertexIndex);
 }
 
 void repclp()
@@ -5822,7 +5822,7 @@ void repclp()
 			{
 				if (loc < clipPointIndex)
 				{
-					fp->lengthOrCount.clipCount = formPointIndex - loc;
+					fp->lengthOrCount.clipCount = FormVertexIndex - loc;
 					MoveMemory(&tclps[cnt], fp->angleOrClipData.clip, sizeof(fPOINT)*fp->lengthOrCount.clipCount);
 					fp->angleOrClipData.clip = &clipPoints[cnt];
 					cnt += fp->lengthOrCount.clipCount;
@@ -5847,7 +5847,7 @@ void repclp()
 			{
 				if (loc < clipPointIndex)
 				{
-					fp->clipEntries = formPointIndex - loc;
+					fp->clipEntries = FormVertexIndex - loc;
 					MoveMemory(&tclps[cnt], fp->borderClipData, sizeof(fPOINT)*fp->clipEntries);
 					fp->borderClipData = &clipPoints[cnt];
 					cnt += fp->clipEntries;
@@ -5880,7 +5880,7 @@ void repsat()
 		if (fp->type == SAT)
 		{
 			dif = fp->satinOrAngle.sac - satinConns;
-			if (formPointIndex > dif + fp->sides)
+			if (FormVertexIndex > dif + fp->sides)
 			{
 				MoveMemory(&satinConns[loc], fp->satinOrAngle.sac, fp->satinGuideCount * sizeof(SATCON));
 				fp->satinOrAngle.sac = &satinConns[loc];

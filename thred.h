@@ -82,8 +82,8 @@ const unsigned long	RMAPBITS = RMAPSIZ << 5;	//a bit for each stitch
 #define		BITCOL		0xffff00	//default bitmap color
 #define		MAXFORMS	1024		//maximum number of forms
 #define		FORMFCT		0.05		//new forms part of screen
-#define		MAXDELAY	600			//maximum movie delay
-#define		MINDELAY	1			//minimum movie delay
+#define		MAXDELAY	600			//maximum movie time step
+#define		MINDELAY	1			//minimum movie time step
 #define		MOVITIM		12			//default movie time
 #define		DEFSPACE	0.45		//default stitch spacing
 #define		JMPSPACE	13			//default jump stitch spacing
@@ -197,7 +197,6 @@ enum {
 	STR_OVRIT,
 	STR_THRED,
 	STR_NUFIL,
-	STR_TRIAL,
 	STR_EMB,
 	STR_ON,
 	STR_OFF,
@@ -313,7 +312,7 @@ enum {
 	STR_FTH5,
 	STR_FTHBLND,
 	STR_FTHUP,
-	STR_FTHDWN,
+	STR_FTHBOTH,
 	STR_FTHUPCNT,
 	STR_FTHDWNCNT,
 	STR_FTHSIZ,
@@ -699,7 +698,7 @@ typedef struct _iniFil {
 	double			stitchBoxesThreshold;	//show sitch box level
 	double			stitchSpace;			//stitch spacing between lines of stitches
 	double			fillAngle;				//fill angle
-	unsigned		binaryVariableBitmap;	//bitmap
+	unsigned		userFlagMap;			//bitmap for user variables
 	double			borderWidth;			//border width
 	unsigned		underlayColor;			//applique color
 	TCHAR			prevNames[OLDNUM][_MAX_PATH];	//last file names

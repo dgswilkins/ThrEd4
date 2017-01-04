@@ -19,7 +19,7 @@ extern	unsigned		buttonHeight;
 extern	unsigned		buttonWidthX3;
 extern	unsigned		closestFormToCursor;
 extern	DRAWITEMSTRUCT*	ds;
-extern	TCHAR			fileName[_MAX_PATH];
+extern	TCHAR			workingFileName[_MAX_PATH];
 extern	unsigned		formIndex;
 extern	FRMHED			formList[MAXFORMS];
 extern	HWND			hButtonWin[9];
@@ -269,7 +269,7 @@ void bfilmsg() {
 	TCHAR	buf[HBUFSIZ];
 
 	LoadString(hInst, IDS_BADFIL, buf, HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, fileName);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, workingFileName);
 	shoMsg(hlpbuf);
 }
 

@@ -46,7 +46,7 @@ extern BOOL		isclp (unsigned find);
 extern BOOL		isclpx (unsigned find);
 extern BOOL		isfclp ();
 extern BOOL		istx (unsigned find);
-extern void		moveStitchPoints (fPOINTATTR* dst, fPOINTATTR* src);
+extern void		moveStitch (fPOINTATTR* dst, fPOINTATTR* src);
 extern void		movStch ();
 extern TCHAR*	mvflpnt (fPOINT* dst, fPOINT* src, unsigned cnt);
 extern void		mvsatk (SATCON* dst, SATCON* src, unsigned cnt);
@@ -378,7 +378,7 @@ POINT			selectedPointsRectangle[9];	//line derived from the point select rectang
 fRECTANGLE		allItemsRectangle;		//rectangle enclosing all forms and stitches
 double			formAngles[MAXFRMLINS];	//angles of a form for satin border fills
 fPOINT			formPoints[MAXFRMPNTS];	//form points
-unsigned		formPointIndex;			//next index to append form points
+unsigned		FormVertexIndex;			//next index to append form points
 fPOINT			clipPoints[MAXCLPNTS];	//main clipboard fill points for forms
 unsigned		clipPointIndex;			//next index to append main clipboard points
 SATCON			satinConns[MAXSAC];		//satin form connects
@@ -839,15 +839,15 @@ void fltspac(fPOINT* strt, unsigned cnt) {
 	unsigned	ind;
 
 	strti = fltind(strt);
-	src = formPointIndex - 1;
-	dst = formPointIndex + cnt - 1;
+	src = FormVertexIndex - 1;
+	dst = FormVertexIndex + cnt - 1;
 	while (src >= strti) {
 		formPoints[dst].x = formPoints[src].x;
 		formPoints[dst--].y = formPoints[src--].y;
 	}
 	for (ind = closestFormToCursor + 1; ind < formIndex; ind++)
 		formList[ind].vertices += cnt;
-	formPointIndex += cnt;
+	FormVertexIndex += cnt;
 }
 
 void delsac(unsigned fpnt) {
@@ -879,15 +879,15 @@ void delflt(unsigned fpnt) {
 	if (formList[fpnt].sides) {
 		dst = fltind(formList[fpnt].vertices);
 		src = dst + formList[fpnt].sides;
-		while (src < formPointIndex) {
+		while (src < FormVertexIndex) {
 			formPoints[dst].x = formPoints[src].x;
 			formPoints[dst++].y = formPoints[src++].y;
 		}
 		for (ind = fpnt + 1; ind < formIndex; ind++)
 			formList[ind].vertices -= formList[fpnt].sides;
-		formPointIndex -= formList[fpnt].sides;
-		if (formPointIndex & 0x8000000)
-			formPointIndex = 0;
+		FormVertexIndex -= formList[fpnt].sides;
+		if (FormVertexIndex & 0x8000000)
+			FormVertexIndex = 0;
 	}
 }
 
@@ -1299,7 +1299,7 @@ void delfrms() {
 	unsigned ind;
 
 	savdo();
-	formIndex = formPointIndex = satinConnectIndex = clipPointIndex = 0;
+	formIndex = FormVertexIndex = satinConnectIndex = clipPointIndex = 0;
 	for (ind = 0; ind < header.stitchCount; ind++)
 	{
 		stitchBuffer[ind].attribute &= NFRM_NTYP;
@@ -1676,7 +1676,7 @@ void setear() {
 		currentFormVertices[0].y = vpos;
 		SelectedForm->sides++;
 		newFormVertexCount++;
-		formPointIndex++;
+		FormVertexIndex++;
 		setMap(FORMSEL);
 		fvars(formIndex);
 		frmout(formIndex);
@@ -5440,9 +5440,9 @@ void delspnt() {
 			}
 		}
 	}
-	MoveMemory(&SelectedForm->vertices[closestVertexToCursor], &SelectedForm->vertices[closestVertexToCursor + 1], (formPointIndex - closestVertexToCursor) * sizeof(fPOINTATTR));
+	MoveMemory(&SelectedForm->vertices[closestVertexToCursor], &SelectedForm->vertices[closestVertexToCursor + 1], (FormVertexIndex - closestVertexToCursor) * sizeof(fPOINTATTR));
 	SelectedForm->sides--;
-	formPointIndex--;
+	FormVertexIndex--;
 	fvars(closestFormToCursor);
 	if (closestVertexToCursor > (unsigned)SelectedForm->sides - 1)
 		closestVertexToCursor = SelectedForm->sides - 1;
@@ -6745,7 +6745,9 @@ void refrmfn()
 			thDat[LFTHBLND] = txtrwin(pchr, rightWindowCoords);
 			nxtlin();
 			if (!(SelectedForm->extendedAttribute&AT_FTHBLND)) {
-				thTxt[LFTHDWN] = txtwin(stab[STR_FTHDWN], leftWindowCoords);
+				// ToDo - check whether we are doing 'feather down' or 'feather both'
+				// only 'feather both' exists in the string table
+				thTxt[LFTHDWN] = txtwin(stab[STR_FTHBOTH], leftWindowCoords);
 				if (SelectedForm->extendedAttribute&(AT_FTHDWN))
 					pchr = stab[STR_ON];
 				else
@@ -7997,7 +7999,7 @@ void duhart(unsigned nsids) {
 	SelectedForm = &formList[formIndex];
 	frmclr(SelectedForm);
 	SelectedForm->attribute = activeLayer << 1;
-	currentFormVertices = &formPoints[formPointIndex];
+	currentFormVertices = &formPoints[FormVertexIndex];
 	px2stch();
 	pnt.x = selectedPoint.x;
 	pnt.y = selectedPoint.y;
@@ -8067,7 +8069,7 @@ void dulens(unsigned nsids) {
 	SelectedForm = &formList[formIndex];
 	closestFormToCursor = formIndex;
 	frmclr(SelectedForm);
-	SelectedForm->vertices = &formPoints[formPointIndex];
+	SelectedForm->vertices = &formPoints[FormVertexIndex];
 	SelectedForm->attribute = activeLayer << 1;
 	fvars(formIndex);
 	px2stch();
@@ -8187,7 +8189,7 @@ void fliph() {
 	}
 	if (chkMap(BIGBOX)) {
 		av = (allItemsRectangle.right - allItemsRectangle.left) / 2 + allItemsRectangle.left;
-		for (ind = 0; ind < formPointIndex; ind++)
+		for (ind = 0; ind < FormVertexIndex; ind++)
 			formPoints[ind].x = av + av - formPoints[ind].x;
 		for (ind = 0; ind < header.stitchCount; ind++)
 			stitchBuffer[ind].x = av + av - stitchBuffer[ind].x;
@@ -8265,7 +8267,7 @@ void flipv() {
 	if (chkMap(BIGBOX)) {
 		savdo();
 		av = (allItemsRectangle.top - allItemsRectangle.bottom) / 2 + allItemsRectangle.bottom;
-		for (ind = 0; ind < formPointIndex; ind++)
+		for (ind = 0; ind < FormVertexIndex; ind++)
 			formPoints[ind].y = av + av - formPoints[ind].y;
 		for (ind = 0; ind < header.stitchCount; ind++)
 			stitchBuffer[ind].y = av + av - stitchBuffer[ind].y;
@@ -10818,9 +10820,9 @@ void dufdat(unsigned find) {
 	dst = &tmpFormList[formRelocationIndex++];
 	src = &formList[find];
 	mvfrms(dst, src, 1);
-	mvflpnt(&tmpFormPoints[formPointIndex], dst->vertices, dst->sides);
-	dst->vertices = &formPoints[formPointIndex];
-	formPointIndex += dst->sides;
+	mvflpnt(&tmpFormPoints[FormVertexIndex], dst->vertices, dst->sides);
+	dst->vertices = &formPoints[FormVertexIndex];
+	FormVertexIndex += dst->sides;
 	if (dst->satinGuideCount) {
 		mvsatk(&tmpSatinConns[satinConnectIndex], dst->satinOrAngle.sac, dst->satinGuideCount);
 		dst->satinOrAngle.sac = &satinConns[satinConnectIndex];
@@ -10874,7 +10876,7 @@ void frmnumfn(unsigned nunum) {
 		tmpFormPoints = (fPOINT*)&tmpFormList[formIndex];
 		tmpSatinConns = (SATCON*)&oseq;
 		tmpClipPoints = (fPOINT*)&tmpSatinConns[satinConnectIndex];
-		formPointIndex = satinConnectIndex = clipPointIndex = 0;
+		FormVertexIndex = satinConnectIndex = clipPointIndex = 0;
 		for (ind = 0; ind < formIndex; ind++) {
 			if (ind == nunum)
 				dufdat(closestFormToCursor);
@@ -10885,7 +10887,7 @@ void frmnumfn(unsigned nunum) {
 			}
 		}
 		mvfrms(formList, tmpFormList, formIndex);
-		mvflpnt(formPoints, tmpFormPoints, formPointIndex);
+		mvflpnt(formPoints, tmpFormPoints, FormVertexIndex);
 		mvsatk(satinConns, tmpSatinConns, satinConnectIndex);
 		mvflpnt(clipPoints, tmpClipPoints, clipPointIndex);
 		for (ind = 0; ind < header.stitchCount; ind++) {
@@ -10960,7 +10962,7 @@ void srtf(unsigned strt, unsigned fin) {
 			ine += tmp;
 		}
 		for (ind = strt; ind < fin; ind++)
-			moveStitchPoints(&stitchBuffer[frmhst[duat(tmpStitchBuffer[ind].attribute)]++], &tmpStitchBuffer[ind]);
+			moveStitch(&stitchBuffer[frmhst[duat(tmpStitchBuffer[ind].attribute)]++], &tmpStitchBuffer[ind]);
 	}
 }
 
@@ -10988,7 +10990,7 @@ void srtbyfrm() {
 			ine += tmp;
 		}
 		for (ind = 0; ind < header.stitchCount; ind++)
-			moveStitchPoints(&tmpStitchBuffer[colhst[colr[stitchBuffer[ind].attribute & 0xf]]++], &stitchBuffer[ind]);
+			moveStitch(&tmpStitchBuffer[colhst[colr[stitchBuffer[ind].attribute & 0xf]]++], &stitchBuffer[ind]);
 		srtf(0, colhst[0]);
 		for (ind = 0; ind < 15; ind++)
 			srtf(colhst[ind], colhst[ind + 1]);
@@ -11131,7 +11133,7 @@ void centir() {
 		stitchBuffer[ind].x += dif.x;
 		stitchBuffer[ind].y += dif.y;
 	}
-	for (ind = 0; ind < formPointIndex; ind++) {
+	for (ind = 0; ind < FormVertexIndex; ind++) {
 		formPoints[ind].x += dif.x;
 		formPoints[ind].y += dif.y;
 	}
@@ -11322,8 +11324,8 @@ void spltsat(SATCON tsac) {
 	mvfrmsb(&formList[formIndex], &formList[formIndex - 1], formIndex - closestFormToCursor);
 	formIndex++;
 	if (closestFormToCursor < (unsigned)formIndex - 2)
-		mvfltsb(&formPoints[formPointIndex + 1], &formPoints[formPointIndex - 1], formPointIndex - fltind(formList[closestFormToCursor + 2].vertices));
-	formPointIndex += 2;
+		mvfltsb(&formPoints[FormVertexIndex + 1], &formPoints[FormVertexIndex - 1], FormVertexIndex - fltind(formList[closestFormToCursor + 2].vertices));
+	FormVertexIndex += 2;
 	for (ind = closestFormToCursor + 2; ind < formIndex; ind++)
 		formList[ind].vertices += 2;
 	lo = 0;
@@ -13385,11 +13387,11 @@ void wavfrm() {
 
 	unmsg();
 	if (DialogBox(hInst, MAKEINTRESOURCE(IDD_WAV), hWnd, (DLGPROC)wavprc)) {
-		ind = formPointIndex;
+		ind = FormVertexIndex;
 		end = iniFile.waveEnd + 1;
 		durpoli(iniFile.wavePoints);
 		mdufrm();
-		formPointIndex = ind;
+		FormVertexIndex = ind;
 		tflt = (fPOINT*)&bseq;
 		ine = 0;
 		ind = iniFile.waveStart;
@@ -13431,7 +13433,7 @@ void wavfrm() {
 			rotflt(&currentFormVertices[ind]);
 		SelectedForm->type = FRMLINE;
 		SelectedForm->sides = ine;
-		formPointIndex += ine;
+		FormVertexIndex += ine;
 		frmout(formIndex);
 		rstMap(FORMSEL);
 		lfp_Size.x = SelectedForm->rectangle.right - SelectedForm->rectangle.left;

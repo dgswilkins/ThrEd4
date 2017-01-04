@@ -399,7 +399,7 @@ extern	SATCON*			currentFormConnections;
 extern	fPOINT*			currentFormVertices;
 extern	double			fillAngle;
 extern	POINT			formLines[MAXFRMLINS];
-extern	unsigned		formPointIndex;
+extern	unsigned		FormVertexIndex;
 extern	fPOINT			formMoveDelta;
 extern	unsigned		formIndex;
 extern	FRMHED			formList[MAXFORMS];
@@ -539,7 +539,7 @@ double			threadSize40 = TSIZ40;	//#40 thread size
 double			threadSize60 = TSIZ60;	//#40 thread size
 unsigned		runPoint;				//point for animating stitchout
 unsigned		stitchesPerFrame;		//number of stitches to draw in each frame
-int				delay;					//time delay for stitchout
+int				movieTimeStep;			//time delay for stitchout
 double			stitchBoxesThreshold = STCHBOX;//threshold for drawing stitch boxes
 //WARNING the size of the following array must be changed if the maximum movie speed is changed
 POINT			movieLine[100];			//line for movie stitch draw
@@ -773,8 +773,8 @@ HANDLE			hBalaradFile;			//balarad file handle
 double			aspectRatio = (double)LHUPX / LHUPY;	//aspect ratio of the stich window
 SCROLLINFO		scrollInfo;				//scroll bar i/o structure
 POINT			stitchWindowSize;		//size of the stich window in pixels
-fPOINT			selectedPoint;			//for converting pixels coordinates
-											// to stitch cordinates
+fPOINT			selectedPoint;			//for converting stitch coordinates
+										// to metric cordinates (mm)
 fPOINT			zoomBoxOrigin;			//zoom box origin
 
 COLORREF defCol[] = {
@@ -823,7 +823,7 @@ MENUITEMINFO filinfo = {
 const TCHAR		allFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
 const TCHAR		bmpFilter[_MAX_PATH + 1] = "Microsoft (BMP)\0*.bmp\0";
 TCHAR			customFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0";
-TCHAR			fileName[_MAX_PATH + 1] = { 0 };
+TCHAR			workingFileName[_MAX_PATH + 1] = { 0 };
 TCHAR			thrName[_MAX_PATH + 1];
 TCHAR			auxName[_MAX_PATH + 1];
 TCHAR			geName[_MAX_PATH + 1];
@@ -855,7 +855,7 @@ OPENFILENAME	ofn = {
 	customFilter,			//lpstrCustomFilter 
 	_MAX_PATH,				//nMaxCustFilter 
 	0,						//nFilterIndex 
-	fileName,				//lpstrFile 
+	workingFileName,		//lpstrFile 
 	_MAX_PATH,				//nMaxFile 
 	0,						//lpstrFileTitle 
 	0,						//nMaxFileTitle 
@@ -1055,11 +1055,11 @@ POINT		rotateBoxToCursorLine[2];	//line from the cursor to the center of the rot
 POINT		stretchBoxLine[5];			//stretch and expand
 
 COLCHNG		colorChangeTable[MAXCHNG];
-PCSHEADER	header;			//pcs file header
-STREX		extendedHeader;	//thred file header extension
-INIFILE		iniFile;		//initialization file
-dPOINT		rotationCenter;	//center of stitch rotation
-POINT		rotationCenterPixels;	//center of pixel rotation
+PCSHEADER	header;						//pcs file header
+STREX		extendedHeader;				//thred file header extension
+INIFILE		iniFile;					//initialization file
+dPOINT		rotationCenter;				//center of stitch rotation
+POINT		rotationCenterPixels;		//center of pixel rotation
 
 unsigned	frmstrt;					//points to the first stitch in a form
 
@@ -1823,11 +1823,11 @@ unsigned upmap[] = {
 };
 
 unsigned			flagMap[MAPLEN];			//bitmap
-unsigned			binaryVariableBitmap = 0;	//for storage of persistent binary variables set by the user
+unsigned			userFlagMap = 0;	//for storage of persistent binary variables set by the user
 // ToDo - stitchBuffer and tmpStitichBuffer have been allocated at the same place. Should they be separate?
 fPOINTATTR			stitchBuffer[MAXPCS];		//main stitch buffer
 fPOINTATTR			clipBuffer[MAXSEQ];			//for temporary copy of imported clipboard data
-FRMHED*				SelectedForm;			//pointer to selected form
+FRMHED*				SelectedForm;				//pointer to selected form
 unsigned			fillTypes[] =				//fill type array for side window display
 { 0,VRTF,HORF,ANGF,SATF,CLPF,CONTF,VCLPF,HCLPF,ANGCLPF,FTHF,TXVRTF,TXHORF,TXANGF };
 //edge fill type array for side window display
@@ -1836,102 +1836,102 @@ unsigned			edgeFillTypes[] = { 0,EDGELINE,EDGEBEAN,EDGECLIP,EDGEANGSAT,EDGEAPPL,
 unsigned			featherFillTypes[] = { FTHSIN,FTHSIN2,FTHLIN,FTHPSG,FTHRMP,FTHFAZ };
 
 //bitmap functions
-unsigned setMap(unsigned bPnt) {
+unsigned setMap(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
 
 		xor		eax, eax
 		mov		ebx, offset flagMap
-		mov		ecx, bPnt
+		mov		ecx, bit
 		bts[ebx], ecx
 		jnc		short setx
 		dec		eax
 		setx :
 	}
 #else
-	return _bittestandset((long *)flagMap, bPnt) ? 0xffffffff : 0;
+	return _bittestandset((long *)flagMap, bit) ? 0xffffffff : 0;
 #endif
 }
 
-void clrMap(unsigned len) {
+void clrMap(unsigned length) {
 
 #if  __UseASM__
 	_asm {
 
 		mov		edi, offset flagMap
-		mov		ecx, len
+		mov		ecx, length
 		xor		eax, eax
 		rep		stosd
 	}
 #else
-	memset(flagMap, 0, sizeof(*flagMap) * len);
+	memset(flagMap, 0, sizeof(*flagMap) * length);
 #endif
 }
 
-unsigned rstMap(unsigned bPnt) {
+unsigned rstMap(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
 
 		xor		eax, eax
 		mov		ebx, offset flagMap
-		mov		ecx, bPnt
+		mov		ecx, bit
 		btr[ebx], ecx
 		jnc		short rstx
 		dec		eax
 		rstx :
 	}
 #else
-	return _bittestandreset((long *)flagMap, bPnt) ? 0xffffffff : 0;
+	return _bittestandreset((long *)flagMap, bit) ? 0xffffffff : 0;
 #endif
 }
 
-unsigned toglMap(unsigned bPnt) {
+unsigned toglMap(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
 
 		xor		eax, eax
 		mov		ebx, offset flagMap
-		mov		edx, bPnt
+		mov		edx, bit
 		btc[ebx], edx
 		jnc		short toglx
 		dec		eax
 		toglx :
 	}
 #else
-	return _bittestandcomplement((long *)flagMap, bPnt) ? 0xffffffff : 0;
+	return _bittestandcomplement((long *)flagMap, bit) ? 0xffffffff : 0;
 #endif
 }
 
-unsigned chkMap(unsigned bPnt) {
+unsigned chkMap(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
 
 		xor		eax, eax
 		mov		ebx, offset flagMap
-		mov		edx, bPnt
+		mov		edx, bit
 		bt[ebx], edx
 		jnc		short chkx
 		dec		eax
 		chkx :
 	}
 #else
-	return _bittest((long *)flagMap, bPnt) ? 0xffffffff : 0;
+	return _bittest((long *)flagMap, bit) ? 0xffffffff : 0;
 #endif
 }
 
-void cpymap(unsigned dst, unsigned src) {
+void cpymap(unsigned destinationBit, unsigned sourceBit) {
 
 #if  __UseASM__
 	_asm {
 
 		mov		ebx, offset flagMap
-		mov		eax, dst
+		mov		eax, destinationBit
 		btr[ebx], eax
-		mov		edx, src
+		mov		edx, sourceBit
 		bt[ebx], edx
 		jnc		short cpx
 		bts[ebx], eax
@@ -1939,84 +1939,84 @@ void cpymap(unsigned dst, unsigned src) {
 	}
 #else
 	// check translation
-	if (_bittest((long *)flagMap, src)) {
-		_bittestandset((long *)flagMap, dst);
+	if (_bittest((long *)flagMap, sourceBit)) {
+		_bittestandset((long *)flagMap, destinationBit);
 	} else {
-		_bittestandreset((long *)flagMap, dst);
+		_bittestandreset((long *)flagMap, destinationBit);
 	}
 #endif
 }
 
 //user bitmap functions
-unsigned setu(unsigned bPnt) {
+unsigned setu(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
 
 		xor		eax, eax
-		mov		ebx, offset binaryVariableBitmap
-		mov		ecx, bPnt
+		mov		ebx, offset userFlagMap
+		mov		ecx, bit
 		bts[ebx], ecx
 		jnc		short setx
 		dec		eax
 		setx :
 	}
 #else
-	return _bittestandset((long *)&binaryVariableBitmap, bPnt) ? 0xffffffff : 0;
+	return _bittestandset((long *)&userFlagMap, bit) ? 0xffffffff : 0;
 #endif
 }
 
-unsigned rstu(unsigned bPnt) {
+unsigned rstu(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
 
 		xor		eax, eax
-		mov		ebx, offset binaryVariableBitmap
-		mov		ecx, bPnt
+		mov		ebx, offset userFlagMap
+		mov		ecx, bit
 		btr[ebx], ecx
 		jnc		short rstx
 		dec		eax
 		rstx :
 	}
 #else
-	return _bittestandreset((long *)&binaryVariableBitmap, bPnt) ? 0xffffffff : 0;
+	return _bittestandreset((long *)&userFlagMap, bit) ? 0xffffffff : 0;
 #endif
 }
 
-unsigned chku(unsigned bPnt) {
+unsigned chku(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
 
 		xor		eax, eax
-		mov		ebx, offset binaryVariableBitmap
-		mov		edx, bPnt
+		mov		ebx, offset userFlagMap
+		mov		edx, bit
 		bt[ebx], edx
 		jnc		short chkx
 		dec		eax
 		chkx :
 	}
 #else
-	return _bittest((long *)&binaryVariableBitmap, bPnt) ? 0xffffffff : 0;
+	return _bittest((long *)&userFlagMap, bit) ? 0xffffffff : 0;
 #endif
 }
 
-unsigned toglu(unsigned bPnt) {
+unsigned toglu(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
 
 		xor		eax, eax
-		mov		ebx, offset binaryVariableBitmap
-		mov		edx, bPnt
+		mov		ebx, offset userFlagMap
+		mov		edx, bit
 		btc[ebx], edx
 		jnc		short toglx
 		dec		eax
 		toglx :
 	}
 #else
-	return _bittestandcomplement((long *)&binaryVariableBitmap, bPnt) ? 0xffffffff : 0;
+	return _bittestandcomplement((long *)&userFlagMap, bit) ? 0xffffffff : 0;
 #endif
 }
 
@@ -2118,9 +2118,9 @@ BOOL iseclpx(unsigned find) {
 	return 0;
 }
 
-double stlen(unsigned p_stind) {
+double stlen(unsigned iStitch) {
 
-	return hypot(stitchBuffer[p_stind + 1].x - stitchBuffer[p_stind].x, stitchBuffer[p_stind + 1].y - stitchBuffer[p_stind].y);
+	return hypot(stitchBuffer[iStitch + 1].x - stitchBuffer[iStitch].x, stitchBuffer[iStitch + 1].y - stitchBuffer[iStitch].y);
 }
 
 void undat() {
@@ -2204,26 +2204,26 @@ void linbmen() {
 
 void wrnmen()
 {
-	unsigned cod;
+	unsigned code;
 
-	cod = MF_CHECKED;
+	code = MF_CHECKED;
 	if (chku(WRNOF))
-		cod = MF_UNCHECKED;
-	CheckMenuItem(hMainMenu, ID_WARNOF, cod);
+		code = MF_UNCHECKED;
+	CheckMenuItem(hMainMenu, ID_WARNOF, code);
 }
 
 int datcod[] = { ID_CHKOF,ID_CHKON,ID_CHKREP,ID_CHKREPMSG };
 
 void chkmen()
 {
-	int ind, cod;
+	int iCode, code;
 
-	for (ind = 0; ind < (sizeof(datcod) / sizeof(int)); ind++)
+	for (iCode = 0; iCode < (sizeof(datcod) / sizeof(int)); iCode++)
 	{
-		cod = MF_UNCHECKED;
-		if (ind == iniFile.dataCheck)
-			cod = MF_CHECKED;
-		CheckMenuItem(hMainMenu, datcod[ind], cod);
+		code = MF_UNCHECKED;
+		if (iCode == iniFile.dataCheck)
+			code = MF_CHECKED;
+		CheckMenuItem(hMainMenu, datcod[iCode], code);
 	}
 }
 
@@ -2239,195 +2239,197 @@ void duzrat() {
 
 unsigned rsed() {
 
-	SYSTEMTIME tim;
+	SYSTEMTIME time;
 
-	GetLocalTime(&tim);
-	return (tim.wSecond << 16) | tim.wMilliseconds;
+	GetLocalTime(&time);
+	return (time.wSecond << 16) | time.wMilliseconds;
 }
 
-void ritfnam(TCHAR* nam) {
+void ritfnam(TCHAR* fileName) {
 
-	unsigned		ind;
-	unsigned char	tnam[50];
+	unsigned		iName;
+	unsigned char	tmpFileName[50];
 
+	// ToDo - is this comparison correct?
 	if (*fileNameOrder > 50)
 		fnamtabs();
 	pseudoRandomValue = rsed();
-	for (ind = 0; ind < 50; ind++)
-		tnam[ind] = psg() & 0xff;
-	for (ind = 0; ind < 50; ind++) {
+	for (iName = 0; iName < 50; iName++)
+		tmpFileName[iName] = psg() & 0xff;
+	for (iName = 0; iName < 50; iName++) {
 
-		if (nam[ind])
+		if (fileName[iName])
 		{
-			tnam[ind] = filenameEncoded[nam[ind]];
+			tmpFileName[iName] = filenameEncoded[fileName[iName]];
 		} else {
 
-			while (filenameDecode[tnam[ind]])
-				tnam[ind] = psg() & 0xff;
+			while (filenameDecode[tmpFileName[iName]])
+				tmpFileName[iName] = psg() & 0xff;
 			break;
 		}
 	}
-	if (ind == 50) {
+	if (iName == 50) {
 
-		while (filenameDecode[tnam[49]])
-			tnam[49] = psg() & 0xff;
+		while (filenameDecode[tmpFileName[49]])
+			tmpFileName[49] = psg() & 0xff;
 	}
-	for (ind = 0; ind < 50; ind++)
-		if (fileNameOrder[ind] < 50) { extendedHeader.creatorName[fileNameOrder[ind]] = tnam[ind]; }
+	for (iName = 0; iName < 50; iName++)
+		if (fileNameOrder[iName] < 50) { extendedHeader.creatorName[fileNameOrder[iName]] = tmpFileName[iName]; }
 }
 
-void redfnam(TCHAR* nam) {
+void redfnam(TCHAR* fileName) {
 
-	unsigned ind;
-	unsigned char tnam[50];
+	unsigned iName;
+	unsigned char tmpFileName[50];
 
-	for (ind = 0; ind < 50; ind++)
-		if (fileNameOrder[ind] < 50)
-			tnam[ind] = extendedHeader.creatorName[fileNameOrder[ind]];
+	for (iName = 0; iName < 50; iName++)
+		if (fileNameOrder[iName] < 50)
+			tmpFileName[iName] = extendedHeader.creatorName[fileNameOrder[iName]];
 		else
-			tnam[ind] = 111;
-	for (ind = 0; ind < 50; ind++) {
+			tmpFileName[iName] = 111;
+	for (iName = 0; iName < 50; iName++) {
 
-		nam[ind] = filenameDecode[tnam[ind]];
-		if (!nam[ind])
+		fileName[iName] = filenameDecode[tmpFileName[iName]];
+		if (!fileName[iName])
 			return;
 	}
 }
 
 void fnamtabs() {
 
-	unsigned		ind, tuns, src, dst;
-	unsigned char	chr;
-	unsigned*		puns;
+	unsigned		iName, swapInteger, source, destination;
+	unsigned char	swapCharacter;
+	unsigned*		pTemp;
 
-	for (ind = 0; ind < 50; ind++)
-		fileNameOrder[ind] = ind;
+	for (iName = 0; iName < 50; iName++)
+		fileNameOrder[iName] = iName;
 	pseudoRandomValue = NORDSED;
-	for (ind = 0; ind < 100; ind++) {
+	for (iName = 0; iName < 100; iName++) {
 
-		src = psg() % 50;
-		dst = psg() % 50;
-		tuns = fileNameOrder[dst];
-		fileNameOrder[dst] = fileNameOrder[src];
-		fileNameOrder[src] = tuns;
+		source = psg() % 50;
+		destination = psg() % 50;
+		swapInteger = fileNameOrder[destination];
+		fileNameOrder[destination] = fileNameOrder[source];
+		fileNameOrder[source] = swapInteger;
 	}
-	for (ind = 0; ind < 128; ind++)
-		filenameEncoded[ind] = (unsigned char)ind + NCODOF;
+	for (iName = 0; iName < 128; iName++)
+		filenameEncoded[iName] = (unsigned char)iName + NCODOF;
 	pseudoRandomValue = NCODSED;
-	for (ind = 0; ind < 256; ind++) {
+	for (iName = 0; iName < 256; iName++) {
 
-		src = psg() & 0x7f;
-		dst = psg() & 0x7f;
-		chr = filenameEncoded[dst];
-		filenameEncoded[dst] = filenameEncoded[src];
-		filenameEncoded[src] = chr;
+		source = psg() & 0x7f;
+		destination = psg() & 0x7f;
+		swapCharacter = filenameEncoded[destination];
+		filenameEncoded[destination] = filenameEncoded[source];
+		filenameEncoded[source] = swapCharacter;
 	}
-	puns = (unsigned*)&filenameDecode;
-	for (ind = 0; ind < 64; ind++)
-		puns[ind] = 0;
-	for (ind = 32; ind < 127; ind++)
-		filenameDecode[filenameEncoded[ind]] = (unsigned char)ind;
+	// ToDo - is pTemp used as an 'optimization'?
+	pTemp = (unsigned*)&filenameDecode;
+	for (iName = 0; iName < 64; iName++)
+		pTemp[iName] = 0;
+	for (iName = 32; iName < 127; iName++)
+		filenameDecode[filenameEncoded[iName]] = (unsigned char)iName;
 }
 
-void dstin(unsigned num, POINT* pout) {
+void dstin(unsigned number, POINT* pout) {
 
-	unsigned ind, shft;
+	unsigned ind, shift;
 
-	shft = 1;
+	shift = 1;
 	pout->x = pout->y = 0;
 	for (ind = 0; ind < 22; ind++) {
 
-		if (num&shft) {
+		if (number&shift) {
 
 			if (dstval[ind].cor)
 				pout->y += dstval[ind].val;
 			else
 				pout->x += dstval[ind].val;
 		}
-		shft <<= 1;
+		shift <<= 1;
 	}
 }
 
-fPOINT* adflt(unsigned cnt) {
+fPOINT* adflt(unsigned count) {
 
-	unsigned ind = formPointIndex;
+	unsigned iFormVertex = FormVertexIndex;
 
-	if (formPointIndex + cnt > MAXFLT)
+	if (FormVertexIndex + count > MAXFLT)
 		tabmsg(IDS_FRMOVR);
-	formPointIndex += cnt;
-	return &formPoints[ind];
+	FormVertexIndex += count;
+	return &formPoints[iFormVertex];
 }
 
-SATCON* adsatk(unsigned cnt) {
+SATCON* adsatk(unsigned count) {
 
-	unsigned ind = satinConnectIndex;
+	unsigned iSatinConnect = satinConnectIndex;
 
-	satinConnectIndex += cnt;
-	return &satinConns[ind];
+	satinConnectIndex += count;
+	return &satinConns[iSatinConnect];
 }
 
-fPOINT* adclp(unsigned cnt) {
+fPOINT* adclp(unsigned count) {
 
-	unsigned ind = clipPointIndex;
+	unsigned iClipPoint = clipPointIndex;
 
-	clipPointIndex += cnt;
-	return &clipPoints[ind];
+	clipPointIndex += count;
+	return &clipPoints[iClipPoint];
 }
 
-unsigned duthrsh(double var) {
+unsigned duthrsh(double threshold) {
 
-	unsigned	ind = 0;
-	double		tdub = 1;
+	unsigned	iZoomLevel = 0;
+	double		zoom = 1;
 
-	if (var) {
+	if (threshold) {
 
-		while (tdub > var) {
+		while (zoom > threshold) {
 
-			tdub *= ZUMFCT;
-			ind++;
+			zoom *= ZUMFCT;
+			iZoomLevel++;
 		}
 	} else
 		return 0;
-	return ind + 1;
+	return iZoomLevel + 1;
 }
 
-double unthrsh(unsigned lev) {
+double unthrsh(unsigned level) {
 
-	double		tdub = 1;
+	double	zoom = 1;
 
-	if (lev)
-		lev--;
+	if (level)
+		level--;
 	else
 		return 0;
-	while (lev) {
+	while (level) {
 
-		tdub *= ZUMFCT;
-		lev--;
+		zoom *= ZUMFCT;
+		level--;
 	}
-	return tdub;
+	return zoom;
 }
 
-void ritfcor(fPOINT* pnt) {
+void ritfcor(fPOINT* point) {
 
-	sprintf_s(msgBuffer, sizeof(msgBuffer), "x%.0f y%.0f", pnt->x / PFGRAN, pnt->y / PFGRAN);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "x%.0f y%.0f", point->x / PFGRAN, point->y / PFGRAN);
 	butxt(HCOR, msgBuffer);
 }
 
-void ritcor(fPOINTATTR* pnt) {
+void ritcor(fPOINTATTR* pointAttribute) {
 
-	fPOINT	tpnt;
+	fPOINT	point;
 
-	tpnt.x = pnt->x;
-	tpnt.y = pnt->y;
-	ritfcor(&tpnt);
+	point.x = pointAttribute->x;
+	point.y = pointAttribute->y;
+	ritfcor(&point);
 }
 
 void coltab() {
 
-	unsigned	ind, col, tuns;
-	unsigned	ocol;
-	dRECTANGLE	rng;
-	fPOINTATTR*	ts;
+	unsigned	iStitch, iColor, nextColor;
+	unsigned	currentColor;
+	dRECTANGLE	range;
+	fPOINTATTR*	Stitch;
 
 	colorChanges = 0;
 	if (header.stitchCount)
@@ -2436,46 +2438,46 @@ void coltab() {
 		stitchBuffer[0].attribute |= (stitchBuffer[1].attribute&COLMSK);
 		stitchBuffer[header.stitchCount - 1].attribute &= NCOLMSK;
 		stitchBuffer[header.stitchCount - 1].attribute |= (stitchBuffer[header.stitchCount - 2].attribute&COLMSK);
-		ocol = stitchBuffer[0].attribute&COLMSK;
-		for (ind = 1; ind < (unsigned)header.stitchCount - 1; ind++)
+		currentColor = stitchBuffer[0].attribute&COLMSK;
+		for (iStitch = 1; iStitch < (unsigned)header.stitchCount - 1; iStitch++)
 		{
-			if ((stitchBuffer[ind].attribute&COLMSK) != ocol)
+			if ((stitchBuffer[iStitch].attribute&COLMSK) != currentColor)
 			{
-				if ((stitchBuffer[ind + 1].attribute&COLMSK) == ocol)
+				if ((stitchBuffer[iStitch + 1].attribute&COLMSK) == currentColor)
 				{
-					stitchBuffer[ind].attribute &= NCOLMSK;
-					stitchBuffer[ind].attribute |= ocol;
+					stitchBuffer[iStitch].attribute &= NCOLMSK;
+					stitchBuffer[iStitch].attribute |= currentColor;
 				}
-				ocol = stitchBuffer[ind].attribute&COLMSK;
+				currentColor = stitchBuffer[iStitch].attribute&COLMSK;
 			}
 		}
-		col = 0;
-		ocol = 0xffffffff;
-		rng.left = -unzoomedRect.x;
-		rng.right = unzoomedRect.x * 2;
-		rng.bottom = -unzoomedRect.y;
-		rng.top = unzoomedRect.y * 2;
-		for (ind = 0; ind < header.stitchCount; ind++)
+		iColor = 0;
+		currentColor = 0xffffffff;
+		range.left = -unzoomedRect.x;
+		range.right = unzoomedRect.x * 2;
+		range.bottom = -unzoomedRect.y;
+		range.top = unzoomedRect.y * 2;
+		for (iStitch = 0; iStitch < header.stitchCount; iStitch++)
 		{
-			ts = &stitchBuffer[ind];
-			if (ts->x < rng.left)
-				ts->x = (float)rng.left;
-			if (ts->x > rng.right)
-				ts->x = (float)rng.right;
-			if (ts->y > rng.top)
-				ts->y = (float)rng.top;
-			if (ts->y < rng.bottom)
-				ts->y = (float)rng.bottom;
-			tuns = ts->attribute&COLMSK;
-			if (ocol != tuns)
+			Stitch = &stitchBuffer[iStitch];
+			if (Stitch->x < range.left)
+				Stitch->x = (float)range.left;
+			if (Stitch->x > range.right)
+				Stitch->x = (float)range.right;
+			if (Stitch->y > range.top)
+				Stitch->y = (float)range.top;
+			if (Stitch->y < range.bottom)
+				Stitch->y = (float)range.bottom;
+			nextColor = Stitch->attribute&COLMSK;
+			if (currentColor != nextColor)
 			{
-				colorChangeTable[col].colorIndex = (unsigned char)tuns;
-				colorChangeTable[col++].stitchIndex = (unsigned short)ind;
-				ocol = tuns;
+				colorChangeTable[iColor].colorIndex = (unsigned char)nextColor;
+				colorChangeTable[iColor++].stitchIndex = (unsigned short)iStitch;
+				currentColor = nextColor;
 			}
 		}
-		colorChanges = col;
-		colorChangeTable[col].stitchIndex = (unsigned short)ind;
+		colorChanges = iColor;
+		colorChangeTable[iColor].stitchIndex = (unsigned short)iStitch;
 		if (closestPointIndex > (unsigned)header.stitchCount - 1)
 			closestPointIndex = header.stitchCount - 1;
 		fndknt();
@@ -2484,43 +2486,43 @@ void coltab() {
 
 void ladj() {
 
-	unsigned ind;
+	unsigned iLayer;
 
-	for (ind = 0; ind < 5; ind++) {
+	for (iLayer = 0; iLayer < 5; iLayer++) {
 
-		if (ind == activeLayer)
-			EnableMenuItem(hMainMenu, ind + M_ALL, MF_BYPOSITION | MF_GRAYED);
+		if (iLayer == activeLayer)
+			EnableMenuItem(hMainMenu, iLayer + M_ALL, MF_BYPOSITION | MF_GRAYED);
 		else
-			EnableMenuItem(hMainMenu, ind + M_ALL, MF_BYPOSITION | MF_ENABLED);
+			EnableMenuItem(hMainMenu, iLayer + M_ALL, MF_BYPOSITION | MF_ENABLED);
 	}
 	setMap(DUMEN);
 }
 
-void stchcpy(unsigned p_siz, fPOINTATTR* dst) {
+void stchcpy(unsigned size, fPOINTATTR* destination) {
 
 #if  __UseASM__
 	_asm {
 
 		mov		esi, offset stitchBuffer
-		mov		edi, dst
-		mov		ecx, p_siz
+		mov		edi, destination
+		mov		ecx, size
 		rep		movsd
 	}
 #else
-	memcpy(dst, stitchBuffer, p_siz * 4);
+	memcpy(destination, stitchBuffer, size * 4);
 #endif
 }
 
 void deldu() {
 
-	unsigned ind;
+	unsigned iBuffer;
 
-	for (ind = 0; ind < 16; ind++) {
+	for (iBuffer = 0; iBuffer < 16; iBuffer++) {
 
-		if (undoBuffer[ind]) {
+		if (undoBuffer[iBuffer]) {
 
-			free(undoBuffer[ind]);
-			undoBuffer[ind] = 0;
+			free(undoBuffer[iBuffer]);
+			undoBuffer[iBuffer] = 0;
 		}
 	}
 	undoBufferWriteIndex = 0;
@@ -2528,86 +2530,86 @@ void deldu() {
 	rstMap(BAKACT);
 }
 
-TCHAR* mvflpnt(fPOINT* dst, fPOINT* src, unsigned cnt) {
+TCHAR* mvflpnt(fPOINT* destination, fPOINT* source, unsigned size) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		ecx, cnt
+		mov		ecx, size
 		shl		ecx, 1
-		mov		esi, src
-		mov		edi, dst
+		mov		esi, source
+		mov		edi, destination
 		rep		movsd
 		mov		eax, edi
 	}
 #else
-	memcpy(dst, src, cnt * sizeof(fPOINT));
-	return (TCHAR *)(dst + cnt);
+	memcpy(destination, source, size * sizeof(fPOINT));
+	return (TCHAR *)(destination + size);
 #endif
 }
 
-void mvsatk(SATCON* dst, SATCON* src, unsigned cnt) {
+void mvsatk(SATCON* destination, SATCON* source, unsigned size) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		ecx, cnt
-		mov		esi, src
-		mov		edi, dst
+		mov		ecx, size
+		mov		esi, source
+		mov		edi, destination
 		rep		movsd
 	}
 #else
-	memcpy(dst, src, cnt * sizeof(SATCON));
+	memcpy(destination, source, size * sizeof(SATCON));
 #endif
 }
 
 void dudat() {
 
-	unsigned	l_siz;
-	BAKHED*		bdat;
+	unsigned	size;
+	BAKHED*		backupData;
 
 	if (undoBuffer[undoBufferWriteIndex])
 		free(undoBuffer[undoBufferWriteIndex]);
-	l_siz = sizeof(BAKHED) + sizeof(FRMHED)*formIndex + sizeof(fPOINTATTR)*header.stitchCount
-		+ sizeof(fPOINT)*(formPointIndex + clipPointIndex) + sizeof(SATCON)*satinConnectIndex + sizeof(COLORREF) * 16 +
+	size = sizeof(BAKHED) + sizeof(FRMHED)*formIndex + sizeof(fPOINTATTR)*header.stitchCount
+		+ sizeof(fPOINT)*(FormVertexIndex + clipPointIndex) + sizeof(SATCON)*satinConnectIndex + sizeof(COLORREF) * 16 +
 		sizeof(TXPNT)*textureIndex;
-	undoBuffer[undoBufferWriteIndex] = calloc(l_siz,sizeof(unsigned));
-	bdat = (BAKHED*)undoBuffer[undoBufferWriteIndex];
-	if (bdat) {
+	undoBuffer[undoBufferWriteIndex] = calloc(size,sizeof(unsigned));
+	backupData = (BAKHED*)undoBuffer[undoBufferWriteIndex];
+	if (backupData) {
 
-		bdat->zoomRect.x = unzoomedRect.x;
-		bdat->zoomRect.y = unzoomedRect.y;
-		bdat->formCount = formIndex;
-		bdat->forms = (FRMHED*)&bdat[1];
+		backupData->zoomRect.x = unzoomedRect.x;
+		backupData->zoomRect.y = unzoomedRect.y;
+		backupData->formCount = formIndex;
+		backupData->forms = (FRMHED*)&backupData[1];
 		//		for(ind=0;ind<formIndex;ind++)
-		//			frmcpy(&bdat->forms[ind],&formList[ind]);
-		MoveMemory(bdat->forms, &formList, sizeof(FRMHED)*formIndex);
-		bdat->stitchCount = header.stitchCount;
-		bdat->stitches = (fPOINTATTR*)&bdat->forms[formIndex];
+		//			frmcpy(&backupData->forms[ind],&formList[ind]);
+		MoveMemory(backupData->forms, &formList, sizeof(FRMHED)*formIndex);
+		backupData->stitchCount = header.stitchCount;
+		backupData->stitches = (fPOINTATTR*)&backupData->forms[formIndex];
 		if (header.stitchCount)
-			stchcpy((sizeof(fPOINTATTR)*header.stitchCount) >> 2, bdat->stitches);
-		bdat->formPointCount = formPointIndex;
-		bdat->formPoints = (fPOINT*)&bdat->stitches[header.stitchCount];
-		if (formPointIndex)
-			mvflpnt(bdat->formPoints, &formPoints[0], formPointIndex);
-		bdat->satinConnectionCount = satinConnectIndex;
-		bdat->satinConnection = (SATCON*)&bdat->formPoints[formPointIndex];
+			stchcpy((sizeof(fPOINTATTR)*header.stitchCount) >> 2, backupData->stitches);
+		backupData->formPointCount = FormVertexIndex;
+		backupData->formPoints = (fPOINT*)&backupData->stitches[header.stitchCount];
+		if (FormVertexIndex)
+			mvflpnt(backupData->formPoints, &formPoints[0], FormVertexIndex);
+		backupData->satinConnectionCount = satinConnectIndex;
+		backupData->satinConnection = (SATCON*)&backupData->formPoints[FormVertexIndex];
 		if (satinConnectIndex)
-			mvsatk(bdat->satinConnection, &satinConns[0], satinConnectIndex);
-		bdat->clipPointCount = clipPointIndex;
-		bdat->clipPoints = (fPOINT*)&bdat->satinConnection[satinConnectIndex];
+			mvsatk(backupData->satinConnection, &satinConns[0], satinConnectIndex);
+		backupData->clipPointCount = clipPointIndex;
+		backupData->clipPoints = (fPOINT*)&backupData->satinConnection[satinConnectIndex];
 		if (clipPointIndex) {
 
 			if (clipPointIndex > MAXCLPNTS)
 				clipPointIndex = MAXCLPNTS;
-			mvflpnt(bdat->clipPoints, &clipPoints[0], clipPointIndex);
+			mvflpnt(backupData->clipPoints, &clipPoints[0], clipPointIndex);
 		}
-		bdat->colors = (COLORREF*)&bdat->clipPoints[clipPointIndex];
-		MoveMemory(bdat->colors, &userColor, sizeof(COLORREF) * 16);
-		bdat->texturePoints = (TXPNT*)&bdat->colors[16];
-		bdat->texturePointCount = textureIndex;
+		backupData->colors = (COLORREF*)&backupData->clipPoints[clipPointIndex];
+		MoveMemory(backupData->colors, &userColor, sizeof(COLORREF) * 16);
+		backupData->texturePoints = (TXPNT*)&backupData->colors[16];
+		backupData->texturePointCount = textureIndex;
 		if (textureIndex)
-			MoveMemory(bdat->texturePoints, &texturePointsBuffer, sizeof(TXPNT)*textureIndex);
+			MoveMemory(backupData->texturePoints, &texturePointsBuffer, sizeof(TXPNT)*textureIndex);
 	}
 }
 
@@ -2635,29 +2637,29 @@ void savdo() {
 
 void redfils() {
 
-	unsigned			ind;
-	WIN32_FIND_DATA		fdat;
-	HANDLE				hndl;
+	unsigned			iLRU;
+	WIN32_FIND_DATA		findData;
+	HANDLE				fileHandle;
 
-	for (ind = 0; ind < OLDNUM; ind++) {
-		if (GetMenuState(hfileMenu, LRUMenuId[ind], MF_BYCOMMAND) != -1)
-			DeleteMenu(hfileMenu, LRUMenuId[ind], MF_BYCOMMAND);
+	for (iLRU = 0; iLRU < OLDNUM; iLRU++) {
+		if (GetMenuState(hfileMenu, LRUMenuId[iLRU], MF_BYCOMMAND) != -1)
+			DeleteMenu(hfileMenu, LRUMenuId[iLRU], MF_BYCOMMAND);
 	}
-	for (ind = 0; ind < OLDNUM; ind++) {
+	for (iLRU = 0; iLRU < OLDNUM; iLRU++) {
 
-		if (iniFile.prevNames[ind][0]) {
+		if (iniFile.prevNames[iLRU][0]) {
 
 			if (chkMap(SAVAS))
-				AppendMenu(hfileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[ind], iniFile.prevNames[ind]);
+				AppendMenu(hfileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], iniFile.prevNames[iLRU]);
 			else {
 
-				hndl = FindFirstFile(iniFile.prevNames[ind], &fdat);
-				if (hndl == INVALID_HANDLE_VALUE)
-					iniFile.prevNames[ind][0] = 0;
+				fileHandle = FindFirstFile(iniFile.prevNames[iLRU], &findData);
+				if (fileHandle == INVALID_HANDLE_VALUE)
+					iniFile.prevNames[iLRU][0] = 0;
 				else {
 
-					AppendMenu(hfileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[ind], iniFile.prevNames[ind]);
-					FindClose(hndl);
+					AppendMenu(hfileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], iniFile.prevNames[iLRU]);
+					FindClose(fileHandle);
 				}
 			}
 		}
@@ -2667,64 +2669,65 @@ void redfils() {
 
 void nunams() {
 
-	TCHAR*		pext;
-	unsigned	ind;
-	TCHAR		tnam[_MAX_PATH];
+	TCHAR*		iFileExtention;
+	unsigned	iPrevious;
+	unsigned	nameLength;
+	TCHAR		swapName[_MAX_PATH];
 
-	_strlwr_s(fileName);
-	pext = strrchr(fileName, '.');
-	if (pext)
-		pext++;
+	_strlwr_s(workingFileName);
+	iFileExtention = strrchr(workingFileName, '.');
+	if (iFileExtention)
+		iFileExtention++;
 	else
-		pext = &fileName[strlen(fileName)];
-	ind = pext - fileName;
-	strncpy_s(auxName, fileName, ind);
-	strncpy_s(thrName, fileName, ind);
-	strncpy_s(geName, fileName, ind);
-	pext = auxName + ind;
+		iFileExtention = &workingFileName[strlen(workingFileName)];
+	nameLength = iFileExtention - workingFileName;
+	strncpy_s(auxName, workingFileName, nameLength);
+	strncpy_s(thrName, workingFileName, nameLength);
+	strncpy_s(geName, workingFileName, nameLength);
+	iFileExtention = auxName + nameLength;
 	switch (iniFile.auxFileType) {
 
 	case AUXDST:
 
-		strcpy_s(pext, sizeof(auxName) - ind, "dst");
+		strcpy_s(iFileExtention, sizeof(auxName) - nameLength, "dst");
 		break;
 
 #if PESACT
 
 	case AUXPES:
 
-		strcpy_s(pext, sizeof(auxName) - ind, "pes");
+		strcpy_s(iFileExtention, sizeof(auxName) - nameLength, "pes");
 		break;
 
 #endif
 
 	default:
 
-		strcpy_s(pext, sizeof(auxName) - ind, "pcs");
+		strcpy_s(iFileExtention, sizeof(auxName) - nameLength, "pcs");
 	}
-	pext = thrName + ind;
-	strcpy_s(pext, sizeof(thrName) - ind, "thr");
-	pext = geName + ind;
-	strcpy_s(pext, sizeof(geName) - ind, "th*");
-	for (ind = 0; ind < OLDNUM; ind++) {
+	iFileExtention = thrName + nameLength;
+	strcpy_s(iFileExtention, sizeof(thrName) - nameLength, "thr");
+	iFileExtention = geName + nameLength;
+	strcpy_s(iFileExtention, sizeof(geName) - nameLength, "th*");
+	for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
 
-		if (!strcmp(iniFile.prevNames[ind], thrName)) {
+		if (!strcmp(iniFile.prevNames[iPrevious], thrName)) {
 
-			if (ind) {
+			if (iPrevious) {
 
-				strcpy_s(tnam, sizeof(tnam), iniFile.prevNames[0]);
-				strcpy_s(iniFile.prevNames[0], sizeof(iniFile.prevNames[0]), iniFile.prevNames[ind]);
-				strcpy_s(iniFile.prevNames[ind], sizeof(iniFile.prevNames[ind]), tnam);
+				strcpy_s(swapName, sizeof(swapName), iniFile.prevNames[0]);
+				strcpy_s(iniFile.prevNames[0], sizeof(iniFile.prevNames[0]), iniFile.prevNames[iPrevious]);
+				strcpy_s(iniFile.prevNames[iPrevious], sizeof(iniFile.prevNames[iPrevious]), swapName);
 				goto mendun;
 			} else
 				goto nomen;
 		}
 	}
-	for (ind = 0; ind < OLDNUM; ind++) {
+	for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
 
-		if (!iniFile.prevNames[ind][0]) {
+		if (!iniFile.prevNames[iPrevious][0]) {
 
-			strcpy_s(iniFile.prevNames[ind], thrName);
+			strcpy_s(iniFile.prevNames[iPrevious], thrName);
 			goto mendun;
 		}
 	}
@@ -2737,58 +2740,58 @@ mendun:;
 nomen:;
 }
 
-void moveStitchPoints(fPOINTATTR* dst, fPOINTATTR* src) {
+void moveStitch(fPOINTATTR* destination, fPOINTATTR* source) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		esi, src
-		mov		edi, dst
+		mov		esi, source
+		mov		edi, destination
 		xor		ecx, ecx
 		mov		cl, 3
 		rep		movsd
 	}
 #else
-	memcpy(dst, src, sizeof(fPOINTATTR));
+	memcpy(destination, source, sizeof(fPOINTATTR));
 #endif
 }
 
 void duzero() {
 
-	unsigned		ind;
-	unsigned short	dst;
-	double			len;
-	fPOINTATTR*		l_pnt;
+	unsigned		iStitch, iForm;
+	unsigned short	iDestination;
+	double			stitchLength;
+	fPOINTATTR*		currentStitch;
 
 	if (selectedFormCount) {
 
 		clRmap(RMAPSIZ);
-		for (ind = 0; ind < selectedFormCount; ind++)
-			setr(selectedFormList[ind]);
+		for (iForm = 0; iForm < selectedFormCount; iForm++)
+			setr(selectedFormList[iForm]);
 		rstMap(CONTIG);
-		dst = 0;
-		l_pnt = stitchBuffer;
-		for (ind = 0; ind < header.stitchCount; ind++) {
+		iDestination = 0;
+		currentStitch = stitchBuffer;
+		for (iStitch = 0; iStitch < header.stitchCount; iStitch++) {
 
-			if (stitchBuffer[ind].attribute&TYPMSK&&chkr((stitchBuffer[ind].attribute&FRMSK) >> FRMSHFT)) {
+			if (stitchBuffer[iStitch].attribute&TYPMSK&&chkr((stitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
 
 				if (setMap(CONTIG)) {
 
-					len = hypot(stitchBuffer[ind].x - l_pnt->x, stitchBuffer[ind].y - l_pnt->y);
-					if (len > minStitchLength) {
+					stitchLength = hypot(stitchBuffer[iStitch].x - currentStitch->x, stitchBuffer[iStitch].y - currentStitch->y);
+					if (stitchLength > minStitchLength) {
 
-						l_pnt = &stitchBuffer[ind];
-						moveStitchPoints(&stitchBuffer[dst++], &stitchBuffer[ind]);
+						currentStitch = &stitchBuffer[iStitch];
+						moveStitch(&stitchBuffer[iDestination++], &stitchBuffer[iStitch]);
 					}
 				} else
-					l_pnt = &stitchBuffer[ind];
+					currentStitch = &stitchBuffer[iStitch];
 			} else {
 
-				moveStitchPoints(&stitchBuffer[dst++], &stitchBuffer[ind]);
+				moveStitch(&stitchBuffer[iDestination++], &stitchBuffer[iStitch]);
 				rstMap(CONTIG);
 			}
 		}
-		header.stitchCount = dst;
+		header.stitchCount = iDestination;
 		coltab();
 		setMap(RESTCH);
 		return;
@@ -2801,12 +2804,12 @@ void duzero() {
 		delsmal(0, header.stitchCount);
 }
 
-void rshft(POINT shpnt) {
+void rshft(POINT shiftPoint) {
 
-	zoomRect.right -= shpnt.x;
-	zoomRect.left -= shpnt.x;
-	zoomRect.top -= shpnt.y;
-	zoomRect.bottom -= shpnt.y;
+	zoomRect.right -= shiftPoint.x;
+	zoomRect.left -= shiftPoint.x;
+	zoomRect.top -= shiftPoint.y;
+	zoomRect.bottom -= shiftPoint.y;
 	zRctAdj();
 	setMap(RESTCH);
 }
@@ -3468,7 +3471,7 @@ void ritini() {
 	iniFile.smallStitchLength = smallStitchLength;
 	iniFile.stitchBoxesThreshold = stitchBoxesThreshold;
 	iniFile.stitchSpace = stitchSpace;
-	iniFile.binaryVariableBitmap = binaryVariableBitmap;
+	iniFile.userFlagMap = userFlagMap;
 	iniFile.borderWidth = borderWidth;
 	iniFile.underlayColor = underlayColor;
 	iniFile.snapLength = snapLength;
@@ -3644,12 +3647,12 @@ void ritbal() {
 
 	if (*balaradName0&&*balaradName1&&header.stitchCount) {
 
-		if (!*fileName) {
+		if (!*workingFileName) {
 
-			strcpy_s(fileName, defaultDirectory);
-			strcat_s(fileName, "\\balfil.thr");
+			strcpy_s(workingFileName, defaultDirectory);
+			strcat_s(workingFileName, "\\balfil.thr");
 		}
-		strcpy_s(onam, fileName);
+		strcpy_s(onam, workingFileName);
 		pbchr = strrchr(onam, '.');
 		if (pbchr)
 			strcpy_s(pbchr, sizeof(onam) - (pbchr - onam), ".thv");
@@ -4844,9 +4847,9 @@ void redbak() {
 	//	for(ind=0;ind<formIndex;ind++)
 	//		frmcpy(&formList[ind],&bdat->forms[ind]);
 	MoveMemory(&formList, bdat->forms, sizeof(FRMHED)*formIndex);
-	formPointIndex = bdat->formPointCount;
-	if (formPointIndex)
-		mvflpnt(&formPoints[0], &bdat->formPoints[0], formPointIndex);
+	FormVertexIndex = bdat->formPointCount;
+	if (FormVertexIndex)
+		mvflpnt(&formPoints[0], &bdat->formPoints[0], FormVertexIndex);
 	satinConnectIndex = bdat->satinConnectionCount;
 	if (satinConnectIndex)
 		mvsatk(&satinConns[0], &bdat->satinConnection[0], satinConnectIndex);
@@ -5271,8 +5274,8 @@ BOOL colfil() {
 
 	TCHAR*	pext;
 
-	strcpy_s(colorFilename, fileName);
-	strcpy_s(rgbFilename, fileName);
+	strcpy_s(colorFilename, workingFileName);
+	strcpy_s(rgbFilename, workingFileName);
 	pext = strrchr(colorFilename, '.');
 	if (pext) {
 
@@ -5562,7 +5565,7 @@ void nuFil() {
 	TCHAR			buf[3];
 	TCHAR*			tnam;
 	DSTHED			dsthed;
-	fRECTANGLE			strct;
+	fRECTANGLE		strct;
 	FRMHEDO*		frmlstx;
 	long			tred;
 
@@ -5597,15 +5600,15 @@ void nuFil() {
 			ReleaseDC(hWnd, bitmapDC);
 			*pcsBMPFileName = 0;
 		}
-		hFile = CreateFile(fileName, GENERIC_READ, 0, NULL,
+		hFile = CreateFile(workingFileName, GENERIC_READ, 0, NULL,
 			OPEN_EXISTING, 0, NULL);
 		if (hFile == INVALID_HANDLE_VALUE) {
 
 			ind = GetLastError();
 			if (GetLastError() == 32)
-				filnopn(IDS_FNOPNA, fileName);
+				filnopn(IDS_FNOPNA, workingFileName);
 			else
-				filnopn(IDS_FNOPN, fileName);
+				filnopn(IDS_FNOPN, workingFileName);
 			hFile = 0;
 		} else {
 
@@ -5639,7 +5642,7 @@ void nuFil() {
 			rstMap(BAKWRAP);
 			zoomFactor = 1;
 			setMap(RESTCH);
-			defNam(fileName);
+			defNam(workingFileName);
 			nearestCount = 0;
 			if (rstMap(WASPAT))
 				DestroyWindow(hSpeedScrollBar);
@@ -5650,13 +5653,13 @@ void nuFil() {
 			if (ind)
 				setMap(WASTXBAK);
 			l_siz = GetFileSize(hFile, &sizh);
-			pext = strrchr(fileName, '.');
+			pext = strrchr(workingFileName, '.');
 			if (pext)
 				pext++;
 			else {
 
-				strcat_s(fileName, ".thr");
-				pext = strrchr(fileName, '.') + 1;
+				strcat_s(workingFileName, ".thr");
+				pext = strrchr(workingFileName, '.') + 1;
 			}
 			tchr = tolower(pext[0]);
 			if (tchr == 't') {
@@ -5765,7 +5768,7 @@ void nuFil() {
 					inf = 0; ing = 0, inh = 0;
 					if (formIndex) {
 
-						ind = formPointIndex = satinConnectIndex = clipPointIndex = 0;
+						ind = FormVertexIndex = satinConnectIndex = clipPointIndex = 0;
 						msgBuffer[0] = 0;
 						if (vervar < 2) {
 
@@ -5791,8 +5794,8 @@ void nuFil() {
 						ReadFile(hFile, (fPOINT*)formPoints, sthed.pointCount * sizeof(fPOINT), &bytesRead, 0);
 						if (bytesRead != sizeof(fPOINT)*sthed.pointCount) {
 
-							formPointIndex = bytesRead / sizeof(fPOINT);
-							for (ind = formPointIndex; ind < sthed.pointCount; ind++)
+							FormVertexIndex = bytesRead / sizeof(fPOINT);
+							for (ind = FormVertexIndex; ind < sthed.pointCount; ind++)
 								formPoints[ind].x = formPoints[ind].y = 0;
 							setMap(BADFIL);
 						}
@@ -5839,7 +5842,7 @@ void nuFil() {
 						ReadFile(hFile, (PCSHEADER*)&header, 0x46, &bytesRead, NULL);
 						if (!l_siz) {
 
-							filnopn(IDS_ZEROL, fileName);
+							filnopn(IDS_ZEROL, workingFileName);
 							return;
 						}
 						if (header.leadIn == 0x32 && header.colorCount == 16) {
@@ -5873,7 +5876,7 @@ void nuFil() {
 							tnam = (TCHAR*)&ptrFileBuffer[ind];
 							strcpy_s(pcsBMPFileName, tnam);
 							delete[] ptrFileBuffer;
-							strcpy_s(pext, sizeof(fileName) - (pext - fileName), "thr");
+							strcpy_s(pext, sizeof(workingFileName) - (pext - workingFileName), "thr");
 							iniFile.auxFileType = AUXPCS;
 							if (header.hoopType != LARGHUP&&header.hoopType != SMALHUP)
 								header.hoopType = LARGHUP;
@@ -5915,7 +5918,7 @@ void nuFil() {
 						l_peschr = (TCHAR*)&bseq;
 						if (strncmp(peshed->led, "#PES00", 6)) {
 
-							sprintf_s(msgBuffer, sizeof(msgBuffer), "Not a PES file: %s\n", fileName);
+							sprintf_s(msgBuffer, sizeof(msgBuffer), "Not a PES file: %s\n", workingFileName);
 							shoMsg(msgBuffer);
 							return;
 						}
@@ -6048,7 +6051,7 @@ void nuFil() {
 			auxmen();
 		}
 		lenCalc();
-		sprintf_s(msgBuffer, sizeof(msgBuffer), stab[STR_THRDBY], fileName, designerName);
+		sprintf_s(msgBuffer, sizeof(msgBuffer), stab[STR_THRDBY], workingFileName, designerName);
 		SetWindowText(hWnd, msgBuffer);
 		CloseHandle(hFile);
 		setMap(INIT);
@@ -6772,7 +6775,7 @@ void sav() {
 			}
 			delete[] ptrFileBuffer;
 		}
-		defNam(fileName);
+		defNam(workingFileName);
 		CloseHandle(hPcsFile);
 		if (chku(ROTAUX))
 			filnopn(IDS_FILROT, auxName);
@@ -6789,27 +6792,27 @@ void savAs() {
 		ofn.nFilterIndex = 0;
 		if (GetSaveFileName(&ofn)) {
 
-			_strlwr_s(fileName);
-			pchr = strrchr(fileName, '.');
+			_strlwr_s(workingFileName);
+			pchr = strrchr(workingFileName, '.');
 			if (!pchr)
-				pchr = &fileName[strlen(fileName)];
+				pchr = &workingFileName[strlen(workingFileName)];
 			switch (ofn.nFilterIndex) {
 
 			case 1:
 
-				strcpy_s(pchr, sizeof(fileName) - (pchr - fileName), ".thr");
+				strcpy_s(pchr, sizeof(workingFileName) - (pchr - workingFileName), ".thr");
 				break;
 
 			case 2:
 
-				strcpy_s(pchr, sizeof(fileName) - (pchr - fileName), ".pcs");
+				strcpy_s(pchr, sizeof(workingFileName) - (pchr - workingFileName), ".pcs");
 				iniFile.auxFileType = AUXPCS;
 				auxmen();
 				break;
 
 			case 3:
 
-				strcpy_s(pchr, sizeof(fileName) - (pchr - fileName), ".dst");
+				strcpy_s(pchr, sizeof(workingFileName) - (pchr - workingFileName), ".dst");
 				iniFile.auxFileType = AUXDST;
 				auxmen();
 				break;
@@ -6831,15 +6834,15 @@ void save() {
 	TCHAR*	pchr;
 	TCHAR	tchr;
 
-	if (fileName[0]) {
+	if (workingFileName[0]) {
 
-		pchr = strrchr(fileName, '.');
+		pchr = strrchr(workingFileName, '.');
 		if (pchr)
 			pchr++;
 		else {
 
-			strcat_s(fileName, ".thr");
-			pchr = strrchr(fileName, '.') + 1;
+			strcat_s(workingFileName, ".thr");
+			pchr = strrchr(workingFileName, '.') + 1;
 		}
 		tchr = pchr[0] | 0x20;
 		thrsav();
@@ -7870,12 +7873,12 @@ void newFil() {
 	DiplayedColorBitmap = 0;
 	pcsBMPFileName[0] = 0;
 	header.stitchCount = 0;
-	formPointIndex = 0;
+	FormVertexIndex = 0;
 	clipPointIndex = 0;
 	textureIndex = 0;
 	satinConnectIndex = 0;
 	formIndex = 0;
-	fileName[0] = 0;
+	workingFileName[0] = 0;
 	colorChanges = 0;
 	knotCount = 0;
 	for (ind = 0; ind < 16; ind++) {
@@ -9783,7 +9786,7 @@ void thrsav() {
 	HANDLE				hndl;
 	TCHAR				nunam[_MAX_PATH];
 
-	if (chkattr(fileName))
+	if (chkattr(workingFileName))
 		return;
 	if (!rstMap(IGNAM)) {
 
@@ -9836,9 +9839,9 @@ void setsped() {
 	unsigned	len;
 	double		tdub;
 
-	if (!delay)
-		delay = 1;
-	tdub = (double)delay / 10;
+	if (!movieTimeStep)
+		movieTimeStep = 1;
+	tdub = (double)movieTimeStep / 10;
 	if (tdub < 10) {
 
 		len = 100;
@@ -9932,7 +9935,7 @@ void frmdel() {
 void deltot() {
 
 	strcpy_s(designerName, iniFile.designerName);
-	formIndex = header.stitchCount = formPointIndex = clipPointIndex = satinConnectIndex = textureIndex = 0;
+	formIndex = header.stitchCount = FormVertexIndex = clipPointIndex = satinConnectIndex = textureIndex = 0;
 	rstMap(GMRK);
 	rstAll();
 	coltab();
@@ -10000,7 +10003,7 @@ void delet() {
 		}
 		ine = fltind(&currentFormVertices[ine]);
 		ind = fltind(&currentFormVertices[ind]);
-		while (ind < formPointIndex) {
+		while (ind < FormVertexIndex) {
 
 			formPoints[ine].x = formPoints[ind].x;
 			formPoints[ine].y = formPoints[ind].y;
@@ -10009,7 +10012,7 @@ void delet() {
 		}
 		for (ind = closestFormToCursor + 1; ind < formIndex; ind++)
 			formList[ind].vertices -= (selectedFormPoints.pointCount + 1);
-		formPointIndex -= (selectedFormPoints.pointCount + 1);
+		FormVertexIndex -= (selectedFormPoints.pointCount + 1);
 		SelectedForm->sides -= (selectedFormPoints.pointCount + 1);
 		frmout(closestFormToCursor);
 		if (SelectedForm->type == SAT)
@@ -10201,17 +10204,17 @@ void movi() {
 		else
 			tdub = header.stitchCount;
 		if (!chkMap(WASPAT))
-			delay = MOVITIM * 10000 / tdub;
-		if (delay < MINDELAY)
-			delay = MINDELAY;
-		if (delay > MAXDELAY)
-			delay = MAXDELAY;
+			movieTimeStep = MOVITIM * 10000 / tdub;
+		if (movieTimeStep < MINDELAY)
+			movieTimeStep = MINDELAY;
+		if (movieTimeStep > MAXDELAY)
+			movieTimeStep = MAXDELAY;
 		scrollInfo.cbSize = sizeof(scrollInfo);
 		scrollInfo.fMask = SIF_ALL;
 		scrollInfo.nMax = MAXDELAY;
 		scrollInfo.nMin = MINDELAY;
 		scrollInfo.nPage = 1;
-		scrollInfo.nPos = MAXDELAY - delay;
+		scrollInfo.nPos = MAXDELAY - movieTimeStep;
 		SetScrollInfo(hSpeedScrollBar, SB_CTL, &scrollInfo, TRUE);
 		FillRect(stitchWindowDC, &stitchWindowClientRect, hBackgroundBrush);
 		setsped();
@@ -10373,14 +10376,14 @@ void getbak() {
 				}
 			} else {
 
-				strcpy_s(fileName, defaultDirectory);
-				pchr = &fileName[strlen(fileName) - 1];
+				strcpy_s(workingFileName, defaultDirectory);
+				pchr = &workingFileName[strlen(workingFileName) - 1];
 				if (pchr[0] != '\\') {
 
 					pchr[1] = '\\';
 					pchr[2] = 0;
 				}
-				strcat_s(fileName, thumbnailsSelected[fileVersionIndex]);
+				strcat_s(workingFileName, thumbnailsSelected[fileVersionIndex]);
 				setMap(REDOLD);
 				nuFil();
 			}
@@ -10405,7 +10408,7 @@ void rebak() {
 	MoveFile(thrName, tnamx);
 	MoveFile(tnaml, thrName);
 	MoveFile(tnamx, tnaml);
-	strcpy_s(fileName, thrName);
+	strcpy_s(workingFileName, thrName);
 	setMap(REDOLD);
 	nuFil();
 	DeleteFile(tnamx);
@@ -10672,7 +10675,7 @@ void delinf() {
 
 	for (ind = 0; ind < header.stitchCount; ind++)
 		infadj(&stitchBuffer[ind].x, &stitchBuffer[ind].y);
-	for (ind = 0; ind < formPointIndex; ind++)
+	for (ind = 0; ind < FormVertexIndex; ind++)
 		infadj(&formPoints[ind].x, &formPoints[ind].y);
 }
 
@@ -10808,7 +10811,7 @@ void rotfn() {
 	}
 	if (chkMap(BIGBOX)) {
 
-		for (ind = 0; ind < formPointIndex; ind++)
+		for (ind = 0; ind < FormVertexIndex; ind++)
 			rotflt(&formPoints[ind]);
 		for (ind = 0; ind < header.stitchCount; ind++)
 			rotstch(&stitchBuffer[ind]);
@@ -11628,7 +11631,7 @@ void hupfn() {
 			checkHoopRect.bottom = checkHoopRect.top = currentFormVertices[0].y;
 			checkHoopRect.left = checkHoopRect.right = currentFormVertices[0].x;
 		}
-		for (ind = 0; ind < formPointIndex; ind++) {
+		for (ind = 0; ind < FormVertexIndex; ind++) {
 
 			if (formPoints[ind].x < checkHoopRect.left)
 				checkHoopRect.left = formPoints[ind].x;
@@ -11640,7 +11643,7 @@ void hupfn() {
 				checkHoopRect.top = formPoints[ind].y;
 		}
 	}
-	if (header.stitchCount || formPointIndex || chkMap(HUPEX)) {
+	if (header.stitchCount || FormVertexIndex || chkMap(HUPEX)) {
 
 		if (checkHoopRect.left<0 ||
 			checkHoopRect.right>iniFile.hoopSizeX ||
@@ -11674,7 +11677,7 @@ void hupfn() {
 				stitchBuffer[ind].x += dif.x;
 				stitchBuffer[ind].y += dif.y;
 			}
-			for (ind = 0; ind < formPointIndex; ind++) {
+			for (ind = 0; ind < FormVertexIndex; ind++) {
 
 				formPoints[ind].x += dif.x;
 				formPoints[ind].y += dif.y;
@@ -12103,7 +12106,7 @@ void insfil() {
 						homscor = (double)
 							formIndex*FRMW +
 							gethand(stitchBuffer, header.stitchCount)*HANDW +
-							formPointIndex*FRMPW +
+							FormVertexIndex*FRMPW +
 							header.stitchCount*STCHW;
 						ReadFile(hInsertedFile, (STREX*)&thedx, sizeof(STREX), &bytesRead, 0);
 					}
@@ -12113,7 +12116,7 @@ void insfil() {
 					trct.left = trct.bottom = (float)1e9;
 					trct.top = trct.right = (float)1e-9;
 					codof = formIndex << FRMSHFT;
-					insflt = formPointIndex; insertFileFormIndex = formIndex;
+					insflt = FormVertexIndex; insertFileFormIndex = formIndex;
 					if (thed.pointCount) {
 
 						if (vervar < 2) {
@@ -12137,7 +12140,7 @@ void insfil() {
 							}
 						} else
 							ReadFile(hInsertedFile, (FRMHED*)&formList[formIndex], thed.formCount * sizeof(FRMHED), &bytesRead, 0);
-						ReadFile(hInsertedFile, (fPOINT*)&formPoints[formPointIndex], thed.pointCount * sizeof(fPOINT), &bytesRead, 0);
+						ReadFile(hInsertedFile, (fPOINT*)&formPoints[FormVertexIndex], thed.pointCount * sizeof(fPOINT), &bytesRead, 0);
 						ReadFile(hInsertedFile, (SATCON*)&satinConns[satinConnectIndex], thed.dlineCount * sizeof(SATCON), &bytesRead, 0);
 						ReadFile(hInsertedFile, (fPOINT*)&clipPoints[clipPointIndex], thed.clipDataCount * sizeof(fPOINT), &bytesRead, 0);
 						CloseHandle(hInsertedFile);
@@ -12162,7 +12165,7 @@ void insfil() {
 
 							trct.left = trct.right = formPoints[insflt].x;
 							trct.bottom = trct.top = formPoints[insflt].y;
-							for (ind = insflt + 1; ind < formPointIndex; ind++) {
+							for (ind = insflt + 1; ind < FormVertexIndex; ind++) {
 
 								if (formPoints[ind].x < trct.left)
 									trct.left = formPoints[ind].x;
@@ -12302,7 +12305,7 @@ void duinsfil() {
 		trct->left += off.x;
 		trct->right += off.x;
 	}
-	for (ind = insflt; ind < formPointIndex; ind++) {
+	for (ind = insflt; ind < FormVertexIndex; ind++) {
 
 		formPoints[ind].x += off.x;
 		formPoints[ind].y += off.y;
@@ -12461,7 +12464,7 @@ void frmrct(fRECTANGLE* rct)
 
 	rct->left = rct->right = formPoints[0].x;
 	rct->top = rct->bottom = formPoints[0].y;
-	for (ind = 0; ind < formPointIndex; ind++) {
+	for (ind = 0; ind < FormVertexIndex; ind++) {
 
 		if (formPoints[ind].x < rct->left)
 			rct->left = formPoints[ind].x;
@@ -12687,7 +12690,7 @@ void defpref() {
 
 	unsigned ind;
 
-	binaryVariableBitmap = 0;
+	userFlagMap = 0;
 	for (ind = 0; ind < 16; ind++) {
 
 		userColor[ind] = defUseCol[ind];
@@ -13391,14 +13394,14 @@ void gsnap() {
 void lodpes() {
 
 	setMap(REDOLD);
-	strcpy_s(fileName, "u:\\mrd\\t.pes");
+	strcpy_s(workingFileName, "u:\\mrd\\t.pes");
 	nuFil();
 }
 
 void savpes() {
 
 	iniFile.auxFileType = AUXPES;
-	strcpy_s(fileName, "u:\\mrd\\t1.thr");
+	strcpy_s(workingFileName, "u:\\mrd\\t1.thr");
 	nunams();
 	sav();
 }
@@ -14274,7 +14277,7 @@ void dutrac() {
 		}
 		SelectedForm = &formList[formIndex];
 		frmclr(SelectedForm);
-		currentFormVertices = &formPoints[formPointIndex];
+		currentFormVertices = &formPoints[FormVertexIndex];
 		currentFormVertices[0].x = tracedPoints[0].x*stitchBmpRatio.x;
 		currentFormVertices[0].y = tracedPoints[0].y*stitchBmpRatio.y;
 		ine = 0;
@@ -14298,7 +14301,7 @@ void dutrac() {
 				tlens = 0;
 			}
 		}
-		if (formPointIndex + outputIndex > MAXFLT) {
+		if (FormVertexIndex + outputIndex > MAXFLT) {
 
 			tabmsg(IDS_FRMOVR);
 			return;
@@ -15010,7 +15013,7 @@ void closfn() {
 	deltot();
 	sprintf_s(msgBuffer, sizeof(msgBuffer), stab[STR_THRED], iniFile.designerName);
 	knotCount = 0;
-	*fileName = 0;
+	*workingFileName = 0;
 	*pcsBMPFileName = 0;
 	deldu();
 	clrhbut(3);
@@ -15563,7 +15566,7 @@ void selfpnt() {
 
 unsigned chkMsg() {
 
-	unsigned		cod, dst;
+	unsigned		l_code, dst;
 	unsigned		ine, inf;
 	long			ind;
 	long			tlng;
@@ -15742,10 +15745,10 @@ unsigned chkMsg() {
 				else
 					tlng = msg.pt.y - stitchWindowOrigin.y;
 				dst = (selectedFormControlVertex + 2) % 4;
-				cod = nxtcrnr(dst);
+				l_code = nxtcrnr(dst);
 				for (ind = 0; ind < 4; ind++) {
 
-					if ((unsigned)ind != dst && (unsigned)ind != cod) {
+					if ((unsigned)ind != dst && (unsigned)ind != l_code) {
 
 						if (selectedFormControlVertex & 1)
 							stretchBoxLine[ind].x = tlng;
@@ -15958,8 +15961,8 @@ unsigned chkMsg() {
 				} else {
 
 					savdo();
-					for (cod = 0; cod < selectedFormCount; cod++)
-						frmadj(selectedFormList[cod]);
+					for (l_code = 0; l_code < selectedFormCount; l_code++)
+						frmadj(selectedFormList[l_code]);
 					frmsadj();
 					setMap(RESTCH);
 				}
@@ -16459,7 +16462,7 @@ unsigned chkMsg() {
 						selectedFormCount = 0;
 					}
 					ritnum(STR_NUMFORM, closestFormToCursor);
-					cod = (formList[closestFormToCursor].attribute&FRMLMSK) >> 1;
+					l_code = (formList[closestFormToCursor].attribute&FRMLMSK) >> 1;
 					lenCalc();
 					unrot();
 					return 1;
@@ -16478,13 +16481,13 @@ unsigned chkMsg() {
 
 					if (chkMap(SELBOX)) {
 
-						cod = closestPointIndex;
+						l_code = closestPointIndex;
 						closPnt1(&closestPointIndex);
-						if (closestPointIndex != cod) {
+						if (closestPointIndex != l_code) {
 
 							unbox();
 							groupStitchIndex = closestPointIndex;
-							closestPointIndex = cod;
+							closestPointIndex = l_code;
 							setMap(GRPSEL);
 							grpAdj();
 						}
@@ -16494,10 +16497,10 @@ unsigned chkMsg() {
 					}
 					if (chkMap(GRPSEL)) {
 
-						cod = closestPointIndex;
+						l_code = closestPointIndex;
 						closPnt1(&closestPointIndex);
 						groupStitchIndex = closestPointIndex;
-						closestPointIndex = cod;
+						closestPointIndex = l_code;
 						grpAdj();
 						nuAct(groupStitchIndex);
 						redraw(hColorBar);
@@ -16666,12 +16669,12 @@ unsigned chkMsg() {
 			return 1;
 		if (rstMap(DELSFRMS)) {
 
-			cod = 0;
+			l_code = 0;
 			if (chkok()) {
 
 				savdo();
 				rstMap(DELTO);
-				cod = 1;
+				l_code = 1;
 			} else {
 
 				GetWindowRect(hDlgDeleteStitches, &trct);
@@ -16680,10 +16683,10 @@ unsigned chkMsg() {
 
 					savdo();
 					setMap(DELTO);
-					cod = 1;
+					l_code = 1;
 				}
 			}
-			delsfrms(cod);
+			delsfrms(l_code);
 			unmsg();
 			return 1;
 		}
@@ -16940,10 +16943,10 @@ unsigned chkMsg() {
 					thrsav();
 					thrName[ind] = 'r';
 					if (fileVersionIndex)
-						fileName[ind] = fileVersionIndex + 0x2f;
+						workingFileName[ind] = fileVersionIndex + 0x2f;
 					setMap(REDOLD);
 					nuFil();
-					fileName[ind] = 'r';
+					workingFileName[ind] = 'r';
 					switch (fileVersionIndex) {
 
 					case 3:
@@ -16979,12 +16982,12 @@ unsigned chkMsg() {
 		}
 		if (chkMap(DELFRM)) {
 
-			cod = 0;
+			l_code = 0;
 			if (chkok()) {
 
 				savdo();
 				rstMap(DELTO);
-				cod = 1;
+				l_code = 1;
 			} else {
 
 				GetWindowRect(hDlgDeleteStitches, &trct);
@@ -16993,10 +16996,10 @@ unsigned chkMsg() {
 
 					savdo();
 					setMap(DELTO);
-					cod = 1;
+					l_code = 1;
 				}
 			}
-			if (cod) {
+			if (l_code) {
 
 				frmdel();
 				coltab();
@@ -17131,8 +17134,8 @@ unsigned chkMsg() {
 
 					if (SelectedForm->edgeType) {
 
-						cod = SelectedForm->edgeType&NEGUND;
-						if (cod == EDGECLIP || cod == EDGEANGSAT || cod == EDGEAPPL)
+						l_code = SelectedForm->edgeType&NEGUND;
+						if (l_code == EDGECLIP || l_code == EDGEANGSAT || l_code == EDGEAPPL)
 							bsizpar();
 						SelectedForm->edgeType = EDGELINE;
 						goto didfil;
@@ -17148,8 +17151,8 @@ unsigned chkMsg() {
 
 					if (SelectedForm->edgeType) {
 
-						cod = SelectedForm->edgeType&NEGUND;
-						if (cod == EDGECLIP || cod == EDGEANGSAT || cod == EDGEAPPL)
+						l_code = SelectedForm->edgeType&NEGUND;
+						if (l_code == EDGECLIP || l_code == EDGEANGSAT || l_code == EDGEAPPL)
 							bsizpar();
 						SelectedForm->edgeType = EDGEBEAN;
 						goto didfil;
@@ -17309,8 +17312,8 @@ unsigned chkMsg() {
 
 					if (SelectedForm->edgeType) {
 
-						cod = SelectedForm->edgeType&NEGUND;
-						if (cod == EDGECLIP || cod == EDGEANGSAT || cod == EDGEAPPL)
+						l_code = SelectedForm->edgeType&NEGUND;
+						if (l_code == EDGECLIP || l_code == EDGEANGSAT || l_code == EDGEAPPL)
 							bsizpar();
 						SelectedForm->edgeType = EDGEDOUBLE;
 						goto didfil;
@@ -17741,8 +17744,8 @@ unsigned chkMsg() {
 			}
 			if (msg.hwnd == thDat[LBSTRT]) {
 
-				cod = SelectedForm->attribute&SBLNT;
-				if (cod)
+				l_code = SelectedForm->attribute&SBLNT;
+				if (l_code)
 					SelectedForm->attribute &= NSBLNT;
 				else
 					SelectedForm->attribute |= SBLNT;
@@ -17753,8 +17756,8 @@ unsigned chkMsg() {
 			}
 			if (msg.hwnd == thDat[LBFIN]) {
 
-				cod = SelectedForm->attribute&FBLNT;
-				if (cod)
+				l_code = SelectedForm->attribute&FBLNT;
+				if (l_code)
 					SelectedForm->attribute &= NFBLNT;
 				else
 					SelectedForm->attribute |= FBLNT;
@@ -18006,7 +18009,7 @@ unsigned chkMsg() {
 				if (chkMap(INSRT) && header.stitchCount < MAXSEQ) {
 
 					px2stch();
-					cod = (activeColor | USMSK | (activeLayer << LAYSHFT) | NOTFRM)&NKNOTMSK;
+					l_code = (activeColor | USMSK | (activeLayer << LAYSHFT) | NOTFRM)&NKNOTMSK;
 					if (chkMap(LIN1)) {
 
 						if (chkMap(BAKEND)) {
@@ -18015,7 +18018,7 @@ unsigned chkMsg() {
 							ind = header.stitchCount;
 							stitchBuffer[ind].x = selectedPoint.x;
 							stitchBuffer[ind].y = selectedPoint.y;
-							stitchBuffer[ind].attribute = cod;
+							stitchBuffer[ind].attribute = l_code;
 							duzrat();
 							stch2px1(ind);
 							insertLine[0].x = stitchSizePixels.x;
@@ -18035,7 +18038,7 @@ unsigned chkMsg() {
 								stitchBuffer[ind].x = stitchBuffer[ind - 1].x;
 								stitchBuffer[ind].y = stitchBuffer[ind - 1].y;
 							}
-							stitchBuffer[0].attribute = cod;
+							stitchBuffer[0].attribute = l_code;
 							stitchBuffer[ind].attribute &= (~KNOTMSK);
 							stitchBuffer[0].x = selectedPoint.x;
 							stitchBuffer[0].y = selectedPoint.y;
@@ -18055,7 +18058,7 @@ unsigned chkMsg() {
 						if (stitchBuffer[closestPointIndex].attribute&ALTYPMSK&&stitchBuffer[closestPointIndex + 1].attribute&ALTYPMSK)
 						{
 							if ((stitchBuffer[closestPointIndex].attribute&FRMSK) == (stitchBuffer[closestPointIndex + 1].attribute&FRMSK))
-								cod = stitchBuffer[closestPointIndex].attribute | USMSK;
+								l_code = stitchBuffer[closestPointIndex].attribute | USMSK;
 						}
 						ind = header.stitchCount;
 						do {
@@ -18069,7 +18072,7 @@ unsigned chkMsg() {
 						closestPointIndex++;
 						stitchBuffer[closestPointIndex].x = selectedPoint.x;
 						stitchBuffer[closestPointIndex].y = selectedPoint.y;
-						stitchBuffer[closestPointIndex].attribute = cod;
+						stitchBuffer[closestPointIndex].attribute = l_code;
 						xlin();
 						insertLine[1].x = msg.pt.x - stitchWindowOrigin.x;
 						insertLine[1].y = msg.pt.y - stitchWindowOrigin.y;
@@ -18212,9 +18215,9 @@ unsigned chkMsg() {
 			if (msg.message == WM_LBUTTONDOWN) {
 
 				savdo();
-				cod = activeColor;
+				l_code = activeColor;
 				activeColor = verticalIndex & 0xf;
-				redraw(hUserColorWin[cod]);
+				redraw(hUserColorWin[l_code]);
 				redraw(hUserColorWin[activeColor]);
 				if (chkMap(HID)) {
 
@@ -18256,11 +18259,11 @@ unsigned chkMsg() {
 								}
 								if (SelectedForm->extendedAttribute&(AT_UND | AT_WALK | AT_CWLK))
 									formList[closestFormToCursor].underlayColor = activeColor;
-								cod = closestFormToCursor << FRMSHFT;
+								l_code = closestFormToCursor << FRMSHFT;
 								for (ind = 0; ind < header.stitchCount; ind++) {
 
 									ine = stitchBuffer[ind].attribute;
-									if (ine&ALTYPMSK && (ine&FRMSK) == cod && (ine&TYPMSK) != TYPMSK)
+									if (ine&ALTYPMSK && (ine&FRMSK) == l_code && (ine&TYPMSK) != TYPMSK)
 									{
 										ine &= NCOLMSK;
 										ine |= activeColor;
@@ -18334,20 +18337,20 @@ unsigned chkMsg() {
 
 	case WM_KEYDOWN:
 
-		cod = msg.wParam & 0xffff;
+		l_code = msg.wParam & 0xffff;
 		if (chkMap(TXTRED))
 		{
-			txtkey(cod);
+			txtkey(l_code);
 			return 1;
 		}
 		fvars(closestFormToCursor);
 
 #if LANG==GRM
-		if (cod >= 0x30 && cod <= 0x39) {
+		if (l_code >= 0x30 && l_code <= 0x39) {
 
 			if (GetKeyState(VK_SHIFT) & 0X8000) {
 
-				switch (cod) {
+				switch (l_code) {
 
 				case 0x38:
 
@@ -18363,13 +18366,13 @@ unsigned chkMsg() {
 		}
 #endif
 		// ToDo - value passed to duform is wierd because it is dependant on order of enumeration of the form types.
-		// ToDo - and value 'SAT' throws it off
+		//        and value 'SAT' throws it off
 		if (chkMap(FORMIN)) {
 
 			if (GetKeyState(VK_CONTROL) & 0X8000)
 				return 1;
 
-			switch (cod) {
+			switch (l_code) {
 
 			case 'E':
 
@@ -18438,7 +18441,7 @@ unsigned chkMsg() {
 		}
 		if (chkMap(FILMSG)) {
 
-			if (cod == VK_RETURN || cod == 0xc0) {
+			if (l_code == VK_RETURN || l_code == 0xc0) {
 
 				savdo();
 				unfil();
@@ -18450,7 +18453,7 @@ unsigned chkMsg() {
 		}
 		if (rstMap(MOVMSG)) {
 
-			if (cod == VK_RETURN || cod == 0xc0) {
+			if (l_code == VK_RETURN || l_code == 0xc0) {
 
 				savdo();
 				refilfn();
@@ -18463,7 +18466,7 @@ unsigned chkMsg() {
 		}
 		if (rstMap(PRGMSG)) {
 
-			if (cod == VK_RETURN || cod == 0xc0) {
+			if (l_code == VK_RETURN || l_code == 0xc0) {
 
 				deldir();
 				return 1;
@@ -18471,14 +18474,14 @@ unsigned chkMsg() {
 		}
 		if (rstMap(DELSFRMS)) {
 
-			if (cod == 'S' || cod == VK_RETURN || cod == 0xc0) {
+			if (l_code == 'S' || l_code == VK_RETURN || l_code == 0xc0) {
 
 				savdo();
-				if (cod == 'S')
+				if (l_code == 'S')
 					setMap(DELTO);
 				else
 					rstMap(DELTO);
-				delsfrms(cod);
+				delsfrms(l_code);
 				coltab();
 				setMap(RESTCH);
 				unmsg();
@@ -18487,10 +18490,10 @@ unsigned chkMsg() {
 		}
 		if (rstMap(DELFRM)) {
 
-			if (cod == 'S' || cod == VK_RETURN || cod == 0xc0) {
+			if (l_code == 'S' || l_code == VK_RETURN || l_code == 0xc0) {
 
 				savdo();
-				if (cod == 'S')
+				if (l_code == 'S')
 					setMap(DELTO);
 				else
 					rstMap(DELTO);
@@ -18504,7 +18507,7 @@ unsigned chkMsg() {
 		}
 		if (chkMap(THUMSHO)) {
 
-			switch (cod) {
+			switch (l_code) {
 
 			case VK_ESCAPE:
 
@@ -18550,7 +18553,7 @@ unsigned chkMsg() {
 		}
 		if (chkMap(FSETFSPAC) || chkMap(GTWLKIND))
 		{
-			if (cod == 189 || cod == 109)
+			if (l_code == 189 || l_code == 109)
 			{
 				*msgBuffer = '-';
 				msgIndex = 1;
@@ -18561,14 +18564,14 @@ unsigned chkMsg() {
 		}
 		if (formMenuChoice || preferenceIndex) {
 
-			if (chkminus(cod)) {
+			if (chkminus(l_code)) {
 
 				msgIndex = 1;
 				sideWindowEntryBuffer[0] = '-';
 				SetWindowText(hSideMessageWin, sideWindowEntryBuffer);
 				return 1;
 			}
-			if (dunum(cod)) {
+			if (dunum(l_code)) {
 
 				if (preferenceIndex == PSHO + 1 || preferenceIndex == PBOX + 1) {
 
@@ -18592,7 +18595,7 @@ unsigned chkMsg() {
 				}
 				return 1;
 			}
-			switch (cod) {
+			switch (l_code) {
 
 			case 0x6e://numpat period
 			case 0xbe://period
@@ -18619,18 +18622,18 @@ unsigned chkMsg() {
 				return 1;
 			}
 		}
-		if (cod == 'I') {
+		if (l_code == 'I') {
 
 			movi();
 			lastKeyCode = 'I';
 			return 1;
 		}
-		if (cod == 'Q'&&lastKeyCode == 'Q')
+		if (l_code == 'Q'&&lastKeyCode == 'Q')
 			unpat();
-		lastKeyCode = cod;
+		lastKeyCode = l_code;
 		if (chkMap(NUMIN)) {
 
-			if (chkMap(SCLPSPAC) && cod == 0xbd && !msgIndex)
+			if (chkMap(SCLPSPAC) && l_code == 0xbd && !msgIndex)
 			{
 				msgBuffer[0] = '-';
 				msgBuffer[1] = 0;
@@ -18638,7 +18641,7 @@ unsigned chkMsg() {
 				SetWindowText(hGeneralNumberInputBox, msgBuffer);
 				return 1;
 			}
-			if (dunum(cod)) {
+			if (dunum(l_code)) {
 
 				if (chkMap(TRNIN0)) {
 
@@ -18669,7 +18672,7 @@ unsigned chkMsg() {
 				}
 				return 1;
 			}
-			switch (cod) {
+			switch (l_code) {
 
 			case 0x6e://numpad period
 			case 0xbe://period
@@ -18708,7 +18711,7 @@ unsigned chkMsg() {
 				break;
 			}
 		}
-		if (cod == 8 && bufferIndex) {
+		if (l_code == 8 && bufferIndex) {
 
 			stitchEntryBuffer[--bufferIndex] = 0;
 			butxt(HNUM, stitchEntryBuffer);
@@ -18716,7 +18719,7 @@ unsigned chkMsg() {
 			movbox();
 			return 1;
 		}
-		if (!chkMap(WASTRAC) && dunum(cod)) {
+		if (!chkMap(WASTRAC) && dunum(l_code)) {
 
 			if (bufferIndex > bufferDigitCount - 1)
 				bufferIndex = 0;
@@ -18737,7 +18740,7 @@ unsigned chkMsg() {
 		}
 		bufferIndex = 0;
 		unmsg();
-		switch (cod) {
+		switch (l_code) {
 
 		case VK_ESCAPE:
 
@@ -18816,7 +18819,7 @@ unsigned chkMsg() {
 			} else {
 #if PESACT
 				//				iniFile.auxFileType=AUXPES;
-				//				strcpy_s(fileName,"u:\\mrd\\t.thr");
+				//				strcpy_s(workingFileName,"u:\\mrd\\t.thr");
 				//				setMap(REDOLD);
 				//				nuFil();
 				//				lodpes();
@@ -19929,7 +19932,7 @@ unsigned chkMsg() {
 
 			if (msg.wParam == LRUMenuId[ind]) {
 
-				strcpy_s(fileName, iniFile.prevNames[ind]);
+				strcpy_s(workingFileName, iniFile.prevNames[ind]);
 				setMap(REDOLD);
 				nuFil();
 			}
@@ -21646,13 +21649,13 @@ void ducmd() {
 	if (__argc > 1) {
 
 #if  __UseASM__
-		bcpy(fileName, __argv[1]);
+		bcpy(workingFileName, __argv[1]);
 #else
-		strcpy_s(fileName, __argv[1]);
+		strcpy_s(workingFileName, __argv[1]);
 #endif
-		if (!strncmp(fileName, "/F1:", 4)) {
+		if (!strncmp(workingFileName, "/F1:", 4)) {
 
-			balaradFileName = &fileName[4];
+			balaradFileName = &workingFileName[4];
 			hBalaradFile = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 			CloseHandle(hBalaradFile);
 			if (hBalaradFile != INVALID_HANDLE_VALUE) {
@@ -21665,13 +21668,13 @@ void ducmd() {
 				if (__argc > 2) {
 
 #if  __UseASM__
-					bcpy(fileName, __argv[2]);
+					bcpy(workingFileName, __argv[2]);
 #else
-					strcpy_s(fileName, __argv[2]);
+					strcpy_s(workingFileName, __argv[2]);
 #endif
-					if (!strncmp(fileName, "/F2:", 4)) {
+					if (!strncmp(workingFileName, "/F2:", 4)) {
 
-						balaradFileName = &fileName[4];
+						balaradFileName = &workingFileName[4];
 						hBalaradFile = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 						if (hBalaradFile != INVALID_HANDLE_VALUE) {
 
@@ -21691,15 +21694,15 @@ void ducmd() {
 				}
 				SetWindowText(hWnd, stab[STR_EMB]);
 			}
-			*fileName = 0;
+			*workingFileName = 0;
 			CloseHandle(hBalaradFile);
 			DeleteFile(balaradName1);
 		} else {
 
 			for (ind = 2; ind < __argc; ind++) {
 
-				strcat_s(fileName, " ");
-				strcat_s(fileName, __argv[ind]);
+				strcat_s(workingFileName, " ");
+				strcat_s(workingFileName, __argv[ind]);
 			}
 			setMap(REDOLD);
 			nuFil();
@@ -21757,7 +21760,7 @@ void redini() {
 		stitchBoxesThreshold = iniFile.stitchBoxesThreshold;
 		if (iniFile.stitchSpace)
 			stitchSpace = iniFile.stitchSpace;
-		binaryVariableBitmap = iniFile.binaryVariableBitmap;
+		userFlagMap = iniFile.userFlagMap;
 		if (iniFile.borderWidth)
 			borderWidth = iniFile.borderWidth;
 		if (iniFile.underlayColor)
@@ -23111,11 +23114,11 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 			if (chkMap(RUNPAT) || chkMap(WASPAT)) {
 
-				delay += SPEDLIN;
-				if (delay > MAXDELAY)
-					delay = MAXDELAY;
+				movieTimeStep += SPEDLIN;
+				if (movieTimeStep > MAXDELAY)
+					movieTimeStep = MAXDELAY;
 				setsped();
-				SetScrollPos(hSpeedScrollBar, SB_CTL, MAXDELAY - delay, TRUE);
+				SetScrollPos(hSpeedScrollBar, SB_CTL, MAXDELAY - movieTimeStep, TRUE);
 			} else {
 
 				scPnt.x = (zoomRect.right - zoomRect.left)*LINSCROL;
@@ -23130,11 +23133,11 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 			if (chkMap(RUNPAT) || chkMap(WASPAT)) {
 
-				delay -= SPEDLIN;
-				if (delay < MINDELAY)
-					delay = MINDELAY;
+				movieTimeStep -= SPEDLIN;
+				if (movieTimeStep < MINDELAY)
+					movieTimeStep = MINDELAY;
 				setsped();
-				SetScrollPos(hSpeedScrollBar, SB_CTL, MAXDELAY - delay, TRUE);
+				SetScrollPos(hSpeedScrollBar, SB_CTL, MAXDELAY - movieTimeStep, TRUE);
 			} else {
 
 				scPnt.x = -(zoomRect.right - zoomRect.left)*LINSCROL;
@@ -23149,11 +23152,11 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 			if (chkMap(RUNPAT) || chkMap(WASPAT)) {
 
-				delay += SPEDPAG;
-				if (delay < MINDELAY)
-					delay = MINDELAY;
+				movieTimeStep += SPEDPAG;
+				if (movieTimeStep < MINDELAY)
+					movieTimeStep = MINDELAY;
 				setsped();
-				SetScrollPos(hSpeedScrollBar, SB_CTL, MAXDELAY - delay, TRUE);
+				SetScrollPos(hSpeedScrollBar, SB_CTL, MAXDELAY - movieTimeStep, TRUE);
 			} else
 				pglft();
 			return 1;
@@ -23162,11 +23165,11 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 			if (chkMap(RUNPAT) || chkMap(WASPAT)) {
 
-				delay -= SPEDPAG;
-				if (delay < MINDELAY)
-					delay = MINDELAY;
+				movieTimeStep -= SPEDPAG;
+				if (movieTimeStep < MINDELAY)
+					movieTimeStep = MINDELAY;
 				setsped();
-				SetScrollPos(hSpeedScrollBar, SB_CTL, MAXDELAY - delay, TRUE);
+				SetScrollPos(hSpeedScrollBar, SB_CTL, MAXDELAY - movieTimeStep, TRUE);
 			} else
 				pgrit();
 			return 1;
@@ -23178,7 +23181,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				if ((HWND)lParam == hSpeedScrollBar) {
 
 					ind = (unsigned)HIWORD(wParam);
-					delay = MAXDELAY - ind;
+					movieTimeStep = MAXDELAY - ind;
 					setsped();
 					SetScrollPos(hSpeedScrollBar, SB_CTL, ind, TRUE);
 				}
@@ -23599,7 +23602,7 @@ void sachk() {
 #define ALL_FPU_EX (BAD_FPU_EX | COMMON_FPU_EX)
 #endif
 
-int	fltex(int cod) {
+int	fltex(int p_code) {
 
 #if  __UseASM__
 	short	cw;
@@ -23607,7 +23610,7 @@ int	fltex(int cod) {
 	_asm {
 
 		xor		eax, eax
-		cmp		cod, 0x10
+		cmp		p_code, 0x10
 		jne		short fltex1
 		mov		cw, 0x27f
 		fldcw	cw
@@ -23615,7 +23618,7 @@ int	fltex(int cod) {
 		fltex1 :
 	}
 #else
-	if (cod != 0x10)
+	if (p_code != 0x10)
 		return 0;
 	unsigned int current_word = 0;
 	_controlfp_s(&current_word, ALL_FPU_EX, _MCW_EM);
