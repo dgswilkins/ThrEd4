@@ -213,7 +213,7 @@ unsigned short ldlst[] = {	//strings to load into memory at init time
 	IDS_TXOF,
 };
 
-TCHAR*	stab[256];		//memory string pointers
+TCHAR*	StringTable[256];		//memory string pointers
 TCHAR*	sdat;			//string storage
 
 #if PESACT
@@ -298,12 +298,12 @@ void butxt(unsigned ind, TCHAR* str) {
 		if (ind == 5) {
 
 			if (chkMap(HIDMAP))
-				SetWindowText(hButtonWin[ind], stab[STR_TRC1H]);
+				SetWindowText(hButtonWin[ind], StringTable[STR_TRC1H]);
 			else
-				SetWindowText(hButtonWin[ind], stab[STR_TRC1S]);
+				SetWindowText(hButtonWin[ind], StringTable[STR_TRC1S]);
 		}
 		else
-			SetWindowText(hButtonWin[ind], stab[ind - 4 + STR_TRC0]);
+			SetWindowText(hButtonWin[ind], StringTable[ind - 4 + STR_TRC0]);
 	}
 	else
 		SetWindowText(hButtonWin[ind], str);
@@ -311,7 +311,7 @@ void butxt(unsigned ind, TCHAR* str) {
 
 void ritnum(unsigned cod, unsigned num) {
 
-	sprintf_s(hlpbuf, sizeof(hlpbuf), "%s %d", stab[cod], num);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), "%s %d", StringTable[cod], num);
 	butxt(HNUM, hlpbuf);
 }
 
@@ -325,23 +325,23 @@ void lodstr() {
 	unsigned	ind, ine, cnt;
 	TCHAR*		pchr;
 
-	stab[0] = pchr = (TCHAR*)bseq;
+	StringTable[0] = pchr = (TCHAR*)bseq;
 	for (ind = 0; ind < STR_LEN; ind++) {
 
 		cnt = LoadString(hInst, ldlst[ind], pchr, 1000) + 1;
 		pchr += cnt;
 	}
-	cnt = pchr - stab[0];
+	cnt = pchr - StringTable[0];
 	sdat = new TCHAR[cnt];
-	MoveMemory(sdat, stab[0], cnt);
-	stab[0] = sdat;
+	MoveMemory(sdat, StringTable[0], cnt);
+	StringTable[0] = sdat;
 	ine = 1;
 	for (ind = 0; ind <= cnt; ind++) {
 
 		if (!sdat[ind]) {
 
 			ind++;
-			stab[ine] = &sdat[ind];
+			StringTable[ine] = &sdat[ind];
 			ine++;
 		}
 	}

@@ -179,7 +179,7 @@ extern			TCHAR			sideWindowEntryBuffer[11];
 extern			unsigned		searchLineIndex;
 extern			double			smallStitchLength;
 extern			unsigned		fillStartsMap;
-extern			TCHAR*			stab[STR_LEN];
+extern			TCHAR*			StringTable[STR_LEN];
 extern			double			stitchBoxesThreshold;
 extern			fPOINTATTR		stitchBuffer[MAXPCS];
 extern			fRECTANGLE		stitchRangeRect;
@@ -1152,7 +1152,7 @@ void setfrm() {
 }
 
 void form() {
-	shoMsg(stab[STR_FMEN]);
+	shoMsg(StringTable[STR_FMEN]);
 	setMap(FORMIN);
 	rstMap(INSRT);
 	duzrat();
@@ -2020,7 +2020,7 @@ void okcan() {
 
 	hOKButton = CreateWindow(
 		"STATIC",
-		stab[STR_OKENT],
+		StringTable[STR_OKENT],
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		5,
 		msgRect.bottom + 15,
@@ -2033,7 +2033,7 @@ void okcan() {
 
 	hCancelButton = CreateWindow(
 		"STATIC",
-		stab[STR_CANCEL],
+		StringTable[STR_CANCEL],
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		buttonWidth * 5,
 		msgRect.bottom + 15,
@@ -2083,7 +2083,7 @@ void savdisc() {
 
 	hCancelButton = CreateWindow(
 		"STATIC",
-		stab[STR_CANCEL],
+		StringTable[STR_CANCEL],
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		2 * buttonWidthX3 + 25,
 		msgRect.bottom + 15,
@@ -6570,7 +6570,7 @@ void maxwid(unsigned strt, unsigned fin) {
 	pnt.x = 0;
 	pnt.y = 0;
 	while (strt <= fin)
-		maxtsiz(stab[strt++], &pnt);
+		maxtsiz(StringTable[strt++], &pnt);
 	preferenceWindowTextWidth = pnt.x + 6;
 }
 
@@ -6664,222 +6664,222 @@ void refrmfn()
 	leftWindowCoords.right = 3 + leftWindowSize.x;
 	rightWindowCoords.left = 6 + leftWindowSize.x;
 	rightWindowCoords.right = 6 + leftWindowSize.x + rightWindowSize.x + 6;
-	thTxt[LFRM] = txtwin(stab[STR_TXT0], leftWindowCoords);
+	thTxt[LFRM] = txtwin(StringTable[STR_TXT0], leftWindowCoords);
 	if (SelectedForm->type == FRMLINE)
-		thDat[LFRM] = txtrwin(stab[STR_EDG1], rightWindowCoords);
+		thDat[LFRM] = txtrwin(StringTable[STR_EDG1], rightWindowCoords);
 	else
-		thDat[LFRM] = txtrwin(stab[STR_FREH], rightWindowCoords);
+		thDat[LFRM] = txtrwin(StringTable[STR_FREH], rightWindowCoords);
 	nxtlin();
-	thTxt[LLAYR] = txtwin(stab[STR_TXT1], leftWindowCoords);
+	thTxt[LLAYR] = txtwin(StringTable[STR_TXT1], leftWindowCoords);
 	sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", (SelectedForm->attribute&FRMLMSK) >> 1);
 	thDat[LLAYR] = txtrwin(msgBuffer, rightWindowCoords);
 	nxtlin();
 	if (SelectedForm->type != FRMLINE)
 	{
-		thTxt[LCWLK] = txtwin(stab[STR_CWLK], leftWindowCoords);
+		thTxt[LCWLK] = txtwin(StringTable[STR_CWLK], leftWindowCoords);
 		if (SelectedForm->extendedAttribute&AT_CWLK)
-			thDat[LCWLK] = txtrwin(stab[STR_ON], rightWindowCoords);
+			thDat[LCWLK] = txtrwin(StringTable[STR_ON], rightWindowCoords);
 		else
-			thDat[LCWLK] = txtrwin(stab[STR_OFF], rightWindowCoords);
+			thDat[LCWLK] = txtrwin(StringTable[STR_OFF], rightWindowCoords);
 		nxtlin();
-		thTxt[LWALK] = txtwin(stab[STR_WALK], leftWindowCoords);
+		thTxt[LWALK] = txtwin(StringTable[STR_WALK], leftWindowCoords);
 		if (SelectedForm->extendedAttribute&AT_WALK)
-			thDat[LWALK] = txtrwin(stab[STR_ON], rightWindowCoords);
+			thDat[LWALK] = txtrwin(StringTable[STR_ON], rightWindowCoords);
 		else
-			thDat[LWALK] = txtrwin(stab[STR_OFF], rightWindowCoords);
+			thDat[LWALK] = txtrwin(StringTable[STR_OFF], rightWindowCoords);
 		nxtlin();
-		thTxt[LUND] = txtwin(stab[STR_UND], leftWindowCoords);
+		thTxt[LUND] = txtwin(StringTable[STR_UND], leftWindowCoords);
 		if (SelectedForm->extendedAttribute&AT_UND)
-			thDat[LUND] = txtrwin(stab[STR_ON], rightWindowCoords);
+			thDat[LUND] = txtrwin(StringTable[STR_ON], rightWindowCoords);
 		else
-			thDat[LUND] = txtrwin(stab[STR_OFF], rightWindowCoords);
+			thDat[LUND] = txtrwin(StringTable[STR_OFF], rightWindowCoords);
 		nxtlin();
 		if (SelectedForm->extendedAttribute&(AT_WALK | AT_UND | AT_CWLK))
 		{
-			thTxt[LUNDCOL] = txtwin(stab[STR_UNDCOL], leftWindowCoords);
+			thTxt[LUNDCOL] = txtwin(StringTable[STR_UNDCOL], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->underlayColor + 1);
 			thDat[LUNDCOL] = txtrwin(msgBuffer, rightWindowCoords);
 			nxtlin();
-			thTxt[LULEN] = txtwin(stab[STR_ULEN], leftWindowCoords);
+			thTxt[LULEN] = txtwin(StringTable[STR_ULEN], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->underlayStitchLen / PFGRAN);
 			thDat[LULEN] = txtrwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
-		thTxt[LWLKIND] = txtwin(stab[STR_UWLKIND], leftWindowCoords);
+		thTxt[LWLKIND] = txtwin(StringTable[STR_UWLKIND], leftWindowCoords);
 		sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->underlayIndent / PFGRAN);
 		thDat[LWLKIND] = txtrwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 		if (SelectedForm->extendedAttribute&AT_UND)
 		{
-			thTxt[LUSPAC] = txtwin(stab[STR_FUSPAC], leftWindowCoords);
+			thTxt[LUSPAC] = txtwin(StringTable[STR_FUSPAC], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->underlaySpacing / PFGRAN);
 			thDat[LUSPAC] = txtrwin(msgBuffer, rightWindowCoords);
 			nxtlin();
-			thTxt[LUANG] = txtwin(stab[STR_FUANG], leftWindowCoords);
+			thTxt[LUANG] = txtwin(StringTable[STR_FUANG], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->underlayStitchAngle * 180 / PI);
 			thDat[LUANG] = txtrwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 	}
-	thTxt[LFRMFIL] = txtwin(stab[STR_TXT2], leftWindowCoords);
-	thDat[LFRMFIL] = txtrwin(stab[STR_FIL0 + SelectedForm->fillType], rightWindowCoords);
+	thTxt[LFRMFIL] = txtwin(StringTable[STR_TXT2], leftWindowCoords);
+	thDat[LFRMFIL] = txtrwin(StringTable[STR_FIL0 + SelectedForm->fillType], rightWindowCoords);
 	nxtlin();
 	if (SelectedForm->fillType) {
-		thTxt[LFRMCOL] = txtwin(stab[STR_TXT3], leftWindowCoords);
+		thTxt[LFRMCOL] = txtwin(StringTable[STR_TXT3], leftWindowCoords);
 		sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillColor + 1);
 		thDat[LFRMCOL] = numwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == FTHF) {
-			thTxt[LFTHCOL] = txtwin(stab[STR_FTHCOL], leftWindowCoords);
+			thTxt[LFTHCOL] = txtwin(StringTable[STR_FTHCOL], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillInfo.feather.color + 1);
 			thDat[LFTHCOL] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
-			thTxt[LFTHTYP] = txtwin(stab[STR_FTHTYP], leftWindowCoords);
-			thDat[LFTHTYP] = numwin(stab[STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1], rightWindowCoords);
+			thTxt[LFTHTYP] = txtwin(StringTable[STR_FTHTYP], leftWindowCoords);
+			thDat[LFTHTYP] = numwin(StringTable[STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1], rightWindowCoords);
 			nxtlin();
-			thTxt[LFTHBLND] = txtwin(stab[STR_FTHBLND], leftWindowCoords);
+			thTxt[LFTHBLND] = txtwin(StringTable[STR_FTHBLND], leftWindowCoords);
 			if (SelectedForm->extendedAttribute&AT_FTHBLND)
-				pchr = stab[STR_ON];
+				pchr = StringTable[STR_ON];
 			else
-				pchr = stab[STR_OFF];
+				pchr = StringTable[STR_OFF];
 			thDat[LFTHBLND] = txtrwin(pchr, rightWindowCoords);
 			nxtlin();
 			if (!(SelectedForm->extendedAttribute&AT_FTHBLND)) {
 				// ToDo - check whether we are doing 'feather down' or 'feather both'
 				// only 'feather both' exists in the string table
-				thTxt[LFTHDWN] = txtwin(stab[STR_FTHBOTH], leftWindowCoords);
+				thTxt[LFTHDWN] = txtwin(StringTable[STR_FTHBOTH], leftWindowCoords);
 				if (SelectedForm->extendedAttribute&(AT_FTHDWN))
-					pchr = stab[STR_ON];
+					pchr = StringTable[STR_ON];
 				else
-					pchr = stab[STR_OFF];
+					pchr = StringTable[STR_OFF];
 				thDat[LFTHDWN] = txtrwin(pchr, rightWindowCoords);
 				nxtlin();
 				if (!(SelectedForm->extendedAttribute&AT_FTHDWN)) {
-					thTxt[LFTHUP] = txtwin(stab[STR_FTHUP], leftWindowCoords);
+					thTxt[LFTHUP] = txtwin(StringTable[STR_FTHUP], leftWindowCoords);
 					if (SelectedForm->extendedAttribute&AT_FTHUP)
-						pchr = stab[STR_ON];
+						pchr = StringTable[STR_ON];
 					else
-						pchr = stab[STR_OFF];
+						pchr = StringTable[STR_OFF];
 					thDat[LFTHUP] = txtrwin(pchr, rightWindowCoords);
 					nxtlin();
 				}
 			}
-			thTxt[LFTHUPCNT] = txtwin(stab[STR_FTHUPCNT], leftWindowCoords);
+			thTxt[LFTHUPCNT] = txtwin(StringTable[STR_FTHUPCNT], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillInfo.feather.upCount);
 			thDat[LFTHUPCNT] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
-			thTxt[LFTHDWNCNT] = txtwin(stab[STR_FTHDWNCNT], leftWindowCoords);
+			thTxt[LFTHDWNCNT] = txtwin(StringTable[STR_FTHDWNCNT], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillInfo.feather.downCount);
 			thDat[LFTHDWNCNT] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
-			thTxt[LFTHSIZ] = txtwin(stab[STR_FTHSIZ], leftWindowCoords);
+			thTxt[LFTHSIZ] = txtwin(StringTable[STR_FTHSIZ], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->fillInfo.feather.ratio);
 			thDat[LFTHSIZ] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 			if (SelectedForm->fillInfo.feather.fillType == FTHPSG) {
-				thTxt[LFTHNUM] = txtwin(stab[STR_FTHNUM], leftWindowCoords);
+				thTxt[LFTHNUM] = txtwin(StringTable[STR_FTHNUM], leftWindowCoords);
 				sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillInfo.feather.count);
 				thDat[LFTHNUM] = numwin(msgBuffer, rightWindowCoords);
 				nxtlin();
 			}
-			thTxt[LFTHFLR] = txtwin(stab[STR_FTHFLR], leftWindowCoords);
+			thTxt[LFTHFLR] = txtwin(StringTable[STR_FTHFLR], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->fillInfo.feather.minStitchSize / PFGRAN);
 			thDat[LFTHFLR] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType != CLPF) {
-			thTxt[LFRMSPAC] = txtwin(stab[STR_TXT4], leftWindowCoords);
+			thTxt[LFRMSPAC] = txtwin(StringTable[STR_TXT4], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->fillSpacing / PFGRAN);
 			thDat[LFRMSPAC] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (istx(closestFormToCursor))
 		{
-			thTxt[LTXOF] = txtwin(stab[STR_TXOF], leftWindowCoords);
+			thTxt[LTXOF] = txtwin(StringTable[STR_TXOF], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->txof / PFGRAN);
 			thDat[LTXOF] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
-		thTxt[LMAXFIL] = txtwin(stab[STR_TXT20], leftWindowCoords);
+		thTxt[LMAXFIL] = txtwin(StringTable[STR_TXT20], leftWindowCoords);
 		sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->maxFillStitchLen / PFGRAN);
 		thDat[LMAXFIL] = numwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 		if (!isclp(closestFormToCursor) && !istx(closestFormToCursor)) {
-			thTxt[LFRMLEN] = txtwin(stab[STR_TXT5], leftWindowCoords);
+			thTxt[LFRMLEN] = txtwin(StringTable[STR_TXT5], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->lengthOrCount.stitchLength / PFGRAN);
 			thDat[LFRMLEN] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
-		thTxt[LMINFIL] = txtwin(stab[STR_TXT21], leftWindowCoords);
+		thTxt[LMINFIL] = txtwin(StringTable[STR_TXT21], leftWindowCoords);
 		sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->minFillStitchLen / PFGRAN);
 		thDat[LMINFIL] = numwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
-			thTxt[LFRMANG] = txtwin(stab[STR_TXT6], leftWindowCoords);
+			thTxt[LFRMANG] = txtwin(StringTable[STR_TXT6], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->angleOrClipData.angle * 180 / PI);
 			thDat[LFRMANG] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == ANGCLPF) {
-			thTxt[LSACANG] = txtwin(stab[STR_TXT6], leftWindowCoords);
+			thTxt[LSACANG] = txtwin(StringTable[STR_TXT6], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->satinOrAngle.angle * 180 / PI);
 			thDat[LSACANG] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VCLPF || SelectedForm->fillType == HCLPF || SelectedForm->fillType == ANGCLPF) {
-			thTxt[LFRMFAZ] = txtwin(stab[STR_TXT18], leftWindowCoords);
+			thTxt[LFRMFAZ] = txtwin(StringTable[STR_TXT18], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->wordParam);
 			thDat[LFRMFAZ] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VRTF || SelectedForm->fillType == HORF || SelectedForm->fillType == ANGF || istx(closestFormToCursor)) {
-			thTxt[LBFILSQR] = txtwin(stab[STR_PRF2], leftWindowCoords);
+			thTxt[LBFILSQR] = txtwin(StringTable[STR_PRF2], leftWindowCoords);
 			if (SelectedForm->extendedAttribute&AT_SQR)
-				strcpy_s(msgBuffer, stab[STR_SQR]);
+				strcpy_s(msgBuffer, StringTable[STR_SQR]);
 			else
-				strcpy_s(msgBuffer, stab[STR_PNTD]);
+				strcpy_s(msgBuffer, StringTable[STR_PNTD]);
 			thDat[LBFILSQR] = txtrwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 	}
-	thTxt[LFSTRT] = txtwin(stab[STR_FSTRT], leftWindowCoords);
+	thTxt[LFSTRT] = txtwin(StringTable[STR_FSTRT], leftWindowCoords);
 	if (SelectedForm->extendedAttribute&AT_STRT)
-		strcpy_s(msgBuffer, stab[STR_ON]);
+		strcpy_s(msgBuffer, StringTable[STR_ON]);
 	else
-		strcpy_s(msgBuffer, stab[STR_OFF]);
+		strcpy_s(msgBuffer, StringTable[STR_OFF]);
 	thDat[LFSTRT] = txtrwin(msgBuffer, rightWindowCoords);
 	nxtlin();
 	if (SelectedForm->extendedAttribute&AT_STRT)
 	{
-		thTxt[LDSTRT] = txtwin(stab[STR_FSTRT], leftWindowCoords);
+		thTxt[LDSTRT] = txtwin(StringTable[STR_FSTRT], leftWindowCoords);
 		sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillStart);
 		thDat[LDSTRT] = numwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 	}
-	thTxt[LFEND] = txtwin(stab[STR_FEND], leftWindowCoords);
+	thTxt[LFEND] = txtwin(StringTable[STR_FEND], leftWindowCoords);
 	if (SelectedForm->extendedAttribute&AT_END)
-		strcpy_s(msgBuffer, stab[STR_ON]);
+		strcpy_s(msgBuffer, StringTable[STR_ON]);
 	else
-		strcpy_s(msgBuffer, stab[STR_OFF]);
+		strcpy_s(msgBuffer, StringTable[STR_OFF]);
 	thDat[LFEND] = txtrwin(msgBuffer, rightWindowCoords);
 	nxtlin();
 	if (SelectedForm->extendedAttribute&AT_END)
 	{
-		thTxt[LDEND] = txtwin(stab[STR_FEND], leftWindowCoords);
+		thTxt[LDEND] = txtwin(StringTable[STR_FEND], leftWindowCoords);
 		sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", SelectedForm->fillEnd);
 		thDat[LDEND] = numwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 	}
-	thTxt[LBRD] = txtwin(stab[STR_TXT7], leftWindowCoords);
-	thDat[LBRD] = txtrwin(stab[STR_EDG0 + cod], rightWindowCoords);
+	thTxt[LBRD] = txtwin(StringTable[STR_TXT7], leftWindowCoords);
+	thDat[LBRD] = txtrwin(StringTable[STR_EDG0 + cod], rightWindowCoords);
 	nxtlin();
 	if (cod) {
-		thTxt[LBRDCOL] = txtwin(stab[STR_TXT8], leftWindowCoords);
+		thTxt[LBRDCOL] = txtwin(StringTable[STR_TXT8], leftWindowCoords);
 		sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", (SelectedForm->borderColor & 0xf) + 1);
 		thDat[LBRDCOL] = numwin(msgBuffer, rightWindowCoords);
 		nxtlin();
 		if (egaray[fpnt] & BESPAC) {
-			thTxt[LBRDSPAC] = txtwin(stab[STR_TXT9], leftWindowCoords);
+			thTxt[LBRDSPAC] = txtwin(StringTable[STR_TXT9], leftWindowCoords);
 			if (cod == EDGEPROPSAT || cod == EDGEOCHAIN || cod == EDGELCHAIN)
 				sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN);
 			else
@@ -6888,59 +6888,59 @@ void refrmfn()
 			nxtlin();
 		}
 		if (egaray[fpnt] & BPICSPAC) {
-			thTxt[LBRDPIC] = txtwin(stab[STR_TXT16], leftWindowCoords);
+			thTxt[LBRDPIC] = txtwin(StringTable[STR_TXT16], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN);
 			thDat[LBRDPIC] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & BEMAX) {
-			thTxt[LMAXBRD] = txtwin(stab[STR_TXT22], leftWindowCoords);
+			thTxt[LMAXBRD] = txtwin(StringTable[STR_TXT22], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->maxBorderStitchLen / PFGRAN);
 			thDat[LMAXBRD] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & BELEN) {
-			thTxt[LBRDLEN] = txtwin(stab[STR_TXT10], leftWindowCoords);
+			thTxt[LBRDLEN] = txtwin(StringTable[STR_TXT10], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->edgeStitchLen / PFGRAN);
 			thDat[LBRDLEN] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & BEMIN) {
-			thTxt[LMINBRD] = txtwin(stab[STR_TXT23], leftWindowCoords);
+			thTxt[LMINBRD] = txtwin(StringTable[STR_TXT23], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->minBorderStitchLen / PFGRAN);
 			thDat[LMINBRD] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & BESIZ) {
-			thTxt[LBRDSIZ] = txtwin(stab[STR_TXT11], leftWindowCoords);
+			thTxt[LBRDSIZ] = txtwin(StringTable[STR_TXT11], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->borderSize / PFGRAN);
 			thDat[LBRDSIZ] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & BRDPOS) {
-			thTxt[LBRDPOS] = txtwin(stab[STR_TXT18], leftWindowCoords);
+			thTxt[LBRDPOS] = txtwin(StringTable[STR_TXT18], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->edgeStitchLen);
 			thDat[LBRDPOS] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & CHNPOS) {
-			thTxt[LBRDPOS] = txtwin(stab[STR_TXT19], leftWindowCoords);
+			thTxt[LBRDPOS] = txtwin(StringTable[STR_TXT19], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", SelectedForm->edgeStitchLen);
 			thDat[LBRDPOS] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (cod == EDGEAPPL) {
-			thTxt[LAPCOL] = txtwin(stab[STR_TXT12], leftWindowCoords);
+			thTxt[LAPCOL] = txtwin(StringTable[STR_TXT12], leftWindowCoords);
 			sprintf_s(msgBuffer, sizeof(msgBuffer), "%d", (SelectedForm->borderColor >> 4) + 1);
 			thDat[LAPCOL] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (cod == EDGEANGSAT || cod == EDGEAPPL || cod == EDGEPROPSAT) {
-			thTxt[LBRDUND] = txtwin(stab[STR_TXT17], leftWindowCoords);
+			thTxt[LBRDUND] = txtwin(StringTable[STR_TXT17], leftWindowCoords);
 			if (SelectedForm->edgeType&EGUND)
-				thDat[LBRDUND] = numwin(stab[STR_ON], rightWindowCoords);
+				thDat[LBRDUND] = numwin(StringTable[STR_ON], rightWindowCoords);
 			else
-				thDat[LBRDUND] = numwin(stab[STR_OFF], rightWindowCoords);
+				thDat[LBRDUND] = numwin(StringTable[STR_OFF], rightWindowCoords);
 			nxtlin();
 		}
 		if (egaray[fpnt] & BCNRSIZ) {
@@ -6948,22 +6948,22 @@ void refrmfn()
 				sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", getblen() / PFGRAN);
 			else
 				sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", getplen() / PFGRAN);
-			thTxt[LBCSIZ] = txtwin(stab[STR_TXT13], leftWindowCoords);
+			thTxt[LBCSIZ] = txtwin(StringTable[STR_TXT13], leftWindowCoords);
 			thDat[LBCSIZ] = numwin(msgBuffer, rightWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->type == FRMLINE&&egaray[fpnt] & BRDEND) {
-			thTxt[LBSTRT] = txtwin(stab[STR_TXT14], leftWindowCoords);
+			thTxt[LBSTRT] = txtwin(StringTable[STR_TXT14], leftWindowCoords);
 			if (SelectedForm->attribute&SBLNT)
-				thDat[LBSTRT] = numwin(stab[STR_BLUNT], rightWindowCoords);
+				thDat[LBSTRT] = numwin(StringTable[STR_BLUNT], rightWindowCoords);
 			else
-				thDat[LBSTRT] = numwin(stab[STR_TAPR], rightWindowCoords);
+				thDat[LBSTRT] = numwin(StringTable[STR_TAPR], rightWindowCoords);
 			nxtlin();
-			thTxt[LBFIN] = txtwin(stab[STR_TXT15], leftWindowCoords);
+			thTxt[LBFIN] = txtwin(StringTable[STR_TXT15], leftWindowCoords);
 			if (SelectedForm->attribute&FBLNT)
-				thDat[LBFIN] = numwin(stab[STR_BLUNT], rightWindowCoords);
+				thDat[LBFIN] = numwin(StringTable[STR_BLUNT], rightWindowCoords);
 			else
-				thDat[LBFIN] = numwin(stab[STR_TAPR], rightWindowCoords);
+				thDat[LBFIN] = numwin(StringTable[STR_TAPR], rightWindowCoords);
 			nxtlin();
 		}
 	}
@@ -7579,7 +7579,7 @@ HWND prfnwin(TCHAR* str) {
 }
 
 void prflin(unsigned p_lin) {
-	prftwin(stab[p_lin]);
+	prftwin(StringTable[p_lin]);
 	thDat[p_lin - STR_PRF0] = prfnwin(msgBuffer);
 	nxtlin();
 }
@@ -7617,8 +7617,8 @@ void prfmsg() {
 	}
 	leftWindowSize.x = leftWindowSize.y = 0;
 	rightWindowSize.x = rightWindowSize.y = 0;
-	maxtsiz(stab[STR_PRF0 + 4], &leftWindowSize);
-	maxtsiz(stab[STR_TAPR], &rightWindowSize);
+	maxtsiz(StringTable[STR_PRF0 + 4], &leftWindowSize);
+	maxtsiz(StringTable[STR_TAPR], &rightWindowSize);
 	leftWindowSize.x = preferenceWindowTextWidth;
 	leftWindowSize.x += 4;
 #if LANG==HNG
@@ -7666,9 +7666,9 @@ void prfmsg() {
 	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", iniFile.fillAngle / PI * 180);
 	prflin(STR_PRF1);
 	if (chku(SQRFIL))
-		strcpy_s(msgBuffer, stab[STR_SQR]);
+		strcpy_s(msgBuffer, StringTable[STR_SQR]);
 	else
-		strcpy_s(msgBuffer, stab[STR_PNTD]);
+		strcpy_s(msgBuffer, StringTable[STR_PNTD]);
 	prflin(STR_PRF2);
 	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", stitchSpace / PFGRAN);
 	prflin(STR_PRF0);
@@ -7677,7 +7677,7 @@ void prfmsg() {
 	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f mm", iniFile.gridSize / PFGRAN);
 	prflin(STR_PRF20);
 	sethup();
-	sprintf_s(msgBuffer, sizeof(msgBuffer), "%s", stab[STR_HUP0 + iniFile.hoopType - 1]);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), "%s", StringTable[STR_HUP0 + iniFile.hoopType - 1]);
 	prflin(STR_PRF17);
 	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.0f mm", iniFile.hoopSizeY / PFGRAN);
 	prflin(STR_PRF27);
@@ -7688,14 +7688,14 @@ void prfmsg() {
 	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", picotSpace / PFGRAN);
 	prflin(STR_PRF16);
 	if (chku(BLUNT))
-		strcpy_s(msgBuffer, stab[STR_BLUNT]);
+		strcpy_s(msgBuffer, StringTable[STR_BLUNT]);
 	else
-		strcpy_s(msgBuffer, stab[STR_TAPR]);
+		strcpy_s(msgBuffer, StringTable[STR_TAPR]);
 	prflin(STR_PRF15);
 	if (chku(DUND))
-		strcpy_s(msgBuffer, stab[STR_ON]);
+		strcpy_s(msgBuffer, StringTable[STR_ON]);
 	else
-		strcpy_s(msgBuffer, stab[STR_OFF]);
+		strcpy_s(msgBuffer, StringTable[STR_OFF]);
 	prflin(STR_PRF19);
 	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", smallStitchLength / PFGRAN);
 	prflin(STR_PRF9);
@@ -7735,8 +7735,8 @@ void prfmsg() {
 	}
 	leftWindowSize.x = leftWindowSize.y = 0;
 	rightWindowSize.x = rightWindowSize.y = 0;
-	maxtsiz(stab[STR_PRF0 + 4], &leftWindowSize);
-	maxtsiz(stab[STR_BLUNT], &rightWindowSize);
+	maxtsiz(StringTable[STR_PRF0 + 4], &leftWindowSize);
+	maxtsiz(StringTable[STR_BLUNT], &rightWindowSize);
 	leftWindowSize.x = preferenceWindowTextWidth;
 	rightWindowSize.x += 4;
 	DestroyWindow(hPreferencesWindow);
@@ -7775,21 +7775,21 @@ void prfmsg() {
 	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", stitchSpace / PFGRAN);
 	prflin(STR_PRF0);
 	if (chku(SQRFIL))
-		strcpy_s(msgBuffer, stab[STR_SQR]);
+		strcpy_s(msgBuffer, StringTable[STR_SQR]);
 	else
-		strcpy_s(msgBuffer, stab[STR_PNTD]);
+		strcpy_s(msgBuffer, StringTable[STR_PNTD]);
 	prflin(STR_PRF2);
 	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", borderWidth / PFGRAN);
 	prflin(STR_PRF3);
 	if (chku(BLUNT))
-		strcpy_s(msgBuffer, stab[STR_BLUNT]);
+		strcpy_s(msgBuffer, StringTable[STR_BLUNT]);
 	else
-		strcpy_s(msgBuffer, stab[STR_TAPR]);
+		strcpy_s(msgBuffer, StringTable[STR_TAPR]);
 	prflin(STR_PRF15);
 	if (chku(DUND))
-		strcpy_s(msgBuffer, stab[STR_ON]);
+		strcpy_s(msgBuffer, StringTable[STR_ON]);
 	else
-		strcpy_s(msgBuffer, stab[STR_OFF]);
+		strcpy_s(msgBuffer, StringTable[STR_OFF]);
 	prflin(STR_PRF19);
 	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", buttonholeFillCornerLength / PFGRAN);
 	prflin(STR_PRF14);
@@ -7804,7 +7804,7 @@ void prfmsg() {
 	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.2f", picotSpace / PFGRAN);
 	prflin(STR_PRF16);
 	sethup();
-	sprintf_s(msgBuffer, sizeof(msgBuffer), stab[STR_HUP0 + iniFile.hoopType - 1]);
+	sprintf_s(msgBuffer, sizeof(msgBuffer), StringTable[STR_HUP0 + iniFile.hoopType - 1]);
 	prflin(STR_PRF17);
 	sprintf_s(msgBuffer, sizeof(msgBuffer), "%.0f mm", iniFile.hoopSizeY / PFGRAN);
 	prflin(STR_PRF27);
@@ -8330,10 +8330,10 @@ void tomsg() {
 	SIZE	tsiz;
 
 	GetWindowRect(hOKButton, &okrct);
-	GetTextExtentPoint32(stitchWindowMemDC, stab[STR_DELST2], strlen(stab[STR_DELST2]), &tsiz);
+	GetTextExtentPoint32(stitchWindowMemDC, StringTable[STR_DELST2], strlen(StringTable[STR_DELST2]), &tsiz);
 	hDlgDeleteStitches = CreateWindow(
 		"STATIC",
-		stab[STR_DELST2],
+		StringTable[STR_DELST2],
 		SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		3,
 		okrct.bottom - stitchWindowOrigin.y + 6 + tsiz.cy,
@@ -8897,9 +8897,9 @@ void tglfrm() {
 		satfix();
 	rstMap(HIDSTCH);
 	if (toglMap(FRMOF))
-		strcpy_s(oftxt, stab[STR_FRMPLUS]);
+		strcpy_s(oftxt, StringTable[STR_FRMPLUS]);
 	else {
-		strcpy_s(oftxt, stab[STR_FRMINUS]);
+		strcpy_s(oftxt, StringTable[STR_FRMINUS]);
 		rstMap(FORMSEL);
 		rstMap(FORMIN);
 		rstMap(MOVFRM);
@@ -8921,7 +8921,7 @@ void tglfrm() {
 void frmon() {
 	unbsho();
 	rstMap(FRMOF);
-	strcpy_s(oftxt, stab[STR_FRMPLUS]);
+	strcpy_s(oftxt, StringTable[STR_FRMPLUS]);
 	SetMenuItemInfo(hMainMenu, ID_FRMOF, FALSE, &meninfo);
 	setMap(DUMEN);
 }

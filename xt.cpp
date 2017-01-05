@@ -83,7 +83,7 @@ extern	unsigned short	selectedFormList[MAXFORMS];
 extern	fPOINT			selectedPoint;
 extern	unsigned		sequenceIndex;
 extern	unsigned short	sides;
-extern	TCHAR*			stab[STR_LEN];
+extern	TCHAR*			StringTable[STR_LEN];
 extern	fPOINTATTR		stitchBuffer[MAXPCS];
 extern	double			stitchSpace;
 extern	RECT			stitchWindowClientRect;
@@ -4795,12 +4795,12 @@ void txcntrv()
 
 void txof()
 {
-	butxt(HBOXSEL, stab[STR_BOXSEL]);
+	butxt(HBOXSEL, StringTable[STR_BOXSEL]);
 	redraw(hButtonWin[HHID]);
 	if (chkMap(UPTO))
-		butxt(HUPTO, stab[STR_UPON]);
+		butxt(HUPTO, StringTable[STR_UPON]);
 	else
-		butxt(HUPTO, stab[STR_UPOF]);
+		butxt(HUPTO, StringTable[STR_UPOF]);
 	SetWindowText(hButtonWin[HTXSPAC], "");
 	savtxt();
 	zumhom();
