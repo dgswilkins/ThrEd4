@@ -1666,9 +1666,9 @@ typedef struct _orec {
 	unsigned 	finish;
 	fPOINTATTR*	spnt;
 	fPOINTATTR*	epnt;
-	unsigned 	col;
-	unsigned 	typ;
-	unsigned 	frm;
+	unsigned 	color;
+	unsigned 	type;
+	unsigned 	form;
 	unsigned	otyp;
 }OREC;
 

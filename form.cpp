@@ -101,84 +101,78 @@ extern void		zumhom ();
 
 extern			unsigned		ActiveColor;
 extern			unsigned		ActiveLayer;
+extern			HCURSOR			ArrowCursor;
 extern			unsigned		BitmapHeight;
 extern			unsigned		BitmapWidth;
 extern			unsigned		ButtonHeight;
 extern			unsigned		ButtonWidth;
 extern			unsigned		ButtonWidthX3;
+extern			HWND			CancelButton;
+extern			unsigned		Clip;
+extern			fPOINTATTR		ClipBuffer[MAXFRMLINS];
+extern			HGLOBAL			ClipMemory;
+extern			void*			ClipPointer;
 extern			fRECTANGLE		ClipRect;
 extern			FLSIZ			ClipRectSize;
-extern			unsigned		ClipStitchCount;	//number of stitchs extracted from clipboard
+extern			unsigned		ClipStitchCount;
 extern			CLPSTCH*		ClipStitchData;
-extern			fPOINTATTR		ClipBuffer[MAXFRMLINS];
 extern			unsigned		ClosestPointIndex;
+extern			HCURSOR			CrossCursor;
+extern			HWND			DeleteStitchesDialog;
+extern			HWND			DiscardButton;
 extern			POINT			EndPointCross;
+extern			HMENU			FillMenu;
+extern			unsigned		FillStartsMap;
+extern			HWND			FormDataSheet;
 extern			unsigned		FormMenuChoice;
 extern			HPEN			FormPen;
 extern			HPEN			FormPen3px;
 extern			HPEN			FormSelectedPen;
-#if	 __UseASM__
+#if	 __UseASM__				
 extern			unsigned		fsizeof;
-#endif
+#endif					
 extern			unsigned		GroupEndStitch;
 extern			unsigned		GroupStartStitch;
 extern			unsigned		GroupStitchIndex;
-extern			HCURSOR			ArrowCursor;
-extern			HWND			CancelButton;
-extern			unsigned		Clip;
-extern			HGLOBAL			ClipMemory;
-extern			HCURSOR			CrossCursor;
-extern			HWND			DiscardButton;
-extern			PCSHEADER		PCSHeader;
-extern			HMENU			FillMenu;
-extern			HWND			FormDataSheet;
-extern			HINSTANCE		ThredInstance;
-extern			HMENU			MainMenu;
-extern			HWND			MainStitchWin;
-extern			HWND			MsgWindow;
-extern			HWND			OKButton;
-extern			HWND			PreferencesWindow;
-extern			HWND			SideMessageWindow;
-extern			HWND			SideWindow[11];
-extern			HWND			DeleteStitchesDialog;
-extern			HWND			ThredWindow;
 extern			INIFILE			IniFile;
 extern			POINT			InsertLine[3];
-extern			fPOINT			interleaveSequence[MAXSEQ];
-extern			unsigned		interleaveSequenceIndex;
-extern			unsigned		interleaveSequenceIndex2;
-extern			INSREC			interleaveSequenceIndices[10];
+extern			fPOINT			InterleaveSequence[MAXSEQ];
+extern			unsigned		InterleaveSequenceIndex;
+extern			unsigned		InterleaveSequenceIndex2;
+extern			INSREC			InterleaveSequenceIndices[10];
 extern			HPEN			LayerPen[5];
-extern			POINT			ThredWindowOrigin;
+extern			HMENU			MainMenu;
+extern			HWND			MainStitchWin;
 extern			unsigned		MarkedStitchMap[RMAPSIZ];
 extern			double			MinStitchLength;
 extern			MSG				Msg;
 extern			TCHAR			MsgBuffer[MSGSIZ];
 extern			unsigned		MsgIndex;
 extern			RECT			MsgRect;
+extern			HWND			MsgWindow;
 extern			HPEN			MultiFormPen;
 extern			unsigned		NearestCount;
-extern			unsigned		numpnt;
+extern			HWND			OKButton;
 extern			TCHAR*			PcdClipFormat;
+extern			PCSHEADER		PCSHeader;
 extern			unsigned		PreferenceIndex;
-extern			void*			ClipPointer;
-extern			FRMHED*			SelectedForm;	//pointer to selected form
+extern			HWND			PreferencesWindow;
 extern			double			RotationAngle;
 extern			dPOINT			RotationCenter;
 extern			fRECTANGLE		RotationRect;
-extern			POINT			scend;
+extern			unsigned		SearchLineIndex;
 extern			HPEN			SelectAllPen;
+extern			FRMHED*			SelectedForm;
 extern			FORMPOINTS		SelectedFormPoints;
 extern			fPOINT			SelectedFormsSize;
 extern			RECT			SelectedPixelsRect;
 extern			fPOINT			SelectedPoint;
 extern			fRECTANGLE		SelectedPointsRect;
 extern			double			ShowStitchThreshold;
+extern			HWND			SideMessageWindow;
+extern			HWND			SideWindow[11];
 extern			TCHAR			SideWindowEntryBuffer[11];
-extern			unsigned		SearchLineIndex;
 extern			double			SmallStitchLength;
-extern			unsigned		fillStartsMap;
-extern			TCHAR*			StringTable[STR_LEN];
 extern			double			StitchBoxesThreshold;
 extern			fPOINTATTR		StitchBuffer[MAXPCS];
 extern			fRECTANGLE		StitchRangeRect;
@@ -189,10 +183,14 @@ extern			HDC				StitchWindowMemDC;
 extern			POINT			StitchWindowOrigin;
 extern			POINT			StitchWindowSize;
 extern			POINT			StretchBoxLine[5];
+extern			TCHAR*			StringTable[STR_LEN];
+extern			int				TextureIndex;
+extern			TXPNT			TexturePointsBuffer[MAXSEQ];
+extern			RNGCNT*			TextureSegments;
+extern			HINSTANCE		ThrEdInstance;
+extern			HWND			ThrEdWindow;
+extern			POINT			ThredWindowOrigin;
 extern			TCHAR			ThrName[_MAX_PATH];
-extern			int				textureIndex;
-extern			TXPNT			texturePointsBuffer[MAXSEQ];
-extern			RNGCNT*			textureSegments;
 extern			unsigned		UnderlayColor;
 extern			void*			UndoBuffer[16];
 extern			unsigned		UndoBufferWriteIndex;
@@ -1001,7 +999,7 @@ unsigned find1st() {
 
 void ispcdclp() {
 	rstMap(WASPCDCLP);
-	if (OpenClipboard(ThredWindow)) {
+	if (OpenClipboard(ThrEdWindow)) {
 		Clip = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory)
@@ -1634,7 +1632,7 @@ void setear() {
 	fPOINT		lSize;
 
 	unmsg();
-	ind = DialogBox(ThredInstance, MAKEINTRESOURCE(IDD_TEAR), ThredWindow, (DLGPROC)tearprc);
+	ind = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, (DLGPROC)tearprc);
 	if (ind > 0) {
 		xstp = IniFile.tearTwistStep;
 		durpoli(IniFile.formSides);
@@ -1841,12 +1839,12 @@ void makspac(unsigned strt, unsigned cnt) {
 void rseq(unsigned strt, unsigned fin, unsigned ostrt, unsigned at) {
 	while (strt < fin) {
 		StitchBuffer[strt].attribute = at;
-		StitchBuffer[strt].x = interleaveSequence[ostrt].x;
-		StitchBuffer[strt++].y = interleaveSequence[ostrt++].y;
+		StitchBuffer[strt].x = InterleaveSequence[ostrt].x;
+		StitchBuffer[strt++].y = InterleaveSequence[ostrt++].y;
 	}
 	ostrt--;
-	LastPoint.x = interleaveSequence[ostrt].x;
-	LastPoint.y = interleaveSequence[ostrt].y;
+	LastPoint.x = InterleaveSequence[ostrt].x;
+	LastPoint.y = InterleaveSequence[ostrt].y;
 }
 
 BOOL ritlin(fPOINT strt, fPOINT fin)
@@ -1858,26 +1856,26 @@ BOOL ritlin(fPOINT strt, fPOINT fin)
 	dif.x = fin.x - strt.x;
 	dif.y = fin.y - strt.y;
 	len = hypot(dif.x, dif.y);
-	interleaveSequence[interleaveSequenceIndex].x = strt.x;
-	interleaveSequence[interleaveSequenceIndex++].y = strt.y;
+	InterleaveSequence[InterleaveSequenceIndex].x = strt.x;
+	InterleaveSequence[InterleaveSequenceIndex++].y = strt.y;
 	if (len > MaxStitchLen) {
 		cnt = ceil(len / UserStichLen);
 		if (!cnt)
 			cnt = 1;
 		while (len / cnt > MaxStitchLen)
 			cnt++;
-		if (!chkmax(interleaveSequenceIndex, cnt)) {
+		if (!chkmax(InterleaveSequenceIndex, cnt)) {
 			stp.x = dif.x / cnt;
 			stp.y = dif.y / cnt;
 			pnt.x = strt.x + stp.x;
 			pnt.y = strt.y + stp.y;
 			for (ine = 0; ine < cnt - 1; ine++) {
-				if (interleaveSequenceIndex&MAXMSK) {
-					interleaveSequenceIndex = MAXSEQ - 2;
+				if (InterleaveSequenceIndex&MAXMSK) {
+					InterleaveSequenceIndex = MAXSEQ - 2;
 					return 0;
 				}
-				interleaveSequence[interleaveSequenceIndex].x = pnt.x;
-				interleaveSequence[interleaveSequenceIndex++].y = pnt.y;
+				InterleaveSequence[InterleaveSequenceIndex].x = pnt.x;
+				InterleaveSequence[InterleaveSequenceIndex++].y = pnt.y;
 				pnt.x += stp.x;
 				pnt.y += stp.y;
 			}
@@ -1915,17 +1913,17 @@ void chkseq(BOOL brd) {
 
 	for (index = 0; index < SequenceIndex; index++)
 	{
-		interleaveSequence[index].x = OSequence[index].x;
-		interleaveSequence[index].y = OSequence[index].y;
+		InterleaveSequence[index].x = OSequence[index].x;
+		InterleaveSequence[index].y = OSequence[index].y;
 	}
-	interleaveSequenceIndex = SequenceIndex;
+	InterleaveSequenceIndex = SequenceIndex;
 #else
 
 	double		len;
 	unsigned	ind, ine, bakind;
 	float		mins;
 
-	bakind = interleaveSequenceIndex;
+	bakind = InterleaveSequenceIndex;
 	if (brd) {
 		if (!SelectedForm->maxBorderStitchLen)
 			SelectedForm->maxBorderStitchLen = IniFile.maxStitchLength;
@@ -1954,57 +1952,57 @@ void chkseq(BOOL brd) {
 		if (!ritlin(OSequence[ind], OSequence[ind + 1]))
 			goto seqskp;
 	}
-	interleaveSequence[interleaveSequenceIndex].x = OSequence[ind].x;
-	interleaveSequence[interleaveSequenceIndex++].y = OSequence[ind].y;
+	InterleaveSequence[InterleaveSequenceIndex].x = OSequence[ind].x;
+	InterleaveSequence[InterleaveSequenceIndex++].y = OSequence[ind].y;
 seqskp:;
 	if (!mins)
 		return;
 	ine = bakind + 1;
-	for (ind = bakind + 1; ind < interleaveSequenceIndex; ind++) {
-		len = hypot(interleaveSequence[ind].x - interleaveSequence[ind - 1].x, interleaveSequence[ind].y - interleaveSequence[ind - 1].y);
+	for (ind = bakind + 1; ind < InterleaveSequenceIndex; ind++) {
+		len = hypot(InterleaveSequence[ind].x - InterleaveSequence[ind - 1].x, InterleaveSequence[ind].y - InterleaveSequence[ind - 1].y);
 		if (len > mins) {
-			interleaveSequence[ine].x = interleaveSequence[ind].x;
-			interleaveSequence[ine].y = interleaveSequence[ind].y;
+			InterleaveSequence[ine].x = InterleaveSequence[ind].x;
+			InterleaveSequence[ine].y = InterleaveSequence[ind].y;
 			ine++;
 		}
 	}
-	interleaveSequenceIndex = ine;
+	InterleaveSequenceIndex = ine;
 #endif
 }
 
 void ritbrd() {
 	if (SequenceIndex)
 	{
-		interleaveSequenceIndices[interleaveSequenceIndex2].ind = interleaveSequenceIndex;
-		interleaveSequenceIndices[interleaveSequenceIndex2].seq = I_BRD;
-		interleaveSequenceIndices[interleaveSequenceIndex2].cod = TYPBRD;
-		interleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->borderColor&COLMSK;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].ind = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_BRD;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].cod = TYPBRD;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->borderColor&COLMSK;
 		chkseq(1);
-		interleaveSequenceIndex2++;
+		InterleaveSequenceIndex2++;
 	}
 }
 
 void ritapbrd() {
 	if (SequenceIndex)
 	{
-		interleaveSequenceIndices[interleaveSequenceIndex2].ind = interleaveSequenceIndex;
-		interleaveSequenceIndices[interleaveSequenceIndex2].seq = I_AP;
-		interleaveSequenceIndices[interleaveSequenceIndex2].cod = TYPMSK;
-		interleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->borderColor >> 4;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].ind = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_AP;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].cod = TYPMSK;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->borderColor >> 4;
 		chkseq(1);
-		interleaveSequenceIndex2++;
+		InterleaveSequenceIndex2++;
 	}
 }
 
 void ritfil() {
 	if (SequenceIndex)
 	{
-		interleaveSequenceIndices[interleaveSequenceIndex2].ind = interleaveSequenceIndex;
-		interleaveSequenceIndices[interleaveSequenceIndex2].seq = I_FIL;
-		interleaveSequenceIndices[interleaveSequenceIndex2].cod = TYPFRM;
-		interleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->fillColor;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].ind = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].cod = TYPFRM;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillColor;
 		chkseq(0);
-		interleaveSequenceIndex2++;
+		InterleaveSequenceIndex2++;
 	}
 }
 
@@ -2021,7 +2019,7 @@ void okcan() {
 		ButtonHeight,
 		MainStitchWin,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 
 	CancelButton = CreateWindow(
@@ -2034,7 +2032,7 @@ void okcan() {
 		ButtonHeight,
 		MainStitchWin,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -2046,7 +2044,7 @@ void savdisc() {
 
 	GetClientRect(MsgWindow, &MsgRect);
 
-	LoadString(ThredInstance, IDS_SAV, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_SAV, buf, HBUFSIZ);
 	OKButton = CreateWindow(
 		"STATIC",
 		buf,
@@ -2057,10 +2055,10 @@ void savdisc() {
 		ButtonHeight,
 		MainStitchWin,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 
-	LoadString(ThredInstance, IDS_DISC, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_DISC, buf, HBUFSIZ);
 	DiscardButton = CreateWindow(
 		"STATIC",
 		buf,
@@ -2071,7 +2069,7 @@ void savdisc() {
 		ButtonHeight,
 		MainStitchWin,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 
 	CancelButton = CreateWindow(
@@ -2084,15 +2082,15 @@ void savdisc() {
 		ButtonHeight,
 		MainStitchWin,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
 BOOL lastch() {
-	if (interleaveSequenceIndex)
+	if (InterleaveSequenceIndex)
 	{
-		LastPoint.x = interleaveSequence[interleaveSequenceIndex - 1].x;
-		LastPoint.y = interleaveSequence[interleaveSequenceIndex - 1].y;
+		LastPoint.x = InterleaveSequence[InterleaveSequenceIndex - 1].x;
+		LastPoint.y = InterleaveSequence[InterleaveSequenceIndex - 1].y;
 		return 1;
 	}
 	else
@@ -2417,7 +2415,7 @@ void refilfn() {
 	rstMap(WASDO);
 	if (SelectedForm->extendedAttribute&(AT_UND | AT_WALK) && SelectedForm->type == FRMLINE&&SelectedForm->fillType != CONTF)
 		SelectedForm->type = FRMFPOLY;
-	interleaveSequenceIndex = interleaveSequenceIndex2 = 0;
+	InterleaveSequenceIndex = InterleaveSequenceIndex2 = 0;
 	rstMap(ISUND);
 	switch (SelectedForm->type) {
 	case FRMLINE:
@@ -6069,7 +6067,7 @@ void fclp() {
 
 	if (filmsgs(FML_CLP))
 		return;
-	if (OpenClipboard(ThredWindow)) {
+	if (OpenClipboard(ThrEdWindow)) {
 		fvars(ClosestFormToCursor);
 		Clip = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
@@ -6543,7 +6541,7 @@ void setap() {
 	TCHAR	buf[HBUFSIZ];
 
 	UnderlayColor = ActiveColor;
-	LoadString(ThredInstance, IDS_APCOL, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_APCOL, buf, HBUFSIZ);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buf, UnderlayColor + 1);
 	shoMsg(MsgBuffer);
 }
@@ -6583,7 +6581,7 @@ HWND txtwin(TCHAR* str, RECT loc) {
 		loc.bottom - loc.top,
 		FormDataSheet,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -6603,7 +6601,7 @@ HWND txtrwin(TCHAR* str, RECT loc) {
 		loc.bottom - loc.top,
 		FormDataSheet,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -6623,7 +6621,7 @@ HWND numwin(TCHAR* str, RECT loc) {
 		loc.bottom - loc.top,
 		FormDataSheet,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -6986,9 +6984,9 @@ void refrm() {
 			3,
 			LabelWindowSize.x + ValueWindowSize.x + 18,
 			LabelWindowSize.y*FormMenuEntryCount + 12,
-			ThredWindow,
+			ThrEdWindow,
 			NULL,
-			ThredInstance,
+			ThrEdInstance,
 			NULL);
 	}
 	rstMap(REFCNT);
@@ -7479,9 +7477,9 @@ void sidwnd(HWND wnd) {
 		wrct.top - ThredWindowOrigin.y - 3,
 		ButtonWidthX3,
 		wrct.bottom - wrct.top + 3,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -7501,9 +7499,9 @@ void prfsid(HWND wnd) {
 		wrct.top - ThredWindowOrigin.y - 3,
 		ValueWindowSize.x,
 		wrct.bottom - wrct.top + 3,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -7552,7 +7550,7 @@ void prftwin(TCHAR* str) {
 		LabelWindowCoords.bottom - LabelWindowCoords.top,
 		PreferencesWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -7567,7 +7565,7 @@ HWND prfnwin(TCHAR* str) {
 		ValueWindowCoords.bottom - ValueWindowCoords.top,
 		PreferencesWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -7627,9 +7625,9 @@ void prfmsg() {
 		3,
 		PreferenceWindowWidth,
 		LabelWindowSize.y*PRFLINS + 12,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 	prfdc = GetDC(PreferencesWindow);
 	GetClientRect(PreferencesWindow, &prfrct);
@@ -7707,7 +7705,7 @@ void prfmsg() {
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", MinStitchLength / PFGRAN);
 	prflin(STR_PRF6);
 	setMap(PRFACT);
-	ReleaseDC(ThredWindow, prfdc);
+	ReleaseDC(ThrEdWindow, prfdc);
 }
 #endif
 
@@ -7742,9 +7740,9 @@ void prfmsg() {
 		3,
 		PreferenceWindowWidth,
 		LabelWindowSize.y*PRFLINS + 12,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 	prfdc = GetDC(PreferencesWindow);
 	GetClientRect(PreferencesWindow, &prfrct);
@@ -7822,7 +7820,7 @@ void prfmsg() {
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", UnderlayColor + 1);
 	prflin(STR_PRF10);
 	setMap(PRFACT);
-	ReleaseDC(ThredWindow, prfdc);
+	ReleaseDC(ThrEdWindow, prfdc);
 }
 #endif
 
@@ -8334,7 +8332,7 @@ void tomsg() {
 		tsiz.cy + 6,
 		MainStitchWin,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -9111,7 +9109,7 @@ void clpfil() {
 
 	if (filmsgs(FMM_CLP))
 		return;
-	if (OpenClipboard(ThredWindow)) {
+	if (OpenClipboard(ThrEdWindow)) {
 		Clip = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory) {
@@ -9176,9 +9174,9 @@ void nutim(double pl_Size) {
 		0,
 		StitchWindowSize.x,
 		ButtonHeight,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 	TimeDC = GetDC(TimeWindow);
 	TimeStep = (double)StitchWindowSize.x / pl_Size;
@@ -9389,7 +9387,7 @@ void rotpar() {
 void rotentr() {
 	TCHAR buf[HBUFSIZ];
 
-	LoadString(ThredInstance, IDS_ROTA, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_ROTA, buf, HBUFSIZ);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buf, RotationAngle / PI * 180);
 	shoMsg(MsgBuffer);
 	setMap(NUMIN);
@@ -10155,7 +10153,7 @@ void boxsel() {
 		rstMap(BZUM);
 		rstMap(BZUMIN);
 		setMap(VCAPT);
-		SetCapture(ThredWindow);
+		SetCapture(ThrEdWindow);
 		setMap(RESTCH);
 	}
 }
@@ -10337,7 +10335,7 @@ void picot() {
 
 	if (filmsgs(FML_PIC))
 		return;
-	if (OpenClipboard(ThredWindow)) {
+	if (OpenClipboard(ThrEdWindow)) {
 		savdo();
 		fvars(ClosestFormToCursor);
 		Clip = RegisterClipboardFormat(PcdClipFormat);
@@ -10907,7 +10905,7 @@ void frmnum() {
 	TCHAR	buf[HBUFSIZ];
 
 	if (FormIndex&&chkMap(FORMSEL)) {
-		LoadString(ThredInstance, IDS_FRML, buf, HBUFSIZ);
+		LoadString(ThrEdInstance, IDS_FRML, buf, HBUFSIZ);
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), buf, FormIndex);
 		shoMsg(MsgBuffer);
 		setMap(NUMIN);
@@ -12010,7 +12008,7 @@ void clpcon() {
 		ClipWidth = (float)CLPMINAUT;
 	if (chkMap(TXFIL))
 	{
-		if (textureIndex&&SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count <= textureIndex)
+		if (TextureIndex&&SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count <= TextureIndex)
 			ClipWidth = SelectedForm->fillSpacing;
 		else
 			return;
@@ -12116,8 +12114,8 @@ void clpcon() {
 		if (chkMap(TXFIL))
 		{
 			tine = (ind + nrct.left) % SelectedForm->fillInfo.texture.lines;
-			ClipStitchCount = textureSegments[tine].stitchCount;
-			ptx = &texturePointsBuffer[SelectedForm->fillInfo.texture.index + textureSegments[tine].line];
+			ClipStitchCount = TextureSegments[tine].stitchCount;
+			ptx = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + TextureSegments[tine].line];
 			lineSegmentStart.x = ploc.x;
 			if (SelectedForm->txof)
 			{
@@ -12365,7 +12363,7 @@ void vrtclp() {
 
 	if (filmsgs(FMM_CLP))
 		return;
-	if (OpenClipboard(ThredWindow)) {
+	if (OpenClipboard(ThrEdWindow)) {
 		Clip = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory) {
@@ -12475,7 +12473,7 @@ void horclp() {
 
 	if (filmsgs(FMM_CLP))
 		return;
-	if (OpenClipboard(ThredWindow)) {
+	if (OpenClipboard(ThrEdWindow)) {
 		Clip = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory) {
@@ -12582,7 +12580,7 @@ void angclp() {
 
 	if (filmsgs(FMM_CLP))
 		return;
-	if (OpenClipboard(ThredWindow)) {
+	if (OpenClipboard(ThrEdWindow)) {
 		Clip = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory) {
@@ -12775,7 +12773,7 @@ void col2frm() {
 			fin += 16;
 		}
 	}
-	LoadString(ThredInstance, IDS_NCOLCHG, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_NCOLCHG, buf, HBUFSIZ);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buf, chngcnt);
 	shoMsg(MsgBuffer);
 }
@@ -13269,7 +13267,7 @@ void filclpx() {
 
 	if (filmsgs(FML_CLP))
 		return;
-	if (OpenClipboard(ThredWindow)) {
+	if (OpenClipboard(ThrEdWindow)) {
 		fvars(ClosestFormToCursor);
 		Clip = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
@@ -13379,7 +13377,7 @@ void wavfrm() {
 	fPOINT		lfp_Size;
 
 	unmsg();
-	if (DialogBox(ThredInstance, MAKEINTRESOURCE(IDD_WAV), ThredWindow, (DLGPROC)wavprc)) {
+	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, (DLGPROC)wavprc)) {
 		ind = FormVertexIndex;
 		end = IniFile.waveEnd + 1;
 		durpoli(IniFile.wavePoints);

@@ -25,12 +25,14 @@ extern	unsigned		ActiveLayer;
 extern	unsigned		ActivePointIndex;
 extern	fPOINT			AngledFormVertices[MAXFRMLINS];
 extern	FRMHED			AngledForm;
-extern	unsigned		auth;
 extern	TCHAR			AuxName[_MAX_PATH];
+extern	HBRUSH			BackgroundBrush;
 extern	BSEQPNT			BSequence[BSEQLEN];
 extern	unsigned		ButtonHeight;
 extern	unsigned		ButtonWidthX3;
+extern	HWND			ButtonWin[9];
 extern	FORMCLIP*		ClipFormData;
+extern	HGLOBAL			ClipMemory;
 extern	fPOINT			ClipPoints[MAXCLPNTS];
 extern	fRECTANGLE		ClipRect;
 extern	FLSIZ			ClipRectSize;
@@ -41,7 +43,6 @@ extern	unsigned		ClosestPointIndex;
 extern	unsigned		ClosestVertexToCursor;
 extern	unsigned		ClipPointIndex;
 extern	fPOINT*			CurrentFormVertices;
-extern	TCHAR			WorkingFileName[_MAX_PATH];
 extern	unsigned		FormVertexIndex;
 extern	fPOINT			FormMoveDelta;
 extern	unsigned		FormIndex;
@@ -49,20 +50,11 @@ extern	POINT			FormLines[MAXFRMLINS];
 extern	FRMHED			FormList[MAXFORMS];
 extern	fPOINT			FormVertices[MAXFRMPNTS];
 extern	HPEN			GridPen;
-extern	HBRUSH			BackgroundBrush;
-extern	HWND			ButtonWin[9];
-extern	HGLOBAL			ClipMemory;
-extern	PCSHEADER		PCSHeader;
 extern	HWND			HorizontalScrollBar;
-extern	fPOINTATTR*		TempStitchBuffer;
-extern	HINSTANCE		ThredInstance;
 extern	TCHAR			HelpBuffer[HBUFSIZ];
-extern	HWND			MainStitchWin;
-extern	unsigned		ThrEdClip;
-extern	HWND			VerticalScrollBar;
-extern	HWND			ThredWindow;
 extern	INIFILE			IniFile;
 extern	fPOINT*			InsidePoints;
+extern	HWND			MainStitchWin;
 extern	unsigned		MarkedStitchMap[RMAPSIZ];
 extern	MSG				Msg;
 extern	TCHAR			MsgBuffer[MSGSIZ];
@@ -70,10 +62,11 @@ extern	unsigned		NewFormVertexCount;
 extern	unsigned		OutputIndex;
 extern	fPOINT*			OutsidePoints;
 extern	fPOINT			OSequence[OSEQLEN];
+extern	PCSHEADER		PCSHeader;
 extern	unsigned		PseudoRandomValue;
-extern	FRMHED*			SelectedForm;
 extern	double			RotationAngle;
 extern	dPOINT			RotationCenter;
+extern	FRMHED*			SelectedForm;
 extern	unsigned		SatinConnectIndex;
 extern	SATCON			SatinConnects[MAXSAC];
 extern	TCHAR*			StringData;
@@ -90,12 +83,18 @@ extern	RECT			StitchWindowClientRect;
 extern	HDC				StitchWindowDC;
 extern	HDC				StitchWindowMemDC;
 extern	POINT			StitchWindowOrigin;
+extern	fPOINTATTR*		TempStitchBuffer;
+extern	unsigned		ThrEdClip;
 extern	TCHAR*			ThrEdClipFormat;
+extern	HINSTANCE		ThrEdInstance;
+extern	HWND			ThrEdWindow;
 extern	TCHAR			ThrName[_MAX_PATH];
 extern	unsigned		UnderlayColor;
 extern	POINT			UnzoomedRect;
 extern	COLORREF		UserColor[16];
 extern	double			UserStitchLength;
+extern	HWND			VerticalScrollBar;
+extern	TCHAR			WorkingFileName[_MAX_PATH];
 extern	POINT			ZoomBoxLine[5];
 extern	fPOINT			ZoomBoxOrigin;
 extern	dRECTANGLE		ZoomRect;
@@ -190,7 +189,7 @@ extern	void		unthum();
 extern	void		wrnmen();
 extern	void		zumhom();
 
-unsigned short daztab[] =
+unsigned short DaisyTypeStrings[] =
 {
 	IDS_DAZCRV,
 	IDS_DAZSAW,
@@ -200,65 +199,65 @@ unsigned short daztab[] =
 	IDS_DAZHART,
 };
 
-RNGCNT*		textureSegments;			//texture fill groups of points
-dPOINT		designSizeRatio;			//design size ratio
-fRECTANGLE	designSizeRect;				//design size rectangle
-float		designAspectRatio;			//design aspect ratio
-HWND		hDlgDesignSize;				//change design size dialog window
-fPOINT		designSize;					//design size
-TXPNT		texturePointsBuffer[MAXSEQ];	//buffer for textured fill points
-int			textureIndex;				//next textured fill point index
-unsigned	textureWindowId;			//id of the window being updated
-TCHAR		textureInputBuffer[16];		//texture fill number buffer
-int			textureInputIndex;			//text number pointer
-HWND		hBtnSideWindow;				//button side window
-RECT		texturePixelRect;			//screen selected texture points rectangle
-TXTRCT		textureRect;				//selected texture points rectangle
-POINT		cloxref;	//original location of selected texture points
-int			cloxcnt;	//number of selected texture points
-unsigned*	cloxlst;	//list of selected points
-POINT		textureCursorLocation;		//texture editor move cursor location
-HPEN		textureCrossPen;			//texture editor cross pen
-TXTSCR		textureScreen;				//texture editor layout parameters
-TXPNT		tmpTexturePoints[16384];	//temporary storage for textured fill data
-unsigned	colorOrder[16];				//color order adjusted for applique
-INTINF		interleaveData;				//interleave data
-fPOINT		interleaveSequence[MAXSEQ]; //storage for interleave points
-unsigned	interleaveSequenceIndex;	//index into the interleave sequence
-FSTRTS		fillStartsData;				//fill start data for refill
-INSREC		interleaveSequenceIndices[10];	//indices into interleave points
-unsigned	interleaveSequenceIndex2;	//index into interleave indices
-unsigned	fillStartsMap;				//fill starts bitmap
-unsigned*	formFillCounter;			//form fill type counters for sort
-fPOINT*		underlayVertices;			//underlay offset points
-unsigned	featherFillType;			//type of feather fill
-float		featherRatio;				//feather ratio
-float		featherMinStitch;			//smallest stitch allowed
-float		featherRatioLocal;			//local feather ratio
-float		formFeatherRatio;			//feather ratio from form
-unsigned	extendedAttribute;			//extended form attribute
-unsigned	featherUpCount;				//feather up count
-unsigned	featherDownCount;			//feather down count
-unsigned	featherTotalCount;			//up count plus down count
-unsigned	featherPhaseIndex;
-unsigned	featherPhase;
-fPOINT		featherSequence[MAXSEQ];
-unsigned	featherCountUp;
-unsigned	featherCountDown;
+RNGCNT*		TextureSegments;			//texture fill groups of points
+dPOINT		DesignSizeRatio;			//design size ratio
+fRECTANGLE	DesignSizeRect;				//design size rectangle
+float		DesignAspectRatio;			//design aspect ratio
+HWND		DesignSizeDialog;			//change design size dialog window
+fPOINT		DesignSize;					//design size
+TXPNT		TexturePointsBuffer[MAXSEQ];	//buffer for textured fill points
+int			TextureIndex;				//next textured fill point index
+unsigned	TextureWindowId;			//id of the window being updated
+TCHAR		TextureInputBuffer[16];		//texture fill number buffer
+int			TextureInputIndex;			//text number pointer
+HWND		SideWindowButton;			//button side window
+RECT		TexturePixelRect;			//screen selected texture points rectangle
+TXTRCT		TextureRect;				//selected texture points rectangle
+POINT		SelectTexturePointsOrigin;	//original location of selected texture points
+int			SelectedTexturePointsCount;	//number of selected texture points
+unsigned*	SelectedTexturePointsList;	//list of selected points
+POINT		TextureCursorLocation;		//texture editor move cursor location
+HPEN		TextureCrossPen;			//texture editor cross pen
+TXTSCR		TextureScreen;				//texture editor layout parameters
+TXPNT		TempTexturePoints[16384];	//temporary storage for textured fill data
+unsigned	ColorOrder[16];				//color order adjusted for applique
+INTINF		InterleaveData;				//interleave data
+fPOINT		InterleaveSequence[MAXSEQ]; //storage for interleave points
+unsigned	InterleaveSequenceIndex;	//index into the interleave sequence
+FSTRTS		FillStartsData;				//fill start data for refill
+INSREC		InterleaveSequenceIndices[10];	//indices into interleave points
+unsigned	InterleaveSequenceIndex2;	//index into interleave indices
+unsigned	FillStartsMap;				//fill starts bitmap
+unsigned*	FormFillCounter;			//form fill type counters for sort
+fPOINT*		UnderlayVertices;			//underlay offset points
+unsigned	FeatherFillType;			//type of feather fill
+float		FeatherRatio;				//feather ratio
+float		FeatherMinStitch;			//smallest stitch allowed
+float		FeatherRatioLocal;			//local feather ratio
+float		FormFeatherRatio;			//feather ratio from form
+unsigned	ExtendedAttribute;			//extended form attribute
+unsigned	FeatherUpCount;				//feather up count
+unsigned	FeatherDownCount;			//feather down count
+unsigned	FeatherTotalCount;			//up count plus down count
+unsigned	FeatherPhaseIndex;
+unsigned	FeatherPhase;
+fPOINT		FeatherSequence[MAXSEQ];
+unsigned	FeatherCountUp;
+unsigned	FeatherCountDown;
 
 // ToDo - Find better names for these than using 'xt' prefix
-float		xtStep;
-float		xtPosition;
-float		xtPhase;
-float		xtUp;
-float		xtDown;
-float		xtRatio;
+float		XTstep;
+float		XTposition;
+float		XTphase;
+float		XTup;
+float		XTdown;
+float		XTratio;
 
 OREC**		precs;
 OREC**		pfrecs;
 
 
-char ftyps[] =
+char StitchTypes[] =
 {
 	0,	// 0 no type
 	1,	// 1 applique
@@ -275,8 +274,8 @@ char ftyps[] =
 	7,	//12 border
 };
 
-TXHST	textureHistory[16];		//text editor history headers
-int		textureHistoryIndex;	//pointer to the next texture history buffer
+TXHST	TextureHistory[16];		//texture editor history headers
+int		TextureHistoryIndex;	//pointer to the next texture history buffer
 
 void setfchk()
 {
@@ -308,67 +307,67 @@ BOOL istx(unsigned find)
 
 TXPNT* adtx(int cnt) {
 
-	unsigned ind = textureIndex;
+	unsigned ind = TextureIndex;
 
-	textureIndex += cnt;
-	return &texturePointsBuffer[ind];
+	TextureIndex += cnt;
+	return &TexturePointsBuffer[ind];
 }
 
 void txspac(int strt, unsigned cnt)
 {
 	unsigned	ind;
 
-	MoveMemory(&texturePointsBuffer[strt + cnt], &texturePointsBuffer[strt], (textureIndex - strt) & sizeof(TXPNT));
+	MoveMemory(&TexturePointsBuffer[strt + cnt], &TexturePointsBuffer[strt], (TextureIndex - strt) & sizeof(TXPNT));
 	for (ind = ClosestFormToCursor + 1; ind < FormIndex; ind++)
 	{
 		if (istx(ind))
 			FormList[ind].fillInfo.texture.index += cnt;
 	}
-	textureIndex += cnt;
+	TextureIndex += cnt;
 }
 
 void rstxt()
 {
-	cloxcnt = 0;
+	SelectedTexturePointsCount = 0;
 	rstMap(TXTMOV);
 	rstMap(BZUM);
 	rstMap(BZUMIN);
 	setMap(RESTCH);
 	rstMap(POLIMOV);
-	DestroyWindow(hBtnSideWindow);
-	hBtnSideWindow = 0;
+	DestroyWindow(SideWindowButton);
+	SideWindowButton = 0;
 	setMap(RESTCH);
 }
 
 void txrbak()
 {
-	textureHistoryIndex--;
-	textureHistoryIndex &= 0xf;
+	TextureHistoryIndex--;
+	TextureHistoryIndex &= 0xf;
 }
 
 void txrfor()
 {
-	textureHistoryIndex++;
-	textureHistoryIndex &= 0xf;
+	TextureHistoryIndex++;
+	TextureHistoryIndex &= 0xf;
 }
 
 BOOL chktxh(TXHST* phst)
 {
 	int ind;
 
-	if (phst->count != textureScreen.index)
+	if (phst->count != TextureScreen.index)
 		return 1;
-	if (phst->height != textureScreen.areaHeight)
+	if (phst->height != TextureScreen.areaHeight)
 		return 1;
-	if (phst->spacing != textureScreen.spacing)
+	if (phst->spacing != TextureScreen.spacing)
 		return 1;
-	if (phst->width != textureScreen.width)
+	if (phst->width != TextureScreen.width)
 		return 1;
-	for (ind = 0; ind < textureScreen.index; ind++)
+	for (ind = 0; ind < TextureScreen.index; ind++)
 	{
-		if (tmpTexturePoints[ind].line != phst->texturePoint[ind].line)
+		if (TempTexturePoints[ind].line != phst->texturePoint[ind].line)
 			return 1;
-		if (tmpTexturePoints[ind].y != phst->texturePoint[ind].y)
+		if (TempTexturePoints[ind].y != phst->texturePoint[ind].y)
 			return 1;
 	}
 	return 0;
@@ -378,27 +377,27 @@ void savtxt()
 {
 	TXHST*	 currentTextureHistory;
 
-	if (textureScreen.index)
+	if (TextureScreen.index)
 	{
-		currentTextureHistory = &textureHistory[textureHistoryIndex];
+		currentTextureHistory = &TextureHistory[TextureHistoryIndex];
 		if (chktxh(currentTextureHistory))
 		{
 			setMap(WASTXBAK);
 			rstMap(TXBDIR);
 			rstMap(LASTXBAK);
 			txrfor();
-			currentTextureHistory = &textureHistory[textureHistoryIndex];
-			currentTextureHistory->count = textureScreen.index;
-			currentTextureHistory->height = textureScreen.areaHeight;
-			currentTextureHistory->width = textureScreen.width;
-			currentTextureHistory->spacing = textureScreen.spacing;
+			currentTextureHistory = &TextureHistory[TextureHistoryIndex];
+			currentTextureHistory->count = TextureScreen.index;
+			currentTextureHistory->height = TextureScreen.areaHeight;
+			currentTextureHistory->width = TextureScreen.width;
+			currentTextureHistory->spacing = TextureScreen.spacing;
 			if (currentTextureHistory->texturePoint)
 			{
 				delete[](currentTextureHistory->texturePoint);
 				currentTextureHistory->texturePoint = 0;
 			}
 			currentTextureHistory->texturePoint = new TXPNT[currentTextureHistory->count];
-			MoveMemory(currentTextureHistory->texturePoint, tmpTexturePoints, currentTextureHistory->count * sizeof(TXPNT));
+			MoveMemory(currentTextureHistory->texturePoint, TempTexturePoints, currentTextureHistory->count * sizeof(TXPNT));
 		}
 	}
 }
@@ -413,15 +412,15 @@ void fthvars() {
 
 	rstMap(BARSAT);
 	rstMap(FTHR);
-	featherFillType = SelectedForm->fillInfo.feather.fillType;
-	formFeatherRatio = SelectedForm->fillInfo.feather.ratio;
-	featherMinStitch = SelectedForm->fillInfo.feather.minStitchSize;
-	featherTotalCount = SelectedForm->fillInfo.feather.count;
-	extendedAttribute = SelectedForm->extendedAttribute;
-	featherCountUp = featherUpCount = SelectedForm->fillInfo.feather.upCount;
-	featherCountDown = featherDownCount = SelectedForm->fillInfo.feather.downCount;
-	featherPhaseIndex = featherUpCount + featherDownCount;
-	if (extendedAttribute&AT_FTHBLND)
+	FeatherFillType = SelectedForm->fillInfo.feather.fillType;
+	FormFeatherRatio = SelectedForm->fillInfo.feather.ratio;
+	FeatherMinStitch = SelectedForm->fillInfo.feather.minStitchSize;
+	FeatherTotalCount = SelectedForm->fillInfo.feather.count;
+	ExtendedAttribute = SelectedForm->extendedAttribute;
+	FeatherCountUp = FeatherUpCount = SelectedForm->fillInfo.feather.upCount;
+	FeatherCountDown = FeatherDownCount = SelectedForm->fillInfo.feather.downCount;
+	FeatherPhaseIndex = FeatherUpCount + FeatherDownCount;
+	if (ExtendedAttribute&AT_FTHBLND)
 		setMap(BARSAT);
 	else
 		setMap(FTHR);
@@ -429,12 +428,12 @@ void fthvars() {
 
 float durat(float strt, float fin) {
 
-	return (fin - strt)*featherRatio + strt;
+	return (fin - strt)*FeatherRatio + strt;
 }
 
 float duxrat(float strt, float fin) {
 
-	return (fin - strt)*featherRatioLocal + strt;
+	return (fin - strt)*FeatherRatioLocal + strt;
 }
 
 void duxrats(unsigned strt, unsigned fin, fPOINT* opt) {
@@ -449,14 +448,14 @@ void durats(unsigned ind, fPOINT* pflt) {
 	fPOINT	ipnt;
 
 	olen = hypot(BSequence[ind + 1].x - BSequence[ind].x, BSequence[ind + 1].y - BSequence[ind].y);
-	if (olen < featherMinStitch) {
+	if (olen < FeatherMinStitch) {
 
 		pflt->x = BSequence[ind].x;
 		pflt->y = BSequence[ind].y;
 	}
 	else {
 
-		featherRatioLocal = featherMinStitch / olen;
+		FeatherRatioLocal = FeatherMinStitch / olen;
 		ipnt.x = duxrat(BSequence[ind + 1].x, BSequence[ind].x);
 		ipnt.y = duxrat(BSequence[ind + 1].y, BSequence[ind].y);
 		pflt->x = durat(ipnt.x, BSequence[ind].x);
@@ -473,8 +472,8 @@ void xoseq(unsigned ind) {
 
 void xpfth(unsigned ind) {
 
-	featherSequence[ActivePointIndex].x = BSequence[ind].x;
-	featherSequence[ActivePointIndex].y = BSequence[ind].y;
+	FeatherSequence[ActivePointIndex].x = BSequence[ind].x;
+	FeatherSequence[ActivePointIndex].y = BSequence[ind].y;
 	ActivePointIndex++;
 }
 
@@ -495,78 +494,78 @@ void nurat() {
 
 	float	rem;
 
-	rem = fmod(xtPosition, 1);
-	switch (featherFillType) {
+	rem = fmod(XTposition, 1);
+	switch (FeatherFillType) {
 
 	case FTHPSG:
 
-		if (featherUpCount) {
+		if (FeatherUpCount) {
 
-			if (featherCountUp) {
+			if (FeatherCountUp) {
 
-				featherRatio = (float)(featherTotalCount - (psg() % featherTotalCount)) / featherTotalCount;
-				featherCountUp--;
+				FeatherRatio = (float)(FeatherTotalCount - (psg() % FeatherTotalCount)) / FeatherTotalCount;
+				FeatherCountUp--;
 			}
 			else {
 
-				featherRatio = (float)(featherTotalCount - (bpsg() % featherTotalCount)) / featherTotalCount;
-				if (featherCountDown)
-					featherCountDown--;
+				FeatherRatio = (float)(FeatherTotalCount - (bpsg() % FeatherTotalCount)) / FeatherTotalCount;
+				if (FeatherCountDown)
+					FeatherCountDown--;
 				else {
 
 					PseudoRandomValue = FSED;
-					featherCountUp = featherUpCount;
-					featherCountDown = featherDownCount;
+					FeatherCountUp = FeatherUpCount;
+					FeatherCountDown = FeatherDownCount;
 				}
 			}
 		}
 		else
-			featherRatio = (float)(featherTotalCount - (psg() % featherTotalCount)) / featherTotalCount;
-		featherRatio *= formFeatherRatio;
+			FeatherRatio = (float)(FeatherTotalCount - (psg() % FeatherTotalCount)) / FeatherTotalCount;
+		FeatherRatio *= FormFeatherRatio;
 		break;
 
 	case FTHFAZ:
 
-		if (featherPhase >= featherUpCount)
-			featherRatio = 1;
+		if (FeatherPhase >= FeatherUpCount)
+			FeatherRatio = 1;
 		else
-			featherRatio = formFeatherRatio;
+			FeatherRatio = FormFeatherRatio;
 		break;
 
 	case FTHSIN:
 
-		if (rem > xtRatio)
-			featherRatio = sin((1 - rem) / (1 - xtRatio)*PI + PI)*0.5 + 0.5;
+		if (rem > XTratio)
+			FeatherRatio = sin((1 - rem) / (1 - XTratio)*PI + PI)*0.5 + 0.5;
 		else
-			featherRatio = sin(rem / xtRatio*PI)*0.5 + 0.5;
-		featherRatio *= formFeatherRatio;
+			FeatherRatio = sin(rem / XTratio*PI)*0.5 + 0.5;
+		FeatherRatio *= FormFeatherRatio;
 		break;
 
 	case FTHSIN2:
 
-		if (rem > xtRatio)
-			featherRatio = sin((1 - rem) / (1 - xtRatio)*PI);
+		if (rem > XTratio)
+			FeatherRatio = sin((1 - rem) / (1 - XTratio)*PI);
 		else
-			featherRatio = sin(rem / xtRatio*PI);
-		featherRatio *= formFeatherRatio;
+			FeatherRatio = sin(rem / XTratio*PI);
+		FeatherRatio *= FormFeatherRatio;
 		break;
 
 	case FTHRMP:
 
-		if (rem > xtRatio)
-			featherRatio = (1 - rem) / (1 - xtRatio);
+		if (rem > XTratio)
+			FeatherRatio = (1 - rem) / (1 - XTratio);
 		else
-			featherRatio = rem / xtRatio;
-		featherRatio *= formFeatherRatio;
+			FeatherRatio = rem / XTratio;
+		FeatherRatio *= FormFeatherRatio;
 		break;
 
 	case FTHLIN:
 	default:
 
-		featherRatio = formFeatherRatio;
+		FeatherRatio = FormFeatherRatio;
 	}
-	++featherPhase %= featherPhaseIndex;
-	xtPosition += xtStep;
+	++FeatherPhase %= FeatherPhaseIndex;
+	XTposition += XTstep;
 }
 
 void fthfn(unsigned ind) {
@@ -577,8 +576,8 @@ void fthfn(unsigned ind) {
 
 void ratpnt(unsigned pt0, unsigned pt1, fPOINT* opt) {
 
-	opt->x = (BSequence[pt1].x - BSequence[pt0].x)*featherRatio + BSequence[pt0].x;
-	opt->y = (BSequence[pt1].y - BSequence[pt0].y)*featherRatio + BSequence[pt0].y;
+	opt->x = (BSequence[pt1].x - BSequence[pt0].x)*FeatherRatio + BSequence[pt0].x;
+	opt->y = (BSequence[pt1].y - BSequence[pt0].y)*FeatherRatio + BSequence[pt0].y;
 }
 
 void midpnt(fPOINT pt0, fPOINT pt1, fPOINT* opt) {
@@ -589,8 +588,8 @@ void midpnt(fPOINT pt0, fPOINT pt1, fPOINT* opt) {
 
 void xratf(fPOINT pt0, fPOINT pt1, fPOINT* opt) {
 
-	opt->x = (pt1.x - pt0.x)*featherRatioLocal + pt0.x;
-	opt->y = (pt1.y - pt0.y)*featherRatioLocal + pt0.y;
+	opt->x = (pt1.x - pt0.x)*FeatherRatioLocal + pt0.x;
+	opt->y = (pt1.y - pt0.y)*FeatherRatioLocal + pt0.y;
 }
 
 void fthrbfn(unsigned ind) {
@@ -606,21 +605,21 @@ void fthrbfn(unsigned ind) {
 
 	nurat();
 	len = hypot(BSequence[ind + 1].y - BSequence[ind].y, BSequence[ind + 1].x - BSequence[ind].x);
-	if (len < (featherMinStitch * 2))
+	if (len < (FeatherMinStitch * 2))
 	{
-		featherRatio = 0.5;
+		FeatherRatio = 0.5;
 		ratpnt(ind, ind + 1, &pnt0);
 		ratpnt(ind + 3, ind + 2, &pnt1);
 	}
 	else
 	{
-		featherRatioLocal = featherMinStitch / len;
+		FeatherRatioLocal = FeatherMinStitch / len;
 		duxrats(ind, ind + 1, &pnt0l);
 		duxrats(ind + 3, ind + 2, &pnt1l);
-		featherRatioLocal = 1 - featherRatioLocal;
+		FeatherRatioLocal = 1 - FeatherRatioLocal;
 		duxrats(ind, ind + 1, &pnt0h);
 		duxrats(ind + 3, ind + 2, &pnt1h);
-		featherRatioLocal = featherRatio;
+		FeatherRatioLocal = FeatherRatio;
 		xratf(pnt0l, pnt0h, &pnt0);
 		xratf(pnt1l, pnt1h, &pnt1);
 	}
@@ -630,8 +629,8 @@ void fthrbfn(unsigned ind) {
 	OSequence[OutputIndex].y = pntm.y;
 	OutputIndex++;
 	xpfth(ind + 1);
-	featherSequence[ActivePointIndex].x = pntm.x;
-	featherSequence[ActivePointIndex].y = pntm.y;
+	FeatherSequence[ActivePointIndex].x = pntm.x;
+	FeatherSequence[ActivePointIndex].y = pntm.y;
 	ActivePointIndex++;
 }
 
@@ -652,14 +651,14 @@ void fthdfn(unsigned ind) {
 	len = hypot(BSequence[ind + 1].y - BSequence[ind].y, BSequence[ind + 1].x - BSequence[ind].x);
 	duoseq(ind);
 	duoseq(ind + 1);
-	if (len > featherMinStitch) {
+	if (len > FeatherMinStitch) {
 
-		featherRatioLocal = 0.5;
+		FeatherRatioLocal = 0.5;
 		duxrats(ind + 1, ind, &mpnt);
-		featherRatioLocal = featherMinStitch / len / 2;
+		FeatherRatioLocal = FeatherMinStitch / len / 2;
 		xratf(mpnt, OSequence[ind], &pt0);
 		xratf(mpnt, OSequence[ind + 1], &pt1);
-		featherRatioLocal = featherRatio;
+		FeatherRatioLocal = FeatherRatio;
 		xratf(pt0, OSequence[ind], &OSequence[ind]);
 		xratf(pt1, OSequence[ind + 1], &OSequence[ind + 1]);
 	}
@@ -677,27 +676,27 @@ void fthrfn() {
 	satfil();
 	BSequence[0].attribute = 0;
 	BSequence[1].attribute = 1;
-	if (!featherPhaseIndex)
-		featherPhaseIndex = 1;
-	ind = SequenceIndex / (featherPhaseIndex << 2);
-	res = SequenceIndex % (featherPhaseIndex << 2);
-	if (res > (featherPhaseIndex << 1))
+	if (!FeatherPhaseIndex)
+		FeatherPhaseIndex = 1;
+	ind = SequenceIndex / (FeatherPhaseIndex << 2);
+	res = SequenceIndex % (FeatherPhaseIndex << 2);
+	if (res > (FeatherPhaseIndex << 1))
 		ind++;
-	xtPosition = 0;
-	xtStep = (float)4 / SequenceIndex*ind;
-	xtPhase = (float)SequenceIndex / ind;
-	xtRatio = (float)featherCountUp / featherPhaseIndex;
-	xtUp = xtPhase*xtRatio;
-	xtDown = xtPhase - xtUp;
+	XTposition = 0;
+	XTstep = (float)4 / SequenceIndex*ind;
+	XTphase = (float)SequenceIndex / ind;
+	XTratio = (float)FeatherCountUp / FeatherPhaseIndex;
+	XTup = XTphase*XTratio;
+	XTdown = XTphase - XTup;
 	SelectedForm->fillType = FTHF;
-	featherPhase = 1;
+	FeatherPhase = 1;
 	BSequence[SequenceIndex].x = BSequence[SequenceIndex - 2].x;
 	BSequence[SequenceIndex].y = BSequence[SequenceIndex - 2].y;
 	BSequence[SequenceIndex].attribute = BSequence[SequenceIndex - 2].attribute;
 	BSequence[SequenceIndex + 1].x = BSequence[SequenceIndex - 1].x;
 	BSequence[SequenceIndex + 1].y = BSequence[SequenceIndex - 1].y;
 	BSequence[SequenceIndex + 1].attribute = BSequence[SequenceIndex - 1].attribute;
-	if (extendedAttribute&AT_FTHBLND) {
+	if (ExtendedAttribute&AT_FTHBLND) {
 
 		OutputIndex = ActivePointIndex = 0;
 		for (ind = 0; ind < SequenceIndex; ind++)
@@ -723,14 +722,14 @@ void fthrfn() {
 
 				if (BSequence[ind].attribute) {
 
-					if (extendedAttribute&AT_FTHUP)
+					if (ExtendedAttribute&AT_FTHUP)
 						fthfn(ind);
 					else
 						duoseq(ind);
 				}
 				else {
 
-					if (extendedAttribute&AT_FTHUP)
+					if (ExtendedAttribute&AT_FTHUP)
 						duoseq(ind);
 					else
 						fthfn(ind);
@@ -752,28 +751,28 @@ void fritfil() {
 
 	if (SequenceIndex) {
 
-		interleaveSequenceIndices[interleaveSequenceIndex2].ind = interleaveSequenceIndex;
-		interleaveSequenceIndices[interleaveSequenceIndex2].seq = I_FIL;
-		interleaveSequenceIndices[interleaveSequenceIndex2].cod = TYPFRM;
-		interleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->fillColor;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].ind = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].cod = TYPFRM;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillColor;
 		chkseq(0);
-		interleaveSequenceIndex2++;
+		InterleaveSequenceIndex2++;
 		if (SelectedForm->extendedAttribute&AT_FTHBLND&&~(SelectedForm->extendedAttribute&(AT_FTHUP | AT_FTHDWN)) != (AT_FTHUP | AT_FTHDWN)) {
 
-			interleaveSequenceIndices[interleaveSequenceIndex2].ind = interleaveSequenceIndex;
-			interleaveSequenceIndices[interleaveSequenceIndex2].seq = I_FTH;
-			interleaveSequenceIndices[interleaveSequenceIndex2].cod = FTHMSK;
-			interleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->fillInfo.feather.color;
+			InterleaveSequenceIndices[InterleaveSequenceIndex2].ind = InterleaveSequenceIndex;
+			InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FTH;
+			InterleaveSequenceIndices[InterleaveSequenceIndex2].cod = FTHMSK;
+			InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillInfo.feather.color;
 			ine = ActivePointIndex - 1;
 			for (ind = 0; ind < ActivePointIndex; ind++) {
 
-				OSequence[ind].x = featherSequence[ine].x;
-				OSequence[ind].y = featherSequence[ine].y;
+				OSequence[ind].x = FeatherSequence[ine].x;
+				OSequence[ind].y = FeatherSequence[ine].y;
 				ine--;
 			}
 			SequenceIndex = ActivePointIndex;
 			chkseq(0);
-			interleaveSequenceIndex2++;
+			InterleaveSequenceIndex2++;
 		}
 	}
 }
@@ -907,8 +906,8 @@ void pes2crd() {
 	OPENFILENAME	tofn = {
 
 	sizeof(OPENFILENAME),	//lStructsize
-		ThredWindow,				//hwndOwner 
-		ThredInstance,				//hInstance 
+		ThrEdWindow,				//hwndOwner 
+		ThrEdInstance,				//hInstance 
 		tfltr,				//lpstrFilter 
 		0,					//lpstrCustomFilter 
 		0,					//nMaxCustFilter 
@@ -955,9 +954,9 @@ void pes2crd() {
 	}
 	if (!*prgnam) {
 
-		LoadString(ThredInstance, IDS_P2CMSG, mbuf, P2CBUFSIZ);
-		LoadString(ThredInstance, IDS_P2CTITL, tbuf, P2CBUFSIZ);
-		if (IDOK == MessageBox(ThredWindow, mbuf, tbuf, MB_OKCANCEL)) {
+		LoadString(ThrEdInstance, IDS_P2CMSG, mbuf, P2CBUFSIZ);
+		LoadString(ThrEdInstance, IDS_P2CTITL, tbuf, P2CBUFSIZ);
+		if (IDOK == MessageBox(ThrEdWindow, mbuf, tbuf, MB_OKCANCEL)) {
 
 			if (GetOpenFileName(&tofn)) {
 
@@ -1036,11 +1035,11 @@ void chkuseq()
 
 	for (index = 0; index < OutputIndex; index++)
 	{
-		interleaveSequence[index].x = OSequence[index].x;
-		interleaveSequence[index].y = OSequence[index].y;
+		InterleaveSequence[index].x = OSequence[index].x;
+		InterleaveSequence[index].y = OSequence[index].y;
 	}
-	interleaveSequenceIndex = index;
-	interleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->UnderlayColor;
+	InterleaveSequenceIndex = index;
+	InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->UnderlayColor;
 #else
 
 	unsigned	ind, ine, cnt;
@@ -1071,24 +1070,24 @@ void chkuseq()
 				loc.y = OSequence[ind].y;
 				for (ine = 0; ine < cnt; ine++)
 				{
-					interleaveSequence[interleaveSequenceIndex].x = loc.x;
-					interleaveSequence[interleaveSequenceIndex].y = loc.y;
-					interleaveSequenceIndex++;
+					InterleaveSequence[InterleaveSequenceIndex].x = loc.x;
+					InterleaveSequence[InterleaveSequenceIndex].y = loc.y;
+					InterleaveSequenceIndex++;
 					loc.x += stp.x;
 					loc.y += stp.y;
 				}
 			}
 			else
 			{
-				interleaveSequence[interleaveSequenceIndex].x = OSequence[ind].x;
-				interleaveSequence[interleaveSequenceIndex].y = OSequence[ind].y;
-				interleaveSequenceIndex++;
+				InterleaveSequence[InterleaveSequenceIndex].x = OSequence[ind].x;
+				InterleaveSequence[InterleaveSequenceIndex].y = OSequence[ind].y;
+				InterleaveSequenceIndex++;
 			}
 		}
-		interleaveSequence[interleaveSequenceIndex].x = OSequence[ind].x;
-		interleaveSequence[interleaveSequenceIndex].y = OSequence[ind].y;
-		interleaveSequenceIndex++;
-		interleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->underlayColor;
+		InterleaveSequence[InterleaveSequenceIndex].x = OSequence[ind].x;
+		InterleaveSequence[InterleaveSequenceIndex].y = OSequence[ind].y;
+		InterleaveSequenceIndex++;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->underlayColor;
 	}
 #endif
 }
@@ -1097,11 +1096,11 @@ void ritwlk()
 {
 	if (OutputIndex)
 	{
-		interleaveSequenceIndices[interleaveSequenceIndex2].ind = interleaveSequenceIndex;
-		interleaveSequenceIndices[interleaveSequenceIndex2].seq = I_FIL;
-		interleaveSequenceIndices[interleaveSequenceIndex2].cod = WLKMSK;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].ind = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].cod = WLKMSK;
 		chkuseq();
-		interleaveSequenceIndex2++;
+		InterleaveSequenceIndex2++;
 	}
 }
 
@@ -1109,11 +1108,11 @@ void ritcwlk()
 {
 	if (OutputIndex) {
 
-		interleaveSequenceIndices[interleaveSequenceIndex2].ind = interleaveSequenceIndex;
-		interleaveSequenceIndices[interleaveSequenceIndex2].seq = I_FIL;
-		interleaveSequenceIndices[interleaveSequenceIndex2].cod = CWLKMSK;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].ind = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].cod = CWLKMSK;
 		chkuseq();
-		interleaveSequenceIndex2++;
+		InterleaveSequenceIndex2++;
 	}
 }
 
@@ -1239,8 +1238,8 @@ void fnuang() {
 	AngledForm.vertices = AngledFormVertices;
 	for (ind = 0; ind < AngledForm.sides; ind++) {
 
-		AngledForm.vertices[ind].x = underlayVertices[ind].x;
-		AngledForm.vertices[ind].y = underlayVertices[ind].y;
+		AngledForm.vertices[ind].x = UnderlayVertices[ind].x;
+		AngledForm.vertices[ind].y = UnderlayVertices[ind].y;
 		rotflt(&AngledForm.vertices[ind]);
 	}
 	SelectedForm = &AngledForm;
@@ -1252,11 +1251,11 @@ void ritund()
 {
 	if (SequenceIndex) {
 
-		interleaveSequenceIndices[interleaveSequenceIndex2].ind = interleaveSequenceIndex;
-		interleaveSequenceIndices[interleaveSequenceIndex2].seq = I_FIL;
-		interleaveSequenceIndices[interleaveSequenceIndex2].cod = UNDMSK;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].ind = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].cod = UNDMSK;
 		chkuseq();
-		interleaveSequenceIndex2++;
+		InterleaveSequenceIndex2++;
 	}
 }
 
@@ -1270,7 +1269,7 @@ void undclp()
 void fnund(unsigned find)
 {
 	float baksiz;
-	underlayVertices = insid();
+	UnderlayVertices = insid();
 	baksiz = UserStitchLength;
 	UserStitchLength = 1e99;
 	if (!SelectedForm->underlaySpacing)
@@ -1368,7 +1367,7 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf);
 		for (ind = 0; ind < 6; ind++) {
 
-			LoadString(ThredInstance, IDS_FTH0 + ind, buf, HBUFSIZ);
+			LoadString(ThrEdInstance, IDS_FTH0 + ind, buf, HBUFSIZ);
 			SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, (long)buf);
 		}
 		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
@@ -1411,7 +1410,7 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			IniFile.featherFillType = FDEFTYP;
 			for (ind = 0; ind < 6; ind++) {
 
-				LoadString(ThredInstance, IDS_FTH0 + ind, buf1, HBUFSIZ);
+				LoadString(ThrEdInstance, IDS_FTH0 + ind, buf1, HBUFSIZ);
 				if (!strcmp(buf, buf1)) {
 
 					IniFile.featherFillType = ind + 1;
@@ -1439,7 +1438,7 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 void dufdef() {
 
-	DialogBox(ThredInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThredWindow, (DLGPROC)fthdefprc);
+	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, (DLGPROC)fthdefprc);
 }
 
 void srtcol() {
@@ -1612,7 +1611,7 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		CheckDlgButton(hwndlg, IDC_DLIN, chku(DAZD));
 		for (ind = 0; ind < 6; ind++)
 		{
-			LoadString(ThredInstance, daztab[ind], buf, HBUFSIZ);
+			LoadString(ThrEdInstance, DaisyTypeStrings[ind], buf, HBUFSIZ);
 			SendMessage(GetDlgItem(hwndlg, IDC_DAZTYP), CB_ADDSTRING, 0, (long)buf);
 		}
 		SendMessage(GetDlgItem(hwndlg, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
@@ -1654,7 +1653,7 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 			GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buf, HBUFSIZ);
 			for (ind = 0; ind < 6; ind++)
 			{
-				LoadString(ThredInstance, daztab[ind], buf1, HBUFSIZ);
+				LoadString(ThrEdInstance, DaisyTypeStrings[ind], buf1, HBUFSIZ);
 				if (!strcmp(buf, buf1))
 				{
 					IniFile.daisyBorderType = ind;
@@ -1702,7 +1701,7 @@ void dasyfrm() {
 	fPOINT		ref;
 
 	unmsg();
-	if (!DialogBox(ThredInstance, MAKEINTRESOURCE(IDD_DASY), ThredWindow, (DLGPROC)dasyproc))
+	if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, (DLGPROC)dasyproc))
 	{
 		rstMap(FORMIN);
 		return;
@@ -1857,10 +1856,10 @@ void durec(OREC* prec)
 	fPOINTATTR*	pstch;
 
 	pstch = &StitchBuffer[prec->start];
-	prec->typ = ftyps[dutyp(pstch->attribute)];
+	prec->type = StitchTypes[dutyp(pstch->attribute)];
 	at = pstch->attribute&SRTMSK;
-	prec->col = at & 0xf;
-	prec->frm = (at&FRMSK) >> FRMSHFT;
+	prec->color = at & 0xf;
+	prec->form = (at&FRMSK) >> FRMSHFT;
 }
 
 
@@ -1885,19 +1884,19 @@ int recmp(const void *arg1, const void *arg2)
 
 	pa1 = recref((const void*)arg1);
 	pa2 = recref((const void*)arg2);
-	if (colorOrder[pa1->col] == colorOrder[pa2->col])
+	if (ColorOrder[pa1->color] == ColorOrder[pa2->color])
 	{
-		if (pa1->frm == pa2->frm)
+		if (pa1->form == pa2->form)
 		{
-			if (pa1->typ == pa2->typ)
+			if (pa1->type == pa2->type)
 				return (int)pa1->start - pa2->start;
 			else
-				return (int)pa1->typ - pa2->typ;
+				return (int)pa1->type - pa2->type;
 		}
 		else
-			return (int)pa1->frm - pa2->frm;
+			return (int)pa1->form - pa2->form;
 	}
-	return (int)colorOrder[pa1->col] - colorOrder[pa2->col];
+	return (int)ColorOrder[pa1->color] - ColorOrder[pa2->color];
 }
 
 int refcmp(const void *arg1, const void *arg2)
@@ -1907,9 +1906,9 @@ int refcmp(const void *arg1, const void *arg2)
 
 	pa1 = recref((const void*)arg1);
 	pa2 = recref((const void*)arg2);
-	if (pa1->frm == pa2->frm)
-		return (int)pa1->typ - pa2->typ;
-	return (int)pa1->frm - pa2->frm;
+	if (pa1->form == pa2->form)
+		return (int)pa1->type - pa2->type;
+	return (int)pa1->form - pa2->form;
 }
 
 double srtlen(fPOINTATTR* pnt, OREC* prec, unsigned swtch)
@@ -1929,7 +1928,7 @@ BOOL chkrdun(SRTREC* psrec)
 
 	for (ind = psrec->start; ind < psrec->finish; ind++)
 	{
-		if (precs[ind]->otyp == formFillCounter[precs[ind]->frm])
+		if (precs[ind]->otyp == FormFillCounter[precs[ind]->form])
 			return 1;
 	}
 	return 0;
@@ -1944,7 +1943,7 @@ double precjmps(SRTREC* psrec)
 	fPOINTATTR*		ploc;
 	BOOL			locdir;
 
-	formFillCounter = (unsigned*)&OSequence;
+	FormFillCounter = (unsigned*)&OSequence;
 	FillMemory(&OSequence, (ActivePointIndex + 2) << 2, 0);
 	loc = psrec->loc;
 	locdir = psrec->dir;
@@ -1959,7 +1958,7 @@ double precjmps(SRTREC* psrec)
 		ploc = &StitchBuffer[loci];
 		for (ind = psrec->start; ind < psrec->finish; ind++)
 		{
-			if (precs[ind]->otyp == formFillCounter[precs[ind]->frm])
+			if (precs[ind]->otyp == FormFillCounter[precs[ind]->form])
 			{
 				len = hypot(precs[ind]->spnt->x - ploc->x, precs[ind]->spnt->y - ploc->y);
 				if (len < minlen)
@@ -1979,7 +1978,7 @@ double precjmps(SRTREC* psrec)
 		}
 		if (minlen > 9 * PFGRAN)
 			totjmps++;
-		formFillCounter[precs[loc]->frm]++;
+		FormFillCounter[precs[loc]->form]++;
 		if (chkMap(DUSRT))
 		{
 			if (locdir)
@@ -2036,9 +2035,9 @@ void dmprec(OREC** recs, unsigned cnt)
 			ind,
 			recs[ind] - (OREC*)BSequence,
 			StitchBuffer[recs[ind]->start].attribute,
-			recs[ind]->frm,
-			recs[ind]->typ,
-			recs[ind]->col,
+			recs[ind]->form,
+			recs[ind]->type,
+			recs[ind]->color,
 			recs[ind]->start,
 			recs[ind]->finish);
 		OutputDebugString(MsgBuffer);
@@ -2051,27 +2050,27 @@ BOOL srtchk(OREC** pfrec, unsigned cnt, unsigned* badfrm)
 	unsigned ind, frm, hcol;
 	FRMHED* fp;
 
-	frm = pfrec[0]->frm;
-	hcol = pfrec[0]->col;
+	frm = pfrec[0]->form;
+	hcol = pfrec[0]->color;
 	for (ind = 1; ind < cnt; ind++)
 	{
-		if (pfrec[ind]->frm == frm)
+		if (pfrec[ind]->form == frm)
 		{
-			if (colorOrder[pfrec[ind]->col] < colorOrder[hcol])
+			if (ColorOrder[pfrec[ind]->color] < ColorOrder[hcol])
 			{
 				fp = &FormList[frm];
-				if (fp->fillType == FTHF&&fp->extendedAttribute&AT_FTHBLND&&pfrec[ind]->col == fp->fillColor)
+				if (fp->fillType == FTHF&&fp->extendedAttribute&AT_FTHBLND&&pfrec[ind]->color == fp->fillColor)
 					continue;
 				*badfrm = ind;
 				return 0;
 			}
 			else
-				hcol = pfrec[ind]->col;
+				hcol = pfrec[ind]->color;
 		}
 		else
 		{
-			hcol = pfrec[ind]->col;
-			frm = pfrec[ind]->frm;
+			hcol = pfrec[ind]->color;
+			frm = pfrec[ind]->form;
 		}
 	}
 	return 1;
@@ -2096,11 +2095,11 @@ void fsort()
 	at = StitchBuffer->attribute&SRTMSK;
 	rind = 0;
 	ActivePointIndex = FormIndex;
-	colorOrder[UnderlayColor] = 0;
+	ColorOrder[UnderlayColor] = 0;
 	for (ind = 0; ind < 16; ind++) {
 
 		if (ind != UnderlayColor)
-			colorOrder[ind] = ind + 1;
+			ColorOrder[ind] = ind + 1;
 	}
 	for (ind = 1; ind < PCSHeader.stitchCount; ind++)
 	{
@@ -2134,29 +2133,29 @@ void fsort()
 	{
 		prngs = (RANGE*)&precs[rind];
 		prngs[0].start = 0;
-		at = precs[0]->col;
+		at = precs[0]->color;
 		cfrm = 0xffffffff;
 		typcnt = 0;
 		pind = 0;
 		l_frmcnts = (unsigned*)&OSequence;
 		for (ind = 0; ind < rind; ind++)
 		{
-			if (at != precs[ind]->col)
+			if (at != precs[ind]->color)
 			{
 				prngs[pind].finish = ind;
 				pind++;
 				prngs[pind].start = ind;
-				at = precs[ind]->col;
-				cfrm = precs[ind]->frm;
+				at = precs[ind]->color;
+				cfrm = precs[ind]->form;
 				typcnt = 0;
 				goto srtskp;
 			}
-			if (precs[ind]->frm == cfrm)
+			if (precs[ind]->form == cfrm)
 				typcnt++;
 			else
 			{
 				typcnt = 0;
-				cfrm = precs[ind]->frm;
+				cfrm = precs[ind]->form;
 			}
 		srtskp:;
 			precs[ind]->otyp = typcnt;
@@ -2204,8 +2203,8 @@ void fsort()
 	}
 	else
 	{
-		LoadString(ThredInstance, IDS_SRTER, HelpBuffer, HBUFSIZ);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, pfrecs[ine]->frm);
+		LoadString(ThrEdInstance, IDS_SRTER, HelpBuffer, HBUFSIZ);
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, pfrecs[ine]->form);
 		shoMsg(MsgBuffer);
 	}
 }
@@ -2259,7 +2258,7 @@ void filim(FRMLIM* flim, unsigned * lmap)
 		at = StitchBuffer[ind].attribute;
 		if (fcod == (at&FRMSK))
 		{
-			typ = ftyps[dutyp(at)];
+			typ = StitchTypes[dutyp(at)];
 			switch (typ)
 			{
 			case 1:	//applique
@@ -2366,7 +2365,7 @@ void duatf(unsigned ind)
 	at = StitchBuffer[ind].attribute;
 	atf.col = at&COLMSK;
 	atf.frm = (at >> FRMSHFT)&FRMSK;
-	atf.typ = ftyps[dutyp(at)];
+	atf.typ = StitchTypes[dutyp(at)];
 	atf.lay = (at >> LAYSHFT) & 7;
 	if (at & 0x80000000)
 		atf.usr = 1;
@@ -2407,7 +2406,7 @@ void fdelstch()
 
 	fvars(ClosestFormToCursor);
 	tmap = 0;
-	FillMemory(&fillStartsData, sizeof(FSTRTS), 0);
+	FillMemory(&FillStartsData, sizeof(FSTRTS), 0);
 	fcod = (ClosestFormToCursor << FRMSHFT);
 	ine = 0;
 	bcol = SelectedForm->borderColor&COLMSK;
@@ -2419,7 +2418,7 @@ void fdelstch()
 		at = StitchBuffer[ind].attribute;
 		if (fcod == (at&(FRMSK | NOTFRM)))
 		{
-			typ = ftyps[dutyp(at)];
+			typ = StitchTypes[dutyp(at)];
 			switch (typ)
 			{
 			case 1:
@@ -2427,7 +2426,7 @@ void fdelstch()
 				if (!(tmap&M_AP))
 				{
 					tmap |= M_AP;
-					fillStartsData.apl = ine;
+					FillStartsData.apl = ine;
 				}
 				break;
 
@@ -2436,7 +2435,7 @@ void fdelstch()
 				if (!(tmap&M_FTH))
 				{
 					tmap |= M_FTH;
-					fillStartsData.fth = ine;
+					FillStartsData.fth = ine;
 				}
 				break;
 
@@ -2445,7 +2444,7 @@ void fdelstch()
 				if (!(tmap&M_FIL))
 				{
 					tmap |= M_FIL;
-					fillStartsData.fil = ine;
+					FillStartsData.fil = ine;
 				}
 				break;
 
@@ -2454,7 +2453,7 @@ void fdelstch()
 				if (!(tmap&M_BRD))
 				{
 					tmap |= M_BRD;
-					fillStartsData.brd = ine;
+					FillStartsData.brd = ine;
 				}
 				break;
 
@@ -2463,7 +2462,7 @@ void fdelstch()
 				if (SelectedForm->fillType && !(tmap&M_FIL))
 				{
 					tmap |= M_FIL;
-					fillStartsData.fil = ine;
+					FillStartsData.fil = ine;
 				}
 				break;
 			}
@@ -2474,22 +2473,22 @@ void fdelstch()
 			if (col == SelectedForm->fillColor)
 			{
 				tmap |= M_FCOL;
-				fillStartsData.fcol = ine;
+				FillStartsData.fcol = ine;
 			}
 			if (col == SelectedForm->fillInfo.feather.color)
 			{
 				tmap |= M_FTHCOL;
-				fillStartsData.fthcol = ine;
+				FillStartsData.fthcol = ine;
 			}
 			if (col == bcol)
 			{
 				tmap |= M_ECOL;
-				fillStartsData.ecol = ine;
+				FillStartsData.ecol = ine;
 			}
 			if (col == tapcol)
 			{
 				tmap |= M_APCOL;
-				fillStartsData.apcol = ine;
+				FillStartsData.apcol = ine;
 			}
 			StitchBuffer[ine].x = StitchBuffer[ind].x;
 			StitchBuffer[ine].y = StitchBuffer[ind].y;
@@ -2497,19 +2496,19 @@ void fdelstch()
 			ine++;
 		}
 	}
-	fillStartsData.fcol++;
-	fillStartsData.fthcol++;
-	fillStartsData.ecol++;
-	fillStartsData.apcol++;
-	fillStartsMap = tmap;
+	FillStartsData.fcol++;
+	FillStartsData.fthcol++;
+	FillStartsData.ecol++;
+	FillStartsData.apcol++;
+	FillStartsMap = tmap;
 	PCSHeader.stitchCount = ine;
 	ine = 0;
 	if (!(tmap&M_ECOL))
-		fillStartsData.ecol = PCSHeader.stitchCount;
+		FillStartsData.ecol = PCSHeader.stitchCount;
 	if (!(tmap&M_FTHCOL))
-		fillStartsData.fthcol = PCSHeader.stitchCount;
+		FillStartsData.fthcol = PCSHeader.stitchCount;
 	if (!(tmap&M_FCOL))
-		fillStartsData.fcol = PCSHeader.stitchCount;
+		FillStartsData.fcol = PCSHeader.stitchCount;
 	if (SelectedForm->edgeType)
 	{
 		if (SelectedForm->edgeType == EDGEAPPL)
@@ -2517,17 +2516,17 @@ void fdelstch()
 			if (!(tmap&M_AP))
 			{
 				if (tmap&M_APCOL)
-					fillStartsData.apl = fillStartsData.apcol + 1;
+					FillStartsData.apl = FillStartsData.apcol + 1;
 				else
-					fillStartsData.apl = PCSHeader.stitchCount;
+					FillStartsData.apl = PCSHeader.stitchCount;
 			}
 		}
 		if (!(tmap&M_BRD))
 		{
 			if (tmap&M_ECOL)
-				fillStartsData.brd = fillStartsData.ecol + 1;
+				FillStartsData.brd = FillStartsData.ecol + 1;
 			else
-				fillStartsData.brd = PCSHeader.stitchCount;
+				FillStartsData.brd = PCSHeader.stitchCount;
 		}
 	}
 	if (SelectedForm->fillType || (tmap&(M_WALK | M_UND | M_CWLK)))
@@ -2535,9 +2534,9 @@ void fdelstch()
 		if (!(tmap&M_FIL))
 		{
 			if (tmap&M_FCOL)
-				fillStartsData.fil = fillStartsData.fcol + 1;
+				FillStartsData.fil = FillStartsData.fcol + 1;
 			else
-				fillStartsData.fil = PCSHeader.stitchCount;
+				FillStartsData.fil = PCSHeader.stitchCount;
 		}
 	}
 	if (SelectedForm->fillType == FTHF)
@@ -2545,12 +2544,12 @@ void fdelstch()
 		if (!(tmap&M_FTH))
 		{
 			if (tmap&M_FTHCOL)
-				fillStartsData.fth = fillStartsData.fthcol + 1;
+				FillStartsData.fth = FillStartsData.fthcol + 1;
 			else
-				fillStartsData.fth = PCSHeader.stitchCount;
+				FillStartsData.fth = PCSHeader.stitchCount;
 		}
 	}
-	stpnt = (unsigned*)&fillStartsData;
+	stpnt = (unsigned*)&FillStartsData;
 	for (ind = 3; ind; ind--)
 	{
 		ine = ind - 1;
@@ -2563,7 +2562,7 @@ void fdelstch()
 	}
 	if (!chku(FIL2OF) && chkMap(SELBOX))
 	{
-		for (ind = 0; ind < sizeof(fillStartsData) >> 2; ind++)
+		for (ind = 0; ind < sizeof(FillStartsData) >> 2; ind++)
 			stpnt[ind] = ClosestPointIndex;
 	}
 }
@@ -2572,14 +2571,14 @@ BOOL lastcol(unsigned ind, fPOINT* pnt)
 {
 	unsigned col;
 
-	col = interleaveSequenceIndices[ind].color;
+	col = InterleaveSequenceIndices[ind].color;
 	while (ind)
 	{
 		ind--;
-		if (interleaveSequenceIndices[ind].color == col)
+		if (InterleaveSequenceIndices[ind].color == col)
 		{
-			pnt->x = interleaveSequence[interleaveSequenceIndices[ind + 1].ind - 1].x;
-			pnt->y = interleaveSequence[interleaveSequenceIndices[ind + 1].ind - 1].y;
+			pnt->x = InterleaveSequence[InterleaveSequenceIndices[ind + 1].ind - 1].x;
+			pnt->y = InterleaveSequence[InterleaveSequenceIndices[ind + 1].ind - 1].y;
 			return 1;
 		}
 	}
@@ -2591,28 +2590,28 @@ void duint(unsigned off, unsigned cod)
 	unsigned	cnt, ind;
 	fPOINT		colpnt;
 
-	if (interleaveData.coloc > interleaveData.sloc)
+	if (InterleaveData.coloc > InterleaveData.sloc)
 	{
-		cnt = interleaveData.coloc - interleaveData.sloc;
-		MoveMemory(&interleaveData.histch[interleaveData.oloc], &StitchBuffer[interleaveData.sloc], sizeof(fPOINTATTR)*cnt);
-		interleaveData.sloc += cnt;
-		interleaveData.oloc += cnt;
+		cnt = InterleaveData.coloc - InterleaveData.sloc;
+		MoveMemory(&InterleaveData.histch[InterleaveData.oloc], &StitchBuffer[InterleaveData.sloc], sizeof(fPOINTATTR)*cnt);
+		InterleaveData.sloc += cnt;
+		InterleaveData.oloc += cnt;
 	}
 	if (SelectedForm->extendedAttribute&AT_STRT)
 	{
 		if (!setMap(DIDSTRT))
-			interleaveData.oloc += gucon(CurrentFormVertices[SelectedForm->fillStart], interleaveSequence[interleaveSequenceIndices[interleaveData.pins].ind], interleaveData.oloc + off, cod);
+			InterleaveData.oloc += gucon(CurrentFormVertices[SelectedForm->fillStart], InterleaveSequence[InterleaveSequenceIndices[InterleaveData.pins].ind], InterleaveData.oloc + off, cod);
 	}
-	if (lastcol(interleaveData.pins, &colpnt))
-		interleaveData.oloc += gucon(colpnt, interleaveSequence[interleaveSequenceIndices[interleaveData.pins].ind], interleaveData.oloc + MAXSEQ, cod);
-	for (ind = interleaveSequenceIndices[interleaveData.pins].ind; ind < interleaveSequenceIndices[interleaveData.pins + 1].ind; ind++)
+	if (lastcol(InterleaveData.pins, &colpnt))
+		InterleaveData.oloc += gucon(colpnt, InterleaveSequence[InterleaveSequenceIndices[InterleaveData.pins].ind], InterleaveData.oloc + MAXSEQ, cod);
+	for (ind = InterleaveSequenceIndices[InterleaveData.pins].ind; ind < InterleaveSequenceIndices[InterleaveData.pins + 1].ind; ind++)
 	{
-		interleaveData.histch[interleaveData.oloc].x = interleaveSequence[ind].x;
-		interleaveData.histch[interleaveData.oloc].y = interleaveSequence[ind].y;
-		interleaveData.histch[interleaveData.oloc].attribute = cod;
-		if (interleaveData.histch[interleaveData.oloc].x != interleaveData.histch[interleaveData.oloc - 1].x ||
-			interleaveData.histch[interleaveData.oloc].y != interleaveData.histch[interleaveData.oloc - 1].y)
-			interleaveData.oloc++;
+		InterleaveData.histch[InterleaveData.oloc].x = InterleaveSequence[ind].x;
+		InterleaveData.histch[InterleaveData.oloc].y = InterleaveSequence[ind].y;
+		InterleaveData.histch[InterleaveData.oloc].attribute = cod;
+		if (InterleaveData.histch[InterleaveData.oloc].x != InterleaveData.histch[InterleaveData.oloc - 1].x ||
+			InterleaveData.histch[InterleaveData.oloc].y != InterleaveData.histch[InterleaveData.oloc - 1].y)
+			InterleaveData.oloc++;
 	}
 }
 
@@ -2633,7 +2632,7 @@ void chkend(unsigned off, unsigned cod)
 	{
 		setMap(ISEND);
 		if (SelectedForm->extendedAttribute&AT_END)
-			interleaveData.oloc += gucon(interleaveSequence[interleaveSequenceIndex - 1], CurrentFormVertices[SelectedForm->fillEnd], interleaveData.oloc + off, cod);
+			InterleaveData.oloc += gucon(InterleaveSequence[InterleaveSequenceIndex - 1], CurrentFormVertices[SelectedForm->fillEnd], InterleaveData.oloc + off, cod);
 	}
 }
 
@@ -2644,93 +2643,93 @@ void intlv()
 
 	rstMap(ISEND);
 	fvars(ClosestFormToCursor);
-	interleaveSequenceIndices[interleaveSequenceIndex2].ind = interleaveSequenceIndex;
-	FillMemory(&interleaveData, sizeof(INTINF), 0);
-	interleaveData.layerIndex = ((SelectedForm->attribute&FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
+	InterleaveSequenceIndices[InterleaveSequenceIndex2].ind = InterleaveSequenceIndex;
+	FillMemory(&InterleaveData, sizeof(INTINF), 0);
+	InterleaveData.layerIndex = ((SelectedForm->attribute&FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
 	rstMap(DIDSTRT);
 	if (PCSHeader.stitchCount)
 	{
 		off = MAXSEQ;
-		interleaveData.histch = &StitchBuffer[MAXSEQ];
-		for (ind = 0; ind < interleaveSequenceIndex2; ind++)
+		InterleaveData.histch = &StitchBuffer[MAXSEQ];
+		for (ind = 0; ind < InterleaveSequenceIndex2; ind++)
 		{
-			interleaveData.pins = ind;
-			switch (interleaveSequenceIndices[ind].seq)
+			InterleaveData.pins = ind;
+			switch (InterleaveSequenceIndices[ind].seq)
 			{
 			case I_AP:
 
-				if (fillStartsMap&M_FIL&&fillStartsData.apl >= interleaveData.coloc)
-					interleaveData.coloc = fillStartsData.apl;
+				if (FillStartsMap&M_FIL&&FillStartsData.apl >= InterleaveData.coloc)
+					InterleaveData.coloc = FillStartsData.apl;
 				else
 				{
-					interleaveData.coloc = fillStartsData.apcol;
-					if (interleaveData.coloc == 1)
-						interleaveData.coloc = 0;
+					InterleaveData.coloc = FillStartsData.apcol;
+					if (InterleaveData.coloc == 1)
+						InterleaveData.coloc = 0;
 				}
 				break;
 
 			case I_FIL:
 
-				if (fillStartsMap&M_FIL&&fillStartsData.fil >= interleaveData.coloc)
-					interleaveData.coloc = fillStartsData.fil;
+				if (FillStartsMap&M_FIL&&FillStartsData.fil >= InterleaveData.coloc)
+					InterleaveData.coloc = FillStartsData.fil;
 				else
-					interleaveData.coloc = fillStartsData.fcol;
+					InterleaveData.coloc = FillStartsData.fcol;
 				break;
 
 			case I_FTH:
 
-				if (fillStartsMap&M_FIL&&fillStartsData.fth >= interleaveData.coloc)
-					interleaveData.coloc = fillStartsData.fth;
+				if (FillStartsMap&M_FIL&&FillStartsData.fth >= InterleaveData.coloc)
+					InterleaveData.coloc = FillStartsData.fth;
 				else
-					interleaveData.coloc = fillStartsData.fthcol;
+					InterleaveData.coloc = FillStartsData.fthcol;
 				break;
 
 			case I_BRD:
 
-				if (fillStartsMap&M_BRD&&fillStartsData.brd >= interleaveData.coloc)
-					interleaveData.coloc = fillStartsData.brd;
+				if (FillStartsMap&M_BRD&&FillStartsData.brd >= InterleaveData.coloc)
+					InterleaveData.coloc = FillStartsData.brd;
 				else
-					interleaveData.coloc = fillStartsData.ecol;
+					InterleaveData.coloc = FillStartsData.ecol;
 				break;
 			}
-			cod = interleaveData.layerIndex | interleaveSequenceIndices[interleaveData.pins].cod | interleaveSequenceIndices[interleaveData.pins].color;
+			cod = InterleaveData.layerIndex | InterleaveSequenceIndices[InterleaveData.pins].cod | InterleaveSequenceIndices[InterleaveData.pins].color;
 			duint(off, cod);
 		}
 		chkend(MAXSEQ, cod);
-		if (PCSHeader.stitchCount&&interleaveData.sloc < (unsigned)PCSHeader.stitchCount - 1)
+		if (PCSHeader.stitchCount&&InterleaveData.sloc < (unsigned)PCSHeader.stitchCount - 1)
 		{
-			ine = PCSHeader.stitchCount - interleaveData.sloc;
-			MoveMemory(&StitchBuffer[interleaveData.oloc + MAXSEQ], &StitchBuffer[interleaveData.sloc], sizeof(fPOINTATTR)*ine);
-			interleaveData.oloc += ine;
+			ine = PCSHeader.stitchCount - InterleaveData.sloc;
+			MoveMemory(&StitchBuffer[InterleaveData.oloc + MAXSEQ], &StitchBuffer[InterleaveData.sloc], sizeof(fPOINTATTR)*ine);
+			InterleaveData.oloc += ine;
 		}
-		MoveMemory(StitchBuffer, interleaveData.histch, sizeof(fPOINTATTR)*interleaveData.oloc);
+		MoveMemory(StitchBuffer, InterleaveData.histch, sizeof(fPOINTATTR)*InterleaveData.oloc);
 	}
 	else
 	{
 		off = 0;
-		for (ind = 0; ind < interleaveSequenceIndex2; ind++)
+		for (ind = 0; ind < InterleaveSequenceIndex2; ind++)
 		{
-			cod = interleaveData.layerIndex | interleaveSequenceIndices[ind].cod | interleaveSequenceIndices[ind].color;
+			cod = InterleaveData.layerIndex | InterleaveSequenceIndices[ind].cod | InterleaveSequenceIndices[ind].color;
 			if (SelectedForm->extendedAttribute&AT_STRT)
 			{
 				if (!setMap(DIDSTRT))
-					interleaveData.oloc += gucon(CurrentFormVertices[SelectedForm->fillStart], interleaveSequence[interleaveSequenceIndices[interleaveData.pins].ind], interleaveData.oloc + off, cod);
+					InterleaveData.oloc += gucon(CurrentFormVertices[SelectedForm->fillStart], InterleaveSequence[InterleaveSequenceIndices[InterleaveData.pins].ind], InterleaveData.oloc + off, cod);
 			}
 			if (lastcol(ind, &colpnt))
-				interleaveData.oloc += gucon(colpnt, interleaveSequence[interleaveSequenceIndices[ind].ind], interleaveData.oloc, cod);
-			for (ine = interleaveSequenceIndices[ind].ind; ine < interleaveSequenceIndices[ind + 1].ind; ine++)
+				InterleaveData.oloc += gucon(colpnt, InterleaveSequence[InterleaveSequenceIndices[ind].ind], InterleaveData.oloc, cod);
+			for (ine = InterleaveSequenceIndices[ind].ind; ine < InterleaveSequenceIndices[ind + 1].ind; ine++)
 			{
-				StitchBuffer[interleaveData.oloc].x = interleaveSequence[ine].x;
-				StitchBuffer[interleaveData.oloc].y = interleaveSequence[ine].y;
-				StitchBuffer[interleaveData.oloc].attribute = cod;
-				if (StitchBuffer[interleaveData.oloc].x != StitchBuffer[interleaveData.oloc - 1].x ||
-					StitchBuffer[interleaveData.oloc].y != StitchBuffer[interleaveData.oloc - 1].y)
-					interleaveData.oloc++;
+				StitchBuffer[InterleaveData.oloc].x = InterleaveSequence[ine].x;
+				StitchBuffer[InterleaveData.oloc].y = InterleaveSequence[ine].y;
+				StitchBuffer[InterleaveData.oloc].attribute = cod;
+				if (StitchBuffer[InterleaveData.oloc].x != StitchBuffer[InterleaveData.oloc - 1].x ||
+					StitchBuffer[InterleaveData.oloc].y != StitchBuffer[InterleaveData.oloc - 1].y)
+					InterleaveData.oloc++;
 			}
 		}
 		chkend(0, cod);
 	}
-	PCSHeader.stitchCount = interleaveData.oloc;
+	PCSHeader.stitchCount = InterleaveData.oloc;
 	coltab();
 }
 
@@ -3579,36 +3578,36 @@ void dutxtfil()
 	movStch();
 	ShowWindow(VerticalScrollBar, FALSE);
 	ShowWindow(HorizontalScrollBar, FALSE);
-	cloxlst = (unsigned*)&OSequence;
-	cloxcnt = 0;
+	SelectedTexturePointsList = (unsigned*)&OSequence;
+	SelectedTexturePointsCount = 0;
 	setMap(INIT);
-	hBtnSideWindow = 0;
+	SideWindowButton = 0;
 	if (chkMap(WASTXBAK))
 	{
 		redtbak();
-		if (!textureScreen.areaHeight)
-			textureScreen.areaHeight = IniFile.textureHeight;
-		if (!textureScreen.spacing)
-			textureScreen.spacing = IniFile.underlaySpacing;
-		if (!textureScreen.width)
-			textureScreen.width = IniFile.textureWidth;
+		if (!TextureScreen.areaHeight)
+			TextureScreen.areaHeight = IniFile.textureHeight;
+		if (!TextureScreen.spacing)
+			TextureScreen.spacing = IniFile.underlaySpacing;
+		if (!TextureScreen.width)
+			TextureScreen.width = IniFile.textureWidth;
 		setMap(LASTXBAK);
 		rstMap(TXBDIR);
 	}
 	else
 	{
-		textureScreen.index = 0;
-		textureScreen.areaHeight = IniFile.textureHeight;
-		textureScreen.width = IniFile.textureWidth;
-		textureScreen.spacing = IniFile.textureSpacing;
+		TextureScreen.index = 0;
+		TextureScreen.areaHeight = IniFile.textureHeight;
+		TextureScreen.width = IniFile.textureWidth;
+		TextureScreen.spacing = IniFile.textureSpacing;
 	}
 	setMap(RESTCH);
 }
 
 void txt2pix(TXPNT txp, POINT* pixp)
 {
-	pixp->y = textureScreen.height - txp.y / textureScreen.areaHeight*textureScreen.height + textureScreen.top;
-	pixp->x = (txp.line*textureScreen.spacing + textureScreen.xOffset) / textureScreen.editToPixelRatio;
+	pixp->y = TextureScreen.height - txp.y / TextureScreen.areaHeight*TextureScreen.height + TextureScreen.top;
+	pixp->x = (txp.line*TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
 }
 
 void txtxfn(POINT ref, int pix)
@@ -3629,12 +3628,12 @@ void dutxtx(int ind, int pix)
 {
 	POINT	ref;
 
-	txt2pix(tmpTexturePoints[ind], &ref);
+	txt2pix(TempTexturePoints[ind], &ref);
 	txtxfn(ref, pix);
-	if (ref.y > textureScreen.halfHeight)
-		ref.y -= textureScreen.height;
+	if (ref.y > TextureScreen.halfHeight)
+		ref.y -= TextureScreen.height;
 	else
-		ref.y += textureScreen.height;
+		ref.y += TextureScreen.height;
 	txtxfn(ref, pix);
 }
 
@@ -3659,14 +3658,14 @@ void txrct2rct(TXTRCT txr, RECT* rct)
 
 void ed2px(fPOINT ped, POINT* px)
 {
-	px->x = ped.x / textureScreen.editToPixelRatio;
-	px->y = StitchWindowClientRect.bottom - ped.y / textureScreen.editToPixelRatio;
+	px->x = ped.x / TextureScreen.editToPixelRatio;
+	px->y = StitchWindowClientRect.bottom - ped.y / TextureScreen.editToPixelRatio;
 }
 
 void px2ed(POINT px, fPOINT* ped)
 {
-	ped->x = px.x*textureScreen.editToPixelRatio;
-	ped->y = textureScreen.screenHeight - px.y*textureScreen.editToPixelRatio;
+	ped->x = px.x*TextureScreen.editToPixelRatio;
+	ped->y = TextureScreen.screenHeight - px.y*TextureScreen.editToPixelRatio;
 }
 
 void bxtxt(unsigned cod, TCHAR* str)
@@ -3676,7 +3675,7 @@ void bxtxt(unsigned cod, TCHAR* str)
 
 void lodhbuf(unsigned cod)
 {
-	LoadString(ThredInstance, cod, HelpBuffer, HBUFSIZ);
+	LoadString(ThrEdInstance, cod, HelpBuffer, HBUFSIZ);
 }
 
 void hlpflt(unsigned mcod, unsigned bcod, float dat)
@@ -3690,9 +3689,9 @@ void drwtxbut()
 {
 	lodhbuf(IDS_CLEAR);
 	bxtxt(HTXCLR, HelpBuffer);
-	hlpflt(IDS_TXHI, HTXHI, textureScreen.areaHeight / PFGRAN);
+	hlpflt(IDS_TXHI, HTXHI, TextureScreen.areaHeight / PFGRAN);
 	redraw(ButtonWin[HTXWID]);
-	hlpflt(IDS_TXSPAC, HTXSPAC, textureScreen.spacing / PFGRAN);
+	hlpflt(IDS_TXSPAC, HTXSPAC, TextureScreen.spacing / PFGRAN);
 	lodhbuf(IDS_TXVRT);
 	bxtxt(HTXVRT, HelpBuffer);
 	lodhbuf(IDS_TXHOR);
@@ -3709,16 +3708,16 @@ void chktx()
 	int ind, ine;
 
 	ine = 0;
-	for (ind = 0; ind < textureScreen.index; ind++)
+	for (ind = 0; ind < TextureScreen.index; ind++)
 	{
-		if (tmpTexturePoints[ind].line <= textureScreen.lines&&tmpTexturePoints[ind].y < textureScreen.areaHeight)
+		if (TempTexturePoints[ind].line <= TextureScreen.lines&&TempTexturePoints[ind].y < TextureScreen.areaHeight)
 		{
-			tmpTexturePoints[ine].line = tmpTexturePoints[ind].line;
-			tmpTexturePoints[ine].y = tmpTexturePoints[ind].y;
+			TempTexturePoints[ine].line = TempTexturePoints[ind].line;
+			TempTexturePoints[ine].y = TempTexturePoints[ind].y;
 			ine++;
 		}
 	}
-	textureScreen.index = ine;
+	TextureScreen.index = ine;
 }
 
 void drwtxtr()
@@ -3735,33 +3734,33 @@ void drwtxtr()
 	float		wid2;
 
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-	edsp = textureScreen.areaHeight * 2 / (textureScreen.spacing*(textureScreen.lines + 2));
+	edsp = TextureScreen.areaHeight * 2 / (TextureScreen.spacing*(TextureScreen.lines + 2));
 	pxsp = (double)StitchWindowClientRect.bottom / StitchWindowClientRect.right;
-	textureScreen.lines = floor(textureScreen.width / textureScreen.spacing);
-	wid2 = textureScreen.spacing*(textureScreen.lines + 2);
+	TextureScreen.lines = floor(TextureScreen.width / TextureScreen.spacing);
+	wid2 = TextureScreen.spacing*(TextureScreen.lines + 2);
 	if (rstMap(CHKTX))
 		chktx();
 	if (pxsp > edsp)
 	{
-		textureScreen.xOffset = 0;
-		textureScreen.editToPixelRatio = wid2 / StitchWindowClientRect.bottom;
-		ofy = (StitchWindowClientRect.bottom - textureScreen.areaHeight / textureScreen.editToPixelRatio) / 2;
+		TextureScreen.xOffset = 0;
+		TextureScreen.editToPixelRatio = wid2 / StitchWindowClientRect.bottom;
+		ofy = (StitchWindowClientRect.bottom - TextureScreen.areaHeight / TextureScreen.editToPixelRatio) / 2;
 	}
 	else
 	{
-		textureScreen.editToPixelRatio = textureScreen.areaHeight * 2 / StitchWindowClientRect.bottom;
+		TextureScreen.editToPixelRatio = TextureScreen.areaHeight * 2 / StitchWindowClientRect.bottom;
 		ofy = StitchWindowClientRect.bottom >> 2;
-		textureScreen.xOffset = (StitchWindowClientRect.right*textureScreen.editToPixelRatio - (textureScreen.lines + 2)*textureScreen.spacing) / 2;
+		TextureScreen.xOffset = (StitchWindowClientRect.right*TextureScreen.editToPixelRatio - (TextureScreen.lines + 2)*TextureScreen.spacing) / 2;
 	}
-	textureScreen.top = ofy;
-	textureScreen.bottom = StitchWindowClientRect.bottom - ofy;
-	textureScreen.height = textureScreen.bottom - textureScreen.top;
-	textureScreen.halfHeight = StitchWindowClientRect.bottom >> 1;
-	textureScreen.screenHeight = StitchWindowClientRect.bottom*textureScreen.editToPixelRatio;
-	textureScreen.yOffset = (textureScreen.screenHeight - textureScreen.areaHeight) / 2;
+	TextureScreen.top = ofy;
+	TextureScreen.bottom = StitchWindowClientRect.bottom - ofy;
+	TextureScreen.height = TextureScreen.bottom - TextureScreen.top;
+	TextureScreen.halfHeight = StitchWindowClientRect.bottom >> 1;
+	TextureScreen.screenHeight = StitchWindowClientRect.bottom*TextureScreen.editToPixelRatio;
+	TextureScreen.yOffset = (TextureScreen.screenHeight - TextureScreen.areaHeight) / 2;
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	SelectObject(StitchWindowMemDC, GridPen);
-	cnt = textureScreen.areaHeight / IniFile.gridSize + 1;
+	cnt = TextureScreen.areaHeight / IniFile.gridSize + 1;
 	txp.line = 0;
 	xlin[0].x = 0;
 	xlin[1].x = StitchWindowClientRect.right;
@@ -3773,53 +3772,53 @@ void drwtxtr()
 		Polyline(StitchWindowMemDC, xlin, 2);
 		txp.y += IniFile.gridSize;
 	}
-	DeleteObject(textureCrossPen);
-	textureCrossPen = CreatePen(PS_SOLID, 1, UserColor[ActiveColor]);
-	SelectObject(StitchWindowMemDC, textureCrossPen);
+	DeleteObject(TextureCrossPen);
+	TextureCrossPen = CreatePen(PS_SOLID, 1, UserColor[ActiveColor]);
+	SelectObject(StitchWindowMemDC, TextureCrossPen);
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	xlin[0].y = 0;
 	xlin[1].y = StitchWindowClientRect.bottom;
-	for (ind = 1; ind < textureScreen.lines + 1; ind++)
+	for (ind = 1; ind < TextureScreen.lines + 1; ind++)
 	{
-		xlin[0].x = xlin[1].x = (ind*textureScreen.spacing + textureScreen.xOffset) / textureScreen.editToPixelRatio;
+		xlin[0].x = xlin[1].x = (ind*TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
 		Polyline(StitchWindowMemDC, xlin, 2);
 	}
 	xlin[0].x = 0;
 	xlin[1].x = StitchWindowClientRect.right;
-	xlin[0].y = xlin[1].y = textureScreen.top;
+	xlin[0].y = xlin[1].y = TextureScreen.top;
 	Polyline(StitchWindowMemDC, xlin, 2);
-	xlin[0].y = xlin[1].y = textureScreen.bottom;
+	xlin[0].y = xlin[1].y = TextureScreen.bottom;
 	Polyline(StitchWindowMemDC, xlin, 2);
-	DeleteObject(textureCrossPen);
-	textureCrossPen = CreatePen(PS_SOLID, 1, 0xffffff);
-	SelectObject(StitchWindowMemDC, textureCrossPen);
+	DeleteObject(TextureCrossPen);
+	TextureCrossPen = CreatePen(PS_SOLID, 1, 0xffffff);
+	SelectObject(StitchWindowMemDC, TextureCrossPen);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	col = UserColor[ActiveColor];
-	for (ind = 0; ind < textureScreen.index; ind++)
+	for (ind = 0; ind < TextureScreen.index; ind++)
 	{
 		dutxtx(ind, IniFile.textureEditorSize);
 	}
-	if (cloxcnt)
+	if (SelectedTexturePointsCount)
 	{
-		txrct2rct(textureRect, &texturePixelRect);
-		xlin[0].y = xlin[1].y = texturePixelRect.top;
-		xlin[0].x = texturePixelRect.left;
-		xlin[1].x = texturePixelRect.right;
+		txrct2rct(TextureRect, &TexturePixelRect);
+		xlin[0].y = xlin[1].y = TexturePixelRect.top;
+		xlin[0].x = TexturePixelRect.left;
+		xlin[1].x = TexturePixelRect.right;
 		Polyline(StitchWindowMemDC, xlin, 2);
-		xlin[1].y = texturePixelRect.bottom;
-		xlin[1].x = texturePixelRect.left;
+		xlin[1].y = TexturePixelRect.bottom;
+		xlin[1].x = TexturePixelRect.left;
 		Polyline(StitchWindowMemDC, xlin, 2);
-		xlin[0].x = texturePixelRect.right;
-		xlin[0].y = texturePixelRect.bottom;
+		xlin[0].x = TexturePixelRect.right;
+		xlin[0].y = TexturePixelRect.bottom;
 		Polyline(StitchWindowMemDC, xlin, 2);
-		xlin[1].x = texturePixelRect.right;
-		xlin[1].y = texturePixelRect.top;
+		xlin[1].x = TexturePixelRect.right;
+		xlin[1].y = TexturePixelRect.top;
 		Polyline(StitchWindowMemDC, xlin, 2);
 	}
-	for (ind = 0; ind < cloxcnt; ind++)
+	for (ind = 0; ind < SelectedTexturePointsCount; ind++)
 	{
-		dutxtx(cloxlst[ind], IniFile.textureEditorSize);
-		dutxtx(cloxlst[ind], IniFile.textureEditorSize << 1);
+		dutxtx(SelectedTexturePointsList[ind], IniFile.textureEditorSize);
+		dutxtx(SelectedTexturePointsList[ind], IniFile.textureEditorSize << 1);
 	}
 	BitBlt(StitchWindowDC, 0, 0, StitchWindowClientRect.right, StitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
 	drwtxbut();
@@ -3830,17 +3829,17 @@ BOOL px2txt(POINT pof, TXPNT* txrec)
 	fPOINT epnt;
 
 	px2ed(pof, &epnt);
-	txrec->line = (epnt.x - textureScreen.xOffset) / textureScreen.spacing + 0.5;
-	if (txrec->line > textureScreen.lines)
+	txrec->line = (epnt.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5;
+	if (txrec->line > TextureScreen.lines)
 		return 0;
 	if (txrec->line < 1)
 		return 0;
-	if (pof.y > textureScreen.top)
+	if (pof.y > TextureScreen.top)
 	{
-		if (pof.y > textureScreen.bottom)
+		if (pof.y > TextureScreen.bottom)
 			return 0;
 		else
-			txrec->y = (float)textureScreen.areaHeight - (float)(pof.y - textureScreen.top) / textureScreen.height*textureScreen.areaHeight;
+			txrec->y = (float)TextureScreen.areaHeight - (float)(pof.y - TextureScreen.top) / TextureScreen.height*TextureScreen.areaHeight;
 	}
 	else
 		return 0;
@@ -3857,10 +3856,10 @@ BOOL txbutfn(TXPNT* txrec)
 
 void txtrbut()
 {
-	if (txbutfn(&tmpTexturePoints[textureScreen.index]))
+	if (txbutfn(&TempTexturePoints[TextureScreen.index]))
 	{
 		savtxt();
-		textureScreen.index++;
+		TextureScreen.index++;
 		setMap(RESTCH);
 	}
 	else
@@ -3879,9 +3878,9 @@ BOOL txtclos(unsigned* pclo)
 	ref.y = Msg.pt.y - StitchWindowOrigin.y;
 	minlen = 1e99;
 	*pclo = 0;
-	for (ind = 0; ind < textureScreen.index; ind++)
+	for (ind = 0; ind < TextureScreen.index; ind++)
 	{
-		txt2pix(tmpTexturePoints[ind], &tpnt);
+		txt2pix(TempTexturePoints[ind], &tpnt);
 		len = hypot(tpnt.x - ref.x, tpnt.y - ref.y);
 		if (len < minlen)
 		{
@@ -3900,21 +3899,21 @@ void tritx()
 	int		li_Size;
 
 	li_Size = IniFile.textureEditorSize << 2;
-	xlin[0].x = xlin[1].x = textureCursorLocation.x;
-	xlin[0].y = textureCursorLocation.y - li_Size;
-	xlin[1].y = textureCursorLocation.y + li_Size;
+	xlin[0].x = xlin[1].x = TextureCursorLocation.x;
+	xlin[0].y = TextureCursorLocation.y - li_Size;
+	xlin[1].y = TextureCursorLocation.y + li_Size;
 	Polyline(StitchWindowDC, xlin, 2);
-	xlin[0].y = xlin[1].y = textureCursorLocation.y;
-	xlin[0].x = textureCursorLocation.x - li_Size;
-	xlin[1].x = textureCursorLocation.x + li_Size;
+	xlin[0].y = xlin[1].y = TextureCursorLocation.y;
+	xlin[0].x = TextureCursorLocation.x - li_Size;
+	xlin[1].x = TextureCursorLocation.x + li_Size;
 	Polyline(StitchWindowDC, xlin, 2);
 }
 
 void setxmov()
 {
 	setMap(TXTMOV);
-	textureCursorLocation.x = cloxref.x = Msg.pt.x - StitchWindowOrigin.x;
-	textureCursorLocation.y = cloxref.y = Msg.pt.y - StitchWindowOrigin.y;
+	TextureCursorLocation.x = SelectTexturePointsOrigin.x = Msg.pt.x - StitchWindowOrigin.x;
+	TextureCursorLocation.y = SelectTexturePointsOrigin.y = Msg.pt.y - StitchWindowOrigin.y;
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 }
 
@@ -3924,12 +3923,12 @@ void ritxrct()
 	RECT	trct;
 	POINT	xlin[5];
 
-	of.x = textureCursorLocation.x - cloxref.x;
-	of.y = textureCursorLocation.y - cloxref.y;
-	trct.bottom = texturePixelRect.bottom + of.y;
-	trct.left = texturePixelRect.left + of.x;
-	trct.right = texturePixelRect.right + of.x;
-	trct.top = texturePixelRect.top + of.y;
+	of.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
+	of.y = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
+	trct.bottom = TexturePixelRect.bottom + of.y;
+	trct.left = TexturePixelRect.left + of.x;
+	trct.right = TexturePixelRect.right + of.x;
+	trct.top = TexturePixelRect.top + of.y;
 	xlin[0].x = xlin[1].x = xlin[4].x = trct.left;
 	xlin[2].x = xlin[3].x = trct.right;
 	xlin[0].y = xlin[3].y = xlin[4].y = trct.top;
@@ -3942,14 +3941,14 @@ void dutxrct(TXTRCT* rct)
 	int		ind;
 	TXPNT*	txp;
 
-	if (cloxcnt)
+	if (SelectedTexturePointsCount)
 	{
-		txp = &tmpTexturePoints[cloxlst[0]];
+		txp = &TempTexturePoints[SelectedTexturePointsList[0]];
 		rct->left = rct->right = txp->line;
 		rct->top = rct->bottom = txp->y;
-		for (ind = 1; ind < cloxcnt; ind++)
+		for (ind = 1; ind < SelectedTexturePointsCount; ind++)
 		{
-			txp = &tmpTexturePoints[cloxlst[ind]];
+			txp = &TempTexturePoints[SelectedTexturePointsList[ind]];
 			if (txp->y > rct->top)
 				rct->top = txp->y;
 			if (txp->y < rct->bottom)
@@ -3966,8 +3965,8 @@ void dutxrct(TXTRCT* rct)
 
 void ed2stch(fPOINT* pt)
 {
-	pt->x -= textureScreen.xOffset;
-	pt->y -= textureScreen.yOffset;
+	pt->x -= TextureScreen.xOffset;
+	pt->y -= TextureScreen.yOffset;
 }
 
 void dutxlin(fPOINT pt0, fPOINT pt1)
@@ -3991,20 +3990,20 @@ void dutxlin(fPOINT pt0, fPOINT pt1)
 		strt = fin;
 		fin = tflt;
 	}
-	istrt = ceil(strt / textureScreen.spacing);
-	ifin = floor(fin / textureScreen.spacing);
+	istrt = ceil(strt / TextureScreen.spacing);
+	ifin = floor(fin / TextureScreen.spacing);
 	if (istrt < 1)
 		istrt = 1;
-	if (ifin > textureScreen.lines)
-		ifin = textureScreen.lines;
+	if (ifin > TextureScreen.lines)
+		ifin = TextureScreen.lines;
 	while (istrt <= ifin)
 	{
-		tflt = slop*(-pt0.x + istrt*textureScreen.spacing) + pt0.y;
-		if (tflt > 0 && tflt < textureScreen.areaHeight)
+		tflt = slop*(-pt0.x + istrt*TextureScreen.spacing) + pt0.y;
+		if (tflt > 0 && tflt < TextureScreen.areaHeight)
 		{
-			tmpTexturePoints[textureScreen.index].line = istrt;
-			tmpTexturePoints[textureScreen.index].y = tflt;
-			textureScreen.index++;
+			TempTexturePoints[TextureScreen.index].line = istrt;
+			TempTexturePoints[TextureScreen.index].y = tflt;
+			TextureScreen.index++;
 		}
 		istrt++;
 	}
@@ -4019,10 +4018,10 @@ void setxclp()
 	deorg(&of);
 	px2ed(of, &fof);
 	if (rstMap(TXHCNTR))
-		fof.x = (textureScreen.lines*textureScreen.spacing) / 2 + textureScreen.xOffset - textureScreen.formCenter.x + textureScreen.spacing / 2;
+		fof.x = (TextureScreen.lines*TextureScreen.spacing) / 2 + TextureScreen.xOffset - TextureScreen.formCenter.x + TextureScreen.spacing / 2;
 	else
-		fof.x -= textureScreen.formCenter.x;
-	fof.y -= textureScreen.formCenter.y;
+		fof.x -= TextureScreen.formCenter.x;
+	fof.y -= TextureScreen.formCenter.y;
 	for (ind = 0; ind < AngledForm.sides; ind++)
 	{
 		AngledFormVertices[ind].x += fof.x;
@@ -4058,8 +4057,8 @@ void ed2txp(POINT pof, TXPNT* txrec)
 	fPOINT epnt;
 
 	px2ed(pof, &epnt);
-	txrec->line = (epnt.x - textureScreen.xOffset) / textureScreen.spacing + 0.5;
-	txrec->y = (float)textureScreen.areaHeight - (float)(pof.y - textureScreen.top) / textureScreen.height*textureScreen.areaHeight;
+	txrec->line = (epnt.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5;
+	txrec->y = (float)TextureScreen.areaHeight - (float)(pof.y - TextureScreen.top) / TextureScreen.height*TextureScreen.areaHeight;
 }
 
 int	hitxlin()
@@ -4067,10 +4066,10 @@ int	hitxlin()
 	int ind, hilin;
 
 	hilin = 0;
-	for (ind = 0; ind < cloxcnt; ind++)
+	for (ind = 0; ind < SelectedTexturePointsCount; ind++)
 	{
-		if (tmpTexturePoints[cloxlst[ind]].line > hilin)
-			hilin = tmpTexturePoints[cloxlst[ind]].line;
+		if (TempTexturePoints[SelectedTexturePointsList[ind]].line > hilin)
+			hilin = TempTexturePoints[SelectedTexturePointsList[ind]].line;
 	}
 	return hilin;
 }
@@ -4090,32 +4089,32 @@ void txtrup()
 	{
 		savtxt();
 		deorg(&of);
-		of.x -= cloxref.x;
-		of.y -= cloxref.y;
+		of.x -= SelectTexturePointsOrigin.x;
+		of.y -= SelectTexturePointsOrigin.y;
 		bakp = abs(of.x);
-		tof.line = bakp*textureScreen.editToPixelRatio / textureScreen.spacing + 0.5;
+		tof.line = bakp*TextureScreen.editToPixelRatio / TextureScreen.spacing + 0.5;
 		if (of.x < 0)
 			tof.line = -tof.line;
-		tof.y = (float)-of.y / textureScreen.height*textureScreen.areaHeight;
-		tflt = textureRect.top + tof.y - textureScreen.areaHeight;
+		tof.y = (float)-of.y / TextureScreen.height*TextureScreen.areaHeight;
+		tflt = TextureRect.top + tof.y - TextureScreen.areaHeight;
 		if (tflt > 0)
 			tof.y -= tflt;
-		tflt = textureRect.bottom + tof.y;
+		tflt = TextureRect.bottom + tof.y;
 		if (tflt < 0)
 			tof.y -= tflt;
-		ind = textureRect.left + tof.line - 1;
+		ind = TextureRect.left + tof.line - 1;
 		if (ind < 0)
 			tof.line -= ind;
-		ind = textureRect.right + tof.line - textureScreen.lines;
+		ind = TextureRect.right + tof.line - TextureScreen.lines;
 		if (ind > 0)
 			tof.line -= ind;
-		for (ind = 0; ind < cloxcnt; ind++)
+		for (ind = 0; ind < SelectedTexturePointsCount; ind++)
 		{
-			ptxt = &tmpTexturePoints[cloxlst[ind]];
+			ptxt = &TempTexturePoints[SelectedTexturePointsList[ind]];
 			ptxt->line += tof.line;
 			ptxt->y += tof.y;
 		}
-		dutxrct(&textureRect);
+		dutxrct(&TextureRect);
 	}
 	else
 	{
@@ -4136,19 +4135,19 @@ void txtrup()
 				hi.y = lo.y;
 				lo.y = tflt;
 			}
-			cloxcnt = 0;
-			for (ind = 0; ind < textureScreen.index; ind++)
+			SelectedTexturePointsCount = 0;
+			for (ind = 0; ind < TextureScreen.index; ind++)
 			{
-				if (tmpTexturePoints[ind].y<hi.y&&
-					tmpTexturePoints[ind].y>lo.y&&
-					tmpTexturePoints[ind].line <= hi.line&&
-					tmpTexturePoints[ind].line >= lo.line)
+				if (TempTexturePoints[ind].y<hi.y&&
+					TempTexturePoints[ind].y>lo.y&&
+					TempTexturePoints[ind].line <= hi.line&&
+					TempTexturePoints[ind].line >= lo.line)
 				{
-					cloxlst[cloxcnt] = ind;
-					cloxcnt++;
+					SelectedTexturePointsList[SelectedTexturePointsCount] = ind;
+					SelectedTexturePointsCount++;
 				}
 			}
-			dutxrct(&textureRect);
+			dutxrct(&TextureRect);
 		}
 	}
 	setMap(RESTCH);
@@ -4178,8 +4177,8 @@ void ritxfrm()
 	unsigned ind, cnt;
 	POINT		of;
 
-	of.x = textureCursorLocation.x - cloxref.x;
-	of.y = textureCursorLocation.y - cloxref.y;
+	of.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
+	of.y = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
 	for (ind = 0; ind < AngledForm.sides; ind++)
 	{
 		ed2px(AngledFormVertices[ind], &FormLines[ind]);
@@ -4210,9 +4209,9 @@ void setxfrm()
 	}
 	angrct(&arct);
 	hi = arct.top - arct.bottom;
-	if (hi > textureScreen.areaHeight)
+	if (hi > TextureScreen.areaHeight)
 	{
-		rat = textureScreen.areaHeight / hi*0.95;
+		rat = TextureScreen.areaHeight / hi*0.95;
 		for (ind = 0; ind < AngledForm.sides; ind++)
 		{
 			AngledFormVertices[ind].x *= rat;
@@ -4220,9 +4219,9 @@ void setxfrm()
 		}
 		angrct(&arct);
 	}
-	textureScreen.formCenter.x = midl(arct.right, arct.left);
-	textureScreen.formCenter.y = midl(arct.top, arct.bottom);
-	ed2px(textureScreen.formCenter, &cloxref);
+	TextureScreen.formCenter.x = midl(arct.right, arct.left);
+	TextureScreen.formCenter.y = midl(arct.top, arct.bottom);
+	ed2px(TextureScreen.formCenter, &SelectTexturePointsOrigin);
 }
 
 void txtclp()
@@ -4242,8 +4241,8 @@ void txtclp()
 				setMap(TXTCLP);
 				setMap(TXTMOV);
 				setxfrm();
-				textureCursorLocation.x = Msg.pt.x - StitchWindowOrigin.x;
-				textureCursorLocation.y = Msg.pt.y - StitchWindowOrigin.y;
+				TextureCursorLocation.x = Msg.pt.x - StitchWindowOrigin.x;
+				TextureCursorLocation.y = Msg.pt.y - StitchWindowOrigin.y;
 			}
 			GlobalUnlock(ClipMemory);
 		}
@@ -4271,17 +4270,17 @@ void txtrmov()
 	{
 		if (setMap(WASWROT))
 			ritxfrm();
-		textureCursorLocation.x = Msg.pt.x - StitchWindowOrigin.x;
-		textureCursorLocation.y = Msg.pt.y - StitchWindowOrigin.y;
+		TextureCursorLocation.x = Msg.pt.x - StitchWindowOrigin.x;
+		TextureCursorLocation.y = Msg.pt.y - StitchWindowOrigin.y;
 		ritxfrm();
 	}
 	else
 	{
-		if (cloxcnt)
+		if (SelectedTexturePointsCount)
 		{
 			ritxrct();
-			textureCursorLocation.x = Msg.pt.x - StitchWindowOrigin.x;
-			textureCursorLocation.y = Msg.pt.y - StitchWindowOrigin.y;
+			TextureCursorLocation.x = Msg.pt.x - StitchWindowOrigin.x;
+			TextureCursorLocation.y = Msg.pt.y - StitchWindowOrigin.y;
 			ritxrct();
 		}
 	}
@@ -4301,9 +4300,9 @@ void butsid(unsigned cod)
 	RECT brct;
 
 	chktxnum();
-	textureWindowId = cod;
+	TextureWindowId = cod;
 	GetWindowRect(ButtonWin[cod], &brct);
-	hBtnSideWindow = CreateWindow(
+	SideWindowButton = CreateWindow(
 		"STATIC",
 		0,
 		SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -4313,7 +4312,7 @@ void butsid(unsigned cod)
 		ButtonHeight,
 		MainStitchWin,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -4344,9 +4343,9 @@ int txcmp(const void *arg1, const void *arg2)
 void txpar()
 {
 	SelectedForm->type = FRMFPOLY;
-	SelectedForm->fillInfo.texture.lines = textureScreen.lines;
-	SelectedForm->fillInfo.texture.height = textureScreen.areaHeight;
-	SelectedForm->fillSpacing = textureScreen.spacing;
+	SelectedForm->fillInfo.texture.lines = TextureScreen.lines;
+	SelectedForm->fillInfo.texture.height = TextureScreen.areaHeight;
+	SelectedForm->fillSpacing = TextureScreen.spacing;
 	SelectedForm->lengthOrCount.stitchLength = IniFile.userStitchLength;
 	SelectedForm->maxFillStitchLen = IniFile.maxStitchLength;
 	SelectedForm->minFillStitchLen = IniFile.minStitchLength;
@@ -4356,7 +4355,7 @@ void txpar()
 
 void txvrt()
 {
-	if (textureScreen.index)
+	if (TextureScreen.index)
 	{
 		if (chkMap(FORMSEL))
 		{
@@ -4369,7 +4368,7 @@ void txvrt()
 
 void txhor()
 {
-	if (textureScreen.index)
+	if (TextureScreen.index)
 	{
 		if (chkMap(FORMSEL))
 		{
@@ -4382,7 +4381,7 @@ void txhor()
 
 void txang()
 {
-	if (textureScreen.index)
+	if (TextureScreen.index)
 	{
 		if (chkMap(FORMSEL))
 		{
@@ -4399,16 +4398,16 @@ void deltx()
 	unsigned ind, cnt;
 
 	cnt = SelectedForm->fillInfo.texture.count;
-	if (textureIndex&&istx(ClosestFormToCursor) && cnt)
+	if (TextureIndex&&istx(ClosestFormToCursor) && cnt)
 	{
 		ind = SelectedForm->fillInfo.texture.index;
-		MoveMemory(&texturePointsBuffer[ind], &texturePointsBuffer[ind + cnt], textureIndex - (ind + cnt));
+		MoveMemory(&TexturePointsBuffer[ind], &TexturePointsBuffer[ind + cnt], TextureIndex - (ind + cnt));
 		for (ind = ClosestFormToCursor + 1; ind < FormIndex; ind++)
 		{
 			if (istx(ind))
 				FormList[ind].fillInfo.texture.index -= cnt;
 		}
-		textureIndex -= SelectedForm->fillInfo.texture.count;
+		TextureIndex -= SelectedForm->fillInfo.texture.count;
 		SelectedForm->fillInfo.texture.count = 0;
 	}
 }
@@ -4418,7 +4417,7 @@ void nutx()
 	int			ind, ins;
 	FRMHED*		pf;
 
-	qsort((void*)&tmpTexturePoints, textureScreen.index, 6, txcmp);
+	qsort((void*)&TempTexturePoints, TextureScreen.index, 6, txcmp);
 	ins = 0;
 	if (FormIndex)
 	{
@@ -4441,10 +4440,10 @@ void nutx()
 		nutskp:;
 		}
 	}
-	txspac(ins, textureScreen.index);
-	MoveMemory(&texturePointsBuffer[ins], &tmpTexturePoints, textureScreen.index * sizeof(TXPNT));
+	txspac(ins, TextureScreen.index);
+	MoveMemory(&TexturePointsBuffer[ins], &TempTexturePoints, TextureScreen.index * sizeof(TXPNT));
 	SelectedForm->fillInfo.texture.index = ins;
-	SelectedForm->fillInfo.texture.count = textureScreen.index;
+	SelectedForm->fillInfo.texture.count = TextureScreen.index;
 }
 
 void altx()
@@ -4454,17 +4453,17 @@ void altx()
 
 	if (chkMap(FORMSEL))
 	{
-		hi2 = textureScreen.areaHeight / 2;
-		clRmap((textureScreen.lines >> 5) + 1);
-		for (ind = 0; ind < textureScreen.index; ind++)
-			setr(tmpTexturePoints[ind].line);
-		for (ind = 1; ind <= textureScreen.lines; ind++)
+		hi2 = TextureScreen.areaHeight / 2;
+		clRmap((TextureScreen.lines >> 5) + 1);
+		for (ind = 0; ind < TextureScreen.index; ind++)
+			setr(TempTexturePoints[ind].line);
+		for (ind = 1; ind <= TextureScreen.lines; ind++)
 		{
 			if (!chkr(ind))
 			{
-				tmpTexturePoints[textureScreen.index].line = ind;
-				tmpTexturePoints[textureScreen.index].y = hi2;
-				textureScreen.index++;
+				TempTexturePoints[TextureScreen.index].line = ind;
+				TempTexturePoints[TextureScreen.index].y = hi2;
+				TextureScreen.index++;
 			}
 		}
 	}
@@ -4516,7 +4515,7 @@ void dutxfn(unsigned typ)
 
 void txsrt()
 {
-	qsort((void*)tmpTexturePoints, textureScreen.index, 6, txcmp);
+	qsort((void*)TempTexturePoints, TextureScreen.index, 6, txcmp);
 }
 
 void dutxmir()
@@ -4525,15 +4524,15 @@ void dutxmir()
 
 	savtxt();
 	txsrt();
-	lin = (textureScreen.lines + 1) >> 1;
-	ind = textureScreen.index - 1;
-	while (tmpTexturePoints[ind].line > lin&&ind >= 0)
+	lin = (TextureScreen.lines + 1) >> 1;
+	ind = TextureScreen.index - 1;
+	while (TempTexturePoints[ind].line > lin&&ind >= 0)
 		ind--;
 	ine = ind + 1;
-	if (textureScreen.lines & 1)
+	if (TextureScreen.lines & 1)
 	{
 		while (ind >= 0) {
-			if (tmpTexturePoints[ind].line == lin) {
+			if (TempTexturePoints[ind].line == lin) {
 				ind--;
 			}
 			else { break; }
@@ -4541,12 +4540,12 @@ void dutxmir()
 	}
 	while (ind >= 0)
 	{
-		tmpTexturePoints[ine].line = textureScreen.lines - tmpTexturePoints[ind].line + 1;
-		tmpTexturePoints[ine].y = tmpTexturePoints[ind].y;
+		TempTexturePoints[ine].line = TextureScreen.lines - TempTexturePoints[ind].line + 1;
+		TempTexturePoints[ine].y = TempTexturePoints[ind].y;
 		ine++;
 		ind--;
 	}
-	textureScreen.index = ine;
+	TextureScreen.index = ine;
 	setMap(RESTCH);
 }
 
@@ -4614,28 +4613,28 @@ void txtlbut()
 		stxlin();
 		return;
 	}
-	if (cloxcnt)
+	if (SelectedTexturePointsCount)
 	{
 		deorg(&tpnt);
-		if (tpnt.x > texturePixelRect.left&&
-			tpnt.x<texturePixelRect.right&&
-			tpnt.y>texturePixelRect.top&&
-			tpnt.y < texturePixelRect.bottom)
+		if (tpnt.x > TexturePixelRect.left&&
+			tpnt.x<TexturePixelRect.right&&
+			tpnt.y>TexturePixelRect.top&&
+			tpnt.y < TexturePixelRect.bottom)
 		{
 			setxmov();
 			ritxrct();
 			return;
 		}
 	}
-	if (txtclos(cloxlst))
+	if (txtclos(SelectedTexturePointsList))
 	{
-		cloxcnt = 1;
+		SelectedTexturePointsCount = 1;
 		setxmov();
-		dutxrct(&textureRect);
+		dutxrct(&TextureRect);
 		setMap(RESTCH);
 		return;
 	}
-	cloxcnt = 0;
+	SelectedTexturePointsCount = 0;
 	setMap(BZUMIN);
 	rstMap(BZUM);
 	ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
@@ -4647,15 +4646,15 @@ void redtbak()
 {
 	TXHST*		phst;
 
-	//	sprintf_s(MsgBuffer, sizeof(MsgBuffer),"%d\n",textureHistoryIndex);
+	//	sprintf_s(MsgBuffer, sizeof(MsgBuffer),"%d\n",TextureHistoryIndex);
 	//	OutputDebugString(MsgBuffer);
-	phst = &textureHistory[textureHistoryIndex];
-	textureScreen.areaHeight = phst->height;
-	textureScreen.width = phst->width;
-	textureScreen.spacing = phst->spacing;
-	textureScreen.index = phst->count;
+	phst = &TextureHistory[TextureHistoryIndex];
+	TextureScreen.areaHeight = phst->height;
+	TextureScreen.width = phst->width;
+	TextureScreen.spacing = phst->spacing;
+	TextureScreen.index = phst->count;
 	// ToDo - check texturePoint is valid first
-	MoveMemory (tmpTexturePoints, phst->texturePoint, phst->count * sizeof (TXPNT));
+	MoveMemory (TempTexturePoints, phst->texturePoint, phst->count * sizeof (TXPNT));
 	setMap(RESTCH);
 }
 
@@ -4665,10 +4664,10 @@ void txbak()
 
 	if (chkMap(WASTXBAK))
 	{
-		cloxcnt = 0;
+		SelectedTexturePointsCount = 0;
 		for (ind = 0; ind < 16; ind++)
 		{
-			if (textureHistory[textureHistoryIndex].width)
+			if (TextureHistory[TextureHistoryIndex].width)
 				goto txbak1;
 			txrbak();
 		}
@@ -4688,7 +4687,7 @@ void nxbak()
 		for (ind = 0; ind < 16; ind++)
 		{
 			txrfor();
-			if (textureHistory[textureHistoryIndex].width)
+			if (TextureHistory[TextureHistoryIndex].width)
 				goto nxbak1;
 		}
 		return;
@@ -4702,31 +4701,31 @@ void txtdel()
 	int			ind, ine;
 	unsigned	clo;
 
-	if (cloxcnt)
+	if (SelectedTexturePointsCount)
 	{
 		savtxt();
 		clRmap(RMAPSIZ);
-		for (ind = 0; ind < cloxcnt; ind++)
-			setr(cloxlst[ind]);
+		for (ind = 0; ind < SelectedTexturePointsCount; ind++)
+			setr(SelectedTexturePointsList[ind]);
 		ine = 0;
-		for (ind = 0; ind < textureScreen.index; ind++)
+		for (ind = 0; ind < TextureScreen.index; ind++)
 		{
 			if (!chkr(ind))
 			{
-				tmpTexturePoints[ine].line = tmpTexturePoints[ind].line;
-				tmpTexturePoints[ine].y = tmpTexturePoints[ind].y;
+				TempTexturePoints[ine].line = TempTexturePoints[ind].line;
+				TempTexturePoints[ine].y = TempTexturePoints[ind].y;
 				ine++;
 			}
 		}
-		cloxcnt = 0;
-		textureScreen.index = ine;
+		SelectedTexturePointsCount = 0;
+		TextureScreen.index = ine;
 		setMap(RESTCH);
 		return;
 	}
-	if (textureScreen.index&&txtclos(&clo))
+	if (TextureScreen.index&&txtclos(&clo))
 	{
-		MoveMemory(&tmpTexturePoints[clo], &tmpTexturePoints[clo + 1], (textureScreen.index - clo) * sizeof(TXPNT));
-		textureScreen.index--;
+		MoveMemory(&TempTexturePoints[clo], &TempTexturePoints[clo + 1], (TextureScreen.index - clo) * sizeof(TXPNT));
+		TextureScreen.index--;
 		setMap(RESTCH);
 	}
 }
@@ -4735,7 +4734,7 @@ void txdelal()
 {
 	chktxnum();
 	savtxt();
-	textureScreen.index = 0;
+	TextureScreen.index = 0;
 	rstxt();
 	setMap(RESTCH);
 }
@@ -4744,16 +4743,16 @@ void chktxnum()
 {
 	float tflt;
 
-	tflt = atof(textureInputBuffer);
+	tflt = atof(TextureInputBuffer);
 	if (tflt)
 	{
 		tflt *= PFGRAN;
-		switch (textureWindowId)
+		switch (TextureWindowId)
 		{
 		case HTXHI:
 
 			savtxt();
-			textureScreen.areaHeight = tflt;
+			TextureScreen.areaHeight = tflt;
 			IniFile.textureHeight = tflt;
 			setMap(CHKTX);
 			break;
@@ -4761,7 +4760,7 @@ void chktxnum()
 		case HTXWID:
 
 			savtxt();
-			textureScreen.width = tflt;
+			TextureScreen.width = tflt;
 			IniFile.textureWidth = tflt;
 			setMap(CHKTX);
 			break;
@@ -4769,16 +4768,16 @@ void chktxnum()
 		case HTXSPAC:
 
 			savtxt();
-			textureScreen.spacing = tflt;
+			TextureScreen.spacing = tflt;
 			IniFile.textureSpacing = tflt;
-			textureScreen.width = tflt*textureScreen.lines + tflt / 2;
+			TextureScreen.width = tflt*TextureScreen.lines + tflt / 2;
 			setMap(CHKTX);
 			break;
 		}
 	}
-	textureInputIndex = 0;
-	DestroyWindow(hBtnSideWindow);
-	hBtnSideWindow = 0;
+	TextureInputIndex = 0;
+	DestroyWindow(SideWindowButton);
+	SideWindowButton = 0;
 	setMap(RESTCH);
 }
 
@@ -4828,9 +4827,9 @@ void txsiz(double rat)
 		AngledFormVertices[ind].y *= rat;
 	}
 	angrct(&arct);
-	textureScreen.formCenter.x = midl(arct.right, arct.left);
-	textureScreen.formCenter.y = midl(arct.top, arct.bottom);
-	ed2px(textureScreen.formCenter, &cloxref);
+	TextureScreen.formCenter.x = midl(arct.right, arct.left);
+	TextureScreen.formCenter.y = midl(arct.top, arct.bottom);
+	ed2px(TextureScreen.formCenter, &SelectTexturePointsOrigin);
 	ritxfrm();
 }
 
@@ -4870,37 +4869,37 @@ void txnudg(int dx, float dy)
 	float tflt;
 	int ind, tlin;
 
-	if (cloxcnt)
+	if (SelectedTexturePointsCount)
 	{
 		if (dy)
 		{
-			fdy = dy*textureScreen.editToPixelRatio;
-			for (ind = 0; ind < cloxcnt; ind++)
+			fdy = dy*TextureScreen.editToPixelRatio;
+			for (ind = 0; ind < SelectedTexturePointsCount; ind++)
 			{
-				tflt = tmpTexturePoints[cloxlst[ind]].y + fdy;
+				tflt = TempTexturePoints[SelectedTexturePointsList[ind]].y + fdy;
 				if (tflt < 0)
 					return;
-				if (tflt > textureScreen.areaHeight)
+				if (tflt > TextureScreen.areaHeight)
 					return;
 			}
-			for (ind = 0; ind < cloxcnt; ind++)
-				tmpTexturePoints[cloxlst[ind]].y += fdy;
+			for (ind = 0; ind < SelectedTexturePointsCount; ind++)
+				TempTexturePoints[SelectedTexturePointsList[ind]].y += fdy;
 		}
 		else
 		{
-			for (ind = 0; ind < cloxcnt; ind++)
+			for (ind = 0; ind < SelectedTexturePointsCount; ind++)
 			{
-				tlin = tmpTexturePoints[cloxlst[ind]].line + dx;
+				tlin = TempTexturePoints[SelectedTexturePointsList[ind]].line + dx;
 				if (tlin < 1)
 					return;
-				if (tlin > textureScreen.lines)
+				if (tlin > TextureScreen.lines)
 					return;
 			}
-			for (ind = 0; ind < cloxcnt; ind++)
-				tmpTexturePoints[cloxlst[ind]].line += dx;
+			for (ind = 0; ind < SelectedTexturePointsCount; ind++)
+				TempTexturePoints[SelectedTexturePointsList[ind]].line += dx;
 		}
 	}
-	dutxrct(&textureRect);
+	dutxrct(&TextureRect);
 	setMap(RESTCH);
 }
 
@@ -4910,24 +4909,24 @@ void txsnap()
 	float siz2;
 	TXPNT*	tp;
 
-	if (textureScreen.index)
+	if (TextureScreen.index)
 	{
 		savtxt();
 		siz2 = IniFile.gridSize / 2;
-		if (cloxcnt)
+		if (SelectedTexturePointsCount)
 		{
-			for (ind = 0; ind < cloxcnt; ind++)
+			for (ind = 0; ind < SelectedTexturePointsCount; ind++)
 			{
-				tp = &tmpTexturePoints[cloxlst[ind]];
+				tp = &TempTexturePoints[SelectedTexturePointsList[ind]];
 				cnt = (tp->y + siz2) / IniFile.gridSize;
 				tp->y = cnt*IniFile.gridSize;
 			}
 		}
 		else
 		{
-			for (ind = 0; ind < textureScreen.index; ind++)
+			for (ind = 0; ind < TextureScreen.index; ind++)
 			{
-				tp = &tmpTexturePoints[ind];
+				tp = &TempTexturePoints[ind];
 				cnt = (tp->y + siz2) / IniFile.gridSize;
 				tp->y = cnt*IniFile.gridSize;
 			}
@@ -4940,7 +4939,7 @@ void txtkey(unsigned cod)
 {
 	TCHAR chr;
 
-	if (hBtnSideWindow)
+	if (SideWindowButton)
 	{
 		switch (cod)
 		{
@@ -4961,18 +4960,18 @@ void txtkey(unsigned cod)
 
 		case 8:	//backspace
 
-			if (textureInputIndex)
-				textureInputIndex--;
+			if (TextureInputIndex)
+				TextureInputIndex--;
 			goto txskp;
 		}
 		if (txdig(cod, &chr))
 		{
-			textureInputBuffer[textureInputIndex] = chr;
-			textureInputIndex++;
+			TextureInputBuffer[TextureInputIndex] = chr;
+			TextureInputIndex++;
 		}
 	txskp:;
-		textureInputBuffer[textureInputIndex] = 0;
-		SetWindowText(hBtnSideWindow, textureInputBuffer);
+		TextureInputBuffer[TextureInputIndex] = 0;
+		SetWindowText(SideWindowButton, TextureInputBuffer);
 		return;
 	}
 	switch (cod)
@@ -5041,7 +5040,7 @@ void txtkey(unsigned cod)
 
 	case 'V':
 
-		if (OpenClipboard(ThredWindow))
+		if (OpenClipboard(ThrEdWindow))
 			txtclp();
 		break;
 
@@ -5105,17 +5104,17 @@ void setxt()
 	setMap(TXFIL);
 	ClipRectSize.cx = SelectedForm->fillSpacing;
 	ClipRectSize.cy = SelectedForm->fillInfo.texture.height;
-	textureSegments = (RNGCNT*)&MarkedStitchMap;
-	pbak = &texturePointsBuffer[SelectedForm->fillInfo.texture.index];
-	FillMemory(textureSegments, SelectedForm->fillInfo.texture.lines * sizeof(RNGCNT), 0);
-	pbak = &texturePointsBuffer[SelectedForm->fillInfo.texture.index];
+	TextureSegments = (RNGCNT*)&MarkedStitchMap;
+	pbak = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
+	FillMemory(TextureSegments, SelectedForm->fillInfo.texture.lines * sizeof(RNGCNT), 0);
+	pbak = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
 	cnt = SelectedForm->fillInfo.texture.count;
 	if (cnt)
 	{
 		for (ind = cnt - 1; ind >= 0; ind--)
 		{
-			textureSegments[pbak[ind].line - 1].line = ind;
-			textureSegments[pbak[ind].line - 1].stitchCount++;
+			TextureSegments[pbak[ind].line - 1].line = ind;
+			TextureSegments[pbak[ind].line - 1].stitchCount++;
 		}
 	}
 }
@@ -5125,13 +5124,13 @@ void rtrtx()
 	TXPNT*	tps;
 
 	fvars(ClosestFormToCursor);
-	tps = &texturePointsBuffer[SelectedForm->fillInfo.texture.index];
-	textureScreen.index = SelectedForm->fillInfo.texture.count;
-	MoveMemory(tmpTexturePoints, tps, sizeof(TXPNT)*textureScreen.index);
-	textureScreen.areaHeight = SelectedForm->fillInfo.texture.height;
-	textureScreen.spacing = SelectedForm->fillSpacing;
-	textureScreen.lines = SelectedForm->fillInfo.texture.lines;
-	textureScreen.width = textureScreen.lines*textureScreen.spacing + textureScreen.spacing / 2;
+	tps = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
+	TextureScreen.index = SelectedForm->fillInfo.texture.count;
+	MoveMemory(TempTexturePoints, tps, sizeof(TXPNT)*TextureScreen.index);
+	TextureScreen.areaHeight = SelectedForm->fillInfo.texture.height;
+	TextureScreen.spacing = SelectedForm->fillSpacing;
+	TextureScreen.lines = SelectedForm->fillInfo.texture.lines;
+	TextureScreen.width = TextureScreen.lines*TextureScreen.spacing + TextureScreen.spacing / 2;
 	savtxt();
 }
 
@@ -5150,12 +5149,12 @@ void rtrclp()
 void setstxt(unsigned cod, float num)
 {
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), "%.2f", (float)num / PFGRAN);
-	SetWindowText(GetDlgItem(hDlgDesignSize, cod), HelpBuffer);
+	SetWindowText(GetDlgItem(DesignSizeDialog, cod), HelpBuffer);
 }
 
 float getstxt(unsigned cod)
 {
-	GetWindowText(GetDlgItem(hDlgDesignSize, cod), HelpBuffer, HBUFSIZ);
+	GetWindowText(GetDlgItem(DesignSizeDialog, cod), HelpBuffer, HBUFSIZ);
 	return atof(HelpBuffer)*PFGRAN;
 }
 
@@ -5163,7 +5162,7 @@ BOOL chkasp(fPOINT* p_flt)
 {
 	p_flt->x = getstxt(IDC_DESWID);
 	p_flt->y = getstxt(IDC_DESHI);
-	if (p_flt->y / p_flt->x == designAspectRatio)
+	if (p_flt->y / p_flt->x == DesignAspectRatio)
 		return 1;
 	else
 		return 0;
@@ -5175,15 +5174,15 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 
 	fPOINT	tflt;
 
-	hDlgDesignSize = hwndlg;
+	DesignSizeDialog = hwndlg;
 	switch (umsg)
 	{
 	case WM_INITDIALOG:
 
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-		setstxt(IDC_DESWID, designSize.x);
-		setstxt(IDC_DESHI, designSize.y);
-		designAspectRatio = designSize.y / designSize.x;
+		setstxt(IDC_DESWID, DesignSize.x);
+		setstxt(IDC_DESHI, DesignSize.y);
+		DesignAspectRatio = DesignSize.y / DesignSize.x;
 		CheckDlgButton(hwndlg, IDC_REFILF, chku(CHREF));
 		break;
 
@@ -5198,8 +5197,8 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 
 		case IDOK:
 
-			designSize.x = getstxt(IDC_DESWID);
-			designSize.y = getstxt(IDC_DESHI);
+			DesignSize.x = getstxt(IDC_DESWID);
+			DesignSize.y = getstxt(IDC_DESHI);
 			if (IsDlgButtonChecked(hwndlg, IDC_REFILF))
 				setu(CHREF);
 			else
@@ -5224,9 +5223,9 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 			if (!chkasp(&tflt))
 			{
 				if (chkMap(DESCHG))
-					setstxt(IDC_DESWID, (float)tflt.y / designAspectRatio);
+					setstxt(IDC_DESWID, (float)tflt.y / DesignAspectRatio);
 				else
-					setstxt(IDC_DESHI, (float)tflt.x*designAspectRatio);
+					setstxt(IDC_DESHI, (float)tflt.x*DesignAspectRatio);
 			}
 			break;
 		}
@@ -5236,14 +5235,14 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 
 void sadj(fPOINTATTR* pt)
 {
-	pt->x = (pt->x - designSizeRect.left)*designSizeRatio.x + designSizeRect.left;
-	pt->y = (pt->y - designSizeRect.bottom)*designSizeRatio.y + designSizeRect.bottom;
+	pt->x = (pt->x - DesignSizeRect.left)*DesignSizeRatio.x + DesignSizeRect.left;
+	pt->y = (pt->y - DesignSizeRect.bottom)*DesignSizeRatio.y + DesignSizeRect.bottom;
 }
 
 void sadj(fPOINT* pt)
 {
-	pt->x = (pt->x - designSizeRect.left)*designSizeRatio.x + designSizeRect.left;
-	pt->y = (pt->y - designSizeRect.bottom)*designSizeRatio.y + designSizeRect.bottom;
+	pt->x = (pt->x - DesignSizeRect.left)*DesignSizeRatio.x + DesignSizeRect.left;
+	pt->y = (pt->y - DesignSizeRect.bottom)*DesignSizeRatio.y + DesignSizeRect.bottom;
 }
 
 void nudfn()
@@ -5251,10 +5250,10 @@ void nudfn()
 	unsigned	ind;
 	fPOINT		osiz;
 
-	osiz.x = designSizeRect.right - designSizeRect.left;
-	osiz.y = designSizeRect.top - designSizeRect.bottom;
-	designSizeRatio.x = designSize.x / osiz.x;
-	designSizeRatio.y = designSize.y / osiz.y;
+	osiz.x = DesignSizeRect.right - DesignSizeRect.left;
+	osiz.y = DesignSizeRect.top - DesignSizeRect.bottom;
+	DesignSizeRatio.x = DesignSize.x / osiz.x;
+	DesignSizeRatio.y = DesignSize.y / osiz.y;
 	for (ind = 0; ind < PCSHeader.stitchCount; ind++)
 		sadj(&StitchBuffer[ind]);
 	for (ind = 0; ind < FormVertexIndex; ind++)
@@ -5272,33 +5271,33 @@ void nudsiz()
 	flg = 0;
 	if (PCSHeader.stitchCount)
 	{
-		stchrct(&designSizeRect);
+		stchrct(&DesignSizeRect);
 		flg = 1;
 	}
 	else
 	{
 		if (FormIndex)
 		{
-			frmrct(&designSizeRect);
+			frmrct(&DesignSizeRect);
 			flg = 2;
 		}
 	}
 	if (flg)
 	{
-		osiz.x = designSize.x = designSizeRect.right - designSizeRect.left;
-		osiz.y = designSize.y = designSizeRect.top - designSizeRect.bottom;
-		if (DialogBox(ThredInstance, MAKEINTRESOURCE(IDD_SIZ), ThredWindow, (DLGPROC)setsprc))
+		osiz.x = DesignSize.x = DesignSizeRect.right - DesignSizeRect.left;
+		osiz.y = DesignSize.y = DesignSizeRect.top - DesignSizeRect.bottom;
+		if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, (DLGPROC)setsprc))
 		{
 			flg = 0;
-			if (designSize.x > IniFile.hoopSizeX)
+			if (DesignSize.x > IniFile.hoopSizeX)
 			{
-				IniFile.hoopSizeX = designSize.x*1.05;
+				IniFile.hoopSizeX = DesignSize.x*1.05;
 				UnzoomedRect.x = IniFile.hoopSizeX;
 				flg = 1;
 			}
-			if (designSize.y > IniFile.hoopSizeY)
+			if (DesignSize.y > IniFile.hoopSizeY)
 			{
-				IniFile.hoopSizeY = designSize.y*1.05;
+				IniFile.hoopSizeY = DesignSize.y*1.05;
 				UnzoomedRect.y = IniFile.hoopSizeY;
 				flg = 1;
 			}
@@ -5338,13 +5337,13 @@ extern void pxCor2stch(POINT pnt);
 void mvshft()
 {
 	if (chkMap(BOXZUM) && setMap(VCAPT))
-		SetCapture(ThredWindow);
+		SetCapture(ThrEdWindow);
 	if (chkMap(BZUMIN))
 	{
 		if (Msg.wParam&MK_LBUTTON)
 		{
 			if (setMap(VCAPT))
-				SetCapture(ThredWindow);
+				SetCapture(ThrEdWindow);
 			unbBox();
 			ZoomBoxLine[1].x = ZoomBoxLine[2].x = Msg.pt.x - StitchWindowOrigin.x;
 			ZoomBoxLine[2].y = ZoomBoxLine[3].y = Msg.pt.y - StitchWindowOrigin.y;
@@ -5373,7 +5372,7 @@ void setshft()
 	unsigned ind, lin;
 
 	savtxt();
-	cloxlst = (unsigned*)&OSequence;
+	SelectedTexturePointsList = (unsigned*)&OSequence;
 	unbBox();
 	rstMap(BZUMIN);
 	pxCor2stch(ZoomBoxLine[0]);
@@ -5383,16 +5382,16 @@ void setshft()
 	srct.bottom = SelectedPoint.y;
 	srct.right = SelectedPoint.x;
 	rstMap(TXIN);
-	textureScreen.index = 0;
+	TextureScreen.index = 0;
 	lin = 1;
 	for (ind = 0; ind < PCSHeader.stitchCount; ind++)
 	{
 		if (inrct(srct, StitchBuffer[ind]))
 		{
 			setMap(TXIN);
-			tmpTexturePoints[textureScreen.index].line = lin;
-			tmpTexturePoints[textureScreen.index].y = StitchBuffer[ind].y - srct.bottom;
-			textureScreen.index++;
+			TempTexturePoints[TextureScreen.index].line = lin;
+			TempTexturePoints[TextureScreen.index].y = StitchBuffer[ind].y - srct.bottom;
+			TextureScreen.index++;
 		}
 		else
 		{
@@ -5400,10 +5399,10 @@ void setshft()
 				lin++;
 		}
 	}
-	if (textureScreen.index) { lin = tmpTexturePoints[textureScreen.index - 1].line; }
-	textureScreen.spacing = (srct.right - srct.left) / lin;
-	textureScreen.areaHeight = srct.top - srct.bottom;
-	textureScreen.width = textureScreen.spacing*lin + textureScreen.spacing / 2;
+	if (TextureScreen.index) { lin = TempTexturePoints[TextureScreen.index - 1].line; }
+	TextureScreen.spacing = (srct.right - srct.left) / lin;
+	TextureScreen.areaHeight = srct.top - srct.bottom;
+	TextureScreen.width = TextureScreen.spacing*lin + TextureScreen.spacing / 2;
 	setMap(TXTRED);
 	setMap(RESTCH);
 }
@@ -5453,7 +5452,7 @@ void txdun()
 	int ind;
 	//char* signature="txh";
 
-	if (textureHistory[0].count)
+	if (TextureHistory[0].count)
 	{
 		if (txnam(nam, sizeof(nam)))
 		{
@@ -5461,12 +5460,12 @@ void txdun()
 			if (hnam != INVALID_HANDLE_VALUE)
 			{
 				WriteFile(hnam, (char*)"txh", 4, &rot, 0);
-				WriteFile(hnam, (int*)&textureHistoryIndex, 4, &rot, 0);
-				WriteFile(hnam, (TXHST*)&textureHistory, sizeof(TXHST) * 16, &rot, 0);
+				WriteFile(hnam, (int*)&TextureHistoryIndex, 4, &rot, 0);
+				WriteFile(hnam, (TXHST*)&TextureHistory, sizeof(TXHST) * 16, &rot, 0);
 				for (ind = 0; ind < 16; ind++)
 				{
-					if (textureHistory[ind].count)
-						WriteFile(hnam, (TXPNT*)textureHistory[ind].texturePoint, textureHistory[ind].count * sizeof(TXPNT), &rot, 0);
+					if (TextureHistory[ind].count)
+						WriteFile(hnam, (TXPNT*)TextureHistory[ind].texturePoint, TextureHistory[ind].count * sizeof(TXPNT), &rot, 0);
 				}
 			}
 			CloseHandle(hnam);
@@ -5485,8 +5484,8 @@ void redtx()
 	unsigned int ind;
 	char sig[4] = { 0 };
 
-	textureHistoryIndex = 15;
-	ZeroMemory(&textureHistory, sizeof(TXHST) * 16);
+	TextureHistoryIndex = 15;
+	ZeroMemory(&TextureHistory, sizeof(TXHST) * 16);
 	if (txnam(nam, sizeof(nam)))
 	{
 		hnam = CreateFile(nam, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
@@ -5495,16 +5494,16 @@ void redtx()
 			ReadFile(hnam, (char*)&sig, 4, &l_BytesRead, 0);
 			if (!strcmp(sig, "txh"))
 			{
-				ReadFile(hnam, (int*)&textureHistoryIndex, 4, &l_BytesRead, 0);
-				ReadFile(hnam, (TXHST*)&textureHistory, sizeof(TXHST) * 16, &l_BytesRead, 0);
+				ReadFile(hnam, (int*)&TextureHistoryIndex, 4, &l_BytesRead, 0);
+				ReadFile(hnam, (TXHST*)&TextureHistory, sizeof(TXHST) * 16, &l_BytesRead, 0);
 				//ToDo - texturePoint should be a null pointer at this point as no memory has been allocated, but it is not
 				//       because the old pointer value is read in from the file, so zero it out
 				for (ind = 0; ind < (l_BytesRead / sizeof(TXHST)); ind++)
 				{
-					if (textureHistory[ind].count)
+					if (TextureHistory[ind].count)
 					{
-						textureHistory[ind].texturePoint = new TXPNT[textureHistory[ind].count];
-						ReadFile((TXPNT*)hnam, textureHistory[ind].texturePoint, sizeof(TXPNT)*textureHistory[ind].count, &l_BytesRead, 0);
+						TextureHistory[ind].texturePoint = new TXPNT[TextureHistory[ind].count];
+						ReadFile((TXPNT*)hnam, TextureHistory[ind].texturePoint, sizeof(TXPNT)*TextureHistory[ind].count, &l_BytesRead, 0);
 					}
 				}
 				setMap(WASTXBAK);
@@ -5679,7 +5678,7 @@ unsigned frmchkfn()
 			bc.attribute |= BADCLP;
 		if (bc.sat != (int)SatinConnectIndex)
 			bc.attribute |= BADSAT;
-		if (bc.tx != textureIndex)
+		if (bc.tx != TextureIndex)
 			bc.attribute |= BADTX;
 	}
 	return bc.attribute;
@@ -5786,7 +5785,7 @@ void repflt()
 				FormIndex = ind;
 				ClipPointIndex = bc.clip;
 				SatinConnectIndex = bc.sat;
-				textureIndex = bc.tx;
+				TextureIndex = bc.tx;
 				chkfstch();
 				adbad(IDS_FRMDAT, FormIndex - ind + 1);
 				goto rfltskp;
@@ -5919,7 +5918,7 @@ void reptx()
 		if (istx(ind))
 		{
 			fp = &FormList[ind];
-			if (textureIndex > fp->fillInfo.texture.index + fp->fillInfo.texture.count)
+			if (TextureIndex > fp->fillInfo.texture.index + fp->fillInfo.texture.count)
 			{
 				MoveMemory(&SatinConnects[loc], &SatinConnects[fp->fillInfo.texture.index], fp->fillInfo.texture.count * sizeof(SATCON));
 				fp->fillInfo.texture.index = loc;
@@ -5928,9 +5927,9 @@ void reptx()
 			}
 			else
 			{
-				if (textureIndex > fp->fillInfo.texture.index)
+				if (TextureIndex > fp->fillInfo.texture.index)
 				{
-					fp->fillInfo.texture.count = textureIndex - fp->fillInfo.texture.index;
+					fp->fillInfo.texture.count = TextureIndex - fp->fillInfo.texture.index;
 					MoveMemory(&SatinConnects[loc], &SatinConnects[fp->fillInfo.texture.index], fp->fillInfo.texture.count * sizeof(SATCON));
 					fp->fillInfo.texture.index = loc;
 					bcup(ind, &bc);
@@ -5941,7 +5940,7 @@ void reptx()
 			}
 		}
 	}
-	textureIndex = loc;
+	TextureIndex = loc;
 }
 
 void repar()

@@ -386,6 +386,7 @@ extern	void			vrtclp ();
 extern	void			vrtsclp ();
 extern	void			wavfrm ();
 
+extern	unsigned		ActivePointIndex;
 extern	fRECTANGLE		AllItemsRect;
 extern	double			BorderWidth;
 extern	BSEQPNT			BSequence[BSEQLEN];
@@ -394,9 +395,10 @@ extern	fPOINT			ClipPoints[MAXCLPNTS];
 extern	unsigned		ClosestFormToCursor;
 extern	unsigned		ClosestVertexToCursor;
 extern	unsigned		ClipPointIndex;
-extern	TCHAR*			cpyrit;
 extern	SATCON*			CurrentFormConnections;
 extern	fPOINT*			CurrentFormVertices;
+extern	HWND			DataSheetLabels[LASTLIN];
+extern	HWND			DataSheetValues[LASTLIN];
 extern	POINT			FormLines[MAXFRMLINS];
 extern	unsigned		FormVertexIndex;
 extern	fPOINT			FormMoveDelta;
@@ -404,16 +406,11 @@ extern	unsigned		FormIndex;
 extern	FRMHED			FormList[MAXFORMS];
 extern	POINT			FormOutlineRect[10];
 extern	fPOINT			FormVertices[MAXFRMPNTS];
-extern	HWND			hindx;
 extern	TCHAR			HelpBuffer[HBUFSIZ];
-extern	HWND			hlptxt;
-extern	HWND			MsgWindow;
-extern	HWND			hnxt;
 extern	double			HorizontalRatio;
-extern	HWND			hsrch;
-extern	fPOINT			interleaveSequence[MAXSEQ];
+extern	fPOINT			InterleaveSequence[MAXSEQ];
 extern	fPOINT			LowerLeftStitch;
-extern	POINT			RubberBandLine[3];
+extern	HWND			MsgWindow;
 extern	unsigned		NewFormVertexCount;
 extern	unsigned		OutputIndex;
 extern	fPOINT			OSequence[OSEQLEN];
@@ -421,7 +418,7 @@ extern	float			PicotSpacing;
 extern	long			PreferenceWindowWidth;
 extern	unsigned		PreviousFormIndex;
 extern	unsigned		PseudoRandomValue;
-extern	int				textureHistoryIndex;
+extern	POINT			RubberBandLine[3];
 extern	unsigned		SatinConnectIndex;
 extern	SATCON			SatinConnects[MAXSAC];
 extern	unsigned		SelectedFormControlVertex;
@@ -436,23 +433,21 @@ extern	double			SpiralWrap;
 extern	TCHAR*			StringTable[STR_LEN];
 extern	double			StarRatio;
 extern	double			StitchSpacing;
-extern	HWND			DataSheetValues[LASTLIN];
-extern	TXHST			textureHistory[16];
-extern	HWND			DataSheetLabels[LASTLIN];
-extern	TXTSCR			textureScreen;
-extern	int				textureIndex;
-extern	TXPNT			texturePointsBuffer[MAXSEQ];
+extern	int				TextureHistoryIndex;
+extern	TXHST			TextureHistory[16];
+extern	TXTSCR			TextureScreen;
+extern	int				TextureIndex;
+extern	TXPNT			TexturePointsBuffer[MAXSEQ];
 extern	double			VerticalRatio;
 extern	unsigned short	WordParam;
-extern	unsigned		ActivePointIndex;
 extern	double			XYratio;
 
 //select box
 #define				NERCNT		4		//number of entries in the near array
 
 //main variables
-HINSTANCE		ThredInstance;			//main instance handle
-HWND			ThredWindow;			//main window handle
+HINSTANCE		ThrEdInstance;			//main instance handle
+HWND			ThrEdWindow;			//main window handle
 MSG				Msg;					//main message loop message
 RECT			ThredWindowRect;		//main window size
 RECT			ColorBarRect;			//color bar rectangle
@@ -854,8 +849,8 @@ TCHAR			UserBMPFileName[_MAX_PATH];	//bitmap file name from user load
 OPENFILENAME	OpenFileName = {
 
 	sizeof(OPENFILENAME),	//lStructsize
-	ThredWindow,			//hwndOwner 
-	ThredInstance,			//hInstance 
+	ThrEdWindow,			//hwndOwner 
+	ThrEdInstance,			//hInstance 
 	AllFilter,				//lpstrFilter 
 	CustomFilter,			//lpstrCustomFilter 
 	_MAX_PATH,				//nMaxCustFilter 
@@ -888,8 +883,8 @@ unsigned			InsertedStitchCount;	//saved stitch pointer for inserting files
 
 OPENFILENAME OpenBitmapName = {
 	sizeof(OPENFILENAME),	//lStructsize
-	ThredWindow,			//hwndOwner 
-	ThredInstance,			//hInstance 
+	ThrEdWindow,			//hwndOwner 
+	ThrEdInstance,			//hInstance 
 	BmpFilter,				//lpstrFilter 
 	CustomFilter,			//lpstrCustomFilter 
 	_MAX_PATH,				//nMaxCustFilter 
@@ -1890,7 +1885,7 @@ BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 			GetWindowText(hwnd, IniFile.designerName, 50);
 			EndDialog(hwndlg, 0);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED], IniFile.designerName);
-			SetWindowText(ThredWindow, MsgBuffer);
+			SetWindowText(ThrEdWindow, MsgBuffer);
 			return TRUE;
 		}
 	}
@@ -1899,7 +1894,7 @@ BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 
 void getdes()
 {
-	DialogBox(ThredInstance, MAKEINTRESOURCE(IDD_DESNAM), ThredWindow, (DLGPROC)dnamproc);
+	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, (DLGPROC)dnamproc);
 }
 
 BOOL isclp(unsigned find) {
@@ -2391,7 +2386,7 @@ void dudat() {
 		free(UndoBuffer[UndoBufferWriteIndex]);
 	size = sizeof(BAKHED) + sizeof(FRMHED)*FormIndex + sizeof(fPOINTATTR)*PCSHeader.stitchCount
 		+ sizeof(fPOINT)*(FormVertexIndex + ClipPointIndex) + sizeof(SATCON)*SatinConnectIndex + sizeof(COLORREF) * 16 +
-		sizeof(TXPNT)*textureIndex;
+		sizeof(TXPNT)*TextureIndex;
 	UndoBuffer[UndoBufferWriteIndex] = calloc(size,sizeof(unsigned));
 	backupData = (BAKHED*)UndoBuffer[UndoBufferWriteIndex];
 	if (backupData) {
@@ -2426,9 +2421,9 @@ void dudat() {
 		backupData->colors = (COLORREF*)&backupData->clipPoints[ClipPointIndex];
 		MoveMemory(backupData->colors, &UserColor, sizeof(COLORREF) * 16);
 		backupData->texturePoints = (TXPNT*)&backupData->colors[16];
-		backupData->texturePointCount = textureIndex;
-		if (textureIndex)
-			MoveMemory(backupData->texturePoints, &texturePointsBuffer, sizeof(TXPNT)*textureIndex);
+		backupData->texturePointCount = TextureIndex;
+		if (TextureIndex)
+			MoveMemory(backupData->texturePoints, &TexturePointsBuffer, sizeof(TXPNT)*TextureIndex);
 	}
 }
 
@@ -3018,7 +3013,7 @@ void ritlayr() {
 
 void nuRct() {
 
-	GetClientRect(ThredWindow, &ThredWindowRect);
+	GetClientRect(ThrEdWindow, &ThredWindowRect);
 	GetWindowRect(ColorBar, &ColorBarRect);
 	GetWindowRect(ButtonWin[HMINLEN], &MinLenRect);
 	GetWindowRect(ButtonWin[HMAXLEN], &MaxLenRect);
@@ -3032,8 +3027,8 @@ void nuRct() {
 	DeleteDC(StitchWindowMemDC);
 	StitchWindowMemDC = CreateCompatibleDC(StitchWindowDC);
 	GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
-	ReleaseDC(ThredWindow, ThredDC);
-	ThredDC = GetDC(ThredWindow);
+	ReleaseDC(ThrEdWindow, ThredDC);
+	ThredDC = GetDC(ThrEdWindow);
 	SetStretchBltMode(ThredDC, COLORONCOLOR);
 	GetDCOrgEx(ThredDC, &ThredWindowOrigin);
 	GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
@@ -3298,7 +3293,7 @@ void ritini() {
 	IniFile.picotSpace = PicotSpacing;
 	if (!chku(SAVMAX)) {
 
-		GetWindowRect(ThredWindow, &windowRect);
+		GetWindowRect(ThrEdWindow, &windowRect);
 		IniFile.initialWindowCoords.left = windowRect.left;
 		IniFile.initialWindowCoords.right = windowRect.right;
 		IniFile.initialWindowCoords.bottom = windowRect.bottom;
@@ -3537,7 +3532,7 @@ void savmsg() {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(ThredInstance, IDS_SAVFIL, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_SAVFIL, buf, HBUFSIZ);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buf, ThrName);
 }
 
@@ -3575,7 +3570,7 @@ void dun() {
 		} else {
 
 			savmsg();
-			if (MessageBox(ThredWindow, MsgBuffer, StringTable[STR_CLOS], MB_YESNO) == IDYES)
+			if (MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_CLOS], MB_YESNO) == IDYES)
 				save();
 			reldun();;
 		}
@@ -3594,7 +3589,7 @@ void dusid(unsigned str) {
 		SideWindowSize.y,
 		SideMessageWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 	SideWindowLocation++;
 }
@@ -3638,9 +3633,9 @@ void sidmsg(HWND hndl, TCHAR** pstr, unsigned cnt) {
 			chkrct.top - ThredWindowOrigin.y - 3,
 			SideWindowSize.x + 12,
 			SideWindowSize.y*cnt1 + 12,
-			ThredWindow,
+			ThrEdWindow,
 			NULL,
-			ThredInstance,
+			ThrEdInstance,
 			NULL);
 		for (ind = 0; ind < cnt; ind++) {
 
@@ -3693,9 +3688,9 @@ void sidmsg(HWND hndl, TCHAR** pstr, unsigned cnt) {
 			chkrct.top - ThredWindowOrigin.y - 3,
 			SideWindowSize.x + 12,
 			SideWindowSize.y*cnt1 + 12,
-			ThredWindow,
+			ThrEdWindow,
 			NULL,
-			ThredInstance,
+			ThrEdInstance,
 			NULL);
 		if (FormMenuChoice == LLAYR) {
 
@@ -4545,9 +4540,9 @@ void stchWnd() {
 		0,
 		StitchWindowSize.x,
 		StitchWindowSize.y,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 
 	GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
@@ -4560,9 +4555,9 @@ void stchWnd() {
 		0,
 		SCROLSIZ,
 		StitchWindowSize.y,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 
 	HorizontalScrollBar = CreateWindow(
@@ -4573,9 +4568,9 @@ void stchWnd() {
 		StitchWindowSize.y,
 		StitchWindowSize.x,
 		SCROLSIZ,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 	ShowWindow(VerticalScrollBar, FALSE);
 	ShowWindow(HorizontalScrollBar, FALSE);
@@ -4611,9 +4606,9 @@ HWND nuSiz(unsigned wndPnt) {
 		ButtonHeight*(wndPnt + VerticalIndex),
 		ButtonWidth,
 		ButtonHeight,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -4681,9 +4676,9 @@ void redbak() {
 	}
 	for (ind = 0; ind < 16; ind++)
 		redraw(UserColorWin[ind]);
-	textureIndex = bdat->texturePointCount;
-	if (textureIndex)
-		MoveMemory(&texturePointsBuffer, bdat->texturePoints, sizeof(TXPNT)*textureIndex);
+	TextureIndex = bdat->texturePointCount;
+	if (TextureIndex)
+		MoveMemory(&TexturePointsBuffer, bdat->texturePoints, sizeof(TXPNT)*TextureIndex);
 	coltab();
 	setMap(RESTCH);
 }
@@ -5038,14 +5033,14 @@ void bfil() {
 				SelectObject(BitmapDC, BitmapFileHandle);
 				BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, tdc, 0, 0, SRCCOPY);
 				DeleteObject(tbit);
-				ReleaseDC(ThredWindow, tdc);
+				ReleaseDC(ThrEdWindow, tdc);
 			}
 			delete[] MonoBitmapData;
 		} else {
 
 			CloseHandle(BitmapFileHandle);
 			rstMap(MONOMAP);
-			BitmapFileHandle = (HBITMAP)LoadImage(ThredInstance, UserBMPFileName, IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
+			BitmapFileHandle = (HBITMAP)LoadImage(ThrEdInstance, UserBMPFileName, IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
 			SelectObject(BitmapDC, BitmapFileHandle);
 			setMap(RESTCH);
 		}
@@ -5414,7 +5409,7 @@ void nuFil() {
 		if (PCSBMPFileName[0]) {
 
 			DeleteObject(BitmapFileHandle);
-			ReleaseDC(ThredWindow, BitmapDC);
+			ReleaseDC(ThrEdWindow, BitmapDC);
 			*PCSBMPFileName = 0;
 		}
 		FileHandle = CreateFile(WorkingFileName, GENERIC_READ, 0, NULL,
@@ -5433,7 +5428,7 @@ void nuFil() {
 			rstMap(SAVACT);
 			rstMap(BAKING);
 			rstMap(REDUSHO);
-			textureIndex = 0;
+			TextureIndex = 0;
 			EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
 			deldu();
 			strcpy_s(DesignerName, IniFile.designerName);
@@ -5628,8 +5623,8 @@ void nuFil() {
 							ClipPointIndex = BytesRead / sizeof(fPOINT);
 							setMap(BADFIL);
 						}
-						ReadFile(FileHandle, (TXPNT*)texturePointsBuffer, ExtendedHeader.texturePointCount * sizeof(TXPNT), &BytesRead, 0);
-						textureIndex = BytesRead / sizeof(TXPNT);
+						ReadFile(FileHandle, (TXPNT*)TexturePointsBuffer, ExtendedHeader.texturePointCount * sizeof(TXPNT), &BytesRead, 0);
+						TextureIndex = BytesRead / sizeof(TXPNT);
 						if (rstMap(BADFIL))
 							bfilmsg();
 						for (ind = 0; ind < FormIndex; ind++) {
@@ -5869,7 +5864,7 @@ void nuFil() {
 		}
 		lenCalc();
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRDBY], WorkingFileName, DesignerName);
-		SetWindowText(ThredWindow, MsgBuffer);
+		SetWindowText(ThrEdWindow, MsgBuffer);
 		CloseHandle(FileHandle);
 		setMap(INIT);
 		rstMap(TRSET);
@@ -6312,7 +6307,7 @@ BOOL chkattr(TCHAR* nam) {
 	if (attr&FILE_ATTRIBUTE_READONLY&&attr != 0xffffffff) {
 
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_OVRLOK], nam);
-		ind = MessageBox(ThredWindow, MsgBuffer, StringTable[STR_OVRIT], MB_YESNO);
+		ind = MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_OVRIT], MB_YESNO);
 		if (ind == IDYES)
 			SetFileAttributes(nam, attr&(0xffffffff ^ FILE_ATTRIBUTE_READONLY));
 		else
@@ -6641,7 +6636,7 @@ void savAs() {
 			rstMap(CMPDO);
 			thrsav();
 			sav();
-			SetWindowText(ThredWindow, ThrName);
+			SetWindowText(ThrEdWindow, ThrName);
 		}
 	}
 }
@@ -6672,7 +6667,7 @@ void save() {
 COLORREF nuCol(COLORREF init) {
 
 	ColorStruct.Flags = CC_ANYCOLOR | CC_RGBINIT;
-	ColorStruct.hwndOwner = ThredWindow;
+	ColorStruct.hwndOwner = ThrEdWindow;
 	ColorStruct.lCustData = 0;
 	ColorStruct.lpCustColors = CustomColor;
 	ColorStruct.lpfnHook = 0;
@@ -6685,7 +6680,7 @@ COLORREF nuCol(COLORREF init) {
 COLORREF nuBak() {
 
 	BackgroundColorStruct.Flags = CC_ANYCOLOR | CC_RGBINIT;
-	BackgroundColorStruct.hwndOwner = ThredWindow;
+	BackgroundColorStruct.hwndOwner = ThrEdWindow;
 	BackgroundColorStruct.lCustData = 0;
 	BackgroundColorStruct.lpCustColors = CustomBackgroundColor;
 	BackgroundColorStruct.lpfnHook = 0;
@@ -6698,7 +6693,7 @@ COLORREF nuBak() {
 COLORREF nuBit() {
 
 	BitMapColorStruct.Flags = CC_ANYCOLOR | CC_RGBINIT;
-	BitMapColorStruct.hwndOwner = ThredWindow;
+	BitMapColorStruct.hwndOwner = ThrEdWindow;
 	BitMapColorStruct.lCustData = 0;
 	BitMapColorStruct.lpCustColors = BitmapBackgroundColors;
 	BitMapColorStruct.lpfnHook = 0;
@@ -7558,7 +7553,7 @@ void istch() {
 
 		setMap(INSRT);
 		duIns();
-		SetCapture(ThredWindow);
+		SetCapture(ThrEdWindow);
 		ritnum(STR_NUMSEL, ClosestPointIndex);
 		nuAct(ClosestPointIndex);
 	}
@@ -7663,11 +7658,11 @@ void newFil() {
 
 		PCSBMPFileName[0] = 0;
 		DeleteObject(BitmapFileHandle);
-		ReleaseDC(ThredWindow, BitmapDC);
+		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED], IniFile.designerName);
 	deldu();
-	SetWindowText(ThredWindow, MsgBuffer);
+	SetWindowText(ThrEdWindow, MsgBuffer);
 	strcpy_s(ThrName, StringTable[STR_NUFIL]);
 	ritfnam(IniFile.designerName);
 	strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
@@ -7692,7 +7687,7 @@ void newFil() {
 	PCSHeader.stitchCount = 0;
 	FormVertexIndex = 0;
 	ClipPointIndex = 0;
-	textureIndex = 0;
+	TextureIndex = 0;
 	SatinConnectIndex = 0;
 	FormIndex = 0;
 	WorkingFileName[0] = 0;
@@ -8551,7 +8546,7 @@ void duclip() {
 
 	if (chkMap(FPSEL)) {
 
-		if (OpenClipboard(ThredWindow)) {
+		if (OpenClipboard(ThrEdWindow)) {
 
 			EmptyClipboard();
 			ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
@@ -8581,7 +8576,7 @@ void duclip() {
 		tabmsg(IDS_INSF);
 	else {
 
-		if (OpenClipboard(ThredWindow)) {
+		if (OpenClipboard(ThrEdWindow)) {
 
 			EmptyClipboard();
 			ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
@@ -8658,7 +8653,7 @@ void duclip() {
 					SelectedForm = &FormList[SelectedFormList[ind]];
 					if (istx(SelectedFormList[ind]))
 					{
-						MoveMemory(&ptx[ine], &texturePointsBuffer[SelectedForm->fillInfo.texture.index], SelectedForm->fillInfo.texture.count * sizeof(TXPNT));
+						MoveMemory(&ptx[ine], &TexturePointsBuffer[SelectedForm->fillInfo.texture.index], SelectedForm->fillInfo.texture.count * sizeof(TXPNT));
 						tfrm[ind].fillInfo.texture.index = ine;
 						ine += SelectedForm->fillInfo.texture.count;
 					}
@@ -8749,7 +8744,7 @@ void duclip() {
 					ptx = (TXPNT*)&l_clipData[ind];
 					if (istx(ClosestFormToCursor))
 					{
-						ptxs = &texturePointsBuffer[SelectedForm->fillInfo.texture.index];
+						ptxs = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
 						for (ind = 0; ind < SelectedForm->fillInfo.texture.count; ind++)
 						{
 							ptx[ind].line = ptxs[ind].line;
@@ -8875,7 +8870,7 @@ void numWnd() {
 		ButtonHeight,
 		MainStitchWin,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 	MsgIndex = 0;
 	*MsgBuffer = 0;
@@ -9296,7 +9291,7 @@ void lodbmp() {
 	if (PCSBMPFileName[0]) {
 
 		DeleteObject(BitmapFileHandle);
-		ReleaseDC(ThredWindow, BitmapDC);
+		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
 	if (GetOpenFileName(&OpenBitmapName)) {
 
@@ -9329,7 +9324,7 @@ void hidbit() {
 void patdun() {
 
 	rstMap(RUNPAT);
-	KillTimer(ThredWindow, 0);
+	KillTimer(ThrEdWindow, 0);
 	setMap(WASPAT);
 	movStch();
 	setMap(RESTCH);
@@ -9521,7 +9516,7 @@ void dubuf() {
 	ExtendedHeader.auxFormat = IniFile.auxFileType;
 	ExtendedHeader.hoopSizeX = IniFile.hoopSizeX;
 	ExtendedHeader.hoopSizeY = IniFile.hoopSizeY;
-	ExtendedHeader.texturePointCount = textureIndex;
+	ExtendedHeader.texturePointCount = TextureIndex;
 	durit(&ExtendedHeader, sizeof(STREX));
 	durit(StitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR));
 	if (!PCSBMPFileName[0]) {
@@ -9583,7 +9578,7 @@ void dubuf() {
 		durit(tpnts, len * sizeof(fPOINT));
 		durit(spnts, slen * sizeof(SATCON));
 		durit(epnts, elen * sizeof(fPOINT));
-		durit(texturePointsBuffer, textureIndex * sizeof(TXPNT));
+		durit(TexturePointsBuffer, TextureIndex * sizeof(TXPNT));
 		delete[] theds;
 		delete[] tpnts;
 		delete[] spnts;
@@ -9669,7 +9664,7 @@ void setsped() {
 	}
 	if (StitchesPerFrame < 2)
 		StitchesPerFrame = 2;
-	SetTimer(ThredWindow, 0, len, 0);
+	SetTimer(ThrEdWindow, 0, len, 0);
 }
 
 void f1del() {
@@ -9749,14 +9744,14 @@ void frmdel() {
 void deltot() {
 
 	strcpy_s(DesignerName, IniFile.designerName);
-	FormIndex = PCSHeader.stitchCount = FormVertexIndex = ClipPointIndex = SatinConnectIndex = textureIndex = 0;
+	FormIndex = PCSHeader.stitchCount = FormVertexIndex = ClipPointIndex = SatinConnectIndex = TextureIndex = 0;
 	rstMap(GMRK);
 	rstAll();
 	coltab();
 	zumhom();
 	strcpy_s(DesignerName, IniFile.designerName);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRDBY], ThrName, DesignerName);
-	SetWindowText(ThredWindow, MsgBuffer);
+	SetWindowText(ThrEdWindow, MsgBuffer);
 }
 
 BOOL wastch() {
@@ -10008,9 +10003,9 @@ void movi() {
 				0,
 				StitchWindowSize.x,
 				SCROLSIZ,
-				ThredWindow,
+				ThrEdWindow,
 				NULL,
-				ThredInstance,
+				ThrEdInstance,
 				NULL);
 		}
 		if (chkMap(ZUMED))
@@ -10156,9 +10151,9 @@ void vubak() {
 				vloc,
 				dx,
 				dy,
-				ThredWindow,
+				ThrEdWindow,
 				NULL,
-				ThredInstance,
+				ThrEdInstance,
 				NULL);
 		}
 		setMap(BAKSHO);
@@ -10730,7 +10725,7 @@ void rtrclpfn() {
 
 	unsigned ind, len = 0;
 
-	if (OpenClipboard(ThredWindow)) {
+	if (OpenClipboard(ThrEdWindow)) {
 
 		fvars(ClosestFormToCursor);
 		if (iseclp(ClosestFormToCursor)) {
@@ -11858,8 +11853,8 @@ void insfil() {
 	OPENFILENAME oin = {
 
 		sizeof(OPENFILENAME),	//lStructsize
-		ThredWindow,					//hwndOwner 
-		ThredInstance,					//hInstance 
+		ThrEdWindow,					//hwndOwner 
+		ThrEdInstance,					//hInstance 
 		"THR files\0*.thr\0\0",	//lpstrFilter 
 		CustomFilter,			//lpstrCustomFilter 
 		_MAX_PATH,				//nMaxCustFilter 
@@ -12025,7 +12020,7 @@ void insfil() {
 								ExtendedHeader.creatorName[ind] = thedx.creatorName[ind];
 							redfnam(DesignerName);
 							sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRDBY], ThrName, DesignerName);
-							SetWindowText(ThredWindow, MsgBuffer);
+							SetWindowText(ThrEdWindow, MsgBuffer);
 						}
 					}
 					InsertCenter.x = (trct.right - trct.left) / 2 + trct.left;
@@ -12381,9 +12376,9 @@ void sidhup() {
 		huprct.top - ThredWindowOrigin.y,
 		ButtonWidthX3 + ButtonWidth * 2 + 6,
 		ButtonHeight*HUPS + 6,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 	for (ind = 0; ind < HUPS; ind++) {
 
@@ -12397,7 +12392,7 @@ void sidhup() {
 			ButtonHeight,
 			SideMessageWindow,
 			NULL,
-			ThredInstance,
+			ThrEdInstance,
 			NULL);
 	}
 }
@@ -13354,7 +13349,7 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 void lock() {
 
-	DialogBox(ThredInstance, MAKEINTRESOURCE(IDD_DLOCK), ThredWindow, (DLGPROC)LockPrc);
+	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, (DLGPROC)LockPrc);
 }
 
 unsigned colsum(COLORREF col) {
@@ -13450,7 +13445,7 @@ void untrace() {
 	if (rstMap(WASTRAC)) {
 
 		DeleteObject(TraceBitmap);
-		ReleaseDC(ThredWindow, TraceDC);
+		ReleaseDC(ThrEdWindow, TraceDC);
 		rstMap(WASEDG);
 		for (ind = 0; ind < 16; ind++) {
 
@@ -14226,9 +14221,9 @@ void trnumwnd0(int pos) {
 		pos,
 		ButtonWidth,
 		ButtonHeight,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -14242,9 +14237,9 @@ void trnumwnd1(int pos) {
 		pos,
 		ButtonWidthX3,
 		ButtonHeight,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -14538,7 +14533,7 @@ void delstch() {
 	savdo();
 	PCSHeader.stitchCount = 0;
 	ClipPointIndex = 0;
-	textureIndex = 0;
+	TextureIndex = 0;
 	rstAll();
 	clrfills();
 	ColorChanges = 0;
@@ -14833,7 +14828,7 @@ void closfn() {
 	*PCSBMPFileName = 0;
 	deldu();
 	clrhbut(3);
-	SetWindowText(ThredWindow, MsgBuffer);
+	SetWindowText(ThrEdWindow, MsgBuffer);
 }
 
 void filclos() {
@@ -15291,21 +15286,21 @@ void setpclp() {
 	POINT		tpnt;
 	unsigned	ind, ine;
 
-	sfCor2px(interleaveSequence[0], &tpnt);
+	sfCor2px(InterleaveSequence[0], &tpnt);
 	FormVerticesAsLine[0].x = tpnt.x;
 	FormVerticesAsLine[0].y = tpnt.y;
-	sfCor2px(interleaveSequence[1], &tpnt);
+	sfCor2px(InterleaveSequence[1], &tpnt);
 	tof.x = Msg.pt.x - StitchWindowOrigin.x - tpnt.x;
 	tof.y = Msg.pt.y - StitchWindowOrigin.y - tpnt.y;
 	for (ind = 0; ind < OutputIndex - 2; ind++) {
 
 		ine = ind + 1;
-		sfCor2px(interleaveSequence[ine], &tpnt);
+		sfCor2px(InterleaveSequence[ine], &tpnt);
 		FormVerticesAsLine[ine].x = tpnt.x + tof.x;
 		FormVerticesAsLine[ine].y = tpnt.y + tof.y;
 	}
 	ind++;
-	sfCor2px(interleaveSequence[ind], &tpnt);
+	sfCor2px(InterleaveSequence[ind], &tpnt);
 	FormVerticesAsLine[ind].x = tpnt.x;
 	FormVerticesAsLine[ind].y = tpnt.y;
 }
@@ -15333,15 +15328,15 @@ void fixpclp() {
 	tpnt.x = Msg.pt.x + FormMoveDelta.x;
 	tpnt.y = Msg.pt.y + FormMoveDelta.y;
 	pxCor2stch(tpnt);
-	pof.x = SelectedPoint.x - interleaveSequence[1].x;
-	pof.y = SelectedPoint.y - interleaveSequence[1].y;
+	pof.x = SelectedPoint.x - InterleaveSequence[1].x;
+	pof.y = SelectedPoint.y - InterleaveSequence[1].y;
 	ine = nxt(ClosestVertexToCursor);
 	cnt = OutputIndex - 2;
 	fltspac(&CurrentFormVertices[ine], cnt);
 	for (ind = 1; ind < OutputIndex - 1; ind++) {
 
-		CurrentFormVertices[ine].x = interleaveSequence[ind].x + pof.x;
-		CurrentFormVertices[ine].y = interleaveSequence[ind].y + pof.y;
+		CurrentFormVertices[ine].x = InterleaveSequence[ind].x + pof.x;
+		CurrentFormVertices[ine].y = InterleaveSequence[ind].y + pof.y;
 		ine++;
 	}
 	SelectedForm->sides += cnt;
@@ -15353,7 +15348,7 @@ void fixpclp() {
 BOOL sidclp() {
 
 	fvars(ClosestFormToCursor);
-	if (OpenClipboard(ThredWindow)) {
+	if (OpenClipboard(ThrEdWindow)) {
 
 		Clip = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
@@ -15659,7 +15654,7 @@ unsigned chkMsg() {
 			if (chkMap(SELPNT)) {
 
 				if (setMap(VCAPT))
-					SetCapture(ThredWindow);
+					SetCapture(ThrEdWindow);
 				unsel();
 				rSelbox();
 				return 1;
@@ -15685,7 +15680,7 @@ unsigned chkMsg() {
 				if (px2stch())
 					ritfcor(&SelectedPoint);
 				if (setMap(VCAPT))
-					SetCapture(ThredWindow);
+					SetCapture(ThrEdWindow);
 				if (chkMap(LIN1)) {
 
 					if (PCSHeader.stitchCount) {
@@ -15706,11 +15701,11 @@ unsigned chkMsg() {
 				return 1;
 			}
 			if (chkMap(BOXZUM) && setMap(VCAPT))
-				SetCapture(ThredWindow);
+				SetCapture(ThrEdWindow);
 			if (chkMap(BZUMIN) && (Msg.wParam&MK_LBUTTON)) {
 
 				if (setMap(VCAPT))
-					SetCapture(ThredWindow);
+					SetCapture(ThrEdWindow);
 				unbBox();
 				ZoomBoxLine[1].x = ZoomBoxLine[2].x = Msg.pt.x - StitchWindowOrigin.x;
 				ZoomBoxLine[2].y = ZoomBoxLine[3].y = Msg.pt.y - StitchWindowOrigin.y;
@@ -16707,7 +16702,7 @@ unsigned chkMsg() {
 
 					duSelbox();
 					setMap(SELPNT);
-					SetCapture(ThredWindow);
+					SetCapture(ThrEdWindow);
 					setMap(VCAPT);
 					rSelbox();
 					return 1;
@@ -17971,7 +17966,7 @@ unsigned chkMsg() {
 						MoveLine1[1].y = StitchSizePixels.y;
 					}
 					dulin();
-					SetCapture(ThredWindow);
+					SetCapture(ThrEdWindow);
 					setMap(CAPT);
 					ritnum(STR_NUMSEL, ClosestPointIndex);
 				}
@@ -17992,7 +17987,7 @@ unsigned chkMsg() {
 					ColorChangeTable[1].stitchIndex = 1;
 					setMap(LIN1);
 					setMap(INSRT);
-					SetCapture(ThredWindow);
+					SetCapture(ThrEdWindow);
 					ClosestPointIndex = 1;
 					setMap(INIT);
 					setMap(BAKEND);
@@ -18976,7 +18971,7 @@ unsigned chkMsg() {
 			{
 				if (chkMap(FORMSEL))
 				{
-					PostMessage(ThredWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
+					PostMessage(ThrEdWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
 					keybd_event('F', 0, 0, 0);
 				}
 			} else
@@ -19087,7 +19082,7 @@ unsigned chkMsg() {
 
 			if (SelectedFormCount)
 			{
-				PostMessage(ThredWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
+				PostMessage(ThrEdWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
 				keybd_event('F', 0, 0, 0);
 			} else {
 
@@ -19108,7 +19103,7 @@ unsigned chkMsg() {
 
 		case 'V':
 
-			if (GetKeyState(VK_CONTROL) & 0X8000 && OpenClipboard(ThredWindow)) {
+			if (GetKeyState(VK_CONTROL) & 0X8000 && OpenClipboard(ThrEdWindow)) {
 
 				ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 				ClipMemory = GetClipboardData(ThrEdClip);
@@ -19127,20 +19122,20 @@ unsigned chkMsg() {
 
 							pchr = (unsigned char*)&BSequence;
 							fvars(ClosestFormToCursor);
-							interleaveSequence[0].x = CurrentFormVertices[ClosestVertexToCursor].x;
-							interleaveSequence[0].y = CurrentFormVertices[ClosestVertexToCursor].y;
+							InterleaveSequence[0].x = CurrentFormVertices[ClosestVertexToCursor].x;
+							InterleaveSequence[0].y = CurrentFormVertices[ClosestVertexToCursor].y;
 							l_clipData = (fPOINT*)&ClipFormVerticesData[1];
 							for (ind = 0; ind <= ClipFormVerticesData->pointCount; ind++) {
 
-								interleaveSequence[ind + 1].x = l_clipData[ind].x;
-								interleaveSequence[ind + 1].y = l_clipData[ind].y;
+								InterleaveSequence[ind + 1].x = l_clipData[ind].x;
+								InterleaveSequence[ind + 1].y = l_clipData[ind].y;
 							}
 							ine = nxt(ClosestVertexToCursor);
 							ind++;
-							interleaveSequence[ind].x = CurrentFormVertices[ine].x;
-							interleaveSequence[ind].y = CurrentFormVertices[ine].y;
+							InterleaveSequence[ind].x = CurrentFormVertices[ine].x;
+							InterleaveSequence[ind].y = CurrentFormVertices[ine].y;
 							OutputIndex = ind + 1;
-							FormVerticesAsLine = (POINT*)&interleaveSequence[OutputIndex];
+							FormVerticesAsLine = (POINT*)&InterleaveSequence[OutputIndex];
 							setpclp();
 							setMap(FPUNCLP);
 							setMap(SHOP);
@@ -19228,7 +19223,7 @@ unsigned chkMsg() {
 							}
 						}
 						pts = (TXPNT*)&l_clipData[inf];
-						ptx = &texturePointsBuffer[textureIndex];
+						ptx = &TexturePointsBuffer[TextureIndex];
 						ine = 0;
 						for (ind = 0; ind < ClipFormsCount; ind++)
 						{
@@ -19236,11 +19231,11 @@ unsigned chkMsg() {
 							{
 								SelectedForm = &FormList[FormIndex + ind];
 								ine += SelectedForm->fillInfo.texture.count;
-								SelectedForm->fillInfo.texture.index += textureIndex;
-								MoveMemory(ptx, pts, (SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count - textureIndex) * sizeof(TXPNT));
+								SelectedForm->fillInfo.texture.index += TextureIndex;
+								MoveMemory(ptx, pts, (SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count - TextureIndex) * sizeof(TXPNT));
 							}
 						}
-						textureIndex += ine;
+						TextureIndex += ine;
 						GlobalUnlock(ClipMemory);
 						SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
 						SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
@@ -19307,7 +19302,7 @@ unsigned chkMsg() {
 							pts = (TXPNT*)&l_clipData[inf];
 							if (istx(FormIndex))
 							{
-								SelectedForm->fillInfo.texture.index = textureIndex;
+								SelectedForm->fillInfo.texture.index = TextureIndex;
 								ptx = adtx(SelectedForm->fillInfo.texture.count);
 								MoveMemory(ptx, pts, SelectedForm->fillInfo.texture.count * sizeof(TXPNT));
 							}
@@ -20888,7 +20883,7 @@ unsigned chkMsg() {
 				setMap(BOXZUM);
 				rstMap(BZUMIN);
 				setMap(VCAPT);
-				SetCapture(ThredWindow);
+				SetCapture(ThrEdWindow);
 			}
 			break;
 
@@ -21017,9 +21012,9 @@ void makCol() {
 			ButtonHeight*ind,
 			ButtonWidth,
 			ButtonHeight,
-			ThredWindow,
+			ThrEdWindow,
 			NULL,
-			ThredInstance,
+			ThrEdInstance,
 			NULL);
 
 		UserColorWin[ind] = CreateWindow(
@@ -21030,9 +21025,9 @@ void makCol() {
 			ButtonHeight*ind,
 			ButtonWidth,
 			ButtonHeight,
-			ThredWindow,
+			ThrEdWindow,
 			NULL,
-			ThredInstance,
+			ThrEdInstance,
 			NULL);
 
 		buf[0] = ThreadSize[ind][0];
@@ -21044,9 +21039,9 @@ void makCol() {
 			ButtonHeight*ind,
 			ButtonWidth,
 			ButtonHeight,
-			ThredWindow,
+			ThrEdWindow,
 			NULL,
-			ThredInstance,
+			ThrEdInstance,
 			NULL);
 	}
 }
@@ -21395,13 +21390,13 @@ void crtcurs() {
 
 	duamsk();
 	ducurs(CursorMasks.form);
-	FormCursor = CreateCursor(ThredInstance, 16, 16, 32, 32, (void*)CursorMask, (void*)&CursorMasks.form);
-	DLineCursor = CreateCursor(ThredInstance, 16, 16, 32, 32, (void*)CursorMask, (void*)&CursorMasks.dline);
-	NeedleUpCursor = CreateCursor(ThredInstance, 16, 32, 32, 32, (void*)CursorMask, (void*)&CursorMasks.uprightNeedle);
-	NeedleRightDownCursor = CreateCursor(ThredInstance, 1, 31, 32, 32, (void*)CursorMask, (void*)&CursorMasks.rightDownNeedle);
-	NeedleRightUpCursor = CreateCursor(ThredInstance, 1, 1, 32, 32, (void*)CursorMask, (void*)&CursorMasks.rightUpNeedle);
-	NeedleLeftDownCursor = CreateCursor(ThredInstance, 30, 30, 32, 32, (void*)CursorMask, (void*)&CursorMasks.leftDownNeedle);
-	NeedleLeftUpCursor = CreateCursor(ThredInstance, 32, 1, 32, 32, (void*)CursorMask, (void*)&CursorMasks.leftUpNeedle);
+	FormCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, (void*)CursorMask, (void*)&CursorMasks.form);
+	DLineCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, (void*)CursorMask, (void*)&CursorMasks.dline);
+	NeedleUpCursor = CreateCursor(ThrEdInstance, 16, 32, 32, 32, (void*)CursorMask, (void*)&CursorMasks.uprightNeedle);
+	NeedleRightDownCursor = CreateCursor(ThrEdInstance, 1, 31, 32, 32, (void*)CursorMask, (void*)&CursorMasks.rightDownNeedle);
+	NeedleRightUpCursor = CreateCursor(ThrEdInstance, 1, 1, 32, 32, (void*)CursorMask, (void*)&CursorMasks.rightUpNeedle);
+	NeedleLeftDownCursor = CreateCursor(ThrEdInstance, 30, 30, 32, 32, (void*)CursorMask, (void*)&CursorMasks.leftDownNeedle);
+	NeedleLeftUpCursor = CreateCursor(ThrEdInstance, 32, 1, 32, 32, (void*)CursorMask, (void*)&CursorMasks.leftUpNeedle);
 }
 
 void dstcurs() {
@@ -21509,7 +21504,7 @@ void ducmd() {
 						}
 					}
 				}
-				SetWindowText(ThredWindow, StringTable[STR_EMB]);
+				SetWindowText(ThrEdWindow, StringTable[STR_EMB]);
 			}
 			*WorkingFileName = 0;
 			CloseHandle(BalaradFile);
@@ -21694,9 +21689,9 @@ void trcsub(HWND* hwnd, unsigned xloc, unsigned yloc, unsigned hi) {
 		yloc,
 		ButtonWidth,
 		hi,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 }
 
@@ -21744,23 +21739,23 @@ void init() {
 	HDC				totdc;
 	TCHAR*			pchr;
 
-	textureIndex = 0;
+	TextureIndex = 0;
 #if	 __UseASM__
 	fsizeof = sizeof(FRMHED) >> 2;
 #endif
-	LoadMenu(ThredInstance, MAKEINTRESOURCE(IDR_MENU1));
-	MainMenu = GetMenu(ThredWindow);
+	LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1));
+	MainMenu = GetMenu(ThrEdWindow);
 	totdc = GetDC(NULL);
 	mwid = GetDeviceCaps(totdc, HORZRES);
 	ReleaseDC(NULL, totdc);
-	GetWindowRect(ThredWindow, &wrct);
-	GetMenuItemRect(ThredWindow, MainMenu, 0, &tRct);
+	GetWindowRect(ThrEdWindow, &wrct);
+	GetMenuItemRect(ThrEdWindow, MainMenu, 0, &tRct);
 	//menhi = tRct.bottom - tRct.top;
 	wrct.left = tRct.left;
 	wrct.right = tRct.right;
 	for (ind = 0; ind <= M_HELP; ind++) {
 
-		GetMenuItemRect(ThredWindow, MainMenu, ind, &tRct);
+		GetMenuItemRect(ThrEdWindow, MainMenu, ind, &tRct);
 		wrct.right += (tRct.right - tRct.left);
 	}
 	wrct.right += 20;
@@ -21781,7 +21776,7 @@ void init() {
 	redfils();
 	clrMap(MAPLEN);						//clear the bitmap
 	//set up the size variables
-	ThredDC = GetDC(ThredWindow);
+	ThredDC = GetDC(ThrEdWindow);
 	SetStretchBltMode(ThredDC, COLORONCOLOR);
 	StitchWindowDC = GetDCEx(MainStitchWin, 0, DCX_PARENTCLIP | DCX_CLIPSIBLINGS);
 	StitchWindowMemDC = CreateCompatibleDC(StitchWindowDC);
@@ -21789,7 +21784,7 @@ void init() {
 	ScreenSizeMM.cy = GetDeviceCaps(ThredDC, VERTSIZE);
 	chkirct();
 	if (!chku(SAVMAX))
-		MoveWindow(ThredWindow, IniFile.initialWindowCoords.left, IniFile.initialWindowCoords.top, IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left, IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top, 0);
+		MoveWindow(ThrEdWindow, IniFile.initialWindowCoords.left, IniFile.initialWindowCoords.top, IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left, IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top, 0);
 	ButtonWidth = txtWid("MM") + TXTSIDS;
 	ButtonWidthX3 = ButtonWidth * 3;
 	ButtonHeight = TextSize.cy + 4;
@@ -21797,7 +21792,7 @@ void init() {
 	selbox = txtWid("0");
 	for (ind = 0; ind < NERCNT; ind++)
 		BoxOffset[ind] = selbox + selbox*ind;
-	GetClientRect(ThredWindow, &ThredWindowRect);
+	GetClientRect(ThrEdWindow, &ThredWindowRect);
 	stchWnd();
 	lodstr();
 	maxwid(STR_PRF0, STR_PRF27);
@@ -21875,9 +21870,9 @@ void init() {
 			ButtonHeight*(16 + ind),
 			ButtonWidthX3,
 			ButtonHeight,
-			ThredWindow,
+			ThrEdWindow,
 			NULL,
-			ThredInstance,
+			ThrEdInstance,
 			NULL);
 	}
 	TraceStepWin = CreateWindow(
@@ -21889,9 +21884,9 @@ void init() {
 		ButtonHeight * 18,
 		ButtonWidthX3,
 		ButtonHeight,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 
 	ColorBar = CreateWindow(
@@ -21902,9 +21897,9 @@ void init() {
 		0,
 		COLSIZ,
 		ThredWindowRect.bottom,
-		ThredWindow,
+		ThrEdWindow,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 
 	for (ind = 0; ind < 3; ind++) {
@@ -21985,7 +21980,7 @@ void init() {
 	//check command line-should be last item in init
 	ducmd();
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED], IniFile.designerName);
-	SetWindowText(ThredWindow, MsgBuffer);
+	SetWindowText(ThrEdWindow, MsgBuffer);
 }
 
 COLORREF defTxt(unsigned colInd) {
@@ -23151,8 +23146,8 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, (HBRUSH)(COLOR_BTNFACE + 1));
 			if (chkMap(TXTRED))
 			{
-				LoadString(ThredInstance, IDS_TXWID, nam, _MAX_PATH);
-				sprintf_s(HelpBuffer, sizeof(HelpBuffer), nam, textureScreen.width / PFGRAN);
+				LoadString(ThrEdInstance, IDS_TXWID, nam, _MAX_PATH);
+				sprintf_s(HelpBuffer, sizeof(HelpBuffer), nam, TextureScreen.width / PFGRAN);
 				TextOut(DrawItem->hDC, ind, 1, HelpBuffer, strlen(HelpBuffer));;
 			} else
 				TextOut(DrawItem->hDC, ind, 1, StringTable[STR_PIKOL], strlen(StringTable[STR_PIKOL]));;
@@ -23458,14 +23453,14 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 	br.lbHatch = 0;
 	br.lbStyle = BS_SOLID;
 
-	ThredInstance = hInstance;
+	ThrEdInstance = hInstance;
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	wc.lpfnWndProc = (WNDPROC)WndProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
-	wc.hInstance = ThredInstance;
-	wc.hIcon = (HICON)LoadImage(ThredInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON,
+	wc.hInstance = ThrEdInstance;
+	wc.hIcon = (HICON)LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON,
 		32, 32, LR_SHARED);
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
@@ -23482,7 +23477,7 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		redini();
 		if (IniFile.initialWindowCoords.right) {
 
-			ThredWindow = CreateWindow(
+			ThrEdWindow = CreateWindow(
 				"thred",
 				"",
 				WS_OVERLAPPEDWINDOW,
@@ -23496,7 +23491,7 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 				0);
 		} else {
 
-			ThredWindow = CreateWindow(
+			ThrEdWindow = CreateWindow(
 				"thred",
 				"",
 				WS_OVERLAPPEDWINDOW,
@@ -23508,7 +23503,7 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 				0,
 				hInstance,
 				0);
-			GetClientRect(ThredWindow, &ThredWindowRect);
+			GetClientRect(ThrEdWindow, &ThredWindowRect);
 			IniFile.initialWindowCoords.left = ThredWindowRect.left;
 			IniFile.initialWindowCoords.right = ThredWindowRect.right;
 			IniFile.initialWindowCoords.top = ThredWindowRect.top;
@@ -23516,12 +23511,12 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		}
 		init();
 		if (chku(SAVMAX))
-			ShowWindow(ThredWindow, SW_SHOWMAXIMIZED);
+			ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);
 		else
-			ShowWindow(ThredWindow, SW_SHOW);
+			ShowWindow(ThrEdWindow, SW_SHOW);
 		if (!*IniFile.designerName)
 		{
-			LoadString(ThredInstance, IDS_UNAM, IniFile.designerName, 50);
+			LoadString(ThrEdInstance, IDS_UNAM, IniFile.designerName, 50);
 			getdes();
 		}
 		while (GetMessage(&Msg, NULL, 0, 0)) {
@@ -23538,7 +23533,7 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 			if (!chkMap(TXTRED))
 				sachk();
 			if (rstMap(DUMEN))
-				DrawMenuBar(ThredWindow);
+				DrawMenuBar(ThrEdWindow);
 		}
 		return 0;
 	}

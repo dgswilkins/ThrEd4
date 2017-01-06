@@ -17,22 +17,19 @@ extern void				shoMsg(TCHAR* str);
 extern	BSEQPNT			BSequence[BSEQLEN];
 extern	unsigned		ButtonHeight;
 extern	unsigned		ButtonWidthX3;
+extern	HWND			ButtonWin[9];
 extern	unsigned		ClosestFormToCursor;
 extern	DRAWITEMSTRUCT*	DrawItem;
-extern	TCHAR			WorkingFileName[_MAX_PATH];
 extern	unsigned		FormIndex;
 extern	FRMHED			FormList[MAXFORMS];
-extern	HWND			ButtonWin[9];
-extern	PCSHEADER		PCSHeader;
-extern	HINSTANCE		ThredInstance;
-extern	HWND			MainStitchWin;
 extern	TCHAR			HomeDirectory[_MAX_PATH];
-extern	HWND			ThredWindow;
 extern	INIFILE			IniFile;
+extern	HWND			MainStitchWin;
 extern	MSG				Msg;
 extern	TCHAR			MsgBuffer[MSGSIZ];
 extern	void			numWnd();
 extern	fPOINT			OSequence[OSEQLEN];
+extern	PCSHEADER		PCSHeader;
 extern	long			PreferenceWindowWidth;
 extern	unsigned		rstMap(unsigned bPnt);
 extern	RECT			scRct;
@@ -40,8 +37,11 @@ extern	FRMHED*			SelectedForm;
 extern	unsigned		SelectedFormCount;
 extern	unsigned		setMap(unsigned bPnt);
 extern	HDC				StitchWindowMemDC;
+extern	HINSTANCE		ThrEdInstance;
+extern	HWND			ThrEdWindow;
 extern	TCHAR			ThrName[_MAX_PATH];
 extern	POINT			UnzoomedRect;
+extern	TCHAR			WorkingFileName[_MAX_PATH];
 
 HANDLE					HelpFile;					//handle to the help file
 TCHAR					HelpFileName[_MAX_PATH];	//help file name
@@ -222,9 +222,9 @@ void adbad(unsigned cod, unsigned cnt)
 {
 	// ToDo - not sure that StringData has been initialized when this is called
 	//what does this function do?
-	LoadString(ThredInstance, cod, StringData, HBUFSIZ);
+	LoadString(ThrEdInstance, cod, StringData, HBUFSIZ);
 	StringData = &StringData[strlen(StringData)];
-	LoadString(ThredInstance, IDS_NOTREP, HelpBuffer, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_NOTREP, HelpBuffer, HBUFSIZ);
 	sprintf_s(StringData, strlen(StringData), HelpBuffer, cnt);
 	StringData = &StringData[strlen(StringData)];
 }
@@ -233,7 +233,7 @@ void hsizmsg()
 {
 	TCHAR buf[HBUFSIZ];
 
-	LoadString(ThredInstance, IDS_HSIZ, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_HSIZ, buf, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, UnzoomedRect.x / PFGRAN, UnzoomedRect.y / PFGRAN);
 	shoMsg(HelpBuffer);
 }
@@ -242,7 +242,7 @@ void msgflt(unsigned msgid, float par)
 {
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(ThredInstance, msgid, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, msgid, buf, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, par);
 	shoMsg(HelpBuffer);
 	setMap(NUMIN);
@@ -253,7 +253,7 @@ void tsizmsg(TCHAR* sizstr, double pd_Size) {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(ThredInstance, IDS_SIZ, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_SIZ, buf, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, sizstr, pd_Size);
 	shoMsg(HelpBuffer);
 	setMap(NUMIN);
@@ -264,7 +264,7 @@ void bfilmsg() {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(ThredInstance, IDS_BADFIL, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_BADFIL, buf, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, WorkingFileName);
 	shoMsg(HelpBuffer);
 }
@@ -273,7 +273,7 @@ void filnopn(unsigned cod, TCHAR* nam) {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(ThredInstance, cod, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, cod, buf, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, nam);
 	shoMsg(HelpBuffer);
 }
@@ -282,7 +282,7 @@ void crmsg(TCHAR* nam) {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(ThredInstance, IDS_CREAT, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_CREAT, buf, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, nam);
 	shoMsg(HelpBuffer);
 }
@@ -313,7 +313,7 @@ void ritnum(unsigned cod, unsigned num) {
 
 void msgstr(unsigned cod) {
 
-	LoadString(ThredInstance, cod, MsgBuffer, MSGSIZ);
+	LoadString(ThrEdInstance, cod, MsgBuffer, MSGSIZ);
 }
 
 void lodstr() {
@@ -324,7 +324,7 @@ void lodstr() {
 	StringTable[0] = pchr = (TCHAR*)BSequence;
 	for (ind = 0; ind < STR_LEN; ind++) {
 
-		cnt = LoadString(ThredInstance, LoadStringList[ind], pchr, 1000) + 1;
+		cnt = LoadString(ThrEdInstance, LoadStringList[ind], pchr, 1000) + 1;
 		pchr += cnt;
 	}
 	cnt = pchr - StringTable[0];
@@ -398,7 +398,7 @@ void shoMsg(TCHAR* str) {
 		msgsiz.cy + 6,
 		MainStitchWin,
 		NULL,
-		ThredInstance,
+		ThrEdInstance,
 		NULL);
 	delete[] strs;
 	delete[] l_lens;
@@ -406,7 +406,7 @@ void shoMsg(TCHAR* str) {
 
 void tabmsg(unsigned cod) {
 
-	LoadString(ThredInstance, cod, HelpBuffer, HBUFSIZ);
+	LoadString(ThrEdInstance, cod, HelpBuffer, HBUFSIZ);
 	shoMsg(HelpBuffer);
 }
 
@@ -420,8 +420,8 @@ void pntmsg(unsigned cod) {
 	TCHAR	temp[HBUFSIZ];
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(ThredInstance, IDS_PNT, temp, HBUFSIZ);
-	LoadString(ThredInstance, cod, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_PNT, temp, HBUFSIZ);
+	LoadString(ThrEdInstance, cod, buf, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), temp, buf);
 	shoMsg(HelpBuffer);
 }
@@ -438,9 +438,9 @@ void shoseln(unsigned cod0, unsigned cod1) {
 	TCHAR	buf0[HBUFSIZ];
 	TCHAR	buf1[HBUFSIZ];
 
-	LoadString(ThredInstance, IDS_SHOSEL, temp, HBUFSIZ);
-	LoadString(ThredInstance, cod0, buf0, HBUFSIZ);
-	LoadString(ThredInstance, cod1, buf1, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_SHOSEL, temp, HBUFSIZ);
+	LoadString(ThrEdInstance, cod0, buf0, HBUFSIZ);
+	LoadString(ThrEdInstance, cod1, buf1, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), temp, buf0, buf1);
 	shoMsg(HelpBuffer);
 }
@@ -524,7 +524,7 @@ void help() {
 #if LANG==GRM
 	strcat_s(HelpFileName, "aladin.chm");
 #endif
-	HelpWindow = HtmlHelp(ThredWindow, HelpFileName, HH_DISPLAY_TOPIC, 0);
+	HelpWindow = HtmlHelp(ThrEdWindow, HelpFileName, HH_DISPLAY_TOPIC, 0);
 	if (!HelpWindow)
 		tabmsg(IDS_NOHLP);
 }
@@ -533,7 +533,7 @@ void sdmsg() {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(ThredInstance, IDS_SAVDISC, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_SAVDISC, buf, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, ThrName);
 	shoMsg(HelpBuffer);
 }
@@ -560,22 +560,22 @@ void datmsg(unsigned cod)
 	pchr = MsgBuffer;
 	if (cod&BADFLT)
 	{
-		LoadString(ThredInstance, IDS_BADFLT, pchr, HBUFSIZ);
+		LoadString(ThrEdInstance, IDS_BADFLT, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
 	if (cod&BADCLP)
 	{
-		LoadString(ThredInstance, IDS_BADCLP, pchr, HBUFSIZ);
+		LoadString(ThrEdInstance, IDS_BADCLP, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
 	if (cod&BADSAT)
 	{
-		LoadString(ThredInstance, IDS_BADSAT, pchr, HBUFSIZ);
+		LoadString(ThrEdInstance, IDS_BADSAT, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
 	if (cod&BADTX)
 	{
-		LoadString(ThredInstance, IDS_BADTX, pchr, HBUFSIZ);
+		LoadString(ThrEdInstance, IDS_BADTX, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
 	pchr--;
