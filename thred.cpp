@@ -1834,27 +1834,6 @@ unsigned toglu(unsigned bit) {
 #endif
 }
 
-unsigned dumsk(unsigned pnt) {
-
-#if  __UseASM__
-	_asm {
-
-		mov		eax, pnt
-		and		al, 31
-		mov		cl, 32
-		sub		cl, al
-		xor		eax, eax
-		inc		eax
-		shl		eax, cl
-		dec		eax
-		not eax
-		bswap	eax
-	}
-#else
-	return _byteswap_ulong(0xffffffff << (32 - (pnt & 0x1F)));
-#endif
-}
-
 BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
 	UNREFERENCED_PARAMETER(lparam);
