@@ -882,7 +882,7 @@ STRINGTABLE
 BEGIN
     IDS_TXT14               "Start"
     IDS_TXT15               "End"
-    IDS_TXT16               "Pico Spacing"
+    IDS_TXT16               "Picot Spacing"
     IDS_TXT17               "Underlay"
     IDS_TXT18               "Fill phase"
     IDS_TXT19               "Chain Position"
