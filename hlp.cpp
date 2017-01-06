@@ -14,14 +14,14 @@ extern void				okcan();
 extern void				rstAll();
 extern void				shoMsg(TCHAR* str);
 
-extern	BSEQPNT			bseq[BSEQLEN];
+extern	BSEQPNT			BSequence[BSEQLEN];
 extern	unsigned		ButtonHeight;
 extern	unsigned		ButtonWidthX3;
-extern	unsigned		closestFormToCursor;
+extern	unsigned		ClosestFormToCursor;
 extern	DRAWITEMSTRUCT*	DrawItem;
 extern	TCHAR			WorkingFileName[_MAX_PATH];
-extern	unsigned		formIndex;
-extern	FRMHED			formList[MAXFORMS];
+extern	unsigned		FormIndex;
+extern	FRMHED			FormList[MAXFORMS];
 extern	HWND			ButtonWin[9];
 extern	PCSHEADER		PCSHeader;
 extern	HINSTANCE		ThredInstance;
@@ -32,12 +32,12 @@ extern	INIFILE			IniFile;
 extern	MSG				Msg;
 extern	TCHAR			MsgBuffer[MSGSIZ];
 extern	void			numWnd();
-extern	fPOINT			oseq[OSEQLEN];
-extern	long			preferenceWindowWidth;
+extern	fPOINT			OSequence[OSEQLEN];
+extern	long			PreferenceWindowWidth;
 extern	unsigned		rstMap(unsigned bPnt);
 extern	RECT			scRct;
 extern	FRMHED*			SelectedForm;
-extern	unsigned		selectedFormCount;
+extern	unsigned		SelectedFormCount;
 extern	unsigned		setMap(unsigned bPnt);
 extern	HDC				StitchWindowMemDC;
 extern	TCHAR			ThrName[_MAX_PATH];
@@ -325,7 +325,7 @@ void lodstr() {
 	unsigned	ind, ine, cnt;
 	TCHAR*		pchr;
 
-	StringTable[0] = pchr = (TCHAR*)bseq;
+	StringTable[0] = pchr = (TCHAR*)BSequence;
 	for (ind = 0; ind < STR_LEN; ind++) {
 
 		cnt = LoadString(ThredInstance, ldlst[ind], pchr, 1000) + 1;
@@ -389,7 +389,7 @@ void shoMsg(TCHAR* str) {
 	}
 	msgsiz.cy *= cnt;
 	if (rstMap(MSGOF))
-		off = preferenceWindowWidth + 6;
+		off = PreferenceWindowWidth + 6;
 	else
 		off = 3;
 	hMsgWindow = CreateWindow(
@@ -462,23 +462,23 @@ BOOL clpmsgs(unsigned cod) {
 
 void frm1pnt() {
 
-	if (formIndex == 1) {
+	if (FormIndex == 1) {
 
 		setMap(FORMSEL);
-		closestFormToCursor = 0;
+		ClosestFormToCursor = 0;
 	}
 }
 
 BOOL filmsgs(unsigned cod) {
 
-	if (selectedFormCount)
+	if (SelectedFormCount)
 		return clpmsgs(cod);
-	if (formIndex) {
+	if (FormIndex) {
 
 		frm1pnt();
 		if (chkMap(FORMSEL)) {
 
-			SelectedForm = &formList[closestFormToCursor];
+			SelectedForm = &FormList[ClosestFormToCursor];
 			if (SelectedForm->sides == 2) {
 
 				if (cod < FML_LIN) {
