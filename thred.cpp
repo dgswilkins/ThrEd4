@@ -405,9 +405,9 @@ extern	FRMHED			FormList[MAXFORMS];
 extern	POINT			FormOutlineRect[10];
 extern	fPOINT			FormVertices[MAXFRMPNTS];
 extern	HWND			hindx;
-extern	TCHAR			hlpbuf[HBUFSIZ];
+extern	TCHAR			HelpBuffer[HBUFSIZ];
 extern	HWND			hlptxt;
-extern	HWND			hMsgWindow;
+extern	HWND			MsgWindow;
 extern	HWND			hnxt;
 extern	double			HorizontalRatio;
 extern	HWND			hsrch;
@@ -430,7 +430,6 @@ extern	unsigned short	SelectedFormList[MAXFORMS];
 extern	POINT			SelectedFormsLine[9];
 extern	RECT			SelectedFormsRect;
 extern	POINT			SelectedPointsLine[9];
-extern	TCHAR*			shrtmsg;
 extern	unsigned short	SideCount;
 extern	double			SnapLength;
 extern	double			SpiralWrap;
@@ -4520,8 +4519,8 @@ void chknum() {
 
 void noMsg() {
 
-	if (DestroyWindow(hMsgWindow))
-		hMsgWindow = 0;
+	if (DestroyWindow(MsgWindow))
+		MsgWindow = 0;
 	DestroyWindow(OKButton);
 	DestroyWindow(DiscardButton);
 	DestroyWindow(CancelButton);
@@ -8865,7 +8864,7 @@ void numWnd() {
 
 	RECT l_msgRct;
 
-	GetClientRect(hMsgWindow, &l_msgRct);
+	GetClientRect(MsgWindow, &l_msgRct);
 	GeneralNumberInputBox = CreateWindow(
 		"STATIC",
 		0,
@@ -8884,7 +8883,7 @@ void numWnd() {
 
 void unmsg() {
 
-	if (hMsgWindow)
+	if (MsgWindow)
 		noMsg();
 }
 
@@ -9986,10 +9985,10 @@ void movi() {
 	rstAll();
 	if (PCSHeader.stitchCount) {
 
-		if (hMsgWindow) {
+		if (MsgWindow) {
 
-			DestroyWindow(hMsgWindow);
-			hMsgWindow = 0;
+			DestroyWindow(MsgWindow);
+			MsgWindow = 0;
 		}
 		setMap(RUNPAT);
 		if (chkMap(GRPSEL)) {
@@ -16094,7 +16093,7 @@ unsigned chkMsg() {
 	}
 	if (Msg.message == WM_RBUTTONDOWN) {
 
-		if (chkMap(TXTRED) && !hMsgWindow)
+		if (chkMap(TXTRED) && !MsgWindow)
 		{
 			txtrbut();
 			return 1;
@@ -16865,7 +16864,7 @@ unsigned chkMsg() {
 		}
 		if (rstMap(FORMIN)) {
 
-			GetWindowRect(hMsgWindow, &trct);
+			GetWindowRect(MsgWindow, &trct);
 			if (Msg.pt.x >= trct.left&&Msg.pt.x <= trct.right
 				&&Msg.pt.y >= trct.top&&Msg.pt.y <= trct.bottom) {
 
@@ -23153,8 +23152,8 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			if (chkMap(TXTRED))
 			{
 				LoadString(ThredInstance, IDS_TXWID, nam, _MAX_PATH);
-				sprintf_s(hlpbuf, sizeof(hlpbuf), nam, textureScreen.width / PFGRAN);
-				TextOut(DrawItem->hDC, ind, 1, hlpbuf, strlen(hlpbuf));;
+				sprintf_s(HelpBuffer, sizeof(HelpBuffer), nam, textureScreen.width / PFGRAN);
+				TextOut(DrawItem->hDC, ind, 1, HelpBuffer, strlen(HelpBuffer));;
 			} else
 				TextOut(DrawItem->hDC, ind, 1, StringTable[STR_PIKOL], strlen(StringTable[STR_PIKOL]));;
 			return 1;

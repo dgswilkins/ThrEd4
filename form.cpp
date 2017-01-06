@@ -135,7 +135,7 @@ extern			HWND			FormDataSheet;
 extern			HINSTANCE		ThredInstance;
 extern			HMENU			MainMenu;
 extern			HWND			MainStitchWin;
-extern			HWND			hMsgWindow;
+extern			HWND			MsgWindow;
 extern			HWND			OKButton;
 extern			HWND			PreferencesWindow;
 extern			HWND			SideMessageWindow;
@@ -2009,7 +2009,7 @@ void ritfil() {
 }
 
 void okcan() {
-	GetClientRect(hMsgWindow, &MsgRect);
+	GetClientRect(MsgWindow, &MsgRect);
 
 	OKButton = CreateWindow(
 		"STATIC",
@@ -2044,7 +2044,7 @@ void savdisc() {
 	sdmsg();
 	rstMap(BIGBOX);
 
-	GetClientRect(hMsgWindow, &MsgRect);
+	GetClientRect(MsgWindow, &MsgRect);
 
 	LoadString(ThredInstance, IDS_SAV, buf, HBUFSIZ);
 	OKButton = CreateWindow(

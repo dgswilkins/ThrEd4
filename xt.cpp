@@ -56,7 +56,7 @@ extern	PCSHEADER		PCSHeader;
 extern	HWND			HorizontalScrollBar;
 extern	fPOINTATTR*		TempStitchBuffer;
 extern	HINSTANCE		ThredInstance;
-extern	TCHAR			hlpbuf[HBUFSIZ];
+extern	TCHAR			HelpBuffer[HBUFSIZ];
 extern	HWND			MainStitchWin;
 extern	unsigned		ThrEdClip;
 extern	HWND			VerticalScrollBar;
@@ -76,7 +76,7 @@ extern	double			RotationAngle;
 extern	dPOINT			RotationCenter;
 extern	unsigned		SatinConnectIndex;
 extern	SATCON			SatinConnects[MAXSAC];
-extern	TCHAR*			sdat;
+extern	TCHAR*			StringData;
 extern	unsigned		SelectedFormCount;
 extern	unsigned		SelectedFormCount;
 extern	unsigned short	SelectedFormList[MAXFORMS];
@@ -2204,8 +2204,8 @@ void fsort()
 	}
 	else
 	{
-		LoadString(ThredInstance, IDS_SRTER, hlpbuf, HBUFSIZ);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), hlpbuf, pfrecs[ine]->frm);
+		LoadString(ThredInstance, IDS_SRTER, HelpBuffer, HBUFSIZ);
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, pfrecs[ine]->frm);
 		shoMsg(MsgBuffer);
 	}
 }
@@ -3676,31 +3676,31 @@ void bxtxt(unsigned cod, TCHAR* str)
 
 void lodhbuf(unsigned cod)
 {
-	LoadString(ThredInstance, cod, hlpbuf, HBUFSIZ);
+	LoadString(ThredInstance, cod, HelpBuffer, HBUFSIZ);
 }
 
 void hlpflt(unsigned mcod, unsigned bcod, float dat)
 {
 	lodhbuf(mcod);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), hlpbuf, dat);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, dat);
 	bxtxt(bcod, MsgBuffer);
 }
 
 void drwtxbut()
 {
 	lodhbuf(IDS_CLEAR);
-	bxtxt(HTXCLR, hlpbuf);
+	bxtxt(HTXCLR, HelpBuffer);
 	hlpflt(IDS_TXHI, HTXHI, textureScreen.areaHeight / PFGRAN);
 	redraw(ButtonWin[HTXWID]);
 	hlpflt(IDS_TXSPAC, HTXSPAC, textureScreen.spacing / PFGRAN);
 	lodhbuf(IDS_TXVRT);
-	bxtxt(HTXVRT, hlpbuf);
+	bxtxt(HTXVRT, HelpBuffer);
 	lodhbuf(IDS_TXHOR);
-	bxtxt(HTXHOR, hlpbuf);
+	bxtxt(HTXHOR, HelpBuffer);
 	lodhbuf(IDS_TXANG);
-	bxtxt(HTXANG, hlpbuf);
+	bxtxt(HTXANG, HelpBuffer);
 	lodhbuf(IDS_TXMIR);
-	bxtxt(HTXMIR, hlpbuf);
+	bxtxt(HTXMIR, HelpBuffer);
 	SetWindowText(ButtonWin[HTXMIR + 1], "");
 }
 
@@ -5149,14 +5149,14 @@ void rtrclp()
 
 void setstxt(unsigned cod, float num)
 {
-	sprintf_s(hlpbuf, sizeof(hlpbuf), "%.2f", (float)num / PFGRAN);
-	SetWindowText(GetDlgItem(hDlgDesignSize, cod), hlpbuf);
+	sprintf_s(HelpBuffer, sizeof(HelpBuffer), "%.2f", (float)num / PFGRAN);
+	SetWindowText(GetDlgItem(hDlgDesignSize, cod), HelpBuffer);
 }
 
 float getstxt(unsigned cod)
 {
-	GetWindowText(GetDlgItem(hDlgDesignSize, cod), hlpbuf, HBUFSIZ);
-	return atof(hlpbuf)*PFGRAN;
+	GetWindowText(GetDlgItem(hDlgDesignSize, cod), HelpBuffer, HBUFSIZ);
+	return atof(HelpBuffer)*PFGRAN;
 }
 
 BOOL chkasp(fPOINT* p_flt)
@@ -5949,7 +5949,7 @@ void repar()
 	unsigned cod;
 
 	savdo();
-	sdat = MsgBuffer;
+	StringData = MsgBuffer;
 	cod = frmchkfn();
 	if (cod&BADFLT)
 		repflt();
@@ -5961,10 +5961,10 @@ void repar()
 		reptx();
 	lodchk();
 	setMap(RESTCH);
-	if (sdat != MsgBuffer)
+	if (StringData != MsgBuffer)
 	{
-		sdat--;
-		*sdat = 0;
+		StringData--;
+		*StringData = 0;
 		shoMsg(MsgBuffer);
 	}
 }
