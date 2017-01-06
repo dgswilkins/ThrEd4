@@ -15,22 +15,22 @@ extern void				rstAll();
 extern void				shoMsg(TCHAR* str);
 
 extern	BSEQPNT			bseq[BSEQLEN];
-extern	unsigned		buttonHeight;
-extern	unsigned		buttonWidthX3;
+extern	unsigned		ButtonHeight;
+extern	unsigned		ButtonWidthX3;
 extern	unsigned		closestFormToCursor;
-extern	DRAWITEMSTRUCT*	ds;
-extern	TCHAR			workingFileName[_MAX_PATH];
+extern	DRAWITEMSTRUCT*	DrawItem;
+extern	TCHAR			WorkingFileName[_MAX_PATH];
 extern	unsigned		formIndex;
 extern	FRMHED			formList[MAXFORMS];
-extern	HWND			hButtonWin[9];
-extern	PCSHEADER		header;
-extern	HINSTANCE		hInst;
-extern	HWND			hMainStitchWin;
-extern	TCHAR			homeDirectory[_MAX_PATH];
-extern	HWND			hWnd;
-extern	INIFILE			iniFile;
-extern	MSG				msg;
-extern	TCHAR			msgBuffer[MSGSIZ];
+extern	HWND			ButtonWin[9];
+extern	PCSHEADER		PCSHeader;
+extern	HINSTANCE		ThredInstance;
+extern	HWND			MainStitchWin;
+extern	TCHAR			HomeDirectory[_MAX_PATH];
+extern	HWND			ThredWindow;
+extern	INIFILE			IniFile;
+extern	MSG				Msg;
+extern	TCHAR			MsgBuffer[MSGSIZ];
 extern	void			numWnd();
 extern	fPOINT			oseq[OSEQLEN];
 extern	long			preferenceWindowWidth;
@@ -39,9 +39,9 @@ extern	RECT			scRct;
 extern	FRMHED*			SelectedForm;
 extern	unsigned		selectedFormCount;
 extern	unsigned		setMap(unsigned bPnt);
-extern	HDC				stitchWindowMemDC;
-extern	TCHAR			thrName[_MAX_PATH];
-extern	POINT			unzoomedRect;
+extern	HDC				StitchWindowMemDC;
+extern	TCHAR			ThrName[_MAX_PATH];
+extern	POINT			UnzoomedRect;
 
 HANDLE					hHelpFile;					//handle to the help file
 TCHAR					helpFilename[_MAX_PATH];	//help file name
@@ -226,9 +226,9 @@ void adbad(unsigned cod, unsigned cnt)
 {
 	// ToDo - not sure that sdat has been initialized when this is called
 	//what does this function do?
-	LoadString(hInst, cod, sdat, HBUFSIZ);
+	LoadString(ThredInstance, cod, sdat, HBUFSIZ);
 	sdat = &sdat[strlen(sdat)];
-	LoadString(hInst, IDS_NOTREP, hlpbuf, HBUFSIZ);
+	LoadString(ThredInstance, IDS_NOTREP, hlpbuf, HBUFSIZ);
 	sprintf_s(sdat, strlen(sdat), hlpbuf, cnt);
 	sdat = &sdat[strlen(sdat)];
 }
@@ -237,8 +237,8 @@ void hsizmsg()
 {
 	TCHAR buf[HBUFSIZ];
 
-	LoadString(hInst, IDS_HSIZ, buf, HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, unzoomedRect.x / PFGRAN, unzoomedRect.y / PFGRAN);
+	LoadString(ThredInstance, IDS_HSIZ, buf, HBUFSIZ);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, UnzoomedRect.x / PFGRAN, UnzoomedRect.y / PFGRAN);
 	shoMsg(hlpbuf);
 }
 
@@ -246,7 +246,7 @@ void msgflt(unsigned msgid, float par)
 {
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst, msgid, buf, HBUFSIZ);
+	LoadString(ThredInstance, msgid, buf, HBUFSIZ);
 	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, par);
 	shoMsg(hlpbuf);
 	setMap(NUMIN);
@@ -257,7 +257,7 @@ void tsizmsg(TCHAR* sizstr, double pd_Size) {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst, IDS_SIZ, buf, HBUFSIZ);
+	LoadString(ThredInstance, IDS_SIZ, buf, HBUFSIZ);
 	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, sizstr, pd_Size);
 	shoMsg(hlpbuf);
 	setMap(NUMIN);
@@ -268,8 +268,8 @@ void bfilmsg() {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst, IDS_BADFIL, buf, HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, workingFileName);
+	LoadString(ThredInstance, IDS_BADFIL, buf, HBUFSIZ);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, WorkingFileName);
 	shoMsg(hlpbuf);
 }
 
@@ -277,7 +277,7 @@ void filnopn(unsigned cod, TCHAR* nam) {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst, cod, buf, HBUFSIZ);
+	LoadString(ThredInstance, cod, buf, HBUFSIZ);
 	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, nam);
 	shoMsg(hlpbuf);
 }
@@ -286,7 +286,7 @@ void crmsg(TCHAR* nam) {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst, IDS_CREAT, buf, HBUFSIZ);
+	LoadString(ThredInstance, IDS_CREAT, buf, HBUFSIZ);
 	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, nam);
 	shoMsg(hlpbuf);
 }
@@ -298,15 +298,15 @@ void butxt(unsigned ind, TCHAR* str) {
 		if (ind == 5) {
 
 			if (chkMap(HIDMAP))
-				SetWindowText(hButtonWin[ind], StringTable[STR_TRC1H]);
+				SetWindowText(ButtonWin[ind], StringTable[STR_TRC1H]);
 			else
-				SetWindowText(hButtonWin[ind], StringTable[STR_TRC1S]);
+				SetWindowText(ButtonWin[ind], StringTable[STR_TRC1S]);
 		}
 		else
-			SetWindowText(hButtonWin[ind], StringTable[ind - 4 + STR_TRC0]);
+			SetWindowText(ButtonWin[ind], StringTable[ind - 4 + STR_TRC0]);
 	}
 	else
-		SetWindowText(hButtonWin[ind], str);
+		SetWindowText(ButtonWin[ind], str);
 }
 
 void ritnum(unsigned cod, unsigned num) {
@@ -317,7 +317,7 @@ void ritnum(unsigned cod, unsigned num) {
 
 void msgstr(unsigned cod) {
 
-	LoadString(hInst, cod, msgBuffer, MSGSIZ);
+	LoadString(ThredInstance, cod, MsgBuffer, MSGSIZ);
 }
 
 void lodstr() {
@@ -328,7 +328,7 @@ void lodstr() {
 	StringTable[0] = pchr = (TCHAR*)bseq;
 	for (ind = 0; ind < STR_LEN; ind++) {
 
-		cnt = LoadString(hInst, ldlst[ind], pchr, 1000) + 1;
+		cnt = LoadString(ThredInstance, ldlst[ind], pchr, 1000) + 1;
 		pchr += cnt;
 	}
 	cnt = pchr - StringTable[0];
@@ -381,7 +381,7 @@ void shoMsg(TCHAR* str) {
 	tsiz.cx = tsiz.cy = msgsiz.cy = msgsiz.cx = 0;
 	for (ind = 0; ind < ine; ind++) {
 
-		GetTextExtentPoint32(stitchWindowMemDC, strs[ind], l_lens[ind], &tsiz);
+		GetTextExtentPoint32(StitchWindowMemDC, strs[ind], l_lens[ind], &tsiz);
 		if (tsiz.cx > msgsiz.cx)
 			msgsiz.cx = tsiz.cx;
 		if (tsiz.cy > msgsiz.cy)
@@ -400,9 +400,9 @@ void shoMsg(TCHAR* str) {
 		3,
 		msgsiz.cx + 20,
 		msgsiz.cy + 6,
-		hMainStitchWin,
+		MainStitchWin,
 		NULL,
-		hInst,
+		ThredInstance,
 		NULL);
 	delete[] strs;
 	delete[] l_lens;
@@ -410,7 +410,7 @@ void shoMsg(TCHAR* str) {
 
 void tabmsg(unsigned cod) {
 
-	LoadString(hInst, cod, hlpbuf, HBUFSIZ);
+	LoadString(ThredInstance, cod, hlpbuf, HBUFSIZ);
 	shoMsg(hlpbuf);
 }
 
@@ -424,8 +424,8 @@ void pntmsg(unsigned cod) {
 	TCHAR	temp[HBUFSIZ];
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst, IDS_PNT, temp, HBUFSIZ);
-	LoadString(hInst, cod, buf, HBUFSIZ);
+	LoadString(ThredInstance, IDS_PNT, temp, HBUFSIZ);
+	LoadString(ThredInstance, cod, buf, HBUFSIZ);
 	sprintf_s(hlpbuf, sizeof(hlpbuf), temp, buf);
 	shoMsg(hlpbuf);
 }
@@ -442,9 +442,9 @@ void shoseln(unsigned cod0, unsigned cod1) {
 	TCHAR	buf0[HBUFSIZ];
 	TCHAR	buf1[HBUFSIZ];
 
-	LoadString(hInst, IDS_SHOSEL, temp, HBUFSIZ);
-	LoadString(hInst, cod0, buf0, HBUFSIZ);
-	LoadString(hInst, cod1, buf1, HBUFSIZ);
+	LoadString(ThredInstance, IDS_SHOSEL, temp, HBUFSIZ);
+	LoadString(ThredInstance, cod0, buf0, HBUFSIZ);
+	LoadString(ThredInstance, cod1, buf1, HBUFSIZ);
 	sprintf_s(hlpbuf, sizeof(hlpbuf), temp, buf0, buf1);
 	shoMsg(hlpbuf);
 }
@@ -521,14 +521,14 @@ void grpmsg1() {
 }
 
 void help() {
-	strcpy_s(helpFilename, homeDirectory);
+	strcpy_s(helpFilename, HomeDirectory);
 #if LANG==ENG||LANG==HNG
 	strcat_s(helpFilename, "thred.chm");
 #endif
 #if LANG==GRM
 	strcat_s(helpFilename, "aladin.chm");
 #endif
-	hHelpWindow = HtmlHelp(hWnd, helpFilename, HH_DISPLAY_TOPIC, 0);
+	hHelpWindow = HtmlHelp(ThredWindow, helpFilename, HH_DISPLAY_TOPIC, 0);
 	if (!hHelpWindow)
 		tabmsg(IDS_NOHLP);
 }
@@ -537,8 +537,8 @@ void sdmsg() {
 
 	TCHAR	buf[HBUFSIZ];
 
-	LoadString(hInst, IDS_SAVDISC, buf, HBUFSIZ);
-	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, thrName);
+	LoadString(ThredInstance, IDS_SAVDISC, buf, HBUFSIZ);
+	sprintf_s(hlpbuf, sizeof(hlpbuf), buf, ThrName);
 	shoMsg(hlpbuf);
 }
 
@@ -561,29 +561,29 @@ void datmsg(unsigned cod)
 {
 	TCHAR*	pchr;
 
-	pchr = msgBuffer;
+	pchr = MsgBuffer;
 	if (cod&BADFLT)
 	{
-		LoadString(hInst, IDS_BADFLT, pchr, HBUFSIZ);
+		LoadString(ThredInstance, IDS_BADFLT, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
 	if (cod&BADCLP)
 	{
-		LoadString(hInst, IDS_BADCLP, pchr, HBUFSIZ);
+		LoadString(ThredInstance, IDS_BADCLP, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
 	if (cod&BADSAT)
 	{
-		LoadString(hInst, IDS_BADSAT, pchr, HBUFSIZ);
+		LoadString(ThredInstance, IDS_BADSAT, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
 	if (cod&BADTX)
 	{
-		LoadString(hInst, IDS_BADTX, pchr, HBUFSIZ);
+		LoadString(ThredInstance, IDS_BADTX, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
 	pchr--;
 	*pchr = 0;
-	shoMsg(msgBuffer);
+	shoMsg(MsgBuffer);
 
 }
