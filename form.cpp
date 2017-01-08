@@ -163,11 +163,11 @@ extern			fRECTANGLE		RotationRect;
 extern			unsigned		SearchLineIndex;
 extern			HPEN			SelectAllPen;
 extern			FRMHED*			SelectedForm;
-extern			FORMPOINTS		SelectedFormPoints;
+extern			FORMVERTICES	SelectedFormVertices;
 extern			fPOINT			SelectedFormsSize;
 extern			RECT			SelectedPixelsRect;
 extern			fPOINT			SelectedPoint;
-extern			fRECTANGLE		SelectedPointsRect;
+extern			fRECTANGLE		SelectedVerticesRect;
 extern			double			ShowStitchThreshold;
 extern			HWND			SideMessageWindow;
 extern			HWND			SideWindow[11];
@@ -326,8 +326,8 @@ double			BorderWidth = BRDWID;	//border width for satin borders
 unsigned		SelectedFormControlVertex;	//user selected form control point
 POINT			FormOutlineRect[10];	//form control rectangle in pixel coordinates
 double			XYratio;				//expand form aspect ratio
-HWND			DataSheetValues[LASTLIN];	//data handles for the form data sheet
-HWND			DataSheetLabels[LASTLIN];	//text handles for the form data sheet
+HWND			ValueWindow[LASTLIN];	//data handles for the form data sheet
+HWND			LabelWindow[LASTLIN];	//text handles for the form data sheet
 RECT			LabelWindowCoords;		//location of left windows in the form data sheet
 RECT			ValueWindowCoords;		//location of right windows in the form data sheet
 POINT			LabelWindowSize;		//size of the left windows in the form data sheet
@@ -392,7 +392,7 @@ fPOINT			BorderClipReference;	//reference for clipboard line border
 unsigned		CurrentSide;			//active form point for line clipboard fill
 dPOINT			Vector0;				//x size of the clipboard fill at the fill angle
 FRMHED*			TempFormList;			//temporary form header storage for reordering forms
-fPOINT*			TempFormPoints;			//temporary form vertex storage for reordering forms
+fPOINT*			TempFormVertices;		//temporary form vertex storage for reordering forms
 SATCON*			TempSatinConnects;		//temporary satin guidline storage for reordering forms
 fPOINT*			TempClipPoints;			//temporary clipboard point storage for reordering forms
 unsigned		FormRelocationIndex;	//form relocator pointer
@@ -1162,7 +1162,7 @@ void frmsqr(unsigned ind) {
 	stch2pxr(CurrentFormVertices[ind]);
 	sqlin[1].x = StitchSizePixels.x;
 	sqlin[1].y = StitchSizePixels.y;
-	rat = (double)IniFile.formPointSizePixels / StitchWindowClientRect.right;
+	rat = (double)IniFile.formVertexSizePixels / StitchWindowClientRect.right;
 	len = (ZoomRect.right - ZoomRect.left)*rat * 2;
 	dif.x = CurrentFormVertices[ind - 1].x - CurrentFormVertices[ind].x;
 	dif.y = CurrentFormVertices[ind - 1].y - CurrentFormVertices[ind].y;
@@ -1191,11 +1191,11 @@ void frmsqr(unsigned ind) {
 void selsqr(POINT p_cpnt, HDC dc) {
 	POINT	sqlin[5];
 
-	sqlin[0].x = sqlin[3].x = sqlin[4].x = p_cpnt.x - IniFile.formPointSizePixels;
-	sqlin[0].y = sqlin[1].y = p_cpnt.y - IniFile.formPointSizePixels;
-	sqlin[1].x = sqlin[2].x = p_cpnt.x + IniFile.formPointSizePixels;
-	sqlin[2].y = sqlin[3].y = p_cpnt.y + IniFile.formPointSizePixels;
-	sqlin[4].y = p_cpnt.y - IniFile.formPointSizePixels;
+	sqlin[0].x = sqlin[3].x = sqlin[4].x = p_cpnt.x - IniFile.formVertexSizePixels;
+	sqlin[0].y = sqlin[1].y = p_cpnt.y - IniFile.formVertexSizePixels;
+	sqlin[1].x = sqlin[2].x = p_cpnt.x + IniFile.formVertexSizePixels;
+	sqlin[2].y = sqlin[3].y = p_cpnt.y + IniFile.formVertexSizePixels;
+	sqlin[4].y = p_cpnt.y - IniFile.formVertexSizePixels;
 	Polyline(dc, sqlin, 5);
 }
 
@@ -1367,7 +1367,7 @@ void dupsel(HDC dc) {
 	SelectObject(dc, FormPen);
 	SetROP2(dc, R2_XORPEN);
 	Polyline(dc, SelectedPointsLine, 9);
-	ind = SelectedFormPoints.start;
+	ind = SelectedFormVertices.start;
 	for (ind = 0; ind < 8; ind++)
 		selsqr(SelectedPointsLine[ind], dc);
 	frmx(EndPointCross, dc);
@@ -1452,7 +1452,7 @@ void drwfrm() {
 				frmsqr0(FormLines[0]);
 			}
 			if (chkMap(FPSEL) && ClosestFormToCursor == ind) {
-				sRct2px(SelectedPointsRect, &SelectedPixelsRect);
+				sRct2px(SelectedVerticesRect, &SelectedPixelsRect);
 				rct2sel(SelectedPixelsRect, SelectedPointsLine);
 				setMap(SHOPSEL);
 				dupsel(StitchWindowMemDC);
@@ -6655,283 +6655,283 @@ void refrmfn()
 	LabelWindowCoords.right = 3 + LabelWindowSize.x;
 	ValueWindowCoords.left = 6 + LabelWindowSize.x;
 	ValueWindowCoords.right = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
-	DataSheetLabels[LFRM] = txtwin(StringTable[STR_TXT0], LabelWindowCoords);
+	LabelWindow[LFRM] = txtwin(StringTable[STR_TXT0], LabelWindowCoords);
 	if (SelectedForm->type == FRMLINE)
-		DataSheetValues[LFRM] = txtrwin(StringTable[STR_EDG1], ValueWindowCoords);
+		ValueWindow[LFRM] = txtrwin(StringTable[STR_EDG1], ValueWindowCoords);
 	else
-		DataSheetValues[LFRM] = txtrwin(StringTable[STR_FREH], ValueWindowCoords);
+		ValueWindow[LFRM] = txtrwin(StringTable[STR_FREH], ValueWindowCoords);
 	nxtlin();
-	DataSheetLabels[LLAYR] = txtwin(StringTable[STR_TXT1], LabelWindowCoords);
+	LabelWindow[LLAYR] = txtwin(StringTable[STR_TXT1], LabelWindowCoords);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", (SelectedForm->attribute&FRMLMSK) >> 1);
-	DataSheetValues[LLAYR] = txtrwin(MsgBuffer, ValueWindowCoords);
+	ValueWindow[LLAYR] = txtrwin(MsgBuffer, ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->type != FRMLINE)
 	{
-		DataSheetLabels[LCWLK] = txtwin(StringTable[STR_CWLK], LabelWindowCoords);
+		LabelWindow[LCWLK] = txtwin(StringTable[STR_CWLK], LabelWindowCoords);
 		if (SelectedForm->extendedAttribute&AT_CWLK)
-			DataSheetValues[LCWLK] = txtrwin(StringTable[STR_ON], ValueWindowCoords);
+			ValueWindow[LCWLK] = txtrwin(StringTable[STR_ON], ValueWindowCoords);
 		else
-			DataSheetValues[LCWLK] = txtrwin(StringTable[STR_OFF], ValueWindowCoords);
+			ValueWindow[LCWLK] = txtrwin(StringTable[STR_OFF], ValueWindowCoords);
 		nxtlin();
-		DataSheetLabels[LWALK] = txtwin(StringTable[STR_WALK], LabelWindowCoords);
+		LabelWindow[LWALK] = txtwin(StringTable[STR_WALK], LabelWindowCoords);
 		if (SelectedForm->extendedAttribute&AT_WALK)
-			DataSheetValues[LWALK] = txtrwin(StringTable[STR_ON], ValueWindowCoords);
+			ValueWindow[LWALK] = txtrwin(StringTable[STR_ON], ValueWindowCoords);
 		else
-			DataSheetValues[LWALK] = txtrwin(StringTable[STR_OFF], ValueWindowCoords);
+			ValueWindow[LWALK] = txtrwin(StringTable[STR_OFF], ValueWindowCoords);
 		nxtlin();
-		DataSheetLabels[LUND] = txtwin(StringTable[STR_UND], LabelWindowCoords);
+		LabelWindow[LUND] = txtwin(StringTable[STR_UND], LabelWindowCoords);
 		if (SelectedForm->extendedAttribute&AT_UND)
-			DataSheetValues[LUND] = txtrwin(StringTable[STR_ON], ValueWindowCoords);
+			ValueWindow[LUND] = txtrwin(StringTable[STR_ON], ValueWindowCoords);
 		else
-			DataSheetValues[LUND] = txtrwin(StringTable[STR_OFF], ValueWindowCoords);
+			ValueWindow[LUND] = txtrwin(StringTable[STR_OFF], ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->extendedAttribute&(AT_WALK | AT_UND | AT_CWLK))
 		{
-			DataSheetLabels[LUNDCOL] = txtwin(StringTable[STR_UNDCOL], LabelWindowCoords);
+			LabelWindow[LUNDCOL] = txtwin(StringTable[STR_UNDCOL], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->underlayColor + 1);
-			DataSheetValues[LUNDCOL] = txtrwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LUNDCOL] = txtrwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
-			DataSheetLabels[LULEN] = txtwin(StringTable[STR_ULEN], LabelWindowCoords);
+			LabelWindow[LULEN] = txtwin(StringTable[STR_ULEN], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->underlayStitchLen / PFGRAN);
-			DataSheetValues[LULEN] = txtrwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LULEN] = txtrwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		DataSheetLabels[LWLKIND] = txtwin(StringTable[STR_UWLKIND], LabelWindowCoords);
+		LabelWindow[LWLKIND] = txtwin(StringTable[STR_UWLKIND], LabelWindowCoords);
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->underlayIndent / PFGRAN);
-		DataSheetValues[LWLKIND] = txtrwin(MsgBuffer, ValueWindowCoords);
+		ValueWindow[LWLKIND] = txtrwin(MsgBuffer, ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->extendedAttribute&AT_UND)
 		{
-			DataSheetLabels[LUSPAC] = txtwin(StringTable[STR_FUSPAC], LabelWindowCoords);
+			LabelWindow[LUSPAC] = txtwin(StringTable[STR_FUSPAC], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->underlaySpacing / PFGRAN);
-			DataSheetValues[LUSPAC] = txtrwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LUSPAC] = txtrwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
-			DataSheetLabels[LUANG] = txtwin(StringTable[STR_FUANG], LabelWindowCoords);
+			LabelWindow[LUANG] = txtwin(StringTable[STR_FUANG], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->underlayStitchAngle * 180 / PI);
-			DataSheetValues[LUANG] = txtrwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LUANG] = txtrwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 	}
-	DataSheetLabels[LFRMFIL] = txtwin(StringTable[STR_TXT2], LabelWindowCoords);
-	DataSheetValues[LFRMFIL] = txtrwin(StringTable[STR_FIL0 + SelectedForm->fillType], ValueWindowCoords);
+	LabelWindow[LFRMFIL] = txtwin(StringTable[STR_TXT2], LabelWindowCoords);
+	ValueWindow[LFRMFIL] = txtrwin(StringTable[STR_FIL0 + SelectedForm->fillType], ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->fillType) {
-		DataSheetLabels[LFRMCOL] = txtwin(StringTable[STR_TXT3], LabelWindowCoords);
+		LabelWindow[LFRMCOL] = txtwin(StringTable[STR_TXT3], LabelWindowCoords);
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillColor + 1);
-		DataSheetValues[LFRMCOL] = numwin(MsgBuffer, ValueWindowCoords);
+		ValueWindow[LFRMCOL] = numwin(MsgBuffer, ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == FTHF) {
-			DataSheetLabels[LFTHCOL] = txtwin(StringTable[STR_FTHCOL], LabelWindowCoords);
+			LabelWindow[LFTHCOL] = txtwin(StringTable[STR_FTHCOL], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillInfo.feather.color + 1);
-			DataSheetValues[LFTHCOL] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LFTHCOL] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
-			DataSheetLabels[LFTHTYP] = txtwin(StringTable[STR_FTHTYP], LabelWindowCoords);
-			DataSheetValues[LFTHTYP] = numwin(StringTable[STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1], ValueWindowCoords);
+			LabelWindow[LFTHTYP] = txtwin(StringTable[STR_FTHTYP], LabelWindowCoords);
+			ValueWindow[LFTHTYP] = numwin(StringTable[STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1], ValueWindowCoords);
 			nxtlin();
-			DataSheetLabels[LFTHBLND] = txtwin(StringTable[STR_FTHBLND], LabelWindowCoords);
+			LabelWindow[LFTHBLND] = txtwin(StringTable[STR_FTHBLND], LabelWindowCoords);
 			if (SelectedForm->extendedAttribute&AT_FTHBLND)
 				pchr = StringTable[STR_ON];
 			else
 				pchr = StringTable[STR_OFF];
-			DataSheetValues[LFTHBLND] = txtrwin(pchr, ValueWindowCoords);
+			ValueWindow[LFTHBLND] = txtrwin(pchr, ValueWindowCoords);
 			nxtlin();
 			if (!(SelectedForm->extendedAttribute&AT_FTHBLND)) {
 				// ToDo - check whether we are doing 'feather down' or 'feather both'
 				// only 'feather both' exists in the string table
-				DataSheetLabels[LFTHDWN] = txtwin(StringTable[STR_FTHBOTH], LabelWindowCoords);
+				LabelWindow[LFTHDWN] = txtwin(StringTable[STR_FTHBOTH], LabelWindowCoords);
 				if (SelectedForm->extendedAttribute&(AT_FTHDWN))
 					pchr = StringTable[STR_ON];
 				else
 					pchr = StringTable[STR_OFF];
-				DataSheetValues[LFTHDWN] = txtrwin(pchr, ValueWindowCoords);
+				ValueWindow[LFTHDWN] = txtrwin(pchr, ValueWindowCoords);
 				nxtlin();
 				if (!(SelectedForm->extendedAttribute&AT_FTHDWN)) {
-					DataSheetLabels[LFTHUP] = txtwin(StringTable[STR_FTHUP], LabelWindowCoords);
+					LabelWindow[LFTHUP] = txtwin(StringTable[STR_FTHUP], LabelWindowCoords);
 					if (SelectedForm->extendedAttribute&AT_FTHUP)
 						pchr = StringTable[STR_ON];
 					else
 						pchr = StringTable[STR_OFF];
-					DataSheetValues[LFTHUP] = txtrwin(pchr, ValueWindowCoords);
+					ValueWindow[LFTHUP] = txtrwin(pchr, ValueWindowCoords);
 					nxtlin();
 				}
 			}
-			DataSheetLabels[LFTHUPCNT] = txtwin(StringTable[STR_FTHUPCNT], LabelWindowCoords);
+			LabelWindow[LFTHUPCNT] = txtwin(StringTable[STR_FTHUPCNT], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillInfo.feather.upCount);
-			DataSheetValues[LFTHUPCNT] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LFTHUPCNT] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
-			DataSheetLabels[LFTHDWNCNT] = txtwin(StringTable[STR_FTHDWNCNT], LabelWindowCoords);
+			LabelWindow[LFTHDWNCNT] = txtwin(StringTable[STR_FTHDWNCNT], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillInfo.feather.downCount);
-			DataSheetValues[LFTHDWNCNT] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LFTHDWNCNT] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
-			DataSheetLabels[LFTHSIZ] = txtwin(StringTable[STR_FTHSIZ], LabelWindowCoords);
+			LabelWindow[LFTHSIZ] = txtwin(StringTable[STR_FTHSIZ], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->fillInfo.feather.ratio);
-			DataSheetValues[LFTHSIZ] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LFTHSIZ] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 			if (SelectedForm->fillInfo.feather.fillType == FTHPSG) {
-				DataSheetLabels[LFTHNUM] = txtwin(StringTable[STR_FTHNUM], LabelWindowCoords);
+				LabelWindow[LFTHNUM] = txtwin(StringTable[STR_FTHNUM], LabelWindowCoords);
 				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillInfo.feather.count);
-				DataSheetValues[LFTHNUM] = numwin(MsgBuffer, ValueWindowCoords);
+				ValueWindow[LFTHNUM] = numwin(MsgBuffer, ValueWindowCoords);
 				nxtlin();
 			}
-			DataSheetLabels[LFTHFLR] = txtwin(StringTable[STR_FTHFLR], LabelWindowCoords);
+			LabelWindow[LFTHFLR] = txtwin(StringTable[STR_FTHFLR], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->fillInfo.feather.minStitchSize / PFGRAN);
-			DataSheetValues[LFTHFLR] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LFTHFLR] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType != CLPF) {
-			DataSheetLabels[LFRMSPAC] = txtwin(StringTable[STR_TXT4], LabelWindowCoords);
+			LabelWindow[LFRMSPAC] = txtwin(StringTable[STR_TXT4], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->fillSpacing / PFGRAN);
-			DataSheetValues[LFRMSPAC] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LFRMSPAC] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (istx(ClosestFormToCursor))
 		{
-			DataSheetLabels[LTXOF] = txtwin(StringTable[STR_TXOF], LabelWindowCoords);
+			LabelWindow[LTXOF] = txtwin(StringTable[STR_TXOF], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->txof / PFGRAN);
-			DataSheetValues[LTXOF] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LTXOF] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		DataSheetLabels[LMAXFIL] = txtwin(StringTable[STR_TXT20], LabelWindowCoords);
+		LabelWindow[LMAXFIL] = txtwin(StringTable[STR_TXT20], LabelWindowCoords);
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->maxFillStitchLen / PFGRAN);
-		DataSheetValues[LMAXFIL] = numwin(MsgBuffer, ValueWindowCoords);
+		ValueWindow[LMAXFIL] = numwin(MsgBuffer, ValueWindowCoords);
 		nxtlin();
 		if (!isclp(ClosestFormToCursor) && !istx(ClosestFormToCursor)) {
-			DataSheetLabels[LFRMLEN] = txtwin(StringTable[STR_TXT5], LabelWindowCoords);
+			LabelWindow[LFRMLEN] = txtwin(StringTable[STR_TXT5], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->lengthOrCount.stitchLength / PFGRAN);
-			DataSheetValues[LFRMLEN] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LFRMLEN] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		DataSheetLabels[LMINFIL] = txtwin(StringTable[STR_TXT21], LabelWindowCoords);
+		LabelWindow[LMINFIL] = txtwin(StringTable[STR_TXT21], LabelWindowCoords);
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->minFillStitchLen / PFGRAN);
-		DataSheetValues[LMINFIL] = numwin(MsgBuffer, ValueWindowCoords);
+		ValueWindow[LMINFIL] = numwin(MsgBuffer, ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
-			DataSheetLabels[LFRMANG] = txtwin(StringTable[STR_TXT6], LabelWindowCoords);
+			LabelWindow[LFRMANG] = txtwin(StringTable[STR_TXT6], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->angleOrClipData.angle * 180 / PI);
-			DataSheetValues[LFRMANG] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LFRMANG] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == ANGCLPF) {
-			DataSheetLabels[LSACANG] = txtwin(StringTable[STR_TXT6], LabelWindowCoords);
+			LabelWindow[LSACANG] = txtwin(StringTable[STR_TXT6], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->satinOrAngle.angle * 180 / PI);
-			DataSheetValues[LSACANG] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LSACANG] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VCLPF || SelectedForm->fillType == HCLPF || SelectedForm->fillType == ANGCLPF) {
-			DataSheetLabels[LFRMFAZ] = txtwin(StringTable[STR_TXT18], LabelWindowCoords);
+			LabelWindow[LFRMFAZ] = txtwin(StringTable[STR_TXT18], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->wordParam);
-			DataSheetValues[LFRMFAZ] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LFRMFAZ] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VRTF || SelectedForm->fillType == HORF || SelectedForm->fillType == ANGF || istx(ClosestFormToCursor)) {
-			DataSheetLabels[LBFILSQR] = txtwin(StringTable[STR_PRF2], LabelWindowCoords);
+			LabelWindow[LBFILSQR] = txtwin(StringTable[STR_PRF2], LabelWindowCoords);
 			if (SelectedForm->extendedAttribute&AT_SQR)
 				strcpy_s(MsgBuffer, StringTable[STR_SQR]);
 			else
 				strcpy_s(MsgBuffer, StringTable[STR_PNTD]);
-			DataSheetValues[LBFILSQR] = txtrwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LBFILSQR] = txtrwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 	}
-	DataSheetLabels[LFSTRT] = txtwin(StringTable[STR_FSTRT], LabelWindowCoords);
+	LabelWindow[LFSTRT] = txtwin(StringTable[STR_FSTRT], LabelWindowCoords);
 	if (SelectedForm->extendedAttribute&AT_STRT)
 		strcpy_s(MsgBuffer, StringTable[STR_ON]);
 	else
 		strcpy_s(MsgBuffer, StringTable[STR_OFF]);
-	DataSheetValues[LFSTRT] = txtrwin(MsgBuffer, ValueWindowCoords);
+	ValueWindow[LFSTRT] = txtrwin(MsgBuffer, ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->extendedAttribute&AT_STRT)
 	{
-		DataSheetLabels[LDSTRT] = txtwin(StringTable[STR_FSTRT], LabelWindowCoords);
+		LabelWindow[LDSTRT] = txtwin(StringTable[STR_FSTRT], LabelWindowCoords);
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillStart);
-		DataSheetValues[LDSTRT] = numwin(MsgBuffer, ValueWindowCoords);
+		ValueWindow[LDSTRT] = numwin(MsgBuffer, ValueWindowCoords);
 		nxtlin();
 	}
-	DataSheetLabels[LFEND] = txtwin(StringTable[STR_FEND], LabelWindowCoords);
+	LabelWindow[LFEND] = txtwin(StringTable[STR_FEND], LabelWindowCoords);
 	if (SelectedForm->extendedAttribute&AT_END)
 		strcpy_s(MsgBuffer, StringTable[STR_ON]);
 	else
 		strcpy_s(MsgBuffer, StringTable[STR_OFF]);
-	DataSheetValues[LFEND] = txtrwin(MsgBuffer, ValueWindowCoords);
+	ValueWindow[LFEND] = txtrwin(MsgBuffer, ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->extendedAttribute&AT_END)
 	{
-		DataSheetLabels[LDEND] = txtwin(StringTable[STR_FEND], LabelWindowCoords);
+		LabelWindow[LDEND] = txtwin(StringTable[STR_FEND], LabelWindowCoords);
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillEnd);
-		DataSheetValues[LDEND] = numwin(MsgBuffer, ValueWindowCoords);
+		ValueWindow[LDEND] = numwin(MsgBuffer, ValueWindowCoords);
 		nxtlin();
 	}
-	DataSheetLabels[LBRD] = txtwin(StringTable[STR_TXT7], LabelWindowCoords);
-	DataSheetValues[LBRD] = txtrwin(StringTable[STR_EDG0 + cod], ValueWindowCoords);
+	LabelWindow[LBRD] = txtwin(StringTable[STR_TXT7], LabelWindowCoords);
+	ValueWindow[LBRD] = txtrwin(StringTable[STR_EDG0 + cod], ValueWindowCoords);
 	nxtlin();
 	if (cod) {
-		DataSheetLabels[LBRDCOL] = txtwin(StringTable[STR_TXT8], LabelWindowCoords);
+		LabelWindow[LBRDCOL] = txtwin(StringTable[STR_TXT8], LabelWindowCoords);
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", (SelectedForm->borderColor & 0xf) + 1);
-		DataSheetValues[LBRDCOL] = numwin(MsgBuffer, ValueWindowCoords);
+		ValueWindow[LBRDCOL] = numwin(MsgBuffer, ValueWindowCoords);
 		nxtlin();
 		if (EdgeArray[fpnt] & BESPAC) {
-			DataSheetLabels[LBRDSPAC] = txtwin(StringTable[STR_TXT9], LabelWindowCoords);
+			LabelWindow[LBRDSPAC] = txtwin(StringTable[STR_TXT9], LabelWindowCoords);
 			if (cod == EDGEPROPSAT || cod == EDGEOCHAIN || cod == EDGELCHAIN)
 				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN);
 			else
 				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN * 2);
-			DataSheetValues[LBRDSPAC] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LBRDSPAC] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[fpnt] & BPICSPAC) {
-			DataSheetLabels[LBRDPIC] = txtwin(StringTable[STR_TXT16], LabelWindowCoords);
+			LabelWindow[LBRDPIC] = txtwin(StringTable[STR_TXT16], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN);
-			DataSheetValues[LBRDPIC] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LBRDPIC] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[fpnt] & BEMAX) {
-			DataSheetLabels[LMAXBRD] = txtwin(StringTable[STR_TXT22], LabelWindowCoords);
+			LabelWindow[LMAXBRD] = txtwin(StringTable[STR_TXT22], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->maxBorderStitchLen / PFGRAN);
-			DataSheetValues[LMAXBRD] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LMAXBRD] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[fpnt] & BELEN) {
-			DataSheetLabels[LBRDLEN] = txtwin(StringTable[STR_TXT10], LabelWindowCoords);
+			LabelWindow[LBRDLEN] = txtwin(StringTable[STR_TXT10], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeStitchLen / PFGRAN);
-			DataSheetValues[LBRDLEN] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LBRDLEN] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[fpnt] & BEMIN) {
-			DataSheetLabels[LMINBRD] = txtwin(StringTable[STR_TXT23], LabelWindowCoords);
+			LabelWindow[LMINBRD] = txtwin(StringTable[STR_TXT23], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->minBorderStitchLen / PFGRAN);
-			DataSheetValues[LMINBRD] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LMINBRD] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[fpnt] & BESIZ) {
-			DataSheetLabels[LBRDSIZ] = txtwin(StringTable[STR_TXT11], LabelWindowCoords);
+			LabelWindow[LBRDSIZ] = txtwin(StringTable[STR_TXT11], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->borderSize / PFGRAN);
-			DataSheetValues[LBRDSIZ] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LBRDSIZ] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[fpnt] & BRDPOS) {
-			DataSheetLabels[LBRDPOS] = txtwin(StringTable[STR_TXT18], LabelWindowCoords);
+			LabelWindow[LBRDPOS] = txtwin(StringTable[STR_TXT18], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeStitchLen);
-			DataSheetValues[LBRDPOS] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LBRDPOS] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[fpnt] & CHNPOS) {
-			DataSheetLabels[LBRDPOS] = txtwin(StringTable[STR_TXT19], LabelWindowCoords);
+			LabelWindow[LBRDPOS] = txtwin(StringTable[STR_TXT19], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeStitchLen);
-			DataSheetValues[LBRDPOS] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LBRDPOS] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (cod == EDGEAPPL) {
-			DataSheetLabels[LAPCOL] = txtwin(StringTable[STR_TXT12], LabelWindowCoords);
+			LabelWindow[LAPCOL] = txtwin(StringTable[STR_TXT12], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", (SelectedForm->borderColor >> 4) + 1);
-			DataSheetValues[LAPCOL] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LAPCOL] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (cod == EDGEANGSAT || cod == EDGEAPPL || cod == EDGEPROPSAT) {
-			DataSheetLabels[LBRDUND] = txtwin(StringTable[STR_TXT17], LabelWindowCoords);
+			LabelWindow[LBRDUND] = txtwin(StringTable[STR_TXT17], LabelWindowCoords);
 			if (SelectedForm->edgeType&EGUND)
-				DataSheetValues[LBRDUND] = numwin(StringTable[STR_ON], ValueWindowCoords);
+				ValueWindow[LBRDUND] = numwin(StringTable[STR_ON], ValueWindowCoords);
 			else
-				DataSheetValues[LBRDUND] = numwin(StringTable[STR_OFF], ValueWindowCoords);
+				ValueWindow[LBRDUND] = numwin(StringTable[STR_OFF], ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[fpnt] & BCNRSIZ) {
@@ -6939,22 +6939,22 @@ void refrmfn()
 				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", getblen() / PFGRAN);
 			else
 				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", getplen() / PFGRAN);
-			DataSheetLabels[LBCSIZ] = txtwin(StringTable[STR_TXT13], LabelWindowCoords);
-			DataSheetValues[LBCSIZ] = numwin(MsgBuffer, ValueWindowCoords);
+			LabelWindow[LBCSIZ] = txtwin(StringTable[STR_TXT13], LabelWindowCoords);
+			ValueWindow[LBCSIZ] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->type == FRMLINE&&EdgeArray[fpnt] & BRDEND) {
-			DataSheetLabels[LBSTRT] = txtwin(StringTable[STR_TXT14], LabelWindowCoords);
+			LabelWindow[LBSTRT] = txtwin(StringTable[STR_TXT14], LabelWindowCoords);
 			if (SelectedForm->attribute&SBLNT)
-				DataSheetValues[LBSTRT] = numwin(StringTable[STR_BLUNT], ValueWindowCoords);
+				ValueWindow[LBSTRT] = numwin(StringTable[STR_BLUNT], ValueWindowCoords);
 			else
-				DataSheetValues[LBSTRT] = numwin(StringTable[STR_TAPR], ValueWindowCoords);
+				ValueWindow[LBSTRT] = numwin(StringTable[STR_TAPR], ValueWindowCoords);
 			nxtlin();
-			DataSheetLabels[LBFIN] = txtwin(StringTable[STR_TXT15], LabelWindowCoords);
+			LabelWindow[LBFIN] = txtwin(StringTable[STR_TXT15], LabelWindowCoords);
 			if (SelectedForm->attribute&FBLNT)
-				DataSheetValues[LBFIN] = numwin(StringTable[STR_BLUNT], ValueWindowCoords);
+				ValueWindow[LBFIN] = numwin(StringTable[STR_BLUNT], ValueWindowCoords);
 			else
-				DataSheetValues[LBFIN] = numwin(StringTable[STR_TAPR], ValueWindowCoords);
+				ValueWindow[LBFIN] = numwin(StringTable[STR_TAPR], ValueWindowCoords);
 			nxtlin();
 		}
 	}
@@ -7118,8 +7118,8 @@ void setstrtch() {
 	if (SelectedFormControlVertex & 1) {
 		if (chkMap(FPSEL)) {
 			fvars(ClosestFormToCursor);
-			ine = SelectedFormPoints.start;
-			for (ind = 0; ind <= SelectedFormPoints.pointCount; ind++) {
+			ine = SelectedFormVertices.start;
+			for (ind = 0; ind <= SelectedFormVertices.vertexCount; ind++) {
 				CurrentFormVertices[ine].x = (CurrentFormVertices[ine].x - ref)*rat + ref;
 				ine = pdir(ine);
 			}
@@ -7163,8 +7163,8 @@ void setstrtch() {
 	else {
 		if (chkMap(FPSEL)) {
 			fvars(ClosestFormToCursor);
-			ine = SelectedFormPoints.start;
-			for (ind = 0; ind <= SelectedFormPoints.pointCount; ind++) {
+			ine = SelectedFormVertices.start;
+			for (ind = 0; ind <= SelectedFormVertices.vertexCount; ind++) {
 				CurrentFormVertices[ine].y = (CurrentFormVertices[ine].y - ref)*rat + ref;
 				ine = pdir(ine);
 			}
@@ -7339,8 +7339,8 @@ void setexpand() {
 	px2stchf(tref, &sref);
 	if (chkMap(FPSEL)) {
 		fvars(ClosestFormToCursor);
-		ine = SelectedFormPoints.start;
-		for (ind = 0; ind <= SelectedFormPoints.pointCount; ind++) {
+		ine = SelectedFormVertices.start;
+		for (ind = 0; ind <= SelectedFormVertices.vertexCount; ind++) {
 			CurrentFormVertices[ine].x = (CurrentFormVertices[ine].x - sref.x)*rat.x + sref.x;
 			CurrentFormVertices[ine].y = (CurrentFormVertices[ine].y - sref.y)*rat.y + sref.y;
 			ine = pdir(ine);
@@ -7571,7 +7571,7 @@ HWND prfnwin(TCHAR* str) {
 
 void prflin(unsigned p_lin) {
 	prftwin(StringTable[p_lin]);
-	DataSheetValues[p_lin - STR_PRF0] = prfnwin(MsgBuffer);
+	ValueWindow[p_lin - STR_PRF0] = prfnwin(MsgBuffer);
 	nxtlin();
 }
 
@@ -8169,9 +8169,9 @@ void fliph() {
 	fvars(ClosestFormToCursor);
 	if (chkMap(FPSEL)) {
 		savdo();
-		av = (SelectedPointsRect.right - SelectedPointsRect.left)*0.5 + SelectedPointsRect.left;
-		ine = SelectedFormPoints.start;
-		for (ind = 0; ind <= SelectedFormPoints.pointCount; ind++) {
+		av = (SelectedVerticesRect.right - SelectedVerticesRect.left)*0.5 + SelectedVerticesRect.left;
+		ine = SelectedFormVertices.start;
+		for (ind = 0; ind <= SelectedFormVertices.vertexCount; ind++) {
 			CurrentFormVertices[ine].x = av + av - CurrentFormVertices[ine].x;
 			ine = pdir(ine);
 		}
@@ -8246,9 +8246,9 @@ void flipv() {
 	fvars(ClosestFormToCursor);
 	if (chkMap(FPSEL)) {
 		savdo();
-		av = (SelectedPointsRect.top - SelectedPointsRect.bottom)*0.5 + SelectedPointsRect.bottom;
-		ine = SelectedFormPoints.start;
-		for (ind = 0; ind <= SelectedFormPoints.pointCount; ind++) {
+		av = (SelectedVerticesRect.top - SelectedVerticesRect.bottom)*0.5 + SelectedVerticesRect.bottom;
+		ine = SelectedFormVertices.start;
+		for (ind = 0; ind <= SelectedFormVertices.vertexCount; ind++) {
 			CurrentFormVertices[ine].y = av + av - CurrentFormVertices[ine].y;
 			ine = pdir(ine);
 		}
@@ -8942,9 +8942,9 @@ void flpord() {
 	fvars(ClosestFormToCursor);
 	if (chkMap(FPSEL)) {
 		savdo();
-		strt = SelectedFormPoints.start;
-		fin = (SelectedFormPoints.start + SelectedFormPoints.pointCount) % SideCount;
-		for (uind = 0; uind <= SelectedFormPoints.pointCount >> 1; uind++) {
+		strt = SelectedFormVertices.start;
+		fin = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % SideCount;
+		for (uind = 0; uind <= SelectedFormVertices.vertexCount >> 1; uind++) {
 			tpnt.x = SelectedForm->vertices[strt].x;
 			tpnt.y = SelectedForm->vertices[strt].y;
 			SelectedForm->vertices[strt].x = SelectedForm->vertices[fin].x;
@@ -9338,8 +9338,8 @@ void rotpar() {
 	if (IniFile.rotationAngle < (PI / 180))
 		tabmsg(IDS_ROTIN);
 	if (chkMap(FPSEL)) {
-		RotationCenter.x = midl(SelectedPointsRect.right, SelectedPointsRect.left);
-		RotationCenter.y = midl(SelectedPointsRect.top, SelectedPointsRect.bottom);
+		RotationCenter.x = midl(SelectedVerticesRect.right, SelectedVerticesRect.left);
+		RotationCenter.y = midl(SelectedVerticesRect.top, SelectedVerticesRect.bottom);
 		return;
 	}
 	if (chkMap(BIGBOX)) {
@@ -10811,7 +10811,7 @@ void dufdat(unsigned find) {
 	dst = &TempFormList[FormRelocationIndex++];
 	src = &FormList[find];
 	mvfrms(dst, src, 1);
-	mvflpnt(&TempFormPoints[FormVertexIndex], dst->vertices, dst->sides);
+	mvflpnt(&TempFormVertices[FormVertexIndex], dst->vertices, dst->sides);
 	dst->vertices = &FormVertices[FormVertexIndex];
 	FormVertexIndex += dst->sides;
 	if (dst->satinGuideCount) {
@@ -10864,7 +10864,7 @@ void frmnumfn(unsigned nunum) {
 		}
 		srcpnt = FormRelocationIndex = 0;
 		TempFormList = (FRMHED*)&BSequence;
-		TempFormPoints = (fPOINT*)&TempFormList[FormIndex];
+		TempFormVertices = (fPOINT*)&TempFormList[FormIndex];
 		TempSatinConnects = (SATCON*)&OSequence;
 		TempClipPoints = (fPOINT*)&TempSatinConnects[SatinConnectIndex];
 		FormVertexIndex = SatinConnectIndex = ClipPointIndex = 0;
@@ -10878,7 +10878,7 @@ void frmnumfn(unsigned nunum) {
 			}
 		}
 		mvfrms(FormList, TempFormList, FormIndex);
-		mvflpnt(FormVertices, TempFormPoints, FormVertexIndex);
+		mvflpnt(FormVertices, TempFormVertices, FormVertexIndex);
 		mvsatk(SatinConnects, TempSatinConnects, SatinConnectIndex);
 		mvflpnt(ClipPoints, TempClipPoints, ClipPointIndex);
 		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {

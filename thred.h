@@ -728,7 +728,7 @@ typedef struct _iniFil {
 	unsigned short  nudgePixels;			//nudge pixels
 	float			eggRatio;				//egg ratio
 	unsigned short	stitchSizePixels;		//size of stitch points in pixels
-	unsigned short	formPointSizePixels;	//size of form points in pixels
+	unsigned short	formVertexSizePixels;	//size of form points in pixels
 	unsigned short	formSides;				//sides of a created form
 	float			tearTailLength;			//length of the tear tail
 	float			tearTwistStep;			//tear twist step
@@ -774,13 +774,13 @@ enum {
 	AUXPES
 };
 
-typedef struct _formPoints {
+typedef struct _formVertices {
 
 	unsigned start;
-	unsigned pointCount;
+	unsigned vertexCount;
 	unsigned finish;
 	unsigned form;
-}FORMPOINTS;
+}FORMVERTICES;
 
 typedef struct _doublePoint {
 
@@ -1112,11 +1112,11 @@ typedef struct _frmsclp {
 	unsigned short	reserved;
 }FORMSCLIP; //multiple forms clipboard header
 
-typedef struct _fpclp {
+typedef struct _fvclip {
 	unsigned		clipType;
-	unsigned short	pointCount;
+	unsigned short	vertexCount;
 	BOOL			direction;
-}FORMPOINTCLIP; // form points clipboard header
+}FORMVERTEXCLIP; // form points clipboard header
 
 typedef struct _strhed {		//thred file header
 	unsigned		headerType;
@@ -1124,8 +1124,8 @@ typedef struct _strhed {		//thred file header
 	unsigned short	stitchCount;	//number of stitches
 	unsigned short	hoopType;		//size of hup
 	unsigned short	formCount;		//number of forms
-	unsigned short	FormPointsLen;	//points to form points
-	unsigned short	pointCount;		//number of form points
+	unsigned short	vertexLen;		//points to form points
+	unsigned short	vertexCount;	//number of form points
 	unsigned short	dlineLen;		//points to dline data
 	unsigned short	dlineCount;		//dline data count
 	unsigned short	clipDataLen;	//points to clipboard data
@@ -1152,7 +1152,7 @@ typedef struct _strex {				//thred v1.0 file header extension
 typedef struct _dsthed {		//dst file header
 	TCHAR desched	[3];	// 0 0		description
 	TCHAR desc		[17];	// 3 3
-	TCHAR recshed	[3];	// 20 14	redord count
+	TCHAR recshed	[3];	// 20 14	record count
 	TCHAR recs		[8];	// 23 17
 	TCHAR cohed		[3];	// 31 1F
 	TCHAR co		[4];	// 34 22
@@ -1224,8 +1224,8 @@ typedef struct _bakhed {
 	FRMHED*		forms;
 	unsigned	stitchCount;
 	fPOINTATTR*	stitches;
-	unsigned	formPointCount;
-	fPOINT*		formPoints;
+	unsigned	vertexCount;
+	fPOINT*		vertices;
 	unsigned	satinConnectionCount;
 	SATCON*		satinConnection;
 	unsigned	clipPointCount;
