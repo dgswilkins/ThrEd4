@@ -1668,18 +1668,18 @@ unsigned setMap(unsigned bit) {
 #endif
 }
 
-void clrMap(unsigned length) {
+void clrMap(unsigned mapLength) {
 
 #if  __UseASM__
 	_asm {
 
 		mov		edi, offset FlagMap
-		mov		ecx, length
+		mov		ecx, mapLength
 		xor		eax, eax
 		rep		stosd
 	}
 #else
-	memset(FlagMap, 0, sizeof(*FlagMap) * length);
+	memset(FlagMap, 0, sizeof(*FlagMap) * mapLength);
 #endif
 }
 
@@ -2291,18 +2291,18 @@ void ladj() {
 	setMap(DUMEN);
 }
 
-void stchcpy(unsigned size, fPOINTATTR* destination) {
+void stchcpy(unsigned count, fPOINTATTR* destination) {
 
 #if  __UseASM__
 	_asm {
 
 		mov		esi, offset StitchBuffer
 		mov		edi, destination
-		mov		ecx, size
+		mov		ecx, count
 		rep		movsd
 	}
 #else
-	memcpy(destination, StitchBuffer, size * 4);
+	memcpy(destination, StitchBuffer, count * 4);
 #endif
 }
 
@@ -2323,12 +2323,12 @@ void deldu() {
 	rstMap(BAKACT);
 }
 
-TCHAR* mvflpnt(fPOINT* destination, fPOINT* source, unsigned size) {
+TCHAR* mvflpnt(fPOINT* destination, fPOINT* source, unsigned count) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		ecx, size
+		mov		ecx, count
 		shl		ecx, 1
 		mov		esi, source
 		mov		edi, destination
@@ -2336,23 +2336,23 @@ TCHAR* mvflpnt(fPOINT* destination, fPOINT* source, unsigned size) {
 		mov		eax, edi
 	}
 #else
-	memcpy(destination, source, size * sizeof(fPOINT));
+	memcpy(destination, source, count * sizeof(fPOINT));
 	return (TCHAR *)(destination + size);
 #endif
 }
 
-void mvsatk(SATCON* destination, SATCON* source, unsigned size) {
+void mvsatk(SATCON* destination, SATCON* source, unsigned count) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		ecx, size
+		mov		ecx, count
 		mov		esi, source
 		mov		edi, destination
 		rep		movsd
 	}
 #else
-	memcpy(destination, source, size * sizeof(SATCON));
+	memcpy(destination, source, count * sizeof(SATCON));
 #endif
 }
 
@@ -4606,18 +4606,18 @@ void delstch1(unsigned iStitch) {
 	}
 }
 
-void stchred(unsigned size, fPOINTATTR* source) {
+void stchred(unsigned count, fPOINTATTR* source) {
 
 #if  __UseASM__
 	_asm {
 
 		mov		edi, offset StitchBuffer
 		mov		esi, source
-		mov		ecx, size
+		mov		ecx, count
 		rep		movsd
 	}
 #else
-	memcpy(StitchBuffer, source, size * 4);
+	memcpy(StitchBuffer, source, count * 4);
 #endif
 }
 
@@ -9009,13 +9009,13 @@ void mvstch(unsigned dst, unsigned src) {
 
 #if  __UseASM__
 	_asm {
-		mov		eax, destination
+		mov		eax, dst
 		xor		ecx, ecx
 		mov		cl, 12
 		mul		ecx
 		mov		ebx, eax
 		add		ebx, offset StitchBuffer
-		mov		eax, source
+		mov		eax, src
 		mul		ecx
 		add		eax, offset StitchBuffer
 		mov		cl, 4
@@ -9433,7 +9433,7 @@ void durit(void* src, unsigned cnt) {
 #if  __UseASM__
 	_asm {
 
-		mov		esi, source
+		mov		esi, src
 		mov		edi, OutputIndex
 		mov		ecx, cnt
 		rep		movsb
@@ -10974,11 +10974,11 @@ void mvstchs(unsigned dst, unsigned src, unsigned cnt) {
 
 		xor		ecx, ecx
 		mov		cl, 12
-		mov		eax, destination
+		mov		eax, dst
 		mul		ecx
 		mov		edi, eax
 		add		edi, offset StitchBuffer
-		mov		eax, source
+		mov		eax, src
 		mul		ecx
 		mov		esi, eax
 		add		esi, offset StitchBuffer
@@ -11511,8 +11511,8 @@ void strlcpy(TCHAR* dst, TCHAR* src) {
 	_asm {
 
 		mov		ebx, offset UpperCaseMap
-		mov		ecx, destination
-		mov		edx, source
+		mov		ecx, dst
+		mov		edx, src
 		xor		eax, eax
 		lup : mov		al, [edx]
 			  inc		edx
