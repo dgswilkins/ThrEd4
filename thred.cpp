@@ -10683,24 +10683,24 @@ void nulayr(unsigned play) {
 
 BOOL iselpnt() {
 
-	unsigned	ind, ine = 0;
-	double		len, minlen = 1e99;
-	POINT		tpnt;
+	unsigned	iControlPoint, closestControlPoint = 0;
+	double		length, minimumLength = 1e99;
+	POINT		pointToTest;
 
-	tpnt.x = Msg.pt.x - StitchWindowOrigin.x;
-	tpnt.y = Msg.pt.y - StitchWindowOrigin.y;
-	for (ind = 0; ind < 9; ind++) {
+	pointToTest.x = Msg.pt.x - StitchWindowOrigin.x;
+	pointToTest.y = Msg.pt.y - StitchWindowOrigin.y;
+	for (iControlPoint = 0; iControlPoint < 9; iControlPoint++) {
 
-		len = hypot(tpnt.x - FormOutlineRect[ind].x, tpnt.y - FormOutlineRect[ind].y);
-		if (len < minlen) {
+		length = hypot(pointToTest.x - FormOutlineRect[iControlPoint].x, pointToTest.y - FormOutlineRect[iControlPoint].y);
+		if (length < minimumLength) {
 
-			minlen = len;
-			ine = ind;
+			minimumLength = length;
+			closestControlPoint = iControlPoint;
 		}
 	}
-	if (minlen < CLOSENUF) {
+	if (minimumLength < CLOSENUF) {
 
-		SelectedFormControlVertex = ine;
+		SelectedFormControlVertex = closestControlPoint;
 		return 1;
 	} else
 		return 0;
@@ -10708,34 +10708,34 @@ BOOL iselpnt() {
 
 void rtrclpfn() {
 
-	unsigned ind, len = 0;
+	unsigned iStitch, count = 0;
 
 	if (OpenClipboard(ThrEdWindow)) {
 
 		fvars(ClosestFormToCursor);
 		if (iseclp(ClosestFormToCursor)) {
 
-			len = SelectedForm->clipEntries;
-			oclp(SelectedForm->borderClipData, len);
+			count = SelectedForm->clipEntries;
+			oclp(SelectedForm->borderClipData, count);
 		} else {
 
 			if (isclp(ClosestFormToCursor)) {
 
-				len = SelectedForm->lengthOrCount.clipCount;
-				oclp(SelectedForm->angleOrClipData.clip, len);
+				count = SelectedForm->lengthOrCount.clipCount;
+				oclp(SelectedForm->angleOrClipData.clip, count);
 			}
 		}
-		if (len) {
+		if (count) {
 
 			LowerLeftStitch.x = LowerLeftStitch.y = 0;
 			EmptyClipboard();
 			Clip = RegisterClipboardFormat(PcdClipFormat);
-			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, len * sizeof(CLPSTCH) + 2);
+			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, count * sizeof(CLPSTCH) + 2);
 			ClipStitchData = deref(ClipPointer);
 			rtclpfn(0, 0);
-			ClipStitchData[0].led = len;
-			for (ind = 1; ind < len; ind++)
-				rtclpfn(ind, ind);
+			ClipStitchData[0].led = count;
+			for (iStitch = 1; iStitch < count; iStitch++)
+				rtclpfn(iStitch, iStitch);
 			SetClipboardData(Clip, ClipPointer);
 			CloseClipboard();
 		}
