@@ -473,7 +473,7 @@ RECT			StitchWindowClientRect;	//stitch window size,client
 DRAWITEMSTRUCT*	DrawItem;				//for owner-draw windows
 double			ZoomFactor = 1;			//zoom factor
 POINT			UnzoomedRect;			//size of the unzoomed stitch window
-POINT			StitchSizePixels;		//converted from stich to pixel
+POINT			StitchCoordinatesPixels;	//converted from stitch to pixel
 POINT			NearestPixel[NERCNT];	//selected points
 POINT			BoxCoordinate;			//single select box point
 double			DistanceToClick;		//distance of closest point to a mouse click
@@ -498,8 +498,8 @@ unsigned		MarkedStitchMap[RMAPSIZ];	//bitmap to tell when stitches have been mar
 TCHAR*			PcdClipFormat = "PMust_Format";
 TCHAR*			ThrEdClipFormat = "threditor";
 CLPSTCH*		ClipStitchData;			//for pcs clipboard data
-FORMCLIP*		ClipFormData;			//for thred form clipboard data
-FORMSCLIP*		ClipFormsData;			//multiple form clipboard header
+FORMCLIP*		ClipFormHeader;			//for thred form clipboard data
+FORMSCLIP*		ClipFormsHeader;		//multiple form clipboard header
 FORMVERTEXCLIP*	ClipFormVerticesData;	//form points clipboard header
 void*			ClipPointer;			//for memory allocation for clipboard data
 void*			ThrEdClipPointer;		//for memory allocation for thred format clipboard data
@@ -581,13 +581,13 @@ POINT*			FormVerticesAsLine;		//form vertex clipboard paste into form line
 unsigned		LastFormSelected;		//end point of selected range of forms
 
 #if	PESACT
-unsigned char*	PesColors;				//pes colors
-TCHAR*			PesData;				//pes card data buffer
-fPOINT			StitchCenterOffset;		//offset for writing pes files
-PESTCH*			PesStitches;			//pes stitch buffer
-unsigned char	PesEquivColors[16];		//pes equivalent colors
-unsigned char*	PesStitch;				//pes stitches
-unsigned		PesColorIndex;			//pes color index
+unsigned char*	PEScolors;				//pes colors
+TCHAR*			PESdata;				//pes card data buffer
+fPOINT			PESstichCenterOffset;	//offset for writing pes files
+PESTCH*			PESstitches;			//pes stitch buffer
+unsigned char	PESequivColors[16];		//pes equivalent colors
+unsigned char*	PESstitch;				//pes stitches
+unsigned		PEScolorIndex;			//pes color index
 #endif
 
 POINT			EndPointCross;			//point to draw at the end cross for form select points
@@ -697,7 +697,7 @@ HWND			MainStitchWin;			//stitch window
 HWND			VerticalScrollBar;		//vertical scroll bar
 HWND			HorizontalScrollBar;	//horizontal scroll bar
 HWND			ButtonWin[9];			//button windows
-HWND			TraceStepWin;			//trace step window
+HWND			TraceStepWin;			//trace stepSize window
 HWND			ColorBar;				//color bar
 HWND			OKButton;				//ok button
 HWND			DiscardButton;			//discard button
@@ -739,7 +739,7 @@ unsigned		NearestCount;			//number of boxes selected
 POINT			SearchLine[MAXSEQ];		//stitch select line 
 unsigned		SearchLineIndex = 0;	//pointer for drawing stitch select lines
 fRECTANGLE		StitchRangeRect;		//stitch range rectangle
-fPOINT			StitchRangeSize;		//from check ranges
+fPOINT			StitchRangeSize;		//form check ranges
 fPOINT			SelectedFormsSize;		//size of multiple select rectangle
 unsigned		MoveAnchor;				//for resequencing stitches
 double			RotateAngle;			//angle for pixel rotate
@@ -753,7 +753,7 @@ double			HighestAngle;			//hi angle for angle from mark
 unsigned		Knots[MAXKNOTS];		//pointers to knots
 unsigned		KnotCount;				//number of knots in the design
 unsigned		KnotAttribute;			//knot stitch attribute
-fPOINT			KnotStep;				//knot step
+fPOINT			KnotStep;				//knot stepSize
 TCHAR			KnotAtStartOrder[] = { 2,3,1,4,0 };		//knot spacings
 TCHAR			KnotAtEndOrder[] = { -2,-3,-1,-4,0 };	//reverse knot spacings
 TCHAR			KnotAtLastOrder[] = { 0,-4,-1,-3,-2 };	//reverse knot spacings
@@ -2337,7 +2337,7 @@ TCHAR* mvflpnt(fPOINT* destination, fPOINT* source, unsigned count) {
 	}
 #else
 	memcpy(destination, source, count * sizeof(fPOINT));
-	return (TCHAR *)(destination + size);
+	return (TCHAR *)(destination + count);
 #endif
 }
 
@@ -2374,8 +2374,8 @@ void dudat() {
 		backupData->zoomRect.y = UnzoomedRect.y;
 		backupData->formCount = FormIndex;
 		backupData->forms = (FRMHED*)&backupData[1];
-		//		for(unsigned ind=0;ind<FormIndex;ind++)
-		//			frmcpy(&backupData->forms[ind],&FormList[ind]);
+		//		for(unsigned iStitch=0;iStitch<FormIndex;iStitch++)
+		//			frmcpy(&backupData->forms[iStitch],&FormList[iStitch]);
 		MoveMemory(backupData->forms, &FormList, sizeof(FRMHED)*FormIndex);
 		backupData->stitchCount = PCSHeader.stitchCount;
 		backupData->stitches = (fPOINTATTR*)&backupData->forms[FormIndex];
@@ -3098,14 +3098,14 @@ void duar() {
 
 	POINT arrowCenter;
 
-	StitchArrow[1].x = StitchSizePixels.x;
-	StitchArrow[1].y = StitchSizePixels.y;
-	RotationCenterPixels.x = StitchSizePixels.x;
-	RotationCenterPixels.y = StitchSizePixels.y;
-	arrowCenter.x = StitchSizePixels.x - 10;
-	arrowCenter.y = StitchSizePixels.y + 10;
+	StitchArrow[1].x = StitchCoordinatesPixels.x;
+	StitchArrow[1].y = StitchCoordinatesPixels.y;
+	RotationCenterPixels.x = StitchCoordinatesPixels.x;
+	RotationCenterPixels.y = StitchCoordinatesPixels.y;
+	arrowCenter.x = StitchCoordinatesPixels.x - 10;
+	arrowCenter.y = StitchCoordinatesPixels.y + 10;
 	rotpix(arrowCenter, &StitchArrow[0]);
-	arrowCenter.y = StitchSizePixels.y - 10;
+	arrowCenter.y = StitchCoordinatesPixels.y - 10;
 	rotpix(arrowCenter, &StitchArrow[2]);
 	SelectObject(StitchWindowMemDC, BoxPen[0]);
 	SelectObject(StitchWindowDC, BoxPen[0]);
@@ -3167,12 +3167,12 @@ void redraw(HWND window) {
 
 unsigned stch2px(unsigned iStitch) {
 
-	StitchSizePixels.x = (StitchBuffer[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-	StitchSizePixels.y = StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-	if (StitchSizePixels.x >= 0 &&
-		StitchSizePixels.x <= StitchWindowClientRect.right&&
-		StitchSizePixels.y >= 0 &&
-		StitchSizePixels.y <= StitchWindowClientRect.bottom)
+	StitchCoordinatesPixels.x = (StitchBuffer[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+	if (StitchCoordinatesPixels.x >= 0 &&
+		StitchCoordinatesPixels.x <= StitchWindowClientRect.right&&
+		StitchCoordinatesPixels.y >= 0 &&
+		StitchCoordinatesPixels.y <= StitchWindowClientRect.bottom)
 
 		return 1;
 	else
@@ -3181,14 +3181,14 @@ unsigned stch2px(unsigned iStitch) {
 
 void stch2px1(unsigned iStitch) {
 
-	StitchSizePixels.x = (StitchBuffer[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-	StitchSizePixels.y = StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+	StitchCoordinatesPixels.x = (StitchBuffer[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 }
 
 void stch2pxr(fPOINT stitchCoordinate) {
 
-	StitchSizePixels.x = (stitchCoordinate.x - ZoomRect.left)*ZoomRatio.x + 0.5;
-	StitchSizePixels.y = StitchWindowClientRect.bottom - (stitchCoordinate.y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+	StitchCoordinatesPixels.x = (stitchCoordinate.x - ZoomRect.left)*ZoomRatio.x + 0.5;
+	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (stitchCoordinate.y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 }
 
 void movins() {
@@ -5260,7 +5260,7 @@ unsigned dupcol() {
 	COLORREF	color;
 	unsigned	matchDistance, minimumDistance, matchIndex = 0;
 
-	color = PESColorTranslate[PesColors[PesColorIndex++]];
+	color = PESColorTranslate[PEScolors[PEScolorIndex++]];
 	for (iColor = 0; iColor < ActivePointIndex; iColor++) {
 
 		if (UserColor[iColor] == color)
@@ -5269,7 +5269,7 @@ unsigned dupcol() {
 	minimumDistance = 0xffffff;
 	for (iColor = 1; iColor < ActivePointIndex; iColor++) {
 
-		matchDistance = pesmtch(color, PesColors[iColor]);
+		matchDistance = pesmtch(color, PEScolors[iColor]);
 		if (matchDistance < minimumDistance) {
 
 			minimumDistance = matchDistance;
@@ -5354,25 +5354,26 @@ void nuFil() {
 	unsigned		fileSize, iStitch;
 	unsigned		version;
 	DWORD			fileSizeHigh;
-	unsigned		ind, pcsStitchCount, ing, inh, color;
+	unsigned		textureHistoryFlag, pcsStitchCount;
+	unsigned		iPCSstitch, iPESstitch, color, iColor;
 	unsigned		iColorChange;
-	TCHAR*			pext;
-	TCHAR			tchr;
-	STRHED			sthed;
-	TCHAR			buf[3];
+	TCHAR*			fileExtention;
+	TCHAR			firstCharacter;
+	STRHED			thredHeader;
+	TCHAR			buffer[3];
 	TCHAR*			tnam;
-	DSTHED			dsthed;
-	fRECTANGLE		strct;
-	FRMHEDO*		frmlstx;
+	DSTHED			dstHeader;
+	fRECTANGLE		stitchRect;
+	FRMHEDO*		formListCopy;
 	long			totalBytesRead;
 
 #if PESACT
 
-	unsigned		ine;
-	PESHED*			peshed;
+	unsigned		iActualPESstitches;
+	PESHED*			pesHeader;
 	TCHAR*			l_peschr;
 	unsigned		pecof;
-	unsigned char*	pcolcnt;
+	unsigned char*	pesColorCount;
 	dPOINT			loc;
 	PESTCH*			pabstch;
 	unsigned		pabind;
@@ -5401,7 +5402,6 @@ void nuFil() {
 			OPEN_EXISTING, 0, NULL);
 		if (FileHandle == INVALID_HANDLE_VALUE) {
 
-			ind = GetLastError();
 			if (GetLastError() == 32)
 				filnopn(IDS_FNOPNA, WorkingFileName);
 			else
@@ -5443,33 +5443,33 @@ void nuFil() {
 			NearestCount = 0;
 			if (rstMap(WASPAT))
 				DestroyWindow(SpeedScrollBar);
-			ind = 0;
+			textureHistoryFlag = 0;
 			if (chkMap(WASTXBAK))
-				ind = 1;
+				textureHistoryFlag = 1;
 			clrMap(MAPLEN);
-			if (ind)
+			if (textureHistoryFlag)
 				setMap(WASTXBAK);
 			fileSize = GetFileSize(FileHandle, &fileSizeHigh);
-			pext = strrchr(WorkingFileName, '.');
-			if (pext)
-				pext++;
+			fileExtention = strrchr(WorkingFileName, '.');
+			if (fileExtention)
+				fileExtention++;
 			else {
 
 				strcat_s(WorkingFileName, ".thr");
-				pext = strrchr(WorkingFileName, '.') + 1;
+				fileExtention = strrchr(WorkingFileName, '.') + 1;
 			}
-			tchr = tolower(pext[0]);
-			if (tchr == 't') {
+			firstCharacter = tolower(fileExtention[0]);
+			if (firstCharacter == 't') {
 
-				ReadFile(FileHandle, (STRHED*)&sthed, sizeof(STRHED), &BytesRead, NULL);
-				if ((sthed.headerType & 0xffffff) == 0x746872) {
+				ReadFile(FileHandle, (STRHED*)&thredHeader, sizeof(STRHED), &BytesRead, NULL);
+				if ((thredHeader.headerType & 0xffffff) == 0x746872) {
 
 					if (BytesRead != sizeof(STRHED)) {
 
 						tabmsg(IDS_SHRTF);
 						return;
 					}
-					version = (sthed.headerType & 0xff000000) >> 24;
+					version = (thredHeader.headerType & 0xff000000) >> 24;
 					switch (version) {
 
 					case 0:
@@ -5511,7 +5511,7 @@ void nuFil() {
 					ZoomRect.bottom = ZoomRect.left = 0;
 					ZoomRect.right = UnzoomedRect.x = IniFile.hoopSizeX;
 					ZoomRect.top = UnzoomedRect.y = IniFile.hoopSizeY;
-					PCSHeader.stitchCount = sthed.stitchCount;
+					PCSHeader.stitchCount = thredHeader.stitchCount;
 					ReadFile(FileHandle, (fPOINTATTR*)StitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR), &BytesRead, NULL);
 					if (BytesRead != PCSHeader.stitchCount * sizeof(fPOINTATTR)) {
 
@@ -5559,18 +5559,18 @@ void nuFil() {
 					}
 					for (int iThread = 0; iThread < 16; iThread++)
 						ThreadSize[iThread][0] = MsgBuffer[iThread];
-					FormIndex = sthed.formCount;
+					FormIndex = thredHeader.formCount;
 					if (FormIndex > MAXFORMS)
 						FormIndex = MAXFORMS;
-					pcsStitchCount = 0; ing = 0, inh = 0;
+					pcsStitchCount = 0;
 					if (FormIndex) {
 
-						ind = FormVertexIndex = SatinConnectIndex = ClipPointIndex = 0;
+						FormVertexIndex = SatinConnectIndex = ClipPointIndex = 0;
 						MsgBuffer[0] = 0;
 						if (version < 2) {
 
-							frmlstx = (FRMHEDO*)&BSequence;
-							ReadFile(FileHandle, (FRMHEDO*)frmlstx, FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
+							formListCopy = (FRMHEDO*)&BSequence;
+							ReadFile(FileHandle, (FRMHEDO*)formListCopy, FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
 							if (BytesRead != FormIndex * sizeof(FRMHEDO)) {
 
 								FormIndex = BytesRead / sizeof(FRMHEDO);
@@ -5588,22 +5588,22 @@ void nuFil() {
 							}
 						}
 						//						nextBufferIndex=SetFilePointer(FileHandle,0,0,FILE_CURRENT);  //bug
-						ReadFile(FileHandle, (fPOINT*)FormVertices, sthed.vertexCount * sizeof(fPOINT), &BytesRead, 0);
-						if (BytesRead != sizeof(fPOINT)*sthed.vertexCount) {
+						ReadFile(FileHandle, (fPOINT*)FormVertices, thredHeader.vertexCount * sizeof(fPOINT), &BytesRead, 0);
+						if (BytesRead != sizeof(fPOINT)*thredHeader.vertexCount) {
 
 							FormVertexIndex = BytesRead / sizeof(fPOINT);
-							for (unsigned iVertex = FormVertexIndex; iVertex < sthed.vertexCount; iVertex++)
+							for (unsigned iVertex = FormVertexIndex; iVertex < thredHeader.vertexCount; iVertex++)
 								FormVertices[iVertex].x = FormVertices[iVertex].y = 0;
 							setMap(BADFIL);
 						}
-						ReadFile(FileHandle, (SATCON*)SatinConnects, sthed.dlineCount * sizeof(SATCON), &BytesRead, 0);
-						if (BytesRead != sthed.dlineCount * sizeof(SATCON)) {
+						ReadFile(FileHandle, (SATCON*)SatinConnects, thredHeader.dlineCount * sizeof(SATCON), &BytesRead, 0);
+						if (BytesRead != thredHeader.dlineCount * sizeof(SATCON)) {
 
 							SatinConnectIndex = BytesRead / sizeof(SATCON);
 							setMap(BADFIL);
 						}
-						ReadFile(FileHandle, (fPOINT*)ClipPoints, sthed.clipDataCount * sizeof(fPOINT), &BytesRead, 0);
-						if (BytesRead != sthed.clipDataCount * sizeof(fPOINT)) {
+						ReadFile(FileHandle, (fPOINT*)ClipPoints, thredHeader.clipDataCount * sizeof(fPOINT), &BytesRead, 0);
+						if (BytesRead != thredHeader.clipDataCount * sizeof(fPOINT)) {
 
 							ClipPointIndex = BytesRead / sizeof(fPOINT);
 							setMap(BADFIL);
@@ -5632,9 +5632,9 @@ void nuFil() {
 			} else {
 
 				setMap(NOTHRFIL);
-				if (tchr == 'p') {
+				if (firstCharacter == 'p') {
 
-					if (tolower(pext[01]) == 'c') {
+					if (tolower(fileExtention[01]) == 'c') {
 
 						ReadFile(FileHandle, (PCSHEADER*)&PCSHeader, 0x46, &BytesRead, NULL);
 						if (!fileSize) {
@@ -5644,7 +5644,7 @@ void nuFil() {
 						}
 						if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16) {
 
-							for (int iColor = 0; iColor < 16; iColor++)
+							for (iColor = 0; iColor < 16; iColor++)
 								UserColor[iColor] = PCSHeader.colors[iColor];
 							fileSize -= 0x46;
 							pcsStitchCount = fileSize / sizeof(PCSTCH) + 2;
@@ -5653,32 +5653,33 @@ void nuFil() {
 							iStitch = 0;
 							iColorChange = 0;
 							color = 0;
-							ind = 0;
-							while (iStitch < PCSHeader.stitchCount&&ind < pcsStitchCount) {
+							iPCSstitch = 0;
+							while (iStitch < PCSHeader.stitchCount&&iPCSstitch < pcsStitchCount) {
 
-								if (PCSStitchBuffer[ind].tag == 3) {
+								if (PCSStitchBuffer[iPCSstitch].tag == 3) {
 
-									ColorChangeTable[iColorChange].colorIndex = PCSStitchBuffer[ind].fx;
+									ColorChangeTable[iColorChange].colorIndex = PCSStitchBuffer[iPCSstitch].fx;
 									ColorChangeTable[iColorChange++].stitchIndex = iStitch;
-									color = NOTFRM | PCSStitchBuffer[ind++].fx;
+									color = NOTFRM | PCSStitchBuffer[iPCSstitch++].fx;
 								} else {
 
-									StitchBuffer[iStitch].x = PCSStitchBuffer[ind].x + (float)PCSStitchBuffer[ind].fx / 256;
-									StitchBuffer[iStitch].y = PCSStitchBuffer[ind].y + (float)PCSStitchBuffer[ind].fy / 256;
+									StitchBuffer[iStitch].x = PCSStitchBuffer[iPCSstitch].x + (float)PCSStitchBuffer[iPCSstitch].fx / 256;
+									StitchBuffer[iStitch].y = PCSStitchBuffer[iPCSstitch].y + (float)PCSStitchBuffer[iPCSstitch].fy / 256;
 									StitchBuffer[iStitch++].attribute = color;
-									ind++;
+									iPCSstitch++;
 								}
 							}
 							PCSHeader.stitchCount = iStitch;
-							tnam = (TCHAR*)&PCSStitchBuffer[ind];
+							// ToDo - Do these 2 lines make sense?
+							tnam = (TCHAR*)&PCSStitchBuffer[iPCSstitch];
 							strcpy_s(PCSBMPFileName, tnam);
 							delete[] PCSStitchBuffer;
-							strcpy_s(pext, sizeof(WorkingFileName) - (pext - WorkingFileName), "thr");
+							strcpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), "thr");
 							IniFile.auxFileType = AUXPCS;
 							if (PCSHeader.hoopType != LARGHUP&&PCSHeader.hoopType != SMALHUP)
 								PCSHeader.hoopType = LARGHUP;
-							sizstch(&strct);
-							if (strct.left<0 || strct.right>LHUPY || strct.bottom<0 || strct.top>LHUPY) {
+							sizstch(&stitchRect);
+							if (stitchRect.left<0 || stitchRect.right>LHUPY || stitchRect.bottom<0 || stitchRect.top>LHUPY) {
 
 								IniFile.hoopSizeX = LHUPX;
 								IniFile.hoopSizeY = LHUPY;
@@ -5692,7 +5693,7 @@ void nuFil() {
 									IniFile.hoopSizeY = LHUPY;
 								} else {
 
-									if (strct.right > SHUPX || strct.top > SHUPY || PCSHeader.hoopType == LARGHUP) {
+									if (stitchRect.right > SHUPX || stitchRect.top > SHUPY || PCSHeader.hoopType == LARGHUP) {
 
 										IniFile.hoopType = LARGHUP;
 										IniFile.hoopSizeX = SHUPX;
@@ -5711,85 +5712,84 @@ void nuFil() {
 					else {
 
 						ReadFile(FileHandle, (BSEQPNT*)&BSequence, sizeof(BSequence), &BytesRead, 0);
-						peshed = (PESHED*)&BSequence;
+						pesHeader = (PESHED*)&BSequence;
 						l_peschr = (TCHAR*)&BSequence;
-						if (strncmp(peshed->led, "#PES00", 6)) {
+						if (strncmp(pesHeader->led, "#PES00", 6)) {
 
 							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Not a PES file: %s\n", WorkingFileName);
 							shoMsg(MsgBuffer);
 							return;
 						}
-						pecof = tripl(peshed->off);
-						PesStitch = (unsigned char*)&l_peschr[pecof + 532];
+						pecof = tripl(pesHeader->off);
+						PESstitch = (unsigned char*)&l_peschr[pecof + 532];
 						ActivePointIndex = 0;
-						pcolcnt = (unsigned char*)&l_peschr[pecof + 48];
-						PesColors = &pcolcnt[1];
+						pesColorCount = (unsigned char*)&l_peschr[pecof + 48];
+						PEScolors = &pesColorCount[1];
 						MarkedStitchMap[0] = MarkedStitchMap[1] = 0;
 						ActivePointIndex = 0;
-						for (ind = 0; ind < (unsigned)(*pcolcnt + 1); ind++) {
+						for (iColor = 0; iColor < (unsigned)(*pesColorCount + 1); iColor++) {
 
-							if (setRmp(PesColors[ind])) {
+							if (setRmp(PEScolors[iColor])) {
 
-								UserColor[ActivePointIndex++] = PESColorTranslate[PesColors[ind] & PESCMSK];
+								UserColor[ActivePointIndex++] = PESColorTranslate[PEScolors[iColor] & PESCMSK];
 								if (ActivePointIndex >= 16)
 									break;
 							}
 						}
 						color = 0;
-						PesColorIndex = 1;
+						PEScolorIndex = 1;
 						loc.x = loc.y = 0;
-						pabind = ind = ine = 0;
+						pabind = 0;
 						rstMap(FILDIR);
-						ind = 0;
 						pabstch = (PESTCH*)&l_peschr[sizeof(PESHED) + 4];
-						ind = 0;
-						ine = 1;
+						iPESstitch = 0;
+						iActualPESstitches = 1;
 						StitchBuffer[0].x = StitchBuffer[0].y;
-						while (ind < BytesRead - pecof - 529) {
+						while (iPESstitch < BytesRead - pecof - 529) {
 
-							if (PesStitch[ind] == 0xff && PesStitch[ind + 1] == 0)
+							if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1] == 0)
 								break;
-							if (PesStitch[ind] == 0xfe && PesStitch[ind + 1] == 0xb0) {
+							if (PESstitch[iPESstitch] == 0xfe && PESstitch[iPESstitch + 1] == 0xb0) {
 
 								color = dupcol();
-								ind += 2;
+								iPESstitch += 2;
 							} else {
 
-								if (PesStitch[ind] & 0x80) {
+								if (PESstitch[iPESstitch] & 0x80) {
 
-									locof = dubl(&PesStitch[ind]);
-									ind++;
+									locof = dubl(&PESstitch[iPESstitch]);
+									iPESstitch++;
 								} else {
 
-									if (PesStitch[ind] & 0x40)
-										locof = PesStitch[ind] - 128;
+									if (PESstitch[iPESstitch] & 0x40)
+										locof = PESstitch[iPESstitch] - 128;
 									else
-										locof = PesStitch[ind];
+										locof = PESstitch[iPESstitch];
 								}
 								locof *= 0.6;
 								if (toglMap(FILDIR)) {
 
 									loc.y -= locof;
-									StitchBuffer[ine].x = loc.x;
-									StitchBuffer[ine].y = loc.y;
-									StitchBuffer[ine].attribute = color;
-									ine++;
+									StitchBuffer[iActualPESstitches].x = loc.x;
+									StitchBuffer[iActualPESstitches].y = loc.y;
+									StitchBuffer[iActualPESstitches].attribute = color;
+									iActualPESstitches++;
 								} else
 									loc.x += locof;
 							}
-							ind++;
+							iPESstitch++;
 						}
-						PCSHeader.stitchCount = ine;
+						PCSHeader.stitchCount = iActualPESstitches;
 						//IniFile.auxFileType=AUXPES;
 						hupfn();
 					}
 #endif
 				} else {
 
-					ReadFile(FileHandle, (DSTHED*)&dsthed, sizeof(DSTHED), &BytesRead, 0);
+					ReadFile(FileHandle, (DSTHED*)&dstHeader, sizeof(DSTHED), &BytesRead, 0);
 					if (BytesRead == sizeof(DSTHED)) {
 
-						if (chkdst(&dsthed)) {
+						if (chkdst(&dstHeader)) {
 
 							PCSBMPFileName[0] = 0;
 							fileSize = GetFileSize(FileHandle, &BytesRead) - sizeof(DSTHED);
@@ -5823,16 +5823,16 @@ void nuFil() {
 			movStch();
 			coltab();
 			rstMap(ZUMED);
-			buf[2] = 0;
-			for (ind = 0; ind < 16; ind++) {
+			buffer[2] = 0;
+			for (iColor = 0; iColor < 16; iColor++) {
 
-				UserPen[ind] = nuPen(UserPen[ind], 1, UserColor[ind]);
-				UserColorBrush[ind] = nuBrush(UserColorBrush[ind], UserColor[ind]);
-				strncpy_s(buf, ThreadSize[ind], 2);
-				SetWindowText(ThreadSizeWin[ind], buf);
+				UserPen[iColor] = nuPen(UserPen[iColor], 1, UserColor[iColor]);
+				UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
+				strncpy_s(buffer, ThreadSize[iColor], 2);
+				SetWindowText(ThreadSizeWin[iColor], buffer);
 			}
-			for (ind = 0; ind < 16; ind++)
-				redraw(UserColorWin[ind]);
+			for (iColor = 0; iColor < 16; iColor++)
+				redraw(UserColorWin[iColor]);
 			redraw(ColorBar);
 			if (PCSHeader.stitchCount)
 				setMap(INIT);
@@ -5855,25 +5855,25 @@ void nuFil() {
 		rstMap(TRSET);
 		if (chkMap(NOTHRFIL))
 		{
-			for (ind = 0; ind < PCSHeader.stitchCount; ind++)
-				StitchBuffer[ind].attribute |= NOTFRM;
+			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
+				StitchBuffer[iStitch].attribute |= NOTFRM;
 		}
 		lodchk();
 	}
 }
 
-void clrfbuf(unsigned p_siz) {
+void clrfbuf(unsigned count) {
 
 #if  __UseASM__
 	_asm {
 
 		mov		edi, PCSStitchBuffer
-		mov		ecx, p_siz
+		mov		ecx, count
 		xor		eax, eax
 		rep		stosd
 	}
 #else
-	memset(PCSStitchBuffer, 0, p_siz * 4);
+	memset(PCSStitchBuffer, 0, count * 4);
 #endif
 }
 
@@ -5882,7 +5882,7 @@ unsigned dudbits(POINT dif) {
 	return Xdst[dif.x + 121] | Ydst[dif.y + 121];
 }
 
-void savdst(unsigned dat) {
+void savdst(unsigned data) {
 
 #if  __UseASM__
 	_asm {
@@ -5893,18 +5893,18 @@ void savdst(unsigned dat) {
 		inc		ecx
 		mov		DSTRecordCount, ecx
 		add		eax, DSTRecords
-		mov		ebx, dat
+		mov		ebx, data
 		mov[eax], ebx
 	}
 #else
 	union {
-		unsigned dat;
-		DSTREC drec;
+		unsigned data;
+		DSTREC dstRecord;
 	} x;
 
-	x.dat = dat;
+	x.data = data;
 
-	DSTRecords[DSTRecordCount++] = x.drec;
+	DSTRecords[DSTRecordCount++] = x.dstRecord;
 #endif
 }
 
@@ -5912,92 +5912,93 @@ void ritdst() {
 
 #define DSTMAX 121
 
-	unsigned		ind, styp, col, cnt, colind;
-	POINT			loc, len, alen, dif, stp;
-	fRECTANGLE		trct;
-	fPOINTATTR*		histch;
-	unsigned*		pcol;
-	HANDLE			hcol;
-	unsigned long	wrot;
+	unsigned		iStitch, dstType, color, count, iColor;
+	POINT			centerCoordinate, lengths, absoluteLengths, difference, stepSize;
+	fRECTANGLE		boundingRect;
+	fPOINTATTR*		highStitchBuffer;
+	unsigned*		colorData;
+	HANDLE			colorFile;
+	unsigned long	bytesWritten;
 
-	pcol = (unsigned*)&OSequence;
-	colind = 3;
-	pcol[0] = COLVER;
-	pcol[1] = BackgroundColor;
-	pcol[2] = UserColor[StitchBuffer[0].attribute&COLMSK];
-	histch = &StitchBuffer[MAXSEQ];
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+	colorData = (unsigned*)&OSequence;
+	iColor = 3;
+	colorData[0] = COLVER;
+	colorData[1] = BackgroundColor;
+	colorData[2] = UserColor[StitchBuffer[0].attribute&COLMSK];
+	highStitchBuffer = &StitchBuffer[MAXSEQ];
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		histch[ind].x = RotatedStitches[ind].x * 5 / 3;
-		histch[ind].y = RotatedStitches[ind].y * 5 / 3;
-		histch[ind].attribute = RotatedStitches[ind].attribute;
+		highStitchBuffer[iStitch].x = RotatedStitches[iStitch].x * 5 / 3;
+		highStitchBuffer[iStitch].y = RotatedStitches[iStitch].y * 5 / 3;
+		highStitchBuffer[iStitch].attribute = RotatedStitches[iStitch].attribute;
 	}
-	trct.left = trct.right = histch[0].x;
-	trct.bottom = trct.top = histch[0].y;
-	for (ind = 1; ind < PCSHeader.stitchCount; ind++) {
+	boundingRect.left = boundingRect.right = highStitchBuffer[0].x;
+	boundingRect.bottom = boundingRect.top = highStitchBuffer[0].y;
+	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		if (histch[ind].x > trct.right)
-			trct.right = histch[ind].x + 0.5;
-		if (histch[ind].x < trct.left)
-			trct.left = histch[ind].x - 0.5;
-		if (histch[ind].y > trct.top)
-			trct.top = histch[ind].y + 0.5;
-		if (histch[ind].y < trct.bottom)
-			trct.bottom = histch[ind].y - 0.5;
+		if (highStitchBuffer[iStitch].x > boundingRect.right)
+			boundingRect.right = highStitchBuffer[iStitch].x + 0.5;
+		if (highStitchBuffer[iStitch].x < boundingRect.left)
+			boundingRect.left = highStitchBuffer[iStitch].x - 0.5;
+		if (highStitchBuffer[iStitch].y > boundingRect.top)
+			boundingRect.top = highStitchBuffer[iStitch].y + 0.5;
+		if (highStitchBuffer[iStitch].y < boundingRect.bottom)
+			boundingRect.bottom = highStitchBuffer[iStitch].y - 0.5;
 	}
 	DSTRecords = (DSTREC*)&BSequence;
 	DSTRecordCount = 0;
-	loc.x = (trct.right - trct.left) / 2 + trct.left;
-	loc.y = (trct.top - trct.bottom) / 2 + trct.bottom;
-	DSTPositiveOffset.x = trct.right - loc.x + 1;
-	DSTPositiveOffset.y = trct.top - loc.y + 1;
-	DSTNegativeOffset.x = loc.x - trct.left - 1;
-	DSTNegativeOffset.y = loc.y - trct.bottom - 1;
-	col = histch[0].attribute & 0xf;
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+	centerCoordinate.x = (boundingRect.right - boundingRect.left) / 2 + boundingRect.left;
+	centerCoordinate.y = (boundingRect.top - boundingRect.bottom) / 2 + boundingRect.bottom;
+	DSTPositiveOffset.x = boundingRect.right - centerCoordinate.x + 1;
+	DSTPositiveOffset.y = boundingRect.top - centerCoordinate.y + 1;
+	DSTNegativeOffset.x = centerCoordinate.x - boundingRect.left - 1;
+	DSTNegativeOffset.y = centerCoordinate.y - boundingRect.bottom - 1;
+	color = highStitchBuffer[0].attribute & 0xf;
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		if (col != (histch[ind].attribute & 0xf)) {
+		if (color != (highStitchBuffer[iStitch].attribute & 0xf)) {
 
 			savdst(0xc30000);
-			col = histch[ind].attribute & 0xf;
-			pcol[colind++] = UserColor[col];
+			color = highStitchBuffer[iStitch].attribute & 0xf;
+			colorData[iColor++] = UserColor[color];
 		}
-		len.x = histch[ind].x - loc.x;
-		len.y = histch[ind].y - loc.y;
-		alen.x = abs(len.x);
-		alen.y = abs(len.y);
-		if (abs(alen.x) > abs(alen.y))
-			cnt = alen.x / DSTMAX + 1;
+		lengths.x = highStitchBuffer[iStitch].x - centerCoordinate.x;
+		lengths.y = highStitchBuffer[iStitch].y - centerCoordinate.y;
+		absoluteLengths.x = abs(lengths.x);
+		absoluteLengths.y = abs(lengths.y);
+		// ToDo - is 'abs' neccessary since absoluteLengths was already abs?
+		if (abs(absoluteLengths.x) > abs(absoluteLengths.y))
+			count = absoluteLengths.x / DSTMAX + 1;
 		else
-			cnt = alen.y / DSTMAX + 1;
-		stp.x = alen.x / cnt + 1;
-		stp.y = alen.y / cnt + 1;
-		while (len.x || len.y) {
+			count = absoluteLengths.y / DSTMAX + 1;
+		stepSize.x = absoluteLengths.x / count + 1;
+		stepSize.y = absoluteLengths.y / count + 1;
+		while (lengths.x || lengths.y) {
 
-			styp = REGTYP;
-			if (abs(len.x) > stp.x) {
+			dstType = REGTYP;
+			if (abs(lengths.x) > stepSize.x) {
 
-				styp = JMPTYP;
-				if (len.x > 0)
-					dif.x = stp.x;
+				dstType = JMPTYP;
+				if (lengths.x > 0)
+					difference.x = stepSize.x;
 				else
-					dif.x = -stp.x;
+					difference.x = -stepSize.x;
 			} else
-				dif.x = len.x;
-			if (abs(len.y) > stp.y) {
+				difference.x = lengths.x;
+			if (abs(lengths.y) > stepSize.y) {
 
-				styp = JMPTYP;
-				if (len.y > 0)
-					dif.y = stp.y;
+				dstType = JMPTYP;
+				if (lengths.y > 0)
+					difference.y = stepSize.y;
 				else
-					dif.y = -stp.y;
+					difference.y = -stepSize.y;
 			} else
-				dif.y = len.y;
-			savdst(dudbits(dif) | styp);
-			loc.x += dif.x;
-			loc.y += dif.y;
-			len.x -= dif.x;
-			len.y -= dif.y;
+				difference.y = lengths.y;
+			savdst(dudbits(difference) | dstType);
+			centerCoordinate.x += difference.x;
+			centerCoordinate.y += difference.y;
+			lengths.x -= difference.x;
+			lengths.y -= difference.y;
 		}
 	}
 	DSTRecords[DSTRecordCount].led = DSTRecords[DSTRecordCount].mid = 0;
@@ -6005,79 +6006,79 @@ void ritdst() {
 
 	if (colfil()) {
 
-		hcol = CreateFile(ColorFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
-		if (hcol != INVALID_HANDLE_VALUE)
-			WriteFile(hcol, &OSequence, colind << 2, &wrot, 0);
-		CloseHandle(hcol);
-		hcol = CreateFile(RGBFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
-		if (hcol != INVALID_HANDLE_VALUE)
-			WriteFile(hcol, &pcol[2], (colind - 2) << 2, &wrot, 0);
-		CloseHandle(hcol);
+		colorFile = CreateFile(ColorFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		if (colorFile != INVALID_HANDLE_VALUE)
+			WriteFile(colorFile, &OSequence, iColor << 2, &bytesWritten, 0);
+		CloseHandle(colorFile);
+		colorFile = CreateFile(RGBFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		if (colorFile != INVALID_HANDLE_VALUE)
+			WriteFile(colorFile, &colorData[2], (iColor - 2) << 2, &bytesWritten, 0);
+		CloseHandle(colorFile);
 	}
 }
 
 BOOL pcshup() {
 
-	fRECTANGLE		trct;
-	fPOINT		l_siz;
-	unsigned	ind;
-	fPOINT		hupsiz;
-	fPOINT		dif;
+	fRECTANGLE	boundingRect;
+	fPOINT		boundingSize;
+	unsigned	iStitch;
+	fPOINT		hoopSize;
+	fPOINT		delta;
 
-	trct.left = trct.right = RotatedStitches[0].x;
-	trct.bottom = trct.top = RotatedStitches[0].y;
-	for (ind = 1; ind < PCSHeader.stitchCount; ind++) {
+	boundingRect.left = boundingRect.right = RotatedStitches[0].x;
+	boundingRect.bottom = boundingRect.top = RotatedStitches[0].y;
+	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		if (RotatedStitches[ind].x < trct.left)
-			trct.left = RotatedStitches[ind].x;
-		if (RotatedStitches[ind].x > trct.right)
-			trct.right = RotatedStitches[ind].x;
-		if (RotatedStitches[ind].y < trct.bottom)
-			trct.bottom = RotatedStitches[ind].y;
-		if (RotatedStitches[ind].y > trct.top)
-			trct.top = RotatedStitches[ind].y;
+		if (RotatedStitches[iStitch].x < boundingRect.left)
+			boundingRect.left = RotatedStitches[iStitch].x;
+		if (RotatedStitches[iStitch].x > boundingRect.right)
+			boundingRect.right = RotatedStitches[iStitch].x;
+		if (RotatedStitches[iStitch].y < boundingRect.bottom)
+			boundingRect.bottom = RotatedStitches[iStitch].y;
+		if (RotatedStitches[iStitch].y > boundingRect.top)
+			boundingRect.top = RotatedStitches[iStitch].y;
 	}
-	l_siz.x = trct.right - trct.left;
-	l_siz.y = trct.top - trct.bottom;
-	if (l_siz.x > LHUPX || l_siz.y > LHUPY) {
+	boundingSize.x = boundingRect.right - boundingRect.left;
+	boundingSize.y = boundingRect.top - boundingRect.bottom;
+	if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
 
 		tabmsg(IDS_PFAF2L);
 		return 1;
 	}
-	if (l_siz.x > SHUPX || l_siz.y > SHUPY) {
+	if (boundingSize.x > SHUPX || boundingSize.y > SHUPY) {
 
 		PCSHeader.hoopType = LARGHUP;
-		hupsiz.x = LHUPX;
-		hupsiz.y = LHUPY;
+		hoopSize.x = LHUPX;
+		hoopSize.y = LHUPY;
 	} else {
 
 		if (IniFile.hoopSizeX == LHUPX&&IniFile.hoopSizeY == LHUPY) {
 
 			PCSHeader.hoopType = LARGHUP;
-			hupsiz.x = LHUPX;
-			hupsiz.y = LHUPY;
+			hoopSize.x = LHUPX;
+			hoopSize.y = LHUPY;
 		} else {
 
 			PCSHeader.hoopType = SMALHUP;
-			hupsiz.x = SHUPX;
-			hupsiz.y = SHUPY;
+			hoopSize.x = SHUPX;
+			hoopSize.y = SHUPY;
 		}
 	}
-	dif.x = dif.y = 0;
-	if (trct.right > hupsiz.x)
-		dif.x = hupsiz.x - trct.right;
-	if (trct.top > hupsiz.y)
-		dif.y = hupsiz.y - trct.top;
-	if (trct.left < 0)
-		dif.x = -trct.left;
-	if (trct.bottom < 0)
-		dif.y = -trct.bottom;
-	if (dif.x || dif.y) {
+	delta.x = delta.y = 0;
+	if (boundingRect.right > hoopSize.x)
+		delta.x = hoopSize.x - boundingRect.right;
+	if (boundingRect.top > hoopSize.y)
+		delta.y = hoopSize.y - boundingRect.top;
+	if (boundingRect.left < 0)
+		delta.x = -boundingRect.left;
+	if (boundingRect.bottom < 0)
+		delta.y = -boundingRect.bottom;
+	if (delta.x || delta.y) {
 
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			RotatedStitches[ind].x += dif.x;
-			RotatedStitches[ind].y += dif.y;
+			RotatedStitches[iStitch].x += delta.x;
+			RotatedStitches[iStitch].y += delta.y;
 		}
 	}
 	return 0;
@@ -6085,13 +6086,13 @@ BOOL pcshup() {
 
 #if PESACT
 
-void ritpes(unsigned p_stind) {
+void ritpes(unsigned iStitch) {
 
-	PesStitches[OutputIndex].x = -RotatedStitches[p_stind].x * 3 / 5 + StitchCenterOffset.x;
-	PesStitches[OutputIndex++].y = RotatedStitches[p_stind].y * 3 / 5 - StitchCenterOffset.y;
+	PESstitches[OutputIndex].x = -RotatedStitches[iStitch].x * 3 / 5 + PESstichCenterOffset.x;
+	PESstitches[OutputIndex++].y = RotatedStitches[iStitch].y * 3 / 5 - PESstichCenterOffset.y;
 }
 
-void ritpcol(unsigned char col) {
+void ritpcol(unsigned char colorIndex) {
 
 #if  __UseASM__
 	_asm {
@@ -6101,9 +6102,9 @@ void ritpcol(unsigned char col) {
 		inc		eax
 		mov		OutputIndex, eax
 		shl		ebx, 2
-		add		ebx, PesStitches
+		add		ebx, PESstitches
 		xor		eax, eax
-		mov		al, col
+		mov		al, colorIndex
 		mov[ebx], eax
 	}
 #else
@@ -6114,9 +6115,9 @@ void ritpcol(unsigned char col) {
 		inc		eax
 		mov		OutputIndex, eax
 		shl		ebx, 2
-		add		ebx, PesStitches
+		add		ebx, PESstitches
 		xor		eax, eax
-		mov		al, col
+		mov		al, colorIndex
 		mov[ebx], eax
 	}
 #endif
@@ -6126,100 +6127,101 @@ unsigned pesnam() {
 
 #if  __UseASM__
 	_asm {
-		mov		ebx, offset AuxName
-		mov		ecx, _MAX_PATH
-		mov		edx, ebx
-		peslup0 : mov		al, [ebx]
-				  or al, al
-				  je		short peslup1
-				  cmp		al, '\\'
-				  jne		short peslup0a
-				  mov		edx, ebx
-				  peslup0a : inc		ebx
-							 loop	peslup0
-							 peslup1 : mov		ebx, edx
-									   cmp		byte ptr[ebx], '\\'
-									   jne		short peslup1a
-									   inc		ebx
-									   peslup1a : xor		ecx, ecx
-												  mov		cl, 17
-												  mov		edi, offset BSequence
-												  mov		dword ptr[edi], ':AL'
-												  add		edi, 3
-												  peslup : mov		al, [ebx]
-														   inc		ebx
-														   cmp		al, '.'
-														   je		pesnamx
-														   mov[edi], al
-														   inc		edi
-														   loop	peslup
-														   pesnamx : mov		eax, edi
-																	 sub		eax, offset BSequence
+			mov		ebx, offset AuxName
+			mov		ecx, _MAX_PATH
+			mov		edx, ebx
+peslup0 :	mov		al, [ebx]
+			or		al, al
+			je		short peslup1
+			cmp		al, '\\'
+			jne		short peslup0a
+			mov		edx, ebx
+peslup0a :	inc		ebx
+			loop	peslup0
+peslup1 :	mov		ebx, edx
+			cmp		byte ptr[ebx], '\\'
+			jne		short peslup1a
+			inc		ebx
+peslup1a :	xor		ecx, ecx
+			mov		cl, 17
+			mov		edi, offset BSequence
+			mov		dword ptr[edi], ':AL'
+			add		edi, 3
+peslup :	mov		al, [ebx]
+			inc		ebx
+			cmp		al, '.'
+			je		pesnamx
+			mov[edi], al
+			inc		edi
+			loop	peslup
+pesnamx :	mov		eax, edi
+			sub		eax, offset BSequence
 	}
 #else
+	// ToDo - Complete translation from assembler
 	_asm {
-		mov		ebx, offset AuxName
-		mov		ecx, _MAX_PATH
-		mov		edx, ebx
-		peslup0 : mov		al, [ebx]
-				  or al, al
-				  je		short peslup1
-				  cmp		al, '\\'
-				  jne		short peslup0a
-				  mov		edx, ebx
-				  peslup0a : inc		ebx
-							 loop	peslup0
-							 peslup1 : mov		ebx, edx
-									   cmp		byte ptr[ebx], '\\'
-									   jne		short peslup1a
-									   inc		ebx
-									   peslup1a : xor		ecx, ecx
-												  mov		cl, 17
-												  mov		edi, offset BSequence
-												  mov		dword ptr[edi], ':AL'
-												  add		edi, 3
-												  peslup : mov		al, [ebx]
-														   inc		ebx
-														   cmp		al, '.'
-														   je		pesnamx
-														   mov[edi], al
-														   inc		edi
-														   loop	peslup
-														   pesnamx : mov		eax, edi
-																	 sub		eax, offset BSequence
+			mov		ebx, offset AuxName
+			mov		ecx, _MAX_PATH
+			mov		edx, ebx
+peslup0 :	mov		al, [ebx]
+			or		al, al
+			je		short peslup1
+			cmp		al, '\\'
+			jne		short peslup0a
+			mov		edx, ebx
+peslup0a :	inc		ebx
+			loop	peslup0
+peslup1 :	mov		ebx, edx
+			cmp		byte ptr[ebx], '\\'
+			jne		short peslup1a
+			inc		ebx
+peslup1a :	xor		ecx, ecx
+			mov		cl, 17
+			mov		edi, offset BSequence
+			mov		dword ptr[edi], ':AL'
+			add		edi, 3
+peslup :	mov		al, [ebx]
+			inc		ebx
+			cmp		al, '.'
+			je		pesnamx
+			mov[edi], al
+			inc		edi
+			loop	peslup
+pesnamx :	mov		eax, edi
+			sub		eax, offset BSequence
 	}
 #endif
 }
 
-void rpcrd(float dif) {
+void rpcrd(float stitchDelta) {
 
-	int idif;
+	int pesDelta;
 
-	idif = dif * 5 / 3;
-	if (idif < 0) {
+	pesDelta = stitchDelta * 5 / 3;
+	if (pesDelta < 0) {
 
-		if (idif > -64) {
+		if (pesDelta > -64) {
 
-			PesData[OutputIndex] = idif - 128;
+			PESdata[OutputIndex] = pesDelta - 128;
 			OutputIndex++;
 		} else {
 
-			PesData[OutputIndex] = idif >> 8;
+			PESdata[OutputIndex] = pesDelta >> 8;
 			OutputIndex++;
-			PesData[OutputIndex] = idif & 0x8f;
+			PESdata[OutputIndex] = pesDelta & 0x8f;
 			OutputIndex++;
 		}
 	} else {
 
-		if (idif < 64) {
+		if (pesDelta < 64) {
 
-			PesData[OutputIndex] = idif;
+			PESdata[OutputIndex] = pesDelta;
 			OutputIndex++;
 		} else {
 
-			PesData[OutputIndex] = (idif >> 8) | 0x80;
+			PESdata[OutputIndex] = (pesDelta >> 8) | 0x80;
 			OutputIndex++;
-			PesData[OutputIndex] = idif & 0xff;
+			PESdata[OutputIndex] = pesDelta & 0xff;
 			OutputIndex++;
 		}
 	}
@@ -6227,80 +6229,81 @@ void rpcrd(float dif) {
 
 void pecdat() {
 
-	unsigned	ind, col, pcol;
+	unsigned	iStitch, color, iColor;
 
 	OutputIndex = 532;
-	pcol = 1;
-	col = StitchBuffer[0].attribute&COLMSK;
-	PesData = (TCHAR*)&BSequence;
-	PesColors = (unsigned char*)&PesData[49];
+	iColor = 1;
+	color = StitchBuffer[0].attribute&COLMSK;
+	PESdata = (TCHAR*)&BSequence;
+	PEScolors = (unsigned char*)&PESdata[49];
 	rpcrd(StitchBuffer[0].x);
 	rpcrd(-StitchBuffer[0].y);
-	for (ind = 0; ind < (unsigned)PCSHeader.stitchCount - 1; ind++) {
+	for (iStitch = 0; iStitch < (unsigned)PCSHeader.stitchCount - 1; iStitch++) {
 
-		if ((StitchBuffer[ind].attribute&COLMSK) != col) {
+		if ((StitchBuffer[iStitch].attribute&COLMSK) != color) {
 
-			col = StitchBuffer[ind].attribute&COLMSK;
-			PesData[OutputIndex] = (TBYTE)254;
+			color = StitchBuffer[iStitch].attribute&COLMSK;
+			PESdata[OutputIndex] = (TBYTE)254;
 			OutputIndex++;
-			PesData[OutputIndex] = (TBYTE)176;
+			PESdata[OutputIndex] = (TBYTE)176;
 			OutputIndex++;
-			PesData[OutputIndex] = pcol;
+			PESdata[OutputIndex] = iColor;
 			OutputIndex++;
-			PesColors[pcol] = PesEquivColors[col];
-			pcol++;
+			PEScolors[iColor] = PESequivColors[color];
+			iColor++;
 		}
-		rpcrd(StitchBuffer[ind + 1].x - StitchBuffer[ind].x);
-		rpcrd(-StitchBuffer[ind + 1].y + StitchBuffer[ind].y);
+		rpcrd(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x);
+		rpcrd(-StitchBuffer[iStitch + 1].y + StitchBuffer[iStitch].y);
 	}
-	PesData[OutputIndex++] = (TBYTE)0xff;
-	PesData[OutputIndex++] = 0;
+	PESdata[OutputIndex++] = (TBYTE)0xff;
+	PESdata[OutputIndex++] = 0;
 }
 
 #endif
 
 void chk1col() {
 
-	unsigned ind, ine, col;
+	unsigned iColorChange, iStitch, color;
 
 	coltab();
 	setMap(RESTCH);
-	for (ind = 0; ind < ColorChanges; ind++) {
+	for (iColorChange = 0; iColorChange < ColorChanges; iColorChange++) {
 
-		if (ColorChangeTable[ind + 1].stitchIndex - ColorChangeTable[ind].stitchIndex == 1) {
+		if (ColorChangeTable[iColorChange + 1].stitchIndex - ColorChangeTable[iColorChange].stitchIndex == 1) {
 
-			ine = ColorChangeTable[ind].stitchIndex;
-			col = StitchBuffer[ine - 1].attribute&COLMSK;
-			StitchBuffer[ine].attribute &= NCOLMSK;
-			StitchBuffer[ine].attribute |= col;
+			iStitch = ColorChangeTable[iColorChange].stitchIndex;
+			color = StitchBuffer[iStitch - 1].attribute&COLMSK;
+			StitchBuffer[iStitch].attribute &= NCOLMSK;
+			StitchBuffer[iStitch].attribute |= color;
 		}
 	}
 }
 
-BOOL chkattr(TCHAR* nam) {
+BOOL chkattr(TCHAR* filename) {
 
-	unsigned		attr, ind;
-	TCHAR			driv[_MAX_PATH];
-	DWORD			sec;
-	DWORD			byt;
-	DWORD			fclst;
-	DWORD			tclst;
+	unsigned		attributes, buttonPressed;
+	TCHAR			drive[_MAX_PATH];
+	DWORD			SectorsPerCluster;
+	DWORD			BytesPerSector;
+	DWORD			NumberOfFreeClusters;
+	DWORD			TotalNumberOfClusters;
 
 	if (rstMap(NOTFREE))
 		return 1;
-	attr = GetFileAttributes(nam);
-	if (attr&FILE_ATTRIBUTE_READONLY&&attr != 0xffffffff) {
+	attributes = GetFileAttributes(filename);
+	if (attributes&FILE_ATTRIBUTE_READONLY&&attributes != 0xffffffff) {
 
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_OVRLOK], nam);
-		ind = MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_OVRIT], MB_YESNO);
-		if (ind == IDYES)
-			SetFileAttributes(nam, attr&(0xffffffff ^ FILE_ATTRIBUTE_READONLY));
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_OVRLOK], filename);
+		buttonPressed = MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_OVRIT], MB_YESNO);
+		if (buttonPressed == IDYES)
+			SetFileAttributes(filename, attributes&(0xffffffff ^ FILE_ATTRIBUTE_READONLY));
 		else
 			return 1;
 	}
-	strcpy_s(driv, HomeDirectory);
-	driv[3] = 0;
-	if (!GetDiskFreeSpace(driv, &sec, &byt, &fclst, &tclst)) {
+	strcpy_s(drive, HomeDirectory);
+	drive[3] = 0;
+	// ToDo - does a return value of 0 mean no free space?
+	if (!GetDiskFreeSpace(drive, &SectorsPerCluster, &BytesPerSector, &NumberOfFreeClusters, &TotalNumberOfClusters)) {
 
 		setMap(NOTFREE);
 		return 1;
@@ -6313,26 +6316,24 @@ BOOL chkattr(TCHAR* nam) {
 #pragma warning(disable : 4996)
 void sav() {
 
-	unsigned		ind, l_stind;
-	unsigned long	wrot;
+	unsigned		iStitch, iColor, iHeader, iPCSstitch;
+	unsigned long	bytesWritten;
 	double			fractionalPart, integerPart;
-	DSTHED			dsthed;
+	DSTHED			dstHeader;
 	TCHAR*			pchr;
-	POINT			loc;
 	unsigned		savcol;	
 
 #if PESACT
 
-	PESHED			peshed;
-	PESTCH*			l_pestch;
+	PESHED			pesHeader;
 	unsigned		match;
-	unsigned		mtchind = 0;
-	unsigned		mtchmin;
-	unsigned char	pescol;
-	fRECTANGLE		srct;
-	unsigned		tcol, ine;
-	unsigned		pcolcnt;
-	unsigned*		pesof;
+	unsigned		matchIndex = 0;
+	unsigned		matchMin;
+	unsigned char	pesColor;
+	fRECTANGLE		boundingRect;
+	unsigned		color, iColorMatch;
+	unsigned		pesColorCount;
+	unsigned*		pesOffset;
 	unsigned*		upnt;
 	short*			psiz;
 #endif
@@ -6347,19 +6348,19 @@ void sav() {
 	RotatedStitches = (fPOINTATTR*)&BSequence;
 	if (chku(ROTAUX)) {
 
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			RotatedStitches[ind].y = -StitchBuffer[ind].x;
-			RotatedStitches[ind].x = StitchBuffer[ind].y;
-			RotatedStitches[ind].attribute = StitchBuffer[ind].attribute;
+			RotatedStitches[iStitch].y = -StitchBuffer[iStitch].x;
+			RotatedStitches[iStitch].x = StitchBuffer[iStitch].y;
+			RotatedStitches[iStitch].attribute = StitchBuffer[iStitch].attribute;
 		}
 	} else {
 
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			RotatedStitches[ind].x = StitchBuffer[ind].x;
-			RotatedStitches[ind].y = StitchBuffer[ind].y;
-			RotatedStitches[ind].attribute = StitchBuffer[ind].attribute;
+			RotatedStitches[iStitch].x = StitchBuffer[iStitch].x;
+			RotatedStitches[iStitch].y = StitchBuffer[iStitch].y;
+			RotatedStitches[iStitch].attribute = StitchBuffer[iStitch].attribute;
 		}
 	}
 	PCSFileHandle = CreateFile(AuxName, (GENERIC_WRITE | GENERIC_READ), 0, NULL,
@@ -6375,124 +6376,122 @@ void sav() {
 		case AUXDST:
 
 			ritdst();
-			ind = 0; loc.x = loc.y = 0;
-			pchr = (TCHAR*)&dsthed;
-			for (ind = 0; ind < sizeof(DSTHED); ind++)
-				pchr[ind] = ' ';
-			strncpy(dsthed.desched, "LA:", 3);
+			pchr = (TCHAR*)&dstHeader;
+			for (iHeader = 0; iHeader < sizeof(DSTHED); iHeader++)
+				pchr[iHeader] = ' ';
+			strncpy(dstHeader.desched, "LA:", 3);
 			pchr = strrchr(AuxName, '\\') + 1;
-			for (ind = 0; ind < sizeof(dsthed.desc); ind++) {
+			for (iHeader = 0; iHeader < sizeof(dstHeader.desc); iHeader++) {
 
-				if (pchr[ind] && pchr[ind] != '.')
-					dsthed.desc[ind] = pchr[ind];
+				if (pchr[iHeader] && pchr[iHeader] != '.')
+					dstHeader.desc[iHeader] = pchr[iHeader];
 				else
 					break;
 			}
-			dsthed.desc[16] = 0xd;
-			strncpy(dsthed.recshed, "ST:", 3);
-			sprintf(dsthed.recs, "%7d\r", DSTRecordCount);
-			strncpy(dsthed.cohed, "CO:", 3);
-			strncpy(dsthed.co, "  0\xd", 4);
-			strncpy(dsthed.xplushed, "+X:", 3);
-			sprintf(dsthed.xplus, "%5d\xd", DSTNegativeOffset.x);
-			strncpy(dsthed.xminhed, "-X:", 3);
-			sprintf(dsthed.xmin, "%5d\xd", DSTPositiveOffset.x);
-			strncpy(dsthed.yplushed, "+Y:", 3);
-			sprintf(dsthed.yplus, "%5d\xd", DSTPositiveOffset.y);
-			strncpy(dsthed.yminhed, "-Y:", 3);
-			sprintf(dsthed.ymin, "%5d\xd", DSTNegativeOffset.y);
-			strncpy(dsthed.axhed, "AX:", 3);
-			strncpy(dsthed.ax, "-    0\r", 7);
-			strncpy(dsthed.ayhed, "AY:", 3);
-			strncpy(dsthed.ay, "+    0\r", 7);
-			strncpy(dsthed.mxhed, "MX:", 3);
-			strncpy(dsthed.mx, "+    0\r", 7);
-			strncpy(dsthed.myhed, "MY:", 3);
-			strncpy(dsthed.my, "+    0\r", 7);
-			strncpy(dsthed.pdhed, "PD", 2);
-			strncpy(dsthed.pd, "******\r", 7);
-			strncpy(dsthed.eof, "\x1a", 1);
-			WriteFile(PCSFileHandle, (DSTHED*)&dsthed, sizeof(DSTHED), &wrot, 0);
-			WriteFile(PCSFileHandle, (DSTREC*)DSTRecords, sizeof(DSTREC)*DSTRecordCount, &wrot, 0);
+			dstHeader.desc[16] = 0xd;
+			strncpy(dstHeader.recshed, "ST:", 3);
+			sprintf(dstHeader.recs, "%7d\r", DSTRecordCount);
+			strncpy(dstHeader.cohed, "CO:", 3);
+			strncpy(dstHeader.co, "  0\xd", 4);
+			strncpy(dstHeader.xplushed, "+X:", 3);
+			sprintf(dstHeader.xplus, "%5d\xd", DSTNegativeOffset.x);
+			strncpy(dstHeader.xminhed, "-X:", 3);
+			sprintf(dstHeader.xmin, "%5d\xd", DSTPositiveOffset.x);
+			strncpy(dstHeader.yplushed, "+Y:", 3);
+			sprintf(dstHeader.yplus, "%5d\xd", DSTPositiveOffset.y);
+			strncpy(dstHeader.yminhed, "-Y:", 3);
+			sprintf(dstHeader.ymin, "%5d\xd", DSTNegativeOffset.y);
+			strncpy(dstHeader.axhed, "AX:", 3);
+			strncpy(dstHeader.ax, "-    0\r", 7);
+			strncpy(dstHeader.ayhed, "AY:", 3);
+			strncpy(dstHeader.ay, "+    0\r", 7);
+			strncpy(dstHeader.mxhed, "MX:", 3);
+			strncpy(dstHeader.mx, "+    0\r", 7);
+			strncpy(dstHeader.myhed, "MY:", 3);
+			strncpy(dstHeader.my, "+    0\r", 7);
+			strncpy(dstHeader.pdhed, "PD", 2);
+			strncpy(dstHeader.pd, "******\r", 7);
+			strncpy(dstHeader.eof, "\x1a", 1);
+			WriteFile(PCSFileHandle, (DSTHED*)&dstHeader, sizeof(DSTHED), &bytesWritten, 0);
+			WriteFile(PCSFileHandle, (DSTREC*)DSTRecords, sizeof(DSTREC)*DSTRecordCount, &bytesWritten, 0);
 			break;
 
 #if PESACT
 
 		case AUXPES:
 
-			pchr = (TCHAR*)&peshed;
-			for (ind = 0; ind < sizeof(PESHED); ind++)
-				pchr[ind] = 0;
-			strncpy(peshed.led, "#PES0001",sizeof(peshed.led));
-			strncpy(peshed.ce, "CEmbOne", sizeof(peshed.ce));
-			strncpy(peshed.cs, "CSewSeg", sizeof(peshed.cs));
-			l_pestch = (PESTCH*)&BSequence;
-			for (ind = 0; ind < 16; ind++) {
+			pchr = (TCHAR*)&pesHeader;
+			for (iHeader = 0; iHeader < sizeof(PESHED); iHeader++)
+				pchr[iHeader] = 0;
+			strncpy(pesHeader.led, "#PES0001",sizeof(pesHeader.led));
+			strncpy(pesHeader.ce, "CEmbOne", sizeof(pesHeader.ce));
+			strncpy(pesHeader.cs, "CSewSeg", sizeof(pesHeader.cs));
+			for (iColor = 0; iColor < 16; iColor++) {
 
-				mtchmin = 0xffffffff;
-				for (ine = 0; ine < sizeof(PESColorTranslate) >> 2; ine++) {
+				matchMin = 0xffffffff;
+				for (iColorMatch = 0; iColorMatch < sizeof(PESColorTranslate) >> 2; iColorMatch++) {
 
-					match = pesmtch(UserColor[ind], ine);
-					if (match < mtchmin) {
+					match = pesmtch(UserColor[iColor], iColorMatch);
+					if (match < matchMin) {
 
-						mtchind = ine;
-						mtchmin = match;
+						matchIndex = iColorMatch;
+						matchMin = match;
 					}
 				}
-				PesEquivColors[ind] = (unsigned char)mtchind;
+				PESequivColors[iColor] = (unsigned char)matchIndex;
 			}
-			tcol = StitchBuffer[0].attribute&COLMSK;
-			pescol = peshed.scol = PesEquivColors[StitchBuffer[0].attribute&COLMSK];
-			sizstch(&srct);
-			StitchCenterOffset.x = midl(srct.right, srct.left);
-			StitchCenterOffset.y = midl(srct.top, srct.bottom);
-			peshed.xsiz = srct.right - srct.left;
-			peshed.ysiz = srct.top - srct.bottom;
+			color = StitchBuffer[0].attribute&COLMSK;
+			pesColor = pesHeader.scol = PESequivColors[StitchBuffer[0].attribute&COLMSK];
+			sizstch(&boundingRect);
+			PESstichCenterOffset.x = midl(boundingRect.right, boundingRect.left);
+			PESstichCenterOffset.y = midl(boundingRect.top, boundingRect.bottom);
+			pesHeader.xsiz = boundingRect.right - boundingRect.left;
+			pesHeader.ysiz = boundingRect.top - boundingRect.bottom;
 			OutputIndex = 0;
-			PesStitches = (PESTCH*)&BSequence;
+			PESstitches = (PESTCH*)&BSequence;
 			ritpes(0);
-			PesStitches[OutputIndex].x = -32765; // 0x8003
-			PesStitches[OutputIndex++].y = 0;
-			ritpcol(PesEquivColors[tcol]);
+			PESstitches[OutputIndex].x = -32765; // 0x8003
+			PESstitches[OutputIndex++].y = 0;
+			ritpcol(PESequivColors[color]);
 			ritpes(0);
-			pcolcnt = 0;
-			for (ind = 1; ind < PCSHeader.stitchCount; ind++) {
+			pesColorCount = 0;
+			for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-				if (tcol == (StitchBuffer[ind].attribute&COLMSK))
-					ritpes(ind);
+				if (color == (StitchBuffer[iStitch].attribute&COLMSK))
+					ritpes(iStitch);
 				else {
 
-					ritpes(ind);
-					PesStitches[OutputIndex].x = -32767; // 0x8001
-					PesStitches[OutputIndex++].y = 0;
-					ritpcol(PesEquivColors[tcol]);
-					tcol = StitchBuffer[ind].attribute&COLMSK;
-					ritpes(ind++);
-					ritpes(ind);
-					PesStitches[OutputIndex].x = -32765; // 0x8003
-					PesStitches[OutputIndex++].y = 0;
-					ritpcol(PesEquivColors[tcol]);
-					ritpes(ind);
-					pcolcnt++;
+					ritpes(iStitch);
+					PESstitches[OutputIndex].x = -32767; // 0x8001
+					PESstitches[OutputIndex++].y = 0;
+					ritpcol(PESequivColors[color]);
+					color = StitchBuffer[iStitch].attribute&COLMSK;
+					ritpes(iStitch++);
+					ritpes(iStitch);
+					PESstitches[OutputIndex].x = -32765; // 0x8003
+					PESstitches[OutputIndex++].y = 0;
+					ritpcol(PESequivColors[color]);
+					ritpes(iStitch);
+					pesColorCount++;
 				}
 			}
-			PesStitches[OutputIndex].x = ine;
-			PesStitches[OutputIndex++].y = 0;
-			pesof = (unsigned*)&peshed.off;
-			*pesof = (OutputIndex << 2) + sizeof(PESHED);
-			*peshed.m1 = 0x20;
+			PESstitches[OutputIndex].x = iColorMatch;
+			PESstitches[OutputIndex++].y = 0;
+			pesOffset = (unsigned*)&pesHeader.off;
+			*pesOffset = (OutputIndex << 2) + sizeof(PESHED);
+			*pesHeader.m1 = 0x20;
 			GroupStartStitch = 0;
 			GroupEndStitch = PCSHeader.stitchCount - 1;
-			peshed.xsiz = 10000;
-			peshed.ysiz = 10000;
-			WriteFile(PCSFileHandle, (PESHED*)&peshed, sizeof(PESHED), &wrot, 0);
-			WriteFile(PCSFileHandle, (PESTCH*)&BSequence, OutputIndex << 2, &wrot, 0);
-			ind = pesnam();
+			pesHeader.xsiz = 10000;
+			pesHeader.ysiz = 10000;
+			WriteFile(PCSFileHandle, (PESHED*)&pesHeader, sizeof(PESHED), &bytesWritten, 0);
+			WriteFile(PCSFileHandle, (PESTCH*)&BSequence, OutputIndex << 2, &bytesWritten, 0);
+			iHeader = pesnam();
 			pchr = (TCHAR*)&BSequence;
-			while (ind < 512)
-				pchr[ind++] = ' ';
+			while (iHeader < 512)
+				pchr[iHeader++] = ' ';
 			pchr[19] = 13;
-			pchr[48] = (TCHAR)pcolcnt;
+			pchr[48] = (TCHAR)pesColorCount;
 			pecdat();
 			upnt = (unsigned*)&pchr[514];
 			*upnt = OutputIndex - 512;
@@ -6500,13 +6499,13 @@ void sav() {
 			pchr[518] = -1;
 			pchr[519] = -17;
 			psiz = (short*)&pchr[520];
-			*psiz = peshed.xsiz;
+			*psiz = pesHeader.xsiz;
 			psiz++;
-			*psiz = peshed.ysiz;
+			*psiz = pesHeader.ysiz;
 			psiz++;
 			*psiz = 480;
-			pesof = (unsigned*)psiz;
-			*pesof = 11534816;
+			pesOffset = (unsigned*)psiz;
+			*pesOffset = 11534816;
 			//			pchr[527]=(TCHAR)0x0;
 			//			pchr[528]=(TCHAR)0x90;
 			//			pchr[529]=(TCHAR)0x0;
@@ -6516,40 +6515,40 @@ void sav() {
 			pchr[529] = (TBYTE)0x80; //hor lsb
 			pchr[530] = (TBYTE)0x82; //vert msb
 			pchr[531] = (TBYTE)0xff; //vert lsb
-			WriteFile(PCSFileHandle, (TBYTE*)&BSequence, OutputIndex, &wrot, 0);
+			WriteFile(PCSFileHandle, (TBYTE*)&BSequence, OutputIndex, &bytesWritten, 0);
 			break;
 #endif
 		default:
 
-			for (ind = 0; ind < 16; ind++)
-				PCSHeader.colors[ind] = UserColor[ind];
+			for (iColor = 0; iColor < 16; iColor++)
+				PCSHeader.colors[iColor] = UserColor[iColor];
 			if (pcshup())
 				return;
-			if (!WriteFile(PCSFileHandle, &PCSHeader, 0x46, &wrot, 0)) {
+			if (!WriteFile(PCSFileHandle, &PCSHeader, 0x46, &bytesWritten, 0)) {
 
 				riter();
 				return;
 			}
 			PCSStitchBuffer = new PCSTCH[PCSHeader.stitchCount + ColorChanges + 2];
 			clrfbuf((sizeof(PCSTCH)*(PCSHeader.stitchCount + ColorChanges + 1)) >> 2);
-			l_stind = 0;
+			iPCSstitch = 0;
 			savcol = 0xff;
-			for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-				if ((RotatedStitches[ind].attribute&COLMSK) != savcol) {
+				if ((RotatedStitches[iStitch].attribute&COLMSK) != savcol) {
 
-					savcol = RotatedStitches[ind].attribute&COLMSK;
-					PCSStitchBuffer[l_stind].tag = 3;
-					PCSStitchBuffer[l_stind++].fx = savcol;
+					savcol = RotatedStitches[iStitch].attribute&COLMSK;
+					PCSStitchBuffer[iPCSstitch].tag = 3;
+					PCSStitchBuffer[iPCSstitch++].fx = savcol;
 				}
-				fractionalPart = modf(RotatedStitches[ind].x, &integerPart);
-				PCSStitchBuffer[l_stind].fx = fractionalPart * 256;
-				PCSStitchBuffer[l_stind].x = integerPart;
-				fractionalPart = modf(RotatedStitches[ind].y, &integerPart);
-				PCSStitchBuffer[l_stind].fy = fractionalPart * 256;
-				PCSStitchBuffer[l_stind++].y = integerPart;
+				fractionalPart = modf(RotatedStitches[iStitch].x, &integerPart);
+				PCSStitchBuffer[iPCSstitch].fx = fractionalPart * 256;
+				PCSStitchBuffer[iPCSstitch].x = integerPart;
+				fractionalPart = modf(RotatedStitches[iStitch].y, &integerPart);
+				PCSStitchBuffer[iPCSstitch].fy = fractionalPart * 256;
+				PCSStitchBuffer[iPCSstitch++].y = integerPart;
 			}
-			if (!WriteFile(PCSFileHandle, PCSStitchBuffer, l_stind * sizeof(PCSTCH), &wrot, 0)) {
+			if (!WriteFile(PCSFileHandle, PCSStitchBuffer, iPCSstitch * sizeof(PCSTCH), &bytesWritten, 0)) {
 
 				riter();
 				return;
@@ -6557,14 +6556,14 @@ void sav() {
 			if (chku(BSAVOF)) {
 
 				*MsgBuffer = 0;
-				if (!WriteFile(PCSFileHandle, MsgBuffer, 15, &wrot, 0)) {
+				if (!WriteFile(PCSFileHandle, MsgBuffer, 15, &bytesWritten, 0)) {
 
 					riter();
 					return;
 				}
 			} else {
 
-				if (!WriteFile(PCSFileHandle, PCSBMPFileName, 15, &wrot, 0)) {
+				if (!WriteFile(PCSFileHandle, PCSBMPFileName, 15, &bytesWritten, 0)) {
 
 					riter();
 					return;
@@ -6629,7 +6628,6 @@ void savAs() {
 void save() {
 
 	TCHAR*	pchr;
-	TCHAR	tchr;
 
 	if (WorkingFileName[0]) {
 
@@ -6641,7 +6639,6 @@ void save() {
 			strcat_s(WorkingFileName, ".thr");
 			pchr = strrchr(WorkingFileName, '.') + 1;
 		}
-		tchr = pchr[0] | 0x20;
 		thrsav();
 		if (PCSHeader.stitchCount)
 			sav();
@@ -6724,10 +6721,10 @@ void shft2box() {
 
 void zumin() {
 
-	dPOINT		nusiz;
-	fRECTANGLE		srct;
-	fRECTANGLE*		trct;
-	unsigned	ind;
+	dPOINT		newSize;
+	fRECTANGLE	groupBoundingRect;
+	fRECTANGLE*	boundingRect;
+	unsigned	iForm;
 
 	if (!rstMap(ZUMACT))
 		ZoomFactor *= ZUMFCT;
@@ -6745,9 +6742,9 @@ void zumin() {
 		}
 		if (chkMap(FORMSEL)) {
 
-			trct = &FormList[ClosestFormToCursor].rectangle;
-			SelectedPoint.x = ((trct->right - trct->left) / 2) + trct->left;
-			SelectedPoint.y = ((trct->top - trct->bottom) / 2) + trct->bottom;
+			boundingRect = &FormList[ClosestFormToCursor].rectangle;
+			SelectedPoint.x = ((boundingRect->right - boundingRect->left) / 2) + boundingRect->left;
+			SelectedPoint.y = ((boundingRect->top - boundingRect->bottom) / 2) + boundingRect->bottom;
 			goto gotc;
 		}
 		if (chkMap(FRMPSEL)) {
@@ -6764,9 +6761,9 @@ void zumin() {
 		}
 		if (chkMap(GRPSEL)) {
 
-			selRct(&srct);
-			SelectedPoint.x = ((srct.right - srct.left) / 2) + srct.left;
-			SelectedPoint.y = ((srct.top - srct.bottom) / 2) + srct.bottom;
+			selRct(&groupBoundingRect);
+			SelectedPoint.x = ((groupBoundingRect.right - groupBoundingRect.left) / 2) + groupBoundingRect.left;
+			SelectedPoint.y = ((groupBoundingRect.top - groupBoundingRect.bottom) / 2) + groupBoundingRect.bottom;
 			goto gotc;
 		}
 		if (chkMap(INSRT)) {
@@ -6795,16 +6792,16 @@ void zumin() {
 			SelectedFormsRect.top = FormList[SelectedFormList[0]].rectangle.top;
 			SelectedFormsRect.left = FormList[SelectedFormList[0]].rectangle.left;
 			SelectedFormsRect.right = FormList[SelectedFormList[0]].rectangle.right;
-			for (ind = 1; ind < SelectedFormCount; ind++) {
+			for (iForm = 1; iForm < SelectedFormCount; iForm++) {
 
-				if (FormList[SelectedFormList[ind]].rectangle.bottom < SelectedFormsRect.bottom)
-					SelectedFormsRect.bottom = FormList[SelectedFormList[ind]].rectangle.bottom;
-				if (FormList[SelectedFormList[ind]].rectangle.top > SelectedFormsRect.top)
-					SelectedFormsRect.top = FormList[SelectedFormList[ind]].rectangle.top;
-				if (FormList[SelectedFormList[ind]].rectangle.left < SelectedFormsRect.left)
-					SelectedFormsRect.left = FormList[SelectedFormList[ind]].rectangle.left;
-				if (FormList[SelectedFormList[ind]].rectangle.right > SelectedFormsRect.right)
-					SelectedFormsRect.right = FormList[SelectedFormList[ind]].rectangle.right;
+				if (FormList[SelectedFormList[iForm]].rectangle.bottom < SelectedFormsRect.bottom)
+					SelectedFormsRect.bottom = FormList[SelectedFormList[iForm]].rectangle.bottom;
+				if (FormList[SelectedFormList[iForm]].rectangle.top > SelectedFormsRect.top)
+					SelectedFormsRect.top = FormList[SelectedFormList[iForm]].rectangle.top;
+				if (FormList[SelectedFormList[iForm]].rectangle.left < SelectedFormsRect.left)
+					SelectedFormsRect.left = FormList[SelectedFormList[iForm]].rectangle.left;
+				if (FormList[SelectedFormList[iForm]].rectangle.right > SelectedFormsRect.right)
+					SelectedFormsRect.right = FormList[SelectedFormList[iForm]].rectangle.right;
 			}
 			SelectedPoint.x = (SelectedFormsRect.right - SelectedFormsRect.left) / 2 + SelectedFormsRect.left;
 			SelectedPoint.y = (SelectedFormsRect.top - SelectedFormsRect.bottom) / 2 + SelectedFormsRect.bottom;
@@ -6814,11 +6811,11 @@ void zumin() {
 			centr();
 	}
 gotc:;
-	nusiz.x = UnzoomedRect.x*ZoomFactor;
-	nusiz.y = nusiz.x / StitchWindowAspectRatio;
+	newSize.x = UnzoomedRect.x*ZoomFactor;
+	newSize.y = newSize.x / StitchWindowAspectRatio;
 	ZoomRect.left = ZoomRect.bottom = 0;
-	ZoomRect.right = nusiz.x;
-	ZoomRect.top = nusiz.y;
+	ZoomRect.right = newSize.x;
+	ZoomRect.top = newSize.y;
 	shft(SelectedPoint);
 	NearestCount = 0;
 	if (!chkMap(GMRK) && chkMap(SELBOX))
@@ -6858,19 +6855,13 @@ void zumhom() {
 
 void zumshft() {
 
-	POINT pnt;
-	dPOINT spnt;
-
 	if (chkMap(ZUMED)) {
 
 		unboxs();
 		if (px2stch()) {
 			NearestCount = 0;
 			shft(SelectedPoint);
-			spnt.x = SelectedPoint.x;
-			spnt.y = SelectedPoint.y;
-			sCor2px(spnt, &pnt);
-			if (chkMap(RUNPAT)) {
+		if (chkMap(RUNPAT)) {
 
 				FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 				RunPoint = 0;
@@ -6883,9 +6874,9 @@ void zumshft() {
 
 void zumout() {
 
-	POINT	nusiz;
-	fRECTANGLE	srct;
-	fRECTANGLE*	trct;
+	POINT	newSize;
+	fRECTANGLE	groupBoundingRect;
+	fRECTANGLE*	boundingRect;
 
 	unboxs();
 	if (chkMap(ZUMED)) {
@@ -6898,9 +6889,9 @@ void zumout() {
 		}
 		if (chkMap(FORMSEL)) {
 
-			trct = &FormList[ClosestFormToCursor].rectangle;
-			SelectedPoint.x = ((trct->right - trct->left) / 2) + trct->left;
-			SelectedPoint.y = ((trct->top - trct->bottom) / 2) + trct->bottom;
+			boundingRect = &FormList[ClosestFormToCursor].rectangle;
+			SelectedPoint.x = ((boundingRect->right - boundingRect->left) / 2) + boundingRect->left;
+			SelectedPoint.y = ((boundingRect->top - boundingRect->bottom) / 2) + boundingRect->bottom;
 			goto gots;
 		}
 		if (chkMap(FRMPSEL)) {
@@ -6917,9 +6908,9 @@ void zumout() {
 		}
 		if (chkMap(GRPSEL)) {
 
-			selRct(&srct);
-			SelectedPoint.x = ((srct.right - srct.left) / 2) + srct.left;
-			SelectedPoint.y = ((srct.top - srct.bottom) / 2) + srct.bottom;
+			selRct(&groupBoundingRect);
+			SelectedPoint.x = ((groupBoundingRect.right - groupBoundingRect.left) / 2) + groupBoundingRect.left;
+			SelectedPoint.y = ((groupBoundingRect.top - groupBoundingRect.bottom) / 2) + groupBoundingRect.bottom;
 			goto gots;
 		}
 		if (chkMap(SELBOX)) {
@@ -6943,11 +6934,11 @@ void zumout() {
 			NearestCount = 0;
 		} else {
 
-			nusiz.x = UnzoomedRect.x*ZoomFactor;
-			nusiz.y = nusiz.x / StitchWindowAspectRatio;
+			newSize.x = UnzoomedRect.x*ZoomFactor;
+			newSize.y = newSize.x / StitchWindowAspectRatio;
 			ZoomRect.left = ZoomRect.bottom = 0;
-			ZoomRect.top = nusiz.y;
-			ZoomRect.right = nusiz.x;
+			ZoomRect.top = newSize.y;
+			ZoomRect.right = newSize.x;
 			shft(SelectedPoint);
 		}
 		if (chkMap(RUNPAT)) {
@@ -6961,27 +6952,27 @@ void zumout() {
 	}
 }
 
-void duClos(unsigned strt, unsigned cnt) {
+void duClos(unsigned startStitch, unsigned stitchCount) {
 
-	unsigned	ind, ine, tind0, tind1;
-	double		sum, tsum;
+	unsigned	iStitch, iNear, tind0, tind1;
+	double		sum, lowestSum;
 	long		cx, cy;
 
-	for (ind = strt; ind < strt + cnt; ind++) {
+	for (iStitch = startStitch; iStitch < startStitch + stitchCount; iStitch++) {
 
-		cx = ((StitchBuffer[ind].x > SelectedPoint.x) ? (StitchBuffer[ind].x - SelectedPoint.x) : (SelectedPoint.x - StitchBuffer[ind].x));
-		cy = ((StitchBuffer[ind].y > SelectedPoint.y) ? (StitchBuffer[ind].y - SelectedPoint.y) : (SelectedPoint.y - StitchBuffer[ind].y));
+		cx = ((StitchBuffer[iStitch].x > SelectedPoint.x) ? (StitchBuffer[iStitch].x - SelectedPoint.x) : (SelectedPoint.x - StitchBuffer[iStitch].x));
+		cy = ((StitchBuffer[iStitch].y > SelectedPoint.y) ? (StitchBuffer[iStitch].y - SelectedPoint.y) : (SelectedPoint.y - StitchBuffer[iStitch].y));
 		sum = hypot(cx, cy);
-		tind0 = ind;
-		for (ine = 0; ine < NERCNT; ine++) {
+		tind0 = iStitch;
+		for (iNear = 0; iNear < NERCNT; iNear++) {
 
-			if (sum < GapToNearest[ine]) {
+			if (sum < GapToNearest[iNear]) {
 
-				tsum = GapToNearest[ine];
-				tind1 = NearestPoint[ine];
-				GapToNearest[ine] = sum;
-				NearestPoint[ine] = tind0;
-				sum = tsum;
+				lowestSum = GapToNearest[iNear];
+				tind1 = NearestPoint[iNear];
+				GapToNearest[iNear] = sum;
+				NearestPoint[iNear] = tind0;
+				sum = lowestSum;
 				tind0 = tind1;
 			}
 		}
@@ -6990,68 +6981,68 @@ void duClos(unsigned strt, unsigned cnt) {
 
 void closPnt() {
 
-	unsigned	ind, sind0, sind1;
+	unsigned	iColor, iNear, iStitch0, iStitch1;
 
 	unbox();
 	unboxs();
-	for (ind = 0; ind < 4; ind++) {
+	for (iNear = 0; iNear < 4; iNear++) {
 
-		GapToNearest[ind] = 1e99;
-		NearestPoint[ind] = -1;
+		GapToNearest[iNear] = 1e99;
+		NearestPoint[iNear] = -1;
 	}
 	px2stch();
-	for (ind = 0; ind < ColorChanges; ind++) {
+	for (iColor = 0; iColor < ColorChanges; iColor++) {
 
-		sind0 = ColorChangeTable[ind].stitchIndex;
-		sind1 = ColorChangeTable[ind + 1].stitchIndex;
+		iStitch0 = ColorChangeTable[iColor].stitchIndex;
+		iStitch1 = ColorChangeTable[iColor + 1].stitchIndex;
 		if (chkMap(HID)) {
 
-			if (ColorChangeTable[ind].colorIndex == ActiveColor)
-				duClos(sind0, sind1 - sind0);
+			if (ColorChangeTable[iColor].colorIndex == ActiveColor)
+				duClos(iStitch0, iStitch1 - iStitch0);
 		} else
-			duClos(sind0, sind1 - sind0);
+			duClos(iStitch0, iStitch1 - iStitch0);
 	}
 	GetClientRect(MainStitchWin, &StitchWindowClientRect);
-	for (ind = 0; ind < NERCNT; ind++) {
+	for (iNear = 0; iNear < NERCNT; iNear++) {
 
-		if (stch2px(NearestPoint[ind])) {
+		if (stch2px(NearestPoint[iNear])) {
 
-			NearestPoint[NearestCount] = NearestPoint[ind];
-			NearestPixel[NearestCount].x = StitchSizePixels.x;
-			NearestPixel[NearestCount++].y = StitchSizePixels.y;
+			NearestPoint[NearestCount] = NearestPoint[iNear];
+			NearestPixel[NearestCount].x = StitchCoordinatesPixels.x;
+			NearestPixel[NearestCount++].y = StitchCoordinatesPixels.y;
 		}
 	}
 	boxs();
 }
 
-unsigned closPnt1(unsigned* clo) {
+unsigned closPnt1(unsigned* closestStitch) {
 
-	unsigned	ind, ine, tclo = 0;
-	unsigned	layr;
-	long		nerSid;
+	unsigned	iColor, iNear, iStitch, closestIndex = 0;
+	unsigned	layer;
+	long		offset;
 	double		cx, cy;
-	POINT		chkPnt;
-	double		tsum = 1e99;
+	POINT		pointToCheck;
+	double		currentDistance = 1e99;
 
-	chkPnt.x = Msg.pt.x - StitchWindowOrigin.x;
-	chkPnt.y = Msg.pt.y - StitchWindowOrigin.y;
+	pointToCheck.x = Msg.pt.x - StitchWindowOrigin.x;
+	pointToCheck.y = Msg.pt.y - StitchWindowOrigin.y;
 	if (chkMap(SELBOX) && stch2px(ClosestPointIndex)) {
 
-		if (hypot(StitchSizePixels.x - chkPnt.x, StitchSizePixels.y - chkPnt.y) < CLOSENUF) {
+		if (hypot(StitchCoordinatesPixels.x - pointToCheck.x, StitchCoordinatesPixels.y - pointToCheck.y) < CLOSENUF) {
 
-			*clo = ClosestPointIndex;
+			*closestStitch = ClosestPointIndex;
 			return 1;
 		}
 	}
-	for (ind = 0; ind < NearestCount; ind++) {
+	for (iNear = 0; iNear < NearestCount; iNear++) {
 
-		nerSid = BoxOffset[ind];
-		if (chkPnt.x >= NearestPixel[ind].x - nerSid&&
-			chkPnt.x <= NearestPixel[ind].x + nerSid&&
-			chkPnt.y >= NearestPixel[ind].y - nerSid&&
-			chkPnt.y <= NearestPixel[ind].y + nerSid) {
+		offset = BoxOffset[iNear];
+		if (pointToCheck.x >= NearestPixel[iNear].x - offset&&
+			pointToCheck.x <= NearestPixel[iNear].x + offset&&
+			pointToCheck.y >= NearestPixel[iNear].y - offset&&
+			pointToCheck.y <= NearestPixel[iNear].y + offset) {
 
-			*clo = NearestPoint[ind];
+			*closestStitch = NearestPoint[iNear];
 			return 1;
 		}
 	}
@@ -7059,24 +7050,24 @@ unsigned closPnt1(unsigned* clo) {
 	DistanceToClick = 1e99;
 	if (chkMap(HID)) {
 
-		for (ind = 0; ind < ColorChanges; ind++) {
+		for (iColor = 0; iColor < ColorChanges; iColor++) {
 
-			if (ColorChangeTable[ind].colorIndex == ActiveColor) {
+			if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
 
-				for (ine = ColorChangeTable[ind].stitchIndex; ine < ColorChangeTable[ind + 1].stitchIndex; ine++) {
+				for (iStitch = ColorChangeTable[iColor].stitchIndex; iStitch < ColorChangeTable[iColor + 1].stitchIndex; iStitch++) {
 
-					if (StitchBuffer[ine].x >= ZoomRect.left&&
-						StitchBuffer[ine].x <= ZoomRect.right&&
-						StitchBuffer[ine].y >= ZoomRect.bottom&&
-						StitchBuffer[ine].y <= ZoomRect.top) {
+					if (StitchBuffer[iStitch].x >= ZoomRect.left&&
+						StitchBuffer[iStitch].x <= ZoomRect.right&&
+						StitchBuffer[iStitch].y >= ZoomRect.bottom&&
+						StitchBuffer[iStitch].y <= ZoomRect.top) {
 
-						cx = ((StitchBuffer[ine].x > SelectedPoint.x) ? (StitchBuffer[ine].x - SelectedPoint.x) : (SelectedPoint.x - StitchBuffer[ine].x));
-						cy = ((StitchBuffer[ine].y > SelectedPoint.y) ? (StitchBuffer[ine].y - SelectedPoint.y) : (SelectedPoint.y - StitchBuffer[ine].y));
-						tsum = hypot(cx, cy);
-						if (tsum < DistanceToClick) {
+						cx = ((StitchBuffer[iStitch].x > SelectedPoint.x) ? (StitchBuffer[iStitch].x - SelectedPoint.x) : (SelectedPoint.x - StitchBuffer[iStitch].x));
+						cy = ((StitchBuffer[iStitch].y > SelectedPoint.y) ? (StitchBuffer[iStitch].y - SelectedPoint.y) : (SelectedPoint.y - StitchBuffer[iStitch].y));
+						currentDistance = hypot(cx, cy);
+						if (currentDistance < DistanceToClick) {
 
-							DistanceToClick = tsum;
-							tclo = ine;
+							DistanceToClick = currentDistance;
+							closestIndex = iStitch;
 						}
 					}
 				}
@@ -7084,23 +7075,23 @@ unsigned closPnt1(unsigned* clo) {
 		}
 	} else {
 
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			layr = (StitchBuffer[ind].attribute&LAYMSK) >> LAYSHFT;
-			if (!ActiveLayer || !layr || layr == ActiveLayer) {
+			layer = (StitchBuffer[iStitch].attribute&LAYMSK) >> LAYSHFT;
+			if (!ActiveLayer || !layer || layer == ActiveLayer) {
 
-				if (StitchBuffer[ind].x >= ZoomRect.left&&
-					StitchBuffer[ind].x <= ZoomRect.right&&
-					StitchBuffer[ind].y >= ZoomRect.bottom&&
-					StitchBuffer[ind].y <= ZoomRect.top) {
+				if (StitchBuffer[iStitch].x >= ZoomRect.left&&
+					StitchBuffer[iStitch].x <= ZoomRect.right&&
+					StitchBuffer[iStitch].y >= ZoomRect.bottom&&
+					StitchBuffer[iStitch].y <= ZoomRect.top) {
 
-					cx = StitchBuffer[ind].x - SelectedPoint.x;
-					cy = StitchBuffer[ind].y - SelectedPoint.y;
-					tsum = hypot(cx, cy);
-					if (tsum < DistanceToClick) {
+					cx = StitchBuffer[iStitch].x - SelectedPoint.x;
+					cy = StitchBuffer[iStitch].y - SelectedPoint.y;
+					currentDistance = hypot(cx, cy);
+					if (currentDistance < DistanceToClick) {
 
-						DistanceToClick = tsum;
-						tclo = ind;
+						DistanceToClick = currentDistance;
+						closestIndex = iStitch;
 					}
 				}
 			}
@@ -7110,16 +7101,16 @@ unsigned closPnt1(unsigned* clo) {
 		return 0;
 	else {
 
-		stch2px(tclo);
+		stch2px(closestIndex);
 		if (chkMap(IGNTHR)) {
 
-			*clo = tclo;
+			*closestStitch = closestIndex;
 			return 1;
 		} else {
 
-			if (hypot(chkPnt.x - StitchSizePixels.x, chkPnt.y - StitchSizePixels.y) < CLOSENUF) {
+			if (hypot(pointToCheck.x - StitchCoordinatesPixels.x, pointToCheck.y - StitchCoordinatesPixels.y) < CLOSENUF) {
 
-				*clo = tclo;
+				*closestStitch = closestIndex;
 				return 1;
 			} else
 				return 0;
@@ -7127,26 +7118,26 @@ unsigned closPnt1(unsigned* clo) {
 	}
 }
 
-unsigned pt2colInd(unsigned pInd) {
+unsigned pt2colInd(unsigned iStitch) {
 
-	unsigned ind;
+	unsigned iColor;
 
-	for (ind = 0; ind < ColorChanges; ind++) {
+	for (iColor = 0; iColor < ColorChanges; iColor++) {
 
-		if (ColorChangeTable[ind].stitchIndex > pInd)
+		if (ColorChangeTable[iColor].stitchIndex > iStitch)
 			break;
 	}
-	return ind;
+	return iColor;
 }
 
 void unthum() {
 
-	unsigned ind;
+	unsigned iBackup;
 
 	if (rstMap(THUMSHO)) {
 
-		for (ind = 0; ind < 4; ind++)
-			DestroyWindow(BackupViewer[ind]);
+		for (iBackup = 0; iBackup < 4; iBackup++)
+			DestroyWindow(BackupViewer[iBackup]);
 		if (chkMap(UPTO))
 			butxt(HUPTO, StringTable[STR_UPON]);
 		else
@@ -7272,8 +7263,8 @@ If the mouse position is inside the rectangle, the distance from the stitch
 
 Find the equation for the line by solving the linear parametric eauations
 
-  StitchBuffer[StitchIndex].x+Slope*StitchBuffer[StitchIndex].y=off
-  StitchBuffer[StitchIndex+1].x+Slope*StitchBuffer[StitchIndex+1].y=off
+  StitchBuffer[StitchIndex].x+Slope*StitchBuffer[StitchIndex].y=offset
+  StitchBuffer[StitchIndex+1].x+Slope*StitchBuffer[StitchIndex+1].y=offset
 
 substituting:
 
@@ -7290,35 +7281,35 @@ define yab=StitchBuffer[StitchIndex].y-StitchBuffer[StitchIndex+1].y
 
   Slope=xba/yab;
 
-back substituting into StitchBuffer[StitchIndex].x+Slope*StitchBuffer[StitchIndex].y=off
+back substituting into StitchBuffer[StitchIndex].x+Slope*StitchBuffer[StitchIndex].y=offset
 
-  off=StitchBuffer[StitchIndex].x+Slope*StitchBuffer[StitchIndex].y
+  offset=StitchBuffer[StitchIndex].x+Slope*StitchBuffer[StitchIndex].y
 
 The equation for a point vertical to the equation for the line and running
  through SelectedPoint is:
 
   SelectedPoint.x-SelectedPoint.y/Slope=poff
 
-If ipnt is the intersections between the two lines then
+If intersection is the intersections between the two lines then
 
-  ipnt.x-Slope*ipnt.y=off
-  ipnt.x+ipnt.y/Slope=poff
+  intersection.x-Slope*intersection.y=offset
+  intersection.x+intersection.y/Slope=poff
 
 Subtracting the two equations
 
-  Slope*ipnt.y+ipnt.y/Slope=off-poff
+  Slope*intersection.y+intersection.y/Slope=offset-poff
 
 Multiply by Slope
 
-  Slope*Slope*ipnt.y+ipnt.y=Slope(off-poff)
-  ipnt.y(Slope*Slope+1)=Slope(off-poff)
-  ipnt.y=Slope*(off-poff)/(Slope*Slope+1)
+  Slope*Slope*intersection.y+intersection.y=Slope(offset-poff)
+  intersection.y(Slope*Slope+1)=Slope(offset-poff)
+  intersection.y=Slope*(offset-poff)/(Slope*Slope+1)
 
-back substitute into ipnt.x+Slope*ipnt.y=off
+back substitute into intersection.x+Slope*intersection.y=offset
 
-  ipnt.x=off-Slope*ipnt.y
+  intersection.x=offset-Slope*intersection.y
 
-if dx=ipnt.x-spnt.x & dy=ipnt.y-spnt.y
+if dx=intersection.x-spnt.x & dy=intersection.y-spnt.y
 
 the distance from the point to the line is given by
 
@@ -7326,134 +7317,136 @@ the distance from the point to the line is given by
 */
 
 unsigned closlin() {
+	// ToDo - This function needs to be thoroughly checked
 
-	unsigned	ind, ine, scnt, clos = 0xffffffff;
+	unsigned	iStitch, iChange, stitchCount, closestPoint = 0xffffffff;
 	double		sum = 1e99;
 	long		xba, yab;
 	double		tsum;
-	dRECTANGLE		trct;
-	double		slop, off, poff, tol, dx, dy;
-	dPOINT		ipnt;
-	dPOINT		chkpnt;
-	fPOINTATTR*	l_pstch;
-	unsigned	layr;
+	dRECTANGLE	boundingRect;
+	double		slope, offset, poff, tolerance, dx, dy;
+	dPOINT		intersection;
+	dPOINT		checkedPoint;
+	fPOINTATTR*	stitches;
+	unsigned	layer;
 
 #define		TOL	20
-
+	// ToDo - Is tsum calculated too many times?
 	unboxs();
-	off = (float)(Msg.pt.x - StitchWindowAbsRect.left) / (StitchWindowAbsRect.right - StitchWindowAbsRect.left);
-	chkpnt.x = off*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-	off = (float)(StitchWindowAbsRect.bottom - Msg.pt.y) / (StitchWindowAbsRect.bottom - StitchWindowAbsRect.top);
-	chkpnt.y = (off*(ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom);
-	off = (double)(ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
-	tol = off*TOL;
-	for (ine = 0; ine < ColorChanges; ine++) {
+	offset = (float)(Msg.pt.x - StitchWindowAbsRect.left) / (StitchWindowAbsRect.right - StitchWindowAbsRect.left);
+	checkedPoint.x = offset*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
+	offset = (float)(StitchWindowAbsRect.bottom - Msg.pt.y) / (StitchWindowAbsRect.bottom - StitchWindowAbsRect.top);
+	checkedPoint.y = (offset*(ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom);
+	offset = (double)(ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
+	tolerance = offset*TOL;
+	for (iChange = 0; iChange < ColorChanges; iChange++) {
 
-		scnt = ColorChangeTable[ine + 1].stitchIndex - ColorChangeTable[ine].stitchIndex;
-		l_pstch = &StitchBuffer[ColorChangeTable[ine].stitchIndex];
-		if (chkhid(ine)) {
+		stitchCount = ColorChangeTable[iChange + 1].stitchIndex - ColorChangeTable[iChange].stitchIndex;
+		stitches = &StitchBuffer[ColorChangeTable[iChange].stitchIndex];
+		if (chkhid(iChange)) {
 
-			for (ind = 0; ind < scnt; ind++) {
+			for (iStitch = 0; iStitch < stitchCount; iStitch++) {
+				// ToDo - should the index in line below be iChange or iStitch?
+				layer = (stitches[iChange].attribute&LAYMSK) >> LAYSHFT;
+				if (!ActiveLayer || !layer || (layer == ActiveLayer)) {
 
-				layr = (l_pstch[ine].attribute&LAYMSK) >> LAYSHFT;
-				if (!ActiveLayer || !layr || (layr == ActiveLayer)) {
-
-					xba = l_pstch[ind + 1].x - l_pstch[ind].x;
-					yab = l_pstch[ind].y - l_pstch[ind + 1].y;
+					xba = stitches[iStitch + 1].x - stitches[iStitch].x;
+					yab = stitches[iStitch].y - stitches[iStitch + 1].y;
 					if (xba > 0) {
 
-						trct.left = l_pstch[ind].x - tol;
-						trct.right = l_pstch[ind + 1].x + tol;
+						boundingRect.left = stitches[iStitch].x - tolerance;
+						boundingRect.right = stitches[iStitch + 1].x + tolerance;
 					} else {
 
-						trct.left = l_pstch[ind + 1].x - tol;
-						trct.right = l_pstch[ind].x + tol;
+						boundingRect.left = stitches[iStitch + 1].x - tolerance;
+						boundingRect.right = stitches[iStitch].x + tolerance;
 					}
 					if (yab < 0) {
 
-						trct.bottom = l_pstch[ind].y - tol;
-						trct.top = l_pstch[ind + 1].y + tol;
+						boundingRect.bottom = stitches[iStitch].y - tolerance;
+						boundingRect.top = stitches[iStitch + 1].y + tolerance;
 					} else {
 
-						trct.bottom = l_pstch[ind + 1].y - tol;
-						trct.top = l_pstch[ind].y + tol;
+						boundingRect.bottom = stitches[iStitch + 1].y - tolerance;
+						boundingRect.top = stitches[iStitch].y + tolerance;
 					}
-					if (chkpnt.x > trct.left&&chkpnt.x<trct.right
-						&&chkpnt.y>trct.bottom&&chkpnt.y < trct.top) {
+					if (checkedPoint.x > boundingRect.left&&checkedPoint.x<boundingRect.right
+						&&checkedPoint.y>boundingRect.bottom&&checkedPoint.y < boundingRect.top) {
 
 						if (yab == 0) {
 
 							//stitch is horizontal
-							ipnt.x = chkpnt.x;
-							ipnt.y = l_pstch[ind].y;
-							tsum = ((l_pstch[ind].y > chkpnt.y) ? (l_pstch[ind].y - chkpnt.y) : (chkpnt.y - l_pstch[ind].y));
+							intersection.x = checkedPoint.x;
+							intersection.y = stitches[iStitch].y;
+							tsum = ((stitches[iStitch].y > checkedPoint.y) ? (stitches[iStitch].y - checkedPoint.y) : (checkedPoint.y - stitches[iStitch].y));
 							goto gotsum;
 						}
 						if (xba == 0) {
 
 							//stitch is vertical
-							dx = l_pstch[ind].x - chkpnt.x;
-							trct.top -= tol;
-							trct.bottom += tol;
-							if (chkpnt.y > trct.top) {
+							dx = stitches[iStitch].x - checkedPoint.x;
+							boundingRect.top -= tolerance;
+							boundingRect.bottom += tolerance;
+							if (checkedPoint.y > boundingRect.top) {
 
-								dy = chkpnt.y - trct.top;
+								dy = checkedPoint.y - boundingRect.top;
 								tsum = hypot(dx, dy);
 								goto gotal;
 							}
-							if (chkpnt.y < trct.bottom) {
+							if (checkedPoint.y < boundingRect.bottom) {
 
-								dy = chkpnt.y - trct.bottom;
+								dy = checkedPoint.y - boundingRect.bottom;
 								tsum = hypot(dx, dy);
 								goto gotal;
 							}
 							tsum = fabs(dx);
 							goto gotal;
 						}
-						slop = (double)xba / yab;
-						off = l_pstch[ind].x + slop*l_pstch[ind].y;
-						poff = chkpnt.x - chkpnt.y / slop;
-						ipnt.y = slop*(off - poff) / (slop*slop + 1);
-						ipnt.x = off - slop*ipnt.y;
-						dx = ipnt.x - chkpnt.x;
-						dy = ipnt.y - chkpnt.y;
+						slope = (double)xba / yab;
+						offset = stitches[iStitch].x + slope*stitches[iStitch].y;
+						poff = checkedPoint.x - checkedPoint.y / slope;
+						intersection.y = slope*(offset - poff) / (slope*slope + 1);
+						intersection.x = offset - slope*intersection.y;
+						dx = intersection.x - checkedPoint.x;
+						dy = intersection.y - checkedPoint.y;
 						tsum = hypot(dx, dy);
 					gotsum:;
-						trct.bottom += tol;
-						trct.top -= tol;
-						trct.left += tol;
-						trct.right -= tol;
-						if (ipnt.x < trct.left) {
+						boundingRect.bottom += tolerance;
+						boundingRect.top -= tolerance;
+						boundingRect.left += tolerance;
+						boundingRect.right -= tolerance;
+						// ToDo - Is tsum being caclulated as sqrt(x+y) and not as sqrt(x*x + y*y)?
+						if (intersection.x < boundingRect.left) {
 
-							if (ipnt.y < trct.bottom)
-								tsum = sqrt(((chkpnt.x > trct.left) ? (chkpnt.x - trct.left) : (trct.left - chkpnt.x)) + ((chkpnt.y > trct.bottom) ? (chkpnt.y - trct.bottom) : (trct.bottom - chkpnt.y)));
+							if (intersection.y < boundingRect.bottom)
+								tsum = sqrt(((checkedPoint.x > boundingRect.left) ? (checkedPoint.x - boundingRect.left) : (boundingRect.left - checkedPoint.x)) + ((checkedPoint.y > boundingRect.bottom) ? (checkedPoint.y - boundingRect.bottom) : (boundingRect.bottom - checkedPoint.y)));
 							else
-								tsum = sqrt(((chkpnt.x > trct.left) ? (chkpnt.x - trct.left) : (trct.left - chkpnt.x)) + ((chkpnt.y > trct.top) ? (chkpnt.y - trct.top) : (chkpnt.y - trct.top)));
+								tsum = sqrt(((checkedPoint.x > boundingRect.left) ? (checkedPoint.x - boundingRect.left) : (boundingRect.left - checkedPoint.x)) + ((checkedPoint.y > boundingRect.top) ? (checkedPoint.y - boundingRect.top) : (checkedPoint.y - boundingRect.top)));
 						} else {
 
-							if (ipnt.x > trct.right) {
+							if (intersection.x > boundingRect.right) {
 
-								if (ipnt.y < trct.bottom)
-									tsum = sqrt(((chkpnt.x > trct.right) ? (chkpnt.x - trct.right) : (trct.right - chkpnt.x)) + ((chkpnt.y > trct.bottom) ? (chkpnt.y - trct.bottom) : (trct.bottom - chkpnt.y)));
+								if (intersection.y < boundingRect.bottom)
+									tsum = sqrt(((checkedPoint.x > boundingRect.right) ? (checkedPoint.x - boundingRect.right) : (boundingRect.right - checkedPoint.x)) + ((checkedPoint.y > boundingRect.bottom) ? (checkedPoint.y - boundingRect.bottom) : (boundingRect.bottom - checkedPoint.y)));
 								else
-									tsum = sqrt(((chkpnt.x > trct.right) ? (chkpnt.x - trct.right) : (trct.right - chkpnt.x)) + ((chkpnt.y > trct.top) ? (chkpnt.y - trct.top) : (trct.top - chkpnt.y)));
+									tsum = sqrt(((checkedPoint.x > boundingRect.right) ? (checkedPoint.x - boundingRect.right) : (boundingRect.right - checkedPoint.x)) + ((checkedPoint.y > boundingRect.top) ? (checkedPoint.y - boundingRect.top) : (boundingRect.top - checkedPoint.y)));
 							}
 						}
 					gotal:;
 						if (tsum < sum) {
 
 							sum = tsum;
-							clos = ind + ColorChangeTable[ine].stitchIndex;
+							closestPoint = iStitch + ColorChangeTable[iChange].stitchIndex;
 						}
 					}
 				}
 			}
 		}
 	}
-	if (sum > tol)
+	if (sum > tolerance)
 		return 0xffffffff;
 	else
-		return clos;
+		return closestPoint;
 }
 
 void ilin() {
@@ -7495,15 +7488,15 @@ void xlin1() {
 void duIns() {
 
 	POINT tlin[2];
-
+	// ToDo - what is tlin being used for?
 	InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 	InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 	stch2px1(ClosestPointIndex);
-	tlin[0].x = InsertLine[0].x = StitchSizePixels.x;
-	tlin[0].y = InsertLine[0].y = StitchSizePixels.y;
+	tlin[0].x = InsertLine[0].x = StitchCoordinatesPixels.x;
+	tlin[0].y = InsertLine[0].y = StitchCoordinatesPixels.y;
 	stch2px1(ClosestPointIndex + 1);
-	tlin[1].x = InsertLine[2].x = StitchSizePixels.x;
-	tlin[1].y = InsertLine[2].y = StitchSizePixels.y;
+	tlin[1].x = InsertLine[2].x = StitchCoordinatesPixels.x;
+	tlin[1].y = InsertLine[2].y = StitchCoordinatesPixels.y;
 	xlin();
 	setMap(ILIN);
 	ilin();
@@ -7546,25 +7539,25 @@ void istch() {
 
 void cros(unsigned ind) {
 
-	long pwid = BoxOffset[0];
+	long armLength = BoxOffset[0];
 
 	stch2px1(ind);
-	InsertLine[0].x = StitchSizePixels.x - pwid;
-	InsertLine[1].y = InsertLine[0].y = StitchSizePixels.y;
-	InsertLine[1].x = StitchSizePixels.x + pwid;
+	InsertLine[0].x = StitchCoordinatesPixels.x - armLength;
+	InsertLine[1].y = InsertLine[0].y = StitchCoordinatesPixels.y;
+	InsertLine[1].x = StitchCoordinatesPixels.x + armLength;
 	SelectObject(StitchWindowDC, CrossPen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	Polyline(StitchWindowDC, InsertLine, 2);
 	SelectObject(StitchWindowMemDC, CrossPen);
 	SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 	Polyline(StitchWindowMemDC, InsertLine, 2);
-	InsertLine[0].y = StitchSizePixels.y - pwid;
-	InsertLine[0].x = InsertLine[1].x = StitchSizePixels.x;
-	InsertLine[1].y = StitchSizePixels.y - 1;
+	InsertLine[0].y = StitchCoordinatesPixels.y - armLength;
+	InsertLine[0].x = InsertLine[1].x = StitchCoordinatesPixels.x;
+	InsertLine[1].y = StitchCoordinatesPixels.y - 1;
 	Polyline(StitchWindowDC, InsertLine, 2);
 	Polyline(StitchWindowMemDC, InsertLine, 2);
-	InsertLine[0].y = StitchSizePixels.y + 2;
-	InsertLine[1].y = StitchSizePixels.y + pwid;
+	InsertLine[0].y = StitchCoordinatesPixels.y + 2;
+	InsertLine[1].y = StitchCoordinatesPixels.y + armLength;
 	Polyline(StitchWindowDC, InsertLine, 2);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 	Polyline(StitchWindowMemDC, InsertLine, 2);
@@ -7589,54 +7582,54 @@ void mark() {
 
 void selCol()
 {
-	unsigned ind, col;
+	unsigned iStitch, color;
 
 	if (PCSHeader.stitchCount)
 	{
 		if (chkMap(SELBOX))
-			ind = ClosestPointIndex;
+			iStitch = ClosestPointIndex;
 		else
 		{
 			if (chkMap(GRPSEL))
-				ind = GroupStitchIndex;
+				iStitch = GroupStitchIndex;
 			else
-				ind = 0;
+				iStitch = 0;
 		}
-		if (ind > (unsigned)PCSHeader.stitchCount - 1)
-			ind = PCSHeader.stitchCount - 1;
-		ClosestPointIndex = GroupStitchIndex = ind;
-		col = StitchBuffer[ind].attribute&COLMSK;
-		while (ClosestPointIndex && (StitchBuffer[ClosestPointIndex].attribute&COLMSK) == col)
+		if (iStitch > (unsigned)PCSHeader.stitchCount - 1)
+			iStitch = PCSHeader.stitchCount - 1;
+		ClosestPointIndex = GroupStitchIndex = iStitch;
+		color = StitchBuffer[iStitch].attribute&COLMSK;
+		while (ClosestPointIndex && (StitchBuffer[ClosestPointIndex].attribute&COLMSK) == color)
 			ClosestPointIndex--;
-		if ((StitchBuffer[ClosestPointIndex].attribute&COLMSK) != col)
+		if ((StitchBuffer[ClosestPointIndex].attribute&COLMSK) != color)
 			ClosestPointIndex++;
-		while (GroupStitchIndex < PCSHeader.stitchCount && (StitchBuffer[GroupStitchIndex].attribute&COLMSK) == col)
+		while (GroupStitchIndex < PCSHeader.stitchCount && (StitchBuffer[GroupStitchIndex].attribute&COLMSK) == color)
 			GroupStitchIndex++;
-		if ((StitchBuffer[ClosestPointIndex].attribute&COLMSK) != col)
+		if ((StitchBuffer[ClosestPointIndex].attribute&COLMSK) != color)
 			ClosestPointIndex--;
 		if (GroupStitchIndex > (unsigned)PCSHeader.stitchCount - 1)
 			GroupStitchIndex = PCSHeader.stitchCount - 1;
 		setMap(GRPSEL);
 		unbox();
 		grpAdj();
-		ActiveColor = col;
+		ActiveColor = color;
 		setMap(RESTCH);
 	}
 }
 
 void nuAct(unsigned ind) {
 
-	unsigned tcol;
+	unsigned color;
 
-	tcol = ActiveColor;
+	color = ActiveColor;
 	ActiveColor = StitchBuffer[ind].attribute&COLMSK;
-	redraw(UserColorWin[tcol]);
+	redraw(UserColorWin[color]);
 	redraw(UserColorWin[ActiveColor]);
 }
 
 void newFil() {
 
-	unsigned ind;
+	unsigned iColor;
 
 	rstMap(CMPDO);
 	if (PCSBMPFileName[0]) {
@@ -7678,11 +7671,11 @@ void newFil() {
 	WorkingFileName[0] = 0;
 	ColorChanges = 0;
 	KnotCount = 0;
-	for (ind = 0; ind < 16; ind++) {
+	for (iColor = 0; iColor < 16; iColor++) {
 
-		redraw(DefaultColorWin[ind]);
-		redraw(UserColorWin[ind]);
-		redraw(ThreadSizeWin[ind]);
+		redraw(DefaultColorWin[iColor]);
+		redraw(UserColorWin[iColor]);
+		redraw(ThreadSizeWin[iColor]);
 	}
 	zumhom();
 }
@@ -7703,7 +7696,7 @@ void unbBox() {
 
 void rebox() {
 
-	unsigned ind;
+	unsigned iColor;
 
 	unbox();
 	if (closPnt1(&ClosestPointIndex)) {
@@ -7717,8 +7710,8 @@ void rebox() {
 			rstMap(ECROS);
 			SearchLineIndex = 0;
 			setMap(RESTCH);
-			for (ind = 0; ind < 16; ind++)
-				redraw(UserColorWin[ind]);
+			for (iColor = 0; iColor < 16; iColor++)
+				redraw(UserColorWin[iColor]);
 		}
 		ritcor(&StitchBuffer[ClosestPointIndex]);
 	}
@@ -7732,25 +7725,25 @@ void endpnt() {
 	setMap(LIN1);
 	setMap(INSRT);
 	rstMap(GRPSEL);
-	InsertLine[0].x = StitchSizePixels.x;
-	InsertLine[0].y = StitchSizePixels.y;
+	InsertLine[0].x = StitchCoordinatesPixels.x;
+	InsertLine[0].y = StitchCoordinatesPixels.y;
 	InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 	InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 }
 
 void delstchm() {
 
-	unsigned ind, dst;
+	unsigned iStitch, destination;
 
 	rngadj();
-	dst = GroupStartStitch;
-	for (ind = GroupEndStitch; ind < PCSHeader.stitchCount; ind++) {
+	destination = GroupStartStitch;
+	for (iStitch = GroupEndStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		StitchBuffer[dst].attribute = StitchBuffer[ind].attribute;
-		StitchBuffer[dst].x = StitchBuffer[ind].x;
-		StitchBuffer[dst++].y = StitchBuffer[ind].y;
+		StitchBuffer[destination].attribute = StitchBuffer[iStitch].attribute;
+		StitchBuffer[destination].x = StitchBuffer[iStitch].x;
+		StitchBuffer[destination++].y = StitchBuffer[iStitch].y;
 	}
-	PCSHeader.stitchCount = dst - 1;
+	PCSHeader.stitchCount = destination - 1;
 }
 
 void unsid() {
@@ -7765,38 +7758,38 @@ void unsid() {
 
 void unbsho() {
 
-	unsigned ind;
+	unsigned iBackup;
 
 	if (rstMap(BAKSHO)) {
 
-		for (ind = 0; ind < OLDVER; ind++)
-			DestroyWindow(BackupViewer[ind]);
+		for (iBackup = 0; iBackup < OLDVER; iBackup++)
+			DestroyWindow(BackupViewer[iBackup]);
 	}
 }
 
-BOOL oldwnd(HWND hwnd) {
+BOOL oldwnd(HWND window) {
 
-	unsigned ind;
+	unsigned iWindow, iColor;
 
-	for (ind = 0; ind < 16; ind++) {
+	for (iColor = 0; iColor < 16; iColor++) {
 
-		if (DefaultColorWin[ind] == hwnd || UserColorWin[ind] == hwnd || ThreadSizeWin[ind] == hwnd)
+		if (DefaultColorWin[iColor] == window || UserColorWin[iColor] == window || ThreadSizeWin[iColor] == window)
 			return 0;
 	}
-	for (ind = 0; ind < 9; ind++) {
+	for (iWindow = 0; iWindow < 9; iWindow++) {
 
-		if (ButtonWin[ind] == hwnd)
+		if (ButtonWin[iWindow] == window)
 			return 0;
 	}
-	if (MainStitchWin == hwnd)
+	if (MainStitchWin == window)
 		return 0;
-	if (VerticalScrollBar == hwnd)
+	if (VerticalScrollBar == window)
 		return 0;
-	if (HorizontalScrollBar == hwnd)
+	if (HorizontalScrollBar == window)
 		return 0;
-	if (ColorBar == hwnd)
+	if (ColorBar == window)
 		return 0;
-	if (SpeedScrollBar == hwnd)
+	if (SpeedScrollBar == window)
 		return 0;
 	return 1;
 }
@@ -7917,17 +7910,17 @@ void rstdu() {
 	setMap(DUMEN);
 }
 
-CLPSTCH* deref(void* pnt) {
+CLPSTCH* deref(void* point) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		eax, pnt
+		mov		eax, point
 		mov		eax, [eax]
 	}
 #else
 	//check translation
-	return *(CLPSTCH **)pnt;
+	return *(CLPSTCH **)point;
 #endif
 }
 
@@ -7965,8 +7958,8 @@ void unsel() {
 
 void clpbox() {
 
-	SIZE	clpx;
-	double	tdub;
+	SIZE	adjustedSize;
+	double	ratio;
 
 	px2stch();
 	if (SelectedPoint.x + ClipRectSize.cx > UnzoomedRect.x)
@@ -7975,47 +7968,47 @@ void clpbox() {
 		SelectedPoint.y = UnzoomedRect.y - ClipRectSize.cy;
 	ClipOrigin.x = SelectedPoint.x;
 	ClipOrigin.y = SelectedPoint.y;
-	tdub = (double)StitchWindowClientRect.right / (ZoomRect.right - ZoomRect.left);
-	clpx.cx = ClipRectSize.cx*tdub + 0.5;
-	clpx.cy = ClipRectSize.cy*tdub + 0.5;
-	StitchSizePixels.x = (SelectedPoint.x - ZoomRect.left)*tdub + 0.5;
-	StitchSizePixels.y = StitchWindowClientRect.bottom - (SelectedPoint.y - ZoomRect.bottom)*tdub + 0.5 - clpx.cy;
-	ClipInsertBoxLine[0].x = ClipInsertBoxLine[3].x = ClipInsertBoxLine[4].x = StitchSizePixels.x;
-	ClipInsertBoxLine[0].y = ClipInsertBoxLine[1].y = ClipInsertBoxLine[4].y = StitchSizePixels.y;
-	ClipInsertBoxLine[1].x = ClipInsertBoxLine[2].x = ClipInsertBoxLine[0].x + clpx.cx;
-	ClipInsertBoxLine[2].y = ClipInsertBoxLine[3].y = ClipInsertBoxLine[0].y + clpx.cy;
+	ratio = (double)StitchWindowClientRect.right / (ZoomRect.right - ZoomRect.left);
+	adjustedSize.cx = ClipRectSize.cx*ratio + 0.5;
+	adjustedSize.cy = ClipRectSize.cy*ratio + 0.5;
+	StitchCoordinatesPixels.x = (SelectedPoint.x - ZoomRect.left)*ratio + 0.5;
+	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (SelectedPoint.y - ZoomRect.bottom)*ratio + 0.5 - adjustedSize.cy;
+	ClipInsertBoxLine[0].x = ClipInsertBoxLine[3].x = ClipInsertBoxLine[4].x = StitchCoordinatesPixels.x;
+	ClipInsertBoxLine[0].y = ClipInsertBoxLine[1].y = ClipInsertBoxLine[4].y = StitchCoordinatesPixels.y;
+	ClipInsertBoxLine[1].x = ClipInsertBoxLine[2].x = ClipInsertBoxLine[0].x + adjustedSize.cx;
+	ClipInsertBoxLine[2].y = ClipInsertBoxLine[3].y = ClipInsertBoxLine[0].y + adjustedSize.cy;
 	setMap(CLPSHO);
 	duclp();
 }
 
-void lodclp(unsigned ind) {
+void lodclp(unsigned iStitch) {
 
-	fPOINT		padj;
-	unsigned	src, dst;
+	fPOINT		adjustment;
+	unsigned	source, destination;
 
-	if (ind != PCSHeader.stitchCount)
-		ind++;
-	padj.x = ClipOrigin.x - ClipRect.left;
-	padj.y = ClipOrigin.y - ClipRect.bottom;
-	if (ind < (unsigned)PCSHeader.stitchCount&&chkMap(INIT)) {
+	if (iStitch != PCSHeader.stitchCount)
+		iStitch++;
+	adjustment.x = ClipOrigin.x - ClipRect.left;
+	adjustment.y = ClipOrigin.y - ClipRect.bottom;
+	if (iStitch < (unsigned)PCSHeader.stitchCount&&chkMap(INIT)) {
 
-		src = PCSHeader.stitchCount - 1;
-		dst = PCSHeader.stitchCount + ClipStitchCount - 1;
-		while (src >= ind) {
+		source = PCSHeader.stitchCount - 1;
+		destination = PCSHeader.stitchCount + ClipStitchCount - 1;
+		while (source >= iStitch) {
 
-			StitchBuffer[dst].x = StitchBuffer[src].x;
-			StitchBuffer[dst].y = StitchBuffer[src--].y;
-			StitchBuffer[dst--].attribute = StitchBuffer[src].attribute;
+			StitchBuffer[destination].x = StitchBuffer[source].x;
+			StitchBuffer[destination].y = StitchBuffer[source--].y;
+			StitchBuffer[destination--].attribute = StitchBuffer[source].attribute;
 		}
 	}
-	ClosestPointIndex = ind;
-	for (src = 0; src < ClipStitchCount; src++) {
+	ClosestPointIndex = iStitch;
+	for (source = 0; source < ClipStitchCount; source++) {
 
-		StitchBuffer[ind].x = ClipBuffer[src].x + padj.x;
-		StitchBuffer[ind].y = ClipBuffer[src].y + padj.y;
-		StitchBuffer[ind++].attribute = ClipBuffer[src].attribute&COLMSK | LayerIndex | NOTFRM;
+		StitchBuffer[iStitch].x = ClipBuffer[source].x + adjustment.x;
+		StitchBuffer[iStitch].y = ClipBuffer[source].y + adjustment.y;
+		StitchBuffer[iStitch++].attribute = ClipBuffer[source].attribute&COLMSK | LayerIndex | NOTFRM;
 	}
-	GroupStitchIndex = ind - 1;
+	GroupStitchIndex = iStitch - 1;
 	setMap(GRPSEL);
 	PCSHeader.stitchCount += ClipStitchCount;
 	if (PCSHeader.stitchCount)
@@ -8024,8 +8017,8 @@ void lodclp(unsigned ind) {
 
 void rSelbox() {
 
-	SIZE	selx;
-	double	tdub;
+	SIZE	adjustedSelectSize;
+	double	ratio;
 
 	unsel();
 	px2stch();
@@ -8037,17 +8030,17 @@ void rSelbox() {
 		SelectedPoint.x = SelectBoxOffset.x;
 	if (SelectedPoint.y - SelectBoxOffset.y < 0)
 		SelectedPoint.y = SelectBoxOffset.y;
-	tdub = (double)StitchWindowClientRect.right / (ZoomRect.right - ZoomRect.left);
-	selx.cx = SelectBoxSize.cx*tdub + 0.5;
-	selx.cy = SelectBoxSize.cy*tdub + 0.5;
-	StitchSizePixels.x = (SelectedPoint.x - ZoomRect.left - SelectBoxOffset.x)*tdub + 0.5;
-	StitchSizePixels.y = StitchWindowClientRect.bottom - (SelectedPoint.y - ZoomRect.bottom - SelectBoxOffset.y)*tdub + 0.5 - selx.cy;
-	FormOutlineRect[0].x = FormOutlineRect[6].x = FormOutlineRect[7].x = FormOutlineRect[8].x = StitchSizePixels.x;
-	FormOutlineRect[1].x = FormOutlineRect[5].x = StitchSizePixels.x + selx.cx / 2;
-	FormOutlineRect[0].y = FormOutlineRect[1].y = FormOutlineRect[2].y = FormOutlineRect[8].y = StitchSizePixels.y;
-	FormOutlineRect[3].y = FormOutlineRect[7].y = StitchSizePixels.y + selx.cy / 2;
-	FormOutlineRect[4].y = FormOutlineRect[5].y = FormOutlineRect[6].y = StitchSizePixels.y + selx.cy;
-	FormOutlineRect[2].x = FormOutlineRect[3].x = FormOutlineRect[4].x = StitchSizePixels.x + selx.cx;
+	ratio = (double)StitchWindowClientRect.right / (ZoomRect.right - ZoomRect.left);
+	adjustedSelectSize.cx = SelectBoxSize.cx*ratio + 0.5;
+	adjustedSelectSize.cy = SelectBoxSize.cy*ratio + 0.5;
+	StitchCoordinatesPixels.x = (SelectedPoint.x - ZoomRect.left - SelectBoxOffset.x)*ratio + 0.5;
+	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (SelectedPoint.y - ZoomRect.bottom - SelectBoxOffset.y)*ratio + 0.5 - adjustedSelectSize.cy;
+	FormOutlineRect[0].x = FormOutlineRect[6].x = FormOutlineRect[7].x = FormOutlineRect[8].x = StitchCoordinatesPixels.x;
+	FormOutlineRect[1].x = FormOutlineRect[5].x = StitchCoordinatesPixels.x + adjustedSelectSize.cx / 2;
+	FormOutlineRect[0].y = FormOutlineRect[1].y = FormOutlineRect[2].y = FormOutlineRect[8].y = StitchCoordinatesPixels.y;
+	FormOutlineRect[3].y = FormOutlineRect[7].y = StitchCoordinatesPixels.y + adjustedSelectSize.cy / 2;
+	FormOutlineRect[4].y = FormOutlineRect[5].y = FormOutlineRect[6].y = StitchCoordinatesPixels.y + adjustedSelectSize.cy;
+	FormOutlineRect[2].x = FormOutlineRect[3].x = FormOutlineRect[4].x = StitchCoordinatesPixels.x + adjustedSelectSize.cx;
 	setMap(SELSHO);
 	dusel(StitchWindowDC);
 }
@@ -8061,40 +8054,40 @@ void duSelbox() {
 	SelectBoxOffset.y = SelectedPoint.y - StitchRangeRect.bottom;
 }
 
-void setbak(unsigned wid) {
+void setbak(unsigned penWidth) {
 
-	if (BackgroundPenWidth != wid)
-		BackgroundPen = nuPen(BackgroundPen, wid, BackgroundColor);
+	if (BackgroundPenWidth != penWidth)
+		BackgroundPen = nuPen(BackgroundPen, penWidth, BackgroundColor);
 }
 
-void stchbox(unsigned ind, HDC dc) {
+void stchbox(unsigned iStitch, HDC dc) {
 
-	POINT		stlin[5];
-	unsigned	layr;
+	POINT		line[5];
+	unsigned	layer;
 
-	layr = (StitchBuffer[ind].attribute&LAYMSK) >> LAYSHFT;
-	if (!ActiveLayer || !layr || layr == ActiveLayer) {
+	layer = (StitchBuffer[iStitch].attribute&LAYMSK) >> LAYSHFT;
+	if (!ActiveLayer || !layer || layer == ActiveLayer) {
 
-		stch2px1(ind);
-		stlin[0].x = stlin[3].x = stlin[4].x = StitchSizePixels.x - IniFile.stitchSizePixels;
-		stlin[0].y = stlin[1].y = StitchSizePixels.y - IniFile.stitchSizePixels;
-		stlin[1].x = stlin[2].x = StitchSizePixels.x + IniFile.stitchSizePixels;
-		stlin[2].y = stlin[3].y = StitchSizePixels.y + IniFile.stitchSizePixels;
-		stlin[4].y = StitchSizePixels.y - IniFile.stitchSizePixels;
-		Polyline(dc, stlin, 5);
+		stch2px1(iStitch);
+		line[0].x = line[3].x = line[4].x = StitchCoordinatesPixels.x - IniFile.stitchSizePixels;
+		line[0].y = line[1].y = StitchCoordinatesPixels.y - IniFile.stitchSizePixels;
+		line[1].x = line[2].x = StitchCoordinatesPixels.x + IniFile.stitchSizePixels;
+		line[2].y = line[3].y = StitchCoordinatesPixels.y + IniFile.stitchSizePixels;
+		line[4].y = StitchCoordinatesPixels.y - IniFile.stitchSizePixels;
+		Polyline(dc, line, 5);
 	}
 }
 
-void sCor2px(dPOINT stpnt, POINT* pxpnt) {
+void sCor2px(dPOINT stitchCoordinate, POINT* pixelCoordinate) {
 
-	pxpnt->x = (stpnt.x - ZoomRect.left)*ZoomRatio.x + 0.5;
-	pxpnt->y = StitchWindowClientRect.bottom + (ZoomRect.bottom - stpnt.y)*ZoomRatio.y + 0.5;
+	pixelCoordinate->x = (stitchCoordinate.x - ZoomRect.left)*ZoomRatio.x + 0.5;
+	pixelCoordinate->y = StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchCoordinate.y)*ZoomRatio.y + 0.5;
 }
 
-void sdCor2px(fPOINTATTR stpnt, POINT* pxpnt) {
+void sdCor2px(fPOINTATTR stitchPoint, POINT* pixelCoordinate) {
 
-	pxpnt->x = (stpnt.x - ZoomRect.left)*ZoomRatio.x + 0.5;
-	pxpnt->y = StitchWindowClientRect.bottom + (ZoomRect.bottom - stpnt.y)*ZoomRatio.y + 0.5;
+	pixelCoordinate->x = (stitchPoint.x - ZoomRect.left)*ZoomRatio.x + 0.5;
+	pixelCoordinate->y = StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchPoint.y)*ZoomRatio.y + 0.5;
 }
 
 void durot() {
@@ -8127,106 +8120,106 @@ void unrotu() {
 		durotu();
 }
 
-void rotang(dPOINT rpnt, POINT* tpnt) {
+void rotang(dPOINT unrotatedPoint, POINT* rotatedPoint) {
 
-	double	len, ang0;
-	dPOINT	ipnt;
+	double	distanceToCenter, newAngle;
+	dPOINT	point;
 	long	dx, dy;
 
-	dx = rpnt.x - RotationCenter.x;
-	dy = rpnt.y - RotationCenter.y;
+	dx = unrotatedPoint.x - RotationCenter.x;
+	dy = unrotatedPoint.y - RotationCenter.y;
 	if (dx) {
 
-		len = hypot(dx, dy);
-		ang0 = atan2(dy, dx);
-		ang0 += RotationAngle;
+		distanceToCenter = hypot(dx, dy);
+		newAngle = atan2(dy, dx);
+		newAngle += RotationAngle;
 	} else {
 
-		len = abs(dy);
+		distanceToCenter = abs(dy);
 		if (dy > 0)
-			ang0 = PI / 2 + RotationAngle;
+			newAngle = PI / 2 + RotationAngle;
 		else
-			ang0 = RotationAngle - PI / 2;
+			newAngle = RotationAngle - PI / 2;
 	}
-	ipnt.y = RotationCenter.y + len*sin(ang0);
-	ipnt.x = RotationCenter.x + len*cos(ang0);
-	sCor2px(ipnt, tpnt);
+	point.y = RotationCenter.y + distanceToCenter*sin(newAngle);
+	point.x = RotationCenter.x + distanceToCenter*cos(newAngle);
+	sCor2px(point, rotatedPoint);
 }
 
-void rotang1(fPOINTATTR rpnt, fPOINT* tpnt) {
+void rotang1(fPOINTATTR unrotatedPoint, fPOINT* rotatedPoint) {
 
-	double	len, ang0;
+	double	distanceToCenter, newAngle;
 	double	dx, dy;
 
-	dx = rpnt.x - RotationCenter.x;
-	dy = rpnt.y - RotationCenter.y;
+	dx = unrotatedPoint.x - RotationCenter.x;
+	dy = unrotatedPoint.y - RotationCenter.y;
 	if (dx) {
 
-		len = hypot(dx, dy);
-		ang0 = atan2(dy, dx);
-		ang0 += RotationAngle;
+		distanceToCenter = hypot(dx, dy);
+		newAngle = atan2(dy, dx);
+		newAngle += RotationAngle;
 	} else {
 
 		if (dy > 0) {
-			len = dy;
-			ang0 = PI / 2 + RotationAngle;
+			distanceToCenter = dy;
+			newAngle = PI / 2 + RotationAngle;
 		} else {
-			len = -dy;
-			ang0 = RotationAngle - PI / 2;
+			distanceToCenter = -dy;
+			newAngle = RotationAngle - PI / 2;
 		}
 	}
-	tpnt->y = RotationCenter.y + len*sin(ang0);
-	tpnt->x = RotationCenter.x + len*cos(ang0);
+	rotatedPoint->y = RotationCenter.y + distanceToCenter*sin(newAngle);
+	rotatedPoint->x = RotationCenter.x + distanceToCenter*cos(newAngle);
 }
 
-void rotangf(fPOINT rpnt, fPOINT* tpnt) {
+void rotangf(fPOINT unrotatedPoint, fPOINT* rotatedPoint) {
 
-	double	len, ang0;
+	double	distanceToCenter, newAngle;
 	double	dx, dy;
 
-	dx = rpnt.x - RotationCenter.x;
-	dy = rpnt.y - RotationCenter.y;
+	dx = unrotatedPoint.x - RotationCenter.x;
+	dy = unrotatedPoint.y - RotationCenter.y;
 	if (dx) {
 
-		len = hypot(dx, dy);
-		ang0 = atan2(dy, dx);
-		ang0 += RotationAngle;
+		distanceToCenter = hypot(dx, dy);
+		newAngle = atan2(dy, dx);
+		newAngle += RotationAngle;
 	} else {
 
 		if (dy > 0) {
-			len = dy;
-			ang0 = PI / 2 + RotationAngle;
+			distanceToCenter = dy;
+			newAngle = PI / 2 + RotationAngle;
 		} else {
-			len = -dy;
-			ang0 = RotationAngle - PI / 2;
+			distanceToCenter = -dy;
+			newAngle = RotationAngle - PI / 2;
 		}
 	}
-	tpnt->y = RotationCenter.y + len*sin(ang0);
-	tpnt->x = RotationCenter.x + len*cos(ang0);
+	rotatedPoint->y = RotationCenter.y + distanceToCenter*sin(newAngle);
+	rotatedPoint->x = RotationCenter.x + distanceToCenter*cos(newAngle);
 }
 
-void rotpix(POINT rpnt, POINT* tpnt) {
+void rotpix(POINT unrotatedPoint, POINT* rotatedPoint) {
 
 	//won't handle vertical lines
-	double	len, ang0;
+	double	distanceToCenter, newAngle;
 	long	dx, dy;
 
-	dx = rpnt.x - RotationCenterPixels.x;
-	dy = rpnt.y - RotationCenterPixels.y;
-	len = hypot(dx, dy);
-	ang0 = atan2(dy, dx);
-	ang0 -= RotateAngle;
-	tpnt->y = RotationCenterPixels.y + len*sin(ang0);
-	tpnt->x = RotationCenterPixels.x + len*cos(ang0);
+	dx = unrotatedPoint.x - RotationCenterPixels.x;
+	dy = unrotatedPoint.y - RotationCenterPixels.y;
+	distanceToCenter = hypot(dx, dy);
+	newAngle = atan2(dy, dx);
+	newAngle -= RotateAngle;
+	rotatedPoint->y = RotationCenterPixels.y + distanceToCenter*sin(newAngle);
+	rotatedPoint->x = RotationCenterPixels.x + distanceToCenter*cos(newAngle);
 }
 
-void rotflt(fPOINT* pnt) {
+void rotflt(fPOINT* point) {
 
 	double	len, ang0;
 	double	dx, dy;
 
-	dx = pnt->x - RotationCenter.x;
-	dy = pnt->y - RotationCenter.y;
+	dx = point->x - RotationCenter.x;
+	dy = point->y - RotationCenter.y;
 	if (dx) {
 
 		len = hypot(dx, dy);
@@ -8242,74 +8235,74 @@ void rotflt(fPOINT* pnt) {
 			ang0 = RotationAngle - PI / 2;
 		}
 	}
-	pnt->y = RotationCenter.y + len*sin(ang0);
-	pnt->x = RotationCenter.x + len*cos(ang0);
+	point->y = RotationCenter.y + len*sin(ang0);
+	point->x = RotationCenter.x + len*cos(ang0);
 }
 
-void rotstch(fPOINTATTR* pnt) {
+void rotstch(fPOINTATTR* stitch) {
 
-	double	len, ang0;
+	double	distanceToCenter, newAngle;
 	double	dx, dy;
 
-	dx = pnt->x - RotationCenter.x;
-	dy = pnt->y - RotationCenter.y;
+	dx = stitch->x - RotationCenter.x;
+	dy = stitch->y - RotationCenter.y;
 	if (dx) {
 
-		len = hypot(dx, dy);
-		ang0 = atan2(dy, dx);
-		ang0 += RotationAngle;
+		distanceToCenter = hypot(dx, dy);
+		newAngle = atan2(dy, dx);
+		newAngle += RotationAngle;
 	} else {
 
 		if (dy > 0) {
-			len = dy;
-			ang0 = PI / 2 + RotationAngle;
+			distanceToCenter = dy;
+			newAngle = PI / 2 + RotationAngle;
 		} else {
-			len = -dy;
-			ang0 = RotationAngle - PI / 2;
+			distanceToCenter = -dy;
+			newAngle = RotationAngle - PI / 2;
 		}
 	}
-	pnt->y = RotationCenter.y + len*sin(ang0);
-	pnt->x = RotationCenter.x + len*cos(ang0);
+	stitch->y = RotationCenter.y + distanceToCenter*sin(newAngle);
+	stitch->x = RotationCenter.x + distanceToCenter*cos(newAngle);
 }
 
 void ritrot() {
 
-	POINT		tpnt;
-	dPOINT		rotpnt;
+	POINT		rotated;
+	dPOINT		rotationReference;
 
-	rotpnt.x = RotationRect.left;
-	rotpnt.y = RotationRect.top;
-	rotang(rotpnt, &tpnt);
-	RotateBoxOutline[0].x = RotateBoxOutline[4].x = tpnt.x;
-	RotateBoxOutline[0].y = RotateBoxOutline[4].y = tpnt.y;
-	rotpnt.x = RotationCenter.x;
-	rotang(rotpnt, &tpnt);
-	RotateBoxCrossVertLine[0].x = tpnt.x;
-	RotateBoxCrossVertLine[0].y = tpnt.y;
-	rotpnt.x = RotationRect.right;
-	rotang(rotpnt, &tpnt);
-	RotateBoxOutline[1].x = tpnt.x;
-	RotateBoxOutline[1].y = tpnt.y;
-	rotpnt.y = RotationCenter.y;
-	rotang(rotpnt, &tpnt);
-	RotateBoxCrossHorzLine[1].x = tpnt.x;
-	RotateBoxCrossHorzLine[1].y = tpnt.y;
-	rotpnt.y = RotationRect.bottom;
-	rotang(rotpnt, &tpnt);
-	RotateBoxOutline[2].x = tpnt.x;
-	RotateBoxOutline[2].y = tpnt.y;
-	rotpnt.x = RotationCenter.x;
-	rotang(rotpnt, &tpnt);
-	RotateBoxCrossVertLine[1].x = tpnt.x;
-	RotateBoxCrossVertLine[1].y = tpnt.y;
-	rotpnt.x = RotationRect.left;
-	rotang(rotpnt, &tpnt);
-	RotateBoxOutline[3].x = tpnt.x;
-	RotateBoxOutline[3].y = tpnt.y;
-	rotpnt.y = RotationCenter.y;
-	rotang(rotpnt, &tpnt);
-	RotateBoxCrossHorzLine[0].x = tpnt.x;
-	RotateBoxCrossHorzLine[0].y = tpnt.y;
+	rotationReference.x = RotationRect.left;
+	rotationReference.y = RotationRect.top;
+	rotang(rotationReference, &rotated);
+	RotateBoxOutline[0].x = RotateBoxOutline[4].x = rotated.x;
+	RotateBoxOutline[0].y = RotateBoxOutline[4].y = rotated.y;
+	rotationReference.x = RotationCenter.x;
+	rotang(rotationReference, &rotated);
+	RotateBoxCrossVertLine[0].x = rotated.x;
+	RotateBoxCrossVertLine[0].y = rotated.y;
+	rotationReference.x = RotationRect.right;
+	rotang(rotationReference, &rotated);
+	RotateBoxOutline[1].x = rotated.x;
+	RotateBoxOutline[1].y = rotated.y;
+	rotationReference.y = RotationCenter.y;
+	rotang(rotationReference, &rotated);
+	RotateBoxCrossHorzLine[1].x = rotated.x;
+	RotateBoxCrossHorzLine[1].y = rotated.y;
+	rotationReference.y = RotationRect.bottom;
+	rotang(rotationReference, &rotated);
+	RotateBoxOutline[2].x = rotated.x;
+	RotateBoxOutline[2].y = rotated.y;
+	rotationReference.x = RotationCenter.x;
+	rotang(rotationReference, &rotated);
+	RotateBoxCrossVertLine[1].x = rotated.x;
+	RotateBoxCrossVertLine[1].y = rotated.y;
+	rotationReference.x = RotationRect.left;
+	rotang(rotationReference, &rotated);
+	RotateBoxOutline[3].x = rotated.x;
+	RotateBoxOutline[3].y = rotated.y;
+	rotationReference.y = RotationCenter.y;
+	rotang(rotationReference, &rotated);
+	RotateBoxCrossHorzLine[0].x = rotated.x;
+	RotateBoxCrossHorzLine[0].y = rotated.y;
 	sCor2px(RotationCenter, &RotateBoxToCursorLine[0]);
 	setMap(ROTSHO);
 	durot();
@@ -8361,137 +8354,138 @@ rotskp:;
 	ritrot();
 }
 
-void savclp(unsigned dst, unsigned src) {
+void savclp(unsigned destination, unsigned source) {
 
 	double	frct, intg;
 
-	ClipStitchData[dst].led = StitchBuffer[src].attribute&COLMSK;
-	frct = modf((double)StitchBuffer[src].x - LowerLeftStitch.x, &intg);
-	ClipStitchData[dst].fx = frct * 256;
-	ClipStitchData[dst].x = intg;
-	ClipStitchData[dst].spcx = 0;
-	frct = modf((double)StitchBuffer[src].y - LowerLeftStitch.y, &intg);
-	ClipStitchData[dst].fy = frct * 256;
-	ClipStitchData[dst].y = intg;
-	ClipStitchData[dst].spcy = 0;
+	ClipStitchData[destination].led = StitchBuffer[source].attribute&COLMSK;
+	frct = modf((double)StitchBuffer[source].x - LowerLeftStitch.x, &intg);
+	ClipStitchData[destination].fx = frct * 256;
+	ClipStitchData[destination].x = intg;
+	ClipStitchData[destination].spcx = 0;
+	frct = modf((double)StitchBuffer[source].y - LowerLeftStitch.y, &intg);
+	ClipStitchData[destination].fy = frct * 256;
+	ClipStitchData[destination].y = intg;
+	ClipStitchData[destination].spcy = 0;
 	// ToDo - Are these structure members needed?
-	ClipStitchData[dst].myst = 1;
-	ClipStitchData[dst].tag = 0x14;
+	ClipStitchData[destination].myst = 1;
+	ClipStitchData[destination].tag = 0x14;
 }
 
-void rtclpfn(unsigned dst, unsigned src) {
+void rtclpfn(unsigned destination, unsigned source) {
 
-	double	frct, intg;
+	double	fractional, integer;
 
-	ClipStitchData[dst].led = 0;
-	frct = modf(ClipBuffer[src].x - LowerLeftStitch.x, &intg);
-	ClipStitchData[dst].fx = frct;
-	ClipStitchData[dst].x = intg;
-	ClipStitchData[dst].spcx = 0;
-	frct = modf(ClipBuffer[src].y - LowerLeftStitch.y, &intg);
-	ClipStitchData[dst].fy = frct;
-	ClipStitchData[dst].y = intg;
-	ClipStitchData[dst].spcy = 0;
+	ClipStitchData[destination].led = 0;
+	fractional = modf(ClipBuffer[source].x - LowerLeftStitch.x, &integer);
+	ClipStitchData[destination].fx = fractional;
+	ClipStitchData[destination].x = integer;
+	ClipStitchData[destination].spcx = 0;
+	fractional = modf(ClipBuffer[source].y - LowerLeftStitch.y, &integer);
+	ClipStitchData[destination].fy = fractional;
+	ClipStitchData[destination].y = integer;
+	ClipStitchData[destination].spcy = 0;
 	// ToDo - Are these structure members needed?
-	ClipStitchData[dst].myst = 1;
-	ClipStitchData[dst].tag = 0x14;
+	ClipStitchData[destination].myst = 1;
+	ClipStitchData[destination].tag = 0x14;
 }
 
-FORMCLIP* frmref(void* pnt) {
+FORMCLIP* frmref(void* clipForm) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		eax, pnt
+		mov		eax, clipForm
 		mov		eax, [eax]
 	}
 #else
-	return *(FORMCLIP **)pnt;
+	return *(FORMCLIP **)clipForm;
 #endif
 }
 
-FORMSCLIP* frmsref(void* pnt) {
+FORMSCLIP* frmsref(void* clipForms) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		eax, pnt
+		mov		eax, clipForms
 		mov		eax, [eax]
 	}
 #else
-	return *(FORMSCLIP **)pnt;
+	return *(FORMSCLIP **)clipForms;
 #endif
 }
 
-FORMVERTEXCLIP* fpref(void* pnt) {
+FORMVERTEXCLIP* fpref(void* clipVertex) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		eax, pnt
+		mov		eax, clipVertex
 		mov		eax, [eax]
 	}
 #else
-	return *(FORMVERTEXCLIP **)pnt;
+	return *(FORMVERTEXCLIP **)clipVertex;
 #endif
 }
 
 unsigned sizfclp()
 {
-	unsigned l_siz;
+	unsigned clipSize;
 
-	l_siz = sizeof(FORMCLIP) + SideCount * sizeof(fPOINT);
+	clipSize = sizeof(FORMCLIP) + SideCount * sizeof(fPOINT);
 	if (SelectedForm->type == SAT)
-		l_siz += SelectedForm->satinGuideCount * sizeof(SATCON);
+		clipSize += SelectedForm->satinGuideCount * sizeof(SATCON);
 	if (iseclp(ClosestFormToCursor))
-		l_siz += SelectedForm->clipEntries * sizeof(fPOINT);
+		clipSize += SelectedForm->clipEntries * sizeof(fPOINT);
 	if (isclpx(ClosestFormToCursor))
-		l_siz += SelectedForm->lengthOrCount.clipCount * sizeof(fPOINT);
+		clipSize += SelectedForm->lengthOrCount.clipCount * sizeof(fPOINT);
 	if (istx(ClosestFormToCursor))
-		l_siz += SelectedForm->fillInfo.texture.count * sizeof(TXPNT);
-	return l_siz;
+		clipSize += SelectedForm->fillInfo.texture.count * sizeof(TXPNT);
+	return clipSize;
 }
 
-unsigned frmcnt(unsigned fpnt) {
+unsigned frmcnt(unsigned iForm) {
 
-	unsigned	at, cnt = 0, ind;
+	unsigned	codedAttribute, stitchCount = 0, iStitch;
 
 	LowerLeftStitch.x = LowerLeftStitch.y = (float)1e20;
-	at = fpnt << 4;
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+	// ToDo should this be using FRMSHFT?
+	codedAttribute = iForm << 4;
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		if ((StitchBuffer[ind].attribute&FRMSK) == at&&StitchBuffer[ind].attribute&TYPMSK)
+		if ((StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute&&StitchBuffer[iStitch].attribute&TYPMSK)
 			goto fskip;
 	}
 	return 0;
 fskip:;
-	FormFirstStitchIndex = ind;
-	while (ind < PCSHeader.stitchCount) {
+	FormFirstStitchIndex = iStitch;
+	while (iStitch < PCSHeader.stitchCount) {
 
-		if ((StitchBuffer[ind].attribute&FRMSK) == at&&StitchBuffer[ind].attribute&TYPMSK) {
+		if ((StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute&&StitchBuffer[iStitch].attribute&TYPMSK) {
 
-			if (StitchBuffer[ind].x < LowerLeftStitch.x)
-				LowerLeftStitch.x = StitchBuffer[ind].x;
-			if (StitchBuffer[ind].y < LowerLeftStitch.y)
-				LowerLeftStitch.y = StitchBuffer[ind].y;
-			cnt++;
+			if (StitchBuffer[iStitch].x < LowerLeftStitch.x)
+				LowerLeftStitch.x = StitchBuffer[iStitch].x;
+			if (StitchBuffer[iStitch].y < LowerLeftStitch.y)
+				LowerLeftStitch.y = StitchBuffer[iStitch].y;
+			stitchCount++;
 		}
-		ind++;
+		iStitch++;
 	}
-	return cnt;
+	return stitchCount;
 }
 
 unsigned sizclp() {
 
-	unsigned len = 0;
+	unsigned length = 0;
 
-	len = FileSize = sizeof(FORMCLIP) + SideCount * sizeof(fPOINT);
+	length = FileSize = sizeof(FORMCLIP) + SideCount * sizeof(fPOINT);
 	if (SelectedForm->type == SAT)
 		FileSize += SelectedForm->satinGuideCount * sizeof(SATCON);
 	if (SelectedForm->fillType || SelectedForm->edgeType) {
 
-		len += frmcnt(ClosestFormToCursor);
-		FileSize += len * sizeof(fPOINTATTR);
+		length += frmcnt(ClosestFormToCursor);
+		FileSize += length * sizeof(fPOINTATTR);
 	}
 	if (iseclp(ClosestFormToCursor))
 		FileSize += SelectedForm->clipEntries * sizeof(fPOINT);
@@ -8499,35 +8493,39 @@ unsigned sizclp() {
 		FileSize += SelectedForm->lengthOrCount.clipCount * sizeof(fPOINT);
 	if (istx(ClosestFormToCursor))
 		FileSize += SelectedForm->fillInfo.texture.count * sizeof(TXPNT);
-	return len;
+	
+	return length;
 }
 
 unsigned lenclp()
 {
-	unsigned cod, ind, cnt;
+	unsigned codedAttribute, iStitch, stitchCount;
 
-	cnt = 0;
-	cod = ClosestFormToCursor << FRMSHFT;
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++)
+	stitchCount = 0;
+	codedAttribute = ClosestFormToCursor << FRMSHFT;
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 	{
-		if ((StitchBuffer[ind].attribute&(FRMSK | NOTFRM)) == cod)
-			cnt++;
+		if ((StitchBuffer[iStitch].attribute&(FRMSK | NOTFRM)) == codedAttribute)
+			stitchCount++;
 	}
-	return cnt;
+	return stitchCount;
 }
 
 void duclip() {
 
-	unsigned		ind, ine, len = 0, inf, at, msiz = 0;
-	SATCON*			l_sac;
-	fPOINT*			l_clipData;
+	unsigned		iClip, iDestination, iForm, iGuide;
+	unsigned		iSide, iStitch, iSource, iTexture, iVertex;
+	unsigned		guideCount, pointCount, textureCount, stitchCount;
+	unsigned		length = 0, codedAttribute, msiz = 0;
+	SATCON*			guides;
+	fPOINT*			points;
 	fPOINT*			mclp;
-	TXPNT*			ptx;
+	TXPNT*			textures;
 	TXPNT*			ptxs;
-	FRMHED*			tfrm;
+	FRMHED*			forms;
 	fPOINTATTR*		astch;
-	FORMVERTEXCLIP*	pclp;
-	fPOINT*			tflt;
+	FORMVERTEXCLIP*	clipHeader;
+	fPOINT*			vertices;
 
 	if (chkMap(FPSEL)) {
 
@@ -8536,21 +8534,22 @@ void duclip() {
 			EmptyClipboard();
 			ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 			ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, (SelectedFormVertices.vertexCount + 1) * sizeof(fPOINT) + sizeof(FORMVERTEXCLIP));
-			pclp = fpref(ThrEdClipPointer);
-			pclp->clipType = CLP_FRMPS;
-			pclp->vertexCount = SelectedFormVertices.vertexCount;
+			clipHeader = fpref(ThrEdClipPointer);
+			clipHeader->clipType = CLP_FRMPS;
+			clipHeader->vertexCount = SelectedFormVertices.vertexCount;
 			if (chkMap(PSELDIR))
-				pclp->direction = 1;
+				clipHeader->direction = 1;
 			else
-				pclp->direction = 0;
-			tflt = (fPOINT*)&pclp[1];
+				clipHeader->direction = 0;
+			// skip past the header
+			vertices = (fPOINT*)&clipHeader[1];
 			fvars(ClosestFormToCursor);
-			ine = SelectedFormVertices.start;
-			for (ind = 0; ind <= SelectedFormVertices.vertexCount; ind++) {
+			iSource = SelectedFormVertices.start;
+			for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 
-				tflt[ind].x = CurrentFormVertices[ine].x;
-				tflt[ind].y = CurrentFormVertices[ine].y;
-				ine = pdir(ine);
+				vertices[iVertex].x = CurrentFormVertices[iSource].x;
+				vertices[iVertex].y = CurrentFormVertices[iSource].y;
+				iSource = pdir(iSource);
 			}
 			SetClipboardData(ThrEdClip, ThrEdClipPointer);
 			CloseClipboard();
@@ -8567,116 +8566,121 @@ void duclip() {
 			ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 			if (SelectedFormCount) {
 
-				for (ind = 0; ind < SelectedFormCount; ind++) {
+				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
-					ClosestFormToCursor = SelectedFormList[ind];
+					ClosestFormToCursor = SelectedFormList[iForm];
 					fvars(ClosestFormToCursor);
-					len += sizfclp();
+					length += sizfclp();
 					msiz += FileSize;
 				}
-				ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, msiz + len);
-				ClipFormsData = frmsref(ThrEdClipPointer);
-				ClipFormsData->clipType = CLP_FRMS;
-				ClipFormsData->formCount = SelectedFormCount;
-				tfrm = (FRMHED*)&ClipFormsData[1];
-				for (ind = 0; ind < SelectedFormCount; ind++) {
+				ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, msiz + length);
+				ClipFormsHeader = frmsref(ThrEdClipPointer);
+				ClipFormsHeader->clipType = CLP_FRMS;
+				ClipFormsHeader->formCount = SelectedFormCount;
+				// Skip past the header
+				forms = (FRMHED*)&ClipFormsHeader[1];
+				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
-					SelectedForm = &FormList[SelectedFormList[ind]];
-					frmcpy(&tfrm[ind], &FormList[SelectedFormList[ind]]);
+					SelectedForm = &FormList[SelectedFormList[iForm]];
+					frmcpy(&forms[iForm], &FormList[SelectedFormList[iForm]]);
 				}
-				CurrentFormVertices = (fPOINT*)&tfrm[ind];
-				inf = 0;
-				for (ind = 0; ind < SelectedFormCount; ind++) {
+				// skip past the forms
+				CurrentFormVertices = (fPOINT*)&forms[iForm];
+				iVertex = 0;
+				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
-					SelectedForm = &FormList[SelectedFormList[ind]];
-					for (ine = 0; ine < SelectedForm->sides; ine++) {
+					SelectedForm = &FormList[SelectedFormList[iForm]];
+					for (iSide = 0; iSide < SelectedForm->sides; iSide++) {
 
-						CurrentFormVertices[inf].x = SelectedForm->vertices[ine].x;
-						CurrentFormVertices[inf++].y = SelectedForm->vertices[ine].y;
+						CurrentFormVertices[iVertex].x = SelectedForm->vertices[iSide].x;
+						CurrentFormVertices[iVertex++].y = SelectedForm->vertices[iSide].y;
 					}
 				}
-				l_sac = (SATCON*)&CurrentFormVertices[inf];
-				inf = 0;
-				for (ind = 0; ind < SelectedFormCount; ind++) {
+				// skip past the vertex list
+				guides = (SATCON*)&CurrentFormVertices[iVertex];
+				guideCount = 0;
+				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
-					SelectedForm = &FormList[SelectedFormList[ind]];
+					SelectedForm = &FormList[SelectedFormList[iForm]];
 					if (SelectedForm->type == SAT) {
 
-						for (ine = 0; ine < SelectedForm->satinGuideCount; ine++) {
-
-							l_sac[inf].start = SelectedForm->satinOrAngle.sac[ine].start;
-							l_sac[inf++].finish = SelectedForm->satinOrAngle.sac[ine].finish;
+						for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+							
+							guides[guideCount].start = SelectedForm->satinOrAngle.sac[iGuide].start;
+							guides[guideCount++].finish = SelectedForm->satinOrAngle.sac[iGuide].finish;
 						}
 					}
 				}
-				l_clipData = (fPOINT*)&l_sac[inf];
-				inf = 0;
-				for (ind = 0; ind < SelectedFormCount; ind++) {
+				// skip past the guides
+				points = (fPOINT*)&guides[guideCount];
+				pointCount = 0;
+				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
-					SelectedForm = &FormList[SelectedFormList[ind]];
-					if (isclpx(SelectedFormList[ind])) {
+					SelectedForm = &FormList[SelectedFormList[iForm]];
+					if (isclpx(SelectedFormList[iForm])) {
 
-						for (ine = 0; ine < SelectedForm->lengthOrCount.clipCount; ine++) {
+						for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
 
-							l_clipData[inf].x = SelectedForm->angleOrClipData.clip[ine].x;
-							l_clipData[inf++].y = SelectedForm->angleOrClipData.clip[ine].y;
+							points[pointCount].x = SelectedForm->angleOrClipData.clip[iClip].x;
+							points[pointCount++].y = SelectedForm->angleOrClipData.clip[iClip].y;
 						}
 					}
-					if (iseclp(SelectedFormList[ind])) {
+					if (iseclp(SelectedFormList[iForm])) {
 
-						for (ine = 0; ine < SelectedForm->clipEntries; ine++) {
+						for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
 
-							l_clipData[inf].x = SelectedForm->borderClipData[ine].x;
-							l_clipData[inf++].y = SelectedForm->borderClipData[ine].y;
+							points[pointCount].x = SelectedForm->borderClipData[iClip].x;
+							points[pointCount++].y = SelectedForm->borderClipData[iClip].y;
 						}
 					}
 				}
-				ptx = (TXPNT*)&l_clipData[inf];
-				ine = 0;
-				for (ind = 0; ind < SelectedFormCount; ind++)
+				// Skip past the points
+				textures = (TXPNT*)&points[pointCount];
+				textureCount = 0;
+				for (iForm = 0; iForm < SelectedFormCount; iForm++)
 				{
-					SelectedForm = &FormList[SelectedFormList[ind]];
-					if (istx(SelectedFormList[ind]))
+					SelectedForm = &FormList[SelectedFormList[iForm]];
+					if (istx(SelectedFormList[iForm]))
 					{
-						MoveMemory(&ptx[ine], &TexturePointsBuffer[SelectedForm->fillInfo.texture.index], SelectedForm->fillInfo.texture.count * sizeof(TXPNT));
-						tfrm[ind].fillInfo.texture.index = ine;
-						ine += SelectedForm->fillInfo.texture.count;
+						MoveMemory(&textures[textureCount], &TexturePointsBuffer[SelectedForm->fillInfo.texture.index], SelectedForm->fillInfo.texture.count * sizeof(TXPNT));
+						forms[iForm].fillInfo.texture.index = textureCount;
+						textureCount += SelectedForm->fillInfo.texture.count;
 					}
 				}
 				SetClipboardData(ThrEdClip, ThrEdClipPointer);
 				CloseClipboard();
 				clRmap(RMAPSIZ);
-				for (ind = 0; ind < SelectedFormCount; ind++)
-					setr(SelectedFormList[ind]);
+				for (iForm = 0; iForm < SelectedFormCount; iForm++)
+					setr(SelectedFormList[iForm]);
 				astch = &StitchBuffer[MAXSEQ];
-				ine = 0;
+				stitchCount = 0;
 				LowerLeftStitch.x = LowerLeftStitch.y = (float)1e30;
-				for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-					if (!(StitchBuffer[ind].attribute&NOTFRM) && chkr((StitchBuffer[ind].attribute&FRMSK) >> FRMSHFT)) {
+					if (!(StitchBuffer[iStitch].attribute&NOTFRM) && chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
 
-						if (StitchBuffer[ind].x < LowerLeftStitch.x)
-							LowerLeftStitch.x = StitchBuffer[ind].x;
-						if (StitchBuffer[ind].y < LowerLeftStitch.y)
-							LowerLeftStitch.y = StitchBuffer[ind].y;
-						astch[ine].x = StitchBuffer[ind].x;
-						astch[ine].y = StitchBuffer[ind].y;
-						astch[ine++].attribute = StitchBuffer[ind].attribute;
+						if (StitchBuffer[iStitch].x < LowerLeftStitch.x)
+							LowerLeftStitch.x = StitchBuffer[iStitch].x;
+						if (StitchBuffer[iStitch].y < LowerLeftStitch.y)
+							LowerLeftStitch.y = StitchBuffer[iStitch].y;
+						astch[stitchCount].x = StitchBuffer[iStitch].x;
+						astch[stitchCount].y = StitchBuffer[iStitch].y;
+						astch[stitchCount++].attribute = StitchBuffer[iStitch].attribute;
 					}
 				}
-				if (PCSHeader.stitchCount&&ine) {
+				if (PCSHeader.stitchCount&&stitchCount) {
 
 					Clip = RegisterClipboardFormat(PcdClipFormat);
-					ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, ine * sizeof(CLPSTCH) + 2);
+					ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2);
 					ClipStitchData = deref(ClipPointer);
-					ind = MAXSEQ;
-					inf = 0;
-					savclp(0, ind);
-					ind++;
-					ClipStitchData[0].led = ine;
-					inf++;
-					while (ind < ine + MAXSEQ)
-						savclp(inf++, ind++);
+					iStitch = MAXSEQ;
+					iDestination = 0;
+					savclp(0, iStitch);
+					iStitch++;
+					ClipStitchData[0].led = stitchCount;
+					iDestination++;
+					while (iStitch < stitchCount + MAXSEQ)
+						savclp(iDestination++, iStitch++);
 					SetClipboardData(Clip, ClipPointer);
 					CloseClipboard();
 				}
@@ -8684,76 +8688,80 @@ void duclip() {
 
 				if (chkMap(FORMSEL)) {
 
-					len = sizclp();
+					length = sizclp();
 					fvars(ClosestFormToCursor);
-					l_sac = 0; at = ClosestFormToCursor << 4;
+					// ToDo - use FRMSHFT?
+					guides = 0; codedAttribute = ClosestFormToCursor << 4;
 					FileSize += sizeof(FORMCLIP);
 					ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize);
-					ClipFormData = frmref(ThrEdClipPointer);
-					ClipFormData->clipType = CLP_FRM;
-					frmcpy(&ClipFormData->form, &FormList[ClosestFormToCursor]);
-					CurrentFormVertices = (fPOINT*)&ClipFormData[1];
-					for (ind = 0; ind < SelectedForm->sides; ind++) {
+					ClipFormHeader = frmref(ThrEdClipPointer);
+					ClipFormHeader->clipType = CLP_FRM;
+					frmcpy(&ClipFormHeader->form, &FormList[ClosestFormToCursor]);
+					CurrentFormVertices = (fPOINT*)&ClipFormHeader[1];
+					for (iSide = 0; iSide < SelectedForm->sides; iSide++) {
 
-						CurrentFormVertices[ind].x = SelectedForm->vertices[ind].x;
-						CurrentFormVertices[ind].y = SelectedForm->vertices[ind].y;
+						CurrentFormVertices[iSide].x = SelectedForm->vertices[iSide].x;
+						CurrentFormVertices[iSide].y = SelectedForm->vertices[iSide].y;
 					}
-					l_sac = (SATCON*)&CurrentFormVertices[SideCount];
-					ind = 0;
+					guides = (SATCON*)&CurrentFormVertices[SideCount];
+					iGuide = 0;
 					if (SelectedForm->type == SAT) {
 
-						for (ind = 0; ind < SelectedForm->satinGuideCount; ind++) {
+						for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 
-							l_sac[ind].start = SelectedForm->satinOrAngle.sac[ind].start;
-							l_sac[ind].finish = SelectedForm->satinOrAngle.sac[ind].finish;
+							guides[iGuide].start = SelectedForm->satinOrAngle.sac[iGuide].start;
+							guides[iGuide].finish = SelectedForm->satinOrAngle.sac[iGuide].finish;
 						}
 					}
-					mclp = (fPOINT*)&l_sac[ind];
+					mclp = (fPOINT*)&guides[iGuide];
+					iClip = 0;
 					if (isclpx(ClosestFormToCursor)) {
 
-						for (ind = 0; ind < SelectedForm->lengthOrCount.clipCount; ind++) {
+						for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
 
-							mclp[ind].x = SelectedForm->angleOrClipData.clip[ind].x;
-							mclp[ind].y = SelectedForm->angleOrClipData.clip[ind].y;
+							mclp[iClip].x = SelectedForm->angleOrClipData.clip[iClip].x;
+							mclp[iClip].y = SelectedForm->angleOrClipData.clip[iClip].y;
 						}
 					}
-					l_clipData = (fPOINT*)&mclp[ind];
+					points = (fPOINT*)&mclp[iClip];
 					if (iseclpx(ClosestFormToCursor)) {
 
-						for (ind = 0; ind < SelectedForm->clipEntries; ind++) {
+						for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
 
-							l_clipData[ind].x = SelectedForm->borderClipData[ind].x;
-							l_clipData[ind].y = SelectedForm->borderClipData[ind].y;
+							points[iClip].x = SelectedForm->borderClipData[iClip].x;
+							points[iClip].y = SelectedForm->borderClipData[iClip].y;
 						}
 					}
-					ptx = (TXPNT*)&l_clipData[ind];
+					textures = (TXPNT*)&points[iClip];
 					if (istx(ClosestFormToCursor))
 					{
 						ptxs = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
-						for (ind = 0; ind < SelectedForm->fillInfo.texture.count; ind++)
+						for (iTexture = 0; iTexture < SelectedForm->fillInfo.texture.count; iTexture++)
 						{
-							ptx[ind].line = ptxs[ind].line;
-							ptx[ind].y = ptxs[ind].y;
+							textures[iTexture].line = ptxs[iTexture].line;
+							textures[iTexture].y = ptxs[iTexture].y;
 						}
 					}
 					SetClipboardData(ThrEdClip, ThrEdClipPointer);
+					iTexture = 0;
 					if ((SelectedForm->fillType || SelectedForm->edgeType))
 					{
-						len = lenclp();
+						length = lenclp();
 						Clip = RegisterClipboardFormat(PcdClipFormat);
-						ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, len * sizeof(CLPSTCH) + 2);
+						ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length * sizeof(CLPSTCH) + 2);
 						ClipStitchData = deref(ClipPointer);
-						ind = FormFirstStitchIndex;
-						savclp(0, ind);
-						ClipStitchData[0].led = len;
-						ind++;
-						inf = 1;
-						at = ClosestFormToCursor << 4;
-						while (ind < PCSHeader.stitchCount) {
+						iStitch = FormFirstStitchIndex;
+						savclp(0, iTexture);
+						ClipStitchData[0].led = length;
+						iTexture++;
+						iDestination = 1;
+						// ToDo - use FRMSHFT?
+						codedAttribute = ClosestFormToCursor << 4;
+						while (iTexture < PCSHeader.stitchCount) {
 
-							if ((StitchBuffer[ind].attribute&FRMSK) == at && !(StitchBuffer[ind].attribute&NOTFRM))
-								savclp(inf++, ind);
-							ind++;
+							if ((StitchBuffer[iTexture].attribute&FRMSK) == codedAttribute && !(StitchBuffer[iTexture].attribute&NOTFRM))
+								savclp(iDestination++, iTexture);
+							iTexture++;
 						}
 						SetClipboardData(Clip, ClipPointer);
 						ispcdclp();
@@ -8766,22 +8774,23 @@ void duclip() {
 						Clip = RegisterClipboardFormat(PcdClipFormat);
 						rngadj();
 						LowerLeftStitch.x = LowerLeftStitch.y = (float)1e30;
-						for (ind = GroupStartStitch; ind <= GroupEndStitch; ind++) {
+						for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
 
-							if (StitchBuffer[ind].x < LowerLeftStitch.x)
-								LowerLeftStitch.x = StitchBuffer[ind].x;
-							if (StitchBuffer[ind].y < LowerLeftStitch.y)
-								LowerLeftStitch.y = StitchBuffer[ind].y;
+							if (StitchBuffer[iStitch].x < LowerLeftStitch.x)
+								LowerLeftStitch.x = StitchBuffer[iStitch].x;
+							if (StitchBuffer[iStitch].y < LowerLeftStitch.y)
+								LowerLeftStitch.y = StitchBuffer[iStitch].y;
 						}
-						len = GroupEndStitch - GroupStartStitch + 1;
-						inf = GroupStartStitch;
-						ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, len * sizeof(CLPSTCH) + 2);
+						length = GroupEndStitch - GroupStartStitch + 1;
+						iSource = GroupStartStitch;
+						ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length * sizeof(CLPSTCH) + 2);
 						ClipStitchData = deref(ClipPointer);
-						savclp(0, inf);
-						ClipStitchData[0].led = len;
-						inf++;
-						for (ind = 1; ind < len; ind++)
-							savclp(ind, inf++);
+						savclp(0, iSource);
+						ClipStitchData[0].led = length;
+						// ToDo - check use of iSource as the destination index
+						iSource++;
+						for (iStitch = 1; iStitch < length; iStitch++)
+							savclp(iStitch, iSource++);
 						SetClipboardData(Clip, ClipPointer);
 						CloseClipboard();
 					}
@@ -8794,26 +8803,26 @@ void duclip() {
 
 void delfstchs() {
 
-	unsigned ind, ine = 0;;
+	unsigned iSourceStitch, iDestinationStitch = 0;
 
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+	for (iSourceStitch = 0; iSourceStitch < PCSHeader.stitchCount; iSourceStitch++) {
 
-		if (StitchBuffer[ind].attribute&NOTFRM) {
+		if (StitchBuffer[iSourceStitch].attribute&NOTFRM) {
 
-			StitchBuffer[ine].attribute = StitchBuffer[ind].attribute;
-			StitchBuffer[ine].x = StitchBuffer[ind].x;
-			StitchBuffer[ine++].y = StitchBuffer[ind].y;
+			StitchBuffer[iDestinationStitch].attribute = StitchBuffer[iSourceStitch].attribute;
+			StitchBuffer[iDestinationStitch].x = StitchBuffer[iSourceStitch].x;
+			StitchBuffer[iDestinationStitch++].y = StitchBuffer[iSourceStitch].y;
 		} else {
 
-			if (((StitchBuffer[ind].attribute&FRMSK) >> 4) != ClosestFormToCursor) {
+			if (((StitchBuffer[iSourceStitch].attribute&FRMSK) >> 4) != ClosestFormToCursor) {
 
-				StitchBuffer[ine].attribute = StitchBuffer[ind].attribute;
-				StitchBuffer[ine].x = StitchBuffer[ind].x;
-				StitchBuffer[ine++].y = StitchBuffer[ind].y;
+				StitchBuffer[iDestinationStitch].attribute = StitchBuffer[iSourceStitch].attribute;
+				StitchBuffer[iDestinationStitch].x = StitchBuffer[iSourceStitch].x;
+				StitchBuffer[iDestinationStitch++].y = StitchBuffer[iSourceStitch].y;
 			}
 		}
 	}
-	PCSHeader.stitchCount = ine;
+	PCSHeader.stitchCount = iDestinationStitch;
 }
 
 void cut() {
@@ -8842,15 +8851,15 @@ void cut() {
 
 void numWnd() {
 
-	RECT l_msgRct;
+	RECT messageRect;
 
-	GetClientRect(MsgWindow, &l_msgRct);
+	GetClientRect(MsgWindow, &messageRect);
 	GeneralNumberInputBox = CreateWindow(
 		"STATIC",
 		0,
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		5,
-		l_msgRct.bottom + 15,
+		messageRect.bottom + 15,
 		ButtonWidthX3,
 		ButtonHeight,
 		MainStitchWin,
@@ -8877,69 +8886,71 @@ void unpat() {
 		setMap(RESTCH);
 	}
 }
-void delsmal(unsigned ind, unsigned fin) {
-
-	unsigned	ine, at = ClosestFormToCursor << 4;
+void delsmal(unsigned startStitch, unsigned endStitch) {
+	// ToDo - does this function work correctly?
+	// ToDo - rename ine and inf
+	unsigned	iStitch, ine, codedAttribute = ClosestFormToCursor << 4;
 	unsigned	inf;
 	long		dx, dy;
-	double		l_siz = 1e99;
+	double		stitchSize = 1e99;
 
 	savdo();
 	if (chkMap(FORMSEL)) {
 
 		ine = find1st();
-		ind = ine + 1;
-		while (ind<(unsigned)PCSHeader.stitchCount - 1 && l_siz>SmallStitchLength) {
+		iStitch = ine + 1;
+		while (iStitch<(unsigned)PCSHeader.stitchCount - 1 && stitchSize>SmallStitchLength) {
 
-			if (!(StitchBuffer[ind].attribute&NOTFRM) && (StitchBuffer[ind].attribute&FRMSK) == at) {
+			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute) {
 
-				if (StitchBuffer[ind].attribute&KNOTMSK)
-					ine = ind;
+				if (StitchBuffer[iStitch].attribute&KNOTMSK)
+					ine = iStitch;
 				else {
 
-					dx = StitchBuffer[ind].x - StitchBuffer[ine].x;
-					dy = StitchBuffer[ind].y - StitchBuffer[ine].y;
-					l_siz = hypot(dx, dy);
+					dx = StitchBuffer[iStitch].x - StitchBuffer[ine].x;
+					dy = StitchBuffer[iStitch].y - StitchBuffer[ine].y;
+					stitchSize = hypot(dx, dy);
 				}
-				ind++;
+				iStitch++;
 			}
 		}
-		if (ind != fin - 2) {
+		if (iStitch != endStitch - 2) {
 
-			ind--;
-			ine = ind + 2;
+			iStitch--;
+			ine = iStitch + 2;
 			while (ine < (unsigned)PCSHeader.stitchCount - 1) {
 
 				do {
 
-					if (!(StitchBuffer[ind].attribute&NOTFRM) && (StitchBuffer[ind].attribute&FRMSK) == at && !(StitchBuffer[ind].attribute&KNOTMSK)) {
+					if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute && !(StitchBuffer[iStitch].attribute&KNOTMSK)) {
 
-						dx = StitchBuffer[ine].x - StitchBuffer[ind].x;
-						dy = StitchBuffer[ine++].y - StitchBuffer[ind].y;
-						l_siz = hypot(dx, dy);
+						dx = StitchBuffer[ine].x - StitchBuffer[iStitch].x;
+						dy = StitchBuffer[ine++].y - StitchBuffer[iStitch].y;
+						stitchSize = hypot(dx, dy);
 					} else
 						ine++;
-				} while (l_siz < SmallStitchLength&&ine < PCSHeader.stitchCount);
-				StitchBuffer[++ind].attribute = StitchBuffer[--ine].attribute;
-				StitchBuffer[ind].x = StitchBuffer[ine].x;
-				StitchBuffer[ind].y = StitchBuffer[ine++].y;
+				} while (stitchSize < SmallStitchLength&&ine < PCSHeader.stitchCount);
+				StitchBuffer[++iStitch].attribute = StitchBuffer[--ine].attribute;
+				StitchBuffer[iStitch].x = StitchBuffer[ine].x;
+				StitchBuffer[iStitch].y = StitchBuffer[ine++].y;
 			}
-			ind++;
+			iStitch++;
 			while (ine < PCSHeader.stitchCount) {
 
-				StitchBuffer[ind].attribute = StitchBuffer[ine].attribute;
-				StitchBuffer[ind].x = StitchBuffer[ine].x;
-				StitchBuffer[ind++].y = StitchBuffer[ine++].y;
+				StitchBuffer[iStitch].attribute = StitchBuffer[ine].attribute;
+				StitchBuffer[iStitch].x = StitchBuffer[ine].x;
+				StitchBuffer[iStitch++].y = StitchBuffer[ine++].y;
 			}
-			PCSHeader.stitchCount = ind;
+			PCSHeader.stitchCount = iStitch;
 			coltab();
 		}
 	} else {
 
-		ine = ind + 1;
-		SelectedPoint.x = StitchBuffer[ind].x;
-		SelectedPoint.y = StitchBuffer[ind].y;
-		for (inf = ine; inf < fin; inf++) {
+		iStitch = startStitch;
+		ine = startStitch + 1;
+		SelectedPoint.x = StitchBuffer[iStitch].x;
+		SelectedPoint.y = StitchBuffer[iStitch].y;
+		for (inf = ine; inf < endStitch; inf++) {
 
 			if (StitchBuffer[ine].attribute&KNOTMSK) {
 
@@ -8950,8 +8961,8 @@ void delsmal(unsigned ind, unsigned fin) {
 
 				dx = StitchBuffer[inf].x - SelectedPoint.x;
 				dy = StitchBuffer[inf].y - SelectedPoint.y;
-				l_siz = hypot(dx, dy);
-				if (l_siz > SmallStitchLength) {
+				stitchSize = hypot(dx, dy);
+				if (stitchSize > SmallStitchLength) {
 
 					mvstch(ine++, inf);
 					SelectedPoint.x = StitchBuffer[inf].x;
@@ -8970,17 +8981,17 @@ void delsmal(unsigned ind, unsigned fin) {
 	setMap(RESTCH);
 }
 
-BOOL cmpstch(unsigned ind0, unsigned ind1) {
+BOOL cmpstch(unsigned iStitchA, unsigned iStitchB) {
 
 #if  __UseASM__
 	_asm {
-		mov		eax, ind0
+		mov		eax, iStitchA
 		xor		ecx, ecx
 		mov		cl, 12
 		mul		ecx
 		mov		ebx, eax
 		add		ebx, offset StitchBuffer
-		mov		eax, ind1
+		mov		eax, iStitchB
 		mul		ecx
 		add		eax, offset StitchBuffer
 		mov		edx, eax
@@ -8998,24 +9009,24 @@ BOOL cmpstch(unsigned ind0, unsigned ind1) {
 				doscmpx :
 	}
 #else
-	if (StitchBuffer[ind0].x != StitchBuffer[ind1].x)
+	if (StitchBuffer[iStitchA].x != StitchBuffer[iStitchB].x)
 		return 0;
 
-	return StitchBuffer[ind0].y == StitchBuffer[ind1].y;
+	return StitchBuffer[iStitchA].y == StitchBuffer[iStitchB].y;
 #endif
 }
 
-void mvstch(unsigned dst, unsigned src) {
+void mvstch(unsigned destination, unsigned source) {
 
 #if  __UseASM__
 	_asm {
-		mov		eax, dst
+		mov		eax, destination
 		xor		ecx, ecx
 		mov		cl, 12
 		mul		ecx
 		mov		ebx, eax
 		add		ebx, offset StitchBuffer
-		mov		eax, src
+		mov		eax, source
 		mul		ecx
 		add		eax, offset StitchBuffer
 		mov		cl, 4
@@ -9031,124 +9042,113 @@ void mvstch(unsigned dst, unsigned src) {
 		mov[ebx], edx
 	}
 #else
-	StitchBuffer[dst] = StitchBuffer[src];
+	StitchBuffer[destination] = StitchBuffer[source];
 #endif
 }
 
-void ofstch(unsigned ind, TCHAR of) {
+void ofstch(unsigned iSource, TCHAR offset) {
 
-	StitchBuffer[OutputIndex].x = StitchBuffer[ind].x + KnotStep.x*of;
-	StitchBuffer[OutputIndex].y = StitchBuffer[ind].y + KnotStep.y*of;
+	StitchBuffer[OutputIndex].x = StitchBuffer[iSource].x + KnotStep.x*offset;
+	StitchBuffer[OutputIndex].y = StitchBuffer[iSource].y + KnotStep.y*offset;
 	StitchBuffer[OutputIndex++].attribute = KnotAttribute;
 }
 
-void endknt(unsigned fin) {
+void endknt(unsigned finish) {
 
-	double		len;
-	dPOINT		dif;
-	unsigned	strt, ind;
-	TCHAR*		tdat;
+	double		length;
+	dPOINT		delta;
+	unsigned	iStart, iKnot;
+	TCHAR*		knots;
 
-	strt = fin - 1;
-	KnotAttribute = StitchBuffer[strt].attribute | KNOTMSK;
+	iStart = finish - 1;
+	KnotAttribute = StitchBuffer[iStart].attribute | KNOTMSK;
 	do {
 
-		dif.x = StitchBuffer[fin].x - StitchBuffer[strt].x;
-		dif.y = StitchBuffer[fin].y - StitchBuffer[strt].y;
-		len = hypot(dif.x, dif.y);
-		strt--;
-	} while (!len);
+		delta.x = StitchBuffer[finish].x - StitchBuffer[iStart].x;
+		delta.y = StitchBuffer[finish].y - StitchBuffer[iStart].y;
+		length = hypot(delta.x, delta.y);
+		iStart--;
+	} while (!length);
 	if (chkMap(FILDIR))
-		tdat = KnotAtLastOrder;
+		knots = KnotAtLastOrder;
 	else
-		tdat = KnotAtEndOrder;
-	if (!(strt & 0x8000000)) {
+		knots = KnotAtEndOrder;
+	if (!(iStart & 0x8000000)) {
 
-		KnotStep.x = 2 / len*dif.x;
-		KnotStep.y = 2 / len*dif.y;
-		for (ind = 0; ind < 5; ind++)
-			ofstch(fin, tdat[ind]);
+		KnotStep.x = 2 / length*delta.x;
+		KnotStep.y = 2 / length*delta.y;
+		for (iKnot = 0; iKnot < 5; iKnot++)
+			ofstch(finish, knots[iKnot]);
 		if (chkMap(FILDIR))
-			ofstch(fin, 0);
+			ofstch(finish, 0);
 	}
 }
 
-void strtknt(unsigned strt) {
+void strtknt(unsigned start) {
 
-	double		len;
-	dPOINT		dif;
-	unsigned	fin, ind;
+	double		length;
+	dPOINT		delta;
+	unsigned	finish, iKnot;
 
-	fin = strt + 1;
+	finish = start + 1;
 	do {
 
-		dif.x = StitchBuffer[fin].x - StitchBuffer[strt].x;
-		dif.y = StitchBuffer[fin].y - StitchBuffer[strt].y;
-		len = hypot(dif.x, dif.y);
-		fin++;
-	} while (len < 2 && fin < PCSHeader.stitchCount);
-	if (fin < PCSHeader.stitchCount) {
+		delta.x = StitchBuffer[finish].x - StitchBuffer[start].x;
+		delta.y = StitchBuffer[finish].y - StitchBuffer[start].y;
+		length = hypot(delta.x, delta.y);
+		finish++;
+	} while (length < 2 && finish < PCSHeader.stitchCount);
+	if (finish < PCSHeader.stitchCount) {
 
-		KnotAttribute = StitchBuffer[strt].attribute | KNOTMSK;
-		KnotStep.x = 2 / len*dif.x;
-		KnotStep.y = 2 / len*dif.y;
-		for (ind = 0; ind < 5; ind++)
-			ofstch(strt, KnotAtStartOrder[ind]);
+		KnotAttribute = StitchBuffer[start].attribute | KNOTMSK;
+		KnotStep.x = 2 / length*delta.x;
+		KnotStep.y = 2 / length*delta.y;
+		for (iKnot = 0; iKnot < 5; iKnot++)
+			ofstch(start, KnotAtStartOrder[iKnot]);
 	}
-}
-
-BOOL aprxlen(double stitchLength, unsigned ulen) {
-
-#define KNER 0.05
-
-	if (stitchLength > ulen + KNER)
-		return 1;
-	if (stitchLength < ulen - KNER)
-		return 1;
-	return 0;
 }
 
 void fndknt() {
 
-	unsigned	ind;
-	BOOL		flg;
+	unsigned	iStitch;
+	BOOL		flag;
 
 	if (PCSHeader.stitchCount > 4) {
 
-		flg = 0;
+		flag = 0;
 		KnotCount = 0;
-		for (ind = 0; ind < (unsigned)PCSHeader.stitchCount - 4; ind++) {
+		for (iStitch = 0; iStitch < (unsigned)PCSHeader.stitchCount - 4; iStitch++) {
 
-			if (StitchBuffer[ind].attribute&KNOTMSK) {
+			if (StitchBuffer[iStitch].attribute&KNOTMSK) {
 
-				if (!flg)
-					Knots[KnotCount++] = ind;
+				if (!flag)
+					Knots[KnotCount++] = iStitch;
 			} else
-				flg = 0;
+				flag = 0;
 		}
 	} else KnotCount = 0;
 }
 
 void delknt() {
 
-	unsigned	ind, ine;
+	unsigned	iStitch, newStitchCount;
 
-	ine = 0;
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+	newStitchCount = 0;
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		if (!(StitchBuffer[ind].attribute&KNOTMSK))
-			mvstch(ine++, ind);
+		if (!(StitchBuffer[iStitch].attribute&KNOTMSK))
+			mvstch(newStitchCount++, iStitch);
 	}
-	PCSHeader.stitchCount = ine;
+	PCSHeader.stitchCount = newStitchCount;
 }
 
 BOOL isknots() {
 
-	unsigned ind;
+	unsigned iStitch;
 
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		if (StitchBuffer[ind].attribute&KNOTMSK)
+		if (StitchBuffer[iStitch].attribute&KNOTMSK)
 			return 1;
 	}
 	return 0;
@@ -9165,60 +9165,60 @@ void delknot() {
 	}
 }
 
-unsigned kjmp(unsigned strt) {
+unsigned kjmp(unsigned start) {
 
-	while (strt<(unsigned)PCSHeader.stitchCount - 1 && stlen(strt)>KNOTLEN)
-		mvstch(OutputIndex++, strt++);
-	strtknt(strt);
-	return strt;
+	while (start<(unsigned)PCSHeader.stitchCount - 1 && stlen(start)>KNOTLEN)
+		mvstch(OutputIndex++, start++);
+	strtknt(start);
+	return start;
 }
 
 void setknt() {
 
-	unsigned	ind;
+	unsigned	iStitch;
 
 	OutputIndex = MAXSEQ;
 	mvstch(OutputIndex++, 0);
 	strtknt(0);
 	if (stlen(0) > KNOTLEN)
-		ind = kjmp(1);
+		iStitch = kjmp(1);
 	else
-		ind = 1;
+		iStitch = 1;
 	rstMap(FILDIR);
-	while (ind < (unsigned)PCSHeader.stitchCount - 1) {
+	while (iStitch < (unsigned)PCSHeader.stitchCount - 1) {
 
-		mvstch(OutputIndex++, ind);
-		if (stlen(ind) > KNOTLEN) {
+		mvstch(OutputIndex++, iStitch);
+		if (stlen(iStitch) > KNOTLEN) {
 
-			endknt(ind);
-			ind = kjmp(ind + 1);
-			mvstch(OutputIndex++, ind);
+			endknt(iStitch);
+			iStitch = kjmp(iStitch + 1);
+			mvstch(OutputIndex++, iStitch);
 		}
-		ind++;
+		iStitch++;
 	}
 	setMap(FILDIR);
-	endknt(ind);
+	endknt(iStitch);
 	StitchBuffer[OutputIndex - 1].attribute &= (~KNOTMSK);
 	PCSHeader.stitchCount = OutputIndex - MAXSEQ;
 	mvstchs(0, MAXSEQ, PCSHeader.stitchCount);
 }
 
-unsigned srchknot(unsigned src) {
+unsigned srchknot(unsigned source) {
 
-	while (Knots[ActivePointIndex] < src&&ActivePointIndex < KnotCount)
+	while (Knots[ActivePointIndex] < source&&ActivePointIndex < KnotCount)
 		ActivePointIndex++;
 	ActivePointIndex--;
-	if (((Knots[ActivePointIndex] > src) ? (Knots[ActivePointIndex] - src) : (src - Knots[ActivePointIndex])) < 5) {
+	if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5) {
 
 		ActivePointIndex++;
-		if (((Knots[ActivePointIndex] > src) ? (Knots[ActivePointIndex] - src) : (src - Knots[ActivePointIndex])) < 5)
+		if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5)
 			return 0;
 		else
 			return 2;
 	} else {
 
 		ActivePointIndex++;
-		if (((Knots[ActivePointIndex] > src) ? (Knots[ActivePointIndex] - src) : (src - Knots[ActivePointIndex])) < 5)
+		if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5)
 			return 1;
 		else
 			return 3;
@@ -9227,27 +9227,27 @@ unsigned srchknot(unsigned src) {
 
 void chkncol() {
 
-	unsigned	src, col, tcol, cod;
+	unsigned	iStitch, initialColor, color, code;
 
 	OutputIndex = MAXSEQ;
-	col = StitchBuffer[0].attribute&COLMSK;
+	initialColor = StitchBuffer[0].attribute&COLMSK;
 	rstMap(FILDIR);
-	for (src = 0; src < PCSHeader.stitchCount; src++) {
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		tcol = StitchBuffer[src].attribute&COLMSK;
-		if (tcol == col)
-			mvstch(OutputIndex++, src);
+		color = StitchBuffer[iStitch].attribute&COLMSK;
+		if (color == initialColor)
+			mvstch(OutputIndex++, iStitch);
 		else {
 
-			col = StitchBuffer[src].attribute&COLMSK;
-			cod = srchknot(src);
-			if (cod & 1) {
+			initialColor = StitchBuffer[iStitch].attribute&COLMSK;
+			code = srchknot(iStitch);
+			if (code & 1) {
 
-				endknt(src - 1);
+				endknt(iStitch - 1);
 			}
-			mvstch(OutputIndex++, src);
-			if (cod & 2)
-				strtknt(src);
+			mvstch(OutputIndex++, iStitch);
+			if (code & 2)
+				strtknt(iStitch);
 		}
 	}
 	PCSHeader.stitchCount = OutputIndex - MAXSEQ;
@@ -9271,7 +9271,7 @@ void setknots()
 
 void lodbmp() {
 
-	TCHAR*	pchr;
+	TCHAR*	filename;
 
 	if (PCSBMPFileName[0]) {
 
@@ -9281,9 +9281,9 @@ void lodbmp() {
 	if (GetOpenFileName(&OpenBitmapName)) {
 
 		untrace();
-		pchr = strrchr(UserBMPFileName, '\\') + 1;
+		filename = strrchr(UserBMPFileName, '\\') + 1;
 		// PCS file can only store a 16 character filename?
-		strncpy_s(PCSBMPFileName, pchr, sizeof(PCSBMPFileName));
+		strncpy_s(PCSBMPFileName, filename, sizeof(PCSBMPFileName));
 		defbNam();
 		bfil();
 		setMap(RESTCH);
@@ -9316,80 +9316,80 @@ void patdun() {
 	tabmsg(IDS_END);
 }
 
-void drwlstch(unsigned fin) {
+void drwlstch(unsigned finish) {
 
-	unsigned	col, ind, prepnt;
-	unsigned	flg;
+	unsigned	color, iMovieFrame, origin;
+	unsigned	flag;
 
-	prepnt = RunPoint;
+	origin = RunPoint;
 	if (chkMap(HID)) {
 
-		while ((StitchBuffer[RunPoint].attribute&COLMSK) != ActiveColor&&RunPoint < fin - 1)
+		while ((StitchBuffer[RunPoint].attribute&COLMSK) != ActiveColor&&RunPoint < finish - 1)
 			RunPoint++;
 	}
 	if (chkMap(ZUMED)) {
 
-		ind = 1;
-		while (RunPoint < StitchesPerFrame + 1 && RunPoint < fin - 2 && !stch2px(RunPoint))
+		iMovieFrame = 1;
+		while (RunPoint < StitchesPerFrame + 1 && RunPoint < finish - 2 && !stch2px(RunPoint))
 			RunPoint++;
-		prepnt = RunPoint - 1;
-		col = StitchBuffer[RunPoint].attribute&COLMSK;
-		flg = 1;
-		while (ind < StitchesPerFrame + 1 && RunPoint < fin - 2 && (StitchBuffer[RunPoint].attribute&COLMSK) == col) {
+		origin = RunPoint - 1;
+		color = StitchBuffer[RunPoint].attribute&COLMSK;
+		flag = 1;
+		while (iMovieFrame < StitchesPerFrame + 1 && RunPoint < finish - 2 && (StitchBuffer[RunPoint].attribute&COLMSK) == color) {
 
 			if (stch2px(RunPoint)) {
 
-				MovieLine[ind].x = StitchSizePixels.x;
-				MovieLine[ind++].y = StitchSizePixels.y;
-				if (flg) {
+				MovieLine[iMovieFrame].x = StitchCoordinatesPixels.x;
+				MovieLine[iMovieFrame++].y = StitchCoordinatesPixels.y;
+				if (flag) {
 
-					flg = 0;
+					flag = 0;
 					if (stch2px(RunPoint - 1)) {
 
 						MovieLine[0].x = MovieLine[1].x;
 						MovieLine[0].y = MovieLine[1].y;
 					} else {
 
-						MovieLine[0].x = StitchSizePixels.x;
-						MovieLine[0].y = StitchSizePixels.y;
+						MovieLine[0].x = StitchCoordinatesPixels.x;
+						MovieLine[0].y = StitchCoordinatesPixels.y;
 					}
 				}
 			}
 			RunPoint++;
 		}
-		if (prepnt == RunPoint)
+		if (RunPoint == origin)
 			RunPoint++;
 		if (!stch2px(RunPoint)) {
 
-			if ((StitchBuffer[RunPoint].attribute&COLMSK) == col) {
+			if ((StitchBuffer[RunPoint].attribute&COLMSK) == color) {
 
-				MovieLine[ind].x = StitchSizePixels.x;
-				MovieLine[ind++].y = StitchSizePixels.y;
+				MovieLine[iMovieFrame].x = StitchCoordinatesPixels.x;
+				MovieLine[iMovieFrame++].y = StitchCoordinatesPixels.y;
 				RunPoint++;
 			}
 		}
-		SelectObject(StitchWindowDC, UserPen[col]);
-		Polyline(StitchWindowDC, MovieLine, ind);
-		if (!flg)
+		SelectObject(StitchWindowDC, UserPen[color]);
+		Polyline(StitchWindowDC, MovieLine, iMovieFrame);
+		if (!flag)
 			RunPoint--;
 	} else {
 
-		ind = 0;
-		col = StitchBuffer[RunPoint].attribute&COLMSK;
-		SelectObject(StitchWindowDC, UserPen[col]);
-		while (ind < StitchesPerFrame && (RunPoint + 1 < fin - 1) && ((StitchBuffer[RunPoint].attribute&COLMSK) == col)) {
+		iMovieFrame = 0;
+		color = StitchBuffer[RunPoint].attribute&COLMSK;
+		SelectObject(StitchWindowDC, UserPen[color]);
+		while (iMovieFrame < StitchesPerFrame && (RunPoint + 1 < finish - 1) && ((StitchBuffer[RunPoint].attribute&COLMSK) == color)) {
 
 			stch2px1(RunPoint++);
-			MovieLine[ind].x = StitchSizePixels.x;
-			MovieLine[ind++].y = StitchSizePixels.y;
+			MovieLine[iMovieFrame].x = StitchCoordinatesPixels.x;
+			MovieLine[iMovieFrame++].y = StitchCoordinatesPixels.y;
 		}
 		RunPoint--;
-		Polyline(StitchWindowDC, MovieLine, ind);
+		Polyline(StitchWindowDC, MovieLine, iMovieFrame);
 	}
-	if ((StitchBuffer[RunPoint + 1].attribute & 0xf) != col)
+	if ((StitchBuffer[RunPoint + 1].attribute & 0xf) != color)
 		RunPoint++;
 	ritnum(STR_NUMSEL, RunPoint);
-	if (RunPoint + 3 > fin - 1)
+	if (RunPoint + 3 > finish - 1)
 		patdun();
 }
 
@@ -9401,46 +9401,46 @@ void stchout() {
 		drwlstch(PCSHeader.stitchCount - 1);
 }
 
-unsigned duth(TCHAR* nam) {
+unsigned duth(TCHAR* name) {
 
-	unsigned ind = strlen(nam);
+	unsigned iLast = strlen(name);
 
-	do ind--;
-	while (tolower(nam[ind]) != 'h'&&ind);
-	if (nam[ind - 1] == 't')
-		return ind + 1;
+	do iLast--;
+	while (tolower(name[iLast]) != 'h'&&iLast);
+	if (name[iLast - 1] == 't')
+		return iLast + 1;
 	else
 		return 0;
 }
 
-void duver(TCHAR* nam) {
+void duver(TCHAR* name) {
 
-	unsigned	ind;
-	int			chr;
+	unsigned	lastChar;
+	int			version;
 
-	ind = duth(nam);
-	if (ind) {
+	lastChar = duth(name);
+	if (lastChar) {
 
-		chr = tolower(nam[ind]) - 'r';
-		nam[_MAX_PATH - 1] = 0;
-		if (chr >= 0 && chr <= 3)
-			strcpy_s(VersionNames[chr], nam);
+		version = tolower(name[lastChar]) - 'r';
+		name[_MAX_PATH - 1] = 0;
+		if (version >= 0 && version <= 3)
+			strcpy_s(VersionNames[version], name);
 	}
 }
 
-void durit(void* src, unsigned cnt) {
+void durit(void* source, unsigned cnt) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		esi, src
+		mov		esi, source
 		mov		edi, OutputIndex
 		mov		ecx, cnt
 		rep		movsb
 		mov		OutputIndex, edi
 	}
 #else
-	memcpy((void *)OutputIndex, src, cnt);
+	memcpy((void *)OutputIndex, source, cnt);
 	OutputIndex += cnt;
 #endif
 }
@@ -9460,44 +9460,45 @@ unsigned bufref() {
 
 void dubuf() {
 
-	STRHED				sthed;
-	unsigned			ind, ine, len, slen, elen;
-	FRMHED*				theds;
-	fPOINT*				tpnts;
-	SATCON*				spnts;
-	fPOINT*				epnts;
-	unsigned			flind = 0;
-	unsigned			slind = 0;
-	unsigned			elind = 0;
+	STRHED				stitchHeader;
+	unsigned			iForm, iColor, iVertex, iGuide, iClip;
+	unsigned			vertexCount, guideCount, clipDataCount;
+	FRMHED*				forms;
+	fPOINT*				vertices;
+	SATCON*				guides;
+	fPOINT*				points;
+	unsigned			iDestinationVertex = 0;
+	unsigned			iDestinationGuide = 0;
+	unsigned			iDestinationClip = 0;
 
 	OutputIndex = (unsigned)&BSequence;
-	sthed.headerType = 0x2746872;
-	sthed.fileLength = PCSHeader.stitchCount * sizeof(fPOINTATTR) + sizeof(STRHED) + 16;
-	sthed.stitchCount = PCSHeader.stitchCount;
-	sthed.hoopType = IniFile.hoopType;
-	len = 0; slen = 0; elen = 0;
+	stitchHeader.headerType = 0x2746872;
+	stitchHeader.fileLength = PCSHeader.stitchCount * sizeof(fPOINTATTR) + sizeof(STRHED) + 16;
+	stitchHeader.stitchCount = PCSHeader.stitchCount;
+	stitchHeader.hoopType = IniFile.hoopType;
+	vertexCount = 0; guideCount = 0; clipDataCount = 0;
 	strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
 	if (FormIndex) {
 
-		for (ind = 0; ind < FormIndex; ind++) {
+		for (iForm = 0; iForm < FormIndex; iForm++) {
 
-			len += FormList[ind].sides;
-			if (FormList[ind].type == SAT)
-				slen += FormList[ind].satinGuideCount;
-			if (isclp(ind))
-				elen += FormList[ind].lengthOrCount.clipCount;
-			if (iseclp(ind))
-				elen += FormList[ind].clipEntries;
+			vertexCount += FormList[iForm].sides;
+			if (FormList[iForm].type == SAT)
+				guideCount += FormList[iForm].satinGuideCount;
+			if (isclp(iForm))
+				clipDataCount += FormList[iForm].lengthOrCount.clipCount;
+			if (iseclp(iForm))
+				clipDataCount += FormList[iForm].clipEntries;
 		}
 	}
-	sthed.formCount = FormIndex;
-	sthed.vertexCount = len;
-	sthed.dlineCount = slen;
-	sthed.clipDataCount = elen;
-	sthed.vertexLen = sizeof(STRHED) + PCSHeader.stitchCount * sizeof(fPOINTATTR) + 164;
-	sthed.dlineLen = sizeof(fPOINT)*len;
-	sthed.clipDataLen = sizeof(fPOINT)*elen;
-	durit(&sthed, sizeof(STRHED));
+	stitchHeader.formCount = FormIndex;
+	stitchHeader.vertexCount = vertexCount;
+	stitchHeader.dlineCount = guideCount;
+	stitchHeader.clipDataCount = clipDataCount;
+	stitchHeader.vertexLen = sizeof(STRHED) + PCSHeader.stitchCount * sizeof(fPOINTATTR) + 164;
+	stitchHeader.dlineLen = sizeof(fPOINT)*vertexCount;
+	stitchHeader.clipDataLen = sizeof(fPOINT)*clipDataCount;
+	durit(&stitchHeader, sizeof(STRHED));
 	ExtendedHeader.auxFormat = IniFile.auxFileType;
 	ExtendedHeader.hoopSizeX = IniFile.hoopSizeX;
 	ExtendedHeader.hoopSizeY = IniFile.hoopSizeY;
@@ -9506,105 +9507,106 @@ void dubuf() {
 	durit(StitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR));
 	if (!PCSBMPFileName[0]) {
 
-		for (ind = 0; ind < 16; ind++)
-			PCSBMPFileName[ind] = 0;
+		for (iColor = 0; iColor < 16; iColor++)
+			PCSBMPFileName[iColor] = 0;
 	}
 	durit(PCSBMPFileName, 16);
 	durit(&BackgroundColor, 4);
 	durit(UserColor, 64);
 	durit(CustomColor, 64);
-	for (ind = 0; ind < 16; ind++)
-		MsgBuffer[ind] = ThreadSize[ind][0];
+	for (iColor = 0; iColor < 16; iColor++)
+		MsgBuffer[iColor] = ThreadSize[iColor][0];
 	durit(MsgBuffer, 16);
 	if (FormIndex) {
 
-		theds = new FRMHED[FormIndex];
-		tpnts = new fPOINT[len + 1];
-		spnts = new SATCON[slen];
-		epnts = new fPOINT[elen + 1];
-		for (ind = 0; ind < FormIndex; ind++) {
+		forms = new FRMHED[FormIndex];
+		vertices = new fPOINT[vertexCount + 1];
+		guides = new SATCON[guideCount];
+		points = new fPOINT[clipDataCount + 1];
+		for (iForm = 0; iForm < FormIndex; iForm++) {
 
-			frmcpy(&theds[ind], &FormList[ind]);
-			theds[ind].vertices = (fPOINT*)(&tpnts[flind] - &tpnts[0]);
-			for (ine = 0; ine < FormList[ind].sides; ine++) {
+			frmcpy(&forms[iForm], &FormList[iForm]);
+			forms[iForm].vertices = (fPOINT*)(&vertices[iDestinationVertex] - &vertices[0]);
+			for (iVertex = 0; iVertex < FormList[iForm].sides; iVertex++) {
 
-				tpnts[flind].x = FormList[ind].vertices[ine].x;
-				tpnts[flind++].y = FormList[ind].vertices[ine].y;
+				vertices[iDestinationVertex].x = FormList[iForm].vertices[iVertex].x;
+				vertices[iDestinationVertex++].y = FormList[iForm].vertices[iVertex].y;
 			}
-			if (FormList[ind].type == SAT) {
+			if (FormList[iForm].type == SAT) {
 
-				theds[ind].satinOrAngle.sac = (SATCON*)(&spnts[slind] - &spnts[0]);
-				theds[ind].satinGuideCount = FormList[ind].satinGuideCount;
-				for (ine = 0; ine < FormList[ind].satinGuideCount; ine++) {
+				forms[iForm].satinOrAngle.sac = (SATCON*)(&guides[iDestinationGuide] - &guides[0]);
+				forms[iForm].satinGuideCount = FormList[iForm].satinGuideCount;
+				for (iGuide = 0; iGuide < FormList[iForm].satinGuideCount; iGuide++) {
 
-					spnts[slind].start = FormList[ind].satinOrAngle.sac[ine].start;
-					spnts[slind++].finish = FormList[ind].satinOrAngle.sac[ine].finish;
+					guides[iDestinationGuide].start = FormList[iForm].satinOrAngle.sac[iGuide].start;
+					guides[iDestinationGuide++].finish = FormList[iForm].satinOrAngle.sac[iGuide].finish;
 				}
 			}
-			if (isclp(ind)) {
+			if (isclp(iForm)) {
 
-				theds[ind].angleOrClipData.clip = (fPOINT*)(&epnts[elind] - &epnts[0]);
-				for (ine = 0; (ine < FormList[ind].lengthOrCount.clipCount) && (elind < elen); ine++) {
+				forms[iForm].angleOrClipData.clip = (fPOINT*)(&points[iDestinationClip] - &points[0]);
+				for (iClip = 0; (iClip < FormList[iForm].lengthOrCount.clipCount) && (iDestinationClip < clipDataCount); iClip++) {
 
-					epnts[elind].x = FormList[ind].angleOrClipData.clip[ine].x;
-					epnts[elind++].y = FormList[ind].angleOrClipData.clip[ine].y;
+					points[iDestinationClip].x = FormList[iForm].angleOrClipData.clip[iClip].x;
+					points[iDestinationClip++].y = FormList[iForm].angleOrClipData.clip[iClip].y;
 				}
 			}
-			if (iseclpx(ind)) {
+			if (iseclpx(iForm)) {
 
-				theds[ind].borderClipData = (fPOINT*)(&epnts[elind] - &epnts[0]);
-				for (ine = 0; (ine < FormList[ind].clipEntries) && ((elind < elen)); ine++) {
-					epnts[elind].x = FormList[ind].borderClipData[ine].x;
-					epnts[elind++].y = FormList[ind].borderClipData[ine].y;
+				forms[iForm].borderClipData = (fPOINT*)(&points[iDestinationClip] - &points[0]);
+				for (iClip = 0; (iClip < FormList[iForm].clipEntries) && ((iDestinationClip < clipDataCount)); iClip++) {
+					points[iDestinationClip].x = FormList[iForm].borderClipData[iClip].x;
+					points[iDestinationClip++].y = FormList[iForm].borderClipData[iClip].y;
 				}
 			}
 		}
-		durit(theds, FormIndex * sizeof(FRMHED));
-		durit(tpnts, len * sizeof(fPOINT));
-		durit(spnts, slen * sizeof(SATCON));
-		durit(epnts, elen * sizeof(fPOINT));
+		durit(forms, FormIndex * sizeof(FRMHED));
+		durit(vertices, vertexCount * sizeof(fPOINT));
+		durit(guides, guideCount * sizeof(SATCON));
+		durit(points, clipDataCount * sizeof(fPOINT));
 		durit(TexturePointsBuffer, TextureIndex * sizeof(TXPNT));
-		delete[] theds;
-		delete[] tpnts;
-		delete[] spnts;
-		delete[] epnts;
+		delete[] forms;
+		delete[] vertices;
+		delete[] guides;
+		delete[] points;
 	}
 }
 
 void thrsav() {
 
-	unsigned			ind, len;
-	int					tind;
-	unsigned long		wrot;
-	WIN32_FIND_DATA		fdat;
-	HANDLE				hndl;
-	TCHAR				nunam[_MAX_PATH];
+	unsigned		iVersion, lastCharacter;
+	int				iBackup;
+	unsigned long	bytesWritten;
+	WIN32_FIND_DATA	fileData;
+	HANDLE			file;
+	TCHAR			newFileName[_MAX_PATH];
 
 	if (chkattr(WorkingFileName))
 		return;
 	if (!rstMap(IGNAM)) {
 
-		hndl = FindFirstFile(GeName, &fdat);
-		ind = 0;
-		if (hndl != INVALID_HANDLE_VALUE) {
+		file = FindFirstFile(GeName, &fileData);
+		iVersion = 0;
+		if (file != INVALID_HANDLE_VALUE) {
 
 			rstMap(CMPDO);
-			for (ind = 0; ind < OLDVER; ind++)
-				VersionNames[ind][0] = 0;
-			duver(fdat.cFileName);
-			while (FindNextFile(hndl, &fdat))
-				duver(fdat.cFileName);
-			FindClose(hndl);
+			for (iVersion = 0; iVersion < OLDVER; iVersion++)
+				VersionNames[iVersion][0] = 0;
+			duver(fileData.cFileName);
+			while (FindNextFile(file, &fileData))
+				duver(fileData.cFileName);
+			FindClose(file);
 			DeleteFile(VersionNames[OLDVER - 1]);
-			for (tind = OLDVER - 2; tind >= 0; tind--) {
+			// ToDo - Does this loop have to decrement or could it increment?
+			for (iBackup = OLDVER - 2; iBackup >= 0; iBackup--) {
 
-				if (VersionNames[tind][0]) {
+				if (VersionNames[iBackup][0]) {
 
-					VersionNames[tind][_MAX_PATH - 1] = 0;
-					strcpy_s(nunam, VersionNames[tind]);
-					len = duth(nunam);
-					nunam[len] = tind + 's';
-					MoveFile(VersionNames[tind], nunam);
+					VersionNames[iBackup][_MAX_PATH - 1] = 0;
+					strcpy_s(newFileName, VersionNames[iBackup]);
+					lastCharacter = duth(newFileName);
+					newFileName[lastCharacter] = iBackup + 's';
+					MoveFile(VersionNames[iBackup], newFileName);
 				}
 			}
 		}
@@ -9618,8 +9620,8 @@ void thrsav() {
 	} else {
 
 		dubuf();
-		WriteFile(FileHandle, BSequence, bufref(), &wrot, 0);
-		if (wrot != (unsigned long)bufref()) {
+		WriteFile(FileHandle, BSequence, bufref(), &bytesWritten, 0);
+		if (bytesWritten != (unsigned long)bufref()) {
 
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "File Write Error: %s\n", ThrName);
 			shoMsg(MsgBuffer);
@@ -9630,47 +9632,48 @@ void thrsav() {
 
 void setsped() {
 
-	unsigned	len;
-	double		tdub;
+	unsigned	elapsedTimePerFrame;
+	double		userTimePerFrame;
 
 	if (!MovieTimeStep)
 		MovieTimeStep = 1;
-	tdub = (double)MovieTimeStep / 10;
-	if (tdub < 10) {
+	userTimePerFrame = (double)MovieTimeStep / 10;
+	if (userTimePerFrame < 10) {
 
-		len = 100;
-		StitchesPerFrame = (unsigned)len / tdub;
+		elapsedTimePerFrame = 100;  // units are millseconds
+		StitchesPerFrame = (unsigned)elapsedTimePerFrame / userTimePerFrame;
 		if (StitchesPerFrame > 99)
 			StitchesPerFrame = 99;
 	} else {
 
-		len = (unsigned)tdub;
+		elapsedTimePerFrame = (unsigned)userTimePerFrame;
 		StitchesPerFrame = 2;
 	}
 	if (StitchesPerFrame < 2)
 		StitchesPerFrame = 2;
-	SetTimer(ThrEdWindow, 0, len, 0);
+	SetTimer(ThrEdWindow, 0, elapsedTimePerFrame, 0);
 }
 
 void f1del() {
 
-	unsigned cod, ind, ine;
+	unsigned cod, iStitch, stitchCount;
 
 	if (chkMap(DELTO)) {
 
 		cod = ClosestFormToCursor << FRMSHFT;
-		ine = 0;
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++)
+		stitchCount = 0;
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 		{
-			if ((StitchBuffer[ind].attribute&(FRMSK | NOTFRM)) != cod)
+			if ((StitchBuffer[iStitch].attribute&(FRMSK | NOTFRM)) != cod)
 			{
-				StitchBuffer[ine].x = StitchBuffer[ind].x;
-				StitchBuffer[ine].y = StitchBuffer[ind].y;
-				StitchBuffer[ine].attribute = StitchBuffer[ind].attribute;
-				ine++;
+				// ToDo - could this be simplified to StitchBuffer[stitchCount] = StitchBuffer[iStitch]
+				StitchBuffer[stitchCount].x = StitchBuffer[iStitch].x;
+				StitchBuffer[stitchCount].y = StitchBuffer[iStitch].y;
+				StitchBuffer[stitchCount].attribute = StitchBuffer[iStitch].attribute;
+				stitchCount++;
 			}
 		}
-		PCSHeader.stitchCount = ine;
+		PCSHeader.stitchCount = stitchCount;
 	}
 	deleclp(ClosestFormToCursor);
 	delmclp(ClosestFormToCursor);
@@ -9681,43 +9684,42 @@ void f1del() {
 
 void frmdel() {
 
-	unsigned ind, ine;
-	unsigned stfrm, tind;
+	unsigned iForm, iStitch;
+	unsigned stitchForm, stitchAttributeFormBits;
 
 	fvars(ClosestFormToCursor);
 	f1del();
-	for (ind = ClosestFormToCursor; ind < (unsigned)FormIndex; ind++)
-		frmcpy(&FormList[ind], &FormList[ind + 1]);
+	for (iForm = ClosestFormToCursor; iForm < (unsigned)FormIndex; iForm++)
+		frmcpy(&FormList[iForm], &FormList[iForm + 1]);
 	if (rstMap(DELTO)) {
 
-		ine = 0;
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			if (!(StitchBuffer[ind].attribute&NOTFRM)) {
+			if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
 
-				tind = (StitchBuffer[ind].attribute&FRMSK);
-				stfrm = tind >> 4;
-				if (stfrm > ClosestFormToCursor) {
+				stitchAttributeFormBits = (StitchBuffer[iStitch].attribute&FRMSK);
+				stitchForm = stitchAttributeFormBits >> 4;
+				if (stitchForm > ClosestFormToCursor) {
 
-					StitchBuffer[ind].attribute &= NFRMSK;
-					StitchBuffer[ind].attribute |= (tind - 0x10);
+					StitchBuffer[iStitch].attribute &= NFRMSK;
+					StitchBuffer[iStitch].attribute |= (stitchAttributeFormBits - 0x10);
 				}
 			}
 		}
 	} else {
 
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			if (!(StitchBuffer[ind].attribute&NOTFRM)) {
+			if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
 
-				tind = (StitchBuffer[ind].attribute&FRMSK);
-				stfrm = tind >> 4;
-				if (stfrm == ClosestFormToCursor)
-					StitchBuffer[ind].attribute &= (NFRMSK&NTYPMSK);
-				if (stfrm > ClosestFormToCursor) {
+				stitchAttributeFormBits = (StitchBuffer[iStitch].attribute&FRMSK);
+				stitchForm = stitchAttributeFormBits >> 4;
+				if (stitchForm == ClosestFormToCursor)
+					StitchBuffer[iStitch].attribute &= (NFRMSK&NTYPMSK);
+				if (stitchForm > ClosestFormToCursor) {
 
-					StitchBuffer[ind].attribute &= NFRMSK;
-					StitchBuffer[ind].attribute |= (tind - 0x10);
+					StitchBuffer[iStitch].attribute &= NFRMSK;
+					StitchBuffer[iStitch].attribute |= (stitchAttributeFormBits - 0x10);
 				}
 			}
 		}
@@ -9741,11 +9743,11 @@ void deltot() {
 
 BOOL wastch() {
 
-	unsigned ind;
+	unsigned iStitch;
 
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		if ((StitchBuffer[ind].attribute&FRMSK) >> FRMSHFT == ClosestFormToCursor)
+		if ((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT == ClosestFormToCursor)
 			return 1;
 	}
 	return 0;
@@ -9753,15 +9755,15 @@ BOOL wastch() {
 
 BOOL frmstch()
 {
-	unsigned ind, cod;
+	unsigned iForm, iStitch, formCode;
 
 	clRmap((FormIndex >> 5) >> 1);
-	for (ind = 0; ind < FormIndex; ind++)
-		setr(SelectedFormList[ind]);
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++)
+	for (iForm = 0; iForm < FormIndex; iForm++)
+		setr(SelectedFormList[iForm]);
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 	{
-		cod = (StitchBuffer[ind].attribute&FRMSK) >> FRMSHFT;
-		if (chkr(cod))
+		formCode = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
+		if (chkr(formCode))
 			return 1;
 	}
 	return 0;
@@ -9769,43 +9771,42 @@ BOOL frmstch()
 
 void delet() {
 
-	unsigned ind, ine;
-	BOOL satflg;
+	unsigned iVertex, iForm, currentFormVertex;
+	BOOL satinFlag=0;
 
 	undat();
-	satflg = 0;
 	if (rstMap(FPSEL)) {
 
 		savdo();
 		fvars(ClosestFormToCursor);
 		clRmap((SideCount >> 5) + 1);
-		ine = SelectedFormVertices.start;
-		for (ind = 0; ind <= SelectedFormVertices.vertexCount; ind++) {
+		currentFormVertex = SelectedFormVertices.start;
+		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 
-			setr(ine);
-			ine = pdir(ine);
+			setr(currentFormVertex);
+			currentFormVertex = pdir(currentFormVertex);
 		}
-		ine = 0;
-		for (ind = 0; ind < SideCount; ind++) {
+		currentFormVertex = 0;
+		for (iVertex = 0; iVertex < SideCount; iVertex++) {
 
-			if (!chkr(ind)) {
+			if (!chkr(iVertex)) {
 
-				CurrentFormVertices[ine].x = CurrentFormVertices[ind].x;
-				CurrentFormVertices[ine].y = CurrentFormVertices[ind].y;
-				ine++;
+				CurrentFormVertices[currentFormVertex].x = CurrentFormVertices[iVertex].x;
+				CurrentFormVertices[currentFormVertex].y = CurrentFormVertices[iVertex].y;
+				currentFormVertex++;
 			}
 		}
-		ine = fltind(&CurrentFormVertices[ine]);
-		ind = fltind(&CurrentFormVertices[ind]);
-		while (ind < FormVertexIndex) {
+		currentFormVertex = fltind(&CurrentFormVertices[currentFormVertex]);
+		iVertex = fltind(&CurrentFormVertices[iVertex]);
+		while (iVertex < FormVertexIndex) {
 
-			FormVertices[ine].x = FormVertices[ind].x;
-			FormVertices[ine].y = FormVertices[ind].y;
-			ine++;
-			ind++;
+			FormVertices[currentFormVertex].x = FormVertices[iVertex].x;
+			FormVertices[currentFormVertex].y = FormVertices[iVertex].y;
+			currentFormVertex++;
+			iVertex++;
 		}
-		for (ind = ClosestFormToCursor + 1; ind < FormIndex; ind++)
-			FormList[ind].vertices -= (SelectedFormVertices.vertexCount + 1);
+		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
+			FormList[iForm].vertices -= (SelectedFormVertices.vertexCount + 1);
 		FormVertexIndex -= (SelectedFormVertices.vertexCount + 1);
 		SelectedForm->sides -= (SelectedFormVertices.vertexCount + 1);
 		frmout(ClosestFormToCursor);
@@ -9916,7 +9917,7 @@ void delet() {
 							SelectedForm->wordParam = 0;
 						else
 							SelectedForm->attribute &= 0xfe;
-						satflg = 1;
+						satinFlag = 1;
 						goto deldun;
 					}
 				}
@@ -9925,16 +9926,16 @@ void delet() {
 					if (ClosestVertexToCursor == (unsigned)WordParam || ClosestVertexToCursor == (unsigned)WordParam + 1) {
 
 						SelectedForm->wordParam = 0;
-						satflg = 1;
+						satinFlag = 1;
 						goto deldun;
 					}
 				}
-				for (ind = 0; ind < SelectedForm->satinGuideCount; ind++) {
+				for (iForm = 0; iForm < SelectedForm->satinGuideCount; iForm++) {
 
-					if (SelectedForm->satinOrAngle.sac[ind].start == ClosestVertexToCursor || SelectedForm->satinOrAngle.sac[ind].finish == ClosestVertexToCursor) {
+					if (SelectedForm->satinOrAngle.sac[iForm].start == ClosestVertexToCursor || SelectedForm->satinOrAngle.sac[iForm].finish == ClosestVertexToCursor) {
 
-						delcon(ind);
-						satflg = 1;
+						delcon(iForm);
+						satinFlag = 1;
 						goto deldun;
 					}
 				}
@@ -9952,7 +9953,7 @@ void delet() {
 			coltab();
 			setMap(RESTCH);
 		}
-		if (!satflg&&closPnt1(&ClosestPointIndex))
+		if (!satinFlag&&closPnt1(&ClosestPointIndex))
 			goto selab;
 	}
 	fndknt();
@@ -9960,7 +9961,7 @@ void delet() {
 
 void movi() {
 
-	double tdub;
+	double stepCount;
 
 	rstAll();
 	if (PCSHeader.stitchCount) {
@@ -9994,11 +9995,11 @@ void movi() {
 				NULL);
 		}
 		if (chkMap(ZUMED))
-			tdub = PCSHeader.stitchCount*ZoomFactor*ZoomFactor;
+			stepCount = PCSHeader.stitchCount*ZoomFactor*ZoomFactor;
 		else
-			tdub = PCSHeader.stitchCount;
+			stepCount = PCSHeader.stitchCount;
 		if (!chkMap(WASPAT))
-			MovieTimeStep = MOVITIM * 10000 / tdub;
+			MovieTimeStep = MOVITIM * 10000 / stepCount;
 		if (MovieTimeStep < MINDELAY)
 			MovieTimeStep = MINDELAY;
 		if (MovieTimeStep > MAXDELAY)
@@ -10019,9 +10020,9 @@ void movi() {
 
 void redclp() {
 
-	int		ind, playcod;
+	int		iStitch, codedLayer;
 
-	playcod = ActiveLayer << LAYSHFT;
+	codedLayer = ActiveLayer << LAYSHFT;
 	ClipPointer = GlobalLock(ClipMemory);
 	ClipStitchData = (CLPSTCH*)ClipPointer;
 	if (ClipPointer) {
@@ -10032,41 +10033,41 @@ void redclp() {
 
 #if CLPBUG
 
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "ind: 0 x: %6.2f,y: %6.2f\n", ClipBuffer[0].x, ClipBuffer[0].y);
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "interator: 0 x: %6.2f,y: %6.2f\n", ClipBuffer[0].x, ClipBuffer[0].y);
 		OutputDebugString(MsgBuffer);
 #endif
 		ClipRect.left = ClipRect.right = ClipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
-		for (ind = 1; ind < (long)ClipStitchCount; ind++) {
+		for (iStitch = 1; iStitch < (long)ClipStitchCount; iStitch++) {
 
-			ClipBuffer[ind].x = ClipStitchData[ind].x + (float)ClipStitchData[ind].fx / 256;
-			ClipBuffer[ind].y = ClipStitchData[ind].y + (float)ClipStitchData[ind].fy / 256;
-			ClipBuffer[ind].attribute = (ClipStitchData[ind].led & 0xf) | playcod;
+			ClipBuffer[iStitch].x = ClipStitchData[iStitch].x + (float)ClipStitchData[iStitch].fx / 256;
+			ClipBuffer[iStitch].y = ClipStitchData[iStitch].y + (float)ClipStitchData[iStitch].fy / 256;
+			ClipBuffer[iStitch].attribute = (ClipStitchData[iStitch].led & 0xf) | codedLayer;
 
 #if CLPBUG
 
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "ind: %d x: %6.2f,y: %6.2f\n", ind, ClipBuffer[ind].x, ClipBuffer[ind].y);
+			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "iterator: %d x: %6.2f,y: %6.2f\n", iStitch, ClipBuffer[iStitch].x, ClipBuffer[iStitch].y);
 			OutputDebugString(MsgBuffer);
 #endif
-			if (ClipBuffer[ind].x < ClipRect.left)
-				ClipRect.left = ClipBuffer[ind].x;
-			if (ClipBuffer[ind].x > ClipRect.right)
-				ClipRect.right = ClipBuffer[ind].x;
-			if (ClipBuffer[ind].y < ClipRect.bottom)
-				ClipRect.bottom = ClipBuffer[ind].y;
-			if (ClipBuffer[ind].y > ClipRect.top)
-				ClipRect.top = ClipBuffer[ind].y;
+			if (ClipBuffer[iStitch].x < ClipRect.left)
+				ClipRect.left = ClipBuffer[iStitch].x;
+			if (ClipBuffer[iStitch].x > ClipRect.right)
+				ClipRect.right = ClipBuffer[iStitch].x;
+			if (ClipBuffer[iStitch].y < ClipRect.bottom)
+				ClipRect.bottom = ClipBuffer[iStitch].y;
+			if (ClipBuffer[iStitch].y > ClipRect.top)
+				ClipRect.top = ClipBuffer[iStitch].y;
 		}
-		ClipBuffer[0].attribute = ActiveColor | playcod;
+		ClipBuffer[0].attribute = ActiveColor | codedLayer;
 		ClipRectSize.cx = ClipRect.right - ClipRect.left;
 		ClipRectSize.cy = ClipRect.top - ClipRect.bottom;
 		GlobalUnlock(ClipMemory);
 		if (ClipRect.left || ClipRect.bottom) {
 
-			for (ind = 0; ind < (int)ClipStitchCount; ind++) {
+			for (iStitch = 0; iStitch < (int)ClipStitchCount; iStitch++) {
 
-				ClipBuffer[ind].x -= ClipRect.left;
-				ClipBuffer[ind].y -= ClipRect.bottom;
+				ClipBuffer[iStitch].x -= ClipRect.left;
+				ClipBuffer[iStitch].y -= ClipRect.bottom;
 			}
 			ClipRect.top -= ClipRect.bottom;
 			ClipRect.right -= ClipRect.left;
@@ -10075,45 +10076,46 @@ void redclp() {
 	}
 }
 
-unsigned nxtcrnr(unsigned ind) {
+unsigned nxtcrnr(unsigned corner) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		eax, ind
+		mov		eax, corner
 		inc		eax
 		and		al, 3
 	}
 #else
-	return (ind + 1) & 3;
+	return (corner + 1) & 3;
 #endif
 }
 
 void drwmrk(HDC dc) {
 
-	POINT pxpnt;
-	POINT mlin[2];
+	POINT	markCoordinates;
+	POINT	markLine[2];
+	long	markOffset = 6;
 
-	sCor2px(ZoomMarkPoint, &pxpnt);
+	sCor2px(ZoomMarkPoint, &markCoordinates);
 	SelectObject(dc, ZoomMarkPen);
 	SetROP2(dc, R2_XORPEN);
-	mlin[0].x = pxpnt.x - 6;
-	mlin[0].y = pxpnt.y - 6;
-	mlin[1].x = pxpnt.x + 6;
-	mlin[1].y = pxpnt.y + 6;
-	Polyline(dc, mlin, 2);
-	mlin[0].x = pxpnt.x - 6;
-	mlin[0].y = pxpnt.y + 6;
-	mlin[1].x = pxpnt.x + 6;
-	mlin[1].y = pxpnt.y - 6;
-	Polyline(dc, mlin, 2);
+	markLine[0].x = markCoordinates.x - markOffset;
+	markLine[0].y = markCoordinates.y - markOffset;
+	markLine[1].x = markCoordinates.x + markOffset;
+	markLine[1].y = markCoordinates.y + markOffset;
+	Polyline(dc, markLine, 2);
+	markLine[0].x = markCoordinates.x - markOffset;
+	markLine[0].y = markCoordinates.y + markOffset;
+	markLine[1].x = markCoordinates.x + markOffset;
+	markLine[1].y = markCoordinates.y - markOffset;
+	Polyline(dc, markLine, 2);
 	SetROP2(dc, R2_COPYPEN);
 }
 
 void vubak() {
 
-	unsigned	ind;
-	long		dx, dy, vloc;
+	unsigned	iVersion;
+	long		dx, dy, verticalLocation;
 
 	if (FileHandle || chkMap(THUMSHO)) {
 
@@ -10122,18 +10124,18 @@ void vubak() {
 		FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 		dx = (StitchWindowClientRect.right >> 1);
 		dy = (StitchWindowClientRect.bottom >> 1);
-		for (ind = 0; ind < OLDVER; ind++) {
+		for (iVersion = 0; iVersion < OLDVER; iVersion++) {
 
-			if (ind & 2)
-				vloc = dy;
+			if (iVersion & 2)
+				verticalLocation = dy;
 			else
-				vloc = 0;
-			BackupViewer[ind] = CreateWindow(
+				verticalLocation = 0;
+			BackupViewer[iVersion] = CreateWindow(
 				"STATIC",
 				"",
 				SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-				dx*(ind & 1) + ButtonWidthX3,
-				vloc,
+				dx*(iVersion & 1) + ButtonWidthX3,
+				verticalLocation,
 				dx,
 				dy,
 				ThrEdWindow,
@@ -10188,63 +10190,63 @@ void getbak() {
 
 void rebak() {
 
-	unsigned	ind;
-	TCHAR		tnaml[_MAX_PATH];
-	TCHAR		tnamx[_MAX_PATH];
+	unsigned	iVersion;
+	TCHAR		newFileName[_MAX_PATH];
+	TCHAR		safetyFileName[_MAX_PATH];
 
-	for (ind = 0; ind < OLDVER; ind++)
-		DestroyWindow(BackupViewer[ind]);
-	strcpy_s(tnaml, ThrName);
-	strcpy_s(tnamx, ThrName);
-	ind = duth(tnaml);
-	tnaml[ind] = FileVersionIndex + 's';
-	tnamx[ind] = 'x';
-	MoveFile(ThrName, tnamx);
-	MoveFile(tnaml, ThrName);
-	MoveFile(tnamx, tnaml);
+	for (iVersion = 0; iVersion < OLDVER; iVersion++)
+		DestroyWindow(BackupViewer[iVersion]);
+	strcpy_s(newFileName, ThrName);
+	strcpy_s(safetyFileName, ThrName);
+	iVersion = duth(newFileName);
+	newFileName[iVersion] = FileVersionIndex + 's';
+	safetyFileName[iVersion] = 'x';
+	MoveFile(ThrName, safetyFileName);
+	MoveFile(newFileName, ThrName);
+	MoveFile(safetyFileName, newFileName);
 	strcpy_s(WorkingFileName, ThrName);
 	setMap(REDOLD);
 	nuFil();
-	DeleteFile(tnamx);
+	DeleteFile(safetyFileName);
 }
 
 void thumbak() {
 
-	unsigned ind;
+	unsigned iVersion;
 
-	for (ind = 0; ind < OLDVER; ind++)
-		DestroyWindow(BackupViewer[ind]);
+	for (iVersion = 0; iVersion < OLDVER; iVersion++)
+		DestroyWindow(BackupViewer[iVersion]);
 	getbak();
 }
 
-void movbak(TCHAR src, TCHAR dst) {
+void movbak(TCHAR source, TCHAR destination) {
 
-	TCHAR	strsrc[_MAX_PATH];
-	TCHAR	strdst[_MAX_PATH];
+	TCHAR	sourceFileName[_MAX_PATH];
+	TCHAR	destinationFileName[_MAX_PATH];
 
-	unsigned ind = duth(ThrName);
+	unsigned lastChar = duth(ThrName);
 
-	strcpy_s(strsrc, ThrName);
-	strcpy_s(strdst, ThrName);
-	strsrc[ind] = (TCHAR)src;
-	strdst[ind] = (TCHAR)dst;
-	DeleteFile(strdst);
-	MoveFile(strsrc, strdst);
+	strcpy_s(sourceFileName, ThrName);
+	strcpy_s(destinationFileName, ThrName);
+	sourceFileName[lastChar] = (TCHAR)source;
+	destinationFileName[lastChar] = (TCHAR)destination;
+	DeleteFile(destinationFileName);
+	MoveFile(sourceFileName, destinationFileName);
 }
 
 void purg() {
 
-	TCHAR		tnam[_MAX_PATH];
-	unsigned	pind, ind;
+	TCHAR		fileName[_MAX_PATH];
+	unsigned	lastChar, iLast;
 
 	if (FileHandle) {
 
-		strcpy_s(tnam, ThrName);
-		pind = duth(tnam);
-		for (ind = 1; ind < 6; ind++) {
+		strcpy_s(fileName, ThrName);
+		lastChar = duth(fileName);
+		for (iLast = 1; iLast < 6; iLast++) {
 
-			tnam[pind] = (TCHAR)ind + 'r';
-			DeleteFile(tnam);
+			fileName[lastChar] = (TCHAR)iLast + 'r';
+			DeleteFile(fileName);
 		}
 	}
 }
@@ -10259,40 +10261,40 @@ void purgdir() {
 
 void deldir() {
 
-	unsigned			ind;
-	TCHAR				tnam[_MAX_PATH];
-	TCHAR*				pchr;
-	WIN32_FIND_DATA		fdat;
-	HANDLE				hndl;
+	unsigned			iLastChar;
+	TCHAR				fileName[_MAX_PATH];
+	TCHAR*				fileSpec;
+	WIN32_FIND_DATA		findFileData;
+	HANDLE				file;
 
 	unmsg();
 	tabmsg(IDS_BAKDEL);
-	strcpy_s(tnam, DefaultDirectory);
-	pchr = &tnam[strlen(tnam)];
-	strcpy_s(pchr, sizeof(tnam) - (pchr - tnam), "\\*.th0");
-	for (ind = 1; ind < 6; ind++) {
+	strcpy_s(fileName, DefaultDirectory);
+	fileSpec = &fileName[strlen(fileName)];
+	strcpy_s(fileSpec, sizeof(fileName) - (fileSpec - fileName), "\\*.th0");
+	for (iLastChar = 1; iLastChar < 6; iLastChar++) {
 
-		pchr[5] = (TCHAR)ind + 'r';
-		hndl = FindFirstFile(tnam, &fdat);
-		if (hndl != INVALID_HANDLE_VALUE) {
+		fileSpec[5] = (TCHAR)iLastChar + 'r';
+		file = FindFirstFile(fileName, &findFileData);
+		if (file != INVALID_HANDLE_VALUE) {
 
-			DeleteFile(fdat.cFileName);
-			while (FindNextFile(hndl, &fdat))
-				DeleteFile(fdat.cFileName);
+			DeleteFile(findFileData.cFileName);
+			while (FindNextFile(file, &findFileData))
+				DeleteFile(findFileData.cFileName);
 		}
-		FindClose(hndl);
+		FindClose(file);
 	}
 	unmsg();
 	tabmsg(IDS_BAKDT);
 }
 
-BOOL chkwnd(HWND hwind) {
+BOOL chkwnd(HWND window) {
 
-	RECT	trct;
+	RECT	windowRect;
 
-	GetWindowRect(hwind, &trct);
-	if (Msg.pt.x >= trct.left&&Msg.pt.x <= trct.right
-		&&Msg.pt.y >= trct.top&&Msg.pt.y <= trct.bottom)
+	GetWindowRect(window, &windowRect);
+	if (Msg.pt.x >= windowRect.left&&Msg.pt.x <= windowRect.right
+		&&Msg.pt.y >= windowRect.top&&Msg.pt.y <= windowRect.bottom)
 		return 1;
 	else
 		return 0;
@@ -10305,34 +10307,34 @@ BOOL chkok() {
 
 void mv2f() {
 
-	unsigned	at, lo, hi, ind;
+	unsigned	attribute, iLowBuffer, iHighBuffer, iStitch;
 
 	if (rstMap(FORMSEL)) {
 
 		savdo();
-		lo = 0;
-		hi = MAXPCS >> 1;
-		at = ClosestFormToCursor << 4;
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+		iLowBuffer = 0;
+		iHighBuffer = MAXPCS >> 1;
+		attribute = ClosestFormToCursor << 4;
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			if (!(StitchBuffer[ind].attribute&NOTFRM) && (StitchBuffer[ind].attribute&FRMSK) == at) {
+			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == attribute) {
 
-				StitchBuffer[lo].attribute = StitchBuffer[ind].attribute;
-				StitchBuffer[lo].x = StitchBuffer[ind].x;
-				StitchBuffer[lo++].y = StitchBuffer[ind].y;
+				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
+				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
+				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
 			} else {
 
-				StitchBuffer[hi].attribute = StitchBuffer[ind].attribute;
-				StitchBuffer[hi].x = StitchBuffer[ind].x;
-				StitchBuffer[hi++].y = StitchBuffer[ind].y;
+				StitchBuffer[iHighBuffer].attribute = StitchBuffer[iStitch].attribute;
+				StitchBuffer[iHighBuffer].x = StitchBuffer[iStitch].x;
+				StitchBuffer[iHighBuffer++].y = StitchBuffer[iStitch].y;
 			}
 		}
-		ind = MAXPCS >> 1;
-		while (ind < hi) {
+		iStitch = MAXPCS >> 1;
+		while (iStitch < iHighBuffer) {
 
-			StitchBuffer[lo].attribute = StitchBuffer[ind].attribute;
-			StitchBuffer[lo].x = StitchBuffer[ind].x;
-			StitchBuffer[lo++].y = StitchBuffer[ind++].y;
+			StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
+			StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
+			StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch++].y;
 		}
 		coltab();
 		setMap(RESTCH);
@@ -10342,31 +10344,31 @@ void mv2f() {
 
 			savdo();
 			rngadj();
-			hi = MAXPCS >> 1;
-			lo = 0;
-			for (ind = 0; ind < GroupStartStitch; ind++) {
+			iHighBuffer = MAXPCS >> 1;
+			iLowBuffer = 0;
+			for (iStitch = 0; iStitch < GroupStartStitch; iStitch++) {
 
-				StitchBuffer[hi].attribute = StitchBuffer[ind].attribute;
-				StitchBuffer[hi].x = StitchBuffer[ind].x;
-				StitchBuffer[hi++].y = StitchBuffer[ind].y;
+				StitchBuffer[iHighBuffer].attribute = StitchBuffer[iStitch].attribute;
+				StitchBuffer[iHighBuffer].x = StitchBuffer[iStitch].x;
+				StitchBuffer[iHighBuffer++].y = StitchBuffer[iStitch].y;
 			}
-			for (ind = GroupEndStitch; ind < PCSHeader.stitchCount; ind++) {
+			for (iStitch = GroupEndStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-				StitchBuffer[hi].attribute = StitchBuffer[ind].attribute;
-				StitchBuffer[hi].x = StitchBuffer[ind].x;
-				StitchBuffer[hi++].y = StitchBuffer[ind].y;
+				StitchBuffer[iHighBuffer].attribute = StitchBuffer[iStitch].attribute;
+				StitchBuffer[iHighBuffer].x = StitchBuffer[iStitch].x;
+				StitchBuffer[iHighBuffer++].y = StitchBuffer[iStitch].y;
 			}
-			for (ind = GroupStartStitch; ind < GroupEndStitch; ind++) {
+			for (iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
 
-				StitchBuffer[lo].attribute = StitchBuffer[ind].attribute;
-				StitchBuffer[lo].x = StitchBuffer[ind].x;
-				StitchBuffer[lo++].y = StitchBuffer[ind].y;
+				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
+				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
+				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
 			}
-			for (ind = MAXPCS >> 1; ind < hi; ind++) {
+			for (iStitch = MAXPCS >> 1; iStitch < iHighBuffer; iStitch++) {
 
-				StitchBuffer[lo].attribute = StitchBuffer[ind].attribute;
-				StitchBuffer[lo].x = StitchBuffer[ind].x;
-				StitchBuffer[lo++].y = StitchBuffer[ind].y;
+				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
+				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
+				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
 			}
 			coltab();
 			setMap(RESTCH);
@@ -10376,34 +10378,34 @@ void mv2f() {
 
 void mv2b() {
 
-	unsigned	at, lo, hi, ind;
+	unsigned	attribute, iLowBuffer, iHighBuffer, iStitch;
 
 	if (rstMap(FORMSEL)) {
 
 		savdo();
-		lo = 0;
-		hi = MAXPCS >> 1;
-		at = ClosestFormToCursor << 4;
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+		iLowBuffer = 0;
+		iHighBuffer = MAXPCS >> 1;
+		attribute = ClosestFormToCursor << 4;
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			if (!(StitchBuffer[ind].attribute&NOTFRM) && (StitchBuffer[ind].attribute&FRMSK) == at) {
+			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == attribute) {
 
-				StitchBuffer[hi].attribute = StitchBuffer[ind].attribute;
-				StitchBuffer[hi].x = StitchBuffer[ind].x;
-				StitchBuffer[hi++].y = StitchBuffer[ind].y;
+				StitchBuffer[iHighBuffer].attribute = StitchBuffer[iStitch].attribute;
+				StitchBuffer[iHighBuffer].x = StitchBuffer[iStitch].x;
+				StitchBuffer[iHighBuffer++].y = StitchBuffer[iStitch].y;
 			} else {
 
-				StitchBuffer[lo].attribute = StitchBuffer[ind].attribute;
-				StitchBuffer[lo].x = StitchBuffer[ind].x;
-				StitchBuffer[lo++].y = StitchBuffer[ind].y;
+				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
+				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
+				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
 			}
 		}
-		ind = MAXPCS >> 1;
-		while (ind < hi) {
+		iStitch = MAXPCS >> 1;
+		while (iStitch < iHighBuffer) {
 
-			StitchBuffer[lo].attribute = StitchBuffer[ind].attribute;
-			StitchBuffer[lo].x = StitchBuffer[ind].x;
-			StitchBuffer[lo++].y = StitchBuffer[ind++].y;
+			StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
+			StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
+			StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch++].y;
 		}
 		coltab();
 		setMap(RESTCH);
@@ -10413,25 +10415,25 @@ void mv2b() {
 
 			savdo();
 			rngadj();
-			hi = MAXPCS >> 1;
-			for (ind = GroupStartStitch; ind < GroupEndStitch; ind++) {
+			iHighBuffer = MAXPCS >> 1;
+			for (iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
 
-				StitchBuffer[hi].attribute = StitchBuffer[ind].attribute;
-				StitchBuffer[hi].x = StitchBuffer[ind].x;
-				StitchBuffer[hi++].y = StitchBuffer[ind].y;
+				StitchBuffer[iHighBuffer].attribute = StitchBuffer[iStitch].attribute;
+				StitchBuffer[iHighBuffer].x = StitchBuffer[iStitch].x;
+				StitchBuffer[iHighBuffer++].y = StitchBuffer[iStitch].y;
 			}
-			lo = GroupStartStitch;
-			for (ind = GroupEndStitch; ind < PCSHeader.stitchCount; ind++) {
+			iLowBuffer = GroupStartStitch;
+			for (iStitch = GroupEndStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-				StitchBuffer[lo].attribute = StitchBuffer[ind].attribute;
-				StitchBuffer[lo].x = StitchBuffer[ind].x;
-				StitchBuffer[lo++].y = StitchBuffer[ind].y;
+				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
+				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
+				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
 			}
-			for (ind = MAXPCS >> 1; ind < hi; ind++) {
+			for (iStitch = MAXPCS >> 1; iStitch < iHighBuffer; iStitch++) {
 
-				StitchBuffer[lo].attribute = StitchBuffer[ind].attribute;
-				StitchBuffer[lo].x = StitchBuffer[ind].x;
-				StitchBuffer[lo++].y = StitchBuffer[ind].y;
+				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
+				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
+				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
 			}
 			coltab();
 			setMap(RESTCH);
@@ -10439,80 +10441,80 @@ void mv2b() {
 	}
 }
 
-void infadj(float* px, float* py) {
+void infadj(float* xCoordinate, float* yCoordinate) {
 
-	if (!_finite(*px)) {
+	if (!_finite(*xCoordinate)) {
 
-		if (*px > UnzoomedRect.x)
-			*px = UnzoomedRect.x;
+		if (*xCoordinate > UnzoomedRect.x)
+			*xCoordinate = UnzoomedRect.x;
 		else {
 
-			if (*px < 0)
-				*px = 0;
+			if (*xCoordinate < 0)
+				*xCoordinate = 0;
 		}
 	}
-	if (!_finite(*py)) {
+	if (!_finite(*yCoordinate)) {
 
-		if (*py > UnzoomedRect.y)
-			*py = UnzoomedRect.y;
+		if (*yCoordinate > UnzoomedRect.y)
+			*yCoordinate = UnzoomedRect.y;
 		else {
 
-			if (*py < 0)
-				*py = 0;
+			if (*yCoordinate < 0)
+				*yCoordinate = 0;
 		}
 	}
 }
 
 void delinf() {
 
-	unsigned ind;
+	unsigned iStitch, iVertex;
 
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++)
-		infadj(&StitchBuffer[ind].x, &StitchBuffer[ind].y);
-	for (ind = 0; ind < FormVertexIndex; ind++)
-		infadj(&FormVertices[ind].x, &FormVertices[ind].y);
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
+		infadj(&StitchBuffer[iStitch].x, &StitchBuffer[iStitch].y);
+	for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
+		infadj(&FormVertices[iVertex].x, &FormVertices[iVertex].y);
 }
 
-void chkrng(fPOINT* rsiz) {
+void chkrng(fPOINT* range) {
 
-	unsigned	ind, ine = 0;
+	unsigned	iStitch, stitchCount = 0;
 
 	delinf();
-	rsiz->x = UnzoomedRect.x;
-	rsiz->y = UnzoomedRect.y;
+	range->x = UnzoomedRect.x;
+	range->y = UnzoomedRect.y;
 	if (FormIndex) {
 
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			if (StitchBuffer[ind].attribute&NOTFRM
-				|| ((StitchBuffer[ind].attribute&TYPMSK) && ((StitchBuffer[ind].attribute&FRMSK) >> FRMSHFT < FormIndex))) {
-				StitchBuffer[ine].attribute = StitchBuffer[ind].attribute;
-				StitchBuffer[ine].x = StitchBuffer[ind].x;
-				StitchBuffer[ine].y = StitchBuffer[ind].y;
-				if (StitchBuffer[ine].x > rsiz->x)
-					StitchBuffer[ine].x = rsiz->x - 1;
-				if (StitchBuffer[ine].x < 0)
-					StitchBuffer[ine].x = 0;
-				if (StitchBuffer[ine].y > rsiz->y)
-					StitchBuffer[ine].y = rsiz->y - 1;
-				if (StitchBuffer[ine].y < 0)
-					StitchBuffer[ine].y = 0;
-				ine++;
+			if (StitchBuffer[iStitch].attribute&NOTFRM
+				|| ((StitchBuffer[iStitch].attribute&TYPMSK) && ((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT < FormIndex))) {
+				StitchBuffer[stitchCount].attribute = StitchBuffer[iStitch].attribute;
+				StitchBuffer[stitchCount].x = StitchBuffer[iStitch].x;
+				StitchBuffer[stitchCount].y = StitchBuffer[iStitch].y;
+				if (StitchBuffer[stitchCount].x > range->x)
+					StitchBuffer[stitchCount].x = range->x - 1;
+				if (StitchBuffer[stitchCount].x < 0)
+					StitchBuffer[stitchCount].x = 0;
+				if (StitchBuffer[stitchCount].y > range->y)
+					StitchBuffer[stitchCount].y = range->y - 1;
+				if (StitchBuffer[stitchCount].y < 0)
+					StitchBuffer[stitchCount].y = 0;
+				stitchCount++;
 			}
 		}
-		PCSHeader.stitchCount = ine;
+		PCSHeader.stitchCount = stitchCount;
 	} else {
 
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			if (StitchBuffer[ind].x > rsiz->x)
-				StitchBuffer[ind].x = rsiz->x - 1;
-			if (StitchBuffer[ind].x < 0)
-				StitchBuffer[ind].x = 0;
-			if (StitchBuffer[ind].y > rsiz->y)
-				StitchBuffer[ind].y = rsiz->y - 1;
-			if (StitchBuffer[ind].y < 0)
-				StitchBuffer[ind].y = 0;
+			if (StitchBuffer[iStitch].x > range->x)
+				StitchBuffer[iStitch].x = range->x - 1;
+			if (StitchBuffer[iStitch].x < 0)
+				StitchBuffer[iStitch].x = 0;
+			if (StitchBuffer[iStitch].y > range->y)
+				StitchBuffer[iStitch].y = range->y - 1;
+			if (StitchBuffer[iStitch].y < 0)
+				StitchBuffer[iStitch].y = 0;
 		}
 	}
 }
@@ -10547,23 +10549,23 @@ void unmov() {
 
 void duprct() {
 
-	unsigned ind, strt;
+	unsigned iVertex, currentVertex;
 
-	strt = SelectedFormVertices.start;
-	SelectedVerticesRect.left = SelectedVerticesRect.right = CurrentFormVertices[strt].x;
-	SelectedVerticesRect.top = SelectedVerticesRect.bottom = CurrentFormVertices[strt].y;
-	strt = pdir(strt);
-	for (ind = 0; ind < SelectedFormVertices.vertexCount; ind++) {
+	currentVertex = SelectedFormVertices.start;
+	SelectedVerticesRect.left = SelectedVerticesRect.right = CurrentFormVertices[currentVertex].x;
+	SelectedVerticesRect.top = SelectedVerticesRect.bottom = CurrentFormVertices[currentVertex].y;
+	currentVertex = pdir(currentVertex);
+	for (iVertex = 0; iVertex < SelectedFormVertices.vertexCount; iVertex++) {
 
-		if (CurrentFormVertices[strt].x < SelectedVerticesRect.left)
-			SelectedVerticesRect.left = CurrentFormVertices[strt].x;
-		if (CurrentFormVertices[strt].x > SelectedVerticesRect.right)
-			SelectedVerticesRect.right = CurrentFormVertices[strt].x;
-		if (CurrentFormVertices[strt].y < SelectedVerticesRect.bottom)
-			SelectedVerticesRect.bottom = CurrentFormVertices[strt].y;
-		if (CurrentFormVertices[strt].y > SelectedVerticesRect.top)
-			SelectedVerticesRect.top = CurrentFormVertices[strt].y;
-		strt = pdir(strt);
+		if (CurrentFormVertices[currentVertex].x < SelectedVerticesRect.left)
+			SelectedVerticesRect.left = CurrentFormVertices[currentVertex].x;
+		if (CurrentFormVertices[currentVertex].x > SelectedVerticesRect.right)
+			SelectedVerticesRect.right = CurrentFormVertices[currentVertex].x;
+		if (CurrentFormVertices[currentVertex].y < SelectedVerticesRect.bottom)
+			SelectedVerticesRect.bottom = CurrentFormVertices[currentVertex].y;
+		if (CurrentFormVertices[currentVertex].y > SelectedVerticesRect.top)
+			SelectedVerticesRect.top = CurrentFormVertices[currentVertex].y;
+		currentVertex = pdir(currentVertex);
 	}
 }
 
@@ -10581,21 +10583,20 @@ void setpsel() {
 
 void rotfn() {
 
-	unsigned	ind, ine;
-	double		len;
-	double		tang;
-	dPOINT		trot;
-	unsigned	dst;
+	unsigned	iVertex, iStitch, iForm, currentVertex;
+	double		length;
+	double		angle;
+	dPOINT		center;
 
 	savdo();
 	if (chkMap(FPSEL)) {
 
 		fvars(ClosestFormToCursor);
-		ine = SelectedFormVertices.start;
-		for (ind = 0; ind <= SelectedFormVertices.vertexCount; ind++) {
+		currentVertex = SelectedFormVertices.start;
+		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 
-			rotflt(&CurrentFormVertices[ine]);
-			ine = pdir(ine);
+			rotflt(&CurrentFormVertices[currentVertex]);
+			currentVertex = pdir(currentVertex);
 		}
 		frmout(ClosestFormToCursor);
 		setpsel();
@@ -10605,31 +10606,31 @@ void rotfn() {
 	}
 	if (chkMap(BIGBOX)) {
 
-		for (ind = 0; ind < FormVertexIndex; ind++)
-			rotflt(&FormVertices[ind]);
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++)
-			rotstch(&StitchBuffer[ind]);
-		for (ind = 0; ind < FormIndex; ind++)
-			frmout(ind);
+		for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
+			rotflt(&FormVertices[iVertex]);
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
+			rotstch(&StitchBuffer[iStitch]);
+		for (iForm = 0; iForm < FormIndex; iForm++)
+			frmout(iForm);
 		selal();
 		return;
 	}
 	if (rstMap(FRMSROT)) {
 
-		tang = RotationAngle;
-		trot.x = RotationCenter.x;
-		trot.y = RotationCenter.y;
-		for (ind = 0; ind < SelectedFormCount; ind++) {
+		angle = RotationAngle;
+		center.x = RotationCenter.x;
+		center.y = RotationCenter.y;
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
-			ClosestFormToCursor = SelectedFormList[ind];
+			ClosestFormToCursor = SelectedFormList[iForm];
 			fvars(ClosestFormToCursor);
-			for (ine = 0; ine < SideCount; ine++)
-				rotflt(&CurrentFormVertices[ine]);
+			for (iVertex = 0; iVertex < SideCount; iVertex++)
+				rotflt(&CurrentFormVertices[iVertex]);
 			frmout(ClosestFormToCursor);
 			refilfn();
-			RotationAngle = tang;
-			RotationCenter.x = trot.x;
-			RotationCenter.y = trot.y;
+			RotationAngle = angle;
+			RotationCenter.x = center.x;
+			RotationCenter.y = center.y;
 		}
 		setMap(RESTCH);
 	} else {
@@ -10637,17 +10638,16 @@ void rotfn() {
 		if (rstMap(FRMROT)) {
 
 			fvars(ClosestFormToCursor);
-			for (ind = 0; ind < SideCount; ind++)
-				rotflt(&CurrentFormVertices[ind]);
+			for (iVertex = 0; iVertex < SideCount; iVertex++)
+				rotflt(&CurrentFormVertices[iVertex]);
 			frmout(ClosestFormToCursor);
 			refil();
 			setMap(RESTCH);
 		} else {
 
-			len = GroupEndStitch - GroupStartStitch + 1;
-			dst = 0;
-			for (ind = GroupStartStitch; ind <= GroupEndStitch; ind++)
-				rotstch(&StitchBuffer[ind]);
+			length = GroupEndStitch - GroupStartStitch + 1;
+			for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++)
+				rotstch(&StitchBuffer[iStitch]);
 			rngadj();
 			selin(GroupStartStitch, GroupEndStitch, StitchWindowDC);
 			setMap(RESTCH);
@@ -16680,10 +16680,10 @@ unsigned chkMsg() {
 				return 1;
 			} else {
 
-				StitchSizePixels.x = Msg.pt.x - StitchWindowOrigin.x;
-				StitchSizePixels.y = Msg.pt.y - StitchWindowOrigin.y;
-				if (StitchSizePixels.x >= FormOutlineRect[0].x&&StitchSizePixels.x <= FormOutlineRect[2].x&&
-					StitchSizePixels.y >= FormOutlineRect[0].y&&StitchSizePixels.y <= FormOutlineRect[4].y) {
+				StitchCoordinatesPixels.x = Msg.pt.x - StitchWindowOrigin.x;
+				StitchCoordinatesPixels.y = Msg.pt.y - StitchWindowOrigin.y;
+				if (StitchCoordinatesPixels.x >= FormOutlineRect[0].x&&StitchCoordinatesPixels.x <= FormOutlineRect[2].x&&
+					StitchCoordinatesPixels.y >= FormOutlineRect[0].y&&StitchCoordinatesPixels.y <= FormOutlineRect[4].y) {
 
 					duSelbox();
 					setMap(SELPNT);
@@ -17817,8 +17817,8 @@ unsigned chkMsg() {
 							StitchBuffer[ind].attribute = l_code;
 							duzrat();
 							stch2px1(ind);
-							InsertLine[0].x = StitchSizePixels.x;
-							InsertLine[0].y = StitchSizePixels.y;
+							InsertLine[0].x = StitchCoordinatesPixels.x;
+							InsertLine[0].y = StitchCoordinatesPixels.y;
 							InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 							InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 							PCSHeader.stitchCount++;
@@ -17839,8 +17839,8 @@ unsigned chkMsg() {
 							StitchBuffer[0].x = SelectedPoint.x;
 							StitchBuffer[0].y = SelectedPoint.y;
 							stch2px1(ind);
-							InsertLine[0].x = StitchSizePixels.x;
-							InsertLine[0].y = StitchSizePixels.y;
+							InsertLine[0].x = StitchCoordinatesPixels.x;
+							InsertLine[0].y = StitchCoordinatesPixels.y;
 							InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 							InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 							PCSHeader.stitchCount++;
@@ -17873,11 +17873,11 @@ unsigned chkMsg() {
 						InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 						InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 						stch2px1(ClosestPointIndex);
-						InsertLine[0].x = StitchSizePixels.x;
-						InsertLine[0].y = StitchSizePixels.y;
+						InsertLine[0].x = StitchCoordinatesPixels.x;
+						InsertLine[0].y = StitchCoordinatesPixels.y;
 						stch2px1(ClosestPointIndex + 1);
-						InsertLine[2].x = StitchSizePixels.x;
-						InsertLine[2].y = StitchSizePixels.y;
+						InsertLine[2].x = StitchCoordinatesPixels.x;
+						InsertLine[2].y = StitchCoordinatesPixels.y;
 						coltab();
 						setMap(RESTCH);
 						ritnum(STR_NUMSEL, ClosestPointIndex);
@@ -17937,8 +17937,8 @@ unsigned chkMsg() {
 
 						setMap(ISDWN);
 						stch2px1(ClosestPointIndex - 1);
-						MoveLine0[0].x = StitchSizePixels.x;
-						MoveLine0[0].y = StitchSizePixels.y;
+						MoveLine0[0].x = StitchCoordinatesPixels.x;
+						MoveLine0[0].y = StitchCoordinatesPixels.y;
 					}
 					tlng = PCSHeader.stitchCount - 1;
 					if (ClosestPointIndex >= (unsigned)tlng)
@@ -17947,8 +17947,8 @@ unsigned chkMsg() {
 
 						setMap(ISUP);
 						stch2px1(ClosestPointIndex + 1);
-						MoveLine1[1].x = StitchSizePixels.x;
-						MoveLine1[1].y = StitchSizePixels.y;
+						MoveLine1[1].x = StitchCoordinatesPixels.x;
+						MoveLine1[1].y = StitchCoordinatesPixels.y;
 					}
 					dulin();
 					SetCapture(ThrEdWindow);
@@ -19146,11 +19146,11 @@ unsigned chkMsg() {
 						}
 						return 1;
 					}
-					ClipFormsData = (FORMSCLIP*)ClipPointer;
-					if (ClipFormsData->clipType == CLP_FRMS) {
+					ClipFormsHeader = (FORMSCLIP*)ClipPointer;
+					if (ClipFormsHeader->clipType == CLP_FRMS) {
 
-						ClipFormsCount = ClipFormsData->formCount;
-						tfrm = (FRMHED*)&ClipFormsData[1];
+						ClipFormsCount = ClipFormsHeader->formCount;
+						tfrm = (FRMHED*)&ClipFormsHeader[1];
 						for (ind = 0; ind < ClipFormsCount; ind++) {
 
 							frmcpy(&FormList[FormIndex + ind], &tfrm[ind]);
@@ -19250,17 +19250,17 @@ unsigned chkMsg() {
 						setMap(FUNSCLP);
 					} else {
 
-						ClipFormData = (FORMCLIP*)ClipPointer;
-						if (ClipFormData->clipType == CLP_FRM) {
+						ClipFormHeader = (FORMCLIP*)ClipPointer;
+						if (ClipFormHeader->clipType == CLP_FRM) {
 
 							FormMoveDelta.x = FormMoveDelta.y = 0;
 							setMap(FUNCLP);
 							ClosestFormToCursor = FormIndex;
 							fvars(FormIndex);
-							frmcpy(&FormList[FormIndex], &ClipFormData->form);
+							frmcpy(&FormList[FormIndex], &ClipFormHeader->form);
 							FormList[FormIndex].attribute = (FormList[FormIndex].attribute&NFRMLMSK) | (ActiveLayer << 1);
 							SelectedForm->vertices = adflt(FormList[FormIndex].sides);
-							CurrentFormVertices = (fPOINT*)&ClipFormData[1];
+							CurrentFormVertices = (fPOINT*)&ClipFormHeader[1];
 							mvflpnt(&SelectedForm->vertices[0], &CurrentFormVertices[0], SelectedForm->sides);
 							l_sac = (SATCON*)&CurrentFormVertices[SelectedForm->sides];
 							ind = 0;
@@ -21986,30 +21986,30 @@ COLORREF defTxt(unsigned colInd) {
 #endif
 }
 
-void setCol(unsigned ind) {
+void setCol(unsigned color) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		ebx, ind
+		mov		ebx, color
 		mov		eax, DisplayedColorBitmap
 		bts		eax, ebx
 		mov		DisplayedColorBitmap, eax
 	}
 #else
 	// mask nextBufferIndex for sanity
-	_bittestandset((long *)&DisplayedColorBitmap, ind & 31);
+	_bittestandset((long *)&DisplayedColorBitmap, color & 31);
 #endif
 }
 
 void relin() {
 
 	stch2px1(ClosestPointIndex - 1);
-	MoveLine0[0].x = StitchSizePixels.x;
-	MoveLine0[0].y = StitchSizePixels.y;
+	MoveLine0[0].x = StitchCoordinatesPixels.x;
+	MoveLine0[0].y = StitchCoordinatesPixels.y;
 	stch2px1(ClosestPointIndex + 1);
-	MoveLine1[1].x = StitchSizePixels.x;
-	MoveLine1[1].y = StitchSizePixels.y;
+	MoveLine1[1].x = StitchCoordinatesPixels.x;
+	MoveLine1[1].y = StitchCoordinatesPixels.y;
 	rstMap(WASLIN);
 	dulin();
 }
@@ -22600,12 +22600,12 @@ void drwStch() {
 	drwknot();
 }
 
-unsigned chkCol(unsigned ind) {
+unsigned chkCol(unsigned color) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		ebx, ind
+		mov		ebx, color
 		mov		edx, DisplayedColorBitmap
 		xor		eax, eax
 		bt		edx, ebx
@@ -22614,7 +22614,7 @@ unsigned chkCol(unsigned ind) {
 		chk1 :
 	}
 #else
-	return _bittest((long *)&DisplayedColorBitmap, ind) ? 0xffffffff : 0;
+	return _bittest((long *)&DisplayedColorBitmap, color) ? 0xffffffff : 0;
 #endif
 }
 

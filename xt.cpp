@@ -31,7 +31,7 @@ extern	BSEQPNT			BSequence[BSEQLEN];
 extern	unsigned		ButtonHeight;
 extern	unsigned		ButtonWidthX3;
 extern	HWND			ButtonWin[9];
-extern	FORMCLIP*		ClipFormData;
+extern	FORMCLIP*		ClipFormHeader;
 extern	HGLOBAL			ClipMemory;
 extern	fPOINT			ClipPoints[MAXCLPNTS];
 extern	fRECTANGLE		ClipRect;
@@ -4230,10 +4230,10 @@ void txtclp()
 	ClipMemory = GetClipboardData(ThrEdClip);
 	if (ClipMemory)
 	{
-		ClipFormData = (FORMCLIP*)GlobalLock(ClipMemory);
-		if (ClipFormData) {
-			if (ClipFormData->clipType == CLP_FRM) {
-				SelectedForm = &ClipFormData->form;
+		ClipFormHeader = (FORMCLIP*)GlobalLock(ClipMemory);
+		if (ClipFormHeader) {
+			if (ClipFormHeader->clipType == CLP_FRM) {
+				SelectedForm = &ClipFormHeader->form;
 				frmcpy(&AngledForm, SelectedForm);
 				MoveMemory(&AngledFormVertices, &SelectedForm[1], sizeof(fPOINT)*SelectedForm->sides);
 				AngledForm.vertices = AngledFormVertices;

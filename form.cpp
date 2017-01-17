@@ -176,7 +176,7 @@ extern			double			SmallStitchLength;
 extern			double			StitchBoxesThreshold;
 extern			fPOINTATTR		StitchBuffer[MAXPCS];
 extern			fRECTANGLE		StitchRangeRect;
-extern			POINT			StitchSizePixels;
+extern			POINT			StitchCoordinatesPixels;
 extern			RECT			StitchWindowClientRect;
 extern			HDC				StitchWindowDC;
 extern			HDC				StitchWindowMemDC;
@@ -1160,8 +1160,8 @@ void frmsqr(unsigned ind) {
 	POINT	sqlin[4];
 
 	stch2pxr(CurrentFormVertices[ind]);
-	sqlin[1].x = StitchSizePixels.x;
-	sqlin[1].y = StitchSizePixels.y;
+	sqlin[1].x = StitchCoordinatesPixels.x;
+	sqlin[1].y = StitchCoordinatesPixels.y;
 	rat = (double)IniFile.formVertexSizePixels / StitchWindowClientRect.right;
 	len = (ZoomRect.right - ZoomRect.left)*rat * 2;
 	dif.x = CurrentFormVertices[ind - 1].x - CurrentFormVertices[ind].x;
@@ -1178,13 +1178,13 @@ void frmsqr(unsigned ind) {
 	l_dpnt.x = fpnt.x + off.x;
 	l_dpnt.y = fpnt.y + off.y;
 	stch2pxr(l_dpnt);
-	sqlin[0].x = sqlin[3].x = StitchSizePixels.x;
-	sqlin[0].y = sqlin[3].y = StitchSizePixels.y;
+	sqlin[0].x = sqlin[3].x = StitchCoordinatesPixels.x;
+	sqlin[0].y = sqlin[3].y = StitchCoordinatesPixels.y;
 	l_dpnt.x = fpnt.x - off.x;
 	l_dpnt.y = fpnt.y - off.y;
 	stch2pxr(l_dpnt);
-	sqlin[2].x = StitchSizePixels.x;
-	sqlin[2].y = StitchSizePixels.y;
+	sqlin[2].x = StitchCoordinatesPixels.x;
+	sqlin[2].y = StitchCoordinatesPixels.y;
 	Polyline(StitchWindowMemDC, sqlin, 4);
 }
 
@@ -1793,7 +1793,7 @@ unsigned closfrm() {
 			}
 		}
 		stch2pxr(FormList[tind].vertices[tine]);
-		minlen = hypot(StitchSizePixels.x - stchpx.x, StitchSizePixels.y - stchpx.y);
+		minlen = hypot(StitchCoordinatesPixels.x - stchpx.x, StitchCoordinatesPixels.y - stchpx.y);
 		if (minlen < CLOSENUF) {
 			ClosestFormToCursor = tind;
 			ClosestVertexToCursor = tine;
