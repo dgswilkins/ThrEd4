@@ -8888,8 +8888,8 @@ void unpat() {
 }
 void delsmal(unsigned startStitch, unsigned endStitch) {
 	// ToDo - does this function work correctly?
-	// ToDo - rename ine and inf
-	unsigned	iStitch, ine, codedAttribute = ClosestFormToCursor << 4;
+	// ToDo - rename inf
+	unsigned	iStitch, iNextStitch, codedAttribute = ClosestFormToCursor << 4;
 	unsigned	inf;
 	long		dx, dy;
 	double		stitchSize = 1e99;
@@ -8897,18 +8897,18 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 	savdo();
 	if (chkMap(FORMSEL)) {
 
-		ine = find1st();
-		iStitch = ine + 1;
+		iNextStitch = find1st();
+		iStitch = iNextStitch + 1;
 		while (iStitch<(unsigned)PCSHeader.stitchCount - 1 && stitchSize>SmallStitchLength) {
 
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute) {
 
 				if (StitchBuffer[iStitch].attribute&KNOTMSK)
-					ine = iStitch;
+					iNextStitch = iStitch;
 				else {
 
-					dx = StitchBuffer[iStitch].x - StitchBuffer[ine].x;
-					dy = StitchBuffer[iStitch].y - StitchBuffer[ine].y;
+					dx = StitchBuffer[iStitch].x - StitchBuffer[iNextStitch].x;
+					dy = StitchBuffer[iStitch].y - StitchBuffer[iNextStitch].y;
 					stitchSize = hypot(dx, dy);
 				}
 				iStitch++;
@@ -8917,29 +8917,29 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 		if (iStitch != endStitch - 2) {
 
 			iStitch--;
-			ine = iStitch + 2;
-			while (ine < (unsigned)PCSHeader.stitchCount - 1) {
+			iNextStitch = iStitch + 2;
+			while (iNextStitch < (unsigned)PCSHeader.stitchCount - 1) {
 
 				do {
 
 					if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute && !(StitchBuffer[iStitch].attribute&KNOTMSK)) {
 
-						dx = StitchBuffer[ine].x - StitchBuffer[iStitch].x;
-						dy = StitchBuffer[ine++].y - StitchBuffer[iStitch].y;
+						dx = StitchBuffer[iNextStitch].x - StitchBuffer[iStitch].x;
+						dy = StitchBuffer[iNextStitch++].y - StitchBuffer[iStitch].y;
 						stitchSize = hypot(dx, dy);
 					} else
-						ine++;
-				} while (stitchSize < SmallStitchLength&&ine < PCSHeader.stitchCount);
-				StitchBuffer[++iStitch].attribute = StitchBuffer[--ine].attribute;
-				StitchBuffer[iStitch].x = StitchBuffer[ine].x;
-				StitchBuffer[iStitch].y = StitchBuffer[ine++].y;
+						iNextStitch++;
+				} while (stitchSize < SmallStitchLength&&iNextStitch < PCSHeader.stitchCount);
+				StitchBuffer[++iStitch].attribute = StitchBuffer[--iNextStitch].attribute;
+				StitchBuffer[iStitch].x = StitchBuffer[iNextStitch].x;
+				StitchBuffer[iStitch].y = StitchBuffer[iNextStitch++].y;
 			}
 			iStitch++;
-			while (ine < PCSHeader.stitchCount) {
+			while (iNextStitch < PCSHeader.stitchCount) {
 
-				StitchBuffer[iStitch].attribute = StitchBuffer[ine].attribute;
-				StitchBuffer[iStitch].x = StitchBuffer[ine].x;
-				StitchBuffer[iStitch++].y = StitchBuffer[ine++].y;
+				StitchBuffer[iStitch].attribute = StitchBuffer[iNextStitch].attribute;
+				StitchBuffer[iStitch].x = StitchBuffer[iNextStitch].x;
+				StitchBuffer[iStitch++].y = StitchBuffer[iNextStitch++].y;
 			}
 			PCSHeader.stitchCount = iStitch;
 			coltab();
@@ -8947,16 +8947,16 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 	} else {
 
 		iStitch = startStitch;
-		ine = startStitch + 1;
+		iNextStitch = startStitch + 1;
 		SelectedPoint.x = StitchBuffer[iStitch].x;
 		SelectedPoint.y = StitchBuffer[iStitch].y;
-		for (inf = ine; inf < endStitch; inf++) {
+		for (inf = iNextStitch; inf < endStitch; inf++) {
 
-			if (StitchBuffer[ine].attribute&KNOTMSK) {
+			if (StitchBuffer[iNextStitch].attribute&KNOTMSK) {
 
-				SelectedPoint.x = StitchBuffer[ine].x;
-				SelectedPoint.y = StitchBuffer[ine].y;
-				mvstch(ine++, inf);
+				SelectedPoint.x = StitchBuffer[iNextStitch].x;
+				SelectedPoint.y = StitchBuffer[iNextStitch].y;
+				mvstch(iNextStitch++, inf);
 			} else {
 
 				dx = StitchBuffer[inf].x - SelectedPoint.x;
@@ -8964,15 +8964,15 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 				stitchSize = hypot(dx, dy);
 				if (stitchSize > SmallStitchLength) {
 
-					mvstch(ine++, inf);
+					mvstch(iNextStitch++, inf);
 					SelectedPoint.x = StitchBuffer[inf].x;
 					SelectedPoint.y = StitchBuffer[inf].y;
 				}
 			}
 		}
 		while (inf < PCSHeader.stitchCount)
-			mvstch(ine++, inf++);
-		PCSHeader.stitchCount = ine;
+			mvstch(iNextStitch++, inf++);
+		PCSHeader.stitchCount = iNextStitch;
 		coltab();
 	}
 	rstAll();
@@ -10744,34 +10744,34 @@ void rtrclpfn() {
 
 BOOL chkbig() {
 
-	unsigned	ind;
-	double		len, minlen = 1e99;
-	POINT		tpnt;
+	unsigned	iControlPoint, iCorner, ind;
+	double		length, minimumLength = 1e99;
+	POINT		pointToTest;
 
-	tpnt.x = Msg.pt.x - StitchWindowOrigin.x;
-	tpnt.y = Msg.pt.y - StitchWindowOrigin.y;
-	for (ind = 0; ind < 9; ind++) {
+	pointToTest.x = Msg.pt.x - StitchWindowOrigin.x;
+	pointToTest.y = Msg.pt.y - StitchWindowOrigin.y;
+	for (iControlPoint = 0; iControlPoint < 9; iControlPoint++) {
 
-		len = hypot(tpnt.x - SelectedFormsLine[ind].x, tpnt.y - SelectedFormsLine[ind].y);
-		if (len < minlen) {
+		length = hypot(pointToTest.x - SelectedFormsLine[iControlPoint].x, pointToTest.y - SelectedFormsLine[iControlPoint].y);
+		if (length < minimumLength) {
 
-			minlen = len;
-			SelectedFormControlVertex = ind;
+			minimumLength = length;
+			SelectedFormControlVertex = iControlPoint;
 		}
 	}
-	for (ind = 0; ind < 4; ind++) {
+	for (iCorner = 0; iCorner < 4; iCorner++) {
 
-		FormLines[ind].x = SelectedFormsLine[ind << 1].x;
-		FormLines[ind].y = SelectedFormsLine[ind << 1].y;
+		FormLines[iCorner].x = SelectedFormsLine[iCorner << 1].x;
+		FormLines[iCorner].y = SelectedFormsLine[iCorner << 1].y;
 	}
 	FormLines[4].x = FormLines[0].x;
 	FormLines[4].y = FormLines[0].y;
-	if (minlen < CLOSENUF) {
+	if (minimumLength < CLOSENUF) {
 
-		for (ind = 0; ind < 4; ind++) {
+		for (iCorner = 0; iCorner < 4; iCorner++) {
 
-			StretchBoxLine[ind].x = SelectedFormsLine[ind << 1].x;
-			StretchBoxLine[ind].y = SelectedFormsLine[ind << 1].y;
+			StretchBoxLine[iCorner].x = SelectedFormsLine[iCorner << 1].x;
+			StretchBoxLine[iCorner].y = SelectedFormsLine[iCorner << 1].y;
 		}
 		StretchBoxLine[4].x = StretchBoxLine[0].x;
 		StretchBoxLine[4].y = StretchBoxLine[0].y;
@@ -10787,14 +10787,14 @@ BOOL chkbig() {
 		strtchbox();
 		return 1;
 	}
-	if (tpnt.x >= SelectedFormsRect.left&&tpnt.x <= SelectedFormsRect.right
-		&&tpnt.y >= SelectedFormsRect.top&&tpnt.y <= SelectedFormsRect.bottom) {
+	if (pointToTest.x >= SelectedFormsRect.left&&pointToTest.x <= SelectedFormsRect.right
+		&&pointToTest.y >= SelectedFormsRect.top&&pointToTest.y <= SelectedFormsRect.bottom) {
 
 		SelectedFormsSize.x = SelectedFormsRect.right - SelectedFormsRect.left;
 		SelectedFormsSize.y = SelectedFormsRect.bottom - SelectedFormsRect.top;
 		setMap(MOVFRMS);
-		FormMoveDelta.x = tpnt.x - SelectedFormsRect.left;
-		FormMoveDelta.y = tpnt.y - SelectedFormsRect.top;
+		FormMoveDelta.x = pointToTest.x - SelectedFormsRect.left;
+		FormMoveDelta.y = pointToTest.y - SelectedFormsRect.top;
 		setMap(SHOSTRTCH);
 		strtchbox();
 		return 1;
@@ -10804,19 +10804,19 @@ BOOL chkbig() {
 
 void delfre() {
 
-	unsigned ind, ine = 0;
+	unsigned iStitch, currentStitchCount = 0;
 
 	savdo();
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		if (!(StitchBuffer[ind].attribute&NOTFRM)) {
+		if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
 
-			StitchBuffer[ine].attribute = StitchBuffer[ind].attribute;
-			StitchBuffer[ine].x = StitchBuffer[ind].x;
-			StitchBuffer[ine++].y = StitchBuffer[ind].y;
+			StitchBuffer[currentStitchCount].attribute = StitchBuffer[iStitch].attribute;
+			StitchBuffer[currentStitchCount].x = StitchBuffer[iStitch].x;
+			StitchBuffer[currentStitchCount++].y = StitchBuffer[iStitch].y;
 		}
 	}
-	PCSHeader.stitchCount = ine;
+	PCSHeader.stitchCount = currentStitchCount;
 	coltab();
 	setMap(RESTCH);
 }
