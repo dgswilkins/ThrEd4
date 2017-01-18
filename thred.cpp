@@ -11583,28 +11583,28 @@ void barnam(HWND window, unsigned iThumbnail) {
 		SetWindowText(window, "");
 }
 
-void rthumnam(unsigned ind) {
+void rthumnam(unsigned iThumbnail) {
 
-	switch (ind) {
+	switch (iThumbnail) {
 
 	case 0:
 
-		barnam(ButtonWin[HNUM], ind);
+		barnam(ButtonWin[HNUM], iThumbnail);
 		break;
 
 	case 1:
 
-		barnam(ButtonWin[HTOT], ind);
+		barnam(ButtonWin[HTOT], iThumbnail);
 		break;
 
 	case 2:
 
-		barnam(ButtonWin[HMINLEN], ind);
+		barnam(ButtonWin[HMINLEN], iThumbnail);
 		break;
 
 	case 3:
 
-		barnam(ButtonWin[HMAXLEN], ind);
+		barnam(ButtonWin[HMAXLEN], iThumbnail);
 		break;
 	}
 }
@@ -11613,59 +11613,59 @@ void rthumnam(unsigned ind) {
 #pragma warning(disable : 4996)
 void thumnail() {
 
-	WIN32_FIND_DATA	fdat;
-	unsigned		ind, ine;
-	HANDLE			shndl;
-	TCHAR*			pchr;
+	WIN32_FIND_DATA	fileData;
+	unsigned		iThumbnail, iThumbnailName;
+	HANDLE			file;
+	TCHAR*			lastCharacter;
 
 	unbsho();
 	undat();
 	untrace();
-	// ToDo is this correct? types do not match
+	// ToDo is this correct? types do not match. Use memory allocation rather than global buffer
 	ThumbnailNames = (TCHAR*)OSequence;
 	Thumbnails = (TCHAR**)&OSequence[MAXSEQ >> 1];
 
 	SetCurrentDirectory(DefaultDirectory);
 	strcpy_s(SearchName, DefaultDirectory);
-	pchr = &SearchName[strlen(SearchName) - 1];
-	if (pchr[0] != '\\') {
+	lastCharacter = &SearchName[strlen(SearchName) - 1];
+	if (lastCharacter[0] != '\\') {
 
-		pchr[1] = '\\';
-		pchr[2] = 0;
+		lastCharacter[1] = '\\';
+		lastCharacter[2] = 0;
 	}
 	strcat_s(SearchName, "*.thr");
-	shndl = FindFirstFile(SearchName, &fdat);
-	if (shndl == INVALID_HANDLE_VALUE) {
+	file = FindFirstFile(SearchName, &fileData);
+	if (file == INVALID_HANDLE_VALUE) {
 
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Can't find %s\n", SearchName);
 		shoMsg(MsgBuffer);
 		unthum();
 	} else {
 
-		ine = 0;
+		iThumbnailName = 0;
 		Thumbnails[0] = ThumbnailNames;
-		strcpy(Thumbnails[0], fdat.cFileName);
-		ine += strlen(fdat.cFileName) + 1;
-		Thumbnails[1] = &ThumbnailNames[ine];
-		ind = 1;
-		while (FindNextFile(shndl, &fdat)) {
+		strcpy(Thumbnails[0], fileData.cFileName);
+		iThumbnailName += strlen(fileData.cFileName) + 1;
+		Thumbnails[1] = &ThumbnailNames[iThumbnailName];
+		iThumbnail = 1;
+		while (FindNextFile(file, &fileData)) {
 
-			strcpy(Thumbnails[ind], fdat.cFileName);
-			ine += strlen(fdat.cFileName) + 1;
-			Thumbnails[++ind] = &ThumbnailNames[ine];
+			strcpy(Thumbnails[iThumbnail], fileData.cFileName);
+			iThumbnailName += strlen(fileData.cFileName) + 1;
+			Thumbnails[++iThumbnail] = &ThumbnailNames[iThumbnailName];
 		}
-		FindClose(shndl);
-		ThumbnailCount = ind;
-		qsort((void*)&Thumbnails[0], ind, 4, strcomp);
-		ind = ThumbnailIndex = 0;
-		while (ind < 4 && ThumbnailIndex < ThumbnailCount&&ind < ThumbnailCount) {
+		FindClose(file);
+		ThumbnailCount = iThumbnail;
+		qsort((void*)&Thumbnails[0], iThumbnail, 4, strcomp);
+		iThumbnail = ThumbnailIndex = 0;
+		while (iThumbnail < 4 && ThumbnailIndex < ThumbnailCount&&iThumbnail < ThumbnailCount) {
 
-			ThumbnailsSelected[ind] = Thumbnails[ind];
-			ind++;
+			ThumbnailsSelected[iThumbnail] = Thumbnails[iThumbnail];
+			iThumbnail++;
 		}
-		ThumbnailIndex = ThumbnailDisplayCount = ind;
-		while (ind < 4 && ind < ThumbnailCount)
-			rthumnam(ind++);
+		ThumbnailIndex = ThumbnailDisplayCount = iThumbnail;
+		while (iThumbnail < 4 && iThumbnail < ThumbnailCount)
+			rthumnam(iThumbnail++);
 		setMap(THUMSHO);
 		ThumbnailSearchString[0] = 0;
 		SetWindowText(ButtonWin[HBOXSEL], "");
@@ -11678,65 +11678,65 @@ void thumnail() {
 
 void nuthsel() {
 
-	unsigned ind, len, bakind;
+	unsigned iThumbnail, length, savedIndex;
 
 	if (ThumbnailIndex < ThumbnailCount) {
 
-		bakind = ThumbnailIndex;
-		ind = 0;
-		len = strlen(ThumbnailSearchString);
+		savedIndex = ThumbnailIndex;
+		iThumbnail = 0;
+		length = strlen(ThumbnailSearchString);
 		setMap(RESTCH);
-		if (len) {
+		if (length) {
 
-			while (ind < 4 && ThumbnailIndex < ThumbnailCount) {
+			while (iThumbnail < 4 && ThumbnailIndex < ThumbnailCount) {
 
-				if (!strncmp(ThumbnailSearchString, Thumbnails[ThumbnailIndex], len)) {
+				if (!strncmp(ThumbnailSearchString, Thumbnails[ThumbnailIndex], length)) {
 
-					ThumbnailsSelected[ind] = Thumbnails[ThumbnailIndex];
-					redraw(BackupViewer[ind++]);
+					ThumbnailsSelected[iThumbnail] = Thumbnails[ThumbnailIndex];
+					redraw(BackupViewer[iThumbnail++]);
 				}
 				ThumbnailIndex++;
 			}
 		} else {
 
-			while (ind < 4 && ThumbnailIndex < ThumbnailCount) {
+			while (iThumbnail < 4 && ThumbnailIndex < ThumbnailCount) {
 
-				ThumbnailsSelected[ind] = Thumbnails[ThumbnailIndex];
-				redraw(BackupViewer[ind++]);
+				ThumbnailsSelected[iThumbnail] = Thumbnails[ThumbnailIndex];
+				redraw(BackupViewer[iThumbnail++]);
 				ThumbnailIndex++;
 			}
 		}
-		if (ind) {
+		if (iThumbnail) {
 
-			ThumbnailDisplayCount = ind;
-			while (ind < 4)
-				rthumnam(ind++);
+			ThumbnailDisplayCount = iThumbnail;
+			while (iThumbnail < 4)
+				rthumnam(iThumbnail++);
 		} else
-			ThumbnailIndex = bakind;
+			ThumbnailIndex = savedIndex;
 	}
 }
 
-void nuthbak(unsigned cnt) {
+void nuthbak(unsigned count) {
 
-	unsigned len;
+	unsigned length;
 
 	if (ThumbnailIndex) {
 
-		len = strlen(ThumbnailSearchString);
-		if (len) {
+		length = strlen(ThumbnailSearchString);
+		if (length) {
 
-			while (cnt&&ThumbnailIndex < MAXFORMS) {
+			while (count&&ThumbnailIndex < MAXFORMS) {
 
 				if (ThumbnailIndex) {
 
 					ThumbnailIndex--;
-					if (!strncmp(ThumbnailSearchString, Thumbnails[ThumbnailIndex], len))
-						cnt--;
+					if (!strncmp(ThumbnailSearchString, Thumbnails[ThumbnailIndex], length))
+						count--;
 				} else
 					break;
 			}
 		} else
-			ThumbnailIndex -= cnt;
+			ThumbnailIndex -= count;
 		if (ThumbnailIndex > MAXFORMS)
 			ThumbnailIndex = 0;
 		nuthsel();
