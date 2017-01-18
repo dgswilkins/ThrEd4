@@ -11743,16 +11743,16 @@ void nuthbak(unsigned count) {
 	}
 }
 
-void nuthum(TCHAR chr) {
+void nuthum(TCHAR character) {
 
-	unsigned ind;
+	unsigned iString;
 
-	ind = strlen(ThumbnailSearchString);
-	if (ind < 16) {
+	iString = strlen(ThumbnailSearchString);
+	if (iString < 16) {
 
 		setMap(RESTCH);
-		ThumbnailSearchString[ind++] = chr;
-		ThumbnailSearchString[ind] = 0;
+		ThumbnailSearchString[iString++] = character;
+		ThumbnailSearchString[iString] = 0;
 		butxt(HBOXSEL, ThumbnailSearchString);
 		ThumbnailIndex = 0;
 		nuthsel();
@@ -11761,13 +11761,13 @@ void nuthum(TCHAR chr) {
 
 void bakthum() {
 
-	unsigned ind;
+	unsigned searchStringLength;
 
-	ind = strlen(ThumbnailSearchString);
-	if (ind) {
+	searchStringLength = strlen(ThumbnailSearchString);
+	if (searchStringLength) {
 
 		setMap(RESTCH);
-		ThumbnailSearchString[--ind] = 0;
+		ThumbnailSearchString[--searchStringLength] = 0;
 		ThumbnailIndex = 0;
 		butxt(HBOXSEL, ThumbnailSearchString);
 		nuthsel();
@@ -11790,28 +11790,28 @@ void selalstch() {
 	}
 }
 
-void insflin(POINT ipnt) {
+void insflin(POINT insertPoint) {
 
-	POINT off;
+	POINT offset;
 
-	off.x = InsertSize.x >> 1;
-	off.y = InsertSize.y >> 1;
+	offset.x = InsertSize.x >> 1;
+	offset.y = InsertSize.y >> 1;
 
-	FormLines[0].x = FormLines[3].x = FormLines[4].x = ipnt.x - off.x;
-	FormLines[1].x = FormLines[2].x = ipnt.x + off.x;
-	FormLines[0].y = FormLines[1].y = FormLines[4].y = ipnt.y - off.y;
-	FormLines[2].y = FormLines[3].y = ipnt.y + off.y;
+	FormLines[0].x = FormLines[3].x = FormLines[4].x = insertPoint.x - offset.x;
+	FormLines[1].x = FormLines[2].x = insertPoint.x + offset.x;
+	FormLines[0].y = FormLines[1].y = FormLines[4].y = insertPoint.y - offset.y;
+	FormLines[2].y = FormLines[3].y = insertPoint.y + offset.y;
 }
 
-BOOL isthr(TCHAR* nam) {
+BOOL isthr(TCHAR* filename) {
 
-	TCHAR* pchr;
+	TCHAR* lastCharacter;
 
-	pchr = strrchr(nam, '.');
-	if (pchr) {
+	lastCharacter = strrchr(filename, '.');
+	if (lastCharacter) {
 
-		pchr++;
-		if (!_strnicmp(pchr, "th", 2))
+		lastCharacter++;
+		if (!_strnicmp(lastCharacter, "th", 2))
 			return 1;
 		else
 			return 0;
@@ -11819,36 +11819,36 @@ BOOL isthr(TCHAR* nam) {
 		return 1;
 }
 
-unsigned gethand(fPOINTATTR* p_pstch, unsigned cnt) {
+unsigned gethand(fPOINTATTR* stitch, unsigned stitchCount) {
 
-	unsigned ind;
-	unsigned ocnt;
+	unsigned iStitch;
+	unsigned userStitchCount;
 
-	ocnt = 0;
-	for (ind = 0; ind < cnt; ind++) {
+	userStitchCount = 0;
+	for (iStitch = 0; iStitch < stitchCount; iStitch++) {
 
-		if (p_pstch[ind].attribute&USMSK)
-			ocnt++;
+		if (stitch[iStitch].attribute&USMSK)
+			userStitchCount++;
 	}
-	return ocnt;
+	return userStitchCount;
 }
 
 void insfil() {
 
-	OPENFILENAME oin = {
+	OPENFILENAME file = {
 
 		sizeof(OPENFILENAME),	//lStructsize
-		ThrEdWindow,					//hwndOwner 
-		ThrEdInstance,					//hInstance 
+		ThrEdWindow,			//hwndOwner 
+		ThrEdInstance,			//hInstance 
 		"THR files\0*.thr\0\0",	//lpstrFilter 
 		CustomFilter,			//lpstrCustomFilter 
 		_MAX_PATH,				//nMaxCustFilter 
 		0,						//nFilterIndex 
-		InsertedFileName,			//lpstrFile 
+		InsertedFileName,		//lpstrFile 
 		_MAX_PATH,				//nMaxFile 
 		0,						//lpstrFileTitle 
 		0,						//nMaxFileTitle 
-		DefaultDirectory,					//lpstr	ialDir 
+		DefaultDirectory,		//lpstr	ialDir 
 		0,						//lpstrTitle
 		OFN_EXPLORER | OFN_OVERWRITEPROMPT,//Flags
 		0,						//nFileOffset
@@ -11858,20 +11858,21 @@ void insfil() {
 		0,						//lpfnHook
 		0,						//lpTemplateName
 	};
-	STRHED		thed;
-	STREX		thedx = { 0 };
-	PCSHEADER			tphed;
-	unsigned	ind, ine, cod, codof;
-	fRECTANGLE		trct;
-	fPOINT		tsiz;
-	POINT		tpnt;
-	PCSTCH*		tbuf;
+	STRHED		fileHeader;
+	STREX		thredHeader = { 0 };
+	PCSHEADER	pcsFileHeader;
+	unsigned	iForm, iFormList, iVertex, iStitch, iName, iPCSStitch;
+	unsigned	newStitchCount, newAttribute, encodedFormIndex;
+	fRECTANGLE	insertedRectangle;
+	fPOINT		insertedSize;
+	POINT		initialInsertPoint;
+	PCSTCH*		pcsStitchBuffer;
 	double		homscor = 0;
 	double		filscor;
-	unsigned	vervar;
-	FRMHEDO*	frmlstx;
+	unsigned	version;
+	FRMHEDO*	formHeader;
 
-	if (chkMap(IGNORINS) || GetOpenFileName(&oin)) {
+	if (chkMap(IGNORINS) || GetOpenFileName(&file)) {
 
 		InsertedFileHandle = CreateFile(InsertedFileName, (GENERIC_READ), 0, NULL,
 			OPEN_EXISTING, 0, NULL);
@@ -11885,13 +11886,13 @@ void insfil() {
 			InsertedStitchCount = PCSHeader.stitchCount;
 			if (isthr(InsertedFileName)) {
 
-				ReadFile(InsertedFileHandle, (STRHED*)&thed, sizeof(STRHED), &BytesRead, NULL);
-				if ((thed.headerType & 0xffffff) != 0x746872)
+				ReadFile(InsertedFileHandle, (STRHED*)&fileHeader, sizeof(STRHED), &BytesRead, NULL);
+				if ((fileHeader.headerType & 0xffffff) != 0x746872)
 					tabmsg(IDS_NOTHR);
 				else {
 
-					vervar = (thed.headerType & 0xff000000) >> 24;
-					if (vervar) {
+					version = (fileHeader.headerType & 0xff000000) >> 24;
+					if (version) {
 #define FRMW 5
 #define HANDW 4
 #define FRMPW 2
@@ -11902,124 +11903,124 @@ void insfil() {
 							gethand(StitchBuffer, PCSHeader.stitchCount)*HANDW +
 							FormVertexIndex*FRMPW +
 							PCSHeader.stitchCount*STCHW;
-						ReadFile(InsertedFileHandle, (STREX*)&thedx, sizeof(STREX), &BytesRead, 0);
+						ReadFile(InsertedFileHandle, (STREX*)&thredHeader, sizeof(STREX), &BytesRead, 0);
 					}
 					savdo();
-					ReadFile(InsertedFileHandle, (fPOINTATTR*)&StitchBuffer[PCSHeader.stitchCount], thed.stitchCount * sizeof(fPOINTATTR), &BytesRead, NULL);
+					ReadFile(InsertedFileHandle, (fPOINTATTR*)&StitchBuffer[PCSHeader.stitchCount], fileHeader.stitchCount * sizeof(fPOINTATTR), &BytesRead, NULL);
 					SetFilePointer(InsertedFileHandle, 164, 0, FILE_CURRENT);
-					trct.left = trct.bottom = (float)1e9;
-					trct.top = trct.right = (float)1e-9;
-					codof = FormIndex << FRMSHFT;
+					insertedRectangle.left = insertedRectangle.bottom = (float)1e9;
+					insertedRectangle.top = insertedRectangle.right = (float)1e-9;
+					encodedFormIndex = FormIndex << FRMSHFT;
 					InsertedVertexIndex = FormVertexIndex; 
 					InsertedFormIndex = FormIndex;
-					if (thed.vertexCount) {
+					if (fileHeader.vertexCount) {
 
-						if (vervar < 2) {
+						if (version < 2) {
 
-							frmlstx = (FRMHEDO*)&BSequence;
-							ReadFile(InsertedFileHandle, (FRMHEDO*)&BSequence, thed.formCount * sizeof(FRMHEDO), &BytesRead, 0);
-							if (BytesRead != thed.formCount * sizeof(FRMHEDO)) {
+							formHeader = (FRMHEDO*)&BSequence;
+							ReadFile(InsertedFileHandle, (FRMHEDO*)&BSequence, fileHeader.formCount * sizeof(FRMHEDO), &BytesRead, 0);
+							if (BytesRead != fileHeader.formCount * sizeof(FRMHEDO)) {
 
 								FormIndex = BytesRead / sizeof(FRMHEDO);
 								setMap(BADFIL);
 							}
-							if (FormIndex + thed.vertexCount < MAXFORMS) {
+							if (FormIndex + fileHeader.vertexCount < MAXFORMS) {
 
-								FillMemory(&FormList[FormIndex], thed.formCount * sizeof(FRMHED), 0);
-								ine = FormIndex;
-								for (ind = 0; ind < thed.formCount; ind++) {
+								FillMemory(&FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), 0);
+								iFormList = FormIndex;
+								for (iForm = 0; iForm < fileHeader.formCount; iForm++) {
 
-									MoveMemory(&FormList[ine], &frmlstx[ind], sizeof(FRMHEDO));
-									ine++;
+									MoveMemory(&FormList[iFormList], &formHeader[iForm], sizeof(FRMHEDO));
+									iFormList++;
 								}
 							}
 						} else
-							ReadFile(InsertedFileHandle, (FRMHED*)&FormList[FormIndex], thed.formCount * sizeof(FRMHED), &BytesRead, 0);
-						ReadFile(InsertedFileHandle, (fPOINT*)&FormVertices[FormVertexIndex], thed.vertexCount * sizeof(fPOINT), &BytesRead, 0);
-						ReadFile(InsertedFileHandle, (SATCON*)&SatinConnects[SatinConnectIndex], thed.dlineCount * sizeof(SATCON), &BytesRead, 0);
-						ReadFile(InsertedFileHandle, (fPOINT*)&ClipPoints[ClipPointIndex], thed.clipDataCount * sizeof(fPOINT), &BytesRead, 0);
+							ReadFile(InsertedFileHandle, (FRMHED*)&FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), &BytesRead, 0);
+						ReadFile(InsertedFileHandle, (fPOINT*)&FormVertices[FormVertexIndex], fileHeader.vertexCount * sizeof(fPOINT), &BytesRead, 0);
+						ReadFile(InsertedFileHandle, (SATCON*)&SatinConnects[SatinConnectIndex], fileHeader.dlineCount * sizeof(SATCON), &BytesRead, 0);
+						ReadFile(InsertedFileHandle, (fPOINT*)&ClipPoints[ClipPointIndex], fileHeader.clipDataCount * sizeof(fPOINT), &BytesRead, 0);
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = 0;
-						for (ind = FormIndex; ind < FormIndex + thed.formCount; ind++) {
+						for (iFormList = FormIndex; iFormList < FormIndex + fileHeader.formCount; iFormList++) {
 
-							FormList[ind].vertices = adflt(FormList[ind].sides);
-							if (FormList[ind].type == SAT) {
+							FormList[iFormList].vertices = adflt(FormList[iFormList].sides);
+							if (FormList[iFormList].type == SAT) {
 
-								if (FormList[ind].satinGuideCount)
-									FormList[ind].satinOrAngle.sac = adsatk(FormList[ind].satinGuideCount);
-								if (isclpx(ind))
-									FormList[ind].angleOrClipData.clip = adclp(FormList[ind].lengthOrCount.clipCount);
+								if (FormList[iFormList].satinGuideCount)
+									FormList[iFormList].satinOrAngle.sac = adsatk(FormList[iFormList].satinGuideCount);
+								if (isclpx(iFormList))
+									FormList[iFormList].angleOrClipData.clip = adclp(FormList[iFormList].lengthOrCount.clipCount);
 							}
-							if (isclp(ind))
-								FormList[ind].angleOrClipData.clip = adclp(FormList[ind].lengthOrCount.clipCount);
-							if (iseclpx(ind))
-								FormList[ind].borderClipData = adclp(FormList[ind].clipEntries);
+							if (isclp(iFormList))
+								FormList[iFormList].angleOrClipData.clip = adclp(FormList[iFormList].lengthOrCount.clipCount);
+							if (iseclpx(iFormList))
+								FormList[iFormList].borderClipData = adclp(FormList[iFormList].clipEntries);
 						}
-						FormIndex += thed.formCount;
-						if (thed.formCount) {
+						FormIndex += fileHeader.formCount;
+						if (fileHeader.formCount) {
 
-							trct.left = trct.right = FormVertices[InsertedVertexIndex].x;
-							trct.bottom = trct.top = FormVertices[InsertedVertexIndex].y;
-							for (ind = InsertedVertexIndex + 1; ind < FormVertexIndex; ind++) {
+							insertedRectangle.left = insertedRectangle.right = FormVertices[InsertedVertexIndex].x;
+							insertedRectangle.bottom = insertedRectangle.top = FormVertices[InsertedVertexIndex].y;
+							for (iVertex = InsertedVertexIndex + 1; iVertex < FormVertexIndex; iVertex++) {
 
-								if (FormVertices[ind].x < trct.left)
-									trct.left = FormVertices[ind].x;
-								if (FormVertices[ind].x > trct.right)
-									trct.right = FormVertices[ind].x;
-								if (FormVertices[ind].y < trct.bottom)
-									trct.bottom = FormVertices[ind].y;
-								if (FormVertices[ind].y > trct.top)
-									trct.top = FormVertices[ind].y;
+								if (FormVertices[iVertex].x < insertedRectangle.left)
+									insertedRectangle.left = FormVertices[iVertex].x;
+								if (FormVertices[iVertex].x > insertedRectangle.right)
+									insertedRectangle.right = FormVertices[iVertex].x;
+								if (FormVertices[iVertex].y < insertedRectangle.bottom)
+									insertedRectangle.bottom = FormVertices[iVertex].y;
+								if (FormVertices[iVertex].y > insertedRectangle.top)
+									insertedRectangle.top = FormVertices[iVertex].y;
 							}
-						}
-					}
-					if (thed.stitchCount) {
-
-						for (ind = PCSHeader.stitchCount; ind < (unsigned)PCSHeader.stitchCount + thed.stitchCount; ind++) {
-
-							if (StitchBuffer[ind].attribute&ALTYPMSK) {
-
-								cod = (StitchBuffer[ind].attribute&FRMSK) + codof;
-								StitchBuffer[ind].attribute &= NFRMSK;
-								StitchBuffer[ind].attribute |= cod;
-							}
-							if (StitchBuffer[ind].x < trct.left)
-								trct.left = StitchBuffer[ind].x;
-							if (StitchBuffer[ind].x > trct.right)
-								trct.right = StitchBuffer[ind].x;
-							if (StitchBuffer[ind].y < trct.bottom)
-								trct.bottom = StitchBuffer[ind].y;
-							if (StitchBuffer[ind].y > trct.top)
-								trct.top = StitchBuffer[ind].y;
 						}
 					}
-					if (thed.headerType & 0x1000000) {
-						// ToDo - should FRMPW be sizeof(fPOINTATTR)?
-						filscor = (double)thed.formCount*FRMW +
-							gethand(&StitchBuffer[PCSHeader.stitchCount], thed.stitchCount)*HANDW +
-							thed.vertexLen*FRMPW +
-							thed.stitchCount*STCHW;
+					if (fileHeader.stitchCount) {
+
+						for (iStitch = PCSHeader.stitchCount; iStitch < (unsigned)PCSHeader.stitchCount + fileHeader.stitchCount; iStitch++) {
+
+							if (StitchBuffer[iStitch].attribute&ALTYPMSK) {
+
+								newAttribute = (StitchBuffer[iStitch].attribute&FRMSK) + encodedFormIndex;
+								StitchBuffer[iStitch].attribute &= NFRMSK;
+								StitchBuffer[iStitch].attribute |= newAttribute;
+							}
+							if (StitchBuffer[iStitch].x < insertedRectangle.left)
+								insertedRectangle.left = StitchBuffer[iStitch].x;
+							if (StitchBuffer[iStitch].x > insertedRectangle.right)
+								insertedRectangle.right = StitchBuffer[iStitch].x;
+							if (StitchBuffer[iStitch].y < insertedRectangle.bottom)
+								insertedRectangle.bottom = StitchBuffer[iStitch].y;
+							if (StitchBuffer[iStitch].y > insertedRectangle.top)
+								insertedRectangle.top = StitchBuffer[iStitch].y;
+						}
+					}
+					if (fileHeader.headerType & 0x1000000) {
+						// ToDo - should FRMPW be sizeof(fPOINTATTR) etc.?
+						filscor = (double)fileHeader.formCount*FRMW +
+							gethand(&StitchBuffer[PCSHeader.stitchCount], fileHeader.stitchCount)*HANDW +
+							fileHeader.vertexLen*FRMPW +
+							fileHeader.stitchCount*STCHW;
 						if (filscor > homscor) {
 
-							for (ind = 0; ind < 50; ind++)
-								ExtendedHeader.creatorName[ind] = thedx.creatorName[ind];
+							for (iName = 0; iName < 50; iName++)
+								ExtendedHeader.creatorName[iName] = thredHeader.creatorName[iName];
 							redfnam(DesignerName);
 							sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRDBY], ThrName, DesignerName);
 							SetWindowText(ThrEdWindow, MsgBuffer);
 						}
 					}
-					InsertCenter.x = (trct.right - trct.left) / 2 + trct.left;
-					InsertCenter.y = (trct.top - trct.bottom) / 2 + trct.bottom;
-					PCSHeader.stitchCount += thed.stitchCount;
-					tsiz.x = trct.right - trct.left;
-					tsiz.y = trct.top - trct.bottom;
+					InsertCenter.x = (insertedRectangle.right - insertedRectangle.left) / 2 + insertedRectangle.left;
+					InsertCenter.y = (insertedRectangle.top - insertedRectangle.bottom) / 2 + insertedRectangle.bottom;
+					PCSHeader.stitchCount += fileHeader.stitchCount;
+					insertedSize.x = insertedRectangle.right - insertedRectangle.left;
+					insertedSize.y = insertedRectangle.top - insertedRectangle.bottom;
 					ratsr();
-					InsertSize.x = tsiz.x*HorizontalRatio;
+					InsertSize.x = insertedSize.x*HorizontalRatio;
 					// ToDo - Should this be vertical ratio?
-					InsertSize.y = tsiz.y*HorizontalRatio;
-					tpnt.x = StitchWindowClientRect.right >> 1;
-					tpnt.y = StitchWindowClientRect.bottom >> 1;
-					insflin(tpnt);
+					InsertSize.y = insertedSize.y*HorizontalRatio;
+					initialInsertPoint.x = StitchWindowClientRect.right >> 1;
+					initialInsertPoint.y = StitchWindowClientRect.bottom >> 1;
+					insflin(initialInsertPoint);
 					NewFormVertexCount = 5;
 					setMap(SHOFRM);
 					setMap(INSFIL);
@@ -12027,51 +12028,53 @@ void insfil() {
 				}
 			} else {
 
-				ReadFile(InsertedFileHandle, (PCSHEADER*)&tphed, 0x46, &BytesRead, NULL);
+				ReadFile(InsertedFileHandle, (PCSHEADER*)&pcsFileHeader, 0x46, &BytesRead, NULL);
 				if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16) {
 
 					savdo();
-					tbuf = (PCSTCH*)BSequence;
-					ReadFile(InsertedFileHandle, (PCSTCH*)tbuf, tphed.stitchCount * sizeof(PCSTCH), &BytesRead, NULL);
-					ine = PCSHeader.stitchCount;
-					cod = 0;
-					for (ind = 0; ind < tphed.stitchCount; ind++) {
+					pcsStitchBuffer = (PCSTCH*)BSequence;
+					ReadFile(InsertedFileHandle, (PCSTCH*)pcsStitchBuffer, pcsFileHeader.stitchCount * sizeof(PCSTCH), &BytesRead, NULL);
+					iStitch = PCSHeader.stitchCount;
+					newAttribute = 0;
+					for (iPCSStitch = 0; iPCSStitch < pcsFileHeader.stitchCount; iPCSStitch++) {
 
-						if (tbuf[ind].tag == 3)
-							cod = tbuf[ind++].fx;
+						if (pcsStitchBuffer[iPCSStitch].tag == 3)
+							newAttribute = pcsStitchBuffer[iPCSStitch++].fx;
 						else {
 
-							StitchBuffer[ine].x = tbuf[ind].x + (float)tbuf[ind].fx / 256;
-							StitchBuffer[ine].y = tbuf[ind].y + (float)tbuf[ind].fy / 256;
-							StitchBuffer[ine++].attribute = cod;
+							StitchBuffer[iStitch].x = pcsStitchBuffer[iPCSStitch].x + (float)pcsStitchBuffer[iPCSStitch].fx / 256;
+							StitchBuffer[iStitch].y = pcsStitchBuffer[iPCSStitch].y + (float)pcsStitchBuffer[iPCSStitch].fy / 256;
+							StitchBuffer[iStitch++].attribute = newAttribute;
 						}
 					}
-					ind = PCSHeader.stitchCount;
-					trct.left = trct.right = StitchBuffer[ind].x;
-					trct.top = trct.bottom = StitchBuffer[ind++].y;
-					while (ind < (unsigned)ine) {
+					newStitchCount = iStitch;
+					iStitch = PCSHeader.stitchCount;
+					insertedRectangle.left = insertedRectangle.right = StitchBuffer[iPCSStitch].x;
+					insertedRectangle.top = insertedRectangle.bottom = StitchBuffer[iPCSStitch++].y;
+					while (iStitch < (unsigned)newStitchCount) {
 
-						if (StitchBuffer[ind].x < trct.left)
-							trct.left = StitchBuffer[ind].x;
-						if (StitchBuffer[ind].x > trct.right)
-							trct.right = StitchBuffer[ind].x;
-						if (StitchBuffer[ind].y < trct.bottom)
-							trct.bottom = StitchBuffer[ind].y;
-						if (StitchBuffer[ind].y > trct.top)
-							trct.top = StitchBuffer[ind].y;
-						ind++;
+						if (StitchBuffer[iStitch].x < insertedRectangle.left)
+							insertedRectangle.left = StitchBuffer[iStitch].x;
+						if (StitchBuffer[iStitch].x > insertedRectangle.right)
+							insertedRectangle.right = StitchBuffer[iStitch].x;
+						if (StitchBuffer[iStitch].y < insertedRectangle.bottom)
+							insertedRectangle.bottom = StitchBuffer[iStitch].y;
+						if (StitchBuffer[iStitch].y > insertedRectangle.top)
+							insertedRectangle.top = StitchBuffer[iStitch].y;
+						iStitch++;
 					}
-					InsertCenter.x = (trct.right - trct.left) / 2 + trct.left;
-					InsertCenter.y = (trct.top - trct.bottom) / 2 + trct.bottom;
-					PCSHeader.stitchCount = ine;
-					tsiz.x = trct.right - trct.left;
-					tsiz.y = trct.top - trct.bottom;
+					InsertCenter.x = (insertedRectangle.right - insertedRectangle.left) / 2 + insertedRectangle.left;
+					InsertCenter.y = (insertedRectangle.top - insertedRectangle.bottom) / 2 + insertedRectangle.bottom;
+					PCSHeader.stitchCount = newStitchCount;
+					insertedSize.x = insertedRectangle.right - insertedRectangle.left;
+					insertedSize.y = insertedRectangle.top - insertedRectangle.bottom;
 					ratsr();
-					InsertSize.x = tsiz.x*HorizontalRatio;
-					InsertSize.y = tsiz.y*HorizontalRatio;
-					tpnt.x = StitchWindowClientRect.right >> 1;
-					tpnt.y = StitchWindowClientRect.bottom >> 1;
-					insflin(tpnt);
+					InsertSize.x = insertedSize.x*HorizontalRatio;
+					// ToDo - Should this be vertical ratio?
+					InsertSize.y = insertedSize.y*HorizontalRatio;
+					initialInsertPoint.x = StitchWindowClientRect.right >> 1;
+					initialInsertPoint.y = StitchWindowClientRect.bottom >> 1;
+					insflin(initialInsertPoint);
 					NewFormVertexCount = 5;
 					setMap(SHOFRM);
 					setMap(INSFIL);
@@ -12086,30 +12089,30 @@ void insfil() {
 
 void duinsfil() {
 
-	fPOINT		off;
-	unsigned	ind;
-	fRECTANGLE*		trct;
+	fPOINT		offset;
+	unsigned	iForm, iVertex, iStitch;
+	fRECTANGLE*	trct;
 
 	px2stch();
-	off.x = SelectedPoint.x - InsertCenter.x;
-	off.y = SelectedPoint.y - InsertCenter.y;
-	for (ind = InsertedFormIndex; ind < FormIndex; ind++) {
+	offset.x = SelectedPoint.x - InsertCenter.x;
+	offset.y = SelectedPoint.y - InsertCenter.y;
+	for (iForm = InsertedFormIndex; iForm < FormIndex; iForm++) {
 
-		trct = &FormList[ind].rectangle;
-		trct->bottom += off.y;
-		trct->top += off.y;
-		trct->left += off.x;
-		trct->right += off.x;
+		trct = &FormList[iForm].rectangle;
+		trct->bottom += offset.y;
+		trct->top += offset.y;
+		trct->left += offset.x;
+		trct->right += offset.x;
 	}
-	for (ind = InsertedVertexIndex; ind < FormVertexIndex; ind++) {
+	for (iVertex = InsertedVertexIndex; iVertex < FormVertexIndex; iVertex++) {
 
-		FormVertices[ind].x += off.x;
-		FormVertices[ind].y += off.y;
+		FormVertices[iVertex].x += offset.x;
+		FormVertices[iVertex].y += offset.y;
 	}
-	for (ind = InsertedStitchCount; ind < PCSHeader.stitchCount; ind++) {
+	for (iStitch = InsertedStitchCount; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		StitchBuffer[ind].x += off.x;
-		StitchBuffer[ind].y += off.y;
+		StitchBuffer[iStitch].x += offset.x;
+		StitchBuffer[iStitch].y += offset.y;
 	}
 	rstMap(FRMOF);
 	setMap(INIT);
@@ -12127,57 +12130,59 @@ void gotbox() {
 
 void rngal() {
 
-	unsigned	ind, ine, in;
-	unsigned	pmax = 0, maxlen, len;
+	unsigned	iStitch = 0, iRange=0, rangeCount;
+	bool		flagInRange = false;
+	unsigned	largestRange = 0, maximumLength, length;
 	RANGE*		prng;
 
 	if (!rstMap(WASFPNT)) {
 
 		rstMap(GRPSEL);
-		ind = ine = in = 0;
+		// ToDo - Allocate memory correctly for stitch ranges
 		prng = (RANGE*)&BSequence;
 		rstMap(GRPSEL);
-		while (ind < PCSHeader.stitchCount) {
+		while (iStitch < PCSHeader.stitchCount) {
 
-			if (inrng(ind)) {
+			if (inrng(iStitch)) {
 
-				if (!in) {
+				if (!flagInRange) {
 
-					prng[ine].start = ind;
-					in = 1;
+					prng[iRange].start = iStitch;
+					flagInRange = true;
 				}
 			} else {
 
-				if (in) {
+				if (flagInRange) {
 
-					prng[ine].finish = ind - 1;
-					ine++;
-					in = 0;
+					prng[iRange].finish = iStitch - 1;
+					iRange++;
+					flagInRange = false;
 				}
 			}
-			ind++;
+			iStitch++;
 		}
-		if (in) {
+		if (flagInRange) {
 
-			prng[ine].finish = ind - 1;
-			ine++;
+			prng[iRange].finish = iStitch - 1;
+			iRange++;
 		}
-		if (ine) {
+		rangeCount = iRange;
+		if (rangeCount) {
 
-			maxlen = 0;
-			for (ind = 0; ind < ine; ind++) {
+			maximumLength = 0;
+			for (iRange = 0; iRange < rangeCount; iRange++) {
 
-				len = prng[ind].finish - prng[ind].start;
-				if (len > maxlen) {
+				length = prng[iRange].finish - prng[iRange].start;
+				if (length > maximumLength) {
 
-					maxlen = len;
-					pmax = ind;
+					maximumLength = length;
+					largestRange = iRange;
 				}
 			}
-			if (maxlen) {
+			if (maximumLength) {
 
-				ClosestPointIndex = prng[pmax].start;
-				GroupStitchIndex = prng[pmax].finish;
+				ClosestPointIndex = prng[largestRange].start;
+				GroupStitchIndex = prng[largestRange].finish;
 				setMap(GRPSEL);
 			}
 			gotbox();
@@ -12187,13 +12192,13 @@ void rngal() {
 
 void nucols() {
 
-	unsigned ind;
+	unsigned iForm, iStitch, ind;
 
 	clRmap((FormIndex << 5) + 1);
-	for (ind = 0; ind < SelectedFormCount; ind++) {
+	for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
-		setr(SelectedFormList[ind]);
-		SelectedForm = &FormList[ind];
+		setr(SelectedFormList[iForm]);
+		SelectedForm = &FormList[iForm];
 		if (SelectedForm->fillType) {
 
 			SelectedForm->fillColor = ActiveColor;
@@ -12204,51 +12209,51 @@ void nucols() {
 		if (SelectedForm->extendedAttribute&(AT_UND | AT_WALK | AT_CWLK))
 			SelectedForm->underlayColor = ActiveColor;
 	}
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		if (chkr((StitchBuffer[ind].attribute&FRMSK) >> FRMSHFT) && (StitchBuffer[ind].attribute&TYPMSK) != TYPMSK) {
+		if (chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT) && (StitchBuffer[iStitch].attribute&TYPMSK) != TYPMSK) {
 
-			StitchBuffer[ind].attribute &= NCOLMSK;
-			StitchBuffer[ind].attribute |= ActiveColor;
+			StitchBuffer[iStitch].attribute &= NCOLMSK;
+			StitchBuffer[iStitch].attribute |= ActiveColor;
 		}
 	}
 }
 
-BOOL dunum(unsigned cod) {
+BOOL dunum(unsigned code) {
 
-	if (cod >= '0'&&cod <= '9') {
+	if (code >= '0'&&code <= '9') {
 
-		NumericCode = cod;
+		NumericCode = code;
 		return 1;
 	}
-	if (cod >= VK_NUMPAD0 && cod <= VK_NUMPAD9) {
+	if (code >= VK_NUMPAD0 && code <= VK_NUMPAD9) {
 
-		NumericCode = cod - '0';
+		NumericCode = code - '0';
 		return 1;
 	}
 	return 0;
 }
 
-void stchrct(fRECTANGLE* rct)
+void stchrct(fRECTANGLE* rectangle)
 {
 	unsigned ind;
 
 	if (PCSHeader.stitchCount)
 	{
-		rct->bottom = rct->left = 1e10;
-		rct->top = rct->right = 0;
+		rectangle->bottom = rectangle->left = 1e10;
+		rectangle->top = rectangle->right = 0;
 		if (PCSHeader.stitchCount) {
 
 			for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
 
-				if (StitchBuffer[ind].x < rct->left)
-					rct->left = StitchBuffer[ind].x;
-				if (StitchBuffer[ind].x > rct->right)
-					rct->right = StitchBuffer[ind].x;
-				if (StitchBuffer[ind].y < rct->bottom)
-					rct->bottom = StitchBuffer[ind].y;
-				if (StitchBuffer[ind].y > rct->top)
-					rct->top = StitchBuffer[ind].y;
+				if (StitchBuffer[ind].x < rectangle->left)
+					rectangle->left = StitchBuffer[ind].x;
+				if (StitchBuffer[ind].x > rectangle->right)
+					rectangle->right = StitchBuffer[ind].x;
+				if (StitchBuffer[ind].y < rectangle->bottom)
+					rectangle->bottom = StitchBuffer[ind].y;
+				if (StitchBuffer[ind].y > rectangle->top)
+					rectangle->top = StitchBuffer[ind].y;
 			}
 		}
 	}
