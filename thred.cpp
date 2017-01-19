@@ -12610,7 +12610,7 @@ void angdif(double angle) {
 
 void rotmrk() {
 
-	unsigned	iVertex, iStitch, ind, segments, codedFormIndex;
+	unsigned	iVertex, iStitch, segments, codedFormIndex;
 	double		tang;
 
 	if (chkMap(GMRK) && (chkMap(FORMSEL) || chkMap(GRPSEL))) {
@@ -12822,67 +12822,70 @@ void ritcur() {
 	}
 }
 
-void delsfrms(unsigned cod) {
+void delsfrms(unsigned code) {
 
-	unsigned ind, ine, inf;
+	unsigned iForm, formFlagWordCount, iWord;
+	unsigned validFormCount, deletedFormCount, iStitch, validStitchCount;
 
-	if (cod) {
+	if (code) {
 
-		inf = (FormIndex >> 5) + 1;
-		for (ine = 0; ine < inf; ine++)
-			MarkedStitchMap[ine] = 0;
-		for (ind = 0; (unsigned)ind < SelectedFormCount; ind++) {
-
-			ClosestFormToCursor = SelectedFormList[ind];
-			setr(ClosestFormToCursor);
+		formFlagWordCount = (FormIndex >> 5) + 1;
+		// ToDo - use local memory allocation for map of deleted forms instead of MarkedStitchMap
+		for (iWord = 0; iWord < formFlagWordCount; iWord++)
+			MarkedStitchMap[iWord] = 0;
+		for (iForm = 0; (unsigned)iForm < SelectedFormCount; iForm++) {
+			// ToDo - Could ClosestFormToCursor be replaced with a local variable?
+			ClosestFormToCursor = SelectedFormList[iForm];
+			setr(ClosestFormToCursor); 
 			fvars(ClosestFormToCursor);
 			f1del();
 		}
+		// ToDo - Allocate memory for FormIndices
 		FormIndices = (unsigned*)BSequence;
-		inf = 0; ind = 0;
-		for (ine = 0; ine < FormIndex; ine++) {
+		validFormCount = 0; deletedFormCount = 0;
+		for (iForm = 0; iForm < FormIndex; iForm++) {
 
-			if (!chkr(ine)) {
+			if (!chkr(iForm)) {
 
-				frmcpy(&FormList[inf], &FormList[ine]);
-				FormIndices[ine] = (ine - ind) << 4;
-				inf++;
+				frmcpy(&FormList[validFormCount], &FormList[iForm]);
+				FormIndices[iForm] = (iForm - deletedFormCount) << 4;
+				validFormCount++;
 			} else
-				ind++;
+				deletedFormCount++;
 		}
-		FormIndex = inf;
-		inf = 0;
+		FormIndex = validFormCount;
+		validStitchCount = 0;
 		if (chkMap(DELTO)) {
 
-			for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-				if (StitchBuffer[ind].attribute&ALTYPMSK) {
+				if (StitchBuffer[iStitch].attribute&ALTYPMSK) {
 
-					cod = (StitchBuffer[ind].attribute&FRMSK) >> FRMSHFT;
-					if (!chkr(cod)) {
+					iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
+					if (!chkr(iForm)) {
 
-						StitchBuffer[inf].attribute = StitchBuffer[ind].attribute &= NFRMSK;
-						StitchBuffer[inf].attribute |= FormIndices[cod];
-						StitchBuffer[inf].x = StitchBuffer[ind].x;
-						StitchBuffer[inf++].y = StitchBuffer[ind].y;
+						StitchBuffer[validStitchCount].attribute = StitchBuffer[iStitch].attribute &= NFRMSK;
+						StitchBuffer[validStitchCount].attribute |= FormIndices[code];
+						StitchBuffer[validStitchCount].x = StitchBuffer[iStitch].x;
+						StitchBuffer[validStitchCount++].y = StitchBuffer[iStitch].y;
 					}
 				} else {
 
-					StitchBuffer[inf].attribute = StitchBuffer[ind].attribute;
-					StitchBuffer[inf].x = StitchBuffer[ind].x;
-					StitchBuffer[inf++].y = StitchBuffer[ind].y;
+					StitchBuffer[validStitchCount].attribute = StitchBuffer[iStitch].attribute;
+					StitchBuffer[validStitchCount].x = StitchBuffer[iStitch].x;
+					StitchBuffer[validStitchCount++].y = StitchBuffer[iStitch].y;
 				}
 			}
-			PCSHeader.stitchCount = inf;
+			PCSHeader.stitchCount = validStitchCount;
 		} else {
 
-			for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-				if (!(StitchBuffer[ind].attribute&NOTFRM)) {
+				if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
 
-					cod = (StitchBuffer[ind].attribute&FRMSK) >> FRMSHFT;
-					if (chkr(cod))
-						StitchBuffer[ind].attribute &= (NFRMSK&NTYPMSK);
+					iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
+					if (chkr(iForm))
+						StitchBuffer[iStitch].attribute &= (NFRMSK&NTYPMSK);
 				}
 			}
 		}
@@ -12949,9 +12952,9 @@ void respac() {
 	}
 }
 
-BOOL chkminus(unsigned cod) {
+BOOL chkminus(unsigned code) {
 
-	if (cod == 189 || cod == 109) {
+	if (code == 189 || code == 109) {
 
 		if (PreferenceIndex == PCLPOF + 1)
 			return 1;
@@ -12965,7 +12968,7 @@ BOOL chkminus(unsigned cod) {
 
 void retrac() {
 
-	unsigned src, dst;
+	unsigned source, destination;
 
 	if (chkMap(GRPSEL)) {
 
@@ -12974,13 +12977,13 @@ void retrac() {
 		if (!GroupStartStitch)
 			GroupStartStitch++;
 		makspac(GroupEndStitch + 1, GroupEndStitch - GroupStartStitch);
-		src = GroupEndStitch - 1;
-		dst = GroupEndStitch + 1;
-		while (src >= GroupStartStitch) {
-
-			StitchBuffer[dst].attribute = StitchBuffer[src].attribute;
-			StitchBuffer[dst].x = StitchBuffer[src].x;
-			StitchBuffer[dst++].y = StitchBuffer[src--].y;
+		source = GroupEndStitch - 1;
+		destination = GroupEndStitch + 1;
+		while (source >= GroupStartStitch) {
+			// ToDo - can this be simplified to StitchBuffer[destination++] = StitchBuffer[Source--]
+			StitchBuffer[destination].attribute = StitchBuffer[source].attribute;
+			StitchBuffer[destination].x = StitchBuffer[source].x;
+			StitchBuffer[destination++].y = StitchBuffer[source--].y;
 		}
 		coltab();
 		setMap(RESTCH);
@@ -12988,10 +12991,10 @@ void retrac() {
 		shoseln(IDS_GRPMSG, IDS_RETRAC);
 }
 
-void setgrd(COLORREF col) {
+void setgrd(COLORREF color) {
 
-	unsigned	ind;
-	GRDCOD		cods[] = {
+	unsigned	iCode;
+	GRDCOD		gridCodes[] = {
 
 		ID_GRDHI,HIGRD,
 		ID_GRDMED,MEDGRD,
@@ -13001,15 +13004,15 @@ void setgrd(COLORREF col) {
 		ID_GRDGRN,GRNGRD,
 	};
 
-	for (ind = 0; ind < 6; ind++) {
+	for (iCode = 0; iCode < 6; iCode++) {
 
-		if (col == cods[ind].col)
-			CheckMenuItem(MainMenu, cods[ind].id, MF_CHECKED);
+		if (color == gridCodes[iCode].col)
+			CheckMenuItem(MainMenu, gridCodes[iCode].id, MF_CHECKED);
 		else
-			CheckMenuItem(MainMenu, cods[ind].id, MF_UNCHECKED);
+			CheckMenuItem(MainMenu, gridCodes[iCode].id, MF_UNCHECKED);
 	}
-	GridPen = nuPen(GridPen, 1, col);
-	IniFile.gridColor = col;
+	GridPen = nuPen(GridPen, 1, color);
+	IniFile.gridColor = color;
 	setMap(RESTCH);
 	setMap(DUMEN);
 }
