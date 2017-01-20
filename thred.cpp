@@ -427,7 +427,7 @@ extern	unsigned short	SelectedFormList[MAXFORMS];
 extern	POINT			SelectedFormsLine[9];
 extern	RECT			SelectedFormsRect;
 extern	POINT			SelectedPointsLine[9];
-extern	unsigned short	SideCount;
+extern	unsigned short	VertexCount;
 extern	double			SnapLength;
 extern	double			SpiralWrap;
 extern	TCHAR*			StringTable[STR_LEN];
@@ -3932,14 +3932,14 @@ void chknum() {
 
 				savdo();
 				SelectedForm->fillStart = value / PFGRAN;
-				SelectedForm->fillStart %= SideCount;
+				SelectedForm->fillStart %= VertexCount;
 				break;
 
 			case LDEND:
 
 				savdo();
 				SelectedForm->fillEnd = value / PFGRAN;
-				SelectedForm->fillEnd %= SideCount;
+				SelectedForm->fillEnd %= VertexCount;
 				break;
 
 			case LFTHUPCNT:
@@ -5614,7 +5614,7 @@ void nuFil() {
 							bfilmsg();
 						for (unsigned iForm = 0; iForm < FormIndex; iForm++) {
 
-							FormList[iForm].vertices = adflt(FormList[iForm].sides);
+							FormList[iForm].vertices = adflt(FormList[iForm].vertexCount);
 							if (FormList[iForm].type == SAT) {
 
 								if (FormList[iForm].satinGuideCount)
@@ -8433,7 +8433,7 @@ unsigned sizfclp()
 {
 	unsigned clipSize;
 
-	clipSize = sizeof(FORMCLIP) + SideCount * sizeof(fPOINT);
+	clipSize = sizeof(FORMCLIP) + VertexCount * sizeof(fPOINT);
 	if (SelectedForm->type == SAT)
 		clipSize += SelectedForm->satinGuideCount * sizeof(SATCON);
 	if (iseclp(ClosestFormToCursor))
@@ -8479,7 +8479,7 @@ unsigned sizclp() {
 
 	unsigned length = 0;
 
-	length = FileSize = sizeof(FORMCLIP) + SideCount * sizeof(fPOINT);
+	length = FileSize = sizeof(FORMCLIP) + VertexCount * sizeof(fPOINT);
 	if (SelectedForm->type == SAT)
 		FileSize += SelectedForm->satinGuideCount * sizeof(SATCON);
 	if (SelectedForm->fillType || SelectedForm->edgeType) {
@@ -8590,7 +8590,7 @@ void duclip() {
 				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
 					SelectedForm = &FormList[SelectedFormList[iForm]];
-					for (iSide = 0; iSide < SelectedForm->sides; iSide++) {
+					for (iSide = 0; iSide < SelectedForm->vertexCount; iSide++) {
 
 						CurrentFormVertices[iVertex].x = SelectedForm->vertices[iSide].x;
 						CurrentFormVertices[iVertex++].y = SelectedForm->vertices[iSide].y;
@@ -8698,12 +8698,12 @@ void duclip() {
 					ClipFormHeader->clipType = CLP_FRM;
 					frmcpy(&ClipFormHeader->form, &FormList[ClosestFormToCursor]);
 					CurrentFormVertices = (fPOINT*)&ClipFormHeader[1];
-					for (iSide = 0; iSide < SelectedForm->sides; iSide++) {
+					for (iSide = 0; iSide < SelectedForm->vertexCount; iSide++) {
 
 						CurrentFormVertices[iSide].x = SelectedForm->vertices[iSide].x;
 						CurrentFormVertices[iSide].y = SelectedForm->vertices[iSide].y;
 					}
-					guides = (SATCON*)&CurrentFormVertices[SideCount];
+					guides = (SATCON*)&CurrentFormVertices[VertexCount];
 					iGuide = 0;
 					if (SelectedForm->type == SAT) {
 
@@ -9482,7 +9482,7 @@ void dubuf() {
 
 		for (iForm = 0; iForm < FormIndex; iForm++) {
 
-			vertexCount += FormList[iForm].sides;
+			vertexCount += FormList[iForm].vertexCount;
 			if (FormList[iForm].type == SAT)
 				guideCount += FormList[iForm].satinGuideCount;
 			if (isclp(iForm))
@@ -9527,7 +9527,7 @@ void dubuf() {
 
 			frmcpy(&forms[iForm], &FormList[iForm]);
 			forms[iForm].vertices = (fPOINT*)(&vertices[iDestinationVertex] - &vertices[0]);
-			for (iVertex = 0; iVertex < FormList[iForm].sides; iVertex++) {
+			for (iVertex = 0; iVertex < FormList[iForm].vertexCount; iVertex++) {
 
 				vertices[iDestinationVertex].x = FormList[iForm].vertices[iVertex].x;
 				vertices[iDestinationVertex++].y = FormList[iForm].vertices[iVertex].y;
@@ -9779,7 +9779,7 @@ void delet() {
 
 		savdo();
 		fvars(ClosestFormToCursor);
-		clRmap((SideCount >> 5) + 1);
+		clRmap((VertexCount >> 5) + 1);
 		currentFormVertex = SelectedFormVertices.start;
 		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 
@@ -9787,7 +9787,7 @@ void delet() {
 			currentFormVertex = pdir(currentFormVertex);
 		}
 		currentFormVertex = 0;
-		for (iVertex = 0; iVertex < SideCount; iVertex++) {
+		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 
 			if (!chkr(iVertex)) {
 
@@ -9808,7 +9808,7 @@ void delet() {
 		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 			FormList[iForm].vertices -= (SelectedFormVertices.vertexCount + 1);
 		FormVertexIndex -= (SelectedFormVertices.vertexCount + 1);
-		SelectedForm->sides -= (SelectedFormVertices.vertexCount + 1);
+		SelectedForm->vertexCount -= (SelectedFormVertices.vertexCount + 1);
 		frmout(ClosestFormToCursor);
 		if (SelectedForm->type == SAT)
 			satadj();
@@ -10525,7 +10525,7 @@ void ritmov() {
 	SelectObject(StitchWindowDC, FormPen);
 	if (ClosestVertexToCursor) {
 
-		if (ClosestVertexToCursor == (unsigned)SelectedForm->sides - 1 && SelectedForm->type == FRMLINE)
+		if (ClosestVertexToCursor == (unsigned)SelectedForm->vertexCount - 1 && SelectedForm->type == FRMLINE)
 			Polyline(StitchWindowDC, RubberBandLine, 2);
 		else
 			Polyline(StitchWindowDC, RubberBandLine, 3);
@@ -10624,7 +10624,7 @@ void rotfn() {
 
 			ClosestFormToCursor = SelectedFormList[iForm];
 			fvars(ClosestFormToCursor);
-			for (iVertex = 0; iVertex < SideCount; iVertex++)
+			for (iVertex = 0; iVertex < VertexCount; iVertex++)
 				rotflt(&CurrentFormVertices[iVertex]);
 			frmout(ClosestFormToCursor);
 			refilfn();
@@ -10638,7 +10638,7 @@ void rotfn() {
 		if (rstMap(FRMROT)) {
 
 			fvars(ClosestFormToCursor);
-			for (iVertex = 0; iVertex < SideCount; iVertex++)
+			for (iVertex = 0; iVertex < VertexCount; iVertex++)
 				rotflt(&CurrentFormVertices[iVertex]);
 			frmout(ClosestFormToCursor);
 			refil();
@@ -11943,7 +11943,7 @@ void insfil() {
 						InsertedFileHandle = 0;
 						for (iFormList = FormIndex; iFormList < FormIndex + fileHeader.formCount; iFormList++) {
 
-							FormList[iFormList].vertices = adflt(FormList[iFormList].sides);
+							FormList[iFormList].vertices = adflt(FormList[iFormList].vertexCount);
 							if (FormList[iFormList].type == SAT) {
 
 								if (FormList[iFormList].satinGuideCount)
@@ -12621,7 +12621,7 @@ void rotmrk() {
 			fvars(ClosestFormToCursor);
 			LowestAngle = HighestAngle = 0;
 			OriginalAngle = atan2(CurrentFormVertices[0].y - ZoomMarkPoint.y, CurrentFormVertices[0].x - ZoomMarkPoint.x);
-			for (iVertex = 1; iVertex < SideCount; iVertex++)
+			for (iVertex = 1; iVertex < VertexCount; iVertex++)
 				angdif(nuang(CurrentFormVertices[iVertex].y - ZoomMarkPoint.y, CurrentFormVertices[iVertex].x - ZoomMarkPoint.x));
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
@@ -13168,7 +13168,7 @@ void gsnap() {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
 			ClosestFormToCursor = SelectedFormList[iForm];
-			frmsnap(FormList[ClosestFormToCursor].vertices, FormList[ClosestFormToCursor].sides);
+			frmsnap(FormList[ClosestFormToCursor].vertices, FormList[ClosestFormToCursor].vertexCount);
 			frmout(ClosestFormToCursor);
 			refil();
 		}
@@ -13178,7 +13178,7 @@ void gsnap() {
 		if (chkMap(FORMSEL)) {
 
 			savdo();
-			frmsnap(FormList[ClosestFormToCursor].vertices, FormList[ClosestFormToCursor].sides);
+			frmsnap(FormList[ClosestFormToCursor].vertices, FormList[ClosestFormToCursor].vertexCount);
 			frmout(ClosestFormToCursor);
 			refil();
 			setMap(RESTCH);
@@ -14114,7 +14114,7 @@ void dutrac() {
 			return;
 		}
 		SelectedForm->vertices = adflt(OutputIndex);
-		SelectedForm->sides = OutputIndex;
+		SelectedForm->vertexCount = OutputIndex;
 		SelectedForm->type = FRMFPOLY;
 		SelectedForm->attribute = ActiveLayer << 1;
 		frmout(FormIndex);
@@ -14563,35 +14563,35 @@ void trcnum(unsigned shift, COLORREF color, unsigned iRGB) {
 	TextOut(DrawItem->hDC, xPosition, 1, buffer, strlen(buffer));
 }
 
-void upnum(unsigned ind) {
+void upnum(unsigned iRGB) {
 
-	trcnum(TraceShift[ind], InvertUpColor, ind);
+	trcnum(TraceShift[iRGB], InvertUpColor, iRGB);
 }
 
-void dwnum(unsigned ind) {
+void dwnum(unsigned iRGB) {
 
-	trcnum(TraceShift[ind], InvertDownColor, ind);
+	trcnum(TraceShift[iRGB], InvertDownColor, iRGB);
 }
 
-void ritrcol(COLORREF* tref, unsigned num) {
+void ritrcol(COLORREF* color, unsigned number) {
 
-	*tref &= TraceRGBMask[ColumnColor];
-	num &= 0xff;
-	*tref |= (num << TraceShift[ColumnColor]);
+	*color &= TraceRGBMask[ColumnColor];
+	number &= 0xff;
+	*color |= (number << TraceShift[ColumnColor]);
 }
 
-void dutrnum0(unsigned num) {
+void dutrnum0(unsigned number) {
 
 	rstMap(NUMIN);
 	rstMap(TRNIN0);
 	if (chkMap(TRNUP)) {
 
-		ritrcol(&InvertUpColor, num);
+		ritrcol(&InvertUpColor, number);
 		UpPixelColor = InvertUpColor ^ 0xffffff;
 		redraw(TraceUpWindow[ColumnColor]);
 	} else {
 
-		ritrcol(&InvertDownColor, num);
+		ritrcol(&InvertDownColor, number);
 		DownPixelColor = InvertDownColor ^ 0xffffff;
 		redraw(TraceDownWindow[ColumnColor]);
 	}
@@ -14603,29 +14603,29 @@ void dutrnum0(unsigned num) {
 
 void dutrnum1() {
 
-	double	tdub;
+	double	traceLength;
 
 	DestroyWindow(GeneralNumberInputBox);
 	rstMap(NUMIN);
 	rstMap(TRNIN1);
-	tdub = atof(MsgBuffer);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", tdub);
-	if (tdub > 9)
-		tdub = 9;
+	traceLength = atof(MsgBuffer);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", traceLength);
+	if (traceLength > 9)
+		traceLength = 9;
 	if (chkMap(TRNUP)) {
 
-		IniFile.traceLength = tdub*PFGRAN;
+		IniFile.traceLength = traceLength*PFGRAN;
 		trcstpnum();
 	} else {
 
-		IniFile.traceRatio = 1 + pow(0.1, tdub);
+		IniFile.traceRatio = 1 + pow(0.1, traceLength);
 		trcratnum();
 	}
 }
 
 void trcsel() {
 
-	unsigned ind, max, xind;
+	unsigned iPixel, maximumColorComponent, iRGB;
 
 	if (*PCSBMPFileName) {
 
@@ -14638,19 +14638,19 @@ void trcsel() {
 		trace();
 		rstMap(HIDMAP);
 		rstMap(TRSET);
-		for (ind = 0; ind < BitmapWidth*BitmapHeight; ind++) {
+		for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
 
-			trcols(TraceBitmapData[ind]);
-			max = PixelColors[0];
-			xind = 2;
-			if (PixelColors[1] > max) {
+			trcols(TraceBitmapData[iPixel]);
+			maximumColorComponent = PixelColors[0];
+			iRGB = 2;
+			if (PixelColors[1] > maximumColorComponent) {
 
-				max = PixelColors[1];
-				xind = 1;
+				maximumColorComponent = PixelColors[1];
+				iRGB = 1;
 			}
-			if (PixelColors[2] > max)
-				xind = 0;
-			TraceBitmapData[ind] &= TraceRGB[xind];
+			if (PixelColors[2] > maximumColorComponent)
+				iRGB = 0;
+			TraceBitmapData[iPixel] &= TraceRGB[iRGB];
 		}
 		BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, TraceDC, 0, 0, SRCCOPY);
 		setMap(WASDSEL);
@@ -14662,12 +14662,12 @@ void trcsel() {
 
 void trinit() {
 
-	unsigned	ind, ine;
-	unsigned	hst[3][256];
-	unsigned*	phst;
-	unsigned	hi[3];
-	unsigned	col[3] = { 0 };
-	COLORREF	tcol;
+	unsigned	iPixel, iRGB, swapComponent, iData, iLevel;
+	unsigned	histogramData[3][256];
+	unsigned*	histogram1D;
+	unsigned	componentPeakCount[3];
+	unsigned	componentPeak[3] = { 0 };
+	COLORREF	color;
 
 	if (*PCSBMPFileName) {
 
@@ -14680,61 +14680,61 @@ void trinit() {
 				getrmap();
 			if (chkMap(MONOMAP)) {
 
-				tcol = TraceBitmapData[0];
-				for (ind = 0; ind < BitmapWidth*BitmapHeight; ind++) {
+				color = TraceBitmapData[0];
+				for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
 
-					if (TraceBitmapData[ind] != tcol)
+					if (TraceBitmapData[iPixel] != color)
 						break;
 				}
-				if (ind < BitmapWidth*BitmapHeight) {
+				if (iPixel < BitmapWidth*BitmapHeight) {
 
-					trcols(TraceBitmapData[ind]);
+					trcols(TraceBitmapData[iPixel]);
 					HighColors[0] = PixelColors[0];
 					HighColors[1] = PixelColors[1];
 					HighColors[2] = PixelColors[2];
-					trcols(tcol);
-					for (ind = 0; ind < 3; ind++) {
+					trcols(color);
+					for (iRGB = 0; iRGB < 3; iRGB++) {
 
-						if (PixelColors[ind] > HighColors[ind]) {
+						if (PixelColors[iRGB] > HighColors[iRGB]) {
 
-							ine = PixelColors[ind];
-							PixelColors[ind] = HighColors[ind];
-							HighColors[ind] = ine;
+							swapComponent = PixelColors[iRGB];
+							PixelColors[iRGB] = HighColors[iRGB];
+							HighColors[iRGB] = swapComponent;
 						}
-						col[ind] = ((HighColors[ind] - PixelColors[ind]) >> 1) + PixelColors[ind];
+						componentPeak[iRGB] = ((HighColors[iRGB] - PixelColors[iRGB]) >> 1) + PixelColors[iRGB];
 					}
 				}
 			} else {
+				// ToDo - does this perform better than a 2D loop?
+				histogram1D = (unsigned*)histogramData;
+				for (iData = 0; iData < 768; iData++)
+					histogram1D[iData] = 0;
+				for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
 
-				phst = (unsigned*)hst;
-				for (ind = 0; ind < 768; ind++)
-					phst[ind] = 0;
-				for (ind = 0; ind < BitmapWidth*BitmapHeight; ind++) {
-
-					trcols(TraceBitmapData[ind]);
-					for (ine = 0; ine < 3; ine++)
-						hst[ine][PixelColors[ine]]++;
+					trcols(TraceBitmapData[iPixel]);
+					for (iRGB = 0; iRGB < 3; iRGB++)
+						histogramData[iRGB][PixelColors[iRGB]]++;
 				}
-				for (ind = 0; ind < 3; ind++)
-					hi[ind] = 0;
-				for (ind = 0; ind < 256; ind++) {
+				for (iRGB = 0; iRGB < 3; iRGB++)
+					componentPeakCount[iRGB] = 0;
+				for (iLevel = 0; iLevel < 256; iLevel++) {
 
-					for (ine = 0; ine < 3; ine++) {
+					for (iRGB = 0; iRGB < 3; iRGB++) {
 
-						if (hst[ine][ind] > hi[ine]) {
+						if (histogramData[iRGB][iLevel] > componentPeakCount[iRGB]) {
 
-							hi[ine] = hst[ine][ind];
-							col[ine] = ind;
+							componentPeakCount[iRGB] = histogramData[iRGB][iLevel];
+							componentPeak[iRGB] = iLevel;
 						}
 					}
 				}
 			}
 			InvertDownColor = 0;
-			for (ind = 0; ind < 3; ind++) {
+			for (iRGB = 0; iRGB < 3; iRGB++) {
 
-				if (col[ind])
-					col[ind]--;
-				InvertDownColor |= col[ind] << TraceShift[ind];
+				if (componentPeak[iRGB])
+					componentPeak[iRGB]--;
+				InvertDownColor |= componentPeak[iRGB] << TraceShift[iRGB];
 			}
 			DownPixelColor = InvertDownColor ^ 0xffffff;
 			InvertUpColor = 0xffffff;
@@ -14746,38 +14746,38 @@ void trinit() {
 		tabmsg(IDS_MAPLOD);
 }
 
-void stch2bit(double px, double py) {
+void stch2bit(double xCoord, double yCoord) {
 
 	if (chkMap(LANDSCAP))
-		py -= (UnzoomedRect.y - BitmapSizeinStitches.y);
-	BitmapPoint.x = BmpStitchRatio.x*px;
-	BitmapPoint.y = (BitmapHeight - BmpStitchRatio.y*py);
+		yCoord -= (UnzoomedRect.y - BitmapSizeinStitches.y);
+	BitmapPoint.x = BmpStitchRatio.x*xCoord;
+	BitmapPoint.y = (BitmapHeight - BmpStitchRatio.y*yCoord);
 }
 
-void pxlin(unsigned strt, unsigned fin) {
+void pxlin(unsigned start, unsigned finish) {
 
-	POINT		lin[2];
+	POINT		line[2];
 
-	stch2bit(CurrentFormVertices[strt].x, CurrentFormVertices[strt].y);
-	lin[0].x = BitmapPoint.x;
-	lin[0].y = BitmapPoint.y;
-	stch2bit(CurrentFormVertices[fin].x, CurrentFormVertices[fin].y);
-	lin[1].x = BitmapPoint.x;
-	lin[1].y = BitmapPoint.y;
-	Polyline(BitmapDC, lin, 2);
-	Polyline(TraceDC, lin, 2);
+	stch2bit(CurrentFormVertices[start].x, CurrentFormVertices[start].y);
+	line[0].x = BitmapPoint.x;
+	line[0].y = BitmapPoint.y;
+	stch2bit(CurrentFormVertices[finish].x, CurrentFormVertices[finish].y);
+	line[1].x = BitmapPoint.x;
+	line[1].y = BitmapPoint.y;
+	Polyline(BitmapDC, line, 2);
+	Polyline(TraceDC, line, 2);
 }
 
 void bfrm() {
 
-	unsigned ind;
+	unsigned iVertex;
 
-	if (SideCount) {
+	if (VertexCount) {
 
-		for (ind = 0; ind < (unsigned)SideCount - 1; ind++)
-			pxlin(ind, ind + 1);
+		for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++)
+			pxlin(iVertex, iVertex + 1);
 		if (SelectedForm->type != FRMLINE)
-			pxlin(ind, 0);
+			pxlin(iVertex, 0);
 	}
 }
 
@@ -14843,7 +14843,7 @@ void frmpos(float dx, float dy) {
 
 	unsigned ine;
 
-	for (ine = 0; ine < SelectedForm->sides; ine++) {
+	for (ine = 0; ine < SelectedForm->vertexCount; ine++) {
 
 		SelectedForm->vertices[ine].x += dx;
 		SelectedForm->vertices[ine].y += dy;
@@ -15272,7 +15272,7 @@ void selfrmx() {
 	if (rstMap(FORMSEL)) {
 
 		setMap(FRMPSEL);
-		ClosestVertexToCursor = FormList[ClosestFormToCursor].sides - 1;
+		ClosestVertexToCursor = FormList[ClosestFormToCursor].vertexCount - 1;
 	}
 	setMap(RESTCH);
 }
@@ -15336,7 +15336,7 @@ void fixpclp() {
 		CurrentFormVertices[ine].y = InterleaveSequence[ind].y + pof.y;
 		ine++;
 	}
-	SelectedForm->sides += cnt;
+	SelectedForm->vertexCount += cnt;
 	refil();
 	coltab();
 	setMap(RESTCH);
@@ -16099,14 +16099,14 @@ unsigned chkMsg() {
 					rstMap(FRMPSEL);
 					setMap(FPSEL);
 					SelectedFormVertices.finish = ClosestVertexToCursor;
-					ine = (SelectedFormVertices.finish - SelectedFormVertices.start + SideCount) % SideCount;
-					if (ine < (unsigned)SideCount >> 1) {
+					ine = (SelectedFormVertices.finish - SelectedFormVertices.start + VertexCount) % VertexCount;
+					if (ine < (unsigned)VertexCount >> 1) {
 
 						SelectedFormVertices.vertexCount = ine;
 						setMap(PSELDIR);
 					} else {
 
-						SelectedFormVertices.vertexCount = SideCount - ine;
+						SelectedFormVertices.vertexCount = VertexCount - ine;
 						rstMap(PSELDIR);
 					}
 					setpsel();
@@ -16522,7 +16522,7 @@ unsigned chkMsg() {
 
 				ClosestFormToCursor = FormIndex + ind;
 				fvars(ClosestFormToCursor);
-				for (ine = 0; ine < SelectedForm->sides; ine++) {
+				for (ine = 0; ine < SelectedForm->vertexCount; ine++) {
 
 					SelectedForm->vertices[ine].x += FormMoveDelta.x;
 					SelectedForm->vertices[ine].y += FormMoveDelta.y;
@@ -19145,12 +19145,12 @@ unsigned chkMsg() {
 							SelectedForm = &FormList[FormIndex];
 							FillMemory(SelectedForm, sizeof(FRMHED), 0);
 							SelectedForm->type = FRMLINE;
-							SelectedForm->sides = ClipFormVerticesData->vertexCount + 1;
-							SelectedForm->vertices = adflt(SelectedForm->sides);
+							SelectedForm->vertexCount = ClipFormVerticesData->vertexCount + 1;
+							SelectedForm->vertices = adflt(SelectedForm->vertexCount);
 							fvars(ClosestFormToCursor);
-							MoveMemory(SelectedForm->vertices, &ClipFormVerticesData[1], sizeof(fPOINT)*SelectedForm->sides);
+							MoveMemory(SelectedForm->vertices, &ClipFormVerticesData[1], sizeof(fPOINT)*SelectedForm->vertexCount);
 							setMap(INIT);
-							NewFormVertexCount = SelectedForm->sides;
+							NewFormVertexCount = SelectedForm->vertexCount;
 							unfrm();
 							setmfrm();
 							setMap(SHOFRM);
@@ -19173,8 +19173,8 @@ unsigned chkMsg() {
 						for (ind = 0; ind < ClipFormsCount; ind++) {
 
 							SelectedForm = &FormList[FormIndex + ind];
-							SelectedForm->vertices = adflt(SelectedForm->sides);
-							for (ine = 0; ine < SelectedForm->sides; ine++) {
+							SelectedForm->vertices = adflt(SelectedForm->vertexCount);
+							for (ine = 0; ine < SelectedForm->vertexCount; ine++) {
 
 								SelectedForm->vertices[ine].x = CurrentFormVertices[inf].x;
 								SelectedForm->vertices[ine].y = CurrentFormVertices[inf++].y;
@@ -19271,10 +19271,10 @@ unsigned chkMsg() {
 							fvars(FormIndex);
 							frmcpy(&FormList[FormIndex], &ClipFormHeader->form);
 							FormList[FormIndex].attribute = (FormList[FormIndex].attribute&NFRMLMSK) | (ActiveLayer << 1);
-							SelectedForm->vertices = adflt(FormList[FormIndex].sides);
+							SelectedForm->vertices = adflt(FormList[FormIndex].vertexCount);
 							CurrentFormVertices = (fPOINT*)&ClipFormHeader[1];
-							mvflpnt(&SelectedForm->vertices[0], &CurrentFormVertices[0], SelectedForm->sides);
-							l_sac = (SATCON*)&CurrentFormVertices[SelectedForm->sides];
+							mvflpnt(&SelectedForm->vertices[0], &CurrentFormVertices[0], SelectedForm->vertexCount);
+							l_sac = (SATCON*)&CurrentFormVertices[SelectedForm->vertexCount];
 							ind = 0;
 							if (SelectedForm->type == SAT&&SelectedForm->satinGuideCount) {
 
@@ -19306,7 +19306,7 @@ unsigned chkMsg() {
 						}
 						GlobalUnlock(ClipMemory);
 						setMap(INIT);
-						NewFormVertexCount = SelectedForm->sides;
+						NewFormVertexCount = SelectedForm->vertexCount;
 						if (SelectedForm->type != FRMLINE)
 							NewFormVertexCount++;
 						unfrm();
@@ -19500,19 +19500,19 @@ unsigned chkMsg() {
 
 					if (chkMap(PSELDIR)) {
 
-						++SelectedFormVertices.vertexCount %= SideCount;
-						SelectedFormVertices.finish = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % SideCount;
+						++SelectedFormVertices.vertexCount %= VertexCount;
+						SelectedFormVertices.finish = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % VertexCount;
 					} else {
 
 						if (SelectedFormVertices.vertexCount) {
 
 							SelectedFormVertices.vertexCount--;
-							SelectedFormVertices.finish = (SelectedFormVertices.start + SideCount - SelectedFormVertices.vertexCount) % SideCount;
+							SelectedFormVertices.finish = (SelectedFormVertices.start + VertexCount - SelectedFormVertices.vertexCount) % VertexCount;
 						} else {
 
 							SelectedFormVertices.vertexCount = 1;
 							setMap(PSELDIR);
-							SelectedFormVertices.finish = (SelectedFormVertices.start + 1) % SideCount;
+							SelectedFormVertices.finish = (SelectedFormVertices.start + 1) % VertexCount;
 						}
 					}
 					setpsel();
@@ -19524,7 +19524,7 @@ unsigned chkMsg() {
 						SelectedFormVertices.start = ClosestVertexToCursor;
 						SelectedFormVertices.form = ClosestFormToCursor;
 						SelectedFormVertices.vertexCount = 1;
-						SelectedFormVertices.finish = (SelectedFormVertices.start + 1) % SideCount;
+						SelectedFormVertices.finish = (SelectedFormVertices.start + 1) % VertexCount;
 						setMap(PSELDIR);
 						setpsel();
 					} else {
@@ -19603,18 +19603,18 @@ unsigned chkMsg() {
 
 					if (!chkMap(PSELDIR)) {
 
-						++SelectedFormVertices.vertexCount %= SideCount;
-						SelectedFormVertices.finish = (SelectedFormVertices.start + SideCount - SelectedFormVertices.vertexCount) % SideCount;
+						++SelectedFormVertices.vertexCount %= VertexCount;
+						SelectedFormVertices.finish = (SelectedFormVertices.start + VertexCount - SelectedFormVertices.vertexCount) % VertexCount;
 					} else {
 
 						if (SelectedFormVertices.vertexCount) {
 
 							SelectedFormVertices.vertexCount--;
-							SelectedFormVertices.finish = (SelectedFormVertices.start + SideCount - SelectedFormVertices.vertexCount) % SideCount;
+							SelectedFormVertices.finish = (SelectedFormVertices.start + VertexCount - SelectedFormVertices.vertexCount) % VertexCount;
 						} else {
 
 							SelectedFormVertices.vertexCount = 1;
-							SelectedFormVertices.finish = (SelectedFormVertices.start + SideCount - 1) % SideCount;
+							SelectedFormVertices.finish = (SelectedFormVertices.start + VertexCount - 1) % VertexCount;
 							rstMap(PSELDIR);
 						}
 					}
@@ -22825,7 +22825,7 @@ void ritbak(TCHAR* nam, DRAWITEMSTRUCT* p_ds) {
 				for (ind = 0; ind < sthed.formCount; ind++) {
 
 					lind = inf;
-					for (ine = 0; (ine < flst[ind].sides) && (inf < sthed.vertexCount); ine++) {
+					for (ine = 0; (ine < flst[ind].vertexCount) && (inf < sthed.vertexCount); ine++) {
 
 						l_plin[ine].x = tflt[inf].x*rat;
 						l_plin[ine].y = l_siz.y - tflt[inf++].y*rat;
@@ -22835,9 +22835,9 @@ void ritbak(TCHAR* nam, DRAWITEMSTRUCT* p_ds) {
 					SelectObject(p_ds->hDC, FormPen);
 					SetROP2(p_ds->hDC, R2_XORPEN);
 					if (FormList[ind].type == FRMLINE)
-						Polyline(p_ds->hDC, l_plin, flst[ind].sides);
+						Polyline(p_ds->hDC, l_plin, flst[ind].vertexCount);
 					else
-						Polyline(p_ds->hDC, l_plin, flst[ind].sides + 1);
+						Polyline(p_ds->hDC, l_plin, flst[ind].vertexCount + 1);
 					SetROP2(StitchWindowMemDC, R2_COPYPEN);
 				}
 			bakskp:;
@@ -23391,7 +23391,7 @@ void sachk() {
 			ts = tfrm->satinOrAngle.sac;
 			for (ine = 0; ine < tfrm->satinGuideCount; ine++) {
 
-				if (ts[ine].start > tfrm->sides || ts[ine].finish > tfrm->sides) {
+				if (ts[ine].start > tfrm->vertexCount || ts[ine].finish > tfrm->vertexCount) {
 
 					bakclo = ClosestFormToCursor;
 					ClosestFormToCursor = ind;

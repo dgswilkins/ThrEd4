@@ -475,7 +475,7 @@ BOOL filmsgs(unsigned cod) {
 		if (chkMap(FORMSEL)) {
 
 			SelectedForm = &FormList[ClosestFormToCursor];
-			if (SelectedForm->sides == 2) {
+			if (SelectedForm->vertexCount == 2) {
 
 				if (cod < FML_LIN) {
 

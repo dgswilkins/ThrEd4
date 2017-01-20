@@ -75,7 +75,7 @@ extern	unsigned		SelectedFormCount;
 extern	unsigned short	SelectedFormList[MAXFORMS];
 extern	fPOINT			SelectedPoint;
 extern	unsigned		SequenceIndex;
-extern	unsigned short	SideCount;
+extern	unsigned short	VertexCount;
 extern	TCHAR*			StringTable[STR_LEN];
 extern	fPOINTATTR		StitchBuffer[MAXPCS];
 extern	double			StitchSpacing;
@@ -986,7 +986,7 @@ fPOINT* insid()
 	satout(fabs(SelectedForm->underlayIndent));
 	if (SelectedForm->underlayIndent > 0)
 	{
-		for (ind = 0; ind < SideCount; ind++)
+		for (ind = 0; ind < VertexCount; ind++)
 		{
 			if (!cisin(InsidePoints[ind].x, InsidePoints[ind].y))
 			{
@@ -1212,7 +1212,7 @@ void fnwlk(unsigned find)
 		strt = SelectedForm->fillStart;
 	else
 		strt = 0;
-	cnt = SideCount;
+	cnt = VertexCount;
 	if (SelectedForm->type != FRMLINE)
 		cnt++;
 	wpnt = insid();
@@ -1236,7 +1236,7 @@ void fnuang() {
 	RotationCenter.x = (double)(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
 	RotationCenter.y = (double)(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;
-	for (ind = 0; ind < AngledForm.sides; ind++) {
+	for (ind = 0; ind < AngledForm.vertexCount; ind++) {
 
 		AngledForm.vertices[ind].x = UnderlayVertices[ind].x;
 		AngledForm.vertices[ind].y = UnderlayVertices[ind].y;
@@ -1326,7 +1326,7 @@ void fncwlk()
 		OutputIndex++;
 		fin = prv(strt);
 		strt = nxt(strt);
-		for (ind = 1; ind < (unsigned)SideCount >> 1; ind++)
+		for (ind = 1; ind < (unsigned)VertexCount >> 1; ind++)
 		{
 			OSequence[OutputIndex].x = midl(CurrentFormVertices[fin].x, CurrentFormVertices[strt].x);
 			OSequence[OutputIndex].y = midl(CurrentFormVertices[fin].y, CurrentFormVertices[strt].y);
@@ -1829,7 +1829,7 @@ void dasyfrm() {
 		CurrentFormVertices[fref - 1].y += (float)0.01;
 		CurrentFormVertices[fref].y += (float)0.01;
 	}
-	SelectedForm->sides = inf;
+	SelectedForm->vertexCount = inf;
 	if (chku(DAZD))
 	{
 		SelectedForm->type = SAT;
@@ -3420,7 +3420,7 @@ void fwidfn(unsigned find, float len)
 	fvars(ClosestFormToCursor);
 	ref = SelectedForm->rectangle.left;
 	rat = len / (SelectedForm->rectangle.right - ref);
-	for (ind = 0; ind < SideCount; ind++)
+	for (ind = 0; ind < VertexCount; ind++)
 		CurrentFormVertices[ind].x = (CurrentFormVertices[ind].x - ref)*rat + ref;
 	frmout(ClosestFormToCursor);
 	refilfn();
@@ -3468,7 +3468,7 @@ void fhifn(unsigned find, float len)
 	fvars(ClosestFormToCursor);
 	ref = SelectedForm->rectangle.bottom;
 	rat = len / (SelectedForm->rectangle.top - ref);
-	for (ind = 0; ind < SideCount; ind++)
+	for (ind = 0; ind < VertexCount; ind++)
 		CurrentFormVertices[ind].y = (CurrentFormVertices[ind].y - ref)*rat + ref;
 	frmout(ClosestFormToCursor);
 	refilfn();
@@ -3570,7 +3570,7 @@ void dutxtfil()
 		IniFile.textureSpacing = (float)ITXSPAC;
 	if (!IniFile.textureEditorSize)
 		IniFile.textureEditorSize = ITXPIX;
-	AngledForm.sides = 0;
+	AngledForm.vertexCount = 0;
 	setMap(TXTRED);
 	setMap(ZUMED);
 	rstMap(WASPAT);
@@ -4022,15 +4022,15 @@ void setxclp()
 	else
 		fof.x -= TextureScreen.formCenter.x;
 	fof.y -= TextureScreen.formCenter.y;
-	for (ind = 0; ind < AngledForm.sides; ind++)
+	for (ind = 0; ind < AngledForm.vertexCount; ind++)
 	{
 		AngledFormVertices[ind].x += fof.x;
 		AngledFormVertices[ind].y += fof.y;
 	}
-	cnt = AngledForm.sides - 1;
+	cnt = AngledForm.vertexCount - 1;
 	if (AngledForm.type != FRMLINE)
 		cnt++;
-	SideCount = AngledForm.sides;
+	VertexCount = AngledForm.vertexCount;
 	for (ind = 0; ind < cnt; ind++)
 	{
 		inx = nxt(ind);
@@ -4159,7 +4159,7 @@ void angrct(fRECTANGLE* rct)
 
 	rct->left = rct->right = AngledFormVertices[0].x;
 	rct->bottom = rct->top = AngledFormVertices[0].y;
-	for (ind = 1; ind < AngledForm.sides; ind++)
+	for (ind = 1; ind < AngledForm.vertexCount; ind++)
 	{
 		if (AngledFormVertices[ind].x < rct->left)
 			rct->left = AngledFormVertices[ind].x;
@@ -4179,7 +4179,7 @@ void ritxfrm()
 
 	of.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
 	of.y = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
-	for (ind = 0; ind < AngledForm.sides; ind++)
+	for (ind = 0; ind < AngledForm.vertexCount; ind++)
 	{
 		ed2px(AngledFormVertices[ind], &FormLines[ind]);
 		FormLines[ind].x += of.x;
@@ -4187,7 +4187,7 @@ void ritxfrm()
 	}
 	FormLines[ind].x = FormLines[0].x;
 	FormLines[ind].y = FormLines[0].y;
-	cnt = AngledForm.sides;
+	cnt = AngledForm.vertexCount;
 	if (AngledForm.type != FRMLINE)
 		cnt++;
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
@@ -4202,7 +4202,7 @@ void setxfrm()
 	double		rat;
 
 	angrct(&arct);
-	for (ind = 0; ind < AngledForm.sides; ind++)
+	for (ind = 0; ind < AngledForm.vertexCount; ind++)
 	{
 		AngledFormVertices[ind].x -= arct.left;
 		AngledFormVertices[ind].y -= arct.bottom;
@@ -4212,7 +4212,7 @@ void setxfrm()
 	if (hi > TextureScreen.areaHeight)
 	{
 		rat = TextureScreen.areaHeight / hi*0.95;
-		for (ind = 0; ind < AngledForm.sides; ind++)
+		for (ind = 0; ind < AngledForm.vertexCount; ind++)
 		{
 			AngledFormVertices[ind].x *= rat;
 			AngledFormVertices[ind].y *= rat;
@@ -4235,7 +4235,7 @@ void txtclp()
 			if (ClipFormHeader->clipType == CLP_FRM) {
 				SelectedForm = &ClipFormHeader->form;
 				frmcpy(&AngledForm, SelectedForm);
-				MoveMemory(&AngledFormVertices, &SelectedForm[1], sizeof(fPOINT)*SelectedForm->sides);
+				MoveMemory(&AngledFormVertices, &SelectedForm[1], sizeof(fPOINT)*SelectedForm->vertexCount);
 				AngledForm.vertices = AngledFormVertices;
 				rstMap(TXTLIN);
 				setMap(TXTCLP);
@@ -4821,7 +4821,7 @@ void txsiz(double rat)
 	fRECTANGLE		arct;
 
 	ritxfrm();
-	for (ind = 0; ind < AngledForm.sides; ind++)
+	for (ind = 0; ind < AngledForm.vertexCount; ind++)
 	{
 		AngledFormVertices[ind].x *= rat;
 		AngledFormVertices[ind].y *= rat;
@@ -5523,13 +5523,13 @@ void setangf(double tang)
 	angbak = RotationAngle;
 	RotationAngle = tang;
 	MoveMemory(&AngledForm, SelectedForm, sizeof(FRMHED));
-	MoveMemory(&AngledFormVertices, CurrentFormVertices, sizeof(fPOINT)*SideCount);
+	MoveMemory(&AngledFormVertices, CurrentFormVertices, sizeof(fPOINT)*VertexCount);
 	RotationCenter.x = (double)(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
 	RotationCenter.y = (double)(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;
 	if (RotationAngle)
 	{
-		for (ind = 0; ind < SideCount; ind++)
+		for (ind = 0; ind < VertexCount; ind++)
 			rotflt(&AngledFormVertices[ind]);
 	}
 	SelectedForm = &AngledForm;
@@ -5635,10 +5635,10 @@ unsigned frmchkfn()
 			fp = &FormList[ind];
 			if (!(bc.attribute&BADFLT))
 			{
-				if (!fp->sides)
+				if (!fp->vertexCount)
 					bc.attribute |= BADFLT;
 				if (bc.flt == fp->vertices - FormVertices)
-					bc.flt += fp->sides;
+					bc.flt += fp->vertexCount;
 				else
 					bc.attribute |= BADFLT;
 			}
@@ -5753,7 +5753,7 @@ void repflt()
 	loc = 0;
 	for (ind = 0; ind < FormIndex; ind++)
 	{
-		if (FormList[ind].sides)
+		if (FormList[ind].vertexCount)
 			MoveMemory(&FormList[loc++], &FormList[ind], sizeof(FRMHED));
 	}
 	FormIndex = loc;
@@ -5764,20 +5764,20 @@ void repflt()
 	{
 		fp = &FormList[ind];
 		dif = fp->vertices - FormVertices;
-		if (FormVertexIndex >= dif + fp->sides)
+		if (FormVertexIndex >= dif + fp->vertexCount)
 		{
-			MoveMemory(&tflt[loc], fp->vertices, fp->sides * sizeof(fPOINT));
+			MoveMemory(&tflt[loc], fp->vertices, fp->vertexCount * sizeof(fPOINT));
 			fp->vertices = &FormVertices[loc];
-			loc += fp->sides;
+			loc += fp->vertexCount;
 			bcup(ind, &bc);
 		}
 		else
 		{
 			if (dif < FormVertexIndex)
 			{
-				fp->sides = FormVertexIndex - dif;
+				fp->vertexCount = FormVertexIndex - dif;
 				delsac(ind);
-				MoveMemory(&tflt[loc], fp->vertices, fp->sides * sizeof(fPOINT));
+				MoveMemory(&tflt[loc], fp->vertices, fp->vertexCount * sizeof(fPOINT));
 				bcup(ind, &bc);
 			}
 			else
@@ -5879,7 +5879,7 @@ void repsat()
 		if (fp->type == SAT)
 		{
 			dif = fp->satinOrAngle.sac - SatinConnects;
-			if (FormVertexIndex > dif + fp->sides)
+			if (FormVertexIndex > dif + fp->vertexCount)
 			{
 				MoveMemory(&SatinConnects[loc], fp->satinOrAngle.sac, fp->satinGuideCount * sizeof(SATCON));
 				fp->satinOrAngle.sac = &SatinConnects[loc];

@@ -977,7 +977,7 @@ typedef union _satinOrAngle {
 typedef struct _frmhedo {
 
 	unsigned char	attribute;		//attribute
-	unsigned short	sides;			//number of sides
+	unsigned short	vertexCount;	//number of sides
 	unsigned char	type;			//type
 	unsigned char	fillColor;		//fill color
 	unsigned char	borderColor;	//border color
@@ -1049,7 +1049,7 @@ typedef union _tfhed
 typedef struct _frmhed {
 
 	unsigned char	attribute;			//attribute
-	unsigned short	sides;				//number of sides
+	unsigned short	vertexCount;		//number of sides
 	unsigned char	type;				//type
 	unsigned char	fillColor;			//fill color
 	unsigned char	borderColor;		//border color
