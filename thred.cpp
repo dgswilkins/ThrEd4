@@ -13600,7 +13600,7 @@ void getrmap() {
 
 void trace() {
 
-	unsigned			ind;
+	unsigned			color, iPixel, iRGB;
 	unsigned			traceColorMask;	
 
 #if TRCMTH==0
@@ -13619,14 +13619,14 @@ void trace() {
 				SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 			BitmapPoint.x = BmpStitchRatio.x*SelectedPoint.x;
 			BitmapPoint.y = BmpStitchRatio.y*SelectedPoint.y - 1;
-			ind = TraceBitmapData[BitmapPoint.y*BitmapWidth + BitmapPoint.x] ^ 0xffffff;
+			color = TraceBitmapData[BitmapPoint.y*BitmapWidth + BitmapPoint.x] ^ 0xffffff;
 			if (chkMap(TRCUP)) {
 
-				UpPixelColor = ind;
+				UpPixelColor = color;
 				DownPixelColor = 0xffffff;
 			} else {
 
-				DownPixelColor = ind;
+				DownPixelColor = color;
 				UpPixelColor = 0;
 			}
 			setMap(TRCRED);
@@ -13642,8 +13642,8 @@ void trace() {
 			traceColorMask &= BLUMSK;
 		if (traceColorMask != 0xffffff) {
 
-			for (ind = 0; ind < BitmapWidth*BitmapHeight; ind++)
-				TraceBitmapData[ind] &= traceColorMask;
+			for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++)
+				TraceBitmapData[iPixel] &= traceColorMask;
 		}
 
 #if TRCMTH==0
@@ -13664,17 +13664,17 @@ void trace() {
 		InvertUpColor = UpPixelColor ^ 0xffffff;
 		InvertDownColor = DownPixelColor ^ 0xffffff;
 		trcols(InvertUpColor);
-		for (ind = 0; ind < 3; ind++)
-			HighColors[ind] = PixelColors[ind];
+		for (iRGB = 0; iRGB < 3; iRGB++)
+			HighColors[iRGB] = PixelColors[iRGB];
 		trcols(InvertDownColor);
-		for (ind = 0; ind < 3; ind++)
-			LowColors[ind] = PixelColors[ind];
-		for (ind = 0; ind < BitmapWidth*BitmapHeight; ind++) {
+		for (iRGB = 0; iRGB < 3; iRGB++)
+			LowColors[iRGB] = PixelColors[iRGB];
+		for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
 
-			if (trcin(TraceBitmapData[ind]))
-				setrac(ind);
+			if (trcin(TraceBitmapData[iPixel]))
+				setrac(iPixel);
 			else
-				TraceBitmapData[ind] = 0;
+				TraceBitmapData[iPixel] = 0;
 		}
 #endif
 		setMap(TRSET);
@@ -13683,27 +13683,27 @@ void trace() {
 		tabmsg(IDS_MAPLOD);
 }
 
-void setedg(unsigned p_bpnt) {
+void setedg(unsigned point) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		eax, p_bpnt
+		mov		eax, point
 		mov		ebx, TracedEdges
 		bts[ebx], eax
 	}
 #else
-	_bittestandset((long *)TracedEdges, p_bpnt);
+	_bittestandset((long *)TracedEdges, point);
 #endif
 }
 
-BOOL chkedg(unsigned p_bpnt) {
+BOOL chkedg(unsigned point) {
 
 #if  __UseASM__
 	_asm {
 
 		xor		eax, eax
-		mov		ecx, p_bpnt
+		mov		ecx, point
 		mov		ebx, TracedEdges
 		bt[ebx], ecx
 		jnc		short chkedgx
@@ -13711,105 +13711,105 @@ BOOL chkedg(unsigned p_bpnt) {
 		chkedgx :
 	}
 #else
-	return _bittest((long *)TracedEdges, p_bpnt);
+	return _bittest((long *)TracedEdges, point);
 #endif
 }
 
 void tracedg() {
 
-	unsigned	ind, ine, flg;
-	long		l_bpnt;
+	unsigned	iHeight, iWidth, iPixel, flag;
+	long		pixelIndex;
 
 	if (!chkMap(WASTRAC))
 		trace();
 	TracedEdges = (unsigned*)&OSequence[TraceDataSize];
-	for (ind = 0; ind < TraceDataSize; ind++)
-		TracedEdges[ind] = 0;
-	l_bpnt = 0;
-	for (ind = 0; ind < BitmapHeight; ind++) {
+	for (iPixel = 0; iPixel < TraceDataSize; iPixel++)
+		TracedEdges[iPixel] = 0;
+	pixelIndex = 0;
+	for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
 
-		flg = 0;
-		for (ine = 0; ine < BitmapWidth; ine++) {
+		flag = 0;
+		for (iWidth = 0; iWidth < BitmapWidth; iWidth++) {
 
-			if (getrac(l_bpnt)) {
+			if (getrac(pixelIndex)) {
 
-				if (!flg) {
+				if (!flag) {
 
-					setedg(l_bpnt);
-					flg = 1;
+					setedg(pixelIndex);
+					flag = 1;
 				}
 			} else {
 
-				if (flg) {
+				if (flag) {
 
-					setedg(l_bpnt - 1);
-					flg = 0;
+					setedg(pixelIndex - 1);
+					flag = 0;
 				}
 			}
-			l_bpnt++;
+			pixelIndex++;
 		}
-		if (flg)
-			setedg(l_bpnt - 1);
+		if (flag)
+			setedg(pixelIndex - 1);
 	}
-	for (ind = 0; ind < BitmapWidth; ind++) {
+	for (iWidth = 0; iWidth < BitmapWidth; iWidth++) {
 
-		l_bpnt = ind;
-		flg = 0;
-		for (ine = 0; ine < BitmapHeight; ine++) {
+		pixelIndex = iWidth;
+		flag = 0;
+		for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
 
-			if (getrac(l_bpnt)) {
+			if (getrac(pixelIndex)) {
 
-				if (!flg) {
+				if (!flag) {
 
-					setedg(l_bpnt);
-					flg = 1;
+					setedg(pixelIndex);
+					flag = 1;
 				}
 			} else {
 
-				if (flg) {
+				if (flag) {
 
-					setedg(l_bpnt - BitmapWidth);
-					flg = 0;
+					setedg(pixelIndex - BitmapWidth);
+					flag = 0;
 				}
 			}
-			l_bpnt += BitmapWidth;
+			pixelIndex += BitmapWidth;
 		}
-		if (flg)
-			setedg(l_bpnt - BitmapWidth);
+		if (flag)
+			setedg(pixelIndex - BitmapWidth);
 	}
-	for (ind = 0; ind < BitmapWidth*BitmapHeight; ind++) {
+	for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
 
-		if (chkedg(ind))
-			TraceBitmapData[ind] = 0xffffff;
+		if (chkedg(iPixel))
+			TraceBitmapData[iPixel] = 0xffffff;
 		else
-			TraceBitmapData[ind] = 0;
+			TraceBitmapData[iPixel] = 0;
 	}
 	setMap(RESTCH);
 	setMap(WASEDG);
 }
 
 BOOL trcbit() {
-	unsigned l_bpnt;
+	unsigned pixelIndex;
 
-	l_bpnt = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
+	pixelIndex = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
 	switch (TraceDirection) {
 
 	case TRCR:
 
-		l_bpnt += (1 - BitmapWidth);
+		pixelIndex += (1 - BitmapWidth);
 		if (CurrentTracePoint.x == (int)BitmapWidth - 1)
 			TraceDirection = TRCU;
 		else {
 
-			if (chkedg(l_bpnt)) {
+			if (chkedg(pixelIndex)) {
 
 				CurrentTracePoint.x++;
 				CurrentTracePoint.y--;
 				TraceDirection = TRCD;
 			} else {
 
-				l_bpnt += BitmapWidth;
-				if (chkedg(l_bpnt))
+				pixelIndex += BitmapWidth;
+				if (chkedg(pixelIndex))
 					CurrentTracePoint.x++;
 				else
 					TraceDirection = TRCU;
@@ -13819,20 +13819,20 @@ BOOL trcbit() {
 
 	case TRCD:
 
-		l_bpnt -= (BitmapWidth + 1);
+		pixelIndex -= (BitmapWidth + 1);
 		if (!CurrentTracePoint.y)
 			TraceDirection = TRCR;
 		else {
 
-			if (chkedg(l_bpnt)) {
+			if (chkedg(pixelIndex)) {
 
 				CurrentTracePoint.x--;
 				CurrentTracePoint.y--;
 				TraceDirection = TRCL;
 			} else {
 
-				l_bpnt++;
-				if (chkedg(l_bpnt))
+				pixelIndex++;
+				if (chkedg(pixelIndex))
 					CurrentTracePoint.y--;
 				else
 					TraceDirection = TRCR;
@@ -13842,20 +13842,20 @@ BOOL trcbit() {
 
 	case TRCL:
 
-		l_bpnt += (BitmapWidth - 1);
+		pixelIndex += (BitmapWidth - 1);
 		if (!CurrentTracePoint.x)
 			TraceDirection = TRCD;
 		else {
 
-			if (chkedg(l_bpnt)) {
+			if (chkedg(pixelIndex)) {
 
 				CurrentTracePoint.x--;
 				CurrentTracePoint.y++;
 				TraceDirection = TRCU;
 			} else {
 
-				l_bpnt -= BitmapWidth;
-				if (chkedg(l_bpnt))
+				pixelIndex -= BitmapWidth;
+				if (chkedg(pixelIndex))
 					CurrentTracePoint.x--;
 				else
 					TraceDirection = TRCD;
@@ -13865,20 +13865,20 @@ BOOL trcbit() {
 
 	case TRCU:
 
-		l_bpnt += (1 + BitmapWidth);
+		pixelIndex += (1 + BitmapWidth);
 		if (CurrentTracePoint.y == (int)BitmapHeight - 1)
 			TraceDirection = TRCL;
 		else {
 
-			if (chkedg(l_bpnt)) {
+			if (chkedg(pixelIndex)) {
 
 				CurrentTracePoint.x++;
 				CurrentTracePoint.y++;
 				TraceDirection = TRCR;
 			} else {
 
-				l_bpnt--;
-				if (chkedg(l_bpnt))
+				pixelIndex--;
+				if (chkedg(pixelIndex))
 					CurrentTracePoint.y++;
 				else
 					TraceDirection = TRCL;
@@ -13899,24 +13899,23 @@ BOOL trcbit() {
 		return 1;
 }
 
-void dutdif(TRCPNT* pnt) {
+void dutdif(TRCPNT* point) {
 
-	TraceDiff0.x = pnt[1].x - pnt[0].x;
+	TraceDiff0.x = point[1].x - point[0].x;
 	// ToDo this is likely incorrect
-	TraceDiff0.y = pnt[1].x - pnt[0].y;
+	TraceDiff0.y = point[1].x - point[0].y;
 }
 
 void dutrac() {
 
-	unsigned	flg;
-	RECT		fndrct;
-	long		l_bpnt, blim, bakpnt;
-	long		dis, mdis;
-	unsigned	ind;
-	double		tlen;
-	double		tlens;
-	float		ratof;
-	unsigned	ine;
+	unsigned	flag;
+	RECT		findRectangle;
+	long		point, limit, savedPoint;
+	long		edgeDistance, minimumEdgeDistance;
+	unsigned	iPoint, iCurrent, iNext;
+	double		traceLength;
+	double		traceLengthSum;
+	float		landscapeOffset;
 
 	if (px2stch()) {
 
@@ -13934,98 +13933,98 @@ void dutrac() {
 			CurrentTracePoint.x = BitmapWidth;
 		if (CurrentTracePoint.y > (long)BitmapHeight)
 			CurrentTracePoint.y = BitmapHeight;
-		bakpnt = l_bpnt = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
-		if (!chkedg(l_bpnt)) {
+		savedPoint = point = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
+		if (!chkedg(point)) {
 
-			flg = 20;
-			l_bpnt = bakpnt;
-			blim = (CurrentTracePoint.y + 1)*BitmapWidth;
-			while (l_bpnt < blim && !chkedg(l_bpnt))
-				l_bpnt++;
-			if (l_bpnt < blim)
-				fndrct.right = l_bpnt - CurrentTracePoint.y*BitmapWidth;
+			flag = 20;
+			point = savedPoint;
+			limit = (CurrentTracePoint.y + 1)*BitmapWidth;
+			while (point < limit && !chkedg(point))
+				point++;
+			if (point < limit)
+				findRectangle.right = point - CurrentTracePoint.y*BitmapWidth;
 			else
-				fndrct.right = BitmapWidth;
-			l_bpnt = bakpnt;
-			blim = CurrentTracePoint.y*BitmapWidth;
-			while (l_bpnt > blim && !chkedg(l_bpnt))
-				l_bpnt--;
-			if (l_bpnt == blim)
-				fndrct.left = 0;
+				findRectangle.right = BitmapWidth;
+			point = savedPoint;
+			limit = CurrentTracePoint.y*BitmapWidth;
+			while (point > limit && !chkedg(point))
+				point--;
+			if (point == limit)
+				findRectangle.left = 0;
 			else
-				fndrct.left = l_bpnt - blim;
-			l_bpnt = bakpnt;
-			while (l_bpnt > 0 && !chkedg(l_bpnt))
-				l_bpnt -= BitmapWidth;
-			if (l_bpnt > 0)
-				fndrct.bottom = l_bpnt / BitmapWidth;
+				findRectangle.left = point - limit;
+			point = savedPoint;
+			while (point > 0 && !chkedg(point))
+				point -= BitmapWidth;
+			if (point > 0)
+				findRectangle.bottom = point / BitmapWidth;
 			else
-				fndrct.bottom = 0;
-			l_bpnt = bakpnt;
-			blim = BitmapWidth*BitmapHeight;
-			while (l_bpnt < blim && !chkedg(l_bpnt))
-				l_bpnt += BitmapWidth;
-			if (l_bpnt < blim)
-				fndrct.top = l_bpnt / BitmapWidth;
+				findRectangle.bottom = 0;
+			point = savedPoint;
+			limit = BitmapWidth*BitmapHeight;
+			while (point < limit && !chkedg(point))
+				point += BitmapWidth;
+			if (point < limit)
+				findRectangle.top = point / BitmapWidth;
 			else
-				fndrct.top = BitmapHeight;
-			flg = 0;
-			mdis = 0x7fffffff;
-			if (fndrct.left) {
+				findRectangle.top = BitmapHeight;
+			flag = 0;
+			minimumEdgeDistance = 0x7fffffff;
+			if (findRectangle.left) {
 
-				mdis = CurrentTracePoint.x - fndrct.left;
-				flg = TRCL;
+				minimumEdgeDistance = CurrentTracePoint.x - findRectangle.left;
+				flag = TRCL;
 			}
-			if (fndrct.right < (long)BitmapWidth) {
+			if (findRectangle.right < (long)BitmapWidth) {
 
-				dis = fndrct.right - CurrentTracePoint.x;
-				if (dis < mdis) {
+				edgeDistance = findRectangle.right - CurrentTracePoint.x;
+				if (edgeDistance < minimumEdgeDistance) {
 
-					mdis = dis;
-					flg = TRCR;
+					minimumEdgeDistance = edgeDistance;
+					flag = TRCR;
 				}
 			}
-			if (fndrct.bottom) {
+			if (findRectangle.bottom) {
 
-				dis = CurrentTracePoint.y - fndrct.bottom;
-				if (dis < mdis) {
+				edgeDistance = CurrentTracePoint.y - findRectangle.bottom;
+				if (edgeDistance < minimumEdgeDistance) {
 
-					mdis = dis;
-					flg = TRCD;
+					minimumEdgeDistance = edgeDistance;
+					flag = TRCD;
 				}
 			}
-			if (fndrct.top < (long)BitmapHeight) {
+			if (findRectangle.top < (long)BitmapHeight) {
 
-				dis = fndrct.top - CurrentTracePoint.y;
-				if (dis < mdis) {
+				edgeDistance = findRectangle.top - CurrentTracePoint.y;
+				if (edgeDistance < minimumEdgeDistance) {
 
-					mdis = dis;
-					flg = TRCU;
+					minimumEdgeDistance = edgeDistance;
+					flag = TRCU;
 				}
 			}
-			switch (flg) {
+			switch (flag) {
 
 			case TRCU:
 
-				CurrentTracePoint.y = fndrct.top;
+				CurrentTracePoint.y = findRectangle.top;
 				TraceDirection = TRCR;
 				break;
 
 			case TRCR:
 
-				CurrentTracePoint.x = fndrct.right;
+				CurrentTracePoint.x = findRectangle.right;
 				TraceDirection = TRCD;
 				break;
 
 			case TRCD:
 
-				CurrentTracePoint.y = fndrct.bottom;
+				CurrentTracePoint.y = findRectangle.bottom;
 				TraceDirection = TRCL;
 				break;
 
 			case TRCL:
 
-				CurrentTracePoint.x = fndrct.left;
+				CurrentTracePoint.x = findRectangle.left;
 				TraceDirection = TRCU;
 				break;
 
@@ -14034,8 +14033,9 @@ void dutrac() {
 			}
 		}
 		InitialDirection = TraceDirection;
-		l_bpnt = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
+		point = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
 		ActivePointIndex = 1;
+		// ToDo - Use local memory for tracedPoints
 		tracedPoints = (TRCPNT*)BSequence;
 		tracedPoints[0].x = CurrentTracePoint.x;
 		tracedPoints[0].y = CurrentTracePoint.y;
@@ -14050,36 +14050,36 @@ void dutrac() {
 		DecimatedLine[0].y = tracedPoints[0].y;
 		dutdif(&tracedPoints[0]);
 		OutputIndex = 1;
-		for (ind = 1; ind < ActivePointIndex; ind++) {
+		for (iPoint = 1; iPoint < ActivePointIndex; iPoint++) {
 
 			TraceDiff1.x = TraceDiff0.x;
 			TraceDiff1.y = TraceDiff0.y;
-			dutdif(&tracedPoints[ind]);
+			dutdif(&tracedPoints[iPoint]);
 			if (TraceDiff1.x != TraceDiff0.x || TraceDiff1.y != TraceDiff0.y) {
 
-				DecimatedLine[OutputIndex].x = tracedPoints[ind].x;
-				DecimatedLine[OutputIndex++].y = tracedPoints[ind].y;
+				DecimatedLine[OutputIndex].x = tracedPoints[iPoint].x;
+				DecimatedLine[OutputIndex++].y = tracedPoints[iPoint].y;
 			}
 		}
 		tracedPoints[0].x = DecimatedLine[0].x;
 		tracedPoints[0].y = DecimatedLine[0].y;
-		ine = 0;
+		iNext = 0;
 		ActivePointIndex = 0;
-		for (ind = 1; ind < OutputIndex; ind++) {
+		for (iCurrent = 1; iCurrent < OutputIndex; iCurrent++) {
 
-			tlen = hypot(DecimatedLine[ind].x - DecimatedLine[ine].x, DecimatedLine[ind].y - DecimatedLine[ine].y);
-			if (tlen > IniFile.traceLength) {
+			traceLength = hypot(DecimatedLine[iCurrent].x - DecimatedLine[iNext].x, DecimatedLine[iCurrent].y - DecimatedLine[iNext].y);
+			if (traceLength > IniFile.traceLength) {
 
-				tracedPoints[ActivePointIndex].x = DecimatedLine[ine].x;
-				tracedPoints[ActivePointIndex].y = DecimatedLine[ine].y;
-				ine = ind;
+				tracedPoints[ActivePointIndex].x = DecimatedLine[iNext].x;
+				tracedPoints[ActivePointIndex].y = DecimatedLine[iNext].y;
+				iNext = iCurrent;
 				ActivePointIndex++;
 			}
 		}
-		for (ind = ine + 1; ind < OutputIndex; ind++) {
+		for (iCurrent = iNext + 1; iCurrent < OutputIndex; iCurrent++) {
 
-			tracedPoints[ActivePointIndex].x = DecimatedLine[ind].x;
-			tracedPoints[ActivePointIndex].y = DecimatedLine[ind].y;
+			tracedPoints[ActivePointIndex].x = DecimatedLine[iCurrent].x;
+			tracedPoints[ActivePointIndex].y = DecimatedLine[iCurrent].y;
 			ActivePointIndex++;
 		}
 		SelectedForm = &FormList[FormIndex];
@@ -14087,25 +14087,25 @@ void dutrac() {
 		CurrentFormVertices = &FormVertices[FormVertexIndex];
 		CurrentFormVertices[0].x = tracedPoints[0].x*StitchBmpRatio.x;
 		CurrentFormVertices[0].y = tracedPoints[0].y*StitchBmpRatio.y;
-		ine = 0;
+		iNext = 0;
 		OutputIndex = 0;
-		tlens = 0;
+		traceLengthSum = 0;
 		if (chkMap(LANDSCAP))
-			ratof = UnzoomedRect.y - BitmapSizeinStitches.y;
+			landscapeOffset = UnzoomedRect.y - BitmapSizeinStitches.y;
 		else
-			ratof = 0;
-		for (ind = 1; ind < ActivePointIndex; ind++) {
+			landscapeOffset = 0;
+		for (iCurrent = 1; iCurrent < ActivePointIndex; iCurrent++) {
 
-			tlens += hypot(tracedPoints[ind].x - tracedPoints[ind - 1].x, tracedPoints[ind].y - tracedPoints[ind - 1].y);
-			tlen = hypot(tracedPoints[ind].x - tracedPoints[ine].x, tracedPoints[ind].y - tracedPoints[ine].y);
-			if (tlens > tlen*IniFile.traceRatio) {
+			traceLengthSum += hypot(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1].x, tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1].y);
+			traceLength = hypot(tracedPoints[iCurrent].x - tracedPoints[iNext].x, tracedPoints[iCurrent].y - tracedPoints[iNext].y);
+			if (traceLengthSum > traceLength*IniFile.traceRatio) {
 
-				CurrentFormVertices[OutputIndex].x = tracedPoints[ind - 1].x*StitchBmpRatio.x;
-				CurrentFormVertices[OutputIndex].y = tracedPoints[ind - 1].y*StitchBmpRatio.y + ratof;
+				CurrentFormVertices[OutputIndex].x = tracedPoints[iCurrent - 1].x*StitchBmpRatio.x;
+				CurrentFormVertices[OutputIndex].y = tracedPoints[iCurrent - 1].y*StitchBmpRatio.y + landscapeOffset;
 				OutputIndex++;
-				ind--;
-				ine = ind;
-				tlens = 0;
+				iCurrent--;
+				iNext = iCurrent;
+				traceLengthSum = 0;
 			}
 		}
 		if (FormVertexIndex + OutputIndex > MAXFLT) {
@@ -14140,34 +14140,34 @@ void chkref() {
 
 #if  __UseASM__
 	_asm {
-		mov		eax, UpPixelColor
-		mov		ebx, DownPixelColor
-		cmp		al, bl
-		jc		short chklup1
-		mov		dl, al
-		mov		al, bl
-		mov		bl, dl
-		chklup1 : cmp		ah, bh
-				  jc		short chklup2
-				  mov		dl, ah
-				  mov		ah, bh
-				  mov		bh, dl
-				  chklup2 : ror		eax, 16
-							ror		ebx, 16
-							cmp		al, bl
-							jc		short chklup3
-							mov		dl, al
-							mov		al, bl
-							mov		bl, dl
-							chklup3 : rol		eax, 16
-									  rol		ebx, 16
-									  mov		UpPixelColor, eax
-									  mov		DownPixelColor, ebx
+			mov		eax, UpPixelColor
+			mov		ebx, DownPixelColor
+			cmp		al, bl
+			jc		short chklup1
+			mov		dl, al
+			mov		al, bl
+			mov		bl, dl
+chklup1 :	cmp		ah, bh
+			jc		short chklup2
+			mov		dl, ah
+			mov		ah, bh
+			mov		bh, dl
+chklup2 :	ror		eax, 16
+			ror		ebx, 16
+			cmp		al, bl
+			jc		short chklup3
+			mov		dl, al
+			mov		al, bl
+			mov		bl, dl
+chklup3 :	rol		eax, 16
+			rol		ebx, 16
+			mov		UpPixelColor, eax
+			mov		DownPixelColor, ebx
 	}
 #else
-	//check translation
+	// ToDo - check translation
 	union {
-		COLORREF cr;
+		COLORREF color;
 		struct {
 			unsigned char g;
 			unsigned char r;
@@ -14176,45 +14176,45 @@ void chkref() {
 		} components;
 	} u, d;
 
-	u.cr = UpPixelColor;
-	d.cr = DownPixelColor;
+	u.color = UpPixelColor;
+	d.color = DownPixelColor;
 
-	unsigned char tmp;
+	unsigned char color;
 
 	if (u.components.r < d.components.r) {
-		tmp = u.components.r;
+		color = u.components.r;
 
 		u.components.r = d.components.r;
-		d.components.r = tmp;
+		d.components.r = color;
 	}
 
 	if (u.components.g < d.components.g) {
-		tmp = u.components.g;
+		color = u.components.g;
 
 		u.components.g = d.components.g;
-		d.components.g = tmp;
+		d.components.g = color;
 	}
 
 	if (u.components.b < d.components.b) {
-		tmp = u.components.b;
+		color = u.components.b;
 
 		u.components.b = d.components.b;
-		d.components.b = tmp;
+		d.components.b = color;
 	}
 
-	UpPixelColor = u.cr;
-	DownPixelColor = d.cr;
+	UpPixelColor = u.color;
+	DownPixelColor = d.color;
 #endif
 }
 
-void trnumwnd0(int pos) {
+void trnumwnd0(int position) {
 
 	TraceNumberInput = CreateWindow(
 		"STATIC",
 		0,
 		SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		ButtonWidthX3,
-		pos,
+		position,
 		ButtonWidth,
 		ButtonHeight,
 		ThrEdWindow,
@@ -14223,14 +14223,14 @@ void trnumwnd0(int pos) {
 		NULL);
 }
 
-void trnumwnd1(int pos) {
+void trnumwnd1(int position) {
 
 	GeneralNumberInputBox = CreateWindow(
 		"STATIC",
 		0,
 		WS_CHILD | WS_VISIBLE | WS_BORDER,
 		ButtonWidthX3,
-		pos,
+		position,
 		ButtonWidthX3,
 		ButtonHeight,
 		ThrEdWindow,
@@ -14241,10 +14241,10 @@ void trnumwnd1(int pos) {
 
 void tracpar() {
 
-	unsigned	pos;
-	double		rat;
-	COLORREF	tcol;
-	COLORREF	tpos;
+	unsigned	position;
+	double		ratio;
+	COLORREF	traceColor;
+	COLORREF	tracePosition;
 
 	if (chkMap(TRNIN0))
 		dutrnum0(atoi(TraceInputBuffer));
@@ -14265,52 +14265,52 @@ void tracpar() {
 				DownPixelColor |= TraceRGB[2 - ColumnColor];
 				goto tracpar1;
 			}
-			rat = (float)TraceMsgPoint.y / (ButtonHeight * 15);
-			pos = rat * 255;
-			tcol = UpPixelColor&TraceRGB[2 - ColumnColor];
-			tpos = pos << TraceShift[ColumnColor];
-			if (tpos < tcol) {
+			ratio = (float)TraceMsgPoint.y / (ButtonHeight * 15);
+			position = ratio * 255;
+			traceColor = UpPixelColor&TraceRGB[2 - ColumnColor];
+			tracePosition = position << TraceShift[ColumnColor];
+			if (tracePosition < traceColor) {
 
 				UpPixelColor &= TraceRGBMask[ColumnColor];
-				UpPixelColor |= tpos;
+				UpPixelColor |= tracePosition;
 				goto tracpar1;
 			}
-			tcol = DownPixelColor&TraceRGB[2 - ColumnColor];
-			if (tpos > tcol) {
+			traceColor = DownPixelColor&TraceRGB[2 - ColumnColor];
+			if (tracePosition > traceColor) {
 
 				DownPixelColor &= TraceRGBMask[ColumnColor];
-				DownPixelColor |= tpos;
+				DownPixelColor |= tracePosition;
 				goto tracpar1;
 			}
 			if (Msg.message == WM_LBUTTONDOWN) {
 
 				UpPixelColor &= TraceRGBMask[ColumnColor];
-				UpPixelColor |= pos << TraceShift[ColumnColor];
+				UpPixelColor |= position << TraceShift[ColumnColor];
 			} else {
 
 				DownPixelColor &= TraceRGBMask[ColumnColor];
-				DownPixelColor |= pos << TraceShift[ColumnColor];
+				DownPixelColor |= position << TraceShift[ColumnColor];
 			}
 		tracpar1:
 			redraw(TraceControlWindow[ColumnColor]);
 			trace();
 		} else {
 
-			pos = floor(TraceMsgPoint.y / ButtonHeight);
-			if (pos < 16) {
+			position = floor(TraceMsgPoint.y / ButtonHeight);
+			if (position < 16) {
 
 				toglMap(TraceRGBFlag[ColumnColor]);
 				redraw(TraceSelectWindow[ColumnColor]);
 				trace();
 			} else {
 
-				if (pos < 18) {
+				if (position < 18) {
 
 					setMap(NUMIN);
 					setMap(TRNIN0);
 					MsgIndex = 0;
 					*TraceInputBuffer = 0;
-					if (pos < 17) {
+					if (position < 17) {
 
 						trnumwnd0(ButtonHeight * 16);
 						setMap(TRNUP);
@@ -14321,13 +14321,13 @@ void tracpar() {
 					}
 				} else {
 
-					if (pos < 20) {
+					if (position < 20) {
 
 						setMap(NUMIN);
 						setMap(TRNIN1);
 						MsgIndex = 0;
 						*TraceInputBuffer = 0;
-						if (pos < 19) {
+						if (position < 19) {
 
 							trnumwnd1(ButtonHeight * 18);
 							setMap(TRNUP);
@@ -14338,7 +14338,7 @@ void tracpar() {
 						}
 					} else {
 
-						switch (pos) {
+						switch (position) {
 
 						case 20:
 
@@ -14374,12 +14374,12 @@ void tracpar() {
 
 #if __UseASM__ == 0
 //Check Translation
-static inline void difsub(unsigned *src, unsigned shft, unsigned *&dst) {
-	*(dst++) = (*src >> (shft & 0x0f)) & 0xff;
+static inline void difsub(unsigned *source, unsigned shift, unsigned *&destination) {
+	*(destination++) = (*source >> (shift & 0x0f)) & 0xff;
 }
 #endif
 
-void difbits(unsigned shft, unsigned* p_bpnt) {
+void difbits(unsigned shift, unsigned* point) {
 
 #if  __UseASM__
 	_asm {
@@ -14393,8 +14393,8 @@ void difbits(unsigned shft, unsigned* p_bpnt) {
 					add		edi, 4
 					ret
 
-		difbts :	mov		esi, p_bpnt
-					mov		ecx, shft
+		difbts :	mov		esi, point
+					mov		ecx, shift
 					mov		edi, offset TraceAdjacentColors
 					mov		ebx, 0xff
 					mov		edx, BitmapWidth
@@ -14418,60 +14418,61 @@ void difbits(unsigned shft, unsigned* p_bpnt) {
 					call	difsub		//8
 	}
 #else
-	//check translation
-	unsigned* l_bpnt = p_bpnt;
-	unsigned *dst = TraceAdjacentColors;
+	// ToDo - check translation
+	unsigned* testPoint = point;
+	unsigned *destination = TraceAdjacentColors;
 
-	difsub(l_bpnt, shft, dst);
+	difsub(testPoint, shift, destination);
 
-	l_bpnt -= BitmapWidth;
-	difsub(l_bpnt, shft, dst);
+	testPoint -= BitmapWidth;
+	difsub(testPoint, shift, destination);
 
-	l_bpnt -= 1;
-	difsub(l_bpnt, shft, dst);
+	testPoint -= 1;
+	difsub(testPoint, shift, destination);
 
-	l_bpnt += 2;
-	difsub(l_bpnt, shft, dst);
+	testPoint += 2;
+	difsub(testPoint, shift, destination);
 
-	l_bpnt += BitmapWidth;
-	difsub(l_bpnt, shft, dst);
+	testPoint += BitmapWidth;
+	difsub(testPoint, shift, destination);
 
-	l_bpnt -= 2;
-	difsub(l_bpnt, shft, dst);
+	testPoint -= 2;
+	difsub(testPoint, shift, destination);
 
-	l_bpnt += BitmapWidth;
-	difsub(l_bpnt, shft, dst);
+	testPoint += BitmapWidth;
+	difsub(testPoint, shift, destination);
 
-	l_bpnt += 1;
-	difsub(l_bpnt, shft, dst);
+	testPoint += 1;
+	difsub(testPoint, shift, destination);
 
-	l_bpnt += 1;
-	difsub(l_bpnt, shft, dst);
+	testPoint += 1;
+	difsub(testPoint, shift, destination);
 #endif
 }
 
-void blanklin(unsigned bind) {
+void blanklin(unsigned lineStart) {
 
-	unsigned ind;
+	unsigned iPoint;
 
-	for (ind = bind; ind < bind + BitmapWidth; ind++)
-		DifferenceBitmap[ind] = 0;
+	for (iPoint = lineStart; iPoint < lineStart + BitmapWidth; iPoint++)
+		DifferenceBitmap[iPoint] = 0;
 }
 
 unsigned trsum() {
 
-	unsigned rsum, ind;
+	unsigned sumAdjacent, iAdjacent;
 
-	rsum = 0;
-	for (ind = 1; ind < 9; ind++)
-		rsum += ((TraceAdjacentColors[ind] > TraceAdjacentColors[0]) ? (TraceAdjacentColors[ind] - TraceAdjacentColors[0]) : (TraceAdjacentColors[0] - TraceAdjacentColors[ind]));
-	return rsum;
+	sumAdjacent = 0;
+	for (iAdjacent = 1; iAdjacent < 9; iAdjacent++)
+		sumAdjacent += ((TraceAdjacentColors[iAdjacent] > TraceAdjacentColors[0]) ? (TraceAdjacentColors[iAdjacent] - TraceAdjacentColors[0]) : (TraceAdjacentColors[0] - TraceAdjacentColors[iAdjacent]));
+	return sumAdjacent;
 }
 
 void trdif() {
 
-	unsigned	ind, ine, inf, l_bpnt = 0, rsum, rmax, rmin;
-	double		rat;
+	unsigned	iHeight, iPixel, iRGB, iWidth, adjustedColorSum;
+	unsigned	iPoint = 0, colorSum, colorSumMaximum, colorSumMinimum;
+	double		ratio;
 
 	if (!*PCSBMPFileName) {
 
@@ -14481,40 +14482,40 @@ void trdif() {
 	rstMap(TRSET);
 	rstMap(HIDMAP);
 	untrace();
+	// ToDo - use local memory allocation
 	DifferenceBitmap = (unsigned*)BSequence;
-	rmax = 0;
-	rmin = 0xffffffff;
+	colorSumMaximum = 0;
+	colorSumMinimum = 0xffffffff;
 	if (!chkMap(WASTRAC))
 		getrmap();
-	ind = 0;
-	for (ind = 0; ind < 3; ind++) {
+	for (iRGB = 0; iRGB < 3; iRGB++) {
 
 		blanklin(0);
-		for (ine = 1; ine < (unsigned)BitmapHeight - 1; ine++) {
+		for (iHeight = 1; iHeight < (unsigned)BitmapHeight - 1; iHeight++) {
 
-			l_bpnt = ine*BitmapWidth;
-			DifferenceBitmap[l_bpnt++] = 0;
-			for (inf = 1; inf < BitmapWidth - 1; inf++) {
+			iPoint = iHeight*BitmapWidth;
+			DifferenceBitmap[iPoint++] = 0;
+			for (iWidth = 1; iWidth < BitmapWidth - 1; iWidth++) {
 
-				difbits(TraceShift[ind], &TraceBitmapData[l_bpnt]);
-				rsum = DifferenceBitmap[l_bpnt] = trsum();
-				l_bpnt++;
-				if (rsum > rmax)
-					rmax = rsum;
-				if (rsum < rmin)
-					rmin = rsum;
+				difbits(TraceShift[iRGB], &TraceBitmapData[iPoint]);
+				colorSum = DifferenceBitmap[iPoint] = trsum();
+				iPoint++;
+				if (colorSum > colorSumMaximum)
+					colorSumMaximum = colorSum;
+				if (colorSum < colorSumMinimum)
+					colorSumMinimum = colorSum;
 			}
-			DifferenceBitmap[l_bpnt++] = 0;
+			DifferenceBitmap[iPoint++] = 0;
 		}
-		blanklin(l_bpnt);
-		rat = (double)255 / (rmax - rmin);
-		for (ine = 0; ine < BitmapWidth*BitmapHeight; ine++) {
+		blanklin(iPoint);
+		ratio = (double)255 / (colorSumMaximum - colorSumMinimum);
+		for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
 
-			TraceBitmapData[ine] &= TraceRGBMask[ind];
-			if (DifferenceBitmap[ine]) {
+			TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
+			if (DifferenceBitmap[iPixel]) {
 
-				inf = (DifferenceBitmap[ine] - rmin)*rat;
-				TraceBitmapData[ine] |= inf << TraceShift[ind];
+				adjustedColorSum = (DifferenceBitmap[iPixel] - colorSumMinimum)*ratio;
+				TraceBitmapData[iPixel] |= adjustedColorSum << TraceShift[iRGB];
 			}
 		}
 	}
@@ -14547,19 +14548,19 @@ void chkbit() {
 	}
 }
 
-void trcnum(unsigned shft, COLORREF col, unsigned ind) {
+void trcnum(unsigned shift, COLORREF color, unsigned iRGB) {
 
-	unsigned	len;
-	unsigned	nwid;
-	TCHAR		trbuf[11] = { 0 };
+	unsigned	bufferLength;
+	unsigned	xPosition;
+	TCHAR		buffer[11] = { 0 };
 
-	col >>= shft;
-	col &= 0xff;
-	_itoa_s(col, trbuf, 10);
-	len = strlen(trbuf);
-	nwid = NumeralWidth*(3 - len) + 1;
-	SetBkColor(DrawItem->hDC, TraceRGB[ind]);
-	TextOut(DrawItem->hDC, nwid, 1, trbuf, strlen(trbuf));
+	color >>= shift;
+	color &= 0xff;
+	_itoa_s(color, buffer, 10);
+	bufferLength = strlen(buffer);
+	xPosition = NumeralWidth*(3 - bufferLength) + 1;
+	SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
+	TextOut(DrawItem->hDC, xPosition, 1, buffer, strlen(buffer));
 }
 
 void upnum(unsigned ind) {
