@@ -13071,10 +13071,10 @@ void frmcurmen() {
 	}
 }
 
-void frmcursel(unsigned stat) {
+void frmcursel(unsigned cursorType) {
 
 	setu(FRMX);
-	if (!stat)
+	if (!cursorType)
 		rstu(FRMX);
 	frmcurmen();
 	setMap(DUMEN);
@@ -13082,37 +13082,37 @@ void frmcursel(unsigned stat) {
 
 #pragma warning (push)
 #pragma warning (disable : 4725)
-void stchsnap(unsigned strt, unsigned fin) {
+void stchsnap(unsigned start, unsigned finish) {
 
 #if  __UseASM__
 	_asm {
-		xor		eax, eax
-		mov		al, 12
-		mul		strt
-		mov		ecx, fin
-		sub		ecx, strt
-		je		short stchsnapx
-		add		eax, offset StitchBuffer
-		fld		IniFile.gridSize
-		snplup : fld		dword ptr[eax]
-				 fdiv	st, st(1)
-				 frndint
-				 fmul	st, st(1)
-				 fstp	dword ptr[eax]
-				 add		eax, 4
-				 fld		dword ptr[eax]
-				 fdiv	st, st(1)
-				 frndint
-				 fmul	st, st(1)
-				 fstp	dword ptr[eax]
-				 add		eax, 8
-				 loop	snplup
-				 stchsnapx :
+			xor		eax, eax
+			mov		al, 12
+			mul		start
+			mov		ecx, finish
+			sub		ecx, start
+			je		short stchsnapx
+			add		eax, offset StitchBuffer
+			fld		IniFile.gridSize
+snplup :	fld		dword ptr[eax]
+			fdiv	st, st(1)
+			frndint
+			fmul	st, st(1)
+			fstp	dword ptr[eax]
+			add		eax, 4
+			fld		dword ptr[eax]
+			fdiv	st, st(1)
+			frndint
+			fmul	st, st(1)
+			fstp	dword ptr[eax]
+			add		eax, 8
+			loop	snplup
+			stchsnapx :
 	}
 #else
-	fPOINTATTR *pnt = StitchBuffer + strt;
+	fPOINTATTR *pnt = StitchBuffer + start;
 
-	for (unsigned i = 0; i < fin - strt; i++) {
+	for (unsigned i = 0; i < finish - start; i++) {
 		pnt->x = rintf(pnt->x / IniFile.gridSize) * IniFile.gridSize;
 		pnt->y = rintf(pnt->y / IniFile.gridSize) * IniFile.gridSize;
 
@@ -13124,30 +13124,30 @@ void stchsnap(unsigned strt, unsigned fin) {
 
 #pragma warning (push)
 #pragma warning (disable : 4725)
-void frmsnap(fPOINT* strt, unsigned cnt) {
+void frmsnap(fPOINT* start, unsigned count) {
 
 #if  __UseASM__
 	_asm {
-		mov		eax, strt
-		mov		ecx, cnt
-		shl		ecx, 1
-		je		short frmsnapx
-		fld		IniFile.gridSize
-		snpflup : fld		dword ptr[eax]
-				  fdiv	st, st(1)
-				  frndint
-				  fmul	st, st(1)
-				  fstp	dword ptr[eax]
-				  add		eax, 4
-				  loop	snpflup
-				  frmsnapx :
+			mov		eax, start
+			mov		ecx, count
+			shl		ecx, 1
+			je		short frmsnapx
+			fld		IniFile.gridSize
+snpflup :	fld		dword ptr[eax]
+			fdiv	st, st(1)
+			frndint
+			fmul	st, st(1)
+			fstp	dword ptr[eax]
+			add		eax, 4
+			loop	snpflup
+			frmsnapx :
 	}
 #else
-	for (unsigned i = 0; i < cnt; i++) {
-		strt->x = rintf(strt->x / IniFile.gridSize) * IniFile.gridSize;
-		strt->y = rintf(strt->y / IniFile.gridSize) * IniFile.gridSize;
+	for (unsigned i = 0; i < count; i++) {
+		start->x = rintf(start->x / IniFile.gridSize) * IniFile.gridSize;
+		start->y = rintf(start->y / IniFile.gridSize) * IniFile.gridSize;
 
-		strt++;
+		start++;
 	}
 #endif
 }
@@ -13155,7 +13155,7 @@ void frmsnap(fPOINT* strt, unsigned cnt) {
 
 void gsnap() {
 
-	unsigned ind;
+	unsigned iForm;
 
 	if (chkMap(TXTRED))
 	{
@@ -13165,9 +13165,9 @@ void gsnap() {
 	if (SelectedFormCount) {
 
 		savdo();
-		for (ind = 0; ind < SelectedFormCount; ind++) {
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
-			ClosestFormToCursor = SelectedFormList[ind];
+			ClosestFormToCursor = SelectedFormList[iForm];
 			frmsnap(FormList[ClosestFormToCursor].vertices, FormList[ClosestFormToCursor].sides);
 			frmout(ClosestFormToCursor);
 			refil();
@@ -13216,49 +13216,50 @@ void savpes() {
 
 void ritlock(HWND hwndlg) {
 
-	unsigned ind;
-	WIN32_FIND_DATA*	pdat;
+	unsigned			iFile;
+	WIN32_FIND_DATA*	fileData;
 
-	pdat = (WIN32_FIND_DATA*)&BSequence;
+	fileData = (WIN32_FIND_DATA*)&BSequence;
 	SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_RESETCONTENT, 0, 0);
 	SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
-	for (ind = 0; ind < ActivePointIndex; ind++) {
+	for (iFile = 0; iFile < ActivePointIndex; iFile++) {
 
-		if (pdat[ind].dwFileAttributes&FILE_ATTRIBUTE_READONLY)
-			SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_ADDSTRING, 0, (long)pdat[ind].cFileName);
+		if (fileData[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)
+			SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_ADDSTRING, 0, (long)fileData[iFile].cFileName);
 		else
-			SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_ADDSTRING, 0, (long)pdat[ind].cFileName);
+			SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_ADDSTRING, 0, (long)fileData[iFile].cFileName);
 	}
 }
 
 BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	WIN32_FIND_DATA*	pdat;
-	HANDLE				srch;
-	TCHAR				snam[_MAX_PATH];
-	TCHAR				tnam[_MAX_PATH];
-	unsigned			ind, ine;
-	HWND				hlok, hunlok;
-
-	pdat = (WIN32_FIND_DATA*)&BSequence;
+	WIN32_FIND_DATA*	fileData;
+	HANDLE				searchResult;
+	TCHAR				searchName[_MAX_PATH];
+	TCHAR				fileName[_MAX_PATH];
+	unsigned			iFile, fileError;
+	HWND				lockHandle, unlockHandle;
+	// ToDo - use local variable for fileData
+	fileData = (WIN32_FIND_DATA*)&BSequence;
 	switch (umsg) {
 
 	case WM_INITDIALOG:
 
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-		strcpy_s(snam, DefaultDirectory);
-		strcat_s(snam, "\\*.thr");
-		srch = FindFirstFile(snam, &pdat[0]);
-		if (srch == INVALID_HANDLE_VALUE) {
+		strcpy_s(searchName, DefaultDirectory);
+		strcat_s(searchName, "\\*.thr");
+		searchResult = FindFirstFile(searchName, &fileData[0]);
+		if (searchResult == INVALID_HANDLE_VALUE) {
 
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Directory: %s has no .thr files\n", DefaultDirectory);
 			shoMsg(MsgBuffer);
 			EndDialog(hwndlg, wparam);
 			return TRUE;
 		}
+		// ToDo - Use a local variable
 		ActivePointIndex = 1;
-		while (FindNextFile(srch, &pdat[ActivePointIndex++]));
+		while (FindNextFile(searchResult, &fileData[ActivePointIndex++]));
 		ActivePointIndex--;
 		ritlock(hwndlg);
 		break;
@@ -13274,29 +13275,29 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 		case IDC_LOCKAL:
 
-			for (ind = 0; ind < ActivePointIndex; ind++)
-				pdat[ind].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
+			for (iFile = 0; iFile < ActivePointIndex; iFile++)
+				fileData[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
 			ritlock(hwndlg);
 			break;
 
 		case IDC_UNLOCKAL:
 
-			for (ind = 0; ind < ActivePointIndex; ind++)
-				pdat[ind].dwFileAttributes &= 0xffffffff ^ FILE_ATTRIBUTE_READONLY;
+			for (iFile = 0; iFile < ActivePointIndex; iFile++)
+				fileData[iFile].dwFileAttributes &= 0xffffffff ^ FILE_ATTRIBUTE_READONLY;
 			ritlock(hwndlg);
 			break;
 
 		case IDC_LOCK:
 
-			ine = 0;
-			hunlok = GetDlgItem(hwndlg, IDC_UNLOCKED);
-			for (ind = 0; ind < ActivePointIndex; ind++) {
+			fileError = 0;
+			unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
+			for (iFile = 0; iFile < ActivePointIndex; iFile++) {
 
-				if (!(pdat[ind].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
+				if (!(fileData[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
 
-					if (SendMessage(hunlok, LB_GETSEL, ine, 0))
-						pdat[ind].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
-					ine++;
+					if (SendMessage(unlockHandle, LB_GETSEL, fileError, 0))
+						fileData[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
+					fileError++;
 				}
 			}
 			ritlock(hwndlg);
@@ -13304,15 +13305,15 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 		case IDC_UNLOCK:
 
-			ine = 0;
-			hlok = GetDlgItem(hwndlg, IDC_LOCKED);
-			for (ind = 0; ind < ActivePointIndex; ind++) {
+			fileError = 0;
+			lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
+			for (iFile = 0; iFile < ActivePointIndex; iFile++) {
 
-				if ((pdat[ind].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
+				if ((fileData[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
 
-					if (SendMessage(hlok, LB_GETSEL, ine, 0))
-						pdat[ind].dwFileAttributes &= 0xffffffff ^ FILE_ATTRIBUTE_READONLY;
-					ine++;
+					if (SendMessage(lockHandle, LB_GETSEL, fileError, 0))
+						fileData[iFile].dwFileAttributes &= 0xffffffff ^ FILE_ATTRIBUTE_READONLY;
+					fileError++;
 				}
 			}
 			ritlock(hwndlg);
@@ -13320,19 +13321,19 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 		case IDOK:
 
-			strcpy_s(snam, DefaultDirectory);
-			strcat_s(snam, "\\");
-			ine = 0;
-			for (ind = 0; ind < ActivePointIndex; ind++) {
+			strcpy_s(searchName, DefaultDirectory);
+			strcat_s(searchName, "\\");
+			fileError = 0;
+			for (iFile = 0; iFile < ActivePointIndex; iFile++) {
 
-				strcpy_s(tnam, snam);
-				strcat_s(tnam, pdat[ind].cFileName);
-				if (!SetFileAttributes(tnam, pdat[ind].dwFileAttributes))
-					ine++;
+				strcpy_s(fileName, searchName);
+				strcat_s(fileName, fileData[iFile].cFileName);
+				if (!SetFileAttributes(fileName, fileData[iFile].dwFileAttributes))
+					fileError++;
 			}
-			if (ine) {
+			if (fileError) {
 
-				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d files could not be locked or unlocked\n", ine);
+				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d files could not be locked or unlocked\n", fileError);
 				shoMsg(MsgBuffer);
 			}
 			EndDialog(hwndlg, wparam);
@@ -13348,71 +13349,71 @@ void lock() {
 	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, (DLGPROC)LockPrc);
 }
 
-unsigned colsum(COLORREF col) {
+unsigned colsum(COLORREF color) {
 
-	unsigned colsum;
-	unsigned ind;
+	unsigned colorSum;
+	unsigned iRGB;
 
-	trcols(col);
-	colsum = 0;
-	for (ind = 0; ind < 3; ind++) {
+	trcols(color);
+	colorSum = 0;
+	for (iRGB = 0; iRGB < 3; iRGB++) {
 
-		if (chkMap(TraceRGBFlag[ind]))
-			colsum += PixelColors[ind];
+		if (chkMap(TraceRGBFlag[iRGB]))
+			colorSum += PixelColors[iRGB];
 	}
-	return colsum;
+	return colorSum;
 }
 
-unsigned icolsum(COLORREF col) {
+unsigned icolsum(COLORREF color) {
 
-	unsigned colsum;
-	unsigned ind;
+	unsigned colorSum;
+	unsigned iRGB;
 
-	trcols(col);
-	colsum = 0;
-	for (ind = 0; ind < 3; ind++) {
+	trcols(color);
+	colorSum = 0;
+	for (iRGB = 0; iRGB < 3; iRGB++) {
 
-		if (chkMap(TraceRGBFlag[ind]))
-			colsum += 255 - PixelColors[ind];
+		if (chkMap(TraceRGBFlag[iRGB]))
+			colorSum += 255 - PixelColors[iRGB];
 	}
-	return colsum;
+	return colorSum;
 }
 
-COLORREF dwnshft(COLORREF col) {
+COLORREF dwnshft(COLORREF color) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		eax, col
+		mov		eax, color
 		shr		eax, 1
 		and eax, 0x3f3f3f
 	}
 #else
-	return (col >> 1) & 0x3f3f3f;
+	return (color >> 1) & 0x3f3f3f;
 #endif
 }
 
-void setrac(unsigned p_bpnt) {
+void setrac(unsigned point) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		eax, p_bpnt
+		mov		eax, point
 		mov		ebx, offset OSequence
 		bts[ebx], eax
 	}
 #else
-	_bittestandset((long *)OSequence, p_bpnt);
+	_bittestandset((long *)OSequence, point);
 #endif
 }
 
-BOOL getrac(unsigned p_bpnt) {
+BOOL getrac(unsigned point) {
 
 #if  __UseASM__
 	_asm {
 
 		xor		eax, eax
-		mov		ecx, p_bpnt
+		mov		ecx, point
 		mov		ebx, offset OSequence
 		bt[ebx], ecx
 		jnc		short getracx
@@ -13420,7 +13421,7 @@ BOOL getrac(unsigned p_bpnt) {
 		getracx :
 	}
 #else
-	return _bittest((long *)OSequence, p_bpnt);
+	return _bittest((long *)OSequence, point);
 #endif
 }
 
@@ -13436,28 +13437,28 @@ void hidwnd(HWND hwnd) {
 
 void untrace() {
 
-	unsigned	ind;
+	unsigned	iColor, iTrace, iButton;
 
 	if (rstMap(WASTRAC)) {
 
 		DeleteObject(TraceBitmap);
 		ReleaseDC(ThrEdWindow, TraceDC);
 		rstMap(WASEDG);
-		for (ind = 0; ind < 16; ind++) {
+		for (iColor = 0; iColor < 16; iColor++) {
 
-			shownd(DefaultColorWin[ind]);
-			shownd(UserColorWin[ind]);
-			shownd(ThreadSizeWin[ind]);
+			shownd(DefaultColorWin[iColor]);
+			shownd(UserColorWin[iColor]);
+			shownd(ThreadSizeWin[iColor]);
 		}
-		for (ind = 0; ind < 3; ind++) {
+		for (iTrace = 0; iTrace < 3; iTrace++) {
 
-			hidwnd(TraceControlWindow[ind]);
-			hidwnd(TraceSelectWindow[ind]);
-			hidwnd(TraceUpWindow[ind]);
-			hidwnd(TraceDownWindow[ind]);
+			hidwnd(TraceControlWindow[iTrace]);
+			hidwnd(TraceSelectWindow[iTrace]);
+			hidwnd(TraceUpWindow[iTrace]);
+			hidwnd(TraceDownWindow[iTrace]);
 		}
-		for (ind = 0; ind < 9; ind++)
-			shownd(ButtonWin[ind]);
+		for (iButton = 0; iButton < 9; iButton++)
+			shownd(ButtonWin[iButton]);
 		hidwnd(TraceStepWin);
 	} else {
 
@@ -13480,30 +13481,30 @@ void trcratnum() {
 	butxt(HLIN, MsgBuffer);
 }
 
-void clrhbut(unsigned strt)
+void clrhbut(unsigned startButton)
 {
-	unsigned ind;
+	unsigned iButton;
 
-	for (ind = strt; ind < 9; ind++)
-		SetWindowText(ButtonWin[ind], "");
+	for (iButton = startButton; iButton < 9; iButton++)
+		SetWindowText(ButtonWin[iButton], "");
 }
 
 void tracwnd() {
 
-	unsigned ind;
+	unsigned iColor, iTrace;
 
-	for (ind = 0; ind < 16; ind++) {
+	for (iColor = 0; iColor < 16; iColor++) {
 
-		hidwnd(DefaultColorWin[ind]);
-		hidwnd(UserColorWin[ind]);
-		hidwnd(ThreadSizeWin[ind]);
+		hidwnd(DefaultColorWin[iColor]);
+		hidwnd(UserColorWin[iColor]);
+		hidwnd(ThreadSizeWin[iColor]);
 	}
-	for (ind = 0; ind < 3; ind++) {
+	for (iTrace = 0; iTrace < 3; iTrace++) {
 
-		shownd(TraceControlWindow[ind]);
-		shownd(TraceSelectWindow[ind]);
-		shownd(TraceUpWindow[ind]);
-		shownd(TraceDownWindow[ind]);
+		shownd(TraceControlWindow[iTrace]);
+		shownd(TraceSelectWindow[iTrace]);
+		shownd(TraceUpWindow[iTrace]);
+		shownd(TraceDownWindow[iTrace]);
 	}
 	hidwnd(ButtonWin[HBOXSEL]);
 	hidwnd(ButtonWin[HUPTO]);
@@ -13513,12 +13514,12 @@ void tracwnd() {
 	clrhbut(4);
 }
 
-void trcols(COLORREF col) {
+void trcols(COLORREF color) {
 
 #if  __UseASM__
 	_asm {
 
-		mov		eax, col
+		mov		eax, color
 		mov		ecx, offset PixelColors
 		movzx	ebx, al
 		mov[ecx], ebx
@@ -13531,18 +13532,17 @@ void trcols(COLORREF col) {
 		mov[ecx], ebx
 	}
 #else
-	//Check translation
-	PixelColors[0] = col & 0xff;
-	PixelColors[1] = (col & 0xff00) >> 8;
-	PixelColors[2] = (col & 0xff0000) >> 16;
+	PixelColors[0] = color & 0xff;
+	PixelColors[1] = (color & 0xff00) >> 8;
+	PixelColors[2] = (color & 0xff0000) >> 16;
 #endif
 }
 
-BOOL trcin(COLORREF col) {
+BOOL trcin(COLORREF color) {
 
-	if (col) {
+	if (color) {
 
-		trcols(col);
+		trcols(color);
 		if (chkMap(TRCRED)) {
 
 			if (PixelColors[0] > HighColors[0])
@@ -13571,19 +13571,19 @@ BOOL trcin(COLORREF col) {
 
 void getrmap() {
 
-	BITMAPINFO			l_binf;
-	BITMAPINFOHEADER	l_binfh;
-	unsigned			ind;
+	BITMAPINFO			info;
+	BITMAPINFOHEADER	header;
+	unsigned			iPixel;
 
-	memset((BITMAPINFOHEADER*)&l_binfh, 0, sizeof(BITMAPINFOHEADER));
-	l_binfh.biSize = sizeof(BITMAPINFOHEADER);
-	l_binfh.biWidth = BitmapWidth;
-	l_binfh.biHeight = BitmapHeight;
-	l_binfh.biPlanes = 1;
-	l_binfh.biBitCount = 32;
-	l_binfh.biCompression = BI_RGB;
-	l_binf.bmiHeader = l_binfh;
-	TraceBitmap = CreateDIBSection(BitmapDC, &l_binf, DIB_RGB_COLORS, (void**)&TraceBitmapData, 0, 0);
+	memset((BITMAPINFOHEADER*)&header, 0, sizeof(BITMAPINFOHEADER));
+	header.biSize = sizeof(BITMAPINFOHEADER);
+	header.biWidth = BitmapWidth;
+	header.biHeight = BitmapHeight;
+	header.biPlanes = 1;
+	header.biBitCount = 32;
+	header.biCompression = BI_RGB;
+	info.bmiHeader = header;
+	TraceBitmap = CreateDIBSection(BitmapDC, &info, DIB_RGB_COLORS, (void**)&TraceBitmapData, 0, 0);
 	TraceDC = CreateCompatibleDC(StitchWindowDC);
 	if (TraceBitmap && TraceDC) {
 		SelectObject(TraceDC, TraceBitmap);
@@ -13591,8 +13591,8 @@ void getrmap() {
 		setMap(WASTRAC);
 		TracedPixels = (unsigned*)OSequence;
 		TraceDataSize = ((BitmapWidth*BitmapHeight) >> 5) + 1;
-		for (ind = 0; ind < TraceDataSize; ind++)
-			TracedPixels[ind] = 0;
+		for (iPixel = 0; iPixel < TraceDataSize; iPixel++)
+			TracedPixels[iPixel] = 0;
 		StretchBlt(StitchWindowMemDC, BitmapDstRect.left, BitmapDstRect.top, BitmapDstRect.right - BitmapDstRect.left, BitmapDstRect.bottom - BitmapDstRect.top,
 			BitmapDC, BitmapSrcRect.left, BitmapSrcRect.top, BitmapSrcRect.right - BitmapSrcRect.left, BitmapSrcRect.bottom - BitmapSrcRect.top, SRCCOPY);
 	}
