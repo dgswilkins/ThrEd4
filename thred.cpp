@@ -15377,12 +15377,12 @@ void selfpnt() {
 unsigned chkMsg() {
 
 	unsigned		l_code, dst;
-	unsigned		ine, inf, iSide, iStitch, iVertex, iSelectedVertex, iForm;
+	unsigned		ine, inf, iSide, iStitch, iVertex, iSelectedVertex, iForm, iVersion, selectedVertexCount, formCount;
 	long			ind;
 	long			lineLength;
 	TCHAR			cmap[] = { '3','4','6' };
 	TCHAR			buf[20];
-	double			tdub,ratio;
+	double			ratio, swapCoordinate, swapFactor, colorBarPosition;
 	fPOINT			newSize;
 	fPOINT			adjustedPoint;
 	RECT			trct;
@@ -15945,21 +15945,21 @@ unsigned chkMsg() {
 
 				if (SelectedPoint.x < ZoomBoxOrigin.x) {
 
-					tdub = ZoomBoxOrigin.x;
+					swapCoordinate = ZoomBoxOrigin.x;
 					ZoomBoxOrigin.x = SelectedPoint.x;
-					SelectedPoint.x = tdub;
+					SelectedPoint.x = swapCoordinate;
 				}
 				if (SelectedPoint.y < ZoomBoxOrigin.y) {
 
-					tdub = ZoomBoxOrigin.y;
+					swapCoordinate = ZoomBoxOrigin.y;
 					ZoomBoxOrigin.y = SelectedPoint.y;
-					SelectedPoint.y = tdub;
+					SelectedPoint.y = swapCoordinate;
 				}
 				newSize.x = SelectedPoint.x - ZoomBoxOrigin.x;
 				newSize.y = SelectedPoint.y - ZoomBoxOrigin.y;
 				SelectedPoint.x = ZoomBoxOrigin.x + newSize.x / 2;
 				SelectedPoint.y = ZoomBoxOrigin.y + newSize.y / 2;
-				tdub = ZoomFactor;
+				swapFactor = ZoomFactor;
 				if (newSize.x > newSize.y) {
 
 					newSize.y = newSize.x / StitchWindowAspectRatio;
@@ -15971,7 +15971,7 @@ unsigned chkMsg() {
 				}
 				if (ZoomFactor < ZoomMin) {
 
-					ZoomFactor = tdub;
+					ZoomFactor = swapFactor;
 					zumin();
 					return 1;
 				}
@@ -16017,11 +16017,11 @@ unsigned chkMsg() {
 				setMap(RBUT);
 			else
 				rstMap(RBUT);
-			for (ind = 0; ind < OLDVER; ind++) {
+			for (iVersion = 0; iVersion < OLDVER; iVersion++) {
 
-				if (Msg.hwnd == BackupViewer[ind]) {
+				if (Msg.hwnd == BackupViewer[iVersion]) {
 
-					FileVersionIndex = ind;
+					FileVersionIndex = iVersion;
 					if (chkMap(THUMSHO)) {
 
 						if (savcmp())
@@ -16049,21 +16049,20 @@ unsigned chkMsg() {
 			&&Msg.pt.y >= ColorBarRect.top&&Msg.pt.y <= ColorBarRect.bottom) {
 
 			unpat();
-			tdub = (double)(Msg.pt.y - ColorBarRect.top) / (ColorBarRect.bottom - ColorBarRect.top);
+			colorBarPosition = (double)(Msg.pt.y - ColorBarRect.top) / (ColorBarRect.bottom - ColorBarRect.top);
 			if (Msg.message == WM_RBUTTONDOWN) {
 
-				tdub = (double)(Msg.pt.y - ColorBarRect.top) / (ColorBarRect.bottom - ColorBarRect.top);
 				if (Msg.wParam&MK_SHIFT && (chkMap(SELBOX) || chkMap(GRPSEL))) {
 
 					unbox();
-					GroupStitchIndex = tdub*PCSHeader.stitchCount;
+					GroupStitchIndex = colorBarPosition*PCSHeader.stitchCount;
 					setMap(GRPSEL);
 					grpAdj();
 					nuAct(GroupStitchIndex);
 					setMap(RESTCH);
 				} else {
 
-					ClosestPointIndex = tdub*PCSHeader.stitchCount;
+					ClosestPointIndex = colorBarPosition*PCSHeader.stitchCount;
 					nuAct(ClosestPointIndex);
 					movbox();
 					if (rstMap(GRPSEL)) {
@@ -16075,7 +16074,7 @@ unsigned chkMsg() {
 				}
 			} else {
 
-				ClosestPointIndex = tdub*PCSHeader.stitchCount;
+				ClosestPointIndex = colorBarPosition*PCSHeader.stitchCount;
 				nuAct(ClosestPointIndex);
 				rstAll();
 				setMap(SELBOX);
@@ -16101,14 +16100,14 @@ unsigned chkMsg() {
 					rstMap(FRMPSEL);
 					setMap(FPSEL);
 					SelectedFormVertices.finish = ClosestVertexToCursor;
-					ine = (SelectedFormVertices.finish - SelectedFormVertices.start + VertexCount) % VertexCount;
-					if (ine < (unsigned)VertexCount >> 1) {
+					selectedVertexCount = (SelectedFormVertices.finish - SelectedFormVertices.start + VertexCount) % VertexCount;
+					if (selectedVertexCount < (unsigned)VertexCount >> 1) {
 
-						SelectedFormVertices.vertexCount = ine;
+						SelectedFormVertices.vertexCount = selectedVertexCount;
 						setMap(PSELDIR);
 					} else {
 
-						SelectedFormVertices.vertexCount = VertexCount - ine;
+						SelectedFormVertices.vertexCount = VertexCount - selectedVertexCount;
 						rstMap(PSELDIR);
 					}
 					setpsel();
@@ -16193,7 +16192,6 @@ unsigned chkMsg() {
 					TmpFormIndex = ClosestFormToCursor;
 					if (closfrm()) {
 
-						ine = 0;
 						if (SelectedFormCount) {
 
 							nuslst(ClosestFormToCursor);
@@ -16203,15 +16201,16 @@ unsigned chkMsg() {
 
 							if (rstMap(FORMSEL) && TmpFormIndex != ClosestFormToCursor) {
 
+								formCount = 0;
 								if (TmpFormIndex > ClosestFormToCursor) {
 
-									ine = ClosestFormToCursor;
+									formCount = ClosestFormToCursor;
 									ClosestFormToCursor = TmpFormIndex;
-									TmpFormIndex = ine;
+									TmpFormIndex = formCount;
 								}
 								for (ind = TmpFormIndex; ind <= (long)ClosestFormToCursor; ind++)
-									SelectedFormList[ine++] = ind;
-								SelectedFormCount = ine;
+									SelectedFormList[formCount++] = ind;
+								SelectedFormCount = formCount;
 								setMap(RESTCH);
 								return 1;
 							} else
