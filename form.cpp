@@ -12105,6 +12105,7 @@ void clpcon() {
 	ind = RegionCrossingStart = cnt = 0;
 	seg = RegionCrossingData[0].seg;
 	clrnum = (nrct.top >> 5) + 1;
+	// ToDo -When copy-pasting multiple forms, ActivePoint Index is not being updated correctly
 	ActivePointIndex = 0;
 	for (ind = 0; ind < segps; ind++) {
 		RegionCrossingStart = iclpx[ind];
