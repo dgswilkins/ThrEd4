@@ -5481,7 +5481,7 @@ void redtx()
 	char nam[_MAX_PATH];
 	HANDLE hnam;
 	DWORD l_BytesRead;
-	unsigned int ind;
+	unsigned int ind, historyCount;
 	char sig[4] = { 0 };
 
 	TextureHistoryIndex = 15;
@@ -5496,9 +5496,16 @@ void redtx()
 			{
 				ReadFile(hnam, (int*)&TextureHistoryIndex, 4, &l_BytesRead, 0);
 				ReadFile(hnam, (TXHST*)&TextureHistory, sizeof(TXHST) * 16, &l_BytesRead, 0);
+				// capture the number of histories read in, since l_BytesRead will be overwritten in the loop
+				historyCount = l_BytesRead / sizeof(TXHST);
 				//ToDo - texturePoint should be a null pointer at this point as no memory has been allocated, but it is not
-				//       because the old pointer value is read in from the file, so zero it out
-				for (ind = 0; ind < (l_BytesRead / sizeof(TXHST)); ind++)
+				//       because the old pointer value is read in from the file, so zero it out either here or when writing it
+				//       to avoid the problem in the first place
+				for (ind = 0; ind < 16; ind++) {
+					TextureHistory[ind].texturePoint = 0;
+				}
+
+				for (ind = 0; ind < historyCount; ind++)
 				{
 					if (TextureHistory[ind].count)
 					{

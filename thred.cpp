@@ -15760,7 +15760,7 @@ unsigned chkMsg() {
 				if (chkMap(BIGBOX)) {
 
 					savdo();
-					for (iForm = 0; iForm < (long)FormIndex; iForm++)
+					for (iForm = 0; iForm < FormIndex; iForm++)
 						frmadj(iForm);
 					for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
@@ -15771,8 +15771,8 @@ unsigned chkMsg() {
 				} else {
 
 					savdo();
-					for (l_code = 0; l_code < SelectedFormCount; l_code++)
-						frmadj(SelectedFormList[l_code]);
+					for (iForm = 0; iForm < SelectedFormCount; iForm++)
+						frmadj(SelectedFormList[iForm]);
 					frmsadj();
 					setMap(RESTCH);
 				}
@@ -15819,10 +15819,10 @@ unsigned chkMsg() {
 			unsel();
 			adjustedPoint.x = (StitchRangeRect.left + SelectBoxOffset.x) - SelectedPoint.x;
 			adjustedPoint.y = (StitchRangeRect.bottom + SelectBoxOffset.y) - SelectedPoint.y;
-			for (ind = GroupStartStitch; ind <= (long)GroupEndStitch; ind++) {
+			for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
 
-				StitchBuffer[ind].x -= adjustedPoint.x;
-				StitchBuffer[ind].y -= adjustedPoint.y;
+				StitchBuffer[iStitch].x -= adjustedPoint.x;
+				StitchBuffer[iStitch].y -= adjustedPoint.y;
 			}
 			setMap(RESTCH);
 			return 1;
@@ -15876,11 +15876,11 @@ unsigned chkMsg() {
 				if (rstMap(GRPSEL)) {
 
 					rngadj();
-					for (ine = GroupStartStitch; ine < GroupEndStitch; ine++) {
+					for (iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
 
-						if (inrng(ine)) {
+						if (inrng(iStitch)) {
 
-							ClosestPointIndex = ine;
+							ClosestPointIndex = iStitch;
 							setMap(SELBOX);
 							break;
 						}
@@ -15890,10 +15890,10 @@ unsigned chkMsg() {
 
 					SelectedFormCount = 0;
 					rstMap(FORMSEL);
-					for (ine = 0; ine < FormIndex; ine++) {
+					for (iForm = 0; iForm < FormIndex; iForm++) {
 
-						if (finrng(ine))
-							SelectedFormList[SelectedFormCount++] = ine;
+						if (finrng(iForm))
+							SelectedFormList[SelectedFormCount++] = iForm;
 					}
 					if (SelectedFormCount) {
 
