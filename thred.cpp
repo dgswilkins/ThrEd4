@@ -15377,20 +15377,20 @@ void selfpnt() {
 unsigned chkMsg() {
 
 	unsigned		l_code, dst;
-	unsigned		ine, inf;
+	unsigned		ine, inf, iSide, iStitch, iVertex, iSelectedVertex, iForm;
 	long			ind;
-	long			tlng;
+	long			lineLength;
 	TCHAR			cmap[] = { '3','4','6' };
 	TCHAR			buf[20];
-	double			tdub;
-	fPOINT			nusiz;
-	fPOINT			padj;
+	double			tdub,ratio;
+	fPOINT			newSize;
+	fPOINT			adjustedPoint;
 	RECT			trct;
 	SATCON*			l_sac;
 	fPOINT*			l_clipData;
-	POINT			tpnt;
+	POINT			point;
 	FRMHED*			tfrm;
-	fRECTANGLE			tbig;
+	fRECTANGLE		tbig;
 	unsigned char*	pchr;
 	TXPNT*			ptx;
 	TXPNT*			pts;
@@ -15481,9 +15481,9 @@ unsigned chkMsg() {
 			if (chkMap(INSFIL)) {
 
 				unfrm();
-				tpnt.x = Msg.pt.x - StitchWindowOrigin.x;
-				tpnt.y = Msg.pt.y - StitchWindowOrigin.y;
-				insflin(tpnt);
+				point.x = Msg.pt.x - StitchWindowOrigin.x;
+				point.y = Msg.pt.y - StitchWindowOrigin.y;
+				insflin(point);
 				setMap(SHOFRM);
 				dufrm();
 				return 1;
@@ -15510,36 +15510,36 @@ unsigned chkMsg() {
 			if (chkMap(EXPAND)) {
 
 				unstrtch();
-				nusiz.x = Msg.pt.x - StitchWindowOrigin.x;
-				nusiz.y = Msg.pt.y - StitchWindowOrigin.y;
-				ind = (SelectedFormControlVertex + 2) % 4;
-				tdub = fabs((double)(nusiz.x - StretchBoxLine[ind].x) / (nusiz.y - StretchBoxLine[ind].y));
-				if (ind & 1) {
+				newSize.x = Msg.pt.x - StitchWindowOrigin.x;
+				newSize.y = Msg.pt.y - StitchWindowOrigin.y;
+				iSide = (SelectedFormControlVertex + 2) % 4;
+				ratio = fabs((double)(newSize.x - StretchBoxLine[iSide].x) / (newSize.y - StretchBoxLine[iSide].y));
+				if (iSide & 1) {
 
-					if (tdub < XYratio)
-						nusiz.x = (StretchBoxLine[ind].y - nusiz.y)*XYratio + StretchBoxLine[ind].x;
+					if (ratio < XYratio)
+						newSize.x = (StretchBoxLine[iSide].y - newSize.y)*XYratio + StretchBoxLine[iSide].x;
 					else
-						nusiz.y = (StretchBoxLine[ind].x - nusiz.x) / XYratio + StretchBoxLine[ind].y;
-					ind = nxtcrnr(ind);
-					StretchBoxLine[ind].y = nusiz.y;
-					ind = nxtcrnr(ind);
-					StretchBoxLine[ind].x = nusiz.x;
-					StretchBoxLine[ind].y = nusiz.y;
-					ind = nxtcrnr(ind);
-					StretchBoxLine[ind].x = nusiz.x;
+						newSize.y = (StretchBoxLine[iSide].x - newSize.x) / XYratio + StretchBoxLine[iSide].y;
+					iSide = nxtcrnr(iSide);
+					StretchBoxLine[iSide].y = newSize.y;
+					iSide = nxtcrnr(iSide);
+					StretchBoxLine[iSide].x = newSize.x;
+					StretchBoxLine[iSide].y = newSize.y;
+					iSide = nxtcrnr(iSide);
+					StretchBoxLine[iSide].x = newSize.x;
 				} else {
 
-					if (tdub < XYratio)
-						nusiz.x = (nusiz.y - StretchBoxLine[ind].y)*XYratio + StretchBoxLine[ind].x;
+					if (ratio < XYratio)
+						newSize.x = (newSize.y - StretchBoxLine[iSide].y)*XYratio + StretchBoxLine[iSide].x;
 					else
-						nusiz.y = (nusiz.x - StretchBoxLine[ind].x) / XYratio + StretchBoxLine[ind].y;
-					ind = nxtcrnr(ind);
-					StretchBoxLine[ind].x = nusiz.x;
-					ind = nxtcrnr(ind);
-					StretchBoxLine[ind].x = nusiz.x;
-					StretchBoxLine[ind].y = nusiz.y;
-					ind = nxtcrnr(ind);
-					StretchBoxLine[ind].y = nusiz.y;
+						newSize.y = (newSize.x - StretchBoxLine[iSide].x) / XYratio + StretchBoxLine[iSide].y;
+					iSide = nxtcrnr(iSide);
+					StretchBoxLine[iSide].x = newSize.x;
+					iSide = nxtcrnr(iSide);
+					StretchBoxLine[iSide].x = newSize.x;
+					StretchBoxLine[iSide].y = newSize.y;
+					iSide = nxtcrnr(iSide);
+					StretchBoxLine[iSide].y = newSize.y;
 				}
 				StretchBoxLine[4].x = StretchBoxLine[0].x;
 				StretchBoxLine[4].y = StretchBoxLine[0].y;
@@ -15551,19 +15551,19 @@ unsigned chkMsg() {
 
 				unstrtch();
 				if (SelectedFormControlVertex & 1)
-					tlng = Msg.pt.x - StitchWindowOrigin.x;
+					lineLength = Msg.pt.x - StitchWindowOrigin.x;
 				else
-					tlng = Msg.pt.y - StitchWindowOrigin.y;
+					lineLength = Msg.pt.y - StitchWindowOrigin.y;
 				dst = (SelectedFormControlVertex + 2) % 4;
 				l_code = nxtcrnr(dst);
-				for (ind = 0; ind < 4; ind++) {
+				for (iSide = 0; iSide < 4; iSide++) {
 
-					if ((unsigned)ind != dst && (unsigned)ind != l_code) {
+					if (iSide != dst && iSide != l_code) {
 
 						if (SelectedFormControlVertex & 1)
-							StretchBoxLine[ind].x = tlng;
+							StretchBoxLine[iSide].x = lineLength;
 						else
-							StretchBoxLine[ind].y = tlng;
+							StretchBoxLine[iSide].y = lineLength;
 					}
 				}
 				StretchBoxLine[4].x = StretchBoxLine[0].x;
@@ -15633,13 +15633,13 @@ unsigned chkMsg() {
 				unrot();
 				RotateBoxToCursorLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 				RotateBoxToCursorLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
-				padj.x = RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x;
-				padj.y = RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y;
-				if (padj.x)
-					RotationAngle = -atan2(padj.y, padj.x);
+				adjustedPoint.x = RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x;
+				adjustedPoint.y = RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y;
+				if (adjustedPoint.x)
+					RotationAngle = -atan2(adjustedPoint.y, adjustedPoint.x);
 				else {
 
-					if (padj.y > 0)
+					if (adjustedPoint.y > 0)
 						RotationAngle = PI / 2;
 					else
 						RotationAngle = -PI / 2;
@@ -15736,20 +15736,20 @@ unsigned chkMsg() {
 		if (rstMap(MOVFRMS)) {
 
 			savdo();
-			tpnt.x = (Msg.pt.x - FormMoveDelta.x - StitchWindowOrigin.x) - SelectedFormsRect.left;
-			tpnt.y = (Msg.pt.y - FormMoveDelta.y - StitchWindowOrigin.y) - SelectedFormsRect.top;
+			point.x = (Msg.pt.x - FormMoveDelta.x - StitchWindowOrigin.x) - SelectedFormsRect.left;
+			point.y = (Msg.pt.y - FormMoveDelta.y - StitchWindowOrigin.y) - SelectedFormsRect.top;
 			ratsr();
-			FormMoveDelta.x = tpnt.x / HorizontalRatio;
-			FormMoveDelta.y = tpnt.y / VerticalRatio;
+			FormMoveDelta.x = point.x / HorizontalRatio;
+			FormMoveDelta.y = point.y / VerticalRatio;
 			if (chkMap(FPSEL)) {
 
 				fvars(ClosestFormToCursor);
-				ine = SelectedFormVertices.start;
-				for (ind = 0; (unsigned)ind <= SelectedFormVertices.vertexCount; ind++) {
+				iSelectedVertex = SelectedFormVertices.start;
+				for (iVertex = 0; (unsigned)iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 
-					CurrentFormVertices[ine].x += FormMoveDelta.x;
-					CurrentFormVertices[ine].y -= FormMoveDelta.y;
-					ine = pdir(ine);
+					CurrentFormVertices[iSelectedVertex].x += FormMoveDelta.x;
+					CurrentFormVertices[iSelectedVertex].y -= FormMoveDelta.y;
+					iSelectedVertex = pdir(iSelectedVertex);
 				}
 				setpsel();
 				frmout(ClosestFormToCursor);
@@ -15760,12 +15760,12 @@ unsigned chkMsg() {
 				if (chkMap(BIGBOX)) {
 
 					savdo();
-					for (ind = 0; ind < (long)FormIndex; ind++)
-						frmadj(ind);
-					for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+					for (iForm = 0; iForm < (long)FormIndex; iForm++)
+						frmadj(iForm);
+					for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-						StitchBuffer[ind].x += FormMoveDelta.x;
-						StitchBuffer[ind].y -= FormMoveDelta.y;
+						StitchBuffer[iStitch].x += FormMoveDelta.x;
+						StitchBuffer[iStitch].y -= FormMoveDelta.y;
 					}
 					selal();
 				} else {
@@ -15817,12 +15817,12 @@ unsigned chkMsg() {
 			savdo();
 			ReleaseCapture();
 			unsel();
-			padj.x = (StitchRangeRect.left + SelectBoxOffset.x) - SelectedPoint.x;
-			padj.y = (StitchRangeRect.bottom + SelectBoxOffset.y) - SelectedPoint.y;
+			adjustedPoint.x = (StitchRangeRect.left + SelectBoxOffset.x) - SelectedPoint.x;
+			adjustedPoint.y = (StitchRangeRect.bottom + SelectBoxOffset.y) - SelectedPoint.y;
 			for (ind = GroupStartStitch; ind <= (long)GroupEndStitch; ind++) {
 
-				StitchBuffer[ind].x -= padj.x;
-				StitchBuffer[ind].y -= padj.y;
+				StitchBuffer[ind].x -= adjustedPoint.x;
+				StitchBuffer[ind].y -= adjustedPoint.y;
 			}
 			setMap(RESTCH);
 			return 1;
@@ -15955,19 +15955,19 @@ unsigned chkMsg() {
 					ZoomBoxOrigin.y = SelectedPoint.y;
 					SelectedPoint.y = tdub;
 				}
-				nusiz.x = SelectedPoint.x - ZoomBoxOrigin.x;
-				nusiz.y = SelectedPoint.y - ZoomBoxOrigin.y;
-				SelectedPoint.x = ZoomBoxOrigin.x + nusiz.x / 2;
-				SelectedPoint.y = ZoomBoxOrigin.y + nusiz.y / 2;
+				newSize.x = SelectedPoint.x - ZoomBoxOrigin.x;
+				newSize.y = SelectedPoint.y - ZoomBoxOrigin.y;
+				SelectedPoint.x = ZoomBoxOrigin.x + newSize.x / 2;
+				SelectedPoint.y = ZoomBoxOrigin.y + newSize.y / 2;
 				tdub = ZoomFactor;
-				if (nusiz.x > nusiz.y) {
+				if (newSize.x > newSize.y) {
 
-					nusiz.y = nusiz.x / StitchWindowAspectRatio;
-					ZoomFactor = nusiz.x / UnzoomedRect.x;
+					newSize.y = newSize.x / StitchWindowAspectRatio;
+					ZoomFactor = newSize.x / UnzoomedRect.x;
 				} else {
 
-					nusiz.x = nusiz.y*StitchWindowAspectRatio;
-					ZoomFactor = nusiz.y / UnzoomedRect.x;
+					newSize.x = newSize.y*StitchWindowAspectRatio;
+					ZoomFactor = newSize.y / UnzoomedRect.x;
 				}
 				if (ZoomFactor < ZoomMin) {
 
@@ -15976,8 +15976,8 @@ unsigned chkMsg() {
 					return 1;
 				}
 				ZoomRect.left = ZoomRect.bottom = 0;
-				ZoomRect.right = nusiz.x;
-				ZoomRect.top = nusiz.y;
+				ZoomRect.right = newSize.x;
+				ZoomRect.top = newSize.y;
 				shft(SelectedPoint);
 				rstMap(BZUMIN);
 				setMap(RESTCH);
@@ -17739,9 +17739,9 @@ unsigned chkMsg() {
 
 				RotateBoxToCursorLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 				RotateBoxToCursorLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
-				padj.x = RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x;
-				padj.y = RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y;
-				if (hypot(padj.x, padj.y) < CLOSENUF) {
+				adjustedPoint.x = RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x;
+				adjustedPoint.y = RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y;
+				if (hypot(adjustedPoint.x, adjustedPoint.y) < CLOSENUF) {
 
 					px2stch();
 					RotationCenter.x = SelectedPoint.x;
@@ -17751,11 +17751,11 @@ unsigned chkMsg() {
 					ritrot();
 				} else {
 
-					if (padj.x)
-						RotationHandleAngle = -atan2(padj.y, padj.x);
+					if (adjustedPoint.x)
+						RotationHandleAngle = -atan2(adjustedPoint.y, adjustedPoint.x);
 					else {
 
-						if (padj.y > 0)
+						if (adjustedPoint.y > 0)
 							RotationHandleAngle = PI / 2;
 						else
 							RotationHandleAngle = -PI / 2;
@@ -17954,8 +17954,8 @@ unsigned chkMsg() {
 						MoveLine0[0].x = StitchCoordinatesPixels.x;
 						MoveLine0[0].y = StitchCoordinatesPixels.y;
 					}
-					tlng = PCSHeader.stitchCount - 1;
-					if (ClosestPointIndex >= (unsigned)tlng)
+					iStitch = PCSHeader.stitchCount - 1;
+					if (ClosestPointIndex >= iStitch)
 						rstMap(ISUP);
 					else {
 
