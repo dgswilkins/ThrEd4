@@ -115,7 +115,7 @@ const unsigned long	RMAPBITS = RMAPSIZ << 5;	//a bit for each stitch
 #define		MAXKNOTS	16384		//maximum nuber of knots
 #define		IBFCLEN		4*PFGRAN	//initial buttonhole fill corner length
 #define		IPICSPAC	6			//initial picot border space
-#define		PRFLINS		28			//number of lines on the prefernece menu
+#define		PRFLINS		28			//number of lines on the preference menu
 #define		EDGETYPS	12			//number of border fill types
 #define		SEED		3037000499	//pseudo-random-sequence seed
 #define		FSED		1340007303	//feather seqence seed
