@@ -21759,12 +21759,12 @@ void init() {
 	thwid = wrct.right - wrct.left;
 	if (thwid < screenHalfWidth)
 		wrct.right = wrct.left += screenHalfWidth;
-	FillMenu = GetSubMenu(MainMenu, M_FIL);
+	FillMenu = GetSubMenu(MainMenu, M_FILL);
 	FileMenu = GetSubMenu(MainMenu, M_FILE);
 	EditMenu = GetSubMenu(MainMenu, M_EDIT);
 	BorderFillMenu = GetSubMenu(FillMenu, MFIL_BORD);
 	ViewMenu = GetSubMenu(MainMenu, M_VIEW);
-	ViewSetMenu = GetSubMenu(ViewMenu, M_VIEW);
+	ViewSetMenu = GetSubMenu(ViewMenu, MVW_SET);
 	qchk();
 	ArrowCursor = LoadCursor(0, IDC_ARROW);
 	CrossCursor = LoadCursor(0, IDC_CROSS);

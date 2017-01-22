@@ -1431,7 +1431,7 @@ enum {
 	M_REDO,
 	M_ROT,
 	M_PREF,
-	M_FIL,
+	M_FILL,
 	M_ADD,
 	M_FRM,
 	M_ALL,
@@ -1442,14 +1442,31 @@ enum {
 	M_HELP,
 };
 
+//view menu items
+enum {
+	MVW_MOVIE,
+	MVW_SET,
+	MVW_BACK,
+	MVW_ZOOM,
+	MVW_THRD,
+	MVW_SHWT,
+	MVW_SHWTCOL,
+	MVW_DSGN,
+	MVW_KNOT,
+	MVW_MARK,
+	MVW_ABOUT,
+};
+
 //fill menu items
 enum {
 	MFIL_SAT,
+	MFIL_FTH,
 	MFIL_VERT,
 	MFIL_HOR,
 	MFIL_ANG,
 	MFIL_CLP,
 	MFIL_CONT,
+	MFIL_TED,
 	MFIL_BORD,
 	MFIL_UNFIL
 };
