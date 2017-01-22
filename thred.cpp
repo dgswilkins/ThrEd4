@@ -20990,27 +20990,27 @@ unsigned chkMsg() {
 }
 
 //return the width of a text item
-int txtWid(TCHAR* str) {
+int txtWid(TCHAR* string) {
 
-	GetTextExtentPoint32(ThredDC, str, strlen(str), &TextSize);
+	GetTextExtentPoint32(ThredDC, string, strlen(string), &TextSize);
 	return TextSize.cx;
 }
 
 void makCol() {
 
-	unsigned	ind;
-	TCHAR		buf[3];
+	unsigned	iColor;
+	TCHAR		buffer[3];
 
-	buf[1] = '0';
-	buf[2] = 0;
-	for (ind = 0; ind < 16; ind++) {
+	buffer[1] = '0';
+	buffer[2] = 0;
+	for (iColor = 0; iColor < 16; iColor++) {
 
-		DefaultColorWin[ind] = CreateWindow(
+		DefaultColorWin[iColor] = CreateWindow(
 			"STATIC",
 			0,
 			SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 			0,
-			ButtonHeight*ind,
+			ButtonHeight*iColor,
 			ButtonWidth,
 			ButtonHeight,
 			ThrEdWindow,
@@ -21018,12 +21018,12 @@ void makCol() {
 			ThrEdInstance,
 			NULL);
 
-		UserColorWin[ind] = CreateWindow(
+		UserColorWin[iColor] = CreateWindow(
 			"STATIC",
 			0,
 			SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 			ButtonWidth,
-			ButtonHeight*ind,
+			ButtonHeight*iColor,
 			ButtonWidth,
 			ButtonHeight,
 			ThrEdWindow,
@@ -21031,13 +21031,13 @@ void makCol() {
 			ThrEdInstance,
 			NULL);
 
-		buf[0] = ThreadSize[ind][0];
-		ThreadSizeWin[ind] = CreateWindow(
+		buffer[0] = ThreadSize[iColor][0];
+		ThreadSizeWin[iColor] = CreateWindow(
 			"STATIC",
-			buf,
+			buffer,
 			SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 			ButtonWidth << 1,
-			ButtonHeight*ind,
+			ButtonHeight*iColor,
 			ButtonWidth,
 			ButtonHeight,
 			ThrEdWindow,
@@ -21045,39 +21045,34 @@ void makCol() {
 			ThrEdInstance,
 			NULL);
 	}
-}
-
-void int2tim(ULARGE_INTEGER num, FILETIME* tim) {
-
-	tim->dwHighDateTime = num.HighPart;
-	tim->dwLowDateTime = num.LowPart;
 }
 
 void ritloc() {
 
-	TCHAR*			penv;
-	TCHAR			locnam[_MAX_PATH] = { 0 };
-	HANDLE			hloc;
-	DWORD			rot;
-	size_t			len;
-	errno_t			err;
-	err = _dupenv_s(&penv, &len, "COMSPEC");
+	TCHAR*			environment;
+	TCHAR			lockFileName[_MAX_PATH] = { 0 };
+	HANDLE			lockFile;
+	DWORD			bytesWritten;
+	size_t			length;
+	errno_t			error;
 
-	if (err) {
-		free(penv);
+	error = _dupenv_s(&environment, &length, "COMSPEC");
+
+	if (error) {
+		free(environment);
 		return;
 	} else {
-		if (penv) {
-			strcpy_s(locnam, penv);
-			free(penv);
+		if (environment) {
+			strcpy_s(lockFileName, environment);
+			free(environment);
 		}
 	}
-	penv = strrchr(locnam, '\\') + 1;
-	strcpy_s(penv, sizeof(locnam) - (penv - locnam), "thredloc.txt");
-	hloc = CreateFile(locnam, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
-	if (hloc != INVALID_HANDLE_VALUE) {
-		WriteFile(hloc, (TCHAR*)HomeDirectory, strlen(HomeDirectory) + 1, &rot, 0);
-		CloseHandle(hloc);
+	environment = strrchr(lockFileName, '\\') + 1;
+	strcpy_s(environment, sizeof(lockFileName) - (environment - lockFileName), "thredloc.txt");
+	lockFile = CreateFile(lockFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+	if (lockFile != INVALID_HANDLE_VALUE) {
+		WriteFile(lockFile, (TCHAR*)HomeDirectory, strlen(HomeDirectory) + 1, &bytesWritten, 0);
+		CloseHandle(lockFile);
 	}
 }
 
@@ -21413,22 +21408,22 @@ void dstcurs() {
 
 void duhom() {
 
-	unsigned	ind;
-	TCHAR*		phom;	//pointer to the home file name
+	unsigned	pathLength;
+	TCHAR*		lastCharacter;
 
 	strcpy_s(HomeDirectory, __argv[0]);
-	phom = strrchr(HomeDirectory, '\\');
-	if (phom)
-		phom++;
+	lastCharacter = strrchr(HomeDirectory, '\\');
+	if (lastCharacter)
+		lastCharacter++;
 	else {
 
-		ind = GetCurrentDirectory(_MAX_PATH, HomeDirectory);
-		if (ind) {
-			HomeDirectory[ind++] = '\\';
-			phom = &HomeDirectory[ind];
+		pathLength = GetCurrentDirectory(_MAX_PATH, HomeDirectory);
+		if (pathLength) {
+			HomeDirectory[pathLength++] = '\\';
+			lastCharacter = &HomeDirectory[pathLength];
 		}
 	}
-	if (phom) { *phom = 0; }
+	if (lastCharacter) { *lastCharacter = 0; }
 }
 
 #if  __UseASM__
@@ -21456,8 +21451,8 @@ void bcpy(TCHAR* destination, TCHAR* source) {
 
 void ducmd() {
 
-	unsigned long	l_red;
-	int				ind;
+	unsigned long	bytesRead;
+	int				iArgument;
 
 	if (__argc > 1) {
 
@@ -21498,9 +21493,9 @@ void ducmd() {
 #endif
 							//ToDo - Does this line make sense?
 							BalaradFileName = (TCHAR*)&BSequence;
-							ReadFile(BalaradFile, (void*)&BalaradName2, 10000, &l_red, 0);
+							ReadFile(BalaradFile, (void*)&BalaradName2, 10000, &bytesRead, 0);
 							strcat_s(BalaradName2, "");
-							if (l_red)
+							if (bytesRead)
 								redbal();
 						}
 					}
@@ -21512,10 +21507,10 @@ void ducmd() {
 			DeleteFile(BalaradName1);
 		} else {
 
-			for (ind = 2; ind < __argc; ind++) {
+			for (iArgument = 2; iArgument < __argc; iArgument++) {
 
 				strcat_s(WorkingFileName, " ");
-				strcat_s(WorkingFileName, __argv[ind]);
+				strcat_s(WorkingFileName, __argv[iArgument]);
 			}
 			setMap(REDOLD);
 			nuFil();
@@ -21525,14 +21520,14 @@ void ducmd() {
 
 void redini() {
 
-	unsigned		ind;
-	unsigned long	wrot;
-	HDC				tdc;
+	unsigned		iUnDo, iVersion, iColor, adjustedWidth;
+	unsigned long	bytesRead;
+	HDC				deviceContext;
 
-	for (ind = 0; ind < 16; ind++)
-		UndoBuffer[ind] = 0;
-	for (ind = 0; ind < OLDNUM; ind++)
-		IniFile.prevNames[ind][0] = 0;
+	for (iUnDo = 0; iUnDo < 16; iUnDo++)
+		UndoBuffer[iUnDo] = 0;
+	for (iVersion = 0; iVersion < OLDNUM; iVersion++)
+		IniFile.prevNames[iVersion][0] = 0;
 	duhom();
 	strcpy_s(IniFileName, HomeDirectory);
 	strcat_s(IniFileName, "thred.ini");
@@ -21542,17 +21537,17 @@ void redini() {
 		defpref();
 	else {
 
-		ReadFile(IniFileHandle, &IniFile, sizeof(IniFile), &wrot, 0);
-		if (wrot < 2061)
+		ReadFile(IniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, 0);
+		if (bytesRead < 2061)
 			IniFile.formBoxSizePixels = DEFBPIX;
 		strcpy_s(DefaultDirectory, IniFile.defaultDirectory);
 		strcpy_s(DefaultBMPDirectory, IniFile.defaultDirectory);
-		for (ind = 0; ind < 16; ind++) {
+		for (iColor = 0; iColor < 16; iColor++) {
 
-			UserColor[ind] = IniFile.stitchColors[ind];
-			CustomColor[ind] = IniFile.stitchPreferredColors[ind];
-			CustomBackgroundColor[ind] = IniFile.backgroundPreferredColors[ind];
-			BitmapBackgroundColors[ind] = IniFile.bitmapBackgroundColors[ind];
+			UserColor[iColor] = IniFile.stitchColors[iColor];
+			CustomColor[iColor] = IniFile.stitchPreferredColors[iColor];
+			CustomBackgroundColor[iColor] = IniFile.backgroundPreferredColors[iColor];
+			BitmapBackgroundColors[iColor] = IniFile.bitmapBackgroundColors[iColor];
 		}
 		BackgroundColor = IniFile.backgroundColor;
 		BitmapColor = IniFile.bitmapColor;
@@ -21666,30 +21661,30 @@ void redini() {
 	CloseHandle(IniFileHandle);
 	if (!IniFile.fillAngle)
 		IniFile.fillAngle = PI / 6;
-	tdc = GetDC(0);
-	ScreenSizePixels.cx = GetDeviceCaps(tdc, HORZRES);
-	ScreenSizePixels.cy = GetDeviceCaps(tdc, VERTRES);
+	deviceContext = GetDC(0);
+	ScreenSizePixels.cx = GetDeviceCaps(deviceContext, HORZRES);
+	ScreenSizePixels.cy = GetDeviceCaps(deviceContext, VERTRES);
 	if (IniFile.initialWindowCoords.left < 0)
 		IniFile.initialWindowCoords.left = 0;
 	if (IniFile.initialWindowCoords.top < 0)
 		IniFile.initialWindowCoords.top = 0;
-	ind = ScreenSizePixels.cx - 30;
-	if (IniFile.initialWindowCoords.right > (int)ind)
-		IniFile.initialWindowCoords.right = ind;
+	adjustedWidth = ScreenSizePixels.cx - 30;
+	if (IniFile.initialWindowCoords.right > (int)adjustedWidth)
+		IniFile.initialWindowCoords.right = adjustedWidth;
 	if (IniFile.initialWindowCoords.bottom > ScreenSizePixels.cy)
 		IniFile.initialWindowCoords.bottom = ScreenSizePixels.cy;
 }
 
-void trcsub(HWND* hwnd, unsigned xloc, unsigned yloc, unsigned hi) {
+void trcsub(HWND* window, unsigned xCoordinate, unsigned yCoordinate, unsigned buttonHeight) {
 
-	*hwnd = CreateWindow(
+	*window = CreateWindow(
 		"STATIC",
 		"",
 		SS_OWNERDRAW | WS_CHILD | WS_BORDER,
-		xloc,
-		yloc,
+		xCoordinate,
+		yCoordinate,
 		ButtonWidth,
-		hi,
+		buttonHeight,
 		ThrEdWindow,
 		NULL,
 		ThrEdInstance,
@@ -21698,22 +21693,22 @@ void trcsub(HWND* hwnd, unsigned xloc, unsigned yloc, unsigned hi) {
 
 void chkirct() {
 
-	POINT lim;
+	POINT screenLimits;
 
-	lim.x = ScreenSizePixels.cx - 1;
-	lim.y = ScreenSizePixels.cy - 1;
-	if (IniFile.initialWindowCoords.left > lim.x)
-		IniFile.initialWindowCoords.left = lim.x;
-	if (IniFile.initialWindowCoords.right > lim.x)
-		IniFile.initialWindowCoords.right = lim.x;
+	screenLimits.x = ScreenSizePixels.cx - 1;
+	screenLimits.y = ScreenSizePixels.cy - 1;
+	if (IniFile.initialWindowCoords.left > screenLimits.x)
+		IniFile.initialWindowCoords.left = screenLimits.x;
+	if (IniFile.initialWindowCoords.right > screenLimits.x)
+		IniFile.initialWindowCoords.right = screenLimits.x;
 	if (IniFile.initialWindowCoords.left < 0)
 		IniFile.initialWindowCoords.left = 0;
 	if (IniFile.initialWindowCoords.right < 0)
 		IniFile.initialWindowCoords.right = 0;
-	if (IniFile.initialWindowCoords.top > lim.y)
-		IniFile.initialWindowCoords.top = lim.y;
-	if (IniFile.initialWindowCoords.bottom > lim.y)
-		IniFile.initialWindowCoords.bottom = lim.y;
+	if (IniFile.initialWindowCoords.top > screenLimits.y)
+		IniFile.initialWindowCoords.top = screenLimits.y;
+	if (IniFile.initialWindowCoords.bottom > screenLimits.y)
+		IniFile.initialWindowCoords.bottom = screenLimits.y;
 	if (IniFile.initialWindowCoords.top < 0)
 		IniFile.initialWindowCoords.top = 0;
 	if (IniFile.initialWindowCoords.bottom < 0)
@@ -21721,23 +21716,23 @@ void chkirct() {
 	if (IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left < 300) {
 
 		IniFile.initialWindowCoords.left = 0;
-		IniFile.initialWindowCoords.right = lim.x >> 1;
+		IniFile.initialWindowCoords.right = screenLimits.x >> 1;
 	}
 	if (IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top < 300) {
 
 		IniFile.initialWindowCoords.top = 0;
-		IniFile.initialWindowCoords.bottom = lim.y >> 1;
+		IniFile.initialWindowCoords.bottom = screenLimits.y >> 1;
 	}
 }
 
 void init() {
 
-	unsigned		ind, flg;
-	unsigned long	thwid, mwid;
-	long			selbox;
+	unsigned		ind, flg, iColor, iOffset, iMenu;
+	unsigned long	thwid, screenHalfWidth;
+	long			offsetStepSize;
 	RECT			tRct;
 	RECT			wrct;
-	HDC				totdc;
+	HDC				deviceContext;
 	TCHAR*			buttonText;
 
 	TextureIndex = 0;
@@ -21746,24 +21741,24 @@ void init() {
 #endif
 	LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1));
 	MainMenu = GetMenu(ThrEdWindow);
-	totdc = GetDC(NULL);
-	mwid = GetDeviceCaps(totdc, HORZRES);
-	ReleaseDC(NULL, totdc);
+	deviceContext = GetDC(NULL);
+	screenHalfWidth = GetDeviceCaps(deviceContext, HORZRES);
+	screenHalfWidth >>= 1;
+	ReleaseDC(NULL, deviceContext);
 	GetWindowRect(ThrEdWindow, &wrct);
 	GetMenuItemRect(ThrEdWindow, MainMenu, 0, &tRct);
 	//menhi = tRct.bottom - tRct.top;
 	wrct.left = tRct.left;
 	wrct.right = tRct.right;
-	for (ind = 0; ind <= M_HELP; ind++) {
+	for (iMenu = 0; iMenu <= M_HELP; iMenu++) {
 
-		GetMenuItemRect(ThrEdWindow, MainMenu, ind, &tRct);
+		GetMenuItemRect(ThrEdWindow, MainMenu, iMenu, &tRct);
 		wrct.right += (tRct.right - tRct.left);
 	}
 	wrct.right += 20;
 	thwid = wrct.right - wrct.left;
-	mwid >>= 1;
-	if (thwid < mwid)
-		wrct.right = wrct.left += mwid;
+	if (thwid < screenHalfWidth)
+		wrct.right = wrct.left += screenHalfWidth;
 	FillMenu = GetSubMenu(MainMenu, M_FIL);
 	FileMenu = GetSubMenu(MainMenu, M_FILE);
 	EditMenu = GetSubMenu(MainMenu, M_EDIT);
@@ -21790,9 +21785,9 @@ void init() {
 	ButtonWidthX3 = ButtonWidth * 3;
 	ButtonHeight = TextSize.cy + 4;
 	NumeralWidth = txtWid("0");
-	selbox = txtWid("0");
-	for (ind = 0; ind < NERCNT; ind++)
-		BoxOffset[ind] = selbox + selbox*ind;
+	offsetStepSize = txtWid("0");
+	for (iOffset = 0; iOffset < NERCNT; iOffset++)
+		BoxOffset[iOffset] = offsetStepSize*(iOffset + 1);
 	GetClientRect(ThrEdWindow, &ThredWindowRect);
 	stchWnd();
 	lodstr();
@@ -21800,13 +21795,13 @@ void init() {
 	if (!IniFileHandle) {
 
 		//initialize the user color and thread size arrays
-		for (ind = 0; ind < 16; ind++)
-			UserColor[ind] = defCol[ind];
+		for (iColor = 0; iColor < 16; iColor++)
+			UserColor[iColor] = defCol[iColor];
 	}
-	for (ind = 0; ind < 16; ind++) {
+	for (iColor = 0; iColor < 16; iColor++) {
 
-		ThreadSize[ind][0] = '4';
-		ThreadSize[ind][1] = '0';
+		ThreadSize[iColor][0] = '4';
+		ThreadSize[iColor][1] = '0';
 	}
 	if (!IniFile.traceLength)
 		IniFile.traceLength = TRACLEN;
