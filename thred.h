@@ -1136,6 +1136,8 @@ typedef struct _txpnt {	//textured fill point
 	short	line;
 }TXPNT;
 
+#define RES_SIZE	26
+
 typedef struct _strex {				//thred v1.0 file header extension
 	float		hoopSizeX;			//hoop size x dimension
 	float		hoopSizeY;			//hoop size y dimension
@@ -1145,7 +1147,7 @@ typedef struct _strex {				//thred v1.0 file header extension
 	TCHAR		auxFormat;			//auxillary file format
 	TCHAR		stres;				//reserved
 	unsigned	texturePointCount;	//textured fill point count
-	TCHAR		res[26];			//reserved for expansion
+	TCHAR		res[RES_SIZE];		//reserved for expansion
 }STREX;
 
 typedef struct _dsthed {		//dst file header

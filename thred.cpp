@@ -21727,7 +21727,7 @@ void chkirct() {
 
 void init() {
 
-	unsigned		ind, flg, iColor, iOffset, iMenu;
+	unsigned		iButton, iRGB, iRGBK, iByte, flag, iColor, iOffset, iMenu;
 	unsigned long	thwid, screenHalfWidth;
 	long			offsetStepSize;
 	RECT			tRct;
@@ -21831,39 +21831,39 @@ void init() {
 		IniFile.underlaySpacing = DEFUSPAC;
 	setgrd(IniFile.gridColor);
 	makCol();		//make the color change windows
-	for (ind = 0; ind < 9; ind++) {
+	for (iButton = 0; iButton < 9; iButton++) {
 
-		switch (ind) {
+		switch (iButton) {
 
 		case HBOXSEL:
 
-			flg = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
+			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
 			buttonText = StringTable[STR_BOXSEL];
 			break;
 
 		case HUPTO:
 
-			flg = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
+			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
 			buttonText = StringTable[STR_UPOF];
 			break;
 
 		case HHID:
 
-			flg = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER;
+			flag = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER;
 			buttonText = StringTable[STR_PIKOL];
 			break;
 
 		default:
 
 			buttonText = "";
-			flg = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
+			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
 		}
-		ButtonWin[ind] = CreateWindow(
+		ButtonWin[iButton] = CreateWindow(
 			"STATIC",
 			buttonText,
-			flg,
+			flag,
 			0,
-			ButtonHeight*(16 + ind),
+			ButtonHeight*(16 + iButton),
 			ButtonWidthX3,
 			ButtonHeight,
 			ThrEdWindow,
@@ -21898,19 +21898,19 @@ void init() {
 		ThrEdInstance,
 		NULL);
 
-	for (ind = 0; ind < 3; ind++) {
+	for (iRGB = 0; iRGB < 3; iRGB++) {
 
-		trcsub(&TraceControlWindow[ind], ButtonWidth*ind, 0, ButtonHeight * 15);
-		trcsub(&TraceSelectWindow[ind], ButtonWidth*ind, ButtonHeight * 15, ButtonHeight);
-		trcsub(&TraceUpWindow[ind], ButtonWidth*ind, ButtonHeight * 16, ButtonHeight);
-		trcsub(&TraceDownWindow[ind], ButtonWidth*ind, ButtonHeight * 17, ButtonHeight);
-		TraceBrush[ind] = CreateSolidBrush(TraceRGB[ind]);
+		trcsub(&TraceControlWindow[iRGB], ButtonWidth*iRGB, 0, ButtonHeight * 15);
+		trcsub(&TraceSelectWindow[iRGB], ButtonWidth*iRGB, ButtonHeight * 15, ButtonHeight);
+		trcsub(&TraceUpWindow[iRGB], ButtonWidth*iRGB, ButtonHeight * 16, ButtonHeight);
+		trcsub(&TraceDownWindow[iRGB], ButtonWidth*iRGB, ButtonHeight * 17, ButtonHeight);
+		TraceBrush[iRGB] = CreateSolidBrush(TraceRGB[iRGB]);
 	}
 
 	nuRct();
 	//create pens
-	for (ind = 0; ind < 4; ind++)
-		BoxPen[ind] = CreatePen(PS_SOLID, 1, BoxColor[ind]);
+	for (iRGBK = 0; iRGBK < 4; iRGBK++)
+		BoxPen[iRGBK] = CreatePen(PS_SOLID, 1, BoxColor[iRGBK]);
 	LinePen = CreatePen(PS_SOLID, 1, 0x404040);
 	CrossPen = CreatePen(PS_SOLID, 5, 0x804080);
 	GroupSelectPen = CreatePen(PS_SOLID, 1, 0x804080);
@@ -21931,18 +21931,18 @@ void init() {
 	LayerPen[4] = CreatePen(PS_SOLID, 1, 0x40c0c0);
 	LayerPen[5] = CreatePen(PS_SOLID, 1, 0xc0c040);
 	BackgroundPenWidth = 1;
-	for (ind = 0; ind < 16; ind++) {
+	for (iColor = 0; iColor < 16; iColor++) {
 
-		ThreadSizePixels[ind] = 1;
-		ThreadSizeIndex[ind] = 1;
-		UserPen[ind] = CreatePen(PS_SOLID, 1, UserColor[ind]);
+		ThreadSizePixels[iColor] = 1;
+		ThreadSizeIndex[iColor] = 1;
+		UserPen[iColor] = CreatePen(PS_SOLID, 1, UserColor[iColor]);
 	}
 	BackgroundBrush = CreateSolidBrush(BackgroundColor);
 	//create brushes
-	for (ind = 0; ind < 16; ind++) {
+	for (iColor = 0; iColor < 16; iColor++) {
 
-		DefaultColorBrush[ind] = CreateSolidBrush(defCol[ind]);
-		UserColorBrush[ind] = CreateSolidBrush(UserColor[ind]);
+		DefaultColorBrush[iColor] = CreateSolidBrush(defCol[iColor]);
+		UserColorBrush[iColor] = CreateSolidBrush(UserColor[iColor]);
 	}
 	BlackBrush = CreateSolidBrush(0);
 	ZoomFactor = 1;
@@ -21957,8 +21957,8 @@ void init() {
 	ritfnam(IniFile.designerName);
 	strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
 	ExtendedHeader.stgran = 0;
-	for (ind = 0; ind < 26; ind++)
-		ExtendedHeader.res[ind] = 0;
+	for (iByte = 0; iByte < RES_SIZE; iByte++)
+		ExtendedHeader.res[iByte] = 0;
 	chkhup();
 	nedmen();
 	fil2men();
@@ -21979,21 +21979,21 @@ void init() {
 	SetWindowText(ThrEdWindow, MsgBuffer);
 }
 
-COLORREF defTxt(unsigned colInd) {
+COLORREF defTxt(unsigned iColor) {
 
 #if  __UseASM__
 	_asm {
 
 		xor		eax, eax
 		mov		ecx, TextColorMap
-		mov		edx, colInd
+		mov		edx, iColor
 		bt		ecx, edx
 		jnc		short defx
 		mov		eax, 0xffffff
 		defx:
 	}
 #else
-	return _bittest((long *)&TextColorMap, colInd) ? 0xffffff : 0;
+	return _bittest((long *)&TextColorMap, iColor) ? 0xffffff : 0;
 #endif
 }
 
@@ -22025,37 +22025,37 @@ void relin() {
 	dulin();
 }
 
-unsigned setRmp(unsigned pbit) {
+unsigned setRmp(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
 		xor		eax, eax
 		mov		ebx, offset MarkedStitchMap
-		mov		ecx, pbit
+		mov		ecx, bit
 		bts[ebx], ecx
 		jc		short setrm
 		dec		eax
 		setrm :
 	}
 #else
-	return _bittestandset((long *)MarkedStitchMap, pbit) ? 0 : 0xffffffff;
+	return _bittestandset((long *)MarkedStitchMap, bit) ? 0 : 0xffffffff;
 #endif
 }
 
-void drwLin(unsigned ind, unsigned len, HPEN hPen) {
+void drwLin(unsigned currentStitch, unsigned length, HPEN hPen) {
 
-	unsigned	ine, layr;
-	fPOINTATTR*	l_pstch = &StitchBuffer[ind];
+	unsigned	iOffset, layer;
+	fPOINTATTR*	activeStitch = &StitchBuffer[currentStitch];
 
 	if (ActiveLayer)
 		LineIndex = 0;
-	for (ine = 0; ine < len; ine++) {
+	for (iOffset = 0; iOffset < length; iOffset++) {
 
-		layr = (l_pstch[ine].attribute&LAYMSK) >> LAYSHFT;
-		if (!ActiveLayer || !layr || (layr == ActiveLayer)) {
+		layer = (activeStitch[iOffset].attribute&LAYMSK) >> LAYSHFT;
+		if (!ActiveLayer || !layer || (layer == ActiveLayer)) {
 
-			LinePoints[LineIndex].x = (l_pstch[ine].x - ZoomRect.left)*ZoomRatio.x;
-			LinePoints[LineIndex++].y = StitchWindowClientRect.bottom - (l_pstch[ine].y - ZoomRect.bottom)*ZoomRatio.y;
+			LinePoints[LineIndex].x = (activeStitch[iOffset].x - ZoomRect.left)*ZoomRatio.x;
+			LinePoints[LineIndex++].y = StitchWindowClientRect.bottom - (activeStitch[iOffset].y - ZoomRect.bottom)*ZoomRatio.y;
 		}
 	}
 	SelectObject(StitchWindowMemDC, hPen);
@@ -22063,98 +22063,98 @@ void drwLin(unsigned ind, unsigned len, HPEN hPen) {
 		Polyline(StitchWindowMemDC, LinePoints, LineIndex);
 	else {
 
-		ine = 0;
+		iOffset = 0;
 		while (LineIndex) {
 
 			if (LineIndex > 16000) {
 
-				Polyline(StitchWindowMemDC, &LinePoints[ine], 16000);
-				ine += 15999;
+				Polyline(StitchWindowMemDC, &LinePoints[iOffset], 16000);
+				iOffset += 15999;
 				LineIndex -= 15999;
 			} else {
 
-				Polyline(StitchWindowMemDC, &LinePoints[ine], LineIndex);
+				Polyline(StitchWindowMemDC, &LinePoints[iOffset], LineIndex);
 				break;
 			}
 		}
 	}
 	LineIndex = 1;
-	layr = (l_pstch[ine].attribute&LAYMSK) >> LAYSHFT;
-	if (!ActiveLayer || !layr || layr == ActiveLayer) {
+	layer = (activeStitch[iOffset].attribute&LAYMSK) >> LAYSHFT;
+	if (!ActiveLayer || !layer || layer == ActiveLayer) {
 
-		LinePoints[0].x = (l_pstch[ine - 1].x - ZoomRect.left)*ZoomRatio.x;
-		LinePoints[0].y = StitchWindowClientRect.bottom - (l_pstch[ine - 1].y - ZoomRect.bottom)*ZoomRatio.y;
+		LinePoints[0].x = (activeStitch[iOffset - 1].x - ZoomRect.left)*ZoomRatio.x;
+		LinePoints[0].y = StitchWindowClientRect.bottom - (activeStitch[iOffset - 1].y - ZoomRect.bottom)*ZoomRatio.y;
 	}
 }
 
 void dumov() {
 
-	fPOINTATTR*	tstch;
-	POINT		arlin[8];
-	POINT		trot;
+	fPOINTATTR*	anchorStitch;
+	POINT		rotationOutline[8];
+	POINT		OffsetFromCenter;
 
 	RotateAngle = atan2(StitchBuffer[MoveAnchor + 1].y - StitchBuffer[MoveAnchor].y, StitchBuffer[MoveAnchor + 1].x - StitchBuffer[MoveAnchor].x);
-	tstch = &StitchBuffer[MoveAnchor];
-	if (tstch->x >= ZoomRect.left&&tstch->x <= ZoomRect.right
-		&&tstch->y >= ZoomRect.bottom&&tstch->y <= ZoomRect.top) {
+	anchorStitch = &StitchBuffer[MoveAnchor];
+	if (anchorStitch->x >= ZoomRect.left&&anchorStitch->x <= ZoomRect.right
+		&&anchorStitch->y >= ZoomRect.bottom&&anchorStitch->y <= ZoomRect.top) {
 
 		sdCor2px(StitchBuffer[MoveAnchor], &RotationCenterPixels);
-		arlin[0].x = arlin[6].x = RotationCenterPixels.x;
-		arlin[0].y = arlin[6].y = RotationCenterPixels.y;
-		trot.x = RotationCenterPixels.x + 12;
-		trot.y = RotationCenterPixels.y + 2;
-		rotpix(trot, &arlin[1]);
-		trot.y = RotationCenterPixels.y - 2;
-		rotpix(trot, &arlin[5]);
-		trot.y = RotationCenterPixels.y + 6;
-		rotpix(trot, &arlin[2]);
-		trot.y = RotationCenterPixels.y - 6;
-		rotpix(trot, &arlin[4]);
-		trot.x = RotationCenterPixels.x + 20;
-		trot.y = RotationCenterPixels.y;
-		rotpix(trot, &arlin[3]);
+		rotationOutline[0].x = rotationOutline[6].x = RotationCenterPixels.x;
+		rotationOutline[0].y = rotationOutline[6].y = RotationCenterPixels.y;
+		OffsetFromCenter.x = RotationCenterPixels.x + 12;
+		OffsetFromCenter.y = RotationCenterPixels.y + 2;
+		rotpix(OffsetFromCenter, &rotationOutline[1]);
+		OffsetFromCenter.y = RotationCenterPixels.y - 2;
+		rotpix(OffsetFromCenter, &rotationOutline[5]);
+		OffsetFromCenter.y = RotationCenterPixels.y + 6;
+		rotpix(OffsetFromCenter, &rotationOutline[2]);
+		OffsetFromCenter.y = RotationCenterPixels.y - 6;
+		rotpix(OffsetFromCenter, &rotationOutline[4]);
+		OffsetFromCenter.x = RotationCenterPixels.x + 20;
+		OffsetFromCenter.y = RotationCenterPixels.y;
+		rotpix(OffsetFromCenter, &rotationOutline[3]);
 		SelectObject(StitchWindowMemDC, FormPen);
 		SetROP2(StitchWindowMemDC, R2_XORPEN);
-		Polyline(StitchWindowMemDC, arlin, 7);
+		Polyline(StitchWindowMemDC, rotationOutline, 7);
 		SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	}
 }
 
-unsigned chkup(unsigned cnt, unsigned ind) {
+unsigned chkup(unsigned count, unsigned iStitch) {
 
 	if (chkMap(UPTO) && ClosestPointIndex) {
 
-		if (ColorChangeTable[ind].stitchIndex < ClosestPointIndex) {
+		if (ColorChangeTable[iStitch].stitchIndex < ClosestPointIndex) {
 
-			if (ColorChangeTable[ind + 1].stitchIndex < ClosestPointIndex)
-				return cnt;
+			if (ColorChangeTable[iStitch + 1].stitchIndex < ClosestPointIndex)
+				return count;
 			else
-				return ClosestPointIndex - ColorChangeTable[ind].stitchIndex + 1;
+				return ClosestPointIndex - ColorChangeTable[iStitch].stitchIndex + 1;
 		} else
 			return 0;
 	} else
-		return cnt;
+		return count;
 }
 
 BOOL bitar() {
 
-	dRECTANGLE	bakrct;
-	dRECTANGLE	difrct;
-	dPOINT	bsdrat;
-	dRECTANGLE	zirct;
+	dRECTANGLE	backingRect;
+	dRECTANGLE	differenceRect;
+	dPOINT	bitmapStitchRatio;
+	dRECTANGLE	ZoomedInRect;
 
-	zirct.bottom = UnzoomedRect.y - ZoomRect.bottom;
-	zirct.top = UnzoomedRect.y - ZoomRect.top;
-	zirct.left = ZoomRect.left;
-	zirct.right = ZoomRect.right;
-	if (zirct.top > BitmapSizeinStitches.y || zirct.left > BitmapSizeinStitches.x)
+	ZoomedInRect.bottom = UnzoomedRect.y - ZoomRect.bottom;
+	ZoomedInRect.top = UnzoomedRect.y - ZoomRect.top;
+	ZoomedInRect.left = ZoomRect.left;
+	ZoomedInRect.right = ZoomRect.right;
+	if (ZoomedInRect.top > BitmapSizeinStitches.y || ZoomedInRect.left > BitmapSizeinStitches.x)
 		return 0;
 	else {
 
-		BitmapSrcRect.top = ceil(zirct.top*BmpStitchRatio.y);
+		BitmapSrcRect.top = ceil(ZoomedInRect.top*BmpStitchRatio.y);
 		BitmapSrcRect.left = ceil(ZoomRect.left*BmpStitchRatio.x);
 		BitmapSrcRect.right = floor(ZoomRect.right*BmpStitchRatio.x);
-		BitmapSrcRect.bottom = floor(zirct.bottom*BmpStitchRatio.y);
+		BitmapSrcRect.bottom = floor(ZoomedInRect.bottom*BmpStitchRatio.y);
 		if (BitmapSrcRect.right > (long)BitmapWidth) {
 
 			BitmapSrcRect.right = BitmapWidth;
@@ -22165,20 +22165,20 @@ BOOL bitar() {
 			BitmapSrcRect.bottom = BitmapHeight;
 			setMap(LANDSCAP);
 		}
-		bakrct.top = BitmapSrcRect.top*StitchBmpRatio.y;
-		bakrct.left = BitmapSrcRect.left*StitchBmpRatio.x;
-		bakrct.right = BitmapSrcRect.right*StitchBmpRatio.x;
-		bakrct.bottom = BitmapSrcRect.bottom*StitchBmpRatio.y;
-		difrct.top = bakrct.top - zirct.top;
-		difrct.left = bakrct.left - zirct.left;
-		difrct.right = zirct.right - bakrct.right;
-		difrct.bottom = zirct.bottom - bakrct.bottom;
-		bsdrat.x = (double)StitchWindowClientRect.right / (ZoomRect.right - ZoomRect.left);
-		bsdrat.y = (double)StitchWindowClientRect.bottom / (ZoomRect.top - ZoomRect.bottom);
-		BitmapDstRect.top = difrct.top*bsdrat.y;
-		BitmapDstRect.left = difrct.left*bsdrat.x;
-		BitmapDstRect.right = StitchWindowClientRect.right - difrct.right*bsdrat.x;
-		BitmapDstRect.bottom = StitchWindowClientRect.bottom - difrct.bottom*bsdrat.y;
+		backingRect.top = BitmapSrcRect.top*StitchBmpRatio.y;
+		backingRect.left = BitmapSrcRect.left*StitchBmpRatio.x;
+		backingRect.right = BitmapSrcRect.right*StitchBmpRatio.x;
+		backingRect.bottom = BitmapSrcRect.bottom*StitchBmpRatio.y;
+		differenceRect.top = backingRect.top - ZoomedInRect.top;
+		differenceRect.left = backingRect.left - ZoomedInRect.left;
+		differenceRect.right = ZoomedInRect.right - backingRect.right;
+		differenceRect.bottom = ZoomedInRect.bottom - backingRect.bottom;
+		bitmapStitchRatio.x = (double)StitchWindowClientRect.right / (ZoomRect.right - ZoomRect.left);
+		bitmapStitchRatio.y = (double)StitchWindowClientRect.bottom / (ZoomRect.top - ZoomRect.bottom);
+		BitmapDstRect.top = differenceRect.top*bitmapStitchRatio.y;
+		BitmapDstRect.left = differenceRect.left*bitmapStitchRatio.x;
+		BitmapDstRect.right = StitchWindowClientRect.right - differenceRect.right*bitmapStitchRatio.x;
+		BitmapDstRect.bottom = StitchWindowClientRect.bottom - differenceRect.bottom*bitmapStitchRatio.y;
 		return 1;
 	}
 }
