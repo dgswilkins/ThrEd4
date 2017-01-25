@@ -23380,31 +23380,32 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 void sachk() {
 
-	unsigned	ind, ine, bakclo;
-	SATCON*		ts;
-	TCHAR*		pchr;
-	FRMHED*		tfrm;
+	unsigned	iForm, iGuide, bakclo;
+	SATCON*		guide;
+	TCHAR*		buffer;
+	FRMHED*		form;
 
-	pchr = MsgBuffer;
-	for (ind = 0; ind < FormIndex; ind++) {
+	buffer = MsgBuffer;
+	for (iForm = 0; iForm < FormIndex; iForm++) {
 
-		tfrm = &FormList[ind];
-		if (tfrm->type == SAT&&tfrm->satinGuideCount) {
+		form = &FormList[iForm];
+		if (form->type == SAT&&form->satinGuideCount) {
 
-			ts = tfrm->satinOrAngle.sac;
-			for (ine = 0; ine < tfrm->satinGuideCount; ine++) {
+			guide = form->satinOrAngle.sac;
+			for (iGuide = 0; iGuide < form->satinGuideCount; iGuide++) {
 
-				if (ts[ine].start > tfrm->vertexCount || ts[ine].finish > tfrm->vertexCount) {
+				if (guide[iGuide].start > form->vertexCount || guide[iGuide].finish > form->vertexCount) {
 
 					bakclo = ClosestFormToCursor;
-					ClosestFormToCursor = ind;
-					delsac(ind);
+					ClosestFormToCursor = iForm;
+					delsac(iForm);
 					ClosestFormToCursor = bakclo;
 				}
 			}
 		}
 	}
-	if (pchr != MsgBuffer)
+	// ToDo - Why is this code here?
+	if (buffer != MsgBuffer)
 		shoMsg(MsgBuffer);
 }
 
@@ -23414,7 +23415,7 @@ void sachk() {
 #define ALL_FPU_EX (BAD_FPU_EX | COMMON_FPU_EX)
 #endif
 
-int	fltex(int p_code) {
+int	fltex(int code) {
 
 #if  __UseASM__
 	short	cw;
@@ -23422,7 +23423,7 @@ int	fltex(int p_code) {
 	_asm {
 
 		xor		eax, eax
-		cmp		p_code, 0x10
+		cmp		code, 0x10
 		jne		short fltex1
 		mov		cw, 0x27f
 		fldcw	cw
@@ -23430,7 +23431,7 @@ int	fltex(int p_code) {
 		fltex1 :
 	}
 #else
-	if (p_code != 0x10)
+	if (code != 0x10)
 		return 0;
 	unsigned int current_word = 0;
 	_controlfp_s(&current_word, ALL_FPU_EX, _MCW_EM);
