@@ -777,7 +777,7 @@ TCHAR*	LayerText[] = {
 	"4"
 };
 
-COLORREF defCol[] = {
+COLORREF DefaultColors[] = {
 
 	0x000000,
 	0x800000,
@@ -9402,7 +9402,7 @@ void stchout() {
 }
 
 unsigned duth(TCHAR* name) {
-
+	// ToDo - Can I use strrchr here?
 	unsigned iLast = strlen(name);
 
 	do iLast--;
@@ -20935,7 +20935,7 @@ unsigned chkMsg() {
 
 			for (iColor = 0; iColor < 16; iColor++) {
 
-				UserColor[iColor] = defCol[iColor];
+				UserColor[iColor] = DefaultColors[iColor];
 				UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 				UserPen[iColor] = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 				redraw(UserColorWin[iColor]);
@@ -21796,7 +21796,7 @@ void init() {
 
 		//initialize the user color and thread size arrays
 		for (iColor = 0; iColor < 16; iColor++)
-			UserColor[iColor] = defCol[iColor];
+			UserColor[iColor] = DefaultColors[iColor];
 	}
 	for (iColor = 0; iColor < 16; iColor++) {
 
@@ -21941,7 +21941,7 @@ void init() {
 	//create brushes
 	for (iColor = 0; iColor < 16; iColor++) {
 
-		DefaultColorBrush[iColor] = CreateSolidBrush(defCol[iColor]);
+		DefaultColorBrush[iColor] = CreateSolidBrush(DefaultColors[iColor]);
 		UserColorBrush[iColor] = CreateSolidBrush(UserColor[iColor]);
 	}
 	BlackBrush = CreateSolidBrush(0);
@@ -22140,7 +22140,7 @@ BOOL bitar() {
 
 	dRECTANGLE	backingRect;
 	dRECTANGLE	differenceRect;
-	dPOINT	bitmapStitchRatio;
+	dPOINT		bitmapStitchRatio;
 	dRECTANGLE	ZoomedInRect;
 
 	ZoomedInRect.bottom = UnzoomedRect.y - ZoomRect.bottom;
@@ -22215,31 +22215,31 @@ void drwknot() {
 
 void dugrid() {
 
-	POINT		tlin[2];
-	RECT		grdrct;
-	unsigned	ind;
+	POINT		gridLine[2];
+	RECT		gridRect;
+	unsigned	iGrid;
 
 	if (ZoomFactor < ShowStitchThreshold || !ShowStitchThreshold) {
 
 		SetROP2(StitchWindowMemDC, R2_XORPEN);
 		SelectObject(StitchWindowMemDC, GridPen);
-		grdrct.left = ceil(ZoomRect.left / IniFile.gridSize);
-		grdrct.right = floor(ZoomRect.right / IniFile.gridSize);
-		grdrct.bottom = ceil(ZoomRect.bottom / IniFile.gridSize);
-		grdrct.top = floor(ZoomRect.top / IniFile.gridSize);
-		tlin[0].x = 0;
-		tlin[1].x = StitchWindowClientRect.right;
-		for (ind = grdrct.bottom; ind <= (unsigned)grdrct.top; ind++) {
+		gridRect.left = ceil(ZoomRect.left / IniFile.gridSize);
+		gridRect.right = floor(ZoomRect.right / IniFile.gridSize);
+		gridRect.bottom = ceil(ZoomRect.bottom / IniFile.gridSize);
+		gridRect.top = floor(ZoomRect.top / IniFile.gridSize);
+		gridLine[0].x = 0;
+		gridLine[1].x = StitchWindowClientRect.right;
+		for (iGrid = gridRect.bottom; iGrid <= (unsigned)gridRect.top; iGrid++) {
 
-			tlin[0].y = tlin[1].y = StitchWindowClientRect.bottom - (ind*IniFile.gridSize - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-			Polyline(StitchWindowMemDC, tlin, 2);
+			gridLine[0].y = gridLine[1].y = StitchWindowClientRect.bottom - (iGrid*IniFile.gridSize - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+			Polyline(StitchWindowMemDC, gridLine, 2);
 		}
-		tlin[0].y = 0;
-		tlin[1].y = StitchWindowClientRect.bottom;
-		for (ind = grdrct.left; ind <= (unsigned)grdrct.right; ind++) {
+		gridLine[0].y = 0;
+		gridLine[1].y = StitchWindowClientRect.bottom;
+		for (iGrid = gridRect.left; iGrid <= (unsigned)gridRect.right; iGrid++) {
 
-			tlin[0].x = tlin[1].x = (ind*IniFile.gridSize - ZoomRect.left)*ZoomRatio.x + 0.5;
-			Polyline(StitchWindowMemDC, tlin, 2);
+			gridLine[0].x = gridLine[1].x = (iGrid*IniFile.gridSize - ZoomRect.left)*ZoomRatio.x + 0.5;
+			Polyline(StitchWindowMemDC, gridLine, 2);
 		}
 		SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	}
@@ -22247,39 +22247,39 @@ void dugrid() {
 
 void rint() {
 
-	unsigned l_siz;
+	unsigned size;
 
 	CellSize.x = (ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
 	CellSize.y = (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom;
-	l_siz = StitchWindowClientRect.right*StitchWindowClientRect.bottom;
-	if (l_siz > RMAPBITS) {
+	size = StitchWindowClientRect.right*StitchWindowClientRect.bottom;
+	if (size > RMAPBITS) {
 
-		CellSize.x *= l_siz / RMAPBITS;
-		CellSize.y *= l_siz / RMAPBITS;
+		CellSize.x *= size / RMAPBITS;
+		CellSize.y *= size / RMAPBITS;
 	}
 }
 
-unsigned setRmap(fPOINTATTR p_sPnt) {
+unsigned setRmap(fPOINTATTR stitchPoint) {
 
-	unsigned l_bpnt;
+	unsigned bitPoint;
 
-	l_bpnt = floor((p_sPnt.x - ZoomRect.left) / CellSize.x)*floor((p_sPnt.y - ZoomRect.bottom) / CellSize.y);
-	if (l_bpnt < RMAPBITS)
-		return setRmp(l_bpnt);
+	bitPoint = floor((stitchPoint.x - ZoomRect.left) / CellSize.x)*floor((stitchPoint.y - ZoomRect.bottom) / CellSize.y);
+	if (bitPoint < RMAPBITS)
+		return setRmp(bitPoint);
 	return 0;
 }
 
 void drwStch() {
 
-	unsigned	ind, ine, scnt, pwid, wascol;
-	unsigned	layr;
-	double		slop, off;
+	unsigned	iColor, iStitch, stitchCount, pwid, wascol;
+	unsigned	layer;
+	double		slope, offset;
 	double		dub6;
-	fPOINTATTR*	l_pstch;
-	POINT		tlin[2];
-	long		hi = DrawItem->rcItem.bottom;
-	long		xba, yab, tlng;
-	HDC			tdc;
+	fPOINTATTR*	currentStitches;
+	POINT		stitchLine[2];
+	long		maxYcoord = DrawItem->rcItem.bottom;
+	long		xDelta, yDelta, gapToEdge;
+	HDC			deviceContext;
 
 	setMap(RELAYR);
 	rstMap(SELSHO);
@@ -22291,25 +22291,25 @@ void drwStch() {
 	rstMap(ILIN);
 	uncros();
 	rstMap(SHOFRM);
-	scnt = 0;
-	for (ind = 0; ind < ColorChanges; ind++) {
+	stitchCount = 0;
+	for (iColor = 0; iColor < ColorChanges; iColor++) {
 
-		LineIndex = ColorChangeTable[ind + 1].stitchIndex - ColorChangeTable[ind].stitchIndex;
-		if (LineIndex > scnt)
-			scnt = LineIndex;
+		LineIndex = ColorChangeTable[iColor + 1].stitchIndex - ColorChangeTable[iColor].stitchIndex;
+		if (LineIndex > stitchCount)
+			stitchCount = LineIndex;
 	}
-	LinePoints = new POINT[scnt + 2];
+	LinePoints = new POINT[stitchCount + 2];
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	duzrat();
 	if (*PCSBMPFileName && !chkMap(HIDMAP) && !chkMap(UPTO)) {
 
 		if (chkMap(WASTRAC))
-			tdc = TraceDC;
+			deviceContext = TraceDC;
 		else
-			tdc = BitmapDC;
+			deviceContext = BitmapDC;
 		if (bitar())
 			StretchBlt(StitchWindowMemDC, BitmapDstRect.left, BitmapDstRect.top, BitmapDstRect.right - BitmapDstRect.left, BitmapDstRect.bottom - BitmapDstRect.top,
-				tdc, BitmapSrcRect.left, BitmapSrcRect.top, BitmapSrcRect.right - BitmapSrcRect.left, BitmapSrcRect.bottom - BitmapSrcRect.top, SRCCOPY);
+				deviceContext, BitmapSrcRect.left, BitmapSrcRect.top, BitmapSrcRect.right - BitmapSrcRect.left, BitmapSrcRect.bottom - BitmapSrcRect.top, SRCCOPY);
 	}
 	dugrid();
 	if (chkMap(INIT)) {
@@ -22339,19 +22339,19 @@ void drwStch() {
 		ThreadWidthPixels[0] = dub6*TSIZ30;
 		ThreadWidthPixels[1] = dub6*TSIZ40;
 		ThreadWidthPixels[2] = dub6*TSIZ60;
-		for (ind = 0; ind < 16; ind++) {
+		for (iColor = 0; iColor < 16; iColor++) {
 
 			if (chkMap(THRDS))
-				nuStchSiz(ind, ThreadWidthPixels[ThreadSizeIndex[ind]]);
+				nuStchSiz(iColor, ThreadWidthPixels[ThreadSizeIndex[iColor]]);
 			else {
 				if (chkMap(COL)) {
 
-					if (ind == ActiveColor)
-						nuStchSiz(ind, ThreadWidthPixels[ThreadSizeIndex[ind]]);
+					if (iColor == ActiveColor)
+						nuStchSiz(iColor, ThreadWidthPixels[ThreadSizeIndex[iColor]]);
 					else
-						nuStchSiz(ind, 1);
+						nuStchSiz(iColor, 1);
 				} else
-					nuStchSiz(ind, 1);
+					nuStchSiz(iColor, 1);
 			}
 		}
 		LineIndex = 0; DisplayedColorBitmap = 0;
@@ -22360,22 +22360,22 @@ void drwStch() {
 			LineIndex = 0;
 			rstMap(LINED);
 			rstMap(LININ);
-			for (ind = 0; ind < ColorChanges; ind++) {
+			for (iColor = 0; iColor < ColorChanges; iColor++) {
 
 				if (chkMap(HID)) {
 
-					if (ColorChangeTable[ind].colorIndex != ActiveColor) {
+					if (ColorChangeTable[iColor].colorIndex != ActiveColor) {
 
-						scnt = ColorChangeTable[ind + 1].stitchIndex - ColorChangeTable[ind].stitchIndex;
-						l_pstch = &StitchBuffer[ColorChangeTable[ind].stitchIndex];
-						for (ine = 0; ine < scnt; ine++) {
+						stitchCount = ColorChangeTable[iColor + 1].stitchIndex - ColorChangeTable[iColor].stitchIndex;
+						currentStitches = &StitchBuffer[ColorChangeTable[iColor].stitchIndex];
+						for (iStitch = 0; iStitch < stitchCount; iStitch++) {
 
-							if (l_pstch[ine].x >= ZoomRect.left
-								&&l_pstch[ine].x <= ZoomRect.right
-								&&l_pstch[ine].y >= ZoomRect.bottom
-								&&l_pstch[ine].y <= ZoomRect.top) {
+							if (currentStitches[iStitch].x >= ZoomRect.left
+								&&currentStitches[iStitch].x <= ZoomRect.right
+								&&currentStitches[iStitch].y >= ZoomRect.bottom
+								&&currentStitches[iStitch].y <= ZoomRect.top) {
 
-								setCol(ColorChangeTable[ind].colorIndex);
+								setCol(ColorChangeTable[iColor].colorIndex);
 								goto skip;
 							}
 						}
@@ -22387,48 +22387,48 @@ void drwStch() {
 
 					wascol = 0;
 				}
-				SelectObject(StitchWindowMemDC, UserPen[ColorChangeTable[ind].colorIndex]);
-				scnt = ColorChangeTable[ind + 1].stitchIndex - ColorChangeTable[ind].stitchIndex;
-				l_pstch = &StitchBuffer[ColorChangeTable[ind].stitchIndex];
-				scnt = chkup(scnt, ind);
-				for (ine = 0; ine < scnt; ine++) {
+				SelectObject(StitchWindowMemDC, UserPen[ColorChangeTable[iColor].colorIndex]);
+				stitchCount = ColorChangeTable[iColor + 1].stitchIndex - ColorChangeTable[iColor].stitchIndex;
+				currentStitches = &StitchBuffer[ColorChangeTable[iColor].stitchIndex];
+				stitchCount = chkup(stitchCount, iColor);
+				for (iStitch = 0; iStitch < stitchCount; iStitch++) {
 
-					layr = (l_pstch[ine].attribute&LAYMSK) >> LAYSHFT;
-					if (!ActiveLayer || !layr || (layr == ActiveLayer)) {
+					layer = (currentStitches[iStitch].attribute&LAYMSK) >> LAYSHFT;
+					if (!ActiveLayer || !layer || (layer == ActiveLayer)) {
 
-						if (l_pstch[ine].x >= ZoomRect.left
-							&&l_pstch[ine].x <= ZoomRect.right
-							&&l_pstch[ine].y >= ZoomRect.bottom
-							&&l_pstch[ine].y <= ZoomRect.top) {
+						if (currentStitches[iStitch].x >= ZoomRect.left
+							&&currentStitches[iStitch].x <= ZoomRect.right
+							&&currentStitches[iStitch].y >= ZoomRect.bottom
+							&&currentStitches[iStitch].y <= ZoomRect.top) {
 
 							wascol = 1;
 							if (setMap(LINED)) {
 
 								if (setMap(LININ)) {
 
-									LinePoints[LineIndex].x = (l_pstch[ine].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-									LinePoints[LineIndex++].y = hi - (l_pstch[ine].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+									LinePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+									LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 
 								} else {
 
-									LinePoints[LineIndex].x = (l_pstch[ine - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-									LinePoints[LineIndex++].y = hi - (l_pstch[ine - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-									LinePoints[LineIndex].x = (l_pstch[ine].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-									LinePoints[LineIndex++].y = hi - (l_pstch[ine].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+									LinePoints[LineIndex].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+									LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+									LinePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+									LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 								}
 							} else {
 
-								if (ine == 0 && ind == 0) {
+								if (iStitch == 0 && iColor == 0) {
 
-									LinePoints[0].x = (l_pstch[ine].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-									LinePoints[0].y = hi - (l_pstch[ine].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+									LinePoints[0].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+									LinePoints[0].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 									LineIndex = 1;
 								} else {
 
-									LinePoints[0].x = (l_pstch[ine - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-									LinePoints[0].y = hi - (l_pstch[ine - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-									LinePoints[1].x = (l_pstch[ine].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-									LinePoints[1].y = hi - (l_pstch[ine].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+									LinePoints[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+									LinePoints[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+									LinePoints[1].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+									LinePoints[1].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 									LineIndex = 2;
 								}
 								setMap(LININ);
@@ -22437,52 +22437,52 @@ void drwStch() {
 
 							if (rstMap(LININ)) {
 
-								LinePoints[LineIndex].x = (l_pstch[ine].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-								LinePoints[LineIndex++].y = hi - (l_pstch[ine].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+								LinePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+								LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 								Polyline(StitchWindowMemDC, LinePoints, LineIndex);
 								LineIndex = 0;
 							} else {
 
-								if (ine) {
+								if (iStitch) {
 
 									//write an equation for this line
-									xba = l_pstch[ine].x - l_pstch[ine - 1].x;
-									yab = l_pstch[ine - 1].y - l_pstch[ine].y;
-									slop = (double)xba / yab;
-									off = l_pstch[ine].x + slop*l_pstch[ine].y;
+									xDelta = currentStitches[iStitch].x - currentStitches[iStitch - 1].x;
+									yDelta = currentStitches[iStitch - 1].y - currentStitches[iStitch].y;
+									slope = (double)xDelta / yDelta;
+									offset = currentStitches[iStitch].x + slope*currentStitches[iStitch].y;
 									//does the line intersect with the top of the screen?
-									tlng = off - slop*ZoomRect.top;
-									if (tlng >= ZoomRect.left&&tlng <= ZoomRect.right) {
+									gapToEdge = offset - slope*ZoomRect.top;
+									if (gapToEdge >= ZoomRect.left&&gapToEdge <= ZoomRect.right) {
 
-										tlin[0].x = (l_pstch[ine - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-										tlin[0].y = hi - (l_pstch[ine - 1].y - ZoomRect.bottom)*ZoomRatio.x + 0.5;
-										tlin[1].x = (l_pstch[ine].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-										tlin[1].y = hi - (l_pstch[ine].y - ZoomRect.bottom)*ZoomRatio.x + 0.5;
-										Polyline(StitchWindowMemDC, tlin, 2);
+										stitchLine[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										stitchLine[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.x + 0.5;
+										stitchLine[1].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										stitchLine[1].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.x + 0.5;
+										Polyline(StitchWindowMemDC, stitchLine, 2);
 										goto rotlin;
 									}
 									//does the line intersect the bottom of the screen?
-									tlng = off - slop*ZoomRect.bottom;
-									if (tlng >= ZoomRect.left&&tlng <= ZoomRect.right) {
+									gapToEdge = offset - slope*ZoomRect.bottom;
+									if (gapToEdge >= ZoomRect.left&&gapToEdge <= ZoomRect.right) {
 
-										tlin[0].x = (l_pstch[ine - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-										tlin[0].y = hi - (l_pstch[ine - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-										tlin[1].x = (l_pstch[ine].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-										tlin[1].y = hi - (l_pstch[ine].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-										Polyline(StitchWindowMemDC, tlin, 2);
+										stitchLine[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										stitchLine[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+										stitchLine[1].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										stitchLine[1].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+										Polyline(StitchWindowMemDC, stitchLine, 2);
 										goto rotlin;
 									}
 									//does the line intersect the left side of the screen?
-									if (slop) {
+									if (slope) {
 
-										tlng = (off - ZoomRect.left) / slop;
-										if (tlng >= ZoomRect.bottom&&tlng <= ZoomRect.top) {
+										gapToEdge = (offset - ZoomRect.left) / slope;
+										if (gapToEdge >= ZoomRect.bottom&&gapToEdge <= ZoomRect.top) {
 
-											tlin[0].x = (l_pstch[ine - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-											tlin[0].y = hi - (l_pstch[ine - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-											tlin[1].x = (l_pstch[ine].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-											tlin[1].y = hi - (l_pstch[ine].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-											Polyline(StitchWindowMemDC, tlin, 2);
+											stitchLine[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+											stitchLine[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+											stitchLine[1].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+											stitchLine[1].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+											Polyline(StitchWindowMemDC, stitchLine, 2);
 										}
 									}
 								}
@@ -22500,19 +22500,19 @@ void drwStch() {
 					LineIndex = 1;
 				}
 				if (wascol)
-					setCol(ColorChangeTable[ind].colorIndex);
+					setCol(ColorChangeTable[iColor].colorIndex);
 			skip:;
 			}
 		} else {
 
 			pwid = chkMap(HID);
-			for (ind = 0; ind < ColorChanges; ind++) {
+			for (iColor = 0; iColor < ColorChanges; iColor++) {
 
-				setCol(ColorChangeTable[ind].colorIndex);
-				scnt = ColorChangeTable[ind + 1].stitchIndex - ColorChangeTable[ind].stitchIndex;
-				scnt = chkup(scnt, ind);
-				if (!pwid || (pwid&&ColorChangeTable[ind].colorIndex == ActiveColor))
-					drwLin(ColorChangeTable[ind].stitchIndex, scnt, UserPen[ColorChangeTable[ind].colorIndex]);
+				setCol(ColorChangeTable[iColor].colorIndex);
+				stitchCount = ColorChangeTable[iColor + 1].stitchIndex - ColorChangeTable[iColor].stitchIndex;
+				stitchCount = chkup(stitchCount, iColor);
+				if (!pwid || (pwid&&ColorChangeTable[iColor].colorIndex == ActiveColor))
+					drwLin(ColorChangeTable[iColor].stitchIndex, stitchCount, UserPen[ColorChangeTable[iColor].colorIndex]);
 			}
 		}
 		if (chkMap(SELBOX)) {
@@ -22549,29 +22549,29 @@ void drwStch() {
 			rint();
 			if (chkMap(HID)) {
 
-				for (ind = 0; ind < ColorChanges; ind++) {
+				for (iColor = 0; iColor < ColorChanges; iColor++) {
 
-					if (ColorChangeTable[ind].colorIndex == ActiveColor) {
+					if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
 
-						for (ine = ColorChangeTable[ind].stitchIndex; ine < ColorChangeTable[ind + 1].stitchIndex; ine++) {
+						for (iStitch = ColorChangeTable[iColor].stitchIndex; iStitch < ColorChangeTable[iColor + 1].stitchIndex; iStitch++) {
 
-							if (StitchBuffer[ine].x >= ZoomRect.left&&StitchBuffer[ine].x <= ZoomRect.right
-								&&StitchBuffer[ine].y >= ZoomRect.bottom&&StitchBuffer[ine].y <= ZoomRect.top
-								&&setRmap(StitchBuffer[ine]))
+							if (StitchBuffer[iStitch].x >= ZoomRect.left&&StitchBuffer[iStitch].x <= ZoomRect.right
+								&&StitchBuffer[iStitch].y >= ZoomRect.bottom&&StitchBuffer[iStitch].y <= ZoomRect.top
+								&&setRmap(StitchBuffer[iStitch]))
 
-								stchbox(ine, StitchWindowMemDC);
+								stchbox(iStitch, StitchWindowMemDC);
 						}
 					}
 				}
 			} else {
 
-				for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
+				for (iColor = 0; iColor < PCSHeader.stitchCount; iColor++) {
 
-					if (StitchBuffer[ind].x >= ZoomRect.left&&StitchBuffer[ind].x <= ZoomRect.right
-						&&StitchBuffer[ind].y >= ZoomRect.bottom&&StitchBuffer[ind].y <= ZoomRect.top
-						&&setRmap(StitchBuffer[ind]))
+					if (StitchBuffer[iColor].x >= ZoomRect.left&&StitchBuffer[iColor].x <= ZoomRect.right
+						&&StitchBuffer[iColor].y >= ZoomRect.bottom&&StitchBuffer[iColor].y <= ZoomRect.top
+						&&setRmap(StitchBuffer[iColor]))
 
-						stchbox(ind, StitchWindowMemDC);
+						stchbox(iColor, StitchWindowMemDC);
 				}
 			}
 			SetROP2(StitchWindowMemDC, R2_COPYPEN);
@@ -22631,101 +22631,101 @@ unsigned chkCol(unsigned color) {
 
 void dubar() {
 
-	unsigned	ind;
-	RECT		tRct;
-	double		tdub;
-	POINT		lin[2];
+	unsigned	iColorChange;
+	RECT		colorBarRect;
+	double		barSectionHeight, selectedIndicator;
+	POINT		indicatorLine[2];
 
-	tRct.left = DrawItem->rcItem.left;
-	tRct.right = DrawItem->rcItem.right;
-	tRct.top = 0;
-	tRct.bottom = DrawItem->rcItem.bottom;
-	for (ind = 0; ind < ColorChanges; ind++) {
+	colorBarRect.left = DrawItem->rcItem.left;
+	colorBarRect.right = DrawItem->rcItem.right;
+	colorBarRect.top = 0;
+	colorBarRect.bottom = DrawItem->rcItem.bottom;
+	for (iColorChange = 0; iColorChange < ColorChanges; iColorChange++) {
 
-		tdub = (double)ColorChangeTable[ind + 1].stitchIndex / PCSHeader.stitchCount;
-		tRct.bottom = tdub*DrawItem->rcItem.bottom;
-		FillRect(DrawItem->hDC, &tRct, UserColorBrush[ColorChangeTable[ind].colorIndex]);
-		tRct.top = tRct.bottom;
+		barSectionHeight = (double)ColorChangeTable[iColorChange + 1].stitchIndex / PCSHeader.stitchCount;
+		colorBarRect.bottom = barSectionHeight*DrawItem->rcItem.bottom;
+		FillRect(DrawItem->hDC, &colorBarRect, UserColorBrush[ColorChangeTable[iColorChange].colorIndex]);
+		colorBarRect.top = colorBarRect.bottom;
 	}
 	if (chkMap(SELBOX) || chkMap(GRPSEL)) {
 
-		tdub = (double)ClosestPointIndex / PCSHeader.stitchCount;
-		lin[0].y = lin[1].y = tRct.bottom*tdub + 0.5;
-		lin[0].x = tRct.left;
-		lin[1].x = tRct.right;
+		selectedIndicator = (double)ClosestPointIndex / PCSHeader.stitchCount;
+		indicatorLine[0].y = indicatorLine[1].y = colorBarRect.bottom*selectedIndicator + 0.5;
+		indicatorLine[0].x = colorBarRect.left;
+		indicatorLine[1].x = colorBarRect.right;
 		SelectObject(DrawItem->hDC, CrossPen);
 		SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-		Polyline(DrawItem->hDC, lin, 2);
+		Polyline(DrawItem->hDC, indicatorLine, 2);
 		if (chkMap(GRPSEL)) {
 
-			tdub = (double)GroupStitchIndex / PCSHeader.stitchCount;
-			lin[0].y = lin[1].y = tRct.bottom*tdub + 0.5;
-			lin[0].x = tRct.left;
-			lin[1].x = tRct.right;
-			Polyline(DrawItem->hDC, lin, 2);
+			selectedIndicator = (double)GroupStitchIndex / PCSHeader.stitchCount;
+			indicatorLine[0].y = indicatorLine[1].y = colorBarRect.bottom*selectedIndicator + 0.5;
+			indicatorLine[0].x = colorBarRect.left;
+			indicatorLine[1].x = colorBarRect.right;
+			Polyline(DrawItem->hDC, indicatorLine, 2);
 		}
 		SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	}
 }
 
-void ritbak(TCHAR* nam, DRAWITEMSTRUCT* p_ds) {
+void ritbak(TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 
-	unsigned	ind, ine, inf, col, lind, redsiz;
-	HANDLE		thfil;
-	POINT		l_siz;
-	fPOINTATTR*	tstch;
-	POINT*		l_plin;
-	STRHED		sthed;
-	fPOINT		rsiz;
-	double		rat;
-	double		ratx, raty;
-	COLORREF	tbak;
-	COLORREF	tcol[16];
-	HBRUSH		tbr;
+	unsigned	iStitch, iForm, iVertexInForm, iVertex, iColor, iLine, bytesToRead;
+	HANDLE		thrEdFile;
+	POINT		drawingDestinationSize;
+	fPOINTATTR*	stitchesToDraw;
+	POINT*		lines;
+	STRHED		stitchHeader;
+	fPOINT		stitchSourceSize;
+	double		ratio;
+	double		xRatio, yRatio;
+	COLORREF	brushColor;
+	COLORREF	colors[16];
+	HBRUSH		brush;
 	HPEN		pen;
-	FRMHED*		flst;
-	fPOINT*		tflt;
-	STREX		thedx;
-	unsigned	vervar = 0;
-	FRMHEDO*	frmlstx;
+	FRMHED*		formList;
+	fPOINT*		vertexList;
+	STREX		extendedHeader;
+	unsigned	fileTypeVersion = 0;
+	FRMHEDO*	formListExtended;
 
-	thfil = CreateFile(nam, GENERIC_READ, 0, 0,
+	thrEdFile = CreateFile(fileName, GENERIC_READ, 0, 0,
 		OPEN_EXISTING, 0, 0);
-	l_siz.x = p_ds->rcItem.right - p_ds->rcItem.left;
-	l_siz.y = p_ds->rcItem.bottom - p_ds->rcItem.top;
-	rsiz.x = rsiz.y = 1;
+	drawingDestinationSize.x = drawItem->rcItem.right - drawItem->rcItem.left;
+	drawingDestinationSize.y = drawItem->rcItem.bottom - drawItem->rcItem.top;
+	stitchSourceSize.x = stitchSourceSize.y = 1;
 
-	if (thfil != INVALID_HANDLE_VALUE) {
+	if (thrEdFile != INVALID_HANDLE_VALUE) {
 
-		ReadFile(thfil, (STRHED*)&sthed, sizeof(STRHED), &BytesRead, NULL);
+		ReadFile(thrEdFile, (STRHED*)&stitchHeader, sizeof(STRHED), &BytesRead, NULL);
 		if (BytesRead == sizeof(STRHED)) {
 
-			if ((sthed.headerType & 0xffffff) == 0x746872) {
+			if ((stitchHeader.headerType & 0xffffff) == 0x746872) {
 
-				vervar = (sthed.headerType & 0xff000000) >> 24;
-				switch (vervar) {
+				fileTypeVersion = (stitchHeader.headerType & 0xff000000) >> 24;
+				switch (fileTypeVersion) {
 
 				case 0:
 
 					if (PCSHeader.hoopType == SMALHUP) {
 
-						rsiz.x = IniFile.hoopSizeX = SHUPX;
-						rsiz.y = IniFile.hoopSizeY = SHUPY;
+						stitchSourceSize.x = IniFile.hoopSizeX = SHUPX;
+						stitchSourceSize.y = IniFile.hoopSizeY = SHUPY;
 					} else {
 
-						rsiz.x = IniFile.hoopSizeX = LHUPX;
-						rsiz.y = IniFile.hoopSizeY = LHUPY;
+						stitchSourceSize.x = IniFile.hoopSizeX = LHUPX;
+						stitchSourceSize.y = IniFile.hoopSizeY = LHUPY;
 					}
 					break;
 
 				case 1:
 				case 2:
 
-					ReadFile(thfil, (STREX*)&thedx, sizeof(STREX), &BytesRead, NULL);
+					ReadFile(thrEdFile, (STREX*)&extendedHeader, sizeof(STREX), &BytesRead, NULL);
 					if (BytesRead != sizeof(STREX))
 						return;
-					rsiz.x = thedx.hoopSizeX;
-					rsiz.y = thedx.hoopSizeY;
+					stitchSourceSize.x = extendedHeader.hoopSizeX;
+					stitchSourceSize.y = extendedHeader.hoopSizeY;
 
 					break;
 
@@ -22734,148 +22734,150 @@ void ritbak(TCHAR* nam, DRAWITEMSTRUCT* p_ds) {
 					return;
 				}
 			}
-			ratx = (double)l_siz.x / rsiz.x;
-			raty = (double)l_siz.y / rsiz.y;
-			if (ratx < raty)
-				rat = ratx;
+			xRatio = (double)drawingDestinationSize.x / stitchSourceSize.x;
+			yRatio = (double)drawingDestinationSize.y / stitchSourceSize.y;
+			if (xRatio < yRatio)
+				ratio = xRatio;
 			else
-				rat = raty;
-			if (sthed.stitchCount) {
+				ratio = yRatio;
+			if (stitchHeader.stitchCount) {
 
-				tstch = new fPOINTATTR[sthed.stitchCount];
-				l_plin = new POINT[sthed.stitchCount];
-				redsiz = sthed.stitchCount * sizeof(fPOINTATTR);
-				ReadFile(thfil, (fPOINTATTR*)tstch, redsiz, &BytesRead, 0);
-				if (redsiz == BytesRead) {
+				stitchesToDraw = new fPOINTATTR[stitchHeader.stitchCount];
+				lines = new POINT[stitchHeader.stitchCount];
+				bytesToRead = stitchHeader.stitchCount * sizeof(fPOINTATTR);
+				ReadFile(thrEdFile, (fPOINTATTR*)stitchesToDraw, bytesToRead, &BytesRead, 0);
+				if (bytesToRead == BytesRead) {
 
-					SetFilePointer(thfil, 16, 0, FILE_CURRENT);
-					ReadFile(thfil, (COLORREF*)&tbak, 4, &BytesRead, 0);
-					ReadFile(thfil, (COLORREF*)tcol, 64, &BytesRead, 0);
-					tbr = CreateSolidBrush(tbak);
-					SelectObject(p_ds->hDC, tbr);
-					FillRect(p_ds->hDC, &p_ds->rcItem, tbr);
-					col = tstch[0].attribute & 0xf;
-					pen = CreatePen(PS_SOLID, 1, tcol[col]);
-					lind = 0;
-					for (ine = 0; ine < sthed.stitchCount; ine++) {
+					SetFilePointer(thrEdFile, 16, 0, FILE_CURRENT);
+					// ToDo - replace 4 & 64 with SIZEOF
+					ReadFile(thrEdFile, (COLORREF*)&brushColor, 4, &BytesRead, 0);
+					ReadFile(thrEdFile, (COLORREF*)colors, 64, &BytesRead, 0);
+					brush = CreateSolidBrush(brushColor);
+					SelectObject(drawItem->hDC, brush);
+					FillRect(drawItem->hDC, &drawItem->rcItem, brush);
+					iColor = stitchesToDraw[0].attribute & 0xf;
+					pen = CreatePen(PS_SOLID, 1, colors[iColor]);
+					iLine = 0;
+					for (iStitch = 0; iStitch < stitchHeader.stitchCount; iStitch++) {
 
-						if ((tstch[ine].attribute & 0xf) == col) {
+						if ((stitchesToDraw[iStitch].attribute & 0xf) == iColor) {
 
-							l_plin[lind].x = tstch[ine].x*rat;
-							l_plin[lind++].y = l_siz.y - tstch[ine].y*rat;
+							lines[iLine].x = stitchesToDraw[iStitch].x*ratio;
+							lines[iLine++].y = drawingDestinationSize.y - stitchesToDraw[iStitch].y*ratio;
 						} else {
 
-							pen = nuPen(pen, 1, tcol[col]);
-							SelectObject(p_ds->hDC, pen);
-							Polyline(p_ds->hDC, l_plin, lind);
-							lind = 0;
-							col = tstch[ine].attribute & 0xf;
+							pen = nuPen(pen, 1, colors[iColor]);
+							SelectObject(drawItem->hDC, pen);
+							Polyline(drawItem->hDC, lines, iLine);
+							iLine = 0;
+							iColor = stitchesToDraw[iStitch].attribute & 0xf;
 						}
 					}
-					if (lind) {
+					if (iLine) {
 
-						pen = nuPen(pen, 1, tcol[col]);
-						SelectObject(p_ds->hDC, pen);
-						Polyline(p_ds->hDC, l_plin, lind);
+						pen = nuPen(pen, 1, colors[iColor]);
+						SelectObject(drawItem->hDC, pen);
+						Polyline(drawItem->hDC, lines, iLine);
 					}
-					DeleteObject(tbr);
+					DeleteObject(brush);
 					DeleteObject(pen);
-					delete[] tstch;
-					delete[] l_plin;
+					delete[] stitchesToDraw;
+					delete[] lines;
 				} else {
 
-					delete[] tstch;
-					delete[] l_plin;
-					CloseHandle(thfil);
+					delete[] stitchesToDraw;
+					delete[] lines;
+					CloseHandle(thrEdFile);
 					return;
 				}
 			} else
-				SetFilePointer(thfil, 84, 0, FILE_CURRENT);
-			if (sthed.formCount) {
+				SetFilePointer(thrEdFile, 84, 0, FILE_CURRENT);
+			if (stitchHeader.formCount) {
 
-				l_plin = new POINT[MAXFRMLINS];
-				SetFilePointer(thfil, 80, 0, FILE_CURRENT);
-				flst = new FRMHED[sthed.formCount];
-				tflt = new fPOINT[sthed.vertexCount];
-				if (vervar < 2) {
+				lines = new POINT[MAXFRMLINS];
+				SetFilePointer(thrEdFile, 80, 0, FILE_CURRENT);
+				formList = new FRMHED[stitchHeader.formCount];
+				vertexList = new fPOINT[stitchHeader.vertexCount];
+				if (fileTypeVersion < 2) {
 
-					frmlstx = (FRMHEDO*)&BSequence;
-					ReadFile(thfil, (FRMHEDO*)frmlstx, sthed.formCount * sizeof(FRMHEDO), &BytesRead, 0);
-					if (BytesRead != sthed.vertexCount * sizeof(FRMHEDO))
+					formListExtended = (FRMHEDO*)&BSequence;
+					ReadFile(thrEdFile, (FRMHEDO*)formListExtended, stitchHeader.formCount * sizeof(FRMHEDO), &BytesRead, 0);
+					if (BytesRead != stitchHeader.vertexCount * sizeof(FRMHEDO))
 						goto bakskp;
 					FillMemory(&BSequence, 0, sizeof(FRMHED)*FormIndex);
-					for (ind = 0; ind < sthed.formCount; ind++) {
+					for (iForm = 0; iForm < stitchHeader.formCount; iForm++) {
 
-						SelectedForm = &flst[ind];
-						MoveMemory(SelectedForm, &frmlstx[ind], sizeof(FRMHEDO));
+						SelectedForm = &formList[iForm];
+						MoveMemory(SelectedForm, &formListExtended[iForm], sizeof(FRMHEDO));
 					}
 				} else {
 
-					redsiz = sthed.formCount * sizeof(FRMHED);
-					ReadFile(thfil, (FRMHED*)flst, redsiz, &BytesRead, 0);
-					if (BytesRead != redsiz)
+					bytesToRead = stitchHeader.formCount * sizeof(FRMHED);
+					ReadFile(thrEdFile, (FRMHED*)formList, bytesToRead, &BytesRead, 0);
+					if (BytesRead != bytesToRead)
 						goto bakskp;
 				}
-				redsiz = sthed.vertexCount * sizeof(fPOINT);
-				ReadFile(thfil, (fPOINT*)tflt, redsiz, &BytesRead, 0);
-				if (BytesRead != redsiz)
+				bytesToRead = stitchHeader.vertexCount * sizeof(fPOINT);
+				ReadFile(thrEdFile, (fPOINT*)vertexList, bytesToRead, &BytesRead, 0);
+				if (BytesRead != bytesToRead)
 					goto bakskp;
-				inf = 0;
-				for (ind = 0; ind < sthed.formCount; ind++) {
+				iVertex = 0;
+				for (iStitch = 0; iStitch < stitchHeader.formCount; iStitch++) {
 
-					lind = inf;
-					for (ine = 0; (ine < flst[ind].vertexCount) && (inf < sthed.vertexCount); ine++) {
+					iLine = iVertex;
+					for (iVertexInForm = 0; (iVertexInForm < formList[iStitch].vertexCount) && (iVertex < stitchHeader.vertexCount); iVertexInForm++) {
 
-						l_plin[ine].x = tflt[inf].x*rat;
-						l_plin[ine].y = l_siz.y - tflt[inf++].y*rat;
+						lines[iVertexInForm].x = vertexList[iVertex].x*ratio;
+						lines[iVertexInForm].y = drawingDestinationSize.y - vertexList[iVertex++].y*ratio;
 					}
-					l_plin[ine].x = tflt[lind].x*rat;
-					l_plin[ine].y = l_siz.y - tflt[lind].y*rat;
-					SelectObject(p_ds->hDC, FormPen);
-					SetROP2(p_ds->hDC, R2_XORPEN);
-					if (FormList[ind].type == FRMLINE)
-						Polyline(p_ds->hDC, l_plin, flst[ind].vertexCount);
+					lines[iVertexInForm].x = vertexList[iLine].x*ratio;
+					lines[iVertexInForm].y = drawingDestinationSize.y - vertexList[iLine].y*ratio;
+					SelectObject(drawItem->hDC, FormPen);
+					SetROP2(drawItem->hDC, R2_XORPEN);
+					if (FormList[iStitch].type == FRMLINE)
+						Polyline(drawItem->hDC, lines, formList[iStitch].vertexCount);
 					else
-						Polyline(p_ds->hDC, l_plin, flst[ind].vertexCount + 1);
+						Polyline(drawItem->hDC, lines, formList[iStitch].vertexCount + 1);
 					SetROP2(StitchWindowMemDC, R2_COPYPEN);
 				}
 			bakskp:;
-				delete[] flst;
-				delete[] tflt;
-				delete[] l_plin;
+				delete[] formList;
+				delete[] vertexList;
+				delete[] lines;
 			}
 		}
-		CloseHandle(thfil);
+		CloseHandle(thrEdFile);
 	}
 }
 
-void durct(unsigned shft, RECT irct) {
+void durct(unsigned shift, RECT TraceControlRect) {
 
-	unsigned	lo, hi, len;
-	double		rat;
+	unsigned	lowerColor, upperColor, controlHeight;
+	double		ratio;
 
-	lo = (UpPixelColor >> shft) & 0xff;
-	hi = (DownPixelColor >> shft) & 0xff;
-	TraceHighMaskRect.left = TraceLowMaskRect.left = TraceMiddleMaskRect.left = irct.left;
-	TraceHighMaskRect.right = TraceLowMaskRect.right = TraceMiddleMaskRect.right = irct.right;
-	len = irct.bottom - irct.top;
-	rat = (double)lo / 255;
-	TraceMiddleMaskRect.top = len*rat + irct.top;
-	rat = (double)hi / 255;
-	TraceMiddleMaskRect.bottom = len*rat + irct.top;
+	lowerColor = (UpPixelColor >> shift) & 0xff;
+	upperColor = (DownPixelColor >> shift) & 0xff;
+	// ToDo - use local variable and parameter instead of Trace[High|Middle]MaskRect ?
+	TraceHighMaskRect.left = TraceLowMaskRect.left = TraceMiddleMaskRect.left = TraceControlRect.left;
+	TraceHighMaskRect.right = TraceLowMaskRect.right = TraceMiddleMaskRect.right = TraceControlRect.right;
+	controlHeight = TraceControlRect.bottom - TraceControlRect.top;
+	ratio = (double)lowerColor / 255;
+	TraceMiddleMaskRect.top = controlHeight*ratio + TraceControlRect.top;
+	ratio = (double)upperColor / 255;
+	TraceMiddleMaskRect.bottom = controlHeight*ratio + TraceControlRect.top;
 	rstMap(DUHI);
 	rstMap(DULO);
-	if (lo) {
+	if (lowerColor) {
 
 		setMap(DULO);
 		TraceLowMaskRect.bottom = TraceMiddleMaskRect.top;
 		TraceLowMaskRect.top = 0;
 	}
-	if (hi != 255) {
+	if (upperColor != 255) {
 
 		setMap(DUHI);
 		TraceHighMaskRect.top = TraceMiddleMaskRect.bottom;
-		TraceHighMaskRect.bottom = irct.bottom;
+		TraceHighMaskRect.bottom = TraceControlRect.bottom;
 	}
 }
 
@@ -22889,15 +22891,17 @@ void dublk(HDC dc) {
 
 LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
-	unsigned			ind, ine;
-	TCHAR				buf[10];		//for integer to string conversion
-	unsigned			len;			//string length
-	SIZE				l_txSiz;			//for measuring text items
-	POINT				scPnt;			//for scroll bar functions
-	POINT				lin[2];
-	long				twid;
+	unsigned			position, iRGB, iColor, iThumb, iVersion, lastCharacter;
+	unsigned			screenCenterOffset;
+	SIZE				maxWindowDimension;
+	TCHAR				buffer[10];		//for integer to string conversion
+	unsigned			length;			//string length
+	SIZE				textSize;		//for measuring text items
+	POINT				scrollPoint;	//for scroll bar functions
+	POINT				line[2];
+	long				adjustedWidth;
 	double				tdub;
-	TCHAR				nam[_MAX_PATH];
+	TCHAR				fileName[_MAX_PATH];
 
 	switch (message) {
 
@@ -22929,11 +22933,11 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
 			} else {
 
-				scPnt.x = (ZoomRect.right - ZoomRect.left)*LINSCROL;
-				if (!scPnt.x)
-					scPnt.x = 1;
-				scPnt.y = 0;
-				rshft(scPnt);
+				scrollPoint.x = (ZoomRect.right - ZoomRect.left)*LINSCROL;
+				if (!scrollPoint.x)
+					scrollPoint.x = 1;
+				scrollPoint.y = 0;
+				rshft(scrollPoint);
 			}
 			return 1;
 
@@ -22948,11 +22952,11 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
 			} else {
 
-				scPnt.x = -(ZoomRect.right - ZoomRect.left)*LINSCROL;
-				if (!scPnt.x)
-					scPnt.x = -1;
-				scPnt.y = 0;
-				rshft(scPnt);
+				scrollPoint.x = -(ZoomRect.right - ZoomRect.left)*LINSCROL;
+				if (!scrollPoint.x)
+					scrollPoint.x = -1;
+				scrollPoint.y = 0;
+				rshft(scrollPoint);
 			}
 			return 1;
 
@@ -22988,22 +22992,22 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 				if ((HWND)lParam == SpeedScrollBar) {
 
-					ind = (unsigned)HIWORD(wParam);
-					MovieTimeStep = MAXDELAY - ind;
+					position = (unsigned)HIWORD(wParam);
+					MovieTimeStep = MAXDELAY - position;
 					setsped();
-					SetScrollPos(SpeedScrollBar, SB_CTL, ind, TRUE);
+					SetScrollPos(SpeedScrollBar, SB_CTL, position, TRUE);
 				}
 			} else {
 
 				if ((HWND)lParam == HorizontalScrollBar) {
 
-					scPnt.x = ZoomRect.right - ZoomRect.left;
+					scrollPoint.x = ZoomRect.right - ZoomRect.left;
 					ZoomRect.left = (long)HIWORD(wParam);
-					ZoomRect.right = ZoomRect.left + scPnt.x;
+					ZoomRect.right = ZoomRect.left + scrollPoint.x;
 					if (ZoomRect.right > UnzoomedRect.x) {
 
 						ZoomRect.right = UnzoomedRect.x;
-						ZoomRect.left = UnzoomedRect.x - scPnt.x;
+						ZoomRect.left = UnzoomedRect.x - scrollPoint.x;
 					}
 					setMap(RESTCH);
 				}
@@ -23019,20 +23023,20 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			//		unpat();
 		case SB_LINEDOWN:
 
-			scPnt.y = (ZoomRect.top - ZoomRect.bottom)*LINSCROL;
-			if (!scPnt.y)
-				scPnt.y = 1;
-			scPnt.x = 0;
-			rshft(scPnt);
+			scrollPoint.y = (ZoomRect.top - ZoomRect.bottom)*LINSCROL;
+			if (!scrollPoint.y)
+				scrollPoint.y = 1;
+			scrollPoint.x = 0;
+			rshft(scrollPoint);
 			return 1;
 
 		case SB_LINEUP:
 
-			scPnt.y = -(ZoomRect.top - ZoomRect.bottom)*LINSCROL;
-			if (!scPnt.y)
-				scPnt.y = -1;
-			scPnt.x = 0;
-			rshft(scPnt);
+			scrollPoint.y = -(ZoomRect.top - ZoomRect.bottom)*LINSCROL;
+			if (!scrollPoint.y)
+				scrollPoint.y = -1;
+			scrollPoint.x = 0;
+			rshft(scrollPoint);
 			return 1;
 
 		case SB_PAGEDOWN:
@@ -23047,13 +23051,13 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 		case SB_THUMBPOSITION:
 
-			scPnt.y = ZoomRect.top - ZoomRect.bottom;
+			scrollPoint.y = ZoomRect.top - ZoomRect.bottom;
 			ZoomRect.top = UnzoomedRect.y - (long)HIWORD(wParam);
-			ZoomRect.bottom = ZoomRect.top - scPnt.y;
+			ZoomRect.bottom = ZoomRect.top - scrollPoint.y;
 			if (ZoomRect.bottom < 0) {
 
 				ZoomRect.bottom = 0;
-				ZoomRect.top = scPnt.y;
+				ZoomRect.top = scrollPoint.y;
 			}
 			setMap(RESTCH);
 			return 1;
@@ -23104,15 +23108,15 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 					}
 				}
 				BitBlt(
-					StitchWindowDC,			// handle to destination DC
-					0,			// x-coord of destination upper-left corner
-					0,			// y-coord of destination upper-left corner
+					StitchWindowDC,					// handle to destination DC
+					0,								// x-coord of destination upper-left corner
+					0,								// y-coord of destination upper-left corner
 					StitchWindowClientRect.right,	// width of destination rectangle
 					StitchWindowClientRect.bottom,	// height of destination rectangle
-					StitchWindowMemDC,			// handle to source DC
-					0,			// x-coordinate of source upper-left corner
-					0,			// y-coordinate of source upper-left corner
-					SRCCOPY		// raster operation code
+					StitchWindowMemDC,				// handle to source DC
+					0,								// x-coordinate of source upper-left corner
+					0,								// y-coordinate of source upper-left corner
+					SRCCOPY							// raster operation code
 				);
 				if (chkMap(ROTSHO))
 					durot();
@@ -23133,7 +23137,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		}
 		if (DrawItem->hwndItem == ButtonWin[HHID] && DrawItem->itemAction == ODA_DRAWENTIRE) {
 
-			ind = (ButtonWidthX3 - PickColorMsgSize.cx) >> 1;
+			position = (ButtonWidthX3 - PickColorMsgSize.cx) >> 1;
 			if (chkMap(HID)) {
 
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[ActiveColor]);
@@ -23142,50 +23146,50 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, (HBRUSH)(COLOR_BTNFACE + 1));
 			if (chkMap(TXTRED))
 			{
-				LoadString(ThrEdInstance, IDS_TXWID, nam, _MAX_PATH);
-				sprintf_s(HelpBuffer, sizeof(HelpBuffer), nam, TextureScreen.width / PFGRAN);
-				TextOut(DrawItem->hDC, ind, 1, HelpBuffer, strlen(HelpBuffer));;
+				LoadString(ThrEdInstance, IDS_TXWID, fileName, _MAX_PATH);
+				sprintf_s(HelpBuffer, sizeof(HelpBuffer), fileName, TextureScreen.width / PFGRAN);
+				TextOut(DrawItem->hDC, position, 1, HelpBuffer, strlen(HelpBuffer));;
 			} else
-				TextOut(DrawItem->hDC, ind, 1, StringTable[STR_PIKOL], strlen(StringTable[STR_PIKOL]));;
+				TextOut(DrawItem->hDC, position, 1, StringTable[STR_PIKOL], strlen(StringTable[STR_PIKOL]));;
 			return 1;
 		}
 		if (chkMap(WASTRAC)) {
 
-			for (ind = 0; ind < 3; ind++) {
+			for (iRGB = 0; iRGB < 3; iRGB++) {
 
-				if (DrawItem->hwndItem == TraceUpWindow[ind]) {
+				if (DrawItem->hwndItem == TraceUpWindow[iRGB]) {
 
-					FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[ind]);
-					upnum(ind);
+					FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);
+					upnum(iRGB);
 					return 1;
 				}
-				if (DrawItem->hwndItem == TraceDownWindow[ind]) {
+				if (DrawItem->hwndItem == TraceDownWindow[iRGB]) {
 
-					FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[ind]);
-					dwnum(ind);
+					FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);
+					dwnum(iRGB);
 				}
-				if (DrawItem->hwndItem == TraceControlWindow[ind]) {
+				if (DrawItem->hwndItem == TraceControlWindow[iRGB]) {
 
-					durct(TraceShift[ind], DrawItem->rcItem);
-					FillRect(DrawItem->hDC, &TraceMiddleMaskRect, TraceBrush[ind]);
+					durct(TraceShift[iRGB], DrawItem->rcItem);
+					FillRect(DrawItem->hDC, &TraceMiddleMaskRect, TraceBrush[iRGB]);
 					dublk(DrawItem->hDC);
 					return 1;
 				}
-				if (DrawItem->hwndItem == TraceSelectWindow[ind]) {
+				if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
 
 					TempBrush = BlackBrush;
-					strcpy_s(buf, StringTable[STR_OFF]);
+					strcpy_s(buffer, StringTable[STR_OFF]);
 					SetBkColor(DrawItem->hDC, 0);
-					SetTextColor(DrawItem->hDC, TraceRGB[ind]);
-					if (chkMap(TraceRGBFlag[ind])) {
+					SetTextColor(DrawItem->hDC, TraceRGB[iRGB]);
+					if (chkMap(TraceRGBFlag[iRGB])) {
 
-						TempBrush = TraceBrush[ind];
-						strcpy_s(buf, StringTable[STR_ON]);
+						TempBrush = TraceBrush[iRGB];
+						strcpy_s(buffer, StringTable[STR_ON]);
 						SetTextColor(DrawItem->hDC, 0);
-						SetBkColor(DrawItem->hDC, TraceRGB[ind]);
+						SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 					}
 					FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
-					TextOut(DrawItem->hDC, 1, 1, buf, strlen(buf));
+					TextOut(DrawItem->hDC, 1, 1, buffer, strlen(buffer));
 					return 1;
 				}
 				if (DrawItem->hwndItem == TraceNumberInput) {
@@ -23198,37 +23202,37 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			}
 		} else {
 
-			for (ind = 0; ind < 16; ind++) {
+			for (iColor = 0; iColor < 16; iColor++) {
 
-				if (DrawItem->hwndItem == DefaultColorWin[ind]) {
+				if (DrawItem->hwndItem == DefaultColorWin[iColor]) {
 
-					FillRect(DrawItem->hDC, &DrawItem->rcItem, DefaultColorBrush[ind]);
-					if (chkCol(ind)) {
+					FillRect(DrawItem->hDC, &DrawItem->rcItem, DefaultColorBrush[iColor]);
+					if (chkCol(iColor)) {
 
-						SetBkColor(DrawItem->hDC, defCol[ind]);
-						SetTextColor(DrawItem->hDC, defTxt(ind));
-						sprintf_s(buf, sizeof(buf), "%d", ind + 1);
-						len = strlen(buf);
-						GetTextExtentPoint32(DrawItem->hDC, buf, len, &l_txSiz);
-						TextOut(DrawItem->hDC, (ButtonWidth - l_txSiz.cx) >> 1, 0, buf, len);
+						SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
+						SetTextColor(DrawItem->hDC, defTxt(iColor));
+						sprintf_s(buffer, sizeof(buffer), "%d", iColor + 1);
+						length = strlen(buffer);
+						GetTextExtentPoint32(DrawItem->hDC, buffer, length, &textSize);
+						TextOut(DrawItem->hDC, (ButtonWidth - textSize.cx) >> 1, 0, buffer, length);
 					}
 					return 1;
 				}
-				if (DrawItem->hwndItem == UserColorWin[ind]) {
+				if (DrawItem->hwndItem == UserColorWin[iColor]) {
 
-					FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[ind]);
-					if (ind == ActiveColor) {
+					FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[iColor]);
+					if (iColor == ActiveColor) {
 
 						SelectObject(DrawItem->hDC, CrossPen);
 						SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-						lin[0].x = lin[1].x = DrawItem->rcItem.right >> 1;
-						lin[0].y = 0;
-						lin[1].y = DrawItem->rcItem.bottom;
-						Polyline(DrawItem->hDC, lin, 2);
-						lin[0].y = lin[1].y = DrawItem->rcItem.bottom >> 1;
-						lin[0].x = 0;
-						lin[1].x = DrawItem->rcItem.right;
-						Polyline(DrawItem->hDC, lin, 2);
+						line[0].x = line[1].x = DrawItem->rcItem.right >> 1;
+						line[0].y = 0;
+						line[1].y = DrawItem->rcItem.bottom;
+						Polyline(DrawItem->hDC, line, 2);
+						line[0].y = line[1].y = DrawItem->rcItem.bottom >> 1;
+						line[0].x = 0;
+						line[1].x = DrawItem->rcItem.right;
+						Polyline(DrawItem->hDC, line, 2);
 						SetROP2(StitchWindowMemDC, R2_COPYPEN);
 					}
 					return 1;
@@ -23239,25 +23243,25 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 			if (chkMap(THUMSHO)) {
 
-				for (ind = 0; ind < 4; ind++) {
+				for (iThumb = 0; iThumb < 4; iThumb++) {
 
-					if (DrawItem->hwndItem == BackupViewer[ind] && ind < ThumbnailDisplayCount) {
+					if (DrawItem->hwndItem == BackupViewer[iThumb] && iThumb < ThumbnailDisplayCount) {
 
-						ritbak(ThumbnailsSelected[ind], DrawItem);
-						rthumnam(ind);
+						ritbak(ThumbnailsSelected[iThumb], DrawItem);
+						rthumnam(iThumb);
 						return 1;
 					}
 				}
 			} else {
 
-				for (ind = 0; ind < OLDVER; ind++) {
+				for (iVersion = 0; iVersion < OLDVER; iVersion++) {
 
-					if (DrawItem->hwndItem == BackupViewer[ind]) {
+					if (DrawItem->hwndItem == BackupViewer[iVersion]) {
 
-						strcpy_s(nam, ThrName);
-						ine = duth(nam);
-						nam[ine] = (TCHAR)ind + 's';
-						ritbak(nam, DrawItem);
+						strcpy_s(fileName, ThrName);
+						lastCharacter = duth(fileName);
+						fileName[lastCharacter] = (TCHAR)iVersion + 's';
+						ritbak(fileName, DrawItem);
 						return 1;
 					}
 				}
@@ -23286,22 +23290,22 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			chkirct();
 			if (setMap(SIZED)) {
 
-				ine = 0;
-				ind = (double)ScreenSizePixels.cx - 30;
-				if ((unsigned)(ThredWindowRect.right - ThredWindowRect.left) > ind) {
+				screenCenterOffset = 0;
+				maxWindowDimension.cx = ScreenSizePixels.cx - 30;
+				if ((ThredWindowRect.right - ThredWindowRect.left) > maxWindowDimension.cx) {
 
-					ine = (ScreenSizePixels.cx - ind) >> 1;
-					ThredWindowRect.left = ine;
-					ThredWindowRect.right = ScreenSizePixels.cx - ine;
+					screenCenterOffset = (ScreenSizePixels.cx - maxWindowDimension.cx) >> 1;
+					ThredWindowRect.left = screenCenterOffset;
+					ThredWindowRect.right = ScreenSizePixels.cx - screenCenterOffset;
 				}
-				ind = (double)ScreenSizePixels.cy - 30;
-				if ((unsigned)(ThredWindowRect.bottom - ThredWindowRect.top) > ind) {
+				maxWindowDimension.cy = ScreenSizePixels.cy - 30;
+				if ((ThredWindowRect.bottom - ThredWindowRect.top) > maxWindowDimension.cy) {
 
-					ine = (ScreenSizePixels.cy - ind) >> 1;
-					ThredWindowRect.top = ine;
-					ThredWindowRect.bottom = ScreenSizePixels.cy - ine;
+					screenCenterOffset = (ScreenSizePixels.cy - maxWindowDimension.cy) >> 1;
+					ThredWindowRect.top = screenCenterOffset;
+					ThredWindowRect.bottom = ScreenSizePixels.cy - screenCenterOffset;
 				}
-				if (ine)
+				if (screenCenterOffset)
 					MoveWindow(p_hWnd, ThredWindowRect.left, ThredWindowRect.top, ThredWindowRect.right - ThredWindowRect.left, ThredWindowRect.bottom - ThredWindowRect.top, TRUE);
 			} else {
 
@@ -23313,15 +23317,15 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		GetClientRect(p_hWnd, &ThredWindowRect);
 		movStch();
 		if (chkMap(ZUMED)) {
-
+			// ToDo - Should this be s.top-s.bottom/z.top-z.bottom
 			tdub = (double)StitchWindowClientRect.bottom / (ZoomRect.top - ZoomRect.bottom);
-			twid = StitchWindowClientRect.right / tdub;
-			if (twid + ZoomRect.left > UnzoomedRect.x) {
+			adjustedWidth = StitchWindowClientRect.right / tdub;
+			if (adjustedWidth + ZoomRect.left > UnzoomedRect.x) {
 
 				ZoomRect.right = UnzoomedRect.x;
-				ZoomRect.left = UnzoomedRect.x - twid;
+				ZoomRect.left = UnzoomedRect.x - adjustedWidth;
 			} else
-				ZoomRect.right = twid + ZoomRect.left;
+				ZoomRect.right = adjustedWidth + ZoomRect.left;
 		} else {
 
 			ZoomRect.left = ZoomRect.bottom = 0;
