@@ -7,12 +7,15 @@
 #include <htmlhelp.h>
 #include <locale.h>
 
-extern unsigned			chkMap(unsigned bPnt);
+extern unsigned			chkMap(unsigned bit);
 extern void				ispcdclp();
 extern void				movStch();
+extern	void			numWnd();
 extern void				okcan();
 extern void				rstAll();
-extern void				shoMsg(TCHAR* str);
+extern	unsigned		rstMap(unsigned bit);
+extern	unsigned		setMap(unsigned bit);
+extern void				shoMsg(TCHAR* string);
 
 extern	BSEQPNT			BSequence[BSEQLEN];
 extern	unsigned		ButtonHeight;
@@ -27,15 +30,12 @@ extern	INIFILE			IniFile;
 extern	HWND			MainStitchWin;
 extern	MSG				Msg;
 extern	TCHAR			MsgBuffer[MSGSIZ];
-extern	void			numWnd();
 extern	fPOINT			OSequence[OSEQLEN];
 extern	PCSHEADER		PCSHeader;
 extern	long			PreferenceWindowWidth;
-extern	unsigned		rstMap(unsigned bPnt);
 extern	RECT			scRct;
 extern	FRMHED*			SelectedForm;
 extern	unsigned		SelectedFormCount;
-extern	unsigned		setMap(unsigned bPnt);
 extern	HDC				StitchWindowMemDC;
 extern	HINSTANCE		ThrEdInstance;
 extern	HWND			ThrEdWindow;
@@ -405,9 +405,9 @@ void shoMsg(TCHAR* string) {
 	delete[] lengths;
 }
 
-void tabmsg(unsigned cod) {
+void tabmsg(unsigned code) {
 
-	LoadString(ThrEdInstance, cod, HelpBuffer, HBUFSIZ);
+	LoadString(ThrEdInstance, code, HelpBuffer, HBUFSIZ);
 	shoMsg(HelpBuffer);
 }
 

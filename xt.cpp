@@ -99,34 +99,34 @@ extern	POINT			ZoomBoxLine[5];
 extern	fPOINT			ZoomBoxOrigin;
 extern	dRECTANGLE		ZoomRect;
 
-extern	void		adbad(unsigned cod, unsigned cnt);
-extern	fPOINT*		adflt(unsigned cnt);
-extern	SATCON*		adsatk(unsigned	cnt);
+extern	void		adbad(unsigned code, unsigned count);
+extern	fPOINT*		adflt(unsigned count);
+extern	SATCON*		adsatk(unsigned	count);
 extern	void		angclpfn();
 extern	void		bakseq();
-extern	void		butxt(unsigned ind, TCHAR* str);
+extern	void		butxt(unsigned iButton, TCHAR* buttonText);
 extern	void		centir();
 extern	void		chkhup();
-extern	unsigned	chkMap(unsigned bPnt);
+extern	unsigned	chkMap(unsigned bit);
 extern	BOOL		chkmax(unsigned arg0, unsigned arg1);
 extern	void		chkmen();
 extern	BOOL		chkr(unsigned pbit);
 extern	void		chkseq(BOOL brd);
-extern	unsigned	chku(unsigned bPnt);
+extern	unsigned	chku(unsigned bit);
 extern	BOOL		cisin(float pntx, float pnty);
 extern	unsigned	closflt(float px, float py);
 extern	void		clpfil();
 extern	void		clRmap(unsigned len);
 extern	void		coltab();
-extern	void		datmsg(unsigned cod);
+extern	void		datmsg(unsigned code);
 extern	void		delclps(unsigned ind);
 extern	void		delinf();
 extern	void		delmclp(unsigned fpnt);
 extern	void		delmfil(unsigned col);
 extern	void		delsac(unsigned fpnt);
-extern	void		dumrk(double pntx, double pnty);
+extern	void		dumrk(double xCoord, double yCoord);
 extern	void		filang();
-extern	BOOL		filmsgs(unsigned cod);
+extern	BOOL		filmsgs(unsigned code);
 extern	void		filsat();
 extern	void		filsfn();
 extern	void		filvrt();
@@ -136,7 +136,7 @@ extern	void		fnvrt();
 extern	void		frmclr(FRMHED* dst);
 extern	void		frmcpy(FRMHED* dst, FRMHED* src);
 extern	void		frmout(unsigned ind);
-extern	void		frmrct(fRECTANGLE* rct);
+extern	void		frmrct(fRECTANGLE* rectangle);
 extern	void		fshor();
 extern	void		fvars(unsigned ind);
 extern	unsigned	getlast();
@@ -148,42 +148,42 @@ extern	void		lcon();
 extern	void		makspac(unsigned strt, unsigned cnt);
 extern	void		mdufrm();
 extern	float		midl(float hi, float lo);
-extern	void		moveStitch(fPOINTATTR* dst, fPOINTATTR* src);
+extern	void		moveStitch(fPOINTATTR* destination, fPOINTATTR* source);
 extern	void		movStch();
 extern	void		movStch();
-extern	void		msgflt(unsigned msgid, float par);
-extern	void		mvstch(unsigned dst, unsigned src);
-extern	void		mvstchs(unsigned dst, unsigned src, unsigned cnt);
+extern	void		msgflt(unsigned messageId, float value);
+extern	void		mvstch(unsigned destination, unsigned source);
+extern	void		mvstchs(unsigned destination, unsigned source, unsigned count);
 extern	void		numWnd();
 extern	unsigned short	nxt(unsigned short ind);
 extern	unsigned short	prv(unsigned ind);
 extern	unsigned	psg();
 extern	unsigned	px2stch();
-extern	void		redraw(HWND dWnd);
+extern	void		redraw(HWND window);
 extern	void		refil();
 extern	void		refilal();
 extern	void		refilfn();
 extern	void		ritfil();
-extern	void		rotflt(fPOINT* pnt);
+extern	void		rotflt(fPOINT* point);
 extern	void		rseq(unsigned strt, unsigned fin, unsigned ostrt, unsigned at);
-extern	unsigned	rstMap(unsigned bPnt);
-extern	unsigned	rstu(unsigned bPnt);
+extern	unsigned	rstMap(unsigned bit);
+extern	unsigned	rstu(unsigned bit);
 extern	void		rtrclpfn();
 extern	void		satfil();
 extern	void		satout(double satwid);
 extern	void		savdo();
 extern	void		save();
 extern	void		setknots();
-extern	unsigned	setMap(unsigned bPnt);
+extern	unsigned	setMap(unsigned bit);
 extern	void		setmfrm();
 extern	void		setr(unsigned pbit);
-extern	unsigned	setu(unsigned bPnt);
-extern	void		shoMsg(TCHAR* str);
-extern	void		shoseln(unsigned cod0, unsigned cod1);
-extern	void		stchrct(fRECTANGLE* rct);
-extern	void		tabmsg(unsigned cod);
-extern	unsigned	toglMap(unsigned bPnt);
-extern	unsigned	toglu(unsigned bPnt);
+extern	unsigned	setu(unsigned bit);
+extern	void		shoMsg(TCHAR* string);
+extern	void		shoseln(unsigned code0, unsigned code1);
+extern	void		stchrct(fRECTANGLE* rectangle);
+extern	void		tabmsg(unsigned code);
+extern	unsigned	toglMap(unsigned bit);
+extern	unsigned	toglu(unsigned bit);
 extern	void		unmsg();
 extern	void		unthum();
 extern	void		wrnmen();
@@ -305,25 +305,25 @@ BOOL istx(unsigned find)
 	return 0;
 }
 
-TXPNT* adtx(int cnt) {
+TXPNT* adtx(int count) {
 
-	unsigned ind = TextureIndex;
+	unsigned iPoint = TextureIndex;
 
-	TextureIndex += cnt;
-	return &TexturePointsBuffer[ind];
+	TextureIndex += count;
+	return &TexturePointsBuffer[iPoint];
 }
 
-void txspac(int strt, unsigned cnt)
+void txspac(int start, unsigned count)
 {
-	unsigned	ind;
-
-	MoveMemory(&TexturePointsBuffer[strt + cnt], &TexturePointsBuffer[strt], (TextureIndex - strt) & sizeof(TXPNT));
-	for (ind = ClosestFormToCursor + 1; ind < FormIndex; ind++)
+	unsigned	iForm;
+	// ToDo - Should the last term be "* sizeof()" and not "& sizeof"?
+	MoveMemory(&TexturePointsBuffer[start + count], &TexturePointsBuffer[start], (TextureIndex - start) & sizeof(TXPNT));
+	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 	{
-		if (istx(ind))
-			FormList[ind].fillInfo.texture.index += cnt;
+		if (istx(iForm))
+			FormList[iForm].fillInfo.texture.index += count;
 	}
-	TextureIndex += cnt;
+	TextureIndex += count;
 }
 
 void rstxt()
@@ -351,23 +351,23 @@ void txrfor()
 	TextureHistoryIndex &= 0xf;
 }
 
-BOOL chktxh(TXHST* phst)
+BOOL chktxh(TXHST* historyItem)
 {
-	int ind;
+	int iPoint;
 
-	if (phst->count != TextureScreen.index)
+	if (historyItem->count != TextureScreen.index)
 		return 1;
-	if (phst->height != TextureScreen.areaHeight)
+	if (historyItem->height != TextureScreen.areaHeight)
 		return 1;
-	if (phst->spacing != TextureScreen.spacing)
+	if (historyItem->spacing != TextureScreen.spacing)
 		return 1;
-	if (phst->width != TextureScreen.width)
+	if (historyItem->width != TextureScreen.width)
 		return 1;
-	for (ind = 0; ind < TextureScreen.index; ind++)
+	for (iPoint = 0; iPoint < TextureScreen.index; iPoint++)
 	{
-		if (TempTexturePoints[ind].line != phst->texturePoint[ind].line)
+		if (TempTexturePoints[iPoint].line != historyItem->texturePoint[iPoint].line)
 			return 1;
-		if (TempTexturePoints[ind].y != phst->texturePoint[ind].y)
+		if (TempTexturePoints[iPoint].y != historyItem->texturePoint[iPoint].y)
 			return 1;
 	}
 	return 0;

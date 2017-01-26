@@ -5287,7 +5287,7 @@ double dubl(unsigned char* pnt) {
 
 	_asm {
 
-		mov		ecx, pnt
+		mov		ecx, point
 		mov		ecx, [ecx]
 		movzx	ebx, ch
 		test	cl, 8
@@ -6685,14 +6685,14 @@ COLORREF nuBit() {
 	return ChooseColor(&BitMapColorStruct);
 }
 
-void pxCor2stch(POINT pnt) {
+void pxCor2stch(POINT point) {
 
-	double	tdub;
+	double	ratio;
 
-	tdub = (double)(pnt.x - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
-	SelectedPoint.x = tdub*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-	tdub = (double)(StitchWindowAbsRect.bottom - pnt.y) / StitchWindowClientRect.bottom;
-	SelectedPoint.y = tdub*(ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
+	ratio = (double)(point.x - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
+	SelectedPoint.x = ratio*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
+	ratio = (double)(StitchWindowAbsRect.bottom - point.y) / StitchWindowClientRect.bottom;
+	SelectedPoint.y = ratio*(ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
 }
 
 unsigned px2stch() {
@@ -21139,7 +21139,7 @@ void ducurs(unsigned char* pnt) {
 					ret
 
 		//form cursor
-		delups:		mov		ebx, pnt
+		delups:		mov		ebx, point
 					mov		edi, ebx
 					xor		ecx, ecx
 					mov		cl, 32
