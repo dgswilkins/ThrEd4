@@ -440,10 +440,10 @@ void shoseln(unsigned code0, unsigned code1) {
 	shoMsg(HelpBuffer);
 }
 
-BOOL clpmsgs(unsigned cod) {
+BOOL clpmsgs(unsigned code) {
 
 	ispcdclp();
-	if ((cod == FML_CLP || cod == FMM_CLP || cod == FML_PIC) && !chkMap(WASPCDCLP)) {
+	if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !chkMap(WASPCDCLP)) {
 
 		tabmsg(IDS_CLPS);
 		return 1;
@@ -460,10 +460,10 @@ void frm1pnt() {
 	}
 }
 
-BOOL filmsgs(unsigned cod) {
+BOOL filmsgs(unsigned code) {
 
 	if (SelectedFormCount)
-		return clpmsgs(cod);
+		return clpmsgs(code);
 	if (FormIndex) {
 
 		frm1pnt();
@@ -472,21 +472,21 @@ BOOL filmsgs(unsigned cod) {
 			SelectedForm = &FormList[ClosestFormToCursor];
 			if (SelectedForm->vertexCount == 2) {
 
-				if (cod < FML_LIN) {
+				if (code < FML_LIN) {
 
 					tabmsg(IDS_FRM3X);
 					return 1;
 				}
 				else {
 
-					if (cod == FML_PRPS) {
+					if (code == FML_PRPS) {
 
 						tabmsg(IDS_ANGS);
 						return 1;
 					}
 				}
 			}
-			return clpmsgs(cod);
+			return clpmsgs(code);
 		}
 		else {
 
@@ -526,10 +526,10 @@ void help() {
 
 void sdmsg() {
 
-	TCHAR	buf[HBUFSIZ];
+	TCHAR	buffer[HBUFSIZ];
 
-	LoadString(ThrEdInstance, IDS_SAVDISC, buf, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, ThrName);
+	LoadString(ThrEdInstance, IDS_SAVDISC, buffer, HBUFSIZ);
+	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, ThrName);
 	shoMsg(HelpBuffer);
 }
 
@@ -548,27 +548,27 @@ void spltmsg() {
 	shoseln(IDS_FRMGUID, IDS_SPLT);
 }
 
-void datmsg(unsigned cod)
+void datmsg(unsigned code)
 {
 	TCHAR*	pchr;
 
 	pchr = MsgBuffer;
-	if (cod&BADFLT)
+	if (code&BADFLT)
 	{
 		LoadString(ThrEdInstance, IDS_BADFLT, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
-	if (cod&BADCLP)
+	if (code&BADCLP)
 	{
 		LoadString(ThrEdInstance, IDS_BADCLP, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
-	if (cod&BADSAT)
+	if (code&BADSAT)
 	{
 		LoadString(ThrEdInstance, IDS_BADSAT, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
-	if (cod&BADTX)
+	if (code&BADTX)
 	{
 		LoadString(ThrEdInstance, IDS_BADTX, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
