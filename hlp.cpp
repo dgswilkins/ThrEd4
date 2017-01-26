@@ -218,43 +218,43 @@ TCHAR*	StringData;			//string storage
 
 TCHAR	HelpBuffer[HBUFSIZ];	//message formatting buffer
 
-void adbad(unsigned cod, unsigned cnt)
+void adbad(unsigned code, unsigned count)
 {
 	// ToDo - not sure that StringData has been initialized when this is called
 	//what does this function do?
-	LoadString(ThrEdInstance, cod, StringData, HBUFSIZ);
+	LoadString(ThrEdInstance, code, StringData, HBUFSIZ);
 	StringData = &StringData[strlen(StringData)];
 	LoadString(ThrEdInstance, IDS_NOTREP, HelpBuffer, HBUFSIZ);
-	sprintf_s(StringData, strlen(StringData), HelpBuffer, cnt);
+	sprintf_s(StringData, strlen(StringData), HelpBuffer, count);
 	StringData = &StringData[strlen(StringData)];
 }
 
 void hsizmsg()
 {
-	TCHAR buf[HBUFSIZ];
+	TCHAR buffer[HBUFSIZ];
 
-	LoadString(ThrEdInstance, IDS_HSIZ, buf, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, UnzoomedRect.x / PFGRAN, UnzoomedRect.y / PFGRAN);
+	LoadString(ThrEdInstance, IDS_HSIZ, buffer, HBUFSIZ);
+	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, UnzoomedRect.x / PFGRAN, UnzoomedRect.y / PFGRAN);
 	shoMsg(HelpBuffer);
 }
 
-void msgflt(unsigned msgid, float par)
+void msgflt(unsigned messageId, float value)
 {
-	TCHAR	buf[HBUFSIZ];
+	TCHAR	buffer[HBUFSIZ];
 
-	LoadString(ThrEdInstance, msgid, buf, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, par);
+	LoadString(ThrEdInstance, messageId, buffer, HBUFSIZ);
+	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, value);
 	shoMsg(HelpBuffer);
 	setMap(NUMIN);
 	numWnd();
 }
 
-void tsizmsg(TCHAR* sizstr, double pd_Size) {
+void tsizmsg(TCHAR* threadSizeText, double threadSize) {
 
-	TCHAR	buf[HBUFSIZ];
+	TCHAR	buffer[HBUFSIZ];
 
-	LoadString(ThrEdInstance, IDS_SIZ, buf, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, sizstr, pd_Size);
+	LoadString(ThrEdInstance, IDS_SIZ, buffer, HBUFSIZ);
+	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, threadSizeText, threadSize);
 	shoMsg(HelpBuffer);
 	setMap(NUMIN);
 	numWnd();
@@ -262,146 +262,147 @@ void tsizmsg(TCHAR* sizstr, double pd_Size) {
 
 void bfilmsg() {
 
-	TCHAR	buf[HBUFSIZ];
+	TCHAR	buffer[HBUFSIZ];
 
-	LoadString(ThrEdInstance, IDS_BADFIL, buf, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, WorkingFileName);
+	LoadString(ThrEdInstance, IDS_BADFIL, buffer, HBUFSIZ);
+	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, WorkingFileName);
 	shoMsg(HelpBuffer);
 }
 
-void filnopn(unsigned cod, TCHAR* nam) {
+void filnopn(unsigned code, TCHAR* fileName) {
 
-	TCHAR	buf[HBUFSIZ];
+	TCHAR	buffer[HBUFSIZ];
 
-	LoadString(ThrEdInstance, cod, buf, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, nam);
+	LoadString(ThrEdInstance, code, buffer, HBUFSIZ);
+	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, fileName);
 	shoMsg(HelpBuffer);
 }
 
-void crmsg(TCHAR* nam) {
+void crmsg(TCHAR* fileName) {
 
-	TCHAR	buf[HBUFSIZ];
+	TCHAR	buffer[HBUFSIZ];
 
-	LoadString(ThrEdInstance, IDS_CREAT, buf, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buf, nam);
+	LoadString(ThrEdInstance, IDS_CREAT, buffer, HBUFSIZ);
+	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, fileName);
 	shoMsg(HelpBuffer);
 }
 
-void butxt(unsigned ind, TCHAR* str) {
+void butxt(unsigned iButton, TCHAR* buttonText) {
 
-	if (chkMap(WASTRAC) && ind > HNUM) {
+	if (chkMap(WASTRAC) && iButton > HNUM) {
 
-		if (ind == 5) {
+		if (iButton == 5) {
 
 			if (chkMap(HIDMAP))
-				SetWindowText(ButtonWin[ind], StringTable[STR_TRC1H]);
+				SetWindowText(ButtonWin[iButton], StringTable[STR_TRC1H]);
 			else
-				SetWindowText(ButtonWin[ind], StringTable[STR_TRC1S]);
+				SetWindowText(ButtonWin[iButton], StringTable[STR_TRC1S]);
 		}
 		else
-			SetWindowText(ButtonWin[ind], StringTable[ind - 4 + STR_TRC0]);
+			SetWindowText(ButtonWin[iButton], StringTable[iButton - 4 + STR_TRC0]);
 	}
 	else
-		SetWindowText(ButtonWin[ind], str);
+		SetWindowText(ButtonWin[iButton], buttonText);
 }
 
-void ritnum(unsigned cod, unsigned num) {
+void ritnum(unsigned code, unsigned value) {
 
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), "%s %d", StringTable[cod], num);
+	sprintf_s(HelpBuffer, sizeof(HelpBuffer), "%s %d", StringTable[code], value);
 	butxt(HNUM, HelpBuffer);
 }
 
-void msgstr(unsigned cod) {
+void msgstr(unsigned code) {
 
-	LoadString(ThrEdInstance, cod, MsgBuffer, MSGSIZ);
+	LoadString(ThrEdInstance, code, MsgBuffer, MSGSIZ);
 }
 
 void lodstr() {
 
-	unsigned	ind, ine, cnt;
-	TCHAR*		pchr;
+	unsigned	iString, iStringData, iStringTable, count;
+	TCHAR*		strings;
 
-	StringTable[0] = pchr = (TCHAR*)BSequence;
-	for (ind = 0; ind < STR_LEN; ind++) {
+	// ToDo - use local variable instead of BSequence
+	StringTable[0] = strings = (TCHAR*)BSequence;
+	for (iString = 0; iString < STR_LEN; iString++) {
 
-		cnt = LoadString(ThrEdInstance, LoadStringList[ind], pchr, 1000) + 1;
-		pchr += cnt;
+		count = LoadString(ThrEdInstance, LoadStringList[iString], strings, 1000) + 1;
+		strings += count;
 	}
-	cnt = pchr - StringTable[0];
-	StringData = new TCHAR[cnt];
-	MoveMemory(StringData, StringTable[0], cnt);
+	count = strings - StringTable[0];
+	StringData = new TCHAR[count];
+	MoveMemory(StringData, StringTable[0], count);
 	StringTable[0] = StringData;
-	ine = 1;
-	for (ind = 0; ind <= cnt; ind++) {
+	iStringTable = 1;
+	for (iStringData = 0; iStringData <= count; iStringData++) {
 
-		if (!StringData[ind]) {
+		if (!StringData[iStringData]) {
 
-			ind++;
-			StringTable[ine] = &StringData[ind];
-			ine++;
+			iStringData++;
+			StringTable[iStringTable] = &StringData[iStringData];
+			iStringTable++;
 		}
 	}
 }
 
-void shoMsg(TCHAR* str) {
+void shoMsg(TCHAR* string) {
 
-	SIZE		tsiz, msgsiz;
-	TCHAR**		strs;
-	unsigned*	l_lens;
-	unsigned	cnt = 0, ind = 0, ine = 0, bak = 0;
-	long		off;
+	SIZE		textSize, messageSize;
+	TCHAR**		strings;
+	unsigned*	lengths;
+	unsigned	count = 0, iString = 0, index = 0, iLength = 0, previousStringLength = 0;
+	long		offset;
 
-	while (str[ind]) {
+	while (string[iString]) {
 
-		if (str[ind++] == 10)
-			cnt++;
+		if (string[iString++] == 10)
+			count++;
 	}
-	cnt++;
-	strs = new TCHAR*[cnt + 1];
-	l_lens = new unsigned[cnt + 1];
-	ind = 0;
-	strs[0] = str;
-	while (str[ind]) {
+	count++;
+	strings = new TCHAR*[count + 1];
+	lengths = new unsigned[count + 1];
+	iString = 0;
+	strings[0] = string;
+	while (string[iString]) {
 
-		if (str[ind] == 10) {
+		if (string[iString] == 10) {
 
-			l_lens[ine] = ind - bak;
-			strs[++ine] = &str[ind++];
-			bak = ind;
+			lengths[iLength] = iString - previousStringLength;
+			strings[++iLength] = &string[iString++];
+			previousStringLength = iString;
 		}
 		else
-			ind++;
+			iString++;
 	}
-	l_lens[ine] = ind - bak;
-	ine++;
-	tsiz.cx = tsiz.cy = msgsiz.cy = msgsiz.cx = 0;
-	for (ind = 0; ind < ine; ind++) {
+	lengths[iLength] = iString - previousStringLength;
+	iLength++;
+	textSize.cx = textSize.cy = messageSize.cy = messageSize.cx = 0;
+	for (index = 0; index < iLength; index++) {
 
-		GetTextExtentPoint32(StitchWindowMemDC, strs[ind], l_lens[ind], &tsiz);
-		if (tsiz.cx > msgsiz.cx)
-			msgsiz.cx = tsiz.cx;
-		if (tsiz.cy > msgsiz.cy)
-			msgsiz.cy = tsiz.cy;
+		GetTextExtentPoint32(StitchWindowMemDC, strings[index], lengths[index], &textSize);
+		if (textSize.cx > messageSize.cx)
+			messageSize.cx = textSize.cx;
+		if (textSize.cy > messageSize.cy)
+			messageSize.cy = textSize.cy;
 	}
-	msgsiz.cy *= cnt;
+	messageSize.cy *= count;
 	if (rstMap(MSGOF))
-		off = PreferenceWindowWidth + 6;
+		offset = PreferenceWindowWidth + 6;
 	else
-		off = 3;
+		offset = 3;
 	MsgWindow = CreateWindow(
 		"STATIC",
-		str,
+		string,
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		off,
+		offset,
 		3,
-		msgsiz.cx + 20,
-		msgsiz.cy + 6,
+		messageSize.cx + 20,
+		messageSize.cy + 6,
 		MainStitchWin,
 		NULL,
 		ThrEdInstance,
 		NULL);
-	delete[] strs;
-	delete[] l_lens;
+	delete[] strings;
+	delete[] lengths;
 }
 
 void tabmsg(unsigned cod) {
@@ -415,33 +416,27 @@ void riter() {
 	tabmsg(IDS_RITER);
 }
 
-void pntmsg(unsigned cod) {
+void pntmsg(unsigned count) {
 
 	TCHAR	temp[HBUFSIZ];
-	TCHAR	buf[HBUFSIZ];
+	TCHAR	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_PNT, temp, HBUFSIZ);
-	LoadString(ThrEdInstance, cod, buf, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), temp, buf);
+	LoadString(ThrEdInstance, count, buffer, HBUFSIZ);
+	sprintf_s(HelpBuffer, sizeof(HelpBuffer), temp, buffer);
 	shoMsg(HelpBuffer);
 }
 
-void shosel(TCHAR* seltxt, TCHAR* selfun) {
-
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), "Select %s\n to use %s", seltxt, selfun);
-	shoMsg(HelpBuffer);
-}
-
-void shoseln(unsigned cod0, unsigned cod1) {
+void shoseln(unsigned code0, unsigned code1) {
 
 	TCHAR	temp[HBUFSIZ];
-	TCHAR	buf0[HBUFSIZ];
-	TCHAR	buf1[HBUFSIZ];
+	TCHAR	buffer0[HBUFSIZ];
+	TCHAR	buffer1[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_SHOSEL, temp, HBUFSIZ);
-	LoadString(ThrEdInstance, cod0, buf0, HBUFSIZ);
-	LoadString(ThrEdInstance, cod1, buf1, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), temp, buf0, buf1);
+	LoadString(ThrEdInstance, code0, buffer0, HBUFSIZ);
+	LoadString(ThrEdInstance, code1, buffer1, HBUFSIZ);
+	sprintf_s(HelpBuffer, sizeof(HelpBuffer), temp, buffer0, buffer1);
 	shoMsg(HelpBuffer);
 }
 
