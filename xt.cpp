@@ -843,40 +843,40 @@ ULARGE_INTEGER  tim2int(FILETIME time) {
 	return op;
 }
 
-int fil2crd(const char* p_filnam)
+int fil2crd(const char* fileName)
 {
-	STARTUPINFO			sinfo;
-	PROCESS_INFORMATION	pinfo;
-	int					erc = 0;
-	char				cmd[_MAX_PATH * 2 + 1 + 4];
+	STARTUPINFO			startupInfo;
+	PROCESS_INFORMATION	processInfo;
+	int					errorCode = 0;
+	char				command[_MAX_PATH * 2 + 1 + 4];
 
-	strcpy_s(cmd, "\"");
-	strcat_s(cmd, IniFile.p2cName);
-	strcat_s(cmd, "\" \"");
-	strcat_s(cmd, p_filnam);
-	strcat_s(cmd, "\"");
-	memset(&sinfo, 0, sizeof(STARTUPINFO));
-	sinfo.cb = sizeof(STARTUPINFO);
-	if (!CreateProcess(0, cmd, 0, 0, 0, NORMAL_PRIORITY_CLASS, 0, 0, &sinfo, &pinfo))
+	strcpy_s(command, "\"");
+	strcat_s(command, IniFile.p2cName);
+	strcat_s(command, "\" \"");
+	strcat_s(command, fileName);
+	strcat_s(command, "\"");
+	memset(&startupInfo, 0, sizeof(STARTUPINFO));
+	startupInfo.cb = sizeof(STARTUPINFO);
+	if (!CreateProcess(0, command, 0, 0, 0, NORMAL_PRIORITY_CLASS, 0, 0, &startupInfo, &processInfo))
 	{
-		erc = GetLastError();
+		errorCode = GetLastError();
 	}
 	else {
-		WaitForSingleObject(pinfo.hProcess, INFINITE);
+		WaitForSingleObject(processInfo.hProcess, INFINITE);
 	}
-	CloseHandle(pinfo.hProcess);
-	CloseHandle(pinfo.hThread);
+	CloseHandle(processInfo.hProcess);
+	CloseHandle(processInfo.hThread);
 
-	return erc;
+	return errorCode;
 }
 
-BOOL chkp2cnam(char* nam) {
+BOOL chkp2cnam(char* fileName) {
 
-	HANDLE	hp2c;
+	HANDLE	handleP2C;
 
-	hp2c = CreateFile(nam, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
-	CloseHandle(hp2c);
-	if (hp2c == INVALID_HANDLE_VALUE)
+	handleP2C = CreateFile(fileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+	CloseHandle(handleP2C);
+	if (handleP2C == INVALID_HANDLE_VALUE)
 		return 0;
 	return 1;
 }
@@ -885,22 +885,22 @@ void pes2crd() {
 
 #define P2CBUFSIZ 256
 
-	HKEY			hkey;
-	unsigned long	typ, lul_Size;
-	TCHAR			prgnam[_MAX_PATH];
-	char			tfltr[] = "ComputerService (Lind2PC.exe)\0LinkP2C.exe\0\0";
-	TCHAR			mbuf[P2CBUFSIZ];
-	TCHAR			tbuf[P2CBUFSIZ];
-	OPENFILENAME	tofn = {
+	HKEY			registryKey;
+	unsigned long	keyType, size;
+	TCHAR			programName[_MAX_PATH];
+	char			filter[] = "ComputerService (Lind2PC.exe)\0LinkP2C.exe\0\0";
+	TCHAR			message[P2CBUFSIZ];
+	TCHAR			caption[P2CBUFSIZ];
+	OPENFILENAME	openFileName = {
 
 	sizeof(OPENFILENAME),	//lStructsize
-		ThrEdWindow,				//hwndOwner 
-		ThrEdInstance,				//hInstance 
-		tfltr,				//lpstrFilter 
+		ThrEdWindow,		//hwndOwner 
+		ThrEdInstance,		//hInstance 
+		filter,				//lpstrFilter 
 		0,					//lpstrCustomFilter 
 		0,					//nMaxCustFilter 
 		0,					//nFilterIndex 
-		prgnam,				//lpstrFile 
+		programName,		//lpstrFile 
 		_MAX_PATH,			//nMaxFile 
 		0,					//lpstrFileTitle 
 		0,					//nMaxFileTitle 
@@ -929,26 +929,26 @@ void pes2crd() {
 	}
 	*IniFile.p2cName = 0;
 	if (!RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion",
-		0, KEY_READ, &hkey)) {
+		0, KEY_READ, &registryKey)) {
 
-		lul_Size = _MAX_PATH;
-		typ = REG_SZ;
-		if (!RegQueryValueEx(hkey, "ProgramFilesDir", 0, &typ, (unsigned char*)prgnam, &lul_Size)) {
+		size = _MAX_PATH;
+		keyType = REG_SZ;
+		if (!RegQueryValueEx(registryKey, "ProgramFilesDir", 0, &keyType, (unsigned char*)programName, &size)) {
 
-			strcat_s(prgnam, "\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
-			if (!chkp2cnam(prgnam))
-				*prgnam = 0;
+			strcat_s(programName, "\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
+			if (!chkp2cnam(programName))
+				*programName = 0;
 		}
 	}
-	if (!*prgnam) {
+	if (!*programName) {
 
-		LoadString(ThrEdInstance, IDS_P2CMSG, mbuf, P2CBUFSIZ);
-		LoadString(ThrEdInstance, IDS_P2CTITL, tbuf, P2CBUFSIZ);
-		if (IDOK == MessageBox(ThrEdWindow, mbuf, tbuf, MB_OKCANCEL)) {
+		LoadString(ThrEdInstance, IDS_P2CMSG, message, P2CBUFSIZ);
+		LoadString(ThrEdInstance, IDS_P2CTITL, caption, P2CBUFSIZ);
+		if (IDOK == MessageBox(ThrEdWindow, message, caption, MB_OKCANCEL)) {
 
-			if (GetOpenFileName(&tofn)) {
+			if (GetOpenFileName(&openFileName)) {
 
-				if (!chkp2cnam(prgnam))
+				if (!chkp2cnam(programName))
 					return;
 			}
 			else
@@ -957,29 +957,29 @@ void pes2crd() {
 		else
 			return;
 	}
-	strcpy_s(IniFile.p2cName, prgnam);
+	strcpy_s(IniFile.p2cName, programName);
 	fil2crd(AuxName);
 }
 
-void sidlen(unsigned strt, unsigned fin, double* ilen, double* olen)
+void sidlen(unsigned start, unsigned finish, double* insideLength, double* outsideLength)
 {
-	*ilen += hypot(InsidePoints[fin].x - InsidePoints[strt].x, InsidePoints[fin].x - InsidePoints[strt].x);
-	*olen += hypot(OutsidePoints[fin].x - OutsidePoints[strt].x, OutsidePoints[fin].x - OutsidePoints[strt].x);
+	*insideLength += hypot(InsidePoints[finish].x - InsidePoints[start].x, InsidePoints[finish].x - InsidePoints[start].x);
+	*outsideLength += hypot(OutsidePoints[finish].x - OutsidePoints[start].x, OutsidePoints[finish].x - OutsidePoints[start].x);
 }
 
 fPOINT* insid()
 {
-	unsigned ind;
+	unsigned iVertex;
 
 	satout(fabs(SelectedForm->underlayIndent));
 	if (SelectedForm->underlayIndent > 0)
 	{
-		for (ind = 0; ind < VertexCount; ind++)
+		for (iVertex = 0; iVertex < VertexCount; iVertex++)
 		{
-			if (!cisin(InsidePoints[ind].x, InsidePoints[ind].y))
+			if (!cisin(InsidePoints[iVertex].x, InsidePoints[iVertex].y))
 			{
-				InsidePoints[ind].x = CurrentFormVertices[ind].x;
-				InsidePoints[ind].y = CurrentFormVertices[ind].y;
+				InsidePoints[iVertex].x = CurrentFormVertices[iVertex].x;
+				InsidePoints[iVertex].y = CurrentFormVertices[iVertex].y;
 			}
 		}
 		return InsidePoints;
@@ -988,27 +988,27 @@ fPOINT* insid()
 		return OutsidePoints;
 }
 
-void delwlk(unsigned cod)
+void delwlk(unsigned code)
 {
-	unsigned	ind, ine;
-	fPOINTATTR*	histch;
-	BOOL		flg;
+	unsigned	iStitch, ine;
+	fPOINTATTR*	highStitchBuffer;
+	BOOL		flag;
 
 	ine = 0;
-	flg = 1;
-	histch = &StitchBuffer[MAXSEQ];
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++)
+	flag = 1;
+	highStitchBuffer = &StitchBuffer[MAXSEQ];
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 	{
-		if ((StitchBuffer[ind].attribute&WLKFMSK) != cod)
+		if ((StitchBuffer[iStitch].attribute&WLKFMSK) != code)
 		{
-			moveStitch(&histch[ine], &StitchBuffer[ind]);
+			moveStitch(&highStitchBuffer[ine], &StitchBuffer[iStitch]);
 			ine++;
 		}
 		else
 		{
-			if (flg)
+			if (flag)
 			{
-				flg = 0;
+				flag = 0;
 			}
 		}
 	}
@@ -1030,12 +1030,12 @@ void chkuseq()
 	InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->UnderlayColor;
 #else
 
-	unsigned	ind, ine, cnt;
-	double		len;
-	fPOINT		dif;
-	fPOINT		loc;
-	fPOINT		stp;
-	double		ulen;
+	unsigned	iSequence, index, stitchCount;
+	double		length;
+	fPOINT		delta;
+	fPOINT		point;
+	fPOINT		step;
+	double		underlayStitchLength;
 
 	if (OutputIndex)
 	{
@@ -1043,37 +1043,37 @@ void chkuseq()
 			SelectedForm->underlayStitchLen = (float)MINWLK;
 		if (SelectedForm->underlayStitchLen > MAXWLK)
 			SelectedForm->underlayStitchLen = MAXWLK;
-		ulen = SelectedForm->underlayStitchLen;
-		for (ind = 0; ind < OutputIndex - 1; ind++)
+		underlayStitchLength = SelectedForm->underlayStitchLen;
+		for (iSequence = 0; iSequence < OutputIndex - 1; iSequence++)
 		{
-			dif.x = OSequence[ind + 1].x - OSequence[ind].x;
-			dif.y = OSequence[ind + 1].y - OSequence[ind].y;
-			len = hypot(dif.x, dif.y);
-			cnt = floor(len / ulen);
-			if (cnt)
+			delta.x = OSequence[iSequence + 1].x - OSequence[iSequence].x;
+			delta.y = OSequence[iSequence + 1].y - OSequence[iSequence].y;
+			length = hypot(delta.x, delta.y);
+			stitchCount = floor(length / underlayStitchLength);
+			if (stitchCount)
 			{
-				stp.x = dif.x / cnt;
-				stp.y = dif.y / cnt;
-				loc.x = OSequence[ind].x;
-				loc.y = OSequence[ind].y;
-				for (ine = 0; ine < cnt; ine++)
+				step.x = delta.x / stitchCount;
+				step.y = delta.y / stitchCount;
+				point.x = OSequence[iSequence].x;
+				point.y = OSequence[iSequence].y;
+				for (index = 0; index < stitchCount; index++)
 				{
-					InterleaveSequence[InterleaveSequenceIndex].x = loc.x;
-					InterleaveSequence[InterleaveSequenceIndex].y = loc.y;
+					InterleaveSequence[InterleaveSequenceIndex].x = point.x;
+					InterleaveSequence[InterleaveSequenceIndex].y = point.y;
 					InterleaveSequenceIndex++;
-					loc.x += stp.x;
-					loc.y += stp.y;
+					point.x += step.x;
+					point.y += step.y;
 				}
 			}
 			else
 			{
-				InterleaveSequence[InterleaveSequenceIndex].x = OSequence[ind].x;
-				InterleaveSequence[InterleaveSequenceIndex].y = OSequence[ind].y;
+				InterleaveSequence[InterleaveSequenceIndex].x = OSequence[iSequence].x;
+				InterleaveSequence[InterleaveSequenceIndex].y = OSequence[iSequence].y;
 				InterleaveSequenceIndex++;
 			}
 		}
-		InterleaveSequence[InterleaveSequenceIndex].x = OSequence[ind].x;
-		InterleaveSequence[InterleaveSequenceIndex].y = OSequence[ind].y;
+		InterleaveSequence[InterleaveSequenceIndex].x = OSequence[iSequence].x;
+		InterleaveSequence[InterleaveSequenceIndex].y = OSequence[iSequence].y;
 		InterleaveSequenceIndex++;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->underlayColor;
 	}
@@ -1104,131 +1104,131 @@ void ritcwlk()
 	}
 }
 
-unsigned gucon(fPOINT pstrt, fPOINT pfin, unsigned dst, unsigned cod)
+unsigned gucon(fPOINT start, fPOINT finish, unsigned dst, unsigned code)
 {
-	double		len;
-	unsigned	strt, fin, cnt, ifin;
-	fPOINT*		ipnt;
-	unsigned	up, dwn, ind, ine;
-	fPOINT		loc, stp, dif;
+	double		length;
+	unsigned	startVertex, endVertex, stitchCount, intermediateVertex;
+	fPOINT*		indentedPoint;
+	unsigned	up, down, iStitch, iStep;
+	fPOINT		localPoint, step, delta;
 
-	len = hypot(pfin.x - pstrt.x, pfin.y - pstrt.y);
-	if (len < 5)
+	length = hypot(finish.x - start.x, finish.y - start.y);
+	if (length < 5)
 		return 0;
-	strt = closflt(pstrt.x, pstrt.y);
-	fin = closflt(pfin.x, pfin.y);
-	if (strt == fin)
+	startVertex = closflt(start.x, start.y);
+	endVertex = closflt(finish.x, finish.y);
+	if (startVertex == endVertex)
 		return 0;
 	//	if(chkMap(ISEND))
 	//		ipnt=vertices;
 	//	else
-	ipnt = insid();
-	up = dwn = strt;
+	indentedPoint = insid();
+	up = down = startVertex;
 gulab:
-	if (up == fin)
+	if (up == endVertex)
 	{
 		rstMap(WLKDIR);
 		goto gulabx;
 	}
-	if (dwn == fin)
+	if (down == endVertex)
 	{
 		setMap(WLKDIR);
 		goto gulabx;
 	}
 	up = nxt(up);
-	dwn = prv(dwn);
+	down = prv(down);
 	goto gulab;
 gulabx:;
-	ind = dst;
-	while (strt != fin)
+	iStitch = dst;
+	while (startVertex != endVertex)
 	{
-		StitchBuffer[ind].x = ipnt[strt].x;
-		StitchBuffer[ind].y = ipnt[strt].y;
-		StitchBuffer[ind].attribute = cod;
-		if (ind)
+		StitchBuffer[iStitch].x = indentedPoint[startVertex].x;
+		StitchBuffer[iStitch].y = indentedPoint[startVertex].y;
+		StitchBuffer[iStitch].attribute = code;
+		if (iStitch)
 		{
-			if (StitchBuffer[ind - 1].x != StitchBuffer[ind].x || StitchBuffer[ind - 1].y != StitchBuffer[ind].y)
-				ind++;
+			if (StitchBuffer[iStitch - 1].x != StitchBuffer[iStitch].x || StitchBuffer[iStitch - 1].y != StitchBuffer[iStitch].y)
+				iStitch++;
 		}
 		else
-			ind++;
+			iStitch++;
 		if (chkMap(WLKDIR))
-			ifin = prv(strt);
+			intermediateVertex = prv(startVertex);
 		else
-			ifin = nxt(strt);
-		dif.x = ipnt[ifin].x - ipnt[strt].x;
-		dif.y = ipnt[ifin].y - ipnt[strt].y;
-		len = hypot(dif.x, dif.y);
-		cnt = len / SelectedForm->lengthOrCount.stitchLength;
-		if (cnt > 1)
+			intermediateVertex = nxt(startVertex);
+		delta.x = indentedPoint[intermediateVertex].x - indentedPoint[startVertex].x;
+		delta.y = indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y;
+		length = hypot(delta.x, delta.y);
+		stitchCount = length / SelectedForm->lengthOrCount.stitchLength;
+		if (stitchCount > 1)
 		{
-			stp.x = dif.x / cnt;
-			stp.y = dif.y / cnt;
-			loc.x = ipnt[strt].x + stp.x;
-			loc.y = ipnt[strt].y + stp.y;
-			for (ine = 0; ine < cnt - 1; ine++)
+			step.x = delta.x / stitchCount;
+			step.y = delta.y / stitchCount;
+			localPoint.x = indentedPoint[startVertex].x + step.x;
+			localPoint.y = indentedPoint[startVertex].y + step.y;
+			for (iStep = 0; iStep < stitchCount - 1; iStep++)
 			{
-				StitchBuffer[ind].x = loc.x;
-				StitchBuffer[ind].y = loc.y;
-				StitchBuffer[ind].attribute = cod;
-				ind++;
-				loc.x += stp.x;
-				loc.y += stp.y;
+				StitchBuffer[iStitch].x = localPoint.x;
+				StitchBuffer[iStitch].y = localPoint.y;
+				StitchBuffer[iStitch].attribute = code;
+				iStitch++;
+				localPoint.x += step.x;
+				localPoint.y += step.y;
 			}
 		}
 		if (chkMap(WLKDIR))
-			strt = prv(strt);
+			startVertex = prv(startVertex);
 		else
-			strt = nxt(strt);
+			startVertex = nxt(startVertex);
 	}
-	StitchBuffer[ind].x = ipnt[strt].x;
-	StitchBuffer[ind].y = ipnt[strt].y;
-	StitchBuffer[ind].attribute = cod;
-	ind++;
-	return ind - dst;
+	StitchBuffer[iStitch].x = indentedPoint[startVertex].x;
+	StitchBuffer[iStitch].y = indentedPoint[startVertex].y;
+	StitchBuffer[iStitch].attribute = code;
+	iStitch++;
+	return iStitch - dst;
 }
 
 void fnwlk(unsigned find)
 {
-	unsigned	strt, cnt;
-	fPOINT*		wpnt;
+	unsigned	start, count;
+	fPOINT*		walkPoints;
 
 	fvars(find);
 	if (SelectedForm->type == FRMLINE)
 		SelectedForm->type = FRMFPOLY;
 	if (SelectedForm->extendedAttribute&AT_STRT&&SelectedForm->type != FRMLINE)
-		strt = SelectedForm->fillStart;
+		start = SelectedForm->fillStart;
 	else
-		strt = 0;
-	cnt = VertexCount;
+		start = 0;
+	count = VertexCount;
 	if (SelectedForm->type != FRMLINE)
-		cnt++;
-	wpnt = insid();
+		count++;
+	walkPoints = insid();
 	OutputIndex = 0;
-	while (cnt)
+	while (count)
 	{
-		OSequence[OutputIndex].x = wpnt[strt].x;
-		OSequence[OutputIndex].y = wpnt[strt].y;
-		strt = nxt(strt);
+		OSequence[OutputIndex].x = walkPoints[start].x;
+		OSequence[OutputIndex].y = walkPoints[start].y;
+		start = nxt(start);
 		OutputIndex++;
-		cnt--;
+		count--;
 	}
 	ritwlk();
 }
 
 void fnuang() {
 
-	unsigned	ind;
+	unsigned	iVertex;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
 	RotationCenter.x = (double)(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
 	RotationCenter.y = (double)(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;
-	for (ind = 0; ind < AngledForm.vertexCount; ind++) {
+	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 
-		AngledForm.vertices[ind].x = UnderlayVertices[ind].x;
-		AngledForm.vertices[ind].y = UnderlayVertices[ind].y;
-		rotflt(&AngledForm.vertices[ind]);
+		AngledForm.vertices[iVertex].x = UnderlayVertices[iVertex].x;
+		AngledForm.vertices[iVertex].y = UnderlayVertices[iVertex].y;
+		rotflt(&AngledForm.vertices[iVertex]);
 	}
 	SelectedForm = &AngledForm;
 	fnvrt();
@@ -1256,9 +1256,9 @@ void undclp()
 
 void fnund(unsigned find)
 {
-	float baksiz;
+	float savedStitchSize;
 	UnderlayVertices = insid();
-	baksiz = UserStitchLength;
+	savedStitchSize = UserStitchLength;
 	UserStitchLength = 1e99;
 	if (!SelectedForm->underlaySpacing)
 		SelectedForm->underlaySpacing = IniFile.underlaySpacing;
@@ -1270,13 +1270,13 @@ void fnund(unsigned find)
 	OutputIndex = SequenceIndex;
 	ritund();
 	fvars(find);
-	UserStitchLength = baksiz;
+	UserStitchLength = savedStitchSize;
 }
 
 void fncwlk()
 {
-	unsigned	ind, ine, strt, fin;
-	SATCON*		sac;
+	unsigned	iGuide, iVertex, start, finish;
+	SATCON*		guide;
 
 	OutputIndex = 0;
 	SelectedForm->extendedAttribute |= AT_CWLK;
@@ -1284,16 +1284,16 @@ void fncwlk()
 	{
 		if (SelectedForm->wordParam)
 		{
-			ine = SelectedForm->wordParam;
-			OSequence[OutputIndex].x = midl(CurrentFormVertices[ine].x, CurrentFormVertices[ine + 1].x);
-			OSequence[OutputIndex].y = midl(CurrentFormVertices[ine].y, CurrentFormVertices[ine + 1].y);
+			iVertex = SelectedForm->wordParam;
+			OSequence[OutputIndex].x = midl(CurrentFormVertices[iVertex].x, CurrentFormVertices[iVertex + 1].x);
+			OSequence[OutputIndex].y = midl(CurrentFormVertices[iVertex].y, CurrentFormVertices[iVertex + 1].y);
 			OutputIndex++;
 		}
-		sac = SelectedForm->satinOrAngle.sac;
-		for (ind = SelectedForm->satinGuideCount; ind != 0; ind--)
+		guide = SelectedForm->satinOrAngle.sac;
+		for (iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--)
 		{
-			OSequence[OutputIndex].x = midl(CurrentFormVertices[sac[ind - 1].finish].x, CurrentFormVertices[sac[ind - 1].start].x);
-			OSequence[OutputIndex].y = midl(CurrentFormVertices[sac[ind - 1].finish].y, CurrentFormVertices[sac[ind - 1].start].y);
+			OSequence[OutputIndex].x = midl(CurrentFormVertices[guide[iGuide - 1].finish].x, CurrentFormVertices[guide[iGuide - 1].start].x);
+			OSequence[OutputIndex].y = midl(CurrentFormVertices[guide[iGuide - 1].finish].y, CurrentFormVertices[guide[iGuide - 1].start].y);
 			OutputIndex++;
 		}
 		if (SelectedForm->attribute&FRMEND)
@@ -1306,25 +1306,25 @@ void fncwlk()
 	else
 	{
 		if (SelectedForm->extendedAttribute&AT_STRT)
-			strt = SelectedForm->fillStart;
+			start = SelectedForm->fillStart;
 		else
-			strt = 0;
-		OSequence[OutputIndex].x = CurrentFormVertices[strt].x;
-		OSequence[OutputIndex].y = CurrentFormVertices[strt].y;
+			start = 0;
+		OSequence[OutputIndex].x = CurrentFormVertices[start].x;
+		OSequence[OutputIndex].y = CurrentFormVertices[start].y;
 		OutputIndex++;
-		fin = prv(strt);
-		strt = nxt(strt);
-		for (ind = 1; ind < (unsigned)VertexCount >> 1; ind++)
+		finish = prv(start);
+		start = nxt(start);
+		for (iGuide = 1; iGuide < (unsigned)VertexCount >> 1; iGuide++)
 		{
-			OSequence[OutputIndex].x = midl(CurrentFormVertices[fin].x, CurrentFormVertices[strt].x);
-			OSequence[OutputIndex].y = midl(CurrentFormVertices[fin].y, CurrentFormVertices[strt].y);
+			OSequence[OutputIndex].x = midl(CurrentFormVertices[finish].x, CurrentFormVertices[start].x);
+			OSequence[OutputIndex].y = midl(CurrentFormVertices[finish].y, CurrentFormVertices[start].y);
 			if (cisin(OSequence[OutputIndex].x, OSequence[OutputIndex].y))
 				OutputIndex++;
-			strt = nxt(strt);
-			fin = prv(fin);
+			start = nxt(start);
+			finish = prv(finish);
 		}
-		OSequence[OutputIndex].x = CurrentFormVertices[strt].x;
-		OSequence[OutputIndex].y = CurrentFormVertices[strt].y;
+		OSequence[OutputIndex].x = CurrentFormVertices[start].x;
+		OSequence[OutputIndex].y = CurrentFormVertices[start].y;
 		OutputIndex++;
 	}
 	ritcwlk();
@@ -1335,13 +1335,13 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 	TCHAR		buf[HBUFSIZ];
 	TCHAR		buf1[HBUFSIZ];
-	unsigned	ind, stat, l_xat;
+	unsigned	iFeatherStyle, state, featherType;
 
 	switch (umsg) {
 
 	case WM_INITDIALOG:
 
-		l_xat = IniFile.featherType;
+		featherType = IniFile.featherType;
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 		sprintf_s(buf, sizeof(buf), "%.2f", IniFile.featherRatio);
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf);
@@ -1353,27 +1353,27 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf);
 		sprintf_s(buf, sizeof(buf), "%d", IniFile.featherCount);
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf);
-		for (ind = 0; ind < 6; ind++) {
+		for (iFeatherStyle = 0; iFeatherStyle < 6; iFeatherStyle++) {
 
-			LoadString(ThrEdInstance, IDS_FTH0 + ind, buf, HBUFSIZ);
+			LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, buf, HBUFSIZ);
 			SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, (long)buf);
 		}
 		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
-		if (l_xat&AT_FTHBLND)
-			stat = BST_CHECKED;
+		if (featherType&AT_FTHBLND)
+			state = BST_CHECKED;
 		else
-			stat = BST_UNCHECKED;
-		CheckDlgButton(hwndlg, IDC_FDBLND, stat);
-		if (l_xat&AT_FTHUP)
-			stat = BST_CHECKED;
+			state = BST_UNCHECKED;
+		CheckDlgButton(hwndlg, IDC_FDBLND, state);
+		if (featherType&AT_FTHUP)
+			state = BST_CHECKED;
 		else
-			stat = BST_UNCHECKED;
-		CheckDlgButton(hwndlg, IDC_FDUP, stat);
-		if (l_xat&AT_FTHDWN)
-			stat = BST_CHECKED;
+			state = BST_UNCHECKED;
+		CheckDlgButton(hwndlg, IDC_FDUP, state);
+		if (featherType&AT_FTHDWN)
+			state = BST_CHECKED;
 		else
-			stat = BST_UNCHECKED;
-		CheckDlgButton(hwndlg, IDC_FDWN, stat);
+			state = BST_UNCHECKED;
+		CheckDlgButton(hwndlg, IDC_FDWN, state);
 		break;
 
 	case WM_COMMAND:
@@ -1396,12 +1396,12 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 				IniFile.featherType |= AT_FTHDWN;
 			GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf, HBUFSIZ);
 			IniFile.featherFillType = FDEFTYP;
-			for (ind = 0; ind < 6; ind++) {
+			for (iFeatherStyle = 0; iFeatherStyle < 6; iFeatherStyle++) {
 
-				LoadString(ThrEdInstance, IDS_FTH0 + ind, buf1, HBUFSIZ);
+				LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, buf1, HBUFSIZ);
 				if (!strcmp(buf, buf1)) {
 
-					IniFile.featherFillType = ind + 1;
+					IniFile.featherFillType = iFeatherStyle + 1;
 					break;
 				}
 			}
@@ -1431,29 +1431,29 @@ void dufdef() {
 
 void srtcol() {
 
-	unsigned		hst[16];
-	unsigned		ind, ine, tmp;
-	fPOINTATTR*		phi;
+	unsigned		histogram[16], colorStartStitch[16] = { 0 };
+	unsigned		iStitch, iColor, startStitch;
+	fPOINTATTR*		highStitchBuffer;
 
-	FillMemory(&hst, 64, 0);
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++)
-		hst[StitchBuffer[ind].attribute&COLMSK]++;
-	ine = 0;
-	for (ind = 0; ind < 16; ind++) {
+	// ToDo - replace this line with variable initialization
+	FillMemory(&histogram, 64, 0);
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
+		histogram[StitchBuffer[iStitch].attribute&COLMSK]++;
+	startStitch = 0;
+	for (iColor = 0; iColor < 16; iColor++) {
 
-		tmp = hst[ind];
-		hst[ind] = ine;
-		ine += tmp;
+		colorStartStitch[iColor] = startStitch;
+		startStitch += histogram[iColor];
 	}
-	phi = &StitchBuffer[MAXSEQ];
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++)
-		moveStitch(&phi[hst[StitchBuffer[ind].attribute&COLMSK]++], &StitchBuffer[ind]);
-	MoveMemory(&StitchBuffer, phi, sizeof(fPOINTATTR)*PCSHeader.stitchCount);
+	highStitchBuffer = &StitchBuffer[MAXSEQ];
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
+		moveStitch(&highStitchBuffer[colorStartStitch[StitchBuffer[iStitch].attribute&COLMSK]++], &StitchBuffer[iStitch]);
+	MoveMemory(&StitchBuffer, highStitchBuffer, sizeof(fPOINTATTR)*PCSHeader.stitchCount);
 }
 
 void dubit(unsigned bit)
 {
-	unsigned cod;
+	unsigned code;
 
 	savdo();
 	setMap(WASDO);
@@ -1472,8 +1472,8 @@ void dubit(unsigned bit)
 		SelectedForm->underlayStitchAngle = IniFile.underlayAngle;
 		SelectedForm->underlaySpacing = IniFile.underlaySpacing;
 	}
-	cod = SelectedForm->extendedAttribute&bit;
-	if (cod)
+	code = SelectedForm->extendedAttribute&bit;
+	if (code)
 		SelectedForm->extendedAttribute &= (~bit);
 	else
 		SelectedForm->extendedAttribute |= bit;
@@ -1547,6 +1547,7 @@ void chkdaz()
 		IniFile.daisyInnerCount = 1;
 	if (!IniFile.daisyPetalCount)
 		IniFile.daisyPetalCount = 1;
+	// ToDo - is this line and variable needed?
 	len = IniFile.daisyDiameter*0.999;
 	if (IniFile.daisyHeartCount > IniFile.daisyPetalPoints)
 		IniFile.daisyHeartCount = IniFile.daisyPetalPoints;
@@ -1570,37 +1571,38 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
 	UNREFERENCED_PARAMETER(lparam);
 
-	TCHAR		buf[HBUFSIZ];
-	TCHAR		buf1[HBUFSIZ];
-	unsigned	ind;
+	TCHAR		buffer[HBUFSIZ];
+	TCHAR		compareBuffer[HBUFSIZ];
+	unsigned	iType;
 
 	switch (umsg) {
 
 	case WM_INITDIALOG:
 
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+		// ToDo - remove label reinit 
 	reinit:;
 		chkdaz();
-		sprintf_s(buf, sizeof(buf), "%d", IniFile.daisyPetalPoints);
-		SetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buf);
-		sprintf_s(buf, sizeof(buf), "%d", IniFile.daisyHeartCount);
-		SetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buf);
-		sprintf_s(buf, sizeof(buf), "%.2f", IniFile.daisyDiameter);
-		SetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buf);
-		sprintf_s(buf, sizeof(buf), "%.2f", IniFile.daisyHoleDiameter);
-		SetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buf);
-		sprintf_s(buf, sizeof(buf), "%d", IniFile.daisyInnerCount);
-		SetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buf);
-		sprintf_s(buf, sizeof(buf), "%d", IniFile.daisyPetalCount);
-		SetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buf);
-		sprintf_s(buf, sizeof(buf), "%.2f", IniFile.daisyPetalLen);
-		SetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buf);
+		sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyPetalPoints);
+		SetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer);
+		sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyHeartCount);
+		SetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer);
+		sprintf_s(buffer, sizeof(buffer), "%.2f", IniFile.daisyDiameter);
+		SetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer);
+		sprintf_s(buffer, sizeof(buffer), "%.2f", IniFile.daisyHoleDiameter);
+		SetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer);
+		sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyInnerCount);
+		SetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer);
+		sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyPetalCount);
+		SetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer);
+		sprintf_s(buffer, sizeof(buffer), "%.2f", IniFile.daisyPetalLen);
+		SetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer);
 		CheckDlgButton(hwndlg, IDC_HOLE, chku(DAZHOL));
 		CheckDlgButton(hwndlg, IDC_DLIN, chku(DAZD));
-		for (ind = 0; ind < 6; ind++)
+		for (iType = 0; iType < 6; iType++)
 		{
-			LoadString(ThrEdInstance, DaisyTypeStrings[ind], buf, HBUFSIZ);
-			SendMessage(GetDlgItem(hwndlg, IDC_DAZTYP), CB_ADDSTRING, 0, (long)buf);
+			LoadString(ThrEdInstance, DaisyTypeStrings[iType], buffer, HBUFSIZ);
+			SendMessage(GetDlgItem(hwndlg, IDC_DAZTYP), CB_ADDSTRING, 0, (long)buffer);
 		}
 		SendMessage(GetDlgItem(hwndlg, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 		break;
@@ -1616,20 +1618,20 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 
 		case IDOK:
 
-			GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buf, HBUFSIZ);
-			IniFile.daisyPetalPoints = atoi(buf);
-			GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buf, HBUFSIZ);
-			IniFile.daisyHeartCount = atoi(buf);
-			GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buf, HBUFSIZ);
-			IniFile.daisyDiameter = atof(buf);
-			GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buf, HBUFSIZ);
-			IniFile.daisyHoleDiameter = atof(buf);
-			GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buf, HBUFSIZ);
-			IniFile.daisyInnerCount = atoi(buf);
-			GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buf, HBUFSIZ);
-			IniFile.daisyPetalCount = atoi(buf);
-			GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buf, HBUFSIZ);
-			IniFile.daisyPetalLen = atof(buf);
+			GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer, HBUFSIZ);
+			IniFile.daisyPetalPoints = atoi(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer, HBUFSIZ);
+			IniFile.daisyHeartCount = atoi(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer, HBUFSIZ);
+			IniFile.daisyDiameter = atof(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer, HBUFSIZ);
+			IniFile.daisyHoleDiameter = atof(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer, HBUFSIZ);
+			IniFile.daisyInnerCount = atoi(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer, HBUFSIZ);
+			IniFile.daisyPetalCount = atoi(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer, HBUFSIZ);
+			IniFile.daisyPetalLen = atof(buffer);
 			if (IsDlgButtonChecked(hwndlg, IDC_HOLE))
 				setu(DAZHOL);
 			else
@@ -1638,13 +1640,13 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 				setu(DAZD);
 			else
 				rstu(DAZD);
-			GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buf, HBUFSIZ);
-			for (ind = 0; ind < 6; ind++)
+			GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer, HBUFSIZ);
+			for (iType = 0; iType < 6; iType++)
 			{
-				LoadString(ThrEdInstance, DaisyTypeStrings[ind], buf1, HBUFSIZ);
-				if (!strcmp(buf, buf1))
+				LoadString(ThrEdInstance, DaisyTypeStrings[iType], compareBuffer, HBUFSIZ);
+				if (!strcmp(buffer, compareBuffer))
 				{
-					IniFile.daisyBorderType = ind;
+					IniFile.daisyBorderType = iType;
 					break;
 				}
 			}
@@ -1675,18 +1677,19 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 
 void dasyfrm() {
 
-	double		dang;
-	double		pang;
-	double		dangp;
-	double		pangp;
-	unsigned	bcnt, ind, ine, inf, dtyp, dcnt, cnt2, fref, pcnt;
-	double		dlen = 0;
-	double		len;
-	double		elen;
-	double		ilen;
-	double		drat;
-	float		maxcor;
-	fPOINT		ref;
+	double		holeSegmentAngle, petalSegmentAngle;
+	double		angle;
+	double		deltaPetalAngle;
+	double		petalPointAngle;
+	unsigned	holeVertexCount, petalVertexCount, iSegment, iMacroPetal, iPoint;
+	unsigned	iVertex, borderType, sawPointCount, halfPetalPointCount, fref, petalPointCount;
+	double		distanceFromDaisyCenter = 0;
+	double		diameter;
+	double		petalLength;
+	double		holeDiameter;
+	double		ratio;
+	float		maximumXsize, maximumYsize;
+	fPOINT		referencePoint;
 
 	unmsg();
 	if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, (DLGPROC)dasyproc))
@@ -1695,120 +1698,120 @@ void dasyfrm() {
 		return;
 	}
 	IniFile.daisyPetalCount = IniFile.daisyPetalCount;
-	len = IniFile.daisyDiameter;
-	elen = IniFile.daisyPetalLen;
-	ilen = IniFile.daisyHoleDiameter;
-	dtyp = IniFile.daisyBorderType;
-	ref.x = midl(ZoomRect.right, ZoomRect.left);
-	ref.y = midl(ZoomRect.top, ZoomRect.bottom);
+	diameter = IniFile.daisyDiameter;
+	petalLength = IniFile.daisyPetalLen;
+	holeDiameter = IniFile.daisyHoleDiameter;
+	borderType = IniFile.daisyBorderType;
+	referencePoint.x = midl(ZoomRect.right, ZoomRect.left);
+	referencePoint.y = midl(ZoomRect.top, ZoomRect.bottom);
 	SelectedForm = &FormList[FormIndex];
 	ClosestFormToCursor = FormIndex;
 	frmclr(SelectedForm);
 	SelectedForm->vertices = &FormVertices[FormVertexIndex];
 	SelectedForm->attribute = ActiveLayer << 1;
 	fvars(FormIndex);
-	cnt2 = IniFile.daisyPetalPoints >> 1;
-	maxcor = ZoomRect.right - ZoomRect.left;
-	drat = ZoomRect.top - ZoomRect.bottom;
-	if (drat > maxcor)
-		maxcor = drat;
-	maxcor /= 6;
-	drat = (double)maxcor / (len + elen);
-	len *= drat;
-	elen *= drat;
-	ilen *= drat;
+	halfPetalPointCount = IniFile.daisyPetalPoints >> 1;
+	maximumXsize = ZoomRect.right - ZoomRect.left;
+	maximumYsize = ZoomRect.top - ZoomRect.bottom;
+	if (maximumYsize > maximumXsize)
+		maximumXsize = maximumYsize;
+	maximumXsize /= 6;
+	ratio = (double)maximumXsize / (diameter + petalLength);
+	diameter *= ratio;
+	petalLength *= ratio;
+	holeDiameter *= ratio;
 	SelectedForm->type = FRMFPOLY;
-	inf = fref = 0;
+	iVertex = fref = 0;
 	if (chku(DAZHOL))
 	{
-		pang = PI2;
-		bcnt = IniFile.daisyPetalCount*IniFile.daisyInnerCount;
-		dang = PI2 / bcnt;
-		CurrentFormVertices[inf].x = ref.x + len*cos(pang);
-		CurrentFormVertices[inf].y = ref.y + len*sin(pang);
-		inf++;
-		for (ind = 0; ind < bcnt + 1; ind++)
+		angle = PI2;
+		holeVertexCount = IniFile.daisyPetalCount*IniFile.daisyInnerCount;
+		holeSegmentAngle = PI2 / holeVertexCount;
+		CurrentFormVertices[iVertex].x = referencePoint.x + diameter*cos(angle);
+		CurrentFormVertices[iVertex].y = referencePoint.y + diameter*sin(angle);
+		iVertex++;
+		for (iSegment = 0; iSegment < holeVertexCount + 1; iSegment++)
 		{
-			CurrentFormVertices[inf].x = ref.x + ilen*cos(pang);
-			CurrentFormVertices[inf].y = ref.y + ilen*sin(pang);
-			inf++;
-			pang -= dang;
+			CurrentFormVertices[iVertex].x = referencePoint.x + holeDiameter*cos(angle);
+			CurrentFormVertices[iVertex].y = referencePoint.y + holeDiameter*sin(angle);
+			iVertex++;
+			angle -= holeSegmentAngle;
 		}
-		fref = inf;
+		fref = iVertex;
 	}
-	pang = 0;
-	bcnt = IniFile.daisyPetalCount*IniFile.daisyPetalPoints;
-	pcnt = IniFile.daisyPetalPoints;
-	if (dtyp == DHART)
+	angle = 0;
+	petalVertexCount = IniFile.daisyPetalCount*IniFile.daisyPetalPoints;
+	petalPointCount = IniFile.daisyPetalPoints;
+	if (borderType == DHART)
 	{
-		pcnt = (IniFile.daisyHeartCount + 1) << 1;
-		bcnt = IniFile.daisyPetalCount*pcnt;
+		petalPointCount = (IniFile.daisyHeartCount + 1) << 1;
+		petalVertexCount = IniFile.daisyPetalCount*petalPointCount;
 	}
-	dang = PI2 / bcnt;
-	dangp = PI / IniFile.daisyPetalPoints;
+	petalSegmentAngle = PI2 / petalVertexCount;
+	deltaPetalAngle = PI / IniFile.daisyPetalPoints;
 	if (chku(DAZD))
 	{
 		SelectedForm->satinGuideCount = IniFile.daisyPetalCount - 1;
 		SelectedForm->wordParam = IniFile.daisyPetalCount*IniFile.daisyInnerCount + 1;
 		SelectedForm->satinOrAngle.sac = adsatk(IniFile.daisyPetalCount - 1);
 	}
-	for (ind = 0; ind < IniFile.daisyPetalCount; ind++)
+	for (iMacroPetal = 0; iMacroPetal < IniFile.daisyPetalCount; iMacroPetal++)
 	{
-		pangp = 0;
+		petalPointAngle = 0;
 		PseudoRandomValue = SEED;
-		for (ine = 0; ine < pcnt; ine++)
+		for (iPoint = 0; iPoint < petalPointCount; iPoint++)
 		{
-			switch (dtyp)
+			switch (borderType)
 			{
 			case DSIN:
 
-				dlen = len + sin(pangp)*elen;
-				pangp += dangp;
+				distanceFromDaisyCenter = diameter + sin(petalPointAngle)*petalLength;
+				petalPointAngle += deltaPetalAngle;
 				break;
 
 			case DRAMP:
 
-				dlen = len + (double)ine / IniFile.daisyPetalPoints*elen;
+				distanceFromDaisyCenter = diameter + (double)iPoint / IniFile.daisyPetalPoints*petalLength;
 				break;
 
 			case DSAW:
 
-				if (ine > cnt2)
-					dcnt = IniFile.daisyPetalPoints - ine;
+				if (iPoint > halfPetalPointCount)
+					sawPointCount = IniFile.daisyPetalPoints - iPoint;
 				else
-					dcnt = ine;
-				dlen = len + (double)dcnt / IniFile.daisyPetalPoints*elen;
+					sawPointCount = iPoint;
+				distanceFromDaisyCenter = diameter + (double)sawPointCount / IniFile.daisyPetalPoints*petalLength;
 				break;
 
 			case DRAG:
 
-				dlen = len + (double)(psg() % IniFile.daisyPetalPoints) / IniFile.daisyPetalPoints*elen;
+				distanceFromDaisyCenter = diameter + (double)(psg() % IniFile.daisyPetalPoints) / IniFile.daisyPetalPoints*petalLength;
 				break;
 
 			case DCOG:
 
-				dlen = len;
-				if (ine > cnt2)
-					dlen += elen;
+				distanceFromDaisyCenter = diameter;
+				if (iPoint > halfPetalPointCount)
+					distanceFromDaisyCenter += petalLength;
 				break;
 
 			case DHART:
 
-				dlen = len + sin(pangp)*elen;
-				if (ine > IniFile.daisyHeartCount)
-					pangp -= dangp;
+				distanceFromDaisyCenter = diameter + sin(petalPointAngle)*petalLength;
+				if (iPoint > IniFile.daisyHeartCount)
+					petalPointAngle -= deltaPetalAngle;
 				else
-					pangp += dangp;
+					petalPointAngle += deltaPetalAngle;
 				break;
 			}
-			CurrentFormVertices[inf].x = ref.x + cos(pang)*dlen;
-			CurrentFormVertices[inf].y = ref.y + sin(pang)*dlen;
-			inf++;
-			pang += dang;
-			if (chku(DAZD) && ind != IniFile.daisyPetalCount - 1)
+			CurrentFormVertices[iVertex].x = referencePoint.x + cos(angle)*distanceFromDaisyCenter;
+			CurrentFormVertices[iVertex].y = referencePoint.y + sin(angle)*distanceFromDaisyCenter;
+			iVertex++;
+			angle += petalSegmentAngle;
+			if (chku(DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1)
 			{
-				SelectedForm->satinOrAngle.sac[ind].start = (IniFile.daisyPetalCount - ind - 1)*IniFile.daisyInnerCount + 1;
-				SelectedForm->satinOrAngle.sac[ind].finish = inf;
+				SelectedForm->satinOrAngle.sac[iMacroPetal].start = (IniFile.daisyPetalCount - iMacroPetal - 1)*IniFile.daisyInnerCount + 1;
+				SelectedForm->satinOrAngle.sac[iMacroPetal].finish = iVertex;
 			}
 		}
 	}
@@ -1817,37 +1820,37 @@ void dasyfrm() {
 		CurrentFormVertices[fref - 1].y += (float)0.01;
 		CurrentFormVertices[fref].y += (float)0.01;
 	}
-	SelectedForm->vertexCount = inf;
+	SelectedForm->vertexCount = iVertex;
 	if (chku(DAZD))
 	{
 		SelectedForm->type = SAT;
 		SelectedForm->attribute = 1;
 	}
-	FormVertexIndex += inf;
+	FormVertexIndex += iVertex;
 	setMap(INIT);
 	frmout(FormIndex);
-	for (ind = 0; ind < inf; ind++) {
+	for (iMacroPetal = 0; iMacroPetal < iVertex; iMacroPetal++) {
 
-		CurrentFormVertices[ind].x -= SelectedForm->rectangle.left;
-		CurrentFormVertices[ind].y -= SelectedForm->rectangle.bottom;
+		CurrentFormVertices[iMacroPetal].x -= SelectedForm->rectangle.left;
+		CurrentFormVertices[iMacroPetal].y -= SelectedForm->rectangle.bottom;
 	}
 	FormMoveDelta.x = FormMoveDelta.y = 0;
-	NewFormVertexCount = inf + 1;
+	NewFormVertexCount = iVertex + 1;
 	setMap(POLIMOV);
 	setmfrm();
 	mdufrm();
 }
 
-void durec(OREC* prec)
+void durec(OREC* record)
 {
-	unsigned	at;
-	fPOINTATTR*	pstch;
+	unsigned	attribute;
+	fPOINTATTR*	stitch;
 
-	pstch = &StitchBuffer[prec->start];
-	prec->type = StitchTypes[dutyp(pstch->attribute)];
-	at = pstch->attribute&SRTMSK;
-	prec->color = at & 0xf;
-	prec->form = (at&FRMSK) >> FRMSHFT;
+	stitch = &StitchBuffer[record->start];
+	record->type = StitchTypes[dutyp(stitch->attribute)];
+	attribute = stitch->attribute&SRTMSK;
+	record->color = attribute & 0xf;
+	record->form = (attribute&FRMSK) >> FRMSHFT;
 }
 
 

@@ -350,12 +350,12 @@ enum {
 };
 
 enum	{	//daisy form types
-	DSIN,
-	DRAMP,
-	DSAW,
-	DRAG,
-	DCOG,
-	DHART
+	DSIN,	// SINE shape
+	DRAMP,	// Ramp shape
+	DSAW,	// Sawtooth shape
+	DRAG,	// Ragged shape
+	DCOG,	// Cog shape
+	DHART	// Heart shape
 };
 
 //bitmap
