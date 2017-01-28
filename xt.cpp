@@ -89,7 +89,7 @@ extern	TCHAR*			ThrEdClipFormat;
 extern	HINSTANCE		ThrEdInstance;
 extern	HWND			ThrEdWindow;
 extern	TCHAR			ThrName[_MAX_PATH];
-extern	unsigned		UnderlayColor;
+extern	unsigned		AppliqueColor;
 extern	POINT			UnzoomedRect;
 extern	COLORREF		UserColor[16];
 extern	double			UserStitchLength;
@@ -1104,7 +1104,7 @@ void ritcwlk()
 	}
 }
 
-unsigned gucon(fPOINT start, fPOINT finish, unsigned dst, unsigned code)
+unsigned gucon(fPOINT start, fPOINT finish, unsigned destination, unsigned code)
 {
 	double		length;
 	unsigned	startVertex, endVertex, stitchCount, intermediateVertex;
@@ -1139,7 +1139,7 @@ gulab:
 	down = prv(down);
 	goto gulab;
 gulabx:;
-	iStitch = dst;
+	iStitch = destination;
 	while (startVertex != endVertex)
 	{
 		StitchBuffer[iStitch].x = indentedPoint[startVertex].x;
@@ -1185,7 +1185,7 @@ gulabx:;
 	StitchBuffer[iStitch].y = indentedPoint[startVertex].y;
 	StitchBuffer[iStitch].attribute = code;
 	iStitch++;
-	return iStitch - dst;
+	return iStitch - destination;
 }
 
 void fnwlk(unsigned find)
@@ -1870,38 +1870,39 @@ OREC*	recref(const void* arg)
 
 int recmp(const void *arg1, const void *arg2)
 {
-	OREC* pa1;
-	OREC* pa2;
+	OREC* record1;
+	OREC* record2;
 
-	pa1 = recref((const void*)arg1);
-	pa2 = recref((const void*)arg2);
-	if (ColorOrder[pa1->color] == ColorOrder[pa2->color])
+	record1 = recref((const void*)arg1);
+	record2 = recref((const void*)arg2);
+	if (ColorOrder[record1->color] == ColorOrder[record2->color])
 	{
-		if (pa1->form == pa2->form)
+		if (record1->form == record2->form)
 		{
-			if (pa1->type == pa2->type)
-				return (int)pa1->start - pa2->start;
+			if (record1->type == record2->type)
+				return (int)record1->start - record2->start;
 			else
-				return (int)pa1->type - pa2->type;
+				return (int)record1->type - record2->type;
 		}
 		else
-			return (int)pa1->form - pa2->form;
+			return (int)record1->form - record2->form;
 	}
-	return (int)ColorOrder[pa1->color] - ColorOrder[pa2->color];
+	return (int)ColorOrder[record1->color] - ColorOrder[record2->color];
 }
 
 int refcmp(const void *arg1, const void *arg2)
 {
-	OREC* pa1;
-	OREC* pa2;
+	OREC* record1;
+	OREC* record2;
 
-	pa1 = recref((const void*)arg1);
-	pa2 = recref((const void*)arg2);
-	if (pa1->form == pa2->form)
-		return (int)pa1->type - pa2->type;
-	return (int)pa1->form - pa2->form;
+	record1 = recref((const void*)arg1);
+	record2 = recref((const void*)arg2);
+	if (record1->form == record2->form)
+		return (int)record1->type - record2->type;
+	return (int)record1->form - record2->form;
 }
 
+/*
 double srtlen(fPOINTATTR* pnt, OREC* prec, unsigned swtch)
 {
 	fPOINTATTR* tpnt;
@@ -1912,156 +1913,159 @@ double srtlen(fPOINTATTR* pnt, OREC* prec, unsigned swtch)
 		tpnt = prec->spnt;
 	return hypot(pnt->x - tpnt->x, pnt->y - tpnt->y);
 }
+*/
 
-BOOL chkrdun(SRTREC* psrec)
+BOOL chkrdun(SRTREC* stitchRecord)
 {
-	unsigned ind;
+	unsigned iStitch;
 
-	for (ind = psrec->start; ind < psrec->finish; ind++)
+	for (iStitch = stitchRecord->start; iStitch < stitchRecord->finish; iStitch++)
 	{
-		if (precs[ind]->otyp == FormFillCounter[precs[ind]->form])
+		if (precs[iStitch]->otyp == FormFillCounter[precs[iStitch]->form])
 			return 1;
 	}
 	return 0;
 }
 
-double precjmps(SRTREC* psrec)
+double precjmps(SRTREC* stitchRecord)
 {
-	unsigned		totjmps;
-	double			len;
-	double			minlen;
-	unsigned		ind, loc, loci;
-	fPOINTATTR*		ploc;
-	BOOL			locdir;
+	unsigned		totalJumps;
+	double			length;
+	double			minimumLength;
+	unsigned		iStitch, loc, loci;
+	fPOINTATTR*		currentStitch;
+	BOOL			direction;
 
+	// ToDo - assign memory locally for FormFillCounter
 	FormFillCounter = (unsigned*)&OSequence;
 	FillMemory(&OSequence, (ActivePointIndex + 2) << 2, 0);
-	loc = psrec->loc;
-	locdir = psrec->dir;
-	totjmps = 0;
-	while (chkrdun(psrec))
+	// ToDo - rename loc (and loci)
+	loc = stitchRecord->loc;
+	direction = stitchRecord->direction;
+	totalJumps = 0;
+	while (chkrdun(stitchRecord))
 	{
-		minlen = 1e9;
-		if (locdir)
+		minimumLength = 1e9;
+		if (direction)
 			loci = precs[loc]->finish;
 		else
 			loci = precs[loc]->start;
-		ploc = &StitchBuffer[loci];
-		for (ind = psrec->start; ind < psrec->finish; ind++)
+		currentStitch = &StitchBuffer[loci];
+		for (iStitch = stitchRecord->start; iStitch < stitchRecord->finish; iStitch++)
 		{
-			if (precs[ind]->otyp == FormFillCounter[precs[ind]->form])
+			if (precs[iStitch]->otyp == FormFillCounter[precs[iStitch]->form])
 			{
-				len = hypot(precs[ind]->spnt->x - ploc->x, precs[ind]->spnt->y - ploc->y);
-				if (len < minlen)
+				length = hypot(precs[iStitch]->startStitch->x - currentStitch->x, precs[iStitch]->startStitch->y - currentStitch->y);
+				if (length < minimumLength)
 				{
-					minlen = len;
-					locdir = 0;
-					loc = ind;
+					minimumLength = length;
+					direction = 0;
+					loc = iStitch;
 				}
-				len = hypot(precs[ind]->epnt->x - ploc->x, precs[ind]->epnt->y - ploc->y);
-				if (len < minlen)
+				length = hypot(precs[iStitch]->endStitch->x - currentStitch->x, precs[iStitch]->endStitch->y - currentStitch->y);
+				if (length < minimumLength)
 				{
-					minlen = len;
-					locdir = 1;
-					loc = ind;
+					minimumLength = length;
+					direction = 1;
+					loc = iStitch;
 				}
 			}
 		}
-		if (minlen > 9 * PFGRAN)
-			totjmps++;
+		if (minimumLength > 9 * PFGRAN)
+			totalJumps++;
 		FormFillCounter[precs[loc]->form]++;
 		if (chkMap(DUSRT))
 		{
-			if (locdir)
+			if (direction)
 			{
 				if (precs[loc]->start)
 				{
-					for (ind = precs[loc]->finish - 1; ind >= precs[loc]->start; ind--)
-						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[ind]);
+					for (iStitch = precs[loc]->finish - 1; iStitch >= precs[loc]->start; iStitch--)
+						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[iStitch]);
 				}
 				else
 				{
-					ind = precs[loc]->finish;
-					while (ind)
-						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[--ind]);
+					iStitch = precs[loc]->finish;
+					while (iStitch)
+						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[--iStitch]);
 				}
 			}
 			else
 			{
-				for (ind = precs[loc]->start; ind < precs[loc]->finish; ind++)
-					moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[ind]);
+				for (iStitch = precs[loc]->start; iStitch < precs[loc]->finish; iStitch++)
+					moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[iStitch]);
 			}
 		}
 	}
-	return totjmps;
+	return totalJumps;
 }
 
-unsigned duprecs(SRTREC* prec)
+unsigned duprecs(SRTREC* record)
 {
-	unsigned jmps0;
-	unsigned jmps1;
+	unsigned jumps0;
+	unsigned jumps1;
 
-	prec->dir = 0;
-	jmps0 = precjmps(prec);
-	prec->dir = 1;
-	jmps1 = precjmps(prec);
-	if (jmps0 < jmps1)
+	record->direction = 0;
+	jumps0 = precjmps(record);
+	record->direction = 1;
+	jumps1 = precjmps(record);
+	if (jumps0 < jumps1)
 	{
-		prec->dir = 0;
-		return jmps0;
+		record->direction = 0;
+		return jumps0;
 	}
-	prec->dir = 1;
-	return jmps1;
+	record->direction = 1;
+	return jumps1;
 }
 
 #ifdef _DEBUG
 
-void dmprec(OREC** recs, unsigned cnt)
+void dmprec(OREC** records, unsigned count)
 {
-	unsigned ind;
+	unsigned iRecord;
 
-	for (ind = 0; ind < cnt; ind++)
+	for (iRecord = 0; iRecord < count; iRecord++)
 	{
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%4d off: %4d at: %08x frm: %4d typ: %d col: %2d st: %5d fin: %5d\n",
-			ind,
-			recs[ind] - (OREC*)BSequence,
-			StitchBuffer[recs[ind]->start].attribute,
-			recs[ind]->form,
-			recs[ind]->type,
-			recs[ind]->color,
-			recs[ind]->start,
-			recs[ind]->finish);
+			iRecord,
+			records[iRecord] - (OREC*)BSequence,
+			StitchBuffer[records[iRecord]->start].attribute,
+			records[iRecord]->form,
+			records[iRecord]->type,
+			records[iRecord]->color,
+			records[iRecord]->start,
+			records[iRecord]->finish);
 		OutputDebugString(MsgBuffer);
 	}
 }
 #endif
 
-BOOL srtchk(OREC** pfrec, unsigned cnt, unsigned* badfrm)
+BOOL srtchk(OREC** record, unsigned count, unsigned* badForm)
 {
-	unsigned ind, frm, hcol;
-	FRMHED* fp;
+	unsigned iRecord, form, color;
+	FRMHED* formHeader;
 
-	frm = pfrec[0]->form;
-	hcol = pfrec[0]->color;
-	for (ind = 1; ind < cnt; ind++)
+	form = record[0]->form;
+	color = record[0]->color;
+	for (iRecord = 1; iRecord < count; iRecord++)
 	{
-		if (pfrec[ind]->form == frm)
+		if (record[iRecord]->form == form)
 		{
-			if (ColorOrder[pfrec[ind]->color] < ColorOrder[hcol])
+			if (ColorOrder[record[iRecord]->color] < ColorOrder[color])
 			{
-				fp = &FormList[frm];
-				if (fp->fillType == FTHF&&fp->extendedAttribute&AT_FTHBLND&&pfrec[ind]->color == fp->fillColor)
+				formHeader = &FormList[form];
+				if (formHeader->fillType == FTHF&&formHeader->extendedAttribute&AT_FTHBLND&&record[iRecord]->color == formHeader->fillColor)
 					continue;
-				*badfrm = ind;
+				*badForm = iRecord;
 				return 0;
 			}
 			else
-				hcol = pfrec[ind]->color;
+				color = record[iRecord]->color;
 		}
 		else
 		{
-			hcol = pfrec[ind]->color;
-			frm = pfrec[ind]->form;
+			color = record[iRecord]->color;
+			form = record[iRecord]->form;
 		}
 	}
 	return 1;
@@ -2069,123 +2073,129 @@ BOOL srtchk(OREC** pfrec, unsigned cnt, unsigned* badfrm)
 
 void fsort()
 {
-	unsigned		ind, ine, pind, at, cfrm, rind, mind = 0, mindir = 0;
-	unsigned		typcnt, jmps, minjmps;
-	OREC*			recs;
-	RANGE*			prngs;
-	unsigned*		l_frmcnts;
-	SRTREC			srec;
-	FILETIME		ftim;
-	ULARGE_INTEGER	stim;
-	ULARGE_INTEGER	ntim;
+	unsigned		iColor, iStitch, badForm, iRange, lastRange;
+	unsigned		currentForm, attribute, iRecord, lastRecord;
+	unsigned		minimumIndex = 0, minimumDirection = 0;
+	unsigned		typeCount, jumps, minimumJumps;
+	OREC*			records;
+	RANGE*			stitchRange;
+	SRTREC			sortRecord;
+	FILETIME		fileTime;
+	ULARGE_INTEGER	startTime;
+	ULARGE_INTEGER	nextTime;
 
 	savdo();
-	recs = (OREC*)&BSequence;
-	recs->start = 0;
-	recs->spnt = StitchBuffer;
-	at = StitchBuffer->attribute&SRTMSK;
-	rind = 0;
+	// Todo - Use local memory allocation for records
+	records = (OREC*)&BSequence;
+	records->start = 0;
+	records->startStitch = StitchBuffer;
+	attribute = StitchBuffer->attribute&SRTMSK;
+	iRecord = 0;
 	ActivePointIndex = FormIndex;
-	ColorOrder[UnderlayColor] = 0;
-	for (ind = 0; ind < 16; ind++) {
+	ColorOrder[AppliqueColor] = 0;
+	for (iColor = 0; iColor < 16; iColor++) {
 
-		if (ind != UnderlayColor)
-			ColorOrder[ind] = ind + 1;
+		if (iColor != AppliqueColor)
+			ColorOrder[iColor] = iColor + 1;
 	}
-	for (ind = 1; ind < PCSHeader.stitchCount; ind++)
+	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++)
 	{
-		if ((StitchBuffer[ind].attribute&SRTMSK) != at)
+		if ((StitchBuffer[iStitch].attribute&SRTMSK) != attribute)
 		{
-			recs[rind].finish = ind;
-			recs[rind].epnt = &StitchBuffer[ind - 1];
-			rind++;
-			recs[rind].start = ind;
-			recs[rind].spnt = &StitchBuffer[ind];
-			at = StitchBuffer[ind].attribute&SRTMSK;
+			records[iRecord].finish = iStitch;
+			records[iRecord].endStitch = &StitchBuffer[iStitch - 1];
+			iRecord++;
+			records[iRecord].start = iStitch;
+			records[iRecord].startStitch = &StitchBuffer[iStitch];
+			attribute = StitchBuffer[iStitch].attribute&SRTMSK;
 		}
 	}
-	recs[rind].epnt = &StitchBuffer[PCSHeader.stitchCount - 1];
-	recs[rind].finish = PCSHeader.stitchCount;
-	rind++;
-	precs = (OREC**)&recs[rind];
-	pfrecs = (OREC**)&recs[rind << 1];
-	for (ind = 0; ind < rind; ind++)
+	records[iRecord].endStitch = &StitchBuffer[PCSHeader.stitchCount - 1];
+	records[iRecord].finish = PCSHeader.stitchCount;
+	iRecord++;
+	lastRecord = iRecord;
+	// ToDo - allocate memory locally for precs
+	precs = (OREC**)&records[lastRecord];
+	// ToDo - allocate memory locally for pfrecs
+	pfrecs = (OREC**)&records[lastRecord << 1];
+	for (iRecord = 0; iRecord < lastRecord; iRecord++)
 	{
-		durec(&recs[ind]);
-		precs[ind] = &recs[ind];
-		pfrecs[ind] = &recs[ind];
+		durec(&records[iRecord]);
+		precs[iRecord] = &records[iRecord];
+		pfrecs[iRecord] = &records[iRecord];
 	}
-	qsort((void*)precs, rind, 4, recmp);
-	qsort((void*)pfrecs, rind, 4, refcmp);
+	qsort((void*)precs, lastRecord, 4, recmp);
+	qsort((void*)pfrecs, lastRecord, 4, refcmp);
 #ifdef _DEBUG
-	//	dmprec(precs,rind);
+	dmprec(precs, lastRecord);
 #endif
-	if (srtchk(pfrecs, rind, &ine))
+	if (srtchk(pfrecs, lastRecord, &badForm))
 	{
-		prngs = (RANGE*)&precs[rind];
-		prngs[0].start = 0;
-		at = precs[0]->color;
-		cfrm = 0xffffffff;
-		typcnt = 0;
-		pind = 0;
-		l_frmcnts = (unsigned*)&OSequence;
-		for (ind = 0; ind < rind; ind++)
+		// ToDo - allocate memory locally for stitchRange
+		stitchRange = (RANGE*)&precs[lastRecord];
+		stitchRange[0].start = 0;
+		attribute = precs[0]->color;
+		currentForm = 0xffffffff;
+		typeCount = 0;
+		iRange = 0;
+		for (iRecord = 0; iRecord < lastRecord; iRecord++)
 		{
-			if (at != precs[ind]->color)
+			if (attribute != precs[iRecord]->color)
 			{
-				prngs[pind].finish = ind;
-				pind++;
-				prngs[pind].start = ind;
-				at = precs[ind]->color;
-				cfrm = precs[ind]->form;
-				typcnt = 0;
+				stitchRange[iRange].finish = iRecord;
+				iRange++;
+				stitchRange[iRange].start = iRecord;
+				attribute = precs[iRecord]->color;
+				currentForm = precs[iRecord]->form;
+				typeCount = 0;
 				goto srtskp;
 			}
-			if (precs[ind]->form == cfrm)
-				typcnt++;
+			if (precs[iRecord]->form == currentForm)
+				typeCount++;
 			else
 			{
-				typcnt = 0;
-				cfrm = precs[ind]->form;
+				typeCount = 0;
+				currentForm = precs[iRecord]->form;
 			}
 		srtskp:;
-			precs[ind]->otyp = typcnt;
+			precs[iRecord]->otyp = typeCount;
 		}
-		prngs[pind].finish = rind;
-		pind++;
+		stitchRange[iRange].finish = lastRecord;
+		lastRange = ++iRange;
 		TempStitchBuffer = &StitchBuffer[MAXSEQ];
 		OutputIndex = 0;
-		for (ind = 0; ind < pind; ind++)
+		for (iRange = 0; iRange < lastRange; iRange++)
 		{
 			rstMap(DUSRT);
-			srec.start = prngs[ind].start;
-			srec.finish = prngs[ind].finish;
-			srec.cnt = srec.finish - srec.start;
-			minjmps = 0xffffffff;
-			GetSystemTimeAsFileTime(&ftim);
-			stim = tim2int(ftim);
-			for (ine = srec.start; ine < srec.finish; ine++)
+			sortRecord.start = stitchRange[iRange].start;
+			sortRecord.finish = stitchRange[iRange].finish;
+			sortRecord.count = sortRecord.finish - sortRecord.start;
+			minimumJumps = 0xffffffff;
+			// ToDo - why is there a timeout implemented here?
+			GetSystemTimeAsFileTime(&fileTime);
+			startTime = tim2int(fileTime);
+			for (iRecord = sortRecord.start; iRecord < sortRecord.finish; iRecord++)
 			{
-				srec.loc = ine;
-				if (!precs[ine]->otyp)
+				sortRecord.loc = iRecord;
+				if (!precs[iRecord]->otyp)
 				{
-					jmps = duprecs(&srec);
-					if (jmps < minjmps)
+					jumps = duprecs(&sortRecord);
+					if (jumps < minimumJumps)
 					{
-						minjmps = jmps;
-						mind = ine;
-						mindir = srec.dir;
+						minimumJumps = jumps;
+						minimumIndex = iRecord;
+						minimumDirection = sortRecord.direction;
 					}
 				}
-				GetSystemTimeAsFileTime(&ftim);
-				ntim = tim2int(ftim);
-				if (ntim.QuadPart - stim.QuadPart > SRTIM)
+				GetSystemTimeAsFileTime(&fileTime);
+				nextTime = tim2int(fileTime);
+				if (nextTime.QuadPart - startTime.QuadPart > SRTIM)
 					break;
 			}
 			setMap(DUSRT);
-			srec.loc = mind;
-			srec.dir = mindir;
-			precjmps(&srec);
+			sortRecord.loc = minimumIndex;
+			sortRecord.direction = minimumDirection;
+			precjmps(&sortRecord);
 		}
 		mvstchs(0, MAXSEQ, OutputIndex);
 		PCSHeader.stitchCount = OutputIndex;
@@ -2195,18 +2205,18 @@ void fsort()
 	else
 	{
 		LoadString(ThrEdInstance, IDS_SRTER, HelpBuffer, HBUFSIZ);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, pfrecs[ine]->form);
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, pfrecs[badForm]->form);
 		shoMsg(MsgBuffer);
 	}
 }
 
-unsigned dutyp(unsigned tat)
+unsigned dutyp(unsigned attribute)
 {
 #if  __UseASM__
 	_asm
 	{
 		xor		eax, eax
-		mov		ebx, tat
+		mov		ebx, attribute
 		and		ebx, SRTYPMSK
 		bsr		eax, ebx
 		je		short dutypx
@@ -2222,89 +2232,22 @@ unsigned dutyp(unsigned tat)
 	//correct
 	char result;
 	DWORD bit;
-	unsigned lat = tat & SRTYPMSK;
+	unsigned maskedAttribute;
 
-	_BitScanReverse(&bit, lat);
+	maskedAttribute = attribute & SRTYPMSK;
+
+	_BitScanReverse(&bit, maskedAttribute);
 
 	if (bit == 0)
 		return 0;
 
 	result = ((bit & 0xff) - 18);
 
-	if ((result != 12) || ((lat & TYPATMSK) == 0))
+	if ((result != 12) || ((maskedAttribute & TYPATMSK) == 0))
 		return result & 0xf;
 
 	return 1;
 #endif
-}
-
-void filim(FRMLIM* flim, unsigned * lmap)
-{
-	unsigned	ind, fcod, at, typ;
-
-	fcod = ClosestFormToCursor << FRMSHFT;
-	*lmap = 0;
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++)
-	{
-		at = StitchBuffer[ind].attribute;
-		if (fcod == (at&FRMSK))
-		{
-			typ = StitchTypes[dutyp(at)];
-			switch (typ)
-			{
-			case 1:	//applique
-
-				if (!(*lmap&M_CWLK))
-					flim->apstrt = ind;
-				*lmap |= M_AP;
-				flim->apend = ind;
-				break;
-
-			case 2:	//center walk
-
-				if (!(*lmap&M_CWLK))
-					flim->cstrt = ind;
-				*lmap |= M_CWLK;
-				flim->cend = ind;
-				break;
-
-			case 3:	//edge walk
-
-				if (!(*lmap&M_WALK))
-					flim->wstrt = ind;
-				*lmap |= M_WALK;
-				flim->wend = ind;
-				break;
-
-			case 4:	//underlay
-
-				if (!(*lmap&M_UND))
-					flim->ustrt = ind;
-				*lmap |= M_UND;
-				flim->uend = ind;
-				break;
-
-			case 5:	//fill
-
-				if (!(*lmap&M_FIL))
-					flim->fstrt = ind;
-				*lmap |= M_FIL;
-				flim->fend = ind;
-				break;
-
-			case 6:	//border
-
-				if (SelectedForm->fillColor == SelectedForm->borderColor)
-				{
-					if (!(*lmap&M_BRD))
-						flim->bstrt = ind;
-					*lmap |= M_BRD;
-					flim->bend = ind;
-				}
-				break;
-			}
-		}
-	}
 }
 
 unsigned frstmap(unsigned* map)
@@ -2340,37 +2283,37 @@ unsigned frstmap(unsigned* map)
 
 typedef struct _atfld {
 
-	unsigned	col;
-	unsigned	frm;
-	unsigned	typ;
-	unsigned	lay;
-	unsigned	usr;
+	unsigned	color;
+	unsigned	form;
+	unsigned	type;
+	unsigned	layer;
+	unsigned	user;
 }ATFLD;
 
 void duatf(unsigned ind)
 {
-	char		abuf[256];
-	unsigned	at;
-	ATFLD		atf;
+	char		attributeBuffer[256];
+	unsigned	attribute;
+	ATFLD		AttributeFields;
 
-	at = StitchBuffer[ind].attribute;
-	atf.col = at&COLMSK;
-	atf.frm = (at >> FRMSHFT)&FRMSK;
-	atf.typ = StitchTypes[dutyp(at)];
-	atf.lay = (at >> LAYSHFT) & 7;
-	if (at & 0x80000000)
-		atf.usr = 1;
+	attribute = StitchBuffer[ind].attribute;
+	AttributeFields.color = attribute&COLMSK;
+	AttributeFields.form = (attribute >> FRMSHFT)&FRMSK;
+	AttributeFields.type = StitchTypes[dutyp(attribute)];
+	AttributeFields.layer = (attribute >> LAYSHFT) & 7;
+	if (attribute & 0x80000000)
+		AttributeFields.user = 1;
 	else
-		atf.usr = 0;
-	sprintf_s(abuf, sizeof(abuf), "%5d: col: %2d frm: %5d typ: %2d, lay: %1d: usr: %1d at: %08x\n",
+		AttributeFields.user = 0;
+	sprintf_s(attributeBuffer, sizeof(attributeBuffer), "%5d: col: %2d frm: %5d typ: %2d, lay: %1d: usr: %1d at: %08x\n",
 		ind,
-		atf.col,
-		atf.frm,
-		atf.typ,
-		atf.lay,
-		atf.usr,
-		at);
-	OutputDebugString(abuf);
+		AttributeFields.color,
+		AttributeFields.form,
+		AttributeFields.type,
+		AttributeFields.layer,
+		AttributeFields.user,
+		attribute);
+	OutputDebugString(attributeBuffer);
 }
 
 void dmpat()

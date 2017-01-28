@@ -1682,8 +1682,8 @@ enum	{ //text button windows
 typedef struct _orec {
 	unsigned 	start;
 	unsigned 	finish;
-	fPOINTATTR*	spnt;
-	fPOINTATTR*	epnt;
+	fPOINTATTR*	startStitch;
+	fPOINTATTR*	endStitch;
 	unsigned 	color;
 	unsigned 	type;
 	unsigned 	form;
@@ -1693,9 +1693,9 @@ typedef struct _orec {
 typedef struct _srtrec	{
 	unsigned start;
 	unsigned finish;
-	unsigned cnt;
+	unsigned count;
 	unsigned loc;
-	BOOL	 dir;
+	BOOL	 direction;
 }SRTREC;
 
 typedef struct _fstrts	{
@@ -1720,21 +1720,6 @@ typedef struct _fstrts	{
 #define M_FCOL	  512
 #define M_FTHCOL 1024
 #define M_ECOL   2048
-
-typedef struct _frmlim	{
-	unsigned apstrt;
-	unsigned apend;
-	unsigned cstrt;
-	unsigned cend;
-	unsigned wstrt;
-	unsigned wend;
-	unsigned ustrt;
-	unsigned uend;
-	unsigned fstrt;
-	unsigned fend;
-	unsigned bstrt;
-	unsigned bend;
-}FRMLIM;
 
 typedef struct _insrec	{
 	unsigned cod;

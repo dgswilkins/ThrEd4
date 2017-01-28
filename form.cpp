@@ -191,7 +191,7 @@ extern			HINSTANCE		ThrEdInstance;
 extern			HWND			ThrEdWindow;
 extern			POINT			ThredWindowOrigin;
 extern			TCHAR			ThrName[_MAX_PATH];
-extern			unsigned		UnderlayColor;
+extern			unsigned		AppliqueColor;
 extern			void*			UndoBuffer[16];
 extern			unsigned		UndoBufferWriteIndex;
 extern			POINT			UnzoomedRect;
@@ -6493,7 +6493,7 @@ void sapliq()
 	SelectedForm->edgeSpacing = StitchSpacing / 2;
 	SelectedForm->borderSize = IniFile.borderWidth;
 	bsizpar();
-	SelectedForm->borderColor = ActiveColor | (UnderlayColor << 4);
+	SelectedForm->borderColor = ActiveColor | (AppliqueColor << 4);
 	if (SelectedForm->type != FRMLINE)
 	{
 		if (SelectedForm->fillType == SAT&&SelectedForm->satinGuideCount)
@@ -6540,9 +6540,9 @@ void apliq() {
 void setap() {
 	TCHAR	buf[HBUFSIZ];
 
-	UnderlayColor = ActiveColor;
+	AppliqueColor = ActiveColor;
 	LoadString(ThrEdInstance, IDS_APCOL, buf, HBUFSIZ);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buf, UnderlayColor + 1);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buf, AppliqueColor + 1);
 	shoMsg(MsgBuffer);
 }
 
@@ -7638,7 +7638,7 @@ void prfmsg() {
 	LabelWindowCoords.right = 3 + LabelWindowSize.x;
 	ValueWindowCoords.left = 6 + LabelWindowSize.x;
 	ValueWindowCoords.right = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", UnderlayColor + 1);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", AppliqueColor + 1);
 	prflin(STR_PRF10);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", BorderWidth / PFGRAN);
 	prflin(STR_PRF3);
@@ -7817,7 +7817,7 @@ void prfmsg() {
 	prflin(STR_PRF13);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", StarRatio);
 	prflin(STR_PRF12);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", UnderlayColor + 1);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", AppliqueColor + 1);
 	prflin(STR_PRF10);
 	setMap(PRFACT);
 	ReleaseDC(ThrEdWindow, prfdc);
@@ -9281,7 +9281,7 @@ unsigned nxtcol() {
 	_asm {
 		xor		eax, eax
 		mov		ebx, ColorBitmap
-		mov		ecx, UnderlayColor
+		mov		ecx, AppliqueColor
 		bt		ebx, ecx
 		jnc		short nxtcol1
 		mov		eax, ecx
@@ -9294,8 +9294,8 @@ unsigned nxtcol() {
 	}
 #else
 	DWORD col;
-	if (_bittest((long *)&ColorBitmap, UnderlayColor)) {
-		col = UnderlayColor;
+	if (_bittest((long *)&ColorBitmap, AppliqueColor)) {
+		col = AppliqueColor;
 	}
 	else {
 		if (ColorBitmap == 0) {
@@ -10964,9 +10964,9 @@ void srtbyfrm() {
 
 	if (FormIndex) {
 		savdo();
-		colr[UnderlayColor] = 0;
+		colr[AppliqueColor] = 0;
 		for (ind = 0; ind < 16; ind++) {
-			if (ind != UnderlayColor)
+			if (ind != AppliqueColor)
 				colr[ind] = ind + 1;
 		}
 		TempStitchBuffer = &StitchBuffer[MAXSEQ];

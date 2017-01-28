@@ -539,7 +539,7 @@ RECT			MsgRect;				//rectangle containing the text message
 void*			UndoBuffer[16];			//backup data
 unsigned		UndoBufferWriteIndex = 0;	//undo storage pointer
 unsigned		UndoBufferReadIndex = 0;	//undo retrieval pointers
-unsigned		UnderlayColor = 15;		//underlay color
+unsigned		AppliqueColor = 15;		//underlay color
 unsigned		LastKeyCode = 0xffff;	//last key code
 unsigned		FormMenuChoice = 0;		//data type for form data form numerical entry
 dPOINT			ZoomMarkPoint;			//stitch coordinates of the zoom mark
@@ -3264,7 +3264,7 @@ void ritini() {
 	IniFile.stitchSpace = StitchSpacing;
 	IniFile.userFlagMap = UserFlagMap;
 	IniFile.borderWidth = BorderWidth;
-	IniFile.underlayColor = UnderlayColor;
+	IniFile.underlayColor = AppliqueColor;
 	IniFile.snapLength = SnapLength;
 	IniFile.starRatio = StarRatio;
 	IniFile.spiralWrap = SpiralWrap;
@@ -4281,8 +4281,8 @@ void chknum() {
 
 						case PAP:
 
-							UnderlayColor = (unsigned)(value - 1) % 16;
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", UnderlayColor + 1);
+							AppliqueColor = (unsigned)(value - 1) % 16;
+							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", AppliqueColor + 1);
 							SetWindowText(ValueWindow[PAP], MsgBuffer);
 							break;
 
@@ -4873,7 +4873,7 @@ void movmap(unsigned cnt) {
 #if  __UseASM__
 	_asm {
 
-		mov		ecx, cnt
+		mov		ecx, count
 		mov		esi, TraceBitmapData
 		mov		edi, offset BSequence
 		movlup : mov		eax, [esi]
@@ -12500,7 +12500,7 @@ void defpref() {
 		BitmapBackgroundColors[iColor] = DefaultBitmapBackgroundColors[iColor];
 	}
 	dazdef();
-	UnderlayColor = 15;
+	AppliqueColor = 15;
 	BorderWidth = BRDWID;
 	ButtonholeCornerLength = IBFCLEN;
 	IniFile.chainSpace = CHSDEF;
@@ -16891,7 +16891,7 @@ unsigned chkMsg() {
 		if (PreferenceIndex == PAP + 1 && chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
 
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", VerticalIndex);
-			UnderlayColor = VerticalIndex;
+			AppliqueColor = VerticalIndex;
 			SetWindowText(ValueWindow[PAP], MsgBuffer);
 			unsid();
 			return 1;
@@ -17035,7 +17035,7 @@ unsigned chkMsg() {
 						SelectedForm->edgeType = EDGEAPPL;
 						if (chku(DUND))
 							SelectedForm->edgeType |= EGUND;
-						SelectedForm->borderColor |= (UnderlayColor << 4);
+						SelectedForm->borderColor |= (AppliqueColor << 4);
 						goto didfil;
 					} else {
 
@@ -21572,7 +21572,7 @@ void redini() {
 		if (IniFile.borderWidth)
 			BorderWidth = IniFile.borderWidth;
 		if (IniFile.underlayColor)
-			UnderlayColor = IniFile.underlayColor & 0xf;
+			AppliqueColor = IniFile.underlayColor & 0xf;
 		if (IniFile.snapLength)
 			SnapLength = IniFile.snapLength;
 		if (IniFile.starRatio)
