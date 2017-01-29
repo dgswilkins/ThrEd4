@@ -3140,29 +3140,29 @@ void setblen()
 	numWnd();
 }
 
-void bspacfn(unsigned find, float len)
+void bspacfn(unsigned find, float length)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType)
 	{
-		SelectedForm->edgeSpacing = len;
+		SelectedForm->edgeSpacing = length;
 		refilfn();
 	}
 }
 
-void dubspac(float len)
+void dubspac(float length)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			bspacfn(SelectedFormList[ind], len);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			bspacfn(SelectedFormList[iForm], length);
 	}
 	if (chkMap(FORMSEL))
-		bspacfn(ClosestFormToCursor, len);
+		bspacfn(ClosestFormToCursor, length);
 	coltab();
 	setMap(RESTCH);
 }
@@ -3175,29 +3175,29 @@ void setbspac()
 	numWnd();
 }
 
-void bminfn(unsigned find, float len)
+void bminfn(unsigned find, float length)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType)
 	{
-		SelectedForm->minBorderStitchLen = len;
+		SelectedForm->minBorderStitchLen = length;
 		refilfn();
 	}
 }
 
-void dubmin(float len)
+void dubmin(float length)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			bminfn(SelectedFormList[ind], len);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			bminfn(SelectedFormList[iForm], length);
 	}
 	if (chkMap(FORMSEL))
-		bminfn(ClosestFormToCursor, len);
+		bminfn(ClosestFormToCursor, length);
 	coltab();
 	setMap(RESTCH);
 }
@@ -3210,29 +3210,29 @@ void setbmin()
 	numWnd();
 }
 
-void bmaxfn(unsigned find, float len)
+void bmaxfn(unsigned find, float length)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType)
 	{
-		SelectedForm->maxBorderStitchLen = len;
+		SelectedForm->maxBorderStitchLen = length;
 		refilfn();
 	}
 }
 
-void dubmax(float len)
+void dubmax(float length)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			bmaxfn(SelectedFormList[ind], len);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			bmaxfn(SelectedFormList[iForm], length);
 	}
 	if (chkMap(FORMSEL))
-		bmaxfn(ClosestFormToCursor, len);
+		bmaxfn(ClosestFormToCursor, length);
 	coltab();
 	setMap(RESTCH);
 }
@@ -3245,29 +3245,29 @@ void setbmax()
 	numWnd();
 }
 
-void fminfn(unsigned find, float len)
+void fminfn(unsigned find, float length)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType)
 	{
-		SelectedForm->minFillStitchLen = len;
+		SelectedForm->minFillStitchLen = length;
 		refilfn();
 	}
 }
 
-void dufmin(float len)
+void dufmin(float length)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			fminfn(SelectedFormList[ind], len);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			fminfn(SelectedFormList[iForm], length);
 	}
 	if (chkMap(FORMSEL))
-		fminfn(ClosestFormToCursor, len);
+		fminfn(ClosestFormToCursor, length);
 	coltab();
 	setMap(RESTCH);
 }
@@ -3280,29 +3280,29 @@ void setfmin()
 	numWnd();
 }
 
-void fmaxfn(unsigned find, float len)
+void fmaxfn(unsigned find, float length)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType)
 	{
-		SelectedForm->maxFillStitchLen = len;
+		SelectedForm->maxFillStitchLen = length;
 		refilfn();
 	}
 }
 
-void dufmax(float len)
+void dufmax(float length)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			fmaxfn(SelectedFormList[ind], len);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			fmaxfn(SelectedFormList[iForm], length);
 	}
 	if (chkMap(FORMSEL))
-		fmaxfn(ClosestFormToCursor, len);
+		fmaxfn(ClosestFormToCursor, length);
 	coltab();
 	setMap(RESTCH);
 }
@@ -3315,34 +3315,34 @@ void setfmax()
 	numWnd();
 }
 
-void fwidfn(unsigned find, float len)
+void fwidfn(unsigned find, float length)
 {
-	unsigned	ind;
-	double		rat;
-	float		ref;
+	unsigned	iVertex;
+	double		ratio;
+	float		reference;
 
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
-	ref = SelectedForm->rectangle.left;
-	rat = len / (SelectedForm->rectangle.right - ref);
-	for (ind = 0; ind < VertexCount; ind++)
-		CurrentFormVertices[ind].x = (CurrentFormVertices[ind].x - ref)*rat + ref;
+	reference = SelectedForm->rectangle.left;
+	ratio = length / (SelectedForm->rectangle.right - reference);
+	for (iVertex = 0; iVertex < VertexCount; iVertex++)
+		CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - reference)*ratio + reference;
 	frmout(ClosestFormToCursor);
 	refilfn();
 }
 
-void dufwid(float len)
+void dufwid(float length)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			fwidfn(SelectedFormList[ind], len);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			fwidfn(SelectedFormList[iForm], length);
 	}
 	if (chkMap(FORMSEL))
-		fwidfn(ClosestFormToCursor, len);
+		fwidfn(ClosestFormToCursor, length);
 	coltab();
 	setMap(RESTCH);
 }
@@ -3363,34 +3363,35 @@ void setfind()
 	numWnd();
 }
 
-void fhifn(unsigned find, float len)
+void fhifn(unsigned find, float length
+)
 {
-	unsigned	ind;
-	double		rat;
-	float		ref;
+	unsigned	iVertex;
+	double		ratio;
+	float		reference;
 
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
-	ref = SelectedForm->rectangle.bottom;
-	rat = len / (SelectedForm->rectangle.top - ref);
-	for (ind = 0; ind < VertexCount; ind++)
-		CurrentFormVertices[ind].y = (CurrentFormVertices[ind].y - ref)*rat + ref;
+	reference = SelectedForm->rectangle.bottom;
+	ratio = length / (SelectedForm->rectangle.top - reference);
+	for (iVertex = 0; iVertex < VertexCount; iVertex++)
+		CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - reference)*ratio + reference;
 	frmout(ClosestFormToCursor);
 	refilfn();
 }
 
-void dufhi(float len)
+void dufhi(float length)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			fhifn(SelectedFormList[ind], len);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			fhifn(SelectedFormList[iForm], length);
 	}
 	if (chkMap(FORMSEL))
-		fhifn(ClosestFormToCursor, len);
+		fhifn(ClosestFormToCursor, length);
 	coltab();
 	setMap(RESTCH);
 }
@@ -3433,16 +3434,16 @@ void setfilend()
 
 void duauxnam()
 {
-	TCHAR* pext;
+	TCHAR* fileExtention;
 
 	_strlwr_s(WorkingFileName);
 	strcpy_s(AuxName, WorkingFileName);
-	pext = strrchr(AuxName, '.');
-	if (pext)
-		pext++;
+	fileExtention = strrchr(AuxName, '.');
+	if (fileExtention)
+		fileExtention++;
 	else
-		pext = &WorkingFileName[strlen(WorkingFileName)];
-	*pext = 0;
+		fileExtention = &WorkingFileName[strlen(WorkingFileName)];
+	*fileExtention = 0;
 	switch (IniFile.auxFileType) {
 
 	case AUXDST:
@@ -3509,56 +3510,54 @@ void dutxtfil()
 	setMap(RESTCH);
 }
 
-void txt2pix(TXPNT txp, POINT* pixp)
+void txt2pix(TXPNT texturePoint, POINT* screenPoint)
 {
-	pixp->y = TextureScreen.height - txp.y / TextureScreen.areaHeight*TextureScreen.height + TextureScreen.top;
-	pixp->x = (txp.line*TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
+	screenPoint->y = TextureScreen.height - texturePoint.y / TextureScreen.areaHeight*TextureScreen.height + TextureScreen.top;
+	screenPoint->x = (texturePoint.line*TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
 }
 
-void txtxfn(POINT ref, int pix)
+void txtxfn(POINT reference, int offsetPixels)
 {
-	POINT xlin[2];
+	POINT line[2];
 
-	xlin[0].x = xlin[1].x = ref.x;
-	xlin[0].y = ref.y - pix;
-	xlin[1].y = ref.y + pix;
-	Polyline(StitchWindowMemDC, xlin, 2);
-	xlin[0].y = xlin[1].y = ref.y;
-	xlin[0].x = ref.x - pix;
-	xlin[1].x = ref.x + pix;
-	Polyline(StitchWindowMemDC, xlin, 2);
+	line[0].x = line[1].x = reference.x;
+	line[0].y = reference.y - offsetPixels;
+	line[1].y = reference.y + offsetPixels;
+	Polyline(StitchWindowMemDC, line, 2);
+	line[0].y = line[1].y = reference.y;
+	line[0].x = reference.x - offsetPixels;
+	line[1].x = reference.x + offsetPixels;
+	Polyline(StitchWindowMemDC, line, 2);
 }
 
-void dutxtx(int ind, int pix)
+void dutxtx(int index, int offsetPixels)
 {
 	POINT	ref;
 
-	txt2pix(TempTexturePoints[ind], &ref);
-	txtxfn(ref, pix);
+	txt2pix(TempTexturePoints[index], &ref);
+	txtxfn(ref, offsetPixels);
 	if (ref.y > TextureScreen.halfHeight)
 		ref.y -= TextureScreen.height;
 	else
 		ref.y += TextureScreen.height;
-	txtxfn(ref, pix);
+	txtxfn(ref, offsetPixels);
 }
 
-void txrct2rct(TXTRCT txr, RECT* rct)
+void txrct2rct(TXTRCT textureRect, RECT* rectangle)
 {
-	TXPNT	txp;
-	POINT	tpnt;
-	int		bh2;
+	TXPNT	texturePoint;
+	POINT	point;
 
-	bh2 = ButtonHeight >> 1;
-	txp.line = txr.left;
-	txp.y = txr.top;
-	txt2pix(txp, &tpnt);
-	rct->left = tpnt.x - IniFile.textureEditorSize;
-	rct->top = tpnt.y - IniFile.textureEditorSize;
-	txp.line = txr.right;
-	txp.y = txr.bottom;
-	txt2pix(txp, &tpnt);
-	rct->right = tpnt.x + IniFile.textureEditorSize;
-	rct->bottom = tpnt.y + IniFile.textureEditorSize;
+	texturePoint.line = textureRect.left;
+	texturePoint.y = textureRect.top;
+	txt2pix(texturePoint, &point);
+	rectangle->left = point.x - IniFile.textureEditorSize;
+	rectangle->top = point.y - IniFile.textureEditorSize;
+	texturePoint.line = textureRect.right;
+	texturePoint.y = textureRect.bottom;
+	txt2pix(texturePoint, &point);
+	rectangle->right = point.x + IniFile.textureEditorSize;
+	rectangle->bottom = point.y + IniFile.textureEditorSize;
 }
 
 void ed2px(fPOINT ped, POINT* px)
