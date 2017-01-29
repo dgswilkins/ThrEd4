@@ -2801,30 +2801,30 @@ void uspac()
 	numWnd();
 }
 
-void uangfn(unsigned find, float p_ang)
+void uangfn(unsigned find, float angle)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute&AT_UND)
 	{
-		SelectedForm->underlayStitchAngle = p_ang;
+		SelectedForm->underlayStitchAngle = angle;
 		refilfn();
 	}
 }
 
-void dufang(float p_ang)
+void dufang(float angle)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
-	p_ang *= (float)PI / 180;
+	angle *= (float)PI / 180;
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			uangfn(SelectedFormList[ind], p_ang);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			uangfn(SelectedFormList[iForm], angle);
 	}
 	if (chkMap(FORMSEL))
-		uangfn(ClosestFormToCursor, p_ang);
+		uangfn(ClosestFormToCursor, angle);
 	coltab();
 	setMap(RESTCH);
 }
@@ -2837,29 +2837,29 @@ void sfuang()
 	numWnd();
 }
 
-void flenfn(unsigned find, float len)
+void flenfn(unsigned find, float length)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType && !isclp(find))
 	{
-		SelectedForm->lengthOrCount.stitchLength = len;
+		SelectedForm->lengthOrCount.stitchLength = length;
 		refilfn();
 	}
 }
 
-void duflen(float len)
+void duflen(float length)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			flenfn(SelectedFormList[ind], len);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			flenfn(SelectedFormList[iForm], length);
 	}
 	if (chkMap(FORMSEL))
-		flenfn(ClosestFormToCursor, len);
+		flenfn(ClosestFormToCursor, length);
 	coltab();
 	setMap(RESTCH);
 }
@@ -2872,34 +2872,34 @@ void setflen()
 	numWnd();
 }
 
-void fspacfn(unsigned find, float spac)
+void fspacfn(unsigned find, float spacing)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType)
 	{
-		if (spac < 0)
+		if (spacing < 0)
 		{
 			if (!isclp(find))
 				return;
 		}
-		SelectedForm->fillSpacing = spac;
+		SelectedForm->fillSpacing = spacing;
 		refilfn();
 	}
 }
 
-void dufspac(float spac)
+void dufspac(float spacing)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			fspacfn(SelectedFormList[ind], spac);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			fspacfn(SelectedFormList[iForm], spacing);
 	}
 	if (chkMap(FORMSEL))
-		fspacfn(ClosestFormToCursor, spac);
+		fspacfn(ClosestFormToCursor, spacing);
 	coltab();
 	setMap(RESTCH);
 }
@@ -2912,33 +2912,33 @@ void setfspac()
 	numWnd();
 }
 
-void findfn(unsigned find, float idnt)
+void findfn(unsigned find, float indent)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
-	SelectedForm->underlayIndent = idnt;
+	SelectedForm->underlayIndent = indent;
 	if (SelectedForm->extendedAttribute&(AT_UND | AT_WALK))
 		refilfn();
 }
 
-void dufind(float idnt)
+void dufind(float indent)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
-	idnt *= PFGRAN;
+	indent *= PFGRAN;
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			findfn(SelectedFormList[ind], idnt);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			findfn(SelectedFormList[iForm], indent);
 	}
 	if (chkMap(FORMSEL))
-		findfn(ClosestFormToCursor, idnt);
+		findfn(ClosestFormToCursor, indent);
 	coltab();
 	setMap(RESTCH);
 }
 
-void fangfn(unsigned find, float p_ang)
+void fangfn(unsigned find, float angle)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
@@ -2951,7 +2951,7 @@ void fangfn(unsigned find, float p_ang)
 		case ANGF:
 
 			SelectedForm->fillType = ANGF;
-			SelectedForm->angleOrClipData.angle = p_ang;
+			SelectedForm->angleOrClipData.angle = angle;
 			break;
 
 		case	VCLPF:
@@ -2959,26 +2959,26 @@ void fangfn(unsigned find, float p_ang)
 		case	ANGCLPF:
 
 			SelectedForm->fillType = ANGCLPF;
-			SelectedForm->satinOrAngle.angle = p_ang;
+			SelectedForm->satinOrAngle.angle = angle;
 			break;
 		}
 		refilfn();
 	}
 }
 
-void dufxang(float p_ang)
+void dufxang(float angle)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
-	p_ang *= (float)PI / 180;
+	angle *= (float)PI / 180;
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			fangfn(SelectedFormList[ind], p_ang);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			fangfn(SelectedFormList[iForm], angle);
 	}
 	if (chkMap(FORMSEL))
-		fangfn(ClosestFormToCursor, p_ang);
+		fangfn(ClosestFormToCursor, angle);
 	coltab();
 	setMap(RESTCH);
 }
@@ -2991,32 +2991,32 @@ void setfang()
 	numWnd();
 }
 
-void ucolfn(unsigned find, unsigned col)
+void ucolfn(unsigned find, unsigned color)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute&(AT_UND | AT_WALK | AT_CWLK))
 	{
-		SelectedForm->underlayColor = col;
+		SelectedForm->underlayColor = color;
 		refilfn();
 	}
 }
 
-void dundcol(unsigned col)
+void dundcol(unsigned color)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
-	if (col)
-		col--;
-	col &= COLMSK;
+	if (color)
+		color--;
+	color &= COLMSK;
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			ucolfn(SelectedFormList[ind], col);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			ucolfn(SelectedFormList[iForm], color);
 	}
 	if (chkMap(FORMSEL))
-		ucolfn(ClosestFormToCursor, col);
+		ucolfn(ClosestFormToCursor, color);
 	coltab();
 	setMap(RESTCH);
 }
@@ -3029,32 +3029,32 @@ void setucol()
 	numWnd();
 }
 
-void fcolfn(unsigned find, unsigned col)
+void fcolfn(unsigned find, unsigned color)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType)
 	{
-		SelectedForm->fillColor = col;
+		SelectedForm->fillColor = color;
 		refilfn();
 	}
 }
 
-void dufcol(unsigned col)
+void dufcol(unsigned color)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
-	if (col)
-		col--;
-	col &= COLMSK;
+	if (color)
+		color--;
+	color &= COLMSK;
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			fcolfn(SelectedFormList[ind], col);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			fcolfn(SelectedFormList[iForm], color);
 	}
 	if (chkMap(FORMSEL))
-		fcolfn(ClosestFormToCursor, col);
+		fcolfn(ClosestFormToCursor, color);
 	coltab();
 	setMap(RESTCH);
 }
@@ -3067,32 +3067,32 @@ void setfcol()
 	numWnd();
 }
 
-void bcolfn(unsigned find, unsigned col)
+void bcolfn(unsigned find, unsigned color)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType)
 	{
-		SelectedForm->borderColor = col;
+		SelectedForm->borderColor = color;
 		refilfn();
 	}
 }
 
-void dubcol(unsigned col)
+void dubcol(unsigned color)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
-	if (col)
-		col--;
-	col &= COLMSK;
+	if (color)
+		color--;
+	color &= COLMSK;
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			bcolfn(SelectedFormList[ind], col);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			bcolfn(SelectedFormList[iForm], color);
 	}
 	if (chkMap(FORMSEL))
-		bcolfn(ClosestFormToCursor, col);
+		bcolfn(ClosestFormToCursor, color);
 	coltab();
 	setMap(RESTCH);
 }
@@ -3105,29 +3105,29 @@ void setbcol()
 	numWnd();
 }
 
-void blenfn(unsigned find, float len)
+void blenfn(unsigned find, float length)
 {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType && !iseclp(find))
 	{
-		SelectedForm->lengthOrCount.stitchLength = len;
+		SelectedForm->lengthOrCount.stitchLength = length;
 		refilfn();
 	}
 }
 
-void dublen(float len)
+void dublen(float length)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			blenfn(SelectedFormList[ind], len);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			blenfn(SelectedFormList[iForm], length);
 	}
 	if (chkMap(FORMSEL))
-		blenfn(ClosestFormToCursor, len);
+		blenfn(ClosestFormToCursor, length);
 	coltab();
 	setMap(RESTCH);
 }
