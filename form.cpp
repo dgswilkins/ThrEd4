@@ -1973,9 +1973,9 @@ seqskp:;
 void ritbrd() {
 	if (SequenceIndex)
 	{
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].ind = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_BRD;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].cod = TYPBRD;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = TYPBRD;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->borderColor&COLMSK;
 		chkseq(1);
 		InterleaveSequenceIndex2++;
@@ -1985,9 +1985,9 @@ void ritbrd() {
 void ritapbrd() {
 	if (SequenceIndex)
 	{
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].ind = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_AP;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].cod = TYPMSK;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = TYPMSK;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->borderColor >> 4;
 		chkseq(1);
 		InterleaveSequenceIndex2++;
@@ -1997,9 +1997,9 @@ void ritapbrd() {
 void ritfil() {
 	if (SequenceIndex)
 	{
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].ind = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].cod = TYPFRM;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = TYPFRM;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillColor;
 		chkseq(0);
 		InterleaveSequenceIndex2++;

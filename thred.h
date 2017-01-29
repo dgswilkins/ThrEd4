@@ -1699,14 +1699,14 @@ typedef struct _srtrec	{
 }SRTREC;
 
 typedef struct _fstrts	{
-	unsigned apl;
-	unsigned fil;
-	unsigned fth;
-	unsigned brd;
-	unsigned apcol;
-	unsigned fcol;
-	unsigned fthcol;
-	unsigned ecol;
+	unsigned applique;
+	unsigned fill;
+	unsigned feather;
+	unsigned border;
+	unsigned appliqueColor;
+	unsigned fillColor;
+	unsigned featherColor;
+	unsigned borderColor;
 }FSTRTS;
 
 #define M_AP	    2
@@ -1722,9 +1722,9 @@ typedef struct _fstrts	{
 #define M_ECOL   2048
 
 typedef struct _insrec	{
-	unsigned cod;
+	unsigned code;
 	unsigned color;
-	unsigned ind;
+	unsigned index;
 	unsigned seq;
 }INSREC;
 
@@ -1739,9 +1739,9 @@ typedef struct _intinf {
 	unsigned	pins;
 	unsigned	coloc;
 	unsigned	layerIndex;
-	unsigned	sloc;
-	unsigned	oloc;
-	fPOINTATTR* histch;
+	unsigned	start;
+	unsigned	output;
+	fPOINTATTR* highStitchBuffer;
 }INTINF;
 
 typedef struct _txtscr	{
