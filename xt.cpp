@@ -3560,33 +3560,33 @@ void txrct2rct(TXTRCT textureRect, RECT* rectangle)
 	rectangle->bottom = point.y + IniFile.textureEditorSize;
 }
 
-void ed2px(fPOINT ped, POINT* px)
+void ed2px(fPOINT editPoint, POINT* point)
 {
-	px->x = ped.x / TextureScreen.editToPixelRatio;
-	px->y = StitchWindowClientRect.bottom - ped.y / TextureScreen.editToPixelRatio;
+	point->x = editPoint.x / TextureScreen.editToPixelRatio;
+	point->y = StitchWindowClientRect.bottom - editPoint.y / TextureScreen.editToPixelRatio;
 }
 
-void px2ed(POINT px, fPOINT* ped)
+void px2ed(POINT point, fPOINT* editPoint)
 {
-	ped->x = px.x*TextureScreen.editToPixelRatio;
-	ped->y = TextureScreen.screenHeight - px.y*TextureScreen.editToPixelRatio;
+	editPoint->x = point.x*TextureScreen.editToPixelRatio;
+	editPoint->y = TextureScreen.screenHeight - point.y*TextureScreen.editToPixelRatio;
 }
 
-void bxtxt(unsigned cod, TCHAR* str)
+void bxtxt(unsigned iButton, TCHAR* string)
 {
-	SetWindowText(ButtonWin[cod], str);
+	SetWindowText(ButtonWin[iButton], string);
 }
 
-void lodhbuf(unsigned cod)
+void lodhbuf(unsigned iString)
 {
-	LoadString(ThrEdInstance, cod, HelpBuffer, HBUFSIZ);
+	LoadString(ThrEdInstance, iString, HelpBuffer, HBUFSIZ);
 }
 
-void hlpflt(unsigned mcod, unsigned bcod, float dat)
+void hlpflt(unsigned iMessage, unsigned iButton, float data)
 {
-	lodhbuf(mcod);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, dat);
-	bxtxt(bcod, MsgBuffer);
+	lodhbuf(iMessage);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, data);
+	bxtxt(iButton, MsgBuffer);
 }
 
 void drwtxbut()
@@ -3609,153 +3609,151 @@ void drwtxbut()
 
 void chktx()
 {
-	int ind, ine;
+	int iPoint, iNextPoint;
 
-	ine = 0;
-	for (ind = 0; ind < TextureScreen.index; ind++)
+	iNextPoint = 0;
+	for (iPoint = 0; iPoint < TextureScreen.index; iPoint++)
 	{
-		if (TempTexturePoints[ind].line <= TextureScreen.lines&&TempTexturePoints[ind].y < TextureScreen.areaHeight)
+		if (TempTexturePoints[iPoint].line <= TextureScreen.lines&&TempTexturePoints[iPoint].y < TextureScreen.areaHeight)
 		{
-			TempTexturePoints[ine].line = TempTexturePoints[ind].line;
-			TempTexturePoints[ine].y = TempTexturePoints[ind].y;
-			ine++;
+			TempTexturePoints[iNextPoint].line = TempTexturePoints[iPoint].line;
+			TempTexturePoints[iNextPoint].y = TempTexturePoints[iPoint].y;
+			iNextPoint++;
 		}
 	}
-	TextureScreen.index = ine;
+	TextureScreen.index = iNextPoint;
 }
 
 void drwtxtr()
 {
-	POINT		xlin[2];
-	int			ind;
-	int			ofy;
-	COLORREF	col;
-	TXPNT		txp;
-	POINT		tpnt;
-	int			cnt;
-	double		edsp;
-	double		pxsp;
-	float		wid2;
+	POINT		line[2];
+	int			iGrid, iVertical, iPoint, index;
+	int			yOffset;
+	TXPNT		textureRecord;
+	POINT		point;
+	int			gridLineCount;
+	double		editSpace;
+	double		pixelSpace;
+	float		extraWidth;
 
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-	edsp = TextureScreen.areaHeight * 2 / (TextureScreen.spacing*(TextureScreen.lines + 2));
-	pxsp = (double)StitchWindowClientRect.bottom / StitchWindowClientRect.right;
+	editSpace = TextureScreen.areaHeight * 2 / (TextureScreen.spacing*(TextureScreen.lines + 2));
+	pixelSpace = (double)StitchWindowClientRect.bottom / StitchWindowClientRect.right;
 	TextureScreen.lines = floor(TextureScreen.width / TextureScreen.spacing);
-	wid2 = TextureScreen.spacing*(TextureScreen.lines + 2);
+	extraWidth = TextureScreen.spacing*(TextureScreen.lines + 2);
 	if (rstMap(CHKTX))
 		chktx();
-	if (pxsp > edsp)
+	if (pixelSpace > editSpace)
 	{
 		TextureScreen.xOffset = 0;
-		TextureScreen.editToPixelRatio = wid2 / StitchWindowClientRect.bottom;
-		ofy = (StitchWindowClientRect.bottom - TextureScreen.areaHeight / TextureScreen.editToPixelRatio) / 2;
+		TextureScreen.editToPixelRatio = extraWidth / StitchWindowClientRect.bottom;
+		yOffset = (StitchWindowClientRect.bottom - TextureScreen.areaHeight / TextureScreen.editToPixelRatio) / 2;
 	}
 	else
 	{
 		TextureScreen.editToPixelRatio = TextureScreen.areaHeight * 2 / StitchWindowClientRect.bottom;
-		ofy = StitchWindowClientRect.bottom >> 2;
+		yOffset = StitchWindowClientRect.bottom >> 2;
 		TextureScreen.xOffset = (StitchWindowClientRect.right*TextureScreen.editToPixelRatio - (TextureScreen.lines + 2)*TextureScreen.spacing) / 2;
 	}
-	TextureScreen.top = ofy;
-	TextureScreen.bottom = StitchWindowClientRect.bottom - ofy;
+	TextureScreen.top = yOffset;
+	TextureScreen.bottom = StitchWindowClientRect.bottom - yOffset;
 	TextureScreen.height = TextureScreen.bottom - TextureScreen.top;
 	TextureScreen.halfHeight = StitchWindowClientRect.bottom >> 1;
 	TextureScreen.screenHeight = StitchWindowClientRect.bottom*TextureScreen.editToPixelRatio;
 	TextureScreen.yOffset = (TextureScreen.screenHeight - TextureScreen.areaHeight) / 2;
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	SelectObject(StitchWindowMemDC, GridPen);
-	cnt = TextureScreen.areaHeight / IniFile.gridSize + 1;
-	txp.line = 0;
-	xlin[0].x = 0;
-	xlin[1].x = StitchWindowClientRect.right;
-	txp.y = 0;
-	for (ind = 0; ind < cnt; ind++)
+	gridLineCount = TextureScreen.areaHeight / IniFile.gridSize + 1;
+	textureRecord.line = 0;
+	line[0].x = 0;
+	line[1].x = StitchWindowClientRect.right;
+	textureRecord.y = 0;
+	for (iGrid = 0; iGrid < gridLineCount; iGrid++)
 	{
-		txt2pix(txp, &tpnt);
-		xlin[0].y = xlin[1].y = tpnt.y;
-		Polyline(StitchWindowMemDC, xlin, 2);
-		txp.y += IniFile.gridSize;
+		txt2pix(textureRecord, &point);
+		line[0].y = line[1].y = point.y;
+		Polyline(StitchWindowMemDC, line, 2);
+		textureRecord.y += IniFile.gridSize;
 	}
 	DeleteObject(TextureCrossPen);
 	TextureCrossPen = CreatePen(PS_SOLID, 1, UserColor[ActiveColor]);
 	SelectObject(StitchWindowMemDC, TextureCrossPen);
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
-	xlin[0].y = 0;
-	xlin[1].y = StitchWindowClientRect.bottom;
-	for (ind = 1; ind < TextureScreen.lines + 1; ind++)
+	line[0].y = 0;
+	line[1].y = StitchWindowClientRect.bottom;
+	for (iVertical = 1; iVertical < TextureScreen.lines + 1; iVertical++)
 	{
-		xlin[0].x = xlin[1].x = (ind*TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
-		Polyline(StitchWindowMemDC, xlin, 2);
+		line[0].x = line[1].x = (iVertical*TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
+		Polyline(StitchWindowMemDC, line, 2);
 	}
-	xlin[0].x = 0;
-	xlin[1].x = StitchWindowClientRect.right;
-	xlin[0].y = xlin[1].y = TextureScreen.top;
-	Polyline(StitchWindowMemDC, xlin, 2);
-	xlin[0].y = xlin[1].y = TextureScreen.bottom;
-	Polyline(StitchWindowMemDC, xlin, 2);
+	line[0].x = 0;
+	line[1].x = StitchWindowClientRect.right;
+	line[0].y = line[1].y = TextureScreen.top;
+	Polyline(StitchWindowMemDC, line, 2);
+	line[0].y = line[1].y = TextureScreen.bottom;
+	Polyline(StitchWindowMemDC, line, 2);
 	DeleteObject(TextureCrossPen);
 	TextureCrossPen = CreatePen(PS_SOLID, 1, 0xffffff);
 	SelectObject(StitchWindowMemDC, TextureCrossPen);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
-	col = UserColor[ActiveColor];
-	for (ind = 0; ind < TextureScreen.index; ind++)
+	for (index = 0; index < TextureScreen.index; index++)
 	{
-		dutxtx(ind, IniFile.textureEditorSize);
+		dutxtx(index, IniFile.textureEditorSize);
 	}
 	if (SelectedTexturePointsCount)
 	{
 		txrct2rct(TextureRect, &TexturePixelRect);
-		xlin[0].y = xlin[1].y = TexturePixelRect.top;
-		xlin[0].x = TexturePixelRect.left;
-		xlin[1].x = TexturePixelRect.right;
-		Polyline(StitchWindowMemDC, xlin, 2);
-		xlin[1].y = TexturePixelRect.bottom;
-		xlin[1].x = TexturePixelRect.left;
-		Polyline(StitchWindowMemDC, xlin, 2);
-		xlin[0].x = TexturePixelRect.right;
-		xlin[0].y = TexturePixelRect.bottom;
-		Polyline(StitchWindowMemDC, xlin, 2);
-		xlin[1].x = TexturePixelRect.right;
-		xlin[1].y = TexturePixelRect.top;
-		Polyline(StitchWindowMemDC, xlin, 2);
+		line[0].y = line[1].y = TexturePixelRect.top;
+		line[0].x = TexturePixelRect.left;
+		line[1].x = TexturePixelRect.right;
+		Polyline(StitchWindowMemDC, line, 2);
+		line[1].y = TexturePixelRect.bottom;
+		line[1].x = TexturePixelRect.left;
+		Polyline(StitchWindowMemDC, line, 2);
+		line[0].x = TexturePixelRect.right;
+		line[0].y = TexturePixelRect.bottom;
+		Polyline(StitchWindowMemDC, line, 2);
+		line[1].x = TexturePixelRect.right;
+		line[1].y = TexturePixelRect.top;
+		Polyline(StitchWindowMemDC, line, 2);
 	}
-	for (ind = 0; ind < SelectedTexturePointsCount; ind++)
+	for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
 	{
-		dutxtx(SelectedTexturePointsList[ind], IniFile.textureEditorSize);
-		dutxtx(SelectedTexturePointsList[ind], IniFile.textureEditorSize << 1);
+		dutxtx(SelectedTexturePointsList[iPoint], IniFile.textureEditorSize);
+		dutxtx(SelectedTexturePointsList[iPoint], IniFile.textureEditorSize << 1);
 	}
 	BitBlt(StitchWindowDC, 0, 0, StitchWindowClientRect.right, StitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
 	drwtxbut();
 }
 
-BOOL px2txt(POINT pof, TXPNT* txrec)
+BOOL px2txt(POINT offset, TXPNT* textureRecord)
 {
-	fPOINT epnt;
+	fPOINT editPoint;
 
-	px2ed(pof, &epnt);
-	txrec->line = (epnt.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5;
-	if (txrec->line > TextureScreen.lines)
+	px2ed(offset, &editPoint);
+	textureRecord->line = (editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5;
+	if (textureRecord->line > TextureScreen.lines)
 		return 0;
-	if (txrec->line < 1)
+	if (textureRecord->line < 1)
 		return 0;
-	if (pof.y > TextureScreen.top)
+	if (offset.y > TextureScreen.top)
 	{
-		if (pof.y > TextureScreen.bottom)
+		if (offset.y > TextureScreen.bottom)
 			return 0;
 		else
-			txrec->y = (float)TextureScreen.areaHeight - (float)(pof.y - TextureScreen.top) / TextureScreen.height*TextureScreen.areaHeight;
+			textureRecord->y = (float)TextureScreen.areaHeight - (float)(offset.y - TextureScreen.top) / TextureScreen.height*TextureScreen.areaHeight;
 	}
 	else
 		return 0;
 	return 1;
 }
 
-BOOL txbutfn(TXPNT* txrec)
+BOOL txbutfn(TXPNT* textureRecord)
 {
-	POINT	pof;
+	POINT	offset;
 
-	deorg(&pof);
-	return px2txt(pof, txrec);
+	deorg(&offset);
+	return px2txt(offset, textureRecord);
 }
 
 void txtrbut()
@@ -3771,46 +3769,47 @@ void txtrbut()
 
 }
 
-BOOL txtclos(unsigned* pclo)
+BOOL txtclos(unsigned* closestTexturePoint)
 {
-	double	len;
-	double	minlen;
-	int		ind;
-	POINT	ref, tpnt;
+	double	length;
+	double	minimumLength;
+	int		iPoint;
+	POINT	reference, point;
 
-	ref.x = Msg.pt.x - StitchWindowOrigin.x;
-	ref.y = Msg.pt.y - StitchWindowOrigin.y;
-	minlen = 1e99;
-	*pclo = 0;
-	for (ind = 0; ind < TextureScreen.index; ind++)
+	// ToDo - could these be replaced by deorg()?
+	reference.x = Msg.pt.x - StitchWindowOrigin.x;
+	reference.y = Msg.pt.y - StitchWindowOrigin.y;
+	minimumLength = 1e99;
+	*closestTexturePoint = 0;
+	for (iPoint = 0; iPoint < TextureScreen.index; iPoint++)
 	{
-		txt2pix(TempTexturePoints[ind], &tpnt);
-		len = hypot(tpnt.x - ref.x, tpnt.y - ref.y);
-		if (len < minlen)
+		txt2pix(TempTexturePoints[iPoint], &point);
+		length = hypot(point.x - reference.x, point.y - reference.y);
+		if (length < minimumLength)
 		{
-			minlen = len;
-			*pclo = ind;
+			minimumLength = length;
+			*closestTexturePoint = iPoint;
 		}
 	}
-	if (minlen < CLOSENUF)
+	if (minimumLength < CLOSENUF)
 		return 1;
 	return 0;
 }
 
 void tritx()
 {
-	POINT	xlin[2];
-	int		li_Size;
+	POINT	line[2];
+	int		size;
 
-	li_Size = IniFile.textureEditorSize << 2;
-	xlin[0].x = xlin[1].x = TextureCursorLocation.x;
-	xlin[0].y = TextureCursorLocation.y - li_Size;
-	xlin[1].y = TextureCursorLocation.y + li_Size;
-	Polyline(StitchWindowDC, xlin, 2);
-	xlin[0].y = xlin[1].y = TextureCursorLocation.y;
-	xlin[0].x = TextureCursorLocation.x - li_Size;
-	xlin[1].x = TextureCursorLocation.x + li_Size;
-	Polyline(StitchWindowDC, xlin, 2);
+	size = IniFile.textureEditorSize << 2;
+	line[0].x = line[1].x = TextureCursorLocation.x;
+	line[0].y = TextureCursorLocation.y - size;
+	line[1].y = TextureCursorLocation.y + size;
+	Polyline(StitchWindowDC, line, 2);
+	line[0].y = line[1].y = TextureCursorLocation.y;
+	line[0].x = TextureCursorLocation.x - size;
+	line[1].x = TextureCursorLocation.x + size;
+	Polyline(StitchWindowDC, line, 2);
 }
 
 void setxmov()
@@ -3823,48 +3822,48 @@ void setxmov()
 
 void ritxrct()
 {
-	POINT	of;
-	RECT	trct;
-	POINT	xlin[5];
+	POINT	offset;
+	RECT	rectangle;
+	POINT	line[5];
 
-	of.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
-	of.y = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
-	trct.bottom = TexturePixelRect.bottom + of.y;
-	trct.left = TexturePixelRect.left + of.x;
-	trct.right = TexturePixelRect.right + of.x;
-	trct.top = TexturePixelRect.top + of.y;
-	xlin[0].x = xlin[1].x = xlin[4].x = trct.left;
-	xlin[2].x = xlin[3].x = trct.right;
-	xlin[0].y = xlin[3].y = xlin[4].y = trct.top;
-	xlin[1].y = xlin[2].y = trct.bottom;
-	Polyline(StitchWindowDC, xlin, 5);
+	offset.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
+	offset.y = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
+	rectangle.bottom = TexturePixelRect.bottom + offset.y;
+	rectangle.left = TexturePixelRect.left + offset.x;
+	rectangle.right = TexturePixelRect.right + offset.x;
+	rectangle.top = TexturePixelRect.top + offset.y;
+	line[0].x = line[1].x = line[4].x = rectangle.left;
+	line[2].x = line[3].x = rectangle.right;
+	line[0].y = line[3].y = line[4].y = rectangle.top;
+	line[1].y = line[2].y = rectangle.bottom;
+	Polyline(StitchWindowDC, line, 5);
 }
 
-void dutxrct(TXTRCT* rct)
+void dutxrct(TXTRCT* textureRect)
 {
-	int		ind;
-	TXPNT*	txp;
+	int		iPoint;
+	TXPNT*	texturePoint;
 
 	if (SelectedTexturePointsCount)
 	{
-		txp = &TempTexturePoints[SelectedTexturePointsList[0]];
-		rct->left = rct->right = txp->line;
-		rct->top = rct->bottom = txp->y;
-		for (ind = 1; ind < SelectedTexturePointsCount; ind++)
+		texturePoint = &TempTexturePoints[SelectedTexturePointsList[0]];
+		textureRect->left = textureRect->right = texturePoint->line;
+		textureRect->top = textureRect->bottom = texturePoint->y;
+		for (iPoint = 1; iPoint < SelectedTexturePointsCount; iPoint++)
 		{
-			txp = &TempTexturePoints[SelectedTexturePointsList[ind]];
-			if (txp->y > rct->top)
-				rct->top = txp->y;
-			if (txp->y < rct->bottom)
-				rct->bottom = txp->y;
-			if (txp->line < rct->left)
-				rct->left = txp->line;
-			if (txp->line > rct->right)
-				rct->right = txp->line;
+			texturePoint = &TempTexturePoints[SelectedTexturePointsList[iPoint]];
+			if (texturePoint->y > textureRect->top)
+				textureRect->top = texturePoint->y;
+			if (texturePoint->y < textureRect->bottom)
+				textureRect->bottom = texturePoint->y;
+			if (texturePoint->line < textureRect->left)
+				textureRect->left = texturePoint->line;
+			if (texturePoint->line > textureRect->right)
+				textureRect->right = texturePoint->line;
 		}
 	}
-	else
-		rct->left = rct->right = rct->top = rct->bottom;
+	else // should all coordinate values be set to 0 (or to center of screen)?
+		textureRect->left = textureRect->right = textureRect->top = textureRect->bottom;
 }
 
 void ed2stch(fPOINT* pt)
@@ -3873,150 +3872,150 @@ void ed2stch(fPOINT* pt)
 	pt->y -= TextureScreen.yOffset;
 }
 
-void dutxlin(fPOINT pt0, fPOINT pt1)
+void dutxlin(fPOINT point0, fPOINT point1)
 {
-	double	slop;
-	float	num;
-	float	strt, fin, tflt;
-	int		istrt, ifin;
+	double	slope;
+	float	deltaX;
+	float	start, finish, swap, yOffset;
+	int		integerStart, integerFinish;
 
-	ed2stch(&pt0);
-	ed2stch(&pt1);
-	num = pt1.x - pt0.x;
-	if (fabs(num) < TINY)
+	ed2stch(&point0);
+	ed2stch(&point1);
+	deltaX = point1.x - point0.x;
+	if (fabs(deltaX) < TINY)
 		return;
-	slop = (pt1.y - pt0.y) / num;
-	strt = pt0.x;
-	fin = pt1.x;
-	if (strt > fin)
+	slope = (point1.y - point0.y) / deltaX;
+	start = point0.x;
+	finish = point1.x;
+	if (start > finish)
 	{
-		tflt = strt;
-		strt = fin;
-		fin = tflt;
+		swap = start;
+		start = finish;
+		finish = swap;
 	}
-	istrt = ceil(strt / TextureScreen.spacing);
-	ifin = floor(fin / TextureScreen.spacing);
-	if (istrt < 1)
-		istrt = 1;
-	if (ifin > TextureScreen.lines)
-		ifin = TextureScreen.lines;
-	while (istrt <= ifin)
+	integerStart = ceil(start / TextureScreen.spacing);
+	integerFinish = floor(finish / TextureScreen.spacing);
+	if (integerStart < 1)
+		integerStart = 1;
+	if (integerFinish > TextureScreen.lines)
+		integerFinish = TextureScreen.lines;
+	while (integerStart <= integerFinish)
 	{
-		tflt = slop*(-pt0.x + istrt*TextureScreen.spacing) + pt0.y;
-		if (tflt > 0 && tflt < TextureScreen.areaHeight)
+		yOffset = slope*(-point0.x + integerStart*TextureScreen.spacing) + point0.y;
+		if (yOffset > 0 && yOffset < TextureScreen.areaHeight)
 		{
-			TempTexturePoints[TextureScreen.index].line = istrt;
-			TempTexturePoints[TextureScreen.index].y = tflt;
+			TempTexturePoints[TextureScreen.index].line = integerStart;
+			TempTexturePoints[TextureScreen.index].y = yOffset;
 			TextureScreen.index++;
 		}
-		istrt++;
+		integerStart++;
 	}
 }
 
 void setxclp()
 {
-	POINT		of;
-	fPOINT		fof;
-	unsigned	ind, inx, cnt;
+	POINT		screenOffset;
+	fPOINT		editorOffset;
+	unsigned	iVertex, iLine, iNextVertex, lineCount;
 
-	deorg(&of);
-	px2ed(of, &fof);
+	deorg(&screenOffset);
+	px2ed(screenOffset, &editorOffset);
 	if (rstMap(TXHCNTR))
-		fof.x = (TextureScreen.lines*TextureScreen.spacing) / 2 + TextureScreen.xOffset - TextureScreen.formCenter.x + TextureScreen.spacing / 2;
+		editorOffset.x = (TextureScreen.lines*TextureScreen.spacing) / 2 + TextureScreen.xOffset - TextureScreen.formCenter.x + TextureScreen.spacing / 2;
 	else
-		fof.x -= TextureScreen.formCenter.x;
-	fof.y -= TextureScreen.formCenter.y;
-	for (ind = 0; ind < AngledForm.vertexCount; ind++)
+		editorOffset.x -= TextureScreen.formCenter.x;
+	editorOffset.y -= TextureScreen.formCenter.y;
+	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++)
 	{
-		AngledFormVertices[ind].x += fof.x;
-		AngledFormVertices[ind].y += fof.y;
+		AngledFormVertices[iVertex].x += editorOffset.x;
+		AngledFormVertices[iVertex].y += editorOffset.y;
 	}
-	cnt = AngledForm.vertexCount - 1;
+	lineCount = AngledForm.vertexCount - 1;
 	if (AngledForm.type != FRMLINE)
-		cnt++;
+		lineCount++;
 	VertexCount = AngledForm.vertexCount;
-	for (ind = 0; ind < cnt; ind++)
+	for (iLine = 0; iLine < lineCount; iLine++)
 	{
-		inx = nxt(ind);
-		dutxlin(AngledFormVertices[ind], AngledFormVertices[inx]);
+		iNextVertex = nxt(iLine);
+		dutxlin(AngledFormVertices[iLine], AngledFormVertices[iNextVertex]);
 	}
 }
 
 void stxlin()
 {
-	POINT	of;
-	fPOINT	pt0;
-	fPOINT	pt1;
+	POINT	offset;
+	fPOINT	point0;
+	fPOINT	point1;
 
 	rstMap(TXTMOV);
-	deorg(&of);
-	px2ed(of, &pt1);
-	px2ed(FormLines[0], &pt0);
-	dutxlin(pt0, pt1);
+	deorg(&offset);
+	px2ed(offset, &point1);
+	px2ed(FormLines[0], &point0);
+	dutxlin(point0, point1);
 	setMap(RESTCH);
 }
 
-void ed2txp(POINT pof, TXPNT* txrec)
+void ed2txp(POINT offset, TXPNT* textureRecord)
 {
-	fPOINT epnt;
+	fPOINT point;
 
-	px2ed(pof, &epnt);
-	txrec->line = (epnt.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5;
-	txrec->y = (float)TextureScreen.areaHeight - (float)(pof.y - TextureScreen.top) / TextureScreen.height*TextureScreen.areaHeight;
+	px2ed(offset, &point);
+	textureRecord->line = (point.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5;
+	textureRecord->y = (float)TextureScreen.areaHeight - (float)(offset.y - TextureScreen.top) / TextureScreen.height*TextureScreen.areaHeight;
 }
 
 int	hitxlin()
 {
-	int ind, hilin;
+	int iPoint, highestLine;
 
-	hilin = 0;
-	for (ind = 0; ind < SelectedTexturePointsCount; ind++)
+	highestLine = 0;
+	for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
 	{
-		if (TempTexturePoints[SelectedTexturePointsList[ind]].line > hilin)
-			hilin = TempTexturePoints[SelectedTexturePointsList[ind]].line;
+		if (TempTexturePoints[SelectedTexturePointsList[iPoint]].line > highestLine)
+			highestLine = TempTexturePoints[SelectedTexturePointsList[iPoint]].line;
 	}
-	return hilin;
+	return highestLine;
 }
 
 void txtrup()
 {
-	TXPNT	hi;
-	TXPNT	lo;
-	TXPNT	tof;
-	float	tflt;
-	short	tsht;
-	int		ind, bakp;
-	POINT	of;
-	TXPNT*	ptxt;
+	TXPNT	highestTexturePoint;
+	TXPNT	lowestTexturePoint;
+	TXPNT	textureOffset;
+	float	yOffset;
+	short	swap;
+	int		iPoint, xCoord, Xmagnitude;
+	POINT	offset;
+	TXPNT*	texturePoint;
 
 	if (rstMap(TXTMOV))
 	{
 		savtxt();
-		deorg(&of);
-		of.x -= SelectTexturePointsOrigin.x;
-		of.y -= SelectTexturePointsOrigin.y;
-		bakp = abs(of.x);
-		tof.line = bakp*TextureScreen.editToPixelRatio / TextureScreen.spacing + 0.5;
-		if (of.x < 0)
-			tof.line = -tof.line;
-		tof.y = (float)-of.y / TextureScreen.height*TextureScreen.areaHeight;
-		tflt = TextureRect.top + tof.y - TextureScreen.areaHeight;
-		if (tflt > 0)
-			tof.y -= tflt;
-		tflt = TextureRect.bottom + tof.y;
-		if (tflt < 0)
-			tof.y -= tflt;
-		ind = TextureRect.left + tof.line - 1;
-		if (ind < 0)
-			tof.line -= ind;
-		ind = TextureRect.right + tof.line - TextureScreen.lines;
-		if (ind > 0)
-			tof.line -= ind;
-		for (ind = 0; ind < SelectedTexturePointsCount; ind++)
+		deorg(&offset);
+		offset.x -= SelectTexturePointsOrigin.x;
+		offset.y -= SelectTexturePointsOrigin.y;
+		Xmagnitude = abs(offset.x);
+		textureOffset.line = Xmagnitude*TextureScreen.editToPixelRatio / TextureScreen.spacing + 0.5;
+		if (offset.x < 0)
+			textureOffset.line = -textureOffset.line;
+		textureOffset.y = (float)-offset.y / TextureScreen.height*TextureScreen.areaHeight;
+		yOffset = TextureRect.top + textureOffset.y - TextureScreen.areaHeight;
+		if (yOffset > 0)
+			textureOffset.y -= yOffset;
+		yOffset = TextureRect.bottom + textureOffset.y;
+		if (yOffset < 0)
+			textureOffset.y -= yOffset;
+		xCoord = TextureRect.left + textureOffset.line - 1;
+		if (xCoord < 0)
+			textureOffset.line -= xCoord;
+		xCoord = TextureRect.right + textureOffset.line - TextureScreen.lines;
+		if (xCoord > 0)
+			textureOffset.line -= xCoord;
+		for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
 		{
-			ptxt = &TempTexturePoints[SelectedTexturePointsList[ind]];
-			ptxt->line += tof.line;
-			ptxt->y += tof.y;
+			texturePoint = &TempTexturePoints[SelectedTexturePointsList[iPoint]];
+			texturePoint->line += textureOffset.line;
+			texturePoint->y += textureOffset.y;
 		}
 		dutxrct(&TextureRect);
 	}
@@ -4024,30 +4023,30 @@ void txtrup()
 	{
 		if (rstMap(BZUMIN))
 		{
-			deorg(&of);
-			ed2txp(ZoomBoxLine[0], &hi);
-			ed2txp(of, &lo);
-			if (hi.line < lo.line)
+			deorg(&offset);
+			ed2txp(ZoomBoxLine[0], &highestTexturePoint);
+			ed2txp(offset, &lowestTexturePoint);
+			if (highestTexturePoint.line < lowestTexturePoint.line)
 			{
-				tsht = hi.line;
-				hi.line = lo.line;
-				lo.line = tsht;
+				swap = highestTexturePoint.line;
+				highestTexturePoint.line = lowestTexturePoint.line;
+				lowestTexturePoint.line = swap;
 			}
-			if (hi.y < lo.y)
+			if (highestTexturePoint.y < lowestTexturePoint.y)
 			{
-				tflt = hi.y;
-				hi.y = lo.y;
-				lo.y = tflt;
+				swap = highestTexturePoint.y;
+				highestTexturePoint.y = lowestTexturePoint.y;
+				lowestTexturePoint.y = swap;
 			}
 			SelectedTexturePointsCount = 0;
-			for (ind = 0; ind < TextureScreen.index; ind++)
+			for (iPoint = 0; iPoint < TextureScreen.index; iPoint++)
 			{
-				if (TempTexturePoints[ind].y<hi.y&&
-					TempTexturePoints[ind].y>lo.y&&
-					TempTexturePoints[ind].line <= hi.line&&
-					TempTexturePoints[ind].line >= lo.line)
+				if (TempTexturePoints[iPoint].y<highestTexturePoint.y&&
+					TempTexturePoints[iPoint].y>lowestTexturePoint.y&&
+					TempTexturePoints[iPoint].line <= highestTexturePoint.line&&
+					TempTexturePoints[iPoint].line >= lowestTexturePoint.line)
 				{
-					SelectedTexturePointsList[SelectedTexturePointsCount] = ind;
+					SelectedTexturePointsList[SelectedTexturePointsCount] = iPoint;
 					SelectedTexturePointsCount++;
 				}
 			}
@@ -4057,45 +4056,45 @@ void txtrup()
 	setMap(RESTCH);
 }
 
-void angrct(fRECTANGLE* rct)
+void angrct(fRECTANGLE* rectangle)
 {
-	unsigned	ind;
+	unsigned	iVertex;
 
-	rct->left = rct->right = AngledFormVertices[0].x;
-	rct->bottom = rct->top = AngledFormVertices[0].y;
-	for (ind = 1; ind < AngledForm.vertexCount; ind++)
+	rectangle->left = rectangle->right = AngledFormVertices[0].x;
+	rectangle->bottom = rectangle->top = AngledFormVertices[0].y;
+	for (iVertex = 1; iVertex < AngledForm.vertexCount; iVertex++)
 	{
-		if (AngledFormVertices[ind].x < rct->left)
-			rct->left = AngledFormVertices[ind].x;
-		if (AngledFormVertices[ind].x > rct->right)
-			rct->right = AngledFormVertices[ind].x;
-		if (AngledFormVertices[ind].y > rct->top)
-			rct->top = AngledFormVertices[ind].y;
-		if (AngledFormVertices[ind].y < rct->bottom)
-			rct->bottom = AngledFormVertices[ind].y;
+		if (AngledFormVertices[iVertex].x < rectangle->left)
+			rectangle->left = AngledFormVertices[iVertex].x;
+		if (AngledFormVertices[iVertex].x > rectangle->right)
+			rectangle->right = AngledFormVertices[iVertex].x;
+		if (AngledFormVertices[iVertex].y > rectangle->top)
+			rectangle->top = AngledFormVertices[iVertex].y;
+		if (AngledFormVertices[iVertex].y < rectangle->bottom)
+			rectangle->bottom = AngledFormVertices[iVertex].y;
 	}
 }
 
 void ritxfrm()
 {
-	unsigned ind, cnt;
-	POINT		of;
+	unsigned	iVertex, vertexCount;
+	POINT		offset;
 
-	of.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
-	of.y = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
-	for (ind = 0; ind < AngledForm.vertexCount; ind++)
+	offset.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
+	offset.y = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
+	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++)
 	{
-		ed2px(AngledFormVertices[ind], &FormLines[ind]);
-		FormLines[ind].x += of.x;
-		FormLines[ind].y += of.y;
+		ed2px(AngledFormVertices[iVertex], &FormLines[iVertex]);
+		FormLines[iVertex].x += offset.x;
+		FormLines[iVertex].y += offset.y;
 	}
-	FormLines[ind].x = FormLines[0].x;
-	FormLines[ind].y = FormLines[0].y;
-	cnt = AngledForm.vertexCount;
+	FormLines[iVertex].x = FormLines[0].x;
+	FormLines[iVertex].y = FormLines[0].y;
+	vertexCount = AngledForm.vertexCount;
 	if (AngledForm.type != FRMLINE)
-		cnt++;
+		vertexCount++;
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	Polyline(StitchWindowDC, FormLines, cnt);
+	Polyline(StitchWindowDC, FormLines, vertexCount);
 }
 
 void setxfrm()
