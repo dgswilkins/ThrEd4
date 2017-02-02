@@ -4099,31 +4099,32 @@ void ritxfrm()
 
 void setxfrm()
 {
-	unsigned	ind;
-	fRECTANGLE		arct;
-	float		hi;
-	double		rat;
+	unsigned	iVertex;
+	fRECTANGLE	angleRect;
+	float		height;
+	double		ratio;
 
-	angrct(&arct);
-	for (ind = 0; ind < AngledForm.vertexCount; ind++)
+	angrct(&angleRect);
+	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++)
 	{
-		AngledFormVertices[ind].x -= arct.left;
-		AngledFormVertices[ind].y -= arct.bottom;
+		AngledFormVertices[iVertex].x -= angleRect.left;
+		AngledFormVertices[iVertex].y -= angleRect.bottom;
 	}
-	angrct(&arct);
-	hi = arct.top - arct.bottom;
-	if (hi > TextureScreen.areaHeight)
+	angrct(&angleRect);
+	height = angleRect.top - angleRect.bottom;
+	if (height > TextureScreen.areaHeight)
 	{
-		rat = TextureScreen.areaHeight / hi*0.95;
-		for (ind = 0; ind < AngledForm.vertexCount; ind++)
+		// ToDo - is 95% a good number?
+		ratio = TextureScreen.areaHeight / height*0.95;
+		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++)
 		{
-			AngledFormVertices[ind].x *= rat;
-			AngledFormVertices[ind].y *= rat;
+			AngledFormVertices[iVertex].x *= ratio;
+			AngledFormVertices[iVertex].y *= ratio;
 		}
-		angrct(&arct);
+		angrct(&angleRect);
 	}
-	TextureScreen.formCenter.x = midl(arct.right, arct.left);
-	TextureScreen.formCenter.y = midl(arct.top, arct.bottom);
+	TextureScreen.formCenter.x = midl(angleRect.right, angleRect.left);
+	TextureScreen.formCenter.y = midl(angleRect.top, angleRect.bottom);
 	ed2px(TextureScreen.formCenter, &SelectTexturePointsOrigin);
 }
 
@@ -4198,19 +4199,19 @@ void txtlin()
 	setMap(TXTMOV);
 }
 
-void butsid(unsigned cod)
+void butsid(unsigned windowId)
 {
-	RECT brct;
+	RECT buttonRect;
 
 	chktxnum();
-	TextureWindowId = cod;
-	GetWindowRect(ButtonWin[cod], &brct);
+	TextureWindowId = windowId;
+	GetWindowRect(ButtonWin[windowId], &buttonRect);
 	SideWindowButton = CreateWindow(
 		"STATIC",
 		0,
 		SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		brct.left + ButtonWidthX3 - StitchWindowOrigin.x,
-		brct.top - StitchWindowOrigin.y,
+		buttonRect.left + ButtonWidthX3 - StitchWindowOrigin.x,
+		buttonRect.top - StitchWindowOrigin.y,
 		ButtonWidthX3,
 		ButtonHeight,
 		MainStitchWin,
@@ -4221,25 +4222,25 @@ void butsid(unsigned cod)
 
 int txcmp(const void *arg1, const void *arg2)
 {
-	TXPNT* p0;
-	TXPNT* p1;
+	TXPNT* texturePoint0;
+	TXPNT* texturePoint1;
 
-	p0 = (TXPNT*)arg1;
-	p1 = (TXPNT*)arg2;
-	if (p0->line == p1->line)
+	texturePoint0 = (TXPNT*)arg1;
+	texturePoint1 = (TXPNT*)arg2;
+	if (texturePoint0->line == texturePoint1->line)
 	{
-		if (p0->y == p1->y)
+		if (texturePoint0->y == texturePoint1->y)
 			return 0;
 		else
 		{
-			if (p0->y > p1->y)
+			if (texturePoint0->y > texturePoint1->y)
 				return 1;
 			else
 				return -1;
 		}
 	}
 	else
-		return p0->line - p1->line;
+		return texturePoint0->line - texturePoint1->line;
 	//	return 0;
 }
 
@@ -4298,17 +4299,17 @@ void txang()
 
 void deltx()
 {
-	unsigned ind, cnt;
+	unsigned iTexture, textureCount;
 
-	cnt = SelectedForm->fillInfo.texture.count;
-	if (TextureIndex&&istx(ClosestFormToCursor) && cnt)
+	textureCount = SelectedForm->fillInfo.texture.count;
+	if (TextureIndex&&istx(ClosestFormToCursor) && textureCount)
 	{
-		ind = SelectedForm->fillInfo.texture.index;
-		MoveMemory(&TexturePointsBuffer[ind], &TexturePointsBuffer[ind + cnt], TextureIndex - (ind + cnt));
-		for (ind = ClosestFormToCursor + 1; ind < FormIndex; ind++)
+		iTexture = SelectedForm->fillInfo.texture.index;
+		MoveMemory(&TexturePointsBuffer[iTexture], &TexturePointsBuffer[iTexture + textureCount], TextureIndex - (iTexture + textureCount));
+		for (iTexture = ClosestFormToCursor + 1; iTexture < FormIndex; iTexture++)
 		{
-			if (istx(ind))
-				FormList[ind].fillInfo.texture.index -= cnt;
+			if (istx(iTexture))
+				FormList[iTexture].fillInfo.texture.index -= textureCount;
 		}
 		TextureIndex -= SelectedForm->fillInfo.texture.count;
 		SelectedForm->fillInfo.texture.count = 0;
@@ -4317,55 +4318,56 @@ void deltx()
 
 void nutx()
 {
-	int			ind, ins;
-	FRMHED*		pf;
+	int			iForm, iPoint;
+	FRMHED*		formHeader;
 
+	// ToDo - Should 6 be replaced with sizeof(TXPNT)
 	qsort((void*)&TempTexturePoints, TextureScreen.index, 6, txcmp);
-	ins = 0;
+	iPoint = 0;
 	if (FormIndex)
 	{
 		if (istx(ClosestFormToCursor))
 		{
-			ins = FormList[ClosestFormToCursor].fillInfo.texture.index;
+			iPoint = FormList[ClosestFormToCursor].fillInfo.texture.index;
 			deltx();
 		}
 		else
 		{
-			for (ind = ClosestFormToCursor - 1; ind >= 0; ind--)
+			for (iForm = ClosestFormToCursor - 1; iForm >= 0; iForm--)
 			{
-				if (istx(ind))
+				if (istx(iForm))
 				{
-					pf = &FormList[ind];
-					ins = pf->fillInfo.texture.index + pf->fillInfo.texture.count;
+					formHeader = &FormList[iForm];
+					iPoint = formHeader->fillInfo.texture.index + formHeader->fillInfo.texture.count;
 					goto nutskp;
 				}
 			}
 		nutskp:;
 		}
 	}
-	txspac(ins, TextureScreen.index);
-	MoveMemory(&TexturePointsBuffer[ins], &TempTexturePoints, TextureScreen.index * sizeof(TXPNT));
-	SelectedForm->fillInfo.texture.index = ins;
+	txspac(iPoint, TextureScreen.index);
+	MoveMemory(&TexturePointsBuffer[iPoint], &TempTexturePoints, TextureScreen.index * sizeof(TXPNT));
+	SelectedForm->fillInfo.texture.index = iPoint;
 	SelectedForm->fillInfo.texture.count = TextureScreen.index;
 }
 
 void altx()
 {
-	int ind;
-	float hi2;
+	int iLine, iPoint;
+	float halfHeight;
 
 	if (chkMap(FORMSEL))
 	{
-		hi2 = TextureScreen.areaHeight / 2;
+		halfHeight = TextureScreen.areaHeight / 2;
 		clRmap((TextureScreen.lines >> 5) + 1);
-		for (ind = 0; ind < TextureScreen.index; ind++)
-			setr(TempTexturePoints[ind].line);
-		for (ind = 1; ind <= TextureScreen.lines; ind++)
+		for (iPoint = 0; iPoint < TextureScreen.index; iPoint++)
+			setr(TempTexturePoints[iPoint].line);
+		for (iLine = 1; iLine <= TextureScreen.lines; iLine++)
 		{
-			if (!chkr(ind))
+			if (!chkr(iLine))
 			{
-				TempTexturePoints[TextureScreen.index].line = ind;
-				TempTexturePoints[TextureScreen.index].y = hi2;
+				TempTexturePoints[TextureScreen.index].line = iLine;
+				TempTexturePoints[TextureScreen.index].y = halfHeight;
 				TextureScreen.index++;
 			}
 		}
@@ -4380,7 +4382,7 @@ enum
 	ANGTYP,
 };
 
-void dutxfn(unsigned typ)
+void dutxfn(unsigned textureType)
 {
 	if (chkMap(FORMSEL))
 	{
@@ -4394,7 +4396,7 @@ void dutxfn(unsigned typ)
 			SelectedForm->extendedAttribute |= AT_SQR;
 		else
 			SelectedForm->extendedAttribute &= (~AT_SQR);
-		switch (typ)
+		switch (textureType)
 		{
 		case VRTYP:
 
@@ -4418,37 +4420,42 @@ void dutxfn(unsigned typ)
 
 void txsrt()
 {
+	// ToDo - replace 6 with sizeof(TXPNT) ?
 	qsort((void*)TempTexturePoints, TextureScreen.index, 6, txcmp);
 }
 
 void dutxmir()
 {
-	int lin, ind, ine;
+	int centerLine, iPoint, iMirrorPoint;
 
 	savtxt();
 	txsrt();
-	lin = (TextureScreen.lines + 1) >> 1;
-	ind = TextureScreen.index - 1;
-	while (TempTexturePoints[ind].line > lin&&ind >= 0)
-		ind--;
-	ine = ind + 1;
+	// ToDo - Is this function correct?
+	//        How is TempTexturePoints populated?
+	//        Since there could be less points in the mirrored texture, 
+	//        does that mean that delete and new textures are setup correctly?
+	centerLine = (TextureScreen.lines + 1) >> 1;
+	iPoint = TextureScreen.index - 1;
+	while (TempTexturePoints[iPoint].line > centerLine&&iPoint >= 0)
+		iPoint--;
+	iMirrorPoint = iPoint + 1;
 	if (TextureScreen.lines & 1)
 	{
-		while (ind >= 0) {
-			if (TempTexturePoints[ind].line == lin) {
-				ind--;
+		while (iPoint >= 0) {
+			if (TempTexturePoints[iPoint].line == centerLine) {
+				iPoint--;
 			}
 			else { break; }
 		}
 	}
-	while (ind >= 0)
+	while (iPoint >= 0)
 	{
-		TempTexturePoints[ine].line = TextureScreen.lines - TempTexturePoints[ind].line + 1;
-		TempTexturePoints[ine].y = TempTexturePoints[ind].y;
-		ine++;
-		ind--;
+		TempTexturePoints[iMirrorPoint].line = TextureScreen.lines - TempTexturePoints[iPoint].line + 1;
+		TempTexturePoints[iMirrorPoint].y = TempTexturePoints[iPoint].y;
+		iMirrorPoint++;
+		iPoint--;
 	}
-	TextureScreen.index = ine;
+	TextureScreen.index = iMirrorPoint;
 	setMap(RESTCH);
 }
 
@@ -4499,7 +4506,7 @@ BOOL chkbut()
 
 void txtlbut()
 {
-	POINT	tpnt;
+	POINT	point;
 
 	fvars(ClosestFormToCursor);
 	if (chkbut())
@@ -4518,11 +4525,11 @@ void txtlbut()
 	}
 	if (SelectedTexturePointsCount)
 	{
-		deorg(&tpnt);
-		if (tpnt.x > TexturePixelRect.left&&
-			tpnt.x<TexturePixelRect.right&&
-			tpnt.y>TexturePixelRect.top&&
-			tpnt.y < TexturePixelRect.bottom)
+		deorg(&point);
+		if (point.x > TexturePixelRect.left&&
+			point.x<TexturePixelRect.right&&
+			point.y>TexturePixelRect.top&&
+			point.y < TexturePixelRect.bottom)
 		{
 			setxmov();
 			ritxrct();
@@ -4547,28 +4554,28 @@ void txtlbut()
 
 void redtbak()
 {
-	TXHST*		phst;
+	TXHST*		textureHistoryItem;
 
 	//	sprintf_s(MsgBuffer, sizeof(MsgBuffer),"%d\n",TextureHistoryIndex);
 	//	OutputDebugString(MsgBuffer);
-	phst = &TextureHistory[TextureHistoryIndex];
-	TextureScreen.areaHeight = phst->height;
-	TextureScreen.width = phst->width;
-	TextureScreen.spacing = phst->spacing;
-	TextureScreen.index = phst->count;
+	textureHistoryItem = &TextureHistory[TextureHistoryIndex];
+	TextureScreen.areaHeight = textureHistoryItem->height;
+	TextureScreen.width = textureHistoryItem->width;
+	TextureScreen.spacing = textureHistoryItem->spacing;
+	TextureScreen.index = textureHistoryItem->count;
 	// ToDo - check texturePoint is valid first
-	MoveMemory (TempTexturePoints, phst->texturePoint, phst->count * sizeof (TXPNT));
+	MoveMemory (TempTexturePoints, textureHistoryItem->texturePoint, textureHistoryItem->count * sizeof (TXPNT));
 	setMap(RESTCH);
 }
 
 void txbak()
 {
-	unsigned	ind;
+	unsigned	iHistory;
 
 	if (chkMap(WASTXBAK))
 	{
 		SelectedTexturePointsCount = 0;
-		for (ind = 0; ind < 16; ind++)
+		for (iHistory = 0; iHistory < 16; iHistory++)
 		{
 			if (TextureHistory[TextureHistoryIndex].width)
 				goto txbak1;
@@ -4583,11 +4590,11 @@ void txbak()
 
 void nxbak()
 {
-	unsigned ind;
+	unsigned iHistory;
 
 	if (chkMap(WASTXBAK))
 	{
-		for (ind = 0; ind < 16; ind++)
+		for (iHistory = 0; iHistory < 16; iHistory++)
 		{
 			txrfor();
 			if (TextureHistory[TextureHistoryIndex].width)
@@ -4601,33 +4608,33 @@ void nxbak()
 
 void txtdel()
 {
-	int			ind, ine;
-	unsigned	clo;
+	int			iPoint, iSourcePoint, iOutputPoint;
+	unsigned	iClosestPoint;
 
 	if (SelectedTexturePointsCount)
 	{
 		savtxt();
 		clRmap(RMAPSIZ);
-		for (ind = 0; ind < SelectedTexturePointsCount; ind++)
-			setr(SelectedTexturePointsList[ind]);
-		ine = 0;
-		for (ind = 0; ind < TextureScreen.index; ind++)
+		for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
+			setr(SelectedTexturePointsList[iPoint]);
+		iOutputPoint = 0;
+		for (iSourcePoint = 0; iSourcePoint < TextureScreen.index; iSourcePoint++)
 		{
-			if (!chkr(ind))
+			if (!chkr(iSourcePoint))
 			{
-				TempTexturePoints[ine].line = TempTexturePoints[ind].line;
-				TempTexturePoints[ine].y = TempTexturePoints[ind].y;
-				ine++;
+				TempTexturePoints[iOutputPoint].line = TempTexturePoints[iSourcePoint].line;
+				TempTexturePoints[iOutputPoint].y = TempTexturePoints[iSourcePoint].y;
+				iOutputPoint++;
 			}
 		}
 		SelectedTexturePointsCount = 0;
-		TextureScreen.index = ine;
+		TextureScreen.index = iOutputPoint;
 		setMap(RESTCH);
 		return;
 	}
-	if (TextureScreen.index&&txtclos(&clo))
+	if (TextureScreen.index&&txtclos(&iClosestPoint))
 	{
-		MoveMemory(&TempTexturePoints[clo], &TempTexturePoints[clo + 1], (TextureScreen.index - clo) * sizeof(TXPNT));
+		MoveMemory(&TempTexturePoints[iClosestPoint], &TempTexturePoints[iClosestPoint + 1], (TextureScreen.index - iClosestPoint) * sizeof(TXPNT));
 		TextureScreen.index--;
 		setMap(RESTCH);
 	}
@@ -4644,36 +4651,36 @@ void txdelal()
 
 void chktxnum()
 {
-	float tflt;
+	float value;
 
-	tflt = atof(TextureInputBuffer);
-	if (tflt)
+	value = atof(TextureInputBuffer);
+	if (value)
 	{
-		tflt *= PFGRAN;
+		value *= PFGRAN;
 		switch (TextureWindowId)
 		{
 		case HTXHI:
 
 			savtxt();
-			TextureScreen.areaHeight = tflt;
-			IniFile.textureHeight = tflt;
+			TextureScreen.areaHeight = value;
+			IniFile.textureHeight = value;
 			setMap(CHKTX);
 			break;
 
 		case HTXWID:
 
 			savtxt();
-			TextureScreen.width = tflt;
-			IniFile.textureWidth = tflt;
+			TextureScreen.width = value;
+			IniFile.textureWidth = value;
 			setMap(CHKTX);
 			break;
 
 		case HTXSPAC:
 
 			savtxt();
-			TextureScreen.spacing = tflt;
-			IniFile.textureSpacing = tflt;
-			TextureScreen.width = tflt*TextureScreen.lines + tflt / 2;
+			TextureScreen.spacing = value;
+			IniFile.textureSpacing = value;
+			TextureScreen.width = value*TextureScreen.lines + value / 2;
 			setMap(CHKTX);
 			break;
 		}
@@ -4718,20 +4725,20 @@ BOOL istxclp()
 
 }
 
-void txsiz(double rat)
+void txsiz(double ratio)
 {
-	unsigned	ind;
-	fRECTANGLE		arct;
+	unsigned	iVertex;
+	fRECTANGLE	angleRect;
 
 	ritxfrm();
-	for (ind = 0; ind < AngledForm.vertexCount; ind++)
+	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++)
 	{
-		AngledFormVertices[ind].x *= rat;
-		AngledFormVertices[ind].y *= rat;
+		AngledFormVertices[iVertex].x *= ratio;
+		AngledFormVertices[iVertex].y *= ratio;
 	}
-	angrct(&arct);
-	TextureScreen.formCenter.x = midl(arct.right, arct.left);
-	TextureScreen.formCenter.y = midl(arct.top, arct.bottom);
+	angrct(&angleRect);
+	TextureScreen.formCenter.x = midl(angleRect.right, angleRect.left);
+	TextureScreen.formCenter.y = midl(angleRect.top, angleRect.bottom);
 	ed2px(TextureScreen.formCenter, &SelectTexturePointsOrigin);
 	ritxfrm();
 }
@@ -4746,60 +4753,60 @@ void txgro()
 	txsiz(1 / TXTRAT);
 }
 
-BOOL txdig(unsigned cod, TCHAR* chr)
+BOOL txdig(unsigned keyCode, TCHAR* character)
 {
-	if (isdigit(cod))
+	if (isdigit(keyCode))
 	{
-		*chr = (TCHAR)cod;
+		*character = (TCHAR)keyCode;
 		return 1;
 	}
-	if (cod >= VK_NUMPAD0&&cod <= VK_NUMPAD9)
+	if (keyCode >= VK_NUMPAD0&&keyCode <= VK_NUMPAD9)
 	{
-		*chr = (TCHAR)cod - VK_NUMPAD0 + 0x30;
+		*character = (TCHAR)keyCode - VK_NUMPAD0 + 0x30;
 		return 1;
 	}
-	if (cod == 0xbe || cod == 0x6e)
+	if (keyCode == 0xbe || keyCode == 0x6e)
 	{
-		*chr = '.';
+		*character = '.';
 		return 1;
 	}
 	return 0;
 }
 
-void txnudg(int dx, float dy)
+void txnudg(int deltaX, float deltaY)
 {
-	float fdy;
-	float tflt;
-	int ind, tlin;
+	float screenDeltaY;
+	float yCoord;
+	int iPoint, textureLine;
 
 	if (SelectedTexturePointsCount)
 	{
-		if (dy)
+		if (deltaY)
 		{
-			fdy = dy*TextureScreen.editToPixelRatio;
-			for (ind = 0; ind < SelectedTexturePointsCount; ind++)
+			screenDeltaY = deltaY*TextureScreen.editToPixelRatio;
+			for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
 			{
-				tflt = TempTexturePoints[SelectedTexturePointsList[ind]].y + fdy;
-				if (tflt < 0)
+				yCoord = TempTexturePoints[SelectedTexturePointsList[iPoint]].y + screenDeltaY;
+				if (yCoord < 0)
 					return;
-				if (tflt > TextureScreen.areaHeight)
+				if (yCoord > TextureScreen.areaHeight)
 					return;
 			}
-			for (ind = 0; ind < SelectedTexturePointsCount; ind++)
-				TempTexturePoints[SelectedTexturePointsList[ind]].y += fdy;
+			for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
+				TempTexturePoints[SelectedTexturePointsList[iPoint]].y += screenDeltaY;
 		}
 		else
 		{
-			for (ind = 0; ind < SelectedTexturePointsCount; ind++)
+			for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
 			{
-				tlin = TempTexturePoints[SelectedTexturePointsList[ind]].line + dx;
-				if (tlin < 1)
+				textureLine = TempTexturePoints[SelectedTexturePointsList[iPoint]].line + deltaX;
+				if (textureLine < 1)
 					return;
-				if (tlin > TextureScreen.lines)
+				if (textureLine > TextureScreen.lines)
 					return;
 			}
-			for (ind = 0; ind < SelectedTexturePointsCount; ind++)
-				TempTexturePoints[SelectedTexturePointsList[ind]].line += dx;
+			for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
+				TempTexturePoints[SelectedTexturePointsList[iPoint]].line += deltaX;
 		}
 	}
 	dutxrct(&TextureRect);
@@ -4808,43 +4815,43 @@ void txnudg(int dx, float dy)
 
 void txsnap()
 {
-	int ind, cnt;
-	float siz2;
-	TXPNT*	tp;
+	int iPoint, yStep;
+	float halfGrid;
+	TXPNT*	texturePoint;
 
 	if (TextureScreen.index)
 	{
 		savtxt();
-		siz2 = IniFile.gridSize / 2;
+		halfGrid = IniFile.gridSize / 2;
 		if (SelectedTexturePointsCount)
 		{
-			for (ind = 0; ind < SelectedTexturePointsCount; ind++)
+			for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
 			{
-				tp = &TempTexturePoints[SelectedTexturePointsList[ind]];
-				cnt = (tp->y + siz2) / IniFile.gridSize;
-				tp->y = cnt*IniFile.gridSize;
+				texturePoint = &TempTexturePoints[SelectedTexturePointsList[iPoint]];
+				yStep = (texturePoint->y + halfGrid) / IniFile.gridSize;
+				texturePoint->y = yStep*IniFile.gridSize;
 			}
 		}
 		else
 		{
-			for (ind = 0; ind < TextureScreen.index; ind++)
+			for (iPoint = 0; iPoint < TextureScreen.index; iPoint++)
 			{
-				tp = &TempTexturePoints[ind];
-				cnt = (tp->y + siz2) / IniFile.gridSize;
-				tp->y = cnt*IniFile.gridSize;
+				texturePoint = &TempTexturePoints[iPoint];
+				yStep = (texturePoint->y + halfGrid) / IniFile.gridSize;
+				texturePoint->y = yStep*IniFile.gridSize;
 			}
 		}
 		setMap(RESTCH);
 	}
 }
 
-void txtkey(unsigned cod)
+void txtkey(unsigned keyCode)
 {
-	TCHAR chr;
+	TCHAR character;
 
 	if (SideWindowButton)
 	{
-		switch (cod)
+		switch (keyCode)
 		{
 		case VK_RETURN:
 
@@ -4867,9 +4874,9 @@ void txtkey(unsigned cod)
 				TextureInputIndex--;
 			goto txskp;
 		}
-		if (txdig(cod, &chr))
+		if (txdig(keyCode, &character))
 		{
-			TextureInputBuffer[TextureInputIndex] = chr;
+			TextureInputBuffer[TextureInputIndex] = character;
 			TextureInputIndex++;
 		}
 	txskp:;
@@ -4877,7 +4884,7 @@ void txtkey(unsigned cod)
 		SetWindowText(SideWindowButton, TextureInputBuffer);
 		return;
 	}
-	switch (cod)
+	switch (keyCode)
 	{
 	case VK_ESCAPE:
 
@@ -4999,25 +5006,25 @@ void txtkey(unsigned cod)
 
 void setxt()
 {
-	TXPNT*		pbak;
-	int			ind, cnt;
+	TXPNT*		currentFormTexture;
+	int			iTexturePoint, count;
 
 	savtxt();
 	SelectedForm->wordParam = 0;
 	setMap(TXFIL);
 	ClipRectSize.cx = SelectedForm->fillSpacing;
 	ClipRectSize.cy = SelectedForm->fillInfo.texture.height;
+	// ToDo - use local memory allocation 
 	TextureSegments = (RNGCNT*)&MarkedStitchMap;
-	pbak = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
 	FillMemory(TextureSegments, SelectedForm->fillInfo.texture.lines * sizeof(RNGCNT), 0);
-	pbak = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
-	cnt = SelectedForm->fillInfo.texture.count;
-	if (cnt)
+	currentFormTexture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
+	count = SelectedForm->fillInfo.texture.count;
+	if (count)
 	{
-		for (ind = cnt - 1; ind >= 0; ind--)
+		for (iTexturePoint = count - 1; iTexturePoint >= 0; iTexturePoint--)
 		{
-			TextureSegments[pbak[ind].line - 1].line = ind;
-			TextureSegments[pbak[ind].line - 1].stitchCount++;
+			TextureSegments[currentFormTexture[iTexturePoint].line - 1].line = iTexturePoint;
+			TextureSegments[currentFormTexture[iTexturePoint].line - 1].stitchCount++;
 		}
 	}
 }
