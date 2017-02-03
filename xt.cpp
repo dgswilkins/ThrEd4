@@ -5520,109 +5520,109 @@ void lodchk()
 	}
 }
 
-void chkclp(FRMHED* formHeader, BADCNTS* badCounts)
+void chkclp(FRMHED* formHeader, BADCNTS* badData)
 {
-	if (badCounts->clip == formHeader->angleOrClipData.clip - ClipPoints)
-		badCounts->clip += formHeader->lengthOrCount.clipCount;
+	if (badData->clip == formHeader->angleOrClipData.clip - ClipPoints)
+		badData->clip += formHeader->lengthOrCount.clipCount;
 	else
-		badCounts->attribute |= BADCLP;
+		badData->attribute |= BADCLP;
 }
 
-void chkeclp(FRMHED* formHeader, BADCNTS* badCounts)
+void chkeclp(FRMHED* formHeader, BADCNTS* badData)
 {
-	if (badCounts->clip == formHeader->borderClipData - ClipPoints)
-		badCounts->clip += formHeader->clipEntries;
+	if (badData->clip == formHeader->borderClipData - ClipPoints)
+		badData->clip += formHeader->clipEntries;
 	else
-		badCounts->attribute |= BADCLP;
+		badData->attribute |= BADCLP;
 }
 
 unsigned frmchkfn()
 {
 	unsigned	iForm;
 	FRMHED*		formHeader;
-	BADCNTS		badCounts;
+	BADCNTS		badData;
 
-	FillMemory(&badCounts, sizeof(BADCNTS), 0);
+	FillMemory(&badData, sizeof(BADCNTS), 0);
 	if (FormIndex)
 	{
 		for (iForm = 0; iForm < FormIndex; iForm++)
 		{
 			formHeader = &FormList[iForm];
-			if (!(badCounts.attribute&BADFLT))
+			if (!(badData.attribute&BADFLT))
 			{
 				if (!formHeader->vertexCount)
-					badCounts.attribute |= BADFLT;
-				if (badCounts.flt == formHeader->vertices - FormVertices)
-					badCounts.flt += formHeader->vertexCount;
+					badData.attribute |= BADFLT;
+				if (badData.flt == formHeader->vertices - FormVertices)
+					badData.flt += formHeader->vertexCount;
 				else
-					badCounts.attribute |= BADFLT;
+					badData.attribute |= BADFLT;
 			}
-			if (!(badCounts.attribute&BADCLP))
+			if (!(badData.attribute&BADCLP))
 			{
 				if (isclp(iForm))
-					chkclp(formHeader, &badCounts);
+					chkclp(formHeader, &badData);
 				if (iseclp(iForm))
-					chkeclp(formHeader, &badCounts);
+					chkeclp(formHeader, &badData);
 			}
 			if (formHeader->type == SAT&&formHeader->satinGuideCount)
 			{
-				if (!(badCounts.attribute&BADSAT))
+				if (!(badData.attribute&BADSAT))
 				{
-					if (badCounts.sat == formHeader->satinOrAngle.sac - SatinConnects)
-						badCounts.sat += formHeader->satinGuideCount;
+					if (badData.sat == formHeader->satinOrAngle.sac - SatinConnects)
+						badData.sat += formHeader->satinGuideCount;
 					else
-						badCounts.attribute |= BADSAT;
+						badData.attribute |= BADSAT;
 				}
 			}
 			if (istx(iForm))
 			{
-				if (!(badCounts.attribute&BADTX))
+				if (!(badData.attribute&BADTX))
 				{
-					if (badCounts.tx == formHeader->fillInfo.texture.index)
-						badCounts.tx += formHeader->fillInfo.texture.count;
+					if (badData.tx == formHeader->fillInfo.texture.index)
+						badData.tx += formHeader->fillInfo.texture.count;
 					else
-						badCounts.attribute |= BADTX;
+						badData.attribute |= BADTX;
 				}
 			}
-			if (badCounts.attribute == (BADFLT | BADCLP | BADSAT | BADTX))
+			if (badData.attribute == (BADFLT | BADCLP | BADSAT | BADTX))
 				break;
 		}
-		if (badCounts.flt != (int)FormVertexIndex)
-			badCounts.attribute |= BADFLT;
-		if (badCounts.clip != (int)ClipPointIndex)
-			badCounts.attribute |= BADCLP;
-		if (badCounts.sat != (int)SatinConnectIndex)
-			badCounts.attribute |= BADSAT;
-		if (badCounts.tx != TextureIndex)
-			badCounts.attribute |= BADTX;
+		if (badData.flt != (int)FormVertexIndex)
+			badData.attribute |= BADFLT;
+		if (badData.clip != (int)ClipPointIndex)
+			badData.attribute |= BADCLP;
+		if (badData.sat != (int)SatinConnectIndex)
+			badData.attribute |= BADSAT;
+		if (badData.tx != TextureIndex)
+			badData.attribute |= BADTX;
 	}
-	return badCounts.attribute;
+	return badData.attribute;
 }
 
 void frmchkx()
 {
-	unsigned cod;
+	unsigned code;
 
 	if (IniFile.dataCheck)
 	{
-		cod = frmchkfn();
+		code = frmchkfn();
 		switch (IniFile.dataCheck)
 		{
 		case 1:
 
-			if (cod)
-				datmsg(cod);
+			if (code)
+				datmsg(code);
 			break;
 
 		case 2:
 
-			if (cod)
+			if (code)
 				repar();
 			break;
 
 		case 3:
 
-			if (cod)
+			if (code)
 			{
 				repar();
 				tabmsg(IDS_DATREP);
@@ -5631,247 +5631,249 @@ void frmchkx()
 	}
 }
 
-void bcup(unsigned find, BADCNTS* bc)
+void bcup(unsigned find, BADCNTS* badData)
 {
-	FRMHED* fp;
+	FRMHED* formHeader;
 
-	fp = &FormList[find];
+	formHeader = &FormList[find];
 	if (isclp(find))
-		bc->clip += fp->lengthOrCount.clipCount;
+		badData->clip += formHeader->lengthOrCount.clipCount;
 	if (iseclp(find))
-		bc->clip += fp->clipEntries;
-	if (fp->type == SAT)
-		bc->sat += fp->satinGuideCount;
+		badData->clip += formHeader->clipEntries;
+	if (formHeader->type == SAT)
+		badData->sat += formHeader->satinGuideCount;
 	if (istx(find))
-		bc->tx += fp->fillInfo.texture.count;
+		badData->tx += formHeader->fillInfo.texture.count;
 }
 
 void chkfstch()
 {
-	unsigned cod, ind;
+	unsigned codedFormIndex, iStitch;
 
-	cod = FormIndex << FRMSHFT;
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++)
+	codedFormIndex = FormIndex << FRMSHFT;
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 	{
-		if ((StitchBuffer[ind].attribute&FRMSK) >= cod)
-			StitchBuffer[ind].attribute = NOTFRM;
+		if ((StitchBuffer[iStitch].attribute&FRMSK) >= codedFormIndex)
+			StitchBuffer[iStitch].attribute = NOTFRM;
 	}
 }
 
 void repflt()
 {
-	fPOINT* tflt;
-	unsigned ind, loc, cnt, dif;
-	FRMHED* fp;
-	BADCNTS bc;
+	fPOINT* vertexPoint;
+	unsigned iForm, iDestination, iVertex, vertexDifference;
+	FRMHED* formHeader;
+	BADCNTS badData;
 
-	loc = 0;
-	for (ind = 0; ind < FormIndex; ind++)
+	iDestination = 0;
+	for (iForm = 0; iForm < FormIndex; iForm++)
 	{
-		if (FormList[ind].vertexCount)
-			MoveMemory(&FormList[loc++], &FormList[ind], sizeof(FRMHED));
+		if (FormList[iForm].vertexCount)
+			MoveMemory(&FormList[iDestination++], &FormList[iForm], sizeof(FRMHED));
 	}
-	FormIndex = loc;
-	ZeroMemory(&bc, sizeof(BADCNTS));
-	tflt = (fPOINT*)BSequence;
-	loc = cnt = 0;
-	for (ind = 0; ind < FormIndex; ind++)
+	FormIndex = iDestination;
+	ZeroMemory(&badData, sizeof(BADCNTS));
+	// ToDo - allocate memory locally for vertexPoint
+	vertexPoint = (fPOINT*)BSequence;
+	iVertex = 0;
+	for (iForm = 0; iForm < FormIndex; iForm++)
 	{
-		fp = &FormList[ind];
-		dif = fp->vertices - FormVertices;
-		if (FormVertexIndex >= dif + fp->vertexCount)
+		formHeader = &FormList[iForm];
+		vertexDifference = formHeader->vertices - FormVertices;
+		if (FormVertexIndex >= vertexDifference + formHeader->vertexCount)
 		{
-			MoveMemory(&tflt[loc], fp->vertices, fp->vertexCount * sizeof(fPOINT));
-			fp->vertices = &FormVertices[loc];
-			loc += fp->vertexCount;
-			bcup(ind, &bc);
+			MoveMemory(&vertexPoint[iVertex], formHeader->vertices, formHeader->vertexCount * sizeof(fPOINT));
+			formHeader->vertices = &FormVertices[iVertex];
+			iVertex += formHeader->vertexCount;
+			bcup(iForm, &badData);
 		}
 		else
 		{
-			if (dif < FormVertexIndex)
+			if (vertexDifference < FormVertexIndex)
 			{
-				fp->vertexCount = FormVertexIndex - dif;
-				delsac(ind);
-				MoveMemory(&tflt[loc], fp->vertices, fp->vertexCount * sizeof(fPOINT));
-				bcup(ind, &bc);
+				formHeader->vertexCount = FormVertexIndex - vertexDifference;
+				delsac(iForm);
+				MoveMemory(&vertexPoint[iVertex], formHeader->vertices, formHeader->vertexCount * sizeof(fPOINT));
+				bcup(iForm, &badData);
 			}
 			else
 			{
-				FormIndex = ind;
-				ClipPointIndex = bc.clip;
-				SatinConnectIndex = bc.sat;
-				TextureIndex = bc.tx;
+				FormIndex = iForm;
+				ClipPointIndex = badData.clip;
+				SatinConnectIndex = badData.sat;
+				TextureIndex = badData.tx;
 				chkfstch();
-				adbad(IDS_FRMDAT, FormIndex - ind + 1);
+				adbad(IDS_FRMDAT, FormIndex - iForm + 1);
 				goto rfltskp;
 			}
 		}
 	}
-	FormVertexIndex = loc;
+	FormVertexIndex = iVertex;
 rfltskp:;
-	MoveMemory(FormVertices, tflt, sizeof(fPOINT)*FormVertexIndex);
+	MoveMemory(FormVertices, vertexPoint, sizeof(fPOINT)*FormVertexIndex);
 }
 
 void repclp()
 {
-	FRMHED*		fp;
-	unsigned	ind, cnt, loc, bcnt;
-	fPOINT*		tclps;
+	FRMHED*		formHeader;
+	unsigned	iForm, clipCount, clipDifference, badClipCount;
+	fPOINT*		clipPoint;
 
-	bcnt = cnt = 0;
-	tclps = (fPOINT*)&BSequence;
-	for (ind = 0; ind < FormIndex; ind++)
+	badClipCount = clipCount = 0;
+	// ToDo - allocate memory locally for clipPoint
+	clipPoint = (fPOINT*)&BSequence;
+	for (iForm = 0; iForm < FormIndex; iForm++)
 	{
-		fp = &FormList[ind];
-		if (isclp(ind))
+		formHeader = &FormList[iForm];
+		if (isclp(iForm))
 		{
-			loc = fp->angleOrClipData.clip - ClipPoints;
-			if (loc + fp->lengthOrCount.clipCount < ClipPointIndex)
+			clipDifference = formHeader->angleOrClipData.clip - ClipPoints;
+			if (clipDifference + formHeader->lengthOrCount.clipCount < ClipPointIndex)
 			{
-				MoveMemory(&tclps[cnt], fp->angleOrClipData.clip, sizeof(fPOINT)*fp->lengthOrCount.clipCount);
-				fp->angleOrClipData.clip = &ClipPoints[cnt];
-				cnt += fp->lengthOrCount.clipCount;
+				MoveMemory(&clipPoint[clipCount], formHeader->angleOrClipData.clip, sizeof(fPOINT)*formHeader->lengthOrCount.clipCount);
+				formHeader->angleOrClipData.clip = &ClipPoints[clipCount];
+				clipCount += formHeader->lengthOrCount.clipCount;
 			}
 			else
 			{
-				if (loc < ClipPointIndex)
+				if (clipDifference < ClipPointIndex)
 				{
-					fp->lengthOrCount.clipCount = FormVertexIndex - loc;
-					MoveMemory(&tclps[cnt], fp->angleOrClipData.clip, sizeof(fPOINT)*fp->lengthOrCount.clipCount);
-					fp->angleOrClipData.clip = &ClipPoints[cnt];
-					cnt += fp->lengthOrCount.clipCount;
+					formHeader->lengthOrCount.clipCount = FormVertexIndex - clipDifference;
+					MoveMemory(&clipPoint[clipCount], formHeader->angleOrClipData.clip, sizeof(fPOINT)*formHeader->lengthOrCount.clipCount);
+					formHeader->angleOrClipData.clip = &ClipPoints[clipCount];
+					clipCount += formHeader->lengthOrCount.clipCount;
 				}
 				else
 				{
-					bcnt++;
-					fp->fillType = 0;
+					badClipCount++;
+					formHeader->fillType = 0;
 				}
 			}
 		}
-		if (iseclp(ind))
+		if (iseclp(iForm))
 		{
-			loc = fp->borderClipData - ClipPoints;
-			if (loc + fp->clipEntries < ClipPointIndex)
+			clipDifference = formHeader->borderClipData - ClipPoints;
+			if (clipDifference + formHeader->clipEntries < ClipPointIndex)
 			{
-				MoveMemory(&tclps[cnt], fp->borderClipData, sizeof(fPOINT)*fp->clipEntries);
-				fp->borderClipData = &ClipPoints[cnt];
-				cnt += fp->clipEntries;
+				MoveMemory(&clipPoint[clipCount], formHeader->borderClipData, sizeof(fPOINT)*formHeader->clipEntries);
+				formHeader->borderClipData = &ClipPoints[clipCount];
+				clipCount += formHeader->clipEntries;
 			}
 			else
 			{
-				if (loc < ClipPointIndex)
+				if (clipDifference < ClipPointIndex)
 				{
-					fp->clipEntries = FormVertexIndex - loc;
-					MoveMemory(&tclps[cnt], fp->borderClipData, sizeof(fPOINT)*fp->clipEntries);
-					fp->borderClipData = &ClipPoints[cnt];
-					cnt += fp->clipEntries;
+					formHeader->clipEntries = FormVertexIndex - clipDifference;
+					MoveMemory(&clipPoint[clipCount], formHeader->borderClipData, sizeof(fPOINT)*formHeader->clipEntries);
+					formHeader->borderClipData = &ClipPoints[clipCount];
+					clipCount += formHeader->clipEntries;
 				}
 				else
 				{
-					bcnt++;
-					fp->fillType = 0;
+					badClipCount++;
+					formHeader->fillType = 0;
 				}
 			}
 		}
 	}
-	MoveMemory(&ClipPoints, tclps, cnt * sizeof(fPOINT));
-	ClipPointIndex = cnt;
-	if (bcnt)
-		adbad(IDS_CLPDAT, bcnt);
+	MoveMemory(&ClipPoints, clipPoint, clipCount * sizeof(fPOINT));
+	ClipPointIndex = clipCount;
+	if (badClipCount)
+		adbad(IDS_CLPDAT, badClipCount);
 }
 
 void repsat()
 {
-	unsigned ind, loc, cnt, dif;
-	FRMHED* fp;
-	BADCNTS bc;
+	unsigned iForm, guideCount, guideDifference;
+	FRMHED* formHeader;
+	BADCNTS badData;
 
-	ZeroMemory(&bc, sizeof(BADCNTS));
-	loc = cnt = 0;
-	for (ind = 0; ind < FormIndex; ind++)
+	ZeroMemory(&badData, sizeof(BADCNTS));
+	guideCount = 0;
+	for (iForm = 0; iForm < FormIndex; iForm++)
 	{
-		fp = &FormList[ind];
-		if (fp->type == SAT)
+		formHeader = &FormList[iForm];
+		if (formHeader->type == SAT)
 		{
-			dif = fp->satinOrAngle.sac - SatinConnects;
-			if (FormVertexIndex > dif + fp->vertexCount)
+			guideDifference = formHeader->satinOrAngle.sac - SatinConnects;
+			if (FormVertexIndex > guideDifference + formHeader->vertexCount)
 			{
-				MoveMemory(&SatinConnects[loc], fp->satinOrAngle.sac, fp->satinGuideCount * sizeof(SATCON));
-				fp->satinOrAngle.sac = &SatinConnects[loc];
-				loc += fp->satinGuideCount;
-				bcup(ind, &bc);
+				MoveMemory(&SatinConnects[guideCount], formHeader->satinOrAngle.sac, formHeader->satinGuideCount * sizeof(SATCON));
+				formHeader->satinOrAngle.sac = &SatinConnects[guideCount];
+				guideCount += formHeader->satinGuideCount;
+				bcup(iForm, &badData);
 			}
 			else
 			{
-				if (dif < SatinConnectIndex)
+				if (guideDifference < SatinConnectIndex)
 				{
-					fp->satinGuideCount = SatinConnectIndex - dif;
-					MoveMemory(&SatinConnects[loc], fp->satinOrAngle.sac, fp->satinGuideCount * sizeof(SATCON));
-					bcup(ind, &bc);
+					formHeader->satinGuideCount = SatinConnectIndex - guideDifference;
+					MoveMemory(&SatinConnects[guideCount], formHeader->satinOrAngle.sac, formHeader->satinGuideCount * sizeof(SATCON));
+					bcup(iForm, &badData);
 				}
 				else
 				{
-					loc = bc.sat;
-					fp->satinGuideCount = 0;
+					guideCount = badData.sat;
+					formHeader->satinGuideCount = 0;
 				}
 			}
 		}
 	}
-	SatinConnectIndex = loc;
+	SatinConnectIndex = guideCount;
 }
 
 void reptx()
 {
-	unsigned ind, loc, cnt;
-	FRMHED* fp;
-	BADCNTS bc;
+	unsigned iForm, textureCount;
+	FRMHED* formHeader;
+	BADCNTS badData;
 
-	ZeroMemory(&bc, sizeof(BADCNTS));
-	loc = cnt = 0;
-	for (ind = 0; ind < FormIndex; ind++)
+	ZeroMemory(&badData, sizeof(BADCNTS));
+	textureCount = 0;
+	for (iForm = 0; iForm < FormIndex; iForm++)
 	{
-		if (istx(ind))
+		if (istx(iForm))
 		{
-			fp = &FormList[ind];
-			if (TextureIndex > fp->fillInfo.texture.index + fp->fillInfo.texture.count)
+			formHeader = &FormList[iForm];
+			if (TextureIndex > formHeader->fillInfo.texture.index + formHeader->fillInfo.texture.count)
 			{
-				MoveMemory(&SatinConnects[loc], &SatinConnects[fp->fillInfo.texture.index], fp->fillInfo.texture.count * sizeof(SATCON));
-				fp->fillInfo.texture.index = loc;
-				loc += fp->fillInfo.texture.count;
-				bcup(ind, &bc);
+				MoveMemory(&SatinConnects[textureCount], &SatinConnects[formHeader->fillInfo.texture.index], formHeader->fillInfo.texture.count * sizeof(SATCON));
+				formHeader->fillInfo.texture.index = textureCount;
+				textureCount += formHeader->fillInfo.texture.count;
+				bcup(iForm, &badData);
 			}
 			else
 			{
-				if (TextureIndex > fp->fillInfo.texture.index)
+				if (TextureIndex > formHeader->fillInfo.texture.index)
 				{
-					fp->fillInfo.texture.count = TextureIndex - fp->fillInfo.texture.index;
-					MoveMemory(&SatinConnects[loc], &SatinConnects[fp->fillInfo.texture.index], fp->fillInfo.texture.count * sizeof(SATCON));
-					fp->fillInfo.texture.index = loc;
-					bcup(ind, &bc);
-					loc = bc.tx;
+					formHeader->fillInfo.texture.count = TextureIndex - formHeader->fillInfo.texture.index;
+					MoveMemory(&SatinConnects[textureCount], &SatinConnects[formHeader->fillInfo.texture.index], formHeader->fillInfo.texture.count * sizeof(SATCON));
+					formHeader->fillInfo.texture.index = textureCount;
+					bcup(iForm, &badData);
+					textureCount = badData.tx;
 				}
 				else
-					fp->fillType = 0;
+					formHeader->fillType = 0;
 			}
 		}
 	}
-	TextureIndex = loc;
+	TextureIndex = textureCount;
 }
 
 void repar()
 {
-	unsigned cod;
+	unsigned repairType;
 
 	savdo();
 	StringData = MsgBuffer;
-	cod = frmchkfn();
-	if (cod&BADFLT)
+	repairType = frmchkfn();
+	if (repairType&BADFLT)
 		repflt();
-	if (cod&BADCLP)
+	if (repairType&BADCLP)
 		repclp();
-	if (cod&BADSAT)
+	if (repairType&BADSAT)
 		repsat();
-	if (cod&BADTX)
+	if (repairType&BADTX)
 		reptx();
 	lodchk();
 	setMap(RESTCH);
