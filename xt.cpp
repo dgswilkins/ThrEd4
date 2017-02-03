@@ -11,7 +11,7 @@
 
 void		chktxnum();
 void		deltx();
-unsigned	dutyp(unsigned tat);
+unsigned	dutyp(unsigned attribute);
 void		redtbak();
 void		repar();
 void		rotbak();
@@ -2777,18 +2777,18 @@ void uspacfn(unsigned find, float spacing)
 	}
 }
 
-void duspac(float spac)
+void duspac(float spacing)
 {
-	unsigned ind;
+	unsigned iForm;
 
 	savdo();
 	if (SelectedFormCount)
 	{
-		for (ind = 0; ind < SelectedFormCount; ind++)
-			uspacfn(SelectedFormList[ind], spac);
+		for (iForm = 0; iForm < SelectedFormCount; iForm++)
+			uspacfn(SelectedFormList[iForm], spacing);
 	}
 	if (chkMap(FORMSEL))
-		uspacfn(ClosestFormToCursor, spac);
+		uspacfn(ClosestFormToCursor, spacing);
 	coltab();
 	setMap(RESTCH);
 }
