@@ -486,42 +486,42 @@ unsigned char* Levels[] = {
 };
 
 
-void frmcpy(FRMHED* dst, FRMHED* src) {
+void frmcpy(FRMHED* destination, FRMHED* source) {
 #if	 __UseASM__
 	unsigned index = sizeof(FRMHED);
 
 	_asm {
-		mov		edi, dst
+		mov		edi, destination
 		mov		ecx, index
 		shr		ecx, 2
-		mov		esi, src
+		mov		esi, source
 		rep		movsd
 	}
 #else
-	memcpy(dst, src, sizeof(FRMHED));
+	memcpy(destination, source, sizeof(FRMHED));
 #endif
 }
 
-void frmclr(FRMHED* dst) {
+void frmclr(FRMHED* destination) {
 #if	 __UseASM__
-	unsigned index = sizeof(FRMHED);
+	unsigned formHeaderSize = sizeof(FRMHED);
 
 	_asm {
-		mov		edi, dst
-		mov		ecx, index
+		mov		edi, destination
+		mov		ecx, formHeaderSize
 		shr		ecx, 2
 		xor eax, eax
 		rep		stosd
 	}
 #else
-	memset(dst, 0, sizeof(FRMHED));
+	memset(destination, 0, sizeof(FRMHED));
 #endif
 }
 
-void duinf(FRMHED* p_hed) {
+void duinf(FRMHED* formHeader) {
 #if	 __UseASM__
 	_asm {
-		mov		ebx, p_hed
+		mov		ebx, formHeader
 		mov		eax, [ebx]
 		mov		ebx, offset FormInfo
 		xor		ecx, ecx
@@ -540,9 +540,9 @@ void duinf(FRMHED* p_hed) {
 	}
 #else
 	//Correct
-	FormInfo.type = p_hed->attribute & 0xf;
-	FormInfo.attribute = (p_hed->attribute >> 4) & 0xf;
-	FormInfo.sideCount = p_hed->vertexCount;
+	FormInfo.type = formHeader->attribute & 0xf;
+	FormInfo.attribute = (formHeader->attribute >> 4) & 0xf;
+	FormInfo.sideCount = formHeader->vertexCount;
 #endif
 }
 
@@ -585,27 +585,27 @@ int comp(const void *arg1, const void *arg2) {
 							 cmpx :
 	}
 #else
-	const dPOINTLINE **pnts1 = (const dPOINTLINE **)arg1, **pnts2 = (const dPOINTLINE **)arg2;
+	const dPOINTLINE **Point1 = (const dPOINTLINE **)arg1, **point2 = (const dPOINTLINE **)arg2;
 
-	if ((*pnts2)->y < (*pnts1)->y)
+	if ((*point2)->y < (*Point1)->y)
 		return 1;
-	if ((*pnts2)->y > (*pnts1)->y)
+	if ((*point2)->y > (*Point1)->y)
 		return -1;
 
-	if ((*pnts2)->x < (*pnts1)->x)
+	if ((*point2)->x < (*Point1)->x)
 		return 1;
-	if ((*pnts2)->x > (*pnts1)->x)
+	if ((*point2)->x > (*Point1)->x)
 		return -1;
 
 	return 0;
 #endif
 }
 
-void getfinfo(unsigned ind) {
-	duinf(&FormList[ind]);
+void getfinfo(unsigned iForm) {
+	duinf(&FormList[iForm]);
 }
 
-unsigned satind(SATCON* pnt) {
+unsigned satind(SATCON* guide) {
 #if	 __UseASM__
 	_asm {
 		mov		eax, pnt
@@ -613,7 +613,7 @@ unsigned satind(SATCON* pnt) {
 		shr		eax, 2
 	}
 #else
-	return pnt - SatinConnects;
+	return guide - SatinConnects;
 #endif
 }
 
@@ -624,52 +624,51 @@ void dusqr() {
 		SelectedForm->extendedAttribute &= (~AT_SQR);
 }
 
-void sacspac(SATCON* strt, unsigned cnt) {
-	int			strti, cnti;
-	int			src, dst;
-	unsigned	ind;
+void sacspac(SATCON* startGuide, unsigned guideCount) {
+	int			iStartGuide;
+	int			source, destination;
+	unsigned	iForm;
 
-	strti = satind(strt);
-	cnti = SatinConnectIndex - strti;
-	src = SatinConnectIndex - 1;
-	dst = SatinConnectIndex + cnt - 1;
-	while (src >= strti) {
-		SatinConnects[dst].start = SatinConnects[src].start;
-		SatinConnects[dst--].finish = SatinConnects[src--].finish;
+	iStartGuide = satind(startGuide);
+	source = SatinConnectIndex - 1;
+	destination = SatinConnectIndex + guideCount - 1;
+	while (source >= iStartGuide) {
+		SatinConnects[destination].start = SatinConnects[source].start;
+		SatinConnects[destination--].finish = SatinConnects[source--].finish;
 	}
-	for (ind = ClosestFormToCursor + 1; ind < FormIndex; ind++) {
-		if (FormList[ind].type == SAT)
-			FormList[ind].satinOrAngle.sac += cnt;
+	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+		if (FormList[iForm].type == SAT)
+			FormList[iForm].satinOrAngle.sac += guideCount;
 	}
-	SatinConnectIndex += cnt;
+	SatinConnectIndex += guideCount;
 }
 
-SATCON* nusac(unsigned pfrm, unsigned cnt) {
-	unsigned ind, ine;
+SATCON* nusac(unsigned formIndex, unsigned guideCount) {
+	unsigned iForm, guideIndex;
 
-	ine = 0;
-	for (ind = 0; ind < pfrm; ind++) {
-		if (FormList[ind].type == SAT)
-			ine += FormList[ind].satinGuideCount;
+	guideIndex = 0;
+	for (iForm = 0; iForm < formIndex; iForm++) {
+		if (FormList[iForm].type == SAT)
+			guideIndex += FormList[iForm].satinGuideCount;
 	}
-	FormList[pfrm].satinOrAngle.sac = &SatinConnects[ine];
-	sacspac(FormList[pfrm].satinOrAngle.sac, cnt);
-	return FormList[pfrm].satinOrAngle.sac;
+	FormList[formIndex].satinOrAngle.sac = &SatinConnects[guideIndex];
+	sacspac(FormList[formIndex].satinOrAngle.sac, guideCount);
+	return FormList[formIndex].satinOrAngle.sac;
 }
 
-void delclps(unsigned ind) {
-	deleclp(ind);
-	delmclp(ind);
+void delclps(unsigned iForm) {
+	deleclp(iForm);
+	delmclp(iForm);
 }
 
-unsigned findclp(unsigned fpnt) {
-	int ind;
+unsigned findclp(unsigned formIndex) {
+	int iForm;
 
-	for (ind = fpnt - 1; ind >= 0; ind--) {
-		if (iseclp(ind))
-			return FormList[ind].borderClipData - ClipPoints + FormList[ind].clipEntries;
-		if (isclp(ind))
-			return FormList[ind].angleOrClipData.clip - ClipPoints + FormList[ind].lengthOrCount.clipCount;
+	for (iForm = formIndex - 1; iForm >= 0; iForm--) {
+		if (iseclp(iForm))
+			return FormList[iForm].borderClipData - ClipPoints + FormList[iForm].clipEntries;
+		if (isclp(iForm))
+			return FormList[iForm].angleOrClipData.clip - ClipPoints + FormList[iForm].lengthOrCount.clipCount;
 	}
 	return 0;
 }
@@ -685,104 +684,105 @@ BOOL chkmax(unsigned arg0, unsigned arg1) {
 }
 
 void clpsub(unsigned fpnt, unsigned cnt) {
-	unsigned ind;
+	unsigned iForm;
 
-	for (ind = fpnt + 1; ind < FormIndex; ind++) {
-		if (isclpx(ind))
-			FormList[ind].angleOrClipData.clip -= cnt;
+	for (iForm = fpnt + 1; iForm < FormIndex; iForm++) {
+		if (isclpx(iForm))
+			FormList[iForm].angleOrClipData.clip -= cnt;
 		if (iseclpx(fpnt))
-			FormList[ind].borderClipData -= cnt;
+			FormList[iForm].borderClipData -= cnt;
 	}
 }
 
-void delmclp(unsigned fpnt) {
-	unsigned	src, dst;
+void delmclp(unsigned iForm) {
+	unsigned	source, destination;
 
 	if (ClipPointIndex) {
-		if (isclp(fpnt)) {
-			dst = findclp(fpnt);
-			src = dst + FormList[fpnt].lengthOrCount.clipCount;
-			MoveMemory(&ClipPoints[dst], &ClipPoints[src], sizeof(fPOINT)*(ClipPointIndex - src));
-			if (iseclp(fpnt))
-				FormList[fpnt].borderClipData -= FormList[fpnt].lengthOrCount.clipCount;
-			clpsub(fpnt, FormList[fpnt].lengthOrCount.clipCount);
-			if (ClipPointIndex > FormList[fpnt].lengthOrCount.clipCount)
-				ClipPointIndex -= FormList[fpnt].lengthOrCount.clipCount;
+		if (isclp(iForm)) {
+			destination = findclp(iForm);
+			source = destination + FormList[iForm].lengthOrCount.clipCount;
+			MoveMemory(&ClipPoints[destination], &ClipPoints[source], sizeof(fPOINT)*(ClipPointIndex - source));
+			if (iseclp(iForm))
+				FormList[iForm].borderClipData -= FormList[iForm].lengthOrCount.clipCount;
+			clpsub(iForm, FormList[iForm].lengthOrCount.clipCount);
+			if (ClipPointIndex > FormList[iForm].lengthOrCount.clipCount)
+				ClipPointIndex -= FormList[iForm].lengthOrCount.clipCount;
 			else
 				ClipPointIndex = 0;
-			FormList[fpnt].lengthOrCount.clipCount = 0;
+			FormList[iForm].lengthOrCount.clipCount = 0;
 		}
 	}
 }
 
-void deleclp(unsigned fpnt) {
-	unsigned	src, dst;
+void deleclp(unsigned iForm) {
+	unsigned	source, destination;
 
 	if (ClipPointIndex) {
-		if (iseclpx(fpnt)) {
-			dst = findclp(fpnt);
-			src = dst + FormList[fpnt].clipEntries;
-			while (src < ClipPointIndex) {
-				ClipPoints[dst].x = ClipPoints[src].x;
-				ClipPoints[dst++].y = ClipPoints[src++].y;
+		if (iseclpx(iForm)) {
+			destination = findclp(iForm);
+			source = destination + FormList[iForm].clipEntries;
+			while (source < ClipPointIndex) {
+				ClipPoints[destination].x = ClipPoints[source].x;
+				ClipPoints[destination++].y = ClipPoints[source++].y;
 			}
-			clpsub(fpnt, FormList[fpnt].clipEntries);
-			if (ClipPointIndex > FormList[fpnt].clipEntries)
-				ClipPointIndex -= FormList[fpnt].clipEntries;
+			clpsub(iForm, FormList[iForm].clipEntries);
+			if (ClipPointIndex > FormList[iForm].clipEntries)
+				ClipPointIndex -= FormList[iForm].clipEntries;
 			else
 				ClipPointIndex = 0;
-			FormList[fpnt].clipEntries = 0;
+			FormList[iForm].clipEntries = 0;
 		}
 	}
 }
 
-fPOINT* nueclp(unsigned pfrm, unsigned cnt) {
+fPOINT* nueclp(unsigned formIndex, unsigned count) {
 	int			find;
-	int			src, dst;
-	unsigned	ind;
+	int			source, destination;
+	unsigned	iform;
 
 	find = findclp(ClosestFormToCursor);
 	if (isclp(ClosestFormToCursor))
 		find += FormList[ClosestFormToCursor].lengthOrCount.clipCount;
-	src = ClipPointIndex - 1;
-	dst = ClipPointIndex + cnt - 1;
-	while (src >= find) {
-		ClipPoints[dst].x = ClipPoints[src].x;
-		ClipPoints[dst--].y = ClipPoints[src--].y;
+	source = ClipPointIndex - 1;
+	destination = ClipPointIndex + count - 1;
+	while (source >= find) {
+		ClipPoints[destination].x = ClipPoints[source].x;
+		ClipPoints[destination--].y = ClipPoints[source--].y;
 	}
 	FormList[find].borderClipData = &ClipPoints[find];
-	for (ind = pfrm; ind < FormIndex; ind++) {
-		if (iseclpx(ind))
-			FormList[ind].borderClipData += cnt;
+	// Todo - Should this be "iForm = 0"?
+	for (iform = formIndex; iform < FormIndex; iform++) {
+		if (iseclpx(iform))
+			FormList[iform].borderClipData += count;
 	}
-	for (ind = pfrm + 1; ind < FormIndex; ind++) {
-		if (isclp(ind))
-			FormList[ind].angleOrClipData.clip += cnt;
+	for (iform = formIndex + 1; iform < FormIndex; iform++) {
+		if (isclp(iform))
+			FormList[iform].angleOrClipData.clip += count;
 	}
-	ClipPointIndex += cnt;
+	ClipPointIndex += count;
 	return &ClipPoints[find];
 }
 
 fPOINT* numclp() {
 	int			find;
-	int			src, dst;
-	unsigned	ind;
+	int			source, destination;
+	unsigned	iForm;
 
 	find = findclp(ClosestFormToCursor);
-	src = ClipPointIndex - 1;
-	dst = ClipPointIndex + ClipStitchCount - 1;
-	while (src >= find) {
-		ClipPoints[dst].x = ClipPoints[src].x;
-		ClipPoints[dst--].y = ClipPoints[src--].y;
+	source = ClipPointIndex - 1;
+	destination = ClipPointIndex + ClipStitchCount - 1;
+	while (source >= find) {
+		ClipPoints[destination].x = ClipPoints[source].x;
+		ClipPoints[destination--].y = ClipPoints[source--].y;
 	}
 	FormList[ClosestFormToCursor].angleOrClipData.clip = &ClipPoints[find];
 	if (iseclpx(ClosestFormToCursor))
 		FormList[ClosestFormToCursor].borderClipData += ClipStitchCount;
-	for (ind = ClosestFormToCursor + 1; ind < FormIndex; ind++) {
-		if (isclpx(ind))
-			FormList[ind].angleOrClipData.clip += ClipStitchCount;
-		if (iseclpx(ind))
-			FormList[ind].borderClipData += ClipStitchCount;
+	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+		if (isclpx(iForm))
+			FormList[iForm].angleOrClipData.clip += ClipStitchCount;
+		if (iseclpx(iForm))
+			FormList[iForm].borderClipData += ClipStitchCount;
 	}
 	ClipPointIndex += ClipStitchCount;
 	return &ClipPoints[find];
@@ -3565,7 +3565,7 @@ void nxtseq(unsigned pthi) {
 #define BUGSEQ 0
 
 void lcon() {
-	unsigned		ind, ine, l_bLine, cnt, sgrp;
+	unsigned		iPath, ind, ine, l_bLine, cnt, sgrp;
 	REGION*			trgns;
 	short			tcon;
 	RCON*			pcon;
@@ -3576,7 +3576,7 @@ void lcon() {
 
 #if BUGSEQ
 
-	unsigned		bugcol;
+	unsigned		bugcol, iRegion;
 #endif
 
 	if (StitchLineCount) {
@@ -3629,8 +3629,8 @@ void lcon() {
 
 #if BUGSEQ
 		bugcol = 0; SequenceIndex = 0;
-		for (ind = 0; ind < RegionCount; ind++) {
-			for (ine = RegionsList[ind].start; ine <= RegionsList[ind].end; ine++) {
+		for (iRegion = 0; iRegion < RegionCount; iRegion++) {
+			for (ine = RegionsList[iRegion].start; ine <= RegionsList[iRegion].end; ine++) {
 				tpnt = &*SortedLines[ine];
 				StitchBuffer[SequenceIndex].attribute = bugcol;
 				StitchBuffer[SequenceIndex].x = tpnt[0].x;
@@ -3741,12 +3741,12 @@ void lcon() {
 			for (ind = 0; ind < RegionCount; ind++)
 				VisitedRegions[ind] = 0;
 			LastGroup = 0;
-			for (ind = 0; ind < PathIndex; ind++) {
-				//				sprintf_s(MsgBuffer, sizeof(MsgBuffer),"ind %d,vrt %d,grpn %d\n",ind,PathMap[ind].vrt,PathMap[ind].grpn);
+			for (iPath = 0; iPath < PathIndex; iPath++) {
+				//				sprintf_s(MsgBuffer, sizeof(MsgBuffer),"iterator %d,vrt %d,grpn %d\n",iterator,PathMap[iPath].vrt,PathMap[iPath].grpn);
 				//				OutputDebugString(MsgBuffer);
 				if (!unvis())
 					break;
-				durgn(ind);
+				durgn(iPath);
 			}
 		}
 		else {
@@ -4537,27 +4537,27 @@ unsigned setchk(unsigned bPnt) {
 #endif
 }
 
-unsigned chkchk(unsigned ind) {
+unsigned chkchk(unsigned bit) {
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
 		mov		ebx, CheckMap
-		mov		ecx, ind
+		mov		ecx, bit
 		bt[ebx], ecx
 		jc		short ccx
 		dec		eax
 		ccx :
 	}
 #else
-	return _bittest((long *)chkMap, ind) ? 0xFFFFFFFF : 0;
+	return _bittest((long *)chkMap, bit) ? 0xFFFFFFFF : 0;
 #endif
 }
 
-unsigned nxtchk(unsigned ind) {
+unsigned nxtchk(unsigned bit) {
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
-		mov		ebx, ind
+		mov		ebx, bit
 		shl		ebx, 2
 		add		ebx, CheckMap
 		mov		ecx, [ebx]
@@ -4570,23 +4570,23 @@ unsigned nxtchk(unsigned ind) {
 				nxtcx :
 	}
 #else
-	if (CheckMap[ind] == 0)
+	if (CheckMap[bit] == 0)
 		return 0xffffffff;
 
-	DWORD bit;
+	DWORD returnBit;
 
-	_BitScanForward(&bit, CheckMap[ind]);
-	_bittestandreset((long *)(CheckMap + ind), bit);
+	_BitScanForward(&returnBit, CheckMap[bit]);
+	_bittestandreset((long *)(CheckMap + bit), returnBit);
 
-	return bit;
+	return returnBit;
 #endif
 }
 
-unsigned prvchk(unsigned ind) {
+unsigned prvchk(unsigned bit) {
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
-		mov		ebx, ind
+		mov		ebx, bit
 		shl		ebx, 2
 		add		ebx, CheckMap
 		mov		ecx, [ebx]
@@ -4594,21 +4594,21 @@ unsigned prvchk(unsigned ind) {
 		jne		short prvc1
 		dec		eax
 		jmp		short prvcx
-		prvc1 : btr		ecx, eax
-				mov[ebx], ecx
-				prvcx :
+prvc1 :	btr		ecx, eax
+		mov[ebx], ecx
+prvcx :
 	}
 #else
 	//Check translation
-	DWORD bit;
+	DWORD returnBit;
 
-	if (CheckMap[ind] == 0)
+	if (CheckMap[bit] == 0)
 		return 0xffffffff;
 
-	_BitScanReverse(&bit, CheckMap[ind]);
-	_bittestandreset((long *)(CheckMap + ind), bit);
+	_BitScanReverse(&returnBit, CheckMap[bit]);
+	_bittestandreset((long *)(CheckMap + bit), returnBit);
 
-	return bit;
+	return returnBit;
 #endif
 }
 
@@ -10788,19 +10788,19 @@ void shrnk() {
 		shoseln(IDS_FRMCLP, IDS_SHRNK);
 }
 
-void mvfrms(FRMHED* dst, FRMHED* src, unsigned cnt) {
+void mvfrms(FRMHED* destination, FRMHED* source, unsigned count) {
 #if	 __UseASM__
 	_asm {
-		mov		esi, src
-		mov		edi, dst
-		mov		eax, cnt
+		mov		esi, source
+		mov		edi, destination
+		mov		eax, count
 		mov		ecx, fsizeof
 		mul		ecx
 		mov		ecx, eax
 		rep		movsd
 	}
 #else
-	memcpy(dst, src, cnt * sizeof (FRMHED));
+	memcpy(destination, source, count * sizeof (FRMHED));
 #endif
 }
 
@@ -11241,40 +11241,40 @@ void debean() {
 	setMap(RESTCH);
 }
 
-void mvfrmsb(FRMHED* dst, FRMHED* src, unsigned cnt) {
+void mvfrmsb(FRMHED* destination, FRMHED* source, unsigned count) {
 #if	 __UseASM__
 	_asm {
 		std
 		mov		eax, fsizeof
-		mul		cnt
+		mul		count
 		mov		ecx, eax
-		mov		edi, dst
+		mov		edi, destination
 		add		edi, 64
-		mov		esi, src
+		mov		esi, source
 		add		esi, 64
 		rep		movsd
 		cld
 	}
 #else
-	memmove(dst, src, cnt * sizeof(FRMHED));
+	memmove(destination, source, count * sizeof(FRMHED));
 #endif
 }
 
-void mvfltsb(fPOINT* dst, fPOINT* src, unsigned cnt) {
+void mvfltsb(fPOINT* destination, fPOINT* source, unsigned count) {
 #if	 __UseASM__
 	_asm {
 		std
-		mov		ecx, cnt
+		mov		ecx, count
 		shl		ecx, 1
-		mov		esi, src
+		mov		esi, source
 		add		esi, 4
-		mov		edi, dst
+		mov		edi, destination
 		add		edi, 4
 		rep		movsd
 		cld
 	}
 #else
-	memmove(dst, src, cnt * sizeof(fPOINT));
+	memmove(destination, source, count * sizeof(fPOINT));
 #endif
 }
 
@@ -11658,14 +11658,14 @@ BOOL nucseg() {
 	return 1;
 }
 
-void mvpclp(unsigned dst, unsigned src) {
+void mvpclp(unsigned destination, unsigned source) {
 #if	 __UseASM__
 	_asm {
-		mov		edi, dst
+		mov		edi, destination
 		shl		edi, 2
 		add		edi, ArrayOfClipIntersectData
 		mov		edi, [edi]
-		mov		esi, src
+		mov		esi, source
 		shl		esi, 2
 		add		esi, ArrayOfClipIntersectData
 		mov		esi, [esi]
@@ -11675,7 +11675,7 @@ void mvpclp(unsigned dst, unsigned src) {
 	}
 #else
 	//ToDo - Should '20' be sizeof(CLIPSORT)'?
-	memcpy(ArrayOfClipIntersectData[dst], ArrayOfClipIntersectData[src], 20);
+	memcpy(ArrayOfClipIntersectData[destination], ArrayOfClipIntersectData[source], 20);
 #endif
 }
 
@@ -11918,12 +11918,12 @@ unsigned vclpbak(unsigned ind) {
 	return ind;
 }
 
-BOOL vscmp(unsigned ind, unsigned ine) {
+BOOL vscmp(unsigned index1, unsigned index2) {
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
-		mov		esi, ind
-		mov		edi, ine
+		mov		esi, index1
+		mov		edi, index2
 		shl		esi, 3
 		shl		edi, 3
 		mov		ecx, offset OSequence
@@ -11934,19 +11934,19 @@ BOOL vscmp(unsigned ind, unsigned ine) {
 		je		short vscmp1
 		inc		eax
 		jmp		short vscmpx
-		vscmp1 : add		esi, 4
-				 add		edi, 4
-				 mov		ecx, [esi]
-				 cmp		ecx, [edi]
-				 je		short vscmpx
-				 inc		eax
-				 vscmpx :
+vscmp1: add		esi, 4
+		add		edi, 4
+		mov		ecx, [esi]
+		cmp		ecx, [edi]
+		je		short vscmpx
+		inc		eax
+vscmpx :
 	}
 #else
-	if (OSequence[ind].x != OSequence[ine].x)
+	if (OSequence[index1].x != OSequence[index2].x)
 		return 1;
 
-	return OSequence[ind].y != OSequence[ine].y ? 1 : 0;
+	return OSequence[index1].y != OSequence[index2].y ? 1 : 0;
 #endif
 }
 
@@ -11983,7 +11983,7 @@ void inspnt()
 
 void clpcon() {
 	RECT		nrct;
-	unsigned	ind, ine, inf, ing, nof, clpneg;
+	unsigned	iSegment, iStitchPoint, ind, ine, inf, ing, nof, clpneg;
 	unsigned	strt, fin, segxs, segps, seg, clrnum;
 	unsigned	cnt;
 	int			tine;
@@ -12196,8 +12196,8 @@ clpskp:;
 	ClipStitchPoints[ActivePointIndex].flag = 2;
 	if (nof) {
 		fnof = nof*ClipRectSize.cy;
-		for (ind = 0; ind < ActivePointIndex; ind++)
-			ClipStitchPoints[ind].y -= fnof;
+		for (iStitchPoint = 0; iStitchPoint < ActivePointIndex; iStitchPoint++)
+			ClipStitchPoints[iStitchPoint].y -= fnof;
 		for (ind = 0; ind < VertexCount; ind++)
 			CurrentFormVertices[ind].y -= fnof;
 	}
@@ -12259,9 +12259,9 @@ clpskp:;
 					clplim = 12;
 				SortedLengths = (float**)&ClipSegments[ClipSegmentIndex];
 				ine = 0;
-				for (ind = 0; ind < ClipSegmentIndex; ind++) {
-					SortedLengths[ine++] = &ClipSegments[ind].borderLength;
-					SortedLengths[ine++] = &ClipSegments[ind].edgeLength;
+				for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
+					SortedLengths[ine++] = &ClipSegments[iSegment].borderLength;
+					SortedLengths[ine++] = &ClipSegments[iSegment].edgeLength;
 				}
 				qsort((void*)SortedLengths, ine, 4, lencmp);
 				ind = sizeof(CLPSEG);
@@ -12276,10 +12276,10 @@ clpskp:;
 
 #if CLPVU==1
 
-				for (ind = 0; ind < ActivePointIndex; ind++) {
-					StitchBuffer[ind].x = ClipStitchPoints[ind].x;
-					StitchBuffer[ind].y = ClipStitchPoints[ind].y;
-					StitchBuffer[ind].attribute = 0;
+				for (unsigned iStitch = 0; iStitch < ActivePointIndex; iStitch++) {
+					StitchBuffer[iStitch].x = ClipStitchPoints[iStitch].x;
+					StitchBuffer[iStitch].y = ClipStitchPoints[iStitch].y;
+					StitchBuffer[iStitch].attribute = 0;
 				}
 				PCSHeader.stitchCount = ActivePointIndex;
 #endif
@@ -12287,11 +12287,11 @@ clpskp:;
 #if CLPVU==2
 
 				inf = 0;
-				for (ind = 0; ind < ClipSegmentIndex; ind++) {
-					for (ine = ClipSegments[ind].start; ine <= ClipSegments[ind].finish; ine++) {
-						StitchBuffer[inf].x = ClipStitchPoints[ine].x;
-						StitchBuffer[inf].y = ClipStitchPoints[ine].y;
-						StitchBuffer[inf++].attribute = ind & 0xf;
+				for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
+					for (iStitchPoint = ClipSegments[iSegment].start; iStitchPoint <= ClipSegments[iSegment].finish; iStitchPoint++) {
+						StitchBuffer[inf].x = ClipStitchPoints[iStitchPoint].x;
+						StitchBuffer[inf].y = ClipStitchPoints[iStitchPoint].y;
+						StitchBuffer[inf++].attribute = iSegment & 0xf;
 					}
 				}
 				PCSHeader.stitchCount = inf;
