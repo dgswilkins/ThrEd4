@@ -1558,19 +1558,19 @@ enum {
 
 //fill types
 enum {
-	VRTF = 1,
-	HORF,
-	ANGF,
-	SATF,
-	CLPF,
-	CONTF,
-	VCLPF,
-	HCLPF,
-	ANGCLPF,
-	FTHF,
-	TXVRTF,
-	TXHORF,
-	TXANGF,
+	VRTF = 1,	// Vertical fill
+	HORF,		// Horizontal fill
+	ANGF,		// Angle fill
+	SATF,		// Fan fill ?
+	CLPF,		// Fan clip Fill
+	CONTF,		// Contour fill
+	VCLPF,		// Vertical clip fill
+	HCLPF,		// Horizontal clip fill
+	ANGCLPF,	// Angle clip fill
+	FTHF,		// Feather fill
+	TXVRTF,		// Vertical texture fill
+	TXHORF,		// Horizontal texture fill
+	TXANGF,		// Angle texture fill
 };
 #define MCLPF		1<<CLPF
 #define MVCLPF		1<<VCLPF

@@ -404,7 +404,7 @@ extern	unsigned		FormVertexIndex;
 extern	fPOINT			FormMoveDelta;
 extern	unsigned		FormIndex;
 extern	FRMHED			FormList[MAXFORMS];
-extern	POINT			FormOutlineRect[10];
+extern	POINT			FormControlPoints[10];
 extern	fPOINT			FormVertices[MAXFRMPNTS];
 extern	TCHAR			HelpBuffer[HBUFSIZ];
 extern	double			HorizontalRatio;
@@ -2873,7 +2873,7 @@ void nuselrct() {
 	outline[4].y = outline[5].y = outline[6].y = StitchRangeRect.bottom;
 	outline[2].x = outline[3].x = outline[4].x = StitchRangeRect.right;
 	for (iLine = 0; iLine < 9; iLine++)
-		sfCor2px(outline[iLine], &FormOutlineRect[iLine]);
+		sfCor2px(outline[iLine], &FormControlPoints[iLine]);
 }
 
 void grpAdj() {
@@ -7944,9 +7944,9 @@ void dusel(HDC dc) {
 
 	SetROP2(dc, R2_NOTXORPEN);
 	SelectObject(dc, LinePen);
-	Polyline(dc, FormOutlineRect, 9);
+	Polyline(dc, FormControlPoints, 9);
 	for (ind = 0; ind < 8; ind++)
-		selsqr(FormOutlineRect[ind], dc);
+		selsqr(FormControlPoints[ind], dc);
 	SetROP2(dc, R2_COPYPEN);
 }
 
@@ -8035,12 +8035,12 @@ void rSelbox() {
 	adjustedSelectSize.cy = SelectBoxSize.cy*ratio + 0.5;
 	StitchCoordinatesPixels.x = (SelectedPoint.x - ZoomRect.left - SelectBoxOffset.x)*ratio + 0.5;
 	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (SelectedPoint.y - ZoomRect.bottom - SelectBoxOffset.y)*ratio + 0.5 - adjustedSelectSize.cy;
-	FormOutlineRect[0].x = FormOutlineRect[6].x = FormOutlineRect[7].x = FormOutlineRect[8].x = StitchCoordinatesPixels.x;
-	FormOutlineRect[1].x = FormOutlineRect[5].x = StitchCoordinatesPixels.x + adjustedSelectSize.cx / 2;
-	FormOutlineRect[0].y = FormOutlineRect[1].y = FormOutlineRect[2].y = FormOutlineRect[8].y = StitchCoordinatesPixels.y;
-	FormOutlineRect[3].y = FormOutlineRect[7].y = StitchCoordinatesPixels.y + adjustedSelectSize.cy / 2;
-	FormOutlineRect[4].y = FormOutlineRect[5].y = FormOutlineRect[6].y = StitchCoordinatesPixels.y + adjustedSelectSize.cy;
-	FormOutlineRect[2].x = FormOutlineRect[3].x = FormOutlineRect[4].x = StitchCoordinatesPixels.x + adjustedSelectSize.cx;
+	FormControlPoints[0].x = FormControlPoints[6].x = FormControlPoints[7].x = FormControlPoints[8].x = StitchCoordinatesPixels.x;
+	FormControlPoints[1].x = FormControlPoints[5].x = StitchCoordinatesPixels.x + adjustedSelectSize.cx / 2;
+	FormControlPoints[0].y = FormControlPoints[1].y = FormControlPoints[2].y = FormControlPoints[8].y = StitchCoordinatesPixels.y;
+	FormControlPoints[3].y = FormControlPoints[7].y = StitchCoordinatesPixels.y + adjustedSelectSize.cy / 2;
+	FormControlPoints[4].y = FormControlPoints[5].y = FormControlPoints[6].y = StitchCoordinatesPixels.y + adjustedSelectSize.cy;
+	FormControlPoints[2].x = FormControlPoints[3].x = FormControlPoints[4].x = StitchCoordinatesPixels.x + adjustedSelectSize.cx;
 	setMap(SELSHO);
 	dusel(StitchWindowDC);
 }
@@ -10691,7 +10691,7 @@ BOOL iselpnt() {
 	pointToTest.y = Msg.pt.y - StitchWindowOrigin.y;
 	for (iControlPoint = 0; iControlPoint < 9; iControlPoint++) {
 
-		length = hypot(pointToTest.x - FormOutlineRect[iControlPoint].x, pointToTest.y - FormOutlineRect[iControlPoint].y);
+		length = hypot(pointToTest.x - FormControlPoints[iControlPoint].x, pointToTest.y - FormControlPoints[iControlPoint].y);
 		if (length < minimumLength) {
 
 			minimumLength = length;
@@ -16677,8 +16677,8 @@ unsigned chkMsg() {
 
 				for (iSide = 0; iSide < 4; iSide++) {
 
-					StretchBoxLine[iSide].x = FormOutlineRect[iSide << 1].x;
-					StretchBoxLine[iSide].y = FormOutlineRect[iSide << 1].y;
+					StretchBoxLine[iSide].x = FormControlPoints[iSide << 1].x;
+					StretchBoxLine[iSide].y = FormControlPoints[iSide << 1].y;
 				}
 				StretchBoxLine[4].x = StretchBoxLine[0].x;
 				StretchBoxLine[4].y = StretchBoxLine[0].y;
@@ -16697,8 +16697,8 @@ unsigned chkMsg() {
 
 				StitchCoordinatesPixels.x = Msg.pt.x - StitchWindowOrigin.x;
 				StitchCoordinatesPixels.y = Msg.pt.y - StitchWindowOrigin.y;
-				if (StitchCoordinatesPixels.x >= FormOutlineRect[0].x&&StitchCoordinatesPixels.x <= FormOutlineRect[2].x&&
-					StitchCoordinatesPixels.y >= FormOutlineRect[0].y&&StitchCoordinatesPixels.y <= FormOutlineRect[4].y) {
+				if (StitchCoordinatesPixels.x >= FormControlPoints[0].x&&StitchCoordinatesPixels.x <= FormControlPoints[2].x&&
+					StitchCoordinatesPixels.y >= FormControlPoints[0].y&&StitchCoordinatesPixels.y <= FormControlPoints[4].y) {
 
 					duSelbox();
 					setMap(SELPNT);
@@ -17778,12 +17778,12 @@ unsigned chkMsg() {
 				selRct(&formsRect);
 				// ToDo - windowRect should be be formsRect? windowRect is not initialized before use here
 
-				FormOutlineRect[0].x = FormOutlineRect[6].x = FormOutlineRect[7].x = FormOutlineRect[8].x = windowRect.left;
-				FormOutlineRect[1].x = FormOutlineRect[5].x = midl(windowRect.right, windowRect.left);
-				FormOutlineRect[0].y = FormOutlineRect[1].y = FormOutlineRect[2].y = FormOutlineRect[8].y = windowRect.top;
-				FormOutlineRect[3].y = FormOutlineRect[7].y = midl(windowRect.top, windowRect.bottom);
-				FormOutlineRect[4].y = FormOutlineRect[5].y = FormOutlineRect[6].y = windowRect.bottom;
-				FormOutlineRect[2].x = FormOutlineRect[3].x = FormOutlineRect[4].x = windowRect.right;
+				FormControlPoints[0].x = FormControlPoints[6].x = FormControlPoints[7].x = FormControlPoints[8].x = windowRect.left;
+				FormControlPoints[1].x = FormControlPoints[5].x = midl(windowRect.right, windowRect.left);
+				FormControlPoints[0].y = FormControlPoints[1].y = FormControlPoints[2].y = FormControlPoints[8].y = windowRect.top;
+				FormControlPoints[3].y = FormControlPoints[7].y = midl(windowRect.top, windowRect.bottom);
+				FormControlPoints[4].y = FormControlPoints[5].y = FormControlPoints[6].y = windowRect.bottom;
+				FormControlPoints[2].x = FormControlPoints[3].x = FormControlPoints[4].x = windowRect.right;
 				coltab();
 				setMap(RESTCH);
 				return 1;
