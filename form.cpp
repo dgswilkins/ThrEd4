@@ -1814,7 +1814,7 @@ unsigned closfrm() {
 }
 
 void frmovlin() {
-	unsigned ind, ine;
+	unsigned iPoint, previousPoint;
 
 	fvars(ClosestFormToCursor);
 	ratsr();
@@ -1823,66 +1823,55 @@ void frmovlin() {
 	else
 		NewFormVertexCount = SelectedForm->vertexCount + 1;
 	frmlin(SelectedForm->vertices, SelectedForm->vertexCount);
-	ine = prv(ClosestVertexToCursor);
-	for (ind = 0; ind < 3; ind++)
+	previousPoint = prv(ClosestVertexToCursor);
+	for (iPoint = 0; iPoint < 3; iPoint++)
 	{
-		RubberBandLine[ind].x = FormLines[ine].x;
-		RubberBandLine[ind].y = FormLines[ine].y;
-		ine++;
+		RubberBandLine[iPoint].x = FormLines[previousPoint].x;
+		RubberBandLine[iPoint].y = FormLines[previousPoint].y;
+		previousPoint++;
 	}
 	ritmov();
 }
 
-void makspac(unsigned strt, unsigned cnt) {
-	if (!chkmax(PCSHeader.stitchCount, cnt))
+void makspac(unsigned start, unsigned count) {
+	if (!chkmax(PCSHeader.stitchCount, count))
 	{
-		MoveMemory(&StitchBuffer[strt + cnt], &StitchBuffer[strt], sizeof(fPOINTATTR)*(PCSHeader.stitchCount - strt));
-		PCSHeader.stitchCount += cnt;
+		MoveMemory(&StitchBuffer[start + count], &StitchBuffer[start], sizeof(fPOINTATTR)*(PCSHeader.stitchCount - start));
+		PCSHeader.stitchCount += count;
 	}
 }
 
-void rseq(unsigned strt, unsigned fin, unsigned ostrt, unsigned at) {
-	while (strt < fin) {
-		StitchBuffer[strt].attribute = at;
-		StitchBuffer[strt].x = InterleaveSequence[ostrt].x;
-		StitchBuffer[strt++].y = InterleaveSequence[ostrt++].y;
-	}
-	ostrt--;
-	LastPoint.x = InterleaveSequence[ostrt].x;
-	LastPoint.y = InterleaveSequence[ostrt].y;
-}
-
-BOOL ritlin(fPOINT strt, fPOINT fin)
+BOOL ritlin(fPOINT start, fPOINT finish)
 {
-	dPOINT		dif, stp, pnt;
-	double		len;
-	unsigned	ine, cnt;
+	dPOINT		delta, step, point;
+	double		length;
+	unsigned	iStep, count;
 
-	dif.x = fin.x - strt.x;
-	dif.y = fin.y - strt.y;
-	len = hypot(dif.x, dif.y);
-	InterleaveSequence[InterleaveSequenceIndex].x = strt.x;
-	InterleaveSequence[InterleaveSequenceIndex++].y = strt.y;
-	if (len > MaxStitchLen) {
-		cnt = ceil(len / UserStichLen);
-		if (!cnt)
-			cnt = 1;
-		while (len / cnt > MaxStitchLen)
-			cnt++;
-		if (!chkmax(InterleaveSequenceIndex, cnt)) {
-			stp.x = dif.x / cnt;
-			stp.y = dif.y / cnt;
-			pnt.x = strt.x + stp.x;
-			pnt.y = strt.y + stp.y;
-			for (ine = 0; ine < cnt - 1; ine++) {
+	delta.x = finish.x - start.x;
+	delta.y = finish.y - start.y;
+	length = hypot(delta.x, delta.y);
+	InterleaveSequence[InterleaveSequenceIndex].x = start.x;
+	InterleaveSequence[InterleaveSequenceIndex++].y = start.y;
+	if (length > MaxStitchLen) {
+		count = ceil(length / UserStichLen);
+		if (!count)
+			count = 1;
+		while (length / count > MaxStitchLen)
+			count++;
+		if (!chkmax(InterleaveSequenceIndex, count)) {
+			step.x = delta.x / count;
+			step.y = delta.y / count;
+			point.x = start.x + step.x;
+			point.y = start.y + step.y;
+			for (iStep = 0; iStep < count - 1; iStep++) {
 				if (InterleaveSequenceIndex&MAXMSK) {
 					InterleaveSequenceIndex = MAXSEQ - 2;
 					return 0;
 				}
-				InterleaveSequence[InterleaveSequenceIndex].x = pnt.x;
-				InterleaveSequence[InterleaveSequenceIndex++].y = pnt.y;
-				pnt.x += stp.x;
-				pnt.y += stp.y;
+				InterleaveSequence[InterleaveSequenceIndex].x = point.x;
+				InterleaveSequence[InterleaveSequenceIndex++].y = point.y;
+				point.x += step.x;
+				point.y += step.y;
 			}
 		}
 		else {
@@ -1893,25 +1882,25 @@ BOOL ritlin(fPOINT strt, fPOINT fin)
 	return 1;
 }
 
-unsigned closflt(float px, float py)
+unsigned closflt(float xCoordinate, float yCoordinate)
 {
-	double		len, minlen;
-	unsigned	ind, ine = 0;
+	double		length, minimumLength;
+	unsigned	iVertex, closestVertex = 0;
 
-	minlen = 1e99;
-	for (ind = 0; ind < VertexCount; ind++)
+	minimumLength = 1e99;
+	for (iVertex = 0; iVertex < VertexCount; iVertex++)
 	{
-		len = hypot(px - CurrentFormVertices[ind].x, py - CurrentFormVertices[ind].y);
-		if (len < minlen)
+		length = hypot(xCoordinate - CurrentFormVertices[iVertex].x, yCoordinate - CurrentFormVertices[iVertex].y);
+		if (length < minimumLength)
 		{
-			ine = ind;
-			minlen = len;
+			closestVertex = iVertex;
+			minimumLength = length;
 		}
 	}
-	return ine;
+	return closestVertex;
 }
 
-void chkseq(BOOL brd) {
+void chkseq(BOOL border) {
 #if BUGBAK
 
 	unsigned index;
@@ -1929,7 +1918,7 @@ void chkseq(BOOL brd) {
 	float		mins;
 
 	bakind = InterleaveSequenceIndex;
-	if (brd) {
+	if (border) {
 		if (!SelectedForm->maxBorderStitchLen)
 			SelectedForm->maxBorderStitchLen = IniFile.maxStitchLength;
 		MaxStitchLen = SelectedForm->maxBorderStitchLen;
@@ -1982,7 +1971,7 @@ void ritbrd() {
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_BRD;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = TYPBRD;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->borderColor&COLMSK;
-		chkseq(1);
+		chkseq(true);
 		InterleaveSequenceIndex2++;
 	}
 }
@@ -1994,7 +1983,7 @@ void ritapbrd() {
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_AP;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = TYPMSK;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->borderColor >> 4;
-		chkseq(1);
+		chkseq(true);
 		InterleaveSequenceIndex2++;
 	}
 }
@@ -2006,7 +1995,7 @@ void ritfil() {
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = TYPFRM;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillColor;
-		chkseq(0);
+		chkseq(false);
 		InterleaveSequenceIndex2++;
 	}
 }

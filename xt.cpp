@@ -165,7 +165,6 @@ extern	void		refilal();
 extern	void		refilfn();
 extern	void		ritfil();
 extern	void		rotflt(fPOINT* point);
-extern	void		rseq(unsigned strt, unsigned fin, unsigned ostrt, unsigned at);
 extern	unsigned	rstMap(unsigned bit);
 extern	unsigned	rstu(unsigned bit);
 extern	void		rtrclpfn();
@@ -765,7 +764,7 @@ void fritfil() {
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = TYPFRM;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillColor;
-		chkseq(0);
+		chkseq(false);
 		InterleaveSequenceIndex2++;
 		if (SelectedForm->extendedAttribute&AT_FTHBLND&&~(SelectedForm->extendedAttribute&(AT_FTHUP | AT_FTHDWN)) != (AT_FTHUP | AT_FTHDWN)) {
 
@@ -781,7 +780,7 @@ void fritfil() {
 				iReverseSequence--;
 			}
 			SequenceIndex = ActivePointIndex;
-			chkseq(0);
+			chkseq(false);
 			InterleaveSequenceIndex2++;
 		}
 	}
