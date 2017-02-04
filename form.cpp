@@ -1914,10 +1914,10 @@ void chkseq(BOOL border) {
 #else
 
 	double		len;
-	unsigned	ind, ine, bakind;
-	float		mins;
+	unsigned	iSequence, ind, destination, savedIndex;
+	float		minimumStitchLength;
 
-	bakind = InterleaveSequenceIndex;
+	savedIndex = InterleaveSequenceIndex;
 	if (border) {
 		if (!SelectedForm->maxBorderStitchLen)
 			SelectedForm->maxBorderStitchLen = IniFile.maxStitchLength;
@@ -1926,7 +1926,7 @@ void chkseq(BOOL border) {
 			UserStichLen = 9 * PFGRAN;
 		else
 			UserStichLen = SelectedForm->edgeStitchLen;
-		mins = SelectedForm->minBorderStitchLen;
+		minimumStitchLength = SelectedForm->minBorderStitchLen;
 	}
 	else {
 		if (!SelectedForm->maxFillStitchLen)
@@ -1936,31 +1936,30 @@ void chkseq(BOOL border) {
 			UserStichLen = MaxStitchLen;
 		else
 			UserStichLen = SelectedForm->lengthOrCount.stitchLength;
-		mins = SelectedForm->minFillStitchLen;
+		minimumStitchLength = SelectedForm->minFillStitchLen;
 	}
 	if (UserStichLen > MaxStitchLen)
 		UserStichLen = MaxStitchLen;
-	ine = 0;
-	for (ind = 0; ind < SequenceIndex - 1; ind++)
+	for (iSequence = 0; iSequence < SequenceIndex - 1; iSequence++)
 	{
-		if (!ritlin(OSequence[ind], OSequence[ind + 1]))
+		if (!ritlin(OSequence[iSequence], OSequence[iSequence + 1]))
 			goto seqskp;
 	}
-	InterleaveSequence[InterleaveSequenceIndex].x = OSequence[ind].x;
-	InterleaveSequence[InterleaveSequenceIndex++].y = OSequence[ind].y;
+	InterleaveSequence[InterleaveSequenceIndex].x = OSequence[iSequence].x;
+	InterleaveSequence[InterleaveSequenceIndex++].y = OSequence[iSequence].y;
 seqskp:;
-	if (!mins)
+	if (!minimumStitchLength)
 		return;
-	ine = bakind + 1;
-	for (ind = bakind + 1; ind < InterleaveSequenceIndex; ind++) {
-		len = hypot(InterleaveSequence[ind].x - InterleaveSequence[ind - 1].x, InterleaveSequence[ind].y - InterleaveSequence[ind - 1].y);
-		if (len > mins) {
-			InterleaveSequence[ine].x = InterleaveSequence[ind].x;
-			InterleaveSequence[ine].y = InterleaveSequence[ind].y;
-			ine++;
+	destination = savedIndex + 1;
+	for (iSequence = savedIndex + 1; iSequence < InterleaveSequenceIndex; iSequence++) {
+		len = hypot(InterleaveSequence[iSequence].x - InterleaveSequence[iSequence - 1].x, InterleaveSequence[iSequence].y - InterleaveSequence[iSequence - 1].y);
+		if (len > minimumStitchLength) {
+			InterleaveSequence[destination].x = InterleaveSequence[iSequence].x;
+			InterleaveSequence[destination].y = InterleaveSequence[iSequence].y;
+			destination++;
 		}
 	}
-	InterleaveSequenceIndex = ine;
+	InterleaveSequenceIndex = destination;
 #endif
 }
 
@@ -2031,17 +2030,17 @@ void okcan() {
 }
 
 void savdisc() {
-	TCHAR	buf[HBUFSIZ];
+	TCHAR	buffer[HBUFSIZ];
 
 	sdmsg();
 	rstMap(BIGBOX);
 
 	GetClientRect(MsgWindow, &MsgRect);
 
-	LoadString(ThrEdInstance, IDS_SAV, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_SAV, buffer, HBUFSIZ);
 	OKButton = CreateWindow(
 		"STATIC",
-		buf,
+		buffer,
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		5,
 		MsgRect.bottom + 15,
@@ -2052,10 +2051,10 @@ void savdisc() {
 		ThrEdInstance,
 		NULL);
 
-	LoadString(ThrEdInstance, IDS_DISC, buf, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_DISC, buffer, HBUFSIZ);
 	DiscardButton = CreateWindow(
 		"STATIC",
-		buf,
+		buffer,
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		ButtonWidthX3 + 15,
 		MsgRect.bottom + 15,
@@ -2092,111 +2091,115 @@ BOOL lastch() {
 }
 
 unsigned getlast() {
-	unsigned		ind;
-	unsigned		tclos = 0;
-	double			len, dx, dy, min = 1e99;
+	unsigned		iVertex;
+	unsigned		closestVertex = 0;
+	double			length, dx, dy, minimumLength = 1e99;
 
 	if (SelectedForm->fillType) {
 		lastch();
-		for (ind = 0; ind < VertexCount; ind++) {
-			dx = LastPoint.x - CurrentFormVertices[ind].x;
-			dy = LastPoint.y - CurrentFormVertices[ind].y;
-			len = hypot(dx, dy);
-			if (len < min) {
-				min = len;
-				tclos = ind;
+		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+			// ToDo - does this have to be a double or would a fPOINT work?
+			dx = LastPoint.x - CurrentFormVertices[iVertex].x;
+			dy = LastPoint.y - CurrentFormVertices[iVertex].y;
+			length = hypot(dx, dy);
+			if (length < minimumLength) {
+				minimumLength = length;
+				closestVertex = iVertex;
 			}
 		}
-		return tclos;
+		return closestVertex;
 	}
 	else
 		return 0;
 }
 
-void flt2dub(fPOINT ipnt, dPOINT* p_opnt) {
-	p_opnt->x = ipnt.x;
-	p_opnt->y = ipnt.y;
+void flt2dub(fPOINT inPoint, dPOINT* outPoint) {
+	outPoint->x = inPoint.x;
+	outPoint->y = inPoint.y;
 }
 
-void linrutb(unsigned strt) {
-	double		tspac;
-	unsigned	ind;
-	dPOINT		tpnt;
+void linrutb(unsigned start) {
+	double		spacing;
+	unsigned	iVertex;
+	dPOINT		point;
 
-	tspac = StitchSpacing;
-	SelectedPoint.x = CurrentFormVertices[strt].x;
-	SelectedPoint.y = CurrentFormVertices[strt].y;
-	for (ind = strt + 1; ind < VertexCount; ind++) {
-		flt2dub(CurrentFormVertices[ind], &tpnt);
-		filinsb(tpnt);
+	spacing = StitchSpacing;
+	SelectedPoint.x = CurrentFormVertices[start].x;
+	SelectedPoint.y = CurrentFormVertices[start].y;
+	for (iVertex = start + 1; iVertex < VertexCount; iVertex++) {
+		flt2dub(CurrentFormVertices[iVertex], &point);
+		filinsb(point);
 	}
-	flt2dub(CurrentFormVertices[0], &tpnt);
-	filinsb(tpnt);
-	StitchSpacing = tspac;
+	flt2dub(CurrentFormVertices[0], &point);
+	filinsb(point);
+	StitchSpacing = spacing;
 }
 
-void oclp(fPOINT* p_clp, unsigned p_nclp) {
-	unsigned	ind;
+void oclp(fPOINT* clip, unsigned clipEntries) {
+	unsigned	iClip;
 
 	if (!chkMap(NOCLP))
 	{
-		for (ind = 0; ind < p_nclp; ind++) {
-			ClipBuffer[ind].x = p_clp[ind].x;
-			ClipBuffer[ind].y = p_clp[ind].y;
+		for (iClip = 0; iClip < clipEntries; iClip++) {
+			ClipBuffer[iClip].x = clip[iClip].x;
+			ClipBuffer[iClip].y = clip[iClip].y;
 		}
 		ClipRect.left = ClipRect.right = ClipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
-		for (ind = 1; ind < (unsigned)p_nclp; ind++) {
-			if (ClipBuffer[ind].x < ClipRect.left)
-				ClipRect.left = ClipBuffer[ind].x;
-			if (ClipBuffer[ind].x > ClipRect.right)
-				ClipRect.right = ClipBuffer[ind].x;
-			if (ClipBuffer[ind].y < ClipRect.bottom)
-				ClipRect.bottom = ClipBuffer[ind].y;
-			if (ClipBuffer[ind].y > ClipRect.top)
-				ClipRect.top = ClipBuffer[ind].y;
+		for (iClip = 1; iClip < (unsigned)clipEntries; iClip++) {
+			if (ClipBuffer[iClip].x < ClipRect.left)
+				ClipRect.left = ClipBuffer[iClip].x;
+			if (ClipBuffer[iClip].x > ClipRect.right)
+				ClipRect.right = ClipBuffer[iClip].x;
+			if (ClipBuffer[iClip].y < ClipRect.bottom)
+				ClipRect.bottom = ClipBuffer[iClip].y;
+			if (ClipBuffer[iClip].y > ClipRect.top)
+				ClipRect.top = ClipBuffer[iClip].y;
 		}
 		ClipRectSize.cx = ClipRect.right - ClipRect.left;
 		ClipRectSize.cy = ClipRect.top - ClipRect.bottom;
-		ClipStitchCount = p_nclp;
+		ClipStitchCount = clipEntries;
 	}
 }
 
 float getblen() {
-#if	 __UseASM__
-	float		fileLength;
-	unsigned	tlen;
+// ToDo - there must be a better way to do this.
+//        savblen is the complementary function
 
-	tlen = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
+#if	 __UseASM__
+	float		fLength;
+	unsigned	length;
+
+	length = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
 
 	_asm {
-		mov		eax, tlen
-		mov		fileLength, eax
+		mov		eax, length
+		mov		fLength, eax
 	}
 	return fileLength;
 #else
 	union {
-		float		len;
-		unsigned	tlen;
+		float		fLength;
+		unsigned	Length;
 	} x;
 
-	x.tlen = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
-	return x.len;
+	x.Length = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
+	return x.fLength;
 #endif
 }
 
 void savblen(float length) {
 #if	 __UseASM__
-	unsigned short l_nclp;
+	unsigned short clipEntries;
 	unsigned short picoLength;
 
 	_asm {
 		mov		eax, length
 		mov		picoLength, ax
 		shr		eax, 16
-		mov		l_nclp, ax
+		mov		clipEntries, ax
 	}
-	FormList[ClosestFormToCursor].clipEntries = l_nclp;
+	FormList[ClosestFormToCursor].clipEntries = clipEntries;
 	FormList[ClosestFormToCursor].picoLength = picoLength;
 #else
 	union {
@@ -2212,25 +2215,25 @@ void savblen(float length) {
 }
 
 float getplen() {
-	unsigned num = SelectedForm->picoLength;
+	unsigned value = SelectedForm->picoLength;
 
-	return((float)(num >> 8) + (num & 0xff) / 256);
+	return((float)(value >> 8) + (value & 0xff) / 256);
 }
 
-void savplen(float len) {
+void savplen(float length) {
 	unsigned	num, fr;
-	double		fnum, frf;
+	double		integerPart, fractionalPart;
 
-	if (len > 255)
-		len = 255;
-	frf = modf(len, &fnum);
-	fr = (unsigned)floor(frf * 256);
-	num = fnum;
+	if (length > 255)
+		length = 255;
+	fractionalPart = modf(length, &integerPart);
+	fr = (unsigned)floor(fractionalPart * 256);
+	num = integerPart;
 	FormList[ClosestFormToCursor].picoLength = (unsigned short)(num << 8) | fr;
 }
 
 void chkbrd() {
-	float	tlen;
+	float	length;
 
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -2281,11 +2284,11 @@ void chkbrd() {
 		case EDGEBHOL: // BH Buttonhole
 
 			HorizontalLength2 = SelectedForm->borderSize * 2;
-			tlen = ButtonholeCornerLength;
+			length = ButtonholeCornerLength;
 			ButtonholeCornerLength = getblen();
 			satout(20);
 			bhbrd(SelectedForm->edgeSpacing);
-			ButtonholeCornerLength = tlen;
+			ButtonholeCornerLength = length;
 			break;
 
 		case EDGEPICOT: // Picot
@@ -2315,82 +2318,82 @@ void chkbrd() {
 	}
 }
 
-void boldlin(unsigned strt, unsigned fin, double pd_Size) {
-	dPOINT		dif, stp, pnt0, pnt1;
-	double		len;
-	unsigned	cnt;
+void boldlin(unsigned start, unsigned finish, double size) {
+	dPOINT		delta, step, point0, point1;
+	double		length;
+	unsigned	count;
 
-	dif.x = CurrentFormVertices[fin].x - CurrentFormVertices[strt].x;
-	dif.y = CurrentFormVertices[fin].y - CurrentFormVertices[strt].y;
-	len = hypot(dif.x, dif.y);
-	cnt = len / pd_Size;
-	if (cnt) {
-		stp.x = dif.x / cnt;
-		stp.y = dif.y / cnt;
-		pnt0.x = CurrentFormVertices[strt].x;
-		pnt0.y = CurrentFormVertices[strt].y;
-		pnt1.x = pnt0.x + stp.x;
-		pnt1.y = pnt0.y + stp.y;
-		while (cnt) {
-			OSequence[SequenceIndex].x = pnt1.x;
-			OSequence[SequenceIndex++].y = pnt1.y;
-			OSequence[SequenceIndex].x = pnt0.x;
-			OSequence[SequenceIndex++].y = pnt0.y;
-			OSequence[SequenceIndex].x = pnt1.x;
-			OSequence[SequenceIndex++].y = pnt1.y;
-			pnt0.x += stp.x;
-			pnt0.y += stp.y;
-			pnt1.x += stp.x;
-			pnt1.y += stp.y;
-			cnt--;
+	delta.x = CurrentFormVertices[finish].x - CurrentFormVertices[start].x;
+	delta.y = CurrentFormVertices[finish].y - CurrentFormVertices[start].y;
+	length = hypot(delta.x, delta.y);
+	count = length / size;
+	if (count) {
+		step.x = delta.x / count;
+		step.y = delta.y / count;
+		point0.x = CurrentFormVertices[start].x;
+		point0.y = CurrentFormVertices[start].y;
+		point1.x = point0.x + step.x;
+		point1.y = point0.y + step.y;
+		while (count) {
+			OSequence[SequenceIndex].x = point1.x;
+			OSequence[SequenceIndex++].y = point1.y;
+			OSequence[SequenceIndex].x = point0.x;
+			OSequence[SequenceIndex++].y = point0.y;
+			OSequence[SequenceIndex].x = point1.x;
+			OSequence[SequenceIndex++].y = point1.y;
+			point0.x += step.x;
+			point0.y += step.y;
+			point1.x += step.x;
+			point1.y += step.y;
+			count--;
 		}
-		OSequence[SequenceIndex].x = CurrentFormVertices[fin].x;
-		OSequence[SequenceIndex++].y = CurrentFormVertices[fin].y;
+		OSequence[SequenceIndex].x = CurrentFormVertices[finish].x;
+		OSequence[SequenceIndex++].y = CurrentFormVertices[finish].y;
 	}
 	else {
-		OSequence[SequenceIndex].x = CurrentFormVertices[fin].x;
-		OSequence[SequenceIndex++].y = CurrentFormVertices[fin].y;
-		OSequence[SequenceIndex].x = CurrentFormVertices[strt].x;
-		OSequence[SequenceIndex++].y = CurrentFormVertices[strt].y;
-		OSequence[SequenceIndex].x = CurrentFormVertices[fin].x;
-		OSequence[SequenceIndex++].y = CurrentFormVertices[fin].y;
+		OSequence[SequenceIndex].x = CurrentFormVertices[finish].x;
+		OSequence[SequenceIndex++].y = CurrentFormVertices[finish].y;
+		OSequence[SequenceIndex].x = CurrentFormVertices[start].x;
+		OSequence[SequenceIndex++].y = CurrentFormVertices[start].y;
+		OSequence[SequenceIndex].x = CurrentFormVertices[finish].x;
+		OSequence[SequenceIndex++].y = CurrentFormVertices[finish].y;
 	}
 }
 
-void bold(double pd_Size) {
-	unsigned		ind, ine = 0;
-	unsigned short	nlin, tlin;
-	double			len;
+void bold(double size) {
+	unsigned		iVertex, iSequence, iOutput = 0;
+	unsigned short	iNextLine, iLine;
+	double			length;
 
-	nlin = tlin = getlast();
+	iNextLine = iLine = getlast();
 	SequenceIndex = 0;
-	OSequence[SequenceIndex].x = CurrentFormVertices[tlin].x;
-	OSequence[SequenceIndex++].y = CurrentFormVertices[tlin].y;
-	for (ind = 0; ind < (unsigned)VertexCount - 1; ind++) {
-		nlin = nxt(tlin);
-		boldlin(tlin, nlin, pd_Size);
-		tlin = nlin;
+	OSequence[SequenceIndex].x = CurrentFormVertices[iLine].x;
+	OSequence[SequenceIndex++].y = CurrentFormVertices[iLine].y;
+	for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+		iNextLine = nxt(iLine);
+		boldlin(iLine, iNextLine, size);
+		iLine = iNextLine;
 	}
 	if (SelectedForm->type != FRMLINE) {
-		nlin = nxt(tlin);
-		boldlin(tlin, nlin, pd_Size);
+		iNextLine = nxt(iLine);
+		boldlin(iLine, iNextLine, size);
 	}
-	for (ind = 0; ind < SequenceIndex - 1; ind++) {
-		len = hypot(OSequence[ind + 1].x - OSequence[ind].x, OSequence[ind + 1].y - OSequence[ind].y);
-		if (len > TINY) {
-			OSequence[ine].x = OSequence[ind].x;
-			OSequence[ine++].y = OSequence[ind].y;
+	for (iSequence = 0; iSequence < SequenceIndex - 1; iSequence++) {
+		length = hypot(OSequence[iSequence + 1].x - OSequence[iSequence].x, OSequence[iSequence + 1].y - OSequence[iSequence].y);
+		if (length > TINY) {
+			OSequence[iOutput].x = OSequence[iSequence].x;
+			OSequence[iOutput++].y = OSequence[iSequence].y;
 		}
 	}
-	OSequence[ine].x = CurrentFormVertices[nlin].x;
-	OSequence[ine++].y = CurrentFormVertices[nlin].y;
-	SequenceIndex = ine;
+	OSequence[iOutput].x = CurrentFormVertices[iNextLine].x;
+	OSequence[iOutput++].y = CurrentFormVertices[iNextLine].y;
+	SequenceIndex = iOutput;
 }
 
 void refilfn() {
-	double		tspac;
-	double		tsiz = UserStitchLength;
-	float		tlen;
+	double		spacing;
+	double		stitchLength = UserStitchLength;
+	float		length;
 
 	rstMap(TXFIL);
 	fvars(ClosestFormToCursor);
@@ -2465,11 +2468,11 @@ void refilfn() {
 		case EDGEBHOL:
 
 			HorizontalLength2 = SelectedForm->borderSize * 2;
-			tlen = ButtonholeCornerLength;
+			length = ButtonholeCornerLength;
 			ButtonholeCornerLength = getblen();
 			satout(20);
 			blbrd(SelectedForm->edgeSpacing);
-			ButtonholeCornerLength = tlen;
+			ButtonholeCornerLength = length;
 			ritbrd();
 			break;
 
@@ -2477,10 +2480,10 @@ void refilfn() {
 
 			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
 			SequenceIndex = 0;
-			tlen = ButtonholeCornerLength;
+			length = ButtonholeCornerLength;
 			ButtonholeCornerLength = getplen();
 			clpic(0);
-			ButtonholeCornerLength = tlen;
+			ButtonholeCornerLength = length;
 			ritbrd();
 			break;
 
@@ -2524,7 +2527,7 @@ void refilfn() {
 		chkund();
 		rstMap(ISUND);
 		if (SelectedForm->fillType) {
-			tspac = StitchSpacing;
+			spacing = StitchSpacing;
 			StitchSpacing = SelectedForm->fillSpacing;
 			switch ((unsigned)SelectedForm->fillType) {
 			case VRTF:
@@ -2595,7 +2598,7 @@ void refilfn() {
 			}
 		skpfil:;
 			ritfil();
-			StitchSpacing = tspac;
+			StitchSpacing = spacing;
 		}
 		chkbrd();
 		break;
@@ -2609,11 +2612,11 @@ void refilfn() {
 		switch (SelectedForm->fillType) {
 		case SATF:
 
-			tspac = StitchSpacing;
+			spacing = StitchSpacing;
 			StitchSpacing = SelectedForm->fillSpacing;
 			UserStitchLength = SelectedForm->lengthOrCount.stitchLength;
 			satfil();
-			StitchSpacing = tspac;
+			StitchSpacing = spacing;
 			ritfil();
 			break;
 
@@ -2635,21 +2638,22 @@ void refilfn() {
 		}
 		chkbrd();
 	}
-	UserStitchLength = tsiz;
+	UserStitchLength = stitchLength;
 	intlv();
 	ritot(PCSHeader.stitchCount);
 	setfchk();
 }
 
 void refil() {
-	unsigned trg, ind, at;
+	unsigned trg, iStitch, attribute;
 
 	if (!chku(WRNOF))
 	{
+		// ToDo - rename trg when I figure it out :)
 		trg = (ClosestFormToCursor << FRMSHFT) | USMSK;
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-			at = StitchBuffer[ind].attribute;
-			if (!(at&NOTFRM) && (at&(USMSK | FRMSK)) == trg) {
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+			attribute = StitchBuffer[iStitch].attribute;
+			if (!(attribute&NOTFRM) && (attribute&(USMSK | FRMSK)) == trg) {
 				if (FormDataSheet)
 					setMap(WASFRMFRM);
 				undat();
@@ -2664,16 +2668,16 @@ void refil() {
 }
 
 void setfpnt() {
-	POINT		stchpx;
-	fPOINT*		l_dpnt;
+	POINT		screenCoordinate;
+	fPOINT*		vertices;
 
 	unfrm();
 	fvars(ClosestFormToCursor);
-	l_dpnt = &SelectedForm->vertices[0];
-	stchpx.x = Msg.pt.x - StitchWindowOrigin.x;
-	stchpx.y = Msg.pt.y - StitchWindowOrigin.y;
+	vertices = &SelectedForm->vertices[0];
+	screenCoordinate.x = Msg.pt.x - StitchWindowOrigin.x;
+	screenCoordinate.y = Msg.pt.y - StitchWindowOrigin.y;
 	rats();
-	px2stchf(stchpx, &l_dpnt[ClosestVertexToCursor]);
+	px2stchf(screenCoordinate, &vertices[ClosestVertexToCursor]);
 	frmout(ClosestFormToCursor);
 	refil();
 	setMap(WASFPNT);
@@ -2683,81 +2687,82 @@ void setfpnt() {
 	setMap(RESTCH);
 }
 
-unsigned short nxt(unsigned short ind) {
-	ind++;
-	if (ind > (unsigned)VertexCount - 1)
-		ind = 0;
-	return ind;
+unsigned short nxt(unsigned short iVertex) {
+	iVertex++;
+	if (iVertex > (unsigned)VertexCount - 1)
+		iVertex = 0;
+	return iVertex;
 }
 
-unsigned short prv(unsigned ind) {
-	if (ind)
-		ind--;
+unsigned short prv(unsigned iVertex) {
+	if (iVertex)
+		iVertex--;
 	else
-		ind = VertexCount - 1;
-	return ind;
+		iVertex = VertexCount - 1;
+	return iVertex;
 }
 
-unsigned proj(dPOINT pnt, double p_slop, fPOINT pnt0, fPOINT pnt1, dPOINT* ipnt) {
-	dPOINT	difl;
-	double	slopl, con, conl, xmin, xmax, ymin, ymax, tdub;
+unsigned proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* adjustedPoint) {
+	dPOINT	delta;
+	double	slopl, con, conl, xMinimum, xMaximum, yMinimum, yMaximum, swap;
 
-	difl.x = pnt1.x - pnt0.x;
-	difl.y = pnt1.y - pnt0.y;
-	if (difl.x) {
-		slopl = difl.y / difl.x;
-		conl = pnt0.y - slopl*pnt0.x;
-		con = pnt.y - p_slop*pnt.x;
-		ipnt->x = (conl - con) / (p_slop - slopl);
-		ipnt->y = ipnt->x*p_slop + con;
+	// ToDo - rename slop1, con & conl
+	delta.x = point1.x - point0.x;
+	delta.y = point1.y - point0.y;
+	if (delta.x) {
+		slopl = delta.y / delta.x;
+		conl = point0.y - slopl*point0.x;
+		con = point.y - slope*point.x;
+		adjustedPoint->x = (conl - con) / (slope - slopl);
+		adjustedPoint->y = adjustedPoint->x*slope + con;
 	}
 	else {
-		ipnt->x = pnt0.x;
-		con = pnt.y - p_slop*pnt.x;
-		ipnt->y = ipnt->x*p_slop + con;
+		adjustedPoint->x = point0.x;
+		con = point.y - slope*point.x;
+		adjustedPoint->y = adjustedPoint->x*slope + con;
 	}
-	xmin = pnt0.x;
-	xmax = pnt1.x;
-	if (xmin > xmax) {
-		tdub = xmin;
-		xmin = xmax;
-		xmax = tdub;
+	xMinimum = point0.x;
+	xMaximum = point1.x;
+	if (xMinimum > xMaximum) {
+		swap = xMinimum;
+		xMinimum = xMaximum;
+		xMaximum = swap;
 	}
-	if (difl.y) {
-		ymin = pnt0.y;
-		ymax = pnt1.y;
-		if (ymin > ymax) {
-			tdub = ymin;
-			ymin = ymax;
-			ymax = tdub;
+	if (delta.y) {
+		yMinimum = point0.y;
+		yMaximum = point1.y;
+		if (yMinimum > yMaximum) {
+			swap = yMinimum;
+			yMinimum = yMaximum;
+			yMaximum = swap;
 		}
-		if (ipnt->x<xmin || ipnt->x>xmax || ipnt->y<ymin || ipnt->y>ymax)
+		if (adjustedPoint->x<xMinimum || adjustedPoint->x>xMaximum || adjustedPoint->y<yMinimum || adjustedPoint->y>yMaximum)
 			return 0;
 		else
 			return 1;
 	}
 	else {
-		if (ipnt->x<xmin || ipnt->x>xmax)
+		if (adjustedPoint->x<xMinimum || adjustedPoint->x>xMaximum)
 			return 0;
 		else
 			return 1;
 	}
 }
 
-unsigned projv(double pntx, fPOINT pnt0, fPOINT pnt1, dPOINT* ipnt) {
-	double tdub, l_slop, dx;
+unsigned projv(double xCoordinate, fPOINT point0, fPOINT point1, dPOINT* adjustedCoordinate) {
+	double swap, slope, deltaX;
 
-	ipnt->x = pntx;
-	dx = pnt1.x - pnt0.x;
-	if (dx) {
-		l_slop = (pnt1.y - pnt0.y) / dx;
-		ipnt->y = (pntx - pnt0.x)*l_slop + pnt0.y;
-		if (pnt0.x > pnt1.x) {
-			tdub = pnt0.x;
-			pnt0.x = pnt1.x;
-			pnt1.x = tdub;
+	adjustedCoordinate->x = xCoordinate;
+	deltaX = point1.x - point0.x;
+	if (deltaX) {
+		slope = (point1.y - point0.y) / deltaX;
+		adjustedCoordinate->y = (xCoordinate - point0.x)*slope + point0.y;
+		if (point0.x > point1.x) {
+			swap = point0.x;
+			point0.x = point1.x;
+			point1.x = swap;
 		}
-		if (pntx<pnt0.x || pntx>pnt1.x)
+		if (xCoordinate<point0.x || xCoordinate>point1.x)
 			return 0;
 		else
 			return 1;
@@ -2766,28 +2771,28 @@ unsigned projv(double pntx, fPOINT pnt0, fPOINT pnt1, dPOINT* ipnt) {
 		return 0;
 }
 
-unsigned projh(double pnty, fPOINT pnt0, fPOINT pnt1, dPOINT* ipnt) {
-	double tdub, l_slop, dx, dy;
+unsigned projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* adjustedCoordinate) {
+	double swap, slope, deltaX, deltaY;
 
-	ipnt->y = pnty;
-	dx = pnt1.x - pnt0.x;
-	if (dx) {
-		dy = pnt1.y - pnt0.y;
-		if (dy) {
-			l_slop = dy / dx;
-			ipnt->x = (pnty - pnt0.y) / l_slop + pnt0.x;
+	adjustedCoordinate->y = yCoordinate;
+	deltaX = point1.x - point0.x;
+	if (deltaX) {
+		deltaY = point1.y - point0.y;
+		if (deltaY) {
+			slope = deltaY / deltaX;
+			adjustedCoordinate->x = (yCoordinate - point0.y) / slope + point0.x;
 		}
 		else
 			return 0;
 	}
 	else
-		ipnt->x = pnt0.x;
-	if (pnt0.y > pnt1.y) {
-		tdub = pnt0.y;
-		pnt0.y = pnt1.y;
-		pnt1.y = tdub;
+		adjustedCoordinate->x = point0.x;
+	if (point0.y > point1.y) {
+		swap = point0.y;
+		point0.y = point1.y;
+		point1.y = swap;
 	}
-	if (pnty<pnt0.y || pnty>pnt1.y)
+	if (yCoordinate<point0.y || yCoordinate>point1.y)
 		return 0;
 	else
 		return 1;
