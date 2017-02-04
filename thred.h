@@ -910,7 +910,7 @@ typedef union _fangclp {
 
 	float		angle;
 	fPOINT*		clip;
-	SATCON		sat;
+	SATCON		guide;
 }FANGCLP;
 
 typedef union _flencnt {
@@ -921,7 +921,7 @@ typedef union _flencnt {
 
 typedef union _satinOrAngle {
 
-	SATCON*	sac;
+	SATCON*	guide;
 	float	angle;
 }SATINANGLE;
 
@@ -1227,8 +1227,8 @@ typedef struct _bakhed {
 	fPOINTATTR*	stitches;
 	unsigned	vertexCount;
 	fPOINT*		vertices;
-	unsigned	satinConnectionCount;
-	SATCON*		satinConnection;
+	unsigned	guideCount;
+	SATCON*		guide;
 	unsigned	clipPointCount;
 	fPOINT*		clipPoints;
 	COLORREF*	colors;
@@ -1791,6 +1791,6 @@ typedef struct _badcnts	{
 	unsigned attribute;
 	int flt;
 	int clip;
-	int sat;
+	int guideCount; // ToDo - is this an accurate description?
 	int tx;
 }BADCNTS;

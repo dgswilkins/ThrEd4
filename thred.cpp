@@ -395,7 +395,7 @@ extern	fPOINT			ClipPoints[MAXCLPNTS];
 extern	unsigned		ClosestFormToCursor;
 extern	unsigned		ClosestVertexToCursor;
 extern	unsigned		ClipPointIndex;
-extern	SATCON*			CurrentFormConnections;
+extern	SATCON*			CurrentFormGuides;
 extern	fPOINT*			CurrentFormVertices;
 extern	HWND			LabelWindow[LASTLIN];
 extern	HWND			ValueWindow[LASTLIN];
@@ -2385,12 +2385,12 @@ void dudat() {
 		backupData->vertices = (fPOINT*)&backupData->stitches[PCSHeader.stitchCount];
 		if (FormVertexIndex)
 			mvflpnt(backupData->vertices, &FormVertices[0], FormVertexIndex);
-		backupData->satinConnectionCount = SatinConnectIndex;
-		backupData->satinConnection = (SATCON*)&backupData->vertices[FormVertexIndex];
+		backupData->guideCount = SatinConnectIndex;
+		backupData->guide = (SATCON*)&backupData->vertices[FormVertexIndex];
 		if (SatinConnectIndex)
-			mvsatk(backupData->satinConnection, &SatinConnects[0], SatinConnectIndex);
+			mvsatk(backupData->guide, &SatinConnects[0], SatinConnectIndex);
 		backupData->clipPointCount = ClipPointIndex;
-		backupData->clipPoints = (fPOINT*)&backupData->satinConnection[SatinConnectIndex];
+		backupData->clipPoints = (fPOINT*)&backupData->guide[SatinConnectIndex];
 		if (ClipPointIndex) {
 
 			if (ClipPointIndex > MAXCLPNTS)
@@ -4639,9 +4639,9 @@ void redbak() {
 	FormVertexIndex = undoData->vertexCount;
 	if (FormVertexIndex)
 		mvflpnt(&FormVertices[0], &undoData->vertices[0], FormVertexIndex);
-	SatinConnectIndex = undoData->satinConnectionCount;
+	SatinConnectIndex = undoData->guideCount;
 	if (SatinConnectIndex)
-		mvsatk(&SatinConnects[0], &undoData->satinConnection[0], SatinConnectIndex);
+		mvsatk(&SatinConnects[0], &undoData->guide[0], SatinConnectIndex);
 	ClipPointIndex = undoData->clipPointCount;
 	if (ClipPointIndex)
 		mvflpnt(&ClipPoints[0], &undoData->clipPoints[0], ClipPointIndex);
@@ -5618,7 +5618,7 @@ void nuFil() {
 							if (FormList[iForm].type == SAT) {
 
 								if (FormList[iForm].satinGuideCount)
-									FormList[iForm].satinOrAngle.sac = adsatk(FormList[iForm].satinGuideCount);
+									FormList[iForm].satinOrAngle.guide = adsatk(FormList[iForm].satinGuideCount);
 							}
 							if (isclp(iForm))
 								FormList[iForm].angleOrClipData.clip = adclp(FormList[iForm].lengthOrCount.clipCount);
@@ -8606,8 +8606,8 @@ void duclip() {
 
 						for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 							
-							guides[guideCount].start = SelectedForm->satinOrAngle.sac[iGuide].start;
-							guides[guideCount++].finish = SelectedForm->satinOrAngle.sac[iGuide].finish;
+							guides[guideCount].start = SelectedForm->satinOrAngle.guide[iGuide].start;
+							guides[guideCount++].finish = SelectedForm->satinOrAngle.guide[iGuide].finish;
 						}
 					}
 				}
@@ -8709,8 +8709,8 @@ void duclip() {
 
 						for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 
-							guides[iGuide].start = SelectedForm->satinOrAngle.sac[iGuide].start;
-							guides[iGuide].finish = SelectedForm->satinOrAngle.sac[iGuide].finish;
+							guides[iGuide].start = SelectedForm->satinOrAngle.guide[iGuide].start;
+							guides[iGuide].finish = SelectedForm->satinOrAngle.guide[iGuide].finish;
 						}
 					}
 					mclp = (fPOINT*)&guides[iGuide];
@@ -9534,12 +9534,12 @@ void dubuf() {
 			}
 			if (FormList[iForm].type == SAT) {
 
-				forms[iForm].satinOrAngle.sac = (SATCON*)(&guides[iDestinationGuide] - &guides[0]);
+				forms[iForm].satinOrAngle.guide = (SATCON*)(&guides[iDestinationGuide] - &guides[0]);
 				forms[iForm].satinGuideCount = FormList[iForm].satinGuideCount;
 				for (iGuide = 0; iGuide < FormList[iForm].satinGuideCount; iGuide++) {
 
-					guides[iDestinationGuide].start = FormList[iForm].satinOrAngle.sac[iGuide].start;
-					guides[iDestinationGuide++].finish = FormList[iForm].satinOrAngle.sac[iGuide].finish;
+					guides[iDestinationGuide].start = FormList[iForm].satinOrAngle.guide[iGuide].start;
+					guides[iDestinationGuide++].finish = FormList[iForm].satinOrAngle.guide[iGuide].finish;
 				}
 			}
 			if (isclp(iForm)) {
@@ -9892,7 +9892,7 @@ void delet() {
 
 				if (SelectedForm->fillType == CONTF) {
 
-					if (ClosestVertexToCursor == SelectedForm->angleOrClipData.sat.start || ClosestVertexToCursor == SelectedForm->angleOrClipData.sat.finish) {
+					if (ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.start || ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.finish) {
 
 						delmfil(SelectedForm->fillColor);
 						SelectedForm->fillType = 0;
@@ -9900,10 +9900,10 @@ void delet() {
 						setMap(RESTCH);
 						return;
 					}
-					if (SelectedForm->angleOrClipData.sat.start > ClosestVertexToCursor)
-						SelectedForm->angleOrClipData.sat.start--;
-					if (SelectedForm->angleOrClipData.sat.finish > ClosestVertexToCursor)
-						SelectedForm->angleOrClipData.sat.finish--;
+					if (SelectedForm->angleOrClipData.guide.start > ClosestVertexToCursor)
+						SelectedForm->angleOrClipData.guide.start--;
+					if (SelectedForm->angleOrClipData.guide.finish > ClosestVertexToCursor)
+						SelectedForm->angleOrClipData.guide.finish--;
 				}
 				break;
 
@@ -9932,7 +9932,7 @@ void delet() {
 				}
 				for (iForm = 0; iForm < SelectedForm->satinGuideCount; iForm++) {
 
-					if (SelectedForm->satinOrAngle.sac[iForm].start == ClosestVertexToCursor || SelectedForm->satinOrAngle.sac[iForm].finish == ClosestVertexToCursor) {
+					if (SelectedForm->satinOrAngle.guide[iForm].start == ClosestVertexToCursor || SelectedForm->satinOrAngle.guide[iForm].finish == ClosestVertexToCursor) {
 
 						delcon(iForm);
 						satinFlag = 1;
@@ -11947,7 +11947,7 @@ void insfil() {
 							if (FormList[iFormList].type == SAT) {
 
 								if (FormList[iFormList].satinGuideCount)
-									FormList[iFormList].satinOrAngle.sac = adsatk(FormList[iFormList].satinGuideCount);
+									FormList[iFormList].satinOrAngle.guide = adsatk(FormList[iFormList].satinGuideCount);
 								if (isclpx(iFormList))
 									FormList[iFormList].angleOrClipData.clip = adclp(FormList[iFormList].lengthOrCount.clipCount);
 							}
@@ -19192,11 +19192,11 @@ unsigned chkMsg() {
 							SelectedForm = &FormList[FormIndex + iForm];
 							if (SelectedForm->type == SAT&&SelectedForm->satinGuideCount) {
 
-								SelectedForm->satinOrAngle.sac = adsatk(SelectedForm->satinGuideCount);
+								SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
 								for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 
-									SelectedForm->satinOrAngle.sac[iGuide].start = guides[currentGuide].start;
-									SelectedForm->satinOrAngle.sac[iGuide].finish = guides[currentGuide++].finish;
+									SelectedForm->satinOrAngle.guide[iGuide].start = guides[currentGuide].start;
+									SelectedForm->satinOrAngle.guide[iGuide].finish = guides[currentGuide++].finish;
 								}
 							}
 						}
@@ -19282,8 +19282,8 @@ unsigned chkMsg() {
 							guides = (SATCON*)&CurrentFormVertices[SelectedForm->vertexCount];
 							if (SelectedForm->type == SAT&&SelectedForm->satinGuideCount) {
 
-								SelectedForm->satinOrAngle.sac = adsatk(SelectedForm->satinGuideCount);
-								mvsatk(&SelectedForm->satinOrAngle.sac[0], &guides[0], SelectedForm->satinGuideCount);
+								SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
+								mvsatk(&SelectedForm->satinOrAngle.guide[0], &guides[0], SelectedForm->satinGuideCount);
 							}
 							clipData = (fPOINT*)&guides[0];
 							clipCount = 0;
@@ -23391,7 +23391,7 @@ void sachk() {
 		form = &FormList[iForm];
 		if (form->type == SAT&&form->satinGuideCount) {
 
-			guide = form->satinOrAngle.sac;
+			guide = form->satinOrAngle.guide;
 			for (iGuide = 0; iGuide < form->satinGuideCount; iGuide++) {
 
 				if (guide[iGuide].start > form->vertexCount || guide[iGuide].finish > form->vertexCount) {

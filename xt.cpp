@@ -1298,7 +1298,7 @@ void fncwlk()
 			OSequence[OutputIndex].y = midl(CurrentFormVertices[iVertex].y, CurrentFormVertices[iVertex + 1].y);
 			OutputIndex++;
 		}
-		guide = SelectedForm->satinOrAngle.sac;
+		guide = SelectedForm->satinOrAngle.guide;
 		for (iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--)
 		{
 			OSequence[OutputIndex].x = midl(CurrentFormVertices[guide[iGuide - 1].finish].x, CurrentFormVertices[guide[iGuide - 1].start].x);
@@ -1762,7 +1762,7 @@ void dasyfrm() {
 	{
 		SelectedForm->satinGuideCount = IniFile.daisyPetalCount - 1;
 		SelectedForm->wordParam = IniFile.daisyPetalCount*IniFile.daisyInnerCount + 1;
-		SelectedForm->satinOrAngle.sac = adsatk(IniFile.daisyPetalCount - 1);
+		SelectedForm->satinOrAngle.guide = adsatk(IniFile.daisyPetalCount - 1);
 	}
 	for (iMacroPetal = 0; iMacroPetal < IniFile.daisyPetalCount; iMacroPetal++)
 	{
@@ -1819,8 +1819,8 @@ void dasyfrm() {
 			angle += petalSegmentAngle;
 			if (chku(DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1)
 			{
-				SelectedForm->satinOrAngle.sac[iMacroPetal].start = (IniFile.daisyPetalCount - iMacroPetal - 1)*IniFile.daisyInnerCount + 1;
-				SelectedForm->satinOrAngle.sac[iMacroPetal].finish = iVertex;
+				SelectedForm->satinOrAngle.guide[iMacroPetal].start = (IniFile.daisyPetalCount - iMacroPetal - 1)*IniFile.daisyInnerCount + 1;
+				SelectedForm->satinOrAngle.guide[iMacroPetal].finish = iVertex;
 			}
 		}
 	}
@@ -5568,8 +5568,8 @@ unsigned frmchkfn()
 			{
 				if (!(badData.attribute&BADSAT))
 				{
-					if (badData.sat == formHeader->satinOrAngle.sac - SatinConnects)
-						badData.sat += formHeader->satinGuideCount;
+					if (badData.guideCount == formHeader->satinOrAngle.guide - SatinConnects)
+						badData.guideCount += formHeader->satinGuideCount;
 					else
 						badData.attribute |= BADSAT;
 				}
@@ -5591,7 +5591,7 @@ unsigned frmchkfn()
 			badData.attribute |= BADFLT;
 		if (badData.clip != (int)ClipPointIndex)
 			badData.attribute |= BADCLP;
-		if (badData.sat != (int)SatinConnectIndex)
+		if (badData.guideCount != (int)SatinConnectIndex)
 			badData.attribute |= BADSAT;
 		if (badData.tx != TextureIndex)
 			badData.attribute |= BADTX;
@@ -5641,7 +5641,7 @@ void bcup(unsigned find, BADCNTS* badData)
 	if (iseclp(find))
 		badData->clip += formHeader->clipEntries;
 	if (formHeader->type == SAT)
-		badData->sat += formHeader->satinGuideCount;
+		badData->guideCount += formHeader->satinGuideCount;
 	if (istx(find))
 		badData->tx += formHeader->fillInfo.texture.count;
 }
@@ -5700,7 +5700,7 @@ void repflt()
 			{
 				FormIndex = iForm;
 				ClipPointIndex = badData.clip;
-				SatinConnectIndex = badData.sat;
+				SatinConnectIndex = badData.guideCount;
 				TextureIndex = badData.tx;
 				chkfstch();
 				adbad(IDS_FRMDAT, FormIndex - iForm + 1);
@@ -5795,11 +5795,11 @@ void repsat()
 		formHeader = &FormList[iForm];
 		if (formHeader->type == SAT)
 		{
-			guideDifference = formHeader->satinOrAngle.sac - SatinConnects;
+			guideDifference = formHeader->satinOrAngle.guide - SatinConnects;
 			if (FormVertexIndex > guideDifference + formHeader->vertexCount)
 			{
-				MoveMemory(&SatinConnects[guideCount], formHeader->satinOrAngle.sac, formHeader->satinGuideCount * sizeof(SATCON));
-				formHeader->satinOrAngle.sac = &SatinConnects[guideCount];
+				MoveMemory(&SatinConnects[guideCount], formHeader->satinOrAngle.guide, formHeader->satinGuideCount * sizeof(SATCON));
+				formHeader->satinOrAngle.guide = &SatinConnects[guideCount];
 				guideCount += formHeader->satinGuideCount;
 				bcup(iForm, &badData);
 			}
@@ -5808,12 +5808,12 @@ void repsat()
 				if (guideDifference < SatinConnectIndex)
 				{
 					formHeader->satinGuideCount = SatinConnectIndex - guideDifference;
-					MoveMemory(&SatinConnects[guideCount], formHeader->satinOrAngle.sac, formHeader->satinGuideCount * sizeof(SATCON));
+					MoveMemory(&SatinConnects[guideCount], formHeader->satinOrAngle.guide, formHeader->satinGuideCount * sizeof(SATCON));
 					bcup(iForm, &badData);
 				}
 				else
 				{
-					guideCount = badData.sat;
+					guideCount = badData.guideCount;
 					formHeader->satinGuideCount = 0;
 				}
 			}
