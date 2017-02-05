@@ -1248,27 +1248,27 @@ typedef struct _range {
 }RANGE;
 
 typedef struct _region {	//region for sequencing vertical fills
-	unsigned start;		//start line of region
-	unsigned end;		//end line of region
-	unsigned brk;		// ToDo - is this member needed?
-	unsigned cntbrk;
+	unsigned start;			//start line of region
+	unsigned end;			//end line of region
+	unsigned regionBreak;	// ToDo - Is this member needed?
+	unsigned breakCount;	
 }REGION;
 
 typedef struct _rcon {		//PathMap: path map for sequencing
-	unsigned short	vrt;
+	unsigned short	node;
 	unsigned short	con;
-	unsigned short	grpn;
+	unsigned short	nextGroup;
 }RCON;
 
 typedef struct _rgseq {		//TempPath: temporary path connections
 	unsigned	pcon;		//pointer to PathMap entry
-	int			cnt;
+	int			count;
 	TCHAR		skp;		//path not found
 }RGSEQ;
 
 typedef struct _fseq {		//SequencePath: path of sequenced regions
-	unsigned short	vrt;
-	unsigned short	grpn;
+	unsigned short	node;
+	unsigned short	nextGroup;
 	TCHAR			skp;	//path not found
 }FSEQ;
 

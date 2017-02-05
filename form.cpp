@@ -1914,7 +1914,7 @@ void chkseq(BOOL border) {
 #else
 
 	double		len;
-	unsigned	iSequence, ind, destination, savedIndex;
+	unsigned	iSequence, destination, savedIndex;
 	float		minimumStitchLength;
 
 	savedIndex = InterleaveSequenceIndex;
@@ -2799,16 +2799,16 @@ unsigned projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* adjuste
 }
 
 void filang() {
-	unsigned	ind;
+	unsigned	iVertex;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
 	RotationCenter.x = (double)(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
 	RotationCenter.y = (double)(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;
-	for (ind = 0; ind < AngledForm.vertexCount; ind++) {
-		AngledForm.vertices[ind].x = SelectedForm->vertices[ind].x;
-		AngledForm.vertices[ind].y = SelectedForm->vertices[ind].y;
-		rotflt(&AngledForm.vertices[ind]);
+	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
+		AngledForm.vertices[iVertex].x = SelectedForm->vertices[iVertex].x;
+		AngledForm.vertices[iVertex].y = SelectedForm->vertices[iVertex].y;
+		rotflt(&AngledForm.vertices[iVertex]);
 	}
 	SelectedForm = &AngledForm;
 	fnvrt();
@@ -2823,114 +2823,114 @@ void makpoli() {
 	SelectedForm->type = FRMFPOLY;
 }
 
-void filinu(float pntx, float pnty) {
-	unsigned	cnt;
-	double		len;
-	dPOINT		ipnt, stp, dif;
+void filinu(float xCoordinate, float yCoordinate) {
+	unsigned	count;
+	double		length;
+	dPOINT		point, step, delta;
 
-	ipnt.x = SelectedPoint.x;
-	ipnt.y = SelectedPoint.y;
-	dif.x = pntx - SelectedPoint.x;
-	dif.y = pnty - SelectedPoint.y;
-	len = hypot(dif.x, dif.y);
-	cnt = len / UserStitchLength;
-	if (chkmax(cnt, SequenceIndex) || cnt + SequenceIndex > MAXSEQ - 3)
+	point.x = SelectedPoint.x;
+	point.y = SelectedPoint.y;
+	delta.x = xCoordinate - SelectedPoint.x;
+	delta.y = yCoordinate - SelectedPoint.y;
+	length = hypot(delta.x, delta.y);
+	count = length / UserStitchLength;
+	if (chkmax(count, SequenceIndex) || count + SequenceIndex > MAXSEQ - 3)
 		return;
-	if (cnt) {
+	if (count) {
 		if (chkMap(FILDIR))
-			cnt++;
-		stp.x = dif.x / cnt;
-		stp.y = dif.y / cnt;
-		while (cnt > 0) {
-			ipnt.x += stp.x;
-			ipnt.y += stp.y;
-			OSequence[SequenceIndex].x = ipnt.x;
-			OSequence[SequenceIndex++].y = ipnt.y;
-			cnt--;
+			count++;
+		step.x = delta.x / count;
+		step.y = delta.y / count;
+		while (count > 0) {
+			point.x += step.x;
+			point.y += step.y;
+			OSequence[SequenceIndex].x = point.x;
+			OSequence[SequenceIndex++].y = point.y;
+			count--;
 		}
 	}
 	else {
-		OSequence[SequenceIndex].x = pntx;
-		OSequence[SequenceIndex++].y = pnty;
+		OSequence[SequenceIndex].x = xCoordinate;
+		OSequence[SequenceIndex++].y = yCoordinate;
 	}
-	SelectedPoint.x = pntx;
-	SelectedPoint.y = pnty;
+	SelectedPoint.x = xCoordinate;
+	SelectedPoint.y = yCoordinate;
 }
 
-void filin(dPOINT pnt) {
-	dPOINT dif, stp, ipnt;
-	double len;
-	int cnt;
+void filin(dPOINT currentPoint) {
+	dPOINT delta, step, point;
+	double length;
+	int count;
 
-	dif.x = pnt.x - SelectedPoint.x;
-	dif.y = pnt.y - SelectedPoint.y;
-	len = hypot(dif.x, dif.y);
-	ipnt.x = SelectedPoint.x;
-	ipnt.y = SelectedPoint.y;
-	cnt = len / UserStitchLength;
-	if (chkmax(cnt, SequenceIndex) || (cnt + SequenceIndex) > MAXSEQ - 3)
+	delta.x = currentPoint.x - SelectedPoint.x;
+	delta.y = currentPoint.y - SelectedPoint.y;
+	length = hypot(delta.x, delta.y);
+	point.x = SelectedPoint.x;
+	point.y = SelectedPoint.y;
+	count = length / UserStitchLength;
+	if (chkmax(count, SequenceIndex) || (count + SequenceIndex) > MAXSEQ - 3)
 		return;
-	if (cnt) {
+	if (count) {
 		if (chkMap(FILDIR))
-			cnt++;
-		stp.x = dif.x / cnt;
-		stp.y = dif.y / cnt;
-		while (cnt > 0) {
-			ipnt.x += stp.x;
-			ipnt.y += stp.y;
-			OSequence[SequenceIndex].x = ipnt.x;
-			OSequence[SequenceIndex++].y = ipnt.y;
-			cnt--;
+			count++;
+		step.x = delta.x / count;
+		step.y = delta.y / count;
+		while (count > 0) {
+			point.x += step.x;
+			point.y += step.y;
+			OSequence[SequenceIndex].x = point.x;
+			OSequence[SequenceIndex++].y = point.y;
+			count--;
 		}
 	}
 	else {
-		OSequence[SequenceIndex].x = pnt.x;
-		OSequence[SequenceIndex++].y = pnt.y;
+		OSequence[SequenceIndex].x = currentPoint.x;
+		OSequence[SequenceIndex++].y = currentPoint.y;
 	}
-	SelectedPoint.x = pnt.x;
-	SelectedPoint.y = pnt.y;
+	SelectedPoint.x = currentPoint.x;
+	SelectedPoint.y = currentPoint.y;
 }
 
-unsigned short isclos(SMALPNTL* pnt0, SMALPNTL* pnt1) {
-	float		lo0, hi0, lo1, hi1;
+unsigned short isclos(SMALPNTL* lineEndPoint0, SMALPNTL* lineEndPoint1) {
+	float		low0, high0, low1, high1;
 
-	hi0 = pnt0[1].y + GapToClosestRegion;
-	lo0 = pnt0[0].y - GapToClosestRegion;
-	hi1 = pnt1[1].y + GapToClosestRegion;
-	lo1 = pnt1[0].y - GapToClosestRegion;
-	if (hi0 < lo1)
+	high0 = lineEndPoint0[1].y + GapToClosestRegion;
+	low0 = lineEndPoint0[0].y - GapToClosestRegion;
+	high1 = lineEndPoint1[1].y + GapToClosestRegion;
+	low1 = lineEndPoint1[0].y - GapToClosestRegion;
+	if (high0 < low1)
 		return 0;
-	if (hi1 < lo0)
+	if (high1 < low0)
 		return 0;
 	return 1;
 }
 
-BOOL lnclos(unsigned gp0, unsigned ln0, unsigned gp1, unsigned ln1) {
-	unsigned	ind0, ind1, cnt0, cnt1;
-	SMALPNTL*	pnt0;
-	SMALPNTL*	pnt1;
+BOOL lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) {
+	unsigned	index0, index1, count0, count1;
+	SMALPNTL*	lineEndPoint0;
+	SMALPNTL*	lineEndPoint1;
 
-	if (gp1 > GroupIndexCount - 2)
+	if (group1 > GroupIndexCount - 2)
 		return 0;
-	if (!gp0)
+	if (!group0)
 		return 0;
-	cnt0 = (GroupIndexSequence[gp0 + 1] - GroupIndexSequence[gp0]) >> 1;
-	ind0 = 0;
-	pnt0 = &LineEndpoints[GroupIndexSequence[gp0]];
-	while (cnt0&&pnt0[ind0].line != ln0) {
-		cnt0--;
-		ind0 += 2;
+	count0 = (GroupIndexSequence[group0 + 1] - GroupIndexSequence[group0]) >> 1;
+	index0 = 0;
+	lineEndPoint0 = &LineEndpoints[GroupIndexSequence[group0]];
+	while (count0&&lineEndPoint0[index0].line != line0) {
+		count0--;
+		index0 += 2;
 	}
-	if (cnt0) {
-		cnt1 = (GroupIndexSequence[gp1 + 1] - GroupIndexSequence[gp1]) >> 1;
-		ind1 = 0;
-		pnt1 = &LineEndpoints[GroupIndexSequence[gp1]];
-		while (cnt1&&pnt1[ind1].line != ln1) {
-			cnt1--;
-			ind1 += 2;
+	if (count0) {
+		count1 = (GroupIndexSequence[group1 + 1] - GroupIndexSequence[group1]) >> 1;
+		index1 = 0;
+		lineEndPoint1 = &LineEndpoints[GroupIndexSequence[group1]];
+		while (count1&&lineEndPoint1[index1].line != line1) {
+			count1--;
+			index1 += 2;
 		}
-		if (cnt1) {
-			if (isclos(&pnt0[ind0], &pnt1[ind1]))
+		if (count1) {
+			if (isclos(&lineEndPoint0[index0], &lineEndPoint1[index1]))
 				return 1;
 			else
 				return 0;
@@ -2939,79 +2939,81 @@ BOOL lnclos(unsigned gp0, unsigned ln0, unsigned gp1, unsigned ln1) {
 	return 0;
 }
 
-unsigned short regclos(unsigned rg0, unsigned rg1) {
-	SMALPNTL*	pnt0s;
-	SMALPNTL*	pnt0e;
-	SMALPNTL*	pnt1s;
-	SMALPNTL*	pnt1e;
-	unsigned	grp0s;
-	unsigned	grp0e;
-	unsigned	grp1s;
-	unsigned	grp1e;
-	unsigned	grps;
-	unsigned	grpe;
-	unsigned	l_lins, line;
+// ToDo - should the return type be BOOL?
+unsigned short regclos(unsigned iRegion0, unsigned iRegion1) {
+	SMALPNTL*	lineEndPoint0Start;
+	SMALPNTL*	lineEndPoint0End;
+	SMALPNTL*	lineEndPoint1Start;
+	SMALPNTL*	lineEndPoint1End;
+	unsigned	group0Start;
+	unsigned	group0End;
+	unsigned	group1Start;
+	unsigned	group1End;
+	unsigned	groupStart;
+	unsigned	groupEnd;
+	unsigned	lineStart, lineEnd;
 	unsigned	prlin, polin;
 
-	pnt0s = &*SortedLines[RegionsList[rg0].start];
-	pnt1s = &*SortedLines[RegionsList[rg1].start];
-	grp1s = pnt1s->group;
-	grp0s = pnt0s->group;
-	if (grp0s > grp1s) {
-		grps = grp0s;
-		l_lins = pnt0s->line;
-		prlin = pnt1s->line;
+	//ToDo - More renaming required
+	lineEndPoint0Start = &*SortedLines[RegionsList[iRegion0].start];
+	lineEndPoint1Start = &*SortedLines[RegionsList[iRegion1].start];
+	group1Start = lineEndPoint1Start->group;
+	group0Start = lineEndPoint0Start->group;
+	if (group0Start > group1Start) {
+		groupStart = group0Start;
+		lineStart = lineEndPoint0Start->line;
+		prlin = lineEndPoint1Start->line;
 	}
 	else {
-		grps = grp1s;
-		l_lins = pnt1s->line;
-		prlin = pnt0s->line;
+		groupStart = group1Start;
+		lineStart = lineEndPoint1Start->line;
+		prlin = lineEndPoint0Start->line;
 	}
-	if (grps&&lnclos(grps - 1, prlin, grps, l_lins)) {
-		NextGroup = grps;
+	if (groupStart&&lnclos(groupStart - 1, prlin, groupStart, lineStart)) {
+		NextGroup = groupStart;
 		return 1;
 	}
 	else {
-		pnt0e = &*SortedLines[RegionsList[rg0].end];
-		pnt1e = &*SortedLines[RegionsList[rg1].end];
-		grp1e = pnt1e->group;
-		grp0e = pnt0e->group;
-		if (grp0e < grp1e) {
-			grpe = grp0e;
-			line = pnt0e->line;
-			polin = pnt1e->line;
+		lineEndPoint0End = &*SortedLines[RegionsList[iRegion0].end];
+		lineEndPoint1End = &*SortedLines[RegionsList[iRegion1].end];
+		group1End = lineEndPoint1End->group;
+		group0End = lineEndPoint0End->group;
+		if (group0End < group1End) {
+			groupEnd = group0End;
+			lineEnd = lineEndPoint0End->line;
+			polin = lineEndPoint1End->line;
 		}
 		else {
-			grpe = grp1e;
-			line = pnt1e->line;
-			polin = pnt0e->line;
+			groupEnd = group1End;
+			lineEnd = lineEndPoint1End->line;
+			polin = lineEndPoint0End->line;
 		}
-		if (lnclos(grpe, line, grpe + 1, polin)) {
-			NextGroup = grpe;
+		if (lnclos(groupEnd, lineEnd, groupEnd + 1, polin)) {
+			NextGroup = groupEnd;
 			return 1;
 		}
 	}
-	if (((grp0s > grp1s) ? (grp0s - grp1s) : (grp1s - grp0s)) < 2) {
-		if (isclos(pnt0s, pnt1s)) {
-			NextGroup = grp0s;
+	if (((group0Start > group1Start) ? (group0Start - group1Start) : (group1Start - group0Start)) < 2) {
+		if (isclos(lineEndPoint0Start, lineEndPoint1Start)) {
+			NextGroup = group0Start;
 			return 1;
 		}
 	}
-	if (((grp0s > grp1e) ? (grp0s - grp1e) : (grp1e - grp0s)) < 2) {
-		if (isclos(pnt0s, pnt1e)) {
-			NextGroup = grp0s;
+	if (((group0Start > group1End) ? (group0Start - group1End) : (group1End - group0Start)) < 2) {
+		if (isclos(lineEndPoint0Start, lineEndPoint1End)) {
+			NextGroup = group0Start;
 			return 1;
 		}
 	}
-	if (((grp0e > grp1s) ? (grp0e - grp1s) : (grp1s - grp0e)) < 2) {
-		if (isclos(pnt0e, pnt1s)) {
-			NextGroup = grp0e;
+	if (((group0End > group1Start) ? (group0End - group1Start) : (group1Start - group0End)) < 2) {
+		if (isclos(lineEndPoint0End, lineEndPoint1Start)) {
+			NextGroup = group0End;
 			return 1;
 		}
 	}
-	if (((grp0e > grp1e) ? (grp0e - grp1e) : (grp1e - grp0e)) < 2) {
-		if (isclos(pnt0e, pnt1e)) {
-			NextGroup = grp0e;
+	if (((group0End > group1End) ? (group0End - group1End) : (group1End - group0End)) < 2) {
+		if (isclos(lineEndPoint0End, lineEndPoint1End)) {
+			NextGroup = group0End;
 			return 1;
 		}
 	}
@@ -3026,68 +3028,68 @@ BOOL unvis() {
 	return 0;
 }
 
-unsigned setseq(unsigned bpnt) {
+unsigned setseq(unsigned bit) {
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
 		mov		ebx, SequenceFlagBitmap
-		mov		ecx, bpnt
+		mov		ecx, bit
 		bts[ebx], ecx
 		jnc		short setseqx
 		inc		eax
 		setseqx :
 	}
 #else
-	return _bittestandset((long *)SequenceFlagBitmap, bpnt);
+	return _bittestandset((long *)SequenceFlagBitmap, bit);
 #endif
 }
 
-void rspnt(float fx, float fy) {
-	BSequence[OutputIndex].x = fx;
-	BSequence[OutputIndex].y = fy;
+void rspnt(float xCoordinate, float yCoordinate) {
+	BSequence[OutputIndex].x = xCoordinate;
+	BSequence[OutputIndex].y = yCoordinate;
 	BSequence[OutputIndex++].attribute = 0;
 }
 
-void dunseq(unsigned strt, unsigned fin) {
-	SMALPNTL*	l_lin0;
-	SMALPNTL*	l_lin1;
-	unsigned	ind;
-	double		dy, miny;
+void dunseq(unsigned start, unsigned finish) {
+	SMALPNTL*	lineEndPoint0;
+	SMALPNTL*	lineEndPoint1;
+	unsigned	iLine;
+	double		deltaY, minimumY;
 
-	miny = 1e30;
-	for (ind = strt; ind <= fin; ind++) {
-		l_lin0 = &*SortedLines[ind];
-		dy = l_lin0[1].y - l_lin0->y;
-		if (dy < miny)
-			miny = dy;
+	minimumY = 1e30;
+	for (iLine = start; iLine <= finish; iLine++) {
+		lineEndPoint0 = &*SortedLines[iLine];
+		deltaY = lineEndPoint0[1].y - lineEndPoint0->y;
+		if (deltaY < minimumY)
+			minimumY = deltaY;
 	}
-	miny /= 2;
-	l_lin0 = &*SortedLines[strt];
-	l_lin1 = &*SortedLines[fin];
-	if (miny == 1e30 / 2)
-		miny = 0;
-	rspnt(l_lin0->x, l_lin0->y + miny);
-	rspnt(l_lin1->x, l_lin1->y + miny);
-	LastGroup = l_lin1->group;
+	minimumY /= 2;
+	lineEndPoint0 = &*SortedLines[start];
+	lineEndPoint1 = &*SortedLines[finish];
+	if (minimumY == 1e30 / 2)
+		minimumY = 0;
+	rspnt(lineEndPoint0->x, lineEndPoint0->y + minimumY);
+	rspnt(lineEndPoint1->x, lineEndPoint1->y + minimumY);
+	LastGroup = lineEndPoint1->group;
 }
 
 void movseq(unsigned ind) {
-	SMALPNTL* l_lin;
+	SMALPNTL* lineEndPoint;
 
-	l_lin = &*SortedLines[ind];
+	lineEndPoint = &*SortedLines[ind];
 	BSequence[OutputIndex].attribute = SEQBOT;
-	BSequence[OutputIndex].x = l_lin->x;
-	BSequence[OutputIndex].y = l_lin->y;
+	BSequence[OutputIndex].x = lineEndPoint->x;
+	BSequence[OutputIndex].y = lineEndPoint->y;
 	OutputIndex++;
-	l_lin++;
+	lineEndPoint++;
 	BSequence[OutputIndex].attribute = SEQTOP;
-	BSequence[OutputIndex].x = l_lin->x;
-	BSequence[OutputIndex].y = l_lin->y;
+	BSequence[OutputIndex].x = lineEndPoint->x;
+	BSequence[OutputIndex].y = lineEndPoint->y;
 	OutputIndex++;
 }
 
-void duseq2(unsigned ind) {
-	SequenceLines = &*SortedLines[ind];
+void duseq2(unsigned iLine) {
+	SequenceLines = &*SortedLines[iLine];
 	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x, (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
 }
 
@@ -3095,112 +3097,114 @@ void duseq1() {
 	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x, (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
 }
 
-void duseq(unsigned strt, unsigned fin) {
-	unsigned	ind, topbak;
+void duseq(unsigned start, unsigned finish) {
+	unsigned	iLine, topbak;
 
+	//ToDo - More renaming required
 	SequenceLines = nullptr;
 	rstMap(SEQDUN);
-	topbak = SortedLines[strt][1].line;
-	if (strt > fin) {
-		for (ind = strt; (int)ind >= (int)fin; ind--) {
-			if (setseq(ind)) {
+	topbak = SortedLines[start][1].line;
+	if (start > finish) {
+		for (iLine = start; (int)iLine >= (int)finish; iLine--) {
+			if (setseq(iLine)) {
 				if (!setMap(SEQDUN))
-					duseq2(ind);
+					duseq2(iLine);
 				else {
-					if (topbak != SortedLines[ind][1].line) {
-						if (ind)
-							duseq2(ind + 1);
-						duseq2(ind);
+					if (topbak != SortedLines[iLine][1].line) {
+						if (iLine)
+							duseq2(iLine + 1);
+						duseq2(iLine);
 						topbak = SequenceLines[1].line;
 					}
 				}
 			}
 			else {
 				if (rstMap(SEQDUN))
-					duseq2(ind + 1);
-				SequenceLines = &*SortedLines[ind];
-				movseq(ind);
+					duseq2(iLine + 1);
+				SequenceLines = &*SortedLines[iLine];
+				movseq(iLine);
 			}
 		}
 		if (rstMap(SEQDUN))
-			duseq2(ind + 1);
+			duseq2(iLine + 1);
 		if (SequenceLines != nullptr) { LastGroup = SequenceLines->group; }
 	}
 	else {
-		for (ind = strt; ind <= fin; ind++) {
-			if (setseq(ind)) {
+		for (iLine = start; iLine <= finish; iLine++) {
+			if (setseq(iLine)) {
 				if (!setMap(SEQDUN))
-					duseq2(ind);
+					duseq2(iLine);
 				else {
-					if (topbak != SortedLines[ind][1].line) {
-						if (ind)
-							duseq2(ind - 1);
-						duseq2(ind);
+					if (topbak != SortedLines[iLine][1].line) {
+						if (iLine)
+							duseq2(iLine - 1);
+						duseq2(iLine);
 						topbak = SequenceLines[1].line;
 					}
 				}
 			}
 			else {
 				if (rstMap(SEQDUN)) {
-					if (ind)
-						duseq2(ind - 1);
+					if (iLine)
+						duseq2(iLine - 1);
 				}
-				SequenceLines = &*SortedLines[ind];
-				movseq(ind);
+				SequenceLines = &*SortedLines[iLine];
+				movseq(iLine);
 			}
 		}
 		if (rstMap(SEQDUN)) {
-			if (ind)
-				duseq2(ind - 1);
+			if (iLine)
+				duseq2(iLine - 1);
 		}
 		if (SequenceLines != nullptr) { LastGroup = SequenceLines->group; }
 	}
 }
 
-void brkseq(unsigned strt, unsigned fin) {
+void brkseq(unsigned start, unsigned finish) {
 	//SMALPNTL* line=0;
-	unsigned	ind, bgrp = 0;
+	unsigned	iLine, bgrp = 0;
 
+	//ToDo - More renaming required
 	rstMap(SEQDUN);
-	if (strt > fin) {
-		bgrp = SortedLines[strt]->group + 1;
-		for (ind = strt; (int)ind >= (int)fin; ind--) {
+	if (start > finish) {
+		bgrp = SortedLines[start]->group + 1;
+		for (iLine = start; (int)iLine >= (int)finish; iLine--) {
 			bgrp--;
-			if (SortedLines[ind]->group != bgrp) {
+			if (SortedLines[iLine]->group != bgrp) {
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
-				SequenceLines = &*SortedLines[ind];
+				SequenceLines = &*SortedLines[iLine];
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
 				bgrp = SequenceLines[0].group;
 			}
 			else
-				SequenceLines = &*SortedLines[ind];
-			if (setseq(ind)) {
+				SequenceLines = &*SortedLines[iLine];
+			if (setseq(iLine)) {
 				if (!setMap(SEQDUN))
 					duseq1();
 			}
 			else
-				movseq(ind);
+				movseq(iLine);
 		}
 		LastGroup = SequenceLines->group;
 	}
 	else {
-		bgrp = SortedLines[strt]->group - 1;
-		for (ind = strt; ind <= fin; ind++) {
+		bgrp = SortedLines[start]->group - 1;
+		for (iLine = start; iLine <= finish; iLine++) {
 			bgrp++;
-			if (SortedLines[ind]->group != bgrp) {
+			if (SortedLines[iLine]->group != bgrp) {
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
-				SequenceLines = &*SortedLines[ind];
+				SequenceLines = &*SortedLines[iLine];
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
 				bgrp = SequenceLines[0].group;
 			}
 			else
-				SequenceLines = &*SortedLines[ind];
-			if (setseq(ind)) {
+				SequenceLines = &*SortedLines[iLine];
+			if (setseq(iLine)) {
 				if (!setMap(SEQDUN))
 					duseq1();
 			}
 			else
-				movseq(ind);
+				movseq(iLine);
 		}
 		LastGroup = SequenceLines->group;
 	}
@@ -3208,44 +3212,45 @@ void brkseq(unsigned strt, unsigned fin) {
 		duseq1();
 }
 
-void brkdun(unsigned strt, unsigned fin) {
-	rspnt(SortedLines[strt]->x, SortedLines[strt]->y);
-	rspnt(SortedLines[fin]->x, SortedLines[fin]->y);
-	rspnt(WorkingFormVertices[SortedLines[strt]->line].x, WorkingFormVertices[SortedLines[strt]->line].y);
+void brkdun(unsigned start, unsigned finish) {
+	rspnt(SortedLines[start]->x, SortedLines[start]->y);
+	rspnt(SortedLines[finish]->x, SortedLines[finish]->y);
+	rspnt(WorkingFormVertices[SortedLines[start]->line].x, WorkingFormVertices[SortedLines[start]->line].y);
 	setMap(BRKFIX);
 }
 
 void durgn(unsigned pthi) {
-	unsigned	dun, gdif, mindif = 0, ind, fdif, bdif;
+	unsigned	dun, gdif, mindif = 0, iVertex, ind, fdif, bdif;
 	unsigned	seql, seqn;
-	unsigned	seqs, seqe;
-	unsigned	grpn, grps, grpe;
+	unsigned	sequenceStart, sequenceEnd;
+	unsigned	nextGroup, groupStart, groupEnd;
 	unsigned	rgind;
-	SMALPNTL*	pnts;
-	SMALPNTL*	pnte;
-	double		len, minlen;
+	SMALPNTL*	lineEndPointStart;
+	SMALPNTL*	lineEndPointEnd;
+	double		length, minimumLength;
 	BSEQPNT*	bpnt;
 
-	rgind = SequencePath[pthi].vrt;
+	//ToDo - More renaming required
+	rgind = SequencePath[pthi].node;
 	CurrentRegion = &RegionsList[rgind];
-	grpn = SequencePath[pthi].grpn;
-	seqs = CurrentRegion->start;
-	seqe = CurrentRegion->end;
+	nextGroup = SequencePath[pthi].nextGroup;
+	sequenceStart = CurrentRegion->start;
+	sequenceEnd = CurrentRegion->end;
 	if (SequencePath[pthi].skp || rstMap(BRKFIX)) {
 		if (BSequence[OutputIndex - 1].attribute != SEQBOT)
 			rspnt(BSequence[OutputIndex - 2].x, BSequence[OutputIndex - 2].y);
-		pnts = &*SortedLines[rgind];
-		dun = SortedLines[seqs]->line;
+		lineEndPointStart = &*SortedLines[rgind];
+		dun = SortedLines[sequenceStart]->line;
 		bpnt = &BSequence[OutputIndex - 1];
-		minlen = 1e99;
-		for (ind = 0; ind < VertexCount; ind++) {
-			len = hypot(bpnt->x - WorkingFormVertices[ind].x, bpnt->y - WorkingFormVertices[ind].y);
-			if (len < minlen) {
-				minlen = len;
-				mindif = ind;
+		minimumLength = 1e99;
+		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+			length = hypot(bpnt->x - WorkingFormVertices[iVertex].x, bpnt->y - WorkingFormVertices[iVertex].y);
+			if (length < minimumLength) {
+				minimumLength = length;
+				mindif = iVertex;
 			}
 		}
-		if (minlen)
+		if (minimumLength)
 			rspnt(WorkingFormVertices[mindif].x, WorkingFormVertices[mindif].y);
 		fdif = (VertexCount + dun - mindif) % VertexCount;
 		bdif = (VertexCount - dun + mindif) % VertexCount;
@@ -3272,38 +3277,38 @@ void durgn(unsigned pthi) {
 		dun = 0;
 		VisitedRegions[rgind]++;
 	}
-	pnts = &*SortedLines[CurrentRegion->start];
-	pnte = &*SortedLines[CurrentRegion->end];
-	grps = pnts->group;
-	grpe = pnte->group;
-	if (grpe != grps)
-		seql = (double)(LastGroup - grps) / (grpe - grps)*(seqe - seqs) + seqs;
+	lineEndPointStart = &*SortedLines[CurrentRegion->start];
+	lineEndPointEnd = &*SortedLines[CurrentRegion->end];
+	groupStart = lineEndPointStart->group;
+	groupEnd = lineEndPointEnd->group;
+	if (groupEnd != groupStart)
+		seql = (double)(LastGroup - groupStart) / (groupEnd - groupStart)*(sequenceEnd - sequenceStart) + sequenceStart;
 	else
 		seql = 0;
 	if (seql > SortedLineIndex)
 		seql = 0;
-	len = (double)(grpe - grps)*(seqe - seqs);
-	if (len)
-		seqn = (double)(grpn - grps) / len + seqs;
+	length = (double)(groupEnd - groupStart)*(sequenceEnd - sequenceStart);
+	if (length)
+		seqn = (double)(nextGroup - groupStart) / length + sequenceStart;
 	else
-		seqn = seqe;
-	if (seql < seqs)
-		seql = seqs;
-	if (seql > seqe)
-		seql = seqe;
-	if (seqn < seqs)
-		seqn = seqs;
-	if (seqn > seqe)
-		seqn = seqe;
+		seqn = sequenceEnd;
+	if (seql < sequenceStart)
+		seql = sequenceStart;
+	if (seql > sequenceEnd)
+		seql = sequenceEnd;
+	if (seqn < sequenceStart)
+		seqn = sequenceStart;
+	if (seqn > sequenceEnd)
+		seqn = sequenceEnd;
 	if (SortedLines[seql]->group != LastGroup) {
-		if (seql < seqe&&SortedLines[seql + 1]->group == LastGroup)
+		if (seql < sequenceEnd&&SortedLines[seql + 1]->group == LastGroup)
 			seql++;
 		else {
-			if (seql > seqs&&SortedLines[seql - 1]->group == LastGroup)
+			if (seql > sequenceStart&&SortedLines[seql - 1]->group == LastGroup)
 				seql--;
 			else {
 				mindif = 0xffffffff;
-				for (ind = seqs; ind <= seqe; ind++) {
+				for (ind = sequenceStart; ind <= sequenceEnd; ind++) {
 					gdif = ((SortedLines[ind]->group > LastGroup) ? (SortedLines[ind]->group - LastGroup) : (LastGroup - SortedLines[ind]->group));
 					if (gdif < mindif) {
 						mindif = gdif;
@@ -3313,16 +3318,16 @@ void durgn(unsigned pthi) {
 			}
 		}
 	}
-	if (SortedLines[seqn]->group != grpn) {
-		if (seqn < seqe&&SortedLines[seqn + 1]->group == grpn)
+	if (SortedLines[seqn]->group != nextGroup) {
+		if (seqn < sequenceEnd&&SortedLines[seqn + 1]->group == nextGroup)
 			seqn++;
 		else {
-			if (seqn > seqs&&SortedLines[seqn - 1]->group == grpn)
+			if (seqn > sequenceStart&&SortedLines[seqn - 1]->group == nextGroup)
 				seqn--;
 			else {
 				mindif = 0xffffffff;
-				for (ind = seqs; ind <= seqe; ind++) {
-					gdif = ((SortedLines[ind]->group > grpn) ? (SortedLines[ind]->group - grpn) : (grpn - SortedLines[ind]->group));
+				for (ind = sequenceStart; ind <= sequenceEnd; ind++) {
+					gdif = ((SortedLines[ind]->group > nextGroup) ? (SortedLines[ind]->group - nextGroup) : (nextGroup - SortedLines[ind]->group));
 					if (gdif < mindif) {
 						mindif = gdif;
 						seqn = ind;
@@ -3331,30 +3336,30 @@ void durgn(unsigned pthi) {
 			}
 		}
 	}
-	if (CurrentRegion->cntbrk) {
+	if (CurrentRegion->breakCount) {
 		if (dun) {
 			brkdun(seql, seqn);
 		}
 		else {
-			if (LastGroup >= grpe) {
-				brkseq(seqe, seqs);
-				if (pthi < SequencePathIndex - 1 && seqe != seqn)
-					brkseq(seqs, seqn);
+			if (LastGroup >= groupEnd) {
+				brkseq(sequenceEnd, sequenceStart);
+				if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn)
+					brkseq(sequenceStart, seqn);
 			}
 			else {
-				if (grps <= grpn) {
-					if (seql != seqs)
-						brkseq(seql, seqs);
-					brkseq(seqs, seqe);
-					if (pthi < SequencePathIndex - 1 && seqe != seqn)
-						brkseq(seqe, seqn);
+				if (groupStart <= nextGroup) {
+					if (seql != sequenceStart)
+						brkseq(seql, sequenceStart);
+					brkseq(sequenceStart, sequenceEnd);
+					if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn)
+						brkseq(sequenceEnd, seqn);
 				}
 				else {
-					if (seql != seqe)
-						brkseq(seql, seqe);
-					brkseq(seqe, seqs);
-					if (pthi < SequencePathIndex - 1 && seqs != seqn)
-						brkseq(seqs, seqn);
+					if (seql != sequenceEnd)
+						brkseq(seql, sequenceEnd);
+					brkseq(sequenceEnd, sequenceStart);
+					if (pthi < SequencePathIndex - 1 && sequenceStart != seqn)
+						brkseq(sequenceStart, seqn);
 				}
 			}
 		}
@@ -3363,43 +3368,44 @@ void durgn(unsigned pthi) {
 		if (dun)
 			dunseq(seql, seqn);
 		else {
-			if (LastGroup >= grpe) {
-				duseq(seqe, seqs);
-				duseq(seqs, seqn);
+			if (LastGroup >= groupEnd) {
+				duseq(sequenceEnd, sequenceStart);
+				duseq(sequenceStart, seqn);
 			}
 			else {
-				if (grps <= grpn) {
-					if (seql != seqs)
-						duseq(seql, seqs);
-					duseq(seqs, seqe);
-					if (pthi < SequencePathIndex - 1 && seqe != seqn)
-						duseq(seqe, seqn);
+				if (groupStart <= nextGroup) {
+					if (seql != sequenceStart)
+						duseq(seql, sequenceStart);
+					duseq(sequenceStart, sequenceEnd);
+					if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn)
+						duseq(sequenceEnd, seqn);
 				}
 				else {
-					if (seql != seqe)
-						duseq(seql, seqe);
-					duseq(seqe, seqs);
-					if (pthi < SequencePathIndex - 1 && seqs != seqn)
-						duseq(seqs, seqn);
+					if (seql != sequenceEnd)
+						duseq(seql, sequenceEnd);
+					duseq(sequenceEnd, sequenceStart);
+					if (pthi < SequencePathIndex - 1 && sequenceStart != seqn)
+						duseq(sequenceStart, seqn);
 				}
 			}
 		}
 	}
 }
 
-unsigned notdun(unsigned lvl) {
+unsigned notdun(unsigned level) {
 	unsigned	ind;
-	int			tpiv, pivot = lvl - 1;
+	int			tpiv, pivot = level - 1;
 
+	//ToDo - More renaming required
 	RegionPath = &TempPath[SequencePathIndex];
 	RegionPath[0].pcon = MapIndexSequence[DoneRegion];
-	RegionPath[0].cnt = MapIndexSequence[DoneRegion + 1] - RegionPath[0].pcon;
-	for (ind = 1; ind < lvl; ind++) {
-		RegionPath[ind].pcon = MapIndexSequence[PathMap[RegionPath[ind - 1].pcon].vrt];
-		RegionPath[ind].cnt = MapIndexSequence[PathMap[RegionPath[ind - 1].pcon].vrt + 1] - RegionPath[ind].pcon;
+	RegionPath[0].count = MapIndexSequence[DoneRegion + 1] - RegionPath[0].pcon;
+	for (ind = 1; ind < level; ind++) {
+		RegionPath[ind].pcon = MapIndexSequence[PathMap[RegionPath[ind - 1].pcon].node];
+		RegionPath[ind].count = MapIndexSequence[PathMap[RegionPath[ind - 1].pcon].node + 1] - RegionPath[ind].pcon;
 	}
-	while (VisitedRegions[PathMap[RegionPath[pivot].pcon].vrt] && pivot >= 0) {
-		if (--RegionPath[pivot].cnt > 0)
+	while (VisitedRegions[PathMap[RegionPath[pivot].pcon].node] && pivot >= 0) {
+		if (--RegionPath[pivot].count > 0)
 			RegionPath[pivot].pcon++;
 		else {
 			tpiv = pivot;
@@ -3407,19 +3413,19 @@ unsigned notdun(unsigned lvl) {
 				tpiv--;
 				if (tpiv < 0)
 					return 1;
-				RegionPath[tpiv].cnt--;
+				RegionPath[tpiv].count--;
 				RegionPath[tpiv].pcon++;
-			} while (!RegionPath[tpiv].cnt);
+			} while (!RegionPath[tpiv].count);
 			if (tpiv < 0)
 				return 1;
 			tpiv++;
 			while (tpiv <= pivot) {
 				if (tpiv) {
-					RegionPath[tpiv].pcon = MapIndexSequence[PathMap[RegionPath[tpiv - 1].pcon].vrt];
-					RegionPath[tpiv].cnt = MapIndexSequence[PathMap[RegionPath[tpiv - 1].pcon].vrt + 1] - RegionPath[tpiv].pcon;
+					RegionPath[tpiv].pcon = MapIndexSequence[PathMap[RegionPath[tpiv - 1].pcon].node];
+					RegionPath[tpiv].count = MapIndexSequence[PathMap[RegionPath[tpiv - 1].pcon].node + 1] - RegionPath[tpiv].pcon;
 				}
 				else {
-					if (--RegionPath[0].cnt)
+					if (--RegionPath[0].count)
 						RegionPath[0].pcon++;
 					else
 						return 1;
@@ -3431,77 +3437,77 @@ unsigned notdun(unsigned lvl) {
 	return 0;
 }
 
-double reglen(unsigned reg) {
-	double		len, minlen = 1e99;
-	unsigned	ind, ine;
-	SMALPNTL*	pnts[4];
+double reglen(unsigned iRegion) {
+	double		length, minimumLength = 1e99;
+	unsigned	iCorner, iPoint;
+	SMALPNTL*	lineEndPoints[4];
 
-	pnts[0] = SortedLines[RegionsList[reg].start];
-	pnts[1] = &SortedLines[RegionsList[reg].start][1];
-	pnts[2] = SortedLines[RegionsList[reg].end];
-	pnts[3] = &SortedLines[RegionsList[reg].end][1];
-	for (ind = 0; ind < 4; ind++) {
-		for (ine = 0; ine < 4; ine++) {
-			len = hypot(LastRegionCorners[ind].x - pnts[ine]->x, LastRegionCorners[ind].y - pnts[ine]->y);
-			if (len < minlen)
-				minlen = len;
+	lineEndPoints[0] = SortedLines[RegionsList[iRegion].start];
+	lineEndPoints[1] = &SortedLines[RegionsList[iRegion].start][1];
+	lineEndPoints[2] = SortedLines[RegionsList[iRegion].end];
+	lineEndPoints[3] = &SortedLines[RegionsList[iRegion].end][1];
+	for (iCorner = 0; iCorner < 4; iCorner++) {
+		for (iPoint = 0; iPoint < 4; iPoint++) {
+			length = hypot(LastRegionCorners[iCorner].x - lineEndPoints[iPoint]->x, LastRegionCorners[iCorner].y - lineEndPoints[iPoint]->y);
+			if (length < minimumLength)
+				minimumLength = length;
 		}
 	}
-	return minlen;
+	return minimumLength;
 }
 
 void nxtrgn() {
-	unsigned	ind, newRegion;
-	SMALPNTL*	tpnt;
-	double		len, minlen = 1e99;
+	unsigned	iRegion, iPath, newRegion;
+	SMALPNTL*	lineEndPoint;
+	double		length, minimumLength = 1e99;
 	unsigned	pathLength;					//length of the path to the region
 
 	pathLength = 1;
 	while (notdun(pathLength)) {
 		pathLength++;
 		if (pathLength > 8) {
-			tpnt = &*SortedLines[RegionsList[DoneRegion].start];
-			LastRegionCorners[0].x = tpnt[0].x;
-			LastRegionCorners[0].y = tpnt[0].y;
-			LastRegionCorners[1].x = tpnt[1].x;
-			LastRegionCorners[1].y = tpnt[1].y;
-			tpnt = &*SortedLines[RegionsList[DoneRegion].end];
-			LastRegionCorners[2].x = tpnt[0].x;
-			LastRegionCorners[2].y = tpnt[0].y;
-			LastRegionCorners[3].x = tpnt[1].x;
-			LastRegionCorners[3].y = tpnt[1].y;
+			lineEndPoint = &*SortedLines[RegionsList[DoneRegion].start];
+			LastRegionCorners[0].x = lineEndPoint[0].x;
+			LastRegionCorners[0].y = lineEndPoint[0].y;
+			LastRegionCorners[1].x = lineEndPoint[1].x;
+			LastRegionCorners[1].y = lineEndPoint[1].y;
+			lineEndPoint = &*SortedLines[RegionsList[DoneRegion].end];
+			LastRegionCorners[2].x = lineEndPoint[0].x;
+			LastRegionCorners[2].y = lineEndPoint[0].y;
+			LastRegionCorners[3].x = lineEndPoint[1].x;
+			LastRegionCorners[3].y = lineEndPoint[1].y;
 			newRegion = 0;
-			for (ind = 0; ind < RegionCount; ind++) {
-				if (!VisitedRegions[ind]) {
-					len = reglen(ind);
-					if (len < minlen) {
-						minlen = len;
-						newRegion = ind;
+			for (iRegion = 0; iRegion < RegionCount; iRegion++) {
+				if (!VisitedRegions[iRegion]) {
+					length = reglen(iRegion);
+					if (length < minimumLength) {
+						minimumLength = length;
+						newRegion = iRegion;
 					}
 				}
 			}
 			TempPath[SequencePathIndex].skp = 1;
-			for (ind = 0; ind < PathMapIndex; ind++) {
-				if (PathMap[ind].vrt == newRegion) {
-					TempPath[SequencePathIndex++].pcon = ind;
+			for (iPath = 0; iPath < PathMapIndex; iPath++) {
+				if (PathMap[iPath].node == newRegion) {
+					TempPath[SequencePathIndex++].pcon = iPath;
 					VisitedRegions[newRegion] = 1;
 					DoneRegion = newRegion;
 					return;
 				}
 			}
-			TempPath[SequencePathIndex].cnt = VisitedIndex;
+			TempPath[SequencePathIndex].count = VisitedIndex;
 			TempPath[SequencePathIndex++].pcon = 0xffffffff;
 			VisitedRegions[VisitedIndex] = 1;
 			DoneRegion = VisitedIndex;
 			return;
 		}
 	}
-	for (ind = 0; ind < pathLength; ind++) {
+	for (iPath = 0; iPath < pathLength; iPath++) {
 		TempPath[SequencePathIndex].skp = 0;
-		TempPath[SequencePathIndex++].pcon = RegionPath[ind].pcon;
-		VisitedRegions[PathMap[RegionPath[ind].pcon].vrt] = 1;
+		TempPath[SequencePathIndex++].pcon = RegionPath[iPath].pcon;
+		VisitedRegions[PathMap[RegionPath[iPath].pcon].node] = 1;
 	}
-	DoneRegion = PathMap[RegionPath[ind - 1].pcon].vrt;
+	DoneRegion = PathMap[RegionPath[iPath - 1].pcon].node;
 }
 
 #if	 __UseASM__
@@ -3514,231 +3520,237 @@ SMALPNTL* srtref(const void* arg) {
 #endif
 
 int sqcomp(const void *arg1, const void *arg2) {
-	SMALPNTL* pnt0;
-	SMALPNTL* pnt1;
+	SMALPNTL* lineEndPoint0;
+	SMALPNTL* lineEndPoint1;
 
 #if	 __UseASM__
-	pnt0 = srtref(arg1);
-	pnt1 = srtref(arg2);
+	lineEndPoint0 = srtref(arg1);
+	lineEndPoint1 = srtref(arg2);
 #else
-	pnt0 = (SMALPNTL*)arg1;
-	pnt1 = (SMALPNTL*)arg2;
+	lineEndPoint0 = (SMALPNTL*)arg1;
+	lineEndPoint1 = (SMALPNTL*)arg2;
 #endif
 
-	if (pnt0->line == pnt1->line) {
-		if (pnt0->group == pnt1->group) {
-			if (pnt0->y == pnt1->y)return 0;
+	if (lineEndPoint0->line == lineEndPoint1->line) {
+		if (lineEndPoint0->group == lineEndPoint1->group) {
+			if (lineEndPoint0->y == lineEndPoint1->y)return 0;
 			else {
-				if (pnt0->y > pnt1->y)
+				if (lineEndPoint0->y > lineEndPoint1->y)
 					return 1;
 				else
 					return -1;
 			}
 		}
 		else {
-			if (pnt0->group > pnt1->group)
+			if (lineEndPoint0->group > lineEndPoint1->group)
 				return 1;
 			else
 				return -1;
 		}
 	}
 	else {
-		if (pnt0->line > pnt1->line)
+		if (lineEndPoint0->line > lineEndPoint1->line)
 			return 1;
 		else
 			return -1;
 	}
 }
 
-void nxtseq(unsigned pthi) {
-	unsigned nxtvrt, ind;
+void nxtseq(unsigned pathIndex) {
+	unsigned nextNode, iPath;
 
-	ind = MapIndexSequence[SequencePath[pthi].vrt];
-	nxtvrt = SequencePath[pthi + 1].vrt;
-	while (ind < MapIndexSequence[SequencePath[pthi].vrt + 1] && PathMap[ind].vrt != nxtvrt) {
-		ind++;
+	iPath = MapIndexSequence[SequencePath[pathIndex].node];
+	nextNode = SequencePath[pathIndex + 1].node;
+	while (iPath < MapIndexSequence[SequencePath[pathIndex].node + 1] && PathMap[iPath].node != nextNode) {
+		iPath++;
 	}
-	SequencePath[PathIndex++].grpn = PathMap[ind].grpn;
+	SequencePath[PathIndex++].nextGroup = PathMap[iPath].nextGroup;
 }
 
 #define BUGSEQ 0
 
 void lcon() {
-	unsigned		iPath, ind, ine, l_bLine, cnt, sgrp;
-	REGION*			trgns;
-	short			tcon;
-	RCON*			pcon;
-	RCON*			tmap;
+	unsigned		iPath, iLine, iRegion, iSequence, iNode, bytesInBitmap;
+	unsigned		iByte, leftRegion, iOutPath, breakLine, count, startGroup;
+	REGION*			regions;
+	short			connected;
+	RCON*			tempPathMap;
 	SMALPNTL*		lineGroupPoint;
-	unsigned*		tsrgns;
-	unsigned		sind;
+	//ToDo - Is regionStarts required?
+	unsigned*		regionStarts;
+	unsigned		iStartLine;
 
 #if BUGSEQ
 
-	unsigned		bugcol, iRegion, iLine;
+	unsigned		bugColor;
 #endif
 
 	if (StitchLineCount) {
 		SortedLines = new SMALPNTL*[StitchLineCount >> 1];
 		SortedLineIndex = 0;
-		for (ind = 0; ind < StitchLineCount; ind += 2)
-			SortedLines[SortedLineIndex++] = &LineEndpoints[ind];
+		for (iLine = 0; iLine < StitchLineCount; iLine += 2)
+			SortedLines[SortedLineIndex++] = &LineEndpoints[iLine];
 		qsort((void*)SortedLines, SortedLineIndex, 4, sqcomp);
 		RegionCount = 0;
-		trgns = (REGION*)OSequence;
-		trgns[0].start = 0;
-		l_bLine = SortedLines[0]->line;
-		for (ind = 0; ind < SortedLineIndex; ind++) {
-			if (l_bLine != SortedLines[ind]->line) {
-				trgns[RegionCount++].end = ind - 1;
-				trgns[RegionCount].start = ind;
-				l_bLine = SortedLines[ind]->line;
+		// ToDo - Allocate memory locally for regions
+		regions = (REGION*)OSequence;
+		regions[0].start = 0;
+		breakLine = SortedLines[0]->line;
+		for (iLine = 0; iLine < SortedLineIndex; iLine++) {
+			if (breakLine != SortedLines[iLine]->line) {
+				regions[RegionCount++].end = iLine - 1;
+				regions[RegionCount].start = iLine;
+				breakLine = SortedLines[iLine]->line;
 			}
 		}
-		trgns[RegionCount++].end = ind - 1;
+		regions[RegionCount++].end = iLine - 1;
 		RegionsList = new REGION[RegionCount];
 		VisitedRegions = new char[RegionCount];
-		for (ind = 0; ind < RegionCount; ind++) {
-			RegionsList[ind].start = trgns[ind].start;
-			RegionsList[ind].end = trgns[ind].end;
-			VisitedRegions[ind] = 0;
-			RegionsList[ind].cntbrk = 0;
+		for (iRegion = 0; iRegion < RegionCount; iRegion++) {
+			RegionsList[iRegion].start = regions[iRegion].start;
+			RegionsList[iRegion].end = regions[iRegion].end;
+			VisitedRegions[iRegion] = 0;
+			RegionsList[iRegion].breakCount = 0;
 		}
-		tsrgns = (unsigned*)OSequence;
-		sind = 0;
-		for (ind = 0; ind < RegionCount; ind++) {
-			cnt = 0;
-			if ((RegionsList[ind].end - RegionsList[ind].start) > 1) {
-				sgrp = SortedLines[RegionsList[ind].start]->group;
-				for (ine = RegionsList[ind].start + 1; ine <= RegionsList[ind].end; ine++) {
-					sgrp++;
-					if (SortedLines[ine]->group != sgrp) {
-						if (!cnt)
-							RegionsList[ind].brk = sind;
-						cnt++;
-						sgrp = SortedLines[ine]->group;
-						tsrgns[sind++] = ine;
+		// ToDo - Allocate memory locally for regionStarts
+		regionStarts = (unsigned*)OSequence;
+		iStartLine = 0;
+		for (iRegion = 0; iRegion < RegionCount; iRegion++) {
+			count = 0;
+			if ((RegionsList[iRegion].end - RegionsList[iRegion].start) > 1) {
+				startGroup = SortedLines[RegionsList[iRegion].start]->group;
+				for (iLine = RegionsList[iRegion].start + 1; iLine <= RegionsList[iRegion].end; iLine++) {
+					startGroup++;
+					if (SortedLines[iLine]->group != startGroup) {
+						if (!count)
+							RegionsList[iRegion].regionBreak = iStartLine;
+						count++;
+						startGroup = SortedLines[iLine]->group;
+						regionStarts[iStartLine++] = iLine;
 					}
 				}
 			}
-			RegionsList[ind].cntbrk = cnt;
+			RegionsList[iRegion].breakCount = count;
 		}
-		tmap = (RCON*)BSequence;
+		// ToDo - Allocate memory locally for tempPathMap
+		tempPathMap = (RCON*)BSequence;
 		MapIndexSequence = new unsigned[RegionCount + 1];
 
 #if BUGSEQ
-		bugcol = 0; SequenceIndex = 0;
+		bugColor = 0; SequenceIndex = 0;
 		for (iRegion = 0; iRegion < RegionCount; iRegion++) {
 			for (iLine = RegionsList[iRegion].start; iLine <= RegionsList[iRegion].end; iLine++) {
 				lineGroupPoint = &*SortedLines[iLine];
-				StitchBuffer[SequenceIndex].attribute = bugcol;
+				StitchBuffer[SequenceIndex].attribute = bugColor;
 				StitchBuffer[SequenceIndex].x = lineGroupPoint[0].x;
 				StitchBuffer[SequenceIndex++].y = lineGroupPoint[0].y;
-				StitchBuffer[SequenceIndex].attribute = bugcol;
+				StitchBuffer[SequenceIndex].attribute = bugColor;
 				StitchBuffer[SequenceIndex].x = lineGroupPoint[1].x;
 				StitchBuffer[SequenceIndex++].y = lineGroupPoint[1].y;
 			}
-			bugcol++;
-			bugcol &= 0xf;
+			bugColor++;
+			bugColor &= 0xf;
 		}
 		PCSHeader.stitchCount = SequenceIndex;
 		goto seqskip;
 #endif
 		OutputIndex = 0;
 		if (RegionCount > 1) {
-			ine = 0; PathMapIndex = 0;
-			for (ind = 0; ind < RegionCount; ind++) {
-				pcon = &tmap[PathMapIndex];
-				MapIndexSequence[ind] = PathMapIndex;
-				cnt = 0; GapToClosestRegion = 0;
-				for (ine = 0; ine < RegionCount; ine++) {
-					if (ind != ine) {
-						tcon = regclos(ind, ine);
-						if (tcon) {
-							tmap[PathMapIndex].con = tcon;
-							tmap[PathMapIndex].grpn = NextGroup;
-							tmap[PathMapIndex++].vrt = ine;
-							cnt++;
+			PathMapIndex = 0;
+			for (iSequence = 0; iSequence < RegionCount; iSequence++) {
+				MapIndexSequence[iSequence] = PathMapIndex;
+				count = 0; GapToClosestRegion = 0;
+				for (iNode = 0; iNode < RegionCount; iNode++) {
+					if (iSequence != iNode) {
+						connected = regclos(iSequence, iNode);
+						if (connected) {
+							tempPathMap[PathMapIndex].con = connected;
+							tempPathMap[PathMapIndex].nextGroup = NextGroup;
+							tempPathMap[PathMapIndex++].node = iNode;
+							count++;
 						}
 					}
 				}
-				while (!cnt) {
+				while (!count) {
 					GapToClosestRegion += StitchSpacing;
-					cnt = 0;
-					for (ine = 0; ine < RegionCount; ine++) {
-						if (ind != ine) {
-							tcon = regclos(ind, ine);
-							if (tcon) {
-								tmap[PathMapIndex].con = tcon;
-								tmap[PathMapIndex].grpn = NextGroup;
-								tmap[PathMapIndex++].vrt = ine;
-								cnt++;
+					count = 0;
+					for (iNode = 0; iNode < RegionCount; iNode++) {
+						if (iSequence != iNode) {
+							connected = regclos(iSequence, iNode);
+							if (connected) {
+								tempPathMap[PathMapIndex].con = connected;
+								tempPathMap[PathMapIndex].nextGroup = NextGroup;
+								tempPathMap[PathMapIndex++].node = iNode;
+								count++;
 							}
 						}
 					}
 				}
 			}
-			MapIndexSequence[ind] = PathMapIndex;
+			MapIndexSequence[iSequence] = PathMapIndex;
 			PathMap = new RCON[PathMapIndex + 1];
-			for (ind = 0; ind < PathMapIndex; ind++) {
-				PathMap[ind].con = tmap[ind].con;
-				PathMap[ind].vrt = tmap[ind].vrt;
-				PathMap[ind].grpn = tmap[ind].grpn;
+			for (iPath = 0; iPath < PathMapIndex; iPath++) {
+				PathMap[iPath].con = tempPathMap[iPath].con;
+				PathMap[iPath].node = tempPathMap[iPath].node;
+				PathMap[iPath].nextGroup = tempPathMap[iPath].nextGroup;
 			}
 			//find the leftmost region
-			sgrp = 0xffffffff; ine = 0;
-			for (ind = 0; ind < RegionCount; ind++) {
-				lineGroupPoint = &*SortedLines[RegionsList[ind].start];
-				if (lineGroupPoint->group < sgrp) {
-					sgrp = lineGroupPoint->group;
-					ine = ind;
+			startGroup = 0xffffffff; leftRegion = 0;
+			for (iRegion = 0; iRegion < RegionCount; iRegion++) {
+				lineGroupPoint = &*SortedLines[RegionsList[iRegion].start];
+				if (lineGroupPoint->group < startGroup) {
+					startGroup = lineGroupPoint->group;
+					leftRegion = iRegion;
 				}
 			}
 			OutputIndex = 0;
+			// ToDo - Allocate memory locally for TempPath
 			TempPath = (RGSEQ*)OSequence;
 			//find the leftmost region in PathMap
 			SequencePathIndex = 1;
-			for (ind = 0; ind < PathMapIndex; ind++) {
-				if (PathMap[ind].vrt == ine)
+			for (iPath = 0; iPath < PathMapIndex; iPath++) {
+				if (PathMap[iPath].node == leftRegion)
 					goto lconskip;
 			}
-			PathMap[PathMapIndex].vrt = ine;
-			PathMap[PathMapIndex].grpn = 0;
-			ind = PathMapIndex;
+			PathMap[PathMapIndex].node = leftRegion;
+			PathMap[PathMapIndex].nextGroup = 0;
+			iPath = PathMapIndex;
 		lconskip:;
 			//set the first entry in the temporary path to the leftmost region
-			TempPath[0].pcon = ind;
-			TempPath[0].cnt = 1;
+			TempPath[0].pcon = iPath;
+			TempPath[0].count = 1;
 			TempPath[0].skp = 0;
-			VisitedRegions[ine] = 1;
-			DoneRegion = ine;
+			VisitedRegions[leftRegion] = 1;
+			DoneRegion = leftRegion;
 			while (unvis())
 				nxtrgn();
-			ine = 0;
-			cnt = 0xffffffff;
+			iOutPath = 0;
+			count = 0xffffffff;
+			// ToDo - Allocate memory locally for SequencePath
 			SequencePath = (FSEQ*)&OSequence[OSEQLEN >> 1];
-			for (ind = 0; ind < SequencePathIndex; ind++) {
-				SequencePath[ine].skp = TempPath[ind].skp;
-				if (TempPath[ind].pcon == 0xffffffff) {
-					SequencePath[ine++].vrt = TempPath[ind].cnt;
-					cnt = TempPath[ind].cnt;
+			for (iPath = 0; iPath < SequencePathIndex; iPath++) {
+				SequencePath[iOutPath].skp = TempPath[iPath].skp;
+				if (TempPath[iPath].pcon == 0xffffffff) {
+					SequencePath[iOutPath++].node = TempPath[iPath].count;
+					count = TempPath[iPath].count;
 				}
 				else {
-					if (TempPath[ind].pcon != cnt) {
-						cnt = TempPath[ind].pcon;
-						SequencePath[ine++].vrt = PathMap[TempPath[ind].pcon].vrt;
+					if (TempPath[iPath].pcon != count) {
+						count = TempPath[iPath].pcon;
+						SequencePath[iOutPath++].node = PathMap[TempPath[iPath].pcon].node;
 					}
 				}
 			}
-			SequencePathIndex = ind; PathIndex = 0;
-			for (ind = 0; ind < SequencePathIndex; ind++)
-				nxtseq(ind);
-			ine = (SortedLineIndex >> 5) + 1;
-			SequenceFlagBitmap = new unsigned[ine];
-			for (ind = 0; ind < ine; ind++)
-				SequenceFlagBitmap[ind] = 0;
-			for (ind = 0; ind < RegionCount; ind++)
-				VisitedRegions[ind] = 0;
+			// ToDo - should this be iPath or iOutPath?
+			SequencePathIndex = iPath; PathIndex = 0;
+			for (iPath = 0; iPath < SequencePathIndex; iPath++)
+				nxtseq(iPath);
+			bytesInBitmap = (SortedLineIndex >> 5) + 1;
+			SequenceFlagBitmap = new unsigned[bytesInBitmap];
+			for (iByte = 0; iByte < bytesInBitmap; iByte++)
+				SequenceFlagBitmap[iByte] = 0;
+			for (iRegion = 0; iRegion < RegionCount; iRegion++)
+				VisitedRegions[iRegion] = 0;
 			LastGroup = 0;
 			for (iPath = 0; iPath < PathIndex; iPath++) {
 				//				sprintf_s(MsgBuffer, sizeof(MsgBuffer),"iterator %d,vrt %d,grpn %d\n",iterator,PathMap[iPath].vrt,PathMap[iPath].grpn);
@@ -3751,13 +3763,13 @@ void lcon() {
 		else {
 			PathMap = new RCON[1];
 			SequencePath = new FSEQ[1];
-			ine = (SortedLineIndex >> 5) + 1;
-			SequenceFlagBitmap = new unsigned[ine];
-			for (ind = 0; ind < ine; ind++)
-				SequenceFlagBitmap[ind] = 0;
+			bytesInBitmap = (SortedLineIndex >> 5) + 1;
+			SequenceFlagBitmap = new unsigned[bytesInBitmap];
+			for (iByte = 0; iByte < bytesInBitmap; iByte++)
+				SequenceFlagBitmap[iByte] = 0;
 			LastGroup = 0;
-			SequencePath[0].vrt = 0;
-			SequencePath[0].grpn = SortedLines[RegionsList[0].end]->group;
+			SequencePath[0].node = 0;
+			SequencePath[0].nextGroup = SortedLines[RegionsList[0].end]->group;
 			SequencePath[0].skp = 0;
 			durgn(0);
 			delete[] SequencePath;
