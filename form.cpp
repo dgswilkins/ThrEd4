@@ -278,7 +278,7 @@ unsigned		ChainSequence[] = { 0,1,2,3,0,1,4,3,0,3 };//chain stich sequence
 double			Div4;					//chain space divided by four
 unsigned		ChainCount;				//number of elements of the chain sequence to process
 unsigned		ClosestFormToCursor;	//closest form to the cursor
-unsigned		ClosestVertexToCursor;	//point closest to the cursor
+unsigned		ClosestVertexToCursor;	//formOrigin closest to the cursor
 double			VerticalRatio;			//vertical ratio between the zoom window
 										// and the entire stitch space
 double			HorizontalRatio;		//horizontal ratio between the zoom window
@@ -294,7 +294,7 @@ fPOINT*			ClipFillData;			//data for clipboard fills
 fPOINT*			ClipReversedData;		//data for clipboard fills
 unsigned		StitchLineCount;		//count of stitch lines
 SMALPNTL*		LineEndpoints;			//pairs of fill line endpoints
-unsigned		ActivePointIndex;		//pointer to the active point in the sequencing algorithm
+unsigned		ActivePointIndex;		//pointer to the active formOrigin in the sequencing algorithm
 unsigned		LineGroupIndex;			//pointer for groups of fill line segments
 SMALPNTL**		SortedLines;			//sorted pointers to LineEndpoints
 unsigned short	VertexCount;				//sides of the selected form to fill
@@ -303,7 +303,7 @@ unsigned		SequenceIndex;			//sequencing pointer
 BSEQPNT			BSequence[BSEQLEN];		//reverse sequence for polygon fills
 fPOINT			OSequence[OSEQLEN];		//temporary storage for sequencing
 double			Slope;					//slope of line in angle fills
-unsigned		SatinIndex;				//pointer to next satin point to enter
+unsigned		SatinIndex;				//pointer to next satin formOrigin to enter
 fPOINT			FormMoveDelta;			//offset for moving forms
 fPOINT			TempPolygon[MAXFRMLINS];	//temporary storage when user is entering a polygon;
 unsigned		OutputIndex;			//output pointer for sequencing
@@ -313,17 +313,17 @@ SATCON*			CurrentFormGuides;	//connections in the currently selecteed form
 unsigned short	CurrentFormConnectionsCount;	//number of connections in the currently selected form
 unsigned short	WordParam;				//word paramater from the currently selected form
 unsigned*		CheckMap;				//bitmap used by satin fill to delete illegal lines
-unsigned short	StartPoint;				//starting point for a satin stitch guide-line
+unsigned short	StartPoint;				//starting formOrigin for a satin stitch guide-line
 double			HorizontalLength2;		//horizontal length of a clipboard fill/2
 double			HorizontalLength;		//horizontal length of a clipboard fill
-fPOINT			LastPoint;				//last point written by line connect routine
+fPOINT			LastPoint;				//last formOrigin written by line connect routine
 fPOINT			OutsidePointList[MAXFRMLINS];	//list of outside outline points for satin or clipboard fills
 fPOINT			InsidePointList[MAXFRMLINS];	//list of inside outline points for satin or clipboard fills
 fPOINT*			OutsidePoints;			//pointer to the list of outside outline points
 fPOINT*			InsidePoints;			//pointer to the list of inside outline points
-fPOINT			ClipReference;			//clipboard reference point
+fPOINT			ClipReference;			//clipboard reference formOrigin
 double			BorderWidth = BRDWID;	//border width for satin borders
-unsigned		SelectedFormControlVertex;	//user selected form control point
+unsigned		SelectedFormControlVertex;	//user selected form control formOrigin
 POINT			FormControlPoints[10];	//form control rectangle in pixel coordinates
 double			XYratio;				//expand form aspect ratio
 HWND			ValueWindow[LASTLIN];	//data handles for the form data sheet
@@ -332,7 +332,7 @@ RECT			LabelWindowCoords;		//location of left windows in the form data sheet
 RECT			ValueWindowCoords;		//location of right windows in the form data sheet
 POINT			LabelWindowSize;		//size of the left windows in the form data sheet
 POINT			ValueWindowSize;		//size of the right windows in the form data sheet
-fPOINT			LowerLeftStitch;		//lower left point in a form
+fPOINT			LowerLeftStitch;		//lower left formOrigin in a form
 VRCT2*			FillVerticalRect;		//fill points for vertical satin fill
 VRCT2*			UnderlayVerticalRect;	//underlay fill points for vertical satin fill
 POINT			RubberBandLine[3];		//points to form points to be moved
@@ -340,7 +340,7 @@ unsigned*		Xhistogram;				//x histogram for snap together
 double			SnapLength = SNPLEN*PFGRAN;		//snap together length
 unsigned*		Xpoints;				//stitch indices sorted according to x values
 unsigned		ColorBitmap;			//bitmap of colors in a design for sort
-double			StarRatio = STARAT;			//star point to body ratio
+double			StarRatio = STARAT;			//star formOrigin to body ratio
 double			SpiralWrap = SPIRWRAP;		//number of revolutions in a spiral
 unsigned		Srtmsk = (1 << EDGEANGSAT) | (1 << EDGEAPPL) | (1 << EDGEPROPSAT);	 //mask for switchable fill types
 fRECTANGLE		BoundingRect;			//isin rectangle
@@ -370,7 +370,7 @@ unsigned		SelectedFormCount = 0;	//number of selected forms
 unsigned		PreviousFormIndex;		//previously selected form
 RECT			SelectedFormsRect;		//for multiple selections;
 POINT			SelectedFormsLine[9];	//line derived from the big rectangle
-POINT			SelectedPointsLine[9];	//line derived from the point select rectangle
+POINT			SelectedPointsLine[9];	//line derived from the formOrigin select rectangle
 fRECTANGLE		AllItemsRect;			//rectangle enclosing all forms and stitches
 double			FormAngles[MAXFRMLINS];	//angles of a form for satin border fills
 fPOINT			FormVertices[MAXFRMPNTS];	//form points
@@ -385,16 +385,16 @@ unsigned		PseudoRandomValue;		//pseudo-random sequence register
 dPOINT			SatinBackup[8];			//backup stitches in satin fills
 unsigned		SatinBackupIndex;		//pointer for backup stitches in satin fills
 double			ClipAngle;				//for clipboard border fill
-dPOINT			MoveToCoords;			//moving point for clipboard fill
+dPOINT			MoveToCoords;			//moving formOrigin for clipboard fill
 double			CosAngle;				//cosine for clipboard fill
 double			SinAngle;				//sine for clipboard fill
 fPOINT			BorderClipReference;	//reference for clipboard line border
-unsigned		CurrentSide;			//active form point for line clipboard fill
+unsigned		CurrentSide;			//active form formOrigin for line clipboard fill
 dPOINT			Vector0;				//x size of the clipboard fill at the fill angle
 FRMHED*			TempFormList;			//temporary form header storage for reordering forms
 fPOINT*			TempFormVertices;		//temporary form vertex storage for reordering forms
 SATCON*			TempSatinConnects;		//temporary satin guidline storage for reordering forms
-fPOINT*			TempClipPoints;			//temporary clipboard point storage for reordering forms
+fPOINT*			TempClipPoints;			//temporary clipboard formOrigin storage for reordering forms
 unsigned		FormRelocationIndex;	//form relocator pointer
 fPOINTATTR*		TempStitchBuffer;		//pointer to high stitch area for form sort
 unsigned		BeanCount;				//number of stitches added by convert to bean
@@ -402,9 +402,9 @@ FRMHED*			FormForInsert;			//insert form vertex in this form
 unsigned		FormVertexPrev;			//form vertex storage for form vertex insert
 unsigned		FormVertexNext;			//form vertex storage for form vertex insert
 SMALPNTL*		SequenceLines;			//line for vertical/horizontal/angle fills
-unsigned		PathIndex;				//point to the next path element for vertical fill sequencing
+unsigned		PathIndex;				//formOrigin to the next path element for vertical fill sequencing
 fPOINT*			WorkingFormVertices;	//form points for angle fills
-fPOINT			AngledFormVertices[MAXFRMLINS];	//form point data for angle fills
+fPOINT			AngledFormVertices[MAXFRMLINS];	//form formOrigin data for angle fills
 CLPSEG*			ClipSegments;			//clipboard segments for virtual clipboard fill
 unsigned		ClipSegmentIndex;		//clipboard segment pointer
 unsigned short	ClipIntersectSide;		//clipboard intersect side;
@@ -548,7 +548,7 @@ void duinf(FRMHED* formHeader) {
 
 int comp(const void *arg1, const void *arg2) {
 #if	 __UseASM__
-	_asm {
+_asm {
 		mov		ebx, arg2
 		mov		ebx, [ebx]
 		add		ebx, 8
@@ -566,23 +566,23 @@ int comp(const void *arg1, const void *arg2) {
 		xor		eax, eax
 		dec		eax
 		jmp		short cmpx
-		cmp1 : sub		ecx, 8
-			   sub		ebx, 8
-			   fld		qword ptr[ebx]
-			   fld		qword ptr[ecx]
-			   fucompp
-			   fstsw	ax
-			   je		short cmpg
-			   cmp		ah, 1
-			   jne		short cmp2
-			   xor		eax, eax
-			   dec		eax
-			   jmp		short cmpx
-			   cmp2 : xor		eax, eax
-					  jmp		short cmpx
-					  cmpg : xor		eax, eax
-							 inc		eax
-							 cmpx :
+cmp1 :	sub		ecx, 8
+		sub		ebx, 8
+		fld		qword ptr[ebx]
+		fld		qword ptr[ecx]
+		fucompp
+		fstsw	ax
+		je		short cmpg
+		cmp		ah, 1
+		jne		short cmp2
+		xor		eax, eax
+		dec		eax
+		jmp		short cmpx
+cmp2 :	xor		eax, eax
+		jmp		short cmpx
+cmpg :	xor		eax, eax
+		inc		eax
+cmpx :
 	}
 #else
 	const dPOINTLINE **Point1 = (const dPOINTLINE **)arg1, **point2 = (const dPOINTLINE **)arg2;
@@ -2749,20 +2749,20 @@ unsigned proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* 
 	}
 }
 
-unsigned projv(double xCoordinate, fPOINT point0, fPOINT point1, dPOINT* adjustedCoordinate) {
+unsigned projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT* intersect) {
 	double swap, slope, deltaX;
 
-	adjustedCoordinate->x = xCoordinate;
-	deltaX = point1.x - point0.x;
+	intersect->x = xCoordinate;
+	deltaX = upperPoint.x - lowerPoint.x;
 	if (deltaX) {
-		slope = (point1.y - point0.y) / deltaX;
-		adjustedCoordinate->y = (xCoordinate - point0.x)*slope + point0.y;
-		if (point0.x > point1.x) {
-			swap = point0.x;
-			point0.x = point1.x;
-			point1.x = swap;
+		slope = (upperPoint.y - lowerPoint.y) / deltaX;
+		intersect->y = (xCoordinate - lowerPoint.x)*slope + lowerPoint.y;
+		if (lowerPoint.x > upperPoint.x) {
+			swap = lowerPoint.x;
+			lowerPoint.x = upperPoint.x;
+			upperPoint.x = swap;
 		}
-		if (xCoordinate<point0.x || xCoordinate>point1.x)
+		if (xCoordinate<lowerPoint.x || xCoordinate>upperPoint.x)
 			return 0;
 		else
 			return 1;
@@ -3791,40 +3791,6 @@ void lcon() {
 	}
 }
 
-BOOL notin(unsigned ond) {
-	dPOINT		pnt;
-	unsigned	ind, cnt;
-	dPOINT		ipnt;
-	double		len;
-	double		minot;		//minimum distance from a line
-	unsigned	minotl;		//index to the minimum distance line
-
-	cnt = 0; minot = 1e99;
-	pnt.x = (OSequence[ond + 1].x - OSequence[ond].x) / 2 + OSequence[ond].x;
-	pnt.y = (OSequence[ond + 1].y - OSequence[ond].y) / 2 + OSequence[ond].y;
-	for (ind = 0; ind < SelectedForm->vertexCount; ind++) {
-		if (projv(pnt.x, CurrentFillVertices[ind], CurrentFillVertices[ind + 1], &ipnt)) {
-			if (ipnt.y > pnt.y)
-				cnt++;
-			len = fabs(ipnt.y - pnt.y);
-			if (len < minot) {
-				minot = len;
-				minotl = ind;
-			}
-		}
-	}
-	if (projv(pnt.x, CurrentFillVertices[ind], CurrentFillVertices[0], &ipnt)) {
-		if (ipnt.y > pnt.y)
-			cnt++;
-		len = fabs(ipnt.y - pnt.y);
-		if (len < minot) {
-			minot = len;
-			minotl = ind;
-		}
-	}
-	return !(cnt & 1);
-}
-
 unsigned seqtab[] =
 {
 	12,7,15,11,13,17,
@@ -3843,246 +3809,252 @@ void bakseq() {
 	SelectedForm->maxFillStitchLen = 6000;
 #else
 
-	int			cnt, rcnt;
-	int			ind, rit;
-	dPOINT		dif, pnt, stp;
-	double		len, rslop;
-	double		usesiz2 = UserStitchLength * 2;
-	double		usesiz9 = UserStitchLength / 9;
-	double		stspac2 = StitchSpacing * 2;
+	int			count, rcnt;
+	int			iSequence, rit;
+	dPOINT		delta, point, step;
+	double		length, slope;
+	double		UserStitchLength2 = UserStitchLength * 2;
+	double		UserStitchLength9 = UserStitchLength / 9;
+	double		StitchSpacing2 = StitchSpacing * 2;
 
+	//ToDo - More renaming required
 	SequenceIndex = 0;
 	rstMap(FILDIR);
-	ind = OutputIndex - 1;
-	OSequence[SequenceIndex].x = BSequence[ind].x;
-	OSequence[SequenceIndex].y = BSequence[ind].y;
+	iSequence = OutputIndex - 1;
+	OSequence[SequenceIndex].x = BSequence[iSequence].x;
+	OSequence[SequenceIndex].y = BSequence[iSequence].y;
 	SequenceIndex++;
-	SelectedPoint.x = BSequence[ind].x;
-	SelectedPoint.y = BSequence[ind].y;
-	ind--;
-	while (ind > 0) {
-		rcnt = ind%RITSIZ;
+	SelectedPoint.x = BSequence[iSequence].x;
+	SelectedPoint.y = BSequence[iSequence].y;
+	iSequence--;
+	while (iSequence > 0) {
+		rcnt = iSequence%RITSIZ;
 		if (SequenceIndex > MAXSEQ) {
 			SequenceIndex = MAXSEQ - 1;
 			return;
 		}
-		rit = BSequence[ind].x / stspac2;
-		dif.x = BSequence[ind].x - BSequence[ind + 1].x;
-		dif.y = BSequence[ind].y - BSequence[ind + 1].y;
-		if (dif.y)
-			rslop = dif.x / dif.y;
+		rit = BSequence[iSequence].x / StitchSpacing2;
+		delta.x = BSequence[iSequence].x - BSequence[iSequence + 1].x;
+		delta.y = BSequence[iSequence].y - BSequence[iSequence + 1].y;
+		if (delta.y)
+			slope = delta.x / delta.y;
 		else
-			rslop = 1e99;
-		switch (BSequence[ind].attribute) {
+			slope = 1e99;
+		switch (BSequence[iSequence].attribute) {
 		case SEQTOP:
 
 			if (SelectedForm->extendedAttribute&AT_SQR) {
 				if (toglMap(FILDIR)) {
-					OSequence[SequenceIndex].x = BSequence[ind - 1].x;
-					OSequence[SequenceIndex++].y = BSequence[ind - 1].y;
-					cnt = ceil(BSequence[ind].y / UserStitchLength);
+					OSequence[SequenceIndex].x = BSequence[iSequence - 1].x;
+					OSequence[SequenceIndex++].y = BSequence[iSequence - 1].y;
+					count = ceil(BSequence[iSequence].y / UserStitchLength);
+				// ToDo - replace labels with while and break
 				blntop:;
-					OSequence[SequenceIndex].y = cnt*UserStitchLength + (rit%seqtab[rcnt])*usesiz9;
-					if (OSequence[SequenceIndex].y > BSequence[ind].y)
+					OSequence[SequenceIndex].y = count*UserStitchLength + (rit%seqtab[rcnt])*UserStitchLength9;
+					if (OSequence[SequenceIndex].y > BSequence[iSequence].y)
 						goto blntopx;
-					dif.y = OSequence[SequenceIndex].y - BSequence[ind].y;
-					OSequence[SequenceIndex++].x = BSequence[ind].x;
-					cnt++;
+					delta.y = OSequence[SequenceIndex].y - BSequence[iSequence].y;
+					OSequence[SequenceIndex++].x = BSequence[iSequence].x;
+					count++;
 					goto blntop;
 				blntopx:;
-					OSequence[SequenceIndex].x = BSequence[ind].x;
-					OSequence[SequenceIndex++].y = BSequence[ind].y;
+					OSequence[SequenceIndex].x = BSequence[iSequence].x;
+					OSequence[SequenceIndex++].y = BSequence[iSequence].y;
 				}
 				else {
-					OSequence[SequenceIndex].x = BSequence[ind].x;
-					OSequence[SequenceIndex++].y = BSequence[ind].y;
-					cnt = floor(BSequence[ind].y / UserStitchLength);
+					OSequence[SequenceIndex].x = BSequence[iSequence].x;
+					OSequence[SequenceIndex++].y = BSequence[iSequence].y;
+					count = floor(BSequence[iSequence].y / UserStitchLength);
 				blntbot:;
-					OSequence[SequenceIndex].y = cnt*UserStitchLength - ((rit + 2) % seqtab[rcnt])*usesiz9;
-					if (OSequence[SequenceIndex].y < BSequence[ind - 1].y)
+					OSequence[SequenceIndex].y = count*UserStitchLength - ((rit + 2) % seqtab[rcnt])*UserStitchLength9;
+					if (OSequence[SequenceIndex].y < BSequence[iSequence - 1].y)
 						goto blntbotx;
-					dif.y = OSequence[SequenceIndex].y - BSequence[ind - 1].y;
-					OSequence[SequenceIndex++].x = BSequence[ind].x;
-					cnt--;
+					delta.y = OSequence[SequenceIndex].y - BSequence[iSequence - 1].y;
+					OSequence[SequenceIndex++].x = BSequence[iSequence].x;
+					count--;
 					goto blntbot;
 				blntbotx:;
-					OSequence[SequenceIndex].x = BSequence[ind - 1].x;
-					OSequence[SequenceIndex++].y = BSequence[ind - 1].y;
+					OSequence[SequenceIndex].x = BSequence[iSequence - 1].x;
+					OSequence[SequenceIndex++].y = BSequence[iSequence - 1].y;
 				}
 			}
 			else {
-				cnt = ceil(BSequence[ind + 1].y / UserStitchLength);
+				count = ceil(BSequence[iSequence + 1].y / UserStitchLength);
 			toplab:;
-				OSequence[SequenceIndex].y = cnt*UserStitchLength + (rit%seqtab[rcnt])*usesiz9;
-				if (OSequence[SequenceIndex].y > BSequence[ind].y)
+				OSequence[SequenceIndex].y = count*UserStitchLength + (rit%seqtab[rcnt])*UserStitchLength9;
+				if (OSequence[SequenceIndex].y > BSequence[iSequence].y)
 					goto toplabx;
-				dif.y = OSequence[SequenceIndex].y - BSequence[ind + 1].y;
-				dif.x = rslop*dif.y;
-				OSequence[SequenceIndex++].x = BSequence[ind + 1].x + dif.x;
-				cnt++;
+				delta.y = OSequence[SequenceIndex].y - BSequence[iSequence + 1].y;
+				delta.x = slope*delta.y;
+				OSequence[SequenceIndex++].x = BSequence[iSequence + 1].x + delta.x;
+				count++;
 				goto toplab;
 			toplabx:;
-				OSequence[SequenceIndex].x = BSequence[ind].x;
-				OSequence[SequenceIndex++].y = BSequence[ind].y;
+				OSequence[SequenceIndex].x = BSequence[iSequence].x;
+				OSequence[SequenceIndex++].y = BSequence[iSequence].y;
 			}
 			break;
 
 		case SEQBOT:
 
 			if (!(SelectedForm->extendedAttribute&AT_SQR)) {
-				cnt = floor(BSequence[ind + 1].y / UserStitchLength);
+				count = floor(BSequence[iSequence + 1].y / UserStitchLength);
 			botlab:;
-				OSequence[SequenceIndex].y = cnt*UserStitchLength - ((rit + 2) % seqtab[rcnt])*usesiz9;
-				if (OSequence[SequenceIndex].y < BSequence[ind].y)
+				OSequence[SequenceIndex].y = count*UserStitchLength - ((rit + 2) % seqtab[rcnt])*UserStitchLength9;
+				if (OSequence[SequenceIndex].y < BSequence[iSequence].y)
 					goto botlabx;
-				dif.y = OSequence[SequenceIndex].y - BSequence[ind + 1].y;
-				dif.x = rslop*dif.y;
-				OSequence[SequenceIndex++].x = BSequence[ind + 1].x + dif.x;
-				cnt--;
+				delta.y = OSequence[SequenceIndex].y - BSequence[iSequence + 1].y;
+				delta.x = slope*delta.y;
+				OSequence[SequenceIndex++].x = BSequence[iSequence + 1].x + delta.x;
+				count--;
 				goto botlab;
 			botlabx:;
-				OSequence[SequenceIndex].x = BSequence[ind].x;
-				OSequence[SequenceIndex++].y = BSequence[ind].y;
+				OSequence[SequenceIndex].x = BSequence[iSequence].x;
+				OSequence[SequenceIndex++].y = BSequence[iSequence].y;
 			}
 			break;
 
 		case 0:
 
-			dif.x = BSequence[ind].x - BSequence[ind + 1].x;
-			dif.y = BSequence[ind].y - BSequence[ind + 1].y;
+			delta.x = BSequence[iSequence].x - BSequence[iSequence + 1].x;
+			delta.y = BSequence[iSequence].y - BSequence[iSequence + 1].y;
 			rstMap(FILDIR);
-			len = hypot(dif.x, dif.y);
-			if (len) {
-				if (len > usesiz2) {
-					pnt.x = BSequence[ind + 1].x;
-					pnt.y = BSequence[ind + 1].y;
-					cnt = len / UserStitchLength - 1;
-					if (chkmax(cnt, SequenceIndex) || (cnt + SequenceIndex) > MAXSEQ - 3)
+			length = hypot(delta.x, delta.y);
+			if (length) {
+				if (length > UserStitchLength2) {
+					point.x = BSequence[iSequence + 1].x;
+					point.y = BSequence[iSequence + 1].y;
+					count = length / UserStitchLength - 1;
+					if (chkmax(count, SequenceIndex) || (count + SequenceIndex) > MAXSEQ - 3)
 						return;
-					stp.x = dif.x / cnt;
-					stp.y = dif.y / cnt;
-					while (cnt) {
-						pnt.x += stp.x;
-						pnt.y += stp.y;
-						OSequence[SequenceIndex].x = pnt.x;
-						OSequence[SequenceIndex++].y = pnt.y;
-						cnt--;
+					step.x = delta.x / count;
+					step.y = delta.y / count;
+					while (count) {
+						point.x += step.x;
+						point.y += step.y;
+						OSequence[SequenceIndex].x = point.x;
+						OSequence[SequenceIndex++].y = point.y;
+						count--;
 					}
 				}
 			}
-			OSequence[SequenceIndex].x = BSequence[ind].x;
-			OSequence[SequenceIndex++].y = BSequence[ind].y;
+			OSequence[SequenceIndex].x = BSequence[iSequence].x;
+			OSequence[SequenceIndex++].y = BSequence[iSequence].y;
 		}
-		ind--;
+		iSequence--;
 	}
 #endif
 }
 
 void fnvrt() {
-	unsigned	ind, ine, inf, cnt, lincnt = 0, tind;
-	int			tcnt;
-	dPOINTLINE*	jpts;
-	dPOINTLINE**	pjpts;
-	double		lox, hix, mx0, mstp;
-	dPOINT		tpnt;
-	unsigned*	tgrinds;
-	unsigned	maxlins = 0;	//maximum angle fill lines for any adjusted y cordinate
+	unsigned		iVertex, iStitch, ind, ine, iLine, inf, stitchCount, lineCount = 0, tind;
+	int				stitchOffset;
+	dPOINTLINE*		projectedPoints;
+	dPOINTLINE**	projectedPointsArray;
+	double			lowX, highX, currentX, step;
+	dPOINT			point;
+	unsigned*		groupIndex;
+	unsigned		maximumLines = 0;	//maximum angle fill lines for any adjusted y cordinate
 
 	CurrentFillVertices = SelectedForm->vertices;
 	VertexCount = SelectedForm->vertexCount;
-	lox = hix = CurrentFillVertices[0].x;
-	for (ind = 1; ind < VertexCount; ind++) {
-		if (CurrentFillVertices[ind].x > hix)
-			hix = CurrentFillVertices[ind].x;
-		if (CurrentFillVertices[ind].x < lox)
-			lox = CurrentFillVertices[ind].x;
+	lowX = highX = CurrentFillVertices[0].x;
+	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
+		if (CurrentFillVertices[iVertex].x > highX)
+			highX = CurrentFillVertices[iVertex].x;
+		if (CurrentFillVertices[iVertex].x < lowX)
+			lowX = CurrentFillVertices[iVertex].x;
 	}
-	tcnt = lox / StitchSpacing;
-	lox = StitchSpacing*tcnt;
-	cnt = (hix - lox) / StitchSpacing + 1;
-	jpts = new dPOINTLINE[VertexCount + 2];
-	pjpts = new dPOINTLINE*[VertexCount + 2];
-	mstp = (hix - lox) / cnt;
-	mx0 = lox;
-	for (ind = 0; ind < cnt; ind++) {
-		inf = 0;
-		lox += mstp;
-		for (ine = 0; ine < (unsigned)VertexCount - 1; ine++) {
-			if (projv(lox, CurrentFillVertices[ine], CurrentFillVertices[ine + 1], &tpnt))
-				inf++;
+
+	stitchOffset = lowX / StitchSpacing;
+	lowX = StitchSpacing*stitchOffset;
+	stitchCount = (highX - lowX) / StitchSpacing + 1;
+	projectedPoints = new dPOINTLINE[VertexCount + 2];
+	projectedPointsArray = new dPOINTLINE*[VertexCount + 2];
+	step = (highX - lowX) / stitchCount;
+	currentX = lowX;
+	for (iStitch = 0; iStitch < stitchCount; iStitch++) {
+		iLine = 0;
+		currentX += step;
+		for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iVertex + 1], &point))
+				iLine++;
 		}
-		if (projv(lox, CurrentFillVertices[ine], CurrentFillVertices[0], &tpnt))
-			inf++;
-		lincnt += inf;
-		if (inf > maxlins)
-			maxlins = inf;
+		if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[0], &point))
+			iLine++;
+		lineCount += iLine;
+		if (iLine > maximumLines)
+			maximumLines = iLine;
 	}
-	maxlins = (maxlins >> 1);
-	LineEndpoints = new SMALPNTL[lincnt + 1];
-	StitchLineCount = 0; LineGroupIndex = 0;
-	tgrinds = (unsigned*)BSequence;
+	maximumLines = (maximumLines >> 1);
+	LineEndpoints = new SMALPNTL[lineCount + 1];
+	StitchLineCount = 0; LineGroupIndex = 0; 
+	// ToDo - Allocate memory locally for groupIndex
+	groupIndex = (unsigned*)BSequence;
 	GroupIndexCount = 0;
-	for (ind = 0; ind < cnt; ind++) {
-		mx0 += mstp;
+	currentX = lowX;
+	for (iStitch = 0; iStitch < stitchCount; iStitch++) {
+		currentX += step;
 		inf = 0;
-		for (ine = 0; ine < (unsigned)VertexCount - 1; ine++) {
-			if (projv(mx0, CurrentFillVertices[ine], CurrentFillVertices[ine + 1], &tpnt)) {
-				pjpts[inf] = &jpts[inf];
-				jpts[inf].line = ine;
-				jpts[inf].x = tpnt.x;
-				jpts[inf++].y = tpnt.y;
+		for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iVertex + 1], &point)) {
+				projectedPointsArray[inf] = &projectedPoints[inf];
+				projectedPoints[inf].line = iVertex;
+				projectedPoints[inf].x = point.x;
+				projectedPoints[inf++].y = point.y;
 
 			}
 		}
-		if (projv(mx0, CurrentFillVertices[ine], CurrentFillVertices[0], &tpnt)) {
-			pjpts[inf] = &jpts[inf];
-			jpts[inf].line = ine;
-			jpts[inf].x = tpnt.x;
-			jpts[inf++].y = tpnt.y;
+		if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[0], &point)) {
+			projectedPointsArray[inf] = &projectedPoints[inf];
+			projectedPoints[inf].line = iVertex;
+			projectedPoints[inf].x = point.x;
+			projectedPoints[inf++].y = point.y;
 		}
 		if (inf > 1) {
 			inf &= 0xfffffffe;
-			tgrinds[GroupIndexCount++] = StitchLineCount;
-			qsort((void*)pjpts, inf, 4, comp);
+			groupIndex[GroupIndexCount++] = StitchLineCount;
+			// ToDo - replace 4 with sizeof(dPOINTLINE(?))
+			qsort((void*)projectedPointsArray, inf, 4, comp);
 			ine = 0;
 			tind = StitchLineCount;
 			while (ine < inf) {
-				if (StitchLineCount < lincnt) {
-					LineEndpoints[StitchLineCount].line = pjpts[ine]->line;
+				if (StitchLineCount < lineCount) {
+					LineEndpoints[StitchLineCount].line = projectedPointsArray[ine]->line;
 					LineEndpoints[StitchLineCount].group = LineGroupIndex;
-					LineEndpoints[StitchLineCount].x = pjpts[ine]->x;
-					LineEndpoints[StitchLineCount++].y = pjpts[ine++]->y;
-					LineEndpoints[StitchLineCount].line = pjpts[ine]->line;
+					LineEndpoints[StitchLineCount].x = projectedPointsArray[ine]->x;
+					LineEndpoints[StitchLineCount++].y = projectedPointsArray[ine++]->y;
+					LineEndpoints[StitchLineCount].line = projectedPointsArray[ine]->line;
 					LineEndpoints[StitchLineCount].group = LineGroupIndex;
-					LineEndpoints[StitchLineCount].x = pjpts[ine]->x;
-					LineEndpoints[StitchLineCount++].y = pjpts[ine++]->y;
+					LineEndpoints[StitchLineCount].x = projectedPointsArray[ine]->x;
+					LineEndpoints[StitchLineCount++].y = projectedPointsArray[ine++]->y;
 				}
 			}
 			if (StitchLineCount != tind)
 				LineGroupIndex++;
 		}
 	}
-	tgrinds[GroupIndexCount++] = StitchLineCount;
+	groupIndex[GroupIndexCount++] = StitchLineCount;
 	GroupIndexSequence = new unsigned[GroupIndexCount];
 	for (ind = 0; ind < GroupIndexCount; ind++)
-		GroupIndexSequence[ind] = tgrinds[ind];
+		GroupIndexSequence[ind] = groupIndex[ind];
 	LineGroupIndex--;
-	delete[] jpts;
-	delete[] pjpts;
+	delete[] projectedPoints;
+	delete[] projectedPointsArray;
 }
 
 void fnhor() {
-	unsigned	ind;
+	unsigned	iVertex;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
 	RotationCenter.x = (double)(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
 	RotationCenter.y = (double)(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	RotationAngle = PI / 2;
 	AngledForm.vertices = AngledFormVertices;
-	for (ind = 0; ind < AngledForm.vertexCount; ind++) {
-		AngledForm.vertices[ind].x = SelectedForm->vertices[ind].x;
-		AngledForm.vertices[ind].y = SelectedForm->vertices[ind].y;
-		rotflt(&AngledForm.vertices[ind]);
+	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
+		AngledForm.vertices[iVertex].x = SelectedForm->vertices[iVertex].x;
+		AngledForm.vertices[iVertex].y = SelectedForm->vertices[iVertex].y;
+		rotflt(&AngledForm.vertices[iVertex]);
 	}
 	SelectedForm = &AngledForm;
 	fnvrt();
@@ -4104,14 +4076,14 @@ void fsvrt() {
 }
 
 void filvrt() {
-	unsigned ind;;
+	unsigned iForm;
 
 	if (filmsgs(FMM_VRT))
 		return;
 	if (SelectedFormCount) {
 		savdo();
-		for (ind = 0; ind < SelectedFormCount; ind++) {
-			ClosestFormToCursor = SelectedFormList[ind];
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+			ClosestFormToCursor = SelectedFormList[iForm];
 			fvars(ClosestFormToCursor);
 			if (SelectedForm->type != FRMLINE)
 				fsvrt();
@@ -4146,13 +4118,13 @@ void fshor() {
 }
 
 void filhor() {
-	unsigned ind;
+	unsigned iForm;
 
 	if (filmsgs(FMM_HOR))
 		return;
 	if (SelectedFormCount) {
-		for (ind = 0; ind < SelectedFormCount; ind++) {
-			ClosestFormToCursor = SelectedFormList[ind];
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+			ClosestFormToCursor = SelectedFormList[iForm];
 			fvars(ClosestFormToCursor);
 			if (SelectedForm->type != FRMLINE)
 				fshor();
@@ -4172,9 +4144,9 @@ void filhor() {
 }
 
 void fsangl() {
-	double bang;
+	double savedAngle;
 
-	bang = RotationAngle;
+	savedAngle = RotationAngle;
 	delmclp(ClosestFormToCursor);
 	deltx();
 	makpoli();
@@ -4187,19 +4159,19 @@ void fsangl() {
 	SelectedForm->type = FRMFPOLY;
 	dusqr();
 	refil();
-	RotationAngle = bang;
+	RotationAngle = savedAngle;
 }
 
 void filangl() {
-	unsigned ind;
+	unsigned iForm;
 
 	if (filmsgs(FMM_ANG))
 		return;
 	RotationAngle = IniFile.fillAngle;
 	if (SelectedFormCount) {
 		savdo();
-		for (ind = 0; ind < SelectedFormCount; ind++) {
-			ClosestFormToCursor = SelectedFormList[ind];
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+			ClosestFormToCursor = SelectedFormList[iForm];
 			fvars(ClosestFormToCursor);
 			if (SelectedForm->type != FRMLINE)
 				fsangl();
@@ -4219,28 +4191,28 @@ void filangl() {
 	}
 }
 
-void sRct2px(fRECTANGLE strct, RECT* pxrct) {
-	pxrct->left = (strct.left - ZoomRect.left)*ZoomRatio.x + 0.5;
-	pxrct->right = (strct.right - ZoomRect.left)*ZoomRatio.x + 0.5;
-	pxrct->top = (StitchWindowClientRect.bottom) - (strct.top - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-	pxrct->bottom = (StitchWindowClientRect.bottom) - (strct.bottom - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+void sRct2px(fRECTANGLE stitchRect, RECT* screenRect) {
+	screenRect->left = (stitchRect.left - ZoomRect.left)*ZoomRatio.x + 0.5;
+	screenRect->right = (stitchRect.right - ZoomRect.left)*ZoomRatio.x + 0.5;
+	screenRect->top = (StitchWindowClientRect.bottom) - (stitchRect.top - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+	screenRect->bottom = (StitchWindowClientRect.bottom) - (stitchRect.bottom - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 }
 
 void setmfrm() {
-	unsigned	ind;
-	POINT		tpnt;
-	POINT		tof;
+	unsigned	iForm;
+	POINT		point;
+	POINT		offset;
 
-	sfCor2px(FormList[ClosestFormToCursor].vertices[0], &tpnt);
-	tof.x = Msg.pt.x - StitchWindowOrigin.x - tpnt.x + FormMoveDelta.x;
-	tof.y = Msg.pt.y - StitchWindowOrigin.y - tpnt.y + FormMoveDelta.y;
-	for (ind = 0; ind < FormList[ClosestFormToCursor].vertexCount; ind++) {
-		sfCor2px(FormList[ClosestFormToCursor].vertices[ind], &tpnt);
-		FormLines[ind].x = tpnt.x + tof.x;
-		FormLines[ind].y = tpnt.y + tof.y;
+	sfCor2px(FormList[ClosestFormToCursor].vertices[0], &point);
+	offset.x = Msg.pt.x - StitchWindowOrigin.x - point.x + FormMoveDelta.x;
+	offset.y = Msg.pt.y - StitchWindowOrigin.y - point.y + FormMoveDelta.y;
+	for (iForm = 0; iForm < FormList[ClosestFormToCursor].vertexCount; iForm++) {
+		sfCor2px(FormList[ClosestFormToCursor].vertices[iForm], &point);
+		FormLines[iForm].x = point.x + offset.x;
+		FormLines[iForm].y = point.y + offset.y;
 	}
-	FormLines[ind].x = FormLines[0].x;
-	FormLines[ind].y = FormLines[0].y;
+	FormLines[iForm].x = FormLines[0].x;
+	FormLines[iForm].y = FormLines[0].y;
 }
 
 void strtchbox() {
@@ -4256,34 +4228,34 @@ void unstrtch() {
 }
 
 unsigned chkfrm() {
-	POINT		tpnt0, tpnt1;
-	RECT		trct;
-	unsigned	ind;
-	double		len, mlen = 1e99;
+	POINT		point, formOrigin;
+	RECT		rectangle;
+	unsigned	iControl;
+	double		length, minimumLength = 1e99;
 
 	fvars(ClosestFormToCursor);
-	tpnt0.x = Msg.pt.x - StitchWindowOrigin.x;
-	tpnt0.y = Msg.pt.y - StitchWindowOrigin.y;
+	point.x = Msg.pt.x - StitchWindowOrigin.x;
+	point.y = Msg.pt.y - StitchWindowOrigin.y;
 	NewFormVertexCount = SelectedForm->vertexCount + 1;
 	duzrat();
-	sRct2px(SelectedForm->rectangle, &trct);
-	FormControlPoints[0].x = FormControlPoints[6].x = FormControlPoints[7].x = FormControlPoints[8].x = trct.left;
-	FormControlPoints[1].x = FormControlPoints[5].x = midl(trct.right, trct.left);
-	FormControlPoints[0].y = FormControlPoints[1].y = FormControlPoints[2].y = FormControlPoints[8].y = trct.top;
-	FormControlPoints[3].y = FormControlPoints[7].y = midl(trct.top, trct.bottom);
-	FormControlPoints[4].y = FormControlPoints[5].y = FormControlPoints[6].y = trct.bottom;
-	FormControlPoints[2].x = FormControlPoints[3].x = FormControlPoints[4].x = trct.right;
-	for (ind = 0; ind < 10; ind++) {
-		len = hypot(FormControlPoints[ind].x - tpnt0.x, FormControlPoints[ind].y - tpnt0.y);
-		if (len < mlen) {
-			mlen = len;
-			SelectedFormControlVertex = ind;
+	sRct2px(SelectedForm->rectangle, &rectangle);
+	FormControlPoints[0].x = FormControlPoints[6].x = FormControlPoints[7].x = FormControlPoints[8].x = rectangle.left;
+	FormControlPoints[1].x = FormControlPoints[5].x = midl(rectangle.right, rectangle.left);
+	FormControlPoints[0].y = FormControlPoints[1].y = FormControlPoints[2].y = FormControlPoints[8].y = rectangle.top;
+	FormControlPoints[3].y = FormControlPoints[7].y = midl(rectangle.top, rectangle.bottom);
+	FormControlPoints[4].y = FormControlPoints[5].y = FormControlPoints[6].y = rectangle.bottom;
+	FormControlPoints[2].x = FormControlPoints[3].x = FormControlPoints[4].x = rectangle.right;
+	for (iControl = 0; iControl < 10; iControl++) {
+		length = hypot(FormControlPoints[iControl].x - point.x, FormControlPoints[iControl].y - point.y);
+		if (length < minimumLength) {
+			minimumLength = length;
+			SelectedFormControlVertex = iControl;
 		}
-		if (mlen < CLOSENUF) {
+		if (minimumLength < CLOSENUF) {
 			ritfrct(ClosestFormToCursor, StitchWindowDC);
-			for (ind = 0; ind < 4; ind++) {
-				StretchBoxLine[ind].x = FormControlPoints[ind << 1].x;
-				StretchBoxLine[ind].y = FormControlPoints[ind << 1].y;
+			for (iControl = 0; iControl < 4; iControl++) {
+				StretchBoxLine[iControl].x = FormControlPoints[iControl << 1].x;
+				StretchBoxLine[iControl].y = FormControlPoints[iControl << 1].y;
 			}
 			StretchBoxLine[4].x = StretchBoxLine[0].x;
 			StretchBoxLine[4].y = StretchBoxLine[0].y;
@@ -4299,11 +4271,11 @@ unsigned chkfrm() {
 			return 1;
 		}
 	}
-	if (tpnt0.x >= trct.left&&tpnt0.x <= trct.right&&
-		tpnt0.y >= trct.top&&tpnt0.y <= trct.bottom) {
-		sfCor2px(SelectedForm->vertices[0], &tpnt1);
-		FormMoveDelta.x = tpnt1.x - tpnt0.x;
-		FormMoveDelta.y = tpnt1.y - tpnt0.y;
+	if (point.x >= rectangle.left&&point.x <= rectangle.right&&
+		point.y >= rectangle.top&&point.y <= rectangle.bottom) {
+		sfCor2px(SelectedForm->vertices[0], &formOrigin);
+		FormMoveDelta.x = formOrigin.x - point.x;
+		FormMoveDelta.y = formOrigin.y - point.y;
 		setMap(FRMOV);
 		return 1;
 	}
@@ -4312,44 +4284,44 @@ unsigned chkfrm() {
 }
 
 void rstfrm() {
-	fPOINT		pof;
-	unsigned	ind;
-	POINT		tpnt;
-	unsigned	tat = (ClosestFormToCursor << 4);
+	fPOINT		offset;
+	unsigned	iVertex, iStitch;
+	POINT		point;
+	unsigned	attribute = (ClosestFormToCursor << 4);
 
 	setmfrm();
 	rstMap(FRMOV);
-	tpnt.x = Msg.pt.x + FormMoveDelta.x;
-	tpnt.y = Msg.pt.y + FormMoveDelta.y;
-	pxCor2stch(tpnt);
-	pof.x = SelectedPoint.x - SelectedForm->vertices[0].x;
-	pof.y = SelectedPoint.y - SelectedForm->vertices[0].y;
-	for (ind = 0; ind < SelectedForm->vertexCount; ind++) {
-		SelectedForm->vertices[ind].x += pof.x;
-		SelectedForm->vertices[ind].y += pof.y;
+	point.x = Msg.pt.x + FormMoveDelta.x;
+	point.y = Msg.pt.y + FormMoveDelta.y;
+	pxCor2stch(point);
+	offset.x = SelectedPoint.x - SelectedForm->vertices[0].x;
+	offset.y = SelectedPoint.y - SelectedForm->vertices[0].y;
+	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+		SelectedForm->vertices[iVertex].x += offset.x;
+		SelectedForm->vertices[iVertex].y += offset.y;
 	}
-	SelectedForm->rectangle.bottom += pof.y;
-	SelectedForm->rectangle.top += pof.y;
-	SelectedForm->rectangle.left += pof.x;
-	SelectedForm->rectangle.right += pof.x;
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-		if ((StitchBuffer[ind].attribute&FRMSK) == tat&&StitchBuffer[ind].attribute&ALTYPMSK && !(StitchBuffer[ind].attribute&NOTFRM)) {
-			StitchBuffer[ind].x += pof.x;
-			StitchBuffer[ind].y += pof.y;
+	SelectedForm->rectangle.bottom += offset.y;
+	SelectedForm->rectangle.top += offset.y;
+	SelectedForm->rectangle.left += offset.x;
+	SelectedForm->rectangle.right += offset.x;
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+		if ((StitchBuffer[iStitch].attribute&FRMSK) == attribute&&StitchBuffer[iStitch].attribute&ALTYPMSK && !(StitchBuffer[iStitch].attribute&NOTFRM)) {
+			StitchBuffer[iStitch].x += offset.x;
+			StitchBuffer[iStitch].y += offset.y;
 		}
 	}
 }
 
 void clrfills() {
-	unsigned ind;
+	unsigned iForm;
 
-	for (ind = 0; ind < FormIndex; ind++) {
-		FormList[ind].clipEntries = 0;
-		FormList[ind].lengthOrCount.clipCount = 0;
-		FormList[ind].edgeType = 0;
-		FormList[ind].fillType = 0;
-		FormList[ind].attribute &= NFRECONT;
-		FormList[ind].extendedAttribute &= !(AT_UND | AT_WALK);
+	for (iForm = 0; iForm < FormIndex; iForm++) {
+		FormList[iForm].clipEntries = 0;
+		FormList[iForm].lengthOrCount.clipCount = 0;
+		FormList[iForm].edgeType = 0;
+		FormList[iForm].fillType = 0;
+		FormList[iForm].attribute &= NFRECONT;
+		FormList[iForm].extendedAttribute &= !(AT_UND | AT_WALK);
 	}
 	ClipPointIndex = 0;
 }
