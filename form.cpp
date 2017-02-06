@@ -2168,33 +2168,33 @@ float getblen() {
 
 #if	 __UseASM__
 	float		fLength;
-	unsigned	length;
+	unsigned	iLength;
 
-	length = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
+	iLength = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
 
 	_asm {
-		mov		eax, length
+		mov		eax, iLength
 		mov		fLength, eax
 	}
-	return fileLength;
+	return fLength;
 #else
 	union {
 		float		fLength;
-		unsigned	Length;
+		unsigned	iLength;
 	} x;
 
-	x.Length = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
+	x.iLength = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
 	return x.fLength;
 #endif
 }
 
-void savblen(float length) {
+void savblen(float fLength) {
 #if	 __UseASM__
 	unsigned short clipEntries;
 	unsigned short picoLength;
 
 	_asm {
-		mov		eax, length
+		mov		eax, fLength
 		mov		picoLength, ax
 		shr		eax, 16
 		mov		clipEntries, ax
@@ -2207,7 +2207,7 @@ void savblen(float length) {
 		float f;
 	} x;
 
-	x.f = length;
+	x.f = fLength;
 
 	FormList[ClosestFormToCursor].clipEntries = x.i >> 16;
 	FormList[ClosestFormToCursor].picoLength = x.i & 0xFFFF;
@@ -9716,16 +9716,16 @@ void setr(unsigned pbit) {
 #endif
 }
 
-void clRmap(unsigned length) {
+void clRmap(unsigned mapSize) {
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
-		mov		ecx, length
+		mov		ecx, mapSize
 		mov		edi, offset MarkedStitchMap
 		rep		stosd
 	}
 #else
-	memset(MarkedStitchMap, 0, length * sizeof(*MarkedStitchMap));
+	memset(MarkedStitchMap, 0, mapSize * sizeof(*MarkedStitchMap));
 #endif
 }
 

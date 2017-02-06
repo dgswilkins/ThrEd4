@@ -4873,7 +4873,7 @@ void movmap(unsigned cnt) {
 #if  __UseASM__
 	_asm {
 
-		mov		ecx, count
+		mov		ecx, cnt
 		mov		esi, TraceBitmapData
 		mov		edi, offset BSequence
 		movlup : mov		eax, [esi]
@@ -5287,7 +5287,7 @@ double dubl(unsigned char* pnt) {
 
 	_asm {
 
-		mov		ecx, point
+		mov		ecx, pnt
 		mov		ecx, [ecx]
 		movzx	ebx, ch
 		test	cl, 8
@@ -21139,7 +21139,7 @@ void ducurs(unsigned char* pnt) {
 					ret
 
 		//form cursor
-		delups:		mov		ebx, point
+		delups:		mov		ebx, pnt
 					mov		edi, ebx
 					xor		ecx, ecx
 					mov		cl, 32
