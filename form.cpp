@@ -4327,11 +4327,11 @@ void clrfills() {
 }
 
 void dusat() {
-	POINT* l_plin = &FormLines[SatinIndex - 1];
+	POINT* line = &FormLines[SatinIndex - 1];
 
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
-	Polyline(StitchWindowDC, l_plin, 2);
+	Polyline(StitchWindowDC, line, 2);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -4372,13 +4372,13 @@ void satpnt1() {
 }
 
 void satfix() {
-	unsigned ind;
+	unsigned iVertex;
 
 	if (SatinIndex > 1) {
 		FormList[FormIndex].vertices = adflt(SatinIndex);
-		for (ind = 0; ind < SatinIndex; ind++) {
-			FormList[FormIndex].vertices[ind].x = TempPolygon[ind].x;
-			FormList[FormIndex].vertices[ind].y = TempPolygon[ind].y;
+		for (iVertex = 0; iVertex < SatinIndex; iVertex++) {
+			FormList[FormIndex].vertices[iVertex].x = TempPolygon[iVertex].x;
+			FormList[FormIndex].vertices[iVertex].y = TempPolygon[iVertex].y;
 		}
 		FormList[FormIndex].vertexCount = SatinIndex;
 		frmout(FormIndex);
@@ -4390,22 +4390,22 @@ void satfix() {
 	setMap(RESTCH);
 }
 
-void delcon(unsigned p_cpnt)
+void delcon(unsigned GuideIndex)
 {
-	unsigned ind;
-	unsigned loc;
-	SATCON* tp;
-	FRMHED* fp;
+	unsigned iForm;
+	unsigned iGuide;
+	SATCON* guide;
+	FRMHED* formHeader;
 
-	tp = &SelectedForm->satinOrAngle.guide[p_cpnt];
-	loc = &SelectedForm->satinOrAngle.guide[p_cpnt] - SatinConnects;
-	if (SatinConnectIndex > loc)
-		MoveMemory(tp, &tp[1], (SatinConnectIndex - loc + 1) * sizeof(SATCON));
-	for (ind = ClosestFormToCursor + 1; ind < FormIndex; ind++)
+	guide = &SelectedForm->satinOrAngle.guide[GuideIndex];
+	iGuide = &SelectedForm->satinOrAngle.guide[GuideIndex] - SatinConnects;
+	if (SatinConnectIndex > iGuide)
+		MoveMemory(guide, &guide[1], (SatinConnectIndex - iGuide + 1) * sizeof(SATCON));
+	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 	{
-		fp = &FormList[ind];
-		if (fp->type == SAT&&fp->satinGuideCount)
-			fp->satinOrAngle.guide--;
+		formHeader = &FormList[iForm];
+		if (formHeader->type == SAT&&formHeader->satinGuideCount)
+			formHeader->satinOrAngle.guide--;
 	}
 	if (ClosestVertexToCursor < WordParam)
 		WordParam--;
@@ -4419,27 +4419,27 @@ void delcon(unsigned p_cpnt)
 }
 
 BOOL satselfn() {
-	unsigned ind, ine, playcod;
-	double		tlen, len = 1e99;
-	double		dx, dy;
+	unsigned iForm, iVertex, layerCode;
+	double		length, minimumLength = 1e99;
+	double		deltaX, deltaY;
 
 	px2stch();
-	for (ind = 0; ind < FormIndex; ind++) {
-		playcod = (FormList[ind].attribute&FRMLMSK) >> 1;
-		if (!ActiveLayer || !playcod || playcod == ActiveLayer) {
-			for (ine = 0; ine < FormList[ind].vertexCount; ine++) {
-				dx = SelectedPoint.x - FormList[ind].vertices[ine].x;
-				dy = SelectedPoint.y - FormList[ind].vertices[ine].y;
-				tlen = hypot(dx, dy);
-				if (tlen < len) {
-					len = tlen;
-					ClosestFormToCursor = ind;
-					ClosestVertexToCursor = ine;
+	for (iForm = 0; iForm < FormIndex; iForm++) {
+		layerCode = (FormList[iForm].attribute&FRMLMSK) >> 1;
+		if (!ActiveLayer || !layerCode || layerCode == ActiveLayer) {
+			for (iVertex = 0; iVertex < FormList[iForm].vertexCount; iVertex++) {
+				deltaX = SelectedPoint.x - FormList[iForm].vertices[iVertex].x;
+				deltaY = SelectedPoint.y - FormList[iForm].vertices[iVertex].y;
+				length = hypot(deltaX, deltaY);
+				if (length < minimumLength) {
+					minimumLength = length;
+					ClosestFormToCursor = iForm;
+					ClosestVertexToCursor = iVertex;
 				}
 			}
 		}
 	}
-	if (len < CLOSENUF)
+	if (minimumLength < CLOSENUF)
 		return 1;
 	else
 		return 0;
@@ -4504,19 +4504,19 @@ int scomp(const void *arg1, const void *arg2) {
 #endif
 }
 
-unsigned setchk(unsigned bPnt) {
+unsigned setchk(unsigned bit) {
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
 		mov		ebx, CheckMap
-		mov		ecx, bPnt
+		mov		ecx, bit
 		bts[ebx], ecx
 		jnc		short setcx
 		dec		eax
 		setcx :
 	}
 #else
-	return _bittestandset((long *)CheckMap, bPnt) ? 0xFFFFFFFF : 0;
+	return _bittestandset((long *)CheckMap, bit) ? 0xFFFFFFFF : 0;
 #endif
 }
 
@@ -4597,40 +4597,43 @@ prvcx :
 
 void satadj()
 {
-	unsigned	ind, ine, inf, psac, mapsiz, prstpt;
-	SATCON*		l_spnt;
-	SATCON*		l_dpnt;
-	unsigned short bstpt;
-	FRMHED*		fp;
+	unsigned	iGuide, iSource, iWord, iForm, iForward, iVertex, iReverse, iDestination, mapSize;
+	SATCON*		guide;
+	SATCON*		sourceGuide;
+	SATCON*		destinationGuide;
+	unsigned short guideCount;
+	FRMHED*		formHeader;
 
 	fvars(ClosestFormToCursor);
-	bstpt = SelectedForm->satinGuideCount;
-	for (ind = 0; ind < SelectedForm->satinGuideCount; ind++)
+	guideCount = SelectedForm->satinGuideCount;
+	for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++)
 	{
-		if (CurrentFormGuides[ind].finish > VertexCount - 1)
-			CurrentFormGuides[ind].finish = VertexCount - 1;
-		if (CurrentFormGuides[ind].start > VertexCount - 1)
-			CurrentFormGuides[ind].start = VertexCount - 1;
+		if (CurrentFormGuides[iGuide].finish > VertexCount - 1)
+			CurrentFormGuides[iGuide].finish = VertexCount - 1;
+		if (CurrentFormGuides[iGuide].start > VertexCount - 1)
+			CurrentFormGuides[iGuide].start = VertexCount - 1;
 	}
-	l_spnt = (SATCON*)BSequence;
-	mapsiz = (VertexCount >> 5) + 1;
+	// ToDo - Allocate memory locally for guide
+	guide = (SATCON*)BSequence;
+	mapSize = (VertexCount >> 5) + 1;
+	// ToDo - Allocate memory locally for CheckMap
 	CheckMap = (unsigned*)OSequence;
-	psac = 0;
-	prstpt = CurrentFormConnectionsCount;
-	for (ind = 0; ind < CurrentFormConnectionsCount; ind++)
+	iDestination = 0;
+	for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++)
 	{
-		if (CurrentFormGuides[ind].start != CurrentFormGuides[ind].finish)
+		if (CurrentFormGuides[iSource].start != CurrentFormGuides[iSource].finish)
 		{
-			CurrentFormGuides[psac].start = CurrentFormGuides[ind].start;
-			CurrentFormGuides[psac].finish = CurrentFormGuides[ind].finish;
-			psac++;
+			CurrentFormGuides[iDestination].start = CurrentFormGuides[iSource].start;
+			CurrentFormGuides[iDestination].finish = CurrentFormGuides[iSource].finish;
+			iDestination++;
 		}
 	}
-	CurrentFormConnectionsCount = SelectedForm->satinGuideCount = ind;
+	// Todo - Should this be iSource or iDestination?
+	CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iSource;
 	if (WordParam || SelectedForm->attribute&FRMEND)
 	{
-		for (ind = 0; ind < mapsiz; ind++)
-			CheckMap[ind] = 0;
+		for (iWord = 0; iWord < mapSize; iWord++)
+			CheckMap[iWord] = 0;
 		if (SelectedForm->attribute&FRMEND)
 		{
 			setchk(0);
@@ -4641,134 +4644,133 @@ void satadj()
 			setchk(WordParam);
 			setchk(WordParam + 1);
 		}
-		ine = 0;
-		for (ind = 0; ind < CurrentFormConnectionsCount; ind++)
+		iDestination = 0;
+		for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++)
 		{
-			if (chkchk(CurrentFormGuides[ind].start) && chkchk(CurrentFormGuides[ind].finish))
+			if (chkchk(CurrentFormGuides[iSource].start) && chkchk(CurrentFormGuides[iSource].finish))
 			{
-				l_spnt[ine].start = CurrentFormGuides[ind].start;
-				l_spnt[ine].finish = CurrentFormGuides[ind].finish;
-				ine++;
+				guide[iDestination].start = CurrentFormGuides[iSource].start;
+				guide[iDestination].finish = CurrentFormGuides[iSource].finish;
+				iDestination++;
 			}
 		}
-		CurrentFormConnectionsCount = SelectedForm->satinGuideCount = ine;
+		CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iDestination;
 		if (WordParam)
 		{
-			ine = 0;
-			for (ind = 0; ind < CurrentFormConnectionsCount; ind++)
+			iDestination = 0;
+			for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++)
 			{
-				if (CurrentFormGuides[ind].start < WordParam)
+				if (CurrentFormGuides[iSource].start < WordParam)
 				{
-					l_spnt[ine].start = CurrentFormGuides[ind].start;
-					l_spnt[ine++].finish = CurrentFormGuides[ind].finish;
+					guide[iDestination].start = CurrentFormGuides[iSource].start;
+					guide[iDestination++].finish = CurrentFormGuides[iSource].finish;
 				}
 			}
-			CurrentFormConnectionsCount = SelectedForm->satinGuideCount = ine;
+			CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iDestination;
 		}
-	}
-	else
+	} else
 	{
-		for (ind = 0; ind < CurrentFormConnectionsCount; ind++)
+		for (iGuide = 0; iGuide < CurrentFormConnectionsCount; iGuide++)
 		{
-			l_spnt[ind].start = CurrentFormGuides[ind].start;
-			l_spnt[ind].finish = CurrentFormGuides[ind].finish;
+			guide[iGuide].start = CurrentFormGuides[iGuide].start;
+			guide[iGuide].finish = CurrentFormGuides[iGuide].finish;
 		}
 	}
 	if (CurrentFormConnectionsCount)
 	{
-		for (ind = 0; ind < mapsiz; ind++)
-			CheckMap[ind] = 0;
-		for (ind = 0; ind < CurrentFormConnectionsCount; ind++)
+		for (iWord = 0; iWord < mapSize; iWord++)
+			CheckMap[iWord] = 0;
+		for (iGuide = 0; iGuide < CurrentFormConnectionsCount; iGuide++)
 		{
-			ine = CurrentFormGuides[ind].start;
-			if (ine > (unsigned)WordParam - 1)
-				ine = WordParam - 1;
-			if (setchk(ine))
+			iForward = CurrentFormGuides[iGuide].start;
+			if (iForward > (unsigned)WordParam - 1)
+				iForward = WordParam - 1;
+			if (setchk(iForward))
 			{
-				inf = ine;
-				if (inf)
-					inf--;
-				while (!chkchk(ine) && ine < (unsigned)WordParam - 1)
-					ine++;
-				while (inf && (!chkchk(inf)))
-					inf--;
-				if (!chkchk(ine) && !chkchk(inf))
+				iReverse = iForward;
+				if (iReverse)
+					iReverse--;
+				while (!chkchk(iForward) && iForward < (unsigned)WordParam - 1)
+					iForward++;
+				while (iReverse && (!chkchk(iReverse)))
+					iReverse--;
+				if (!chkchk(iForward) && !chkchk(iReverse))
 					break;
-				if (chkchk(ine) && chkchk(inf))
+				if (chkchk(iForward) && chkchk(iReverse))
 				{
-					if (ine - CurrentFormGuides[ind].start > CurrentFormGuides[ind].start - inf)
-						setchk(inf);
+					if (iForward - CurrentFormGuides[iGuide].start > CurrentFormGuides[iGuide].start - iReverse)
+						setchk(iReverse);
 					else
-						setchk(ine);
-				}
-				else {
-					if (chkchk(ine))
-						setchk(inf);
+						setchk(iForward);
+				} else {
+					if (chkchk(iForward))
+						setchk(iReverse);
 					else
-						setchk(ine);
+						setchk(iForward);
 				}
 
 			}
 		}
-		inf = 0;
-		for (ind = 0; ind < mapsiz; ind++)
+		iGuide = 0;
+		// ToDo - Does this for loop make sense?
+		for (iWord = 0; iWord < mapSize; iWord++)
 		{
 			do
 			{
-				ine = nxtchk(ind);
-				if (ine < VertexCount)
-					CurrentFormGuides[inf++].start = ine + (ind << 5);
-			} while (ine < VertexCount);
+				iVertex = nxtchk(iWord);
+				if (iVertex < VertexCount)
+					CurrentFormGuides[iGuide++].start = iVertex + (iWord << 5);
+			} while (iVertex < VertexCount);
 		}
-		CurrentFormConnectionsCount = SelectedForm->satinGuideCount = inf;
-		for (ind = 0; ind < mapsiz; ind++)
-			CheckMap[ind] = 0;
-		for (ind = 0; ind < CurrentFormConnectionsCount; ind++)
+		CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iGuide;
+		for (iWord = 0; iWord < mapSize; iWord++)
+			CheckMap[iWord] = 0;
+		// Todo - are iForward and iReverse appropriate variable names below?
+		for (iGuide = 0; iGuide < CurrentFormConnectionsCount; iGuide++)
 		{
-			ine = inf = CurrentFormGuides[ind].finish;
-			if (ine > (unsigned)VertexCount - 1)
-				ine = VertexCount - 1;
-			if (setchk(ine))
+			iForward = iReverse = CurrentFormGuides[iGuide].finish;
+			if (iForward > (unsigned)VertexCount - 1)
+				iForward = VertexCount - 1;
+			if (setchk(iForward))
 			{
-				if (ine < (unsigned)VertexCount - 1)
-					ine++;
-				if (inf > (unsigned)WordParam + 1)
-					inf--;
-				while (!chkchk(ine) && ine < (unsigned)VertexCount - 1)
-					ine++;
-				while (inf > (unsigned)WordParam - 1 && (!chkchk(inf)))
-					inf--;
-				if (!chkchk(ine) && !chkchk(inf))
+				if (iForward < (unsigned)VertexCount - 1)
+					iForward++;
+				if (iReverse > (unsigned)WordParam + 1)
+					iReverse--;
+				while (!chkchk(iForward) && iForward < (unsigned)VertexCount - 1)
+					iForward++;
+				while (iReverse > (unsigned)WordParam - 1 && (!chkchk(iReverse)))
+					iReverse--;
+				if (!chkchk(iForward) && !chkchk(iReverse))
 					break;
-				if (chkchk(ine) && chkchk(inf))
+				if (chkchk(iForward) && chkchk(iReverse))
 				{
-					if (ine - CurrentFormGuides[ind].finish > CurrentFormGuides[ind].finish - inf)
-						setchk(inf);
+					if (iForward - CurrentFormGuides[iGuide].finish > CurrentFormGuides[iGuide].finish - iReverse)
+						setchk(iReverse);
 					else
-						setchk(ine);
-				}
-				else
+						setchk(iForward);
+				} else
 				{
-					if (chkchk(ine))
-						setchk(ine);
+					if (chkchk(iForward))
+						setchk(iForward);
 					else
-						setchk(inf);
+						setchk(iReverse);
 				}
 			}
 		}
-		inf = 0;
-		for (ind = mapsiz; ind != 0; ind--)
+		iGuide = 0;
+		for (iWord = mapSize; iWord != 0; iWord--)
 		{
 			do
 			{
-				ine = prvchk(ind - 1);
-				if (ine < VertexCount)
-					CurrentFormGuides[inf++].finish = ine + ((ind - 1) << 5);
-			} while (ine < VertexCount);
+				iReverse = prvchk(iWord - 1);
+				if (iReverse < VertexCount)
+					CurrentFormGuides[iGuide++].finish = iReverse + ((iWord - 1) << 5);
+			} while (iReverse < VertexCount);
 		}
-		if (inf < CurrentFormConnectionsCount)
-			inf = CurrentFormConnectionsCount;
-		CurrentFormConnectionsCount = SelectedForm->satinGuideCount = inf;
+		if (iGuide < CurrentFormConnectionsCount)
+			iGuide = CurrentFormConnectionsCount;
+		CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iGuide;
 		if (WordParam)
 		{
 			if (CurrentFormConnectionsCount > VertexCount - WordParam - 2)
@@ -4778,20 +4780,20 @@ void satadj()
 			SelectedForm->satinGuideCount = CurrentFormConnectionsCount;
 		}
 	}
-	if (SelectedForm->satinGuideCount < bstpt)
+	if (SelectedForm->satinGuideCount < guideCount)
 	{
-		ine = bstpt - CurrentFormConnectionsCount;
-		l_spnt = l_dpnt = SelectedForm->satinOrAngle.guide;
-		l_dpnt += SelectedForm->satinGuideCount;
-		l_spnt += bstpt;
-		MoveMemory(l_dpnt, l_spnt, sizeof(SATCON)*(&SatinConnects[SatinConnectIndex] - l_spnt + 1));
-		for (ind = ClosestFormToCursor + 1; ind < FormIndex; ind++)
+		iGuide = guideCount - CurrentFormConnectionsCount;
+		sourceGuide = destinationGuide = SelectedForm->satinOrAngle.guide;
+		destinationGuide += SelectedForm->satinGuideCount;
+		sourceGuide += guideCount;
+		MoveMemory(destinationGuide, sourceGuide, sizeof(SATCON)*(&SatinConnects[SatinConnectIndex] - sourceGuide + 1));
+		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 		{
-			fp = &FormList[ind];
-			if (fp->type == SAT)
-				fp->satinOrAngle.guide -= ine;
+			formHeader = &FormList[iForm];
+			if (formHeader->type == SAT)
+				formHeader->satinOrAngle.guide -= iGuide;
 		}
-		SatinConnectIndex -= ine;
+		SatinConnectIndex -= iGuide;
 	}
 }
 
