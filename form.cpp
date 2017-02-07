@@ -4521,6 +4521,7 @@ unsigned setchk(unsigned bit) {
 }
 
 unsigned chkchk(unsigned bit) {
+	// ToDo - reverse the return value (if the bit is set,  return 0xFFFFFFFF) and adjust usage appropriately 
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
@@ -4532,7 +4533,7 @@ unsigned chkchk(unsigned bit) {
 		ccx :
 	}
 #else
-	return _bittest((long *)chkMap, bit) ? 0xFFFFFFFF : 0;
+	return _bittest((long *)CheckMap, bit) ? 0 : 0xFFFFFFFF;
 #endif
 }
 
