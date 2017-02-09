@@ -2645,15 +2645,14 @@ void refilfn() {
 }
 
 void refil() {
-	unsigned trg, iStitch, attribute;
+	unsigned codedForm, iStitch, attribute;
 
 	if (!chku(WRNOF))
 	{
-		// ToDo - rename trg when I figure it out :)
-		trg = (ClosestFormToCursor << FRMSHFT) | USMSK;
+		codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			attribute = StitchBuffer[iStitch].attribute;
-			if (!(attribute&NOTFRM) && (attribute&(USMSK | FRMSK)) == trg) {
+			if (!(attribute&NOTFRM) && (attribute&(USMSK | FRMSK)) == codedForm) {
 				if (FormDataSheet)
 					setMap(WASFRMFRM);
 				undat();
@@ -4799,75 +4798,73 @@ void satadj()
 }
 
 void satclos() {
-	unsigned	ind, clos, psac;
-	double		dx, dy, tlen, len = 1e99;
-	SATCON*		tsac;
+	unsigned	iVertex, closestVertex, swap, initialGuideCount;
+	double		deltaX, deltaY, length, minimumLength = 1e99;
 
 	uninsf();
 	px2stch();
-	psac = SelectedForm->satinGuideCount;
-	tsac = SelectedForm->satinOrAngle.guide;
-	clos = StartPoint;
-	for (ind = 0; ind < SelectedForm->vertexCount; ind++) {
-		dx = SelectedPoint.x - SelectedForm->vertices[ind].x;
-		dy = SelectedPoint.y - SelectedForm->vertices[ind].y;
-		tlen = hypot(dx, dy);
-		if (tlen < len) {
-			len = tlen;
-			ClosestVertexToCursor = ind;
+	initialGuideCount = SelectedForm->satinGuideCount;
+	closestVertex = StartPoint;
+	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+		deltaX = SelectedPoint.x - SelectedForm->vertices[iVertex].x;
+		deltaY = SelectedPoint.y - SelectedForm->vertices[iVertex].y;
+		length = hypot(deltaX, deltaY);
+		if (length < minimumLength) {
+			minimumLength = length;
+			ClosestVertexToCursor = iVertex;
 		}
 	}
 	rstMap(SATCNKT);
 	if (SelectedForm->type == FRMLINE) {
 		SelectedForm->fillType = CONTF;
-		clos = ClosestVertexToCursor;
-		if (StartPoint > clos) {
-			psac = clos;
-			clos = StartPoint;
-			StartPoint = psac;
+		closestVertex = ClosestVertexToCursor;
+		if (StartPoint > closestVertex) {
+			swap = closestVertex;
+			closestVertex = StartPoint;
+			StartPoint = swap;
 		}
 		if (!StartPoint)
 			StartPoint++;
-		if (StartPoint == SelectedForm->vertexCount - 2 && clos == (unsigned)SelectedForm->vertexCount - 1) {
+		if (StartPoint == SelectedForm->vertexCount - 2 && closestVertex == (unsigned)SelectedForm->vertexCount - 1) {
 			StartPoint = 1;
-			clos = SelectedForm->vertexCount - 2;
+			closestVertex = SelectedForm->vertexCount - 2;
 		}
-		if (clos >= (unsigned)SelectedForm->vertexCount - 2) {
-			clos = SelectedForm->vertexCount - 2;
+		if (closestVertex >= (unsigned)SelectedForm->vertexCount - 2) {
+			closestVertex = SelectedForm->vertexCount - 2;
 			if (StartPoint >= (unsigned)SelectedForm->vertexCount - 2)
 				StartPoint = SelectedForm->vertexCount - 2;
 		}
-		if (clos - StartPoint < 2) {
-			clos = StartPoint + 2;
-			if (clos > (unsigned)SelectedForm->vertexCount - 2) {
-				clos = clos - SelectedForm->vertexCount - 2;
-				clos -= clos;
-				StartPoint -= clos;
+		if (closestVertex - StartPoint < 2) {
+			closestVertex = StartPoint + 2;
+			if (closestVertex > (unsigned)SelectedForm->vertexCount - 2) {
+				closestVertex = closestVertex - SelectedForm->vertexCount - 2;
+				closestVertex -= closestVertex;
+				StartPoint -= closestVertex;
 			}
 		}
 		SelectedForm->angleOrClipData.guide.start = StartPoint;
-		SelectedForm->angleOrClipData.guide.finish = clos;
+		SelectedForm->angleOrClipData.guide.finish = closestVertex;
 	}
 	else {
-		if (ClosestVertexToCursor < clos) {
-			ind = ClosestVertexToCursor;
-			ClosestVertexToCursor = clos;
-			clos = ind;
+		if (ClosestVertexToCursor < closestVertex) {
+			swap = ClosestVertexToCursor;
+			ClosestVertexToCursor = closestVertex;
+			closestVertex = swap;
 		}
-		if (clos == 0 && ClosestVertexToCursor == (unsigned)VertexCount - 1) {
-			clos = VertexCount - 1;
+		if (closestVertex == 0 && ClosestVertexToCursor == (unsigned)VertexCount - 1) {
+			closestVertex = VertexCount - 1;
 			ClosestVertexToCursor = VertexCount;
 		}
-		if (clos == 1 && ClosestVertexToCursor == (unsigned)VertexCount) {
-			clos = 0;
+		if (closestVertex == 1 && ClosestVertexToCursor == (unsigned)VertexCount) {
+			closestVertex = 0;
 			ClosestVertexToCursor = 1;
 		}
-		if (ClosestVertexToCursor - clos == 1) {
+		if (ClosestVertexToCursor - closestVertex == 1) {
 			if (SelectedForm->attribute&FRMEND)
-				SelectedForm->wordParam = clos;
+				SelectedForm->wordParam = closestVertex;
 			else {
-				if (clos)
-					rotfrm(clos);
+				if (closestVertex)
+					rotfrm(closestVertex);
 				SelectedForm->attribute |= FRMEND;
 			}
 			satadj();
@@ -4875,14 +4872,14 @@ void satclos() {
 		else {
 			if (CurrentFormConnectionsCount) {
 				sacspac(&SelectedForm->satinOrAngle.guide[SelectedForm->satinGuideCount], 1);
-				SelectedForm->satinOrAngle.guide[SelectedForm->satinGuideCount].start = clos;
+				SelectedForm->satinOrAngle.guide[SelectedForm->satinGuideCount].start = closestVertex;
 				SelectedForm->satinOrAngle.guide[SelectedForm->satinGuideCount++].finish = ClosestVertexToCursor;
 				satadj();
 			}
 			else {
 				SelectedForm->satinOrAngle.guide = nusac(ClosestFormToCursor, 1);
-				SelectedForm->satinOrAngle.guide[psac].start = clos;
-				SelectedForm->satinOrAngle.guide[psac].finish = ClosestVertexToCursor;
+				SelectedForm->satinOrAngle.guide[initialGuideCount].start = closestVertex;
+				SelectedForm->satinOrAngle.guide[initialGuideCount].finish = ClosestVertexToCursor;
 				SelectedForm->satinGuideCount = 1;
 			}
 		}
@@ -4902,252 +4899,253 @@ void ritseq1(unsigned ind) {
 	SequenceIndex++;
 }
 
-void satfn(unsigned astrt, unsigned afin, unsigned bstrt, unsigned bfin) {
-	unsigned	anxt, bprv, cnt, ind, acnt, bcnt, ine, inf, tcnt, acind, bcind, pacnt = 0, pbcnt = 0;
-	unsigned	asegs, bsegs;
-	unsigned*	acnts;
-	unsigned*	bcnts;
-	double		alen, blen;
-	dPOINT		apnt, bpnt, adif, bdif, astp, bstp;
+void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned line2End) {
+	unsigned	line1Next, line2Previous, stitchCount, iSegment, line1Count, line2Count, iVertex;
+	unsigned	iNextVertex, segmentStitchCount, iLine1Vertex, iLine2Vertex, iLine1Count = 0, iLine2Count = 0;
+	unsigned	line1Segments, line2Segments;
+	unsigned*	line1StitchCounts;
+	unsigned*	line2StitchCounts;
+	double		line1Length, line2Length;
+	dPOINT		line1Point, line2Point, line1Delta, line2Delta, line1Step, line2Step;
 
-	if (astrt != afin&&bstrt != bfin) {
+	if (line1Start != line1End&&line2Start != line2End) {
 		if (!setMap(SAT1)) {
 			if (chkMap(FTHR)) {
 				BSequence[SequenceIndex].attribute = 0;
-				ritseq1(astrt%VertexCount);
+				ritseq1(line1Start%VertexCount);
 			}
 			else {
 				if (chkMap(BARSAT)) {
-					ritseq1(astrt%VertexCount);
-					ritseq1(bstrt%VertexCount);
+					ritseq1(line1Start%VertexCount);
+					ritseq1(line2Start%VertexCount);
 				}
 				else {
-					SelectedPoint.x = CurrentFormVertices[astrt].x;
-					SelectedPoint.y = CurrentFormVertices[astrt].y;
+					SelectedPoint.x = CurrentFormVertices[line1Start].x;
+					SelectedPoint.y = CurrentFormVertices[line1Start].y;
 					OSequence[SequenceIndex].x = SelectedPoint.x;
 					OSequence[SequenceIndex++].y = SelectedPoint.y;
 				}
 			}
 		}
-		alen = Lengths[afin] - Lengths[astrt];
-		blen = Lengths[bstrt] - Lengths[bfin];
-		if (fabs(alen) > fabs(blen))
-			cnt = fabs(blen) / StitchSpacing;
+		line1Length = Lengths[line1End] - Lengths[line1Start];
+		line2Length = Lengths[line2Start] - Lengths[line2End];
+		if (fabs(line1Length) > fabs(line2Length))
+			stitchCount = fabs(line2Length) / StitchSpacing;
 		else
-			cnt = fabs(alen) / StitchSpacing;
-		asegs = ((afin > astrt) ? (afin - astrt) : (astrt - afin));
-		bsegs = ((bstrt > bfin) ? (bstrt - bfin) : (bfin - bstrt));
-		acnts = new unsigned[asegs];
-		bcnts = new unsigned[bsegs + 1];
-		ine = astrt;
-		tcnt = 0;
-		for (ind = 0; ind < asegs - 1; ind++) {
-			inf = nxt(ine);
-			acnts[ind] = ((Lengths[inf] - Lengths[ine]) / alen)*cnt + 0.5;
-			tcnt += acnts[ind];
-			ine++;
+			stitchCount = fabs(line1Length) / StitchSpacing;
+		line1Segments = ((line1End > line1Start) ? (line1End - line1Start) : (line1Start - line1End));
+		line2Segments = ((line2Start > line2End) ? (line2Start - line2End) : (line2End - line2Start));
+		line1StitchCounts = new unsigned[line1Segments];
+		line2StitchCounts = new unsigned[line2Segments + 1];
+		iVertex = line1Start;
+		segmentStitchCount = 0;
+		for (iSegment = 0; iSegment < line1Segments - 1; iSegment++) {
+			iNextVertex = nxt(iVertex);
+			line1StitchCounts[iSegment] = ((Lengths[iNextVertex] - Lengths[iVertex]) / line1Length)*stitchCount + 0.5;
+			segmentStitchCount += line1StitchCounts[iSegment];
+			iVertex++;
 		}
-		acnts[ind] = cnt - tcnt;
-		ind = bstrt;
-		ine = prv(ind);
-		inf = 0;
-		tcnt = 0;
-		while (ine > bfin) {
-			bcnts[inf] = ((Lengths[ind] - Lengths[ine]) / blen)*cnt + 0.5;
-			tcnt += bcnts[inf++];
-			ine = prv(--ind);
+		line1StitchCounts[iSegment] = stitchCount - segmentStitchCount;
+		iNextVertex = line2Start;
+		iVertex = prv(iNextVertex);
+		iSegment = 0;
+		segmentStitchCount = 0;
+		while (iVertex > line2End) {
+			line2StitchCounts[iSegment] = ((Lengths[iNextVertex] - Lengths[iVertex]) / line2Length)*stitchCount + 0.5;
+			segmentStitchCount += line2StitchCounts[iSegment++];
+			iVertex = prv(--iNextVertex);
 		}
-		bcnts[inf] = cnt - tcnt;
-		apnt.x = CurrentFormVertices[astrt].x;
-		apnt.y = CurrentFormVertices[astrt].y;
-		anxt = nxt(astrt);
-		bprv = prv(bstrt);
-		acnt = acnts[pacnt++];
-		bcnt = bcnts[pbcnt++];
-		acind = astrt;
-		bcind = bstrt;
-		adif.x = CurrentFormVertices[anxt].x - CurrentFormVertices[acind].x;
-		adif.y = CurrentFormVertices[anxt].y - CurrentFormVertices[acind].y;
-		if (bcind == VertexCount) {
-			bdif.x = CurrentFormVertices[bprv].x - CurrentFormVertices[0].x;
-			bdif.y = CurrentFormVertices[bprv].y - CurrentFormVertices[0].y;
-			bpnt.x = CurrentFormVertices[0].x;
-			bpnt.y = CurrentFormVertices[0].y;
+		line2StitchCounts[iSegment] = stitchCount - segmentStitchCount;
+		line1Point.x = CurrentFormVertices[line1Start].x;
+		line1Point.y = CurrentFormVertices[line1Start].y;
+		line1Next = nxt(line1Start);
+		line2Previous = prv(line2Start);
+		line1Count = line1StitchCounts[iLine1Count++];
+		line2Count = line2StitchCounts[iLine2Count++];
+		iLine1Vertex = line1Start;
+		iLine2Vertex = line2Start;
+		line1Delta.x = CurrentFormVertices[line1Next].x - CurrentFormVertices[iLine1Vertex].x;
+		line1Delta.y = CurrentFormVertices[line1Next].y - CurrentFormVertices[iLine1Vertex].y;
+		if (iLine2Vertex == VertexCount) {
+			line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[0].x;
+			line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[0].y;
+			line2Point.x = CurrentFormVertices[0].x;
+			line2Point.y = CurrentFormVertices[0].y;
 		}
 		else {
-			bdif.x = CurrentFormVertices[bprv].x - CurrentFormVertices[bcind].x;
-			bdif.y = CurrentFormVertices[bprv].y - CurrentFormVertices[bcind].y;
-			bpnt.x = CurrentFormVertices[bcind].x;
-			bpnt.y = CurrentFormVertices[bcind].y;
+			line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x;
+			line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y;
+			line2Point.x = CurrentFormVertices[iLine2Vertex].x;
+			line2Point.y = CurrentFormVertices[iLine2Vertex].y;
 		}
-		acind = nxt(acind);
-		bcind = prv(bcind);
-		astp.x = adif.x / acnt;
-		astp.y = adif.y / acnt;
-		bstp.x = bdif.x / bcnt;
-		bstp.y = bdif.y / bcnt;
+		iLine1Vertex = nxt(iLine1Vertex);
+		iLine2Vertex = prv(iLine2Vertex);
+		line1Step.x = line1Delta.x / line1Count;
+		line1Step.y = line1Delta.y / line1Count;
+		line2Step.x = line2Delta.x / line2Count;
+		line2Step.y = line2Delta.y / line2Count;
 	nuseg:;
 
 		if (chkMap(FTHR)) {
-			while (acnt&&bcnt) {
-				apnt.x += astp.x;
-				apnt.y += astp.y;
-				bpnt.x += bstp.x;
-				bpnt.y += bstp.y;
+			while (line1Count&&line2Count) {
+				line1Point.x += line1Step.x;
+				line1Point.y += line1Step.y;
+				line2Point.x += line2Step.x;
+				line2Point.y += line2Step.y;
 				if (toglMap(FILDIR)) {
 					BSequence[SequenceIndex].attribute = 0;
-					BSequence[SequenceIndex].x = apnt.x;
-					BSequence[SequenceIndex++].y = apnt.y;
+					BSequence[SequenceIndex].x = line1Point.x;
+					BSequence[SequenceIndex++].y = line1Point.y;
 				}
 				else {
 					BSequence[SequenceIndex].attribute = 1;
-					BSequence[SequenceIndex].x = bpnt.x;
-					BSequence[SequenceIndex++].y = bpnt.y;
+					BSequence[SequenceIndex].x = line2Point.x;
+					BSequence[SequenceIndex++].y = line2Point.y;
 				}
 				if (SequenceIndex > MAXSEQ - 6) {
 					SequenceIndex = MAXSEQ - 6;
 					return;
 				}
-				acnt--;
-				bcnt--;
+				line1Count--;
+				line2Count--;
 			}
 		}
 		else {
 			if (chkMap(BARSAT)) {
-				while (acnt&&bcnt) {
-					apnt.x += astp.x;
-					apnt.y += astp.y;
-					bpnt.x += bstp.x;
-					bpnt.y += bstp.y;
+				while (line1Count&&line2Count) {
+					line1Point.x += line1Step.x;
+					line1Point.y += line1Step.y;
+					line2Point.x += line2Step.x;
+					line2Point.y += line2Step.y;
 					if (toglMap(FILDIR)) {
 						BSequence[SequenceIndex].attribute = 0;
-						BSequence[SequenceIndex].x = apnt.x;
-						BSequence[SequenceIndex++].y = apnt.y;
+						BSequence[SequenceIndex].x = line1Point.x;
+						BSequence[SequenceIndex++].y = line1Point.y;
 						BSequence[SequenceIndex].attribute = 1;
-						BSequence[SequenceIndex].x = bpnt.x;
-						BSequence[SequenceIndex++].y = bpnt.y;
+						BSequence[SequenceIndex].x = line2Point.x;
+						BSequence[SequenceIndex++].y = line2Point.y;
 					}
 					else {
 						BSequence[SequenceIndex].attribute = 2;
-						BSequence[SequenceIndex].x = bpnt.x;
-						BSequence[SequenceIndex++].y = bpnt.y;
+						BSequence[SequenceIndex].x = line2Point.x;
+						BSequence[SequenceIndex++].y = line2Point.y;
 						BSequence[SequenceIndex].attribute = 3;
-						BSequence[SequenceIndex].x = apnt.x;
-						BSequence[SequenceIndex++].y = apnt.y;
+						BSequence[SequenceIndex].x = line1Point.x;
+						BSequence[SequenceIndex++].y = line1Point.y;
 					}
 					if (SequenceIndex > MAXSEQ - 6) {
 						SequenceIndex = MAXSEQ - 6;
 						return;
 					}
-					acnt--;
-					bcnt--;
+					line1Count--;
+					line2Count--;
 				}
 			}
 			else {
-				while (acnt&&bcnt) {
-					apnt.x += astp.x;
-					apnt.y += astp.y;
-					bpnt.x += bstp.x;
-					bpnt.y += bstp.y;
+				while (line1Count&&line2Count) {
+					line1Point.x += line1Step.x;
+					line1Point.y += line1Step.y;
+					line2Point.x += line2Step.x;
+					line2Point.y += line2Step.y;
 					if (toglMap(FILDIR)) {
 						if (chku(SQRFIL))
-							filinu(bpnt.x, bpnt.y);
-						filin(apnt);
+							filinu(line2Point.x, line2Point.y);
+						filin(line1Point);
 					}
 					else {
 						if (chku(SQRFIL))
-							filinu(apnt.x, apnt.y);
-						filin(bpnt);
+							filinu(line1Point.x, line1Point.y);
+						filin(line2Point);
 					}
-					acnt--;
-					bcnt--;
+					line1Count--;
+					line2Count--;
 				}
 			}
 		}
-		if ((pacnt < asegs || pbcnt < bsegs)) {
-			if (!acnt) {
-				acnt = acnts[pacnt++];
-				anxt = nxt(acind);
-				adif.x = CurrentFormVertices[anxt].x - CurrentFormVertices[acind].x;
-				adif.y = CurrentFormVertices[anxt].y - CurrentFormVertices[acind].y;
-				acind = nxt(acind);
-				astp.x = adif.x / acnt;
-				astp.y = adif.y / acnt;
+		if ((iLine1Count < line1Segments || iLine2Count < line2Segments)) {
+			if (!line1Count) {
+				line1Count = line1StitchCounts[iLine1Count++];
+				line1Next = nxt(iLine1Vertex);
+				line1Delta.x = CurrentFormVertices[line1Next].x - CurrentFormVertices[iLine1Vertex].x;
+				line1Delta.y = CurrentFormVertices[line1Next].y - CurrentFormVertices[iLine1Vertex].y;
+				iLine1Vertex = nxt(iLine1Vertex);
+				line1Step.x = line1Delta.x / line1Count;
+				line1Step.y = line1Delta.y / line1Count;
 			}
-			if (!bcnt) {
-				bcnt = bcnts[pbcnt++];
-				bprv = prv(bcind);
-				bdif.x = CurrentFormVertices[bprv].x - CurrentFormVertices[bcind].x;
-				bdif.y = CurrentFormVertices[bprv].y - CurrentFormVertices[bcind].y;
-				bcind = prv(bcind);
-				bstp.x = bdif.x / bcnt;
-				bstp.y = bdif.y / bcnt;
+			if (!line2Count) {
+				line2Count = line2StitchCounts[iLine2Count++];
+				line2Previous = prv(iLine2Vertex);
+				line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x;
+				line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y;
+				iLine2Vertex = prv(iLine2Vertex);
+				line2Step.x = line2Delta.x / line2Count;
+				line2Step.y = line2Delta.y / line2Count;
 			}
-			if ((acnt || bcnt) && acnt < MAXSEQ&&bcnt < MAXSEQ)
+			if ((line1Count || line2Count) && line1Count < MAXSEQ&&line2Count < MAXSEQ)
 				goto nuseg;
 		}
-		delete[] acnts;
-		delete[] bcnts;
+		delete[] line1StitchCounts;
+		delete[] line2StitchCounts;
 	}
 }
 
 void satmf() {
-	unsigned	ind, ine;
-	double		len, dx, dy;
+	unsigned	iGuide, iVertex;
+	double		length, deltaX, deltaY;
 
-	ind = 0;
+	iGuide = 0;
 	if (SelectedForm->attribute&FRMEND)
-		ind = 1;
-	satfn(ind, CurrentFormGuides[0].start, VertexCount, CurrentFormGuides[0].finish);
-	for (ind = 0; ind < (unsigned)CurrentFormConnectionsCount - 1; ind++)
-		satfn(CurrentFormGuides[ind].start, CurrentFormGuides[ind + 1].start, CurrentFormGuides[ind].finish, CurrentFormGuides[ind + 1].finish);
+		iGuide = 1;
+	satfn(iGuide, CurrentFormGuides[0].start, VertexCount, CurrentFormGuides[0].finish);
+	for (iGuide = 0; iGuide < (unsigned)CurrentFormConnectionsCount - 1; iGuide++)
+		satfn(CurrentFormGuides[iGuide].start, CurrentFormGuides[iGuide + 1].start, CurrentFormGuides[iGuide].finish, CurrentFormGuides[iGuide + 1].finish);
 	if (WordParam)
-		satfn(CurrentFormGuides[ind].start, WordParam, CurrentFormGuides[ind].finish, WordParam + 1);
+		satfn(CurrentFormGuides[iGuide].start, WordParam, CurrentFormGuides[iGuide].finish, WordParam + 1);
 	else {
-		if (CurrentFormGuides[ind].finish - CurrentFormGuides[ind].start > 2) {
-			len = (Lengths[CurrentFormGuides[ind].finish] - Lengths[CurrentFormGuides[ind].start]) / 2 + Lengths[CurrentFormGuides[ind].start];
-			ine = CurrentFormGuides[ind].start;
-			while (len > Lengths[ine])
-				ine++;
-			dx = Lengths[ine] - len;
-			dy = len - Lengths[ine - 1];
-			if (dy > dx)
-				ine--;
-			satfn(CurrentFormGuides[ind].start, ine, CurrentFormGuides[ind].finish, ine);
+		if (CurrentFormGuides[iGuide].finish - CurrentFormGuides[iGuide].start > 2) {
+			length = (Lengths[CurrentFormGuides[iGuide].finish] - Lengths[CurrentFormGuides[iGuide].start]) / 2 + Lengths[CurrentFormGuides[iGuide].start];
+			iVertex = CurrentFormGuides[iGuide].start;
+			while (length > Lengths[iVertex])
+				iVertex++;
+			deltaX = Lengths[iVertex] - length;
+			deltaY = length - Lengths[iVertex - 1];
+			if (deltaY > deltaX)
+				iVertex--;
+			satfn(CurrentFormGuides[iGuide].start, iVertex, CurrentFormGuides[iGuide].finish, iVertex);
 		}
 		else
-			satfn(CurrentFormGuides[ind].start, CurrentFormGuides[ind].start + 1, CurrentFormGuides[ind].finish, CurrentFormGuides[ind].start + 1);
+			satfn(CurrentFormGuides[iGuide].start, CurrentFormGuides[iGuide].start + 1, CurrentFormGuides[iGuide].finish, CurrentFormGuides[iGuide].start + 1);
 	}
 }
 
 extern void prbug();
 
 void satfil() {
-	unsigned		ind;
-	double			len, dx, dy;
-	double			tspac;
+	unsigned		iVertex;
+	double			length, deltaX, deltaY;
+	double			spacing;
 
 	fvars(ClosestFormToCursor);
 	satadj();
-	tspac = StitchSpacing;
+	spacing = StitchSpacing;
 	StitchSpacing /= 2;
 	SequenceIndex = 0;
 	rstMap(SAT1);
 	rstMap(FILDIR);
 	SelectedForm->fillType = SATF;
 	Lengths = new double[VertexCount + 2];
-	len = 0;
-	for (ind = 0; ind < (unsigned)VertexCount - 1; ind++) {
-		Lengths[ind] = len;
-		dx = CurrentFormVertices[ind + 1].x - CurrentFormVertices[ind].x;
-		dy = CurrentFormVertices[ind + 1].y - CurrentFormVertices[ind].y;
-		len += hypot(dx, dy);
+	length = 0;
+	for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+		Lengths[iVertex] = length;
+		deltaX = CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x;
+		deltaY = CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y;
+		length += hypot(deltaX, deltaY);
 	}
-	Lengths[ind] = len;
-	dx = CurrentFormVertices[0].x - CurrentFormVertices[ind].x;
-	dy = CurrentFormVertices[0].y - CurrentFormVertices[ind].y;
-	len += hypot(dx, dy);
-	Lengths[ind + 1] = len;
+	Lengths[iVertex] = length;
+	deltaX = CurrentFormVertices[0].x - CurrentFormVertices[iVertex].x;
+	deltaY = CurrentFormVertices[0].y - CurrentFormVertices[iVertex].y;
+	length += hypot(deltaX, deltaY);
+	Lengths[iVertex + 1] = length;
 	if (WordParam) {
 		if (CurrentFormConnectionsCount) {
 			satmf();
@@ -5169,20 +5167,20 @@ void satfil() {
 				goto satdun;
 			}
 			else {
-				len = (len - Lengths[1]) / 2;
-				ind = 1;
+				length = (length - Lengths[1]) / 2;
+				iVertex = 1;
 				if (!chkMap(BARSAT)) {
 					OSequence[0].x = SelectedPoint.x = CurrentFormVertices[1].x;
 					OSequence[0].y = SelectedPoint.y = CurrentFormVertices[1].y;
 					SequenceIndex = 1;
 				}
-				while ((len > Lengths[ind]) && (ind < (unsigned int)(VertexCount + 1)))
-					ind++;
-				dx = Lengths[ind] - len;
-				dy = len - Lengths[ind - 1];
-				if (dy > dx)
-					ind--;
-				satfn(1, ind, VertexCount, ind);
+				while ((length > Lengths[iVertex]) && (iVertex < (unsigned int)(VertexCount + 1)))
+					iVertex++;
+				deltaX = Lengths[iVertex] - length;
+				deltaY = length - Lengths[iVertex - 1];
+				if (deltaY > deltaX)
+					iVertex--;
+				satfn(1, iVertex, VertexCount, iVertex);
 			}
 			goto satdun;
 		}
@@ -5191,24 +5189,24 @@ void satfil() {
 		satmf();
 		goto satdun;
 	}
-	len /= 2;
-	ind = 0;
+	length /= 2;
+	iVertex = 0;
 	if (!chkMap(BARSAT) && !chkMap(FTHR)) {
 		OSequence[0].x = SelectedPoint.x = CurrentFormVertices[0].x;
 		OSequence[0].y = SelectedPoint.y = CurrentFormVertices[0].y;
 		SequenceIndex = 1;
 	}
-	while (len > Lengths[ind])
-		ind++;
-	dx = Lengths[ind] - len;
-	dy = len - Lengths[ind - 1];
-	if (dy > dx)
-		ind--;
-	satfn(0, ind, VertexCount, ind);
+	while (length > Lengths[iVertex])
+		iVertex++;
+	deltaX = Lengths[iVertex] - length;
+	deltaY = length - Lengths[iVertex - 1];
+	if (deltaY > deltaX)
+		iVertex--;
+	satfn(0, iVertex, VertexCount, iVertex);
 satdun:;
 
 	delete[] Lengths;
-	StitchSpacing = tspac;
+	StitchSpacing = spacing;
 }
 
 void filsfn() {
@@ -5224,14 +5222,14 @@ void filsfn() {
 }
 
 void filsat() {
-	unsigned ind;
+	unsigned iForm;
 
 	if (filmsgs(FMM_FAN))
 		return;
 	if (SelectedFormCount) {
 		savdo();
-		for (ind = 0; ind < SelectedFormCount; ind++) {
-			ClosestFormToCursor = SelectedFormList[ind];
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+			ClosestFormToCursor = SelectedFormList[iForm];
 			fvars(ClosestFormToCursor);
 			if (SelectedForm->type != FRMLINE)
 				filsfn();
@@ -5252,76 +5250,76 @@ void filsat() {
 }
 
 unsigned closat() {
-	unsigned	ind, ine;
-	double		len = 1e99, tlen, dx, dy;
+	unsigned	iForm, iVertex;
+	double		minimumLength = 1e99, length, deltaX, deltaY;
 
 	px2stch();
-	for (ind = 0; ind < FormIndex; ind++) {
-		if (!ActiveLayer || (unsigned)((FormList[ind].attribute&FRMLMSK) >> 1) == ActiveLayer || !(FormList[ind].attribute&FRMLMSK)) {
-			CurrentFormVertices = FormList[ind].vertices;
-			for (ine = 0; ine < FormList[ind].vertexCount; ine++) {
-				dx = SelectedPoint.x - CurrentFormVertices[ine].x;
-				dy = SelectedPoint.y - CurrentFormVertices[ine].y;
-				tlen = hypot(dx, dy);
-				if (tlen < len) {
-					len = tlen;
-					ClosestFormToCursor = ind;
-					ClosestVertexToCursor = ine;
+	for (iForm = 0; iForm < FormIndex; iForm++) {
+		if (!ActiveLayer || (unsigned)((FormList[iForm].attribute&FRMLMSK) >> 1) == ActiveLayer || !(FormList[iForm].attribute&FRMLMSK)) {
+			CurrentFormVertices = FormList[iForm].vertices;
+			for (iVertex = 0; iVertex < FormList[iForm].vertexCount; iVertex++) {
+				deltaX = SelectedPoint.x - CurrentFormVertices[iVertex].x;
+				deltaY = SelectedPoint.y - CurrentFormVertices[iVertex].y;
+				length = hypot(deltaX, deltaY);
+				if (length < minimumLength) {
+					minimumLength = length;
+					ClosestFormToCursor = iForm;
+					ClosestVertexToCursor = iVertex;
 				}
 			}
 		}
 	}
-	if (len == 1e99)
+	if (minimumLength == 1e99)
 		return 0;
 	else
 		return 1;
 }
 
-void nufpnt(unsigned pnu) {
+void nufpnt(unsigned vertex) {
 	unsigned ind;
+	unsigned newVertex = vertex++;
 
-	pnu++;
-	fltspac(&FormForInsert->vertices[pnu], 1);
-	FormForInsert->vertices[pnu].x = SelectedPoint.x;
-	FormForInsert->vertices[pnu].y = SelectedPoint.y;
+	fltspac(&FormForInsert->vertices[newVertex], 1);
+	FormForInsert->vertices[newVertex].x = SelectedPoint.x;
+	FormForInsert->vertices[newVertex].y = SelectedPoint.y;
 	FormForInsert->vertexCount++;
 	for (ind = 0; ind < FormForInsert->satinGuideCount; ind++) {
-		if (FormForInsert->satinOrAngle.guide[ind].start > pnu - 1)
+		if (FormForInsert->satinOrAngle.guide[ind].start > newVertex - 1)
 			FormForInsert->satinOrAngle.guide[ind].start++;
-		if (FormForInsert->satinOrAngle.guide[ind].finish > pnu - 1)
+		if (FormForInsert->satinOrAngle.guide[ind].finish > newVertex - 1)
 			FormForInsert->satinOrAngle.guide[ind].finish++;
 	}
-	if (FormForInsert->wordParam >= pnu) {
+	if (FormForInsert->wordParam >= newVertex) {
 		FormForInsert->wordParam++;
 		FormForInsert->wordParam %= VertexCount;
 	}
 	if (FormForInsert->fillType == CONTF) {
-		if (FormForInsert->angleOrClipData.guide.start > pnu - 1)
+		if (FormForInsert->angleOrClipData.guide.start > newVertex - 1)
 			FormForInsert->angleOrClipData.guide.start++;
-		if (FormForInsert->angleOrClipData.guide.finish > pnu - 1)
+		if (FormForInsert->angleOrClipData.guide.finish > newVertex - 1)
 			FormForInsert->angleOrClipData.guide.finish++;
 	}
 	frmlin(FormForInsert->vertices, FormForInsert->vertexCount);
 }
 
-double p2p(fPOINT pnt0, fPOINT pnt1) {
-	return hypot(pnt0.x - pnt1.x, pnt0.y - pnt1.y);
+double p2p(fPOINT point0, fPOINT point1) {
+	return hypot(point0.x - point1.x, point0.y - point1.y);
 }
 
 unsigned upsat() {
-	unsigned	ind;
-	double		dwnlen, uplen, p2clos, p2up, p2dwn;
+	unsigned	iVertex;
+	double		previousToClosest, nextToClosest, selectedToClosest, nextToSelected, previousToSelected;
 
 	VertexCount = FormForInsert->vertexCount;
 	CurrentFormVertices = FormForInsert->vertices;
-	p2clos = p2p(SelectedPoint, CurrentFormVertices[ClosestVertexToCursor]);
-	ind = prv(ClosestVertexToCursor);
-	dwnlen = p2p(CurrentFormVertices[ind], CurrentFormVertices[ClosestVertexToCursor]);
-	p2dwn = p2p(CurrentFormVertices[ind], SelectedPoint);
-	ind = nxt(ClosestVertexToCursor);
-	uplen = p2p(CurrentFormVertices[ind], CurrentFormVertices[ClosestVertexToCursor]);
-	p2up = p2p(CurrentFormVertices[ind], SelectedPoint);
-	if ((p2dwn + p2clos) / dwnlen > (p2up + p2clos) / uplen)
+	selectedToClosest = p2p(SelectedPoint, CurrentFormVertices[ClosestVertexToCursor]);
+	iVertex = prv(ClosestVertexToCursor);
+	previousToClosest = p2p(CurrentFormVertices[iVertex], CurrentFormVertices[ClosestVertexToCursor]);
+	previousToSelected = p2p(CurrentFormVertices[iVertex], SelectedPoint);
+	iVertex = nxt(ClosestVertexToCursor);
+	nextToClosest = p2p(CurrentFormVertices[iVertex], CurrentFormVertices[ClosestVertexToCursor]);
+	nextToSelected = p2p(CurrentFormVertices[iVertex], SelectedPoint);
+	if ((previousToSelected + selectedToClosest) / previousToClosest > (nextToSelected + selectedToClosest) / nextToClosest)
 		return 0;
 	else {
 		return 1;
@@ -5372,10 +5370,10 @@ BOOL chkdel() {
 }
 
 void delspnt() {
-	unsigned	ind, ine;
-	SATCON*		l_sac;
-	fPOINT*		tflt;
-	FRMHED* fp;
+	unsigned	iGuide, iForm;
+	SATCON*		guide;
+	fPOINT*		vertex;
+	FRMHED*		formHeader;
 
 	fvars(ClosestFormToCursor);
 	if (chkdel()) {
@@ -5390,30 +5388,30 @@ void delspnt() {
 		if (ClosestVertexToCursor < SelectedForm->wordParam)
 			SelectedForm->wordParam--;
 		if (SelectedForm->satinGuideCount) {
-			l_sac = SelectedForm->satinOrAngle.guide;
-			ind = 0;
-			while (l_sac[ind].start != ClosestVertexToCursor&&l_sac[ind].finish != ClosestVertexToCursor&&ind < SelectedForm->satinGuideCount)
-				ind++;
-			if (ind < SelectedForm->satinGuideCount && (l_sac[ind].start == ClosestVertexToCursor || l_sac[ind].finish == ClosestVertexToCursor)) {
-				while (ind < SelectedForm->satinGuideCount) {
-					l_sac[ind].start = l_sac[ind + 1].start;
-					l_sac[ind].finish = l_sac[ind + 1].finish;
-					ind++;
+			guide = SelectedForm->satinOrAngle.guide;
+			iGuide = 0;
+			while (guide[iGuide].start != ClosestVertexToCursor&&guide[iGuide].finish != ClosestVertexToCursor&&iGuide < SelectedForm->satinGuideCount)
+				iGuide++;
+			if (iGuide < SelectedForm->satinGuideCount && (guide[iGuide].start == ClosestVertexToCursor || guide[iGuide].finish == ClosestVertexToCursor)) {
+				while (iGuide < SelectedForm->satinGuideCount) {
+					guide[iGuide].start = guide[iGuide + 1].start;
+					guide[iGuide].finish = guide[iGuide + 1].finish;
+					iGuide++;
 				}
 				SelectedForm->satinGuideCount--;
 				SatinConnectIndex--;
-				for (ine = ClosestFormToCursor + 1; ine < FormIndex; ine++)
+				for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 				{
-					fp = &FormList[ine];
-					if (fp->type == SAT&&fp->satinGuideCount)
-						fp->satinOrAngle.guide++;
+					formHeader = &FormList[iForm];
+					if (formHeader->type == SAT&&formHeader->satinGuideCount)
+						formHeader->satinOrAngle.guide++;
 				}
 			}
-			for (ind = 0; ind < SelectedForm->satinGuideCount; ind++) {
-				if (l_sac[ind].start > ClosestVertexToCursor)
-					l_sac[ind].start--;
-				if (l_sac[ind].finish > ClosestVertexToCursor)
-					l_sac[ind].finish--;
+			for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+				if (guide[iGuide].start > ClosestVertexToCursor)
+					guide[iGuide].start--;
+				if (guide[iGuide].finish > ClosestVertexToCursor)
+					guide[iGuide].finish--;
 			}
 		}
 	}
@@ -5424,58 +5422,59 @@ void delspnt() {
 	if (ClosestVertexToCursor > (unsigned)SelectedForm->vertexCount - 1)
 		ClosestVertexToCursor = SelectedForm->vertexCount - 1;
 	setMap(FRMPSEL);
-	for (ind = ClosestFormToCursor + 1; ind < FormIndex; ind++)
-		FormList[ind].vertices--;
+	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
+		FormList[iForm].vertices--;
 	ritfcor(&CurrentFormVertices[ClosestVertexToCursor]);
 	ritnum(STR_NUMPNT, ClosestVertexToCursor);
 	frmout(ClosestFormToCursor);
-	tflt = &SelectedForm->vertices[ClosestVertexToCursor];
-	if (tflt->x<ZoomRect.left || tflt->x>ZoomRect.right || tflt->y<ZoomRect.bottom || tflt->y>ZoomRect.top)
+	// ToDo - vertex should probably not be a pointer
+	vertex = &SelectedForm->vertices[ClosestVertexToCursor];
+	if (vertex->x<ZoomRect.left || vertex->x>ZoomRect.right || vertex->y<ZoomRect.bottom || vertex->y>ZoomRect.top)
 		shft(SelectedForm->vertices[ClosestVertexToCursor]);
 	refil();
 }
 
 void unfil() {
-	unsigned src, dst, trg, at;
-	unsigned mlen;
+	unsigned iMap, iForm, iStitch, iSource, iDestination, codedForm, attribute;
+	unsigned mapLength;
 
 	if (filmsgs(FMX_UNF))
 		return;
 	if (SelectedFormCount) {
-		mlen = (SelectedFormCount >> 5) + 1;
-		for (src = 0; src < mlen; src++)
-			MarkedStitchMap[src] = 0;
-		for (src = 0; src < SelectedFormCount; src++) {
-			SelectedForm = &FormList[SelectedFormList[src]];
+		mapLength = (SelectedFormCount >> 5) + 1;
+		for (iMap = 0; iMap < mapLength; iMap++)
+			MarkedStitchMap[iMap] = 0;
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+			SelectedForm = &FormList[SelectedFormList[iForm]];
 			if (SelectedForm->fillType || SelectedForm->edgeType) {
-				delclps(SelectedFormList[src]);
+				delclps(SelectedFormList[iForm]);
 				deltx();
-				setr(SelectedFormList[src]);
+				setr(SelectedFormList[iForm]);
 				SelectedForm->fillType = 0;
 				SelectedForm->edgeType = 0;
 				SelectedForm->extendedAttribute &= !(AT_UND | AT_CWLK | AT_WALK);
 			}
 		}
-		dst = 0;
-		for (src = 0; src < PCSHeader.stitchCount; src++) {
-			if (!chkr((StitchBuffer[src].attribute&FRMSK) >> FRMSHFT)) {
-				StitchBuffer[dst].attribute = StitchBuffer[src].attribute;
-				StitchBuffer[dst].x = StitchBuffer[src].x;
-				StitchBuffer[dst++].y = StitchBuffer[src].y;
+		iDestination = 0;
+		for (iSource = 0; iSource < PCSHeader.stitchCount; iSource++) {
+			if (!chkr((StitchBuffer[iSource].attribute&FRMSK) >> FRMSHFT)) {
+				StitchBuffer[iDestination].attribute = StitchBuffer[iSource].attribute;
+				StitchBuffer[iDestination].x = StitchBuffer[iSource].x;
+				StitchBuffer[iDestination++].y = StitchBuffer[iSource].y;
 			}
 		}
-		PCSHeader.stitchCount = dst;
+		PCSHeader.stitchCount = iDestination;
 		coltab();
 		setMap(RESTCH);
 	}
 	else {
 		if (chkMap(FORMSEL)) {
 			if (!rstMap(IGNOR) && !chku(WRNOF)) {
-				trg = (ClosestFormToCursor << FRMSHFT) | USMSK;
-				mlen = StitchBuffer[0].attribute&(FRMSK | USMSK);
-				for (src = 0; src < PCSHeader.stitchCount; src++) {
-					at = StitchBuffer[src].attribute;
-					if (!(at&NOTFRM) && (at&(USMSK | FRMSK)) == trg) {
+				codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
+				mapLength = StitchBuffer[0].attribute&(FRMSK | USMSK);
+				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+					attribute = StitchBuffer[iStitch].attribute;
+					if (!(attribute&NOTFRM) && (attribute&(USMSK | FRMSK)) == codedForm) {
 						tabmsg(IDS_UNFIL);
 						setMap(FILMSG);
 						okcan();
@@ -5484,13 +5483,13 @@ void unfil() {
 					}
 				}
 			}
-			trg = ClosestFormToCursor << FRMSHFT;
-			dst = 0;
-			for (src = 0; src < PCSHeader.stitchCount; src++) {
-				if ((StitchBuffer[src].attribute&FRMSK) != trg || (StitchBuffer[src].attribute&NOTFRM)) {
-					StitchBuffer[dst].attribute = StitchBuffer[src].attribute;
-					StitchBuffer[dst].x = StitchBuffer[src].x;
-					StitchBuffer[dst++].y = StitchBuffer[src].y;
+			codedForm = ClosestFormToCursor << FRMSHFT;
+			iDestination = 0;
+			for (iSource = 0; iSource < PCSHeader.stitchCount; iSource++) {
+				if ((StitchBuffer[iSource].attribute&FRMSK) != codedForm || (StitchBuffer[iSource].attribute&NOTFRM)) {
+					StitchBuffer[iDestination].attribute = StitchBuffer[iSource].attribute;
+					StitchBuffer[iDestination].x = StitchBuffer[iSource].x;
+					StitchBuffer[iDestination++].y = StitchBuffer[iSource].y;
 				}
 			}
 			delclps(ClosestFormToCursor);
@@ -5498,7 +5497,7 @@ void unfil() {
 			SelectedForm->fillType = 0;
 			SelectedForm->edgeType = 0;
 			SelectedForm->extendedAttribute &= !(AT_UND | AT_CWLK | AT_WALK);
-			PCSHeader.stitchCount = dst;
+			PCSHeader.stitchCount = iDestination;
 			ritot(PCSHeader.stitchCount);
 		}
 	}
@@ -5516,65 +5515,65 @@ void satzum() {
 	drwsat();
 }
 
-void rotfrm(unsigned nu0) {
-	fPOINT*			flt0;
-	fPOINT*			flt1;
-	SATCON*			nsac;
-	SATCON**		psac;
-	unsigned		ind, ine, l_xpnt = nu0;
+void rotfrm(unsigned newStartVertex) {
+	fPOINT*			selectedVertices;
+	fPOINT*			rotatedVertices;
+	SATCON*			rotatedGuides;
+	SATCON**		rotatedGuidesArray;
+	unsigned		iVertex, iGuide, iRotatedGuide, iRotated = newStartVertex;
 	unsigned short	tlin;
 
 	fvars(ClosestFormToCursor);
-	flt0 = SelectedForm->vertices;
+	selectedVertices = SelectedForm->vertices;
 	VertexCount = SelectedForm->vertexCount;
-	flt1 = new fPOINT[VertexCount];
-	for (ind = 0; ind < VertexCount; ind++) {
-		flt1[ind].x = flt0[ind].x;
-		flt1[ind].y = flt0[ind].y;
+	rotatedVertices = new fPOINT[VertexCount];
+	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+		rotatedVertices[iVertex].x = selectedVertices[iVertex].x;
+		rotatedVertices[iVertex].y = selectedVertices[iVertex].y;
 	}
-	for (ind = 0; ind < VertexCount; ind++) {
-		flt0[ind].x = flt1[l_xpnt].x;
-		flt0[ind].y = flt1[l_xpnt].y;
-		l_xpnt = nxt(l_xpnt);
+	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+		selectedVertices[iVertex].x = rotatedVertices[iRotated].x;
+		selectedVertices[iVertex].y = rotatedVertices[iRotated].y;
+		iRotated = nxt(iRotated);
 	}
-	ine = 0;
+	iRotatedGuide = 0;
 	if (SelectedForm->type == SAT) {
 		if (SelectedForm->wordParam)
 			SelectedForm->wordParam = (SelectedForm->wordParam + SelectedForm->vertexCount
-				- nu0) % SelectedForm->vertexCount;
-		for (ind = 0; ind < SelectedForm->satinGuideCount; ind++) {
-			if (CurrentFormGuides[ind].start != nu0&&CurrentFormGuides[ind].finish != nu0) {
-				CurrentFormGuides[ine].start = (CurrentFormGuides[ind].start + VertexCount - nu0) % VertexCount;
-				CurrentFormGuides[ine].finish = (CurrentFormGuides[ind].finish + VertexCount - nu0) % VertexCount;
-				if (CurrentFormGuides[ine].start > CurrentFormGuides[ine].finish) {
-					tlin = CurrentFormGuides[ine].start;
-					CurrentFormGuides[ine].start = CurrentFormGuides[ine].finish;
-					CurrentFormGuides[ind].finish = tlin;
+				- newStartVertex) % SelectedForm->vertexCount;
+		for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+			if (CurrentFormGuides[iGuide].start != newStartVertex&&CurrentFormGuides[iGuide].finish != newStartVertex) {
+				CurrentFormGuides[iRotatedGuide].start = (CurrentFormGuides[iGuide].start + VertexCount - newStartVertex) % VertexCount;
+				CurrentFormGuides[iRotatedGuide].finish = (CurrentFormGuides[iGuide].finish + VertexCount - newStartVertex) % VertexCount;
+				if (CurrentFormGuides[iRotatedGuide].start > CurrentFormGuides[iRotatedGuide].finish) {
+					tlin = CurrentFormGuides[iRotatedGuide].start;
+					CurrentFormGuides[iRotatedGuide].start = CurrentFormGuides[iRotatedGuide].finish;
+					CurrentFormGuides[iGuide].finish = tlin;
 				}
-				ine++;
+				iRotatedGuide++;
 			}
 		}
 	}
-	SelectedForm->satinGuideCount = ine;
-	psac = new SATCON*[ine];
-	nsac = new SATCON[ine];
-	for (ind = 0; ind < ine; ind++) {
-		psac[ind] = &nsac[ind];
-		nsac[ind].start = CurrentFormGuides[ind].start;
-		nsac[ind].finish = CurrentFormGuides[ind].finish;
+	SelectedForm->satinGuideCount = iRotatedGuide;
+	rotatedGuidesArray = new SATCON*[iRotatedGuide];
+	rotatedGuides = new SATCON[iRotatedGuide];
+	for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
+		rotatedGuidesArray[iGuide] = &rotatedGuides[iGuide];
+		rotatedGuides[iGuide].start = CurrentFormGuides[iGuide].start;
+		rotatedGuides[iGuide].finish = CurrentFormGuides[iGuide].finish;
 	}
-	qsort((void*)psac, ine, 4, scomp);
-	for (ind = 0; ind < ine; ind++) {
-		CurrentFormGuides[ind].start = psac[ind]->start;
-		CurrentFormGuides[ind].finish = psac[ind]->finish;
+	qsort((void*)rotatedGuidesArray, iRotatedGuide, 4, scomp);
+	for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
+		CurrentFormGuides[iGuide].start = rotatedGuidesArray[iGuide]->start;
+		CurrentFormGuides[iGuide].finish = rotatedGuidesArray[iGuide]->finish;
 	}
 	if (SelectedForm->extendedAttribute&AT_STRT)
-		SelectedForm->fillStart = (SelectedForm->fillStart + VertexCount - nu0) % VertexCount;
+		SelectedForm->fillStart = (SelectedForm->fillStart + VertexCount - newStartVertex) % VertexCount;
 	if (SelectedForm->extendedAttribute&AT_END)
-		SelectedForm->fillEnd = (SelectedForm->fillEnd + VertexCount - nu0) % VertexCount;
-	delete[] flt1;
-	delete[] nsac;
-	delete[] psac;
+		SelectedForm->fillEnd = (SelectedForm->fillEnd + VertexCount - newStartVertex) % VertexCount;
+	delete[] rotatedVertices;
+	delete[] rotatedGuides;
+	delete[] rotatedGuidesArray;
 }
 
 
@@ -5666,65 +5665,65 @@ void setins() {
 	setMap(RESTCH);
 }
 
-void bdrlin(unsigned strt, unsigned fin, double pd_Size) {
-	dPOINT		dif, stp, pnt;
-	double		len, tang;
-	unsigned	cnt;
+void bdrlin(unsigned start, unsigned finish, double stitchSize) {
+	dPOINT		delta, step, point;
+	double		length, angle;
+	unsigned	stitchCount;
 
 	//_asm finit;
-	stp.x = 0;
-	stp.y = 0;
-	dif.x = CurrentFormVertices[fin].x - CurrentFormVertices[strt].x;
-	dif.y = CurrentFormVertices[fin].y - CurrentFormVertices[strt].y;
-	len = hypot(dif.x, dif.y);
+	step.x = 0;
+	step.y = 0;
+	delta.x = CurrentFormVertices[finish].x - CurrentFormVertices[start].x;
+	delta.y = CurrentFormVertices[finish].y - CurrentFormVertices[start].y;
+	length = hypot(delta.x, delta.y);
 	if (chku(LINSPAC)) {
-		cnt = len / pd_Size + 0.5;
-		if (cnt) {
-			stp.x = dif.x / cnt;
-			stp.y = dif.y / cnt;
+		stitchCount = length / stitchSize + 0.5;
+		if (stitchCount) {
+			step.x = delta.x / stitchCount;
+			step.y = delta.y / stitchCount;
 		}
 	}
 	else {
-		cnt = (len - pd_Size / 2) / pd_Size + 1;
-		tang = atan2(dif.y, dif.x);
-		stp.x = cos(tang)*pd_Size;
-		stp.y = sin(tang)*pd_Size;
+		stitchCount = (length - stitchSize / 2) / stitchSize + 1;
+		angle = atan2(delta.y, delta.x);
+		step.x = cos(angle)*stitchSize;
+		step.y = sin(angle)*stitchSize;
 	}
-	if (cnt) {
-		pnt.x = CurrentFormVertices[strt].x + stp.x;
-		pnt.y = CurrentFormVertices[strt].y + stp.y;
-		cnt--;
-		while (cnt) {
-			OSequence[SequenceIndex].x = pnt.x;
-			OSequence[SequenceIndex++].y = pnt.y;
-			pnt.x += stp.x;
-			pnt.y += stp.y;
-			cnt--;
+	if (stitchCount) {
+		point.x = CurrentFormVertices[start].x + step.x;
+		point.y = CurrentFormVertices[start].y + step.y;
+		stitchCount--;
+		while (stitchCount) {
+			OSequence[SequenceIndex].x = point.x;
+			OSequence[SequenceIndex++].y = point.y;
+			point.x += step.x;
+			point.y += step.y;
+			stitchCount--;
 		}
 	}
-	OSequence[SequenceIndex].x = CurrentFormVertices[fin].x;
-	OSequence[SequenceIndex++].y = CurrentFormVertices[fin].y;
+	OSequence[SequenceIndex].x = CurrentFormVertices[finish].x;
+	OSequence[SequenceIndex++].y = CurrentFormVertices[finish].y;
 }
 
 void brdfil(double pd_Size) {
-	unsigned		ind;
-	unsigned short	nlin, tlin;
+	unsigned		iVertex;
+	unsigned short	nextVertex, currentVertex;
 
 	if (SelectedForm->extendedAttribute&AT_STRT)
-		tlin = SelectedForm->fillStart;
+		currentVertex = SelectedForm->fillStart;
 	else
-		tlin = getlast();
+		currentVertex = getlast();
 	SequenceIndex = 0;
-	OSequence[SequenceIndex].x = CurrentFormVertices[tlin].x;
-	OSequence[SequenceIndex++].y = CurrentFormVertices[tlin].y;
-	for (ind = 0; ind < (unsigned)VertexCount - 1; ind++) {
-		nlin = nxt(tlin);
-		bdrlin(tlin, nlin, pd_Size);
-		tlin = nlin;
+	OSequence[SequenceIndex].x = CurrentFormVertices[currentVertex].x;
+	OSequence[SequenceIndex++].y = CurrentFormVertices[currentVertex].y;
+	for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+		nextVertex = nxt(currentVertex);
+		bdrlin(currentVertex, nextVertex, pd_Size);
+		currentVertex = nextVertex;
 	}
 	if (SelectedForm->type != FRMLINE) {
-		nlin = nxt(tlin);
-		bdrlin(tlin, nlin, pd_Size);
+		nextVertex = nxt(currentVertex);
+		bdrlin(currentVertex, nextVertex, pd_Size);
 	}
 }
 
@@ -5743,13 +5742,13 @@ void sbord() {
 }
 
 void bord() {
-	unsigned ind;
+	unsigned iForm;
 
 	if (filmsgs(FML_LIN))
 		return;
 	if (SelectedFormCount) {
-		for (ind = 0; ind < SelectedFormCount; ind++) {
-			ClosestFormToCursor = SelectedFormList[ind];
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+			ClosestFormToCursor = SelectedFormList[iForm];
 			fvars(ClosestFormToCursor);
 			SelectedForm->borderColor = ActiveColor;
 			sbord();
@@ -5769,54 +5768,55 @@ void bord() {
 	}
 }
 
-BOOL ritclp(fPOINT pnt) {
-	fPOINT		adj;
-	unsigned	ind;
+BOOL ritclp(fPOINT point) {
+	fPOINT		adjustedPoint;
+	unsigned	iStitch;
 
 	if (chkmax(ClipStitchCount, SequenceIndex))
 		return 1;
-	adj.x = pnt.x - ClipReference.x;
-	adj.y = pnt.y - ClipReference.y;
-	for (ind = 0; ind < ClipStitchCount; ind++) {
-		OSequence[SequenceIndex].x = ClipFillData[ind].x + adj.x;
-		OSequence[SequenceIndex++].y = ClipFillData[ind].y + adj.y;
+	adjustedPoint.x = point.x - ClipReference.x;
+	adjustedPoint.y = point.y - ClipReference.y;
+	for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
+		OSequence[SequenceIndex].x = ClipFillData[iStitch].x + adjustedPoint.x;
+		OSequence[SequenceIndex++].y = ClipFillData[iStitch].y + adjustedPoint.y;
 	}
 	return 0;
 }
 
-BOOL clpsid(unsigned strt, unsigned fin) {
-	unsigned		ind, cnt;
-	fPOINT			dif, stp, pnt;
-	double			len, tdub;
-	fPOINTATTR		rpnt;
+BOOL clpsid(unsigned start, unsigned finish) {
+	unsigned		ind, clipCount;
+	fPOINT			delta, step, insertPoint;
+	double			length, tdub;
+	fPOINTATTR		clipReferencePoint;
 
-	rpnt.x = ClipRect.left;
-	rpnt.y = ClipRect.bottom;
-	pnt.x = CurrentFormVertices[strt].x;
-	pnt.y = CurrentFormVertices[fin].y;
-	dif.x = CurrentFormVertices[fin].x - CurrentFormVertices[strt].x;
-	dif.y = CurrentFormVertices[fin].y - CurrentFormVertices[strt].y;
-	len = hypot(dif.x, dif.y);
-	RotationAngle = atan2(dif.y, dif.x);
-	rotang1(rpnt, &ClipReference);
-	cnt = len / ClipRectSize.cx;
-	if (cnt) {
-		if (cnt > 1)
-			tdub = ((len - cnt*ClipRectSize.cx) / (cnt - 1) + ClipRectSize.cx) / len;
+	clipReferencePoint.x = ClipRect.left;
+	clipReferencePoint.y = ClipRect.bottom;
+	// ToDo - check that these next two lines are needed
+	insertPoint.x = CurrentFormVertices[start].x;
+	insertPoint.y = CurrentFormVertices[finish].y;
+	delta.x = CurrentFormVertices[finish].x - CurrentFormVertices[start].x;
+	delta.y = CurrentFormVertices[finish].y - CurrentFormVertices[start].y;
+	length = hypot(delta.x, delta.y);
+	RotationAngle = atan2(delta.y, delta.x);
+	rotang1(clipReferencePoint, &ClipReference);
+	clipCount = length / ClipRectSize.cx;
+	if (clipCount) {
+		if (clipCount > 1)
+			tdub = ((length - clipCount*ClipRectSize.cx) / (clipCount - 1) + ClipRectSize.cx) / length;
 		else
-			tdub = (len - ClipRectSize.cx) / 2;
-		stp.x = dif.x*tdub;
-		stp.y = dif.y*tdub;
-		pnt.x = CurrentFormVertices[strt].x;
-		pnt.y = CurrentFormVertices[strt].y;
-		RotationAngle = atan2(dif.y, dif.x);
+			tdub = (length - ClipRectSize.cx) / 2;
+		step.x = delta.x*tdub;
+		step.y = delta.y*tdub;
+		insertPoint.x = CurrentFormVertices[start].x;
+		insertPoint.y = CurrentFormVertices[start].y;
+		RotationAngle = atan2(delta.y, delta.x);
 		for (ind = 0; ind < ClipStitchCount; ind++)
 			rotangf(ClipReversedData[ind], &ClipFillData[ind]);
-		for (ind = 0; ind < cnt; ind++) {
-			if (ritclp(pnt))
+		for (ind = 0; ind < clipCount; ind++) {
+			if (ritclp(insertPoint))
 				break;
-			pnt.x += stp.x;
-			pnt.y += stp.y;
+			insertPoint.x += step.x;
+			insertPoint.y += step.y;
 		}
 		return 1;
 	}
@@ -5824,20 +5824,20 @@ BOOL clpsid(unsigned strt, unsigned fin) {
 }
 
 void linsid() {
-	fPOINT		dif;
-	unsigned	cnt, ind;
-	double		len;
+	fPOINT		delta;
+	unsigned	clipCount, iStitch, iClip;
+	double		length;
 
-	dif.x = CurrentFormVertices[CurrentSide + 1].x - SelectedPoint.x;
-	dif.y = CurrentFormVertices[CurrentSide + 1].y - SelectedPoint.y;
-	len = hypot(dif.x, dif.y);
-	cnt = len / ClipRectSize.cx;
-	if (cnt) {
+	delta.x = CurrentFormVertices[CurrentSide + 1].x - SelectedPoint.x;
+	delta.y = CurrentFormVertices[CurrentSide + 1].y - SelectedPoint.y;
+	length = hypot(delta.x, delta.y);
+	clipCount = length / ClipRectSize.cx;
+	if (clipCount) {
 		RotationAngle = ClipAngle;
 		rotangf(BorderClipReference, &ClipReference);
-		for (ind = 0; ind < ClipStitchCount; ind++)
-			rotangf(ClipReversedData[ind], &ClipFillData[ind]);
-		for (ind = 0; ind < cnt; ind++) {
+		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
+			rotangf(ClipReversedData[iStitch], &ClipFillData[iStitch]);
+		for (iClip = 0; iClip < clipCount; iClip++) {
 			ritclp(SelectedPoint);
 			SelectedPoint.x += Vector0.x;
 			SelectedPoint.y += Vector0.y;
@@ -5846,19 +5846,19 @@ void linsid() {
 }
 
 BOOL nupnt() {
-	double		len, dif;
-	unsigned	ind;
+	double		length, delta;
+	unsigned	step;
 
 	MoveToCoords.x = CurrentFormVertices[CurrentSide + 2].x;
 	MoveToCoords.y = CurrentFormVertices[CurrentSide + 2].y;
-	len = hypot(MoveToCoords.x - SelectedPoint.x, MoveToCoords.y - SelectedPoint.y);
-	if (len > ClipRectSize.cx) {
-		for (ind = 0; ind < 10; ind++) {
-			len = hypot(MoveToCoords.x - SelectedPoint.x, MoveToCoords.y - SelectedPoint.y);
-			dif = ClipRectSize.cx - len;
-			MoveToCoords.x += dif*CosAngle;
-			MoveToCoords.y += dif*SinAngle;
-			if (fabs(dif) < 0.01)
+	length = hypot(MoveToCoords.x - SelectedPoint.x, MoveToCoords.y - SelectedPoint.y);
+	if (length > ClipRectSize.cx) {
+		for (step = 0; step < 10; step++) {
+			length = hypot(MoveToCoords.x - SelectedPoint.x, MoveToCoords.y - SelectedPoint.y);
+			delta = ClipRectSize.cx - length;
+			MoveToCoords.x += delta*CosAngle;
+			MoveToCoords.y += delta*SinAngle;
+			if (fabs(delta) < 0.01)
 				break;
 		}
 		return 1;
@@ -5867,18 +5867,18 @@ BOOL nupnt() {
 }
 
 void lincrnr() {
-	dPOINT		dif;
-	unsigned	ind;
+	dPOINT		delta;
+	unsigned	iStitch;
 
 	SinAngle = sin(ClipAngle);
 	CosAngle = cos(ClipAngle);
 	if (nupnt()) {
-		dif.x = MoveToCoords.x - SelectedPoint.x;
-		dif.y = MoveToCoords.y - SelectedPoint.y;
-		RotationAngle = atan2(dif.y, dif.x);
+		delta.x = MoveToCoords.x - SelectedPoint.x;
+		delta.y = MoveToCoords.y - SelectedPoint.y;
+		RotationAngle = atan2(delta.y, delta.x);
 		rotangf(BorderClipReference, &ClipReference);
-		for (ind = 0; ind < ClipStitchCount; ind++)
-			rotangf(ClipReversedData[ind], &ClipFillData[ind]);
+		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
+			rotangf(ClipReversedData[iStitch], &ClipFillData[iStitch]);
 		ritclp(SelectedPoint);
 		SelectedPoint.x = MoveToCoords.x;
 		SelectedPoint.y = MoveToCoords.y;
@@ -5886,34 +5886,34 @@ void lincrnr() {
 }
 
 void durev() {
-	unsigned	ind;
-	double		mid;
+	unsigned	iStitch;
+	double		midpoint;
 
-	mid = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
-	if (ClipBuffer[0].x > mid) {
-		for (ind = 0; ind < ClipStitchCount; ind++) {
-			ClipReversedData[ind].x = ClipRect.right - ClipBuffer[ind].x;
-			ClipReversedData[ind].y = ClipBuffer[ind].y;
+	midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
+	if (ClipBuffer[0].x > midpoint) {
+		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
+			ClipReversedData[iStitch].x = ClipRect.right - ClipBuffer[iStitch].x;
+			ClipReversedData[iStitch].y = ClipBuffer[iStitch].y;
 		}
 	}
 	else {
-		for (ind = 0; ind < ClipStitchCount; ind++) {
-			ClipReversedData[ind].x = ClipBuffer[ind].x;
-			ClipReversedData[ind].y = ClipBuffer[ind].y;
+		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
+			ClipReversedData[iStitch].x = ClipBuffer[iStitch].x;
+			ClipReversedData[iStitch].y = ClipBuffer[iStitch].y;
 		}
 	}
 }
 
-void setvct(unsigned strt, unsigned fin) {
-	ClipAngle = atan2(CurrentFormVertices[fin].y - CurrentFormVertices[strt].y, CurrentFormVertices[fin].x - CurrentFormVertices[strt].x);
+void setvct(unsigned start, unsigned finish) {
+	ClipAngle = atan2(CurrentFormVertices[finish].y - CurrentFormVertices[start].y, CurrentFormVertices[finish].x - CurrentFormVertices[start].x);
 	Vector0.x = ClipRectSize.cx*cos(ClipAngle);
 	// ToDo - is this line below correct?
 	Vector0.y = ClipRectSize.cx*sin(ClipAngle);
 }
 
-void clpbrd(unsigned short strtlin) {
-	unsigned		ind, ref;
-	unsigned short	nlin;
+void clpbrd(unsigned short startVertex) {
+	unsigned		iVertex, reference;
+	unsigned short	currentVertex, nextVertex;
 
 	SequenceIndex = 0;
 	rstMap(CLPBAK);
@@ -5925,7 +5925,7 @@ void clpbrd(unsigned short strtlin) {
 	ClipReference.y = RotationCenter.y = (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom;
 	ClipReference.x = ClipRect.left;
 	durev();
-	ref = 0;
+	reference = 0;
 	if (SelectedForm->type == FRMLINE) {
 		SelectedPoint.x = CurrentFormVertices[0].x;
 		SelectedPoint.y = CurrentFormVertices[0].y;
@@ -5942,12 +5942,12 @@ void clpbrd(unsigned short strtlin) {
 	}
 	else {
 		clpout();
-		ref = strtlin;
-		for (ind = 0; ind < VertexCount; ind++) {
-			nlin = prv(strtlin);
-			if (clpsid(ref, nlin))
-				ref = nlin;
-			strtlin = nlin;
+		reference = currentVertex = startVertex;
+		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+			nextVertex = prv(currentVertex);
+			if (clpsid(reference, nextVertex))
+				reference = nextVertex;
+			currentVertex = nextVertex;
 		}
 	}
 	delete[] ClipFillData;
