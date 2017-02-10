@@ -6572,40 +6572,40 @@ HWND txtwin(TCHAR* string, RECT location) {
 		NULL);
 }
 
-HWND txtrwin(TCHAR* str, RECT loc) {
+HWND txtrwin(TCHAR* string, RECT location) {
 	if (chkMap(REFCNT))
 	{
-		maxtsiz(str, &ValueWindowSize);
+		maxtsiz(string, &ValueWindowSize);
 		return 0;
 	}
 	return CreateWindow(
 		"STATIC",
-		str,
+		string,
 		SS_NOTIFY | WS_BORDER | WS_CHILD | WS_VISIBLE,
-		loc.left,
-		loc.top,
-		loc.right - loc.left,
-		loc.bottom - loc.top,
+		location.left,
+		location.top,
+		location.right - location.left,
+		location.bottom - location.top,
 		FormDataSheet,
 		NULL,
 		ThrEdInstance,
 		NULL);
 }
 
-HWND numwin(TCHAR* str, RECT loc) {
+HWND numwin(TCHAR* string, RECT location) {
 	if (chkMap(REFCNT))
 	{
-		maxtsiz(str, &ValueWindowSize);
+		maxtsiz(string, &ValueWindowSize);
 		return 0;
 	}
 	return CreateWindow(
 		"STATIC",
-		str,
+		string,
 		SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
-		loc.left,
-		loc.top,
-		loc.right - loc.left,
-		loc.bottom - loc.top,
+		location.left,
+		location.top,
+		location.right - location.left,
+		location.bottom - location.top,
 		FormDataSheet,
 		NULL,
 		ThrEdInstance,
@@ -6628,14 +6628,14 @@ BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam) {
 
 void refrmfn()
 {
-	char*		pchr;
-	unsigned	cod, fpnt;
+	char*		string;
+	unsigned	edgeFillType, iEdge;
 
-	cod = SelectedForm->edgeType&NEGUND;
-	if (cod >= EDGELAST) {
-		cod = EDGELAST - 1;
+	edgeFillType = SelectedForm->edgeType&NEGUND;
+	if (edgeFillType >= EDGELAST) {
+		edgeFillType = EDGELAST - 1;
 	}
-	fpnt = cod - 1;
+	iEdge = edgeFillType - 1;
 	LabelWindowCoords.top = ValueWindowCoords.top = 3;
 	LabelWindowCoords.bottom = ValueWindowCoords.bottom = 3 + LabelWindowSize.y;
 	LabelWindowCoords.left = 3;
@@ -6717,28 +6717,28 @@ void refrmfn()
 			nxtlin();
 			LabelWindow[LFTHBLND] = txtwin(StringTable[STR_FTHBLND], LabelWindowCoords);
 			if (SelectedForm->extendedAttribute&AT_FTHBLND)
-				pchr = StringTable[STR_ON];
+				string = StringTable[STR_ON];
 			else
-				pchr = StringTable[STR_OFF];
-			ValueWindow[LFTHBLND] = txtrwin(pchr, ValueWindowCoords);
+				string = StringTable[STR_OFF];
+			ValueWindow[LFTHBLND] = txtrwin(string, ValueWindowCoords);
 			nxtlin();
 			if (!(SelectedForm->extendedAttribute&AT_FTHBLND)) {
 				// ToDo - check whether we are doing 'feather down' or 'feather both'
 				// only 'feather both' exists in the string table
 				LabelWindow[LFTHDWN] = txtwin(StringTable[STR_FTHBOTH], LabelWindowCoords);
 				if (SelectedForm->extendedAttribute&(AT_FTHDWN))
-					pchr = StringTable[STR_ON];
+					string = StringTable[STR_ON];
 				else
-					pchr = StringTable[STR_OFF];
-				ValueWindow[LFTHDWN] = txtrwin(pchr, ValueWindowCoords);
+					string = StringTable[STR_OFF];
+				ValueWindow[LFTHDWN] = txtrwin(string, ValueWindowCoords);
 				nxtlin();
 				if (!(SelectedForm->extendedAttribute&AT_FTHDWN)) {
 					LabelWindow[LFTHUP] = txtwin(StringTable[STR_FTHUP], LabelWindowCoords);
 					if (SelectedForm->extendedAttribute&AT_FTHUP)
-						pchr = StringTable[STR_ON];
+						string = StringTable[STR_ON];
 					else
-						pchr = StringTable[STR_OFF];
-					ValueWindow[LFTHUP] = txtrwin(pchr, ValueWindowCoords);
+						string = StringTable[STR_OFF];
+					ValueWindow[LFTHUP] = txtrwin(string, ValueWindowCoords);
 					nxtlin();
 				}
 			}
@@ -6849,71 +6849,71 @@ void refrmfn()
 		nxtlin();
 	}
 	LabelWindow[LBRD] = txtwin(StringTable[STR_TXT7], LabelWindowCoords);
-	ValueWindow[LBRD] = txtrwin(StringTable[STR_EDG0 + cod], ValueWindowCoords);
+	ValueWindow[LBRD] = txtrwin(StringTable[STR_EDG0 + edgeFillType], ValueWindowCoords);
 	nxtlin();
-	if (cod) {
+	if (edgeFillType) {
 		LabelWindow[LBRDCOL] = txtwin(StringTable[STR_TXT8], LabelWindowCoords);
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", (SelectedForm->borderColor & 0xf) + 1);
 		ValueWindow[LBRDCOL] = numwin(MsgBuffer, ValueWindowCoords);
 		nxtlin();
-		if (EdgeArray[fpnt] & BESPAC) {
+		if (EdgeArray[iEdge] & BESPAC) {
 			LabelWindow[LBRDSPAC] = txtwin(StringTable[STR_TXT9], LabelWindowCoords);
-			if (cod == EDGEPROPSAT || cod == EDGEOCHAIN || cod == EDGELCHAIN)
+			if (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN)
 				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN);
 			else
 				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN * 2);
 			ValueWindow[LBRDSPAC] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		if (EdgeArray[fpnt] & BPICSPAC) {
+		if (EdgeArray[iEdge] & BPICSPAC) {
 			LabelWindow[LBRDPIC] = txtwin(StringTable[STR_TXT16], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN);
 			ValueWindow[LBRDPIC] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		if (EdgeArray[fpnt] & BEMAX) {
+		if (EdgeArray[iEdge] & BEMAX) {
 			LabelWindow[LMAXBRD] = txtwin(StringTable[STR_TXT22], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->maxBorderStitchLen / PFGRAN);
 			ValueWindow[LMAXBRD] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		if (EdgeArray[fpnt] & BELEN) {
+		if (EdgeArray[iEdge] & BELEN) {
 			LabelWindow[LBRDLEN] = txtwin(StringTable[STR_TXT10], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeStitchLen / PFGRAN);
 			ValueWindow[LBRDLEN] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		if (EdgeArray[fpnt] & BEMIN) {
+		if (EdgeArray[iEdge] & BEMIN) {
 			LabelWindow[LMINBRD] = txtwin(StringTable[STR_TXT23], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->minBorderStitchLen / PFGRAN);
 			ValueWindow[LMINBRD] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		if (EdgeArray[fpnt] & BESIZ) {
+		if (EdgeArray[iEdge] & BESIZ) {
 			LabelWindow[LBRDSIZ] = txtwin(StringTable[STR_TXT11], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->borderSize / PFGRAN);
 			ValueWindow[LBRDSIZ] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		if (EdgeArray[fpnt] & BRDPOS) {
+		if (EdgeArray[iEdge] & BRDPOS) {
 			LabelWindow[LBRDPOS] = txtwin(StringTable[STR_TXT18], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeStitchLen);
 			ValueWindow[LBRDPOS] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		if (EdgeArray[fpnt] & CHNPOS) {
+		if (EdgeArray[iEdge] & CHNPOS) {
 			LabelWindow[LBRDPOS] = txtwin(StringTable[STR_TXT19], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeStitchLen);
 			ValueWindow[LBRDPOS] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		if (cod == EDGEAPPL) {
+		if (edgeFillType == EDGEAPPL) {
 			LabelWindow[LAPCOL] = txtwin(StringTable[STR_TXT12], LabelWindowCoords);
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", (SelectedForm->borderColor >> 4) + 1);
 			ValueWindow[LAPCOL] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		if (cod == EDGEANGSAT || cod == EDGEAPPL || cod == EDGEPROPSAT) {
+		if (edgeFillType == EDGEANGSAT || edgeFillType == EDGEAPPL || edgeFillType == EDGEPROPSAT) {
 			LabelWindow[LBRDUND] = txtwin(StringTable[STR_TXT17], LabelWindowCoords);
 			if (SelectedForm->edgeType&EGUND)
 				ValueWindow[LBRDUND] = numwin(StringTable[STR_ON], ValueWindowCoords);
@@ -6921,7 +6921,7 @@ void refrmfn()
 				ValueWindow[LBRDUND] = numwin(StringTable[STR_OFF], ValueWindowCoords);
 			nxtlin();
 		}
-		if (EdgeArray[fpnt] & BCNRSIZ) {
+		if (EdgeArray[iEdge] & BCNRSIZ) {
 			if (SelectedForm->edgeType == EDGEBHOL)
 				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", getblen() / PFGRAN);
 			else
@@ -6930,7 +6930,7 @@ void refrmfn()
 			ValueWindow[LBCSIZ] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		if (SelectedForm->type == FRMLINE&&EdgeArray[fpnt] & BRDEND) {
+		if (SelectedForm->type == FRMLINE&&EdgeArray[iEdge] & BRDEND) {
 			LabelWindow[LBSTRT] = txtwin(StringTable[STR_TXT14], LabelWindowCoords);
 			if (SelectedForm->attribute&SBLNT)
 				ValueWindow[LBSTRT] = numwin(StringTable[STR_BLUNT], ValueWindowCoords);
@@ -6980,64 +6980,64 @@ void refrm() {
 	refrmfn();
 }
 
-void pxrct2stch(RECT pxr, fRECTANGLE* str) {
-	POINT	tpnt;
+void pxrct2stch(RECT screenRect, fRECTANGLE* stitchRect) {
+	POINT	corner;
 
-	tpnt.x = pxr.left + StitchWindowOrigin.x;
-	tpnt.y = pxr.top + StitchWindowOrigin.y;
-	pxCor2stch(tpnt);
-	str->left = SelectedPoint.x;
-	str->top = SelectedPoint.y;
-	tpnt.x = pxr.right + StitchWindowOrigin.x;
-	tpnt.y = pxr.bottom + StitchWindowOrigin.y;
-	pxCor2stch(tpnt);
-	str->right = SelectedPoint.x;
-	str->bottom = SelectedPoint.y;
+	corner.x = screenRect.left + StitchWindowOrigin.x;
+	corner.y = screenRect.top + StitchWindowOrigin.y;
+	pxCor2stch(corner);
+	stitchRect->left = SelectedPoint.x;
+	stitchRect->top = SelectedPoint.y;
+	corner.x = screenRect.right + StitchWindowOrigin.x;
+	corner.y = screenRect.bottom + StitchWindowOrigin.y;
+	pxCor2stch(corner);
+	stitchRect->right = SelectedPoint.x;
+	stitchRect->bottom = SelectedPoint.y;
 }
 
-unsigned pdir(unsigned ind) {
+unsigned pdir(unsigned vertex) {
 	if (chkMap(PSELDIR))
-		return nxt(ind);
+		return nxt(vertex);
 	else
-		return prv(ind);
+		return prv(vertex);
 }
 
 void setstrtch() {
-	FLOAT		ref = 0;
-	double		rat = 1;
-	unsigned	ind, ine;
-	fRECTANGLE		trct;
-	long		tlng;
+	FLOAT		reference = 0;
+	double		ratio = 1;
+	unsigned	iForm, iVertex, iStitch, currentVertex, currentForm;
+	fRECTANGLE	stitchRect;
+	long		offsetY, offsetX;
 
 	savdo();
 	if (chkMap(FPSEL))
-		MoveMemory(&trct, &SelectedPointsLine, sizeof(fRECTANGLE));
+		MoveMemory(&stitchRect, &SelectedPointsLine, sizeof(fRECTANGLE));
 	else {
 		if (SelectedFormCount || chkMap(BIGBOX))
-			pxrct2stch(SelectedFormsRect, &trct);
+			pxrct2stch(SelectedFormsRect, &stitchRect);
 		else {
 			fvars(ClosestFormToCursor);
 			px2stch();
-			trct.bottom = trct.left = trct.right = trct.top = 0;
+			stitchRect.bottom = stitchRect.left = stitchRect.right = stitchRect.top = 0;
 		}
 	}
 	switch (SelectedFormControlVertex) {
 	case 0:
 
 		if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
-			ref = trct.bottom;
-			tlng = Msg.pt.y - StitchWindowOrigin.y;
-			rat = (double)(SelectedFormsRect.bottom - tlng) / (SelectedFormsRect.bottom - SelectedFormsRect.top);
+			reference = stitchRect.bottom;
+			offsetY = Msg.pt.y - StitchWindowOrigin.y;
+			ratio = (double)(SelectedFormsRect.bottom - offsetY) / (SelectedFormsRect.bottom - SelectedFormsRect.top);
 		}
 		else {
 			if (chkMap(FORMSEL)) {
-				ref = SelectedForm->rectangle.bottom;
-				rat = (double)(SelectedPoint.y - ref) / (SelectedForm->rectangle.top - ref);
+				reference = SelectedForm->rectangle.bottom;
+				ratio = (double)(SelectedPoint.y - reference) / (SelectedForm->rectangle.top - reference);
 				SelectedForm->rectangle.top = SelectedPoint.y;
 			}
 			else {
-				ref = StitchRangeRect.bottom;
-				rat = (double)(SelectedPoint.y - ref) / (StitchRangeRect.top - ref);
+				reference = StitchRangeRect.bottom;
+				ratio = (double)(SelectedPoint.y - reference) / (StitchRangeRect.top - reference);
 			}
 		}
 		break;
@@ -7045,19 +7045,19 @@ void setstrtch() {
 	case 1:
 
 		if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
-			ref = trct.left;
-			tlng = Msg.pt.x - StitchWindowOrigin.x;
-			rat = (double)(tlng - SelectedFormsRect.left) / (SelectedFormsRect.right - SelectedFormsRect.left);
+			reference = stitchRect.left;
+			offsetX = Msg.pt.x - StitchWindowOrigin.x;
+			ratio = (double)(offsetX - SelectedFormsRect.left) / (SelectedFormsRect.right - SelectedFormsRect.left);
 		}
 		else {
 			if (chkMap(FORMSEL)) {
-				ref = SelectedForm->rectangle.left;
-				rat = (double)(SelectedPoint.x - ref) / (SelectedForm->rectangle.right - ref);
+				reference = SelectedForm->rectangle.left;
+				ratio = (double)(SelectedPoint.x - reference) / (SelectedForm->rectangle.right - reference);
 				SelectedForm->rectangle.right = SelectedPoint.x;
 			}
 			else {
-				ref = StitchRangeRect.left;
-				rat = (double)(SelectedPoint.x - ref) / (StitchRangeRect.right - ref);
+				reference = StitchRangeRect.left;
+				ratio = (double)(SelectedPoint.x - reference) / (StitchRangeRect.right - reference);
 			}
 		}
 		break;
@@ -7065,19 +7065,19 @@ void setstrtch() {
 	case 2:
 
 		if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
-			ref = trct.top;
-			tlng = Msg.pt.y - StitchWindowOrigin.y;
-			rat = (double)(tlng - SelectedFormsRect.top) / (SelectedFormsRect.bottom - SelectedFormsRect.top);
+			reference = stitchRect.top;
+			offsetY = Msg.pt.y - StitchWindowOrigin.y;
+			ratio = (double)(offsetY - SelectedFormsRect.top) / (SelectedFormsRect.bottom - SelectedFormsRect.top);
 		}
 		else {
 			if (chkMap(FORMSEL)) {
-				ref = SelectedForm->rectangle.top;
-				rat = (double)(SelectedPoint.y - ref) / (SelectedForm->rectangle.bottom - ref);
+				reference = SelectedForm->rectangle.top;
+				ratio = (double)(SelectedPoint.y - reference) / (SelectedForm->rectangle.bottom - reference);
 				SelectedForm->rectangle.bottom = SelectedPoint.y;
 			}
 			else {
-				ref = StitchRangeRect.top;
-				rat = (double)(SelectedPoint.y - ref) / (StitchRangeRect.bottom - ref);
+				reference = StitchRangeRect.top;
+				ratio = (double)(SelectedPoint.y - reference) / (StitchRangeRect.bottom - reference);
 			}
 		}
 		break;
@@ -7085,19 +7085,19 @@ void setstrtch() {
 	case 3:
 
 		if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
-			ref = trct.right;
-			tlng = Msg.pt.x - StitchWindowOrigin.x;
-			rat = (double)(SelectedFormsRect.right - tlng) / (SelectedFormsRect.right - SelectedFormsRect.left);
+			reference = stitchRect.right;
+			offsetX = Msg.pt.x - StitchWindowOrigin.x;
+			ratio = (double)(SelectedFormsRect.right - offsetX) / (SelectedFormsRect.right - SelectedFormsRect.left);
 		}
 		else {
 			if (chkMap(FORMSEL)) {
-				ref = SelectedForm->rectangle.right;
-				rat = (double)(SelectedPoint.x - ref) / (SelectedForm->rectangle.left - ref);
+				reference = SelectedForm->rectangle.right;
+				ratio = (double)(SelectedPoint.x - reference) / (SelectedForm->rectangle.left - reference);
 				SelectedForm->rectangle.left = SelectedPoint.x;
 			}
 			else {
-				ref = StitchRangeRect.right;
-				rat = (double)(SelectedPoint.x - ref) / (StitchRangeRect.left - ref);
+				reference = StitchRangeRect.right;
+				ratio = (double)(SelectedPoint.x - reference) / (StitchRangeRect.left - reference);
 			}
 		}
 		break;
@@ -7105,10 +7105,10 @@ void setstrtch() {
 	if (SelectedFormControlVertex & 1) {
 		if (chkMap(FPSEL)) {
 			fvars(ClosestFormToCursor);
-			ine = SelectedFormVertices.start;
-			for (ind = 0; ind <= SelectedFormVertices.vertexCount; ind++) {
-				CurrentFormVertices[ine].x = (CurrentFormVertices[ine].x - ref)*rat + ref;
-				ine = pdir(ine);
+			currentVertex = SelectedFormVertices.start;
+			for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
+				CurrentFormVertices[currentVertex].x = (CurrentFormVertices[currentVertex].x - reference)*ratio + reference;
+				currentVertex = pdir(currentVertex);
 			}
 			frmout(ClosestFormToCursor);
 			setpsel();
@@ -7116,33 +7116,33 @@ void setstrtch() {
 			return;
 		}
 		if (chkMap(BIGBOX)) {
-			for (ind = 0; ind < FormIndex; ind++) {
-				CurrentFormVertices = FormList[ind].vertices;
-				for (ine = 0; ine < FormList[ind].vertexCount; ine++)
-					CurrentFormVertices[ine].x = (CurrentFormVertices[ine].x - ref)*rat + ref;
-				frmout(ind);
+			for (iForm = 0; iForm < FormIndex; iForm++) {
+				CurrentFormVertices = FormList[iForm].vertices;
+				for (iVertex = 0; iVertex < FormList[iForm].vertexCount; iVertex++)
+					CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - reference)*ratio + reference;
+				frmout(iForm);
 			}
-			for (ind = 0; ind < PCSHeader.stitchCount; ind++)
-				StitchBuffer[ind].x = (StitchBuffer[ind].x - ref)*rat + ref;
+			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
+				StitchBuffer[iStitch].x = (StitchBuffer[iStitch].x - reference)*ratio + reference;
 			selal();
 			return;
 		}
 		else {
 			if (SelectedFormCount) {
-				for (ind = 0; ind < SelectedFormCount; ind++) {
-					CurrentFormVertices = FormList[SelectedFormList[ind]].vertices;
-					for (ine = 0; ine < FormList[SelectedFormList[ind]].vertexCount; ine++)
-						CurrentFormVertices[ine].x = (CurrentFormVertices[ine].x - ref)*rat + ref;
+				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+					CurrentFormVertices = FormList[SelectedFormList[iForm]].vertices;
+					for (iVertex = 0; iVertex < FormList[SelectedFormList[iForm]].vertexCount; iVertex++)
+						CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - reference)*ratio + reference;
 				}
 			}
 			else {
 				if (chkMap(FORMSEL)) {
-					for (ind = 0; ind < VertexCount; ind++)
-						CurrentFormVertices[ind].x = (CurrentFormVertices[ind].x - ref)*rat + ref;
+					for (iVertex = 0; iVertex < VertexCount; iVertex++)
+						CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - reference)*ratio + reference;
 				}
 				else {
-					for (ind = GroupStartStitch; ind <= GroupEndStitch; ind++)
-						StitchBuffer[ind].x = (StitchBuffer[ind].x - ref)*rat + ref;
+					for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++)
+						StitchBuffer[iStitch].x = (StitchBuffer[iStitch].x - reference)*ratio + reference;
 				}
 			}
 		}
@@ -7150,10 +7150,10 @@ void setstrtch() {
 	else {
 		if (chkMap(FPSEL)) {
 			fvars(ClosestFormToCursor);
-			ine = SelectedFormVertices.start;
-			for (ind = 0; ind <= SelectedFormVertices.vertexCount; ind++) {
-				CurrentFormVertices[ine].y = (CurrentFormVertices[ine].y - ref)*rat + ref;
-				ine = pdir(ine);
+			currentVertex = SelectedFormVertices.start;
+			for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
+				CurrentFormVertices[currentVertex].y = (CurrentFormVertices[currentVertex].y - reference)*ratio + reference;
+				currentVertex = pdir(currentVertex);
 			}
 			frmout(ClosestFormToCursor);
 			setpsel();
@@ -7162,42 +7162,42 @@ void setstrtch() {
 			return;
 		}
 		if (chkMap(BIGBOX)) {
-			for (ind = 0; ind < FormIndex; ind++) {
-				CurrentFormVertices = FormList[ind].vertices;
-				for (ine = 0; ine < FormList[ind].vertexCount; ine++)
-					CurrentFormVertices[ine].y = (CurrentFormVertices[ine].y - ref)*rat + ref;
-				frmout(ind);
+			for (iForm = 0; iForm < FormIndex; iForm++) {
+				CurrentFormVertices = FormList[iForm].vertices;
+				for (iVertex = 0; iVertex < FormList[iForm].vertexCount; iVertex++)
+					CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - reference)*ratio + reference;
+				frmout(iForm);
 			}
-			for (ind = 0; ind < PCSHeader.stitchCount; ind++)
-				StitchBuffer[ind].y = (StitchBuffer[ind].y - ref)*rat + ref;
+			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
+				StitchBuffer[iStitch].y = (StitchBuffer[iStitch].y - reference)*ratio + reference;
 			selal();
 			return;
 		}
 		else {
 			if (SelectedFormCount) {
-				for (ind = 0; ind < SelectedFormCount; ind++) {
-					CurrentFormVertices = FormList[SelectedFormList[ind]].vertices;
-					for (ine = 0; ine < FormList[SelectedFormList[ind]].vertexCount; ine++)
-						CurrentFormVertices[ine].y = (CurrentFormVertices[ine].y - ref)*rat + ref;
+				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+					CurrentFormVertices = FormList[SelectedFormList[iForm]].vertices;
+					for (iVertex = 0; iVertex < FormList[SelectedFormList[iForm]].vertexCount; iVertex++)
+						CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - reference)*ratio + reference;
 				}
 			}
 			else {
 				if (chkMap(FORMSEL)) {
-					for (ind = 0; ind < VertexCount; ind++)
-						CurrentFormVertices[ind].y = (CurrentFormVertices[ind].y - ref)*rat + ref;
+					for (iVertex = 0; iVertex < VertexCount; iVertex++)
+						CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - reference)*ratio + reference;
 				}
 				else {
-					for (ind = GroupStartStitch; ind <= GroupEndStitch; ind++)
-						StitchBuffer[ind].y = (StitchBuffer[ind].y - ref)*rat + ref;
+					for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++)
+						StitchBuffer[iStitch].y = (StitchBuffer[iStitch].y - reference)*ratio + reference;
 				}
 			}
 		}
 	}
 	if (SelectedFormCount) {
-		for (ind = 0; ind < SelectedFormCount; ind++) {
-			ine = SelectedFormList[ind];
-			frmout(ine);
-			ClosestFormToCursor = ine;
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+			currentForm = SelectedFormList[iForm];
+			frmout(currentForm);
+			ClosestFormToCursor = currentForm;
 			refil();
 		}
 	}
@@ -7208,129 +7208,129 @@ void setstrtch() {
 }
 
 void setexpand() {
-	dPOINT		ref;
-	POINT		tref;
-	fPOINT		sref;
-	dPOINT		l_siz0;
-	dPOINT		l_siz1;
-	dPOINT		rat;
+	dPOINT		reference;
+	POINT		integerReference;
+	fPOINT		stitchReference;
+	dPOINT		size0;
+	dPOINT		size1;
+	dPOINT		ratio;
 	double		aspect;
-	unsigned	ind, ine;
-	fRECTANGLE		rct;
+	unsigned	iVertex, iForm, iStitch, iCurrent;
+	fRECTANGLE	rectangle;
 
 	savdo();
 	if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
-		rct.bottom = SelectedFormsRect.bottom;
-		rct.left = SelectedFormsRect.left;
-		rct.right = SelectedFormsRect.right;
-		rct.top = SelectedFormsRect.top;
+		rectangle.bottom = SelectedFormsRect.bottom;
+		rectangle.left = SelectedFormsRect.left;
+		rectangle.right = SelectedFormsRect.right;
+		rectangle.top = SelectedFormsRect.top;
 		SelectedPoint.x = Msg.pt.x - StitchWindowOrigin.x;
 		SelectedPoint.y = Msg.pt.y - StitchWindowOrigin.y;
-		l_siz0.y = rct.bottom - rct.top;
+		size0.y = rectangle.bottom - rectangle.top;
 	}
 	else {
 		px2stch();
 		fvars(ClosestFormToCursor);
 		if (chkMap(FORMSEL))
-			rct = SelectedForm->rectangle;
+			rectangle = SelectedForm->rectangle;
 		else {
-			rct.bottom = StitchRangeRect.bottom;
-			rct.top = StitchRangeRect.top;
-			rct.right = StitchRangeRect.right;
-			rct.left = StitchRangeRect.left;
+			rectangle.bottom = StitchRangeRect.bottom;
+			rectangle.top = StitchRangeRect.top;
+			rectangle.right = StitchRangeRect.right;
+			rectangle.left = StitchRangeRect.left;
 		}
-		l_siz0.y = rct.top - rct.bottom;
+		size0.y = rectangle.top - rectangle.bottom;
 	}
-	rat.x = rat.y = 1;
-	ref.x = ref.y = 0;
-	l_siz0.x = rct.right - rct.left;
+	ratio.x = ratio.y = 1;
+	reference.x = reference.y = 0;
+	size0.x = rectangle.right - rectangle.left;
 	switch (SelectedFormControlVertex) {
 	case 0:
 
-		ref.x = rct.right;
-		ref.y = rct.bottom;
-		l_siz1.x = fabs(SelectedPoint.x - ref.x);
-		l_siz1.y = fabs(SelectedPoint.y - ref.y);
-		aspect = l_siz1.x / l_siz1.y;
+		reference.x = rectangle.right;
+		reference.y = rectangle.bottom;
+		size1.x = fabs(SelectedPoint.x - reference.x);
+		size1.y = fabs(SelectedPoint.y - reference.y);
+		aspect = size1.x / size1.y;
 		if (aspect < XYratio)
-			l_siz1.x = l_siz1.y*XYratio;
+			size1.x = size1.y*XYratio;
 		else
-			l_siz1.y = l_siz1.x / XYratio;
-		rat.x = l_siz1.x / l_siz0.x;
-		rat.y = l_siz1.y / l_siz0.y;
+			size1.y = size1.x / XYratio;
+		ratio.x = size1.x / size0.x;
+		ratio.y = size1.y / size0.y;
 		if (!SelectedFormCount&&chkMap(FORMSEL)) {
-			SelectedForm->rectangle.left = rct.right - l_siz1.x;
-			SelectedForm->rectangle.top = rct.bottom + l_siz1.y;
+			SelectedForm->rectangle.left = rectangle.right - size1.x;
+			SelectedForm->rectangle.top = rectangle.bottom + size1.y;
 		}
 		break;
 
 	case 1:
 
-		ref.x = rct.left;
-		ref.y = rct.bottom;
-		l_siz1.x = fabs(SelectedPoint.x - ref.x);
-		l_siz1.y = fabs(SelectedPoint.y - ref.y);
-		aspect = l_siz1.x / l_siz1.y;
+		reference.x = rectangle.left;
+		reference.y = rectangle.bottom;
+		size1.x = fabs(SelectedPoint.x - reference.x);
+		size1.y = fabs(SelectedPoint.y - reference.y);
+		aspect = size1.x / size1.y;
 		if (aspect < XYratio)
-			l_siz1.x = l_siz1.y*XYratio;
+			size1.x = size1.y*XYratio;
 		else
-			l_siz1.y = l_siz1.x / XYratio;
-		rat.x = l_siz1.x / l_siz0.x;
-		rat.y = l_siz1.y / l_siz0.y;
+			size1.y = size1.x / XYratio;
+		ratio.x = size1.x / size0.x;
+		ratio.y = size1.y / size0.y;
 		if (!SelectedFormCount&&chkMap(FORMSEL)) {
-			SelectedForm->rectangle.right = rct.left + l_siz1.x;
-			SelectedForm->rectangle.top = rct.bottom + l_siz1.y;
+			SelectedForm->rectangle.right = rectangle.left + size1.x;
+			SelectedForm->rectangle.top = rectangle.bottom + size1.y;
 		}
 		break;
 
 	case 2:
 
-		ref.x = rct.left;
-		ref.y = rct.top;
-		l_siz1.x = fabs(SelectedPoint.x - ref.x);
-		l_siz1.y = fabs(SelectedPoint.y - ref.y);
-		aspect = l_siz1.x / l_siz1.y;
+		reference.x = rectangle.left;
+		reference.y = rectangle.top;
+		size1.x = fabs(SelectedPoint.x - reference.x);
+		size1.y = fabs(SelectedPoint.y - reference.y);
+		aspect = size1.x / size1.y;
 		if (aspect < XYratio)
-			l_siz1.x = l_siz1.y*XYratio;
+			size1.x = size1.y*XYratio;
 		else
-			l_siz1.y = l_siz1.x / XYratio;
-		rat.x = l_siz1.x / l_siz0.x;
-		rat.y = l_siz1.y / l_siz0.y;
+			size1.y = size1.x / XYratio;
+		ratio.x = size1.x / size0.x;
+		ratio.y = size1.y / size0.y;
 		if (!SelectedFormCount&&chkMap(FORMSEL)) {
-			SelectedForm->rectangle.right = rct.left + l_siz1.x;
-			SelectedForm->rectangle.bottom = rct.top - l_siz1.y;
+			SelectedForm->rectangle.right = rectangle.left + size1.x;
+			SelectedForm->rectangle.bottom = rectangle.top - size1.y;
 		}
 		break;
 
 	case 3:
 
-		ref.x = rct.right;
-		ref.y = rct.top;
-		l_siz1.x = fabs(SelectedPoint.x - ref.x);
-		l_siz1.y = fabs(SelectedPoint.y - ref.y);
-		aspect = l_siz1.x / l_siz1.y;
+		reference.x = rectangle.right;
+		reference.y = rectangle.top;
+		size1.x = fabs(SelectedPoint.x - reference.x);
+		size1.y = fabs(SelectedPoint.y - reference.y);
+		aspect = size1.x / size1.y;
 		if (aspect < XYratio)
-			l_siz1.x = l_siz1.y*XYratio;
+			size1.x = size1.y*XYratio;
 		else
-			l_siz1.y = l_siz1.x / XYratio;
-		rat.x = l_siz1.x / l_siz0.x;
-		rat.y = l_siz1.y / l_siz0.y;
+			size1.y = size1.x / XYratio;
+		ratio.x = size1.x / size0.x;
+		ratio.y = size1.y / size0.y;
 		if (!SelectedFormCount&&chkMap(FORMSEL)) {
-			SelectedForm->rectangle.left = rct.right - l_siz1.x;
-			SelectedForm->rectangle.bottom = rct.top - l_siz1.y;
+			SelectedForm->rectangle.left = rectangle.right - size1.x;
+			SelectedForm->rectangle.bottom = rectangle.top - size1.y;
 		}
 		break;
 	}
-	tref.x = ref.x;
-	tref.y = ref.y;
-	px2stchf(tref, &sref);
+	integerReference.x = reference.x;
+	integerReference.y = reference.y;
+	px2stchf(integerReference, &stitchReference);
 	if (chkMap(FPSEL)) {
 		fvars(ClosestFormToCursor);
-		ine = SelectedFormVertices.start;
-		for (ind = 0; ind <= SelectedFormVertices.vertexCount; ind++) {
-			CurrentFormVertices[ine].x = (CurrentFormVertices[ine].x - sref.x)*rat.x + sref.x;
-			CurrentFormVertices[ine].y = (CurrentFormVertices[ine].y - sref.y)*rat.y + sref.y;
-			ine = pdir(ine);
+		iCurrent = SelectedFormVertices.start;
+		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
+			CurrentFormVertices[iCurrent].x = (CurrentFormVertices[iCurrent].x - stitchReference.x)*ratio.x + stitchReference.x;
+			CurrentFormVertices[iCurrent].y = (CurrentFormVertices[iCurrent].y - stitchReference.y)*ratio.y + stitchReference.y;
+			iCurrent = pdir(iCurrent);
 		}
 		setpsel();
 		frmout(ClosestFormToCursor);
@@ -7339,46 +7339,46 @@ void setexpand() {
 		return;
 	}
 	if (chkMap(BIGBOX)) {
-		for (ind = 0; ind < FormIndex; ind++) {
-			fvars(ind);
-			for (ine = 0; ine < SelectedForm->vertexCount; ine++) {
-				CurrentFormVertices[ine].x = (CurrentFormVertices[ine].x - sref.x)*rat.x + sref.x;
-				CurrentFormVertices[ine].y = (CurrentFormVertices[ine].y - sref.y)*rat.y + sref.y;
+		for (iForm = 0; iForm < FormIndex; iForm++) {
+			fvars(iForm);
+			for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+				CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - stitchReference.x)*ratio.x + stitchReference.x;
+				CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - stitchReference.y)*ratio.y + stitchReference.y;
 			}
-			frmout(ind);
+			frmout(iForm);
 		}
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-			StitchBuffer[ind].x = (StitchBuffer[ind].x - sref.x)*rat.x + sref.x;
-			StitchBuffer[ind].y = (StitchBuffer[ind].y - sref.y)*rat.y + sref.y;
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+			StitchBuffer[iStitch].x = (StitchBuffer[iStitch].x - stitchReference.x)*ratio.x + stitchReference.x;
+			StitchBuffer[iStitch].y = (StitchBuffer[iStitch].y - stitchReference.y)*ratio.y + stitchReference.y;
 		}
 		selal();
 		return;
 	}
 	else {
 		if (SelectedFormCount) {
-			for (ind = 0; ind < SelectedFormCount; ind++) {
-				fvars(SelectedFormList[ind]);
-				for (ine = 0; ine < SelectedForm->vertexCount; ine++) {
-					CurrentFormVertices[ine].x = (CurrentFormVertices[ine].x - sref.x)*rat.x + sref.x;
-					CurrentFormVertices[ine].y = (CurrentFormVertices[ine].y - sref.y)*rat.y + sref.y;
+			for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+				fvars(SelectedFormList[iForm]);
+				for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+					CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - stitchReference.x)*ratio.x + stitchReference.x;
+					CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - stitchReference.y)*ratio.y + stitchReference.y;
 				}
-				frmout(SelectedFormList[ind]);
-				ClosestFormToCursor = SelectedFormList[ind];
+				frmout(SelectedFormList[iForm]);
+				ClosestFormToCursor = SelectedFormList[iForm];
 				refil();
 			}
 		}
 		else {
 			if (chkMap(FORMSEL)) {
-				for (ind = 0; ind < VertexCount; ind++) {
-					CurrentFormVertices[ind].x = (CurrentFormVertices[ind].x - ref.x)*rat.x + ref.x;
-					CurrentFormVertices[ind].y = (CurrentFormVertices[ind].y - ref.y)*rat.y + ref.y;
+				for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+					CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - reference.x)*ratio.x + reference.x;
+					CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - reference.y)*ratio.y + reference.y;
 				}
 				refil();
 			}
 			else {
-				for (ind = GroupStartStitch; ind <= GroupEndStitch; ind++) {
-					StitchBuffer[ind].x = (StitchBuffer[ind].x - ref.x)*rat.x + ref.x;
-					StitchBuffer[ind].y = (StitchBuffer[ind].y - ref.y)*rat.y + ref.y;
+				for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
+					StitchBuffer[iStitch].x = (StitchBuffer[iStitch].x - reference.x)*ratio.x + reference.x;
+					StitchBuffer[iStitch].y = (StitchBuffer[iStitch].y - reference.y)*ratio.y + reference.y;
 				}
 			}
 		}
@@ -7386,84 +7386,84 @@ void setexpand() {
 	}
 }
 
-void nufilcol(unsigned col) {
-	unsigned at, ind;
+void nufilcol(unsigned color) {
+	unsigned attribute, iStitch;
 
-	if (SelectedForm->fillColor != col) {
-		SelectedForm->fillColor = col;
-		at = (ClosestFormToCursor << 4) | FRMFIL;
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-			if ((StitchBuffer[ind].attribute&(FRMSK | TYPMSK | FTHMSK)) == at) {
-				StitchBuffer[ind].attribute &= 0xfffffff0;
-				StitchBuffer[ind].attribute |= col;
+	if (SelectedForm->fillColor != color) {
+		SelectedForm->fillColor = color;
+		attribute = (ClosestFormToCursor << 4) | FRMFIL;
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+			if ((StitchBuffer[iStitch].attribute&(FRMSK | TYPMSK | FTHMSK)) == attribute) {
+				StitchBuffer[iStitch].attribute &= 0xfffffff0;
+				StitchBuffer[iStitch].attribute |= color;
 			}
 		}
 	}
 }
 
-void nufthcol(unsigned col) {
-	unsigned at, ind;
+void nufthcol(unsigned color) {
+	unsigned attribute, iStitch;
 
-	if (SelectedForm->fillInfo.feather.color != col) {
-		SelectedForm->fillInfo.feather.color = col;
-		at = (ClosestFormToCursor << 4) | FTHMSK;
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-			if ((StitchBuffer[ind].attribute&(FRMSK | FTHMSK)) == at) {
-				StitchBuffer[ind].attribute &= 0xfffffff0;
-				StitchBuffer[ind].attribute |= col;
+	if (SelectedForm->fillInfo.feather.color != color) {
+		SelectedForm->fillInfo.feather.color = color;
+		attribute = (ClosestFormToCursor << 4) | FTHMSK;
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+			if ((StitchBuffer[iStitch].attribute&(FRMSK | FTHMSK)) == attribute) {
+				StitchBuffer[iStitch].attribute &= 0xfffffff0;
+				StitchBuffer[iStitch].attribute |= color;
 			}
 		}
 	}
 }
 
-void nubrdcol(unsigned col) {
-	unsigned at, ind;
+void nubrdcol(unsigned color) {
+	unsigned attribute, iStitch;
 
-	SelectedForm->borderColor = col;
-	at = (ClosestFormToCursor << 4) | FRMBFIL;
-	for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-		if ((StitchBuffer[ind].attribute&(FRMSK | TYPMSK)) == at) {
-			StitchBuffer[ind].attribute &= 0xfffffff0;
-			StitchBuffer[ind].attribute |= col;
+	SelectedForm->borderColor = color;
+	attribute = (ClosestFormToCursor << 4) | FRMBFIL;
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+		if ((StitchBuffer[iStitch].attribute&(FRMSK | TYPMSK)) == attribute) {
+			StitchBuffer[iStitch].attribute &= 0xfffffff0;
+			StitchBuffer[iStitch].attribute |= color;
 		}
 	}
 }
 
-void nulapcol(unsigned col) {
-	unsigned at, ind;
+void nulapcol(unsigned color) {
+	unsigned attribute, iStitch;
 
-	if ((unsigned)(SelectedForm->borderColor >> 4) != col) {
+	if ((unsigned)(SelectedForm->borderColor >> 4) != color) {
 		SelectedForm->borderColor &= 0xf;
-		SelectedForm->borderColor |= col << 4;
-		at = (ClosestFormToCursor << 4) | TYPMSK;
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-			if ((StitchBuffer[ind].attribute&(TYPMSK | FRMSK)) == at) {
-				StitchBuffer[ind].attribute &= 0xfffffff0;
-				StitchBuffer[ind].attribute |= col;
+		SelectedForm->borderColor |= color << 4;
+		attribute = (ClosestFormToCursor << 4) | TYPMSK;
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+			if ((StitchBuffer[iStitch].attribute&(TYPMSK | FRMSK)) == attribute) {
+				StitchBuffer[iStitch].attribute &= 0xfffffff0;
+				StitchBuffer[iStitch].attribute |= color;
 			}
 		}
 	}
 }
 
 void sidwnd(HWND wnd) {
-	RECT		wrct;
-	unsigned	baksid;
+	RECT		windowRect;
+	unsigned	savedChoice;
 
 	MsgIndex = 0;
 	SideWindowEntryBuffer[0] = 0;
-	baksid = FormMenuChoice;
+	savedChoice = FormMenuChoice;
 	unsid();
-	FormMenuChoice = baksid;
-	GetWindowRect(wnd, &wrct);
+	FormMenuChoice = savedChoice;
+	GetWindowRect(wnd, &windowRect);
 	GetWindowRect(FormDataSheet, &MsgRect);
 	SideMessageWindow = CreateWindow(
 		"STATIC",
 		0,
 		WS_BORDER | WS_CHILD | WS_VISIBLE,
 		MsgRect.right - ThredWindowOrigin.x + 3,
-		wrct.top - ThredWindowOrigin.y - 3,
+		windowRect.top - ThredWindowOrigin.y - 3,
 		ButtonWidthX3,
-		wrct.bottom - wrct.top + 3,
+		windowRect.bottom - windowRect.top + 3,
 		ThrEdWindow,
 		NULL,
 		ThrEdInstance,
@@ -7471,21 +7471,21 @@ void sidwnd(HWND wnd) {
 }
 
 void prfsid(HWND wnd) {
-	RECT	wrct;
+	RECT	windowRect;
 
 	MsgIndex = 0;
 	SideWindowEntryBuffer[0] = 0;
 	unsid();
-	GetWindowRect(wnd, &wrct);
+	GetWindowRect(wnd, &windowRect);
 	GetClientRect(PreferencesWindow, &MsgRect);
 	SideMessageWindow = CreateWindow(
 		"STATIC",
 		0,
 		WS_BORDER | WS_CHILD | WS_VISIBLE,
-		wrct.right - ThredWindowOrigin.x + 6,
-		wrct.top - ThredWindowOrigin.y - 3,
+		windowRect.right - ThredWindowOrigin.x + 6,
+		windowRect.top - ThredWindowOrigin.y - 3,
 		ValueWindowSize.x,
-		wrct.bottom - wrct.top + 3,
+		windowRect.bottom - windowRect.top + 3,
 		ThrEdWindow,
 		NULL,
 		ThrEdInstance,
@@ -7501,13 +7501,13 @@ void sbold() {
 }
 
 void dubold() {
-	unsigned ind;
+	unsigned iForm;
 
 	if (filmsgs(FML_BLD))
 		return;
 	if (SelectedFormCount) {
-		for (ind = 0; ind < SelectedFormCount; ind++) {
-			ClosestFormToCursor = SelectedFormList[ind];
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+			ClosestFormToCursor = SelectedFormList[iForm];
 			fvars(ClosestFormToCursor);
 			sbold();
 		}
@@ -7526,10 +7526,10 @@ void dubold() {
 	}
 }
 
-void prftwin(TCHAR* str) {
+void prftwin(TCHAR* text) {
 	CreateWindow(
 		"STATIC",
-		str,
+		text,
 		WS_CHILD | WS_VISIBLE,
 		LabelWindowCoords.left,
 		LabelWindowCoords.top,
@@ -7541,10 +7541,10 @@ void prftwin(TCHAR* str) {
 		NULL);
 }
 
-HWND prfnwin(TCHAR* str) {
+HWND prfnwin(TCHAR* text) {
 	return CreateWindow(
 		"STATIC",
-		str,
+		text,
 		SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
 		ValueWindowCoords.left,
 		ValueWindowCoords.top,
@@ -7556,9 +7556,9 @@ HWND prfnwin(TCHAR* str) {
 		NULL);
 }
 
-void prflin(unsigned p_lin) {
-	prftwin(StringTable[p_lin]);
-	ValueWindow[p_lin - STR_PRF0] = prfnwin(MsgBuffer);
+void prflin(unsigned row) {
+	prftwin(StringTable[row]);
+	ValueWindow[row - STR_PRF0] = prfnwin(MsgBuffer);
 	nxtlin();
 }
 
@@ -7581,8 +7581,8 @@ void sethup() {
 #if LANG==ENG||LANG==HNG
 
 void prfmsg() {
-	HDC		prfdc;
-	RECT	prfrct;
+	HDC		preferenceDC;
+	RECT	preferenceRect;
 
 	if (rstMap(INSRT))
 		setMap(WASRT);
@@ -7616,9 +7616,9 @@ void prfmsg() {
 		NULL,
 		ThrEdInstance,
 		NULL);
-	prfdc = GetDC(PreferencesWindow);
-	GetClientRect(PreferencesWindow, &prfrct);
-	FillRect(prfdc, &prfrct, (HBRUSH)(COLOR_WINDOW + 1));
+	preferenceDC = GetDC(PreferencesWindow);
+	GetClientRect(PreferencesWindow, &preferenceRect);
+	FillRect(preferenceDC, &preferenceRect, (HBRUSH)(COLOR_WINDOW + 1));
 	LabelWindowCoords.top = ValueWindowCoords.top = 3;
 	LabelWindowCoords.bottom = ValueWindowCoords.bottom = 3 + LabelWindowSize.y;
 	LabelWindowCoords.left = 3;
@@ -7692,15 +7692,15 @@ void prfmsg() {
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", MinStitchLength / PFGRAN);
 	prflin(STR_PRF6);
 	setMap(PRFACT);
-	ReleaseDC(ThrEdWindow, prfdc);
+	ReleaseDC(ThrEdWindow, preferenceDC);
 }
 #endif
 
 #if LANG==GRM
 
 void prfmsg() {
-	HDC		prfdc;
-	RECT	prfrct;
+	HDC		preferenceDC;
+	RECT	preferenceRect;
 
 	if (rstMap(INSRT))
 		setMap(WASRT);
@@ -7731,9 +7731,9 @@ void prfmsg() {
 		NULL,
 		ThrEdInstance,
 		NULL);
-	prfdc = GetDC(PreferencesWindow);
-	GetClientRect(PreferencesWindow, &prfrct);
-	FillRect(prfdc, &prfrct, (HBRUSH)(COLOR_WINDOW + 1));
+	preferenceDC = GetDC(PreferencesWindow);
+	GetClientRect(PreferencesWindow, &preferenceRect);
+	FillRect(preferenceDC, &preferenceRect, (HBRUSH)(COLOR_WINDOW + 1));
 	LabelWindowCoords.top = ValueWindowCoords.top = 3;
 	LabelWindowCoords.bottom = ValueWindowCoords.bottom = 3 + LabelWindowSize.y;
 	LabelWindowCoords.left = 3;
@@ -7807,7 +7807,7 @@ void prfmsg() {
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", AppliqueColor + 1);
 	prflin(STR_PRF10);
 	setMap(PRFACT);
-	ReleaseDC(ThrEdWindow, prfdc);
+	ReleaseDC(ThrEdWindow, preferenceDC);
 }
 #endif
 
