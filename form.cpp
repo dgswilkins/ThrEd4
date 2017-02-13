@@ -2687,6 +2687,7 @@ void setfpnt() {
 }
 
 unsigned short nxt(unsigned short iVertex) {
+	// ToDo - should these all be 'unsigned' rather than 'unsigned short'
 	iVertex++;
 	if (iVertex > (unsigned)VertexCount - 1)
 		iVertex = 0;
@@ -7811,164 +7812,166 @@ void prfmsg() {
 }
 #endif
 
-void durpoli(unsigned nsids) {
-	double		dang;
-	double		l_ang = 0;
-	double		len;
-	unsigned	ind;
-	dPOINT		pnt;
+void durpoli(unsigned vertexCount) {
+	double		stepAngle;
+	double		angle = 0;
+	double		length;
+	unsigned	iVertex;
+	dPOINT		point;
 
-	if (nsids < 3)
-		nsids = 3;
-	if (nsids > 100)
-		nsids = 100;
-	dang = PI * 2 / nsids;
-	len = 500 / nsids*ZoomFactor*(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+	if (vertexCount < 3)
+		vertexCount = 3;
+	if (vertexCount > 100)
+		vertexCount = 100;
+	stepAngle = PI * 2 / vertexCount;
+	// ToDo - why 500?
+	length = 500 / vertexCount*ZoomFactor*(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
 	SelectedForm = &FormList[FormIndex];
 	ClosestFormToCursor = FormIndex;
 	frmclr(SelectedForm);
-	SelectedForm->vertices = adflt(nsids);
-	SelectedForm->vertexCount = nsids;
+	SelectedForm->vertices = adflt(vertexCount);
+	SelectedForm->vertexCount = vertexCount;
 	SelectedForm->attribute = ActiveLayer << 1;
 	fvars(FormIndex);
 	px2stch();
-	pnt.x = SelectedPoint.x;
-	pnt.y = SelectedPoint.y;
-	for (ind = 0; ind < VertexCount; ind++) {
-		CurrentFormVertices[ind].x = pnt.x;
-		CurrentFormVertices[ind].y = pnt.y;
-		pnt.x += len*cos(l_ang);
-		pnt.y += len*sin(l_ang);
-		l_ang += dang;
+	point.x = SelectedPoint.x;
+	point.y = SelectedPoint.y;
+	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+		CurrentFormVertices[iVertex].x = point.x;
+		CurrentFormVertices[iVertex].y = point.y;
+		point.x += length*cos(angle);
+		point.y += length*sin(angle);
+		angle += stepAngle;
 	}
 	SelectedForm->type = FRMFPOLY;
 	ClosestFormToCursor = FormIndex;
 	frmout(FormIndex);
 	FormMoveDelta.x = FormMoveDelta.y = 0;
-	NewFormVertexCount = nsids + 1;
+	NewFormVertexCount = vertexCount + 1;
 	setMap(POLIMOV);
 	setmfrm();
 	setMap(SHOFRM);
 	mdufrm();
 }
 
-void dustar(unsigned nsids, double len) {
-	double		dang;
-	double		l_ang;
-	unsigned	ind, tsid;
-	dPOINT		pnt, cntr;
+void dustar(unsigned starCount, double length) {
+	double		stepAngle;
+	double		angle;
+	unsigned	iVertex, vertexCount;
+	dPOINT		point, center;
 
-	if (nsids < 3)
-		nsids = 3;
-	if (nsids > 100)
-		nsids = 100;
-	dang = PI / nsids;
-	l_ang = dang / 2 + PI;
-	tsid = nsids << 1;
+	if (starCount < 3)
+		starCount = 3;
+	if (starCount > 100)
+		starCount = 100;
+	stepAngle = PI / starCount;
+	angle = stepAngle / 2 + PI;
+	vertexCount = starCount << 1;
 	SelectedForm = &FormList[FormIndex];
 	ClosestFormToCursor = FormIndex;
 	frmclr(SelectedForm);
-	SelectedForm->vertices = adflt(tsid);
-	SelectedForm->vertexCount = tsid;
+	SelectedForm->vertices = adflt(vertexCount);
+	SelectedForm->vertexCount = vertexCount;
 	SelectedForm->attribute = (ActiveLayer << 1);
 	fvars(FormIndex);
 	px2stch();
-	pnt.x = SelectedPoint.x;
-	pnt.y = SelectedPoint.y;
+	point.x = SelectedPoint.x;
+	point.y = SelectedPoint.y;
 	setMap(FILDIR);
-	for (ind = 0; ind < tsid; ind++) {
-		CurrentFormVertices[ind].x = pnt.x;
-		CurrentFormVertices[ind].y = pnt.y;
-		pnt.x += len*cos(l_ang);
-		pnt.y += len*sin(l_ang);
-		l_ang += dang;
+	for (iVertex = 0; iVertex < vertexCount; iVertex++) {
+		CurrentFormVertices[iVertex].x = point.x;
+		CurrentFormVertices[iVertex].y = point.y;
+		point.x += length*cos(angle);
+		point.y += length*sin(angle);
+		angle += stepAngle;
 	}
-	cntr.x = (CurrentFormVertices[nsids].x - CurrentFormVertices[0].x) / 2 + CurrentFormVertices[0].x;
-	cntr.y = (CurrentFormVertices[nsids].y - CurrentFormVertices[0].y) / 2 + CurrentFormVertices[0].y;
-	for (ind = 1; ind < tsid; ind += 2) {
-		CurrentFormVertices[ind].x = (CurrentFormVertices[ind].x - cntr.x)*StarRatio + cntr.x;
-		CurrentFormVertices[ind].y = (CurrentFormVertices[ind].y - cntr.y)*StarRatio + cntr.y;
+	center.x = (CurrentFormVertices[starCount].x - CurrentFormVertices[0].x) / 2 + CurrentFormVertices[0].x;
+	center.y = (CurrentFormVertices[starCount].y - CurrentFormVertices[0].y) / 2 + CurrentFormVertices[0].y;
+	for (iVertex = 1; iVertex < vertexCount; iVertex += 2) {
+		CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - center.x)*StarRatio + center.x;
+		CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - center.y)*StarRatio + center.y;
 	}
 	SelectedForm->type = FRMFPOLY;
 	frmout(FormIndex);
 	FormMoveDelta.x = FormMoveDelta.y = 0;
-	NewFormVertexCount = tsid + 1;
+	NewFormVertexCount = vertexCount + 1;
 	setMap(POLIMOV);
 	setmfrm();
 	setMap(SHOFRM);
 	mdufrm();
 }
 
-void duspir(unsigned nsids) {
-	double		dang;
-	double		l_ang = 0;
-	double		len, drat, rat;
-	unsigned	ind, ine, num;
-	dPOINT		pnt;
-	dPOINT		cntr;
-	fPOINT*		tflt;
-	fPOINT*		tdif;
+void duspir(unsigned stepCount) {
+	double		stepAngle;
+	double		angle = 0;
+	double		length, stepRatio, ratio;
+	unsigned	iStep, iVertex, vertexCount;
+	dPOINT		point;
+	dPOINT		center;
+	fPOINT*		firstSpiral;
+	fPOINT*		centeredSpiral;
 
-	if (nsids < 3)
-		nsids = 3;
-	if (nsids > 100)
-		nsids = 100;
-	dang = PI * 2 / nsids;
-	len = 800 / nsids*ZoomFactor*(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+	if (stepCount < 3)
+		stepCount = 3;
+	if (stepCount > 100)
+		stepCount = 100;
+	stepAngle = PI * 2 / stepCount;
+	// ToDo - Why 800?
+	length = 800 / stepCount*ZoomFactor*(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
 	SelectedForm = &FormList[FormIndex];
 	ClosestFormToCursor = FormIndex;
 	frmclr(SelectedForm);
-	num = nsids*SpiralWrap;
-	SelectedForm->vertices = adflt(num);
-	tflt = new fPOINT[nsids];
-	tdif = new fPOINT[nsids];
-	SelectedForm->vertexCount = num;
+	vertexCount = stepCount*SpiralWrap;
+	SelectedForm->vertices = adflt(vertexCount);
+	firstSpiral = new fPOINT[stepCount];
+	centeredSpiral = new fPOINT[stepCount];
+	SelectedForm->vertexCount = vertexCount;
 	SelectedForm->attribute = (ActiveLayer << 1);
 	fvars(FormIndex);
 	px2stch();
-	pnt.x = SelectedPoint.x;
-	pnt.y = SelectedPoint.y;
-	for (ind = 0; ind < nsids; ind++) {
-		tflt[ind].x = pnt.x;
-		tflt[ind].y = pnt.y;
-		pnt.x += len*cos(l_ang);
-		pnt.y += len*sin(l_ang);
-		l_ang += dang;
+	point.x = SelectedPoint.x;
+	point.y = SelectedPoint.y;
+	for (iStep = 0; iStep < stepCount; iStep++) {
+		firstSpiral[iStep].x = point.x;
+		firstSpiral[iStep].y = point.y;
+		point.x += length*cos(angle);
+		point.y += length*sin(angle);
+		angle += stepAngle;
 	}
-	cntr.x = (tflt[nsids >> 1].x - tflt[0].x) / 2 + tflt[0].x;
-	cntr.y = (tflt[nsids >> 1].y - tflt[0].y) / 2 + tflt[0].y;
-	for (ind = 0; ind < nsids; ind++) {
-		tdif[ind].x = tflt[ind].x - cntr.x;
-		tdif[ind].y = tflt[ind].y - cntr.y;
+	center.x = (firstSpiral[stepCount >> 1].x - firstSpiral[0].x) / 2 + firstSpiral[0].x;
+	center.y = (firstSpiral[stepCount >> 1].y - firstSpiral[0].y) / 2 + firstSpiral[0].y;
+	for (iStep = 0; iStep < stepCount; iStep++) {
+		centeredSpiral[iStep].x = firstSpiral[iStep].x - center.x;
+		centeredSpiral[iStep].y = firstSpiral[iStep].y - center.y;
 	}
-	drat = (double)1 / num;
-	rat = drat; ine = 0;
-	for (ind = 0; ind < num; ind++) {
-		SelectedForm->vertices[ine].x = tdif[ine%nsids].x*rat + cntr.x;
-		SelectedForm->vertices[ine].y = tdif[ine%nsids].y*rat + cntr.y;
-		rat += drat;
-		ine++;
+	stepRatio = (double)1 / vertexCount;
+	ratio = stepRatio;
+	for (iVertex = 0; iVertex < vertexCount; iVertex++) {
+		SelectedForm->vertices[iVertex].x = centeredSpiral[iVertex%stepCount].x*ratio + center.x;
+		SelectedForm->vertices[iVertex].y = centeredSpiral[iVertex%stepCount].y*ratio + center.y;
+		ratio += stepRatio;
 	}
 	SelectedForm->type = FRMLINE;
 	frmout(FormIndex);
 	FormMoveDelta.x = FormMoveDelta.y = 0;
-	NewFormVertexCount = num + 1;
+	NewFormVertexCount = vertexCount + 1;
 	setMap(POLIMOV);
 	setmfrm();
 	setMap(SHOFRM);
 	mdufrm();
-	delete[] tflt;
-	delete[] tdif;
+	delete[] firstSpiral;
+	delete[] centeredSpiral;
 }
 
 void duhart(unsigned nsids) {
-	double		dang;
-	double		l_ang;
-	double		len;
+	double		stepAngle;
+	double		angle;
+	double		length;
+	// ToDo - rename ind, ine & bind
 	unsigned	ind, ine, bind;
-	float		av;
-	dPOINT		pnt;
-	double		rat;
+	float		maximumX;
+	dPOINT		point;
+	double		ratio;
 
 	if (nsids > 100)
 		nsids = 100;
@@ -7979,39 +7982,39 @@ void duhart(unsigned nsids) {
 	SelectedForm->attribute = ActiveLayer << 1;
 	CurrentFormVertices = &FormVertices[FormVertexIndex];
 	px2stch();
-	pnt.x = SelectedPoint.x;
-	pnt.y = SelectedPoint.y;
-	dang = PI * 2 / nsids;
-	len = 300 / nsids*ZoomFactor*(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
-	l_ang = PI*0.28;
+	point.x = SelectedPoint.x;
+	point.y = SelectedPoint.y;
+	stepAngle = PI * 2 / nsids;
+	length = 300 / nsids*ZoomFactor*(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+	angle = PI*0.28;
 	ind = 0;
-	av = 0;
-	while (l_ang > -PI*0.7) {
-		if (pnt.x > av)
-			av = pnt.x;
-		CurrentFormVertices[ind].x = pnt.x;
-		CurrentFormVertices[ind++].y = pnt.y;
-		pnt.x += len*cos(l_ang);
-		pnt.y += len*sin(l_ang);
-		l_ang -= dang;
+	maximumX = 0;
+	while (angle > -PI*0.7) {
+		if (point.x > maximumX)
+			maximumX = point.x;
+		CurrentFormVertices[ind].x = point.x;
+		CurrentFormVertices[ind++].y = point.y;
+		point.x += length*cos(angle);
+		point.y += length*sin(angle);
+		angle -= stepAngle;
 	}
-	dang /= 4.5;
+	stepAngle /= 4.5;
 	bind = ind;
-	while (pnt.x > CurrentFormVertices[0].x&&ind < 200) {
-		CurrentFormVertices[ind].x = pnt.x;
-		CurrentFormVertices[ind++].y = pnt.y;
-		pnt.x += len*cos(l_ang);
-		pnt.y += len*sin(l_ang);
-		l_ang -= dang;
+	while (point.x > CurrentFormVertices[0].x&&ind < 200) {
+		CurrentFormVertices[ind].x = point.x;
+		CurrentFormVertices[ind++].y = point.y;
+		point.x += length*cos(angle);
+		point.y += length*sin(angle);
+		angle -= stepAngle;
 	}
 	bind--;
-	rat = (CurrentFormVertices[bind].x - CurrentFormVertices[0].x) / (CurrentFormVertices[bind].x - CurrentFormVertices[ind - 1].x);
+	ratio = (CurrentFormVertices[bind].x - CurrentFormVertices[0].x) / (CurrentFormVertices[bind].x - CurrentFormVertices[ind - 1].x);
 	for (ine = bind + 1; ine < ind; ine++)
-		CurrentFormVertices[ine].x = (CurrentFormVertices[ine].x - CurrentFormVertices[bind].x)*rat + CurrentFormVertices[bind].x;
+		CurrentFormVertices[ine].x = (CurrentFormVertices[ine].x - CurrentFormVertices[bind].x)*ratio + CurrentFormVertices[bind].x;
 	bind = ine;
 	for (ind = bind - 2; ind; ind--) {
 		CurrentFormVertices[ine].y = CurrentFormVertices[ind].y;
-		CurrentFormVertices[ine].x = av + av - CurrentFormVertices[ind].x - 2 * (av - CurrentFormVertices[0].x);
+		CurrentFormVertices[ine].x = maximumX + maximumX - CurrentFormVertices[ind].x - 2 * (maximumX - CurrentFormVertices[0].x);
 		ine++;
 	}
 	NewFormVertexCount = ine + 1;
@@ -8027,23 +8030,25 @@ void duhart(unsigned nsids) {
 	mdufrm();
 }
 
-void dulens(unsigned nsids) {
-	double		dang;
-	double		l_ang;
-	double		len;
-	unsigned	ind, ine, bind, cnt;
+void dulens(unsigned sides) {
+	double		stepAngle;
+	double		angle;
+	double		length;
+	unsigned	ind, ine, bind, count;
 	float		av;
-	dPOINT		pnt;
+	dPOINT		point;
 
-	if (nsids < 6)
-		nsids = 6;
-	if (nsids > 48)
-		nsids = 48;
-	nsids <<= 1;
-	dang = PI * 2 / nsids;
-	cnt = nsids / 2 * 0.3;
-	l_ang = cnt*dang;
-	len = 500 / nsids*ZoomFactor*(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+	// ToDo - this does not produce a consistent size of lens 
+	//        or the correct number of sides
+	if (sides < 6)
+		sides = 6;
+	if (sides > 48)
+		sides = 48;
+	sides <<= 1;
+	stepAngle = PI * 2 / sides;
+	count = sides / 2 * 0.3;
+	angle = count*stepAngle;
+	length = 500 / sides*ZoomFactor*(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
 	SelectedForm = &FormList[FormIndex];
 	ClosestFormToCursor = FormIndex;
 	frmclr(SelectedForm);
@@ -8051,16 +8056,17 @@ void dulens(unsigned nsids) {
 	SelectedForm->attribute = ActiveLayer << 1;
 	fvars(FormIndex);
 	px2stch();
-	pnt.x = SelectedPoint.x;
-	pnt.y = SelectedPoint.y;
+	point.x = SelectedPoint.x;
+	point.y = SelectedPoint.y;
+	// ToDo - rename ind, ine & bind
 	ind = 0;
 	SelectedPoint.x -= (float)0.0001;
-	while (pnt.x >= SelectedPoint.x) {
-		CurrentFormVertices[ind].x = pnt.x;
-		CurrentFormVertices[ind++].y = pnt.y;
-		pnt.x += len*cos(l_ang);
-		pnt.y += len*sin(l_ang);
-		l_ang += dang;
+	while (point.x >= SelectedPoint.x) {
+		CurrentFormVertices[ind].x = point.x;
+		CurrentFormVertices[ind++].y = point.y;
+		point.x += length*cos(angle);
+		point.y += length*sin(angle);
+		angle += stepAngle;
 	}
 	bind = ind - 1;
 	ine = ind;
@@ -8083,65 +8089,65 @@ void dulens(unsigned nsids) {
 	mdufrm();
 }
 
-float shreg(float hi, float ref) {
-	return (hi - ref)*EggRatio + ref;
+float shreg(float highValue, float reference) {
+	return (highValue - reference)*EggRatio + reference;
 }
 
-void dueg(unsigned nsids) {
-	double		ref, hi;
-	unsigned	ind;
+void dueg(unsigned sides) {
+	double		reference, maximumY;
+	unsigned	iVertex;
 
-	if (nsids < 8)
-		nsids = 8;
+	if (sides < 8)
+		sides = 8;
 	fvars(FormIndex);
-	durpoli(nsids);
-	ref = midl(CurrentFormVertices[nsids / 2].y, CurrentFormVertices[0].y);
-	hi = CurrentFormVertices[nsids >> 2].y - CurrentFormVertices[0].y;
-	for (ind = 0; ind < nsids; ind++) {
-		if (CurrentFormVertices[ind].y < ref)
-			CurrentFormVertices[ind].y = ref - (ref - CurrentFormVertices[ind].y)*IniFile.eggRatio;
+	durpoli(sides);
+	reference = midl(CurrentFormVertices[sides / 2].y, CurrentFormVertices[0].y);
+	maximumY = CurrentFormVertices[sides >> 2].y - CurrentFormVertices[0].y;
+	for (iVertex = 0; iVertex < sides; iVertex++) {
+		if (CurrentFormVertices[iVertex].y < reference)
+			CurrentFormVertices[iVertex].y = reference - (reference - CurrentFormVertices[iVertex].y)*IniFile.eggRatio;
 	}
-	EggRatio = hi / (CurrentFormVertices[nsids >> 2].y - CurrentFormVertices[0].y);
-	for (ind = 1; ind < VertexCount; ind++) {
-		CurrentFormVertices[ind].x = shreg(CurrentFormVertices[ind].x, CurrentFormVertices[0].x);
-		CurrentFormVertices[ind].y = shreg(CurrentFormVertices[ind].y, CurrentFormVertices[0].y);
+	EggRatio = maximumY / (CurrentFormVertices[sides >> 2].y - CurrentFormVertices[0].y);
+	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
+		CurrentFormVertices[iVertex].x = shreg(CurrentFormVertices[iVertex].x, CurrentFormVertices[0].x);
+		CurrentFormVertices[iVertex].y = shreg(CurrentFormVertices[iVertex].y, CurrentFormVertices[0].y);
 	}
 }
 
-void duzig(unsigned nsids) {
-	fPOINT		off;
-	unsigned	ind;
+void duzig(unsigned vertices) {
+	fPOINT		offset;
+	unsigned	iVertex;
 
-	if (nsids < 3)
-		nsids = 3;
-	if (nsids > 100)
-		nsids = 100;
+	if (vertices < 3)
+		vertices = 3;
+	if (vertices > 100)
+		vertices = 100;
 	SelectedForm = &FormList[FormIndex];
 	ClosestFormToCursor = FormIndex;
 	frmclr(SelectedForm);
-	SelectedForm->vertices = adflt(nsids);
-	SelectedForm->vertexCount = nsids;
+	SelectedForm->vertices = adflt(vertices);
+	SelectedForm->vertexCount = vertices;
 	SelectedForm->attribute = ActiveLayer << 1;
 	fvars(FormIndex);
 	px2stch();
 	SelectedPoint.x;
 	SelectedPoint.y;
-	off.x = UnzoomedRect.x / 6;
-	off.y = UnzoomedRect.y / (6 * nsids);
-	for (ind = 0; ind < nsids; ind++) {
-		CurrentFormVertices[ind].x = SelectedPoint.x;
-		CurrentFormVertices[ind].y = SelectedPoint.y;
-		SelectedPoint.y -= off.y;
-		if (ind & 1)
-			SelectedPoint.x += off.x;
+	offset.x = UnzoomedRect.x / 6;
+	offset.y = UnzoomedRect.y / (6 * vertices);
+	for (iVertex = 0; iVertex < vertices; iVertex++) {
+		CurrentFormVertices[iVertex].x = SelectedPoint.x;
+		CurrentFormVertices[iVertex].y = SelectedPoint.y;
+		SelectedPoint.y -= offset.y;
+		if (iVertex & 1)
+			SelectedPoint.x += offset.x;
 		else
-			SelectedPoint.x -= off.x;
+			SelectedPoint.x -= offset.x;
 	}
 	SelectedForm->type = FRMLINE;
 	ClosestFormToCursor = FormIndex;
 	frmout(FormIndex);
 	FormMoveDelta.x = FormMoveDelta.y = 0;
-	NewFormVertexCount = nsids + 1;
+	NewFormVertexCount = vertices + 1;
 	setMap(POLIMOV);
 	setmfrm();
 	setMap(SHOFRM);
@@ -8149,31 +8155,31 @@ void duzig(unsigned nsids) {
 }
 
 void fliph() {
-	unsigned	ind, ine;
-	float		av = 0;
-	fRECTANGLE		trct;
+	unsigned	iForm, iVertex, iStitch, currentVertex, decodedForm;
+	float		midpoint = 0;
+	fRECTANGLE	rectangle;
 
 	fvars(ClosestFormToCursor);
 	if (chkMap(FPSEL)) {
 		savdo();
-		av = (SelectedVerticesRect.right - SelectedVerticesRect.left)*0.5 + SelectedVerticesRect.left;
-		ine = SelectedFormVertices.start;
-		for (ind = 0; ind <= SelectedFormVertices.vertexCount; ind++) {
-			CurrentFormVertices[ine].x = av + av - CurrentFormVertices[ine].x;
-			ine = pdir(ine);
+		midpoint = (SelectedVerticesRect.right - SelectedVerticesRect.left)*0.5 + SelectedVerticesRect.left;
+		currentVertex = SelectedFormVertices.start;
+		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
+			CurrentFormVertices[currentVertex].x = midpoint + midpoint - CurrentFormVertices[currentVertex].x;
+			currentVertex = pdir(currentVertex);
 		}
 		setMap(RESTCH);
 		return;
 	}
 	if (chkMap(BIGBOX)) {
-		av = (AllItemsRect.right - AllItemsRect.left) / 2 + AllItemsRect.left;
-		for (ind = 0; ind < FormVertexIndex; ind++)
-			FormVertices[ind].x = av + av - FormVertices[ind].x;
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++)
-			StitchBuffer[ind].x = av + av - StitchBuffer[ind].x;
-		for (ind = 0; ind < FormIndex; ind++) {
-			FormList[ind].rectangle.left = av + av - FormList[ind].rectangle.left;
-			FormList[ind].rectangle.right = av + av - FormList[ind].rectangle.right;
+		midpoint = (AllItemsRect.right - AllItemsRect.left) / 2 + AllItemsRect.left;
+		for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
+			FormVertices[iVertex].x = midpoint + midpoint - FormVertices[iVertex].x;
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
+			StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
+		for (iForm = 0; iForm < FormIndex; iForm++) {
+			FormList[iForm].rectangle.left = midpoint + midpoint - FormList[iForm].rectangle.left;
+			FormList[iForm].rectangle.right = midpoint + midpoint - FormList[iForm].rectangle.right;
 		}
 		setMap(RESTCH);
 		return;
@@ -8181,32 +8187,32 @@ void fliph() {
 	if (SelectedFormCount) {
 		savdo();
 		clRmap((FormIndex >> 5) + 1);
-		pxrct2stch(SelectedFormsRect, &trct);
-		av = (trct.right - trct.left) / 2 + trct.left;
-		for (ind = 0; ind < SelectedFormCount; ind++) {
-			ClosestFormToCursor = SelectedFormList[ind];
+		pxrct2stch(SelectedFormsRect, &rectangle);
+		midpoint = (rectangle.right - rectangle.left) / 2 + rectangle.left;
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+			ClosestFormToCursor = SelectedFormList[iForm];
 			setr(ClosestFormToCursor);
 			fvars(ClosestFormToCursor);
-			for (ine = 0; ine < SelectedForm->vertexCount; ine++)
-				CurrentFormVertices[ine].x = av + av - CurrentFormVertices[ine].x;
+			for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++)
+				CurrentFormVertices[iVertex].x = midpoint + midpoint - CurrentFormVertices[iVertex].x;
 			frmout(ClosestFormToCursor);
 		}
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-			ine = (StitchBuffer[ind].attribute&FRMSK) >> FRMSHFT;
-			if (chkr(ine) && !(StitchBuffer[ind].attribute&NOTFRM))
-				StitchBuffer[ind].x = av + av - StitchBuffer[ind].x;
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+			decodedForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
+			if (chkr(decodedForm) && !(StitchBuffer[iStitch].attribute&NOTFRM))
+				StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
 		}
 		setMap(RESTCH);
 	}
 	else {
 		if (chkMap(FORMSEL)) {
 			savdo();
-			av = (SelectedForm->rectangle.right - SelectedForm->rectangle.left) / 2 + SelectedForm->rectangle.left;
-			for (ind = 0; ind < VertexCount; ind++)
-				CurrentFormVertices[ind].x = av + av - CurrentFormVertices[ind].x;
-			for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-				if ((StitchBuffer[ind].attribute&FRMSK) >> FRMSHFT == ClosestFormToCursor && !(StitchBuffer[ind].attribute&NOTFRM))
-					StitchBuffer[ind].x = av + av - StitchBuffer[ind].x;
+			midpoint = (SelectedForm->rectangle.right - SelectedForm->rectangle.left) / 2 + SelectedForm->rectangle.left;
+			for (iVertex = 0; iVertex < VertexCount; iVertex++)
+				CurrentFormVertices[iVertex].x = midpoint + midpoint - CurrentFormVertices[iVertex].x;
+			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+				if ((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT == ClosestFormToCursor && !(StitchBuffer[iStitch].attribute&NOTFRM))
+					StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
 			}
 			frmout(ClosestFormToCursor);
 			setMap(RESTCH);
@@ -8215,10 +8221,10 @@ void fliph() {
 			if (chkMap(GRPSEL)) {
 				savdo();
 				rngadj();
-				selRct(&trct);
-				av = (trct.right - trct.left) / 2 + trct.left;
-				for (ind = GroupStartStitch; ind <= GroupEndStitch; ind++)
-					StitchBuffer[ind].x = av + av - StitchBuffer[ind].x;
+				selRct(&rectangle);
+				midpoint = (rectangle.right - rectangle.left) / 2 + rectangle.left;
+				for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++)
+					StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
 				setMap(RESTCH);
 			}
 		}
@@ -8226,32 +8232,32 @@ void fliph() {
 }
 
 void flipv() {
-	unsigned	ind, ine;
-	float		av = 0;
-	fRECTANGLE		trct;
+	unsigned	iForm, iStitch, iVertex, currentVertex, decodedForm;
+	float		midpoint = 0;
+	fRECTANGLE	rectangle;
 
 	fvars(ClosestFormToCursor);
 	if (chkMap(FPSEL)) {
 		savdo();
-		av = (SelectedVerticesRect.top - SelectedVerticesRect.bottom)*0.5 + SelectedVerticesRect.bottom;
-		ine = SelectedFormVertices.start;
-		for (ind = 0; ind <= SelectedFormVertices.vertexCount; ind++) {
-			CurrentFormVertices[ine].y = av + av - CurrentFormVertices[ine].y;
-			ine = pdir(ine);
+		midpoint = (SelectedVerticesRect.top - SelectedVerticesRect.bottom)*0.5 + SelectedVerticesRect.bottom;
+		currentVertex = SelectedFormVertices.start;
+		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
+			CurrentFormVertices[currentVertex].y = midpoint + midpoint - CurrentFormVertices[currentVertex].y;
+			currentVertex = pdir(currentVertex);
 		}
 		setMap(RESTCH);
 		return;
 	}
 	if (chkMap(BIGBOX)) {
 		savdo();
-		av = (AllItemsRect.top - AllItemsRect.bottom) / 2 + AllItemsRect.bottom;
-		for (ind = 0; ind < FormVertexIndex; ind++)
-			FormVertices[ind].y = av + av - FormVertices[ind].y;
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++)
-			StitchBuffer[ind].y = av + av - StitchBuffer[ind].y;
-		for (ind = 0; ind < FormIndex; ind++) {
-			FormList[ind].rectangle.bottom = av + av - FormList[ind].rectangle.bottom;
-			FormList[ind].rectangle.top = av + av - FormList[ind].rectangle.top;
+		midpoint = (AllItemsRect.top - AllItemsRect.bottom) / 2 + AllItemsRect.bottom;
+		for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
+			FormVertices[iVertex].y = midpoint + midpoint - FormVertices[iVertex].y;
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
+			StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
+		for (iForm = 0; iForm < FormIndex; iForm++) {
+			FormList[iForm].rectangle.bottom = midpoint + midpoint - FormList[iForm].rectangle.bottom;
+			FormList[iForm].rectangle.top = midpoint + midpoint - FormList[iForm].rectangle.top;
 		}
 		setMap(RESTCH);
 		return;
@@ -8259,32 +8265,32 @@ void flipv() {
 	if (SelectedFormCount) {
 		savdo();
 		clRmap((FormIndex >> 5) + 1);
-		pxrct2stch(SelectedFormsRect, &trct);
-		av = (trct.top - trct.bottom) / 2 + trct.bottom;
-		for (ind = 0; ind < SelectedFormCount; ind++) {
-			ClosestFormToCursor = SelectedFormList[ind];
+		pxrct2stch(SelectedFormsRect, &rectangle);
+		midpoint = (rectangle.top - rectangle.bottom) / 2 + rectangle.bottom;
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+			ClosestFormToCursor = SelectedFormList[iForm];
 			setr(ClosestFormToCursor);
 			fvars(ClosestFormToCursor);
-			for (ine = 0; ine < SelectedForm->vertexCount; ine++)
-				CurrentFormVertices[ine].y = av + av - CurrentFormVertices[ine].y;
+			for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++)
+				CurrentFormVertices[iVertex].y = midpoint + midpoint - CurrentFormVertices[iVertex].y;
 			frmout(ClosestFormToCursor);
 		}
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-			ine = (StitchBuffer[ind].attribute&FRMSK) >> FRMSHFT;
-			if (chkr(ine) && !(StitchBuffer[ind].attribute&NOTFRM))
-				StitchBuffer[ind].y = av + av - StitchBuffer[ind].y;
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+			decodedForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
+			if (chkr(decodedForm) && !(StitchBuffer[iStitch].attribute&NOTFRM))
+				StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
 		}
 		setMap(RESTCH);
 	}
 	else {
 		if (chkMap(FORMSEL)) {
 			savdo();
-			av = (SelectedForm->rectangle.top - SelectedForm->rectangle.bottom) / 2 + SelectedForm->rectangle.bottom;
-			for (ind = 0; ind < VertexCount; ind++)
-				CurrentFormVertices[ind].y = av + av - CurrentFormVertices[ind].y;
-			for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-				if ((StitchBuffer[ind].attribute&FRMSK) >> FRMSHFT == ClosestFormToCursor && !(StitchBuffer[ind].attribute&NOTFRM))
-					StitchBuffer[ind].y = av + av - StitchBuffer[ind].y;
+			midpoint = (SelectedForm->rectangle.top - SelectedForm->rectangle.bottom) / 2 + SelectedForm->rectangle.bottom;
+			for (iVertex = 0; iVertex < VertexCount; iVertex++)
+				CurrentFormVertices[iVertex].y = midpoint + midpoint - CurrentFormVertices[iVertex].y;
+			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+				if ((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT == ClosestFormToCursor && !(StitchBuffer[iStitch].attribute&NOTFRM))
+					StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
 			}
 			frmout(ClosestFormToCursor);
 			setMap(RESTCH);
@@ -8293,10 +8299,10 @@ void flipv() {
 			if (chkMap(GRPSEL)) {
 				savdo();
 				rngadj();
-				selRct(&trct);
-				av = (trct.top - trct.bottom) / 2 + trct.bottom;
-				for (ind = GroupStartStitch; ind <= GroupEndStitch; ind++)
-					StitchBuffer[ind].y = av + av - StitchBuffer[ind].y;
+				selRct(&rectangle);
+				midpoint = (rectangle.top - rectangle.bottom) / 2 + rectangle.bottom;
+				for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++)
+					StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
 				setMap(RESTCH);
 			}
 		}
@@ -8304,412 +8310,395 @@ void flipv() {
 }
 
 void tomsg() {
-	RECT	okrct;
-	SIZE	tsiz;
+	RECT	OKrect;
+	SIZE	textSize;
 
-	GetWindowRect(OKButton, &okrct);
-	GetTextExtentPoint32(StitchWindowMemDC, StringTable[STR_DELST2], strlen(StringTable[STR_DELST2]), &tsiz);
+	GetWindowRect(OKButton, &OKrect);
+	GetTextExtentPoint32(StitchWindowMemDC, StringTable[STR_DELST2], strlen(StringTable[STR_DELST2]), &textSize);
 	DeleteStitchesDialog = CreateWindow(
 		"STATIC",
 		StringTable[STR_DELST2],
 		SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		3,
-		okrct.bottom - StitchWindowOrigin.y + 6 + tsiz.cy,
-		tsiz.cx + 6,
-		tsiz.cy + 6,
+		OKrect.bottom - StitchWindowOrigin.y + 6 + textSize.cy,
+		textSize.cx + 6,
+		textSize.cy + 6,
 		MainStitchWin,
 		NULL,
 		ThrEdInstance,
 		NULL);
 }
 
-void sprct(unsigned strt, unsigned fin) {
-	dPOINT	dif, tpnt;
-	VRCT2*	tvrct;
+void sprct(unsigned start, unsigned finish) {
+	dPOINT	delta, point;
+	VRCT2*	verticalRect;
 
-	tvrct = &FillVerticalRect[strt];
-	dif.x = OutsidePoints[fin].x - OutsidePoints[strt].x;
-	dif.y = OutsidePoints[fin].y - OutsidePoints[strt].y;
-	if (dif.x&&dif.y) {
-		Slope = -dif.x / dif.y;
-		tpnt.x = CurrentFormVertices[fin].x;
-		tpnt.y = CurrentFormVertices[fin].y;
-		proj(tpnt, Slope, OutsidePoints[strt], OutsidePoints[fin], &tvrct->dopnt);
-		proj(tpnt, Slope, InsidePoints[strt], InsidePoints[fin], &tvrct->dipnt);
-		tpnt.x = CurrentFormVertices[strt].x;
-		tpnt.y = CurrentFormVertices[strt].y;
-		proj(tpnt, Slope, OutsidePoints[strt], OutsidePoints[fin], &tvrct->aopnt);
-		proj(tpnt, Slope, InsidePoints[strt], InsidePoints[fin], &tvrct->aipnt);
-		tpnt.x = InsidePoints[strt].x;
-		tpnt.y = InsidePoints[strt].y;
-		if (proj(tpnt, Slope, OutsidePoints[strt], OutsidePoints[fin], &tvrct->bopnt)) {
-			tvrct->bipnt.x = InsidePoints[strt].x;
-			tvrct->bipnt.y = InsidePoints[strt].y;
+	verticalRect = &FillVerticalRect[start];
+	delta.x = OutsidePoints[finish].x - OutsidePoints[start].x;
+	delta.y = OutsidePoints[finish].y - OutsidePoints[start].y;
+	if (delta.x&&delta.y) {
+		Slope = -delta.x / delta.y;
+		point.x = CurrentFormVertices[finish].x;
+		point.y = CurrentFormVertices[finish].y;
+		proj(point, Slope, OutsidePoints[start], OutsidePoints[finish], &verticalRect->dopnt);
+		proj(point, Slope, InsidePoints[start], InsidePoints[finish], &verticalRect->dipnt);
+		point.x = CurrentFormVertices[start].x;
+		point.y = CurrentFormVertices[start].y;
+		proj(point, Slope, OutsidePoints[start], OutsidePoints[finish], &verticalRect->aopnt);
+		proj(point, Slope, InsidePoints[start], InsidePoints[finish], &verticalRect->aipnt);
+		point.x = InsidePoints[start].x;
+		point.y = InsidePoints[start].y;
+		if (proj(point, Slope, OutsidePoints[start], OutsidePoints[finish], &verticalRect->bopnt)) {
+			verticalRect->bipnt.x = InsidePoints[start].x;
+			verticalRect->bipnt.y = InsidePoints[start].y;
 		}
 		else {
-			tvrct->bopnt.x = OutsidePoints[strt].x;
-			tvrct->bopnt.y = OutsidePoints[strt].y;
-			tpnt.x = OutsidePoints[strt].x;
-			tpnt.y = OutsidePoints[strt].y;
-			proj(tpnt, Slope, InsidePoints[strt], InsidePoints[fin], &tvrct->bipnt);
+			verticalRect->bopnt.x = OutsidePoints[start].x;
+			verticalRect->bopnt.y = OutsidePoints[start].y;
+			point.x = OutsidePoints[start].x;
+			point.y = OutsidePoints[start].y;
+			proj(point, Slope, InsidePoints[start], InsidePoints[finish], &verticalRect->bipnt);
 		}
-		tpnt.x = InsidePoints[fin].x;
-		tpnt.y = InsidePoints[fin].y;
-		if (proj(tpnt, Slope, OutsidePoints[strt], OutsidePoints[fin], &tvrct->copnt)) {
-			tvrct->cipnt.x = InsidePoints[fin].x;
-			tvrct->cipnt.y = InsidePoints[fin].y;
+		point.x = InsidePoints[finish].x;
+		point.y = InsidePoints[finish].y;
+		if (proj(point, Slope, OutsidePoints[start], OutsidePoints[finish], &verticalRect->copnt)) {
+			verticalRect->cipnt.x = InsidePoints[finish].x;
+			verticalRect->cipnt.y = InsidePoints[finish].y;
 		}
 		else {
-			tvrct->copnt.x = OutsidePoints[fin].x;
-			tvrct->copnt.y = OutsidePoints[fin].y;
-			tpnt.x = OutsidePoints[fin].x;
-			tpnt.y = OutsidePoints[fin].y;
-			proj(tpnt, Slope, InsidePoints[strt], InsidePoints[fin], &tvrct->cipnt);
+			verticalRect->copnt.x = OutsidePoints[finish].x;
+			verticalRect->copnt.y = OutsidePoints[finish].y;
+			point.x = OutsidePoints[finish].x;
+			point.y = OutsidePoints[finish].y;
+			proj(point, Slope, InsidePoints[start], InsidePoints[finish], &verticalRect->cipnt);
 		}
 	}
 	else {
-		if (dif.x) {
-			tpnt.x = CurrentFormVertices[fin].x;
-			projv(tpnt.x, OutsidePoints[strt], OutsidePoints[fin], &tvrct->dopnt);
-			projv(tpnt.x, InsidePoints[strt], InsidePoints[fin], &tvrct->dipnt);
-			tpnt.x = CurrentFormVertices[strt].x;
-			projv(tpnt.x, OutsidePoints[strt], OutsidePoints[fin], &tvrct->aopnt);
-			projv(tpnt.x, InsidePoints[strt], InsidePoints[fin], &tvrct->aipnt);
-			tpnt.x = InsidePoints[strt].x;
-			if (projv(tpnt.x, OutsidePoints[strt], OutsidePoints[fin], &tvrct->bopnt)) {
-				tvrct->bipnt.x = InsidePoints[strt].x;
-				tvrct->bipnt.y = InsidePoints[strt].y;
+		if (delta.x) {
+			point.x = CurrentFormVertices[finish].x;
+			projv(point.x, OutsidePoints[start], OutsidePoints[finish], &verticalRect->dopnt);
+			projv(point.x, InsidePoints[start], InsidePoints[finish], &verticalRect->dipnt);
+			point.x = CurrentFormVertices[start].x;
+			projv(point.x, OutsidePoints[start], OutsidePoints[finish], &verticalRect->aopnt);
+			projv(point.x, InsidePoints[start], InsidePoints[finish], &verticalRect->aipnt);
+			point.x = InsidePoints[start].x;
+			if (projv(point.x, OutsidePoints[start], OutsidePoints[finish], &verticalRect->bopnt)) {
+				verticalRect->bipnt.x = InsidePoints[start].x;
+				verticalRect->bipnt.y = InsidePoints[start].y;
 			}
 			else {
-				tvrct->bopnt.x = OutsidePoints[strt].x;
-				tvrct->bopnt.y = OutsidePoints[strt].y;
-				tpnt.x = OutsidePoints[strt].x;
-				projv(tpnt.x, InsidePoints[strt], InsidePoints[fin], &tvrct->bipnt);
+				verticalRect->bopnt.x = OutsidePoints[start].x;
+				verticalRect->bopnt.y = OutsidePoints[start].y;
+				point.x = OutsidePoints[start].x;
+				projv(point.x, InsidePoints[start], InsidePoints[finish], &verticalRect->bipnt);
 			}
-			tpnt.x = InsidePoints[fin].x;
-			if (projv(tpnt.x, OutsidePoints[strt], OutsidePoints[fin], &tvrct->copnt)) {
-				tvrct->cipnt.x = InsidePoints[fin].x;
-				tvrct->cipnt.y = InsidePoints[fin].y;
+			point.x = InsidePoints[finish].x;
+			if (projv(point.x, OutsidePoints[start], OutsidePoints[finish], &verticalRect->copnt)) {
+				verticalRect->cipnt.x = InsidePoints[finish].x;
+				verticalRect->cipnt.y = InsidePoints[finish].y;
 			}
 			else {
-				tvrct->copnt.x = OutsidePoints[fin].x;
-				tvrct->copnt.y = OutsidePoints[fin].y;
-				tpnt.x = OutsidePoints[fin].x;
-				projv(tpnt.x, InsidePoints[strt], InsidePoints[fin], &tvrct->cipnt);
+				verticalRect->copnt.x = OutsidePoints[finish].x;
+				verticalRect->copnt.y = OutsidePoints[finish].y;
+				point.x = OutsidePoints[finish].x;
+				projv(point.x, InsidePoints[start], InsidePoints[finish], &verticalRect->cipnt);
 			}
 		}
 		else {
-			tpnt.y = CurrentFormVertices[fin].y;
-			projh(tpnt.y, OutsidePoints[strt], OutsidePoints[fin], &tvrct->dopnt);
-			projh(tpnt.y, InsidePoints[strt], InsidePoints[fin], &tvrct->dipnt);
-			tpnt.y = CurrentFormVertices[strt].y;
-			projh(tpnt.y, OutsidePoints[strt], OutsidePoints[fin], &tvrct->aopnt);
-			projh(tpnt.y, InsidePoints[strt], InsidePoints[fin], &tvrct->aipnt);
-			tpnt.y = InsidePoints[strt].y;
-			if (projh(tpnt.y, OutsidePoints[strt], OutsidePoints[fin], &tvrct->bopnt)) {
-				tvrct->bipnt.x = InsidePoints[strt].x;
-				tvrct->bipnt.y = InsidePoints[strt].y;
+			point.y = CurrentFormVertices[finish].y;
+			projh(point.y, OutsidePoints[start], OutsidePoints[finish], &verticalRect->dopnt);
+			projh(point.y, InsidePoints[start], InsidePoints[finish], &verticalRect->dipnt);
+			point.y = CurrentFormVertices[start].y;
+			projh(point.y, OutsidePoints[start], OutsidePoints[finish], &verticalRect->aopnt);
+			projh(point.y, InsidePoints[start], InsidePoints[finish], &verticalRect->aipnt);
+			point.y = InsidePoints[start].y;
+			if (projh(point.y, OutsidePoints[start], OutsidePoints[finish], &verticalRect->bopnt)) {
+				verticalRect->bipnt.x = InsidePoints[start].x;
+				verticalRect->bipnt.y = InsidePoints[start].y;
 			}
 			else {
-				tvrct->bopnt.x = OutsidePoints[strt].x;
-				tvrct->bopnt.y = OutsidePoints[strt].y;
-				tpnt.y = OutsidePoints[strt].y;
-				projh(tpnt.y, InsidePoints[strt], InsidePoints[fin], &tvrct->bipnt);
+				verticalRect->bopnt.x = OutsidePoints[start].x;
+				verticalRect->bopnt.y = OutsidePoints[start].y;
+				point.y = OutsidePoints[start].y;
+				projh(point.y, InsidePoints[start], InsidePoints[finish], &verticalRect->bipnt);
 			}
-			tpnt.y = InsidePoints[fin].y;
-			if (projh(tpnt.y, OutsidePoints[strt], OutsidePoints[fin], &tvrct->copnt)) {
-				tvrct->cipnt.x = InsidePoints[fin].x;
-				tvrct->cipnt.y = InsidePoints[fin].y;
+			point.y = InsidePoints[finish].y;
+			if (projh(point.y, OutsidePoints[start], OutsidePoints[finish], &verticalRect->copnt)) {
+				verticalRect->cipnt.x = InsidePoints[finish].x;
+				verticalRect->cipnt.y = InsidePoints[finish].y;
 			}
 			else {
-				tvrct->copnt.x = OutsidePoints[fin].x;
-				tvrct->copnt.y = OutsidePoints[fin].y;
-				tpnt.y = OutsidePoints[fin].y;
-				projh(OutsidePoints[fin].y, InsidePoints[strt], InsidePoints[fin], &tvrct->cipnt);
+				verticalRect->copnt.x = OutsidePoints[finish].x;
+				verticalRect->copnt.y = OutsidePoints[finish].y;
+				point.y = OutsidePoints[finish].y;
+				projh(OutsidePoints[finish].y, InsidePoints[start], InsidePoints[finish], &verticalRect->cipnt);
 			}
 		}
 	}
 }
 
-void spurfn(dPOINT* ipnt, dPOINT* p_opnt, dPOINT* uipnt, dPOINT* uopnt) {
-	dPOINT	dif;
+void spurfn(dPOINT* innerPoint, dPOINT* outerPoint, dPOINT* underlayInnerPoint, dPOINT* underlayOuterPoint) {
+	dPOINT	delta;
 
-	dif.x = p_opnt->x - ipnt->x;
-	dif.y = p_opnt->y - ipnt->y;
-	uipnt->x = dif.x*DIURAT + ipnt->x;
-	uipnt->y = dif.y*DIURAT + ipnt->y;
-	uopnt->x = dif.x*DOURAT + ipnt->x;
-	uopnt->y = dif.y*DOURAT + ipnt->y;
+	delta.x = outerPoint->x - innerPoint->x;
+	delta.y = outerPoint->y - innerPoint->y;
+	underlayInnerPoint->x = delta.x*DIURAT + innerPoint->x;
+	underlayInnerPoint->y = delta.y*DIURAT + innerPoint->y;
+	underlayOuterPoint->x = delta.x*DOURAT + innerPoint->x;
+	underlayOuterPoint->y = delta.y*DOURAT + innerPoint->y;
 }
 
-void spurct(unsigned ind) {
-	spurfn(&FillVerticalRect[ind].aipnt, &FillVerticalRect[ind].aopnt, &UnderlayVerticalRect[ind].aipnt, &UnderlayVerticalRect[ind].aopnt);
-	spurfn(&FillVerticalRect[ind].bipnt, &FillVerticalRect[ind].bopnt, &UnderlayVerticalRect[ind].bipnt, &UnderlayVerticalRect[ind].bopnt);
-	spurfn(&FillVerticalRect[ind].cipnt, &FillVerticalRect[ind].copnt, &UnderlayVerticalRect[ind].cipnt, &UnderlayVerticalRect[ind].copnt);
-	spurfn(&FillVerticalRect[ind].dipnt, &FillVerticalRect[ind].dopnt, &UnderlayVerticalRect[ind].dipnt, &UnderlayVerticalRect[ind].dopnt);
+void spurct(unsigned iRect) {
+	spurfn(&FillVerticalRect[iRect].aipnt, &FillVerticalRect[iRect].aopnt, &UnderlayVerticalRect[iRect].aipnt, &UnderlayVerticalRect[iRect].aopnt);
+	spurfn(&FillVerticalRect[iRect].bipnt, &FillVerticalRect[iRect].bopnt, &UnderlayVerticalRect[iRect].bipnt, &UnderlayVerticalRect[iRect].bopnt);
+	spurfn(&FillVerticalRect[iRect].cipnt, &FillVerticalRect[iRect].copnt, &UnderlayVerticalRect[iRect].cipnt, &UnderlayVerticalRect[iRect].copnt);
+	spurfn(&FillVerticalRect[iRect].dipnt, &FillVerticalRect[iRect].dopnt, &UnderlayVerticalRect[iRect].dipnt, &UnderlayVerticalRect[iRect].dopnt);
 }
 
 unsigned psg() {
-	unsigned tmp;
+	unsigned temp;
 
 	if (!PseudoRandomValue)
 		PseudoRandomValue = SEED;
-	tmp = PseudoRandomValue & 0x48000000;
+	temp = PseudoRandomValue & 0x48000000;
 	PseudoRandomValue <<= 1;
-	if (tmp == 0x40000000 || tmp == 0x8000000)
+	if (temp == 0x40000000 || temp == 0x8000000)
 		PseudoRandomValue++;
 	return PseudoRandomValue;
 }
 
-void duromb(dPOINT strt0, dPOINT fin0, dPOINT strt1, dPOINT fin1) {
-	dPOINT		dif0, dif1, stp0, stp1;
-	double		len0, len1;
-	unsigned	cnt, ind;
+void duromb(dPOINT start0, dPOINT finish0, dPOINT start1, dPOINT finish1) {
+	dPOINT		delta0, delta1, step0, step1;
+	double		length0, length1;
+	unsigned	count, iStep;
 
 	if (!chkMap(UND)) {
-		dif0.x = SelectedPoint.x - strt0.x;
-		dif0.y = SelectedPoint.y - strt0.y;
-		dif1.x = SelectedPoint.x - strt1.x;
-		dif1.y = SelectedPoint.y - strt1.y;
-		len0 = hypot(dif0.x, dif0.y);
-		len1 = hypot(dif1.x, dif1.y);
-		if (len0 > len1)
+		delta0.x = SelectedPoint.x - start0.x;
+		delta0.y = SelectedPoint.y - start0.y;
+		delta1.x = SelectedPoint.x - start1.x;
+		delta1.y = SelectedPoint.y - start1.y;
+		length0 = hypot(delta0.x, delta0.y);
+		length1 = hypot(delta1.x, delta1.y);
+		if (length0 > length1)
 			setMap(FILDIR);
 		else
 			rstMap(FILDIR);
 	}
-	dif0.x = fin0.x - strt0.x;
-	dif0.y = fin0.y - strt0.y;
-	dif1.x = fin1.x - strt1.x;
-	dif1.y = fin1.y - strt1.y;
-	len0 = hypot(dif0.x, dif0.y);
-	cnt = len0 / (StitchSpacing / 2);
-	if (!cnt)
-		cnt++;
-	stp0.x = dif0.x / cnt;
-	stp0.y = dif0.y / cnt;
-	stp1.x = dif1.x / cnt;
-	stp1.y = dif1.y / cnt;
-	for (ind = 0; ind < cnt; ind++) {
+	delta0.x = finish0.x - start0.x;
+	delta0.y = finish0.y - start0.y;
+	delta1.x = finish1.x - start1.x;
+	delta1.y = finish1.y - start1.y;
+	length0 = hypot(delta0.x, delta0.y);
+	count = length0 / (StitchSpacing / 2);
+	if (!count)
+		count++;
+	step0.x = delta0.x / count;
+	step0.y = delta0.y / count;
+	step1.x = delta1.x / count;
+	step1.y = delta1.y / count;
+	for (iStep = 0; iStep < count; iStep++) {
 		if (toglMap(FILDIR))
-			filinsb(strt0);
+			filinsb(start0);
 		else
-			filinsb(strt1);
-		strt0.x += stp0.x;
-		strt0.y += stp0.y;
-		strt1.x += stp1.x;
-		strt1.y += stp1.y;
+			filinsb(start1);
+		start0.x += step0.x;
+		start0.y += step0.y;
+		start1.x += step1.x;
+		start1.y += step1.y;
 	}
 }
 
-void spend(unsigned strt, unsigned fin) {
-	double		ilen, olen;
-	dPOINT		idif, odif;
-	double		sang, fang, dang, stang;
-	dPOINT		sdif, fdif;
-	dPOINT		piv;
-	double		rad, arc, irad;
-	unsigned	ind, cnt, lvl;
-	dPOINT		ipnt, l_opnt;
+void spend(unsigned start, unsigned finish) {
+	double		innerLength, outerLength;
+	dPOINT		innerDelta, outerDelta;
+	double		startAngle, finishAngle, deltaAngle, stepAngle;
+	dPOINT		startDelta, finishDelta;
+	dPOINT		pivot;
+	double		radius, arc, innerRadius;
+	unsigned	ind, count, level;
+	dPOINT		innerPoint, outerPoint;
 
-	idif.x = FillVerticalRect[fin].cipnt.x - FillVerticalRect[strt].bipnt.x;
-	idif.y = FillVerticalRect[fin].cipnt.y - FillVerticalRect[strt].bipnt.y;
-	odif.x = FillVerticalRect[fin].copnt.x - FillVerticalRect[strt].bopnt.x;
-	odif.y = FillVerticalRect[fin].copnt.y - FillVerticalRect[strt].bopnt.y;
-	ilen = hypot(idif.x, idif.y);
-	olen = hypot(odif.x, odif.y);
-	if (olen > ilen) {
-		piv.x = FillVerticalRect[strt].cipnt.x;
-		piv.y = FillVerticalRect[strt].cipnt.y;
-		sdif.x = FillVerticalRect[strt].copnt.x - piv.x;
-		sdif.y = FillVerticalRect[strt].copnt.y - piv.y;
-		fdif.x = FillVerticalRect[fin].bopnt.x - piv.x;
-		fdif.y = FillVerticalRect[fin].bopnt.y - piv.y;
+	innerDelta.x = FillVerticalRect[finish].cipnt.x - FillVerticalRect[start].bipnt.x;
+	innerDelta.y = FillVerticalRect[finish].cipnt.y - FillVerticalRect[start].bipnt.y;
+	outerDelta.x = FillVerticalRect[finish].copnt.x - FillVerticalRect[start].bopnt.x;
+	outerDelta.y = FillVerticalRect[finish].copnt.y - FillVerticalRect[start].bopnt.y;
+	innerLength = hypot(innerDelta.x, innerDelta.y);
+	outerLength = hypot(outerDelta.x, outerDelta.y);
+	if (outerLength > innerLength) {
+		pivot.x = FillVerticalRect[start].cipnt.x;
+		pivot.y = FillVerticalRect[start].cipnt.y;
+		startDelta.x = FillVerticalRect[start].copnt.x - pivot.x;
+		startDelta.y = FillVerticalRect[start].copnt.y - pivot.y;
+		finishDelta.x = FillVerticalRect[finish].bopnt.x - pivot.x;
+		finishDelta.y = FillVerticalRect[finish].bopnt.y - pivot.y;
 	}
 	else {
-		piv.x = FillVerticalRect[strt].copnt.x;
-		piv.y = FillVerticalRect[strt].copnt.y;
-		sdif.x = FillVerticalRect[strt].cipnt.x - piv.x;
-		sdif.y = FillVerticalRect[strt].cipnt.y - piv.y;
-		fdif.x = FillVerticalRect[fin].bipnt.x - piv.x;
-		fdif.y = FillVerticalRect[fin].bipnt.y - piv.y;
+		pivot.x = FillVerticalRect[start].copnt.x;
+		pivot.y = FillVerticalRect[start].copnt.y;
+		startDelta.x = FillVerticalRect[start].cipnt.x - pivot.x;
+		startDelta.y = FillVerticalRect[start].cipnt.y - pivot.y;
+		finishDelta.x = FillVerticalRect[finish].bipnt.x - pivot.x;
+		finishDelta.y = FillVerticalRect[finish].bipnt.y - pivot.y;
 	}
-	if (hypot(SelectedPoint.x - piv.x, SelectedPoint.y - piv.y) > 2 * PI)
-		filinsb(piv);
-	sang = atan2(sdif.y, sdif.x);
-	fang = atan2(fdif.y, fdif.x);
-	dang = fang - sang;
-	if (dang > PI)
-		dang -= 2 * PI;
-	if (dang < -PI)
-		dang += 2 * PI;
-	rad = hypot(sdif.x, sdif.y);
-	arc = fabs(rad*dang);
-	cnt = arc / StitchSpacing;
-	stang = dang / cnt;
-	if (!cnt)
-		cnt = 1;
-	for (ind = 0; ind < cnt; ind++) {
-		l_opnt.x = piv.x + cos(sang)*rad;
-		l_opnt.y = piv.y + sin(sang)*rad;
-		filinsb(l_opnt);
-		if (cnt & 0xfffffff0)
-			lvl = psg() % cnt;
+	if (hypot(SelectedPoint.x - pivot.x, SelectedPoint.y - pivot.y) > 2 * PI)
+		filinsb(pivot);
+	startAngle = atan2(startDelta.y, startDelta.x);
+	finishAngle = atan2(finishDelta.y, finishDelta.x);
+	deltaAngle = finishAngle - startAngle;
+	if (deltaAngle > PI)
+		deltaAngle -= 2 * PI;
+	if (deltaAngle < -PI)
+		deltaAngle += 2 * PI;
+	radius = hypot(startDelta.x, startDelta.y);
+	arc = fabs(radius*deltaAngle);
+	count = arc / StitchSpacing;
+	stepAngle = deltaAngle / count;
+	if (!count)
+		count = 1;
+	for (ind = 0; ind < count; ind++) {
+		outerPoint.x = pivot.x + cos(startAngle)*radius;
+		outerPoint.y = pivot.y + sin(startAngle)*radius;
+		filinsb(outerPoint);
+		if (count & 0xfffffff0)
+			level = psg() % count;
 		else
-			lvl = Levels[cnt][ind];
-		irad = rad*lvl / cnt*0.4;
-		ipnt.x = piv.x + cos(sang)*irad;
-		ipnt.y = piv.y + sin(sang)*irad;
-		filinsb(ipnt);
-		sang += stang;
+			level = Levels[count][ind];
+		innerRadius = radius*level / count*0.4;
+		innerPoint.x = pivot.x + cos(startAngle)*innerRadius;
+		innerPoint.y = pivot.y + sin(startAngle)*innerRadius;
+		filinsb(innerPoint);
+		startAngle += stepAngle;
 	}
 }
 
-void duspnd(unsigned strt, unsigned fin) {
-	double	len, tang;
-	dPOINT	tpnt, dif;
+void duspnd(unsigned start, unsigned finish) {
+	double	length, angle;
+	dPOINT	point, delta;
 
 	if (chkMap(UND)) {
 		if (chkMap(UNDPHAS)) {
-			filinsb(UnderlayVerticalRect[strt].copnt);
-			filinsb(UnderlayVerticalRect[strt].cipnt);
-			dif.x = UnderlayVerticalRect[fin].bipnt.x - UnderlayVerticalRect[strt].cipnt.x;
-			dif.y = UnderlayVerticalRect[fin].bipnt.y - UnderlayVerticalRect[strt].cipnt.y;
-			len = hypot(dif.x, dif.y);
-			if (len > SelectedForm->edgeStitchLen) {
-				tang = atan2(InsidePoints[fin].y - OutsidePoints[fin].y, InsidePoints[fin].x - OutsidePoints[fin].x);
-				tpnt.x = UnderlayVerticalRect[fin].bopnt.x + cos(tang)*HorizontalLength2;
-				tpnt.y = UnderlayVerticalRect[fin].bopnt.y + sin(tang)*HorizontalLength2;
-				filinsb(tpnt);
+			filinsb(UnderlayVerticalRect[start].copnt);
+			filinsb(UnderlayVerticalRect[start].cipnt);
+			delta.x = UnderlayVerticalRect[finish].bipnt.x - UnderlayVerticalRect[start].cipnt.x;
+			delta.y = UnderlayVerticalRect[finish].bipnt.y - UnderlayVerticalRect[start].cipnt.y;
+			length = hypot(delta.x, delta.y);
+			if (length > SelectedForm->edgeStitchLen) {
+				angle = atan2(InsidePoints[finish].y - OutsidePoints[finish].y, InsidePoints[finish].x - OutsidePoints[finish].x);
+				point.x = UnderlayVerticalRect[finish].bopnt.x + cos(angle)*HorizontalLength2;
+				point.y = UnderlayVerticalRect[finish].bopnt.y + sin(angle)*HorizontalLength2;
+				filinsb(point);
 			}
-			filinsb(UnderlayVerticalRect[fin].bipnt);
-			filinsb(UnderlayVerticalRect[fin].bopnt);
+			filinsb(UnderlayVerticalRect[finish].bipnt);
+			filinsb(UnderlayVerticalRect[finish].bopnt);
 		}
 		else {
-			filinsb(UnderlayVerticalRect[strt].cipnt);
-			filinsb(UnderlayVerticalRect[strt].copnt);
-			dif.x = UnderlayVerticalRect[fin].bopnt.x - UnderlayVerticalRect[strt].copnt.x;
-			dif.y = UnderlayVerticalRect[fin].bopnt.y - UnderlayVerticalRect[strt].copnt.y;
-			len = hypot(dif.x, dif.y);
-			if (len > SelectedForm->edgeStitchLen) {
-				tang = atan2(OutsidePoints[fin].y - InsidePoints[fin].y, OutsidePoints[fin].x - InsidePoints[fin].x);
-				tpnt.x = UnderlayVerticalRect[fin].bipnt.x + cos(tang)*HorizontalLength2;
-				tpnt.y = UnderlayVerticalRect[fin].bipnt.y + sin(tang)*HorizontalLength2;
-				filinsb(tpnt);
+			filinsb(UnderlayVerticalRect[start].cipnt);
+			filinsb(UnderlayVerticalRect[start].copnt);
+			delta.x = UnderlayVerticalRect[finish].bopnt.x - UnderlayVerticalRect[start].copnt.x;
+			delta.y = UnderlayVerticalRect[finish].bopnt.y - UnderlayVerticalRect[start].copnt.y;
+			length = hypot(delta.x, delta.y);
+			if (length > SelectedForm->edgeStitchLen) {
+				angle = atan2(OutsidePoints[finish].y - InsidePoints[finish].y, OutsidePoints[finish].x - InsidePoints[finish].x);
+				point.x = UnderlayVerticalRect[finish].bipnt.x + cos(angle)*HorizontalLength2;
+				point.y = UnderlayVerticalRect[finish].bipnt.y + sin(angle)*HorizontalLength2;
+				filinsb(point);
 			}
-			filinsb(UnderlayVerticalRect[fin].bopnt);
-			filinsb(UnderlayVerticalRect[fin].bipnt);
+			filinsb(UnderlayVerticalRect[finish].bopnt);
+			filinsb(UnderlayVerticalRect[finish].bipnt);
 		}
 	}
 	else
-		spend(strt, fin);
+		spend(start, finish);
 }
 
-void pfn(unsigned strtlin, VRCT2* vrct) {
-	unsigned		ind;
-	unsigned short	nlin;
+void pfn(unsigned startVertex, VRCT2* vrct) {
+	unsigned		iVertex;
+	unsigned short	nextVertex, currentVertex = startVertex;
 
-	SelectedPoint.x = CurrentFormVertices[strtlin].x;
-	SelectedPoint.y = CurrentFormVertices[strtlin].y;
-	nlin = nxt(strtlin);
-	for (ind = 0; ind < SelectedForm->vertexCount; ind++) {
-		duromb(vrct[strtlin].bipnt, vrct[strtlin].cipnt, vrct[strtlin].bopnt, vrct[strtlin].copnt);
-		duspnd(strtlin, nlin);
-		strtlin = nlin;
-		nlin = nxt(nlin);
+	SelectedPoint.x = CurrentFormVertices[startVertex].x;
+	SelectedPoint.y = CurrentFormVertices[startVertex].y;
+	nextVertex = nxt(currentVertex);
+	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+		duromb(vrct[currentVertex].bipnt, vrct[currentVertex].cipnt, vrct[currentVertex].bopnt, vrct[currentVertex].copnt);
+		duspnd(currentVertex, nextVertex);
+		currentVertex = nextVertex;
+		nextVertex = nxt(nextVertex);
 	}
 }
 
 void plfn(VRCT2* prct) {
-	unsigned	ind;
+	unsigned	iVertex;
 
 	duromb(prct[1].aipnt, prct[1].cipnt, prct[1].aopnt, prct[1].copnt);
 	duspnd(1, 2);
-	for (ind = 2; ind < (unsigned)VertexCount - 4; ind++) {
-		duromb(prct[ind].bipnt, prct[ind].cipnt, prct[ind].bopnt, prct[ind].copnt);
-		duspnd(ind, ind + 1);
+	for (iVertex = 2; iVertex < (unsigned)VertexCount - 4; iVertex++) {
+		duromb(prct[iVertex].bipnt, prct[iVertex].cipnt, prct[iVertex].bopnt, prct[iVertex].copnt);
+		duspnd(iVertex, iVertex + 1);
 	}
 	duromb(prct[VertexCount - 4].bipnt, prct[VertexCount - 4].dipnt, prct[VertexCount - 4].bopnt, prct[VertexCount - 4].dopnt);
 }
 
 void prsmal() {
-	unsigned	ind, ine, ref;
-	double		lSize, len;
-	dPOINT		dif;
+	unsigned	iSequence, iOutput = 0, iReference = 0;
+	double		minimumLength, length;
+	dPOINT		delta;
 
-	ref = 0; ine = 0;
-	lSize = USPAC*0.8;
-	if (lSize > HorizontalLength2)
-		lSize = HorizontalLength2*0.9;
-	for (ind = 1; ind < SequenceIndex; ind++) {
-		dif.x = OSequence[ind].x - OSequence[ref].x;
-		dif.y = OSequence[ind].y - OSequence[ref].y;
-		len = hypot(dif.x, dif.y);
-		if (len > lSize) {
-			OSequence[ine].x = OSequence[ind].x;
-			OSequence[ine++].y = OSequence[ind].y;
-			ref = ind;
+	minimumLength = USPAC*0.8;
+	if (minimumLength > HorizontalLength2)
+		minimumLength = HorizontalLength2*0.9;
+	for (iSequence = 1; iSequence < SequenceIndex; iSequence++) {
+		delta.x = OSequence[iSequence].x - OSequence[iReference].x;
+		delta.y = OSequence[iSequence].y - OSequence[iReference].y;
+		length = hypot(delta.x, delta.y);
+		if (length > minimumLength) {
+			OSequence[iOutput].x = OSequence[iSequence].x;
+			OSequence[iOutput++].y = OSequence[iSequence].y;
+			iReference = iSequence;
 		}
 	}
-	SequenceIndex = ine;
+	SequenceIndex = iOutput;
 }
 
-void plbak(unsigned bpnt) {
-	unsigned	ind = SequenceIndex - 1;
+void plbak(unsigned backPoint) {
+	unsigned	iSequence = SequenceIndex - 1;
 	fPOINT		tflt;
 
-	while (ind > bpnt) {
-		tflt.x = OSequence[ind].x;
-		tflt.y = OSequence[ind].y;
-		OSequence[ind].x = OSequence[bpnt].x;
-		OSequence[ind].y = OSequence[bpnt].y;
-		OSequence[bpnt].x = tflt.x;
-		OSequence[bpnt].y = tflt.y;
-		ind--; bpnt++;
+	while (iSequence > backPoint) {
+		tflt.x = OSequence[iSequence].x;
+		tflt.y = OSequence[iSequence].y;
+		OSequence[iSequence].x = OSequence[backPoint].x;
+		OSequence[iSequence].y = OSequence[backPoint].y;
+		OSequence[backPoint].x = tflt.x;
+		OSequence[backPoint].y = tflt.y;
+		iSequence--; backPoint++;
 	}
-}
-
-void plvct(unsigned pind, dPOINT* vp0, dPOINT* vp1, double len)
-{
-	double l_angl;
-	double len2;
-	fPOINT vct;
-
-	len2 = len / 2;
-	l_angl = atan2(CurrentFormVertices[pind + 1].y - CurrentFormVertices[pind].y, CurrentFormVertices[pind + 1].x - CurrentFormVertices[pind].x) + PI / 2;
-	vct.x = cos(l_angl)*len2;
-	vct.y = sin(l_angl)*len2;
-	vp0->x = CurrentFormVertices[pind].x + vct.x;
-	vp0->y = CurrentFormVertices[pind].y + vct.y;
-	vp1->x = CurrentFormVertices[pind].x - vct.x;
-	vp1->y = CurrentFormVertices[pind].y - vct.y;
 }
 
 void prebrd()
 {
-	fPOINT dif;
-	double rat;
+	fPOINT delta;
+	double ratio;
 
 	MoveMemory(&AngledFormVertices[1], CurrentFormVertices, sizeof(fPOINT)*VertexCount);
-	dif.x = CurrentFormVertices[1].x - CurrentFormVertices[0].x;
-	dif.y = CurrentFormVertices[1].y - CurrentFormVertices[0].y;
-	if (fabs(dif.x) > fabs(dif.y))
-		rat = fabs(0.1 / dif.x);
+	delta.x = CurrentFormVertices[1].x - CurrentFormVertices[0].x;
+	delta.y = CurrentFormVertices[1].y - CurrentFormVertices[0].y;
+	if (fabs(delta.x) > fabs(delta.y))
+		ratio = fabs(0.1 / delta.x);
 	else
-		rat = fabs(0.1 / dif.y);
-	AngledFormVertices[0].x = CurrentFormVertices[0].x - dif.x*rat;
-	AngledFormVertices[0].y = CurrentFormVertices[0].y - dif.y*rat;
+		ratio = fabs(0.1 / delta.y);
+	AngledFormVertices[0].x = CurrentFormVertices[0].x - delta.x*ratio;
+	AngledFormVertices[0].y = CurrentFormVertices[0].y - delta.y*ratio;
 	MoveMemory(&AngledForm, SelectedForm, sizeof(FRMHED));
 	AngledForm.vertices = AngledFormVertices;
 	AngledForm.vertexCount += 3;
-	dif.x = CurrentFormVertices[VertexCount - 1].x - CurrentFormVertices[VertexCount - 2].x;
-	dif.y = CurrentFormVertices[VertexCount - 1].y - CurrentFormVertices[VertexCount - 2].y;
-	if (dif.x > dif.y)
-		rat = 0.1 / dif.x;
+	delta.x = CurrentFormVertices[VertexCount - 1].x - CurrentFormVertices[VertexCount - 2].x;
+	delta.y = CurrentFormVertices[VertexCount - 1].y - CurrentFormVertices[VertexCount - 2].y;
+	if (delta.x > delta.y)
+		ratio = 0.1 / delta.x;
 	else
-		rat = 0.1 / dif.y;
-	AngledFormVertices[AngledForm.vertexCount - 1].x = CurrentFormVertices[VertexCount - 1].x + dif.x*rat;
-	AngledFormVertices[AngledForm.vertexCount - 1].y = CurrentFormVertices[VertexCount - 1].y + dif.y*rat;
+		ratio = 0.1 / delta.y;
+	AngledFormVertices[AngledForm.vertexCount - 1].x = CurrentFormVertices[VertexCount - 1].x + delta.x*ratio;
+	AngledFormVertices[AngledForm.vertexCount - 1].y = CurrentFormVertices[VertexCount - 1].y + delta.y*ratio;
 	SelectedForm = &AngledForm;
 	VertexCount = AngledForm.vertexCount;
 	CurrentFormVertices = AngledForm.vertices;
