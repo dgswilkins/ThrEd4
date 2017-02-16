@@ -393,7 +393,7 @@ unsigned		CurrentSide;			//active form formOrigin for line clipboard fill
 dPOINT			Vector0;				//x size of the clipboard fill at the fill angle
 FRMHED*			TempFormList;			//temporary form header storage for reordering forms
 fPOINT*			TempFormVertices;		//temporary form vertex storage for reordering forms
-SATCON*			TempSatinConnects;		//temporary satin guidline storage for reordering forms
+SATCON*			TempGuides;				//temporary satin guideline storage for reordering forms
 fPOINT*			TempClipPoints;			//temporary clipboard formOrigin storage for reordering forms
 unsigned		FormRelocationIndex;	//form relocator pointer
 fPOINTATTR*		TempStitchBuffer;		//pointer to high stitch area for form sort
@@ -10585,91 +10585,92 @@ void contfil() {
 }
 
 void ribon() {
-	FRMHED*		tfrm;
-	unsigned	ind, fpnt, clobak;
+	FRMHED*		formHeader;
+	unsigned	iVertex, iGuide, isBlunt, iNewVertex, savedFormIndex;
 
 	frm1pnt();
 	if (chkMap(FORMSEL)) {
 		fvars(ClosestFormToCursor);
 		if (VertexCount > 2) {
 			savdo();
-			clobak = ClosestFormToCursor;
+			savedFormIndex = ClosestFormToCursor;
 			satout(BorderWidth);
 
 			HorizontalLength2 = BorderWidth / 2;
-			tfrm = &FormList[FormIndex];
-			frmclr(tfrm);
-			fpnt = 0;
-			tfrm->maxFillStitchLen = 9 * PFGRAN;
-			tfrm->minFillStitchLen = MinStitchLength;
+			formHeader = &FormList[FormIndex];
+			frmclr(formHeader);
+			iNewVertex = 0;
+			formHeader->maxFillStitchLen = 9 * PFGRAN;
+			formHeader->minFillStitchLen = MinStitchLength;
 			MaxStitchLen = 9 * PFGRAN;
 			if (SelectedForm->type == FRMLINE) {
+				// ToDo - convert isBlunt to BOOL
 				if (chku(BLUNT))
-					ind = 0xffffffff;
+					isBlunt = 0xffffffff;
 				else
-					ind = 0;
-				satends(ind);
-				tfrm->vertices = adflt(VertexCount << 1);
-				tfrm->vertices[0].x = OutsidePoints[0].x;
-				tfrm->vertices[fpnt++].y = OutsidePoints[0].y;
-				for (ind = 0; ind < VertexCount; ind++) {
-					tfrm->vertices[fpnt].x = InsidePoints[ind].x;
-					tfrm->vertices[fpnt++].y = InsidePoints[ind].y;
+					isBlunt = 0;
+				satends(isBlunt);
+				formHeader->vertices = adflt(VertexCount << 1);
+				formHeader->vertices[0].x = OutsidePoints[0].x;
+				formHeader->vertices[iNewVertex++].y = OutsidePoints[0].y;
+				for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+					formHeader->vertices[iNewVertex].x = InsidePoints[iVertex].x;
+					formHeader->vertices[iNewVertex++].y = InsidePoints[iVertex].y;
 				}
-				for (ind = VertexCount - 1; ind; ind--) {
-					tfrm->vertices[fpnt].x = OutsidePoints[ind].x;
-					tfrm->vertices[fpnt++].y = OutsidePoints[ind].y;
+				for (iVertex = VertexCount - 1; iVertex; iVertex--) {
+					formHeader->vertices[iNewVertex].x = OutsidePoints[iVertex].x;
+					formHeader->vertices[iNewVertex++].y = OutsidePoints[iVertex].y;
 				}
 			}
 			else {
-				tfrm->vertices = adflt((VertexCount << 1) + 2);
-				tfrm->vertices[0].x = OutsidePoints[0].x;
-				tfrm->vertices[fpnt++].y = OutsidePoints[0].y;
-				tfrm->underlayIndent = IniFile.underlayIndent;
-				for (ind = 0; ind < VertexCount; ind++) {
-					tfrm->vertices[fpnt].x = InsidePoints[ind].x;
-					tfrm->vertices[fpnt++].y = InsidePoints[ind].y;
+				formHeader->vertices = adflt((VertexCount << 1) + 2);
+				formHeader->vertices[0].x = OutsidePoints[0].x;
+				formHeader->vertices[iNewVertex++].y = OutsidePoints[0].y;
+				formHeader->underlayIndent = IniFile.underlayIndent;
+				for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+					formHeader->vertices[iNewVertex].x = InsidePoints[iVertex].x;
+					formHeader->vertices[iNewVertex++].y = InsidePoints[iVertex].y;
 				}
-				tfrm->vertices[fpnt].x = InsidePoints[0].x;
-				tfrm->vertices[fpnt++].y = InsidePoints[0].y;
-				tfrm->vertices[fpnt].x = OutsidePoints[0].x;
-				tfrm->vertices[fpnt++].y = OutsidePoints[0].y;
-				for (ind = VertexCount - 1; ind; ind--) {
-					tfrm->vertices[fpnt].x = OutsidePoints[ind].x;
-					tfrm->vertices[fpnt++].y = OutsidePoints[ind].y;
+				formHeader->vertices[iNewVertex].x = InsidePoints[0].x;
+				formHeader->vertices[iNewVertex++].y = InsidePoints[0].y;
+				formHeader->vertices[iNewVertex].x = OutsidePoints[0].x;
+				formHeader->vertices[iNewVertex++].y = OutsidePoints[0].y;
+				for (iVertex = VertexCount - 1; iVertex; iVertex--) {
+					formHeader->vertices[iNewVertex].x = OutsidePoints[iVertex].x;
+					formHeader->vertices[iNewVertex++].y = OutsidePoints[iVertex].y;
 				}
 			}
-			tfrm->type = SAT;
-			tfrm->fillColor = ActiveColor;
-			tfrm->fillSpacing = StitchSpacing;
-			tfrm->lengthOrCount.stitchLength = IniFile.maxStitchLength;
-			tfrm->vertexCount = fpnt;
-			tfrm->attribute = 1;
-			tfrm->wordParam = fpnt >> 1;
-			tfrm->satinGuideCount = tfrm->wordParam - 2;
-			tfrm->satinOrAngle.guide = adsatk(tfrm->satinGuideCount);
+			formHeader->type = SAT;
+			formHeader->fillColor = ActiveColor;
+			formHeader->fillSpacing = StitchSpacing;
+			formHeader->lengthOrCount.stitchLength = IniFile.maxStitchLength;
+			formHeader->vertexCount = iNewVertex;
+			formHeader->attribute = 1;
+			formHeader->wordParam = iNewVertex >> 1;
+			formHeader->satinGuideCount = formHeader->wordParam - 2;
+			formHeader->satinOrAngle.guide = adsatk(formHeader->satinGuideCount);
 			if (chkMap(CNV2FTH)) {
-				tfrm->fillType = FTHF;
-				tfrm->fillInfo.feather.ratio = IniFile.featherRatio;
-				tfrm->fillInfo.feather.upCount = IniFile.featherUpCount;
-				tfrm->fillInfo.feather.downCount = IniFile.featherDownCount;
-				tfrm->fillInfo.feather.fillType = IniFile.featherFillType;
-				tfrm->fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
-				tfrm->extendedAttribute = IniFile.featherType;
-				tfrm->fillInfo.feather.count = IniFile.featherCount;
-				tfrm->fillInfo.feather.color = (ActiveColor + 1)&COLMSK;
+				formHeader->fillType = FTHF;
+				formHeader->fillInfo.feather.ratio = IniFile.featherRatio;
+				formHeader->fillInfo.feather.upCount = IniFile.featherUpCount;
+				formHeader->fillInfo.feather.downCount = IniFile.featherDownCount;
+				formHeader->fillInfo.feather.fillType = IniFile.featherFillType;
+				formHeader->fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
+				formHeader->extendedAttribute = IniFile.featherType;
+				formHeader->fillInfo.feather.count = IniFile.featherCount;
+				formHeader->fillInfo.feather.color = (ActiveColor + 1)&COLMSK;
 			}
 			else
-				tfrm->fillType = SATF;
-			for (ind = 0; ind < tfrm->satinGuideCount; ind++) {
-				tfrm->satinOrAngle.guide[ind].start = ind + 2;
-				tfrm->satinOrAngle.guide[ind].finish = tfrm->vertexCount - ind - 1;
+				formHeader->fillType = SATF;
+			for (iGuide = 0; iGuide < formHeader->satinGuideCount; iGuide++) {
+				formHeader->satinOrAngle.guide[iGuide].start = iGuide + 2;
+				formHeader->satinOrAngle.guide[iGuide].finish = formHeader->vertexCount - iGuide - 1;
 			}
 			FormIndex++;
 			frmout(FormIndex - 1);
 			ClosestFormToCursor = FormIndex - 1;
 			refilfn();
-			ClosestFormToCursor = clobak;
+			ClosestFormToCursor = savedFormIndex;
 			setMap(DELTO);
 			frmdel();
 			ClosestFormToCursor = FormIndex - 1;
@@ -10718,35 +10719,36 @@ void bakdup() {
 }
 
 void shrnks() {
-	unsigned	ind, ine, cnt;
-	dPOINT		dif;
-	double		len, rat, dlen, adif;
+	unsigned	iVertex, ine, count;
+	dPOINT		delta;
+	double		length, ratio, deltaLength, truncationDelta;
 
 	oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
-	for (ind = 0; ind < (unsigned)VertexCount - 1; ind++) {
-		dif.x = CurrentFormVertices[ind + 1].x - CurrentFormVertices[ind].x;
-		dif.y = CurrentFormVertices[ind + 1].y - CurrentFormVertices[ind].y;
-		len = hypot(dif.x, dif.y);
-		cnt = len / ClipRectSize.cx + 0.5;
-		rat = (ClipRectSize.cx*cnt + 0.004) / len;
-		CurrentFormVertices[ind + 1].x = CurrentFormVertices[ind].x + dif.x*rat;
-		CurrentFormVertices[ind + 1].y = CurrentFormVertices[ind].y + dif.y*rat;
+	for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+		delta.x = CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x;
+		delta.y = CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y;
+		length = hypot(delta.x, delta.y);
+		count = length / ClipRectSize.cx + 0.5;
+		ratio = (ClipRectSize.cx*count + 0.004) / length;
+		CurrentFormVertices[iVertex + 1].x = CurrentFormVertices[iVertex].x + delta.x*ratio;
+		CurrentFormVertices[iVertex + 1].y = CurrentFormVertices[iVertex].y + delta.y*ratio;
 	}
-	dif.x = CurrentFormVertices[0].x - CurrentFormVertices[1].x;
-	dif.y = CurrentFormVertices[0].y - CurrentFormVertices[1].y;
-	len = hypot(dif.x, dif.y);
-	RotationAngle = atan2(dif.y, dif.x);
+	delta.x = CurrentFormVertices[0].x - CurrentFormVertices[1].x;
+	delta.y = CurrentFormVertices[0].y - CurrentFormVertices[1].y;
+	length = hypot(delta.x, delta.y);
+	RotationAngle = atan2(delta.y, delta.x);
+	// ToDo - what does this loop do?
 	for (ine = 0; ine < 5; ine++) {
-		dif.x = CurrentFormVertices[0].x - CurrentFormVertices[ind].x;
-		dif.y = CurrentFormVertices[0].y - CurrentFormVertices[ind].y;
-		dlen = hypot(dif.x, dif.y);
-		cnt = dlen / ClipRectSize.cx;
-		adif = dlen - cnt*ClipRectSize.cx;
-		RotationAngle -= adif / len;
-		dif.x = cos(RotationAngle)*len;
-		dif.y = sin(RotationAngle)*len;
-		CurrentFormVertices[0].x = CurrentFormVertices[1].x + dif.x;
-		CurrentFormVertices[0].y = CurrentFormVertices[1].y + dif.y;
+		delta.x = CurrentFormVertices[0].x - CurrentFormVertices[iVertex].x;
+		delta.y = CurrentFormVertices[0].y - CurrentFormVertices[iVertex].y;
+		deltaLength = hypot(delta.x, delta.y);
+		count = deltaLength / ClipRectSize.cx;
+		truncationDelta = deltaLength - count*ClipRectSize.cx;
+		RotationAngle -= truncationDelta / length;
+		delta.x = cos(RotationAngle)*length;
+		delta.y = sin(RotationAngle)*length;
+		CurrentFormVertices[0].x = CurrentFormVertices[1].x + delta.x;
+		CurrentFormVertices[0].y = CurrentFormVertices[1].y + delta.y;
 	}
 	refil();
 }
@@ -10778,39 +10780,39 @@ void mvfrms(FRMHED* destination, FRMHED* source, unsigned count) {
 #endif
 }
 
-void dufdat(unsigned find) {
-	FRMHED* dst;
-	FRMHED* src;
+void dufdat(unsigned formIndex) {
+	FRMHED* destination;
+	FRMHED* source;
 
-	dst = &TempFormList[FormRelocationIndex++];
-	src = &FormList[find];
-	mvfrms(dst, src, 1);
-	mvflpnt(&TempFormVertices[FormVertexIndex], dst->vertices, dst->vertexCount);
-	dst->vertices = &FormVertices[FormVertexIndex];
-	FormVertexIndex += dst->vertexCount;
-	if (dst->satinGuideCount) {
-		mvsatk(&TempSatinConnects[SatinConnectIndex], dst->satinOrAngle.guide, dst->satinGuideCount);
-		dst->satinOrAngle.guide = &SatinConnects[SatinConnectIndex];
-		SatinConnectIndex += dst->satinGuideCount;
+	destination = &TempFormList[FormRelocationIndex++];
+	source = &FormList[formIndex];
+	mvfrms(destination, source, 1);
+	mvflpnt(&TempFormVertices[FormVertexIndex], destination->vertices, destination->vertexCount);
+	destination->vertices = &FormVertices[FormVertexIndex];
+	FormVertexIndex += destination->vertexCount;
+	if (destination->satinGuideCount) {
+		mvsatk(&TempGuides[SatinConnectIndex], destination->satinOrAngle.guide, destination->satinGuideCount);
+		destination->satinOrAngle.guide = &SatinConnects[SatinConnectIndex];
+		SatinConnectIndex += destination->satinGuideCount;
 	}
-	if (iseclpx(find))
+	if (iseclpx(formIndex))
 	{
-		mvflpnt(&TempClipPoints[ClipPointIndex], dst->borderClipData, dst->clipEntries);
-		dst->borderClipData = &ClipPoints[ClipPointIndex];
-		ClipPointIndex += dst->clipEntries;
+		mvflpnt(&TempClipPoints[ClipPointIndex], destination->borderClipData, destination->clipEntries);
+		destination->borderClipData = &ClipPoints[ClipPointIndex];
+		ClipPointIndex += destination->clipEntries;
 	}
-	if (isclpx(find))
+	if (isclpx(formIndex))
 	{
-		mvflpnt(&TempClipPoints[ClipPointIndex], dst->angleOrClipData.clip, dst->lengthOrCount.clipCount);
-		dst->angleOrClipData.clip = &ClipPoints[ClipPointIndex];
-		ClipPointIndex += dst->lengthOrCount.clipCount;
+		mvflpnt(&TempClipPoints[ClipPointIndex], destination->angleOrClipData.clip, destination->lengthOrCount.clipCount);
+		destination->angleOrClipData.clip = &ClipPoints[ClipPointIndex];
+		ClipPointIndex += destination->lengthOrCount.clipCount;
 	}
 }
 
-void stchfrm(unsigned fnum, unsigned* attribute) {
+void stchfrm(unsigned formIndex, unsigned* attribute) {
 #if	 __UseASM__
 	_asm {
-		mov		eax, fnum
+		mov		eax, formIndex
 		shl		eax, FRMSHFT
 		mov		ebx, attribute
 		mov		ecx, [ebx]
@@ -10820,57 +10822,58 @@ void stchfrm(unsigned fnum, unsigned* attribute) {
 	}
 #else
 	*attribute &= NFRMSK;
-	*attribute |= fnum << FRMSHFT;
+	*attribute |= formIndex << FRMSHFT;
 #endif
 }
 
-void frmnumfn(unsigned nunum) {
-	unsigned	ind, srcpnt, strt, fin, cod;
+void frmnumfn(unsigned newFormIndex) {
+	unsigned	iForm, iStitch, sourceForm, start, finish, decodedFormIndex;
 
-	if (nunum != ClosestFormToCursor) {
-		if (ClosestFormToCursor > nunum) {
-			strt = nunum;
-			fin = ClosestFormToCursor;
+	if (newFormIndex != ClosestFormToCursor) {
+		if (ClosestFormToCursor > newFormIndex) {
+			start = newFormIndex;
+			finish = ClosestFormToCursor;
 		}
 		else {
-			strt = ClosestFormToCursor;
-			fin = nunum;
+			start = ClosestFormToCursor;
+			finish = newFormIndex;
 		}
-		srcpnt = FormRelocationIndex = 0;
+		sourceForm = FormRelocationIndex = 0;
+		// ToDo - Allocate memory locally for TempFormList, TempFormVertices, TempGuides, TempClipPoints
 		TempFormList = (FRMHED*)&BSequence;
 		TempFormVertices = (fPOINT*)&TempFormList[FormIndex];
-		TempSatinConnects = (SATCON*)&OSequence;
-		TempClipPoints = (fPOINT*)&TempSatinConnects[SatinConnectIndex];
+		TempGuides = (SATCON*)&OSequence;
+		TempClipPoints = (fPOINT*)&TempGuides[SatinConnectIndex];
 		FormVertexIndex = SatinConnectIndex = ClipPointIndex = 0;
-		for (ind = 0; ind < FormIndex; ind++) {
-			if (ind == nunum)
+		for (iForm = 0; iForm < FormIndex; iForm++) {
+			if (iForm == newFormIndex)
 				dufdat(ClosestFormToCursor);
 			else {
-				if (srcpnt == ClosestFormToCursor)
-					srcpnt++;
-				dufdat(srcpnt++);
+				if (sourceForm == ClosestFormToCursor)
+					sourceForm++;
+				dufdat(sourceForm++);
 			}
 		}
 		mvfrms(FormList, TempFormList, FormIndex);
 		mvflpnt(FormVertices, TempFormVertices, FormVertexIndex);
-		mvsatk(SatinConnects, TempSatinConnects, SatinConnectIndex);
+		mvsatk(SatinConnects, TempGuides, SatinConnectIndex);
 		mvflpnt(ClipPoints, TempClipPoints, ClipPointIndex);
-		for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-			if (StitchBuffer[ind].attribute&TYPMSK) {
-				cod = (StitchBuffer[ind].attribute&FRMSK) >> FRMSHFT;
-				if (cod == ClosestFormToCursor)
-					stchfrm(nunum, &StitchBuffer[ind].attribute);
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+			if (StitchBuffer[iStitch].attribute&TYPMSK) {
+				decodedFormIndex = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
+				if (decodedFormIndex == ClosestFormToCursor)
+					stchfrm(newFormIndex, &StitchBuffer[iStitch].attribute);
 				else {
-					if (cod >= strt&&cod <= fin) {
-						if (nunum < ClosestFormToCursor)
-							stchfrm(cod + 1, &StitchBuffer[ind].attribute);
+					if (decodedFormIndex >= start&&decodedFormIndex <= finish) {
+						if (newFormIndex < ClosestFormToCursor)
+							stchfrm(decodedFormIndex + 1, &StitchBuffer[iStitch].attribute);
 						else
-							stchfrm(cod - 1, &StitchBuffer[ind].attribute);
+							stchfrm(decodedFormIndex - 1, &StitchBuffer[iStitch].attribute);
 					}
 				}
 			}
 		}
-		ClosestFormToCursor = nunum;
+		ClosestFormToCursor = newFormIndex;
 		ritnum(STR_NUMFRM, ClosestFormToCursor);
 	}
 }
