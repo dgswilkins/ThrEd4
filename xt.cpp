@@ -998,19 +998,19 @@ fPOINT* insid()
 
 void delwlk(unsigned code)
 {
-	unsigned	iStitch, ine;
+	unsigned	iStitch, stitchCount;
 	fPOINTATTR*	highStitchBuffer;
 	BOOL		flag;
 
-	ine = 0;
+	stitchCount = 0;
 	flag = 1;
 	highStitchBuffer = &StitchBuffer[MAXSEQ];
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 	{
 		if ((StitchBuffer[iStitch].attribute&WLKFMSK) != code)
 		{
-			moveStitch(&highStitchBuffer[ine], &StitchBuffer[iStitch]);
-			ine++;
+			moveStitch(&highStitchBuffer[stitchCount], &StitchBuffer[iStitch]);
+			stitchCount++;
 		}
 		else
 		{
@@ -1020,8 +1020,8 @@ void delwlk(unsigned code)
 			}
 		}
 	}
-	mvstchs(0, MAXSEQ, ine);
-	PCSHeader.stitchCount = ine;
+	mvstchs(0, MAXSEQ, stitchCount);
+	PCSHeader.stitchCount = stitchCount;
 }
 
 void chkuseq()

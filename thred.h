@@ -1328,33 +1328,33 @@ typedef struct _balstch {
 
 typedef struct _clpseg {
 	unsigned		start;
-	float			borderLength;
-	unsigned		bind;
+	float			beginLength;
+	unsigned		beginIndex;
 	unsigned short	asid;
 	unsigned		finish;
-	float			edgeLength;
-	unsigned		edgeIndex;
+	float			endLength;
+	unsigned		endIndex;
 	unsigned short	zsid;
 	TCHAR			dun;
 }CLPSEG;
 
 typedef struct _clipsort {
-	float		seglen;
-	float		sidlen;
-	unsigned	lin;
+	float		segmentLength;
+	float		sideLength;
+	unsigned	vertexIndex;
 	fPOINT		point;
 }CLIPSORT;
 
 typedef struct _clipnt {
 	float			x;
 	float			y;
-	unsigned short	side;
+	unsigned short	vertexIndex;
 	unsigned short	flag;
 }CLIPNT;
 
 typedef struct _vclpx {
 	unsigned seg;
-	unsigned sid;
+	unsigned vertex;
 }VCLPX;
 
 #if PESACT
