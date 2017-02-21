@@ -1353,7 +1353,7 @@ typedef struct _clipnt {
 }CLIPNT;
 
 typedef struct _vclpx {
-	unsigned seg;
+	unsigned segment;
 	unsigned vertex;
 }VCLPX;
 

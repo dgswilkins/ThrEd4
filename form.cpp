@@ -7966,20 +7966,19 @@ void duspir(unsigned stepCount) {
 	delete[] centeredSpiral;
 }
 
-void duhart(unsigned nsids) {
+void duhart(unsigned sideCount) {
 	double		stepAngle;
 	double		angle;
 	double		length;
-	// ToDo - rename ind, ine & bind
-	unsigned	ind, ine, bind;
+	unsigned	iVertex, lastVertex, firstVertex, iDestination;
 	float		maximumX;
 	dPOINT		point;
 	double		ratio;
 
-	if (nsids > 100)
-		nsids = 100;
-	if (nsids < 6)
-		nsids = 6;
+	if (sideCount > 100)
+		sideCount = 100;
+	if (sideCount < 6)
+		sideCount = 6;
 	SelectedForm = &FormList[FormIndex];
 	frmclr(SelectedForm);
 	SelectedForm->attribute = ActiveLayer << 1;
@@ -7987,42 +7986,42 @@ void duhart(unsigned nsids) {
 	px2stch();
 	point.x = SelectedPoint.x;
 	point.y = SelectedPoint.y;
-	stepAngle = PI * 2 / nsids;
-	length = 300 / nsids*ZoomFactor*(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+	stepAngle = PI * 2 / sideCount;
+	length = 300 / sideCount*ZoomFactor*(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
 	angle = PI*0.28;
-	ind = 0;
+	iVertex = 0;
 	maximumX = 0;
 	while (angle > -PI*0.7) {
 		if (point.x > maximumX)
 			maximumX = point.x;
-		CurrentFormVertices[ind].x = point.x;
-		CurrentFormVertices[ind++].y = point.y;
+		CurrentFormVertices[iVertex].x = point.x;
+		CurrentFormVertices[iVertex++].y = point.y;
 		point.x += length*cos(angle);
 		point.y += length*sin(angle);
 		angle -= stepAngle;
 	}
 	stepAngle /= 4.5;
-	bind = ind;
-	while (point.x > CurrentFormVertices[0].x&&ind < 200) {
-		CurrentFormVertices[ind].x = point.x;
-		CurrentFormVertices[ind++].y = point.y;
+	lastVertex = iVertex;
+	while (point.x > CurrentFormVertices[0].x&&iVertex < 200) {
+		CurrentFormVertices[iVertex].x = point.x;
+		CurrentFormVertices[iVertex++].y = point.y;
 		point.x += length*cos(angle);
 		point.y += length*sin(angle);
 		angle -= stepAngle;
 	}
-	bind--;
-	ratio = (CurrentFormVertices[bind].x - CurrentFormVertices[0].x) / (CurrentFormVertices[bind].x - CurrentFormVertices[ind - 1].x);
-	for (ine = bind + 1; ine < ind; ine++)
-		CurrentFormVertices[ine].x = (CurrentFormVertices[ine].x - CurrentFormVertices[bind].x)*ratio + CurrentFormVertices[bind].x;
-	bind = ine;
-	for (ind = bind - 2; ind; ind--) {
-		CurrentFormVertices[ine].y = CurrentFormVertices[ind].y;
-		CurrentFormVertices[ine].x = maximumX + maximumX - CurrentFormVertices[ind].x - 2 * (maximumX - CurrentFormVertices[0].x);
-		ine++;
+	firstVertex = iVertex;
+	ratio = (CurrentFormVertices[lastVertex - 1].x - CurrentFormVertices[0].x) / (CurrentFormVertices[lastVertex - 1].x - CurrentFormVertices[firstVertex - 1].x);
+	for (iVertex = lastVertex; iVertex < firstVertex; iVertex++)
+		CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - CurrentFormVertices[lastVertex - 1].x)*ratio + CurrentFormVertices[lastVertex - 1].x;
+	lastVertex = iDestination = iVertex;
+	for (iVertex = lastVertex - 2; iVertex; iVertex--) {
+		CurrentFormVertices[iDestination].y = CurrentFormVertices[iVertex].y;
+		CurrentFormVertices[iDestination].x = maximumX + maximumX - CurrentFormVertices[iVertex].x - 2 * (maximumX - CurrentFormVertices[0].x);
+		iDestination++;
 	}
-	NewFormVertexCount = ine + 1;
-	SelectedForm->vertices = adflt(ine);
-	SelectedForm->vertexCount = ine;
+	NewFormVertexCount = iDestination + 1;
+	SelectedForm->vertices = adflt(iDestination);
+	SelectedForm->vertexCount = iDestination;
 	SelectedForm->type = FRMFPOLY;
 	ClosestFormToCursor = FormIndex;
 	frmout(FormIndex);
@@ -8037,7 +8036,7 @@ void dulens(unsigned sides) {
 	double		stepAngle;
 	double		angle;
 	double		length;
-	unsigned	ind, ine, bind, count;
+	unsigned	iVertex, iDestination, lastVertex, count;
 	float		av;
 	dPOINT		point;
 
@@ -8061,27 +8060,27 @@ void dulens(unsigned sides) {
 	px2stch();
 	point.x = SelectedPoint.x;
 	point.y = SelectedPoint.y;
-	// ToDo - rename ind, ine & bind
-	ind = 0;
+	iVertex = 0;
 	SelectedPoint.x -= (float)0.0001;
 	while (point.x >= SelectedPoint.x) {
-		CurrentFormVertices[ind].x = point.x;
-		CurrentFormVertices[ind++].y = point.y;
+		CurrentFormVertices[iVertex].x = point.x;
+		CurrentFormVertices[iVertex++].y = point.y;
 		point.x += length*cos(angle);
 		point.y += length*sin(angle);
 		angle += stepAngle;
 	}
-	bind = ind - 1;
-	ine = ind;
+	lastVertex = iVertex - 1;
+	iDestination = iVertex;
 	av = CurrentFormVertices[0].x;
-	for (ind = bind; ind != 0; ind--) {
-		CurrentFormVertices[ine].y = CurrentFormVertices[ind - 1].y;
-		CurrentFormVertices[ine].x = av + av - CurrentFormVertices[ind - 1].x;
-		ine++;
+	for (iVertex = lastVertex; iVertex != 0; iVertex--) {
+		CurrentFormVertices[iDestination].y = CurrentFormVertices[iVertex - 1].y;
+		CurrentFormVertices[iDestination].x = av + av - CurrentFormVertices[iVertex - 1].x;
+		iDestination++;
 	}
-	NewFormVertexCount = ine;
-	SelectedForm->vertices = adflt(ine - 1);
-	SelectedForm->vertexCount = ine - 1;
+	// ToDo - should this be iDestination-1?
+	NewFormVertexCount = iDestination;
+	SelectedForm->vertices = adflt(iDestination - 1);
+	SelectedForm->vertexCount = iDestination - 1;
 	SelectedForm->type = FRMFPOLY;
 	ClosestFormToCursor = FormIndex;
 	frmout(FormIndex);
@@ -9601,7 +9600,7 @@ void join() {
 	setMap(FRMSAM);
 	if (FormIndex > 1 && chkMap(FORMSEL) && closfrm()) {
 		vertexCount = FormList[ClosestFormToCursor].vertexCount;
-		// ToDo - Allocate memory locally for tflt
+		// ToDo - Allocate memory locally for vertexList
 		vertexList = (fPOINT*)&BSequence;
 		for (iVertex = 0; iVertex < vertexCount; iVertex++) {
 			vertexList[iVertex].x = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].x;
@@ -11531,39 +11530,38 @@ void chksid(unsigned vertexIndex) {
 }
 
 void ritseg() {
-	// ToDo - rename ind
-	unsigned	ind;
+	unsigned	iPoint;
 	BOOL		isPointedEnd;
 
 	isPointedEnd = true;
 	if (SelectedForm->extendedAttribute&AT_SQR)
 		isPointedEnd = false;
 	if (chkMap(FILDIR)) {
-		ind = ClipSegments[ActivePointIndex].start;
+		iPoint = ClipSegments[ActivePointIndex].start;
 		if (chkMap(TXFIL) && isPointedEnd)
-			ind++;
+			iPoint++;
 		chksid(ClipSegments[ActivePointIndex].asid);
-		while (ind <= ClipSegments[ActivePointIndex].finish) {
-			OSequence[SequenceIndex].x = ClipStitchPoints[ind].x;
-			OSequence[SequenceIndex++].y = ClipStitchPoints[ind++].y;
+		while (iPoint <= ClipSegments[ActivePointIndex].finish) {
+			OSequence[SequenceIndex].x = ClipStitchPoints[iPoint].x;
+			OSequence[SequenceIndex++].y = ClipStitchPoints[iPoint++].y;
 		}
 		ClipIntersectSide = ClipSegments[ActivePointIndex].zsid;
 	}
 	else {
-		ind = ClipSegments[ActivePointIndex].finish;
+		iPoint = ClipSegments[ActivePointIndex].finish;
 		if (chkMap(TXFIL) && isPointedEnd)
-			ind--;
+			iPoint--;
 		chksid(ClipSegments[ActivePointIndex].zsid);
 		if (ClipSegments[ActivePointIndex].start) {
-			while (ind >= ClipSegments[ActivePointIndex].start) {
-				OSequence[SequenceIndex].x = ClipStitchPoints[ind].x;
-				OSequence[SequenceIndex++].y = ClipStitchPoints[ind--].y;
+			while (iPoint >= ClipSegments[ActivePointIndex].start) {
+				OSequence[SequenceIndex].x = ClipStitchPoints[iPoint].x;
+				OSequence[SequenceIndex++].y = ClipStitchPoints[iPoint--].y;
 			}
 		}
 		else {
-			while (ind < ClipSegments[ActivePointIndex].start) {
-				OSequence[SequenceIndex].x = ClipStitchPoints[ind].x;
-				OSequence[SequenceIndex++].y = ClipStitchPoints[ind--].y;
+			while (iPoint < ClipSegments[ActivePointIndex].start) {
+				OSequence[SequenceIndex].x = ClipStitchPoints[iPoint].x;
+				OSequence[SequenceIndex++].y = ClipStitchPoints[iPoint--].y;
 			}
 		}
 		ClipIntersectSide = ClipSegments[ActivePointIndex].asid;
@@ -11712,10 +11710,10 @@ int clpcmp(const void* arg1, const void* arg2) {
 	}
 #else
 	VCLPX *vclpx1 = (VCLPX *)arg1, *vclpx2 = (VCLPX *)arg2;
-	if (vclpx1->seg < vclpx2->seg)
+	if (vclpx1->segment < vclpx2->segment)
 		return -1;
 
-	if (vclpx1->seg > vclpx2->seg)
+	if (vclpx1->segment > vclpx2->segment)
 		return 1;
 
 	if (vclpx1->vertex == vclpx2->vertex)
@@ -11840,40 +11838,40 @@ unsigned insect() {
 	return count;
 }
 
-BOOL isin(float pntx, float pnty) {
-	unsigned	ind, acnt;
+BOOL isin(float xCoordinate, float yCoordinate) {
+	unsigned	iRegion, acnt;
 	unsigned	svrt, nvrt;
 	dPOINT		ipnt;
 
-	if (pntx < BoundingRect.left)
+	if (xCoordinate < BoundingRect.left)
 		return 0;
-	if (pntx > BoundingRect.right)
+	if (xCoordinate > BoundingRect.right)
 		return 0;
-	if (pnty < BoundingRect.bottom)
+	if (yCoordinate < BoundingRect.bottom)
 		return 0;
-	if (pnty > BoundingRect.top)
+	if (yCoordinate > BoundingRect.top)
 		return 0;
 	acnt = 0;
-	for (ind = RegionCrossingStart; ind < RegionCrossingEnd; ind++)
+	for (iRegion = RegionCrossingStart; iRegion < RegionCrossingEnd; iRegion++)
 	{
-		svrt = RegionCrossingData[ind].vertex;
+		svrt = RegionCrossingData[iRegion].vertex;
 		nvrt = nxt(svrt);
-		if (projv(pntx, CurrentFormVertices[svrt], CurrentFormVertices[nvrt], &ipnt))
+		if (projv(xCoordinate, CurrentFormVertices[svrt], CurrentFormVertices[nvrt], &ipnt))
 		{
-			if (ipnt.y > pnty)
+			if (ipnt.y > yCoordinate)
 			{
-				if (CurrentFormVertices[svrt].x != pntx&&CurrentFormVertices[nvrt].x != pntx)
+				if (CurrentFormVertices[svrt].x != xCoordinate&&CurrentFormVertices[nvrt].x != xCoordinate)
 					acnt++;
 				else
 				{
 					if (CurrentFormVertices[svrt].x < CurrentFormVertices[nvrt].x)
 					{
-						if (CurrentFormVertices[nvrt].x != pntx)
+						if (CurrentFormVertices[nvrt].x != xCoordinate)
 							acnt++;
 					}
 					else
 					{
-						if (CurrentFormVertices[svrt].x != pntx)
+						if (CurrentFormVertices[svrt].x != xCoordinate)
 							acnt++;
 					}
 				}
@@ -11894,16 +11892,16 @@ unsigned clpnseg(unsigned start, unsigned finish) {
 	return finish + 1;
 }
 
-unsigned vclpfor(unsigned ind) {
-	while (!ClipStitchPoints[ind].flag&&ind < ActivePointIndex)
-		ind++;
-	return ind;
+unsigned vclpfor(unsigned iPoint) {
+	while (!ClipStitchPoints[iPoint].flag&&iPoint < ActivePointIndex)
+		iPoint++;
+	return iPoint;
 }
 
-unsigned vclpbak(unsigned ind) {
-	while (!ClipStitchPoints[ind].flag&&ind)
-		ind--;
-	return ind;
+unsigned vclpbak(unsigned iPoint) {
+	while (!ClipStitchPoints[iPoint].flag&&iPoint)
+		iPoint--;
+	return iPoint;
 }
 
 BOOL vscmp(unsigned index1, unsigned index2) {
@@ -11939,19 +11937,19 @@ vscmpx :
 }
 
 void duflt() {
-	unsigned	ind;
+	unsigned	iVertex;
 	float		leftEdge;
 
 	leftEdge = 1e9;
-	for (ind = 0; ind < VertexCount; ind++) {
-		if (CurrentFormVertices[ind].x < leftEdge)
-			leftEdge = CurrentFormVertices[ind].x;
+	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+		if (CurrentFormVertices[iVertex].x < leftEdge)
+			leftEdge = CurrentFormVertices[iVertex].x;
 	}
 	if (leftEdge < ClipRectSize.cx) {
 		setMap(WASNEG);
 		FormOffset = ClipRectSize.cx + fabs(leftEdge) + .05;
-		for (ind = 0; ind < VertexCount; ind++)
-			CurrentFormVertices[ind].x += FormOffset;
+		for (iVertex = 0; iVertex < VertexCount; iVertex++)
+			CurrentFormVertices[iVertex].x += FormOffset;
 		SelectedForm->rectangle.left += FormOffset;
 		SelectedForm->rectangle.right += FormOffset;
 	}
@@ -11970,17 +11968,20 @@ void inspnt()
 }
 
 void clpcon() {
-	RECT		nrct;
-	unsigned	iSegment, iStitchPoint, ind, ine, inf, ing, nof, clpneg;
-	unsigned	strt, fin, segxs, segps, seg, clrnum;
-	unsigned	cnt;
-	int			tine;
-	fPOINT		ploc;
-	double		tlen, minx;
-	float		fnof;
-	unsigned	clpnof;
-	double		clpvof;
-	TXPNT*		ptx = nullptr;
+	RECT		clipGrid;
+	unsigned	iSegment, iStitchPoint, iVertex, iPoint, iSorted, iSequence, vertex;
+	unsigned	swap, iRegion, sortedCount, ine, nextVertex, regionSegment, iStitch;
+	unsigned	lineOffset, negativeOffset, clipNegative;
+	unsigned	start, finish, segmentCount, regionCount, previousPoint;
+	// ToDo - rename variables
+	unsigned	inf, ing, cnt;
+	int			iVerticalGrid, textureLine;
+	fPOINT		pasteLocation;
+	double		totalLength, minx;
+	float		formNegativeOffset;
+	unsigned	clipGridOffset;
+	double		clipVerticalOffset;
+	TXPNT*		texture = nullptr;
 	unsigned*	iclpx;			//indices into region crossing data for vertical clipboard fills
 	unsigned	clplim;			//vertical clipboard search limit
 
@@ -11989,9 +11990,9 @@ void clpcon() {
 	if (chkMap(ISUND))
 		ClipWidth = SelectedForm->underlaySpacing;
 	if (SelectedForm->fillSpacing < 0)
-		clpneg = 1;
+		clipNegative = 1;
 	else
-		clpneg = 0;
+		clipNegative = 0;
 	if (ClipWidth < CLPMINAUT)
 		ClipWidth = (float)CLPMINAUT;
 	if (chkMap(TXFIL))
@@ -12005,142 +12006,140 @@ void clpcon() {
 	ClipSideLengths = new double[VertexCount];
 	ClipIntersectData = new CLIPSORT[VertexCount];
 	ArrayOfClipIntersectData = new CLIPSORT*[VertexCount + 1]();
-	ine = leftsid();
-	tlen = 0;
-	Lengths[ine] = 0;
-	ine = nxt(ine);
-	for (ind = 0; ind <= VertexCount; ind++) {
-		inf = nxt(ine);
-		Lengths[ine] = tlen;
-		ClipSideLengths[ine] = hypot(CurrentFormVertices[inf].x - CurrentFormVertices[ine].x, CurrentFormVertices[inf].y - CurrentFormVertices[ine].y);
-		tlen += ClipSideLengths[ine];
-		ine = inf;
+	vertex = leftsid();
+	totalLength = 0;
+	Lengths[vertex] = 0;
+	vertex = nxt(vertex);
+	for (iVertex = 0; iVertex <= VertexCount; iVertex++) {
+		nextVertex = nxt(vertex);
+		Lengths[vertex] = totalLength;
+		ClipSideLengths[vertex] = hypot(CurrentFormVertices[nextVertex].x - CurrentFormVertices[vertex].x, CurrentFormVertices[nextVertex].y - CurrentFormVertices[vertex].y);
+		totalLength += ClipSideLengths[vertex];
+		vertex = nextVertex;
 	}
 	ClipSegments = (CLPSEG*)&StitchBuffer[MAXSEQ];
-	nrct.left = floor(SelectedForm->rectangle.left / ClipWidth);
-	nrct.right = ceil(SelectedForm->rectangle.right / ClipWidth);
-	nrct.bottom = floor(SelectedForm->rectangle.bottom / ClipRectSize.cy - 1);
-	nrct.top = ceil(SelectedForm->rectangle.top / ClipRectSize.cy + 1) + 2;
-	nof = 0;
+	clipGrid.left = floor(SelectedForm->rectangle.left / ClipWidth);
+	clipGrid.right = ceil(SelectedForm->rectangle.right / ClipWidth);
+	clipGrid.bottom = floor(SelectedForm->rectangle.bottom / ClipRectSize.cy - 1);
+	clipGrid.top = ceil(SelectedForm->rectangle.top / ClipRectSize.cy + 1) + 2;
+	negativeOffset = 0;
 	if (SelectedForm->wordParam > 1)
-		clpnof = SelectedForm->wordParam;
+		clipGridOffset = SelectedForm->wordParam;
 	else
-		clpnof = 0;
-	if (clpnof) {
-		nrct.top++;
+		clipGridOffset = 0;
+	if (clipGridOffset) {
+		clipGrid.top++;
 		if (SelectedForm->fillSpacing < 0) {
-			nrct.bottom--;
-			nrct.left -= (float)ClipRectSize.cx / ClipWidth;
-			nrct.right += (float)ClipRectSize.cx / ClipWidth;
+			clipGrid.bottom--;
+			clipGrid.left -= (float)ClipRectSize.cx / ClipWidth;
+			clipGrid.right += (float)ClipRectSize.cx / ClipWidth;
 		}
 	}
-	if (clpneg && !clpnof)
-		nrct.left -= (float)ClipRectSize.cx / ClipWidth;
-	if (nrct.bottom < 0) {
-		nof = 1 - nrct.bottom;
-		nrct.bottom += nof;
-		nrct.top += nof;
-		fnof = ClipRectSize.cy*nof;
-		for (ind = 0; ind < VertexCount; ind++)
-			CurrentFormVertices[ind].y += fnof;
+	if (clipNegative && !clipGridOffset)
+		clipGrid.left -= (float)ClipRectSize.cx / ClipWidth;
+	if (clipGrid.bottom < 0) {
+		negativeOffset = 1 - clipGrid.bottom;
+		clipGrid.bottom += negativeOffset;
+		clipGrid.top += negativeOffset;
+		formNegativeOffset = ClipRectSize.cy*negativeOffset;
+		for (iVertex = 0; iVertex < VertexCount; iVertex++)
+			CurrentFormVertices[iVertex].y += formNegativeOffset;
 	}
 	ClipStitchPoints = (CLIPNT*)&BSequence;
-	segxs = 0;
-	for (ind = 0; ind < VertexCount; ind++) {
-		strt = floor(CurrentFormVertices[ind].x / ClipWidth);
-		fin = floor((CurrentFormVertices[nxt(ind)].x) / ClipWidth);
-		if (strt > fin) {
-			ine = strt;
-			strt = fin;
-			fin = ine;
+	segmentCount = 0;
+	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+		start = floor(CurrentFormVertices[iVertex].x / ClipWidth);
+		finish = floor((CurrentFormVertices[nxt(iVertex)].x) / ClipWidth);
+		if (start > finish) {
+			swap = start;
+			start = finish;
+			finish = swap;
 		}
 		if (SelectedForm->fillSpacing < 0)
-			fin += ClipRectSize.cx / ClipWidth;
-		if (fin > (unsigned)nrct.right)
-			fin = nrct.right;
-		if (clpneg)
-			strt -= (float)ClipRectSize.cx / ClipWidth;
-		for (ine = strt; ine <= fin; ine++) {
-			RegionCrossingData[segxs].vertex = ind;
-			RegionCrossingData[segxs++].seg = ine;
+			finish += ClipRectSize.cx / ClipWidth;
+		if (finish > (unsigned)clipGrid.right)
+			finish = clipGrid.right;
+		if (clipNegative)
+			start -= (float)ClipRectSize.cx / ClipWidth;
+		for (iSegment = start; iSegment <= finish; iSegment++) {
+			RegionCrossingData[segmentCount].vertex = iVertex;
+			RegionCrossingData[segmentCount++].segment = iSegment;
 		}
 	}
-	qsort((void*)RegionCrossingData, segxs, 8, clpcmp);
-	iclpx = (unsigned*)&RegionCrossingData[segxs];
-	ine = 1; inf = RegionCrossingData[0].seg;
+	qsort((void*)RegionCrossingData, segmentCount, 8, clpcmp);
+	// ToDo - Allocate memory locally for iclpx
+	iclpx = (unsigned*)&RegionCrossingData[segmentCount];
+	iRegion = 1; regionSegment = RegionCrossingData[0].segment;
 	iclpx[0] = 0;
-	for (ind = 1; ind < segxs; ind++) {
-		if (RegionCrossingData[ind].seg != inf) {
-			iclpx[ine++] = ind;
-			inf = RegionCrossingData[ind].seg;
+	for (iSegment = 1; iSegment < segmentCount; iSegment++) {
+		if (RegionCrossingData[iSegment].segment != regionSegment) {
+			iclpx[iRegion++] = iSegment;
+			regionSegment = RegionCrossingData[iSegment].segment;
 		}
 	}
-	iclpx[ine] = ind;
+	iclpx[iRegion] = iSegment;
+	regionCount = iRegion;
 	BoundingRect.left = BoundingRect.right = CurrentFormVertices[0].x;
 	BoundingRect.top = BoundingRect.bottom = CurrentFormVertices[0].y;
-	for (ind = 1; ind < VertexCount; ind++)
+	for (iVertex = 1; iVertex < VertexCount; iVertex++)
 	{
-		if (CurrentFormVertices[ind].x > BoundingRect.right)
-			BoundingRect.right = CurrentFormVertices[ind].x;
-		if (CurrentFormVertices[ind].x < BoundingRect.left)
-			BoundingRect.left = CurrentFormVertices[ind].x;
-		if (CurrentFormVertices[ind].y > BoundingRect.top)
-			BoundingRect.top = CurrentFormVertices[ind].y;
-		if (CurrentFormVertices[ind].y < BoundingRect.bottom)
-			BoundingRect.bottom = CurrentFormVertices[ind].y;
+		if (CurrentFormVertices[iVertex].x > BoundingRect.right)
+			BoundingRect.right = CurrentFormVertices[iVertex].x;
+		if (CurrentFormVertices[iVertex].x < BoundingRect.left)
+			BoundingRect.left = CurrentFormVertices[iVertex].x;
+		if (CurrentFormVertices[iVertex].y > BoundingRect.top)
+			BoundingRect.top = CurrentFormVertices[iVertex].y;
+		if (CurrentFormVertices[iVertex].y < BoundingRect.bottom)
+			BoundingRect.bottom = CurrentFormVertices[iVertex].y;
 	}
-	segps = ine;
-	ind = RegionCrossingStart = cnt = 0;
-	seg = RegionCrossingData[0].seg;
-	clrnum = (nrct.top >> 5) + 1;
-	// ToDo -When copy-pasting multiple forms, ActivePoint Index is not being updated correctly
+	// ToDo - When copy-pasting multiple forms, ActivePoint Index is not being updated correctly
 	ActivePointIndex = 0;
-	for (ind = 0; ind < segps; ind++) {
-		RegionCrossingStart = iclpx[ind];
-		RegionCrossingEnd = iclpx[ind + 1];
-		ploc.x = ClipWidth*(ind + nrct.left);
-		clpvof = 0;
+	for (iRegion = 0; iRegion < regionCount; iRegion++) {
+		RegionCrossingStart = iclpx[iRegion];
+		RegionCrossingEnd = iclpx[iRegion + 1];
+		pasteLocation.x = ClipWidth*(iRegion + clipGrid.left);
+		clipVerticalOffset = 0;
 		if (chkMap(TXFIL))
 		{
-			tine = (ind + nrct.left) % SelectedForm->fillInfo.texture.lines;
-			ClipStitchCount = TextureSegments[tine].stitchCount;
-			ptx = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + TextureSegments[tine].line];
-			LineSegmentStart.x = ploc.x;
+			textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
+			ClipStitchCount = TextureSegments[textureLine].stitchCount;
+			texture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + TextureSegments[textureLine].line];
+			LineSegmentStart.x = pasteLocation.x;
 			if (SelectedForm->txof)
 			{
-				inf = (ind + nrct.left) / SelectedForm->fillInfo.texture.lines;
-				clpvof = fmod(SelectedForm->txof*inf, SelectedForm->fillInfo.texture.height);
+				lineOffset = (iRegion + clipGrid.left) / SelectedForm->fillInfo.texture.lines;
+				clipVerticalOffset = fmod(SelectedForm->txof*lineOffset, SelectedForm->fillInfo.texture.height);
 			}
 		}
 		else
 		{
-			if (clpnof)
-				clpvof = (float)(ind%clpnof) / clpnof*ClipRectSize.cy;
-			LineSegmentStart.x = ploc.x + ClipBuffer[0].x;
+			if (clipGridOffset)
+				clipVerticalOffset = (float)(iRegion%clipGridOffset) / clipGridOffset*ClipRectSize.cy;
+			LineSegmentStart.x = pasteLocation.x + ClipBuffer[0].x;
 		}
-		LineSegmentStart.y = nrct.bottom*ClipRectSize.cy;
-		if (clpnof)
-			clpvof = (float)(ind%clpnof) / clpnof*ClipRectSize.cy;
-		for (tine = nrct.bottom; tine < nrct.top; tine++) {
-			ploc.y = tine*ClipRectSize.cy - clpvof;
-			LineSegmentEnd.x = ploc.x + ClipBuffer[0].x;
-			LineSegmentEnd.y = ploc.y + ClipBuffer[0].y;
+		LineSegmentStart.y = clipGrid.bottom*ClipRectSize.cy;
+		if (clipGridOffset)
+			clipVerticalOffset = (float)(iRegion%clipGridOffset) / clipGridOffset*ClipRectSize.cy;
+		for (iVerticalGrid = clipGrid.bottom; iVerticalGrid < clipGrid.top; iVerticalGrid++) {
+			pasteLocation.y = iVerticalGrid*ClipRectSize.cy - clipVerticalOffset;
+			LineSegmentEnd.x = pasteLocation.x + ClipBuffer[0].x;
+			LineSegmentEnd.y = pasteLocation.y + ClipBuffer[0].y;
 			if (!ActivePointIndex) {
 				LineSegmentStart.x = LineSegmentEnd.x;
 				LineSegmentStart.y = LineSegmentEnd.y;
 			}
-			for (inf = 0; inf < ClipStitchCount; inf++) {
+			for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
 				if (chkMap(TXFIL))
 				{
-					if (ptx != nullptr) {
-						LineSegmentEnd.x = ploc.x;
-						LineSegmentEnd.y = ploc.y + ptx[inf].y;
+					if (texture != nullptr) {
+						LineSegmentEnd.x = pasteLocation.x;
+						LineSegmentEnd.y = pasteLocation.y + texture[iStitch].y;
 					}
 				}
 				else
 				{
-					LineSegmentEnd.x = ploc.x + ClipBuffer[inf].x;
-					LineSegmentEnd.y = ploc.y + ClipBuffer[inf].y;
+					LineSegmentEnd.x = pasteLocation.x + ClipBuffer[iStitch].x;
+					LineSegmentEnd.y = pasteLocation.y + ClipBuffer[iStitch].y;
 				}
 
 				ClipStitchPoints[ActivePointIndex].x = LineSegmentStart.x;
@@ -12182,12 +12181,12 @@ void clpcon() {
 clpskp:;
 
 	ClipStitchPoints[ActivePointIndex].flag = 2;
-	if (nof) {
-		fnof = nof*ClipRectSize.cy;
+	if (negativeOffset) {
+		formNegativeOffset = negativeOffset*ClipRectSize.cy;
 		for (iStitchPoint = 0; iStitchPoint < ActivePointIndex; iStitchPoint++)
-			ClipStitchPoints[iStitchPoint].y -= fnof;
-		for (ind = 0; ind < VertexCount; ind++)
-			CurrentFormVertices[ind].y -= fnof;
+			ClipStitchPoints[iStitchPoint].y -= formNegativeOffset;
+		for (iVertex = 0; iVertex < VertexCount; iVertex++)
+			CurrentFormVertices[iVertex].y -= formNegativeOffset;
 	}
 #define CLPVU 0
 
@@ -12200,11 +12199,11 @@ clpskp:;
 
 	ClipSegmentIndex = 0;
 	rstMap(FILDIR);
-	ine = 0;
+	previousPoint = 0;
 	if (ActivePointIndex)
 	{
-		for (ind = 0; ind < ActivePointIndex - 1; ind++) {
-			switch (ClipStitchPoints[ind].flag)
+		for (iPoint = 0; iPoint < ActivePointIndex - 1; iPoint++) {
+			switch (ClipStitchPoints[iPoint].flag)
 			{
 			case 0:		//inside
 
@@ -12214,9 +12213,9 @@ clpskp:;
 			case 1:		//line
 
 				if (toglMap(FILDIR))
-					clpnseg(ine, ind);
+					clpnseg(previousPoint, iPoint);
 				else
-					ine = ind;
+					previousPoint = iPoint;
 				break;
 
 			case 2:		//outside
@@ -12246,20 +12245,20 @@ clpskp:;
 				if (clplim > 12)
 					clplim = 12;
 				SortedLengths = (float**)&ClipSegments[ClipSegmentIndex];
-				ine = 0;
+				sortedCount = 0;
 				for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
-					SortedLengths[ine++] = &ClipSegments[iSegment].beginLength;
-					SortedLengths[ine++] = &ClipSegments[iSegment].endLength;
+					SortedLengths[sortedCount++] = &ClipSegments[iSegment].beginLength;
+					SortedLengths[sortedCount++] = &ClipSegments[iSegment].endLength;
 				}
-				qsort((void*)SortedLengths, ine, 4, lencmp);
-				ind = sizeof(CLPSEG);  // ToDo - does this line do anything?
-				for (ind = 0; ind < ine; ind++) {
-					inf = lenref(SortedLengths[ind]);
+				qsort((void*)SortedLengths, sortedCount, 4, lencmp);
+				for (iSorted = 0; iSorted < sortedCount; iSorted++) {
+					// ToDo - what does lenref do exactly?
+					inf = lenref(SortedLengths[iSorted]);
 					ing = inf >> 1;
 					if (inf & 1)
-						ClipSegments[ing].endIndex = ind;
+						ClipSegments[ing].endIndex = iSorted;
 					else
-						ClipSegments[ing].beginIndex = ind;
+						ClipSegments[ing].beginIndex = iSorted;
 				}
 
 #if CLPVU==1
@@ -12304,21 +12303,21 @@ clpskp:;
 				if (SequenceIndex > MAXSEQ - 100)
 					SequenceIndex = MAXSEQ - 100;
 				ine = 0; inf = 0;
-				for (ind = 0; ind < SequenceIndex; ind++) {
-					if (vscmp(ind, ine)) {
+				for (iSequence = 0; iSequence < SequenceIndex; iSequence++) {
+					if (vscmp(iSequence, ine)) {
 						ine++;
-						OSequence[ine].x = OSequence[ind].x;
-						OSequence[ine].y = OSequence[ind].y;
+						OSequence[ine].x = OSequence[iSequence].x;
+						OSequence[ine].y = OSequence[iSequence].y;
 					}
 					else
 						inf++;
 				}
 				SequenceIndex = ine;
 				if (chkMap(WASNEG)) {
-					for (ind = 0; ind < SequenceIndex; ind++)
-						OSequence[ind].x -= FormOffset;
-					for (ind = 0; ind < VertexCount; ind++)
-						CurrentFormVertices[ind].x -= FormOffset;
+					for (iSequence = 0; iSequence < SequenceIndex; iSequence++)
+						OSequence[iSequence].x -= FormOffset;
+					for (iVertex = 0; iVertex < VertexCount; iVertex++)
+						CurrentFormVertices[iVertex].x -= FormOffset;
 					SelectedForm->rectangle.left -= FormOffset;
 					SelectedForm->rectangle.right -= FormOffset;
 				}
@@ -12327,7 +12326,7 @@ clpskp:;
 }
 
 void vrtsclp() {
-	unsigned ind;
+	unsigned iStitch;
 
 	fvars(ClosestFormToCursor);
 	delmclp(ClosestFormToCursor);
@@ -12337,9 +12336,9 @@ void vrtsclp() {
 	SelectedForm->wordParam = IniFile.fillPhase;
 	makpoli();
 	SelectedForm->fillSpacing = IniFile.clipOffset;
-	for (ind = 0; ind < ClipStitchCount; ind++) {
-		SelectedForm->angleOrClipData.clip[ind].x = ClipBuffer[ind].x;
-		SelectedForm->angleOrClipData.clip[ind].y = ClipBuffer[ind].y;
+	for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
+		SelectedForm->angleOrClipData.clip[iStitch].x = ClipBuffer[iStitch].x;
+		SelectedForm->angleOrClipData.clip[iStitch].y = ClipBuffer[iStitch].y;
 	}
 	SelectedForm->fillType = VCLPF;
 	SelectedForm->fillColor = ActiveColor;
@@ -12348,7 +12347,7 @@ void vrtsclp() {
 }
 
 void vrtclp() {
-	unsigned ind;
+	unsigned iForm;
 
 	if (filmsgs(FMM_CLP))
 		return;
@@ -12361,8 +12360,8 @@ void vrtclp() {
 			if (ClipRectSize.cy > CLPMIN) {
 				if (SelectedFormCount) {
 					setMap(NOCLP);
-					for (ind = 0; ind < SelectedFormCount; ind++) {
-						ClosestFormToCursor = SelectedFormList[ind];
+					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+						ClosestFormToCursor = SelectedFormList[iForm];
 						fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE)
 							vrtsclp();
@@ -12391,39 +12390,39 @@ void vrtclp() {
 }
 
 void angout() {
-	fRECTANGLE*		trct;
-	unsigned	ine;
+	fRECTANGLE*	rectangle;
+	unsigned	iVertex;
 
 	if (AngledForm.vertexCount) {
-		trct = &AngledForm.rectangle;
+		rectangle = &AngledForm.rectangle;
 		CurrentFormVertices = AngledForm.vertices;
-		trct->left = trct->right = CurrentFormVertices[0].x;
-		trct->bottom = trct->top = CurrentFormVertices[0].y;
-		for (ine = 1; ine < AngledForm.vertexCount; ine++) {
-			if (CurrentFormVertices[ine].x > trct->right)
-				trct->right = CurrentFormVertices[ine].x;
-			if (CurrentFormVertices[ine].x < trct->left)
-				trct->left = CurrentFormVertices[ine].x;
-			if (CurrentFormVertices[ine].y < trct->bottom)
-				trct->bottom = CurrentFormVertices[ine].y;
-			if (CurrentFormVertices[ine].y > trct->top)
-				trct->top = CurrentFormVertices[ine].y;
+		rectangle->left = rectangle->right = CurrentFormVertices[0].x;
+		rectangle->bottom = rectangle->top = CurrentFormVertices[0].y;
+		for (iVertex = 1; iVertex < AngledForm.vertexCount; iVertex++) {
+			if (CurrentFormVertices[iVertex].x > rectangle->right)
+				rectangle->right = CurrentFormVertices[iVertex].x;
+			if (CurrentFormVertices[iVertex].x < rectangle->left)
+				rectangle->left = CurrentFormVertices[iVertex].x;
+			if (CurrentFormVertices[iVertex].y < rectangle->bottom)
+				rectangle->bottom = CurrentFormVertices[iVertex].y;
+			if (CurrentFormVertices[iVertex].y > rectangle->top)
+				rectangle->top = CurrentFormVertices[iVertex].y;
 		}
 	}
 }
 
 void horclpfn() {
-	unsigned ind;
+	unsigned iVertex;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
 	RotationCenter.x = (double)(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
 	RotationCenter.y = (double)(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;
 	RotationAngle = PI / 2;
-	for (ind = 0; ind < AngledForm.vertexCount; ind++) {
-		AngledForm.vertices[ind].x = SelectedForm->vertices[ind].x;
-		AngledForm.vertices[ind].y = SelectedForm->vertices[ind].y;
-		rotflt(&AngledForm.vertices[ind]);
+	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
+		AngledForm.vertices[iVertex].x = SelectedForm->vertices[iVertex].x;
+		AngledForm.vertices[iVertex].y = SelectedForm->vertices[iVertex].y;
+		rotflt(&AngledForm.vertices[iVertex]);
 	}
 	angout();
 	SelectedForm = &AngledForm;
@@ -12435,7 +12434,7 @@ void horclpfn() {
 }
 
 void horsclp() {
-	unsigned ind;
+	unsigned iStitch;
 
 	fvars(ClosestFormToCursor);
 	delmclp(ClosestFormToCursor);
@@ -12446,9 +12445,9 @@ void horsclp() {
 	SelectedForm->wordParam = IniFile.fillPhase;
 	makpoli();
 	SelectedForm->fillSpacing = IniFile.clipOffset;
-	for (ind = 0; ind < ClipStitchCount; ind++) {
-		SelectedForm->angleOrClipData.clip[ind].x = ClipBuffer[ind].x;
-		SelectedForm->angleOrClipData.clip[ind].y = ClipBuffer[ind].y;
+	for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
+		SelectedForm->angleOrClipData.clip[iStitch].x = ClipBuffer[iStitch].x;
+		SelectedForm->angleOrClipData.clip[iStitch].y = ClipBuffer[iStitch].y;
 	}
 	SelectedForm->fillType = HCLPF;
 	SelectedForm->fillColor = ActiveColor;
@@ -12458,7 +12457,7 @@ void horsclp() {
 }
 
 void horclp() {
-	unsigned ind;
+	unsigned iForm;
 
 	if (filmsgs(FMM_CLP))
 		return;
@@ -12471,8 +12470,8 @@ void horclp() {
 			if (ClipRectSize.cy > CLPMIN) {
 				if (SelectedFormCount) {
 					setMap(NOCLP);
-					for (ind = 0; ind < SelectedFormCount; ind++) {
-						ClosestFormToCursor = SelectedFormList[ind];
+					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+						ClosestFormToCursor = SelectedFormList[iForm];
 						fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE)
 							horsclp();
@@ -12502,8 +12501,8 @@ void horclp() {
 
 void angclpfn()
 {
-	unsigned	ind;
-	fPOINT*		tflt;
+	unsigned	iVertex;
+	fPOINT*		vertexList;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
 	RotationCenter.x = (double)(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
@@ -12512,12 +12511,12 @@ void angclpfn()
 	if (chkMap(ISUND))
 	{
 		RotationAngle = PI / 2 - SelectedForm->underlayStitchAngle;
-		tflt = insid();
-		for (ind = 0; ind < AngledForm.vertexCount; ind++)
+		vertexList = insid();
+		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++)
 		{
-			AngledFormVertices[ind].x = tflt[ind].x;
-			AngledFormVertices[ind].y = tflt[ind].y;
-			rotflt(&AngledFormVertices[ind]);
+			AngledFormVertices[iVertex].x = vertexList[iVertex].x;
+			AngledFormVertices[iVertex].y = vertexList[iVertex].y;
+			rotflt(&AngledFormVertices[iVertex]);
 		}
 	}
 	else
@@ -12526,11 +12525,11 @@ void angclpfn()
 			RotationAngle = PI / 2 - SelectedForm->angleOrClipData.angle;
 		else
 			RotationAngle = PI / 2 - SelectedForm->satinOrAngle.angle;
-		for (ind = 0; ind < AngledForm.vertexCount; ind++)
+		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++)
 		{
-			AngledFormVertices[ind].x = SelectedForm->vertices[ind].x;
-			AngledFormVertices[ind].y = SelectedForm->vertices[ind].y;
-			rotflt(&AngledFormVertices[ind]);
+			AngledFormVertices[iVertex].x = SelectedForm->vertices[iVertex].x;
+			AngledFormVertices[iVertex].y = SelectedForm->vertices[iVertex].y;
+			rotflt(&AngledFormVertices[iVertex]);
 		}
 	}
 	angout();
@@ -12543,7 +12542,7 @@ void angclpfn()
 }
 
 void angsclp() {
-	unsigned ind;
+	unsigned iStitch;
 
 	fvars(ClosestFormToCursor);
 	delmclp(ClosestFormToCursor);
@@ -12554,9 +12553,9 @@ void angsclp() {
 	makpoli();
 	SelectedForm->satinOrAngle.angle = IniFile.fillAngle;
 	SelectedForm->fillSpacing = IniFile.clipOffset;
-	for (ind = 0; ind < ClipStitchCount; ind++) {
-		SelectedForm->angleOrClipData.clip[ind].x = ClipBuffer[ind].x;
-		SelectedForm->angleOrClipData.clip[ind].y = ClipBuffer[ind].y;
+	for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
+		SelectedForm->angleOrClipData.clip[iStitch].x = ClipBuffer[iStitch].x;
+		SelectedForm->angleOrClipData.clip[iStitch].y = ClipBuffer[iStitch].y;
 	}
 	SelectedForm->fillType = ANGCLPF;
 	SelectedForm->fillColor = ActiveColor;
@@ -12565,7 +12564,7 @@ void angsclp() {
 }
 
 void angclp() {
-	unsigned ind;
+	unsigned iForm;
 
 	if (filmsgs(FMM_CLP))
 		return;
@@ -12578,8 +12577,8 @@ void angclp() {
 			if (ClipRectSize.cy > CLPMIN) {
 				if (SelectedFormCount) {
 					setMap(NOCLP);
-					for (ind = 0; ind < SelectedFormCount; ind++) {
-						ClosestFormToCursor = SelectedFormList[ind];
+					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+						ClosestFormToCursor = SelectedFormList[iForm];
 						fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE)
 							angsclp();
@@ -12608,15 +12607,15 @@ void angclp() {
 }
 
 void dubfn() {
-	unsigned ind, ine;
+	unsigned iBackward, iForward;
 
 	brdfil(SelectedForm->edgeStitchLen);
-	ine = SequenceIndex;
-	for (ind = SequenceIndex; ind != 0; ind--) {
-		OSequence[ine].x = OSequence[ind - 1].x;
-		OSequence[ine++].y = OSequence[ind - 1].y;
+	iForward = SequenceIndex;
+	for (iBackward = SequenceIndex; iBackward != 0; iBackward--) {
+		OSequence[iForward].x = OSequence[iBackward - 1].x;
+		OSequence[iForward++].y = OSequence[iBackward - 1].y;
 	}
-	SequenceIndex = ine;
+	SequenceIndex = iForward;
 }
 
 void dubsfil() {
@@ -12631,13 +12630,13 @@ void dubsfil() {
 }
 
 void dubfil() {
-	unsigned ind;
+	unsigned iForm;
 
 	if (filmsgs(FML_LIN))
 		return;
 	if (SelectedFormCount) {
-		for (ind = 0; ind < SelectedFormCount; ind++) {
-			ClosestFormToCursor = SelectedFormList[ind];
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+			ClosestFormToCursor = SelectedFormList[iForm];
 			fvars(ClosestFormToCursor);
 			dubsfil();
 		}
