@@ -1439,12 +1439,10 @@ void dufdef() {
 
 void srtcol() {
 
-	unsigned		histogram[16], colorStartStitch[16] = { 0 };
+	unsigned		histogram[16] = { 0 }, colorStartStitch[16] = { 0 };
 	unsigned		iStitch, iColor, startStitch;
 	fPOINTATTR*		highStitchBuffer;
 
-	// ToDo - replace this line with variable initialization
-	FillMemory(&histogram, 64, 0);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 		histogram[StitchBuffer[iStitch].attribute&COLMSK]++;
 	startStitch = 0;
