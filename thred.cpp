@@ -430,6 +430,7 @@ extern	POINT			SelectedPointsLine[9];
 extern	unsigned short	VertexCount;
 extern	double			SnapLength;
 extern	double			SpiralWrap;
+extern	TCHAR*			StringData;
 extern	TCHAR*			StringTable[STR_LEN];
 extern	double			StarRatio;
 extern	double			StitchSpacing;
@@ -3551,9 +3552,10 @@ void dun() {
 			savmsg();
 			if (MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_CLOS], MB_YESNO) == IDYES)
 				save();
-			reldun();;
+			reldun();
 		}
 	}
+	delete[] StringData;
 }
 
 void dusid(unsigned entry) {
