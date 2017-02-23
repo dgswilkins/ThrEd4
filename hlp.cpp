@@ -221,7 +221,7 @@ TCHAR	HelpBuffer[HBUFSIZ];	//message formatting buffer
 void adbad(unsigned code, unsigned count)
 {
 	// ToDo - not sure that StringData has been initialized when this is called
-	//what does this function do?
+	// ToDo - what does this function do? should there be a call to shoMsg here
 	LoadString(ThrEdInstance, code, StringData, HBUFSIZ);
 	StringData = &StringData[strlen(StringData)];
 	LoadString(ThrEdInstance, IDS_NOTREP, HelpBuffer, HBUFSIZ);

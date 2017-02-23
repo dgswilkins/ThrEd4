@@ -324,8 +324,8 @@ TXPNT* adtx(int count) {
 void txspac(int start, unsigned count)
 {
 	unsigned	iForm;
-	// ToDo - Should the last term be "* sizeof()" and not "& sizeof"?
-	MoveMemory(&TexturePointsBuffer[start + count], &TexturePointsBuffer[start], (TextureIndex - start) & sizeof(TXPNT));
+
+	MoveMemory(&TexturePointsBuffer[start + count], &TexturePointsBuffer[start], (TextureIndex - start) * sizeof(TXPNT));
 	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 	{
 		if (istx(iForm))
