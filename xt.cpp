@@ -1545,7 +1545,6 @@ void selalfrm()
 
 void chkdaz()
 {
-	float	len;
 
 	if (!IniFile.daisyPetalPoints)
 		IniFile.daisyPetalPoints = 1;
@@ -1553,8 +1552,6 @@ void chkdaz()
 		IniFile.daisyInnerCount = 1;
 	if (!IniFile.daisyPetalCount)
 		IniFile.daisyPetalCount = 1;
-	// ToDo - is this line and variable needed?
-	len = IniFile.daisyDiameter*0.999;
 	if (IniFile.daisyHeartCount > IniFile.daisyPetalPoints)
 		IniFile.daisyHeartCount = IniFile.daisyPetalPoints;
 }
