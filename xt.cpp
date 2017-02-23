@@ -252,8 +252,8 @@ float		XTup;
 float		XTdown;
 float		XTratio;
 
-OREC**		precs;
-OREC**		pfrecs;
+OREC**		PRecs;
+OREC**		PFRecs;
 
 enum {
 	TYPE_APPLIQUE = 1,	// applique
@@ -1911,7 +1911,7 @@ BOOL chkrdun(SRTREC* stitchRecord)
 
 	for (iStitch = stitchRecord->start; iStitch < stitchRecord->finish; iStitch++)
 	{
-		if (precs[iStitch]->otyp == FormFillCounter[precs[iStitch]->form])
+		if (PRecs[iStitch]->otyp == FormFillCounter[PRecs[iStitch]->form])
 			return 1;
 	}
 	return 0;
@@ -1937,22 +1937,22 @@ double precjmps(SRTREC* stitchRecord)
 	{
 		minimumLength = 1e9;
 		if (direction)
-			loci = precs[loc]->finish;
+			loci = PRecs[loc]->finish;
 		else
-			loci = precs[loc]->start;
+			loci = PRecs[loc]->start;
 		currentStitch = &StitchBuffer[loci];
 		for (iStitch = stitchRecord->start; iStitch < stitchRecord->finish; iStitch++)
 		{
-			if (precs[iStitch]->otyp == FormFillCounter[precs[iStitch]->form])
+			if (PRecs[iStitch]->otyp == FormFillCounter[PRecs[iStitch]->form])
 			{
-				length = hypot(precs[iStitch]->startStitch->x - currentStitch->x, precs[iStitch]->startStitch->y - currentStitch->y);
+				length = hypot(PRecs[iStitch]->startStitch->x - currentStitch->x, PRecs[iStitch]->startStitch->y - currentStitch->y);
 				if (length < minimumLength)
 				{
 					minimumLength = length;
 					direction = 0;
 					loc = iStitch;
 				}
-				length = hypot(precs[iStitch]->endStitch->x - currentStitch->x, precs[iStitch]->endStitch->y - currentStitch->y);
+				length = hypot(PRecs[iStitch]->endStitch->x - currentStitch->x, PRecs[iStitch]->endStitch->y - currentStitch->y);
 				if (length < minimumLength)
 				{
 					minimumLength = length;
@@ -1963,26 +1963,26 @@ double precjmps(SRTREC* stitchRecord)
 		}
 		if (minimumLength > 9 * PFGRAN)
 			totalJumps++;
-		FormFillCounter[precs[loc]->form]++;
+		FormFillCounter[PRecs[loc]->form]++;
 		if (chkMap(DUSRT))
 		{
 			if (direction)
 			{
-				if (precs[loc]->start)
+				if (PRecs[loc]->start)
 				{
-					for (iStitch = precs[loc]->finish - 1; iStitch >= precs[loc]->start; iStitch--)
+					for (iStitch = PRecs[loc]->finish - 1; iStitch >= PRecs[loc]->start; iStitch--)
 						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[iStitch]);
 				}
 				else
 				{
-					iStitch = precs[loc]->finish;
+					iStitch = PRecs[loc]->finish;
 					while (iStitch)
 						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[--iStitch]);
 				}
 			}
 			else
 			{
-				for (iStitch = precs[loc]->start; iStitch < precs[loc]->finish; iStitch++)
+				for (iStitch = PRecs[loc]->start; iStitch < PRecs[loc]->finish; iStitch++)
 					moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[iStitch]);
 			}
 		}
@@ -2104,51 +2104,51 @@ void fsort()
 	records[iRecord].finish = PCSHeader.stitchCount;
 	iRecord++;
 	lastRecord = iRecord;
-	// ToDo - allocate memory locally for precs
-	precs = (OREC**)&records[lastRecord];
-	// ToDo - allocate memory locally for pfrecs
-	pfrecs = (OREC**)&records[lastRecord << 1];
+	// ToDo - allocate memory locally for PRecs
+	PRecs = (OREC**)&records[lastRecord];
+	// ToDo - allocate memory locally for PFRecs
+	PFRecs = (OREC**)&records[lastRecord << 1];
 	for (iRecord = 0; iRecord < lastRecord; iRecord++)
 	{
 		durec(&records[iRecord]);
-		precs[iRecord] = &records[iRecord];
-		pfrecs[iRecord] = &records[iRecord];
+		PRecs[iRecord] = &records[iRecord];
+		PFRecs[iRecord] = &records[iRecord];
 	}
-	qsort((void*)precs, lastRecord, 4, recmp);
-	qsort((void*)pfrecs, lastRecord, 4, refcmp);
+	qsort((void*)PRecs, lastRecord, 4, recmp);
+	qsort((void*)PFRecs, lastRecord, 4, refcmp);
 #ifdef _DEBUG
-	dmprec(precs, lastRecord);
+	dmprec(PRecs, lastRecord);
 #endif
-	if (srtchk(pfrecs, lastRecord, &badForm))
+	if (srtchk(PFRecs, lastRecord, &badForm))
 	{
 		// ToDo - allocate memory locally for stitchRange
-		stitchRange = (RANGE*)&precs[lastRecord];
+		stitchRange = (RANGE*)&PRecs[lastRecord];
 		stitchRange[0].start = 0;
-		attribute = precs[0]->color;
+		attribute = PRecs[0]->color;
 		currentForm = 0xffffffff;
 		typeCount = 0;
 		iRange = 0;
 		for (iRecord = 0; iRecord < lastRecord; iRecord++)
 		{
-			if (attribute != precs[iRecord]->color)
+			if (attribute != PRecs[iRecord]->color)
 			{
 				stitchRange[iRange].finish = iRecord;
 				iRange++;
 				stitchRange[iRange].start = iRecord;
-				attribute = precs[iRecord]->color;
-				currentForm = precs[iRecord]->form;
+				attribute = PRecs[iRecord]->color;
+				currentForm = PRecs[iRecord]->form;
 				typeCount = 0;
 				goto srtskp;
 			}
-			if (precs[iRecord]->form == currentForm)
+			if (PRecs[iRecord]->form == currentForm)
 				typeCount++;
 			else
 			{
 				typeCount = 0;
-				currentForm = precs[iRecord]->form;
+				currentForm = PRecs[iRecord]->form;
 			}
 		srtskp:;
-			precs[iRecord]->otyp = typeCount;
+			PRecs[iRecord]->otyp = typeCount;
 		}
 		stitchRange[iRange].finish = lastRecord;
 		lastRange = ++iRange;
@@ -2167,7 +2167,7 @@ void fsort()
 			for (iRecord = sortRecord.start; iRecord < sortRecord.finish; iRecord++)
 			{
 				sortRecord.loc = iRecord;
-				if (!precs[iRecord]->otyp)
+				if (!PRecs[iRecord]->otyp)
 				{
 					jumps = duprecs(&sortRecord);
 					if (jumps < minimumJumps)
@@ -2195,7 +2195,7 @@ void fsort()
 	else
 	{
 		LoadString(ThrEdInstance, IDS_SRTER, HelpBuffer, HBUFSIZ);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, pfrecs[badForm]->form);
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, PFRecs[badForm]->form);
 		shoMsg(MsgBuffer);
 	}
 }
