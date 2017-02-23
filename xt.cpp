@@ -1926,9 +1926,7 @@ double precjmps(SRTREC* stitchRecord)
 	fPOINTATTR*		currentStitch;
 	BOOL			direction;
 
-	// ToDo - assign memory locally for FormFillCounter
-	FormFillCounter = (unsigned*)&OSequence;
-	FillMemory(&OSequence, (ActivePointIndex + 2) << 2, 0);
+	FormFillCounter = new unsigned[(ActivePointIndex + 2) << 2]();
 	// ToDo - rename loc (and loci)
 	loc = stitchRecord->loc;
 	direction = stitchRecord->direction;
@@ -1987,6 +1985,7 @@ double precjmps(SRTREC* stitchRecord)
 			}
 		}
 	}
+	delete[] FormFillCounter;
 	return totalJumps;
 }
 

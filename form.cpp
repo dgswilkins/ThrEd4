@@ -294,7 +294,7 @@ fPOINT*			ClipFillData;			//data for clipboard fills
 fPOINT*			ClipReversedData;		//data for clipboard fills
 unsigned		StitchLineCount;		//count of stitch lines
 SMALPNTL*		LineEndpoints;			//pairs of fill line endpoints
-unsigned		ActivePointIndex;		//pointer to the active formOrigin in the sequencing algorithm
+unsigned		ActivePointIndex;		//pointer to the active form in the sequencing algorithm
 unsigned		LineGroupIndex;			//pointer for groups of fill line segments
 SMALPNTL**		SortedLines;			//sorted pointers to LineEndpoints
 unsigned short	VertexCount;			//sides of the selected form to fill
