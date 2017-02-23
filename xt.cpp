@@ -110,20 +110,20 @@ extern	void		chkhup();
 extern	unsigned	chkMap(unsigned bit);
 extern	BOOL		chkmax(unsigned arg0, unsigned arg1);
 extern	void		chkmen();
-extern	BOOL		chkr(unsigned pbit);
-extern	void		chkseq(BOOL brd);
+extern	BOOL		chkr(unsigned bit);
+extern	void		chkseq(BOOL border);
 extern	unsigned	chku(unsigned bit);
-extern	BOOL		cisin(float pntx, float pnty);
-extern	unsigned	closflt(float px, float py);
+extern	BOOL		cisin(float xCoordinate, float yCoordinate);
+extern	unsigned	closflt(float xCoordinate, float yCoordinate);
 extern	void		clpfil();
-extern	void		clRmap(unsigned len);
+extern	void		clRmap(unsigned mapSize);
 extern	void		coltab();
 extern	void		datmsg(unsigned code);
-extern	void		delclps(unsigned ind);
+extern	void		delclps(unsigned iForm);
 extern	void		delinf();
-extern	void		delmclp(unsigned fpnt);
-extern	void		delmfil(unsigned col);
-extern	void		delsac(unsigned fpnt);
+extern	void		delmclp(unsigned iForm);
+extern	void		delmfil(unsigned color);
+extern	void		delsac(unsigned formIndex);
 extern	void		dumrk(double xCoord, double yCoord);
 extern	void		filang();
 extern	BOOL		filmsgs(unsigned code);
@@ -133,21 +133,21 @@ extern	void		filvrt();
 extern	unsigned	find1st();
 extern	void		fnhor();
 extern	void		fnvrt();
-extern	void		frmclr(FRMHED* dst);
-extern	void		frmcpy(FRMHED* dst, FRMHED* src);
-extern	void		frmout(unsigned ind);
+extern	void		frmclr(FRMHED* destination);
+extern	void		frmcpy(FRMHED* destination, FRMHED* source);
+extern	void		frmout(unsigned formIndex);
 extern	void		frmrct(fRECTANGLE* rectangle);
 extern	void		fshor();
-extern	void		fvars(unsigned ind);
+extern	void		fvars(unsigned iForm);
 extern	unsigned	getlast();
 extern	void		hsizmsg();
-extern	BOOL		isclp(unsigned find);
-extern	BOOL		iseclp(unsigned find);
-extern	BOOL		isin(float pntx, float pnty);
+extern	BOOL		isclp(unsigned iForm);
+extern	BOOL		iseclp(unsigned iForm);
+extern	BOOL		isin(float xCoordinate, float yCoordinate);
 extern	void		lcon();
-extern	void		makspac(unsigned strt, unsigned cnt);
+extern	void		makspac(unsigned start, unsigned count);
 extern	void		mdufrm();
-extern	float		midl(float hi, float lo);
+extern	float		midl(float high, float low);
 extern	void		moveStitch(fPOINTATTR* destination, fPOINTATTR* source);
 extern	void		movStch();
 extern	void		movStch();
@@ -155,8 +155,8 @@ extern	void		msgflt(unsigned messageId, float value);
 extern	void		mvstch(unsigned destination, unsigned source);
 extern	void		mvstchs(unsigned destination, unsigned source, unsigned count);
 extern	void		numWnd();
-extern	unsigned short	nxt(unsigned short ind);
-extern	unsigned short	prv(unsigned ind);
+extern	unsigned short	nxt(unsigned short iVertex);
+extern	unsigned short	prv(unsigned iVertex);
 extern	unsigned	psg();
 extern	unsigned	px2stch();
 extern	void		redraw(HWND window);
@@ -169,13 +169,13 @@ extern	unsigned	rstMap(unsigned bit);
 extern	unsigned	rstu(unsigned bit);
 extern	void		rtrclpfn();
 extern	void		satfil();
-extern	void		satout(double satwid);
+extern	void		satout(double satinWidth);
 extern	void		savdo();
 extern	void		save();
 extern	void		setknots();
 extern	unsigned	setMap(unsigned bit);
 extern	void		setmfrm();
-extern	void		setr(unsigned pbit);
+extern	void		setr(unsigned bit);
 extern	unsigned	setu(unsigned bit);
 extern	void		shoMsg(TCHAR* string);
 extern	void		shoseln(unsigned code0, unsigned code1);
@@ -299,11 +299,11 @@ void prbug()
 }
 #endif
 
-BOOL istx(unsigned find)
+BOOL istx(unsigned iForm)
 {
 	FRMHED* pfrm;
 
-	pfrm = &FormList[find];
+	pfrm = &FormList[iForm];
 	if (pfrm->fillType == TXVRTF)
 		return 1;
 	if (pfrm->fillType == TXHORF)

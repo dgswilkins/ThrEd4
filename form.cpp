@@ -1248,13 +1248,13 @@ float midl(float high, float low) {
 	return (high - low) / 2 + low;
 }
 
-void fvars(unsigned ind) {
-	SelectedForm = &FormList[ind];
-	CurrentFormVertices = FormList[ind].vertices;
-	VertexCount = FormList[ind].vertexCount;
-	CurrentFormGuides = FormList[ind].satinOrAngle.guide;
-	CurrentFormConnectionsCount = FormList[ind].satinGuideCount;
-	WordParam = FormList[ind].wordParam;
+void fvars(unsigned iForm) {
+	SelectedForm = &FormList[iForm];
+	CurrentFormVertices = FormList[iForm].vertices;
+	VertexCount = FormList[iForm].vertexCount;
+	CurrentFormGuides = FormList[iForm].satinOrAngle.guide;
+	CurrentFormConnectionsCount = FormList[iForm].satinGuideCount;
+	WordParam = FormList[iForm].wordParam;
 }
 
 void ritfrct(unsigned iForm, HDC dc) {

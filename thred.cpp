@@ -67,6 +67,7 @@ void		selRct (fRECTANGLE* sourceRect);
 unsigned	setRmp (unsigned bit);
 void		setpsel ();
 void		shft (fPOINT delta);
+void		sizstch (fRECTANGLE* rectangle);
 void		thrsav ();
 void		trcols (COLORREF color);
 void		trcsel ();
@@ -103,28 +104,28 @@ extern	void			chgchk (int code);
 extern	void			chgwrn ();
 extern	void			chkcont ();
 extern	unsigned		chkfrm ();
-extern	BOOL			chkr (unsigned pbit);
+extern	BOOL			chkr (unsigned bit);
 extern	unsigned		closfrm ();
-extern	void			clRmap (unsigned len);
+extern	void			clRmap (unsigned mapSize);
 extern	void			clpfil ();
-extern	void			clpic (unsigned short strtlin);
+extern	void			clpic (unsigned short start);
 extern	void			clrfills ();
 extern	void			clrstch ();
 extern	void			cntrx ();
 extern	void			col2frm ();
 extern	void			contfil ();
-extern	void			cpylayr (unsigned play);
+extern	void			cpylayr (unsigned codedLayer);
 extern	void			crmsg (TCHAR* fileName);
 extern	void			crop ();
 extern	void			dazdef ();
 extern	void			debean ();
-extern	void			delcon (unsigned p_cpnt);
-extern	void			deleclp (unsigned fpnt);
-extern	void			delflt (unsigned fpnt);
+extern	void			delcon (unsigned GuideIndex);
+extern	void			deleclp (unsigned iForm);
+extern	void			delflt (unsigned formIndex);
 extern	void			delfrms ();
-extern	void			delmclp (unsigned fpnt);
-extern	void			delmfil (unsigned col);
-extern	void			delsac (unsigned fpnt);
+extern	void			delmclp (unsigned iForm);
+extern	void			delmfil (unsigned color);
+extern	void			delsac (unsigned formIndex);
 extern	void			delspnt ();
 extern	void			deltx ();
 #ifdef _DEBUG
@@ -159,22 +160,22 @@ extern	void			dufrm ();
 extern	void			dufspac (float spacing);
 extern	void			dufwid (float length);
 extern	void			dufxang (float angle);
-extern	void			duhart (unsigned nsids);
+extern	void			duhart (unsigned sideCount);
 extern	void			duinsf ();
-extern	void			dulens (unsigned nsids);
+extern	void			dulens (unsigned sides);
 extern	void			dundcol (unsigned color);
 extern	void			duprot ();
 extern	void			dupsel (HDC dc);
-extern	void			durpoli (unsigned sidz);
+extern	void			durpoli (unsigned vertexCount);
 extern	void			dusat ();
 extern	void			dushft ();
 extern	void			duspac (float spacing);
-extern	void			duspir (unsigned nsids);
-extern	void			dustar (unsigned nsids, double len);
+extern	void			duspir (unsigned stepCount);
+extern	void			dustar (unsigned starCount, double length);
 extern	void			dusulen (float length);
 extern	void			dutxtfil ();
 extern	void			duxclp ();
-extern	void			duzig (unsigned nsids);
+extern	void			duzig (unsigned vertices);
 extern	void			fclp ();
 extern	void			fcntr ();
 extern	void			fethr ();
@@ -189,31 +190,31 @@ extern	unsigned		find1st ();
 extern	void			fliph ();
 extern	void			flipv ();
 extern	void			flpord ();
-extern	unsigned		fltind (fPOINT* pnt);
-extern	void			fltspac (fPOINT* strt, unsigned cnt);
+extern	unsigned		fltind (fPOINT* point);
+extern	void			fltspac (fPOINT* start, unsigned count);
 extern	void			form ();
 extern	void			fritfil ();
 extern	void			frm0 ();
-extern	void			frmadj (unsigned find);
+extern	void			frmadj (unsigned formIndex);
 extern	void			frmchkx ();
-extern	void			frmclr (FRMHED* dst);
-extern	void			frmcpy (FRMHED* dst, FRMHED* src);
-extern	void			frmlin (fPOINT* scr, unsigned sidz);
+extern	void			frmclr (FRMHED* destination);
+extern	void			frmcpy (FRMHED* destination, FRMHED* source);
+extern	void			frmlin (fPOINT* vertices, unsigned vertexCount);
 extern	void			frmnum ();
-extern	void			frmnumfn (unsigned nunum);
+extern	void			frmnumfn (unsigned newFormIndex);
 extern	void			frmon ();
-extern	void			frmout (unsigned ind);
+extern	void			frmout (unsigned formIndex);
 extern	void			frmovlin ();
-extern	BOOL			frmrng (unsigned fpnt, RANGE* rng);
+extern	BOOL			frmrng (unsigned iForm, RANGE* range);
 extern	void			frmsadj ();
-extern	void			frmsqr (unsigned ind);
-extern	void			frmx (POINT p_cpnt, HDC dc);
+extern	void			frmsqr (unsigned iVertex);
+extern	void			frmx (POINT controlPoint, HDC dc);
 extern	void			fsclpx ();
-extern	void			fselrct (unsigned fpnt);
+extern	void			fselrct (unsigned iForm);
 extern	void			fsizpar ();
 extern	void			fsort ();
-extern	void			fvars (unsigned ind);
-extern	void			getfinfo (unsigned ind);
+extern	void			fvars (unsigned iForm);
+extern	void			getfinfo (unsigned iForm);
 extern	unsigned		getlast ();
 extern	void			grpmsg ();
 extern	void			grpmsg1 ();
@@ -225,47 +226,47 @@ extern	void			hsizmsg ();
 extern	void			infrm ();
 extern	void			insat ();
 extern	void			ispcdclp ();
-extern	BOOL			istx (unsigned find);
+extern	BOOL			istx (unsigned iForm);
 extern	void			join ();
 extern	void			lodchk ();
 extern	void			lodstr ();
-extern	void			makspac (unsigned strt, unsigned cnt);
-extern	void			maxtsiz (TCHAR* str, POINT* pt);
-extern	void			maxwid (unsigned strt, unsigned fin);
-extern	float			midl (float hi, float lo);
+extern	void			makspac (unsigned start, unsigned count);
+extern	void			maxtsiz (TCHAR* string, POINT* textSize);
+extern	void			maxwid (unsigned start, unsigned finish);
+extern	float			midl (float high, float low);
 extern	void			mdufrm ();
-extern	void			movlayr (unsigned play);
+extern	void			movlayr (unsigned codedLayer);
 extern	void			msgstr (unsigned code);
 extern	void			munfrm ();
 extern	void			mvshft ();
 extern	void			notcwlk ();
-extern	BOOL			notfstch (unsigned at);
+extern	BOOL			notfstch (unsigned attribute);
 extern	BOOL			notsel ();
 extern	void			notund ();
 extern	void			notwlk ();
-extern	void			nubrdcol (unsigned col);
+extern	void			nubrdcol (unsigned color);
 extern	void			nudsiz ();
-extern	void			nufilcol (unsigned col);
+extern	void			nufilcol (unsigned color);
 extern	void			nufsel ();
-extern	void			nufthcol (unsigned col);
-extern	void			nulapcol (unsigned col);
-extern	unsigned short	nxt (unsigned short ind);
-extern	void			oclp (fPOINT* p_clp, unsigned p_nclp);
-extern	unsigned		pdir (unsigned ind);
+extern	void			nufthcol (unsigned color);
+extern	void			nulapcol (unsigned color);
+extern	unsigned short	nxt (unsigned short iVertex);
+extern	void			oclp (fPOINT* clip, unsigned clipEntries);
+extern	unsigned		pdir (unsigned vertex);
 extern	void			pes2crd ();
 extern	void			picot ();
 extern	void			prbug ();
 extern	void			prfmsg ();
 extern	void			prfsid (HWND wnd);
-extern	unsigned		projh (double pnty, fPOINT pnt0, fPOINT pnt1, dPOINT* ipnt);
-extern	void			prpbrd (double spac);
-extern	unsigned short	prv (unsigned ind);
+extern	unsigned		projh (double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersection);
+extern	void			prpbrd (double borderStitchSpacing);
+extern	unsigned short	prv (unsigned iVertex);
 extern	unsigned		psg ();
-extern	void			px2stchf (POINT pxpnt, fPOINT* stpnt);
-extern	void			pxrct2stch (RECT pxr, fRECTANGLE* str);
+extern	void			px2stchf (POINT screen, fPOINT* stitchPoint);
+extern	void			pxrct2stch (RECT screenRect, fRECTANGLE* stitchRect);
 extern	void			rats ();
 extern	void			ratsr ();
-extern	void			rct2sel (RECT rct, POINT* lin);
+extern	void			rct2sel (RECT rectangle, POINT* line);
 extern	void			redtx ();
 extern	void			redtx ();
 extern	void			redup ();
@@ -278,7 +279,7 @@ extern	void			ribon ();
 extern	void			rinfrm ();
 extern	void			ritbrd ();
 extern	void			riter ();
-extern	void			ritfrct (unsigned ind, HDC dc);
+extern	void			ritfrct (unsigned iForm, HDC dc);
 extern	void			rotagain ();
 extern	void			rotcmd ();
 extern	void			rotdup ();
@@ -286,7 +287,7 @@ extern	void			rstfrm ();
 extern	void			rstxt ();
 extern	void			rstxt ();
 extern	void			rtrclp ();
-extern	void			sRct2px (fRECTANGLE strct, RECT* pxrct);
+extern	void			sRct2px (fRECTANGLE stitchRect, RECT* screenRect);
 extern	void			satadj ();
 extern	void			satbrd ();
 extern	void			satfix ();
@@ -295,15 +296,15 @@ extern	void			satpnt0 ();
 extern	void			satpnt1 ();
 extern	void			satsel ();
 extern	void			satzum ();
-extern	void			savblen (float len);
+extern	void			savblen (float fLength);
 extern	void			savdisc ();
-extern	void			savplen (float len);
+extern	void			savplen (float length);
 extern	void			savtxt ();
 extern	void			selal ();
 extern	void			selalfil ();
 extern	void			selalfrm ();
-extern	void			selfil (unsigned typ);
-extern	void			selsqr (POINT p_cpnt, HDC dc);
+extern	void			selfil (unsigned type);
+extern	void			selsqr (POINT controlPoint, HDC dc);
 extern	void			setap ();
 extern	void			setbcol ();
 extern	void			setblen ();
@@ -331,10 +332,10 @@ extern	void			setfwid ();
 extern	void			sethup ();
 extern	void			setins ();
 extern	void			setmfrm ();
-extern	void			setr (unsigned pbit);
+extern	void			setr (unsigned bit);
 extern	void			setrang ();
 #if PESACT
-extern	BOOL			setrc (unsigned pbit);
+extern	BOOL			setrc (unsigned bit);
 #endif
 extern	void			setshft ();
 extern	void			setstrtch ();
@@ -345,19 +346,18 @@ extern	void			setund ();
 extern	void			setuspac ();
 extern	void			setwlk ();
 extern	void			setwlkind ();
-extern	void			sfCor2px (fPOINT stpnt, POINT* pxpnt);
+extern	void			sfCor2px (fPOINT stitchPoint, POINT* screen);
 extern	void			sfuang ();
 extern	void			shoMsg (TCHAR* string);
-extern	void			shoseln (unsigned cod0, unsigned cod1);
+extern	void			shoseln (unsigned code0, unsigned code1);
 extern	void			shrnk ();
 extern	void			sidwnd (HWND wnd);
-void			sizstch (fRECTANGLE* rectangle);
 extern	void			snap ();
 extern	void			spltfrm ();
 extern	void			srtbyfrm ();
 extern	void			srtfrm ();
-extern	void			stCor2px (fPOINTATTR stpnt, POINT* pxpnt);
-extern	void			stchrct2px (fRECTANGLE srct, RECT* prct);
+extern	void			stCor2px (fPOINTATTR stitch, POINT* screen);
+extern	void			stchrct2px (fRECTANGLE stitchRect, RECT* screenRect);
 extern	void			stchs2frm ();
 extern	void			strtchbox ();
 extern	void			tabmsg (unsigned code);
@@ -1876,16 +1876,16 @@ void getdes()
 	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, (DLGPROC)dnamproc);
 }
 
-BOOL isclp(unsigned find) {
+BOOL isclp(unsigned iForm) {
 
-	if ((1 << FormList[find].fillType)&ClipTypeMap)
+	if ((1 << FormList[iForm].fillType)&ClipTypeMap)
 		return 1;
 	return 0;
 }
 
-BOOL isclpx(unsigned find) {
+BOOL isclpx(unsigned iForm) {
 
-	if (isclp(find) && FormList[find].lengthOrCount.clipCount)
+	if (isclp(iForm) && FormList[iForm].lengthOrCount.clipCount)
 		return 1;
 	return 0;
 }
@@ -1897,16 +1897,16 @@ BOOL isfclp() {
 	return 0;
 }
 
-BOOL iseclp(unsigned find) {
+BOOL iseclp(unsigned iForm) {
 
-	if (FormList[find].edgeType == EDGECLIP || FormList[find].edgeType == EDGEPICOT || FormList[find].edgeType == EDGECLIPX)
+	if (FormList[iForm].edgeType == EDGECLIP || FormList[iForm].edgeType == EDGEPICOT || FormList[iForm].edgeType == EDGECLIPX)
 		return 1;
 	return 0;
 }
 
-BOOL iseclpx(unsigned find) {
+BOOL iseclpx(unsigned iForm) {
 
-	if (iseclp(find) && FormList[find].clipEntries)
+	if (iseclp(iForm) && FormList[iForm].clipEntries)
 		return 1;
 	return 0;
 }
