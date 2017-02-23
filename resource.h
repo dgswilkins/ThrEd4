@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by thred.rc
 //
 #define IDS_FSELB                       1
@@ -20,10 +20,7 @@
 #define IDS_HUP2                        17
 #define IDS_HUP3                        18
 #define IDS_HUP4                        19
-#define IDS_KEY                         20
 #define IDS_CLP                         21
-#define IDS_EXP                         22
-#define IDS_XPIRAD                      23
 #define IDS_CNTR                        24
 #define IDS_MAPLOD                      25
 #define IDS_FRMOVR                      26
@@ -147,7 +144,6 @@
 #define IDS_THRED                       138
 #define IDS_NUFIL                       139
 #define IDS_SIZ                         140
-#define IDS_TRIAL                       141
 #define IDS_EMB                         142
 #define IDS_ON                          143
 #define IDS_OFF                         144
@@ -294,7 +290,6 @@
 #define IDS_ULEN                        292
 #define IDS_FUANG                       293
 #define IDS_FUSPAC                      294
-#define IDS_KEYVER                      295
 #define IDC_LOCKAL                      1001
 #define IDC_UNLOCKAL                    1002
 #define IDC_LOCKED                      1003
@@ -643,6 +638,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
+#define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        125
 #define _APS_NEXT_COMMAND_VALUE         40293
 #define _APS_NEXT_CONTROL_VALUE         1077
