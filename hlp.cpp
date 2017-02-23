@@ -320,17 +320,21 @@ void lodstr() {
 
 	unsigned	iString, iStringData, iStringTable, count;
 	TCHAR*		strings;
+	TCHAR*		stringStorage;
 
-	// ToDo - use local variable instead of BSequence
-	StringTable[0] = strings = (TCHAR*)BSequence;
+	// Over allocate storage to ensure no overflow
+	stringStorage = new TCHAR[65535];
+	strings = stringStorage;
 	for (iString = 0; iString < STR_LEN; iString++) {
 
 		count = LoadString(ThrEdInstance, LoadStringList[iString], strings, 1000) + 1;
 		strings += count;
 	}
-	count = strings - StringTable[0];
+	count = strings - stringStorage;
+	// Now allocate based on actual count
 	StringData = new TCHAR[count];
-	MoveMemory(StringData, StringTable[0], count);
+	MoveMemory(StringData, stringStorage, count);
+	delete[] stringStorage;
 	StringTable[0] = StringData;
 	iStringTable = 1;
 	for (iStringData = 0; iStringData <= count; iStringData++) {
