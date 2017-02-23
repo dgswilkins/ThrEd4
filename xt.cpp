@@ -1926,7 +1926,7 @@ double precjmps(SRTREC* stitchRecord)
 	fPOINTATTR*		currentStitch;
 	BOOL			direction;
 
-	FormFillCounter = new unsigned[(ActivePointIndex + 2) << 2]();
+	FormFillCounter = new unsigned[(FormIndex + 2) << 2]();
 	// ToDo - rename loc (and loci)
 	loc = stitchRecord->loc;
 	direction = stitchRecord->direction;
@@ -2080,7 +2080,7 @@ void fsort()
 	records->startStitch = StitchBuffer;
 	attribute = StitchBuffer->attribute&SRTMSK;
 	iRecord = 0;
-	ActivePointIndex = FormIndex;
+	//ActivePointIndex = FormIndex;
 	ColorOrder[AppliqueColor] = 0;
 	for (iColor = 0; iColor < 16; iColor++) {
 
