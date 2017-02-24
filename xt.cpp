@@ -5665,8 +5665,6 @@ void repflt()
 	}
 	FormIndex = iDestination;
 	ZeroMemory(&badData, sizeof(BADCNTS));
-	// ToDo - allocate memory locally for vertexPoint
-	//vertexPoint = (fPOINT*)BSequence;
 	vertexPoint = new fPOINT[vertexCount];
 	iVertex = 0;
 	for (iForm = 0; iForm < FormIndex; iForm++)
@@ -5714,8 +5712,7 @@ void repclp()
 	fPOINT*		clipPoint;
 
 	badClipCount = clipCount = 0;
-	// ToDo - allocate memory locally for clipPoint
-	clipPoint = (fPOINT*)&BSequence;
+	clipPoint = new fPOINT[MAXFRMPNTS];
 	for (iForm = 0; iForm < FormIndex; iForm++)
 	{
 		formHeader = &FormList[iForm];
@@ -5774,6 +5771,7 @@ void repclp()
 	ClipPointIndex = clipCount;
 	if (badClipCount)
 		adbad(IDS_CLPDAT, badClipCount);
+	delete[] clipPoint;
 }
 
 void repsat()
