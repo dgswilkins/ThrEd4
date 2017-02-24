@@ -4412,8 +4412,7 @@ void dutxfn(unsigned textureType)
 
 void txsrt()
 {
-	// ToDo - replace 6 with sizeof(TXPNT) ?
-	qsort((void*)TempTexturePoints, TextureScreen.index, 6, txcmp);
+	qsort((void*)TempTexturePoints, TextureScreen.index, sizeof(TXPNT), txcmp);
 }
 
 void dutxmir()
@@ -4915,8 +4914,7 @@ void txtkey(unsigned keyCode)
 
 	case 'H':
 
-		// ToDo - shouldn't this be HORTYP?
-		dutxfn(ANGTYP);
+		dutxfn(HORTYP);
 		break;
 
 	case 'E':
