@@ -12017,6 +12017,7 @@ void clpcon() {
 		totalLength += ClipSideLengths[vertex];
 		vertex = nextVertex;
 	}
+	// ToDo - Allocate memory locally for ClipSegments
 	ClipSegments = (CLPSEG*)&StitchBuffer[MAXSEQ];
 	clipGrid.left = floor(SelectedForm->rectangle.left / ClipWidth);
 	clipGrid.right = ceil(SelectedForm->rectangle.right / ClipWidth);
@@ -12179,7 +12180,7 @@ void clpcon() {
 		ClipStitchPoints[ActivePointIndex - 1].flag = 2;
 	}
 clpskp:;
-
+	delete[] TextureSegments; // this is allocated in setxt
 	ClipStitchPoints[ActivePointIndex].flag = 2;
 	if (negativeOffset) {
 		formNegativeOffset = negativeOffset*ClipRectSize.cy;

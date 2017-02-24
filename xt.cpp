@@ -402,7 +402,7 @@ void savtxt()
 			if (currentHistoryItem->texturePoint)
 			{
 				delete[](currentHistoryItem->texturePoint);
-				currentHistoryItem->texturePoint = 0;
+				currentHistoryItem->texturePoint = nullptr;
 			}
 			currentHistoryItem->texturePoint = new TXPNT[currentHistoryItem->count];
 			MoveMemory(currentHistoryItem->texturePoint, TempTexturePoints, currentHistoryItem->count * sizeof(TXPNT));
@@ -3477,7 +3477,7 @@ void dutxtfil()
 	movStch();
 	ShowWindow(VerticalScrollBar, FALSE);
 	ShowWindow(HorizontalScrollBar, FALSE);
-	SelectedTexturePointsList = (unsigned*)&OSequence;
+	SelectedTexturePointsList = new unsigned[MAXSTITCHS];
 	SelectedTexturePointsCount = 0;
 	setMap(INIT);
 	SideWindowButton = 0;
@@ -4364,7 +4364,6 @@ void altx()
 			}
 		}
 	}
-	txof();
 }
 
 enum
@@ -4527,7 +4526,7 @@ void txtlbut()
 			return;
 		}
 	}
-	if (txtclos(SelectedTexturePointsList))
+	if (txtclos(&SelectedTexturePointsList[0]))
 	{
 		SelectedTexturePointsCount = 1;
 		setxmov();
@@ -4704,6 +4703,10 @@ void txof()
 	SetWindowText(ButtonWin[HTXSPAC], "");
 	savtxt();
 	zumhom();
+	if (SelectedTexturePointsList) {
+		delete[] SelectedTexturePointsList; // Allocated in setshft or dutxtfil
+		SelectedTexturePointsList = nullptr;
+	}
 	rstMap(TXTRED);
 }
 
@@ -5004,9 +5007,7 @@ void setxt()
 	setMap(TXFIL);
 	ClipRectSize.cx = SelectedForm->fillSpacing;
 	ClipRectSize.cy = SelectedForm->fillInfo.texture.height;
-	// ToDo - Allocate memory locally for TextureSegments
-	TextureSegments = (RNGCNT*)&MarkedStitchMap;
-	FillMemory(TextureSegments, SelectedForm->fillInfo.texture.lines * sizeof(RNGCNT), 0);
+	TextureSegments = new RNGCNT[SelectedForm->fillInfo.texture.lines]();
 	currentFormTexture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
 	count = SelectedForm->fillInfo.texture.count;
 	if (count)
@@ -5271,8 +5272,7 @@ void setshft()
 	unsigned	iStitch, line;
 
 	savtxt();
-	// ToDo - Allocate memory locally for SelectedTexturePointsList
-	SelectedTexturePointsList = (unsigned*)&OSequence;
+	SelectedTexturePointsList = new unsigned[MAXSTITCHS];
 	unbBox();
 	rstMap(BZUMIN);
 	pxCor2stch(ZoomBoxLine[0]);

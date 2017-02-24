@@ -52,7 +52,8 @@
 #define		PAGSCROL	0.9			//page scroll factor
 #define		LINSCROL	0.05		//line scroll factor
 #define		TXTSIDS		6			//extra pixels in a text box
-#define		MAXPCS		131072		//maximum possible stiches in a pcs file*2
+#define		MAXSTITCHS	0x10000		//maximum number of stitches
+#define		MAXPCS		0x20000		//maximum possible stiches in a pcs file*2
 #define		MAXCHNG		10000		//maximum number of color changes
 #define		SHUPX		480			//small hoop x size
 #define		SHUPY		480			//small hoop y size
@@ -95,7 +96,7 @@ const unsigned long	RMAPBITS = RMAPSIZ << 5;	//a bit for each stitch
 #define		MAXSTCH		54			//maximum permitted stitch length for pfaf in pfaf "stitch pixels"
 #define		USPAC		15			//underlay fill spacing
 #define		APSPAC		10.8		//applique border spacing
-#define		OSEQLEN		262144		//output sequence length
+#define		OSEQLEN		0x40000		//output sequence length
 #define		BSEQLEN		OSEQLEN<<1	//reverse sequence length
 #define		MAXRAT		3			//maximum number of stitches in one place in satin border
 #define		URAT		0.75		//ratio of underlay stitch to satin border size
