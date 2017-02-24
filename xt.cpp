@@ -2076,8 +2076,8 @@ void fsort()
 	savdo();
 	// There cannot be more records than stitches, so use MAXPCS
 	records = new OREC[MAXPCS];
-	records->start = 0;
-	records->startStitch = StitchBuffer;
+	records[0].start = 0;
+	records[0].startStitch = StitchBuffer;
 	attribute = StitchBuffer->attribute&SRTMSK;
 	iRecord = 0;
 	ColorOrder[AppliqueColor] = 0;
