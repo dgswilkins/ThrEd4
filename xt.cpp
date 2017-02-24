@@ -122,7 +122,6 @@ extern	void		datmsg(unsigned code);
 extern	void		delclps(unsigned iForm);
 extern	void		delinf();
 extern	void		delmclp(unsigned iForm);
-extern	void		delmfil(unsigned color);
 extern	void		delsac(unsigned formIndex);
 extern	void		dumrk(double xCoord, double yCoord);
 extern	void		filang();

@@ -124,7 +124,7 @@ extern	void			deleclp (unsigned iForm);
 extern	void			delflt (unsigned formIndex);
 extern	void			delfrms ();
 extern	void			delmclp (unsigned iForm);
-extern	void			delmfil (unsigned color);
+extern	void			delmfil ();
 extern	void			delsac (unsigned formIndex);
 extern	void			delspnt ();
 extern	void			deltx ();
@@ -9896,7 +9896,7 @@ void delet() {
 
 					if (ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.start || ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.finish) {
 
-						delmfil(SelectedForm->fillColor);
+						delmfil();
 						SelectedForm->fillType = 0;
 						coltab();
 						setMap(RESTCH);
@@ -17022,7 +17022,7 @@ unsigned chkMsg() {
 
 					if (SelectedForm->fillType) {
 
-						delmfil(SelectedForm->fillColor);
+						delmfil();
 						SelectedForm->fillType = 0;
 					}
 					if (SelectedForm->edgeType) {
@@ -17178,7 +17178,7 @@ unsigned chkMsg() {
 				if (Msg.hwnd == SideWindow[0]) {
 
 					SelectedForm->type = FRMFPOLY;
-					delmfil(SelectedForm->fillColor);
+					delmfil();
 					SelectedForm->fillType = 0;
 					coltab();
 					unsid();

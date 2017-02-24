@@ -749,6 +749,7 @@ fPOINT* nueclp(unsigned formIndex, unsigned count) {
 		ClipPoints[destination].x = ClipPoints[source].x;
 		ClipPoints[destination--].y = ClipPoints[source--].y;
 	}
+	// ToDo - This does not look right. find is the number of stitches in the current clip
 	FormList[find].borderClipData = &ClipPoints[find];
 	// Todo - Should this be "iForm = 0"?
 	for (iform = formIndex; iform < FormIndex; iform++) {
@@ -920,15 +921,13 @@ void delfil(unsigned attribute) {
 	PCSHeader.stitchCount = iDestination;
 }
 
-void delmfil(unsigned color) {
+void delmfil() {
 	unsigned attribute, stitchAttribute;
 	unsigned iSource, iDestination;
 
 	if (istx(ClosestFormToCursor))
 		deltx();
 	delmclp(ClosestFormToCursor);
-	// ToDo - color is not used. Remove parameter?
-	color &= 0xf;
 	attribute = ClosestFormToCursor << FRMSHFT;
 	iDestination = 0;
 	for (iSource = 0; iSource < PCSHeader.stitchCount; iSource++)
