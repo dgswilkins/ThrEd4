@@ -4553,8 +4553,9 @@ void redtbak()
 	TextureScreen.width = textureHistoryItem->width;
 	TextureScreen.spacing = textureHistoryItem->spacing;
 	TextureScreen.index = textureHistoryItem->count;
-	// ToDo - check texturePoint is valid first
-	MoveMemory (TempTexturePoints, textureHistoryItem->texturePoint, textureHistoryItem->count * sizeof (TXPNT));
+	if (textureHistoryItem->texturePoint) {
+		MoveMemory (TempTexturePoints, textureHistoryItem->texturePoint, textureHistoryItem->count * sizeof (TXPNT));
+	}
 	setMap(RESTCH);
 }
 
@@ -5396,9 +5397,9 @@ void redtx()
 			{
 				ReadFile(handle, (int*)&TextureHistoryIndex, 4, &bytesRead, 0);
 				ReadFile(handle, (TXHST*)&TextureHistory, sizeof(TXHST) * 16, &historyBytesRead, 0);
-				//ToDo - texturePoint should be a null pointer at this point as no memory has been allocated, but it is not
-				//       because the old pointer value is read in from the file, so zero it out either here or when writing it
-				//       to avoid the problem in the first place
+				// texturePoint should be a null pointer at this point as no memory has been allocated, but it is not
+				// because the old pointer value is read in from the file, so zero it out here as it is easier than 
+				// writing a zero to the file
 				for (ind = 0; ind < 16; ind++) {
 					TextureHistory[ind].texturePoint = 0;
 				}
