@@ -2017,7 +2017,7 @@ void dmprec(OREC** records, unsigned count)
 	{
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%4d off: %4d at: %08x frm: %4d typ: %d col: %2d st: %5d fin: %5d\n",
 			iRecord,
-			records[iRecord] - (OREC*)BSequence,
+			records[iRecord] - records[0],
 			StitchBuffer[records[iRecord]->start].attribute,
 			records[iRecord]->form,
 			records[iRecord]->type,
@@ -2074,13 +2074,12 @@ void fsort()
 	ULARGE_INTEGER	nextTime;
 
 	savdo();
-	// ToDo - Allocate memory locally for records
-	records = (OREC*)&BSequence;
+	// There cannot be more records than stitches, so use MAXPCS
+	records = new OREC[MAXPCS];
 	records->start = 0;
 	records->startStitch = StitchBuffer;
 	attribute = StitchBuffer->attribute&SRTMSK;
 	iRecord = 0;
-	//ActivePointIndex = FormIndex;
 	ColorOrder[AppliqueColor] = 0;
 	for (iColor = 0; iColor < 16; iColor++) {
 
@@ -2103,10 +2102,8 @@ void fsort()
 	records[iRecord].finish = PCSHeader.stitchCount;
 	iRecord++;
 	lastRecord = iRecord;
-	// ToDo - allocate memory locally for PRecs
-	PRecs = (OREC**)&records[lastRecord];
-	// ToDo - allocate memory locally for PFRecs
-	PFRecs = (OREC**)&records[lastRecord << 1];
+	PRecs = new OREC*[lastRecord];
+	PFRecs = new OREC*[lastRecord];
 	for (iRecord = 0; iRecord < lastRecord; iRecord++)
 	{
 		durec(&records[iRecord]);
@@ -2120,8 +2117,7 @@ void fsort()
 #endif
 	if (srtchk(PFRecs, lastRecord, &badForm))
 	{
-		// ToDo - allocate memory locally for stitchRange
-		stitchRange = (RANGE*)&PRecs[lastRecord];
+		stitchRange = new RANGE[lastRecord];
 		stitchRange[0].start = 0;
 		attribute = PRecs[0]->color;
 		currentForm = 0xffffffff;
@@ -2190,6 +2186,7 @@ void fsort()
 		PCSHeader.stitchCount = OutputIndex;
 		coltab();
 		setMap(RESTCH);
+		delete[] stitchRange;
 	}
 	else
 	{
@@ -2197,6 +2194,9 @@ void fsort()
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, PFRecs[badForm]->form);
 		shoMsg(MsgBuffer);
 	}
+	delete[] PFRecs;
+	delete[] PRecs;
+	delete[] records;
 }
 
 unsigned dutyp(unsigned attribute)
@@ -4314,8 +4314,7 @@ void nutx()
 	int			iForm, iPoint;
 	FRMHED*		formHeader;
 
-	// ToDo - Should 6 be replaced with sizeof(TXPNT)
-	qsort((void*)&TempTexturePoints, TextureScreen.index, 6, txcmp);
+	qsort((void*)&TempTexturePoints, TextureScreen.index, sizeof(TXPNT), txcmp);
 	iPoint = 0;
 	if (FormIndex)
 	{
