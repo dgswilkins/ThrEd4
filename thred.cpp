@@ -3555,7 +3555,7 @@ void dun() {
 			reldun();
 		}
 	}
-	delete[] StringData;
+	delete[] StringData; // This is allocated in lodstr
 }
 
 void dusid(unsigned entry) {

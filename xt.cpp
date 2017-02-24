@@ -5651,20 +5651,23 @@ void chkfstch()
 void repflt()
 {
 	fPOINT* vertexPoint;
-	unsigned iForm, iDestination, iVertex, vertexDifference;
+	unsigned iForm, iDestination, iVertex, vertexDifference, vertexCount=0;
 	FRMHED* formHeader;
 	BADCNTS badData;
 
 	iDestination = 0;
 	for (iForm = 0; iForm < FormIndex; iForm++)
 	{
-		if (FormList[iForm].vertexCount)
+		if (FormList[iForm].vertexCount) {
 			MoveMemory(&FormList[iDestination++], &FormList[iForm], sizeof(FRMHED));
+			vertexCount += FormList[iForm].vertexCount;
+		}
 	}
 	FormIndex = iDestination;
 	ZeroMemory(&badData, sizeof(BADCNTS));
 	// ToDo - allocate memory locally for vertexPoint
-	vertexPoint = (fPOINT*)BSequence;
+	//vertexPoint = (fPOINT*)BSequence;
+	vertexPoint = new fPOINT[vertexCount];
 	iVertex = 0;
 	for (iForm = 0; iForm < FormIndex; iForm++)
 	{
@@ -5701,6 +5704,7 @@ void repflt()
 	FormVertexIndex = iVertex;
 rfltskp:;
 	MoveMemory(FormVertices, vertexPoint, sizeof(fPOINT)*FormVertexIndex);
+	delete[] vertexPoint;
 }
 
 void repclp()
@@ -5853,7 +5857,9 @@ void reptx()
 void repar()
 {
 	unsigned repairType;
+	TCHAR* savedStringData;
 
+	savedStringData = StringData;
 	savdo();
 	StringData = MsgBuffer;
 	repairType = frmchkfn();
@@ -5873,6 +5879,7 @@ void repar()
 		*StringData = 0;
 		shoMsg(MsgBuffer);
 	}
+	StringData = savedStringData;
 }
 
 void tst()
