@@ -154,8 +154,8 @@ extern	void		msgflt(unsigned messageId, float value);
 extern	void		mvstch(unsigned destination, unsigned source);
 extern	void		mvstchs(unsigned destination, unsigned source, unsigned count);
 extern	void		numWnd();
-extern	unsigned short	nxt(unsigned short iVertex);
-extern	unsigned short	prv(unsigned iVertex);
+extern	unsigned	nxt(unsigned iVertex);
+extern	unsigned	prv(unsigned iVertex);
 extern	unsigned	psg();
 extern	unsigned	px2stch();
 extern	void		redraw(HWND window);
@@ -4999,8 +4999,8 @@ void txtkey(unsigned keyCode)
 
 void setxt()
 {
-	TXPNT*		currentFormTexture;
-	int			iTexturePoint, count;
+	TXPNT*	currentFormTexture;
+	int		iTexturePoint, count;
 
 	savtxt();
 	SelectedForm->wordParam = 0;

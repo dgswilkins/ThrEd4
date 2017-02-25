@@ -245,12 +245,12 @@ BOOL			iseclp (unsigned find);
 BOOL			iseclpx (unsigned find);
 void			lapbrd ();
 void			lcon ();
-unsigned short	nxt (unsigned short ind);
+unsigned		nxt (unsigned ind);
 void			oclp (fPOINT* p_clp, unsigned p_nclp);
 void			pbrd (double spac);
 void			plbrd (double spac);
 void			prpbrd (double spac);
-unsigned short	prv (unsigned ind);
+unsigned		prv (unsigned ind);
 unsigned		psg ();
 void			rbrd ();
 void			rotfrm (unsigned nu0);
@@ -258,13 +258,12 @@ void			satfil ();
 void			satout (double satwid);
 void			sbrd ();
 void			selal ();
-unsigned		setdun (unsigned bpnt);
 void			setr (unsigned pbit);
 void			slbrd ();
 void			sRct2px (fRECTANGLE strct, RECT* pxrct);
 void			uncon ();
 void			uninsf ();
-void wavfrm ();
+void		wavfrm ();
 
 unsigned		FormMenuEntryCount;		//lines in the form-form
 float			MaxStitchLen;			//maximum stitch length
@@ -2359,9 +2358,9 @@ void boldlin(unsigned start, unsigned finish, double size) {
 }
 
 void bold(double size) {
-	unsigned		iVertex, iSequence, iOutput = 0;
-	unsigned short	iNextLine, iLine;
-	double			length;
+	unsigned	iVertex, iSequence, iOutput = 0;
+	unsigned	iNextLine, iLine;
+	double		length;
 
 	iNextLine = iLine = getlast();
 	SequenceIndex = 0;
@@ -2684,7 +2683,7 @@ void setfpnt() {
 	setMap(RESTCH);
 }
 
-unsigned short nxt(unsigned short iVertex) {
+unsigned nxt(unsigned iVertex) {
 	// ToDo - should these all be 'unsigned' rather than 'unsigned short'
 	iVertex++;
 	if (iVertex > (unsigned)VertexCount - 1)
@@ -2692,7 +2691,7 @@ unsigned short nxt(unsigned short iVertex) {
 	return iVertex;
 }
 
-unsigned short prv(unsigned iVertex) {
+unsigned prv(unsigned iVertex) {
 	if (iVertex)
 		iVertex--;
 	else
@@ -5708,8 +5707,8 @@ void bdrlin(unsigned start, unsigned finish, double stitchSize) {
 }
 
 void brdfil(double pd_Size) {
-	unsigned		iVertex;
-	unsigned short	nextVertex, currentVertex;
+	unsigned	iVertex;
+	unsigned	nextVertex, currentVertex;
 
 	if (SelectedForm->extendedAttribute&AT_STRT)
 		currentVertex = SelectedForm->fillStart;
@@ -5914,8 +5913,8 @@ void setvct(unsigned start, unsigned finish) {
 }
 
 void clpbrd(unsigned short startVertex) {
-	unsigned		iVertex, reference;
-	unsigned short	currentVertex, nextVertex;
+	unsigned	iVertex, reference;
+	unsigned	currentVertex, nextVertex;
 
 	SequenceIndex = 0;
 	rstMap(CLPBAK);
@@ -6265,9 +6264,9 @@ void sbfn(fPOINT* insidePoints, unsigned start, unsigned finish) {
 	}
 }
 
-void sfn(unsigned short startVertex) {
+void sfn(unsigned startVertex) {
 	unsigned iVertex;
-	unsigned short nextVertex;
+	unsigned nextVertex;
 
 	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
 		nextVertex = nxt(startVertex);
@@ -6304,8 +6303,8 @@ void sbrd() {
 }
 
 void rfn(unsigned startVertex) {
-	unsigned iVertex, nextVertex;
-	unsigned short currentVertex = startVertex;
+	unsigned	iVertex, nextVertex;
+	unsigned	currentVertex = startVertex;
 
 	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
 		nextVertex = nxt(currentVertex);
@@ -8612,8 +8611,8 @@ void duspnd(unsigned start, unsigned finish) {
 }
 
 void pfn(unsigned startVertex, VRCT2* vrct) {
-	unsigned		iVertex;
-	unsigned short	nextVertex, currentVertex = startVertex;
+	unsigned	iVertex;
+	unsigned	nextVertex, currentVertex = startVertex;
 
 	SelectedPoint.x = CurrentFormVertices[startVertex].x;
 	SelectedPoint.y = CurrentFormVertices[startVertex].y;
@@ -10016,8 +10015,8 @@ void bhcrnr(unsigned vertex) {
 }
 
 void bhbrd(double spacing) {
-	unsigned short	vertex;
-	unsigned short	nextVertex, iVertex;
+	unsigned	vertex;
+	unsigned	nextVertex, iVertex;
 
 	vertex = getlast();
 	SequenceIndex = 0;
@@ -10253,8 +10252,8 @@ picfnx:;
 }
 
 void clpic(unsigned short start) {
-	unsigned		iVertex;
-	unsigned short	currentVertex, nextVertex;
+	unsigned	iVertex;
+	unsigned	currentVertex, nextVertex;
 
 	SequenceIndex = 0;
 	rstMap(CLPBAK);
@@ -11837,6 +11836,7 @@ unsigned insect() {
 }
 
 BOOL isin(float xCoordinate, float yCoordinate) {
+	// ToDo - rename local variables
 	unsigned	iRegion, acnt;
 	unsigned	svrt, nvrt;
 	dPOINT		ipnt;
