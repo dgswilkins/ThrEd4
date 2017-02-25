@@ -3574,8 +3574,6 @@ void lcon() {
 	BOOL			isConnected;
 	RCON*			tempPathMap;
 	SMALPNTL*		lineGroupPoint;
-	//ToDo - Is regionStarts required?
-	unsigned*		regionStarts;
 	unsigned		iStartLine;
 
 #if BUGSEQ
@@ -3612,8 +3610,6 @@ void lcon() {
 		}
 		// we don't need regions anymore as the data has been transferred to RegionsList
 		delete[] regions;
-		// ToDo - Allocate memory locally for regionStarts
-		regionStarts = (unsigned*)OSequence;
 		iStartLine = 0;
 		for (iRegion = 0; iRegion < RegionCount; iRegion++) {
 			count = 0;
@@ -3626,7 +3622,6 @@ void lcon() {
 							RegionsList[iRegion].regionBreak = iStartLine;
 						count++;
 						startGroup = SortedLines[iLine]->group;
-						regionStarts[iStartLine++] = iLine;
 					}
 				}
 			}
