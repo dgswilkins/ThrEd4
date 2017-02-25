@@ -2684,7 +2684,6 @@ void setfpnt() {
 }
 
 unsigned nxt(unsigned iVertex) {
-	// ToDo - should these all be 'unsigned' rather than 'unsigned short'
 	iVertex++;
 	if (iVertex > (unsigned)VertexCount - 1)
 		iVertex = 0;
@@ -2939,8 +2938,7 @@ BOOL lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) {
 	return 0;
 }
 
-// ToDo - should the return type be BOOL?
-unsigned short regclos(unsigned iRegion0, unsigned iRegion1) {
+BOOL regclos(unsigned iRegion0, unsigned iRegion1) {
 	SMALPNTL*	lineEndPoint0Start;
 	SMALPNTL*	lineEndPoint0End;
 	SMALPNTL*	lineEndPoint1Start;
@@ -3573,7 +3571,7 @@ void lcon() {
 	unsigned		iPath, iLine, iRegion, iSequence, iNode, bytesInBitmap;
 	unsigned		iByte, leftRegion, iOutPath, breakLine, count, startGroup;
 	REGION*			regions;
-	short			connected;
+	BOOL			isConnected;
 	RCON*			tempPathMap;
 	SMALPNTL*		lineGroupPoint;
 	//ToDo - Is regionStarts required?
@@ -3662,9 +3660,9 @@ void lcon() {
 				count = 0; GapToClosestRegion = 0;
 				for (iNode = 0; iNode < RegionCount; iNode++) {
 					if (iSequence != iNode) {
-						connected = regclos(iSequence, iNode);
-						if (connected) {
-							tempPathMap[PathMapIndex].con = connected;
+						isConnected = regclos(iSequence, iNode);
+						if (isConnected) {
+							tempPathMap[PathMapIndex].isConnected = isConnected;
 							tempPathMap[PathMapIndex].nextGroup = NextGroup;
 							tempPathMap[PathMapIndex++].node = iNode;
 							count++;
@@ -3676,9 +3674,9 @@ void lcon() {
 					count = 0;
 					for (iNode = 0; iNode < RegionCount; iNode++) {
 						if (iSequence != iNode) {
-							connected = regclos(iSequence, iNode);
-							if (connected) {
-								tempPathMap[PathMapIndex].con = connected;
+							isConnected = regclos(iSequence, iNode);
+							if (isConnected) {
+								tempPathMap[PathMapIndex].isConnected = isConnected;
 								tempPathMap[PathMapIndex].nextGroup = NextGroup;
 								tempPathMap[PathMapIndex++].node = iNode;
 								count++;
@@ -3690,7 +3688,7 @@ void lcon() {
 			MapIndexSequence[iSequence] = PathMapIndex;
 			PathMap = new RCON[PathMapIndex + 1];
 			for (iPath = 0; iPath < PathMapIndex; iPath++) {
-				PathMap[iPath].con = tempPathMap[iPath].con;
+				PathMap[iPath].isConnected = tempPathMap[iPath].isConnected;
 				PathMap[iPath].node = tempPathMap[iPath].node;
 				PathMap[iPath].nextGroup = tempPathMap[iPath].nextGroup;
 			}
@@ -3741,8 +3739,7 @@ void lcon() {
 					}
 				}
 			}
-			// ToDo - should this be iPath or iOutPath?
-			SequencePathIndex = iPath; PathIndex = 0;
+			PathIndex = 0;
 			for (iPath = 0; iPath < SequencePathIndex; iPath++)
 				nxtseq(iPath);
 			bytesInBitmap = (SortedLineIndex >> 5) + 1;

@@ -1256,9 +1256,9 @@ typedef struct _region {	//region for sequencing vertical fills
 }REGION;
 
 typedef struct _rcon {		//PathMap: path map for sequencing
-	unsigned short	node;
-	unsigned short	con;
-	unsigned short	nextGroup;
+	unsigned	short	node;
+	BOOL		isConnected;
+	unsigned	short	nextGroup;
 }RCON;
 
 typedef struct _rgseq {		//TempPath: temporary path connections
