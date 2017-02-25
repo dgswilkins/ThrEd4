@@ -3590,8 +3590,8 @@ void lcon() {
 			SortedLines[SortedLineIndex++] = &LineEndpoints[iLine];
 		qsort((void*)SortedLines, SortedLineIndex, 4, sqcomp);
 		RegionCount = 0;
-		// ToDo - Allocate memory locally for regions
-		regions = (REGION*)OSequence;
+		// Count the regions. There cannot be more regions than lines
+		regions = new REGION[SortedLineIndex];
 		regions[0].start = 0;
 		breakLine = SortedLines[0]->line;
 		for (iLine = 0; iLine < SortedLineIndex; iLine++) {
@@ -3610,6 +3610,8 @@ void lcon() {
 			VisitedRegions[iRegion] = 0;
 			RegionsList[iRegion].breakCount = 0;
 		}
+		// we don't need regions anymore as the data has been transferred to RegionsList
+		delete[] regions;
 		// ToDo - Allocate memory locally for regionStarts
 		regionStarts = (unsigned*)OSequence;
 		iStartLine = 0;
