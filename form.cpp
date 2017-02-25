@@ -1054,7 +1054,7 @@ void stCor2px(fPOINTATTR stitch, POINT* screen) {
 void px2stchf(POINT screen, fPOINT* stitchPoint) {
 	double	factorX, factorY;
 
-	// ToDo - is factorX calculated correctly?
+	// ToDo - is StitchWindowClientRect.left ever not zero?
 	factorX = (double)(screen.x - StitchWindowClientRect.left) / StitchWindowClientRect.right;
 	stitchPoint->x = factorX*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
 	factorY = (double)(StitchWindowClientRect.bottom - screen.y) / StitchWindowClientRect.bottom;
@@ -2090,14 +2090,13 @@ BOOL lastch() {
 }
 
 unsigned getlast() {
-	unsigned		iVertex;
-	unsigned		closestVertex = 0;
-	double			length, dx, dy, minimumLength = 1e99;
+	unsigned	iVertex;
+	unsigned	closestVertex = 0;
+	double		length, dx, dy, minimumLength = 1e99;
 
 	if (SelectedForm->fillType) {
 		lastch();
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-			// ToDo - does this have to be a double or would a fPOINT work?
 			dx = LastPoint.x - CurrentFormVertices[iVertex].x;
 			dy = LastPoint.y - CurrentFormVertices[iVertex].y;
 			length = hypot(dx, dy);
