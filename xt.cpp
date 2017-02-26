@@ -1856,18 +1856,14 @@ void durec(OREC* record)
 }
 
 
+#if  __UseASM__
 OREC*	recref(const void* arg)
 {
-#if  __UseASM__
 	_asm
 	{
 		mov		eax, arg
 		mov		eax, [eax]
 	}
-#else
-	// Check translation
-	return *(OREC **)arg;
-#endif
 }
 
 int recmp(const void *arg1, const void *arg2)
@@ -1903,6 +1899,36 @@ int refcmp(const void *arg1, const void *arg2)
 		return (int)record1->type - record2->type;
 	return (int)record1->form - record2->form;
 }
+#else
+int recmp(const void *arg1, const void *arg2)
+{
+	OREC record1 = **(OREC **)arg1;
+	OREC record2 = **(OREC **)arg2;
+
+	if (ColorOrder[record1.color] == ColorOrder[record2.color])
+	{
+		if (record1.form == record2.form)
+		{
+			if (record1.type == record2.type)
+				return (int)record1.start - record2.start;
+			else
+				return (int)record1.type - record2.type;
+		} else
+			return (int)record1.form - record2.form;
+	}
+	return (int)ColorOrder[record1.color] - ColorOrder[record2.color];
+}
+
+int refcmp(const void *arg1, const void *arg2)
+{
+	OREC record1 = **(OREC **)arg1;
+	OREC record2 = **(OREC **)arg2;
+
+	if (record1.form == record2.form)
+		return (int)record1.type - record2.type;
+	return (int)record1.form - record2.form;
+}
+#endif
 
 BOOL chkrdun(SRTREC* stitchRecord)
 {

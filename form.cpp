@@ -584,6 +584,8 @@ cmpg :	xor		eax, eax
 cmpx :
 	}
 #else
+	// ToDo - derefererence completely
+	//dPOINTLINE Point1 = *(*(const dPOINTLINE **)arg1);
 	const dPOINTLINE **Point1 = (const dPOINTLINE **)arg1, **point2 = (const dPOINTLINE **)arg2;
 
 	if ((*point2)->y < (*Point1)->y)
@@ -11504,7 +11506,6 @@ int lencmp(const void *arg1, const void *arg2) {
 				lcmpx :
 	}
 #else
-	//Correct
 	float local1 = **(float **)arg1, local2 = **(float **)arg2;
 
 	if (local1 < local2)
@@ -11721,6 +11722,8 @@ int clpcmp(const void* arg1, const void* arg2) {
 							clpcmpx :
 	}
 #else
+	// ToDo - dereference completely
+	// VCLPX vclpx1 = *(VCLPX *)arg1
 	VCLPX *vclpx1 = (VCLPX *)arg1, *vclpx2 = (VCLPX *)arg2;
 	if (vclpx1->segment < vclpx2->segment)
 		return -1;
