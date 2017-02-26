@@ -3515,19 +3515,13 @@ SMALPNTL* srtref(const void* arg) {
 		mov		eax, [eax]
 	}
 }
-#endif
 
 int sqcomp(const void *arg1, const void *arg2) {
 	SMALPNTL* lineEndPoint0;
 	SMALPNTL* lineEndPoint1;
 
-#if	 __UseASM__
 	lineEndPoint0 = srtref(arg1);
 	lineEndPoint1 = srtref(arg2);
-#else
-	lineEndPoint0 = (SMALPNTL*)arg1;
-	lineEndPoint1 = (SMALPNTL*)arg2;
-#endif
 
 	if (lineEndPoint0->line == lineEndPoint1->line) {
 		if (lineEndPoint0->group == lineEndPoint1->group) {
@@ -3538,21 +3532,48 @@ int sqcomp(const void *arg1, const void *arg2) {
 				else
 					return -1;
 			}
-		}
-		else {
+		} else {
 			if (lineEndPoint0->group > lineEndPoint1->group)
 				return 1;
 			else
 				return -1;
 		}
-	}
-	else {
+	} else {
 		if (lineEndPoint0->line > lineEndPoint1->line)
 			return 1;
 		else
 			return -1;
 	}
 }
+#else
+int sqcomp(const void *arg1, const void *arg2) {
+	SMALPNTL lineEnd1 = *(*(const SMALPNTL **)arg1);
+	SMALPNTL lineEnd2 = *(*(const SMALPNTL **)arg2);
+
+	if (lineEnd1.line == lineEnd2.line) {
+		if (lineEnd1.group == lineEnd2.group) {
+			if (lineEnd1.y == lineEnd2.y)return 0;
+			else {
+				if (lineEnd1.y > lineEnd2.y)
+					return 1;
+				else
+					return -1;
+			}
+		} else {
+			if (lineEnd1.group > lineEnd2.group)
+				return 1;
+			else
+				return -1;
+		}
+	} else {
+		if (lineEnd1.line > lineEnd2.line)
+			return 1;
+		else
+			return -1;
+	}
+}
+#endif
+
 
 void nxtseq(unsigned pathIndex) {
 	unsigned nextNode, iPath;
@@ -3586,7 +3607,7 @@ void lcon() {
 		SortedLineIndex = 0;
 		for (iLine = 0; iLine < StitchLineCount; iLine += 2)
 			SortedLines[SortedLineIndex++] = &LineEndpoints[iLine];
-		qsort((void*)SortedLines, SortedLineIndex, 4, sqcomp);
+		qsort(SortedLines, SortedLineIndex, sizeof(SMALPNTL*), sqcomp);
 		RegionCount = 0;
 		// Count the regions. There cannot be more regions than lines
 		regions = new REGION[SortedLineIndex];
