@@ -735,7 +735,7 @@ void deleclp(unsigned iForm) {
 	}
 }
 
-fPOINT* nueclp(unsigned formIndex, unsigned count) {
+fPOINT* nueclp(unsigned currentForm, unsigned count) {
 	int			find;
 	int			source, destination;
 	unsigned	iform;
@@ -749,14 +749,11 @@ fPOINT* nueclp(unsigned formIndex, unsigned count) {
 		ClipPoints[destination].x = ClipPoints[source].x;
 		ClipPoints[destination--].y = ClipPoints[source--].y;
 	}
-	// ToDo - This does not look right. find is the number of stitches in the current clip
-	FormList[find].borderClipData = &ClipPoints[find];
-	// Todo - Should this be "iForm = 0"?
-	for (iform = formIndex; iform < FormIndex; iform++) {
+	for (iform = currentForm; iform < FormIndex; iform++) {
 		if (iseclpx(iform))
 			FormList[iform].borderClipData += count;
 	}
-	for (iform = formIndex + 1; iform < FormIndex; iform++) {
+	for (iform = currentForm + 1; iform < FormIndex; iform++) {
 		if (isclp(iform))
 			FormList[iform].angleOrClipData.clip += count;
 	}
