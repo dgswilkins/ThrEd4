@@ -4443,10 +4443,6 @@ void dutxmir()
 
 	savtxt();
 	txsrt();
-	// ToDo - Is this function correct?
-	//        How is TempTexturePoints populated?
-	//        Since there could be less points in the mirrored texture, 
-	//        does that mean that delete and new textures are setup correctly?
 	centerLine = (TextureScreen.lines + 1) >> 1;
 	iPoint = TextureScreen.index - 1;
 	while (TempTexturePoints[iPoint].line > centerLine&&iPoint >= 0)
@@ -4923,8 +4919,8 @@ void txtkey(unsigned keyCode)
 
 		txgro();
 		break;
-	// ToDo - what is keycode 192?
-	case 192:
+
+	case 192: //`
 
 		tst();
 		break;
