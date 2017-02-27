@@ -584,18 +584,17 @@ cmpg :	xor		eax, eax
 cmpx :
 	}
 #else
-	// ToDo - derefererence completely
-	//dPOINTLINE Point1 = *(*(const dPOINTLINE **)arg1);
-	const dPOINTLINE **Point1 = (const dPOINTLINE **)arg1, **point2 = (const dPOINTLINE **)arg2;
+	dPOINTLINE point1 = *(*(const dPOINTLINE **)arg1);
+	dPOINTLINE point2 = *(*(const dPOINTLINE **)arg2);
 
-	if ((*point2)->y < (*Point1)->y)
+	if (point2.y < point1.y)
 		return 1;
-	if ((*point2)->y > (*Point1)->y)
+	if (point2.y > point1.y)
 		return -1;
 
-	if ((*point2)->x < (*Point1)->x)
+	if (point2.x < point1.x)
 		return 1;
-	if ((*point2)->x > (*Point1)->x)
+	if (point2.x > point1.x)
 		return -1;
 
 	return 0;
@@ -4032,7 +4031,7 @@ void fnvrt() {
 			inf &= 0xfffffffe;
 			groupIndex[GroupIndexCount++] = StitchLineCount;
 			// ToDo - replace 4 with sizeof(dPOINTLINE(?))
-			qsort((void*)projectedPointsArray, inf, 4, comp);
+			qsort((void*)projectedPointsArray, inf, sizeof(dPOINTLINE*), comp);
 			ine = 0;
 			tind = StitchLineCount;
 			while (ine < inf) {
@@ -5580,7 +5579,7 @@ void rotfrm(unsigned newStartVertex) {
 		rotatedGuides[iGuide].start = CurrentFormGuides[iGuide].start;
 		rotatedGuides[iGuide].finish = CurrentFormGuides[iGuide].finish;
 	}
-	qsort((void*)rotatedGuidesArray, iRotatedGuide, 4, scomp);
+	qsort(rotatedGuidesArray, iRotatedGuide, sizeof(SATCON *), scomp);
 	for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
 		CurrentFormGuides[iGuide].start = rotatedGuidesArray[iGuide]->start;
 		CurrentFormGuides[iGuide].finish = rotatedGuidesArray[iGuide]->finish;
