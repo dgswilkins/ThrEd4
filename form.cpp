@@ -4513,9 +4513,9 @@ int scomp(const void *arg1, const void *arg2) {
 				scmpx :
 	}
 #else
-	unsigned short **s1 = (unsigned short **)arg1, **s2 = (unsigned short **)arg2;
-	if (**s2 == **s1) return 0;
-	if (**s2 < **s1) return 1;
+	unsigned short s1 = **(unsigned short **)arg1, s2 = **(unsigned short **)arg2;
+	if (s2 == s1) return 0;
+	if (s2 < s1) return 1;
 	return -1;
 #endif
 }
