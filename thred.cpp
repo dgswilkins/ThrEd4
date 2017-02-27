@@ -11658,7 +11658,7 @@ void thumnail() {
 		}
 		FindClose(file);
 		ThumbnailCount = iThumbnail;
-		qsort((void*)&Thumbnails[0], iThumbnail, 4, strcomp);
+		qsort(Thumbnails, iThumbnail, sizeof(TCHAR *), strcomp);
 		iThumbnail = ThumbnailIndex = 0;
 		while (iThumbnail < 4 && ThumbnailIndex < ThumbnailCount&&iThumbnail < ThumbnailCount) {
 

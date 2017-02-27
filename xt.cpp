@@ -2135,8 +2135,8 @@ void fsort()
 		PRecs[iRecord] = &records[iRecord];
 		PFRecs[iRecord] = &records[iRecord];
 	}
-	qsort((void*)PRecs, lastRecord, 4, recmp);
-	qsort((void*)PFRecs, lastRecord, 4, refcmp);
+	qsort(PRecs, lastRecord, sizeof(OREC *), recmp);
+	qsort(PFRecs, lastRecord, sizeof(OREC *), refcmp);
 #ifdef _DEBUG
 	dmprec(PRecs, lastRecord);
 #endif
@@ -4240,25 +4240,23 @@ void butsid(unsigned windowId)
 
 int txcmp(const void *arg1, const void *arg2)
 {
-	TXPNT* texturePoint0;
-	TXPNT* texturePoint1;
+	TXPNT texturePoint0 = *(TXPNT*)arg1;
+	TXPNT texturePoint1 = *(TXPNT*)arg2;
 
-	texturePoint0 = (TXPNT*)arg1;
-	texturePoint1 = (TXPNT*)arg2;
-	if (texturePoint0->line == texturePoint1->line)
+	if (texturePoint0.line == texturePoint1.line)
 	{
-		if (texturePoint0->y == texturePoint1->y)
+		if (texturePoint0.y == texturePoint1.y)
 			return 0;
 		else
 		{
-			if (texturePoint0->y > texturePoint1->y)
+			if (texturePoint0.y > texturePoint1.y)
 				return 1;
 			else
 				return -1;
 		}
 	}
 	else
-		return texturePoint0->line - texturePoint1->line;
+		return texturePoint0.line - texturePoint1.line;
 	//	return 0;
 }
 
@@ -4339,7 +4337,7 @@ void nutx()
 	int			iForm, iPoint;
 	FRMHED*		formHeader;
 
-	qsort((void*)&TempTexturePoints, TextureScreen.index, sizeof(TXPNT), txcmp);
+	qsort(TempTexturePoints, TextureScreen.index, sizeof(TXPNT), txcmp);
 	iPoint = 0;
 	if (FormIndex)
 	{
@@ -4436,7 +4434,7 @@ void dutxfn(unsigned textureType)
 
 void txsrt()
 {
-	qsort((void*)TempTexturePoints, TextureScreen.index, sizeof(TXPNT), txcmp);
+	qsort(TempTexturePoints, TextureScreen.index, sizeof(TXPNT), txcmp);
 }
 
 void dutxmir()

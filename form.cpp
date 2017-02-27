@@ -11721,19 +11721,18 @@ int clpcmp(const void* arg1, const void* arg2) {
 							clpcmpx :
 	}
 #else
-	// ToDo - dereference completely
-	// VCLPX vclpx1 = *(VCLPX *)arg1
-	VCLPX *vclpx1 = (VCLPX *)arg1, *vclpx2 = (VCLPX *)arg2;
-	if (vclpx1->segment < vclpx2->segment)
+	VCLPX vclpx1 = *(VCLPX *)arg1;
+	VCLPX vclpx2 = *(VCLPX *)arg2;
+	if (vclpx1.segment < vclpx2.segment)
 		return -1;
 
-	if (vclpx1->segment > vclpx2->segment)
+	if (vclpx1.segment > vclpx2.segment)
 		return 1;
 
-	if (vclpx1->vertex == vclpx2->vertex)
+	if (vclpx1.vertex == vclpx2.vertex)
 		return 0;
 
-	if (vclpx1->vertex < vclpx2->vertex)
+	if (vclpx1.vertex < vclpx2.vertex)
 		return -1;
 
 	return 1;
@@ -11841,7 +11840,7 @@ unsigned insect() {
 		}
 	}
 	if (count > 1) {
-		qsort((void*)ArrayOfClipIntersectData, count, 4, lencmp);
+		qsort(ArrayOfClipIntersectData, count, sizeof(CLIPSORT *), lencmp);
 		iDestination = 1;
 		for (iIntersection = 0; iIntersection < count - 1; iIntersection++) {
 			if (fabs(ArrayOfClipIntersectData[iIntersection]->segmentLength - ArrayOfClipIntersectData[iIntersection + 1]->segmentLength) > TINY)
@@ -12082,7 +12081,7 @@ void clpcon() {
 			RegionCrossingData[segmentCount++].segment = iSegment;
 		}
 	}
-	qsort((void*)RegionCrossingData, segmentCount, 8, clpcmp);
+	qsort(RegionCrossingData, segmentCount, sizeof(VCLPX), clpcmp);
 	// ToDo - Allocate memory locally for iclpx
 	iclpx = (unsigned*)&RegionCrossingData[segmentCount];
 	iRegion = 1; regionSegment = RegionCrossingData[0].segment;
@@ -12266,7 +12265,7 @@ clpskp:;
 					SortedLengths[sortedCount++] = &ClipSegments[iSegment].beginLength;
 					SortedLengths[sortedCount++] = &ClipSegments[iSegment].endLength;
 				}
-				qsort((void*)SortedLengths, sortedCount, 4, lencmp);
+				qsort(SortedLengths, sortedCount, sizeof(float *), lencmp);
 				for (iSorted = 0; iSorted < sortedCount; iSorted++) {
 					// ToDo - what does lenref do exactly?
 					inf = lenref(SortedLengths[iSorted]);
