@@ -1386,8 +1386,6 @@ void drwfrm() {
 	rstMap(SHOMOV);
 	rstMap(SHOPSEL);
 	line[0].x = line[0].y = line[1].x = line[1].y = 0;
-	// ToDo - why draw the line when coords are 0?
-	Polyline(StitchWindowMemDC, line, 2);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	ratsr();
 	duzrat();
@@ -3646,8 +3644,7 @@ void lcon() {
 			}
 			RegionsList[iRegion].breakCount = count;
 		}
-		// ToDo - Allocate memory locally for tempPathMap
-		tempPathMap = (RCON*)BSequence;
+		tempPathMap = new RCON[MAXSTITCHS];
 		MapIndexSequence = new unsigned[RegionCount + 1];
 
 #if BUGSEQ
@@ -3708,6 +3705,7 @@ void lcon() {
 				PathMap[iPath].node = tempPathMap[iPath].node;
 				PathMap[iPath].nextGroup = tempPathMap[iPath].nextGroup;
 			}
+			delete[] tempPathMap;
 			//find the leftmost region
 			startGroup = 0xffffffff; leftRegion = 0;
 			for (iRegion = 0; iRegion < RegionCount; iRegion++) {
