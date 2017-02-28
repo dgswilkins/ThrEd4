@@ -3716,8 +3716,8 @@ void lcon() {
 				}
 			}
 			OutputIndex = 0;
-			// ToDo - Allocate memory locally for TempPath
-			TempPath = (RGSEQ*)OSequence;
+			TempPath = new RGSEQ[MAXSTITCHS];
+
 			//find the leftmost region in PathMap
 			SequencePathIndex = 1;
 			for (iPath = 0; iPath < PathMapIndex; iPath++) {
@@ -3753,6 +3753,7 @@ void lcon() {
 					}
 				}
 			}
+ 			delete[] TempPath;
 			PathIndex = 0;
 			for (iPath = 0; iPath < SequencePathIndex; iPath++)
 				nxtseq(iPath);
