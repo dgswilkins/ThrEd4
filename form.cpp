@@ -3738,8 +3738,7 @@ void lcon() {
 				nxtrgn();
 			iOutPath = 0;
 			count = 0xffffffff;
-			// ToDo - Allocate memory locally for SequencePath
-			SequencePath = (FSEQ*)&OSequence[OSEQLEN >> 1];
+			SequencePath = new FSEQ[MAXSTITCHS];
 			for (iPath = 0; iPath < SequencePathIndex; iPath++) {
 				SequencePath[iOutPath].skp = TempPath[iPath].skp;
 				if (TempPath[iPath].pcon == 0xffffffff) {
@@ -3784,7 +3783,6 @@ void lcon() {
 			SequencePath[0].nextGroup = SortedLines[RegionsList[0].end]->group;
 			SequencePath[0].skp = 0;
 			durgn(0);
-			delete[] SequencePath;
 		}
 		//skip:;
 
@@ -3792,14 +3790,15 @@ void lcon() {
 
 		seqskip : ;
 #endif
-				  delete[] SortedLines;
-				  delete[] LineEndpoints;
-				  delete[] RegionsList;
-				  delete[] MapIndexSequence;
-				  delete[] VisitedRegions;
-				  delete[] PathMap;
-				  delete[] GroupIndexSequence;
-				  delete[] SequenceFlagBitmap;
+		delete[] SequencePath;
+		delete[] SortedLines;
+		delete[] LineEndpoints;
+		delete[] RegionsList;
+		delete[] MapIndexSequence;
+		delete[] VisitedRegions;
+		delete[] PathMap;
+		delete[] GroupIndexSequence;
+		delete[] SequenceFlagBitmap;
 	}
 }
 
@@ -3829,7 +3828,7 @@ void bakseq() {
 	double		UserStitchLength9 = UserStitchLength / 9;
 	double		StitchSpacing2 = StitchSpacing * 2;
 
-	//ToDo - More renaming required
+	// ToDo - More renaming required
 	SequenceIndex = 0;
 	rstMap(FILDIR);
 	iSequence = OutputIndex - 1;
