@@ -10846,6 +10846,7 @@ void stchfrm(unsigned formIndex, unsigned* attribute) {
 }
 
 void frmnumfn(unsigned newFormIndex) {
+	// ToDo - Changing the form number does not seem to change the form number of the underlay stitches
 	unsigned	iForm, iStitch, sourceForm, start, finish, decodedFormIndex;
 
 	if (newFormIndex != ClosestFormToCursor) {
@@ -10858,11 +10859,12 @@ void frmnumfn(unsigned newFormIndex) {
 			finish = newFormIndex;
 		}
 		sourceForm = FormRelocationIndex = 0;
-		// ToDo - Allocate memory locally for TempFormList, TempFormVertices, TempGuides, TempClipPoints
-		TempFormList = (FRMHED*)&BSequence;
-		TempFormVertices = (fPOINT*)&TempFormList[FormIndex];
-		TempGuides = (SATCON*)&OSequence;
-		TempClipPoints = (fPOINT*)&TempGuides[SatinConnectIndex];
+
+		TempFormList = new FRMHED[FormIndex];
+		TempFormVertices = new fPOINT[MAXSTITCHS];
+		TempGuides = new SATCON[SatinConnectIndex];
+		TempClipPoints = new fPOINT[MAXSTITCHS];
+
 		FormVertexIndex = SatinConnectIndex = ClipPointIndex = 0;
 		for (iForm = 0; iForm < FormIndex; iForm++) {
 			if (iForm == newFormIndex)
@@ -10894,6 +10896,11 @@ void frmnumfn(unsigned newFormIndex) {
 		}
 		ClosestFormToCursor = newFormIndex;
 		ritnum(STR_NUMFRM, ClosestFormToCursor);
+
+		delete[] TempClipPoints;
+		delete[] TempGuides;
+		delete[] TempFormVertices;
+		delete[] TempFormList;
 	}
 }
 
