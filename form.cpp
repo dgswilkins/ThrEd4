@@ -10944,8 +10944,7 @@ void srtf(unsigned start, unsigned finish) {
 	unsigned	iForm, iStitch, stitchAccumulator, swap;
 
 	if (start != finish) {
-		// ToDo - Allocate memory locally for stitchHistogram
-		stitchHistogram = (unsigned*)&BSequence;
+		stitchHistogram = new unsigned[FormIndex];
 		for (iForm = 0; iForm < FormIndex << 2; iForm++)
 			stitchHistogram[iForm] = 0;
 		for (iStitch = start; iStitch < finish; iStitch++)
@@ -10958,6 +10957,7 @@ void srtf(unsigned start, unsigned finish) {
 		}
 		for (iStitch = start; iStitch < finish; iStitch++)
 			moveStitch(&StitchBuffer[stitchHistogram[duat(TempStitchBuffer[iStitch].attribute)]++], &TempStitchBuffer[iStitch]);
+		delete[] stitchHistogram;
 	}
 }
 

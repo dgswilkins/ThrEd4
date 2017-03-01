@@ -33,7 +33,7 @@
 
 #define		TXTRAT		0.95		//texture fill clipboard shrink/grow ratio
 #define		MAXMSK		0xffff0000	//for checking for greater than 65536
-#define		MAXSEQ		65536		//maximum number of points in the sequence list
+#define		MAXSEQ		0x10000		//maximum number of points in the sequence list
 
 #define		DEFBPIX		4			//default form box pixels
 #define		MAXWLK		54			//max underlay/edge walk stitch length
