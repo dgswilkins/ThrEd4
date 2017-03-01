@@ -9609,8 +9609,7 @@ void join() {
 	setMap(FRMSAM);
 	if (FormIndex > 1 && chkMap(FORMSEL) && closfrm()) {
 		vertexCount = FormList[ClosestFormToCursor].vertexCount;
-		// ToDo - Allocate memory locally for vertexList
-		vertexList = (fPOINT*)&BSequence;
+		vertexList = new fPOINT[vertexCount];
 		for (iVertex = 0; iVertex < vertexCount; iVertex++) {
 			vertexList[iVertex].x = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].x;
 			vertexList[iVertex].y = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].y;
@@ -9628,6 +9627,7 @@ void join() {
 			insertedVertex[iVertex].x = vertexList[iVertex].x;
 			insertedVertex[iVertex].y = vertexList[iVertex].y;
 		}
+		delete[] vertexList;
 		SelectedForm = &FormList[ClosestFormToCursor];
 		SelectedForm->vertexCount += vertexCount;
 		SelectedForm->rectangle.left = SelectedForm->rectangle.right = SelectedForm->vertices[0].x;
