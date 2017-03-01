@@ -4000,8 +4000,7 @@ void fnvrt() {
 	maximumLines = (maximumLines >> 1);
 	LineEndpoints = new SMALPNTL[lineCount + 1];
 	StitchLineCount = 0; LineGroupIndex = 0; 
-	// ToDo - Allocate memory locally for groupIndex
-	groupIndex = (unsigned*)BSequence;
+	groupIndex = new unsigned[MAXSTITCHS];
 	GroupIndexCount = 0;
 	currentX = lowX;
 	for (iStitch = 0; iStitch < stitchCount; iStitch++) {
@@ -4025,7 +4024,6 @@ void fnvrt() {
 		if (inf > 1) {
 			inf &= 0xfffffffe;
 			groupIndex[GroupIndexCount++] = StitchLineCount;
-			// ToDo - replace 4 with sizeof(dPOINTLINE(?))
 			qsort((void*)projectedPointsArray, inf, sizeof(dPOINTLINE*), comp);
 			ine = 0;
 			tind = StitchLineCount;
@@ -4050,6 +4048,7 @@ void fnvrt() {
 	for (ind = 0; ind < GroupIndexCount; ind++)
 		GroupIndexSequence[ind] = groupIndex[ind];
 	LineGroupIndex--;
+	delete[] groupIndex;
 	delete[] projectedPoints;
 	delete[] projectedPointsArray;
 }
@@ -4532,7 +4531,6 @@ unsigned setchk(unsigned bit) {
 }
 
 unsigned chkchk(unsigned bit) {
-	// ToDo - reverse the return value (if the bit is set,  return 0xFFFFFFFF) and adjust usage appropriately 
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
@@ -4628,8 +4626,7 @@ void satadj()
 	// ToDo - Allocate memory locally for guide
 	guide = (SATCON*)BSequence;
 	mapSize = (VertexCount >> 5) + 1;
-	// ToDo - Allocate memory locally for CheckMap
-	CheckMap = (unsigned*)OSequence;
+	CheckMap = new unsigned[mapSize];
 	iDestination = 0;
 	for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++)
 	{
@@ -4807,6 +4804,7 @@ void satadj()
 		}
 		SatinConnectIndex -= iGuide;
 	}
+	delete[] CheckMap;
 }
 
 void satclos() {
