@@ -4607,6 +4607,9 @@ prvcx :
 
 void satadj()
 {
+	// ToDo - satadj does not seem to work properly. 
+	//        When setting the form zero point satadj does not keep the guides in the same place.
+
 	unsigned	iGuide, iSource, iWord, iForm, iForward, iVertex, iReverse, iDestination, mapSize;
 	SATCON*		guide;
 	SATCON*		sourceGuide;
@@ -4623,8 +4626,8 @@ void satadj()
 		if (CurrentFormGuides[iGuide].start > VertexCount - 1)
 			CurrentFormGuides[iGuide].start = VertexCount - 1;
 	}
-	// ToDo - Allocate memory locally for guide
-	guide = (SATCON*)BSequence;
+	// ToDo - what is guide used for? 
+	guide = new SATCON[CurrentFormConnectionsCount];
 	mapSize = (VertexCount >> 5) + 1;
 	CheckMap = new unsigned[mapSize];
 	iDestination = 0;
@@ -4804,6 +4807,7 @@ void satadj()
 		}
 		SatinConnectIndex -= iGuide;
 	}
+	delete[] guide;
 	delete[] CheckMap;
 }
 
@@ -9183,9 +9187,7 @@ void snp(unsigned start, unsigned finish) {
 	unsigned*	txhst;
 
 	chkrng(&range);
-	// ToDo - Allocate memory locally for Xpoints
-	Xpoints = (unsigned*)BSequence;
-	ZeroMemory(BSequence, 65536 * sizeof(unsigned));
+	Xpoints = new unsigned[MAXSTITCHS]();
 	Xhistogram = txhst = new unsigned[static_cast<int>(range.x) + 1];
 	for (iColumn = 0; iColumn < range.x; iColumn++)
 		Xhistogram[iColumn] = 0;
@@ -9233,6 +9235,7 @@ void snp(unsigned start, unsigned finish) {
 		nxtim();
 	}
 	DestroyWindow(TimeWindow);
+	delete[] Xpoints;
 	delete[] txhst;
 }
 
