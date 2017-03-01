@@ -427,7 +427,6 @@ extern	unsigned short	SelectedFormList[MAXFORMS];
 extern	POINT			SelectedFormsLine[9];
 extern	RECT			SelectedFormsRect;
 extern	POINT			SelectedPointsLine[9];
-extern	unsigned short	VertexCount;
 extern	double			SnapLength;
 extern	double			SpiralWrap;
 extern	TCHAR*			StringData;
@@ -439,6 +438,7 @@ extern	TXHST			TextureHistory[16];
 extern	TXTSCR			TextureScreen;
 extern	int				TextureIndex;
 extern	TXPNT			TexturePointsBuffer[MAXSEQ];
+extern	unsigned		VertexCount;
 extern	double			VerticalRatio;
 extern	unsigned short	WordParam;
 extern	double			XYratio;
@@ -14776,7 +14776,7 @@ void bfrm() {
 
 	if (VertexCount) {
 
-		for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++)
+		for (iVertex = 0; iVertex < VertexCount - 1; iVertex++)
 			pxlin(iVertex, iVertex + 1);
 		if (SelectedForm->type != FRMLINE)
 			pxlin(iVertex, 0);
@@ -16105,7 +16105,7 @@ unsigned chkMsg() {
 					setMap(FPSEL);
 					SelectedFormVertices.finish = ClosestVertexToCursor;
 					selectedVertexCount = (SelectedFormVertices.finish - SelectedFormVertices.start + VertexCount) % VertexCount;
-					if (selectedVertexCount < (unsigned)VertexCount >> 1) {
+					if (selectedVertexCount < VertexCount >> 1) {
 
 						SelectedFormVertices.vertexCount = selectedVertexCount;
 						setMap(PSELDIR);

@@ -296,7 +296,7 @@ SMALPNTL*		LineEndpoints;			//pairs of fill line endpoints
 unsigned		ActivePointIndex;		//pointer to the active form in the sequencing algorithm
 unsigned		LineGroupIndex;			//pointer for groups of fill line segments
 SMALPNTL**		SortedLines;			//sorted pointers to LineEndpoints
-unsigned short	VertexCount;			//sides of the selected form to fill
+unsigned		VertexCount;			//sides of the selected form to fill
 unsigned		SortedLineIndex;		//for connecting fill lines
 unsigned		SequenceIndex;			//sequencing pointer
 BSEQPNT			BSequence[BSEQLEN];		//reverse sequence for polygon fills
@@ -3987,7 +3987,7 @@ void fnvrt() {
 	for (iStitch = 0; iStitch < stitchCount; iStitch++) {
 		iLine = 0;
 		currentX += step;
-		for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+		for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iVertex + 1], &point))
 				iLine++;
 		}
@@ -4006,7 +4006,7 @@ void fnvrt() {
 	for (iStitch = 0; iStitch < stitchCount; iStitch++) {
 		currentX += step;
 		inf = 0;
-		for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+		for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iVertex + 1], &point)) {
 				projectedPointsArray[inf] = &projectedPoints[inf];
 				projectedPoints[inf].line = iVertex;
@@ -4741,15 +4741,15 @@ void satadj()
 		for (iGuide = 0; iGuide < CurrentFormConnectionsCount; iGuide++)
 		{
 			iForward = iReverse = CurrentFormGuides[iGuide].finish;
-			if (iForward > (unsigned)VertexCount - 1)
+			if (iForward > VertexCount - 1)
 				iForward = VertexCount - 1;
 			if (setchk(iForward))
 			{
-				if (iForward < (unsigned)VertexCount - 1)
+				if (iForward < VertexCount - 1)
 					iForward++;
 				if (iReverse > (unsigned)WordParam + 1)
 					iReverse--;
-				while (!chkchk(iForward) && iForward < (unsigned)VertexCount - 1)
+				while (!chkchk(iForward) && iForward < VertexCount - 1)
 					iForward++;
 				while (iReverse > (unsigned)WordParam - 1 && (!chkchk(iReverse)))
 					iReverse--;
@@ -4865,11 +4865,11 @@ void satclos() {
 			ClosestVertexToCursor = closestVertex;
 			closestVertex = swap;
 		}
-		if (closestVertex == 0 && ClosestVertexToCursor == (unsigned)VertexCount - 1) {
+		if (closestVertex == 0 && ClosestVertexToCursor == VertexCount - 1) {
 			closestVertex = VertexCount - 1;
 			ClosestVertexToCursor = VertexCount;
 		}
-		if (closestVertex == 1 && ClosestVertexToCursor == (unsigned)VertexCount) {
+		if (closestVertex == 1 && ClosestVertexToCursor == VertexCount) {
 			closestVertex = 0;
 			ClosestVertexToCursor = 1;
 		}
@@ -5149,7 +5149,7 @@ void satfil() {
 	SelectedForm->fillType = SATF;
 	Lengths = new double[VertexCount + 2];
 	length = 0;
-	for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		Lengths[iVertex] = length;
 		deltaX = CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x;
 		deltaY = CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y;
@@ -5188,7 +5188,7 @@ void satfil() {
 					OSequence[0].y = SelectedPoint.y = CurrentFormVertices[1].y;
 					SequenceIndex = 1;
 				}
-				while ((length > Lengths[iVertex]) && (iVertex < (unsigned int)(VertexCount + 1)))
+				while ((length > Lengths[iVertex]) && (iVertex < (VertexCount + 1)))
 					iVertex++;
 				deltaX = Lengths[iVertex] - length;
 				deltaY = length - Lengths[iVertex - 1];
@@ -5730,7 +5730,7 @@ void brdfil(double pd_Size) {
 	SequenceIndex = 0;
 	OSequence[SequenceIndex].x = CurrentFormVertices[currentVertex].x;
 	OSequence[SequenceIndex++].y = CurrentFormVertices[currentVertex].y;
-	for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		nextVertex = nxt(currentVertex);
 		bdrlin(currentVertex, nextVertex, pd_Size);
 		currentVertex = nextVertex;
@@ -5947,7 +5947,7 @@ void clpbrd(unsigned short startVertex) {
 		BorderClipReference.y = (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom;
 		// ToDo - is this line below correct?
 		BorderClipReference.x = (ClipRect.top = ClipRect.left) / 2 + ClipRect.left;
-		for (CurrentSide = 0; CurrentSide < (unsigned)VertexCount - 2; CurrentSide++) {
+		for (CurrentSide = 0; CurrentSide < VertexCount - 2; CurrentSide++) {
 			linsid();
 			setvct(CurrentSide + 1, CurrentSide + 2);
 			lincrnr();
@@ -6011,7 +6011,7 @@ void satout(double satinWidth) {
 		duangs();
 		OutsidePoints = OutsidePointList;
 		InsidePoints = InsidePointList;
-		for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++)
+		for (iVertex = 0; iVertex < VertexCount - 1; iVertex++)
 			outfn(iVertex, iVertex + 1, 0.1);
 		count = 0;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++)
@@ -6020,11 +6020,11 @@ void satout(double satinWidth) {
 				count++;
 		}
 		satinWidth /= 2;
-		for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++)
+		for (iVertex = 0; iVertex < VertexCount - 1; iVertex++)
 			outfn(iVertex, iVertex + 1, satinWidth);
 		outfn(iVertex, 0, satinWidth);
 		rstMap(INDIR);
-		if (count < (unsigned)VertexCount >> 1)
+		if (count < VertexCount >> 1)
 		{
 			setMap(INDIR);
 			OutsidePoints = InsidePointList;
@@ -6463,7 +6463,7 @@ void lapbrd() {
 	SequenceIndex = 0;
 	savedStitchLength = UserStitchLength;
 	UserStitchLength = APSPAC;
-	for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++)
+	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++)
 		bdrlin(iVertex, iVertex + 1, APSPAC);
 	for (iVertex = VertexCount - 1; iVertex; iVertex--)
 		bdrlin(iVertex, iVertex - 1, APSPAC);
@@ -6477,7 +6477,7 @@ void apbrd() {
 	SequenceIndex = 0;
 	OSequence[SequenceIndex].x = CurrentFormVertices[currentVertex].x;
 	OSequence[SequenceIndex++].y = CurrentFormVertices[currentVertex].y;
-	for (iVertex = 0; iVertex < (unsigned)VertexCount << 1; iVertex++) {
+	for (iVertex = 0; iVertex < VertexCount << 1; iVertex++) {
 		nextVertex = nxt(currentVertex);
 		bdrlin(currentVertex, nextVertex, APSPAC);
 		currentVertex = nextVertex;
@@ -8643,7 +8643,7 @@ void plfn(VRCT2* prct) {
 
 	duromb(prct[1].aipnt, prct[1].cipnt, prct[1].aopnt, prct[1].copnt);
 	duspnd(1, 2);
-	for (iVertex = 2; iVertex < (unsigned)VertexCount - 4; iVertex++) {
+	for (iVertex = 2; iVertex < VertexCount - 4; iVertex++) {
 		duromb(prct[iVertex].bipnt, prct[iVertex].cipnt, prct[iVertex].bopnt, prct[iVertex].copnt);
 		duspnd(iVertex, iVertex + 1);
 	}
@@ -8732,7 +8732,7 @@ void plbrd(double edgeSpacing) {
 	InsidePoints[VertexCount].y = InsidePoints[0].y;
 	OutsidePoints[VertexCount].x = OutsidePoints[0].x;
 	OutsidePoints[VertexCount].y = OutsidePoints[0].y;
-	for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++)
+	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++)
 	{
 		sprct(iVertex, iVertex + 1);
 		spurct(iVertex);
@@ -8791,7 +8791,7 @@ void pbrd(double edgeSpacing) {
 	UnderlayVerticalRect = &FillVerticalRect[VertexCount];
 	start = getlast();
 	satout(SelectedForm->borderSize);
-	for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		sprct(iVertex, iVertex + 1);
 		spurct(iVertex);
 	}
@@ -10048,7 +10048,7 @@ void blbrd(double spacing) {
 	SequenceIndex = 0;
 	OSequence[SequenceIndex].x = CurrentFormVertices[0].x;
 	OSequence[SequenceIndex++].y = CurrentFormVertices[0].y;
-	for (iVertex = 0; iVertex < (unsigned)VertexCount - 2; iVertex++) {
+	for (iVertex = 0; iVertex < VertexCount - 2; iVertex++) {
 		bhfn(iVertex, iVertex + 1, spacing);
 		bhcrnr(iVertex);
 	}
@@ -10277,7 +10277,7 @@ void clpic(unsigned short start) {
 	ClipReference.x = ClipRect.left;
 	satout(20);
 	if (SelectedForm->type == FRMLINE) {
-		for (iVertex = 0; iVertex < (unsigned)VertexCount - 2; iVertex++) {
+		for (iVertex = 0; iVertex < VertexCount - 2; iVertex++) {
 			picfn(iVertex, iVertex + 1, SelectedForm->edgeSpacing);
 			clpcrnr(iVertex);
 		}
@@ -10394,23 +10394,20 @@ void contf() {
 	selectionStart = &CurrentFormVertices[start];
 	highStart = &CurrentFormVertices[finish];
 	lowLength = highLength = 0;
-	// ToDo - Allocate memory locally for lowCounts, highCounts, LowLengths, 
-	//        highLengths, lowDeltas, highDeltas, lowSteps, HighSteps,
-	//        highVertices, pols, lowVertices
-	lowCounts = (unsigned*)BSequence;
-	highCounts = &lowCounts[lowVertexIndex];
+	lowCounts = new unsigned[lowVertexIndex];
+	highCounts = new unsigned[highVertexIndex];
 
-	lowLengths = (double*)&highCounts[highVertexIndex];
-	highLengths = &lowLengths[lowVertexIndex];
+	lowLengths = new double[lowVertexIndex];
+	highLengths = new double[highVertexIndex];
 
-	lowDeltas = (dPOINT*)&highLengths[highVertexIndex];
-	highDeltas = &lowDeltas[lowVertexIndex];
-	lowSteps = &highDeltas[highVertexIndex];
-	highSteps = &lowSteps[lowVertexIndex];
-	highVertices = &highSteps[highVertexIndex];
+	lowDeltas = new dPOINT[lowVertexIndex];
+	highDeltas = new dPOINT[highVertexIndex];
+	lowSteps = new dPOINT[lowVertexIndex];
+	highSteps = new dPOINT[highVertexIndex];
+	highVertices = new dPOINT[highVertexIndex];
 
-	pols = (PVEC*)&highVertices[highVertexIndex];
-	lowVertices = (fPOINT*)&pols[selectedVertexCount];
+	pols = new PVEC[selectedVertexCount];
+	lowVertices = new fPOINT[lowVertexIndex];
 
 	lowLength = lowIndex = 0;
 	lowStep.x = lowStep.y = 0;
@@ -10436,7 +10433,7 @@ void contf() {
 		selind++;
 	}
 	highIndex = 0; highLength = 0;
-	for (iVertex = finish; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+	for (iVertex = finish; iVertex < VertexCount - 1; iVertex++) {
 		highVertices[highIndex].x = CurrentFormVertices[iVertex].x;
 		highVertices[highIndex].y = CurrentFormVertices[iVertex].y;
 		highDeltas[highIndex].x = CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x;
@@ -10547,6 +10544,17 @@ void contf() {
 	}
 	if (SelectedForm->lengthOrCount.stitchLength < MinStitchLength)
 		SelectedForm->lengthOrCount.stitchLength = MinStitchLength;
+	delete[] lowVertices;
+	delete[] pols;
+	delete[] highVertices;
+	delete[] highSteps;
+	delete[] lowSteps;
+	delete[] highDeltas;
+	delete[] lowDeltas;
+	delete[] highLengths;
+	delete[] lowLengths;
+	delete[] highCounts;
+	delete[] lowCounts;
 }
 
 BOOL contsf(unsigned formIndex)
@@ -10735,7 +10743,7 @@ void shrnks() {
 	double		length, ratio, deltaLength, truncationDelta;
 
 	oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
-	for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		delta.x = CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x;
 		delta.y = CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y;
 		length = hypot(delta.x, delta.y);
@@ -12859,7 +12867,7 @@ void fxlen() {
 	// ToDo - Allocate memory locally for ChainEndPoints
 	ChainEndPoints = (fPOINT*)BSequence;
 	AdjustedSpace = 0;
-	for (iVertex = 1; iVertex < (unsigned)VertexCount; iVertex++) {
+	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
 		length = hypot(CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x, CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y);
 		if (length > SelectedForm->edgeSpacing)
 			goto fxlab;
@@ -12890,7 +12898,7 @@ fxlab:;
 		ActivePointIndex = 1;
 		ChainEndPoints[0].x = SelectedPoint.x;
 		ChainEndPoints[0].y = SelectedPoint.y;
-		for (CurrentSide = 0; CurrentSide < (unsigned)VertexCount - 1; CurrentSide++) {
+		for (CurrentSide = 0; CurrentSide < VertexCount - 1; CurrentSide++) {
 			NextStart = CurrentSide + 1;
 			fxlit();
 		}
@@ -12933,7 +12941,7 @@ fxlab:;
 	SelectedPoint.y = CurrentFormVertices[0].y;
 	OutputIndex = 1;
 	AdjustedSpace = minimumSpacing;
-	for (CurrentSide = 0; CurrentSide < (unsigned)VertexCount - 1; CurrentSide++) {
+	for (CurrentSide = 0; CurrentSide < VertexCount - 1; CurrentSide++) {
 		NextStart = CurrentSide + 1;
 		fxlin();
 	}
@@ -13026,7 +13034,7 @@ void dufxlen() {
 	// ToDo - Allocate memory locally for ListSINEs & ListCOSINEs
 	ListSINEs = (double*)AngledFormVertices;
 	ListCOSINEs = (double*)TempPolygon;
-	for (iVertex = 0; iVertex < (unsigned)VertexCount; iVertex++) {
+	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 		ListSINEs[iVertex] = sin(FormAngles[iVertex]);
 		ListCOSINEs[iVertex] = cos(FormAngles[iVertex]);
 	}

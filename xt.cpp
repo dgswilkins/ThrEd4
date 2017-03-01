@@ -75,7 +75,6 @@ extern	unsigned		SelectedFormCount;
 extern	unsigned short	SelectedFormList[MAXFORMS];
 extern	fPOINT			SelectedPoint;
 extern	unsigned		SequenceIndex;
-extern	unsigned short	VertexCount;
 extern	TCHAR*			StringTable[STR_LEN];
 extern	fPOINTATTR		StitchBuffer[MAXPCS];
 extern	double			StitchSpacing;
@@ -93,6 +92,7 @@ extern	unsigned		AppliqueColor;
 extern	POINT			UnzoomedRect;
 extern	COLORREF		UserColor[16];
 extern	double			UserStitchLength;
+extern	unsigned		VertexCount;
 extern	HWND			VerticalScrollBar;
 extern	TCHAR			WorkingFileName[_MAX_PATH];
 extern	POINT			ZoomBoxLine[5];
@@ -1321,7 +1321,7 @@ void fncwlk()
 		OutputIndex++;
 		finish = prv(start);
 		start = nxt(start);
-		for (iGuide = 1; iGuide < (unsigned)VertexCount >> 1; iGuide++)
+		for (iGuide = 1; iGuide < VertexCount >> 1; iGuide++)
 		{
 			OSequence[OutputIndex].x = midl(CurrentFormVertices[finish].x, CurrentFormVertices[start].x);
 			OSequence[OutputIndex].y = midl(CurrentFormVertices[finish].y, CurrentFormVertices[start].y);
