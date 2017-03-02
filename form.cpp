@@ -10398,13 +10398,13 @@ void contf() {
 	highCounts = new unsigned[highVertexIndex];
 
 	lowLengths = new double[lowVertexIndex];
-	highLengths = new double[highVertexIndex];
+	highLengths = new double[highVertexIndex]();
 
 	lowDeltas = new dPOINT[lowVertexIndex];
-	highDeltas = new dPOINT[highVertexIndex];
+	highDeltas = new dPOINT[highVertexIndex]();
 	lowSteps = new dPOINT[lowVertexIndex];
 	highSteps = new dPOINT[highVertexIndex];
-	highVertices = new dPOINT[highVertexIndex];
+	highVertices = new dPOINT[highVertexIndex]();
 
 	pols = new PVEC[selectedVertexCount];
 	lowVertices = new fPOINT[lowVertexIndex];
@@ -10944,7 +10944,7 @@ void srtf(unsigned start, unsigned finish) {
 	unsigned	iForm, iStitch, stitchAccumulator, swap;
 
 	if (start != finish) {
-		stitchHistogram = new unsigned[FormIndex];
+		stitchHistogram = new unsigned[FormIndex << 2];
 		for (iForm = 0; iForm < FormIndex << 2; iForm++)
 			stitchHistogram[iForm] = 0;
 		for (iStitch = start; iStitch < finish; iStitch++)
