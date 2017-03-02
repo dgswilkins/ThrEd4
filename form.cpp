@@ -12042,8 +12042,7 @@ void clpcon() {
 		totalLength += ClipSideLengths[vertex];
 		vertex = nextVertex;
 	}
-	// ToDo - Allocate memory locally for ClipSegments
-	ClipSegments = (CLPSEG*)&StitchBuffer[MAXSEQ];
+	ClipSegments = new CLPSEG[MAXSTITCHS];
 	clipGrid.left = floor(SelectedForm->rectangle.left / ClipWidth);
 	clipGrid.right = ceil(SelectedForm->rectangle.right / ClipWidth);
 	clipGrid.bottom = floor(SelectedForm->rectangle.bottom / ClipRectSize.cy - 1);
@@ -12071,6 +12070,7 @@ void clpcon() {
 		for (iVertex = 0; iVertex < VertexCount; iVertex++)
 			CurrentFormVertices[iVertex].y += formNegativeOffset;
 	}
+	// ToDo - Allocate memory locally for ClipStitchPoints
 	ClipStitchPoints = (CLIPNT*)&BSequence;
 	segmentCount = 0;
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
@@ -12258,97 +12258,99 @@ clpskp:;
 
 #endif
 
-			delete[] Lengths;
-			delete[] ClipSideLengths;
-			delete[] ClipIntersectData;
-			delete[] ArrayOfClipIntersectData;
+	delete[] Lengths;
+	delete[] ClipSideLengths;
+	delete[] ClipIntersectData;
+	delete[] ArrayOfClipIntersectData;
 
-			if (ClipSegmentIndex) {
-				clplim = ClipSegmentIndex >> 3;
-				clplim = ClipSegmentIndex >> 1;
-				if (!clplim)
-					clplim = 1;
-				if (clplim > 12)
-					clplim = 12;
-				SortedLengths = (float**)&ClipSegments[ClipSegmentIndex];
-				sortedCount = 0;
-				for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
-					SortedLengths[sortedCount++] = &ClipSegments[iSegment].beginLength;
-					SortedLengths[sortedCount++] = &ClipSegments[iSegment].endLength;
-				}
-				qsort(SortedLengths, sortedCount, sizeof(float *), lencmp);
-				for (iSorted = 0; iSorted < sortedCount; iSorted++) {
-					// ToDo - what does lenref do exactly?
-					inf = lenref(SortedLengths[iSorted]);
-					ing = inf >> 1;
-					if (inf & 1)
-						ClipSegments[ing].endIndex = iSorted;
-					else
-						ClipSegments[ing].beginIndex = iSorted;
-				}
+	if (ClipSegmentIndex) {
+		clplim = ClipSegmentIndex >> 3;
+		clplim = ClipSegmentIndex >> 1;
+		if (!clplim)
+			clplim = 1;
+		if (clplim > 12)
+			clplim = 12;
+		// ToDo - Allocate memory locally for SortedLengths
+		SortedLengths = (float**)&ClipSegments[ClipSegmentIndex];
+		sortedCount = 0;
+		for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
+			SortedLengths[sortedCount++] = &ClipSegments[iSegment].beginLength;
+			SortedLengths[sortedCount++] = &ClipSegments[iSegment].endLength;
+		}
+		qsort(SortedLengths, sortedCount, sizeof(float *), lencmp);
+		for (iSorted = 0; iSorted < sortedCount; iSorted++) {
+			// ToDo - what does lenref do exactly?
+			inf = lenref(SortedLengths[iSorted]);
+			ing = inf >> 1;
+			if (inf & 1)
+				ClipSegments[ing].endIndex = iSorted;
+			else
+				ClipSegments[ing].beginIndex = iSorted;
+		}
 
 #if CLPVU==1
 
-				for (unsigned iStitch = 0; iStitch < ActivePointIndex; iStitch++) {
-					StitchBuffer[iStitch].x = ClipStitchPoints[iStitch].x;
-					StitchBuffer[iStitch].y = ClipStitchPoints[iStitch].y;
-					StitchBuffer[iStitch].attribute = 0;
-				}
-				PCSHeader.stitchCount = ActivePointIndex;
+		for (unsigned iStitch = 0; iStitch < ActivePointIndex; iStitch++) {
+			StitchBuffer[iStitch].x = ClipStitchPoints[iStitch].x;
+			StitchBuffer[iStitch].y = ClipStitchPoints[iStitch].y;
+			StitchBuffer[iStitch].attribute = 0;
+		}
+		PCSHeader.stitchCount = ActivePointIndex;
 #endif
 
 #if CLPVU==2
 
-				inf = 0;
-				for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
-					for (iStitchPoint = ClipSegments[iSegment].start; iStitchPoint <= ClipSegments[iSegment].finish; iStitchPoint++) {
-						StitchBuffer[inf].x = ClipStitchPoints[iStitchPoint].x;
-						StitchBuffer[inf].y = ClipStitchPoints[iStitchPoint].y;
-						StitchBuffer[inf++].attribute = iSegment & 0xf;
-					}
-				}
-				PCSHeader.stitchCount = inf;
+		inf = 0;
+		for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
+			for (iStitchPoint = ClipSegments[iSegment].start; iStitchPoint <= ClipSegments[iSegment].finish; iStitchPoint++) {
+				StitchBuffer[inf].x = ClipStitchPoints[iStitchPoint].x;
+				StitchBuffer[inf].y = ClipStitchPoints[iStitchPoint].y;
+				StitchBuffer[inf++].attribute = iSegment & 0xf;
+			}
+		}
+		PCSHeader.stitchCount = inf;
 
 #endif
 
-				minx = 1e99;
+		minx = 1e99;
 
 #if CLPVU==0
 
-				ActivePointIndex = 0;
-				setMap(FILDIR);
-				SequenceIndex = 0;
-				ClipIntersectSide = ClipSegments[0].asid;
-				ritseg();
-				while (nucseg()) {
-					if (SequenceIndex > MAXSEQ - 3)
-						break;
-					ritseg();
-				}
-				chksid(0);
-				if (SequenceIndex > MAXSEQ - 100)
-					SequenceIndex = MAXSEQ - 100;
-				ine = 0; inf = 0;
-				for (iSequence = 0; iSequence < SequenceIndex; iSequence++) {
-					if (vscmp(iSequence, ine)) {
-						ine++;
-						OSequence[ine].x = OSequence[iSequence].x;
-						OSequence[ine].y = OSequence[iSequence].y;
-					}
-					else
-						inf++;
-				}
-				SequenceIndex = ine;
-				if (chkMap(WASNEG)) {
-					for (iSequence = 0; iSequence < SequenceIndex; iSequence++)
-						OSequence[iSequence].x -= FormOffset;
-					for (iVertex = 0; iVertex < VertexCount; iVertex++)
-						CurrentFormVertices[iVertex].x -= FormOffset;
-					SelectedForm->rectangle.left -= FormOffset;
-					SelectedForm->rectangle.right -= FormOffset;
-				}
-#endif
+		ActivePointIndex = 0;
+		setMap(FILDIR);
+		SequenceIndex = 0;
+		ClipIntersectSide = ClipSegments[0].asid;
+		ritseg();
+		while (nucseg()) {
+			if (SequenceIndex > MAXSEQ - 3)
+				break;
+			ritseg();
+		}
+		chksid(0);
+		if (SequenceIndex > MAXSEQ - 100)
+			SequenceIndex = MAXSEQ - 100;
+		ine = 0; inf = 0;
+		for (iSequence = 0; iSequence < SequenceIndex; iSequence++) {
+			if (vscmp(iSequence, ine)) {
+				ine++;
+				OSequence[ine].x = OSequence[iSequence].x;
+				OSequence[ine].y = OSequence[iSequence].y;
 			}
+			else
+				inf++;
+		}
+		SequenceIndex = ine;
+		if (chkMap(WASNEG)) {
+			for (iSequence = 0; iSequence < SequenceIndex; iSequence++)
+				OSequence[iSequence].x -= FormOffset;
+			for (iVertex = 0; iVertex < VertexCount; iVertex++)
+				CurrentFormVertices[iVertex].x -= FormOffset;
+			SelectedForm->rectangle.left -= FormOffset;
+			SelectedForm->rectangle.right -= FormOffset;
+		}
+#endif
+	}
+	delete[] ClipSegments;
 }
 
 void vrtsclp() {
