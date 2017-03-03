@@ -1942,6 +1942,10 @@ BOOL chkrdun(SRTREC* stitchRecord)
 	return 0;
 }
 
+// Disable the warning for Dereferencing NULL pointer since 'new' will throw an
+// exception rather than returning NULL
+#pragma warning(push)
+#pragma warning(disable : 28182)
 double precjmps(SRTREC* stitchRecord)
 {
 	unsigned		totalJumps;
@@ -2013,6 +2017,7 @@ double precjmps(SRTREC* stitchRecord)
 	delete[] FormFillCounter;
 	return totalJumps;
 }
+#pragma warning(pop)
 
 unsigned duprecs(SRTREC* record)
 {
@@ -5017,6 +5022,10 @@ void txtkey(unsigned keyCode)
 	rstMap(LASTXBAK);
 }
 
+// Disable the warning for Dereferencing NULL pointer since 'new' will throw an
+// exception rather than returning NULL
+#pragma warning(push)
+#pragma warning(disable : 28182)
 void setxt()
 {
 	TXPNT*	currentFormTexture;
@@ -5039,6 +5048,7 @@ void setxt()
 		}
 	}
 }
+#pragma warning(pop)
 
 void rtrtx()
 {
