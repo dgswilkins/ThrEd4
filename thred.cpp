@@ -3,6 +3,9 @@
 #include <math.h>
 #include <float.h>
 #include <tchar.h>
+#ifdef ALLOCFAILURE
+#include <new.h>
+#endif
 #include "lang.h"
 #include "resource.h"
 #include "thred.h"
@@ -23444,6 +23447,15 @@ int	fltex(int code) {
 #endif
 }
 
+#ifdef ALLOCFAILURE
+int handle_program_memory_depletion(size_t)
+{
+	// ToDo - Make this handle the failure with more user notifiication
+	shoMsg("Memory Allocation Failure");
+	exit(EXIT_FAILURE);
+}
+#endif
+
 int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_     LPSTR     lpCmdLine,
@@ -23453,6 +23465,11 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 	WNDCLASSEX		wc;
 	LOGBRUSH		br;
 
+#ifdef ALLOCFAILURE
+	_PNH old_handler = _set_new_handler(handle_program_memory_depletion);
+	//char* testalloc = new char[(~unsigned int((int)0) / 2) - 1]();
+	//testalloc[0] = 1;
+#endif
 	br.lbColor = COLOR_BACKGROUND + 1;
 	br.lbHatch = 0;
 	br.lbStyle = BS_SOLID;
@@ -23539,7 +23556,13 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 			if (rstMap(DUMEN))
 				DrawMenuBar(ThrEdWindow);
 		}
+#ifdef ALLOCFAILURE
+		_set_new_handler(old_handler);
+#endif
 		return 0;
 	}
+#ifdef ALLOCFAILURE
+	_set_new_handler(old_handler);
+#endif
 	return -1;
 }
