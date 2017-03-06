@@ -394,7 +394,7 @@ extern	fRECTANGLE		AllItemsRect;
 extern	double			BorderWidth;
 extern	BSEQPNT			BSequence[BSEQLEN];
 extern	float			ButtonholeCornerLength;
-extern	fPOINT			ClipPoints[MAXCLPNTS];
+extern	fPOINT			ClipPoints[MAXITEMS];
 extern	unsigned		ClosestFormToCursor;
 extern	unsigned		ClosestVertexToCursor;
 extern	unsigned		ClipPointIndex;
@@ -408,10 +408,10 @@ extern	fPOINT			FormMoveDelta;
 extern	unsigned		FormIndex;
 extern	FRMHED			FormList[MAXFORMS];
 extern	POINT			FormControlPoints[10];
-extern	fPOINT			FormVertices[MAXFRMPNTS];
+extern	fPOINT			FormVertices[MAXITEMS];
 extern	TCHAR			HelpBuffer[HBUFSIZ];
 extern	double			HorizontalRatio;
-extern	fPOINT			InterleaveSequence[MAXSEQ];
+extern	fPOINT			InterleaveSequence[MAXITEMS];
 extern	fPOINT			LowerLeftStitch;
 extern	HWND			MsgWindow;
 extern	unsigned		NewFormVertexCount;
@@ -440,7 +440,7 @@ extern	int				TextureHistoryIndex;
 extern	TXHST			TextureHistory[16];
 extern	TXTSCR			TextureScreen;
 extern	int				TextureIndex;
-extern	TXPNT			TexturePointsBuffer[MAXSEQ];
+extern	TXPNT			TexturePointsBuffer[MAXITEMS];
 extern	unsigned		VertexCount;
 extern	double			VerticalRatio;
 extern	unsigned short	WordParam;
@@ -498,7 +498,7 @@ double			StitchWindowAspectRatio;	//aspect ratio of the stitch window
 double			MinStitchLength	  = MINSIZ*PFAFGRAN;	//minimum stitch size
 double			UserStitchLength  = USESIZ*PFAFGRAN;	//user selected stitch size
 double			SmallStitchLength = SMALSIZ*PFAFGRAN;	//user can remove stitches smaller than this
-unsigned		MarkedStitchMap[RMAPSIZ];	//bitmap to tell when stitches have been marked
+unsigned		MarkedStitchMap[MAXITEMS];	//bitmap to tell when stitches have been marked
 TCHAR*			PcdClipFormat = "PMust_Format";
 TCHAR*			ThrEdClipFormat = "threditor";
 CLPSTCH*		ClipStitchData;			//for pcs clipboard data
@@ -739,8 +739,8 @@ double			GapToNearest[NERCNT];	//distances of the closest points
 										//to a mouse click
 long			NearestPoint[NERCNT];	//indices of the closest points
 unsigned		NearestCount;			//number of boxes selected
-//ToDo - convert SearchLine to calloc'd local variable?
-POINT			SearchLine[MAXSEQ];		//stitch select line 
+//ToDo - convert SearchLine to locallly allocated variable?
+POINT			SearchLine[MAXITEMS];	//stitch select line 
 unsigned		SearchLineIndex = 0;	//pointer for drawing stitch select lines
 fRECTANGLE		StitchRangeRect;		//stitch range rectangle
 fPOINT			StitchRangeSize;		//form check ranges
@@ -1640,13 +1640,13 @@ unsigned UpperCaseMap[] = {
 0,			//00000000000000000000000000000000
 };
 
-unsigned			FlagMap[MAPLEN];			//bitmap
-unsigned			UserFlagMap = 0;	//for storage of persistent binary variables set by the user
+unsigned			FlagMap[MAPLEN];		//bitmap
+unsigned			UserFlagMap = 0;		//for storage of persistent binary variables set by the user
 // ToDo - StitchBuffer and tmpStitichBuffer have been allocated at the same place. Should they be separate?
-fPOINTATTR			StitchBuffer[MAXPCS];		//main stitch buffer
-fPOINTATTR			ClipBuffer[MAXSEQ];			//for temporary copy of imported clipboard data
-FRMHED*				SelectedForm;				//pointer to selected form
-unsigned			FillTypes[] =				//fill type array for side window display
+fPOINTATTR			StitchBuffer[MAXPCS];	//main stitch buffer
+fPOINTATTR			ClipBuffer[MAXITEMS];	//for temporary copy of imported clipboard data
+FRMHED*				SelectedForm;			//pointer to selected form
+unsigned			FillTypes[] =			//fill type array for side window display
 { 0,VRTF,HORF,ANGF,SATF,CLPF,CONTF,VCLPF,HCLPF,ANGCLPF,FTHF,TXVRTF,TXHORF,TXANGF };
 //edge fill type array for side window display
 unsigned			EdgeFillTypes[] = { 0,EDGELINE,EDGEBEAN,EDGECLIP,EDGEANGSAT,EDGEAPPL,EDGEPROPSAT,EDGEBHOL,EDGEPICOT,EDGEDOUBLE,EDGELCHAIN,EDGEOCHAIN,EDGECLIPX };
@@ -2151,7 +2151,7 @@ fPOINT* adflt(unsigned count) {
 
 	unsigned iFormVertex = FormVertexIndex;
 
-	if (FormVertexIndex + count > MAXFLT)
+	if (FormVertexIndex + count > MAXITEMS)
 		tabmsg(IDS_FRMOVR);
 	FormVertexIndex += count;
 	return &FormVertices[iFormVertex];
@@ -2397,8 +2397,8 @@ void dudat() {
 		backupData->clipPoints = (fPOINT*)&backupData->guide[SatinConnectIndex];
 		if (ClipPointIndex) {
 
-			if (ClipPointIndex > MAXCLPNTS)
-				ClipPointIndex = MAXCLPNTS;
+			if (ClipPointIndex > MAXITEMS)
+				ClipPointIndex = MAXITEMS;
 			mvflpnt(backupData->clipPoints, &ClipPoints[0], ClipPointIndex);
 		}
 		backupData->colors = (COLORREF*)&backupData->clipPoints[ClipPointIndex];
@@ -2562,7 +2562,7 @@ void duzero() {
 
 	if (SelectedFormCount) {
 
-		clRmap(RMAPSIZ);
+		clRmap(MAXITEMS);
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			setr(SelectedFormList[iForm]);
 		rstMap(CONTIG);
@@ -5930,7 +5930,7 @@ void ritdst() {
 	colorData[0] = COLVER;
 	colorData[1] = BackgroundColor;
 	colorData[2] = UserColor[StitchBuffer[0].attribute&COLMSK];
-	highStitchBuffer = &StitchBuffer[MAXSEQ];
+	highStitchBuffer = &StitchBuffer[MAXITEMS];
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
 		highStitchBuffer[iStitch].x = RotatedStitches[iStitch].x * 5 / 3;
@@ -8655,10 +8655,10 @@ void duclip() {
 				}
 				SetClipboardData(ThrEdClip, ThrEdClipPointer);
 				CloseClipboard();
-				clRmap(RMAPSIZ);
+				clRmap(MAXITEMS);
 				for (iForm = 0; iForm < SelectedFormCount; iForm++)
 					setr(SelectedFormList[iForm]);
-				astch = &StitchBuffer[MAXSEQ];
+				astch = &StitchBuffer[MAXITEMS];
 				stitchCount = 0;
 				LowerLeftStitch.x = LowerLeftStitch.y = (float)1e30;
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -8679,13 +8679,13 @@ void duclip() {
 					Clip = RegisterClipboardFormat(PcdClipFormat);
 					ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2);
 					ClipStitchData = deref(ClipPointer);
-					iStitch = MAXSEQ;
+					iStitch = MAXITEMS;
 					iDestination = 0;
 					savclp(0, iStitch);
 					iStitch++;
 					ClipStitchData[0].led = stitchCount;
 					iDestination++;
-					while (iStitch < stitchCount + MAXSEQ)
+					while (iStitch < stitchCount + MAXITEMS)
 						savclp(iDestination++, iStitch++);
 					SetClipboardData(Clip, ClipPointer);
 					CloseClipboard();
@@ -9183,7 +9183,7 @@ void setknt() {
 
 	unsigned	iStitch;
 
-	OutputIndex = MAXSEQ;
+	OutputIndex = MAXITEMS;
 	mvstch(OutputIndex++, 0);
 	strtknt(0);
 	if (stlen(0) > KNOTLEN)
@@ -9205,8 +9205,8 @@ void setknt() {
 	setMap(FILDIR);
 	endknt(iStitch);
 	StitchBuffer[OutputIndex - 1].attribute &= (~KNOTMSK);
-	PCSHeader.stitchCount = OutputIndex - MAXSEQ;
-	mvstchs(0, MAXSEQ, PCSHeader.stitchCount);
+	PCSHeader.stitchCount = OutputIndex - MAXITEMS;
+	mvstchs(0, MAXITEMS, PCSHeader.stitchCount);
 }
 
 unsigned srchknot(unsigned source) {
@@ -9235,7 +9235,7 @@ void chkncol() {
 
 	unsigned	iStitch, initialColor, color, code;
 
-	OutputIndex = MAXSEQ;
+	OutputIndex = MAXITEMS;
 	initialColor = StitchBuffer[0].attribute&COLMSK;
 	rstMap(FILDIR);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -9256,8 +9256,8 @@ void chkncol() {
 				strtknt(iStitch);
 		}
 	}
-	PCSHeader.stitchCount = OutputIndex - MAXSEQ;
-	mvstchs(0, MAXSEQ, PCSHeader.stitchCount);
+	PCSHeader.stitchCount = OutputIndex - MAXITEMS;
+	mvstchs(0, MAXITEMS, PCSHeader.stitchCount);
 }
 
 void setknots()
@@ -11629,7 +11629,7 @@ void thumnail() {
 	untrace();
 	// ToDo is this correct? types do not match. Use memory allocation rather than global buffer
 	ThumbnailNames = (TCHAR*)OSequence;
-	Thumbnails = (TCHAR**)&OSequence[MAXSEQ >> 1];
+	Thumbnails = (TCHAR**)&OSequence[MAXITEMS >> 1];
 
 	SetCurrentDirectory(DefaultDirectory);
 	strcpy_s(SearchName, DefaultDirectory);
@@ -14114,7 +14114,7 @@ void dutrac() {
 				traceLengthSum = 0;
 			}
 		}
-		if (FormVertexIndex + OutputIndex > MAXFLT) {
+		if (FormVertexIndex + OutputIndex > MAXITEMS) {
 
 			tabmsg(IDS_FRMOVR);
 			return;
@@ -17825,7 +17825,7 @@ unsigned chkMsg() {
 
 				unlin();
 				savdo();
-				if (chkMap(INSRT) && PCSHeader.stitchCount < MAXSEQ) {
+				if (chkMap(INSRT) && PCSHeader.stitchCount < MAXITEMS) {
 
 					px2stch();
 					code = (ActiveColor | USMSK | (ActiveLayer << LAYSHFT) | NOTFRM)&NKNOTMSK;
@@ -22549,7 +22549,7 @@ void drwStch() {
 		}
 		if (ZoomFactor < StitchBoxesThreshold) {
 
-			clRmap(RMAPSIZ);
+			clRmap(MAXITEMS);
 			SelectObject(StitchWindowMemDC, LinePen);
 			SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 			rint();

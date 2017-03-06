@@ -33,7 +33,6 @@
 
 #define		TXTRAT		0.95		//texture fill clipboard shrink/grow ratio
 #define		MAXMSK		0xffff0000	//for checking for greater than 65536
-#define		MAXSEQ		0x10000		//maximum number of points in the sequence list
 
 #define		DEFBPIX		4			//default form box pixels
 #define		MAXWLK		54			//max underlay/edge walk stitch length
@@ -47,14 +46,14 @@
 #define		IWAVS		5			//default wave lobes
 #define		THRLED0		0x746872	//lead dword value for thred file v 1.0
 #define		THRLED1		0x1746872	//lead dword value for thred file v 1.1
-#define		MAXFLT		65536		//maximum number of floating point items, form & clipboard points
 #define		ZUMFCT		0.65		//zoom factor
 #define		PAGSCROL	0.9			//page scroll factor
 #define		LINSCROL	0.05		//line scroll factor
 #define		TXTSIDS		6			//extra pixels in a text box
-#define		MAXSTITCHS	0x10000		//maximum number of stitches
+#define		MAXITEMS	0x10000		//maximum number of stitches, vertices, texture points, sequence items & clipboard points
 #define		MAXPCS		0x20000		//maximum possible stiches in a pcs file*2
 #define		MAXCHNG		10000		//maximum number of color changes
+const unsigned long	RMAPBITS = MAXITEMS << 5;	//a bit for each stitch
 #define		SHUPX		480			//small hoop x size
 #define		SHUPY		480			//small hoop y size
 #define		LHUPX		719			//large hoop x size
@@ -74,8 +73,6 @@
 #define		USESIZ		3.5			//user preferred size
 #define		MAXSIZ		9.0			//default maximum stitch size
 #define		PFAFGRAN	6			//pfaf stitch points per millimeter
-#define		RMAPSIZ		65536		//a bit for each stitch
-const unsigned long	RMAPBITS = RMAPSIZ << 5;	//a bit for each stitch
 #define		MINZUM		5			 //minimum zoom in stitch points
 #define		MAXZLEV		9			//maximum levels of zoom
 #define		SHOPNTS		0.00		//show stitch points when zoom below this
@@ -110,9 +107,7 @@ const unsigned long	RMAPBITS = RMAPSIZ << 5;	//a bit for each stitch
 #define		SPEDLIN		30			//speed change for line message on speed scroll bar
 #define		SPEDPAG		120			//speed change for page message on speed scroll bar
 #define		KNOTLEN		54			//set knots for stitches longer than this
-#define		MAXFRMPNTS	65536		//maximum total form points
-#define		MAXCLPNTS	65536		//maximum total cliboard storage in forms
-#define		MAXSAC		10000		//maximum number of satin guidlins
+#define		MAXSAC		10000		//maximum number of satin guidlines
 #define		MAXKNOTS	16384		//maximum nuber of knots
 #define		IBFCLEN		4*PFGRAN	//initial buttonhole fill corner length
 #define		IPICSPAC	6			//initial picot border space

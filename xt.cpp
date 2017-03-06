@@ -33,7 +33,7 @@ extern	unsigned		ButtonWidthX3;
 extern	HWND			ButtonWin[9];
 extern	FORMCLIP*		ClipFormHeader;
 extern	HGLOBAL			ClipMemory;
-extern	fPOINT			ClipPoints[MAXCLPNTS];
+extern	fPOINT			ClipPoints[MAXITEMS];
 extern	fRECTANGLE		ClipRect;
 extern	FLSIZ			ClipRectSize;
 extern	unsigned		ClipStitchCount;
@@ -48,14 +48,14 @@ extern	fPOINT			FormMoveDelta;
 extern	unsigned		FormIndex;
 extern	POINT			FormLines[MAXFRMLINS];
 extern	FRMHED			FormList[MAXFORMS];
-extern	fPOINT			FormVertices[MAXFRMPNTS];
+extern	fPOINT			FormVertices[MAXITEMS];
 extern	HPEN			GridPen;
 extern	HWND			HorizontalScrollBar;
 extern	TCHAR			HelpBuffer[HBUFSIZ];
 extern	INIFILE			IniFile;
 extern	fPOINT*			InsidePoints;
 extern	HWND			MainStitchWin;
-extern	unsigned		MarkedStitchMap[RMAPSIZ];
+extern	unsigned		MarkedStitchMap[MAXITEMS];
 extern	MSG				Msg;
 extern	TCHAR			MsgBuffer[MSGSIZ];
 extern	unsigned		NewFormVertexCount;
@@ -203,7 +203,7 @@ fRECTANGLE	DesignSizeRect;				//design size rectangle
 float		DesignAspectRatio;			//design aspect ratio
 HWND		DesignSizeDialog;			//change design size dialog window
 fPOINT		DesignSize;					//design size
-TXPNT		TexturePointsBuffer[MAXSEQ];	//buffer for textured fill points
+TXPNT		TexturePointsBuffer[MAXITEMS];	//buffer for textured fill points
 int			TextureIndex;				//next textured fill point index
 unsigned	TextureWindowId;			//id of the window being updated
 TCHAR		TextureInputBuffer[16];		//texture fill number buffer
@@ -220,7 +220,7 @@ TXTSCR		TextureScreen;				//texture editor layout parameters
 TXPNT		TempTexturePoints[16384];	//temporary storage for textured fill data
 unsigned	ColorOrder[16];				//color order adjusted for applique
 INTINF		InterleaveData;				//interleave data
-fPOINT		InterleaveSequence[MAXSEQ]; //storage for interleave points
+fPOINT		InterleaveSequence[MAXITEMS]; //storage for interleave points
 unsigned	InterleaveSequenceIndex;	//index into the interleave sequence
 FSTRTS		FillStartsData;				//fill start data for refill
 INSREC		InterleaveSequenceIndices[10];	//indices into interleave points
@@ -239,7 +239,7 @@ unsigned	FeatherDownCount;			//feather down count
 unsigned	FeatherTotalCount;			//up count plus down count
 unsigned	FeatherPhaseIndex;
 unsigned	FeatherPhase;
-fPOINT		FeatherSequence[MAXSEQ];
+fPOINT		FeatherSequence[MAXITEMS];
 unsigned	FeatherCountUp;
 unsigned	FeatherCountDown;
 
@@ -1003,7 +1003,7 @@ void delwlk(unsigned code)
 
 	stitchCount = 0;
 	flag = 1;
-	highStitchBuffer = &StitchBuffer[MAXSEQ];
+	highStitchBuffer = &StitchBuffer[MAXITEMS];
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 	{
 		if ((StitchBuffer[iStitch].attribute&WLKFMSK) != code)
@@ -1019,7 +1019,7 @@ void delwlk(unsigned code)
 			}
 		}
 	}
-	mvstchs(0, MAXSEQ, stitchCount);
+	mvstchs(0, MAXITEMS, stitchCount);
 	PCSHeader.stitchCount = stitchCount;
 }
 
@@ -1450,7 +1450,7 @@ void srtcol() {
 		colorStartStitch[iColor] = startStitch;
 		startStitch += histogram[iColor];
 	}
-	highStitchBuffer = &StitchBuffer[MAXSEQ];
+	highStitchBuffer = &StitchBuffer[MAXITEMS];
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 		moveStitch(&highStitchBuffer[colorStartStitch[StitchBuffer[iStitch].attribute&COLMSK]++], &StitchBuffer[iStitch]);
 	MoveMemory(&StitchBuffer, highStitchBuffer, sizeof(fPOINTATTR)*PCSHeader.stitchCount);
@@ -2177,7 +2177,7 @@ void fsort()
 		}
 		stitchRange[iRange].finish = lastRecord;
 		lastRange = ++iRange;
-		TempStitchBuffer = &StitchBuffer[MAXSEQ];
+		TempStitchBuffer = &StitchBuffer[MAXITEMS];
 		OutputIndex = 0;
 		for (iRange = 0; iRange < lastRange; iRange++)
 		{
@@ -2212,7 +2212,7 @@ void fsort()
 			sortRecord.direction = minimumDirection;
 			precjmps(&sortRecord);
 		}
-		mvstchs(0, MAXSEQ, OutputIndex);
+		mvstchs(0, MAXITEMS, OutputIndex);
 		PCSHeader.stitchCount = OutputIndex;
 		coltab();
 		setMap(RESTCH);
@@ -2531,7 +2531,7 @@ void duint(unsigned offset, unsigned code)
 			InterleaveData.output += gucon(CurrentFormVertices[SelectedForm->fillStart], InterleaveSequence[InterleaveSequenceIndices[InterleaveData.pins].index], InterleaveData.output + offset, code);
 	}
 	if (lastcol(InterleaveData.pins, &point))
-		InterleaveData.output += gucon(point, InterleaveSequence[InterleaveSequenceIndices[InterleaveData.pins].index], InterleaveData.output + MAXSEQ, code);
+		InterleaveData.output += gucon(point, InterleaveSequence[InterleaveSequenceIndices[InterleaveData.pins].index], InterleaveData.output + MAXITEMS, code);
 	for (iSequence = InterleaveSequenceIndices[InterleaveData.pins].index; iSequence < InterleaveSequenceIndices[InterleaveData.pins + 1].index; iSequence++)
 	{
 		InterleaveData.highStitchBuffer[InterleaveData.output].x = InterleaveSequence[iSequence].x;
@@ -2577,8 +2577,8 @@ void intlv()
 	rstMap(DIDSTRT);
 	if (PCSHeader.stitchCount)
 	{
-		offset = MAXSEQ;
-		InterleaveData.highStitchBuffer = &StitchBuffer[MAXSEQ];
+		offset = MAXITEMS;
+		InterleaveData.highStitchBuffer = &StitchBuffer[MAXITEMS];
 		for (iSequence = 0; iSequence < InterleaveSequenceIndex2; iSequence++)
 		{
 			InterleaveData.pins = iSequence;
@@ -2623,11 +2623,11 @@ void intlv()
 			code = InterleaveData.layerIndex | InterleaveSequenceIndices[InterleaveData.pins].code | InterleaveSequenceIndices[InterleaveData.pins].color;
 			duint(offset, code);
 		}
-		chkend(MAXSEQ, code);
+		chkend(MAXITEMS, code);
 		if (PCSHeader.stitchCount&&InterleaveData.start < (unsigned)PCSHeader.stitchCount - 1)
 		{
 			ine = PCSHeader.stitchCount - InterleaveData.start;
-			MoveMemory(&StitchBuffer[InterleaveData.output + MAXSEQ], &StitchBuffer[InterleaveData.start], sizeof(fPOINTATTR)*ine);
+			MoveMemory(&StitchBuffer[InterleaveData.output + MAXITEMS], &StitchBuffer[InterleaveData.start], sizeof(fPOINTATTR)*ine);
 			InterleaveData.output += ine;
 		}
 		MoveMemory(StitchBuffer, InterleaveData.highStitchBuffer, sizeof(fPOINTATTR)*InterleaveData.output);
@@ -3507,7 +3507,7 @@ void dutxtfil()
 	movStch();
 	ShowWindow(VerticalScrollBar, FALSE);
 	ShowWindow(HorizontalScrollBar, FALSE);
-	SelectedTexturePointsList = new unsigned[MAXSTITCHS];
+	SelectedTexturePointsList = new unsigned[MAXITEMS];
 	SelectedTexturePointsCount = 0;
 	setMap(INIT);
 	SideWindowButton = 0;
@@ -4629,7 +4629,7 @@ void txtdel()
 	if (SelectedTexturePointsCount)
 	{
 		savtxt();
-		clRmap(RMAPSIZ);
+		clRmap(MAXITEMS);
 		for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
 			setr(SelectedTexturePointsList[iPoint]);
 		iOutputPoint = 0;
@@ -5302,7 +5302,7 @@ void setshft()
 	unsigned	iStitch, line;
 
 	savtxt();
-	SelectedTexturePointsList = new unsigned[MAXSTITCHS];
+	SelectedTexturePointsList = new unsigned[MAXITEMS];
 	unbBox();
 	rstMap(BZUMIN);
 	pxCor2stch(ZoomBoxLine[0]);
@@ -5742,7 +5742,7 @@ void repclp()
 	fPOINT*		clipPoint;
 
 	badClipCount = clipCount = 0;
-	clipPoint = new fPOINT[MAXFRMPNTS];
+	clipPoint = new fPOINT[MAXITEMS];
 	for (iForm = 0; iForm < FormIndex; iForm++)
 	{
 		formHeader = &FormList[iForm];

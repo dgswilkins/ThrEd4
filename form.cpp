@@ -134,14 +134,14 @@ extern			unsigned		GroupStartStitch;
 extern			unsigned		GroupStitchIndex;
 extern			INIFILE			IniFile;
 extern			POINT			InsertLine[3];
-extern			fPOINT			InterleaveSequence[MAXSEQ];
+extern			fPOINT			InterleaveSequence[MAXITEMS];
 extern			unsigned		InterleaveSequenceIndex;
 extern			unsigned		InterleaveSequenceIndex2;
 extern			INSREC			InterleaveSequenceIndices[10];
 extern			HPEN			LayerPen[5];
 extern			HMENU			MainMenu;
 extern			HWND			MainStitchWin;
-extern			unsigned		MarkedStitchMap[RMAPSIZ];
+extern			unsigned		MarkedStitchMap[MAXITEMS];
 extern			double			MinStitchLength;
 extern			MSG				Msg;
 extern			TCHAR			MsgBuffer[MSGSIZ];
@@ -183,7 +183,7 @@ extern			POINT			StitchWindowSize;
 extern			POINT			StretchBoxLine[5];
 extern			TCHAR*			StringTable[STR_LEN];
 extern			int				TextureIndex;
-extern			TXPNT			TexturePointsBuffer[MAXSEQ];
+extern			TXPNT			TexturePointsBuffer[MAXITEMS];
 extern			RNGCNT*			TextureSegments;
 extern			HINSTANCE		ThrEdInstance;
 extern			HWND			ThrEdWindow;
@@ -372,9 +372,9 @@ POINT			SelectedFormsLine[9];	//line derived from the big rectangle
 POINT			SelectedPointsLine[9];	//line derived from the formOrigin select rectangle
 fRECTANGLE		AllItemsRect;			//rectangle enclosing all forms and stitches
 double			FormAngles[MAXFRMLINS];	//angles of a form for satin border fills
-fPOINT			FormVertices[MAXFRMPNTS];	//form points
+fPOINT			FormVertices[MAXITEMS];	//form points
 unsigned		FormVertexIndex;		//next index to append form points
-fPOINT			ClipPoints[MAXCLPNTS];	//main clipboard fill points for forms
+fPOINT			ClipPoints[MAXITEMS];	//main clipboard fill points for forms
 unsigned		ClipPointIndex;			//next index to append main clipboard points
 SATCON			SatinConnects[MAXSAC];	//satin form connects
 unsigned		SatinConnectIndex;		//next index to append satin connect points
@@ -1859,7 +1859,7 @@ BOOL ritlin(fPOINT start, fPOINT finish)
 			point.y = start.y + step.y;
 			for (iStep = 0; iStep < count - 1; iStep++) {
 				if (InterleaveSequenceIndex&MAXMSK) {
-					InterleaveSequenceIndex = MAXSEQ - 2;
+					InterleaveSequenceIndex = MAXITEMS - 2;
 					return 0;
 				}
 				InterleaveSequence[InterleaveSequenceIndex].x = point.x;
@@ -1869,7 +1869,7 @@ BOOL ritlin(fPOINT start, fPOINT finish)
 			}
 		}
 		else {
-			SequenceIndex = MAXSEQ - 2;
+			SequenceIndex = MAXITEMS - 2;
 			return 0;
 		}
 	}
@@ -2829,7 +2829,7 @@ void filinu(float xCoordinate, float yCoordinate) {
 	delta.y = yCoordinate - SelectedPoint.y;
 	length = hypot(delta.x, delta.y);
 	count = length / UserStitchLength;
-	if (chkmax(count, SequenceIndex) || count + SequenceIndex > MAXSEQ - 3)
+	if (chkmax(count, SequenceIndex) || count + SequenceIndex > MAXITEMS - 3)
 		return;
 	if (count) {
 		if (chkMap(FILDIR))
@@ -2863,7 +2863,7 @@ void filin(dPOINT currentPoint) {
 	point.x = SelectedPoint.x;
 	point.y = SelectedPoint.y;
 	count = length / UserStitchLength;
-	if (chkmax(count, SequenceIndex) || (count + SequenceIndex) > MAXSEQ - 3)
+	if (chkmax(count, SequenceIndex) || (count + SequenceIndex) > MAXITEMS - 3)
 		return;
 	if (count) {
 		if (chkMap(FILDIR))
@@ -3840,8 +3840,8 @@ void bakseq() {
 	iSequence--;
 	while (iSequence > 0) {
 		rcnt = iSequence%RITSIZ;
-		if (SequenceIndex > MAXSEQ) {
-			SequenceIndex = MAXSEQ - 1;
+		if (SequenceIndex > MAXITEMS) {
+			SequenceIndex = MAXITEMS - 1;
 			return;
 		}
 		rit = BSequence[iSequence].x / StitchSpacing2;
@@ -3936,7 +3936,7 @@ void bakseq() {
 					point.x = BSequence[iSequence + 1].x;
 					point.y = BSequence[iSequence + 1].y;
 					count = length / UserStitchLength - 1;
-					if (chkmax(count, SequenceIndex) || (count + SequenceIndex) > MAXSEQ - 3)
+					if (chkmax(count, SequenceIndex) || (count + SequenceIndex) > MAXITEMS - 3)
 						return;
 					step.x = delta.x / count;
 					step.y = delta.y / count;
@@ -5016,8 +5016,8 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 					BSequence[SequenceIndex].x = line2Point.x;
 					BSequence[SequenceIndex++].y = line2Point.y;
 				}
-				if (SequenceIndex > MAXSEQ - 6) {
-					SequenceIndex = MAXSEQ - 6;
+				if (SequenceIndex > MAXITEMS - 6) {
+					SequenceIndex = MAXITEMS - 6;
 					return;
 				}
 				line1Count--;
@@ -5047,8 +5047,8 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 						BSequence[SequenceIndex].x = line1Point.x;
 						BSequence[SequenceIndex++].y = line1Point.y;
 					}
-					if (SequenceIndex > MAXSEQ - 6) {
-						SequenceIndex = MAXSEQ - 6;
+					if (SequenceIndex > MAXITEMS - 6) {
+						SequenceIndex = MAXITEMS - 6;
 						return;
 					}
 					line1Count--;
@@ -5095,7 +5095,7 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 				line2Step.x = line2Delta.x / line2Count;
 				line2Step.y = line2Delta.y / line2Count;
 			}
-			if ((line1Count || line2Count) && line1Count < MAXSEQ&&line2Count < MAXSEQ)
+			if ((line1Count || line2Count) && line1Count < MAXITEMS&&line2Count < MAXITEMS)
 				goto nuseg;
 		}
 		delete[] line1StitchCounts;
@@ -6288,8 +6288,8 @@ void sfn(unsigned startVertex) {
 	}
 	OSequence[0].x = OSequence[SequenceIndex - 1].x;
 	OSequence[0].y = OSequence[SequenceIndex - 1].y;
-	if (SequenceIndex > MAXSEQ - 2)
-		SequenceIndex = MAXSEQ - 2;
+	if (SequenceIndex > MAXITEMS - 2)
+		SequenceIndex = MAXITEMS - 2;
 }
 
 void sbrd() {
@@ -9054,7 +9054,7 @@ void clpfm() {
 			topLeft.y += leftStep.y;
 			topRight.x += rightStep.x;
 			topRight.y += rightStep.y;
-			if (ActivePointIndex > MAXSEQ - ClipStitchCount - 1)
+			if (ActivePointIndex > MAXITEMS - ClipStitchCount - 1)
 				return;
 			trfrm(bottomLeft, topLeft, bottomRight, topRight);
 		}
@@ -9191,7 +9191,7 @@ void snp(unsigned start, unsigned finish) {
 	unsigned*	txhst;
 
 	chkrng(&range);
-	Xpoints = new unsigned[MAXSTITCHS]();
+	Xpoints = new unsigned[MAXITEMS]();
 	Xhistogram = txhst = new unsigned[static_cast<int>(range.x) + 1];
 	for (iColumn = 0; iColumn < range.x; iColumn++)
 		Xhistogram[iColumn] = 0;
@@ -9778,7 +9778,7 @@ BOOL chkr(unsigned bit) {
 void frmsadj() {
 	unsigned iForm, iStitch;
 
-	clRmap(RMAPSIZ);
+	clRmap(MAXITEMS);
 	for (iForm = 0; iForm < SelectedFormCount; iForm++)
 		setr(SelectedFormList[iForm]);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -10871,9 +10871,9 @@ void frmnumfn(unsigned newFormIndex) {
 		sourceForm = FormRelocationIndex = 0;
 
 		TempFormList = new FRMHED[FormIndex];
-		TempFormVertices = new fPOINT[MAXSTITCHS];
+		TempFormVertices = new fPOINT[MAXITEMS];
 		TempGuides = new SATCON[SatinConnectIndex];
-		TempClipPoints = new fPOINT[MAXSTITCHS];
+		TempClipPoints = new fPOINT[MAXITEMS];
 
 		FormVertexIndex = SatinConnectIndex = ClipPointIndex = 0;
 		for (iForm = 0; iForm < FormIndex; iForm++) {
@@ -10983,7 +10983,7 @@ void srtbyfrm() {
 			if (iColor != AppliqueColor)
 				color[iColor] = iColor + 1;
 		}
-		TempStitchBuffer = &StitchBuffer[MAXSEQ];
+		TempStitchBuffer = &StitchBuffer[MAXITEMS];
 		for (iColor = 0; iColor < 16; iColor++)
 			colorHistogram[iColor] = 0;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
@@ -11152,7 +11152,7 @@ void centir() {
 void bean(unsigned start, unsigned finish) {
 	unsigned iOutputStitch, iSourceStitch, iCopyStitch;
 
-	iCopyStitch = MAXSEQ;
+	iCopyStitch = MAXITEMS;
 	iSourceStitch = start;
 	BeanCount = 0;
 	mvstch(iCopyStitch++, iSourceStitch);
@@ -11189,7 +11189,7 @@ void bean(unsigned start, unsigned finish) {
 	while (iSourceStitch < PCSHeader.stitchCount)
 		mvstch(iCopyStitch++, iSourceStitch++);
 	iOutputStitch = start;
-	for (iSourceStitch = MAXSEQ; iSourceStitch < iCopyStitch; iSourceStitch++)
+	for (iSourceStitch = MAXITEMS; iSourceStitch < iCopyStitch; iSourceStitch++)
 		mvstch(iOutputStitch++, iSourceStitch);
 	PCSHeader.stitchCount = iOutputStitch;
 }
@@ -11216,7 +11216,7 @@ void dubean() {
 void unbean(unsigned start, unsigned finish) {
 	unsigned iSource, iCopy;
 
-	iCopy = MAXSEQ;
+	iCopy = MAXITEMS;
 	BeanCount = 0;
 	for (iSource = start; iSource <= finish; iSource++) {
 		mvstch(iCopy++, iSource);
@@ -11232,7 +11232,7 @@ void unbean(unsigned start, unsigned finish) {
 	while (iSource < PCSHeader.stitchCount)
 		mvstch(iCopy++, iSource++);
 	// ToDo - should this call be mvstchs(start, MAXSEQ, (iCopy - MAXSEQ))?
-	mvstchs(start, MAXSEQ, iCopy);
+	mvstchs(start, MAXITEMS, iCopy);
 	PCSHeader.stitchCount = start + iCopy;
 }
 
@@ -12041,7 +12041,7 @@ void clpcon() {
 		totalLength += ClipSideLengths[vertex];
 		vertex = nextVertex;
 	}
-	ClipSegments = new CLPSEG[MAXSTITCHS];
+	ClipSegments = new CLPSEG[MAXITEMS];
 	clipGrid.left = floor(SelectedForm->rectangle.left / ClipWidth);
 	clipGrid.right = ceil(SelectedForm->rectangle.right / ClipWidth);
 	clipGrid.bottom = floor(SelectedForm->rectangle.bottom / ClipRectSize.cy - 1);
@@ -12069,7 +12069,7 @@ void clpcon() {
 		for (iVertex = 0; iVertex < VertexCount; iVertex++)
 			CurrentFormVertices[iVertex].y += formNegativeOffset;
 	}
-	ClipStitchPoints = new CLIPNT[MAXSTITCHS];
+	ClipStitchPoints = new CLIPNT[MAXITEMS];
 	segmentCount = 0;
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 		start = floor(CurrentFormVertices[iVertex].x / ClipWidth);
@@ -12191,7 +12191,7 @@ void clpcon() {
 							ClipStitchPoints[ActivePointIndex].y = ArrayOfClipIntersectData[ing]->point.y;
 							ClipStitchPoints[ActivePointIndex].flag = 1;
 							ActivePointIndex++;
-							if (ActivePointIndex > MAXSEQ << 2)
+							if (ActivePointIndex > MAXITEMS << 2)
 								goto clpskp;
 						}
 					}
@@ -12320,13 +12320,13 @@ clpskp:;
 		ClipIntersectSide = ClipSegments[0].asid;
 		ritseg();
 		while (nucseg()) {
-			if (SequenceIndex > MAXSEQ - 3)
+			if (SequenceIndex > MAXITEMS - 3)
 				break;
 			ritseg();
 		}
 		chksid(0);
-		if (SequenceIndex > MAXSEQ - 100)
-			SequenceIndex = MAXSEQ - 100;
+		if (SequenceIndex > MAXITEMS - 100)
+			SequenceIndex = MAXITEMS - 100;
 		ine = 0; inf = 0;
 		for (iSequence = 0; iSequence < SequenceIndex; iSequence++) {
 			if (vscmp(iSequence, ine)) {
@@ -13492,7 +13492,7 @@ void srtfrm() {
 			totalStitches += formStitchCount;
 		}
 		// ToDo - Allocate memory locally for highStitchBuffer
-		highStitchBuffer = &StitchBuffer[MAXSEQ];
+		highStitchBuffer = &StitchBuffer[MAXITEMS];
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
 			iHighStitch = histogram[iForm]++;
