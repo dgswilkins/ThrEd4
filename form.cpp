@@ -2156,9 +2156,6 @@ void oclp(fPOINT* clip, unsigned clipEntries) {
 }
 
 float getblen() {
-// ToDo - there must be a better way to do this.
-//        savblen is the complementary function
-
 #if	 __UseASM__
 	float		fLength;
 	unsigned	iLength;
@@ -11686,8 +11683,7 @@ void mvpclp(unsigned destination, unsigned source) {
 		rep		movsd
 	}
 #else
-	//ToDo - Should '20' be sizeof(CLIPSORT)'?
-	memcpy(ArrayOfClipIntersectData[destination], ArrayOfClipIntersectData[source], 20);
+	memcpy(ArrayOfClipIntersectData[destination], ArrayOfClipIntersectData[source], sizeof(CLIPSORT));
 #endif
 }
 
