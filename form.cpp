@@ -2171,13 +2171,10 @@ float getblen() {
 	}
 	return fLength;
 #else
-	union {
-		float		fLength;
-		unsigned	iLength;
-	} x;
+	unsigned	iLength;
 
-	x.iLength = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
-	return x.fLength;
+	iLength = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
+	return static_cast<float>(iLength);
 #endif
 }
 
@@ -2195,15 +2192,11 @@ void savblen(float fLength) {
 	FormList[ClosestFormToCursor].clipEntries = clipEntries;
 	FormList[ClosestFormToCursor].picoLength = picoLength;
 #else
-	union {
-		unsigned int i;
-		float f;
-	} x;
+	unsigned	iLength;
+	iLength = static_cast<int>(fLength);
 
-	x.f = fLength;
-
-	FormList[ClosestFormToCursor].clipEntries = x.i >> 16;
-	FormList[ClosestFormToCursor].picoLength = x.i & 0xFFFF;
+	FormList[ClosestFormToCursor].clipEntries = iLength >> 16;
+	FormList[ClosestFormToCursor].picoLength = iLength & 0xFFFF;
 #endif
 }
 
