@@ -3644,7 +3644,7 @@ void lcon() {
 			}
 			RegionsList[iRegion].breakCount = count;
 		}
-		tempPathMap = new RCON[MAXSTITCHS];
+		tempPathMap = new RCON[RegionCount + 1];
 		MapIndexSequence = new unsigned[RegionCount + 1];
 
 #if BUGSEQ
@@ -3716,7 +3716,7 @@ void lcon() {
 				}
 			}
 			OutputIndex = 0;
-			TempPath = new RGSEQ[MAXSTITCHS];
+			TempPath = new RGSEQ[RegionCount];
 
 			//find the leftmost region in PathMap
 			SequencePathIndex = 1;
@@ -3738,7 +3738,7 @@ void lcon() {
 				nxtrgn();
 			iOutPath = 0;
 			count = 0xffffffff;
-			SequencePath = new FSEQ[MAXSTITCHS];
+			SequencePath = new FSEQ[RegionCount];
 			for (iPath = 0; iPath < SequencePathIndex; iPath++) {
 				SequencePath[iOutPath].skp = TempPath[iPath].skp;
 				if (TempPath[iPath].pcon == 0xffffffff) {
@@ -4000,7 +4000,7 @@ void fnvrt() {
 	maximumLines = (maximumLines >> 1);
 	LineEndpoints = new SMALPNTL[lineCount + 1];
 	StitchLineCount = 0; LineGroupIndex = 0; 
-	groupIndex = new unsigned[MAXSTITCHS];
+	groupIndex = new unsigned[stitchCount+2];
 	GroupIndexCount = 0;
 	currentX = lowX;
 	for (iStitch = 0; iStitch < stitchCount; iStitch++) {
@@ -11327,7 +11327,8 @@ void spltsat(SATCON currentGuide) {
 	fPOINT*		vertexBuffer;
 	unsigned	iForm, iGuide, iVertex, iOldVertex, iNewVertex, oldLastVertex;
 
-	vertexBuffer = new fPOINT[MAXSTITCHS];
+	// We are adding two additional vertices when splitting the form
+	vertexBuffer = new fPOINT[VertexCount + 2];
 	mvfrmsb(&FormList[FormIndex], &FormList[FormIndex - 1], FormIndex - ClosestFormToCursor);
 	FormIndex++;
 	if (ClosestFormToCursor < (unsigned)FormIndex - 2)
