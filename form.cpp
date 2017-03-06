@@ -11327,8 +11327,7 @@ void spltsat(SATCON currentGuide) {
 	fPOINT*		vertexBuffer;
 	unsigned	iForm, iGuide, iVertex, iOldVertex, iNewVertex, oldLastVertex;
 
-	// ToDo - Allocate memory locally for vertexBuffer
-	vertexBuffer = (fPOINT*)&OSequence;
+	vertexBuffer = new fPOINT[MAXSTITCHS];
 	mvfrmsb(&FormList[FormIndex], &FormList[FormIndex - 1], FormIndex - ClosestFormToCursor);
 	FormIndex++;
 	if (ClosestFormToCursor < (unsigned)FormIndex - 2)
@@ -11404,6 +11403,7 @@ void spltsat(SATCON currentGuide) {
 			FormList[iForm].borderClipData += SelectedForm->clipEntries;
 	}
 	stchadj();
+	delete[] vertexBuffer;
 }
 
 BOOL spltlin() {
@@ -11927,18 +11927,6 @@ unsigned clpnseg(unsigned start, unsigned finish) {
 	return finish + 1;
 }
 
-unsigned vclpfor(unsigned iPoint) {
-	while (!ClipStitchPoints[iPoint].flag&&iPoint < ActivePointIndex)
-		iPoint++;
-	return iPoint;
-}
-
-unsigned vclpbak(unsigned iPoint) {
-	while (!ClipStitchPoints[iPoint].flag&&iPoint)
-		iPoint--;
-	return iPoint;
-}
-
 BOOL vscmp(unsigned index1, unsigned index2) {
 #if	 __UseASM__
 	_asm {
@@ -12080,8 +12068,7 @@ void clpcon() {
 		for (iVertex = 0; iVertex < VertexCount; iVertex++)
 			CurrentFormVertices[iVertex].y += formNegativeOffset;
 	}
-	// ToDo - Allocate memory locally for ClipStitchPoints
-	ClipStitchPoints = (CLIPNT*)&BSequence;
+	ClipStitchPoints = new CLIPNT[MAXSTITCHS];
 	segmentCount = 0;
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 		start = floor(CurrentFormVertices[iVertex].x / ClipWidth);
@@ -12360,6 +12347,7 @@ clpskp:;
 		}
 #endif
 	}
+	delete[] ClipStitchPoints;
 	delete[] ClipSegments;
 }
 
