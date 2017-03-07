@@ -12080,8 +12080,7 @@ void clpcon() {
 		}
 	}
 	qsort(RegionCrossingData, segmentCount, sizeof(VCLPX), clpcmp);
-	// ToDo - Allocate memory locally for iclpx
-	iclpx = (unsigned*)&RegionCrossingData[segmentCount];
+	iclpx = new unsigned[segmentCount];
 	iRegion = 1; regionSegment = RegionCrossingData[0].segment;
 	iclpx[0] = 0;
 	for (iSegment = 1; iSegment < segmentCount; iSegment++) {
@@ -12192,6 +12191,7 @@ void clpcon() {
 		ClipStitchPoints[ActivePointIndex - 1].flag = 2;
 	}
 clpskp:;
+	delete[] iclpx;
 	delete[] TextureSegments; // this is allocated in setxt
 	ClipStitchPoints[ActivePointIndex].flag = 2;
 	if (negativeOffset) {
@@ -12257,8 +12257,7 @@ clpskp:;
 			clplim = 1;
 		if (clplim > 12)
 			clplim = 12;
-		// ToDo - Allocate memory locally for SortedLengths
-		SortedLengths = (float**)&ClipSegments[ClipSegmentIndex];
+		SortedLengths = new float*[ClipSegmentIndex*2];
 		sortedCount = 0;
 		for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
 			SortedLengths[sortedCount++] = &ClipSegments[iSegment].beginLength;
@@ -12335,6 +12334,7 @@ clpskp:;
 			SelectedForm->rectangle.left -= FormOffset;
 			SelectedForm->rectangle.right -= FormOffset;
 		}
+		delete[] SortedLengths;
 #endif
 	}
 	delete[] ClipStitchPoints;
