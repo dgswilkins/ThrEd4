@@ -12008,8 +12008,7 @@ void clpcon() {
 		clipNegative = 0;
 	if (ClipWidth < CLPMINAUT)
 		ClipWidth = (float)CLPMINAUT;
-	if (chkMap(TXFIL))
-	{
+	if (chkMap(TXFIL)) {
 		if (TextureIndex&&SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count <= TextureIndex)
 			ClipWidth = SelectedForm->fillSpacing;
 		else
@@ -12080,7 +12079,7 @@ void clpcon() {
 		}
 	}
 	qsort(RegionCrossingData, segmentCount, sizeof(VCLPX), clpcmp);
-	iclpx = new unsigned[segmentCount+1];
+	iclpx = new unsigned[segmentCount + 1];
 	iRegion = 1; regionSegment = RegionCrossingData[0].segment;
 	iclpx[0] = 0;
 	for (iSegment = 1; iSegment < segmentCount; iSegment++) {
@@ -12093,8 +12092,7 @@ void clpcon() {
 	regionCount = iRegion;
 	BoundingRect.left = BoundingRect.right = CurrentFormVertices[0].x;
 	BoundingRect.top = BoundingRect.bottom = CurrentFormVertices[0].y;
-	for (iVertex = 1; iVertex < VertexCount; iVertex++)
-	{
+	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
 		if (CurrentFormVertices[iVertex].x > BoundingRect.right)
 			BoundingRect.right = CurrentFormVertices[iVertex].x;
 		if (CurrentFormVertices[iVertex].x < BoundingRect.left)
@@ -12111,20 +12109,16 @@ void clpcon() {
 		RegionCrossingEnd = iclpx[iRegion + 1];
 		pasteLocation.x = ClipWidth*(iRegion + clipGrid.left);
 		clipVerticalOffset = 0;
-		if (chkMap(TXFIL))
-		{
+		if (chkMap(TXFIL)) {
 			textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
 			ClipStitchCount = TextureSegments[textureLine].stitchCount;
 			texture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + TextureSegments[textureLine].line];
 			LineSegmentStart.x = pasteLocation.x;
-			if (SelectedForm->txof)
-			{
+			if (SelectedForm->txof) {
 				lineOffset = (iRegion + clipGrid.left) / SelectedForm->fillInfo.texture.lines;
 				clipVerticalOffset = fmod(SelectedForm->txof*lineOffset, SelectedForm->fillInfo.texture.height);
 			}
-		}
-		else
-		{
+		} else {
 			if (clipGridOffset)
 				clipVerticalOffset = (float)(iRegion%clipGridOffset) / clipGridOffset*ClipRectSize.cy;
 			LineSegmentStart.x = pasteLocation.x + ClipBuffer[0].x;
@@ -12141,37 +12135,30 @@ void clpcon() {
 				LineSegmentStart.y = LineSegmentEnd.y;
 			}
 			for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
-				if (chkMap(TXFIL))
-				{
+				if (chkMap(TXFIL)) {
 					if (texture != nullptr) {
 						LineSegmentEnd.x = pasteLocation.x;
 						LineSegmentEnd.y = pasteLocation.y + texture[iStitch].y;
 					}
-				}
-				else
-				{
+				} else {
 					LineSegmentEnd.x = pasteLocation.x + ClipBuffer[iStitch].x;
 					LineSegmentEnd.y = pasteLocation.y + ClipBuffer[iStitch].y;
 				}
 
 				ClipStitchPoints[ActivePointIndex].x = LineSegmentStart.x;
 				ClipStitchPoints[ActivePointIndex].y = LineSegmentStart.y;
-				if (isin(LineSegmentStart.x, LineSegmentStart.y))
-				{
+				if (isin(LineSegmentStart.x, LineSegmentStart.y)) {
 					if (ActivePointIndex&&ClipStitchPoints[ActivePointIndex - 1].flag == 2)
 						inspnt();
 					ClipStitchPoints[ActivePointIndex].flag = 0;
-				}
-				else
-				{
+				} else {
 					if (ActivePointIndex && !ClipStitchPoints[ActivePointIndex - 1].flag)
 						inspnt();
 					ClipStitchPoints[ActivePointIndex].flag = 2;
 				}
 				ActivePointIndex++;
 				cnt = insect();
-				if (cnt)
-				{
+				if (cnt) {
 					for (ing = 0; ing < cnt; ing++) {
 						if (ArrayOfClipIntersectData != nullptr) {
 							ClipStitchPoints[ActivePointIndex].vertexIndex = ArrayOfClipIntersectData[ing]->vertexIndex;
@@ -12213,35 +12200,33 @@ clpskp:;
 	ClipSegmentIndex = 0;
 	rstMap(FILDIR);
 	previousPoint = 0;
-	if (ActivePointIndex)
-	{
+	if (ActivePointIndex) {
 		for (iPoint = 0; iPoint < ActivePointIndex - 1; iPoint++) {
-			switch (ClipStitchPoints[iPoint].flag)
-			{
-			case 0:		//inside
+			switch (ClipStitchPoints[iPoint].flag) {
+				case 0:		//inside
 
-				setMap(FILDIR);
-				break;
+					setMap(FILDIR);
+					break;
 
-			case 1:		//line
+				case 1:		//line
 
-				if (toglMap(FILDIR))
-					clpnseg(previousPoint, iPoint);
-				else
-					previousPoint = iPoint;
-				break;
+					if (toglMap(FILDIR))
+						clpnseg(previousPoint, iPoint);
+					else
+						previousPoint = iPoint;
+					break;
 
-			case 2:		//outside
+				case 2:		//outside
 
-				rstMap(FILDIR);
-				break;
+					rstMap(FILDIR);
+					break;
 			}
 		}
 	}
 
 #if CLPVU==1
 
-	clp1skp:;
+clp1skp:;
 
 #endif
 
@@ -12257,7 +12242,7 @@ clpskp:;
 			clplim = 1;
 		if (clplim > 12)
 			clplim = 12;
-		SortedLengths = new float*[ClipSegmentIndex*2];
+		SortedLengths = new float*[ClipSegmentIndex * 2];
 		sortedCount = 0;
 		for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
 			SortedLengths[sortedCount++] = &ClipSegments[iSegment].beginLength;
@@ -12321,8 +12306,7 @@ clpskp:;
 				ine++;
 				OSequence[ine].x = OSequence[iSequence].x;
 				OSequence[ine].y = OSequence[iSequence].y;
-			}
-			else
+			} else
 				inf++;
 		}
 		SequenceIndex = ine;
