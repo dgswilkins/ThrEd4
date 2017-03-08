@@ -12080,7 +12080,7 @@ void clpcon() {
 		}
 	}
 	qsort(RegionCrossingData, segmentCount, sizeof(VCLPX), clpcmp);
-	iclpx = new unsigned[segmentCount];
+	iclpx = new unsigned[segmentCount+1];
 	iRegion = 1; regionSegment = RegionCrossingData[0].segment;
 	iclpx[0] = 0;
 	for (iSegment = 1; iSegment < segmentCount; iSegment++) {
