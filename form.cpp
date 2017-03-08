@@ -12659,25 +12659,17 @@ void col2frm() {
 	unsigned*	borderColorHistogram;
 	unsigned*	featherColorHistogram;
 	unsigned*	underlayColorHistogram;
-	unsigned	iCount, iStitch, iForm, iColor, formColorCode, count, majorityColor;
+	unsigned	iStitch, iForm, iColor, formColorCode, count, majorityColor;
 	unsigned	startColorOffset, endColorOffset, colorChangedCount, formColorPermutations;
 	TCHAR		buffer[HBUFSIZ];
 
 	colorChangedCount = 0;
 	formColorPermutations = FormIndex << 4; // total number of form and color combinations
 	if (FormIndex) {
-		// ToDo - Allocate memory locally for fillColorHistogram, borderColorHistogram, 
-		//        featherColorHistogram & underlayColorHistogram
-		fillColorHistogram = (unsigned*)&OSequence;
-		borderColorHistogram = (unsigned*)&BSequence;
-		featherColorHistogram = &borderColorHistogram[formColorPermutations];
-		underlayColorHistogram = &featherColorHistogram[formColorPermutations];
-		for (iCount = 0; iCount < formColorPermutations; iCount++) {
-			fillColorHistogram[iCount] = 0;
-			borderColorHistogram[iCount] = 0;
-			featherColorHistogram[iCount] = 0;
-			underlayColorHistogram[iCount] = 0;
-		}
+		fillColorHistogram = new unsigned[formColorPermutations]();
+		borderColorHistogram = new unsigned[formColorPermutations]();
+		featherColorHistogram = new unsigned[formColorPermutations]();
+		underlayColorHistogram = new unsigned[formColorPermutations]();
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			formColorCode = StitchBuffer[iStitch].attribute & 0x3fff;
 			if (StitchBuffer[iStitch].attribute&(WLKMSK | CWLKMSK | UNDMSK))
@@ -12762,6 +12754,10 @@ void col2frm() {
 			startColorOffset += 16;
 			endColorOffset += 16;
 		}
+		delete[] fillColorHistogram;
+		delete[] borderColorHistogram;
+		delete[] featherColorHistogram;
+		delete[] underlayColorHistogram;
 	}
 	LoadString(ThrEdInstance, IDS_NCOLCHG, buffer, HBUFSIZ);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buffer, colorChangedCount);
