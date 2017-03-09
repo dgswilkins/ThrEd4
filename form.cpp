@@ -13151,8 +13151,7 @@ void xclpfn(unsigned start, unsigned finish) {
 	double		ratio;
 	fPOINT*		points;
 
-	// ToDo - Allocate memory locally for points
-	points = (fPOINT*)&StitchBuffer[MAXPCS];
+	points = new fPOINT[ClipStitchCount];
 	delta.x = ChainEndPoints[finish].x - ChainEndPoints[start].x;
 	delta.y = ChainEndPoints[finish].y - ChainEndPoints[start].y;
 	length = hypot(delta.x, delta.y);
@@ -13165,6 +13164,7 @@ void xclpfn(unsigned start, unsigned finish) {
 		OSequence[SequenceIndex].x = ChainEndPoints[start].x + points[iPoint].x;
 		OSequence[SequenceIndex++].y = ChainEndPoints[start].y + points[iPoint].y;
 	}
+	delete[] points;
 }
 
 void duxclp() {
