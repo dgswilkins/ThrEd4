@@ -13006,15 +13006,16 @@ void dufxlen() {
 	unsigned iVertex;
 
 	duangs();
-	// ToDo - Allocate memory locally for ListSINEs & ListCOSINEs
-	ListSINEs = (double*)AngledFormVertices;
-	ListCOSINEs = (double*)TempPolygon;
+	ListSINEs = new double[VertexCount + 1];
+	ListCOSINEs = new double[VertexCount];
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 		ListSINEs[iVertex] = sin(FormAngles[iVertex]);
 		ListCOSINEs[iVertex] = cos(FormAngles[iVertex]);
 	}
 	ListSINEs[iVertex] = sin((FormAngles[0] > FormAngles[iVertex]) ? (FormAngles[0] - FormAngles[iVertex]) : (FormAngles[iVertex] - FormAngles[0]));
 	fxlen();
+	delete[] ListCOSINEs;
+	delete[] ListSINEs;
 }
 
 void chnfn() {
