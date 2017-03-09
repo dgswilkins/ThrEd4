@@ -12841,8 +12841,6 @@ void fxlen() {
 	unsigned	iVertex;
 	double		length;
 
-	// ToDo - Allocate memory locally for ChainEndPoints
-	ChainEndPoints = (fPOINT*)BSequence;
 	AdjustedSpace = 0;
 	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
 		length = hypot(CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x, CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y);
@@ -13020,6 +13018,8 @@ void dufxlen() {
 }
 
 void chnfn() {
+	// ToDo - Can we do better than MAXITEMS?
+	ChainEndPoints = new fPOINT[MAXITEMS];
 	ChainCount = 10;
 	if (chkMap(LINCHN))
 		ChainCount--;
@@ -13029,6 +13029,7 @@ void chnfn() {
 	dulast();
 	SequenceIndex = 0;
 	duch();
+	delete[] ChainEndPoints;
 }
 
 void chan() {
@@ -13167,7 +13168,8 @@ void xclpfn(unsigned start, unsigned finish) {
 
 void duxclp() {
 	unsigned iPoint;
-
+	// ToDo - Can we do better than MAXITEMS?
+	ChainEndPoints = new fPOINT[MAXITEMS];
 	duangs();
 	dufxlen();
 	clpxadj();
@@ -13179,6 +13181,7 @@ void duxclp() {
 		OSequence[SequenceIndex].x = ChainEndPoints[0].x;
 		OSequence[SequenceIndex++].y = ChainEndPoints[0].y;
 	}
+	delete[] ChainEndPoints;
 }
 
 void dulast() {
