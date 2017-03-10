@@ -13377,8 +13377,7 @@ void wavfrm() {
 		durpoli(IniFile.wavePoints);
 		mdufrm();
 		FormVertexIndex = iVertex;
-		// ToDo - Allocate memory locally for points
-		points = (fPOINT*)&BSequence;
+		points = new fPOINT[IniFile.waveEnd];
 		iPoint = 0;
 		iVertex = IniFile.waveStart;
 		while (iVertex != IniFile.waveEnd) {
@@ -13411,6 +13410,7 @@ void wavfrm() {
 				}
 			}
 		}
+		delete[] points;
 		CurrentFormVertices[iVertex].x = currentPosition.x;
 		CurrentFormVertices[iVertex].y = currentPosition.y;
 		vertexCount = iVertex + 1;
