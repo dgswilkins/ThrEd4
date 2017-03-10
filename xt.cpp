@@ -1003,6 +1003,7 @@ void delwlk(unsigned code)
 
 	stitchCount = 0;
 	flag = 1;
+	// Todo - Allocate memory locally for highStitchBuffer
 	highStitchBuffer = &StitchBuffer[MAXITEMS];
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 	{
@@ -1450,6 +1451,7 @@ void srtcol() {
 		colorStartStitch[iColor] = startStitch;
 		startStitch += histogram[iColor];
 	}
+	// Todo - Allocate memory locally for highStitchBuffer
 	highStitchBuffer = &StitchBuffer[MAXITEMS];
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 		moveStitch(&highStitchBuffer[colorStartStitch[StitchBuffer[iStitch].attribute&COLMSK]++], &StitchBuffer[iStitch]);
@@ -2177,6 +2179,7 @@ void fsort()
 		}
 		stitchRange[iRange].finish = lastRecord;
 		lastRange = ++iRange;
+		// Todo - Allocate memory locally for TempStitchBuffer
 		TempStitchBuffer = &StitchBuffer[MAXITEMS];
 		OutputIndex = 0;
 		for (iRange = 0; iRange < lastRange; iRange++)
@@ -2578,6 +2581,7 @@ void intlv()
 	if (PCSHeader.stitchCount)
 	{
 		offset = MAXITEMS;
+		// Todo - Allocate memory locally for InterleaveData.highStitchBuffer
 		InterleaveData.highStitchBuffer = &StitchBuffer[MAXITEMS];
 		for (iSequence = 0; iSequence < InterleaveSequenceIndex2; iSequence++)
 		{

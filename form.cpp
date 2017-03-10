@@ -10973,6 +10973,7 @@ void srtbyfrm() {
 			if (iColor != AppliqueColor)
 				color[iColor] = iColor + 1;
 		}
+		// Todo - Allocate memory locally for TempStitchBuffer
 		TempStitchBuffer = &StitchBuffer[MAXITEMS];
 		for (iColor = 0; iColor < 16; iColor++)
 			colorHistogram[iColor] = 0;

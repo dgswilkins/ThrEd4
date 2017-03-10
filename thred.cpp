@@ -3381,7 +3381,7 @@ void redbal() {
 
 		ReadFile(balaradFile, (BALHED*)&balaradHeader, sizeof(BALHED), &bytesRead, 0);
 		if (bytesRead == sizeof(BALHED)) {
-
+			// Todo - Allocate memory locally for BalaradStitch
 			BalaradStitch = (BALSTCH*)&BSequence;
 			ReadFile(balaradFile, (BALSTCH*)BalaradStitch, sizeof(BSequence), &bytesRead, 0);
 			stitchCount = bytesRead / sizeof(BALSTCH);
@@ -3479,6 +3479,7 @@ void ritbal() {
 		WriteFile(balaradFile, (BALHED*)&balaradHeader, sizeof(BALHED), &bytesWritten, 0);
 		BalaradOffset.x = IniFile.hoopSizeX / 2;
 		BalaradOffset.y = IniFile.hoopSizeY / 2;
+		// Todo - Allocate memory locally for BalaradStitch
 		BalaradStitch = (BALSTCH*)&BSequence;
 		color = StitchBuffer[0].attribute&COLMSK;
 		thr2bal(0, 0, BALJUMP);
@@ -5347,7 +5348,7 @@ void xofrm() {
 
 	unsigned	iForm;
 	FRMHEDO*	formListCopy;
-
+	// Todo - Allocate memory locally for formListCopy and replace use of BSequence in FillMemory 
 	formListCopy = (FRMHEDO*)&BSequence;
 	FillMemory(&BSequence, 0, sizeof(FRMHED)*FormIndex);
 	for (iForm = 0; iForm < FormIndex; iForm++)
@@ -5573,7 +5574,7 @@ void nuFil() {
 						FormVertexIndex = SatinConnectIndex = ClipPointIndex = 0;
 						MsgBuffer[0] = 0;
 						if (version < 2) {
-
+							// Todo - Allocate memory locally for formListCopy
 							formListCopy = (FRMHEDO*)&BSequence;
 							ReadFile(FileHandle, (FRMHEDO*)formListCopy, FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
 							if (BytesRead != FormIndex * sizeof(FRMHEDO)) {
@@ -5715,7 +5716,7 @@ void nuFil() {
 					}
 #if PESACT
 					else {
-
+						// Todo - Allocate memory locally for ReadFile to replace use of BSequence
 						ReadFile(FileHandle, (BSEQPNT*)&BSequence, sizeof(BSequence), &BytesRead, 0);
 						pesHeader = (PESHED*)&BSequence;
 						l_peschr = (TCHAR*)&BSequence;
@@ -5925,11 +5926,13 @@ void ritdst() {
 	HANDLE			colorFile;
 	unsigned long	bytesWritten;
 
+	// Todo - Allocate memory locally for colorData
 	colorData = (unsigned*)&OSequence;
 	iColor = 3;
 	colorData[0] = COLVER;
 	colorData[1] = BackgroundColor;
 	colorData[2] = UserColor[StitchBuffer[0].attribute&COLMSK];
+	// Todo - Allocate memory locally for highStitchBuffer
 	highStitchBuffer = &StitchBuffer[MAXITEMS];
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
@@ -5950,6 +5953,7 @@ void ritdst() {
 		if (highStitchBuffer[iStitch].y < boundingRect.bottom)
 			boundingRect.bottom = highStitchBuffer[iStitch].y - 0.5;
 	}
+	// Todo - Allocate memory locally for DSTRecords
 	DSTRecords = (DSTREC*)&BSequence;
 	DSTRecordCount = 0;
 	centerCoordinate.x = (boundingRect.right - boundingRect.left) / 2 + boundingRect.left;
@@ -6012,6 +6016,7 @@ void ritdst() {
 	if (colfil()) {
 
 		colorFile = CreateFile(ColorFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		// Todo - Is Osequence still correctly used here if memory allocated locally for colorData
 		if (colorFile != INVALID_HANDLE_VALUE)
 			WriteFile(colorFile, &OSequence, iColor << 2, &bytesWritten, 0);
 		CloseHandle(colorFile);
@@ -6239,6 +6244,7 @@ void pecdat() {
 	OutputIndex = 532;
 	iColor = 1;
 	color = StitchBuffer[0].attribute&COLMSK;
+	// Todo - Allocate memory locally for PESdata
 	PESdata = (TCHAR*)&BSequence;
 	PEScolors = (unsigned char*)&PESdata[49];
 	rpcrd(StitchBuffer[0].x);
@@ -6350,6 +6356,7 @@ void sav() {
 		return;
 	chk1col();
 	coltab();
+	// Todo - Allocate memory locally for RotatedStitches
 	RotatedStitches = (fPOINTATTR*)&BSequence;
 	if (chku(ROTAUX)) {
 
@@ -6453,6 +6460,7 @@ void sav() {
 			pesHeader.xsiz = boundingRect.right - boundingRect.left;
 			pesHeader.ysiz = boundingRect.top - boundingRect.bottom;
 			OutputIndex = 0;
+			// Todo - Allocate memory locally for PESstitches
 			PESstitches = (PESTCH*)&BSequence;
 			ritpes(0);
 			PESstitches[OutputIndex].x = -32765; // 0x8003
@@ -6490,8 +6498,10 @@ void sav() {
 			pesHeader.xsiz = 10000;
 			pesHeader.ysiz = 10000;
 			WriteFile(PCSFileHandle, (PESHED*)&pesHeader, sizeof(PESHED), &bytesWritten, 0);
+			// Todo - replace use of BSequence with PESstitches
 			WriteFile(PCSFileHandle, (PESTCH*)&BSequence, OutputIndex << 2, &bytesWritten, 0);
 			iHeader = pesnam();
+			// Todo - Allocate memory locally for pchr
 			pchr = (TCHAR*)&BSequence;
 			while (iHeader < 512)
 				pchr[iHeader++] = ' ';
@@ -6520,6 +6530,7 @@ void sav() {
 			pchr[529] = (TBYTE)0x80; //hor lsb
 			pchr[530] = (TBYTE)0x82; //vert msb
 			pchr[531] = (TBYTE)0xff; //vert lsb
+			// ToDo - replace use of BSequence with pchr
 			WriteFile(PCSFileHandle, (TBYTE*)&BSequence, OutputIndex, &bytesWritten, 0);
 			break;
 #endif
@@ -8658,6 +8669,7 @@ void duclip() {
 				clRmap(MAXITEMS);
 				for (iForm = 0; iForm < SelectedFormCount; iForm++)
 					setr(SelectedFormList[iForm]);
+				// Todo - Allocate memory locally for astch
 				astch = &StitchBuffer[MAXITEMS];
 				stitchCount = 0;
 				LowerLeftStitch.x = LowerLeftStitch.y = (float)1e30;
@@ -9477,6 +9489,7 @@ void dubuf() {
 	unsigned			iDestinationGuide = 0;
 	unsigned			iDestinationClip = 0;
 
+	// Todo - Allocate memory locally for OutputIndex
 	OutputIndex = (unsigned)&BSequence;
 	stitchHeader.headerType = 0x2746872;
 	stitchHeader.fileLength = PCSHeader.stitchCount * sizeof(fPOINTATTR) + sizeof(STRHED) + 16;
@@ -11627,7 +11640,7 @@ void thumnail() {
 	unbsho();
 	undat();
 	untrace();
-	// ToDo is this correct? types do not match. Use memory allocation rather than global buffer
+	// // Todo - Allocate memory locally for ThumbnailNames & Thumbnails
 	ThumbnailNames = (TCHAR*)OSequence;
 	Thumbnails = (TCHAR**)&OSequence[MAXITEMS >> 1];
 
@@ -11922,7 +11935,7 @@ void insfil() {
 					if (fileHeader.vertexCount) {
 
 						if (version < 2) {
-
+							// Todo - Allocate memory locally for formHeader and replace use of BSequence in ReadFile
 							formHeader = (FRMHEDO*)&BSequence;
 							ReadFile(InsertedFileHandle, (FRMHEDO*)&BSequence, fileHeader.formCount * sizeof(FRMHEDO), &BytesRead, 0);
 							if (BytesRead != fileHeader.formCount * sizeof(FRMHEDO)) {
@@ -13225,6 +13238,7 @@ void ritlock(HWND hwndlg) {
 	unsigned			iFile;
 	WIN32_FIND_DATA*	fileData;
 
+	// Todo - Allocate memory locally for fileData
 	fileData = (WIN32_FIND_DATA*)&BSequence;
 	SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_RESETCONTENT, 0, 0);
 	SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
@@ -13728,6 +13742,7 @@ void tracedg() {
 
 	if (!chkMap(WASTRAC))
 		trace();
+	// Todo - Allocate memory locally for TracedEdges
 	TracedEdges = (unsigned*)&OSequence[TraceDataSize];
 	for (iPixel = 0; iPixel < TraceDataSize; iPixel++)
 		TracedEdges[iPixel] = 0;
@@ -19124,6 +19139,7 @@ unsigned chkMsg() {
 
 						duzrat();
 						byteCount = sizeof(FORMVERTEXCLIP) + (ClipFormVerticesData->vertexCount + 1) * sizeof(fPOINT);
+						// Todo - Allocate memory locally for ClipFormVerticesData and replace use of BSequence in MoveMemory
 						MoveMemory(&BSequence, ClipPointer, byteCount);
 						GlobalUnlock(ClipMemory);
 						ClipFormVerticesData = (FORMVERTEXCLIP*)&BSequence;
@@ -22805,11 +22821,12 @@ void ritbak(TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 				formList = new FRMHED[stitchHeader.formCount];
 				vertexList = new fPOINT[stitchHeader.vertexCount];
 				if (fileTypeVersion < 2) {
-
+					// Todo - Allocate memory locally for formListExtended
 					formListExtended = (FRMHEDO*)&BSequence;
 					ReadFile(thrEdFile, (FRMHEDO*)formListExtended, stitchHeader.formCount * sizeof(FRMHEDO), &BytesRead, 0);
 					if (BytesRead != stitchHeader.vertexCount * sizeof(FRMHEDO))
 						goto bakskp;
+					// ToDo - replace BSequence with formListExtended
 					FillMemory(&BSequence, 0, sizeof(FRMHED)*FormIndex);
 					for (iForm = 0; iForm < stitchHeader.formCount; iForm++) {
 
