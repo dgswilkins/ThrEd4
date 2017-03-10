@@ -13464,8 +13464,7 @@ void srtfrm() {
 			histogram[iForm] = totalStitches;
 			totalStitches += formStitchCount;
 		}
-		// ToDo - Allocate memory locally for highStitchBuffer
-		highStitchBuffer = &StitchBuffer[MAXITEMS];
+		highStitchBuffer = new fPOINTATTR[MAXITEMS];
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
 			iHighStitch = histogram[iForm]++;
@@ -13474,6 +13473,7 @@ void srtfrm() {
 			highStitchBuffer[iHighStitch].attribute = StitchBuffer[iStitch].attribute;
 		}
 		MoveMemory(StitchBuffer, highStitchBuffer, sizeof(fPOINTATTR)*PCSHeader.stitchCount);
+		delete[] highStitchBuffer;
 		coltab();
 		setMap(RESTCH);
 	}
