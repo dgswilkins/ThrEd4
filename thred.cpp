@@ -1643,7 +1643,7 @@ unsigned UpperCaseMap[] = {
 unsigned			FlagMap[MAPLEN];		//bitmap
 unsigned			UserFlagMap = 0;		//for storage of persistent binary variables set by the user
 // ToDo - StitchBuffer and tmpStitichBuffer have been allocated at the same place. Should they be separate?
-fPOINTATTR			StitchBuffer[MAXPCS];	//main stitch buffer
+fPOINTATTR			StitchBuffer[MAXITEMS * 2];	//main stitch buffer
 fPOINTATTR			ClipBuffer[MAXITEMS];	//for temporary copy of imported clipboard data
 FRMHED*				SelectedForm;			//pointer to selected form
 unsigned			FillTypes[] =			//fill type array for side window display
@@ -9195,6 +9195,7 @@ void setknt() {
 
 	unsigned	iStitch;
 
+	// ToDo - Use a temp buffer rather than the high buffer
 	OutputIndex = MAXITEMS;
 	mvstch(OutputIndex++, 0);
 	strtknt(0);
@@ -9247,6 +9248,7 @@ void chkncol() {
 
 	unsigned	iStitch, initialColor, color, code;
 
+	// ToDo - Use a temp buffer rather than the high buffer
 	OutputIndex = MAXITEMS;
 	initialColor = StitchBuffer[0].attribute&COLMSK;
 	rstMap(FILDIR);
@@ -10330,9 +10332,10 @@ void mv2f() {
 
 	if (rstMap(FORMSEL)) {
 
+		// ToDo - Use a temp buffer rather than the high buffer
 		savdo();
 		iLowBuffer = 0;
-		iHighBuffer = MAXPCS >> 1;
+		iHighBuffer = MAXITEMS;
 		attribute = ClosestFormToCursor << 4;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
@@ -10348,7 +10351,7 @@ void mv2f() {
 				StitchBuffer[iHighBuffer++].y = StitchBuffer[iStitch].y;
 			}
 		}
-		iStitch = MAXPCS >> 1;
+		iStitch = MAXITEMS;
 		while (iStitch < iHighBuffer) {
 
 			StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
@@ -10363,7 +10366,7 @@ void mv2f() {
 
 			savdo();
 			rngadj();
-			iHighBuffer = MAXPCS >> 1;
+			iHighBuffer = MAXITEMS;
 			iLowBuffer = 0;
 			for (iStitch = 0; iStitch < GroupStartStitch; iStitch++) {
 
@@ -10383,7 +10386,7 @@ void mv2f() {
 				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
 				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
 			}
-			for (iStitch = MAXPCS >> 1; iStitch < iHighBuffer; iStitch++) {
+			for (iStitch = MAXITEMS; iStitch < iHighBuffer; iStitch++) {
 
 				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
 				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
@@ -10401,9 +10404,10 @@ void mv2b() {
 
 	if (rstMap(FORMSEL)) {
 
+		// ToDo - Use a temp buffer rather than the high buffer
 		savdo();
 		iLowBuffer = 0;
-		iHighBuffer = MAXPCS >> 1;
+		iHighBuffer = MAXITEMS;
 		attribute = ClosestFormToCursor << 4;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
@@ -10419,7 +10423,7 @@ void mv2b() {
 				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
 			}
 		}
-		iStitch = MAXPCS >> 1;
+		iStitch = MAXITEMS;
 		while (iStitch < iHighBuffer) {
 
 			StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
@@ -10434,7 +10438,7 @@ void mv2b() {
 
 			savdo();
 			rngadj();
-			iHighBuffer = MAXPCS >> 1;
+			iHighBuffer = MAXITEMS;
 			for (iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
 
 				StitchBuffer[iHighBuffer].attribute = StitchBuffer[iStitch].attribute;
@@ -10448,7 +10452,7 @@ void mv2b() {
 				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
 				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
 			}
-			for (iStitch = MAXPCS >> 1; iStitch < iHighBuffer; iStitch++) {
+			for (iStitch = MAXITEMS; iStitch < iHighBuffer; iStitch++) {
 
 				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
 				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
@@ -11015,8 +11019,9 @@ void mvstchs(unsigned destination, unsigned source, unsigned count) {
 BOOL movstchs(unsigned destination, unsigned start, unsigned finish) {
 
 	unsigned count, swap;
-	unsigned dind = MAXPCS >> 1;
+	unsigned dind = MAXITEMS;
 
+	// ToDo - Use a temp buffer rather than the high buffer
 	if (destination < (unsigned)PCSHeader.stitchCount - 1)
 		destination++;
 	if (start > finish) {
@@ -11038,7 +11043,7 @@ BOOL movstchs(unsigned destination, unsigned start, unsigned finish) {
 		count = start - destination;
 		mvstchs(dind, destination, count);
 		dind += count;
-		mvstchs(destination, MAXPCS >> 1, dind - (MAXPCS >> 1));
+		mvstchs(destination, MAXITEMS, dind - (MAXITEMS));
 	} else {
 
 		count = destination - finish;
@@ -11047,7 +11052,7 @@ BOOL movstchs(unsigned destination, unsigned start, unsigned finish) {
 		count = finish - start;
 		mvstchs(dind, start, count);
 		dind += count;
-		mvstchs(start, MAXPCS >> 1, dind - (MAXPCS >> 1));
+		mvstchs(start, MAXITEMS, dind - (MAXITEMS));
 	}
 	return 1;
 }
@@ -11132,7 +11137,8 @@ unsigned makbig(unsigned start, unsigned finish) {
 	double		length;
 	dPOINT		delta, step, point;
 
-	destination = MAXPCS >> 1;
+	// ToDo - Use a temp buffer rather than the high buffer
+	destination = MAXITEMS;
 	for (source = start; source < (unsigned)finish - 1; source++) {
 
 		delta.x = StitchBuffer[source + 1].x - StitchBuffer[source].x;
@@ -11170,9 +11176,9 @@ unsigned makbig(unsigned start, unsigned finish) {
 	}
 	while (source < PCSHeader.stitchCount)
 		mvstch(destination++, source++);
-	sourceStitch = &StitchBuffer[MAXPCS >> 1];
+	sourceStitch = &StitchBuffer[MAXITEMS];
 	destinationStitch = &StitchBuffer[start];
-	stitchCount = destination - (MAXPCS >> 1);
+	stitchCount = destination - (MAXITEMS);
 	for (source = 0; source < stitchCount; source++)
 		destinationStitch[source] = sourceStitch[source];
 	PCSHeader.stitchCount = start + stitchCount;

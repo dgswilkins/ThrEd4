@@ -172,7 +172,7 @@ extern			HWND			SideWindow[11];
 extern			TCHAR			SideWindowEntryBuffer[11];
 extern			double			SmallStitchLength;
 extern			double			StitchBoxesThreshold;
-extern			fPOINTATTR		StitchBuffer[MAXPCS];
+extern			fPOINTATTR		StitchBuffer[MAXITEMS * 2];
 extern			fRECTANGLE		StitchRangeRect;
 extern			POINT			StitchCoordinatesPixels;
 extern			RECT			StitchWindowClientRect;
@@ -11143,6 +11143,7 @@ void centir() {
 void bean(unsigned start, unsigned finish) {
 	unsigned iOutputStitch, iSourceStitch, iCopyStitch;
 
+	// ToDo - Use a temp buffer rather than the high buffer
 	iCopyStitch = MAXITEMS;
 	iSourceStitch = start;
 	BeanCount = 0;
@@ -11207,6 +11208,7 @@ void dubean() {
 void unbean(unsigned start, unsigned finish) {
 	unsigned iSource, iCopy;
 
+	// ToDo - Use a temp buffer rather than the high buffer
 	iCopy = MAXITEMS;
 	BeanCount = 0;
 	for (iSource = start; iSource <= finish; iSource++) {

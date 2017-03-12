@@ -51,7 +51,6 @@
 #define		LINSCROL	0.05		//line scroll factor
 #define		TXTSIDS		6			//extra pixels in a text box
 #define		MAXITEMS	0x10000		//maximum number of stitches, vertices, texture points, sequence items & clipboard points
-#define		MAXPCS		0x20000		//maximum possible stiches in a pcs file*2
 #define		MAXCHNG		10000		//maximum number of color changes
 const unsigned long	RMAPBITS = MAXITEMS << 5;	//a bit for each stitch
 #define		SHUPX		480			//small hoop x size

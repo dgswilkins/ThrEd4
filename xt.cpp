@@ -76,7 +76,7 @@ extern	unsigned short	SelectedFormList[MAXFORMS];
 extern	fPOINT			SelectedPoint;
 extern	unsigned		SequenceIndex;
 extern	TCHAR*			StringTable[STR_LEN];
-extern	fPOINTATTR		StitchBuffer[MAXPCS];
+extern	fPOINTATTR		StitchBuffer[MAXITEMS * 2];
 extern	double			StitchSpacing;
 extern	RECT			StitchWindowClientRect;
 extern	HDC				StitchWindowDC;
@@ -151,7 +151,6 @@ extern	void		moveStitch(fPOINTATTR* destination, fPOINTATTR* source);
 extern	void		movStch();
 extern	void		movStch();
 extern	void		msgflt(unsigned messageId, float value);
-extern	void		mvstch(unsigned destination, unsigned source);
 extern	void		mvstchs(unsigned destination, unsigned source, unsigned count);
 extern	void		numWnd();
 extern	unsigned	nxt(unsigned iVertex);
@@ -999,29 +998,20 @@ void delwlk(unsigned code)
 {
 	unsigned	iStitch, stitchCount;
 	fPOINTATTR*	highStitchBuffer;
-	BOOL		flag;
 
-	stitchCount = 0;
-	flag = 1;
-	// Todo - Allocate memory locally for highStitchBuffer
-	highStitchBuffer = &StitchBuffer[MAXITEMS];
-	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
-	{
-		if ((StitchBuffer[iStitch].attribute&WLKFMSK) != code)
-		{
-			moveStitch(&highStitchBuffer[stitchCount], &StitchBuffer[iStitch]);
-			stitchCount++;
-		}
-		else
-		{
-			if (flag)
-			{
-				flag = 0;
+	// ToDo - If the file has not been saved, is PCSHeader.stitchCount ever non-zero?
+	if (PCSHeader.stitchCount) {
+		stitchCount = 0;
+		highStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+			if ((StitchBuffer[iStitch].attribute&WLKFMSK) != code) {
+				memcpy(&highStitchBuffer[stitchCount++], &StitchBuffer[iStitch], sizeof(fPOINTATTR));
 			}
 		}
+		memcpy(StitchBuffer, highStitchBuffer, stitchCount * sizeof(fPOINTATTR));
+		PCSHeader.stitchCount = stitchCount;
+		delete[] highStitchBuffer;
 	}
-	mvstchs(0, MAXITEMS, stitchCount);
-	PCSHeader.stitchCount = stitchCount;
 }
 
 void chkuseq()
@@ -2106,8 +2096,8 @@ void fsort()
 	ULARGE_INTEGER	nextTime;
 
 	savdo();
-	// There cannot be more records than stitches, so use MAXPCS
-	records = new OREC[MAXPCS];
+	// There cannot be more records than stitches, so use MAXITEMS
+	records = new OREC[MAXITEMS];
 	records[0].start = 0;
 	records[0].startStitch = StitchBuffer;
 	attribute = StitchBuffer->attribute&SRTMSK;
@@ -2215,6 +2205,7 @@ void fsort()
 			sortRecord.direction = minimumDirection;
 			precjmps(&sortRecord);
 		}
+		// ToDo - replace with memcpy
 		mvstchs(0, MAXITEMS, OutputIndex);
 		PCSHeader.stitchCount = OutputIndex;
 		coltab();
