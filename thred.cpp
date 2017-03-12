@@ -2549,7 +2549,7 @@ void moveStitch(fPOINTATTR* destination, fPOINTATTR* source) {
 		rep		movsd
 	}
 #else
-	memcpy(destination, source, sizeof(fPOINTATTR));
+	MoveMemory(destination, source, sizeof(fPOINTATTR));
 #endif
 }
 

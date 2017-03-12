@@ -1005,10 +1005,10 @@ void delwlk(unsigned code)
 		highStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if ((StitchBuffer[iStitch].attribute&WLKFMSK) != code) {
-				memcpy(&highStitchBuffer[stitchCount++], &StitchBuffer[iStitch], sizeof(fPOINTATTR));
+				MoveMemory(&highStitchBuffer[stitchCount++], &StitchBuffer[iStitch], sizeof(fPOINTATTR));
 			}
 		}
-		memcpy(StitchBuffer, highStitchBuffer, stitchCount * sizeof(fPOINTATTR));
+		MoveMemory(StitchBuffer, highStitchBuffer, stitchCount * sizeof(fPOINTATTR));
 		PCSHeader.stitchCount = stitchCount;
 		delete[] highStitchBuffer;
 	}
@@ -1441,11 +1441,11 @@ void srtcol() {
 		colorStartStitch[iColor] = startStitch;
 		startStitch += histogram[iColor];
 	}
-	// Todo - Allocate memory locally for highStitchBuffer
-	highStitchBuffer = &StitchBuffer[MAXITEMS];
+	highStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 		moveStitch(&highStitchBuffer[colorStartStitch[StitchBuffer[iStitch].attribute&COLMSK]++], &StitchBuffer[iStitch]);
-	MoveMemory(&StitchBuffer, highStitchBuffer, sizeof(fPOINTATTR)*PCSHeader.stitchCount);
+	MoveMemory(&StitchBuffer, highStitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR));
+	delete[] highStitchBuffer;
 }
 
 void dubit(unsigned bit)
@@ -2205,7 +2205,7 @@ void fsort()
 			sortRecord.direction = minimumDirection;
 			precjmps(&sortRecord);
 		}
-		// ToDo - replace with memcpy
+		// ToDo - replace with MoveMemory
 		mvstchs(0, MAXITEMS, OutputIndex);
 		PCSHeader.stitchCount = OutputIndex;
 		coltab();
