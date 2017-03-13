@@ -10963,7 +10963,7 @@ void srtf(unsigned start, unsigned finish) {
 
 void srtbyfrm() {
 	unsigned	iStitch, iColor, colorAccumulator, swap;
-	unsigned	colorHistogram[16];
+	unsigned	colorHistogram[16] = {};
 	unsigned	color[16];
 
 	if (FormIndex) {
@@ -10973,10 +10973,7 @@ void srtbyfrm() {
 			if (iColor != AppliqueColor)
 				color[iColor] = iColor + 1;
 		}
-		// Todo - Allocate memory locally for TempStitchBuffer
-		TempStitchBuffer = &StitchBuffer[MAXITEMS];
-		for (iColor = 0; iColor < 16; iColor++)
-			colorHistogram[iColor] = 0;
+		TempStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 			colorHistogram[color[StitchBuffer[iStitch].attribute & 0xf]]++;
 		colorAccumulator = 0;
@@ -10990,6 +10987,7 @@ void srtbyfrm() {
 		srtf(0, colorHistogram[0]);
 		for (iColor = 0; iColor < 15; iColor++)
 			srtf(colorHistogram[iColor], colorHistogram[iColor + 1]);
+		delete[] TempStitchBuffer;
 	}
 	else
 		srtcol();

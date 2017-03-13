@@ -2095,6 +2095,8 @@ void fsort()
 	ULARGE_INTEGER	startTime;
 	ULARGE_INTEGER	nextTime;
 
+	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors 
+	//        in a single form are not in ascending order already. 
 	savdo();
 	// There cannot be more records than stitches
 	records = new OREC[PCSHeader.stitchCount];
