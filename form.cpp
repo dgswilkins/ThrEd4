@@ -11222,7 +11222,6 @@ void unbean(unsigned start, unsigned finish) {
 		iSource = PCSHeader.stitchCount - 1;
 	while (iSource < PCSHeader.stitchCount)
 		mvstch(iCopy++, iSource++);
-	// ToDo - should this call be mvstchs(start, MAXSEQ, (iCopy - MAXSEQ))?
 	mvstchs(start, MAXITEMS, iCopy);
 	PCSHeader.stitchCount = start + iCopy;
 }

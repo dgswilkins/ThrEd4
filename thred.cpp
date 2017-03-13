@@ -739,7 +739,6 @@ double			GapToNearest[NERCNT];	//distances of the closest points
 										//to a mouse click
 long			NearestPoint[NERCNT];	//indices of the closest points
 unsigned		NearestCount;			//number of boxes selected
-//ToDo - convert SearchLine to locallly allocated variable?
 POINT			SearchLine[MAXITEMS];	//stitch select line 
 unsigned		SearchLineIndex = 0;	//pointer for drawing stitch select lines
 fRECTANGLE		StitchRangeRect;		//stitch range rectangle
@@ -2662,12 +2661,11 @@ void pgrit() {
 void selin(unsigned start, unsigned end, HDC dc) {
 
 	unsigned		iStitch,swap;
-	double			tcor;
+	double			coordinate;
 	long			hi;
 	
 	SelectObject(dc, GroupSelectPen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	//Todo - Is SearchLine initialized at this point?
 	if (SearchLineIndex)
 		Polyline(dc, SearchLine, SearchLineIndex);
 	if (start > end) {
@@ -2680,10 +2678,10 @@ void selin(unsigned start, unsigned end, HDC dc) {
 	SearchLineIndex = 0;
 	for (iStitch = start; iStitch <= end; iStitch++) {
 
-		tcor = ((StitchBuffer[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5);
-		SearchLine[SearchLineIndex].x = (long)tcor;
-		tcor = (hi - (StitchBuffer[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5);
-		SearchLine[SearchLineIndex++].y = (long)tcor;
+		coordinate = ((StitchBuffer[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5);
+		SearchLine[SearchLineIndex].x = static_cast<long>(coordinate);
+		coordinate = (hi - (StitchBuffer[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5);
+		SearchLine[SearchLineIndex++].y = static_cast<long>(coordinate);
 	}
 	Polyline(dc, SearchLine, SearchLineIndex);
 	SetROP2(dc, R2_COPYPEN);
