@@ -2096,8 +2096,8 @@ void fsort()
 	ULARGE_INTEGER	nextTime;
 
 	savdo();
-	// There cannot be more records than stitches, so use MAXITEMS
-	records = new OREC[MAXITEMS];
+	// There cannot be more records than stitches
+	records = new OREC[PCSHeader.stitchCount];
 	records[0].start = 0;
 	records[0].startStitch = StitchBuffer;
 	attribute = StitchBuffer->attribute&SRTMSK;
@@ -2169,8 +2169,7 @@ void fsort()
 		}
 		stitchRange[iRange].finish = lastRecord;
 		lastRange = ++iRange;
-		// Todo - Allocate memory locally for TempStitchBuffer
-		TempStitchBuffer = &StitchBuffer[MAXITEMS];
+		TempStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
 		OutputIndex = 0;
 		for (iRange = 0; iRange < lastRange; iRange++)
 		{
@@ -2205,9 +2204,9 @@ void fsort()
 			sortRecord.direction = minimumDirection;
 			precjmps(&sortRecord);
 		}
-		// ToDo - replace with MoveMemory
-		mvstchs(0, MAXITEMS, OutputIndex);
+		MoveMemory(StitchBuffer, TempStitchBuffer, OutputIndex * sizeof(fPOINTATTR));
 		PCSHeader.stitchCount = OutputIndex;
+		delete[] TempStitchBuffer;
 		coltab();
 		setMap(RESTCH);
 		delete[] stitchRange;
