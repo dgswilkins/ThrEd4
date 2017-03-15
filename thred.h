@@ -968,7 +968,7 @@ typedef union _satinOrAngle {
 #define EGPIC_LINS	7
 #define EGCHN_LINS	6
 
-// ToDo - Is this structure valid and should it be used?
+// Original form header used prior to version 2
 typedef struct _frmhedo {
 
 	unsigned char	attribute;		//attribute

@@ -5152,7 +5152,6 @@ void dstran() {
 		} else {
 
 			dstin(dtrn(&DSTRecords[iRecord]), &dstStitch);
-			// ToDo - Is localStitch Required?
 			localStitch.x += dstStitch.x;
 			localStitch.y += dstStitch.y;
 			if (!(DSTRecords[iRecord].nd & 0x80)) {
@@ -5344,9 +5343,10 @@ void xofrm() {
 
 	unsigned	iForm;
 	FRMHEDO*	formListCopy;
-	// Todo - Allocate memory locally for formListCopy and replace use of BSequence in FillMemory 
 	formListCopy = (FRMHEDO*)&BSequence;
+	// ToDo - Does this do anything valid? 
 	FillMemory(&BSequence, 0, sizeof(FRMHED)*FormIndex);
+	// ToDo - find a better way to write original form header data into new version
 	for (iForm = 0; iForm < FormIndex; iForm++)
 		MoveMemory(&FormList[iForm], &formListCopy[iForm], sizeof(FRMHEDO));
 }
@@ -5570,7 +5570,7 @@ void nuFil() {
 						FormVertexIndex = SatinConnectIndex = ClipPointIndex = 0;
 						MsgBuffer[0] = 0;
 						if (version < 2) {
-							// Todo - Allocate memory locally for formListCopy
+							// Todo - Allocate memory locally for formListCopy and replace use of BSequence in xoform 
 							formListCopy = (FRMHEDO*)&BSequence;
 							ReadFile(FileHandle, (FRMHEDO*)formListCopy, FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
 							if (BytesRead != FormIndex * sizeof(FRMHEDO)) {
@@ -5917,40 +5917,37 @@ void ritdst() {
 	unsigned		iStitch, dstType, color, count, iColor;
 	POINT			centerCoordinate, lengths, absoluteLengths, difference, stepSize;
 	fRECTANGLE		boundingRect;
-	fPOINTATTR*		highStitchBuffer;
+	fPOINTATTR*		dstStitchBuffer;
 	unsigned*		colorData;
 	HANDLE			colorFile;
 	unsigned long	bytesWritten;
 
-	// Todo - Allocate memory locally for colorData
-	colorData = (unsigned*)&OSequence;
-	iColor = 3;
-	colorData[0] = COLVER;
-	colorData[1] = BackgroundColor;
-	colorData[2] = UserColor[StitchBuffer[0].attribute&COLMSK];
-	// Todo - Allocate memory locally for highStitchBuffer
-	highStitchBuffer = &StitchBuffer[MAXITEMS];
+	// In this case, there could be as many colors as there are stitches
+	colorData = new unsigned[PCSHeader.stitchCount];
+	iColor = 0;
+	colorData[iColor++] = COLVER;
+	colorData[iColor++] = BackgroundColor;
+	colorData[iColor++] = UserColor[StitchBuffer[0].attribute&COLMSK];
+	dstStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		highStitchBuffer[iStitch].x = RotatedStitches[iStitch].x * 5 / 3;
-		highStitchBuffer[iStitch].y = RotatedStitches[iStitch].y * 5 / 3;
-		highStitchBuffer[iStitch].attribute = RotatedStitches[iStitch].attribute;
+		dstStitchBuffer[iStitch].x = RotatedStitches[iStitch].x * 5 / 3;
+		dstStitchBuffer[iStitch].y = RotatedStitches[iStitch].y * 5 / 3;
+		dstStitchBuffer[iStitch].attribute = RotatedStitches[iStitch].attribute;
 	}
-	boundingRect.left = boundingRect.right = highStitchBuffer[0].x;
-	boundingRect.bottom = boundingRect.top = highStitchBuffer[0].y;
+	boundingRect.left = boundingRect.right = dstStitchBuffer[0].x;
+	boundingRect.bottom = boundingRect.top = dstStitchBuffer[0].y;
 	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		if (highStitchBuffer[iStitch].x > boundingRect.right)
-			boundingRect.right = highStitchBuffer[iStitch].x + 0.5;
-		if (highStitchBuffer[iStitch].x < boundingRect.left)
-			boundingRect.left = highStitchBuffer[iStitch].x - 0.5;
-		if (highStitchBuffer[iStitch].y > boundingRect.top)
-			boundingRect.top = highStitchBuffer[iStitch].y + 0.5;
-		if (highStitchBuffer[iStitch].y < boundingRect.bottom)
-			boundingRect.bottom = highStitchBuffer[iStitch].y - 0.5;
+		if (dstStitchBuffer[iStitch].x > boundingRect.right)
+			boundingRect.right = dstStitchBuffer[iStitch].x + 0.5;
+		if (dstStitchBuffer[iStitch].x < boundingRect.left)
+			boundingRect.left = dstStitchBuffer[iStitch].x - 0.5;
+		if (dstStitchBuffer[iStitch].y > boundingRect.top)
+			boundingRect.top = dstStitchBuffer[iStitch].y + 0.5;
+		if (dstStitchBuffer[iStitch].y < boundingRect.bottom)
+			boundingRect.bottom = dstStitchBuffer[iStitch].y - 0.5;
 	}
-	// Todo - Allocate memory locally for DSTRecords
-	DSTRecords = (DSTREC*)&BSequence;
 	DSTRecordCount = 0;
 	centerCoordinate.x = (boundingRect.right - boundingRect.left) / 2 + boundingRect.left;
 	centerCoordinate.y = (boundingRect.top - boundingRect.bottom) / 2 + boundingRect.bottom;
@@ -5958,17 +5955,17 @@ void ritdst() {
 	DSTPositiveOffset.y = boundingRect.top - centerCoordinate.y + 1;
 	DSTNegativeOffset.x = centerCoordinate.x - boundingRect.left - 1;
 	DSTNegativeOffset.y = centerCoordinate.y - boundingRect.bottom - 1;
-	color = highStitchBuffer[0].attribute & 0xf;
+	color = dstStitchBuffer[0].attribute & 0xf;
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		if (color != (highStitchBuffer[iStitch].attribute & 0xf)) {
+		if (color != (dstStitchBuffer[iStitch].attribute & 0xf)) {
 
 			savdst(0xc30000);
-			color = highStitchBuffer[iStitch].attribute & 0xf;
+			color = dstStitchBuffer[iStitch].attribute & 0xf;
 			colorData[iColor++] = UserColor[color];
 		}
-		lengths.x = highStitchBuffer[iStitch].x - centerCoordinate.x;
-		lengths.y = highStitchBuffer[iStitch].y - centerCoordinate.y;
+		lengths.x = dstStitchBuffer[iStitch].x - centerCoordinate.x;
+		lengths.y = dstStitchBuffer[iStitch].y - centerCoordinate.y;
 		absoluteLengths.x = abs(lengths.x);
 		absoluteLengths.y = abs(lengths.y);
 		// ToDo - is 'abs' neccessary since absoluteLengths was already abs?
@@ -6012,15 +6009,16 @@ void ritdst() {
 	if (colfil()) {
 
 		colorFile = CreateFile(ColorFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
-		// Todo - Is Osequence still correctly used here if memory allocated locally for colorData
 		if (colorFile != INVALID_HANDLE_VALUE)
-			WriteFile(colorFile, &OSequence, iColor << 2, &bytesWritten, 0);
+			WriteFile(colorFile, &colorData, iColor * sizeof(unsigned), &bytesWritten, 0);
 		CloseHandle(colorFile);
 		colorFile = CreateFile(RGBFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		if (colorFile != INVALID_HANDLE_VALUE)
-			WriteFile(colorFile, &colorData[2], (iColor - 2) << 2, &bytesWritten, 0);
+			WriteFile(colorFile, &colorData[2], (iColor - 2) * sizeof(unsigned), &bytesWritten, 0);
 		CloseHandle(colorFile);
 	}
+	delete[] dstStitchBuffer;
+	delete[] colorData;
 }
 
 BOOL pcshup() {
@@ -6383,6 +6381,8 @@ void sav() {
 
 		case AUXDST:
 
+			// There are always going to be more recordds in the DST format
+			DSTRecords = new DSTREC[2 * PCSHeader.stitchCount];
 			ritdst();
 			pchr = (TCHAR*)&dstHeader;
 			for (iHeader = 0; iHeader < sizeof(DSTHED); iHeader++)
@@ -6422,6 +6422,7 @@ void sav() {
 			strncpy(dstHeader.eof, "\x1a", 1);
 			WriteFile(PCSFileHandle, (DSTHED*)&dstHeader, sizeof(DSTHED), &bytesWritten, 0);
 			WriteFile(PCSFileHandle, (DSTREC*)DSTRecords, sizeof(DSTREC)*DSTRecordCount, &bytesWritten, 0);
+			delete[] DSTRecords;
 			break;
 
 #if PESACT
