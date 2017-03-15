@@ -761,7 +761,6 @@ TCHAR			KnotAtStartOrder[] = { 2,3,1,4,0 };		//knot spacings
 TCHAR			KnotAtEndOrder[] = { -2,-3,-1,-4,0 };	//reverse knot spacings
 TCHAR			KnotAtLastOrder[] = { 0,-4,-1,-3,-2 };	//reverse knot spacings
 fRECTANGLE		ClipRectAdjusted;		//rectangle for adjust range ends for clipboard fills
-TCHAR*			BalaradFileName;		//used in the balarad interface
 HANDLE			BalaradFile;			//balarad file handle
 
 //graphics variables		
@@ -1641,7 +1640,6 @@ unsigned UpperCaseMap[] = {
 
 unsigned			FlagMap[MAPLEN];		//bitmap
 unsigned			UserFlagMap = 0;		//for storage of persistent binary variables set by the user
-// ToDo - StitchBuffer and tmpStitichBuffer have been allocated at the same place. Should they be separate?
 fPOINTATTR			StitchBuffer[MAXITEMS * 2];	//main stitch buffer
 fPOINTATTR			ClipBuffer[MAXITEMS];	//for temporary copy of imported clipboard data
 FRMHED*				SelectedForm;			//pointer to selected form
@@ -3379,8 +3377,7 @@ void redbal() {
 
 		ReadFile(balaradFile, (BALHED*)&balaradHeader, sizeof(BALHED), &bytesRead, 0);
 		if (bytesRead == sizeof(BALHED)) {
-			// Todo - Allocate memory locally for BalaradStitch
-			BalaradStitch = (BALSTCH*)&BSequence;
+			BalaradStitch = new BALSTCH[MAXITEMS];
 			ReadFile(balaradFile, (BALSTCH*)BalaradStitch, sizeof(BSequence), &bytesRead, 0);
 			stitchCount = bytesRead / sizeof(BALSTCH);
 			IniFile.backgroundColor = BackgroundColor = balaradHeader.backgroundColor;
@@ -3423,6 +3420,7 @@ void redbal() {
 			redraw(ColorBar);
 			setMap(INIT);
 			setMap(RESTCH);
+			delete[] BalaradStitch;
 		}
 	}
 	CloseHandle(balaradFile);
@@ -3432,7 +3430,7 @@ void ritbal() {
 
 	BALHED			balaradHeader;
 	unsigned*		ptrBalaradHeader;
-	unsigned		iHeader, iStitch, iColor, color;
+	unsigned		iHeader, iStitch, iColor, iOutput, color;
 	HANDLE			balaradFile;
 	TCHAR*			lastNameCharacter;
 	TCHAR			outputName[_MAX_PATH];
@@ -3477,27 +3475,27 @@ void ritbal() {
 		WriteFile(balaradFile, (BALHED*)&balaradHeader, sizeof(BALHED), &bytesWritten, 0);
 		BalaradOffset.x = IniFile.hoopSizeX / 2;
 		BalaradOffset.y = IniFile.hoopSizeY / 2;
-		// Todo - Allocate memory locally for BalaradStitch
-		BalaradStitch = (BALSTCH*)&BSequence;
+		BalaradStitch = new BALSTCH[PCSHeader.stitchCount];
 		color = StitchBuffer[0].attribute&COLMSK;
-		thr2bal(0, 0, BALJUMP);
-		BalaradStitch[1].flag = (unsigned char)color;
-		iColor = 1;
+		iOutput = 0;
+		thr2bal(iOutput++, 0, BALJUMP);
+		BalaradStitch[iOutput].flag = (unsigned char)color;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			thr2bal(iColor++, iStitch, BALNORM);
+			thr2bal(iOutput++, iStitch, BALNORM);
 			if ((StitchBuffer[iStitch].attribute&COLMSK) != color) {
 
-				thr2bal(iColor, iStitch, BALSTOP);
+				thr2bal(iOutput, iStitch, BALSTOP);
 				color = StitchBuffer[iStitch].attribute&COLMSK;
-				BalaradStitch[iColor++].flag = (unsigned char)color;
+				BalaradStitch[iOutput++].flag = (unsigned char)color;
 			}
 		}
-		WriteFile(balaradFile, (BALSTCH*)BalaradStitch, iColor * sizeof(BALSTCH), &bytesWritten, 0);
+		WriteFile(balaradFile, (BALSTCH*)BalaradStitch, iOutput * sizeof(BALSTCH), &bytesWritten, 0);
 		CloseHandle(balaradFile);
 		balaradFile = CreateFile(BalaradName1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		WriteFile(balaradFile, (TCHAR*)outputName, strlen(outputName) + 1, &bytesWritten, 0);
 		CloseHandle(balaradFile);
+		delete[] BalaradStitch;
 	} else {
 
 		if (*BalaradName1) {
@@ -21479,6 +21477,7 @@ void ducmd() {
 
 	unsigned long	bytesRead;
 	int				iArgument;
+	TCHAR*			balaradFileName;
 
 	if (__argc > 1) {
 
@@ -21489,15 +21488,15 @@ void ducmd() {
 #endif
 		if (!strncmp(WorkingFileName, "/F1:", 4)) {
 
-			BalaradFileName = &WorkingFileName[4];
-			BalaradFile = CreateFile(BalaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+			balaradFileName = &WorkingFileName[4];
+			BalaradFile = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 			CloseHandle(BalaradFile);
 			if (BalaradFile != INVALID_HANDLE_VALUE) {
 
 #if  __UseASM__
-				bcpy(BalaradName0, BalaradFileName);
+				bcpy(BalaradName0, balaradFileName);
 #else
-				strcpy_s(BalaradName0, BalaradFileName);
+				strcpy_s(BalaradName0, balaradFileName);
 #endif
 				if (__argc > 2) {
 
@@ -21508,18 +21507,16 @@ void ducmd() {
 #endif
 					if (!strncmp(WorkingFileName, "/F2:", 4)) {
 
-						BalaradFileName = &WorkingFileName[4];
-						BalaradFile = CreateFile(BalaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+						balaradFileName = &WorkingFileName[4];
+						BalaradFile = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 						if (BalaradFile != INVALID_HANDLE_VALUE) {
 
 #if  __UseASM__
-							bcpy(BalaradName1, BalaradFileName);
+							bcpy(BalaradName1, balaradFileName);
 #else
-							strcpy_s(BalaradName1, BalaradFileName);
+							strcpy_s(BalaradName1, balaradFileName);
 #endif
-							//ToDo - Does this line make sense?
-							BalaradFileName = (TCHAR*)&BSequence;
-							ReadFile(BalaradFile, (void*)&BalaradName2, 10000, &bytesRead, 0);
+							ReadFile(BalaradFile, (void*)&BalaradName2, (_MAX_PATH + 1), &bytesRead, 0);
 							strcat_s(BalaradName2, "");
 							if (bytesRead)
 								redbal();
