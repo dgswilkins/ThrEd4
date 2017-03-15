@@ -13218,24 +13218,6 @@ void gsnap() {
 	}
 }
 
-#if PESACT
-
-void lodpes() {
-
-	setMap(REDOLD);
-	strcpy_s(WorkingFileName, "u:\\mrd\\t.pes");
-	nuFil();
-}
-
-void savpes() {
-
-	IniFile.auxFileType = AUXPES;
-	strcpy_s(WorkingFileName, "u:\\mrd\\t1.thr");
-	nunams();
-	sav();
-}
-#endif
-
 void ritlock(HWND hwndlg) {
 
 	unsigned			iFile;
