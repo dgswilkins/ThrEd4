@@ -6350,8 +6350,7 @@ void sav() {
 		return;
 	chk1col();
 	coltab();
-	// Todo - Allocate memory locally for RotatedStitches
-	RotatedStitches = (fPOINTATTR*)&BSequence;
+	RotatedStitches = new fPOINTATTR[PCSHeader.stitchCount];
 	if (chku(ROTAUX)) {
 
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -6589,6 +6588,7 @@ void sav() {
 		if (chku(ROTAUX))
 			filnopn(IDS_FILROT, AuxName);
 	}
+	delete[] RotatedStitches;
 }
 #pragma warning(pop)
 
