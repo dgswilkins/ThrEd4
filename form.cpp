@@ -13170,7 +13170,7 @@ void xclpfn(unsigned start, unsigned finish) {
 void duxclp() {
 	unsigned iPoint;
 	// ToDo - Can we do better than MAXITEMS?
-	ChainEndPoints = new fPOINT[MAXITEMS];
+	ChainEndPoints = new fPOINT[MAXITEMS]();
 	duangs();
 	dufxlen();
 	clpxadj();
@@ -13377,10 +13377,11 @@ void wavfrm() {
 		durpoli(IniFile.wavePoints);
 		mdufrm();
 		FormVertexIndex = iVertex;
-		points = new fPOINT[IniFile.waveEnd];
+		// ToDo - check wavePoints is the right option
+		points = new fPOINT[IniFile.wavePoints];
 		iPoint = 0;
 		iVertex = IniFile.waveStart;
-		while (iVertex != IniFile.waveEnd) {
+		while (iVertex != IniFile.waveEnd&&iPoint < IniFile.wavePoints) {
 			iNextVertex = (iVertex + 1) % IniFile.wavePoints;
 			points[iPoint].x = -CurrentFormVertices[iNextVertex].x + CurrentFormVertices[iVertex].x;
 			points[iPoint].y = -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[iVertex].y;

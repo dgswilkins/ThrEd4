@@ -3378,7 +3378,7 @@ void redbal() {
 		ReadFile(balaradFile, (BALHED*)&balaradHeader, sizeof(BALHED), &bytesRead, 0);
 		if (bytesRead == sizeof(BALHED)) {
 			BalaradStitch = new BALSTCH[MAXITEMS];
-			ReadFile(balaradFile, (BALSTCH*)BalaradStitch, sizeof(BSequence), &bytesRead, 0);
+			ReadFile(balaradFile, (BALSTCH*)BalaradStitch, MAXITEMS * sizeof(BALSTCH), &bytesRead, 0);
 			stitchCount = bytesRead / sizeof(BALSTCH);
 			IniFile.backgroundColor = BackgroundColor = balaradHeader.backgroundColor;
 			BackgroundPen = nuPen(BackgroundPen, 1, BackgroundColor);
@@ -3475,12 +3475,12 @@ void ritbal() {
 		WriteFile(balaradFile, (BALHED*)&balaradHeader, sizeof(BALHED), &bytesWritten, 0);
 		BalaradOffset.x = IniFile.hoopSizeX / 2;
 		BalaradOffset.y = IniFile.hoopSizeY / 2;
-		BalaradStitch = new BALSTCH[PCSHeader.stitchCount];
+		BalaradStitch = new BALSTCH[PCSHeader.stitchCount + 2];
 		color = StitchBuffer[0].attribute&COLMSK;
 		iOutput = 0;
 		thr2bal(iOutput++, 0, BALJUMP);
 		BalaradStitch[iOutput].flag = (unsigned char)color;
-		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount && iOutput < 2; iStitch++) {
 
 			thr2bal(iOutput++, iStitch, BALNORM);
 			if ((StitchBuffer[iStitch].attribute&COLMSK) != color) {
@@ -5923,7 +5923,8 @@ void ritdst() {
 	unsigned long	bytesWritten;
 
 	// In this case, there could be as many colors as there are stitches
-	colorData = new unsigned[PCSHeader.stitchCount];
+	// And we have to account for at least one color/stitch
+	colorData = new unsigned[PCSHeader.stitchCount+3];
 	iColor = 0;
 	colorData[iColor++] = COLVER;
 	colorData[iColor++] = BackgroundColor;
@@ -9445,51 +9446,28 @@ void duver(TCHAR* name) {
 	}
 }
 
-void durit(void* source, unsigned cnt) {
+void durit(char **destination, void* source, unsigned count) {
 
-#if  __UseASM__
-	_asm {
-
-		mov		esi, source
-		mov		edi, OutputIndex
-		mov		ecx, cnt
-		rep		movsb
-		mov		OutputIndex, edi
-	}
-#else
-	memcpy((void *)OutputIndex, source, cnt);
-	OutputIndex += cnt;
-#endif
+	CopyMemory(static_cast<void *>(*destination), source, count);
+	*destination += count;
 }
 
-unsigned bufref() {
 
-#if  __UseASM__
-	_asm {
+void dubuf(char *buffer, unsigned *count) {
 
-		mov		eax, OutputIndex
-		sub		eax, offset BSequence
-	}
-#else
-	return (unsigned)OutputIndex - (unsigned)BSequence;
-#endif
-}
+	STRHED		stitchHeader;
+	unsigned	iForm, iColor, iVertex, iGuide, iClip;
+	unsigned	vertexCount, guideCount, clipDataCount;
+	FRMHED*		forms;
+	fPOINT*		vertices;
+	SATCON*		guides;
+	fPOINT*		points;
+	unsigned	iDestinationVertex = 0;
+	unsigned	iDestinationGuide = 0;
+	unsigned	iDestinationClip = 0;
+	char*		output;
 
-void dubuf() {
-
-	STRHED				stitchHeader;
-	unsigned			iForm, iColor, iVertex, iGuide, iClip;
-	unsigned			vertexCount, guideCount, clipDataCount;
-	FRMHED*				forms;
-	fPOINT*				vertices;
-	SATCON*				guides;
-	fPOINT*				points;
-	unsigned			iDestinationVertex = 0;
-	unsigned			iDestinationGuide = 0;
-	unsigned			iDestinationClip = 0;
-
-	// Todo - Allocate memory locally for OutputIndex
-	OutputIndex = (unsigned)&BSequence;
+	output = buffer;
 	stitchHeader.headerType = 0x2746872;
 	stitchHeader.fileLength = PCSHeader.stitchCount * sizeof(fPOINTATTR) + sizeof(STRHED) + 16;
 	stitchHeader.stitchCount = PCSHeader.stitchCount;
@@ -9516,25 +9494,25 @@ void dubuf() {
 	stitchHeader.vertexLen = sizeof(STRHED) + PCSHeader.stitchCount * sizeof(fPOINTATTR) + 164;
 	stitchHeader.dlineLen = sizeof(fPOINT)*vertexCount;
 	stitchHeader.clipDataLen = sizeof(fPOINT)*clipDataCount;
-	durit(&stitchHeader, sizeof(STRHED));
+	durit(&output, &stitchHeader, sizeof(STRHED));
 	ExtendedHeader.auxFormat = IniFile.auxFileType;
 	ExtendedHeader.hoopSizeX = IniFile.hoopSizeX;
 	ExtendedHeader.hoopSizeY = IniFile.hoopSizeY;
 	ExtendedHeader.texturePointCount = TextureIndex;
-	durit(&ExtendedHeader, sizeof(STREX));
-	durit(StitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR));
+	durit(&output, &ExtendedHeader, sizeof(STREX));
+	durit(&output, StitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR));
 	if (!PCSBMPFileName[0]) {
 
 		for (iColor = 0; iColor < 16; iColor++)
 			PCSBMPFileName[iColor] = 0;
 	}
-	durit(PCSBMPFileName, 16);
-	durit(&BackgroundColor, 4);
-	durit(UserColor, 64);
-	durit(CustomColor, 64);
+	durit(&output, PCSBMPFileName, 16);
+	durit(&output, &BackgroundColor, 4);
+	durit(&output, UserColor, 64);
+	durit(&output, CustomColor, 64);
 	for (iColor = 0; iColor < 16; iColor++)
 		MsgBuffer[iColor] = ThreadSize[iColor][0];
-	durit(MsgBuffer, 16);
+	durit(&output, MsgBuffer, 16);
 	if (FormIndex) {
 
 		forms = new FRMHED[FormIndex];
@@ -9578,16 +9556,17 @@ void dubuf() {
 				}
 			}
 		}
-		durit(forms, FormIndex * sizeof(FRMHED));
-		durit(vertices, vertexCount * sizeof(fPOINT));
-		durit(guides, guideCount * sizeof(SATCON));
-		durit(points, clipDataCount * sizeof(fPOINT));
-		durit(TexturePointsBuffer, TextureIndex * sizeof(TXPNT));
+		durit(&output, forms, FormIndex * sizeof(FRMHED));
+		durit(&output, vertices, vertexCount * sizeof(fPOINT));
+		durit(&output, guides, guideCount * sizeof(SATCON));
+		durit(&output, points, clipDataCount * sizeof(fPOINT));
+		durit(&output, TexturePointsBuffer, TextureIndex * sizeof(TXPNT));
 		delete[] forms;
 		delete[] vertices;
 		delete[] guides;
 		delete[] points;
 	}
+	*count = output - buffer;
 }
 
 void thrsav() {
@@ -9598,6 +9577,8 @@ void thrsav() {
 	WIN32_FIND_DATA	fileData;
 	HANDLE			file;
 	TCHAR			newFileName[_MAX_PATH];
+	char*			output;
+	unsigned		count;
 
 	if (chkattr(WorkingFileName))
 		return;
@@ -9636,10 +9617,11 @@ void thrsav() {
 		crmsg(ThrName);
 		FileHandle = 0;
 	} else {
-
-		dubuf();
-		WriteFile(FileHandle, BSequence, bufref(), &bytesWritten, 0);
-		if (bytesWritten != (unsigned long)bufref()) {
+		output = new char[MAXITEMS * 4];
+		dubuf(output, &count);
+		WriteFile(FileHandle, output, count, &bytesWritten, 0);
+		delete[] output;
+		if (bytesWritten != count) {
 
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "File Write Error: %s\n", ThrName);
 			shoMsg(MsgBuffer);
