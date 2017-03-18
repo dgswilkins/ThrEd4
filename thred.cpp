@@ -8462,8 +8462,7 @@ unsigned frmcnt(unsigned iForm) {
 	unsigned	codedAttribute, stitchCount = 0, iStitch;
 
 	LowerLeftStitch.x = LowerLeftStitch.y = (float)1e20;
-	// ToDo should this be using FRMSHFT?
-	codedAttribute = iForm << 4;
+	codedAttribute = iForm << FRMSHFT;
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
 		if ((StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute&&StitchBuffer[iStitch].attribute&TYPMSK)
@@ -8704,8 +8703,7 @@ void duclip() {
 
 					length = sizclp();
 					fvars(ClosestFormToCursor);
-					// ToDo - use FRMSHFT?
-					guides = 0; codedAttribute = ClosestFormToCursor << 4;
+					guides = 0; codedAttribute = ClosestFormToCursor << FRMSHFT;
 					FileSize += sizeof(FORMCLIP);
 					ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize);
 					ClipFormHeader = frmref(ThrEdClipPointer);
@@ -8769,8 +8767,7 @@ void duclip() {
 						ClipStitchData[0].led = length;
 						iTexture++;
 						iDestination = 1;
-						// ToDo - use FRMSHFT?
-						codedAttribute = ClosestFormToCursor << 4;
+						codedAttribute = ClosestFormToCursor << FRMSHFT;
 						while (iTexture < PCSHeader.stitchCount) {
 
 							if ((StitchBuffer[iTexture].attribute&FRMSK) == codedAttribute && !(StitchBuffer[iTexture].attribute&NOTFRM))
