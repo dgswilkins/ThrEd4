@@ -17,7 +17,6 @@
 
 //Forward Declarations
 void		blak ();
-unsigned	bufref ();
 void		chkhup ();
 void		clrhbut (unsigned startButton);
 BOOL		cmpstch (unsigned iStitchA, unsigned iStitchB);
@@ -29,7 +28,6 @@ void		delstchm ();
 void		drwLin (unsigned currentStitch, unsigned length, HPEN hPen);
 void		dstcurs ();
 void		duIns ();
-void		dubuf ();
 void		dufdef ();
 void		dusel (HDC dc);
 void		duselrng ();
