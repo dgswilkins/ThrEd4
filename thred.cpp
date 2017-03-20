@@ -12773,28 +12773,29 @@ unsigned duswap(unsigned data) {
 
 void ritcur() {
 
-	ICONINFO	iconInfo;
-	HCURSOR		currentCursor;
-	POINT		cursorPosition;
-	unsigned	iRow, iPixel;
-	unsigned	mask, bitmapInverse;
-	unsigned	bitMask;
-	unsigned	pixelColor;
+	ICONINFO		iconInfo;
+	HCURSOR			currentCursor;
+	POINT			cursorPosition;
+	unsigned		iRow, iPixel;
+	unsigned		mask, bitmapInverse;
+	unsigned		bitMask;
+	unsigned		pixelColor;
+	unsigned char*	bitmapBits;
 
 	currentCursor = GetCursor();
 	GetIconInfo(currentCursor, &iconInfo);
 	GetCursorPos(&cursorPosition);
 	cursorPosition.x -= (StitchWindowOrigin.x + iconInfo.xHotspot);
 	cursorPosition.y -= (StitchWindowOrigin.y + iconInfo.yHotspot);
-	// ToDo - Allocate memory for cursor bitmap
+	bitmapBits = new unsigned char[64];
 	// ToDo - replace with GetDIBits
-	GetBitmapBits(iconInfo.hbmMask, 256, (unsigned char*)&MarkedStitchMap);
+	GetBitmapBits(iconInfo.hbmMask, 256, &bitmapBits);
 	if (currentCursor == ArrowCursor) {
 
 		for (iRow = 0; iRow < 32; iRow++) {
 
-			mask = duswap(MarkedStitchMap[iRow]);
-			bitmapInverse = duswap(MarkedStitchMap[iRow + 32]);
+			mask = duswap(bitmapBits[iRow]);
+			bitmapInverse = duswap(bitmapBits[iRow + 32]);
 			bitMask = 0x80000000;
 			for (iPixel = 0; iPixel < 32; iPixel++) {
 
@@ -12813,7 +12814,7 @@ void ritcur() {
 
 		for (iRow = 0; iRow < 32; iRow++) {
 
-			bitmapInverse = duswap(MarkedStitchMap[iRow + 32]);
+			bitmapInverse = duswap(bitmapBits[iRow + 32]);
 			bitMask = 0x80000000;
 			for (iPixel = 0; iPixel < 32; iPixel++) {
 
@@ -12823,6 +12824,7 @@ void ritcur() {
 			}
 		}
 	}
+	delete[] bitmapBits;
 }
 
 void delsfrms(unsigned code) {
