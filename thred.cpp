@@ -7157,6 +7157,10 @@ void unthum() {
 		butxt(HNUM, "");
 		redraw(ButtonWin[HHID]);
 		butxt(HBOXSEL, StringTable[STR_BOXSEL]);
+		// allocated in thumnail
+		delete[] ThumbnailNames;
+		delete[] Thumbnails;
+		
 	}
 }
 
@@ -11620,9 +11624,9 @@ void thumnail() {
 	unbsho();
 	undat();
 	untrace();
-	// // Todo - Allocate memory locally for ThumbnailNames & Thumbnails
-	ThumbnailNames = (TCHAR*)OSequence;
-	Thumbnails = (TCHAR**)&OSequence[MAXITEMS >> 1];
+	// ToDo - Check for a better value than MAXITEMS/2
+	ThumbnailNames = new TCHAR[MAXITEMS >> 1];
+	Thumbnails = new TCHAR*[MAXITEMS >> 1];
 
 	SetCurrentDirectory(DefaultDirectory);
 	strcpy_s(SearchName, DefaultDirectory);
@@ -12137,8 +12141,7 @@ void rngal() {
 	if (!rstMap(WASFPNT)) {
 
 		rstMap(GRPSEL);
-		// ToDo - Allocate memory correctly for stitch ranges
-		prng = (RANGE*)&BSequence;
+		prng = new RANGE[];
 		rstMap(GRPSEL);
 		while (iStitch < PCSHeader.stitchCount) {
 
@@ -12186,6 +12189,7 @@ void rngal() {
 			}
 			gotbox();
 		}
+		delete[] prng;
 	}
 }
 
