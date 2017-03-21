@@ -1789,3 +1789,8 @@ typedef struct _badcnts	{
 	int guideCount; // ToDo - is this an accurate description?
 	int tx;
 }BADCNTS;
+
+typedef struct _findInfo {
+	unsigned			count;
+	WIN32_FIND_DATA*	data;
+}FINDINFO;

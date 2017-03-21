@@ -12826,80 +12826,86 @@ void ritcur() {
 	delete[] bitmapBits;
 }
 
+#pragma warning (push)
+#pragma warning (disable : 6001)
+#pragma warning (disable : 6385)
 void delsfrms(unsigned code) {
 
 	unsigned	iForm, formFlagWordCount, iWord;
 	unsigned	validFormCount, deletedFormCount, iStitch, validStitchCount;
-	unsigned*	formIndices;			
+	unsigned*	formIndices;
 
 	if (code) {
+		if (FormIndex) {
+			// ToDo - why does this result in a 6001 warning
+			formIndices = new unsigned[FormIndex];
+			formFlagWordCount = (FormIndex >> 5) + 1;
+			// ToDo - use local memory allocation for map of deleted forms instead of MarkedStitchMap
+			for (iWord = 0; iWord < formFlagWordCount; iWord++)
+				MarkedStitchMap[iWord] = 0;
+			for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+				// ToDo - Could ClosestFormToCursor be replaced with a local variable?
+				ClosestFormToCursor = SelectedFormList[iForm];
+				setr(ClosestFormToCursor);
+				fvars(ClosestFormToCursor);
+				f1del();
+			}
+			validFormCount = 0; deletedFormCount = 0;
+			for (iForm = 0; iForm < FormIndex; iForm++) {
 
-		formFlagWordCount = (FormIndex >> 5) + 1;
-		// ToDo - use local memory allocation for map of deleted forms instead of MarkedStitchMap
-		for (iWord = 0; iWord < formFlagWordCount; iWord++)
-			MarkedStitchMap[iWord] = 0;
-		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			// ToDo - Could ClosestFormToCursor be replaced with a local variable?
-			ClosestFormToCursor = SelectedFormList[iForm];
-			setr(ClosestFormToCursor); 
-			fvars(ClosestFormToCursor);
-			f1del();
-		}
-		formIndices = new unsigned[FormIndex];
-		validFormCount = 0; deletedFormCount = 0;
-		for (iForm = 0; iForm < FormIndex; iForm++) {
+				if (!chkr(iForm)) {
 
-			if (!chkr(iForm)) {
+					frmcpy(&FormList[validFormCount], &FormList[iForm]);
+					formIndices[iForm] = (iForm - deletedFormCount) << 4;
+					validFormCount++;
+				} else
+					deletedFormCount++;
+			}
+			FormIndex = validFormCount;
+			validStitchCount = 0;
+			if (chkMap(DELTO)) {
 
-				frmcpy(&FormList[validFormCount], &FormList[iForm]);
-				formIndices[iForm] = (iForm - deletedFormCount) << 4;
-				validFormCount++;
-			} else
-				deletedFormCount++;
-		}
-		FormIndex = validFormCount;
-		validStitchCount = 0;
-		if (chkMap(DELTO)) {
+				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+					if (StitchBuffer[iStitch].attribute&ALTYPMSK) {
 
-				if (StitchBuffer[iStitch].attribute&ALTYPMSK) {
+						iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
+						if (!chkr(iForm)) {
 
-					iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
-					if (!chkr(iForm)) {
+							StitchBuffer[validStitchCount].attribute = StitchBuffer[iStitch].attribute &= NFRMSK;
+							StitchBuffer[validStitchCount].attribute |= formIndices[code];
+							StitchBuffer[validStitchCount].x = StitchBuffer[iStitch].x;
+							StitchBuffer[validStitchCount++].y = StitchBuffer[iStitch].y;
+						}
+					} else {
 
-						StitchBuffer[validStitchCount].attribute = StitchBuffer[iStitch].attribute &= NFRMSK;
-						StitchBuffer[validStitchCount].attribute |= formIndices[code];
+						StitchBuffer[validStitchCount].attribute = StitchBuffer[iStitch].attribute;
 						StitchBuffer[validStitchCount].x = StitchBuffer[iStitch].x;
 						StitchBuffer[validStitchCount++].y = StitchBuffer[iStitch].y;
 					}
-				} else {
+				}
+				PCSHeader.stitchCount = validStitchCount;
+			} else {
 
-					StitchBuffer[validStitchCount].attribute = StitchBuffer[iStitch].attribute;
-					StitchBuffer[validStitchCount].x = StitchBuffer[iStitch].x;
-					StitchBuffer[validStitchCount++].y = StitchBuffer[iStitch].y;
+				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+
+					if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
+
+						iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
+						if (chkr(iForm))
+							StitchBuffer[iStitch].attribute &= (NFRMSK&NTYPMSK);
+					}
 				}
 			}
-			PCSHeader.stitchCount = validStitchCount;
-		} else {
-
-			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
-				if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
-
-					iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
-					if (chkr(iForm))
-						StitchBuffer[iStitch].attribute &= (NFRMSK&NTYPMSK);
-				}
-			}
+			SelectedFormCount = 0;
+			delete[] formIndices;
+			rstMap(FORMSEL);
+			coltab();
+			setMap(RESTCH);
 		}
-		SelectedFormCount = 0;
-		delete[] formIndices;
-		rstMap(FORMSEL);
-		coltab();
-		setMap(RESTCH);
 	}
 }
+#pragma warning (pop)
 
 void nedon() {
 
@@ -13201,16 +13207,13 @@ void gsnap() {
 	}
 }
 
-void ritlock(HWND hwndlg) {
+void ritlock(WIN32_FIND_DATA* fileData, unsigned fileIndex, HWND hwndlg) {
 
 	unsigned			iFile;
-	WIN32_FIND_DATA*	fileData;
 
-	// Todo - Allocate memory locally for fileData
-	fileData = (WIN32_FIND_DATA*)&BSequence;
 	SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_RESETCONTENT, 0, 0);
 	SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
-	for (iFile = 0; iFile < ActivePointIndex; iFile++) {
+	for (iFile = 0; iFile < fileIndex; iFile++) {
 
 		if (fileData[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)
 			SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_ADDSTRING, 0, (long)fileData[iFile].cFileName);
@@ -13222,22 +13225,23 @@ void ritlock(HWND hwndlg) {
 BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	WIN32_FIND_DATA*	fileData;
-	HANDLE				searchResult;
-	TCHAR				searchName[_MAX_PATH];
-	TCHAR				fileName[_MAX_PATH];
-	unsigned			iFile, fileError;
-	HWND				lockHandle, unlockHandle;
-	// ToDo - use local variable for fileData
-	fileData = (WIN32_FIND_DATA*)&BSequence;
+	FINDINFO	*fileInfo;
+	HANDLE		searchResult;
+	TCHAR		searchName[_MAX_PATH];
+	TCHAR		fileName[_MAX_PATH];
+	unsigned	iFile, fileError;
+	HWND		lockHandle, unlockHandle;
+
 	switch (umsg) {
 
 	case WM_INITDIALOG:
 
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+		SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
+		fileInfo = reinterpret_cast<FINDINFO*>(lparam);
 		strcpy_s(searchName, DefaultDirectory);
 		strcat_s(searchName, "\\*.thr");
-		searchResult = FindFirstFile(searchName, &fileData[0]);
+		searchResult = FindFirstFile(searchName, &(fileInfo->data[0]));
 		if (searchResult == INVALID_HANDLE_VALUE) {
 
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Directory: %s has no .thr files\n", DefaultDirectory);
@@ -13245,14 +13249,15 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			EndDialog(hwndlg, wparam);
 			return TRUE;
 		}
-		// ToDo - Use a local variable
-		ActivePointIndex = 1;
-		while (FindNextFile(searchResult, &fileData[ActivePointIndex++]));
-		ActivePointIndex--;
-		ritlock(hwndlg);
+		fileInfo->count = 1;
+		while (FindNextFile(searchResult, &fileInfo->data[fileInfo->count++]));
+		fileInfo->count--;
+		ritlock(fileInfo->data, fileInfo->count, hwndlg);
 		break;
 
 	case WM_COMMAND:
+
+		fileInfo = reinterpret_cast<FINDINFO *>(GetWindowLongPtr(hwndlg, DWLP_USER));
 
 		switch (LOWORD(wparam)) {
 
@@ -13263,48 +13268,48 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 		case IDC_LOCKAL:
 
-			for (iFile = 0; iFile < ActivePointIndex; iFile++)
-				fileData[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
-			ritlock(hwndlg);
+			for (iFile = 0; iFile < fileInfo->count; iFile++)
+				fileInfo->data[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
+			ritlock(fileInfo->data, fileInfo->count, hwndlg);
 			break;
 
 		case IDC_UNLOCKAL:
 
-			for (iFile = 0; iFile < ActivePointIndex; iFile++)
-				fileData[iFile].dwFileAttributes &= 0xffffffff ^ FILE_ATTRIBUTE_READONLY;
-			ritlock(hwndlg);
+			for (iFile = 0; iFile < fileInfo->count; iFile++)
+				fileInfo->data[iFile].dwFileAttributes &= 0xffffffff ^ FILE_ATTRIBUTE_READONLY;
+			ritlock(fileInfo->data, fileInfo->count, hwndlg);
 			break;
 
 		case IDC_LOCK:
 
 			fileError = 0;
 			unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
-			for (iFile = 0; iFile < ActivePointIndex; iFile++) {
+			for (iFile = 0; iFile < fileInfo->count; iFile++) {
 
-				if (!(fileData[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
+				if (!(fileInfo->data[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
 
 					if (SendMessage(unlockHandle, LB_GETSEL, fileError, 0))
-						fileData[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
+						fileInfo->data[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
 					fileError++;
 				}
 			}
-			ritlock(hwndlg);
+			ritlock(fileInfo->data, fileInfo->count, hwndlg);
 			break;
 
 		case IDC_UNLOCK:
 
 			fileError = 0;
 			lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
-			for (iFile = 0; iFile < ActivePointIndex; iFile++) {
+			for (iFile = 0; iFile < fileInfo->count; iFile++) {
 
-				if ((fileData[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
+				if ((fileInfo->data[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
 
 					if (SendMessage(lockHandle, LB_GETSEL, fileError, 0))
-						fileData[iFile].dwFileAttributes &= 0xffffffff ^ FILE_ATTRIBUTE_READONLY;
+						fileInfo->data[iFile].dwFileAttributes &= 0xffffffff ^ FILE_ATTRIBUTE_READONLY;
 					fileError++;
 				}
 			}
-			ritlock(hwndlg);
+			ritlock(fileInfo->data, fileInfo->count, hwndlg);
 			break;
 
 		case IDOK:
@@ -13312,11 +13317,11 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			strcpy_s(searchName, DefaultDirectory);
 			strcat_s(searchName, "\\");
 			fileError = 0;
-			for (iFile = 0; iFile < ActivePointIndex; iFile++) {
+			for (iFile = 0; iFile < fileInfo->count; iFile++) {
 
 				strcpy_s(fileName, searchName);
-				strcat_s(fileName, fileData[iFile].cFileName);
-				if (!SetFileAttributes(fileName, fileData[iFile].dwFileAttributes))
+				strcat_s(fileName, fileInfo->data[iFile].cFileName);
+				if (!SetFileAttributes(fileName, fileInfo->data[iFile].dwFileAttributes))
 					fileError++;
 			}
 			if (fileError) {
@@ -13333,8 +13338,16 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 }
 
 void lock() {
+	FINDINFO lockInfo;
 
-	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, (DLGPROC)LockPrc);
+	lockInfo.count = 0;
+	// ToDo - Replace 512 with maximum files in subdirectory
+	lockInfo.data = new WIN32_FIND_DATA[512];
+
+	DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, (DLGPROC)LockPrc, (LPARAM)&lockInfo);
+
+	delete[] lockInfo.data;
+
 }
 
 unsigned colsum(COLORREF color) {
