@@ -12141,7 +12141,7 @@ void rngal() {
 	if (!rstMap(WASFPNT)) {
 
 		rstMap(GRPSEL);
-		prng = new RANGE[];
+		prng = new RANGE[MAXITEMS];
 		rstMap(GRPSEL);
 		while (iStitch < PCSHeader.stitchCount) {
 
