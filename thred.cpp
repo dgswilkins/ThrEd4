@@ -552,7 +552,6 @@ unsigned		FileVersionIndex;		//points to old version to be read
 unsigned		ActiveLayer = 0;		//active layer
 unsigned		LayerIndex;				//active layer code
 unsigned		ClipFormsCount;			//number of forms the on the clipboard
-unsigned*		FormIndices;			//array of form indices for delete multiple forms
 POINT			StitchArrow[3];			//arrow for selected stitch
 RANGE			SelectedRange;			//first and last stitch for min/max stitch select
 unsigned		FileNameOrder[50];		//file name order table
@@ -12829,8 +12828,9 @@ void ritcur() {
 
 void delsfrms(unsigned code) {
 
-	unsigned iForm, formFlagWordCount, iWord;
-	unsigned validFormCount, deletedFormCount, iStitch, validStitchCount;
+	unsigned	iForm, formFlagWordCount, iWord;
+	unsigned	validFormCount, deletedFormCount, iStitch, validStitchCount;
+	unsigned*	formIndices;			
 
 	if (code) {
 
@@ -12838,22 +12838,21 @@ void delsfrms(unsigned code) {
 		// ToDo - use local memory allocation for map of deleted forms instead of MarkedStitchMap
 		for (iWord = 0; iWord < formFlagWordCount; iWord++)
 			MarkedStitchMap[iWord] = 0;
-		for (iForm = 0; (unsigned)iForm < SelectedFormCount; iForm++) {
+		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 			// ToDo - Could ClosestFormToCursor be replaced with a local variable?
 			ClosestFormToCursor = SelectedFormList[iForm];
 			setr(ClosestFormToCursor); 
 			fvars(ClosestFormToCursor);
 			f1del();
 		}
-		// ToDo - Allocate memory for FormIndices
-		FormIndices = (unsigned*)BSequence;
+		formIndices = new unsigned[FormIndex];
 		validFormCount = 0; deletedFormCount = 0;
 		for (iForm = 0; iForm < FormIndex; iForm++) {
 
 			if (!chkr(iForm)) {
 
 				frmcpy(&FormList[validFormCount], &FormList[iForm]);
-				FormIndices[iForm] = (iForm - deletedFormCount) << 4;
+				formIndices[iForm] = (iForm - deletedFormCount) << 4;
 				validFormCount++;
 			} else
 				deletedFormCount++;
@@ -12870,7 +12869,7 @@ void delsfrms(unsigned code) {
 					if (!chkr(iForm)) {
 
 						StitchBuffer[validStitchCount].attribute = StitchBuffer[iStitch].attribute &= NFRMSK;
-						StitchBuffer[validStitchCount].attribute |= FormIndices[code];
+						StitchBuffer[validStitchCount].attribute |= formIndices[code];
 						StitchBuffer[validStitchCount].x = StitchBuffer[iStitch].x;
 						StitchBuffer[validStitchCount++].y = StitchBuffer[iStitch].y;
 					}
@@ -12895,6 +12894,7 @@ void delsfrms(unsigned code) {
 			}
 		}
 		SelectedFormCount = 0;
+		delete[] formIndices;
 		rstMap(FORMSEL);
 		coltab();
 		setMap(RESTCH);
