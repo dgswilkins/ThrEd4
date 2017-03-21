@@ -523,7 +523,7 @@ enum {
 	WASCOL,		//mouse move started in a color box
 	ENTREG,		//user is entering an egg form
 	BADFIL,		//loaded file is corrupted
-	WASTRAC,	//traace bitmap loaded
+	WASTRAC,	//trace bitmap loaded
 	LANDSCAP,	//trace bitmap is landscape position
 	WASEDG,		//trace edge map was created
 	TRCUP,		//trace the up limit

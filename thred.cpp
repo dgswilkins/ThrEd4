@@ -12827,8 +12827,7 @@ void ritcur() {
 }
 
 #pragma warning (push)
-#pragma warning (disable : 6001)
-#pragma warning (disable : 6385)
+//#pragma warning (disable : 6001)
 void delsfrms(unsigned code) {
 
 	unsigned	iForm, formFlagWordCount, iWord;
@@ -12844,7 +12843,6 @@ void delsfrms(unsigned code) {
 			for (iWord = 0; iWord < formFlagWordCount; iWord++)
 				MarkedStitchMap[iWord] = 0;
 			for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-				// ToDo - Could ClosestFormToCursor be replaced with a local variable?
 				ClosestFormToCursor = SelectedFormList[iForm];
 				setr(ClosestFormToCursor);
 				fvars(ClosestFormToCursor);
@@ -22689,7 +22687,7 @@ void ritbak(TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 	fPOINT*		vertexList;
 	STREX		extendedHeader;
 	unsigned	fileTypeVersion = 0;
-	FRMHEDO*	formListExtended;
+	FRMHEDO*	formListOriginal;
 
 	thrEdFile = CreateFile(fileName, GENERIC_READ, 0, 0,
 		OPEN_EXISTING, 0, 0);
@@ -22798,25 +22796,24 @@ void ritbak(TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 
 				lines = new POINT[MAXFRMLINS];
 				SetFilePointer(thrEdFile, 80, 0, FILE_CURRENT);
-				formList = new FRMHED[stitchHeader.formCount];
+				formList = new FRMHED[stitchHeader.formCount]();
 				vertexList = new fPOINT[stitchHeader.vertexCount];
 				if (fileTypeVersion < 2) {
-					// Todo - Allocate memory locally for formListExtended
-					formListExtended = (FRMHEDO*)&BSequence;
-					ReadFile(thrEdFile, (FRMHEDO*)formListExtended, stitchHeader.formCount * sizeof(FRMHEDO), &BytesRead, 0);
-					if (BytesRead != stitchHeader.vertexCount * sizeof(FRMHEDO))
+					formListOriginal = new FRMHEDO[stitchHeader.formCount];
+					bytesToRead = stitchHeader.formCount * sizeof(FRMHEDO);
+					ReadFile(thrEdFile, formListOriginal, bytesToRead, &BytesRead, 0);
+					if (BytesRead != bytesToRead)
 						goto bakskp;
-					// ToDo - replace BSequence with formListExtended
-					FillMemory(&BSequence, 0, sizeof(FRMHED)*FormIndex);
 					for (iForm = 0; iForm < stitchHeader.formCount; iForm++) {
 
 						SelectedForm = &formList[iForm];
-						MoveMemory(SelectedForm, &formListExtended[iForm], sizeof(FRMHEDO));
+						MoveMemory(SelectedForm, &formListOriginal[iForm], sizeof(FRMHEDO));
 					}
+					delete[] formListOriginal;
 				} else {
 
 					bytesToRead = stitchHeader.formCount * sizeof(FRMHED);
-					ReadFile(thrEdFile, (FRMHED*)formList, bytesToRead, &BytesRead, 0);
+					ReadFile(thrEdFile, formList, bytesToRead, &BytesRead, 0);
 					if (BytesRead != bytesToRead)
 						goto bakskp;
 				}
