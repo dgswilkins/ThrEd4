@@ -14482,8 +14482,7 @@ void trdif() {
 	rstMap(TRSET);
 	rstMap(HIDMAP);
 	untrace();
-	// ToDo - use local memory allocation
-	DifferenceBitmap = (unsigned*)BSequence;
+	DifferenceBitmap = new unsigned[BitmapHeight*BitmapWidth];
 	colorSumMaximum = 0;
 	colorSumMinimum = 0xffffffff;
 	if (!chkMap(WASTRAC))
@@ -14523,6 +14522,7 @@ void trdif() {
 	setMap(WASDIF);
 	setMap(RESTCH);
 	tracwnd();
+	delete[] DifferenceBitmap;
 }
 
 void delstch() {
