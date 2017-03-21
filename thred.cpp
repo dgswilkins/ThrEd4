@@ -12873,7 +12873,7 @@ void delsfrms(unsigned code) {
 						if (!chkr(iForm)) {
 
 							StitchBuffer[validStitchCount].attribute = StitchBuffer[iStitch].attribute &= NFRMSK;
-							StitchBuffer[validStitchCount].attribute |= formIndices[code];
+							StitchBuffer[validStitchCount].attribute |= formIndices[iForm];
 							StitchBuffer[validStitchCount].x = StitchBuffer[iStitch].x;
 							StitchBuffer[validStitchCount++].y = StitchBuffer[iStitch].y;
 						}
