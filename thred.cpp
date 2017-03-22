@@ -14462,6 +14462,8 @@ unsigned trsum() {
 	return sumAdjacent;
 }
 
+#pragma warning (push)
+//#pragma warning (disable : 6001)
 void trdif() {
 
 	unsigned	iHeight, iPixel, iRGB, iWidth, adjustedColorSum;
@@ -14476,6 +14478,7 @@ void trdif() {
 	rstMap(TRSET);
 	rstMap(HIDMAP);
 	untrace();
+	// ToDo - why does this result in a 6001 warning
 	DifferenceBitmap = new unsigned[BitmapHeight*BitmapWidth];
 	colorSumMaximum = 0;
 	colorSumMinimum = 0xffffffff;
@@ -14518,6 +14521,7 @@ void trdif() {
 	tracwnd();
 	delete[] DifferenceBitmap;
 }
+#pragma warning (pop)
 
 void delstch() {
 
