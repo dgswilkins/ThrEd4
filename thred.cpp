@@ -613,9 +613,6 @@ COLORREF		DownPixelColor;			//color of the down reference pixel
 COLORREF		InvertUpColor;			//complement color of the up reference pixel
 COLORREF		InvertDownColor;		//complement color of the down reference pixel
 POINT			TraceMsgPoint;			//message point for trace parsing
-RECT			TraceHighMaskRect;		//high trace mask rectangle
-RECT			TraceMiddleMaskRect;	//middle trace mask rectangle
-RECT			TraceLowMaskRect;		//low trace mask rectangle
 unsigned		HighColors[3];			//separated upper reference colors
 unsigned		PixelColors[3];			//separated pixel reference colors
 unsigned		LowColors[3];			//separated lower reference colors
@@ -22847,7 +22844,7 @@ void ritbak(TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 	}
 }
 
-void durct(unsigned shift, RECT TraceControlRect) {
+void durct(unsigned shift, RECT traceControlRect, RECT* traceHighMask, RECT* traceMiddleMask, RECT* traceLowMask) {
 
 	unsigned	lowerColor, upperColor, controlHeight;
 	double		ratio;
@@ -22855,50 +22852,53 @@ void durct(unsigned shift, RECT TraceControlRect) {
 	lowerColor = (UpPixelColor >> shift) & 0xff;
 	upperColor = (DownPixelColor >> shift) & 0xff;
 	// ToDo - use local variable and parameter instead of Trace[High|Middle]MaskRect ?
-	TraceHighMaskRect.left = TraceLowMaskRect.left = TraceMiddleMaskRect.left = TraceControlRect.left;
-	TraceHighMaskRect.right = TraceLowMaskRect.right = TraceMiddleMaskRect.right = TraceControlRect.right;
-	controlHeight = TraceControlRect.bottom - TraceControlRect.top;
+	traceHighMask->left = traceLowMask->left = traceMiddleMask->left = traceControlRect.left;
+	traceHighMask->right = traceLowMask->right = traceMiddleMask->right = traceControlRect.right;
+	controlHeight = traceControlRect.bottom - traceControlRect.top;
 	ratio = (double)lowerColor / 255;
-	TraceMiddleMaskRect.top = controlHeight*ratio + TraceControlRect.top;
+	traceMiddleMask->top = controlHeight*ratio + traceControlRect.top;
 	ratio = (double)upperColor / 255;
-	TraceMiddleMaskRect.bottom = controlHeight*ratio + TraceControlRect.top;
+	traceMiddleMask->bottom = controlHeight*ratio + traceControlRect.top;
 	rstMap(DUHI);
 	rstMap(DULO);
 	if (lowerColor) {
 
 		setMap(DULO);
-		TraceLowMaskRect.bottom = TraceMiddleMaskRect.top;
-		TraceLowMaskRect.top = 0;
+		traceLowMask->bottom = traceMiddleMask->top;
+		traceLowMask->top = 0;
 	}
 	if (upperColor != 255) {
 
 		setMap(DUHI);
-		TraceHighMaskRect.top = TraceMiddleMaskRect.bottom;
-		TraceHighMaskRect.bottom = TraceControlRect.bottom;
+		traceHighMask->top = traceMiddleMask->bottom;
+		traceHighMask->bottom = traceControlRect.bottom;
 	}
 }
 
-void dublk(HDC dc) {
+void dublk(HDC dc, RECT* traceHighMask, RECT* traceLowMask) {
 
 	if (chkMap(DUHI))
-		FillRect(dc, &TraceHighMaskRect, BlackBrush);
+		FillRect(dc, traceHighMask, BlackBrush);
 	if (chkMap(DULO))
-		FillRect(dc, &TraceLowMaskRect, BlackBrush);
+		FillRect(dc, traceLowMask, BlackBrush);
 }
 
 LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
-	unsigned			position, iRGB, iColor, iThumb, iVersion, lastCharacter;
-	unsigned			screenCenterOffset;
-	SIZE				maxWindowDimension;
-	TCHAR				buffer[10];		//for integer to string conversion
-	unsigned			length;			//string length
-	SIZE				textSize;		//for measuring text items
-	POINT				scrollPoint;	//for scroll bar functions
-	POINT				line[2];
-	long				adjustedWidth;
-	double				tdub;
-	TCHAR				fileName[_MAX_PATH];
+	unsigned	position, iRGB, iColor, iThumb, iVersion, lastCharacter;
+	unsigned	screenCenterOffset;
+	SIZE		maxWindowDimension;
+	TCHAR		buffer[10];		//for integer to string conversion
+	unsigned	length;			//string length
+	SIZE		textSize;		//for measuring text items
+	POINT		scrollPoint;	//for scroll bar functions
+	POINT		line[2];
+	long		adjustedWidth;
+	double		tdub;
+	TCHAR		fileName[_MAX_PATH];
+	RECT		traceHighMaskRect;		//high trace mask rectangle
+	RECT		traceMiddleMaskRect;	//middle trace mask rectangle
+	RECT		traceLowMaskRect;		//low trace mask rectangle
 
 	switch (message) {
 
@@ -23167,9 +23167,9 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				}
 				if (DrawItem->hwndItem == TraceControlWindow[iRGB]) {
 
-					durct(TraceShift[iRGB], DrawItem->rcItem);
-					FillRect(DrawItem->hDC, &TraceMiddleMaskRect, TraceBrush[iRGB]);
-					dublk(DrawItem->hDC);
+					durct(TraceShift[iRGB], DrawItem->rcItem, &traceHighMaskRect, &traceMiddleMaskRect, &traceLowMaskRect);
+					FillRect(DrawItem->hDC, &traceMiddleMaskRect, TraceBrush[iRGB]);
+					dublk(DrawItem->hDC, &traceHighMaskRect, &traceLowMaskRect);
 					return 1;
 				}
 				if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
