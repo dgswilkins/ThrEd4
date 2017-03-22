@@ -285,7 +285,7 @@ double			HorizontalRatio;		//horizontal ratio between the zoom window
 POINT			FormLines[MAXFRMLINS];	//used in the form drawing routines
 unsigned		NewFormVertexCount;		//points in the new form
 FORMINFO		FormInfo;				//form info used in drawing forms
-FRMHED			FormList[MAXFORMS];		//a list of pointers to forms
+FRMHED			FormList[MAXFORMS];		//a list of form headers
 unsigned		FormIndex = 0;			//index into the list of forms
 double			StitchSpacing = DEFSPACE*PFGRAN;//stitch spacing in stitch units
 fPOINT*			CurrentFillVertices;	//pointer to the line of the polygon being filled
