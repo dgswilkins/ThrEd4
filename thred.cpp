@@ -5336,16 +5336,14 @@ dubl2 : mov		tdat, ecx
 }
 #endif
 
-void xofrm() {
+void xofrm(FRMHEDO*	formListOriginal) {
 
 	unsigned	iForm;
-	FRMHEDO*	formListCopy;
-	formListCopy = (FRMHEDO*)&BSequence;
-	// ToDo - Does this do anything valid? 
-	FillMemory(&BSequence, 0, sizeof(FRMHED)*FormIndex);
+	
+	FillMemory(FormList, sizeof(FRMHED)*FormIndex, 0);
 	// ToDo - find a better way to write original form header data into new version
 	for (iForm = 0; iForm < FormIndex; iForm++)
-		MoveMemory(&FormList[iForm], &formListCopy[iForm], sizeof(FRMHEDO));
+		MoveMemory(&FormList[iForm], &formListOriginal[iForm], sizeof(FRMHEDO));
 }
 
 void nuFil() {
@@ -5363,7 +5361,7 @@ void nuFil() {
 	TCHAR*			tnam;
 	DSTHED			dstHeader;
 	fRECTANGLE		stitchRect;
-	FRMHEDO*		formListCopy;
+	FRMHEDO*		formListOriginal;
 	long			totalBytesRead;
 
 #if PESACT
@@ -5567,15 +5565,14 @@ void nuFil() {
 						FormVertexIndex = SatinConnectIndex = ClipPointIndex = 0;
 						MsgBuffer[0] = 0;
 						if (version < 2) {
-							// Todo - Allocate memory locally for formListCopy and replace use of BSequence in xoform 
-							formListCopy = (FRMHEDO*)&BSequence;
-							ReadFile(FileHandle, (FRMHEDO*)formListCopy, FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
+							formListOriginal = new FRMHEDO[FormIndex];
+							ReadFile(FileHandle, (FRMHEDO*)formListOriginal, FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
 							if (BytesRead != FormIndex * sizeof(FRMHEDO)) {
 
 								FormIndex = BytesRead / sizeof(FRMHEDO);
 								setMap(BADFIL);
 							}
-							xofrm();
+							xofrm(formListOriginal);
 						} else {
 
 							ReadFile(FileHandle, (FRMHED*)FormList, FormIndex * sizeof(FRMHED), &BytesRead, 0);
