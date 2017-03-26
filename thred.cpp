@@ -2021,8 +2021,8 @@ void duzrat() {
 		ZoomRect.right = LHUPX;
 	if (!ZoomRect.top)
 		ZoomRect.top = LHUPY;
-	ZoomRatio.x = (double)(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
-	ZoomRatio.y = (double)(StitchWindowClientRect.bottom / (ZoomRect.top - ZoomRect.bottom));
+	ZoomRatio.x = static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
+	ZoomRatio.y = static_cast<double>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
 }
 
 unsigned rsed() {
@@ -15385,6 +15385,7 @@ unsigned chkMsg() {
 	RECT			windowRect;
 	SATCON*			guides;
 	TCHAR			buffer[20];
+	unsigned char*	clipCopyBuffer;
 	TCHAR			threadSizeMap[] = { '3','4','6' };
 	TXPNT*			textureDestination;
 	TXPNT*			textureSource;
@@ -19116,10 +19117,11 @@ unsigned chkMsg() {
 
 						duzrat();
 						byteCount = sizeof(FORMVERTEXCLIP) + (ClipFormVerticesData->vertexCount + 1) * sizeof(fPOINT);
-						// Todo - Allocate memory locally for ClipFormVerticesData and replace use of BSequence in MoveMemory
-						MoveMemory(&BSequence, ClipPointer, byteCount);
+						clipCopyBuffer = new unsigned char[byteCount];
+						MoveMemory(clipCopyBuffer, ClipPointer, byteCount);
 						GlobalUnlock(ClipMemory);
-						ClipFormVerticesData = (FORMVERTEXCLIP*)&BSequence;
+						CloseClipboard();
+						ClipFormVerticesData = (FORMVERTEXCLIP*)clipCopyBuffer;
 						if (chkMap(FRMPSEL)) {
 
 							fvars(ClosestFormToCursor);
@@ -19160,8 +19162,10 @@ unsigned chkMsg() {
 							setMap(SHOFRM);
 							dufrm();
 						}
+						delete[] clipCopyBuffer;
 						return 1;
 					}
+					// ToDo - Add more information to the clipboard so that memory can be allocated 
 					ClipFormsHeader = (FORMSCLIP*)ClipPointer;
 					if (ClipFormsHeader->clipType == CLP_FRMS) {
 
@@ -19243,11 +19247,7 @@ unsigned chkMsg() {
 						ratsr();
 						for (OutputIndex = 0; OutputIndex < (unsigned)ClipFormsCount; OutputIndex++) {
 
-#if  __UseASM__
 							fselrct(OutputIndex + FormIndex);
-#else
-							fselrct(OutputIndex + FormIndex);
-#endif
 							SelectedFormList[OutputIndex] = OutputIndex + FormIndex;
 						}
 						SelectedFormCount = ClipFormsCount;
@@ -19318,6 +19318,7 @@ unsigned chkMsg() {
 						setMap(SHOFRM);
 						dufrm();
 					}
+					CloseClipboard();
 				} else {
 
 					Clip = RegisterClipboardFormat(PcdClipFormat);
@@ -19328,8 +19329,8 @@ unsigned chkMsg() {
 						clpbox();
 						setMap(CLPSHO);
 					}
+					CloseClipboard();
 				}
-				CloseClipboard();
 			} else
 				closPnt();
 			break;
@@ -22855,7 +22856,6 @@ void durct(unsigned shift, RECT traceControlRect, RECT* traceHighMask, RECT* tra
 
 	lowerColor = (UpPixelColor >> shift) & 0xff;
 	upperColor = (DownPixelColor >> shift) & 0xff;
-	// ToDo - use local variable and parameter instead of Trace[High|Middle]MaskRect ?
 	traceHighMask->left = traceLowMask->left = traceMiddleMask->left = traceControlRect.left;
 	traceHighMask->right = traceLowMask->right = traceMiddleMask->right = traceControlRect.right;
 	controlHeight = traceControlRect.bottom - traceControlRect.top;
