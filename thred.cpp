@@ -8586,7 +8586,6 @@ void duclip() {
 					length += sizfclp();
 					msiz += FileSize;
 				}
-				// ToDo - Is global memory the right thing to use here?
 				ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, msiz + length);
 				ClipFormsHeader = frmsref(ThrEdClipPointer);
 				ClipFormsHeader->clipType = CLP_FRMS;
