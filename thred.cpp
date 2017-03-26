@@ -11917,9 +11917,8 @@ void insfil() {
 					if (fileHeader.vertexCount) {
 
 						if (version < 2) {
-							// Todo - Allocate memory locally for formHeader and replace use of BSequence in ReadFile
-							formHeader = (FRMHEDO*)&BSequence;
-							ReadFile(InsertedFileHandle, (FRMHEDO*)&BSequence, fileHeader.formCount * sizeof(FRMHEDO), &BytesRead, 0);
+							formHeader = new FRMHEDO[fileHeader.formCount];
+							ReadFile(InsertedFileHandle, formHeader, fileHeader.formCount * sizeof(FRMHEDO), &BytesRead, 0);
 							if (BytesRead != fileHeader.formCount * sizeof(FRMHEDO)) {
 
 								FormIndex = BytesRead / sizeof(FRMHEDO);
@@ -11935,6 +11934,7 @@ void insfil() {
 									iFormList++;
 								}
 							}
+							delete[] formHeader;
 						} else
 							ReadFile(InsertedFileHandle, (FRMHED*)&FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), &BytesRead, 0);
 						ReadFile(InsertedFileHandle, (fPOINT*)&FormVertices[FormVertexIndex], fileHeader.vertexCount * sizeof(fPOINT), &BytesRead, 0);
