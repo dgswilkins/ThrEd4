@@ -5351,6 +5351,7 @@ void nuFil() {
 	unsigned		textureHistoryFlag, pcsStitchCount;
 	unsigned		iPCSstitch, iPESstitch, color, iColor;
 	unsigned		iColorChange;
+	unsigned char*	fileBuffer;
 	TCHAR*			fileExtention;
 	TCHAR			firstCharacter;
 	STRHED			thredHeader;
@@ -5703,10 +5704,11 @@ void nuFil() {
 					}
 #if PESACT
 					else {
-						// Todo - Allocate memory locally for ReadFile to replace use of BSequence
-						ReadFile(FileHandle, (BSEQPNT*)&BSequence, sizeof(BSequence), &BytesRead, 0);
-						pesHeader = (PESHED*)&BSequence;
-						l_peschr = (TCHAR*)&BSequence;
+						// ToDo - is there a better estimate for data size?
+						fileBuffer = new unsigned char[MAXITEMS * 8];
+						ReadFile(FileHandle, fileBuffer, MAXITEMS * 8, &BytesRead, 0);
+						pesHeader = (PESHED*)fileBuffer;
+						l_peschr = (TCHAR*)pesHeader;
 						if (strncmp(pesHeader->led, "#PES00", 6)) {
 
 							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Not a PES file: %s\n", WorkingFileName);
@@ -5714,7 +5716,7 @@ void nuFil() {
 							return;
 						}
 						pecof = tripl(pesHeader->off);
-						PESstitch = (unsigned char*)&l_peschr[pecof + 532];
+						PESstitch = fileBuffer + (pecof + 532);
 						ActivePointIndex = 0;
 						pesColorCount = (unsigned char*)&l_peschr[pecof + 48];
 						PEScolors = &pesColorCount[1];
@@ -5760,6 +5762,7 @@ void nuFil() {
 										locof = PESstitch[iPESstitch];
 								}
 								locof *= 0.6;
+								// ToDo - Use a new flag bit for this since FILDIR is not correct
 								if (toglMap(FILDIR)) {
 
 									loc.y -= locof;
@@ -5775,6 +5778,7 @@ void nuFil() {
 						PCSHeader.stitchCount = iActualPESstitches;
 						//IniFile.auxFileType=AUXPES;
 						hupfn();
+						delete[] fileBuffer;
 					}
 #endif
 				} else {
@@ -6104,7 +6108,7 @@ void ritpcol(unsigned char colorIndex) {
 		mov[ebx], eax
 	}
 #else
-	// ToDo - Rewrite assembler 
+	// ToDo - Complete translation from assembler
 	_asm {
 
 		mov		ebx, OutputIndex
@@ -6224,15 +6228,14 @@ void rpcrd(float stitchDelta) {
 	}
 }
 
-void pecdat() {
+void pecdat(TCHAR* buffer) {
 
 	unsigned	iStitch, color, iColor;
 
 	OutputIndex = 532;
 	iColor = 1;
 	color = StitchBuffer[0].attribute&COLMSK;
-	// Todo - Allocate memory locally for PESdata
-	PESdata = (TCHAR*)&BSequence;
+	PESdata = buffer;
 	PEScolors = (unsigned char*)&PESdata[49];
 	rpcrd(StitchBuffer[0].x);
 	rpcrd(-StitchBuffer[0].y);
@@ -6449,7 +6452,6 @@ void sav() {
 			pesHeader.xsiz = boundingRect.right - boundingRect.left;
 			pesHeader.ysiz = boundingRect.top - boundingRect.bottom;
 			OutputIndex = 0;
-			//PESstitches = (PESTCH*)&BSequence;
 			// There cannot be more color changes than stitches
 			PESstitches = new PESTCH[PCSHeader.stitchCount * 2];
 			ritpes(0);
@@ -6489,15 +6491,15 @@ void sav() {
 			pesHeader.ysiz = 10000;
 			WriteFile(PCSFileHandle, (PESHED*)&pesHeader, sizeof(PESHED), &bytesWritten, 0);
 			WriteFile(PCSFileHandle, PESstitches, OutputIndex * sizeof(PESTCH), &bytesWritten, 0);
-			// ToDo - this code sequence needs to be looked at closely
+			delete[] PESstitches;
 			iHeader = pesnam();
-			//pchr = (TCHAR*)&BSequence;
-			pchr = new TCHAR[532];
+			// ToDo - is there a better estimate for data size?
+			pchr = new TCHAR[MAXITEMS * 4];
 			while (iHeader < 512)
 				pchr[iHeader++] = ' ';
 			pchr[19] = 13;
 			pchr[48] = (TCHAR)pesColorCount;
-			pecdat();
+			pecdat(pchr);
 			upnt = (unsigned*)&pchr[514];
 			*upnt = OutputIndex - 512;
 			pchr[517] = 0x20;
@@ -6521,10 +6523,8 @@ void sav() {
 			pchr[530] = (TBYTE)0x82;	//vert msb
 			pchr[531] = (TBYTE)0xff;	//vert lsb
 			//WriteFile(PCSFileHandle, (TBYTE*)&BSequence, OutputIndex, &bytesWritten, 0);
-			WriteFile(PCSFileHandle, pchr, 532, &bytesWritten, 0);
-			WriteFile(PCSFileHandle, PESstitches, OutputIndex, &bytesWritten, 0);
+			WriteFile(PCSFileHandle, pchr, OutputIndex, &bytesWritten, 0);
 			delete[] pchr;
-			delete[] PESstitches;
 			break;
 #endif
 		default:
@@ -12826,7 +12826,7 @@ void ritcur() {
 }
 
 #pragma warning (push)
-//#pragma warning (disable : 6001)
+#pragma warning (disable : 6001)
 void delsfrms(unsigned code) {
 
 	unsigned	iForm, formFlagWordCount, iWord;
@@ -14468,7 +14468,7 @@ unsigned trsum() {
 }
 
 #pragma warning (push)
-//#pragma warning (disable : 6001)
+#pragma warning (disable : 6001)
 void trdif() {
 
 	unsigned	iHeight, iPixel, iRGB, iWidth, adjustedColorSum;
