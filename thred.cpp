@@ -6104,6 +6104,7 @@ void ritpcol(unsigned char colorIndex) {
 		mov[ebx], eax
 	}
 #else
+	// ToDo - Rewrite assembler 
 	_asm {
 
 		mov		ebx, OutputIndex
@@ -6448,8 +6449,9 @@ void sav() {
 			pesHeader.xsiz = boundingRect.right - boundingRect.left;
 			pesHeader.ysiz = boundingRect.top - boundingRect.bottom;
 			OutputIndex = 0;
-			// Todo - Allocate memory locally for PESstitches
-			PESstitches = (PESTCH*)&BSequence;
+			//PESstitches = (PESTCH*)&BSequence;
+			// There cannot be more color changes than stitches
+			PESstitches = new PESTCH[PCSHeader.stitchCount * 2];
 			ritpes(0);
 			PESstitches[OutputIndex].x = -32765; // 0x8003
 			PESstitches[OutputIndex++].y = 0;
@@ -6486,11 +6488,11 @@ void sav() {
 			pesHeader.xsiz = 10000;
 			pesHeader.ysiz = 10000;
 			WriteFile(PCSFileHandle, (PESHED*)&pesHeader, sizeof(PESHED), &bytesWritten, 0);
-			// Todo - replace use of BSequence with PESstitches
-			WriteFile(PCSFileHandle, (PESTCH*)&BSequence, OutputIndex << 2, &bytesWritten, 0);
+			WriteFile(PCSFileHandle, PESstitches, OutputIndex * sizeof(PESTCH), &bytesWritten, 0);
+			// ToDo - this code sequence needs to be looked at closely
 			iHeader = pesnam();
-			// Todo - Allocate memory locally for pchr
-			pchr = (TCHAR*)&BSequence;
+			//pchr = (TCHAR*)&BSequence;
+			pchr = new TCHAR[532];
 			while (iHeader < 512)
 				pchr[iHeader++] = ' ';
 			pchr[19] = 13;
@@ -6514,12 +6516,15 @@ void sav() {
 			//			pchr[529]=(TCHAR)0x0;
 			//			pchr[530]=(TCHAR)0x8f;
 			pchr[527] = (TBYTE)0x00;
-			pchr[528] = (TBYTE)0x80;	//hor	msb
-			pchr[529] = (TBYTE)0x80; //hor lsb
-			pchr[530] = (TBYTE)0x82; //vert msb
-			pchr[531] = (TBYTE)0xff; //vert lsb
-			// ToDo - replace use of BSequence with pchr
-			WriteFile(PCSFileHandle, (TBYTE*)&BSequence, OutputIndex, &bytesWritten, 0);
+			pchr[528] = (TBYTE)0x80;	//hor msb
+			pchr[529] = (TBYTE)0x80;	//hor lsb
+			pchr[530] = (TBYTE)0x82;	//vert msb
+			pchr[531] = (TBYTE)0xff;	//vert lsb
+			//WriteFile(PCSFileHandle, (TBYTE*)&BSequence, OutputIndex, &bytesWritten, 0);
+			WriteFile(PCSFileHandle, pchr, 532, &bytesWritten, 0);
+			WriteFile(PCSFileHandle, PESstitches, OutputIndex, &bytesWritten, 0);
+			delete[] pchr;
+			delete[] PESstitches;
 			break;
 #endif
 		default:
