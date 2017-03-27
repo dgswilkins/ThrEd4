@@ -14033,8 +14033,7 @@ void dutrac() {
 		InitialDirection = TraceDirection;
 		point = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
 		ActivePointIndex = 1;
-		// ToDo - Use local memory for tracedPoints
-		tracedPoints = (TRCPNT*)BSequence;
+		tracedPoints = new TRCPNT[MAXITEMS * 8];
 		tracedPoints[0].x = CurrentTracePoint.x;
 		tracedPoints[0].y = CurrentTracePoint.y;
 		while (trcbit());
@@ -14106,6 +14105,7 @@ void dutrac() {
 				traceLengthSum = 0;
 			}
 		}
+		delete[] tracedPoints;
 		if (FormVertexIndex + OutputIndex > MAXITEMS) {
 
 			tabmsg(IDS_FRMOVR);
