@@ -8715,6 +8715,7 @@ void plbrd(double edgeSpacing) {
 	startVertex = getlast();
 	prebrd();
 	spacing = StitchSpacing;
+	// ToDo - Allocate local memory for FillVerticalRect
 	FillVerticalRect = (VRCT2*)BSequence;
 	UnderlayVerticalRect = &FillVerticalRect[VertexCount];
 	satout(SelectedForm->borderSize);
@@ -8777,6 +8778,7 @@ void pbrd(double edgeSpacing) {
 	spacing = StitchSpacing;
 	StitchSpacing = SelectedForm->edgeSpacing;
 	SequenceIndex = 0;
+	// ToDo - Allocate local memory for FillVerticalRect
 	FillVerticalRect = (VRCT2*)BSequence;
 	UnderlayVerticalRect = &FillVerticalRect[VertexCount];
 	start = getlast();

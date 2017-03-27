@@ -4881,6 +4881,7 @@ void movmap(unsigned cnt) {
 #else
 	// ToDo check translation
 	unsigned *source = TraceBitmapData;
+	// ToDo - Add parameter for destination
 	char *destination = (char *)BSequence;
 
 	for (unsigned i = 0; i < cnt; i++) {
@@ -4917,6 +4918,7 @@ void savmap() {
 			}
 			WriteFile(BitmapFileHandle, (BITMAPFILEHEADER*)&BitmapFileHeader, 14, &bytesWritten, NULL);
 			WriteFile(BitmapFileHandle, (BITMAPV4HEADER*)&BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14, &bytesWritten, NULL);
+			// ToDo - Allocate local memory for movmap and WriteFile
 			movmap(BitmapWidth*BitmapHeight);
 			WriteFile(BitmapFileHandle, (BSEQPNT*)BSequence, BitmapWidth*BitmapHeight * 3, &bytesWritten, NULL);
 			CloseHandle(BitmapFileHandle);
@@ -6492,9 +6494,10 @@ void sav() {
 			WriteFile(PCSFileHandle, (PESHED*)&pesHeader, sizeof(PESHED), &bytesWritten, 0);
 			WriteFile(PCSFileHandle, PESstitches, OutputIndex * sizeof(PESTCH), &bytesWritten, 0);
 			delete[] PESstitches;
-			iHeader = pesnam();
 			// ToDo - is there a better estimate for data size?
 			pchr = new TCHAR[MAXITEMS * 4];
+			// ToDo - Add buffer parameter and remove use of BSequence in pesname
+			iHeader = pesnam();
 			while (iHeader < 512)
 				pchr[iHeader++] = ' ';
 			pchr[19] = 13;
@@ -12032,6 +12035,7 @@ void insfil() {
 				if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16) {
 
 					savdo();
+					// ToDo - Allocate local memory for pcsStitchBuffer
 					pcsStitchBuffer = (PCSTCH*)BSequence;
 					ReadFile(InsertedFileHandle, (PCSTCH*)pcsStitchBuffer, pcsFileHeader.stitchCount * sizeof(PCSTCH), &BytesRead, NULL);
 					iStitch = PCSHeader.stitchCount;
@@ -13719,7 +13723,7 @@ void tracedg() {
 
 	if (!chkMap(WASTRAC))
 		trace();
-	// Todo - Allocate memory locally for TracedEdges
+	// Todo - Allocate memory locally for TracedEdges and replace use of BSequence in setrac/getrac
 	TracedEdges = (unsigned*)&OSequence[TraceDataSize];
 	for (iPixel = 0; iPixel < TraceDataSize; iPixel++)
 		TracedEdges[iPixel] = 0;
