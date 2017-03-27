@@ -13723,7 +13723,7 @@ void tracedg() {
 
 	if (!chkMap(WASTRAC))
 		trace();
-	// Todo - Allocate memory locally for TracedEdges and replace use of BSequence in setrac/getrac
+	// Todo - Allocate memory locally for TracedEdges and replace use of lower portion of OSequence in setrac/getrac
 	TracedEdges = (unsigned*)&OSequence[TraceDataSize];
 	for (iPixel = 0; iPixel < TraceDataSize; iPixel++)
 		TracedEdges[iPixel] = 0;
