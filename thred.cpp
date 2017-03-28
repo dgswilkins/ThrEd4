@@ -8669,7 +8669,6 @@ void duclip() {
 				clRmap(MAXITEMS);
 				for (iForm = 0; iForm < SelectedFormCount; iForm++)
 					setr(SelectedFormList[iForm]);
-				// Todo - Allocate memory locally for astch
 				astch = &StitchBuffer[MAXITEMS];
 				stitchCount = 0;
 				LowerLeftStitch.x = LowerLeftStitch.y = (float)1e30;
