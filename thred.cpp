@@ -601,8 +601,9 @@ unsigned*		TraceBitmapData;		//trace bitmap data
 POINT			CurrentTracePoint;		//current point being traced
 unsigned		TraceDataSize;			//size of the trace bitmap in double words
 unsigned*		TracedPixels;			//bitmap of selected trace pixels
-unsigned*		TracedEdges;			//detected edges of trace areas
-TRCPNT*			tracedPoints;			//collection of traced points
+unsigned*		TracedEdges = nullptr;	//detected edges of trace areas
+unsigned*		TracedMap = nullptr;	//in/out state of trace areas
+TRCPNT*			TracedPoints;			//collection of traced points
 TRCPNT*			DecimatedLine;			//differenced collection of traced points
 unsigned		TraceDirection;			//trace direction
 unsigned		InitialDirection;		//initial trace direction
@@ -13404,7 +13405,7 @@ void setrac(unsigned point) {
 		bts[ebx], eax
 	}
 #else
-	_bittestandset((long *)OSequence, point);
+	_bittestandset((long *)TracedMap, point);
 #endif
 }
 
@@ -13422,7 +13423,7 @@ BOOL getrac(unsigned point) {
 		getracx :
 	}
 #else
-	return _bittest((long *)OSequence, point);
+	return _bittest((long *)TracedMap, point);
 #endif
 }
 
@@ -13444,6 +13445,14 @@ void untrace() {
 
 		DeleteObject(TraceBitmap);
 		ReleaseDC(ThrEdWindow, TraceDC);
+		if (TracedEdges!=nullptr) {
+			delete[] TracedEdges; // allocated in tracedg
+			TracedEdges = nullptr;
+		}
+		if (TracedMap != nullptr) {
+			delete[] TracedMap; // allocated in trace
+			TracedMap = nullptr;
+		}
 		rstMap(WASEDG);
 		for (iColor = 0; iColor < 16; iColor++) {
 
@@ -13651,6 +13660,9 @@ void trace() {
 
 		usum = icolsum(UpPixelColor);
 		dsum = icolsum(DownPixelColor);
+		if (TracedMap == nullptr) {
+			TracedMap = new unsigned[TraceDataSize]();
+		}
 		for (index = 0; index < BitmapWidth*BitmapHeight; index++) {
 
 			psum = colsum(TraceBitmapData[index]);
@@ -13670,6 +13682,9 @@ void trace() {
 		trcols(InvertDownColor);
 		for (iRGB = 0; iRGB < 3; iRGB++)
 			LowColors[iRGB] = PixelColors[iRGB];
+		if (TracedMap == nullptr) {
+			TracedMap = new unsigned[TraceDataSize]();
+		}
 		for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
 
 			if (trcin(TraceBitmapData[iPixel]))
@@ -13724,9 +13739,7 @@ void tracedg() {
 	if (!chkMap(WASTRAC))
 		trace();
 	// Todo - Allocate memory locally for TracedEdges and replace use of lower portion of OSequence in setrac/getrac
-	TracedEdges = (unsigned*)&OSequence[TraceDataSize];
-	for (iPixel = 0; iPixel < TraceDataSize; iPixel++)
-		TracedEdges[iPixel] = 0;
+	TracedEdges = new unsigned[TraceDataSize]();
 	pixelIndex = 0;
 	for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
 
@@ -13888,14 +13901,14 @@ BOOL trcbit() {
 		}
 		break;
 	}
-	if (tracedPoints[ActivePointIndex - 1].x != CurrentTracePoint.x || tracedPoints[ActivePointIndex - 1].y != CurrentTracePoint.y) {
+	if (TracedPoints[ActivePointIndex - 1].x != CurrentTracePoint.x || TracedPoints[ActivePointIndex - 1].y != CurrentTracePoint.y) {
 
-		tracedPoints[ActivePointIndex].x = CurrentTracePoint.x;
-		tracedPoints[ActivePointIndex++].y = CurrentTracePoint.y;
+		TracedPoints[ActivePointIndex].x = CurrentTracePoint.x;
+		TracedPoints[ActivePointIndex++].y = CurrentTracePoint.y;
 		if (ActivePointIndex >= 500000)
 			return 0;
 	}
-	if (TraceDirection == InitialDirection&&CurrentTracePoint.x == tracedPoints[0].x&&CurrentTracePoint.y == tracedPoints[0].y)
+	if (TraceDirection == InitialDirection&&CurrentTracePoint.x == TracedPoints[0].x&&CurrentTracePoint.y == TracedPoints[0].y)
 		return 0;
 	else
 		return 1;
@@ -14037,33 +14050,33 @@ void dutrac() {
 		InitialDirection = TraceDirection;
 		point = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
 		ActivePointIndex = 1;
-		tracedPoints = new TRCPNT[MAXITEMS * 8];
-		tracedPoints[0].x = CurrentTracePoint.x;
-		tracedPoints[0].y = CurrentTracePoint.y;
+		TracedPoints = new TRCPNT[MAXITEMS * 8];
+		TracedPoints[0].x = CurrentTracePoint.x;
+		TracedPoints[0].y = CurrentTracePoint.y;
 		while (trcbit());
 		if (ActivePointIndex >= 500000) {
 
 			tabmsg(IDS_FRM2L);
 			return;
 		}
-		DecimatedLine = &tracedPoints[ActivePointIndex];
-		DecimatedLine[0].x = tracedPoints[0].x;
-		DecimatedLine[0].y = tracedPoints[0].y;
-		dutdif(&tracedPoints[0]);
+		DecimatedLine = &TracedPoints[ActivePointIndex];
+		DecimatedLine[0].x = TracedPoints[0].x;
+		DecimatedLine[0].y = TracedPoints[0].y;
+		dutdif(&TracedPoints[0]);
 		OutputIndex = 1;
 		for (iPoint = 1; iPoint < ActivePointIndex; iPoint++) {
 
 			TraceDiff1.x = TraceDiff0.x;
 			TraceDiff1.y = TraceDiff0.y;
-			dutdif(&tracedPoints[iPoint]);
+			dutdif(&TracedPoints[iPoint]);
 			if (TraceDiff1.x != TraceDiff0.x || TraceDiff1.y != TraceDiff0.y) {
 
-				DecimatedLine[OutputIndex].x = tracedPoints[iPoint].x;
-				DecimatedLine[OutputIndex++].y = tracedPoints[iPoint].y;
+				DecimatedLine[OutputIndex].x = TracedPoints[iPoint].x;
+				DecimatedLine[OutputIndex++].y = TracedPoints[iPoint].y;
 			}
 		}
-		tracedPoints[0].x = DecimatedLine[0].x;
-		tracedPoints[0].y = DecimatedLine[0].y;
+		TracedPoints[0].x = DecimatedLine[0].x;
+		TracedPoints[0].y = DecimatedLine[0].y;
 		iNext = 0;
 		ActivePointIndex = 0;
 		for (iCurrent = 1; iCurrent < OutputIndex; iCurrent++) {
@@ -14071,23 +14084,23 @@ void dutrac() {
 			traceLength = hypot(DecimatedLine[iCurrent].x - DecimatedLine[iNext].x, DecimatedLine[iCurrent].y - DecimatedLine[iNext].y);
 			if (traceLength > IniFile.traceLength) {
 
-				tracedPoints[ActivePointIndex].x = DecimatedLine[iNext].x;
-				tracedPoints[ActivePointIndex].y = DecimatedLine[iNext].y;
+				TracedPoints[ActivePointIndex].x = DecimatedLine[iNext].x;
+				TracedPoints[ActivePointIndex].y = DecimatedLine[iNext].y;
 				iNext = iCurrent;
 				ActivePointIndex++;
 			}
 		}
 		for (iCurrent = iNext + 1; iCurrent < OutputIndex; iCurrent++) {
 
-			tracedPoints[ActivePointIndex].x = DecimatedLine[iCurrent].x;
-			tracedPoints[ActivePointIndex].y = DecimatedLine[iCurrent].y;
+			TracedPoints[ActivePointIndex].x = DecimatedLine[iCurrent].x;
+			TracedPoints[ActivePointIndex].y = DecimatedLine[iCurrent].y;
 			ActivePointIndex++;
 		}
 		SelectedForm = &FormList[FormIndex];
 		frmclr(SelectedForm);
 		CurrentFormVertices = &FormVertices[FormVertexIndex];
-		CurrentFormVertices[0].x = tracedPoints[0].x*StitchBmpRatio.x;
-		CurrentFormVertices[0].y = tracedPoints[0].y*StitchBmpRatio.y;
+		CurrentFormVertices[0].x = TracedPoints[0].x*StitchBmpRatio.x;
+		CurrentFormVertices[0].y = TracedPoints[0].y*StitchBmpRatio.y;
 		iNext = 0;
 		OutputIndex = 0;
 		traceLengthSum = 0;
@@ -14097,19 +14110,19 @@ void dutrac() {
 			landscapeOffset = 0;
 		for (iCurrent = 1; iCurrent < ActivePointIndex; iCurrent++) {
 
-			traceLengthSum += hypot(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1].x, tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1].y);
-			traceLength = hypot(tracedPoints[iCurrent].x - tracedPoints[iNext].x, tracedPoints[iCurrent].y - tracedPoints[iNext].y);
+			traceLengthSum += hypot(TracedPoints[iCurrent].x - TracedPoints[iCurrent - 1].x, TracedPoints[iCurrent].y - TracedPoints[iCurrent - 1].y);
+			traceLength = hypot(TracedPoints[iCurrent].x - TracedPoints[iNext].x, TracedPoints[iCurrent].y - TracedPoints[iNext].y);
 			if (traceLengthSum > traceLength*IniFile.traceRatio) {
 
-				CurrentFormVertices[OutputIndex].x = tracedPoints[iCurrent - 1].x*StitchBmpRatio.x;
-				CurrentFormVertices[OutputIndex].y = tracedPoints[iCurrent - 1].y*StitchBmpRatio.y + landscapeOffset;
+				CurrentFormVertices[OutputIndex].x = TracedPoints[iCurrent - 1].x*StitchBmpRatio.x;
+				CurrentFormVertices[OutputIndex].y = TracedPoints[iCurrent - 1].y*StitchBmpRatio.y + landscapeOffset;
 				OutputIndex++;
 				iCurrent--;
 				iNext = iCurrent;
 				traceLengthSum = 0;
 			}
 		}
-		delete[] tracedPoints;
+		delete[] TracedPoints;
 		if (FormVertexIndex + OutputIndex > MAXITEMS) {
 
 			tabmsg(IDS_FRMOVR);
