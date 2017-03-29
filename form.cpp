@@ -3707,7 +3707,7 @@ void lcon() {
 				}
 			}
 			OutputIndex = 0;
-			TempPath = new RGSEQ[RegionCount];
+			TempPath = new RGSEQ[(RegionCount * (RegionCount - 1)) / 2];
 
 			//find the leftmost region in PathMap
 			SequencePathIndex = 1;
@@ -3729,7 +3729,7 @@ void lcon() {
 				nxtrgn();
 			iOutPath = 0;
 			count = 0xffffffff;
-			SequencePath = new FSEQ[RegionCount];
+			SequencePath = new FSEQ[(RegionCount * (RegionCount - 1)) / 2];
 			for (iPath = 0; iPath < SequencePathIndex; iPath++) {
 				SequencePath[iOutPath].skp = TempPath[iPath].skp;
 				if (TempPath[iPath].pcon == 0xffffffff) {
