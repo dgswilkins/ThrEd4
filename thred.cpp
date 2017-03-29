@@ -11983,7 +11983,6 @@ void insfil() {
 						}
 					}
 					if (fileHeader.headerType & 0x1000000) {
-						// ToDo - should FRMPW be sizeof(fPOINTATTR) etc.?
 						filscor = (double)fileHeader.formCount*FRMW +
 							gethand(&StitchBuffer[PCSHeader.stitchCount], fileHeader.stitchCount)*HANDW +
 							fileHeader.vertexLen*FRMPW +
@@ -13722,7 +13721,6 @@ void tracedg() {
 
 	if (!chkMap(WASTRAC))
 		trace();
-	// Todo - Allocate memory locally for TracedEdges and replace use of lower portion of OSequence in setrac/getrac
 	TracedEdges = new unsigned[TraceDataSize]();
 	pixelIndex = 0;
 	for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
@@ -13901,7 +13899,7 @@ BOOL trcbit() {
 void dutdif(TRCPNT* point) {
 
 	TraceDiff0.x = point[1].x - point[0].x;
-	// ToDo this is likely incorrect
+	// ToDo - this is likely incorrect
 	TraceDiff0.y = point[1].x - point[0].y;
 }
 
@@ -18370,7 +18368,7 @@ unsigned chkMsg() {
 		}
 		if (chkMap(FSETFSPAC) || chkMap(GTWLKIND))
 		{
-			// ToDo - add defines for keycode 'dash' and numpad 'subtract'
+			// Check for keycode 'dash' and numpad 'subtract'
 			if (code == 189 || code == 109)
 			{
 				*MsgBuffer = '-';
@@ -22753,9 +22751,8 @@ void ritbak(TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 				if (bytesToRead == BytesRead) {
 
 					SetFilePointer(thrEdFile, 16, 0, FILE_CURRENT);
-					// ToDo - replace 4 & 64 with SIZEOF
-					ReadFile(thrEdFile, (COLORREF*)&brushColor, 4, &BytesRead, 0);
-					ReadFile(thrEdFile, (COLORREF*)colors, 64, &BytesRead, 0);
+					ReadFile(thrEdFile, (COLORREF*)&brushColor, sizeof(COLORREF), &BytesRead, 0);
+					ReadFile(thrEdFile, (COLORREF*)colors, 16 * sizeof(COLORREF), &BytesRead, 0);
 					brush = CreateSolidBrush(brushColor);
 					SelectObject(drawItem->hDC, brush);
 					FillRect(drawItem->hDC, &drawItem->rcItem, brush);
