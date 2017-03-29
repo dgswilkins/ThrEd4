@@ -8715,9 +8715,9 @@ void plbrd(double edgeSpacing) {
 	startVertex = getlast();
 	prebrd();
 	spacing = StitchSpacing;
-	// ToDo - Allocate local memory for FillVerticalRect
-	FillVerticalRect = (VRCT2*)BSequence;
-	UnderlayVerticalRect = &FillVerticalRect[VertexCount];
+	// Ensure that we have at least 4 array members
+	FillVerticalRect = new VRCT2[VertexCount+5];
+	UnderlayVerticalRect = new VRCT2[VertexCount+5];
 	satout(SelectedForm->borderSize);
 	InsidePoints[VertexCount].x = InsidePoints[0].x;
 	InsidePoints[VertexCount].y = InsidePoints[0].y;
@@ -8768,6 +8768,8 @@ void plbrd(double edgeSpacing) {
 	plfn(&FillVerticalRect[0]);
 	StitchSpacing = edgeSpacing;
 	fvars(ClosestFormToCursor);
+	delete[] UnderlayVerticalRect;
+	delete[] FillVerticalRect;
 }
 
 void pbrd(double edgeSpacing) {
@@ -8778,9 +8780,8 @@ void pbrd(double edgeSpacing) {
 	spacing = StitchSpacing;
 	StitchSpacing = SelectedForm->edgeSpacing;
 	SequenceIndex = 0;
-	// ToDo - Allocate local memory for FillVerticalRect
-	FillVerticalRect = (VRCT2*)BSequence;
-	UnderlayVerticalRect = &FillVerticalRect[VertexCount];
+	FillVerticalRect = new VRCT2[VertexCount];
+	UnderlayVerticalRect = new VRCT2[VertexCount];
 	start = getlast();
 	satout(SelectedForm->borderSize);
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
@@ -8808,6 +8809,8 @@ void pbrd(double edgeSpacing) {
 	}
 	pfn(start, &FillVerticalRect[0]);
 	StitchSpacing = spacing;
+	delete[] UnderlayVerticalRect;
+	delete[] FillVerticalRect;
 }
 
 void prpsbrd() {

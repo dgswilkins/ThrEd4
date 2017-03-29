@@ -17,7 +17,6 @@ extern	unsigned		rstMap(unsigned bit);
 extern	unsigned		setMap(unsigned bit);
 extern void				shoMsg(TCHAR* string);
 
-extern	BSEQPNT			BSequence[BSEQLEN];
 extern	unsigned		ButtonHeight;
 extern	unsigned		ButtonWidthX3;
 extern	HWND			ButtonWin[9];
