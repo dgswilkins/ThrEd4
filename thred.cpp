@@ -12015,14 +12015,13 @@ void insfil() {
 					dufrm();
 				}
 			} else {
-
+				// ToDo - inserting PCS files is broken and needs to be fixed
 				ReadFile(InsertedFileHandle, (PCSHEADER*)&pcsFileHeader, 0x46, &BytesRead, NULL);
 				if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16) {
 
 					savdo();
-					// ToDo - Allocate local memory for pcsStitchBuffer
-					pcsStitchBuffer = (PCSTCH*)BSequence;
-					ReadFile(InsertedFileHandle, (PCSTCH*)pcsStitchBuffer, pcsFileHeader.stitchCount * sizeof(PCSTCH), &BytesRead, NULL);
+					pcsStitchBuffer = new PCSTCH[pcsFileHeader.stitchCount];
+					ReadFile(InsertedFileHandle, pcsStitchBuffer, pcsFileHeader.stitchCount * sizeof(PCSTCH), &BytesRead, NULL);
 					iStitch = PCSHeader.stitchCount;
 					newAttribute = 0;
 					for (iPCSStitch = 0; iPCSStitch < pcsFileHeader.stitchCount; iPCSStitch++) {
@@ -12036,6 +12035,7 @@ void insfil() {
 							StitchBuffer[iStitch++].attribute = newAttribute;
 						}
 					}
+					delete[] pcsStitchBuffer;
 					newStitchCount = iStitch;
 					iStitch = PCSHeader.stitchCount;
 					insertedRectangle.left = insertedRectangle.right = StitchBuffer[iPCSStitch].x;
