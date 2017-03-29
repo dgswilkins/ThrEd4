@@ -4865,37 +4865,22 @@ BOOL gudtyp(WORD bitCount) {
 	return 0;
 }
 
-void movmap(unsigned cnt) {
+void movmap(unsigned cnt, unsigned char *buffer) {
 
-#if  __UseASM__
-	_asm {
-
-		mov		ecx, cnt
-		mov		esi, TraceBitmapData
-		mov		edi, offset BSequence
-		movlup : mov		eax, [esi]
-				 add		esi, 4
-				 mov[edi], eax
-				 add		edi, 3
-				 loop	movlup
-	}
-#else
-	// ToDo check translation
 	unsigned *source = TraceBitmapData;
-	// ToDo - Add parameter for destination
-	char *destination = (char *)BSequence;
+	unsigned char *destination = buffer;
 
 	for (unsigned i = 0; i < cnt; i++) {
-		*(unsigned *)destination = *(source++);
+		*((unsigned *)destination) = *(source++);
 
 		destination += 3;
 	}
-#endif
 }
 
 void savmap() {
 
-	unsigned long		bytesWritten;
+	unsigned long	bytesWritten;
+	unsigned char*	buffer;
 
 	if (*PCSBMPFileName) {
 
@@ -4919,9 +4904,10 @@ void savmap() {
 			}
 			WriteFile(BitmapFileHandle, (BITMAPFILEHEADER*)&BitmapFileHeader, 14, &bytesWritten, NULL);
 			WriteFile(BitmapFileHandle, (BITMAPV4HEADER*)&BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14, &bytesWritten, NULL);
-			// ToDo - Allocate local memory for movmap and WriteFile
-			movmap(BitmapWidth*BitmapHeight);
-			WriteFile(BitmapFileHandle, (BSEQPNT*)BSequence, BitmapWidth*BitmapHeight * 3, &bytesWritten, NULL);
+			buffer = new unsigned char[(BitmapWidth*BitmapHeight * 3)+1];
+			movmap(BitmapWidth*BitmapHeight, buffer);
+			WriteFile(BitmapFileHandle, buffer, BitmapWidth*BitmapHeight * 3, &bytesWritten, NULL);
+			delete[] buffer;
 			CloseHandle(BitmapFileHandle);
 		}
 	} else
@@ -8802,7 +8788,6 @@ void duclip() {
 						ClipStitchData = deref(ClipPointer);
 						savclp(0, iSource);
 						ClipStitchData[0].led = length;
-						// ToDo - check use of iSource as the destination index
 						iSource++;
 						for (iStitch = 1; iStitch < length; iStitch++)
 							savclp(iStitch, iSource++);
