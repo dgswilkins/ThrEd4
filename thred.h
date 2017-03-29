@@ -1,6 +1,6 @@
 //compile switches
 #define		__UseASM__	0
-#define		PESACT		1			//compile pes code
+#define		PESACT		0			//compile pes code
 #define		BUGBAK		0			//turn bakseq off
 
 #define		TRCMTH		1			//0=brightness compare,1=color compare

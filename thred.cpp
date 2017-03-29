@@ -5693,7 +5693,7 @@ void nuFil() {
 					}
 #if PESACT
 					else {
-						// ToDo - is there a better estimate for data size?
+						// ToDo - (PES) is there a better estimate for data size?
 						fileBuffer = new unsigned char[MAXITEMS * 8];
 						ReadFile(FileHandle, fileBuffer, MAXITEMS * 8, &BytesRead, 0);
 						pesHeader = (PESHED*)fileBuffer;
@@ -5751,7 +5751,7 @@ void nuFil() {
 										locof = PESstitch[iPESstitch];
 								}
 								locof *= 0.6;
-								// ToDo - Use a new flag bit for this since FILDIR is not correct
+								// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
 								if (toglMap(FILDIR)) {
 
 									loc.y -= locof;
@@ -6097,7 +6097,7 @@ void ritpcol(unsigned char colorIndex) {
 		mov[ebx], eax
 	}
 #else
-	// ToDo - Complete translation from assembler
+	// ToDo - (PES) Complete translation from assembler
 	_asm {
 
 		mov		ebx, OutputIndex
@@ -6148,7 +6148,7 @@ pesnamx :	mov		eax, edi
 			sub		eax, offset BSequence
 	}
 #else
-	// ToDo - Complete translation from assembler
+	// ToDo - (PES) Complete translation from assembler
 	_asm {
 			mov		ebx, offset AuxName
 			mov		ecx, _MAX_PATH
@@ -6481,9 +6481,9 @@ void sav() {
 			WriteFile(PCSFileHandle, (PESHED*)&pesHeader, sizeof(PESHED), &bytesWritten, 0);
 			WriteFile(PCSFileHandle, PESstitches, OutputIndex * sizeof(PESTCH), &bytesWritten, 0);
 			delete[] PESstitches;
-			// ToDo - is there a better estimate for data size?
+			// ToDo - (PES) is there a better estimate for data size?
 			pchr = new TCHAR[MAXITEMS * 4];
-			// ToDo - Add buffer parameter and remove use of BSequence in pesname
+			// ToDo - (PES) Add buffer parameter and remove use of BSequence in pesname
 			iHeader = pesnam();
 			while (iHeader < 512)
 				pchr[iHeader++] = ' ';
