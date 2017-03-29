@@ -3634,8 +3634,9 @@ void lcon() {
 			}
 			RegionsList[iRegion].breakCount = count;
 		}
-		tempPathMap = new RCON[RegionCount + 1];
-		MapIndexSequence = new unsigned[RegionCount + 1];
+		// use the number of possible pairs of nodes n(n - 1)/2
+		tempPathMap = new RCON[(RegionCount * (RegionCount - 1))/2]();
+		MapIndexSequence = new unsigned[RegionCount + 1]();
 
 #if BUGSEQ
 		bugColor = 0; SequenceIndex = 0;
