@@ -5338,9 +5338,8 @@ void nuFil() {
 	unsigned		version;
 	DWORD			fileSizeHigh;
 	unsigned		textureHistoryFlag, pcsStitchCount;
-	unsigned		iPCSstitch, iPESstitch, color, iColor;
+	unsigned		iPCSstitch, color, iColor;
 	unsigned		iColorChange;
-	unsigned char*	fileBuffer;
 	TCHAR*			fileExtention;
 	TCHAR			firstCharacter;
 	STRHED			thredHeader;
@@ -5353,7 +5352,8 @@ void nuFil() {
 
 #if PESACT
 
-	unsigned		iActualPESstitches;
+	unsigned char*	fileBuffer;
+	unsigned		iActualPESstitches, iPESstitch;
 	PESHED*			pesHeader;
 	TCHAR*			l_peschr;
 	unsigned		pecof;
