@@ -217,8 +217,8 @@ TCHAR*	StringData;			//string storage
 
 TCHAR	HelpBuffer[HBUFSIZ];	//message formatting buffer
 
-void adbad(unsigned code, unsigned count)
-{
+void adbad(unsigned code, unsigned count) {
+
 	LoadString(ThrEdInstance, code, StringData, HBUFSIZ);
 	StringData = &StringData[strlen(StringData)];
 	LoadString(ThrEdInstance, IDS_NOTREP, HelpBuffer, HBUFSIZ);
@@ -226,17 +226,17 @@ void adbad(unsigned code, unsigned count)
 	StringData = &StringData[strlen(StringData)];
 }
 
-void hsizmsg()
-{
-	TCHAR buffer[HBUFSIZ];
+void hsizmsg() {
+
+	TCHAR	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_HSIZ, buffer, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, UnzoomedRect.x / PFGRAN, UnzoomedRect.y / PFGRAN);
 	shoMsg(HelpBuffer);
 }
 
-void msgflt(unsigned messageId, float value)
-{
+void msgflt(unsigned messageId, float value) {
+
 	TCHAR	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, messageId, buffer, HBUFSIZ);
@@ -549,28 +549,23 @@ void spltmsg() {
 	shoseln(IDS_FRMGUID, IDS_SPLT);
 }
 
-void datmsg(unsigned code)
-{
+void datmsg(unsigned code) {
 	TCHAR*	pchr;
 
 	pchr = MsgBuffer;
-	if (code&BADFLT)
-	{
+	if (code&BADFLT) {
 		LoadString(ThrEdInstance, IDS_BADFLT, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
-	if (code&BADCLP)
-	{
+	if (code&BADCLP) {
 		LoadString(ThrEdInstance, IDS_BADCLP, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
-	if (code&BADSAT)
-	{
+	if (code&BADSAT) {
 		LoadString(ThrEdInstance, IDS_BADSAT, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
-	if (code&BADTX)
-	{
+	if (code&BADTX) {
 		LoadString(ThrEdInstance, IDS_BADTX, pchr, HBUFSIZ);
 		pchr = &pchr[strlen(pchr)];
 	}
