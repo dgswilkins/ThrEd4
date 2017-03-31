@@ -10986,7 +10986,6 @@ void stchfrm(unsigned formIndex, unsigned* attribute) {
 }
 
 void frmnumfn(unsigned newFormIndex) {
-	// ToDo - Changing the form number does not seem to change the form number of the underlay stitches
 
 	unsigned	iForm, iStitch, sourceForm, start, finish, decodedFormIndex;
 
@@ -11021,7 +11020,7 @@ void frmnumfn(unsigned newFormIndex) {
 		mvsatk(SatinConnects, TempGuides, SatinConnectIndex);
 		mvflpnt(ClipPoints, TempClipPoints, ClipPointIndex);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (StitchBuffer[iStitch].attribute&TYPMSK) {
+			if (StitchBuffer[iStitch].attribute&SRTYPMSK) {
 				decodedFormIndex = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
 				if (decodedFormIndex == ClosestFormToCursor)
 					stchfrm(newFormIndex, &StitchBuffer[iStitch].attribute);
