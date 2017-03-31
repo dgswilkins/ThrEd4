@@ -2112,7 +2112,8 @@ unsigned dutyp(unsigned attribute) {
 		test	ebx, 0x20000000
 		je		short dutypx
 		mov		al, 1
-		dutypx:		and		eax, 0xf
+dutypx :
+		and		eax, 0xf
 	}
 #else
 	//correct

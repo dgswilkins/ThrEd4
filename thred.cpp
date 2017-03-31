@@ -1650,14 +1650,13 @@ unsigned setMap(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
-
 		xor		eax, eax
 		mov		ebx, offset FlagMap
 		mov		ecx, bit
-		bts[ebx], ecx
+		bts		[ebx], ecx
 		jnc		short setx
 		dec		eax
-		setx :
+setx :
 	}
 #else
 	return _bittestandset((long *)FlagMap, bit) ? 0xffffffff : 0;
@@ -1668,7 +1667,6 @@ void clrMap(unsigned mapLength) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		edi, offset FlagMap
 		mov		ecx, mapLength
 		xor		eax, eax
@@ -1683,14 +1681,13 @@ unsigned rstMap(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
-
 		xor		eax, eax
 		mov		ebx, offset FlagMap
 		mov		ecx, bit
-		btr[ebx], ecx
+		btr		[ebx], ecx
 		jnc		short rstx
 		dec		eax
-		rstx :
+rstx :
 	}
 #else
 	return _bittestandreset((long *)FlagMap, bit) ? 0xffffffff : 0;
@@ -1701,14 +1698,13 @@ unsigned toglMap(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
-
 		xor		eax, eax
 		mov		ebx, offset FlagMap
 		mov		edx, bit
-		btc[ebx], edx
+		btc		[ebx], edx
 		jnc		short toglx
 		dec		eax
-		toglx :
+toglx :
 	}
 #else
 	return _bittestandcomplement((long *)FlagMap, bit) ? 0xffffffff : 0;
@@ -1719,14 +1715,13 @@ unsigned chkMap(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
-
 		xor		eax, eax
 		mov		ebx, offset FlagMap
 		mov		edx, bit
-		bt[ebx], edx
+		bt		[ebx], edx
 		jnc		short chkx
 		dec		eax
-		chkx :
+chkx :
 	}
 #else
 	return _bittest((long *)FlagMap, bit) ? 0xffffffff : 0;
@@ -1737,15 +1732,14 @@ void cpymap(unsigned destinationBit, unsigned sourceBit) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		ebx, offset FlagMap
 		mov		eax, destinationBit
-		btr[ebx], eax
+		btr		[ebx], eax
 		mov		edx, sourceBit
-		bt[ebx], edx
+		bt		[ebx], edx
 		jnc		short cpx
-		bts[ebx], eax
-		cpx :
+		bts		[ebx], eax
+cpx :
 	}
 #else
 	// check translation
@@ -1763,14 +1757,13 @@ unsigned setu(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
-
 		xor		eax, eax
 		mov		ebx, offset UserFlagMap
 		mov		ecx, bit
-		bts[ebx], ecx
+		bts		[ebx], ecx
 		jnc		short setx
 		dec		eax
-		setx :
+setx :
 	}
 #else
 	return _bittestandset((long *)&UserFlagMap, bit) ? 0xffffffff : 0;
@@ -1781,14 +1774,13 @@ unsigned rstu(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
-
 		xor		eax, eax
 		mov		ebx, offset UserFlagMap
 		mov		ecx, bit
-		btr[ebx], ecx
+		btr		[ebx], ecx
 		jnc		short rstx
 		dec		eax
-		rstx :
+rstx :
 	}
 #else
 	return _bittestandreset((long *)&UserFlagMap, bit) ? 0xffffffff : 0;
@@ -1799,14 +1791,13 @@ unsigned chku(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
-
 		xor		eax, eax
 		mov		ebx, offset UserFlagMap
 		mov		edx, bit
-		bt[ebx], edx
+		bt		[ebx], edx
 		jnc		short chkx
 		dec		eax
-		chkx :
+chkx :
 	}
 #else
 	return _bittest((long *)&UserFlagMap, bit) ? 0xffffffff : 0;
@@ -1817,14 +1808,13 @@ unsigned toglu(unsigned bit) {
 
 #if  __UseASM__
 	_asm {
-
 		xor		eax, eax
 		mov		ebx, offset UserFlagMap
 		mov		edx, bit
-		btc[ebx], edx
+		btc		[ebx], edx
 		jnc		short toglx
 		dec		eax
-		toglx :
+toglx :
 	}
 #else
 	return _bittestandcomplement((long *)&UserFlagMap, bit) ? 0xffffffff : 0;
@@ -2285,7 +2275,6 @@ void stchcpy(unsigned count, fPOINTATTR* destination) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		esi, offset StitchBuffer
 		mov		edi, destination
 		mov		ecx, count
@@ -2317,7 +2306,6 @@ TCHAR* mvflpnt(fPOINT* destination, fPOINT* source, unsigned count) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		ecx, count
 		shl		ecx, 1
 		mov		esi, source
@@ -2335,7 +2323,6 @@ void mvsatk(SATCON* destination, SATCON* source, unsigned count) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		ecx, count
 		mov		esi, source
 		mov		edi, destination
@@ -2528,7 +2515,6 @@ void moveStitch(fPOINTATTR* destination, fPOINTATTR* source) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		esi, source
 		mov		edi, destination
 		xor		ecx, ecx
@@ -4621,7 +4607,6 @@ void stchred(unsigned count, fPOINTATTR* source) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		edi, offset StitchBuffer
 		mov		esi, source
 		mov		ecx, count
@@ -4807,23 +4792,22 @@ void bitlin(unsigned* source, unsigned* destination, COLORREF foreground, COLORR
 
 #if  __UseASM__
 	_asm {
-
 		mov		esi, source
 		mov		edi, destination
 		mov		ecx, BitmapWidth
 		xor		eax, eax
-
-		blup : mov		ebx, eax
-			   xor		bl, 7
-			   mov		edx, background
-			   bt[esi], ebx
-			   jnc		short blup1
-			   mov		edx, foreground
-
-			   blup1 : mov[edi], edx
-					   add		edi, 4
-					   inc		eax
-					   loop	blup
+blup : 
+		mov		ebx, eax
+		xor		bl, 7
+		mov		edx, background
+		bt		[esi], ebx
+		jnc		short blup1
+		mov		edx, foreground
+blup1 : 
+		mov		[edi], edx
+		add		edi, 4
+		inc		eax
+		loop	blup
 	}
 #else
 	//correct
@@ -4852,7 +4836,6 @@ COLORREF fswap(COLORREF color) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		eax, color
 		bswap	eax
 		shr		eax, 8
@@ -5060,7 +5043,6 @@ unsigned dtrn(DSTREC* dpnt) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		eax, dpnt
 		mov		eax, [eax]
 	}
@@ -5234,10 +5216,9 @@ unsigned tripl(TCHAR* dat) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		eax, dat
 		mov		eax, [eax]
-		and eax, 0xffffff
+		and		eax, 0xffffff
 	}
 #else
 	return (*(unsigned *)dat) & 0xffffff;
@@ -5300,7 +5281,7 @@ double dubl(unsigned char* pnt) {
 		test	cl, 8
 		je		short dubl1
 		mov		ch, 15
-		and cl, ch
+		and		cl, ch
 		sub		ch, cl
 		movzx	ecx, ch
 		shl		ecx, 8
@@ -5309,11 +5290,13 @@ double dubl(unsigned char* pnt) {
 		add		ecx, eax
 		neg		ecx
 		jmp		short dubl2
-		dubl1 : and		ecx, 0x7
-				shl		ecx, 8
-				add		ecx, ebx
-				dubl2 : mov		tdat, ecx
-						fild	tdat
+dubl1 :
+		and		ecx, 0x7
+		shl		ecx, 8
+		add		ecx, ebx
+dubl2 : 
+		mov		tdat, ecx
+		fild	tdat
 	}
 #else
 	unsigned tdat;
@@ -5326,7 +5309,7 @@ double dubl(unsigned char* pnt) {
 		test	cl, 8
 		je		short dubl1
 		mov		ch, 15
-		and cl, ch
+		and		cl, ch
 		sub		ch, cl
 		movzx	ecx, ch
 		shl		ecx, 8
@@ -5335,11 +5318,13 @@ double dubl(unsigned char* pnt) {
 		add		ecx, eax
 		neg		ecx
 		jmp		short dubl2
-		dubl1 : and		ecx, 0x7
-				shl		ecx, 8
-				add		ecx, ebx
-				dubl2 : mov		tdat, ecx
-						fild	tdat
+dubl1 : 
+		and		ecx, 0x7
+		shl		ecx, 8
+		add		ecx, ebx
+dubl2 :
+		mov		tdat, ecx
+		fild	tdat
 	}
 #endif
 }
@@ -5887,7 +5872,6 @@ void clrfbuf(unsigned count) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		edi, PCSStitchBuffer
 		mov		ecx, count
 		xor		eax, eax
@@ -5915,7 +5899,7 @@ void savdst(unsigned data) {
 		mov		DSTRecordCount, ecx
 		add		eax, DSTRecords
 		mov		ebx, data
-		mov[eax], ebx
+		mov		[eax], ebx
 	}
 #else
 	union {
@@ -6124,7 +6108,6 @@ void ritpcol(unsigned char colorIndex) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		ebx, OutputIndex
 		mov		eax, ebx
 		inc		eax
@@ -6133,7 +6116,7 @@ void ritpcol(unsigned char colorIndex) {
 		add		ebx, PESstitches
 		xor		eax, eax
 		mov		al, colorIndex
-		mov[ebx], eax
+		mov		[ebx], eax
 	}
 #else
 	// ToDo - (PES) Complete translation from assembler
@@ -6159,32 +6142,38 @@ unsigned pesnam() {
 		mov		ebx, offset AuxName
 		mov		ecx, _MAX_PATH
 		mov		edx, ebx
-		peslup0 : mov		al, [ebx]
-				  or al, al
-				  je		short peslup1
-				  cmp		al, '\\'
-				  jne		short peslup0a
-				  mov		edx, ebx
-				  peslup0a : inc		ebx
-							 loop	peslup0
-							 peslup1 : mov		ebx, edx
-									   cmp		byte ptr[ebx], '\\'
-									   jne		short peslup1a
-									   inc		ebx
-									   peslup1a : xor		ecx, ecx
-												  mov		cl, 17
-												  mov		edi, offset BSequence
-												  mov		dword ptr[edi], ':AL'
-												  add		edi, 3
-												  peslup : mov		al, [ebx]
-														   inc		ebx
-														   cmp		al, '.'
-														   je		pesnamx
-														   mov[edi], al
-														   inc		edi
-														   loop	peslup
-														   pesnamx : mov		eax, edi
-																	 sub		eax, offset BSequence
+		peslup0 :
+		mov		al, [ebx]
+		or		al, al
+		je		short peslup1
+		cmp		al, '\\'
+		jne		short peslup0a
+		mov		edx, ebx
+peslup0a :
+		inc		ebx
+		loop	peslup0
+peslup1 :
+		mov		ebx, edx
+		cmp		byte ptr[ebx], '\\'
+		jne		short peslup1a
+		inc		ebx
+peslup1a :
+		xor		ecx, ecx
+		mov		cl, 17
+		mov		edi, offset BSequence
+		mov		dword ptr[edi], ':AL'
+		add		edi, 3
+peslup :
+		mov		al, [ebx]
+		inc		ebx
+		cmp		al, '.'
+		je		pesnamx
+		mov[edi], al
+		inc		edi
+		loop	peslup
+pesnamx :
+		mov		eax, edi
+		sub		eax, offset BSequence
 	}
 #else
 	// ToDo - (PES) Complete translation from assembler
@@ -6192,32 +6181,38 @@ unsigned pesnam() {
 		mov		ebx, offset AuxName
 		mov		ecx, _MAX_PATH
 		mov		edx, ebx
-		peslup0 : mov		al, [ebx]
-				  or al, al
-				  je		short peslup1
-				  cmp		al, '\\'
-				  jne		short peslup0a
-				  mov		edx, ebx
-				  peslup0a : inc		ebx
-							 loop	peslup0
-							 peslup1 : mov		ebx, edx
-									   cmp		byte ptr[ebx], '\\'
-									   jne		short peslup1a
-									   inc		ebx
-									   peslup1a : xor		ecx, ecx
-												  mov		cl, 17
-												  mov		edi, offset BSequence
-												  mov		dword ptr[edi], ':AL'
-												  add		edi, 3
-												  peslup : mov		al, [ebx]
-														   inc		ebx
-														   cmp		al, '.'
-														   je		pesnamx
-														   mov[edi], al
-														   inc		edi
-														   loop	peslup
-														   pesnamx : mov		eax, edi
-																	 sub		eax, offset BSequence
+		peslup0 :
+		mov		al, [ebx]
+			or al, al
+			je		short peslup1
+			cmp		al, '\\'
+			jne		short peslup0a
+			mov		edx, ebx
+			peslup0a :
+		inc		ebx
+			loop	peslup0
+			peslup1 :
+		mov		ebx, edx
+			cmp		byte ptr[ebx], '\\'
+			jne		short peslup1a
+			inc		ebx
+			peslup1a :
+		xor		ecx, ecx
+			mov		cl, 17
+			mov		edi, offset BSequence
+			mov		dword ptr[edi], ':AL'
+			add		edi, 3
+			peslup :
+			mov		al, [ebx]
+			inc		ebx
+			cmp		al, '.'
+			je		pesnamx
+			mov[edi], al
+			inc		edi
+			loop	peslup
+			pesnamx :
+		mov		eax, edi
+			sub		eax, offset BSequence
 	}
 #endif
 }
@@ -7980,7 +7975,6 @@ CLPSTCH* deref(void* point) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		eax, point
 		mov		eax, [eax]
 	}
@@ -8469,7 +8463,6 @@ FORMCLIP* frmref(void* clipForm) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		eax, clipForm
 		mov		eax, [eax]
 	}
@@ -8482,7 +8475,6 @@ FORMSCLIP* frmsref(void* clipForms) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		eax, clipForms
 		mov		eax, [eax]
 	}
@@ -8495,7 +8487,6 @@ FORMVERTEXCLIP* fpref(void* clipVertex) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		eax, clipVertex
 		mov		eax, [eax]
 	}
@@ -9077,8 +9068,9 @@ BOOL cmpstch(unsigned iStitchA, unsigned iStitchB) {
 		jne		short ncmpx
 		mov		al, 1
 		jmp		short doscmpx
-		ncmpx : xor		eax, eax
-				doscmpx :
+ncmpx : 
+		xor		eax, eax
+doscmpx :
 	}
 #else
 	if (StitchBuffer[iStitchA].x != StitchBuffer[iStitchB].x)
@@ -9103,15 +9095,15 @@ void mvstch(unsigned destination, unsigned source) {
 		add		eax, offset StitchBuffer
 		mov		cl, 4
 		mov		edx, [eax]
-		mov[ebx], edx
+		mov		[ebx], edx
 		add		ebx, ecx
 		add		eax, ecx
 		mov		edx, [eax]
-		mov[ebx], edx
+		mov		[ebx], edx
 		add		ebx, ecx
 		add		eax, ecx
 		mov		edx, [eax]
-		mov[ebx], edx
+		mov		[ebx], edx
 	}
 #else
 	StitchBuffer[destination] = StitchBuffer[source];
@@ -10139,7 +10131,6 @@ unsigned nxtcrnr(unsigned corner) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		eax, corner
 		inc		eax
 		and		al, 3
@@ -11048,7 +11039,6 @@ void mvstchs(unsigned destination, unsigned source, unsigned count) {
 
 #if  __UseASM__
 	_asm {
-
 		xor		ecx, ecx
 		mov		cl, 12
 		mov		eax, destination
@@ -11600,23 +11590,25 @@ void strlcpy(TCHAR* destination, TCHAR* source) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		ebx, offset UpperCaseMap
 		mov		ecx, destination
 		mov		edx, source
 		xor		eax, eax
-		lup : mov		al, [edx]
-			  inc		edx
-			  or al, al
-			  je		lupx
-			  and		al, 0x7f
-			  bt[ebx], eax
-			  jnc		short lup1
-			  or al, 0x20
-			  lup1:		mov[ecx], al
-						inc		ecx
-						jmp		lup
-						lupx : mov[ecx], al
+lup :
+		mov		al, [edx]
+		inc		edx
+		or		al, al
+		je		lupx
+		and		al, 0x7f
+		bt		[ebx], eax
+		jnc		short lup1
+		or		al, 0x20
+lup1:
+		mov		[ecx], al
+		inc		ecx
+		jmp		lup
+lupx :
+		mov[ecx], al
 	}
 #else
 	//Correct
@@ -11642,14 +11634,13 @@ TCHAR lchr(int character) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		ebx, offset UpperCaseMap
 		mov		eax, character
 		and		eax, 0x7f
-		bt[ebx], eax
+		bt		[ebx], eax
 		jnc		short lchrx
-		or al, 0x20
-		lchrx:
+		or		al, 0x20
+lchrx:
 	}
 #else
 	TCHAR tchar = character & 0x7f;
@@ -12870,7 +12861,6 @@ unsigned duswap(unsigned data) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		eax, data
 		bswap	eax
 	}
@@ -13219,7 +13209,8 @@ void stchsnap(unsigned start, unsigned finish) {
 		je		short stchsnapx
 		add		eax, offset StitchBuffer
 		fld		IniFile.gridSize
-snplup : fld		dword ptr[eax]
+snplup : 
+		fld		dword ptr[eax]
 		fdiv	st, st(1)
 		frndint
 		fmul	st, st(1)
@@ -13258,7 +13249,8 @@ void frmsnap(fPOINT* start, unsigned count) {
 		shl		ecx, 1
 		je		short frmsnapx
 		fld		IniFile.gridSize
-snpflup : fld		dword ptr[eax]
+snpflup : 
+		fld		dword ptr[eax]
 		fdiv	st, st(1)
 		frndint
 		fmul	st, st(1)
@@ -13501,10 +13493,9 @@ COLORREF dwnshft(COLORREF color) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		eax, color
 		shr		eax, 1
-		and eax, 0x3f3f3f
+		and		eax, 0x3f3f3f
 	}
 #else
 	return (color >> 1) & 0x3f3f3f;
@@ -13515,10 +13506,9 @@ void setrac(unsigned point) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		eax, point
 		mov		ebx, offset OSequence
-		bts[ebx], eax
+		bts		[ebx], eax
 	}
 #else
 	_bittestandset((long *)TracedMap, point);
@@ -13529,14 +13519,13 @@ BOOL getrac(unsigned point) {
 
 #if  __UseASM__
 	_asm {
-
 		xor		eax, eax
 		mov		ecx, point
 		mov		ebx, offset OSequence
-		bt[ebx], ecx
+		bt		[ebx], ecx
 		jnc		short getracx
 		inc		eax
-		getracx :
+getracx :
 	}
 #else
 	return _bittest((long *)TracedMap, point);
@@ -13645,18 +13634,17 @@ void trcols(COLORREF color) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		eax, color
 		mov		ecx, offset PixelColors
 		movzx	ebx, al
-		mov[ecx], ebx
+		mov		[ecx], ebx
 		add		ecx, 4
 		movzx	ebx, ah
-		mov[ecx], ebx
+		mov		[ecx], ebx
 		shr		eax, 8
 		movzx	ebx, ah
 		add		ecx, 4
-		mov[ecx], ebx
+		mov		[ecx], ebx
 	}
 #else
 	PixelColors[0] = color & 0xff;
@@ -13822,10 +13810,9 @@ void setedg(unsigned point) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		eax, point
 		mov		ebx, TracedEdges
-		bts[ebx], eax
+		bts		[ebx], eax
 	}
 #else
 	_bittestandset((long *)TracedEdges, point);
@@ -13836,14 +13823,13 @@ BOOL chkedg(unsigned point) {
 
 #if  __UseASM__
 	_asm {
-
 		xor		eax, eax
 		mov		ecx, point
 		mov		ebx, TracedEdges
-		bt[ebx], ecx
+		bt		[ebx], ecx
 		jnc		short chkedgx
 		inc		eax
-		chkedgx :
+chkedgx :
 	}
 #else
 	return _bittest((long *)TracedEdges, point);
@@ -14287,22 +14273,25 @@ void chkref() {
 		mov		dl, al
 		mov		al, bl
 		mov		bl, dl
-		chklup1 : cmp		ah, bh
-				  jc		short chklup2
-				  mov		dl, ah
-				  mov		ah, bh
-				  mov		bh, dl
-				  chklup2 : ror		eax, 16
-							ror		ebx, 16
-							cmp		al, bl
-							jc		short chklup3
-							mov		dl, al
-							mov		al, bl
-							mov		bl, dl
-							chklup3 : rol		eax, 16
-									  rol		ebx, 16
-									  mov		UpPixelColor, eax
-									  mov		DownPixelColor, ebx
+chklup1 : 
+		cmp		ah, bh
+		jc		short chklup2
+		mov		dl, ah
+		mov		ah, bh
+		mov		bh, dl
+chklup2 : 
+		ror		eax, 16
+		ror		ebx, 16
+		cmp		al, bl
+		jc		short chklup3
+		mov		dl, al
+		mov		al, bl
+		mov		bl, dl
+chklup3 : 
+		rol		eax, 16
+		rol		ebx, 16
+		mov		UpPixelColor, eax
+		mov		DownPixelColor, ebx
 	}
 #else
 	// ToDo - check translation
@@ -14530,39 +14519,38 @@ void difbits(unsigned shift, unsigned* point) {
 
 #if  __UseASM__
 	_asm {
-
 		jmp		short difbts
-
-		difsub : mov		eax, [esi]
-				 shr		eax, cl
-				 and		eax, ebx
-				 mov[edi], eax
-				 add		edi, 4
-				 ret
-
-				 difbts : mov		esi, point
-						  mov		ecx, shift
-						  mov		edi, offset TraceAdjacentColors
-						  mov		ebx, 0xff
-						  mov		edx, BitmapWidth
-						  shl		edx, 2
-						  call	difsub		//4
-						  sub		esi, edx
-						  call	difsub		//1
-						  sub		esi, 4
-						  call	difsub		//0
-						  add		esi, 8
-						  call	difsub		//2
-						  add		esi, edx
-						  call	difsub		//5
-						  sub		esi, 8
-						  call	difsub		//3
-						  add		esi, edx
-						  call	difsub		//6
-						  add		esi, 4
-						  call	difsub		//7
-						  add		esi, 4
-						  call	difsub		//8
+difsub : 
+		mov		eax, [esi]
+		shr		eax, cl
+		and		eax, ebx
+		mov		[edi], eax
+		add		edi, 4
+		ret
+difbts : 
+		mov		esi, point
+		mov		ecx, shift
+		mov		edi, offset TraceAdjacentColors
+		mov		ebx, 0xff
+		mov		edx, BitmapWidth
+		shl		edx, 2
+		call	difsub		//4
+		sub		esi, edx
+		call	difsub		//1
+		sub		esi, 4
+		call	difsub		//0
+		add		esi, 8
+		call	difsub		//2
+		add		esi, edx
+		call	difsub		//5
+		sub		esi, 8
+		call	difsub		//3
+		add		esi, edx
+		call	difsub		//6
+		add		esi, 4
+		call	difsub		//7
+		add		esi, 4
+		call	difsub		//8
 	}
 #else
 	// ToDo - check translation
@@ -21324,35 +21312,34 @@ void ducurs(unsigned char* pnt) {
 
 #if  __UseASM__
 	_asm {
-
 		jmp		short delups
-
-delsubl : bswap	eax
-		mov[edi], eax
+delsubl : 
+		bswap	eax
+		mov		[edi], eax
 		add		edi, 4
 		bswap	eax
 		shl		eax, 1
 		loop	delsubl
 		ret
-
-delsubr : bswap	eax
-		mov[edi], eax
+delsubr : 
+		bswap	eax
+		mov		[edi], eax
 		add		edi, 4
 		bswap	eax
 		shr		eax, 1
 		loop	delsubr
 		ret
-
-delsubt : mov		eax, [esi]
+delsubt : 
+		mov		eax, [esi]
 		add		esi, 4
 		bswap	eax
-		mov[edi], eax
+		mov		[edi], eax
 		add		edi, 4
 		loop	delsubt
 		ret
-
 //form cursor
-delups : mov		ebx, pnt
+delups : 
+		mov		ebx, pnt
 		mov		edi, ebx
 		xor		ecx, ecx
 		mov		cl, 32
@@ -21362,32 +21349,32 @@ delups : mov		ebx, pnt
 		dec		eax
 		mov		edi, ebx
 		add		edi, 64
-		mov[edi], eax
+		mov		[edi], eax
 		mov		eax, 0x00ffff00
 		add		edi, 32
-		mov[edi], eax
+		mov		[edi], eax
 		sub		edi, 64
-		mov[edi], eax
+		mov		[edi], eax
 		mov		eax, 0x00018000
 		mov		cl, 16
-dulup0: or [edi], eax
+dulup0: 
+		or		[edi], eax
 		add		edi, 4
 		loop	dulup0
-
-		//dline cursor
-
+//dline cursor
 		add		ebx, 128
 		mov		edi, ebx
 		mov		ecx, 32
-		xor edx, edx
+		xor		edx, edx
 		inc		edx
 		mov		esi, edx
 		ror		esi, 1
-dulup:	mov		eax, edx
-		or eax, esi
-		or eax, 0x80000001
+dulup:	
+		mov		eax, edx
+		or		eax, esi
+		or		eax, 0x80000001
 		bswap	eax
-		mov[edi], eax
+		mov		[edi], eax
 		add		edi, 4
 		shl		edx, 1
 		shr		esi, 1
@@ -21395,10 +21382,9 @@ dulup:	mov		eax, edx
 		xor		eax, eax
 		dec		eax
 		sub		edi, 4
-		mov[edi], eax
-		mov[ebx], eax
-
-		//straight up needle cursor
+		mov		[edi], eax
+		mov		[ebx], eax
+//straight up needle cursor
 		add		ebx, 128
 		mov		edi, ebx
 		mov		eax, 0x0003c000
@@ -21413,8 +21399,7 @@ dulup:	mov		eax, edx
 		bswap	eax
 		mov		cl, 2
 		rep		stosd
-
-		//left up
+//left up
 		add		ebx, 128
 		mov		edi, ebx
 		mov		cl, 5
@@ -21429,8 +21414,7 @@ dulup:	mov		eax, edx
 		mov		esi, offset LeftUpCursorEnd
 		mov		cl, 3
 		call	delsubt
-
-		//left down
+//left down
 		add		ebx, 128
 		mov		edi, ebx
 		mov		esi, offset LeftDownCursorStart
@@ -21445,8 +21429,7 @@ dulup:	mov		eax, edx
 		mov		cl, 5
 		mov		esi, offset LeftDownCursorFinish
 		call	delsubt
-
-		//right up
+//right up
 		add		ebx, 128
 		mov		edi, ebx
 		mov		cl, 5
@@ -21461,8 +21444,7 @@ dulup:	mov		eax, edx
 		mov		esi, offset RightUpCursorFinish
 		mov		cl, 3
 		call	delsubt
-
-		//right down
+//right down
 		add		ebx, 128
 		mov		edi, ebx
 		mov		esi, offset RightDownCursorStart
@@ -21477,7 +21459,6 @@ dulup:	mov		eax, edx
 		mov		esi, offset RightDownCursorFinish
 		mov		cl, 5
 		call	delsubt
-
 	}
 #else
 	unsigned *zPnt = (unsigned *)pnt;
@@ -21582,7 +21563,6 @@ void duamsk() {
 
 #if  __UseASM__
 	_asm {
-
 		xor		eax, eax
 		dec		eax
 		xor		ecx, ecx
@@ -21643,22 +21623,19 @@ void duhom() {
 void bcpy(TCHAR* destination, TCHAR* source) {
 
 	_asm {
-
 		mov		ebx, source
 		mov		edx, destination
 		xor		eax, eax
-blup :	mov		al, [ebx]
+blup :	
+		mov		al, [ebx]
 		mov[edx], al
 		or eax, eax
 		je		short blupx
 		inc		ebx
 		inc		edx
 		jmp		blup
-			   blupx :
+blupx :
 	}
-	//#else
-	//	strcpy(destination, source);
-	//#endif
 }
 #endif
 
@@ -22196,14 +22173,13 @@ COLORREF defTxt(unsigned iColor) {
 
 #if  __UseASM__
 	_asm {
-
 		xor		eax, eax
 		mov		ecx, TextColorMap
 		mov		edx, iColor
 		bt		ecx, edx
 		jnc		short defx
 		mov		eax, 0xffffff
-		defx:
+defx:
 	}
 #else
 	return _bittest((long *)&TextColorMap, iColor) ? 0xffffff : 0;
@@ -22214,7 +22190,6 @@ void setCol(unsigned color) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		ebx, color
 		mov		eax, DisplayedColorBitmap
 		bts		eax, ebx
@@ -22245,10 +22220,10 @@ unsigned setRmp(unsigned bit) {
 		xor		eax, eax
 		mov		ebx, offset MarkedStitchMap
 		mov		ecx, bit
-		bts[ebx], ecx
+		bts		[ebx], ecx
 		jc		short setrm
 		dec		eax
-		setrm :
+setrm :
 	}
 #else
 	return _bittestandset((long *)MarkedStitchMap, bit) ? 0 : 0xffffffff;
@@ -22842,14 +22817,13 @@ unsigned chkCol(unsigned color) {
 
 #if  __UseASM__
 	_asm {
-
 		mov		ebx, color
 		mov		edx, DisplayedColorBitmap
 		xor		eax, eax
 		bt		edx, ebx
 		jnc		chk1
 		dec		eax
-		chk1 :
+chk1 :
 	}
 #else
 	return _bittest((long *)&DisplayedColorBitmap, color) ? 0xffffffff : 0;
@@ -23664,14 +23638,13 @@ int	fltex(int code) {
 	short	cw;
 
 	_asm {
-
 		xor		eax, eax
 		cmp		code, 0x10
 		jne		short fltex1
 		mov		cw, 0x27f
 		fldcw	cw
 		dec		eax
-		fltex1 :
+fltex1 :
 	}
 #else
 	if (code != 0x10)
