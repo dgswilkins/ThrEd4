@@ -3691,7 +3691,7 @@ void lcon() {
 			RegionsList[iRegion].breakCount = count;
 		}
 		// use the number of possible pairs of nodes n(n - 1)/2
-		tempPathMap = new RCON[(RegionCount * (RegionCount - 1)) / 2]();
+		tempPathMap = new RCON[((RegionCount * (RegionCount - 1)) / 2) + 1]();
 		MapIndexSequence = new unsigned[RegionCount + 1]();
 
 #if BUGSEQ
@@ -3763,7 +3763,7 @@ void lcon() {
 				}
 			}
 			OutputIndex = 0;
-			TempPath = new RGSEQ[(RegionCount * (RegionCount - 1)) / 2];
+			TempPath = new RGSEQ[((RegionCount * (RegionCount - 1)) / 2) + 1];
 
 			//find the leftmost region in PathMap
 			SequencePathIndex = 1;
@@ -3785,7 +3785,7 @@ lconskip:;
 				nxtrgn();
 			iOutPath = 0;
 			count = 0xffffffff;
-			SequencePath = new FSEQ[(RegionCount * (RegionCount - 1)) / 2];
+			SequencePath = new FSEQ[((RegionCount * (RegionCount - 1)) / 2) + 1];
 			for (iPath = 0; iPath < SequencePathIndex; iPath++) {
 				SequencePath[iOutPath].skp = TempPath[iPath].skp;
 				if (TempPath[iPath].pcon == 0xffffffff) {
