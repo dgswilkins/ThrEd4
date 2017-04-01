@@ -670,12 +670,11 @@ unsigned findclp(unsigned formIndex) {
 
 	unsigned	iForm;
 
-	// ToDo - iForm can never be < 0. fix condition so loop terminates
-	for (iForm = formIndex - 1; iForm >= 0; iForm--) {
-		if (iseclp(iForm))
-			return FormList[iForm].borderClipData - ClipPoints + FormList[iForm].clipEntries;
-		if (isclp(iForm))
-			return FormList[iForm].angleOrClipData.clip - ClipPoints + FormList[iForm].lengthOrCount.clipCount;
+	for (iForm = formIndex; iForm != 0; iForm--) {
+		if (iseclp(iForm - 1))
+			return FormList[iForm - 1].borderClipData - ClipPoints + FormList[iForm - 1].clipEntries;
+		if (isclp(iForm - 1))
+			return FormList[iForm - 1].angleOrClipData.clip - ClipPoints + FormList[iForm - 1].lengthOrCount.clipCount;
 	}
 	return 0;
 }
@@ -3133,7 +3132,8 @@ void duseq(unsigned start, unsigned finish) {
 	rstMap(SEQDUN);
 	topbak = SortedLines[start][1].line;
 	if (start > finish) {
-		for (iLine = start; (int)iLine >= (int)finish; iLine--) {
+		// ToDo - Does this loop terminate when finish = 0?
+		for (iLine = start; iLine >= finish; iLine--) {
 			if (setseq(iLine)) {
 				if (!setMap(SEQDUN))
 					duseq2(iLine);
@@ -3197,7 +3197,8 @@ void brkseq(unsigned start, unsigned finish) {
 	rstMap(SEQDUN);
 	if (start > finish) {
 		bgrp = SortedLines[start]->group + 1;
-		for (iLine = start; (int)iLine >= (int)finish; iLine--) {
+		// ToDo - Does this loop terminate when finish = 0?
+		for (iLine = start; iLine >= finish; iLine--) {
 			bgrp--;
 			if (SortedLines[iLine]->group != bgrp) {
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
@@ -6464,7 +6465,7 @@ void slbrd() {
 		for (iVertex = 0; iVertex < (unsigned)SelectedForm->vertexCount - 1; iVertex++)
 			sbfn(InsidePoints, iVertex, iVertex + 1);
 		toglMap(FILDIR);
-		for (iVertex = SelectedForm->vertexCount - 1; iVertex; iVertex--)
+		for (iVertex = SelectedForm->vertexCount - 1; iVertex != 0; iVertex--)
 			sbfn(InsidePoints, iVertex, iVertex - 1);
 	}
 	HorizontalLength2 = SelectedForm->borderSize;
@@ -6535,7 +6536,7 @@ void lapbrd() {
 	UserStitchLength = APSPAC;
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++)
 		bdrlin(iVertex, iVertex + 1, APSPAC);
-	for (iVertex = VertexCount - 1; iVertex; iVertex--)
+	for (iVertex = VertexCount - 1; iVertex != 0; iVertex--)
 		bdrlin(iVertex, iVertex - 1, APSPAC);
 	UserStitchLength = savedStitchLength;
 }
@@ -8104,7 +8105,7 @@ void duhart(unsigned sideCount) {
 	for (iVertex = lastVertex; iVertex < firstVertex; iVertex++)
 		CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - CurrentFormVertices[lastVertex - 1].x)*ratio + CurrentFormVertices[lastVertex - 1].x;
 	lastVertex = iDestination = iVertex;
-	for (iVertex = lastVertex - 2; iVertex; iVertex--) {
+	for (iVertex = lastVertex - 2; iVertex != 0; iVertex--) {
 		CurrentFormVertices[iDestination].y = CurrentFormVertices[iVertex].y;
 		CurrentFormVertices[iDestination].x = maximumX + maximumX - CurrentFormVertices[iVertex].x - 2 * (maximumX - CurrentFormVertices[0].x);
 		iDestination++;
@@ -10556,7 +10557,7 @@ void contf() {
 	highStep.x = highStep.y = 0;
 	highPoint.x = highPoint.y = 0;
 
-	for (iVertex = lowVertexIndex; iVertex; iVertex--) {
+	for (iVertex = lowVertexIndex; iVertex != 0; iVertex--) {
 		lowVertices[lowIndex].x = CurrentFormVertices[iVertex].x;
 		lowVertices[lowIndex].y = CurrentFormVertices[iVertex].y;
 		lowDeltas[lowIndex].x = CurrentFormVertices[iVertex - 1].x - CurrentFormVertices[iVertex].x;
@@ -10777,7 +10778,7 @@ void ribon() {
 					formHeader->vertices[iNewVertex].x = InsidePoints[iVertex].x;
 					formHeader->vertices[iNewVertex++].y = InsidePoints[iVertex].y;
 				}
-				for (iVertex = VertexCount - 1; iVertex; iVertex--) {
+				for (iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
 					formHeader->vertices[iNewVertex].x = OutsidePoints[iVertex].x;
 					formHeader->vertices[iNewVertex++].y = OutsidePoints[iVertex].y;
 				}
@@ -10795,7 +10796,7 @@ void ribon() {
 				formHeader->vertices[iNewVertex++].y = InsidePoints[0].y;
 				formHeader->vertices[iNewVertex].x = OutsidePoints[0].x;
 				formHeader->vertices[iNewVertex++].y = OutsidePoints[0].y;
-				for (iVertex = VertexCount - 1; iVertex; iVertex--) {
+				for (iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
 					formHeader->vertices[iNewVertex].x = OutsidePoints[iVertex].x;
 					formHeader->vertices[iNewVertex++].y = OutsidePoints[iVertex].y;
 				}
@@ -12260,7 +12261,6 @@ void clpcon() {
 		if (CurrentFormVertices[iVertex].y < BoundingRect.bottom)
 			BoundingRect.bottom = CurrentFormVertices[iVertex].y;
 	}
-	// ToDo - When copy-pasting multiple forms, ActivePoint Index is not being updated correctly
 	ActivePointIndex = 0;
 	for (iRegion = 0; iRegion < regionCount; iRegion++) {
 		RegionCrossingStart = iclpx[iRegion];
