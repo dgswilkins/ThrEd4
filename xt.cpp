@@ -4561,13 +4561,9 @@ txskp:;
 	rstMap(LASTXBAK);
 }
 
-// Disable the warning for Dereferencing NULL pointer since 'new' will throw an
-// exception rather than returning NULL
-#pragma warning(push)
-#pragma warning(disable : 28182)
 void setxt() {
 	TXPNT*	currentFormTexture;
-	int		iTexturePoint, count;
+	int		iTexturePoint, count, iSegment;
 
 	savtxt();
 	SelectedForm->wordParam = 0;
@@ -4579,12 +4575,14 @@ void setxt() {
 	count = SelectedForm->fillInfo.texture.count;
 	if (count) {
 		for (iTexturePoint = count - 1; iTexturePoint >= 0; iTexturePoint--) {
-			TextureSegments[currentFormTexture[iTexturePoint].line - 1].line = iTexturePoint;
-			TextureSegments[currentFormTexture[iTexturePoint].line - 1].stitchCount++;
+			if (currentFormTexture[iTexturePoint].line) {
+				iSegment = currentFormTexture[iTexturePoint].line - 1;
+				TextureSegments[iSegment].line = iTexturePoint;
+				TextureSegments[iSegment].stitchCount++;
+			}
 		}
 	}
 }
-#pragma warning(pop)
 
 void rtrtx() {
 	TXPNT*	currentFormTexture;

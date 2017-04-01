@@ -670,6 +670,7 @@ unsigned findclp(unsigned formIndex) {
 
 	unsigned	iForm;
 
+	// ToDo - iForm can never be < 0. fix condition so loop terminates
 	for (iForm = formIndex - 1; iForm >= 0; iForm--) {
 		if (iseclp(iForm))
 			return FormList[iForm].borderClipData - ClipPoints + FormList[iForm].clipEntries;
@@ -12335,7 +12336,9 @@ void clpcon() {
 				LineSegmentStart.y = LineSegmentEnd.y;
 			}
 		}
-		ClipStitchPoints[ActivePointIndex - 1].flag = 2;
+		if (ActivePointIndex) {
+			ClipStitchPoints[ActivePointIndex - 1].flag = 2;
+		};
 	}
 clpskp:;
 	delete[] iclpx;
