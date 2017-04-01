@@ -11692,6 +11692,7 @@ void rthumnam(unsigned iThumbnail) {
 	}
 }
 
+// Suppress warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead
 #pragma warning(push)
 #pragma warning(disable : 4996)
 void thumnail() {
@@ -12926,8 +12927,6 @@ void ritcur() {
 	delete[] bitmapBits;
 }
 
-#pragma warning (push)
-#pragma warning (disable : 6001)
 void delsfrms(unsigned code) {
 
 	unsigned	iForm, formFlagWordCount, iWord;
@@ -12936,8 +12935,7 @@ void delsfrms(unsigned code) {
 
 	if (code) {
 		if (FormIndex) {
-			// ToDo - why does this result in a 6001 warning
-			formIndices = new unsigned[FormIndex];
+			formIndices = new unsigned[FormIndex]();
 			formFlagWordCount = (FormIndex >> 5) + 1;
 			// ToDo - use local memory allocation for map of deleted forms instead of MarkedStitchMap
 			for (iWord = 0; iWord < formFlagWordCount; iWord++)
@@ -13006,7 +13004,6 @@ void delsfrms(unsigned code) {
 		}
 	}
 }
-#pragma warning (pop)
 
 void nedon() {
 
@@ -13195,8 +13192,6 @@ void frmcursel(unsigned cursorType) {
 	setMap(DUMEN);
 }
 
-#pragma warning (push)
-#pragma warning (disable : 4725)
 void stchsnap(unsigned start, unsigned finish) {
 
 #if  __UseASM__
@@ -13236,10 +13231,7 @@ stchsnapx :
 	}
 #endif
 }
-#pragma warning (pop)
 
-#pragma warning (push)
-#pragma warning (disable : 4725)
 void frmsnap(fPOINT* start, unsigned count) {
 
 #if  __UseASM__
@@ -13268,7 +13260,6 @@ frmsnapx :
 	}
 #endif
 }
-#pragma warning (pop)
 
 void gsnap() {
 
@@ -14603,8 +14594,6 @@ unsigned trsum() {
 	return sumAdjacent;
 }
 
-#pragma warning (push)
-#pragma warning (disable : 6001)
 void trdif() {
 
 	unsigned	iHeight, iPixel, iRGB, iWidth, adjustedColorSum;
@@ -14619,50 +14608,50 @@ void trdif() {
 	rstMap(TRSET);
 	rstMap(HIDMAP);
 	untrace();
-	// ToDo - why does this result in a 6001 warning
-	DifferenceBitmap = new unsigned[BitmapHeight*BitmapWidth];
-	colorSumMaximum = 0;
-	colorSumMinimum = 0xffffffff;
-	if (!chkMap(WASTRAC))
-		getrmap();
-	for (iRGB = 0; iRGB < 3; iRGB++) {
+	if (BitmapHeight*BitmapWidth) {
+		DifferenceBitmap = new unsigned[BitmapHeight*BitmapWidth]();
+		colorSumMaximum = 0;
+		colorSumMinimum = 0xffffffff;
+		if (!chkMap(WASTRAC))
+			getrmap();
+		for (iRGB = 0; iRGB < 3; iRGB++) {
 
-		blanklin(0);
-		for (iHeight = 1; iHeight < (unsigned)BitmapHeight - 1; iHeight++) {
+			blanklin(0);
+			for (iHeight = 1; iHeight < (unsigned)BitmapHeight - 1; iHeight++) {
 
-			iPoint = iHeight*BitmapWidth;
-			DifferenceBitmap[iPoint++] = 0;
-			for (iWidth = 1; iWidth < BitmapWidth - 1; iWidth++) {
+				iPoint = iHeight*BitmapWidth;
+				DifferenceBitmap[iPoint++] = 0;
+				for (iWidth = 1; iWidth < BitmapWidth - 1; iWidth++) {
 
-				difbits(TraceShift[iRGB], &TraceBitmapData[iPoint]);
-				colorSum = DifferenceBitmap[iPoint] = trsum();
-				iPoint++;
-				if (colorSum > colorSumMaximum)
-					colorSumMaximum = colorSum;
-				if (colorSum < colorSumMinimum)
-					colorSumMinimum = colorSum;
+					difbits(TraceShift[iRGB], &TraceBitmapData[iPoint]);
+					colorSum = DifferenceBitmap[iPoint] = trsum();
+					iPoint++;
+					if (colorSum > colorSumMaximum)
+						colorSumMaximum = colorSum;
+					if (colorSum < colorSumMinimum)
+						colorSumMinimum = colorSum;
+				}
+				DifferenceBitmap[iPoint++] = 0;
 			}
-			DifferenceBitmap[iPoint++] = 0;
-		}
-		blanklin(iPoint);
-		ratio = (double)255 / (colorSumMaximum - colorSumMinimum);
-		for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
+			blanklin(iPoint);
+			ratio = (double)255 / (colorSumMaximum - colorSumMinimum);
+			for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
 
-			TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
-			if (DifferenceBitmap[iPixel]) {
+				TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
+				if (DifferenceBitmap[iPixel]) {
 
-				adjustedColorSum = (DifferenceBitmap[iPixel] - colorSumMinimum)*ratio;
-				TraceBitmapData[iPixel] |= adjustedColorSum << TraceShift[iRGB];
+					adjustedColorSum = (DifferenceBitmap[iPixel] - colorSumMinimum)*ratio;
+					TraceBitmapData[iPixel] |= adjustedColorSum << TraceShift[iRGB];
+				}
 			}
 		}
+		BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, TraceDC, 0, 0, SRCCOPY);
+		setMap(WASDIF);
+		setMap(RESTCH);
+		tracwnd();
+		delete[] DifferenceBitmap;
 	}
-	BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, TraceDC, 0, 0, SRCCOPY);
-	setMap(WASDIF);
-	setMap(RESTCH);
-	tracwnd();
-	delete[] DifferenceBitmap;
 }
-#pragma warning (pop)
 
 void delstch() {
 

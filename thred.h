@@ -1740,20 +1740,20 @@ typedef struct _intinf {
 }INTINF;
 
 typedef struct _txtscr	{
-	int		top;		//pixel top line
-	int		bottom;		//pixel bottom line
-	int		height;		//pixel height of area
-	int		halfHeight;	//pixel middle of area
-	float	xOffset;	//edit x offset of area
-	float	yOffset;	//edit y offset of area
-	int		index;		//index into temporay texture fill point table
-	float	areaHeight;	//edit height of area
-	float	screenHeight;	//edit height of screen
-	float	width;		//edit width of area
-	float	spacing;	//edit space between lines
-	short	lines;		//number of lines
-	double	editToPixelRatio;	//edit to pixel ratio
-	fPOINT	formCenter;	//middle of the form
+	int				top;		//pixel top line
+	int				bottom;		//pixel bottom line
+	int				height;		//pixel height of area
+	int				halfHeight;	//pixel middle of area
+	float			xOffset;	//edit x offset of area
+	float			yOffset;	//edit y offset of area
+	unsigned		index;		//index into temporay texture fill point table
+	float			areaHeight;	//edit height of area
+	float			screenHeight;	//edit height of screen
+	float			width;		//edit width of area
+	float			spacing;	//edit space between lines
+	unsigned short	lines;		//number of lines
+	double			editToPixelRatio;	//edit to pixel ratio
+	fPOINT			formCenter;	//middle of the form
 }TXTSCR;
 
 
@@ -1765,11 +1765,11 @@ typedef struct _txtrct	{
 }TXTRCT;
 
 typedef struct _txhst	{
-	TXPNT*	texturePoint;
-	int		count;
-	float	height;
-	float	width;
-	float	spacing;
+	TXPNT*		texturePoint;
+	unsigned	count;
+	float		height;
+	float		width;
+	float		spacing;
 }TXHST;
 
 typedef struct _rngcnt	{

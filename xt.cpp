@@ -211,7 +211,7 @@ HWND		SideWindowButton;			//button side window
 RECT		TexturePixelRect;			//screen selected texture points rectangle
 TXTRCT		TextureRect;				//selected texture points rectangle
 POINT		SelectTexturePointsOrigin;	//original location of selected texture points
-int			SelectedTexturePointsCount;	//number of selected texture points
+unsigned	SelectedTexturePointsCount;	//number of selected texture points
 unsigned*	SelectedTexturePointsList;	//list of selected points
 POINT		TextureCursorLocation;		//texture editor move cursor location
 HPEN		TextureCrossPen;			//texture editor cross pen
@@ -350,7 +350,7 @@ void txrfor() {
 }
 
 BOOL chktxh(TXHST* historyItem) {
-	int iPoint;
+	unsigned iPoint;
 
 	if (historyItem->count != TextureScreen.index)
 		return 1;
@@ -1840,10 +1840,6 @@ BOOL chkrdun(SRTREC* stitchRecord) {
 	return 0;
 }
 
-// Disable the warning for Dereferencing NULL pointer since 'new' will throw an
-// exception rather than returning NULL
-#pragma warning(push)
-#pragma warning(disable : 28182)
 double precjmps(SRTREC* stitchRecord) {
 	unsigned		totalJumps;
 	double			length;
@@ -1904,7 +1900,6 @@ double precjmps(SRTREC* stitchRecord) {
 	delete[] FormFillCounter;
 	return totalJumps;
 }
-#pragma warning(pop)
 
 unsigned duprecs(SRTREC* record) {
 	unsigned jumps0;
@@ -3330,7 +3325,7 @@ void drwtxbut() {
 }
 
 void chktx() {
-	int iPoint, iNextPoint;
+	unsigned iPoint, iNextPoint;
 
 	iNextPoint = 0;
 	for (iPoint = 0; iPoint < TextureScreen.index; iPoint++) {
@@ -3345,7 +3340,9 @@ void chktx() {
 
 void drwtxtr() {
 	POINT		line[2];
-	int			iGrid, iVertical, iPoint, index;
+	int			iGrid, iVertical;
+	unsigned	iPoint;
+	unsigned	index;
 	int			yOffset;
 	TXPNT		textureRecord;
 	POINT		point;
@@ -3476,10 +3473,10 @@ void txtrbut() {
 }
 
 BOOL txtclos(unsigned* closestTexturePoint) {
-	double	length;
-	double	minimumLength;
-	int		iPoint;
-	POINT	reference, point;
+	double		length;
+	double		minimumLength;
+	unsigned	iPoint;
+	POINT		reference, point;
 
 	// ToDo - could these be replaced by deorg()?
 	reference.x = Msg.pt.x - StitchWindowOrigin.x;
@@ -3540,8 +3537,8 @@ void ritxrct() {
 }
 
 void dutxrct(TXTRCT* textureRect) {
-	int		iPoint;
-	TXPNT*	texturePoint;
+	unsigned	iPoint;
+	TXPNT*		texturePoint;
 
 	if (SelectedTexturePointsCount) {
 		texturePoint = &TempTexturePoints[SelectedTexturePointsList[0]];
@@ -3652,7 +3649,8 @@ void ed2txp(POINT offset, TXPNT* textureRecord) {
 }
 
 int	hitxlin() {
-	int	iPoint, highestLine;
+	unsigned	iPoint;
+	short		highestLine;
 
 	highestLine = 0;
 	for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++) {
@@ -3663,14 +3661,15 @@ int	hitxlin() {
 }
 
 void txtrup() {
-	TXPNT	highestTexturePoint;
-	TXPNT	lowestTexturePoint;
-	TXPNT	textureOffset;
-	float	yOffset;
-	short	swap;
-	int		iPoint, xCoord, Xmagnitude;
-	POINT	offset;
-	TXPNT*	texturePoint;
+	TXPNT		highestTexturePoint;
+	TXPNT		lowestTexturePoint;
+	TXPNT		textureOffset;
+	float		yOffset;
+	short		swap;
+	unsigned	iPoint;
+	int			xCoord, Xmagnitude;
+	POINT		offset;
+	TXPNT*		texturePoint;
 
 	if (rstMap(TXTMOV)) {
 		savtxt();
@@ -3985,8 +3984,8 @@ nutskp:;
 }
 
 void altx() {
-	int iLine, iPoint;
-	float halfHeight;
+	unsigned	iLine, iPoint;
+	float		halfHeight;
 
 	if (chkMap(FORMSEL)) {
 		halfHeight = TextureScreen.areaHeight / 2;
@@ -4201,7 +4200,7 @@ nxbak1:;
 }
 
 void txtdel() {
-	int			iPoint, iSourcePoint, iOutputPoint;
+	unsigned	iPoint, iSourcePoint, iOutputPoint;
 	unsigned	iClosestPoint;
 
 	if (SelectedTexturePointsCount) {
@@ -4351,9 +4350,10 @@ BOOL txdig(unsigned keyCode, TCHAR* character) {
 }
 
 void txnudg(int deltaX, float deltaY) {
-	float screenDeltaY;
-	float yCoord;
-	int iPoint, textureLine;
+	float		screenDeltaY;
+	float		yCoord;
+	unsigned	iPoint;
+	int			textureLine;
 
 	if (SelectedTexturePointsCount) {
 		if (deltaY) {
@@ -4385,9 +4385,10 @@ void txnudg(int deltaX, float deltaY) {
 }
 
 void txsnap() {
-	int iPoint, yStep;
-	float halfGrid;
-	TXPNT*	texturePoint;
+	unsigned	iPoint;
+	int			yStep;
+	float		halfGrid;
+	TXPNT*		texturePoint;
 
 	if (TextureScreen.index) {
 		savtxt();
@@ -4896,14 +4897,11 @@ void txdun() {
 	}
 }
 
-// Suppress C6031: return value ignored
-#pragma warning(push)
-#pragma warning(disable : 6031)
 void redtx() {
 	char			name[_MAX_PATH];
 	HANDLE			handle;
 	DWORD			bytesRead, historyBytesRead;
-	unsigned int	ind;
+	unsigned int	ind,ine;
 	char			sig[4] = { 0 };
 
 	TextureHistoryIndex = 15;
@@ -4911,31 +4909,38 @@ void redtx() {
 	if (txnam(name, sizeof(name))) {
 		handle = CreateFile(name, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 		if (handle != INVALID_HANDLE_VALUE) {
-			ReadFile(handle, (char*)&sig, 4, &bytesRead, 0);
-			if (!strcmp(sig, "txh")) {
-				ReadFile(handle, (int*)&TextureHistoryIndex, 4, &bytesRead, 0);
-				ReadFile(handle, (TXHST*)&TextureHistory, sizeof(TXHST) * 16, &historyBytesRead, 0);
-				// texturePoint should be a null pointer at this point as no memory has been allocated, but it is not
-				// because the old pointer value is read in from the file, so zero it out here as it is easier than 
-				// writing a zero to the file
-				for (ind = 0; ind < 16; ind++) {
-					TextureHistory[ind].texturePoint = 0;
-				}
+			if (ReadFile(handle, (char*)&sig, 4, &bytesRead, 0)) {
+				if (!strcmp(sig, "txh")) {
+					if (ReadFile(handle, (int*)&TextureHistoryIndex, 4, &bytesRead, 0)) {
+						if (ReadFile(handle, (TXHST*)&TextureHistory, sizeof(TXHST) * 16, &historyBytesRead, 0)) {
+							// texturePoint should be a null pointer at this point as no memory has been allocated, but it is not
+							// because the old pointer value is read in from the file, so zero it out here as it is easier than 
+							// writing a zero to the file
+							for (ind = 0; ind < 16; ind++) {
+								TextureHistory[ind].texturePoint = 0;
+							}
 
-				for (ind = 0; ind < (historyBytesRead / sizeof(TXHST)); ind++) {
-					if (TextureHistory[ind].count) {
-						TextureHistory[ind].texturePoint = new TXPNT[TextureHistory[ind].count];
-						ReadFile((TXPNT*)handle, TextureHistory[ind].texturePoint, sizeof(TXPNT)*TextureHistory[ind].count, &bytesRead, 0);
+							for (ind = 0; ind < (historyBytesRead / sizeof(TXHST)); ind++) {
+								if (TextureHistory[ind].count) {
+									TextureHistory[ind].texturePoint = new TXPNT[TextureHistory[ind].count];
+									if (!ReadFile((TXPNT*)handle, TextureHistory[ind].texturePoint, sizeof(TXPNT)*TextureHistory[ind].count, &bytesRead, 0)) {
+										for (ine = 0; ine < TextureHistory[ind].count; ine++) {
+											TextureHistory[ine].texturePoint->line = 0;
+											TextureHistory[ine].texturePoint->y = 0;
+										}
+									}
+								}
+							}
+						}
 					}
+					setMap(WASTXBAK);
 				}
-				setMap(WASTXBAK);
 			}
 		}
 		CloseHandle(handle);
 	}
 	redtbak();
 }
-#pragma warning(pop)
 
 void setangf(double angle) {
 	unsigned	iVertex;

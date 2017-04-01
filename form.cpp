@@ -9291,10 +9291,6 @@ void nxtim() {
 	FormLines[0].x = FormLines[1].x = TimePosition;
 }
 
-// Disable the warning for Dereferencing NULL pointer since 'new' will throw an
-// exception rather than returning NULL
-#pragma warning(push)
-#pragma warning(disable : 28182)
 void snp(unsigned start, unsigned finish) {
 
 	unsigned	iColumn, iStitch, swap, accumulator, checkLength, attribute = 0;
@@ -9353,7 +9349,6 @@ void snp(unsigned start, unsigned finish) {
 	delete[] Xpoints;
 	delete[] txhst;
 }
-#pragma warning(pop)
 
 void snap() {
 	savdo();
@@ -10499,10 +10494,6 @@ void picot() {
 	}
 }
 
-// Disable the warning for Dereferencing NULL pointer since 'new' will throw an
-// exception rather than returning NULL
-#pragma warning(push)
-#pragma warning(disable : 28182)
 void contf() {
 
 	unsigned	iVertex, lowIndex, highIndex, selind, lowVertexIndex, highVertexIndex, selectedVertexCount, start, finish;
@@ -10698,7 +10689,6 @@ void contf() {
 	delete[] highCounts;
 	delete[] lowCounts;
 }
-#pragma warning(pop)
 
 BOOL contsf(unsigned formIndex) {
 	ClosestFormToCursor = formIndex;
