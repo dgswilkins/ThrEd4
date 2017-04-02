@@ -4665,8 +4665,6 @@ prvcx :
 }
 
 void satadj() {
-	// ToDo - satadj does not seem to work properly. 
-	//        When setting the form zero point satadj does not keep the guides in the same place.
 
 	unsigned		iGuide, iSource, iWord, iForm, iForward, iVertex, iReverse, iDestination, mapSize;
 	SATCON*			guide;
@@ -5572,7 +5570,8 @@ void satzum() {
 }
 
 void rotfrm(unsigned newStartVertex) {
-
+	// ToDo - rotfrm does not seem to work properly. 
+	//        When setting the form zero point rotfrm does not keep the guides in the same place.
 	fPOINT*			selectedVertices;
 	fPOINT*			rotatedVertices;
 	SATCON*			rotatedGuides;
