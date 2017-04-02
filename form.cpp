@@ -3125,36 +3125,37 @@ void duseq1() {
 
 void duseq(unsigned start, unsigned finish) {
 
-	unsigned	iLine, topbak;
+	unsigned	iLine, iLineDec, topbak;
 
 	//ToDo - More renaming required
 	SequenceLines = nullptr;
 	rstMap(SEQDUN);
 	topbak = SortedLines[start][1].line;
 	if (start > finish) {
-		// ToDo - Does this loop terminate when finish = 0?
-		for (iLine = start; iLine >= finish; iLine--) {
-			if (setseq(iLine)) {
+		// This odd construction for iLine is used to ensure loop terminates when finish = 0
+		for (iLine = start + 1; iLine != finish; iLine--) {
+			iLineDec = iLine - 1;
+			if (setseq(iLineDec)) {
 				if (!setMap(SEQDUN))
-					duseq2(iLine);
+					duseq2(iLineDec);
 				else {
-					if (topbak != SortedLines[iLine][1].line) {
-						if (iLine)
-							duseq2(iLine + 1);
-						duseq2(iLine);
+					if (topbak != SortedLines[iLineDec][1].line) {
+						if (iLineDec)
+							duseq2(iLineDec + 1);
+						duseq2(iLineDec);
 						topbak = SequenceLines[1].line;
 					}
 				}
 			}
 			else {
 				if (rstMap(SEQDUN))
-					duseq2(iLine + 1);
-				SequenceLines = &*SortedLines[iLine];
-				movseq(iLine);
+					duseq2(iLineDec + 1);
+				SequenceLines = &*SortedLines[iLineDec];
+				movseq(iLineDec);
 			}
 		}
 		if (rstMap(SEQDUN))
-			duseq2(iLine + 1);
+			duseq2(iLine);
 		if (SequenceLines != nullptr) { LastGroup = SequenceLines->group; }
 	}
 	else {
@@ -3190,30 +3191,31 @@ void duseq(unsigned start, unsigned finish) {
 
 void brkseq(unsigned start, unsigned finish) {
 
-	//SMALPNTL* line=0;
-	unsigned	iLine, bgrp = 0;
+	unsigned	iLine, iLineDec, bgrp = 0;
 
 	//ToDo - More renaming required
 	rstMap(SEQDUN);
 	if (start > finish) {
 		bgrp = SortedLines[start]->group + 1;
-		// ToDo - Does this loop terminate when finish = 0?
-		for (iLine = start; iLine >= finish; iLine--) {
+		// This odd construction for iLine is used to ensure
+		// loop terminates when finish = 0
+		for (iLine = start + 1; iLine != finish; iLine--) {
+			iLineDec = iLine - 1;
 			bgrp--;
-			if (SortedLines[iLine]->group != bgrp) {
+			if (SortedLines[iLineDec]->group != bgrp) {
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
-				SequenceLines = &*SortedLines[iLine];
+				SequenceLines = &*SortedLines[iLineDec];
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
 				bgrp = SequenceLines[0].group;
 			}
 			else
-				SequenceLines = &*SortedLines[iLine];
-			if (setseq(iLine)) {
+				SequenceLines = &*SortedLines[iLineDec];
+			if (setseq(iLineDec)) {
 				if (!setMap(SEQDUN))
 					duseq1();
 			}
 			else
-				movseq(iLine);
+				movseq(iLineDec);
 		}
 		LastGroup = SequenceLines->group;
 	}
@@ -3255,22 +3257,22 @@ void durgn(unsigned pthi) {
 	unsigned	seql, seqn;
 	unsigned	sequenceStart, sequenceEnd;
 	unsigned	nextGroup, groupStart, groupEnd;
-	unsigned	rgind;
+	unsigned	iRegion;
 	SMALPNTL*	lineEndPointStart;
 	SMALPNTL*	lineEndPointEnd;
 	double		length, minimumLength;
 	BSEQPNT*	bpnt;
 
 	//ToDo - More renaming required
-	rgind = SequencePath[pthi].node;
-	CurrentRegion = &RegionsList[rgind];
+	iRegion = SequencePath[pthi].node;
+	CurrentRegion = &RegionsList[iRegion];
 	nextGroup = SequencePath[pthi].nextGroup;
 	sequenceStart = CurrentRegion->start;
 	sequenceEnd = CurrentRegion->end;
 	if (SequencePath[pthi].skp || rstMap(BRKFIX)) {
 		if (BSequence[OutputIndex - 1].attribute != SEQBOT)
 			rspnt(BSequence[OutputIndex - 2].x, BSequence[OutputIndex - 2].y);
-		lineEndPointStart = &*SortedLines[rgind];
+		lineEndPointStart = &*SortedLines[iRegion];
 		dun = SortedLines[sequenceStart]->line;
 		bpnt = &BSequence[OutputIndex - 1];
 		minimumLength = 1e99;
@@ -3302,11 +3304,11 @@ void durgn(unsigned pthi) {
 			rspnt(WorkingFormVertices[ind].x, WorkingFormVertices[ind].y);
 		}
 	}
-	if (VisitedRegions[rgind])
+	if (VisitedRegions[iRegion])
 		dun = 1;
 	else {
 		dun = 0;
-		VisitedRegions[rgind]++;
+		VisitedRegions[iRegion]++;
 	}
 	lineEndPointStart = &*SortedLines[CurrentRegion->start];
 	lineEndPointEnd = &*SortedLines[CurrentRegion->end];
