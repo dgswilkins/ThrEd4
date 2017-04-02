@@ -3909,16 +3909,14 @@ void bakseq() {
 						OSequence[SequenceIndex].x = BSequence[iSequence - 1].x;
 						OSequence[SequenceIndex++].y = BSequence[iSequence - 1].y;
 						count = ceil(BSequence[iSequence].y / UserStitchLength);
-						// ToDo - replace labels with while and break
-blntop:;
-						OSequence[SequenceIndex].y = count*UserStitchLength + (rit%seqtab[rcnt])*UserStitchLength9;
-						if (OSequence[SequenceIndex].y > BSequence[iSequence].y)
-							goto blntopx;
-						delta.y = OSequence[SequenceIndex].y - BSequence[iSequence].y;
-						OSequence[SequenceIndex++].x = BSequence[iSequence].x;
-						count++;
-						goto blntop;
-blntopx:;
+						do {
+							OSequence[SequenceIndex].y = count*UserStitchLength + (rit%seqtab[rcnt])*UserStitchLength9;
+							if (OSequence[SequenceIndex].y > BSequence[iSequence].y)
+								break;
+							delta.y = OSequence[SequenceIndex].y - BSequence[iSequence].y;
+							OSequence[SequenceIndex++].x = BSequence[iSequence].x;
+							count++;
+						} while (true);
 						OSequence[SequenceIndex].x = BSequence[iSequence].x;
 						OSequence[SequenceIndex++].y = BSequence[iSequence].y;
 					}
@@ -3926,31 +3924,29 @@ blntopx:;
 						OSequence[SequenceIndex].x = BSequence[iSequence].x;
 						OSequence[SequenceIndex++].y = BSequence[iSequence].y;
 						count = floor(BSequence[iSequence].y / UserStitchLength);
-blntbot:;
-						OSequence[SequenceIndex].y = count*UserStitchLength - ((rit + 2) % seqtab[rcnt])*UserStitchLength9;
-						if (OSequence[SequenceIndex].y < BSequence[iSequence - 1].y)
-							goto blntbotx;
-						delta.y = OSequence[SequenceIndex].y - BSequence[iSequence - 1].y;
-						OSequence[SequenceIndex++].x = BSequence[iSequence].x;
-						count--;
-						goto blntbot;
-blntbotx:;
+						do {
+							OSequence[SequenceIndex].y = count*UserStitchLength - ((rit + 2) % seqtab[rcnt])*UserStitchLength9;
+							if (OSequence[SequenceIndex].y < BSequence[iSequence - 1].y)
+								break;
+							delta.y = OSequence[SequenceIndex].y - BSequence[iSequence - 1].y;
+							OSequence[SequenceIndex++].x = BSequence[iSequence].x;
+							count--;
+						} while (true);
 						OSequence[SequenceIndex].x = BSequence[iSequence - 1].x;
 						OSequence[SequenceIndex++].y = BSequence[iSequence - 1].y;
 					}
 				}
 				else {
 					count = ceil(BSequence[iSequence + 1].y / UserStitchLength);
-toplab:;
-					OSequence[SequenceIndex].y = count*UserStitchLength + (rit%seqtab[rcnt])*UserStitchLength9;
-					if (OSequence[SequenceIndex].y > BSequence[iSequence].y)
-						goto toplabx;
-					delta.y = OSequence[SequenceIndex].y - BSequence[iSequence + 1].y;
-					delta.x = slope*delta.y;
-					OSequence[SequenceIndex++].x = BSequence[iSequence + 1].x + delta.x;
-					count++;
-					goto toplab;
-toplabx:;
+					do {
+						OSequence[SequenceIndex].y = count*UserStitchLength + (rit%seqtab[rcnt])*UserStitchLength9;
+						if (OSequence[SequenceIndex].y > BSequence[iSequence].y)
+							break;
+						delta.y = OSequence[SequenceIndex].y - BSequence[iSequence + 1].y;
+						delta.x = slope*delta.y;
+						OSequence[SequenceIndex++].x = BSequence[iSequence + 1].x + delta.x;
+						count++;
+					} while (true);
 					OSequence[SequenceIndex].x = BSequence[iSequence].x;
 					OSequence[SequenceIndex++].y = BSequence[iSequence].y;
 				}
@@ -3960,16 +3956,15 @@ toplabx:;
 
 				if (!(SelectedForm->extendedAttribute&AT_SQR)) {
 					count = floor(BSequence[iSequence + 1].y / UserStitchLength);
-botlab:;
-					OSequence[SequenceIndex].y = count*UserStitchLength - ((rit + 2) % seqtab[rcnt])*UserStitchLength9;
-					if (OSequence[SequenceIndex].y < BSequence[iSequence].y)
-						goto botlabx;
-					delta.y = OSequence[SequenceIndex].y - BSequence[iSequence + 1].y;
-					delta.x = slope*delta.y;
-					OSequence[SequenceIndex++].x = BSequence[iSequence + 1].x + delta.x;
-					count--;
-					goto botlab;
-botlabx:;
+					do {
+						OSequence[SequenceIndex].y = count*UserStitchLength - ((rit + 2) % seqtab[rcnt])*UserStitchLength9;
+						if (OSequence[SequenceIndex].y < BSequence[iSequence].y)
+							break;
+						delta.y = OSequence[SequenceIndex].y - BSequence[iSequence + 1].y;
+						delta.x = slope*delta.y;
+						OSequence[SequenceIndex++].x = BSequence[iSequence + 1].x + delta.x;
+						count--;
+					} while (true);
 					OSequence[SequenceIndex].x = BSequence[iSequence].x;
 					OSequence[SequenceIndex++].y = BSequence[iSequence].y;
 				}
