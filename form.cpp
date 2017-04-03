@@ -5571,6 +5571,7 @@ void satzum() {
 void rotfrm(unsigned newStartVertex) {
 	// ToDo - rotfrm does not seem to work properly. 
 	//        When setting the form zero point rotfrm does not keep the guides in the same place.
+	//        Read docs to see if this makes sense
 	fPOINT*			selectedVertices;
 	fPOINT*			rotatedVertices;
 	SATCON*			rotatedGuides;
@@ -5851,9 +5852,6 @@ BOOL clpsid(unsigned start, unsigned finish) {
 
 	clipReferencePoint.x = ClipRect.left;
 	clipReferencePoint.y = ClipRect.bottom;
-	// ToDo - check that these next two lines are needed
-	insertPoint.x = CurrentFormVertices[start].x;
-	insertPoint.y = CurrentFormVertices[finish].y;
 	delta.x = CurrentFormVertices[finish].x - CurrentFormVertices[start].x;
 	delta.y = CurrentFormVertices[finish].y - CurrentFormVertices[start].y;
 	length = hypot(delta.x, delta.y);
