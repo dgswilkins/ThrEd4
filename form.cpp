@@ -5426,7 +5426,7 @@ void delspnt() {
 
 	unsigned	iGuide, iForm;
 	SATCON*		guide;
-	fPOINT*		vertex;
+	fPOINT		vertex;
 	FRMHED*		formHeader;
 
 	fvars(ClosestFormToCursor);
@@ -5480,10 +5480,9 @@ void delspnt() {
 	ritfcor(&CurrentFormVertices[ClosestVertexToCursor]);
 	ritnum(STR_NUMPNT, ClosestVertexToCursor);
 	frmout(ClosestFormToCursor);
-	// ToDo - vertex should probably not be a pointer
-	vertex = &SelectedForm->vertices[ClosestVertexToCursor];
-	if (vertex->x<ZoomRect.left || vertex->x>ZoomRect.right || vertex->y<ZoomRect.bottom || vertex->y>ZoomRect.top)
-		shft(SelectedForm->vertices[ClosestVertexToCursor]);
+	vertex = SelectedForm->vertices[ClosestVertexToCursor];
+	if (vertex.x < ZoomRect.left || vertex.x > ZoomRect.right || vertex.y < ZoomRect.bottom || vertex.y > ZoomRect.top)
+		shft(vertex);
 	refil();
 }
 
