@@ -252,7 +252,6 @@ void			plbrd (double spac);
 void			prpbrd (double spac);
 unsigned		prv (unsigned ind);
 unsigned		psg ();
-void			rbrd ();
 void			rotfrm (unsigned nu0);
 void			satfil ();
 void			satout (double satwid);
@@ -5969,7 +5968,6 @@ void durev() {
 void setvct(unsigned start, unsigned finish) {
 	ClipAngle = atan2(CurrentFormVertices[finish].y - CurrentFormVertices[start].y, CurrentFormVertices[finish].x - CurrentFormVertices[start].x);
 	Vector0.x = ClipRectSize.cx*cos(ClipAngle);
-	// ToDo - is this line below correct?
 	Vector0.y = ClipRectSize.cx*sin(ClipAngle);
 }
 
@@ -5993,9 +5991,12 @@ void clpbrd(unsigned short startVertex) {
 		SelectedPoint.x = CurrentFormVertices[0].x;
 		SelectedPoint.y = CurrentFormVertices[0].y;
 		setvct(0, 1);
-		BorderClipReference.y = (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom;
-		// ToDo - is this line below correct?
-		BorderClipReference.x = (ClipRect.top = ClipRect.left) / 2 + ClipRect.left;
+		// Since ClipRect.bottom is always 0 
+		BorderClipReference.y = ClipRect.top / 2;
+		// Use 0 to align left edge of clip with beginning of line, ClipRect.right / 2 if you want to align 
+		// the center of the clip with the beginning of the line
+		BorderClipReference.x = 0;
+		// BorderClipReference.x = ClipRect.right / 2;
 		for (CurrentSide = 0; CurrentSide < VertexCount - 2; CurrentSide++) {
 			linsid();
 			setvct(CurrentSide + 1, CurrentSide + 2);
@@ -6190,12 +6191,11 @@ void filinsb(dPOINT point) {
 
 BOOL chkbak(dPOINT pnt) {
 
-	unsigned	ind;
+	unsigned	iBackup;
 	double		length;
 
-	// ToDo - Why 8?
-	for (ind = 0; ind < 8; ind++) {
-		length = hypot(SatinBackup[ind].x - pnt.x, SatinBackup[ind].y - pnt.y);
+	for (iBackup = 0; iBackup < 8; iBackup++) {
+		length = hypot(SatinBackup[iBackup].x - pnt.x, SatinBackup[iBackup].y - pnt.y);
 		if (length < StitchSpacing)
 			return 1;
 	}
@@ -6373,35 +6373,6 @@ void sbrd() {
 	StitchSpacing = SelectedForm->edgeSpacing;
 	sfn(start);
 	StitchSpacing = spacing;
-}
-
-void rfn(unsigned startVertex) {
-
-	unsigned	iVertex, nextVertex;
-	unsigned	currentVertex = startVertex;
-
-	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
-		nextVertex = nxt(currentVertex);
-		sbfn(InsidePoints, currentVertex, nextVertex);
-		currentVertex = nextVertex;
-	}
-}
-
-void rbrd() {
-
-	unsigned short	startVertex = getlast();
-	double			spacing;
-
-	rstMap(SAT1);
-	rstMap(FILDIR);
-	spacing = StitchSpacing;
-	StitchSpacing = USPAC;
-	rfn(startVertex);
-	setMap(FILDIR);
-	rfn(startVertex);
-	satout(HorizontalLength2);
-	StitchSpacing = spacing;
-	rfn(startVertex);
 }
 
 void satends(unsigned isBlunt) {
@@ -8162,7 +8133,6 @@ void dulens(unsigned sides) {
 		CurrentFormVertices[iDestination].x = av + av - CurrentFormVertices[iVertex - 1].x;
 		iDestination++;
 	}
-	// ToDo - should this be iDestination-1?
 	NewFormVertexCount = iDestination;
 	SelectedForm->vertices = adflt(iDestination - 1);
 	SelectedForm->vertexCount = iDestination - 1;
