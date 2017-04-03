@@ -10275,9 +10275,8 @@ void clpcrnr(unsigned vertex) {
 	OSequence[SequenceIndex++].y = CurrentFormVertices[nextVertex].y;
 	OSequence[SequenceIndex].x = point.x;
 	OSequence[SequenceIndex++].y = point.y;
-	// ToDo - Is tpnt required?
-	tpnt.x = point.x;
-	tpnt.y = point.y;
+	tpnt.x = static_cast<float>(point.x);
+	tpnt.y = static_cast<float>(point.y);
 	if (!ritclp(tpnt)) {
 		OSequence[SequenceIndex].x = point.x;
 		OSequence[SequenceIndex++].y = point.y;
