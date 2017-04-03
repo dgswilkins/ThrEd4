@@ -10335,9 +10335,8 @@ void picfn(unsigned start, unsigned finish, double spacing) {
 			OSequence[SequenceIndex++].y = firstPoint.y;
 			OSequence[SequenceIndex].x = outerPoint.x;
 			OSequence[SequenceIndex++].y = outerPoint.y;
-			// ToDo - Is tpnt required?
-			tpnt.x = outerPoint.x;
-			tpnt.y = outerPoint.y;
+			tpnt.x = static_cast<float>(outerPoint.x);
+			tpnt.y = static_cast<float>(outerPoint.y);
 			if (ritclp(tpnt))
 				goto picfnx;
 			OSequence[SequenceIndex].x = outerPoint.x;
