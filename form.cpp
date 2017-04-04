@@ -11121,7 +11121,8 @@ void cntrx() {
 
 	dPOINT		markCenter;
 	dPOINT		selectedCenter;
-	unsigned	iForm, iStitch, flag;
+	unsigned	iForm, iStitch;
+	BOOL		flag;
 	fRECTANGLE*	formRect;
 	fRECTANGLE	groupRect;
 
@@ -11133,10 +11134,9 @@ void cntrx() {
 		markCenter.x = UnzoomedRect.x / 2;
 		markCenter.y = UnzoomedRect.y / 2;
 	}
-	// ToDo - convert flag to BOOL
-	flag = 0;
+	flag = false;
 	if (SelectedFormCount) {
-		flag = 1;
+		flag = true;
 		savdo();
 		dufcntr(&selectedCenter);
 		FormMoveDelta.x = markCenter.x - selectedCenter.x;
@@ -11151,7 +11151,7 @@ void cntrx() {
 	}
 	else {
 		if (chkMap(FORMSEL)) {
-			flag = 1;
+			flag = true;
 			savdo();
 			formRect = &FormList[ClosestFormToCursor].rectangle;
 			selectedCenter.x = (formRect->right - formRect->left) / 2 + formRect->left;
@@ -11172,7 +11172,7 @@ void cntrx() {
 		}
 		else {
 			if (chkMap(GRPSEL)) {
-				flag = 1;
+				flag = true;
 				savdo();
 				rngadj();
 				groupRect.right = groupRect.left = StitchBuffer[GroupStartStitch].x;
