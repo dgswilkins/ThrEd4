@@ -11241,7 +11241,6 @@ void bean(unsigned start, unsigned finish) {
 
 	unsigned	iOutputStitch, iSourceStitch, iCopyStitch;
 
-	// ToDo - Use a temp buffer rather than the high buffer
 	iCopyStitch = MAXITEMS;
 	iSourceStitch = start;
 	BeanCount = 0;
@@ -11307,7 +11306,6 @@ void unbean(unsigned start, unsigned finish) {
 
 	unsigned	iSource, iCopy;
 
-	// ToDo - Use a temp buffer rather than the high buffer
 	iCopy = MAXITEMS;
 	BeanCount = 0;
 	for (iSource = start; iSource <= finish; iSource++) {
@@ -11701,11 +11699,10 @@ void ritseg() {
 	ClipSegments[ActivePointIndex].dun = 1;
 }
 
-unsigned lenref(float* pflt) {
-	// ToDo - rename pflt
+unsigned lenref(float* length) {
 #if	 __UseASM__
 	_asm {
-		mov		eax, pflt
+		mov		eax, length
 		sub		eax, ClipSegments
 		xor		ecx, ecx
 		mov		ecx, 29
@@ -11719,7 +11716,7 @@ lrefx :
 	}
 #else
 	//Correct
-	unsigned eax = (unsigned)pflt - (unsigned)ClipSegments;
+	unsigned eax = (unsigned)length - (unsigned)ClipSegments;
 
 	unsigned edx = eax % 29;
 	eax /= 29;
