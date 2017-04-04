@@ -2543,7 +2543,7 @@ void duzero() {
 		currentStitch = StitchBuffer;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			if (StitchBuffer[iStitch].attribute&TYPMSK&&chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
+			if (StitchBuffer[iStitch].attribute&TYPMSK && chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
 
 				if (setMap(CONTIG)) {
 
@@ -3154,9 +3154,9 @@ unsigned stch2px(unsigned iStitch) {
 
 	StitchCoordinatesPixels.x = (StitchBuffer[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
 	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-	if (StitchCoordinatesPixels.x >= 0 &&
-		StitchCoordinatesPixels.x <= StitchWindowClientRect.right&&
-		StitchCoordinatesPixels.y >= 0 &&
+	if (StitchCoordinatesPixels.x >= 0 && 
+		StitchCoordinatesPixels.x <= StitchWindowClientRect.right && 
+		StitchCoordinatesPixels.y >= 0 && 
 		StitchCoordinatesPixels.y <= StitchWindowClientRect.bottom)
 
 		return 1;
@@ -3423,7 +3423,7 @@ void ritbal() {
 	TCHAR			outputName[_MAX_PATH];
 	unsigned long	bytesWritten;
 
-	if (*BalaradName0&&*BalaradName1&&PCSHeader.stitchCount) {
+	if (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount) {
 
 		if (!*WorkingFileName) {
 
@@ -3526,7 +3526,7 @@ void dun() {
 	unsid();
 	unbsho();
 	rstAll();
-	//	if(savcmp()||(*BalaradName0&&*BalaradName1&&PCSHeader.stitchCount&&!FormIndex))
+	//	if(savcmp()||(*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount && !FormIndex))
 	if (savcmp() || (*BalaradName0))
 		reldun();
 	else {
@@ -4178,7 +4178,7 @@ void chknum() {
 				else {
 
 					savdo();
-					if (FormMenuChoice == LFRMSPAC&&isfclp())
+					if (FormMenuChoice == LFRMSPAC && isfclp())
 						SelectedForm->fillSpacing = 0;
 				}
 			}
@@ -4559,7 +4559,7 @@ unsigned chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) {
 	GetWindowRect(topWindow, &topRect);
 	GetWindowRect(bottomWindow, &bottomRect);
 
-	if (clickCoord.x > topRect.left&&clickCoord.x<bottomRect.right&&clickCoord.y>topRect.top&&clickCoord.y < bottomRect.bottom) {
+	if (clickCoord.x > topRect.left && clickCoord.x<bottomRect.right && clickCoord.y>topRect.top && clickCoord.y < bottomRect.bottom) {
 
 		VerticalIndex = 15 - (bottomRect.bottom - clickCoord.y) / ButtonHeight;
 		return 1;
@@ -5100,7 +5100,7 @@ void dstran() {
 			ReadFile(colorFile, (unsigned*)colors, colorFileSize.u.LowPart, &bytesRead, 0);
 			CloseHandle(colorFile);
 			if (bytesRead > 1) {
-				if (bytesRead&&colors&&colors[0] == COLVER) {
+				if (bytesRead && colors && colors[0] == COLVER) {
 
 					BackgroundColor = colors[1];
 					ColorChanges = 0;
@@ -5649,7 +5649,7 @@ void nuFil() {
 							iColorChange = 0;
 							color = 0;
 							iPCSstitch = 0;
-							while (iStitch < PCSHeader.stitchCount&&iPCSstitch < pcsStitchCount) {
+							while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
 
 								if (PCSStitchBuffer[iPCSstitch].tag == 3) {
 
@@ -5672,7 +5672,7 @@ void nuFil() {
 							delete[] PCSStitchBuffer;
 							strcpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), "thr");
 							IniFile.auxFileType = AUXPCS;
-							if (PCSHeader.hoopType != LARGHUP&&PCSHeader.hoopType != SMALHUP)
+							if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP)
 								PCSHeader.hoopType = LARGHUP;
 							sizstch(&stitchRect);
 							if (stitchRect.left<0 || stitchRect.right>LHUPY || stitchRect.bottom<0 || stitchRect.top>LHUPY) {
@@ -6063,7 +6063,7 @@ BOOL pcshup() {
 	}
 	else {
 
-		if (IniFile.hoopSizeX == LHUPX&&IniFile.hoopSizeY == LHUPY) {
+		if (IniFile.hoopSizeX == LHUPX && IniFile.hoopSizeY == LHUPY) {
 
 			PCSHeader.hoopType = LARGHUP;
 			hoopSize.x = LHUPX;
@@ -6318,7 +6318,7 @@ BOOL chkattr(TCHAR* filename) {
 	if (rstMap(NOTFREE))
 		return 1;
 	attributes = GetFileAttributes(filename);
-	if (attributes&FILE_ATTRIBUTE_READONLY&&attributes != 0xffffffff) {
+	if (attributes&FILE_ATTRIBUTE_READONLY && attributes != 0xffffffff) {
 
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_OVRLOK], filename);
 		buttonPressed = MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_OVRIT], MB_YESNO);
@@ -6739,8 +6739,8 @@ unsigned px2stch() {
 
 	double	tdub;
 
-	if (Msg.pt.x >= StitchWindowAbsRect.left&&Msg.pt.x <= StitchWindowAbsRect.right
-		&&Msg.pt.y >= StitchWindowAbsRect.top&&Msg.pt.y <= StitchWindowAbsRect.bottom) {
+	if (Msg.pt.x >= StitchWindowAbsRect.left && Msg.pt.x <= StitchWindowAbsRect.right
+		&& Msg.pt.y >= StitchWindowAbsRect.top && Msg.pt.y <= StitchWindowAbsRect.bottom) {
 
 		tdub = (double)(Msg.pt.x - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
 		SelectedPoint.x = tdub*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
@@ -7082,9 +7082,9 @@ unsigned closPnt1(unsigned* closestStitch) {
 	for (iNear = 0; iNear < NearestCount; iNear++) {
 
 		offset = BoxOffset[iNear];
-		if (pointToCheck.x >= NearestPixel[iNear].x - offset&&
-			pointToCheck.x <= NearestPixel[iNear].x + offset&&
-			pointToCheck.y >= NearestPixel[iNear].y - offset&&
+		if (pointToCheck.x >= NearestPixel[iNear].x - offset &&
+			pointToCheck.x <= NearestPixel[iNear].x + offset &&
+			pointToCheck.y >= NearestPixel[iNear].y - offset && 
 			pointToCheck.y <= NearestPixel[iNear].y + offset) {
 
 			*closestStitch = NearestPoint[iNear];
@@ -7101,9 +7101,9 @@ unsigned closPnt1(unsigned* closestStitch) {
 
 				for (iStitch = ColorChangeTable[iColor].stitchIndex; iStitch < ColorChangeTable[iColor + 1].stitchIndex; iStitch++) {
 
-					if (StitchBuffer[iStitch].x >= ZoomRect.left&&
-						StitchBuffer[iStitch].x <= ZoomRect.right&&
-						StitchBuffer[iStitch].y >= ZoomRect.bottom&&
+					if (StitchBuffer[iStitch].x >= ZoomRect.left &&
+						StitchBuffer[iStitch].x <= ZoomRect.right &&
+						StitchBuffer[iStitch].y >= ZoomRect.bottom && 
 						StitchBuffer[iStitch].y <= ZoomRect.top) {
 
 						cx = ((StitchBuffer[iStitch].x > SelectedPoint.x) ? (StitchBuffer[iStitch].x - SelectedPoint.x) : (SelectedPoint.x - StitchBuffer[iStitch].x));
@@ -7126,9 +7126,9 @@ unsigned closPnt1(unsigned* closestStitch) {
 			layer = (StitchBuffer[iStitch].attribute&LAYMSK) >> LAYSHFT;
 			if (!ActiveLayer || !layer || layer == ActiveLayer) {
 
-				if (StitchBuffer[iStitch].x >= ZoomRect.left&&
-					StitchBuffer[iStitch].x <= ZoomRect.right&&
-					StitchBuffer[iStitch].y >= ZoomRect.bottom&&
+				if (StitchBuffer[iStitch].x >= ZoomRect.left &&
+					StitchBuffer[iStitch].x <= ZoomRect.right &&
+					StitchBuffer[iStitch].y >= ZoomRect.bottom && 
 					StitchBuffer[iStitch].y <= ZoomRect.top) {
 
 					cx = StitchBuffer[iStitch].x - SelectedPoint.x;
@@ -7219,7 +7219,7 @@ void toglup() {
 				ClosestPointIndex = 0;
 				if (rstMap(FORMSEL)) {
 
-					while (ClosestPointIndex < PCSHeader.stitchCount&&notfstch(StitchBuffer[ClosestPointIndex].attribute))
+					while (ClosestPointIndex < PCSHeader.stitchCount && notfstch(StitchBuffer[ClosestPointIndex].attribute))
 						ClosestPointIndex++;
 					setMap(SELBOX);
 					rstMap(FRMPSEL);
@@ -7246,7 +7246,7 @@ void dulin() {
 
 	SelectObject(StitchWindowDC, LinePen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	if (MoveLine0[0].x == MoveLine1[1].x&&MoveLine0[0].y == MoveLine1[1].y) {
+	if (MoveLine0[0].x == MoveLine1[1].x && MoveLine0[0].y == MoveLine1[1].y) {
 
 		if (chkMap(ISDWN)) {
 
@@ -7428,8 +7428,8 @@ unsigned closlin() {
 						boundingRect.bottom = stitches[iStitch + 1].y - tolerance;
 						boundingRect.top = stitches[iStitch].y + tolerance;
 					}
-					if (checkedPoint.x > boundingRect.left&&checkedPoint.x<boundingRect.right
-						&&checkedPoint.y>boundingRect.bottom&&checkedPoint.y < boundingRect.top) {
+					if (checkedPoint.x > boundingRect.left && checkedPoint.x<boundingRect.right
+						&& checkedPoint.y>boundingRect.bottom && checkedPoint.y < boundingRect.top) {
 
 						if (yab == 0) {
 
@@ -7570,7 +7570,7 @@ void istch() {
 	xlin1();
 	if (chkMap(SELBOX)) {
 
-		if (ClosestPointIndex&&ClosestPointIndex != (unsigned)PCSHeader.stitchCount - 1) {
+		if (ClosestPointIndex && ClosestPointIndex != (unsigned)PCSHeader.stitchCount - 1) {
 
 			px2stch();
 			angt = atan2(StitchBuffer[ClosestPointIndex].y - SelectedPoint.y, StitchBuffer[ClosestPointIndex].x - SelectedPoint.x);
@@ -8050,7 +8050,7 @@ void lodclp(unsigned iStitch) {
 		iStitch++;
 	adjustment.x = ClipOrigin.x - ClipRect.left;
 	adjustment.y = ClipOrigin.y - ClipRect.bottom;
-	if (iStitch < (unsigned)PCSHeader.stitchCount&&chkMap(INIT)) {
+	if (iStitch < (unsigned)PCSHeader.stitchCount && chkMap(INIT)) {
 
 		source = PCSHeader.stitchCount - 1;
 		destination = PCSHeader.stitchCount + ClipStitchCount - 1;
@@ -8519,7 +8519,7 @@ unsigned frmcnt(unsigned iForm) {
 	codedAttribute = iForm << FRMSHFT;
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		if ((StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute&&StitchBuffer[iStitch].attribute&TYPMSK)
+		if ((StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute && StitchBuffer[iStitch].attribute&TYPMSK)
 			goto fskip;
 	}
 	return 0;
@@ -8527,7 +8527,7 @@ fskip:;
 	FormFirstStitchIndex = iStitch;
 	while (iStitch < PCSHeader.stitchCount) {
 
-		if ((StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute&&StitchBuffer[iStitch].attribute&TYPMSK) {
+		if ((StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute && StitchBuffer[iStitch].attribute&TYPMSK) {
 
 			if (StitchBuffer[iStitch].x < LowerLeftStitch.x)
 				LowerLeftStitch.x = StitchBuffer[iStitch].x;
@@ -8730,7 +8730,7 @@ void duclip() {
 						astch[stitchCount++].attribute = StitchBuffer[iStitch].attribute;
 					}
 				}
-				if (PCSHeader.stitchCount&&stitchCount) {
+				if (PCSHeader.stitchCount && stitchCount) {
 
 					Clip = RegisterClipboardFormat(PcdClipFormat);
 					ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2);
@@ -8828,7 +8828,7 @@ void duclip() {
 				}
 				else {
 
-					if (PCSHeader.stitchCount&&chkMap(GRPSEL)) {
+					if (PCSHeader.stitchCount && chkMap(GRPSEL)) {
 
 						Clip = RegisterClipboardFormat(PcdClipFormat);
 						rngadj();
@@ -8990,7 +8990,7 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 					}
 					else
 						iNextStitch++;
-				} while (stitchSize < SmallStitchLength&&iNextStitch < PCSHeader.stitchCount);
+				} while (stitchSize < SmallStitchLength && iNextStitch < PCSHeader.stitchCount);
 				StitchBuffer[++iStitch].attribute = StitchBuffer[--iNextStitch].attribute;
 				StitchBuffer[iStitch].x = StitchBuffer[iNextStitch].x;
 				StitchBuffer[iStitch].y = StitchBuffer[iNextStitch++].y;
@@ -9269,7 +9269,7 @@ void setknt() {
 
 unsigned srchknot(unsigned source) {
 
-	while (Knots[ActivePointIndex] < source&&ActivePointIndex < KnotCount)
+	while (Knots[ActivePointIndex] < source && ActivePointIndex < KnotCount)
 		ActivePointIndex++;
 	ActivePointIndex--;
 	if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5) {
@@ -9388,7 +9388,7 @@ void drwlstch(unsigned finish) {
 	origin = RunPoint;
 	if (chkMap(HID)) {
 
-		while ((StitchBuffer[RunPoint].attribute&COLMSK) != ActiveColor&&RunPoint < finish - 1)
+		while ((StitchBuffer[RunPoint].attribute&COLMSK) != ActiveColor && RunPoint < finish - 1)
 			RunPoint++;
 	}
 	if (chkMap(ZUMED)) {
@@ -9473,7 +9473,7 @@ unsigned duth(TCHAR* name) {
 	unsigned	iLast = strlen(name);
 
 	do iLast--;
-	while (tolower(name[iLast]) != 'h'&&iLast);
+	while (tolower(name[iLast]) != 'h' && iLast);
 	if (name[iLast - 1] == 't')
 		return iLast + 1;
 	else
@@ -10003,7 +10003,7 @@ deldun:;
 			coltab();
 			setMap(RESTCH);
 		}
-		if (!satinFlag&&closPnt1(&ClosestPointIndex))
+		if (!satinFlag && closPnt1(&ClosestPointIndex))
 			goto selab;
 	}
 	fndknt();
@@ -10344,8 +10344,8 @@ BOOL chkwnd(HWND window) {
 	RECT	windowRect;
 
 	GetWindowRect(window, &windowRect);
-	if (Msg.pt.x >= windowRect.left&&Msg.pt.x <= windowRect.right
-		&&Msg.pt.y >= windowRect.top&&Msg.pt.y <= windowRect.bottom)
+	if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right
+		&& Msg.pt.y >= windowRect.top && Msg.pt.y <= windowRect.bottom)
 		return 1;
 	else
 		return 0;
@@ -10849,8 +10849,8 @@ BOOL chkbig() {
 		strtchbox();
 		return 1;
 	}
-	if (pointToTest.x >= SelectedFormsRect.left&&pointToTest.x <= SelectedFormsRect.right
-		&&pointToTest.y >= SelectedFormsRect.top&&pointToTest.y <= SelectedFormsRect.bottom) {
+	if (pointToTest.x >= SelectedFormsRect.left && pointToTest.x <= SelectedFormsRect.right
+		&& pointToTest.y >= SelectedFormsRect.top && pointToTest.y <= SelectedFormsRect.bottom) {
 
 		SelectedFormsSize.x = SelectedFormsRect.right - SelectedFormsRect.left;
 		SelectedFormsSize.y = SelectedFormsRect.bottom - SelectedFormsRect.top;
@@ -11074,7 +11074,7 @@ BOOL movstchs(unsigned destination, unsigned start, unsigned finish) {
 		start = finish;
 		finish = swap;
 	}
-	if (destination >= start&&destination < finish) {
+	if (destination >= start && destination < finish) {
 
 		tabmsg(IDS_DST1);
 		return 0;
@@ -11310,7 +11310,7 @@ void longer() {
 	for (currentStitch = SelectedRange.start; currentStitch < SelectedRange.finish - 1; currentStitch++) {
 
 		length = hypot(StitchBuffer[currentStitch + 1].x - StitchBuffer[currentStitch].x, StitchBuffer[currentStitch + 1].y - StitchBuffer[currentStitch].y);
-		if (length > currentLength&&length < minimumLength) {
+		if (length > currentLength && length < minimumLength) {
 
 			minimumLength = length;
 			iStitch = currentStitch;
@@ -11344,7 +11344,7 @@ void shorter() {
 	for (iStitch = SelectedRange.start; iStitch < SelectedRange.finish - 1; iStitch++) {
 
 		length = hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
-		if (length<currentLength&&length>maximumLength) {
+		if (length<currentLength && length>maximumLength) {
 
 			maximumLength = length;
 			currentStitch = iStitch;
@@ -11368,9 +11368,9 @@ void setsrch(unsigned stitch) {
 BOOL inrng(unsigned stitch) {
 
 	if (StitchBuffer[stitch].x >= StitchRangeRect.left
-		&&StitchBuffer[stitch].x <= StitchRangeRect.right
-		&&StitchBuffer[stitch].y >= StitchRangeRect.bottom
-		&&StitchBuffer[stitch].y <= StitchRangeRect.top)
+		&& StitchBuffer[stitch].x <= StitchRangeRect.right
+		&& StitchBuffer[stitch].y >= StitchRangeRect.bottom
+		&& StitchBuffer[stitch].y <= StitchRangeRect.top)
 
 		return 1;
 	else
@@ -11382,9 +11382,9 @@ BOOL finrng(unsigned find) {
 	unsigned cod;
 
 	if (FormList[find].rectangle.left >= StitchRangeRect.left
-		&&FormList[find].rectangle.right <= StitchRangeRect.right
-		&&FormList[find].rectangle.bottom >= StitchRangeRect.bottom
-		&&FormList[find].rectangle.top <= StitchRangeRect.top) {
+		&& FormList[find].rectangle.right <= StitchRangeRect.right
+		&& FormList[find].rectangle.bottom >= StitchRangeRect.bottom
+		&& FormList[find].rectangle.top <= StitchRangeRect.top) {
 
 		if (!ActiveLayer)
 			return 1;
@@ -11654,7 +11654,7 @@ void barnam(HWND window, unsigned iThumbnail) {
 	TCHAR		buffer[_MAX_PATH];
 	TCHAR*		lastCharacter;
 
-	if (iThumbnail < ThumbnailDisplayCount&&ThumbnailsSelected[iThumbnail]) {
+	if (iThumbnail < ThumbnailDisplayCount && ThumbnailsSelected[iThumbnail]) {
 
 		strcpy_s(buffer, ThumbnailsSelected[iThumbnail]);
 		lastCharacter = strrchr(buffer, '.');
@@ -11743,7 +11743,7 @@ void thumnail() {
 		ThumbnailCount = iThumbnail;
 		qsort(Thumbnails, iThumbnail, sizeof(TCHAR *), strcomp);
 		iThumbnail = ThumbnailIndex = 0;
-		while (iThumbnail < 4 && ThumbnailIndex < ThumbnailCount&&iThumbnail < ThumbnailCount) {
+		while (iThumbnail < 4 && ThumbnailIndex < ThumbnailCount && iThumbnail < ThumbnailCount) {
 
 			ThumbnailsSelected[iThumbnail] = Thumbnails[iThumbnail];
 			iThumbnail++;
@@ -11812,7 +11812,7 @@ void nuthbak(unsigned count) {
 		length = strlen(ThumbnailSearchString);
 		if (length) {
 
-			while (count&&ThumbnailIndex < MAXFORMS) {
+			while (count && ThumbnailIndex < MAXFORMS) {
 
 				if (ThumbnailIndex) {
 
@@ -12315,7 +12315,7 @@ void nucols() {
 
 BOOL dunum(unsigned code) {
 
-	if (code >= '0'&&code <= '9') {
+	if (code >= '0' && code <= '9') {
 
 		NumericCode = code;
 		return 1;
@@ -13067,7 +13067,7 @@ BOOL chkminus(unsigned code) {
 
 		if (PreferenceIndex == PCLPOF + 1)
 			return 1;
-		if (FormMenuChoice == LFRMSPAC&&isfclp())
+		if (FormMenuChoice == LFRMSPAC && isfclp())
 			return 1;
 		if (FormMenuChoice == LWLKIND)
 			return 1;
@@ -13763,7 +13763,7 @@ void trace() {
 		for (index = 0; index < BitmapWidth*BitmapHeight; index++) {
 
 			psum = colsum(TraceBitmapData[index]);
-			if (usum > psum&&dsum < psum)
+			if (usum > psum && dsum < psum)
 				setrac(index);
 			else
 				TraceBitmapData[index] = 0;
@@ -14010,7 +14010,7 @@ BOOL trcbit() {
 		if (ActivePointIndex >= 500000)
 			return 0;
 	}
-	if (TraceDirection == InitialDirection&&CurrentTracePoint.x == TracedPoints[0].x&&CurrentTracePoint.y == TracedPoints[0].y)
+	if (TraceDirection == InitialDirection && CurrentTracePoint.x == TracedPoints[0].x && CurrentTracePoint.y == TracedPoints[0].y)
 		return 0;
 	else
 		return 1;
@@ -15192,7 +15192,7 @@ void movchk() {
 					}
 					else {
 
-						if (!key&&color == DraggedColor) {
+						if (!key && color == DraggedColor) {
 
 							StitchBuffer[iStitch].attribute &= NCOLMSK;
 							StitchBuffer[iStitch].attribute |= VerticalIndex;
@@ -15208,14 +15208,14 @@ void movchk() {
 							pfrm->fillColor = DraggedColor;
 						else {
 
-							if (!key&&pfrm->fillColor == DraggedColor)
+							if (!key && pfrm->fillColor == DraggedColor)
 								pfrm->fillColor = VerticalIndex;
 						}
 						if (pfrm->fillInfo.feather.color == VerticalIndex)
 							pfrm->fillInfo.feather.color = DraggedColor;
 						else {
 
-							if (!key&&pfrm->fillInfo.feather.color == DraggedColor)
+							if (!key && pfrm->fillInfo.feather.color == DraggedColor)
 								pfrm->fillInfo.feather.color = VerticalIndex;
 						}
 					}
@@ -15225,7 +15225,7 @@ void movchk() {
 							pfrm->borderColor = DraggedColor;
 						else {
 
-							if (!key&&pfrm->borderColor == DraggedColor)
+							if (!key && pfrm->borderColor == DraggedColor)
 								pfrm->borderColor = VerticalIndex;
 						}
 					}
@@ -15269,7 +15269,7 @@ void inscol() {
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
 				color = StitchBuffer[iStitch].attribute&COLMSK;
-				if (color >= VerticalIndex&&color < nextColor) {
+				if (color >= VerticalIndex && color < nextColor) {
 
 					StitchBuffer[iStitch].attribute &= NCOLMSK;
 					StitchBuffer[iStitch].attribute |= color + 1;
@@ -15280,14 +15280,14 @@ void inscol() {
 				form = &FormList[iForm];
 				if (form->fillType) {
 
-					if (form->fillColor >= VerticalIndex&&form->fillColor < nextColor)
+					if (form->fillColor >= VerticalIndex && form->fillColor < nextColor)
 						form->fillColor++;
-					if (form->fillInfo.feather.color >= VerticalIndex&&form->fillInfo.feather.color < nextColor)
+					if (form->fillInfo.feather.color >= VerticalIndex && form->fillInfo.feather.color < nextColor)
 						form->fillInfo.feather.color++;
 				}
 				if (form->edgeType) {
 
-					if (form->borderColor >= VerticalIndex&&form->borderColor < nextColor)
+					if (form->borderColor >= VerticalIndex && form->borderColor < nextColor)
 						form->borderColor++;
 				}
 			}
@@ -15329,7 +15329,7 @@ void delcol() {
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
 				color = StitchBuffer[iStitch].attribute&COLMSK;
-				if (color > VerticalIndex&&color) {
+				if (color > VerticalIndex && color) {
 
 					StitchBuffer[iStitch].attribute &= NCOLMSK;
 					StitchBuffer[iStitch].attribute |= color - 1;
@@ -15366,7 +15366,7 @@ void set1knot() {
 
 	unsigned	source, destination;
 
-	if (PCSHeader.stitchCount&&chkMap(SELBOX)) {
+	if (PCSHeader.stitchCount && chkMap(SELBOX)) {
 
 		savdo();
 		if (ClosestPointIndex == (unsigned)PCSHeader.stitchCount - 1) {
@@ -15379,7 +15379,7 @@ void set1knot() {
 
 			source = PCSHeader.stitchCount - 1;
 			destination = PCSHeader.stitchCount + 4;
-			while (source&&source >= ClosestPointIndex)
+			while (source && source >= ClosestPointIndex)
 				mvstch(destination--, source--);
 			OutputIndex = ClosestPointIndex + 1;
 			strtknt(ClosestPointIndex);
@@ -15544,8 +15544,8 @@ unsigned chkMsg() {
 			return 1;
 		}
 		movchk();
-		if (Msg.pt.x >= StitchWindowAbsRect.left&&Msg.pt.x <= StitchWindowAbsRect.right
-			&&Msg.pt.y >= StitchWindowAbsRect.top&&Msg.pt.y <= StitchWindowAbsRect.bottom) {
+		if (Msg.pt.x >= StitchWindowAbsRect.left && Msg.pt.x <= StitchWindowAbsRect.right
+			&& Msg.pt.y >= StitchWindowAbsRect.top && Msg.pt.y <= StitchWindowAbsRect.bottom) {
 
 			if (GetKeyState(VK_SHIFT) & 0x8000) {
 				mvshft();
@@ -16192,8 +16192,8 @@ gotcur:;
 				}
 			}
 		}
-		if (Msg.pt.x >= ColorBarRect.left&&Msg.pt.x <= ColorBarRect.right
-			&&Msg.pt.y >= ColorBarRect.top&&Msg.pt.y <= ColorBarRect.bottom) {
+		if (Msg.pt.x >= ColorBarRect.left && Msg.pt.x <= ColorBarRect.right
+			&& Msg.pt.y >= ColorBarRect.top && Msg.pt.y <= ColorBarRect.bottom) {
 
 			unpat();
 			colorBarPosition = (double)(Msg.pt.y - ColorBarRect.top) / (ColorBarRect.bottom - ColorBarRect.top);
@@ -16373,7 +16373,7 @@ gotcur:;
 				}
 				if (Msg.wParam&MK_CONTROL) {
 
-					if (!SelectedFormCount&&chkMap(FORMSEL)) {
+					if (!SelectedFormCount && chkMap(FORMSEL)) {
 
 						setMap(WASEL);
 						PreviousFormIndex = ClosestFormToCursor;
@@ -16496,8 +16496,8 @@ frmskip:;
 			}
 			return 1;
 		}
-		if (Msg.pt.x >= MinLenRect.left&&Msg.pt.x <= MinLenRect.right
-			&&Msg.pt.y > MinLenRect.top&&Msg.pt.y <= MinLenRect.bottom) {
+		if (Msg.pt.x >= MinLenRect.left && Msg.pt.x <= MinLenRect.right
+			&& Msg.pt.y > MinLenRect.top && Msg.pt.y <= MinLenRect.bottom) {
 
 			srchk();
 			setsrch(SmallestStitchIndex);
@@ -16506,8 +16506,8 @@ frmskip:;
 			setMap(RESTCH);
 			return 1;
 		}
-		if (Msg.pt.x >= MaxLenRect.left&&Msg.pt.x <= MaxLenRect.right
-			&&Msg.pt.y > MaxLenRect.top&&Msg.pt.y <= MaxLenRect.bottom) {
+		if (Msg.pt.x >= MaxLenRect.left && Msg.pt.x <= MaxLenRect.right
+			&& Msg.pt.y > MaxLenRect.top && Msg.pt.y <= MaxLenRect.bottom) {
 
 			srchk();
 			setsrch(LargestStitchIndex);
@@ -16637,8 +16637,8 @@ frmskip:;
 			else {
 
 				GetWindowRect(DeleteStitchesDialog, &windowRect);
-				if (Msg.pt.x >= windowRect.left&&Msg.pt.x <= windowRect.right
-					&&Msg.pt.y >= windowRect.top&&Msg.pt.y <= windowRect.bottom) {
+				if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right
+					&& Msg.pt.y >= windowRect.top && Msg.pt.y <= windowRect.bottom) {
 
 					savdo();
 					setMap(DELTO);
@@ -16840,8 +16840,8 @@ chkcolx:;
 
 				StitchCoordinatesPixels.x = Msg.pt.x - StitchWindowOrigin.x;
 				StitchCoordinatesPixels.y = Msg.pt.y - StitchWindowOrigin.y;
-				if (StitchCoordinatesPixels.x >= FormControlPoints[0].x&&StitchCoordinatesPixels.x <= FormControlPoints[2].x&&
-					StitchCoordinatesPixels.y >= FormControlPoints[0].y&&StitchCoordinatesPixels.y <= FormControlPoints[4].y) {
+				if (StitchCoordinatesPixels.x >= FormControlPoints[0].x && StitchCoordinatesPixels.x <= FormControlPoints[2].x &&
+					StitchCoordinatesPixels.y >= FormControlPoints[0].y && StitchCoordinatesPixels.y <= FormControlPoints[4].y) {
 
 					duSelbox();
 					setMap(SELPNT);
@@ -16927,8 +16927,8 @@ chkcolx:;
 					return 1;
 				}
 				GetWindowRect(CancelButton, &windowRect);
-				if (Msg.pt.x >= windowRect.left&&Msg.pt.x <= windowRect.right
-					&&Msg.pt.y >= windowRect.top&&Msg.pt.y <= windowRect.bottom) {
+				if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right
+					&& Msg.pt.y >= windowRect.top && Msg.pt.y <= windowRect.bottom) {
 
 					getbak();
 					return 1;
@@ -16947,8 +16947,8 @@ chkcolx:;
 			else {
 
 				GetWindowRect(DeleteStitchesDialog, &windowRect);
-				if (Msg.pt.x >= windowRect.left&&Msg.pt.x <= windowRect.right
-					&&Msg.pt.y >= windowRect.top&&Msg.pt.y <= windowRect.bottom) {
+				if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right
+					&& Msg.pt.y >= windowRect.top && Msg.pt.y <= windowRect.bottom) {
 
 					savdo();
 					setMap(DELTO);
@@ -17006,8 +17006,8 @@ chkcolx:;
 		if (rstMap(FORMIN)) {
 
 			GetWindowRect(MsgWindow, &windowRect);
-			if (Msg.pt.x >= windowRect.left&&Msg.pt.x <= windowRect.right
-				&&Msg.pt.y >= windowRect.top&&Msg.pt.y <= windowRect.bottom) {
+			if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right
+				&& Msg.pt.y >= windowRect.top && Msg.pt.y <= windowRect.bottom) {
 
 				iFillType = (Msg.pt.y - windowRect.top - 1) / (ButtonHeight - 4);
 				if (rstMap(FENDIN)) {
@@ -17321,7 +17321,7 @@ chkcolx:;
 			}
 			else {
 
-				if (SelectedForm->fillType == SAT&&SelectedForm->satinGuideCount)
+				if (SelectedForm->fillType == SAT && SelectedForm->satinGuideCount)
 					delsac(ClosestFormToCursor);
 				if ((SelectedForm->edgeType&NEGUND) == EDGEAPPL) {
 
@@ -18020,7 +18020,7 @@ didskip:;
 					else {
 
 						xlin();
-						if (StitchBuffer[ClosestPointIndex].attribute&ALTYPMSK&&StitchBuffer[ClosestPointIndex + 1].attribute&ALTYPMSK) {
+						if (StitchBuffer[ClosestPointIndex].attribute&ALTYPMSK && StitchBuffer[ClosestPointIndex + 1].attribute&ALTYPMSK) {
 							if ((StitchBuffer[ClosestPointIndex].attribute&FRMSK) == (StitchBuffer[ClosestPointIndex + 1].attribute&FRMSK))
 								code = StitchBuffer[ClosestPointIndex].attribute | USMSK;
 						}
@@ -18266,7 +18266,7 @@ didskip:;
 		}
 		if (chkMsgs(Msg.pt, UserColorWin[0], UserColorWin[15])) {
 
-			if (Msg.message == WM_LBUTTONDOWN&&nuCol(UserColor[VerticalIndex])) {
+			if (Msg.message == WM_LBUTTONDOWN && nuCol(UserColor[VerticalIndex])) {
 
 				savdo();
 				UserColor[VerticalIndex] = ColorStruct.rgbResult;
@@ -18598,7 +18598,7 @@ didskip:;
 				LastKeyCode = 'I';
 				return 1;
 			}
-			if (code == 'Q'&&LastKeyCode == 'Q')
+			if (code == 'Q' && LastKeyCode == 'Q')
 				unpat();
 			LastKeyCode = code;
 			if (chkMap(NUMIN)) {
@@ -18694,7 +18694,7 @@ didskip:;
 
 				if (BufferIndex > BufferDigitCount - 1)
 					BufferIndex = 0;
-				if (StitchEntryBuffer[0] == '0'&&BufferIndex)
+				if (StitchEntryBuffer[0] == '0' && BufferIndex)
 					BufferIndex--;
 				StitchEntryBuffer[BufferIndex++] = NumericCode;
 				StitchEntryBuffer[BufferIndex] = 0;
@@ -19355,7 +19355,7 @@ thumout:;
 								for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 
 									SelectedForm = &FormList[FormIndex + iForm];
-									if (SelectedForm->type == SAT&&SelectedForm->satinGuideCount) {
+									if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
 
 										SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
 										for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
@@ -19440,7 +19440,7 @@ thumout:;
 									CurrentFormVertices = (fPOINT*)&ClipFormHeader[1];
 									mvflpnt(&SelectedForm->vertices[0], &CurrentFormVertices[0], SelectedForm->vertexCount);
 									guides = (SATCON*)&CurrentFormVertices[SelectedForm->vertexCount];
-									if (SelectedForm->type == SAT&&SelectedForm->satinGuideCount) {
+									if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
 
 										SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
 										mvsatk(&SelectedForm->satinOrAngle.guide[0], &guides[0], SelectedForm->satinGuideCount);
@@ -22273,8 +22273,8 @@ void dumov() {
 
 	RotateAngle = atan2(StitchBuffer[MoveAnchor + 1].y - StitchBuffer[MoveAnchor].y, StitchBuffer[MoveAnchor + 1].x - StitchBuffer[MoveAnchor].x);
 	anchorStitch = &StitchBuffer[MoveAnchor];
-	if (anchorStitch->x >= ZoomRect.left&&anchorStitch->x <= ZoomRect.right
-		&&anchorStitch->y >= ZoomRect.bottom&&anchorStitch->y <= ZoomRect.top) {
+	if (anchorStitch->x >= ZoomRect.left && anchorStitch->x <= ZoomRect.right
+		&& anchorStitch->y >= ZoomRect.bottom && anchorStitch->y <= ZoomRect.top) {
 
 		sdCor2px(StitchBuffer[MoveAnchor], &RotationCenterPixels);
 		rotationOutline[0].x = rotationOutline[6].x = RotationCenterPixels.x;
@@ -22372,7 +22372,7 @@ void drwknot() {
 	POINT		pnt;
 	POINT		tlin[5];
 
-	if (!chku(KNOTOF) && KnotCount&&PCSHeader.stitchCount) {
+	if (!chku(KNOTOF) && KnotCount && PCSHeader.stitchCount) {
 
 		for (ind = 0; ind < KnotCount; ind++) {
 
@@ -22553,9 +22553,9 @@ void drwStch() {
 						for (iStitch = 0; iStitch < stitchCount; iStitch++) {
 
 							if (currentStitches[iStitch].x >= ZoomRect.left
-								&&currentStitches[iStitch].x <= ZoomRect.right
-								&&currentStitches[iStitch].y >= ZoomRect.bottom
-								&&currentStitches[iStitch].y <= ZoomRect.top) {
+								&& currentStitches[iStitch].x <= ZoomRect.right
+								&& currentStitches[iStitch].y >= ZoomRect.bottom
+								&& currentStitches[iStitch].y <= ZoomRect.top) {
 
 								setCol(ColorChangeTable[iColor].colorIndex);
 								goto skip;
@@ -22581,9 +22581,9 @@ skip1:;
 					if (!ActiveLayer || !layer || (layer == ActiveLayer)) {
 
 						if (currentStitches[iStitch].x >= ZoomRect.left
-							&&currentStitches[iStitch].x <= ZoomRect.right
-							&&currentStitches[iStitch].y >= ZoomRect.bottom
-							&&currentStitches[iStitch].y <= ZoomRect.top) {
+							&& currentStitches[iStitch].x <= ZoomRect.right
+							&& currentStitches[iStitch].y >= ZoomRect.bottom
+							&& currentStitches[iStitch].y <= ZoomRect.top) {
 
 							wascol = 1;
 							if (setMap(LINED)) {
@@ -22641,7 +22641,7 @@ skip1:;
 									offset = currentStitches[iStitch].x + slope*currentStitches[iStitch].y;
 									//does the line intersect with the top of the screen?
 									gapToEdge = offset - slope*ZoomRect.top;
-									if (gapToEdge >= ZoomRect.left&&gapToEdge <= ZoomRect.right) {
+									if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
 
 										stitchLine[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
 										stitchLine[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.x + 0.5;
@@ -22652,7 +22652,7 @@ skip1:;
 									}
 									//does the line intersect the bottom of the screen?
 									gapToEdge = offset - slope*ZoomRect.bottom;
-									if (gapToEdge >= ZoomRect.left&&gapToEdge <= ZoomRect.right) {
+									if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
 
 										stitchLine[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
 										stitchLine[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
@@ -22665,7 +22665,7 @@ skip1:;
 									if (slope) {
 
 										gapToEdge = (offset - ZoomRect.left) / slope;
-										if (gapToEdge >= ZoomRect.bottom&&gapToEdge <= ZoomRect.top) {
+										if (gapToEdge >= ZoomRect.bottom && gapToEdge <= ZoomRect.top) {
 
 											stitchLine[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
 											stitchLine[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
@@ -22701,7 +22701,7 @@ skip:;
 				setCol(ColorChangeTable[iColor].colorIndex);
 				stitchCount = ColorChangeTable[iColor + 1].stitchIndex - ColorChangeTable[iColor].stitchIndex;
 				stitchCount = chkup(stitchCount, iColor);
-				if (!pwid || (pwid&&ColorChangeTable[iColor].colorIndex == ActiveColor))
+				if (!pwid || (pwid && ColorChangeTable[iColor].colorIndex == ActiveColor))
 					drwLin(ColorChangeTable[iColor].stitchIndex, stitchCount, UserPen[ColorChangeTable[iColor].colorIndex]);
 			}
 		}
@@ -22745,9 +22745,9 @@ skip:;
 
 						for (iStitch = ColorChangeTable[iColor].stitchIndex; iStitch < ColorChangeTable[iColor + 1].stitchIndex; iStitch++) {
 
-							if (StitchBuffer[iStitch].x >= ZoomRect.left&&StitchBuffer[iStitch].x <= ZoomRect.right
-								&&StitchBuffer[iStitch].y >= ZoomRect.bottom&&StitchBuffer[iStitch].y <= ZoomRect.top
-								&&setRmap(StitchBuffer[iStitch]))
+							if (StitchBuffer[iStitch].x >= ZoomRect.left && StitchBuffer[iStitch].x <= ZoomRect.right
+								&& StitchBuffer[iStitch].y >= ZoomRect.bottom && StitchBuffer[iStitch].y <= ZoomRect.top
+								&& setRmap(StitchBuffer[iStitch]))
 
 								stchbox(iStitch, StitchWindowMemDC);
 						}
@@ -22758,9 +22758,9 @@ skip:;
 
 				for (iColor = 0; iColor < PCSHeader.stitchCount; iColor++) {
 
-					if (StitchBuffer[iColor].x >= ZoomRect.left&&StitchBuffer[iColor].x <= ZoomRect.right
-						&&StitchBuffer[iColor].y >= ZoomRect.bottom&&StitchBuffer[iColor].y <= ZoomRect.top
-						&&setRmap(StitchBuffer[iColor]))
+					if (StitchBuffer[iColor].x >= ZoomRect.left && StitchBuffer[iColor].x <= ZoomRect.right
+						&& StitchBuffer[iColor].y >= ZoomRect.bottom && StitchBuffer[iColor].y <= ZoomRect.top
+						&& setRmap(StitchBuffer[iColor]))
 
 						stchbox(iColor, StitchWindowMemDC);
 				}
@@ -23269,7 +23269,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 			//owner draw windows
 			DrawItem = (LPDRAWITEMSTRUCT)lParam;
-			if (DrawItem->hwndItem == MainStitchWin&&DrawItem->itemAction == ODA_DRAWENTIRE) {
+			if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
 
 				if (chkMap(TXTRED)) {
 					drwtxtr();
@@ -23327,7 +23327,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				}
 				return 1;
 			}
-			if (DrawItem->hwndItem == ColorBar&&DrawItem->itemAction == ODA_DRAWENTIRE) {
+			if (DrawItem->hwndItem == ColorBar && DrawItem->itemAction == ODA_DRAWENTIRE) {
 
 				if (PCSHeader.stitchCount)
 					dubar();
@@ -23595,7 +23595,7 @@ void sachk() {
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 
 		form = &FormList[iForm];
-		if (form->type == SAT&&form->satinGuideCount) {
+		if (form->type == SAT && form->satinGuideCount) {
 
 			guide = form->satinOrAngle.guide;
 			for (iGuide = 0; iGuide < form->satinGuideCount; iGuide++) {

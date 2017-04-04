@@ -856,7 +856,7 @@ void delsac(unsigned formIndex) {
 	unsigned	source, destination;
 
 	if (SatinConnectIndex) {
-		if (FormList[formIndex].type == SAT&&FormList[formIndex].satinGuideCount) {
+		if (FormList[formIndex].type == SAT && FormList[formIndex].satinGuideCount) {
 			destination = satind(FormList[formIndex].satinOrAngle.guide);
 			source = destination + FormList[formIndex].satinGuideCount;
 			while (source < SatinConnectIndex) {
@@ -864,7 +864,7 @@ void delsac(unsigned formIndex) {
 				SatinConnects[destination++].finish = SatinConnects[source++].finish;
 			}
 			for (iForm = formIndex + 1; iForm < FormIndex; iForm++) {
-				if (FormList[iForm].type == SAT&&FormList[iForm].satinGuideCount)
+				if (FormList[iForm].type == SAT && FormList[iForm].satinGuideCount)
 					FormList[iForm].satinOrAngle.guide -= FormList[formIndex].satinGuideCount;
 			}
 			SatinConnectIndex -= FormList[formIndex].satinGuideCount;
@@ -916,7 +916,7 @@ void delfil(unsigned attribute) {
 	attribute &= TYPMSK | FRMSK;
 	iDestination = iSource = 0;
 	rstMap(WASDEL);
-	while ((StitchBuffer[iSource].attribute&(TYPMSK | FRMSK)) != attribute&&iSource < PCSHeader.stitchCount)
+	while ((StitchBuffer[iSource].attribute&(TYPMSK | FRMSK)) != attribute && iSource < PCSHeader.stitchCount)
 		iSource++;
 	iDestination = iSource;
 	if (iSource < PCSHeader.stitchCount) {
@@ -1459,7 +1459,7 @@ void drwfrm() {
 			}
 			else
 				frmpoly(&FormLines[lastPoint], VertexCount + 1 - lastPoint);
-			if (ClosestFormToCursor == iForm&&chkMap(FRMPSEL)) {
+			if (ClosestFormToCursor == iForm && chkMap(FRMPSEL)) {
 				for (iVertex = 1; iVertex < VertexCount; iVertex++) {
 					if (iVertex == ClosestVertexToCursor)
 						frmx(FormLines[iVertex], StitchWindowMemDC);
@@ -1813,7 +1813,7 @@ unsigned closfrm() {
 				vertices = FormList[iForm].vertices;
 				for (iVertex = 0; iVertex < FormInfo.sideCount; iVertex++) {
 					length = hypot(point.x - vertices[iVertex].x, point.y - vertices[iVertex].y);
-					if (length < minimumLength&&length >= 0) {
+					if (length < minimumLength && length >= 0) {
 						minimumLength = length;
 						closestForm = iForm;
 						closestVertex = iVertex;
@@ -2423,7 +2423,7 @@ void refilfn() {
 	if (!chkMap(WASDO))
 		savdo();
 	rstMap(WASDO);
-	if (SelectedForm->extendedAttribute&(AT_UND | AT_WALK) && SelectedForm->type == FRMLINE&&SelectedForm->fillType != CONTF)
+	if (SelectedForm->extendedAttribute&(AT_UND | AT_WALK) && SelectedForm->type == FRMLINE && SelectedForm->fillType != CONTF)
 		SelectedForm->type = FRMFPOLY;
 	InterleaveSequenceIndex = InterleaveSequenceIndex2 = 0;
 	rstMap(ISUND);
@@ -2527,7 +2527,7 @@ void refilfn() {
 					ritbrd();
 					break;
 			}
-			if (SelectedForm->fillType == CONTF&&SelectedForm->attribute&FRECONT) {
+			if (SelectedForm->fillType == CONTF && SelectedForm->attribute&FRECONT) {
 				contf();
 				ritfil();
 			}
@@ -2605,7 +2605,7 @@ void refilfn() {
 				}
 				lcon();
 				bakseq();
-				if (SelectedForm->fillType != VRTF&&SelectedForm->fillType != TXVRTF) {
+				if (SelectedForm->fillType != VRTF && SelectedForm->fillType != TXVRTF) {
 					RotationAngle = -RotationAngle;
 					rotbak();
 				}
@@ -2940,7 +2940,7 @@ BOOL lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) {
 	count0 = (GroupIndexSequence[group0 + 1] - GroupIndexSequence[group0]) >> 1;
 	index0 = 0;
 	lineEndPoint0 = &LineEndpoints[GroupIndexSequence[group0]];
-	while (count0&&lineEndPoint0[index0].line != line0) {
+	while (count0 && lineEndPoint0[index0].line != line0) {
 		count0--;
 		index0 += 2;
 	}
@@ -2948,7 +2948,7 @@ BOOL lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) {
 		count1 = (GroupIndexSequence[group1 + 1] - GroupIndexSequence[group1]) >> 1;
 		index1 = 0;
 		lineEndPoint1 = &LineEndpoints[GroupIndexSequence[group1]];
-		while (count1&&lineEndPoint1[index1].line != line1) {
+		while (count1 && lineEndPoint1[index1].line != line1) {
 			count1--;
 			index1 += 2;
 		}
@@ -2992,7 +2992,7 @@ BOOL regclos(unsigned iRegion0, unsigned iRegion1) {
 		lineStart = lineEndPoint1Start->line;
 		prlin = lineEndPoint0Start->line;
 	}
-	if (groupStart&&lnclos(groupStart - 1, prlin, groupStart, lineStart)) {
+	if (groupStart && lnclos(groupStart - 1, prlin, groupStart, lineStart)) {
 		NextGroup = groupStart;
 		return 1;
 	}
@@ -3333,10 +3333,10 @@ void durgn(unsigned pthi) {
 	if (seqn > sequenceEnd)
 		seqn = sequenceEnd;
 	if (SortedLines[seql]->group != LastGroup) {
-		if (seql < sequenceEnd&&SortedLines[seql + 1]->group == LastGroup)
+		if (seql < sequenceEnd && SortedLines[seql + 1]->group == LastGroup)
 			seql++;
 		else {
-			if (seql > sequenceStart&&SortedLines[seql - 1]->group == LastGroup)
+			if (seql > sequenceStart && SortedLines[seql - 1]->group == LastGroup)
 				seql--;
 			else {
 				mindif = 0xffffffff;
@@ -3351,10 +3351,10 @@ void durgn(unsigned pthi) {
 		}
 	}
 	if (SortedLines[seqn]->group != nextGroup) {
-		if (seqn < sequenceEnd&&SortedLines[seqn + 1]->group == nextGroup)
+		if (seqn < sequenceEnd && SortedLines[seqn + 1]->group == nextGroup)
 			seqn++;
 		else {
-			if (seqn > sequenceStart&&SortedLines[seqn - 1]->group == nextGroup)
+			if (seqn > sequenceStart && SortedLines[seqn - 1]->group == nextGroup)
 				seqn--;
 			else {
 				mindif = 0xffffffff;
@@ -4333,8 +4333,8 @@ unsigned chkfrm() {
 			return 1;
 		}
 	}
-	if (point.x >= rectangle.left&&point.x <= rectangle.right&&
-		point.y >= rectangle.top&&point.y <= rectangle.bottom) {
+	if (point.x >= rectangle.left && point.x <= rectangle.right && 
+		point.y >= rectangle.top && point.y <= rectangle.bottom) {
 		sfCor2px(SelectedForm->vertices[0], &formOrigin);
 		FormMoveDelta.x = formOrigin.x - point.x;
 		FormMoveDelta.y = formOrigin.y - point.y;
@@ -4368,7 +4368,7 @@ void rstfrm() {
 	SelectedForm->rectangle.left += offset.x;
 	SelectedForm->rectangle.right += offset.x;
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if ((StitchBuffer[iStitch].attribute&FRMSK) == attribute&&StitchBuffer[iStitch].attribute&ALTYPMSK && !(StitchBuffer[iStitch].attribute&NOTFRM)) {
+		if ((StitchBuffer[iStitch].attribute&FRMSK) == attribute && StitchBuffer[iStitch].attribute&ALTYPMSK && !(StitchBuffer[iStitch].attribute&NOTFRM)) {
 			StitchBuffer[iStitch].x += offset.x;
 			StitchBuffer[iStitch].y += offset.y;
 		}
@@ -4468,7 +4468,7 @@ void delcon(unsigned GuideIndex) {
 		MoveMemory(guide, &guide[1], (SatinConnectIndex - iGuide + 1) * sizeof(SATCON));
 	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 		formHeader = &FormList[iForm];
-		if (formHeader->type == SAT&&formHeader->satinGuideCount)
+		if (formHeader->type == SAT && formHeader->satinGuideCount)
 			formHeader->satinOrAngle.guide--;
 	}
 	if (ClosestVertexToCursor < WordParam)
@@ -4954,7 +4954,7 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 	double		line1Length, line2Length;
 	dPOINT		line1Point, line2Point, line1Delta, line2Delta, line1Step, line2Step;
 
-	if (line1Start != line1End&&line2Start != line2End) {
+	if (line1Start != line1End && line2Start != line2End) {
 		if (!setMap(SAT1)) {
 			if (chkMap(FTHR)) {
 				BSequence[SequenceIndex].attribute = 0;
@@ -5033,7 +5033,7 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 nuseg:;
 
 		if (chkMap(FTHR)) {
-			while (line1Count&&line2Count) {
+			while (line1Count && line2Count) {
 				line1Point.x += line1Step.x;
 				line1Point.y += line1Step.y;
 				line2Point.x += line2Step.x;
@@ -5058,7 +5058,7 @@ nuseg:;
 		}
 		else {
 			if (chkMap(BARSAT)) {
-				while (line1Count&&line2Count) {
+				while (line1Count && line2Count) {
 					line1Point.x += line1Step.x;
 					line1Point.y += line1Step.y;
 					line2Point.x += line2Step.x;
@@ -5088,7 +5088,7 @@ nuseg:;
 				}
 			}
 			else {
-				while (line1Count&&line2Count) {
+				while (line1Count && line2Count) {
 					line1Point.x += line1Step.x;
 					line1Point.y += line1Step.y;
 					line2Point.x += line2Step.x;
@@ -5127,7 +5127,7 @@ nuseg:;
 				line2Step.x = line2Delta.x / line2Count;
 				line2Step.y = line2Delta.y / line2Count;
 			}
-			if ((line1Count || line2Count) && line1Count < MAXITEMS&&line2Count < MAXITEMS)
+			if ((line1Count || line2Count) && line1Count < MAXITEMS && line2Count < MAXITEMS)
 				goto nuseg;
 		}
 		delete[] line1StitchCounts;
@@ -5385,7 +5385,7 @@ void insat() {
 		FormForInsert = SelectedForm;
 		fvars(ClosestFormToCursor);
 		if (upsat()) {
-			if (!ClosestVertexToCursor&&FormForInsert->type == FRMLINE)
+			if (!ClosestVertexToCursor && FormForInsert->type == FRMLINE)
 				setMap(PRELIN);
 			else
 				ClosestVertexToCursor = prv(ClosestVertexToCursor);
@@ -5443,7 +5443,7 @@ void delspnt() {
 		if (SelectedForm->satinGuideCount) {
 			guide = SelectedForm->satinOrAngle.guide;
 			iGuide = 0;
-			while (guide[iGuide].start != ClosestVertexToCursor&&guide[iGuide].finish != ClosestVertexToCursor&&iGuide < SelectedForm->satinGuideCount)
+			while (guide[iGuide].start != ClosestVertexToCursor && guide[iGuide].finish != ClosestVertexToCursor && iGuide < SelectedForm->satinGuideCount)
 				iGuide++;
 			if (iGuide < SelectedForm->satinGuideCount && (guide[iGuide].start == ClosestVertexToCursor || guide[iGuide].finish == ClosestVertexToCursor)) {
 				while (iGuide < SelectedForm->satinGuideCount) {
@@ -5455,7 +5455,7 @@ void delspnt() {
 				SatinConnectIndex--;
 				for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 					formHeader = &FormList[iForm];
-					if (formHeader->type == SAT&&formHeader->satinGuideCount)
+					if (formHeader->type == SAT && formHeader->satinGuideCount)
 						formHeader->satinOrAngle.guide++;
 				}
 			}
@@ -5597,7 +5597,7 @@ void rotfrm(unsigned newStartVertex) {
 			SelectedForm->wordParam = (SelectedForm->wordParam + SelectedForm->vertexCount
 				- newStartVertex) % SelectedForm->vertexCount;
 		for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-			if (CurrentFormGuides[iGuide].start != newStartVertex&&CurrentFormGuides[iGuide].finish != newStartVertex) {
+			if (CurrentFormGuides[iGuide].start != newStartVertex && CurrentFormGuides[iGuide].finish != newStartVertex) {
 				CurrentFormGuides[iRotatedGuide].start = (CurrentFormGuides[iGuide].start + VertexCount - newStartVertex) % VertexCount;
 				CurrentFormGuides[iRotatedGuide].finish = (CurrentFormGuides[iGuide].finish + VertexCount - newStartVertex) % VertexCount;
 				if (CurrentFormGuides[iRotatedGuide].start > CurrentFormGuides[iRotatedGuide].finish) {
@@ -5675,7 +5675,7 @@ void infrm() {
 		FormForInsert = &FormList[ClosestFormToCursor];
 		fvars(ClosestFormToCursor);
 		if (upsat()) {
-			if (!ClosestVertexToCursor&&FormForInsert->type == FRMLINE) {
+			if (!ClosestVertexToCursor && FormForInsert->type == FRMLINE) {
 				FormVertexPrev = 0;
 				setMap(PRELIN);
 			}
@@ -6531,7 +6531,7 @@ void sapliq() {
 	bsizpar();
 	SelectedForm->borderColor = ActiveColor | (AppliqueColor << 4);
 	if (SelectedForm->type != FRMLINE) {
-		if (SelectedForm->fillType == SAT&&SelectedForm->satinGuideCount)
+		if (SelectedForm->fillType == SAT && SelectedForm->satinGuideCount)
 			delsac(ClosestFormToCursor);
 	}
 	SelectedForm->fillType = 0;
@@ -6973,7 +6973,7 @@ void refrmfn() {
 			ValueWindow[LBCSIZ] = numwin(MsgBuffer, ValueWindowCoords);
 			nxtlin();
 		}
-		if (SelectedForm->type == FRMLINE&&EdgeArray[iEdge] & BRDEND) {
+		if (SelectedForm->type == FRMLINE && EdgeArray[iEdge] & BRDEND) {
 			LabelWindow[LBSTRT] = txtwin(StringTable[STR_TXT14], LabelWindowCoords);
 			if (SelectedForm->attribute&SBLNT)
 				ValueWindow[LBSTRT] = numwin(StringTable[STR_BLUNT], ValueWindowCoords);
@@ -7304,7 +7304,7 @@ void setexpand() {
 				size1.y = size1.x / XYratio;
 			ratio.x = size1.x / size0.x;
 			ratio.y = size1.y / size0.y;
-			if (!SelectedFormCount&&chkMap(FORMSEL)) {
+			if (!SelectedFormCount && chkMap(FORMSEL)) {
 				SelectedForm->rectangle.left = rectangle.right - size1.x;
 				SelectedForm->rectangle.top = rectangle.bottom + size1.y;
 			}
@@ -7323,7 +7323,7 @@ void setexpand() {
 				size1.y = size1.x / XYratio;
 			ratio.x = size1.x / size0.x;
 			ratio.y = size1.y / size0.y;
-			if (!SelectedFormCount&&chkMap(FORMSEL)) {
+			if (!SelectedFormCount && chkMap(FORMSEL)) {
 				SelectedForm->rectangle.right = rectangle.left + size1.x;
 				SelectedForm->rectangle.top = rectangle.bottom + size1.y;
 			}
@@ -7342,7 +7342,7 @@ void setexpand() {
 				size1.y = size1.x / XYratio;
 			ratio.x = size1.x / size0.x;
 			ratio.y = size1.y / size0.y;
-			if (!SelectedFormCount&&chkMap(FORMSEL)) {
+			if (!SelectedFormCount && chkMap(FORMSEL)) {
 				SelectedForm->rectangle.right = rectangle.left + size1.x;
 				SelectedForm->rectangle.bottom = rectangle.top - size1.y;
 			}
@@ -7361,7 +7361,7 @@ void setexpand() {
 				size1.y = size1.x / XYratio;
 			ratio.x = size1.x / size0.x;
 			ratio.y = size1.y / size0.y;
-			if (!SelectedFormCount&&chkMap(FORMSEL)) {
+			if (!SelectedFormCount && chkMap(FORMSEL)) {
 				SelectedForm->rectangle.left = rectangle.right - size1.x;
 				SelectedForm->rectangle.bottom = rectangle.top - size1.y;
 			}
@@ -7616,15 +7616,15 @@ void prflin(unsigned row) {
 }
 
 void sethup() {
-	if (IniFile.hoopSizeX == LHUPX&&IniFile.hoopSizeY == LHUPY) {
+	if (IniFile.hoopSizeX == LHUPX && IniFile.hoopSizeY == LHUPY) {
 		IniFile.hoopType = LARGHUP;
 		return;
 	}
-	if (IniFile.hoopSizeX == SHUPX&&IniFile.hoopSizeY == SHUPY) {
+	if (IniFile.hoopSizeX == SHUPX && IniFile.hoopSizeY == SHUPY) {
 		IniFile.hoopType = SMALHUP;
 		return;
 	}
-	if (IniFile.hoopSizeX == HUP100XY&&IniFile.hoopSizeY == HUP100XY) {
+	if (IniFile.hoopSizeX == HUP100XY && IniFile.hoopSizeY == HUP100XY) {
 		IniFile.hoopType = HUP100;
 		return;
 	}
@@ -8057,7 +8057,7 @@ void duhart(unsigned sideCount) {
 	}
 	stepAngle /= 4.5;
 	lastVertex = iVertex;
-	while (point.x > CurrentFormVertices[0].x&&iVertex < 200) {
+	while (point.x > CurrentFormVertices[0].x && iVertex < 200) {
 		CurrentFormVertices[iVertex].x = point.x;
 		CurrentFormVertices[iVertex++].y = point.y;
 		point.x += length*cos(angle);
@@ -8399,7 +8399,7 @@ void sprct(unsigned start, unsigned finish) {
 	verticalRect = &FillVerticalRect[start];
 	delta.x = OutsidePoints[finish].x - OutsidePoints[start].x;
 	delta.y = OutsidePoints[finish].y - OutsidePoints[start].y;
-	if (delta.x&&delta.y) {
+	if (delta.x && delta.y) {
 		Slope = -delta.x / delta.y;
 		point.x = CurrentFormVertices[finish].x;
 		point.y = CurrentFormVertices[finish].y;
@@ -9175,7 +9175,7 @@ void clpfil() {
 		if (ClipMemory) {
 			redclp();
 			CloseClipboard();
-			if (ClipRectSize.cx > CLPMIN&&ClipRectSize.cy > CLPMIN) {
+			if (ClipRectSize.cx > CLPMIN && ClipRectSize.cy > CLPMIN) {
 				if (SelectedFormCount) {
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 						ClosestFormToCursor = SelectedFormList[iForm];
@@ -9518,7 +9518,7 @@ void adfrm(unsigned iForm) {
 	ClosestFormToCursor = FormIndex;
 	formHeader->vertices = adflt(SelectedForm->vertexCount);
 	mvflpnt(formHeader->vertices, SelectedForm->vertices, SelectedForm->vertexCount);
-	if (formHeader->type == SAT&&formHeader->satinGuideCount) {
+	if (formHeader->type == SAT && formHeader->satinGuideCount) {
 		formHeader->satinOrAngle.guide = adsatk(formHeader->satinGuideCount);
 		mvsatk(formHeader->satinOrAngle.guide, SelectedForm->satinOrAngle.guide, SelectedForm->satinGuideCount);
 	}
@@ -9586,7 +9586,7 @@ void cplayfn(unsigned iForm, unsigned play) {
 	fvars(FormIndex);
 	SelectedForm->vertices = adflt(SelectedForm->vertexCount);
 	MoveMemory(SelectedForm->vertices, formHeader->vertices, VertexCount * sizeof(fPOINT));
-	if (SelectedForm->type == SAT&&SelectedForm->satinGuideCount) {
+	if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
 		SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
 		MoveMemory(SelectedForm->satinOrAngle.guide, formHeader->satinOrAngle.guide, SelectedForm->satinGuideCount * sizeof(SATCON));
 	}
@@ -9864,7 +9864,7 @@ void frmsadj() {
 	for (iForm = 0; iForm < SelectedFormCount; iForm++)
 		setr(SelectedFormList[iForm]);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (StitchBuffer[iStitch].attribute&ALTYPMSK&&chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
+		if (StitchBuffer[iStitch].attribute&ALTYPMSK && chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
 			StitchBuffer[iStitch].x += FormMoveDelta.x;
 			StitchBuffer[iStitch].y -= FormMoveDelta.y;
 		}
@@ -9995,13 +9995,13 @@ void selalfil() {
 	frm1pnt();
 	if (chkMap(FORMSEL)) {
 		ClosestPointIndex = 0;
-		while (ClosestPointIndex < PCSHeader.stitchCount&&notfstch(StitchBuffer[ClosestPointIndex].attribute))
+		while (ClosestPointIndex < PCSHeader.stitchCount && notfstch(StitchBuffer[ClosestPointIndex].attribute))
 			ClosestPointIndex++;
 		if (ClosestPointIndex != PCSHeader.stitchCount) {
 			if (ClosestPointIndex)
 				ClosestPointIndex--;
 			GroupStitchIndex = PCSHeader.stitchCount - 1;
-			while (GroupStitchIndex > ClosestPointIndex&&notfstch(StitchBuffer[GroupStitchIndex].attribute))
+			while (GroupStitchIndex > ClosestPointIndex && notfstch(StitchBuffer[GroupStitchIndex].attribute))
 				GroupStitchIndex--;
 			setMap(GRPSEL);
 			rstMap(FORMSEL);
@@ -10019,10 +10019,10 @@ BOOL frmrng(unsigned iForm, RANGE* range) {
 	range->start = 0;
 	range->finish = PCSHeader.stitchCount;
 	if (FormList[iForm].fillType || FormList[iForm].edgeType) {
-		while (range->start < PCSHeader.stitchCount&&notfstch(StitchBuffer[range->start].attribute))
+		while (range->start < PCSHeader.stitchCount && notfstch(StitchBuffer[range->start].attribute))
 			range->start++;
 		range->finish = PCSHeader.stitchCount - 1;
-		while (range->finish > range->start&&notfstch(StitchBuffer[range->finish].attribute))
+		while (range->finish > range->start && notfstch(StitchBuffer[range->finish].attribute))
 			range->finish--;
 		if (range->finish > range->start)
 			return 1;
@@ -10566,7 +10566,7 @@ void contf() {
 	delta.y = CurrentFormVertices[finish].y - CurrentFormVertices[start].y;
 	polref.length = hypot(delta.x, delta.y);
 	polref.angle = atan2(delta.y, delta.x);
-	while (lowCount || (lowIndex < lowVertexIndex&&highIndex < highVertexIndex)) {
+	while (lowCount || (lowIndex < lowVertexIndex && highIndex < highVertexIndex)) {
 		if (lowCount)
 			lowCount--;
 		else {
@@ -10978,7 +10978,7 @@ void frmnumfn(unsigned newFormIndex) {
 				if (decodedFormIndex == ClosestFormToCursor)
 					stchfrm(newFormIndex, &StitchBuffer[iStitch].attribute);
 				else {
-					if (decodedFormIndex >= start&&decodedFormIndex <= finish) {
+					if (decodedFormIndex >= start && decodedFormIndex <= finish) {
 						if (newFormIndex < ClosestFormToCursor)
 							stchfrm(decodedFormIndex + 1, &StitchBuffer[iStitch].attribute);
 						else
@@ -11001,7 +11001,7 @@ void frmnum() {
 
 	TCHAR	buffer[HBUFSIZ];
 
-	if (FormIndex&&chkMap(FORMSEL)) {
+	if (FormIndex && chkMap(FORMSEL)) {
 		LoadString(ThrEdInstance, IDS_FRML, buffer, HBUFSIZ);
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), buffer, FormIndex);
 		shoMsg(MsgBuffer);
@@ -11261,7 +11261,7 @@ void bean(unsigned start, unsigned finish) {
 	iSourceStitch++;
 	while (iSourceStitch < (unsigned)finish - 2) {
 		mvstch(iCopyStitch++, iSourceStitch);
-		if ((StitchBuffer[iSourceStitch + 2].x != StitchBuffer[iSourceStitch].x || StitchBuffer[iSourceStitch + 2].y != StitchBuffer[iSourceStitch].y) &&
+		if ((StitchBuffer[iSourceStitch + 2].x != StitchBuffer[iSourceStitch].x || StitchBuffer[iSourceStitch + 2].y != StitchBuffer[iSourceStitch].y) && 
 			(StitchBuffer[iSourceStitch - 2].x != StitchBuffer[iSourceStitch].x || StitchBuffer[iSourceStitch - 2].y != StitchBuffer[iSourceStitch].y)) {
 			mvstch(iCopyStitch++, iSourceStitch + 1);
 			mvstch(iCopyStitch++, iSourceStitch);
@@ -11312,7 +11312,7 @@ void unbean(unsigned start, unsigned finish) {
 	BeanCount = 0;
 	for (iSource = start; iSource <= finish; iSource++) {
 		mvstch(iCopy++, iSource);
-		if (StitchBuffer[iSource].x == StitchBuffer[iSource + 2].x&&StitchBuffer[iSource].y == StitchBuffer[iSource + 2].y) {
+		if (StitchBuffer[iSource].x == StitchBuffer[iSource + 2].x && StitchBuffer[iSource].y == StitchBuffer[iSource + 2].y) {
 			iSource += 2;
 			BeanCount += 2;
 		}
@@ -11888,7 +11888,7 @@ BOOL isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* leng
 			if (delta.x)
 				flag = projh(point.y, CurrentFormVertices[vertex0], CurrentFormVertices[vertex1], &tempIntersection);
 			else
-				if (CurrentFormVertices[vertex0].y == LineSegmentStart.y&&CurrentFormVertices[vertex1].y == LineSegmentStart.y) {
+				if (CurrentFormVertices[vertex0].y == LineSegmentStart.y && CurrentFormVertices[vertex1].y == LineSegmentStart.y) {
 					if (CurrentFormVertices[vertex0].x < CurrentFormVertices[vertex1].x) {
 						left = CurrentFormVertices[vertex0].x;
 						right = CurrentFormVertices[vertex1].x;
@@ -11950,9 +11950,9 @@ unsigned insect() {
 		nextVertex = nxt(currentVertex);
 		if (isect(currentVertex, nextVertex, &ClipIntersectData[iIntersection].point, &ClipIntersectData[iIntersection].sideLength)) {
 			intersection = &ClipIntersectData[iIntersection].point;
-			if (intersection->x >= lineSegmentRect.left&&
-				intersection->x <= lineSegmentRect.right&&
-				intersection->y >= lineSegmentRect.bottom&&
+			if (intersection->x >= lineSegmentRect.left &&
+				intersection->x <= lineSegmentRect.right &&
+				intersection->y >= lineSegmentRect.bottom && 
 				intersection->y <= lineSegmentRect.top) {
 				ClipIntersectData[iIntersection].segmentLength = hypot(ClipIntersectData[iIntersection].point.x - LineSegmentStart.x, ClipIntersectData[iIntersection].point.y - LineSegmentStart.y);
 				ClipIntersectData[iIntersection].vertexIndex = currentVertex;
@@ -11995,7 +11995,7 @@ BOOL isin(float xCoordinate, float yCoordinate) {
 		nvrt = nxt(svrt);
 		if (projv(xCoordinate, CurrentFormVertices[svrt], CurrentFormVertices[nvrt], &ipnt)) {
 			if (ipnt.y > yCoordinate) {
-				if (CurrentFormVertices[svrt].x != xCoordinate&&CurrentFormVertices[nvrt].x != xCoordinate)
+				if (CurrentFormVertices[svrt].x != xCoordinate && CurrentFormVertices[nvrt].x != xCoordinate)
 					acnt++;
 				else {
 					if (CurrentFormVertices[svrt].x < CurrentFormVertices[nvrt].x) {
@@ -12118,7 +12118,7 @@ void clpcon() {
 	if (ClipWidth < CLPMINAUT)
 		ClipWidth = (float)CLPMINAUT;
 	if (chkMap(TXFIL)) {
-		if (TextureIndex&&SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count <= TextureIndex)
+		if (TextureIndex && SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count <= TextureIndex)
 			ClipWidth = SelectedForm->fillSpacing;
 		else
 			return;
@@ -12258,7 +12258,7 @@ void clpcon() {
 				ClipStitchPoints[ActivePointIndex].x = LineSegmentStart.x;
 				ClipStitchPoints[ActivePointIndex].y = LineSegmentStart.y;
 				if (isin(LineSegmentStart.x, LineSegmentStart.y)) {
-					if (ActivePointIndex&&ClipStitchPoints[ActivePointIndex - 1].flag == 2)
+					if (ActivePointIndex && ClipStitchPoints[ActivePointIndex - 1].flag == 2)
 						inspnt();
 					ClipStitchPoints[ActivePointIndex].flag = 0;
 				}
@@ -12828,7 +12828,7 @@ void col2frm() {
 					colorChangedCount++;
 					FormList[iForm].fillColor = majorityColor;
 				}
-				if (FormList[iForm].fillType == FTHF&&FormList[iForm].extendedAttribute&AT_FTHBLND) {
+				if (FormList[iForm].fillType == FTHF && FormList[iForm].extendedAttribute&AT_FTHBLND) {
 					count = majorityColor = 0;
 					for (iColor = startColorOffset; iColor < endColorOffset; iColor++) {
 						if (featherColorHistogram[iColor] > count) {
@@ -13224,7 +13224,7 @@ BOOL cisin(float xCoordinate, float yCoordinate) {
 		nextVertex = nxt(iVertex);
 		if (projv(xCoordinate, CurrentFormVertices[iVertex], CurrentFormVertices[nextVertex], &intersection)) {
 			if (intersection.y >= yCoordinate) {
-				if (CurrentFormVertices[iVertex].x != xCoordinate&&CurrentFormVertices[nextVertex].x != xCoordinate)
+				if (CurrentFormVertices[iVertex].x != xCoordinate && CurrentFormVertices[nextVertex].x != xCoordinate)
 					count++;
 				else {
 					if (CurrentFormVertices[iVertex].x < CurrentFormVertices[nextVertex].x) {
@@ -13513,7 +13513,7 @@ void wavfrm() {
 		points = new fPOINT[IniFile.wavePoints];
 		iPoint = 0;
 		iVertex = IniFile.waveStart;
-		while (iVertex != IniFile.waveEnd&&iPoint < IniFile.wavePoints) {
+		while (iVertex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 			iNextVertex = (iVertex + 1) % IniFile.wavePoints;
 			points[iPoint].x = -CurrentFormVertices[iNextVertex].x + CurrentFormVertices[iVertex].x;
 			points[iPoint].y = -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[iVertex].y;

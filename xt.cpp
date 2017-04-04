@@ -746,7 +746,7 @@ void fritfil() {
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillColor;
 		chkseq(false);
 		InterleaveSequenceIndex2++;
-		if (SelectedForm->extendedAttribute&AT_FTHBLND&&~(SelectedForm->extendedAttribute&(AT_FTHUP | AT_FTHDWN)) != (AT_FTHUP | AT_FTHDWN)) {
+		if (SelectedForm->extendedAttribute&AT_FTHBLND && ~(SelectedForm->extendedAttribute&(AT_FTHUP | AT_FTHDWN)) != (AT_FTHUP | AT_FTHDWN)) {
 
 			InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 			InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FTH;
@@ -1149,7 +1149,7 @@ void fnwlk(unsigned find) {
 	fvars(find);
 	if (SelectedForm->type == FRMLINE)
 		SelectedForm->type = FRMFPOLY;
-	if (SelectedForm->extendedAttribute&AT_STRT&&SelectedForm->type != FRMLINE)
+	if (SelectedForm->extendedAttribute&AT_STRT && SelectedForm->type != FRMLINE)
 		start = SelectedForm->fillStart;
 	else
 		start = 0;
@@ -1947,7 +1947,7 @@ BOOL srtchk(OREC** record, unsigned count, unsigned* badForm) {
 		if (record[iRecord]->form == form) {
 			if (ColorOrder[record[iRecord]->color] < ColorOrder[color]) {
 				formHeader = &FormList[form];
-				if (formHeader->fillType == FTHF&&formHeader->extendedAttribute&AT_FTHBLND&&record[iRecord]->color == formHeader->fillColor)
+				if (formHeader->fillType == FTHF && formHeader->extendedAttribute&AT_FTHBLND && record[iRecord]->color == formHeader->fillColor)
 					continue;
 				*badForm = iRecord;
 				return 0;
@@ -2407,7 +2407,7 @@ void intlv() {
 			switch (InterleaveSequenceIndices[iSequence].seq) {
 				case I_AP:
 
-					if (FillStartsMap&M_FIL&&FillStartsData.applique >= InterleaveData.coloc)
+					if (FillStartsMap&M_FIL && FillStartsData.applique >= InterleaveData.coloc)
 						InterleaveData.coloc = FillStartsData.applique;
 					else {
 						InterleaveData.coloc = FillStartsData.appliqueColor;
@@ -2418,7 +2418,7 @@ void intlv() {
 
 				case I_FIL:
 
-					if (FillStartsMap&M_FIL&&FillStartsData.fill >= InterleaveData.coloc)
+					if (FillStartsMap&M_FIL && FillStartsData.fill >= InterleaveData.coloc)
 						InterleaveData.coloc = FillStartsData.fill;
 					else
 						InterleaveData.coloc = FillStartsData.fillColor;
@@ -2426,7 +2426,7 @@ void intlv() {
 
 				case I_FTH:
 
-					if (FillStartsMap&M_FIL&&FillStartsData.feather >= InterleaveData.coloc)
+					if (FillStartsMap&M_FIL && FillStartsData.feather >= InterleaveData.coloc)
 						InterleaveData.coloc = FillStartsData.feather;
 					else
 						InterleaveData.coloc = FillStartsData.featherColor;
@@ -2434,7 +2434,7 @@ void intlv() {
 
 				case I_BRD:
 
-					if (FillStartsMap&M_BRD&&FillStartsData.border >= InterleaveData.coloc)
+					if (FillStartsMap&M_BRD && FillStartsData.border >= InterleaveData.coloc)
 						InterleaveData.coloc = FillStartsData.border;
 					else
 						InterleaveData.coloc = FillStartsData.borderColor;
@@ -2444,7 +2444,7 @@ void intlv() {
 			duint(offset, code);
 		}
 		chkend(MAXITEMS, code);
-		if (PCSHeader.stitchCount&&InterleaveData.start < (unsigned)PCSHeader.stitchCount - 1) {
+		if (PCSHeader.stitchCount && InterleaveData.start < (unsigned)PCSHeader.stitchCount - 1) {
 			ine = PCSHeader.stitchCount - InterleaveData.start;
 			MoveMemory(&StitchBuffer[InterleaveData.output + MAXITEMS], &StitchBuffer[InterleaveData.start], sizeof(fPOINTATTR)*ine);
 			InterleaveData.output += ine;
@@ -2736,7 +2736,7 @@ void dufind(float indent) {
 void fangfn(unsigned find, float angle) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
-	if (SelectedForm->type == FRMFPOLY&&SelectedForm->fillType) {
+	if (SelectedForm->type == FRMFPOLY && SelectedForm->fillType) {
 		switch (SelectedForm->fillType) {
 			case VRTF:
 			case HORF:
@@ -3329,7 +3329,7 @@ void chktx() {
 
 	iNextPoint = 0;
 	for (iPoint = 0; iPoint < TextureScreen.index; iPoint++) {
-		if (TempTexturePoints[iPoint].line <= TextureScreen.lines&&TempTexturePoints[iPoint].y < TextureScreen.areaHeight) {
+		if (TempTexturePoints[iPoint].line <= TextureScreen.lines && TempTexturePoints[iPoint].y < TextureScreen.areaHeight) {
 			TempTexturePoints[iNextPoint].line = TempTexturePoints[iPoint].line;
 			TempTexturePoints[iNextPoint].y = TempTexturePoints[iPoint].y;
 			iNextPoint++;
@@ -3717,9 +3717,9 @@ void txtrup() {
 			}
 			SelectedTexturePointsCount = 0;
 			for (iPoint = 0; iPoint < TextureScreen.index; iPoint++) {
-				if (TempTexturePoints[iPoint].y<highestTexturePoint.y&&
-					TempTexturePoints[iPoint].y>lowestTexturePoint.y&&
-					TempTexturePoints[iPoint].line <= highestTexturePoint.line&&
+				if (TempTexturePoints[iPoint].y<highestTexturePoint.y &&
+					TempTexturePoints[iPoint].y>lowestTexturePoint.y &&
+					TempTexturePoints[iPoint].line <= highestTexturePoint.line &&
 					TempTexturePoints[iPoint].line >= lowestTexturePoint.line) {
 					SelectedTexturePointsList[SelectedTexturePointsCount] = iPoint;
 					SelectedTexturePointsCount++;
@@ -3943,7 +3943,7 @@ void deltx() {
 	unsigned iTexture, textureCount;
 
 	textureCount = SelectedForm->fillInfo.texture.count;
-	if (TextureIndex&&istx(ClosestFormToCursor) && textureCount) {
+	if (TextureIndex && istx(ClosestFormToCursor) && textureCount) {
 		iTexture = SelectedForm->fillInfo.texture.index;
 		MoveMemory(&TexturePointsBuffer[iTexture], &TexturePointsBuffer[iTexture + textureCount], TextureIndex - (iTexture + textureCount));
 		for (iTexture = ClosestFormToCursor + 1; iTexture < FormIndex; iTexture++) {
@@ -4052,7 +4052,7 @@ void dutxmir() {
 	txsrt();
 	centerLine = (TextureScreen.lines + 1) >> 1;
 	iPoint = TextureScreen.index - 1;
-	while (TempTexturePoints[iPoint].line > centerLine&&iPoint >= 0)
+	while (TempTexturePoints[iPoint].line > centerLine && iPoint >= 0)
 		iPoint--;
 	iMirrorPoint = iPoint + 1;
 	if (TextureScreen.lines & 1) {
@@ -4127,9 +4127,9 @@ void txtlbut() {
 	}
 	if (SelectedTexturePointsCount) {
 		deorg(&point);
-		if (point.x > TexturePixelRect.left&&
-			point.x<TexturePixelRect.right&&
-			point.y>TexturePixelRect.top&&
+		if (point.x > TexturePixelRect.left &&
+			point.x<TexturePixelRect.right &&
+			point.y>TexturePixelRect.top &&
 			point.y < TexturePixelRect.bottom) {
 			setxmov();
 			ritxrct();
@@ -4221,7 +4221,7 @@ void txtdel() {
 		setMap(RESTCH);
 		return;
 	}
-	if (TextureScreen.index&&txtclos(&iClosestPoint)) {
+	if (TextureScreen.index && txtclos(&iClosestPoint)) {
 		MoveMemory(&TempTexturePoints[iClosestPoint], &TempTexturePoints[iClosestPoint + 1], (TextureScreen.index - iClosestPoint) * sizeof(TXPNT));
 		TextureScreen.index--;
 		setMap(RESTCH);
@@ -4338,7 +4338,7 @@ BOOL txdig(unsigned keyCode, TCHAR* character) {
 		*character = (TCHAR)keyCode;
 		return 1;
 	}
-	if (keyCode >= VK_NUMPAD0&&keyCode <= VK_NUMPAD9) {
+	if (keyCode >= VK_NUMPAD0 && keyCode <= VK_NUMPAD9) {
 		*character = (TCHAR)keyCode - VK_NUMPAD0 + 0x30;
 		return 1;
 	}
@@ -5064,7 +5064,7 @@ unsigned frmchkfn() {
 				if (iseclp(iForm))
 					chkeclp(formHeader, &badData);
 			}
-			if (formHeader->type == SAT&&formHeader->satinGuideCount) {
+			if (formHeader->type == SAT && formHeader->satinGuideCount) {
 				if (!(badData.attribute&BADSAT)) {
 					if (badData.guideCount == formHeader->satinOrAngle.guide - SatinConnects)
 						badData.guideCount += formHeader->satinGuideCount;
