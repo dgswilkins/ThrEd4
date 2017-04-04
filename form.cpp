@@ -10716,9 +10716,9 @@ void ribon() {
 			formHeader->minFillStitchLen = MinStitchLength;
 			MaxStitchLen = 9 * PFGRAN;
 			if (SelectedForm->type == FRMLINE) {
-				// ToDo - convert isBlunt to BOOL
+				// Set blunt flags
 				if (chku(BLUNT))
-					isBlunt = 0xffffffff;
+					isBlunt = SBLNT | FBLNT;
 				else
 					isBlunt = 0;
 				satends(isBlunt);
