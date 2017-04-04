@@ -2717,7 +2717,7 @@ unsigned prv(unsigned iVertex) {
 
 /* find the intersection of two lines, one defined by point and slope, the other by the coordinates
    of the endpoints. */
-unsigned proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* intersectionPoint) {
+BOOL proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* intersectionPoint) {
 
 	dPOINT	delta;
 	double	sideSlope, pointConstant, sideConstant, xMinimum, xMaximum, yMinimum, yMaximum, swap;
@@ -2752,20 +2752,20 @@ unsigned proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* 
 			yMaximum = swap;
 		}
 		if (intersectionPoint->x<xMinimum || intersectionPoint->x>xMaximum || intersectionPoint->y<yMinimum || intersectionPoint->y>yMaximum)
-			return 0;
+			return false;
 		else
-			return 1;
+			return true;
 	}
 	else {
 		if (intersectionPoint->x<xMinimum || intersectionPoint->x>xMaximum)
-			return 0;
+			return false;
 		else
-			return 1;
+			return true;
 	}
 }
 
 // find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
-unsigned projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT* intersection) {
+BOOL projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT* intersection) {
 	double swap, slope, deltaX;
 
 	intersection->x = xCoordinate;
@@ -2779,16 +2779,16 @@ unsigned projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT*
 			upperPoint.x = swap;
 		}
 		if (xCoordinate<lowerPoint.x || xCoordinate>upperPoint.x)
-			return 0;
+			return false;
 		else
-			return 1;
+			return true;
 	}
 	else
-		return 0;
+		return false;
 }
 
 // find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
-unsigned projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersection) {
+BOOL projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersection) {
 
 	double	swap, slope, deltaX, deltaY;
 
@@ -2801,7 +2801,7 @@ unsigned projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* interse
 			intersection->x = (yCoordinate - point0.y) / slope + point0.x;
 		}
 		else
-			return 0;
+			return false;
 	}
 	else
 		intersection->x = point0.x;
@@ -2811,9 +2811,9 @@ unsigned projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* interse
 		point1.y = swap;
 	}
 	if (yCoordinate<point0.y || yCoordinate>point1.y)
-		return 0;
+		return false;
 	else
-		return 1;
+		return true;
 }
 
 void filang() {
@@ -11867,20 +11867,19 @@ clpcmpx :
 
 BOOL isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* length) {
 
-	dPOINT		delta;
-	dPOINT		point;
-	dPOINT		tempIntersection;
-	// ToDo - convert flag type and proj[h|v] return values to BOOL
-	unsigned	flag;
-	float		left;
-	float		right;
+	dPOINT	delta;
+	dPOINT	point;
+	dPOINT	tempIntersection;
+	BOOL	flag;
+	float	left;
+	float	right;
 
 	delta.x = LineSegmentEnd.x - LineSegmentStart.x;
 	delta.y = LineSegmentEnd.y - LineSegmentStart.y;
 	point.x = LineSegmentStart.x;
 	point.y = LineSegmentStart.y;
-	flag = 0;
-	if (delta.x&&delta.y)
+	flag = false;
+	if (delta.x && delta.y)
 		flag = proj(point, delta.y / delta.x, CurrentFormVertices[vertex0], CurrentFormVertices[vertex1], &tempIntersection);
 	else {
 		if (delta.y)
@@ -11898,16 +11897,16 @@ BOOL isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* leng
 						left = CurrentFormVertices[vertex1].x;
 						right = CurrentFormVertices[vertex0].x;
 					}
-					if (LineSegmentStart.x > left&&LineSegmentStart.x < right) {
+					if (LineSegmentStart.x > left && LineSegmentStart.x < right) {
 						intersection->x = LineSegmentStart.x;
 						intersection->y = LineSegmentStart.y;
 						*length = 0;
-						return 1;
+						return true;
 					}
-					return 0;
+					return false;
 				}
 				else
-					return 0;
+					return false;
 		}
 	}
 	if (tempIntersection.x < TINY)
