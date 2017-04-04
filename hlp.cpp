@@ -514,7 +514,7 @@ void grpmsg1() {
 
 void help() {
 	strcpy_s(HelpFileName, HomeDirectory);
-#if LANG==ENG||LANG==HNG
+#if LANG==ENG || LANG==HNG
 	strcat_s(HelpFileName, "thred.chm");
 #endif
 #if LANG==GRM

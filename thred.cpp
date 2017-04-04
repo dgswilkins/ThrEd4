@@ -3526,7 +3526,7 @@ void dun() {
 	unsid();
 	unbsho();
 	rstAll();
-	//	if(savcmp()||(*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount && !FormIndex))
+	//	if(savcmp() || (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount && !FormIndex))
 	if (savcmp() || (*BalaradName0))
 		reldun();
 	else {
@@ -11522,7 +11522,7 @@ void hupfn() {
 
 		if (CheckHoopRect.left<0 ||
 			CheckHoopRect.right>IniFile.hoopSizeX ||
-			CheckHoopRect.bottom<0 ||
+			CheckHoopRect.bottom < 0 || 
 			CheckHoopRect.top>IniFile.hoopSizeY) {
 
 			setMap(HUPEX);
@@ -12387,7 +12387,7 @@ void desiz() {
 			strcpy_s(MsgBuffer, StringTable[STR_STCHOUT]);
 			message = &MsgBuffer[strlen(MsgBuffer)];
 		}
-#if LANG==ENG||LANG==HNG
+#if LANG==ENG || LANG==HNG
 
 		sprintf_s(message, sizeof(MsgBuffer),
 			StringTable[STR_STCHS],
@@ -12411,7 +12411,7 @@ void desiz() {
 		frmrct(&rectangle);
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
-#if LANG==ENG||LANG==HNG
+#if LANG==ENG || LANG==HNG
 
 		sprintf_s(message, sizeof(MsgBuffer), StringTable[STR_FORMS],
 			FormIndex,
@@ -18861,7 +18861,7 @@ thumout:;
 
 				case 0xdb:		//[
 
-#if LANG==ENG||LANG==HNG
+#if LANG==ENG || LANG==HNG
 
 					if (GetKeyState(VK_SHIFT) & 0X8000)
 						selfrm0();
@@ -18872,7 +18872,7 @@ thumout:;
 
 				case 0xdd:		//]
 
-#if LANG==ENG||LANG==HNG
+#if LANG==ENG || LANG==HNG
 
 					if (GetKeyState(VK_SHIFT) & 0X8000)
 						selfrmx();

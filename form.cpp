@@ -7631,7 +7631,7 @@ void sethup() {
 	IniFile.hoopType = CUSTHUP;
 }
 
-#if LANG==ENG||LANG==HNG
+#if LANG==ENG || LANG==HNG
 
 void prfmsg() {
 
