@@ -11699,10 +11699,10 @@ void ritseg() {
 	ClipSegments[ActivePointIndex].dun = 1;
 }
 
-unsigned lenref(float* length) {
+unsigned lenref(float* lineLength) {
 #if	 __UseASM__
 	_asm {
-		mov		eax, length
+		mov		eax, lineLength
 		sub		eax, ClipSegments
 		xor		ecx, ecx
 		mov		ecx, 29
@@ -11716,7 +11716,7 @@ lrefx :
 	}
 #else
 	//Correct
-	unsigned eax = (unsigned)length - (unsigned)ClipSegments;
+	unsigned eax = (unsigned)lineLength - (unsigned)ClipSegments;
 
 	unsigned edx = eax % 29;
 	eax /= 29;
