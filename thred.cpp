@@ -21645,8 +21645,8 @@ void ducmd() {
 
 			balaradFileName = &WorkingFileName[4];
 			BalaradFile = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
-			CloseHandle(BalaradFile);
 			if (BalaradFile != INVALID_HANDLE_VALUE) {
+				CloseHandle(BalaradFile);
 
 #if  __UseASM__
 				bcpy(BalaradName0, balaradFileName);
@@ -21675,13 +21675,13 @@ void ducmd() {
 							strcat_s(BalaradName2, "");
 							if (bytesRead)
 								redbal();
+							CloseHandle(BalaradFile);
 						}
 					}
 				}
 				SetWindowText(ThrEdWindow, StringTable[STR_EMB]);
 			}
 			*WorkingFileName = 0;
-			CloseHandle(BalaradFile);
 			DeleteFile(BalaradName1);
 		}
 		else {

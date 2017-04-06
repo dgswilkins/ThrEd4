@@ -861,10 +861,13 @@ BOOL chkp2cnam(char* fileName) {
 	HANDLE	handleP2C;
 
 	handleP2C = CreateFile(fileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
-	CloseHandle(handleP2C);
-	if (handleP2C == INVALID_HANDLE_VALUE)
+	if (handleP2C == INVALID_HANDLE_VALUE) {
 		return 0;
-	return 1;
+	} 
+	else {
+		CloseHandle(handleP2C);
+		return 1;
+	}
 }
 
 void pes2crd() {
