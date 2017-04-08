@@ -3481,9 +3481,7 @@ BOOL txtclos(unsigned* closestTexturePoint) {
 	unsigned	iPoint;
 	POINT		reference, point;
 
-	// ToDo - could these be replaced by deorg()?
-	reference.x = Msg.pt.x - StitchWindowOrigin.x;
-	reference.y = Msg.pt.y - StitchWindowOrigin.y;
+	deorg(&reference);
 	minimumLength = 1e99;
 	*closestTexturePoint = 0;
 	for (iPoint = 0; iPoint < TextureScreen.index; iPoint++) {
@@ -3785,7 +3783,6 @@ void setxfrm() {
 	angrct(&angleRect);
 	height = angleRect.top - angleRect.bottom;
 	if (height > TextureScreen.areaHeight) {
-		// ToDo - is 95% a good number?
 		ratio = TextureScreen.areaHeight / height*0.95;
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 			AngledFormVertices[iVertex].x *= ratio;
