@@ -1206,7 +1206,6 @@ void frmsqr(unsigned iVertex) {
 	Polyline(StitchWindowMemDC, line, 4);
 }
 
-// ToDo - selsqr, frmsqr0 and frmx are very similar. Can they be combined?
 void selsqr(POINT controlPoint, HDC dc) {
 
 	POINT	line[5];
@@ -1379,7 +1378,6 @@ void frmpoly(POINT* line, unsigned count) {
 
 	unsigned	iPoint;
 
-	// ToDo - why iterate through the points instead of drawing as 1 polygon?
 	if (count) {
 		for (iPoint = 0; iPoint < count - 1; iPoint++)
 			Polyline(StitchWindowMemDC, &line[iPoint], 2);
@@ -3123,12 +3121,11 @@ void duseq1() {
 
 void duseq(unsigned start, unsigned finish) {
 
-	unsigned	iLine, iLineDec, topbak;
+	unsigned	iLine, iLineDec, savedTopLine;
 
-	//ToDo - More renaming required
 	SequenceLines = nullptr;
 	rstMap(SEQDUN);
-	topbak = SortedLines[start][1].line;
+	savedTopLine = SortedLines[start][1].line;
 	if (start > finish) {
 		// This odd construction for iLine is used to ensure loop terminates when finish = 0
 		for (iLine = start + 1; iLine != finish; iLine--) {
@@ -3137,11 +3134,11 @@ void duseq(unsigned start, unsigned finish) {
 				if (!setMap(SEQDUN))
 					duseq2(iLineDec);
 				else {
-					if (topbak != SortedLines[iLineDec][1].line) {
+					if (savedTopLine != SortedLines[iLineDec][1].line) {
 						if (iLineDec)
 							duseq2(iLineDec + 1);
 						duseq2(iLineDec);
-						topbak = SequenceLines[1].line;
+						savedTopLine = SequenceLines[1].line;
 					}
 				}
 			}
@@ -3162,11 +3159,11 @@ void duseq(unsigned start, unsigned finish) {
 				if (!setMap(SEQDUN))
 					duseq2(iLine);
 				else {
-					if (topbak != SortedLines[iLine][1].line) {
+					if (savedTopLine != SortedLines[iLine][1].line) {
 						if (iLine)
 							duseq2(iLine - 1);
 						duseq2(iLine);
-						topbak = SequenceLines[1].line;
+						savedTopLine = SequenceLines[1].line;
 					}
 				}
 			}
@@ -3189,22 +3186,21 @@ void duseq(unsigned start, unsigned finish) {
 
 void brkseq(unsigned start, unsigned finish) {
 
-	unsigned	iLine, iLineDec, bgrp = 0;
+	unsigned	iLine, iLineDec, savedGroup = 0;
 
-	//ToDo - More renaming required
 	rstMap(SEQDUN);
 	if (start > finish) {
-		bgrp = SortedLines[start]->group + 1;
+		savedGroup = SortedLines[start]->group + 1;
 		// This odd construction for iLine is used to ensure
 		// loop terminates when finish = 0
 		for (iLine = start + 1; iLine != finish; iLine--) {
 			iLineDec = iLine - 1;
-			bgrp--;
-			if (SortedLines[iLineDec]->group != bgrp) {
+			savedGroup--;
+			if (SortedLines[iLineDec]->group != savedGroup) {
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
 				SequenceLines = &*SortedLines[iLineDec];
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
-				bgrp = SequenceLines[0].group;
+				savedGroup = SequenceLines[0].group;
 			}
 			else
 				SequenceLines = &*SortedLines[iLineDec];
@@ -3218,14 +3214,14 @@ void brkseq(unsigned start, unsigned finish) {
 		LastGroup = SequenceLines->group;
 	}
 	else {
-		bgrp = SortedLines[start]->group - 1;
+		savedGroup = SortedLines[start]->group - 1;
 		for (iLine = start; iLine <= finish; iLine++) {
-			bgrp++;
-			if (SortedLines[iLine]->group != bgrp) {
+			savedGroup++;
+			if (SortedLines[iLine]->group != savedGroup) {
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
 				SequenceLines = &*SortedLines[iLine];
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
-				bgrp = SequenceLines[0].group;
+				savedGroup = SequenceLines[0].group;
 			}
 			else
 				SequenceLines = &*SortedLines[iLine];
