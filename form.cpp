@@ -1069,8 +1069,7 @@ void px2stchf(POINT screen, fPOINT* stitchPoint) {
 
 	double	factorX, factorY;
 
-	// ToDo - is StitchWindowClientRect.left ever not zero?
-	factorX = (double)(screen.x - StitchWindowClientRect.left) / StitchWindowClientRect.right;
+	factorX = static_cast<double>(screen.x) / static_cast<double>(StitchWindowClientRect.right);
 	stitchPoint->x = factorX*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
 	factorY = (double)(StitchWindowClientRect.bottom - screen.y) / StitchWindowClientRect.bottom;
 	stitchPoint->y = factorY*(ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
@@ -13506,7 +13505,6 @@ void wavfrm() {
 		durpoli(IniFile.wavePoints);
 		mdufrm();
 		FormVertexIndex = iVertex;
-		// ToDo - check wavePoints is the right option
 		points = new fPOINT[IniFile.wavePoints];
 		iPoint = 0;
 		iVertex = IniFile.waveStart;
