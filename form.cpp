@@ -4686,8 +4686,7 @@ void satadj() {
 			iDestination++;
 		}
 	}
-	// Todo - Should this be iSource or iDestination?
-	CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iSource;
+	CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iDestination;
 	if (WordParam || SelectedForm->attribute&FRMEND) {
 		for (iWord = 0; iWord < mapSize; iWord++)
 			CheckMap[iWord] = 0;
