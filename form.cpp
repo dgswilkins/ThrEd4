@@ -3808,8 +3808,8 @@ lconskip:;
 				VisitedRegions[iRegion] = 0;
 			LastGroup = 0;
 			for (iPath = 0; iPath < PathIndex; iPath++) {
-				//				sprintf_s(MsgBuffer, sizeof(MsgBuffer),"iterator %d,vrt %d,grpn %d\n",iterator,PathMap[iPath].vrt,PathMap[iPath].grpn);
-				//				OutputDebugString(MsgBuffer);
+				// sprintf_s(MsgBuffer, sizeof(MsgBuffer), "iterator %d,vrt %d,grpn %d\n", iPath, PathMap[iPath].node, PathMap[iPath].nextGroup);
+				// OutputDebugString(MsgBuffer);
 				if (!unvis())
 					break;
 				durgn(iPath);
