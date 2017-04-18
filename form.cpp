@@ -3421,36 +3421,35 @@ void durgn(unsigned pthi) {
 
 unsigned notdun(unsigned level) {
 
-	unsigned	ind;
-	int			tpiv, pivot = level - 1;
+	unsigned	iPath;
+	int			pivot, previousLevel = level - 1;
 
-	//ToDo - More renaming required
 	RegionPath = &TempPath[SequencePathIndex];
 	RegionPath[0].pcon = MapIndexSequence[DoneRegion];
 	RegionPath[0].count = MapIndexSequence[DoneRegion + 1] - RegionPath[0].pcon;
-	for (ind = 1; ind < level; ind++) {
-		RegionPath[ind].pcon = MapIndexSequence[PathMap[RegionPath[ind - 1].pcon].node];
-		RegionPath[ind].count = MapIndexSequence[PathMap[RegionPath[ind - 1].pcon].node + 1] - RegionPath[ind].pcon;
+	for (iPath = 1; iPath < level; iPath++) {
+		RegionPath[iPath].pcon = MapIndexSequence[PathMap[RegionPath[iPath - 1].pcon].node];
+		RegionPath[iPath].count = MapIndexSequence[PathMap[RegionPath[iPath - 1].pcon].node + 1] - RegionPath[iPath].pcon;
 	}
-	while (VisitedRegions[PathMap[RegionPath[pivot].pcon].node] && pivot >= 0) {
-		if (--RegionPath[pivot].count > 0)
-			RegionPath[pivot].pcon++;
+	while (VisitedRegions[PathMap[RegionPath[previousLevel].pcon].node] && previousLevel >= 0) {
+		if (--RegionPath[previousLevel].count > 0)
+			RegionPath[previousLevel].pcon++;
 		else {
-			tpiv = pivot;
+			pivot = previousLevel;
 			do {
-				tpiv--;
-				if (tpiv < 0)
+				pivot--;
+				if (pivot < 0)
 					return 1;
-				RegionPath[tpiv].count--;
-				RegionPath[tpiv].pcon++;
-			} while (!RegionPath[tpiv].count);
-			if (tpiv < 0)
+				RegionPath[pivot].count--;
+				RegionPath[pivot].pcon++;
+			} while (!RegionPath[pivot].count);
+			if (pivot < 0)
 				return 1;
-			tpiv++;
-			while (tpiv <= pivot) {
-				if (tpiv) {
-					RegionPath[tpiv].pcon = MapIndexSequence[PathMap[RegionPath[tpiv - 1].pcon].node];
-					RegionPath[tpiv].count = MapIndexSequence[PathMap[RegionPath[tpiv - 1].pcon].node + 1] - RegionPath[tpiv].pcon;
+			pivot++;
+			while (pivot <= previousLevel) {
+				if (pivot) {
+					RegionPath[pivot].pcon = MapIndexSequence[PathMap[RegionPath[pivot - 1].pcon].node];
+					RegionPath[pivot].count = MapIndexSequence[PathMap[RegionPath[pivot - 1].pcon].node + 1] - RegionPath[pivot].pcon;
 				}
 				else {
 					if (--RegionPath[0].count)
@@ -3458,7 +3457,7 @@ unsigned notdun(unsigned level) {
 					else
 						return 1;
 				}
-				tpiv++;
+				pivot++;
 			}
 		}
 	}
