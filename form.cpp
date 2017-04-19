@@ -4757,7 +4757,6 @@ void satadj() {
 			}
 		}
 		iGuide = 0;
-		// ToDo - Does this for loop make sense?
 		for (iWord = 0; iWord < mapSize; iWord++) {
 			do {
 				iVertex = nxtchk(iWord);
@@ -5561,9 +5560,6 @@ void satzum() {
 }
 
 void rotfrm(unsigned newStartVertex) {
-	// ToDo - rotfrm does not seem to work properly. 
-	//        When setting the form zero point rotfrm does not keep the guides in the same place.
-	//        Read docs to see if this makes sense
 	fPOINT*			selectedVertices;
 	fPOINT*			rotatedVertices;
 	SATCON*			rotatedGuides;
