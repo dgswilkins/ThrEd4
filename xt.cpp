@@ -242,13 +242,12 @@ fPOINT		FeatherSequence[MAXITEMS];
 unsigned	FeatherCountUp;
 unsigned	FeatherCountDown;
 
-// ToDo - Find better names for these than using 'xt' prefix
-float		XTstep;
-float		XTposition;
-float		XTphase;
-float		XTup;
-float		XTdown;
-float		XTratio;
+float		FeatherGlobalStep;
+float		FeatherGlobalPosition;
+float		FeatherGlobalPhase;
+float		FeatherGlobalUp;
+float		FeatherGlobalDown;
+float		FeatherGlobalRatio;
 
 OREC**		PRecs;
 OREC**		PFRecs;
@@ -485,7 +484,7 @@ void nurat() {
 
 	float	remainder;
 
-	remainder = fmod(XTposition, 1);
+	remainder = fmod(FeatherGlobalPosition, 1);
 	switch (FeatherFillType) {
 
 		case FTHPSG:
@@ -525,28 +524,28 @@ void nurat() {
 
 		case FTHSIN:
 
-			if (remainder > XTratio)
-				FeatherRatio = sin((1 - remainder) / (1 - XTratio)*PI + PI)*0.5 + 0.5;
+			if (remainder > FeatherGlobalRatio)
+				FeatherRatio = sin((1 - remainder) / (1 - FeatherGlobalRatio)*PI + PI)*0.5 + 0.5;
 			else
-				FeatherRatio = sin(remainder / XTratio*PI)*0.5 + 0.5;
+				FeatherRatio = sin(remainder / FeatherGlobalRatio*PI)*0.5 + 0.5;
 			FeatherRatio *= FormFeatherRatio;
 			break;
 
 		case FTHSIN2:
 
-			if (remainder > XTratio)
-				FeatherRatio = sin((1 - remainder) / (1 - XTratio)*PI);
+			if (remainder > FeatherGlobalRatio)
+				FeatherRatio = sin((1 - remainder) / (1 - FeatherGlobalRatio)*PI);
 			else
-				FeatherRatio = sin(remainder / XTratio*PI);
+				FeatherRatio = sin(remainder / FeatherGlobalRatio*PI);
 			FeatherRatio *= FormFeatherRatio;
 			break;
 
 		case FTHRMP:
 
-			if (remainder > XTratio)
-				FeatherRatio = (1 - remainder) / (1 - XTratio);
+			if (remainder > FeatherGlobalRatio)
+				FeatherRatio = (1 - remainder) / (1 - FeatherGlobalRatio);
 			else
-				FeatherRatio = remainder / XTratio;
+				FeatherRatio = remainder / FeatherGlobalRatio;
 			FeatherRatio *= FormFeatherRatio;
 			break;
 
@@ -556,7 +555,7 @@ void nurat() {
 			FeatherRatio = FormFeatherRatio;
 	}
 	++FeatherPhase %= FeatherPhaseIndex;
-	XTposition += XTstep;
+	FeatherGlobalPosition += FeatherGlobalStep;
 }
 
 void fthfn(unsigned iSequence) {
@@ -672,12 +671,12 @@ void fthrfn() {
 	res = SequenceIndex % (FeatherPhaseIndex << 2);
 	if (res > (FeatherPhaseIndex << 1))
 		ind++;
-	XTposition = 0;
-	XTstep = (float)4 / SequenceIndex*ind;
-	XTphase = (float)SequenceIndex / ind;
-	XTratio = (float)FeatherCountUp / FeatherPhaseIndex;
-	XTup = XTphase*XTratio;
-	XTdown = XTphase - XTup;
+	FeatherGlobalPosition = 0;
+	FeatherGlobalStep = (float)4 / SequenceIndex*ind;
+	FeatherGlobalPhase = (float)SequenceIndex / ind;
+	FeatherGlobalRatio = (float)FeatherCountUp / FeatherPhaseIndex;
+	FeatherGlobalUp = FeatherGlobalPhase*FeatherGlobalRatio;
+	FeatherGlobalDown = FeatherGlobalPhase - FeatherGlobalUp;
 	SelectedForm->fillType = FTHF;
 	FeatherPhase = 1;
 	BSequence[SequenceIndex].x = BSequence[SequenceIndex - 2].x;
