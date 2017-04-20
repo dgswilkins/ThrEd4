@@ -6758,16 +6758,14 @@ void refrmfn() {
 			ValueWindow[LFTHBLND] = txtrwin(string, ValueWindowCoords);
 			nxtlin();
 			if (!(SelectedForm->extendedAttribute&AT_FTHBLND)) {
-				// ToDo - check whether we are doing 'feather down' or 'feather both'
-				// only 'feather both' exists in the string table
-				LabelWindow[LFTHDWN] = txtwin(StringTable[STR_FTHBOTH], LabelWindowCoords);
-				if (SelectedForm->extendedAttribute&(AT_FTHDWN))
+				LabelWindow[LFTHBTH] = txtwin(StringTable[STR_FTHBOTH], LabelWindowCoords);
+				if (SelectedForm->extendedAttribute&(AT_FTHBTH))
 					string = StringTable[STR_ON];
 				else
 					string = StringTable[STR_OFF];
-				ValueWindow[LFTHDWN] = txtrwin(string, ValueWindowCoords);
+				ValueWindow[LFTHBTH] = txtrwin(string, ValueWindowCoords);
 				nxtlin();
-				if (!(SelectedForm->extendedAttribute&AT_FTHDWN)) {
+				if (!(SelectedForm->extendedAttribute&AT_FTHBTH)) {
 					LabelWindow[LFTHUP] = txtwin(StringTable[STR_FTHUP], LabelWindowCoords);
 					if (SelectedForm->extendedAttribute&AT_FTHUP)
 						string = StringTable[STR_ON];

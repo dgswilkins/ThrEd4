@@ -319,7 +319,7 @@
 #define IDC_FDUP                        1029
 #define IDC_FDUPCNT                     1031
 #define IDC_DFUPCNT                     1031
-#define IDC_FDWN                        1032
+#define IDC_FBTH                        1032
 #define IDC_FDWNCNT                     1033
 #define IDC_DFDWNCNT                    1033
 #define IDC_FDBLND                      1036

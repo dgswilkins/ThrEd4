@@ -17587,9 +17587,9 @@ didfil:;
 				SelectedForm->extendedAttribute ^= AT_FTHUP;
 				goto didfil;
 			}
-			if (Msg.hwnd == ValueWindow[LFTHDWN]) {
+			if (Msg.hwnd == ValueWindow[LFTHBTH]) {
 
-				SelectedForm->extendedAttribute ^= AT_FTHDWN;
+				SelectedForm->extendedAttribute ^= AT_FTHBTH;
 				goto didfil;
 			}
 			if (Msg.hwnd == ValueWindow[LFTHTYP]) {

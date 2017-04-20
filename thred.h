@@ -1085,8 +1085,8 @@ typedef struct _frmhed {
 //frmhed extended attribute bits
 
 #define AT_SQR 1		//square ends
-#define AT_FTHUP 2		//feather up flag
-#define AT_FTHDWN 4		//feather down flag
+#define AT_FTHUP 2		//feather up or down flag
+#define AT_FTHBTH 4		//feather both up and down flag
 #define AT_FTHBLND 8	//feather blend flag
 #define AT_STRT 16		//user set start flag
 #define AT_END 32		//user set end flag
@@ -1528,8 +1528,8 @@ enum {
 	LFTHCOL,		//feather color 26
 	LFTHTYP,		//feather fill type
 	LFTHBLND,		//feather blend
-	LFTHDWN,		//feather down
-	LFTHUP,			//feather up
+	LFTHBTH,		//feather both up and down
+	LFTHUP,			//feather up or down
 	LFTHUPCNT,		//feather up count
 	LFTHDWNCNT,		//feather down count
 	LFTHSIZ,		//feather size

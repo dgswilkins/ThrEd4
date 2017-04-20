@@ -696,7 +696,7 @@ void fthrfn() {
 	}
 	else {
 
-		if (SelectedForm->extendedAttribute&AT_FTHDWN) {
+		if (SelectedForm->extendedAttribute&AT_FTHBTH) {
 
 			for (ind = 0; ind <= SequenceIndex; ind++) {
 
@@ -746,7 +746,7 @@ void fritfil() {
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillColor;
 		chkseq(false);
 		InterleaveSequenceIndex2++;
-		if (SelectedForm->extendedAttribute&AT_FTHBLND && ~(SelectedForm->extendedAttribute&(AT_FTHUP | AT_FTHDWN)) != (AT_FTHUP | AT_FTHDWN)) {
+		if (SelectedForm->extendedAttribute&AT_FTHBLND && ~(SelectedForm->extendedAttribute&(AT_FTHUP | AT_FTHBTH)) != (AT_FTHUP | AT_FTHBTH)) {
 
 			InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 			InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FTH;
@@ -779,7 +779,7 @@ void fethrf() {
 		SelectedForm->fillInfo.feather.downCount = IniFile.featherDownCount;
 		SelectedForm->fillInfo.feather.fillType = IniFile.featherFillType;
 		SelectedForm->fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
-		SelectedForm->extendedAttribute &= !(AT_FTHUP | AT_FTHDWN | AT_FTHBLND);
+		SelectedForm->extendedAttribute &= !(AT_FTHUP | AT_FTHBTH | AT_FTHBLND);
 		SelectedForm->extendedAttribute |= IniFile.featherType;
 		SelectedForm->fillInfo.feather.count = IniFile.featherCount;
 		SelectedForm->lengthOrCount.stitchLength = UserStitchLength;
@@ -1315,11 +1315,11 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			else
 				state = BST_UNCHECKED;
 			CheckDlgButton(hwndlg, IDC_FDUP, state);
-			if (featherType&AT_FTHDWN)
+			if (featherType&AT_FTHBTH)
 				state = BST_CHECKED;
 			else
 				state = BST_UNCHECKED;
-			CheckDlgButton(hwndlg, IDC_FDWN, state);
+			CheckDlgButton(hwndlg, IDC_FBTH, state);
 			break;
 
 		case WM_COMMAND:
@@ -1338,8 +1338,8 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 						IniFile.featherType = AT_FTHBLND;
 					if (IsDlgButtonChecked(hwndlg, IDC_FDUP))
 						IniFile.featherType |= AT_FTHUP;
-					if (IsDlgButtonChecked(hwndlg, IDC_FDWN))
-						IniFile.featherType |= AT_FTHDWN;
+					if (IsDlgButtonChecked(hwndlg, IDC_FBTH))
+						IniFile.featherType |= AT_FTHBTH;
 					GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf, HBUFSIZ);
 					IniFile.featherFillType = FDEFTYP;
 					for (iFeatherStyle = 0; iFeatherStyle < 6; iFeatherStyle++) {
