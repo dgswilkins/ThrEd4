@@ -4166,11 +4166,12 @@ void chknum() {
 						case LAPCOL:
 
 							savdo();
-							SelectedForm->borderColor &= 0xf;
+							SelectedForm->borderColor &= COLMSK;
+							// ToDo - Is this line correct? I suspect it should be 16 and could be replaced by >>4
 							borderColor = value / 6;
 							if (borderColor)
 								borderColor--;
-							borderColor &= 0xf;
+							borderColor &= COLMSK;
 							SelectedForm->borderColor |= (borderColor << 4);
 							break;
 					}
@@ -17074,7 +17075,7 @@ chkcolx:;
 				}
 				return 1;
 			}
-			SelectedForm->borderColor &= 0xf;
+			SelectedForm->borderColor &= COLMSK;
 			if (rstMap(BRDACT)) {
 
 				if (iseclp(ClosestFormToCursor))
@@ -18219,7 +18220,7 @@ didskip:;
 								}
 								if (FormList[ClosestFormToCursor].edgeType) {
 									if (FormList[ClosestFormToCursor].edgeType == EDGEAPPL) {
-										FormList[ClosestFormToCursor].borderColor &= 0xf0;
+										FormList[ClosestFormToCursor].borderColor &= APCOLMSK;
 										FormList[ClosestFormToCursor].borderColor |= ActiveColor;
 									}
 									else

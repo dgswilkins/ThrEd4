@@ -6883,7 +6883,7 @@ void refrmfn() {
 	nxtlin();
 	if (edgeFillType) {
 		LabelWindow[LBRDCOL] = txtwin(StringTable[STR_TXT8], LabelWindowCoords);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", (SelectedForm->borderColor & 0xf) + 1);
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", (SelectedForm->borderColor & COLMSK) + 1);
 		ValueWindow[LBRDCOL] = numwin(MsgBuffer, ValueWindowCoords);
 		nxtlin();
 		if (EdgeArray[iEdge] & BESPAC) {
@@ -7470,7 +7470,7 @@ void nulapcol(unsigned color) {
 	unsigned	attribute, iStitch;
 
 	if ((unsigned)(SelectedForm->borderColor >> 4) != color) {
-		SelectedForm->borderColor &= 0xf;
+		SelectedForm->borderColor &= COLMSK;
 		SelectedForm->borderColor |= color << 4;
 		attribute = (ClosestFormToCursor << 4) | TYPMSK;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
