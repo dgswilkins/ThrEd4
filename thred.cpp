@@ -20878,7 +20878,7 @@ thumout:;
 					flipv();
 					break;
 
-				case ID_FILANG: // fil/ / Angle 
+				case ID_FILANG: // fill / Angle 
 
 					if (chkMap(FORMSEL))
 						savdo();
