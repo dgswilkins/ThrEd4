@@ -1808,6 +1808,8 @@ unsigned closfrm() {
 			if (!ActiveLayer || !formLayer || formLayer == layerCoded) {
 				getfinfo(iForm);
 				vertices = FormList[iForm].vertices;
+				// ToDo - Change calculate closestVertex to be more intuitive by finding 
+				//        the closest line first and then finding the closest vertex on that line
 				for (iVertex = 0; iVertex < FormInfo.sideCount; iVertex++) {
 					length = hypot(point.x - vertices[iVertex].x, point.y - vertices[iVertex].y);
 					if (length < minimumLength && length >= 0) {
