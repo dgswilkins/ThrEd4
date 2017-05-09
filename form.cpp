@@ -1785,7 +1785,7 @@ void duform(unsigned formType) {
 	}
 }
 
-double FindDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point)
+float FindDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point, double *length)
 {
 	double A = point.x - lineStart.x;
 	double B = point.y - lineStart.y;
@@ -1825,7 +1825,8 @@ double FindDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point)
 	}
 
 	//returning shortest distance
-	return sqrt(diffX * diffX + diffY * diffY);
+	*length = sqrt(diffX * diffX + diffY * diffY);
+	return param;
 }
 
 unsigned closfrm() {
@@ -1835,6 +1836,7 @@ unsigned closfrm() {
 	fPOINT		point;
 	POINT		screenCoordinate;
 	double		length, minimumLength = 1e99;
+	float		param;
 
 	if (FormIndex) {
 		screenCoordinate.x = Msg.pt.x - StitchWindowOrigin.x;
@@ -1853,21 +1855,22 @@ unsigned closfrm() {
 				vertices = FormList[iForm].vertices;
 				// find the closest line first and then find the closest vertex on that line
 				for (iVertex = 0; iVertex < FormInfo.sideCount; iVertex++) {
-					length = FindDistanceToSide(vertices[iVertex], vertices[nxt(iVertex)], point);
+					param = FindDistanceToSide(vertices[iVertex], vertices[nxt(iVertex)], point, &length);
 					if (length < minimumLength && length >= 0) {
 						minimumLength = length;
 						closestForm = iForm;
-						closestVertex = iVertex;
+						if (param < 0.5) {
+							closestVertex = iVertex;
+						}
+						else {
+							closestVertex = nxt(iVertex); 
+						}
 					}
 				}
 			}
 		}
-		stch2pxr(FormList[closestForm].vertices[nxt(closestVertex)]);
-		minimumLength = hypot(StitchCoordinatesPixels.x - screenCoordinate.x, StitchCoordinatesPixels.y - screenCoordinate.y);
 		stch2pxr(FormList[closestForm].vertices[closestVertex]);
-		if (minimumLength < hypot(StitchCoordinatesPixels.x - screenCoordinate.x, StitchCoordinatesPixels.y - screenCoordinate.y)) { 
-			closestVertex = nxt(closestVertex);
-		}
+		minimumLength = hypot(StitchCoordinatesPixels.x - screenCoordinate.x, StitchCoordinatesPixels.y - screenCoordinate.y);
 		if (minimumLength < CLOSENUF) {
 			ClosestFormToCursor = closestForm;
 			ClosestVertexToCursor = closestVertex;
@@ -5340,23 +5343,32 @@ void filsat() {
 
 unsigned closat() {
 
-	unsigned	iForm, iVertex;
-	double		minimumLength = 1e99, length, deltaX, deltaY;
+	unsigned		iForm, iVertex;
+	double			minimumLength = 1e99, length;
+	unsigned int	savedVertex;
+	float			param;
 
 	px2stch();
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		if (!ActiveLayer || (unsigned)((FormList[iForm].attribute&FRMLMSK) >> 1) == ActiveLayer || !(FormList[iForm].attribute&FRMLMSK)) {
 			CurrentFormVertices = FormList[iForm].vertices;
-			for (iVertex = 0; iVertex < FormList[iForm].vertexCount; iVertex++) {
-				deltaX = SelectedPoint.x - CurrentFormVertices[iVertex].x;
-				deltaY = SelectedPoint.y - CurrentFormVertices[iVertex].y;
-				length = hypot(deltaX, deltaY);
+			savedVertex = VertexCount;
+			VertexCount = FormList[iForm].vertexCount;
+			// Loop through for all line segments
+			for (iVertex = 0; iVertex < VertexCount-1; iVertex++) {
+				param = FindDistanceToSide(CurrentFormVertices[iVertex], CurrentFormVertices[nxt(iVertex)], SelectedPoint, &length);
 				if (length < minimumLength) {
 					minimumLength = length;
 					ClosestFormToCursor = iForm;
-					ClosestVertexToCursor = iVertex;
+					if ((param < 0.0)) {
+						ClosestVertexToCursor = iVertex;
+					}
+					else {
+						ClosestVertexToCursor = nxt(iVertex);
+					}
 				}
 			}
+			VertexCount = savedVertex;
 		}
 	}
 	if (minimumLength == 1e99)
@@ -5414,7 +5426,7 @@ unsigned upsat() {
 	if ((previousToSelected + selectedToClosest) / previousToClosest > (nextToSelected + selectedToClosest) / nextToClosest)
 		return 0;
 	else {
-		return 1;
+		return 0;
 	}
 }
 
