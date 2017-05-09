@@ -65,7 +65,8 @@ const unsigned long	RMAPBITS = MAXITEMS << 5;	//a bit for each stitch
 #define		SCROLSIZ	12			//width of a scroll bar
 #define		COLSIZ		12			//width of the color bar
 #define		RIGHTSIZ	24			//SCROLSIZ+COLSIZ
-#define		CLOSENUF	10			//mouse click region for select
+// ToDo - Should this be a configurable parameter?
+#define		CLOSENUF	15			//mouse click region for select
 #define		ZMARGIN		1.25		//zoom margin for select zooms
 #define		SMALSIZ		0.25		//default small stitch size
 #define		MINSIZ		0.1			//default minimum stitch size

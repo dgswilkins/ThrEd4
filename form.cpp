@@ -1785,6 +1785,49 @@ void duform(unsigned formType) {
 	}
 }
 
+double FindDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point)
+{
+	double A = point.x - lineStart.x;
+	double B = point.y - lineStart.y;
+	double C = lineEnd.x - lineStart.x;
+	double D = lineEnd.y - lineStart.y;
+	double diffX;
+	double diffY;
+
+	if ((C == 0) && (D == 0))
+	{
+		diffX = A;
+		diffY = B;
+		return sqrt(diffX * diffX + diffY * diffY);
+	}
+
+	double dot = A * C + B * D;
+	double len_sq = C * C + D * D;
+	float param = dot / len_sq;
+
+	if (param < 0)
+	{
+		//point is nearest to the first point i.e lineStart.x and lineStart.y
+		diffX = point.x - lineStart.x;
+		diffY = point.y - lineStart.y;
+	}
+	else if (param > 1)
+	{
+		//point is nearest to the end point i.e lineEnd.x and lineEnd.y
+		diffX = point.x - lineEnd.x;
+		diffY = point.y - lineEnd.y;
+	}
+	else
+	{
+		//if perpendicular line intersect the line segment.
+		diffX = point.x - (lineStart.x + param * C);
+		diffY = point.y	- (lineStart.y + param * D);
+	}
+
+	//returning shortest distance
+	return sqrt(diffX * diffX + diffY * diffY);
+}
+
 unsigned closfrm() {
 
 	unsigned	iForm, iVertex, closestForm, closestVertex, layerCoded, formLayer;
@@ -1808,10 +1851,9 @@ unsigned closfrm() {
 			if (!ActiveLayer || !formLayer || formLayer == layerCoded) {
 				getfinfo(iForm);
 				vertices = FormList[iForm].vertices;
-				// ToDo - Change calculate closestVertex to be more intuitive by finding 
-				//        the closest line first and then finding the closest vertex on that line
+				// find the closest line first and then find the closest vertex on that line
 				for (iVertex = 0; iVertex < FormInfo.sideCount; iVertex++) {
-					length = hypot(point.x - vertices[iVertex].x, point.y - vertices[iVertex].y);
+					length = FindDistanceToSide(vertices[iVertex], vertices[nxt(iVertex)], point);
 					if (length < minimumLength && length >= 0) {
 						minimumLength = length;
 						closestForm = iForm;
@@ -1820,8 +1862,12 @@ unsigned closfrm() {
 				}
 			}
 		}
-		stch2pxr(FormList[closestForm].vertices[closestVertex]);
+		stch2pxr(FormList[closestForm].vertices[nxt(closestVertex)]);
 		minimumLength = hypot(StitchCoordinatesPixels.x - screenCoordinate.x, StitchCoordinatesPixels.y - screenCoordinate.y);
+		stch2pxr(FormList[closestForm].vertices[closestVertex]);
+		if (minimumLength < hypot(StitchCoordinatesPixels.x - screenCoordinate.x, StitchCoordinatesPixels.y - screenCoordinate.y)) { 
+			closestVertex = nxt(closestVertex);
+		}
 		if (minimumLength < CLOSENUF) {
 			ClosestFormToCursor = closestForm;
 			ClosestVertexToCursor = closestVertex;
