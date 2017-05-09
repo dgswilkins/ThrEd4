@@ -5431,6 +5431,7 @@ unsigned upsat() {
 }
 
 void insat() {
+	// ToDo - can insert form point before start of line, but not after. why?
 	if (closat()) {
 		savdo();
 		SelectedForm = &FormList[ClosestFormToCursor];
