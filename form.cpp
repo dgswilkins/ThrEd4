@@ -277,6 +277,7 @@ double			Div4;					//chain space divided by four
 unsigned		ChainCount;				//number of elements of the chain sequence to process
 unsigned		ClosestFormToCursor;	//closest form to the cursor
 unsigned		ClosestVertexToCursor;	//formOrigin closest to the cursor
+unsigned		InOutFlag;				//is intersection of line and cursor before, in or after the line
 double			VerticalRatio;			//vertical ratio between the zoom window
 										// and the entire stitch space
 double			HorizontalRatio;		//horizontal ratio between the zoom window
@@ -5355,16 +5356,30 @@ unsigned closat() {
 			savedVertex = VertexCount;
 			VertexCount = FormList[iForm].vertexCount;
 			// Loop through for all line segments
-			for (iVertex = 0; iVertex < VertexCount-1; iVertex++) {
+			for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 				param = FindDistanceToSide(CurrentFormVertices[iVertex], CurrentFormVertices[nxt(iVertex)], SelectedPoint, &length);
-				if (length < minimumLength) {
-					minimumLength = length;
-					ClosestFormToCursor = iForm;
-					if ((param < 0.0)) {
+				if ((length < minimumLength)) {
+					if ((param < 0.0) && (iVertex == 0)) {
+						// this should only happen if the Closest vertex is the start of a line (vertex 0)
+						minimumLength = length;
+						ClosestFormToCursor = iForm;
 						ClosestVertexToCursor = iVertex;
+						InOutFlag = POINT_BEFORE_LINE;
 					}
 					else {
-						ClosestVertexToCursor = nxt(iVertex);
+						// return the vertex after the intersection
+						if ((param > 1.0) && (iVertex == VertexCount - 2)) {
+							minimumLength = length;
+							ClosestFormToCursor = iForm;
+							ClosestVertexToCursor = nxt(iVertex);
+							InOutFlag = POINT_AFTER_LINE;
+						}
+						else {
+							minimumLength = length;
+							ClosestFormToCursor = iForm;
+							ClosestVertexToCursor = nxt(iVertex);
+							InOutFlag = POINT_IN_LINE;
+						}
 					}
 				}
 			}
@@ -5380,7 +5395,7 @@ unsigned closat() {
 void nufpnt(unsigned vertex) {
 
 	unsigned	ind;
-	unsigned	newVertex = vertex++;
+	unsigned	newVertex = vertex + 1;
 
 	fltspac(&FormForInsert->vertices[newVertex], 1);
 	FormForInsert->vertices[newVertex].x = SelectedPoint.x;
@@ -5409,39 +5424,24 @@ double p2p(fPOINT point0, fPOINT point1) {
 	return hypot(point0.x - point1.x, point0.y - point1.y);
 }
 
-unsigned upsat() {
-
-	unsigned	iVertex;
-	double		previousToClosest, nextToClosest, selectedToClosest, nextToSelected, previousToSelected;
-
-	VertexCount = FormForInsert->vertexCount;
-	CurrentFormVertices = FormForInsert->vertices;
-	selectedToClosest = p2p(SelectedPoint, CurrentFormVertices[ClosestVertexToCursor]);
-	iVertex = prv(ClosestVertexToCursor);
-	previousToClosest = p2p(CurrentFormVertices[iVertex], CurrentFormVertices[ClosestVertexToCursor]);
-	previousToSelected = p2p(CurrentFormVertices[iVertex], SelectedPoint);
-	iVertex = nxt(ClosestVertexToCursor);
-	nextToClosest = p2p(CurrentFormVertices[iVertex], CurrentFormVertices[ClosestVertexToCursor]);
-	nextToSelected = p2p(CurrentFormVertices[iVertex], SelectedPoint);
-	if ((previousToSelected + selectedToClosest) / previousToClosest > (nextToSelected + selectedToClosest) / nextToClosest)
-		return 0;
-	else {
-		return 0;
-	}
-}
-
 void insat() {
-	// ToDo - can insert form point before start of line, but not after. why?
+	unsigned int lastVertex;
+
 	if (closat()) {
 		savdo();
 		SelectedForm = &FormList[ClosestFormToCursor];
 		FormForInsert = SelectedForm;
+		lastVertex = FormForInsert->vertexCount - 1;
 		fvars(ClosestFormToCursor);
-		if (upsat()) {
-			if (!ClosestVertexToCursor && FormForInsert->type == FRMLINE)
+		if (InOutFlag) {
+			if (ClosestVertexToCursor == 0 && FormForInsert->type == FRMLINE) {
 				setMap(PRELIN);
-			else
-				ClosestVertexToCursor = prv(ClosestVertexToCursor);
+			}
+			else {
+				if (ClosestVertexToCursor != lastVertex && FormForInsert->type == FRMLINE) { 
+					ClosestVertexToCursor = prv(ClosestVertexToCursor);
+				}
+			}
 			nufpnt(ClosestVertexToCursor);
 			if (rstMap(PRELIN)) {
 				SelectedPoint.x = FormForInsert->vertices[0].x;
@@ -5452,8 +5452,10 @@ void insat() {
 				FormForInsert->vertices[1].y = SelectedPoint.y;
 			}
 		}
-		else
+		else {
+			ClosestVertexToCursor = prv(ClosestVertexToCursor);
 			nufpnt(ClosestVertexToCursor);
+		}
 		refil();
 	}
 	setMap(RESTCH);
@@ -5724,7 +5726,7 @@ void infrm() {
 	if (closat()) {
 		FormForInsert = &FormList[ClosestFormToCursor];
 		fvars(ClosestFormToCursor);
-		if (upsat()) {
+		if (InOutFlag) {
 			if (!ClosestVertexToCursor && FormForInsert->type == FRMLINE) {
 				FormVertexPrev = 0;
 				setMap(PRELIN);
@@ -5735,8 +5737,8 @@ void infrm() {
 			}
 		}
 		else {
-			FormVertexPrev = ClosestVertexToCursor;
-			FormVertexNext = nxt(ClosestVertexToCursor);
+			FormVertexNext = ClosestVertexToCursor;
+			FormVertexPrev = prv(ClosestVertexToCursor);
 		}
 		setMap(INSFRM);
 		setMap(INIT);

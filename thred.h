@@ -1796,3 +1796,11 @@ typedef struct _findInfo {
 	unsigned			count;
 	WIN32_FIND_DATA*	data;
 }FINDINFO;
+
+//Line point intersection
+enum {
+	POINT_IN_LINE = 0,
+	POINT_BEFORE_LINE,
+	POINT_AFTER_LINE
+};
+
