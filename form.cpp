@@ -5344,7 +5344,7 @@ void filsat() {
 
 unsigned closat() {
 
-	unsigned		iForm, iVertex;
+	unsigned		iForm, iVertex, lastVertex;
 	double			minimumLength = 1e99, length;
 	unsigned int	savedVertex;
 	float			param;
@@ -5355,8 +5355,14 @@ unsigned closat() {
 			CurrentFormVertices = FormList[iForm].vertices;
 			savedVertex = VertexCount;
 			VertexCount = FormList[iForm].vertexCount;
+			if (FormList[iForm].type == FRMLINE) {
+				lastVertex = VertexCount - 1;
+			}
+			else {
+				lastVertex = VertexCount;
+			}
 			// Loop through for all line segments
-			for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+			for (iVertex = 0; iVertex < lastVertex; iVertex++) {
 				param = FindDistanceToSide(CurrentFormVertices[iVertex], CurrentFormVertices[nxt(iVertex)], SelectedPoint, &length);
 				if ((length < minimumLength)) {
 					if ((param < 0.0) && (iVertex == 0)) {
@@ -5368,7 +5374,7 @@ unsigned closat() {
 					}
 					else {
 						// return the vertex after the intersection
-						if ((param > 1.0) && (iVertex == VertexCount - 2)) {
+						if ((param > 1.0) && (iVertex == lastVertex - 1)) {
 							minimumLength = length;
 							ClosestFormToCursor = iForm;
 							ClosestVertexToCursor = nxt(iVertex);
