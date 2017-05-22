@@ -3228,7 +3228,6 @@ void ritini() {
 	unsigned	iColor;
 	RECT		windowRect;
 
-	// ToDo - ensure ini names are the same as variable names
 	strcpy_s(IniFile.defaultDirectory, DefaultDirectory);
 	for (iColor = 0; iColor < 16; iColor++) {
 
@@ -3250,11 +3249,11 @@ void ritini() {
 	IniFile.stitchSpace = StitchSpacing;
 	IniFile.userFlagMap = UserFlagMap;
 	IniFile.borderWidth = BorderWidth;
-	IniFile.underlayColor = AppliqueColor;
+	IniFile.appliqueColor = AppliqueColor;
 	IniFile.snapLength = SnapLength;
 	IniFile.starRatio = StarRatio;
 	IniFile.spiralWrap = SpiralWrap;
-	IniFile.buttonholeFillCornerLength = ButtonholeCornerLength;
+	IniFile.buttonholeCornerLength = ButtonholeCornerLength;
 	IniFile.picotSpace = PicotSpacing;
 	if (!chku(SAVMAX)) {
 
@@ -21751,16 +21750,16 @@ void redini() {
 		UserFlagMap = IniFile.userFlagMap;
 		if (IniFile.borderWidth)
 			BorderWidth = IniFile.borderWidth;
-		if (IniFile.underlayColor)
-			AppliqueColor = IniFile.underlayColor & 0xf;
+		if (IniFile.appliqueColor)
+			AppliqueColor = IniFile.appliqueColor & 0xf;
 		if (IniFile.snapLength)
 			SnapLength = IniFile.snapLength;
 		if (IniFile.starRatio)
 			StarRatio = IniFile.starRatio;
 		if (IniFile.spiralWrap)
 			SpiralWrap = IniFile.spiralWrap;
-		if (IniFile.buttonholeFillCornerLength)
-			ButtonholeCornerLength = IniFile.buttonholeFillCornerLength;
+		if (IniFile.buttonholeCornerLength)
+			ButtonholeCornerLength = IniFile.buttonholeCornerLength;
 		if (!IniFile.gridSize)
 			IniFile.gridSize = 12;
 		if (!IniFile.wavePoints)
@@ -23522,7 +23521,6 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			GetClientRect(p_hWnd, &ThredWindowRect);
 			movStch();
 			if (chkMap(ZUMED)) {
-				// ToDo - Should this be s.top-s.bottom/z.top-z.bottom
 				tdub = (double)StitchWindowClientRect.bottom / (ZoomRect.top - ZoomRect.bottom);
 				adjustedWidth = StitchWindowClientRect.right / tdub;
 				if (adjustedWidth + ZoomRect.left > UnzoomedRect.x) {

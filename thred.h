@@ -696,13 +696,13 @@ typedef struct _iniFil {
 	double			fillAngle;				//fill angle
 	unsigned		userFlagMap;			//bitmap for user variables
 	double			borderWidth;			//border width
-	unsigned		underlayColor;			//applique color
+	unsigned		appliqueColor;			//applique color
 	TCHAR			prevNames[OLDNUM][_MAX_PATH];	//last file names
 	double			snapLength;				//snap together length
 	double			starRatio;				//star ratio
 	double			spiralWrap;				//spiral wrap
 	COLORREF		bitmapBackgroundColors[16];	//bitmap background color preferences
-	double			buttonholeFillCornerLength;	//buttonhole fill corner length		
+	double			buttonholeCornerLength;	//buttonhole fill corner length		
 	float			picotSpace;				//space between border picots
 	TCHAR			hoopType;				//hoop type
 	TCHAR			auxFileType;			//machine file type
