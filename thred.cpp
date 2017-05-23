@@ -477,7 +477,7 @@ double			ZoomFactor = 1;			//zoom factor
 POINT			UnzoomedRect;			//size of the unzoomed stitch window
 POINT			StitchCoordinatesPixels;	//converted from stitch to pixel
 POINT			NearestPixel[NERCNT];	//selected points
-POINT			BoxCoordinate;			//single select box point
+POINT			BoxCoordinate = {0, 0};	//single select box point
 double			DistanceToClick;		//distance of closest point to a mouse click
 unsigned		ClosestPointIndex;		//index of closest point
 unsigned		ClosestPointIndexClone;	//copy of index of closest point
@@ -3055,6 +3055,8 @@ void boxs() {
 
 void dubx() {
 
+	// ToDo - Remove this after figuring out function purpose
+	return;
 	POINT	line[5];
 	long	boxWidth = BoxOffset[0];
 
@@ -3062,7 +3064,7 @@ void dubx() {
 	SelectObject(StitchWindowDC, BoxPen[0]);
 	SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	// ToDo - is BoxCoordinate initialized at this point
+	// ToDo - is BoxCoordinate the correct variable
 	line[0].x = BoxCoordinate.x - boxWidth;
 	line[0].y = BoxCoordinate.y - boxWidth;
 	line[1].x = BoxCoordinate.x + boxWidth;
