@@ -6555,6 +6555,7 @@ void lapbrd() {
 
 	SequenceIndex = 0;
 	savedStitchLength = UserStitchLength;
+	// ToDo - Should APSPAC be a configurable variable instead?
 	UserStitchLength = APSPAC;
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++)
 		bdrlin(iVertex, iVertex + 1, APSPAC);
