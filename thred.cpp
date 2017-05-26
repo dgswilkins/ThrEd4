@@ -3053,34 +3053,6 @@ void boxs() {
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
-void dubx() {
-
-	// ToDo - Remove this after figuring out function purpose
-	return;
-	POINT	line[5];
-	long	boxWidth = BoxOffset[0];
-
-	SelectObject(StitchWindowMemDC, BoxPen[0]);
-	SelectObject(StitchWindowDC, BoxPen[0]);
-	SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	// ToDo - is BoxCoordinate the correct variable
-	line[0].x = BoxCoordinate.x - boxWidth;
-	line[0].y = BoxCoordinate.y - boxWidth;
-	line[1].x = BoxCoordinate.x + boxWidth;
-	line[1].y = BoxCoordinate.y - boxWidth;
-	line[2].x = BoxCoordinate.x + boxWidth;
-	line[2].y = BoxCoordinate.y + boxWidth;
-	line[3].x = BoxCoordinate.x - boxWidth;
-	line[3].y = BoxCoordinate.y + boxWidth;
-	line[4].x = BoxCoordinate.x - boxWidth;
-	line[4].y = BoxCoordinate.y - boxWidth;
-	Polyline(StitchWindowMemDC, line, 5);
-	Polyline(StitchWindowDC, line, 5);
-	SetROP2(StitchWindowMemDC, R2_COPYPEN);
-	SetROP2(StitchWindowDC, R2_COPYPEN);
-}
-
 void duar() {
 
 	POINT	arrowCenter;
@@ -4168,8 +4140,7 @@ void chknum() {
 
 							savdo();
 							SelectedForm->borderColor &= COLMSK;
-							// ToDo - Is this line correct? I suspect it should be 16 and could be replaced by >>4
-							borderColor = value / 6;
+							borderColor = value / PFGRAN;
 							if (borderColor)
 								borderColor--;
 							borderColor &= COLMSK;
@@ -19528,7 +19499,6 @@ thumout:;
 						if (rstMap(SELBOX)) {
 
 							GroupStitchIndex = 0;
-							dubx();
 							setMap(GRPSEL);
 						}
 						else {
@@ -19554,7 +19524,6 @@ thumout:;
 
 						if (rstMap(SELBOX)) {
 
-							dubx();
 							setMap(GRPSEL);
 							iColor = pt2colInd(ClosestPointIndex);
 						}
@@ -19605,7 +19574,6 @@ thumout:;
 						if (rstMap(SELBOX)) {
 
 							GroupStitchIndex = PCSHeader.stitchCount - 1;
-							dubx();
 							setMap(GRPSEL);
 						}
 						else {
@@ -19633,7 +19601,6 @@ thumout:;
 
 						if (rstMap(SELBOX)) {
 
-							dubx();
 							setMap(GRPSEL);
 							iColor = pt2colInd(ClosestPointIndex);
 						}
@@ -19720,7 +19687,6 @@ thumout:;
 								rstMap(FORMSEL);
 								if (rstMap(SELBOX)) {
 
-									dubx();
 									if (ClosestPointIndex < (unsigned)PCSHeader.stitchCount - 1) {
 
 										setMap(GRPSEL);
@@ -19829,7 +19795,6 @@ thumout:;
 								rstMap(FORMSEL);
 								if (rstMap(SELBOX)) {
 
-									dubx();
 									setMap(GRPSEL);
 									GroupStitchIndex = ClosestPointIndex - 1;
 								}
