@@ -5035,7 +5035,6 @@ BOOL colfil() {
 
 		extentionLocation++;
 		strcpy_s(extentionLocation, sizeof(ColorFileName) - (extentionLocation - ColorFileName), "thw");
-		// ToDo - do we have to search again?
 		extentionLocation = strrchr(RGBFileName, '.');
 		extentionLocation++;
 		strcpy_s(extentionLocation, sizeof(RGBFileName) - (extentionLocation - RGBFileName), "rgb");
@@ -23554,10 +23553,8 @@ void sachk() {
 
 	unsigned	iForm, iGuide, bakclo;
 	SATCON*		guide;
-	TCHAR*		buffer;
 	FRMHED*		form;
 
-	buffer = MsgBuffer;
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 
 		form = &FormList[iForm];
@@ -23576,9 +23573,6 @@ void sachk() {
 			}
 		}
 	}
-	// ToDo - Why is this code here?
-	if (buffer != MsgBuffer)
-		shoMsg(MsgBuffer);
 }
 
 #if __UseASM__ == 0
