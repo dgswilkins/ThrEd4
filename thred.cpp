@@ -2077,7 +2077,6 @@ void fnamtabs() {
 
 	unsigned		iName, swapInteger, source, destination;
 	unsigned char	swapCharacter;
-	unsigned*		pTemp;
 
 	for (iName = 0; iName < 50; iName++)
 		FileNameOrder[iName] = iName;
@@ -2101,10 +2100,7 @@ void fnamtabs() {
 		FilenameEncoded[destination] = FilenameEncoded[source];
 		FilenameEncoded[source] = swapCharacter;
 	}
-	// ToDo - is pTemp used as an 'optimization'?
-	pTemp = (unsigned*)&FilenameDecode;
-	for (iName = 0; iName < 64; iName++)
-		pTemp[iName] = 0;
+	memset(FilenameDecode, 0, sizeof(FilenameDecode));
 	for (iName = 32; iName < 127; iName++)
 		FilenameDecode[FilenameEncoded[iName]] = (unsigned char)iName;
 }
