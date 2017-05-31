@@ -5621,8 +5621,7 @@ void nuFil() {
 				if (firstCharacter == 'p') {
 
 					if (tolower(fileExtention[01]) == 'c') {
-
-						ReadFile(FileHandle, (PCSHEADER*)&PCSHeader, 0x46, &BytesRead, NULL);
+						ReadFile(FileHandle, (PCSHEADER*)&PCSHeader, sizeof(PCSHeader), &BytesRead, NULL);
 						if (!fileSize) {
 
 							filnopn(IDS_ZEROL, WorkingFileName);
@@ -5632,7 +5631,7 @@ void nuFil() {
 
 							for (iColor = 0; iColor < 16; iColor++)
 								UserColor[iColor] = PCSHeader.colors[iColor];
-							fileSize -= 0x46;
+							fileSize -= sizeof(PCSHeader);
 							pcsStitchCount = fileSize / sizeof(PCSTCH) + 2;
 							PCSStitchBuffer = new PCSTCH[pcsStitchCount];
 							ReadFile(FileHandle, PCSStitchBuffer, fileSize, &BytesRead, NULL);
