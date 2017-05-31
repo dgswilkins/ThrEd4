@@ -5063,7 +5063,7 @@ void dstran() {
 		if (colorFile != INVALID_HANDLE_VALUE) {
 
 			retval = GetFileSizeEx(colorFile, &colorFileSize);
-			// ToDo - check HighPart is non-zero
+			// There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
 			colors = new unsigned[colorFileSize.u.LowPart];
 			ReadFile(colorFile, (unsigned*)colors, colorFileSize.u.LowPart, &bytesRead, 0);
 			CloseHandle(colorFile);
@@ -5300,11 +5300,34 @@ dubl2 :
 
 void xofrm(FRMHEDO*	formListOriginal) {
 	unsigned	iForm;
+	FRMHED		dstForm;
+	FRMHEDO		srcForm;
 
 	FillMemory(FormList, sizeof(FRMHED)*FormIndex, 0);
-	// ToDo - find a better way to write original form header data into new version
-	for (iForm = 0; iForm < FormIndex; iForm++)
-		MoveMemory(&FormList[iForm], &formListOriginal[iForm], sizeof(FRMHEDO));
+	for (iForm = 0; iForm < FormIndex; iForm++) {
+		srcForm = formListOriginal[iForm];
+		dstForm = FormList[iForm];
+		dstForm.attribute		= srcForm.attribute;
+		dstForm.vertexCount		= srcForm.vertexCount;
+		dstForm.type			= srcForm.type;
+		dstForm.fillColor		= srcForm.fillColor;
+		dstForm.borderColor		= srcForm.borderColor;
+		dstForm.clipEntries		= srcForm.clipEntries;
+		dstForm.vertices		= srcForm.vertices;
+		dstForm.satinOrAngle	= srcForm.satinOrAngle;
+		dstForm.borderClipData	= srcForm.borderClipData;
+		dstForm.satinGuideCount	= srcForm.satinGuideCount;
+		dstForm.wordParam		= srcForm.wordParam;
+		dstForm.rectangle		= srcForm.rectangle;
+		dstForm.fillType		= srcForm.fillType;
+		dstForm.edgeType		= srcForm.edgeType;
+		dstForm.fillSpacing		= srcForm.fillSpacing;
+		dstForm.lengthOrCount	= srcForm.lengthOrCount;
+		dstForm.angleOrClipData	= srcForm.angleOrClipData;
+		dstForm.borderSize		= srcForm.borderSize;
+		dstForm.edgeSpacing		= srcForm.edgeSpacing;
+		dstForm.edgeStitchLen	= srcForm.edgeStitchLen;
+	}
 }
 
 void nuFil() {
