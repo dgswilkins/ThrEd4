@@ -5627,7 +5627,7 @@ void nuFil() {
 							filnopn(IDS_ZEROL, WorkingFileName);
 							return;
 						}
-						if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16) {
+						if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == 16) {
 
 							for (iColor = 0; iColor < 16; iColor++)
 								UserColor[iColor] = PCSHeader.colors[iColor];

@@ -12346,7 +12346,10 @@ void clpcon() {
 	}
 clpskp:;
 	delete[] iclpx;
-	delete[] TextureSegments; // this is allocated in setxt
+	if (TextureSegments) {
+		delete[] TextureSegments; // this is allocated in setxt
+		TextureSegments = nullptr;
+	}
 	ClipStitchPoints[ActivePointIndex].flag = 2;
 	if (negativeOffset) {
 		formNegativeOffset = negativeOffset*ClipRectSize.cy;
