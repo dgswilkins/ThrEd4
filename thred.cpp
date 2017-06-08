@@ -5656,7 +5656,7 @@ void nuFil() {
 								}
 							}
 							PCSHeader.stitchCount = iStitch;
-							// ToDo - Do these 2 lines make sense?
+							// Grab the bitmap filename
 							tnam = (TCHAR*)&PCSStitchBuffer[iPCSstitch];
 							strcpy_s(PCSBMPFileName, tnam);
 							delete[] PCSStitchBuffer;
@@ -5962,8 +5962,7 @@ void ritdst() {
 		lengths.y = dstStitchBuffer[iStitch].y - centerCoordinate.y;
 		absoluteLengths.x = abs(lengths.x);
 		absoluteLengths.y = abs(lengths.y);
-		// ToDo - is 'abs' neccessary since absoluteLengths was already abs?
-		if (abs(absoluteLengths.x) > abs(absoluteLengths.y))
+		if (absoluteLengths.x > absoluteLengths.y)
 			count = absoluteLengths.x / DSTMAX + 1;
 		else
 			count = absoluteLengths.y / DSTMAX + 1;
