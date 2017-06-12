@@ -7362,7 +7362,7 @@ the distance from the point to the line is given by
 */
 
 unsigned closlin() {
-	// ToDo - This function needs to be thoroughly checked
+	// ToDo - This function needs to be thoroughly checked and compared to FindDistanceToSide
 
 	unsigned	iStitch, iChange, stitchCount, closestPoint = 0xffffffff;
 	double		sum = 1e99;
