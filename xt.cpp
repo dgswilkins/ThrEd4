@@ -3940,14 +3940,15 @@ void txang() {
 
 void deltx() {
 	unsigned iTexture, textureCount;
+	unsigned iForm;
 
 	textureCount = SelectedForm->fillInfo.texture.count;
 	if (TextureIndex && istx(ClosestFormToCursor) && textureCount) {
 		iTexture = SelectedForm->fillInfo.texture.index;
 		MoveMemory(&TexturePointsBuffer[iTexture], &TexturePointsBuffer[iTexture + textureCount], TextureIndex - (iTexture + textureCount));
-		for (iTexture = ClosestFormToCursor + 1; iTexture < FormIndex; iTexture++) {
-			if (istx(iTexture))
-				FormList[iTexture].fillInfo.texture.index -= textureCount;
+		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+			if (istx(iForm))
+				FormList[iForm].fillInfo.texture.index -= textureCount;
 		}
 		TextureIndex -= SelectedForm->fillInfo.texture.count;
 		SelectedForm->fillInfo.texture.count = 0;
