@@ -3939,19 +3939,30 @@ void txang() {
 }
 
 void deltx() {
-	unsigned iTexture, textureCount;
-	unsigned iForm;
+	TXPNT		*textureBuffer;
+	unsigned	iBuffer;
+	unsigned	iForm;
 
-	textureCount = SelectedForm->fillInfo.texture.count;
-	if (TextureIndex && istx(ClosestFormToCursor) && textureCount) {
-		iTexture = SelectedForm->fillInfo.texture.index;
-		MoveMemory(&TexturePointsBuffer[iTexture], &TexturePointsBuffer[iTexture + textureCount], TextureIndex - (iTexture + textureCount));
-		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-			if (istx(iForm))
-				FormList[iForm].fillInfo.texture.index -= textureCount;
+	if (TextureIndex && istx(ClosestFormToCursor) && SelectedForm->fillInfo.texture.count) {
+		textureBuffer = new TXPNT[TextureIndex]();
+		iBuffer = 0;
+		for (iForm = 0; iForm < ClosestFormToCursor; iForm++) {
+			if (istx(iForm)) {
+				MoveMemory(&textureBuffer[iBuffer], &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index], FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
+				FormList[iForm].fillInfo.texture.index = iBuffer;
+				iBuffer += FormList[iForm].fillInfo.texture.count;
+			}
 		}
-		TextureIndex -= SelectedForm->fillInfo.texture.count;
-		SelectedForm->fillInfo.texture.count = 0;
+		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+			if (istx(iForm)) {
+				MoveMemory(&textureBuffer[iBuffer], &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index], FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
+				FormList[iForm].fillInfo.texture.index = iBuffer;
+				iBuffer += FormList[iForm].fillInfo.texture.count;
+			}
+		}
+		TextureIndex = iBuffer;
+		MoveMemory(&TexturePointsBuffer[0], &textureBuffer[0], iBuffer * sizeof(TXPNT));
+		delete[] textureBuffer;
 	}
 }
 
@@ -3983,6 +3994,7 @@ nutskp:;
 	SelectedForm->fillInfo.texture.count = TextureScreen.index;
 }
 
+//Ensure all lines in the texture have at least 1 point
 void altx() {
 	unsigned	iLine, iPoint;
 	float		halfHeight;

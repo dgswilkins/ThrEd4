@@ -52,6 +52,7 @@
 #define		TXTSIDS		6			//extra pixels in a text box
 #define		MAXITEMS	0x10000		//maximum number of stitches, vertices, texture points, sequence items & clipboard points
 #define		MAXCHNG		10000		//maximum number of color changes
+//ToDo - Is this shift in the correct direction?
 const unsigned long	RMAPBITS = MAXITEMS << 5;	//a bit for each stitch
 #define		SHUPX		480			//small hoop x size
 #define		SHUPY		480			//small hoop y size
