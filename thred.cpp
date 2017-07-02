@@ -4960,7 +4960,8 @@ void bfil() {
 			BitmapInfoHeader.biCompression = BI_RGB;
 			BitmapInfo.bmiHeader = BitmapInfoHeader;
 			bitmap = CreateDIBSection(BitmapDC, &BitmapInfo, DIB_RGB_COLORS, (void**)&pbits, 0, 0);
-			// ToDo - Do I need to call GDIFlush() before or in this loop?
+			//Synchronize
+			GdiFlush();
 			for (iHeight = 0; iHeight < BitmapHeight; iHeight++)
 				bitlin(&MonoBitmapData[iHeight*bitmapWidthWords], &pbits[iHeight*BitmapWidth], background, foreground);
 			deviceContext = CreateCompatibleDC(StitchWindowDC);
@@ -9337,9 +9338,12 @@ void lodbmp() {
 		untrace();
 		filename = strrchr(UserBMPFileName, '\\') + 1;
 		// PCS file can only store a 16 character filename?
-		strncpy_s(PCSBMPFileName, filename, sizeof(PCSBMPFileName));
-		defbNam();
-		bfil();
+		// ToDo - give the user a little more info that the bitmap has not been loaded
+		if (strlen(filename) < 16) {
+			strncpy_s(PCSBMPFileName, filename, sizeof(PCSBMPFileName));
+			defbNam();
+			bfil();
+		}
 		setMap(RESTCH);
 	}
 }
