@@ -2106,7 +2106,7 @@ void fnamtabs() {
 }
 
 void dstin(unsigned number, POINT* pout) {
-	// ToDo - what is this code doing and what should nextBufferIndex be called?
+	// ToDo - what is this code doing?
 	unsigned ind, shift;
 
 	shift = 1;
