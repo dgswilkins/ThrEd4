@@ -759,7 +759,7 @@ fRECTANGLE		ClipRectAdjusted;		//rectangle for adjust range ends for clipboard f
 HANDLE			BalaradFile;			//balarad file handle
 
 //graphics variables		
-double			AspectRatio = (double)LHUPX / LHUPY;	//aspect ratio of the stich window
+double			AspectRatio = (LHUPX / LHUPY);	//aspect ratio of the stich window
 SCROLLINFO		ScrollInfo;				//scroll bar i/o structure
 POINT			StitchWindowSize;		//size of the stich window in pixels
 fPOINT			SelectedPoint;			//for converting stitch coordinates
@@ -1766,7 +1766,7 @@ unsigned setu(unsigned bit) {
 setx :
 	}
 #else
-	return _bittestandset((long *)&UserFlagMap, bit) ? 0xffffffff : 0;
+	return _bittestandset(static_cast<long *>(static_cast<void *>(&UserFlagMap)), bit) ? 0xffffffff : 0;
 #endif
 }
 
@@ -1783,7 +1783,7 @@ unsigned rstu(unsigned bit) {
 rstx :
 	}
 #else
-	return _bittestandreset((long *)&UserFlagMap, bit) ? 0xffffffff : 0;
+	return _bittestandreset(static_cast<long *>(static_cast<void *>(&UserFlagMap)), bit) ? 0xffffffff : 0;
 #endif
 }
 
@@ -1800,7 +1800,7 @@ unsigned chku(unsigned bit) {
 chkx :
 	}
 #else
-	return _bittest((long *)&UserFlagMap, bit) ? 0xffffffff : 0;
+	return _bittest(static_cast<long *>(static_cast<void *>(&UserFlagMap)), bit) ? 0xffffffff : 0;
 #endif
 }
 
@@ -1817,7 +1817,7 @@ unsigned toglu(unsigned bit) {
 toglx :
 	}
 #else
-	return _bittestandcomplement((long *)&UserFlagMap, bit) ? 0xffffffff : 0;
+	return _bittestandcomplement(static_cast<long *>(static_cast<void *>(&UserFlagMap)), bit) ? 0xffffffff : 0;
 #endif
 }
 
@@ -2090,7 +2090,7 @@ void fnamtabs() {
 		FileNameOrder[source] = swapInteger;
 	}
 	for (iName = 0; iName < 128; iName++)
-		FilenameEncoded[iName] = (unsigned char)iName + NCODOF;
+		FilenameEncoded[iName] = static_cast<unsigned char>(iName) + NCODOF;
 	PseudoRandomValue = NCODSED;
 	for (iName = 0; iName < 256; iName++) {
 
@@ -2102,7 +2102,7 @@ void fnamtabs() {
 	}
 	memset(FilenameDecode, 0, sizeof(FilenameDecode));
 	for (iName = 32; iName < 127; iName++)
-		FilenameDecode[FilenameEncoded[iName]] = (unsigned char)iName;
+		FilenameDecode[FilenameEncoded[iName]] = static_cast<unsigned char>(iName);
 }
 
 void dstin(unsigned number, POINT* pout) {
@@ -2213,7 +2213,7 @@ void coltab() {
 		StitchBuffer[PCSHeader.stitchCount - 1].attribute &= NCOLMSK;
 		StitchBuffer[PCSHeader.stitchCount - 1].attribute |= (StitchBuffer[PCSHeader.stitchCount - 2].attribute&COLMSK);
 		currentColor = StitchBuffer[0].attribute&COLMSK;
-		for (iStitch = 1; iStitch < (unsigned)PCSHeader.stitchCount - 1; iStitch++) {
+		for (iStitch = 1; iStitch < static_cast<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
 			if ((StitchBuffer[iStitch].attribute&COLMSK) != currentColor) {
 				if ((StitchBuffer[iStitch + 1].attribute&COLMSK) == currentColor) {
 					StitchBuffer[iStitch].attribute &= NCOLMSK;
@@ -2231,23 +2231,23 @@ void coltab() {
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			Stitch = &StitchBuffer[iStitch];
 			if (Stitch->x < range.left)
-				Stitch->x = (float)range.left;
+				Stitch->x = static_cast<float>(range.left);
 			if (Stitch->x > range.right)
-				Stitch->x = (float)range.right;
+				Stitch->x = static_cast<float>(range.right);
 			if (Stitch->y > range.top)
-				Stitch->y = (float)range.top;
+				Stitch->y = static_cast<float>(range.top);
 			if (Stitch->y < range.bottom)
-				Stitch->y = (float)range.bottom;
+				Stitch->y = static_cast<float>(range.bottom);
 			nextColor = Stitch->attribute&COLMSK;
 			if (currentColor != nextColor) {
-				ColorChangeTable[iColor].colorIndex = (unsigned char)nextColor;
-				ColorChangeTable[iColor++].stitchIndex = (unsigned short)iStitch;
+				ColorChangeTable[iColor].colorIndex = static_cast<unsigned short>(nextColor);
+				ColorChangeTable[iColor++].stitchIndex = static_cast<unsigned short>(iStitch);
 				currentColor = nextColor;
 			}
 		}
 		ColorChanges = iColor;
-		ColorChangeTable[iColor].stitchIndex = (unsigned short)iStitch;
-		if (ClosestPointIndex > (unsigned)PCSHeader.stitchCount - 1)
+		ColorChangeTable[iColor].stitchIndex = static_cast<unsigned short>(iStitch);
+		if (ClosestPointIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 			ClosestPointIndex = PCSHeader.stitchCount - 1;
 		fndknt();
 	}
@@ -2298,7 +2298,7 @@ void deldu() {
 	rstMap(BAKACT);
 }
 
-TCHAR* mvflpnt(fPOINT* destination, fPOINT* source, unsigned count) {
+void mvflpnt(fPOINT* destination, fPOINT* source, unsigned count) {
 
 #if  __UseASM__
 	_asm {
@@ -2311,7 +2311,6 @@ TCHAR* mvflpnt(fPOINT* destination, fPOINT* source, unsigned count) {
 	}
 #else
 	memcpy(destination, source, count * sizeof(fPOINT));
-	return (TCHAR *)(destination + count);
 #endif
 }
 
@@ -2340,39 +2339,39 @@ void dudat() {
 		+ sizeof(fPOINT)*(FormVertexIndex + ClipPointIndex) + sizeof(SATCON)*SatinConnectIndex + sizeof(COLORREF) * 16 +
 		sizeof(TXPNT)*TextureIndex;
 	UndoBuffer[UndoBufferWriteIndex] = calloc(size, sizeof(unsigned));
-	backupData = (BAKHED*)UndoBuffer[UndoBufferWriteIndex];
+	backupData = static_cast<BAKHED*>(UndoBuffer[UndoBufferWriteIndex]);
 	if (backupData) {
 
 		backupData->zoomRect.x = UnzoomedRect.x;
 		backupData->zoomRect.y = UnzoomedRect.y;
 		backupData->formCount = FormIndex;
-		backupData->forms = (FRMHED*)&backupData[1];
+		backupData->forms = static_cast<FRMHED*>(static_cast<void *>(&backupData[1]));
 		//		for(unsigned iStitch=0;iStitch<FormIndex;iStitch++)
 		//			frmcpy(&backupData->forms[iStitch],&FormList[iStitch]);
 		MoveMemory(backupData->forms, &FormList, sizeof(FRMHED)*FormIndex);
 		backupData->stitchCount = PCSHeader.stitchCount;
-		backupData->stitches = (fPOINTATTR*)&backupData->forms[FormIndex];
+		backupData->stitches = static_cast<fPOINTATTR *>(static_cast<void *>(&backupData->forms[FormIndex]));
 		if (PCSHeader.stitchCount)
 			stchcpy((sizeof(fPOINTATTR)*PCSHeader.stitchCount) >> 2, backupData->stitches);
 		backupData->vertexCount = FormVertexIndex;
-		backupData->vertices = (fPOINT*)&backupData->stitches[PCSHeader.stitchCount];
+		backupData->vertices = static_cast<fPOINT *>(static_cast<void *>(&backupData->stitches[PCSHeader.stitchCount]));
 		if (FormVertexIndex)
 			mvflpnt(backupData->vertices, &FormVertices[0], FormVertexIndex);
 		backupData->guideCount = SatinConnectIndex;
-		backupData->guide = (SATCON*)&backupData->vertices[FormVertexIndex];
+		backupData->guide = static_cast<SATCON *>(static_cast<void *>(&backupData->vertices[FormVertexIndex]));
 		if (SatinConnectIndex)
 			mvsatk(backupData->guide, &SatinConnects[0], SatinConnectIndex);
 		backupData->clipPointCount = ClipPointIndex;
-		backupData->clipPoints = (fPOINT*)&backupData->guide[SatinConnectIndex];
+		backupData->clipPoints = static_cast<fPOINT *>(static_cast<void *>(&backupData->guide[SatinConnectIndex]));
 		if (ClipPointIndex) {
 
 			if (ClipPointIndex > MAXITEMS)
 				ClipPointIndex = MAXITEMS;
 			mvflpnt(backupData->clipPoints, &ClipPoints[0], ClipPointIndex);
 		}
-		backupData->colors = (COLORREF*)&backupData->clipPoints[ClipPointIndex];
+		backupData->colors = static_cast<COLORREF *>(static_cast<void *>(&backupData->clipPoints[ClipPointIndex]));
 		MoveMemory(backupData->colors, &UserColor, sizeof(COLORREF) * 16);
-		backupData->texturePoints = (TXPNT*)&backupData->colors[16];
+		backupData->texturePoints = static_cast<TXPNT *>(static_cast<void *>(&backupData->colors[16]));
 		backupData->texturePointCount = TextureIndex;
 		if (TextureIndex)
 			MoveMemory(backupData->texturePoints, &TexturePointsBuffer, sizeof(TXPNT)*TextureIndex);
@@ -2716,7 +2715,7 @@ void selRct(fRECTANGLE* sourceRect) {
 
 void rngadj() {
 
-	if (ClosestPointIndex > (unsigned)PCSHeader.stitchCount - 1)
+	if (ClosestPointIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 		ClosestPointIndex = PCSHeader.stitchCount - 1;
 	if (GroupStitchIndex > PCSHeader.stitchCount)
 		GroupStitchIndex = ClosestPointIndex;
@@ -2771,7 +2770,7 @@ void frmcalc() {
 	if (FormList[ClosestFormToCursor].fillType || FormList[ClosestFormToCursor].edgeType) {
 
 		code = ClosestFormToCursor << FRMSHFT;
-		for (iStitch = 0; iStitch < (unsigned)PCSHeader.stitchCount - 1; iStitch++) {
+		for (iStitch = 0; iStitch < static_cast<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
 
 			if ((StitchBuffer[iStitch].attribute&FRMSK) == code && !(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch + 1].attribute&FRMSK) == code && (StitchBuffer[iStitch + 1].attribute&TYPMSK)) {
 
@@ -2884,16 +2883,16 @@ void grpAdj() {
 			if (newSize.x > newSize.y) {
 
 				coordinate = newSize.x*ZMARGIN;
-				newSize.x += (long)coordinate;
+				newSize.x += static_cast<long>(coordinate);
 				coordinate = newSize.x / StitchWindowAspectRatio;
-				newSize.y = (long)coordinate;
+				newSize.y = static_cast<long>(coordinate);
 			}
 			else {
 
 				coordinate = newSize.y*ZMARGIN;
-				newSize.y = (long)coordinate;
+				newSize.y = static_cast<long>(coordinate);
 				coordinate = newSize.y*StitchWindowAspectRatio;
-				newSize.x = (long)coordinate;
+				newSize.x = static_cast<long>(coordinate);
 			}
 			if (newSize.x > UnzoomedRect.x || newSize.y > UnzoomedRect.y) {
 
@@ -2907,7 +2906,7 @@ void grpAdj() {
 			else {
 
 				ZoomRect.right = ZoomRect.left + (newSize.x);
-				ZoomFactor = (double)newSize.x / UnzoomedRect.x;
+				ZoomFactor = static_cast<double>(newSize.x) / static_cast<double>(UnzoomedRect.x);
 				ZoomRect.top = ZoomRect.bottom + (newSize.y);
 				SelectedPoint.x = ((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left;
 				SelectedPoint.y = ((StitchRangeRect.top - StitchRangeRect.bottom) / 2) + StitchRangeRect.bottom;
@@ -3258,7 +3257,7 @@ void thr2bal(unsigned destination, unsigned source, unsigned code) {
 #define BALRAT 1.6666666666667
 
 	BalaradStitch[destination].flag = 0;
-	BalaradStitch[destination].code = (unsigned char)code;
+	BalaradStitch[destination].code = static_cast<unsigned char>(code);
 	BalaradStitch[destination].x = (StitchBuffer[source].x - BalaradOffset.x)*BALRAT;
 	BalaradStitch[destination].y = (StitchBuffer[source].y - BalaradOffset.y)*BALRAT;
 }
@@ -3330,11 +3329,10 @@ void redbal() {
 	FormIndex = 0;
 	balaradFile = CreateFile(BalaradName2, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 	if (balaradFile != INVALID_HANDLE_VALUE) {
-
-		ReadFile(balaradFile, (BALHED*)&balaradHeader, sizeof(BALHED), &bytesRead, 0);
+		ReadFile(balaradFile, &balaradHeader, sizeof(BALHED), &bytesRead, 0);
 		if (bytesRead == sizeof(BALHED)) {
 			BalaradStitch = new BALSTCH[MAXITEMS];
-			ReadFile(balaradFile, (BALSTCH*)BalaradStitch, MAXITEMS * sizeof(BALSTCH), &bytesRead, 0);
+			ReadFile(balaradFile, BalaradStitch, MAXITEMS * sizeof(BALSTCH), &bytesRead, 0);
 			stitchCount = bytesRead / sizeof(BALSTCH);
 			IniFile.backgroundColor = BackgroundColor = balaradHeader.backgroundColor;
 			BackgroundPen = nuPen(BackgroundPen, 1, BackgroundColor);
@@ -3408,7 +3406,7 @@ void ritbal() {
 		balaradFile = CreateFile(outputName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		if (balaradFile == INVALID_HANDLE_VALUE)
 			return;
-		ptrBalaradHeader = (unsigned*)&balaradHeader;
+		ptrBalaradHeader = static_cast<unsigned *>(static_cast<void *>(&balaradHeader));
 		for (iHeader = 0; iHeader < (sizeof(BALHED) >> 2); iHeader++)
 			ptrBalaradHeader[iHeader] = 0;
 		color = StitchBuffer[0].attribute&COLMSK;
@@ -3428,14 +3426,14 @@ void ritbal() {
 		balaradHeader.backgroundColor = BackgroundColor;
 		balaradHeader.hoopSizeX = IniFile.hoopSizeX*BALRAT;
 		balaradHeader.hoopSizeY = IniFile.hoopSizeY*BALRAT;
-		WriteFile(balaradFile, (BALHED*)&balaradHeader, sizeof(BALHED), &bytesWritten, 0);
+		WriteFile(balaradFile, &balaradHeader, sizeof(BALHED), &bytesWritten, 0);
 		BalaradOffset.x = IniFile.hoopSizeX / 2;
 		BalaradOffset.y = IniFile.hoopSizeY / 2;
 		BalaradStitch = new BALSTCH[PCSHeader.stitchCount + 2];
 		color = StitchBuffer[0].attribute&COLMSK;
 		iOutput = 0;
 		thr2bal(iOutput++, 0, BALJUMP);
-		BalaradStitch[iOutput].flag = (unsigned char)color;
+		BalaradStitch[iOutput].flag = static_cast<unsigned char>(color);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount && iOutput < 2; iStitch++) {
 
 			thr2bal(iOutput++, iStitch, BALNORM);
@@ -3443,10 +3441,10 @@ void ritbal() {
 
 				thr2bal(iOutput, iStitch, BALSTOP);
 				color = StitchBuffer[iStitch].attribute&COLMSK;
-				BalaradStitch[iOutput++].flag = (unsigned char)color;
+				BalaradStitch[iOutput++].flag = static_cast<unsigned char>(color);
 			}
 		}
-		WriteFile(balaradFile, (BALSTCH*)BalaradStitch, iOutput * sizeof(BALSTCH), &bytesWritten, 0);
+		WriteFile(balaradFile, BalaradStitch, iOutput * sizeof(BALSTCH), &bytesWritten, 0);
 		CloseHandle(balaradFile);
 		balaradFile = CreateFile(BalaradName1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		WriteFile(balaradFile, (TCHAR*)outputName, strlen(outputName) + 1, &bytesWritten, 0);
@@ -3550,7 +3548,7 @@ void sidmsg(HWND window, TCHAR** strings, unsigned entries) {
 
 		for (iEntry = 0; iEntry < EDGETYPS + 1; iEntry++) {
 
-			if ((unsigned)(SelectedForm->edgeType&NEGUND) == EdgeFillTypes[iEntry])
+			if (static_cast<unsigned>(SelectedForm->edgeType&NEGUND) == EdgeFillTypes[iEntry])
 				entryCount--;
 			else {
 
@@ -3579,7 +3577,7 @@ void sidmsg(HWND window, TCHAR** strings, unsigned entries) {
 			NULL);
 		for (iEntry = 0; iEntry < entries; iEntry++) {
 
-			if ((unsigned)(SelectedForm->edgeType&NEGUND) != EdgeFillTypes[iEntry]) {
+			if (static_cast<unsigned>(SelectedForm->edgeType&NEGUND) != EdgeFillTypes[iEntry]) {
 
 				if (EdgeFillTypes[iEntry] == EDGECLIP || EdgeFillTypes[iEntry] == EDGEPICOT || EdgeFillTypes[iEntry] == EDGECLIPX) {
 
@@ -3675,13 +3673,13 @@ void sidmsg(HWND window, TCHAR** strings, unsigned entries) {
 
 void stchPars() {
 
-	AspectRatio = (double)UnzoomedRect.x / UnzoomedRect.y;
+	AspectRatio = static_cast<double>(UnzoomedRect.x) / static_cast<double>(UnzoomedRect.y);
 	if (chkMap(RUNPAT) || chkMap(WASPAT))
-		StitchWindowSize.x = (long)(ThredWindowRect.bottom - (SCROLSIZ << 1))*AspectRatio;
+		StitchWindowSize.x = static_cast<long>((ThredWindowRect.bottom - (SCROLSIZ << 1))*AspectRatio);
 	else
-		StitchWindowSize.x = (long)(ThredWindowRect.bottom - SCROLSIZ)*AspectRatio;
+		StitchWindowSize.x = static_cast<long>((ThredWindowRect.bottom - SCROLSIZ)*AspectRatio);
 
-	if ((StitchWindowSize.x + (long)ButtonWidthX3 + RIGHTSIZ) < ThredWindowRect.right) {
+	if ((StitchWindowSize.x + static_cast<long>(ButtonWidthX3) + RIGHTSIZ) < ThredWindowRect.right) {
 
 		if (chkMap(RUNPAT) || chkMap(WASPAT))
 			StitchWindowSize.y = ThredWindowRect.bottom - (SCROLSIZ << 1);
@@ -3692,7 +3690,7 @@ void stchPars() {
 
 		StitchWindowSize.x = (ThredWindowRect.right - ButtonWidthX3 - COLSIZ);
 		StitchWindowSize.y = ThredWindowRect.bottom - ThredWindowRect.top;
-		if ((double)StitchWindowSize.x / StitchWindowSize.y > AspectRatio)
+		if (static_cast<double>(StitchWindowSize.x) / static_cast<double>(StitchWindowSize.y) > AspectRatio)
 			StitchWindowSize.x = StitchWindowSize.y*AspectRatio;
 		else
 			StitchWindowSize.y = StitchWindowSize.x / AspectRatio;
@@ -3720,7 +3718,7 @@ void movStch() {
 		MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, clientSize.x, clientSize.y, FALSE);
 		MoveWindow(VerticalScrollBar, ButtonWidthX3 + clientSize.x, 0, SCROLSIZ, clientSize.y, TRUE);
 		MoveWindow(HorizontalScrollBar, ButtonWidthX3, clientSize.y + verticalOffset, clientSize.x, SCROLSIZ, TRUE);
-		StitchWindowAspectRatio = (double)clientSize.x / clientSize.y;
+		StitchWindowAspectRatio = static_cast<double>(clientSize.x) / clientSize.y;
 		if (chkMap(RUNPAT) || chkMap(WASPAT))
 			MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, clientSize.x, SCROLSIZ, TRUE);
 		ShowWindow(VerticalScrollBar, TRUE);
@@ -3733,7 +3731,7 @@ void movStch() {
 		MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, StitchWindowSize.x, actualWindowHeight, TRUE);
 		ShowWindow(VerticalScrollBar, FALSE);
 		ShowWindow(HorizontalScrollBar, FALSE);
-		StitchWindowAspectRatio = (double)StitchWindowSize.x / actualWindowHeight;
+		StitchWindowAspectRatio = static_cast<double>(StitchWindowSize.x) / actualWindowHeight;
 		if (chkMap(RUNPAT) || chkMap(WASPAT))
 			MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, StitchWindowSize.x, SCROLSIZ, TRUE);
 	}
@@ -4036,9 +4034,9 @@ void chknum() {
 
 				savdo();
 				if (SelectedForm->edgeType == EDGEBHOL)
-					savblen((float)value);
+					savblen(static_cast<float>(value));
 				else
-					savplen((float)value);
+					savplen(static_cast<float>(value));
 			}
 			else {
 
@@ -4257,7 +4255,7 @@ void chknum() {
 
 								case PAP:
 
-									AppliqueColor = (unsigned)(value - 1) % 16;
+									AppliqueColor = static_cast<unsigned>(value - 1) % 16;
 									sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", AppliqueColor + 1);
 									SetWindowText(ValueWindow[PAP], MsgBuffer);
 									break;
@@ -4567,7 +4565,7 @@ void delstch1(unsigned iStitch) {
 			iStitch++;
 		}
 		PCSHeader.stitchCount--;
-		if (ClosestPointIndex > (unsigned)PCSHeader.stitchCount - 1)
+		if (ClosestPointIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 			ClosestPointIndex = PCSHeader.stitchCount - 1;
 	}
 }
@@ -4591,7 +4589,7 @@ void redbak() {
 	BAKHED*		undoData;
 	unsigned	iColor;
 
-	undoData = (BAKHED*)UndoBuffer[UndoBufferWriteIndex];
+	undoData = static_cast<BAKHED *>(static_cast<void *>(UndoBuffer[UndoBufferWriteIndex]));
 	PCSHeader.stitchCount = undoData->stitchCount;
 	if (PCSHeader.stitchCount)
 		stchred((sizeof(fPOINTATTR)*PCSHeader.stitchCount) >> 2, undoData->stitches);
@@ -4711,8 +4709,8 @@ void bitsiz() {
 	double	screenAspectRatio;
 	double	bitmapAspectRatio;
 
-	bitmapAspectRatio = (double)BitmapWidth / BitmapHeight;
-	screenAspectRatio = (double)UnzoomedRect.x / UnzoomedRect.y;
+	bitmapAspectRatio = static_cast<double>(BitmapWidth) / BitmapHeight;
+	screenAspectRatio = static_cast<double>(UnzoomedRect.x) / UnzoomedRect.y;
 	if (bitmapAspectRatio > screenAspectRatio) {
 
 		BitmapSizeinStitches.x = UnzoomedRect.x;
@@ -4723,10 +4721,10 @@ void bitsiz() {
 		BitmapSizeinStitches.y = UnzoomedRect.y;
 		BitmapSizeinStitches.x = UnzoomedRect.y*bitmapAspectRatio;
 	}
-	BmpStitchRatio.x = (double)BitmapWidth / BitmapSizeinStitches.x;
-	BmpStitchRatio.y = (double)BitmapHeight / BitmapSizeinStitches.y;
-	StitchBmpRatio.x = (double)BitmapSizeinStitches.x / BitmapWidth;
-	StitchBmpRatio.y = (double)BitmapSizeinStitches.y / BitmapHeight;
+	BmpStitchRatio.x = static_cast<double>(BitmapWidth) / BitmapSizeinStitches.x;
+	BmpStitchRatio.y = static_cast<double>(BitmapHeight) / BitmapSizeinStitches.y;
+	StitchBmpRatio.x = static_cast<double>(BitmapSizeinStitches.x) / BitmapWidth;
+	StitchBmpRatio.y = static_cast<double>(BitmapSizeinStitches.y) / BitmapHeight;
 }
 
 // Get a rough estimate of whether black or white 
@@ -4739,14 +4737,14 @@ BOOL binv(unsigned bitmapWidthInWords) {
 	byteCount = BitmapWidth >> 3;
 	for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
 
-		bcpnt = (TCHAR*)&MonoBitmapData[bitmapWidthInWords*iHeight];
+		bcpnt = static_cast<TCHAR *>(static_cast<void *>(&MonoBitmapData[bitmapWidthInWords*iHeight]));
 		for (iBytes = 0; iBytes < byteCount; iBytes++) {
 
 			if (!bcpnt[iBytes])
 				blackBits++;
 			else {
 
-				if (bcpnt[iBytes] == (TBYTE)0xff)
+				if (bcpnt[iBytes] == 0xff)
 					whiteBits++;
 			}
 		}
@@ -4794,7 +4792,7 @@ blup1 :
 		bit.dword0 = i;
 		bit.bytes.byte0 = bit.bytes.byte0 ^ 0x07;
 
-		*destination = (_bittest((long *)source, bit.dword0)) ? foreground : background;
+		*destination = (_bittest(static_cast<long *>(static_cast<void *>(source)), bit.dword0)) ? foreground : background;
 
 		destination++;
 	}
@@ -4838,7 +4836,7 @@ void movmap(unsigned cnt, unsigned char *buffer) {
 	unsigned char*	destination = buffer;
 
 	for (unsigned i = 0; i < cnt; i++) {
-		*((unsigned *)destination) = *(source++);
+		*(static_cast<unsigned *>(static_cast<void *>(destination))) = *(source++);
 
 		destination += 3;
 	}
@@ -4869,8 +4867,8 @@ void savmap() {
 				crmsg(UserBMPFileName);
 				return;
 			}
-			WriteFile(BitmapFileHandle, (BITMAPFILEHEADER*)&BitmapFileHeader, 14, &bytesWritten, NULL);
-			WriteFile(BitmapFileHandle, (BITMAPV4HEADER*)&BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14, &bytesWritten, NULL);
+			WriteFile(BitmapFileHandle, &BitmapFileHeader, 14, &bytesWritten, NULL);
+			WriteFile(BitmapFileHandle, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14, &bytesWritten, NULL);
 			buffer = new unsigned char[(BitmapWidth*BitmapHeight * 3) + 1];
 			movmap(BitmapWidth*BitmapHeight, buffer);
 			WriteFile(BitmapFileHandle, buffer, BitmapWidth*BitmapHeight * 3, &bytesWritten, NULL);
@@ -4903,13 +4901,13 @@ void bfil() {
 		*PCSBMPFileName = 0;
 		return;
 	}
-	ReadFile(BitmapFileHandle, (BITMAPFILEHEADER*)&BitmapFileHeader, 14, &BytesRead, NULL);
+	ReadFile(BitmapFileHandle, &BitmapFileHeader, 14, &BytesRead, NULL);
 	if (BitmapFileHeader.bfType == 'MB') {
 
 		fileHeaderSize = BitmapFileHeader.bfOffBits - 14;
 		if (fileHeaderSize > sizeof(BITMAPV4HEADER))
 			fileHeaderSize = sizeof(BITMAPV4HEADER);
-		ReadFile(BitmapFileHandle, (BITMAPV4HEADER*)&BitmapFileHeaderV4, fileHeaderSize, &BytesRead, NULL);
+		ReadFile(BitmapFileHandle, &BitmapFileHeaderV4, fileHeaderSize, &BytesRead, NULL);
 	}
 	else {
 
@@ -4939,7 +4937,7 @@ void bfil() {
 				bitmapWidthWords++;
 			bitmapSizeWords = bitmapWidthWords*BitmapHeight;
 			MonoBitmapData = new unsigned[bitmapSizeWords];
-			ReadFile(BitmapFileHandle, (unsigned*)MonoBitmapData, bitmapSizeWords << 2, &BytesRead, NULL);
+			ReadFile(BitmapFileHandle, MonoBitmapData, bitmapSizeWords << 2, &BytesRead, NULL);
 			CloseHandle(BitmapFileHandle);
 			if (binv(bitmapWidthWords)) {
 
@@ -4951,7 +4949,7 @@ void bfil() {
 				foreground = BitmapColor;
 				background = InverseBackgroundColor;
 			}
-			memset((BITMAPINFOHEADER*)&BitmapInfoHeader, 0, sizeof(BITMAPINFOHEADER));
+			memset(&BitmapInfoHeader, 0, sizeof(BITMAPINFOHEADER));
 			BitmapInfoHeader.biSize = sizeof(BITMAPINFOHEADER);
 			BitmapInfoHeader.biWidth = BitmapWidth;
 			BitmapInfoHeader.biHeight = BitmapHeight;
@@ -4959,7 +4957,7 @@ void bfil() {
 			BitmapInfoHeader.biBitCount = 32;
 			BitmapInfoHeader.biCompression = BI_RGB;
 			BitmapInfo.bmiHeader = BitmapInfoHeader;
-			bitmap = CreateDIBSection(BitmapDC, &BitmapInfo, DIB_RGB_COLORS, (void**)&pbits, 0, 0);
+			bitmap = CreateDIBSection(BitmapDC, &BitmapInfo, DIB_RGB_COLORS, reinterpret_cast<void **>(&pbits), 0, 0);
 			//Synchronize
 			GdiFlush();
 			for (iHeight = 0; iHeight < BitmapHeight; iHeight++)
@@ -4979,7 +4977,7 @@ void bfil() {
 
 			CloseHandle(BitmapFileHandle);
 			rstMap(MONOMAP);
-			BitmapFileHandle = (HBITMAP)LoadImage(ThrEdInstance, UserBMPFileName, IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
+			BitmapFileHandle = LoadImage(ThrEdInstance, UserBMPFileName, IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
 			SelectObject(BitmapDC, BitmapFileHandle);
 			setMap(RESTCH);
 		}
@@ -5017,7 +5015,7 @@ unsigned dtrn(DSTREC* dpnt) {
 		mov		eax, [eax]
 	}
 #else
-	return *(unsigned *)dpnt;
+	return *static_cast<unsigned *>(static_cast<void *>(dpnt));
 #endif
 }
 
@@ -5066,7 +5064,7 @@ void dstran() {
 			retval = GetFileSizeEx(colorFile, &colorFileSize);
 			// There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
 			colors = new unsigned[colorFileSize.u.LowPart];
-			ReadFile(colorFile, (unsigned*)colors, colorFileSize.u.LowPart, &bytesRead, 0);
+			ReadFile(colorFile, colors, colorFileSize.u.LowPart, &bytesRead, 0);
 			CloseHandle(colorFile);
 			if (bytesRead > 1) {
 				if (bytesRead && colors && colors[0] == COLVER) {
@@ -5445,7 +5443,7 @@ void nuFil() {
 			firstCharacter = tolower(fileExtention[0]);
 			if (firstCharacter == 't') {
 
-				ReadFile(FileHandle, (STRHED*)&thredHeader, sizeof(STRHED), &BytesRead, NULL);
+				ReadFile(FileHandle, &thredHeader, sizeof(STRHED), &BytesRead, NULL);
 				if ((thredHeader.headerType & 0xffffff) == 0x746872) {
 
 					if (BytesRead != sizeof(STRHED)) {
@@ -5477,7 +5475,7 @@ void nuFil() {
 						case 1:
 						case 2:
 
-							ReadFile(FileHandle, (STREX*)&ExtendedHeader, sizeof(STREX), &BytesRead, NULL);
+							ReadFile(FileHandle, &ExtendedHeader, sizeof(STREX), &BytesRead, NULL);
 							if (BytesRead != sizeof(STREX)) {
 
 								tabmsg(IDS_SHRTF);
@@ -5512,7 +5510,7 @@ void nuFil() {
 						prtred();
 						return;
 					}
-					ReadFile(FileHandle, (COLORREF*)&BackgroundColor, 4, &BytesRead, 0);
+					ReadFile(FileHandle, &BackgroundColor, 4, &BytesRead, 0);
 					totalBytesRead += BytesRead;
 					if (BytesRead != 4) {
 
@@ -5554,7 +5552,7 @@ void nuFil() {
 						MsgBuffer[0] = 0;
 						if (version < 2) {
 							formListOriginal = new FRMHEDO[FormIndex];
-							ReadFile(FileHandle, (FRMHEDO*)formListOriginal, FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
+							ReadFile(FileHandle, formListOriginal, FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
 							if (BytesRead != FormIndex * sizeof(FRMHEDO)) {
 
 								FormIndex = BytesRead / sizeof(FRMHEDO);
@@ -5622,7 +5620,7 @@ void nuFil() {
 				if (firstCharacter == 'p') {
 
 					if (tolower(fileExtention[01]) == 'c') {
-						ReadFile(FileHandle, (PCSHEADER*)&PCSHeader, sizeof(PCSHeader), &BytesRead, NULL);
+						ReadFile(FileHandle, &PCSHeader, sizeof(PCSHeader), &BytesRead, NULL);
 						if (!fileSize) {
 
 							filnopn(IDS_ZEROL, WorkingFileName);
@@ -5650,15 +5648,15 @@ void nuFil() {
 								}
 								else {
 
-									StitchBuffer[iStitch].x = PCSStitchBuffer[iPCSstitch].x + (float)PCSStitchBuffer[iPCSstitch].fx / 256;
-									StitchBuffer[iStitch].y = PCSStitchBuffer[iPCSstitch].y + (float)PCSStitchBuffer[iPCSstitch].fy / 256;
+									StitchBuffer[iStitch].x = PCSStitchBuffer[iPCSstitch].x + static_cast<float>(PCSStitchBuffer[iPCSstitch].fx) / 256;
+									StitchBuffer[iStitch].y = PCSStitchBuffer[iPCSstitch].y + static_cast<float>(PCSStitchBuffer[iPCSstitch].fy) / 256;
 									StitchBuffer[iStitch++].attribute = color;
 									iPCSstitch++;
 								}
 							}
 							PCSHeader.stitchCount = iStitch;
 							// Grab the bitmap filename
-							tnam = (TCHAR*)&PCSStitchBuffer[iPCSstitch];
+							tnam = static_cast<TCHAR *>(static_cast<void *>(&PCSStitchBuffer[iPCSstitch]));
 							strcpy_s(PCSBMPFileName, tnam);
 							delete[] PCSStitchBuffer;
 							strcpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), "thr");
@@ -5718,7 +5716,7 @@ void nuFil() {
 						PEScolors = &pesColorCount[1];
 						MarkedStitchMap[0] = MarkedStitchMap[1] = 0;
 						ActivePointIndex = 0;
-						for (iColor = 0; iColor < (unsigned)(*pesColorCount + 1); iColor++) {
+						for (iColor = 0; iColor < static_cast<unsigned>(*pesColorCount + 1); iColor++) {
 
 							if (setRmp(PEScolors[iColor])) {
 
@@ -5783,7 +5781,7 @@ void nuFil() {
 				}
 				else {
 
-					ReadFile(FileHandle, (DSTHED*)&dstHeader, sizeof(DSTHED), &BytesRead, 0);
+					ReadFile(FileHandle, &dstHeader, sizeof(DSTHED), &BytesRead, 0);
 					if (BytesRead == sizeof(DSTHED)) {
 
 						if (chkdst(&dstHeader)) {
@@ -5792,7 +5790,7 @@ void nuFil() {
 							fileSize = GetFileSize(FileHandle, &BytesRead) - sizeof(DSTHED);
 							DSTRecordCount = fileSize / sizeof(DSTREC);
 							DSTRecords = new DSTREC[DSTRecordCount];
-							ReadFile(FileHandle, (DSTREC*)DSTRecords, sizeof(DSTREC)*DSTRecordCount, &BytesRead, 0);
+							ReadFile(FileHandle, DSTRecords, sizeof(DSTREC)*DSTRecordCount, &BytesRead, 0);
 							dstran();
 							delete[] DSTRecords;
 							IniFile.auxFileType = AUXDST;
@@ -6000,7 +5998,7 @@ void ritdst() {
 		}
 	}
 	DSTRecords[DSTRecordCount].led = DSTRecords[DSTRecordCount].mid = 0;
-	DSTRecords[DSTRecordCount++].nd = (TBYTE)0xf3;
+	DSTRecords[DSTRecordCount++].nd = static_cast<TBYTE>(0xf3);
 
 	if (colfil()) {
 
@@ -6255,7 +6253,7 @@ void pecdat(TCHAR* buffer) {
 	PEScolors = (unsigned char*)&PESdata[49];
 	rpcrd(StitchBuffer[0].x);
 	rpcrd(-StitchBuffer[0].y);
-	for (iStitch = 0; iStitch < (unsigned)PCSHeader.stitchCount - 1; iStitch++) {
+	for (iStitch = 0; iStitch < static_cast<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
 
 		if ((StitchBuffer[iStitch].attribute&COLMSK) != color) {
 
@@ -6397,7 +6395,7 @@ void sav() {
 				// There are always going to be more recordds in the DST format
 				DSTRecords = new DSTREC[2 * PCSHeader.stitchCount];
 				ritdst();
-				pchr = (TCHAR*)&dstHeader;
+				pchr = static_cast<TCHAR  *>(static_cast<void *>(&dstHeader));
 				for (iHeader = 0; iHeader < sizeof(DSTHED); iHeader++)
 					pchr[iHeader] = ' ';
 				strncpy(dstHeader.desched, "LA:", 3);
@@ -6433,8 +6431,8 @@ void sav() {
 				strncpy(dstHeader.pdhed, "PD", 2);
 				strncpy(dstHeader.pd, "******\r", 7);
 				strncpy(dstHeader.eof, "\x1a", 1);
-				WriteFile(PCSFileHandle, (DSTHED*)&dstHeader, sizeof(DSTHED), &bytesWritten, 0);
-				WriteFile(PCSFileHandle, (DSTREC*)DSTRecords, sizeof(DSTREC)*DSTRecordCount, &bytesWritten, 0);
+				WriteFile(PCSFileHandle, &dstHeader, sizeof(DSTHED), &bytesWritten, 0);
+				WriteFile(PCSFileHandle, DSTRecords, sizeof(DSTREC)*DSTRecordCount, &bytesWritten, 0);
 				delete[] DSTRecords;
 				break;
 
@@ -6719,9 +6717,9 @@ COLORREF nuBit() {
 void pxCor2stch(POINT point) {
 	double	ratio;
 
-	ratio = (double)(point.x - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
+	ratio = static_cast<double>(point.x - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
 	SelectedPoint.x = ratio*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-	ratio = (double)(StitchWindowAbsRect.bottom - point.y) / StitchWindowClientRect.bottom;
+	ratio = static_cast<double>(StitchWindowAbsRect.bottom - point.y) / StitchWindowClientRect.bottom;
 	SelectedPoint.y = ratio*(ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
 }
 
@@ -6732,9 +6730,9 @@ unsigned px2stch() {
 	if (Msg.pt.x >= StitchWindowAbsRect.left && Msg.pt.x <= StitchWindowAbsRect.right
 		&& Msg.pt.y >= StitchWindowAbsRect.top && Msg.pt.y <= StitchWindowAbsRect.bottom) {
 
-		tdub = (double)(Msg.pt.x - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
+		tdub = static_cast<double>(Msg.pt.x - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
 		SelectedPoint.x = tdub*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-		tdub = (double)(StitchWindowAbsRect.bottom - Msg.pt.y) / StitchWindowClientRect.bottom;
+		tdub = static_cast<double>(StitchWindowAbsRect.bottom - Msg.pt.y) / StitchWindowClientRect.bottom;
 		SelectedPoint.y = tdub*(ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
 		return 1;
 	}
@@ -7379,11 +7377,11 @@ unsigned closlin() {
 #define		TOL	20
 	// ToDo - Is tsum calculated too many times?
 	unboxs();
-	offset = (float)(Msg.pt.x - StitchWindowAbsRect.left) / (StitchWindowAbsRect.right - StitchWindowAbsRect.left);
+	offset = static_cast<float>(Msg.pt.x - StitchWindowAbsRect.left) / (StitchWindowAbsRect.right - StitchWindowAbsRect.left);
 	checkedPoint.x = offset*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-	offset = (float)(StitchWindowAbsRect.bottom - Msg.pt.y) / (StitchWindowAbsRect.bottom - StitchWindowAbsRect.top);
+	offset = static_cast<float>(StitchWindowAbsRect.bottom - Msg.pt.y) / (StitchWindowAbsRect.bottom - StitchWindowAbsRect.top);
 	checkedPoint.y = (offset*(ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom);
-	offset = (double)(ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
+	offset = static_cast<double>(ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
 	tolerance = offset*TOL;
 	for (iChange = 0; iChange < ColorChanges; iChange++) {
 
@@ -7450,7 +7448,7 @@ unsigned closlin() {
 							tsum = fabs(dx);
 							goto gotal;
 						}
-						slope = (double)xba / yab;
+						slope = static_cast<double>(xba) / yab;
 						offset = stitches[iStitch].x + slope*stitches[iStitch].y;
 						poff = checkedPoint.x - checkedPoint.y / slope;
 						intersection.y = slope*(offset - poff) / (slope*slope + 1);
@@ -7560,7 +7558,7 @@ void istch() {
 	xlin1();
 	if (chkMap(SELBOX)) {
 
-		if (ClosestPointIndex && ClosestPointIndex != (unsigned)PCSHeader.stitchCount - 1) {
+		if (ClosestPointIndex && ClosestPointIndex != static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
 
 			px2stch();
 			angt = atan2(StitchBuffer[ClosestPointIndex].y - SelectedPoint.y, StitchBuffer[ClosestPointIndex].x - SelectedPoint.x);
@@ -7571,7 +7569,7 @@ void istch() {
 		}
 		else {
 
-			if (ClosestPointIndex == (unsigned)PCSHeader.stitchCount - 1)
+			if (ClosestPointIndex == static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 				ClosestPointIndex--;
 		}
 	}
@@ -7645,7 +7643,7 @@ void selCol() {
 			else
 				iStitch = 0;
 		}
-		if (iStitch > (unsigned)PCSHeader.stitchCount - 1)
+		if (iStitch > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 			iStitch = PCSHeader.stitchCount - 1;
 		ClosestPointIndex = GroupStitchIndex = iStitch;
 		color = StitchBuffer[iStitch].attribute&COLMSK;
@@ -7657,7 +7655,7 @@ void selCol() {
 			GroupStitchIndex++;
 		if ((StitchBuffer[ClosestPointIndex].attribute&COLMSK) != color)
 			ClosestPointIndex--;
-		if (GroupStitchIndex > (unsigned)PCSHeader.stitchCount - 1)
+		if (GroupStitchIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 			GroupStitchIndex = PCSHeader.stitchCount - 1;
 		setMap(GRPSEL);
 		unbox();
@@ -7961,19 +7959,6 @@ void rstdu() {
 	setMap(DUMEN);
 }
 
-CLPSTCH* deref(void* point) {
-
-#if  __UseASM__
-	_asm {
-		mov		eax, point
-		mov		eax, [eax]
-	}
-#else
-	//check translation
-	return *(CLPSTCH **)point;
-#endif
-}
-
 void duclp() {
 
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
@@ -8018,7 +8003,7 @@ void clpbox() {
 		SelectedPoint.y = UnzoomedRect.y - ClipRectSize.cy;
 	ClipOrigin.x = SelectedPoint.x;
 	ClipOrigin.y = SelectedPoint.y;
-	ratio = (double)StitchWindowClientRect.right / (ZoomRect.right - ZoomRect.left);
+	ratio = static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
 	adjustedSize.cx = ClipRectSize.cx*ratio + 0.5;
 	adjustedSize.cy = ClipRectSize.cy*ratio + 0.5;
 	StitchCoordinatesPixels.x = (SelectedPoint.x - ZoomRect.left)*ratio + 0.5;
@@ -8040,7 +8025,7 @@ void lodclp(unsigned iStitch) {
 		iStitch++;
 	adjustment.x = ClipOrigin.x - ClipRect.left;
 	adjustment.y = ClipOrigin.y - ClipRect.bottom;
-	if (iStitch < (unsigned)PCSHeader.stitchCount && chkMap(INIT)) {
+	if (iStitch < static_cast<unsigned>(PCSHeader.stitchCount) && chkMap(INIT)) {
 
 		source = PCSHeader.stitchCount - 1;
 		destination = PCSHeader.stitchCount + ClipStitchCount - 1;
@@ -8080,7 +8065,7 @@ void rSelbox() {
 		SelectedPoint.x = SelectBoxOffset.x;
 	if (SelectedPoint.y - SelectBoxOffset.y < 0)
 		SelectedPoint.y = SelectBoxOffset.y;
-	ratio = (double)StitchWindowClientRect.right / (ZoomRect.right - ZoomRect.left);
+	ratio = static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
 	adjustedSelectSize.cx = SelectBoxSize.cx*ratio + 0.5;
 	adjustedSelectSize.cy = SelectBoxSize.cy*ratio + 0.5;
 	StitchCoordinatesPixels.x = (SelectedPoint.x - ZoomRect.left - SelectBoxOffset.x)*ratio + 0.5;
@@ -8418,11 +8403,11 @@ void savclp(unsigned destination, unsigned source) {
 	double	frct, intg;
 
 	ClipStitchData[destination].led = StitchBuffer[source].attribute&COLMSK;
-	frct = modf((double)StitchBuffer[source].x - LowerLeftStitch.x, &intg);
+	frct = modf(static_cast<double>(StitchBuffer[source].x) - LowerLeftStitch.x, &intg);
 	ClipStitchData[destination].fx = frct * 256;
 	ClipStitchData[destination].x = intg;
 	ClipStitchData[destination].spcx = 0;
-	frct = modf((double)StitchBuffer[source].y - LowerLeftStitch.y, &intg);
+	frct = modf(static_cast<double>(StitchBuffer[source].y) - LowerLeftStitch.y, &intg);
 	ClipStitchData[destination].fy = frct * 256;
 	ClipStitchData[destination].y = intg;
 	ClipStitchData[destination].spcy = 0;
@@ -8447,42 +8432,6 @@ void rtclpfn(unsigned destination, unsigned source) {
 	// ToDo - Are these structure members needed?
 	ClipStitchData[destination].myst = 1;
 	ClipStitchData[destination].tag = 0x14;
-}
-
-FORMCLIP* frmref(void* clipForm) {
-
-#if  __UseASM__
-	_asm {
-		mov		eax, clipForm
-		mov		eax, [eax]
-	}
-#else
-	return *(FORMCLIP **)clipForm;
-#endif
-}
-
-FORMSCLIP* frmsref(void* clipForms) {
-
-#if  __UseASM__
-	_asm {
-		mov		eax, clipForms
-		mov		eax, [eax]
-	}
-#else
-	return *(FORMSCLIP **)clipForms;
-#endif
-}
-
-FORMVERTEXCLIP* fpref(void* clipVertex) {
-
-#if  __UseASM__
-	_asm {
-		mov		eax, clipVertex
-		mov		eax, [eax]
-	}
-#else
-	return *(FORMVERTEXCLIP **)clipVertex;
-#endif
 }
 
 unsigned sizfclp() {
@@ -8588,24 +8537,26 @@ void duclip() {
 			EmptyClipboard();
 			ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 			ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, (SelectedFormVertices.vertexCount + 1) * sizeof(fPOINT) + sizeof(FORMVERTEXCLIP));
-			clipHeader = fpref(ThrEdClipPointer);
-			clipHeader->clipType = CLP_FRMPS;
-			clipHeader->vertexCount = SelectedFormVertices.vertexCount;
-			if (chkMap(PSELDIR))
-				clipHeader->direction = 1;
-			else
-				clipHeader->direction = 0;
-			// skip past the header
-			vertices = (fPOINT*)&clipHeader[1];
-			fvars(ClosestFormToCursor);
-			iSource = SelectedFormVertices.start;
-			for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
+			if (ThrEdClipPointer) {
+				clipHeader = *(static_cast<FORMVERTEXCLIP * *>(ThrEdClipPointer));
+				clipHeader->clipType = CLP_FRMPS;
+				clipHeader->vertexCount = SelectedFormVertices.vertexCount;
+				if (chkMap(PSELDIR))
+					clipHeader->direction = 1;
+				else
+					clipHeader->direction = 0;
+				// skip past the header
+				vertices = static_cast<fPOINT *>(static_cast<void *>(&clipHeader[1]));
+				fvars(ClosestFormToCursor);
+				iSource = SelectedFormVertices.start;
+				for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 
-				vertices[iVertex].x = CurrentFormVertices[iSource].x;
-				vertices[iVertex].y = CurrentFormVertices[iSource].y;
-				iSource = pdir(iSource);
+					vertices[iVertex].x = CurrentFormVertices[iSource].x;
+					vertices[iVertex].y = CurrentFormVertices[iSource].y;
+					iSource = pdir(iSource);
+				}
+				SetClipboardData(ThrEdClip, ThrEdClipPointer);
 			}
-			SetClipboardData(ThrEdClip, ThrEdClipPointer);
 			CloseClipboard();
 		}
 		return;
@@ -8628,78 +8579,80 @@ void duclip() {
 					msiz += FileSize;
 				}
 				ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, msiz + length);
-				ClipFormsHeader = frmsref(ThrEdClipPointer);
-				ClipFormsHeader->clipType = CLP_FRMS;
-				ClipFormsHeader->formCount = SelectedFormCount;
-				// Skip past the header
-				forms = (FRMHED*)&ClipFormsHeader[1];
-				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+				if (ThrEdClipPointer) {
+					ClipFormsHeader = *(static_cast<FORMSCLIP * *>(ThrEdClipPointer));
+					ClipFormsHeader->clipType = CLP_FRMS;
+					ClipFormsHeader->formCount = SelectedFormCount;
+					// Skip past the header
+					forms = static_cast<FRMHED *>(static_cast<void *>(&ClipFormsHeader[1]));
+					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
-					SelectedForm = &FormList[SelectedFormList[iForm]];
-					frmcpy(&forms[iForm], &FormList[SelectedFormList[iForm]]);
-				}
-				// skip past the forms
-				CurrentFormVertices = (fPOINT*)&forms[iForm];
-				iVertex = 0;
-				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-
-					SelectedForm = &FormList[SelectedFormList[iForm]];
-					for (iSide = 0; iSide < SelectedForm->vertexCount; iSide++) {
-
-						CurrentFormVertices[iVertex].x = SelectedForm->vertices[iSide].x;
-						CurrentFormVertices[iVertex++].y = SelectedForm->vertices[iSide].y;
+						SelectedForm = &FormList[SelectedFormList[iForm]];
+						frmcpy(&forms[iForm], &FormList[SelectedFormList[iForm]]);
 					}
-				}
-				// skip past the vertex list
-				guides = (SATCON*)&CurrentFormVertices[iVertex];
-				guideCount = 0;
-				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+					// skip past the forms
+					CurrentFormVertices = static_cast<fPOINT *>(static_cast<void *>(&forms[iForm]));
+					iVertex = 0;
+					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
-					SelectedForm = &FormList[SelectedFormList[iForm]];
-					if (SelectedForm->type == SAT) {
+						SelectedForm = &FormList[SelectedFormList[iForm]];
+						for (iSide = 0; iSide < SelectedForm->vertexCount; iSide++) {
 
-						for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-
-							guides[guideCount].start = SelectedForm->satinOrAngle.guide[iGuide].start;
-							guides[guideCount++].finish = SelectedForm->satinOrAngle.guide[iGuide].finish;
+							CurrentFormVertices[iVertex].x = SelectedForm->vertices[iSide].x;
+							CurrentFormVertices[iVertex++].y = SelectedForm->vertices[iSide].y;
 						}
 					}
-				}
-				// skip past the guides
-				points = (fPOINT*)&guides[guideCount];
-				pointCount = 0;
-				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+					// skip past the vertex list
+					guides = static_cast<SATCON *>(static_cast<void *>(&CurrentFormVertices[iVertex]));
+					guideCount = 0;
+					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
-					SelectedForm = &FormList[SelectedFormList[iForm]];
-					if (isclpx(SelectedFormList[iForm])) {
+						SelectedForm = &FormList[SelectedFormList[iForm]];
+						if (SelectedForm->type == SAT) {
 
-						for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
+							for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 
-							points[pointCount].x = SelectedForm->angleOrClipData.clip[iClip].x;
-							points[pointCount++].y = SelectedForm->angleOrClipData.clip[iClip].y;
+								guides[guideCount].start = SelectedForm->satinOrAngle.guide[iGuide].start;
+								guides[guideCount++].finish = SelectedForm->satinOrAngle.guide[iGuide].finish;
+							}
 						}
 					}
-					if (iseclp(SelectedFormList[iForm])) {
+					// skip past the guides
+					points = static_cast<fPOINT *>(static_cast<void *>(&guides[guideCount]));
+					pointCount = 0;
+					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
-						for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
+						SelectedForm = &FormList[SelectedFormList[iForm]];
+						if (isclpx(SelectedFormList[iForm])) {
 
-							points[pointCount].x = SelectedForm->borderClipData[iClip].x;
-							points[pointCount++].y = SelectedForm->borderClipData[iClip].y;
+							for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
+
+								points[pointCount].x = SelectedForm->angleOrClipData.clip[iClip].x;
+								points[pointCount++].y = SelectedForm->angleOrClipData.clip[iClip].y;
+							}
+						}
+						if (iseclp(SelectedFormList[iForm])) {
+
+							for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
+
+								points[pointCount].x = SelectedForm->borderClipData[iClip].x;
+								points[pointCount++].y = SelectedForm->borderClipData[iClip].y;
+							}
 						}
 					}
-				}
-				// Skip past the points
-				textures = (TXPNT*)&points[pointCount];
-				textureCount = 0;
-				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-					SelectedForm = &FormList[SelectedFormList[iForm]];
-					if (istx(SelectedFormList[iForm])) {
-						MoveMemory(&textures[textureCount], &TexturePointsBuffer[SelectedForm->fillInfo.texture.index], SelectedForm->fillInfo.texture.count * sizeof(TXPNT));
-						forms[iForm].fillInfo.texture.index = textureCount;
-						textureCount += SelectedForm->fillInfo.texture.count;
+					// Skip past the points
+					textures = static_cast<TXPNT *>(static_cast<void *>(&points[pointCount]));
+					textureCount = 0;
+					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+						SelectedForm = &FormList[SelectedFormList[iForm]];
+						if (istx(SelectedFormList[iForm])) {
+							MoveMemory(&textures[textureCount], &TexturePointsBuffer[SelectedForm->fillInfo.texture.index], SelectedForm->fillInfo.texture.count * sizeof(TXPNT));
+							forms[iForm].fillInfo.texture.index = textureCount;
+							textureCount += SelectedForm->fillInfo.texture.count;
+						}
 					}
+					SetClipboardData(ThrEdClip, ThrEdClipPointer);
 				}
-				SetClipboardData(ThrEdClip, ThrEdClipPointer);
 				CloseClipboard();
 				clRmap(MAXITEMS);
 				for (iForm = 0; iForm < SelectedFormCount; iForm++)
@@ -8724,16 +8677,18 @@ void duclip() {
 
 					Clip = RegisterClipboardFormat(PcdClipFormat);
 					ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2);
-					ClipStitchData = deref(ClipPointer);
-					iStitch = MAXITEMS;
-					iDestination = 0;
-					savclp(0, iStitch);
-					iStitch++;
-					ClipStitchData[0].led = stitchCount;
-					iDestination++;
-					while (iStitch < stitchCount + MAXITEMS)
-						savclp(iDestination++, iStitch++);
-					SetClipboardData(Clip, ClipPointer);
+					if (ClipPointer) {
+						ClipStitchData = *(static_cast<CLPSTCH * *>(ClipPointer));
+						iStitch = MAXITEMS;
+						iDestination = 0;
+						savclp(0, iStitch);
+						iStitch++;
+						ClipStitchData[0].led = stitchCount;
+						iDestination++;
+						while (iStitch < stitchCount + MAXITEMS)
+							savclp(iDestination++, iStitch++);
+						SetClipboardData(Clip, ClipPointer);
+					}
 					CloseClipboard();
 				}
 			}
@@ -8746,72 +8701,76 @@ void duclip() {
 					guides = 0; codedAttribute = ClosestFormToCursor << FRMSHFT;
 					FileSize += sizeof(FORMCLIP);
 					ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize);
-					ClipFormHeader = frmref(ThrEdClipPointer);
-					ClipFormHeader->clipType = CLP_FRM;
-					frmcpy(&ClipFormHeader->form, &FormList[ClosestFormToCursor]);
-					CurrentFormVertices = (fPOINT*)&ClipFormHeader[1];
-					for (iSide = 0; iSide < SelectedForm->vertexCount; iSide++) {
+					if (ThrEdClipPointer) {
+						ClipFormHeader = *(static_cast<FORMCLIP * *>(ThrEdClipPointer));
+						ClipFormHeader->clipType = CLP_FRM;
+						frmcpy(&ClipFormHeader->form, &FormList[ClosestFormToCursor]);
+						CurrentFormVertices = static_cast<fPOINT *>(static_cast<void *>(&ClipFormHeader[1]));
+						for (iSide = 0; iSide < SelectedForm->vertexCount; iSide++) {
 
-						CurrentFormVertices[iSide].x = SelectedForm->vertices[iSide].x;
-						CurrentFormVertices[iSide].y = SelectedForm->vertices[iSide].y;
-					}
-					guides = (SATCON*)&CurrentFormVertices[VertexCount];
-					iGuide = 0;
-					if (SelectedForm->type == SAT) {
-
-						for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-
-							guides[iGuide].start = SelectedForm->satinOrAngle.guide[iGuide].start;
-							guides[iGuide].finish = SelectedForm->satinOrAngle.guide[iGuide].finish;
+							CurrentFormVertices[iSide].x = SelectedForm->vertices[iSide].x;
+							CurrentFormVertices[iSide].y = SelectedForm->vertices[iSide].y;
 						}
-					}
-					mclp = (fPOINT*)&guides[iGuide];
-					iClip = 0;
-					if (isclpx(ClosestFormToCursor)) {
+						guides = static_cast<SATCON *>(static_cast<void *>(&CurrentFormVertices[VertexCount]));
+						iGuide = 0;
+						if (SelectedForm->type == SAT) {
 
-						for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
+							for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 
-							mclp[iClip].x = SelectedForm->angleOrClipData.clip[iClip].x;
-							mclp[iClip].y = SelectedForm->angleOrClipData.clip[iClip].y;
+								guides[iGuide].start = SelectedForm->satinOrAngle.guide[iGuide].start;
+								guides[iGuide].finish = SelectedForm->satinOrAngle.guide[iGuide].finish;
+							}
 						}
-					}
-					points = (fPOINT*)&mclp[iClip];
-					if (iseclpx(ClosestFormToCursor)) {
+						mclp = static_cast<fPOINT *>(static_cast<void *>(&guides[iGuide]));
+						iClip = 0;
+						if (isclpx(ClosestFormToCursor)) {
 
-						for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
+							for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
 
-							points[iClip].x = SelectedForm->borderClipData[iClip].x;
-							points[iClip].y = SelectedForm->borderClipData[iClip].y;
+								mclp[iClip].x = SelectedForm->angleOrClipData.clip[iClip].x;
+								mclp[iClip].y = SelectedForm->angleOrClipData.clip[iClip].y;
+							}
 						}
-					}
-					textures = (TXPNT*)&points[iClip];
-					if (istx(ClosestFormToCursor)) {
-						ptxs = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
-						for (iTexture = 0; iTexture < SelectedForm->fillInfo.texture.count; iTexture++) {
-							textures[iTexture].line = ptxs[iTexture].line;
-							textures[iTexture].y = ptxs[iTexture].y;
+						points = static_cast<fPOINT *>(static_cast<void *>(&mclp[iClip]));
+						if (iseclpx(ClosestFormToCursor)) {
+
+							for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
+
+								points[iClip].x = SelectedForm->borderClipData[iClip].x;
+								points[iClip].y = SelectedForm->borderClipData[iClip].y;
+							}
 						}
+						textures = static_cast<TXPNT *>(static_cast<void *>(&points[iClip]));
+						if (istx(ClosestFormToCursor)) {
+							ptxs = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
+							for (iTexture = 0; iTexture < SelectedForm->fillInfo.texture.count; iTexture++) {
+								textures[iTexture].line = ptxs[iTexture].line;
+								textures[iTexture].y = ptxs[iTexture].y;
+							}
+						}
+						SetClipboardData(ThrEdClip, ThrEdClipPointer);
 					}
-					SetClipboardData(ThrEdClip, ThrEdClipPointer);
 					iTexture = 0;
 					if ((SelectedForm->fillType || SelectedForm->edgeType)) {
 						length = lenclp();
 						Clip = RegisterClipboardFormat(PcdClipFormat);
 						ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length * sizeof(CLPSTCH) + 2);
-						ClipStitchData = deref(ClipPointer);
-						iStitch = FormFirstStitchIndex;
-						savclp(0, iTexture);
-						ClipStitchData[0].led = length;
-						iTexture++;
-						iDestination = 1;
-						codedAttribute = ClosestFormToCursor << FRMSHFT;
-						while (iTexture < PCSHeader.stitchCount) {
-
-							if ((StitchBuffer[iTexture].attribute&FRMSK) == codedAttribute && !(StitchBuffer[iTexture].attribute&NOTFRM))
-								savclp(iDestination++, iTexture);
+						if (ClipPointer) {
+							ClipStitchData = *(static_cast<CLPSTCH * *>(ClipPointer));
+							iStitch = FormFirstStitchIndex;
+							savclp(0, iTexture);
+							ClipStitchData[0].led = length;
 							iTexture++;
+							iDestination = 1;
+							codedAttribute = ClosestFormToCursor << FRMSHFT;
+							while (iTexture < PCSHeader.stitchCount) {
+
+								if ((StitchBuffer[iTexture].attribute&FRMSK) == codedAttribute && !(StitchBuffer[iTexture].attribute&NOTFRM))
+									savclp(iDestination++, iTexture);
+								iTexture++;
+							}
+							SetClipboardData(Clip, ClipPointer);
 						}
-						SetClipboardData(Clip, ClipPointer);
 						ispcdclp();
 					}
 					CloseClipboard();
@@ -8833,13 +8792,15 @@ void duclip() {
 						length = GroupEndStitch - GroupStartStitch + 1;
 						iSource = GroupStartStitch;
 						ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length * sizeof(CLPSTCH) + 2);
-						ClipStitchData = deref(ClipPointer);
-						savclp(0, iSource);
-						ClipStitchData[0].led = length;
-						iSource++;
-						for (iStitch = 1; iStitch < length; iStitch++)
-							savclp(iStitch, iSource++);
-						SetClipboardData(Clip, ClipPointer);
+						if (ClipPointer) {
+							ClipStitchData = *(static_cast<CLPSTCH * *>(ClipPointer));
+							savclp(0, iSource);
+							ClipStitchData[0].led = length;
+							iSource++;
+							for (iStitch = 1; iStitch < length; iStitch++)
+								savclp(iStitch, iSource++);
+							SetClipboardData(Clip, ClipPointer);
+						}
 						CloseClipboard();
 					}
 				}
@@ -8949,7 +8910,7 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 
 		iNextStitch = find1st();
 		iStitch = iNextStitch + 1;
-		while (iStitch<(unsigned)PCSHeader.stitchCount - 1 && stitchSize>SmallStitchLength) {
+		while (iStitch<static_cast<unsigned>(PCSHeader.stitchCount) - 1 && stitchSize>SmallStitchLength) {
 
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute) {
 
@@ -8968,7 +8929,7 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 
 			iStitch--;
 			iNextStitch = iStitch + 2;
-			while (iNextStitch < (unsigned)PCSHeader.stitchCount - 1) {
+			while (iNextStitch < static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
 
 				do {
 
@@ -9170,7 +9131,7 @@ void fndknt() {
 
 		flag = 0;
 		KnotCount = 0;
-		for (iStitch = 0; iStitch < (unsigned)PCSHeader.stitchCount - 4; iStitch++) {
+		for (iStitch = 0; iStitch < static_cast<unsigned>(PCSHeader.stitchCount) - 4; iStitch++) {
 
 			if (StitchBuffer[iStitch].attribute&KNOTMSK) {
 
@@ -9220,7 +9181,7 @@ void delknot() {
 
 unsigned kjmp(unsigned start) {
 
-	while (start<(unsigned)PCSHeader.stitchCount - 1 && stlen(start)>KNOTLEN)
+	while (start<static_cast<unsigned>(PCSHeader.stitchCount) - 1 && stlen(start)>KNOTLEN)
 		mvstch(OutputIndex++, start++);
 	strtknt(start);
 	return start;
@@ -9239,7 +9200,7 @@ void setknt() {
 	else
 		iStitch = 1;
 	rstMap(FILDIR);
-	while (iStitch < (unsigned)PCSHeader.stitchCount - 1) {
+	while (iStitch < static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
 
 		mvstch(OutputIndex++, iStitch);
 		if (stlen(iStitch) > KNOTLEN) {
@@ -9564,15 +9525,18 @@ void dubuf(char *buffer, unsigned *count) {
 		for (iForm = 0; iForm < FormIndex; iForm++) {
 
 			frmcpy(&forms[iForm], &FormList[iForm]);
-			forms[iForm].vertices = (fPOINT*)(&vertices[iDestinationVertex] - &vertices[0]);
+			// ToDo - does this line make sense?
+			//forms[iForm].vertices = (fPOINT*)(&vertices[iDestinationVertex] - &vertices[0]);
+			forms[iForm].vertices = nullptr;
 			for (iVertex = 0; iVertex < FormList[iForm].vertexCount; iVertex++) {
 
 				vertices[iDestinationVertex].x = FormList[iForm].vertices[iVertex].x;
 				vertices[iDestinationVertex++].y = FormList[iForm].vertices[iVertex].y;
 			}
 			if (FormList[iForm].type == SAT) {
-
-				forms[iForm].satinOrAngle.guide = (SATCON*)(&guides[iDestinationGuide] - &guides[0]);
+				// ToDo - does this line make sense?
+				//forms[iForm].satinOrAngle.guide = (SATCON*)(&guides[iDestinationGuide] - &guides[0]);
+				forms[iForm].satinOrAngle.guide = nullptr;
 				forms[iForm].satinGuideCount = FormList[iForm].satinGuideCount;
 				for (iGuide = 0; iGuide < FormList[iForm].satinGuideCount; iGuide++) {
 
@@ -9581,8 +9545,9 @@ void dubuf(char *buffer, unsigned *count) {
 				}
 			}
 			if (isclp(iForm)) {
-
-				forms[iForm].angleOrClipData.clip = (fPOINT*)(&points[iDestinationClip] - &points[0]);
+				// ToDo - does this line make sense?
+				//forms[iForm].angleOrClipData.clip = (fPOINT*)(&points[iDestinationClip] - &points[0]);
+				forms[iForm].angleOrClipData.clip = nullptr;
 				for (iClip = 0; (iClip < FormList[iForm].lengthOrCount.clipCount) && (iDestinationClip < clipDataCount); iClip++) {
 
 					points[iDestinationClip].x = FormList[iForm].angleOrClipData.clip[iClip].x;
@@ -9590,8 +9555,9 @@ void dubuf(char *buffer, unsigned *count) {
 				}
 			}
 			if (iseclpx(iForm)) {
-
-				forms[iForm].borderClipData = (fPOINT*)(&points[iDestinationClip] - &points[0]);
+				// ToDo - does this line make sense?
+				//forms[iForm].borderClipData = (fPOINT*)(&points[iDestinationClip] - &points[0]);
+				forms[iForm].borderClipData = nullptr;
 				for (iClip = 0; (iClip < FormList[iForm].clipEntries) && ((iDestinationClip < clipDataCount)); iClip++) {
 					points[iDestinationClip].x = FormList[iForm].borderClipData[iClip].x;
 					points[iDestinationClip++].y = FormList[iForm].borderClipData[iClip].y;
@@ -9680,17 +9646,17 @@ void setsped() {
 
 	if (!MovieTimeStep)
 		MovieTimeStep = 1;
-	userTimePerFrame = (double)MovieTimeStep / 10;
+	userTimePerFrame = static_cast<double>(MovieTimeStep) / 10;
 	if (userTimePerFrame < 10) {
 
 		elapsedTimePerFrame = 100;  // units are millseconds
-		StitchesPerFrame = (unsigned)elapsedTimePerFrame / userTimePerFrame;
+		StitchesPerFrame = static_cast<unsigned>(elapsedTimePerFrame / userTimePerFrame);
 		if (StitchesPerFrame > 99)
 			StitchesPerFrame = 99;
 	}
 	else {
 
-		elapsedTimePerFrame = (unsigned)userTimePerFrame;
+		elapsedTimePerFrame = static_cast<unsigned>(userTimePerFrame);
 		StitchesPerFrame = 2;
 	}
 	if (StitchesPerFrame < 2)
@@ -9731,7 +9697,7 @@ void frmdel() {
 
 	fvars(ClosestFormToCursor);
 	f1del();
-	for (iForm = ClosestFormToCursor; iForm < (unsigned)FormIndex; iForm++)
+	for (iForm = ClosestFormToCursor; iForm < static_cast<unsigned>(FormIndex); iForm++)
 		frmcpy(&FormList[iForm], &FormList[iForm + 1]);
 	if (rstMap(DELTO)) {
 
@@ -9966,7 +9932,7 @@ selab:;
 					}
 					if (WordParam) {
 
-						if (ClosestVertexToCursor == (unsigned)WordParam || ClosestVertexToCursor == (unsigned)WordParam + 1) {
+						if (ClosestVertexToCursor == static_cast<unsigned>(WordParam) || ClosestVertexToCursor == static_cast<unsigned>(WordParam) + 1) {
 
 							SelectedForm->wordParam = 0;
 							satinFlag = 1;
@@ -10068,11 +10034,11 @@ void redclp() {
 
 	codedLayer = ActiveLayer << LAYSHFT;
 	ClipPointer = GlobalLock(ClipMemory);
-	ClipStitchData = (CLPSTCH*)ClipPointer;
 	if (ClipPointer) {
+		ClipStitchData = static_cast<CLPSTCH *>(ClipPointer);
 		ClipStitchCount = ClipStitchData[0].led;
-		ClipBuffer[0].x = ClipStitchData[0].x + (float)ClipStitchData[0].fx / 256;
-		ClipBuffer[0].y = ClipStitchData[0].y + (float)ClipStitchData[0].fy / 256;
+		ClipBuffer[0].x = ClipStitchData[0].x + static_cast<float>(ClipStitchData[0].fx) / 256;
+		ClipBuffer[0].y = ClipStitchData[0].y + static_cast<float>(ClipStitchData[0].fy) / 256;
 		ClipBuffer[0].attribute = 0;
 
 #if CLPBUG
@@ -10082,10 +10048,10 @@ void redclp() {
 #endif
 		ClipRect.left = ClipRect.right = ClipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
-		for (iStitch = 1; iStitch < (long)ClipStitchCount; iStitch++) {
+		for (iStitch = 1; iStitch < static_cast<long>(ClipStitchCount); iStitch++) {
 
-			ClipBuffer[iStitch].x = ClipStitchData[iStitch].x + (float)ClipStitchData[iStitch].fx / 256;
-			ClipBuffer[iStitch].y = ClipStitchData[iStitch].y + (float)ClipStitchData[iStitch].fy / 256;
+			ClipBuffer[iStitch].x = ClipStitchData[iStitch].x + static_cast<float>(ClipStitchData[iStitch].fx) / 256;
+			ClipBuffer[iStitch].y = ClipStitchData[iStitch].y + static_cast<float>(ClipStitchData[iStitch].fy) / 256;
 			ClipBuffer[iStitch].attribute = (ClipStitchData[iStitch].led & 0xf) | codedLayer;
 
 #if CLPBUG
@@ -10108,7 +10074,7 @@ void redclp() {
 		GlobalUnlock(ClipMemory);
 		if (ClipRect.left || ClipRect.bottom) {
 
-			for (iStitch = 0; iStitch < (int)ClipStitchCount; iStitch++) {
+			for (iStitch = 0; iStitch < static_cast<int>(ClipStitchCount); iStitch++) {
 
 				ClipBuffer[iStitch].x -= ClipRect.left;
 				ClipBuffer[iStitch].y -= ClipRect.bottom;
@@ -10272,8 +10238,8 @@ void movbak(TCHAR source, TCHAR destination) {
 
 	strcpy_s(sourceFileName, ThrName);
 	strcpy_s(destinationFileName, ThrName);
-	sourceFileName[lastChar] = (TCHAR)source;
-	destinationFileName[lastChar] = (TCHAR)destination;
+	sourceFileName[lastChar] = source;
+	destinationFileName[lastChar] = destination;
 	DeleteFile(destinationFileName);
 	MoveFile(sourceFileName, destinationFileName);
 }
@@ -10289,7 +10255,7 @@ void purg() {
 		lastChar = duth(fileName);
 		for (iLast = 1; iLast < 6; iLast++) {
 
-			fileName[lastChar] = (TCHAR)iLast + 'r';
+			fileName[lastChar] = static_cast<TCHAR>(iLast) + 'r';
 			DeleteFile(fileName);
 		}
 	}
@@ -10318,7 +10284,7 @@ void deldir() {
 	strcpy_s(fileSpec, sizeof(fileName) - (fileSpec - fileName), "\\*.th0");
 	for (iLastChar = 1; iLastChar < 6; iLastChar++) {
 
-		fileSpec[5] = (TCHAR)iLastChar + 'r';
+		fileSpec[5] = static_cast<TCHAR>(iLastChar) + 'r';
 		file = FindFirstFile(fileName, &findFileData);
 		if (file != INVALID_HANDLE_VALUE) {
 
@@ -10576,7 +10542,7 @@ void ritmov() {
 	SelectObject(StitchWindowDC, FormPen);
 	if (ClosestVertexToCursor) {
 
-		if (ClosestVertexToCursor == (unsigned)SelectedForm->vertexCount - 1 && SelectedForm->type == FRMLINE)
+		if (ClosestVertexToCursor == static_cast<unsigned>(SelectedForm->vertexCount) - 1 && SelectedForm->type == FRMLINE)
 			Polyline(StitchWindowDC, RubberBandLine, 2);
 		else
 			Polyline(StitchWindowDC, RubberBandLine, 3);
@@ -10722,7 +10688,7 @@ void nulayr(unsigned play) {
 	ladj();
 	if (ActiveLayer) {
 
-		if (chkMap(FORMSEL) && ((unsigned)((FormList[ClosestFormToCursor].attribute&FRMLMSK) >> 1) != ActiveLayer))
+		if (chkMap(FORMSEL) && (static_cast<unsigned>((FormList[ClosestFormToCursor].attribute&FRMLMSK) >> 1) != ActiveLayer))
 			rstMap(FORMSEL);
 		rstMap(GRPSEL);
 		if (chkMap(SELBOX)) {
@@ -10786,12 +10752,14 @@ void rtrclpfn() {
 			EmptyClipboard();
 			Clip = RegisterClipboardFormat(PcdClipFormat);
 			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, count * sizeof(CLPSTCH) + 2);
-			ClipStitchData = deref(ClipPointer);
-			rtclpfn(0, 0);
-			ClipStitchData[0].led = count;
-			for (iStitch = 1; iStitch < count; iStitch++)
-				rtclpfn(iStitch, iStitch);
-			SetClipboardData(Clip, ClipPointer);
+			if (ClipPointer) {
+				ClipStitchData = *(static_cast<CLPSTCH * *>(ClipPointer));
+				rtclpfn(0, 0);
+				ClipStitchData[0].led = count;
+				for (iStitch = 1; iStitch < count; iStitch++)
+					rtclpfn(iStitch, iStitch);
+				SetClipboardData(Clip, ClipPointer);
+			}
 			CloseClipboard();
 		}
 	}
@@ -10835,7 +10803,7 @@ BOOL chkbig() {
 		else {
 
 			setMap(EXPAND);
-			XYratio = (double)(SelectedFormsRect.right - SelectedFormsRect.left) / (SelectedFormsRect.bottom - SelectedFormsRect.top);
+			XYratio = static_cast<double>(SelectedFormsRect.right - SelectedFormsRect.left) / (SelectedFormsRect.bottom - SelectedFormsRect.top);
 		}
 		SelectedFormControlVertex >>= 1;
 		setMap(SHOSTRTCH);
@@ -10944,7 +10912,7 @@ void selup() {
 
 			unbox();
 			attribute = StitchBuffer[ClosestPointIndex].attribute&ATMSK;
-			while (ClosestPointIndex < (unsigned)PCSHeader.stitchCount - 1 && (StitchBuffer[ClosestPointIndex].attribute&ATMSK) == attribute)
+			while (ClosestPointIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1 && (StitchBuffer[ClosestPointIndex].attribute&ATMSK) == attribute)
 				ClosestPointIndex++;
 			stch2px(ClosestPointIndex);
 			dubox();
@@ -10955,7 +10923,7 @@ void selup() {
 
 				if (setMap(FORMSEL)) {
 
-					if (ClosestFormToCursor < (unsigned)FormIndex - 1)
+					if (ClosestFormToCursor < static_cast<unsigned>(FormIndex) - 1)
 						ClosestFormToCursor++;
 				}
 				else
@@ -11059,7 +11027,7 @@ BOOL movstchs(unsigned destination, unsigned start, unsigned finish) {
 	unsigned	dind = MAXITEMS;
 
 	// ToDo - Use a temp buffer rather than the high buffer
-	if (destination < (unsigned)PCSHeader.stitchCount - 1)
+	if (destination < static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 		destination++;
 	if (start > finish) {
 
@@ -11180,7 +11148,7 @@ unsigned makbig(unsigned start, unsigned finish) {
 
 	// ToDo - Use a temp buffer rather than the high buffer
 	destination = MAXITEMS;
-	for (source = start; source < (unsigned)finish - 1; source++) {
+	for (source = start; source < static_cast<unsigned>(finish) - 1; source++) {
 
 		delta.x = StitchBuffer[source + 1].x - StitchBuffer[source].x;
 		delta.y = StitchBuffer[source + 1].y - StitchBuffer[source].y;
@@ -11559,7 +11527,7 @@ void hupfn() {
 			}
 			UnzoomedRect.x = IniFile.hoopSizeX;
 			UnzoomedRect.y = IniFile.hoopSizeY;
-			ZoomMin = (double)MINZUM / UnzoomedRect.x;
+			ZoomMin = static_cast<double>(MINZUM) / UnzoomedRect.x;
 			zumhom();
 		}
 	}
@@ -11576,7 +11544,7 @@ void chkhup() {
 
 int strcomp(const void *arg1, const void *arg2) {
 
-	return _stricmp(*(TCHAR**)arg1, *(TCHAR**)arg2);
+	return _stricmp(*static_cast<TCHAR * const *>(arg1), *static_cast<TCHAR * const *>(arg2));
 }
 
 void strlcpy(TCHAR* destination, TCHAR* source) {
@@ -11970,7 +11938,7 @@ void insfil() {
 			InsertedStitchCount = PCSHeader.stitchCount;
 			if (isthr(InsertedFileName)) {
 
-				ReadFile(InsertedFileHandle, (STRHED*)&fileHeader, sizeof(STRHED), &BytesRead, NULL);
+				ReadFile(InsertedFileHandle, &fileHeader, sizeof(STRHED), &BytesRead, NULL);
 				if ((fileHeader.headerType & 0xffffff) != 0x746872)
 					tabmsg(IDS_NOTHR);
 				else {
@@ -11982,15 +11950,15 @@ void insfil() {
 #define FRMPW 2
 #define STCHW 1			
 						gethand(StitchBuffer, PCSHeader.stitchCount);
-						homscor = (double)
-							FormIndex*FRMW +
+						homscor = static_cast<double>(
+							FormIndex)*FRMW +
 							gethand(StitchBuffer, PCSHeader.stitchCount)*HANDW +
 							FormVertexIndex*FRMPW +
 							PCSHeader.stitchCount*STCHW;
-						ReadFile(InsertedFileHandle, (STREX*)&thredHeader, sizeof(STREX), &BytesRead, 0);
+						ReadFile(InsertedFileHandle, &thredHeader, sizeof(STREX), &BytesRead, 0);
 					}
 					savdo();
-					ReadFile(InsertedFileHandle, (fPOINTATTR*)&StitchBuffer[PCSHeader.stitchCount], fileHeader.stitchCount * sizeof(fPOINTATTR), &BytesRead, NULL);
+					ReadFile(InsertedFileHandle, &StitchBuffer[PCSHeader.stitchCount], fileHeader.stitchCount * sizeof(fPOINTATTR), &BytesRead, NULL);
 					SetFilePointer(InsertedFileHandle, 164, 0, FILE_CURRENT);
 					insertedRectangle.left = insertedRectangle.bottom = (float)1e9;
 					insertedRectangle.top = insertedRectangle.right = (float)1e-9;
@@ -12020,10 +11988,10 @@ void insfil() {
 							delete[] formHeader;
 						}
 						else
-							ReadFile(InsertedFileHandle, (FRMHED*)&FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), &BytesRead, 0);
-						ReadFile(InsertedFileHandle, (fPOINT*)&FormVertices[FormVertexIndex], fileHeader.vertexCount * sizeof(fPOINT), &BytesRead, 0);
-						ReadFile(InsertedFileHandle, (SATCON*)&SatinConnects[SatinConnectIndex], fileHeader.dlineCount * sizeof(SATCON), &BytesRead, 0);
-						ReadFile(InsertedFileHandle, (fPOINT*)&ClipPoints[ClipPointIndex], fileHeader.clipDataCount * sizeof(fPOINT), &BytesRead, 0);
+							ReadFile(InsertedFileHandle, &FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), &BytesRead, 0);
+						ReadFile(InsertedFileHandle, &FormVertices[FormVertexIndex], fileHeader.vertexCount * sizeof(fPOINT), &BytesRead, 0);
+						ReadFile(InsertedFileHandle, &SatinConnects[SatinConnectIndex], fileHeader.dlineCount * sizeof(SATCON), &BytesRead, 0);
+						ReadFile(InsertedFileHandle, &ClipPoints[ClipPointIndex], fileHeader.clipDataCount * sizeof(fPOINT), &BytesRead, 0);
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = 0;
 						for (iFormList = FormIndex; iFormList < FormIndex + fileHeader.formCount; iFormList++) {
@@ -12061,7 +12029,7 @@ void insfil() {
 					}
 					if (fileHeader.stitchCount) {
 
-						for (iStitch = PCSHeader.stitchCount; iStitch < (unsigned)PCSHeader.stitchCount + fileHeader.stitchCount; iStitch++) {
+						for (iStitch = PCSHeader.stitchCount; iStitch < static_cast<unsigned>(PCSHeader.stitchCount) + fileHeader.stitchCount; iStitch++) {
 
 							if (StitchBuffer[iStitch].attribute&ALTYPMSK) {
 
@@ -12080,7 +12048,7 @@ void insfil() {
 						}
 					}
 					if (fileHeader.headerType & 0x1000000) {
-						filscor = (double)fileHeader.formCount*FRMW +
+						filscor = static_cast<double>(fileHeader.formCount)*FRMW +
 							gethand(&StitchBuffer[PCSHeader.stitchCount], fileHeader.stitchCount)*HANDW +
 							fileHeader.vertexLen*FRMPW +
 							fileHeader.stitchCount*STCHW;
@@ -12113,7 +12081,7 @@ void insfil() {
 			}
 			else {
 				// ToDo - inserting PCS files is broken and needs to be fixed
-				ReadFile(InsertedFileHandle, (PCSHEADER*)&pcsFileHeader, 0x46, &BytesRead, NULL);
+				ReadFile(InsertedFileHandle, &pcsFileHeader, 0x46, &BytesRead, NULL);
 				if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16) {
 
 					savdo();
@@ -12127,8 +12095,8 @@ void insfil() {
 							newAttribute = pcsStitchBuffer[iPCSStitch++].fx;
 						else {
 
-							StitchBuffer[iStitch].x = pcsStitchBuffer[iPCSStitch].x + (float)pcsStitchBuffer[iPCSStitch].fx / 256;
-							StitchBuffer[iStitch].y = pcsStitchBuffer[iPCSStitch].y + (float)pcsStitchBuffer[iPCSStitch].fy / 256;
+							StitchBuffer[iStitch].x = pcsStitchBuffer[iPCSStitch].x + static_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256;
+							StitchBuffer[iStitch].y = pcsStitchBuffer[iPCSStitch].y + static_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256;
 							StitchBuffer[iStitch++].attribute = newAttribute;
 						}
 					}
@@ -12137,7 +12105,7 @@ void insfil() {
 					iStitch = PCSHeader.stitchCount;
 					insertedRectangle.left = insertedRectangle.right = StitchBuffer[iPCSStitch].x;
 					insertedRectangle.top = insertedRectangle.bottom = StitchBuffer[iPCSStitch++].y;
-					while (iStitch < (unsigned)newStitchCount) {
+					while (iStitch < static_cast<unsigned>(newStitchCount)) {
 
 						if (StitchBuffer[iStitch].x < insertedRectangle.left)
 							insertedRectangle.left = StitchBuffer[iStitch].x;
@@ -13308,9 +13276,9 @@ void ritlock(WIN32_FIND_DATA* fileData, unsigned fileIndex, HWND hwndlg) {
 	for (iFile = 0; iFile < fileIndex; iFile++) {
 
 		if (fileData[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)
-			SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_ADDSTRING, 0, (long)fileData[iFile].cFileName);
+			SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(fileData[iFile].cFileName));
 		else
-			SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_ADDSTRING, 0, (long)fileData[iFile].cFileName);
+			SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(fileData[iFile].cFileName));
 	}
 }
 
@@ -13437,7 +13405,7 @@ void lock() {
 	// ToDo - Replace 512 with maximum files in subdirectory
 	lockInfo.data = new WIN32_FIND_DATA[512];
 
-	DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, (DLGPROC)LockPrc, (LPARAM)&lockInfo);
+	DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, LockPrc, reinterpret_cast<LPARAM>(&lockInfo));
 
 	delete[] lockInfo.data;
 
@@ -13495,7 +13463,7 @@ void setrac(unsigned point) {
 		bts		[ebx], eax
 	}
 #else
-	_bittestandset((long *)TracedMap, point);
+	_bittestandset(static_cast<long *>(static_cast<void *>(TracedMap)), point);
 #endif
 }
 
@@ -13512,7 +13480,7 @@ BOOL getrac(unsigned point) {
 getracx :
 	}
 #else
-	return _bittest((long *)TracedMap, point);
+	return _bittest(static_cast<long *>(static_cast<void *>(TracedMap)), point);
 #endif
 }
 
@@ -13674,7 +13642,7 @@ void getrmap() {
 	BITMAPINFOHEADER	header;
 	unsigned			iPixel;
 
-	memset((BITMAPINFOHEADER*)&header, 0, sizeof(BITMAPINFOHEADER));
+	memset(&header, 0, sizeof(BITMAPINFOHEADER));
 	header.biSize = sizeof(BITMAPINFOHEADER);
 	header.biWidth = BitmapWidth;
 	header.biHeight = BitmapHeight;
@@ -13682,7 +13650,7 @@ void getrmap() {
 	header.biBitCount = 32;
 	header.biCompression = BI_RGB;
 	info.bmiHeader = header;
-	TraceBitmap = CreateDIBSection(BitmapDC, &info, DIB_RGB_COLORS, (void**)&TraceBitmapData, 0, 0);
+	TraceBitmap = CreateDIBSection(BitmapDC, &info, DIB_RGB_COLORS, reinterpret_cast<void **>(&TraceBitmapData), 0, 0);
 	TraceDC = CreateCompatibleDC(StitchWindowDC);
 	if (TraceBitmap && TraceDC) {
 		SelectObject(TraceDC, TraceBitmap);
@@ -13799,7 +13767,7 @@ void setedg(unsigned point) {
 		bts		[ebx], eax
 	}
 #else
-	_bittestandset((long *)TracedEdges, point);
+	_bittestandset(static_cast<long *>(static_cast<void *>(TracedEdges)), point);
 #endif
 }
 
@@ -13816,7 +13784,7 @@ BOOL chkedg(unsigned point) {
 chkedgx :
 	}
 #else
-	return _bittest((long *)TracedEdges, point);
+	return _bittest(static_cast<long *>(static_cast<void *>(TracedEdges)), point);
 #endif
 }
 
@@ -13903,7 +13871,7 @@ BOOL trcbit() {
 		case TRCR:
 
 			pixelIndex += (1 - BitmapWidth);
-			if (CurrentTracePoint.x == (int)BitmapWidth - 1)
+			if (CurrentTracePoint.x == static_cast<int>(BitmapWidth) - 1)
 				TraceDirection = TRCU;
 			else {
 
@@ -13975,7 +13943,7 @@ BOOL trcbit() {
 		case TRCU:
 
 			pixelIndex += (1 + BitmapWidth);
-			if (CurrentTracePoint.y == (int)BitmapHeight - 1)
+			if (CurrentTracePoint.y == static_cast<int>(BitmapHeight) - 1)
 				TraceDirection = TRCL;
 			else {
 
@@ -14039,9 +14007,9 @@ void dutrac() {
 			SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 		CurrentTracePoint.x = BmpStitchRatio.x*SelectedPoint.x;
 		CurrentTracePoint.y = BmpStitchRatio.y*SelectedPoint.y;
-		if (CurrentTracePoint.x > (long)BitmapWidth)
+		if (CurrentTracePoint.x > static_cast<long>(BitmapWidth))
 			CurrentTracePoint.x = BitmapWidth;
-		if (CurrentTracePoint.y > (long)BitmapHeight)
+		if (CurrentTracePoint.y > static_cast<long>(BitmapHeight))
 			CurrentTracePoint.y = BitmapHeight;
 		savedPoint = point = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
 		if (!chkedg(point)) {
@@ -14085,7 +14053,7 @@ void dutrac() {
 				minimumEdgeDistance = CurrentTracePoint.x - findRectangle.left;
 				flag = TRCL;
 			}
-			if (findRectangle.right < (long)BitmapWidth) {
+			if (findRectangle.right < static_cast<long>(BitmapWidth)) {
 
 				edgeDistance = findRectangle.right - CurrentTracePoint.x;
 				if (edgeDistance < minimumEdgeDistance) {
@@ -14103,7 +14071,7 @@ void dutrac() {
 					flag = TRCD;
 				}
 			}
-			if (findRectangle.top < (long)BitmapHeight) {
+			if (findRectangle.top < static_cast<long>(BitmapHeight)) {
 
 				edgeDistance = findRectangle.top - CurrentTracePoint.y;
 				if (edgeDistance < minimumEdgeDistance) {
@@ -14238,9 +14206,9 @@ void dutrac() {
 
 unsigned ducolm() {
 
-	if (TraceMsgPoint.x < (int)ButtonWidth)
+	if (TraceMsgPoint.x < static_cast<int>(ButtonWidth))
 		return 0;
-	if (TraceMsgPoint.x < (int)ButtonWidth << 1)
+	if (TraceMsgPoint.x < static_cast<int>(ButtonWidth) << 1)
 		return 1;
 	else
 		return 2;
@@ -14365,12 +14333,12 @@ void tracpar() {
 		dutrnum1();
 	TraceMsgPoint.x = Msg.pt.x - ThredWindowOrigin.x;
 	TraceMsgPoint.y = Msg.pt.y - ThredWindowOrigin.y;
-	if (TraceMsgPoint.x > (int)ButtonWidthX3)
+	if (TraceMsgPoint.x > static_cast<int>(ButtonWidthX3))
 		dutrac();
 	else {
 
 		ColumnColor = ducolm();
-		if (TraceMsgPoint.y < (int)ButtonHeight * 15) {
+		if (TraceMsgPoint.y < static_cast<int>(ButtonHeight) * 15) {
 
 			if (GetKeyState(VK_SHIFT) & 0X8000) {
 
@@ -14378,7 +14346,7 @@ void tracpar() {
 				DownPixelColor |= TraceRGB[2 - ColumnColor];
 				goto tracpar1;
 			}
-			ratio = (float)TraceMsgPoint.y / (ButtonHeight * 15);
+			ratio = static_cast<float>(TraceMsgPoint.y) / (ButtonHeight * 15);
 			position = ratio * 255;
 			traceColor = UpPixelColor&TraceRGB[2 - ColumnColor];
 			tracePosition = position << TraceShift[ColumnColor];
@@ -14610,7 +14578,7 @@ void trdif() {
 		for (iRGB = 0; iRGB < 3; iRGB++) {
 
 			blanklin(0);
-			for (iHeight = 1; iHeight < (unsigned)BitmapHeight - 1; iHeight++) {
+			for (iHeight = 1; iHeight < static_cast<unsigned>(BitmapHeight) - 1; iHeight++) {
 
 				iPoint = iHeight*BitmapWidth;
 				DifferenceBitmap[iPoint++] = 0;
@@ -14627,7 +14595,7 @@ void trdif() {
 				DifferenceBitmap[iPoint++] = 0;
 			}
 			blanklin(iPoint);
-			ratio = (double)255 / (colorSumMaximum - colorSumMinimum);
+			ratio = static_cast<double>(255) / (colorSumMaximum - colorSumMinimum);
 			for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
 
 				TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
@@ -15362,7 +15330,7 @@ void set1knot() {
 	if (PCSHeader.stitchCount && chkMap(SELBOX)) {
 
 		savdo();
-		if (ClosestPointIndex == (unsigned)PCSHeader.stitchCount - 1) {
+		if (ClosestPointIndex == static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
 
 			setMap(FILDIR);
 			OutputIndex = ClosestPointIndex + 1;
@@ -15647,7 +15615,7 @@ gotcur:;
 				newSize.x = Msg.pt.x - StitchWindowOrigin.x;
 				newSize.y = Msg.pt.y - StitchWindowOrigin.y;
 				iSide = (SelectedFormControlVertex + 2) % 4;
-				ratio = fabs((double)(newSize.x - StretchBoxLine[iSide].x) / (newSize.y - StretchBoxLine[iSide].y));
+				ratio = fabs(static_cast<double>(newSize.x - StretchBoxLine[iSide].x) / (newSize.y - StretchBoxLine[iSide].y));
 				if (iSide & 1) {
 
 					if (ratio < XYratio)
@@ -15878,7 +15846,7 @@ gotcur:;
 
 				fvars(ClosestFormToCursor);
 				iSelectedVertex = SelectedFormVertices.start;
-				for (iVertex = 0; (unsigned)iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
+				for (iVertex = 0; static_cast<unsigned>(iVertex) <= SelectedFormVertices.vertexCount; iVertex++) {
 
 					CurrentFormVertices[iSelectedVertex].x += FormMoveDelta.x;
 					CurrentFormVertices[iSelectedVertex].y -= FormMoveDelta.y;
@@ -16189,7 +16157,7 @@ gotcur:;
 			&& Msg.pt.y >= ColorBarRect.top && Msg.pt.y <= ColorBarRect.bottom) {
 
 			unpat();
-			colorBarPosition = (double)(Msg.pt.y - ColorBarRect.top) / (ColorBarRect.bottom - ColorBarRect.top);
+			colorBarPosition = static_cast<double>(Msg.pt.y - ColorBarRect.top) / (ColorBarRect.bottom - ColorBarRect.top);
 			if (Msg.message == WM_RBUTTONDOWN) {
 
 				if (Msg.wParam&MK_SHIFT && (chkMap(SELBOX) || chkMap(GRPSEL))) {
@@ -16711,7 +16679,7 @@ frmskip:;
 			}
 			nufilcol(VerticalIndex);
 chkcolx:;
-			MsgBuffer[0] = (TCHAR)VerticalIndex + 0x30;
+			MsgBuffer[0] = static_cast<TCHAR>(VerticalIndex) + 0x30;
 			MsgBuffer[1] = 0;
 			SetWindowText(ValueWindow[LBRDCOL], MsgBuffer);
 			unsid();
@@ -16822,7 +16790,7 @@ chkcolx:;
 				else {
 
 					setMap(EXPAND);
-					XYratio = (double)(StitchRangeRect.right - StitchRangeRect.left) / (StitchRangeRect.top - StitchRangeRect.bottom);
+					XYratio = static_cast<double>(StitchRangeRect.right - StitchRangeRect.left) / (StitchRangeRect.top - StitchRangeRect.bottom);
 				}
 				SelectedFormControlVertex >>= 1;
 				setMap(SHOSTRTCH);
@@ -17913,7 +17881,7 @@ didskip:;
 			if (rstMap(CLPSHO)) {
 
 				savdo();
-				if ((rstMap(SELBOX) || rstMap(INSRT)) && ClosestPointIndex != (unsigned)PCSHeader.stitchCount - 1)
+				if ((rstMap(SELBOX) || rstMap(INSRT)) && ClosestPointIndex != static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 					lodclp(ClosestPointIndex);
 				else
 					lodclp(PCSHeader.stitchCount);
@@ -18067,7 +18035,7 @@ didskip:;
 					}
 					else {
 
-						if (ClosestPointIndex == (unsigned)PCSHeader.stitchCount - 1) {
+						if (ClosestPointIndex == static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
 
 							if (ZoomFactor < STCHBOX) {
 
@@ -18536,7 +18504,7 @@ didskip:;
 
 					if (PreferenceIndex == PSHO + 1 || PreferenceIndex == PBOX + 1) {
 
-						MsgBuffer[0] = (TCHAR)NumericCode;
+						MsgBuffer[0] = static_cast<TCHAR>(NumericCode);
 						MsgBuffer[1] = 0;
 						if (PreferenceIndex == PSHO + 1) {
 
@@ -18692,7 +18660,7 @@ didskip:;
 				StitchEntryBuffer[BufferIndex++] = NumericCode;
 				StitchEntryBuffer[BufferIndex] = 0;
 				ClosestPointIndex = atoi(StitchEntryBuffer);
-				if (ClosestPointIndex > (unsigned)PCSHeader.stitchCount - 1) {
+				if (ClosestPointIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
 
 					sprintf_s(StitchEntryBuffer, sizeof(StitchEntryBuffer), "%d", PCSHeader.stitchCount - 1);
 					ClosestPointIndex = PCSHeader.stitchCount - 1;
@@ -19266,210 +19234,212 @@ thumout:;
 						if (ClipMemory) {
 
 							ClipPointer = GlobalLock(ClipMemory);
-							ClipFormVerticesData = (FORMVERTEXCLIP*)ClipPointer;
-							if (ClipFormVerticesData->clipType == CLP_FRMPS) {
+							if (ClipPointer) {
+								ClipFormVerticesData = static_cast<FORMVERTEXCLIP *>(ClipPointer);
+								if (ClipFormVerticesData->clipType == CLP_FRMPS) {
 
-								duzrat();
-								byteCount = sizeof(FORMVERTEXCLIP) + (ClipFormVerticesData->vertexCount + 1) * sizeof(fPOINT);
-								clipCopyBuffer = new unsigned char[byteCount];
-								MoveMemory(clipCopyBuffer, ClipPointer, byteCount);
-								GlobalUnlock(ClipMemory);
-								CloseClipboard();
-								ClipFormVerticesData = (FORMVERTEXCLIP*)clipCopyBuffer;
-								if (chkMap(FRMPSEL)) {
+									duzrat();
+									byteCount = sizeof(FORMVERTEXCLIP) + (ClipFormVerticesData->vertexCount + 1) * sizeof(fPOINT);
+									clipCopyBuffer = new unsigned char[byteCount];
+									MoveMemory(clipCopyBuffer, ClipPointer, byteCount);
+									GlobalUnlock(ClipMemory);
+									CloseClipboard();
+									ClipFormVerticesData = static_cast<FORMVERTEXCLIP *>(static_cast<void *>(clipCopyBuffer));
+									if (chkMap(FRMPSEL)) {
 
-									fvars(ClosestFormToCursor);
-									InterleaveSequence[0].x = CurrentFormVertices[ClosestVertexToCursor].x;
-									InterleaveSequence[0].y = CurrentFormVertices[ClosestVertexToCursor].y;
-									clipData = (fPOINT*)&ClipFormVerticesData[1];
-									for (iVertex = 0; iVertex <= ClipFormVerticesData->vertexCount; iVertex++) {
+										fvars(ClosestFormToCursor);
+										InterleaveSequence[0].x = CurrentFormVertices[ClosestVertexToCursor].x;
+										InterleaveSequence[0].y = CurrentFormVertices[ClosestVertexToCursor].y;
+										clipData = static_cast<fPOINT *>(static_cast<void *>(&ClipFormVerticesData[1]));
+										for (iVertex = 0; iVertex <= ClipFormVerticesData->vertexCount; iVertex++) {
 
-										InterleaveSequence[iVertex + 1].x = clipData[iVertex].x;
-										InterleaveSequence[iVertex + 1].y = clipData[iVertex].y;
+											InterleaveSequence[iVertex + 1].x = clipData[iVertex].x;
+											InterleaveSequence[iVertex + 1].y = clipData[iVertex].y;
+										}
+										nextVertex = nxt(ClosestVertexToCursor);
+										iVertex++;
+										InterleaveSequence[iVertex].x = CurrentFormVertices[nextVertex].x;
+										InterleaveSequence[iVertex].y = CurrentFormVertices[nextVertex].y;
+										OutputIndex = iVertex + 1;
+										FormVerticesAsLine = static_cast<POINT *>(static_cast<void *>(&InterleaveSequence[OutputIndex]));
+										setpclp();
+										setMap(FPUNCLP);
+										setMap(SHOP);
+										dupclp();
 									}
-									nextVertex = nxt(ClosestVertexToCursor);
-									iVertex++;
-									InterleaveSequence[iVertex].x = CurrentFormVertices[nextVertex].x;
-									InterleaveSequence[iVertex].y = CurrentFormVertices[nextVertex].y;
-									OutputIndex = iVertex + 1;
-									FormVerticesAsLine = (POINT*)&InterleaveSequence[OutputIndex];
-									setpclp();
-									setMap(FPUNCLP);
-									setMap(SHOP);
-									dupclp();
+									else {
+
+										FormMoveDelta.x = FormMoveDelta.y = 0;
+										setMap(FUNCLP);
+										ClosestFormToCursor = FormIndex;
+										SelectedForm = &FormList[FormIndex];
+										FillMemory(SelectedForm, sizeof(FRMHED), 0);
+										SelectedForm->type = FRMLINE;
+										SelectedForm->vertexCount = ClipFormVerticesData->vertexCount + 1;
+										SelectedForm->vertices = adflt(SelectedForm->vertexCount);
+										fvars(ClosestFormToCursor);
+										MoveMemory(SelectedForm->vertices, &ClipFormVerticesData[1], sizeof(fPOINT)*SelectedForm->vertexCount);
+										setMap(INIT);
+										NewFormVertexCount = SelectedForm->vertexCount;
+										unfrm();
+										setmfrm();
+										setMap(SHOFRM);
+										dufrm();
+									}
+									delete[] clipCopyBuffer;
+									return 1;
+								}
+								// ToDo - Add more information to the clipboard so that memory can be allocated 
+								ClipFormsHeader = static_cast<FORMSCLIP *>(ClipPointer);
+								if (ClipFormsHeader->clipType == CLP_FRMS) {
+
+									ClipFormsCount = ClipFormsHeader->formCount;
+									forms = static_cast<FRMHED *>(static_cast<void *>(&ClipFormsHeader[1]));
+									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
+
+										frmcpy(&FormList[FormIndex + iForm], &forms[iForm]);
+										FormList[FormIndex + iForm].attribute = (FormList[FormIndex + iForm].attribute&NFRMLMSK) | (ActiveLayer << 1);
+									}
+									CurrentFormVertices = static_cast<fPOINT *>(static_cast<void *>(&forms[iForm]));
+									currentVertex = 0;
+									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
+
+										SelectedForm = &FormList[FormIndex + iForm];
+										SelectedForm->vertices = adflt(SelectedForm->vertexCount);
+										for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+
+											SelectedForm->vertices[iVertex].x = CurrentFormVertices[currentVertex].x;
+											SelectedForm->vertices[iVertex].y = CurrentFormVertices[currentVertex++].y;
+										}
+									}
+									guides = static_cast<SATCON *>(static_cast<void *>(&CurrentFormVertices[currentVertex]));
+									currentGuide = 0;
+									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
+
+										SelectedForm = &FormList[FormIndex + iForm];
+										if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
+
+											SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
+											for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+
+												SelectedForm->satinOrAngle.guide[iGuide].start = guides[currentGuide].start;
+												SelectedForm->satinOrAngle.guide[iGuide].finish = guides[currentGuide++].finish;
+											}
+										}
+									}
+									clipData = static_cast<fPOINT *>(static_cast<void *>(&guides[currentGuide]));
+									currentClip = 0;
+									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
+
+										SelectedForm = &FormList[FormIndex + iForm];
+										if (isclpx(FormIndex + iForm)) {
+
+											SelectedForm->angleOrClipData.clip = adclp(SelectedForm->lengthOrCount.clipCount);
+											for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
+
+												SelectedForm->angleOrClipData.clip[iClip].x = clipData[currentClip].x;
+												SelectedForm->angleOrClipData.clip[iClip].y = clipData[currentClip++].y;
+											}
+										}
+										if (iseclpx(FormIndex + iForm)) {
+
+											SelectedForm->borderClipData = adclp(SelectedForm->clipEntries);
+											for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
+
+												SelectedForm->borderClipData[iClip].x = clipData[currentClip].x;
+												SelectedForm->borderClipData[iClip].y = clipData[currentClip++].y;
+											}
+										}
+									}
+									textureSource = static_cast<TXPNT *>(static_cast<void *>(&clipData[currentClip]));
+									textureDestination = &TexturePointsBuffer[TextureIndex];
+									textureCount = 0;
+									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
+										if (istx(FormIndex + iForm)) {
+											SelectedForm = &FormList[FormIndex + iForm];
+											textureCount += SelectedForm->fillInfo.texture.count;
+											SelectedForm->fillInfo.texture.index += TextureIndex;
+											MoveMemory(textureDestination, textureSource, (SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count - TextureIndex) * sizeof(TXPNT));
+										}
+									}
+									TextureIndex += textureCount;
+									GlobalUnlock(ClipMemory);
+									SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
+									SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
+									ratsr();
+									for (OutputIndex = 0; OutputIndex < static_cast<unsigned>(ClipFormsCount); OutputIndex++) {
+
+										fselrct(OutputIndex + FormIndex);
+										SelectedFormList[OutputIndex] = OutputIndex + FormIndex;
+									}
+									SelectedFormCount = ClipFormsCount;
+									SelectedFormsSize.x = SelectedFormsRect.right - SelectedFormsRect.left;
+									SelectedFormsSize.y = SelectedFormsRect.bottom - SelectedFormsRect.top;
+									setMap(INIT);
+									FormLines[0].x = FormLines[3].x = FormLines[4].x = SelectedFormsRect.left;
+									FormLines[1].x = FormLines[2].x = SelectedFormsRect.right;
+									FormLines[0].y = FormLines[1].y = FormLines[4].y = SelectedFormsRect.top;
+									FormLines[2].y = FormLines[3].y = SelectedFormsRect.bottom;
+									setMap(SHOSTRTCH);
+									strtchbox();
+									FormMoveDelta.x = ((SelectedFormsRect.right - SelectedFormsRect.left) >> 1);
+									FormMoveDelta.y = ((SelectedFormsRect.bottom - SelectedFormsRect.top) >> 1);
+									setMap(MOVFRMS);
+									setMap(FUNSCLP);
 								}
 								else {
 
-									FormMoveDelta.x = FormMoveDelta.y = 0;
-									setMap(FUNCLP);
-									ClosestFormToCursor = FormIndex;
-									SelectedForm = &FormList[FormIndex];
-									FillMemory(SelectedForm, sizeof(FRMHED), 0);
-									SelectedForm->type = FRMLINE;
-									SelectedForm->vertexCount = ClipFormVerticesData->vertexCount + 1;
-									SelectedForm->vertices = adflt(SelectedForm->vertexCount);
-									fvars(ClosestFormToCursor);
-									MoveMemory(SelectedForm->vertices, &ClipFormVerticesData[1], sizeof(fPOINT)*SelectedForm->vertexCount);
+									ClipFormHeader = static_cast<FORMCLIP *>(ClipPointer);
+									if (ClipFormHeader->clipType == CLP_FRM) {
+
+										FormMoveDelta.x = FormMoveDelta.y = 0;
+										setMap(FUNCLP);
+										ClosestFormToCursor = FormIndex;
+										fvars(FormIndex);
+										frmcpy(&FormList[FormIndex], &ClipFormHeader->form);
+										FormList[FormIndex].attribute = (FormList[FormIndex].attribute&NFRMLMSK) | (ActiveLayer << 1);
+										SelectedForm->vertices = adflt(FormList[FormIndex].vertexCount);
+										CurrentFormVertices = static_cast<fPOINT *>(static_cast<void *>(&ClipFormHeader[1]));
+										mvflpnt(&SelectedForm->vertices[0], &CurrentFormVertices[0], SelectedForm->vertexCount);
+										guides = static_cast<SATCON *>(static_cast<void *>(&CurrentFormVertices[SelectedForm->vertexCount]));
+										if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
+
+											SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
+											mvsatk(&SelectedForm->satinOrAngle.guide[0], &guides[0], SelectedForm->satinGuideCount);
+										}
+										clipData = static_cast<fPOINT *>(static_cast<void *>(&guides[0]));
+										clipCount = 0;
+										if (isclpx(FormIndex)) {
+
+											SelectedForm->angleOrClipData.clip = adclp(SelectedForm->lengthOrCount.clipCount);
+											mvflpnt(SelectedForm->angleOrClipData.clip, clipData, SelectedForm->lengthOrCount.clipCount);
+											clipCount += SelectedForm->lengthOrCount.clipCount;
+										}
+										if (iseclpx(FormIndex)) {
+
+											clipData = static_cast<fPOINT *>(static_cast<void *>(&clipData[clipCount]));
+											SelectedForm->borderClipData = adclp(SelectedForm->clipEntries);
+											mvflpnt(SelectedForm->borderClipData, clipData, SelectedForm->clipEntries);
+											clipCount += SelectedForm->clipEntries;
+										}
+										textureSource = static_cast<TXPNT *>(static_cast<void *>(&clipData[clipCount]));
+										if (istx(FormIndex)) {
+											SelectedForm->fillInfo.texture.index = TextureIndex;
+											textureDestination = adtx(SelectedForm->fillInfo.texture.count);
+											MoveMemory(textureDestination, textureSource, SelectedForm->fillInfo.texture.count * sizeof(TXPNT));
+										}
+									}
+									GlobalUnlock(ClipMemory);
 									setMap(INIT);
 									NewFormVertexCount = SelectedForm->vertexCount;
+									if (SelectedForm->type != FRMLINE)
+										NewFormVertexCount++;
 									unfrm();
+									duzrat();
 									setmfrm();
 									setMap(SHOFRM);
 									dufrm();
 								}
-								delete[] clipCopyBuffer;
-								return 1;
-							}
-							// ToDo - Add more information to the clipboard so that memory can be allocated 
-							ClipFormsHeader = (FORMSCLIP*)ClipPointer;
-							if (ClipFormsHeader->clipType == CLP_FRMS) {
-
-								ClipFormsCount = ClipFormsHeader->formCount;
-								forms = (FRMHED*)&ClipFormsHeader[1];
-								for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-
-									frmcpy(&FormList[FormIndex + iForm], &forms[iForm]);
-									FormList[FormIndex + iForm].attribute = (FormList[FormIndex + iForm].attribute&NFRMLMSK) | (ActiveLayer << 1);
-								}
-								CurrentFormVertices = (fPOINT*)&forms[iForm];
-								currentVertex = 0;
-								for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-
-									SelectedForm = &FormList[FormIndex + iForm];
-									SelectedForm->vertices = adflt(SelectedForm->vertexCount);
-									for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
-
-										SelectedForm->vertices[iVertex].x = CurrentFormVertices[currentVertex].x;
-										SelectedForm->vertices[iVertex].y = CurrentFormVertices[currentVertex++].y;
-									}
-								}
-								guides = (SATCON*)&CurrentFormVertices[currentVertex];
-								currentGuide = 0;
-								for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-
-									SelectedForm = &FormList[FormIndex + iForm];
-									if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
-
-										SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
-										for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-
-											SelectedForm->satinOrAngle.guide[iGuide].start = guides[currentGuide].start;
-											SelectedForm->satinOrAngle.guide[iGuide].finish = guides[currentGuide++].finish;
-										}
-									}
-								}
-								clipData = (fPOINT*)&guides[currentGuide];
-								currentClip = 0;
-								for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-
-									SelectedForm = &FormList[FormIndex + iForm];
-									if (isclpx(FormIndex + iForm)) {
-
-										SelectedForm->angleOrClipData.clip = adclp(SelectedForm->lengthOrCount.clipCount);
-										for (iClip = 0; (unsigned)iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
-
-											SelectedForm->angleOrClipData.clip[iClip].x = clipData[currentClip].x;
-											SelectedForm->angleOrClipData.clip[iClip].y = clipData[currentClip++].y;
-										}
-									}
-									if (iseclpx(FormIndex + iForm)) {
-
-										SelectedForm->borderClipData = adclp(SelectedForm->clipEntries);
-										for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
-
-											SelectedForm->borderClipData[iClip].x = clipData[currentClip].x;
-											SelectedForm->borderClipData[iClip].y = clipData[currentClip++].y;
-										}
-									}
-								}
-								textureSource = (TXPNT*)&clipData[currentClip];
-								textureDestination = &TexturePointsBuffer[TextureIndex];
-								textureCount = 0;
-								for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-									if (istx(FormIndex + iForm)) {
-										SelectedForm = &FormList[FormIndex + iForm];
-										textureCount += SelectedForm->fillInfo.texture.count;
-										SelectedForm->fillInfo.texture.index += TextureIndex;
-										MoveMemory(textureDestination, textureSource, (SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count - TextureIndex) * sizeof(TXPNT));
-									}
-								}
-								TextureIndex += textureCount;
-								GlobalUnlock(ClipMemory);
-								SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
-								SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
-								ratsr();
-								for (OutputIndex = 0; OutputIndex < (unsigned)ClipFormsCount; OutputIndex++) {
-
-									fselrct(OutputIndex + FormIndex);
-									SelectedFormList[OutputIndex] = OutputIndex + FormIndex;
-								}
-								SelectedFormCount = ClipFormsCount;
-								SelectedFormsSize.x = SelectedFormsRect.right - SelectedFormsRect.left;
-								SelectedFormsSize.y = SelectedFormsRect.bottom - SelectedFormsRect.top;
-								setMap(INIT);
-								FormLines[0].x = FormLines[3].x = FormLines[4].x = SelectedFormsRect.left;
-								FormLines[1].x = FormLines[2].x = SelectedFormsRect.right;
-								FormLines[0].y = FormLines[1].y = FormLines[4].y = SelectedFormsRect.top;
-								FormLines[2].y = FormLines[3].y = SelectedFormsRect.bottom;
-								setMap(SHOSTRTCH);
-								strtchbox();
-								FormMoveDelta.x = ((SelectedFormsRect.right - SelectedFormsRect.left) >> 1);
-								FormMoveDelta.y = ((SelectedFormsRect.bottom - SelectedFormsRect.top) >> 1);
-								setMap(MOVFRMS);
-								setMap(FUNSCLP);
-							}
-							else {
-
-								ClipFormHeader = (FORMCLIP*)ClipPointer;
-								if (ClipFormHeader->clipType == CLP_FRM) {
-
-									FormMoveDelta.x = FormMoveDelta.y = 0;
-									setMap(FUNCLP);
-									ClosestFormToCursor = FormIndex;
-									fvars(FormIndex);
-									frmcpy(&FormList[FormIndex], &ClipFormHeader->form);
-									FormList[FormIndex].attribute = (FormList[FormIndex].attribute&NFRMLMSK) | (ActiveLayer << 1);
-									SelectedForm->vertices = adflt(FormList[FormIndex].vertexCount);
-									CurrentFormVertices = (fPOINT*)&ClipFormHeader[1];
-									mvflpnt(&SelectedForm->vertices[0], &CurrentFormVertices[0], SelectedForm->vertexCount);
-									guides = (SATCON*)&CurrentFormVertices[SelectedForm->vertexCount];
-									if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
-
-										SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
-										mvsatk(&SelectedForm->satinOrAngle.guide[0], &guides[0], SelectedForm->satinGuideCount);
-									}
-									clipData = (fPOINT*)&guides[0];
-									clipCount = 0;
-									if (isclpx(FormIndex)) {
-
-										SelectedForm->angleOrClipData.clip = adclp(SelectedForm->lengthOrCount.clipCount);
-										mvflpnt(SelectedForm->angleOrClipData.clip, clipData, SelectedForm->lengthOrCount.clipCount);
-										clipCount += SelectedForm->lengthOrCount.clipCount;
-									}
-									if (iseclpx(FormIndex)) {
-
-										clipData = (fPOINT*)&clipData[clipCount];
-										SelectedForm->borderClipData = adclp(SelectedForm->clipEntries);
-										mvflpnt(SelectedForm->borderClipData, clipData, SelectedForm->clipEntries);
-										clipCount += SelectedForm->clipEntries;
-									}
-									textureSource = (TXPNT*)&clipData[clipCount];
-									if (istx(FormIndex)) {
-										SelectedForm->fillInfo.texture.index = TextureIndex;
-										textureDestination = adtx(SelectedForm->fillInfo.texture.count);
-										MoveMemory(textureDestination, textureSource, SelectedForm->fillInfo.texture.count * sizeof(TXPNT));
-									}
-								}
-								GlobalUnlock(ClipMemory);
-								setMap(INIT);
-								NewFormVertexCount = SelectedForm->vertexCount;
-								if (SelectedForm->type != FRMLINE)
-									NewFormVertexCount++;
-								unfrm();
-								duzrat();
-								setmfrm();
-								setMap(SHOFRM);
-								dufrm();
 							}
 							CloseClipboard();
 						}
@@ -19707,7 +19677,7 @@ thumout:;
 								rstMap(FORMSEL);
 								if (rstMap(SELBOX)) {
 
-									if (ClosestPointIndex < (unsigned)PCSHeader.stitchCount - 1) {
+									if (ClosestPointIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
 
 										setMap(GRPSEL);
 										GroupStitchIndex = ClosestPointIndex + 1;
@@ -19715,7 +19685,7 @@ thumout:;
 								}
 								else {
 
-									if (GroupStitchIndex < (unsigned)PCSHeader.stitchCount - 1) {
+									if (GroupStitchIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
 
 										GroupStitchIndex++;
 										nuAct(GroupStitchIndex);
@@ -19752,14 +19722,14 @@ thumout:;
 
 									if (chkMap(SELBOX)) {
 
-										if (ClosestPointIndex < (unsigned)PCSHeader.stitchCount - 1)
+										if (ClosestPointIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 											ClosestPointIndex++;
 										movbox();
 										return 1;
 									}
 									if (chkMap(GRPSEL)) {
 
-										if (GroupStitchIndex < (unsigned)PCSHeader.stitchCount - 1) {
+										if (GroupStitchIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
 
 											GroupStitchIndex++;
 											grpAdj();
@@ -21437,7 +21407,7 @@ dulup:
 		call	delsubt
 	}
 #else
-	unsigned *zPnt = (unsigned *)pnt;
+	unsigned *zPnt = static_cast<unsigned *>(static_cast<void *>(pnt));
 	unsigned *dst = zPnt;
 	//form cursor
 	for (int i = 0; i < 32; i++) {
@@ -21555,13 +21525,13 @@ void crtcurs() {
 
 	duamsk();
 	ducurs(CursorMasks.form);
-	FormCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, (void*)CursorMask, (void*)&CursorMasks.form);
-	DLineCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, (void*)CursorMask, (void*)&CursorMasks.dline);
-	NeedleUpCursor = CreateCursor(ThrEdInstance, 16, 32, 32, 32, (void*)CursorMask, (void*)&CursorMasks.uprightNeedle);
-	NeedleRightDownCursor = CreateCursor(ThrEdInstance, 1, 31, 32, 32, (void*)CursorMask, (void*)&CursorMasks.rightDownNeedle);
-	NeedleRightUpCursor = CreateCursor(ThrEdInstance, 1, 1, 32, 32, (void*)CursorMask, (void*)&CursorMasks.rightUpNeedle);
-	NeedleLeftDownCursor = CreateCursor(ThrEdInstance, 30, 30, 32, 32, (void*)CursorMask, (void*)&CursorMasks.leftDownNeedle);
-	NeedleLeftUpCursor = CreateCursor(ThrEdInstance, 32, 1, 32, 32, (void*)CursorMask, (void*)&CursorMasks.leftUpNeedle);
+	FormCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.form));
+	DLineCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.dline));
+	NeedleUpCursor = CreateCursor(ThrEdInstance, 16, 32, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.uprightNeedle));
+	NeedleRightDownCursor = CreateCursor(ThrEdInstance, 1, 31, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.rightDownNeedle));
+	NeedleRightUpCursor = CreateCursor(ThrEdInstance, 1, 1, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.rightUpNeedle));
+	NeedleLeftDownCursor = CreateCursor(ThrEdInstance, 30, 30, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.leftDownNeedle));
+	NeedleLeftUpCursor = CreateCursor(ThrEdInstance, 32, 1, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.leftUpNeedle));
 }
 
 void dstcurs() {
@@ -21658,7 +21628,7 @@ void ducmd() {
 #else
 							strcpy_s(BalaradName1, balaradFileName);
 #endif
-							ReadFile(BalaradFile, (void*)&BalaradName2, (_MAX_PATH + 1), &bytesRead, 0);
+							ReadFile(BalaradFile, &BalaradName2, (_MAX_PATH + 1), &bytesRead, 0);
 							strcat_s(BalaradName2, "");
 							if (bytesRead)
 								redbal();
@@ -21835,7 +21805,7 @@ void redini() {
 	if (IniFile.initialWindowCoords.top < 0)
 		IniFile.initialWindowCoords.top = 0;
 	adjustedWidth = ScreenSizePixels.cx - 30;
-	if (IniFile.initialWindowCoords.right > (int)adjustedWidth)
+	if (IniFile.initialWindowCoords.right > static_cast<int>(adjustedWidth))
 		IniFile.initialWindowCoords.right = adjustedWidth;
 	if (IniFile.initialWindowCoords.bottom > ScreenSizePixels.cy)
 		IniFile.initialWindowCoords.bottom = ScreenSizePixels.cy;
@@ -22158,7 +22128,7 @@ COLORREF defTxt(unsigned iColor) {
 defx:
 	}
 #else
-	return _bittest((long *)&TextColorMap, iColor) ? 0xffffff : 0;
+	return _bittest(static_cast<long *>(static_cast<void *>(&TextColorMap)), iColor) ? 0xffffff : 0;
 #endif
 }
 
@@ -22173,7 +22143,7 @@ void setCol(unsigned color) {
 	}
 #else
 	// mask nextBufferIndex for sanity
-	_bittestandset((long *)&DisplayedColorBitmap, color & 31);
+	_bittestandset(static_cast<long *>(static_cast<void *>(&DisplayedColorBitmap)), color & 31);
 #endif
 }
 
@@ -22322,12 +22292,12 @@ BOOL bitar() {
 		BitmapSrcRect.left = ceil(ZoomRect.left*BmpStitchRatio.x);
 		BitmapSrcRect.right = floor(ZoomRect.right*BmpStitchRatio.x);
 		BitmapSrcRect.bottom = floor(ZoomedInRect.bottom*BmpStitchRatio.y);
-		if (BitmapSrcRect.right > (long)BitmapWidth) {
+		if (BitmapSrcRect.right > static_cast<long>(BitmapWidth)) {
 
 			BitmapSrcRect.right = BitmapWidth;
 			rstMap(LANDSCAP);
 		}
-		if (BitmapSrcRect.bottom > (long)BitmapHeight) {
+		if (BitmapSrcRect.bottom > static_cast<long>(BitmapHeight)) {
 
 			BitmapSrcRect.bottom = BitmapHeight;
 			setMap(LANDSCAP);
@@ -22340,8 +22310,8 @@ BOOL bitar() {
 		differenceRect.left = backingRect.left - ZoomedInRect.left;
 		differenceRect.right = ZoomedInRect.right - backingRect.right;
 		differenceRect.bottom = ZoomedInRect.bottom - backingRect.bottom;
-		bitmapStitchRatio.x = (double)StitchWindowClientRect.right / (ZoomRect.right - ZoomRect.left);
-		bitmapStitchRatio.y = (double)StitchWindowClientRect.bottom / (ZoomRect.top - ZoomRect.bottom);
+		bitmapStitchRatio.x = static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
+		bitmapStitchRatio.y = static_cast<double>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
 		BitmapDstRect.top = differenceRect.top*bitmapStitchRatio.y;
 		BitmapDstRect.left = differenceRect.left*bitmapStitchRatio.x;
 		BitmapDstRect.right = StitchWindowClientRect.right - differenceRect.right*bitmapStitchRatio.x;
@@ -22396,14 +22366,14 @@ void dugrid() {
 		gridRect.top = floor(ZoomRect.top / IniFile.gridSize);
 		gridLine[0].x = 0;
 		gridLine[1].x = StitchWindowClientRect.right;
-		for (iGrid = gridRect.bottom; iGrid <= (unsigned)gridRect.top; iGrid++) {
+		for (iGrid = gridRect.bottom; iGrid <= static_cast<unsigned>(gridRect.top); iGrid++) {
 
 			gridLine[0].y = gridLine[1].y = StitchWindowClientRect.bottom - (iGrid*IniFile.gridSize - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 			Polyline(StitchWindowMemDC, gridLine, 2);
 		}
 		gridLine[0].y = 0;
 		gridLine[1].y = StitchWindowClientRect.bottom;
-		for (iGrid = gridRect.left; iGrid <= (unsigned)gridRect.right; iGrid++) {
+		for (iGrid = gridRect.left; iGrid <= static_cast<unsigned>(gridRect.right); iGrid++) {
 
 			gridLine[0].x = gridLine[1].x = (iGrid*IniFile.gridSize - ZoomRect.left)*ZoomRatio.x + 0.5;
 			Polyline(StitchWindowMemDC, gridLine, 2);
@@ -22624,7 +22594,7 @@ skip1:;
 									//write an equation for this line
 									xDelta = currentStitches[iStitch].x - currentStitches[iStitch - 1].x;
 									yDelta = currentStitches[iStitch - 1].y - currentStitches[iStitch].y;
-									slope = (double)xDelta / yDelta;
+									slope = static_cast<double>(xDelta) / yDelta;
 									offset = currentStitches[iStitch].x + slope*currentStitches[iStitch].y;
 									//does the line intersect with the top of the screen?
 									gapToEdge = offset - slope*ZoomRect.top;
@@ -22802,7 +22772,7 @@ unsigned chkCol(unsigned color) {
 chk1 :
 	}
 #else
-	return _bittest((long *)&DisplayedColorBitmap, color) ? 0xffffffff : 0;
+	return _bittest(static_cast<long *>(static_cast<void *>(&DisplayedColorBitmap)), color) ? 0xffffffff : 0;
 #endif
 }
 
@@ -22819,14 +22789,14 @@ void dubar() {
 	colorBarRect.bottom = DrawItem->rcItem.bottom;
 	for (iColorChange = 0; iColorChange < ColorChanges; iColorChange++) {
 
-		barSectionHeight = (double)ColorChangeTable[iColorChange + 1].stitchIndex / PCSHeader.stitchCount;
+		barSectionHeight = static_cast<double>(ColorChangeTable[iColorChange + 1].stitchIndex) / PCSHeader.stitchCount;
 		colorBarRect.bottom = barSectionHeight*DrawItem->rcItem.bottom;
 		FillRect(DrawItem->hDC, &colorBarRect, UserColorBrush[ColorChangeTable[iColorChange].colorIndex]);
 		colorBarRect.top = colorBarRect.bottom;
 	}
 	if (chkMap(SELBOX) || chkMap(GRPSEL)) {
 
-		selectedIndicator = (double)ClosestPointIndex / PCSHeader.stitchCount;
+		selectedIndicator = static_cast<double>(ClosestPointIndex) / PCSHeader.stitchCount;
 		indicatorLine[0].y = indicatorLine[1].y = colorBarRect.bottom*selectedIndicator + 0.5;
 		indicatorLine[0].x = colorBarRect.left;
 		indicatorLine[1].x = colorBarRect.right;
@@ -22835,7 +22805,7 @@ void dubar() {
 		Polyline(DrawItem->hDC, indicatorLine, 2);
 		if (chkMap(GRPSEL)) {
 
-			selectedIndicator = (double)GroupStitchIndex / PCSHeader.stitchCount;
+			selectedIndicator = static_cast<double>(GroupStitchIndex) / PCSHeader.stitchCount;
 			indicatorLine[0].y = indicatorLine[1].y = colorBarRect.bottom*selectedIndicator + 0.5;
 			indicatorLine[0].x = colorBarRect.left;
 			indicatorLine[1].x = colorBarRect.right;
@@ -22874,7 +22844,7 @@ void ritbak(TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 
 	if (thrEdFile != INVALID_HANDLE_VALUE) {
 
-		ReadFile(thrEdFile, (STRHED*)&stitchHeader, sizeof(STRHED), &BytesRead, NULL);
+		ReadFile(thrEdFile, &stitchHeader, sizeof(STRHED), &BytesRead, NULL);
 		if (BytesRead == sizeof(STRHED)) {
 
 			if ((stitchHeader.headerType & 0xffffff) == 0x746872) {
@@ -22899,7 +22869,7 @@ void ritbak(TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 					case 1:
 					case 2:
 
-						ReadFile(thrEdFile, (STREX*)&extendedHeader, sizeof(STREX), &BytesRead, NULL);
+						ReadFile(thrEdFile, &extendedHeader, sizeof(STREX), &BytesRead, NULL);
 						if (BytesRead != sizeof(STREX))
 							return;
 						stitchSourceSize.x = extendedHeader.hoopSizeX;
@@ -22912,8 +22882,8 @@ void ritbak(TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 						return;
 				}
 			}
-			xRatio = (double)drawingDestinationSize.x / stitchSourceSize.x;
-			yRatio = (double)drawingDestinationSize.y / stitchSourceSize.y;
+			xRatio = static_cast<double>(drawingDestinationSize.x) / stitchSourceSize.x;
+			yRatio = static_cast<double>(drawingDestinationSize.y) / stitchSourceSize.y;
 			if (xRatio < yRatio)
 				ratio = xRatio;
 			else
@@ -22923,12 +22893,12 @@ void ritbak(TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 				stitchesToDraw = new fPOINTATTR[stitchHeader.stitchCount];
 				lines = new POINT[stitchHeader.stitchCount];
 				bytesToRead = stitchHeader.stitchCount * sizeof(fPOINTATTR);
-				ReadFile(thrEdFile, (fPOINTATTR*)stitchesToDraw, bytesToRead, &BytesRead, 0);
+				ReadFile(thrEdFile, stitchesToDraw, bytesToRead, &BytesRead, 0);
 				if (bytesToRead == BytesRead) {
 
 					SetFilePointer(thrEdFile, 16, 0, FILE_CURRENT);
-					ReadFile(thrEdFile, (COLORREF*)&brushColor, sizeof(COLORREF), &BytesRead, 0);
-					ReadFile(thrEdFile, (COLORREF*)colors, 16 * sizeof(COLORREF), &BytesRead, 0);
+					ReadFile(thrEdFile, &brushColor, sizeof(COLORREF), &BytesRead, 0);
+					ReadFile(thrEdFile, colors, 16 * sizeof(COLORREF), &BytesRead, 0);
 					brush = CreateSolidBrush(brushColor);
 					SelectObject(drawItem->hDC, brush);
 					FillRect(drawItem->hDC, &drawItem->rcItem, brush);
@@ -22999,7 +22969,7 @@ void ritbak(TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 						goto bakskp;
 				}
 				bytesToRead = stitchHeader.vertexCount * sizeof(fPOINT);
-				ReadFile(thrEdFile, (fPOINT*)vertexList, bytesToRead, &BytesRead, 0);
+				ReadFile(thrEdFile, vertexList, bytesToRead, &BytesRead, 0);
 				if (BytesRead != bytesToRead)
 					goto bakskp;
 				iVertex = 0;
@@ -23041,9 +23011,9 @@ void durct(unsigned shift, RECT traceControlRect, RECT* traceHighMask, RECT* tra
 	traceHighMask->left = traceLowMask->left = traceMiddleMask->left = traceControlRect.left;
 	traceHighMask->right = traceLowMask->right = traceMiddleMask->right = traceControlRect.right;
 	controlHeight = traceControlRect.bottom - traceControlRect.top;
-	ratio = (double)lowerColor / 255;
+	ratio = static_cast<double>(lowerColor) / 255;
 	traceMiddleMask->top = controlHeight*ratio + traceControlRect.top;
-	ratio = (double)upperColor / 255;
+	ratio = static_cast<double>(upperColor) / 255;
 	traceMiddleMask->bottom = controlHeight*ratio + traceControlRect.top;
 	rstMap(DUHI);
 	rstMap(DULO);
@@ -23103,7 +23073,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 		case WM_HSCROLL:
 
-			switch ((long)(LOWORD(wParam))) {
+			switch (static_cast<long>(LOWORD(wParam))) {
 
 				case SB_LINELEFT:
 
@@ -23177,9 +23147,9 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 					if (chkMap(RUNPAT) || chkMap(WASPAT)) {
 
-						if ((HWND)lParam == SpeedScrollBar) {
+						if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) {
 
-							position = (unsigned)HIWORD(wParam);
+							position = HIWORD(wParam);
 							MovieTimeStep = MAXDELAY - position;
 							setsped();
 							SetScrollPos(SpeedScrollBar, SB_CTL, position, TRUE);
@@ -23187,10 +23157,10 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 					}
 					else {
 
-						if ((HWND)lParam == HorizontalScrollBar) {
+						if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) {
 
 							scrollPoint.x = ZoomRect.right - ZoomRect.left;
-							ZoomRect.left = (long)HIWORD(wParam);
+							ZoomRect.left = static_cast<long>(HIWORD(wParam));
 							ZoomRect.right = ZoomRect.left + scrollPoint.x;
 							if (ZoomRect.right > UnzoomedRect.x) {
 
@@ -23206,7 +23176,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 		case WM_VSCROLL:
 
-			switch ((int)LOWORD(wParam)) {
+			switch (LOWORD(wParam)) {
 
 				//		unpat();
 				case SB_LINEDOWN:
@@ -23240,7 +23210,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				case SB_THUMBPOSITION:
 
 					scrollPoint.y = ZoomRect.top - ZoomRect.bottom;
-					ZoomRect.top = UnzoomedRect.y - (long)HIWORD(wParam);
+					ZoomRect.top = UnzoomedRect.y - static_cast<long>(HIWORD(wParam));
 					ZoomRect.bottom = ZoomRect.top - scrollPoint.y;
 					if (ZoomRect.bottom < 0) {
 
@@ -23255,7 +23225,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		case WM_DRAWITEM:
 
 			//owner draw windows
-			DrawItem = (LPDRAWITEMSTRUCT)lParam;
+			DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
 			if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
 
 				if (chkMap(TXTRED)) {
@@ -23319,7 +23289,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				if (PCSHeader.stitchCount)
 					dubar();
 				else
-					FillRect(DrawItem->hDC, &DrawItem->rcItem, (HBRUSH)(COLOR_WINDOW + 1));
+					FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_WINDOW));
 				return 1;
 			}
 			if (DrawItem->hwndItem == ButtonWin[HHID] && DrawItem->itemAction == ODA_DRAWENTIRE) {
@@ -23331,7 +23301,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 					SetBkColor(DrawItem->hDC, UserColor[ActiveColor]);
 				}
 				else
-					FillRect(DrawItem->hDC, &DrawItem->rcItem, (HBRUSH)(COLOR_BTNFACE + 1));
+					FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_BTNFACE));
 				if (chkMap(TXTRED)) {
 					LoadString(ThrEdInstance, IDS_TXWID, fileName, _MAX_PATH);
 					sprintf_s(HelpBuffer, sizeof(HelpBuffer), fileName, TextureScreen.width / PFGRAN);
@@ -23450,7 +23420,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 							strcpy_s(fileName, ThrName);
 							lastCharacter = duth(fileName);
-							fileName[lastCharacter] = (TCHAR)iVersion + 's';
+							fileName[lastCharacter] = static_cast<TCHAR>(iVersion) + 's';
 							ritbak(fileName, DrawItem);
 							return 1;
 						}
@@ -23508,7 +23478,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			GetClientRect(p_hWnd, &ThredWindowRect);
 			movStch();
 			if (chkMap(ZUMED)) {
-				tdub = (double)StitchWindowClientRect.bottom / (ZoomRect.top - ZoomRect.bottom);
+				tdub = static_cast<double>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
 				adjustedWidth = StitchWindowClientRect.right / tdub;
 				if (adjustedWidth + ZoomRect.left > UnzoomedRect.x) {
 
@@ -23660,10 +23630,9 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = ThrEdInstance;
-	wc.hIcon = (HICON)LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON,
-		32, 32, LR_SHARED);
+	wc.hIcon = static_cast<HICON>(LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_SHARED));
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wc.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
 	wc.lpszMenuName = MAKEINTRESOURCE(IDR_MENU1);
 	wc.lpszClassName = "thred";
 	wc.hIconSm = NULL;

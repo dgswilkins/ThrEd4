@@ -46,7 +46,7 @@ extern BOOL		isfclp ();
 extern BOOL		istx (unsigned find);
 extern void		moveStitch (fPOINTATTR* destination, fPOINTATTR* source);
 extern void		movStch ();
-extern TCHAR*	mvflpnt (fPOINT* destination, fPOINT* source, unsigned count);
+extern void		mvflpnt (fPOINT* destination, fPOINT* source, unsigned count);
 extern void		mvsatk (SATCON* destination, SATCON* source, unsigned count);
 extern void		mvstch (unsigned destination, unsigned source);
 extern void		mvstchs (unsigned destination, unsigned source, unsigned count);
@@ -587,17 +587,19 @@ cmpg :
 cmpx :
 	}
 #else
-	dPOINTLINE	point1 = *(*(const dPOINTLINE **)arg1);
-	dPOINTLINE	point2 = *(*(const dPOINTLINE **)arg2);
+	dPOINTLINE	*point1 = *static_cast<dPOINTLINE * const *>(arg1);
+	//dPOINTLINE	point1 = *(*(const dPOINTLINE **)arg1);
+	dPOINTLINE	*point2 = *static_cast<dPOINTLINE * const *>(arg2);
+	//dPOINTLINE	point2 = *(*(const dPOINTLINE **)arg2);
 
-	if (point2.y < point1.y)
+	if (point2->y < point1->y)
 		return 1;
-	if (point2.y > point1.y)
+	if (point2->y > point1->y)
 		return -1;
 
-	if (point2.x < point1.x)
+	if (point2->x < point1->x)
 		return 1;
-	if (point2.x > point1.x)
+	if (point2->x > point1->x)
 		return -1;
 
 	return 0;
@@ -1072,7 +1074,7 @@ void px2stchf(POINT screen, fPOINT* stitchPoint) {
 
 	factorX = static_cast<double>(screen.x) / static_cast<double>(StitchWindowClientRect.right);
 	stitchPoint->x = factorX*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-	factorY = (double)(StitchWindowClientRect.bottom - screen.y) / StitchWindowClientRect.bottom;
+	factorY = static_cast<double>(StitchWindowClientRect.bottom - screen.y) / StitchWindowClientRect.bottom;
 	stitchPoint->y = factorY*(ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
 }
 
@@ -1119,12 +1121,12 @@ void munfrm() {
 
 void rats() {
 	if (chkMap(ZUMED)) {
-		HorizontalRatio = (double)(ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
-		VerticalRatio = (double)(ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom;
+		HorizontalRatio = (ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
+		VerticalRatio = (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom;
 	}
 	else {
-		HorizontalRatio = (double)UnzoomedRect.x / StitchWindowClientRect.right;
-		VerticalRatio = (double)UnzoomedRect.y / StitchWindowClientRect.bottom;
+		HorizontalRatio = static_cast<double>(UnzoomedRect.x) / StitchWindowClientRect.right;
+		VerticalRatio = static_cast<double>(UnzoomedRect.y) / StitchWindowClientRect.bottom;
 	}
 }
 
@@ -1181,7 +1183,7 @@ void frmsqr(unsigned iVertex) {
 	stch2pxr(CurrentFormVertices[iVertex]);
 	line[1].x = StitchCoordinatesPixels.x;
 	line[1].y = StitchCoordinatesPixels.y;
-	ratio = (double)IniFile.formVertexSizePixels / StitchWindowClientRect.right;
+	ratio = static_cast<double>(IniFile.formVertexSizePixels) / StitchWindowClientRect.right;
 	length = (ZoomRect.right - ZoomRect.left)*ratio * 2;
 	delta.x = CurrentFormVertices[iVertex - 1].x - CurrentFormVertices[iVertex].x;
 	delta.y = CurrentFormVertices[iVertex - 1].y - CurrentFormVertices[iVertex].y;
@@ -1252,12 +1254,12 @@ void frmx(POINT controlPoint, HDC dc) {
 
 void ratsr() {
 	if (chkMap(ZUMED)) {
-		HorizontalRatio = (double)StitchWindowClientRect.right / (ZoomRect.right - ZoomRect.left);
-		VerticalRatio = (double)StitchWindowClientRect.bottom / (ZoomRect.top - ZoomRect.bottom);
+		HorizontalRatio = static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
+		VerticalRatio = static_cast<double>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
 	}
 	else {
-		HorizontalRatio = (double)StitchWindowClientRect.right / UnzoomedRect.x;
-		VerticalRatio = (double)StitchWindowClientRect.bottom / UnzoomedRect.y;
+		HorizontalRatio = static_cast<double>(StitchWindowClientRect.right) / UnzoomedRect.x;
+		VerticalRatio = static_cast<double>(StitchWindowClientRect.bottom) / UnzoomedRect.y;
 	}
 }
 
@@ -1670,7 +1672,7 @@ void setear() {
 		verticalPosition = CurrentFormVertices[count + 1].y;
 		iLeftVertices = VertexCount - count;
 		iRightVertices = count + 1;
-		for (iStep = 0; iStep < (unsigned)count; iStep++) {
+		for (iStep = 0; iStep < count; iStep++) {
 			CurrentFormVertices[iRightVertices].y = CurrentFormVertices[iLeftVertices].y = verticalPosition;
 			CurrentFormVertices[iRightVertices].x += twistStep;
 			CurrentFormVertices[iLeftVertices].x += twistStep;
@@ -2212,7 +2214,7 @@ void oclp(fPOINT* clip, unsigned clipEntries) {
 		}
 		ClipRect.left = ClipRect.right = ClipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
-		for (iClip = 1; iClip < (unsigned)clipEntries; iClip++) {
+		for (iClip = 1; iClip < clipEntries; iClip++) {
 			if (ClipBuffer[iClip].x < ClipRect.left)
 				ClipRect.left = ClipBuffer[iClip].x;
 			if (ClipBuffer[iClip].x > ClipRect.right)
@@ -2274,7 +2276,7 @@ void savblen(float fLength) {
 float getplen() {
 	unsigned value = SelectedForm->picoLength;
 
-	return((float)(value >> 8) + (value & 0xff) / 256);
+	return(static_cast<float>(value >> 8) + (value & 0xff) / 256);
 }
 
 void savplen(float length) {
@@ -2285,9 +2287,9 @@ void savplen(float length) {
 	if (length > 255)
 		length = 255;
 	fractionalPart = modf(length, &integerPart);
-	fr = (unsigned)floor(fractionalPart * 256);
+	fr = static_cast<unsigned>(floor(fractionalPart * 256));
 	num = integerPart;
-	FormList[ClosestFormToCursor].picoLength = (unsigned short)(num << 8) | fr;
+	FormList[ClosestFormToCursor].picoLength = static_cast<unsigned short>(num << 8) | fr;
 }
 
 void chkbrd() {
@@ -2430,7 +2432,7 @@ void bold(double size) {
 	SequenceIndex = 0;
 	OSequence[SequenceIndex].x = CurrentFormVertices[iLine].x;
 	OSequence[SequenceIndex++].y = CurrentFormVertices[iLine].y;
-	for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++) {
+	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		iNextLine = nxt(iLine);
 		boldlin(iLine, iNextLine, size);
 		iLine = iNextLine;
@@ -2591,7 +2593,7 @@ void refilfn() {
 			if (SelectedForm->fillType) {
 				spacing = StitchSpacing;
 				StitchSpacing = SelectedForm->fillSpacing;
-				switch ((unsigned)SelectedForm->fillType) {
+				switch (static_cast<unsigned>(SelectedForm->fillType)) {
 					case VRTF:
 
 						fnvrt();
@@ -2749,9 +2751,9 @@ void setfpnt() {
 	setMap(RESTCH);
 }
 
-unsigned nxt(unsigned iVertex) {
+unsigned nxt(unsigned int iVertex) {
 	iVertex++;
-	if (iVertex > (unsigned)VertexCount - 1)
+	if (iVertex > VertexCount - 1)
 		iVertex = 0;
 	return iVertex;
 }
@@ -2870,8 +2872,8 @@ void filang() {
 	unsigned	iVertex;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
-	RotationCenter.x = (double)(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
-	RotationCenter.y = (double)(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
+	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
+	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 		AngledForm.vertices[iVertex].x = SelectedForm->vertices[iVertex].x;
@@ -3112,7 +3114,7 @@ unsigned setseq(unsigned bit) {
 setseqx :
 	}
 #else
-	return _bittestandset((long *)SequenceFlagBitmap, bit);
+	return _bittestandset(static_cast<long *>(static_cast<void *>(SequenceFlagBitmap)), bit);
 #endif
 }
 
@@ -3361,14 +3363,14 @@ void durgn(unsigned pthi) {
 	groupStart = lineEndPointStart->group;
 	groupEnd = lineEndPointEnd->group;
 	if (groupEnd != groupStart)
-		seql = (double)(LastGroup - groupStart) / (groupEnd - groupStart)*(sequenceEnd - sequenceStart) + sequenceStart;
+		seql = static_cast<double>(LastGroup - groupStart) / (groupEnd - groupStart)*(sequenceEnd - sequenceStart) + sequenceStart;
 	else
 		seql = 0;
 	if (seql > SortedLineIndex)
 		seql = 0;
-	length = (double)(groupEnd - groupStart)*(sequenceEnd - sequenceStart);
+	length = static_cast<double>(groupEnd - groupStart)*(sequenceEnd - sequenceStart);
 	if (length)
-		seqn = (double)(nextGroup - groupStart) / length + sequenceStart;
+		seqn = static_cast<double>(nextGroup - groupStart) / length + sequenceStart;
 	else
 		seqn = sequenceEnd;
 	if (seql < sequenceStart)
@@ -3634,8 +3636,8 @@ int sqcomp(const void *arg1, const void *arg2) {
 #else
 int sqcomp(const void *arg1, const void *arg2) {
 
-	SMALPNTL	lineEnd1 = *(*(const SMALPNTL **)arg1);
-	SMALPNTL	lineEnd2 = *(*(const SMALPNTL **)arg2);
+	SMALPNTL	lineEnd1 = *(*static_cast<const SMALPNTL * const *>(arg1));
+	SMALPNTL	lineEnd2 = *(*static_cast<const SMALPNTL * const *>(arg2));
 
 	if (lineEnd1.line == lineEnd2.line) {
 		if (lineEnd1.group == lineEnd2.group) {
@@ -4115,7 +4117,7 @@ void fnvrt() {
 		if (inf > 1) {
 			inf &= 0xfffffffe;
 			groupIndex[GroupIndexCount++] = StitchLineCount;
-			qsort((void*)projectedPointsArray, inf, sizeof(dPOINTLINE*), comp);
+			qsort(static_cast<void*>(projectedPointsArray), inf, sizeof(dPOINTLINE*), comp);
 			ine = 0;
 			tind = StitchLineCount;
 			while (ine < inf) {
@@ -4149,8 +4151,8 @@ void fnhor() {
 	unsigned	iVertex;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
-	RotationCenter.x = (double)(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
-	RotationCenter.y = (double)(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
+	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
+	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	RotationAngle = PI / 2;
 	AngledForm.vertices = AngledFormVertices;
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
@@ -4257,7 +4259,7 @@ void fsangl() {
 	makpoli();
 	SelectedForm->fillType = ANGF;
 	RotationAngle = PI / 2 - RotationAngle;
-	SelectedForm->angleOrClipData.angle = (float)IniFile.fillAngle;
+	SelectedForm->angleOrClipData.angle = static_cast<float>(IniFile.fillAngle);
 	SelectedForm->fillColor = ActiveColor;
 	fsizpar();
 	SelectedForm->fillSpacing = StitchSpacing;
@@ -4371,7 +4373,7 @@ unsigned chkfrm() {
 				setMap(STRTCH);
 			else {
 				setMap(EXPAND);
-				XYratio = (double)(SelectedForm->rectangle.right - SelectedForm->rectangle.left) / (SelectedForm->rectangle.top - SelectedForm->rectangle.bottom);
+				XYratio = static_cast<double>(SelectedForm->rectangle.right - SelectedForm->rectangle.left) / (SelectedForm->rectangle.top - SelectedForm->rectangle.bottom);
 			}
 			SelectedFormControlVertex >>= 1;
 			setMap(SHOSTRTCH);
@@ -4609,7 +4611,8 @@ scmp1 :
 scmpx :
 	}
 #else
-	unsigned short s1 = **(unsigned short **)arg1, s2 = **(unsigned short **)arg2;
+	unsigned short s1 = **static_cast<unsigned short * const *>(arg1);
+	unsigned short s2 = **static_cast<unsigned short * const *>(arg2);
 	if (s2 == s1) return 0;
 	if (s2 < s1) return 1;
 	return -1;
@@ -4628,7 +4631,7 @@ unsigned setchk(unsigned bit) {
 setcx :
 	}
 #else
-	return _bittestandset((long *)CheckMap, bit) ? 0xFFFFFFFF : 0;
+	return _bittestandset(static_cast<long *>(static_cast<void *>(CheckMap)), bit) ? 0xFFFFFFFF : 0;
 #endif
 }
 
@@ -4644,7 +4647,7 @@ unsigned chkchk(unsigned bit) {
 ccx :
 	}
 #else
-	return _bittest((long *)CheckMap, bit) ? 0 : 0xFFFFFFFF;
+	return _bittest(static_cast<long *>(static_cast<void *>(CheckMap)), bit) ? 0 : 0xFFFFFFFF;
 #endif
 }
 
@@ -4672,7 +4675,7 @@ nxtcx :
 	DWORD returnBit;
 
 	_BitScanForward(&returnBit, CheckMap[bit]);
-	_bittestandreset((long *)(CheckMap + bit), returnBit);
+	_bittestandreset(static_cast<long *>(static_cast<void *>(CheckMap + bit)), returnBit);
 
 	return returnBit;
 #endif
@@ -4703,7 +4706,7 @@ prvcx :
 		return 0xffffffff;
 
 	_BitScanReverse(&returnBit, CheckMap[bit]);
-	_bittestandreset((long *)(CheckMap + bit), returnBit);
+	_bittestandreset(static_cast<long *>(static_cast<void *>(CheckMap + bit)), returnBit);
 
 	return returnBit;
 #endif
@@ -4781,13 +4784,13 @@ void satadj() {
 			CheckMap[iWord] = 0;
 		for (iGuide = 0; iGuide < CurrentFormConnectionsCount; iGuide++) {
 			iForward = CurrentFormGuides[iGuide].start;
-			if (iForward > (unsigned)WordParam - 1)
+			if (iForward > static_cast<unsigned>(WordParam) - 1)
 				iForward = WordParam - 1;
 			if (setchk(iForward)) {
 				iReverse = iForward;
 				if (iReverse)
 					iReverse--;
-				while (!chkchk(iForward) && iForward < (unsigned)WordParam - 1)
+				while (!chkchk(iForward) && iForward < static_cast<unsigned>(WordParam) - 1)
 					iForward++;
 				while (iReverse && (!chkchk(iReverse)))
 					iReverse--;
@@ -4827,11 +4830,11 @@ void satadj() {
 			if (setchk(iForward)) {
 				if (iForward < VertexCount - 1)
 					iForward++;
-				if (iReverse > (unsigned)WordParam + 1)
+				if (iReverse > static_cast<unsigned>(WordParam) + 1)
 					iReverse--;
 				while (!chkchk(iForward) && iForward < VertexCount - 1)
 					iForward++;
-				while (iReverse > (unsigned)WordParam - 1 && (!chkchk(iReverse)))
+				while (iReverse > static_cast<unsigned>(WordParam) - 1 && (!chkchk(iReverse)))
 					iReverse--;
 				if (!chkchk(iForward) && !chkchk(iReverse))
 					break;
@@ -4914,18 +4917,18 @@ void satclos() {
 		}
 		if (!StartPoint)
 			StartPoint++;
-		if (StartPoint == SelectedForm->vertexCount - 2 && closestVertex == (unsigned)SelectedForm->vertexCount - 1) {
+		if (StartPoint == SelectedForm->vertexCount - 2 && closestVertex == static_cast<unsigned>(SelectedForm->vertexCount) - 1) {
 			StartPoint = 1;
 			closestVertex = SelectedForm->vertexCount - 2;
 		}
-		if (closestVertex >= (unsigned)SelectedForm->vertexCount - 2) {
+		if (closestVertex >= static_cast<unsigned>(SelectedForm->vertexCount) - 2) {
 			closestVertex = SelectedForm->vertexCount - 2;
-			if (StartPoint >= (unsigned)SelectedForm->vertexCount - 2)
+			if (StartPoint >= static_cast<unsigned>(SelectedForm->vertexCount) - 2)
 				StartPoint = SelectedForm->vertexCount - 2;
 		}
 		if (closestVertex - StartPoint < 2) {
 			closestVertex = StartPoint + 2;
-			if (closestVertex > (unsigned)SelectedForm->vertexCount - 2) {
+			if (closestVertex > static_cast<unsigned>(SelectedForm->vertexCount) - 2) {
 				closestVertex = closestVertex - SelectedForm->vertexCount - 2;
 				closestVertex -= closestVertex;
 				StartPoint -= closestVertex;
@@ -5188,7 +5191,7 @@ void satmf() {
 	if (SelectedForm->attribute&FRMEND)
 		iGuide = 1;
 	satfn(iGuide, CurrentFormGuides[0].start, VertexCount, CurrentFormGuides[0].finish);
-	for (iGuide = 0; iGuide < (unsigned)CurrentFormConnectionsCount - 1; iGuide++)
+	for (iGuide = 0; iGuide < static_cast<unsigned>(CurrentFormConnectionsCount) - 1; iGuide++)
 		satfn(CurrentFormGuides[iGuide].start, CurrentFormGuides[iGuide + 1].start, CurrentFormGuides[iGuide].finish, CurrentFormGuides[iGuide + 1].finish);
 	if (WordParam)
 		satfn(CurrentFormGuides[iGuide].start, WordParam, CurrentFormGuides[iGuide].finish, WordParam + 1);
@@ -5351,7 +5354,7 @@ unsigned closat() {
 
 	px2stch();
 	for (iForm = 0; iForm < FormIndex; iForm++) {
-		if (!ActiveLayer || (unsigned)((FormList[iForm].attribute&FRMLMSK) >> 1) == ActiveLayer || !(FormList[iForm].attribute&FRMLMSK)) {
+		if (!ActiveLayer || static_cast<unsigned>((FormList[iForm].attribute&FRMLMSK) >> 1) == ActiveLayer || !(FormList[iForm].attribute&FRMLMSK)) {
 			CurrentFormVertices = FormList[iForm].vertices;
 			savedVertex = VertexCount;
 			VertexCount = FormList[iForm].vertexCount;
@@ -5532,7 +5535,7 @@ void delspnt() {
 	SelectedForm->vertexCount--;
 	FormVertexIndex--;
 	fvars(ClosestFormToCursor);
-	if (ClosestVertexToCursor > (unsigned)SelectedForm->vertexCount - 1)
+	if (ClosestVertexToCursor > static_cast<unsigned>(SelectedForm->vertexCount) - 1)
 		ClosestVertexToCursor = SelectedForm->vertexCount - 1;
 	setMap(FRMPSEL);
 	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
@@ -6107,9 +6110,9 @@ void outfn(unsigned start, unsigned finish, double satinWidth) {
 
 void duangs() {
 
-	unsigned	iVertex;
+	unsigned int	iVertex;
 
-	for (iVertex = 0; iVertex < (unsigned)VertexCount - 1; iVertex++)
+	for (iVertex = 0; iVertex <VertexCount - 1; iVertex++)
 		FormAngles[iVertex] = atan2(CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y, CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x);
 	FormAngles[iVertex] = atan2(CurrentFormVertices[0].y - CurrentFormVertices[iVertex].y, CurrentFormVertices[0].x - CurrentFormVertices[iVertex].x);
 }
@@ -6484,7 +6487,7 @@ void slbrd() {
 		rstMap(SAT1);
 		rstMap(FILDIR);
 		StitchSpacing = USPAC;
-		for (iVertex = 0; iVertex < (unsigned)SelectedForm->vertexCount - 1; iVertex++)
+		for (iVertex = 0; iVertex < static_cast<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
 			sbfn(InsidePoints, iVertex, iVertex + 1);
 		toglMap(FILDIR);
 		for (iVertex = SelectedForm->vertexCount - 1; iVertex != 0; iVertex--)
@@ -6495,7 +6498,7 @@ void slbrd() {
 	satends(SelectedForm->attribute);
 	StitchSpacing = SelectedForm->edgeSpacing;
 	rstMap(SAT1);
-	for (iVertex = 0; iVertex < (unsigned)SelectedForm->vertexCount - 1; iVertex++)
+	for (iVertex = 0; iVertex < static_cast<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
 		sbfn(InsidePoints, iVertex, iVertex + 1);
 	StitchSpacing = spacing;
 }
@@ -7129,17 +7132,17 @@ void setstrtch() {
 			if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
 				reference = stitchRect.bottom;
 				offsetY = Msg.pt.y - StitchWindowOrigin.y;
-				ratio = (double)(SelectedFormsRect.bottom - offsetY) / (SelectedFormsRect.bottom - SelectedFormsRect.top);
+				ratio = static_cast<double>(SelectedFormsRect.bottom - offsetY) / (SelectedFormsRect.bottom - SelectedFormsRect.top);
 			}
 			else {
 				if (chkMap(FORMSEL)) {
 					reference = SelectedForm->rectangle.bottom;
-					ratio = (double)(SelectedPoint.y - reference) / (SelectedForm->rectangle.top - reference);
+					ratio = static_cast<double>(SelectedPoint.y - reference) / (SelectedForm->rectangle.top - reference);
 					SelectedForm->rectangle.top = SelectedPoint.y;
 				}
 				else {
 					reference = StitchRangeRect.bottom;
-					ratio = (double)(SelectedPoint.y - reference) / (StitchRangeRect.top - reference);
+					ratio = static_cast<double>(SelectedPoint.y - reference) / (StitchRangeRect.top - reference);
 				}
 			}
 			break;
@@ -7149,17 +7152,17 @@ void setstrtch() {
 			if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
 				reference = stitchRect.left;
 				offsetX = Msg.pt.x - StitchWindowOrigin.x;
-				ratio = (double)(offsetX - SelectedFormsRect.left) / (SelectedFormsRect.right - SelectedFormsRect.left);
+				ratio = static_cast<double>(offsetX - SelectedFormsRect.left) / (SelectedFormsRect.right - SelectedFormsRect.left);
 			}
 			else {
 				if (chkMap(FORMSEL)) {
 					reference = SelectedForm->rectangle.left;
-					ratio = (double)(SelectedPoint.x - reference) / (SelectedForm->rectangle.right - reference);
+					ratio = static_cast<double>(SelectedPoint.x - reference) / (SelectedForm->rectangle.right - reference);
 					SelectedForm->rectangle.right = SelectedPoint.x;
 				}
 				else {
 					reference = StitchRangeRect.left;
-					ratio = (double)(SelectedPoint.x - reference) / (StitchRangeRect.right - reference);
+					ratio = static_cast<double>(SelectedPoint.x - reference) / (StitchRangeRect.right - reference);
 				}
 			}
 			break;
@@ -7169,17 +7172,17 @@ void setstrtch() {
 			if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
 				reference = stitchRect.top;
 				offsetY = Msg.pt.y - StitchWindowOrigin.y;
-				ratio = (double)(offsetY - SelectedFormsRect.top) / (SelectedFormsRect.bottom - SelectedFormsRect.top);
+				ratio = static_cast<double>(offsetY - SelectedFormsRect.top) / (SelectedFormsRect.bottom - SelectedFormsRect.top);
 			}
 			else {
 				if (chkMap(FORMSEL)) {
 					reference = SelectedForm->rectangle.top;
-					ratio = (double)(SelectedPoint.y - reference) / (SelectedForm->rectangle.bottom - reference);
+					ratio = static_cast<double>(SelectedPoint.y - reference) / (SelectedForm->rectangle.bottom - reference);
 					SelectedForm->rectangle.bottom = SelectedPoint.y;
 				}
 				else {
 					reference = StitchRangeRect.top;
-					ratio = (double)(SelectedPoint.y - reference) / (StitchRangeRect.bottom - reference);
+					ratio = static_cast<double>(SelectedPoint.y - reference) / (StitchRangeRect.bottom - reference);
 				}
 			}
 			break;
@@ -7189,17 +7192,17 @@ void setstrtch() {
 			if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
 				reference = stitchRect.right;
 				offsetX = Msg.pt.x - StitchWindowOrigin.x;
-				ratio = (double)(SelectedFormsRect.right - offsetX) / (SelectedFormsRect.right - SelectedFormsRect.left);
+				ratio = static_cast<double>(SelectedFormsRect.right - offsetX) / (SelectedFormsRect.right - SelectedFormsRect.left);
 			}
 			else {
 				if (chkMap(FORMSEL)) {
 					reference = SelectedForm->rectangle.right;
-					ratio = (double)(SelectedPoint.x - reference) / (SelectedForm->rectangle.left - reference);
+					ratio = static_cast<double>(SelectedPoint.x - reference) / (SelectedForm->rectangle.left - reference);
 					SelectedForm->rectangle.left = SelectedPoint.x;
 				}
 				else {
 					reference = StitchRangeRect.right;
-					ratio = (double)(SelectedPoint.x - reference) / (StitchRangeRect.left - reference);
+					ratio = static_cast<double>(SelectedPoint.x - reference) / (StitchRangeRect.left - reference);
 				}
 			}
 			break;
@@ -7539,7 +7542,7 @@ void nulapcol(unsigned color) {
 
 	unsigned	attribute, iStitch;
 
-	if ((unsigned)(SelectedForm->borderColor >> 4) != color) {
+	if (static_cast<unsigned>(SelectedForm->borderColor >> 4) != color) {
 		SelectedForm->borderColor &= COLMSK;
 		SelectedForm->borderColor |= color << 4;
 		attribute = (ClosestFormToCursor << 4) | TYPMSK;
@@ -7729,7 +7732,7 @@ void prfmsg() {
 		NULL);
 	preferenceDC = GetDC(PreferencesWindow);
 	GetClientRect(PreferencesWindow, &preferenceRect);
-	FillRect(preferenceDC, &preferenceRect, (HBRUSH)(COLOR_WINDOW + 1));
+	FillRect(preferenceDC, &preferenceRect, GetSysColorBrush(COLOR_WINDOW));
 	LabelWindowCoords.top = ValueWindowCoords.top = 3;
 	LabelWindowCoords.bottom = ValueWindowCoords.bottom = 3 + LabelWindowSize.y;
 	LabelWindowCoords.left = 3;
@@ -7845,7 +7848,7 @@ void prfmsg() {
 		NULL);
 	preferenceDC = GetDC(PreferencesWindow);
 	GetClientRect(PreferencesWindow, &preferenceRect);
-	FillRect(preferenceDC, &preferenceRect, (HBRUSH)(COLOR_WINDOW + 1));
+	FillRect(preferenceDC, &preferenceRect, GetSysColorBrush(COLOR_WINDOW));
 	LabelWindowCoords.top = ValueWindowCoords.top = 3;
 	LabelWindowCoords.bottom = ValueWindowCoords.bottom = 3 + LabelWindowSize.y;
 	LabelWindowCoords.left = 3;
@@ -8058,7 +8061,7 @@ void duspir(unsigned stepCount) {
 		centeredSpiral[iStep].x = firstSpiral[iStep].x - center.x;
 		centeredSpiral[iStep].y = firstSpiral[iStep].y - center.y;
 	}
-	stepRatio = (double)1 / vertexCount;
+	stepRatio = 1.0 / vertexCount;
 	ratio = stepRatio;
 	for (iVertex = 0; iVertex < vertexCount; iVertex++) {
 		SelectedForm->vertices[iVertex].x = centeredSpiral[iVertex%stepCount].x*ratio + center.x;
@@ -9092,7 +9095,7 @@ void flpord() {
 				savdo();
 				rngadj();
 				iForward = GroupStartStitch;
-				for (iStitch = 0; iStitch < ((signed)(GroupEndStitch - GroupStartStitch) >> 1) + 1; iStitch++) {
+				for (iStitch = 0; iStitch < (static_cast<signed>(GroupEndStitch - GroupStartStitch) >> 1) + 1; iStitch++) {
 					swapPoint.attribute = StitchBuffer[iForward].attribute;
 					swapPoint.x = StitchBuffer[iForward].x;
 					swapPoint.y = StitchBuffer[iForward].y;
@@ -9297,7 +9300,7 @@ void nutim(double size) {
 		ThrEdInstance,
 		NULL);
 	TimeDC = GetDC(TimeWindow);
-	TimeStep = (double)StitchWindowSize.x / size;
+	TimeStep = static_cast<double>(StitchWindowSize.x) / size;
 	TimePosition = 0;
 	FormLines[0].y = 0;
 	FormLines[1].y = ButtonHeight;
@@ -9391,7 +9394,7 @@ void setcmap(unsigned bit) {
 		mov		ColorBitmap, eax
 	}
 #else
-	_bittestandset((long *)&ColorBitmap, bit);
+	_bittestandset(static_cast<long *>(static_cast<void *>(&ColorBitmap)), bit);
 #endif
 }
 
@@ -9417,7 +9420,7 @@ nxtcolx :
 
 	DWORD	color;
 
-	if (_bittest((long *)&ColorBitmap, AppliqueColor)) {
+	if (_bittest(static_cast<long *>(static_cast<void *>(&ColorBitmap)), AppliqueColor)) {
 		color = AppliqueColor;
 	}
 	else {
@@ -9428,7 +9431,7 @@ nxtcolx :
 		_BitScanForward(&color, ColorBitmap);
 	}
 
-	_bittestandcomplement((long *)&ColorBitmap, color);
+	_bittestandcomplement(static_cast<long *>(static_cast<void *>(&ColorBitmap)), color);
 
 	return color;
 #endif
@@ -9446,7 +9449,7 @@ unsigned isrt(unsigned bit) {
 isrtx :
 	}
 #else
-	return _bittest((long *)&Srtmsk, bit);
+	return _bittest(static_cast<long *>(static_cast<void *>(&Srtmsk)), bit);
 #endif
 }
 
@@ -9486,8 +9489,8 @@ void rotpar() {
 		RotationRect.top = SelectedForm->rectangle.top;
 		RotationRect.bottom = SelectedForm->rectangle.bottom;
 		if (!chkMap(GMRK)) {
-			RotationCenter.x = (double)(RotationRect.right - RotationRect.left) / 2 + RotationRect.left;
-			RotationCenter.y = (double)(RotationRect.top - RotationRect.bottom) / 2 + RotationRect.bottom;
+			RotationCenter.x = static_cast<double>(RotationRect.right - RotationRect.left) / 2 + RotationRect.left;
+			RotationCenter.y = static_cast<double>(RotationRect.top - RotationRect.bottom) / 2 + RotationRect.bottom;
 		}
 		setMap(FRMROT);
 	}
@@ -9502,8 +9505,8 @@ void rotpar() {
 		RotationCenter.y = ZoomMarkPoint.y;
 	}
 	else {
-		RotationCenter.x = (double)(RotationRect.right - RotationRect.left) / 2 + RotationRect.left;
-		RotationCenter.y = (double)(RotationRect.top - RotationRect.bottom) / 2 + RotationRect.bottom;
+		RotationCenter.x = static_cast<double>(RotationRect.right - RotationRect.left) / 2 + RotationRect.left;
+		RotationCenter.y = static_cast<double>(RotationRect.top - RotationRect.bottom) / 2 + RotationRect.bottom;
 	}
 }
 
@@ -9702,7 +9705,7 @@ void movlayr(unsigned codedLayer) {
 		clRmap((FormIndex >> 5) + 1);
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 			iCurrentForm = SelectedFormList[iForm];
-			FormList[iCurrentForm].attribute = (TCHAR)(FormList[iCurrentForm].attribute&NFRMLMSK) | codedLayer;
+			FormList[iCurrentForm].attribute = (FormList[iCurrentForm].attribute&NFRMLMSK) | codedLayer;
 			setr(iCurrentForm);
 		}
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -9719,7 +9722,7 @@ void movlayr(unsigned codedLayer) {
 	else {
 		if (chkMap(FORMSEL)) {
 			savdo();
-			FormList[ClosestFormToCursor].attribute = (TCHAR)(FormList[ClosestFormToCursor].attribute&NFRMLMSK) | codedLayer;
+			FormList[ClosestFormToCursor].attribute = (FormList[ClosestFormToCursor].attribute&NFRMLMSK) | codedLayer;
 			rstMap(FORMSEL);
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 				if (StitchBuffer[iStitch].attribute&ALTYPMSK && ((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT) == ClosestFormToCursor)
@@ -9823,7 +9826,7 @@ BOOL notsel() {
 	unsigned	iForm;
 
 	for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-		if ((unsigned)SelectedFormList[iForm] == ClosestFormToCursor)
+		if (static_cast<unsigned>(SelectedFormList[iForm]) == ClosestFormToCursor)
 			return 0;
 	}
 	return 1;
@@ -9835,7 +9838,7 @@ void nufsel() {
 		if (rstMap(WASEL))
 			SelectedFormList[SelectedFormCount++] = PreviousFormIndex;
 		if (notsel())
-			SelectedFormList[SelectedFormCount++] = (unsigned short)ClosestFormToCursor;
+			SelectedFormList[SelectedFormCount++] = static_cast<unsigned short>(ClosestFormToCursor);
 		setMap(RESTCH);
 	}
 }
@@ -11315,7 +11318,7 @@ void bean(unsigned start, unsigned finish) {
 		BeanCount += 2;
 	}
 	iSourceStitch++;
-	while (iSourceStitch < (unsigned)finish - 2) {
+	while (iSourceStitch < finish - 2) {
 		mvstch(iCopyStitch++, iSourceStitch);
 		if ((StitchBuffer[iSourceStitch + 2].x != StitchBuffer[iSourceStitch].x || StitchBuffer[iSourceStitch + 2].y != StitchBuffer[iSourceStitch].y) && 
 			(StitchBuffer[iSourceStitch - 2].x != StitchBuffer[iSourceStitch].x || StitchBuffer[iSourceStitch - 2].y != StitchBuffer[iSourceStitch].y)) {
@@ -11374,7 +11377,7 @@ void unbean(unsigned start, unsigned finish) {
 	}
 	if (BeanCount)
 		BeanCount -= 2;;
-	if (iSource > (unsigned)PCSHeader.stitchCount - 1)
+	if (iSource > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 		iSource = PCSHeader.stitchCount - 1;
 	while (iSource < PCSHeader.stitchCount)
 		mvstch(iCopy++, iSource++);
@@ -11391,9 +11394,9 @@ void debean() {
 			ClosestPointIndex -= BeanCount;
 		else
 			GroupStitchIndex -= BeanCount;
-		if (ClosestPointIndex > (unsigned)PCSHeader.stitchCount - 1)
+		if (ClosestPointIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 			ClosestPointIndex = PCSHeader.stitchCount - 1;
-		if (GroupStitchIndex > (unsigned)PCSHeader.stitchCount - 1)
+		if (GroupStitchIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 			GroupStitchIndex = PCSHeader.stitchCount - 1;
 		grpAdj();
 	}
@@ -11479,7 +11482,7 @@ void spltsat(SATCON currentGuide) {
 	vertexBuffer = new fPOINT[VertexCount + 2];
 	mvfrmsb(&FormList[FormIndex], &FormList[FormIndex - 1], FormIndex - ClosestFormToCursor);
 	FormIndex++;
-	if (ClosestFormToCursor < (unsigned)FormIndex - 2)
+	if (ClosestFormToCursor < FormIndex - 2)
 		mvfltsb(&FormVertices[FormVertexIndex + 1], &FormVertices[FormVertexIndex - 1], FormVertexIndex - fltind(FormList[ClosestFormToCursor + 2].vertices));
 	FormVertexIndex += 2;
 	for (iForm = ClosestFormToCursor + 2; iForm < FormIndex; iForm++)
@@ -11532,7 +11535,7 @@ void spltsat(SATCON currentGuide) {
 	if (SelectedForm->wordParam)
 		SelectedForm->wordParam = currentGuide.start;
 	iOldVertex = iGuide + 1;
-	while (iGuide < (unsigned)SelectedForm->satinGuideCount) {
+	while (iGuide < static_cast<unsigned>(SelectedForm->satinGuideCount)) {
 		SelectedForm->satinOrAngle.guide[iGuide].start -= (currentGuide.start - 1);
 		SelectedForm->satinOrAngle.guide[iGuide].finish -= (currentGuide.start - 1);
 		iGuide++;
@@ -11638,11 +11641,11 @@ void stchs2frm() {
 		frmout(FormIndex);
 		FormIndex++;
 		if (ClosestPointIndex > GroupStitchIndex) {
-			if (ClosestPointIndex < (unsigned)PCSHeader.stitchCount - 1)
+			if (ClosestPointIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 				ClosestPointIndex++;
 		}
 		else {
-			if (GroupStitchIndex < (unsigned)PCSHeader.stitchCount - 1)
+			if (GroupStitchIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1)
 				GroupStitchIndex++;
 		}
 		delstchm();
@@ -11678,7 +11681,7 @@ lcmp2 :
 lcmpx :
 	}
 #else
-	float local1 = **(float **)arg1, local2 = **(float **)arg2;
+	float local1 = **static_cast<float * const *>(arg1), local2 = **static_cast<float * const *>(arg2);
 
 	if (local1 < local2)
 		return -1;
@@ -11695,7 +11698,7 @@ void chksid(unsigned vertexIndex) {
 	unsigned	iVertex, limit;
 
 	if (ClipIntersectSide != vertexIndex) {
-		if ((vertexIndex - ClipIntersectSide + VertexCount) % VertexCount < (unsigned)(VertexCount >> 1)) {
+		if ((vertexIndex - ClipIntersectSide + VertexCount) % VertexCount < (VertexCount >> 1)) {
 			iVertex = nxt(ClipIntersectSide);
 			limit = nxt(vertexIndex);
 			while (iVertex != limit) {
@@ -11772,8 +11775,8 @@ unsigned lenref(float* lineLength) {
 lrefx :
 	}
 #else
-	//Correct
-	unsigned eax = (unsigned)lineLength - (unsigned)ClipSegments;
+	//Correct (randomization?)
+	unsigned eax = reinterpret_cast<unsigned>(lineLength) - reinterpret_cast<unsigned>(ClipSegments);
 
 	unsigned edx = eax % 29;
 	eax /= 29;
@@ -11900,8 +11903,8 @@ clpcmpx :
 	}
 #else
 
-	VCLPX	vclpx1 = *(VCLPX *)arg1;
-	VCLPX	vclpx2 = *(VCLPX *)arg2;
+	const VCLPX	vclpx1 = *static_cast<const VCLPX *>(arg1);
+	const VCLPX	vclpx2 = *static_cast<const VCLPX *>(arg2);
 
 	if (vclpx1.segment < vclpx2.segment)
 		return -1;
@@ -11967,8 +11970,8 @@ BOOL isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* leng
 		tempIntersection.x = 0;
 	if (tempIntersection.y < TINY)
 		tempIntersection.y = 0;
-	intersection->x = (float)tempIntersection.x;
-	intersection->y = (float)tempIntersection.y;
+	intersection->x = static_cast<float>(tempIntersection.x);
+	intersection->y = static_cast<float>(tempIntersection.y);
 	*length = hypot(tempIntersection.x - LineSegmentStart.x, tempIntersection.y - LineSegmentStart.y);
 	// ToDo - should length be determined from start or end?
 	//	 hypot(tipnt.x-LineSegmentEnd.x,tipnt.y-LineSegmentEnd.y);
@@ -12206,12 +12209,12 @@ void clpcon() {
 		clipGrid.top++;
 		if (SelectedForm->fillSpacing < 0) {
 			clipGrid.bottom--;
-			clipGrid.left -= (float)ClipRectSize.cx / ClipWidth;
-			clipGrid.right += (float)ClipRectSize.cx / ClipWidth;
+			clipGrid.left -= static_cast<long>(ClipRectSize.cx / ClipWidth);
+			clipGrid.right += static_cast<long>(ClipRectSize.cx / ClipWidth);
 		}
 	}
 	if (clipNegative && !clipGridOffset)
-		clipGrid.left -= (float)ClipRectSize.cx / ClipWidth;
+		clipGrid.left -= static_cast<long>(ClipRectSize.cx / ClipWidth);
 	if (clipGrid.bottom < 0) {
 		negativeOffset = 1 - clipGrid.bottom;
 		clipGrid.bottom += negativeOffset;
@@ -12232,10 +12235,10 @@ void clpcon() {
 		}
 		if (SelectedForm->fillSpacing < 0)
 			finish += ClipRectSize.cx / ClipWidth;
-		if (finish > (unsigned)clipGrid.right)
-			finish = clipGrid.right;
+		if (finish > static_cast<unsigned>(clipGrid.right))
+			finish = static_cast<unsigned>(clipGrid.right);
 		if (clipNegative)
-			start -= (float)ClipRectSize.cx / ClipWidth;
+			start -= static_cast<unsigned int>(ClipRectSize.cx / ClipWidth);
 		for (iSegment = start; iSegment <= finish; iSegment++) {
 			RegionCrossingData[segmentCount].vertex = iVertex;
 			RegionCrossingData[segmentCount++].segment = iSegment;
@@ -12283,12 +12286,12 @@ void clpcon() {
 		}
 		else {
 			if (clipGridOffset)
-				clipVerticalOffset = (float)(iRegion%clipGridOffset) / clipGridOffset*ClipRectSize.cy;
+				clipVerticalOffset = static_cast<float>(iRegion%clipGridOffset) / (clipGridOffset*ClipRectSize.cy);
 			LineSegmentStart.x = pasteLocation.x + ClipBuffer[0].x;
 		}
 		LineSegmentStart.y = clipGrid.bottom*ClipRectSize.cy;
 		if (clipGridOffset)
-			clipVerticalOffset = (float)(iRegion%clipGridOffset) / clipGridOffset*ClipRectSize.cy;
+			clipVerticalOffset = static_cast<float>(iRegion%clipGridOffset) / (clipGridOffset*ClipRectSize.cy);
 		for (iVerticalGrid = clipGrid.bottom; iVerticalGrid < clipGrid.top; iVerticalGrid++) {
 			pasteLocation.y = iVerticalGrid*ClipRectSize.cy - clipVerticalOffset;
 			LineSegmentEnd.x = pasteLocation.x + ClipBuffer[0].x;
@@ -12590,8 +12593,8 @@ void horclpfn() {
 	unsigned	iVertex;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
-	RotationCenter.x = (double)(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
-	RotationCenter.y = (double)(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
+	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
+	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;
 	RotationAngle = PI / 2;
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
@@ -12682,8 +12685,8 @@ void angclpfn() {
 	fPOINT*		vertexList;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
-	RotationCenter.x = (double)(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
-	RotationCenter.y = (double)(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
+	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
+	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;
 	if (chkMap(ISUND)) {
 		RotationAngle = PI / 2 - SelectedForm->underlayStitchAngle;
@@ -13067,7 +13070,7 @@ fxlab:;
 		if (!initialCount) {
 			initialCount = BeanCount;
 			smallestSpacing = AdjustedSpace;
-			minimumInterval = interval = (double)hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
+			minimumInterval = interval = static_cast<double>(hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y));
 			minimumSpacing = AdjustedSpace;
 			interval /= initialCount;
 			AdjustedSpace += interval / 2;
@@ -13160,7 +13163,7 @@ void duch() {
 	Div4 = AdjustedSpace / 4;
 	SequenceIndex = 0;
 	if (ActivePointIndex > 1) {
-		for (iPoint = 0; iPoint < (unsigned)ActivePointIndex - 2; iPoint++)
+		for (iPoint = 0; iPoint < static_cast<unsigned>(ActivePointIndex) - 2; iPoint++)
 			duchfn(iPoint, iPoint + 1);
 		if (SelectedForm->type == FRMLINE) {
 			duchfn(iPoint, iPoint + 1);
@@ -13375,7 +13378,7 @@ void dulast() {
 	double		minimumLength;
 	double		length;
 
-	TempClipPoints = (fPOINT*)&ChainEndPoints[ActivePointIndex];
+	TempClipPoints = static_cast<fPOINT*>(&ChainEndPoints[ActivePointIndex]);
 	if (lastch()) {
 		minimumLength = 1e99;
 		minimumIndex = 0;
