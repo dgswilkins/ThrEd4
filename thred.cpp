@@ -4485,35 +4485,37 @@ void stchWnd() {
 		ThrEdInstance,
 		NULL);
 
-	GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
+	if (MainStitchWin) {
+		GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
 
-	VerticalScrollBar = CreateWindow(
-		"SCROLLBAR",
-		0,
-		SBS_VERT | WS_CHILD | WS_VISIBLE,
-		StitchWindowSize.x + ButtonWidthX3,
-		0,
-		SCROLSIZ,
-		StitchWindowSize.y,
-		ThrEdWindow,
-		NULL,
-		ThrEdInstance,
-		NULL);
+		VerticalScrollBar = CreateWindow(
+			"SCROLLBAR",
+			0,
+			SBS_VERT | WS_CHILD | WS_VISIBLE,
+			StitchWindowSize.x + ButtonWidthX3,
+			0,
+			SCROLSIZ,
+			StitchWindowSize.y,
+			ThrEdWindow,
+			NULL,
+			ThrEdInstance,
+			NULL);
 
-	HorizontalScrollBar = CreateWindow(
-		"SCROLLBAR",
-		0,
-		SBS_HORZ | WS_CHILD | WS_VISIBLE,
-		ButtonWidthX3,
-		StitchWindowSize.y,
-		StitchWindowSize.x,
-		SCROLSIZ,
-		ThrEdWindow,
-		NULL,
-		ThrEdInstance,
-		NULL);
-	ShowWindow(VerticalScrollBar, FALSE);
-	ShowWindow(HorizontalScrollBar, FALSE);
+		HorizontalScrollBar = CreateWindow(
+			"SCROLLBAR",
+			0,
+			SBS_HORZ | WS_CHILD | WS_VISIBLE,
+			ButtonWidthX3,
+			StitchWindowSize.y,
+			StitchWindowSize.x,
+			SCROLSIZ,
+			ThrEdWindow,
+			NULL,
+			ThrEdInstance,
+			NULL);
+		ShowWindow(VerticalScrollBar, FALSE);
+		ShowWindow(HorizontalScrollBar, FALSE);
+	}
 }
 
 //check if a click occurred in A vertical set of 16 windows
@@ -4883,7 +4885,7 @@ void savmap() {
 void bfil() {
 
 	unsigned	bitmapWidthWords, widthOverflow, fileHeaderSize, bitmapSizeWords, iHeight;
-	unsigned*	pbits;
+	unsigned*	pbits = nullptr;
 	HBITMAP		bitmap;
 	HDC			deviceContext;
 	COLORREF	foreground;
@@ -4960,8 +4962,10 @@ void bfil() {
 			bitmap = CreateDIBSection(BitmapDC, &BitmapInfo, DIB_RGB_COLORS, reinterpret_cast<void **>(&pbits), 0, 0);
 			//Synchronize
 			GdiFlush();
-			for (iHeight = 0; iHeight < BitmapHeight; iHeight++)
-				bitlin(&MonoBitmapData[iHeight*bitmapWidthWords], &pbits[iHeight*BitmapWidth], background, foreground);
+			if (pbits) {
+				for (iHeight = 0; iHeight < BitmapHeight; iHeight++)
+					bitlin(&MonoBitmapData[iHeight*bitmapWidthWords], &pbits[iHeight*BitmapWidth], background, foreground);
+			}
 			deviceContext = CreateCompatibleDC(StitchWindowDC);
 			if (bitmap && deviceContext) {
 				SelectObject(deviceContext, bitmap);
@@ -21200,13 +21204,14 @@ void makCol() {
 
 void ritloc() {
 
-	TCHAR*	environment;
+	TCHAR*	environment = nullptr;
 	TCHAR	lockFileName[_MAX_PATH] = { 0 };
 	HANDLE	lockFile;
 	DWORD	bytesWritten;
 	size_t	length;
 	errno_t	error;
 
+	[[gsl::suppress(lifetime)]]
 	error = _dupenv_s(&environment, &length, "COMSPEC");
 
 	if (error) {

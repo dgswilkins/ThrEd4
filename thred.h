@@ -4,8 +4,8 @@
 // C++ Code Checker rules - disable them as required 
 /*
 #pragma warning(disable:26493) // type.4	Don't use C-style casts
-*/
 #pragma warning(disable:26400) //			Do not dereference an invalid pointer
+*/
 #pragma warning(disable:26401) //			Do not dereference nullptr
 #pragma warning(disable:26423) //			The allocation was not directly assigned to an owner
 #pragma warning(disable:26424) //			Failing to delete or assign ownership of allocation

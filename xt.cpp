@@ -916,12 +916,11 @@ void pes2crd() {
 		return;
 	}
 	*IniFile.p2cName = 0;
-	if (!RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion",
-		0, KEY_READ, &registryKey)) {
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion", 0, KEY_READ, &registryKey) == ERROR_SUCCESS) {
 
 		size = _MAX_PATH;
 		keyType = REG_SZ;
-		if (!RegQueryValueEx(registryKey, "ProgramFilesDir", 0, &keyType, (unsigned char*)programName, &size)) {
+		if (RegQueryValueEx(registryKey, "ProgramFilesDir", 0, &keyType, (unsigned char*)programName, &size) == ERROR_SUCCESS) {
 
 			strcat_s(programName, "\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
 			if (!chkp2cnam(programName))
