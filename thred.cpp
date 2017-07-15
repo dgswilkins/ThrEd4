@@ -9290,7 +9290,7 @@ void setknots() {
 
 void lodbmp() {
 
-	TCHAR*	filename;
+	TCHAR*	filename = nullptr;
 
 	if (PCSBMPFileName[0]) {
 
@@ -9303,7 +9303,7 @@ void lodbmp() {
 		filename = strrchr(UserBMPFileName, '\\') + 1;
 		// PCS file can only store a 16 character filename?
 		// ToDo - give the user a little more info that the bitmap has not been loaded
-		if (strlen(filename) < 16) {
+		if (filename && strlen(filename) < 16) {
 			strncpy_s(PCSBMPFileName, filename, sizeof(PCSBMPFileName));
 			defbNam();
 			bfil();
@@ -16951,14 +16951,16 @@ chkcolx:;
 				buffer[2] = 0;
 				SetWindowText(ThreadSizeWin[ThreadSizeSelected], buffer);
 				setMap(RESTCH);
-				for (iWindow = 0; iWindow < 3; iWindow++)
-					DestroyWindow(ChangeThreadSizeWin[iWindow]);
+				for (iWindow = 0; iWindow < 3; iWindow++) {
+					if (ChangeThreadSizeWin[iWindow]) { DestroyWindow(ChangeThreadSizeWin[iWindow]); }
+				}
 				return 1;
 			}
 			else {
 
-				for (iWindow = 0; iWindow < 3; iWindow++)
-					DestroyWindow(ChangeThreadSizeWin[iWindow]);
+				for (iWindow = 0; iWindow < 3; iWindow++) {
+					if (ChangeThreadSizeWin[iWindow]) { DestroyWindow(ChangeThreadSizeWin[iWindow]); }
+				}
 			}
 		}
 		if (rstMap(POLIMOV)) {
