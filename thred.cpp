@@ -9452,7 +9452,7 @@ void duver(TCHAR* name) {
 	}
 }
 
-void durit(char **destination, void* source, unsigned count) {
+void durit(char **destination, const void* source, unsigned count) {
 
 	CopyMemory(static_cast<void *>(*destination), source, count);
 	*destination += count;

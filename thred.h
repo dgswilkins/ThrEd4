@@ -2,22 +2,20 @@
 #pragma warning(disable:4244)
 
 // C++ Code Checker rules - disable them as required 
-/*
-#pragma warning(disable:26493) // type.4	Don't use C-style casts
 #pragma warning(disable:26400) //			Do not dereference an invalid pointer
-*/
 #pragma warning(disable:26401) //			Do not dereference nullptr
 #pragma warning(disable:26423) //			The allocation was not directly assigned to an owner
 #pragma warning(disable:26424) //			Failing to delete or assign ownership of allocation
 #pragma warning(disable:26425) //			Assigning 'return of new[]' to a static variable
-#pragma warning(disable:26461) // con.3		The pointer argument can be marked as a pointer to const
+//#pragma warning(disable:26461) // con.3		The pointer argument can be marked as a pointer to const
 #pragma warning(disable:26481) // bounds.1	Don't use pointer arithmetic. Use span instead
 #pragma warning(disable:26482) // bounds.2	Only index into arrays using constant expressions
 #pragma warning(disable:26485) // bounds.3	No array to pointer decay
 #pragma warning(disable:26490) // type.1	Don't use reinterpret_cast
+//#pragma warning(disable:26493) // type.4	Don't use C-style casts
 #pragma warning(disable:26494) // type.5	Variable is uninitialized
 #pragma warning(disable:26496) // Con.4		Value is assigned only once, mark it as a pointer to const
-#pragma warning(disable:26497) // f.4		This function could be marked constexpr if compile-time evaluation is desired
+//#pragma warning(disable:26497) // f.4		This function could be marked constexpr if compile-time evaluation is desired
 #pragma warning(disable:26499) //			Could not find any lifetime tracking information
 
 //compile switches

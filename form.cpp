@@ -11759,7 +11759,7 @@ void ritseg() {
 	ClipSegments[ActivePointIndex].dun = 1;
 }
 
-unsigned lenref(float* lineLength) {
+unsigned lenref(const float* lineLength) {
 #if	 __UseASM__
 	_asm {
 		mov		eax, lineLength
