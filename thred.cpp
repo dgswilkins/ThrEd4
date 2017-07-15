@@ -5053,13 +5053,12 @@ void dstran() {
 	fPOINT			dstSize;
 	fPOINT			delta;
 	HANDLE			colorFile;
-	unsigned*		colors;
+	unsigned*		colors = nullptr;
 	unsigned		iColor;
 	DWORD			bytesRead;
 	LARGE_INTEGER	colorFileSize;
 	BOOL			retval;
 
-	colors = 0;
 	if (colfil()) {
 
 		colorFile = CreateFile(ColorFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
@@ -5082,7 +5081,7 @@ void dstran() {
 				if (colors) {
 
 					delete[] colors;
-					colors = 0;
+					colors = nullptr;
 				}
 			}
 		}
