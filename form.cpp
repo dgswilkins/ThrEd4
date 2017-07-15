@@ -245,12 +245,12 @@ BOOL			iseclp (unsigned find);
 BOOL			iseclpx (unsigned find);
 void			lapbrd ();
 void			lcon ();
-unsigned		nxt (unsigned ind);
+constexpr unsigned	nxt (unsigned iVertex);
 void			oclp (fPOINT* p_clp, unsigned p_nclp);
 void			pbrd (double spac);
 void			plbrd (double spac);
 void			prpbrd (double spac);
-unsigned		prv (unsigned ind);
+constexpr unsigned	prv (unsigned iVertex);
 unsigned		psg ();
 void			rotfrm (unsigned nu0);
 void			satfil ();
@@ -1263,7 +1263,7 @@ void ratsr() {
 	}
 }
 
-float midl(float high, float low) {
+constexpr float midl(float high, float low) {
 	return (high - low) / 2 + low;
 }
 
@@ -2230,7 +2230,7 @@ void oclp(fPOINT* clip, unsigned clipEntries) {
 	}
 }
 
-float getblen() {
+constexpr float getblen() {
 #if	 __UseASM__
 	float		fLength;
 	unsigned	iLength;
@@ -2243,7 +2243,7 @@ float getblen() {
 	}
 	return fLength;
 #else
-	unsigned	iLength;
+	unsigned	iLength = 0;
 
 	iLength = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
 	return static_cast<float>(iLength);
@@ -2273,7 +2273,7 @@ void savblen(float fLength) {
 #endif
 }
 
-float getplen() {
+constexpr float getplen() {
 	unsigned value = SelectedForm->picoLength;
 
 	return(static_cast<float>(value >> 8) + (value & 0xff) / 256);
@@ -2751,14 +2751,14 @@ void setfpnt() {
 	setMap(RESTCH);
 }
 
-unsigned nxt(unsigned int iVertex) {
+constexpr unsigned nxt(unsigned int iVertex) {
 	iVertex++;
 	if (iVertex > VertexCount - 1)
 		iVertex = 0;
 	return iVertex;
 }
 
-unsigned prv(unsigned iVertex) {
+constexpr unsigned prv(unsigned iVertex) {
 	if (iVertex)
 		iVertex--;
 	else
@@ -8206,7 +8206,7 @@ void dulens(unsigned sides) {
 	mdufrm();
 }
 
-float shreg(float highValue, float reference) {
+constexpr float shreg(float highValue, float reference) {
 	return (highValue - reference)*EggRatio + reference;
 }
 
@@ -11073,7 +11073,7 @@ void frmnum() {
 		shoseln(IDS_FRM1MSG, IDS_SETFRM);
 }
 
-unsigned duat(unsigned attribute) {
+constexpr unsigned duat(unsigned attribute) {
 #if	 __UseASM__
 	_asm {
 		mov		eax, attribute
@@ -11861,13 +11861,11 @@ float getlen(unsigned iPoint) {
 			CurrentFormVertices[ClipStitchPoints[iPoint].vertexIndex].y - ClipStitchPoints[iPoint].y);
 }
 
-unsigned leftsid() {
+constexpr unsigned leftsid() {
 
-	unsigned	iVertex, leftVertex;
-	float		minimumX;
+	unsigned	iVertex = 0, leftVertex = 0;
+	float		minimumX = 1e9;
 
-	minimumX = 1e9;
-	leftVertex = 0;
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 		if (CurrentFormVertices[iVertex].x < minimumX) {
 			minimumX = CurrentFormVertices[iVertex].x;

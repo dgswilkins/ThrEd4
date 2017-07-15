@@ -153,8 +153,8 @@ extern	void		movStch();
 extern	void		msgflt(unsigned messageId, float value);
 extern	void		mvstchs(unsigned destination, unsigned source, unsigned count);
 extern	void		numWnd();
-extern	unsigned	nxt(unsigned iVertex);
-extern	unsigned	prv(unsigned iVertex);
+extern	constexpr unsigned	nxt(unsigned iVertex);
+extern	constexpr unsigned	prv(unsigned iVertex);
 extern	unsigned	psg();
 extern	unsigned	px2stch();
 extern	void		redraw(HWND window);
@@ -416,12 +416,12 @@ void fthvars() {
 		setMap(FTHR);
 }
 
-float durat(float start, float finish) {
+constexpr float durat(float start, float finish) {
 
 	return (finish - start)*FeatherRatio + start;
 }
 
-float duxrat(float strt, float fin) {
+constexpr float duxrat(float strt, float fin) {
 
 	return (fin - strt)*FeatherRatioLocal + strt;
 }
@@ -3647,11 +3647,10 @@ void ed2txp(POINT offset, TXPNT* textureRecord) {
 	textureRecord->y = TextureScreen.areaHeight - (static_cast<float>(offset.y - TextureScreen.top) / TextureScreen.height*TextureScreen.areaHeight);
 }
 
-int	hitxlin() {
-	unsigned	iPoint;
-	short		highestLine;
+constexpr int	hitxlin() {
+	unsigned	iPoint = 0;
+	short		highestLine = 0;
 
-	highestLine = 0;
 	for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++) {
 		if (TempTexturePoints[SelectedTexturePointsList[iPoint]].line > highestLine)
 			highestLine = TempTexturePoints[SelectedTexturePointsList[iPoint]].line;

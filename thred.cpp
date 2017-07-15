@@ -51,7 +51,7 @@ void		nuAct (unsigned iStitch);
 void		nuslst (unsigned find);
 void		okcan ();
 void		patdun ();
-unsigned	pt2colInd (unsigned iStitch);
+constexpr unsigned	pt2colInd (unsigned iStitch);
 void		rSelbox ();
 void		redraw (HWND window);
 void		ritnum (unsigned code, unsigned value);
@@ -251,7 +251,7 @@ extern	void			nufilcol (unsigned color);
 extern	void			nufsel ();
 extern	void			nufthcol (unsigned color);
 extern	void			nulapcol (unsigned color);
-extern	unsigned		nxt (unsigned iVertex);
+extern	constexpr unsigned		nxt (unsigned iVertex);
 extern	void			oclp (fPOINT* clip, unsigned clipEntries);
 extern	unsigned		pdir (unsigned vertex);
 extern	void			pes2crd ();
@@ -261,7 +261,7 @@ extern	void			prfmsg ();
 extern	void			prfsid (HWND wnd);
 extern	unsigned		projh (double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersection);
 extern	void			prpbrd (double borderStitchSpacing);
-extern	unsigned		prv (unsigned iVertex);
+extern	constexpr unsigned	prv (unsigned iVertex);
 extern	unsigned		psg ();
 extern	void			px2stchf (POINT screen, fPOINT* stitchPoint);
 extern	void			pxrct2stch (RECT screenRect, fRECTANGLE* stitchRect);
@@ -3262,9 +3262,9 @@ void thr2bal(unsigned destination, unsigned source, unsigned code) {
 	BalaradStitch[destination].y = (StitchBuffer[source].y - BalaradOffset.y)*BALRAT;
 }
 
-unsigned coldis(COLORREF colorA, COLORREF colorB) {
+constexpr unsigned coldis(COLORREF colorA, COLORREF colorB) {
 
-	unsigned	distance;
+	unsigned	distance = 0;
 
 	distance = ((colorA & 0xff) > (colorB & 0xff)) ? ((colorA & 0xff) - (colorB & 0xff)) : ((colorB & 0xff) - (colorA & 0xff));
 	colorA >>= 8;
@@ -5874,7 +5874,7 @@ void clrfbuf(unsigned count) {
 #endif
 }
 
-unsigned dudbits(POINT dif) {
+constexpr unsigned dudbits(POINT dif) {
 
 	return Xdst[dif.x + 121] | Ydst[dif.y + 121];
 }
@@ -7157,8 +7157,8 @@ unsigned closPnt1(unsigned* closestStitch) {
 	}
 }
 
-unsigned pt2colInd(unsigned iStitch) {
-	unsigned iColor;
+constexpr unsigned pt2colInd(unsigned iStitch) {
+	unsigned iColor = 0;
 
 	for (iColor = 0; iColor < ColorChanges; iColor++) {
 
@@ -8504,9 +8504,9 @@ unsigned sizclp() {
 	return length;
 }
 
-unsigned lenclp() {
+constexpr unsigned lenclp() {
 
-	unsigned	codedAttribute, iStitch, stitchCount;
+	unsigned	codedAttribute = 0, iStitch = 0, stitchCount = 0;
 
 	stitchCount = 0;
 	codedAttribute = ClosestFormToCursor << FRMSHFT;
@@ -10089,7 +10089,7 @@ void redclp() {
 	}
 }
 
-unsigned nxtcrnr(unsigned corner) {
+constexpr unsigned nxtcrnr(unsigned corner) {
 
 #if  __UseASM__
 	_asm {
@@ -14548,11 +14548,10 @@ void blanklin(unsigned lineStart) {
 		DifferenceBitmap[iPoint] = 0;
 }
 
-unsigned trsum() {
+constexpr unsigned trsum() {
 
-	unsigned	sumAdjacent, iAdjacent;
+	unsigned	sumAdjacent = 0, iAdjacent = 1;
 
-	sumAdjacent = 0;
 	for (iAdjacent = 1; iAdjacent < 9; iAdjacent++)
 		sumAdjacent += ((TraceAdjacentColors[iAdjacent] > TraceAdjacentColors[0]) ? (TraceAdjacentColors[iAdjacent] - TraceAdjacentColors[0]) : (TraceAdjacentColors[0] - TraceAdjacentColors[iAdjacent]));
 	return sumAdjacent;
