@@ -230,7 +230,7 @@ void			duhart (unsigned nsids);
 void			durpoli (unsigned nsids);
 void			duxclp ();
 void			filang ();
-void			filinsb (dPOINT pnt);
+void			filinsb (dPOINT point);
 void			filvrt ();
 void			flipv ();
 void			fmclp ();
@@ -631,9 +631,9 @@ void dusqr() {
 
 void sacspac(SATCON* startGuide, unsigned guideCount) {
 
-	int			iStartGuide;
-	int			source, destination;
-	unsigned	iForm;
+	int			iStartGuide = 0;
+	int			source = 0, destination = 0;
+	unsigned	iForm = 0;
 
 	iStartGuide = satind(startGuide);
 	source = SatinConnectIndex - 1;
@@ -651,9 +651,8 @@ void sacspac(SATCON* startGuide, unsigned guideCount) {
 
 SATCON* nusac(unsigned formIndex, unsigned guideCount) {
 
-	unsigned	iForm, guideIndex;
+	unsigned	iForm = 0, guideIndex = 0;
 
-	guideIndex = 0;
 	for (iForm = 0; iForm < formIndex; iForm++) {
 		if (FormList[iForm].type == SAT)
 			guideIndex += FormList[iForm].satinGuideCount;
@@ -705,7 +704,7 @@ void clpsub(unsigned fpnt, unsigned cnt) {
 
 void delmclp(unsigned iForm) {
 
-	unsigned	source, destination;
+	unsigned	source = 0, destination = 0;
 
 	if (ClipPointIndex) {
 		if (isclp(iForm)) {
@@ -726,7 +725,7 @@ void delmclp(unsigned iForm) {
 
 void deleclp(unsigned iForm) {
 
-	unsigned	source, destination;
+	unsigned	source = 0, destination = 0;
 
 	if (ClipPointIndex) {
 		if (iseclpx(iForm)) {
@@ -748,15 +747,13 @@ void deleclp(unsigned iForm) {
 
 fPOINT* nueclp(unsigned currentForm, unsigned count) {
 
-	int			find;
-	int			source, destination;
-	unsigned	iform;
+	int			find = findclp(ClosestFormToCursor);
+	int			source = ClipPointIndex - 1;
+	int			destination = ClipPointIndex + count - 1;
+	unsigned	iform = currentForm;
 
-	find = findclp(ClosestFormToCursor);
 	if (isclp(ClosestFormToCursor))
 		find += FormList[ClosestFormToCursor].lengthOrCount.clipCount;
-	source = ClipPointIndex - 1;
-	destination = ClipPointIndex + count - 1;
 	while (source >= find) {
 		ClipPoints[destination].x = ClipPoints[source].x;
 		ClipPoints[destination--].y = ClipPoints[source--].y;
@@ -775,13 +772,11 @@ fPOINT* nueclp(unsigned currentForm, unsigned count) {
 
 fPOINT* numclp() {
 
-	int			find;
-	int			source, destination;
-	unsigned	iForm;
+	int			find = findclp(ClosestFormToCursor);
+	int			source = ClipPointIndex - 1; 
+	int			destination = ClipPointIndex + ClipStitchCount - 1;
+	unsigned	iForm = ClosestFormToCursor + 1;
 
-	find = findclp(ClosestFormToCursor);
-	source = ClipPointIndex - 1;
-	destination = ClipPointIndex + ClipStitchCount - 1;
 	while (source >= find) {
 		ClipPoints[destination].x = ClipPoints[source].x;
 		ClipPoints[destination--].y = ClipPoints[source--].y;
@@ -837,13 +832,11 @@ unsigned clpind(fPOINT* point) {
 
 void fltspac(fPOINT* start, unsigned count) {
 
-	int			startIndex;
-	int			source, destination;
-	unsigned	iForm;
+	const int	startIndex = fltind(start);
+	int			source = FormVertexIndex - 1; 
+	int			destination = FormVertexIndex + count - 1;
+	unsigned	iForm = ClosestFormToCursor + 1;
 
-	startIndex = fltind(start);
-	source = FormVertexIndex - 1;
-	destination = FormVertexIndex + count - 1;
 	while (source >= startIndex) {
 		FormVertices[destination].x = FormVertices[source].x;
 		FormVertices[destination--].y = FormVertices[source--].y;
@@ -855,8 +848,8 @@ void fltspac(fPOINT* start, unsigned count) {
 
 void delsac(unsigned formIndex) {
 
-	unsigned	iForm;
-	unsigned	source, destination;
+	unsigned	iForm = 0;
+	unsigned	source = 0, destination = 0;
 
 	if (SatinConnectIndex) {
 		if (FormList[formIndex].type == SAT && FormList[formIndex].satinGuideCount) {
@@ -878,8 +871,8 @@ void delsac(unsigned formIndex) {
 
 void delflt(unsigned formIndex) {
 
-	unsigned	iForm;
-	unsigned	source, destination;
+	unsigned	iForm = 0;
+	unsigned	source = 0, destination = 0;
 
 	if (FormList[formIndex].vertexCount) {
 		destination = fltind(FormList[formIndex].vertices);
@@ -914,10 +907,9 @@ void rotbak() {
 
 void delfil(unsigned attribute) {
 
-	unsigned	iSource, iDestination;
+	unsigned	iSource = 0, iDestination = 0;
 
 	attribute &= TYPMSK | FRMSK;
-	iDestination = iSource = 0;
 	rstMap(WASDEL);
 	while ((StitchBuffer[iSource].attribute&(TYPMSK | FRMSK)) != attribute && iSource < PCSHeader.stitchCount)
 		iSource++;
@@ -938,14 +930,13 @@ void delfil(unsigned attribute) {
 
 void delmfil() {
 
-	unsigned	attribute, stitchAttribute;
-	unsigned	iSource, iDestination;
+	const unsigned	attribute = ClosestFormToCursor << FRMSHFT; 
+	unsigned	stitchAttribute = 0;
+	unsigned	iSource = 0, iDestination = 0;
 
 	if (istx(ClosestFormToCursor))
 		deltx();
 	delmclp(ClosestFormToCursor);
-	attribute = ClosestFormToCursor << FRMSHFT;
-	iDestination = 0;
 	for (iSource = 0; iSource < PCSHeader.stitchCount; iSource++) {
 		stitchAttribute = StitchBuffer[iSource].attribute;
 		if (!(stitchAttribute&NOTFRM)) {
@@ -966,7 +957,7 @@ void fsizpar() {
 
 void chkcont() {
 
-	unsigned	iGuide, shortestGuideIndex = 0, length, minimumLength = 10000;
+	unsigned	iGuide = 0, shortestGuideIndex = 0, length = 0, minimumLength = 10000;
 
 	delmclp(ClosestFormToCursor);
 	deleclp(ClosestFormToCursor);
@@ -996,7 +987,7 @@ void chkcont() {
 
 unsigned find1st() {
 
-	unsigned	iStitch = 0, attribute;
+	unsigned	iStitch = 0, attribute = 0;
 
 	if (chk2of())
 		return ClosestPointIndex;
@@ -1026,9 +1017,9 @@ void ispcdclp() {
 
 void frmout(unsigned formIndex) {
 
-	fRECTANGLE*	rectangle;
-	unsigned	iVertex;
-	float		offset;
+	fRECTANGLE*	rectangle = nullptr;
+	unsigned	iVertex = 0;
+	float		offset = 0.0;
 
 	if (FormList[formIndex].vertexCount) {
 		rectangle = &FormList[formIndex].rectangle;
@@ -1070,7 +1061,7 @@ void stCor2px(fPOINTATTR stitch, POINT* screen) {
 
 void px2stchf(POINT screen, fPOINT* stitchPoint) {
 
-	double	factorX, factorY;
+	double	factorX = 0.0, factorY = 0.0;
 
 	factorX = static_cast<double>(screen.x) / static_cast<double>(StitchWindowClientRect.right);
 	stitchPoint->x = factorX*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
@@ -1080,7 +1071,7 @@ void px2stchf(POINT screen, fPOINT* stitchPoint) {
 
 void frmlin(fPOINT* vertices, unsigned vertexCount) {
 
-	unsigned	iVertex;
+	unsigned	iVertex = 0;
 
 	if (VertexCount) {
 		for (iVertex = 0; iVertex < vertexCount; iVertex++) {
@@ -1132,9 +1123,9 @@ void rats() {
 
 void setfrm() {
 
-	unsigned	iVertex;
-	fPOINT		point;
-	fPOINT		delta;
+	unsigned	iVertex = 0;
+	fPOINT		point = {};
+	fPOINT		delta = {};
 
 	rats();
 	ClosestFormToCursor = FormIndex;
@@ -1171,14 +1162,14 @@ void form() {
 
 void frmsqr(unsigned iVertex) {
 
-	double	angle;
-	double	ratio;
-	float	length;
-	fPOINT	offset;
-	fPOINT	point;
-	fPOINT	adjustedPoint;
-	dPOINT	delta;
-	POINT	line[4];
+	double	angle = 0.0;
+	double	ratio = 0.0;
+	float	length = 0.0;
+	fPOINT	offset = {};
+	fPOINT	point = {};
+	fPOINT	adjustedPoint = {};
+	dPOINT	delta = {};
+	POINT	line[4] = {};
 
 	stch2pxr(CurrentFormVertices[iVertex]);
 	line[1].x = StitchCoordinatesPixels.x;
@@ -1222,10 +1213,9 @@ void selsqr(POINT controlPoint, HDC dc) {
 }
 
 void frmsqr0(POINT controlPoint) {
-	POINT		line[5];
-	unsigned	offset;
+	POINT		line[5] = {};
+	unsigned	offset = IniFile.formBoxSizePixels;
 
-	offset = IniFile.formBoxSizePixels;
 	if (offset) {
 		line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
 		line[0].y = line[1].y = controlPoint.y - offset;
@@ -1278,10 +1268,10 @@ void fvars(unsigned iForm) {
 
 void ritfrct(unsigned iForm, HDC dc) {
 
-	unsigned		controlPoint;
-	POINT			pixelOutline[10];
-	fRECTANGLE*		rectangle;
-	fPOINT			formOutline[10];
+	unsigned		controlPoint = 0;
+	POINT			pixelOutline[10] = {};
+	fRECTANGLE*		rectangle = nullptr;
+	fPOINT			formOutline[10] = {};
 
 	ratsr();
 	SelectObject(StitchWindowDC, FormPen);
@@ -1311,7 +1301,7 @@ void ritfrct(unsigned iForm, HDC dc) {
 
 void delfrms() {
 
-	unsigned	iStitch;
+	unsigned	iStitch = 0;
 
 	savdo();
 	FormIndex = FormVertexIndex = SatinConnectIndex = ClipPointIndex = 0;
@@ -1324,9 +1314,9 @@ void delfrms() {
 void fselrct(unsigned iForm) {
 
 	FRMHED*		formHeader = &FormList[iForm];
-	fPOINT		formOutline[5];
-	POINT		line[6];
-	unsigned	iPoint;
+	fPOINT		formOutline[5] = {};
+	POINT		line[6] = {};
+	unsigned	iPoint = 0;
 
 	formOutline[0].x = formOutline[3].x = formOutline[4].x = formHeader->rectangle.left;
 	formOutline[1].x = formOutline[2].x = formHeader->rectangle.right;
@@ -1379,7 +1369,7 @@ void dubig() {
 
 void frmpoly(POINT* line, unsigned count) {
 
-	unsigned	iPoint;
+	unsigned	iPoint = 0;
 
 	if (count) {
 		for (iPoint = 0; iPoint < count - 1; iPoint++)
@@ -1407,13 +1397,12 @@ void unpsel() {
 
 void drwfrm() {
 
-	unsigned	iForm, iGuide, iVertex, lastPoint, layer;
-	POINT		line[2];
-	dPOINT		point;
+	unsigned	iForm = 0, iGuide = 0, iVertex = 0, lastPoint = 0, layer = 0;
+	POINT		line[2] = {};
+	dPOINT		point = {};
 
 	rstMap(SHOMOV);
 	rstMap(SHOPSEL);
-	line[0].x = line[0].y = line[1].x = line[1].y = 0;
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	ratsr();
 	duzrat();
@@ -1589,7 +1578,7 @@ void setzig() {
 BOOL CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	TCHAR		buffer[HBUFSIZ];
+	TCHAR		buffer[HBUFSIZ] = { 0 };
 
 	switch (umsg) {
 		case WM_INITDIALOG:
@@ -1649,15 +1638,15 @@ reinit:;
 
 void setear() {
 
-	unsigned	nResult, iStep, iVertex, count, iRightVertices, iLeftVertices;
-	double		middle;
-	double		verticalPosition;
-	double		length;
-	double		step;
-	double		horizontalRatio;
-	double		verticalRatio;
-	float		twistStep;
-	fPOINT		size;
+	unsigned	nResult = 0, iStep = 0, iVertex = 0, count = 0, iRightVertices = 0, iLeftVertices = 0;
+	double		middle = 0.0;
+	double		verticalPosition = 0.0;
+	double		length = 0.0;
+	double		step = 0.0;
+	double		horizontalRatio = 0.0;
+	double		verticalRatio = 0.0;
+	float		twistStep = 0.0;
+	fPOINT		size = {};
 
 	unmsg();
 	nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, (DLGPROC)tearprc);
@@ -1790,12 +1779,12 @@ void duform(unsigned formType) {
 
 float FindDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point, double *length)
 {
-	double A = point.x - lineStart.x;
-	double B = point.y - lineStart.y;
-	double C = lineEnd.x - lineStart.x;
-	double D = lineEnd.y - lineStart.y;
-	double diffX;
-	double diffY;
+	const double A = point.x - lineStart.x;
+	const double B = point.y - lineStart.y;
+	const double C = lineEnd.x - lineStart.x;
+	const double D = lineEnd.y - lineStart.y;
+	double diffX = 0.0;
+	double diffY = 0.0;
 
 	if ((C == 0) && (D == 0))
 	{
@@ -1804,9 +1793,9 @@ float FindDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point, double 
 		return sqrt(diffX * diffX + diffY * diffY);
 	}
 
-	double dot = A * C + B * D;
-	double len_sq = C * C + D * D;
-	float param = dot / len_sq;
+	const double dot = A * C + B * D;
+	const double len_sq = C * C + D * D;
+	const float param = dot / len_sq;
 
 	if (param < 0)
 	{
@@ -1834,12 +1823,12 @@ float FindDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point, double 
 
 unsigned closfrm() {
 
-	unsigned	iForm, iVertex, closestForm, closestVertex, layerCoded, formLayer;
-	fPOINT*		vertices;
-	fPOINT		point;
-	POINT		screenCoordinate;
-	double		length, minimumLength = 1e99;
-	float		param;
+	unsigned	iForm = 0, iVertex = 0, closestForm = 0, closestVertex = 0, layerCoded = 0, formLayer = 0;
+	fPOINT*		vertices = nullptr;
+	fPOINT		point = {};
+	POINT		screenCoordinate = {};
+	double		length = 0, minimumLength = 1e99;
+	float		param = 0.0;
 
 	if (FormIndex) {
 		screenCoordinate.x = Msg.pt.x - StitchWindowOrigin.x;
@@ -1890,7 +1879,7 @@ unsigned closfrm() {
 
 void frmovlin() {
 
-	unsigned	iPoint, previousPoint;
+	unsigned	iPoint = 0, previousPoint = 0;
 
 	fvars(ClosestFormToCursor);
 	ratsr();
@@ -1917,9 +1906,9 @@ void makspac(unsigned start, unsigned count) {
 
 BOOL ritlin(fPOINT start, fPOINT finish) {
 
-	dPOINT		delta, step, point;
-	double		length;
-	unsigned	iStep, count;
+	dPOINT		delta = {}, step = {}, point = {};
+	double		length = 0.0;
+	unsigned	iStep = 0, count = 0;
 
 	delta.x = finish.x - start.x;
 	delta.y = finish.y - start.y;
@@ -1958,8 +1947,8 @@ BOOL ritlin(fPOINT start, fPOINT finish) {
 
 unsigned closflt(float xCoordinate, float yCoordinate) {
 
-	double		length, minimumLength;
-	unsigned	iVertex, closestVertex = 0;
+	double		length = 0.0, minimumLength = 0.0;
+	unsigned	iVertex = 0, closestVertex = 0;
 
 	minimumLength = 1e99;
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
@@ -1984,9 +1973,9 @@ void chkseq(BOOL border) {
 	InterleaveSequenceIndex = SequenceIndex;
 #else
 
-	double		len;
-	unsigned	iSequence, destination, savedIndex;
-	float		minimumStitchLength;
+	double		len = 0.0;
+	unsigned	iSequence = 0, destination = 0, savedIndex = 0;
+	float		minimumStitchLength = 0.0;
 
 	savedIndex = InterleaveSequenceIndex;
 	if (border) {
@@ -2159,9 +2148,9 @@ BOOL lastch() {
 
 unsigned getlast() {
 
-	unsigned	iVertex;
+	unsigned	iVertex = 0;
 	unsigned	closestVertex = 0;
-	double		length, dx, dy, minimumLength = 1e99;
+	double		length = 0.0, dx = 0.0, dy = 0.0, minimumLength = 1e99;
 
 	if (SelectedForm->fillType) {
 		lastch();
@@ -2187,13 +2176,10 @@ void flt2dub(fPOINT inPoint, dPOINT* outPoint) {
 
 void linrutb(unsigned start) {
 
-	double		spacing;
-	unsigned	iVertex;
-	dPOINT		point;
+	const double	spacing = StitchSpacing;
+	unsigned		iVertex = start + 1;
+	dPOINT			point = { (CurrentFormVertices[start].x),(CurrentFormVertices[start].y) };
 
-	spacing = StitchSpacing;
-	SelectedPoint.x = CurrentFormVertices[start].x;
-	SelectedPoint.y = CurrentFormVertices[start].y;
 	for (iVertex = start + 1; iVertex < VertexCount; iVertex++) {
 		flt2dub(CurrentFormVertices[iVertex], &point);
 		filinsb(point);
@@ -2205,7 +2191,7 @@ void linrutb(unsigned start) {
 
 void oclp(fPOINT* clip, unsigned clipEntries) {
 
-	unsigned	iClip;
+	unsigned	iClip = 1;
 
 	if (!chkMap(NOCLP)) {
 		for (iClip = 0; iClip < clipEntries; iClip++) {
@@ -2274,15 +2260,15 @@ void savblen(float fLength) {
 }
 
 constexpr float getplen() {
-	unsigned value = SelectedForm->picoLength;
+	const unsigned value = SelectedForm->picoLength;
 
 	return(static_cast<float>(value >> 8) + (value & 0xff) / 256);
 }
 
 void savplen(float length) {
 
-	unsigned	num, fr;
-	double		integerPart, fractionalPart;
+	unsigned	num = 0, fr = 0;
+	double		integerPart = 0.0, fractionalPart = 0.0;
 
 	if (length > 255)
 		length = 255;
@@ -2294,7 +2280,7 @@ void savplen(float length) {
 
 void chkbrd() {
 
-	float	length;
+	float	length = 0.0;
 
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -2381,14 +2367,12 @@ void chkbrd() {
 
 void boldlin(unsigned start, unsigned finish, double size) {
 
-	dPOINT		delta, step, point0, point1;
-	double		length;
-	unsigned	count;
-
-	delta.x = CurrentFormVertices[finish].x - CurrentFormVertices[start].x;
-	delta.y = CurrentFormVertices[finish].y - CurrentFormVertices[start].y;
-	length = hypot(delta.x, delta.y);
-	count = length / size;
+	dPOINT		delta = {(CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
+						 (CurrentFormVertices[finish].y - CurrentFormVertices[start].y)};
+	dPOINT		step = {}, point0 = {}, point1 = {};
+	const double	length = hypot(delta.x, delta.y);
+	unsigned	count = length / size;
+	
 	if (count) {
 		step.x = delta.x / count;
 		step.y = delta.y / count;
@@ -2424,11 +2408,11 @@ void boldlin(unsigned start, unsigned finish, double size) {
 
 void bold(double size) {
 
-	unsigned	iVertex, iSequence, iOutput = 0;
-	unsigned	iNextLine, iLine;
-	double		length;
+	unsigned	iVertex = 0, iSequence = 0, iOutput = 0;
+	unsigned	iNextLine = getlast();
+	unsigned	iLine = iNextLine;
+	double		length = 0.0;
 
-	iNextLine = iLine = getlast();
 	SequenceIndex = 0;
 	OSequence[SequenceIndex].x = CurrentFormVertices[iLine].x;
 	OSequence[SequenceIndex++].y = CurrentFormVertices[iLine].y;
@@ -2455,9 +2439,9 @@ void bold(double size) {
 
 void refilfn() {
 
-	double	spacing;
-	double	stitchLength = UserStitchLength;
-	float	length;
+	double	spacing = 0.0;
+	const double	stitchLength = UserStitchLength;
+	float	length = 0.0;
 
 	rstMap(TXFIL);
 	fvars(ClosestFormToCursor);
@@ -2710,7 +2694,7 @@ skpfil:;
 
 void refil() {
 
-	unsigned	codedForm, iStitch, attribute;
+	unsigned	codedForm = 0, iStitch = 0, attribute = 0;
 
 	if (!chku(WRNOF)) {
 		codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
@@ -2732,14 +2716,13 @@ void refil() {
 
 void setfpnt() {
 
-	POINT	screenCoordinate;
-	fPOINT*	vertices;
+	fvars(ClosestFormToCursor);
+
+	POINT	screenCoordinate = { (Msg.pt.x - StitchWindowOrigin.x),
+								 (Msg.pt.y - StitchWindowOrigin.y) };
+	fPOINT*	vertices = &SelectedForm->vertices[0];
 
 	unfrm();
-	fvars(ClosestFormToCursor);
-	vertices = &SelectedForm->vertices[0];
-	screenCoordinate.x = Msg.pt.x - StitchWindowOrigin.x;
-	screenCoordinate.y = Msg.pt.y - StitchWindowOrigin.y;
 	rats();
 	px2stchf(screenCoordinate, &vertices[ClosestVertexToCursor]);
 	frmout(ClosestFormToCursor);
@@ -2770,8 +2753,9 @@ constexpr unsigned prv(unsigned iVertex) {
    of the endpoints. */
 BOOL proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* intersectionPoint) {
 
-	dPOINT	delta;
-	double	sideSlope, pointConstant, sideConstant, xMinimum, xMaximum, yMinimum, yMaximum, swap;
+	dPOINT	delta = {};
+	double	sideSlope = 0.0, pointConstant = 0.0, sideConstant = 0.0, xMinimum = 0.0;
+	double	xMaximum = 0.0, yMinimum = 0.0, yMaximum = 0.0, swap = 0.0;
 
 	delta.x = point1.x - point0.x;
 	delta.y = point1.y - point0.y;
@@ -2817,10 +2801,11 @@ BOOL proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* inte
 
 // find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
 BOOL projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT* intersection) {
-	double swap, slope, deltaX;
+	double	swap = 0.0, slope = 0.0;
+	const double	deltaX = upperPoint.x - lowerPoint.x;
 
 	intersection->x = xCoordinate;
-	deltaX = upperPoint.x - lowerPoint.x;
+	
 	if (deltaX) {
 		slope = (upperPoint.y - lowerPoint.y) / deltaX;
 		intersection->y = (xCoordinate - lowerPoint.x)*slope + lowerPoint.y;
@@ -2841,10 +2826,11 @@ BOOL projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT* int
 // find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
 BOOL projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersection) {
 
-	double	swap, slope, deltaX, deltaY;
+	double	swap = 0.0, slope = 0.0;
+	const double	deltaX = point1.x - point0.x; 
+	double	deltaY = 0.0;
 
 	intersection->y = yCoordinate;
-	deltaX = point1.x - point0.x;
 	if (deltaX) {
 		deltaY = point1.y - point0.y;
 		if (deltaY) {
@@ -2869,7 +2855,7 @@ BOOL projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersectio
 
 void filang() {
 
-	unsigned	iVertex;
+	unsigned	iVertex = 0;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
 	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
@@ -2895,16 +2881,12 @@ void makpoli() {
 
 void filinu(float xCoordinate, float yCoordinate) {
 
-	unsigned	count;
-	double		length;
-	dPOINT		point, step, delta;
+	dPOINT		point = { SelectedPoint.x ,SelectedPoint.y };
+	dPOINT		delta = { (xCoordinate - SelectedPoint.x),(yCoordinate - SelectedPoint.y) };
+	const double		length = hypot(delta.x, delta.y);
+	unsigned	count = length / UserStitchLength;
+	dPOINT		step = {};
 
-	point.x = SelectedPoint.x;
-	point.y = SelectedPoint.y;
-	delta.x = xCoordinate - SelectedPoint.x;
-	delta.y = yCoordinate - SelectedPoint.y;
-	length = hypot(delta.x, delta.y);
-	count = length / UserStitchLength;
 	if (chkmax(count, SequenceIndex) || count + SequenceIndex > MAXITEMS - 3)
 		return;
 	if (count) {
@@ -2930,16 +2912,12 @@ void filinu(float xCoordinate, float yCoordinate) {
 
 void filin(dPOINT currentPoint) {
 
-	dPOINT	delta, step, point;
-	double	length;
-	int		count;
+	dPOINT	delta = { (currentPoint.x - SelectedPoint.x),(currentPoint.y - SelectedPoint.y) };
+	dPOINT	step = {};
+	dPOINT	point = { SelectedPoint.x ,SelectedPoint.y };
+	const double	length = hypot(delta.x, delta.y);
+	int		count = length / UserStitchLength;
 
-	delta.x = currentPoint.x - SelectedPoint.x;
-	delta.y = currentPoint.y - SelectedPoint.y;
-	length = hypot(delta.x, delta.y);
-	point.x = SelectedPoint.x;
-	point.y = SelectedPoint.y;
-	count = length / UserStitchLength;
 	if (chkmax(count, SequenceIndex) || (count + SequenceIndex) > MAXITEMS - 3)
 		return;
 	if (count) {
@@ -2965,12 +2943,11 @@ void filin(dPOINT currentPoint) {
 
 unsigned short isclos(SMALPNTL* lineEndPoint0, SMALPNTL* lineEndPoint1) {
 
-	float	low0, high0, low1, high1;
+	const float	low0 = lineEndPoint0[0].y - GapToClosestRegion; 
+	const float	high0 = lineEndPoint0[1].y + GapToClosestRegion;
+	const float	low1 = lineEndPoint1[0].y - GapToClosestRegion; 
+	const float	high1 = lineEndPoint1[1].y + GapToClosestRegion;
 
-	high0 = lineEndPoint0[1].y + GapToClosestRegion;
-	low0 = lineEndPoint0[0].y - GapToClosestRegion;
-	high1 = lineEndPoint1[1].y + GapToClosestRegion;
-	low1 = lineEndPoint1[0].y - GapToClosestRegion;
 	if (high0 < low1)
 		return 0;
 	if (high1 < low0)
@@ -2980,17 +2957,16 @@ unsigned short isclos(SMALPNTL* lineEndPoint0, SMALPNTL* lineEndPoint1) {
 
 BOOL lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) {
 
-	unsigned	index0, index1, count0, count1;
-	SMALPNTL*	lineEndPoint0;
-	SMALPNTL*	lineEndPoint1;
+	unsigned	index0 = 0, index1 = 0;
+	unsigned	count0 = (GroupIndexSequence[group0 + 1] - GroupIndexSequence[group0]) >> 1;
+	unsigned	count1 = 0;
+	SMALPNTL*	lineEndPoint0 = &LineEndpoints[GroupIndexSequence[group0]];
+	SMALPNTL*	lineEndPoint1 = 0;
 
 	if (group1 > GroupIndexCount - 2)
 		return 0;
 	if (!group0)
 		return 0;
-	count0 = (GroupIndexSequence[group0 + 1] - GroupIndexSequence[group0]) >> 1;
-	index0 = 0;
-	lineEndPoint0 = &LineEndpoints[GroupIndexSequence[group0]];
 	while (count0 && lineEndPoint0[index0].line != line0) {
 		count0--;
 		index0 += 2;
@@ -3014,25 +2990,21 @@ BOOL lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) {
 }
 
 BOOL regclos(unsigned iRegion0, unsigned iRegion1) {
-
-	SMALPNTL*	lineEndPoint0Start;
-	SMALPNTL*	lineEndPoint0End;
-	SMALPNTL*	lineEndPoint1Start;
-	SMALPNTL*	lineEndPoint1End;
-	unsigned	group0Start;
-	unsigned	group0End;
-	unsigned	group1Start;
-	unsigned	group1End;
-	unsigned	groupStart;
-	unsigned	groupEnd;
-	unsigned	lineStart, lineEnd;
-	unsigned	prlin, polin;
-
 	//ToDo - More renaming required
-	lineEndPoint0Start = &*SortedLines[RegionsList[iRegion0].start];
-	lineEndPoint1Start = &*SortedLines[RegionsList[iRegion1].start];
-	group1Start = lineEndPoint1Start->group;
-	group0Start = lineEndPoint0Start->group;
+
+	SMALPNTL*	lineEndPoint0Start = &*SortedLines[RegionsList[iRegion0].start];
+	SMALPNTL*	lineEndPoint0End = nullptr;
+	SMALPNTL*	lineEndPoint1Start = &*SortedLines[RegionsList[iRegion1].start];
+	SMALPNTL*	lineEndPoint1End = nullptr;
+	const unsigned	group0Start = lineEndPoint0Start->group;
+	unsigned	group0End = 0;
+	const unsigned	group1Start = lineEndPoint1Start->group;
+	unsigned	group1End = 0;
+	unsigned	groupStart = 0;
+	unsigned	groupEnd = 0;
+	unsigned	lineStart = 0, lineEnd = 0;
+	unsigned	prlin = 0, polin = 0;
+
 	if (group0Start > group1Start) {
 		groupStart = group0Start;
 		lineStart = lineEndPoint0Start->line;
@@ -3126,12 +3098,11 @@ void rspnt(float xCoordinate, float yCoordinate) {
 
 void dunseq(unsigned start, unsigned finish) {
 
-	SMALPNTL*	lineEndPoint0;
-	SMALPNTL*	lineEndPoint1;
-	unsigned	iLine;
-	double		deltaY, minimumY;
+	SMALPNTL*	lineEndPoint0 = &*SortedLines[start];
+	SMALPNTL*	lineEndPoint1 = &*SortedLines[finish];
+	unsigned	iLine = 0;
+	double		deltaY = 0.0, minimumY = 1e30;
 
-	minimumY = 1e30;
 	for (iLine = start; iLine <= finish; iLine++) {
 		lineEndPoint0 = &*SortedLines[iLine];
 		deltaY = lineEndPoint0[1].y - lineEndPoint0->y;
@@ -3139,8 +3110,6 @@ void dunseq(unsigned start, unsigned finish) {
 			minimumY = deltaY;
 	}
 	minimumY /= 2;
-	lineEndPoint0 = &*SortedLines[start];
-	lineEndPoint1 = &*SortedLines[finish];
 	if (minimumY == 1e30 / 2)
 		minimumY = 0;
 	rspnt(lineEndPoint0->x, lineEndPoint0->y + minimumY);
@@ -3150,9 +3119,8 @@ void dunseq(unsigned start, unsigned finish) {
 
 void movseq(unsigned ind) {
 
-	SMALPNTL*	lineEndPoint;
+	SMALPNTL*	lineEndPoint = &*SortedLines[ind];
 
-	lineEndPoint = &*SortedLines[ind];
 	BSequence[OutputIndex].attribute = SEQBOT;
 	BSequence[OutputIndex].x = lineEndPoint->x;
 	BSequence[OutputIndex].y = lineEndPoint->y;
@@ -3175,11 +3143,11 @@ void duseq1() {
 
 void duseq(unsigned start, unsigned finish) {
 
-	unsigned	iLine, iLineDec, savedTopLine;
+	unsigned	iLine = 0, iLineDec = 0;
+	unsigned	savedTopLine = SortedLines[start][1].line;
 
 	SequenceLines = nullptr;
 	rstMap(SEQDUN);
-	savedTopLine = SortedLines[start][1].line;
 	if (start > finish) {
 		// This odd construction for iLine is used to ensure loop terminates when finish = 0
 		for (iLine = start + 1; iLine != finish; iLine--) {
@@ -3240,7 +3208,7 @@ void duseq(unsigned start, unsigned finish) {
 
 void brkseq(unsigned start, unsigned finish) {
 
-	unsigned	iLine, iLineDec, savedGroup = 0;
+	unsigned	iLine = 0, iLineDec = 0, savedGroup = 0;
 
 	rstMap(SEQDUN);
 	if (start > finish) {
@@ -3301,22 +3269,20 @@ void brkdun(unsigned start, unsigned finish) {
 
 void durgn(unsigned pthi) {
 
-	unsigned	dun, gdif, mindif = 0, iVertex, ind, fdif, bdif;
-	unsigned	seql, seqn;
-	unsigned	sequenceStart, sequenceEnd;
-	unsigned	nextGroup, groupStart, groupEnd;
-	unsigned	iRegion;
-	SMALPNTL*	lineEndPointStart;
-	SMALPNTL*	lineEndPointEnd;
-	double		length, minimumLength;
-	BSEQPNT*	bpnt;
+	unsigned	dun = 0, gdif = 0, mindif = 0, iVertex = 0, ind = 0, fdif = 0, bdif = 0;
+	unsigned	seql = 0, seqn = 0;
+	const unsigned	sequenceStart = CurrentRegion->start;
+	const unsigned	sequenceEnd = CurrentRegion->end;
+	const unsigned	nextGroup = SequencePath[pthi].nextGroup;
+	unsigned	groupStart = 0, groupEnd = 0;
+	unsigned	iRegion = SequencePath[pthi].node;
+	SMALPNTL*	lineEndPointStart = nullptr;
+	SMALPNTL*	lineEndPointEnd = nullptr;
+	double		length = 0.0, minimumLength = 0.0;
+	BSEQPNT*	bpnt = nullptr;
 
 	//ToDo - More renaming required
-	iRegion = SequencePath[pthi].node;
 	CurrentRegion = &RegionsList[iRegion];
-	nextGroup = SequencePath[pthi].nextGroup;
-	sequenceStart = CurrentRegion->start;
-	sequenceEnd = CurrentRegion->end;
 	if (SequencePath[pthi].skp || rstMap(BRKFIX)) {
 		if (BSequence[OutputIndex - 1].attribute != SEQBOT)
 			rspnt(BSequence[OutputIndex - 2].x, BSequence[OutputIndex - 2].y);
@@ -3475,8 +3441,9 @@ void durgn(unsigned pthi) {
 
 unsigned notdun(unsigned level) {
 
-	unsigned	iPath;
-	int			pivot, previousLevel = level - 1;
+	unsigned	iPath = 1;
+	int			pivot = 0;
+	int			previousLevel = level - 1;
 
 	RegionPath = &TempPath[SequencePathIndex];
 	RegionPath[0].pcon = MapIndexSequence[DoneRegion];
@@ -3520,9 +3487,9 @@ unsigned notdun(unsigned level) {
 
 double reglen(unsigned iRegion) {
 
-	double		length, minimumLength = 1e99;
-	unsigned	iCorner, iPoint;
-	SMALPNTL*	lineEndPoints[4];
+	double		length = 0.0, minimumLength = 1e99;
+	unsigned	iCorner = 0, iPoint = 0;
+	SMALPNTL*	lineEndPoints[4] = {};
 
 	lineEndPoints[0] = SortedLines[RegionsList[iRegion].start];
 	lineEndPoints[1] = &SortedLines[RegionsList[iRegion].start][1];
@@ -3540,12 +3507,12 @@ double reglen(unsigned iRegion) {
 
 void nxtrgn() {
 
-	unsigned	iRegion, iPath, newRegion;
-	SMALPNTL*	lineEndPoint;
-	double		length, minimumLength = 1e99;
-	unsigned	pathLength;					//length of the path to the region
+	unsigned	iRegion = 0, iPath = 0, newRegion = 0;
+	SMALPNTL*	lineEndPoint = nullptr;
+	double		length = 0, minimumLength = 1e99;
+	unsigned	pathLength = 1;				//length of the path to the region
 
-	pathLength = 1;
+	
 	while (notdun(pathLength)) {
 		pathLength++;
 		if (pathLength > 8) {
@@ -3668,10 +3635,9 @@ int sqcomp(const void *arg1, const void *arg2) {
 
 void nxtseq(unsigned pathIndex) {
 
-	unsigned	nextNode, iPath;
-
-	iPath = MapIndexSequence[SequencePath[pathIndex].node];
-	nextNode = SequencePath[pathIndex + 1].node;
+	const unsigned	nextNode = SequencePath[pathIndex + 1].node; 
+	unsigned	iPath = MapIndexSequence[SequencePath[pathIndex].node];
+	
 	while (iPath < MapIndexSequence[SequencePath[pathIndex].node + 1] && PathMap[iPath].node != nextNode) {
 		iPath++;
 	}
@@ -3682,13 +3648,13 @@ void nxtseq(unsigned pathIndex) {
 
 void lcon() {
 
-	unsigned		iPath, iLine, iRegion, iSequence, iNode, bytesInBitmap;
-	unsigned		iByte, leftRegion, iOutPath, breakLine, count, startGroup;
-	REGION*			regions;
-	BOOL			isConnected;
-	RCON*			tempPathMap;
-	SMALPNTL*		lineGroupPoint;
-	unsigned		iStartLine;
+	unsigned		iPath = 0, iLine = 0, iRegion = 0, iSequence = 0, iNode = 0, bytesInBitmap = 0;
+	unsigned		iByte = 0, leftRegion = 0, iOutPath = 0, breakLine = 0, count = 0, startGroup = 0;
+	REGION*			regions = nullptr;
+	BOOL			isConnected = false;
+	RCON*			tempPathMap = nullptr;
+	SMALPNTL*		lineGroupPoint = nullptr;
+	unsigned		iStartLine = 0;
 
 #if BUGSEQ
 
@@ -3917,18 +3883,18 @@ void bakseq() {
 	SelectedForm->maxFillStitchLen = 6000;
 #else
 
-	int			count, rcnt;
-	int			iSequence, rit;
-	dPOINT		delta, point, step;
-	double		length, slope;
-	double		UserStitchLength2 = UserStitchLength * 2;
-	double		UserStitchLength9 = UserStitchLength / 9;
-	double		StitchSpacing2 = StitchSpacing * 2;
-
 	// ToDo - More renaming required
+	int		count = 0, rcnt = 0;
+	int		iSequence = OutputIndex - 1; 
+	int		rit = 0;
+	dPOINT	delta = {}, point = {}, step = {};
+	double	length = 0.0, slope = 0.0;
+	const double	UserStitchLength2 = UserStitchLength * 2;
+	const double	UserStitchLength9 = UserStitchLength / 9;
+	const double	StitchSpacing2 = StitchSpacing * 2;
+
 	SequenceIndex = 0;
 	rstMap(FILDIR);
-	iSequence = OutputIndex - 1;
 	OSequence[SequenceIndex].x = BSequence[iSequence].x;
 	OSequence[SequenceIndex].y = BSequence[iSequence].y;
 	SequenceIndex++;
@@ -4051,18 +4017,20 @@ void bakseq() {
 
 void fnvrt() {
 
-	unsigned		iVertex, iStitch, ind, ine, iLine, inf, stitchCount, lineCount = 0, tind;
-	int				stitchOffset;
-	dPOINTLINE*		projectedPoints;
-	dPOINTLINE**	projectedPointsArray;
-	double			lowX, highX, currentX, step;
-	dPOINT			point;
-	unsigned*		groupIndex;
+	unsigned		iVertex = 0, iStitch = 0, ind = 0, ine = 0;
+	unsigned		iLine = 0, inf = 0, stitchCount = 0, lineCount = 0, tind = 0;
+	int				stitchOffset = 0;
+	dPOINTLINE*		projectedPoints = nullptr;
+	dPOINTLINE**	projectedPointsArray = nullptr;
+	double			lowX = 0.0, highX = 0.0;
+	double			currentX = 0.0, step = 0.0;
+	dPOINT			point = {};
+	unsigned*		groupIndex = nullptr;
 	unsigned		maximumLines = 0;	//maximum angle fill lines for any adjusted y cordinate
 
 	CurrentFillVertices = SelectedForm->vertices;
+	highX = lowX = CurrentFillVertices[0].x;
 	VertexCount = SelectedForm->vertexCount;
-	lowX = highX = CurrentFillVertices[0].x;
 	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
 		if (CurrentFillVertices[iVertex].x > highX)
 			highX = CurrentFillVertices[iVertex].x;
@@ -4148,7 +4116,7 @@ void fnvrt() {
 
 void fnhor() {
 
-	unsigned	iVertex;
+	unsigned	iVertex = 0;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
 	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
@@ -4181,7 +4149,7 @@ void fsvrt() {
 
 void filvrt() {
 
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	if (filmsgs(FMM_VRT))
 		return;
@@ -4224,7 +4192,7 @@ void fshor() {
 
 void filhor() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FMM_HOR))
 		return;
@@ -4271,7 +4239,7 @@ void fsangl() {
 
 void filangl() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FMM_ANG))
 		return;
@@ -4308,9 +4276,9 @@ void sRct2px(fRECTANGLE stitchRect, RECT* screenRect) {
 
 void setmfrm() {
 
-	unsigned	iForm;
-	POINT		point;
-	POINT		offset;
+	unsigned	iForm = 0;
+	POINT		point = {};
+	POINT		offset = {};
 
 	sfCor2px(FormList[ClosestFormToCursor].vertices[0], &point);
 	offset.x = Msg.pt.x - StitchWindowOrigin.x - point.x + FormMoveDelta.x;
@@ -4338,14 +4306,15 @@ void unstrtch() {
 
 unsigned chkfrm() {
 
-	POINT		point, formOrigin;
-	RECT		rectangle;
-	unsigned	iControl;
-	double		length, minimumLength = 1e99;
-
 	fvars(ClosestFormToCursor);
-	point.x = Msg.pt.x - StitchWindowOrigin.x;
-	point.y = Msg.pt.y - StitchWindowOrigin.y;
+
+	POINT		point = { (Msg.pt.x - StitchWindowOrigin.x),
+						  (Msg.pt.y - StitchWindowOrigin.y) };
+	POINT		formOrigin = {};
+	RECT		rectangle = {};
+	unsigned	iControl = 0;
+	double		length = 0.0, minimumLength = 1e99;
+
 	NewFormVertexCount = SelectedForm->vertexCount + 1;
 	duzrat();
 	sRct2px(SelectedForm->rectangle, &rectangle);
@@ -4395,15 +4364,13 @@ unsigned chkfrm() {
 
 void rstfrm() {
 
-	fPOINT		offset;
-	unsigned	iVertex, iStitch;
-	POINT		point;
-	unsigned	attribute = (ClosestFormToCursor << 4);
+	fPOINT		offset = {};
+	unsigned	iVertex = 0, iStitch = 0;
+	POINT		point = { (Msg.pt.x + static_cast<long>(FormMoveDelta.x)),(Msg.pt.y + static_cast<long>(FormMoveDelta.y)) };
+	const	unsigned	attribute = (ClosestFormToCursor << 4);
 
 	setmfrm();
 	rstMap(FRMOV);
-	point.x = Msg.pt.x + FormMoveDelta.x;
-	point.y = Msg.pt.y + FormMoveDelta.y;
 	pxCor2stch(point);
 	offset.x = SelectedPoint.x - SelectedForm->vertices[0].x;
 	offset.y = SelectedPoint.y - SelectedForm->vertices[0].y;
@@ -4485,7 +4452,7 @@ void satpnt1() {
 }
 
 void satfix() {
-	unsigned iVertex;
+	unsigned iVertex = 0;
 
 	if (SatinIndex > 1) {
 		FormList[FormIndex].vertices = adflt(SatinIndex);
@@ -4505,13 +4472,11 @@ void satfix() {
 
 void delcon(unsigned GuideIndex) {
 
-	unsigned	iForm;
-	unsigned	iGuide;
-	SATCON*		guide;
-	FRMHED*		formHeader;
+	unsigned	iForm = ClosestFormToCursor + 1;
+	const unsigned	iGuide = &SelectedForm->satinOrAngle.guide[GuideIndex] - SatinConnects;
+	SATCON*		guide = &SelectedForm->satinOrAngle.guide[GuideIndex];
+	FRMHED*		formHeader = nullptr;
 
-	guide = &SelectedForm->satinOrAngle.guide[GuideIndex];
-	iGuide = &SelectedForm->satinOrAngle.guide[GuideIndex] - SatinConnects;
 	if (SatinConnectIndex > iGuide)
 		MoveMemory(guide, &guide[1], (SatinConnectIndex - iGuide + 1) * sizeof(SATCON));
 	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
@@ -4532,9 +4497,9 @@ void delcon(unsigned GuideIndex) {
 
 BOOL satselfn() {
 
-	unsigned	iForm, iVertex, layerCode;
-	double		length, minimumLength = 1e99;
-	double		deltaX, deltaY;
+	unsigned	iForm = 0, iVertex = 0, layerCode = 0;
+	double		length = 0, minimumLength = 1e99;
+	double		deltaX = 0.0, deltaY = 0.0;
 
 	px2stch();
 	for (iForm = 0; iForm < FormIndex; iForm++) {
@@ -4611,8 +4576,9 @@ scmp1 :
 scmpx :
 	}
 #else
-	unsigned short s1 = **static_cast<unsigned short * const *>(arg1);
-	unsigned short s2 = **static_cast<unsigned short * const *>(arg2);
+	const unsigned short s1 = **static_cast<unsigned short * const *>(arg1);
+	const unsigned short s2 = **static_cast<unsigned short * const *>(arg2);
+
 	if (s2 == s1) return 0;
 	if (s2 < s1) return 1;
 	return -1;
@@ -4700,7 +4666,7 @@ prvcx :
 	}
 #else
 	//Check translation
-	DWORD returnBit;
+	DWORD returnBit = 0;
 
 	if (CheckMap[bit] == 0)
 		return 0xffffffff;
@@ -4714,24 +4680,23 @@ prvcx :
 
 void satadj() {
 
-	unsigned		iGuide, iSource, iWord, iForm, iForward, iVertex, iReverse, iDestination, mapSize;
-	SATCON*			guide;
-	SATCON*			sourceGuide;
-	SATCON*			destinationGuide;
-	unsigned short	guideCount;
-	FRMHED*			formHeader;
-
 	fvars(ClosestFormToCursor);
-	guideCount = SelectedForm->satinGuideCount;
+
+	unsigned		iGuide = 0, iSource = 0, iWord = 0, iForm = 0, iForward = 0, iVertex = 0, iReverse = 0, iDestination = 0;
+	const unsigned	mapSize = (VertexCount >> 5) + 1;
+	// ToDo - what is guide used for? 
+	SATCON*			guide = new SATCON[CurrentFormConnectionsCount];
+	SATCON*			sourceGuide = nullptr;
+	SATCON*			destinationGuide = nullptr;
+	unsigned short	guideCount = SelectedForm->satinGuideCount;
+	FRMHED*			formHeader = nullptr;
+
 	for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 		if (CurrentFormGuides[iGuide].finish > VertexCount - 1)
 			CurrentFormGuides[iGuide].finish = VertexCount - 1;
 		if (CurrentFormGuides[iGuide].start > VertexCount - 1)
 			CurrentFormGuides[iGuide].start = VertexCount - 1;
 	}
-	// ToDo - what is guide used for? 
-	guide = new SATCON[CurrentFormConnectionsCount];
-	mapSize = (VertexCount >> 5) + 1;
 	CheckMap = new unsigned[mapSize];
 	iDestination = 0;
 	for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++) {
@@ -4890,13 +4855,12 @@ void satadj() {
 
 void satclos() {
 
-	unsigned	iVertex, closestVertex, swap, initialGuideCount;
-	double		deltaX, deltaY, length, minimumLength = 1e99;
+	unsigned	iVertex = 0, closestVertex = StartPoint, swap = 0;
+	unsigned	initialGuideCount = SelectedForm->satinGuideCount;
+	double		deltaX = 0.0, deltaY = 0.0, length = 0.0, minimumLength = 1e99;
 
 	uninsf();
 	px2stch();
-	initialGuideCount = SelectedForm->satinGuideCount;
-	closestVertex = StartPoint;
 	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
 		deltaX = SelectedPoint.x - SelectedForm->vertices[iVertex].x;
 		deltaY = SelectedPoint.y - SelectedForm->vertices[iVertex].y;
@@ -4993,13 +4957,16 @@ void ritseq1(unsigned ind) {
 
 void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned line2End) {
 
-	unsigned	line1Next, line2Previous, stitchCount, iSegment, line1Count, line2Count, iVertex;
-	unsigned	iNextVertex, segmentStitchCount, iLine1Vertex, iLine2Vertex, iLine1Count = 0, iLine2Count = 0;
-	unsigned	line1Segments, line2Segments;
-	unsigned*	line1StitchCounts;
-	unsigned*	line2StitchCounts;
-	double		line1Length, line2Length;
-	dPOINT		line1Point, line2Point, line1Delta, line2Delta, line1Step, line2Step;
+	unsigned	line1Next = 0, line2Previous = 0, stitchCount = 0;
+	unsigned	iSegment = 0, line1Count = 0, line2Count = 0, iVertex = 0;
+	unsigned	iNextVertex = 0, segmentStitchCount = 0, iLine1Vertex = 0;
+	unsigned	iLine2Vertex = 0, iLine1Count = 0, iLine2Count = 0;
+	unsigned	line1Segments = 0, line2Segments = 0;
+	unsigned*	line1StitchCounts = nullptr;
+	unsigned*	line2StitchCounts = nullptr;
+	double		line1Length = 0.0, line2Length = 0.0;
+	dPOINT		line1Point = {}, line2Point = {}, line1Delta = {}, line2Delta = {};
+	dPOINT		line1Step = {}, line2Step = {};
 
 	if (line1Start != line1End && line2Start != line2End) {
 		if (!setMap(SAT1)) {
@@ -5184,10 +5151,9 @@ nuseg:;
 
 void satmf() {
 
-	unsigned	iGuide, iVertex;
-	double		length, deltaX, deltaY;
+	unsigned	iGuide = 0, iVertex = 0;
+	double		length = 0.0, deltaX = 0.0, deltaY = 0.0;
 
-	iGuide = 0;
 	if (SelectedForm->attribute&FRMEND)
 		iGuide = 1;
 	satfn(iGuide, CurrentFormGuides[0].start, VertexCount, CurrentFormGuides[0].finish);
@@ -5216,13 +5182,12 @@ extern void prbug();
 
 void satfil() {
 
-	unsigned	iVertex;
-	double		length, deltaX, deltaY;
-	double		spacing;
+	unsigned		iVertex = 0;
+	double			length = 0.0, deltaX = 0.0, deltaY = 0.0;
+	const double	spacing = StitchSpacing;
 
 	fvars(ClosestFormToCursor);
 	satadj();
-	spacing = StitchSpacing;
 	StitchSpacing /= 2;
 	SequenceIndex = 0;
 	rstMap(SAT1);
@@ -5318,7 +5283,7 @@ void filsfn() {
 
 void filsat() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FMM_FAN))
 		return;
@@ -5347,10 +5312,10 @@ void filsat() {
 
 unsigned closat() {
 
-	unsigned		iForm, iVertex, lastVertex;
-	double			minimumLength = 1e99, length;
-	unsigned int	savedVertex;
-	float			param;
+	unsigned		iForm = 0, iVertex = 0, lastVertex = 0;
+	double			minimumLength = 1e99, length = 0;
+	unsigned int	savedVertex = 0;
+	float			param = 0.0;
 
 	px2stch();
 	for (iForm = 0; iForm < FormIndex; iForm++) {
@@ -5403,7 +5368,7 @@ unsigned closat() {
 
 void nufpnt(unsigned vertex) {
 
-	unsigned	ind;
+	unsigned	ind = 0;
 	unsigned	newVertex = vertex + 1;
 
 	fltspac(&FormForInsert->vertices[newVertex], 1);
@@ -5434,7 +5399,7 @@ double p2p(fPOINT point0, fPOINT point1) {
 }
 
 void insat() {
-	unsigned int lastVertex;
+	unsigned int lastVertex = 0;
 
 	if (closat()) {
 		savdo();
@@ -5487,10 +5452,10 @@ BOOL chkdel() {
 
 void delspnt() {
 
-	unsigned	iGuide, iForm;
-	SATCON*		guide;
-	fPOINT		vertex;
-	FRMHED*		formHeader;
+	unsigned	iGuide = 0, iForm = 0;
+	SATCON*		guide = nullptr;
+	fPOINT		vertex = {};
+	FRMHED*		formHeader = nullptr;
 
 	fvars(ClosestFormToCursor);
 	if (chkdel()) {
@@ -5551,8 +5516,9 @@ void delspnt() {
 
 void unfil() {
 
-	unsigned	iMap, iForm, iStitch, iSource, iDestination, codedForm, attribute;
-	unsigned	mapLength;
+	unsigned	iMap = 0, iForm = 0, iStitch = 0, iSource = 0, iDestination = 0;
+	unsigned	codedForm = 0, attribute = 0;
+	unsigned	mapLength = 0;
 
 	if (filmsgs(FMX_UNF))
 		return;
@@ -5632,17 +5598,17 @@ void satzum() {
 }
 
 void rotfrm(unsigned newStartVertex) {
-	fPOINT*			selectedVertices;
-	fPOINT*			rotatedVertices;
-	SATCON*			rotatedGuides;
-	SATCON**		rotatedGuidesArray;
-	unsigned		iVertex, iGuide, iRotatedGuide, iRotated = newStartVertex;
-	unsigned short	tlin;
 
 	fvars(ClosestFormToCursor);
-	selectedVertices = SelectedForm->vertices;
 	VertexCount = SelectedForm->vertexCount;
-	rotatedVertices = new fPOINT[VertexCount];
+
+	fPOINT*			selectedVertices = SelectedForm->vertices;
+	fPOINT*			rotatedVertices = new fPOINT[VertexCount];
+	SATCON*			rotatedGuides = nullptr;
+	SATCON**		rotatedGuidesArray = nullptr;
+	unsigned		iVertex = 0, iGuide = 0, iRotatedGuide = 0, iRotated = newStartVertex;
+	unsigned short	tlin = 0;
+
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 		rotatedVertices[iVertex].x = selectedVertices[iVertex].x;
 		rotatedVertices[iVertex].y = selectedVertices[iVertex].y;
@@ -5783,16 +5749,15 @@ void setins() {
 
 void bdrlin(unsigned start, unsigned finish, double stitchSize) {
 
-	dPOINT		delta, step, point;
-	double		length, angle;
-	unsigned	stitchCount;
+	dPOINT		delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
+						  (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
+	dPOINT		step = {}, point = {};
+	const double	length = hypot(delta.x, delta.y); 
+	double		angle = 0.0;
+	unsigned	stitchCount = 0;
 
 	//_asm finit;
-	step.x = 0;
-	step.y = 0;
-	delta.x = CurrentFormVertices[finish].x - CurrentFormVertices[start].x;
-	delta.y = CurrentFormVertices[finish].y - CurrentFormVertices[start].y;
-	length = hypot(delta.x, delta.y);
+	
 	if (chku(LINSPAC)) {
 		stitchCount = length / stitchSize + 0.5;
 		if (stitchCount) {
@@ -5824,8 +5789,8 @@ void bdrlin(unsigned start, unsigned finish, double stitchSize) {
 
 void brdfil(double pd_Size) {
 
-	unsigned	iVertex;
-	unsigned	nextVertex, currentVertex;
+	unsigned	iVertex = 0;
+	unsigned	nextVertex = 0, currentVertex = 0;
 
 	if (SelectedForm->extendedAttribute&AT_STRT)
 		currentVertex = SelectedForm->fillStart;
@@ -5861,7 +5826,7 @@ void sbord() {
 
 void bord() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FML_LIN))
 		return;
@@ -5889,13 +5854,12 @@ void bord() {
 
 BOOL ritclp(fPOINT point) {
 
-	fPOINT		adjustedPoint;
-	unsigned	iStitch;
+	fPOINT		adjustedPoint = { (point.x - ClipReference.x),
+								  (point.y - ClipReference.y) };
+	unsigned	iStitch = 0;
 
 	if (chkmax(ClipStitchCount, SequenceIndex))
 		return 1;
-	adjustedPoint.x = point.x - ClipReference.x;
-	adjustedPoint.y = point.y - ClipReference.y;
 	for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
 		OSequence[SequenceIndex].x = ClipFillData[iStitch].x + adjustedPoint.x;
 		OSequence[SequenceIndex++].y = ClipFillData[iStitch].y + adjustedPoint.y;
@@ -5905,16 +5869,14 @@ BOOL ritclp(fPOINT point) {
 
 BOOL clpsid(unsigned start, unsigned finish) {
 
-	unsigned	ind, clipCount;
-	fPOINT		delta, step, insertPoint;
-	double		length, tdub;
-	fPOINTATTR	clipReferencePoint;
+	unsigned	ind = 0, clipCount = 0;
+	fPOINT		delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
+						  (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
+	fPOINT		step = {}, insertPoint = {};
+	const double	length = hypot(delta.x, delta.y); 
+	double		tdub = 0.0;
+	fPOINTATTR	clipReferencePoint = { ClipRect.left ,ClipRect.bottom };
 
-	clipReferencePoint.x = ClipRect.left;
-	clipReferencePoint.y = ClipRect.bottom;
-	delta.x = CurrentFormVertices[finish].x - CurrentFormVertices[start].x;
-	delta.y = CurrentFormVertices[finish].y - CurrentFormVertices[start].y;
-	length = hypot(delta.x, delta.y);
 	RotationAngle = atan2(delta.y, delta.x);
 	rotang1(clipReferencePoint, &ClipReference);
 	clipCount = length / ClipRectSize.cx;
@@ -5943,14 +5905,12 @@ BOOL clpsid(unsigned start, unsigned finish) {
 
 void linsid() {
 
-	fPOINT		delta;
-	unsigned	clipCount, iStitch, iClip;
-	double		length;
+	fPOINT		delta = { (CurrentFormVertices[CurrentSide + 1].x - SelectedPoint.x),
+						  (CurrentFormVertices[CurrentSide + 1].y - SelectedPoint.y) };
+	const double	length = hypot(delta.x, delta.y);
+	const unsigned	clipCount = length / ClipRectSize.cx;
+	unsigned	iStitch = 0, iClip = 0;
 
-	delta.x = CurrentFormVertices[CurrentSide + 1].x - SelectedPoint.x;
-	delta.y = CurrentFormVertices[CurrentSide + 1].y - SelectedPoint.y;
-	length = hypot(delta.x, delta.y);
-	clipCount = length / ClipRectSize.cx;
 	if (clipCount) {
 		RotationAngle = ClipAngle;
 		rotangf(BorderClipReference, &ClipReference);
@@ -5966,8 +5926,8 @@ void linsid() {
 
 BOOL nupnt() {
 
-	double		length, delta;
-	unsigned	step;
+	double		length = 0.0, delta = 0.0;
+	unsigned	step = 0;
 
 	MoveToCoords.x = CurrentFormVertices[CurrentSide + 2].x;
 	MoveToCoords.y = CurrentFormVertices[CurrentSide + 2].y;
@@ -5988,8 +5948,8 @@ BOOL nupnt() {
 
 void lincrnr() {
 
-	dPOINT		delta;
-	unsigned	iStitch;
+	dPOINT		delta = {};
+	unsigned	iStitch = 0;
 
 	SinAngle = sin(ClipAngle);
 	CosAngle = cos(ClipAngle);
@@ -6008,10 +5968,9 @@ void lincrnr() {
 
 void durev() {
 
-	unsigned	iStitch;
-	double		midpoint;
+	unsigned	iStitch = 0;
+	const double	midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
 
-	midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
 	if (ClipBuffer[0].x > midpoint) {
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
 			ClipReversedData[iStitch].x = ClipRect.right - ClipBuffer[iStitch].x;
@@ -6034,8 +5993,8 @@ void setvct(unsigned start, unsigned finish) {
 
 void clpbrd(unsigned short startVertex) {
 
-	unsigned	iVertex, reference;
-	unsigned	currentVertex, nextVertex;
+	unsigned	iVertex = 0, reference = 0;
+	unsigned	currentVertex = 0, nextVertex = 0;
 
 	SequenceIndex = 0;
 	rstMap(CLPBAK);
@@ -6047,7 +6006,6 @@ void clpbrd(unsigned short startVertex) {
 	ClipReference.y = RotationCenter.y = (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom;
 	ClipReference.x = ClipRect.left;
 	durev();
-	reference = 0;
 	if (SelectedForm->type == FRMLINE) {
 		SelectedPoint.x = CurrentFormVertices[0].x;
 		SelectedPoint.y = CurrentFormVertices[0].y;
@@ -6081,12 +6039,12 @@ void clpbrd(unsigned short startVertex) {
 
 void outfn(unsigned start, unsigned finish, double satinWidth) {
 
-	double	angle;
-	double	length;
-	double	xOffset, yOffset;
+	double	angle = 0.0;
+	double	length = 0.0;
+	double	xOffset = 0.0, yOffset = 0.0;
 
 	if (fabs(FormAngles[start]) < TINY && fabs(FormAngles[finish]) < TINY) {
-		xOffset = 0;
+		xOffset = 0.0;
 		yOffset = satinWidth;
 	}
 	else {
@@ -6119,8 +6077,8 @@ void duangs() {
 
 void satout(double satinWidth) {
 
-	unsigned	iVertex;
-	unsigned	count;
+	unsigned	iVertex = 0;
+	unsigned	count = 0;
 
 	if (VertexCount) {
 		duangs();
@@ -6157,7 +6115,7 @@ void clpout() {
 
 void fsclp() {
 
-	unsigned	iStitch;
+	unsigned	iStitch = 0;
 
 	deleclp(ClosestFormToCursor);
 	SelectedForm->edgeType = EDGECLIP;
@@ -6178,7 +6136,7 @@ void fsclp() {
 
 void fclp() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FML_CLP))
 		return;
@@ -6220,17 +6178,13 @@ void fclp() {
 
 void filinsb(dPOINT point) {
 
-	double		length;
-	dPOINT		delta, step;
-	unsigned	count;
+	dPOINT		delta = { (point.x - SelectedPoint.x),
+						  (point.y - SelectedPoint.y) };
+	const double	length = hypot(delta.x, delta.y);
+	unsigned	count = length / MAXSTCH + 1;
+	dPOINT		step = { (delta.x / count),(delta.y / count) };
 
-	delta.x = point.x - SelectedPoint.x;
-	delta.y = point.y - SelectedPoint.y;
-	length = hypot(delta.x, delta.y);
 	if (length > MAXSTCH) {
-		count = length / MAXSTCH + 1;
-		step.x = delta.x / count;
-		step.y = delta.y / count;
 		count--;
 		if (chkmax(count, SequenceIndex))
 			return;
@@ -6252,8 +6206,8 @@ void filinsb(dPOINT point) {
 
 BOOL chkbak(dPOINT pnt) {
 
-	unsigned	iBackup;
-	double		length;
+	unsigned	iBackup = 0;
+	double		length = 0.0;
 
 	for (iBackup = 0; iBackup < 8; iBackup++) {
 		length = hypot(SatinBackup[iBackup].x - pnt.x, SatinBackup[iBackup].y - pnt.y);
@@ -6265,15 +6219,12 @@ BOOL chkbak(dPOINT pnt) {
 
 BOOL linx(fPOINT* points, unsigned start, unsigned finish, dPOINT* intersection) {
 
-	dPOINT	delta;
-	dPOINT	point;
+	dPOINT	delta = { (OutsidePoints[start].x - points[start].x),
+					  (OutsidePoints[start].y - points[start].y) };
+	dPOINT	point = { (points[start].x),(points[start].y) };
 
-	delta.x = OutsidePoints[start].x - points[start].x;
-	delta.y = OutsidePoints[start].y - points[start].y;
 	if (!delta.x && !delta.y)
 		return 0;
-	point.x = points[start].x;
-	point.y = points[start].y;
 	if (delta.x) {
 		if (proj(point, delta.y / delta.x, OutsidePoints[finish], points[finish], intersection))
 			return 1;
@@ -6297,27 +6248,26 @@ void filinsbw(dPOINT point) {
 
 void sbfn(fPOINT* insidePoints, unsigned start, unsigned finish) {
 
-	dPOINT		innerDelta, outerDelta, innerStep, outerStep, outerPoint, innerPoint;
-	dPOINT		offsetDelta, offsetStep, offset;
-	dPOINT		intersection;
-	double		innerLength, outerLength, offsetLength;
-	unsigned	count, innerFlag, outerFlag, offsetCount, iStep, ind, intersectFlag;
+	dPOINT		innerDelta = { (insidePoints[finish].x - insidePoints[start].x),
+							   (insidePoints[finish].y - insidePoints[start].y) };
+	double		innerLength = hypot(innerDelta.x, innerDelta.y);
+	dPOINT		outerDelta = { (OutsidePoints[finish].x - OutsidePoints[start].x),
+							   (OutsidePoints[finish].y - OutsidePoints[start].y) };
+	double		outerLength = hypot(outerDelta.x, outerDelta.y);
+	dPOINT		innerPoint = { insidePoints[start].x ,insidePoints[start].y };
+	dPOINT		outerPoint = { OutsidePoints[start].x ,OutsidePoints[start].y };
+	dPOINT		innerStep = {}, outerStep = {};
+	dPOINT		offsetDelta = {}, offsetStep = {}, offset = {};
+	dPOINT		intersection = {};
+	double		offsetLength = 0.0;
+	unsigned	count = 0, innerFlag = 0, outerFlag = 0, offsetCount = 0, iStep = 0;
+	unsigned	ind = 0, intersectFlag = 0;
 
 	if (!setMap(SAT1)) {
 		SelectedPoint.x = insidePoints[start].x;
 		SelectedPoint.y = insidePoints[start].y;
 	}
-	innerDelta.x = insidePoints[finish].x - insidePoints[start].x;
-	innerDelta.y = insidePoints[finish].y - insidePoints[start].y;
-	outerDelta.x = OutsidePoints[finish].x - OutsidePoints[start].x;
-	outerDelta.y = OutsidePoints[finish].y - OutsidePoints[start].y;
-	innerLength = hypot(innerDelta.x, innerDelta.y);
-	outerLength = hypot(outerDelta.x, outerDelta.y);
-	innerPoint.x = insidePoints[start].x;
-	innerPoint.y = insidePoints[start].y;
-	outerPoint.x = OutsidePoints[start].x;
-	outerPoint.y = OutsidePoints[start].y;
-	intersectFlag = SatinBackupIndex = innerFlag = outerFlag = offsetCount = 0;
+	SatinBackupIndex = 0;
 	for (ind = 0; ind < 8; ind++) {
 		SatinBackup[ind].x = (float)1e12;
 		SatinBackup[ind].y = (float)1e12;
@@ -6398,8 +6348,8 @@ void sbfn(fPOINT* insidePoints, unsigned start, unsigned finish) {
 
 void sfn(unsigned startVertex) {
 
-	unsigned	iVertex;
-	unsigned	nextVertex;
+	unsigned	iVertex = 0;
+	unsigned	nextVertex = 0;
 
 	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
 		nextVertex = nxt(startVertex);
@@ -6414,11 +6364,9 @@ void sfn(unsigned startVertex) {
 
 void sbrd() {
 
-	double		spacing;
-	unsigned	start;
-
-	start = getlast();
-	spacing = StitchSpacing;
+	const double	spacing = StitchSpacing;
+	const unsigned	start = getlast();
+	
 	rstMap(SAT1);
 	rstMap(FILDIR);
 	SequenceIndex = 1;
@@ -6438,7 +6386,7 @@ void sbrd() {
 
 void satends(unsigned isBlunt) {
 
-	fPOINT		step;
+	fPOINT		step = {};
 
 	if (isBlunt&SBLNT) {
 		step.x = sin(FormAngles[0])*HorizontalLength2 / 2;
@@ -6476,8 +6424,8 @@ void satends(unsigned isBlunt) {
 
 void slbrd() {
 
-	unsigned	iVertex;
-	double		spacing = StitchSpacing;
+	unsigned	iVertex = 0;
+	const double	spacing = StitchSpacing;
 
 	SequenceIndex = 0;
 	if (SelectedForm->edgeType&EGUND) {
@@ -6517,7 +6465,7 @@ void satsbrd() {
 
 void satbrd() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FML_ANGS))
 		return;
@@ -6553,11 +6501,10 @@ void satbrd() {
 
 void lapbrd() {
 
-	double		savedStitchLength;
-	unsigned	iVertex;
+	const double	savedStitchLength = UserStitchLength;
+	unsigned	iVertex = 0;
 
 	SequenceIndex = 0;
-	savedStitchLength = UserStitchLength;
 	// ToDo - Should APSPAC be a configurable variable instead?
 	UserStitchLength = APSPAC;
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++)
@@ -6569,8 +6516,8 @@ void lapbrd() {
 
 void apbrd() {
 
-	unsigned		iVertex;
-	unsigned short	nextVertex, currentVertex = 0;
+	unsigned		iVertex = 0;
+	unsigned short	nextVertex = 0, currentVertex = 0;
 
 	SequenceIndex = 0;
 	OSequence[SequenceIndex].x = CurrentFormVertices[currentVertex].x;
@@ -6603,7 +6550,7 @@ void sapliq() {
 
 void apliq() {
 
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	if (filmsgs(FML_APLQ))
 		return;
@@ -6637,7 +6584,7 @@ void apliq() {
 
 void setap() {
 
-	TCHAR	buffer[HBUFSIZ];
+	TCHAR	buffer[HBUFSIZ] = { 0 };
 
 	AppliqueColor = ActiveColor;
 	LoadString(ThrEdInstance, IDS_APCOL, buffer, HBUFSIZ);
@@ -6739,8 +6686,8 @@ BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam) {
 
 void refrmfn() {
 
-	char*		string;
-	unsigned	edgeFillType, iEdge;
+	char*		string = { 0 };
+	unsigned	edgeFillType = 0, iEdge = 0;
 
 	edgeFillType = SelectedForm->edgeType&NEGUND;
 	if (edgeFillType >= EDGELAST) {
@@ -7108,11 +7055,11 @@ unsigned pdir(unsigned vertex) {
 
 void setstrtch() {
 
-	FLOAT		reference = 0;
-	double		ratio = 1;
-	unsigned	iForm, iVertex, iStitch, currentVertex, currentForm;
-	fRECTANGLE	stitchRect;
-	long		offsetY, offsetX;
+	FLOAT		reference = 0.0;
+	double		ratio = 1.0;
+	unsigned	iForm = 0, iVertex = 0, iStitch = 0, currentVertex = 0, currentForm = 0;
+	fRECTANGLE	stitchRect = {};
+	long		offsetY = 0, offsetX = 0;
 
 	savdo();
 	if (chkMap(FPSEL))
@@ -7314,15 +7261,15 @@ void setstrtch() {
 
 void setexpand() {
 
-	dPOINT		reference;
-	POINT		integerReference;
-	fPOINT		stitchReference;
-	dPOINT		size0;
-	dPOINT		size1;
-	dPOINT		ratio;
-	double		aspect;
-	unsigned	iVertex, iForm, iStitch, iCurrent;
-	fRECTANGLE	rectangle;
+	dPOINT		reference = {};
+	POINT		integerReference = {};
+	fPOINT		stitchReference = {};
+	dPOINT		size0 = {};
+	dPOINT		size1 = {};
+	dPOINT		ratio = {};
+	double		aspect = 0.0;
+	unsigned	iVertex = 0, iForm = 0, iStitch = 0, iCurrent = 0;
+	fRECTANGLE	rectangle = {};
 
 	savdo();
 	if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
@@ -7494,7 +7441,7 @@ void setexpand() {
 
 void nufilcol(unsigned color) {
 
-	unsigned	attribute, iStitch;
+	unsigned	attribute = 0, iStitch = 0;
 
 	if (SelectedForm->fillColor != color) {
 		SelectedForm->fillColor = color;
@@ -7510,7 +7457,7 @@ void nufilcol(unsigned color) {
 
 void nufthcol(unsigned color) {
 
-	unsigned	attribute, iStitch;
+	unsigned	attribute = 0, iStitch = 0;
 
 	if (SelectedForm->fillInfo.feather.color != color) {
 		SelectedForm->fillInfo.feather.color = color;
@@ -7526,7 +7473,7 @@ void nufthcol(unsigned color) {
 
 void nubrdcol(unsigned color) {
 
-	unsigned	attribute, iStitch;
+	unsigned	attribute = 0, iStitch = 0;
 
 	SelectedForm->borderColor = color;
 	attribute = (ClosestFormToCursor << 4) | FRMBFIL;
@@ -7540,7 +7487,7 @@ void nubrdcol(unsigned color) {
 
 void nulapcol(unsigned color) {
 
-	unsigned	attribute, iStitch;
+	unsigned	attribute = 0, iStitch = 0;
 
 	if (static_cast<unsigned>(SelectedForm->borderColor >> 4) != color) {
 		SelectedForm->borderColor &= COLMSK;
@@ -7557,8 +7504,8 @@ void nulapcol(unsigned color) {
 
 void sidwnd(HWND wnd) {
 
-	RECT		windowRect;
-	unsigned	savedChoice;
+	RECT		windowRect = {};
+	unsigned	savedChoice = 0;
 
 	MsgIndex = 0;
 	SideWindowEntryBuffer[0] = 0;
@@ -7583,7 +7530,7 @@ void sidwnd(HWND wnd) {
 
 void prfsid(HWND wnd) {
 
-	RECT	windowRect;
+	RECT	windowRect = {};
 
 	MsgIndex = 0;
 	SideWindowEntryBuffer[0] = 0;
@@ -7614,7 +7561,7 @@ void sbold() {
 
 void dubold() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FML_BLD))
 		return;
@@ -7695,8 +7642,8 @@ void sethup() {
 
 void prfmsg() {
 
-	HDC		preferenceDC;
-	RECT	preferenceRect;
+	HDC		preferenceDC = {};
+	RECT	preferenceRect = {};
 
 	if (rstMap(INSRT))
 		setMap(WASRT);
@@ -7928,11 +7875,11 @@ void prfmsg() {
 
 void durpoli(unsigned vertexCount) {
 
-	double		stepAngle;
-	double		angle = 0;
-	double		length;
-	unsigned	iVertex;
-	dPOINT		point;
+	double		stepAngle = 0.0;
+	double		angle = 0.0;
+	double		length = 0.0;
+	unsigned	iVertex = 0;
+	dPOINT		point = {};
 
 	if (vertexCount < 3)
 		vertexCount = 3;
@@ -7971,10 +7918,10 @@ void durpoli(unsigned vertexCount) {
 
 void dustar(unsigned starCount, double length) {
 
-	double		stepAngle;
-	double		angle;
-	unsigned	iVertex, vertexCount;
-	dPOINT		point, center;
+	double		stepAngle = 0.0;
+	double		angle = 0.0;
+	unsigned	iVertex = 0, vertexCount = 0;
+	dPOINT		point = {}, center = {};
 
 	if (starCount < 3)
 		starCount = 3;
@@ -8019,14 +7966,14 @@ void dustar(unsigned starCount, double length) {
 
 void duspir(unsigned stepCount) {
 
-	double		stepAngle;
-	double		angle = 0;
-	double		length, stepRatio, ratio;
-	unsigned	iStep, iVertex, vertexCount;
-	dPOINT		point;
-	dPOINT		center;
-	fPOINT*		firstSpiral;
-	fPOINT*		centeredSpiral;
+	double		stepAngle = 0.0;
+	double		angle = 0.0;
+	double		length = 0.0, stepRatio = 0.0, ratio = 0.0;
+	unsigned	iStep = 0, iVertex = 0, vertexCount = 0;
+	dPOINT		point = {};
+	dPOINT		center = {};
+	fPOINT*		firstSpiral = nullptr;
+	fPOINT*		centeredSpiral = nullptr;
 
 	if (stepCount < 3)
 		stepCount = 3;
@@ -8082,13 +8029,13 @@ void duspir(unsigned stepCount) {
 
 void duhart(unsigned sideCount) {
 
-	double		stepAngle;
-	double		angle;
-	double		length;
-	unsigned	iVertex, lastVertex, firstVertex, iDestination;
-	float		maximumX;
-	dPOINT		point;
-	double		ratio;
+	double		stepAngle = 0.0;
+	double		angle = 0.0;
+	double		length = 0.0;
+	unsigned	iVertex = 0, lastVertex = 0, firstVertex = 0, iDestination = 0;
+	float		maximumX = 0.0;
+	dPOINT		point = {};
+	double		ratio = 0.0;
 
 	if (sideCount > 100)
 		sideCount = 100;
@@ -8149,12 +8096,12 @@ void duhart(unsigned sideCount) {
 
 void dulens(unsigned sides) {
 
-	double		stepAngle;
-	double		angle;
-	double		length;
-	unsigned	iVertex, iDestination, lastVertex, count;
-	float		av;
-	dPOINT		point;
+	double		stepAngle = 0.0;
+	double		angle = 0.0;
+	double		length = 0.0;
+	unsigned	iVertex = 0, iDestination = 0, lastVertex = 0, count = 0;
+	float		av = 0.0;
+	dPOINT		point = {};
 
 	// ToDo - this does not produce a consistent size of lens 
 	//        or the correct number of sides
@@ -8212,21 +8159,21 @@ constexpr float shreg(float highValue, float reference) {
 
 void dueg(unsigned sides) {
 
-	double		reference, maximumY;
-	unsigned	iVertex;
+	fvars(FormIndex);
 
 	if (sides < 8)
 		sides = 8;
-	fvars(FormIndex);
 	durpoli(sides);
-	reference = midl(CurrentFormVertices[sides / 2].y, CurrentFormVertices[0].y);
-	maximumY = CurrentFormVertices[sides >> 2].y - CurrentFormVertices[0].y;
-	for (iVertex = 0; iVertex < sides; iVertex++) {
+
+	const double reference = midl(CurrentFormVertices[sides / 2].y, CurrentFormVertices[0].y);
+	const double maximumY = CurrentFormVertices[sides >> 2].y - CurrentFormVertices[0].y;
+
+	for (unsigned iVertex = 0; iVertex < sides; iVertex++) {
 		if (CurrentFormVertices[iVertex].y < reference)
 			CurrentFormVertices[iVertex].y = reference - (reference - CurrentFormVertices[iVertex].y)*IniFile.eggRatio;
 	}
 	EggRatio = maximumY / (CurrentFormVertices[sides >> 2].y - CurrentFormVertices[0].y);
-	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
+	for (unsigned iVertex = 1; iVertex < VertexCount; iVertex++) {
 		CurrentFormVertices[iVertex].x = shreg(CurrentFormVertices[iVertex].x, CurrentFormVertices[0].x);
 		CurrentFormVertices[iVertex].y = shreg(CurrentFormVertices[iVertex].y, CurrentFormVertices[0].y);
 	}
@@ -8234,8 +8181,8 @@ void dueg(unsigned sides) {
 
 void duzig(unsigned vertices) {
 
-	fPOINT		offset;
-	unsigned	iVertex;
+	fPOINT		offset = {};
+	unsigned	iVertex = 0;
 
 	if (vertices < 3)
 		vertices = 3;
@@ -8275,9 +8222,9 @@ void duzig(unsigned vertices) {
 
 void fliph() {
 
-	unsigned	iForm, iVertex, iStitch, currentVertex, decodedForm;
+	unsigned	iForm = 0, iVertex = 0, iStitch = 0, currentVertex = 0, decodedForm = 0;
 	float		midpoint = 0;
-	fRECTANGLE	rectangle;
+	fRECTANGLE	rectangle = {};
 
 	fvars(ClosestFormToCursor);
 	if (chkMap(FPSEL)) {
@@ -8353,9 +8300,9 @@ void fliph() {
 
 void flipv() {
 
-	unsigned	iForm, iStitch, iVertex, currentVertex, decodedForm;
+	unsigned	iForm = 0, iStitch = 0, iVertex = 0, currentVertex = 0, decodedForm = 0;
 	float		midpoint = 0;
-	fRECTANGLE	rectangle;
+	fRECTANGLE	rectangle = {};
 
 	fvars(ClosestFormToCursor);
 	if (chkMap(FPSEL)) {
@@ -8453,12 +8400,11 @@ void tomsg() {
 
 void sprct(unsigned start, unsigned finish) {
 
-	dPOINT	delta, point;
-	VRCT2*	verticalRect;
+	dPOINT	delta = { (OutsidePoints[finish].x - OutsidePoints[start].x),
+					  (OutsidePoints[finish].y - OutsidePoints[start].y) };
+	dPOINT	point = {};
+	VRCT2*	verticalRect = &FillVerticalRect[start];
 
-	verticalRect = &FillVerticalRect[start];
-	delta.x = OutsidePoints[finish].x - OutsidePoints[start].x;
-	delta.y = OutsidePoints[finish].y - OutsidePoints[start].y;
 	if (delta.x && delta.y) {
 		Slope = -delta.x / delta.y;
 		point.x = CurrentFormVertices[finish].x;
@@ -8581,7 +8527,7 @@ void spurct(unsigned iRect) {
 
 unsigned psg() {
 
-	unsigned	temp;
+	unsigned	temp = 0;
 
 	if (!PseudoRandomValue)
 		PseudoRandomValue = SEED;
@@ -8594,9 +8540,9 @@ unsigned psg() {
 
 void duromb(dPOINT start0, dPOINT finish0, dPOINT start1, dPOINT finish1) {
 
-	dPOINT		delta0, delta1, step0, step1;
-	double		length0, length1;
-	unsigned	count, iStep;
+	dPOINT		delta0 = {}, delta1 = {}, step0 = {}, step1 = {};
+	double		length0 = 0.0, length1 = 0.0;
+	unsigned	count = 0, iStep = 0;
 
 	if (!chkMap(UND)) {
 		delta0.x = SelectedPoint.x - start0.x;
@@ -8636,21 +8582,19 @@ void duromb(dPOINT start0, dPOINT finish0, dPOINT start1, dPOINT finish1) {
 
 void spend(unsigned start, unsigned finish) {
 
-	double		innerLength, outerLength;
-	dPOINT		innerDelta, outerDelta;
-	double		startAngle, finishAngle, deltaAngle, stepAngle;
-	dPOINT		startDelta, finishDelta;
-	dPOINT		pivot;
-	double		radius, arc, innerRadius;
-	unsigned	ind, count, level;
-	dPOINT		innerPoint, outerPoint;
+	dPOINT		innerDelta = { (FillVerticalRect[finish].cipnt.x - FillVerticalRect[start].bipnt.x),
+							   (FillVerticalRect[finish].cipnt.y - FillVerticalRect[start].bipnt.y) };
+	const double	innerLength = hypot(innerDelta.x, innerDelta.y);
+	dPOINT		outerDelta = { (FillVerticalRect[finish].copnt.x - FillVerticalRect[start].bopnt.x), 
+							   (FillVerticalRect[finish].copnt.y - FillVerticalRect[start].bopnt.y) };
+	const double	outerLength = hypot(outerDelta.x, outerDelta.y);
+	double		startAngle = 0.0, finishAngle = 0.0, deltaAngle = 0.0, stepAngle = 0.0;
+	dPOINT		startDelta = {}, finishDelta = {};
+	dPOINT		pivot = {};
+	double		radius = 0.0, arc = 0.0, innerRadius = 0.0;
+	unsigned	ind = 0, count = 0, level = 0;
+	dPOINT		innerPoint = {}, outerPoint = {};
 
-	innerDelta.x = FillVerticalRect[finish].cipnt.x - FillVerticalRect[start].bipnt.x;
-	innerDelta.y = FillVerticalRect[finish].cipnt.y - FillVerticalRect[start].bipnt.y;
-	outerDelta.x = FillVerticalRect[finish].copnt.x - FillVerticalRect[start].bopnt.x;
-	outerDelta.y = FillVerticalRect[finish].copnt.y - FillVerticalRect[start].bopnt.y;
-	innerLength = hypot(innerDelta.x, innerDelta.y);
-	outerLength = hypot(outerDelta.x, outerDelta.y);
 	if (outerLength > innerLength) {
 		pivot.x = FillVerticalRect[start].cipnt.x;
 		pivot.y = FillVerticalRect[start].cipnt.y;
@@ -8700,8 +8644,8 @@ void spend(unsigned start, unsigned finish) {
 
 void duspnd(unsigned start, unsigned finish) {
 
-	double	length, angle;
-	dPOINT	point, delta;
+	double	length = 0.0, angle = 0.0;
+	dPOINT	point = {}, delta = {};
 
 	if (chkMap(UND)) {
 		if (chkMap(UNDPHAS)) {
@@ -8741,12 +8685,12 @@ void duspnd(unsigned start, unsigned finish) {
 
 void pfn(unsigned startVertex, VRCT2* vrct) {
 
-	unsigned	iVertex;
-	unsigned	nextVertex, currentVertex = startVertex;
+	unsigned	iVertex = 0;
+	unsigned	currentVertex = startVertex;
+	unsigned	nextVertex = nxt(currentVertex);
 
 	SelectedPoint.x = CurrentFormVertices[startVertex].x;
 	SelectedPoint.y = CurrentFormVertices[startVertex].y;
-	nextVertex = nxt(currentVertex);
 	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
 		duromb(vrct[currentVertex].bipnt, vrct[currentVertex].cipnt, vrct[currentVertex].bopnt, vrct[currentVertex].copnt);
 		duspnd(currentVertex, nextVertex);
@@ -8770,11 +8714,11 @@ void plfn(VRCT2* prct) {
 
 void prsmal() {
 
-	unsigned	iSequence, iOutput = 0, iReference = 0;
-	double		minimumLength, length;
-	dPOINT		delta;
+	unsigned	iSequence = 0, iOutput = 0, iReference = 0;
+	double		minimumLength = USPAC*0.8; 
+	dPOINT		delta = {};
+	double		length = 0.0;
 
-	minimumLength = USPAC*0.8;
 	if (minimumLength > HorizontalLength2)
 		minimumLength = HorizontalLength2*0.9;
 	for (iSequence = 1; iSequence < SequenceIndex; iSequence++) {
@@ -8793,7 +8737,7 @@ void prsmal() {
 void plbak(unsigned backPoint) {
 
 	unsigned	iSequence = SequenceIndex - 1;
-	fPOINT		tflt;
+	fPOINT		tflt = {};
 
 	while (iSequence > backPoint) {
 		tflt.x = OSequence[iSequence].x;
@@ -8808,12 +8752,11 @@ void plbak(unsigned backPoint) {
 
 void prebrd() {
 
-	fPOINT	delta;
-	double	ratio;
+	fPOINT	delta = { (CurrentFormVertices[1].x - CurrentFormVertices[0].x),
+					  (CurrentFormVertices[1].y - CurrentFormVertices[0].y) };
+	double	ratio = 0.0;
 
 	MoveMemory(&AngledFormVertices[1], CurrentFormVertices, sizeof(fPOINT)*VertexCount);
-	delta.x = CurrentFormVertices[1].x - CurrentFormVertices[0].x;
-	delta.y = CurrentFormVertices[1].y - CurrentFormVertices[0].y;
 	if (fabs(delta.x) > fabs(delta.y))
 		ratio = fabs(0.1 / delta.x);
 	else
@@ -8838,14 +8781,10 @@ void prebrd() {
 
 void plbrd(double edgeSpacing) {
 
-	double			spacing;
-	unsigned short	startVertex;
-	unsigned		savedIndex;
-	unsigned		iVertex;
+	unsigned		savedIndex = 0;
+	unsigned		iVertex = 0;
 
-	startVertex = getlast();
 	prebrd();
-	spacing = StitchSpacing;
 	// Ensure that we have at least 4 array members
 	FillVerticalRect = new VRCT2[VertexCount + 5];
 	UnderlayVerticalRect = new VRCT2[VertexCount + 5];
@@ -8902,16 +8841,14 @@ void plbrd(double edgeSpacing) {
 
 void pbrd(double edgeSpacing) {
 
-	double		spacing;
-	unsigned	iVertex;
-	unsigned	start;
+	const double	spacing = StitchSpacing;
+	unsigned	iVertex = 0;
+	const unsigned	start = getlast();
 
-	spacing = StitchSpacing;
 	StitchSpacing = SelectedForm->edgeSpacing;
 	SequenceIndex = 0;
 	FillVerticalRect = new VRCT2[VertexCount];
 	UnderlayVerticalRect = new VRCT2[VertexCount];
-	start = getlast();
 	satout(SelectedForm->borderSize);
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		sprct(iVertex, iVertex + 1);
@@ -8958,8 +8895,8 @@ void prpsbrd() {
 
 void prpbrd(double borderStitchSpacing) {
 
-	double		savedSpacing = StitchSpacing;
-	unsigned	iForm;
+	const double	savedSpacing = StitchSpacing;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FML_PRPS))
 		return;
@@ -9032,8 +8969,8 @@ void frmon() {
 
 void fnord() {
 
-	int			iVertex;
-	fPOINTATTR	swapPoint;
+	int			iVertex = 0;
+	fPOINTATTR	swapPoint = {};
 
 	fvars(ClosestFormToCursor);
 	SelectedForm = &FormList[ClosestFormToCursor];
@@ -9050,9 +8987,9 @@ void fnord() {
 
 void flpord() {
 
-	int			iStitch;
-	unsigned	iVertex, iForm, iForward, start, finish;
-	fPOINTATTR	swapPoint;
+	int			iStitch = 0;
+	unsigned	iVertex = 0, iForm = 0, iForward = 0, start = 0, finish = 0;
+	fPOINTATTR	swapPoint = {};
 
 	fvars(ClosestFormToCursor);
 	if (chkMap(FPSEL)) {
@@ -9121,9 +9058,9 @@ void dudif(dPOINT start, dPOINT finish, dPOINT* delta) {
 
 void trfrm(dPOINT bottomLeftPoint, dPOINT topLeftPoint, dPOINT bottomRightPoint, dPOINT topRightPoint) {
 
-	unsigned	iStitch;
-	dPOINT		topDelta, bottomDelta, leftDelta, rightDelta;
-	dPOINT		clipRatio, topMidpoint, bottomMidpoint, middleDelta;
+	unsigned	iStitch = 0;
+	dPOINT		topDelta = {}, bottomDelta = {}, leftDelta = {}, rightDelta = {};
+	dPOINT		clipRatio = {}, topMidpoint = {}, bottomMidpoint = {}, middleDelta = {};
 
 	dudif(topLeftPoint, topRightPoint, &topDelta);
 	dudif(bottomLeftPoint, bottomRightPoint, &bottomDelta);
@@ -9145,12 +9082,12 @@ void trfrm(dPOINT bottomLeftPoint, dPOINT topLeftPoint, dPOINT bottomRightPoint,
 
 void clpfm() {
 
-	unsigned	iSequence, iStep, count;
-	double		leftLength, rightLength;
-	dPOINT		leftDelta, rightDelta;
-	dPOINT		leftStep, rightStep;
-	dPOINT		bottomLeft, bottomRight;
-	dPOINT		topLeft, topRight;
+	unsigned	iSequence = 0, iStep = 0, count = 0;
+	double		leftLength = 0.0, rightLength = 0.0;
+	dPOINT		leftDelta = {}, rightDelta = {};
+	dPOINT		leftStep = {}, rightStep = {};
+	dPOINT		bottomLeft = {}, bottomRight = {};
+	dPOINT		topLeft = {}, topRight = {};
 
 	ActivePointIndex = 0;
 	for (iSequence = 0; iSequence < SequenceIndex - 2; iSequence += 2) {
@@ -9192,7 +9129,7 @@ void clpfm() {
 
 void fmclp() {
 
-	double	savedSpacing = StitchSpacing;
+	const double	savedSpacing = StitchSpacing;
 
 	StitchSpacing = ClipRectSize.cx;
 	setMap(BARSAT);
@@ -9206,7 +9143,7 @@ void fmclp() {
 
 void filsclp() {
 
-	unsigned	iClip;
+	unsigned	iClip = 0;
 
 	deltx();
 	fvars(ClosestFormToCursor);
@@ -9225,7 +9162,7 @@ void filsclp() {
 
 void clpfil() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FMM_CLP))
 		return;
@@ -9266,11 +9203,11 @@ void clpfil() {
 
 void snpfn(unsigned xIndex, unsigned length) {
 
-	unsigned	current, iPoint, finish, reference, check;
-	double		CheckLength;
+	unsigned	current = Xhistogram[xIndex]; 
+	const unsigned	finish = Xhistogram[xIndex + length];
+	unsigned	iPoint = 0, reference = 0, check = 0;
+	double		CheckLength = 0.0;
 
-	finish = Xhistogram[xIndex + length];
-	current = Xhistogram[xIndex];
 	if (finish - current) {
 		for (current = Xhistogram[xIndex]; current < Xhistogram[xIndex + 1]; current++) {
 			reference = Xpoints[current];
@@ -9316,13 +9253,14 @@ void nxtim() {
 
 void snp(unsigned start, unsigned finish) {
 
-	unsigned	iColumn, iStitch, swap, accumulator, checkLength, attribute = 0;
-	fPOINT		range;
-	unsigned*	txhst;
+	unsigned	iColumn = 0, iStitch = 0, swap = 0, accumulator = 0, checkLength = 0, attribute = 0;
+	fPOINT		range = {};
+	unsigned*	txhst = nullptr;
 
 	chkrng(&range);
+	txhst = new unsigned[static_cast<int>(range.x) + 1]();
 	Xpoints = new unsigned[MAXITEMS]();
-	Xhistogram = txhst = new unsigned[static_cast<int>(range.x) + 1];
+	Xhistogram = txhst;
 	for (iColumn = 0; iColumn < range.x; iColumn++)
 		Xhistogram[iColumn] = 0;
 	if (chkMap(FORMSEL)) {
@@ -9418,7 +9356,7 @@ nxtcolx :
 	}
 #else
 
-	DWORD	color;
+	DWORD	color = 0.0;
 
 	if (_bittest(static_cast<long *>(static_cast<void *>(&ColorBitmap)), AppliqueColor)) {
 		color = AppliqueColor;
@@ -9570,10 +9508,9 @@ void rotdup() {
 
 void adfrm(unsigned iForm) {
 
-	FRMHED*		formHeader;
+	FRMHED*		formHeader = &FormList[FormIndex];
 
 	SelectedForm = &FormList[iForm];
-	formHeader = &FormList[FormIndex];
 	frmcpy(formHeader, SelectedForm);
 	ClosestFormToCursor = FormIndex;
 	formHeader->vertices = adflt(SelectedForm->vertexCount);
@@ -9603,9 +9540,10 @@ void duprot() {
 
 void duprotfs() {
 
-	unsigned	savedFormIndex, iForm;
+	const unsigned	savedFormIndex = FormIndex;
+	unsigned	iForm = 0;
 
-	savedFormIndex = FormIndex;
+	
 	rotpar();
 	for (iForm = 0; iForm < SelectedFormCount; iForm++)
 		adfrm(SelectedFormList[iForm]);
@@ -9617,10 +9555,10 @@ void duprotfs() {
 
 void duprots() {
 
-	unsigned	source, destination;
+	unsigned	source = 0, destination = PCSHeader.stitchCount;
 
 	rngadj();
-	destination = PCSHeader.stitchCount;
+	
 	for (source = GroupStartStitch; source <= GroupEndStitch; source++) {
 		StitchBuffer[destination].x = StitchBuffer[source].x;
 		StitchBuffer[destination].y = StitchBuffer[source].y;
@@ -9638,9 +9576,8 @@ void duprots() {
 
 void cplayfn(unsigned iForm, unsigned play) {
 
-	FRMHED*		formHeader;
+	FRMHED*		formHeader = &FormList[iForm];
 
-	formHeader = &FormList[iForm];
 	fvars(FormIndex);
 	frmcpy(SelectedForm, formHeader);
 	fvars(FormIndex);
@@ -9662,7 +9599,8 @@ void cplayfn(unsigned iForm, unsigned play) {
 
 void cpylayr(unsigned codedLayer) {
 
-	unsigned	iForm, iStitch, iCurrentStitch, codedStitchLayer;
+	unsigned	iForm = 0, iStitch = 0, iCurrentStitch = 0;
+	const unsigned	codedStitchLayer = codedLayer << (LAYSHFT - 1);
 
 	if (SelectedFormCount) {
 		savdo();
@@ -9677,7 +9615,6 @@ void cpylayr(unsigned codedLayer) {
 		else {
 			if (chkMap(GRPSEL)) {
 				savdo();
-				codedStitchLayer = codedLayer << (LAYSHFT - 1);
 				rngadj();
 				iCurrentStitch = PCSHeader.stitchCount;
 				for (iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
@@ -9695,10 +9632,10 @@ void cpylayr(unsigned codedLayer) {
 
 void movlayr(unsigned codedLayer) {
 
-	unsigned	iForm, iStitch, iCurrentForm;
-	unsigned	codedStitchLayer;
+	unsigned	iForm = 0, iStitch = 0, iCurrentForm = 0;
+	const unsigned	codedStitchLayer = codedLayer << (LAYSHFT - 1);
 
-	codedStitchLayer = codedLayer << (LAYSHFT - 1);
+	
 	if (SelectedFormCount) {
 		savdo();
 		//  ToDo - use a form map rather than a marked stitch map 
@@ -9744,11 +9681,12 @@ void movlayr(unsigned codedLayer) {
 
 void join() {
 
-	unsigned	savedFormIndex, iVertex, vertexCount;
-	fPOINT*		vertexList;
-	fPOINT*		insertedVertex;
+	const unsigned	savedFormIndex = ClosestFormToCursor;
+	unsigned	iVertex = 0, vertexCount = 0;
+	fPOINT*		vertexList = nullptr;
+	fPOINT*		insertedVertex = nullptr;
 
-	savedFormIndex = ClosestFormToCursor;
+	
 	setMap(FRMSAM);
 	if (FormIndex > 1 && chkMap(FORMSEL) && closfrm()) {
 		vertexCount = FormList[ClosestFormToCursor].vertexCount;
@@ -9809,10 +9747,9 @@ BOOL chkbfil() {
 
 void refilal() {
 
-	unsigned	savedFormIndex;
+	const unsigned	savedFormIndex = ClosestFormToCursor;
 
 	savdo();
-	savedFormIndex = ClosestFormToCursor;
 	for (ClosestFormToCursor = 0; ClosestFormToCursor < FormIndex; ClosestFormToCursor++)
 		refilfn();
 	ClosestFormToCursor = savedFormIndex;
@@ -9845,7 +9782,7 @@ void nufsel() {
 
 void frmadj(unsigned formIndex) {
 
-	unsigned	iVertex;
+	unsigned	iVertex = 0;
 
 	fvars(formIndex);
 	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
@@ -9918,7 +9855,7 @@ chkrx :
 
 void frmsadj() {
 
-	unsigned	iForm, iStitch;
+	unsigned	iForm = 0, iStitch = 0;
 
 	clRmap(MAXITEMS);
 	for (iForm = 0; iForm < SelectedFormCount; iForm++)
@@ -9933,11 +9870,9 @@ void frmsadj() {
 
 void stchrct2px(fRECTANGLE stitchRect, RECT* screenRect) {
 
-	dPOINT	stitchCoord;
-	POINT	screenCoord;
+	dPOINT	stitchCoord = { stitchRect.left,stitchRect.top };
+	POINT	screenCoord = {};
 
-	stitchCoord.x = stitchRect.left;
-	stitchCoord.y = stitchRect.top;
 	sCor2px(stitchCoord, &screenCoord);
 	screenRect->left = screenCoord.x;
 	screenRect->top = screenCoord.y;
@@ -9950,8 +9885,8 @@ void stchrct2px(fRECTANGLE stitchRect, RECT* screenRect) {
 
 void getbig() {
 
-	unsigned	iForm, iStitch;
-	fRECTANGLE*	trct;
+	unsigned	iForm = 0, iStitch = 0;
+	fRECTANGLE*	trct = nullptr;
 
 	AllItemsRect.bottom = AllItemsRect.left = 1e9;
 	AllItemsRect.top = AllItemsRect.right = 0;
@@ -10002,7 +9937,7 @@ void selal() {
 void frmpnts(unsigned type) {
 
 	unsigned	iStitch = 0;
-	unsigned	trg = (ClosestFormToCursor << 4) | type;
+	const unsigned	trg = (ClosestFormToCursor << 4) | type;
 
 	while (iStitch < PCSHeader.stitchCount && (StitchBuffer[iStitch].attribute&(ALTYPMSK | FRMSK)) != trg)
 		iStitch++;
@@ -10095,21 +10030,20 @@ BOOL frmrng(unsigned iForm, RANGE* range) {
 
 void bhfn(unsigned start, unsigned finish, double spacing) {
 
-	double		length;
-	dPOINT		delta, step, outerStep, innerPoint, firstPoint, outerPoint;
-	unsigned	count, iStep;
+	dPOINT		delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
+						  (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
+	const double	length = hypot(delta.x, delta.y);
+	const unsigned	count = length / spacing;
+	dPOINT		step = { (delta.x / count),
+						 (delta.y / count) };
+	dPOINT		innerPoint = { CurrentFormVertices[start].x ,
+							   CurrentFormVertices[start].y };
+	dPOINT		outerStep = {}, firstPoint = {}, outerPoint = {};
+	unsigned	iStep = 0;
 
-	delta.x = CurrentFormVertices[finish].x - CurrentFormVertices[start].x;
-	delta.y = CurrentFormVertices[finish].y - CurrentFormVertices[start].y;
 	RotationAngle = atan2(-delta.x, delta.y);
 	outerStep.x = SelectedForm->borderSize*cos(RotationAngle);
 	outerStep.y = SelectedForm->borderSize*sin(RotationAngle);
-	length = hypot(delta.x, delta.y);
-	count = length / spacing;
-	step.x = delta.x / count;
-	step.y = delta.y / count;
-	innerPoint.x = CurrentFormVertices[start].x;
-	innerPoint.y = CurrentFormVertices[start].y;
 	if (count) {
 		for (iStep = 0; iStep < count - 1; iStep++) {
 			firstPoint.x = innerPoint.x + step.x;
@@ -10144,9 +10078,9 @@ void bhfn(unsigned start, unsigned finish, double spacing) {
 
 void bhcrnr(unsigned vertex) {
 
-	unsigned	nextVertex = nxt(vertex);
-	dPOINT		delta, point;
-	double		length, ratio;
+	const unsigned	nextVertex = nxt(vertex);
+	dPOINT		delta = {}, point = {};
+	double		length = 0.0, ratio = 0.0;
 
 	if (chkMap(INDIR)) {
 		delta.x = OutsidePoints[nextVertex].x - CurrentFormVertices[nextVertex].x;
@@ -10176,10 +10110,9 @@ void bhcrnr(unsigned vertex) {
 
 void bhbrd(double spacing) {
 
-	unsigned	vertex;
-	unsigned	nextVertex, iVertex;
+	unsigned	vertex = getlast();
+	unsigned	nextVertex = 0, iVertex = 0;
 
-	vertex = getlast();
 	SequenceIndex = 0;
 	OSequence[SequenceIndex].x = CurrentFormVertices[vertex].x;
 	OSequence[SequenceIndex++].y = CurrentFormVertices[vertex].y;
@@ -10193,7 +10126,7 @@ void bhbrd(double spacing) {
 
 void blbrd(double spacing) {
 
-	unsigned	iVertex;
+	unsigned	iVertex = 0;
 
 	SequenceIndex = 0;
 	OSequence[SequenceIndex].x = CurrentFormVertices[0].x;
@@ -10220,8 +10153,8 @@ void bholbrd() {
 
 void bhol() {
 
-	double		savedSpacing = StitchSpacing;
-	unsigned	iForm;
+	const double	savedSpacing = StitchSpacing;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FML_BHOL))
 		return;
@@ -10251,10 +10184,10 @@ void bhol() {
 
 void fcntr() {
 
-	unsigned	iForm, iVertex, iStitch, iCurrentForm, codedForm;
-	dPOINT		initialCenter;
-	dPOINT		currentCenter;
-	dPOINT		delta;
+	unsigned	iForm = 0, iVertex = 0, iStitch = 0, iCurrentForm = 0, codedForm = 0;
+	dPOINT		initialCenter = {};
+	dPOINT		currentCenter = {};
+	dPOINT		delta = {};
 
 	if (SelectedFormCount) {
 		savdo();
@@ -10300,15 +10233,13 @@ void boxsel() {
 
 void clpcrnr(unsigned vertex) {
 
-	unsigned	nextVertex = nxt(vertex);
-	unsigned	iStitch;
-	dPOINT		delta, point;
-	fPOINT		tpnt;
-	double		length, ratio;
-	fPOINTATTR	referencePoint;
+	const unsigned	nextVertex = nxt(vertex);
+	unsigned	iStitch = 0;
+	dPOINT		delta = {}, point = {};
+	fPOINT		tpnt = {};
+	double		length = 0.0, ratio = 0.0;
+	fPOINTATTR	referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left),ClipRect.top };
 
-	referencePoint.x = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
-	referencePoint.y = ClipRect.top;
 	if (chkMap(INDIR)) {
 		delta.x = OutsidePoints[nextVertex].x - CurrentFormVertices[nextVertex].x;
 		delta.y = OutsidePoints[nextVertex].y - CurrentFormVertices[nextVertex].y;
@@ -10347,26 +10278,23 @@ void clpcrnr(unsigned vertex) {
 
 void picfn(unsigned start, unsigned finish, double spacing) {
 
-	double		length, tdub;
-	dPOINT		delta, step, outerStep, innerPoint, firstPoint, outerPoint;
-	fPOINT		tpnt;
-	fPOINTATTR	referencePoint;
-	unsigned	count, iStitch, iStep;
+	dPOINT		delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
+						  (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
+	const double	length = hypot(delta.x, delta.y);
+	dPOINT		innerPoint = { CurrentFormVertices[start].x ,CurrentFormVertices[start].y };
+	fPOINTATTR	referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left),ClipRect.top };
+	double		tdub = 0.0;
+	dPOINT		step = {}, outerStep = {}, firstPoint = {}, outerPoint = {};
+	fPOINT		tpnt = {};
+	unsigned	count = 0, iStitch = 0, iStep = 0;
 
-	delta.x = CurrentFormVertices[finish].x - CurrentFormVertices[start].x;
-	delta.y = CurrentFormVertices[finish].y - CurrentFormVertices[start].y;
 	RotationAngle = atan2(-delta.x, delta.y);
 	outerStep.x = SelectedForm->borderSize*cos(RotationAngle);
 	outerStep.y = SelectedForm->borderSize*sin(RotationAngle);
-	length = hypot(delta.x, delta.y);
 	spacing += ClipRectSize.cx;
 	count = length / spacing;
-	referencePoint.x = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
-	referencePoint.y = ClipRect.top;
 	RotationAngle = atan2(delta.y, delta.x);
 	rotang1(referencePoint, &ClipReference);
-	innerPoint.x = CurrentFormVertices[start].x;
-	innerPoint.y = CurrentFormVertices[start].y;
 	if (count) {
 		step.x = 0;
 		step.y = 0;
@@ -10415,8 +10343,8 @@ picfnx:;
 
 void clpic(unsigned short start) {
 
-	unsigned	iVertex;
-	unsigned	currentVertex, nextVertex;
+	unsigned	iVertex = 0;
+	unsigned	currentVertex = start, nextVertex = 0;
 
 	SequenceIndex = 0;
 	rstMap(CLPBAK);
@@ -10454,7 +10382,7 @@ void clpic(unsigned short start) {
 
 void fspic() {
 
-	unsigned	iStitch;
+	unsigned	iStitch = 0;
 
 	deleclp(ClosestFormToCursor);
 	SelectedForm->edgeType = EDGEPICOT;
@@ -10475,7 +10403,7 @@ void fspic() {
 
 void picot() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FML_PIC))
 		return;
@@ -10517,58 +10445,34 @@ void picot() {
 
 void contf() {
 
-	unsigned	iVertex, lowIndex, highIndex, selind, lowVertexIndex, highVertexIndex, selectedVertexCount, start, finish;
-	double		lowLength, highLength, length, lowSpacing, highSpacing;
-	unsigned	highCount, lowCount, count;
-	unsigned*	lowCounts;
-	unsigned*	highCounts;
-	double*		lowLengths;
-	double*		highLengths;
-	dPOINT*		lowDeltas;
-	dPOINT*		highDeltas;
-	dPOINT*		lowSteps;
-	dPOINT*		highSteps;
-	fPOINT*		lowVertices;
-	dPOINT*		highVertices;
-	dPOINT		lowStep, lowPoint;
-	dPOINT		highStep, highPoint;
-	dPOINT		delta;
-	fPOINT*		selectionStart;
-	fPOINT*		highStart;
+	unsigned	start = SelectedForm->angleOrClipData.guide.start;
+	const unsigned	finish = SelectedForm->angleOrClipData.guide.finish;
+	const unsigned	lowVertexIndex = start;
+	const unsigned	highVertexIndex = VertexCount - start - 1;
+	const unsigned	selectedVertexCount = finish - start;
+	unsigned*	lowCounts = new unsigned[lowVertexIndex]();
+	unsigned*	highCounts = new unsigned[highVertexIndex]();
+	double*		lowLengths = new double[lowVertexIndex]();
+	double*		highLengths = new double[highVertexIndex]();
+	dPOINT*		lowDeltas = new dPOINT[lowVertexIndex]();
+	dPOINT*		highDeltas = new dPOINT[highVertexIndex]();
+	dPOINT*		lowSteps = new dPOINT[lowVertexIndex]();
+	dPOINT*		highSteps = new dPOINT[highVertexIndex]();
+	fPOINT*		lowVertices = new fPOINT[lowVertexIndex]();
+	dPOINT*		highVertices = new dPOINT[highVertexIndex]();
+	unsigned	iVertex = 0, lowIndex = 0, highIndex = 0, selind = 0;
+	double		lowLength = 0.0, highLength = 0.0, length = 0.0;
+	double		lowSpacing = 0.0, highSpacing = 0.0;
+	unsigned	highCount = 0, lowCount = 0, count = 0;
+	dPOINT		lowStep = {}, lowPoint = {};
+	dPOINT		highStep = {}, highPoint = {};
+	dPOINT		delta = {};
+	fPOINT*		selectionStart = &CurrentFormVertices[start];
 	// ToDo - rename pols, polref, polin & poldif
-	PVEC*		pols;
-	PVEC		polref, polin, poldif;
+	PVEC*		pols = new PVEC[selectedVertexCount];
+	PVEC		polref = {}, polin = {}, poldif = {};
 
 	SequenceIndex = 0;
-	start = SelectedForm->angleOrClipData.guide.start;
-	finish = SelectedForm->angleOrClipData.guide.finish;
-	highVertexIndex = VertexCount - start - 1;
-	lowVertexIndex = start;
-	selectedVertexCount = finish - start;
-	selectionStart = &CurrentFormVertices[start];
-	highStart = &CurrentFormVertices[finish];
-	lowLength = highLength = 0;
-	lowCounts = new unsigned[lowVertexIndex];
-	highCounts = new unsigned[highVertexIndex];
-
-	lowLengths = new double[lowVertexIndex];
-	highLengths = new double[highVertexIndex]();
-
-	lowDeltas = new dPOINT[lowVertexIndex];
-	highDeltas = new dPOINT[highVertexIndex]();
-	lowSteps = new dPOINT[lowVertexIndex];
-	highSteps = new dPOINT[highVertexIndex];
-	highVertices = new dPOINT[highVertexIndex]();
-
-	pols = new PVEC[selectedVertexCount];
-	lowVertices = new fPOINT[lowVertexIndex];
-
-	lowLength = lowIndex = 0;
-	lowStep.x = lowStep.y = 0;
-	lowPoint.x = lowPoint.y = 0;
-	highStep.x = highStep.y = 0;
-	highPoint.x = highPoint.y = 0;
-
 	for (iVertex = lowVertexIndex; iVertex != 0; iVertex--) {
 		lowVertices[lowIndex].x = CurrentFormVertices[iVertex].x;
 		lowVertices[lowIndex].y = CurrentFormVertices[iVertex].y;
@@ -10730,7 +10634,7 @@ BOOL contsf(unsigned formIndex) {
 
 void contfil() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FML_CONT))
 		return;
@@ -10757,8 +10661,8 @@ void contfil() {
 
 void ribon() {
 
-	FRMHED*		formHeader;
-	unsigned	iVertex, iGuide, isBlunt, iNewVertex, savedFormIndex;
+	FRMHED*		formHeader = nullptr;
+	unsigned	iVertex = 0, iGuide = 0, isBlunt = 0, iNewVertex = 0, savedFormIndex = 0;
 
 	frm1pnt();
 	if (chkMap(FORMSEL)) {
@@ -10892,9 +10796,9 @@ void bakdup() {
 
 void shrnks() {
 
-	unsigned	iVertex, ine, count;
-	dPOINT		delta;
-	double		length, ratio, deltaLength, truncationDelta;
+	unsigned	iVertex = 0, ine = 0, count = 0;
+	dPOINT		delta = {};
+	double		length = 0.0, ratio = 0.0, deltaLength = 0.0, truncationDelta = 0.0;
 
 	oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
@@ -10955,11 +10859,9 @@ void mvfrms(FRMHED* destination, FRMHED* source, unsigned count) {
 
 void dufdat(unsigned formIndex) {
 
-	FRMHED*	destination;
-	FRMHED*	source;
+	FRMHED*	destination = &TempFormList[FormRelocationIndex++];
+	FRMHED*	source = &FormList[formIndex];
 
-	destination = &TempFormList[FormRelocationIndex++];
-	source = &FormList[formIndex];
 	mvfrms(destination, source, 1);
 	mvflpnt(&TempFormVertices[FormVertexIndex], destination->vertices, destination->vertexCount);
 	destination->vertices = &FormVertices[FormVertexIndex];
@@ -11000,7 +10902,7 @@ void stchfrm(unsigned formIndex, unsigned* attribute) {
 
 void frmnumfn(unsigned newFormIndex) {
 
-	unsigned	iForm, iStitch, sourceForm, start, finish, decodedFormIndex;
+	unsigned	iForm = 0, iStitch = 0, sourceForm = 0, start = 0, finish = 0, decodedFormIndex = 0;
 
 	if (newFormIndex != ClosestFormToCursor) {
 		if (ClosestFormToCursor > newFormIndex) {
@@ -11059,7 +10961,7 @@ void frmnumfn(unsigned newFormIndex) {
 
 void frmnum() {
 
-	TCHAR	buffer[HBUFSIZ];
+	TCHAR	buffer[HBUFSIZ] = { 0 };
 
 	if (FormIndex && chkMap(FORMSEL)) {
 		LoadString(ThrEdInstance, IDS_FRML, buffer, HBUFSIZ);
@@ -11086,8 +10988,8 @@ constexpr unsigned duat(unsigned attribute) {
 		or		eax, ebx
 	}
 #else
-	unsigned type = ((attribute >> TYPSHFT) + 1) & 3;
-	unsigned frm = (attribute & FRMSK) >> 2;
+	const unsigned type = ((attribute >> TYPSHFT) + 1) & 3;
+	const unsigned frm = (attribute & FRMSK) >> 2;
 
 	return type | frm;
 #endif
@@ -11095,8 +10997,8 @@ constexpr unsigned duat(unsigned attribute) {
 
 void srtf(unsigned start, unsigned finish) {
 
-	unsigned*	stitchHistogram;
-	unsigned	iForm, iStitch, stitchAccumulator, swap;
+	unsigned*	stitchHistogram = nullptr;
+	unsigned	iForm = 0, iStitch = 0, stitchAccumulator = 0, swap = 0;
 
 	if (start != finish) {
 		stitchHistogram = new unsigned[FormIndex << 2];
@@ -11118,9 +11020,9 @@ void srtf(unsigned start, unsigned finish) {
 
 void srtbyfrm() {
 
-	unsigned	iStitch, iColor, colorAccumulator, swap;
-	unsigned	colorHistogram[16] = {};
-	unsigned	color[16];
+	unsigned	iStitch = 0, iColor = 0, colorAccumulator = 0, swap = 0;
+	unsigned	colorHistogram[16] = { 0 };
+	unsigned	color[16] = { 0 };
 
 	if (FormIndex) {
 		savdo();
@@ -11153,9 +11055,9 @@ void srtbyfrm() {
 
 void dufcntr(dPOINT* center) {
 
-	unsigned	iForm;
-	fRECTANGLE*	formRect;
-	fRECTANGLE	bigRect;
+	unsigned	iForm = 0;
+	fRECTANGLE*	formRect = nullptr;
+	fRECTANGLE	bigRect = {};
 
 	formRect = &FormList[SelectedFormList[0]].rectangle;
 	bigRect.left = formRect->left;
@@ -11179,12 +11081,12 @@ void dufcntr(dPOINT* center) {
 
 void cntrx() {
 
-	dPOINT		markCenter;
-	dPOINT		selectedCenter;
-	unsigned	iForm, iStitch;
-	BOOL		flag;
-	fRECTANGLE*	formRect;
-	fRECTANGLE	groupRect;
+	dPOINT		markCenter = {};
+	dPOINT		selectedCenter = {};
+	unsigned	iForm = 0, iStitch = 0;
+	BOOL		flag = false;
+	fRECTANGLE*	formRect = nullptr;
+	fRECTANGLE	groupRect = {};
 
 	if (chkMap(GMRK)) {
 		markCenter.x = ZoomMarkPoint.x;
@@ -11194,7 +11096,6 @@ void cntrx() {
 		markCenter.x = UnzoomedRect.x / 2;
 		markCenter.y = UnzoomedRect.y / 2;
 	}
-	flag = false;
 	if (SelectedFormCount) {
 		flag = true;
 		savdo();
@@ -11270,10 +11171,10 @@ void cntrx() {
 
 void centir() {
 
-	dPOINT		hoopCenter;
-	dPOINT		itemCenter;
-	dPOINT		delta;
-	unsigned	iVertex, iForm, iStitch;
+	dPOINT		hoopCenter = {};
+	dPOINT		itemCenter = {};
+	dPOINT		delta = {};
+	unsigned	iVertex = 0, iForm = 0, iStitch = 0;
 
 	rstMap(BIGBOX);
 	getbig();
@@ -11299,10 +11200,10 @@ void centir() {
 
 void bean(unsigned start, unsigned finish) {
 
-	unsigned	iOutputStitch, iSourceStitch, iCopyStitch;
+	unsigned	iOutputStitch = start; 
+	unsigned	iSourceStitch = start;
+	unsigned	iCopyStitch = MAXITEMS;
 
-	iCopyStitch = MAXITEMS;
-	iSourceStitch = start;
 	BeanCount = 0;
 	mvstch(iCopyStitch++, iSourceStitch);
 	if (StitchBuffer[iSourceStitch + 2].x != StitchBuffer[iSourceStitch].x || StitchBuffer[iSourceStitch + 2].y != StitchBuffer[iSourceStitch].y) {
@@ -11337,7 +11238,6 @@ void bean(unsigned start, unsigned finish) {
 	iSourceStitch++;
 	while (iSourceStitch < PCSHeader.stitchCount)
 		mvstch(iCopyStitch++, iSourceStitch++);
-	iOutputStitch = start;
 	for (iSourceStitch = MAXITEMS; iSourceStitch < iCopyStitch; iSourceStitch++)
 		mvstch(iOutputStitch++, iSourceStitch);
 	PCSHeader.stitchCount = iOutputStitch;
@@ -11364,9 +11264,8 @@ void dubean() {
 
 void unbean(unsigned start, unsigned finish) {
 
-	unsigned	iSource, iCopy;
+	unsigned	iSource = start, iCopy = MAXITEMS;
 
-	iCopy = MAXITEMS;
 	BeanCount = 0;
 	for (iSource = start; iSource <= finish; iSource++) {
 		mvstch(iCopy++, iSource);
@@ -11449,7 +11348,7 @@ void clpspac(fPOINT* insertPoint, unsigned count) {
 
 void stchadj() {
 
-	unsigned	iStitch, low, high;
+	unsigned	iStitch = 0, low = 0, high = 0;
 
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		high = StitchBuffer[iStitch].attribute&FRMSK;
@@ -11475,11 +11374,10 @@ void stchadj() {
 
 void spltsat(SATCON currentGuide) {
 
-	fPOINT*		vertexBuffer;
-	unsigned	iForm, iGuide, iVertex, iOldVertex, iNewVertex, oldLastVertex;
-
 	// We are adding two additional vertices when splitting the form
-	vertexBuffer = new fPOINT[VertexCount + 2];
+	fPOINT*		vertexBuffer = new fPOINT[VertexCount + 2];
+	unsigned	iForm = 0, iGuide = 0, iVertex = 0, iOldVertex = 0, iNewVertex = 0, oldLastVertex = 0;
+
 	mvfrmsb(&FormList[FormIndex], &FormList[FormIndex - 1], FormIndex - ClosestFormToCursor);
 	FormIndex++;
 	if (ClosestFormToCursor < FormIndex - 2)
@@ -11560,7 +11458,7 @@ void spltsat(SATCON currentGuide) {
 
 BOOL spltlin() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (ClosestVertexToCursor < 2 || SelectedForm->vertexCount - ClosestVertexToCursor < 2)
 		return 0;
@@ -11619,7 +11517,7 @@ void spltfrm() {
 
 void stchs2frm() {
 
-	unsigned	iStitch, iVertex, vertexCount;
+	unsigned	iStitch = 0, iVertex = 0, vertexCount = 0;
 
 	if (chkMap(GRPSEL)) {
 		rngadj();
@@ -11681,7 +11579,7 @@ lcmp2 :
 lcmpx :
 	}
 #else
-	float local1 = **static_cast<float * const *>(arg1), local2 = **static_cast<float * const *>(arg2);
+	const float local1 = **static_cast<float * const *>(arg1), local2 = **static_cast<float * const *>(arg2);
 
 	if (local1 < local2)
 		return -1;
@@ -11695,7 +11593,7 @@ lcmpx :
 
 void chksid(unsigned vertexIndex) {
 
-	unsigned	iVertex, limit;
+	unsigned	iVertex = 0, limit = 0;
 
 	if (ClipIntersectSide != vertexIndex) {
 		if ((vertexIndex - ClipIntersectSide + VertexCount) % VertexCount < (VertexCount >> 1)) {
@@ -11720,10 +11618,9 @@ void chksid(unsigned vertexIndex) {
 
 void ritseg() {
 
-	unsigned	iPoint;
-	BOOL		isPointedEnd;
+	unsigned	iPoint = 0;
+	BOOL		isPointedEnd = true;
 
-	isPointedEnd = true;
 	if (SelectedForm->extendedAttribute&AT_SQR)
 		isPointedEnd = false;
 	if (chkMap(FILDIR)) {
@@ -11759,7 +11656,7 @@ void ritseg() {
 	ClipSegments[ActivePointIndex].dun = 1;
 }
 
-unsigned lenref(const float* lineLength) {
+unsigned lenref(const float *lineLength) {
 #if	 __UseASM__
 	_asm {
 		mov		eax, lineLength
@@ -11772,32 +11669,33 @@ unsigned lenref(const float* lineLength) {
 		cmp		dl, 18
 		jne		short lrefx
 		inc		eax
-lrefx :
+		lrefx :
 	}
 #else
+
 	//Correct (randomization?)
-	unsigned eax = reinterpret_cast<unsigned>(lineLength) - reinterpret_cast<unsigned>(ClipSegments);
+	[[gsl::suppress(type.1)]]{
+		unsigned eax = reinterpret_cast<unsigned>(lineLength) - reinterpret_cast<unsigned>(ClipSegments);
 
-	unsigned edx = eax % 29;
-	eax /= 29;
+		const unsigned edx = eax % 29;
+		eax /= 29;
 
-	eax <<= 1;
+		eax <<= 1;
 
-	if ((edx & 0xFF) == 18)
-		eax++;
+		if ((edx & 0xFF) == 18)
+			eax++;
 
-	return eax;
+		return eax;
+	}
 #endif
 }
 
 BOOL clpnxt(unsigned sind) {
 	// ToDo - rename local variables
 
-	unsigned	ind;
-	unsigned	indexDoubled;	//clipboard segment index * 2
+	unsigned	ind = 1;
+	const unsigned	indexDoubled = ClipSegmentIndex << 1;
 
-	ind = 1;
-	indexDoubled = ClipSegmentIndex << 1;
 	rstMap(FILDIR);
 	while (ind < ClipSegmentIndex) {
 		if (toglMap(FILDIR)) {
@@ -11817,7 +11715,7 @@ BOOL clpnxt(unsigned sind) {
 
 BOOL nucseg() {
 
-	unsigned	ind;
+	unsigned	ind = 0;
 
 	if (chkMap(FILDIR))
 		ind = ClipSegments[ActivePointIndex].endIndex;
@@ -11901,8 +11799,8 @@ clpcmpx :
 	}
 #else
 
-	const VCLPX	vclpx1 = *static_cast<const VCLPX *>(arg1);
-	const VCLPX	vclpx2 = *static_cast<const VCLPX *>(arg2);
+	VCLPX	vclpx1 = *static_cast<const VCLPX *>(arg1);
+	VCLPX	vclpx2 = *static_cast<const VCLPX *>(arg2);
 
 	if (vclpx1.segment < vclpx2.segment)
 		return -1;
@@ -11922,18 +11820,13 @@ clpcmpx :
 
 BOOL isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* length) {
 
-	dPOINT	delta;
-	dPOINT	point;
-	dPOINT	tempIntersection;
-	BOOL	flag;
-	float	left;
-	float	right;
+	dPOINT	delta = {(LineSegmentEnd.x - LineSegmentStart.x),(LineSegmentEnd.y - LineSegmentStart.y)};
+	dPOINT	point = {(LineSegmentStart.x),(LineSegmentStart.y)};
+	dPOINT	tempIntersection = {};
+	BOOL	flag = false;
+	float	left = 0.0;
+	float	right = 0.0;
 
-	delta.x = LineSegmentEnd.x - LineSegmentStart.x;
-	delta.y = LineSegmentEnd.y - LineSegmentStart.y;
-	point.x = LineSegmentStart.x;
-	point.y = LineSegmentStart.y;
-	flag = false;
 	if (delta.x && delta.y)
 		flag = proj(point, delta.y / delta.x, CurrentFormVertices[vertex0], CurrentFormVertices[vertex1], &tempIntersection);
 	else {
@@ -11978,10 +11871,10 @@ BOOL isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* leng
 
 unsigned insect() {
 
-	unsigned	iRegions, iDestination, iIntersection, count;
-	unsigned	currentVertex, nextVertex;
-	fRECTANGLE	lineSegmentRect;
-	fPOINT*		intersection;
+	unsigned	iRegions = 0, iDestination = 0, iIntersection = 0, count = 0;
+	unsigned	currentVertex = 0, nextVertex = 0;
+	fRECTANGLE	lineSegmentRect = {};
+	fPOINT*		intersection = nullptr;
 
 	if (LineSegmentEnd.x > LineSegmentStart.x) {
 		lineSegmentRect.left = LineSegmentStart.x;
@@ -12032,9 +11925,9 @@ unsigned insect() {
 BOOL isin(float xCoordinate, float yCoordinate) {
 	// ToDo - rename local variables
 
-	unsigned	iRegion, acnt;
-	unsigned	svrt, nvrt;
-	dPOINT		ipnt;
+	unsigned	iRegion = 0, acnt = 0;
+	unsigned	svrt = 0, nvrt = 0;
+	dPOINT		ipnt = {};
 
 	if (xCoordinate < BoundingRect.left)
 		return 0;
@@ -12044,7 +11937,6 @@ BOOL isin(float xCoordinate, float yCoordinate) {
 		return 0;
 	if (yCoordinate > BoundingRect.top)
 		return 0;
-	acnt = 0;
 	for (iRegion = RegionCrossingStart; iRegion < RegionCrossingEnd; iRegion++) {
 		svrt = RegionCrossingData[iRegion].vertex;
 		nvrt = nxt(svrt);
@@ -12114,10 +12006,9 @@ vscmpx :
 
 void duflt() {
 
-	unsigned	iVertex;
-	float		leftEdge;
+	unsigned	iVertex = 0;
+	float		leftEdge = 1e9;
 
-	leftEdge = 1e9;
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 		if (CurrentFormVertices[iVertex].x < leftEdge)
 			leftEdge = CurrentFormVertices[iVertex].x;
@@ -12145,22 +12036,22 @@ void inspnt() {
 
 void clpcon() {
 
-	RECT		clipGrid;
-	unsigned	iSegment, iStitchPoint, iVertex, iPoint, iSorted, iSequence, vertex;
-	unsigned	swap, iRegion, sortedCount, ine, nextVertex, regionSegment, iStitch;
-	unsigned	lineOffset, negativeOffset, clipNegative;
-	unsigned	start, finish, segmentCount, regionCount, previousPoint;
+	RECT		clipGrid = {};
+	unsigned	iSegment = 0, iStitchPoint = 0, iVertex = 0, iPoint = 0, iSorted = 0, iSequence = 0, vertex = 0;
+	unsigned	swap = 0, iRegion = 0, sortedCount = 0, ine = 0, nextVertex = 0, regionSegment = 0, iStitch = 0;
+	unsigned	lineOffset = 0, negativeOffset = 0, clipNegative = 0;
+	unsigned	start = 0, finish = 0, segmentCount = 0, regionCount = 0, previousPoint = 0;
 	// ToDo - rename variables
-	unsigned	inf, ing, cnt;
-	int			iVerticalGrid, textureLine;
-	fPOINT		pasteLocation;
-	double		totalLength, minx;
-	float		formNegativeOffset;
-	unsigned	clipGridOffset;
-	double		clipVerticalOffset;
+	unsigned	inf = 0, ing = 0, cnt = 0;
+	int			iVerticalGrid = 0, textureLine = 0;
+	fPOINT		pasteLocation = {};
+	double		totalLength = 0.0, minx = 0.0;
+	float		formNegativeOffset = 0.0;
+	unsigned	clipGridOffset = 0;
+	double		clipVerticalOffset = 0.0;
 	TXPNT*		texture = nullptr;
-	unsigned*	iclpx;			//indices into region crossing data for vertical clipboard fills
-	unsigned	clplim;			//vertical clipboard search limit
+	unsigned*	iclpx = nullptr;			//indices into region crossing data for vertical clipboard fills
+	unsigned	clplim = 0;			//vertical clipboard search limit
 
 	duflt();
 	ClipWidth = ClipRectSize.cx + SelectedForm->fillSpacing;
@@ -12499,7 +12390,7 @@ clp1skp:;
 
 void vrtsclp() {
 
-	unsigned	iStitch;
+	unsigned	iStitch = 0;
 
 	fvars(ClosestFormToCursor);
 	delmclp(ClosestFormToCursor);
@@ -12521,7 +12412,7 @@ void vrtsclp() {
 
 void vrtclp() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FMM_CLP))
 		return;
@@ -12565,8 +12456,8 @@ void vrtclp() {
 
 void angout() {
 
-	fRECTANGLE*	rectangle;
-	unsigned	iVertex;
+	fRECTANGLE*	rectangle = nullptr;
+	unsigned	iVertex = 1;
 
 	if (AngledForm.vertexCount) {
 		rectangle = &AngledForm.rectangle;
@@ -12588,7 +12479,7 @@ void angout() {
 
 void horclpfn() {
 
-	unsigned	iVertex;
+	unsigned	iVertex = 0;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
 	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
@@ -12611,7 +12502,7 @@ void horclpfn() {
 
 void horsclp() {
 
-	unsigned	iStitch;
+	unsigned	iStitch = 0;
 
 	fvars(ClosestFormToCursor);
 	delmclp(ClosestFormToCursor);
@@ -12635,7 +12526,7 @@ void horsclp() {
 
 void horclp() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FMM_CLP))
 		return;
@@ -12679,8 +12570,8 @@ void horclp() {
 
 void angclpfn() {
 
-	unsigned	iVertex;
-	fPOINT*		vertexList;
+	unsigned	iVertex = 0;
+	fPOINT*		vertexList = nullptr;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
 	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
@@ -12717,7 +12608,7 @@ void angclpfn() {
 
 void angsclp() {
 
-	unsigned	iStitch;
+	unsigned	iStitch = 0;
 
 	fvars(ClosestFormToCursor);
 	delmclp(ClosestFormToCursor);
@@ -12740,7 +12631,7 @@ void angsclp() {
 
 void angclp() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FMM_CLP))
 		return;
@@ -12784,7 +12675,7 @@ void angclp() {
 
 void dubfn() {
 
-	unsigned	iBackward, iForward;
+	unsigned	iBackward = 0, iForward = 0;
 
 	brdfil(SelectedForm->edgeStitchLen);
 	iForward = SequenceIndex;
@@ -12808,7 +12699,7 @@ void dubsfil() {
 
 void dubfil() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FML_LIN))
 		return;
@@ -12834,16 +12725,17 @@ void dubfil() {
 
 void col2frm() {
 
-	unsigned*	fillColorHistogram;
-	unsigned*	borderColorHistogram;
-	unsigned*	featherColorHistogram;
-	unsigned*	underlayColorHistogram;
-	unsigned	iStitch, iForm, iColor, formColorCode, count, majorityColor;
-	unsigned	startColorOffset, endColorOffset, colorChangedCount, formColorPermutations;
-	TCHAR		buffer[HBUFSIZ];
+	unsigned*	fillColorHistogram = nullptr;
+	unsigned*	borderColorHistogram = nullptr;
+	unsigned*	featherColorHistogram = nullptr;
+	unsigned*	underlayColorHistogram = nullptr;
+	unsigned	iStitch = 0, iForm = 0, iColor = 0, formColorCode = 0, count = 0, majorityColor = 0;
+	unsigned	startColorOffset = 0, endColorOffset = 0, colorChangedCount = 0; 
+	unsigned	formColorPermutations = FormIndex << 4; // total number of form and color combinations
+	TCHAR		buffer[HBUFSIZ] = { 0 };
 
-	colorChangedCount = 0;
-	formColorPermutations = FormIndex << 4; // total number of form and color combinations
+	
+	
 	if (FormIndex) {
 		fillColorHistogram = new unsigned[formColorPermutations]();
 		borderColorHistogram = new unsigned[formColorPermutations]();
@@ -12944,8 +12836,8 @@ void col2frm() {
 
 BOOL fxpnt() {
 
-	double		length, delta;
-	unsigned	iChainStitch;
+	double		length = 0.0, delta = 0.0;
+	unsigned	iChainStitch = 0;
 
 	MoveToCoords.x = CurrentFormVertices[NextStart].x;
 	MoveToCoords.y = CurrentFormVertices[NextStart].y;
@@ -12967,9 +12859,9 @@ BOOL fxpnt() {
 
 void fxlit() {
 
-	double		length;
-	unsigned	count;
-	dPOINT		delta;
+	double		length = 0.0;
+	unsigned	count = 0;
+	dPOINT		delta = {};
 
 	if (fxpnt()) {
 		SelectedPoint.x = MoveToCoords.x;
@@ -12987,10 +12879,10 @@ void fxlit() {
 
 void fxlin() {
 
-	double		length;
-	unsigned	count;
-	unsigned	iChain;
-	dPOINT		delta;
+	double		length = 0.0;
+	unsigned	count = 0;
+	unsigned	iChain = 0;
+	dPOINT		delta = {};
 
 	if (fxpnt()) {
 		ChainEndPoints[ActivePointIndex].x = SelectedPoint.x = MoveToCoords.x;
@@ -13012,16 +12904,16 @@ void fxlin() {
 
 void fxlen() {
 
-	double		interval;
-	double		minimumInterval;
-	double		minimumSpacing;
-	double		largestSpacing;
-	double		smallestSpacing;
-	double		halfSpacing;
-	unsigned	initialCount;
-	unsigned	loopCount;
-	unsigned	iVertex;
-	double		length;
+	double		interval = 0.0;
+	double		minimumInterval = 0.0;
+	double		minimumSpacing = 0.0;
+	double		largestSpacing = 0.0;
+	double		smallestSpacing = 0.0;
+	double		halfSpacing = 0.0;
+	unsigned	initialCount = 0;
+	unsigned	loopCount = 0;
+	unsigned	iVertex = 0;
+	double		length = 0.0;
 
 	AdjustedSpace = 0;
 	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
@@ -13116,28 +13008,22 @@ fxlab:;
 
 void duchfn(unsigned start, unsigned finish) {
 
-	fPOINT		chainPoint[5];
-	float		middleXcoord;
-	float		middleYcoord;
-	dPOINT		delta;
-	dPOINT		lengthDelta;
-	dPOINT		offset;
-	unsigned	iChain;
-	double		angle;
+	fPOINT		chainPoint[5] = {};
+	dPOINT		delta = { (ChainEndPoints[finish].x - ChainEndPoints[start].x),
+						  (ChainEndPoints[finish].y - ChainEndPoints[start].y) };
+	dPOINT		lengthDelta = { (delta.x*SelectedForm->edgeStitchLen),
+								(delta.y*SelectedForm->edgeStitchLen) };
+	float		middleXcoord = ChainEndPoints[start].x + lengthDelta.x;
+	float		middleYcoord = ChainEndPoints[start].y + lengthDelta.y;
+	unsigned	iChain = 0;
+	double		angle = atan2(delta.y, delta.x) + PI / 2;
+	dPOINT		offset = { (cos(angle)*SelectedForm->borderSize),
+						   (sin(angle)*SelectedForm->borderSize) };
 
-	delta.x = ChainEndPoints[finish].x - ChainEndPoints[start].x;
-	delta.y = ChainEndPoints[finish].y - ChainEndPoints[start].y;
-	lengthDelta.x = delta.x*SelectedForm->edgeStitchLen;
-	lengthDelta.y = delta.y*SelectedForm->edgeStitchLen;
 	chainPoint[0].x = ChainEndPoints[start].x;
 	chainPoint[0].y = ChainEndPoints[start].y;
 	chainPoint[4].x = ChainEndPoints[finish].x;
 	chainPoint[4].y = ChainEndPoints[finish].y;
-	angle = atan2(delta.y, delta.x) + PI / 2;
-	offset.x = cos(angle)*SelectedForm->borderSize;
-	offset.y = sin(angle)*SelectedForm->borderSize;
-	middleXcoord = ChainEndPoints[start].x + lengthDelta.x;
-	middleYcoord = ChainEndPoints[start].y + lengthDelta.y;
 	chainPoint[1].x = middleXcoord + offset.x;
 	chainPoint[1].y = middleYcoord + offset.y;
 	chainPoint[3].x = middleXcoord - offset.x;
@@ -13154,9 +13040,8 @@ void duchfn(unsigned start, unsigned finish) {
 }
 
 void duch() {
-	// ToDo - should iPoint be iVertex?
 
-	unsigned	iPoint, backupAt;
+	unsigned	iPoint = 0, backupAt = 0;
 
 	Div4 = AdjustedSpace / 4;
 	SequenceIndex = 0;
@@ -13188,7 +13073,7 @@ void duch() {
 
 void dufxlen() {
 
-	unsigned	iVertex;
+	unsigned	iVertex = 0;
 
 	duangs();
 	ListSINEs = new double[VertexCount + 1];
@@ -13234,7 +13119,7 @@ void chan() {
 
 void chain() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FML_CHAIN))
 		return;
@@ -13263,12 +13148,11 @@ void chain() {
 
 BOOL cisin(float xCoordinate, float yCoordinate) {
 
-	unsigned	iVertex, count;
-	unsigned	nextVertex;
-	dPOINT		intersection;
-	fRECTANGLE*	rectangle;
+	unsigned	iVertex = 0, count = 0;
+	unsigned	nextVertex = 0;
+	dPOINT		intersection = {};
+	fRECTANGLE*	rectangle = &SelectedForm->rectangle;
 
-	rectangle = &SelectedForm->rectangle;
 	if (xCoordinate >= rectangle->right)
 		return 0;
 	if (xCoordinate <= rectangle->left)
@@ -13302,7 +13186,7 @@ BOOL cisin(float xCoordinate, float yCoordinate) {
 
 void crop() {
 
-	unsigned	iSource, iDestination;
+	unsigned	iSource = 0, iDestination = 0;
 
 	frm1pnt();
 	if (chkMap(FORMSEL)) {
@@ -13328,17 +13212,13 @@ void crop() {
 
 void xclpfn(unsigned start, unsigned finish) {
 
-	unsigned	iPoint;
-	dPOINT		delta;
-	double		length;
-	double		ratio;
-	fPOINT*		points;
-
-	points = new fPOINT[ClipStitchCount];
-	delta.x = ChainEndPoints[finish].x - ChainEndPoints[start].x;
-	delta.y = ChainEndPoints[finish].y - ChainEndPoints[start].y;
-	length = hypot(delta.x, delta.y);
-	ratio = length / ClipRectSize.cx;
+	unsigned	iPoint = 0;
+	dPOINT		delta = { (ChainEndPoints[finish].x - ChainEndPoints[start].x),
+						  (ChainEndPoints[finish].y - ChainEndPoints[start].y) };
+	double		length = hypot(delta.x, delta.y);
+	double		ratio = length / ClipRectSize.cx;
+	fPOINT*		points = new fPOINT[ClipStitchCount];
+	
 	RotationAngle = atan2(delta.y, delta.x);
 	for (iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
 		points[iPoint].x = TempClipPoints[iPoint].x*ratio;
@@ -13372,9 +13252,9 @@ void duxclp() {
 
 void dulast() {
 
-	unsigned	iPoint, iDestination, minimumIndex;
-	double		minimumLength;
-	double		length;
+	unsigned	iPoint = 0, iDestination = 0, minimumIndex = 0;
+	double		minimumLength = 0.0;
+	double		length = 0.0;
 
 	TempClipPoints = static_cast<fPOINT*>(&ChainEndPoints[ActivePointIndex]);
 	if (lastch()) {
@@ -13404,8 +13284,8 @@ void dulast() {
 
 void clpxadj() {
 
-	unsigned	iPoint;
-	double		pivot;
+	unsigned	iPoint = 0;
+	double		pivot = 0.0;
 
 	dulast();
 	if (SelectedForm->type == FRMLINE) {
@@ -13425,7 +13305,7 @@ void clpxadj() {
 
 void fsclpx() {
 
-	unsigned	iPoint;
+	unsigned	iPoint = 0;
 
 	deleclp(ClosestFormToCursor);
 	SelectedForm->edgeType = EDGECLIPX;
@@ -13446,7 +13326,7 @@ void fsclpx() {
 
 void filclpx() {
 
-	unsigned	iForm;
+	unsigned	iForm = 0;
 
 	if (filmsgs(FML_CLP))
 		return;
@@ -13491,7 +13371,7 @@ void filclpx() {
 BOOL CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	TCHAR	buffer[HBUFSIZ];
+	TCHAR	buffer[HBUFSIZ] = { 0 };
 
 	switch (umsg) {
 		case WM_INITDIALOG:
@@ -13551,14 +13431,14 @@ reinit:;
 
 void wavfrm() {
 
-	unsigned	iVertex, iPoint, vertexCount, iNextVertex, iLobe;
-	unsigned	end;
-	unsigned	count;
-	fPOINT*		points;
-	fPOINT		currentPosition;
-	double		horizontalRatio;
-	double		verticalRatio;
-	fPOINT		selectedSize;
+	unsigned	iVertex = 0, iPoint = 0, vertexCount = 0, iNextVertex = 0, iLobe = 0;
+	unsigned	end = 0;
+	unsigned	count = 0;
+	fPOINT*		points = nullptr;
+	fPOINT		currentPosition = {};
+	double		horizontalRatio = 0.0;
+	double		verticalRatio = 0.0;
+	fPOINT		selectedSize = {};
 
 	unmsg();
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, (DLGPROC)wavprc)) {
@@ -13640,9 +13520,9 @@ void wavfrm() {
 
 void srtfrm() {
 
-	unsigned	iStitch, iForm, iHighStitch, totalStitches, formStitchCount;
-	unsigned	histogram[MAXFORMS];
-	fPOINTATTR*	highStitchBuffer;
+	unsigned	iStitch = 0, iForm = 0, iHighStitch = 0, totalStitches = 0, formStitchCount = 0;
+	unsigned	histogram[MAXFORMS] = { 0 };
+	fPOINTATTR*	highStitchBuffer = nullptr;
 
 	if (PCSHeader.stitchCount) {
 		savdo();

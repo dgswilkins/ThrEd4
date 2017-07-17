@@ -315,13 +315,11 @@ void msgstr(unsigned code) {
 
 void lodstr() {
 
-	unsigned	iString, iStringData, iStringTable, count;
-	TCHAR*		strings;
-	TCHAR*		stringStorage;
-
+	unsigned	iString = 0, iStringData = 0, iStringTable = 0, count = 0;
 	// Over allocate storage to ensure no overflow
-	stringStorage = new TCHAR[65535];
-	strings = stringStorage;
+	TCHAR*		stringStorage = new TCHAR[65535];
+	TCHAR*		strings = stringStorage;
+
 	for (iString = 0; iString < STR_LEN; iString++) {
 
 		count = LoadString(ThrEdInstance, LoadStringList[iString], strings, 1000) + 1;
@@ -347,11 +345,11 @@ void lodstr() {
 
 void shoMsg(TCHAR* string) {
 
-	SIZE		textSize, messageSize;
-	TCHAR**		strings;
-	unsigned*	lengths;
+	SIZE		textSize = {}, messageSize = {};
+	TCHAR**		strings = nullptr;
+	unsigned*	lengths = nullptr;
 	unsigned	count = 0, iString = 0, index = 0, iLength = 0, previousStringLength = 0;
-	long		offset;
+	long		offset = 0;
 
 	while (string[iString]) {
 

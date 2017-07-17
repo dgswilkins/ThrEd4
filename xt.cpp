@@ -349,7 +349,7 @@ void txrfor() {
 }
 
 BOOL chktxh(TXHST* historyItem) {
-	unsigned iPoint;
+	unsigned iPoint = 0;
 
 	if (historyItem->count != TextureScreen.index)
 		return 1;
@@ -369,7 +369,7 @@ BOOL chktxh(TXHST* historyItem) {
 }
 
 void savtxt() {
-	TXHST*	 currentHistoryItem;
+	TXHST*	 currentHistoryItem = nullptr;
 
 	if (TextureScreen.index) {
 		currentHistoryItem = &TextureHistory[TextureHistoryIndex];
@@ -434,10 +434,9 @@ void duxrats(unsigned start, unsigned finish, fPOINT* point) {
 
 void durats(unsigned iSequence, fPOINT* point) {
 
-	double	stitchLength;
-	fPOINT	adjustedPoint;
+	double	stitchLength = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x, BSequence[iSequence + 1].y - BSequence[iSequence].y);
+	fPOINT	adjustedPoint = {};
 
-	stitchLength = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x, BSequence[iSequence + 1].y - BSequence[iSequence].y);
 	if (stitchLength < FeatherMinStitch) {
 
 		point->x = BSequence[iSequence].x;
@@ -469,7 +468,7 @@ void xpfth(unsigned iSequence) {
 
 unsigned bpsg() {
 
-	unsigned testValue;
+	unsigned testValue = 0;
 
 	if (!PseudoRandomValue)
 		PseudoRandomValue = FSED;
@@ -584,17 +583,17 @@ void xratf(fPOINT startPoint, fPOINT endPoint, fPOINT* point) {
 
 void fthrbfn(unsigned iSequence) {
 
-	fPOINT	currentPoint;
-	fPOINT	nextPoint;
-	fPOINT	currentHighPoint;
-	fPOINT	currentLowPoint;
-	fPOINT	nextHighPoint;
-	fPOINT	nextLowPoint;
-	fPOINT	midPoint;
-	double	length;
+	fPOINT	currentPoint = {};
+	fPOINT	nextPoint = {};
+	fPOINT	currentHighPoint = {};
+	fPOINT	currentLowPoint = {};
+	fPOINT	nextHighPoint = {};
+	fPOINT	nextLowPoint = {};
+	fPOINT	midPoint = {};
+	// ToDo - Is BSequence valid here
+	double	length = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 
 	nurat();
-	length = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 	if (length < (FeatherMinStitch * 2)) {
 		FeatherRatio = 0.5;
 		ratpnt(iSequence, iSequence + 1, &currentPoint);
@@ -630,13 +629,12 @@ void duoseq(unsigned iSequence) {
 
 void fthdfn(unsigned iSequence) {
 
-	double	length;
-	fPOINT	adjustedPoint;
-	fPOINT	currentPoint;
-	fPOINT	nextPoint;
+	double	length = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
+	fPOINT	adjustedPoint = {};
+	fPOINT	currentPoint = {};
+	fPOINT	nextPoint = {};
 
 	nurat();
-	length = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 	duoseq(iSequence);
 	duoseq(iSequence + 1);
 	if (length > FeatherMinStitch) {
@@ -654,13 +652,12 @@ void fthdfn(unsigned iSequence) {
 
 void fthrfn() {
 
-	unsigned	ind, res;
-	double		savedSpacing;
+	unsigned	ind = 0, res = 0;
+	double		savedSpacing = StitchSpacing;
 
 	// ToDo - what does this function do
 	PseudoRandomValue = FSED;
 	fthvars();
-	savedSpacing = StitchSpacing;
 	StitchSpacing = SelectedForm->fillSpacing;
 	satfil();
 	BSequence[0].attribute = 0;
@@ -735,7 +732,7 @@ void fthrfn() {
 
 void fritfil() {
 
-	unsigned iSequence, iReverseSequence;
+	unsigned iSequence = 0, iReverseSequence = 0;
 
 	if (SequenceIndex) {
 
@@ -792,7 +789,7 @@ void fethrf() {
 
 void fethr() {
 
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	if (filmsgs(FMM_FTH))
 		return;
@@ -831,8 +828,8 @@ ULARGE_INTEGER  tim2int(FILETIME time) {
 }
 
 int fil2crd(const char* fileName) {
-	STARTUPINFO			startupInfo;
-	PROCESS_INFORMATION	processInfo;
+	STARTUPINFO			startupInfo = {};
+	PROCESS_INFORMATION	processInfo = {};
 	int					errorCode = 0;
 	char				command[_MAX_PATH * 2 + 1 + 4];
 
@@ -873,12 +870,12 @@ void pes2crd() {
 
 #define P2CBUFSIZ 256
 
-	HKEY			registryKey;
-	unsigned long	keyType, size;
-	TCHAR			programName[_MAX_PATH];
+	HKEY			registryKey = {};
+	unsigned long	keyType = 0, size = 0;
+	TCHAR			programName[_MAX_PATH] = { 0 };
 	char			filter[] = "ComputerService (Lind2PC.exe)\0LinkP2C.exe\0\0";
-	TCHAR			message[P2CBUFSIZ];
-	TCHAR			caption[P2CBUFSIZ];
+	TCHAR			message[P2CBUFSIZ] = { 0 };
+	TCHAR			caption[P2CBUFSIZ] = { 0 };
 	OPENFILENAME	openFileName = {
 
 	sizeof(OPENFILENAME),	//lStructsize
@@ -954,7 +951,7 @@ void sidlen(unsigned start, unsigned finish, double* insideLength, double* outsi
 }
 
 fPOINT* insid() {
-	unsigned iVertex;
+	unsigned iVertex = 0;
 
 	satout(fabs(SelectedForm->underlayIndent));
 	if (SelectedForm->underlayIndent > 0) {
@@ -971,8 +968,8 @@ fPOINT* insid() {
 }
 
 void delwlk(unsigned code) {
-	unsigned	iStitch, stitchCount;
-	fPOINTATTR*	highStitchBuffer;
+	unsigned	iStitch = 0, stitchCount = 0;
+	fPOINTATTR*	highStitchBuffer = nullptr;
 
 	if (PCSHeader.stitchCount) {
 		stitchCount = 0;
@@ -1000,12 +997,12 @@ void chkuseq() {
 	InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->UnderlayColor;
 #else
 
-	unsigned	iSequence, index, stitchCount;
-	double		length;
-	fPOINT		delta;
-	fPOINT		point;
-	fPOINT		step;
-	double		underlayStitchLength;
+	unsigned	iSequence = 0, index = 0, stitchCount = 0;
+	double		length = 0.0;
+	fPOINT		delta = {};
+	fPOINT		point = {};
+	fPOINT		step = {};
+	double		underlayStitchLength = 0.0;
 
 	if (OutputIndex) {
 		if (SelectedForm->underlayStitchLen < MINWLK)
@@ -1067,22 +1064,18 @@ void ritcwlk() {
 }
 
 unsigned gucon(fPOINT start, fPOINT finish, unsigned destination, unsigned code) {
-	double		length;
-	unsigned	startVertex, endVertex, stitchCount, intermediateVertex;
-	fPOINT*		indentedPoint;
-	unsigned	up, down, iStitch, iStep;
-	fPOINT		localPoint, step, delta;
+	double		length = hypot(finish.x - start.x, finish.y - start.y);
+	unsigned	startVertex = closflt(start.x, start.y); 
+	unsigned	endVertex = closflt(finish.x, finish.y); 
+	unsigned	stitchCount = 0, intermediateVertex = 0;
+	fPOINT*		indentedPoint = nullptr;
+	unsigned	up = 0, down = 0, iStitch = 0, iStep = 0;
+	fPOINT		localPoint = {}, step = {}, delta = {};
 
-	length = hypot(finish.x - start.x, finish.y - start.y);
 	if (length < 5)
 		return 0;
-	startVertex = closflt(start.x, start.y);
-	endVertex = closflt(finish.x, finish.y);
 	if (startVertex == endVertex)
 		return 0;
-	//	if(chkMap(ISEND))
-	//		ipnt=vertices;
-	//	else
 	indentedPoint = insid();
 	up = down = startVertex;
 gulab:
@@ -1144,8 +1137,8 @@ gulabx:;
 }
 
 void fnwlk(unsigned find) {
-	unsigned	start, count;
-	fPOINT*		walkPoints;
+	unsigned	start = 0, count = 0;
+	fPOINT*		walkPoints = nullptr;
 
 	fvars(find);
 	if (SelectedForm->type == FRMLINE)
@@ -1171,7 +1164,7 @@ void fnwlk(unsigned find) {
 
 void fnuang() {
 
-	unsigned	iVertex;
+	unsigned	iVertex = 0;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
 	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
@@ -1206,10 +1199,9 @@ void undclp() {
 }
 
 void fnund(unsigned find) {
-	float	savedStitchSize;
+	float	savedStitchSize = UserStitchLength;
 
 	UnderlayVertices = insid();
-	savedStitchSize = UserStitchLength;
 	UserStitchLength = 1e99;
 	if (!SelectedForm->underlaySpacing)
 		SelectedForm->underlaySpacing = IniFile.underlaySpacing;
@@ -1225,8 +1217,8 @@ void fnund(unsigned find) {
 }
 
 void fncwlk() {
-	unsigned	iGuide, iVertex, start, finish;
-	SATCON*		guide;
+	unsigned	iGuide = 0, iVertex = 0, start = 0, finish = 0;
+	SATCON*		guide = nullptr;
 
 	OutputIndex = 0;
 	SelectedForm->extendedAttribute |= AT_CWLK;
@@ -1277,9 +1269,9 @@ void fncwlk() {
 BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	TCHAR		buf[HBUFSIZ];
-	TCHAR		buf1[HBUFSIZ];
-	unsigned	iFeatherStyle, state, featherType;
+	TCHAR		buf[HBUFSIZ] = { 0 };
+	TCHAR		buf1[HBUFSIZ] = { 0 };
+	unsigned	iFeatherStyle = 0, state = 0, featherType = 0;
 
 	switch (umsg) {
 
@@ -1300,7 +1292,8 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			for (iFeatherStyle = 0; iFeatherStyle < 6; iFeatherStyle++) {
 
 				LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, buf, HBUFSIZ);
-				SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<long>(buf));
+				[[gsl::suppress(type.1)]]
+				SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(buf));
 			}
 			SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
 			if (featherType&AT_FTHBLND)
@@ -1376,8 +1369,8 @@ void dufdef() {
 void srtcol() {
 
 	unsigned		histogram[16] = { 0 }, colorStartStitch[16] = { 0 };
-	unsigned		iStitch, iColor, startStitch;
-	fPOINTATTR*		highStitchBuffer;
+	unsigned		iStitch = 0, iColor = 0, startStitch = 0;
+	fPOINTATTR*		highStitchBuffer = nullptr;
 
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 		histogram[StitchBuffer[iStitch].attribute&COLMSK]++;
@@ -1395,7 +1388,7 @@ void srtcol() {
 }
 
 void dubit(unsigned bit) {
-	unsigned code;
+	unsigned code = 0;
 
 	savdo();
 	setMap(WASDO);
@@ -1497,9 +1490,9 @@ void dazdef() {
 BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	TCHAR		buffer[HBUFSIZ];
-	TCHAR		compareBuffer[HBUFSIZ];
-	unsigned	iType;
+	TCHAR		buffer[HBUFSIZ] = { 0 };
+	TCHAR		compareBuffer[HBUFSIZ] = { 0 };
+	unsigned	iType = 0;
 
 	switch (umsg) {
 
@@ -1527,7 +1520,8 @@ reinit:;
 			CheckDlgButton(hwndlg, IDC_DLIN, chku(DAZD));
 			for (iType = 0; iType < 6; iType++) {
 				LoadString(ThrEdInstance, DaisyTypeStrings[iType], buffer, HBUFSIZ);
-				SendMessage(GetDlgItem(hwndlg, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<long>(buffer));
+				[[gsl::suppress(type.1)]]
+				SendMessage(GetDlgItem(hwndlg, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(buffer));
 			}
 			SendMessage(GetDlgItem(hwndlg, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 			break;
@@ -1600,19 +1594,19 @@ reinit:;
 
 void dasyfrm() {
 
-	double		holeSegmentAngle, petalSegmentAngle;
-	double		angle;
-	double		deltaPetalAngle;
-	double		petalPointAngle;
-	unsigned	holeVertexCount, petalVertexCount, iSegment, iMacroPetal, iPoint;
-	unsigned	iVertex, borderType, sawPointCount, halfPetalPointCount, fref, petalPointCount;
-	double		distanceFromDaisyCenter = 0;
-	double		diameter;
-	double		petalLength;
-	double		holeDiameter;
-	double		ratio;
-	float		maximumXsize, maximumYsize;
-	fPOINT		referencePoint;
+	double		holeSegmentAngle = 0.0, petalSegmentAngle = 0.0;
+	double		angle = 0.0;
+	double		deltaPetalAngle = 0.0;
+	double		petalPointAngle = 0.0;
+	unsigned	holeVertexCount = 0, petalVertexCount = 0, iSegment = 0, iMacroPetal = 0, iPoint = 0;
+	unsigned	iVertex = 0, borderType = 0, sawPointCount = 0, halfPetalPointCount = 0, fref = 0, petalPointCount = 0;
+	double		distanceFromDaisyCenter = 0.0;
+	double		diameter = 0.0;
+	double		petalLength = 0.0;
+	double		holeDiameter = 0.0;
+	double		ratio = 0.0;
+	float		maximumXsize = 0.0, maximumYsize = 0.0;
+	fPOINT		referencePoint = {};
 
 	unmsg();
 	if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, (DLGPROC)dasyproc)) {
@@ -1754,10 +1748,9 @@ void dasyfrm() {
 }
 
 void durec(OREC* record) {
-	unsigned	attribute;
-	fPOINTATTR*	stitch;
-
-	stitch = &StitchBuffer[record->start];
+	unsigned	attribute = 0;
+	fPOINTATTR*	stitch = &StitchBuffer[record->start];
+	
 	record->type = StitchTypes[dutyp(stitch->attribute)];
 	attribute = stitch->attribute&SRTMSK;
 	record->color = attribute & 0xf;
@@ -1903,13 +1896,13 @@ double precjmps(SRTREC* stitchRecord) {
 }
 
 unsigned duprecs(SRTREC* record) {
-	unsigned jumps0;
-	unsigned jumps1;
 
 	record->direction = 0;
-	jumps0 = precjmps(record);
+	unsigned	jumps0 = precjmps(record);
+
 	record->direction = 1;
-	jumps1 = precjmps(record);
+	unsigned	jumps1 = precjmps(record);
+
 	if (jumps0 < jumps1) {
 		record->direction = 0;
 		return jumps0;
@@ -1939,11 +1932,12 @@ void dmprec(OREC** records, unsigned count) {
 #endif
 
 BOOL srtchk(OREC** record, unsigned count, unsigned* badForm) {
-	unsigned iRecord, form, color;
-	FRMHED* formHeader;
 
-	form = record[0]->form;
-	color = record[0]->color;
+	unsigned	iRecord = 1;
+	unsigned	form = record[0]->form; 
+	unsigned	color = record[0]->color;
+	FRMHED*		formHeader = nullptr;
+
 	for (iRecord = 1; iRecord < count; iRecord++) {
 		if (record[iRecord]->form == form) {
 			if (ColorOrder[record[iRecord]->color] < ColorOrder[color]) {
@@ -1965,26 +1959,24 @@ BOOL srtchk(OREC** record, unsigned count, unsigned* badForm) {
 }
 
 void fsort() {
-	unsigned		iColor, iStitch, badForm, iRange, lastRange;
-	unsigned		currentForm, attribute, iRecord, lastRecord;
+	unsigned		attribute = StitchBuffer->attribute&SRTMSK;
+	unsigned		iColor = 0, iStitch = 0, badForm = 0, iRange = 0, lastRange = 0;
+	unsigned		currentForm = 0, iRecord = 0, lastRecord = 0;
 	unsigned		minimumIndex = 0, minimumDirection = 0;
-	unsigned		typeCount, jumps, minimumJumps;
-	OREC*			records;
-	RANGE*			stitchRange;
-	SRTREC			sortRecord;
-	FILETIME		fileTime;
-	ULARGE_INTEGER	startTime;
-	ULARGE_INTEGER	nextTime;
+	unsigned		typeCount = 0, jumps = 0, minimumJumps = 0;
+	// There cannot be more records than stitches
+	OREC*			records = new OREC[PCSHeader.stitchCount];
+	RANGE*			stitchRange = nullptr;
+	SRTREC			sortRecord = {};
+	FILETIME		fileTime = {};
+	ULARGE_INTEGER	startTime = {};
+	ULARGE_INTEGER	nextTime = {};
 
 	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors 
 	//        in a single form are not in ascending order already. 
 	savdo();
-	// There cannot be more records than stitches
-	records = new OREC[PCSHeader.stitchCount];
 	records[0].start = 0;
 	records[0].startStitch = StitchBuffer;
-	attribute = StitchBuffer->attribute&SRTMSK;
-	iRecord = 0;
 	ColorOrder[AppliqueColor] = 0;
 	for (iColor = 0; iColor < 16; iColor++) {
 
@@ -2113,11 +2105,9 @@ dutypx :
 	}
 #else
 	//correct
-	char result;
-	DWORD bit;
-	unsigned maskedAttribute;
-
-	maskedAttribute = attribute & SRTYPMSK;
+	char result = 0;
+	DWORD bit = 0;
+	unsigned maskedAttribute = attribute & SRTYPMSK;
 
 	_BitScanReverse(&bit, maskedAttribute);
 
@@ -2145,35 +2135,33 @@ typedef struct _atfld {
 }ATFLD;
 
 void duatf(unsigned ind) {
-	char		attributeBuffer[256];
-	unsigned	attribute;
-	ATFLD		AttributeFields;
+	char		attributeBuffer[256] = { 0 };
+	unsigned	attribute = StitchBuffer[ind].attribute;
+	ATFLD		attributeFields = { (attribute&COLMSK),
+									((attribute >> FRMSHFT)&FRMSK),
+									static_cast<unsigned>(StitchTypes[dutyp(attribute)]),
+									((attribute >> LAYSHFT) & 7),
+									0};
 
-	attribute = StitchBuffer[ind].attribute;
-	AttributeFields.color = attribute&COLMSK;
-	AttributeFields.form = (attribute >> FRMSHFT)&FRMSK;
-	AttributeFields.type = StitchTypes[dutyp(attribute)];
-	AttributeFields.layer = (attribute >> LAYSHFT) & 7;
 	if (attribute & 0x80000000)
-		AttributeFields.user = 1;
+		attributeFields.user = 1;
 	else
-		AttributeFields.user = 0;
+		attributeFields.user = 0;
 	sprintf_s(attributeBuffer, sizeof(attributeBuffer), "%5d: col: %2d frm: %5d typ: %2d, lay: %1d: usr: %1d at: %08x\n",
 		ind,
-		AttributeFields.color,
-		AttributeFields.form,
-		AttributeFields.type,
-		AttributeFields.layer,
-		AttributeFields.user,
+		attributeFields.color,
+		attributeFields.form,
+		attributeFields.type,
+		attributeFields.layer,
+		attributeFields.user,
 		attribute);
 	OutputDebugString(attributeBuffer);
 }
 
 void dmpat() {
-	unsigned iStitch, attribute;
+	unsigned iStitch = 0, attribute = StitchBuffer[0].attribute;
 
 	duatf(0);
-	attribute = StitchBuffer[0].attribute;
 	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (attribute != StitchBuffer[iStitch].attribute) {
 			duatf(iStitch);
@@ -2184,8 +2172,8 @@ void dmpat() {
 #endif
 
 void fdelstch() {
-	unsigned	iStitch, ind, ine, codedFormIndex, attribute, type, tmap, color, bordercolor, tapcol;
-	unsigned*	stpnt;
+	unsigned	iStitch = 0, ind = 0, ine = 0, codedFormIndex = 0, attribute = 0, type = 0, tmap = 0, color = 0, bordercolor = 0, tapcol = 0;
+	unsigned*	stpnt = nullptr;
 	// ToDo - Still not sure what this function does?
 	//        I suspect the FillStartsData members are not correctly named
 	fvars(ClosestFormToCursor);
@@ -2346,8 +2334,8 @@ BOOL lastcol(unsigned index, fPOINT* point) {
 }
 
 void duint(unsigned offset, unsigned code) {
-	unsigned	count, iSequence;
-	fPOINT		point;
+	unsigned	count = 0, iSequence = 0;
+	fPOINT		point = {};
 
 	if (InterleaveData.coloc > InterleaveData.start) {
 		count = InterleaveData.coloc - InterleaveData.start;
@@ -2390,8 +2378,8 @@ void chkend(unsigned offset, unsigned code) {
 }
 
 void intlv() {
-	unsigned	iSequence, ine, code = 0, offset;
-	fPOINT		colpnt;
+	unsigned	iSequence = 0, ine = 0, code = 0, offset = 0;
+	fPOINT		colpnt = {};
 
 	rstMap(ISEND);
 	fvars(ClosestFormToCursor);
@@ -2478,7 +2466,7 @@ void intlv() {
 }
 
 void setundfn(unsigned code) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (SelectedFormCount) {
@@ -2516,7 +2504,7 @@ void setcwlk() {
 }
 
 void notundfn(unsigned code) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	code = !code;
@@ -2566,7 +2554,7 @@ void ulenfn(unsigned find, float length) {
 }
 
 void dusulen(float length) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (SelectedFormCount) {
@@ -2596,7 +2584,7 @@ void uspacfn(unsigned find, float spacing) {
 }
 
 void duspac(float spacing) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (SelectedFormCount) {
@@ -2626,7 +2614,7 @@ void uangfn(unsigned find, float angle) {
 }
 
 void dufang(float angle) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	angle *= (float)PI / 180;
@@ -2657,7 +2645,7 @@ void flenfn(unsigned find, float length) {
 }
 
 void duflen(float length) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (SelectedFormCount) {
@@ -2691,7 +2679,7 @@ void fspacfn(unsigned find, float spacing) {
 }
 
 void dufspac(float spacing) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (SelectedFormCount) {
@@ -2720,7 +2708,7 @@ void findfn(unsigned find, float indent) {
 }
 
 void dufind(float indent) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	indent *= PFGRAN;
@@ -2760,7 +2748,7 @@ void fangfn(unsigned find, float angle) {
 }
 
 void dufxang(float angle) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	angle *= (float)PI / 180;
@@ -2791,7 +2779,7 @@ void ucolfn(unsigned find, unsigned color) {
 }
 
 void dundcol(unsigned color) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (color)
@@ -2824,7 +2812,7 @@ void fcolfn(unsigned find, unsigned color) {
 }
 
 void dufcol(unsigned color) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (color)
@@ -2857,7 +2845,7 @@ void bcolfn(unsigned find, unsigned color) {
 }
 
 void dubcol(unsigned color) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (color)
@@ -2890,7 +2878,7 @@ void blenfn(unsigned find, float length) {
 }
 
 void dublen(float length) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (SelectedFormCount) {
@@ -2920,7 +2908,7 @@ void bspacfn(unsigned find, float length) {
 }
 
 void dubspac(float length) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (SelectedFormCount) {
@@ -2950,7 +2938,7 @@ void bminfn(unsigned find, float length) {
 }
 
 void dubmin(float length) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (SelectedFormCount) {
@@ -2980,7 +2968,7 @@ void bmaxfn(unsigned find, float length) {
 }
 
 void dubmax(float length) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (SelectedFormCount) {
@@ -3010,7 +2998,7 @@ void fminfn(unsigned find, float length) {
 }
 
 void dufmin(float length) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (SelectedFormCount) {
@@ -3040,7 +3028,7 @@ void fmaxfn(unsigned find, float length) {
 }
 
 void dufmax(float length) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (SelectedFormCount) {
@@ -3061,9 +3049,9 @@ void setfmax() {
 }
 
 void fwidfn(unsigned find, float length) {
-	unsigned	iVertex;
-	double		ratio;
-	float		reference;
+	unsigned	iVertex = 0;
+	double		ratio = 0.0;
+	float		reference = 0.0;
 
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
@@ -3076,7 +3064,7 @@ void fwidfn(unsigned find, float length) {
 }
 
 void dufwid(float length) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (SelectedFormCount) {
@@ -3105,9 +3093,9 @@ void setfind() {
 
 void fhifn(unsigned find, float length
 ) {
-	unsigned	iVertex;
-	double		ratio;
-	float		reference;
+	unsigned	iVertex = 0;
+	double		ratio = 0.0;
+	float		reference = 0.0;
 
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
@@ -3120,7 +3108,7 @@ void fhifn(unsigned find, float length
 }
 
 void dufhi(float length) {
-	unsigned iForm;
+	unsigned iForm = 0;
 
 	savdo();
 	if (SelectedFormCount) {
@@ -3269,16 +3257,14 @@ void dutxtx(int index, int offsetPixels) {
 }
 
 void txrct2rct(TXTRCT textureRect, RECT* rectangle) {
-	TXPNT	texturePoint;
-	POINT	point;
+	TXPNT	texturePoint = { textureRect.top ,textureRect.left };
+	POINT	point = {};
 
-	texturePoint.line = textureRect.left;
-	texturePoint.y = textureRect.top;
 	txt2pix(texturePoint, &point);
 	rectangle->left = point.x - IniFile.textureEditorSize;
 	rectangle->top = point.y - IniFile.textureEditorSize;
-	texturePoint.line = textureRect.right;
 	texturePoint.y = textureRect.bottom;
+	texturePoint.line = textureRect.right;
 	txt2pix(texturePoint, &point);
 	rectangle->right = point.x + IniFile.textureEditorSize;
 	rectangle->bottom = point.y + IniFile.textureEditorSize;
@@ -3326,9 +3312,8 @@ void drwtxbut() {
 }
 
 void chktx() {
-	unsigned iPoint, iNextPoint;
+	unsigned iPoint = 0, iNextPoint = 0;
 
-	iNextPoint = 0;
 	for (iPoint = 0; iPoint < TextureScreen.index; iPoint++) {
 		if (TempTexturePoints[iPoint].line <= TextureScreen.lines && TempTexturePoints[iPoint].y < TextureScreen.areaHeight) {
 			TempTexturePoints[iNextPoint].line = TempTexturePoints[iPoint].line;
@@ -3340,20 +3325,19 @@ void chktx() {
 }
 
 void drwtxtr() {
-	POINT		line[2];
-	int			iGrid, iVertical;
-	unsigned	iPoint;
-	unsigned	index;
-	int			yOffset;
-	TXPNT		textureRecord;
-	POINT		point;
-	int			gridLineCount;
-	double		editSpace;
-	double		pixelSpace;
-	float		extraWidth;
+	POINT		line[2] = {};
+	int			iGrid = 0, iVertical = 0;
+	unsigned	iPoint = 0;
+	unsigned	index = 0;
+	int			yOffset = 0;
+	TXPNT		textureRecord = {};
+	POINT		point = {};
+	int			gridLineCount = 0;
+	double		editSpace = TextureScreen.areaHeight * 2 / (TextureScreen.spacing*(TextureScreen.lines + 2));
+	double		pixelSpace = 0.0;
+	float		extraWidth = 0.0;
 
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-	editSpace = TextureScreen.areaHeight * 2 / (TextureScreen.spacing*(TextureScreen.lines + 2));
 	pixelSpace = static_cast<double>(StitchWindowClientRect.bottom) / StitchWindowClientRect.right;
 	TextureScreen.lines = floor(TextureScreen.width / TextureScreen.spacing);
 	extraWidth = TextureScreen.spacing*(TextureScreen.lines + 2);
@@ -3474,13 +3458,12 @@ void txtrbut() {
 }
 
 BOOL txtclos(unsigned* closestTexturePoint) {
-	double		length;
-	double		minimumLength;
-	unsigned	iPoint;
-	POINT		reference, point;
+	double		length = 0.0;
+	double		minimumLength = 1e99;
+	unsigned	iPoint = 0;
+	POINT		reference = {}, point = {};
 
 	deorg(&reference);
-	minimumLength = 1e99;
 	*closestTexturePoint = 0;
 	for (iPoint = 0; iPoint < TextureScreen.index; iPoint++) {
 		txt2pix(TempTexturePoints[iPoint], &point);
@@ -3496,10 +3479,9 @@ BOOL txtclos(unsigned* closestTexturePoint) {
 }
 
 void tritx() {
-	POINT	line[2];
-	int		size;
+	POINT	line[2] = {};
+	int		size = IniFile.textureEditorSize << 2;
 
-	size = IniFile.textureEditorSize << 2;
 	line[0].x = line[1].x = TextureCursorLocation.x;
 	line[0].y = TextureCursorLocation.y - size;
 	line[1].y = TextureCursorLocation.y + size;
@@ -3518,16 +3500,12 @@ void setxmov() {
 }
 
 void ritxrct() {
-	POINT	offset;
-	RECT	rectangle;
-	POINT	line[5];
+	POINT	offset = { (TextureCursorLocation.x - SelectTexturePointsOrigin.x),
+					   (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
+	RECT	rectangle = { (TexturePixelRect.left + offset.x),(TexturePixelRect.top + offset.y),
+						  (TexturePixelRect.right + offset.x),(TexturePixelRect.bottom + offset.y) };
+	POINT	line[5] = {};
 
-	offset.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
-	offset.y = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
-	rectangle.bottom = TexturePixelRect.bottom + offset.y;
-	rectangle.left = TexturePixelRect.left + offset.x;
-	rectangle.right = TexturePixelRect.right + offset.x;
-	rectangle.top = TexturePixelRect.top + offset.y;
 	line[0].x = line[1].x = line[4].x = rectangle.left;
 	line[2].x = line[3].x = rectangle.right;
 	line[0].y = line[3].y = line[4].y = rectangle.top;
@@ -3536,8 +3514,8 @@ void ritxrct() {
 }
 
 void dutxrct(TXTRCT* textureRect) {
-	unsigned	iPoint;
-	TXPNT*		texturePoint;
+	unsigned	iPoint = 0;
+	TXPNT*		texturePoint = nullptr;
 
 	if (SelectedTexturePointsCount) {
 		texturePoint = &TempTexturePoints[SelectedTexturePointsList[0]];
@@ -3565,10 +3543,10 @@ void ed2stch(fPOINT* pt) {
 }
 
 void dutxlin(fPOINT point0, fPOINT point1) {
-	double	slope;
-	float	deltaX;
-	float	start, finish, swap, yOffset;
-	int		integerStart, integerFinish;
+	double	slope = 0.0;
+	float	deltaX = 0.0;
+	float	start = 0.0, finish = 0.0, swap = 0.0, yOffset = 0.0;
+	int		integerStart = 0, integerFinish = 0;
 
 	ed2stch(&point0);
 	ed2stch(&point1);
@@ -3601,9 +3579,9 @@ void dutxlin(fPOINT point0, fPOINT point1) {
 }
 
 void setxclp() {
-	POINT		screenOffset;
-	fPOINT		editorOffset;
-	unsigned	iVertex, iLine, iNextVertex, lineCount;
+	POINT		screenOffset = {};
+	fPOINT		editorOffset = {};
+	unsigned	iVertex = 0, iLine = 0, iNextVertex = 0, lineCount = 0;
 
 	deorg(&screenOffset);
 	px2ed(screenOffset, &editorOffset);
@@ -3659,15 +3637,15 @@ constexpr int	hitxlin() {
 }
 
 void txtrup() {
-	TXPNT		highestTexturePoint;
-	TXPNT		lowestTexturePoint;
-	TXPNT		textureOffset;
-	float		yOffset;
-	short		swap;
-	unsigned	iPoint;
-	int			xCoord, Xmagnitude;
-	POINT		offset;
-	TXPNT*		texturePoint;
+	TXPNT		highestTexturePoint = {};
+	TXPNT		lowestTexturePoint = {};
+	TXPNT		textureOffset = {};
+	float		yOffset = 0.0;
+	short		swap = 0;
+	unsigned	iPoint = 0;
+	int			xCoord = 0, Xmagnitude = 0;
+	POINT		offset = {};
+	TXPNT*		texturePoint = nullptr;
 
 	if (rstMap(TXTMOV)) {
 		savtxt();
@@ -3730,7 +3708,7 @@ void txtrup() {
 }
 
 void angrct(fRECTANGLE* rectangle) {
-	unsigned	iVertex;
+	unsigned	iVertex = 0;
 
 	rectangle->left = rectangle->right = AngledFormVertices[0].x;
 	rectangle->bottom = rectangle->top = AngledFormVertices[0].y;
@@ -3747,8 +3725,8 @@ void angrct(fRECTANGLE* rectangle) {
 }
 
 void ritxfrm() {
-	unsigned	iVertex, vertexCount;
-	POINT		offset;
+	unsigned	iVertex = 0, vertexCount = 0;
+	POINT		offset = { (TextureCursorLocation.x - SelectTexturePointsOrigin.x),(TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
 
 	offset.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
 	offset.y = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
@@ -3767,10 +3745,10 @@ void ritxfrm() {
 }
 
 void setxfrm() {
-	unsigned	iVertex;
-	fRECTANGLE	angleRect;
-	float		height;
-	double		ratio;
+	unsigned	iVertex = 0;
+	fRECTANGLE	angleRect = {};
+	float		height = 0.0;
+	double		ratio = 0.0;
 
 	angrct(&angleRect);
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
@@ -3855,7 +3833,7 @@ void txtlin() {
 }
 
 void butsid(unsigned windowId) {
-	RECT buttonRect;
+	RECT buttonRect = {};
 
 	chktxnum();
 	TextureWindowId = windowId;
@@ -3937,9 +3915,9 @@ void txang() {
 }
 
 void deltx() {
-	TXPNT		*textureBuffer;
-	unsigned	iBuffer;
-	unsigned	iForm;
+	TXPNT		*textureBuffer = nullptr;
+	unsigned	iBuffer = 0;
+	unsigned	iForm = 0;
 
 	if (TextureIndex && istx(ClosestFormToCursor) && SelectedForm->fillInfo.texture.count) {
 		textureBuffer = new TXPNT[TextureIndex]();
@@ -3965,8 +3943,8 @@ void deltx() {
 }
 
 void nutx() {
-	int			iForm, iPoint;
-	FRMHED*		formHeader;
+	int			iForm = 0, iPoint = 0;
+	FRMHED*		formHeader = nullptr;
 
 	qsort(TempTexturePoints, TextureScreen.index, sizeof(TXPNT), txcmp);
 	iPoint = 0;
@@ -3994,8 +3972,8 @@ nutskp:;
 
 //Ensure all lines in the texture have at least 1 point
 void altx() {
-	unsigned	iLine, iPoint;
-	float		halfHeight;
+	unsigned	iLine = 0, iPoint = 0;
+	float		halfHeight = 0.0;
 
 	if (chkMap(FORMSEL)) {
 		halfHeight = TextureScreen.areaHeight / 2;
@@ -4056,12 +4034,12 @@ void txsrt() {
 }
 
 void dutxmir() {
-	int centerLine, iPoint, iMirrorPoint;
+	const int	centerLine = (TextureScreen.lines + 1) >> 1; 
+	int			iPoint = TextureScreen.index - 1;
+	int			iMirrorPoint = 0;
 
 	savtxt();
 	txsrt();
-	centerLine = (TextureScreen.lines + 1) >> 1;
-	iPoint = TextureScreen.index - 1;
 	while (TempTexturePoints[iPoint].line > centerLine && iPoint >= 0)
 		iPoint--;
 	iMirrorPoint = iPoint + 1;
@@ -4120,7 +4098,7 @@ BOOL chkbut() {
 }
 
 void txtlbut() {
-	POINT	point;
+	POINT	point = {};
 
 	fvars(ClosestFormToCursor);
 	if (chkbut())
@@ -4178,7 +4156,7 @@ void redtbak() {
 }
 
 void txbak() {
-	unsigned	iHistory;
+	unsigned	iHistory = 0;
 
 	if (chkMap(WASTXBAK)) {
 		SelectedTexturePointsCount = 0;
@@ -4195,7 +4173,7 @@ txbak1:;
 }
 
 void nxbak() {
-	unsigned	iHistory;
+	unsigned	iHistory = 0;
 
 	if (chkMap(WASTXBAK)) {
 		for (iHistory = 0; iHistory < 16; iHistory++) {
@@ -4210,8 +4188,8 @@ nxbak1:;
 }
 
 void txtdel() {
-	unsigned	iPoint, iSourcePoint, iOutputPoint;
-	unsigned	iClosestPoint;
+	unsigned	iPoint = 0, iSourcePoint = 0, iOutputPoint = 0;
+	unsigned	iClosestPoint = 0;
 
 	if (SelectedTexturePointsCount) {
 		savtxt();
@@ -4320,8 +4298,8 @@ BOOL istxclp() {
 }
 
 void txsiz(double ratio) {
-	unsigned	iVertex;
-	fRECTANGLE	angleRect;
+	unsigned	iVertex = 0;
+	fRECTANGLE	angleRect = {};
 
 	ritxfrm();
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
@@ -4360,10 +4338,10 @@ BOOL txdig(unsigned keyCode, TCHAR* character) {
 }
 
 void txnudg(int deltaX, float deltaY) {
-	float		screenDeltaY;
-	float		yCoord;
-	unsigned	iPoint;
-	int			textureLine;
+	float		screenDeltaY = 0.0;
+	float		yCoord = 0.0;
+	unsigned	iPoint = 0;
+	int			textureLine = 0;
 
 	if (SelectedTexturePointsCount) {
 		if (deltaY) {
@@ -4395,10 +4373,10 @@ void txnudg(int deltaX, float deltaY) {
 }
 
 void txsnap() {
-	unsigned	iPoint;
-	int			yStep;
-	float		halfGrid;
-	TXPNT*		texturePoint;
+	unsigned	iPoint = 0;
+	int			yStep = 0;
+	float		halfGrid = 0.0;
+	TXPNT*		texturePoint = nullptr;
 
 	if (TextureScreen.index) {
 		savtxt();
@@ -4422,7 +4400,7 @@ void txsnap() {
 }
 
 void txtkey(unsigned keyCode) {
-	TCHAR	character;
+	TCHAR	character = {};
 
 	if (SideWindowButton) {
 		switch (keyCode) {
@@ -4573,8 +4551,8 @@ txskp:;
 }
 
 void setxt() {
-	TXPNT*	currentFormTexture;
-	int		iTexturePoint, count, iSegment;
+	TXPNT *	currentFormTexture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
+	int				iTexturePoint = 0, iSegment = 0, count = SelectedForm->fillInfo.texture.count;
 
 	savtxt();
 	SelectedForm->wordParam = 0;
@@ -4582,8 +4560,6 @@ void setxt() {
 	ClipRectSize.cx = SelectedForm->fillSpacing;
 	ClipRectSize.cy = SelectedForm->fillInfo.texture.height;
 	TextureSegments = new RNGCNT[SelectedForm->fillInfo.texture.lines]();
-	currentFormTexture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
-	count = SelectedForm->fillInfo.texture.count;
 	if (count) {
 		for (iTexturePoint = count - 1; iTexturePoint >= 0; iTexturePoint--) {
 			if (currentFormTexture[iTexturePoint].line) {
@@ -4641,7 +4617,7 @@ BOOL chkasp(fPOINT* point) {
 BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	fPOINT	designSize;
+	fPOINT	designSize = {};
 
 	DesignSizeDialog = hwndlg;
 	switch (umsg) {
@@ -4710,8 +4686,8 @@ void sadj(fPOINT* point) {
 }
 
 void nudfn() {
-	unsigned	iStitch, iVertex;
-	fPOINT		newSize;
+	unsigned	iStitch = 0, iVertex = 0;
+	fPOINT		newSize = { (DesignSizeRect.right - DesignSizeRect.left),(DesignSizeRect.top - DesignSizeRect.bottom) };
 
 	newSize.x = DesignSizeRect.right - DesignSizeRect.left;
 	newSize.y = DesignSizeRect.top - DesignSizeRect.bottom;
@@ -4725,8 +4701,8 @@ void nudfn() {
 }
 
 void nudsiz() {
-	int			flag;
-	unsigned	iForm;
+	int			flag = 0;
+	unsigned	iForm = 0;
 
 	savdo();
 	flag = 0;
@@ -4815,8 +4791,8 @@ BOOL inrct(fRECTANGLE rectangle, fPOINTATTR stitch) {
 }
 
 void setshft() {
-	fRECTANGLE	selectionRect;
-	unsigned	iStitch, line;
+	fRECTANGLE	selectionRect = {};
+	unsigned	iStitch = 0, line = 0;
 
 	savtxt();
 	SelectedTexturePointsList = new unsigned[MAXITEMS];
@@ -4884,10 +4860,10 @@ BOOL txnam(char *name, int sizeName) {
 }
 
 void txdun() {
-	char			name[_MAX_PATH];
-	HANDLE			handle;
-	unsigned long	bytesWritten;
-	int				iHistory;
+	char			name[_MAX_PATH] = { 0 };
+	HANDLE			handle = {};
+	unsigned long	bytesWritten = 0;
+	int				iHistory = 0;
 	char			signature[4] = "txh";
 
 	if (TextureHistory[0].count) {
@@ -4908,10 +4884,10 @@ void txdun() {
 }
 
 void redtx() {
-	char			name[_MAX_PATH];
-	HANDLE			handle;
-	DWORD			bytesRead, historyBytesRead;
-	unsigned int	ind,ine;
+	char			name[_MAX_PATH] = { 0 };
+	HANDLE			handle = {};
+	DWORD			bytesRead = 0, historyBytesRead = 0;
+	unsigned int	ind = 0,ine = 0;
 	char			sig[4] = { 0 };
 
 	TextureHistoryIndex = 15;
@@ -4953,10 +4929,9 @@ void redtx() {
 }
 
 void setangf(double angle) {
-	unsigned	iVertex;
-	double		savedAngle;
+	unsigned	iVertex = 0;
+	double		savedAngle = RotationAngle;
 
-	savedAngle = RotationAngle;
 	RotationAngle = angle;
 	MoveMemory(&AngledForm, SelectedForm, sizeof(FRMHED));
 	MoveMemory(&AngledFormVertices, CurrentFormVertices, sizeof(fPOINT)*VertexCount);
@@ -4985,7 +4960,7 @@ void chgchk(int code) {
 }
 
 void lodchk() {
-	unsigned	iForm, iStitch, attribute;
+	unsigned	iForm = 0, iStitch = 0, attribute = 0;
 
 	delinf();
 	for (iForm = 0; iForm < FormIndex; iForm++) {
@@ -5052,11 +5027,10 @@ void chkeclp(FRMHED* formHeader, BADCNTS* badData) {
 }
 
 unsigned frmchkfn() {
-	unsigned	iForm;
-	FRMHED*		formHeader;
-	BADCNTS		badData;
+	unsigned	iForm = 0;
+	FRMHED*		formHeader = nullptr;
+	BADCNTS		badData = {};
 
-	FillMemory(&badData, sizeof(BADCNTS), 0);
 	if (FormIndex) {
 		for (iForm = 0; iForm < FormIndex; iForm++) {
 			formHeader = &FormList[iForm];
@@ -5106,7 +5080,7 @@ unsigned frmchkfn() {
 }
 
 void frmchkx() {
-	unsigned	code;
+	unsigned	code = 0;
 
 	if (IniFile.dataCheck) {
 		code = frmchkfn();
@@ -5148,9 +5122,9 @@ void bcup(unsigned find, BADCNTS* badData) {
 }
 
 void chkfstch() {
-	unsigned	codedFormIndex, iStitch;
+	const unsigned	codedFormIndex = FormIndex << FRMSHFT; 
+	unsigned		iStitch = 0;
 
-	codedFormIndex = FormIndex << FRMSHFT;
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute&FRMSK) >= codedFormIndex)
 			StitchBuffer[iStitch].attribute = NOTFRM;
@@ -5158,12 +5132,11 @@ void chkfstch() {
 }
 
 void repflt() {
-	fPOINT*		vertexPoint;
-	unsigned	iForm, iDestination, iVertex, vertexDifference, vertexCount = 0;
-	FRMHED*		formHeader;
-	BADCNTS		badData;
+	fPOINT*		vertexPoint = nullptr;
+	unsigned	iForm = 0, iDestination = 0, iVertex = 0, vertexDifference = 0, vertexCount = 0;
+	FRMHED*		formHeader = nullptr;
+	BADCNTS		badData = {};
 
-	iDestination = 0;
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		if (FormList[iForm].vertexCount) {
 			MoveMemory(&FormList[iDestination++], &FormList[iForm], sizeof(FRMHED));
@@ -5208,12 +5181,9 @@ rfltskp:;
 }
 
 void repclp() {
-	FRMHED*		formHeader;
-	unsigned	iForm, clipCount, clipDifference, badClipCount;
-	fPOINT*		clipPoint;
-
-	badClipCount = clipCount = 0;
-	clipPoint = new fPOINT[MAXITEMS];
+	FRMHED*		formHeader = nullptr;
+	unsigned	iForm = 0, clipCount = 0, clipDifference = 0, badClipCount = 0;
+	fPOINT*		clipPoint = new fPOINT[MAXITEMS];
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		formHeader = &FormList[iForm];
 		if (isclp(iForm)) {
@@ -5265,12 +5235,10 @@ void repclp() {
 }
 
 void repsat() {
-	unsigned	iForm, guideCount, guideDifference;
-	FRMHED*		formHeader;
-	BADCNTS		badData;
+	unsigned	iForm = 0, guideCount = 0, guideDifference = 0;
+	FRMHED*		formHeader = nullptr;
+	BADCNTS		badData = {};
 
-	ZeroMemory(&badData, sizeof(BADCNTS));
-	guideCount = 0;
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		formHeader = &FormList[iForm];
 		if (formHeader->type == SAT) {
@@ -5298,12 +5266,10 @@ void repsat() {
 }
 
 void reptx() {
-	unsigned	iForm, textureCount;
-	FRMHED*		formHeader;
-	BADCNTS		badData;
-
-	ZeroMemory(&badData, sizeof(BADCNTS));
-	textureCount = 0;
+	unsigned	iForm = 0, textureCount = 0;
+	FRMHED*		formHeader = nullptr;
+	BADCNTS		badData = {};
+		
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		if (istx(iForm)) {
 			formHeader = &FormList[iForm];
@@ -5330,13 +5296,12 @@ void reptx() {
 }
 
 void repar() {
-	unsigned	repairType;
+	unsigned	repairType = frmchkfn();
 	TCHAR*		savedStringData;
 
 	savedStringData = StringData;
 	savdo();
 	StringData = MsgBuffer;
-	repairType = frmchkfn();
 	if (repairType&BADFLT)
 		repflt();
 	if (repairType&BADCLP)
