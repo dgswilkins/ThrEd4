@@ -3271,8 +3271,8 @@ void durgn(unsigned pthi) {
 
 	unsigned	dun = 0, gdif = 0, mindif = 0, iVertex = 0, ind = 0, fdif = 0, bdif = 0;
 	unsigned	seql = 0, seqn = 0;
-	const unsigned	sequenceStart = CurrentRegion->start;
-	const unsigned	sequenceEnd = CurrentRegion->end;
+	unsigned	sequenceStart = 0;
+	unsigned	sequenceEnd = 0;
 	const unsigned	nextGroup = SequencePath[pthi].nextGroup;
 	unsigned	groupStart = 0, groupEnd = 0;
 	unsigned	iRegion = SequencePath[pthi].node;
@@ -3283,6 +3283,8 @@ void durgn(unsigned pthi) {
 
 	//ToDo - More renaming required
 	CurrentRegion = &RegionsList[iRegion];
+	sequenceStart = CurrentRegion->start;
+	sequenceEnd = CurrentRegion->end;
 	if (SequencePath[pthi].skp || rstMap(BRKFIX)) {
 		if (BSequence[OutputIndex - 1].attribute != SEQBOT)
 			rspnt(BSequence[OutputIndex - 2].x, BSequence[OutputIndex - 2].y);
