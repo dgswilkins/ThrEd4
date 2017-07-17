@@ -554,10 +554,10 @@ unsigned		LayerIndex;				//active layer code
 unsigned		ClipFormsCount;			//number of forms the on the clipboard
 POINT			StitchArrow[3];			//arrow for selected stitch
 RANGE			SelectedRange;			//first and last stitch for min/max stitch select
-unsigned		FileNameOrder[50];		//file name order table
-unsigned char	FilenameEncoded[128];	//file name encoding
-unsigned char	FilenameDecode[256];	//file name decode
-TCHAR			DesignerName[50];		//file designer name in clear
+unsigned		NameOrder[50];			//designer name order table
+unsigned char	NameEncoder[128];		//designer name encoding
+unsigned char	NameDecoder[256];		//designer name decode
+TCHAR			DesignerName[50];		//designer name in clear
 HWND			FirstWin;				//first window not destroyed for exiting enumerate loop
 RANGE			SelectedFormsRange;		//range of selected forms
 unsigned		TmpFormIndex;			//saved form index
@@ -2022,52 +2022,52 @@ unsigned rsed() {
 	return (time.wSecond << 16) | time.wMilliseconds;
 }
 
-void ritfnam(TCHAR* fileName) {
+void ritfnam(TCHAR* designerName) {
 
 	unsigned		iName = 0;
-	unsigned char	tmpFileName[50] = { 0 };
+	unsigned char	tmpName[50] = { 0 };
 
 	// ToDo - is this comparison correct?
-	if (*FileNameOrder > 50)
+	if (*NameOrder > 50)
 		fnamtabs();
 	PseudoRandomValue = rsed();
 	for (iName = 0; iName < 50; iName++)
-		tmpFileName[iName] = psg() & 0xff;
+		tmpName[iName] = psg() & 0xff;
 	for (iName = 0; iName < 50; iName++) {
 
-		if (fileName[iName]) {
-			tmpFileName[iName] = FilenameEncoded[fileName[iName]];
+		if (designerName[iName]) {
+			tmpName[iName] = NameEncoder[designerName[iName]];
 		}
 		else {
 
-			while (FilenameDecode[tmpFileName[iName]])
-				tmpFileName[iName] = psg() & 0xff;
+			while (NameDecoder[tmpName[iName]])
+				tmpName[iName] = psg() & 0xff;
 			break;
 		}
 	}
 	if (iName == 50) {
 
-		while (FilenameDecode[tmpFileName[49]])
-			tmpFileName[49] = psg() & 0xff;
+		while (NameDecoder[tmpName[49]])
+			tmpName[49] = psg() & 0xff;
 	}
 	for (iName = 0; iName < 50; iName++)
-		if (FileNameOrder[iName] < 50) { ExtendedHeader.creatorName[FileNameOrder[iName]] = tmpFileName[iName]; }
+		if (NameOrder[iName] < 50) { ExtendedHeader.creatorName[NameOrder[iName]] = tmpName[iName]; }
 }
 
-void redfnam(TCHAR* fileName) {
+void redfnam(TCHAR* designerName) {
 
 	unsigned iName = 0;
-	unsigned char tmpFileName[50] = { 0 };
+	unsigned char tmpName[50] = { 0 };
 
 	for (iName = 0; iName < 50; iName++)
-		if (FileNameOrder[iName] < 50)
-			tmpFileName[iName] = ExtendedHeader.creatorName[FileNameOrder[iName]];
+		if (NameOrder[iName] < 50)
+			tmpName[iName] = ExtendedHeader.creatorName[NameOrder[iName]];
 		else
-			tmpFileName[iName] = 111;
+			tmpName[iName] = 111;
 	for (iName = 0; iName < 50; iName++) {
 
-		fileName[iName] = FilenameDecode[tmpFileName[iName]];
-		if (!fileName[iName])
+		designerName[iName] = NameDecoder[tmpName[iName]];
+		if (!designerName[iName])
 			return;
 	}
 }
@@ -2078,30 +2078,30 @@ void fnamtabs() {
 	unsigned char	swapCharacter = 0;
 
 	for (iName = 0; iName < 50; iName++)
-		FileNameOrder[iName] = iName;
+		NameOrder[iName] = iName;
 	PseudoRandomValue = NORDSED;
 	for (iName = 0; iName < 100; iName++) {
 
 		source = psg() % 50;
 		destination = psg() % 50;
-		swapInteger = FileNameOrder[destination];
-		FileNameOrder[destination] = FileNameOrder[source];
-		FileNameOrder[source] = swapInteger;
+		swapInteger = NameOrder[destination];
+		NameOrder[destination] = NameOrder[source];
+		NameOrder[source] = swapInteger;
 	}
 	for (iName = 0; iName < 128; iName++)
-		FilenameEncoded[iName] = static_cast<unsigned char>(iName) + NCODOF;
+		NameEncoder[iName] = static_cast<unsigned char>(iName) + NCODOF;
 	PseudoRandomValue = NCODSED;
 	for (iName = 0; iName < 256; iName++) {
 
 		source = psg() & 0x7f;
 		destination = psg() & 0x7f;
-		swapCharacter = FilenameEncoded[destination];
-		FilenameEncoded[destination] = FilenameEncoded[source];
-		FilenameEncoded[source] = swapCharacter;
+		swapCharacter = NameEncoder[destination];
+		NameEncoder[destination] = NameEncoder[source];
+		NameEncoder[source] = swapCharacter;
 	}
-	memset(FilenameDecode, 0, sizeof(FilenameDecode));
+	memset(NameDecoder, 0, sizeof(NameDecoder));
 	for (iName = 32; iName < 127; iName++)
-		FilenameDecode[FilenameEncoded[iName]] = static_cast<unsigned char>(iName);
+		NameDecoder[NameEncoder[iName]] = static_cast<unsigned char>(iName);
 }
 
 void dstin(unsigned number, POINT* pout) {
@@ -7350,7 +7350,6 @@ unsigned closlin() {
 	unsigned	layer = 0;
 
 #define		TOL	20
-	// ToDo - Is tsum calculated too many times?
 	unboxs();
 	offset = static_cast<float>(Msg.pt.x - StitchWindowAbsRect.left) / (StitchWindowAbsRect.right - StitchWindowAbsRect.left);
 	checkedPoint.x = offset*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
@@ -7435,7 +7434,6 @@ gotsum:;
 						boundingRect.top -= tolerance;
 						boundingRect.left += tolerance;
 						boundingRect.right -= tolerance;
-						// ToDo - Is tsum being caclulated as sqrt(x+y) and not as sqrt(x*x + y*y)?
 						if (intersection.x < boundingRect.left) {
 							if (intersection.y < boundingRect.bottom) {
 								dx = checkedPoint.x - boundingRect.left;
