@@ -1777,7 +1777,7 @@ void duform(unsigned formType) {
 	}
 }
 
-float FindDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point, double *length)
+float findDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point, double *length)
 {
 	const double A = point.x - lineStart.x;
 	const double B = point.y - lineStart.y;
@@ -1847,7 +1847,7 @@ unsigned closfrm() {
 				vertices = FormList[iForm].vertices;
 				// find the closest line first and then find the closest vertex on that line
 				for (iVertex = 0; iVertex < FormInfo.sideCount; iVertex++) {
-					param = FindDistanceToSide(vertices[iVertex], vertices[nxt(iVertex)], point, &length);
+					param = findDistanceToSide(vertices[iVertex], vertices[nxt(iVertex)], point, &length);
 					if (length < minimumLength && length >= 0) {
 						minimumLength = length;
 						closestForm = iForm;
@@ -5333,7 +5333,7 @@ unsigned closat() {
 			}
 			// Loop through for all line segments
 			for (iVertex = 0; iVertex < lastVertex; iVertex++) {
-				param = FindDistanceToSide(CurrentFormVertices[iVertex], CurrentFormVertices[nxt(iVertex)], SelectedPoint, &length);
+				param = findDistanceToSide(CurrentFormVertices[iVertex], CurrentFormVertices[nxt(iVertex)], SelectedPoint, &length);
 				if ((length < minimumLength)) {
 					if ((param < 0.0) && (iVertex == 0)) {
 						// this should only happen if the Closest vertex is the start of a line (vertex 0)

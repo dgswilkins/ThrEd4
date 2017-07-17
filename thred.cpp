@@ -7336,7 +7336,7 @@ the distance from the point to the line is given by
 */
 
 unsigned closlin() {
-	// ToDo - This function needs to be thoroughly checked and compared to FindDistanceToSide
+	// ToDo - This function needs to be thoroughly checked and compared to findDistanceToSide
 
 	unsigned	iStitch = 0, iChange = 0, stitchCount = 0, closestPoint = 0xffffffff;
 	double		sum = 1e99;
@@ -7365,8 +7365,7 @@ unsigned closlin() {
 		if (chkhid(iChange)) {
 
 			for (iStitch = 0; iStitch < stitchCount; iStitch++) {
-				// ToDo - should the iterator in line below be iChange or iStitch?
-				layer = (stitches[iChange].attribute&LAYMSK) >> LAYSHFT;
+				layer = (stitches[iStitch].attribute&LAYMSK) >> LAYSHFT;
 				if (!ActiveLayer || !layer || (layer == ActiveLayer)) {
 
 					xba = stitches[iStitch + 1].x - stitches[iStitch].x;
@@ -7438,22 +7437,28 @@ gotsum:;
 						boundingRect.right -= tolerance;
 						// ToDo - Is tsum being caclulated as sqrt(x+y) and not as sqrt(x*x + y*y)?
 						if (intersection.x < boundingRect.left) {
-
-							if (intersection.y < boundingRect.bottom)
-								tsum = sqrt(((checkedPoint.x > boundingRect.left) ? (checkedPoint.x - boundingRect.left) : (boundingRect.left - checkedPoint.x)) + ((checkedPoint.y > boundingRect.bottom) ? (checkedPoint.y - boundingRect.bottom) : (boundingRect.bottom - checkedPoint.y)));
-							else
-								tsum = sqrt(((checkedPoint.x > boundingRect.left) ? (checkedPoint.x - boundingRect.left) : (boundingRect.left - checkedPoint.x)) + ((checkedPoint.y > boundingRect.top) ? (checkedPoint.y - boundingRect.top) : (checkedPoint.y - boundingRect.top)));
-						}
-						else {
-
-							if (intersection.x > boundingRect.right) {
-
-								if (intersection.y < boundingRect.bottom)
-									tsum = sqrt(((checkedPoint.x > boundingRect.right) ? (checkedPoint.x - boundingRect.right) : (boundingRect.right - checkedPoint.x)) + ((checkedPoint.y > boundingRect.bottom) ? (checkedPoint.y - boundingRect.bottom) : (boundingRect.bottom - checkedPoint.y)));
-								else
-									tsum = sqrt(((checkedPoint.x > boundingRect.right) ? (checkedPoint.x - boundingRect.right) : (boundingRect.right - checkedPoint.x)) + ((checkedPoint.y > boundingRect.top) ? (checkedPoint.y - boundingRect.top) : (boundingRect.top - checkedPoint.y)));
+							if (intersection.y < boundingRect.bottom) {
+								dx = checkedPoint.x - boundingRect.left;
+								dy = checkedPoint.y - boundingRect.bottom;
+							}
+							else {
+								dx = checkedPoint.x - boundingRect.left;
+								dy = checkedPoint.y - boundingRect.top;
 							}
 						}
+						else {
+							if (intersection.x > boundingRect.right) {
+								if (intersection.y < boundingRect.bottom) {
+									dx = checkedPoint.x - boundingRect.right;
+									dy = checkedPoint.y - boundingRect.bottom;
+								}
+								else {
+									dx = checkedPoint.x - boundingRect.right;
+									dy = checkedPoint.y - boundingRect.top;
+								}
+							}
+						}
+						tsum = sqrt(dx*dx + dy*dy);
 gotal:;
 						if (tsum < sum) {
 
