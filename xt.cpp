@@ -3533,7 +3533,7 @@ void dutxrct(TXTRCT* textureRect) {
 				textureRect->right = texturePoint->line;
 		}
 	}
-	else // should all coordinate values be set to 0 (or to center of screen)?
+	else // ToDo - should all coordinate values be set to 0 (or to center of screen)?
 		textureRect->left = textureRect->right = textureRect->top = textureRect->bottom;
 }
 
