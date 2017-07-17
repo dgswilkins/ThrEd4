@@ -7291,9 +7291,9 @@ substituting:
 
 collecting terms:
 
-  Slope*StitchBuffer[StitchIndex].y-Slope*StitchBuffer[StitchIndex-1].y=StitchBuffer[StitchIndex+1].x-StitchBuffer[StitchIndex].x
-  Slope*(StitchBuffer[StitchIndex].y-StitchBuffer[StitchIndex-1].y)=StitchBuffer[StitchIndex+1].x-StitchBuffer[StitchIndex].x
-  Slope=(StitchBuffer[StitchIndex+1].x-StitchBuffer[StitchIndex].x)/(StitchBuffer[StitchIndex].y-StitchBuffer[StitchIndex-1].y)
+  Slope*StitchBuffer[StitchIndex].y-Slope*StitchBuffer[StitchIndex+1].y=StitchBuffer[StitchIndex+1].x-StitchBuffer[StitchIndex].x
+  Slope*(StitchBuffer[StitchIndex].y-StitchBuffer[StitchIndex+1].y)=StitchBuffer[StitchIndex+1].x-StitchBuffer[StitchIndex].x
+  Slope=(StitchBuffer[StitchIndex+1].x-StitchBuffer[StitchIndex].x)/(StitchBuffer[StitchIndex].y-StitchBuffer[StitchIndex+1].y)
 
 define xba=StitchBuffer[StitchIndex+1].x-StitchBuffer[StitchIndex].x
 define yab=StitchBuffer[StitchIndex].y-StitchBuffer[StitchIndex+1].y
