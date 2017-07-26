@@ -2027,8 +2027,7 @@ void ritfnam(TCHAR* designerName) {
 	unsigned		iName = 0;
 	unsigned char	tmpName[50] = { 0 };
 
-	// ToDo - is this comparison correct?
-	if (*NameOrder > 50)
+	if (NameOrder[0] > 50)
 		fnamtabs();
 	PseudoRandomValue = rsed();
 	for (iName = 0; iName < 50; iName++)
@@ -2106,16 +2105,16 @@ void fnamtabs() {
 
 void dstin(unsigned number, POINT* pout) {
 	// ToDo - what is this code doing?
-	unsigned ind = 0, shift = 1;
+	unsigned index = 0, shift = 1;
 	pout->x = pout->y = 0;
-	for (ind = 0; ind < 22; ind++) {
+	for (index = 0; index < 22; index++) {
 
 		if (number&shift) {
 
-			if (DSTValues[ind].cor)
-				pout->y += DSTValues[ind].val;
+			if (DSTValues[index].cor)
+				pout->y += DSTValues[index].val;
 			else
-				pout->x += DSTValues[ind].val;
+				pout->x += DSTValues[index].val;
 		}
 		shift <<= 1;
 	}
@@ -2152,7 +2151,7 @@ unsigned duthrsh(double threshold) {
 	unsigned	iZoomLevel = 0;
 	double		zoom = 1;
 
-	if (threshold) {
+	if (threshold > 0.0) {
 
 		while (zoom > threshold) {
 
