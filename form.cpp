@@ -12839,14 +12839,13 @@ void col2frm() {
 BOOL fxpnt() {
 
 	double		length = 0.0, delta = 0.0;
-	unsigned	iChainStitch = 0;
+	unsigned	iGuess = 0;
 
 	MoveToCoords.x = CurrentFormVertices[NextStart].x;
 	MoveToCoords.y = CurrentFormVertices[NextStart].y;
 	length = hypot(MoveToCoords.x - SelectedPoint.x, MoveToCoords.y - SelectedPoint.y);
 	if (length > AdjustedSpace) {
-		// ToDo - Is this iterating through chain stitches?
-		for (iChainStitch = 0; iChainStitch < 10; iChainStitch++) {
+		for (iGuess = 0; iGuess < 10; iGuess++) {
 			length = hypot(MoveToCoords.x - SelectedPoint.x, MoveToCoords.y - SelectedPoint.y);
 			delta = AdjustedSpace - length;
 			MoveToCoords.x += delta*ListCOSINEs[CurrentSide];
@@ -12941,8 +12940,8 @@ fxlab:;
 	loopCount = initialCount = 0;
 	smallestSpacing = 0;
 	largestSpacing = 1;
-	// ToDo - why 100?
-	while (loopCount<100 && (largestSpacing - smallestSpacing)>TINY) {
+	// loop at least 50 times to guarantee convergence
+	while (loopCount<50 && (largestSpacing - smallestSpacing)>TINY) {
 		BeanCount = 0;
 		SelectedPoint.x = CurrentFormVertices[0].x;
 		SelectedPoint.y = CurrentFormVertices[0].y;
