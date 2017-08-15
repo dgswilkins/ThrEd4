@@ -68,7 +68,7 @@ void		selRct (fRECTANGLE* sourceRect);
 unsigned	setRmp (unsigned bit);
 void		setpsel ();
 void		shft (fPOINT delta);
-void		sizstch (fRECTANGLE* rectangle);
+void		sizstch(fRECTANGLE* rectangle, fPOINTATTR* stitches);
 void		thrsav ();
 void		trcols (COLORREF color);
 void		trcsel ();
@@ -567,7 +567,6 @@ fRECTANGLE		CheckHoopRect;			//for checking the hoop size
 BALSTCH*		BalaradStitch;			//balarad stitch pointer
 fPOINT			BalaradOffset;			//balarad offset
 unsigned		ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; //for checking if a fill is a clipboard fill
-fPOINTATTR*		RotatedStitches;		//rotated stitches for rotate and save
 unsigned		SideWindowLocation;		//side message window location
 POINT			SideWindowSize;			//size of the side message window
 TCHAR**			SideWindowsStrings;		//string array displayed in sidmsg
@@ -5644,7 +5643,7 @@ void nuFil() {
 							IniFile.auxFileType = AUXPCS;
 							if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP)
 								PCSHeader.hoopType = LARGHUP;
-							sizstch(&stitchRect);
+							sizstch(&stitchRect,StitchBuffer);
 							if (stitchRect.left<0 || stitchRect.right>LHUPY || stitchRect.bottom<0 || stitchRect.top>LHUPY) {
 
 								IniFile.hoopSizeX = LHUPX;
@@ -5883,28 +5882,28 @@ void savdst(unsigned data) {
 #endif
 }
 
-void ritdst() {
+void ritdst(fPOINTATTR* stitches) {
 
 #define DSTMAX 121
 
 	unsigned		iStitch = 0, dstType = 0, color = 0, count = 0, iColor = 0;
 	POINT			centerCoordinate = {}, lengths = {}, absoluteLengths = {}, difference = {}, stepSize = {};
 	fRECTANGLE		boundingRect = {};
-	fPOINTATTR*		dstStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
+	fPOINTATTR*		dstStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount]();
 	// In this case, there could be as many colors as there are stitches
 	// And we have to account for at least one color/stitch
-	unsigned*		colorData = new unsigned[PCSHeader.stitchCount + 3];
+	unsigned*		colorData = new unsigned[PCSHeader.stitchCount + 3]();
 	HANDLE			colorFile = {};
 	unsigned long	bytesWritten = 0;
 
 	colorData[iColor++] = COLVER;
 	colorData[iColor++] = BackgroundColor;
-	colorData[iColor++] = UserColor[StitchBuffer[0].attribute&COLMSK];
+	colorData[iColor++] = UserColor[stitches[0].attribute&COLMSK];
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		dstStitchBuffer[iStitch].x = RotatedStitches[iStitch].x * 5 / 3;
-		dstStitchBuffer[iStitch].y = RotatedStitches[iStitch].y * 5 / 3;
-		dstStitchBuffer[iStitch].attribute = RotatedStitches[iStitch].attribute;
+		dstStitchBuffer[iStitch].x = stitches[iStitch].x * 5 / 3;
+		dstStitchBuffer[iStitch].y = stitches[iStitch].y * 5 / 3;
+		dstStitchBuffer[iStitch].attribute = stitches[iStitch].attribute;
 	}
 	boundingRect.left = boundingRect.right = dstStitchBuffer[0].x;
 	boundingRect.bottom = boundingRect.top = dstStitchBuffer[0].y;
@@ -5982,7 +5981,7 @@ void ritdst() {
 
 		colorFile = CreateFile(ColorFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		if (colorFile != INVALID_HANDLE_VALUE)
-			WriteFile(colorFile, &colorData, iColor * sizeof(unsigned), &bytesWritten, 0);
+			WriteFile(colorFile, &colorData[0], iColor * sizeof(unsigned), &bytesWritten, 0);
 		CloseHandle(colorFile);
 		colorFile = CreateFile(RGBFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		if (colorFile != INVALID_HANDLE_VALUE)
@@ -5993,9 +5992,9 @@ void ritdst() {
 	delete[] colorData;
 }
 
-BOOL pcshup() {
+BOOL pcshup(fPOINTATTR*	stitches) {
 
-	fRECTANGLE	boundingRect = { RotatedStitches[0].y ,RotatedStitches[0].x , RotatedStitches[0].x ,RotatedStitches[0].y };
+	fRECTANGLE	boundingRect = { stitches[0].y ,stitches[0].x , stitches[0].x ,stitches[0].y };
 	fPOINT		boundingSize = {};
 	unsigned	iStitch = 0;
 	fPOINT		hoopSize = {};
@@ -6003,14 +6002,14 @@ BOOL pcshup() {
 
 	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-		if (RotatedStitches[iStitch].x < boundingRect.left)
-			boundingRect.left = RotatedStitches[iStitch].x;
-		if (RotatedStitches[iStitch].x > boundingRect.right)
-			boundingRect.right = RotatedStitches[iStitch].x;
-		if (RotatedStitches[iStitch].y < boundingRect.bottom)
-			boundingRect.bottom = RotatedStitches[iStitch].y;
-		if (RotatedStitches[iStitch].y > boundingRect.top)
-			boundingRect.top = RotatedStitches[iStitch].y;
+		if (stitches[iStitch].x < boundingRect.left)
+			boundingRect.left = stitches[iStitch].x;
+		if (stitches[iStitch].x > boundingRect.right)
+			boundingRect.right = stitches[iStitch].x;
+		if (stitches[iStitch].y < boundingRect.bottom)
+			boundingRect.bottom = stitches[iStitch].y;
+		if (stitches[iStitch].y > boundingRect.top)
+			boundingRect.top = stitches[iStitch].y;
 	}
 	boundingSize.x = boundingRect.right - boundingRect.left;
 	boundingSize.y = boundingRect.top - boundingRect.bottom;
@@ -6053,8 +6052,8 @@ BOOL pcshup() {
 
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			RotatedStitches[iStitch].x += delta.x;
-			RotatedStitches[iStitch].y += delta.y;
+			stitches[iStitch].x += delta.x;
+			stitches[iStitch].y += delta.y;
 		}
 	}
 	return 0;
@@ -6313,6 +6312,7 @@ void sav() {
 	DSTHED			dstHeader = {};
 	TCHAR*			pchr = nullptr;
 	unsigned		savcol = 0;
+	fPOINTATTR*		saveStitches = nullptr;
 
 #if PESACT
 
@@ -6336,23 +6336,23 @@ void sav() {
 		return;
 	chk1col();
 	coltab();
-	RotatedStitches = new fPOINTATTR[PCSHeader.stitchCount];
+	saveStitches = new fPOINTATTR[PCSHeader.stitchCount]();
 	if (chku(ROTAUX)) {
 
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			RotatedStitches[iStitch].y = -StitchBuffer[iStitch].x;
-			RotatedStitches[iStitch].x = StitchBuffer[iStitch].y;
-			RotatedStitches[iStitch].attribute = StitchBuffer[iStitch].attribute;
+			saveStitches[iStitch].y = -StitchBuffer[iStitch].x;
+			saveStitches[iStitch].x = StitchBuffer[iStitch].y;
+			saveStitches[iStitch].attribute = StitchBuffer[iStitch].attribute;
 		}
 	}
 	else {
 
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			RotatedStitches[iStitch].x = StitchBuffer[iStitch].x;
-			RotatedStitches[iStitch].y = StitchBuffer[iStitch].y;
-			RotatedStitches[iStitch].attribute = StitchBuffer[iStitch].attribute;
+			saveStitches[iStitch].x = StitchBuffer[iStitch].x;
+			saveStitches[iStitch].y = StitchBuffer[iStitch].y;
+			saveStitches[iStitch].attribute = StitchBuffer[iStitch].attribute;
 		}
 	}
 	PCSFileHandle = CreateFile(AuxName, (GENERIC_WRITE | GENERIC_READ), 0, NULL,
@@ -6369,8 +6369,8 @@ void sav() {
 			case AUXDST:
 
 				// There are always going to be more recordds in the DST format
-				DSTRecords = new DSTREC[2 * PCSHeader.stitchCount];
-				ritdst();
+				DSTRecords = new DSTREC[2 * PCSHeader.stitchCount]();
+				ritdst(saveStitches);
 				pchr = static_cast<TCHAR  *>(static_cast<void *>(&dstHeader));
 				for (iHeader = 0; iHeader < sizeof(DSTHED); iHeader++)
 					pchr[iHeader] = ' ';
@@ -6523,7 +6523,7 @@ void sav() {
 
 				for (iColor = 0; iColor < 16; iColor++)
 					PCSHeader.colors[iColor] = UserColor[iColor];
-				if (pcshup())
+				if (pcshup(saveStitches))
 					return;
 				if (!WriteFile(PCSFileHandle, &PCSHeader, 0x46, &bytesWritten, 0)) {
 
@@ -6536,16 +6536,16 @@ void sav() {
 				savcol = 0xff;
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-					if ((RotatedStitches[iStitch].attribute&COLMSK) != savcol) {
+					if ((saveStitches[iStitch].attribute&COLMSK) != savcol) {
 
-						savcol = RotatedStitches[iStitch].attribute&COLMSK;
+						savcol = saveStitches[iStitch].attribute&COLMSK;
 						PCSStitchBuffer[iPCSstitch].tag = 3;
 						PCSStitchBuffer[iPCSstitch++].fx = savcol;
 					}
-					fractionalPart = modf(RotatedStitches[iStitch].x, &integerPart);
+					fractionalPart = modf(saveStitches[iStitch].x, &integerPart);
 					PCSStitchBuffer[iPCSstitch].fx = fractionalPart * 256;
 					PCSStitchBuffer[iPCSstitch].x = integerPart;
-					fractionalPart = modf(RotatedStitches[iStitch].y, &integerPart);
+					fractionalPart = modf(saveStitches[iStitch].y, &integerPart);
 					PCSStitchBuffer[iPCSstitch].fy = fractionalPart * 256;
 					PCSStitchBuffer[iPCSstitch++].y = integerPart;
 				}
@@ -6578,7 +6578,7 @@ void sav() {
 		if (chku(ROTAUX))
 			filnopn(IDS_FILROT, AuxName);
 	}
-	delete[] RotatedStitches;
+	delete[] saveStitches;
 }
 #pragma warning(pop)
 
@@ -11376,24 +11376,24 @@ void ungrphi() {
 dwngrpdun:;
 }
 
-void sizstch(fRECTANGLE* rectangle) {
+void sizstch(fRECTANGLE* rectangle, fPOINTATTR* stitches) {
 
 	unsigned	iStitch = 0;
 
 	if (PCSHeader.stitchCount) {
 
-		rectangle->bottom = rectangle->top = RotatedStitches[0].y;
-		rectangle->left = rectangle->right = RotatedStitches[0].x;
+		rectangle->bottom = rectangle->top = stitches[0].y;
+		rectangle->left = rectangle->right = stitches[0].x;
 		for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			if (RotatedStitches[iStitch].x < rectangle->left)
-				rectangle->left = RotatedStitches[iStitch].x;
-			if (RotatedStitches[iStitch].x > rectangle->right)
-				rectangle->right = RotatedStitches[iStitch].x;
-			if (RotatedStitches[iStitch].y < rectangle->bottom)
-				rectangle->bottom = RotatedStitches[iStitch].y;
-			if (RotatedStitches[iStitch].y > rectangle->top)
-				rectangle->top = RotatedStitches[iStitch].y;
+			if (stitches[iStitch].x < rectangle->left)
+				rectangle->left = stitches[iStitch].x;
+			if (stitches[iStitch].x > rectangle->right)
+				rectangle->right = stitches[iStitch].x;
+			if (stitches[iStitch].y < rectangle->bottom)
+				rectangle->bottom = stitches[iStitch].y;
+			if (stitches[iStitch].y > rectangle->top)
+				rectangle->top = stitches[iStitch].y;
 		}
 	}
 	else
@@ -11409,8 +11409,7 @@ void hupfn() {
 	dPOINT		delta = {};
 
 	rstMap(HUPCHNG);
-	RotatedStitches = StitchBuffer;
-	sizstch(&CheckHoopRect);
+	sizstch(&CheckHoopRect, StitchBuffer);
 	if (FormIndex) {
 
 		if (!PCSHeader.stitchCount) {
