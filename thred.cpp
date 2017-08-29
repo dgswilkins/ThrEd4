@@ -7768,7 +7768,7 @@ void delstchm() {
 		StitchBuffer[destination].x = StitchBuffer[iStitch].x;
 		StitchBuffer[destination++].y = StitchBuffer[iStitch].y;
 	}
-	PCSHeader.stitchCount = destination - 1;
+	PCSHeader.stitchCount = destination;
 }
 
 void unsid() {
