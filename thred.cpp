@@ -3197,6 +3197,12 @@ void ritini() {
 	IniFile.backgroundColor = BackgroundColor;
 	IniFile.bitmapColor = BitmapColor;
 	IniFile.minStitchLength = MinStitchLength;
+	if (ShowStitchThreshold < 0) {
+		ShowStitchThreshold = 0;
+	}
+	if (ShowStitchThreshold > 9) {
+		ShowStitchThreshold = 9;
+	}
 	IniFile.showStitchThreshold = ShowStitchThreshold;
 	IniFile.threadSize30 = ThreadSize30;
 	IniFile.threadSize40 = ThreadSize40;
@@ -4733,7 +4739,7 @@ BOOL binv(unsigned bitmapWidthInWords) {
 		return 0;
 }
 
-void bitlin(unsigned* source, unsigned* destination, COLORREF foreground, COLORREF background) {
+void bitlin(const unsigned* source, unsigned* destination, COLORREF foreground, COLORREF background) {
 
 #if  __UseASM__
 	_asm {
@@ -4770,7 +4776,7 @@ blup1 :
 		bit.dword0 = i;
 		bit.bytes.byte0 = bit.bytes.byte0 ^ 0x07;
 
-		*destination = (_bittest(static_cast<long *>(static_cast<void *>(source)), bit.dword0)) ? foreground : background;
+		*destination = (_bittest(static_cast<const long *>(static_cast<const void *>(source)), bit.dword0)) ? foreground : background;
 
 		destination++;
 	}
@@ -21631,6 +21637,12 @@ void redini() {
 		BackgroundColor = IniFile.backgroundColor;
 		BitmapColor = IniFile.bitmapColor;
 		MinStitchLength = IniFile.minStitchLength;
+		if (IniFile.showStitchThreshold < 0) {
+			IniFile.showStitchThreshold = 0;
+		}
+		if (IniFile.showStitchThreshold > 9) {
+			IniFile.showStitchThreshold = 9;
+		}
 		ShowStitchThreshold = IniFile.showStitchThreshold;
 		if (IniFile.threadSize30)
 			ThreadSize30 = IniFile.threadSize30;
