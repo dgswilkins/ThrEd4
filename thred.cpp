@@ -5048,7 +5048,7 @@ void dstran() {
 
 			retval = GetFileSizeEx(colorFile, &colorFileSize);
 			// There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
-			colors = new unsigned[colorFileSize.u.LowPart];
+			colors = new unsigned[colorFileSize.u.LowPart]();
 			ReadFile(colorFile, colors, colorFileSize.u.LowPart, &bytesRead, 0);
 			CloseHandle(colorFile);
 			if (bytesRead > 1) {

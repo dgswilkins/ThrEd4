@@ -3145,20 +3145,24 @@ void duseq(unsigned start, unsigned finish) {
 
 	unsigned	iLine = 0, iLineDec = 0;
 	unsigned	savedTopLine = SortedLines[start][1].line;
+	bool		flag = false;
 
-	SequenceLines = nullptr;
+	SequenceLines = &*SortedLines[start];
 	rstMap(SEQDUN);
 	if (start > finish) {
 		// This odd construction for iLine is used to ensure loop terminates when finish = 0
 		for (iLine = start + 1; iLine != finish; iLine--) {
 			iLineDec = iLine - 1;
 			if (setseq(iLineDec)) {
-				if (!setMap(SEQDUN))
+				if (!setMap(SEQDUN)) {
+					flag = true;
 					duseq2(iLineDec);
+				}
 				else {
 					if (savedTopLine != SortedLines[iLineDec][1].line) {
 						if (iLineDec)
 							duseq2(iLineDec + 1);
+						flag = true;
 						duseq2(iLineDec);
 						savedTopLine = SequenceLines[1].line;
 					}
@@ -3167,23 +3171,29 @@ void duseq(unsigned start, unsigned finish) {
 			else {
 				if (rstMap(SEQDUN))
 					duseq2(iLineDec + 1);
+				flag = true;
 				SequenceLines = &*SortedLines[iLineDec];
 				movseq(iLineDec);
 			}
 		}
-		if (rstMap(SEQDUN))
+		if (rstMap(SEQDUN)) {
+			flag = true;
 			duseq2(iLine);
-		if (SequenceLines != nullptr) { LastGroup = SequenceLines->group; }
+		}
+		if (flag) { LastGroup = SequenceLines->group; }
 	}
 	else {
 		for (iLine = start; iLine <= finish; iLine++) {
 			if (setseq(iLine)) {
-				if (!setMap(SEQDUN))
+				if (!setMap(SEQDUN)) {
+					flag = true;
 					duseq2(iLine);
+				}
 				else {
 					if (savedTopLine != SortedLines[iLine][1].line) {
 						if (iLine)
 							duseq2(iLine - 1);
+						flag = true;
 						duseq2(iLine);
 						savedTopLine = SequenceLines[1].line;
 					}
@@ -3194,15 +3204,18 @@ void duseq(unsigned start, unsigned finish) {
 					if (iLine)
 						duseq2(iLine - 1);
 				}
+				flag = true;
 				SequenceLines = &*SortedLines[iLine];
 				movseq(iLine);
 			}
 		}
 		if (rstMap(SEQDUN)) {
-			if (iLine)
+			if (iLine) {
+				flag = true;
 				duseq2(iLine - 1);
+			}
 		}
-		if (SequenceLines != nullptr) { LastGroup = SequenceLines->group; }
+		if (flag) { LastGroup = SequenceLines->group; }
 	}
 }
 
@@ -12052,6 +12065,7 @@ void clpcon() {
 	unsigned	clipGridOffset = 0;
 	double		clipVerticalOffset = 0.0;
 	TXPNT*		texture = nullptr;
+	bool		flag = false;
 	unsigned*	iclpx = nullptr;			//indices into region crossing data for vertical clipboard fills
 	unsigned	clplim = 0;			//vertical clipboard search limit
 
@@ -12169,6 +12183,7 @@ void clpcon() {
 			textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
 			ClipStitchCount = TextureSegments[textureLine].stitchCount;
 			texture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + TextureSegments[textureLine].line];
+			flag = true;
 			LineSegmentStart.x = pasteLocation.x;
 			if (SelectedForm->txof) {
 				lineOffset = (iRegion + clipGrid.left) / SelectedForm->fillInfo.texture.lines;
@@ -12193,7 +12208,7 @@ void clpcon() {
 			}
 			for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
 				if (chkMap(TXFIL)) {
-					if (texture != nullptr) {
+					if (flag) {
 						LineSegmentEnd.x = pasteLocation.x;
 						LineSegmentEnd.y = pasteLocation.y + texture[iStitch].y;
 					}
