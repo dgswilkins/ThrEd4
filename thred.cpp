@@ -13116,24 +13116,24 @@ void stchsnap(unsigned start, unsigned finish) {
 		je		short stchsnapx
 		add		eax, offset StitchBuffer
 		fld		IniFile.gridSize
-snplup : 
+		snplup :
 		fld		dword ptr[eax]
-		fdiv	st, st(1)
-		frndint
-		fmul	st, st(1)
-		fstp	dword ptr[eax]
-		add		eax, 4
-		fld		dword ptr[eax]
-		fdiv	st, st(1)
-		frndint
-		fmul	st, st(1)
-		fstp	dword ptr[eax]
-		add		eax, 8
-		loop	snplup
-stchsnapx :
+			fdiv	st, st(1)
+			frndint
+			fmul	st, st(1)
+			fstp	dword ptr[eax]
+			add		eax, 4
+			fld		dword ptr[eax]
+			fdiv	st, st(1)
+			frndint
+			fmul	st, st(1)
+			fstp	dword ptr[eax]
+			add		eax, 8
+			loop	snplup
+			stchsnapx :
 	}
 #else
-	fPOINTATTR *pnt = StitchBuffer + start;
+	fPOINTATTR *pnt = &StitchBuffer[start];
 
 	for (unsigned i = 0; i < finish - start; i++) {
 		pnt->x = rintf(pnt->x / IniFile.gridSize) * IniFile.gridSize;
