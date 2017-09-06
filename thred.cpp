@@ -2281,9 +2281,8 @@ void deldu() {
 	for (iBuffer = 0; iBuffer < 16; iBuffer++) {
 
 		if (UndoBuffer[iBuffer]) {
-
-			free(UndoBuffer[iBuffer]);
-			UndoBuffer[iBuffer] = 0;
+			delete UndoBuffer[iBuffer];
+			UndoBuffer[iBuffer] = nullptr;
 		}
 	}
 	UndoBufferWriteIndex = 0;
@@ -2327,11 +2326,11 @@ void dudat() {
 	BAKHED*		backupData = nullptr;
 
 	if (UndoBuffer[UndoBufferWriteIndex])
-		free(UndoBuffer[UndoBufferWriteIndex]);
+		delete UndoBuffer[UndoBufferWriteIndex];
 	size = sizeof(BAKHED) + sizeof(FRMHED)*FormIndex + sizeof(fPOINTATTR)*PCSHeader.stitchCount
 		+ sizeof(fPOINT)*(FormVertexIndex + ClipPointIndex) + sizeof(SATCON)*SatinConnectIndex + sizeof(COLORREF) * 16 +
 		sizeof(TXPNT)*TextureIndex;
-	UndoBuffer[UndoBufferWriteIndex] = calloc(size, sizeof(unsigned));
+	UndoBuffer[UndoBufferWriteIndex] = new unsigned[size];
 	backupData = static_cast<BAKHED*>(UndoBuffer[UndoBufferWriteIndex]);
 	if (backupData) {
 
@@ -5048,7 +5047,7 @@ void dstran() {
 
 			retval = GetFileSizeEx(colorFile, &colorFileSize);
 			// There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
-			colors = new unsigned[colorFileSize.u.LowPart]();
+			colors = new unsigned[colorFileSize.u.LowPart];
 			ReadFile(colorFile, colors, colorFileSize.u.LowPart, &bytesRead, 0);
 			CloseHandle(colorFile);
 			if (bytesRead > 1) {
