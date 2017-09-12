@@ -5034,67 +5034,52 @@ void dstran() {
 	fPOINT			dstSize = {};
 	fPOINT			delta = {};
 	HANDLE			colorFile = {};
-	unsigned*		colors = nullptr;
+	unsigned*		colors = new unsigned[1];
 	unsigned		iColor = 0;
 	DWORD			bytesRead = 0;
 	LARGE_INTEGER	colorFileSize = {};
 	BOOL			retval = false;
 
 	if (colfil()) {
-
 		colorFile = CreateFile(ColorFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 		if (colorFile != INVALID_HANDLE_VALUE) {
-
 			retval = GetFileSizeEx(colorFile, &colorFileSize);
 			// There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
-			colors = new unsigned[colorFileSize.u.LowPart];
+			delete[] colors;
+			colors = new unsigned[colorFileSize.u.LowPart/sizeof(unsigned)];
 			ReadFile(colorFile, colors, colorFileSize.u.LowPart, &bytesRead, 0);
 			CloseHandle(colorFile);
-			if (bytesRead > 1) {
-				if (bytesRead && colors && colors[0] == COLVER) {
-
+			if (bytesRead > (sizeof(colors[0]) * 2)) {
+				if (colors[0] == COLVER) {
 					BackgroundColor = colors[1];
 					ColorChanges = 0;
 				}
 			}
-			else {
-
-				if (colors) {
-
-					delete[] colors;
-					colors = nullptr;
-				}
-			}
 		}
 	}
-	iStitch = 0;
-	if (colors)
-		color = colmatch(colors[2]);
+
+	iColor = 2;
+	if (bytesRead >= ((iColor + 1) * sizeof(colors[0])))
+		color = colmatch(colors[iColor++]);
 	else
 		color = 0;
-	iColor = 3;
 	localStitch.x = localStitch.y = 0;
 	maximumCoordinate.x = maximumCoordinate.y = (float)-1e12;
 	mimimumCoordinate.x = mimimumCoordinate.y = (float)1e12;
 	for (iRecord = 0; iRecord < DSTRecordCount; iRecord++) {
-
 		if (DSTRecords[iRecord].nd & 0x40) {
-
-			if (colors)
+			if (bytesRead >= ((iColor + 1) * sizeof(colors[0])))
 				color = colmatch(colors[iColor++]);
 			else {
-
 				color++;
 				color &= 0xf;
 			}
 		}
 		else {
-
 			dstin(dtrn(&DSTRecords[iRecord]), &dstStitch);
 			localStitch.x += dstStitch.x;
 			localStitch.y += dstStitch.y;
 			if (!(DSTRecords[iRecord].nd & 0x80)) {
-
 				StitchBuffer[iStitch].attribute = color | NOTFRM;
 				StitchBuffer[iStitch].x = localStitch.x*0.6;
 				StitchBuffer[iStitch].y = localStitch.y*0.6;
@@ -5110,8 +5095,7 @@ void dstran() {
 			}
 		}
 	}
-	if (colors)
-		delete[] colors;
+	delete[] colors;
 	PCSHeader.stitchCount = iStitch;
 	dstSize.x = maximumCoordinate.x - mimimumCoordinate.x;
 	dstSize.y = maximumCoordinate.y - mimimumCoordinate.y;
@@ -5119,7 +5103,6 @@ void dstran() {
 	UnzoomedRect.x = IniFile.hoopSizeX;
 	UnzoomedRect.y = IniFile.hoopSizeY;
 	if (dstSize.x > UnzoomedRect.x || dstSize.y > UnzoomedRect.y) {
-
 		IniFile.hoopSizeX = UnzoomedRect.x = dstSize.x*1.1;
 		IniFile.hoopSizeY = UnzoomedRect.y = dstSize.y*1.1;
 		hsizmsg();
@@ -5127,7 +5110,6 @@ void dstran() {
 	delta.x = (UnzoomedRect.x - dstSize.x) / 2 - mimimumCoordinate.x;
 	delta.y = (UnzoomedRect.y - dstSize.y) / 2 - mimimumCoordinate.y;
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		StitchBuffer[iStitch].x += delta.x;
 		StitchBuffer[iStitch].y += delta.y;
 	}

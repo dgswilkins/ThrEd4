@@ -12064,7 +12064,7 @@ void clpcon() {
 	float		formNegativeOffset = 0.0;
 	unsigned	clipGridOffset = 0;
 	double		clipVerticalOffset = 0.0;
-	TXPNT*		texture = nullptr;
+	TXPNT*		texture = new TXPNT[1]();
 	bool		flag = false;
 	unsigned*	iclpx = nullptr;			//indices into region crossing data for vertical clipboard fills
 	unsigned	clplim = 0;			//vertical clipboard search limit
@@ -12182,6 +12182,7 @@ void clpcon() {
 		if (chkMap(TXFIL)) {
 			textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
 			ClipStitchCount = TextureSegments[textureLine].stitchCount;
+			delete[] texture;
 			texture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + TextureSegments[textureLine].line];
 			flag = true;
 			LineSegmentStart.x = pasteLocation.x;
@@ -12403,6 +12404,7 @@ clp1skp:;
 	}
 	delete[] ClipStitchPoints;
 	delete[] ClipSegments;
+	if (!flag) { delete[] texture; }
 }
 
 void vrtsclp() {
