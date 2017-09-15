@@ -4866,7 +4866,8 @@ void savmap() {
 void bfil() {
 
 	unsigned	bitmapWidthWords = 0, widthOverflow = 0, fileHeaderSize = 0, bitmapSizeWords = 0, iHeight = 0;
-	unsigned	*pbits = nullptr;
+	void		*lpBits = nullptr;
+	unsigned	*bits = nullptr;
 	HBITMAP		bitmap = {};
 	HDC			deviceContext = {};
 	COLORREF	foreground = {};
@@ -4940,12 +4941,13 @@ void bfil() {
 			BitmapInfoHeader.biBitCount = 32;
 			BitmapInfoHeader.biCompression = BI_RGB;
 			BitmapInfo.bmiHeader = BitmapInfoHeader;
-			[[gsl::suppress(type.1)]]bitmap = CreateDIBSection(BitmapDC, &BitmapInfo, DIB_RGB_COLORS, reinterpret_cast<void **>(&pbits), 0, 0);
+			bitmap = CreateDIBSection(BitmapDC, &BitmapInfo, DIB_RGB_COLORS, &lpBits, 0, 0);
 			//Synchronize
 			GdiFlush();
-			if (pbits) {
+			if (lpBits != nullptr) {
+				bits = static_cast<unsigned *>(lpBits);
 				for (iHeight = 0; iHeight < BitmapHeight; iHeight++)
-					bitlin(&MonoBitmapData[iHeight*bitmapWidthWords], &pbits[iHeight*BitmapWidth], background, foreground);
+					bitlin(&MonoBitmapData[iHeight * bitmapWidthWords], &bits[iHeight * BitmapWidth], background, foreground);
 			}
 			deviceContext = CreateCompatibleDC(StitchWindowDC);
 			if (bitmap && deviceContext) {
