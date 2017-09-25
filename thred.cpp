@@ -433,7 +433,7 @@ extern	double			SpiralWrap;
 extern	TCHAR*			StringData;
 extern	TCHAR*			StringTable[STR_LEN];
 extern	double			StarRatio;
-extern	double			StitchSpacing;
+extern	double			LineSpacing;
 extern	int				TextureHistoryIndex;
 extern	TXHST			TextureHistory[16];
 extern	TXTSCR			TextureScreen;
@@ -3209,7 +3209,7 @@ void ritini() {
 	IniFile.userStitchLength = UserStitchLength;
 	IniFile.smallStitchLength = SmallStitchLength;
 	IniFile.stitchBoxesThreshold = StitchBoxesThreshold;
-	IniFile.stitchSpace = StitchSpacing;
+	IniFile.stitchSpace = LineSpacing;
 	IniFile.userFlagMap = UserFlagMap;
 	IniFile.borderWidth = BorderWidth;
 	IniFile.appliqueColor = AppliqueColor;
@@ -4203,7 +4203,7 @@ void chknum() {
 
 								case PSPAC:
 
-									StitchSpacing = value*PFGRAN;
+									LineSpacing = value*PFGRAN;
 									SetWindowText(ValueWindow[PSPAC], MsgBuffer);
 									break;
 
@@ -12502,7 +12502,7 @@ void defpref() {
 	IniFile.chainRatio = CHRDEF;
 	IniFile.fillAngle = DEFANG;
 	rstu(SQRFIL);
-	StitchSpacing = DEFSPACE*PFGRAN;
+	LineSpacing = DEFSPACE*PFGRAN;
 	ShowStitchThreshold = SHOPNTS;
 	IniFile.gridSize = 12;
 	IniFile.hoopType = LARGHUP;
@@ -12952,7 +12952,7 @@ void respac() {
 
 	if (isclp(ClosestFormToCursor)) {
 
-		SelectedForm->fillSpacing = StitchSpacing;
+		SelectedForm->fillSpacing = LineSpacing;
 		fsizpar();
 	}
 }
@@ -17038,7 +17038,7 @@ chkcolx:;
 							case EDGEBEAN:
 
 								SelectedForm->borderSize = BorderWidth;
-								SelectedForm->edgeSpacing = StitchSpacing;
+								SelectedForm->edgeSpacing = LineSpacing;
 								break;
 
 							case EDGEPROPSAT:
@@ -17071,7 +17071,7 @@ chkcolx:;
 						if (SelectedForm->edgeType == EDGELINE || SelectedForm->edgeType == EDGEBEAN || SelectedForm->edgeType == EDGECLIP) {
 
 							SelectedForm->borderSize = BorderWidth;
-							SelectedForm->edgeSpacing = StitchSpacing;
+							SelectedForm->edgeSpacing = LineSpacing;
 							if (SelectedForm->edgeType == EDGECLIP)
 								bsizpar();
 						}
@@ -17102,7 +17102,7 @@ chkcolx:;
 							case EDGEBEAN:
 
 								SelectedForm->borderSize = BorderWidth;
-								SelectedForm->edgeSpacing = StitchSpacing;
+								SelectedForm->edgeSpacing = LineSpacing;
 								break;
 
 							case EDGEANGSAT:
@@ -17118,7 +17118,7 @@ chkcolx:;
 
 						unmsg();
 						unsid();
-						prpbrd(StitchSpacing);
+						prpbrd(LineSpacing);
 						return 1;
 					}
 				}
@@ -17129,7 +17129,7 @@ chkcolx:;
 						if (SelectedForm->edgeType == EDGELINE || SelectedForm->edgeType == EDGEBEAN || SelectedForm->edgeType == EDGECLIP) {
 
 							SelectedForm->borderSize = BorderWidth;
-							SelectedForm->edgeSpacing = StitchSpacing;
+							SelectedForm->edgeSpacing = LineSpacing;
 							if (SelectedForm->edgeType == EDGECLIP)
 								bsizpar();
 						}
@@ -17151,7 +17151,7 @@ chkcolx:;
 						if (SelectedForm->edgeType == EDGELINE || SelectedForm->edgeType == EDGEBEAN || SelectedForm->edgeType == EDGECLIP) {
 
 							SelectedForm->borderSize = BorderWidth;
-							SelectedForm->edgeSpacing = StitchSpacing;
+							SelectedForm->edgeSpacing = LineSpacing;
 							if (SelectedForm->edgeType == EDGECLIP)
 								bsizpar();
 						}
@@ -17317,7 +17317,7 @@ chkcolx:;
 					if (SelectedForm->fillType) {
 
 						if (SelectedForm->fillType == CLPF)
-							SelectedForm->fillSpacing = StitchSpacing;
+							SelectedForm->fillSpacing = LineSpacing;
 						chkcont();
 						goto didfil;
 					}
@@ -20733,7 +20733,7 @@ thumout:;
 
 					if (chkMap(FORMSEL) || SelectedFormCount)
 						savdo();
-					prpbrd(StitchSpacing);
+					prpbrd(LineSpacing);
 					break;
 
 				case ID_PURGDIR: // file / Delete Backups / All backups in the selected directory
@@ -21641,7 +21641,7 @@ void redini() {
 			SmallStitchLength = IniFile.smallStitchLength;
 		StitchBoxesThreshold = IniFile.stitchBoxesThreshold;
 		if (IniFile.stitchSpace)
-			StitchSpacing = IniFile.stitchSpace;
+			LineSpacing = IniFile.stitchSpace;
 		UserFlagMap = IniFile.userFlagMap;
 		if (IniFile.borderWidth)
 			BorderWidth = IniFile.borderWidth;

@@ -287,7 +287,7 @@ unsigned		NewFormVertexCount;		//points in the new form
 FORMINFO		FormInfo;				//form info used in drawing forms
 FRMHED			FormList[MAXFORMS];		//a list of form headers
 unsigned		FormIndex = 0;			//index into the list of forms
-double			StitchSpacing = DEFSPACE*PFGRAN;//stitch spacing in stitch units
+double			LineSpacing = DEFSPACE*PFGRAN;//stitch spacing in stitch units
 fPOINT*			CurrentFillVertices;	//pointer to the line of the polygon being filled
 fPOINT*			ClipFillData;			//data for clipboard fills
 fPOINT*			ClipReversedData;		//data for clipboard fills
@@ -2176,7 +2176,7 @@ void flt2dub(fPOINT inPoint, dPOINT* outPoint) {
 
 void linrutb(unsigned start) {
 
-	const double	spacing = StitchSpacing;
+	const double	spacing = LineSpacing;
 	unsigned		iVertex = start + 1;
 	dPOINT			point = { (CurrentFormVertices[start].x),(CurrentFormVertices[start].y) };
 
@@ -2186,7 +2186,7 @@ void linrutb(unsigned start) {
 	}
 	flt2dub(CurrentFormVertices[0], &point);
 	filinsb(point);
-	StitchSpacing = spacing;
+	LineSpacing = spacing;
 }
 
 void oclp(fPOINT* clip, unsigned clipEntries) {
@@ -2575,8 +2575,8 @@ void refilfn() {
 			chkund();
 			rstMap(ISUND);
 			if (SelectedForm->fillType) {
-				spacing = StitchSpacing;
-				StitchSpacing = SelectedForm->fillSpacing;
+				spacing = LineSpacing;
+				LineSpacing = SelectedForm->fillSpacing;
 				switch (static_cast<unsigned>(SelectedForm->fillType)) {
 					case VRTF:
 
@@ -2646,7 +2646,7 @@ void refilfn() {
 				}
 skpfil:;
 				ritfil();
-				StitchSpacing = spacing;
+				LineSpacing = spacing;
 			}
 			chkbrd();
 			break;
@@ -2660,11 +2660,11 @@ skpfil:;
 			switch (SelectedForm->fillType) {
 				case SATF:
 
-					spacing = StitchSpacing;
-					StitchSpacing = SelectedForm->fillSpacing;
+					spacing = LineSpacing;
+					LineSpacing = SelectedForm->fillSpacing;
 					UserStitchLength = SelectedForm->lengthOrCount.stitchLength;
 					satfil();
-					StitchSpacing = spacing;
+					LineSpacing = spacing;
 					ritfil();
 					break;
 
@@ -3762,7 +3762,7 @@ void lcon() {
 					}
 				}
 				while (!count) {
-					GapToClosestRegion += StitchSpacing;
+					GapToClosestRegion += LineSpacing;
 					count = 0;
 					for (iNode = 0; iNode < RegionCount; iNode++) {
 						if (iSequence != iNode) {
@@ -3906,7 +3906,7 @@ void bakseq() {
 	double	length = 0.0, slope = 0.0;
 	const double	UserStitchLength2 = UserStitchLength * 2;
 	const double	UserStitchLength9 = UserStitchLength / 9;
-	const double	StitchSpacing2 = StitchSpacing * 2;
+	const double	StitchSpacing2 = LineSpacing * 2;
 
 	SequenceIndex = 0;
 	rstMap(FILDIR);
@@ -4032,9 +4032,9 @@ void bakseq() {
 
 void fnvrt() {
 
-	unsigned		iVertex = 0, iStitch = 0, ind = 0, ine = 0;
-	unsigned		iLine = 0, inf = 0, stitchCount = 0, lineCount = 0, tind = 0;
-	int				stitchOffset = 0;
+	unsigned		iVertex = 0, iLine = 0, ind = 0, ine = 0;
+	unsigned		iLineCounter = 0, inf = 0, fillLineCount = 0, lineCount = 0, tind = 0;
+	int				lineOffset = 0;
 	dPOINTLINE*		projectedPoints = nullptr;
 	dPOINTLINE**	projectedPointsArray = nullptr;
 	double			lowX = 0.0, highX = 0.0;
@@ -4053,33 +4053,33 @@ void fnvrt() {
 			lowX = CurrentFillVertices[iVertex].x;
 	}
 
-	stitchOffset = lowX / StitchSpacing;
-	lowX = StitchSpacing*stitchOffset;
-	stitchCount = (highX - lowX) / StitchSpacing + 1;
+	lineOffset = lowX / LineSpacing;
+	lowX = LineSpacing*lineOffset;
+	fillLineCount = (highX - lowX) / LineSpacing + 1;
 	projectedPoints = new dPOINTLINE[VertexCount + 2];
 	projectedPointsArray = new dPOINTLINE*[VertexCount + 2];
-	step = (highX - lowX) / stitchCount;
+	step = (highX - lowX) / fillLineCount;
 	currentX = lowX;
-	for (iStitch = 0; iStitch < stitchCount; iStitch++) {
-		iLine = 0;
+	for (iLine = 0; iLine < fillLineCount; iLine++) {
+		iLineCounter = 0;
 		currentX += step;
 		for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iVertex + 1], &point))
-				iLine++;
+				iLineCounter++;
 		}
 		if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[0], &point))
-			iLine++;
-		lineCount += iLine;
-		if (iLine > maximumLines)
-			maximumLines = iLine;
+			iLineCounter++;
+		fillLineCount += iLineCounter;
+		if (iLineCounter > maximumLines)
+			maximumLines = iLineCounter;
 	}
 	maximumLines = (maximumLines >> 1);
-	LineEndpoints = new SMALPNTL[lineCount + 1];
+	LineEndpoints = new SMALPNTL[fillLineCount + 1];
 	StitchLineCount = 0; LineGroupIndex = 0;
-	groupIndex = new unsigned[stitchCount + 2];
+	groupIndex = new unsigned[fillLineCount + 2];
 	GroupIndexCount = 0;
 	currentX = lowX;
-	for (iStitch = 0; iStitch < stitchCount; iStitch++) {
+	for (iLine = 0; iLine < fillLineCount; iLine++) {
 		currentX += step;
 		inf = 0;
 		for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
@@ -4104,7 +4104,7 @@ void fnvrt() {
 			ine = 0;
 			tind = StitchLineCount;
 			while (ine < inf) {
-				if (StitchLineCount < lineCount) {
+				if (StitchLineCount < fillLineCount) {
 					LineEndpoints[StitchLineCount].line = projectedPointsArray[ine]->line;
 					LineEndpoints[StitchLineCount].group = LineGroupIndex;
 					LineEndpoints[StitchLineCount].x = projectedPointsArray[ine]->x;
@@ -4156,7 +4156,7 @@ void fsvrt() {
 	SelectedForm->type = FRMFPOLY;
 	SelectedForm->fillColor = ActiveColor;
 	fsizpar();
-	SelectedForm->fillSpacing = StitchSpacing;
+	SelectedForm->fillSpacing = LineSpacing;
 	SelectedForm->type = FRMFPOLY;
 	dusqr();
 	refilfn();
@@ -4198,7 +4198,7 @@ void fshor() {
 	SelectedForm->fillType = HORF;
 	SelectedForm->fillColor = ActiveColor;
 	fsizpar();
-	SelectedForm->fillSpacing = StitchSpacing;
+	SelectedForm->fillSpacing = LineSpacing;
 	SelectedForm->angleOrClipData.angle = (float)PI / 2;
 	SelectedForm->type = FRMFPOLY;
 	dusqr();
@@ -4245,7 +4245,7 @@ void fsangl() {
 	SelectedForm->angleOrClipData.angle = static_cast<float>(IniFile.fillAngle);
 	SelectedForm->fillColor = ActiveColor;
 	fsizpar();
-	SelectedForm->fillSpacing = StitchSpacing;
+	SelectedForm->fillSpacing = LineSpacing;
 	SelectedForm->type = FRMFPOLY;
 	dusqr();
 	refil();
@@ -5005,9 +5005,9 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 		line1Length = Lengths[line1End] - Lengths[line1Start];
 		line2Length = Lengths[line2Start] - Lengths[line2End];
 		if (fabs(line1Length) > fabs(line2Length))
-			stitchCount = fabs(line2Length) / StitchSpacing;
+			stitchCount = fabs(line2Length) / LineSpacing;
 		else
-			stitchCount = fabs(line1Length) / StitchSpacing;
+			stitchCount = fabs(line1Length) / LineSpacing;
 		line1Segments = ((line1End > line1Start) ? (line1End - line1Start) : (line1Start - line1End));
 		line2Segments = ((line2Start > line2End) ? (line2Start - line2End) : (line2End - line2Start));
 		line1StitchCounts = new unsigned[line1Segments];
@@ -5199,11 +5199,11 @@ void satfil() {
 
 	unsigned		iVertex = 0;
 	double			length = 0.0, deltaX = 0.0, deltaY = 0.0;
-	const double	spacing = StitchSpacing;
+	const double	spacing = LineSpacing;
 
 	fvars(ClosestFormToCursor);
 	satadj();
-	StitchSpacing /= 2;
+	LineSpacing /= 2;
 	SequenceIndex = 0;
 	rstMap(SAT1);
 	rstMap(FILDIR);
@@ -5281,7 +5281,7 @@ void satfil() {
 satdun:;
 
 	delete[] Lengths;
-	StitchSpacing = spacing;
+	LineSpacing = spacing;
 }
 
 void filsfn() {
@@ -5291,7 +5291,7 @@ void filsfn() {
 	fsizpar();
 	SelectedForm->fillType = SATF;
 	SelectedForm->fillColor = ActiveColor;
-	SelectedForm->fillSpacing = StitchSpacing;
+	SelectedForm->fillSpacing = LineSpacing;
 	SelectedForm->type = SAT;
 	refilfn();
 }
@@ -6226,7 +6226,7 @@ BOOL chkbak(dPOINT pnt) {
 
 	for (iBackup = 0; iBackup < 8; iBackup++) {
 		length = hypot(SatinBackup[iBackup].x - pnt.x, SatinBackup[iBackup].y - pnt.y);
-		if (length < StitchSpacing)
+		if (length < LineSpacing)
 			return 1;
 	}
 	return 0;
@@ -6288,7 +6288,7 @@ void sbfn(fPOINT* insidePoints, unsigned start, unsigned finish) {
 		SatinBackup[ind].y = (float)1e12;
 	}
 	if (outerLength > innerLength) {
-		count = outerLength / StitchSpacing;
+		count = outerLength / LineSpacing;
 		innerFlag = 1;
 		if (linx(insidePoints, start, finish, &intersection)) {
 			intersectFlag = 1;
@@ -6298,7 +6298,7 @@ void sbfn(fPOINT* insidePoints, unsigned start, unsigned finish) {
 		}
 	}
 	else {
-		count = innerLength / StitchSpacing;
+		count = innerLength / LineSpacing;
 		outerFlag = 1;
 		if (linx(insidePoints, start, finish, &intersection)) {
 			intersectFlag = 1;
@@ -6325,7 +6325,7 @@ void sbfn(fPOINT* insidePoints, unsigned start, unsigned finish) {
 				offsetDelta.x = innerPoint.x - SelectedPoint.x;
 				offsetDelta.y = innerPoint.y - SelectedPoint.y;
 				offsetLength = hypot(offsetDelta.x, offsetDelta.y);
-				offsetCount = offsetLength / StitchSpacing;
+				offsetCount = offsetLength / LineSpacing;
 				offsetStep.x = offsetDelta.x / offsetCount;
 				offsetStep.y = offsetDelta.y / offsetCount;
 				offset.x = innerPoint.x;
@@ -6344,7 +6344,7 @@ void sbfn(fPOINT* insidePoints, unsigned start, unsigned finish) {
 				offsetDelta.x = outerPoint.x - SelectedPoint.x;
 				offsetDelta.y = outerPoint.y - SelectedPoint.y;
 				offsetLength = hypot(offsetDelta.x, offsetDelta.y);
-				offsetCount = offsetLength / StitchSpacing;
+				offsetCount = offsetLength / LineSpacing;
 				offsetStep.x = offsetDelta.x / offsetCount;
 				offsetStep.y = offsetDelta.y / offsetCount;
 				offset.x = outerPoint.x;
@@ -6379,14 +6379,14 @@ void sfn(unsigned startVertex) {
 
 void sbrd() {
 
-	const double	spacing = StitchSpacing;
+	const double	spacing = LineSpacing;
 	const unsigned	start = getlast();
 	
 	rstMap(SAT1);
 	rstMap(FILDIR);
 	SequenceIndex = 1;
 	if (SelectedForm->edgeType&EGUND) {
-		StitchSpacing = USPAC;
+		LineSpacing = USPAC;
 		satout(HorizontalLength2*URAT);
 		sfn(start);
 		setMap(FILDIR);
@@ -6394,9 +6394,9 @@ void sbrd() {
 	}
 	fvars(ClosestFormToCursor);
 	satout(HorizontalLength2);
-	StitchSpacing = SelectedForm->edgeSpacing;
+	LineSpacing = SelectedForm->edgeSpacing;
 	sfn(start);
-	StitchSpacing = spacing;
+	LineSpacing = spacing;
 }
 
 void satends(unsigned isBlunt) {
@@ -6440,7 +6440,7 @@ void satends(unsigned isBlunt) {
 void slbrd() {
 
 	unsigned	iVertex = 0;
-	const double	spacing = StitchSpacing;
+	const double	spacing = LineSpacing;
 
 	SequenceIndex = 0;
 	if (SelectedForm->edgeType&EGUND) {
@@ -6449,7 +6449,7 @@ void slbrd() {
 		satends(SelectedForm->attribute);
 		rstMap(SAT1);
 		rstMap(FILDIR);
-		StitchSpacing = USPAC;
+		LineSpacing = USPAC;
 		for (iVertex = 0; iVertex < static_cast<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
 			sbfn(InsidePoints, iVertex, iVertex + 1);
 		toglMap(FILDIR);
@@ -6459,11 +6459,11 @@ void slbrd() {
 	HorizontalLength2 = SelectedForm->borderSize;
 	satout(HorizontalLength2);
 	satends(SelectedForm->attribute);
-	StitchSpacing = SelectedForm->edgeSpacing;
+	LineSpacing = SelectedForm->edgeSpacing;
 	rstMap(SAT1);
 	for (iVertex = 0; iVertex < static_cast<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
 		sbfn(InsidePoints, iVertex, iVertex + 1);
-	StitchSpacing = spacing;
+	LineSpacing = spacing;
 }
 
 void satsbrd() {
@@ -6473,7 +6473,7 @@ void satsbrd() {
 		SelectedForm->edgeType |= EGUND;
 	bsizpar();
 	SelectedForm->borderSize = BorderWidth;
-	SelectedForm->edgeSpacing = StitchSpacing / 2;
+	SelectedForm->edgeSpacing = LineSpacing / 2;
 	SelectedForm->borderColor = ActiveColor;
 	refilfn();
 }
@@ -6550,7 +6550,7 @@ void sapliq() {
 	SelectedForm->edgeType = EDGEAPPL;
 	if (chku(DUND))
 		SelectedForm->edgeType |= EGUND;
-	SelectedForm->edgeSpacing = StitchSpacing / 2;
+	SelectedForm->edgeSpacing = LineSpacing / 2;
 	SelectedForm->borderSize = IniFile.borderWidth;
 	bsizpar();
 	SelectedForm->borderColor = ActiveColor | (AppliqueColor << 4);
@@ -7724,7 +7724,7 @@ void prfmsg() {
 	else
 		strcpy_s(MsgBuffer, StringTable[STR_PNTD]);
 	prflin(STR_PRF2);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", StitchSpacing / PFGRAN);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", LineSpacing / PFGRAN);
 	prflin(STR_PRF0);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", duthrsh(ShowStitchThreshold));
 	prflin(STR_PRF7);
@@ -8576,7 +8576,7 @@ void duromb(dPOINT start0, dPOINT finish0, dPOINT start1, dPOINT finish1) {
 	delta1.x = finish1.x - start1.x;
 	delta1.y = finish1.y - start1.y;
 	length0 = hypot(delta0.x, delta0.y);
-	count = length0 / (StitchSpacing / 2);
+	count = length0 / (LineSpacing / 2);
 	if (!count)
 		count++;
 	step0.x = delta0.x / count;
@@ -8637,7 +8637,7 @@ void spend(unsigned start, unsigned finish) {
 		deltaAngle += 2 * PI;
 	radius = hypot(startDelta.x, startDelta.y);
 	arc = fabs(radius*deltaAngle);
-	count = arc / StitchSpacing;
+	count = arc / LineSpacing;
 	stepAngle = deltaAngle / count;
 	if (!count)
 		count = 1;
@@ -8826,7 +8826,7 @@ void plbrd(double edgeSpacing) {
 	SelectedPoint.x = CurrentFormVertices[0].x;
 	SelectedPoint.y = CurrentFormVertices[0].y;
 	if (SelectedForm->edgeType&EGUND) {
-		StitchSpacing = USPAC;
+		LineSpacing = USPAC;
 		setMap(UND);
 		HorizontalLength2 = SelectedForm->borderSize*URAT;
 		setMap(UNDPHAS);
@@ -8846,9 +8846,9 @@ void plbrd(double edgeSpacing) {
 		}
 	}
 	rstMap(UND);
-	StitchSpacing = SelectedForm->edgeSpacing;
+	LineSpacing = SelectedForm->edgeSpacing;
 	plfn(&FillVerticalRect[0]);
-	StitchSpacing = edgeSpacing;
+	LineSpacing = edgeSpacing;
 	fvars(ClosestFormToCursor);
 	delete[] UnderlayVerticalRect;
 	delete[] FillVerticalRect;
@@ -8856,11 +8856,11 @@ void plbrd(double edgeSpacing) {
 
 void pbrd(double edgeSpacing) {
 
-	const double	spacing = StitchSpacing;
+	const double	spacing = LineSpacing;
 	unsigned	iVertex = 0;
 	const unsigned	start = getlast();
 
-	StitchSpacing = SelectedForm->edgeSpacing;
+	LineSpacing = SelectedForm->edgeSpacing;
 	SequenceIndex = 0;
 	FillVerticalRect = new VRCT2[VertexCount];
 	UnderlayVerticalRect = new VRCT2[VertexCount];
@@ -8873,7 +8873,7 @@ void pbrd(double edgeSpacing) {
 	spurct(iVertex);
 	if (SelectedForm->edgeType&EGUND) {
 		rstMap(SAT1);
-		StitchSpacing = USPAC;
+		LineSpacing = USPAC;
 		setMap(UND);
 		HorizontalLength2 = SelectedForm->borderSize*URAT;
 		satout(HorizontalLength2);
@@ -8883,13 +8883,13 @@ void pbrd(double edgeSpacing) {
 		rstMap(UNDPHAS);
 		rstMap(FILDIR);
 		pfn(start, &UnderlayVerticalRect[0]);
-		StitchSpacing = edgeSpacing;
+		LineSpacing = edgeSpacing;
 		prsmal();
 		HorizontalLength2 = SelectedForm->borderSize;
 		rstMap(UND);
 	}
 	pfn(start, &FillVerticalRect[0]);
-	StitchSpacing = spacing;
+	LineSpacing = spacing;
 	delete[] UnderlayVerticalRect;
 	delete[] FillVerticalRect;
 }
@@ -8902,7 +8902,7 @@ void prpsbrd() {
 			SelectedForm->edgeType |= EGUND;
 		bsizpar();
 		SelectedForm->borderSize = BorderWidth;
-		SelectedForm->edgeSpacing = StitchSpacing;
+		SelectedForm->edgeSpacing = LineSpacing;
 		SelectedForm->borderColor = ActiveColor;
 		refilfn();
 	}
@@ -8910,17 +8910,17 @@ void prpsbrd() {
 
 void prpbrd(double borderStitchSpacing) {
 
-	const double	savedSpacing = StitchSpacing;
+	const double	savedSpacing = LineSpacing;
 	unsigned	iForm = 0;
 
 	if (filmsgs(FML_PRPS))
 		return;
-	StitchSpacing = borderStitchSpacing;
+	LineSpacing = borderStitchSpacing;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 			ClosestFormToCursor = SelectedFormList[iForm];
 			fvars(ClosestFormToCursor);
-			SelectedForm->borderSize = StitchSpacing;
+			SelectedForm->borderSize = LineSpacing;
 			if (chku(BLUNT))
 				SelectedForm->attribute |= (SBLNT | FBLNT);
 			else
@@ -8945,7 +8945,7 @@ void prpbrd(double borderStitchSpacing) {
 			setMap(RESTCH);
 		}
 	}
-	StitchSpacing = savedSpacing;
+	LineSpacing = savedSpacing;
 }
 
 void tglfrm() {
@@ -9144,16 +9144,16 @@ void clpfm() {
 
 void fmclp() {
 
-	const double	savedSpacing = StitchSpacing;
+	const double	savedSpacing = LineSpacing;
 
-	StitchSpacing = ClipRectSize.cx;
+	LineSpacing = ClipRectSize.cx;
 	setMap(BARSAT);
 	satfil();
 	rstMap(BARSAT);
 	clpfm();
 	SelectedForm->fillType = CLPF;
 	SequenceIndex = ActivePointIndex;
-	StitchSpacing = savedSpacing;
+	LineSpacing = savedSpacing;
 }
 
 void filsclp() {
@@ -10160,7 +10160,7 @@ void bholbrd() {
 	SelectedForm->borderSize = BorderWidth;
 	bsizpar();
 	SelectedForm->edgeType = EDGEBHOL;
-	SelectedForm->edgeSpacing = StitchSpacing;
+	SelectedForm->edgeSpacing = LineSpacing;
 	SelectedForm->borderColor = ActiveColor;
 	savblen(ButtonholeCornerLength);
 	refilfn();
@@ -10168,12 +10168,12 @@ void bholbrd() {
 
 void bhol() {
 
-	const double	savedSpacing = StitchSpacing;
+	const double	savedSpacing = LineSpacing;
 	unsigned	iForm = 0;
 
 	if (filmsgs(FML_BHOL))
 		return;
-	StitchSpacing = savedSpacing;
+	LineSpacing = savedSpacing;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 			ClosestFormToCursor = SelectedFormList[iForm];
@@ -10194,7 +10194,7 @@ void bhol() {
 			setMap(RESTCH);
 		}
 	}
-	StitchSpacing = savedSpacing;
+	LineSpacing = savedSpacing;
 }
 
 void fcntr() {
@@ -10575,7 +10575,7 @@ void contf() {
 		polin.angle = atan2(delta.y, delta.x);
 		polin.length = hypot(delta.x, delta.y);
 		poldif.angle = polin.angle - polref.angle;
-		if (polref.length > 0.9*StitchSpacing) {
+		if (polref.length > 0.9*LineSpacing) {
 			poldif.length = polin.length / polref.length;
 			if (toglMap(FILDIR)) {
 				OSequence[SequenceIndex].x = lowPoint.x;
@@ -10637,7 +10637,7 @@ BOOL contsf(unsigned formIndex) {
 		delclps(ClosestFormToCursor);
 		deltx();
 		chkcont();
-		SelectedForm->fillSpacing = StitchSpacing;
+		SelectedForm->fillSpacing = LineSpacing;
 		SelectedForm->fillColor = ActiveColor;
 		fsizpar();
 		SelectedForm->attribute |= (ActiveLayer << 1);
@@ -10733,7 +10733,7 @@ void ribon() {
 			}
 			formHeader->type = SAT;
 			formHeader->fillColor = ActiveColor;
-			formHeader->fillSpacing = StitchSpacing;
+			formHeader->fillSpacing = LineSpacing;
 			formHeader->lengthOrCount.stitchLength = IniFile.maxStitchLength;
 			formHeader->vertexCount = iNewVertex;
 			formHeader->attribute = 1;
@@ -12182,7 +12182,7 @@ void clpcon() {
 		if (chkMap(TXFIL)) {
 			textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
 			ClipStitchCount = TextureSegments[textureLine].stitchCount;
-			delete[] texture;
+			if (!flag) { delete[] texture; }
 			texture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + TextureSegments[textureLine].line];
 			flag = true;
 			LineSegmentStart.x = pasteLocation.x;

@@ -77,7 +77,7 @@ extern	fPOINT			SelectedPoint;
 extern	unsigned		SequenceIndex;
 extern	TCHAR*			StringTable[STR_LEN];
 extern	fPOINTATTR		StitchBuffer[MAXITEMS * 2];
-extern	double			StitchSpacing;
+extern	double			LineSpacing;
 extern	RECT			StitchWindowClientRect;
 extern	HDC				StitchWindowDC;
 extern	HDC				StitchWindowMemDC;
@@ -653,12 +653,12 @@ void fthdfn(unsigned iSequence) {
 void fthrfn() {
 
 	unsigned	ind = 0, res = 0;
-	double		savedSpacing = StitchSpacing;
+	double		savedSpacing = LineSpacing;
 
 	// ToDo - what does this function do
 	PseudoRandomValue = FSED;
 	fthvars();
-	StitchSpacing = SelectedForm->fillSpacing;
+	LineSpacing = SelectedForm->fillSpacing;
 	satfil();
 	BSequence[0].attribute = 0;
 	BSequence[1].attribute = 1;
@@ -726,7 +726,7 @@ void fthrfn() {
 	}
 	rstMap(FTHR);
 	rstMap(BARSAT);
-	StitchSpacing = savedSpacing;
+	LineSpacing = savedSpacing;
 	SequenceIndex = OutputIndex;
 }
 
@@ -779,7 +779,7 @@ void fethrf() {
 		SelectedForm->extendedAttribute |= IniFile.featherType;
 		SelectedForm->fillInfo.feather.count = IniFile.featherCount;
 		SelectedForm->lengthOrCount.stitchLength = UserStitchLength;
-		SelectedForm->fillSpacing = StitchSpacing;
+		SelectedForm->fillSpacing = LineSpacing;
 		SelectedForm->fillColor = ActiveColor;
 		SelectedForm->fillInfo.feather.color = (ActiveColor + 1)&COLMSK;
 		SelectedForm->fillType = FTHF;
