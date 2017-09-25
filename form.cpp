@@ -4033,7 +4033,7 @@ void bakseq() {
 void fnvrt() {
 
 	unsigned		iVertex = 0, iLine = 0, ind = 0, ine = 0;
-	unsigned		iLineCounter = 0, inf = 0, fillLineCount = 0, lineCount = 0, tind = 0;
+	unsigned		iLineCounter = 0, inf = 0, fillLineCount = 0, tind = 0;
 	int				lineOffset = 0;
 	dPOINTLINE*		projectedPoints = nullptr;
 	dPOINTLINE**	projectedPointsArray = nullptr;
