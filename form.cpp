@@ -6,9 +6,6 @@
 #include "resource.h"
 #include "thred.h"
 
-// Suppress C4244: conversion from 'type1' to 'type2', possible loss of data
-#pragma warning(disable:4244)
-
 extern fPOINT*	adclp (unsigned count);
 extern fPOINT*	adflt (unsigned count);
 extern SATCON*	adsatk (unsigned count);
