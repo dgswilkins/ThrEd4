@@ -264,7 +264,6 @@ extern	void			rats ();
 extern	void			ratsr ();
 extern	void			rct2sel (RECT rectangle, POINT* line);
 extern	void			redtx ();
-extern	void			redtx ();
 extern	void			redup ();
 extern	void			refil ();
 extern	void			refilal ();
@@ -11855,6 +11854,7 @@ void insfil() {
 	double		filscor = 0.0;
 	unsigned	version = 0;
 	FRMHEDO*	formHeader = nullptr;
+	int			newTextureIndex = TextureIndex;
 
 	if (chkMap(IGNORINS) || GetOpenFileName(&file)) {
 
@@ -11883,6 +11883,7 @@ void insfil() {
 #define FRMPW 2
 #define STCHW 1			
 						gethand(StitchBuffer, PCSHeader.stitchCount);
+						//ToDo - replace constants with sizes of data structures?
 						homscor = static_cast<double>(
 							FormIndex)*FRMW +
 							gethand(StitchBuffer, PCSHeader.stitchCount)*HANDW +
@@ -11892,6 +11893,7 @@ void insfil() {
 					}
 					savdo();
 					ReadFile(InsertedFileHandle, &StitchBuffer[PCSHeader.stitchCount], fileHeader.stitchCount * sizeof(fPOINTATTR), &BytesRead, NULL);
+					// ToDo - replace magic number 164
 					SetFilePointer(InsertedFileHandle, 164, 0, FILE_CURRENT);
 					insertedRectangle.left = insertedRectangle.bottom = (float)1e9;
 					insertedRectangle.top = insertedRectangle.right = (float)1e-9;
@@ -11925,6 +11927,7 @@ void insfil() {
 						ReadFile(InsertedFileHandle, &FormVertices[FormVertexIndex], fileHeader.vertexCount * sizeof(fPOINT), &BytesRead, 0);
 						ReadFile(InsertedFileHandle, &SatinConnects[SatinConnectIndex], fileHeader.dlineCount * sizeof(SATCON), &BytesRead, 0);
 						ReadFile(InsertedFileHandle, &ClipPoints[ClipPointIndex], fileHeader.clipDataCount * sizeof(fPOINT), &BytesRead, 0);
+						ReadFile(InsertedFileHandle, &TexturePointsBuffer[TextureIndex], ExtendedHeader.texturePointCount * sizeof(TXPNT), &BytesRead, 0);
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = 0;
 						for (iFormList = FormIndex; iFormList < FormIndex + fileHeader.formCount; iFormList++) {
@@ -11941,7 +11944,12 @@ void insfil() {
 								FormList[iFormList].angleOrClipData.clip = adclp(FormList[iFormList].lengthOrCount.clipCount);
 							if (iseclpx(iFormList))
 								FormList[iFormList].borderClipData = adclp(FormList[iFormList].clipEntries);
+							if (istx(iFormList)) {
+								FormList[iFormList].fillInfo.texture.index += TextureIndex;
+								newTextureIndex += FormList[iFormList].fillInfo.texture.count;
+							}
 						}
+						TextureIndex = newTextureIndex;
 						FormIndex += fileHeader.formCount;
 						if (fileHeader.formCount) {
 
@@ -11981,6 +11989,7 @@ void insfil() {
 						}
 					}
 					if (fileHeader.headerType & 0x1000000) {
+						// ToDo - Replace constants with sizes of data structures
 						filscor = static_cast<double>(fileHeader.formCount)*FRMW +
 							gethand(&StitchBuffer[PCSHeader.stitchCount], fileHeader.stitchCount)*HANDW +
 							fileHeader.vertexLen*FRMPW +
@@ -12305,7 +12314,7 @@ void desiz() {
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
 #if LANG==ENG || LANG==HNG
-
+		// ToDo - There is a buffer overrun here that overwrites at least ShowStichThreshold
 		sprintf_s(message, sizeof(MsgBuffer), StringTable[STR_FORMS],
 			FormIndex,
 			xSize, xSize / 25.4,

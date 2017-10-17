@@ -3912,30 +3912,42 @@ void txang() {
 }
 
 void deltx() {
-	TXPNT		*textureBuffer = nullptr;
-	unsigned	iBuffer = 0;
-	unsigned	iForm = 0;
+	TXPNT			*textureBuffer = nullptr;
+	unsigned		iBuffer = 0;
+	unsigned		iForm = 0;
+	BOOL			flag = false;
+	unsigned short	currentIndex = FormList[ClosestFormToCursor].fillInfo.texture.index;
 
 	if (TextureIndex && istx(ClosestFormToCursor) && SelectedForm->fillInfo.texture.count) {
-		textureBuffer = new TXPNT[TextureIndex]();
-		iBuffer = 0;
+		// First check to see if the texture is shared between forms
 		for (iForm = 0; iForm < ClosestFormToCursor; iForm++) {
-			if (istx(iForm)) {
-				MoveMemory(&textureBuffer[iBuffer], &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index], FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
-				FormList[iForm].fillInfo.texture.index = iBuffer;
-				iBuffer += FormList[iForm].fillInfo.texture.count;
-			}
+			if (FormList[iForm].fillInfo.texture.index == currentIndex) { flag = true; }
 		}
 		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-			if (istx(iForm)) {
-				MoveMemory(&textureBuffer[iBuffer], &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index], FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
-				FormList[iForm].fillInfo.texture.index = iBuffer;
-				iBuffer += FormList[iForm].fillInfo.texture.count;
-			}
+			if (FormList[iForm].fillInfo.texture.index == currentIndex) { flag = true; }
 		}
-		TextureIndex = iBuffer;
-		MoveMemory(&TexturePointsBuffer[0], &textureBuffer[0], iBuffer * sizeof(TXPNT));
-		delete[] textureBuffer;
+		// Only if it is not shared, should the texture be deleted
+		if (!flag) {
+			textureBuffer = new TXPNT[TextureIndex]();
+			iBuffer = 0;
+			for (iForm = 0; iForm < ClosestFormToCursor; iForm++) {
+				if (istx(iForm)) {
+					MoveMemory(&textureBuffer[iBuffer], &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index], FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
+					FormList[iForm].fillInfo.texture.index = iBuffer;
+					iBuffer += FormList[iForm].fillInfo.texture.count;
+				}
+			}
+			for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+				if (istx(iForm)) {
+					MoveMemory(&textureBuffer[iBuffer], &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index], FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
+					FormList[iForm].fillInfo.texture.index = iBuffer;
+					iBuffer += FormList[iForm].fillInfo.texture.count;
+				}
+			}
+			TextureIndex = iBuffer;
+			MoveMemory(&TexturePointsBuffer[0], &textureBuffer[0], iBuffer * sizeof(TXPNT));
+			delete[] textureBuffer;
+		}
 	}
 }
 
