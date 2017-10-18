@@ -3921,10 +3921,14 @@ void deltx() {
 	if (TextureIndex && istx(ClosestFormToCursor) && SelectedForm->fillInfo.texture.count) {
 		// First check to see if the texture is shared between forms
 		for (iForm = 0; iForm < ClosestFormToCursor; iForm++) {
-			if (FormList[iForm].fillInfo.texture.index == currentIndex) { flag = true; }
+			if (FormList[iForm].fillInfo.texture.index == currentIndex) {
+				flag = true;
+			}
 		}
 		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-			if (FormList[iForm].fillInfo.texture.index == currentIndex) { flag = true; }
+			if (FormList[iForm].fillInfo.texture.index == currentIndex) {
+				flag = true;
+			}
 		}
 		// Only if it is not shared, should the texture be deleted
 		if (!flag) {
