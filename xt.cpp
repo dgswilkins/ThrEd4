@@ -61,6 +61,7 @@ extern	fPOINT*			OutsidePoints;
 extern	fPOINT			OSequence[OSEQLEN];
 extern	PCSHEADER		PCSHeader;
 extern	unsigned		PseudoRandomValue;
+extern	TCHAR*			RepairString;
 extern	double			RotationAngle;
 extern	dPOINT			RotationCenter;
 extern	FRMHED*			SelectedForm;
@@ -5310,11 +5311,9 @@ void reptx() {
 
 void repar() {
 	unsigned	repairType = frmchkfn();
-	TCHAR*		savedStringData;
 
-	savedStringData = StringData;
 	savdo();
-	StringData = MsgBuffer;
+	RepairString = MsgBuffer;
 	if (repairType&BADFLT)
 		repflt();
 	if (repairType&BADCLP)
@@ -5325,12 +5324,11 @@ void repar() {
 		reptx();
 	lodchk();
 	setMap(RESTCH);
-	if (StringData != MsgBuffer) {
-		StringData--;
-		*StringData = 0;
+	if (RepairString != MsgBuffer) {
+		RepairString--;
+		*RepairString = 0;
 		shoMsg(MsgBuffer);
 	}
-	StringData = savedStringData;
 }
 
 void tst() {

@@ -12278,6 +12278,7 @@ void desiz() {
 	fRECTANGLE	rectangle = {};
 	FLOAT		xSize = 0.0, ySize = 0.0;
 	TCHAR*		message = MsgBuffer;
+	int			bufferRemaining = sizeof(MsgBuffer);
 
 	if (PCSHeader.stitchCount) {
 
@@ -12288,10 +12289,11 @@ void desiz() {
 
 			strcpy_s(MsgBuffer, StringTable[STR_STCHOUT]);
 			message = &MsgBuffer[strlen(MsgBuffer)];
+			bufferRemaining -= strlen(MsgBuffer);
 		}
 #if LANG==ENG || LANG==HNG
 
-		sprintf_s(message, sizeof(MsgBuffer),
+		bufferRemaining -= sprintf_s(message, bufferRemaining,
 			StringTable[STR_STCHS],
 			PCSHeader.stitchCount,
 			xSize, xSize / 25.4,
@@ -12300,7 +12302,7 @@ void desiz() {
 
 #if LANG==GRM
 
-		sprintf_s(message, sizeof(MsgBuffer),
+		bufferRemaining -= sprintf_s(message, sizeof(MsgBuffer),
 			StringTable[STR_STCHS],
 			PCSHeader.stitchCount,
 			xSize,
@@ -12314,8 +12316,7 @@ void desiz() {
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
 #if LANG==ENG || LANG==HNG
-		// ToDo - There is a buffer overrun here that overwrites at least ShowStichThreshold
-		sprintf_s(message, sizeof(MsgBuffer), StringTable[STR_FORMS],
+		bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable[STR_FORMS],
 			FormIndex,
 			xSize, xSize / 25.4,
 			ySize, ySize / 25.4);
@@ -12323,20 +12324,20 @@ void desiz() {
 
 #if LANG==GRM
 
-		sprintf_s(message, sizeof(MsgBuffer), StringTable[STR_FORMS],
+		bufferRemaining -= sprintf_s(message, sizeof(MsgBuffer), StringTable[STR_FORMS],
 			FormIndex,
 			xSize,
 			ySize);
 #endif
 		message = &message[strlen(message)];
 	}
-	sprintf_s(message, sizeof(MsgBuffer), StringTable[STR_HUPWID],
+	bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable[STR_HUPWID],
 		IniFile.hoopSizeX / PFGRAN,
 		IniFile.hoopSizeY / PFGRAN);
 	message = &message[strlen(message)];
 	if (PCSHeader.stitchCount) {
 
-		sprintf_s(message, sizeof(MsgBuffer), StringTable[STR_CREATBY],
+		bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable[STR_CREATBY],
 			DesignerName,
 			ExtendedHeader.modifierName);
 	}

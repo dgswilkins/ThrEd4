@@ -213,17 +213,18 @@ unsigned short LoadStringList[] = {	//strings to load into memory at init time
 };
 
 TCHAR*	StringTable[256];		//memory string pointers
-TCHAR*	StringData;			//string storage
+TCHAR*	StringData;				//string storage
+TCHAR*	RepairString;			//Repair Type
 
 TCHAR	HelpBuffer[HBUFSIZ];	//message formatting buffer
 
 void adbad(unsigned code, unsigned count) {
 
-	LoadString(ThrEdInstance, code, StringData, HBUFSIZ);
-	StringData = &StringData[strlen(StringData)];
-	LoadString(ThrEdInstance, IDS_NOTREP, HelpBuffer, HBUFSIZ);
-	sprintf_s(StringData, strlen(StringData), HelpBuffer, count);
-	StringData = &StringData[strlen(StringData)];
+	LoadString(ThrEdInstance, code, RepairString, sizeof(MsgBuffer) - strlen(RepairString));
+	RepairString = &RepairString[strlen(RepairString)];
+	LoadString(ThrEdInstance, IDS_NOTREP, HelpBuffer, sizeof(HelpBuffer));
+	sprintf_s(RepairString, sizeof(MsgBuffer) - strlen(RepairString), HelpBuffer, count);
+	RepairString = &RepairString[strlen(RepairString)];
 }
 
 void hsizmsg() {
