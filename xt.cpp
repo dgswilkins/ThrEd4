@@ -1485,6 +1485,35 @@ void dazdef() {
 	IniFile.daisyBorderType = DAZTYP;
 }
 
+void initdaz(HWND hWinDialog) {
+	TCHAR		buffer[HBUFSIZ] = { 0 };
+	unsigned	iType = 0;
+
+	chkdaz();
+	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyPetalPoints);
+	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS), buffer);
+	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyHeartCount);
+	SetWindowText(GetDlgItem(hWinDialog, IDC_DAZPCNT), buffer);
+	sprintf_s(buffer, sizeof(buffer), "%.2f", IniFile.daisyDiameter);
+	SetWindowText(GetDlgItem(hWinDialog, IDC_CNTLEN), buffer);
+	sprintf_s(buffer, sizeof(buffer), "%.2f", IniFile.daisyHoleDiameter);
+	SetWindowText(GetDlgItem(hWinDialog, IDC_HOLSIZ), buffer);
+	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyInnerCount);
+	SetWindowText(GetDlgItem(hWinDialog, IDC_INPNTS), buffer);
+	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyPetalCount);
+	SetWindowText(GetDlgItem(hWinDialog, IDC_PETALS), buffer);
+	sprintf_s(buffer, sizeof(buffer), "%.2f", IniFile.daisyPetalLen);
+	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLEN), buffer);
+	CheckDlgButton(hWinDialog, IDC_HOLE, chku(DAZHOL));
+	CheckDlgButton(hWinDialog, IDC_DLIN, chku(DAZD));
+	for (iType = 0; iType < 6; iType++) {
+		LoadString(ThrEdInstance, DaisyTypeStrings[iType], buffer, HBUFSIZ);
+		[[gsl::suppress(type.1)]]
+		SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(buffer));
+	}
+	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
+}
+
 BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
@@ -1497,31 +1526,7 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 		case WM_INITDIALOG:
 
 			SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-			// ToDo - remove label reinit 
-reinit:;
-			chkdaz();
-			sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyPetalPoints);
-			SetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer);
-			sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyHeartCount);
-			SetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer);
-			sprintf_s(buffer, sizeof(buffer), "%.2f", IniFile.daisyDiameter);
-			SetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer);
-			sprintf_s(buffer, sizeof(buffer), "%.2f", IniFile.daisyHoleDiameter);
-			SetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer);
-			sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyInnerCount);
-			SetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer);
-			sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyPetalCount);
-			SetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer);
-			sprintf_s(buffer, sizeof(buffer), "%.2f", IniFile.daisyPetalLen);
-			SetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer);
-			CheckDlgButton(hwndlg, IDC_HOLE, chku(DAZHOL));
-			CheckDlgButton(hwndlg, IDC_DLIN, chku(DAZD));
-			for (iType = 0; iType < 6; iType++) {
-				LoadString(ThrEdInstance, DaisyTypeStrings[iType], buffer, HBUFSIZ);
-				[[gsl::suppress(type.1)]]
-				SendMessage(GetDlgItem(hwndlg, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(buffer));
-			}
-			SendMessage(GetDlgItem(hwndlg, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
+			initdaz(hwndlg);
 			break;
 
 		case WM_COMMAND:
@@ -1572,7 +1577,8 @@ reinit:;
 				case IDC_DAZRST:
 
 					dazdef();
-					goto reinit;
+					initdaz(hwndlg);
+					break;
 
 				case IDC_DLIN:
 
