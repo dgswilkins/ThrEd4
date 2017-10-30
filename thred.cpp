@@ -13587,7 +13587,7 @@ void getrmap() {
 	header.biBitCount = 32;
 	header.biCompression = BI_RGB;
 	info.bmiHeader = header;
-	[[gsl::suppress(type.1)]]TraceBitmap = CreateDIBSection(BitmapDC, &info, DIB_RGB_COLORS, reinterpret_cast<void **>(TraceBitmapData), 0, 0);
+	[[gsl::suppress(type.1)]]TraceBitmap = CreateDIBSection(BitmapDC, &info, DIB_RGB_COLORS, reinterpret_cast<void **>(&TraceBitmapData), 0, 0);
 	TraceDC = CreateCompatibleDC(StitchWindowDC);
 	if (TraceBitmap && TraceDC) {
 		SelectObject(TraceDC, TraceBitmap);
