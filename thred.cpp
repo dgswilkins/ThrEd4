@@ -13579,7 +13579,6 @@ void getrmap() {
 	BITMAPINFOHEADER	header = {};
 	unsigned			iPixel = 0;
 
-	memset(&header, 0, sizeof(BITMAPINFOHEADER));
 	header.biSize = sizeof(BITMAPINFOHEADER);
 	header.biWidth = BitmapWidth;
 	header.biHeight = BitmapHeight;
@@ -21147,7 +21146,9 @@ void ritloc() {
 	error = _dupenv_s(&environment, &length, "COMSPEC");
 
 	if (error) {
-		free(environment);
+		if (environment) {
+			free(environment);
+		}
 		return;
 	}
 	else {
