@@ -3661,7 +3661,7 @@ void nxtseq(unsigned pathIndex) {
 void lcon() {
 
 	unsigned		iPath = 0, iLine = 0, iRegion = 0, iSequence = 0, iNode = 0, bytesInBitmap = 0;
-	unsigned		iByte = 0, leftRegion = 0, iOutPath = 0, breakLine = 0, count = 0, startGroup = 0;
+	unsigned		leftRegion = 0, iOutPath = 0, breakLine = 0, count = 0, startGroup = 0;
 	REGION*			regions = nullptr;
 	BOOL			isConnected = false;
 	RCON*			tempPathMap = nullptr;
