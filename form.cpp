@@ -3674,14 +3674,14 @@ void lcon() {
 #endif
 
 	if (StitchLineCount) {
-		SortedLines = new SMALPNTL*[StitchLineCount >> 1];
+		SortedLines = new SMALPNTL*[StitchLineCount >> 1]();
 		SortedLineIndex = 0;
 		for (iLine = 0; iLine < StitchLineCount; iLine += 2)
 			SortedLines[SortedLineIndex++] = &LineEndpoints[iLine];
 		qsort(SortedLines, SortedLineIndex, sizeof(SMALPNTL*), sqcomp);
 		RegionCount = 0;
 		// Count the regions. There cannot be more regions than lines
-		regions = new REGION[SortedLineIndex];
+		regions = new REGION[SortedLineIndex]();
 		regions[0].start = 0;
 		breakLine = SortedLines[0]->line;
 		for (iLine = 0; iLine < SortedLineIndex; iLine++) {
@@ -3692,12 +3692,11 @@ void lcon() {
 			}
 		}
 		regions[RegionCount++].end = iLine - 1;
-		RegionsList = new REGION[RegionCount];
-		VisitedRegions = new char[RegionCount];
+		RegionsList = new REGION[RegionCount]();
+		VisitedRegions = new char[RegionCount]();
 		for (iRegion = 0; iRegion < RegionCount; iRegion++) {
 			RegionsList[iRegion].start = regions[iRegion].start;
 			RegionsList[iRegion].end = regions[iRegion].end;
-			VisitedRegions[iRegion] = 0;
 			RegionsList[iRegion].breakCount = 0;
 		}
 		// we don't need regions anymore as the data has been transferred to RegionsList
@@ -3775,7 +3774,7 @@ void lcon() {
 				}
 			}
 			MapIndexSequence[iSequence] = PathMapIndex;
-			PathMap = new RCON[PathMapIndex + 1];
+			PathMap = new RCON[PathMapIndex + 1]();
 			for (iPath = 0; iPath < PathMapIndex; iPath++) {
 				PathMap[iPath].isConnected = tempPathMap[iPath].isConnected;
 				PathMap[iPath].node = tempPathMap[iPath].node;
@@ -3792,7 +3791,7 @@ void lcon() {
 				}
 			}
 			OutputIndex = 0;
-			TempPath = new RGSEQ[((RegionCount * (RegionCount - 1)) / 2) + 1];
+			TempPath = new RGSEQ[((RegionCount * (RegionCount - 1)) / 2) + 1]();
 
 			//find the leftmost region in PathMap
 			SequencePathIndex = 1;
@@ -3814,7 +3813,7 @@ lconskip:;
 				nxtrgn();
 			iOutPath = 0;
 			count = 0xffffffff;
-			SequencePath = new FSEQ[((RegionCount * (RegionCount - 1)) / 2) + 1];
+			SequencePath = new FSEQ[((RegionCount * (RegionCount - 1)) / 2) + 1]();
 			for (iPath = 0; iPath < SequencePathIndex; iPath++) {
 				SequencePath[iOutPath].skp = TempPath[iPath].skp;
 				if (TempPath[iPath].pcon == 0xffffffff) {
@@ -3833,9 +3832,7 @@ lconskip:;
 			for (iPath = 0; iPath < SequencePathIndex; iPath++)
 				nxtseq(iPath);
 			bytesInBitmap = (SortedLineIndex >> 5) + 1;
-			SequenceFlagBitmap = new unsigned[bytesInBitmap];
-			for (iByte = 0; iByte < bytesInBitmap; iByte++)
-				SequenceFlagBitmap[iByte] = 0;
+			SequenceFlagBitmap = new unsigned[bytesInBitmap]();
 			for (iRegion = 0; iRegion < RegionCount; iRegion++)
 				VisitedRegions[iRegion] = 0;
 			LastGroup = 0;
@@ -3848,12 +3845,10 @@ lconskip:;
 			}
 		}
 		else {
-			PathMap = new RCON[1];
-			SequencePath = new FSEQ[1];
+			PathMap = new RCON[1]();
+			SequencePath = new FSEQ[1]();
 			bytesInBitmap = (SortedLineIndex >> 5) + 1;
-			SequenceFlagBitmap = new unsigned[bytesInBitmap];
-			for (iByte = 0; iByte < bytesInBitmap; iByte++)
-				SequenceFlagBitmap[iByte] = 0;
+			SequenceFlagBitmap = new unsigned[bytesInBitmap]();
 			LastGroup = 0;
 			SequencePath[0].node = 0;
 			SequencePath[0].nextGroup = SortedLines[RegionsList[0].end]->group;
