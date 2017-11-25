@@ -3719,7 +3719,7 @@ void lcon() {
 			RegionsList[iRegion].breakCount = count;
 		}
 		// use the number of possible pairs of nodes n(n - 1)/2
-		tempPathMap = new RCON[((RegionCount * (RegionCount - 1)) / 2) + 1]();
+		tempPathMap = new RCON[((RegionCount * (RegionCount - 1)) / 2) + 2]();
 		MapIndexSequence = new unsigned[RegionCount + 1]();
 
 #if BUGSEQ
@@ -4048,8 +4048,8 @@ void fnvrt() {
 	lineOffset = lowX / LineSpacing;
 	lowX = LineSpacing*lineOffset;
 	fillLineCount = (highX - lowX) / LineSpacing + 1;
-	projectedPoints = new dPOINTLINE[VertexCount + 2];
-	projectedPointsArray = new dPOINTLINE*[VertexCount + 2];
+	projectedPoints = new dPOINTLINE[VertexCount + 2]();
+	projectedPointsArray = new dPOINTLINE*[VertexCount + 2]();
 	step = (highX - lowX) / fillLineCount;
 	currentX = lowX;
 	for (iLine = 0; iLine < fillLineCount; iLine++) {
@@ -4066,9 +4066,9 @@ void fnvrt() {
 			maximumLines = iLineCounter;
 	}
 	maximumLines = (maximumLines >> 1);
-	LineEndpoints = new SMALPNTL[fillLineCount + 1];
+	LineEndpoints = new SMALPNTL[fillLineCount + 1]();
 	StitchLineCount = 0; LineGroupIndex = 0;
-	groupIndex = new unsigned[fillLineCount + 2];
+	groupIndex = new unsigned[fillLineCount + 2]();
 	GroupIndexCount = 0;
 	currentX = lowX;
 	for (iLine = 0; iLine < fillLineCount; iLine++) {
