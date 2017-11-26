@@ -1712,11 +1712,11 @@ typedef struct _orec {
 }OREC;
 
 typedef struct _srtrec	{
-	unsigned start;
-	unsigned finish;
-	unsigned count;
-	unsigned loc;
-	BOOL	 direction;
+	unsigned start;			// start region index
+	unsigned finish;		// finish region index
+	unsigned count;			// number of regions in range
+	unsigned currentRegion;	// current region index
+	BOOL	 direction;		// direction of sort
 }SRTREC;
 
 typedef struct _fstrts	{

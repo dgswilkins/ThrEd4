@@ -588,7 +588,7 @@ void fthrbfn(unsigned iSequence) {
 	fPOINT	nextHighPoint = {};
 	fPOINT	nextLowPoint = {};
 	fPOINT	midPoint = {};
-	// ToDo - Is BSequence valid here
+
 	double	length = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 
 	nurat();
@@ -1838,60 +1838,58 @@ BOOL chkrdun(SRTREC* stitchRecord) {
 	return 0;
 }
 
-double precjmps(SRTREC* stitchRecord) {
+double precjmps(SRTREC* sortRecord) {
 	unsigned		totalJumps;
 	double			length;
 	double			minimumLength;
-	unsigned		iStitch, loc, loci;
+	unsigned		iRegion, currentRegion;
 	fPOINTATTR*		currentStitch;
 	BOOL			direction;
 
 	FormFillCounter = new unsigned[(FormIndex + 2) << 2]();
-	// ToDo - rename loc (and loci)
-	loc = stitchRecord->loc;
-	direction = stitchRecord->direction;
+	currentRegion = sortRecord->currentRegion;
+	direction = sortRecord->direction;
 	totalJumps = 0;
-	while (chkrdun(stitchRecord)) {
+	while (chkrdun(sortRecord)) {
 		minimumLength = 1e9;
 		if (direction)
-			loci = PRecs[loc]->finish;
+			currentStitch = &StitchBuffer[PRecs[currentRegion]->finish];
 		else
-			loci = PRecs[loc]->start;
-		currentStitch = &StitchBuffer[loci];
-		for (iStitch = stitchRecord->start; iStitch < stitchRecord->finish; iStitch++) {
-			if (PRecs[iStitch]->otyp == FormFillCounter[PRecs[iStitch]->form]) {
-				length = hypot(PRecs[iStitch]->startStitch->x - currentStitch->x, PRecs[iStitch]->startStitch->y - currentStitch->y);
+			currentStitch = &StitchBuffer[PRecs[currentRegion]->start];
+		for (iRegion = sortRecord->start; iRegion < sortRecord->finish; iRegion++) {
+			if (PRecs[iRegion]->otyp == FormFillCounter[PRecs[iRegion]->form]) {
+				length = hypot(PRecs[iRegion]->startStitch->x - currentStitch->x, PRecs[iRegion]->startStitch->y - currentStitch->y);
 				if (length < minimumLength) {
 					minimumLength = length;
 					direction = 0;
-					loc = iStitch;
+					currentRegion = iRegion;
 				}
-				length = hypot(PRecs[iStitch]->endStitch->x - currentStitch->x, PRecs[iStitch]->endStitch->y - currentStitch->y);
+				length = hypot(PRecs[iRegion]->endStitch->x - currentStitch->x, PRecs[iRegion]->endStitch->y - currentStitch->y);
 				if (length < minimumLength) {
 					minimumLength = length;
 					direction = 1;
-					loc = iStitch;
+					currentRegion = iRegion;
 				}
 			}
 		}
 		if (minimumLength > 9 * PFGRAN)
 			totalJumps++;
-		FormFillCounter[PRecs[loc]->form]++;
+		FormFillCounter[PRecs[currentRegion]->form]++;
 		if (chkMap(DUSRT)) {
 			if (direction) {
-				if (PRecs[loc]->start) {
-					for (iStitch = PRecs[loc]->finish - 1; iStitch >= PRecs[loc]->start; iStitch--)
-						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[iStitch]);
+				if (PRecs[currentRegion]->start) {
+					for (iRegion = PRecs[currentRegion]->finish - 1; iRegion >= PRecs[currentRegion]->start; iRegion--)
+						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[iRegion]);
 				}
 				else {
-					iStitch = PRecs[loc]->finish;
-					while (iStitch)
-						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[--iStitch]);
+					iRegion = PRecs[currentRegion]->finish;
+					while (iRegion)
+						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[--iRegion]);
 				}
 			}
 			else {
-				for (iStitch = PRecs[loc]->start; iStitch < PRecs[loc]->finish; iStitch++)
-					moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[iStitch]);
+				for (iRegion = PRecs[currentRegion]->start; iRegion < PRecs[currentRegion]->finish; iRegion++)
+					moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[iRegion]);
 			}
 		}
 	}
@@ -1899,64 +1897,64 @@ double precjmps(SRTREC* stitchRecord) {
 	return totalJumps;
 }
 
-unsigned duprecs(SRTREC* record) {
+unsigned duprecs(SRTREC* sortRecord) {
 
-	record->direction = 0;
-	unsigned	jumps0 = precjmps(record);
+	sortRecord->direction = 0;
+	unsigned	jumps0 = precjmps(sortRecord);
 
-	record->direction = 1;
-	unsigned	jumps1 = precjmps(record);
+	sortRecord->direction = 1;
+	unsigned	jumps1 = precjmps(sortRecord);
 
 	if (jumps0 < jumps1) {
-		record->direction = 0;
+		sortRecord->direction = 0;
 		return jumps0;
 	}
-	record->direction = 1;
+	sortRecord->direction = 1;
 	return jumps1;
 }
 
 #ifdef _DEBUG
 
-void dmprec(OREC** records, unsigned count) {
-	unsigned iRecord;
+void dmprec(OREC** stitchRegion, unsigned count) {
+	unsigned iRegion;
 
-	for (iRecord = 0; iRecord < count; iRecord++) {
+	for (iRegion = 0; iRegion < count; iRegion++) {
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%4d off: %4d at: %08x frm: %4d typ: %d col: %2d st: %5d fin: %5d\n",
-			iRecord,
-			records[iRecord] - records[0],
-			StitchBuffer[records[iRecord]->start].attribute,
-			records[iRecord]->form,
-			records[iRecord]->type,
-			records[iRecord]->color,
-			records[iRecord]->start,
-			records[iRecord]->finish);
+			iRegion,
+			stitchRegion[iRegion] - stitchRegion[0],
+			StitchBuffer[stitchRegion[iRegion]->start].attribute,
+			stitchRegion[iRegion]->form,
+			stitchRegion[iRegion]->type,
+			stitchRegion[iRegion]->color,
+			stitchRegion[iRegion]->start,
+			stitchRegion[iRegion]->finish);
 		OutputDebugString(MsgBuffer);
 	}
 }
 #endif
 
-BOOL srtchk(OREC** record, unsigned count, unsigned* badForm) {
+BOOL srtchk(OREC** stitchRegion, unsigned count, unsigned* badForm) {
 
-	unsigned	iRecord = 1;
-	unsigned	form = record[0]->form; 
-	unsigned	color = record[0]->color;
+	unsigned	iRegion = 1;
+	unsigned	form = stitchRegion[0]->form; 
+	unsigned	color = stitchRegion[0]->color;
 	FRMHED*		formHeader = nullptr;
 
-	for (iRecord = 1; iRecord < count; iRecord++) {
-		if (record[iRecord]->form == form) {
-			if (ColorOrder[record[iRecord]->color] < ColorOrder[color]) {
+	for (iRegion = 1; iRegion < count; iRegion++) {
+		if (stitchRegion[iRegion]->form == form) {
+			if (ColorOrder[stitchRegion[iRegion]->color] < ColorOrder[color]) {
 				formHeader = &FormList[form];
-				if (formHeader->fillType == FTHF && formHeader->extendedAttribute&AT_FTHBLND && record[iRecord]->color == formHeader->fillColor)
+				if (formHeader->fillType == FTHF && formHeader->extendedAttribute&AT_FTHBLND && stitchRegion[iRegion]->color == formHeader->fillColor)
 					continue;
-				*badForm = iRecord;
+				*badForm = iRegion;
 				return 0;
 			}
 			else
-				color = record[iRecord]->color;
+				color = stitchRegion[iRegion]->color;
 		}
 		else {
-			color = record[iRecord]->color;
-			form = record[iRecord]->form;
+			color = stitchRegion[iRegion]->color;
+			form = stitchRegion[iRegion]->form;
 		}
 	}
 	return 1;
@@ -1965,11 +1963,11 @@ BOOL srtchk(OREC** record, unsigned count, unsigned* badForm) {
 void fsort() {
 	unsigned		attribute = StitchBuffer->attribute&SRTMSK;
 	unsigned		iColor = 0, iStitch = 0, badForm = 0, iRange = 0, lastRange = 0;
-	unsigned		currentForm = 0, iRecord = 0, lastRecord = 0;
+	unsigned		currentForm = 0, iRegion = 0, lastRegion = 0;
 	unsigned		minimumIndex = 0, minimumDirection = 0;
 	unsigned		typeCount = 0, jumps = 0, minimumJumps = 0;
 	// There cannot be more records than stitches
-	OREC*			records = new OREC[PCSHeader.stitchCount];
+	OREC*			stitchRegion = new OREC[PCSHeader.stitchCount];
 	RANGE*			stitchRange = nullptr;
 	SRTREC			sortRecord = {};
 	FILETIME		fileTime = {};
@@ -1979,8 +1977,8 @@ void fsort() {
 	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors 
 	//        in a single form are not in ascending order already. 
 	savdo();
-	records[0].start = 0;
-	records[0].startStitch = StitchBuffer;
+	stitchRegion[0].start = 0;
+	stitchRegion[0].startStitch = StitchBuffer;
 	ColorOrder[AppliqueColor] = 0;
 	for (iColor = 0; iColor < 16; iColor++) {
 
@@ -1989,57 +1987,57 @@ void fsort() {
 	}
 	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute&SRTMSK) != attribute) {
-			records[iRecord].finish = iStitch;
-			records[iRecord].endStitch = &StitchBuffer[iStitch - 1];
-			iRecord++;
-			records[iRecord].start = iStitch;
-			records[iRecord].startStitch = &StitchBuffer[iStitch];
+			stitchRegion[iRegion].finish = iStitch;
+			stitchRegion[iRegion].endStitch = &StitchBuffer[iStitch - 1];
+			iRegion++;
+			stitchRegion[iRegion].start = iStitch;
+			stitchRegion[iRegion].startStitch = &StitchBuffer[iStitch];
 			attribute = StitchBuffer[iStitch].attribute&SRTMSK;
 		}
 	}
-	records[iRecord].endStitch = &StitchBuffer[PCSHeader.stitchCount - 1];
-	records[iRecord].finish = PCSHeader.stitchCount;
-	iRecord++;
-	lastRecord = iRecord;
-	PRecs = new OREC*[lastRecord];
-	PFRecs = new OREC*[lastRecord];
-	for (iRecord = 0; iRecord < lastRecord; iRecord++) {
-		durec(&records[iRecord]);
-		PRecs[iRecord] = &records[iRecord];
-		PFRecs[iRecord] = &records[iRecord];
+	stitchRegion[iRegion].endStitch = &StitchBuffer[PCSHeader.stitchCount - 1];
+	stitchRegion[iRegion].finish = PCSHeader.stitchCount;
+	iRegion++;
+	lastRegion = iRegion;
+	PRecs = new OREC*[lastRegion];
+	PFRecs = new OREC*[lastRegion];
+	for (iRegion = 0; iRegion < lastRegion; iRegion++) {
+		durec(&stitchRegion[iRegion]);
+		PRecs[iRegion] = &stitchRegion[iRegion];
+		PFRecs[iRegion] = &stitchRegion[iRegion];
 	}
-	qsort(PRecs, lastRecord, sizeof(OREC *), recmp);
-	qsort(PFRecs, lastRecord, sizeof(OREC *), refcmp);
+	qsort(PRecs, lastRegion, sizeof(OREC *), recmp);
+	qsort(PFRecs, lastRegion, sizeof(OREC *), refcmp);
 #ifdef _DEBUG
-	dmprec(PRecs, lastRecord);
+	dmprec(PRecs, lastRegion);
 #endif
-	if (srtchk(PFRecs, lastRecord, &badForm)) {
-		stitchRange = new RANGE[lastRecord];
+	if (srtchk(PFRecs, lastRegion, &badForm)) {
+		stitchRange = new RANGE[lastRegion];
 		stitchRange[0].start = 0;
 		attribute = PRecs[0]->color;
 		currentForm = 0xffffffff;
 		typeCount = 0;
 		iRange = 0;
-		for (iRecord = 0; iRecord < lastRecord; iRecord++) {
-			if (attribute != PRecs[iRecord]->color) {
-				stitchRange[iRange].finish = iRecord;
+		for (iRegion = 0; iRegion < lastRegion; iRegion++) {
+			if (attribute != PRecs[iRegion]->color) {
+				stitchRange[iRange].finish = iRegion;
 				iRange++;
-				stitchRange[iRange].start = iRecord;
-				attribute = PRecs[iRecord]->color;
-				currentForm = PRecs[iRecord]->form;
+				stitchRange[iRange].start = iRegion;
+				attribute = PRecs[iRegion]->color;
+				currentForm = PRecs[iRegion]->form;
 				typeCount = 0;
 				goto srtskp;
 			}
-			if (PRecs[iRecord]->form == currentForm)
+			if (PRecs[iRegion]->form == currentForm)
 				typeCount++;
 			else {
 				typeCount = 0;
-				currentForm = PRecs[iRecord]->form;
+				currentForm = PRecs[iRegion]->form;
 			}
 srtskp:;
-			PRecs[iRecord]->otyp = typeCount;
+			PRecs[iRegion]->otyp = typeCount;
 		}
-		stitchRange[iRange].finish = lastRecord;
+		stitchRange[iRange].finish = lastRegion;
 		lastRange = ++iRange;
 		TempStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
 		OutputIndex = 0;
@@ -2052,13 +2050,13 @@ srtskp:;
 			// ToDo - why is there a timeout implemented here?
 			GetSystemTimeAsFileTime(&fileTime);
 			startTime = tim2int(fileTime);
-			for (iRecord = sortRecord.start; iRecord < sortRecord.finish; iRecord++) {
-				sortRecord.loc = iRecord;
-				if (!PRecs[iRecord]->otyp) {
+			for (iRegion = sortRecord.start; iRegion < sortRecord.finish; iRegion++) {
+				sortRecord.currentRegion = iRegion;
+				if (!PRecs[iRegion]->otyp) {
 					jumps = duprecs(&sortRecord);
 					if (jumps < minimumJumps) {
 						minimumJumps = jumps;
-						minimumIndex = iRecord;
+						minimumIndex = iRegion;
 						minimumDirection = sortRecord.direction;
 					}
 				}
@@ -2068,7 +2066,7 @@ srtskp:;
 					break;
 			}
 			setMap(DUSRT);
-			sortRecord.loc = minimumIndex;
+			sortRecord.currentRegion = minimumIndex;
 			sortRecord.direction = minimumDirection;
 			precjmps(&sortRecord);
 		}
@@ -2086,7 +2084,7 @@ srtskp:;
 	}
 	delete[] PFRecs;
 	delete[] PRecs;
-	delete[] records;
+	delete[] stitchRegion;
 }
 
 unsigned dutyp(unsigned attribute) {
