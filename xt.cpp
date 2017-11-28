@@ -2047,7 +2047,7 @@ srtskp:;
 			sortRecord.finish = stitchRange[iRange].finish;
 			sortRecord.count = sortRecord.finish - sortRecord.start;
 			minimumJumps = 0xffffffff;
-			// ToDo - why is there a timeout implemented here?
+			// timeout used to put an upper bound on the number of sorting permutations checked
 			GetSystemTimeAsFileTime(&fileTime);
 			startTime = tim2int(fileTime);
 			for (iRegion = sortRecord.start; iRegion < sortRecord.finish; iRegion++) {
@@ -2174,29 +2174,27 @@ void dmpat() {
 #endif
 
 void fdelstch() {
-	unsigned	iStitch = 0, ind = 0, ine = 0, codedFormIndex = 0, attribute = 0, type = 0, tmap = 0, color = 0, bordercolor = 0, tapcol = 0;
+	unsigned	iSourceStitch = 0, ind = 0, iDestinationStitch = 0, codedFormIndex = 0, attribute = 0, type = 0, tmap = 0, color = 0, bordercolor = 0, tapcol = 0;
 	unsigned*	stpnt = nullptr;
 	// ToDo - Still not sure what this function does?
 	//        I suspect the FillStartsData members are not correctly named
 	fvars(ClosestFormToCursor);
-	tmap = 0;
-	FillMemory(&FillStartsData, sizeof(FSTRTS), 0);
+	ZeroMemory(&FillStartsData, sizeof(FSTRTS));
 	codedFormIndex = (ClosestFormToCursor << FRMSHFT);
-	ine = 0;
 	bordercolor = SelectedForm->borderColor&COLMSK;
 	tapcol = SelectedForm->borderColor >> 4;
-	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (!chku(FIL2OF) && chkMap(SELBOX) && iStitch == ClosestPointIndex)
-			ClosestPointIndex = ine;
-		attribute = StitchBuffer[iStitch].attribute;
-		if (codedFormIndex == (attribute&(FRMSK | NOTFRM))) {
+	for (iSourceStitch = 0; iSourceStitch < PCSHeader.stitchCount; iSourceStitch++) {
+		if (!chku(FIL2OF) && chkMap(SELBOX) && iSourceStitch == ClosestPointIndex)
+			ClosestPointIndex = iDestinationStitch;
+		attribute = StitchBuffer[iSourceStitch].attribute;
+ 		if (codedFormIndex == (attribute&(FRMSK | NOTFRM))) {
 			type = StitchTypes[dutyp(attribute)];
 			switch (type) {
 				case TYPE_APPLIQUE:
 
 					if (!(tmap&M_AP)) {
 						tmap |= M_AP;
-						FillStartsData.applique = ine;
+						FillStartsData.applique = iDestinationStitch;
 					}
 					break;
 
@@ -2204,7 +2202,7 @@ void fdelstch() {
 
 					if (!(tmap&M_FTH)) {
 						tmap |= M_FTH;
-						FillStartsData.feather = ine;
+						FillStartsData.feather = iDestinationStitch;
 					}
 					break;
 
@@ -2212,7 +2210,7 @@ void fdelstch() {
 
 					if (!(tmap&M_FIL)) {
 						tmap |= M_FIL;
-						FillStartsData.fill = ine;
+						FillStartsData.fill = iDestinationStitch;
 					}
 					break;
 
@@ -2220,7 +2218,7 @@ void fdelstch() {
 
 					if (!(tmap&M_BRD)) {
 						tmap |= M_BRD;
-						FillStartsData.border = ine;
+						FillStartsData.border = iDestinationStitch;
 					}
 					break;
 
@@ -2228,7 +2226,7 @@ void fdelstch() {
 
 					if (SelectedForm->fillType && !(tmap&M_FIL)) {
 						tmap |= M_FIL;
-						FillStartsData.fill = ine;
+						FillStartsData.fill = iDestinationStitch;
 					}
 					break;
 			}
@@ -2240,24 +2238,24 @@ void fdelstch() {
 			color = attribute&COLMSK;
 			if (color == SelectedForm->fillColor) {
 				tmap |= M_FCOL;
-				FillStartsData.fillColor = ine;
+				FillStartsData.fillColor = iDestinationStitch;
 			}
 			if (color == SelectedForm->fillInfo.feather.color) {
 				tmap |= M_FTHCOL;
-				FillStartsData.featherColor = ine;
+				FillStartsData.featherColor = iDestinationStitch;
 			}
 			if (color == bordercolor) {
 				tmap |= M_ECOL;
-				FillStartsData.borderColor = ine;
+				FillStartsData.borderColor = iDestinationStitch;
 			}
 			if (color == tapcol) {
 				tmap |= M_APCOL;
-				FillStartsData.appliqueColor = ine;
+				FillStartsData.appliqueColor = iDestinationStitch;
 			}
-			StitchBuffer[ine].x = StitchBuffer[iStitch].x;
-			StitchBuffer[ine].y = StitchBuffer[iStitch].y;
-			StitchBuffer[ine].attribute = StitchBuffer[iStitch].attribute;
-			ine++;
+			StitchBuffer[iDestinationStitch].x = StitchBuffer[iSourceStitch].x;
+			StitchBuffer[iDestinationStitch].y = StitchBuffer[iSourceStitch].y;
+			StitchBuffer[iDestinationStitch].attribute = StitchBuffer[iSourceStitch].attribute;
+			iDestinationStitch++;
 		}
 	}
 	FillStartsData.fillColor++;
@@ -2265,8 +2263,8 @@ void fdelstch() {
 	FillStartsData.borderColor++;
 	FillStartsData.appliqueColor++;
 	FillStartsMap = tmap;
-	PCSHeader.stitchCount = ine;
-	ine = 0;
+	PCSHeader.stitchCount = iDestinationStitch;
+	iDestinationStitch = 0;
 	if (!(tmap&M_ECOL))
 		FillStartsData.borderColor = PCSHeader.stitchCount;
 	if (!(tmap&M_FTHCOL))
@@ -2307,11 +2305,11 @@ void fdelstch() {
 	}
 	stpnt = static_cast<unsigned *>(static_cast<void *>(&FillStartsData));
 	for (ind = 3; ind; ind--) {
-		ine = ind - 1;
-		while (ine < ind) {
-			if (stpnt[ine] > stpnt[ind])
-				stpnt[ind] = stpnt[ine];
-			ine--;
+		iDestinationStitch = ind - 1;
+		while (iDestinationStitch < ind) {
+			if (stpnt[iDestinationStitch] > stpnt[ind])
+				stpnt[ind] = stpnt[iDestinationStitch];
+			iDestinationStitch--;
 		}
 	}
 	if (!chku(FIL2OF) && chkMap(SELBOX)) {
@@ -2386,7 +2384,7 @@ void intlv() {
 	rstMap(ISEND);
 	fvars(ClosestFormToCursor);
 	InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
-	FillMemory(&InterleaveData, sizeof(INTINF), 0);
+	ZeroMemory(&InterleaveData, sizeof(INTINF));
 	InterleaveData.layerIndex = ((SelectedForm->attribute&FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
 	rstMap(DIDSTRT);
 	if (PCSHeader.stitchCount) {
