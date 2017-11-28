@@ -216,7 +216,6 @@ HPEN		TextureCrossPen;			//texture editor cross pen
 TXTSCR		TextureScreen;				//texture editor layout parameters
 TXPNT		TempTexturePoints[16384];	//temporary storage for textured fill data
 unsigned	ColorOrder[16];				//color order adjusted for applique
-INTINF		InterleaveData;				//interleave data
 fPOINT		InterleaveSequence[MAXITEMS]; //storage for interleave points
 unsigned	InterleaveSequenceIndex;	//index into the interleave sequence
 FSTRTS		FillStartsData;				//fill start data for refill
@@ -2333,29 +2332,29 @@ BOOL lastcol(unsigned index, fPOINT* point) {
 	return 0;
 }
 
-void duint(unsigned offset, unsigned code) {
+void duint(unsigned offset, unsigned code, INTINF *ilData) {
 	unsigned	count = 0, iSequence = 0;
 	fPOINT		point = {};
 
-	if (InterleaveData.coloc > InterleaveData.start) {
-		count = InterleaveData.coloc - InterleaveData.start;
-		MoveMemory(&InterleaveData.highStitchBuffer[InterleaveData.output], &StitchBuffer[InterleaveData.start], sizeof(fPOINTATTR)*count);
-		InterleaveData.start += count;
-		InterleaveData.output += count;
+	if (ilData->coloc > ilData->start) {
+		count = ilData->coloc - ilData->start;
+		MoveMemory(&ilData->highStitchBuffer[ilData->output], &StitchBuffer[ilData->start], sizeof(fPOINTATTR)*count);
+		ilData->start += count;
+		ilData->output += count;
 	}
 	if (SelectedForm->extendedAttribute&AT_STRT) {
 		if (!setMap(DIDSTRT))
-			InterleaveData.output += gucon(CurrentFormVertices[SelectedForm->fillStart], InterleaveSequence[InterleaveSequenceIndices[InterleaveData.pins].index], InterleaveData.output + offset, code);
+			ilData->output += gucon(CurrentFormVertices[SelectedForm->fillStart], InterleaveSequence[InterleaveSequenceIndices[ilData->pins].index], ilData->output + offset, code);
 	}
-	if (lastcol(InterleaveData.pins, &point))
-		InterleaveData.output += gucon(point, InterleaveSequence[InterleaveSequenceIndices[InterleaveData.pins].index], InterleaveData.output + MAXITEMS, code);
-	for (iSequence = InterleaveSequenceIndices[InterleaveData.pins].index; iSequence < InterleaveSequenceIndices[InterleaveData.pins + 1].index; iSequence++) {
-		InterleaveData.highStitchBuffer[InterleaveData.output].x = InterleaveSequence[iSequence].x;
-		InterleaveData.highStitchBuffer[InterleaveData.output].y = InterleaveSequence[iSequence].y;
-		InterleaveData.highStitchBuffer[InterleaveData.output].attribute = code;
-		if (InterleaveData.highStitchBuffer[InterleaveData.output].x != InterleaveData.highStitchBuffer[InterleaveData.output - 1].x ||
-			InterleaveData.highStitchBuffer[InterleaveData.output].y != InterleaveData.highStitchBuffer[InterleaveData.output - 1].y)
-			InterleaveData.output++;
+	if (lastcol(ilData->pins, &point))
+		ilData->output += gucon(point, InterleaveSequence[InterleaveSequenceIndices[ilData->pins].index], ilData->output + MAXITEMS, code);
+	for (iSequence = InterleaveSequenceIndices[ilData->pins].index; iSequence < InterleaveSequenceIndices[ilData->pins + 1].index; iSequence++) {
+		ilData->highStitchBuffer[ilData->output].x = InterleaveSequence[iSequence].x;
+		ilData->highStitchBuffer[ilData->output].y = InterleaveSequence[iSequence].y;
+		ilData->highStitchBuffer[ilData->output].attribute = code;
+		if (ilData->highStitchBuffer[ilData->output].x != ilData->highStitchBuffer[ilData->output - 1].x ||
+			ilData->highStitchBuffer[ilData->output].y != ilData->highStitchBuffer[ilData->output - 1].y)
+			ilData->output++;
 	}
 }
 
@@ -2369,99 +2368,99 @@ BOOL isfil() {
 	return 0;
 }
 
-void chkend(unsigned offset, unsigned code) {
+void chkend(unsigned offset, unsigned code, INTINF *ilData) {
 	if (isfil()) {
 		setMap(ISEND);
 		if (SelectedForm->extendedAttribute&AT_END)
-			InterleaveData.output += gucon(InterleaveSequence[InterleaveSequenceIndex - 1], CurrentFormVertices[SelectedForm->fillEnd], InterleaveData.output + offset, code);
+			ilData->output += gucon(InterleaveSequence[InterleaveSequenceIndex - 1], CurrentFormVertices[SelectedForm->fillEnd], ilData->output + offset, code);
 	}
 }
 
 void intlv() {
 	unsigned	iSequence = 0, ine = 0, code = 0, offset = 0;
 	fPOINT		colpnt = {};
+	INTINF		ilData = {};
 
 	rstMap(ISEND);
 	fvars(ClosestFormToCursor);
 	InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
-	ZeroMemory(&InterleaveData, sizeof(INTINF));
-	InterleaveData.layerIndex = ((SelectedForm->attribute&FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
+	ilData.layerIndex = ((SelectedForm->attribute&FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
 	rstMap(DIDSTRT);
 	if (PCSHeader.stitchCount) {
 		offset = MAXITEMS;
-		// Todo - Allocate memory locally for InterleaveData.highStitchBuffer
-		InterleaveData.highStitchBuffer = &StitchBuffer[MAXITEMS];
+		// Todo - Allocate memory locally for ilData.highStitchBuffer
+		ilData.highStitchBuffer = &StitchBuffer[MAXITEMS];
 		for (iSequence = 0; iSequence < InterleaveSequenceIndex2; iSequence++) {
-			InterleaveData.pins = iSequence;
+			ilData.pins = iSequence;
 			switch (InterleaveSequenceIndices[iSequence].seq) {
 				case I_AP:
 
-					if (FillStartsMap&M_FIL && FillStartsData.applique >= InterleaveData.coloc)
-						InterleaveData.coloc = FillStartsData.applique;
+					if (FillStartsMap&M_FIL && FillStartsData.applique >= ilData.coloc)
+						ilData.coloc = FillStartsData.applique;
 					else {
-						InterleaveData.coloc = FillStartsData.appliqueColor;
-						if (InterleaveData.coloc == 1)
-							InterleaveData.coloc = 0;
+						ilData.coloc = FillStartsData.appliqueColor;
+						if (ilData.coloc == 1)
+							ilData.coloc = 0;
 					}
 					break;
 
 				case I_FIL:
 
-					if (FillStartsMap&M_FIL && FillStartsData.fill >= InterleaveData.coloc)
-						InterleaveData.coloc = FillStartsData.fill;
+					if (FillStartsMap&M_FIL && FillStartsData.fill >= ilData.coloc)
+						ilData.coloc = FillStartsData.fill;
 					else
-						InterleaveData.coloc = FillStartsData.fillColor;
+						ilData.coloc = FillStartsData.fillColor;
 					break;
 
 				case I_FTH:
 
-					if (FillStartsMap&M_FIL && FillStartsData.feather >= InterleaveData.coloc)
-						InterleaveData.coloc = FillStartsData.feather;
+					if (FillStartsMap&M_FIL && FillStartsData.feather >= ilData.coloc)
+						ilData.coloc = FillStartsData.feather;
 					else
-						InterleaveData.coloc = FillStartsData.featherColor;
+						ilData.coloc = FillStartsData.featherColor;
 					break;
 
 				case I_BRD:
 
-					if (FillStartsMap&M_BRD && FillStartsData.border >= InterleaveData.coloc)
-						InterleaveData.coloc = FillStartsData.border;
+					if (FillStartsMap&M_BRD && FillStartsData.border >= ilData.coloc)
+						ilData.coloc = FillStartsData.border;
 					else
-						InterleaveData.coloc = FillStartsData.borderColor;
+						ilData.coloc = FillStartsData.borderColor;
 					break;
 			}
-			code = InterleaveData.layerIndex | InterleaveSequenceIndices[InterleaveData.pins].code | InterleaveSequenceIndices[InterleaveData.pins].color;
-			duint(offset, code);
+			code = ilData.layerIndex | InterleaveSequenceIndices[ilData.pins].code | InterleaveSequenceIndices[ilData.pins].color;
+			duint(offset, code, &ilData);
 		}
-		chkend(MAXITEMS, code);
-		if (PCSHeader.stitchCount && InterleaveData.start < static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
-			ine = PCSHeader.stitchCount - InterleaveData.start;
-			MoveMemory(&StitchBuffer[InterleaveData.output + MAXITEMS], &StitchBuffer[InterleaveData.start], sizeof(fPOINTATTR)*ine);
-			InterleaveData.output += ine;
+		chkend(MAXITEMS, code, &ilData);
+		if (PCSHeader.stitchCount && ilData.start < static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
+			ine = PCSHeader.stitchCount - ilData.start;
+			MoveMemory(&StitchBuffer[ilData.output + MAXITEMS], &StitchBuffer[ilData.start], sizeof(fPOINTATTR)*ine);
+			ilData.output += ine;
 		}
-		MoveMemory(StitchBuffer, InterleaveData.highStitchBuffer, sizeof(fPOINTATTR)*InterleaveData.output);
+		MoveMemory(StitchBuffer, ilData.highStitchBuffer, sizeof(fPOINTATTR)*ilData.output);
 	}
 	else {
 		offset = 0;
 		for (iSequence = 0; iSequence < InterleaveSequenceIndex2; iSequence++) {
-			code = InterleaveData.layerIndex | InterleaveSequenceIndices[iSequence].code | InterleaveSequenceIndices[iSequence].color;
+			code = ilData.layerIndex | InterleaveSequenceIndices[iSequence].code | InterleaveSequenceIndices[iSequence].color;
 			if (SelectedForm->extendedAttribute&AT_STRT) {
 				if (!setMap(DIDSTRT))
-					InterleaveData.output += gucon(CurrentFormVertices[SelectedForm->fillStart], InterleaveSequence[InterleaveSequenceIndices[InterleaveData.pins].index], InterleaveData.output + offset, code);
+					ilData.output += gucon(CurrentFormVertices[SelectedForm->fillStart], InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index], ilData.output + offset, code);
 			}
 			if (lastcol(iSequence, &colpnt))
-				InterleaveData.output += gucon(colpnt, InterleaveSequence[InterleaveSequenceIndices[iSequence].index], InterleaveData.output, code);
+				ilData.output += gucon(colpnt, InterleaveSequence[InterleaveSequenceIndices[iSequence].index], ilData.output, code);
 			for (ine = InterleaveSequenceIndices[iSequence].index; ine < InterleaveSequenceIndices[iSequence + 1].index; ine++) {
-				StitchBuffer[InterleaveData.output].x = InterleaveSequence[ine].x;
-				StitchBuffer[InterleaveData.output].y = InterleaveSequence[ine].y;
-				StitchBuffer[InterleaveData.output].attribute = code;
-				if (StitchBuffer[InterleaveData.output].x != StitchBuffer[InterleaveData.output - 1].x ||
-					StitchBuffer[InterleaveData.output].y != StitchBuffer[InterleaveData.output - 1].y)
-					InterleaveData.output++;
+				StitchBuffer[ilData.output].x = InterleaveSequence[ine].x;
+				StitchBuffer[ilData.output].y = InterleaveSequence[ine].y;
+				StitchBuffer[ilData.output].attribute = code;
+				if (StitchBuffer[ilData.output].x != StitchBuffer[ilData.output - 1].x ||
+					StitchBuffer[ilData.output].y != StitchBuffer[ilData.output - 1].y)
+					ilData.output++;
 			}
 		}
-		chkend(0, code);
+		chkend(0, code, &ilData);
 	}
-	PCSHeader.stitchCount = InterleaveData.output;
+	PCSHeader.stitchCount = ilData.output;
 	coltab();
 }
 
