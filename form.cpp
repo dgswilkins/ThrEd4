@@ -4024,8 +4024,8 @@ void bakseq() {
 
 void fnvrt() {
 
-	unsigned		iVertex = 0, iNextVertex = 0, iLine = 0, ind = 0, ine = 0;
-	unsigned		iLineCounter = 0, inf = 0, fillLineCount = 0, tind = 0;
+	unsigned		iVertex = 0, iNextVertex = 0, iLine = 0, ind = 0, evenPointCount = 0;
+	unsigned		iLineCounter = 0, iPoint = 0, fillLineCount = 0, savedLineCount = 0;
 	int				lineOffset = 0;
 	dPOINTLINE*		projectedPoints = nullptr;
 	dPOINTLINE**	projectedPointsArray = nullptr;
@@ -4072,36 +4072,36 @@ void fnvrt() {
 	currentX = lowX;
 	for (iLine = 0; iLine < fillLineCount; iLine++) {
 		currentX += step;
-		inf = 0;
+		iPoint = 0;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 			iNextVertex = (iVertex + 1) % VertexCount;
 			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iNextVertex], &point)) {
-				projectedPointsArray[inf] = &projectedPoints[inf];
-				projectedPoints[inf].line = iVertex;
-				projectedPoints[inf].x = point.x;
-				projectedPoints[inf++].y = point.y;
+				projectedPointsArray[iPoint] = &projectedPoints[iPoint];
+				projectedPoints[iPoint].line = iVertex;
+				projectedPoints[iPoint].x = point.x;
+				projectedPoints[iPoint++].y = point.y;
 
 			}
 		}
-		if (inf > 1) {
-			inf &= 0xfffffffe;
+		if (iPoint > 1) {
+			evenPointCount = iPoint &= 0xfffffffe;
 			groupIndex[GroupIndexCount++] = StitchLineCount;
-			qsort(static_cast<void*>(projectedPointsArray), inf, sizeof(dPOINTLINE*), comp);
-			ine = 0;
-			tind = StitchLineCount;
-			while (ine < inf) {
+			qsort(static_cast<void*>(projectedPointsArray), evenPointCount, sizeof(dPOINTLINE*), comp);
+			iPoint = 0;
+			savedLineCount = StitchLineCount;
+			while (iPoint < evenPointCount) {
 				if (StitchLineCount < fillLineCount) {
-					LineEndpoints[StitchLineCount].line = projectedPointsArray[ine]->line;
+					LineEndpoints[StitchLineCount].line = projectedPointsArray[iPoint]->line;
 					LineEndpoints[StitchLineCount].group = LineGroupIndex;
-					LineEndpoints[StitchLineCount].x = projectedPointsArray[ine]->x;
-					LineEndpoints[StitchLineCount++].y = projectedPointsArray[ine++]->y;
-					LineEndpoints[StitchLineCount].line = projectedPointsArray[ine]->line;
+					LineEndpoints[StitchLineCount].x = projectedPointsArray[iPoint]->x;
+					LineEndpoints[StitchLineCount++].y = projectedPointsArray[iPoint++]->y;
+					LineEndpoints[StitchLineCount].line = projectedPointsArray[iPoint]->line;
 					LineEndpoints[StitchLineCount].group = LineGroupIndex;
-					LineEndpoints[StitchLineCount].x = projectedPointsArray[ine]->x;
-					LineEndpoints[StitchLineCount++].y = projectedPointsArray[ine++]->y;
+					LineEndpoints[StitchLineCount].x = projectedPointsArray[iPoint]->x;
+					LineEndpoints[StitchLineCount++].y = projectedPointsArray[iPoint++]->y;
 				}
 			}
-			if (StitchLineCount != tind)
+			if (StitchLineCount != savedLineCount)
 				LineGroupIndex++;
 		}
 	}
