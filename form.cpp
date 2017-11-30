@@ -4024,7 +4024,7 @@ void bakseq() {
 
 void fnvrt() {
 
-	unsigned		iVertex = 0, iLine = 0, ind = 0, ine = 0;
+	unsigned		iVertex = 0, iNextVertex = 0, iLine = 0, ind = 0, ine = 0;
 	unsigned		iLineCounter = 0, inf = 0, fillLineCount = 0, tind = 0;
 	int				lineOffset = 0;
 	dPOINTLINE*		projectedPoints = nullptr;
@@ -4055,12 +4055,11 @@ void fnvrt() {
 	for (iLine = 0; iLine < fillLineCount; iLine++) {
 		iLineCounter = 0;
 		currentX += step;
-		for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
-			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iVertex + 1], &point))
+		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+			iNextVertex = (iVertex + 1) % VertexCount;
+			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iNextVertex], &point))
 				iLineCounter++;
 		}
-		if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[0], &point))
-			iLineCounter++;
 		fillLineCount += iLineCounter;
 		if (iLineCounter > maximumLines)
 			maximumLines = iLineCounter;
@@ -4074,20 +4073,15 @@ void fnvrt() {
 	for (iLine = 0; iLine < fillLineCount; iLine++) {
 		currentX += step;
 		inf = 0;
-		for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
-			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iVertex + 1], &point)) {
+		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+			iNextVertex = (iVertex + 1) % VertexCount;
+			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iNextVertex], &point)) {
 				projectedPointsArray[inf] = &projectedPoints[inf];
 				projectedPoints[inf].line = iVertex;
 				projectedPoints[inf].x = point.x;
 				projectedPoints[inf++].y = point.y;
 
 			}
-		}
-		if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[0], &point)) {
-			projectedPointsArray[inf] = &projectedPoints[inf];
-			projectedPoints[inf].line = iVertex;
-			projectedPoints[inf].x = point.x;
-			projectedPoints[inf++].y = point.y;
 		}
 		if (inf > 1) {
 			inf &= 0xfffffffe;
