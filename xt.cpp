@@ -4162,8 +4162,8 @@ void txtlbut() {
 void redtbak() {
 	TXHST*		textureHistoryItem;
 
-	//	sprintf_s(MsgBuffer, sizeof(MsgBuffer),"%d\n",TextureHistoryIndex);
-	//	OutputDebugString(MsgBuffer);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer),"%d\n",TextureHistoryIndex);
+	OutputDebugString(MsgBuffer);
 	textureHistoryItem = &TextureHistory[TextureHistoryIndex];
 	TextureScreen.areaHeight = textureHistoryItem->height;
 	TextureScreen.width = textureHistoryItem->width;

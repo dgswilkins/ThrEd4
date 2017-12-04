@@ -3718,7 +3718,7 @@ void lcon() {
 			}
 			RegionsList[iRegion].breakCount = count;
 		}
-		// use the number of possible pairs of nodes n(n - 1)/2
+		// use the number of possible pairs of nodes n(n - 1)/2 and account for RegionCount possibly being odd
 		tempPathMap = new RCON[((RegionCount * (RegionCount - 1)) / 2) + 2]();
 		MapIndexSequence = new unsigned[RegionCount + 1]();
 
@@ -3837,8 +3837,8 @@ lconskip:;
 				VisitedRegions[iRegion] = 0;
 			LastGroup = 0;
 			for (iPath = 0; iPath < PathIndex; iPath++) {
-				// sprintf_s(MsgBuffer, sizeof(MsgBuffer), "iterator %d,vrt %d,grpn %d\n", iPath, PathMap[iPath].node, PathMap[iPath].nextGroup);
-				// OutputDebugString(MsgBuffer);
+				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "iterator %d,vrt %d,grpn %d\n", iPath, PathMap[iPath].node, PathMap[iPath].nextGroup);
+				OutputDebugString(MsgBuffer);
 				if (!unvis())
 					break;
 				durgn(iPath);
@@ -4024,7 +4024,7 @@ void bakseq() {
 
 void fnvrt() {
 
-	unsigned		iVertex = 0, iNextVertex = 0, iLine = 0, ind = 0, evenPointCount = 0;
+	unsigned		iVertex = 0, iNextVertex = 0, iLine = 0, iGroup = 0, evenPointCount = 0;
 	unsigned		iLineCounter = 0, iPoint = 0, fillLineCount = 0, savedLineCount = 0;
 	int				lineOffset = 0;
 	dPOINTLINE*		projectedPoints = nullptr;
@@ -4107,8 +4107,8 @@ void fnvrt() {
 	}
 	groupIndex[GroupIndexCount++] = StitchLineCount;
 	GroupIndexSequence = new unsigned[GroupIndexCount];
-	for (ind = 0; ind < GroupIndexCount; ind++)
-		GroupIndexSequence[ind] = groupIndex[ind];
+	for (iGroup = 0; iGroup < GroupIndexCount; iGroup++)
+		GroupIndexSequence[iGroup] = groupIndex[iGroup];
 	LineGroupIndex--;
 	delete[] groupIndex;
 	delete[] projectedPoints;
