@@ -2962,7 +2962,7 @@ BOOL lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) {
 
 	if (group1 > GroupIndexCount - 2)
 		return 0;
-	if (!group0)
+	if (group0 == 0)
 		return 0;
 	while (count0 && lineEndPoint0[index0].line != line0) {
 		count0--;
@@ -3000,19 +3000,19 @@ BOOL regclos(unsigned iRegion0, unsigned iRegion1) {
 	unsigned	groupStart = 0;
 	unsigned	groupEnd = 0;
 	unsigned	lineStart = 0, lineEnd = 0;
-	unsigned	prlin = 0, polin = 0;
+	unsigned	prevLine = 0, lastLine = 0;
 
 	if (group0Start > group1Start) {
 		groupStart = group0Start;
 		lineStart = lineEndPoint0Start->line;
-		prlin = lineEndPoint1Start->line;
+		prevLine = lineEndPoint1Start->line;
 	}
 	else {
 		groupStart = group1Start;
 		lineStart = lineEndPoint1Start->line;
-		prlin = lineEndPoint0Start->line;
+		prevLine = lineEndPoint0Start->line;
 	}
-	if (groupStart && lnclos(groupStart - 1, prlin, groupStart, lineStart)) {
+	if (groupStart && lnclos(groupStart - 1, prevLine, groupStart, lineStart)) {
 		NextGroup = groupStart;
 		return 1;
 	}
@@ -3024,14 +3024,14 @@ BOOL regclos(unsigned iRegion0, unsigned iRegion1) {
 		if (group0End < group1End) {
 			groupEnd = group0End;
 			lineEnd = lineEndPoint0End->line;
-			polin = lineEndPoint1End->line;
+			lastLine = lineEndPoint1End->line;
 		}
 		else {
 			groupEnd = group1End;
 			lineEnd = lineEndPoint1End->line;
-			polin = lineEndPoint0End->line;
+			lastLine = lineEndPoint0End->line;
 		}
-		if (lnclos(groupEnd, lineEnd, groupEnd + 1, polin)) {
+		if (lnclos(groupEnd, lineEnd, groupEnd + 1, lastLine)) {
 			NextGroup = groupEnd;
 			return 1;
 		}
