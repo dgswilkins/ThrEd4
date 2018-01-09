@@ -2574,6 +2574,7 @@ void refilfn() {
 			if (SelectedForm->fillType) {
 				spacing = LineSpacing;
 				LineSpacing = SelectedForm->fillSpacing;
+				bool doFill = true;
 				switch (static_cast<unsigned>(SelectedForm->fillType)) {
 					case VRTF:
 
@@ -2600,48 +2601,55 @@ void refilfn() {
 						setangf(0);
 						fvars(ClosestFormToCursor);
 						clpcon();
-						goto skpfil;
+						doFill = false;
+						break;
 
 					case HCLPF:
 
 						oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 						horclpfn();
-						goto skpfil;
+						doFill = false;
+						break;
 
 					case ANGCLPF:
 
 						oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 						rstMap(ISUND);
 						angclpfn();
-						goto skpfil;
+						doFill = false;
+						break;
 
 					case TXVRTF:
 
 						setangf(0);
 						setxt();
 						clpcon();
-						goto skpfil;
+						doFill = false;
+						break;
 
 					case TXHORF:
 
 						setxt();
 						horclpfn();
-						goto skpfil;
+						doFill = false;
+						break;
 
 					case TXANGF:
 
 						setxt();
 						rstMap(ISUND);
 						angclpfn();
-						goto skpfil;
+						doFill = false;
+						break;
 				}
-				lcon();
-				bakseq();
-				if (SelectedForm->fillType != VRTF && SelectedForm->fillType != TXVRTF) {
-					RotationAngle = -RotationAngle;
-					rotbak();
+				if (doFill) {
+					lcon();
+					bakseq();
+					if (SelectedForm->fillType != VRTF && SelectedForm->fillType != TXVRTF) {
+						RotationAngle = -RotationAngle;
+						rotbak();
+					}
 				}
-skpfil:;
 				ritfil();
 				LineSpacing = spacing;
 			}
