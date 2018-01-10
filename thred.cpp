@@ -1640,7 +1640,7 @@ unsigned			FeatherFillTypes[] = { FTHSIN,FTHSIN2,FTHLIN,FTHPSG,FTHRMP,FTHFAZ };
 
 //bitmap functions
 unsigned setMap(unsigned bit) {
-
+	// ToDo - setMap is optimized incorrectly in release version. replace with bitset 
 #if  __UseASM__
 	_asm {
 		xor		eax, eax

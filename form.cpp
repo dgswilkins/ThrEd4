@@ -3803,14 +3803,18 @@ void lcon() {
 
 			//find the leftmost region in PathMap
 			SequencePathIndex = 1;
+			bool dontSkip = true;
 			for (iPath = 0; iPath < PathMapIndex; iPath++) {
-				if (PathMap[iPath].node == leftRegion)
-					goto lconskip;
+				if (PathMap[iPath].node == leftRegion) {
+					dontSkip = false;
+					break;
+				}
 			}
-			PathMap[PathMapIndex].node = leftRegion;
-			PathMap[PathMapIndex].nextGroup = 0;
-			iPath = PathMapIndex;
-lconskip:;
+			if (dontSkip) {
+				PathMap[PathMapIndex].node = leftRegion;
+				PathMap[PathMapIndex].nextGroup = 0;
+				iPath = PathMapIndex;
+			}
 			//set the first entry in the temporary path to the leftmost region
 			TempPath[0].pcon = iPath;
 			TempPath[0].count = 1;
