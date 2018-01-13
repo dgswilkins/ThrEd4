@@ -7,14 +7,14 @@
 #include <htmlhelp.h>
 #include <locale.h>
 
-extern unsigned			chkMap(unsigned bit);
+extern bool				chkMap(StateFlags bit);
 extern void				ispcdclp();
 extern void				movStch();
 extern	void			numWnd();
 extern void				okcan();
 extern void				rstAll();
-extern	unsigned		rstMap(unsigned bit);
-extern	unsigned		setMap(unsigned bit);
+extern	bool			rstMap(StateFlags bit);
+extern	bool			setMap(StateFlags bit);
 extern void				shoMsg(TCHAR* string);
 
 extern	unsigned		ButtonHeight;

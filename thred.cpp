@@ -610,7 +610,7 @@ POINT			TraceMsgPoint;			//message point for trace parsing
 unsigned		HighColors[3];			//separated upper reference colors
 unsigned		PixelColors[3];			//separated pixel reference colors
 unsigned		LowColors[3];			//separated lower reference colors
-unsigned		TraceRGBFlag[] = { TRCRED,TRCGRN,TRCBLU };	//trace bits
+StateFlags		TraceRGBFlag[] = { TRCRED,TRCGRN,TRCBLU };	//trace bits
 unsigned		TraceRGBMask[] = { REDMSK,GRNMSK,BLUMSK };	//trace masks
 unsigned		TraceRGB[] = { BLUCOL,GRNCOL,REDCOL };	//trace colors
 unsigned		TraceAdjacentColors[9];	//separated colors for adjacent pixels
@@ -1626,7 +1626,7 @@ unsigned UpperCaseMap[] = {
 0,			//00000000000000000000000000000000
 };
 
-unsigned			FlagMap[MAPLEN];		//bitmap
+EnumMask<StateFlags> Flagset;
 unsigned			UserFlagMap = 0;		//for storage of persistent binary variables set by the user
 fPOINTATTR			StitchBuffer[MAXITEMS * 2];	//main stitch buffer
 fPOINTATTR			ClipBuffer[MAXITEMS];	//for temporary copy of imported clipboard data
@@ -1639,110 +1639,30 @@ unsigned			EdgeFillTypes[] = { 0,EDGELINE,EDGEBEAN,EDGECLIP,EDGEANGSAT,EDGEAPPL,
 unsigned			FeatherFillTypes[] = { FTHSIN,FTHSIN2,FTHLIN,FTHPSG,FTHRMP,FTHFAZ };
 
 //bitmap functions
-unsigned setMap(unsigned bit) {
-	// ToDo - setMap is optimized incorrectly in release version. replace with bitset 
-#if  __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, offset FlagMap
-		mov		ecx, bit
-		bts		[ebx], ecx
-		jnc		short setx
-		dec		eax
-setx :
-	}
-#else
-	return _bittestandset((long *)FlagMap, bit) ? 0xffffffff : 0;
-#endif
+bool setMap(StateFlags bit) {
+	bool val = Flagset.test(bit);
+	Flagset.set(bit);
+	return val;
 }
 
-void clrMap(unsigned mapLength) {
-
-#if  __UseASM__
-	_asm {
-		mov		edi, offset FlagMap
-		mov		ecx, mapLength
-		xor		eax, eax
-		rep		stosd
-	}
-#else
-	memset(FlagMap, 0, sizeof(*FlagMap) * mapLength);
-#endif
+void clrMap() {
+	Flagset.reset();
 }
 
-unsigned rstMap(unsigned bit) {
-
-#if  __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, offset FlagMap
-		mov		ecx, bit
-		btr		[ebx], ecx
-		jnc		short rstx
-		dec		eax
-rstx :
-	}
-#else
-	return _bittestandreset((long *)FlagMap, bit) ? 0xffffffff : 0;
-#endif
+bool rstMap(StateFlags bit) {
+	bool val = Flagset.test(bit);
+	Flagset.reset(bit);
+	return val;
 }
 
-unsigned toglMap(unsigned bit) {
-
-#if  __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, offset FlagMap
-		mov		edx, bit
-		btc		[ebx], edx
-		jnc		short toglx
-		dec		eax
-toglx :
-	}
-#else
-	return _bittestandcomplement((long *)FlagMap, bit) ? 0xffffffff : 0;
-#endif
+bool toglMap(StateFlags bit) {
+	bool val = Flagset.test(bit);
+	Flagset.flip(bit);
+	return val;
 }
 
-unsigned chkMap(unsigned bit) {
-
-#if  __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, offset FlagMap
-		mov		edx, bit
-		bt		[ebx], edx
-		jnc		short chkx
-		dec		eax
-chkx :
-	}
-#else
-	return _bittest((long *)FlagMap, bit) ? 0xffffffff : 0;
-#endif
-}
-
-void cpymap(unsigned destinationBit, unsigned sourceBit) {
-
-#if  __UseASM__
-	_asm {
-		mov		ebx, offset FlagMap
-		mov		eax, destinationBit
-		btr		[ebx], eax
-		mov		edx, sourceBit
-		bt		[ebx], edx
-		jnc		short cpx
-		bts		[ebx], eax
-cpx :
-	}
-#else
-	// check translation
-	if (_bittest((long *)FlagMap, sourceBit)) {
-		_bittestandset((long *)FlagMap, destinationBit);
-	}
-	else {
-		_bittestandreset((long *)FlagMap, destinationBit);
-	}
-#endif
+bool chkMap(StateFlags bit) {
+	return Flagset.test(bit);
 }
 
 //user bitmap functions
@@ -5391,7 +5311,7 @@ void nuFil() {
 			textureHistoryFlag = 0;
 			if (chkMap(WASTXBAK))
 				textureHistoryFlag = 1;
-			clrMap(MAPLEN);
+			clrMap();
 			if (textureHistoryFlag)
 				setMap(WASTXBAK);
 			fileSize = GetFileSize(FileHandle, &fileSizeHigh);
@@ -15448,7 +15368,7 @@ unsigned chkMsg() {
 			}
 			if (GetKeyState(VK_SHIFT) & 0x8000 && px2stch())
 				ritfcor(&SelectedPoint);
-			if (*FlagMap&(PRFACTB | FORMINB | POLIMOVB) || FormDataSheet) {
+			if ((chkMap(PRFACT) | chkMap(FORMIN) | chkMap(POLIMOV)) || FormDataSheet) {
 
 				SetCursor(ArrowCursor);
 				goto gotcur;
@@ -15489,12 +15409,12 @@ unsigned chkMsg() {
 				}
 				goto gotcur;
 			}
-			if (*FlagMap&(BZUMINB | BOXZUMB | SELPNTB)) {
+			if (chkMap(BZUMIN) | chkMap(BOXZUM) | chkMap(SELPNT)) {
 
 				SetCursor(CrossCursor);
 				goto gotcur;
 			}
-			if (*FlagMap&(SATINB | SATPNTB | INSFRMB)) {
+			if (chkMap(SATIN) | chkMap(SATPNT) | chkMap(INSFRM)) {
 
 				if (chku(FRMX))
 					SetCursor(CrossCursor);
@@ -15502,7 +15422,7 @@ unsigned chkMsg() {
 					SetCursor(FormCursor);
 				goto gotcur;
 			}
-			if (*FlagMap&SATCNKTB)
+			if (chkMap(SATCNKT))
 				SetCursor(DLineCursor);
 			else
 				SetCursor(ArrowCursor);
@@ -21847,7 +21767,7 @@ void init() {
 	CrossCursor = LoadCursor(0, IDC_CROSS);
 	crtcurs();
 	redfils();
-	clrMap(MAPLEN);						//clear the bitmap
+	clrMap();						//clear the bitmap
 	//set up the size variables
 	ThredDC = GetDC(ThrEdWindow);
 	SetStretchBltMode(ThredDC, COLORONCOLOR);

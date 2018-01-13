@@ -21,6 +21,8 @@
 //#pragma warning(disable:26497) // f.4		This function could be marked constexpr if compile-time evaluation is desired
 #pragma warning(disable:26499) //			Could not find any lifetime tracking information
 
+#include "EnumMask.h"
+
 //compile switches
 #define		__UseASM__	0
 #define		PESACT		0			//compile pes code
@@ -379,7 +381,7 @@ enum	{	//daisy form types
 };
 
 //bitmap
-enum {
+enum StateFlags {
 	SATIN,		//user is entering a satin stitch form
 	SATPNT,		//user is entering points for a satin stitch form
 	BOXZUM,		//box zoom select mode
@@ -641,23 +643,8 @@ enum {
 	NOCLP,		//don't load clipboard data from forms
 	NOTHRFIL,	//loaded file wasn't a Thred file
 
-	LASTBIT		//must be the last entry in the enum
+	EnumCount		//must be the last entry in the enum
 };
-
-#define	MAPLEN (LASTBIT>>5)+1 //length of the state bitmap in 32 bit words
-
-#define BZUMINB 1<<BZUMIN
-#define BOXZUMB 1<<BOXZUM
-#define INSRTB 1<<INSRT
-#define SELPNTB 1<<SELPNT
-#define SATINB 1<<SATIN
-#define SATPNTB 1<<SATPNT
-#define SATCNKTB 1<<SATCNKT
-#define INSFRMB 1<<INSFRM
-#define SELBOXM 1<<SELBOX
-#define FORMINB 1<<FORMIN
-#define PRFACTB 1<<PRFACT
-#define	POLIMOVB 1<<POLIMOV
 
 //user bitmap
 enum {

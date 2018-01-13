@@ -38,6 +38,9 @@
     <ClInclude Include="thred.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EnumMask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="thred.rc">
