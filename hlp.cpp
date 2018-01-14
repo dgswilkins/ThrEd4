@@ -7,14 +7,11 @@
 #include <htmlhelp.h>
 #include <locale.h>
 
-extern bool				chkMap(StateFlags bit);
 extern void				ispcdclp();
 extern void				movStch();
 extern	void			numWnd();
 extern void				okcan();
 extern void				rstAll();
-extern	bool			rstMap(StateFlags bit);
-extern	bool			setMap(StateFlags bit);
 extern void				shoMsg(TCHAR* string);
 
 extern	unsigned		ButtonHeight;
@@ -22,6 +19,7 @@ extern	unsigned		ButtonWidthX3;
 extern	HWND			ButtonWin[9];
 extern	unsigned		ClosestFormToCursor;
 extern	DRAWITEMSTRUCT*	DrawItem;
+extern	EnumMap<StateFlags>	StateMap;
 extern	unsigned		FormIndex;
 extern	FRMHED			FormList[MAXFORMS];
 extern	TCHAR			HomeDirectory[_MAX_PATH];
@@ -243,7 +241,7 @@ void msgflt(unsigned messageId, float value) {
 	LoadString(ThrEdInstance, messageId, buffer, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, value);
 	shoMsg(HelpBuffer);
-	setMap(NUMIN);
+	StateMap.set(NUMIN);
 	numWnd();
 }
 
@@ -254,7 +252,7 @@ void tsizmsg(TCHAR* threadSizeText, double threadSize) {
 	LoadString(ThrEdInstance, IDS_SIZ, buffer, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, threadSizeText, threadSize);
 	shoMsg(HelpBuffer);
-	setMap(NUMIN);
+	StateMap.set(NUMIN);
 	numWnd();
 }
 
@@ -287,11 +285,11 @@ void crmsg(TCHAR* fileName) {
 
 void butxt(unsigned iButton, TCHAR* buttonText) {
 
-	if (chkMap(WASTRAC) && iButton > HNUM) {
+	if (StateMap.test(WASTRAC) && iButton > HNUM) {
 
 		if (iButton == 5) {
 
-			if (chkMap(HIDMAP))
+			if (StateMap.test(HIDMAP))
 				SetWindowText(ButtonWin[iButton], StringTable[STR_TRC1H]);
 			else
 				SetWindowText(ButtonWin[iButton], StringTable[STR_TRC1S]);
@@ -385,7 +383,7 @@ void shoMsg(TCHAR* string) {
 			messageSize.cy = textSize.cy;
 	}
 	messageSize.cy *= count;
-	if (rstMap(MSGOF))
+	if (StateMap.testAndReset(MSGOF))
 		offset = PreferenceWindowWidth + 6;
 	else
 		offset = 3;
@@ -443,7 +441,7 @@ void shoseln(unsigned code0, unsigned code1) {
 BOOL clpmsgs(unsigned code) {
 
 	ispcdclp();
-	if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !chkMap(WASPCDCLP)) {
+	if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap.test(WASPCDCLP)) {
 
 		tabmsg(IDS_CLPS);
 		return 1;
@@ -455,7 +453,7 @@ void frm1pnt() {
 
 	if (FormIndex == 1) {
 
-		setMap(FORMSEL);
+		StateMap.set(FORMSEL);
 		ClosestFormToCursor = 0;
 	}
 }
@@ -467,7 +465,7 @@ BOOL filmsgs(unsigned code) {
 	if (FormIndex) {
 
 		frm1pnt();
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 
 			SelectedForm = &FormList[ClosestFormToCursor];
 			if (SelectedForm->vertexCount == 2) {

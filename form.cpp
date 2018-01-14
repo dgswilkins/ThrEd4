@@ -13,7 +13,6 @@ extern void		alrotmsg ();
 extern void		angrct (fRECTANGLE* rectangle);
 extern void		centr ();
 extern void		chkcwlk ();
-extern bool		chkMap (StateFlags bit);
 extern void		chkrng (fPOINT* range);
 extern unsigned	chku (unsigned bit);
 extern void		chkund ();
@@ -64,14 +63,12 @@ extern void		rotangf (fPOINT unrotatedPoint, fPOINT* rotatedPoint);
 extern void		rotflt (fPOINT* point);
 extern void		rotfn ();
 extern void		rstAll ();
-extern bool		rstMap (StateFlags bit);
 extern void		savdo ();
 extern void		sCor2px (dPOINT stitchCoordinate, POINT* pixelCoordinate);
 extern void		sdmsg ();
 extern void		selRct (fRECTANGLE* sourceRect);
 extern void		setangf (double angle);
 extern void		setfchk ();
-extern bool		setMap (StateFlags bit);
 extern void		setpsel ();
 extern unsigned	setRmap (fPOINTATTR stitchPoint);
 extern void		setxt ();
@@ -83,7 +80,6 @@ extern void		spltmsg ();
 extern void		srtcol ();
 extern void		stch2pxr (fPOINT stitchCoordinate);
 extern void		tabmsg (unsigned code);
-extern bool		toglMap (StateFlags bit);
 extern unsigned	toglu (unsigned bit);
 extern void		unbsho ();
 extern void		uncros ();
@@ -118,6 +114,7 @@ extern			HWND			DiscardButton;
 extern			POINT			EndPointCross;
 extern			HMENU			FillMenu;
 extern			unsigned		FillStartsMap;
+extern			EnumMap<StateFlags>	StateMap;
 extern			HWND			FormDataSheet;
 extern			unsigned		FormMenuChoice;
 extern			HPEN			FormPen;
@@ -242,7 +239,7 @@ BOOL			iseclp (unsigned find);
 BOOL			iseclpx (unsigned find);
 void			lapbrd ();
 void			lcon ();
-constexpr unsigned	nxt (unsigned iVertex);
+constexpr unsigned	nxt (unsigned int iVertex);
 void			oclp (fPOINT* p_clp, unsigned p_nclp);
 void			pbrd (double spac);
 void			plbrd (double spac);
@@ -482,7 +479,7 @@ unsigned char* Levels[] = {
 };
 
 
-void frmcpy(FRMHED* destination, FRMHED* source) {
+void frmcpy(FRMHED* destination, const FRMHED* source) noexcept {
 #if	 __UseASM__
 	unsigned index = sizeof(FRMHED);
 
@@ -498,7 +495,7 @@ void frmcpy(FRMHED* destination, FRMHED* source) {
 #endif
 }
 
-void frmclr(FRMHED* destination) {
+void frmclr(FRMHED* destination) noexcept {
 #if	 __UseASM__
 	unsigned formHeaderSize = sizeof(FRMHED);
 
@@ -514,7 +511,7 @@ void frmclr(FRMHED* destination) {
 #endif
 }
 
-void duinf(FRMHED* formHeader) {
+void duinf(const FRMHED* formHeader) noexcept {
 #if	 __UseASM__
 	_asm {
 		mov		ebx, formHeader
@@ -887,7 +884,7 @@ void delflt(unsigned formIndex) {
 }
 
 BOOL chk2of() {
-	if (!chkMap(SELBOX))
+	if (!StateMap.test(SELBOX))
 		return 0;
 	if (chku(FIL2OF))
 		return 0;
@@ -907,12 +904,12 @@ void delfil(unsigned attribute) {
 	unsigned	iSource = 0, iDestination = 0;
 
 	attribute &= TYPMSK | FRMSK;
-	rstMap(WASDEL);
+	StateMap.reset(WASDEL);
 	while ((StitchBuffer[iSource].attribute&(TYPMSK | FRMSK)) != attribute && iSource < PCSHeader.stitchCount)
 		iSource++;
 	iDestination = iSource;
 	if (iSource < PCSHeader.stitchCount) {
-		setMap(WASDEL);
+		StateMap.set(WASDEL);
 	}
 	while (iSource < PCSHeader.stitchCount) {
 		if ((StitchBuffer[iSource].attribute&(TYPMSK | FRMSK)) != attribute) {
@@ -1002,12 +999,12 @@ unsigned find1st() {
 }
 
 void ispcdclp() {
-	rstMap(WASPCDCLP);
+	StateMap.reset(WASPCDCLP);
 	if (OpenClipboard(ThrEdWindow)) {
 		Clip = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory)
-			setMap(WASPCDCLP);
+			StateMap.set(WASPCDCLP);
 	}
 	CloseClipboard();
 }
@@ -1088,7 +1085,7 @@ void dufrm() {
 }
 
 void unfrm() {
-	if (rstMap(SHOFRM))
+	if (StateMap.testAndReset(SHOFRM))
 		dufrm();
 }
 
@@ -1103,12 +1100,12 @@ void mdufrm() {
 }
 
 void munfrm() {
-	if (rstMap(SHOFRM))
+	if (StateMap.testAndReset(SHOFRM))
 		mdufrm();
 }
 
 void rats() {
-	if (chkMap(ZUMED)) {
+	if (StateMap.test(ZUMED)) {
 		HorizontalRatio = (ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
 		VerticalRatio = (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom;
 	}
@@ -1145,15 +1142,15 @@ void setfrm() {
 			SelectedForm->rectangle.bottom = CurrentFormVertices[iVertex].y;
 	}
 	FormIndex++;
-	rstMap(FORMIN);
-	setMap(INIT);
-	setMap(RESTCH);
+	StateMap.reset(FORMIN);
+	StateMap.set(INIT);
+	StateMap.set(RESTCH);
 }
 
 void form() {
 	shoMsg(StringTable[STR_FMEN]);
-	setMap(FORMIN);
-	rstMap(INSRT);
+	StateMap.set(FORMIN);
+	StateMap.reset(INSRT);
 	duzrat();
 }
 
@@ -1240,7 +1237,7 @@ void frmx(POINT controlPoint, HDC dc) {
 }
 
 void ratsr() {
-	if (chkMap(ZUMED)) {
+	if (StateMap.test(ZUMED)) {
 		HorizontalRatio = static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
 		VerticalRatio = static_cast<double>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
 	}
@@ -1289,10 +1286,10 @@ void ritfrct(unsigned iForm, HDC dc) {
 	for (controlPoint = 0; controlPoint < 8; controlPoint++)
 		selsqr(pixelOutline[controlPoint], dc);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
-	if (rstMap(GRPSEL)) {
-		rstMap(SELSHO);
+	if (StateMap.testAndReset(GRPSEL)) {
+		StateMap.reset(SELSHO);
 		SearchLineIndex = 0;
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 }
 
@@ -1388,7 +1385,7 @@ void dupsel(HDC dc) {
 }
 
 void unpsel() {
-	if (rstMap(SHOPSEL))
+	if (StateMap.testAndReset(SHOPSEL))
 		dupsel(StitchWindowDC);
 }
 
@@ -1398,8 +1395,8 @@ void drwfrm() {
 	POINT		line[2] = {};
 	dPOINT		point = {};
 
-	rstMap(SHOMOV);
-	rstMap(SHOPSEL);
+	StateMap.reset(SHOMOV);
+	StateMap.reset(SHOPSEL);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	ratsr();
 	duzrat();
@@ -1445,7 +1442,7 @@ void drwfrm() {
 			}
 			else
 				frmpoly(&FormLines[lastPoint], VertexCount + 1 - lastPoint);
-			if (ClosestFormToCursor == iForm && chkMap(FRMPSEL)) {
+			if (ClosestFormToCursor == iForm && StateMap.test(FRMPSEL)) {
 				for (iVertex = 1; iVertex < VertexCount; iVertex++) {
 					if (iVertex == ClosestVertexToCursor)
 						frmx(FormLines[iVertex], StitchWindowMemDC);
@@ -1464,10 +1461,10 @@ void drwfrm() {
 				SelectObject(StitchWindowMemDC, FormSelectedPen);
 				frmsqr0(FormLines[0]);
 			}
-			if (chkMap(FPSEL) && ClosestFormToCursor == iForm) {
+			if (StateMap.test(FPSEL) && ClosestFormToCursor == iForm) {
 				sRct2px(SelectedVerticesRect, &SelectedPixelsRect);
 				rct2sel(SelectedPixelsRect, SelectedPointsLine);
-				setMap(SHOPSEL);
+				StateMap.set(SHOPSEL);
 				dupsel(StitchWindowMemDC);
 			}
 		}
@@ -1484,13 +1481,13 @@ void drwfrm() {
 		dubig();
 	}
 	else {
-		if (chkMap(FORMSEL))
+		if (StateMap.test(FORMSEL))
 			ritfrct(ClosestFormToCursor, StitchWindowMemDC);
-		if (chkMap(FRMPMOV)) {
+		if (StateMap.test(FRMPMOV)) {
 			ritmov();
 			RubberBandLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 			RubberBandLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
-			setMap(SHOMOV);
+			StateMap.set(SHOMOV);
 			ritmov();
 		}
 	}
@@ -1503,8 +1500,8 @@ void setpoli() {
 	//frmtyp = FRMFPOLY;
 	FormList[FormIndex].attribute = ActiveLayer << 1;
 	FormList[FormIndex].underlayIndent = IniFile.underlayIndent;
-	setMap(SATIN);
-	setMap(INIT);
+	StateMap.set(SATIN);
+	StateMap.set(INIT);
 }
 
 void setlin() {
@@ -1512,63 +1509,63 @@ void setlin() {
 	FormList[FormIndex].type = FRMLINE;
 	//frmtyp = FRMLINE;
 	FormList[FormIndex].attribute = ActiveLayer << 1;
-	setMap(SATIN);
-	setMap(INIT);
+	StateMap.set(SATIN);
+	StateMap.set(INIT);
 }
 
 void setrpoli() {
 	unmsg();
 	pntmsg(IDS_REGP);
-	setMap(NUMIN);
-	setMap(ENTRPOL);
+	StateMap.set(NUMIN);
+	StateMap.set(ENTRPOL);
 	numWnd();
 }
 
 void setstar() {
 	unmsg();
 	pntmsg(IDS_STAR);
-	setMap(NUMIN);
-	setMap(ENTRSTAR);
+	StateMap.set(NUMIN);
+	StateMap.set(ENTRSTAR);
 	numWnd();
 }
 
 void setspir() {
 	unmsg();
 	pntmsg(IDS_SPIR);
-	setMap(NUMIN);
-	setMap(ENTRSPIR);
+	StateMap.set(NUMIN);
+	StateMap.set(ENTRSPIR);
 	numWnd();
 }
 
 void sethart() {
 	unmsg();
 	pntmsg(IDS_HEART);
-	setMap(NUMIN);
-	setMap(ENTRHART);
+	StateMap.set(NUMIN);
+	StateMap.set(ENTRHART);
 	numWnd();
 }
 
 void setlens() {
 	unmsg();
 	pntmsg(IDS_LENS);
-	setMap(NUMIN);
-	setMap(ENTRLENS);
+	StateMap.set(NUMIN);
+	StateMap.set(ENTRLENS);
 	numWnd();
 }
 
 void seteg() {
 	unmsg();
 	pntmsg(IDS_EGG);
-	setMap(NUMIN);
-	setMap(ENTREG);
+	StateMap.set(NUMIN);
+	StateMap.set(ENTREG);
 	numWnd();
 }
 
 void setzig() {
 	unmsg();
 	pntmsg(IDS_ZIG);
-	setMap(NUMIN);
-	setMap(ENTRZIG);
+	StateMap.set(NUMIN);
+	StateMap.set(ENTRZIG);
 	numWnd();
 }
 
@@ -1682,11 +1679,11 @@ void setear() {
 		SelectedForm->vertexCount++;
 		NewFormVertexCount++;
 		FormVertexIndex++;
-		setMap(FORMSEL);
+		StateMap.set(FORMSEL);
 		fvars(FormIndex);
 		frmout(FormIndex);
 		flipv();
-		rstMap(FORMSEL);
+		StateMap.reset(FORMSEL);
 		size.x = SelectedForm->rectangle.right - SelectedForm->rectangle.left;
 		size.y = SelectedForm->rectangle.top - SelectedForm->rectangle.bottom;
 		horizontalRatio = UnzoomedRect.x / 4 / size.x;
@@ -1835,7 +1832,7 @@ unsigned closfrm() {
 		px2stchf(screenCoordinate, &point);
 		layerCoded = ActiveLayer << 1;
 		for (iForm = 0; iForm < FormIndex; iForm++) {
-			if (chkMap(FRMSAM) && iForm == ClosestFormToCursor)
+			if (StateMap.test(FRMSAM) && iForm == ClosestFormToCursor)
 				continue;
 
 			formLayer = FormList[iForm].attribute&FRMLMSK;
@@ -1864,7 +1861,7 @@ unsigned closfrm() {
 			ClosestFormToCursor = closestForm;
 			ClosestVertexToCursor = closestVertex;
 			fvars(ClosestFormToCursor);
-			setMap(RELAYR);
+			StateMap.set(RELAYR);
 			return 1;
 		}
 		else
@@ -2087,7 +2084,7 @@ void savdisc() {
 	TCHAR	buffer[HBUFSIZ];
 
 	sdmsg();
-	rstMap(BIGBOX);
+	StateMap.reset(BIGBOX);
 
 	GetClientRect(MsgWindow, &MsgRect);
 
@@ -2190,7 +2187,7 @@ void oclp(fPOINT* clip, unsigned clipEntries) {
 
 	unsigned	iClip = 1;
 
-	if (!chkMap(NOCLP)) {
+	if (!StateMap.test(NOCLP)) {
 		for (iClip = 0; iClip < clipEntries; iClip++) {
 			ClipBuffer[iClip].x = clip[iClip].x;
 			ClipBuffer[iClip].y = clip[iClip].y;
@@ -2348,13 +2345,13 @@ void chkbrd() {
 
 			case EDGELCHAIN: // Lin Chain
 
-				setMap(LINCHN);
+				StateMap.set(LINCHN);
 				chnfn();
 				break;
 
 			case EDGEOCHAIN: // Open Chain
 
-				rstMap(LINCHN);
+				StateMap.reset(LINCHN);
 				chnfn();
 				break;
 		}
@@ -2440,25 +2437,25 @@ void refilfn() {
 	const double	stitchLength = UserStitchLength;
 	float	length = 0.0;
 
-	rstMap(TXFIL);
+	StateMap.reset(TXFIL);
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->type == FRMLINE)
 		SelectedForm->underlayIndent = 0;
 	savdo();
 	fdelstch();
-	setMap(WASREFIL);
+	StateMap.set(WASREFIL);
 	if (SelectedForm->fillSpacing < 0.5 && !isclp(ClosestFormToCursor))
 		SelectedForm->fillSpacing = 0.5;
 	if (SelectedForm->edgeSpacing < 0.5)
 		SelectedForm->edgeSpacing = 0.5;
 	UserStitchLength = SelectedForm->lengthOrCount.stitchLength;
-	if (!chkMap(WASDO))
+	if (!StateMap.test(WASDO))
 		savdo();
-	rstMap(WASDO);
+	StateMap.reset(WASDO);
 	if (SelectedForm->extendedAttribute&(AT_UND | AT_WALK) && SelectedForm->type == FRMLINE && SelectedForm->fillType != CONTF)
 		SelectedForm->type = FRMFPOLY;
 	InterleaveSequenceIndex = InterleaveSequenceIndex2 = 0;
-	rstMap(ISUND);
+	StateMap.reset(ISUND);
 	switch (SelectedForm->type) {
 		case FRMLINE:
 
@@ -2487,7 +2484,7 @@ void refilfn() {
 
 				case EDGEANGSAT:
 
-					rstMap(SAT1);
+					StateMap.reset(SAT1);
 					slbrd();
 					ritbrd();
 					break;
@@ -2495,7 +2492,7 @@ void refilfn() {
 				case EDGEPROPSAT:
 
 					if (SelectedForm->vertexCount > 2) {
-						rstMap(SAT1);
+						StateMap.reset(SAT1);
 						plbrd(SelectedForm->edgeSpacing);
 						ritbrd();
 					}
@@ -2505,7 +2502,7 @@ void refilfn() {
 
 					lapbrd();
 					ritapbrd();
-					rstMap(SAT1);
+					StateMap.reset(SAT1);
 					slbrd();
 					ritbrd();
 					break;
@@ -2540,14 +2537,14 @@ void refilfn() {
 
 				case EDGELCHAIN:
 
-					setMap(LINCHN);
+					StateMap.set(LINCHN);
 					chnfn();
 					ritbrd();
 					break;
 
 				case EDGEOCHAIN:
 
-					rstMap(LINCHN);
+					StateMap.reset(LINCHN);
 					chnfn();
 					ritbrd();
 					break;
@@ -2570,7 +2567,7 @@ void refilfn() {
 			chkcwlk();
 			chkwlk();
 			chkund();
-			rstMap(ISUND);
+			StateMap.reset(ISUND);
 			if (SelectedForm->fillType) {
 				spacing = LineSpacing;
 				LineSpacing = SelectedForm->fillSpacing;
@@ -2614,7 +2611,7 @@ void refilfn() {
 					case ANGCLPF:
 
 						oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
-						rstMap(ISUND);
+						StateMap.reset(ISUND);
 						angclpfn();
 						doFill = false;
 						break;
@@ -2637,7 +2634,7 @@ void refilfn() {
 					case TXANGF:
 
 						setxt();
-						rstMap(ISUND);
+						StateMap.reset(ISUND);
 						angclpfn();
 						doFill = false;
 						break;
@@ -2661,7 +2658,7 @@ void refilfn() {
 			chkcwlk();
 			chkwlk();
 			chkund();
-			rstMap(ISUND);
+			StateMap.reset(ISUND);
 			switch (SelectedForm->fillType) {
 				case SATF:
 
@@ -2682,9 +2679,9 @@ void refilfn() {
 
 				case FTHF:
 
-					if (rstMap(FLPBLND))
+					if (StateMap.testAndReset(FLPBLND))
 						SelectedForm->extendedAttribute ^= AT_FTHBLND;
-					setMap(CNV2FTH);
+					StateMap.set(CNV2FTH);
 					fthrfn();
 					fritfil();
 					break;
@@ -2707,10 +2704,10 @@ void refil() {
 			attribute = StitchBuffer[iStitch].attribute;
 			if (!(attribute&NOTFRM) && (attribute&(USMSK | FRMSK)) == codedForm) {
 				if (FormDataSheet)
-					setMap(WASFRMFRM);
+					StateMap.set(WASFRMFRM);
 				undat();
 				tabmsg(IDS_REFIL);
-				setMap(MOVMSG);
+				StateMap.set(MOVMSG);
 				okcan();
 				return;
 			}
@@ -2732,11 +2729,11 @@ void setfpnt() {
 	px2stchf(screenCoordinate, &vertices[ClosestVertexToCursor]);
 	frmout(ClosestFormToCursor);
 	refil();
-	setMap(WASFPNT);
-	rstMap(SELBOX);
-	setMap(FRMPSEL);
+	StateMap.set(WASFPNT);
+	StateMap.reset(SELBOX);
+	StateMap.set(FRMPSEL);
 	ritfcor(&CurrentFormVertices[ClosestVertexToCursor]);
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 constexpr unsigned nxt(unsigned int iVertex) {
@@ -2895,7 +2892,7 @@ void filinu(float xCoordinate, float yCoordinate) {
 	if (chkmax(count, SequenceIndex) || count + SequenceIndex > MAXITEMS - 3)
 		return;
 	if (count) {
-		if (chkMap(FILDIR))
+		if (StateMap.test(FILDIR))
 			count++;
 		step.x = delta.x / count;
 		step.y = delta.y / count;
@@ -2926,7 +2923,7 @@ void filin(dPOINT currentPoint) {
 	if (chkmax(count, SequenceIndex) || (count + SequenceIndex) > MAXITEMS - 3)
 		return;
 	if (count) {
-		if (chkMap(FILDIR))
+		if (StateMap.test(FILDIR))
 			count++;
 		step.x = delta.x / count;
 		step.y = delta.y / count;
@@ -3153,13 +3150,13 @@ void duseq(unsigned start, unsigned finish) {
 	bool		flag = false;
 
 	SequenceLines = &*SortedLines[start];
-	rstMap(SEQDUN);
+	StateMap.reset(SEQDUN);
 	if (start > finish) {
 		// This odd construction for iLine is used to ensure loop terminates when finish = 0
 		for (iLine = start + 1; iLine != finish; iLine--) {
 			iLineDec = iLine - 1;
 			if (setseq(iLineDec)) {
-				if (!setMap(SEQDUN)) {
+				if (!StateMap.testAndSet(SEQDUN)) {
 					flag = true;
 					duseq2(iLineDec);
 				}
@@ -3174,14 +3171,14 @@ void duseq(unsigned start, unsigned finish) {
 				}
 			}
 			else {
-				if (rstMap(SEQDUN))
+				if (StateMap.testAndReset(SEQDUN))
 					duseq2(iLineDec + 1);
 				flag = true;
 				SequenceLines = &*SortedLines[iLineDec];
 				movseq(iLineDec);
 			}
 		}
-		if (rstMap(SEQDUN)) {
+		if (StateMap.testAndReset(SEQDUN)) {
 			flag = true;
 			duseq2(iLine);
 		}
@@ -3190,7 +3187,7 @@ void duseq(unsigned start, unsigned finish) {
 	else {
 		for (iLine = start; iLine <= finish; iLine++) {
 			if (setseq(iLine)) {
-				if (!setMap(SEQDUN)) {
+				if (!StateMap.testAndSet(SEQDUN)) {
 					flag = true;
 					duseq2(iLine);
 				}
@@ -3205,7 +3202,7 @@ void duseq(unsigned start, unsigned finish) {
 				}
 			}
 			else {
-				if (rstMap(SEQDUN)) {
+				if (StateMap.testAndReset(SEQDUN)) {
 					if (iLine)
 						duseq2(iLine - 1);
 				}
@@ -3214,7 +3211,7 @@ void duseq(unsigned start, unsigned finish) {
 				movseq(iLine);
 			}
 		}
-		if (rstMap(SEQDUN)) {
+		if (StateMap.testAndReset(SEQDUN)) {
 			if (iLine) {
 				flag = true;
 				duseq2(iLine - 1);
@@ -3228,7 +3225,7 @@ void brkseq(unsigned start, unsigned finish) {
 
 	unsigned	iLine = 0, iLineDec = 0, savedGroup = 0;
 
-	rstMap(SEQDUN);
+	StateMap.reset(SEQDUN);
 	if (start > finish) {
 		savedGroup = SortedLines[start]->group + 1;
 		// This odd construction for iLine is used to ensure
@@ -3245,7 +3242,7 @@ void brkseq(unsigned start, unsigned finish) {
 			else
 				SequenceLines = &*SortedLines[iLineDec];
 			if (setseq(iLineDec)) {
-				if (!setMap(SEQDUN))
+				if (!StateMap.testAndSet(SEQDUN))
 					duseq1();
 			}
 			else
@@ -3266,7 +3263,7 @@ void brkseq(unsigned start, unsigned finish) {
 			else
 				SequenceLines = &*SortedLines[iLine];
 			if (setseq(iLine)) {
-				if (!setMap(SEQDUN))
+				if (!StateMap.testAndSet(SEQDUN))
 					duseq1();
 			}
 			else
@@ -3274,7 +3271,7 @@ void brkseq(unsigned start, unsigned finish) {
 		}
 		LastGroup = SequenceLines->group;
 	}
-	if (rstMap(SEQDUN))
+	if (StateMap.testAndReset(SEQDUN))
 		duseq1();
 }
 
@@ -3282,7 +3279,7 @@ void brkdun(unsigned start, unsigned finish) {
 	rspnt(SortedLines[start]->x, SortedLines[start]->y);
 	rspnt(SortedLines[finish]->x, SortedLines[finish]->y);
 	rspnt(WorkingFormVertices[SortedLines[start]->line].x, WorkingFormVertices[SortedLines[start]->line].y);
-	setMap(BRKFIX);
+	StateMap.set(BRKFIX);
 }
 
 void durgn(unsigned pthi) {
@@ -3303,7 +3300,7 @@ void durgn(unsigned pthi) {
 	CurrentRegion = &RegionsList[iRegion];
 	sequenceStart = CurrentRegion->start;
 	sequenceEnd = CurrentRegion->end;
-	if (SequencePath[pthi].skp || rstMap(BRKFIX)) {
+	if (SequencePath[pthi].skp || StateMap.testAndReset(BRKFIX)) {
 		if (BSequence[OutputIndex - 1].attribute != SEQBOT)
 			rspnt(BSequence[OutputIndex - 2].x, BSequence[OutputIndex - 2].y);
 		lineEndPointStart = &*SortedLines[iRegion];
@@ -3913,7 +3910,7 @@ void bakseq() {
 	const double	StitchSpacing2 = LineSpacing * 2;
 
 	SequenceIndex = 0;
-	rstMap(FILDIR);
+	StateMap.reset(FILDIR);
 	OSequence[SequenceIndex].x = BSequence[iSequence].x;
 	OSequence[SequenceIndex].y = BSequence[iSequence].y;
 	SequenceIndex++;
@@ -3937,7 +3934,7 @@ void bakseq() {
 			case SEQTOP:
 
 				if (SelectedForm->extendedAttribute&AT_SQR) {
-					if (toglMap(FILDIR)) {
+					if (StateMap.testAndFlip(FILDIR)) {
 						OSequence[SequenceIndex].x = BSequence[iSequence - 1].x;
 						OSequence[SequenceIndex++].y = BSequence[iSequence - 1].y;
 						count = ceil(BSequence[iSequence].y / UserStitchLength);
@@ -4006,7 +4003,7 @@ void bakseq() {
 
 				delta.x = BSequence[iSequence].x - BSequence[iSequence + 1].x;
 				delta.y = BSequence[iSequence].y - BSequence[iSequence + 1].y;
-				rstMap(FILDIR);
+				StateMap.reset(FILDIR);
 				length = hypot(delta.x, delta.y);
 				if (length) {
 					if (length > UserStitchLength2) {
@@ -4174,17 +4171,17 @@ void filvrt() {
 			if (SelectedForm->type != FRMLINE)
 				fsvrt();
 		}
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			savdo();
 			fsvrt();
-			setMap(INIT);
+			StateMap.set(INIT);
 			coltab();
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 	}
 }
@@ -4216,16 +4213,16 @@ void filhor() {
 			if (SelectedForm->type != FRMLINE)
 				fshor();
 		}
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			fshor();
-			setMap(INIT);
+			StateMap.set(INIT);
 			coltab();
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 	}
 }
@@ -4265,17 +4262,17 @@ void filangl() {
 			if (SelectedForm->type != FRMLINE)
 				fsangl();
 		}
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			savdo();
 			fsangl();
-			setMap(INIT);
+			StateMap.set(INIT);
 			coltab();
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 	}
 }
@@ -4313,7 +4310,7 @@ void strtchbox() {
 }
 
 void unstrtch() {
-	if (rstMap(SHOSTRTCH))
+	if (StateMap.testAndReset(SHOSTRTCH))
 		strtchbox();
 }
 
@@ -4352,13 +4349,13 @@ unsigned chkfrm() {
 			StretchBoxLine[4].x = StretchBoxLine[0].x;
 			StretchBoxLine[4].y = StretchBoxLine[0].y;
 			if (SelectedFormControlVertex & 1)
-				setMap(STRTCH);
+				StateMap.set(STRTCH);
 			else {
-				setMap(EXPAND);
+				StateMap.set(EXPAND);
 				XYratio = static_cast<double>(SelectedForm->rectangle.right - SelectedForm->rectangle.left) / (SelectedForm->rectangle.top - SelectedForm->rectangle.bottom);
 			}
 			SelectedFormControlVertex >>= 1;
-			setMap(SHOSTRTCH);
+			StateMap.set(SHOSTRTCH);
 			strtchbox();
 			return 1;
 		}
@@ -4368,7 +4365,7 @@ unsigned chkfrm() {
 		sfCor2px(SelectedForm->vertices[0], &formOrigin);
 		FormMoveDelta.x = formOrigin.x - point.x;
 		FormMoveDelta.y = formOrigin.y - point.y;
-		setMap(FRMOV);
+		StateMap.set(FRMOV);
 		return 1;
 	}
 	else
@@ -4383,7 +4380,7 @@ void rstfrm() {
 	const	unsigned	attribute = (ClosestFormToCursor << 4);
 
 	setmfrm();
-	rstMap(FRMOV);
+	StateMap.reset(FRMOV);
 	pxCor2stch(point);
 	offset.x = SelectedPoint.x - SelectedForm->vertices[0].x;
 	offset.y = SelectedPoint.y - SelectedForm->vertices[0].y;
@@ -4429,7 +4426,7 @@ void dusat() {
 }
 
 void unsat() {
-	if (rstMap(SHOSAT))
+	if (StateMap.testAndReset(SHOSAT))
 		dusat();
 }
 
@@ -4438,7 +4435,7 @@ void drwsat() {
 	px2stch();
 	FormLines[SatinIndex].x = Msg.pt.x - StitchWindowOrigin.x;
 	FormLines[SatinIndex].y = Msg.pt.y - StitchWindowOrigin.y;
-	setMap(SHOSAT);
+	StateMap.set(SHOSAT);
 	dusat();
 }
 
@@ -4449,7 +4446,7 @@ void satpnt0() {
 	TempPolygon[0].x = SelectedPoint.x;
 	TempPolygon[0].y = SelectedPoint.y;
 	SatinIndex = 1;
-	setMap(SATPNT);
+	StateMap.set(SATPNT);
 }
 
 void satpnt1() {
@@ -4461,7 +4458,7 @@ void satpnt1() {
 	TempPolygon[SatinIndex].x = SelectedPoint.x;
 	TempPolygon[SatinIndex].y = SelectedPoint.y;
 	SatinIndex++;
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void satfix() {
@@ -4477,10 +4474,10 @@ void satfix() {
 		frmout(FormIndex);
 		FormList[FormIndex].satinGuideCount = 0;
 		FormIndex++;
-		setMap(INIT);
+		StateMap.set(INIT);
 	}
-	rstMap(SHOSAT);
-	setMap(RESTCH);
+	StateMap.reset(SHOSAT);
+	StateMap.set(RESTCH);
 }
 
 void delcon(unsigned GuideIndex) {
@@ -4505,7 +4502,7 @@ void delcon(unsigned GuideIndex) {
 	if (SelectedForm->fillType == SATF)
 		refil();
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 BOOL satselfn() {
@@ -4542,8 +4539,8 @@ void satsel() {
 		duzrat();
 		StartPoint = ClosestVertexToCursor;
 		sfCor2px(SelectedForm->vertices[ClosestVertexToCursor], &FormLines[0]);
-		rstMap(SHOCON);
-		setMap(SATCNKT);
+		StateMap.reset(SHOCON);
+		StateMap.set(SATCNKT);
 		if (SelectedForm->type == FRMFPOLY)
 			SelectedForm->type = SAT;
 	}
@@ -4557,7 +4554,7 @@ void ducon() {
 }
 
 void uncon() {
-	if (rstMap(SHOCON))
+	if (StateMap.testAndReset(SHOCON))
 		ducon();
 }
 
@@ -4565,7 +4562,7 @@ void drwcon() {
 	uncon();
 	FormLines[1].x = Msg.pt.x - StitchWindowOrigin.x;
 	FormLines[1].y = Msg.pt.y - StitchWindowOrigin.y;
-	setMap(SHOCON);
+	StateMap.set(SHOCON);
 	ducon();
 }
 
@@ -4883,7 +4880,7 @@ void satclos() {
 			ClosestVertexToCursor = iVertex;
 		}
 	}
-	rstMap(SATCNKT);
+	StateMap.reset(SATCNKT);
 	if (SelectedForm->type == FRMLINE) {
 		SelectedForm->fillType = CONTF;
 		closestVertex = ClosestVertexToCursor;
@@ -4959,7 +4956,7 @@ void satknkt() {
 	satclos();
 	fvars(ClosestFormToCursor);
 	refil();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void ritseq1(unsigned ind) {
@@ -4982,13 +4979,13 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 	dPOINT		line1Step = {}, line2Step = {};
 
 	if (line1Start != line1End && line2Start != line2End) {
-		if (!setMap(SAT1)) {
-			if (chkMap(FTHR)) {
+		if (!StateMap.testAndSet(SAT1)) {
+			if (StateMap.test(FTHR)) {
 				BSequence[SequenceIndex].attribute = 0;
 				ritseq1(line1Start%VertexCount);
 			}
 			else {
-				if (chkMap(BARSAT)) {
+				if (StateMap.test(BARSAT)) {
 					ritseq1(line1Start%VertexCount);
 					ritseq1(line2Start%VertexCount);
 				}
@@ -5059,13 +5056,13 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 		line2Step.y = line2Delta.y / line2Count;
 nuseg:;
 
-		if (chkMap(FTHR)) {
+		if (StateMap.test(FTHR)) {
 			while (line1Count && line2Count) {
 				line1Point.x += line1Step.x;
 				line1Point.y += line1Step.y;
 				line2Point.x += line2Step.x;
 				line2Point.y += line2Step.y;
-				if (toglMap(FILDIR)) {
+				if (StateMap.testAndFlip(FILDIR)) {
 					BSequence[SequenceIndex].attribute = 0;
 					BSequence[SequenceIndex].x = line1Point.x;
 					BSequence[SequenceIndex++].y = line1Point.y;
@@ -5084,13 +5081,13 @@ nuseg:;
 			}
 		}
 		else {
-			if (chkMap(BARSAT)) {
+			if (StateMap.test(BARSAT)) {
 				while (line1Count && line2Count) {
 					line1Point.x += line1Step.x;
 					line1Point.y += line1Step.y;
 					line2Point.x += line2Step.x;
 					line2Point.y += line2Step.y;
-					if (toglMap(FILDIR)) {
+					if (StateMap.testAndFlip(FILDIR)) {
 						BSequence[SequenceIndex].attribute = 0;
 						BSequence[SequenceIndex].x = line1Point.x;
 						BSequence[SequenceIndex++].y = line1Point.y;
@@ -5120,7 +5117,7 @@ nuseg:;
 					line1Point.y += line1Step.y;
 					line2Point.x += line2Step.x;
 					line2Point.y += line2Step.y;
-					if (toglMap(FILDIR)) {
+					if (StateMap.testAndFlip(FILDIR)) {
 						if (chku(SQRFIL))
 							filinu(line2Point.x, line2Point.y);
 						filin(line1Point);
@@ -5203,8 +5200,8 @@ void satfil() {
 	satadj();
 	LineSpacing /= 2;
 	SequenceIndex = 0;
-	rstMap(SAT1);
-	rstMap(FILDIR);
+	StateMap.reset(SAT1);
+	StateMap.reset(FILDIR);
 	SelectedForm->fillType = SATF;
 	Lengths = new double[VertexCount + 2];
 	length = 0;
@@ -5242,7 +5239,7 @@ void satfil() {
 			else {
 				length = (length - Lengths[1]) / 2;
 				iVertex = 1;
-				if (!chkMap(BARSAT)) {
+				if (!StateMap.test(BARSAT)) {
 					OSequence[0].x = SelectedPoint.x = CurrentFormVertices[1].x;
 					OSequence[0].y = SelectedPoint.y = CurrentFormVertices[1].y;
 					SequenceIndex = 1;
@@ -5264,7 +5261,7 @@ void satfil() {
 	}
 	length /= 2;
 	iVertex = 0;
-	if (!chkMap(BARSAT) && !chkMap(FTHR)) {
+	if (!StateMap.test(BARSAT) && !StateMap.test(FTHR)) {
 		OSequence[0].x = SelectedPoint.x = CurrentFormVertices[0].x;
 		OSequence[0].y = SelectedPoint.y = CurrentFormVertices[0].y;
 		SequenceIndex = 1;
@@ -5308,17 +5305,17 @@ void filsat() {
 			if (SelectedForm->type != FRMLINE)
 				filsfn();
 		}
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			savdo();
 			filsfn();
-			setMap(INIT);
+			StateMap.set(INIT);
 			coltab();
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 	}
 }
@@ -5422,7 +5419,7 @@ void insat() {
 		fvars(ClosestFormToCursor);
 		if (InOutFlag) {
 			if (ClosestVertexToCursor == 0 && FormForInsert->type == FRMLINE) {
-				setMap(PRELIN);
+				StateMap.set(PRELIN);
 			}
 			else {
 				if (ClosestVertexToCursor != lastVertex && FormForInsert->type == FRMLINE) { 
@@ -5430,7 +5427,7 @@ void insat() {
 				}
 			}
 			nufpnt(ClosestVertexToCursor);
-			if (rstMap(PRELIN)) {
+			if (StateMap.testAndReset(PRELIN)) {
 				SelectedPoint.x = FormForInsert->vertices[0].x;
 				SelectedPoint.y = FormForInsert->vertices[0].y;
 				FormForInsert->vertices[0].x = FormForInsert->vertices[1].x;
@@ -5445,7 +5442,7 @@ void insat() {
 		}
 		refil();
 	}
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 BOOL chkdel() {
@@ -5472,11 +5469,11 @@ void delspnt() {
 
 	fvars(ClosestFormToCursor);
 	if (chkdel()) {
-		setMap(DELTO);
+		StateMap.set(DELTO);
 		frmdel();
-		rstMap(FRMPSEL);
+		StateMap.reset(FRMPSEL);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 		return;
 	}
 	if (SelectedForm->type == SAT) {
@@ -5515,7 +5512,7 @@ void delspnt() {
 	fvars(ClosestFormToCursor);
 	if (ClosestVertexToCursor > static_cast<unsigned>(SelectedForm->vertexCount) - 1)
 		ClosestVertexToCursor = SelectedForm->vertexCount - 1;
-	setMap(FRMPSEL);
+	StateMap.set(FRMPSEL);
 	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 		FormList[iForm].vertices--;
 	ritfcor(&CurrentFormVertices[ClosestVertexToCursor]);
@@ -5560,20 +5557,20 @@ void unfil() {
 		}
 		PCSHeader.stitchCount = iDestination;
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
-			if (!rstMap(IGNOR) && !chku(WRNOF)) {
+		if (StateMap.test(FORMSEL)) {
+			if (!StateMap.testAndReset(IGNOR) && !chku(WRNOF)) {
 				codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
 				mapLength = StitchBuffer[0].attribute&(FRMSK | USMSK);
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 					attribute = StitchBuffer[iStitch].attribute;
 					if (!(attribute&NOTFRM) && (attribute&(USMSK | FRMSK)) == codedForm) {
 						tabmsg(IDS_UNFIL);
-						setMap(FILMSG);
+						StateMap.set(FILMSG);
 						okcan();
-						setMap(IGNOR);
+						StateMap.set(IGNOR);
 						return;
 					}
 				}
@@ -5599,7 +5596,7 @@ void unfil() {
 }
 
 void satzum() {
-	rstMap(SHOSAT);
+	StateMap.reset(SHOSAT);
 	duzrat();
 	VertexCount = SatinIndex;
 	frmlin(TempPolygon, SatinIndex);
@@ -5673,14 +5670,14 @@ void rotfrm(unsigned newStartVertex) {
 
 
 void frm0() {
-	if (chkMap(FRMPSEL)) {
+	if (StateMap.test(FRMPSEL)) {
 		savdo();
 		rotfrm(ClosestVertexToCursor);
 		ClosestVertexToCursor = 0;
 		satadj();
 		refil();
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 }
 
@@ -5692,7 +5689,7 @@ void duinsf() {
 }
 
 void uninsf() {
-	if (rstMap(SHOINSF))
+	if (StateMap.testAndReset(SHOINSF))
 		duinsf();
 }
 
@@ -5706,7 +5703,7 @@ void rinfrm() {
 	InsertLine[0].y = FormLines[FormVertexPrev].y;
 	InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 	InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
-	setMap(SHOINSF);
+	StateMap.set(SHOINSF);
 	duinsf();
 }
 
@@ -5717,7 +5714,7 @@ void infrm() {
 		if (InOutFlag) {
 			if (!ClosestVertexToCursor && FormForInsert->type == FRMLINE) {
 				FormVertexPrev = 0;
-				setMap(PRELIN);
+				StateMap.set(PRELIN);
 			}
 			else {
 				FormVertexPrev = prv(ClosestVertexToCursor);
@@ -5728,8 +5725,8 @@ void infrm() {
 			FormVertexNext = ClosestVertexToCursor;
 			FormVertexPrev = prv(ClosestVertexToCursor);
 		}
-		setMap(INSFRM);
-		setMap(INIT);
+		StateMap.set(INSFRM);
+		StateMap.set(INIT);
 		rinfrm();
 	}
 }
@@ -5737,7 +5734,7 @@ void infrm() {
 void setins() {
 	px2stch();
 	nufpnt(FormVertexPrev);
-	if (chkMap(PRELIN)) {
+	if (StateMap.test(PRELIN)) {
 		SelectedPoint.x = FormForInsert->vertices[0].x;
 		SelectedPoint.y = FormForInsert->vertices[0].y;
 		FormForInsert->vertices[0].x = FormForInsert->vertices[1].x;
@@ -5755,9 +5752,9 @@ void setins() {
 	InsertLine[0].y = FormLines[FormVertexPrev].y;
 	InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 	InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
-	setMap(INSFRM);
+	StateMap.set(INSFRM);
 	duinsf();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void bdrlin(unsigned start, unsigned finish, double stitchSize) {
@@ -5850,17 +5847,17 @@ void bord() {
 			SelectedForm->borderColor = ActiveColor;
 			sbord();
 		}
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			SelectedForm->borderColor = ActiveColor;
 			sbord();
 			coltab();
-			setMap(INIT);
-			setMap(RESTCH);
+			StateMap.set(INIT);
+			StateMap.set(RESTCH);
 		}
 	}
 }
@@ -6010,7 +6007,7 @@ void clpbrd(unsigned short startVertex) {
 	unsigned	currentVertex = 0, nextVertex = 0;
 
 	SequenceIndex = 0;
-	rstMap(CLPBAK);
+	StateMap.reset(CLPBAK);
 	HorizontalLength2 = ClipRectSize.cx / 2;
 	HorizontalLength = ClipRectSize.cx;
 	ClipFillData = new fPOINT[ClipStitchCount];
@@ -6108,9 +6105,9 @@ void satout(double satinWidth) {
 		for (iVertex = 0; iVertex < VertexCount - 1; iVertex++)
 			outfn(iVertex, iVertex + 1, satinWidth);
 		outfn(iVertex, 0, satinWidth);
-		rstMap(INDIR);
+		StateMap.reset(INDIR);
 		if (count < VertexCount >> 1) {
-			setMap(INDIR);
+			StateMap.set(INDIR);
 			OutsidePoints = InsidePointList;
 			InsidePoints = OutsidePointList;
 		}
@@ -6168,16 +6165,16 @@ void fclp() {
 						fvars(ClosestFormToCursor);
 						fsclp();
 					}
-					setMap(INIT);
+					StateMap.set(INIT);
 					coltab();
-					setMap(RESTCH);
+					StateMap.set(RESTCH);
 				}
 				else {
-					if (chkMap(FORMSEL)) {
+					if (StateMap.test(FORMSEL)) {
 						fsclp();
-						setMap(INIT);
+						StateMap.set(INIT);
 						coltab();
-						setMap(RESTCH);
+						StateMap.set(RESTCH);
 					}
 				}
 			}
@@ -6276,7 +6273,7 @@ void sbfn(fPOINT* insidePoints, unsigned start, unsigned finish) {
 	unsigned	count = 0, innerFlag = 0, outerFlag = 0, offsetCount = 0, iStep = 0;
 	unsigned	ind = 0, intersectFlag = 0;
 
-	if (!setMap(SAT1)) {
+	if (!StateMap.testAndSet(SAT1)) {
 		SelectedPoint.x = insidePoints[start].x;
 		SelectedPoint.y = insidePoints[start].y;
 	}
@@ -6318,7 +6315,7 @@ void sbfn(fPOINT* insidePoints, unsigned start, unsigned finish) {
 		innerPoint.y += innerStep.y;
 		outerPoint.x += outerStep.x;
 		outerPoint.y += outerStep.y;
-		if (toglMap(FILDIR)) {
+		if (StateMap.testAndFlip(FILDIR)) {
 			if (innerFlag) {
 				offsetDelta.x = innerPoint.x - SelectedPoint.x;
 				offsetDelta.y = innerPoint.y - SelectedPoint.y;
@@ -6380,14 +6377,14 @@ void sbrd() {
 	const double	spacing = LineSpacing;
 	const unsigned	start = getlast();
 	
-	rstMap(SAT1);
-	rstMap(FILDIR);
+	StateMap.reset(SAT1);
+	StateMap.reset(FILDIR);
 	SequenceIndex = 1;
 	if (SelectedForm->edgeType&EGUND) {
 		LineSpacing = USPAC;
 		satout(HorizontalLength2*URAT);
 		sfn(start);
-		setMap(FILDIR);
+		StateMap.set(FILDIR);
 		sfn(start);
 	}
 	fvars(ClosestFormToCursor);
@@ -6404,7 +6401,7 @@ void satends(unsigned isBlunt) {
 	if (isBlunt&SBLNT) {
 		step.x = sin(FormAngles[0])*HorizontalLength2 / 2;
 		step.y = cos(FormAngles[0])*HorizontalLength2 / 2;
-		if (chkMap(INDIR)) {
+		if (StateMap.test(INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
 		}
@@ -6420,7 +6417,7 @@ void satends(unsigned isBlunt) {
 	if (isBlunt&FBLNT) {
 		step.x = sin(FormAngles[VertexCount - 2])*HorizontalLength2 / 2;
 		step.y = cos(FormAngles[VertexCount - 2])*HorizontalLength2 / 2;
-		if (chkMap(INDIR)) {
+		if (StateMap.test(INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
 		}
@@ -6445,12 +6442,12 @@ void slbrd() {
 		HorizontalLength2 = SelectedForm->borderSize*URAT;
 		satout(HorizontalLength2);
 		satends(SelectedForm->attribute);
-		rstMap(SAT1);
-		rstMap(FILDIR);
+		StateMap.reset(SAT1);
+		StateMap.reset(FILDIR);
 		LineSpacing = USPAC;
 		for (iVertex = 0; iVertex < static_cast<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
 			sbfn(InsidePoints, iVertex, iVertex + 1);
-		toglMap(FILDIR);
+		StateMap.flip(FILDIR);
 		for (iVertex = SelectedForm->vertexCount - 1; iVertex != 0; iVertex--)
 			sbfn(InsidePoints, iVertex, iVertex - 1);
 	}
@@ -6458,7 +6455,7 @@ void slbrd() {
 	satout(HorizontalLength2);
 	satends(SelectedForm->attribute);
 	LineSpacing = SelectedForm->edgeSpacing;
-	rstMap(SAT1);
+	StateMap.reset(SAT1);
 	for (iVertex = 0; iVertex < static_cast<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
 		sbfn(InsidePoints, iVertex, iVertex + 1);
 	LineSpacing = spacing;
@@ -6492,22 +6489,22 @@ void satbrd() {
 				SelectedForm->attribute &= NOBLNT;
 			satsbrd();
 		}
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			fvars(ClosestFormToCursor);
 			if (chku(BLUNT))
 				SelectedForm->attribute |= (SBLNT | FBLNT);
 			else
 				SelectedForm->attribute &= NOBLNT;
 			satsbrd();
-			setMap(INIT);
+			StateMap.set(INIT);
 			coltab();
 			ritot(PCSHeader.stitchCount);
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 	}
 }
@@ -6577,20 +6574,20 @@ void apliq() {
 				SelectedForm->attribute &= NOBLNT;
 			sapliq();
 		}
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			if (chku(BLUNT))
 				SelectedForm->attribute |= (SBLNT | FBLNT);
 			else
 				SelectedForm->attribute &= NOBLNT;
 			sapliq();
-			setMap(INIT);
+			StateMap.set(INIT);
 			coltab();
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 	}
 }
@@ -6627,7 +6624,7 @@ void maxwid(unsigned start, unsigned finish) {
 }
 
 HWND txtwin(TCHAR* string, RECT location) {
-	if (chkMap(REFCNT)) {
+	if (StateMap.test(REFCNT)) {
 		maxtsiz(string, &LabelWindowSize);
 		return 0;
 	}
@@ -6646,7 +6643,7 @@ HWND txtwin(TCHAR* string, RECT location) {
 }
 
 HWND txtrwin(TCHAR* string, RECT location) {
-	if (chkMap(REFCNT)) {
+	if (StateMap.test(REFCNT)) {
 		maxtsiz(string, &ValueWindowSize);
 		return 0;
 	}
@@ -6665,7 +6662,7 @@ HWND txtrwin(TCHAR* string, RECT location) {
 }
 
 HWND numwin(TCHAR* string, RECT location) {
-	if (chkMap(REFCNT)) {
+	if (StateMap.test(REFCNT)) {
 		maxtsiz(string, &ValueWindowSize);
 		return 0;
 	}
@@ -7012,12 +7009,12 @@ void refrmfn() {
 
 void refrm() {
 	SelectedForm = &FormList[ClosestFormToCursor];
-	if (rstMap(PRFACT)) {
+	if (StateMap.testAndReset(PRFACT)) {
 		DestroyWindow(PreferencesWindow);
-		rstMap(WASRT);
+		StateMap.reset(WASRT);
 	}
 	LabelWindowSize.x = LabelWindowSize.y = ValueWindowSize.x = ValueWindowSize.y = 0;
-	setMap(REFCNT);
+	StateMap.set(REFCNT);
 	FormMenuEntryCount = 0;
 	refrmfn();
 	if (FormDataSheet) {
@@ -7039,7 +7036,7 @@ void refrm() {
 			ThrEdInstance,
 			NULL);
 	}
-	rstMap(REFCNT);
+	StateMap.reset(REFCNT);
 	refrmfn();
 }
 
@@ -7060,7 +7057,7 @@ void pxrct2stch(RECT screenRect, fRECTANGLE* stitchRect) {
 }
 
 unsigned pdir(unsigned vertex) {
-	if (chkMap(PSELDIR))
+	if (StateMap.test(PSELDIR))
 		return nxt(vertex);
 	else
 		return prv(vertex);
@@ -7075,10 +7072,10 @@ void setstrtch() {
 	long		offsetY = 0, offsetX = 0;
 
 	savdo();
-	if (chkMap(FPSEL))
+	if (StateMap.test(FPSEL))
 		MoveMemory(&stitchRect, &SelectedPointsLine, sizeof(fRECTANGLE));
 	else {
-		if (SelectedFormCount || chkMap(BIGBOX))
+		if (SelectedFormCount || StateMap.test(BIGBOX))
 			pxrct2stch(SelectedFormsRect, &stitchRect);
 		else {
 			fvars(ClosestFormToCursor);
@@ -7089,13 +7086,13 @@ void setstrtch() {
 	switch (SelectedFormControlVertex) {
 		case 0:
 
-			if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
+			if (SelectedFormCount || StateMap.test(BIGBOX) || StateMap.test(FPSEL)) {
 				reference = stitchRect.bottom;
 				offsetY = Msg.pt.y - StitchWindowOrigin.y;
 				ratio = static_cast<double>(SelectedFormsRect.bottom - offsetY) / (SelectedFormsRect.bottom - SelectedFormsRect.top);
 			}
 			else {
-				if (chkMap(FORMSEL)) {
+				if (StateMap.test(FORMSEL)) {
 					reference = SelectedForm->rectangle.bottom;
 					ratio = static_cast<double>(SelectedPoint.y - reference) / (SelectedForm->rectangle.top - reference);
 					SelectedForm->rectangle.top = SelectedPoint.y;
@@ -7109,13 +7106,13 @@ void setstrtch() {
 
 		case 1:
 
-			if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
+			if (SelectedFormCount || StateMap.test(BIGBOX) || StateMap.test(FPSEL)) {
 				reference = stitchRect.left;
 				offsetX = Msg.pt.x - StitchWindowOrigin.x;
 				ratio = static_cast<double>(offsetX - SelectedFormsRect.left) / (SelectedFormsRect.right - SelectedFormsRect.left);
 			}
 			else {
-				if (chkMap(FORMSEL)) {
+				if (StateMap.test(FORMSEL)) {
 					reference = SelectedForm->rectangle.left;
 					ratio = static_cast<double>(SelectedPoint.x - reference) / (SelectedForm->rectangle.right - reference);
 					SelectedForm->rectangle.right = SelectedPoint.x;
@@ -7129,13 +7126,13 @@ void setstrtch() {
 
 		case 2:
 
-			if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
+			if (SelectedFormCount || StateMap.test(BIGBOX) || StateMap.test(FPSEL)) {
 				reference = stitchRect.top;
 				offsetY = Msg.pt.y - StitchWindowOrigin.y;
 				ratio = static_cast<double>(offsetY - SelectedFormsRect.top) / (SelectedFormsRect.bottom - SelectedFormsRect.top);
 			}
 			else {
-				if (chkMap(FORMSEL)) {
+				if (StateMap.test(FORMSEL)) {
 					reference = SelectedForm->rectangle.top;
 					ratio = static_cast<double>(SelectedPoint.y - reference) / (SelectedForm->rectangle.bottom - reference);
 					SelectedForm->rectangle.bottom = SelectedPoint.y;
@@ -7149,13 +7146,13 @@ void setstrtch() {
 
 		case 3:
 
-			if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
+			if (SelectedFormCount || StateMap.test(BIGBOX) || StateMap.test(FPSEL)) {
 				reference = stitchRect.right;
 				offsetX = Msg.pt.x - StitchWindowOrigin.x;
 				ratio = static_cast<double>(SelectedFormsRect.right - offsetX) / (SelectedFormsRect.right - SelectedFormsRect.left);
 			}
 			else {
-				if (chkMap(FORMSEL)) {
+				if (StateMap.test(FORMSEL)) {
 					reference = SelectedForm->rectangle.right;
 					ratio = static_cast<double>(SelectedPoint.x - reference) / (SelectedForm->rectangle.left - reference);
 					SelectedForm->rectangle.left = SelectedPoint.x;
@@ -7168,7 +7165,7 @@ void setstrtch() {
 			break;
 	}
 	if (SelectedFormControlVertex & 1) {
-		if (chkMap(FPSEL)) {
+		if (StateMap.test(FPSEL)) {
 			fvars(ClosestFormToCursor);
 			currentVertex = SelectedFormVertices.start;
 			for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
@@ -7177,10 +7174,10 @@ void setstrtch() {
 			}
 			frmout(ClosestFormToCursor);
 			setpsel();
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 			return;
 		}
-		if (chkMap(BIGBOX)) {
+		if (StateMap.test(BIGBOX)) {
 			for (iForm = 0; iForm < FormIndex; iForm++) {
 				CurrentFormVertices = FormList[iForm].vertices;
 				for (iVertex = 0; iVertex < FormList[iForm].vertexCount; iVertex++)
@@ -7201,7 +7198,7 @@ void setstrtch() {
 				}
 			}
 			else {
-				if (chkMap(FORMSEL)) {
+				if (StateMap.test(FORMSEL)) {
 					for (iVertex = 0; iVertex < VertexCount; iVertex++)
 						CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - reference)*ratio + reference;
 				}
@@ -7213,7 +7210,7 @@ void setstrtch() {
 		}
 	}
 	else {
-		if (chkMap(FPSEL)) {
+		if (StateMap.test(FPSEL)) {
 			fvars(ClosestFormToCursor);
 			currentVertex = SelectedFormVertices.start;
 			for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
@@ -7223,10 +7220,10 @@ void setstrtch() {
 			frmout(ClosestFormToCursor);
 			setpsel();
 			refil();
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 			return;
 		}
-		if (chkMap(BIGBOX)) {
+		if (StateMap.test(BIGBOX)) {
 			for (iForm = 0; iForm < FormIndex; iForm++) {
 				CurrentFormVertices = FormList[iForm].vertices;
 				for (iVertex = 0; iVertex < FormList[iForm].vertexCount; iVertex++)
@@ -7247,7 +7244,7 @@ void setstrtch() {
 				}
 			}
 			else {
-				if (chkMap(FORMSEL)) {
+				if (StateMap.test(FORMSEL)) {
 					for (iVertex = 0; iVertex < VertexCount; iVertex++)
 						CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - reference)*ratio + reference;
 				}
@@ -7267,9 +7264,9 @@ void setstrtch() {
 		}
 	}
 	else
-		if (chkMap(FORMSEL))
+		if (StateMap.test(FORMSEL))
 			refil();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setexpand() {
@@ -7285,7 +7282,7 @@ void setexpand() {
 	fRECTANGLE	rectangle = {};
 
 	savdo();
-	if (SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
+	if (SelectedFormCount || StateMap.test(BIGBOX) || StateMap.test(FPSEL)) {
 		rectangle.bottom = SelectedFormsRect.bottom;
 		rectangle.left = SelectedFormsRect.left;
 		rectangle.right = SelectedFormsRect.right;
@@ -7297,7 +7294,7 @@ void setexpand() {
 	else {
 		px2stch();
 		fvars(ClosestFormToCursor);
-		if (chkMap(FORMSEL))
+		if (StateMap.test(FORMSEL))
 			rectangle = SelectedForm->rectangle;
 		else {
 			rectangle.bottom = StitchRangeRect.bottom;
@@ -7324,7 +7321,7 @@ void setexpand() {
 				size1.y = size1.x / XYratio;
 			ratio.x = size1.x / size0.x;
 			ratio.y = size1.y / size0.y;
-			if (!SelectedFormCount && chkMap(FORMSEL)) {
+			if (!SelectedFormCount && StateMap.test(FORMSEL)) {
 				SelectedForm->rectangle.left = rectangle.right - size1.x;
 				SelectedForm->rectangle.top = rectangle.bottom + size1.y;
 			}
@@ -7343,7 +7340,7 @@ void setexpand() {
 				size1.y = size1.x / XYratio;
 			ratio.x = size1.x / size0.x;
 			ratio.y = size1.y / size0.y;
-			if (!SelectedFormCount && chkMap(FORMSEL)) {
+			if (!SelectedFormCount && StateMap.test(FORMSEL)) {
 				SelectedForm->rectangle.right = rectangle.left + size1.x;
 				SelectedForm->rectangle.top = rectangle.bottom + size1.y;
 			}
@@ -7362,7 +7359,7 @@ void setexpand() {
 				size1.y = size1.x / XYratio;
 			ratio.x = size1.x / size0.x;
 			ratio.y = size1.y / size0.y;
-			if (!SelectedFormCount && chkMap(FORMSEL)) {
+			if (!SelectedFormCount && StateMap.test(FORMSEL)) {
 				SelectedForm->rectangle.right = rectangle.left + size1.x;
 				SelectedForm->rectangle.bottom = rectangle.top - size1.y;
 			}
@@ -7381,7 +7378,7 @@ void setexpand() {
 				size1.y = size1.x / XYratio;
 			ratio.x = size1.x / size0.x;
 			ratio.y = size1.y / size0.y;
-			if (!SelectedFormCount && chkMap(FORMSEL)) {
+			if (!SelectedFormCount && StateMap.test(FORMSEL)) {
 				SelectedForm->rectangle.left = rectangle.right - size1.x;
 				SelectedForm->rectangle.bottom = rectangle.top - size1.y;
 			}
@@ -7390,7 +7387,7 @@ void setexpand() {
 	integerReference.x = reference.x;
 	integerReference.y = reference.y;
 	px2stchf(integerReference, &stitchReference);
-	if (chkMap(FPSEL)) {
+	if (StateMap.test(FPSEL)) {
 		fvars(ClosestFormToCursor);
 		iCurrent = SelectedFormVertices.start;
 		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
@@ -7401,10 +7398,10 @@ void setexpand() {
 		setpsel();
 		frmout(ClosestFormToCursor);
 		refil();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 		return;
 	}
-	if (chkMap(BIGBOX)) {
+	if (StateMap.test(BIGBOX)) {
 		for (iForm = 0; iForm < FormIndex; iForm++) {
 			fvars(iForm);
 			for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
@@ -7434,7 +7431,7 @@ void setexpand() {
 			}
 		}
 		else {
-			if (chkMap(FORMSEL)) {
+			if (StateMap.test(FORMSEL)) {
 				for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 					CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - reference.x)*ratio.x + reference.x;
 					CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - reference.y)*ratio.y + reference.y;
@@ -7448,7 +7445,7 @@ void setexpand() {
 				}
 			}
 		}
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 }
 
@@ -7584,16 +7581,16 @@ void dubold() {
 			fvars(ClosestFormToCursor);
 			sbold();
 		}
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			sbold();
 			coltab();
-			setMap(INIT);
-			setMap(RESTCH);
+			StateMap.set(INIT);
+			StateMap.set(RESTCH);
 			ritot(PCSHeader.stitchCount);
 		}
 	}
@@ -7658,9 +7655,9 @@ void prfmsg() {
 	HDC		preferenceDC = {};
 	RECT	preferenceRect = {};
 
-	if (rstMap(INSRT))
-		setMap(WASRT);
-	rstMap(BIGBOX);
+	if (StateMap.testAndReset(INSRT))
+		StateMap.set(WASRT);
+	StateMap.reset(BIGBOX);
 	SelectedFormCount = 0;
 	if (FormDataSheet) {
 		undat();
@@ -7765,7 +7762,7 @@ void prfmsg() {
 	prflin(STR_PRF5);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", MinStitchLength / PFGRAN);
 	prflin(STR_PRF6);
-	setMap(PRFACT);
+	StateMap.set(PRFACT);
 	ReleaseDC(ThrEdWindow, preferenceDC);
 }
 #endif
@@ -7777,9 +7774,9 @@ void prfmsg() {
 	HDC		preferenceDC;
 	RECT	preferenceRect;
 
-	if (rstMap(INSRT))
-		setMap(WASRT);
-	rstMap(BIGBOX);
+	if (StateMap.testAndReset(INSRT))
+		StateMap.set(WASRT);
+	StateMap.reset(BIGBOX);
 	SelectedFormCount = 0;
 	if (FormDataSheet) {
 		undat();
@@ -7881,7 +7878,7 @@ void prfmsg() {
 	prflin(STR_PRF12);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", AppliqueColor + 1);
 	prflin(STR_PRF10);
-	setMap(PRFACT);
+	StateMap.set(PRFACT);
 	ReleaseDC(ThrEdWindow, preferenceDC);
 }
 #endif
@@ -7923,9 +7920,9 @@ void durpoli(unsigned vertexCount) {
 	frmout(FormIndex);
 	FormMoveDelta.x = FormMoveDelta.y = 0;
 	NewFormVertexCount = vertexCount + 1;
-	setMap(POLIMOV);
+	StateMap.set(POLIMOV);
 	setmfrm();
-	setMap(SHOFRM);
+	StateMap.set(SHOFRM);
 	mdufrm();
 }
 
@@ -7953,7 +7950,7 @@ void dustar(unsigned starCount, double length) {
 	px2stch();
 	point.x = SelectedPoint.x;
 	point.y = SelectedPoint.y;
-	setMap(FILDIR);
+	StateMap.set(FILDIR);
 	for (iVertex = 0; iVertex < vertexCount; iVertex++) {
 		CurrentFormVertices[iVertex].x = point.x;
 		CurrentFormVertices[iVertex].y = point.y;
@@ -7971,9 +7968,9 @@ void dustar(unsigned starCount, double length) {
 	frmout(FormIndex);
 	FormMoveDelta.x = FormMoveDelta.y = 0;
 	NewFormVertexCount = vertexCount + 1;
-	setMap(POLIMOV);
+	StateMap.set(POLIMOV);
 	setmfrm();
-	setMap(SHOFRM);
+	StateMap.set(SHOFRM);
 	mdufrm();
 }
 
@@ -8032,9 +8029,9 @@ void duspir(unsigned stepCount) {
 	frmout(FormIndex);
 	FormMoveDelta.x = FormMoveDelta.y = 0;
 	NewFormVertexCount = vertexCount + 1;
-	setMap(POLIMOV);
+	StateMap.set(POLIMOV);
 	setmfrm();
-	setMap(SHOFRM);
+	StateMap.set(SHOFRM);
 	mdufrm();
 	delete[] firstSpiral;
 	delete[] centeredSpiral;
@@ -8101,9 +8098,9 @@ void duhart(unsigned sideCount) {
 	ClosestFormToCursor = FormIndex;
 	frmout(FormIndex);
 	FormMoveDelta.x = FormMoveDelta.y = 0;
-	setMap(POLIMOV);
+	StateMap.set(POLIMOV);
 	setmfrm();
-	setMap(SHOFRM);
+	StateMap.set(SHOFRM);
 	mdufrm();
 }
 
@@ -8160,9 +8157,9 @@ void dulens(unsigned sides) {
 	ClosestFormToCursor = FormIndex;
 	frmout(FormIndex);
 	FormMoveDelta.x = FormMoveDelta.y = 0;
-	setMap(POLIMOV);
+	StateMap.set(POLIMOV);
 	setmfrm();
-	setMap(SHOFRM);
+	StateMap.set(SHOFRM);
 	mdufrm();
 }
 
@@ -8227,9 +8224,9 @@ void duzig(unsigned vertices) {
 	frmout(FormIndex);
 	FormMoveDelta.x = FormMoveDelta.y = 0;
 	NewFormVertexCount = vertices + 1;
-	setMap(POLIMOV);
+	StateMap.set(POLIMOV);
 	setmfrm();
-	setMap(SHOFRM);
+	StateMap.set(SHOFRM);
 	mdufrm();
 }
 
@@ -8240,7 +8237,7 @@ void fliph() {
 	fRECTANGLE	rectangle = {};
 
 	fvars(ClosestFormToCursor);
-	if (chkMap(FPSEL)) {
+	if (StateMap.test(FPSEL)) {
 		savdo();
 		midpoint = (SelectedVerticesRect.right - SelectedVerticesRect.left)*0.5 + SelectedVerticesRect.left;
 		currentVertex = SelectedFormVertices.start;
@@ -8248,10 +8245,10 @@ void fliph() {
 			CurrentFormVertices[currentVertex].x = midpoint + midpoint - CurrentFormVertices[currentVertex].x;
 			currentVertex = pdir(currentVertex);
 		}
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 		return;
 	}
-	if (chkMap(BIGBOX)) {
+	if (StateMap.test(BIGBOX)) {
 		midpoint = (AllItemsRect.right - AllItemsRect.left) / 2 + AllItemsRect.left;
 		for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
 			FormVertices[iVertex].x = midpoint + midpoint - FormVertices[iVertex].x;
@@ -8261,7 +8258,7 @@ void fliph() {
 			FormList[iForm].rectangle.left = midpoint + midpoint - FormList[iForm].rectangle.left;
 			FormList[iForm].rectangle.right = midpoint + midpoint - FormList[iForm].rectangle.right;
 		}
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 		return;
 	}
 	if (SelectedFormCount) {
@@ -8282,10 +8279,10 @@ void fliph() {
 			if (chkr(decodedForm) && !(StitchBuffer[iStitch].attribute&NOTFRM))
 				StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
 		}
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			savdo();
 			midpoint = (SelectedForm->rectangle.right - SelectedForm->rectangle.left) / 2 + SelectedForm->rectangle.left;
 			for (iVertex = 0; iVertex < VertexCount; iVertex++)
@@ -8295,17 +8292,17 @@ void fliph() {
 					StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
 			}
 			frmout(ClosestFormToCursor);
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 		else {
-			if (chkMap(GRPSEL)) {
+			if (StateMap.test(GRPSEL)) {
 				savdo();
 				rngadj();
 				selRct(&rectangle);
 				midpoint = (rectangle.right - rectangle.left) / 2 + rectangle.left;
 				for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++)
 					StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
-				setMap(RESTCH);
+				StateMap.set(RESTCH);
 			}
 		}
 	}
@@ -8318,7 +8315,7 @@ void flipv() {
 	fRECTANGLE	rectangle = {};
 
 	fvars(ClosestFormToCursor);
-	if (chkMap(FPSEL)) {
+	if (StateMap.test(FPSEL)) {
 		savdo();
 		midpoint = (SelectedVerticesRect.top - SelectedVerticesRect.bottom)*0.5 + SelectedVerticesRect.bottom;
 		currentVertex = SelectedFormVertices.start;
@@ -8326,10 +8323,10 @@ void flipv() {
 			CurrentFormVertices[currentVertex].y = midpoint + midpoint - CurrentFormVertices[currentVertex].y;
 			currentVertex = pdir(currentVertex);
 		}
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 		return;
 	}
-	if (chkMap(BIGBOX)) {
+	if (StateMap.test(BIGBOX)) {
 		savdo();
 		midpoint = (AllItemsRect.top - AllItemsRect.bottom) / 2 + AllItemsRect.bottom;
 		for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
@@ -8340,7 +8337,7 @@ void flipv() {
 			FormList[iForm].rectangle.bottom = midpoint + midpoint - FormList[iForm].rectangle.bottom;
 			FormList[iForm].rectangle.top = midpoint + midpoint - FormList[iForm].rectangle.top;
 		}
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 		return;
 	}
 	if (SelectedFormCount) {
@@ -8361,10 +8358,10 @@ void flipv() {
 			if (chkr(decodedForm) && !(StitchBuffer[iStitch].attribute&NOTFRM))
 				StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
 		}
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			savdo();
 			midpoint = (SelectedForm->rectangle.top - SelectedForm->rectangle.bottom) / 2 + SelectedForm->rectangle.bottom;
 			for (iVertex = 0; iVertex < VertexCount; iVertex++)
@@ -8374,17 +8371,17 @@ void flipv() {
 					StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
 			}
 			frmout(ClosestFormToCursor);
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 		else {
-			if (chkMap(GRPSEL)) {
+			if (StateMap.test(GRPSEL)) {
 				savdo();
 				rngadj();
 				selRct(&rectangle);
 				midpoint = (rectangle.top - rectangle.bottom) / 2 + rectangle.bottom;
 				for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++)
 					StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
-				setMap(RESTCH);
+				StateMap.set(RESTCH);
 			}
 		}
 	}
@@ -8557,7 +8554,7 @@ void duromb(dPOINT start0, dPOINT finish0, dPOINT start1, dPOINT finish1) {
 	double		length0 = 0.0, length1 = 0.0;
 	unsigned	count = 0, iStep = 0;
 
-	if (!chkMap(UND)) {
+	if (!StateMap.test(UND)) {
 		delta0.x = SelectedPoint.x - start0.x;
 		delta0.y = SelectedPoint.y - start0.y;
 		delta1.x = SelectedPoint.x - start1.x;
@@ -8565,9 +8562,9 @@ void duromb(dPOINT start0, dPOINT finish0, dPOINT start1, dPOINT finish1) {
 		length0 = hypot(delta0.x, delta0.y);
 		length1 = hypot(delta1.x, delta1.y);
 		if (length0 > length1)
-			setMap(FILDIR);
+			StateMap.set(FILDIR);
 		else
-			rstMap(FILDIR);
+			StateMap.reset(FILDIR);
 	}
 	delta0.x = finish0.x - start0.x;
 	delta0.y = finish0.y - start0.y;
@@ -8582,7 +8579,7 @@ void duromb(dPOINT start0, dPOINT finish0, dPOINT start1, dPOINT finish1) {
 	step1.x = delta1.x / count;
 	step1.y = delta1.y / count;
 	for (iStep = 0; iStep < count; iStep++) {
-		if (toglMap(FILDIR))
+		if (StateMap.testAndFlip(FILDIR))
 			filinsb(start0);
 		else
 			filinsb(start1);
@@ -8660,8 +8657,8 @@ void duspnd(unsigned start, unsigned finish) {
 	double	length = 0.0, angle = 0.0;
 	dPOINT	point = {}, delta = {};
 
-	if (chkMap(UND)) {
-		if (chkMap(UNDPHAS)) {
+	if (StateMap.test(UND)) {
+		if (StateMap.test(UNDPHAS)) {
 			filinsb(UnderlayVerticalRect[start].copnt);
 			filinsb(UnderlayVerticalRect[start].cipnt);
 			delta.x = UnderlayVerticalRect[finish].bipnt.x - UnderlayVerticalRect[start].cipnt.x;
@@ -8825,16 +8822,16 @@ void plbrd(double edgeSpacing) {
 	SelectedPoint.y = CurrentFormVertices[0].y;
 	if (SelectedForm->edgeType&EGUND) {
 		LineSpacing = USPAC;
-		setMap(UND);
+		StateMap.set(UND);
 		HorizontalLength2 = SelectedForm->borderSize*URAT;
-		setMap(UNDPHAS);
-		rstMap(FILDIR);
+		StateMap.set(UNDPHAS);
+		StateMap.reset(FILDIR);
 		plfn(&UnderlayVerticalRect[0]);
 		savedIndex = SequenceIndex;
-		rstMap(UNDPHAS);
+		StateMap.reset(UNDPHAS);
 		SelectedPoint.x = CurrentFormVertices[0].x;
 		SelectedPoint.y = CurrentFormVertices[0].y;
-		setMap(FILDIR);
+		StateMap.set(FILDIR);
 		plfn(&UnderlayVerticalRect[0]);
 		plbak(savedIndex);
 		prsmal();
@@ -8843,7 +8840,7 @@ void plbrd(double edgeSpacing) {
 			SelectedPoint.y = OSequence[SequenceIndex - 1].y;
 		}
 	}
-	rstMap(UND);
+	StateMap.reset(UND);
 	LineSpacing = SelectedForm->edgeSpacing;
 	plfn(&FillVerticalRect[0]);
 	LineSpacing = edgeSpacing;
@@ -8870,21 +8867,21 @@ void pbrd(double edgeSpacing) {
 	sprct(iVertex, 0);
 	spurct(iVertex);
 	if (SelectedForm->edgeType&EGUND) {
-		rstMap(SAT1);
+		StateMap.reset(SAT1);
 		LineSpacing = USPAC;
-		setMap(UND);
+		StateMap.set(UND);
 		HorizontalLength2 = SelectedForm->borderSize*URAT;
 		satout(HorizontalLength2);
-		setMap(UNDPHAS);
-		setMap(FILDIR);
+		StateMap.set(UNDPHAS);
+		StateMap.set(FILDIR);
 		pfn(start, &UnderlayVerticalRect[0]);
-		rstMap(UNDPHAS);
-		rstMap(FILDIR);
+		StateMap.reset(UNDPHAS);
+		StateMap.reset(FILDIR);
 		pfn(start, &UnderlayVerticalRect[0]);
 		LineSpacing = edgeSpacing;
 		prsmal();
 		HorizontalLength2 = SelectedForm->borderSize;
-		rstMap(UND);
+		StateMap.reset(UND);
 	}
 	pfn(start, &FillVerticalRect[0]);
 	LineSpacing = spacing;
@@ -8925,59 +8922,59 @@ void prpbrd(double borderStitchSpacing) {
 				SelectedForm->attribute &= NOBLNT;
 			prpsbrd();
 		}
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			fvars(ClosestFormToCursor);
 			if (chku(BLUNT))
 				SelectedForm->attribute |= (SBLNT | FBLNT);
 			else
 				SelectedForm->attribute &= NOBLNT;
 			prpsbrd();
-			setMap(INIT);
+			StateMap.set(INIT);
 			coltab();
 			ritot(PCSHeader.stitchCount);
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 	}
 	LineSpacing = savedSpacing;
 }
 
 void tglfrm() {
-	if (rstMap(SATPNT))
+	if (StateMap.testAndReset(SATPNT))
 		satfix();
-	rstMap(HIDSTCH);
-	if (toglMap(FRMOF))
+	StateMap.reset(HIDSTCH);
+	if (StateMap.testAndFlip(FRMOF))
 		strcpy_s(FormOnOff, StringTable[STR_FRMPLUS]);
 	else {
 		strcpy_s(FormOnOff, StringTable[STR_FRMINUS]);
-		rstMap(FORMSEL);
-		rstMap(FORMIN);
-		rstMap(MOVFRM);
-		rstMap(FRMPMOV);
-		rstMap(FRMOV);
-		rstMap(SATIN);
-		rstMap(SATPNT);
-		rstMap(SATCNKT);
-		rstMap(FENDIN);
-		rstMap(DELFRM);
-		rstMap(FRMPSEL);
-		rstMap(INSFRM);
+		StateMap.reset(FORMSEL);
+		StateMap.reset(FORMIN);
+		StateMap.reset(MOVFRM);
+		StateMap.reset(FRMPMOV);
+		StateMap.reset(FRMOV);
+		StateMap.reset(SATIN);
+		StateMap.reset(SATPNT);
+		StateMap.reset(SATCNKT);
+		StateMap.reset(FENDIN);
+		StateMap.reset(DELFRM);
+		StateMap.reset(FRMPSEL);
+		StateMap.reset(INSFRM);
 	}
 	SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, &MenuInfo);
-	setMap(DUMEN);
-	setMap(RESTCH);
+	StateMap.set(DUMEN);
+	StateMap.set(RESTCH);
 }
 
 void frmon() {
 	unbsho();
-	rstMap(FRMOF);
+	StateMap.reset(FRMOF);
 	strcpy_s(FormOnOff, StringTable[STR_FRMPLUS]);
 	SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, &MenuInfo);
-	setMap(DUMEN);
+	StateMap.set(DUMEN);
 }
 
 void fnord() {
@@ -9005,7 +9002,7 @@ void flpord() {
 	fPOINTATTR	swapPoint = {};
 
 	fvars(ClosestFormToCursor);
-	if (chkMap(FPSEL)) {
+	if (StateMap.test(FPSEL)) {
 		savdo();
 		start = SelectedFormVertices.start;
 		finish = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % VertexCount;
@@ -9017,9 +9014,9 @@ void flpord() {
 			SelectedForm->vertices[finish].x = swapPoint.x;
 			SelectedForm->vertices[finish].y = swapPoint.y;
 			start = pdir(start);
-			toglMap(PSELDIR);
+			StateMap.flip(PSELDIR);
 			finish = pdir(finish);
-			toglMap(PSELDIR);
+			StateMap.flip(PSELDIR);
 		}
 		refil();
 		return;
@@ -9031,17 +9028,17 @@ void flpord() {
 			fnord();
 		}
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			savdo();
 			fnord();
 			coltab();
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 		else {
-			if (chkMap(GRPSEL)) {
+			if (StateMap.test(GRPSEL)) {
 				savdo();
 				rngadj();
 				iForward = GroupStartStitch;
@@ -9058,7 +9055,7 @@ void flpord() {
 					iForward++;
 				}
 				coltab();
-				setMap(RESTCH);
+				StateMap.set(RESTCH);
 			}
 		}
 	}
@@ -9145,9 +9142,9 @@ void fmclp() {
 	const double	savedSpacing = LineSpacing;
 
 	LineSpacing = ClipRectSize.cx;
-	setMap(BARSAT);
+	StateMap.set(BARSAT);
 	satfil();
-	rstMap(BARSAT);
+	StateMap.reset(BARSAT);
 	clpfm();
 	SelectedForm->fillType = CLPF;
 	SequenceIndex = ActivePointIndex;
@@ -9193,16 +9190,16 @@ void clpfil() {
 						if (SelectedForm->type != FRMLINE)
 							filsclp();
 					}
-					setMap(INIT);
+					StateMap.set(INIT);
 					coltab();
-					setMap(RESTCH);
+					StateMap.set(RESTCH);
 				}
 				else {
-					if (chkMap(FORMSEL)) {
+					if (StateMap.test(FORMSEL)) {
 						filsclp();
-						setMap(INIT);
+						StateMap.set(INIT);
 						coltab();
-						setMap(RESTCH);
+						StateMap.set(RESTCH);
 					}
 				}
 			}
@@ -9276,7 +9273,7 @@ void snp(unsigned start, unsigned finish) {
 	Xhistogram = txhst;
 	for (iColumn = 0; iColumn < range.x; iColumn++)
 		Xhistogram[iColumn] = 0;
-	if (chkMap(FORMSEL)) {
+	if (StateMap.test(FORMSEL)) {
 		attribute = (ClosestFormToCursor << 4)&FRMSK;
 		for (iStitch = start; iStitch < finish; iStitch++) {
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == attribute) {
@@ -9298,7 +9295,7 @@ void snp(unsigned start, unsigned finish) {
 		accumulator += swap;
 	}
 	Xhistogram[iColumn] = accumulator;
-	if (chkMap(FORMSEL)) {
+	if (StateMap.test(FORMSEL)) {
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == attribute) {
 				iColumn = StitchBuffer[iStitch].x;
@@ -9326,14 +9323,14 @@ void snp(unsigned start, unsigned finish) {
 
 void snap() {
 	savdo();
-	if (chkMap(GRPSEL)) {
+	if (StateMap.test(GRPSEL)) {
 		rngadj();
 		snp(GroupStartStitch, GroupEndStitch);
 	}
 	else
 		snp(0, PCSHeader.stitchCount);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setcmap(unsigned bit) {
@@ -9414,44 +9411,44 @@ unsigned prgflg(unsigned iStitch) {
 void rotpar() {
 	if (IniFile.rotationAngle < (PI / 180))
 		tabmsg(IDS_ROTIN);
-	if (chkMap(FPSEL)) {
+	if (StateMap.test(FPSEL)) {
 		RotationCenter.x = midl(SelectedVerticesRect.right, SelectedVerticesRect.left);
 		RotationCenter.y = midl(SelectedVerticesRect.top, SelectedVerticesRect.bottom);
 		return;
 	}
-	if (chkMap(BIGBOX)) {
+	if (StateMap.test(BIGBOX)) {
 		RotationCenter.x = midl(AllItemsRect.right, AllItemsRect.left);
 		RotationCenter.y = midl(AllItemsRect.top, AllItemsRect.bottom);
 		return;
 	}
 	if (SelectedFormCount) {
-		if (chkMap(GMRK)) {
+		if (StateMap.test(GMRK)) {
 			RotationCenter.x = ZoomMarkPoint.x;
 			RotationCenter.y = ZoomMarkPoint.y;
 		}
 		else
 			dufcntr(&RotationCenter);
-		setMap(FRMSROT);
+		StateMap.set(FRMSROT);
 		return;
 	}
-	if (chkMap(FORMSEL)) {
+	if (StateMap.test(FORMSEL)) {
 		RotationRect.left = SelectedForm->rectangle.left;
 		RotationRect.right = SelectedForm->rectangle.right;
 		RotationRect.top = SelectedForm->rectangle.top;
 		RotationRect.bottom = SelectedForm->rectangle.bottom;
-		if (!chkMap(GMRK)) {
+		if (!StateMap.test(GMRK)) {
 			RotationCenter.x = static_cast<double>(RotationRect.right - RotationRect.left) / 2 + RotationRect.left;
 			RotationCenter.y = static_cast<double>(RotationRect.top - RotationRect.bottom) / 2 + RotationRect.bottom;
 		}
-		setMap(FRMROT);
+		StateMap.set(FRMROT);
 	}
 	else {
-		if (chkMap(GRPSEL)) {
+		if (StateMap.test(GRPSEL)) {
 			rngadj();
 			selRct(&RotationRect);
 		}
 	}
-	if (chkMap(GMRK)) {
+	if (StateMap.test(GMRK)) {
 		RotationCenter.x = ZoomMarkPoint.x;
 		RotationCenter.y = ZoomMarkPoint.y;
 	}
@@ -9468,29 +9465,29 @@ void rotentr() {
 	LoadString(ThrEdInstance, IDS_ROTA, buffer, HBUFSIZ);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buffer, RotationAngle / PI * 180);
 	shoMsg(MsgBuffer);
-	setMap(NUMIN);
+	StateMap.set(NUMIN);
 	numWnd();
 }
 
 void setrang() {
 	RotationAngle = IniFile.rotationAngle;
 	rotentr();
-	setMap(NUROT);
+	StateMap.set(NUROT);
 }
 
 void rotcmd() {
-	if (chkMap(FORMSEL) || chkMap(GRPSEL) || SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
+	if (StateMap.test(FORMSEL) || StateMap.test(GRPSEL) || SelectedFormCount || StateMap.test(BIGBOX) || StateMap.test(FPSEL)) {
 		RotationAngle = IniFile.rotationAngle;
 		rotpar();
 		rotentr();
-		setMap(ENTROT);
+		StateMap.set(ENTROT);
 	}
 	else
 		shoseln(IDS_ALLX, IDS_ROTCMD);
 }
 
 void fnagain() {
-	if (chkMap(FORMSEL) || chkMap(GRPSEL) || SelectedFormCount || chkMap(BIGBOX) || chkMap(FPSEL)) {
+	if (StateMap.test(FORMSEL) || StateMap.test(GRPSEL) || SelectedFormCount || StateMap.test(BIGBOX) || StateMap.test(FPSEL)) {
 		rotpar();
 		rotfn();
 	}
@@ -9509,11 +9506,11 @@ void bakagain() {
 }
 
 void rotdup() {
-	if (chkMap(FORMSEL) || chkMap(GRPSEL) || SelectedFormCount) {
+	if (StateMap.test(FORMSEL) || StateMap.test(GRPSEL) || SelectedFormCount) {
 		RotationAngle = IniFile.rotationAngle;
 		rotpar();
 		rotentr();
-		setMap(ENTRDUP);
+		StateMap.set(ENTRDUP);
 	}
 	else
 		shord();
@@ -9547,8 +9544,8 @@ void duprot() {
 	adfrm(ClosestFormToCursor);
 	rotfn();
 	refil();
-	setMap(FORMSEL);
-	setMap(RESTCH);
+	StateMap.set(FORMSEL);
+	StateMap.set(RESTCH);
 }
 
 void duprotfs() {
@@ -9584,7 +9581,7 @@ void duprots() {
 	rngadj();
 	rotfn();
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void cplayfn(unsigned iForm, unsigned play) {
@@ -9621,12 +9618,12 @@ void cpylayr(unsigned codedLayer) {
 			cplayfn(SelectedFormList[iForm], codedLayer);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			savdo();
 			cplayfn(ClosestFormToCursor, codedLayer);
 		}
 		else {
-			if (chkMap(GRPSEL)) {
+			if (StateMap.test(GRPSEL)) {
 				savdo();
 				rngadj();
 				iCurrentStitch = PCSHeader.stitchCount;
@@ -9637,7 +9634,7 @@ void cpylayr(unsigned codedLayer) {
 				}
 				PCSHeader.stitchCount = iCurrentStitch;
 				coltab();
-				setMap(RESTCH);
+				StateMap.set(RESTCH);
 			}
 		}
 	}
@@ -9666,27 +9663,27 @@ void movlayr(unsigned codedLayer) {
 			}
 		}
 		SelectedFormCount = 0;
-		rstMap(FORMSEL);
-		setMap(RESTCH);
+		StateMap.reset(FORMSEL);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			savdo();
 			FormList[ClosestFormToCursor].attribute = (FormList[ClosestFormToCursor].attribute&NFRMLMSK) | codedLayer;
-			rstMap(FORMSEL);
+			StateMap.reset(FORMSEL);
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 				if (StitchBuffer[iStitch].attribute&ALTYPMSK && ((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT) == ClosestFormToCursor)
 					StitchBuffer[iStitch].attribute = StitchBuffer[iStitch].attribute&NLAYMSK | codedStitchLayer;
 			}
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 		else {
-			if (chkMap(GRPSEL)) {
+			if (StateMap.test(GRPSEL)) {
 				savdo();
 				rngadj();
 				for (iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++)
 					StitchBuffer[iStitch].attribute = StitchBuffer[iStitch].attribute&NLAYMSK | codedStitchLayer;
-				setMap(RESTCH);
+				StateMap.set(RESTCH);
 			}
 		}
 	}
@@ -9700,8 +9697,8 @@ void join() {
 	fPOINT*		insertedVertex = nullptr;
 
 	
-	setMap(FRMSAM);
-	if (FormIndex > 1 && chkMap(FORMSEL) && closfrm()) {
+	StateMap.set(FRMSAM);
+	if (FormIndex > 1 && StateMap.test(FORMSEL) && closfrm()) {
 		vertexCount = FormList[ClosestFormToCursor].vertexCount;
 		vertexList = new fPOINT[vertexCount];
 		for (iVertex = 0; iVertex < vertexCount; iVertex++) {
@@ -9709,7 +9706,7 @@ void join() {
 			vertexList[iVertex].y = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].y;
 			ClosestVertexToCursor = nxt(ClosestVertexToCursor);
 		}
-		setMap(DELTO);
+		StateMap.set(DELTO);
 		frmdel();
 		if (savedFormIndex > ClosestFormToCursor)
 			ClosestFormToCursor = savedFormIndex - 1;
@@ -9738,9 +9735,9 @@ void join() {
 		}
 		refil();
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
-	rstMap(FRMSAM);
+	StateMap.reset(FRMSAM);
 }
 
 BOOL chkbfil() {
@@ -9768,7 +9765,7 @@ void refilal() {
 	ClosestFormToCursor = savedFormIndex;
 	fvars(ClosestFormToCursor);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 BOOL notsel() {
@@ -9784,12 +9781,12 @@ BOOL notsel() {
 
 void nufsel() {
 	if (FormIndex) {
-		rstMap(FORMSEL);
-		if (rstMap(WASEL))
+		StateMap.reset(FORMSEL);
+		if (StateMap.testAndReset(WASEL))
 			SelectedFormList[SelectedFormCount++] = PreviousFormIndex;
 		if (notsel())
 			SelectedFormList[SelectedFormCount++] = static_cast<unsigned short>(ClosestFormToCursor);
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 }
 
@@ -9927,24 +9924,24 @@ void getbig() {
 }
 
 void selal() {
-	rstMap(FORMSEL);
+	StateMap.reset(FORMSEL);
 	SelectedFormCount = 0;
-	rstMap(SELBOX);
-	rstMap(GRPSEL);
+	StateMap.reset(SELBOX);
+	StateMap.reset(GRPSEL);
 	getbig();
 	ZoomRect.bottom = 0;
 	ZoomRect.left = 0;
 	ZoomRect.right = UnzoomedRect.x;
 	ZoomRect.top = UnzoomedRect.y;
 	ZoomFactor = 1;
-	rstMap(ZUMED);
+	StateMap.reset(ZUMED);
 	movStch();
 	NearestCount = 0;
-	rstMap(RUNPAT);
+	StateMap.reset(RUNPAT);
 	duzrat();
 	stchrct2px(AllItemsRect, &SelectedFormsRect);
-	setMap(BIGBOX);
-	setMap(RESTCH);
+	StateMap.set(BIGBOX);
+	StateMap.set(RESTCH);
 }
 
 void frmpnts(unsigned type) {
@@ -9968,7 +9965,7 @@ void frmpnts(unsigned type) {
 
 void selfil(unsigned type) {
 	frm1pnt();
-	if (chkMap(FORMSEL)) {
+	if (StateMap.test(FORMSEL)) {
 		if (type == FRMFIL && !FormList[ClosestFormToCursor].fillType) {
 			tabmsg(IDS_FSELF);
 			return;
@@ -9982,10 +9979,10 @@ void selfil(unsigned type) {
 			return;
 		}
 		frmpnts(type);
-		setMap(GRPSEL);
-		rstMap(FORMSEL);
+		StateMap.set(GRPSEL);
+		StateMap.reset(FORMSEL);
 		rngadj();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else
 		tabmsg(IDS_SEL1FRM);
@@ -10001,7 +9998,7 @@ BOOL notfstch(unsigned attribute) {
 
 void selalfil() {
 	frm1pnt();
-	if (chkMap(FORMSEL)) {
+	if (StateMap.test(FORMSEL)) {
 		ClosestPointIndex = 0;
 		while (ClosestPointIndex < PCSHeader.stitchCount && notfstch(StitchBuffer[ClosestPointIndex].attribute))
 			ClosestPointIndex++;
@@ -10011,10 +10008,10 @@ void selalfil() {
 			GroupStitchIndex = PCSHeader.stitchCount - 1;
 			while (GroupStitchIndex > ClosestPointIndex && notfstch(StitchBuffer[GroupStitchIndex].attribute))
 				GroupStitchIndex--;
-			setMap(GRPSEL);
-			rstMap(FORMSEL);
+			StateMap.set(GRPSEL);
+			StateMap.reset(FORMSEL);
 			rngadj();
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 		else
 			tabmsg(IDS_FSELM);
@@ -10095,7 +10092,7 @@ void bhcrnr(unsigned vertex) {
 	dPOINT		delta = {}, point = {};
 	double		length = 0.0, ratio = 0.0;
 
-	if (chkMap(INDIR)) {
+	if (StateMap.test(INDIR)) {
 		delta.x = OutsidePoints[nextVertex].x - CurrentFormVertices[nextVertex].x;
 		delta.y = OutsidePoints[nextVertex].y - CurrentFormVertices[nextVertex].y;
 	}
@@ -10178,18 +10175,18 @@ void bhol() {
 			fvars(ClosestFormToCursor);
 			bholbrd();
 		}
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			fvars(ClosestFormToCursor);
 			bholbrd();
-			setMap(INIT);
+			StateMap.set(INIT);
 			coltab();
 			ritot(PCSHeader.stitchCount);
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 	}
 	LineSpacing = savedSpacing;
@@ -10227,20 +10224,20 @@ void fcntr() {
 				}
 			}
 		}
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else
 		tabmsg(IDS_SELC);
 }
 
 void boxsel() {
-	rstMap(INSRT);
-	if (!chkMap(THUMSHO)) {
-		rstMap(BZUM);
-		rstMap(BZUMIN);
-		setMap(VCAPT);
+	StateMap.reset(INSRT);
+	if (!StateMap.test(THUMSHO)) {
+		StateMap.reset(BZUM);
+		StateMap.reset(BZUMIN);
+		StateMap.set(VCAPT);
 		SetCapture(ThrEdWindow);
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 }
 
@@ -10253,7 +10250,7 @@ void clpcrnr(unsigned vertex) {
 	double		length = 0.0, ratio = 0.0;
 	fPOINTATTR	referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left),ClipRect.top };
 
-	if (chkMap(INDIR)) {
+	if (StateMap.test(INDIR)) {
 		delta.x = OutsidePoints[nextVertex].x - CurrentFormVertices[nextVertex].x;
 		delta.y = OutsidePoints[nextVertex].y - CurrentFormVertices[nextVertex].y;
 	}
@@ -10360,7 +10357,7 @@ void clpic(unsigned short start) {
 	unsigned	currentVertex = start, nextVertex = 0;
 
 	SequenceIndex = 0;
-	rstMap(CLPBAK);
+	StateMap.reset(CLPBAK);
 	HorizontalLength2 = ClipRectSize.cx / 2;
 	HorizontalLength = ClipRectSize.cx;
 	ClipFillData = new fPOINT[ClipStitchCount];
@@ -10435,16 +10432,16 @@ void picot() {
 						fvars(ClosestFormToCursor);
 						fspic();
 					}
-					setMap(INIT);
+					StateMap.set(INIT);
 					coltab();
-					setMap(RESTCH);
+					StateMap.set(RESTCH);
 				}
 				else {
-					if (chkMap(FORMSEL)) {
+					if (StateMap.test(FORMSEL)) {
 						fspic();
-						setMap(INIT);
+						StateMap.set(INIT);
 						coltab();
-						setMap(RESTCH);
+						StateMap.set(RESTCH);
 					}
 				}
 			}
@@ -10537,7 +10534,7 @@ void contf() {
 		highSteps[iVertex].y = highDeltas[iVertex].y / highCounts[iVertex];
 	}
 	lowIndex = highIndex = 0;
-	rstMap(FILDIR);
+	StateMap.reset(FILDIR);
 	lowCount = highCount = 0;
 	delta.x = CurrentFormVertices[finish].x - CurrentFormVertices[start].x;
 	delta.y = CurrentFormVertices[finish].y - CurrentFormVertices[start].y;
@@ -10575,7 +10572,7 @@ void contf() {
 		poldif.angle = polin.angle - polref.angle;
 		if (polref.length > 0.9*LineSpacing) {
 			poldif.length = polin.length / polref.length;
-			if (toglMap(FILDIR)) {
+			if (StateMap.testAndFlip(FILDIR)) {
 				OSequence[SequenceIndex].x = lowPoint.x;
 				OSequence[SequenceIndex].y = lowPoint.y;
 				SequenceIndex++;
@@ -10605,7 +10602,7 @@ void contf() {
 		highPoint.x += highStep.x;
 		highPoint.y += highStep.y;
 	}
-	if (chkMap(FILDIR)) {
+	if (StateMap.test(FILDIR)) {
 		OSequence[SequenceIndex].x = CurrentFormVertices[0].x;
 		OSequence[SequenceIndex++].y = CurrentFormVertices[0].y;
 	}
@@ -10655,17 +10652,17 @@ void contfil() {
 		savdo();
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			contsf(SelectedFormList[iForm]);
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
 		fvars(ClosestFormToCursor);
 		savdo();
 		if (contsf(ClosestFormToCursor)) {
-			setMap(INIT);
+			StateMap.set(INIT);
 			coltab();
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 		else
 			tabmsg(IDS_CONT);
@@ -10678,7 +10675,7 @@ void ribon() {
 	unsigned	iVertex = 0, iGuide = 0, isBlunt = 0, iNewVertex = 0, savedFormIndex = 0;
 
 	frm1pnt();
-	if (chkMap(FORMSEL)) {
+	if (StateMap.test(FORMSEL)) {
 		fvars(ClosestFormToCursor);
 		if (VertexCount > 2) {
 			savdo();
@@ -10738,7 +10735,7 @@ void ribon() {
 			formHeader->wordParam = iNewVertex >> 1;
 			formHeader->satinGuideCount = formHeader->wordParam - 2;
 			formHeader->satinOrAngle.guide = adsatk(formHeader->satinGuideCount);
-			if (chkMap(CNV2FTH)) {
+			if (StateMap.test(CNV2FTH)) {
 				formHeader->fillType = FTHF;
 				formHeader->fillInfo.feather.ratio = IniFile.featherRatio;
 				formHeader->fillInfo.feather.upCount = IniFile.featherUpCount;
@@ -10760,12 +10757,12 @@ void ribon() {
 			ClosestFormToCursor = FormIndex - 1;
 			refilfn();
 			ClosestFormToCursor = savedFormIndex;
-			setMap(DELTO);
+			StateMap.set(DELTO);
 			frmdel();
 			ClosestFormToCursor = FormIndex - 1;
-			setMap(FORMSEL);
-			setMap(INIT);
-			setMap(RESTCH);
+			StateMap.set(FORMSEL);
+			StateMap.set(INIT);
+			StateMap.set(RESTCH);
 		}
 		else
 			tabmsg(IDS_FRM2);
@@ -10778,10 +10775,10 @@ void dupfn() {
 	savdo();
 	rotpar();
 	if (IniFile.rotationAngle) {
-		if (chkMap(FORMSEL))
+		if (StateMap.test(FORMSEL))
 			duprot();
 		else {
-			if (chkMap(GRPSEL))
+			if (StateMap.test(GRPSEL))
 				duprots();
 			else {
 				if (SelectedFormCount)
@@ -10793,7 +10790,7 @@ void dupfn() {
 	}
 	else {
 		rotentr();
-		setMap(ENTRDUP);
+		StateMap.set(ENTRDUP);
 	}
 }
 
@@ -10845,10 +10842,10 @@ void shrnks() {
 
 void shrnk() {
 	fvars(ClosestFormToCursor);
-	if (chkMap(FORMSEL) && SelectedForm->edgeType == EDGECLIP) {
+	if (StateMap.test(FORMSEL) && SelectedForm->edgeType == EDGECLIP) {
 		shrnks();
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else
 		shoseln(IDS_FRMCLP, IDS_SHRNK);
@@ -10976,12 +10973,12 @@ void frmnum() {
 
 	TCHAR	buffer[HBUFSIZ] = { 0 };
 
-	if (FormIndex && chkMap(FORMSEL)) {
+	if (FormIndex && StateMap.test(FORMSEL)) {
 		LoadString(ThrEdInstance, IDS_FRML, buffer, HBUFSIZ);
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), buffer, FormIndex);
 		shoMsg(MsgBuffer);
-		setMap(NUMIN);
-		setMap(ENTRFNUM);
+		StateMap.set(NUMIN);
+		StateMap.set(ENTRFNUM);
 		numWnd();
 	}
 	else
@@ -11063,7 +11060,7 @@ void srtbyfrm() {
 	else
 		srtcol();
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void dufcntr(dPOINT* center) {
@@ -11101,7 +11098,7 @@ void cntrx() {
 	fRECTANGLE*	formRect = nullptr;
 	fRECTANGLE	groupRect = {};
 
-	if (chkMap(GMRK)) {
+	if (StateMap.test(GMRK)) {
 		markCenter.x = ZoomMarkPoint.x;
 		markCenter.y = ZoomMarkPoint.y;
 	}
@@ -11115,16 +11112,16 @@ void cntrx() {
 		dufcntr(&selectedCenter);
 		FormMoveDelta.x = markCenter.x - selectedCenter.x;
 		FormMoveDelta.y = -markCenter.y + selectedCenter.y;
-		if (chkMap(CNTRV))
+		if (StateMap.test(CNTRV))
 			FormMoveDelta.y = 0;
-		if (chkMap(CNTRH))
+		if (StateMap.test(CNTRH))
 			FormMoveDelta.x = 0;
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			frmadj(SelectedFormList[iForm]);
 		frmsadj();
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			flag = true;
 			savdo();
 			formRect = &FormList[ClosestFormToCursor].rectangle;
@@ -11132,9 +11129,9 @@ void cntrx() {
 			selectedCenter.y = (formRect->top - formRect->bottom) / 2 + formRect->bottom;
 			FormMoveDelta.x = markCenter.x - selectedCenter.x;
 			FormMoveDelta.y = -markCenter.y + selectedCenter.y;
-			if (chkMap(CNTRV))
+			if (StateMap.test(CNTRV))
 				FormMoveDelta.y = 0;
-			if (chkMap(CNTRH))
+			if (StateMap.test(CNTRH))
 				FormMoveDelta.x = 0;
 			frmadj(ClosestFormToCursor);
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -11145,7 +11142,7 @@ void cntrx() {
 			}
 		}
 		else {
-			if (chkMap(GRPSEL)) {
+			if (StateMap.test(GRPSEL)) {
 				flag = true;
 				savdo();
 				rngadj();
@@ -11165,9 +11162,9 @@ void cntrx() {
 				selectedCenter.y = (groupRect.top - groupRect.bottom) / 2 + groupRect.bottom;
 				FormMoveDelta.x = markCenter.x - selectedCenter.x;
 				FormMoveDelta.y = -markCenter.y + selectedCenter.y;
-				if (chkMap(CNTRV))
+				if (StateMap.test(CNTRV))
 					FormMoveDelta.y = 0;
-				if (chkMap(CNTRH))
+				if (StateMap.test(CNTRH))
 					FormMoveDelta.x = 0;
 				for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
 					StitchBuffer[iStitch].x += FormMoveDelta.x;
@@ -11179,7 +11176,7 @@ void cntrx() {
 		}
 	}
 	if (flag)
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 }
 
 void centir() {
@@ -11189,7 +11186,7 @@ void centir() {
 	dPOINT		delta = {};
 	unsigned	iVertex = 0, iForm = 0, iStitch = 0;
 
-	rstMap(BIGBOX);
+	StateMap.reset(BIGBOX);
 	getbig();
 	itemCenter.x = (AllItemsRect.right - AllItemsRect.left) / 2 + AllItemsRect.left;
 	itemCenter.y = (AllItemsRect.top - AllItemsRect.bottom) / 2 + AllItemsRect.bottom;
@@ -11208,7 +11205,7 @@ void centir() {
 	for (iForm = 0; iForm < FormIndex; iForm++)
 		frmout(iForm);
 	setfchk();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void bean(unsigned start, unsigned finish) {
@@ -11259,7 +11256,7 @@ void bean(unsigned start, unsigned finish) {
 void dubean() {
 	if (PCSHeader.stitchCount) {
 		savdo();
-		if (chkMap(GRPSEL)) {
+		if (StateMap.test(GRPSEL)) {
 			rngadj();
 			bean(GroupStartStitch, GroupEndStitch);
 			if (ClosestPointIndex > GroupStitchIndex)
@@ -11271,7 +11268,7 @@ void dubean() {
 		else
 			bean(0, PCSHeader.stitchCount - 1);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 }
 
@@ -11299,7 +11296,7 @@ void unbean(unsigned start, unsigned finish) {
 
 void debean() {
 	savdo();
-	if (chkMap(GRPSEL)) {
+	if (StateMap.test(GRPSEL)) {
 		rngadj();
 		unbean(GroupStartStitch, GroupEndStitch);
 		if (ClosestPointIndex > GroupStitchIndex)
@@ -11315,7 +11312,7 @@ void debean() {
 	else
 		unbean(0, PCSHeader.stitchCount - 1);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void mvfrmsb(FRMHED* destination, FRMHED* source, unsigned count) {
@@ -11382,7 +11379,7 @@ void stchadj() {
 	}
 	ClosestFormToCursor++;
 	refilfn();
-	rstMap(FRMPSEL);
+	StateMap.reset(FRMPSEL);
 }
 
 void spltsat(SATCON currentGuide) {
@@ -11492,7 +11489,7 @@ BOOL spltlin() {
 }
 
 void spltfrm() {
-	if (chkMap(FRMPSEL)) {
+	if (StateMap.test(FRMPSEL)) {
 		savdo();
 		fvars(ClosestFormToCursor);
 		if (SelectedForm->type == SAT) {
@@ -11515,7 +11512,7 @@ void spltfrm() {
 			if (SelectedForm->type == FRMLINE) {
 				if (spltlin()) {
 					coltab();
-					setMap(RESTCH);
+					StateMap.set(RESTCH);
 				}
 				else
 					tabmsg(IDS_FRM3);
@@ -11532,7 +11529,7 @@ void stchs2frm() {
 
 	unsigned	iStitch = 0, iVertex = 0, vertexCount = 0;
 
-	if (chkMap(GRPSEL)) {
+	if (StateMap.test(GRPSEL)) {
 		rngadj();
 		if ((GroupEndStitch - GroupStartStitch) > 12000) {
 			tabmsg(IDS_STMAX);
@@ -11560,9 +11557,9 @@ void stchs2frm() {
 				GroupStitchIndex++;
 		}
 		delstchm();
-		rstMap(GRPSEL);
+		StateMap.reset(GRPSEL);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else
 		shoseln(IDS_GRPMSG, IDS_STCH2FRM);
@@ -11636,9 +11633,9 @@ void ritseg() {
 
 	if (SelectedForm->extendedAttribute&AT_SQR)
 		isPointedEnd = false;
-	if (chkMap(FILDIR)) {
+	if (StateMap.test(FILDIR)) {
 		iPoint = ClipSegments[ActivePointIndex].start;
-		if (chkMap(TXFIL) && isPointedEnd)
+		if (StateMap.test(TXFIL) && isPointedEnd)
 			iPoint++;
 		chksid(ClipSegments[ActivePointIndex].asid);
 		while (iPoint <= ClipSegments[ActivePointIndex].finish) {
@@ -11649,7 +11646,7 @@ void ritseg() {
 	}
 	else {
 		iPoint = ClipSegments[ActivePointIndex].finish;
-		if (chkMap(TXFIL) && isPointedEnd)
+		if (StateMap.test(TXFIL) && isPointedEnd)
 			iPoint--;
 		chksid(ClipSegments[ActivePointIndex].zsid);
 		if (ClipSegments[ActivePointIndex].start) {
@@ -11709,9 +11706,9 @@ BOOL clpnxt(unsigned sind) {
 	unsigned	ind = 1;
 	const unsigned	indexDoubled = ClipSegmentIndex << 1;
 
-	rstMap(FILDIR);
+	StateMap.reset(FILDIR);
 	while (ind < ClipSegmentIndex) {
-		if (toglMap(FILDIR)) {
+		if (StateMap.testAndFlip(FILDIR)) {
 			OutputIndex = (sind + ind) % indexDoubled;
 			if (!ClipSegments[lenref(SortedLengths[OutputIndex]) >> 1].dun)
 				return 0;
@@ -11730,7 +11727,7 @@ BOOL nucseg() {
 
 	unsigned	ind = 0;
 
-	if (chkMap(FILDIR))
+	if (StateMap.test(FILDIR))
 		ind = ClipSegments[ActivePointIndex].endIndex;
 	else
 		ind = ClipSegments[ActivePointIndex].beginIndex;
@@ -11738,9 +11735,9 @@ BOOL nucseg() {
 		return 0;
 	ind = lenref(SortedLengths[OutputIndex]);
 	if (ind & 1)
-		rstMap(FILDIR);
+		StateMap.reset(FILDIR);
 	else
-		setMap(FILDIR);
+		StateMap.set(FILDIR);
 	ActivePointIndex = ind >> 1;
 	return 1;
 }
@@ -12027,7 +12024,7 @@ void duflt() {
 			leftEdge = CurrentFormVertices[iVertex].x;
 	}
 	if (leftEdge < ClipRectSize.cx) {
-		setMap(WASNEG);
+		StateMap.set(WASNEG);
 		FormOffset = ClipRectSize.cx + fabs(leftEdge) + .05;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++)
 			CurrentFormVertices[iVertex].x += FormOffset;
@@ -12035,7 +12032,7 @@ void duflt() {
 		SelectedForm->rectangle.right += FormOffset;
 	}
 	else
-		rstMap(WASNEG);
+		StateMap.reset(WASNEG);
 }
 
 void inspnt() {
@@ -12069,7 +12066,7 @@ void clpcon() {
 
 	duflt();
 	ClipWidth = ClipRectSize.cx + SelectedForm->fillSpacing;
-	if (chkMap(ISUND))
+	if (StateMap.test(ISUND))
 		ClipWidth = SelectedForm->underlaySpacing;
 	if (SelectedForm->fillSpacing < 0)
 		clipNegative = 1;
@@ -12077,7 +12074,7 @@ void clpcon() {
 		clipNegative = 0;
 	if (ClipWidth < CLPMINAUT)
 		ClipWidth = (float)CLPMINAUT;
-	if (chkMap(TXFIL)) {
+	if (StateMap.test(TXFIL)) {
 		if (TextureIndex && SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count <= TextureIndex)
 			ClipWidth = SelectedForm->fillSpacing;
 		else
@@ -12177,7 +12174,7 @@ void clpcon() {
 		RegionCrossingEnd = iclpx[iRegion + 1];
 		pasteLocation.x = ClipWidth*(iRegion + clipGrid.left);
 		clipVerticalOffset = 0;
-		if (chkMap(TXFIL)) {
+		if (StateMap.test(TXFIL)) {
 			textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
 			ClipStitchCount = TextureSegments[textureLine].stitchCount;
 			if (!flag) { delete[] texture; }
@@ -12206,7 +12203,7 @@ void clpcon() {
 				LineSegmentStart.y = LineSegmentEnd.y;
 			}
 			for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
-				if (chkMap(TXFIL)) {
+				if (StateMap.test(TXFIL)) {
 					if (flag) {
 						LineSegmentEnd.x = pasteLocation.x;
 						LineSegmentEnd.y = pasteLocation.y + texture[iStitch].y;
@@ -12276,19 +12273,19 @@ clpskp:;
 #endif
 
 	ClipSegmentIndex = 0;
-	rstMap(FILDIR);
+	StateMap.reset(FILDIR);
 	previousPoint = 0;
 	if (ActivePointIndex) {
 		for (iPoint = 0; iPoint < ActivePointIndex - 1; iPoint++) {
 			switch (ClipStitchPoints[iPoint].flag) {
 				case 0:		//inside
 
-					setMap(FILDIR);
+					StateMap.set(FILDIR);
 					break;
 
 				case 1:		//line
 
-					if (toglMap(FILDIR))
+					if (StateMap.testAndFlip(FILDIR))
 						clpnseg(previousPoint, iPoint);
 					else
 						previousPoint = iPoint;
@@ -12296,7 +12293,7 @@ clpskp:;
 
 				case 2:		//outside
 
-					rstMap(FILDIR);
+					StateMap.reset(FILDIR);
 					break;
 			}
 		}
@@ -12366,7 +12363,7 @@ clp1skp:;
 #if CLPVU==0
 
 		ActivePointIndex = 0;
-		setMap(FILDIR);
+		StateMap.set(FILDIR);
 		SequenceIndex = 0;
 		ClipIntersectSide = ClipSegments[0].asid;
 		ritseg();
@@ -12389,7 +12386,7 @@ clp1skp:;
 				inf++;
 		}
 		SequenceIndex = ine;
-		if (chkMap(WASNEG)) {
+		if (StateMap.test(WASNEG)) {
 			for (iSequence = 0; iSequence < SequenceIndex; iSequence++)
 				OSequence[iSequence].x -= FormOffset;
 			for (iVertex = 0; iVertex < VertexCount; iVertex++)
@@ -12441,25 +12438,25 @@ void vrtclp() {
 			CloseClipboard();
 			if (ClipRectSize.cy > CLPMIN) {
 				if (SelectedFormCount) {
-					setMap(NOCLP);
+					StateMap.set(NOCLP);
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 						ClosestFormToCursor = SelectedFormList[iForm];
 						fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE)
 							vrtsclp();
 					}
-					rstMap(NOCLP);
-					setMap(INIT);
+					StateMap.reset(NOCLP);
+					StateMap.set(INIT);
 					coltab();
-					setMap(RESTCH);
+					StateMap.set(RESTCH);
 				}
 				else {
-					if (chkMap(FORMSEL)) {
+					if (StateMap.test(FORMSEL)) {
 						fvars(ClosestFormToCursor);
 						vrtsclp();
-						setMap(INIT);
+						StateMap.set(INIT);
 						coltab();
-						setMap(RESTCH);
+						StateMap.set(RESTCH);
 					}
 				}
 			}
@@ -12555,25 +12552,25 @@ void horclp() {
 			CloseClipboard();
 			if (ClipRectSize.cy > CLPMIN) {
 				if (SelectedFormCount) {
-					setMap(NOCLP);
+					StateMap.set(NOCLP);
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 						ClosestFormToCursor = SelectedFormList[iForm];
 						fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE)
 							horsclp();
 					}
-					setMap(NOCLP);
-					setMap(INIT);
+					StateMap.set(NOCLP);
+					StateMap.set(INIT);
 					coltab();
-					setMap(RESTCH);
+					StateMap.set(RESTCH);
 				}
 				else {
-					if (chkMap(FORMSEL)) {
+					if (StateMap.test(FORMSEL)) {
 						fvars(ClosestFormToCursor);
 						horsclp();
-						setMap(INIT);
+						StateMap.set(INIT);
 						coltab();
-						setMap(RESTCH);
+						StateMap.set(RESTCH);
 					}
 				}
 			}
@@ -12594,7 +12591,7 @@ void angclpfn() {
 	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
 	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;
-	if (chkMap(ISUND)) {
+	if (StateMap.test(ISUND)) {
 		RotationAngle = PI / 2 - SelectedForm->underlayStitchAngle;
 		vertexList = insid();
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
@@ -12604,7 +12601,7 @@ void angclpfn() {
 		}
 	}
 	else {
-		if (chkMap(TXFIL))
+		if (StateMap.test(TXFIL))
 			RotationAngle = PI / 2 - SelectedForm->angleOrClipData.angle;
 		else
 			RotationAngle = PI / 2 - SelectedForm->satinOrAngle.angle;
@@ -12660,25 +12657,25 @@ void angclp() {
 			CloseClipboard();
 			if (ClipRectSize.cy > CLPMIN) {
 				if (SelectedFormCount) {
-					setMap(NOCLP);
+					StateMap.set(NOCLP);
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 						ClosestFormToCursor = SelectedFormList[iForm];
 						fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE)
 							angsclp();
 					}
-					rstMap(NOCLP);
-					setMap(INIT);
+					StateMap.reset(NOCLP);
+					StateMap.set(INIT);
 					coltab();
-					setMap(RESTCH);
+					StateMap.set(RESTCH);
 				}
 				else {
-					if (chkMap(FORMSEL)) {
+					if (StateMap.test(FORMSEL)) {
 						SelectedForm = &FormList[ClosestFormToCursor];
 						angsclp();
-						setMap(INIT);
+						StateMap.set(INIT);
 						coltab();
-						setMap(RESTCH);
+						StateMap.set(RESTCH);
 					}
 				}
 			}
@@ -12726,16 +12723,16 @@ void dubfil() {
 			fvars(ClosestFormToCursor);
 			dubsfil();
 		}
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			dubsfil();
 			coltab();
-			setMap(INIT);
-			setMap(RESTCH);
+			StateMap.set(INIT);
+			StateMap.set(RESTCH);
 		}
 	}
 }
@@ -13067,7 +13064,7 @@ void duch() {
 		if (SelectedForm->type == FRMLINE) {
 			duchfn(iPoint, iPoint + 1);
 			backupAt = 8;
-			if (chkMap(LINCHN))
+			if (StateMap.test(LINCHN))
 				backupAt--;
 			if ((SequenceIndex >= backupAt)) {
 				OSequence[SequenceIndex - backupAt].x = ChainEndPoints[iPoint + 1].x;
@@ -13108,7 +13105,7 @@ void chnfn() {
 	// ToDo - Can we do better than MAXITEMS?
 	ChainEndPoints = new fPOINT[MAXITEMS];
 	ChainCount = 10;
-	if (chkMap(LINCHN))
+	if (StateMap.test(LINCHN))
 		ChainCount--;
 	fvars(ClosestFormToCursor);
 	deleclp(ClosestFormToCursor);
@@ -13126,7 +13123,7 @@ void chan() {
 	SelectedForm->edgeStitchLen = IniFile.chainRatio;
 	SelectedForm->maxBorderStitchLen = IniFile.maxStitchLength;
 	SelectedForm->minBorderStitchLen = MinStitchLength;
-	if (chkMap(LINCHN))
+	if (StateMap.test(LINCHN))
 		SelectedForm->edgeType = EDGELCHAIN;
 	else
 		SelectedForm->edgeType = EDGEOCHAIN;
@@ -13146,18 +13143,18 @@ void chain() {
 			fvars(ClosestFormToCursor);
 			chan();
 		}
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			fvars(ClosestFormToCursor);
 			chan();
-			setMap(INIT);
+			StateMap.set(INIT);
 			coltab();
 			ritot(PCSHeader.stitchCount);
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 	}
 }
@@ -13205,7 +13202,7 @@ void crop() {
 	unsigned	iSource = 0, iDestination = 0;
 
 	frm1pnt();
-	if (chkMap(FORMSEL)) {
+	if (StateMap.test(FORMSEL)) {
 		savdo();
 		fvars(ClosestFormToCursor);
 		iDestination = 0;
@@ -13220,7 +13217,7 @@ void crop() {
 		}
 		PCSHeader.stitchCount = iDestination;
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else
 		shoseln(IDS_FRM1MSG, IDS_CROP);
@@ -13361,16 +13358,16 @@ void filclpx() {
 						fvars(ClosestFormToCursor);
 						fsclpx();
 					}
-					setMap(INIT);
+					StateMap.set(INIT);
 					coltab();
-					setMap(RESTCH);
+					StateMap.set(RESTCH);
 				}
 				else {
-					if (chkMap(FORMSEL)) {
+					if (StateMap.test(FORMSEL)) {
 						fsclpx();
-						setMap(INIT);
+						StateMap.set(INIT);
 						coltab();
-						setMap(RESTCH);
+						StateMap.set(RESTCH);
 					}
 				}
 			}
@@ -13507,7 +13504,7 @@ void wavfrm() {
 		SelectedForm->vertexCount = vertexCount;
 		FormVertexIndex += vertexCount;
 		frmout(FormIndex);
-		rstMap(FORMSEL);
+		StateMap.reset(FORMSEL);
 		selectedSize.x = SelectedForm->rectangle.right - SelectedForm->rectangle.left;
 		selectedSize.y = SelectedForm->rectangle.top - SelectedForm->rectangle.bottom;
 		horizontalRatio = UnzoomedRect.x / 4 / selectedSize.x;
@@ -13562,7 +13559,7 @@ void srtfrm() {
 		MoveMemory(StitchBuffer, highStitchBuffer, sizeof(fPOINTATTR)*PCSHeader.stitchCount);
 		delete[] highStitchBuffer;
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 }
 

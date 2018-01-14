@@ -110,7 +110,7 @@
     <ClCompile Include="xt.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EnumMask.h" />
+    <ClInclude Include="EnumMap.h" />
     <ClInclude Include="lang.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="thred.h" />

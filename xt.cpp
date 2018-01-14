@@ -40,6 +40,7 @@ extern	unsigned		ClosestPointIndex;
 extern	unsigned		ClosestVertexToCursor;
 extern	unsigned		ClipPointIndex;
 extern	fPOINT*			CurrentFormVertices;
+extern	EnumMap<StateFlags> StateMap;
 extern	unsigned		FormVertexIndex;
 extern	fPOINT			FormMoveDelta;
 extern	unsigned		FormIndex;
@@ -105,7 +106,6 @@ extern	void		bakseq();
 extern	void		butxt(unsigned iButton, TCHAR* buttonText);
 extern	void		centir();
 extern	void		chkhup();
-extern	bool		chkMap(StateFlags bit);
 extern	BOOL		chkmax(unsigned arg0, unsigned arg1);
 extern	void		chkmen();
 extern	BOOL		chkr(unsigned bit);
@@ -131,7 +131,7 @@ extern	unsigned	find1st();
 extern	void		fnhor();
 extern	void		fnvrt();
 extern	void		frmclr(FRMHED* destination);
-extern	void		frmcpy(FRMHED* destination, FRMHED* source);
+extern	void		frmcpy(FRMHED* destination, const FRMHED* source);
 extern	void		frmout(unsigned formIndex);
 extern	void		frmrct(fRECTANGLE* rectangle);
 extern	void		fshor();
@@ -151,7 +151,7 @@ extern	void		movStch();
 extern	void		msgflt(unsigned messageId, float value);
 extern	void		mvstchs(unsigned destination, unsigned source, unsigned count);
 extern	void		numWnd();
-extern	constexpr unsigned	nxt(unsigned iVertex);
+extern	constexpr unsigned	nxt(unsigned int iVertex);
 extern	constexpr unsigned	prv(unsigned iVertex);
 extern	unsigned	psg();
 extern	unsigned	px2stch();
@@ -161,7 +161,6 @@ extern	void		refilal();
 extern	void		refilfn();
 extern	void		ritfil();
 extern	void		rotflt(fPOINT* point);
-extern	bool		rstMap(StateFlags bit);
 extern	unsigned	rstu(unsigned bit);
 extern	void		rtrclpfn();
 extern	void		satfil();
@@ -169,7 +168,6 @@ extern	void		satout(double satinWidth);
 extern	void		savdo();
 extern	void		save();
 extern	void		setknots();
-extern	bool		setMap(StateFlags bit);
 extern	void		setmfrm();
 extern	void		setr(unsigned bit);
 extern	unsigned	setu(unsigned bit);
@@ -177,7 +175,6 @@ extern	void		shoMsg(TCHAR* string);
 extern	void		shoseln(unsigned code0, unsigned code1);
 extern	void		stchrct(fRECTANGLE* rectangle);
 extern	void		tabmsg(unsigned code);
-extern	bool		toglMap(StateFlags bit);
 extern	unsigned	toglu(unsigned bit);
 extern	void		unmsg();
 extern	void		unthum();
@@ -281,7 +278,7 @@ int		TextureHistoryIndex;	//pointer to the next texture history buffer
 
 void setfchk() {
 	if (IniFile.dataCheck)
-		setMap(FCHK);
+		StateMap.set(FCHK);
 }
 
 #ifdef _DEBUG
@@ -325,14 +322,14 @@ void txspac(int start, unsigned count) {
 
 void rstxt() {
 	SelectedTexturePointsCount = 0;
-	rstMap(TXTMOV);
-	rstMap(BZUM);
-	rstMap(BZUMIN);
-	setMap(RESTCH);
-	rstMap(POLIMOV);
+	StateMap.reset(TXTMOV);
+	StateMap.reset(BZUM);
+	StateMap.reset(BZUMIN);
+	StateMap.set(RESTCH);
+	StateMap.reset(POLIMOV);
 	DestroyWindow(SideWindowButton);
 	SideWindowButton = 0;
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void txrbak() {
@@ -371,9 +368,9 @@ void savtxt() {
 	if (TextureScreen.index) {
 		currentHistoryItem = &TextureHistory[TextureHistoryIndex];
 		if (chktxh(currentHistoryItem)) {
-			setMap(WASTXBAK);
-			rstMap(TXBDIR);
-			rstMap(LASTXBAK);
+			StateMap.set(WASTXBAK);
+			StateMap.reset(TXBDIR);
+			StateMap.reset(LASTXBAK);
 			txrfor();
 			currentHistoryItem = &TextureHistory[TextureHistoryIndex];
 			currentHistoryItem->count = TextureScreen.index;
@@ -397,8 +394,8 @@ void deorg(POINT* point) {
 
 void fthvars() {
 
-	rstMap(BARSAT);
-	rstMap(FTHR);
+	StateMap.reset(BARSAT);
+	StateMap.reset(FTHR);
 	FeatherFillType = SelectedForm->fillInfo.feather.fillType;
 	FormFeatherRatio = SelectedForm->fillInfo.feather.ratio;
 	FeatherMinStitch = SelectedForm->fillInfo.feather.minStitchSize;
@@ -408,9 +405,9 @@ void fthvars() {
 	FeatherCountDown = FeatherDownCount = SelectedForm->fillInfo.feather.downCount;
 	FeatherPhaseIndex = FeatherUpCount + FeatherDownCount;
 	if (ExtendedAttribute&AT_FTHBLND)
-		setMap(BARSAT);
+		StateMap.set(BARSAT);
 	else
-		setMap(FTHR);
+		StateMap.set(FTHR);
 }
 
 constexpr float durat(float start, float finish) {
@@ -721,8 +718,8 @@ void fthrfn() {
 		}
 		OutputIndex = ind;
 	}
-	rstMap(FTHR);
-	rstMap(BARSAT);
+	StateMap.reset(FTHR);
+	StateMap.reset(BARSAT);
 	LineSpacing = savedSpacing;
 	SequenceIndex = OutputIndex;
 }
@@ -798,19 +795,19 @@ void fethr() {
 			ClosestFormToCursor = SelectedFormList[iForm];
 			fethrf();
 		}
-		setMap(INIT);
+		StateMap.set(INIT);
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else {
 
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 
 			savdo();
 			fethrf();
-			setMap(INIT);
+			StateMap.set(INIT);
 			coltab();
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 		}
 	}
 }
@@ -1077,11 +1074,11 @@ unsigned gucon(fPOINT start, fPOINT finish, unsigned destination, unsigned code)
 	up = down = startVertex;
 gulab:
 	if (up == endVertex) {
-		rstMap(WLKDIR);
+		StateMap.reset(WLKDIR);
 		goto gulabx;
 	}
 	if (down == endVertex) {
-		setMap(WLKDIR);
+		StateMap.set(WLKDIR);
 		goto gulabx;
 	}
 	up = nxt(up);
@@ -1099,7 +1096,7 @@ gulabx:;
 		}
 		else
 			iStitch++;
-		if (chkMap(WLKDIR))
+		if (StateMap.test(WLKDIR))
 			intermediateVertex = prv(startVertex);
 		else
 			intermediateVertex = nxt(startVertex);
@@ -1121,7 +1118,7 @@ gulabx:;
 				localPoint.y += step.y;
 			}
 		}
-		if (chkMap(WLKDIR))
+		if (StateMap.test(WLKDIR))
 			startVertex = prv(startVertex);
 		else
 			startVertex = nxt(startVertex);
@@ -1205,7 +1202,7 @@ void fnund(unsigned find) {
 	if (!SelectedForm->underlayStitchLen)
 		SelectedForm->underlayStitchLen = IniFile.underlayStitchLen;
 	undclp();
-	setMap(ISUND);
+	StateMap.set(ISUND);
 	angclpfn();
 	OutputIndex = SequenceIndex;
 	ritund();
@@ -1388,7 +1385,7 @@ void dubit(unsigned bit) {
 	unsigned code = 0;
 
 	savdo();
-	setMap(WASDO);
+	StateMap.set(WASDO);
 	if (SelectedForm->type == FRMLINE)
 		SelectedForm->type = FRMFPOLY;
 	if (!(SelectedForm->extendedAttribute&(AT_UND | AT_WALK | AT_CWLK)) && bit&(AT_UND | AT_WALK | AT_CWLK)) {
@@ -1409,26 +1406,26 @@ void dubit(unsigned bit) {
 		SelectedForm->extendedAttribute |= bit;
 	refil();
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setuang() {
-	setMap(GTUANG);
+	StateMap.set(GTUANG);
 	msgflt(IDS_UANG, IniFile.underlayAngle / PI * 180);
 }
 
 void setuspac() {
-	setMap(GTUSPAC);
+	StateMap.set(GTUSPAC);
 	msgflt(IDS_USPAC, IniFile.underlaySpacing / PFGRAN);
 }
 
 void setwlkind() {
-	setMap(GTWLKIND);
+	StateMap.set(GTWLKIND);
 	msgflt(IDS_WLKIND, IniFile.underlayIndent / PFGRAN);
 }
 
 void setulen() {
-	setMap(GTWLKLEN);
+	StateMap.set(GTWLKLEN);
 	msgflt(IDS_WLKLEN, IniFile.underlayStitchLen / PFGRAN);
 }
 
@@ -1456,7 +1453,7 @@ void chkund() {
 void selalfrm() {
 	for (SelectedFormCount = 0; SelectedFormCount < FormIndex; SelectedFormCount++)
 		SelectedFormList[SelectedFormCount] = SelectedFormCount;
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void chkdaz() {
@@ -1613,7 +1610,7 @@ void dasyfrm() {
 
 	unmsg();
 	if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, (DLGPROC)dasyproc)) {
-		rstMap(FORMIN);
+		StateMap.reset(FORMIN);
 		return;
 	}
 	IniFile.daisyPetalCount = IniFile.daisyPetalCount;
@@ -1736,7 +1733,7 @@ void dasyfrm() {
 		SelectedForm->attribute = 1;
 	}
 	FormVertexIndex += iVertex;
-	setMap(INIT);
+	StateMap.set(INIT);
 	frmout(FormIndex);
 	for (iMacroPetal = 0; iMacroPetal < iVertex; iMacroPetal++) {
 
@@ -1745,7 +1742,7 @@ void dasyfrm() {
 	}
 	FormMoveDelta.x = FormMoveDelta.y = 0;
 	NewFormVertexCount = iVertex + 1;
-	setMap(POLIMOV);
+	StateMap.set(POLIMOV);
 	setmfrm();
 	mdufrm();
 }
@@ -1874,7 +1871,7 @@ double precjmps(SRTREC* sortRecord) {
 		if (minimumLength > 9 * PFGRAN)
 			totalJumps++;
 		FormFillCounter[PRecs[currentRegion]->form]++;
-		if (chkMap(DUSRT)) {
+		if (StateMap.test(DUSRT)) {
 			if (direction) {
 				if (PRecs[currentRegion]->start) {
 					for (iRegion = PRecs[currentRegion]->finish - 1; iRegion >= PRecs[currentRegion]->start; iRegion--)
@@ -2041,7 +2038,7 @@ srtskp:;
 		TempStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
 		OutputIndex = 0;
 		for (iRange = 0; iRange < lastRange; iRange++) {
-			rstMap(DUSRT);
+			StateMap.reset(DUSRT);
 			sortRecord.start = stitchRange[iRange].start;
 			sortRecord.finish = stitchRange[iRange].finish;
 			sortRecord.count = sortRecord.finish - sortRecord.start;
@@ -2064,7 +2061,7 @@ srtskp:;
 				if (nextTime.QuadPart - startTime.QuadPart > SRTIM)
 					break;
 			}
-			setMap(DUSRT);
+			StateMap.set(DUSRT);
 			sortRecord.currentRegion = minimumIndex;
 			sortRecord.direction = minimumDirection;
 			precjmps(&sortRecord);
@@ -2073,7 +2070,7 @@ srtskp:;
 		PCSHeader.stitchCount = OutputIndex;
 		delete[] TempStitchBuffer;
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 		delete[] stitchRange;
 	}
 	else {
@@ -2183,7 +2180,7 @@ void fdelstch() {
 	bordercolor = SelectedForm->borderColor&COLMSK;
 	tapcol = SelectedForm->borderColor >> 4;
 	for (iSourceStitch = 0; iSourceStitch < PCSHeader.stitchCount; iSourceStitch++) {
-		if (!chku(FIL2OF) && chkMap(SELBOX) && iSourceStitch == ClosestPointIndex)
+		if (!chku(FIL2OF) && StateMap.test(SELBOX) && iSourceStitch == ClosestPointIndex)
 			ClosestPointIndex = iDestinationStitch;
 		attribute = StitchBuffer[iSourceStitch].attribute;
  		if (codedFormIndex == (attribute&(FRMSK | NOTFRM))) {
@@ -2311,7 +2308,7 @@ void fdelstch() {
 			iDestinationStitch--;
 		}
 	}
-	if (!chku(FIL2OF) && chkMap(SELBOX)) {
+	if (!chku(FIL2OF) && StateMap.test(SELBOX)) {
 		for (ind = 0; ind < sizeof(FillStartsData) >> 2; ind++)
 			stpnt[ind] = ClosestPointIndex;
 	}
@@ -2343,7 +2340,7 @@ void duint(unsigned offset, unsigned code, INTINF *ilData) {
 		ilData->output += count;
 	}
 	if (SelectedForm->extendedAttribute&AT_STRT) {
-		if (!setMap(DIDSTRT))
+		if (!StateMap.testAndSet(DIDSTRT))
 			ilData->output += gucon(CurrentFormVertices[SelectedForm->fillStart], InterleaveSequence[InterleaveSequenceIndices[ilData->pins].index], ilData->output + offset, code);
 	}
 	if (lastcol(ilData->pins, &point))
@@ -2370,7 +2367,7 @@ BOOL isfil() {
 
 void chkend(unsigned offset, unsigned code, INTINF *ilData) {
 	if (isfil()) {
-		setMap(ISEND);
+		StateMap.set(ISEND);
 		if (SelectedForm->extendedAttribute&AT_END)
 			ilData->output += gucon(InterleaveSequence[InterleaveSequenceIndex - 1], CurrentFormVertices[SelectedForm->fillEnd], ilData->output + offset, code);
 	}
@@ -2381,11 +2378,11 @@ void intlv() {
 	fPOINT		colpnt = {};
 	INTINF		ilData = {};
 
-	rstMap(ISEND);
+	StateMap.reset(ISEND);
 	fvars(ClosestFormToCursor);
 	InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 	ilData.layerIndex = ((SelectedForm->attribute&FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
-	rstMap(DIDSTRT);
+	StateMap.reset(DIDSTRT);
 	if (PCSHeader.stitchCount) {
 		offset = MAXITEMS;
 		// Todo - Allocate memory locally for ilData.highStitchBuffer
@@ -2444,7 +2441,7 @@ void intlv() {
 		for (iSequence = 0; iSequence < InterleaveSequenceIndex2; iSequence++) {
 			code = ilData.layerIndex | InterleaveSequenceIndices[iSequence].code | InterleaveSequenceIndices[iSequence].color;
 			if (SelectedForm->extendedAttribute&AT_STRT) {
-				if (!setMap(DIDSTRT))
+				if (!StateMap.testAndSet(DIDSTRT))
 					ilData.output += gucon(CurrentFormVertices[SelectedForm->fillStart], InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index], ilData.output + offset, code);
 			}
 			if (lastcol(iSequence, &colpnt))
@@ -2478,15 +2475,15 @@ void setundfn(unsigned code) {
 			refilfn();
 		}
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 		return;
 	}
-	if (chkMap(FORMSEL)) {
+	if (StateMap.test(FORMSEL)) {
 		fvars(ClosestFormToCursor);
 		SelectedForm->extendedAttribute |= code;
 		refilfn();
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 }
 
@@ -2517,17 +2514,17 @@ void notundfn(unsigned code) {
 			refilfn();
 		}
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 		return;
 	}
-	if (chkMap(FORMSEL)) {
+	if (StateMap.test(FORMSEL)) {
 		fvars(ClosestFormToCursor);
 		if (SelectedForm->type == FRMLINE)
 			return;
 		SelectedForm->extendedAttribute &= code;
 		refilfn();
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 }
 
@@ -2560,16 +2557,16 @@ void dusulen(float length) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			ulenfn(SelectedFormList[iForm], length);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		ulenfn(ClosestFormToCursor, length);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void undlen() {
 	tabmsg(IDS_SETULEN);
-	setMap(NUMIN);
-	setMap(FSETULEN);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETULEN);
 	numWnd();
 }
 
@@ -2590,16 +2587,16 @@ void duspac(float spacing) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			uspacfn(SelectedFormList[iForm], spacing);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		uspacfn(ClosestFormToCursor, spacing);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void uspac() {
 	tabmsg(IDS_SETUSPAC);
-	setMap(NUMIN);
-	setMap(FSETUSPAC);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETUSPAC);
 	numWnd();
 }
 
@@ -2621,16 +2618,16 @@ void dufang(float angle) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			uangfn(SelectedFormList[iForm], angle);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		uangfn(ClosestFormToCursor, angle);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void sfuang() {
 	tabmsg(IDS_SETUANG);
-	setMap(NUMIN);
-	setMap(FSETUANG);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETUANG);
 	numWnd();
 }
 
@@ -2651,16 +2648,16 @@ void duflen(float length) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			flenfn(SelectedFormList[iForm], length);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		flenfn(ClosestFormToCursor, length);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setflen() {
 	tabmsg(IDS_SETFLEN);
-	setMap(NUMIN);
-	setMap(FSETFLEN);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETFLEN);
 	numWnd();
 }
 
@@ -2685,16 +2682,16 @@ void dufspac(float spacing) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			fspacfn(SelectedFormList[iForm], spacing);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		fspacfn(ClosestFormToCursor, spacing);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setfspac() {
 	tabmsg(IDS_SETFSPAC);
-	setMap(NUMIN);
-	setMap(FSETFSPAC);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETFSPAC);
 	numWnd();
 }
 
@@ -2715,10 +2712,10 @@ void dufind(float indent) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			findfn(SelectedFormList[iForm], indent);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		findfn(ClosestFormToCursor, indent);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void fangfn(unsigned find, float angle) {
@@ -2755,16 +2752,16 @@ void dufxang(float angle) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			fangfn(SelectedFormList[iForm], angle);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		fangfn(ClosestFormToCursor, angle);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setfang() {
 	tabmsg(IDS_SETFANG);
-	setMap(NUMIN);
-	setMap(FSETFANG);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETFANG);
 	numWnd();
 }
 
@@ -2788,16 +2785,16 @@ void dundcol(unsigned color) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			ucolfn(SelectedFormList[iForm], color);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		ucolfn(ClosestFormToCursor, color);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setucol() {
 	tabmsg(IDS_COL);
-	setMap(NUMIN);
-	setMap(FSETUCOL);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETUCOL);
 	numWnd();
 }
 
@@ -2821,16 +2818,16 @@ void dufcol(unsigned color) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			fcolfn(SelectedFormList[iForm], color);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		fcolfn(ClosestFormToCursor, color);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setfcol() {
 	tabmsg(IDS_COL);
-	setMap(NUMIN);
-	setMap(FSETFCOL);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETFCOL);
 	numWnd();
 }
 
@@ -2854,16 +2851,16 @@ void dubcol(unsigned color) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			bcolfn(SelectedFormList[iForm], color);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		bcolfn(ClosestFormToCursor, color);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setbcol() {
 	tabmsg(IDS_COL);
-	setMap(NUMIN);
-	setMap(FSETBCOL);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETBCOL);
 	numWnd();
 }
 
@@ -2884,16 +2881,16 @@ void dublen(float length) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			blenfn(SelectedFormList[iForm], length);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		blenfn(ClosestFormToCursor, length);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setblen() {
 	tabmsg(IDS_SETFLEN);
-	setMap(NUMIN);
-	setMap(FSETBLEN);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETBLEN);
 	numWnd();
 }
 
@@ -2914,16 +2911,16 @@ void dubspac(float length) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			bspacfn(SelectedFormList[iForm], length);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		bspacfn(ClosestFormToCursor, length);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setbspac() {
 	tabmsg(IDS_SETFSPAC);
-	setMap(NUMIN);
-	setMap(FSETBSPAC);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETBSPAC);
 	numWnd();
 }
 
@@ -2944,16 +2941,16 @@ void dubmin(float length) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			bminfn(SelectedFormList[iForm], length);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		bminfn(ClosestFormToCursor, length);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setbmin() {
 	tabmsg(IDS_TXT23);
-	setMap(NUMIN);
-	setMap(FSETBMIN);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETBMIN);
 	numWnd();
 }
 
@@ -2974,16 +2971,16 @@ void dubmax(float length) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			bmaxfn(SelectedFormList[iForm], length);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		bmaxfn(ClosestFormToCursor, length);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setbmax() {
 	tabmsg(IDS_TXT22);
-	setMap(NUMIN);
-	setMap(FSETBMAX);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETBMAX);
 	numWnd();
 }
 
@@ -3004,16 +3001,16 @@ void dufmin(float length) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			fminfn(SelectedFormList[iForm], length);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		fminfn(ClosestFormToCursor, length);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setfmin() {
 	tabmsg(IDS_TXT21);
-	setMap(NUMIN);
-	setMap(FSETFMIN);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETFMIN);
 	numWnd();
 }
 
@@ -3034,16 +3031,16 @@ void dufmax(float length) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			fmaxfn(SelectedFormList[iForm], length);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		fmaxfn(ClosestFormToCursor, length);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setfmax() {
 	tabmsg(IDS_TXT20);
-	setMap(NUMIN);
-	setMap(FSETFMAX);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETFMAX);
 	numWnd();
 }
 
@@ -3070,23 +3067,23 @@ void dufwid(float length) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			fwidfn(SelectedFormList[iForm], length);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		fwidfn(ClosestFormToCursor, length);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setfwid() {
 	tabmsg(IDS_WID);
-	setMap(NUMIN);
-	setMap(FSETFWID);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETFWID);
 	numWnd();
 }
 
 void setfind() {
 	tabmsg(IDS_UWLKIND);
-	setMap(NUMIN);
-	setMap(FSETFIND);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETFIND);
 	numWnd();
 }
 
@@ -3114,38 +3111,38 @@ void dufhi(float length) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			fhifn(SelectedFormList[iForm], length);
 	}
-	if (chkMap(FORMSEL))
+	if (StateMap.test(FORMSEL))
 		fhifn(ClosestFormToCursor, length);
 	coltab();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void setfhi() {
 	tabmsg(IDS_HI);
-	setMap(NUMIN);
-	setMap(FSETFHI);
+	StateMap.set(NUMIN);
+	StateMap.set(FSETFHI);
 	numWnd();
 }
 
 void setfilstrt() {
-	if (chkMap(FRMPSEL)) {
+	if (StateMap.test(FRMPSEL)) {
 		FormList[ClosestFormToCursor].fillStart = ClosestVertexToCursor;
 		FormList[ClosestFormToCursor].extendedAttribute |= AT_STRT;
 		refil();
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else
 		shoseln(IDS_FORMP, IDS_FSTRT);
 }
 
 void setfilend() {
-	if (chkMap(FRMPSEL)) {
+	if (StateMap.test(FRMPSEL)) {
 		FormList[ClosestFormToCursor].fillEnd = ClosestVertexToCursor;
 		FormList[ClosestFormToCursor].extendedAttribute |= AT_END;
 		refil();
 		coltab();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else
 		shoseln(IDS_FORMP, IDS_FEND);
@@ -3194,18 +3191,18 @@ void dutxtfil() {
 	if (!IniFile.textureEditorSize)
 		IniFile.textureEditorSize = ITXPIX;
 	AngledForm.vertexCount = 0;
-	setMap(TXTRED);
-	setMap(ZUMED);
-	rstMap(WASPAT);
-	rstMap(RUNPAT);
+	StateMap.set(TXTRED);
+	StateMap.set(ZUMED);
+	StateMap.reset(WASPAT);
+	StateMap.reset(RUNPAT);
 	movStch();
 	ShowWindow(VerticalScrollBar, FALSE);
 	ShowWindow(HorizontalScrollBar, FALSE);
 	SelectedTexturePointsList = new unsigned[MAXITEMS];
 	SelectedTexturePointsCount = 0;
-	setMap(INIT);
+	StateMap.set(INIT);
 	SideWindowButton = 0;
-	if (chkMap(WASTXBAK)) {
+	if (StateMap.test(WASTXBAK)) {
 		redtbak();
 		if (!TextureScreen.areaHeight)
 			TextureScreen.areaHeight = IniFile.textureHeight;
@@ -3213,8 +3210,8 @@ void dutxtfil() {
 			TextureScreen.spacing = IniFile.underlaySpacing;
 		if (!TextureScreen.width)
 			TextureScreen.width = IniFile.textureWidth;
-		setMap(LASTXBAK);
-		rstMap(TXBDIR);
+		StateMap.set(LASTXBAK);
+		StateMap.reset(TXBDIR);
 	}
 	else {
 		TextureScreen.index = 0;
@@ -3222,7 +3219,7 @@ void dutxtfil() {
 		TextureScreen.width = IniFile.textureWidth;
 		TextureScreen.spacing = IniFile.textureSpacing;
 	}
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void txt2pix(TXPNT texturePoint, POINT* screenPoint) {
@@ -3340,7 +3337,7 @@ void drwtxtr() {
 	pixelSpace = static_cast<double>(StitchWindowClientRect.bottom) / StitchWindowClientRect.right;
 	TextureScreen.lines = floor(TextureScreen.width / TextureScreen.spacing);
 	extraWidth = TextureScreen.spacing*(TextureScreen.lines + 2);
-	if (rstMap(CHKTX))
+	if (StateMap.testAndReset(CHKTX))
 		chktx();
 	if (pixelSpace > editSpace) {
 		TextureScreen.xOffset = 0;
@@ -3449,7 +3446,7 @@ void txtrbut() {
 	if (txbutfn(&TempTexturePoints[TextureScreen.index])) {
 		savtxt();
 		TextureScreen.index++;
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 	else
 		rstxt();
@@ -3492,7 +3489,7 @@ void tritx() {
 }
 
 void setxmov() {
-	setMap(TXTMOV);
+	StateMap.set(TXTMOV);
 	TextureCursorLocation.x = SelectTexturePointsOrigin.x = Msg.pt.x - StitchWindowOrigin.x;
 	TextureCursorLocation.y = SelectTexturePointsOrigin.y = Msg.pt.y - StitchWindowOrigin.y;
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
@@ -3584,7 +3581,7 @@ void setxclp() {
 
 	deorg(&screenOffset);
 	px2ed(screenOffset, &editorOffset);
-	if (rstMap(TXHCNTR))
+	if (StateMap.testAndReset(TXHCNTR))
 		editorOffset.x = (TextureScreen.lines*TextureScreen.spacing) / 2 + TextureScreen.xOffset - TextureScreen.formCenter.x + TextureScreen.spacing / 2;
 	else
 		editorOffset.x -= TextureScreen.formCenter.x;
@@ -3608,12 +3605,12 @@ void stxlin() {
 	fPOINT	point0;
 	fPOINT	point1;
 
-	rstMap(TXTMOV);
+	StateMap.reset(TXTMOV);
 	deorg(&offset);
 	px2ed(offset, &point1);
 	px2ed(FormLines[0], &point0);
 	dutxlin(point0, point1);
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void ed2txp(POINT offset, TXPNT* textureRecord) {
@@ -3646,7 +3643,7 @@ void txtrup() {
 	POINT		offset = {};
 	TXPNT*		texturePoint = nullptr;
 
-	if (rstMap(TXTMOV)) {
+	if (StateMap.testAndReset(TXTMOV)) {
 		savtxt();
 		deorg(&offset);
 		offset.x -= SelectTexturePointsOrigin.x;
@@ -3676,7 +3673,7 @@ void txtrup() {
 		dutxrct(&TextureRect);
 	}
 	else {
-		if (rstMap(BZUMIN)) {
+		if (StateMap.testAndReset(BZUMIN)) {
 			deorg(&offset);
 			ed2txp(ZoomBoxLine[0], &highestTexturePoint);
 			ed2txp(offset, &lowestTexturePoint);
@@ -3703,7 +3700,7 @@ void txtrup() {
 			dutxrct(&TextureRect);
 		}
 	}
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void angrct(fRECTANGLE* rectangle) {
@@ -3780,9 +3777,9 @@ void txtclp() {
 				frmcpy(&AngledForm, SelectedForm);
 				MoveMemory(&AngledFormVertices, &SelectedForm[1], sizeof(fPOINT)*SelectedForm->vertexCount);
 				AngledForm.vertices = AngledFormVertices;
-				rstMap(TXTLIN);
-				setMap(TXTCLP);
-				setMap(TXTMOV);
+				StateMap.reset(TXTLIN);
+				StateMap.set(TXTCLP);
+				StateMap.set(TXTMOV);
 				setxfrm();
 				TextureCursorLocation.x = Msg.pt.x - StitchWindowOrigin.x;
 				TextureCursorLocation.y = Msg.pt.y - StitchWindowOrigin.y;
@@ -3790,8 +3787,8 @@ void txtclp() {
 			GlobalUnlock(ClipMemory);
 		}
 	}
-	setMap(RESTCH);
-	rstMap(WASWROT);
+	StateMap.set(RESTCH);
+	StateMap.reset(WASWROT);
 }
 
 void dutxtlin() {
@@ -3800,14 +3797,14 @@ void dutxtlin() {
 }
 
 void txtrmov() {
-	if (chkMap(TXTLIN)) {
+	if (StateMap.test(TXTLIN)) {
 		dutxtlin();
 		deorg(&FormLines[1]);
 		dutxtlin();
 		return;
 	}
-	if (chkMap(TXTCLP)) {
-		if (setMap(WASWROT))
+	if (StateMap.test(TXTCLP)) {
+		if (StateMap.testAndSet(WASWROT))
 			ritxfrm();
 		TextureCursorLocation.x = Msg.pt.x - StitchWindowOrigin.x;
 		TextureCursorLocation.y = Msg.pt.y - StitchWindowOrigin.y;
@@ -3826,9 +3823,9 @@ void txtrmov() {
 void txtlin() {
 	deorg(FormLines);
 	deorg(&FormLines[1]);
-	rstMap(TXTCLP);
-	setMap(TXTLIN);
-	setMap(TXTMOV);
+	StateMap.reset(TXTCLP);
+	StateMap.set(TXTLIN);
+	StateMap.set(TXTMOV);
 }
 
 void butsid(unsigned windowId) {
@@ -3884,7 +3881,7 @@ void txpar() {
 
 void txvrt() {
 	if (TextureScreen.index) {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			fvars(ClosestFormToCursor);
 			SelectedForm->fillType = TXVRTF;
 			txpar();
@@ -3894,7 +3891,7 @@ void txvrt() {
 
 void txhor() {
 	if (TextureScreen.index) {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			fvars(ClosestFormToCursor);
 			SelectedForm->fillType = TXHORF;
 			txpar();
@@ -3904,7 +3901,7 @@ void txhor() {
 
 void txang() {
 	if (TextureScreen.index) {
-		if (chkMap(FORMSEL)) {
+		if (StateMap.test(FORMSEL)) {
 			fvars(ClosestFormToCursor);
 			SelectedForm->fillType = TXANGF;
 			SelectedForm->angleOrClipData.angle = static_cast<float>(IniFile.fillAngle);
@@ -3995,7 +3992,7 @@ void altx() {
 	unsigned	iLine = 0, iPoint = 0;
 	float		halfHeight = 0.0;
 
-	if (chkMap(FORMSEL)) {
+	if (StateMap.test(FORMSEL)) {
 		halfHeight = TextureScreen.areaHeight / 2;
 		clRmap((TextureScreen.lines >> 5) + 1);
 		for (iPoint = 0; iPoint < TextureScreen.index; iPoint++)
@@ -4017,7 +4014,7 @@ enum {
 };
 
 void dutxfn(unsigned textureType) {
-	if (chkMap(FORMSEL)) {
+	if (StateMap.test(FORMSEL)) {
 		altx();
 		delmclp(ClosestFormToCursor);
 		delsac(ClosestFormToCursor);
@@ -4078,7 +4075,7 @@ void dutxmir() {
 		iPoint--;
 	}
 	TextureScreen.index = iMirrorPoint;
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 BOOL chkbut() {
@@ -4123,12 +4120,12 @@ void txtlbut() {
 	fvars(ClosestFormToCursor);
 	if (chkbut())
 		return;
-	if (rstMap(TXTCLP)) {
+	if (StateMap.testAndReset(TXTCLP)) {
 		savtxt();
 		setxclp();
 		return;
 	}
-	if (rstMap(TXTLIN)) {
+	if (StateMap.testAndReset(TXTLIN)) {
 		savtxt();
 		stxlin();
 		return;
@@ -4148,12 +4145,12 @@ void txtlbut() {
 		SelectedTexturePointsCount = 1;
 		setxmov();
 		dutxrct(&TextureRect);
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 		return;
 	}
 	SelectedTexturePointsCount = 0;
-	setMap(BZUMIN);
-	rstMap(BZUM);
+	StateMap.set(BZUMIN);
+	StateMap.reset(BZUM);
 	ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
 	ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 	ZoomBoxLine[4].y = ZoomBoxLine[0].y - 1;
@@ -4172,13 +4169,13 @@ void redtbak() {
 	if (textureHistoryItem->texturePoint) {
 		MoveMemory (TempTexturePoints, textureHistoryItem->texturePoint, textureHistoryItem->count * sizeof (TXPNT));
 	}
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void txbak() {
 	unsigned	iHistory = 0;
 
-	if (chkMap(WASTXBAK)) {
+	if (StateMap.test(WASTXBAK)) {
 		SelectedTexturePointsCount = 0;
 		for (iHistory = 0; iHistory < 16; iHistory++) {
 			if (TextureHistory[TextureHistoryIndex].width)
@@ -4195,7 +4192,7 @@ txbak1:;
 void nxbak() {
 	unsigned	iHistory = 0;
 
-	if (chkMap(WASTXBAK)) {
+	if (StateMap.test(WASTXBAK)) {
 		for (iHistory = 0; iHistory < 16; iHistory++) {
 			txrfor();
 			if (TextureHistory[TextureHistoryIndex].width)
@@ -4226,13 +4223,13 @@ void txtdel() {
 		}
 		SelectedTexturePointsCount = 0;
 		TextureScreen.index = iOutputPoint;
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 		return;
 	}
 	if (TextureScreen.index && txtclos(&iClosestPoint)) {
 		MoveMemory(&TempTexturePoints[iClosestPoint], &TempTexturePoints[iClosestPoint + 1], (TextureScreen.index - iClosestPoint) * sizeof(TXPNT));
 		TextureScreen.index--;
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 }
 
@@ -4241,7 +4238,7 @@ void txdelal() {
 	savtxt();
 	TextureScreen.index = 0;
 	rstxt();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void chktxnum() {
@@ -4256,7 +4253,7 @@ void chktxnum() {
 				savtxt();
 				TextureScreen.areaHeight = value;
 				IniFile.textureHeight = value;
-				setMap(CHKTX);
+				StateMap.set(CHKTX);
 				break;
 
 			case HTXWID:
@@ -4264,7 +4261,7 @@ void chktxnum() {
 				savtxt();
 				TextureScreen.width = value;
 				IniFile.textureWidth = value;
-				setMap(CHKTX);
+				StateMap.set(CHKTX);
 				break;
 
 			case HTXSPAC:
@@ -4273,29 +4270,29 @@ void chktxnum() {
 				TextureScreen.spacing = value;
 				IniFile.textureSpacing = value;
 				TextureScreen.width = value*TextureScreen.lines + value / 2;
-				setMap(CHKTX);
+				StateMap.set(CHKTX);
 				break;
 		}
 	}
 	TextureInputIndex = 0;
 	DestroyWindow(SideWindowButton);
 	SideWindowButton = 0;
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void txcntrv() {
-	if (rstMap(TXTCLP)) {
-		setMap(TXHCNTR);
+	if (StateMap.testAndReset(TXTCLP)) {
+		StateMap.set(TXHCNTR);
 		savtxt();
 		setxclp();
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 }
 
 void txof() {
 	butxt(HBOXSEL, StringTable[STR_BOXSEL]);
 	redraw(ButtonWin[HHID]);
-	if (chkMap(UPTO))
+	if (StateMap.test(UPTO))
 		butxt(HUPTO, StringTable[STR_UPON]);
 	else
 		butxt(HUPTO, StringTable[STR_UPOF]);
@@ -4306,11 +4303,11 @@ void txof() {
 		delete[] SelectedTexturePointsList; // Allocated in setshft or dutxtfil
 		SelectedTexturePointsList = nullptr;
 	}
-	rstMap(TXTRED);
+	StateMap.reset(TXTRED);
 }
 
 BOOL istxclp() {
-	if (chkMap(TXTMOV) && chkMap(TXTCLP))
+	if (StateMap.test(TXTMOV) && StateMap.test(TXTCLP))
 		return 1;
 	else
 		return 0;
@@ -4389,7 +4386,7 @@ void txnudg(int deltaX, float deltaY) {
 		}
 	}
 	dutxrct(&TextureRect);
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }
 
 void txsnap() {
@@ -4415,7 +4412,7 @@ void txsnap() {
 				texturePoint->y = yStep*IniFile.gridSize;
 			}
 		}
-		setMap(RESTCH);
+		StateMap.set(RESTCH);
 	}
 }
 
@@ -4436,7 +4433,7 @@ void txtkey(unsigned keyCode) {
 			case 'Q':
 
 				rstxt();
-				setMap(RESTCH);
+				StateMap.set(RESTCH);
 				break;
 
 			case 8:	//backspace
@@ -4462,7 +4459,7 @@ txskp:;
 		case 'Q':
 
 			rstxt();
-			setMap(RESTCH);
+			StateMap.set(RESTCH);
 			break;
 
 		case 0xdb:	//[
@@ -4503,12 +4500,12 @@ txskp:;
 		case 'Z':
 		case 'B':
 
-			if (!setMap(LASTXBAK)) {
+			if (!StateMap.testAndSet(LASTXBAK)) {
 				savtxt();
 				txrbak();
 			}
 			else {
-				if (rstMap(TXBDIR))
+				if (StateMap.testAndReset(TXBDIR))
 					txrbak();
 			}
 			txbak();
@@ -4522,8 +4519,8 @@ txskp:;
 
 		case 'N':
 
-			setMap(LASTXBAK);
-			if (!setMap(TXBDIR))
+			StateMap.set(LASTXBAK);
+			if (!StateMap.testAndSet(TXBDIR))
 				txrfor();
 			nxbak();
 			return;
@@ -4567,7 +4564,7 @@ txskp:;
 			txsnap();
 			break;
 	}
-	rstMap(LASTXBAK);
+	StateMap.reset(LASTXBAK);
 }
 
 void setxt() {
@@ -4576,7 +4573,7 @@ void setxt() {
 
 	savtxt();
 	SelectedForm->wordParam = 0;
-	setMap(TXFIL);
+	StateMap.set(TXFIL);
 	ClipRectSize.cx = SelectedForm->fillSpacing;
 	ClipRectSize.cy = SelectedForm->fillInfo.texture.height;
 	TextureSegments = new RNGCNT[SelectedForm->fillInfo.texture.lines]();
@@ -4606,7 +4603,7 @@ void rtrtx() {
 }
 
 void rtrclp() {
-	if (chkMap(FORMSEL)) {
+	if (StateMap.test(FORMSEL)) {
 		fvars(ClosestFormToCursor);
 		if (istx(ClosestFormToCursor))
 			rtrtx();
@@ -4672,19 +4669,19 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 				case IDC_DESWID:
 
 					if ((wparam >> 16) == EN_CHANGE)
-						rstMap(DESCHG);
+						StateMap.reset(DESCHG);
 					break;
 
 				case IDC_DESHI:
 
 					if ((wparam >> 16) == EN_CHANGE)
-						setMap(DESCHG);
+						StateMap.set(DESCHG);
 					break;
 
 				case IDC_DUASP:
 
 					if (!chkasp(&designSize)) {
-						if (chkMap(DESCHG))
+						if (StateMap.test(DESCHG))
 							setstxt(IDC_DESWID, designSize.y / DesignAspectRatio);
 						else
 							setstxt(IDC_DESHI, designSize.x*DesignAspectRatio);
@@ -4767,9 +4764,9 @@ void nudsiz() {
 }
 
 void dushft() {
-	//	setMap(BOXSLCT);
-	setMap(BZUMIN);
-	//	setMap(NOSEL);
+	//	StateMap.set(BOXSLCT);
+	StateMap.set(BZUMIN);
+	//	StateMap.set(NOSEL);
 	ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
 	ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 	ZoomBoxLine[4].y = ZoomBoxLine[0].y - 1;
@@ -4783,16 +4780,16 @@ extern void bBox();
 extern void pxCor2stch(POINT pnt);
 
 void mvshft() {
-	if (chkMap(BOXZUM) && setMap(VCAPT))
+	if (StateMap.test(BOXZUM) && StateMap.testAndSet(VCAPT))
 		SetCapture(ThrEdWindow);
-	if (chkMap(BZUMIN)) {
+	if (StateMap.test(BZUMIN)) {
 		if (Msg.wParam&MK_LBUTTON) {
-			if (setMap(VCAPT))
+			if (StateMap.testAndSet(VCAPT))
 				SetCapture(ThrEdWindow);
 			unbBox();
 			ZoomBoxLine[1].x = ZoomBoxLine[2].x = Msg.pt.x - StitchWindowOrigin.x;
 			ZoomBoxLine[2].y = ZoomBoxLine[3].y = Msg.pt.y - StitchWindowOrigin.y;
-			setMap(BZUM);
+			StateMap.set(BZUM);
 			bBox();
 		}
 	}
@@ -4817,25 +4814,25 @@ void setshft() {
 	savtxt();
 	SelectedTexturePointsList = new unsigned[MAXITEMS];
 	unbBox();
-	rstMap(BZUMIN);
+	StateMap.reset(BZUMIN);
 	pxCor2stch(ZoomBoxLine[0]);
 	selectionRect.top = SelectedPoint.y;
 	selectionRect.left = SelectedPoint.x;
 	pxCor2stch(ZoomBoxLine[2]);
 	selectionRect.bottom = SelectedPoint.y;
 	selectionRect.right = SelectedPoint.x;
-	rstMap(TXIN);
+	StateMap.reset(TXIN);
 	TextureScreen.index = 0;
 	line = 1;
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (inrct(selectionRect, StitchBuffer[iStitch])) {
-			setMap(TXIN);
+			StateMap.set(TXIN);
 			TempTexturePoints[TextureScreen.index].line = line;
 			TempTexturePoints[TextureScreen.index].y = StitchBuffer[iStitch].y - selectionRect.bottom;
 			TextureScreen.index++;
 		}
 		else {
-			if (rstMap(TXIN))
+			if (StateMap.testAndReset(TXIN))
 				line++;
 		}
 	}
@@ -4843,14 +4840,14 @@ void setshft() {
 	TextureScreen.spacing = (selectionRect.right - selectionRect.left) / line;
 	TextureScreen.areaHeight = selectionRect.top - selectionRect.bottom;
 	TextureScreen.width = TextureScreen.spacing*line + TextureScreen.spacing / 2;
-	setMap(TXTRED);
-	setMap(RESTCH);
+	StateMap.set(TXTRED);
+	StateMap.set(RESTCH);
 }
 
 void setclpspac() {
 	msgflt(IDS_CLPSPAC, IniFile.clipOffset / PFGRAN);
-	setMap(NUMIN);
-	setMap(SCLPSPAC);
+	StateMap.set(NUMIN);
+	StateMap.set(SCLPSPAC);
 	numWnd();
 }
 
@@ -4939,7 +4936,7 @@ void redtx() {
 							}
 						}
 					}
-					setMap(WASTXBAK);
+					StateMap.set(WASTXBAK);
 				}
 			}
 		}
@@ -4970,13 +4967,13 @@ void setangf(double angle) {
 void chgwrn() {
 	toglu(WRNOF);
 	wrnmen();
-	setMap(DUMEN);
+	StateMap.set(DUMEN);
 }
 
 void chgchk(int code) {
 	IniFile.dataCheck = code;
 	chkmen();
-	setMap(DUMEN);
+	StateMap.set(DUMEN);
 }
 
 void lodchk() {
@@ -5329,7 +5326,7 @@ void repar() {
 	if (repairType&BADTX)
 		reptx();
 	lodchk();
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 	if (RepairString != MsgBuffer) {
 		RepairString--;
 		*RepairString = 0;
@@ -5340,5 +5337,5 @@ void repar() {
 void tst() {
 	strcpy_s(IniFile.designerName, "Mr");
 	strcpy_s(ThrName, IniFile.designerName);
-	setMap(RESTCH);
+	StateMap.set(RESTCH);
 }

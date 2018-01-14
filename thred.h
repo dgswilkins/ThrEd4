@@ -21,7 +21,7 @@
 //#pragma warning(disable:26497) // f.4		This function could be marked constexpr if compile-time evaluation is desired
 #pragma warning(disable:26499) //			Could not find any lifetime tracking information
 
-#include "EnumMask.h"
+#include "EnumMap.h"
 
 //compile switches
 #define		__UseASM__	0
