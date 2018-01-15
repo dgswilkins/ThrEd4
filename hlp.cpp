@@ -216,7 +216,7 @@ TCHAR*	RepairString;			//Repair Type
 
 TCHAR	HelpBuffer[HBUFSIZ];	//message formatting buffer
 
-void adbad(unsigned code, unsigned count) {
+void adbad(unsigned code, unsigned count) noexcept {
 
 	LoadString(ThrEdInstance, code, RepairString, sizeof(MsgBuffer) - strlen(RepairString));
 	RepairString = &RepairString[strlen(RepairString)];
@@ -283,7 +283,7 @@ void crmsg(TCHAR* fileName) {
 	shoMsg(HelpBuffer);
 }
 
-void butxt(unsigned iButton, TCHAR* buttonText) {
+void butxt(unsigned iButton, const TCHAR* buttonText) {
 
 	if (StateMap.test(WASTRAC) && iButton > HNUM) {
 
@@ -307,7 +307,7 @@ void ritnum(unsigned code, unsigned value) {
 	butxt(HNUM, HelpBuffer);
 }
 
-void msgstr(unsigned code) {
+void msgstr(unsigned code) noexcept {
 
 	LoadString(ThrEdInstance, code, MsgBuffer, MSGSIZ);
 }

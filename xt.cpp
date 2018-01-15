@@ -8,7 +8,7 @@
 
 void		chktxnum();
 void		deltx();
-unsigned	dutyp(unsigned attribute);
+unsigned	dutyp(unsigned attribute) noexcept;
 void		redtbak();
 void		repar();
 void		rotbak();
@@ -103,7 +103,7 @@ extern	fPOINT*		adflt(unsigned count);
 extern	SATCON*		adsatk(unsigned	count);
 extern	void		angclpfn();
 extern	void		bakseq();
-extern	void		butxt(unsigned iButton, TCHAR* buttonText);
+extern	void		butxt(unsigned iButton, const TCHAR* buttonText);
 extern	void		centir();
 extern	void		chkhup();
 extern	BOOL		chkmax(unsigned arg0, unsigned arg1);
@@ -145,7 +145,7 @@ extern	void		lcon();
 extern	void		makspac(unsigned start, unsigned count);
 extern	void		mdufrm();
 extern	float		midl(float high, float low);
-extern	void		moveStitch(fPOINTATTR* destination, fPOINTATTR* source);
+extern	void		moveStitch(fPOINTATTR* destination, const fPOINTATTR* source);
 extern	void		movStch();
 extern	void		movStch();
 extern	void		msgflt(unsigned messageId, float value);
@@ -283,12 +283,12 @@ void setfchk() {
 
 #ifdef _DEBUG
 
-void prbug() {
+void prbug() noexcept {
 	OutputDebugString(MsgBuffer);
 }
 #endif
 
-BOOL istx(unsigned iForm) {
+BOOL istx(unsigned iForm) noexcept {
 	FRMHED* pfrm;
 
 	pfrm = &FormList[iForm];
@@ -301,7 +301,7 @@ BOOL istx(unsigned iForm) {
 	return 0;
 }
 
-TXPNT* adtx(int count) {
+TXPNT* adtx(int count) noexcept {
 
 	unsigned iPoint = TextureIndex;
 
@@ -309,7 +309,7 @@ TXPNT* adtx(int count) {
 	return &TexturePointsBuffer[iPoint];
 }
 
-void txspac(int start, unsigned count) {
+void txspac(int start, unsigned count) noexcept {
 	unsigned	iForm;
 
 	MoveMemory(&TexturePointsBuffer[start + count], &TexturePointsBuffer[start], (TextureIndex - start) * sizeof(TXPNT));
@@ -332,17 +332,17 @@ void rstxt() {
 	StateMap.set(RESTCH);
 }
 
-void txrbak() {
+void txrbak() noexcept {
 	TextureHistoryIndex--;
 	TextureHistoryIndex &= 0xf;
 }
 
-void txrfor() {
+void txrfor() noexcept {
 	TextureHistoryIndex++;
 	TextureHistoryIndex &= 0xf;
 }
 
-BOOL chktxh(TXHST* historyItem) {
+BOOL chktxh(const TXHST* historyItem) noexcept {
 	unsigned iPoint = 0;
 
 	if (historyItem->count != TextureScreen.index)
@@ -387,7 +387,7 @@ void savtxt() {
 	}
 }
 
-void deorg(POINT* point) {
+void deorg(POINT* point) noexcept {
 	point->x = Msg.pt.x - StitchWindowOrigin.x;
 	point->y = Msg.pt.y - StitchWindowOrigin.y;
 }
@@ -420,13 +420,13 @@ constexpr float duxrat(float strt, float fin) {
 	return (fin - strt)*FeatherRatioLocal + strt;
 }
 
-void duxrats(unsigned start, unsigned finish, fPOINT* point) {
+void duxrats(unsigned start, unsigned finish, fPOINT* point) noexcept {
 
 	point->x = duxrat(BSequence[finish].x, BSequence[start].x);
 	point->y = duxrat(BSequence[finish].y, BSequence[start].y);
 }
 
-void durats(unsigned iSequence, fPOINT* point) {
+void durats(unsigned iSequence, fPOINT* point) noexcept {
 
 	double	stitchLength = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x, BSequence[iSequence + 1].y - BSequence[iSequence].y);
 	fPOINT	adjustedPoint = {};
@@ -446,21 +446,21 @@ void durats(unsigned iSequence, fPOINT* point) {
 	}
 }
 
-void xoseq(unsigned iSequence) {
+void xoseq(unsigned iSequence) noexcept {
 
 	OSequence[OutputIndex].x = BSequence[iSequence].x;
 	OSequence[OutputIndex].y = BSequence[iSequence].y;
 	OutputIndex++;
 }
 
-void xpfth(unsigned iSequence) {
+void xpfth(unsigned iSequence) noexcept {
 
 	FeatherSequence[ActivePointIndex].x = BSequence[iSequence].x;
 	FeatherSequence[ActivePointIndex].y = BSequence[iSequence].y;
 	ActivePointIndex++;
 }
 
-unsigned bpsg() {
+unsigned bpsg() noexcept {
 
 	unsigned testValue = 0;
 
@@ -557,19 +557,19 @@ void fthfn(unsigned iSequence) {
 	durats(iSequence, &OSequence[iSequence]);
 }
 
-void ratpnt(unsigned iPoint, unsigned iNextPoint, fPOINT* point) {
+void ratpnt(unsigned iPoint, unsigned iNextPoint, fPOINT* point) noexcept {
 
 	point->x = (BSequence[iNextPoint].x - BSequence[iPoint].x)*FeatherRatio + BSequence[iPoint].x;
 	point->y = (BSequence[iNextPoint].y - BSequence[iPoint].y)*FeatherRatio + BSequence[iPoint].y;
 }
 
-void midpnt(fPOINT startPoint, fPOINT endPoint, fPOINT* midPoint) {
+void midpnt(fPOINT startPoint, fPOINT endPoint, fPOINT* midPoint) noexcept {
 
-	midPoint->x = (endPoint.x - startPoint.x)*(float)0.5 + startPoint.x;
-	midPoint->y = (endPoint.y - startPoint.y)*(float)0.5 + startPoint.y;
+	midPoint->x = (endPoint.x - startPoint.x) * 0.5f + startPoint.x;
+	midPoint->y = (endPoint.y - startPoint.y) * 0.5f + startPoint.y;
 }
 
-void xratf(fPOINT startPoint, fPOINT endPoint, fPOINT* point) {
+void xratf(fPOINT startPoint, fPOINT endPoint, fPOINT* point) noexcept {
 
 	point->x = (endPoint.x - startPoint.x)*FeatherRatioLocal + startPoint.x;
 	point->y = (endPoint.y - startPoint.y)*FeatherRatioLocal + startPoint.y;
@@ -615,7 +615,7 @@ void fthrbfn(unsigned iSequence) {
 	ActivePointIndex++;
 }
 
-void duoseq(unsigned iSequence) {
+void duoseq(unsigned iSequence) noexcept {
 
 	OSequence[iSequence].x = BSequence[iSequence].x;
 	OSequence[iSequence].y = BSequence[iSequence].y;
@@ -812,16 +812,16 @@ void fethr() {
 	}
 }
 
-ULARGE_INTEGER  tim2int(FILETIME time) {
+constexpr ULARGE_INTEGER  tim2int(FILETIME time) noexcept {
 
-	ULARGE_INTEGER  op;
+	ULARGE_INTEGER  op = { {0,0} };
 
 	op.LowPart = time.dwLowDateTime;
 	op.HighPart = time.dwHighDateTime;
 	return op;
 }
 
-int fil2crd(const char* fileName) {
+int fil2crd(const char* fileName) noexcept {
 	STARTUPINFO			startupInfo = {};
 	PROCESS_INFORMATION	processInfo = {};
 	int					errorCode = 0;
@@ -846,7 +846,7 @@ int fil2crd(const char* fileName) {
 	return errorCode;
 }
 
-BOOL chkp2cnam(char* fileName) {
+BOOL chkp2cnam(const char* fileName) noexcept {
 
 	HANDLE	handleP2C;
 
@@ -939,7 +939,7 @@ void pes2crd() {
 	fil2crd(AuxName);
 }
 
-void sidlen(unsigned start, unsigned finish, double* insideLength, double* outsideLength) {
+void sidlen(unsigned start, unsigned finish, double* insideLength, double* outsideLength) noexcept {
 	*insideLength += hypot(InsidePoints[finish].x - InsidePoints[start].x, InsidePoints[finish].x - InsidePoints[start].x);
 	*outsideLength += hypot(OutsidePoints[finish].x - OutsidePoints[start].x, OutsidePoints[finish].x - OutsidePoints[start].x);
 }
@@ -979,7 +979,7 @@ void delwlk(unsigned code) {
 	}
 }
 
-void chkuseq() {
+void chkuseq() noexcept {
 #if BUGBAK
 	unsigned index;
 
@@ -1000,7 +1000,7 @@ void chkuseq() {
 
 	if (OutputIndex) {
 		if (SelectedForm->underlayStitchLen < MINWLK)
-			SelectedForm->underlayStitchLen = (float)MINWLK;
+			SelectedForm->underlayStitchLen = MINWLK;
 		if (SelectedForm->underlayStitchLen > MAXWLK)
 			SelectedForm->underlayStitchLen = MAXWLK;
 		underlayStitchLength = SelectedForm->underlayStitchLen;
@@ -1036,7 +1036,7 @@ void chkuseq() {
 #endif
 }
 
-void ritwlk() {
+void ritwlk() noexcept {
 	if (OutputIndex) {
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
@@ -1046,7 +1046,7 @@ void ritwlk() {
 	}
 }
 
-void ritcwlk() {
+void ritcwlk() noexcept {
 	if (OutputIndex) {
 
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
@@ -1175,7 +1175,7 @@ void fnuang() {
 	fvars(ClosestFormToCursor);
 }
 
-void ritund() {
+void ritund() noexcept {
 	if (SequenceIndex) {
 
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
@@ -1186,7 +1186,7 @@ void ritund() {
 	}
 }
 
-void undclp() {
+void undclp() noexcept {
 	ClipRectSize.cx = ClipRect.bottom = ClipRect.left = ClipRect.right = ClipBuffer[0].x = ClipBuffer[1].x = ClipBuffer[0].y = 0;
 	ClipRectSize.cy = ClipRect.top = ClipBuffer[1].y = SelectedForm->underlayStitchLen;
 	ClipStitchCount = 2;
@@ -1260,7 +1260,7 @@ void fncwlk() {
 	ritcwlk();
 }
 
-BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
+BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
 	UNREFERENCED_PARAMETER(lparam);
 
 	TCHAR		buf[HBUFSIZ] = { 0 };
@@ -1355,7 +1355,7 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	return 0;
 }
 
-void dufdef() {
+void dufdef() noexcept {
 
 	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, (DLGPROC)fthdefprc);
 }
@@ -1456,7 +1456,7 @@ void selalfrm() {
 	StateMap.set(RESTCH);
 }
 
-void chkdaz() {
+void chkdaz() noexcept {
 
 	if (!IniFile.daisyPetalPoints)
 		IniFile.daisyPetalPoints = 1;
@@ -1724,8 +1724,8 @@ void dasyfrm() {
 		}
 	}
 	if (chku(DAZHOL)) {
-		CurrentFormVertices[fref - 1].y += (float)0.01;
-		CurrentFormVertices[fref].y += (float)0.01;
+		CurrentFormVertices[fref - 1].y += 0.01f;
+		CurrentFormVertices[fref].y += 0.01f;
 	}
 	SelectedForm->vertexCount = iVertex;
 	if (chku(DAZD)) {
@@ -1747,9 +1747,10 @@ void dasyfrm() {
 	mdufrm();
 }
 
-void durec(OREC* record) {
-	unsigned	attribute = 0;
-	fPOINTATTR*	stitch = &StitchBuffer[record->start];
+void durec(OREC* record) noexcept {
+
+	unsigned			attribute = 0;
+	const fPOINTATTR*	stitch = &StitchBuffer[record->start];
 	
 	record->type = StitchTypes[dutyp(stitch->attribute)];
 	attribute = stitch->attribute&SRTMSK;
@@ -1797,7 +1798,7 @@ int refcmp(const void *arg1, const void *arg2) {
 	return (int)record1->form - record2->form;
 }
 #else
-int recmp(const void *arg1, const void *arg2) {
+int recmp(const void *arg1, const void *arg2) noexcept {
 	OREC record1 = **static_cast<OREC * const *>(arg1);
 	OREC record2 = **static_cast<OREC * const *>(arg2);
 
@@ -1814,7 +1815,7 @@ int recmp(const void *arg1, const void *arg2) {
 	return static_cast<int>(ColorOrder[record1.color]) - ColorOrder[record2.color];
 }
 
-int refcmp(const void *arg1, const void *arg2) {
+int refcmp(const void *arg1, const void *arg2) noexcept {
 	OREC record1 = **static_cast<OREC * const *>(arg1);
 	OREC record2 = **static_cast<OREC * const *>(arg2);
 
@@ -1824,7 +1825,7 @@ int refcmp(const void *arg1, const void *arg2) {
 }
 #endif
 
-BOOL chkrdun(SRTREC* stitchRecord) {
+BOOL chkrdun(const SRTREC* stitchRecord) noexcept {
 	unsigned iStitch;
 
 	for (iStitch = stitchRecord->start; iStitch < stitchRecord->finish; iStitch++) {
@@ -1834,7 +1835,7 @@ BOOL chkrdun(SRTREC* stitchRecord) {
 	return 0;
 }
 
-double precjmps(SRTREC* sortRecord) {
+double precjmps(const SRTREC* sortRecord) {
 	unsigned		totalJumps;
 	double			length;
 	double			minimumLength;
@@ -1911,7 +1912,7 @@ unsigned duprecs(SRTREC* sortRecord) {
 
 #ifdef _DEBUG
 
-void dmprec(OREC** stitchRegion, unsigned count) {
+void dmprec(OREC** stitchRegion, unsigned count) noexcept {
 	unsigned iRegion;
 
 	for (iRegion = 0; iRegion < count; iRegion++) {
@@ -1929,7 +1930,7 @@ void dmprec(OREC** stitchRegion, unsigned count) {
 }
 #endif
 
-BOOL srtchk(OREC** stitchRegion, unsigned count, unsigned* badForm) {
+BOOL srtchk(OREC** stitchRegion, unsigned count, unsigned* badForm) noexcept {
 
 	unsigned	iRegion = 1;
 	unsigned	form = stitchRegion[0]->form; 
@@ -2083,7 +2084,7 @@ srtskp:;
 	delete[] stitchRegion;
 }
 
-unsigned dutyp(unsigned attribute) {
+unsigned dutyp(unsigned attribute) noexcept {
 #if  __UseASM__
 	_asm
 	{
@@ -2132,7 +2133,7 @@ typedef struct _atfld {
 	unsigned	user;
 }ATFLD;
 
-void duatf(unsigned ind) {
+void duatf(unsigned ind) noexcept {
 	char		attributeBuffer[256] = { 0 };
 	unsigned	attribute = StitchBuffer[ind].attribute;
 	ATFLD		attributeFields = { (attribute&COLMSK),
@@ -2156,7 +2157,7 @@ void duatf(unsigned ind) {
 	OutputDebugString(attributeBuffer);
 }
 
-void dmpat() {
+void dmpat() noexcept {
 	unsigned iStitch = 0, attribute = StitchBuffer[0].attribute;
 
 	duatf(0);
@@ -2314,7 +2315,7 @@ void fdelstch() {
 	}
 }
 
-BOOL lastcol(unsigned index, fPOINT* point) {
+BOOL lastcol(unsigned index, fPOINT* point) noexcept {
 	unsigned color;
 
 	color = InterleaveSequenceIndices[index].color;
@@ -2355,7 +2356,7 @@ void duint(unsigned offset, unsigned code, INTINF *ilData) {
 	}
 }
 
-BOOL isfil() {
+BOOL isfil() noexcept {
 	if (SelectedForm->fillType)
 		return 1;
 	if (SelectedForm->edgeType)
@@ -3222,12 +3223,12 @@ void dutxtfil() {
 	StateMap.set(RESTCH);
 }
 
-void txt2pix(TXPNT texturePoint, POINT* screenPoint) {
+void txt2pix(TXPNT texturePoint, POINT* screenPoint) noexcept {
 	screenPoint->y = TextureScreen.height - texturePoint.y / TextureScreen.areaHeight*TextureScreen.height + TextureScreen.top;
 	screenPoint->x = (texturePoint.line*TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
 }
 
-void txtxfn(POINT reference, int offsetPixels) {
+void txtxfn(POINT reference, int offsetPixels) noexcept {
 	POINT line[2];
 
 	line[0].x = line[1].x = reference.x;
@@ -3240,7 +3241,7 @@ void txtxfn(POINT reference, int offsetPixels) {
 	Polyline(StitchWindowMemDC, line, 2);
 }
 
-void dutxtx(int index, int offsetPixels) {
+void dutxtx(int index, int offsetPixels) noexcept {
 	POINT	ref;
 
 	txt2pix(TempTexturePoints[index], &ref);
@@ -3252,7 +3253,7 @@ void dutxtx(int index, int offsetPixels) {
 	txtxfn(ref, offsetPixels);
 }
 
-void txrct2rct(TXTRCT textureRect, RECT* rectangle) {
+void txrct2rct(TXTRCT textureRect, RECT* rectangle) noexcept {
 	TXPNT	texturePoint = { textureRect.top ,textureRect.left };
 	POINT	point = {};
 
@@ -3266,25 +3267,25 @@ void txrct2rct(TXTRCT textureRect, RECT* rectangle) {
 	rectangle->bottom = point.y + IniFile.textureEditorSize;
 }
 
-void ed2px(fPOINT editPoint, POINT* point) {
+void ed2px(fPOINT editPoint, POINT* point) noexcept {
 	point->x = editPoint.x / TextureScreen.editToPixelRatio;
 	point->y = StitchWindowClientRect.bottom - editPoint.y / TextureScreen.editToPixelRatio;
 }
 
-void px2ed(POINT point, fPOINT* editPoint) {
+void px2ed(POINT point, fPOINT* editPoint) noexcept {
 	editPoint->x = point.x*TextureScreen.editToPixelRatio;
 	editPoint->y = TextureScreen.screenHeight - point.y*TextureScreen.editToPixelRatio;
 }
 
-void bxtxt(unsigned iButton, TCHAR* string) {
+void bxtxt(unsigned iButton, const TCHAR* string) noexcept {
 	SetWindowText(ButtonWin[iButton], string);
 }
 
-void lodhbuf(unsigned iString) {
+void lodhbuf(unsigned iString) noexcept {
 	LoadString(ThrEdInstance, iString, HelpBuffer, HBUFSIZ);
 }
 
-void hlpflt(unsigned iMessage, unsigned iButton, float data) {
+void hlpflt(unsigned iMessage, unsigned iButton, float data) noexcept {
 	lodhbuf(iMessage);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, data);
 	bxtxt(iButton, MsgBuffer);
@@ -3307,7 +3308,7 @@ void drwtxbut() {
 	SetWindowText(ButtonWin[HTXMIR + 1], "");
 }
 
-void chktx() {
+void chktx() noexcept {
 	unsigned iPoint = 0, iNextPoint = 0;
 
 	for (iPoint = 0; iPoint < TextureScreen.index; iPoint++) {
@@ -3415,7 +3416,7 @@ void drwtxtr() {
 	drwtxbut();
 }
 
-BOOL px2txt(POINT offset, TXPNT* textureRecord) {
+BOOL px2txt(POINT offset, TXPNT* textureRecord) noexcept {
 	fPOINT editPoint;
 
 	px2ed(offset, &editPoint);
@@ -3435,7 +3436,7 @@ BOOL px2txt(POINT offset, TXPNT* textureRecord) {
 	return 1;
 }
 
-BOOL txbutfn(TXPNT* textureRecord) {
+BOOL txbutfn(TXPNT* textureRecord) noexcept {
 	POINT	offset;
 
 	deorg(&offset);
@@ -3474,7 +3475,7 @@ BOOL txtclos(unsigned* closestTexturePoint) {
 	return 0;
 }
 
-void tritx() {
+void tritx() noexcept {
 	POINT	line[2] = {};
 	int		size = IniFile.textureEditorSize << 2;
 
@@ -3495,7 +3496,7 @@ void setxmov() {
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 }
 
-void ritxrct() {
+void ritxrct() noexcept {
 	POINT	offset = { (TextureCursorLocation.x - SelectTexturePointsOrigin.x),
 					   (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
 	RECT	rectangle = { (TexturePixelRect.left + offset.x),(TexturePixelRect.top + offset.y),
@@ -3509,7 +3510,7 @@ void ritxrct() {
 	Polyline(StitchWindowDC, line, 5);
 }
 
-void dutxrct(TXTRCT* textureRect) {
+void dutxrct(TXTRCT* textureRect) noexcept {
 	unsigned	iPoint = 0;
 	TXPNT*		texturePoint = nullptr;
 
@@ -3533,12 +3534,12 @@ void dutxrct(TXTRCT* textureRect) {
 		textureRect->left = textureRect->right = textureRect->top = textureRect->bottom = 0;
 }
 
-void ed2stch(fPOINT* pt) {
+void ed2stch(fPOINT* pt) noexcept {
 	pt->x -= TextureScreen.xOffset;
 	pt->y -= TextureScreen.yOffset;
 }
 
-void dutxlin(fPOINT point0, fPOINT point1) {
+void dutxlin(fPOINT point0, fPOINT point1) noexcept {
 	double	slope = 0.0;
 	float	deltaX = 0.0;
 	float	start = 0.0, finish = 0.0, swap = 0.0, yOffset = 0.0;
@@ -3613,7 +3614,7 @@ void stxlin() {
 	StateMap.set(RESTCH);
 }
 
-void ed2txp(POINT offset, TXPNT* textureRecord) {
+void ed2txp(POINT offset, TXPNT* textureRecord) noexcept {
 	fPOINT point;
 
 	px2ed(offset, &point);
@@ -3703,7 +3704,7 @@ void txtrup() {
 	StateMap.set(RESTCH);
 }
 
-void angrct(fRECTANGLE* rectangle) {
+void angrct(fRECTANGLE* rectangle) noexcept {
 	unsigned	iVertex = 0;
 
 	rectangle->left = rectangle->right = AngledFormVertices[0].x;
@@ -3720,7 +3721,7 @@ void angrct(fRECTANGLE* rectangle) {
 	}
 }
 
-void ritxfrm() {
+void ritxfrm() noexcept {
 	unsigned	iVertex = 0, vertexCount = 0;
 	POINT		offset = { (TextureCursorLocation.x - SelectTexturePointsOrigin.x),(TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
 
@@ -3791,7 +3792,7 @@ void txtclp() {
 	StateMap.reset(WASWROT);
 }
 
-void dutxtlin() {
+void dutxtlin() noexcept {
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	Polyline(StitchWindowDC, FormLines, 2);
 }
@@ -3848,7 +3849,7 @@ void butsid(unsigned windowId) {
 		NULL);
 }
 
-int txcmp(const void *arg1, const void *arg2) {
+int txcmp(const void *arg1, const void *arg2) noexcept {
 	const TXPNT	texturePoint0 = *static_cast<const TXPNT *>(arg1);
 	const TXPNT	texturePoint1 = *static_cast<const TXPNT *>(arg2);
 
@@ -4046,7 +4047,7 @@ void dutxfn(unsigned textureType) {
 	rstxt();
 }
 
-void txsrt() {
+void txsrt() noexcept {
 	qsort(TempTexturePoints, TextureScreen.index, sizeof(TXPNT), txcmp);
 }
 
@@ -4338,7 +4339,7 @@ void txgro() {
 	txsiz(1 / TXTRAT);
 }
 
-BOOL txdig(unsigned keyCode, TCHAR* character) {
+BOOL txdig(unsigned keyCode, TCHAR* character) noexcept {
 	if (isdigit(keyCode)) {
 		*character = static_cast<TCHAR>(keyCode);
 		return 1;
@@ -4568,7 +4569,7 @@ txskp:;
 }
 
 void setxt() {
-	TXPNT *	currentFormTexture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
+	const TXPNT *	currentFormTexture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
 	int				iTexturePoint = 0, iSegment = 0, count = SelectedForm->fillInfo.texture.count;
 
 	savtxt();
@@ -4612,17 +4613,17 @@ void rtrclp() {
 	}
 }
 
-void setstxt(unsigned stringIndex, float value) {
+void setstxt(unsigned stringIndex, float value) noexcept {
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), "%.2f", (value / PFGRAN));
 	SetWindowText(GetDlgItem(DesignSizeDialog, stringIndex), HelpBuffer);
 }
 
-float getstxt(unsigned stringIndex) {
+float getstxt(unsigned stringIndex) noexcept {
 	GetWindowText(GetDlgItem(DesignSizeDialog, stringIndex), HelpBuffer, HBUFSIZ);
 	return atof(HelpBuffer)*PFGRAN;
 }
 
-BOOL chkasp(fPOINT* point) {
+BOOL chkasp(fPOINT* point) noexcept {
 	point->x = getstxt(IDC_DESWID);
 	point->y = getstxt(IDC_DESHI);
 	if (point->y / point->x == DesignAspectRatio)
@@ -4692,12 +4693,13 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	return 0;
 }
 
-void sadj(fPOINTATTR* stitch) {
+// ToDo - Find a better name
+void sadj(fPOINTATTR* stitch) noexcept {
 	stitch->x = (stitch->x - DesignSizeRect.left)*DesignSizeRatio.x + DesignSizeRect.left;
 	stitch->y = (stitch->y - DesignSizeRect.bottom)*DesignSizeRatio.y + DesignSizeRect.bottom;
 }
 
-void sadj(fPOINT* point) {
+void sadj(fPOINT* point) noexcept {
 	point->x = (point->x - DesignSizeRect.left)*DesignSizeRatio.x + DesignSizeRect.left;
 	point->y = (point->y - DesignSizeRect.bottom)*DesignSizeRatio.y + DesignSizeRect.bottom;
 }
@@ -4795,7 +4797,7 @@ void mvshft() {
 	}
 }
 
-BOOL inrct(fRECTANGLE rectangle, fPOINTATTR stitch) {
+BOOL inrct(fRECTANGLE rectangle, fPOINTATTR stitch) noexcept {
 	if (stitch.x < rectangle.left)
 		return 0;
 	if (stitch.x > rectangle.right)
@@ -4851,14 +4853,14 @@ void setclpspac() {
 	numWnd();
 }
 
-BOOL CALLBACK enumch(HWND hwnd, LPARAM lParam) {
+BOOL CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	DestroyWindow(hwnd);
 	return 1;
 }
 
-void clrstch() {
+void clrstch() noexcept {
 	while (EnumChildWindows(MainStitchWin, enumch, 0));
 }
 
@@ -5029,14 +5031,14 @@ void lodchk() {
 	}
 }
 
-void chkclp(FRMHED* formHeader, BADCNTS* badData) {
+void chkclp(const FRMHED* formHeader, BADCNTS* badData) noexcept {
 	if (badData->clip == formHeader->angleOrClipData.clip - ClipPoints)
 		badData->clip += formHeader->lengthOrCount.clipCount;
 	else
 		badData->attribute |= BADCLP;
 }
 
-void chkeclp(FRMHED* formHeader, BADCNTS* badData) {
+void chkeclp(const FRMHED* formHeader, BADCNTS* badData) noexcept {
 	if (badData->clip == formHeader->borderClipData - ClipPoints)
 		badData->clip += formHeader->clipEntries;
 	else
@@ -5138,7 +5140,7 @@ void bcup(unsigned find, BADCNTS* badData) {
 		badData->tx += formHeader->fillInfo.texture.count;
 }
 
-void chkfstch() {
+void chkfstch() noexcept {
 	const unsigned	codedFormIndex = FormIndex << FRMSHFT; 
 	unsigned		iStitch = 0;
 

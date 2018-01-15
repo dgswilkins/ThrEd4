@@ -10,7 +10,11 @@
 #pragma warning(disable:26423) //			The allocation was not directly assigned to an owner
 #pragma warning(disable:26424) //			Failing to delete or assign ownership of allocation
 #pragma warning(disable:26425) //			Assigning 'return of new[]' to a static variable
+//#pragma warning(disable:26429) // f.23		Symbol is never tested for nullness, it can be marked as not_null
+//#pragma warning(disable:26438) // es.76		Avoid 'goto'
 //#pragma warning(disable:26461) // con.3		The pointer argument can be marked as a pointer to const
+//#pragma warning(disable:26472) // type.1	Don't use a static_cast for arithmetic conversions
+//#pragma warning(disable:26474) // type.1	Don't cast between pointer types when the conversion could be implicit
 #pragma warning(disable:26481) // bounds.1	Don't use pointer arithmetic. Use span instead
 #pragma warning(disable:26482) // bounds.2	Only index into arrays using constant expressions
 #pragma warning(disable:26485) // bounds.3	No array to pointer decay
@@ -61,7 +65,7 @@
 
 #define		DEFBPIX		4			//default form box pixels
 #define		MAXWLK		54			//max underlay/edge walk stitch length
-#define		MINWLK		2.4			//max underlay/edge walk stitch length
+#define		MINWLK		2.4f			//max underlay/edge walk stitch length
 #define		DEFULEN		12;			//default underlay stitch length
 #define		DEFUSPAC	6;			//default underlay stitch spacing
 
@@ -148,7 +152,7 @@ const unsigned long	RMAPBITS = MAXITEMS << 5;	//a bit for each stitch
 #define		NCODSED		0x73ef5a7e	//name encoding seed
 #define		NCODOF		80			//name encoding offset
 #define		CLPMIN		0.5			//if clipboard data less wide, then don't fill
-#define		CLPMINAUT	1.2			//for skinny vertical clips
+#define		CLPMINAUT	1.2f		//for skinny vertical clips
 #define		BRDWID		18			//default satin border size
 #define		SNPLEN		0.15		//default snap together length size
 #define		STARAT		0.4			//default star ratio
@@ -179,7 +183,7 @@ const unsigned long	RMAPBITS = MAXITEMS << 5;	//a bit for each stitch
 #define		REDGRD		0xff2020	//grid red color
 #define		BLUGRD		0x20ff20	//grid green color
 #define		GRNGRD		0x2020ff	//grid blue color
-#define		FDEFRAT		0.6			//default feather ratio
+#define		FDEFRAT		0.6f		//default feather ratio
 #define		FDEFUP		10			//default feather up count
 #define		FDEFDWN		5			//default feather down count
 #define		FDEFFLR		9			//default feather floor

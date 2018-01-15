@@ -32,7 +32,7 @@ public:
 		bool val = mask_.test(i_key);
 		mask_.set(i_key, i_val);
 		return val;  }
-	inline void reset() { mask_.reset(); }
+	inline void reset() noexcept { mask_.reset(); }
 	inline void reset(const EnumType i_key) { mask_.reset(i_key); }
 	inline bool testAndReset(const EnumType i_key) {
 		bool val = mask_.test(i_key);
