@@ -1,8 +1,13 @@
+#ifndef NOMINMAX
+# define NOMINMAX
+#endif
 #include <windows.h>
 #include <stdio.h>
 #include <math.h>
 #include <float.h>
 #include <tchar.h>
+#include <gsl/gsl>
+
 #ifdef ALLOCFAILURE
 #include <new.h>
 #endif
@@ -30,7 +35,7 @@ void		dutrnum0 (unsigned color);
 void		dutrnum1 ();
 void		endpnt ();
 void		fnamtabs ();
-void		fndknt () noexcept;
+void		fndknt ();
 void		frmdel ();
 COLORREF	fswap (COLORREF color) noexcept;
 void		fthrfn ();
@@ -51,7 +56,7 @@ void		rSelbox ();
 void		redraw (HWND window) noexcept;
 void		ritnum (unsigned code, unsigned value);
 void		ritot (unsigned number);
-void		rngadj () noexcept;
+void		rngadj ();
 void		rotfn ();
 void		rotfns ();
 void		rotpix (POINT unrotatedPoint, POINT* rotatedPoint);
@@ -1905,7 +1910,7 @@ void fnamtabs() {
 		NameOrder[source] = swapInteger;
 	}
 	for (iName = 0; iName < 128; iName++)
-		NameEncoder[iName] = static_cast<unsigned char>(iName) + NCODOF;
+		NameEncoder[iName] = gsl::narrow<unsigned char>(iName) + NCODOF;
 	PseudoRandomValue = NCODSED;
 	for (iName = 0; iName < 256; iName++) {
 
@@ -1917,7 +1922,7 @@ void fnamtabs() {
 	}
 	memset(NameDecoder, 0, sizeof(NameDecoder));
 	for (iName = 32; iName < 127; iName++)
-		NameDecoder[NameEncoder[iName]] = static_cast<unsigned char>(iName);
+		NameDecoder[NameEncoder[iName]] = gsl::narrow<unsigned char>(iName);
 }
 
 void dstin(unsigned number, POINT* pout) noexcept {
@@ -2010,7 +2015,7 @@ void ritcor(const fPOINTATTR* pointAttribute) {
 	ritfcor(&point);
 }
 
-void coltab() noexcept {
+void coltab() {
 
 	unsigned	iStitch = 0, iColor = 0, nextColor = 0;
 	unsigned	currentColor = 0;
@@ -2024,7 +2029,7 @@ void coltab() noexcept {
 		StitchBuffer[PCSHeader.stitchCount - 1].attribute &= NCOLMSK;
 		StitchBuffer[PCSHeader.stitchCount - 1].attribute |= (StitchBuffer[PCSHeader.stitchCount - 2].attribute&COLMSK);
 		currentColor = StitchBuffer[0].attribute&COLMSK;
-		for (iStitch = 1; iStitch < static_cast<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
+		for (iStitch = 1; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
 			if ((StitchBuffer[iStitch].attribute&COLMSK) != currentColor) {
 				if ((StitchBuffer[iStitch + 1].attribute&COLMSK) == currentColor) {
 					StitchBuffer[iStitch].attribute &= NCOLMSK;
@@ -2051,14 +2056,14 @@ void coltab() noexcept {
 				Stitch->y = static_cast<float>(range.bottom);
 			nextColor = Stitch->attribute&COLMSK;
 			if (currentColor != nextColor) {
-				ColorChangeTable[iColor].colorIndex = static_cast<unsigned short>(nextColor);
-				ColorChangeTable[iColor++].stitchIndex = static_cast<unsigned short>(iStitch);
+				ColorChangeTable[iColor].colorIndex = gsl::narrow<unsigned short>(nextColor);
+				ColorChangeTable[iColor++].stitchIndex = gsl::narrow<unsigned short>(iStitch);
 				currentColor = nextColor;
 			}
 		}
 		ColorChanges = iColor;
-		ColorChangeTable[iColor].stitchIndex = static_cast<unsigned short>(iStitch);
-		if (ClosestPointIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+		ColorChangeTable[iColor].stitchIndex = gsl::narrow<unsigned short>(iStitch);
+		if (ClosestPointIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 			ClosestPointIndex = PCSHeader.stitchCount - 1;
 		fndknt();
 	}
@@ -2440,7 +2445,7 @@ void pgrit() {
 	}
 }
 
-void selin(unsigned start, unsigned end, HDC dc) noexcept {
+void selin(unsigned start, unsigned end, HDC dc) {
 
 	unsigned		iStitch = 0, swap = 0;
 	double			coordinate = 0.0;
@@ -2460,9 +2465,9 @@ void selin(unsigned start, unsigned end, HDC dc) noexcept {
 	for (iStitch = start; iStitch <= end; iStitch++) {
 
 		coordinate = ((StitchBuffer[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5);
-		SearchLine[SearchLineIndex].x = static_cast<long>(coordinate);
+		SearchLine[SearchLineIndex].x = gsl::narrow<long>(coordinate);
 		coordinate = (hi - (StitchBuffer[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5);
-		SearchLine[SearchLineIndex++].y = static_cast<long>(coordinate);
+		SearchLine[SearchLineIndex++].y = gsl::narrow<long>(coordinate);
 	}
 	Polyline(dc, SearchLine, SearchLineIndex);
 	SetROP2(dc, R2_COPYPEN);
@@ -2522,9 +2527,9 @@ void selRct(fRECTANGLE* sourceRect) noexcept {
 	}
 }
 
-void rngadj() noexcept {
+void rngadj() {
 
-	if (ClosestPointIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+	if (ClosestPointIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 		ClosestPointIndex = PCSHeader.stitchCount - 1;
 	if (GroupStitchIndex > PCSHeader.stitchCount)
 		GroupStitchIndex = ClosestPointIndex;
@@ -2579,7 +2584,7 @@ void frmcalc() {
 	if (FormList[ClosestFormToCursor].fillType || FormList[ClosestFormToCursor].edgeType) {
 
 		code = ClosestFormToCursor << FRMSHFT;
-		for (iStitch = 0; iStitch < static_cast<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
+		for (iStitch = 0; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
 
 			if ((StitchBuffer[iStitch].attribute&FRMSK) == code && !(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch + 1].attribute&FRMSK) == code && (StitchBuffer[iStitch + 1].attribute&TYPMSK)) {
 
@@ -2692,16 +2697,16 @@ void grpAdj() {
 			if (newSize.x > newSize.y) {
 
 				coordinate = newSize.x*ZMARGIN;
-				newSize.x += static_cast<long>(coordinate);
+				newSize.x += gsl::narrow<long>(coordinate);
 				coordinate = newSize.x / StitchWindowAspectRatio;
-				newSize.y = static_cast<long>(coordinate);
+				newSize.y = gsl::narrow<long>(coordinate);
 			}
 			else {
 
 				coordinate = newSize.y*ZMARGIN;
-				newSize.y = static_cast<long>(coordinate);
+				newSize.y = gsl::narrow<long>(coordinate);
 				coordinate = newSize.y*StitchWindowAspectRatio;
-				newSize.x = static_cast<long>(coordinate);
+				newSize.x = gsl::narrow<long>(coordinate);
 			}
 			if (newSize.x > UnzoomedRect.x || newSize.y > UnzoomedRect.y) {
 
@@ -3064,12 +3069,12 @@ BOOL savcmp() noexcept {
 #endif
 }
 
-void thr2bal(unsigned destination, unsigned source, unsigned code) noexcept {
+void thr2bal(unsigned destination, unsigned source, unsigned code)  {
 
 #define BALRAT 1.6666666666667
 
 	BalaradStitch[destination].flag = 0;
-	BalaradStitch[destination].code = static_cast<unsigned char>(code);
+	BalaradStitch[destination].code = gsl::narrow<unsigned char>(code);
 	BalaradStitch[destination].x = (StitchBuffer[source].x - BalaradOffset.x)*BALRAT;
 	BalaradStitch[destination].y = (StitchBuffer[source].y - BalaradOffset.y)*BALRAT;
 }
@@ -3245,7 +3250,7 @@ void ritbal() {
 		color = StitchBuffer[0].attribute&COLMSK;
 		iOutput = 0;
 		thr2bal(iOutput++, 0, BALJUMP);
-		BalaradStitch[iOutput].flag = static_cast<unsigned char>(color);
+		BalaradStitch[iOutput].flag = gsl::narrow<unsigned char>(color);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount && iOutput < 2; iStitch++) {
 
 			thr2bal(iOutput++, iStitch, BALNORM);
@@ -3253,7 +3258,7 @@ void ritbal() {
 
 				thr2bal(iOutput, iStitch, BALSTOP);
 				color = StitchBuffer[iStitch].attribute&COLMSK;
-				BalaradStitch[iOutput++].flag = static_cast<unsigned char>(color);
+				BalaradStitch[iOutput++].flag = gsl::narrow<unsigned char>(color);
 			}
 		}
 		WriteFile(balaradFile, BalaradStitch, iOutput * sizeof(BALSTCH), &bytesWritten, 0);
@@ -3360,7 +3365,7 @@ void sidmsg(HWND window, TCHAR** strings, unsigned entries) {
 
 		for (iEntry = 0; iEntry < EDGETYPS + 1; iEntry++) {
 
-			if (static_cast<unsigned>(SelectedForm->edgeType&NEGUND) == EdgeFillTypes[iEntry])
+			if (gsl::narrow<unsigned>(SelectedForm->edgeType&NEGUND) == EdgeFillTypes[iEntry])
 				entryCount--;
 			else {
 
@@ -3389,7 +3394,7 @@ void sidmsg(HWND window, TCHAR** strings, unsigned entries) {
 			NULL);
 		for (iEntry = 0; iEntry < entries; iEntry++) {
 
-			if (static_cast<unsigned>(SelectedForm->edgeType&NEGUND) != EdgeFillTypes[iEntry]) {
+			if (gsl::narrow<unsigned>(SelectedForm->edgeType&NEGUND) != EdgeFillTypes[iEntry]) {
 
 				if (EdgeFillTypes[iEntry] == EDGECLIP || EdgeFillTypes[iEntry] == EDGEPICOT || EdgeFillTypes[iEntry] == EDGECLIPX) {
 
@@ -3487,11 +3492,11 @@ void stchPars() {
 
 	AspectRatio = static_cast<double>(UnzoomedRect.x) / static_cast<double>(UnzoomedRect.y);
 	if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT))
-		StitchWindowSize.x = static_cast<long>((ThredWindowRect.bottom - (SCROLSIZ << 1))*AspectRatio);
+		StitchWindowSize.x = gsl::narrow<long>((ThredWindowRect.bottom - (SCROLSIZ << 1))*AspectRatio);
 	else
-		StitchWindowSize.x = static_cast<long>((ThredWindowRect.bottom - SCROLSIZ)*AspectRatio);
+		StitchWindowSize.x = gsl::narrow<long>((ThredWindowRect.bottom - SCROLSIZ)*AspectRatio);
 
-	if ((StitchWindowSize.x + static_cast<long>(ButtonWidthX3) + RIGHTSIZ) < ThredWindowRect.right) {
+	if ((StitchWindowSize.x + gsl::narrow<long>(ButtonWidthX3) + RIGHTSIZ) < ThredWindowRect.right) {
 
 		if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT))
 			StitchWindowSize.y = ThredWindowRect.bottom - (SCROLSIZ << 1);
@@ -3511,7 +3516,7 @@ void stchPars() {
 
 void movStch() {
 
-	POINT		clientSize = { (ThredWindowRect.right - static_cast<LONG>(ButtonWidthX3) - RIGHTSIZ),
+	POINT		clientSize = { (ThredWindowRect.right - gsl::narrow<LONG>(ButtonWidthX3) - RIGHTSIZ),
 							   (ThredWindowRect.bottom) };
 	long		verticalOffset = 0;
 	long		actualWindowHeight = StitchWindowSize.y;
@@ -4058,7 +4063,7 @@ void chknum() {
 
 								case PAP:
 
-									AppliqueColor = static_cast<unsigned>(value - 1) % 16;
+									AppliqueColor = gsl::narrow<unsigned>(value - 1) % 16;
 									sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", AppliqueColor + 1);
 									SetWindowText(ValueWindow[PAP], MsgBuffer);
 									break;
@@ -4358,7 +4363,7 @@ HWND nuSiz(unsigned iThreadSize) noexcept {
 		NULL);
 }
 
-void delstch1(unsigned iStitch) noexcept {
+void delstch1(unsigned iStitch) {
 
 	if (PCSHeader.stitchCount) {
 
@@ -4370,7 +4375,7 @@ void delstch1(unsigned iStitch) noexcept {
 			iStitch++;
 		}
 		PCSHeader.stitchCount--;
-		if (ClosestPointIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+		if (ClosestPointIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 			ClosestPointIndex = PCSHeader.stitchCount - 1;
 	}
 }
@@ -5503,7 +5508,7 @@ void nuFil() {
 						PEScolors = &pesColorCount[1];
 						MarkedStitchMap[0] = MarkedStitchMap[1] = 0;
 						ActivePointIndex = 0;
-						for (iColor = 0; iColor < static_cast<unsigned>(*pesColorCount + 1); iColor++) {
+						for (iColor = 0; iColor < gsl::narrow<unsigned>(*pesColorCount + 1); iColor++) {
 
 							if (setRmp(PEScolors[iColor])) {
 
@@ -5782,7 +5787,7 @@ void ritdst(const fPOINTATTR* stitches) {
 		}
 	}
 	DSTRecords[DSTRecordCount].led = DSTRecords[DSTRecordCount].mid = 0;
-	DSTRecords[DSTRecordCount++].nd = static_cast<TBYTE>(0xf3);
+	DSTRecords[DSTRecordCount++].nd = gsl::narrow<TBYTE>(0xf3);
 
 	if (colfil()) {
 
@@ -6035,7 +6040,7 @@ void pecdat(TCHAR* buffer) {
 	PEScolors = static_cast<unsigned char *>(static_cast<void *>(&PESdata[49]));
 	rpcrd(StitchBuffer[0].x);
 	rpcrd(-StitchBuffer[0].y);
-	for (iStitch = 0; iStitch < static_cast<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
+	for (iStitch = 0; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
 
 		if ((StitchBuffer[iStitch].attribute&COLMSK) != color) {
 
@@ -7342,7 +7347,7 @@ void istch() {
 	xlin1();
 	if (StateMap.test(StateFlag::SELBOX)) {
 
-		if (ClosestPointIndex && ClosestPointIndex != static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
+		if (ClosestPointIndex && ClosestPointIndex != gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 
 			px2stch();
 			angt = atan2(StitchBuffer[ClosestPointIndex].y - SelectedPoint.y, StitchBuffer[ClosestPointIndex].x - SelectedPoint.x);
@@ -7353,7 +7358,7 @@ void istch() {
 		}
 		else {
 
-			if (ClosestPointIndex == static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+			if (ClosestPointIndex == gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 				ClosestPointIndex--;
 		}
 	}
@@ -7427,7 +7432,7 @@ void selCol() {
 			else
 				iStitch = 0;
 		}
-		if (iStitch > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+		if (iStitch > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 			iStitch = PCSHeader.stitchCount - 1;
 		ClosestPointIndex = GroupStitchIndex = iStitch;
 		color = StitchBuffer[iStitch].attribute&COLMSK;
@@ -7439,7 +7444,7 @@ void selCol() {
 			GroupStitchIndex++;
 		if ((StitchBuffer[ClosestPointIndex].attribute&COLMSK) != color)
 			ClosestPointIndex--;
-		if (GroupStitchIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+		if (GroupStitchIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 			GroupStitchIndex = PCSHeader.stitchCount - 1;
 		StateMap.set(StateFlag::GRPSEL);
 		unbox();
@@ -7808,7 +7813,7 @@ void lodclp(unsigned iStitch) {
 
 	if (iStitch != PCSHeader.stitchCount)
 		iStitch++;
-	if (iStitch < static_cast<unsigned>(PCSHeader.stitchCount) && StateMap.test(StateFlag::INIT)) {
+	if (iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) && StateMap.test(StateFlag::INIT)) {
 		while (source >= iStitch) {
 
 			StitchBuffer[destination].x = StitchBuffer[source].x;
@@ -8677,7 +8682,7 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 
 		iNextStitch = find1st();
 		iStitch = iNextStitch + 1;
-		while (iStitch<static_cast<unsigned>(PCSHeader.stitchCount) - 1 && stitchSize>SmallStitchLength) {
+		while (iStitch<gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1 && stitchSize>SmallStitchLength) {
 
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute) {
 
@@ -8696,7 +8701,7 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 
 			iStitch--;
 			iNextStitch = iStitch + 2;
-			while (iNextStitch < static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
+			while (iNextStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 
 				do {
 
@@ -8889,7 +8894,7 @@ void strtknt(unsigned start) noexcept {
 	}
 }
 
-void fndknt() noexcept {
+void fndknt() {
 	unsigned	iStitch = 0;
 	BOOL		flag = false;
 
@@ -8897,7 +8902,7 @@ void fndknt() noexcept {
 		// ToDo - Is flag initialized and used correctly?
 		flag = 0;
 		KnotCount = 0;
-		for (iStitch = 0; iStitch < static_cast<unsigned>(PCSHeader.stitchCount) - 4; iStitch++) {
+		for (iStitch = 0; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 4; iStitch++) {
 
 			if (StitchBuffer[iStitch].attribute&KNOTMSK) {
 
@@ -8944,9 +8949,9 @@ void delknot() {
 	}
 }
 
-unsigned kjmp(unsigned start) noexcept {
+unsigned kjmp(unsigned start) {
 
-	while (start<static_cast<unsigned>(PCSHeader.stitchCount) - 1 && stlen(start)>KNOTLEN)
+	while (start<gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1 && stlen(start)>KNOTLEN)
 		mvstch(OutputIndex++, start++);
 	strtknt(start);
 	return start;
@@ -8965,7 +8970,7 @@ void setknt() {
 	else
 		iStitch = 1;
 	StateMap.reset(StateFlag::FILDIR);
-	while (iStitch < static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
+	while (iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 
 		mvstch(OutputIndex++, iStitch);
 		if (stlen(iStitch) > KNOTLEN) {
@@ -9401,7 +9406,7 @@ void thrsav() {
 	}
 }
 
-void setsped() noexcept {
+void setsped() {
 
 	unsigned	elapsedTimePerFrame = 0;
 	double		userTimePerFrame = 0.0;
@@ -9412,13 +9417,13 @@ void setsped() noexcept {
 	if (userTimePerFrame < 10) {
 
 		elapsedTimePerFrame = 100;  // units are millseconds
-		StitchesPerFrame = static_cast<unsigned>(elapsedTimePerFrame / userTimePerFrame);
+		StitchesPerFrame = gsl::narrow<unsigned>(elapsedTimePerFrame / userTimePerFrame);
 		if (StitchesPerFrame > 99)
 			StitchesPerFrame = 99;
 	}
 	else {
 
-		elapsedTimePerFrame = static_cast<unsigned>(userTimePerFrame);
+		elapsedTimePerFrame = gsl::narrow<unsigned>(userTimePerFrame);
 		StitchesPerFrame = 2;
 	}
 	if (StitchesPerFrame < 2)
@@ -9459,7 +9464,7 @@ void frmdel() {
 
 	fvars(ClosestFormToCursor);
 	f1del();
-	for (iForm = ClosestFormToCursor; iForm < static_cast<unsigned>(FormIndex); iForm++)
+	for (iForm = ClosestFormToCursor; iForm < gsl::narrow<unsigned>(FormIndex); iForm++)
 		frmcpy(&FormList[iForm], &FormList[iForm + 1]);
 	if (StateMap.testAndReset(StateFlag::DELTO)) {
 
@@ -9695,7 +9700,7 @@ selab:;
 					}
 					if (WordParam) {
 
-						if (ClosestVertexToCursor == static_cast<unsigned>(WordParam) || ClosestVertexToCursor == static_cast<unsigned>(WordParam) + 1) {
+						if (ClosestVertexToCursor == gsl::narrow<unsigned>(WordParam) || ClosestVertexToCursor == gsl::narrow<unsigned>(WordParam) + 1) {
 
 							SelectedForm->wordParam = 0;
 							satinFlag = 1;
@@ -9791,7 +9796,7 @@ void movi() {
 
 #define CLPBUG 0
 
-void redclp() noexcept {
+void redclp() {
 
 	int			iStitch = 0;
 	const int	codedLayer = ActiveLayer << LAYSHFT;
@@ -9811,7 +9816,7 @@ void redclp() noexcept {
 #endif
 		ClipRect.left = ClipRect.right = ClipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
-		for (iStitch = 1; iStitch < static_cast<long>(ClipStitchCount); iStitch++) {
+		for (iStitch = 1; iStitch < gsl::narrow<long>(ClipStitchCount); iStitch++) {
 
 			ClipBuffer[iStitch].x = ClipStitchData[iStitch].x + static_cast<float>(ClipStitchData[iStitch].fx) / 256;
 			ClipBuffer[iStitch].y = ClipStitchData[iStitch].y + static_cast<float>(ClipStitchData[iStitch].fy) / 256;
@@ -9837,7 +9842,7 @@ void redclp() noexcept {
 		GlobalUnlock(ClipMemory);
 		if (ClipRect.left || ClipRect.bottom) {
 
-			for (iStitch = 0; iStitch < static_cast<int>(ClipStitchCount); iStitch++) {
+			for (iStitch = 0; iStitch < gsl::narrow<int>(ClipStitchCount); iStitch++) {
 
 				ClipBuffer[iStitch].x -= ClipRect.left;
 				ClipBuffer[iStitch].y -= ClipRect.bottom;
@@ -10007,7 +10012,7 @@ void movbak(TCHAR source, TCHAR destination) noexcept {
 	MoveFile(sourceFileName, destinationFileName);
 }
 
-void purg() noexcept {
+void purg() {
 
 	TCHAR		fileName[_MAX_PATH] = { 0 };
 	unsigned	lastChar = 0, iLast = 0;
@@ -10018,7 +10023,7 @@ void purg() noexcept {
 		lastChar = duth(fileName);
 		for (iLast = 1; iLast < 6; iLast++) {
 
-			fileName[lastChar] = static_cast<TCHAR>(iLast) + 'r';
+			fileName[lastChar] = gsl::narrow<TCHAR>(iLast) + 'r';
 			DeleteFile(fileName);
 		}
 	}
@@ -10047,7 +10052,7 @@ void deldir() {
 	strcpy_s(fileSpec, sizeof(fileName) - (fileSpec - fileName), "\\*.th0");
 	for (iLastChar = 1; iLastChar < 6; iLastChar++) {
 
-		fileSpec[5] = static_cast<TCHAR>(iLastChar) + 'r';
+		fileSpec[5] = gsl::narrow<TCHAR>(iLastChar) + 'r';
 		file = FindFirstFile(fileName, &findFileData);
 		if (file != INVALID_HANDLE_VALUE) {
 
@@ -10305,7 +10310,7 @@ void ritmov() noexcept {
 	SelectObject(StitchWindowDC, FormPen);
 	if (ClosestVertexToCursor) {
 
-		if (ClosestVertexToCursor == static_cast<unsigned>(SelectedForm->vertexCount) - 1 && SelectedForm->type == FRMLINE)
+		if (ClosestVertexToCursor == gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1 && SelectedForm->type == FRMLINE)
 			Polyline(StitchWindowDC, RubberBandLine, 2);
 		else
 			Polyline(StitchWindowDC, RubberBandLine, 3);
@@ -10450,7 +10455,7 @@ void nulayr(unsigned play) {
 	ladj();
 	if (ActiveLayer) {
 
-		if (StateMap.test(StateFlag::FORMSEL) && (static_cast<unsigned>((FormList[ClosestFormToCursor].attribute&FRMLMSK) >> 1) != ActiveLayer))
+		if (StateMap.test(StateFlag::FORMSEL) && (gsl::narrow<unsigned>((FormList[ClosestFormToCursor].attribute&FRMLMSK) >> 1) != ActiveLayer))
 			StateMap.reset(StateFlag::FORMSEL);
 		StateMap.reset(StateFlag::GRPSEL);
 		if (StateMap.test(StateFlag::SELBOX)) {
@@ -10672,7 +10677,7 @@ void selup() {
 
 			unbox();
 			attribute = StitchBuffer[ClosestPointIndex].attribute&ATMSK;
-			while (ClosestPointIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1 && (StitchBuffer[ClosestPointIndex].attribute&ATMSK) == attribute)
+			while (ClosestPointIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1 && (StitchBuffer[ClosestPointIndex].attribute&ATMSK) == attribute)
 				ClosestPointIndex++;
 			stch2px(ClosestPointIndex);
 			dubox();
@@ -10683,7 +10688,7 @@ void selup() {
 
 				if (StateMap.testAndSet(StateFlag::FORMSEL)) {
 
-					if (ClosestFormToCursor < static_cast<unsigned>(FormIndex) - 1)
+					if (ClosestFormToCursor < gsl::narrow<unsigned>(FormIndex) - 1)
 						ClosestFormToCursor++;
 				}
 				else
@@ -10787,7 +10792,7 @@ BOOL movstchs(unsigned destination, unsigned start, unsigned finish) {
 	unsigned	dind = MAXITEMS;
 
 	// ToDo - Use a temp buffer rather than the high buffer
-	if (destination < static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+	if (destination < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 		destination++;
 	if (start > finish) {
 
@@ -10897,7 +10902,7 @@ void colchk() noexcept {
 	}
 }
 
-unsigned makbig(unsigned start, unsigned finish) noexcept {
+unsigned makbig(unsigned start, unsigned finish) {
 
 	unsigned	destination = MAXITEMS, source = 0, stitchCount = 0, iStitch = 0, adcnt = 0, attribute = 0;
 	fPOINTATTR*	sourceStitch = nullptr;
@@ -10906,7 +10911,7 @@ unsigned makbig(unsigned start, unsigned finish) noexcept {
 	dPOINT		delta = {}, step = {}, point = {};
 
 	// ToDo - Use a temp buffer rather than the high buffer
-	for (source = start; source < static_cast<unsigned>(finish) - 1; source++) {
+	for (source = start; source < gsl::narrow<unsigned>(finish) - 1; source++) {
 
 		delta.x = StitchBuffer[source + 1].x - StitchBuffer[source].x;
 		delta.y = StitchBuffer[source + 1].y - StitchBuffer[source].y;
@@ -11794,7 +11799,7 @@ void insfil() {
 					}
 					if (fileHeader.stitchCount) {
 
-						for (iStitch = PCSHeader.stitchCount; iStitch < static_cast<unsigned>(PCSHeader.stitchCount) + fileHeader.stitchCount; iStitch++) {
+						for (iStitch = PCSHeader.stitchCount; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) + fileHeader.stitchCount; iStitch++) {
 
 							if (StitchBuffer[iStitch].attribute&ALTYPMSK) {
 
@@ -11871,7 +11876,7 @@ void insfil() {
 					iStitch = PCSHeader.stitchCount;
 					insertedRectangle.left = insertedRectangle.right = StitchBuffer[iPCSStitch].x;
 					insertedRectangle.top = insertedRectangle.bottom = StitchBuffer[iPCSStitch++].y;
-					while (iStitch < static_cast<unsigned>(newStitchCount)) {
+					while (iStitch < gsl::narrow<unsigned>(newStitchCount)) {
 
 						if (StitchBuffer[iStitch].x < insertedRectangle.left)
 							insertedRectangle.left = StitchBuffer[iStitch].x;
@@ -13608,7 +13613,7 @@ void tracedg() {
 	StateMap.set(StateFlag::WASEDG);
 }
 
-BOOL trcbit() noexcept {
+BOOL trcbit() {
 
 	unsigned	pixelIndex;
 
@@ -13618,7 +13623,7 @@ BOOL trcbit() noexcept {
 		case TRCR:
 
 			pixelIndex += (1 - BitmapWidth);
-			if (CurrentTracePoint.x == static_cast<int>(BitmapWidth) - 1)
+			if (CurrentTracePoint.x == gsl::narrow<int>(BitmapWidth) - 1)
 				TraceDirection = TRCU;
 			else {
 
@@ -13690,7 +13695,7 @@ BOOL trcbit() noexcept {
 		case TRCU:
 
 			pixelIndex += (1 + BitmapWidth);
-			if (CurrentTracePoint.y == static_cast<int>(BitmapHeight) - 1)
+			if (CurrentTracePoint.y == gsl::narrow<int>(BitmapHeight) - 1)
 				TraceDirection = TRCL;
 			else {
 
@@ -13754,9 +13759,9 @@ void dutrac() {
 			SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 		CurrentTracePoint.x = BmpStitchRatio.x*SelectedPoint.x;
 		CurrentTracePoint.y = BmpStitchRatio.y*SelectedPoint.y;
-		if (CurrentTracePoint.x > static_cast<long>(BitmapWidth))
+		if (CurrentTracePoint.x > gsl::narrow<long>(BitmapWidth))
 			CurrentTracePoint.x = BitmapWidth;
-		if (CurrentTracePoint.y > static_cast<long>(BitmapHeight))
+		if (CurrentTracePoint.y > gsl::narrow<long>(BitmapHeight))
 			CurrentTracePoint.y = BitmapHeight;
 		savedPoint = point = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
 		if (!chkedg(point)) {
@@ -13800,7 +13805,7 @@ void dutrac() {
 				minimumEdgeDistance = CurrentTracePoint.x - findRectangle.left;
 				flag = TRCL;
 			}
-			if (findRectangle.right < static_cast<long>(BitmapWidth)) {
+			if (findRectangle.right < gsl::narrow<long>(BitmapWidth)) {
 
 				edgeDistance = findRectangle.right - CurrentTracePoint.x;
 				if (edgeDistance < minimumEdgeDistance) {
@@ -13818,7 +13823,7 @@ void dutrac() {
 					flag = TRCD;
 				}
 			}
-			if (findRectangle.top < static_cast<long>(BitmapHeight)) {
+			if (findRectangle.top < gsl::narrow<long>(BitmapHeight)) {
 
 				edgeDistance = findRectangle.top - CurrentTracePoint.y;
 				if (edgeDistance < minimumEdgeDistance) {
@@ -13951,11 +13956,11 @@ void dutrac() {
 	}
 }
 
-unsigned ducolm() noexcept {
+unsigned ducolm() {
 
-	if (TraceMsgPoint.x < static_cast<int>(ButtonWidth))
+	if (TraceMsgPoint.x < gsl::narrow<int>(ButtonWidth))
 		return 0;
-	if (TraceMsgPoint.x < static_cast<int>(ButtonWidth) << 1)
+	if (TraceMsgPoint.x < gsl::narrow<int>(ButtonWidth) << 1)
 		return 1;
 	else
 		return 2;
@@ -14080,12 +14085,12 @@ void tracpar() {
 		dutrnum1();
 	TraceMsgPoint.x = Msg.pt.x - ThredWindowOrigin.x;
 	TraceMsgPoint.y = Msg.pt.y - ThredWindowOrigin.y;
-	if (TraceMsgPoint.x > static_cast<int>(ButtonWidthX3))
+	if (TraceMsgPoint.x > gsl::narrow<int>(ButtonWidthX3))
 		dutrac();
 	else {
 
 		ColumnColor = ducolm();
-		if (TraceMsgPoint.y < static_cast<int>(ButtonHeight) * 15) {
+		if (TraceMsgPoint.y < gsl::narrow<int>(ButtonHeight) * 15) {
 
 			if (GetKeyState(VK_SHIFT) & 0X8000) {
 
@@ -14324,7 +14329,7 @@ void trdif() {
 		for (iRGB = 0; iRGB < 3; iRGB++) {
 
 			blanklin(0);
-			for (iHeight = 1; iHeight < static_cast<unsigned>(BitmapHeight) - 1; iHeight++) {
+			for (iHeight = 1; iHeight < gsl::narrow<unsigned>(BitmapHeight) - 1; iHeight++) {
 
 				iPoint = iHeight*BitmapWidth;
 				DifferenceBitmap[iPoint++] = 0;
@@ -15076,7 +15081,7 @@ void set1knot() {
 	if (PCSHeader.stitchCount && StateMap.test(StateFlag::SELBOX)) {
 
 		savdo();
-		if (ClosestPointIndex == static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
+		if (ClosestPointIndex == gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 
 			StateMap.set(StateFlag::FILDIR);
 			OutputIndex = ClosestPointIndex + 1;
@@ -15591,7 +15596,7 @@ gotcur:;
 
 				fvars(ClosestFormToCursor);
 				iSelectedVertex = SelectedFormVertices.start;
-				for (iVertex = 0; static_cast<unsigned>(iVertex) <= SelectedFormVertices.vertexCount; iVertex++) {
+				for (iVertex = 0; gsl::narrow<unsigned>(iVertex) <= SelectedFormVertices.vertexCount; iVertex++) {
 
 					CurrentFormVertices[iSelectedVertex].x += FormMoveDelta.x;
 					CurrentFormVertices[iSelectedVertex].y -= FormMoveDelta.y;
@@ -16424,7 +16429,7 @@ frmskip:;
 			}
 			nufilcol(VerticalIndex);
 chkcolx:;
-			MsgBuffer[0] = static_cast<TCHAR>(VerticalIndex) + 0x30;
+			MsgBuffer[0] = gsl::narrow<TCHAR>(VerticalIndex) + 0x30;
 			MsgBuffer[1] = 0;
 			SetWindowText(ValueWindow[LBRDCOL], MsgBuffer);
 			unsid();
@@ -17628,7 +17633,7 @@ didskip:;
 			if (StateMap.testAndReset(StateFlag::CLPSHO)) {
 
 				savdo();
-				if ((StateMap.testAndReset(StateFlag::SELBOX) || StateMap.testAndReset(StateFlag::INSRT)) && ClosestPointIndex != static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+				if ((StateMap.testAndReset(StateFlag::SELBOX) || StateMap.testAndReset(StateFlag::INSRT)) && ClosestPointIndex != gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 					lodclp(ClosestPointIndex);
 				else
 					lodclp(PCSHeader.stitchCount);
@@ -17782,7 +17787,7 @@ didskip:;
 					}
 					else {
 
-						if (ClosestPointIndex == static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
+						if (ClosestPointIndex == gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 
 							if (ZoomFactor < STCHBOX) {
 
@@ -18251,7 +18256,7 @@ didskip:;
 
 					if (PreferenceIndex == PSHO + 1 || PreferenceIndex == PBOX + 1) {
 
-						MsgBuffer[0] = static_cast<TCHAR>(NumericCode);
+						MsgBuffer[0] = gsl::narrow<TCHAR>(NumericCode);
 						MsgBuffer[1] = 0;
 						if (PreferenceIndex == PSHO + 1) {
 
@@ -18407,7 +18412,7 @@ didskip:;
 				StitchEntryBuffer[BufferIndex++] = NumericCode;
 				StitchEntryBuffer[BufferIndex] = 0;
 				ClosestPointIndex = atoi(StitchEntryBuffer);
-				if (ClosestPointIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
+				if (ClosestPointIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 
 					sprintf_s(StitchEntryBuffer, sizeof(StitchEntryBuffer), "%d", PCSHeader.stitchCount - 1);
 					ClosestPointIndex = PCSHeader.stitchCount - 1;
@@ -19114,7 +19119,7 @@ thumout:;
 									SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
 									SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
 									ratsr();
-									for (OutputIndex = 0; OutputIndex < static_cast<unsigned>(ClipFormsCount); OutputIndex++) {
+									for (OutputIndex = 0; OutputIndex < gsl::narrow<unsigned>(ClipFormsCount); OutputIndex++) {
 
 										fselrct(OutputIndex + FormIndex);
 										SelectedFormList[OutputIndex] = OutputIndex + FormIndex;
@@ -19424,7 +19429,7 @@ thumout:;
 								StateMap.reset(StateFlag::FORMSEL);
 								if (StateMap.testAndReset(StateFlag::SELBOX)) {
 
-									if (ClosestPointIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
+									if (ClosestPointIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 
 										StateMap.set(StateFlag::GRPSEL);
 										GroupStitchIndex = ClosestPointIndex + 1;
@@ -19432,7 +19437,7 @@ thumout:;
 								}
 								else {
 
-									if (GroupStitchIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
+									if (GroupStitchIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 
 										GroupStitchIndex++;
 										nuAct(GroupStitchIndex);
@@ -19469,14 +19474,14 @@ thumout:;
 
 									if (StateMap.test(StateFlag::SELBOX)) {
 
-										if (ClosestPointIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+										if (ClosestPointIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 											ClosestPointIndex++;
 										movbox();
 										return 1;
 									}
 									if (StateMap.test(StateFlag::GRPSEL)) {
 
-										if (GroupStitchIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
+										if (GroupStitchIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 
 											GroupStitchIndex++;
 											grpAdj();
@@ -21563,7 +21568,7 @@ void redini() {
 	if (IniFile.initialWindowCoords.top < 0)
 		IniFile.initialWindowCoords.top = 0;
 	adjustedWidth = ScreenSizePixels.cx - 30;
-	if (IniFile.initialWindowCoords.right > static_cast<int>(adjustedWidth))
+	if (IniFile.initialWindowCoords.right > gsl::narrow<int>(adjustedWidth))
 		IniFile.initialWindowCoords.right = adjustedWidth;
 	if (IniFile.initialWindowCoords.bottom > ScreenSizePixels.cy)
 		IniFile.initialWindowCoords.bottom = ScreenSizePixels.cy;
@@ -22045,12 +22050,12 @@ BOOL bitar() {
 		BitmapSrcRect.left = ceil(ZoomRect.left*BmpStitchRatio.x);
 		BitmapSrcRect.right = floor(ZoomRect.right*BmpStitchRatio.x);
 		BitmapSrcRect.bottom = floor(zoomedInRect.bottom*BmpStitchRatio.y);
-		if (BitmapSrcRect.right > static_cast<long>(BitmapWidth)) {
+		if (BitmapSrcRect.right > gsl::narrow<long>(BitmapWidth)) {
 
 			BitmapSrcRect.right = BitmapWidth;
 			StateMap.reset(StateFlag::LANDSCAP);
 		}
-		if (BitmapSrcRect.bottom > static_cast<long>(BitmapHeight)) {
+		if (BitmapSrcRect.bottom > gsl::narrow<long>(BitmapHeight)) {
 
 			BitmapSrcRect.bottom = BitmapHeight;
 			StateMap.set(StateFlag::LANDSCAP);
@@ -22103,7 +22108,7 @@ void drwknot() {
 	}
 }
 
-void dugrid() noexcept {
+void dugrid() {
 
 	POINT		gridLine[2] = {};
 	RECT		gridRect = {};
@@ -22119,14 +22124,14 @@ void dugrid() noexcept {
 		gridRect.top = floor(ZoomRect.top / IniFile.gridSize);
 		gridLine[0].x = 0;
 		gridLine[1].x = StitchWindowClientRect.right;
-		for (iGrid = gridRect.bottom; iGrid <= static_cast<unsigned>(gridRect.top); iGrid++) {
+		for (iGrid = gridRect.bottom; iGrid <= gsl::narrow<unsigned>(gridRect.top); iGrid++) {
 
 			gridLine[0].y = gridLine[1].y = StitchWindowClientRect.bottom - (iGrid*IniFile.gridSize - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 			Polyline(StitchWindowMemDC, gridLine, 2);
 		}
 		gridLine[0].y = 0;
 		gridLine[1].y = StitchWindowClientRect.bottom;
-		for (iGrid = gridRect.left; iGrid <= static_cast<unsigned>(gridRect.right); iGrid++) {
+		for (iGrid = gridRect.left; iGrid <= gsl::narrow<unsigned>(gridRect.right); iGrid++) {
 
 			gridLine[0].x = gridLine[1].x = (iGrid*IniFile.gridSize - ZoomRect.left)*ZoomRatio.x + 0.5;
 			Polyline(StitchWindowMemDC, gridLine, 2);
@@ -22819,7 +22824,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 		case WM_HSCROLL:
 
-			switch (static_cast<long>(LOWORD(wParam))) {
+			switch (gsl::narrow<long>(LOWORD(wParam))) {
 
 				case SB_LINELEFT:
 
@@ -22907,7 +22912,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 							if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) {
 
 							scrollPoint.x = ZoomRect.right - ZoomRect.left;
-							ZoomRect.left = static_cast<long>(HIWORD(wParam));
+							ZoomRect.left = gsl::narrow<long>(HIWORD(wParam));
 							ZoomRect.right = ZoomRect.left + scrollPoint.x;
 							if (ZoomRect.right > UnzoomedRect.x) {
 
@@ -22958,7 +22963,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				case SB_THUMBPOSITION:
 
 					scrollPoint.y = ZoomRect.top - ZoomRect.bottom;
-					ZoomRect.top = UnzoomedRect.y - static_cast<long>(HIWORD(wParam));
+					ZoomRect.top = UnzoomedRect.y - gsl::narrow<long>(HIWORD(wParam));
 					ZoomRect.bottom = ZoomRect.top - scrollPoint.y;
 					if (ZoomRect.bottom < 0) {
 
@@ -23168,7 +23173,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 							strcpy_s(fileName, ThrName);
 							lastCharacter = duth(fileName);
-							fileName[lastCharacter] = static_cast<TCHAR>(iVersion) + 's';
+							fileName[lastCharacter] = gsl::narrow<TCHAR>(iVersion) + 's';
 							ritbak(fileName, DrawItem);
 							return 1;
 						}

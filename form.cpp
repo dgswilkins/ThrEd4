@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <tchar.h>
+#include <gsl/gsl>
+
 #include "lang.h"
 #include "resource.h"
 #include "thred.h"
@@ -2234,7 +2236,7 @@ constexpr float getblen() {
 #endif
 }
 
-void savblen(float fLength) noexcept {
+void savblen(float fLength) {
 #if	 __UseASM__
 	unsigned short clipEntries;
 	unsigned short picoLength;
@@ -2250,7 +2252,7 @@ void savblen(float fLength) noexcept {
 #else
 
 	unsigned	iLength;
-	iLength = static_cast<int>(fLength);
+	iLength = gsl::narrow<int>(fLength);
 
 	FormList[ClosestFormToCursor].clipEntries = iLength >> 16;
 	FormList[ClosestFormToCursor].picoLength = iLength & 0xFFFF;
@@ -2263,7 +2265,7 @@ constexpr float getplen() {
 	return(static_cast<float>(value >> 8) + (value & 0xff) / 256);
 }
 
-void savplen(float length) noexcept {
+void savplen(float length) {
 
 	unsigned	num = 0, fr = 0;
 	double		integerPart = 0.0, fractionalPart = 0.0;
@@ -2271,9 +2273,9 @@ void savplen(float length) noexcept {
 	if (length > 255)
 		length = 255;
 	fractionalPart = modf(length, &integerPart);
-	fr = static_cast<unsigned>(floor(fractionalPart * 256));
+	fr = gsl::narrow<unsigned>(floor(fractionalPart * 256));
 	num = integerPart;
-	FormList[ClosestFormToCursor].picoLength = static_cast<unsigned short>(num << 8) | fr;
+	FormList[ClosestFormToCursor].picoLength = gsl::narrow<unsigned short>(num << 8) | fr;
 }
 
 void chkbrd() {
@@ -2576,7 +2578,7 @@ void refilfn() {
 				spacing = LineSpacing;
 				LineSpacing = SelectedForm->fillSpacing;
 				bool doFill = true;
-				switch (static_cast<unsigned>(SelectedForm->fillType)) {
+				switch (gsl::narrow<unsigned>(SelectedForm->fillType)) {
 					case VRTF:
 
 						fnvrt();
@@ -4380,7 +4382,7 @@ void rstfrm() {
 
 	fPOINT		offset = {};
 	unsigned	iVertex = 0, iStitch = 0;
-	POINT		point = { (Msg.pt.x + static_cast<long>(FormMoveDelta.x)),(Msg.pt.y + static_cast<long>(FormMoveDelta.y)) };
+	POINT		point = { (Msg.pt.x + gsl::narrow<long>(FormMoveDelta.x)),(Msg.pt.y + gsl::narrow<long>(FormMoveDelta.y)) };
 	const	unsigned	attribute = (ClosestFormToCursor << 4);
 
 	setmfrm();
@@ -4763,13 +4765,13 @@ void satadj() {
 			CheckMap[iWord] = 0;
 		for (iGuide = 0; iGuide < CurrentFormConnectionsCount; iGuide++) {
 			iForward = CurrentFormGuides[iGuide].start;
-			if (iForward > static_cast<unsigned>(WordParam) - 1)
+			if (iForward > gsl::narrow<unsigned>(WordParam) - 1)
 				iForward = WordParam - 1;
 			if (setchk(iForward)) {
 				iReverse = iForward;
 				if (iReverse)
 					iReverse--;
-				while (!chkchk(iForward) && iForward < static_cast<unsigned>(WordParam) - 1)
+				while (!chkchk(iForward) && iForward < gsl::narrow<unsigned>(WordParam) - 1)
 					iForward++;
 				while (iReverse && (!chkchk(iReverse)))
 					iReverse--;
@@ -4809,11 +4811,11 @@ void satadj() {
 			if (setchk(iForward)) {
 				if (iForward < VertexCount - 1)
 					iForward++;
-				if (iReverse > static_cast<unsigned>(WordParam) + 1)
+				if (iReverse > gsl::narrow<unsigned>(WordParam) + 1)
 					iReverse--;
 				while (!chkchk(iForward) && iForward < VertexCount - 1)
 					iForward++;
-				while (iReverse > static_cast<unsigned>(WordParam) - 1 && (!chkchk(iReverse)))
+				while (iReverse > gsl::narrow<unsigned>(WordParam) - 1 && (!chkchk(iReverse)))
 					iReverse--;
 				if (!chkchk(iForward) && !chkchk(iReverse))
 					break;
@@ -4895,18 +4897,18 @@ void satclos() {
 		}
 		if (!StartPoint)
 			StartPoint++;
-		if (StartPoint == SelectedForm->vertexCount - 2 && closestVertex == static_cast<unsigned>(SelectedForm->vertexCount) - 1) {
+		if (StartPoint == SelectedForm->vertexCount - 2 && closestVertex == gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1) {
 			StartPoint = 1;
 			closestVertex = SelectedForm->vertexCount - 2;
 		}
-		if (closestVertex >= static_cast<unsigned>(SelectedForm->vertexCount) - 2) {
+		if (closestVertex >= gsl::narrow<unsigned>(SelectedForm->vertexCount) - 2) {
 			closestVertex = SelectedForm->vertexCount - 2;
-			if (StartPoint >= static_cast<unsigned>(SelectedForm->vertexCount) - 2)
+			if (StartPoint >= gsl::narrow<unsigned>(SelectedForm->vertexCount) - 2)
 				StartPoint = SelectedForm->vertexCount - 2;
 		}
 		if (closestVertex - StartPoint < 2) {
 			closestVertex = StartPoint + 2;
-			if (closestVertex > static_cast<unsigned>(SelectedForm->vertexCount) - 2) {
+			if (closestVertex > gsl::narrow<unsigned>(SelectedForm->vertexCount) - 2) {
 				closestVertex = closestVertex - SelectedForm->vertexCount - 2;
 				closestVertex -= closestVertex;
 				StartPoint -= closestVertex;
@@ -5171,7 +5173,7 @@ void satmf() {
 	if (SelectedForm->attribute&FRMEND)
 		iGuide = 1;
 	satfn(iGuide, CurrentFormGuides[0].start, VertexCount, CurrentFormGuides[0].finish);
-	for (iGuide = 0; iGuide < static_cast<unsigned>(CurrentFormConnectionsCount) - 1; iGuide++)
+	for (iGuide = 0; iGuide < gsl::narrow<unsigned>(CurrentFormConnectionsCount) - 1; iGuide++)
 		satfn(CurrentFormGuides[iGuide].start, CurrentFormGuides[iGuide + 1].start, CurrentFormGuides[iGuide].finish, CurrentFormGuides[iGuide + 1].finish);
 	if (WordParam)
 		satfn(CurrentFormGuides[iGuide].start, WordParam, CurrentFormGuides[iGuide].finish, WordParam + 1);
@@ -5333,7 +5335,7 @@ unsigned closat() {
 
 	px2stch();
 	for (iForm = 0; iForm < FormIndex; iForm++) {
-		if (!ActiveLayer || static_cast<unsigned>((FormList[iForm].attribute&FRMLMSK) >> 1) == ActiveLayer || !(FormList[iForm].attribute&FRMLMSK)) {
+		if (!ActiveLayer || gsl::narrow<unsigned>((FormList[iForm].attribute&FRMLMSK) >> 1) == ActiveLayer || !(FormList[iForm].attribute&FRMLMSK)) {
 			CurrentFormVertices = FormList[iForm].vertices;
 			savedVertex = VertexCount;
 			VertexCount = FormList[iForm].vertexCount;
@@ -5514,7 +5516,7 @@ void delspnt() {
 	SelectedForm->vertexCount--;
 	FormVertexIndex--;
 	fvars(ClosestFormToCursor);
-	if (ClosestVertexToCursor > static_cast<unsigned>(SelectedForm->vertexCount) - 1)
+	if (ClosestVertexToCursor > gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1)
 		ClosestVertexToCursor = SelectedForm->vertexCount - 1;
 	StateMap.set(StateFlag::FRMPSEL);
 	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
@@ -6449,7 +6451,7 @@ void slbrd() {
 		StateMap.reset(StateFlag::SAT1);
 		StateMap.reset(StateFlag::FILDIR);
 		LineSpacing = USPAC;
-		for (iVertex = 0; iVertex < static_cast<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
+		for (iVertex = 0; iVertex < gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
 			sbfn(InsidePoints, iVertex, iVertex + 1);
 		StateMap.flip(StateFlag::FILDIR);
 		for (iVertex = SelectedForm->vertexCount - 1; iVertex != 0; iVertex--)
@@ -6460,7 +6462,7 @@ void slbrd() {
 	satends(SelectedForm->attribute);
 	LineSpacing = SelectedForm->edgeSpacing;
 	StateMap.reset(StateFlag::SAT1);
-	for (iVertex = 0; iVertex < static_cast<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
+	for (iVertex = 0; iVertex < gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
 		sbfn(InsidePoints, iVertex, iVertex + 1);
 	LineSpacing = spacing;
 }
@@ -7499,11 +7501,11 @@ void nubrdcol(unsigned color) noexcept {
 	}
 }
 
-void nulapcol(unsigned color) noexcept {
+void nulapcol(unsigned color) {
 
 	unsigned	attribute = 0, iStitch = 0;
 
-	if (static_cast<unsigned>(SelectedForm->borderColor >> 4) != color) {
+	if (gsl::narrow<unsigned>(SelectedForm->borderColor >> 4) != color) {
 		SelectedForm->borderColor &= COLMSK;
 		SelectedForm->borderColor |= color << 4;
 		attribute = (ClosestFormToCursor << 4) | TYPMSK;
@@ -9046,7 +9048,7 @@ void flpord() {
 				savdo();
 				rngadj();
 				iForward = GroupStartStitch;
-				for (iStitch = 0; iStitch < (static_cast<signed>(GroupEndStitch - GroupStartStitch) >> 1) + 1; iStitch++) {
+				for (iStitch = 0; iStitch < (gsl::narrow<signed>(GroupEndStitch - GroupStartStitch) >> 1) + 1; iStitch++) {
 					swapPoint.attribute = StitchBuffer[iForward].attribute;
 					swapPoint.x = StitchBuffer[iForward].x;
 					swapPoint.y = StitchBuffer[iForward].y;
@@ -9272,7 +9274,7 @@ void snp(unsigned start, unsigned finish) {
 	unsigned*	txhst = nullptr;
 
 	chkrng(&range);
-	txhst = new unsigned[static_cast<int>(range.x) + 1]();
+	txhst = new unsigned[gsl::narrow<int>(range.x) + 1]();
 	Xpoints = new unsigned[MAXITEMS]();
 	Xhistogram = txhst;
 	for (iColumn = 0; iColumn < range.x; iColumn++)
@@ -9772,12 +9774,12 @@ void refilal() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-BOOL notsel() noexcept {
+BOOL notsel() {
 
 	unsigned	iForm;
 
 	for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-		if (static_cast<unsigned>(SelectedFormList[iForm]) == ClosestFormToCursor)
+		if (gsl::narrow<unsigned>(SelectedFormList[iForm]) == ClosestFormToCursor)
 			return 0;
 	}
 	return 1;
@@ -9789,7 +9791,7 @@ void nufsel() {
 		if (StateMap.testAndReset(StateFlag::WASEL))
 			SelectedFormList[SelectedFormCount++] = PreviousFormIndex;
 		if (notsel())
-			SelectedFormList[SelectedFormCount++] = static_cast<unsigned short>(ClosestFormToCursor);
+			SelectedFormList[SelectedFormCount++] = gsl::narrow<unsigned short>(ClosestFormToCursor);
 		StateMap.set(StateFlag::RESTCH);
 	}
 }
@@ -11290,7 +11292,7 @@ void unbean(unsigned start, unsigned finish) {
 	}
 	if (BeanCount)
 		BeanCount -= 2;;
-	if (iSource > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+	if (iSource > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 		iSource = PCSHeader.stitchCount - 1;
 	while (iSource < PCSHeader.stitchCount)
 		mvstch(iCopy++, iSource++);
@@ -11307,9 +11309,9 @@ void debean() {
 			ClosestPointIndex -= BeanCount;
 		else
 			GroupStitchIndex -= BeanCount;
-		if (ClosestPointIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+		if (ClosestPointIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 			ClosestPointIndex = PCSHeader.stitchCount - 1;
-		if (GroupStitchIndex > static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+		if (GroupStitchIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 			GroupStitchIndex = PCSHeader.stitchCount - 1;
 		grpAdj();
 	}
@@ -11447,7 +11449,7 @@ void spltsat(SATCON currentGuide) {
 	if (SelectedForm->wordParam)
 		SelectedForm->wordParam = currentGuide.start;
 	iOldVertex = iGuide + 1;
-	while (iGuide < static_cast<unsigned>(SelectedForm->satinGuideCount)) {
+	while (iGuide < gsl::narrow<unsigned>(SelectedForm->satinGuideCount)) {
 		SelectedForm->satinOrAngle.guide[iGuide].start -= (currentGuide.start - 1);
 		SelectedForm->satinOrAngle.guide[iGuide].finish -= (currentGuide.start - 1);
 		iGuide++;
@@ -11553,11 +11555,11 @@ void stchs2frm() {
 		frmout(FormIndex);
 		FormIndex++;
 		if (ClosestPointIndex > GroupStitchIndex) {
-			if (ClosestPointIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+			if (ClosestPointIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 				ClosestPointIndex++;
 		}
 		else {
-			if (GroupStitchIndex < static_cast<unsigned>(PCSHeader.stitchCount) - 1)
+			if (GroupStitchIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 				GroupStitchIndex++;
 		}
 		delstchm();
@@ -12113,12 +12115,12 @@ void clpcon() {
 		clipGrid.top++;
 		if (SelectedForm->fillSpacing < 0) {
 			clipGrid.bottom--;
-			clipGrid.left -= static_cast<long>(ClipRectSize.cx / ClipWidth);
-			clipGrid.right += static_cast<long>(ClipRectSize.cx / ClipWidth);
+			clipGrid.left -= gsl::narrow<long>(ClipRectSize.cx / ClipWidth);
+			clipGrid.right += gsl::narrow<long>(ClipRectSize.cx / ClipWidth);
 		}
 	}
 	if (clipNegative && !clipGridOffset)
-		clipGrid.left -= static_cast<long>(ClipRectSize.cx / ClipWidth);
+		clipGrid.left -= gsl::narrow<long>(ClipRectSize.cx / ClipWidth);
 	if (clipGrid.bottom < 0) {
 		negativeOffset = 1 - clipGrid.bottom;
 		clipGrid.bottom += negativeOffset;
@@ -12139,8 +12141,8 @@ void clpcon() {
 		}
 		if (SelectedForm->fillSpacing < 0)
 			finish += ClipRectSize.cx / ClipWidth;
-		if (finish > static_cast<unsigned>(clipGrid.right))
-			finish = static_cast<unsigned>(clipGrid.right);
+		if (finish > gsl::narrow<unsigned>(clipGrid.right))
+			finish = gsl::narrow<unsigned>(clipGrid.right);
 		if (clipNegative)
 			start -= static_cast<unsigned int>(ClipRectSize.cx / ClipWidth);
 		for (iSegment = start; iSegment <= finish; iSegment++) {
@@ -13063,7 +13065,7 @@ void duch() {
 	Div4 = AdjustedSpace / 4;
 	SequenceIndex = 0;
 	if (ActivePointIndex > 1) {
-		for (iPoint = 0; iPoint < static_cast<unsigned>(ActivePointIndex) - 2; iPoint++)
+		for (iPoint = 0; iPoint < gsl::narrow<unsigned>(ActivePointIndex) - 2; iPoint++)
 			duchfn(iPoint, iPoint + 1);
 		if (SelectedForm->type == FRMLINE) {
 			duchfn(iPoint, iPoint + 1);

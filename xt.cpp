@@ -1,7 +1,12 @@
+#ifndef NOMINMAX
+# define NOMINMAX
+#endif
 #include <windows.h>
 #include <stdio.h>
 #include <math.h>
 #include <tchar.h>
+#include <gsl/gsl>
+
 #include "lang.h"
 #include "resource.h"
 #include "thred.h"
@@ -1795,30 +1800,30 @@ int refcmp(const void *arg1, const void *arg2) {
 	return (int)record1->form - record2->form;
 }
 #else
-int recmp(const void *arg1, const void *arg2) noexcept {
+int recmp(const void *arg1, const void *arg2) {
 	OREC record1 = **static_cast<OREC * const *>(arg1);
 	OREC record2 = **static_cast<OREC * const *>(arg2);
 
 	if (ColorOrder[record1.color] == ColorOrder[record2.color]) {
 		if (record1.form == record2.form) {
 			if (record1.type == record2.type)
-				return static_cast<int>(record1.start) - record2.start;
+				return gsl::narrow<int>(record1.start) - gsl::narrow<int>(record2.start);
 			else
-				return static_cast<int>(record1.type) - record2.type;
+				return gsl::narrow<int>(record1.type) - gsl::narrow<int>(record2.type);
 		}
 		else
-			return static_cast<int>(record1.form) - record2.form;
+			return gsl::narrow<int>(record1.form) - gsl::narrow<int>(record2.form);
 	}
-	return static_cast<int>(ColorOrder[record1.color]) - ColorOrder[record2.color];
+	return gsl::narrow<int>(ColorOrder[record1.color]) - gsl::narrow<int>(ColorOrder[record2.color]);
 }
 
-int refcmp(const void *arg1, const void *arg2) noexcept {
+int refcmp(const void *arg1, const void *arg2) {
 	OREC record1 = **static_cast<OREC * const *>(arg1);
 	OREC record2 = **static_cast<OREC * const *>(arg2);
 
 	if (record1.form == record2.form)
-		return static_cast<int>(record1.type) - record2.type;
-	return static_cast<int>(record1.form) - record2.form;
+		return gsl::narrow<int>(record1.type) - gsl::narrow<int>(record2.type);
+	return gsl::narrow<int>(record1.form) - gsl::narrow<int>(record2.form);
 }
 #endif
 
@@ -2130,12 +2135,12 @@ typedef struct _atfld {
 	unsigned	user;
 }ATFLD;
 
-void duatf(unsigned ind) noexcept {
+void duatf(unsigned ind) {
 	char		attributeBuffer[256] = { 0 };
 	unsigned	attribute = StitchBuffer[ind].attribute;
 	ATFLD		attributeFields = { (attribute&COLMSK),
 									((attribute >> FRMSHFT)&FRMSK),
-									static_cast<unsigned>(StitchTypes[dutyp(attribute)]),
+									gsl::narrow<unsigned>(StitchTypes[dutyp(attribute)]),
 									((attribute >> LAYSHFT) & 7),
 									0};
 
@@ -2427,7 +2432,7 @@ void intlv() {
 			duint(offset, code, &ilData);
 		}
 		chkend(MAXITEMS, code, &ilData);
-		if (PCSHeader.stitchCount && ilData.start < static_cast<unsigned>(PCSHeader.stitchCount) - 1) {
+		if (PCSHeader.stitchCount && ilData.start < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 			ine = PCSHeader.stitchCount - ilData.start;
 			MoveMemory(&StitchBuffer[ilData.output + MAXITEMS], &StitchBuffer[ilData.start], sizeof(fPOINTATTR)*ine);
 			ilData.output += ine;
@@ -4336,13 +4341,13 @@ void txgro() {
 	txsiz(1 / TXTRAT);
 }
 
-BOOL txdig(unsigned keyCode, TCHAR* character) noexcept {
+BOOL txdig(unsigned keyCode, TCHAR* character) {
 	if (isdigit(keyCode)) {
-		*character = static_cast<TCHAR>(keyCode);
+		*character = gsl::narrow<TCHAR>(keyCode);
 		return 1;
 	}
 	if (keyCode >= VK_NUMPAD0 && keyCode <= VK_NUMPAD9) {
-		*character = static_cast<TCHAR>(keyCode) - VK_NUMPAD0 + 0x30;
+		*character = gsl::narrow<TCHAR>(keyCode) - VK_NUMPAD0 + 0x30;
 		return 1;
 	}
 	if (keyCode == 0xbe || keyCode == 0x6e) {
@@ -5083,11 +5088,11 @@ unsigned frmchkfn() {
 			if (badData.attribute == (BADFLT | BADCLP | BADSAT | BADTX))
 				break;
 		}
-		if (badData.flt != static_cast<int>(FormVertexIndex))
+		if (badData.flt != gsl::narrow<int>(FormVertexIndex))
 			badData.attribute |= BADFLT;
-		if (badData.clip != static_cast<int>(ClipPointIndex))
+		if (badData.clip != gsl::narrow<int>(ClipPointIndex))
 			badData.attribute |= BADCLP;
-		if (badData.guideCount != static_cast<int>(SatinConnectIndex))
+		if (badData.guideCount != gsl::narrow<int>(SatinConnectIndex))
 			badData.attribute |= BADSAT;
 		if (badData.tx != TextureIndex)
 			badData.attribute |= BADTX;
