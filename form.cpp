@@ -2252,7 +2252,7 @@ void savblen(float fLength) {
 #else
 
 	unsigned	iLength;
-	iLength = gsl::narrow<int>(fLength);
+	iLength = gsl::narrow<int>(round(fLength));
 
 	FormList[ClosestFormToCursor].clipEntries = iLength >> 16;
 	FormList[ClosestFormToCursor].picoLength = iLength & 0xFFFF;
@@ -4382,7 +4382,7 @@ void rstfrm() {
 
 	fPOINT		offset = {};
 	unsigned	iVertex = 0, iStitch = 0;
-	POINT		point = { (Msg.pt.x + gsl::narrow<long>(FormMoveDelta.x)),(Msg.pt.y + gsl::narrow<long>(FormMoveDelta.y)) };
+	POINT		point = { (Msg.pt.x + gsl::narrow<long>(round(FormMoveDelta.x))),(Msg.pt.y + gsl::narrow<long>(round(FormMoveDelta.y))) };
 	const	unsigned	attribute = (ClosestFormToCursor << 4);
 
 	setmfrm();
@@ -9274,7 +9274,7 @@ void snp(unsigned start, unsigned finish) {
 	unsigned*	txhst = nullptr;
 
 	chkrng(&range);
-	txhst = new unsigned[gsl::narrow<int>(range.x) + 1]();
+	txhst = new unsigned[gsl::narrow<int>(round(range.x)) + 1]();
 	Xpoints = new unsigned[MAXITEMS]();
 	Xhistogram = txhst;
 	for (iColumn = 0; iColumn < range.x; iColumn++)
@@ -12115,12 +12115,12 @@ void clpcon() {
 		clipGrid.top++;
 		if (SelectedForm->fillSpacing < 0) {
 			clipGrid.bottom--;
-			clipGrid.left -= gsl::narrow<long>(ClipRectSize.cx / ClipWidth);
-			clipGrid.right += gsl::narrow<long>(ClipRectSize.cx / ClipWidth);
+			clipGrid.left -= gsl::narrow<long>(round(ClipRectSize.cx / ClipWidth));
+			clipGrid.right += gsl::narrow<long>(round(ClipRectSize.cx / ClipWidth));
 		}
 	}
 	if (clipNegative && !clipGridOffset)
-		clipGrid.left -= gsl::narrow<long>(ClipRectSize.cx / ClipWidth);
+		clipGrid.left -= gsl::narrow<long>(round(ClipRectSize.cx / ClipWidth));
 	if (clipGrid.bottom < 0) {
 		negativeOffset = 1 - clipGrid.bottom;
 		clipGrid.bottom += negativeOffset;

@@ -2465,9 +2465,9 @@ void selin(unsigned start, unsigned end, HDC dc) {
 	for (iStitch = start; iStitch <= end; iStitch++) {
 
 		coordinate = ((StitchBuffer[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5);
-		SearchLine[SearchLineIndex].x = gsl::narrow<long>(coordinate);
+		SearchLine[SearchLineIndex].x = gsl::narrow<long>(round(coordinate));
 		coordinate = (hi - (StitchBuffer[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5);
-		SearchLine[SearchLineIndex++].y = gsl::narrow<long>(coordinate);
+		SearchLine[SearchLineIndex++].y = gsl::narrow<long>(round(coordinate));
 	}
 	Polyline(dc, SearchLine, SearchLineIndex);
 	SetROP2(dc, R2_COPYPEN);
@@ -2697,16 +2697,16 @@ void grpAdj() {
 			if (newSize.x > newSize.y) {
 
 				coordinate = newSize.x*ZMARGIN;
-				newSize.x += gsl::narrow<long>(coordinate);
+				newSize.x += gsl::narrow<long>(round(coordinate));
 				coordinate = newSize.x / StitchWindowAspectRatio;
-				newSize.y = gsl::narrow<long>(coordinate);
+				newSize.y = gsl::narrow<long>(round(coordinate));
 			}
 			else {
 
 				coordinate = newSize.y*ZMARGIN;
-				newSize.y = gsl::narrow<long>(coordinate);
+				newSize.y = gsl::narrow<long>(round(coordinate));
 				coordinate = newSize.y*StitchWindowAspectRatio;
-				newSize.x = gsl::narrow<long>(coordinate);
+				newSize.x = gsl::narrow<long>(round(coordinate));
 			}
 			if (newSize.x > UnzoomedRect.x || newSize.y > UnzoomedRect.y) {
 
@@ -3492,9 +3492,9 @@ void stchPars() {
 
 	AspectRatio = static_cast<double>(UnzoomedRect.x) / static_cast<double>(UnzoomedRect.y);
 	if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT))
-		StitchWindowSize.x = gsl::narrow<long>((ThredWindowRect.bottom - (SCROLSIZ << 1))*AspectRatio);
+		StitchWindowSize.x = gsl::narrow<long>(round((ThredWindowRect.bottom - (SCROLSIZ << 1))*AspectRatio));
 	else
-		StitchWindowSize.x = gsl::narrow<long>((ThredWindowRect.bottom - SCROLSIZ)*AspectRatio);
+		StitchWindowSize.x = gsl::narrow<long>(round((ThredWindowRect.bottom - SCROLSIZ)*AspectRatio));
 
 	if ((StitchWindowSize.x + gsl::narrow<long>(ButtonWidthX3) + RIGHTSIZ) < ThredWindowRect.right) {
 
@@ -4063,7 +4063,7 @@ void chknum() {
 
 								case PAP:
 
-									AppliqueColor = gsl::narrow<unsigned>(value - 1) % 16;
+									AppliqueColor = gsl::narrow<unsigned>(round(value - 1)) % 16;
 									sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", AppliqueColor + 1);
 									SetWindowText(ValueWindow[PAP], MsgBuffer);
 									break;
@@ -8682,7 +8682,7 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 
 		iNextStitch = find1st();
 		iStitch = iNextStitch + 1;
-		while (iStitch<gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1 && stitchSize>SmallStitchLength) {
+		while (iStitch<gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1 && stitchSize > SmallStitchLength) {
 
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute) {
 
@@ -9417,13 +9417,13 @@ void setsped() {
 	if (userTimePerFrame < 10) {
 
 		elapsedTimePerFrame = 100;  // units are millseconds
-		StitchesPerFrame = gsl::narrow<unsigned>(elapsedTimePerFrame / userTimePerFrame);
+		StitchesPerFrame = gsl::narrow<unsigned>(round(elapsedTimePerFrame / userTimePerFrame));
 		if (StitchesPerFrame > 99)
 			StitchesPerFrame = 99;
 	}
 	else {
 
-		elapsedTimePerFrame = gsl::narrow<unsigned>(userTimePerFrame);
+		elapsedTimePerFrame = gsl::narrow<unsigned>(round(userTimePerFrame));
 		StitchesPerFrame = 2;
 	}
 	if (StitchesPerFrame < 2)
