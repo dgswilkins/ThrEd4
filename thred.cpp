@@ -21465,7 +21465,7 @@ void redini() {
 		if (IniFile.stitchSpace)
 			LineSpacing = IniFile.stitchSpace;
 		{
-			EnumMap<UserFlag>tmp(IniFile.userFlagMap);
+			EnumMap<UserFlag> tmp(IniFile.userFlagMap);
 			UserFlagMap = tmp;
 		}
 		if (IniFile.borderWidth)

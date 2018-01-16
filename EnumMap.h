@@ -25,7 +25,7 @@ class EnumMap
 	static_assert(has_enum_count<EnumType>::value, "Enum provided to EnumMap must have a \"EnumCount\" option as the last element in the enum.");
 
 public:
-	EnumMap(unsigned i_val) : mask_(i_val) {}
+	constexpr EnumMap(unsigned i_val) : mask_(i_val) {}
 	inline bool test(const EnumType i_key) const { return mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key)); }
 	inline void set() { mask_.set(); }
 	inline void set(const EnumType i_key, bool i_val = true) { mask_.set(static_cast<typename std::underlying_type<EnumType>::type>(i_key), i_val); }
