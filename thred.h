@@ -385,7 +385,7 @@ enum	{	//daisy form types
 };
 
 //bitmap
-enum StateFlags {
+enum class StateFlag {
 	SATIN,		//user is entering a satin stitch form
 	SATPNT,		//user is entering points for a satin stitch form
 	BOXZUM,		//box zoom select mode
@@ -651,7 +651,7 @@ enum StateFlags {
 };
 
 //user bitmap
-enum {
+enum class UserFlag {
 	SQRFIL,		//square ends on fills
 	BLUNT,		//blunt ends on satin lines
 	NEDOF,		//needle cursor off
@@ -667,7 +667,8 @@ enum {
 	DAZHOL,		//daisy hole
 	DAZD,		//daisy d-lines
 	CHREF,		//refill forms when changing design size
-	WRNOF		//warn if edited off
+	WRNOF,		//warn if edited off
+	EnumCount		//must be the last entry in the enum
 };
 
 enum {			//feather fill types

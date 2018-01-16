@@ -25,34 +25,36 @@ class EnumMap
 	static_assert(has_enum_count<EnumType>::value, "Enum provided to EnumMap must have a \"EnumCount\" option as the last element in the enum.");
 
 public:
-	inline bool test(const EnumType i_key) const { return mask_.test(i_key); }
+	EnumMap(unsigned i_val) : mask_(i_val) {}
+	inline bool test(const EnumType i_key) const { return mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key)); }
 	inline void set() { mask_.set(); }
-	inline void set(const EnumType i_key, bool i_val = true) { mask_.set(i_key, i_val); }
+	inline void set(const EnumType i_key, bool i_val = true) { mask_.set(static_cast<typename std::underlying_type<EnumType>::type>(i_key), i_val); }
 	inline bool testAndSet(const EnumType i_key, bool i_val = true) {
-		bool val = mask_.test(i_key);
-		mask_.set(i_key, i_val);
+		bool val = mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		mask_.set(static_cast<typename std::underlying_type<EnumType>::type>(i_key), i_val);
 		return val;  }
 	inline void reset() noexcept { mask_.reset(); }
-	inline void reset(const EnumType i_key) { mask_.reset(i_key); }
+	inline void reset(const EnumType i_key) { mask_.reset(static_cast<typename std::underlying_type<EnumType>::type>(i_key)); }
 	inline bool testAndReset(const EnumType i_key) {
-		bool val = mask_.test(i_key);
-		mask_.reset(i_key);
+		bool val = mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		mask_.reset(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		return val;
 	}
 	inline void flip() { mask_.flip(); }
-	inline void flip(const EnumType i_key) { mask_.flip(i_key); }
+	inline void flip(const EnumType i_key) { mask_.flip(static_cast<typename std::underlying_type<EnumType>::type>(i_key)); }
 	inline bool testAndFlip(const EnumType i_key) {
-		bool val = mask_.test(i_key);
-		mask_.flip(i_key);
+		bool val = mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		mask_.flip(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		return val;
 	}
+	inline unsigned long to_ulong() { return mask_.to_ulong(); }
 	inline size_t count() const { return mask_.count(); }				//number of set bits
 	inline size_t size() const { return mask_.size(); }					//number of bits in the entire set
 	inline bool any() const { return mask_.any(); }
 	inline bool none() const { return mask_.none(); }
 	inline bool all() const { return mask_.all(); }
-	inline std::bitset<EnumType::EnumCount> mask() const { return mask_; }
-	inline void mask(const std::bitset<EnumType::EnumCount>& i_mask) { mask_ = i_mask; }
+	inline std::bitset<static_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> mask() const { return mask_; }
+	inline void mask(const std::bitset<static_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)>& i_mask) { mask_ = i_mask; }
 
 	bool operator==(const EnumMap<EnumType>& i_other) const { return mask_ == i_other.mask_; }
 	bool operator!=(const EnumMap<EnumType>& i_other) const { return mask_ != i_other.mask_; }
@@ -91,7 +93,7 @@ public:
 	}
 
 private:
-	std::bitset<EnumType::EnumCount> mask_;
+	std::bitset<static_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> mask_;
 };
 
 #endif //_ENUM_MASK
