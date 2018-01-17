@@ -1618,19 +1618,6 @@ unsigned	DSTRecordCount;		//number of destination stitch records
 POINT		DSTPositiveOffset;	//plus offset written into the destination file header
 POINT		DSTNegativeOffset;	//minus offset written into the destination file header
 
-//bitmap for upper case characters
-unsigned UpperCaseMap[] = {
-
-	//fedcba9876543210fedcba9876543210
-0,			//00000000000000000000000000000000
-			//?>=</:9876543210 /.-,+*)('&%$#"!
-0,			//00000000000000000000000000000000
-			//_^]\[ZYXWVUTSRQPONMLKJIHGFEDCBA@
-0x07fffffe,	//00000111111111111111111111111110
-			// ~}|{zyxwvutsrqponmlkjihgfedcba'
-0,			//00000000000000000000000000000000
-};
-
 EnumMap<StateFlag>	StateMap(0);				// Flags indicating current run state
 EnumMap<UserFlag>	UserFlagMap(0);				//for storage of persistent binary variables set by the user
 fPOINTATTR			StitchBuffer[MAXITEMS * 2];	//main stitch buffer
@@ -11309,69 +11296,6 @@ int strcomp(const void *arg1, const void *arg2) noexcept {
 	return _stricmp(*static_cast<TCHAR * const *>(arg1), *static_cast<TCHAR * const *>(arg2));
 }
 
-void strlcpy(TCHAR* destination, TCHAR* source) noexcept {
-
-#if  __UseASM__
-	_asm {
-		mov		ebx, offset UpperCaseMap
-		mov		ecx, destination
-		mov		edx, source
-		xor		eax, eax
-lup :
-		mov		al, [edx]
-		inc		edx
-		or		al, al
-		je		lupx
-		and		al, 0x7f
-		bt		[ebx], eax
-		jnc		short lup1
-		or		al, 0x20
-lup1:
-		mov		[ecx], al
-		inc		ecx
-		jmp		lup
-lupx :
-		mov[ecx], al
-	}
-#else
-	//Correct
-	for (;;) {
-		TCHAR character = *(source++);
-
-		if (character == 0)
-			break;
-
-		character &= 0x7f;
-
-		if (_bittest((long *)UpperCaseMap, character))
-			character |= 0x20;
-
-		*(destination++) = character;
-	}
-
-	*destination = 0;
-#endif
-}
-
-TCHAR lchr(int character) noexcept {
-
-#if  __UseASM__
-	_asm {
-		mov		ebx, offset UpperCaseMap
-		mov		eax, character
-		and		eax, 0x7f
-		bt		[ebx], eax
-		jnc		short lchrx
-		or		al, 0x20
-lchrx:
-	}
-#else
-	TCHAR tchar = character & 0x7f;
-
-	return _bittest((long *)UpperCaseMap, tchar) ? tchar : tchar | 0x20;
-#endif
-}
-
 void barnam(HWND window, unsigned iThumbnail) {
 
 	TCHAR		buffer[_MAX_PATH] = { 0 };
@@ -18014,7 +17938,7 @@ didskip:;
 		case WM_CHAR:
 
 			if (isgraph(Msg.wParam))
-				nuthum(lchr(Msg.wParam));
+				nuthum(tolower(Msg.wParam));
 			break;
 
 		case WM_KEYDOWN:
