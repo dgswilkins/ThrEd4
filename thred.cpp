@@ -1638,10 +1638,10 @@ fPOINTATTR			ClipBuffer[MAXITEMS];		//for temporary copy of imported clipboard d
 FRMHED*				SelectedForm;				//pointer to selected form
 unsigned			FillTypes[] =				//fill type array for side window display
 { 0,VRTF,HORF,ANGF,SATF,CLPF,CONTF,VCLPF,HCLPF,ANGCLPF,FTHF,TXVRTF,TXHORF,TXANGF };
-//edge fill type array for side window display
-unsigned			EdgeFillTypes[] = { 0,EDGELINE,EDGEBEAN,EDGECLIP,EDGEANGSAT,EDGEAPPL,EDGEPROPSAT,EDGEBHOL,EDGEPICOT,EDGEDOUBLE,EDGELCHAIN,EDGEOCHAIN,EDGECLIPX };
-//feather fill types
-unsigned			FeatherFillTypes[] = { FTHSIN,FTHSIN2,FTHLIN,FTHPSG,FTHRMP,FTHFAZ };
+unsigned			EdgeFillTypes[] =			//edge fill type array for side window display
+{ 0,EDGELINE,EDGEBEAN,EDGECLIP,EDGEANGSAT,EDGEAPPL,EDGEPROPSAT,EDGEBHOL,EDGEPICOT,EDGEDOUBLE,EDGELCHAIN,EDGEOCHAIN,EDGECLIPX };
+unsigned			FeatherFillTypes[] =		//feather fill types
+{ FTHSIN,FTHSIN2,FTHLIN,FTHPSG,FTHRMP,FTHFAZ };
 
 BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
 	UNREFERENCED_PARAMETER(lparam);
