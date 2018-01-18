@@ -4613,7 +4613,7 @@ unsigned setchk(unsigned bit) noexcept {
 setcx :
 	}
 #else
-	return _bittestandset(static_cast<long *>(static_cast<void *>(CheckMap)), bit) ? 0xFFFFFFFF : 0;
+ 	return _bittestandset(static_cast<long *>(static_cast<void *>(CheckMap)), bit) ? 0xFFFFFFFF : 0;
 #endif
 }
 
@@ -4633,11 +4633,11 @@ ccx :
 #endif
 }
 
-unsigned nxtchk(unsigned bit) noexcept {
+unsigned nxtchk(unsigned mapWord) noexcept {
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
-		mov		ebx, bit
+		mov		ebx, mapWord
 		shl		ebx, 2
 		add		ebx, CheckMap
 		mov		ecx, [ebx]
@@ -4651,23 +4651,23 @@ nxtc1 :
 nxtcx :
 	}
 #else
-	if (CheckMap[bit] == 0)
+	if (CheckMap[mapWord] == 0)
 		return 0xffffffff;
 
 	DWORD returnBit;
 
-	_BitScanForward(&returnBit, CheckMap[bit]);
-	_bittestandreset(static_cast<long *>(static_cast<void *>(CheckMap + bit)), returnBit);
+	_BitScanForward(&returnBit, CheckMap[mapWord]);
+	_bittestandreset(static_cast<long *>(static_cast<void *>(CheckMap + mapWord)), returnBit);
 
 	return returnBit;
 #endif
 }
 
-unsigned prvchk(unsigned bit) noexcept {
+unsigned prvchk(unsigned mapWord) noexcept {
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
-		mov		ebx, bit
+		mov		ebx, mapWord
 		shl		ebx, 2
 		add		ebx, CheckMap
 		mov		ecx, [ebx]
@@ -4684,11 +4684,11 @@ prvcx :
 	//Check translation
 	DWORD returnBit = 0;
 
-	if (CheckMap[bit] == 0)
+	if (CheckMap[mapWord] == 0)
 		return 0xffffffff;
 
-	_BitScanReverse(&returnBit, CheckMap[bit]);
-	_bittestandreset(static_cast<long *>(static_cast<void *>(CheckMap + bit)), returnBit);
+	_BitScanReverse(&returnBit, CheckMap[mapWord]);
+	_bittestandreset(static_cast<long *>(static_cast<void *>(CheckMap + mapWord)), returnBit);
 
 	return returnBit;
 #endif
