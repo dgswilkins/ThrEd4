@@ -4614,7 +4614,11 @@ unsigned setchk(boost::dynamic_bitset<> mapParam, unsigned bit) {
 
 unsigned nxtchk(boost::dynamic_bitset<> *mapParam) {
 	unsigned foundBit = mapParam->find_first();
-	mapParam->reset(foundBit);
+	if (foundBit != boost::dynamic_bitset<>::npos) {
+		mapParam->reset(foundBit);
+	} else {
+		return 0xFFFFFFFF;
+	}
 	return foundBit;
 }
 
@@ -4625,7 +4629,12 @@ unsigned prvchk(boost::dynamic_bitset<> *mapParam) {
 			foundBit = mapParam->find_next(foundBit);
 		} while (mapParam->find_next(foundBit) != boost::dynamic_bitset<>::npos);
 	}
-	mapParam->reset(foundBit);
+	if (foundBit != boost::dynamic_bitset<>::npos) {
+		mapParam->reset(foundBit);
+	}
+	else {
+		return 0xFFFFFFFF;
+	}
 	return foundBit;
 }
 
@@ -4670,7 +4679,7 @@ void satadj() {
 		}
 		iDestination = 0;
 		for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++) {
-			if (satinMap.test(CurrentFormGuides[iSource].start) && satinMap.test(CurrentFormGuides[iSource].finish)) {
+			if (!satinMap.test(CurrentFormGuides[iSource].start) && !satinMap.test(CurrentFormGuides[iSource].finish)) {
 				guide[iDestination].start = CurrentFormGuides[iSource].start;
 				guide[iDestination].finish = CurrentFormGuides[iSource].finish;
 				iDestination++;
@@ -4704,20 +4713,20 @@ void satadj() {
 				iReverse = iForward;
 				if (iReverse)
 					iReverse--;
-				while (!satinMap.test(iForward) && (iForward < (gsl::narrow<unsigned>(WordParam) - 1)))
+				while (satinMap.test(iForward) && (iForward < (gsl::narrow<unsigned>(WordParam) - 1)))
 					iForward++;
-				while (iReverse && (!satinMap.test(iReverse)))
+				while (iReverse && (satinMap.test(iReverse)))
 					iReverse--;
-				if (!satinMap.test(iForward) && !satinMap.test(iReverse))
+				if (satinMap.test(iForward) && satinMap.test(iReverse))
 					break;
-				if (satinMap.test(iForward) && satinMap.test(iReverse)) {
+				if (!satinMap.test(iForward) && !satinMap.test(iReverse)) {
 					if (iForward - CurrentFormGuides[iGuide].start > CurrentFormGuides[iGuide].start - iReverse)
 						satinMap.set(iReverse);
 					else
 						satinMap.set(iForward);
 				}
 				else {
-					if (satinMap.test(iForward))
+					if (!satinMap.test(iForward))
 						satinMap.set(iReverse);
 					else
 						satinMap.set(iForward);
@@ -4728,6 +4737,8 @@ void satadj() {
 		iGuide = 0;
 		do {
 			iVertex = nxtchk(&satinMap);
+			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "satadj:iVertex %d\n", iVertex);
+			OutputDebugString(MsgBuffer);
 			if (iVertex < VertexCount)
 				CurrentFormGuides[iGuide++].start = iVertex;
 		} while (iVertex < VertexCount);
@@ -4744,20 +4755,20 @@ void satadj() {
 					iForward++;
 				if (iReverse > gsl::narrow<unsigned>(WordParam) + 1)
 					iReverse--;
-				while (!satinMap.test(iForward) && iForward < VertexCount - 1)
+				while (satinMap.test(iForward) && iForward < VertexCount - 1)
 					iForward++;
-				while (iReverse > gsl::narrow<unsigned>(WordParam) - 1 && (!satinMap.test(iReverse)))
+				while (iReverse > gsl::narrow<unsigned>(WordParam) - 1 && (satinMap.test(iReverse)))
 					iReverse--;
-				if (!satinMap.test(iForward) && !satinMap.test(iReverse))
+				if (satinMap.test(iForward) && satinMap.test(iReverse))
 					break;
-				if (satinMap.test(iForward) && satinMap.test(iReverse)) {
+				if (!satinMap.test(iForward) && !satinMap.test(iReverse)) {
 					if (iForward - CurrentFormGuides[iGuide].finish > CurrentFormGuides[iGuide].finish - iReverse)
 						satinMap.set(iReverse);
 					else
 						satinMap.set(iForward);
 				}
 				else {
-					if (satinMap.test(iForward))
+					if (!satinMap.test(iForward))
 						satinMap.set(iForward);
 					else
 						satinMap.set(iReverse);
@@ -4767,6 +4778,8 @@ void satadj() {
 		iGuide = 0;
 		do {
 			iReverse = prvchk(&satinMap);
+			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "satadj:iReverse %d\n", iReverse);
+			OutputDebugString(MsgBuffer);
 			if (iReverse < VertexCount)
 				CurrentFormGuides[iGuide++].finish = iReverse;
 		} while (iReverse < VertexCount);
