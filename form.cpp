@@ -1,11 +1,17 @@
 #ifndef NOMINMAX
 # define NOMINMAX
 #endif
+
+#ifndef BCSOM
+#define BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE
+#endif
+
 #include <windows.h>
 #include <stdio.h>
 #include <math.h>
 #include <tchar.h>
 #include <gsl/gsl>
+#include <boost/dynamic_bitset.hpp>
 
 #include "lang.h"
 #include "resource.h"
@@ -309,7 +315,6 @@ fPOINT*			CurrentFormVertices;	//points in the currently selected form
 SATCON*			CurrentFormGuides;	//connections in the currently selecteed form
 unsigned short	CurrentFormConnectionsCount;	//number of connections in the currently selected form
 unsigned short	WordParam;				//word paramater from the currently selected form
-unsigned*		CheckMap;				//bitmap used by satin fill to delete illegal lines
 unsigned short	StartPoint;				//starting formOrigin for a satin stitch guide-line
 double			HorizontalLength2;		//horizontal length of a clipboard fill/2
 double			HorizontalLength;		//horizontal length of a clipboard fill
@@ -4601,104 +4606,34 @@ scmpx :
 #endif
 }
 
-unsigned setchk(unsigned bit) noexcept {
-#if	 __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, CheckMap
-		mov		ecx, bit
-		bts		[ebx], ecx
-		jnc		short setcx
-		dec		eax
-setcx :
-	}
-#else
- 	return _bittestandset(static_cast<long *>(static_cast<void *>(CheckMap)), bit) ? 0xFFFFFFFF : 0;
-#endif
+unsigned setchk(boost::dynamic_bitset<> mapParam, unsigned bit) {
+	bool var = mapParam.test(bit);
+	mapParam.set(bit);
+	return var;
 }
 
-unsigned chkchk(unsigned bit) noexcept {
-#if	 __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, CheckMap
-		mov		ecx, bit
-		bt		[ebx], ecx
-		jc		short ccx
-		dec		eax
-ccx :
-	}
-#else
-	return _bittest(static_cast<long *>(static_cast<void *>(CheckMap)), bit) ? 0 : 0xFFFFFFFF;
-#endif
+unsigned nxtchk(boost::dynamic_bitset<> *mapParam) {
+	unsigned foundBit = mapParam->find_first();
+	mapParam->reset(foundBit);
+	return foundBit;
 }
 
-unsigned nxtchk(unsigned mapWord) noexcept {
-#if	 __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, mapWord
-		shl		ebx, 2
-		add		ebx, CheckMap
-		mov		ecx, [ebx]
-		bsf		eax, ecx
-		jne		short nxtc1
-		dec		eax
-		jmp		short nxtcx
-nxtc1 :
-		btr		ecx, eax
-		mov		[ebx], ecx
-nxtcx :
+unsigned prvchk(boost::dynamic_bitset<> *mapParam) {
+	unsigned foundBit = mapParam->find_first();
+	if (foundBit != boost::dynamic_bitset<>::npos) {
+		do {
+			foundBit = mapParam->find_next(foundBit);
+		} while (mapParam->find_next(foundBit) != boost::dynamic_bitset<>::npos);
 	}
-#else
-	if (CheckMap[mapWord] == 0)
-		return 0xffffffff;
-
-	DWORD returnBit;
-
-	_BitScanForward(&returnBit, CheckMap[mapWord]);
-	_bittestandreset(static_cast<long *>(static_cast<void *>(CheckMap + mapWord)), returnBit);
-
-	return returnBit;
-#endif
-}
-
-unsigned prvchk(unsigned mapWord) noexcept {
-#if	 __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, mapWord
-		shl		ebx, 2
-		add		ebx, CheckMap
-		mov		ecx, [ebx]
-		bsr		eax, ecx
-		jne		short prvc1
-		dec		eax
-		jmp		short prvcx
-prvc1 : 
-		btr		ecx, eax
-		mov		[ebx], ecx
-prvcx :
-	}
-#else
-	//Check translation
-	DWORD returnBit = 0;
-
-	if (CheckMap[mapWord] == 0)
-		return 0xffffffff;
-
-	_BitScanReverse(&returnBit, CheckMap[mapWord]);
-	_bittestandreset(static_cast<long *>(static_cast<void *>(CheckMap + mapWord)), returnBit);
-
-	return returnBit;
-#endif
+	mapParam->reset(foundBit);
+	return foundBit;
 }
 
 void satadj() {
 
 	fvars(ClosestFormToCursor);
 
-	unsigned		iGuide = 0, iSource = 0, iWord = 0, iForm = 0, iForward = 0, iVertex = 0, iReverse = 0, iDestination = 0;
+	unsigned		iGuide = 0, iSource = 0, iForm = 0, iForward = 0, iVertex = 0, iReverse = 0, iDestination = 0;
 	const unsigned	mapSize = (VertexCount >> 5) + 1;
 	// ToDo - what is guide used for? 
 	SATCON*			guide = new SATCON[CurrentFormConnectionsCount];
@@ -4706,6 +4641,7 @@ void satadj() {
 	SATCON*			destinationGuide = nullptr;
 	unsigned short	guideCount = SelectedForm->satinGuideCount;
 	FRMHED*			formHeader = nullptr;
+	boost::dynamic_bitset<> satinMap(VertexCount);
 
 	for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 		if (CurrentFormGuides[iGuide].finish > VertexCount - 1)
@@ -4713,7 +4649,6 @@ void satadj() {
 		if (CurrentFormGuides[iGuide].start > VertexCount - 1)
 			CurrentFormGuides[iGuide].start = VertexCount - 1;
 	}
-	CheckMap = new unsigned[mapSize];
 	iDestination = 0;
 	for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++) {
 		if (CurrentFormGuides[iSource].start != CurrentFormGuides[iSource].finish) {
@@ -4724,19 +4659,18 @@ void satadj() {
 	}
 	CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iDestination;
 	if (WordParam || SelectedForm->attribute&FRMEND) {
-		for (iWord = 0; iWord < mapSize; iWord++)
-			CheckMap[iWord] = 0;
+		satinMap.reset();
 		if (SelectedForm->attribute&FRMEND) {
-			setchk(0);
-			setchk(1);
+			satinMap.set(0);
+			satinMap.set(1);
 		}
 		if (WordParam) {
-			setchk(WordParam);
-			setchk(WordParam + 1);
+			satinMap.set(WordParam);
+			satinMap.set(WordParam + 1);
 		}
 		iDestination = 0;
 		for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++) {
-			if (chkchk(CurrentFormGuides[iSource].start) && chkchk(CurrentFormGuides[iSource].finish)) {
+			if (satinMap.test(CurrentFormGuides[iSource].start) && satinMap.test(CurrentFormGuides[iSource].finish)) {
 				guide[iDestination].start = CurrentFormGuides[iSource].start;
 				guide[iDestination].finish = CurrentFormGuides[iSource].finish;
 				iDestination++;
@@ -4761,86 +4695,81 @@ void satadj() {
 		}
 	}
 	if (CurrentFormConnectionsCount) {
-		for (iWord = 0; iWord < mapSize; iWord++)
-			CheckMap[iWord] = 0;
+		satinMap.reset();
 		for (iGuide = 0; iGuide < CurrentFormConnectionsCount; iGuide++) {
 			iForward = CurrentFormGuides[iGuide].start;
 			if (iForward > gsl::narrow<unsigned>(WordParam) - 1)
 				iForward = WordParam - 1;
-			if (setchk(iForward)) {
+			if (setchk(satinMap, iForward)) {
 				iReverse = iForward;
 				if (iReverse)
 					iReverse--;
-				while (!chkchk(iForward) && iForward < gsl::narrow<unsigned>(WordParam) - 1)
+				while (!satinMap.test(iForward) && (iForward < (gsl::narrow<unsigned>(WordParam) - 1)))
 					iForward++;
-				while (iReverse && (!chkchk(iReverse)))
+				while (iReverse && (!satinMap.test(iReverse)))
 					iReverse--;
-				if (!chkchk(iForward) && !chkchk(iReverse))
+				if (!satinMap.test(iForward) && !satinMap.test(iReverse))
 					break;
-				if (chkchk(iForward) && chkchk(iReverse)) {
+				if (satinMap.test(iForward) && satinMap.test(iReverse)) {
 					if (iForward - CurrentFormGuides[iGuide].start > CurrentFormGuides[iGuide].start - iReverse)
-						setchk(iReverse);
+						satinMap.set(iReverse);
 					else
-						setchk(iForward);
+						satinMap.set(iForward);
 				}
 				else {
-					if (chkchk(iForward))
-						setchk(iReverse);
+					if (satinMap.test(iForward))
+						satinMap.set(iReverse);
 					else
-						setchk(iForward);
+						satinMap.set(iForward);
 				}
 
 			}
 		}
 		iGuide = 0;
-		for (iWord = 0; iWord < mapSize; iWord++) {
-			do {
-				iVertex = nxtchk(iWord);
-				if (iVertex < VertexCount)
-					CurrentFormGuides[iGuide++].start = iVertex + (iWord << 5);
-			} while (iVertex < VertexCount);
-		}
+		do {
+			iVertex = nxtchk(&satinMap);
+			if (iVertex < VertexCount)
+				CurrentFormGuides[iGuide++].start = iVertex;
+		} while (iVertex < VertexCount);
+
 		CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iGuide;
-		for (iWord = 0; iWord < mapSize; iWord++)
-			CheckMap[iWord] = 0;
+		satinMap.reset();
 		// Todo - are iForward and iReverse appropriate variable names below?
 		for (iGuide = 0; iGuide < CurrentFormConnectionsCount; iGuide++) {
 			iForward = iReverse = CurrentFormGuides[iGuide].finish;
 			if (iForward > VertexCount - 1)
 				iForward = VertexCount - 1;
-			if (setchk(iForward)) {
+			if (setchk(satinMap, iForward)) {
 				if (iForward < VertexCount - 1)
 					iForward++;
 				if (iReverse > gsl::narrow<unsigned>(WordParam) + 1)
 					iReverse--;
-				while (!chkchk(iForward) && iForward < VertexCount - 1)
+				while (!satinMap.test(iForward) && iForward < VertexCount - 1)
 					iForward++;
-				while (iReverse > gsl::narrow<unsigned>(WordParam) - 1 && (!chkchk(iReverse)))
+				while (iReverse > gsl::narrow<unsigned>(WordParam) - 1 && (!satinMap.test(iReverse)))
 					iReverse--;
-				if (!chkchk(iForward) && !chkchk(iReverse))
+				if (!satinMap.test(iForward) && !satinMap.test(iReverse))
 					break;
-				if (chkchk(iForward) && chkchk(iReverse)) {
+				if (satinMap.test(iForward) && satinMap.test(iReverse)) {
 					if (iForward - CurrentFormGuides[iGuide].finish > CurrentFormGuides[iGuide].finish - iReverse)
-						setchk(iReverse);
+						satinMap.set(iReverse);
 					else
-						setchk(iForward);
+						satinMap.set(iForward);
 				}
 				else {
-					if (chkchk(iForward))
-						setchk(iForward);
+					if (satinMap.test(iForward))
+						satinMap.set(iForward);
 					else
-						setchk(iReverse);
+						satinMap.set(iReverse);
 				}
 			}
 		}
 		iGuide = 0;
-		for (iWord = mapSize; iWord != 0; iWord--) {
-			do {
-				iReverse = prvchk(iWord - 1);
-				if (iReverse < VertexCount)
-					CurrentFormGuides[iGuide++].finish = iReverse + ((iWord - 1) << 5);
-			} while (iReverse < VertexCount);
-		}
+		do {
+			iReverse = prvchk(&satinMap);
+			if (iReverse < VertexCount)
+				CurrentFormGuides[iGuide++].finish = iReverse;
+		} while (iReverse < VertexCount);
 		if (iGuide < CurrentFormConnectionsCount)
 			iGuide = CurrentFormConnectionsCount;
 		CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iGuide;
@@ -4866,7 +4795,6 @@ void satadj() {
 		SatinConnectIndex -= iGuide;
 	}
 	delete[] guide;
-	delete[] CheckMap;
 }
 
 void satclos() {
