@@ -4606,7 +4606,7 @@ scmpx :
 #endif
 }
 
-unsigned setchk(boost::dynamic_bitset<> *mapParam, unsigned bit) {
+bool setchk(boost::dynamic_bitset<> *mapParam, unsigned bit) {
 	bool var = mapParam->test(bit);
 	mapParam->set(bit);
 	return var;
@@ -4626,7 +4626,9 @@ unsigned prvchk(boost::dynamic_bitset<> *mapParam) {
 	unsigned foundBit = mapParam->find_first();
 	if (foundBit != boost::dynamic_bitset<>::npos) {
 		do {
-			foundBit = mapParam->find_next(foundBit);
+			if (mapParam->find_next(foundBit) != boost::dynamic_bitset<>::npos) {
+				foundBit = mapParam->find_next(foundBit);
+			}
 		} while (mapParam->find_next(foundBit) != boost::dynamic_bitset<>::npos);
 	}
 	if (foundBit != boost::dynamic_bitset<>::npos) {
@@ -4755,7 +4757,7 @@ void satadj() {
 			iForward = iReverse = CurrentFormGuides[iGuide].finish;
 			if (iForward > VertexCount - 1)
 				iForward = VertexCount - 1;
-			if (!setchk(&satinMap, iForward)) {
+			if (setchk(&satinMap, iForward)) {
 				if (iForward < VertexCount - 1)
 					iForward++;
 				if (iReverse > gsl::narrow<unsigned>(WordParam) + 1)
@@ -4975,7 +4977,8 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 		while (iVertex > line2End) {
 			line2StitchCounts[iSegment] = ((Lengths[iNextVertex] - Lengths[iVertex]) / line2Length)*stitchCount + 0.5;
 			segmentStitchCount += line2StitchCounts[iSegment++];
-			iVertex = prv(--iNextVertex);
+			iNextVertex = prv(iNextVertex);
+			iVertex = prv(iNextVertex);
 		}
 		line2StitchCounts[iSegment] = stitchCount - segmentStitchCount;
 		line1Point.x = CurrentFormVertices[line1Start].x;
