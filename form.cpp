@@ -4606,9 +4606,9 @@ scmpx :
 #endif
 }
 
-unsigned setchk(boost::dynamic_bitset<> mapParam, unsigned bit) {
-	bool var = mapParam.test(bit);
-	mapParam.set(bit);
+unsigned setchk(boost::dynamic_bitset<> *mapParam, unsigned bit) {
+	bool var = mapParam->test(bit);
+	mapParam->set(bit);
 	return var;
 }
 
@@ -4652,12 +4652,15 @@ void satadj() {
 	FRMHED*			formHeader = nullptr;
 	boost::dynamic_bitset<> satinMap(VertexCount);
 
+	// ensure all guide endpoints are on vertices
 	for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 		if (CurrentFormGuides[iGuide].finish > VertexCount - 1)
 			CurrentFormGuides[iGuide].finish = VertexCount - 1;
 		if (CurrentFormGuides[iGuide].start > VertexCount - 1)
 			CurrentFormGuides[iGuide].start = VertexCount - 1;
 	}
+
+	// remove any guides of 0 length
 	iDestination = 0;
 	for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++) {
 		if (CurrentFormGuides[iSource].start != CurrentFormGuides[iSource].finish) {
@@ -4677,6 +4680,7 @@ void satadj() {
 			satinMap.set(WordParam);
 			satinMap.set(WordParam + 1);
 		}
+		// check to see if any of the current guides are already in the CheckMap and add to guide if not
 		iDestination = 0;
 		for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++) {
 			if (!satinMap.test(CurrentFormGuides[iSource].start) && !satinMap.test(CurrentFormGuides[iSource].finish)) {
@@ -4686,6 +4690,7 @@ void satadj() {
 			}
 		}
 		CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iDestination;
+		// remove any guides after the turn
 		if (WordParam) {
 			iDestination = 0;
 			for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++) {
@@ -4709,7 +4714,7 @@ void satadj() {
 			iForward = CurrentFormGuides[iGuide].start;
 			if (iForward > gsl::narrow<unsigned>(WordParam) - 1)
 				iForward = WordParam - 1;
-			if (setchk(satinMap, iForward)) {
+			if (!setchk(&satinMap, iForward)) {
 				iReverse = iForward;
 				if (iReverse)
 					iReverse--;
@@ -4750,7 +4755,7 @@ void satadj() {
 			iForward = iReverse = CurrentFormGuides[iGuide].finish;
 			if (iForward > VertexCount - 1)
 				iForward = VertexCount - 1;
-			if (setchk(satinMap, iForward)) {
+			if (!setchk(&satinMap, iForward)) {
 				if (iForward < VertexCount - 1)
 					iForward++;
 				if (iReverse > gsl::narrow<unsigned>(WordParam) + 1)
