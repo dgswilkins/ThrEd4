@@ -438,7 +438,7 @@ void shoseln(unsigned code0, unsigned code1) {
 	shoMsg(HelpBuffer);
 }
 
-BOOL clpmsgs(unsigned code) {
+bool clpmsgs(unsigned code) {
 
 	ispcdclp();
 	if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap.test(StateFlag::WASPCDCLP)) {
@@ -458,7 +458,7 @@ void frm1pnt() {
 	}
 }
 
-BOOL filmsgs(unsigned code) {
+bool filmsgs(unsigned code) {
 
 	if (SelectedFormCount)
 		return clpmsgs(code);

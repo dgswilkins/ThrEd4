@@ -112,11 +112,11 @@ extern	void		bakseq();
 extern	void		butxt(unsigned iButton, const TCHAR* buttonText);
 extern	void		centir();
 extern	void		chkhup();
-extern	BOOL		chkmax(unsigned arg0, unsigned arg1);
+extern	bool		chkmax(unsigned arg0, unsigned arg1);
 extern	void		chkmen();
-extern	BOOL		chkr(unsigned bit);
-extern	void		chkseq(BOOL border);
-extern	BOOL		cisin(float xCoordinate, float yCoordinate);
+extern	bool		chkr(unsigned bit);
+extern	void		chkseq(bool border);
+extern	bool		cisin(float xCoordinate, float yCoordinate);
 extern	unsigned	closflt(float xCoordinate, float yCoordinate);
 extern	void		clpfil();
 extern	void		clRmap(unsigned mapSize);
@@ -128,7 +128,7 @@ extern	void		delmclp(unsigned iForm);
 extern	void		delsac(unsigned formIndex);
 extern	void		dumrk(double xCoord, double yCoord);
 extern	void		filang();
-extern	BOOL		filmsgs(unsigned code);
+extern	bool		filmsgs(unsigned code);
 extern	void		filsat();
 extern	void		filsfn();
 extern	void		filvrt();
@@ -143,9 +143,9 @@ extern	void		fshor();
 extern	void		fvars(unsigned iForm);
 extern	unsigned	getlast();
 extern	void		hsizmsg();
-extern	BOOL		isclp(unsigned iForm);
-extern	BOOL		iseclp(unsigned iForm);
-extern	BOOL		isin(float xCoordinate, float yCoordinate);
+extern	bool		isclp(unsigned iForm);
+extern	bool		iseclp(unsigned iForm);
+extern	bool		isin(float xCoordinate, float yCoordinate);
 extern	void		lcon();
 extern	void		makspac(unsigned start, unsigned count);
 extern	void		mdufrm();
@@ -290,7 +290,7 @@ void prbug() noexcept {
 }
 #endif
 
-BOOL istx(unsigned iForm) noexcept {
+bool istx(unsigned iForm) noexcept {
 	FRMHED* pfrm;
 
 	pfrm = &FormList[iForm];
@@ -344,7 +344,7 @@ void txrfor() noexcept {
 	TextureHistoryIndex &= 0xf;
 }
 
-BOOL chktxh(const TXHST* historyItem) noexcept {
+bool chktxh(const TXHST* historyItem) noexcept {
 	unsigned iPoint = 0;
 
 	if (historyItem->count != TextureScreen.index)
@@ -848,7 +848,7 @@ int fil2crd(const char* fileName) noexcept {
 	return errorCode;
 }
 
-BOOL chkp2cnam(const char* fileName) noexcept {
+bool chkp2cnam(const char* fileName) noexcept {
 
 	HANDLE	handleP2C;
 
@@ -1827,7 +1827,7 @@ int refcmp(const void *arg1, const void *arg2) {
 }
 #endif
 
-BOOL chkrdun(const SRTREC* stitchRecord) noexcept {
+bool chkrdun(const SRTREC* stitchRecord) noexcept {
 	unsigned iStitch;
 
 	for (iStitch = stitchRecord->start; iStitch < stitchRecord->finish; iStitch++) {
@@ -1843,7 +1843,7 @@ double precjmps(const SRTREC* sortRecord) {
 	double			minimumLength;
 	unsigned		iRegion, currentRegion;
 	fPOINTATTR*		currentStitch;
-	BOOL			direction;
+	bool			direction;
 
 	FormFillCounter = new unsigned[(FormIndex + 2) << 2]();
 	currentRegion = sortRecord->currentRegion;
@@ -1932,7 +1932,7 @@ void dmprec(OREC** stitchRegion, unsigned count) noexcept {
 }
 #endif
 
-BOOL srtchk(OREC** stitchRegion, unsigned count, unsigned* badForm) noexcept {
+bool srtchk(OREC** stitchRegion, unsigned count, unsigned* badForm) noexcept {
 
 	unsigned	iRegion = 1;
 	unsigned	form = stitchRegion[0]->form; 
@@ -2317,7 +2317,7 @@ void fdelstch() {
 	}
 }
 
-BOOL lastcol(unsigned index, fPOINT* point) noexcept {
+bool lastcol(unsigned index, fPOINT* point) noexcept {
 	unsigned color;
 
 	color = InterleaveSequenceIndices[index].color;
@@ -2358,7 +2358,7 @@ void duint(unsigned offset, unsigned code, INTINF *ilData) {
 	}
 }
 
-BOOL isfil() noexcept {
+bool isfil() noexcept {
 	if (SelectedForm->fillType)
 		return 1;
 	if (SelectedForm->edgeType)
@@ -3418,7 +3418,7 @@ void drwtxtr() {
 	drwtxbut();
 }
 
-BOOL px2txt(POINT offset, TXPNT* textureRecord) noexcept {
+bool px2txt(POINT offset, TXPNT* textureRecord) noexcept {
 	fPOINT editPoint;
 
 	px2ed(offset, &editPoint);
@@ -3438,7 +3438,7 @@ BOOL px2txt(POINT offset, TXPNT* textureRecord) noexcept {
 	return 1;
 }
 
-BOOL txbutfn(TXPNT* textureRecord) noexcept {
+bool txbutfn(TXPNT* textureRecord) noexcept {
 	POINT	offset;
 
 	deorg(&offset);
@@ -3456,7 +3456,7 @@ void txtrbut() {
 
 }
 
-BOOL txtclos(unsigned* closestTexturePoint) {
+bool txtclos(unsigned* closestTexturePoint) {
 	double		length = 0.0;
 	double		minimumLength = 1e99;
 	unsigned	iPoint = 0;
@@ -3917,7 +3917,7 @@ void deltx() {
 	TXPNT			*textureBuffer = nullptr;
 	unsigned		iBuffer = 0;
 	unsigned		iForm = 0;
-	BOOL			flag = false;
+	bool			flag = false;
 	unsigned short	currentIndex = FormList[ClosestFormToCursor].fillInfo.texture.index;
 
 	if (TextureIndex && istx(ClosestFormToCursor) && SelectedForm->fillInfo.texture.count) {
@@ -4081,7 +4081,7 @@ void dutxmir() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-BOOL chkbut() {
+bool chkbut() {
 	if (Msg.hwnd == ButtonWin[HTXCLR]) {
 		txdelal();
 		return 1;
@@ -4309,7 +4309,7 @@ void txof() {
 	StateMap.reset(StateFlag::TXTRED);
 }
 
-BOOL istxclp() {
+bool istxclp() {
 	if (StateMap.test(StateFlag::TXTMOV) && StateMap.test(StateFlag::TXTCLP))
 		return 1;
 	else
@@ -4341,7 +4341,7 @@ void txgro() {
 	txsiz(1 / TXTRAT);
 }
 
-BOOL txdig(unsigned keyCode, TCHAR* character) {
+bool txdig(unsigned keyCode, TCHAR* character) {
 	if (isdigit(keyCode)) {
 		*character = gsl::narrow<TCHAR>(keyCode);
 		return 1;
@@ -4625,7 +4625,7 @@ float getstxt(unsigned stringIndex) noexcept {
 	return atof(HelpBuffer)*PFGRAN;
 }
 
-BOOL chkasp(fPOINT* point) noexcept {
+bool chkasp(fPOINT* point) noexcept {
 	point->x = getstxt(IDC_DESWID);
 	point->y = getstxt(IDC_DESHI);
 	if (point->y / point->x == DesignAspectRatio)
@@ -4799,7 +4799,7 @@ void mvshft() {
 	}
 }
 
-BOOL inrct(fRECTANGLE rectangle, fPOINTATTR stitch) noexcept {
+bool inrct(fRECTANGLE rectangle, fPOINTATTR stitch) noexcept {
 	if (stitch.x < rectangle.left)
 		return 0;
 	if (stitch.x > rectangle.right)
@@ -4866,7 +4866,7 @@ void clrstch() noexcept {
 	while (EnumChildWindows(MainStitchWin, enumch, 0));
 }
 
-BOOL txnam(char *name, int sizeName) {
+bool txnam(char *name, int sizeName) {
 	char*	lastCharacter;
 
 	strcpy_s(name, sizeName, __argv[0]);

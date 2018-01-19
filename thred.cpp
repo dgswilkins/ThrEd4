@@ -19,7 +19,7 @@
 void		blak ();
 void		chkhup ();
 void		clrhbut (unsigned startButton) noexcept;
-BOOL		cmpstch (unsigned iStitchA, unsigned iStitchB) noexcept;
+bool		cmpstch (unsigned iStitchA, unsigned iStitchB) noexcept;
 void		cros (unsigned iStitch) noexcept;
 void		delet ();
 void		delsfrms (unsigned code);
@@ -105,7 +105,7 @@ extern	void			chgchk (int code);
 extern	void			chgwrn ();
 extern	void			chkcont ();
 extern	unsigned		chkfrm ();
-extern	BOOL			chkr (unsigned bit);
+extern	bool			chkr (unsigned bit);
 extern	unsigned		closfrm ();
 extern	void			clRmap (unsigned mapSize);
 extern	void			clpfil ();
@@ -206,7 +206,7 @@ extern	void			frmnumfn (unsigned newFormIndex);
 extern	void			frmon ();
 extern	void			frmout (unsigned formIndex);
 extern	void			frmovlin ();
-extern	BOOL			frmrng (unsigned iForm, RANGE* range);
+extern	bool			frmrng (unsigned iForm, RANGE* range);
 extern	void			frmsadj ();
 extern	void			frmsqr (unsigned iVertex);
 extern	void			frmx (POINT controlPoint, HDC dc);
@@ -227,7 +227,7 @@ extern	void			hsizmsg ();
 extern	void			infrm ();
 extern	void			insat ();
 extern	void			ispcdclp ();
-extern	BOOL			istx (unsigned iForm);
+extern	bool			istx (unsigned iForm);
 extern	void			join ();
 extern	void			lodchk ();
 extern	void			lodstr ();
@@ -241,8 +241,8 @@ extern	void			msgstr (unsigned code);
 extern	void			munfrm ();
 extern	void			mvshft ();
 extern	void			notcwlk ();
-extern	BOOL			notfstch (unsigned attribute);
-extern	BOOL			notsel ();
+extern	bool			notfstch (unsigned attribute);
+extern	bool			notsel ();
 extern	void			notund ();
 extern	void			notwlk ();
 extern	void			nubrdcol (unsigned color);
@@ -335,7 +335,7 @@ extern	void			setmfrm ();
 extern	void			setr (unsigned bit);
 extern	void			setrang ();
 #if PESACT
-extern	BOOL			setrc (unsigned bit);
+extern	bool			setrc (unsigned bit);
 #endif
 extern	void			setshft ();
 extern	void			setstrtch ();
@@ -1668,35 +1668,35 @@ void getdes() noexcept {
 	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, (DLGPROC)dnamproc);
 }
 
-BOOL isclp(unsigned iForm) noexcept {
+bool isclp(unsigned iForm) noexcept {
 
 	if ((1 << FormList[iForm].fillType)&ClipTypeMap)
 		return 1;
 	return 0;
 }
 
-BOOL isclpx(unsigned iForm) noexcept {
+bool isclpx(unsigned iForm) noexcept {
 
 	if (isclp(iForm) && FormList[iForm].lengthOrCount.clipCount)
 		return 1;
 	return 0;
 }
 
-BOOL isfclp() noexcept {
+bool isfclp() noexcept {
 
 	if (isclp(ClosestFormToCursor) && FormList[ClosestFormToCursor].fillType != CLPF)
 		return 1;
 	return 0;
 }
 
-BOOL iseclp(unsigned iForm) noexcept {
+bool iseclp(unsigned iForm) noexcept {
 
 	if (FormList[iForm].edgeType == EDGECLIP || FormList[iForm].edgeType == EDGEPICOT || FormList[iForm].edgeType == EDGECLIPX)
 		return 1;
 	return 0;
 }
 
-BOOL iseclpx(unsigned iForm) noexcept {
+bool iseclpx(unsigned iForm) noexcept {
 
 	if (iseclp(iForm) && FormList[iForm].clipEntries)
 		return 1;
@@ -3043,7 +3043,7 @@ void ritini() noexcept {
 	CloseHandle(IniFileHandle);
 }
 
-BOOL savcmp() noexcept {
+bool savcmp() noexcept {
 
 #ifdef _DEBUG
 
@@ -4523,7 +4523,7 @@ void bitsiz() noexcept {
 
 // Get a rough estimate of whether black or white 
 // is dominant in the monochrome bitmap
-BOOL binv(unsigned bitmapWidthInWords) noexcept {
+bool binv(unsigned bitmapWidthInWords) noexcept {
 	unsigned		iHeight = 0, iBytes = 0, whiteBits = 0, blackBits = 0;
 	const unsigned	byteCount = BitmapWidth >> 3;
 	TCHAR*			bcpnt = nullptr;
@@ -4605,7 +4605,7 @@ COLORREF fswap(COLORREF color) noexcept {
 #endif
 }
 
-BOOL gudtyp(WORD bitCount) noexcept {
+bool gudtyp(WORD bitCount) noexcept {
 
 	switch (bitCount) {
 
@@ -4816,7 +4816,7 @@ unsigned dtrn(const DSTREC* dpnt) noexcept {
 #endif
 }
 
-BOOL colfil() {
+bool colfil() {
 
 	TCHAR*	extentionLocation = nullptr;
 
@@ -4850,7 +4850,7 @@ void dstran() {
 	unsigned		iColor = 0;
 	DWORD			bytesRead = 0;
 	LARGE_INTEGER	colorFileSize = {};
-	BOOL			retval = false;
+	bool			retval = false;
 
 	if (colfil()) {
 		colorFile = CreateFile(ColorFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
@@ -4927,7 +4927,7 @@ void dstran() {
 	}
 }
 
-BOOL chkdst(const DSTHED* dstHeader) noexcept {
+bool chkdst(const DSTHED* dstHeader) noexcept {
 
 	if (strncmp(dstHeader->desched, "LA:", 3))
 		return 0;
@@ -5791,7 +5791,7 @@ void ritdst(const fPOINTATTR* stitches) {
 	delete[] colorData;
 }
 
-BOOL pcshup(fPOINTATTR*	stitches) {
+bool pcshup(fPOINTATTR*	stitches) {
 
 	fRECTANGLE	boundingRect = { stitches[0].y ,stitches[0].x , stitches[0].x ,stitches[0].y };
 	fPOINT		boundingSize = {};
@@ -6068,7 +6068,7 @@ void chk1col() {
 	}
 }
 
-BOOL chkattr(TCHAR* filename) {
+bool chkattr(TCHAR* filename) {
 
 	const unsigned	attributes = GetFileAttributes(filename);
 	unsigned		buttonPressed = 0;
@@ -7058,7 +7058,7 @@ void movbox() {
 	ritcor(&StitchBuffer[ClosestPointIndex]);
 }
 
-BOOL chkhid(unsigned colorToCheck) {
+bool chkhid(unsigned colorToCheck) {
 
 	if (StateMap.test(StateFlag::HID)) {
 
@@ -7591,7 +7591,7 @@ void unbsho() {
 	}
 }
 
-BOOL oldwnd(const HWND window) noexcept {
+bool oldwnd(const HWND window) noexcept {
 
 	unsigned	iWindow = 0, iColor = 0;
 
@@ -8754,7 +8754,7 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-BOOL cmpstch(unsigned iStitchA, unsigned iStitchB) noexcept {
+bool cmpstch(unsigned iStitchA, unsigned iStitchB) noexcept {
 
 #if  __UseASM__
 	_asm {
@@ -8883,7 +8883,7 @@ void strtknt(unsigned start) noexcept {
 
 void fndknt() {
 	unsigned	iStitch = 0;
-	BOOL		flag = false;
+	bool		flag = false;
 
 	if (PCSHeader.stitchCount > 4) {
 		// ToDo - Is flag initialized and used correctly?
@@ -8914,7 +8914,7 @@ void delknt() noexcept {
 	PCSHeader.stitchCount = newStitchCount;
 }
 
-BOOL isknots() noexcept {
+bool isknots() noexcept {
 	unsigned	iStitch;
 
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -9504,7 +9504,7 @@ void deltot() {
 	SetWindowText(ThrEdWindow, MsgBuffer);
 }
 
-BOOL wastch() noexcept {
+bool wastch() noexcept {
 
 	unsigned	iStitch;
 
@@ -9516,7 +9516,7 @@ BOOL wastch() noexcept {
 	return 0;
 }
 
-BOOL frmstch() {
+bool frmstch() {
 	unsigned	iForm = 0, iStitch = 0, formCode = 0;
 
 	clRmap((FormIndex >> 5) >> 1);
@@ -9534,7 +9534,7 @@ void delet() {
 
 	unsigned	iVertex = 0, iForm = 0, currentFormVertex = 0;
 	// ToDo - check satinFlag
-	BOOL		satinFlag = 0;
+	bool		satinFlag = 0;
 
 	undat();
 	if (StateMap.testAndReset(StateFlag::FPSEL)) {
@@ -9681,7 +9681,7 @@ selab:;
 								SelectedForm->wordParam = 0;
 							else
 								SelectedForm->attribute &= 0xfe;
-							satinFlag = 1;
+							satinFlag = true;
 							goto deldun;
 						}
 					}
@@ -10053,7 +10053,7 @@ void deldir() {
 	tabmsg(IDS_BAKDT);
 }
 
-BOOL chkwnd(HWND window) noexcept {
+bool chkwnd(HWND window) noexcept {
 
 	RECT	windowRect;
 
@@ -10065,7 +10065,7 @@ BOOL chkwnd(HWND window) noexcept {
 		return 0;
 }
 
-BOOL chkok() noexcept {
+bool chkok() noexcept {
 
 	return chkwnd(OKButton);
 }
@@ -10455,7 +10455,7 @@ void nulayr(unsigned play) {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-BOOL iselpnt() {
+bool iselpnt() {
 	unsigned	iControlPoint = 0, closestControlPoint = 0;
 	double		length = 0.0, minimumLength = 1e99;
 	POINT		pointToTest = { (Msg.pt.x - StitchWindowOrigin.x),
@@ -10518,7 +10518,7 @@ void rtrclpfn() {
 	}
 }
 
-BOOL chkbig() {
+bool chkbig() {
 
 	unsigned	iControlPoint = 0, iCorner = 0;
 	double		length = 0.0, minimumLength = 1e99;
@@ -10773,7 +10773,7 @@ void mvstchs(unsigned destination, unsigned source, unsigned count) noexcept {
 #endif
 }
 
-BOOL movstchs(unsigned destination, unsigned start, unsigned finish) {
+bool movstchs(unsigned destination, unsigned start, unsigned finish) {
 
 	unsigned	count = 0, swap = 0;
 	unsigned	dind = MAXITEMS;
@@ -11076,7 +11076,7 @@ void setsrch(unsigned stitch) {
 	ritnum(STR_NUMSCH, ClosestPointIndex);
 }
 
-BOOL inrng(unsigned stitch) noexcept {
+bool inrng(unsigned stitch) noexcept {
 
 	if (StitchBuffer[stitch].x >= StitchRangeRect.left
 		&& StitchBuffer[stitch].x <= StitchRangeRect.right
@@ -11088,7 +11088,7 @@ BOOL inrng(unsigned stitch) noexcept {
 		return 0;
 }
 
-BOOL finrng(unsigned find) noexcept {
+bool finrng(unsigned find) noexcept {
 
 	unsigned cod = 0;
 
@@ -11539,7 +11539,7 @@ void insflin(POINT insertPoint) noexcept {
 	FormLines[2].y = FormLines[3].y = insertPoint.y + offset.y;
 }
 
-BOOL isthr(TCHAR* filename) {
+bool isthr(TCHAR* filename) {
 
 	TCHAR* lastCharacter;
 
@@ -11969,7 +11969,7 @@ void nucols() {
 	}
 }
 
-BOOL dunum(unsigned code) noexcept {
+bool dunum(unsigned code) noexcept {
 
 	if (code >= '0' && code <= '9') {
 
@@ -12715,7 +12715,7 @@ void respac() {
 	}
 }
 
-BOOL chkminus(unsigned code) noexcept {
+bool chkminus(unsigned code) noexcept {
 
 	if (code == 189 || code == 109) {
 
@@ -13144,7 +13144,7 @@ void setrac(unsigned point) noexcept {
 #endif
 }
 
-BOOL getrac(unsigned point) noexcept {
+bool getrac(unsigned point) noexcept {
 
 #if  __UseASM__
 	_asm {
@@ -13282,7 +13282,7 @@ void trcols(COLORREF color) noexcept {
 #endif
 }
 
-BOOL trcin(COLORREF color) {
+bool trcin(COLORREF color) {
 
 	if (color) {
 
@@ -13447,7 +13447,7 @@ void setedg(unsigned point) noexcept {
 #endif
 }
 
-BOOL chkedg(unsigned point) noexcept {
+bool chkedg(unsigned point) noexcept {
 
 #if  __UseASM__
 	_asm {
@@ -13537,7 +13537,7 @@ void tracedg() {
 	StateMap.set(StateFlag::WASEDG);
 }
 
-BOOL trcbit() {
+bool trcbit() {
 
 	unsigned	pixelIndex;
 
@@ -14938,7 +14938,7 @@ void inscol() {
 	}
 }
 
-BOOL usedcol() noexcept {
+bool usedcol() noexcept {
 
 	unsigned	iStitch;
 
@@ -15118,7 +15118,7 @@ void fixpclp() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-BOOL sidclp() {
+bool sidclp() {
 
 	fvars(ClosestFormToCursor);
 	if (OpenClipboard(ThrEdWindow)) {
@@ -21956,7 +21956,7 @@ unsigned chkup(unsigned count, unsigned iStitch) {
 		return count;
 }
 
-BOOL bitar() {
+bool bitar() {
 
 	dRECTANGLE	backingRect = {};
 	dRECTANGLE	differenceRect = {};

@@ -1127,7 +1127,7 @@ typedef struct _frmsclp {
 typedef struct _fvclip {
 	unsigned		clipType;
 	unsigned short	vertexCount;
-	BOOL			direction;
+	bool			direction;
 }FORMVERTEXCLIP; // form points clipboard header
 
 typedef struct _strhed {		//thred file header
@@ -1269,7 +1269,7 @@ typedef struct _region {	//region for sequencing vertical fills
 
 typedef struct _rcon {		//PathMap: path map for sequencing
 	unsigned	short	node;
-	BOOL		isConnected;
+	bool		isConnected;
 	unsigned	short	nextGroup;
 }RCON;
 
@@ -1708,7 +1708,7 @@ typedef struct _srtrec	{
 	unsigned finish;		// finish region index
 	unsigned count;			// number of regions in range
 	unsigned currentRegion;	// current region index
-	BOOL	 direction;		// direction of sort
+	bool	 direction;		// direction of sort
 }SRTREC;
 
 typedef struct _fstrts	{

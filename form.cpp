@@ -36,7 +36,7 @@ extern void		deltx ();
 extern unsigned	duthrsh (double threshold);
 extern void		duzrat ();
 extern void		fdelstch ();
-extern BOOL		filmsgs (unsigned code);
+extern bool		filmsgs (unsigned code);
 extern void		fritfil ();
 extern void		frm1pnt ();
 extern void		frmdel ();
@@ -45,10 +45,10 @@ extern void		grpAdj ();
 extern void		insadj ();
 extern fPOINT*	insid ();
 extern void		intlv ();
-extern BOOL		isclp (unsigned find);
-extern BOOL		isclpx (unsigned find);
-extern BOOL		isfclp ();
-extern BOOL		istx (unsigned find);
+extern bool		isclp (unsigned find);
+extern bool		isclpx (unsigned find);
+extern bool		isfclp ();
+extern bool		istx (unsigned find);
 extern void		moveStitch (fPOINTATTR* destination, const fPOINTATTR* source);
 extern void		movStch ();
 extern void		mvflpnt (fPOINT* destination, const fPOINT* source, unsigned count);
@@ -213,9 +213,9 @@ void			blbrd (double spac);
 void			bold (double pd_Size) noexcept;
 void			brdfil (double pd_Size);
 void			chan ();
-BOOL			chkr (unsigned pbit) noexcept;
+bool			chkr (unsigned pbit) noexcept;
 void			chnfn ();
-BOOL			cisin (float pntx, float pnty) noexcept;
+bool			cisin (float pntx, float pnty) noexcept;
 void			clpbrd (unsigned short slin);
 void			clpcon ();
 void			clpic (unsigned short strtlin);
@@ -245,8 +245,8 @@ void			frmsqr (unsigned ind);
 void			fvars (unsigned ind) noexcept;
 void			horclpfn ();
 void			horsclp ();
-BOOL			iseclp (unsigned find);
-BOOL			iseclpx (unsigned find);
+bool			iseclp (unsigned find);
+bool			iseclpx (unsigned find);
 void			lapbrd ();
 void			lcon ();
 constexpr unsigned	nxt (unsigned int iVertex);
@@ -686,7 +686,7 @@ unsigned findclp(unsigned formIndex) {
 	return 0;
 }
 
-BOOL chkmax(unsigned arg0, unsigned arg1) noexcept {
+bool chkmax(unsigned arg0, unsigned arg1) noexcept {
 	if (arg0&MAXMSK)
 		return 1;
 	if (arg1&MAXMSK)
@@ -895,7 +895,7 @@ void delflt(unsigned formIndex) noexcept {
 	}
 }
 
-BOOL chk2of() {
+bool chk2of() {
 	if (!StateMap.test(StateFlag::SELBOX))
 		return 0;
 	if (UserFlagMap.test(UserFlag::FIL2OF))
@@ -1909,7 +1909,7 @@ void makspac(unsigned start, unsigned count) noexcept {
 	}
 }
 
-BOOL ritlin(fPOINT start, fPOINT finish) noexcept {
+bool ritlin(fPOINT start, fPOINT finish) noexcept {
 
 	dPOINT		delta = {}, step = {}, point = {};
 	double		length = 0.0;
@@ -1966,7 +1966,7 @@ unsigned closflt(float xCoordinate, float yCoordinate) noexcept {
 	return closestVertex;
 }
 
-void chkseq(BOOL border) {
+void chkseq(bool border) {
 #if BUGBAK
 
 	unsigned index;
@@ -2141,7 +2141,7 @@ void savdisc() {
 		NULL);
 }
 
-BOOL lastch() noexcept {
+bool lastch() noexcept {
 	if (InterleaveSequenceIndex) {
 		LastPoint.x = InterleaveSequence[InterleaveSequenceIndex - 1].x;
 		LastPoint.y = InterleaveSequence[InterleaveSequenceIndex - 1].y;
@@ -2764,7 +2764,7 @@ constexpr unsigned prv(unsigned iVertex) {
 
 /* find the intersection of two lines, one defined by point and slope, the other by the coordinates
    of the endpoints. */
-BOOL proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* intersectionPoint) noexcept {
+bool proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* intersectionPoint) noexcept {
 
 	dPOINT	delta = {};
 	double	sideSlope = 0.0, pointConstant = 0.0, sideConstant = 0.0, xMinimum = 0.0;
@@ -2813,7 +2813,7 @@ BOOL proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* inte
 }
 
 // find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
-BOOL projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT* intersection) noexcept {
+bool projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT* intersection) noexcept {
 	double	swap = 0.0, slope = 0.0;
 	const double	deltaX = upperPoint.x - lowerPoint.x;
 
@@ -2837,7 +2837,7 @@ BOOL projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT* int
 }
 
 // find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
-BOOL projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersection) noexcept {
+bool projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersection) noexcept {
 
 	double	swap = 0.0, slope = 0.0;
 	const double	deltaX = point1.x - point0.x; 
@@ -2968,7 +2968,7 @@ unsigned short isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoin
 	return 1;
 }
 
-BOOL lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) noexcept {
+bool lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) noexcept {
 
 	unsigned		index0 = 0, index1 = 0;
 	unsigned		count0 = (GroupIndexSequence[group0 + 1] - GroupIndexSequence[group0]) >> 1;
@@ -3002,7 +3002,7 @@ BOOL lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) no
 	return 0;
 }
 
-BOOL regclos(unsigned iRegion0, unsigned iRegion1) noexcept {
+bool regclos(unsigned iRegion0, unsigned iRegion1) noexcept {
 	//ToDo - More renaming required
 
 	const SMALPNTL*	lineEndPoint0Start = &*SortedLines[RegionsList[iRegion0].start];
@@ -3079,7 +3079,7 @@ BOOL regclos(unsigned iRegion0, unsigned iRegion1) noexcept {
 	return 0;
 }
 
-BOOL unvis() noexcept {
+bool unvis() noexcept {
 	for (VisitedIndex = 0; VisitedIndex < RegionCount; VisitedIndex++) {
 		if (!VisitedRegions[VisitedIndex])
 			return 1;
@@ -3679,7 +3679,7 @@ void lcon() {
 	unsigned		iPath = 0, iLine = 0, iRegion = 0, iSequence = 0, iNode = 0, bytesInBitmap = 0;
 	unsigned		leftRegion = 0, iOutPath = 0, breakLine = 0, count = 0, startGroup = 0;
 	REGION*			regions = nullptr;
-	BOOL			isConnected = false;
+	bool			isConnected = false;
 	RCON*			tempPathMap = nullptr;
 	SMALPNTL*		lineGroupPoint = nullptr;
 	unsigned		iStartLine = 0;
@@ -4516,7 +4516,7 @@ void delcon(unsigned GuideIndex) {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-BOOL satselfn() {
+bool satselfn() {
 
 	unsigned	iForm = 0, iVertex = 0, layerCode = 0;
 	double		length = 0, minimumLength = 1e99;
@@ -4967,7 +4967,7 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 			iNextVertex = nxt(iVertex);
 			line1StitchCounts[iSegment] = ((Lengths[iNextVertex] - Lengths[iVertex]) / line1Length)*stitchCount + 0.5;
 			segmentStitchCount += line1StitchCounts[iSegment];
-			iVertex++;
+			iVertex = nxt(iVertex);
 		}
 		line1StitchCounts[iSegment] = stitchCount - segmentStitchCount;
 		iNextVertex = line2Start;
@@ -5400,7 +5400,7 @@ void insat() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-BOOL chkdel() noexcept {
+bool chkdel() noexcept {
 	if (SelectedForm->type == FRMLINE) {
 		if (SelectedForm->vertexCount > 2)
 			return 0;
@@ -5817,7 +5817,7 @@ void bord() {
 	}
 }
 
-BOOL ritclp(fPOINT point) noexcept {
+bool ritclp(fPOINT point) noexcept {
 
 	fPOINT		adjustedPoint = { (point.x - ClipReference.x),
 								  (point.y - ClipReference.y) };
@@ -5832,7 +5832,7 @@ BOOL ritclp(fPOINT point) noexcept {
 	return 0;
 }
 
-BOOL clpsid(unsigned start, unsigned finish) {
+bool clpsid(unsigned start, unsigned finish) {
 
 	unsigned	ind = 0, clipCount = 0;
 	fPOINT		delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
@@ -5889,7 +5889,7 @@ void linsid() {
 	}
 }
 
-BOOL nupnt() noexcept {
+bool nupnt() noexcept {
 
 	double		length = 0.0, delta = 0.0;
 	unsigned	step = 0;
@@ -6169,7 +6169,7 @@ void filinsb(dPOINT point) noexcept {
 	SelectedPoint.y = point.y;
 }
 
-BOOL chkbak(dPOINT pnt) noexcept {
+bool chkbak(dPOINT pnt) noexcept {
 
 	unsigned	iBackup = 0;
 	double		length = 0.0;
@@ -6182,7 +6182,7 @@ BOOL chkbak(dPOINT pnt) noexcept {
 	return 0;
 }
 
-BOOL linx(const fPOINT* points, unsigned start, unsigned finish, dPOINT* intersection) noexcept {
+bool linx(const fPOINT* points, unsigned start, unsigned finish, dPOINT* intersection) noexcept {
 
 	dPOINT	delta = { (OutsidePoints[start].x - points[start].x),
 					  (OutsidePoints[start].y - points[start].y) };
@@ -9695,7 +9695,7 @@ void join() {
 	StateMap.reset(StateFlag::FRMSAM);
 }
 
-BOOL chkbfil() noexcept {
+bool chkbfil() noexcept {
 	switch (SelectedForm->edgeType) {
 		case EDGELINE:
 		case EDGEBEAN:
@@ -9723,7 +9723,7 @@ void refilal() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-BOOL notsel() {
+bool notsel() {
 
 	unsigned	iForm;
 
@@ -9784,7 +9784,7 @@ void clRmap(unsigned mapSize) noexcept {
 
 #if PESACT
 
-BOOL setrc(unsigned bit) {
+bool setrc(unsigned bit) {
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
@@ -9802,7 +9802,7 @@ setrcx :
 
 #endif
 
-BOOL chkr(unsigned bit) noexcept {
+bool chkr(unsigned bit) noexcept {
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
@@ -9943,7 +9943,7 @@ void selfil(unsigned type) {
 		tabmsg(IDS_SEL1FRM);
 }
 
-BOOL notfstch(unsigned attribute) noexcept {
+bool notfstch(unsigned attribute) noexcept {
 	if (attribute&NOTFRM)
 		return 1;
 	if (((attribute&FRMSK) >> FRMSHFT) == ClosestFormToCursor)
@@ -9975,7 +9975,7 @@ void selalfil() {
 		tabmsg(IDS_SEL1FRM);
 }
 
-BOOL frmrng(unsigned iForm, RANGE* range) noexcept {
+bool frmrng(unsigned iForm, RANGE* range) noexcept {
 	range->start = 0;
 	range->finish = PCSHeader.stitchCount;
 	if (FormList[iForm].fillType || FormList[iForm].edgeType) {
@@ -10580,7 +10580,7 @@ void contf() {
 	delete[] lowCounts;
 }
 
-BOOL contsf(unsigned formIndex) {
+bool contsf(unsigned formIndex) {
 	ClosestFormToCursor = formIndex;
 	fvars(formIndex);
 	if (SelectedForm->vertexCount > 4) {
@@ -11049,7 +11049,7 @@ void cntrx() {
 	dPOINT		markCenter = {};
 	dPOINT		selectedCenter = {};
 	unsigned	iForm = 0, iStitch = 0;
-	BOOL		flag = false;
+	bool		flag = false;
 	fRECTANGLE*	formRect = nullptr;
 	fRECTANGLE	groupRect = {};
 
@@ -11421,7 +11421,7 @@ void spltsat(SATCON currentGuide) {
 	delete[] vertexBuffer;
 }
 
-BOOL spltlin() {
+bool spltlin() {
 
 	unsigned	iForm = 0;
 
@@ -11584,7 +11584,7 @@ void chksid(unsigned vertexIndex) noexcept {
 void ritseg() {
 
 	unsigned	iPoint = 0;
-	BOOL		isPointedEnd = true;
+	bool		isPointedEnd = true;
 
 	if (SelectedForm->extendedAttribute&AT_SQR)
 		isPointedEnd = false;
@@ -11655,7 +11655,7 @@ unsigned lenref(const float *lineLength) noexcept {
 #endif
 }
 
-BOOL clpnxt(unsigned sind) {
+bool clpnxt(unsigned sind) {
 	// ToDo - rename local variables
 
 	unsigned	ind = 1;
@@ -11678,7 +11678,7 @@ BOOL clpnxt(unsigned sind) {
 	return 1;
 }
 
-BOOL nucseg() {
+bool nucseg() {
 
 	unsigned	ind = 0;
 
@@ -11783,12 +11783,12 @@ clpcmpx :
 #endif
 }
 
-BOOL isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* length) noexcept {
+bool isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* length) noexcept {
 
 	dPOINT	delta = {(LineSegmentEnd.x - LineSegmentStart.x),(LineSegmentEnd.y - LineSegmentStart.y)};
 	dPOINT	point = {(LineSegmentStart.x),(LineSegmentStart.y)};
 	dPOINT	tempIntersection = {};
-	BOOL	flag = false;
+	bool	flag = false;
 	float	left = 0.0;
 	float	right = 0.0;
 
@@ -11887,7 +11887,7 @@ unsigned insect() noexcept {
 	return count;
 }
 
-BOOL isin(float xCoordinate, float yCoordinate) noexcept {
+bool isin(float xCoordinate, float yCoordinate) noexcept {
 	// ToDo - rename local variables
 
 	unsigned	iRegion = 0, acnt = 0;
@@ -11936,7 +11936,7 @@ unsigned clpnseg(unsigned start, unsigned finish) noexcept {
 	return finish + 1;
 }
 
-BOOL vscmp(unsigned index1, unsigned index2) noexcept {
+bool vscmp(unsigned index1, unsigned index2) noexcept {
 #if	 __UseASM__
 	_asm {
 		xor		eax, eax
@@ -12803,7 +12803,7 @@ void col2frm() {
 	shoMsg(MsgBuffer);
 }
 
-BOOL fxpnt() noexcept {
+bool fxpnt() noexcept {
 
 	double		length = 0.0, delta = 0.0;
 	unsigned	iGuess = 0;
@@ -13114,7 +13114,7 @@ void chain() {
 	}
 }
 
-BOOL cisin(float xCoordinate, float yCoordinate) noexcept {
+bool cisin(float xCoordinate, float yCoordinate) noexcept {
 
 	unsigned	iVertex = 0, count = 0;
 	unsigned	nextVertex = 0;
@@ -13336,7 +13336,7 @@ void filclpx() {
 	}
 }
 
-BOOL CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
+bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
 	UNREFERENCED_PARAMETER(lparam);
 
 	TCHAR	buffer[HBUFSIZ] = { 0 };
