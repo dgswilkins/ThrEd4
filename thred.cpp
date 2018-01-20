@@ -9532,7 +9532,7 @@ bool frmstch() {
 
 void delet() {
 
-	unsigned	iVertex = 0, iForm = 0, currentFormVertex = 0;
+	unsigned	iVertex = 0, iForm = 0, iGuide = 0, currentFormVertex = 0;
 	// ToDo - check satinFlag
 	bool		satinFlag = 0;
 
@@ -9694,11 +9694,11 @@ selab:;
 							goto deldun;
 						}
 					}
-					for (iForm = 0; iForm < SelectedForm->satinGuideCount; iForm++) {
+					for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 
-						if (SelectedForm->satinOrAngle.guide[iForm].start == ClosestVertexToCursor || SelectedForm->satinOrAngle.guide[iForm].finish == ClosestVertexToCursor) {
+						if (SelectedForm->satinOrAngle.guide[iGuide].start == ClosestVertexToCursor || SelectedForm->satinOrAngle.guide[iGuide].finish == ClosestVertexToCursor) {
 
-							delcon(iForm);
+							delcon(iGuide);
 							satinFlag = 1;
 							goto deldun;
 						}

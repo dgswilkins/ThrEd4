@@ -4494,6 +4494,7 @@ void satfix() {
 void delcon(unsigned GuideIndex) {
 
 	unsigned	iForm = ClosestFormToCursor + 1;
+	// ToDo - Find a better way to calculate the offset into the SatinConnects array
 	const unsigned	iGuide = &SelectedForm->satinOrAngle.guide[GuideIndex] - SatinConnects;
 	SATCON*		guide = &SelectedForm->satinOrAngle.guide[GuideIndex];
 	FRMHED*		formHeader = nullptr;
