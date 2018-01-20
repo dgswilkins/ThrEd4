@@ -312,9 +312,9 @@ fPOINT			TempPolygon[MAXFRMLINS];	//temporary storage when user is entering a po
 unsigned		OutputIndex;			//output pointer for sequencing
 double*			Lengths;				//array of cumulative lengths used in satin fills
 fPOINT*			CurrentFormVertices;	//points in the currently selected form
-SATCON*			CurrentFormGuides;	//connections in the currently selecteed form
-unsigned short	CurrentFormConnectionsCount;	//number of connections in the currently selected form
-unsigned short	WordParam;				//word paramater from the currently selected form
+SATCON*			CurrentFormGuides;		//connections in the currently selecteed form
+unsigned short	CurrentFormGuidesCount;	//number of connections in the currently selected form
+unsigned short	SatinEndGuide;			//satin end guide for the currently selected form
 unsigned short	StartPoint;				//starting formOrigin for a satin stitch guide-line
 double			HorizontalLength2;		//horizontal length of a clipboard fill/2
 double			HorizontalLength;		//horizontal length of a clipboard fill
@@ -969,7 +969,7 @@ void chkcont() {
 	deleclp(ClosestFormToCursor);
 	fsizpar();
 	if (SelectedForm->fillType != CONTF) {
-		if (CurrentFormConnectionsCount) {
+		if (CurrentFormGuidesCount) {
 			for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 				length = SelectedForm->satinOrAngle.guide[iGuide].finish - SelectedForm->satinOrAngle.guide[iGuide].start;
 				if (length < minimumLength) {
@@ -1268,8 +1268,8 @@ void fvars(unsigned iForm) noexcept {
 	CurrentFormVertices = FormList[iForm].vertices;
 	VertexCount = FormList[iForm].vertexCount;
 	CurrentFormGuides = FormList[iForm].satinOrAngle.guide;
-	CurrentFormConnectionsCount = FormList[iForm].satinGuideCount;
-	WordParam = FormList[iForm].wordParam;
+	CurrentFormGuidesCount = FormList[iForm].satinGuideCount;
+	SatinEndGuide = FormList[iForm].wordParam;
 }
 
 void ritfrct(unsigned iForm, HDC dc) {
@@ -4506,11 +4506,11 @@ void delcon(unsigned GuideIndex) {
 		if (formHeader->type == SAT && formHeader->satinGuideCount)
 			formHeader->satinOrAngle.guide--;
 	}
-	if (ClosestVertexToCursor < WordParam)
-		WordParam--;
+	if (ClosestVertexToCursor < SatinEndGuide)
+		SatinEndGuide--;
 	SelectedForm->satinGuideCount--;
 	SatinConnectIndex--;
-	CurrentFormConnectionsCount = SelectedForm->satinGuideCount;
+	CurrentFormGuidesCount = SelectedForm->satinGuideCount;
 	if (SelectedForm->fillType == SATF)
 		refil();
 	coltab();
@@ -4647,15 +4647,14 @@ void satadj() {
 
 	unsigned		iGuide = 0, iSource = 0, iForm = 0, iForward = 0, iVertex = 0, iReverse = 0, iDestination = 0;
 	const unsigned	mapSize = (VertexCount >> 5) + 1;
-	// ToDo - what is guide used for? 
-	SATCON*			guide = new SATCON[CurrentFormConnectionsCount];
+	SATCON*			interiorGuides = new SATCON[CurrentFormGuidesCount];
 	SATCON*			sourceGuide = nullptr;
 	SATCON*			destinationGuide = nullptr;
 	unsigned short	guideCount = SelectedForm->satinGuideCount;
 	FRMHED*			formHeader = nullptr;
 	boost::dynamic_bitset<> satinMap(VertexCount);
 
-	// ensure all guide endpoints are on vertices
+	// ensure all guide endpoints are on valid vertices
 	for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 		if (CurrentFormGuides[iGuide].finish > VertexCount - 1)
 			CurrentFormGuides[iGuide].finish = VertexCount - 1;
@@ -4665,63 +4664,64 @@ void satadj() {
 
 	// remove any guides of 0 length
 	iDestination = 0;
-	for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++) {
+	for (iSource = 0; iSource < CurrentFormGuidesCount; iSource++) {
 		if (CurrentFormGuides[iSource].start != CurrentFormGuides[iSource].finish) {
 			CurrentFormGuides[iDestination].start = CurrentFormGuides[iSource].start;
 			CurrentFormGuides[iDestination].finish = CurrentFormGuides[iSource].finish;
 			iDestination++;
 		}
 	}
-	CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iDestination;
-	if (WordParam || SelectedForm->attribute&FRMEND) {
+	CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
+	if (SatinEndGuide || SelectedForm->attribute&FRMEND) {
+		// there are end guides so set the satinMap 
 		satinMap.reset();
 		if (SelectedForm->attribute&FRMEND) {
 			satinMap.set(0);
 			satinMap.set(1);
 		}
-		if (WordParam) {
-			satinMap.set(WordParam);
-			satinMap.set(WordParam + 1);
+		if (SatinEndGuide) {
+			satinMap.set(SatinEndGuide);
+			satinMap.set(SatinEndGuide + 1);
 		}
-		// check to see if any of the current guides are already in the CheckMap and add to guide if not
+		// check to see if any of the current guides are end guides and add to interiorGuides if not
 		iDestination = 0;
-		for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++) {
+		for (iSource = 0; iSource < CurrentFormGuidesCount; iSource++) {
 			if (!satinMap.test(CurrentFormGuides[iSource].start) && !satinMap.test(CurrentFormGuides[iSource].finish)) {
-				guide[iDestination].start = CurrentFormGuides[iSource].start;
-				guide[iDestination].finish = CurrentFormGuides[iSource].finish;
+				interiorGuides[iDestination].start = CurrentFormGuides[iSource].start;
+				interiorGuides[iDestination].finish = CurrentFormGuides[iSource].finish;
 				iDestination++;
 			}
 		}
-		CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iDestination;
+		CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
 		// remove any guides after the turn
-		if (WordParam) {
+		if (SatinEndGuide) {
 			iDestination = 0;
-			for (iSource = 0; iSource < CurrentFormConnectionsCount; iSource++) {
-				if (CurrentFormGuides[iSource].start < WordParam) {
-					guide[iDestination].start = CurrentFormGuides[iSource].start;
-					guide[iDestination++].finish = CurrentFormGuides[iSource].finish;
+			for (iSource = 0; iSource < CurrentFormGuidesCount; iSource++) {
+				if (CurrentFormGuides[iSource].start < SatinEndGuide) {
+					interiorGuides[iDestination].start = CurrentFormGuides[iSource].start;
+					interiorGuides[iDestination++].finish = CurrentFormGuides[iSource].finish;
 				}
 			}
-			CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iDestination;
+			CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
 		}
 	}
 	else {
-		for (iGuide = 0; iGuide < CurrentFormConnectionsCount; iGuide++) {
-			guide[iGuide].start = CurrentFormGuides[iGuide].start;
-			guide[iGuide].finish = CurrentFormGuides[iGuide].finish;
+		for (iGuide = 0; iGuide < CurrentFormGuidesCount; iGuide++) {
+			interiorGuides[iGuide].start = CurrentFormGuides[iGuide].start;
+			interiorGuides[iGuide].finish = CurrentFormGuides[iGuide].finish;
 		}
 	}
-	if (CurrentFormConnectionsCount) {
+	if (CurrentFormGuidesCount) {
 		satinMap.reset();
-		for (iGuide = 0; iGuide < CurrentFormConnectionsCount; iGuide++) {
+		for (iGuide = 0; iGuide < CurrentFormGuidesCount; iGuide++) {
 			iForward = CurrentFormGuides[iGuide].start;
-			if (iForward > gsl::narrow<unsigned>(WordParam) - 1)
-				iForward = WordParam - 1;
+			if (iForward > gsl::narrow<unsigned>(SatinEndGuide) - 1)
+				iForward = SatinEndGuide - 1;
 			if (!setchk(&satinMap, iForward)) {
 				iReverse = iForward;
 				if (iReverse)
 					iReverse--;
-				while (satinMap.test(iForward) && (iForward < (gsl::narrow<unsigned>(WordParam) - 1)))
+				while (satinMap.test(iForward) && (iForward < (gsl::narrow<unsigned>(SatinEndGuide) - 1)))
 					iForward++;
 				while (iReverse && (satinMap.test(iReverse)))
 					iReverse--;
@@ -4751,21 +4751,21 @@ void satadj() {
 				CurrentFormGuides[iGuide++].start = iVertex;
 		} while (iVertex < VertexCount);
 
-		CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iGuide;
+		CurrentFormGuidesCount = SelectedForm->satinGuideCount = iGuide;
 		satinMap.reset();
 		// Todo - are iForward and iReverse appropriate variable names below?
-		for (iGuide = 0; iGuide < CurrentFormConnectionsCount; iGuide++) {
+		for (iGuide = 0; iGuide < CurrentFormGuidesCount; iGuide++) {
 			iForward = iReverse = CurrentFormGuides[iGuide].finish;
 			if (iForward > VertexCount - 1)
 				iForward = VertexCount - 1;
 			if (setchk(&satinMap, iForward)) {
 				if (iForward < VertexCount - 1)
 					iForward++;
-				if (iReverse > gsl::narrow<unsigned>(WordParam) + 1)
+				if (iReverse > gsl::narrow<unsigned>(SatinEndGuide) + 1)
 					iReverse--;
 				while (satinMap.test(iForward) && iForward < VertexCount - 1)
 					iForward++;
-				while (iReverse > gsl::narrow<unsigned>(WordParam) - 1 && (satinMap.test(iReverse)))
+				while (iReverse > gsl::narrow<unsigned>(SatinEndGuide) - 1 && (satinMap.test(iReverse)))
 					iReverse--;
 				if (satinMap.test(iForward) && satinMap.test(iReverse))
 					break;
@@ -4791,19 +4791,19 @@ void satadj() {
 			if (iReverse < VertexCount)
 				CurrentFormGuides[iGuide++].finish = iReverse;
 		} while (iReverse < VertexCount);
-		if (iGuide < CurrentFormConnectionsCount)
-			iGuide = CurrentFormConnectionsCount;
-		CurrentFormConnectionsCount = SelectedForm->satinGuideCount = iGuide;
-		if (WordParam) {
-			if (CurrentFormConnectionsCount > VertexCount - WordParam - 2)
-				CurrentFormConnectionsCount = VertexCount - WordParam - 2;
-			if (CurrentFormConnectionsCount > WordParam - 2)
-				CurrentFormConnectionsCount = WordParam - 2;
-			SelectedForm->satinGuideCount = CurrentFormConnectionsCount;
+		if (iGuide < CurrentFormGuidesCount)
+			iGuide = CurrentFormGuidesCount;
+		CurrentFormGuidesCount = SelectedForm->satinGuideCount = iGuide;
+		if (SatinEndGuide) {
+			if (CurrentFormGuidesCount > VertexCount - SatinEndGuide - 2)
+				CurrentFormGuidesCount = VertexCount - SatinEndGuide - 2;
+			if (CurrentFormGuidesCount > SatinEndGuide - 2)
+				CurrentFormGuidesCount = SatinEndGuide - 2;
+			SelectedForm->satinGuideCount = CurrentFormGuidesCount;
 		}
 	}
 	if (SelectedForm->satinGuideCount < guideCount) {
-		iGuide = guideCount - CurrentFormConnectionsCount;
+		iGuide = guideCount - CurrentFormGuidesCount;
 		sourceGuide = destinationGuide = SelectedForm->satinOrAngle.guide;
 		destinationGuide += SelectedForm->satinGuideCount;
 		sourceGuide += guideCount;
@@ -4815,7 +4815,7 @@ void satadj() {
 		}
 		SatinConnectIndex -= iGuide;
 	}
-	delete[] guide;
+	delete[] interiorGuides;
 }
 
 void satclos() {
@@ -4891,7 +4891,7 @@ void satclos() {
 			satadj();
 		}
 		else {
-			if (CurrentFormConnectionsCount) {
+			if (CurrentFormGuidesCount) {
 				sacspac(&SelectedForm->satinOrAngle.guide[SelectedForm->satinGuideCount], 1);
 				SelectedForm->satinOrAngle.guide[SelectedForm->satinGuideCount].start = closestVertex;
 				SelectedForm->satinOrAngle.guide[SelectedForm->satinGuideCount++].finish = ClosestVertexToCursor;
@@ -5123,10 +5123,10 @@ void satmf() {
 	if (SelectedForm->attribute&FRMEND)
 		iGuide = 1;
 	satfn(iGuide, CurrentFormGuides[0].start, VertexCount, CurrentFormGuides[0].finish);
-	for (iGuide = 0; iGuide < gsl::narrow<unsigned>(CurrentFormConnectionsCount) - 1; iGuide++)
+	for (iGuide = 0; iGuide < gsl::narrow<unsigned>(CurrentFormGuidesCount) - 1; iGuide++)
 		satfn(CurrentFormGuides[iGuide].start, CurrentFormGuides[iGuide + 1].start, CurrentFormGuides[iGuide].finish, CurrentFormGuides[iGuide + 1].finish);
-	if (WordParam)
-		satfn(CurrentFormGuides[iGuide].start, WordParam, CurrentFormGuides[iGuide].finish, WordParam + 1);
+	if (SatinEndGuide)
+		satfn(CurrentFormGuides[iGuide].start, SatinEndGuide, CurrentFormGuides[iGuide].finish, SatinEndGuide + 1);
 	else {
 		if (CurrentFormGuides[iGuide].finish - CurrentFormGuides[iGuide].start > 2) {
 			length = (Lengths[CurrentFormGuides[iGuide].finish] - Lengths[CurrentFormGuides[iGuide].start]) / 2 + Lengths[CurrentFormGuides[iGuide].start];
@@ -5172,18 +5172,18 @@ void satfil() {
 	deltaY = CurrentFormVertices[0].y - CurrentFormVertices[iVertex].y;
 	length += hypot(deltaX, deltaY);
 	Lengths[iVertex + 1] = length;
-	if (WordParam) {
-		if (CurrentFormConnectionsCount) {
+	if (SatinEndGuide) {
+		if (CurrentFormGuidesCount) {
 			satmf();
 			goto satdun;
 		}
 		else {
-			satfn(1, WordParam, VertexCount, WordParam + 1);
+			satfn(1, SatinEndGuide, VertexCount, SatinEndGuide + 1);
 			goto satdun;
 		}
 	}
 	if (SelectedForm->attribute&FRMEND) {
-		if (CurrentFormConnectionsCount) {
+		if (CurrentFormGuidesCount) {
 			satmf();
 			goto satdun;
 		}
@@ -5211,7 +5211,7 @@ void satfil() {
 			goto satdun;
 		}
 	}
-	if (CurrentFormConnectionsCount) {
+	if (CurrentFormGuidesCount) {
 		satmf();
 		goto satdun;
 	}

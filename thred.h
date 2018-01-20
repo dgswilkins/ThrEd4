@@ -1071,7 +1071,7 @@ typedef struct _frmhed {
 	SATINANGLE		satinOrAngle;		//satin guidlines or angle clipboard fill angle
 	fPOINT*			borderClipData;		//border clipboard data
 	unsigned short	satinGuideCount;	//number of satin guidlines
-	unsigned short	wordParam;			//clipboard/textured fill phase or satin connect end
+	unsigned short	wordParam;			//clipboard/textured fill phase or satin end guide
 	fRECTANGLE		rectangle;			//rectangle
 	unsigned char	fillType;			//fill type
 	unsigned char	edgeType;			//edge type

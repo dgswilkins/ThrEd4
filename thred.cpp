@@ -440,7 +440,7 @@ extern	int				TextureIndex;
 extern	TXPNT			TexturePointsBuffer[MAXITEMS];
 extern	unsigned		VertexCount;
 extern	double			VerticalRatio;
-extern	unsigned short	WordParam;
+extern	unsigned short	SatinEndGuide;
 extern	double			XYratio;
 
 //select box
@@ -9685,9 +9685,9 @@ selab:;
 							goto deldun;
 						}
 					}
-					if (WordParam) {
+					if (SatinEndGuide) {
 
-						if (ClosestVertexToCursor == gsl::narrow<unsigned>(WordParam) || ClosestVertexToCursor == gsl::narrow<unsigned>(WordParam) + 1) {
+						if (ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) || ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) + 1) {
 
 							SelectedForm->wordParam = 0;
 							satinFlag = 1;
