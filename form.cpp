@@ -2,10 +2,6 @@
 # define NOMINMAX
 #endif
 
-#ifndef BCSOM
-#define BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE
-#endif
-
 #include <windows.h>
 #include <stdio.h>
 #include <math.h>
@@ -379,8 +375,8 @@ fPOINT			FormVertices[MAXITEMS];	//form points
 unsigned		FormVertexIndex;		//next index to append form points
 fPOINT			ClipPoints[MAXITEMS];	//main clipboard fill points for forms
 unsigned		ClipPointIndex;			//next index to append main clipboard points
-SATCON			SatinConnects[MAXSAC];	//satin form connects
-unsigned		SatinConnectIndex;		//next index to append satin connect points
+SATCON			SatinGuides[MAXSAC];	//satin form connects
+unsigned		SatinGuideIndex;		//next index to append satin connect points
 float			ButtonholeCornerLength = IBFCLEN;	//buttonhole corner length
 float			PicotSpacing = IPICSPAC;	//space between border picots
 unsigned		PseudoRandomValue;		//pseudo-random sequence register
@@ -620,11 +616,11 @@ unsigned satind(const SATCON* guide) noexcept {
 #if	 __UseASM__
 	_asm {
 		mov		eax, guide
-		sub		eax, offset SatinConnects
+		sub		eax, offset SatinGuides
 		shr		eax, 2
 	}
 #else
-	return guide - SatinConnects;
+	return guide - SatinGuides;
 #endif
 }
 
@@ -642,17 +638,17 @@ void sacspac(const SATCON* startGuide, unsigned guideCount) noexcept {
 	unsigned	iForm = 0;
 
 	iStartGuide = satind(startGuide);
-	source = SatinConnectIndex - 1;
-	destination = SatinConnectIndex + guideCount - 1;
+	source = SatinGuideIndex - 1;
+	destination = SatinGuideIndex + guideCount - 1;
 	while (source >= iStartGuide) {
-		SatinConnects[destination].start = SatinConnects[source].start;
-		SatinConnects[destination--].finish = SatinConnects[source--].finish;
+		SatinGuides[destination].start = SatinGuides[source].start;
+		SatinGuides[destination--].finish = SatinGuides[source--].finish;
 	}
 	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 		if (FormList[iForm].type == SAT)
 			FormList[iForm].satinOrAngle.guide += guideCount;
 	}
-	SatinConnectIndex += guideCount;
+	SatinGuideIndex += guideCount;
 }
 
 SATCON* nusac(unsigned formIndex, unsigned guideCount) noexcept {
@@ -663,7 +659,7 @@ SATCON* nusac(unsigned formIndex, unsigned guideCount) noexcept {
 		if (FormList[iForm].type == SAT)
 			guideIndex += FormList[iForm].satinGuideCount;
 	}
-	FormList[formIndex].satinOrAngle.guide = &SatinConnects[guideIndex];
+	FormList[formIndex].satinOrAngle.guide = &SatinGuides[guideIndex];
 	sacspac(FormList[formIndex].satinOrAngle.guide, guideCount);
 	return FormList[formIndex].satinOrAngle.guide;
 }
@@ -816,11 +812,11 @@ unsigned sacind(const SATCON* guide) noexcept {
 #if	 __UseASM__
 	_asm {
 		mov		eax, guide
-		sub		eax, offset SatinConnects
+		sub		eax, offset SatinGuides
 		shr		eax, 2
 	}
 #else
-	return guide - SatinConnects;
+	return guide - SatinGuides;
 #endif
 }
 
@@ -857,19 +853,19 @@ void delsac(unsigned formIndex) noexcept {
 	unsigned	iForm = 0;
 	unsigned	source = 0, destination = 0;
 
-	if (SatinConnectIndex) {
+	if (SatinGuideIndex) {
 		if (FormList[formIndex].type == SAT && FormList[formIndex].satinGuideCount) {
 			destination = satind(FormList[formIndex].satinOrAngle.guide);
 			source = destination + FormList[formIndex].satinGuideCount;
-			while (source < SatinConnectIndex) {
-				SatinConnects[destination].start = SatinConnects[source].start;
-				SatinConnects[destination++].finish = SatinConnects[source++].finish;
+			while (source < SatinGuideIndex) {
+				SatinGuides[destination].start = SatinGuides[source].start;
+				SatinGuides[destination++].finish = SatinGuides[source++].finish;
 			}
 			for (iForm = formIndex + 1; iForm < FormIndex; iForm++) {
 				if (FormList[iForm].type == SAT && FormList[iForm].satinGuideCount)
 					FormList[iForm].satinOrAngle.guide -= FormList[formIndex].satinGuideCount;
 			}
-			SatinConnectIndex -= FormList[formIndex].satinGuideCount;
+			SatinGuideIndex -= FormList[formIndex].satinGuideCount;
 		}
 	}
 	FormList[formIndex].satinGuideCount = 0;
@@ -1310,7 +1306,7 @@ void delfrms() {
 	unsigned	iStitch = 0;
 
 	savdo();
-	FormIndex = FormVertexIndex = SatinConnectIndex = ClipPointIndex = 0;
+	FormIndex = FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		StitchBuffer[iStitch].attribute &= NFRM_NTYP;
 		StitchBuffer[iStitch].attribute |= NOTFRM;
@@ -4494,13 +4490,13 @@ void satfix() {
 void delcon(unsigned GuideIndex) {
 
 	unsigned	iForm = ClosestFormToCursor + 1;
-	// ToDo - Find a better way to calculate the offset into the SatinConnects array
-	const unsigned	iGuide = &SelectedForm->satinOrAngle.guide[GuideIndex] - SatinConnects;
+	// ToDo - Find a better way to calculate the offset into the SatinGuides array
+	const unsigned	iGuide = &SelectedForm->satinOrAngle.guide[GuideIndex] - SatinGuides;
 	SATCON*		guide = &SelectedForm->satinOrAngle.guide[GuideIndex];
 	FRMHED*		formHeader = nullptr;
 
-	if (SatinConnectIndex > iGuide)
-		MoveMemory(guide, &guide[1], (SatinConnectIndex - iGuide + 1) * sizeof(SATCON));
+	if (SatinGuideIndex > iGuide)
+		MoveMemory(guide, &guide[1], (SatinGuideIndex - iGuide + 1) * sizeof(SATCON));
 	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 		formHeader = &FormList[iForm];
 		if (formHeader->type == SAT && formHeader->satinGuideCount)
@@ -4509,7 +4505,7 @@ void delcon(unsigned GuideIndex) {
 	if (ClosestVertexToCursor < SatinEndGuide)
 		SatinEndGuide--;
 	SelectedForm->satinGuideCount--;
-	SatinConnectIndex--;
+	SatinGuideIndex--;
 	CurrentFormGuidesCount = SelectedForm->satinGuideCount;
 	if (SelectedForm->fillType == SATF)
 		refil();
@@ -4673,7 +4669,7 @@ void satadj() {
 	}
 	CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
 	if (SatinEndGuide || SelectedForm->attribute&FRMEND) {
-		// there are end guides so set the satinMap 
+		// there are end guides so set the satinMap for the next step
 		satinMap.reset();
 		if (SelectedForm->attribute&FRMEND) {
 			satinMap.set(0);
@@ -4693,7 +4689,7 @@ void satadj() {
 			}
 		}
 		CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
-		// remove any guides after the turn
+		// remove any guides that start after the end guide
 		if (SatinEndGuide) {
 			iDestination = 0;
 			for (iSource = 0; iSource < CurrentFormGuidesCount; iSource++) {
@@ -4813,7 +4809,7 @@ void satadj() {
 			if (formHeader->type == SAT)
 				formHeader->satinOrAngle.guide -= iGuide;
 		}
-		SatinConnectIndex -= iGuide;
+		SatinGuideIndex -= iGuide;
 	}
 	delete[] interiorGuides;
 }
@@ -5447,7 +5443,7 @@ void delspnt() {
 					iGuide++;
 				}
 				SelectedForm->satinGuideCount--;
-				SatinConnectIndex--;
+				SatinGuideIndex--;
 				for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 					formHeader = &FormList[iForm];
 					if (formHeader->type == SAT && formHeader->satinGuideCount)
@@ -10833,9 +10829,9 @@ void dufdat(unsigned formIndex) {
 	destination->vertices = &FormVertices[FormVertexIndex];
 	FormVertexIndex += destination->vertexCount;
 	if (destination->satinGuideCount) {
-		mvsatk(&TempGuides[SatinConnectIndex], destination->satinOrAngle.guide, destination->satinGuideCount);
-		destination->satinOrAngle.guide = &SatinConnects[SatinConnectIndex];
-		SatinConnectIndex += destination->satinGuideCount;
+		mvsatk(&TempGuides[SatinGuideIndex], destination->satinOrAngle.guide, destination->satinGuideCount);
+		destination->satinOrAngle.guide = &SatinGuides[SatinGuideIndex];
+		SatinGuideIndex += destination->satinGuideCount;
 	}
 	if (iseclpx(formIndex)) {
 		mvflpnt(&TempClipPoints[ClipPointIndex], destination->borderClipData, destination->clipEntries);
@@ -10883,10 +10879,10 @@ void frmnumfn(unsigned newFormIndex) {
 
 		TempFormList = new FRMHED[FormIndex];
 		TempFormVertices = new fPOINT[MAXITEMS];
-		TempGuides = new SATCON[SatinConnectIndex];
+		TempGuides = new SATCON[SatinGuideIndex];
 		TempClipPoints = new fPOINT[MAXITEMS];
 
-		FormVertexIndex = SatinConnectIndex = ClipPointIndex = 0;
+		FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
 		for (iForm = 0; iForm < FormIndex; iForm++) {
 			if (iForm == newFormIndex)
 				dufdat(ClosestFormToCursor);
@@ -10898,7 +10894,7 @@ void frmnumfn(unsigned newFormIndex) {
 		}
 		mvfrms(FormList, TempFormList, FormIndex);
 		mvflpnt(FormVertices, TempFormVertices, FormVertexIndex);
-		mvsatk(SatinConnects, TempGuides, SatinConnectIndex);
+		mvsatk(SatinGuides, TempGuides, SatinGuideIndex);
 		mvflpnt(ClipPoints, TempClipPoints, ClipPointIndex);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (StitchBuffer[iStitch].attribute&SRTYPMSK) {
@@ -11406,8 +11402,8 @@ void spltsat(SATCON currentGuide) {
 	}
 	if (FormList[ClosestFormToCursor + 1].wordParam)
 		FormList[ClosestFormToCursor + 1].wordParam -= (currentGuide.start - 1);
-	mvsatk(&SelectedForm->satinOrAngle.guide[iOldVertex - 1], &SelectedForm->satinOrAngle.guide[iOldVertex], SatinConnectIndex - sacind(&SelectedForm->satinOrAngle.guide[iOldVertex]));
-	SatinConnectIndex--;
+	mvsatk(&SelectedForm->satinOrAngle.guide[iOldVertex - 1], &SelectedForm->satinOrAngle.guide[iOldVertex], SatinGuideIndex - sacind(&SelectedForm->satinOrAngle.guide[iOldVertex]));
+	SatinGuideIndex--;
 	FormList[ClosestFormToCursor + 1].satinOrAngle.guide = &SelectedForm->satinOrAngle.guide[ActivePointIndex];
 	FormList[ClosestFormToCursor + 1].satinGuideCount = SelectedForm->satinGuideCount - ActivePointIndex - 1;
 	SelectedForm->satinGuideCount = ActivePointIndex;

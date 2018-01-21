@@ -419,8 +419,8 @@ extern	long			PreferenceWindowWidth;
 extern	unsigned		PreviousFormIndex;
 extern	unsigned		PseudoRandomValue;
 extern	POINT			RubberBandLine[3];
-extern	unsigned		SatinConnectIndex;
-extern	SATCON			SatinConnects[MAXSAC];
+extern	unsigned		SatinGuideIndex;
+extern	SATCON			SatinGuides[MAXSAC];
 extern	unsigned		SelectedFormControlVertex;
 extern	unsigned		SelectedFormCount;
 extern	unsigned short	SelectedFormList[MAXFORMS];
@@ -1941,10 +1941,10 @@ fPOINT* adflt(unsigned count) {
 
 SATCON* adsatk(unsigned count) noexcept {
 
-	unsigned iSatinConnect = SatinConnectIndex;
+	unsigned iSatinConnect = SatinGuideIndex;
 
-	SatinConnectIndex += count;
-	return &SatinConnects[iSatinConnect];
+	SatinGuideIndex += count;
+	return &SatinGuides[iSatinConnect];
 }
 
 fPOINT* adclp(unsigned count) noexcept {
@@ -2138,7 +2138,7 @@ void dudat() {
 	if (UndoBuffer[UndoBufferWriteIndex])
 		delete UndoBuffer[UndoBufferWriteIndex];
 	size = sizeof(BAKHED) + sizeof(FRMHED)*FormIndex + sizeof(fPOINTATTR)*PCSHeader.stitchCount
-		+ sizeof(fPOINT)*(FormVertexIndex + ClipPointIndex) + sizeof(SATCON)*SatinConnectIndex + sizeof(COLORREF) * 16 +
+		+ sizeof(fPOINT)*(FormVertexIndex + ClipPointIndex) + sizeof(SATCON)*SatinGuideIndex + sizeof(COLORREF) * 16 +
 		sizeof(TXPNT)*TextureIndex;
 	UndoBuffer[UndoBufferWriteIndex] = new unsigned[size];
 	backupData = static_cast<BAKHED*>(UndoBuffer[UndoBufferWriteIndex]);
@@ -2159,12 +2159,12 @@ void dudat() {
 		backupData->vertices = static_cast<fPOINT *>(static_cast<void *>(&backupData->stitches[PCSHeader.stitchCount]));
 		if (FormVertexIndex)
 			mvflpnt(backupData->vertices, &FormVertices[0], FormVertexIndex);
-		backupData->guideCount = SatinConnectIndex;
+		backupData->guideCount = SatinGuideIndex;
 		backupData->guide = static_cast<SATCON *>(static_cast<void *>(&backupData->vertices[FormVertexIndex]));
-		if (SatinConnectIndex)
-			mvsatk(backupData->guide, &SatinConnects[0], SatinConnectIndex);
+		if (SatinGuideIndex)
+			mvsatk(backupData->guide, &SatinGuides[0], SatinGuideIndex);
 		backupData->clipPointCount = ClipPointIndex;
-		backupData->clipPoints = static_cast<fPOINT *>(static_cast<void *>(&backupData->guide[SatinConnectIndex]));
+		backupData->clipPoints = static_cast<fPOINT *>(static_cast<void *>(&backupData->guide[SatinGuideIndex]));
 		if (ClipPointIndex) {
 
 			if (ClipPointIndex > MAXITEMS)
@@ -4398,9 +4398,9 @@ void redbak() {
 	FormVertexIndex = undoData->vertexCount;
 	if (FormVertexIndex)
 		mvflpnt(&FormVertices[0], &undoData->vertices[0], FormVertexIndex);
-	SatinConnectIndex = undoData->guideCount;
-	if (SatinConnectIndex)
-		mvsatk(&SatinConnects[0], &undoData->guide[0], SatinConnectIndex);
+	SatinGuideIndex = undoData->guideCount;
+	if (SatinGuideIndex)
+		mvsatk(&SatinGuides[0], &undoData->guide[0], SatinGuideIndex);
 	ClipPointIndex = undoData->clipPointCount;
 	if (ClipPointIndex)
 		mvflpnt(&ClipPoints[0], &undoData->clipPoints[0], ClipPointIndex);
@@ -5327,7 +5327,7 @@ void nuFil() {
 					pcsStitchCount = 0;
 					if (FormIndex) {
 
-						FormVertexIndex = SatinConnectIndex = ClipPointIndex = 0;
+						FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
 						MsgBuffer[0] = 0;
 						if (version < 2) {
 							formListOriginal = new FRMHEDO[FormIndex];
@@ -5358,10 +5358,10 @@ void nuFil() {
 								FormVertices[iVertex].x = FormVertices[iVertex].y = 0;
 							StateMap.set(StateFlag::BADFIL);
 						}
-						ReadFile(FileHandle, (SATCON*)SatinConnects, thredHeader.dlineCount * sizeof(SATCON), &BytesRead, 0);
+						ReadFile(FileHandle, (SATCON*)SatinGuides, thredHeader.dlineCount * sizeof(SATCON), &BytesRead, 0);
 						if (BytesRead != thredHeader.dlineCount * sizeof(SATCON)) {
 
-							SatinConnectIndex = BytesRead / sizeof(SATCON);
+							SatinGuideIndex = BytesRead / sizeof(SATCON);
 							StateMap.set(StateFlag::BADFIL);
 						}
 						ReadFile(FileHandle, (fPOINT*)ClipPoints, thredHeader.clipDataCount * sizeof(fPOINT), &BytesRead, 0);
@@ -7490,7 +7490,7 @@ void newFil() {
 	FormVertexIndex = 0;
 	ClipPointIndex = 0;
 	TextureIndex = 0;
-	SatinConnectIndex = 0;
+	SatinGuideIndex = 0;
 	FormIndex = 0;
 	WorkingFileName[0] = 0;
 	ColorChanges = 0;
@@ -9494,7 +9494,7 @@ void frmdel() {
 void deltot() {
 
 	strcpy_s(DesignerName, IniFile.designerName);
-	FormIndex = PCSHeader.stitchCount = FormVertexIndex = ClipPointIndex = SatinConnectIndex = TextureIndex = 0;
+	FormIndex = PCSHeader.stitchCount = FormVertexIndex = ClipPointIndex = SatinGuideIndex = TextureIndex = 0;
 	StateMap.reset(StateFlag::GMRK);
 	rstAll();
 	coltab();
@@ -11678,7 +11678,7 @@ void insfil() {
 						else
 							ReadFile(InsertedFileHandle, &FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), &BytesRead, 0);
 						ReadFile(InsertedFileHandle, &FormVertices[FormVertexIndex], fileHeader.vertexCount * sizeof(fPOINT), &BytesRead, 0);
-						ReadFile(InsertedFileHandle, &SatinConnects[SatinConnectIndex], fileHeader.dlineCount * sizeof(SATCON), &BytesRead, 0);
+						ReadFile(InsertedFileHandle, &SatinGuides[SatinGuideIndex], fileHeader.dlineCount * sizeof(SATCON), &BytesRead, 0);
 						ReadFile(InsertedFileHandle, &ClipPoints[ClipPointIndex], fileHeader.clipDataCount * sizeof(fPOINT), &BytesRead, 0);
 						ReadFile(InsertedFileHandle, &TexturePointsBuffer[TextureIndex], ExtendedHeader.texturePointCount * sizeof(TXPNT), &BytesRead, 0);
 						CloseHandle(InsertedFileHandle);

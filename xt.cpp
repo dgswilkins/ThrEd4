@@ -70,8 +70,8 @@ extern	TCHAR*			RepairString;
 extern	double			RotationAngle;
 extern	dPOINT			RotationCenter;
 extern	FRMHED*			SelectedForm;
-extern	unsigned		SatinConnectIndex;
-extern	SATCON			SatinConnects[MAXSAC];
+extern	unsigned		SatinGuideIndex;
+extern	SATCON			SatinGuides[MAXSAC];
 extern	EnumMap<StateFlag>	StateMap;
 extern	TCHAR*			StringData;
 extern	unsigned		SelectedFormCount;
@@ -5071,7 +5071,7 @@ unsigned frmchkfn() {
 			}
 			if (formHeader->type == SAT && formHeader->satinGuideCount) {
 				if (!(badData.attribute&BADSAT)) {
-					if (badData.guideCount == formHeader->satinOrAngle.guide - SatinConnects)
+					if (badData.guideCount == formHeader->satinOrAngle.guide - SatinGuides)
 						badData.guideCount += formHeader->satinGuideCount;
 					else
 						badData.attribute |= BADSAT;
@@ -5092,7 +5092,7 @@ unsigned frmchkfn() {
 			badData.attribute |= BADFLT;
 		if (badData.clip != gsl::narrow<int>(ClipPointIndex))
 			badData.attribute |= BADCLP;
-		if (badData.guideCount != gsl::narrow<int>(SatinConnectIndex))
+		if (badData.guideCount != gsl::narrow<int>(SatinGuideIndex))
 			badData.attribute |= BADSAT;
 		if (badData.tx != TextureIndex)
 			badData.attribute |= BADTX;
@@ -5187,7 +5187,7 @@ void repflt() {
 			else {
 				FormIndex = iForm;
 				ClipPointIndex = badData.clip;
-				SatinConnectIndex = badData.guideCount;
+				SatinGuideIndex = badData.guideCount;
 				TextureIndex = badData.tx;
 				chkfstch();
 				adbad(IDS_FRMDAT, FormIndex - iForm + 1);
@@ -5263,17 +5263,17 @@ void repsat() {
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		formHeader = &FormList[iForm];
 		if (formHeader->type == SAT) {
-			guideDifference = formHeader->satinOrAngle.guide - SatinConnects;
+			guideDifference = formHeader->satinOrAngle.guide - SatinGuides;
 			if (FormVertexIndex > guideDifference + formHeader->vertexCount) {
-				MoveMemory(&SatinConnects[guideCount], formHeader->satinOrAngle.guide, formHeader->satinGuideCount * sizeof(SATCON));
-				formHeader->satinOrAngle.guide = &SatinConnects[guideCount];
+				MoveMemory(&SatinGuides[guideCount], formHeader->satinOrAngle.guide, formHeader->satinGuideCount * sizeof(SATCON));
+				formHeader->satinOrAngle.guide = &SatinGuides[guideCount];
 				guideCount += formHeader->satinGuideCount;
 				bcup(iForm, &badData);
 			}
 			else {
-				if (guideDifference < SatinConnectIndex) {
-					formHeader->satinGuideCount = SatinConnectIndex - guideDifference;
-					MoveMemory(&SatinConnects[guideCount], formHeader->satinOrAngle.guide, formHeader->satinGuideCount * sizeof(SATCON));
+				if (guideDifference < SatinGuideIndex) {
+					formHeader->satinGuideCount = SatinGuideIndex - guideDifference;
+					MoveMemory(&SatinGuides[guideCount], formHeader->satinOrAngle.guide, formHeader->satinGuideCount * sizeof(SATCON));
 					bcup(iForm, &badData);
 				}
 				else {
@@ -5283,7 +5283,7 @@ void repsat() {
 			}
 		}
 	}
-	SatinConnectIndex = guideCount;
+	SatinGuideIndex = guideCount;
 }
 
 void reptx() {
@@ -5295,7 +5295,7 @@ void reptx() {
 		if (istx(iForm)) {
 			formHeader = &FormList[iForm];
 			if (TextureIndex > formHeader->fillInfo.texture.index + formHeader->fillInfo.texture.count) {
-				MoveMemory(&SatinConnects[textureCount], &SatinConnects[formHeader->fillInfo.texture.index], formHeader->fillInfo.texture.count * sizeof(SATCON));
+				MoveMemory(&SatinGuides[textureCount], &SatinGuides[formHeader->fillInfo.texture.index], formHeader->fillInfo.texture.count * sizeof(SATCON));
 				formHeader->fillInfo.texture.index = textureCount;
 				textureCount += formHeader->fillInfo.texture.count;
 				bcup(iForm, &badData);
@@ -5303,7 +5303,7 @@ void reptx() {
 			else {
 				if (TextureIndex > formHeader->fillInfo.texture.index) {
 					formHeader->fillInfo.texture.count = TextureIndex - formHeader->fillInfo.texture.index;
-					MoveMemory(&SatinConnects[textureCount], &SatinConnects[formHeader->fillInfo.texture.index], formHeader->fillInfo.texture.count * sizeof(SATCON));
+					MoveMemory(&SatinGuides[textureCount], &SatinGuides[formHeader->fillInfo.texture.index], formHeader->fillInfo.texture.count * sizeof(SATCON));
 					formHeader->fillInfo.texture.index = textureCount;
 					bcup(iForm, &badData);
 					textureCount = badData.tx;
