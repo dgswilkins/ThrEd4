@@ -2458,6 +2458,9 @@ void intlv() {
 						StitchBuffer[ilData.output].y != StitchBuffer[ilData.output - 1].y)
 						ilData.output++;
 				}
+				else {
+					ilData.output++;
+				}
 			}
 		}
 		chkend(0, code, &ilData);
