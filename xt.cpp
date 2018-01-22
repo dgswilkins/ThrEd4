@@ -2453,9 +2453,11 @@ void intlv() {
 				StitchBuffer[ilData.output].x = InterleaveSequence[ine].x;
 				StitchBuffer[ilData.output].y = InterleaveSequence[ine].y;
 				StitchBuffer[ilData.output].attribute = code;
-				if (StitchBuffer[ilData.output].x != StitchBuffer[ilData.output - 1].x ||
-					StitchBuffer[ilData.output].y != StitchBuffer[ilData.output - 1].y)
-					ilData.output++;
+				if (ilData.output > 0) {
+					if (StitchBuffer[ilData.output].x != StitchBuffer[ilData.output - 1].x ||
+						StitchBuffer[ilData.output].y != StitchBuffer[ilData.output - 1].y)
+						ilData.output++;
+				}
 			}
 		}
 		chkend(0, code, &ilData);
