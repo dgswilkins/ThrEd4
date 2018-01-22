@@ -4803,7 +4803,7 @@ void satadj() {
 		sourceGuide = destinationGuide = SelectedForm->satinOrAngle.guide;
 		destinationGuide += SelectedForm->satinGuideCount;
 		sourceGuide += guideCount;
-		MoveMemory(destinationGuide, sourceGuide, sizeof(SATCON)*(&SatinConnects[SatinConnectIndex] - sourceGuide + 1));
+		MoveMemory(destinationGuide, sourceGuide, sizeof(SATCON)*(&SatinGuides[SatinGuideIndex] - sourceGuide + 1));
 		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			formHeader = &FormList[iForm];
 			if (formHeader->type == SAT)
