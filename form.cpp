@@ -4642,7 +4642,6 @@ void satadj() {
 	fvars(ClosestFormToCursor);
 
 	unsigned		iGuide = 0, iSource = 0, iForm = 0, iForward = 0, iVertex = 0, iReverse = 0, iDestination = 0;
-	const unsigned	mapSize = (VertexCount >> 5) + 1;
 	SATCON*			interiorGuides = new SATCON[CurrentFormGuidesCount];
 	SATCON*			sourceGuide = nullptr;
 	SATCON*			destinationGuide = nullptr;
