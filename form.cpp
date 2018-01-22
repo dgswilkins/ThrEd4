@@ -4713,7 +4713,7 @@ void satadj() {
 			iForward = CurrentFormGuides[iGuide].start;
 			if (iForward > gsl::narrow<unsigned>(SatinEndGuide) - 1)
 				iForward = SatinEndGuide - 1;
-			if (!setchk(&satinMap, iForward)) {
+			if (setchk(&satinMap, iForward)) {
 				iReverse = iForward;
 				if (iReverse)
 					iReverse--;
