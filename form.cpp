@@ -297,7 +297,6 @@ unsigned		ActivePointIndex;		//pointer to the active form in the sequencing algo
 unsigned		LineGroupIndex;			//pointer for groups of fill line segments
 SMALPNTL**		SortedLines;			//sorted pointers to LineEndpoints
 unsigned		VertexCount;			//sides of the selected form to fill
-unsigned		SortedLineIndex;		//for connecting fill lines
 unsigned		SequenceIndex;			//sequencing pointer
 BSEQPNT			BSequence[BSEQLEN];		//reverse sequence for polygon fills
 fPOINT			OSequence[OSEQLEN];		//temporary storage for sequencing
@@ -359,7 +358,6 @@ FSEQ*			SequencePath;			//path of sequenced regions
 RGSEQ*			TempPath;				//temporary path connections
 unsigned		SequencePathIndex;		//index to path of sequenced regions
 unsigned		NextGroup;				//group that connects to the next region
-unsigned*		SequenceFlagBitmap;		//a bitmap of sequenced lines
 REGION*			CurrentRegion;			//region currently being sequenced
 fPOINT			LastRegionCorners[4];	//corners of last region sequenced
 FRMHED			AngledForm;				//a temporary rotated form for angle fills
@@ -3083,22 +3081,6 @@ bool unvis() noexcept {
 	return 0;
 }
 
-unsigned setseq(unsigned bit) noexcept {
-#if	 __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, SequenceFlagBitmap
-		mov		ecx, bit
-		bts		[ebx], ecx
-		jnc		short setseqx
-		inc		eax
-setseqx :
-	}
-#else
-	return _bittestandset(static_cast<long *>(static_cast<void *>(SequenceFlagBitmap)), bit);
-#endif
-}
-
 void rspnt(float xCoordinate, float yCoordinate) noexcept {
 	BSequence[OutputIndex].x = xCoordinate;
 	BSequence[OutputIndex].y = yCoordinate;
@@ -3150,7 +3132,7 @@ void duseq1() noexcept {
 	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x, (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
 }
 
-void duseq(unsigned start, unsigned finish) {
+void duseq(unsigned start, unsigned finish, ExtendedBitSet<> *sequenceMap) {
 
 	unsigned	iLine = 0, iLineDec = 0;
 	unsigned	savedTopLine = SortedLines[start][1].line;
@@ -3162,7 +3144,7 @@ void duseq(unsigned start, unsigned finish) {
 		// This odd construction for iLine is used to ensure loop terminates when finish = 0
 		for (iLine = start + 1; iLine != finish; iLine--) {
 			iLineDec = iLine - 1;
-			if (setseq(iLineDec)) {
+			if (sequenceMap->testAndSet(iLineDec)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
 					flag = true;
 					duseq2(iLineDec);
@@ -3193,7 +3175,7 @@ void duseq(unsigned start, unsigned finish) {
 	}
 	else {
 		for (iLine = start; iLine <= finish; iLine++) {
-			if (setseq(iLine)) {
+			if (sequenceMap->testAndSet(iLine)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
 					flag = true;
 					duseq2(iLine);
@@ -3228,7 +3210,7 @@ void duseq(unsigned start, unsigned finish) {
 	}
 }
 
-void brkseq(unsigned start, unsigned finish) {
+void brkseq(unsigned start, unsigned finish, ExtendedBitSet<> *sequenceMap) {
 
 	unsigned	iLine = 0, iLineDec = 0, savedGroup = 0;
 
@@ -3248,7 +3230,7 @@ void brkseq(unsigned start, unsigned finish) {
 			}
 			else
 				SequenceLines = &*SortedLines[iLineDec];
-			if (setseq(iLineDec)) {
+			if (sequenceMap->testAndSet(iLineDec)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN))
 					duseq1();
 			}
@@ -3269,7 +3251,7 @@ void brkseq(unsigned start, unsigned finish) {
 			}
 			else
 				SequenceLines = &*SortedLines[iLine];
-			if (setseq(iLine)) {
+			if (sequenceMap->testAndSet(iLine)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN))
 					duseq1();
 			}
@@ -3289,7 +3271,7 @@ void brkdun(unsigned start, unsigned finish) {
 	StateMap.set(StateFlag::BRKFIX);
 }
 
-void durgn(unsigned pthi) {
+void durgn(unsigned pthi, unsigned lineCount) {
 
 	unsigned	dun = 0, gdif = 0, mindif = 0, iVertex = 0, ind = 0, fdif = 0, bdif = 0;
 	unsigned	seql = 0, seqn = 0;
@@ -3302,6 +3284,7 @@ void durgn(unsigned pthi) {
 	SMALPNTL*	lineEndPointEnd = nullptr;
 	double		length = 0.0, minimumLength = 0.0;
 	BSEQPNT*	bpnt = nullptr;
+	ExtendedBitSet<> sequenceMap(lineCount);
 
 	//ToDo - More renaming required
 	CurrentRegion = &RegionsList[iRegion];
@@ -3356,7 +3339,7 @@ void durgn(unsigned pthi) {
 		seql = static_cast<double>(LastGroup - groupStart) / (groupEnd - groupStart)*(sequenceEnd - sequenceStart) + sequenceStart;
 	else
 		seql = 0;
-	if (seql > SortedLineIndex)
+	if (seql > lineCount)
 		seql = 0;
 	length = static_cast<double>(groupEnd - groupStart)*(sequenceEnd - sequenceStart);
 	if (length)
@@ -3413,24 +3396,24 @@ void durgn(unsigned pthi) {
 		}
 		else {
 			if (LastGroup >= groupEnd) {
-				brkseq(sequenceEnd, sequenceStart);
+				brkseq(sequenceEnd, sequenceStart, &sequenceMap);
 				if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn)
-					brkseq(sequenceStart, seqn);
+					brkseq(sequenceStart, seqn, &sequenceMap);
 			}
 			else {
 				if (groupStart <= nextGroup) {
 					if (seql != sequenceStart)
-						brkseq(seql, sequenceStart);
-					brkseq(sequenceStart, sequenceEnd);
+						brkseq(seql, sequenceStart, &sequenceMap);
+					brkseq(sequenceStart, sequenceEnd, &sequenceMap);
 					if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn)
-						brkseq(sequenceEnd, seqn);
+						brkseq(sequenceEnd, seqn, &sequenceMap);
 				}
 				else {
 					if (seql != sequenceEnd)
-						brkseq(seql, sequenceEnd);
-					brkseq(sequenceEnd, sequenceStart);
+						brkseq(seql, sequenceEnd, &sequenceMap);
+					brkseq(sequenceEnd, sequenceStart, &sequenceMap);
 					if (pthi < SequencePathIndex - 1 && sequenceStart != seqn)
-						brkseq(sequenceStart, seqn);
+						brkseq(sequenceStart, seqn, &sequenceMap);
 				}
 			}
 		}
@@ -3440,23 +3423,23 @@ void durgn(unsigned pthi) {
 			dunseq(seql, seqn);
 		else {
 			if (LastGroup >= groupEnd) {
-				duseq(sequenceEnd, sequenceStart);
-				duseq(sequenceStart, seqn);
+				duseq(sequenceEnd, sequenceStart, &sequenceMap);
+				duseq(sequenceStart, seqn, &sequenceMap);
 			}
 			else {
 				if (groupStart <= nextGroup) {
 					if (seql != sequenceStart)
-						duseq(seql, sequenceStart);
-					duseq(sequenceStart, sequenceEnd);
+						duseq(seql, sequenceStart, &sequenceMap);
+					duseq(sequenceStart, sequenceEnd, &sequenceMap);
 					if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn)
-						duseq(sequenceEnd, seqn);
+						duseq(sequenceEnd, seqn, &sequenceMap);
 				}
 				else {
 					if (seql != sequenceEnd)
-						duseq(seql, sequenceEnd);
-					duseq(sequenceEnd, sequenceStart);
+						duseq(seql, sequenceEnd, &sequenceMap);
+					duseq(sequenceEnd, sequenceStart, &sequenceMap);
 					if (pthi < SequencePathIndex - 1 && sequenceStart != seqn)
-						duseq(sequenceStart, seqn);
+						duseq(sequenceStart, seqn, &sequenceMap);
 				}
 			}
 		}
@@ -3672,13 +3655,14 @@ void nxtseq(unsigned pathIndex) noexcept {
 
 void lcon() {
 
-	unsigned		iPath = 0, iLine = 0, iRegion = 0, iSequence = 0, iNode = 0, bytesInBitmap = 0;
+	unsigned		iPath = 0, iLine = 0, iRegion = 0, iSequence = 0, iNode = 0;
 	unsigned		leftRegion = 0, iOutPath = 0, breakLine = 0, count = 0, startGroup = 0;
 	REGION*			regions = nullptr;
 	bool			isConnected = false;
 	RCON*			tempPathMap = nullptr;
 	SMALPNTL*		lineGroupPoint = nullptr;
 	unsigned		iStartLine = 0;
+	unsigned		lineCount = 0;
 
 #if BUGSEQ
 
@@ -3687,16 +3671,15 @@ void lcon() {
 
 	if (StitchLineCount) {
 		SortedLines = new SMALPNTL*[StitchLineCount >> 1]();
-		SortedLineIndex = 0;
 		for (iLine = 0; iLine < StitchLineCount; iLine += 2)
-			SortedLines[SortedLineIndex++] = &LineEndpoints[iLine];
-		qsort(SortedLines, SortedLineIndex, sizeof(SMALPNTL*), sqcomp);
+			SortedLines[lineCount++] = &LineEndpoints[iLine];
+		qsort(SortedLines, lineCount, sizeof(SMALPNTL*), sqcomp);
 		RegionCount = 0;
 		// Count the regions. There cannot be more regions than lines
-		regions = new REGION[SortedLineIndex]();
+		regions = new REGION[lineCount]();
 		regions[0].start = 0;
 		breakLine = SortedLines[0]->line;
-		for (iLine = 0; iLine < SortedLineIndex; iLine++) {
+		for (iLine = 0; iLine < lineCount; iLine++) {
 			if (breakLine != SortedLines[iLine]->line) {
 				regions[RegionCount++].end = iLine - 1;
 				regions[RegionCount].start = iLine;
@@ -3753,6 +3736,7 @@ void lcon() {
 		goto seqskip;
 #endif
 		OutputIndex = 0;
+
 		if (RegionCount > 1) {
 			PathMapIndex = 0;
 			for (iSequence = 0; iSequence < RegionCount; iSequence++) {
@@ -3847,8 +3831,6 @@ void lcon() {
 			PathIndex = 0;
 			for (iPath = 0; iPath < SequencePathIndex; iPath++)
 				nxtseq(iPath);
-			bytesInBitmap = (SortedLineIndex >> 5) + 1;
-			SequenceFlagBitmap = new unsigned[bytesInBitmap]();
 			for (iRegion = 0; iRegion < RegionCount; iRegion++)
 				VisitedRegions[iRegion] = 0;
 			LastGroup = 0;
@@ -3857,19 +3839,17 @@ void lcon() {
 				OutputDebugString(MsgBuffer);
 				if (!unvis())
 					break;
-				durgn(iPath);
+				durgn(iPath, lineCount);
 			}
 		}
 		else {
 			PathMap = new RCON[1]();
 			SequencePath = new FSEQ[1]();
-			bytesInBitmap = (SortedLineIndex >> 5) + 1;
-			SequenceFlagBitmap = new unsigned[bytesInBitmap]();
 			LastGroup = 0;
 			SequencePath[0].node = 0;
 			SequencePath[0].nextGroup = SortedLines[RegionsList[0].end]->group;
 			SequencePath[0].skp = 0;
-			durgn(0);
+			durgn(0, lineCount);
 		}
 		//skip:;
 
@@ -3885,7 +3865,6 @@ seqskip : ;
 		delete[] VisitedRegions;
 		delete[] PathMap;
 		delete[] GroupIndexSequence;
-		delete[] SequenceFlagBitmap;
 	}
 }
 
