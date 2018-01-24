@@ -7,11 +7,11 @@
 #include <math.h>
 #include <tchar.h>
 #include <gsl/gsl>
-#include <boost/dynamic_bitset.hpp>
 
 #include "lang.h"
 #include "resource.h"
 #include "thred.h"
+#include "ExtendedBitSet.h"
 
 extern fPOINT*	adclp (unsigned count);
 extern fPOINT*	adflt (unsigned count);
@@ -4603,38 +4603,11 @@ scmpx :
 #endif
 }
 
-bool setchk(boost::dynamic_bitset<> *mapParam, unsigned bit) {
-	bool var = mapParam->test(bit);
-	mapParam->set(bit);
-	return var;
-}
-
-unsigned nxtchk(boost::dynamic_bitset<> *mapParam) {
-	unsigned foundBit = mapParam->find_first();
-	if (foundBit != boost::dynamic_bitset<>::npos) {
-		mapParam->reset(foundBit);
-	} else {
-		return 0xFFFFFFFF;
+void satcpy(SATCON* destination, SATCON const * source, unsigned int size) noexcept {
+	for (unsigned int iSource = 0; iSource < size; iSource++) {
+		destination[iSource].start = source[iSource].start;
+		destination[iSource].finish = source[iSource].finish;
 	}
-	return foundBit;
-}
-
-unsigned prvchk(boost::dynamic_bitset<> *mapParam) {
-	unsigned foundBit = mapParam->find_first();
-	if (foundBit != boost::dynamic_bitset<>::npos) {
-		do {
-			if (mapParam->find_next(foundBit) != boost::dynamic_bitset<>::npos) {
-				foundBit = mapParam->find_next(foundBit);
-			}
-		} while (mapParam->find_next(foundBit) != boost::dynamic_bitset<>::npos);
-	}
-	if (foundBit != boost::dynamic_bitset<>::npos) {
-		mapParam->reset(foundBit);
-	}
-	else {
-		return 0xFFFFFFFF;
-	}
-	return foundBit;
 }
 
 void satadj() {
@@ -4645,9 +4618,9 @@ void satadj() {
 	SATCON*			interiorGuides = new SATCON[CurrentFormGuidesCount];
 	SATCON*			sourceGuide = nullptr;
 	SATCON*			destinationGuide = nullptr;
-	unsigned short	guideCount = SelectedForm->satinGuideCount;
+	unsigned short	savedGuideCount = SelectedForm->satinGuideCount;
 	FRMHED*			formHeader = nullptr;
-	boost::dynamic_bitset<> satinMap(VertexCount);
+	ExtendedBitSet<> satinMap(VertexCount);
 
 	// ensure all guide endpoints are on valid vertices
 	for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
@@ -4661,12 +4634,16 @@ void satadj() {
 	iDestination = 0;
 	for (iSource = 0; iSource < CurrentFormGuidesCount; iSource++) {
 		if (CurrentFormGuides[iSource].start != CurrentFormGuides[iSource].finish) {
-			CurrentFormGuides[iDestination].start = CurrentFormGuides[iSource].start;
-			CurrentFormGuides[iDestination].finish = CurrentFormGuides[iSource].finish;
-			iDestination++;
+			interiorGuides[iDestination].start = CurrentFormGuides[iSource].start;
+			interiorGuides[iDestination++].finish = CurrentFormGuides[iSource].finish;
 		}
 	}
-	CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
+	if (CurrentFormGuidesCount != iDestination) {
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Removed %d zero length guides\n", (CurrentFormGuidesCount - iDestination));
+		OutputDebugString(MsgBuffer);
+		CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
+		satcpy (CurrentFormGuides, interiorGuides, iDestination);
+	}
 	if (SatinEndGuide || SelectedForm->attribute&FRMEND) {
 		// there are end guides so set the satinMap for the next step
 		satinMap.reset();
@@ -4683,11 +4660,15 @@ void satadj() {
 		for (iSource = 0; iSource < CurrentFormGuidesCount; iSource++) {
 			if (!satinMap.test(CurrentFormGuides[iSource].start) && !satinMap.test(CurrentFormGuides[iSource].finish)) {
 				interiorGuides[iDestination].start = CurrentFormGuides[iSource].start;
-				interiorGuides[iDestination].finish = CurrentFormGuides[iSource].finish;
-				iDestination++;
+				interiorGuides[iDestination++].finish = CurrentFormGuides[iSource].finish;
 			}
 		}
-		CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
+		if (CurrentFormGuidesCount != iDestination) {
+			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Removed %d end guides\n", (CurrentFormGuidesCount - iDestination));
+			OutputDebugString(MsgBuffer);
+			CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
+			satcpy (CurrentFormGuides, interiorGuides, iDestination);
+		}
 		// remove any guides that start after the end guide
 		if (SatinEndGuide) {
 			iDestination = 0;
@@ -4697,22 +4678,24 @@ void satadj() {
 					interiorGuides[iDestination++].finish = CurrentFormGuides[iSource].finish;
 				}
 			}
-			CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
+			if (CurrentFormGuidesCount != iDestination) {
+				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Removed %d reversed guides\n", (CurrentFormGuidesCount - iDestination));
+				OutputDebugString(MsgBuffer);
+				CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
+				satcpy (CurrentFormGuides, interiorGuides, iDestination);
+			}
 		}
 	}
-	else {
-		for (iGuide = 0; iGuide < CurrentFormGuidesCount; iGuide++) {
-			interiorGuides[iGuide].start = CurrentFormGuides[iGuide].start;
-			interiorGuides[iGuide].finish = CurrentFormGuides[iGuide].finish;
-		}
-	}
+
+	delete[] interiorGuides;
+
 	if (CurrentFormGuidesCount) {
 		satinMap.reset();
 		for (iGuide = 0; iGuide < CurrentFormGuidesCount; iGuide++) {
 			iForward = CurrentFormGuides[iGuide].start;
 			if (iForward > gsl::narrow<unsigned>(SatinEndGuide) - 1)
 				iForward = SatinEndGuide - 1;
-			if (setchk(&satinMap, iForward)) {
+			if (satinMap.testAndSet(iForward)) {
 				iReverse = iForward;
 				if (iReverse)
 					iReverse--;
@@ -4739,9 +4722,7 @@ void satadj() {
 		}
 		iGuide = 0;
 		do {
-			iVertex = nxtchk(&satinMap);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "satadj:iVertex %d\n", iVertex);
-			OutputDebugString(MsgBuffer);
+			iVertex = satinMap.getFirst();
 			if (iVertex < VertexCount)
 				CurrentFormGuides[iGuide++].start = iVertex;
 		} while (iVertex < VertexCount);
@@ -4753,7 +4734,7 @@ void satadj() {
 			iForward = iReverse = CurrentFormGuides[iGuide].finish;
 			if (iForward > VertexCount - 1)
 				iForward = VertexCount - 1;
-			if (setchk(&satinMap, iForward)) {
+			if (satinMap.testAndSet(iForward)) {
 				if (iForward < VertexCount - 1)
 					iForward++;
 				if (iReverse > gsl::narrow<unsigned>(SatinEndGuide) + 1)
@@ -4780,9 +4761,7 @@ void satadj() {
 		}
 		iGuide = 0;
 		do {
-			iReverse = prvchk(&satinMap);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "satadj:iReverse %d\n", iReverse);
-			OutputDebugString(MsgBuffer);
+			iReverse = satinMap.getLast();
 			if (iReverse < VertexCount)
 				CurrentFormGuides[iGuide++].finish = iReverse;
 		} while (iReverse < VertexCount);
@@ -4797,11 +4776,11 @@ void satadj() {
 			SelectedForm->satinGuideCount = CurrentFormGuidesCount;
 		}
 	}
-	if (SelectedForm->satinGuideCount < guideCount) {
-		iGuide = guideCount - CurrentFormGuidesCount;
+	if (SelectedForm->satinGuideCount < savedGuideCount) {
+		iGuide = savedGuideCount - CurrentFormGuidesCount;
 		sourceGuide = destinationGuide = SelectedForm->satinOrAngle.guide;
 		destinationGuide += SelectedForm->satinGuideCount;
-		sourceGuide += guideCount;
+		sourceGuide += savedGuideCount;
 		MoveMemory(destinationGuide, sourceGuide, sizeof(SATCON)*(&SatinGuides[SatinGuideIndex] - sourceGuide + 1));
 		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			formHeader = &FormList[iForm];
@@ -4810,7 +4789,6 @@ void satadj() {
 		}
 		SatinGuideIndex -= iGuide;
 	}
-	delete[] interiorGuides;
 }
 
 void satclos() {

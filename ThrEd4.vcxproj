@@ -115,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EnumMap.h" />
+    <ClInclude Include="ExtendedBitSet.h" />
     <ClInclude Include="lang.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="thred.h" />
