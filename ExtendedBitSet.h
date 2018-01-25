@@ -7,16 +7,13 @@ class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator> {
 public:
 	ExtendedBitSet (std::size_t bits) : super::dynamic_bitset(bits) {}
 
-	bool testAndSet(std::size_t pos) {
-		bool val = super::test(pos);
-		super::set(pos);
-		return val;
-	}
+	/*
 	bool testAndReset(std::size_t pos) const {
 		bool val = super::test(pos);
-		super::set(pos);
+		super::reset(pos);
 		return val;
 	}
+	*/
 
 	unsigned getFirst() {
 		unsigned foundBit = super::find_first();

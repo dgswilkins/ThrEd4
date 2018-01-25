@@ -3130,7 +3130,7 @@ void duseq1() noexcept {
 	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x, (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
 }
 
-void duseq(unsigned start, unsigned finish, ExtendedBitSet<> *sequenceMap) {
+void duseq(unsigned start, unsigned finish, boost::dynamic_bitset<> *sequenceMap) {
 
 	unsigned	iLine = 0, iLineDec = 0;
 	unsigned	savedTopLine = SortedLines[start][1].line;
@@ -3142,7 +3142,7 @@ void duseq(unsigned start, unsigned finish, ExtendedBitSet<> *sequenceMap) {
 		// This odd construction for iLine is used to ensure loop terminates when finish = 0
 		for (iLine = start + 1; iLine != finish; iLine--) {
 			iLineDec = iLine - 1;
-			if (sequenceMap->testAndSet(iLineDec)) {
+			if (sequenceMap->test_set(iLineDec)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
 					flag = true;
 					duseq2(iLineDec);
@@ -3173,7 +3173,7 @@ void duseq(unsigned start, unsigned finish, ExtendedBitSet<> *sequenceMap) {
 	}
 	else {
 		for (iLine = start; iLine <= finish; iLine++) {
-			if (sequenceMap->testAndSet(iLine)) {
+			if (sequenceMap->test_set(iLine)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
 					flag = true;
 					duseq2(iLine);
@@ -3208,7 +3208,7 @@ void duseq(unsigned start, unsigned finish, ExtendedBitSet<> *sequenceMap) {
 	}
 }
 
-void brkseq(unsigned start, unsigned finish, ExtendedBitSet<> *sequenceMap) {
+void brkseq(unsigned start, unsigned finish, boost::dynamic_bitset<> *sequenceMap) {
 
 	unsigned	iLine = 0, iLineDec = 0, savedGroup = 0;
 
@@ -3228,7 +3228,7 @@ void brkseq(unsigned start, unsigned finish, ExtendedBitSet<> *sequenceMap) {
 			}
 			else
 				SequenceLines = &*SortedLines[iLineDec];
-			if (sequenceMap->testAndSet(iLineDec)) {
+			if (sequenceMap->test_set(iLineDec)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN))
 					duseq1();
 			}
@@ -3249,7 +3249,7 @@ void brkseq(unsigned start, unsigned finish, ExtendedBitSet<> *sequenceMap) {
 			}
 			else
 				SequenceLines = &*SortedLines[iLine];
-			if (sequenceMap->testAndSet(iLine)) {
+			if (sequenceMap->test_set(iLine)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN))
 					duseq1();
 			}
@@ -3282,7 +3282,7 @@ void durgn(unsigned pthi, unsigned lineCount) {
 	SMALPNTL*	lineEndPointEnd = nullptr;
 	double		length = 0.0, minimumLength = 0.0;
 	BSEQPNT*	bpnt = nullptr;
-	ExtendedBitSet<> sequenceMap(lineCount);
+	boost::dynamic_bitset<> sequenceMap(lineCount);
 
 	//ToDo - More renaming required
 	CurrentRegion = &RegionsList[iRegion];
@@ -4672,7 +4672,7 @@ void satadj() {
 			iForward = CurrentFormGuides[iGuide].start;
 			if (iForward > gsl::narrow<unsigned>(SatinEndGuide) - 1)
 				iForward = SatinEndGuide - 1;
-			if (satinMap.testAndSet(iForward)) {
+			if (satinMap.test_set(iForward)) {
 				iReverse = iForward;
 				if (iReverse)
 					iReverse--;
@@ -4711,7 +4711,7 @@ void satadj() {
 			iForward = iReverse = CurrentFormGuides[iGuide].finish;
 			if (iForward > VertexCount - 1)
 				iForward = VertexCount - 1;
-			if (satinMap.testAndSet(iForward)) {
+			if (satinMap.test_set(iForward)) {
 				if (iForward < VertexCount - 1)
 					iForward++;
 				if (iReverse > gsl::narrow<unsigned>(SatinEndGuide) + 1)
