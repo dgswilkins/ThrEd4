@@ -1722,6 +1722,11 @@ typedef struct _fstrts	{
 	unsigned borderColor;
 }FSTRTS;
 
+typedef union _fillStarts {
+	FSTRTS			fillNamed;
+	unsigned int	fillArray[sizeof(FSTRTS)/sizeof(unsigned int)];
+}FILLSTARTS;
+
 #define M_AP	    2
 #define M_CWLK	    4
 #define M_WALK	    8

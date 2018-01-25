@@ -217,7 +217,7 @@ TXPNT		TempTexturePoints[16384];	//temporary storage for textured fill data
 unsigned	ColorOrder[16];				//color order adjusted for applique
 fPOINT		InterleaveSequence[MAXITEMS]; //storage for interleave points
 unsigned	InterleaveSequenceIndex;	//index into the interleave sequence
-FSTRTS		FillStartsData;				//fill start data for refill
+FILLSTARTS	FillStartsData;				//fill start data for refill
 INSREC		InterleaveSequenceIndices[10];	//indices into interleave points
 unsigned	InterleaveSequenceIndex2;	//index into interleave indices
 unsigned	FillStartsMap;				//fill starts bitmap
@@ -2174,7 +2174,6 @@ void dmpat() noexcept {
 
 void fdelstch() {
 	unsigned	iSourceStitch = 0, ind = 0, iDestinationStitch = 0, codedFormIndex = 0, attribute = 0, type = 0, tmap = 0, color = 0, bordercolor = 0, tapcol = 0;
-	unsigned*	stpnt = nullptr;
 	// ToDo - Still not sure what this function does?
 	//        I suspect the FillStartsData members are not correctly named
 	fvars(ClosestFormToCursor);
@@ -2193,7 +2192,7 @@ void fdelstch() {
 
 					if (!(tmap&M_AP)) {
 						tmap |= M_AP;
-						FillStartsData.applique = iDestinationStitch;
+						FillStartsData.fillNamed.applique = iDestinationStitch;
 					}
 					break;
 
@@ -2201,7 +2200,7 @@ void fdelstch() {
 
 					if (!(tmap&M_FTH)) {
 						tmap |= M_FTH;
-						FillStartsData.feather = iDestinationStitch;
+						FillStartsData.fillNamed.feather = iDestinationStitch;
 					}
 					break;
 
@@ -2209,7 +2208,7 @@ void fdelstch() {
 
 					if (!(tmap&M_FIL)) {
 						tmap |= M_FIL;
-						FillStartsData.fill = iDestinationStitch;
+						FillStartsData.fillNamed.fill = iDestinationStitch;
 					}
 					break;
 
@@ -2217,7 +2216,7 @@ void fdelstch() {
 
 					if (!(tmap&M_BRD)) {
 						tmap |= M_BRD;
-						FillStartsData.border = iDestinationStitch;
+						FillStartsData.fillNamed.border = iDestinationStitch;
 					}
 					break;
 
@@ -2225,7 +2224,7 @@ void fdelstch() {
 
 					if (SelectedForm->fillType && !(tmap&M_FIL)) {
 						tmap |= M_FIL;
-						FillStartsData.fill = iDestinationStitch;
+						FillStartsData.fillNamed.fill = iDestinationStitch;
 					}
 					break;
 			}
@@ -2237,19 +2236,19 @@ void fdelstch() {
 			color = attribute&COLMSK;
 			if (color == SelectedForm->fillColor) {
 				tmap |= M_FCOL;
-				FillStartsData.fillColor = iDestinationStitch;
+				FillStartsData.fillNamed.fillColor = iDestinationStitch;
 			}
 			if (color == SelectedForm->fillInfo.feather.color) {
 				tmap |= M_FTHCOL;
-				FillStartsData.featherColor = iDestinationStitch;
+				FillStartsData.fillNamed.featherColor = iDestinationStitch;
 			}
 			if (color == bordercolor) {
 				tmap |= M_ECOL;
-				FillStartsData.borderColor = iDestinationStitch;
+				FillStartsData.fillNamed.borderColor = iDestinationStitch;
 			}
 			if (color == tapcol) {
 				tmap |= M_APCOL;
-				FillStartsData.appliqueColor = iDestinationStitch;
+				FillStartsData.fillNamed.appliqueColor = iDestinationStitch;
 			}
 			StitchBuffer[iDestinationStitch].x = StitchBuffer[iSourceStitch].x;
 			StitchBuffer[iDestinationStitch].y = StitchBuffer[iSourceStitch].y;
@@ -2257,63 +2256,62 @@ void fdelstch() {
 			iDestinationStitch++;
 		}
 	}
-	FillStartsData.fillColor++;
-	FillStartsData.featherColor++;
-	FillStartsData.borderColor++;
-	FillStartsData.appliqueColor++;
+	FillStartsData.fillNamed.fillColor++;
+	FillStartsData.fillNamed.featherColor++;
+	FillStartsData.fillNamed.borderColor++;
+	FillStartsData.fillNamed.appliqueColor++;
 	FillStartsMap = tmap;
 	PCSHeader.stitchCount = iDestinationStitch;
 	iDestinationStitch = 0;
 	if (!(tmap&M_ECOL))
-		FillStartsData.borderColor = PCSHeader.stitchCount;
+		FillStartsData.fillNamed.borderColor = PCSHeader.stitchCount;
 	if (!(tmap&M_FTHCOL))
-		FillStartsData.featherColor = PCSHeader.stitchCount;
+		FillStartsData.fillNamed.featherColor = PCSHeader.stitchCount;
 	if (!(tmap&M_FCOL))
-		FillStartsData.fillColor = PCSHeader.stitchCount;
+		FillStartsData.fillNamed.fillColor = PCSHeader.stitchCount;
 	if (SelectedForm->edgeType) {
 		if (SelectedForm->edgeType == EDGEAPPL) {
 			if (!(tmap&M_AP)) {
 				if (tmap&M_APCOL)
-					FillStartsData.applique = FillStartsData.appliqueColor + 1;
+					FillStartsData.fillNamed.applique = FillStartsData.fillNamed.appliqueColor + 1;
 				else
-					FillStartsData.applique = PCSHeader.stitchCount;
+					FillStartsData.fillNamed.applique = PCSHeader.stitchCount;
 			}
 		}
 		if (!(tmap&M_BRD)) {
 			if (tmap&M_ECOL)
-				FillStartsData.border = FillStartsData.borderColor + 1;
+				FillStartsData.fillNamed.border = FillStartsData.fillNamed.borderColor + 1;
 			else
-				FillStartsData.border = PCSHeader.stitchCount;
+				FillStartsData.fillNamed.border = PCSHeader.stitchCount;
 		}
 	}
 	if (SelectedForm->fillType || (tmap&(M_WALK | M_UND | M_CWLK))) {
 		if (!(tmap&M_FIL)) {
 			if (tmap&M_FCOL)
-				FillStartsData.fill = FillStartsData.fillColor + 1;
+				FillStartsData.fillNamed.fill = FillStartsData.fillNamed.fillColor + 1;
 			else
-				FillStartsData.fill = PCSHeader.stitchCount;
+				FillStartsData.fillNamed.fill = PCSHeader.stitchCount;
 		}
 	}
 	if (SelectedForm->fillType == FTHF) {
 		if (!(tmap&M_FTH)) {
 			if (tmap&M_FTHCOL)
-				FillStartsData.feather = FillStartsData.featherColor + 1;
+				FillStartsData.fillNamed.feather = FillStartsData.fillNamed.featherColor + 1;
 			else
-				FillStartsData.feather = PCSHeader.stitchCount;
+				FillStartsData.fillNamed.feather = PCSHeader.stitchCount;
 		}
 	}
-	stpnt = static_cast<unsigned *>(static_cast<void *>(&FillStartsData));
 	for (ind = 3; ind; ind--) {
 		iDestinationStitch = ind - 1;
 		while (iDestinationStitch < ind) {
-			if (stpnt[iDestinationStitch] > stpnt[ind])
-				stpnt[ind] = stpnt[iDestinationStitch];
+			if (FillStartsData.fillArray[iDestinationStitch] > FillStartsData.fillArray[ind])
+				FillStartsData.fillArray[ind] = FillStartsData.fillArray[iDestinationStitch];
 			iDestinationStitch--;
 		}
 	}
 	if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX)) {
 		for (ind = 0; ind < sizeof(FillStartsData) >> 2; ind++)
-			stpnt[ind] = ClosestPointIndex;
+			FillStartsData.fillArray[ind] = ClosestPointIndex;
 	}
 }
 
@@ -2395,10 +2393,10 @@ void intlv() {
 			switch (InterleaveSequenceIndices[iSequence].seq) {
 				case I_AP:
 
-					if (FillStartsMap&M_FIL && FillStartsData.applique >= ilData.coloc)
-						ilData.coloc = FillStartsData.applique;
+					if (FillStartsMap&M_FIL && FillStartsData.fillNamed.applique >= ilData.coloc)
+						ilData.coloc = FillStartsData.fillNamed.applique;
 					else {
-						ilData.coloc = FillStartsData.appliqueColor;
+						ilData.coloc = FillStartsData.fillNamed.appliqueColor;
 						if (ilData.coloc == 1)
 							ilData.coloc = 0;
 					}
@@ -2406,26 +2404,26 @@ void intlv() {
 
 				case I_FIL:
 
-					if (FillStartsMap&M_FIL && FillStartsData.fill >= ilData.coloc)
-						ilData.coloc = FillStartsData.fill;
+					if (FillStartsMap&M_FIL && FillStartsData.fillNamed.fill >= ilData.coloc)
+						ilData.coloc = FillStartsData.fillNamed.fill;
 					else
-						ilData.coloc = FillStartsData.fillColor;
+						ilData.coloc = FillStartsData.fillNamed.fillColor;
 					break;
 
 				case I_FTH:
 
-					if (FillStartsMap&M_FIL && FillStartsData.feather >= ilData.coloc)
-						ilData.coloc = FillStartsData.feather;
+					if (FillStartsMap&M_FIL && FillStartsData.fillNamed.feather >= ilData.coloc)
+						ilData.coloc = FillStartsData.fillNamed.feather;
 					else
-						ilData.coloc = FillStartsData.featherColor;
+						ilData.coloc = FillStartsData.fillNamed.featherColor;
 					break;
 
 				case I_BRD:
 
-					if (FillStartsMap&M_BRD && FillStartsData.border >= ilData.coloc)
-						ilData.coloc = FillStartsData.border;
+					if (FillStartsMap&M_BRD && FillStartsData.fillNamed.border >= ilData.coloc)
+						ilData.coloc = FillStartsData.fillNamed.border;
 					else
-						ilData.coloc = FillStartsData.borderColor;
+						ilData.coloc = FillStartsData.fillNamed.borderColor;
 					break;
 			}
 			code = ilData.layerIndex | InterleaveSequenceIndices[ilData.pins].code | InterleaveSequenceIndices[ilData.pins].color;
