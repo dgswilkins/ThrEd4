@@ -336,7 +336,6 @@ POINT			RubberBandLine[3];		//points to form points to be moved
 unsigned*		Xhistogram;				//x histogram for snap together
 double			SnapLength = SNPLEN*PFGRAN;	//snap together length
 unsigned*		Xpoints;				//stitch indices sorted according to x values
-unsigned		ColorBitmap;			//bitmap of colors in a design for sort
 double			StarRatio = STARAT;		//star formOrigin to body ratio
 double			SpiralWrap = SPIRWRAP;	//number of revolutions in a spiral
 unsigned		Srtmsk = (1 << EDGEANGSAT) | (1 << EDGEAPPL) | (1 << EDGEPROPSAT);	 //mask for switchable fill types
@@ -9239,45 +9238,6 @@ void snap() {
 		snp(0, PCSHeader.stitchCount);
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
-}
-
-unsigned nxtcol() noexcept {
-#if	 __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, ColorBitmap
-		mov		ecx, AppliqueColor
-		bt		ebx, ecx
-		jnc		short nxtcol1
-		mov		eax, ecx
-		jmp		short nxtcolx
-nxtcol1 :
-		bsf		eax, ebx
-		jne		short nxtcolx
-		dec		eax
-nxtcolx :
-		btc		ebx, eax
-		mov		ColorBitmap, ebx
-	}
-#else
-
-	DWORD	color = 0.0;
-
-	if (_bittest(static_cast<long *>(static_cast<void *>(&ColorBitmap)), AppliqueColor)) {
-		color = AppliqueColor;
-	}
-	else {
-		if (ColorBitmap == 0) {
-			return 0xffffffff;
-		}
-
-		_BitScanForward(&color, ColorBitmap);
-	}
-
-	_bittestandcomplement(static_cast<long *>(static_cast<void *>(&ColorBitmap)), color);
-
-	return color;
-#endif
 }
 
 unsigned isrt(unsigned bit) noexcept {
