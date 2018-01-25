@@ -31,7 +31,7 @@ extern void		delstchm ();
 extern void		deltx ();
 extern unsigned	duthrsh (double threshold);
 extern void		duzrat ();
-extern void		fdelstch ();
+extern void		fdelstch (FILLSTARTS &FillStartsData);
 extern bool		filmsgs (unsigned code);
 extern void		fritfil ();
 extern void		frm1pnt ();
@@ -40,7 +40,7 @@ extern void		fthrfn ();
 extern void		grpAdj ();
 extern void		insadj ();
 extern fPOINT*	insid ();
-extern void		intlv ();
+extern void		intlv (const FILLSTARTS &FillStartsData);
 extern bool		isclp (unsigned find);
 extern bool		isclpx (unsigned find);
 extern bool		isfclp ();
@@ -2436,16 +2436,17 @@ void bold(double size) noexcept {
 
 void refilfn() {
 
-	double	spacing = 0.0;
+	double			spacing = 0.0;
 	const double	stitchLength = UserStitchLength;
-	float	length = 0.0;
+	float			length = 0.0;
+	FILLSTARTS		FillStartsData = {};				//fill start data for refill
 
 	StateMap.reset(StateFlag::TXFIL);
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->type == FRMLINE)
 		SelectedForm->underlayIndent = 0;
 	savdo();
-	fdelstch();
+	fdelstch(FillStartsData);
 	StateMap.set(StateFlag::WASREFIL);
 	if (SelectedForm->fillSpacing < 0.5 && !isclp(ClosestFormToCursor))
 		SelectedForm->fillSpacing = 0.5;
@@ -2692,7 +2693,7 @@ void refilfn() {
 			chkbrd();
 	}
 	UserStitchLength = stitchLength;
-	intlv();
+	intlv(FillStartsData);
 	ritot(PCSHeader.stitchCount);
 	setfchk();
 }

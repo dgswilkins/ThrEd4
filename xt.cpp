@@ -217,7 +217,6 @@ TXPNT		TempTexturePoints[16384];	//temporary storage for textured fill data
 unsigned	ColorOrder[16];				//color order adjusted for applique
 fPOINT		InterleaveSequence[MAXITEMS]; //storage for interleave points
 unsigned	InterleaveSequenceIndex;	//index into the interleave sequence
-FILLSTARTS	FillStartsData;				//fill start data for refill
 INSREC		InterleaveSequenceIndices[10];	//indices into interleave points
 unsigned	InterleaveSequenceIndex2;	//index into interleave indices
 unsigned	FillStartsMap;				//fill starts bitmap
@@ -2172,12 +2171,10 @@ void dmpat() noexcept {
 }
 #endif
 
-void fdelstch() {
+void fdelstch(FILLSTARTS &FillStartsData) {
 	unsigned	iSourceStitch = 0, ind = 0, iDestinationStitch = 0, codedFormIndex = 0, attribute = 0, type = 0, tmap = 0, color = 0, bordercolor = 0, tapcol = 0;
 	// ToDo - Still not sure what this function does?
 	//        I suspect the FillStartsData members are not correctly named
-	fvars(ClosestFormToCursor);
-	ZeroMemory(&FillStartsData, sizeof(FSTRTS));
 	codedFormIndex = (ClosestFormToCursor << FRMSHFT);
 	bordercolor = SelectedForm->borderColor&COLMSK;
 	tapcol = SelectedForm->borderColor >> 4;
@@ -2374,7 +2371,7 @@ void chkend(unsigned offset, unsigned code, INTINF *ilData) {
 	}
 }
 
-void intlv() {
+void intlv(const FILLSTARTS &FillStartsData) {
 	unsigned	iSequence = 0, ine = 0, code = 0, offset = 0;
 	fPOINT		colpnt = {};
 	INTINF		ilData = {};
