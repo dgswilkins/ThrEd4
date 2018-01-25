@@ -338,7 +338,6 @@ double			SnapLength = SNPLEN*PFGRAN;	//snap together length
 unsigned*		Xpoints;				//stitch indices sorted according to x values
 double			StarRatio = STARAT;		//star formOrigin to body ratio
 double			SpiralWrap = SPIRWRAP;	//number of revolutions in a spiral
-unsigned		Srtmsk = (1 << EDGEANGSAT) | (1 << EDGEAPPL) | (1 << EDGEPROPSAT);	 //mask for switchable fill types
 fRECTANGLE		BoundingRect;			//isin rectangle
 RCON*			PathMap;				//path map for sequencing
 unsigned		PathMapIndex;			//number of entries in the path map
@@ -9238,29 +9237,6 @@ void snap() {
 		snp(0, PCSHeader.stitchCount);
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
-}
-
-unsigned isrt(unsigned bit) noexcept {
-#if	 __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, offset Srtmsk
-		mov		ecx, bit
-		bt		[ebx], ecx
-		jnc		isrtx
-		inc		eax
-isrtx :
-	}
-#else
-	return _bittest(static_cast<long *>(static_cast<void *>(&Srtmsk)), bit);
-#endif
-}
-
-unsigned prgflg(unsigned iStitch) noexcept {
-	if ((StitchBuffer[iStitch].attribute&TYPMSK) == FRMBFIL)
-		return isrt(FormList[(StitchBuffer[iStitch].attribute&FRMSK) >> 4].edgeType&NEGUND);
-	else
-		return 0;
 }
 
 void rotpar() {
