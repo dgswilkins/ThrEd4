@@ -9241,19 +9241,6 @@ void snap() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setcmap(unsigned bit) noexcept {
-#if	 __UseASM__
-	_asm {
-		mov		eax, ColorBitmap
-		mov		ebx, bit
-		bts		eax, ebx
-		mov		ColorBitmap, eax
-	}
-#else
-	_bittestandset(static_cast<long *>(static_cast<void *>(&ColorBitmap)), bit);
-#endif
-}
-
 unsigned nxtcol() noexcept {
 #if	 __UseASM__
 	_asm {
