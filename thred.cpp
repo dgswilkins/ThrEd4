@@ -21203,13 +21203,13 @@ void crtcurs() noexcept {
 
 	duamsk();
 	ducurs(CursorMasks.form);
-	FormCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.form));
-	DLineCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.dline));
-	NeedleUpCursor = CreateCursor(ThrEdInstance, 16, 32, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.uprightNeedle));
-	NeedleRightDownCursor = CreateCursor(ThrEdInstance, 1, 31, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.rightDownNeedle));
-	NeedleRightUpCursor = CreateCursor(ThrEdInstance, 1, 1, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.rightUpNeedle));
-	NeedleLeftDownCursor = CreateCursor(ThrEdInstance, 30, 30, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.leftDownNeedle));
-	NeedleLeftUpCursor = CreateCursor(ThrEdInstance, 32, 1, 32, 32, static_cast<void*>(CursorMask), static_cast<void*>(&CursorMasks.leftUpNeedle));
+	FormCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, CursorMask, &CursorMasks.form);
+	DLineCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, CursorMask, &CursorMasks.dline);
+	NeedleUpCursor = CreateCursor(ThrEdInstance, 16, 32, 32, 32, CursorMask, &CursorMasks.uprightNeedle);
+	NeedleRightDownCursor = CreateCursor(ThrEdInstance, 1, 31, 32, 32, CursorMask, &CursorMasks.rightDownNeedle);
+	NeedleRightUpCursor = CreateCursor(ThrEdInstance, 1, 1, 32, 32, CursorMask, &CursorMasks.rightUpNeedle);
+	NeedleLeftDownCursor = CreateCursor(ThrEdInstance, 30, 30, 32, 32, CursorMask, &CursorMasks.leftDownNeedle);
+	NeedleLeftUpCursor = CreateCursor(ThrEdInstance, 32, 1, 32, 32, CursorMask, &CursorMasks.leftUpNeedle);
 }
 
 void dstcurs() noexcept {
