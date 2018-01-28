@@ -4505,14 +4505,14 @@ void bitsiz() noexcept {
 
 // Get a rough estimate of whether black or white 
 // is dominant in the monochrome bitmap
-bool binv(unsigned*	monoBitmapData, unsigned bitmapWidthInWords) noexcept {
+bool binv(unsigned char* monoBitmapData, unsigned bitmapWidthInBytes) noexcept {
 	unsigned		iHeight = 0, iBytes = 0, whiteBits = 0, blackBits = 0;
 	const unsigned	byteCount = BitmapWidth >> 3;
-	TCHAR*			bcpnt = nullptr;
+	unsigned char*	bcpnt = nullptr;
 
 	for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
 
-		bcpnt = static_cast<TCHAR *>(static_cast<void *>(&monoBitmapData[bitmapWidthInWords*iHeight]));
+		bcpnt = &monoBitmapData[bitmapWidthInBytes * iHeight];
 		for (iBytes = 0; iBytes < byteCount; iBytes++) {
 
 			if (!bcpnt[iBytes])
@@ -4530,7 +4530,7 @@ bool binv(unsigned*	monoBitmapData, unsigned bitmapWidthInWords) noexcept {
 		return 0;
 }
 
-void bitlin(const unsigned* source, unsigned* destination, COLORREF foreground, COLORREF background) noexcept {
+void bitlin(const unsigned char* source, unsigned* destination, COLORREF foreground, COLORREF background) noexcept {
 
 #if  __UseASM__
 	_asm {
@@ -4658,16 +4658,15 @@ void savmap() {
 
 void bfil() {
 
-	unsigned	bitmapWidthWords = 0, widthOverflow = 0, fileHeaderSize = 0, bitmapSizeWords = 0, iHeight = 0;
-	void		*lpBits = nullptr;
-	unsigned	*bits = nullptr;
-	HBITMAP		bitmap = {};
-	HDC			deviceContext = {};
-	COLORREF	foreground = {};
-	COLORREF	background = {};
-	COLORREF	InverseBackgroundColor = {};
-	unsigned*	monoBitmapData;			//monochrome bitmap data
-
+	unsigned		bitmapWidthBytes = 0, widthOverflow = 0, fileHeaderSize = 0, bitmapSizeBytes = 0, iHeight = 0;
+	void			*lpBits = nullptr;
+	unsigned		*bits = nullptr;
+	HBITMAP			bitmap = {};
+	HDC				deviceContext = {};
+	COLORREF		foreground = {};
+	COLORREF		background = {};
+	COLORREF		InverseBackgroundColor = {};
+	unsigned char*	monoBitmapData = nullptr;			//monochrome bitmap data
 
 	InverseBackgroundColor = fswap(BackgroundColor);
 	BitmapFileHandle = CreateFile(UserBMPFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
@@ -4710,15 +4709,15 @@ void bfil() {
 		if (BitmapFileHeaderV4.bV4BitCount == 1) {
 
 			StateMap.set(StateFlag::MONOMAP);
-			bitmapWidthWords = BitmapWidth >> 5;
+			bitmapWidthBytes = (BitmapWidth >> 5) << 2;
 			widthOverflow = BitmapWidth % 32;
 			if (widthOverflow)
-				bitmapWidthWords++;
-			bitmapSizeWords = bitmapWidthWords*BitmapHeight;
-			monoBitmapData = new unsigned[bitmapSizeWords];
-			ReadFile(BitmapFileHandle, monoBitmapData, bitmapSizeWords << 2, &BytesRead, NULL);
+				bitmapWidthBytes += 4;
+			bitmapSizeBytes = bitmapWidthBytes*BitmapHeight;
+			monoBitmapData = new unsigned char[bitmapSizeBytes];
+			ReadFile(BitmapFileHandle, monoBitmapData, bitmapSizeBytes, &BytesRead, NULL);
 			CloseHandle(BitmapFileHandle);
-			if (binv(monoBitmapData,bitmapWidthWords)) {
+			if (binv(monoBitmapData,bitmapWidthBytes)) {
 
 				background = BitmapColor;
 				foreground = InverseBackgroundColor;
@@ -4739,10 +4738,10 @@ void bfil() {
 			bitmap = CreateDIBSection(BitmapDC, &BitmapInfo, DIB_RGB_COLORS, &lpBits, 0, 0);
 			//Synchronize
 			GdiFlush();
-			if (lpBits != nullptr) {
-				bits = static_cast<unsigned *>(lpBits);
+			bits = static_cast<unsigned *>(lpBits);
+			if (bits != nullptr) {
 				for (iHeight = 0; iHeight < BitmapHeight; iHeight++)
-					bitlin(&monoBitmapData[iHeight * bitmapWidthWords], &bits[iHeight * BitmapWidth], background, foreground);
+					bitlin(&monoBitmapData[iHeight * bitmapWidthBytes], &bits[iHeight * BitmapWidth], background, foreground);
 			}
 			deviceContext = CreateCompatibleDC(StitchWindowDC);
 			if (bitmap && deviceContext) {
