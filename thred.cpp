@@ -4532,46 +4532,19 @@ bool binv(unsigned char* monoBitmapData, unsigned bitmapWidthInBytes) noexcept {
 
 void bitlin(const unsigned char* source, unsigned* destination, COLORREF foreground, COLORREF background) noexcept {
 
-#if  __UseASM__
-	_asm {
-		mov		esi, source
-		mov		edi, destination
-		mov		ecx, BitmapWidth
-		xor		eax, eax
-blup : 
-		mov		ebx, eax
-		xor		bl, 7
-		mov		edx, background
-		bt		[esi], ebx
-		jnc		short blup1
-		mov		edx, foreground
-blup1 : 
-		mov		[edi], edx
-		add		edi, 4
-		inc		eax
-		loop	blup
+	unsigned i = 0;
+	for (i = 0; i < (BitmapWidth >> 3); i++) {
+		std::bitset<8> bits(source[i]);
+		for (unsigned bitOffset = 0; bitOffset < 8; bitOffset++) {
+			*destination++ = bits[bitOffset ^ 7] ? foreground : background;
+		}
 	}
-#else
-	//correct
-	union {
-		struct {
-			unsigned char byte0;
-			unsigned char byte1;
-			unsigned char byte2;
-			unsigned char byte3;
-		} bytes;
-		unsigned dword0;
-	} bit = {};
-
-	for (unsigned i = 0; i < BitmapWidth; i++) {
-		bit.dword0 = i;
-		bit.bytes.byte0 = bit.bytes.byte0 ^ 0x07;
-
-		*destination = (_bittest(static_cast<const long *>(static_cast<const void *>(source)), bit.dword0)) ? foreground : background;
-
-		destination++;
+	if (unsigned int final = (BitmapWidth % 8)) {
+		std::bitset<8> bits(source[i]);
+		for (unsigned bitOffset = final; bitOffset < 8; bitOffset++) {
+			*destination++ = bits[bitOffset ^ 7] ? foreground : background;
+		}
 	}
-#endif
 }
 
 COLORREF fswap(COLORREF color) noexcept {
