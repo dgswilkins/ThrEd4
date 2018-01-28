@@ -522,7 +522,6 @@ RECT			BitmapDstRect;			//stitch window destination rectangle for zooomed view
 unsigned		BitmapWidth;			//bitmap width
 unsigned		BitmapHeight;			//bitmap height
 dPOINT			BitmapSizeinStitches;	//bitmap end points in stitch points
-unsigned*		MonoBitmapData;			//monochrome bitmap data
 unsigned		BitmapColor = BITCOL;	//bitmap color
 TCHAR			MsgBuffer[MSGSIZ];		//for user messages
 unsigned		MsgIndex;				//pointer to the message buffer
@@ -4506,14 +4505,14 @@ void bitsiz() noexcept {
 
 // Get a rough estimate of whether black or white 
 // is dominant in the monochrome bitmap
-bool binv(unsigned bitmapWidthInWords) noexcept {
+bool binv(unsigned*	monoBitmapData, unsigned bitmapWidthInWords) noexcept {
 	unsigned		iHeight = 0, iBytes = 0, whiteBits = 0, blackBits = 0;
 	const unsigned	byteCount = BitmapWidth >> 3;
 	TCHAR*			bcpnt = nullptr;
 
 	for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
 
-		bcpnt = static_cast<TCHAR *>(static_cast<void *>(&MonoBitmapData[bitmapWidthInWords*iHeight]));
+		bcpnt = static_cast<TCHAR *>(static_cast<void *>(&monoBitmapData[bitmapWidthInWords*iHeight]));
 		for (iBytes = 0; iBytes < byteCount; iBytes++) {
 
 			if (!bcpnt[iBytes])
@@ -4667,6 +4666,8 @@ void bfil() {
 	COLORREF	foreground = {};
 	COLORREF	background = {};
 	COLORREF	InverseBackgroundColor = {};
+	unsigned*	monoBitmapData;			//monochrome bitmap data
+
 
 	InverseBackgroundColor = fswap(BackgroundColor);
 	BitmapFileHandle = CreateFile(UserBMPFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
@@ -4714,10 +4715,10 @@ void bfil() {
 			if (widthOverflow)
 				bitmapWidthWords++;
 			bitmapSizeWords = bitmapWidthWords*BitmapHeight;
-			MonoBitmapData = new unsigned[bitmapSizeWords];
-			ReadFile(BitmapFileHandle, MonoBitmapData, bitmapSizeWords << 2, &BytesRead, NULL);
+			monoBitmapData = new unsigned[bitmapSizeWords];
+			ReadFile(BitmapFileHandle, monoBitmapData, bitmapSizeWords << 2, &BytesRead, NULL);
 			CloseHandle(BitmapFileHandle);
-			if (binv(bitmapWidthWords)) {
+			if (binv(monoBitmapData,bitmapWidthWords)) {
 
 				background = BitmapColor;
 				foreground = InverseBackgroundColor;
@@ -4741,7 +4742,7 @@ void bfil() {
 			if (lpBits != nullptr) {
 				bits = static_cast<unsigned *>(lpBits);
 				for (iHeight = 0; iHeight < BitmapHeight; iHeight++)
-					bitlin(&MonoBitmapData[iHeight * bitmapWidthWords], &bits[iHeight * BitmapWidth], background, foreground);
+					bitlin(&monoBitmapData[iHeight * bitmapWidthWords], &bits[iHeight * BitmapWidth], background, foreground);
 			}
 			deviceContext = CreateCompatibleDC(StitchWindowDC);
 			if (bitmap && deviceContext) {
@@ -4752,7 +4753,7 @@ void bfil() {
 				DeleteObject(bitmap);
 				ReleaseDC(ThrEdWindow, deviceContext);
 			}
-			delete[] MonoBitmapData;
+			delete[] monoBitmapData;
 		}
 		else {
 
