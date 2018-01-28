@@ -4267,6 +4267,7 @@ void stchWnd() {
 
 	stchPars();
 
+	MainStitchWin = nullptr;
 	MainStitchWin = CreateWindow(
 		"STATIC",
 		0,
@@ -4280,7 +4281,7 @@ void stchWnd() {
 		ThrEdInstance,
 		NULL);
 
-	if (MainStitchWin) {
+	if (MainStitchWin != nullptr) {
 		GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
 
 		VerticalScrollBar = CreateWindow(
@@ -4330,24 +4331,6 @@ unsigned chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept {
 	}
 	else
 		return 0;
-}
-
-HWND nuSiz(unsigned iThreadSize) noexcept {
-
-	TCHAR*	str[] = { "30","40","60" };
-
-	return CreateWindow(
-		"STATIC",
-		str[iThreadSize],
-		WS_CHILD | WS_VISIBLE | WS_BORDER,
-		ButtonWidthX3,
-		ButtonHeight*(iThreadSize + VerticalIndex),
-		ButtonWidth,
-		ButtonHeight,
-		ThrEdWindow,
-		NULL,
-		ThrEdInstance,
-		NULL);
 }
 
 void delstch1(unsigned iStitch) {
@@ -4624,6 +4607,7 @@ bool gudtyp(WORD bitCount) noexcept {
 	return 0;
 }
 
+// Move unpacked 24BPP data into packed 24BPP data
 void movmap(unsigned cnt, unsigned char *buffer) noexcept {
 	unsigned*		source = TraceBitmapData;
 	unsigned char*	destination = buffer;
@@ -17917,11 +17901,24 @@ didskip:;
 		if (chkMsgs(Msg.pt, ThreadSizeWin[0], ThreadSizeWin[15])) {
 
 			if (Msg.message == WM_LBUTTONDOWN) {
+				TCHAR*	str[] = { "30","40","60" };
 
 				savdo();
 				ThreadSizeSelected = VerticalIndex;
-				for (iThreadSize = 0; iThreadSize < 3; iThreadSize++)
-					ChangeThreadSizeWin[iThreadSize] = nuSiz(iThreadSize);
+				for (iThreadSize = 0; iThreadSize < 3; iThreadSize++) {
+					ChangeThreadSizeWin[iThreadSize] = CreateWindow(
+						"STATIC",
+						str[iThreadSize],
+						WS_CHILD | WS_VISIBLE | WS_BORDER,
+						ButtonWidthX3,
+						ButtonHeight*(iThreadSize + VerticalIndex),
+						ButtonWidth,
+						ButtonHeight,
+						ThrEdWindow,
+						NULL,
+						ThrEdInstance,
+						NULL);
+				}
 				StateMap.set(StateFlag::SIZSEL);
 			}
 			return 1;
