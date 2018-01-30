@@ -795,7 +795,6 @@ COLORREF DefaultColors[] = {
 
 long			BoxOffset[4];
 
-unsigned		TextColorMap = 0xaf;	//bitmap for text color number colors
 unsigned		VerticalIndex;		//vertical index of the color window, calculated from mouse click
 unsigned		ThreadSizeSelected;	//thread selected for size change
 
@@ -21679,20 +21678,10 @@ void init() {
 }
 
 COLORREF defTxt(unsigned iColor) noexcept {
-
-#if  __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ecx, TextColorMap
-		mov		edx, iColor
-		bt		ecx, edx
-		jnc		short defx
-		mov		eax, 0xffffff
-defx:
-	}
-#else
-	return _bittest(static_cast<long *>(static_cast<void *>(&TextColorMap)), iColor) ? 0xffffff : 0;
-#endif
+	std::bitset<16>	textColorMap(0xbaf);	//bitmap for color number colors chosen for contrast against the default background colors
+	const unsigned int white = 0xffffff;
+	const unsigned int black = 0;
+	return textColorMap.test(iColor) ? white : black;
 }
 
 void relin() {
