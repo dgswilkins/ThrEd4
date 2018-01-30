@@ -6,6 +6,7 @@
 #include <math.h>
 #include <float.h>
 #include <tchar.h>
+#include <bitset>
 #include <gsl/gsl>
 #include <boost/dynamic_bitset.hpp>
 
@@ -727,7 +728,7 @@ unsigned		ButtonWidth;			//button width
 unsigned		ButtonWidthX3;			//button width times 3
 unsigned		NumeralWidth;			//width of 0
 int				ThreadWidthPixels[3];	//thread sizes in pixels
-unsigned		DisplayedColorBitmap;	//color bitmap for recording colors on screen
+std::bitset<32>	DisplayedColorBitmap(0);	//Map of color numbers in design that are actually displayed
 double			GapToNearest[NERCNT];	//distances of the closest points
 										//to a mouse click
 long			NearestPoint[NERCNT];	//indices of the closest points
@@ -7442,7 +7443,7 @@ void newFil() {
 	StateMap.reset(StateFlag::BAKACT);
 	StateMap.reset(StateFlag::GMRK);
 	PCSHeader.stitchCount = 0;
-	DisplayedColorBitmap = 0;
+	DisplayedColorBitmap.reset();
 	PCSBMPFileName[0] = 0;
 	PCSHeader.stitchCount = 0;
 	FormVertexIndex = 0;
@@ -21694,21 +21695,6 @@ defx:
 #endif
 }
 
-void setCol(unsigned color) noexcept {
-
-#if  __UseASM__
-	_asm {
-		mov		ebx, color
-		mov		eax, DisplayedColorBitmap
-		bts		eax, ebx
-		mov		DisplayedColorBitmap, eax
-	}
-#else
-	// mask nextBufferIndex for sanity
-	_bittestandset(static_cast<long *>(static_cast<void *>(&DisplayedColorBitmap)), color & 31);
-#endif
-}
-
 void relin() {
 
 	stch2px1(ClosestPointIndex - 1);
@@ -22051,7 +22037,8 @@ void drwStch() {
 					nuStchSiz(iColor, 1);
 			}
 		}
-		LineIndex = 0; DisplayedColorBitmap = 0;
+		LineIndex = 0; 
+		DisplayedColorBitmap.reset();
 		if (StateMap.test(StateFlag::ZUMED)) {
 
 			LineIndex = 0;
@@ -22072,7 +22059,7 @@ void drwStch() {
 								&& currentStitches[iStitch].y >= ZoomRect.bottom
 								&& currentStitches[iStitch].y <= ZoomRect.top) {
 
-								setCol(ColorChangeTable[iColor].colorIndex);
+								DisplayedColorBitmap.set(ColorChangeTable[iColor].colorIndex);
 								goto skip;
 							}
 						}
@@ -22204,7 +22191,7 @@ rotlin:;
 					LineIndex = 1;
 				}
 				if (wascol)
-					setCol(ColorChangeTable[iColor].colorIndex);
+					DisplayedColorBitmap.set(ColorChangeTable[iColor].colorIndex);
 skip:;
 			}
 		}
@@ -22213,7 +22200,7 @@ skip:;
 			pwid = StateMap.test(StateFlag::HID);
 			for (iColor = 0; iColor < ColorChanges; iColor++) {
 
-				setCol(ColorChangeTable[iColor].colorIndex);
+				DisplayedColorBitmap.set(ColorChangeTable[iColor].colorIndex);
 				stitchCount = ColorChangeTable[iColor + 1].stitchIndex - ColorChangeTable[iColor].stitchIndex;
 				stitchCount = chkup(stitchCount, iColor);
 				if (!pwid || (pwid && ColorChangeTable[iColor].colorIndex == ActiveColor))
@@ -22315,23 +22302,6 @@ skip:;
 	if (StateMap.test(StateFlag::MOVSET))
 		dumov();
 	drwknot();
-}
-
-unsigned chkCol(unsigned color) noexcept {
-
-#if  __UseASM__
-	_asm {
-		mov		ebx, color
-		mov		edx, DisplayedColorBitmap
-		xor		eax, eax
-		bt		edx, ebx
-		jnc		chk1
-		dec		eax
-chk1 :
-	}
-#else
-	return _bittest(static_cast<long *>(static_cast<void *>(&DisplayedColorBitmap)), color) ? 0xffffffff : 0;
-#endif
 }
 
 void dubar() {
@@ -22921,8 +22891,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 					if (DrawItem->hwndItem == DefaultColorWin[iColor]) {
 
 						FillRect(DrawItem->hDC, &DrawItem->rcItem, DefaultColorBrush[iColor]);
-						if (chkCol(iColor)) {
-
+						if (DisplayedColorBitmap.test(iColor)) {
 							SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
 							SetTextColor(DrawItem->hDC, defTxt(iColor));
 							sprintf_s(buffer, sizeof(buffer), "%d", iColor + 1);
