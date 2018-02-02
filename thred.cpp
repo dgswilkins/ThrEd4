@@ -4641,11 +4641,20 @@ void savmap() {
 		tabmsg(IDS_SHOMAP);
 }
 
+HBITMAP getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO *pbmi, _Outptr_ unsigned int **ppvBits) {
+	[[gsl::suppress(type.1)]]HBITMAP bitmap = CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void **>(ppvBits), 0, 0);
+	if (*ppvBits != nullptr) {
+		return bitmap;
+	}
+	else {
+		throw;
+	}
+}
+
 void bfil() {
 
 	unsigned		bitmapWidthBytes = 0, widthOverflow = 0, fileHeaderSize = 0, bitmapSizeBytes = 0, iHeight = 0;
-	void			*lpBits = nullptr;
-	unsigned		*bits = nullptr;
+	unsigned int*	bits = nullptr;
 	HBITMAP			bitmap = {};
 	HDC				deviceContext = {};
 	COLORREF		foreground = {};
@@ -4720,13 +4729,11 @@ void bfil() {
 			BitmapInfoHeader.biBitCount = 32;
 			BitmapInfoHeader.biCompression = BI_RGB;
 			BitmapInfo.bmiHeader = BitmapInfoHeader;
-			bitmap = CreateDIBSection(BitmapDC, &BitmapInfo, DIB_RGB_COLORS, &lpBits, 0, 0);
+			bitmap = getBitmap(BitmapDC, &BitmapInfo, &bits);
 			//Synchronize
 			GdiFlush();
-			bits = static_cast<unsigned *>(lpBits);
-			if (bits != nullptr) {
-				for (iHeight = 0; iHeight < BitmapHeight; iHeight++)
-					bitlin(&monoBitmapData[iHeight * bitmapWidthBytes], &bits[iHeight * BitmapWidth], background, foreground);
+			for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
+					bitlin(&monoBitmapData[iHeight * bitmapWidthBytes], &(static_cast<unsigned int *>(bits)[iHeight * BitmapWidth]), background, foreground);
 			}
 			deviceContext = CreateCompatibleDC(StitchWindowDC);
 			if (bitmap && deviceContext) {
@@ -13248,7 +13255,7 @@ void getrmap() {
 	header.biBitCount = 32;
 	header.biCompression = BI_RGB;
 	info.bmiHeader = header;
-	[[gsl::suppress(type.1)]]TraceBitmap = CreateDIBSection(BitmapDC, &info, DIB_RGB_COLORS, reinterpret_cast<void **>(&TraceBitmapData), 0, 0);
+	TraceBitmap = getBitmap(BitmapDC, &info, &TraceBitmapData);
 	TraceDC = CreateCompatibleDC(StitchWindowDC);
 	if (TraceBitmap && TraceDC) {
 		SelectObject(TraceDC, TraceBitmap);
