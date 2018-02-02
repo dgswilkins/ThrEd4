@@ -599,8 +599,8 @@ unsigned*		TraceBitmapData;		//trace bitmap data
 POINT			CurrentTracePoint;		//current point being traced
 unsigned		TraceDataSize;			//size of the trace bitmap in double words
 unsigned*		TracedPixels;			//bitmap of selected trace pixels
-boost::dynamic_bitset<>	TracedEdges(0);	//detected edges of trace areas
-boost::dynamic_bitset<>	TracedMap(0);	//in/out state of trace areas
+boost::dynamic_bitset<>	*TracedEdges;	//detected edges of trace areas
+boost::dynamic_bitset<>	*TracedMap;		//in/out state of trace areas
 TRCPNT*			TracedPoints;			//collection of traced points
 TRCPNT*			DecimatedLine;			//differenced collection of traced points
 unsigned		TraceDirection;			//trace direction
@@ -13105,11 +13105,11 @@ void untrace() {
 
 		DeleteObject(TraceBitmap);
 		ReleaseDC(ThrEdWindow, TraceDC);
-		if (TracedEdges.size() != 0) {
-			TracedEdges.resize(0); // allocated in tracedg
+		if (TracedEdges->size() != 0) {
+			TracedEdges->resize(0); // allocated in tracedg
 		}
-		if (TracedMap.size() != 0) {
-			TracedMap.resize(0); // allocated in trace
+		if (TracedMap->size() != 0) {
+			TracedMap->resize(0); // allocated in trace
 		}
 		StateMap.reset(StateFlag::WASEDG);
 		for (iColor = 0; iColor < 16; iColor++) {
@@ -13249,7 +13249,7 @@ void getrmap() {
 		BitBlt(TraceDC, 0, 0, BitmapWidth, BitmapHeight, BitmapDC, 0, 0, SRCCOPY);
 		StateMap.set(StateFlag::WASTRAC);
 		TraceDataSize = (BitmapWidth*BitmapHeight) + 1;
-		TracedMap.resize(TraceDataSize);
+		TracedMap->resize(TraceDataSize);
 		StretchBlt(StitchWindowMemDC, BitmapDstRect.left, BitmapDstRect.top, BitmapDstRect.right - BitmapDstRect.left, BitmapDstRect.bottom - BitmapDstRect.top,
 			BitmapDC, BitmapSrcRect.left, BitmapSrcRect.top, BitmapSrcRect.right - BitmapSrcRect.left, BitmapSrcRect.bottom - BitmapSrcRect.top, SRCCOPY);
 	}
@@ -13330,13 +13330,13 @@ void trace() {
 		trcols(InvertDownColor);
 		for (iRGB = 0; iRGB < 3; iRGB++)
 			LowColors[iRGB] = PixelColors[iRGB];
-		if (TracedMap.size() == 0) {
-			TracedMap.resize(TraceDataSize,false);
+		if (TracedMap->size() == 0) {
+			TracedMap->resize(TraceDataSize,false);
 		}
 		for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
 
 			if (trcin(TraceBitmapData[iPixel]))
-				TracedMap.set(iPixel);
+				TracedMap->set(iPixel);
 			else
 				TraceBitmapData[iPixel] = 0;
 		}
@@ -13355,30 +13355,30 @@ void tracedg() {
 
 	if (!StateMap.test(StateFlag::WASTRAC))
 		trace();
-	TracedEdges.resize(TraceDataSize,false);
-	TracedEdges.reset();
+	TracedEdges->resize(TraceDataSize,false);
+	TracedEdges->reset();
 	pixelIndex = 0;
 	for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
 
 		flag = 0;
 		for (iWidth = 0; iWidth < BitmapWidth; iWidth++) {
 
-			if (TracedMap.test(pixelIndex)) {
+			if (TracedMap->test(pixelIndex)) {
 				if (!flag) {
-					TracedEdges.set(pixelIndex);
+					TracedEdges->set(pixelIndex);
 					flag = 1;
 				}
 			}
 			else {
 				if (flag) {
-					TracedEdges.set(pixelIndex - 1);
+					TracedEdges->set(pixelIndex - 1);
 					flag = 0;
 				}
 			}
 			pixelIndex++;
 		}
 		if (flag)
-			TracedEdges.set(pixelIndex - 1);
+			TracedEdges->set(pixelIndex - 1);
 	}
 	for (iWidth = 0; iWidth < BitmapWidth; iWidth++) {
 
@@ -13386,26 +13386,26 @@ void tracedg() {
 		flag = 0;
 		for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
 
-			if (TracedMap.test(pixelIndex)) {
+			if (TracedMap->test(pixelIndex)) {
 				if (!flag) {
-					TracedEdges.set(pixelIndex);
+					TracedEdges->set(pixelIndex);
 					flag = 1;
 				}
 			}
 			else {
 				if (flag) {
-					TracedEdges.set(pixelIndex - BitmapWidth);
+					TracedEdges->set(pixelIndex - BitmapWidth);
 					flag = 0;
 				}
 			}
 			pixelIndex += BitmapWidth;
 		}
 		if (flag)
-			TracedEdges.set(pixelIndex - BitmapWidth);
+			TracedEdges->set(pixelIndex - BitmapWidth);
 	}
 	for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
 
-		if (TracedEdges.test(iPixel))
+		if (TracedEdges->test(iPixel))
 			TraceBitmapData[iPixel] = 0xffffff;
 		else
 			TraceBitmapData[iPixel] = 0;
@@ -13427,14 +13427,14 @@ bool trcbit() {
 			if (CurrentTracePoint.x == gsl::narrow<int>(BitmapWidth) - 1)
 				TraceDirection = TRCU;
 			else {
-				if (TracedEdges.test(pixelIndex)) {
+				if (TracedEdges->test(pixelIndex)) {
 					CurrentTracePoint.x++;
 					CurrentTracePoint.y--;
 					TraceDirection = TRCD;
 				}
 				else {
 					pixelIndex += BitmapWidth;
-					if (TracedEdges.test(pixelIndex))
+					if (TracedEdges->test(pixelIndex))
 						CurrentTracePoint.x++;
 					else
 						TraceDirection = TRCU;
@@ -13448,14 +13448,14 @@ bool trcbit() {
 			if (!CurrentTracePoint.y)
 				TraceDirection = TRCR;
 			else {
-				if (TracedEdges.test(pixelIndex)) {
+				if (TracedEdges->test(pixelIndex)) {
 					CurrentTracePoint.x--;
 					CurrentTracePoint.y--;
 					TraceDirection = TRCL;
 				}
 				else {
 					pixelIndex++;
-					if (TracedEdges.test(pixelIndex))
+					if (TracedEdges->test(pixelIndex))
 						CurrentTracePoint.y--;
 					else
 						TraceDirection = TRCR;
@@ -13469,14 +13469,14 @@ bool trcbit() {
 			if (!CurrentTracePoint.x)
 				TraceDirection = TRCD;
 			else {
-				if (TracedEdges.test(pixelIndex)) {
+				if (TracedEdges->test(pixelIndex)) {
 					CurrentTracePoint.x--;
 					CurrentTracePoint.y++;
 					TraceDirection = TRCU;
 				}
 				else {
 					pixelIndex -= BitmapWidth;
-					if (TracedEdges.test(pixelIndex))
+					if (TracedEdges->test(pixelIndex))
 						CurrentTracePoint.x--;
 					else
 						TraceDirection = TRCD;
@@ -13490,14 +13490,14 @@ bool trcbit() {
 			if (CurrentTracePoint.y == gsl::narrow<int>(BitmapHeight) - 1)
 				TraceDirection = TRCL;
 			else {
-				if (TracedEdges.test(pixelIndex)) {
+				if (TracedEdges->test(pixelIndex)) {
 					CurrentTracePoint.x++;
 					CurrentTracePoint.y++;
 					TraceDirection = TRCR;
 				}
 				else {
 					pixelIndex--;
-					if (TracedEdges.test(pixelIndex))
+					if (TracedEdges->test(pixelIndex))
 						CurrentTracePoint.y++;
 					else
 						TraceDirection = TRCL;
@@ -13552,11 +13552,11 @@ void dutrac() {
 		if (CurrentTracePoint.y > gsl::narrow<long>(BitmapHeight))
 			CurrentTracePoint.y = BitmapHeight;
 		savedPoint = point = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
-		if (!TracedEdges.test(point)) {
+		if (!TracedEdges->test(point)) {
 			flag = 20;
 			point = savedPoint;
 			limit = (CurrentTracePoint.y + 1)*BitmapWidth;
-			while (point < limit && !TracedEdges.test(point))
+			while (point < limit && !TracedEdges->test(point))
 				point++;
 			if (point < limit)
 				findRectangle.right = point - CurrentTracePoint.y*BitmapWidth;
@@ -13564,14 +13564,14 @@ void dutrac() {
 				findRectangle.right = BitmapWidth;
 			point = savedPoint;
 			limit = CurrentTracePoint.y*BitmapWidth;
-			while (point > limit && !TracedEdges.test(point))
+			while (point > limit && !TracedEdges->test(point))
 				point--;
 			if (point == limit)
 				findRectangle.left = 0;
 			else
 				findRectangle.left = point - limit;
 			point = savedPoint;
-			while (point > 0 && !TracedEdges.test(point))
+			while (point > 0 && !TracedEdges->test(point))
 				point -= BitmapWidth;
 			if (point > 0)
 				findRectangle.bottom = point / BitmapWidth;
@@ -13579,7 +13579,7 @@ void dutrac() {
 				findRectangle.bottom = 0;
 			point = savedPoint;
 			limit = BitmapWidth*BitmapHeight;
-			while (point < limit && !TracedEdges.test(point))
+			while (point < limit && !TracedEdges->test(point))
 				point += BitmapWidth;
 			if (point < limit)
 				findRectangle.top = point / BitmapWidth;
@@ -23182,6 +23182,10 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 			LoadString(ThrEdInstance, IDS_UNAM, IniFile.designerName, 50);
 			getdes();
 		}
+		boost::dynamic_bitset<> private_TracedMap(0);
+		TracedMap = &private_TracedMap;
+		boost::dynamic_bitset<> private_TracedEdges(0);
+		TracedEdges = &private_TracedEdges;
 		while (GetMessage(&Msg, NULL, 0, 0)) {
 
 			StateMap.set(StateFlag::SAVACT);
