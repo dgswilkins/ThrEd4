@@ -3185,8 +3185,7 @@ void redbal() {
 void ritbal() {
 
 	BALHED			balaradHeader = {};
-	unsigned*		ptrBalaradHeader = nullptr;
-	unsigned		iHeader = 0, iStitch = 0, iColor = 0, iOutput = 0, color = 0;
+	unsigned		iStitch = 0, iColor = 0, iOutput = 0, color = 0;
 	HANDLE			balaradFile = {};
 	TCHAR*			lastNameCharacter = nullptr;
 	TCHAR			outputName[_MAX_PATH] = { 0 };
@@ -3208,9 +3207,6 @@ void ritbal() {
 		balaradFile = CreateFile(outputName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		if (balaradFile == INVALID_HANDLE_VALUE)
 			return;
-		ptrBalaradHeader = static_cast<unsigned *>(static_cast<void *>(&balaradHeader));
-		for (iHeader = 0; iHeader < (sizeof(BALHED) >> 2); iHeader++)
-			ptrBalaradHeader[iHeader] = 0;
 		color = StitchBuffer[0].attribute&COLMSK;
 		balaradHeader.color[0] = UserColor[color];
 		iColor = 1;
