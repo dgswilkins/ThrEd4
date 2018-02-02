@@ -561,7 +561,6 @@ TCHAR			DesignerName[50];		//designer name in clear
 HWND			FirstWin;				//first window not destroyed for exiting enumerate loop
 RANGE			SelectedFormsRange;		//range of selected forms
 unsigned		TmpFormIndex;			//saved form index
-unsigned char	CursorMask[128];		//cursor and mask
 double			ZoomMin;				//minimum allowed zoom value
 fRECTANGLE		CheckHoopRect;			//for checking the hoop size
 BALSTCH*		BalaradStitch;			//balarad stitch pointer
@@ -635,7 +634,6 @@ HCURSOR			NeedleLeftUpCursor;		//left up needle
 HCURSOR			NeedleLeftDownCursor;	//left down needle 
 HCURSOR			NeedleRightUpCursor;	//right up needle 
 HCURSOR			NeedleRightDownCursor;	//right down needle 
-CURSORMASK		CursorMasks;			//cursor mask structure
 
 HPEN			LinePen;				//line pen for stitch move lines			
 HPEN			BoxPen[4];				//box pens
@@ -21061,33 +21059,19 @@ dulup:
 #endif
 }
 
-void duamsk() noexcept {
-
-#if  __UseASM__
-	_asm {
-		xor		eax, eax
-		dec		eax
-		xor		ecx, ecx
-		mov		cl, 32
-		mov		edi, offset CursorMask
-		rep		stosd
-	}
-#else
-	memset(CursorMask, 0xff, 128);
-#endif
-}
-
 void crtcurs() noexcept {
+	unsigned char	cursorMask[128];		//cursor 'and' mask
+	CURSORMASK		cursorMasks;			//cursor mask structure
 
-	duamsk();
-	ducurs(CursorMasks.form);
-	FormCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, CursorMask, &CursorMasks.form);
-	DLineCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, CursorMask, &CursorMasks.dline);
-	NeedleUpCursor = CreateCursor(ThrEdInstance, 16, 32, 32, 32, CursorMask, &CursorMasks.uprightNeedle);
-	NeedleRightDownCursor = CreateCursor(ThrEdInstance, 1, 31, 32, 32, CursorMask, &CursorMasks.rightDownNeedle);
-	NeedleRightUpCursor = CreateCursor(ThrEdInstance, 1, 1, 32, 32, CursorMask, &CursorMasks.rightUpNeedle);
-	NeedleLeftDownCursor = CreateCursor(ThrEdInstance, 30, 30, 32, 32, CursorMask, &CursorMasks.leftDownNeedle);
-	NeedleLeftUpCursor = CreateCursor(ThrEdInstance, 32, 1, 32, 32, CursorMask, &CursorMasks.leftUpNeedle);
+	memset(cursorMask, 0xff, 128);
+	ducurs(cursorMasks.form);
+	FormCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, cursorMask, &cursorMasks.form);
+	DLineCursor = CreateCursor(ThrEdInstance, 16, 16, 32, 32, cursorMask, &cursorMasks.dline);
+	NeedleUpCursor = CreateCursor(ThrEdInstance, 16, 32, 32, 32, cursorMask, &cursorMasks.uprightNeedle);
+	NeedleRightDownCursor = CreateCursor(ThrEdInstance, 1, 31, 32, 32, cursorMask, &cursorMasks.rightDownNeedle);
+	NeedleRightUpCursor = CreateCursor(ThrEdInstance, 1, 1, 32, 32, cursorMask, &cursorMasks.rightUpNeedle);
+	NeedleLeftDownCursor = CreateCursor(ThrEdInstance, 30, 30, 32, 32, cursorMask, &cursorMasks.leftDownNeedle);
+	NeedleLeftUpCursor = CreateCursor(ThrEdInstance, 32, 1, 32, 32, cursorMask, &cursorMasks.leftUpNeedle);
 }
 
 void dstcurs() noexcept {
