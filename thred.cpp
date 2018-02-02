@@ -4733,7 +4733,7 @@ void bfil() {
 			//Synchronize
 			GdiFlush();
 			for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
-					bitlin(&monoBitmapData[iHeight * bitmapWidthBytes], &(static_cast<unsigned int *>(bits)[iHeight * BitmapWidth]), background, foreground);
+					bitlin(&monoBitmapData[iHeight * bitmapWidthBytes], &bits[iHeight * BitmapWidth], background, foreground);
 			}
 			deviceContext = CreateCompatibleDC(StitchWindowDC);
 			if (bitmap && deviceContext) {
