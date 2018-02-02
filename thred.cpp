@@ -17,6 +17,23 @@
 #include "resource.h"
 #include "thred.h"
 
+template <class T2, class T1>
+inline _Ret_notnull_ T2 convert_ptr(T1 *pointer)
+{
+	union
+	{
+		T1 *in;
+		T2 out;
+	} result = { pointer };
+
+	if (result.out) {
+		return result.out;
+	}
+	else {
+		throw;
+	}
+}
+
 //Forward Declarations
 void		blak ();
 void		chkhup ();
@@ -2139,39 +2156,39 @@ void dudat() {
 		+ sizeof(fPOINT)*(FormVertexIndex + ClipPointIndex) + sizeof(SATCON)*SatinGuideIndex + sizeof(COLORREF) * 16 +
 		sizeof(TXPNT)*TextureIndex;
 	UndoBuffer[UndoBufferWriteIndex] = new unsigned[size];
-	backupData = static_cast<BAKHED*>(UndoBuffer[UndoBufferWriteIndex]);
+	backupData = static_cast<BAKHED *>(UndoBuffer[UndoBufferWriteIndex]);
 	if (backupData) {
 
 		backupData->zoomRect.x = UnzoomedRect.x;
 		backupData->zoomRect.y = UnzoomedRect.y;
 		backupData->formCount = FormIndex;
-		backupData->forms = static_cast<FRMHED*>(static_cast<void *>(&backupData[1]));
+		backupData->forms = convert_ptr<FRMHED *>(&backupData[1]);
 		//		for(unsigned iStitch=0;iStitch<FormIndex;iStitch++)
 		//			frmcpy(&backupData->forms[iStitch],&FormList[iStitch]);
 		MoveMemory(backupData->forms, &FormList, sizeof(FRMHED)*FormIndex);
 		backupData->stitchCount = PCSHeader.stitchCount;
-		backupData->stitches = static_cast<fPOINTATTR *>(static_cast<void *>(&backupData->forms[FormIndex]));
+		backupData->stitches = convert_ptr<fPOINTATTR *>(&backupData->forms[FormIndex]);
 		if (PCSHeader.stitchCount)
 			stchcpy((sizeof(fPOINTATTR)*PCSHeader.stitchCount) >> 2, backupData->stitches);
 		backupData->vertexCount = FormVertexIndex;
-		backupData->vertices = static_cast<fPOINT *>(static_cast<void *>(&backupData->stitches[PCSHeader.stitchCount]));
+		backupData->vertices = convert_ptr<fPOINT *>(&backupData->stitches[PCSHeader.stitchCount]);
 		if (FormVertexIndex)
 			mvflpnt(backupData->vertices, &FormVertices[0], FormVertexIndex);
 		backupData->guideCount = SatinGuideIndex;
-		backupData->guide = static_cast<SATCON *>(static_cast<void *>(&backupData->vertices[FormVertexIndex]));
+		backupData->guide = convert_ptr<SATCON *>(&backupData->vertices[FormVertexIndex]);
 		if (SatinGuideIndex)
 			mvsatk(backupData->guide, &SatinGuides[0], SatinGuideIndex);
 		backupData->clipPointCount = ClipPointIndex;
-		backupData->clipPoints = static_cast<fPOINT *>(static_cast<void *>(&backupData->guide[SatinGuideIndex]));
+		backupData->clipPoints = convert_ptr<fPOINT *>(&backupData->guide[SatinGuideIndex]);
 		if (ClipPointIndex) {
 
 			if (ClipPointIndex > MAXITEMS)
 				ClipPointIndex = MAXITEMS;
 			mvflpnt(backupData->clipPoints, &ClipPoints[0], ClipPointIndex);
 		}
-		backupData->colors = static_cast<COLORREF *>(static_cast<void *>(&backupData->clipPoints[ClipPointIndex]));
+		backupData->colors = convert_ptr<COLORREF *>(&backupData->clipPoints[ClipPointIndex]);
 		MoveMemory(backupData->colors, &UserColor, sizeof(COLORREF) * 16);
-		backupData->texturePoints = static_cast<TXPNT *>(static_cast<void *>(&backupData->colors[16]));
+		backupData->texturePoints = convert_ptr<TXPNT *>(&backupData->colors[16]);
 		backupData->texturePointCount = TextureIndex;
 		if (TextureIndex)
 			MoveMemory(backupData->texturePoints, &TexturePointsBuffer, sizeof(TXPNT)*TextureIndex);
@@ -4756,16 +4773,9 @@ void prtred() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-unsigned dtrn(const DSTREC* dpnt) noexcept {
+inline unsigned dtrn(const DSTREC* dpnt) noexcept {
 
-#if  __UseASM__
-	_asm {
-		mov		eax, dpnt
-		mov		eax, [eax]
-	}
-#else
-	return *static_cast<const unsigned *>(static_cast<const void *>(dpnt));
-#endif
+	return *(convert_ptr<unsigned int *>(dpnt));
 }
 
 bool colfil() {
@@ -5387,7 +5397,7 @@ void nuFil() {
 							}
 							PCSHeader.stitchCount = iStitch;
 							// Grab the bitmap filename
-							tnam = static_cast<TCHAR *>(static_cast<void *>(&PCSStitchBuffer[iPCSstitch]));
+							tnam = convert_ptr<TCHAR *>(&PCSStitchBuffer[iPCSstitch]);
 							strcpy_s(PCSBMPFileName, tnam);
 							delete[] PCSStitchBuffer;
 							strcpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), "thr");
@@ -6122,7 +6132,7 @@ void sav() {
 				// There are always going to be more recordds in the DST format
 				DSTRecords = new DSTREC[2 * PCSHeader.stitchCount]();
 				ritdst(saveStitches);
-				pchr = static_cast<TCHAR  *>(static_cast<void *>(&dstHeader));
+				pchr = convert_ptr<TCHAR *>(&dstHeader);
 				for (iHeader = 0; iHeader < sizeof(DSTHED); iHeader++)
 					pchr[iHeader] = ' ';
 				strncpy(dstHeader.desched, "LA:", 3);
@@ -7543,7 +7553,7 @@ void unbsho() {
 	}
 }
 
-bool oldwnd(const HWND window) noexcept {
+bool oldwnd(HWND window) noexcept {
 
 	unsigned	iWindow = 0, iColor = 0;
 
@@ -8256,7 +8266,7 @@ void duclip() {
 				else
 					clipHeader->direction = 0;
 				// skip past the header
-				vertices = static_cast<fPOINT *>(static_cast<void *>(&clipHeader[1]));
+				vertices = convert_ptr<fPOINT *>(&clipHeader[1]);
 				fvars(ClosestFormToCursor);
 				iSource = SelectedFormVertices.start;
 				for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
@@ -8294,14 +8304,14 @@ void duclip() {
 					ClipFormsHeader->clipType = CLP_FRMS;
 					ClipFormsHeader->formCount = SelectedFormCount;
 					// Skip past the header
-					forms = static_cast<FRMHED *>(static_cast<void *>(&ClipFormsHeader[1]));
+					forms = convert_ptr<FRMHED *>(&ClipFormsHeader[1]);
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
 						SelectedForm = &FormList[SelectedFormList[iForm]];
 						frmcpy(&forms[iForm], &FormList[SelectedFormList[iForm]]);
 					}
 					// skip past the forms
-					CurrentFormVertices = static_cast<fPOINT *>(static_cast<void *>(&forms[iForm]));
+					CurrentFormVertices = convert_ptr<fPOINT *>(&forms[iForm]);
 					iVertex = 0;
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
@@ -8313,7 +8323,7 @@ void duclip() {
 						}
 					}
 					// skip past the vertex list
-					guides = static_cast<SATCON *>(static_cast<void *>(&CurrentFormVertices[iVertex]));
+					guides = convert_ptr<SATCON *>(&CurrentFormVertices[iVertex]);
 					guideCount = 0;
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
@@ -8328,7 +8338,7 @@ void duclip() {
 						}
 					}
 					// skip past the guides
-					points = static_cast<fPOINT *>(static_cast<void *>(&guides[guideCount]));
+					points = convert_ptr<fPOINT *>(&guides[guideCount]);
 					pointCount = 0;
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
@@ -8351,7 +8361,7 @@ void duclip() {
 						}
 					}
 					// Skip past the points
-					textures = static_cast<TXPNT *>(static_cast<void *>(&points[pointCount]));
+					textures = convert_ptr<TXPNT *>(&points[pointCount]);
 					textureCount = 0;
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 						SelectedForm = &FormList[SelectedFormList[iForm]];
@@ -8415,13 +8425,13 @@ void duclip() {
 						ClipFormHeader = *(static_cast<FORMCLIP * *>(ThrEdClipPointer));
 						ClipFormHeader->clipType = CLP_FRM;
 						frmcpy(&ClipFormHeader->form, &FormList[ClosestFormToCursor]);
-						CurrentFormVertices = static_cast<fPOINT *>(static_cast<void *>(&ClipFormHeader[1]));
+						CurrentFormVertices = convert_ptr<fPOINT *>(&ClipFormHeader[1]);
 						for (iSide = 0; iSide < SelectedForm->vertexCount; iSide++) {
 
 							CurrentFormVertices[iSide].x = SelectedForm->vertices[iSide].x;
 							CurrentFormVertices[iSide].y = SelectedForm->vertices[iSide].y;
 						}
-						guides = static_cast<SATCON *>(static_cast<void *>(&CurrentFormVertices[VertexCount]));
+						guides = convert_ptr<SATCON *>(&CurrentFormVertices[VertexCount]);
 						iGuide = 0;
 						if (SelectedForm->type == SAT) {
 
@@ -8431,7 +8441,7 @@ void duclip() {
 								guides[iGuide].finish = SelectedForm->satinOrAngle.guide[iGuide].finish;
 							}
 						}
-						mclp = static_cast<fPOINT *>(static_cast<void *>(&guides[iGuide]));
+						mclp = convert_ptr<fPOINT *>(&guides[iGuide]);
 						iClip = 0;
 						if (isclpx(ClosestFormToCursor)) {
 
@@ -8441,7 +8451,7 @@ void duclip() {
 								mclp[iClip].y = SelectedForm->angleOrClipData.clip[iClip].y;
 							}
 						}
-						points = static_cast<fPOINT *>(static_cast<void *>(&mclp[iClip]));
+						points =convert_ptr<fPOINT *>(&mclp[iClip]);
 						if (iseclpx(ClosestFormToCursor)) {
 
 							for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
@@ -8450,7 +8460,7 @@ void duclip() {
 								points[iClip].y = SelectedForm->borderClipData[iClip].y;
 							}
 						}
-						textures = static_cast<TXPNT *>(static_cast<void *>(&points[iClip]));
+						textures = convert_ptr<TXPNT *>(&points[iClip]);
 						if (istx(ClosestFormToCursor)) {
 							ptxs = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
 							for (iTexture = 0; iTexture < SelectedForm->fillInfo.texture.count; iTexture++) {
@@ -18792,13 +18802,13 @@ thumout:;
 									MoveMemory(clipCopyBuffer, ClipPointer, byteCount);
 									GlobalUnlock(ClipMemory);
 									CloseClipboard();
-									ClipFormVerticesData = static_cast<FORMVERTEXCLIP *>(static_cast<void *>(clipCopyBuffer));
+									ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP *>(clipCopyBuffer);
 									if (StateMap.test(StateFlag::FRMPSEL)) {
 
 										fvars(ClosestFormToCursor);
 										InterleaveSequence[0].x = CurrentFormVertices[ClosestVertexToCursor].x;
 										InterleaveSequence[0].y = CurrentFormVertices[ClosestVertexToCursor].y;
-										clipData = static_cast<fPOINT *>(static_cast<void *>(&ClipFormVerticesData[1]));
+										clipData = convert_ptr<fPOINT *>(&ClipFormVerticesData[1]);
 										for (iVertex = 0; iVertex <= ClipFormVerticesData->vertexCount; iVertex++) {
 
 											InterleaveSequence[iVertex + 1].x = clipData[iVertex].x;
@@ -18809,7 +18819,7 @@ thumout:;
 										InterleaveSequence[iVertex].x = CurrentFormVertices[nextVertex].x;
 										InterleaveSequence[iVertex].y = CurrentFormVertices[nextVertex].y;
 										OutputIndex = iVertex + 1;
-										FormVerticesAsLine = static_cast<POINT *>(static_cast<void *>(&InterleaveSequence[OutputIndex]));
+										FormVerticesAsLine = convert_ptr<POINT *>(&InterleaveSequence[OutputIndex]);
 										setpclp();
 										StateMap.set(StateFlag::FPUNCLP);
 										StateMap.set(StateFlag::SHOP);
@@ -18842,13 +18852,13 @@ thumout:;
 								if (ClipFormsHeader->clipType == CLP_FRMS) {
 
 									ClipFormsCount = ClipFormsHeader->formCount;
-									forms = static_cast<FRMHED *>(static_cast<void *>(&ClipFormsHeader[1]));
+									forms = convert_ptr<FRMHED *>(&ClipFormsHeader[1]);
 									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 
 										frmcpy(&FormList[FormIndex + iForm], &forms[iForm]);
 										FormList[FormIndex + iForm].attribute = (FormList[FormIndex + iForm].attribute&NFRMLMSK) | (ActiveLayer << 1);
 									}
-									CurrentFormVertices = static_cast<fPOINT *>(static_cast<void *>(&forms[iForm]));
+									CurrentFormVertices = convert_ptr<fPOINT *>(&forms[iForm]);
 									currentVertex = 0;
 									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 
@@ -18860,7 +18870,7 @@ thumout:;
 											SelectedForm->vertices[iVertex].y = CurrentFormVertices[currentVertex++].y;
 										}
 									}
-									guides = static_cast<SATCON *>(static_cast<void *>(&CurrentFormVertices[currentVertex]));
+									guides = convert_ptr<SATCON *>(&CurrentFormVertices[currentVertex]);
 									currentGuide = 0;
 									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 
@@ -18875,7 +18885,7 @@ thumout:;
 											}
 										}
 									}
-									clipData = static_cast<fPOINT *>(static_cast<void *>(&guides[currentGuide]));
+									clipData = convert_ptr<fPOINT *>(&guides[currentGuide]);
 									currentClip = 0;
 									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 
@@ -18899,7 +18909,7 @@ thumout:;
 											}
 										}
 									}
-									textureSource = static_cast<TXPNT *>(static_cast<void *>(&clipData[currentClip]));
+									textureSource = convert_ptr<TXPNT *>(&clipData[currentClip]);
 									textureDestination = &TexturePointsBuffer[TextureIndex];
 									textureCount = 0;
 									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
@@ -18947,15 +18957,15 @@ thumout:;
 										frmcpy(&FormList[FormIndex], &ClipFormHeader->form);
 										FormList[FormIndex].attribute = (FormList[FormIndex].attribute&NFRMLMSK) | (ActiveLayer << 1);
 										SelectedForm->vertices = adflt(FormList[FormIndex].vertexCount);
-										CurrentFormVertices = static_cast<fPOINT *>(static_cast<void *>(&ClipFormHeader[1]));
+										CurrentFormVertices = convert_ptr<fPOINT *>(&ClipFormHeader[1]);
 										mvflpnt(&SelectedForm->vertices[0], &CurrentFormVertices[0], SelectedForm->vertexCount);
-										guides = static_cast<SATCON *>(static_cast<void *>(&CurrentFormVertices[SelectedForm->vertexCount]));
+										guides = convert_ptr<SATCON *>(&CurrentFormVertices[SelectedForm->vertexCount]);
 										if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
 
 											SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
 											mvsatk(&SelectedForm->satinOrAngle.guide[0], &guides[0], SelectedForm->satinGuideCount);
 										}
-										clipData = static_cast<fPOINT *>(static_cast<void *>(&guides[0]));
+										clipData = convert_ptr<fPOINT *>(&guides[0]);
 										clipCount = 0;
 										if (isclpx(FormIndex)) {
 
@@ -18965,12 +18975,12 @@ thumout:;
 										}
 										if (iseclpx(FormIndex)) {
 
-											clipData = static_cast<fPOINT *>(static_cast<void *>(&clipData[clipCount]));
+											clipData = convert_ptr<fPOINT *>(&clipData[clipCount]);
 											SelectedForm->borderClipData = adclp(SelectedForm->clipEntries);
 											mvflpnt(SelectedForm->borderClipData, clipData, SelectedForm->clipEntries);
 											clipCount += SelectedForm->clipEntries;
 										}
-										textureSource = static_cast<TXPNT *>(static_cast<void *>(&clipData[clipCount]));
+										textureSource = convert_ptr<TXPNT *>(&clipData[clipCount]);
 										if (istx(FormIndex)) {
 											SelectedForm->fillInfo.texture.index = TextureIndex;
 											textureDestination = adtx(SelectedForm->fillInfo.texture.count);
@@ -20957,7 +20967,7 @@ dulup:
 		call	delsubt
 	}
 #else
-	unsigned *zPnt = static_cast<unsigned *>(static_cast<void *>(pnt));
+	unsigned *zPnt = convert_ptr<unsigned *>(pnt);
 	unsigned *dst = zPnt;
 	//form cursor
 	for (int i = 0; i < 32; i++) {
