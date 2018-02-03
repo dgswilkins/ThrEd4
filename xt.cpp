@@ -343,7 +343,7 @@ void txrfor() noexcept {
 	TextureHistoryIndex &= 0xf;
 }
 
-bool chktxh(const TXHST* historyItem) noexcept {
+bool chktxh(_In_ const TXHST* historyItem) noexcept {
 	unsigned iPoint = 0;
 
 	if (historyItem->count != TextureScreen.index)
@@ -429,7 +429,7 @@ void duxrats(unsigned start, unsigned finish, fPOINT* point) noexcept {
 
 void durats(unsigned iSequence, fPOINT* point) noexcept {
 
-	double	stitchLength = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x, BSequence[iSequence + 1].y - BSequence[iSequence].y);
+	const double	stitchLength = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x, BSequence[iSequence + 1].y - BSequence[iSequence].y);
 	fPOINT	adjustedPoint = {};
 
 	if (stitchLength < FeatherMinStitch) {
@@ -586,7 +586,7 @@ void fthrbfn(unsigned iSequence) {
 	fPOINT	nextLowPoint = {};
 	fPOINT	midPoint = {};
 
-	double	length = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
+	const double	length = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 
 	nurat();
 	if (length < (FeatherMinStitch * 2)) {
@@ -624,7 +624,7 @@ void duoseq(unsigned iSequence) noexcept {
 
 void fthdfn(unsigned iSequence) {
 
-	double	length = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
+	const double	length = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 	fPOINT	adjustedPoint = {};
 	fPOINT	currentPoint = {};
 	fPOINT	nextPoint = {};
@@ -647,8 +647,8 @@ void fthdfn(unsigned iSequence) {
 
 void fthrfn() {
 
-	unsigned	ind = 0, res = 0;
-	double		savedSpacing = LineSpacing;
+	unsigned		ind = 0, res = 0;
+	const double	savedSpacing = LineSpacing;
 
 	// ToDo - what does this function do
 	PseudoRandomValue = FSED;
@@ -868,7 +868,7 @@ void pes2crd() {
 	HKEY			registryKey = {};
 	unsigned long	keyType = 0, size = 0;
 	TCHAR			programName[_MAX_PATH] = { 0 };
-	char			filter[] = "ComputerService (Lind2PC.exe)\0LinkP2C.exe\0\0";
+	const char		filter[] = "ComputerService (Lind2PC.exe)\0LinkP2C.exe\0\0";
 	TCHAR			message[P2CBUFSIZ] = { 0 };
 	TCHAR			caption[P2CBUFSIZ] = { 0 };
 	OPENFILENAME	openFileName = {
@@ -1059,13 +1059,13 @@ void ritcwlk() noexcept {
 }
 
 unsigned gucon(fPOINT start, fPOINT finish, unsigned destination, unsigned code) {
-	double		length = hypot(finish.x - start.x, finish.y - start.y);
-	unsigned	startVertex = closflt(start.x, start.y); 
-	unsigned	endVertex = closflt(finish.x, finish.y); 
-	unsigned	stitchCount = 0, intermediateVertex = 0;
-	fPOINT*		indentedPoint = nullptr;
-	unsigned	up = 0, down = 0, iStitch = 0, iStep = 0;
-	fPOINT		localPoint = {}, step = {}, delta = {};
+	double			length = hypot(finish.x - start.x, finish.y - start.y);
+	unsigned		startVertex = closflt(start.x, start.y); 
+	const unsigned	endVertex = closflt(finish.x, finish.y); 
+	unsigned		stitchCount = 0, intermediateVertex = 0;
+	fPOINT*			indentedPoint = nullptr;
+	unsigned		up = 0, down = 0, iStitch = 0, iStep = 0;
+	fPOINT			localPoint = {}, step = {}, delta = {};
 
 	if (length < 5)
 		return 0;
@@ -1194,7 +1194,7 @@ void undclp() noexcept {
 }
 
 void fnund(unsigned find) {
-	float	savedStitchSize = UserStitchLength;
+	const float	savedStitchSize = UserStitchLength;
 
 	UnderlayVertices = insid();
 	UserStitchLength = 1e99;
@@ -1800,8 +1800,8 @@ int refcmp(const void *arg1, const void *arg2) {
 }
 #else
 int recmp(const void *arg1, const void *arg2) {
-	OREC record1 = **static_cast<OREC * const *>(arg1);
-	OREC record2 = **static_cast<OREC * const *>(arg2);
+	const OREC record1 = **static_cast<OREC * const *>(arg1);
+	const OREC record2 = **static_cast<OREC * const *>(arg2);
 
 	if (ColorOrder[record1.color] == ColorOrder[record2.color]) {
 		if (record1.form == record2.form) {
@@ -1817,8 +1817,8 @@ int recmp(const void *arg1, const void *arg2) {
 }
 
 int refcmp(const void *arg1, const void *arg2) {
-	OREC record1 = **static_cast<OREC * const *>(arg1);
-	OREC record2 = **static_cast<OREC * const *>(arg2);
+	const OREC record1 = **static_cast<OREC * const *>(arg1);
+	const OREC record2 = **static_cast<OREC * const *>(arg2);
 
 	if (record1.form == record2.form)
 		return gsl::narrow<int>(record1.type) - gsl::narrow<int>(record2.type);
@@ -1898,10 +1898,10 @@ double precjmps(const SRTREC* sortRecord) {
 unsigned duprecs(SRTREC* sortRecord) {
 
 	sortRecord->direction = 0;
-	unsigned	jumps0 = precjmps(sortRecord);
+	const unsigned	jumps0 = precjmps(sortRecord);
 
 	sortRecord->direction = 1;
-	unsigned	jumps1 = precjmps(sortRecord);
+	const unsigned	jumps1 = precjmps(sortRecord);
 
 	if (jumps0 < jumps1) {
 		sortRecord->direction = 0;
@@ -2105,9 +2105,9 @@ dutypx :
 	}
 #else
 	//correct
-	char result = 0;
-	DWORD bit = 0;
-	unsigned maskedAttribute = attribute & SRTYPMSK;
+	char			result = 0;
+	DWORD			bit = 0;
+	const unsigned	maskedAttribute = attribute & SRTYPMSK;
 
 	_BitScanReverse(&bit, maskedAttribute);
 
@@ -2135,13 +2135,13 @@ typedef struct _atfld {
 }ATFLD;
 
 void duatf(unsigned ind) {
-	char		attributeBuffer[256] = { 0 };
-	unsigned	attribute = StitchBuffer[ind].attribute;
-	ATFLD		attributeFields = { (attribute&COLMSK),
-									((attribute >> FRMSHFT)&FRMSK),
-									gsl::narrow<unsigned>(StitchTypes[dutyp(attribute)]),
-									((attribute >> LAYSHFT) & 7),
-									0};
+	char			attributeBuffer[256] = { 0 };
+	const unsigned	attribute = StitchBuffer[ind].attribute;
+	ATFLD			attributeFields = { (attribute&COLMSK),
+										((attribute >> FRMSHFT)&FRMSK),
+										gsl::narrow<unsigned>(StitchTypes[dutyp(attribute)]),
+										((attribute >> LAYSHFT) & 7),
+										0};
 
 	if (attribute & 0x80000000)
 		attributeFields.user = 1;
@@ -3332,9 +3332,10 @@ void drwtxtr() {
 	TXPNT		textureRecord = {};
 	POINT		point = {};
 	int			gridLineCount = 0;
-	double		editSpace = TextureScreen.areaHeight * 2 / (TextureScreen.spacing*(TextureScreen.lines + 2));
 	double		pixelSpace = 0.0;
 	float		extraWidth = 0.0;
+
+	const double editSpace = TextureScreen.areaHeight * 2 / (TextureScreen.spacing*(TextureScreen.lines + 2));
 
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	pixelSpace = static_cast<double>(StitchWindowClientRect.bottom) / StitchWindowClientRect.right;
@@ -3478,8 +3479,8 @@ bool txtclos(unsigned* closestTexturePoint) {
 }
 
 void tritx() noexcept {
-	POINT	line[2] = {};
-	int		size = IniFile.textureEditorSize << 2;
+	POINT		line[2] = {};
+	const int	size = IniFile.textureEditorSize << 2;
 
 	line[0].x = line[1].x = TextureCursorLocation.x;
 	line[0].y = TextureCursorLocation.y - size;
@@ -3918,7 +3919,8 @@ void deltx() {
 	unsigned		iBuffer = 0;
 	unsigned		iForm = 0;
 	bool			flag = false;
-	unsigned short	currentIndex = FormList[ClosestFormToCursor].fillInfo.texture.index;
+	
+	const unsigned short currentIndex = FormList[ClosestFormToCursor].fillInfo.texture.index;
 
 	if (TextureIndex && istx(ClosestFormToCursor) && SelectedForm->fillInfo.texture.count) {
 		// First check to see if the texture is shared between forms
@@ -4572,7 +4574,8 @@ txskp:;
 
 void setxt() {
 	const TXPNT *	currentFormTexture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
-	int				iTexturePoint = 0, iSegment = 0, count = SelectedForm->fillInfo.texture.count;
+	int				iTexturePoint = 0, iSegment = 0;
+	const int		count = SelectedForm->fillInfo.texture.count;
 
 	savtxt();
 	SelectedForm->wordParam = 0;
@@ -4885,7 +4888,7 @@ void txdun() {
 	HANDLE			handle = {};
 	unsigned long	bytesWritten = 0;
 	int				iHistory = 0;
-	char			signature[4] = "txh";
+	const char		signature[4] = "txh";
 
 	if (TextureHistory[0].count) {
 		if (txnam(name, sizeof(name))) {
@@ -4950,8 +4953,8 @@ void redtx() {
 }
 
 void setangf(double angle) {
-	unsigned	iVertex = 0;
-	double		savedAngle = RotationAngle;
+	unsigned		iVertex = 0;
+	const double	savedAngle = RotationAngle;
 
 	RotationAngle = angle;
 	MoveMemory(&AngledForm, SelectedForm, sizeof(FRMHED));
@@ -5317,7 +5320,7 @@ void reptx() {
 }
 
 void repar() {
-	unsigned	repairType = frmchkfn();
+	const unsigned	repairType = frmchkfn();
 
 	savdo();
 	RepairString = MsgBuffer;
