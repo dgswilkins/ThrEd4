@@ -1,5 +1,9 @@
 #pragma once
+#include <CppCoreCheck\warnings.h>
+#pragma warning( push )  
+#pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #include <boost/dynamic_bitset.hpp>
+#pragma warning( pop )  
 
 template <typename Block = unsigned, typename Allocator = std::allocator<unsigned>>
 class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator> {
@@ -16,7 +20,7 @@ public:
 	*/
 
 	unsigned getFirst() {
-		unsigned foundBit = super::find_first();
+		const unsigned foundBit = super::find_first();
 		if (foundBit != super::npos) {
 			super::reset(foundBit);
 		}

@@ -7,8 +7,12 @@
 #include <float.h>
 #include <tchar.h>
 #include <bitset>
+#include <CppCoreCheck\warnings.h>
+#pragma warning( push )  
+#pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #include <gsl/gsl>
 #include <boost/dynamic_bitset.hpp>
+#pragma warning( pop )  
 
 #ifdef ALLOCFAILURE
 #include <new.h>
@@ -17,20 +21,19 @@
 #include "resource.h"
 #include "thred.h"
 
+// Do the type punning while ensuring that the returned pointer is non_null
+// use the encapsulation recommended in I.30 (https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#i30-encapsulate-rule-violations)
 template <class T2, class T1>
 inline _Ret_notnull_ T2 convert_ptr(T1 *pointer)
 {
-	union
+	[[gsl::suppress(26474)]]
 	{
-		T1 *in;
-		T2 out;
-	} result = { pointer };
-
-	if (result.out) {
-		return result.out;
-	}
-	else {
-		throw;
+		if (pointer) {
+			return static_cast<T2>(static_cast<void *>(pointer));
+		}
+		else {
+			throw;
+		}
 	}
 }
 
@@ -4597,7 +4600,7 @@ void movmap(unsigned cnt, unsigned char *buffer) noexcept {
 	unsigned char*	destination = buffer;
 
 	for (unsigned i = 0; i < cnt; i++) {
-		*(static_cast<unsigned *>(static_cast<void *>(destination))) = *(source++);
+		*(convert_ptr<unsigned *>(destination)) = *(source++);
 
 		destination += 3;
 	}
@@ -4642,12 +4645,15 @@ void savmap() {
 }
 
 HBITMAP getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO *pbmi, _Outptr_ unsigned int **ppvBits) {
-	[[gsl::suppress(type.1)]]HBITMAP bitmap = CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void **>(ppvBits), 0, 0);
-	if (*ppvBits != nullptr) {
-		return bitmap;
-	}
-	else {
-		throw;
+	[[gsl::suppress(26490)]]
+	{
+		HBITMAP bitmap = CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void **>(ppvBits), 0, 0);
+		if (*ppvBits != nullptr) {
+			return bitmap;
+		}
+		else {
+			throw;
+		}
 	}
 }
 
@@ -4729,11 +4735,14 @@ void bfil() {
 			BitmapInfoHeader.biBitCount = 32;
 			BitmapInfoHeader.biCompression = BI_RGB;
 			BitmapInfo.bmiHeader = BitmapInfoHeader;
-			bitmap = getBitmap(BitmapDC, &BitmapInfo, &bits);
-			//Synchronize
-			GdiFlush();
-			for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
-					bitlin(&monoBitmapData[iHeight * bitmapWidthBytes], &bits[iHeight * BitmapWidth], background, foreground);
+			[[gsl::suppress(26413)]]
+			{
+				bitmap = getBitmap(BitmapDC, &BitmapInfo, &bits);
+				//Synchronize
+				GdiFlush();
+				for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
+						bitlin(&monoBitmapData[iHeight * bitmapWidthBytes], &bits[iHeight * BitmapWidth], background, foreground);
+				}
 			}
 			deviceContext = CreateCompatibleDC(StitchWindowDC);
 			if (bitmap && deviceContext) {
@@ -4780,7 +4789,7 @@ void prtred() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-inline unsigned dtrn(const DSTREC* dpnt) noexcept {
+inline unsigned dtrn(DSTREC* dpnt) noexcept {
 
 	return *(convert_ptr<unsigned int *>(dpnt));
 }
@@ -7560,6 +7569,7 @@ void unbsho() {
 	}
 }
 
+[[gsl::suppress(con.3)]]
 bool oldwnd(HWND window) noexcept {
 
 	unsigned	iWindow = 0, iColor = 0;
@@ -20774,16 +20784,20 @@ void ritloc() {
 
 	error = _dupenv_s(&environment, &length, "COMSPEC");
 
-	if (error) {
-		if (environment) {
-			free(environment);
+	// We have to use free here because of _dupenv_s, so suppress the warning
+	[[gsl::suppress(26408)]]
+	{
+		if (error) {
+			if (environment) {
+				free(environment);
+			}
+			return;
 		}
-		return;
-	}
-	else {
-		if (environment) {
-			strcpy_s(lockFileName, environment);
-			free(environment);
+		else {
+			if (environment) {
+				strcpy_s(lockFileName, environment);
+				free(environment);
+			}
 		}
 	}
 	environment = strrchr(lockFileName, '\\') + 1;

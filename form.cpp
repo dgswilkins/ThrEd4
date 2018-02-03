@@ -6,7 +6,11 @@
 #include <stdio.h>
 #include <math.h>
 #include <tchar.h>
+#include <CppCoreCheck\warnings.h>
+#pragma warning( push )  
+#pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #include <gsl/gsl>
+#pragma warning( pop )  
 
 #include "lang.h"
 #include "resource.h"
