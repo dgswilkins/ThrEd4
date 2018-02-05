@@ -30,20 +30,20 @@ public:
 	inline void set() { mask_.set(); }
 	inline void set(const EnumType i_key, bool i_val = true) { mask_.set(static_cast<typename std::underlying_type<EnumType>::type>(i_key), i_val); }
 	inline bool testAndSet(const EnumType i_key, bool i_val = true) {
-		bool val = mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		const bool val = mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		mask_.set(static_cast<typename std::underlying_type<EnumType>::type>(i_key), i_val);
 		return val;  }
 	inline void reset() noexcept { mask_.reset(); }
 	inline void reset(const EnumType i_key) { mask_.reset(static_cast<typename std::underlying_type<EnumType>::type>(i_key)); }
 	inline bool testAndReset(const EnumType i_key) {
-		bool val = mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		const bool val = mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		mask_.reset(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		return val;
 	}
 	inline void flip() { mask_.flip(); }
 	inline void flip(const EnumType i_key) { mask_.flip(static_cast<typename std::underlying_type<EnumType>::type>(i_key)); }
 	inline bool testAndFlip(const EnumType i_key) {
-		bool val = mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		const bool val = mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		mask_.flip(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		return val;
 	}

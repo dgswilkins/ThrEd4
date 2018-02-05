@@ -2454,7 +2454,7 @@ void selin(unsigned start, unsigned end, HDC dc) {
 
 	unsigned		iStitch = 0, swap = 0;
 	double			coordinate = 0.0;
-	long			hi = StitchWindowClientRect.bottom;
+	const long		hi = StitchWindowClientRect.bottom;
 
 	SelectObject(dc, GroupSelectPen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
@@ -2837,7 +2837,7 @@ HBRUSH nuBrush(HBRUSH brush, COLORREF color) noexcept {
 
 void box(unsigned iNearest, HDC dc) noexcept {
 
-	long boxWidth = BoxOffset[iNearest];
+	const long boxWidth = BoxOffset[iNearest];
 	POINT line[5] = {};
 
 	line[0].x = NearestPixel[iNearest].x - boxWidth;
@@ -4499,7 +4499,7 @@ void bak() {
 
 void bitsiz() noexcept {
 
-	double	screenAspectRatio = static_cast<double>(UnzoomedRect.x) / UnzoomedRect.y;
+	const double	screenAspectRatio = static_cast<double>(UnzoomedRect.x) / UnzoomedRect.y;
 	const double	bitmapAspectRatio = static_cast<double>(BitmapWidth) / BitmapHeight;
 
 	if (bitmapAspectRatio > screenAspectRatio) {
@@ -4554,7 +4554,7 @@ void bitlin(const unsigned char* source, unsigned* destination, COLORREF foregro
 			*destination++ = bits[bitOffset ^ 7] ? foreground : background;
 		}
 	}
-	if (unsigned int final = (BitmapWidth % 8)) {
+	if (const unsigned int final = (BitmapWidth % 8)) {
 		std::bitset<8> bits(source[i]);
 		for (unsigned bitOffset = final; bitOffset < 8; bitOffset++) {
 			*destination++ = bits[bitOffset ^ 7] ? foreground : background;
@@ -7343,7 +7343,7 @@ void istch() {
 
 void cros(unsigned iStitch) noexcept {
 
-	long	armLength = BoxOffset[0];
+	const long	armLength = BoxOffset[0];
 
 	stch2px1(iStitch);
 	InsertLine[0].x = StitchCoordinatesPixels.x - armLength;
@@ -7749,7 +7749,7 @@ void unsel() {
 void clpbox() {
 
 	SIZE	adjustedSize = {};
-	double	ratio = static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
+	const double	ratio = static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
 
 	px2stch();
 	if (SelectedPoint.x + ClipRectSize.cx > UnzoomedRect.x)
@@ -7803,7 +7803,7 @@ void lodclp(unsigned iStitch) {
 
 void rSelbox() {
 
-	double	ratio = static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
+	const double	ratio = static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
 	SIZE	adjustedSelectSize = { static_cast<LONG>(SelectBoxSize.cx*ratio + 0.5),
 								   static_cast<LONG>(SelectBoxSize.cy*ratio + 0.5) };
 
@@ -7847,7 +7847,7 @@ void setbak(unsigned penWidth) noexcept {
 void stchbox(unsigned iStitch, HDC dc) noexcept {
 
 	POINT		line[5] = {};
-	unsigned	layer = (StitchBuffer[iStitch].attribute&LAYMSK) >> LAYSHFT;
+	const unsigned	layer = (StitchBuffer[iStitch].attribute&LAYMSK) >> LAYSHFT;
 
 	if (!ActiveLayer || !layer || layer == ActiveLayer) {
 
@@ -7907,8 +7907,8 @@ void rotang(dPOINT unrotatedPoint, POINT* rotatedPoint) {
 
 	double	distanceToCenter = 0.0, newAngle = 0.0;
 	dPOINT	point = {};
-	long	dx = unrotatedPoint.x - RotationCenter.x; 
-	long	dy = unrotatedPoint.y - RotationCenter.y;
+	const long	dx = unrotatedPoint.x - RotationCenter.x; 
+	const long	dy = unrotatedPoint.y - RotationCenter.y;
 		
 	if (dx) {
 
@@ -7932,8 +7932,8 @@ void rotang(dPOINT unrotatedPoint, POINT* rotatedPoint) {
 void rotang1(fPOINTATTR unrotatedPoint, fPOINT* rotatedPoint) noexcept {
 
 	double	distanceToCenter = 0.0, newAngle = 0.0;
-	double	dx = unrotatedPoint.x - RotationCenter.x; 
-	double	dy = unrotatedPoint.y - RotationCenter.y;
+	const double	dx = unrotatedPoint.x - RotationCenter.x; 
+	const double	dy = unrotatedPoint.y - RotationCenter.y;
 	
 	if (dx) {
 
@@ -7959,8 +7959,8 @@ void rotang1(fPOINTATTR unrotatedPoint, fPOINT* rotatedPoint) noexcept {
 void rotangf(fPOINT unrotatedPoint, fPOINT* rotatedPoint) noexcept {
 
 	double	distanceToCenter = 0.0, newAngle = 0.0;
-	double	dx = unrotatedPoint.x - RotationCenter.x; 
-	double	dy = unrotatedPoint.y - RotationCenter.y;
+	const double	dx = unrotatedPoint.x - RotationCenter.x; 
+	const double	dy = unrotatedPoint.y - RotationCenter.y;
 
 	if (dx) {
 
@@ -7987,8 +7987,8 @@ void rotpix(POINT unrotatedPoint, POINT* rotatedPoint) {
 	//won't handle vertical lines
 
 	double	distanceToCenter = 0.0, newAngle = 0.0;
-	long	dx = unrotatedPoint.x - RotationCenterPixels.x; 
-	long	dy = unrotatedPoint.y - RotationCenterPixels.y;
+	const long	dx = unrotatedPoint.x - RotationCenterPixels.x; 
+	const long	dy = unrotatedPoint.y - RotationCenterPixels.y;
 
 	distanceToCenter = hypot(dx, dy);
 	newAngle = atan2(dy, dx);
@@ -8000,8 +8000,8 @@ void rotpix(POINT unrotatedPoint, POINT* rotatedPoint) {
 void rotflt(fPOINT* point) noexcept {
 
 	double	len = 0.0, ang0 = 0.0;
-	double	dx = point->x - RotationCenter.x; 
-	double	dy = point->y - RotationCenter.y;
+	const double	dx = point->x - RotationCenter.x; 
+	const double	dy = point->y - RotationCenter.y;
 
 	if (dx) {
 
@@ -8027,8 +8027,8 @@ void rotflt(fPOINT* point) noexcept {
 void rotstch(fPOINTATTR* stitch) noexcept {
 
 	double	distanceToCenter = 0.0, newAngle = 0.0;
-	double	dx = stitch->x - RotationCenter.x; 
-	double	dy = stitch->y - RotationCenter.y;
+	const double	dx = stitch->x - RotationCenter.x; 
+	const double	dy = stitch->y - RotationCenter.y;
 
 	if (dx) {
 
@@ -9172,7 +9172,7 @@ unsigned duth(const TCHAR* name) noexcept {
 
 void duver(TCHAR* name) noexcept {
 
-	unsigned	lastChar = duth(name);
+	const unsigned	lastChar = duth(name);
 	int			version = 0;
 
 	if (lastChar) {
@@ -9837,7 +9837,7 @@ void drwmrk(HDC dc) noexcept {
 
 	POINT	markCoordinates = {};
 	POINT	markLine[2] = {};
-	long	markOffset = 6;
+	const long	markOffset = 6;
 
 	sCor2px(ZoomMarkPoint, &markCoordinates);
 	SelectObject(dc, ZoomMarkPen);
@@ -12736,9 +12736,8 @@ void retrac() {
 
 void setgrd(COLORREF color) {
 
-	unsigned	iCode = 0;
-	GRDCOD		gridCodes[] = {
-
+	unsigned		iCode = 0;
+	const GRDCOD	gridCodes[] = {
 		ID_GRDHI,HIGRD,
 		ID_GRDMED,MEDGRD,
 		ID_GRDEF,DEFGRD,
@@ -17803,7 +17802,7 @@ didskip:;
 		if (chkMsgs(Msg.pt, ThreadSizeWin[0], ThreadSizeWin[15])) {
 
 			if (Msg.message == WM_LBUTTONDOWN) {
-				TCHAR*	str[] = { "30","40","60" };
+				const TCHAR*	const str[] = { "30","40","60" };
 
 				savdo();
 				ThreadSizeSelected = VerticalIndex;
@@ -21278,7 +21277,7 @@ void redini() {
 		if (IniFile.stitchSpace)
 			LineSpacing = IniFile.stitchSpace;
 		{
-			EnumMap<UserFlag> tmp(IniFile.userFlagMap);
+			const EnumMap<UserFlag> tmp(IniFile.userFlagMap);
 			UserFlagMap = tmp;
 		}
 		if (IniFile.borderWidth)
@@ -21445,7 +21444,7 @@ void init() {
 	RECT			tRct = {};
 	RECT			wrct = {};
 	HDC				deviceContext = GetDC(NULL);
-	unsigned long	screenHalfWidth = (GetDeviceCaps(deviceContext, HORZRES))>>1;
+	const unsigned long	screenHalfWidth = (GetDeviceCaps(deviceContext, HORZRES))>>1;
 	TCHAR*			buttonText = nullptr;
 
 	ReleaseDC(NULL, deviceContext);
@@ -21689,7 +21688,7 @@ void init() {
 }
 
 COLORREF defTxt(unsigned iColor) noexcept {
-	std::bitset<16>	textColorMap(0xbaf);	//bitmap for color number colors chosen for contrast against the default background colors
+	const std::bitset<16>	textColorMap(0xbaf);	//bitmap for color number colors chosen for contrast against the default background colors
 	const unsigned int white = 0xffffff;
 	const unsigned int black = 0;
 	return textColorMap.test(iColor) ? white : black;
@@ -21930,7 +21929,7 @@ void dugrid() {
 
 void rint() noexcept {
 
-	unsigned	size = StitchWindowClientRect.right*StitchWindowClientRect.bottom;
+	const unsigned	size = StitchWindowClientRect.right*StitchWindowClientRect.bottom;
 
 	CellSize.x = (ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
 	CellSize.y = (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom;
@@ -21959,7 +21958,7 @@ void drwStch() {
 	double		dub6 = 0.0;
 	fPOINTATTR*	currentStitches = nullptr;
 	POINT		stitchLine[2] = {};
-	long		maxYcoord = DrawItem->rcItem.bottom;
+	const long	maxYcoord = DrawItem->rcItem.bottom;
 	long		xDelta = 0, yDelta = 0, gapToEdge = 0;
 	HDC			deviceContext = {};
 
@@ -22525,10 +22524,10 @@ bakskp:;
 
 void durct(unsigned shift, RECT traceControlRect, RECT* traceHighMask, RECT* traceMiddleMask, RECT* traceLowMask) {
 
-	unsigned	lowerColor = (UpPixelColor >> shift) & 0xff; 
-	unsigned	upperColor = (DownPixelColor >> shift) & 0xff; 
-	unsigned	controlHeight = traceControlRect.bottom - traceControlRect.top;
-	double		ratio = 0.0;
+	const unsigned	lowerColor = (UpPixelColor >> shift) & 0xff; 
+	const unsigned	upperColor = (DownPixelColor >> shift) & 0xff; 
+	const unsigned	controlHeight = traceControlRect.bottom - traceControlRect.top;
+	double			ratio = 0.0;
 
 	
 	

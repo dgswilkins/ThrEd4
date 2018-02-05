@@ -1072,17 +1072,16 @@ void px2stchf(POINT screen, fPOINT* stitchPoint) noexcept {
 }
 
 void frmlin(const fPOINT* vertices, unsigned vertexCount) noexcept {
+		unsigned	iVertex = 0;
 
-	unsigned	iVertex = 0;
-
-	if (VertexCount) {
-		for (iVertex = 0; iVertex < vertexCount; iVertex++) {
-			FormLines[iVertex].x = (vertices[iVertex].x - ZoomRect.left)*ZoomRatio.x;
-			FormLines[iVertex].y = StitchWindowClientRect.bottom - (vertices[iVertex].y - ZoomRect.bottom)*ZoomRatio.y;
+		if (VertexCount) {
+			for (iVertex = 0; iVertex < vertexCount; iVertex++) {
+				FormLines[iVertex].x = (vertices[iVertex].x - ZoomRect.left)*ZoomRatio.x;
+				FormLines[iVertex].y = StitchWindowClientRect.bottom - (vertices[iVertex].y - ZoomRect.bottom)*ZoomRatio.y;
+			}
+			FormLines[iVertex].x = (vertices[0].x - ZoomRect.left)*ZoomRatio.x;
+			FormLines[iVertex].y = StitchWindowClientRect.bottom - (vertices[0].y - ZoomRect.bottom)*ZoomRatio.y;
 		}
-		FormLines[iVertex].x = (vertices[0].x - ZoomRect.left)*ZoomRatio.x;
-		FormLines[iVertex].y = StitchWindowClientRect.bottom - (vertices[0].y - ZoomRect.bottom)*ZoomRatio.y;
-	}
 }
 
 void dufrm() noexcept {
@@ -1216,7 +1215,7 @@ void selsqr(POINT controlPoint, HDC dc) noexcept {
 
 void frmsqr0(POINT controlPoint) noexcept {
 	POINT		line[5] = {};
-	unsigned	offset = IniFile.formBoxSizePixels;
+	const unsigned	offset = IniFile.formBoxSizePixels;
 
 	if (offset) {
 		line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
@@ -3613,8 +3612,8 @@ int sqcomp(const void *arg1, const void *arg2) {
 #else
 int sqcomp(const void *arg1, const void *arg2) noexcept {
 
-	SMALPNTL	lineEnd1 = *(*static_cast<const SMALPNTL * const *>(arg1));
-	SMALPNTL	lineEnd2 = *(*static_cast<const SMALPNTL * const *>(arg2));
+	const SMALPNTL	lineEnd1 = *(*static_cast<const SMALPNTL * const *>(arg1));
+	const SMALPNTL	lineEnd2 = *(*static_cast<const SMALPNTL * const *>(arg2));
 
 	if (lineEnd1.line == lineEnd2.line) {
 		if (lineEnd1.group == lineEnd2.group) {
@@ -3779,7 +3778,6 @@ void lcon() {
 				PathMap[iPath].node = tempPathMap[iPath].node;
 				PathMap[iPath].nextGroup = tempPathMap[iPath].nextGroup;
 			}
-			delete[] tempPathMap;
 			//find the leftmost region
 			startGroup = 0xffffffff; leftRegion = 0;
 			for (iRegion = 0; iRegion < RegionCount; iRegion++) {
@@ -3860,6 +3858,7 @@ void lcon() {
 
 seqskip : ;
 #endif
+		delete[] tempPathMap;
 		delete[] SequencePath;
 		delete[] SortedLines;
 		delete[] LineEndpoints;
@@ -4063,7 +4062,7 @@ void fnvrt() {
 			maximumLines = iLineCounter;
 	}
 	maximumLines = (maximumLines >> 1);
-	LineEndpoints = new SMALPNTL[fillLineCount + 1]();
+	LineEndpoints = new SMALPNTL[fillLineCount + 1](); //deleted in lcon
 	StitchLineCount = 0; LineGroupIndex = 0;
 	groupIndex = new unsigned[fillLineCount + 2]();
 	GroupIndexCount = 0;
@@ -10291,7 +10290,7 @@ void picot() {
 
 void contf() {
 
-	unsigned	start = SelectedForm->angleOrClipData.guide.start;
+	const unsigned	start = SelectedForm->angleOrClipData.guide.start;
 	const unsigned	finish = SelectedForm->angleOrClipData.guide.finish;
 	const unsigned	lowVertexIndex = start;
 	const unsigned	highVertexIndex = VertexCount - start - 1;
@@ -11645,8 +11644,8 @@ clpcmpx :
 	}
 #else
 
-	VCLPX	vclpx1 = *static_cast<const VCLPX *>(arg1);
-	VCLPX	vclpx2 = *static_cast<const VCLPX *>(arg2);
+	const VCLPX	vclpx1 = *static_cast<const VCLPX *>(arg1);
+	const VCLPX	vclpx2 = *static_cast<const VCLPX *>(arg2);
 
 	if (vclpx1.segment < vclpx2.segment)
 		return -1;
@@ -11895,7 +11894,8 @@ void clpcon() {
 	float		formNegativeOffset = 0.0;
 	unsigned	clipGridOffset = 0;
 	double		clipVerticalOffset = 0.0;
-	TXPNT*		texture = new TXPNT[1]();
+	TXPNT*		tmpTexture = new TXPNT[1]();
+	TXPNT*		texture = tmpTexture;
 	bool		flag = false;
 	unsigned*	iclpx = nullptr;			//indices into region crossing data for vertical clipboard fills
 	unsigned	clplim = 0;			//vertical clipboard search limit
@@ -12013,7 +12013,6 @@ void clpcon() {
 		if (StateMap.test(StateFlag::TXFIL)) {
 			textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
 			ClipStitchCount = TextureSegments[textureLine].stitchCount;
-			if (!flag) { delete[] texture; }
 			texture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + TextureSegments[textureLine].line];
 			flag = true;
 			LineSegmentStart.x = pasteLocation.x;
@@ -12235,7 +12234,7 @@ clp1skp:;
 	}
 	delete[] ClipStitchPoints;
 	delete[] ClipSegments;
-	if (!flag) { delete[] texture; }
+	delete[] tmpTexture;
 }
 
 void vrtsclp() {
@@ -12581,7 +12580,7 @@ void col2frm() {
 	unsigned*	underlayColorHistogram = nullptr;
 	unsigned	iStitch = 0, iForm = 0, iColor = 0, formColorCode = 0, count = 0, majorityColor = 0;
 	unsigned	startColorOffset = 0, endColorOffset = 0, colorChangedCount = 0; 
-	unsigned	formColorPermutations = FormIndex << 4; // total number of form and color combinations
+	const unsigned	formColorPermutations = FormIndex << 4; // total number of form and color combinations
 	TCHAR		buffer[HBUFSIZ] = { 0 };
 
 	
@@ -12857,17 +12856,17 @@ fxlab:;
 
 void duchfn(unsigned start, unsigned finish) noexcept {
 
-	fPOINT		chainPoint[5] = {};
-	dPOINT		delta = { (ChainEndPoints[finish].x - ChainEndPoints[start].x),
-						  (ChainEndPoints[finish].y - ChainEndPoints[start].y) };
-	dPOINT		lengthDelta = { (delta.x*SelectedForm->edgeStitchLen),
-								(delta.y*SelectedForm->edgeStitchLen) };
-	float		middleXcoord = ChainEndPoints[start].x + lengthDelta.x;
-	float		middleYcoord = ChainEndPoints[start].y + lengthDelta.y;
-	unsigned	iChain = 0;
-	double		angle = atan2(delta.y, delta.x) + PI / 2;
-	dPOINT		offset = { (cos(angle)*SelectedForm->borderSize),
-						   (sin(angle)*SelectedForm->borderSize) };
+	unsigned		iChain = 0;
+	fPOINT			chainPoint[5] = {};
+	dPOINT			delta = { (ChainEndPoints[finish].x - ChainEndPoints[start].x),
+							  (ChainEndPoints[finish].y - ChainEndPoints[start].y) };
+	dPOINT			lengthDelta = { (delta.x*SelectedForm->edgeStitchLen),
+									(delta.y*SelectedForm->edgeStitchLen) };
+	const double	angle = atan2(delta.y, delta.x) + PI / 2;
+	dPOINT			offset = {	(cos(angle)*SelectedForm->borderSize),
+								(sin(angle)*SelectedForm->borderSize) };
+	const float		middleXcoord = ChainEndPoints[start].x + lengthDelta.x;
+	const float		middleYcoord = ChainEndPoints[start].y + lengthDelta.y;
 
 	chainPoint[0].x = ChainEndPoints[start].x;
 	chainPoint[0].y = ChainEndPoints[start].y;
@@ -13061,13 +13060,13 @@ void crop() {
 
 void xclpfn(unsigned start, unsigned finish) {
 
-	unsigned	iPoint = 0;
-	dPOINT		delta = { (ChainEndPoints[finish].x - ChainEndPoints[start].x),
-						  (ChainEndPoints[finish].y - ChainEndPoints[start].y) };
-	double		length = hypot(delta.x, delta.y);
-	double		ratio = length / ClipRectSize.cx;
-	fPOINT*		points = new fPOINT[ClipStitchCount];
-	
+	dPOINT			delta = {	(ChainEndPoints[finish].x - ChainEndPoints[start].x),
+								(ChainEndPoints[finish].y - ChainEndPoints[start].y) };
+	unsigned		iPoint = 0;
+	const double	length = hypot(delta.x, delta.y);
+	const double	ratio = length / ClipRectSize.cx;
+	fPOINT*			points = new fPOINT[ClipStitchCount];
+
 	RotationAngle = atan2(delta.y, delta.x);
 	for (iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
 		points[iPoint].x = TempClipPoints[iPoint].x*ratio;
