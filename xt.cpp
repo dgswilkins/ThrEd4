@@ -5,7 +5,11 @@
 #include <stdio.h>
 #include <math.h>
 #include <tchar.h>
+#include <CppCoreCheck\warnings.h>
+#pragma warning( push )  
+#pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #include <gsl/gsl>
+#pragma warning( pop )  
 
 #include "lang.h"
 #include "resource.h"
@@ -1913,49 +1917,49 @@ unsigned duprecs(SRTREC* sortRecord) {
 
 #ifdef _DEBUG
 
-void dmprec(OREC** stitchRegion, unsigned count) noexcept {
-	unsigned iRegion;
+void dmprec(const OREC* stitchRegion, unsigned count) noexcept {
+		unsigned iRegion;
 
-	for (iRegion = 0; iRegion < count; iRegion++) {
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%4d off: %4d at: %08x frm: %4d typ: %d col: %2d st: %5d fin: %5d\n",
-			iRegion,
-			stitchRegion[iRegion] - stitchRegion[0],
-			StitchBuffer[stitchRegion[iRegion]->start].attribute,
-			stitchRegion[iRegion]->form,
-			stitchRegion[iRegion]->type,
-			stitchRegion[iRegion]->color,
-			stitchRegion[iRegion]->start,
-			stitchRegion[iRegion]->finish);
-		OutputDebugString(MsgBuffer);
-	}
+		for (iRegion = 0; iRegion < count; iRegion++) {
+			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%4d off: %4d at: %08x frm: %4d typ: %d col: %2d st: %5d fin: %5d\n",
+				iRegion,
+				&stitchRegion[iRegion] - &stitchRegion[0],
+				StitchBuffer[stitchRegion[iRegion].start].attribute,
+				stitchRegion[iRegion].form,
+				stitchRegion[iRegion].type,
+				stitchRegion[iRegion].color,
+				stitchRegion[iRegion].start,
+				stitchRegion[iRegion].finish);
+			OutputDebugString(MsgBuffer);
+		}
 }
 #endif
 
-bool srtchk(OREC** stitchRegion, unsigned count, unsigned* badForm) noexcept {
+bool srtchk(const OREC* stitchRegion, unsigned count, unsigned* badForm) noexcept {
 
 	unsigned	iRegion = 1;
-	unsigned	form = stitchRegion[0]->form; 
-	unsigned	color = stitchRegion[0]->color;
-	FRMHED*		formHeader = nullptr;
+		unsigned	form = stitchRegion[0].form;
+		unsigned	color = stitchRegion[0].color;
+		FRMHED*		formHeader = nullptr;
 
-	for (iRegion = 1; iRegion < count; iRegion++) {
-		if (stitchRegion[iRegion]->form == form) {
-			if (ColorOrder[stitchRegion[iRegion]->color] < ColorOrder[color]) {
-				formHeader = &FormList[form];
-				if (formHeader->fillType == FTHF && formHeader->extendedAttribute&AT_FTHBLND && stitchRegion[iRegion]->color == formHeader->fillColor)
-					continue;
-				*badForm = iRegion;
-				return 0;
+		for (iRegion = 1; iRegion < count; iRegion++) {
+			if (stitchRegion[iRegion].form == form) {
+				if (ColorOrder[stitchRegion[iRegion].color] < ColorOrder[color]) {
+					formHeader = &FormList[form];
+					if (formHeader->fillType == FTHF && formHeader->extendedAttribute&AT_FTHBLND && stitchRegion[iRegion].color == formHeader->fillColor)
+						continue;
+						*badForm = iRegion;
+					return 0;
+				}
+				else
+					color = stitchRegion[iRegion].color;
 			}
-			else
-				color = stitchRegion[iRegion]->color;
+			else {
+				color = stitchRegion[iRegion].color;
+				form = stitchRegion[iRegion].form;
+			}
 		}
-		else {
-			color = stitchRegion[iRegion]->color;
-			form = stitchRegion[iRegion]->form;
-		}
-	}
-	return 1;
+		return 1;
 }
 
 void fsort() {
@@ -2007,9 +2011,9 @@ void fsort() {
 	qsort(PRecs, lastRegion, sizeof(OREC *), recmp);
 	qsort(PFRecs, lastRegion, sizeof(OREC *), refcmp);
 #ifdef _DEBUG
-	dmprec(PRecs, lastRegion);
+	dmprec(*PRecs, lastRegion);
 #endif
-	if (srtchk(PFRecs, lastRegion, &badForm)) {
+	if (srtchk(*PFRecs, lastRegion, &badForm)) {
 		stitchRange = new RANGE[lastRegion];
 		stitchRange[0].start = 0;
 		attribute = PRecs[0]->color;
