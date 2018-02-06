@@ -1,11 +1,13 @@
 #include <windows.h>
 #include <stdio.h>
 #include <tchar.h>
+#include <htmlhelp.h>
+#include <locale.h>
+#include <vector>
+
 #include "lang.h"
 #include "resource.h"
 #include "thred.h"
-#include <htmlhelp.h>
-#include <locale.h>
 
 extern void				ispcdclp();
 extern void				movStch();
@@ -343,64 +345,61 @@ void lodstr() {
 }
 
 void shoMsg(TCHAR* string) {
+	if (string) {
+		SIZE		textSize = {}, messageSize = {};
+		unsigned	count = 0, iString = 0, index = 0, iLength = 0, previousStringLength = 0;
+		long		offset = 0;
 
-	SIZE		textSize = {}, messageSize = {};
-	TCHAR**		strings = nullptr;
-	unsigned*	lengths = nullptr;
-	unsigned	count = 0, iString = 0, index = 0, iLength = 0, previousStringLength = 0;
-	long		offset = 0;
+		while (string[iString]) {
 
-	while (string[iString]) {
-
-		if (string[iString++] == 10)
-			count++;
-	}
-	count++;
-	strings = new TCHAR*[count + 1];
-	lengths = new unsigned[count + 1];
-	iString = 0;
-	strings[0] = string;
-	while (string[iString]) {
-
-		if (string[iString] == 10) {
-
-			lengths[iLength] = iString - previousStringLength;
-			strings[++iLength] = &string[iString++];
-			previousStringLength = iString;
+			if (string[iString++] == 10)
+				count++;
 		}
-		else
-			iString++;
-	}
-	lengths[iLength] = iString - previousStringLength;
-	iLength++;
-	textSize.cx = textSize.cy = messageSize.cy = messageSize.cx = 0;
-	for (index = 0; index < iLength; index++) {
+		count++;
+		std::vector<TCHAR*> strings(count + 1);
+		std::vector<unsigned> lengths(count + 1);
+		iString = 0;
+		strings[0] = string;
+		while (string[iString]) {
 
-		GetTextExtentPoint32(StitchWindowMemDC, strings[index], lengths[index], &textSize);
-		if (textSize.cx > messageSize.cx)
-			messageSize.cx = textSize.cx;
-		if (textSize.cy > messageSize.cy)
-			messageSize.cy = textSize.cy;
+			if (string[iString] == 10) {
+
+				lengths[iLength] = iString - previousStringLength;
+				strings[++iLength] = &string[iString++];
+				previousStringLength = iString;
+			}
+			else
+				iString++;
+		}
+		lengths[iLength] = iString - previousStringLength;
+		iLength++;
+		textSize.cx = textSize.cy = messageSize.cy = messageSize.cx = 0;
+		for (index = 0; index < iLength; index++) {
+
+			GetTextExtentPoint32(StitchWindowMemDC, strings[index], lengths[index], &textSize);
+			if (textSize.cx > messageSize.cx)
+				messageSize.cx = textSize.cx;
+			if (textSize.cy > messageSize.cy)
+				messageSize.cy = textSize.cy;
+		}
+		messageSize.cy *= count;
+		if (StateMap.testAndReset(StateFlag::MSGOF))
+			offset = PreferenceWindowWidth + 6;
+		else
+			offset = 3;
+		MsgWindow = CreateWindow(
+			"STATIC",
+			string,
+			SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+			offset,
+			3,
+			messageSize.cx + 20,
+			messageSize.cy + 6,
+			MainStitchWin,
+			NULL,
+			ThrEdInstance,
+			NULL);
 	}
-	messageSize.cy *= count;
-	if (StateMap.testAndReset(StateFlag::MSGOF))
-		offset = PreferenceWindowWidth + 6;
-	else
-		offset = 3;
-	MsgWindow = CreateWindow(
-		"STATIC",
-		string,
-		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		offset,
-		3,
-		messageSize.cx + 20,
-		messageSize.cy + 6,
-		MainStitchWin,
-		NULL,
-		ThrEdInstance,
-		NULL);
-	delete[] strings;
-	delete[] lengths;
 }
 
 void tabmsg(unsigned code) {
@@ -550,24 +549,25 @@ void datmsg(unsigned code) {
 	TCHAR*	pchr;
 
 	pchr = MsgBuffer;
-	if (code&BADFLT) {
-		LoadString(ThrEdInstance, IDS_BADFLT, pchr, HBUFSIZ);
-		pchr = &pchr[strlen(pchr)];
+	if (pchr) {
+		if (code&BADFLT) {
+			LoadString(ThrEdInstance, IDS_BADFLT, pchr, HBUFSIZ);
+			pchr = &pchr[strlen(pchr)];
+		}
+		if (code&BADCLP) {
+			LoadString(ThrEdInstance, IDS_BADCLP, pchr, HBUFSIZ);
+			pchr = &pchr[strlen(pchr)];
+		}
+		if (code&BADSAT) {
+			LoadString(ThrEdInstance, IDS_BADSAT, pchr, HBUFSIZ);
+			pchr = &pchr[strlen(pchr)];
+		}
+		if (code&BADTX) {
+			LoadString(ThrEdInstance, IDS_BADTX, pchr, HBUFSIZ);
+			pchr = &pchr[strlen(pchr)];
+		}
+		pchr--;
+		*pchr = 0;
+		shoMsg(MsgBuffer);
 	}
-	if (code&BADCLP) {
-		LoadString(ThrEdInstance, IDS_BADCLP, pchr, HBUFSIZ);
-		pchr = &pchr[strlen(pchr)];
-	}
-	if (code&BADSAT) {
-		LoadString(ThrEdInstance, IDS_BADSAT, pchr, HBUFSIZ);
-		pchr = &pchr[strlen(pchr)];
-	}
-	if (code&BADTX) {
-		LoadString(ThrEdInstance, IDS_BADTX, pchr, HBUFSIZ);
-		pchr = &pchr[strlen(pchr)];
-	}
-	pchr--;
-	*pchr = 0;
-	shoMsg(MsgBuffer);
-
 }
