@@ -7817,8 +7817,6 @@ void duspir(unsigned stepCount) {
 	unsigned	iStep = 0, iVertex = 0, vertexCount = 0;
 	dPOINT		point = {};
 	dPOINT		center = {};
-	fPOINT*		firstSpiral = nullptr;
-	fPOINT*		centeredSpiral = nullptr;
 
 	if (stepCount < 3)
 		stepCount = 3;
@@ -7832,8 +7830,8 @@ void duspir(unsigned stepCount) {
 	frmclr(SelectedForm);
 	vertexCount = stepCount*SpiralWrap;
 	SelectedForm->vertices = adflt(vertexCount);
-	firstSpiral = new fPOINT[stepCount];
-	centeredSpiral = new fPOINT[stepCount];
+	std::vector<fPOINT> firstSpiral(stepCount);
+	std::vector<fPOINT> centeredSpiral(stepCount);
 	SelectedForm->vertexCount = vertexCount;
 	SelectedForm->attribute = (ActiveLayer << 1);
 	fvars(FormIndex);
@@ -7868,8 +7866,6 @@ void duspir(unsigned stepCount) {
 	setmfrm();
 	StateMap.set(StateFlag::SHOFRM);
 	mdufrm();
-	delete[] firstSpiral;
-	delete[] centeredSpiral;
 }
 
 void duhart(unsigned sideCount) {
