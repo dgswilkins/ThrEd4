@@ -4506,7 +4506,7 @@ void drwcon() {
 }
 
 bool scomp(const SATCON &arg1, const SATCON &arg2) noexcept {
-	return (arg2.start < arg1.start);
+	return (arg1.start < arg2.start);
 }
 
 void satcpy(SATCON* destination, std::vector<SATCON> source, unsigned int size) noexcept {
@@ -5479,6 +5479,7 @@ void rotfrm(unsigned newStartVertex) {
 	}
 	if (iRotatedGuide) {
 		SelectedForm->satinGuideCount = iRotatedGuide;
+		// ToDo - Can we do the sort in place?
 		std::vector<SATCON> rotatedGuides(iRotatedGuide);
 		for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
 			rotatedGuides[iGuide].start = CurrentFormGuides[iGuide].start;
