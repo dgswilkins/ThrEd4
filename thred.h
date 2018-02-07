@@ -4,13 +4,13 @@
 #pragma warning(disable:6031)
 
 // C++ Code Checker rules - disable them as required 
-#pragma warning(disable:26400) //			Do not dereference an invalid pointer
-#pragma warning(disable:26401) //			Do not dereference nullptr
+#pragma warning(disable:26400) //			Do not assign the result of an allocation or a function call with an owner<T>
+#pragma warning(disable:26401) //	i.11	Do not delete a raw pointer that is not an owner<T>
 #pragma warning(disable:26409) //			Avoid calling new and delete explicitly, use std::make_unique<T> instead
 #pragma warning(disable:26423) //			The allocation was not directly assigned to an owner
 #pragma warning(disable:26424) //			Failing to delete or assign ownership of allocation
 #pragma warning(disable:26425) //			Assigning 'return of new[]' to a static variable
-#pragma warning(disable:26429) // f.23		Symbol is never tested for nullness, it can be marked as not_null
+//#pragma warning(disable:26429) // f.23		Symbol is never tested for nullness, it can be marked as not_null
 #pragma warning(disable:26438) // es.76		Avoid 'goto'
 //#pragma warning(disable:26461) // con.3		The pointer argument can be marked as a pointer to const
 //#pragma warning(disable:26472) // type.1	Don't use a static_cast for arithmetic conversions
@@ -21,7 +21,7 @@
 //#pragma warning(disable:26490) // type.1	Don't use reinterpret_cast
 //#pragma warning(disable:26493) // type.4	Don't use C-style casts
 //#pragma warning(disable:26494) // type.5	Variable is uninitialized
-#pragma warning(disable:26496) // Con.4		Value is assigned only once, mark it as a pointer to const
+//#pragma warning(disable:26496) // Con.4		Value is assigned only once, mark it as a pointer to const
 //#pragma warning(disable:26497) // f.4		This function could be marked constexpr if compile-time evaluation is desired
 #pragma warning(disable:26499) //			Could not find any lifetime tracking information
 
