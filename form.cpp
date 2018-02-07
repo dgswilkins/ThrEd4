@@ -6058,24 +6058,28 @@ bool chkbak(dPOINT pnt) noexcept {
 }
 
 bool linx(const fPOINT* points, unsigned start, unsigned finish, dPOINT* intersection) noexcept {
+	if (OutsidePoints && points) {
+		dPOINT	delta = { (OutsidePoints[start].x - points[start].x),
+						  (OutsidePoints[start].y - points[start].y) };
+		dPOINT	point = { (points[start].x),(points[start].y) };
 
-	dPOINT	delta = { (OutsidePoints[start].x - points[start].x),
-					  (OutsidePoints[start].y - points[start].y) };
-	dPOINT	point = { (points[start].x),(points[start].y) };
-
-	if (!delta.x && !delta.y)
-		return 0;
-	if (delta.x) {
-		if (proj(point, delta.y / delta.x, OutsidePoints[finish], points[finish], intersection))
-			return 1;
-		else
+		if (!delta.x && !delta.y)
 			return 0;
+		if (delta.x) {
+			if (proj(point, delta.y / delta.x, OutsidePoints[finish], points[finish], intersection))
+				return 1;
+			else
+				return 0;
+		}
+		else {
+			if (projv(point.x, points[finish], OutsidePoints[finish], intersection))
+				return 1;
+			else
+				return 0;
+		}
 	}
 	else {
-		if (projv(point.x, points[finish], OutsidePoints[finish], intersection))
-			return 1;
-		else
-			return 0;
+		return 0;
 	}
 }
 
@@ -6087,101 +6091,102 @@ void filinsbw(dPOINT point) noexcept {
 }
 
 void sbfn(const fPOINT* insidePoints, unsigned start, unsigned finish) {
+	if (insidePoints && OutsidePoints && SatinBackup) {
+		dPOINT		innerDelta = { (insidePoints[finish].x - insidePoints[start].x),
+								   (insidePoints[finish].y - insidePoints[start].y) };
+		double		innerLength = hypot(innerDelta.x, innerDelta.y);
+		dPOINT		outerDelta = { (OutsidePoints[finish].x - OutsidePoints[start].x),
+								   (OutsidePoints[finish].y - OutsidePoints[start].y) };
+		double		outerLength = hypot(outerDelta.x, outerDelta.y);
+		dPOINT		innerPoint = { insidePoints[start].x ,insidePoints[start].y };
+		dPOINT		outerPoint = { OutsidePoints[start].x ,OutsidePoints[start].y };
+		dPOINT		innerStep = {}, outerStep = {};
+		dPOINT		offsetDelta = {}, offsetStep = {}, offset = {};
+		dPOINT		intersection = {};
+		double		offsetLength = 0.0;
+		unsigned	count = 0, innerFlag = 0, outerFlag = 0, offsetCount = 0, iStep = 0;
+		unsigned	ind = 0, intersectFlag = 0;
 
-	dPOINT		innerDelta = { (insidePoints[finish].x - insidePoints[start].x),
-							   (insidePoints[finish].y - insidePoints[start].y) };
-	double		innerLength = hypot(innerDelta.x, innerDelta.y);
-	dPOINT		outerDelta = { (OutsidePoints[finish].x - OutsidePoints[start].x),
-							   (OutsidePoints[finish].y - OutsidePoints[start].y) };
-	double		outerLength = hypot(outerDelta.x, outerDelta.y);
-	dPOINT		innerPoint = { insidePoints[start].x ,insidePoints[start].y };
-	dPOINT		outerPoint = { OutsidePoints[start].x ,OutsidePoints[start].y };
-	dPOINT		innerStep = {}, outerStep = {};
-	dPOINT		offsetDelta = {}, offsetStep = {}, offset = {};
-	dPOINT		intersection = {};
-	double		offsetLength = 0.0;
-	unsigned	count = 0, innerFlag = 0, outerFlag = 0, offsetCount = 0, iStep = 0;
-	unsigned	ind = 0, intersectFlag = 0;
-
-	if (!StateMap.testAndSet(StateFlag::SAT1)) {
-		SelectedPoint.x = insidePoints[start].x;
-		SelectedPoint.y = insidePoints[start].y;
-	}
-	SatinBackupIndex = 0;
-	for (ind = 0; ind < 8; ind++) {
-		SatinBackup[ind].x = 1e12f;
-		SatinBackup[ind].y = 1e12f;
-	}
-	if (outerLength > innerLength) {
-		count = outerLength / LineSpacing;
-		innerFlag = 1;
-		if (linx(insidePoints, start, finish, &intersection)) {
-			intersectFlag = 1;
-			innerDelta.x = innerDelta.y = innerLength = 0;
-			innerPoint.x = intersection.x;
-			innerPoint.y = intersection.y;
+		if (!StateMap.testAndSet(StateFlag::SAT1)) {
+			SelectedPoint.x = insidePoints[start].x;
+			SelectedPoint.y = insidePoints[start].y;
 		}
-	}
-	else {
-		count = innerLength / LineSpacing;
-		outerFlag = 1;
-		if (linx(insidePoints, start, finish, &intersection)) {
-			intersectFlag = 1;
-			outerDelta.x = outerDelta.y = outerLength = 0;
-			outerPoint.x = intersection.x;
-			outerPoint.y = intersection.y;
+		SatinBackupIndex = 0;
+		for (ind = 0; ind < 8; ind++) {
+			SatinBackup[ind].x = 1e12f;
+			SatinBackup[ind].y = 1e12f;
 		}
-	}
-	if (!count)
-		count = 1;
-	if (chkmax(count, SequenceIndex))
-		return;
-	innerStep.x = innerDelta.x / count;
-	innerStep.y = innerDelta.y / count;
-	outerStep.x = outerDelta.x / count;
-	outerStep.y = outerDelta.y / count;
-	for (iStep = 0; iStep < count; iStep++) {
-		innerPoint.x += innerStep.x;
-		innerPoint.y += innerStep.y;
-		outerPoint.x += outerStep.x;
-		outerPoint.y += outerStep.y;
-		if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-			if (innerFlag) {
-				offsetDelta.x = innerPoint.x - SelectedPoint.x;
-				offsetDelta.y = innerPoint.y - SelectedPoint.y;
-				offsetLength = hypot(offsetDelta.x, offsetDelta.y);
-				offsetCount = offsetLength / LineSpacing;
-				offsetStep.x = offsetDelta.x / offsetCount;
-				offsetStep.y = offsetDelta.y / offsetCount;
-				offset.x = innerPoint.x;
-				offset.y = innerPoint.y;
-				while (chkbak(offset)) {
-					offset.x -= offsetStep.x;
-					offset.y -= offsetStep.y;
-				}
-				filinsbw(offset);
+		if (outerLength > innerLength) {
+			count = outerLength / LineSpacing;
+			innerFlag = 1;
+			if (linx(insidePoints, start, finish, &intersection)) {
+				intersectFlag = 1;
+				innerDelta.x = innerDelta.y = innerLength = 0;
+				innerPoint.x = intersection.x;
+				innerPoint.y = intersection.y;
 			}
-			else
-				filinsb(innerPoint);
 		}
 		else {
-			if (outerFlag) {
-				offsetDelta.x = outerPoint.x - SelectedPoint.x;
-				offsetDelta.y = outerPoint.y - SelectedPoint.y;
-				offsetLength = hypot(offsetDelta.x, offsetDelta.y);
-				offsetCount = offsetLength / LineSpacing;
-				offsetStep.x = offsetDelta.x / offsetCount;
-				offsetStep.y = offsetDelta.y / offsetCount;
-				offset.x = outerPoint.x;
-				offset.y = outerPoint.y;
-				while (chkbak(offset)) {
-					offset.x -= offsetStep.x;
-					offset.y -= offsetStep.y;
-				}
-				filinsbw(offset);
+			count = innerLength / LineSpacing;
+			outerFlag = 1;
+			if (linx(insidePoints, start, finish, &intersection)) {
+				intersectFlag = 1;
+				outerDelta.x = outerDelta.y = outerLength = 0;
+				outerPoint.x = intersection.x;
+				outerPoint.y = intersection.y;
 			}
-			else
-				filinsb(outerPoint);
+		}
+		if (!count)
+			count = 1;
+		if (chkmax(count, SequenceIndex))
+			return;
+		innerStep.x = innerDelta.x / count;
+		innerStep.y = innerDelta.y / count;
+		outerStep.x = outerDelta.x / count;
+		outerStep.y = outerDelta.y / count;
+		for (iStep = 0; iStep < count; iStep++) {
+			innerPoint.x += innerStep.x;
+			innerPoint.y += innerStep.y;
+			outerPoint.x += outerStep.x;
+			outerPoint.y += outerStep.y;
+			if (StateMap.testAndFlip(StateFlag::FILDIR)) {
+				if (innerFlag) {
+					offsetDelta.x = innerPoint.x - SelectedPoint.x;
+					offsetDelta.y = innerPoint.y - SelectedPoint.y;
+					offsetLength = hypot(offsetDelta.x, offsetDelta.y);
+					offsetCount = offsetLength / LineSpacing;
+					offsetStep.x = offsetDelta.x / offsetCount;
+					offsetStep.y = offsetDelta.y / offsetCount;
+					offset.x = innerPoint.x;
+					offset.y = innerPoint.y;
+					while (chkbak(offset)) {
+						offset.x -= offsetStep.x;
+						offset.y -= offsetStep.y;
+					}
+					filinsbw(offset);
+				}
+				else
+					filinsb(innerPoint);
+			}
+			else {
+				if (outerFlag) {
+					offsetDelta.x = outerPoint.x - SelectedPoint.x;
+					offsetDelta.y = outerPoint.y - SelectedPoint.y;
+					offsetLength = hypot(offsetDelta.x, offsetDelta.y);
+					offsetCount = offsetLength / LineSpacing;
+					offsetStep.x = offsetDelta.x / offsetCount;
+					offsetStep.y = offsetDelta.y / offsetCount;
+					offset.x = outerPoint.x;
+					offset.y = outerPoint.y;
+					while (chkbak(offset)) {
+						offset.x -= offsetStep.x;
+						offset.y -= offsetStep.y;
+					}
+					filinsbw(offset);
+				}
+				else
+					filinsb(outerPoint);
+			}
 		}
 	}
 }
