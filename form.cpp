@@ -8525,32 +8525,34 @@ void duspnd(unsigned start, unsigned finish) {
 }
 
 void pfn(unsigned startVertex, const VRCT2* vrct) {
+	if (vrct) {
+		unsigned	iVertex = 0;
+		unsigned	currentVertex = startVertex;
+		unsigned	nextVertex = nxt(currentVertex);
 
-	unsigned	iVertex = 0;
-	unsigned	currentVertex = startVertex;
-	unsigned	nextVertex = nxt(currentVertex);
-
-	SelectedPoint.x = CurrentFormVertices[startVertex].x;
-	SelectedPoint.y = CurrentFormVertices[startVertex].y;
-	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
-		duromb(vrct[currentVertex].bipnt, vrct[currentVertex].cipnt, vrct[currentVertex].bopnt, vrct[currentVertex].copnt);
-		duspnd(currentVertex, nextVertex);
-		currentVertex = nextVertex;
-		nextVertex = nxt(nextVertex);
+		SelectedPoint.x = CurrentFormVertices[startVertex].x;
+		SelectedPoint.y = CurrentFormVertices[startVertex].y;
+		for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+			duromb(vrct[currentVertex].bipnt, vrct[currentVertex].cipnt, vrct[currentVertex].bopnt, vrct[currentVertex].copnt);
+			duspnd(currentVertex, nextVertex);
+			currentVertex = nextVertex;
+			nextVertex = nxt(nextVertex);
+		}
 	}
 }
 
 void plfn(const VRCT2* prct) {
+	if (prct) {
+		unsigned	iVertex;
 
-	unsigned	iVertex;
-
-	duromb(prct[1].aipnt, prct[1].cipnt, prct[1].aopnt, prct[1].copnt);
-	duspnd(1, 2);
-	for (iVertex = 2; iVertex < VertexCount - 4; iVertex++) {
-		duromb(prct[iVertex].bipnt, prct[iVertex].cipnt, prct[iVertex].bopnt, prct[iVertex].copnt);
-		duspnd(iVertex, iVertex + 1);
+		duromb(prct[1].aipnt, prct[1].cipnt, prct[1].aopnt, prct[1].copnt);
+		duspnd(1, 2);
+		for (iVertex = 2; iVertex < VertexCount - 4; iVertex++) {
+			duromb(prct[iVertex].bipnt, prct[iVertex].cipnt, prct[iVertex].bopnt, prct[iVertex].copnt);
+			duspnd(iVertex, iVertex + 1);
+		}
+		duromb(prct[VertexCount - 4].bipnt, prct[VertexCount - 4].dipnt, prct[VertexCount - 4].bopnt, prct[VertexCount - 4].dopnt);
 	}
-	duromb(prct[VertexCount - 4].bipnt, prct[VertexCount - 4].dipnt, prct[VertexCount - 4].bopnt, prct[VertexCount - 4].dopnt);
 }
 
 void prsmal() noexcept {
@@ -9449,14 +9451,12 @@ void join() {
 
 	const unsigned	savedFormIndex = ClosestFormToCursor;
 	unsigned	iVertex = 0, vertexCount = 0;
-	fPOINT*		vertexList = nullptr;
-	fPOINT*		insertedVertex = nullptr;
 
 	
 	StateMap.set(StateFlag::FRMSAM);
 	if (FormIndex > 1 && StateMap.test(StateFlag::FORMSEL) && closfrm()) {
 		vertexCount = FormList[ClosestFormToCursor].vertexCount;
-		vertexList = new fPOINT[vertexCount];
+		std::vector<fPOINT> vertexList(vertexCount);
 		for (iVertex = 0; iVertex < vertexCount; iVertex++) {
 			vertexList[iVertex].x = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].x;
 			vertexList[iVertex].y = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].y;
@@ -9468,13 +9468,14 @@ void join() {
 			ClosestFormToCursor = savedFormIndex - 1;
 		else
 			ClosestFormToCursor = savedFormIndex;
-		insertedVertex = &FormList[ClosestFormToCursor].vertices[FormList[ClosestFormToCursor].vertexCount];
-		fltspac(insertedVertex, vertexCount);
-		for (iVertex = 0; iVertex < vertexCount; iVertex++) {
-			insertedVertex[iVertex].x = vertexList[iVertex].x;
-			insertedVertex[iVertex].y = vertexList[iVertex].y;
+		fPOINT* insertedVertex = &FormList[ClosestFormToCursor].vertices[FormList[ClosestFormToCursor].vertexCount];
+		if (insertedVertex) {
+			fltspac(insertedVertex, vertexCount);
+			for (iVertex = 0; iVertex < vertexCount; iVertex++) {
+				insertedVertex[iVertex].x = vertexList[iVertex].x;
+				insertedVertex[iVertex].y = vertexList[iVertex].y;
+			}
 		}
-		delete[] vertexList;
 		SelectedForm = &FormList[ClosestFormToCursor];
 		SelectedForm->vertexCount += vertexCount;
 		SelectedForm->rectangle.left = SelectedForm->rectangle.right = SelectedForm->vertices[0].x;
