@@ -5443,58 +5443,59 @@ void satzum() {
 void rotfrm(unsigned newStartVertex) {
 
 	fvars(ClosestFormToCursor);
-	VertexCount = SelectedForm->vertexCount;
 
-	fPOINT*			selectedVertices = SelectedForm->vertices;
-	std::vector<fPOINT>	rotatedVertices(VertexCount);
-	unsigned		iVertex = 0, iGuide = 0, iRotatedGuide = 0, iRotated = newStartVertex;
-	unsigned short	tlin = 0;
+	fPOINT*			selectedVertices = CurrentFormVertices;
+	if (selectedVertices) {
+		std::vector<fPOINT>	rotatedVertices(VertexCount);
+		unsigned		iVertex = 0, iGuide = 0, iRotatedGuide = 0, iRotated = newStartVertex;
+		unsigned short	tlin = 0;
 
-	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-		rotatedVertices[iVertex].x = selectedVertices[iVertex].x;
-		rotatedVertices[iVertex].y = selectedVertices[iVertex].y;
-	}
-	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-		selectedVertices[iVertex].x = rotatedVertices[iRotated].x;
-		selectedVertices[iVertex].y = rotatedVertices[iRotated].y;
-		iRotated = nxt(iRotated);
-	}
-	iRotatedGuide = 0;
-	if (SelectedForm->type == SAT) {
-		if (SelectedForm->wordParam)
-			SelectedForm->wordParam = (SelectedForm->wordParam + SelectedForm->vertexCount
-				- newStartVertex) % SelectedForm->vertexCount;
-		for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-			if (CurrentFormGuides[iGuide].start != newStartVertex && CurrentFormGuides[iGuide].finish != newStartVertex) {
-				CurrentFormGuides[iRotatedGuide].start = (CurrentFormGuides[iGuide].start + VertexCount - newStartVertex) % VertexCount;
-				CurrentFormGuides[iRotatedGuide].finish = (CurrentFormGuides[iGuide].finish + VertexCount - newStartVertex) % VertexCount;
-				if (CurrentFormGuides[iRotatedGuide].start > CurrentFormGuides[iRotatedGuide].finish) {
-					tlin = CurrentFormGuides[iRotatedGuide].start;
-					CurrentFormGuides[iRotatedGuide].start = CurrentFormGuides[iRotatedGuide].finish;
-					CurrentFormGuides[iGuide].finish = tlin;
+		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+			rotatedVertices[iVertex].x = selectedVertices[iVertex].x;
+			rotatedVertices[iVertex].y = selectedVertices[iVertex].y;
+		}
+		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+			selectedVertices[iVertex].x = rotatedVertices[iRotated].x;
+			selectedVertices[iVertex].y = rotatedVertices[iRotated].y;
+			iRotated = nxt(iRotated);
+		}
+		iRotatedGuide = 0;
+		if (SelectedForm->type == SAT) {
+			if (SelectedForm->wordParam)
+				SelectedForm->wordParam = (SelectedForm->wordParam + SelectedForm->vertexCount
+					- newStartVertex) % SelectedForm->vertexCount;
+			for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+				if (CurrentFormGuides[iGuide].start != newStartVertex && CurrentFormGuides[iGuide].finish != newStartVertex) {
+					CurrentFormGuides[iRotatedGuide].start = (CurrentFormGuides[iGuide].start + VertexCount - newStartVertex) % VertexCount;
+					CurrentFormGuides[iRotatedGuide].finish = (CurrentFormGuides[iGuide].finish + VertexCount - newStartVertex) % VertexCount;
+					if (CurrentFormGuides[iRotatedGuide].start > CurrentFormGuides[iRotatedGuide].finish) {
+						tlin = CurrentFormGuides[iRotatedGuide].start;
+						CurrentFormGuides[iRotatedGuide].start = CurrentFormGuides[iRotatedGuide].finish;
+						CurrentFormGuides[iGuide].finish = tlin;
+					}
+					iRotatedGuide++;
 				}
-				iRotatedGuide++;
 			}
 		}
-	}
-	if (iRotatedGuide) {
-		SelectedForm->satinGuideCount = iRotatedGuide;
-		// ToDo - Can we do the sort in place?
-		std::vector<SATCON> rotatedGuides(iRotatedGuide);
-		for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
-			rotatedGuides[iGuide].start = CurrentFormGuides[iGuide].start;
-			rotatedGuides[iGuide].finish = CurrentFormGuides[iGuide].finish;
+		if (iRotatedGuide) {
+			SelectedForm->satinGuideCount = iRotatedGuide;
+			// ToDo - Can we do the sort in place?
+			std::vector<SATCON> rotatedGuides(iRotatedGuide);
+			for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
+				rotatedGuides[iGuide].start = CurrentFormGuides[iGuide].start;
+				rotatedGuides[iGuide].finish = CurrentFormGuides[iGuide].finish;
+			}
+			std::sort(rotatedGuides.begin(), rotatedGuides.end(), scomp);
+			for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
+				CurrentFormGuides[iGuide].start = rotatedGuides[iGuide].start;
+				CurrentFormGuides[iGuide].finish = rotatedGuides[iGuide].finish;
+			}
 		}
-		std::sort(rotatedGuides.begin(), rotatedGuides.end(), scomp);
-		for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
-			CurrentFormGuides[iGuide].start = rotatedGuides[iGuide].start;
-			CurrentFormGuides[iGuide].finish = rotatedGuides[iGuide].finish;
-		}
+		if (SelectedForm->extendedAttribute&AT_STRT)
+			SelectedForm->fillStart = (SelectedForm->fillStart + VertexCount - newStartVertex) % VertexCount;
+		if (SelectedForm->extendedAttribute&AT_END)
+			SelectedForm->fillEnd = (SelectedForm->fillEnd + VertexCount - newStartVertex) % VertexCount;
 	}
-	if (SelectedForm->extendedAttribute&AT_STRT)
-		SelectedForm->fillStart = (SelectedForm->fillStart + VertexCount - newStartVertex) % VertexCount;
-	if (SelectedForm->extendedAttribute&AT_END)
-		SelectedForm->fillEnd = (SelectedForm->fillEnd + VertexCount - newStartVertex) % VertexCount;
 }
 
 
