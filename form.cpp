@@ -10217,16 +10217,16 @@ void contf() {
 	const unsigned	lowVertexIndex = start;
 	const unsigned	highVertexIndex = VertexCount - start - 1;
 	const unsigned	selectedVertexCount = finish - start;
-	unsigned*	lowCounts = new unsigned[lowVertexIndex]();
-	unsigned*	highCounts = new unsigned[highVertexIndex]();
-	double*		lowLengths = new double[lowVertexIndex]();
-	double*		highLengths = new double[highVertexIndex]();
-	dPOINT*		lowDeltas = new dPOINT[lowVertexIndex]();
-	dPOINT*		highDeltas = new dPOINT[highVertexIndex]();
-	dPOINT*		lowSteps = new dPOINT[lowVertexIndex]();
-	dPOINT*		highSteps = new dPOINT[highVertexIndex]();
-	fPOINT*		lowVertices = new fPOINT[lowVertexIndex]();
-	dPOINT*		highVertices = new dPOINT[highVertexIndex]();
+	std::vector<unsigned> lowCounts(lowVertexIndex);
+	std::vector<unsigned>	highCounts(highVertexIndex);
+	std::vector<double>		lowLengths(lowVertexIndex);
+	std::vector<double>		highLengths(highVertexIndex);
+	std::vector<dPOINT>		lowDeltas(lowVertexIndex);
+	std::vector<dPOINT>		highDeltas(highVertexIndex);
+	std::vector<dPOINT>		lowSteps(lowVertexIndex);
+	std::vector<dPOINT>		highSteps(highVertexIndex);
+	std::vector<fPOINT>		lowVertices(lowVertexIndex);
+	std::vector<dPOINT>		highVertices(highVertexIndex);
 	unsigned	iVertex = 0, lowIndex = 0, highIndex = 0, selind = 0;
 	double		lowLength = 0.0, highLength = 0.0, length = 0.0;
 	double		lowSpacing = 0.0, highSpacing = 0.0;
@@ -10236,7 +10236,7 @@ void contf() {
 	dPOINT		delta = {};
 	const fPOINT*	selectionStart = &CurrentFormVertices[start];
 	// ToDo - rename pols, polref, polin & poldif
-	PVEC*		pols = new PVEC[selectedVertexCount];
+	std::vector<PVEC>		pols(selectedVertexCount);
 	PVEC		polref = {}, polin = {}, poldif = {};
 
 	SequenceIndex = 0;
@@ -10369,17 +10369,6 @@ void contf() {
 	}
 	if (SelectedForm->lengthOrCount.stitchLength < MinStitchLength)
 		SelectedForm->lengthOrCount.stitchLength = MinStitchLength;
-	delete[] lowVertices;
-	delete[] pols;
-	delete[] highVertices;
-	delete[] highSteps;
-	delete[] lowSteps;
-	delete[] highDeltas;
-	delete[] lowDeltas;
-	delete[] highLengths;
-	delete[] lowLengths;
-	delete[] highCounts;
-	delete[] lowCounts;
 }
 
 bool contsf(unsigned formIndex) {
