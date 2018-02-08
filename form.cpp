@@ -542,11 +542,10 @@ void duinf(const FRMHED* formHeader) noexcept {
 #endif
 }
 
-bool comp(const dPOINTLINE &point1, const dPOINTLINE &point2) noexcept {
-	if (point2.y > point1.y)
+bool comp(const dPOINTLINE point1, const dPOINTLINE point2) noexcept {
+	if (point1.y < point2.y)
 		return true;
-
-	if (point2.x > point1.x)
+	if (point1.x < point2.x)
 		return true;
 	return false;
 }
@@ -3980,11 +3979,12 @@ void bakseq() {
 void fnvrt() {
 
 	unsigned		iVertex = 0, iNextVertex = 0, iLine = 0, iGroup = 0, evenPointCount = 0;
-	unsigned		iLineCounter = 0, fillLineCount = 0, savedLineCount = 0;
+	unsigned		iLineCounter = 0, iPoint = 0, fillLineCount = 0, savedLineCount = 0;
 	int				lineOffset = 0;
 	double			lowX = 0.0, highX = 0.0;
 	double			currentX = 0.0, step = 0.0;
 	dPOINT			point = {};
+	unsigned*		groupIndex = nullptr;
 	unsigned		maximumLines = 0;	//maximum angle fill lines for any adjusted y cordinate
 
 	CurrentFillVertices = SelectedForm->vertices;
@@ -3998,8 +3998,10 @@ void fnvrt() {
 	}
 
 	lineOffset = lowX / LineSpacing;
-	lowX = LineSpacing*lineOffset;
+	lowX = LineSpacing * lineOffset;
 	fillLineCount = (highX - lowX) / LineSpacing + 1;
+	std::vector<dPOINTLINE> projectedPoints;
+	projectedPoints.reserve(VertexCount + 2);
 	step = (highX - lowX) / fillLineCount;
 	currentX = lowX;
 	for (iLine = 0; iLine < fillLineCount; iLine++) {
@@ -4015,23 +4017,23 @@ void fnvrt() {
 			maximumLines = iLineCounter;
 	}
 	maximumLines = (maximumLines >> 1);
-	LineEndpoints = new SMALPNTL[fillLineCount + 2](); //deleted in lcon
+	LineEndpoints = new SMALPNTL[fillLineCount + 1](); //deleted in lcon
 	StitchLineCount = 0; LineGroupIndex = 0;
-	std::vector<unsigned> groupIndex(fillLineCount + 2);
+	groupIndex = new unsigned[fillLineCount + 2]();
 	GroupIndexCount = 0;
 	currentX = lowX;
 	for (iLine = 0; iLine < fillLineCount; iLine++) {
-		std::vector<dPOINTLINE> projectedPoints;
-		projectedPoints.reserve(VertexCount + 2);
+		projectedPoints.clear();
 		currentX += step;
+		iPoint = 0;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 			iNextVertex = (iVertex + 1) % VertexCount;
 			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iNextVertex], &point)) {
-				dPOINTLINE a = {point.x,point.y,gsl::narrow<unsigned short>(iVertex)};
+				dPOINTLINE a = { point.x,point.y,gsl::narrow<unsigned short>(iVertex) };
 				projectedPoints.push_back(a);
+				iPoint++;
 			}
 		}
-		unsigned iPoint = projectedPoints.size();
 		if (iPoint > 1) {
 			evenPointCount = iPoint &= 0xfffffffe;
 			groupIndex[GroupIndexCount++] = StitchLineCount;
@@ -4039,7 +4041,7 @@ void fnvrt() {
 			iPoint = 0;
 			savedLineCount = StitchLineCount;
 			while (iPoint < evenPointCount) {
-				if (StitchLineCount < fillLineCount - 1) {
+				if (StitchLineCount < fillLineCount) {
 					LineEndpoints[StitchLineCount].line = projectedPoints[iPoint].line;
 					LineEndpoints[StitchLineCount].group = LineGroupIndex;
 					LineEndpoints[StitchLineCount].x = projectedPoints[iPoint].x;
@@ -4059,6 +4061,7 @@ void fnvrt() {
 	for (iGroup = 0; iGroup < GroupIndexCount; iGroup++)
 		GroupIndexSequence[iGroup] = groupIndex[iGroup];
 	LineGroupIndex--;
+	delete[] groupIndex;
 }
 
 void fnhor() {
