@@ -313,7 +313,7 @@ BEGIN
             MENUITEM "Fill Start Point (<)",        ID_FILSTRT
             MENUITEM "Fill End Point (>)",          ID_FILEND
             MENUITEM "Form Number (/)",             ID_FRMNUM
-            MENUITEM "Form Color to  Stich Color",  ID_FRM2COL
+            MENUITEM "Form Color to Stitch Color",  ID_FRM2COL
             MENUITEM "Form Zero Point",             ID_FRM0
             MENUITEM "Knots",                       ID_KNOTS
             MENUITEM "Knot at Selected Stitch (Ctrl+K)", ID_KNOTAT
@@ -693,7 +693,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_FSELB               "No border stiches"
+    IDS_FSELB               "No border stitches"
     IDS_FSELF               "No fill stitches"
     IDS_FSELA               "No applique stitches"
     IDS_FSELM               "No stitches"
@@ -794,7 +794,7 @@ BEGIN
     IDS_REFIL               "Stitches in the form are edited, refill anyway?"
     IDS_SNAP2GRD            "Snap to Grid"
     IDS_RETRAC              "Retrace"
-    IDS_STCH_FRM            "a stich point or a form point"
+    IDS_STCH_FRM            "a stitch point or a form point"
     IDS_SETMRK              "Set Mark at Selected Point"
     IDS_FSZ                 "a form or a group of stitches\n and set the zoom mark"
     IDS_SETROTM             "Set Rotation Angle from Mark"

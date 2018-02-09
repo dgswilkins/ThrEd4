@@ -602,7 +602,7 @@ unsigned		LastFormSelected;		//end point of selected range of forms
 #if	PESACT
 unsigned char*	PEScolors;				//pes colors
 TCHAR*			PESdata;				//pes card data buffer
-fPOINT			PESstichCenterOffset;	//offset for writing pes files
+fPOINT			PESstitchCenterOffset;	//offset for writing pes files
 PESTCH*			PESstitches;			//pes stitch buffer
 unsigned char	PESequivColors[16];		//pes equivalent colors
 unsigned char*	PESstitch;				//pes stitches
@@ -738,7 +738,7 @@ HBRUSH			BlackBrush;				//black brush
 HBRUSH			TempBrush;				//temporary brush
 
 COLORREF		UserColor[16];			//user colors
-COLORREF		BackgroundColor;		//stich window background
+COLORREF		BackgroundColor;		//stitch window background
 COLORREF		BoxColor[] = { 0x404040,0x408040,0x804040,0x404080 };
 unsigned		ActiveColor = 0;		//active color selector
 unsigned		ButtonHeight;			//button height
@@ -776,9 +776,9 @@ fRECTANGLE		ClipRectAdjusted;		//rectangle for adjust range ends for clipboard f
 HANDLE			BalaradFile;			//balarad file handle
 
 //graphics variables		
-double			AspectRatio = (LHUPX / LHUPY);	//aspect ratio of the stich window
+double			AspectRatio = (LHUPX / LHUPY);	//aspect ratio of the stitch window
 SCROLLINFO		ScrollInfo;				//scroll bar i/o structure
-POINT			StitchWindowSize;		//size of the stich window in pixels
+POINT			StitchWindowSize;		//size of the stitch window in pixels
 fPOINT			SelectedPoint;			//for converting stitch coordinates
 										// to metric cordinates (mm)
 fPOINT			ZoomBoxOrigin;			//zoom box origin
@@ -5840,8 +5840,8 @@ bool pcshup(fPOINTATTR*	stitches) {
 
 void ritpes(unsigned iStitch) {
 
-	PESstitches[OutputIndex].x = -RotatedStitches[iStitch].x * 3 / 5 + PESstichCenterOffset.x;
-	PESstitches[OutputIndex++].y = RotatedStitches[iStitch].y * 3 / 5 - PESstichCenterOffset.y;
+	PESstitches[OutputIndex].x = -RotatedStitches[iStitch].x * 3 / 5 + PESstitchCenterOffset.x;
+	PESstitches[OutputIndex++].y = RotatedStitches[iStitch].y * 3 / 5 - PESstitchCenterOffset.y;
 }
 
 void ritpcol(unsigned char colorIndex) {
@@ -6216,8 +6216,8 @@ void sav() {
 				color = StitchBuffer[0].attribute&COLMSK;
 				pesColor = pesHeader.scol = PESequivColors[StitchBuffer[0].attribute&COLMSK];
 				sizstch(&boundingRect);
-				PESstichCenterOffset.x = midl(boundingRect.right, boundingRect.left);
-				PESstichCenterOffset.y = midl(boundingRect.top, boundingRect.bottom);
+				PESstitchCenterOffset.x = midl(boundingRect.right, boundingRect.left);
+				PESstitchCenterOffset.y = midl(boundingRect.top, boundingRect.bottom);
 				pesHeader.xsiz = boundingRect.right - boundingRect.left;
 				pesHeader.ysiz = boundingRect.top - boundingRect.bottom;
 				OutputIndex = 0;
@@ -19843,7 +19843,7 @@ thumout:;
 					rotauxsel(0);
 					break;
 
-				case ID_FRM2COL: // edit / Set / Form Color to  Stich Color
+				case ID_FRM2COL: // edit / Set / Form Color to  stitch Color
 
 					col2frm();
 					break;

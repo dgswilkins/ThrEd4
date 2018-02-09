@@ -573,7 +573,7 @@ enum class StateFlag {
 	WASESC,		//user hit escape
 	HIDMAP,		//hide the bitmap
 	WASBLAK,	//bitmap form pixels set to black
-	LINCHN,		//chain stich has line in middle
+	LINCHN,		//chain stitch has line in middle
 	ENTRZIG,	//user is creating a zig-zag form
 	FOLFRM,		//form-form is displaying a follower form
 	DUREFRM,	//display the form-form
@@ -695,7 +695,7 @@ typedef struct _pcsheader {
 typedef struct _iniFil {
 	TCHAR			defaultDirectory[180];	//default directory
 	COLORREF		stitchColors[16];		//colors
-	COLORREF		stitchPreferredColors[16];	//stich preference colors
+	COLORREF		stitchPreferredColors[16];	//stitch preference colors
 	COLORREF		backgroundPreferredColors[16];	//background preference colors
 	COLORREF		backgroundColor;		//background color
 	COLORREF		bitmapColor;			//bitmap color
@@ -820,7 +820,7 @@ typedef struct _doublerectangle {
 
 typedef struct _colChng {
 
-	unsigned short stitchIndex;	//stich index
+	unsigned short stitchIndex;	//stitch index
 	unsigned short colorIndex;	//color index
 }COLCHNG;
 

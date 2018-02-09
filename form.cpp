@@ -270,13 +270,13 @@ void		wavfrm ();
 
 unsigned		FormMenuEntryCount;		//lines in the form-form
 float			MaxStitchLen;			//maximum stitch length
-float			UserStichLen;			//user stitch length
+float			UserStitchLen;			//user stitch length
 double*			ListSINEs;				//a list of sins of form angles
 double*			ListCOSINEs;			//a list of cosins of form angles
 double			AdjustedSpace;			//adjusted space
 unsigned		NextStart;				//index of the endpoint of the line segment being processed
-fPOINT*			ChainEndPoints;			//end points of chain stiches
-unsigned		ChainSequence[] = { 0,1,2,3,0,1,4,3,0,3 };//chain stich sequence
+fPOINT*			ChainEndPoints;			//end points of chain stitches
+unsigned		ChainSequence[] = { 0,1,2,3,0,1,4,3,0,3 };//chain stitch sequence
 double			Div4;					//chain space divided by four
 unsigned		ChainCount;				//number of elements of the chain sequence to process
 unsigned		ClosestFormToCursor;	//closest form to the cursor
@@ -1866,7 +1866,7 @@ bool ritlin(fPOINT start, fPOINT finish) noexcept {
 	InterleaveSequence[InterleaveSequenceIndex].x = start.x;
 	InterleaveSequence[InterleaveSequenceIndex++].y = start.y;
 	if (length > MaxStitchLen) {
-		count = ceil(length / UserStichLen);
+		count = ceil(length / UserStitchLen);
 		if (!count)
 			count = 1;
 		while (length / count > MaxStitchLen)
@@ -1933,9 +1933,9 @@ void chkseq(bool border) {
 			SelectedForm->maxBorderStitchLen = IniFile.maxStitchLength;
 		MaxStitchLen = SelectedForm->maxBorderStitchLen;
 		if (SelectedForm->edgeType == EDGELCHAIN || SelectedForm->edgeType == EDGEOCHAIN)
-			UserStichLen = 9 * PFGRAN;
+			UserStitchLen = 9 * PFGRAN;
 		else
-			UserStichLen = SelectedForm->edgeStitchLen;
+			UserStitchLen = SelectedForm->edgeStitchLen;
 		minimumStitchLength = SelectedForm->minBorderStitchLen;
 	}
 	else {
@@ -1943,13 +1943,13 @@ void chkseq(bool border) {
 			SelectedForm->maxFillStitchLen = IniFile.maxStitchLength;
 		MaxStitchLen = SelectedForm->maxFillStitchLen;
 		if (isclp(ClosestFormToCursor))
-			UserStichLen = MaxStitchLen;
+			UserStitchLen = MaxStitchLen;
 		else
-			UserStichLen = SelectedForm->lengthOrCount.stitchLength;
+			UserStitchLen = SelectedForm->lengthOrCount.stitchLength;
 		minimumStitchLength = SelectedForm->minFillStitchLen;
 	}
-	if (UserStichLen > MaxStitchLen)
-		UserStichLen = MaxStitchLen;
+	if (UserStitchLen > MaxStitchLen)
+		UserStitchLen = MaxStitchLen;
 	for (iSequence = 0; iSequence < SequenceIndex - 1; iSequence++) {
 		if (!ritlin(OSequence[iSequence], OSequence[iSequence + 1]))
 			goto seqskp;
