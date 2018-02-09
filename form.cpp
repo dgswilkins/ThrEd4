@@ -12972,7 +12972,7 @@ void xclpfn(unsigned start, unsigned finish) {
 	unsigned		iPoint = 0;
 	const double	length = hypot(delta.x, delta.y);
 	const double	ratio = length / ClipRectSize.cx;
-	fPOINT*			points = new fPOINT[ClipStitchCount];
+	std::vector<fPOINT> points(ClipStitchCount);
 
 	RotationAngle = atan2(delta.y, delta.x);
 	for (iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
@@ -12982,7 +12982,6 @@ void xclpfn(unsigned start, unsigned finish) {
 		OSequence[SequenceIndex].x = ChainEndPoints[start].x + points[iPoint].x;
 		OSequence[SequenceIndex++].y = ChainEndPoints[start].y + points[iPoint].y;
 	}
-	delete[] points;
 }
 
 void duxclp() {
@@ -13189,7 +13188,6 @@ void wavfrm() {
 	unsigned	iVertex = 0, iPoint = 0, vertexCount = 0, iNextVertex = 0, iLobe = 0;
 	unsigned	end = 0;
 	unsigned	count = 0;
-	fPOINT*		points = nullptr;
 	fPOINT		currentPosition = {};
 	double		horizontalRatio = 0.0;
 	double		verticalRatio = 0.0;
@@ -13202,7 +13200,7 @@ void wavfrm() {
 		durpoli(IniFile.wavePoints);
 		mdufrm();
 		FormVertexIndex = iVertex;
-		points = new fPOINT[IniFile.wavePoints];
+		std::vector<fPOINT> points(IniFile.wavePoints);
 		iPoint = 0;
 		iVertex = IniFile.waveStart;
 		while (iVertex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
@@ -13235,7 +13233,6 @@ void wavfrm() {
 				}
 			}
 		}
-		delete[] points;
 		CurrentFormVertices[iVertex].x = currentPosition.x;
 		CurrentFormVertices[iVertex].y = currentPosition.y;
 		vertexCount = iVertex + 1;
@@ -13277,8 +13274,7 @@ void srtfrm() {
 
 	unsigned	iStitch = 0, iForm = 0, iHighStitch = 0, totalStitches = 0, formStitchCount = 0;
 	unsigned	histogram[MAXFORMS] = { 0 };
-	fPOINTATTR*	highStitchBuffer = nullptr;
-
+	
 	if (PCSHeader.stitchCount) {
 		savdo();
 		FillMemory(histogram, sizeof(unsigned)*MAXFORMS, 0);
@@ -13290,7 +13286,7 @@ void srtfrm() {
 			histogram[iForm] = totalStitches;
 			totalStitches += formStitchCount;
 		}
-		highStitchBuffer = new fPOINTATTR[MAXITEMS];
+		fPOINTATTR* highStitchBuffer = new fPOINTATTR[MAXITEMS];
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
 			iHighStitch = histogram[iForm]++;
