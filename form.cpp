@@ -12488,22 +12488,17 @@ void dubfil() {
 
 void col2frm() {
 
-	unsigned*	fillColorHistogram = nullptr;
-	unsigned*	borderColorHistogram = nullptr;
-	unsigned*	featherColorHistogram = nullptr;
-	unsigned*	underlayColorHistogram = nullptr;
 	unsigned	iStitch = 0, iForm = 0, iColor = 0, formColorCode = 0, count = 0, majorityColor = 0;
 	unsigned	startColorOffset = 0, endColorOffset = 0, colorChangedCount = 0; 
 	const unsigned	formColorPermutations = FormIndex << 4; // total number of form and color combinations
-	TCHAR		buffer[HBUFSIZ] = { 0 };
 
 	
 	
 	if (FormIndex) {
-		fillColorHistogram = new unsigned[formColorPermutations]();
-		borderColorHistogram = new unsigned[formColorPermutations]();
-		featherColorHistogram = new unsigned[formColorPermutations]();
-		underlayColorHistogram = new unsigned[formColorPermutations]();
+		std::vector<unsigned> fillColorHistogram(formColorPermutations);
+		std::vector<unsigned> borderColorHistogram(formColorPermutations);
+		std::vector<unsigned> featherColorHistogram(formColorPermutations);
+		std::vector<unsigned> underlayColorHistogram(formColorPermutations);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			formColorCode = StitchBuffer[iStitch].attribute & 0x3fff;
 			if (StitchBuffer[iStitch].attribute&(WLKMSK | CWLKMSK | UNDMSK))
@@ -12587,11 +12582,9 @@ void col2frm() {
 			startColorOffset += 16;
 			endColorOffset += 16;
 		}
-		delete[] fillColorHistogram;
-		delete[] borderColorHistogram;
-		delete[] featherColorHistogram;
-		delete[] underlayColorHistogram;
 	}
+	TCHAR		buffer[HBUFSIZ] = { 0 };
+
 	LoadString(ThrEdInstance, IDS_NCOLCHG, buffer, HBUFSIZ);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buffer, colorChangedCount);
 	shoMsg(MsgBuffer);
