@@ -3984,7 +3984,6 @@ void fnvrt() {
 	double			lowX = 0.0, highX = 0.0;
 	double			currentX = 0.0, step = 0.0;
 	dPOINT			point = {};
-	unsigned*		groupIndex = nullptr;
 	unsigned		maximumLines = 0;	//maximum angle fill lines for any adjusted y cordinate
 
 	CurrentFillVertices = SelectedForm->vertices;
@@ -4019,7 +4018,7 @@ void fnvrt() {
 	maximumLines = (maximumLines >> 1);
 	LineEndpoints = new SMALPNTL[fillLineCount + 1](); //deleted in lcon
 	StitchLineCount = 0; LineGroupIndex = 0;
-	groupIndex = new unsigned[fillLineCount + 2]();
+	unsigned* groupIndex = new unsigned[fillLineCount + 2]();
 	GroupIndexCount = 0;
 	currentX = lowX;
 	for (iLine = 0; iLine < fillLineCount; iLine++) {
@@ -10216,162 +10215,164 @@ void picot() {
 void contf() {
 
 	const unsigned	start = SelectedForm->angleOrClipData.guide.start;
-	const unsigned	finish = SelectedForm->angleOrClipData.guide.finish;
-	const unsigned	lowVertexIndex = start;
-	const unsigned	highVertexIndex = VertexCount - start - 1;
-	const unsigned	selectedVertexCount = finish - start;
-	std::vector<unsigned> lowCounts(lowVertexIndex);
-	std::vector<unsigned>	highCounts(highVertexIndex);
-	std::vector<double>		lowLengths(lowVertexIndex);
-	std::vector<double>		highLengths(highVertexIndex);
-	std::vector<dPOINT>		lowDeltas(lowVertexIndex);
-	std::vector<dPOINT>		highDeltas(highVertexIndex);
-	std::vector<dPOINT>		lowSteps(lowVertexIndex);
-	std::vector<dPOINT>		highSteps(highVertexIndex);
-	std::vector<fPOINT>		lowVertices(lowVertexIndex);
-	std::vector<dPOINT>		highVertices(highVertexIndex);
-	unsigned	iVertex = 0, lowIndex = 0, highIndex = 0, selind = 0;
-	double		lowLength = 0.0, highLength = 0.0, length = 0.0;
-	double		lowSpacing = 0.0, highSpacing = 0.0;
-	unsigned	highCount = 0, lowCount = 0, count = 0;
-	dPOINT		lowStep = {}, lowPoint = {};
-	dPOINT		highStep = {}, highPoint = {};
-	dPOINT		delta = {};
 	const fPOINT*	selectionStart = &CurrentFormVertices[start];
-	// ToDo - rename pols, polref, polin & poldif
-	std::vector<PVEC>		pols(selectedVertexCount);
-	PVEC		polref = {}, polin = {}, poldif = {};
+	if (selectionStart) {
+		const unsigned	finish = SelectedForm->angleOrClipData.guide.finish;
+		const unsigned	lowVertexIndex = start;
+		const unsigned	highVertexIndex = VertexCount - start - 1;
+		const unsigned	selectedVertexCount = finish - start;
+		std::vector<unsigned> lowCounts(lowVertexIndex);
+		std::vector<unsigned>	highCounts(highVertexIndex);
+		std::vector<double>		lowLengths(lowVertexIndex);
+		std::vector<double>		highLengths(highVertexIndex);
+		std::vector<dPOINT>		lowDeltas(lowVertexIndex);
+		std::vector<dPOINT>		highDeltas(highVertexIndex);
+		std::vector<dPOINT>		lowSteps(lowVertexIndex);
+		std::vector<dPOINT>		highSteps(highVertexIndex);
+		std::vector<fPOINT>		lowVertices(lowVertexIndex);
+		std::vector<dPOINT>		highVertices(highVertexIndex);
+		unsigned	iVertex = 0, lowIndex = 0, highIndex = 0, selind = 0;
+		double		lowLength = 0.0, highLength = 0.0, length = 0.0;
+		double		lowSpacing = 0.0, highSpacing = 0.0;
+		unsigned	highCount = 0, lowCount = 0, count = 0;
+		dPOINT		lowStep = {}, lowPoint = {};
+		dPOINT		highStep = {}, highPoint = {};
+		dPOINT		delta = {};
+		// ToDo - rename pols, polref, polin & poldif
+		std::vector<PVEC>		pols(selectedVertexCount);
+		PVEC		polref = {}, polin = {}, poldif = {};
 
-	SequenceIndex = 0;
-	for (iVertex = lowVertexIndex; iVertex != 0; iVertex--) {
-		lowVertices[lowIndex].x = CurrentFormVertices[iVertex].x;
-		lowVertices[lowIndex].y = CurrentFormVertices[iVertex].y;
-		lowDeltas[lowIndex].x = CurrentFormVertices[iVertex - 1].x - CurrentFormVertices[iVertex].x;
-		lowDeltas[lowIndex].y = CurrentFormVertices[iVertex - 1].y - CurrentFormVertices[iVertex].y;
-		lowLengths[lowIndex] = hypot(lowDeltas[lowIndex].x, lowDeltas[lowIndex].y);
-		lowLength += lowLengths[lowIndex];
-		lowIndex++;
-	}
-	selind = 0;
-	for (iVertex = start + 1; iVertex <= finish; iVertex++) {
-		delta.x = CurrentFormVertices[iVertex].x - selectionStart[0].x;
-		delta.y = CurrentFormVertices[iVertex].y - selectionStart[0].y;
-		pols[selind].length = hypot(delta.x, delta.y);
-		pols[selind].angle = atan2(delta.y, delta.x);
-		selind++;
-	}
-	highIndex = 0; highLength = 0;
-	for (iVertex = finish; iVertex < VertexCount - 1; iVertex++) {
-		highVertices[highIndex].x = CurrentFormVertices[iVertex].x;
-		highVertices[highIndex].y = CurrentFormVertices[iVertex].y;
-		highDeltas[highIndex].x = CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x;
-		highDeltas[highIndex].y = CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y;
-		highLengths[highIndex] = hypot(highDeltas[highIndex].x, highDeltas[highIndex].y);
-		highLength += highLengths[highIndex];
-		highIndex++;
-	}
-	if (highLength > lowLength)
-		length = lowLength;
-	else
-		length = highLength;
-	count = length / SelectedForm->fillSpacing;
-	if (highLength < lowLength) {
-		lowSpacing = SelectedForm->fillSpacing;
-		highSpacing = SelectedForm->fillSpacing*highLength / lowLength;
-	}
-	else {
-		highSpacing = SelectedForm->fillSpacing;
-		lowSpacing = SelectedForm->fillSpacing*lowLength / highLength;
-	}
-	for (iVertex = 0; iVertex < lowVertexIndex; iVertex++) {
-		lowCounts[iVertex] = lowLengths[iVertex] / lowSpacing;
-		lowSteps[iVertex].x = lowDeltas[iVertex].x / lowCounts[iVertex];
-		lowSteps[iVertex].y = lowDeltas[iVertex].y / lowCounts[iVertex];
-	}
-	for (iVertex = 0; iVertex < highVertexIndex; iVertex++) {
-		highCounts[iVertex] = highLengths[iVertex] / highSpacing;
-		highSteps[iVertex].x = highDeltas[iVertex].x / highCounts[iVertex];
-		highSteps[iVertex].y = highDeltas[iVertex].y / highCounts[iVertex];
-	}
-	lowIndex = highIndex = 0;
-	StateMap.reset(StateFlag::FILDIR);
-	lowCount = highCount = 0;
-	delta.x = CurrentFormVertices[finish].x - CurrentFormVertices[start].x;
-	delta.y = CurrentFormVertices[finish].y - CurrentFormVertices[start].y;
-	polref.length = hypot(delta.x, delta.y);
-	polref.angle = atan2(delta.y, delta.x);
-	while (lowCount || (lowIndex < lowVertexIndex && highIndex < highVertexIndex)) {
-		if (lowCount)
-			lowCount--;
-		else {
-			if (lowIndex < lowVertexIndex) {
-				lowCount = lowCounts[lowIndex];
-				lowStep.x = lowSteps[lowIndex].x;
-				lowStep.y = lowSteps[lowIndex].y;
-				lowPoint.x = lowVertices[lowIndex].x;
-				lowPoint.y = lowVertices[lowIndex].y;
-				lowIndex++;
-			}
+		SequenceIndex = 0;
+		for (iVertex = lowVertexIndex; iVertex != 0; iVertex--) {
+			lowVertices[lowIndex].x = CurrentFormVertices[iVertex].x;
+			lowVertices[lowIndex].y = CurrentFormVertices[iVertex].y;
+			lowDeltas[lowIndex].x = CurrentFormVertices[iVertex - 1].x - CurrentFormVertices[iVertex].x;
+			lowDeltas[lowIndex].y = CurrentFormVertices[iVertex - 1].y - CurrentFormVertices[iVertex].y;
+			lowLengths[lowIndex] = hypot(lowDeltas[lowIndex].x, lowDeltas[lowIndex].y);
+			lowLength += lowLengths[lowIndex];
+			lowIndex++;
 		}
-		if (highCount)
-			highCount--;
-		else {
-			if (highIndex < highVertexIndex) {
-				highCount = highCounts[highIndex];
-				highStep.x = highSteps[highIndex].x;
-				highStep.y = highSteps[highIndex].y;
-				highPoint.x = highVertices[highIndex].x;
-				highPoint.y = highVertices[highIndex].y;
-				highIndex++;
-			}
+		selind = 0;
+		for (iVertex = start + 1; iVertex <= finish; iVertex++) {
+			delta.x = CurrentFormVertices[iVertex].x - selectionStart[0].x;
+			delta.y = CurrentFormVertices[iVertex].y - selectionStart[0].y;
+			pols[selind].length = hypot(delta.x, delta.y);
+			pols[selind].angle = atan2(delta.y, delta.x);
+			selind++;
 		}
-		delta.x = highPoint.x - lowPoint.x;
-		delta.y = highPoint.y - lowPoint.y;
-		polin.angle = atan2(delta.y, delta.x);
-		polin.length = hypot(delta.x, delta.y);
-		poldif.angle = polin.angle - polref.angle;
-		if (polref.length > 0.9*LineSpacing) {
-			poldif.length = polin.length / polref.length;
-			if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-				OSequence[SequenceIndex].x = lowPoint.x;
-				OSequence[SequenceIndex].y = lowPoint.y;
-				SequenceIndex++;
-				for (iVertex = 0; iVertex < (selectedVertexCount - 1); iVertex++) {
-					RotationAngle = pols[iVertex].angle + poldif.angle;
-					length = pols[iVertex].length*poldif.length;
-					OSequence[SequenceIndex].x = lowPoint.x + cos(RotationAngle)*length;
-					OSequence[SequenceIndex].y = lowPoint.y + sin(RotationAngle)*length;
-					SequenceIndex++;
-				}
-			}
+		highIndex = 0; highLength = 0;
+		for (iVertex = finish; iVertex < VertexCount - 1; iVertex++) {
+			highVertices[highIndex].x = CurrentFormVertices[iVertex].x;
+			highVertices[highIndex].y = CurrentFormVertices[iVertex].y;
+			highDeltas[highIndex].x = CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x;
+			highDeltas[highIndex].y = CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y;
+			highLengths[highIndex] = hypot(highDeltas[highIndex].x, highDeltas[highIndex].y);
+			highLength += highLengths[highIndex];
+			highIndex++;
+		}
+		if (highLength > lowLength)
+			length = lowLength;
+		else
+			length = highLength;
+		count = length / SelectedForm->fillSpacing;
+		if (highLength < lowLength) {
+			lowSpacing = SelectedForm->fillSpacing;
+			highSpacing = SelectedForm->fillSpacing*highLength / lowLength;
+		}
+		else {
+			highSpacing = SelectedForm->fillSpacing;
+			lowSpacing = SelectedForm->fillSpacing*lowLength / highLength;
+		}
+		for (iVertex = 0; iVertex < lowVertexIndex; iVertex++) {
+			lowCounts[iVertex] = lowLengths[iVertex] / lowSpacing;
+			lowSteps[iVertex].x = lowDeltas[iVertex].x / lowCounts[iVertex];
+			lowSteps[iVertex].y = lowDeltas[iVertex].y / lowCounts[iVertex];
+		}
+		for (iVertex = 0; iVertex < highVertexIndex; iVertex++) {
+			highCounts[iVertex] = highLengths[iVertex] / highSpacing;
+			highSteps[iVertex].x = highDeltas[iVertex].x / highCounts[iVertex];
+			highSteps[iVertex].y = highDeltas[iVertex].y / highCounts[iVertex];
+		}
+		lowIndex = highIndex = 0;
+		StateMap.reset(StateFlag::FILDIR);
+		lowCount = highCount = 0;
+		delta.x = CurrentFormVertices[finish].x - CurrentFormVertices[start].x;
+		delta.y = CurrentFormVertices[finish].y - CurrentFormVertices[start].y;
+		polref.length = hypot(delta.x, delta.y);
+		polref.angle = atan2(delta.y, delta.x);
+		while (lowCount || (lowIndex < lowVertexIndex && highIndex < highVertexIndex)) {
+			if (lowCount)
+				lowCount--;
 			else {
-				OSequence[SequenceIndex].x = highPoint.x;
-				OSequence[SequenceIndex].y = highPoint.y;
-				SequenceIndex++;
-				for (iVertex = selectedVertexCount - 1; iVertex != 0; iVertex--) {
-					RotationAngle = pols[iVertex - 1].angle + poldif.angle;
-					length = pols[iVertex - 1].length*poldif.length;
-					OSequence[SequenceIndex].x = lowPoint.x + cos(RotationAngle)*length;
-					OSequence[SequenceIndex].y = lowPoint.y + sin(RotationAngle)*length;
-					SequenceIndex++;
+				if (lowIndex < lowVertexIndex) {
+					lowCount = lowCounts[lowIndex];
+					lowStep.x = lowSteps[lowIndex].x;
+					lowStep.y = lowSteps[lowIndex].y;
+					lowPoint.x = lowVertices[lowIndex].x;
+					lowPoint.y = lowVertices[lowIndex].y;
+					lowIndex++;
 				}
 			}
+			if (highCount)
+				highCount--;
+			else {
+				if (highIndex < highVertexIndex) {
+					highCount = highCounts[highIndex];
+					highStep.x = highSteps[highIndex].x;
+					highStep.y = highSteps[highIndex].y;
+					highPoint.x = highVertices[highIndex].x;
+					highPoint.y = highVertices[highIndex].y;
+					highIndex++;
+				}
+			}
+			delta.x = highPoint.x - lowPoint.x;
+			delta.y = highPoint.y - lowPoint.y;
+			polin.angle = atan2(delta.y, delta.x);
+			polin.length = hypot(delta.x, delta.y);
+			poldif.angle = polin.angle - polref.angle;
+			if (polref.length > 0.9*LineSpacing) {
+				poldif.length = polin.length / polref.length;
+				if (StateMap.testAndFlip(StateFlag::FILDIR)) {
+					OSequence[SequenceIndex].x = lowPoint.x;
+					OSequence[SequenceIndex].y = lowPoint.y;
+					SequenceIndex++;
+					for (iVertex = 0; iVertex < (selectedVertexCount - 1); iVertex++) {
+						RotationAngle = pols[iVertex].angle + poldif.angle;
+						length = pols[iVertex].length*poldif.length;
+						OSequence[SequenceIndex].x = lowPoint.x + cos(RotationAngle)*length;
+						OSequence[SequenceIndex].y = lowPoint.y + sin(RotationAngle)*length;
+						SequenceIndex++;
+					}
+				}
+				else {
+					OSequence[SequenceIndex].x = highPoint.x;
+					OSequence[SequenceIndex].y = highPoint.y;
+					SequenceIndex++;
+					for (iVertex = selectedVertexCount - 1; iVertex != 0; iVertex--) {
+						RotationAngle = pols[iVertex - 1].angle + poldif.angle;
+						length = pols[iVertex - 1].length*poldif.length;
+						OSequence[SequenceIndex].x = lowPoint.x + cos(RotationAngle)*length;
+						OSequence[SequenceIndex].y = lowPoint.y + sin(RotationAngle)*length;
+						SequenceIndex++;
+					}
+				}
+			}
+			lowPoint.x += lowStep.x;
+			lowPoint.y += lowStep.y;
+			highPoint.x += highStep.x;
+			highPoint.y += highStep.y;
 		}
-		lowPoint.x += lowStep.x;
-		lowPoint.y += lowStep.y;
-		highPoint.x += highStep.x;
-		highPoint.y += highStep.y;
+		if (StateMap.test(StateFlag::FILDIR)) {
+			OSequence[SequenceIndex].x = CurrentFormVertices[0].x;
+			OSequence[SequenceIndex++].y = CurrentFormVertices[0].y;
+		}
+		else {
+			OSequence[SequenceIndex].x = CurrentFormVertices[VertexCount - 1].x;
+			OSequence[SequenceIndex++].y = CurrentFormVertices[VertexCount - 1].y;
+		}
+		if (SelectedForm->lengthOrCount.stitchLength < MinStitchLength)
+			SelectedForm->lengthOrCount.stitchLength = MinStitchLength;
 	}
-	if (StateMap.test(StateFlag::FILDIR)) {
-		OSequence[SequenceIndex].x = CurrentFormVertices[0].x;
-		OSequence[SequenceIndex++].y = CurrentFormVertices[0].y;
-	}
-	else {
-		OSequence[SequenceIndex].x = CurrentFormVertices[VertexCount - 1].x;
-		OSequence[SequenceIndex++].y = CurrentFormVertices[VertexCount - 1].y;
-	}
-	if (SelectedForm->lengthOrCount.stitchLength < MinStitchLength)
-		SelectedForm->lengthOrCount.stitchLength = MinStitchLength;
 }
 
 bool contsf(unsigned formIndex) {
@@ -10420,7 +10421,6 @@ void contfil() {
 
 void ribon() {
 
-	FRMHED*		formHeader = nullptr;
 	unsigned	iVertex = 0, iGuide = 0, isBlunt = 0, iNewVertex = 0, savedFormIndex = 0;
 
 	frm1pnt();
@@ -10432,7 +10432,7 @@ void ribon() {
 			satout(BorderWidth);
 
 			HorizontalLength2 = BorderWidth / 2;
-			formHeader = &FormList[FormIndex];
+			FRMHED* formHeader = &FormList[FormIndex];
 			frmclr(formHeader);
 			iNewVertex = 0;
 			formHeader->maxFillStitchLen = 9 * PFGRAN;
@@ -10654,8 +10654,10 @@ void stchfrm(unsigned formIndex, unsigned* attribute) noexcept {
 		mov		[ebx], ecx
 	}
 #else
-	*attribute &= NFRMSK;
-	*attribute |= formIndex << FRMSHFT;
+	if (attribute) {
+		*attribute &= NFRMSK;
+		*attribute |= formIndex << FRMSHFT;
+	}
 #endif
 }
 
@@ -10756,13 +10758,10 @@ constexpr unsigned duat(unsigned attribute) {
 
 void srtf(unsigned start, unsigned finish) {
 
-	unsigned*	stitchHistogram = nullptr;
 	unsigned	iForm = 0, iStitch = 0, stitchAccumulator = 0, swap = 0;
 
 	if (start != finish) {
-		stitchHistogram = new unsigned[FormIndex << 2];
-		for (iForm = 0; iForm < FormIndex << 2; iForm++)
-			stitchHistogram[iForm] = 0;
+		std::vector<unsigned> stitchHistogram(FormIndex << 2);
 		for (iStitch = start; iStitch < finish; iStitch++)
 			stitchHistogram[duat(TempStitchBuffer[iStitch].attribute)]++;
 		stitchAccumulator = start;
@@ -10773,7 +10772,6 @@ void srtf(unsigned start, unsigned finish) {
 		}
 		for (iStitch = start; iStitch < finish; iStitch++)
 			moveStitch(&StitchBuffer[stitchHistogram[duat(TempStitchBuffer[iStitch].attribute)]++], &TempStitchBuffer[iStitch]);
-		delete[] stitchHistogram;
 	}
 }
 
@@ -11134,7 +11132,7 @@ void stchadj() {
 void spltsat(SATCON currentGuide) {
 
 	// We are adding two additional vertices when splitting the form
-	fPOINT*		vertexBuffer = new fPOINT[VertexCount + 2];
+	std::vector<fPOINT>	vertexBuffer(VertexCount + 2);
 	unsigned	iForm = 0, iGuide = 0, iVertex = 0, iOldVertex = 0, iNewVertex = 0, oldLastVertex = 0;
 
 	mvfrmsb(&FormList[FormIndex], &FormList[FormIndex - 1], FormIndex - ClosestFormToCursor);
@@ -11212,7 +11210,6 @@ void spltsat(SATCON currentGuide) {
 			FormList[iForm].borderClipData += SelectedForm->clipEntries;
 	}
 	stchadj();
-	delete[] vertexBuffer;
 }
 
 bool spltlin() {
@@ -11607,7 +11604,9 @@ bool isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* leng
 					if (LineSegmentStart.x > left && LineSegmentStart.x < right) {
 						intersection->x = LineSegmentStart.x;
 						intersection->y = LineSegmentStart.y;
-						*length = 0;
+						if (length) {
+							*length = 0;
+						}
 						return true;
 					}
 					return false;
@@ -11622,7 +11621,9 @@ bool isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* leng
 		tempIntersection.y = 0;
 	intersection->x = static_cast<float>(tempIntersection.x);
 	intersection->y = static_cast<float>(tempIntersection.y);
-	*length = hypot(tempIntersection.x - LineSegmentStart.x, tempIntersection.y - LineSegmentStart.y);
+	if (length) {
+		*length = hypot(tempIntersection.x - LineSegmentStart.x, tempIntersection.y - LineSegmentStart.y);
+	}
 	// ToDo - should length be determined from start or end?
 	//	 hypot(tipnt.x-LineSegmentEnd.x,tipnt.y-LineSegmentEnd.y);
 	return flag;
@@ -12334,15 +12335,14 @@ void horclp() {
 void angclpfn() {
 
 	unsigned	iVertex = 0;
-	fPOINT*		vertexList = nullptr;
-
+	
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
 	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
 	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;
 	if (StateMap.test(StateFlag::ISUND)) {
 		RotationAngle = PI / 2 - SelectedForm->underlayStitchAngle;
-		vertexList = insid();
+		const fPOINT* vertexList = insid();
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 			AngledFormVertices[iVertex].x = vertexList[iVertex].x;
 			AngledFormVertices[iVertex].y = vertexList[iVertex].y;
