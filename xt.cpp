@@ -1079,19 +1079,18 @@ unsigned gucon(fPOINT start, fPOINT finish, unsigned destination, unsigned code)
 		return 0;
 	const fPOINT* indentedPoint = insid();
 	up = down = startVertex;
-gulab:
-	if (up == endVertex) {
-		StateMap.reset(StateFlag::WLKDIR);
-		goto gulabx;
-	}
-	if (down == endVertex) {
-		StateMap.set(StateFlag::WLKDIR);
-		goto gulabx;
-	}
-	up = nxt(up);
-	down = prv(down);
-	goto gulab;
-gulabx:;
+	do {
+		if (up == endVertex) {
+			StateMap.reset(StateFlag::WLKDIR);
+			break;
+		}
+		if (down == endVertex) {
+			StateMap.set(StateFlag::WLKDIR);
+			break;
+		}
+		up = nxt(up);
+		down = prv(down);
+	} while (true);
 	iStitch = destination;
 	while (startVertex != endVertex) {
 		StitchBuffer[iStitch].x = indentedPoint[startVertex].x;
