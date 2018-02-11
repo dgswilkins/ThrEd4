@@ -6977,24 +6977,18 @@ void dulin() {
 	if (MoveLine0[0].x == MoveLine1[1].x && MoveLine0[0].y == MoveLine1[1].y) {
 
 		if (StateMap.test(StateFlag::ISDWN)) {
-
 			Polyline(StitchWindowDC, MoveLine0, 2);
-			goto dux;
 		}
 		else {
-
 			Polyline(StitchWindowDC, MoveLine1, 2);
-			goto dux;
 		}
 	}
 	else {
-
 		if (StateMap.test(StateFlag::ISDWN))
 			Polyline(StitchWindowDC, MoveLine0, 2);
 		if (StateMap.test(StateFlag::ISUP))
 			Polyline(StitchWindowDC, MoveLine1, 2);
 	}
-dux:;
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 	StateMap.flip(StateFlag::WASLIN);
 }
