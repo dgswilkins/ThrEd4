@@ -4218,16 +4218,19 @@ void txbak() {
 
 void nxbak() {
 	unsigned	iHistory = 0;
+	bool flag = false;
 
 	if (StateMap.test(StateFlag::WASTXBAK)) {
 		for (iHistory = 0; iHistory < 16; iHistory++) {
 			txrfor();
-			if (TextureHistory[TextureHistoryIndex].width)
-				goto nxbak1;
+			if (TextureHistory[TextureHistoryIndex].width) {
+				flag = true;
+				break;
+			}
 		}
-		return;
-nxbak1:;
-		redtbak();
+		if (flag) {
+			redtbak();
+		}
 	}
 }
 
