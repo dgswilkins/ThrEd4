@@ -6975,7 +6975,6 @@ void dulin() {
 	SelectObject(StitchWindowDC, LinePen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	if (MoveLine0[0].x == MoveLine1[1].x && MoveLine0[0].y == MoveLine1[1].y) {
-
 		if (StateMap.test(StateFlag::ISDWN)) {
 			Polyline(StitchWindowDC, MoveLine0, 2);
 		}
@@ -7149,73 +7148,71 @@ unsigned closlin() {
 						}
 						if (checkedPoint.x > boundingRect.left && checkedPoint.x<boundingRect.right
 							&& checkedPoint.y>boundingRect.bottom && checkedPoint.y < boundingRect.top) {
+							do {
+								if (yab == 0) {
 
-							if (yab == 0) {
-
-								//stitch is horizontal
-								intersection.x = checkedPoint.x;
-								intersection.y = stitches[iStitch].y;
-								tsum = ((stitches[iStitch].y > checkedPoint.y) ? (stitches[iStitch].y - checkedPoint.y) : (checkedPoint.y - stitches[iStitch].y));
-								goto gotsum;
-							}
-							if (xba == 0) {
-
-								//stitch is vertical
-								dx = stitches[iStitch].x - checkedPoint.x;
-								boundingRect.top -= tolerance;
-								boundingRect.bottom += tolerance;
-								if (checkedPoint.y > boundingRect.top) {
-
-									dy = checkedPoint.y - boundingRect.top;
-									tsum = hypot(dx, dy);
-									goto gotal;
-								}
-								if (checkedPoint.y < boundingRect.bottom) {
-
-									dy = checkedPoint.y - boundingRect.bottom;
-									tsum = hypot(dx, dy);
-									goto gotal;
-								}
-								tsum = fabs(dx);
-								goto gotal;
-							}
-							slope = static_cast<double>(xba) / yab;
-							offset = stitches[iStitch].x + slope * stitches[iStitch].y;
-							poff = checkedPoint.x - checkedPoint.y / slope;
-							intersection.y = slope * (offset - poff) / (slope*slope + 1);
-							intersection.x = offset - slope * intersection.y;
-							dx = intersection.x - checkedPoint.x;
-							dy = intersection.y - checkedPoint.y;
-							tsum = hypot(dx, dy);
-						gotsum:;
-							boundingRect.bottom += tolerance;
-							boundingRect.top -= tolerance;
-							boundingRect.left += tolerance;
-							boundingRect.right -= tolerance;
-							if (intersection.x < boundingRect.left) {
-								if (intersection.y < boundingRect.bottom) {
-									dx = checkedPoint.x - boundingRect.left;
-									dy = checkedPoint.y - boundingRect.bottom;
+									//stitch is horizontal
+									intersection.x = checkedPoint.x;
+									intersection.y = stitches[iStitch].y;
+									tsum = ((stitches[iStitch].y > checkedPoint.y) ? (stitches[iStitch].y - checkedPoint.y) : (checkedPoint.y - stitches[iStitch].y));
 								}
 								else {
-									dx = checkedPoint.x - boundingRect.left;
-									dy = checkedPoint.y - boundingRect.top;
+									if (xba == 0) {
+
+										//stitch is vertical
+										dx = stitches[iStitch].x - checkedPoint.x;
+										boundingRect.top -= tolerance;
+										boundingRect.bottom += tolerance;
+										if (checkedPoint.y > boundingRect.top) {
+											dy = checkedPoint.y - boundingRect.top;
+											tsum = hypot(dx, dy);
+											break;
+										}
+										if (checkedPoint.y < boundingRect.bottom) {
+											dy = checkedPoint.y - boundingRect.bottom;
+											tsum = hypot(dx, dy);
+											break;
+										}
+										tsum = fabs(dx);
+										break;
+									}
+									slope = static_cast<double>(xba) / yab;
+									offset = stitches[iStitch].x + slope * stitches[iStitch].y;
+									poff = checkedPoint.x - checkedPoint.y / slope;
+									intersection.y = slope * (offset - poff) / (slope*slope + 1);
+									intersection.x = offset - slope * intersection.y;
+									dx = intersection.x - checkedPoint.x;
+									dy = intersection.y - checkedPoint.y;
+									tsum = hypot(dx, dy);
 								}
-							}
-							else {
-								if (intersection.x > boundingRect.right) {
+								boundingRect.bottom += tolerance;
+								boundingRect.top -= tolerance;
+								boundingRect.left += tolerance;
+								boundingRect.right -= tolerance;
+								if (intersection.x < boundingRect.left) {
 									if (intersection.y < boundingRect.bottom) {
-										dx = checkedPoint.x - boundingRect.right;
+										dx = checkedPoint.x - boundingRect.left;
 										dy = checkedPoint.y - boundingRect.bottom;
 									}
 									else {
-										dx = checkedPoint.x - boundingRect.right;
+										dx = checkedPoint.x - boundingRect.left;
 										dy = checkedPoint.y - boundingRect.top;
 									}
 								}
-							}
-							tsum = sqrt(dx*dx + dy * dy);
-						gotal:;
+								else {
+									if (intersection.x > boundingRect.right) {
+										if (intersection.y < boundingRect.bottom) {
+											dx = checkedPoint.x - boundingRect.right;
+											dy = checkedPoint.y - boundingRect.bottom;
+										}
+										else {
+											dx = checkedPoint.x - boundingRect.right;
+											dy = checkedPoint.y - boundingRect.top;
+										}
+									}
+								}
+								tsum = sqrt(dx*dx + dy * dy);
+							} while (false);
 							if (tsum < sum) {
 
 								sum = tsum;
