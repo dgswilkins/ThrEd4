@@ -6513,86 +6513,74 @@ void zumin() {
 	if (!StateMap.testAndSet(StateFlag::ZUMED))
 		movStch();
 	if (!StateMap.testAndReset(StateFlag::BZUMIN)) {
-
-		if (StateMap.test(StateFlag::GMRK)) {
-
-			SelectedPoint.x = ZoomMarkPoint.x;
-			SelectedPoint.y = ZoomMarkPoint.y;
-			goto gotc;
-		}
-		if (StateMap.test(StateFlag::FORMSEL)) {
-
-			boundingRect = &FormList[ClosestFormToCursor].rectangle;
-			SelectedPoint.x = ((boundingRect->right - boundingRect->left) / 2) + boundingRect->left;
-			SelectedPoint.y = ((boundingRect->top - boundingRect->bottom) / 2) + boundingRect->bottom;
-			goto gotc;
-		}
-		if (StateMap.test(StateFlag::FRMPSEL)) {
-
-			SelectedPoint.x = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].x;
-			SelectedPoint.y = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].y;
-			goto gotc;
-		}
-		if (StateMap.test(StateFlag::SELBOX)) {
-
-			SelectedPoint.x = StitchBuffer[ClosestPointIndex].x;
-			SelectedPoint.y = StitchBuffer[ClosestPointIndex].y;
-			goto gotc;
-		}
-		if (StateMap.test(StateFlag::GRPSEL)) {
-
-			selRct(&groupBoundingRect);
-			SelectedPoint.x = ((groupBoundingRect.right - groupBoundingRect.left) / 2) + groupBoundingRect.left;
-			SelectedPoint.y = ((groupBoundingRect.top - groupBoundingRect.bottom) / 2) + groupBoundingRect.bottom;
-			goto gotc;
-		}
-		if (StateMap.test(StateFlag::INSRT)) {
-
-			if (StateMap.test(StateFlag::LIN1)) {
-
-				if (StateMap.test(StateFlag::BAKEND)) {
-
-					SelectedPoint.x = StitchBuffer[PCSHeader.stitchCount - 1].x;
-					SelectedPoint.y = StitchBuffer[PCSHeader.stitchCount - 1].y;
+		do {
+			if (StateMap.test(StateFlag::GMRK)) {
+				SelectedPoint.x = ZoomMarkPoint.x;
+				SelectedPoint.y = ZoomMarkPoint.y;
+				break;
+			}
+			if (StateMap.test(StateFlag::FORMSEL)) {
+				boundingRect = &FormList[ClosestFormToCursor].rectangle;
+				SelectedPoint.x = ((boundingRect->right - boundingRect->left) / 2) + boundingRect->left;
+				SelectedPoint.y = ((boundingRect->top - boundingRect->bottom) / 2) + boundingRect->bottom;
+				break;
+			}
+			if (StateMap.test(StateFlag::FRMPSEL)) {
+				SelectedPoint.x = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].x;
+				SelectedPoint.y = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].y;
+				break;
+			}
+			if (StateMap.test(StateFlag::SELBOX)) {
+				SelectedPoint.x = StitchBuffer[ClosestPointIndex].x;
+				SelectedPoint.y = StitchBuffer[ClosestPointIndex].y;
+				break;
+			}
+			if (StateMap.test(StateFlag::GRPSEL)) {
+				selRct(&groupBoundingRect);
+				SelectedPoint.x = ((groupBoundingRect.right - groupBoundingRect.left) / 2) + groupBoundingRect.left;
+				SelectedPoint.y = ((groupBoundingRect.top - groupBoundingRect.bottom) / 2) + groupBoundingRect.bottom;
+				break;
+			}
+			if (StateMap.test(StateFlag::INSRT)) {
+				if (StateMap.test(StateFlag::LIN1)) {
+					if (StateMap.test(StateFlag::BAKEND)) {
+						SelectedPoint.x = StitchBuffer[PCSHeader.stitchCount - 1].x;
+						SelectedPoint.y = StitchBuffer[PCSHeader.stitchCount - 1].y;
+					}
+					else {
+						SelectedPoint.x = StitchBuffer[0].x;
+						SelectedPoint.y = StitchBuffer[0].y;
+					}
 				}
 				else {
-
-					SelectedPoint.x = StitchBuffer[0].x;
-					SelectedPoint.y = StitchBuffer[0].y;
+					SelectedPoint.x = (StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x) / 2 + StitchBuffer[ClosestPointIndex].x;
+					SelectedPoint.y = (StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y) / 2 + StitchBuffer[ClosestPointIndex].y;
 				}
+				break;
 			}
-			else {
-
-				SelectedPoint.x = (StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x) / 2 + StitchBuffer[ClosestPointIndex].x;
-				SelectedPoint.y = (StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y) / 2 + StitchBuffer[ClosestPointIndex].y;
+			if (SelectedFormCount) {
+				SelectedFormsRect.bottom = FormList[SelectedFormList[0]].rectangle.bottom;
+				SelectedFormsRect.top = FormList[SelectedFormList[0]].rectangle.top;
+				SelectedFormsRect.left = FormList[SelectedFormList[0]].rectangle.left;
+				SelectedFormsRect.right = FormList[SelectedFormList[0]].rectangle.right;
+				for (iForm = 1; iForm < SelectedFormCount; iForm++) {
+					if (FormList[SelectedFormList[iForm]].rectangle.bottom < SelectedFormsRect.bottom)
+						SelectedFormsRect.bottom = FormList[SelectedFormList[iForm]].rectangle.bottom;
+					if (FormList[SelectedFormList[iForm]].rectangle.top > SelectedFormsRect.top)
+						SelectedFormsRect.top = FormList[SelectedFormList[iForm]].rectangle.top;
+					if (FormList[SelectedFormList[iForm]].rectangle.left < SelectedFormsRect.left)
+						SelectedFormsRect.left = FormList[SelectedFormList[iForm]].rectangle.left;
+					if (FormList[SelectedFormList[iForm]].rectangle.right > SelectedFormsRect.right)
+						SelectedFormsRect.right = FormList[SelectedFormList[iForm]].rectangle.right;
+				}
+				SelectedPoint.x = (SelectedFormsRect.right - SelectedFormsRect.left) / 2 + SelectedFormsRect.left;
+				SelectedPoint.y = (SelectedFormsRect.top - SelectedFormsRect.bottom) / 2 + SelectedFormsRect.bottom;
+				break;
 			}
-			goto gotc;
-		}
-		if (SelectedFormCount) {
-
-			SelectedFormsRect.bottom = FormList[SelectedFormList[0]].rectangle.bottom;
-			SelectedFormsRect.top = FormList[SelectedFormList[0]].rectangle.top;
-			SelectedFormsRect.left = FormList[SelectedFormList[0]].rectangle.left;
-			SelectedFormsRect.right = FormList[SelectedFormList[0]].rectangle.right;
-			for (iForm = 1; iForm < SelectedFormCount; iForm++) {
-
-				if (FormList[SelectedFormList[iForm]].rectangle.bottom < SelectedFormsRect.bottom)
-					SelectedFormsRect.bottom = FormList[SelectedFormList[iForm]].rectangle.bottom;
-				if (FormList[SelectedFormList[iForm]].rectangle.top > SelectedFormsRect.top)
-					SelectedFormsRect.top = FormList[SelectedFormList[iForm]].rectangle.top;
-				if (FormList[SelectedFormList[iForm]].rectangle.left < SelectedFormsRect.left)
-					SelectedFormsRect.left = FormList[SelectedFormList[iForm]].rectangle.left;
-				if (FormList[SelectedFormList[iForm]].rectangle.right > SelectedFormsRect.right)
-					SelectedFormsRect.right = FormList[SelectedFormList[iForm]].rectangle.right;
-			}
-			SelectedPoint.x = (SelectedFormsRect.right - SelectedFormsRect.left) / 2 + SelectedFormsRect.left;
-			SelectedPoint.y = (SelectedFormsRect.top - SelectedFormsRect.bottom) / 2 + SelectedFormsRect.bottom;
-			goto gotc;
-		}
-		if (!px2stch())
-			centr();
+			if (!px2stch())
+				centr();
+		} while (false); 
 	}
-gotc:;
 	newSize.x = UnzoomedRect.x*ZoomFactor;
 	newSize.y = newSize.x / StitchWindowAspectRatio;
 	ZoomRect.left = ZoomRect.bottom = 0;
