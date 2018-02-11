@@ -4450,6 +4450,7 @@ void txsnap() {
 
 void txtkey(unsigned keyCode) {
 	TCHAR	character = {};
+	bool flag = true;
 
 	if (SideWindowButton) {
 		switch (keyCode) {
@@ -4472,13 +4473,15 @@ void txtkey(unsigned keyCode) {
 
 				if (TextureInputIndex)
 					TextureInputIndex--;
-				goto txskp;
+				flag = false;
+				break;
 		}
-		if (txdig(keyCode, &character)) {
-			TextureInputBuffer[TextureInputIndex] = character;
-			TextureInputIndex++;
+		if (flag) {
+			if (txdig(keyCode, &character)) {
+				TextureInputBuffer[TextureInputIndex] = character;
+				TextureInputIndex++;
+			}
 		}
-txskp:;
 		TextureInputBuffer[TextureInputIndex] = 0;
 		SetWindowText(SideWindowButton, TextureInputBuffer);
 		return;
