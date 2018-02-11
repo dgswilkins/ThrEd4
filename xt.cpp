@@ -5201,6 +5201,7 @@ void repflt() {
 	ZeroMemory(&badData, sizeof(BADCNTS));
 	fPOINT* vertexPoint = new fPOINT[vertexCount];
 	iVertex = 0;
+	bool flag = true;
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		FRMHED* formHeader = &FormList[iForm];
 		vertexDifference = formHeader->vertices - FormVertices;
@@ -5224,12 +5225,14 @@ void repflt() {
 				TextureIndex = badData.tx;
 				chkfstch();
 				adbad(IDS_FRMDAT, FormIndex - iForm + 1);
-				goto rfltskp;
+				flag = false;
+				break;
 			}
 		}
 	}
-	FormVertexIndex = iVertex;
-rfltskp:;
+	if (flag) {
+		FormVertexIndex = iVertex;
+	}
 	MoveMemory(FormVertices, vertexPoint, sizeof(fPOINT)*FormVertexIndex);
 	delete[] vertexPoint;
 }
