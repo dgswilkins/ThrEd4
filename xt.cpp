@@ -4000,10 +4000,9 @@ void nutx() {
 				if (istx(iForm)) {
 					formHeader = &FormList[iForm];
 					iPoint = formHeader->fillInfo.texture.index + formHeader->fillInfo.texture.count;
-					goto nutskp;
+					break;
 				}
 			}
-nutskp:;
 		}
 	}
 	txspac(iPoint, TextureScreen.index);
