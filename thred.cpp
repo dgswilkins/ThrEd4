@@ -6650,47 +6650,47 @@ void zumout() {
 
 	unboxs();
 	if (StateMap.test(StateFlag::ZUMED)) {
+		do {
+			if (StateMap.test(StateFlag::GMRK)) {
 
-		if (StateMap.test(StateFlag::GMRK)) {
+				SelectedPoint.x = ZoomMarkPoint.x;
+				SelectedPoint.y = ZoomMarkPoint.y;
+				break;
+			}
+			if (StateMap.test(StateFlag::FORMSEL)) {
 
-			SelectedPoint.x = ZoomMarkPoint.x;
-			SelectedPoint.y = ZoomMarkPoint.y;
-			goto gots;
-		}
-		if (StateMap.test(StateFlag::FORMSEL)) {
+				boundingRect = &FormList[ClosestFormToCursor].rectangle;
+				SelectedPoint.x = ((boundingRect->right - boundingRect->left) / 2) + boundingRect->left;
+				SelectedPoint.y = ((boundingRect->top - boundingRect->bottom) / 2) + boundingRect->bottom;
+				break;
+			}
+			if (StateMap.test(StateFlag::FRMPSEL)) {
 
-			boundingRect = &FormList[ClosestFormToCursor].rectangle;
-			SelectedPoint.x = ((boundingRect->right - boundingRect->left) / 2) + boundingRect->left;
-			SelectedPoint.y = ((boundingRect->top - boundingRect->bottom) / 2) + boundingRect->bottom;
-			goto gots;
-		}
-		if (StateMap.test(StateFlag::FRMPSEL)) {
+				SelectedPoint.x = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].x;
+				SelectedPoint.y = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].y;
+				break;
+			}
+			if (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::INSRT)) {
 
-			SelectedPoint.x = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].x;
-			SelectedPoint.y = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].y;
-			goto gots;
-		}
-		if (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::INSRT)) {
+				SelectedPoint.x = StitchBuffer[ClosestPointIndex].x;
+				SelectedPoint.y = StitchBuffer[ClosestPointIndex].y;
+				break;
+			}
+			if (StateMap.test(StateFlag::GRPSEL)) {
 
-			SelectedPoint.x = StitchBuffer[ClosestPointIndex].x;
-			SelectedPoint.y = StitchBuffer[ClosestPointIndex].y;
-			goto gots;
-		}
-		if (StateMap.test(StateFlag::GRPSEL)) {
+				selRct(&groupBoundingRect);
+				SelectedPoint.x = ((groupBoundingRect.right - groupBoundingRect.left) / 2) + groupBoundingRect.left;
+				SelectedPoint.y = ((groupBoundingRect.top - groupBoundingRect.bottom) / 2) + groupBoundingRect.bottom;
+				break;
+			}
+			if (StateMap.test(StateFlag::SELBOX)) {
 
-			selRct(&groupBoundingRect);
-			SelectedPoint.x = ((groupBoundingRect.right - groupBoundingRect.left) / 2) + groupBoundingRect.left;
-			SelectedPoint.y = ((groupBoundingRect.top - groupBoundingRect.bottom) / 2) + groupBoundingRect.bottom;
-			goto gots;
-		}
-		if (StateMap.test(StateFlag::SELBOX)) {
-
-			shft2box();
-			goto gots;
-		}
-		if (!px2stch())
-			centr();
-gots:;
+				shft2box();
+				break;
+			}
+			if (!px2stch())
+				centr();
+		} while (false);
 		ZoomFactor /= ZUMFCT;
 		if (ZoomFactor > 0.98) {
 
