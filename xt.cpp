@@ -4198,18 +4198,21 @@ void redtbak() {
 
 void txbak() {
 	unsigned	iHistory = 0;
+	bool flag = false;
 
 	if (StateMap.test(StateFlag::WASTXBAK)) {
 		SelectedTexturePointsCount = 0;
 		for (iHistory = 0; iHistory < 16; iHistory++) {
-			if (TextureHistory[TextureHistoryIndex].width)
-				goto txbak1;
+			if (TextureHistory[TextureHistoryIndex].width) {
+				flag = true;
+				break;
+			}
 			txrbak();
 		}
-		return;
-txbak1:;
-		redtbak();
-		txrbak();
+		if (flag) {
+			redtbak();
+			txrbak();
+		}
 	}
 }
 
