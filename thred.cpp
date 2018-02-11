@@ -8079,39 +8079,34 @@ void durcntr() {
 }
 
 void rot() {
-
-	if (StateMap.test(StateFlag::FPSEL)) {
-
-		MoveMemory(&RotationRect, &SelectedPointsLine, sizeof(fRECTANGLE));
-		goto rotskp;
-	}
-	if (StateMap.test(StateFlag::BIGBOX)) {
-
-		MoveMemory(&RotationRect, &AllItemsRect, sizeof(fRECTANGLE));
-		goto rotskp;
-	}
-	if (SelectedFormCount) {
-
-		pxrct2stch(SelectedFormsRect, &RotationRect);
-		StateMap.set(StateFlag::FRMSROT);
-		goto rotskp;
-	}
-	if (StateMap.test(StateFlag::FORMSEL)) {
-
-		fvars(ClosestFormToCursor);
-		StateMap.set(StateFlag::FRMROT);
-		MoveMemory(&RotationRect, &SelectedForm->rectangle, sizeof(fRECTANGLE));
-		goto rotskp;
-	}
-	if (StateMap.test(StateFlag::GRPSEL)) {
-
-		rngadj();
-		selRct(&RotationRect);
-		goto rotskp;
-	}
-	shoseln(IDS_FGRPF, IDS_ROT);
-	return;
-rotskp:;
+	do {
+		if (StateMap.test(StateFlag::FPSEL)) {
+			MoveMemory(&RotationRect, &SelectedPointsLine, sizeof(fRECTANGLE));
+			break;
+		}
+		if (StateMap.test(StateFlag::BIGBOX)) {
+			MoveMemory(&RotationRect, &AllItemsRect, sizeof(fRECTANGLE));
+			break;
+		}
+		if (SelectedFormCount) {
+			pxrct2stch(SelectedFormsRect, &RotationRect);
+			StateMap.set(StateFlag::FRMSROT);
+			break;
+		}
+		if (StateMap.test(StateFlag::FORMSEL)) {
+			fvars(ClosestFormToCursor);
+			StateMap.set(StateFlag::FRMROT);
+			MoveMemory(&RotationRect, &SelectedForm->rectangle, sizeof(fRECTANGLE));
+			break;
+		}
+		if (StateMap.test(StateFlag::GRPSEL)) {
+			rngadj();
+			selRct(&RotationRect);
+			break;
+		}
+		shoseln(IDS_FGRPF, IDS_ROT);
+		return;
+	} while (false);
 	StateMap.set(StateFlag::ROTAT);
 	durcntr();
 	RotationAngle = 0;
@@ -8176,24 +8171,30 @@ unsigned frmcnt(unsigned iForm) noexcept {
 	unsigned	stitchCount = 0, iStitch = 0;
 
 	LowerLeftStitch.x = LowerLeftStitch.y = 1e20f;
+	bool flag = true;
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if ((StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute && StitchBuffer[iStitch].attribute&TYPMSK)
-			goto fskip;
-	}
-	return 0;
-fskip:;
-	FormFirstStitchIndex = iStitch;
-	while (iStitch < PCSHeader.stitchCount) {
 		if ((StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute && StitchBuffer[iStitch].attribute&TYPMSK) {
-			if (StitchBuffer[iStitch].x < LowerLeftStitch.x)
-				LowerLeftStitch.x = StitchBuffer[iStitch].x;
-			if (StitchBuffer[iStitch].y < LowerLeftStitch.y)
-				LowerLeftStitch.y = StitchBuffer[iStitch].y;
-			stitchCount++;
+			flag = false;
+			break;
 		}
-		iStitch++;
 	}
-	return stitchCount;
+	if (flag) {
+		return 0;
+	}
+	else {
+		FormFirstStitchIndex = iStitch;
+		while (iStitch < PCSHeader.stitchCount) {
+			if ((StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute && StitchBuffer[iStitch].attribute&TYPMSK) {
+				if (StitchBuffer[iStitch].x < LowerLeftStitch.x)
+					LowerLeftStitch.x = StitchBuffer[iStitch].x;
+				if (StitchBuffer[iStitch].y < LowerLeftStitch.y)
+					LowerLeftStitch.y = StitchBuffer[iStitch].y;
+				stitchCount++;
+			}
+			iStitch++;
+		}
+		return stitchCount;
+	}
 }
 
 unsigned sizclp() {
