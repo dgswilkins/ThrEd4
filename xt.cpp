@@ -2032,6 +2032,7 @@ void fsort() {
 		typeCount = 0;
 		iRange = 0;
 		for (iRegion = 0; iRegion < lastRegion; iRegion++) {
+			bool srtskp = true;
 			if (attribute != PRecs[iRegion]->color) {
 				stitchRange[iRange].finish = iRegion;
 				iRange++;
@@ -2039,15 +2040,16 @@ void fsort() {
 				attribute = PRecs[iRegion]->color;
 				currentForm = PRecs[iRegion]->form;
 				typeCount = 0;
-				goto srtskp;
+				srtskp = false;
 			}
-			if (PRecs[iRegion]->form == currentForm)
-				typeCount++;
-			else {
-				typeCount = 0;
-				currentForm = PRecs[iRegion]->form;
+			if (srtskp) {
+				if (PRecs[iRegion]->form == currentForm)
+					typeCount++;
+				else {
+					typeCount = 0;
+					currentForm = PRecs[iRegion]->form;
+				}
 			}
-srtskp:;
 			PRecs[iRegion]->otyp = typeCount;
 		}
 		stitchRange[iRange].finish = lastRegion;
