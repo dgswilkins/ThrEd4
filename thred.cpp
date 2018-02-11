@@ -2296,6 +2296,7 @@ void nunams() {
 	strcpy_s(iFileExtention, sizeof(ThrName) - nameLength, "thr");
 	iFileExtention = GeName + nameLength;
 	strcpy_s(iFileExtention, sizeof(GeName) - nameLength, "th*");
+	bool flag = true;
 	for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
 
 		if (!strcmp(IniFile.prevNames[iPrevious], ThrName)) {
@@ -2305,27 +2306,30 @@ void nunams() {
 				strcpy_s(swapName, sizeof(swapName), IniFile.prevNames[0]);
 				strcpy_s(IniFile.prevNames[0], sizeof(IniFile.prevNames[0]), IniFile.prevNames[iPrevious]);
 				strcpy_s(IniFile.prevNames[iPrevious], sizeof(IniFile.prevNames[iPrevious]), swapName);
-				goto mendun;
+				flag = false;
+				break;
 			}
-			else
-				goto nomen;
+			else {
+				return;
+			}
 		}
 	}
-	for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
-
-		if (!IniFile.prevNames[iPrevious][0]) {
-
-			strcpy_s(IniFile.prevNames[iPrevious], ThrName);
-			goto mendun;
+	if (flag) {
+		for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
+			if (!IniFile.prevNames[iPrevious][0]) {
+				strcpy_s(IniFile.prevNames[iPrevious], ThrName);
+				flag = false;
+				break;
+			}
 		}
 	}
-	strcpy_s(IniFile.prevNames[3], IniFile.prevNames[2]);
-	strcpy_s(IniFile.prevNames[2], IniFile.prevNames[1]);
-	strcpy_s(IniFile.prevNames[1], IniFile.prevNames[0]);
-	strcpy_s(IniFile.prevNames[0], ThrName);
-mendun:;
+	if (flag) {
+		strcpy_s(IniFile.prevNames[3], IniFile.prevNames[2]);
+		strcpy_s(IniFile.prevNames[2], IniFile.prevNames[1]);
+		strcpy_s(IniFile.prevNames[1], IniFile.prevNames[0]);
+		strcpy_s(IniFile.prevNames[0], ThrName);
+	}
 	redfils();
-nomen:;
 }
 
 void moveStitch(fPOINTATTR* destination, const fPOINTATTR* source) noexcept {
