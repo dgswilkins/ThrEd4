@@ -10902,36 +10902,36 @@ void rembig() {
 	if (UserStitchLength < IniFile.maxStitchLength) {
 
 		savdo();
-		if (SelectedFormCount) {
+		do {
+			if (SelectedFormCount) {
 
-			for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 
-				frmrng(SelectedFormList[iForm], &range);
-				makbig(range.start, range.finish);
+					frmrng(SelectedFormList[iForm], &range);
+					makbig(range.start, range.finish);
+				}
+				break;
 			}
-			goto bigdun;
-		}
-		if (StateMap.test(StateFlag::FORMSEL)) {
+			if (StateMap.test(StateFlag::FORMSEL)) {
 
-			frmrng(ClosestFormToCursor, &range);
-			makbig(range.start, range.finish);
-			goto bigdun;
-		}
-		if (StateMap.test(StateFlag::GRPSEL)) {
+				frmrng(ClosestFormToCursor, &range);
+				makbig(range.start, range.finish);
+				break;
+			}
+			if (StateMap.test(StateFlag::GRPSEL)) {
 
-			rngadj();
-			if (GroupEndStitch < PCSHeader.stitchCount)
-				GroupEndStitch++;
-			if (ClosestPointIndex < GroupStitchIndex)
-				GroupStitchIndex += makbig(GroupStartStitch, GroupEndStitch);
-			else
-				ClosestPointIndex += makbig(GroupStartStitch, GroupEndStitch);
-			grpAdj();
-			goto bigdun;
-		}
-		makbig(0, PCSHeader.stitchCount);
-
-bigdun:;
+				rngadj();
+				if (GroupEndStitch < PCSHeader.stitchCount)
+					GroupEndStitch++;
+				if (ClosestPointIndex < GroupStitchIndex)
+					GroupStitchIndex += makbig(GroupStartStitch, GroupEndStitch);
+				else
+					ClosestPointIndex += makbig(GroupStartStitch, GroupEndStitch);
+				grpAdj();
+				break;
+			}
+			makbig(0, PCSHeader.stitchCount);
+		} while (false);
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
