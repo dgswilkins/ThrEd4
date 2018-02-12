@@ -9490,25 +9490,21 @@ void delet() {
 
 	unsigned	iVertex = 0, iForm = 0, iGuide = 0, currentFormVertex = 0;
 	// ToDo - check satinFlag
-	bool		satinFlag = 0;
+	bool		satinFlag = false;
 
 	undat();
 	if (StateMap.testAndReset(StateFlag::FPSEL)) {
-
 		savdo();
 		fvars(ClosestFormToCursor);
 		clRmap((VertexCount >> 5) + 1);
 		currentFormVertex = SelectedFormVertices.start;
 		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
-
 			setr(currentFormVertex);
 			currentFormVertex = pdir(currentFormVertex);
 		}
 		currentFormVertex = 0;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-
 			if (!chkr(iVertex)) {
-
 				CurrentFormVertices[currentFormVertex].x = CurrentFormVertices[iVertex].x;
 				CurrentFormVertices[currentFormVertex].y = CurrentFormVertices[iVertex].y;
 				currentFormVertex++;
@@ -9517,7 +9513,6 @@ void delet() {
 		currentFormVertex = fltind(&CurrentFormVertices[currentFormVertex]);
 		iVertex = fltind(&CurrentFormVertices[iVertex]);
 		while (iVertex < FormVertexIndex) {
-
 			FormVertices[currentFormVertex].x = FormVertices[iVertex].x;
 			FormVertices[currentFormVertex].y = FormVertices[iVertex].y;
 			currentFormVertex++;
@@ -9535,13 +9530,12 @@ void delet() {
 		StateMap.set(StateFlag::RESTCH);
 		return;
 	}
-	if (GetKeyState(VK_CONTROL)&GetKeyState(VK_SHIFT) & 0X8000)
+	if (GetKeyState(VK_CONTROL)&GetKeyState(VK_SHIFT) & 0X8000) {
 		deltot();
+	}
 	else {
-
 		savdo();
 		if (SelectedFormCount) {
-
 			if (frmstch()) {
 				StateMap.set(StateFlag::DELSFRMS);
 				tabmsg(IDS_DELFRM);
@@ -9553,18 +9547,14 @@ void delet() {
 			return;
 		}
 		if (StateMap.test(StateFlag::FORMSEL) && FormIndex) {
-
 			if (wastch()) {
-
 				StateMap.set(StateFlag::DELFRM);
 				tabmsg(IDS_FDEL);
 				okcan();
 				tomsg();
 			}
 			else {
-
 				if (FormIndex) {
-
 					StateMap.reset(StateFlag::DELTO);
 					frmdel();
 					StateMap.set(StateFlag::RESTCH);
@@ -9574,8 +9564,91 @@ void delet() {
 			return;
 		}
 		if (StateMap.test(StateFlag::SELBOX)) {
+			if (PCSHeader.stitchCount > 2) {
+				delstch1(ClosestPointIndex);
+				if (!stch2px(ClosestPointIndex))
+					movbox();
+			}
+			else {
+				PCSHeader.stitchCount = 0;
+				StateMap.reset(StateFlag::SELBOX);
+			}
+			coltab();
+			setfchk();
+			fndknt();
+			StateMap.set(StateFlag::RESTCH);
+			return;
+		}
+		if (StateMap.test(StateFlag::GRPSEL)) {
+			delstchm();
+			coltab();
+			rstAll();
+			setfchk();
+			fndknt();
+			StateMap.set(StateFlag::RESTCH);
+			return;
+		}
+		if (StateMap.test(StateFlag::FRMPSEL) || closfrm()) {
+			SelectedForm = &FormList[ClosestFormToCursor];
+			switch (SelectedForm->type) {
+				case FRMLINE:
+					if (SelectedForm->fillType == CONTF) {
+						if (ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.start || ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.finish) {
+							delmfil();
+							SelectedForm->fillType = 0;
+							coltab();
+							StateMap.set(StateFlag::RESTCH);
+							return;
+						}
+						if (SelectedForm->angleOrClipData.guide.start > ClosestVertexToCursor)
+							SelectedForm->angleOrClipData.guide.start--;
+						if (SelectedForm->angleOrClipData.guide.finish > ClosestVertexToCursor)
+							SelectedForm->angleOrClipData.guide.finish--;
+					}
+					break;
 
-selab:;
+				case SAT:
+					do {
+						if (ClosestVertexToCursor <= 1) {
+							if (SelectedForm->attribute&FRMEND) {
+								if (SelectedForm->wordParam)
+									SelectedForm->wordParam = 0;
+								else
+									SelectedForm->attribute &= 0xfe;
+								satinFlag = true;
+								break;
+							}
+						}
+						if (SatinEndGuide) {
+							if (ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) || ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) + 1) {
+								SelectedForm->wordParam = 0;
+								satinFlag = true;
+								break;
+							}
+						}
+						for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+							if (SelectedForm->satinOrAngle.guide[iGuide].start == ClosestVertexToCursor || SelectedForm->satinOrAngle.guide[iGuide].finish == ClosestVertexToCursor) {
+								delcon(iGuide);
+								satinFlag = true;
+								break;
+							}
+						}
+					} while (false);
+			}
+			if (!satinFlag) {
+				delspnt();
+			}
+			if (ClosestFormToCursor > FormIndex - 1)
+				ClosestFormToCursor = FormIndex - 1;
+			if (FormIndex) {
+				frmout(ClosestFormToCursor);
+				fvars(ClosestFormToCursor);
+				refil();
+			}
+			coltab();
+			StateMap.set(StateFlag::RESTCH);
+		}
+		if (!satinFlag && closPnt1(&ClosestPointIndex)) {
 			if (PCSHeader.stitchCount > 2) {
 
 				delstch1(ClosestPointIndex);
@@ -9593,88 +9666,6 @@ selab:;
 			StateMap.set(StateFlag::RESTCH);
 			return;
 		}
-		if (StateMap.test(StateFlag::GRPSEL)) {
-
-			delstchm();
-			coltab();
-			rstAll();
-			setfchk();
-			fndknt();
-			StateMap.set(StateFlag::RESTCH);
-			return;
-		}
-		if (StateMap.test(StateFlag::FRMPSEL) || closfrm()) {
-
-			SelectedForm = &FormList[ClosestFormToCursor];
-			switch (SelectedForm->type) {
-
-				case FRMLINE:
-
-					if (SelectedForm->fillType == CONTF) {
-
-						if (ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.start || ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.finish) {
-
-							delmfil();
-							SelectedForm->fillType = 0;
-							coltab();
-							StateMap.set(StateFlag::RESTCH);
-							return;
-						}
-						if (SelectedForm->angleOrClipData.guide.start > ClosestVertexToCursor)
-							SelectedForm->angleOrClipData.guide.start--;
-						if (SelectedForm->angleOrClipData.guide.finish > ClosestVertexToCursor)
-							SelectedForm->angleOrClipData.guide.finish--;
-					}
-					break;
-
-				case SAT:
-
-					if (ClosestVertexToCursor <= 1) {
-
-						if (SelectedForm->attribute&FRMEND) {
-
-							if (SelectedForm->wordParam)
-								SelectedForm->wordParam = 0;
-							else
-								SelectedForm->attribute &= 0xfe;
-							satinFlag = true;
-							goto deldun;
-						}
-					}
-					if (SatinEndGuide) {
-
-						if (ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) || ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) + 1) {
-
-							SelectedForm->wordParam = 0;
-							satinFlag = 1;
-							goto deldun;
-						}
-					}
-					for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-
-						if (SelectedForm->satinOrAngle.guide[iGuide].start == ClosestVertexToCursor || SelectedForm->satinOrAngle.guide[iGuide].finish == ClosestVertexToCursor) {
-
-							delcon(iGuide);
-							satinFlag = 1;
-							goto deldun;
-						}
-					}
-			}
-			delspnt();
-deldun:;
-			if (ClosestFormToCursor > FormIndex - 1)
-				ClosestFormToCursor = FormIndex - 1;
-			if (FormIndex) {
-
-				frmout(ClosestFormToCursor);
-				fvars(ClosestFormToCursor);
-				refil();
-			}
-			coltab();
-			StateMap.set(StateFlag::RESTCH);
-		}
-		if (!satinFlag && closPnt1(&ClosestPointIndex))
-			goto selab;
 	}
 	fndknt();
 }
