@@ -10957,6 +10957,7 @@ void longer() {
 	unsigned	iStitch = 0, currentStitch = 0;
 	double		length = 0.0, minimumLength = 1e99;
 	double		currentLength = 0.0;
+	bool		flag = true;
 
 	if (ClosestPointIndex == LargestStitchIndex)
 		return;
@@ -10964,21 +10965,24 @@ void longer() {
 	for (iStitch = ClosestPointIndex + 1; iStitch < SelectedRange.finish; iStitch++) {
 
 		length = hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
-		if (length == currentLength)
-			goto long1;
-	}
-	for (currentStitch = SelectedRange.start; currentStitch < SelectedRange.finish - 1; currentStitch++) {
-
-		length = hypot(StitchBuffer[currentStitch + 1].x - StitchBuffer[currentStitch].x, StitchBuffer[currentStitch + 1].y - StitchBuffer[currentStitch].y);
-		if (length > currentLength && length < minimumLength) {
-
-			minimumLength = length;
-			iStitch = currentStitch;
+		if (length == currentLength) {
+			flag = false;
+			break;
 		}
 	}
-	if (minimumLength == 1e99)
-		return;
-long1:;
+	if (flag) {
+		for (currentStitch = SelectedRange.start; currentStitch < SelectedRange.finish - 1; currentStitch++) {
+
+			length = hypot(StitchBuffer[currentStitch + 1].x - StitchBuffer[currentStitch].x, StitchBuffer[currentStitch + 1].y - StitchBuffer[currentStitch].y);
+			if (length > currentLength && length < minimumLength) {
+
+				minimumLength = length;
+				iStitch = currentStitch;
+			}
+		}
+		if (minimumLength == 1e99)
+			return;
+	}
 	CurrentStitchIndex = iStitch;
 	lensadj();
 	ritnum(STR_NUMSCH, ClosestPointIndex);
@@ -10989,6 +10993,7 @@ void shorter() {
 	unsigned	iStitch = 0, currentStitch = 0;
 	double		length = 0.0, maximumLength = 0.0;
 	double		currentLength = 0.0;
+	bool		flag = true;
 
 	if (ClosestPointIndex == SmallestStitchIndex)
 		return;
@@ -10998,21 +11003,23 @@ void shorter() {
 		length = hypot(StitchBuffer[currentStitch].x - StitchBuffer[currentStitch - 1].x, StitchBuffer[currentStitch].y - StitchBuffer[currentStitch - 1].y);
 		if (length == currentLength) {
 			currentStitch--;
-			goto short1;
+			flag = false;
+			break;
 		}
 	}
-	for (iStitch = SelectedRange.start; iStitch < SelectedRange.finish - 1; iStitch++) {
+	if (flag) {
+		for (iStitch = SelectedRange.start; iStitch < SelectedRange.finish - 1; iStitch++) {
 
-		length = hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
-		if (length<currentLength && length>maximumLength) {
+			length = hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
+			if (length<currentLength && length>maximumLength) {
 
-			maximumLength = length;
-			currentStitch = iStitch;
+				maximumLength = length;
+				currentStitch = iStitch;
+			}
 		}
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y));
+		butxt(HMINLEN, MsgBuffer);
 	}
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y));
-	butxt(HMINLEN, MsgBuffer);
-short1:;
 	CurrentStitchIndex = currentStitch;
 	lensadj();
 	ritnum(STR_NUMSCH, ClosestPointIndex);
