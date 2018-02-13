@@ -12388,19 +12388,17 @@ void rotseg() {
 
 void pntmrk() {
 
-	if (StateMap.test(StateFlag::SELBOX)) {
-
-		dumrk(StitchBuffer[ClosestPointIndex].x, StitchBuffer[ClosestPointIndex].y);
-		goto mrkdun;
-	}
-	if (StateMap.test(StateFlag::FRMPSEL)) {
-
-		dumrk(FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].x, FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].y);
-		goto mrkdun;
-	}
-	shoseln(IDS_STCH_FRM, IDS_SETMRK);
-
-mrkdun:;
+	do {
+		if (StateMap.test(StateFlag::SELBOX)) {
+			dumrk(StitchBuffer[ClosestPointIndex].x, StitchBuffer[ClosestPointIndex].y);
+			break;
+		}
+		if (StateMap.test(StateFlag::FRMPSEL)) {
+			dumrk(FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].x, FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].y);
+			break;
+		}
+		shoseln(IDS_STCH_FRM, IDS_SETMRK);
+	} while (false);
 }
 
 void filfrms() {
@@ -12429,25 +12427,26 @@ void filfrms() {
 }
 
 void nuslst(unsigned find) noexcept {
-
 	unsigned	form = 0, iFormList = 0;
 
 	gselrng();
-	if (find < SelectedFormsRange.start) {
+	do {
+		if (find < SelectedFormsRange.start) {
 
-		for (form = find; form < SelectedFormsRange.finish; form++)
-			SelectedFormList[iFormList++] = form;
-		goto gotsrng;
-	}
-	if (find > SelectedFormsRange.finish) {
+			for (form = find; form < SelectedFormsRange.finish; form++)
+				SelectedFormList[iFormList++] = form;
+			break;
+		}
+		if (find > SelectedFormsRange.finish) {
 
-		for (form = SelectedFormsRange.start; form <= find; form++)
+			for (form = SelectedFormsRange.start; form <= find; form++)
+				SelectedFormList[iFormList++] = form;
+			break;
+		}
+		for (form = SelectedFormsRange.start; form <= find; form++) {
 			SelectedFormList[iFormList++] = form;
-		goto gotsrng;
-	}
-	for (form = SelectedFormsRange.start; form <= find; form++)
-		SelectedFormList[iFormList++] = form;
-gotsrng:;
+		}
+	} while (false);
 	SelectedFormCount = iFormList;
 }
 
