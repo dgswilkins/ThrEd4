@@ -13885,120 +13885,99 @@ void tracpar() {
 	if (TraceMsgPoint.x > gsl::narrow<int>(ButtonWidthX3))
 		dutrac();
 	else {
-
 		ColumnColor = ducolm();
 		if (TraceMsgPoint.y < gsl::narrow<int>(ButtonHeight) * 15) {
+			do {
 
-			if (GetKeyState(VK_SHIFT) & 0X8000) {
+				if (GetKeyState(VK_SHIFT) & 0X8000) {
 
-				UpPixelColor &= TraceRGBMask[ColumnColor];
-				DownPixelColor |= TraceRGB[2 - ColumnColor];
-				goto tracpar1;
-			}
-			ratio = static_cast<float>(TraceMsgPoint.y) / (ButtonHeight * 15);
-			position = ratio * 255;
-			traceColor = UpPixelColor&TraceRGB[2 - ColumnColor];
-			tracePosition = position << TraceShift[ColumnColor];
-			if (tracePosition < traceColor) {
+					UpPixelColor &= TraceRGBMask[ColumnColor];
+					DownPixelColor |= TraceRGB[2 - ColumnColor];
+					break;
+				}
+				ratio = static_cast<float>(TraceMsgPoint.y) / (ButtonHeight * 15);
+				position = ratio * 255;
+				traceColor = UpPixelColor & TraceRGB[2 - ColumnColor];
+				tracePosition = position << TraceShift[ColumnColor];
+				if (tracePosition < traceColor) {
 
-				UpPixelColor &= TraceRGBMask[ColumnColor];
-				UpPixelColor |= tracePosition;
-				goto tracpar1;
-			}
-			traceColor = DownPixelColor&TraceRGB[2 - ColumnColor];
-			if (tracePosition > traceColor) {
+					UpPixelColor &= TraceRGBMask[ColumnColor];
+					UpPixelColor |= tracePosition;
+					break;
+				}
+				traceColor = DownPixelColor & TraceRGB[2 - ColumnColor];
+				if (tracePosition > traceColor) {
 
-				DownPixelColor &= TraceRGBMask[ColumnColor];
-				DownPixelColor |= tracePosition;
-				goto tracpar1;
-			}
-			if (Msg.message == WM_LBUTTONDOWN) {
+					DownPixelColor &= TraceRGBMask[ColumnColor];
+					DownPixelColor |= tracePosition;
+					break;
+				}
+				if (Msg.message == WM_LBUTTONDOWN) {
 
-				UpPixelColor &= TraceRGBMask[ColumnColor];
-				UpPixelColor |= position << TraceShift[ColumnColor];
-			}
-			else {
+					UpPixelColor &= TraceRGBMask[ColumnColor];
+					UpPixelColor |= position << TraceShift[ColumnColor];
+				}
+				else {
 
-				DownPixelColor &= TraceRGBMask[ColumnColor];
-				DownPixelColor |= position << TraceShift[ColumnColor];
-			}
-tracpar1:
+					DownPixelColor &= TraceRGBMask[ColumnColor];
+					DownPixelColor |= position << TraceShift[ColumnColor];
+				}
+			} while (false);
 			redraw(TraceControlWindow[ColumnColor]);
 			trace();
 		}
 		else {
-
 			position = floor(TraceMsgPoint.y / ButtonHeight);
 			if (position < 16) {
-
 				StateMap.flip(TraceRGBFlag[ColumnColor]);
 				redraw(TraceSelectWindow[ColumnColor]);
 				trace();
 			}
 			else {
-
 				if (position < 18) {
-
 					StateMap.set(StateFlag::NUMIN);
 					StateMap.set(StateFlag::TRNIN0);
 					MsgIndex = 0;
 					*TraceInputBuffer = 0;
 					if (position < 17) {
-
 						trnumwnd0(ButtonHeight * 16);
 						StateMap.set(StateFlag::TRNUP);
 					}
 					else {
-
 						trnumwnd0(ButtonHeight * 17);
 						StateMap.reset(StateFlag::TRNUP);
 					}
 				}
 				else {
-
 					if (position < 20) {
-
 						StateMap.set(StateFlag::NUMIN);
 						StateMap.set(StateFlag::TRNIN1);
 						MsgIndex = 0;
 						*TraceInputBuffer = 0;
 						if (position < 19) {
-
 							trnumwnd1(ButtonHeight * 18);
 							StateMap.set(StateFlag::TRNUP);
 						}
 						else {
-
 							trnumwnd1(ButtonHeight * 19);
 							StateMap.reset(StateFlag::TRNUP);
 						}
 					}
 					else {
-
 						switch (position) {
-
 							case 20:
-
 								trdif();
 								break;
-
 							case 21:
-
 								hidbit();
 								break;
-
 							case 22:
-
 								blak();
 								break;
-
 							case 23:
-
 								trcsel();
 								break;
-
 							case 24:
-
 								tracedg();
 								break;
 						}
