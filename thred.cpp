@@ -11079,7 +11079,7 @@ void ungrplo() {
 	else {
 
 		if (StateMap.test(StateFlag::FORMSEL)) {
-
+			bool flag = true;
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
 				if (!(StitchBuffer[iStitch].attribute&NOTFRM) && ((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
@@ -11087,15 +11087,18 @@ void ungrplo() {
 					ClosestPointIndex = iStitch;
 					StateMap.set(StateFlag::SELBOX);
 					StateMap.set(StateFlag::RESTCH);
-					goto upgrpdun;
+					flag = false;
+					break;
 				}
 			}
-			grpmsg1();
+			if (flag) {
+				grpmsg1();
+			}
 		}
-		else
+		else {
 			grpmsg();
+		}
 	}
-upgrpdun:;
 }
 
 void ungrphi() {
@@ -11112,7 +11115,7 @@ void ungrphi() {
 	else {
 
 		if (StateMap.test(StateFlag::FORMSEL)) {
-
+			bool flag = true;
 			for (iStitch = PCSHeader.stitchCount; iStitch != 0; iStitch--) {
 
 				if (!(StitchBuffer[iStitch - 1].attribute&NOTFRM) && ((StitchBuffer[iStitch - 1].attribute&FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
@@ -11120,15 +11123,18 @@ void ungrphi() {
 					ClosestPointIndex = iStitch - 1;
 					StateMap.set(StateFlag::SELBOX);
 					StateMap.set(StateFlag::RESTCH);
-					goto dwngrpdun;
+					flag = false;
+					break;
 				}
 			}
-			grpmsg1();
+			if (flag) {
+				grpmsg1();
+			}
 		}
-		else
+		else {
 			grpmsg();
+		}
 	}
-dwngrpdun:;
 }
 
 void sizstch(fRECTANGLE* rectangle, const fPOINTATTR* stitches) noexcept {
