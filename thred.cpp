@@ -16803,15 +16803,27 @@ frmskip:;
 				}
 				if (Msg.hwnd == ValueWindow[LFTHBLND]) {
 					StateMap.set(StateFlag::FLPBLND);
-					goto didfil;
+					refrm();
+					refil();
+					unsid();
+					StateMap.set(StateFlag::RESTCH);
+					break;
 				}
 				if (Msg.hwnd == ValueWindow[LFTHUP]) {
 					SelectedForm->extendedAttribute ^= AT_FTHUP;
-					goto didfil;
+					refrm();
+					refil();
+					unsid();
+					StateMap.set(StateFlag::RESTCH);
+					break;
 				}
 				if (Msg.hwnd == ValueWindow[LFTHBTH]) {
 					SelectedForm->extendedAttribute ^= AT_FTHBTH;
-					goto didfil;
+					refrm();
+					refil();
+					unsid();
+					StateMap.set(StateFlag::RESTCH);
+					break;
 				}
 				if (Msg.hwnd == ValueWindow[LFTHTYP]) {
 					FormMenuChoice = LFTHTYP;
