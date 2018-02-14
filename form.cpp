@@ -5049,64 +5049,65 @@ void satfil() {
 	deltaY = CurrentFormVertices[0].y - CurrentFormVertices[iVertex].y;
 	length += hypot(deltaX, deltaY);
 	Lengths[iVertex + 1] = length;
-	if (SatinEndGuide) {
-		if (CurrentFormGuidesCount) {
-			satmf();
-			goto satdun;
-		}
-		else {
-			satfn(1, SatinEndGuide, VertexCount, SatinEndGuide + 1);
-			goto satdun;
-		}
-	}
-	if (SelectedForm->attribute&FRMEND) {
-		if (CurrentFormGuidesCount) {
-			satmf();
-			goto satdun;
-		}
-		else {
-			if (VertexCount == 3 && FormList[ClosestFormToCursor].attribute & 1) {
-				satfn(2, 3, 2, 1);
-				goto satdun;
+	do {
+		if (SatinEndGuide) {
+			if (CurrentFormGuidesCount) {
+				satmf();
+				break;
 			}
 			else {
-				length = (length - Lengths[1]) / 2;
-				iVertex = 1;
-				if (!StateMap.test(StateFlag::BARSAT)) {
-					OSequence[0].x = SelectedPoint.x = CurrentFormVertices[1].x;
-					OSequence[0].y = SelectedPoint.y = CurrentFormVertices[1].y;
-					SequenceIndex = 1;
-				}
-				while ((length > Lengths[iVertex]) && (iVertex < (VertexCount + 1)))
-					iVertex++;
-				deltaX = Lengths[iVertex] - length;
-				deltaY = length - Lengths[iVertex - 1];
-				if (deltaY > deltaX)
-					iVertex--;
-				satfn(1, iVertex, VertexCount, iVertex);
+				satfn(1, SatinEndGuide, VertexCount, SatinEndGuide + 1);
+				break;
 			}
-			goto satdun;
 		}
-	}
-	if (CurrentFormGuidesCount) {
-		satmf();
-		goto satdun;
-	}
-	length /= 2;
-	iVertex = 0;
-	if (!StateMap.test(StateFlag::BARSAT) && !StateMap.test(StateFlag::FTHR)) {
-		OSequence[0].x = SelectedPoint.x = CurrentFormVertices[0].x;
-		OSequence[0].y = SelectedPoint.y = CurrentFormVertices[0].y;
-		SequenceIndex = 1;
-	}
-	while (length > Lengths[iVertex])
-		iVertex++;
-	deltaX = Lengths[iVertex] - length;
-	deltaY = length - Lengths[iVertex - 1];
-	if (deltaY > deltaX)
-		iVertex--;
-	satfn(0, iVertex, VertexCount, iVertex);
-satdun:;
+		if (SelectedForm->attribute&FRMEND) {
+			if (CurrentFormGuidesCount) {
+				satmf();
+				break;
+			}
+			else {
+				if (VertexCount == 3 && FormList[ClosestFormToCursor].attribute & 1) {
+					satfn(2, 3, 2, 1);
+					break;;
+				}
+				else {
+					length = (length - Lengths[1]) / 2;
+					iVertex = 1;
+					if (!StateMap.test(StateFlag::BARSAT)) {
+						OSequence[0].x = SelectedPoint.x = CurrentFormVertices[1].x;
+						OSequence[0].y = SelectedPoint.y = CurrentFormVertices[1].y;
+						SequenceIndex = 1;
+					}
+					while ((length > Lengths[iVertex]) && (iVertex < (VertexCount + 1)))
+						iVertex++;
+					deltaX = Lengths[iVertex] - length;
+					deltaY = length - Lengths[iVertex - 1];
+					if (deltaY > deltaX)
+						iVertex--;
+					satfn(1, iVertex, VertexCount, iVertex);
+				}
+				break;
+			}
+		}
+		if (CurrentFormGuidesCount) {
+			satmf();
+			break;
+		}
+		length /= 2;
+		iVertex = 0;
+		if (!StateMap.test(StateFlag::BARSAT) && !StateMap.test(StateFlag::FTHR)) {
+			OSequence[0].x = SelectedPoint.x = CurrentFormVertices[0].x;
+			OSequence[0].y = SelectedPoint.y = CurrentFormVertices[0].y;
+			SequenceIndex = 1;
+		}
+		while (length > Lengths[iVertex])
+			iVertex++;
+		deltaX = Lengths[iVertex] - length;
+		deltaY = length - Lengths[iVertex - 1];
+		if (deltaY > deltaX)
+			iVertex--;
+		satfn(0, iVertex, VertexCount, iVertex);
+	} while (false);
 
 	delete[] Lengths;
 	LineSpacing = spacing;
