@@ -15764,26 +15764,27 @@ unsigned chkMsg() {
 					return 1;
 				}
 				if (StateMap.test(StateFlag::FORMSEL)) {
-					if (FormMenuChoice) {
-						chknum();
-						FormMenuChoice = 0;
-						goto frmskip;
-					}
-					if (FormDataSheet) {
-						undat();
-						unsid();
-						FormMenuChoice = 0;
-						StateMap.set(StateFlag::RESTCH);
-						goto frmskip;
-					}
-					ritfrct(ClosestFormToCursor, StitchWindowDC);
-					lenCalc();
-					if (!StateMap.testAndReset(StateFlag::ENTROT))
-						StateMap.reset(StateFlag::FORMSEL);
-					StateMap.set(StateFlag::DUMEN);
-					if (!closPnt1(&ClosestPointIndex))
-						unbox();
-frmskip:;
+					do {
+						if (FormMenuChoice) {
+							chknum();
+							FormMenuChoice = 0;
+							break;
+						}
+						if (FormDataSheet) {
+							undat();
+							unsid();
+							FormMenuChoice = 0;
+							StateMap.set(StateFlag::RESTCH);
+							break;
+						}
+						ritfrct(ClosestFormToCursor, StitchWindowDC);
+						lenCalc();
+						if (!StateMap.testAndReset(StateFlag::ENTROT))
+							StateMap.reset(StateFlag::FORMSEL);
+						StateMap.set(StateFlag::DUMEN);
+						if (!closPnt1(&ClosestPointIndex))
+							unbox();
+					} while (false);
 				}
 				if (closfrm()) {
 					StateMap.set(StateFlag::FORMSEL);

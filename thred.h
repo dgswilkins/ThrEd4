@@ -10,8 +10,8 @@
 #pragma warning(disable:26423) //			The allocation was not directly assigned to an owner
 #pragma warning(disable:26424) //			Failing to delete or assign ownership of allocation
 #pragma warning(disable:26425) //			Assigning 'return of new[]' to a static variable
-//#pragma warning(disable:26429) // f.23		Symbol is never tested for nullness, it can be marked as not_null
-#pragma warning(disable:26438) // es.76		Avoid 'goto'
+#pragma warning(disable:26429) // f.23		Symbol is never tested for nullness, it can be marked as not_null
+//#pragma warning(disable:26438) // es.76		Avoid 'goto'
 //#pragma warning(disable:26461) // con.3		The pointer argument can be marked as a pointer to const
 //#pragma warning(disable:26472) // type.1	Don't use a static_cast for arithmetic conversions
 //#pragma warning(disable:26474) // type.1	Don't cast between pointer types when the conversion could be implicit
