@@ -22103,50 +22103,51 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 				SetFilePointer(thrEdFile, 80, 0, FILE_CURRENT);
 				FRMHED* formList = new FRMHED[stitchHeader.formCount]();
 				fPOINT* vertexList = new fPOINT[stitchHeader.vertexCount];
-				if (fileTypeVersion < 2) {
-					FRMHEDO* formListOriginal = new FRMHEDO[stitchHeader.formCount];
-					bytesToRead = stitchHeader.formCount * sizeof(FRMHEDO);
-					ReadFile(thrEdFile, formListOriginal, bytesToRead, &BytesRead, 0);
-					if (BytesRead != bytesToRead)
-						goto bakskp;
-					for (iForm = 0; iForm < stitchHeader.formCount; iForm++) {
+				do {
+					if (fileTypeVersion < 2) {
+						FRMHEDO* formListOriginal = new FRMHEDO[stitchHeader.formCount];
+						bytesToRead = stitchHeader.formCount * sizeof(FRMHEDO);
+						ReadFile(thrEdFile, formListOriginal, bytesToRead, &BytesRead, 0);
+						if (BytesRead != bytesToRead)
+							break;
+						for (iForm = 0; iForm < stitchHeader.formCount; iForm++) {
 
-						SelectedForm = &formList[iForm];
-						MoveMemory(SelectedForm, &formListOriginal[iForm], sizeof(FRMHEDO));
+							SelectedForm = &formList[iForm];
+							MoveMemory(SelectedForm, &formListOriginal[iForm], sizeof(FRMHEDO));
+						}
+						delete[] formListOriginal;
 					}
-					delete[] formListOriginal;
-				}
-				else {
+					else {
 
-					bytesToRead = stitchHeader.formCount * sizeof(FRMHED);
-					ReadFile(thrEdFile, formList, bytesToRead, &BytesRead, 0);
-					if (BytesRead != bytesToRead)
-						goto bakskp;
-				}
-				bytesToRead = stitchHeader.vertexCount * sizeof(fPOINT);
-				ReadFile(thrEdFile, vertexList, bytesToRead, &BytesRead, 0);
-				if (BytesRead != bytesToRead)
-					goto bakskp;
-				iVertex = 0;
-				for (iStitch = 0; iStitch < stitchHeader.formCount; iStitch++) {
-
-					iLine = iVertex;
-					for (iVertexInForm = 0; (iVertexInForm < formList[iStitch].vertexCount) && (iVertex < stitchHeader.vertexCount); iVertexInForm++) {
-
-						lines[iVertexInForm].x = vertexList[iVertex].x*ratio;
-						lines[iVertexInForm].y = drawingDestinationSize.y - vertexList[iVertex++].y*ratio;
+						bytesToRead = stitchHeader.formCount * sizeof(FRMHED);
+						ReadFile(thrEdFile, formList, bytesToRead, &BytesRead, 0);
+						if (BytesRead != bytesToRead)
+							break;
 					}
-					lines[iVertexInForm].x = vertexList[iLine].x*ratio;
-					lines[iVertexInForm].y = drawingDestinationSize.y - vertexList[iLine].y*ratio;
-					SelectObject(drawItem->hDC, FormPen);
-					SetROP2(drawItem->hDC, R2_XORPEN);
-					if (FormList[iStitch].type == FRMLINE)
-						Polyline(drawItem->hDC, lines, formList[iStitch].vertexCount);
-					else
-						Polyline(drawItem->hDC, lines, formList[iStitch].vertexCount + 1);
-					SetROP2(StitchWindowMemDC, R2_COPYPEN);
-				}
-bakskp:;
+					bytesToRead = stitchHeader.vertexCount * sizeof(fPOINT);
+					ReadFile(thrEdFile, vertexList, bytesToRead, &BytesRead, 0);
+					if (BytesRead != bytesToRead)
+						break;
+					iVertex = 0;
+					for (iStitch = 0; iStitch < stitchHeader.formCount; iStitch++) {
+
+						iLine = iVertex;
+						for (iVertexInForm = 0; (iVertexInForm < formList[iStitch].vertexCount) && (iVertex < stitchHeader.vertexCount); iVertexInForm++) {
+
+							lines[iVertexInForm].x = vertexList[iVertex].x*ratio;
+							lines[iVertexInForm].y = drawingDestinationSize.y - vertexList[iVertex++].y*ratio;
+						}
+						lines[iVertexInForm].x = vertexList[iLine].x*ratio;
+						lines[iVertexInForm].y = drawingDestinationSize.y - vertexList[iLine].y*ratio;
+						SelectObject(drawItem->hDC, FormPen);
+						SetROP2(drawItem->hDC, R2_XORPEN);
+						if (FormList[iStitch].type == FRMLINE)
+							Polyline(drawItem->hDC, lines, formList[iStitch].vertexCount);
+						else
+							Polyline(drawItem->hDC, lines, formList[iStitch].vertexCount + 1);
+						SetROP2(StitchWindowMemDC, R2_COPYPEN);
+					}
+				} while (false);
 				delete[] formList;
 				delete[] vertexList;
 				delete[] lines;
