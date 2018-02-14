@@ -21730,16 +21730,16 @@ void drwStch() {
 								&& currentStitches[iStitch].y >= ZoomRect.bottom
 								&& currentStitches[iStitch].y <= ZoomRect.top) {
 								DisplayedColorBitmap.set(ColorChangeTable[iColor].colorIndex);
-								goto skip;
+								break;
 							}
 						}
-						goto skip;
+						break;
 					}
-					else
-						goto skip1;
+					else {
+						wascol = 0;
+					}
 				}
 				else {
-skip1:;
 					wascol = 0;
 				}
 				SelectObject(StitchWindowMemDC, UserPen[ColorChangeTable[iColor].colorIndex]);
@@ -21842,7 +21842,6 @@ skip1:;
 				}
 				if (wascol)
 					DisplayedColorBitmap.set(ColorChangeTable[iColor].colorIndex);
-skip:;
 			}
 		}
 		else {
