@@ -1523,6 +1523,19 @@ void setzig() {
 	numWnd();
 }
 
+inline void initTearDlg(HWND hwndlg) {
+	TCHAR		buffer[HBUFSIZ] = { 0 };
+
+	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.formSides);
+	SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer);
+	sprintf_s(buffer, sizeof(buffer), "%.3f", IniFile.tearTailLength);
+	SetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer);
+	sprintf_s(buffer, sizeof(buffer), "%.3f", IniFile.tearTwistStep / PFGRAN);
+	SetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), buffer);
+	sprintf_s(buffer, sizeof(buffer), "%.3f", IniFile.tearTwistRatio);
+	SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), buffer);
+}
+
 BOOL CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
 	UNREFERENCED_PARAMETER(lparam);
 
@@ -1532,15 +1545,7 @@ BOOL CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noex
 		case WM_INITDIALOG:
 
 			SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-reinit:;
-			sprintf_s(buffer, sizeof(buffer), "%d", IniFile.formSides);
-			SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer);
-			sprintf_s(buffer, sizeof(buffer), "%.3f", IniFile.tearTailLength);
-			SetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer);
-			sprintf_s(buffer, sizeof(buffer), "%.3f", IniFile.tearTwistStep / PFGRAN);
-			SetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), buffer);
-			sprintf_s(buffer, sizeof(buffer), "%.3f", IniFile.tearTwistRatio);
-			SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), buffer);
+			initTearDlg(hwndlg);
 			break;
 
 		case WM_COMMAND:
@@ -1570,7 +1575,8 @@ reinit:;
 					IniFile.tearTailLength = 1.1f;
 					IniFile.tearTwistStep = 0.0f;
 					IniFile.tearTwistRatio = 1.6f;
-					goto reinit;
+					initTearDlg(hwndlg);
+					break;
 
 				case IDC_DEFPAIS:
 
@@ -1578,7 +1584,8 @@ reinit:;
 					IniFile.tearTailLength = 1.15f;
 					IniFile.tearTwistStep = 0.3f*PFGRAN;
 					IniFile.tearTwistRatio = 1.8f;
-					goto reinit;
+					initTearDlg(hwndlg);
+					break;
 			}
 	}
 	return 0;
