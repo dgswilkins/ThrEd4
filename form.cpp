@@ -1523,7 +1523,7 @@ void setzig() {
 	numWnd();
 }
 
-inline void initTearDlg(HWND hwndlg) {
+inline void initTearDlg(HWND hwndlg) noexcept {
 	TCHAR		buffer[HBUFSIZ] = { 0 };
 
 	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.formSides);
@@ -1957,13 +1957,17 @@ void chkseq(bool border) {
 	}
 	if (UserStitchLen > MaxStitchLen)
 		UserStitchLen = MaxStitchLen;
+	bool flag = true;
 	for (iSequence = 0; iSequence < SequenceIndex - 1; iSequence++) {
-		if (!ritlin(OSequence[iSequence], OSequence[iSequence + 1]))
-			goto seqskp;
+		if (!ritlin(OSequence[iSequence], OSequence[iSequence + 1])) {
+			flag = false;
+			break;
+		}
 	}
-	InterleaveSequence[InterleaveSequenceIndex].x = OSequence[iSequence].x;
-	InterleaveSequence[InterleaveSequenceIndex++].y = OSequence[iSequence].y;
-seqskp:;
+	if (flag) {
+		InterleaveSequence[InterleaveSequenceIndex].x = OSequence[iSequence].x;
+		InterleaveSequence[InterleaveSequenceIndex++].y = OSequence[iSequence].y;
+	}
 	if (!minimumStitchLength)
 		return;
 	destination = savedIndex + 1;
