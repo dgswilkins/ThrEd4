@@ -11939,6 +11939,7 @@ void clpcon() {
 			BoundingRect.bottom = CurrentFormVertices[iVertex].y;
 	}
 	ActivePointIndex = 0;
+	bool breakFlag = false;
 	for (iRegion = 0; iRegion < regionCount; iRegion++) {
 		RegionCrossingStart = iclpx[iRegion];
 		RegionCrossingEnd = iclpx[iRegion + 1];
@@ -12005,20 +12006,34 @@ void clpcon() {
 							ClipStitchPoints[ActivePointIndex].y = ArrayOfClipIntersectData[ing]->point.y;
 							ClipStitchPoints[ActivePointIndex].flag = 1;
 							ActivePointIndex++;
-							if (ActivePointIndex > MAXITEMS << 2)
-								goto clpskp;
+							if (ActivePointIndex > MAXITEMS << 2) {
+								breakFlag = true;
+								break;
+								//goto clpskp;
+							}
 						}
 					}
+					if (breakFlag) {
+						break;
+					}
+
 				}
 				LineSegmentStart.x = LineSegmentEnd.x;
 				LineSegmentStart.y = LineSegmentEnd.y;
 			}
+			if (breakFlag) {
+				break;
+			}
 		}
-		if (ActivePointIndex) {
-			ClipStitchPoints[ActivePointIndex - 1].flag = 2;
-		};
+		if (!breakFlag) {
+			if (ActivePointIndex) {
+				ClipStitchPoints[ActivePointIndex - 1].flag = 2;
+			};
+		}
+		else {
+			break;
+		}
 	}
-clpskp:;
 	delete[] iclpx;
 	if (TextureSegments) {
 		delete[] TextureSegments; // this is allocated in setxt
