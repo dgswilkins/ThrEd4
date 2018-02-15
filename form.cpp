@@ -10089,6 +10089,7 @@ void picfn(unsigned start, unsigned finish, double spacing) {
 		}
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
 			rotang1(ClipBuffer[iStitch], &ClipFillData[iStitch]);
+		bool flag = true;
 		for (iStep = 0; iStep < count - 1; iStep++) {
 			firstPoint.x = innerPoint.x + step.x;
 			firstPoint.y = innerPoint.y + step.y;
@@ -10108,8 +10109,10 @@ void picfn(unsigned start, unsigned finish, double spacing) {
 			OSequence[SequenceIndex++].y = outerPoint.y;
 			tpnt.x = static_cast<float>(outerPoint.x);
 			tpnt.y = static_cast<float>(outerPoint.y);
-			if (ritclp(tpnt))
-				goto picfnx;
+			if (ritclp(tpnt)) {
+				flag = false;
+				break;
+			}
 			OSequence[SequenceIndex].x = outerPoint.x;
 			OSequence[SequenceIndex++].y = outerPoint.y;
 			OSequence[SequenceIndex].x = firstPoint.x;
@@ -10117,12 +10120,13 @@ void picfn(unsigned start, unsigned finish, double spacing) {
 			innerPoint.x += step.x;
 			innerPoint.y += step.y;
 		}
-		OSequence[SequenceIndex].x = CurrentFormVertices[finish].x;
-		OSequence[SequenceIndex++].y = CurrentFormVertices[finish].y;
-		OSequence[SequenceIndex].x = innerPoint.x;
-		OSequence[SequenceIndex++].y = innerPoint.y;
+		if (flag) {
+			OSequence[SequenceIndex].x = CurrentFormVertices[finish].x;
+			OSequence[SequenceIndex++].y = CurrentFormVertices[finish].y;
+			OSequence[SequenceIndex].x = innerPoint.x;
+			OSequence[SequenceIndex++].y = innerPoint.y;
+		}
 	}
-picfnx:;
 }
 
 void clpic(unsigned short start) {
