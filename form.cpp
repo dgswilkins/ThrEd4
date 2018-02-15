@@ -4900,34 +4900,10 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 		line1Step.y = line1Delta.y / line1Count;
 		line2Step.x = line2Delta.x / line2Count;
 		line2Step.y = line2Delta.y / line2Count;
-nuseg:;
-
-		if (StateMap.test(StateFlag::FTHR)) {
-			while (line1Count && line2Count) {
-				line1Point.x += line1Step.x;
-				line1Point.y += line1Step.y;
-				line2Point.x += line2Step.x;
-				line2Point.y += line2Step.y;
-				if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-					BSequence[SequenceIndex].attribute = 0;
-					BSequence[SequenceIndex].x = line1Point.x;
-					BSequence[SequenceIndex++].y = line1Point.y;
-				}
-				else {
-					BSequence[SequenceIndex].attribute = 1;
-					BSequence[SequenceIndex].x = line2Point.x;
-					BSequence[SequenceIndex++].y = line2Point.y;
-				}
-				if (SequenceIndex > MAXITEMS - 6) {
-					SequenceIndex = MAXITEMS - 6;
-					return;
-				}
-				line1Count--;
-				line2Count--;
-			}
-		}
-		else {
-			if (StateMap.test(StateFlag::BARSAT)) {
+		bool flag = false;
+		do {
+			flag = false;
+			if (StateMap.test(StateFlag::FTHR)) {
 				while (line1Count && line2Count) {
 					line1Point.x += line1Step.x;
 					line1Point.y += line1Step.y;
@@ -4937,17 +4913,11 @@ nuseg:;
 						BSequence[SequenceIndex].attribute = 0;
 						BSequence[SequenceIndex].x = line1Point.x;
 						BSequence[SequenceIndex++].y = line1Point.y;
+					}
+					else {
 						BSequence[SequenceIndex].attribute = 1;
 						BSequence[SequenceIndex].x = line2Point.x;
 						BSequence[SequenceIndex++].y = line2Point.y;
-					}
-					else {
-						BSequence[SequenceIndex].attribute = 2;
-						BSequence[SequenceIndex].x = line2Point.x;
-						BSequence[SequenceIndex++].y = line2Point.y;
-						BSequence[SequenceIndex].attribute = 3;
-						BSequence[SequenceIndex].x = line1Point.x;
-						BSequence[SequenceIndex++].y = line1Point.y;
 					}
 					if (SequenceIndex > MAXITEMS - 6) {
 						SequenceIndex = MAXITEMS - 6;
@@ -4958,48 +4928,81 @@ nuseg:;
 				}
 			}
 			else {
-				while (line1Count && line2Count) {
-					line1Point.x += line1Step.x;
-					line1Point.y += line1Step.y;
-					line2Point.x += line2Step.x;
-					line2Point.y += line2Step.y;
-					if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-						if (UserFlagMap.test(UserFlag::SQRFIL))
-							filinu(line2Point.x, line2Point.y);
-						filin(line1Point);
+				if (StateMap.test(StateFlag::BARSAT)) {
+					while (line1Count && line2Count) {
+						line1Point.x += line1Step.x;
+						line1Point.y += line1Step.y;
+						line2Point.x += line2Step.x;
+						line2Point.y += line2Step.y;
+						if (StateMap.testAndFlip(StateFlag::FILDIR)) {
+							BSequence[SequenceIndex].attribute = 0;
+							BSequence[SequenceIndex].x = line1Point.x;
+							BSequence[SequenceIndex++].y = line1Point.y;
+							BSequence[SequenceIndex].attribute = 1;
+							BSequence[SequenceIndex].x = line2Point.x;
+							BSequence[SequenceIndex++].y = line2Point.y;
+						}
+						else {
+							BSequence[SequenceIndex].attribute = 2;
+							BSequence[SequenceIndex].x = line2Point.x;
+							BSequence[SequenceIndex++].y = line2Point.y;
+							BSequence[SequenceIndex].attribute = 3;
+							BSequence[SequenceIndex].x = line1Point.x;
+							BSequence[SequenceIndex++].y = line1Point.y;
+						}
+						if (SequenceIndex > MAXITEMS - 6) {
+							SequenceIndex = MAXITEMS - 6;
+							return;
+						}
+						line1Count--;
+						line2Count--;
 					}
-					else {
-						if (UserFlagMap.test(UserFlag::SQRFIL))
-							filinu(line1Point.x, line1Point.y);
-						filin(line2Point);
+				}
+				else {
+					while (line1Count && line2Count) {
+						line1Point.x += line1Step.x;
+						line1Point.y += line1Step.y;
+						line2Point.x += line2Step.x;
+						line2Point.y += line2Step.y;
+						if (StateMap.testAndFlip(StateFlag::FILDIR)) {
+							if (UserFlagMap.test(UserFlag::SQRFIL))
+								filinu(line2Point.x, line2Point.y);
+							filin(line1Point);
+						}
+						else {
+							if (UserFlagMap.test(UserFlag::SQRFIL))
+								filinu(line1Point.x, line1Point.y);
+							filin(line2Point);
+						}
+						line1Count--;
+						line2Count--;
 					}
-					line1Count--;
-					line2Count--;
 				}
 			}
-		}
-		if ((iLine1Count < line1Segments || iLine2Count < line2Segments)) {
-			if (!line1Count) {
-				line1Count = line1StitchCounts[iLine1Count++];
-				line1Next = nxt(iLine1Vertex);
-				line1Delta.x = CurrentFormVertices[line1Next].x - CurrentFormVertices[iLine1Vertex].x;
-				line1Delta.y = CurrentFormVertices[line1Next].y - CurrentFormVertices[iLine1Vertex].y;
-				iLine1Vertex = nxt(iLine1Vertex);
-				line1Step.x = line1Delta.x / line1Count;
-				line1Step.y = line1Delta.y / line1Count;
+			if ((iLine1Count < line1Segments || iLine2Count < line2Segments)) {
+				if (!line1Count) {
+					line1Count = line1StitchCounts[iLine1Count++];
+					line1Next = nxt(iLine1Vertex);
+					line1Delta.x = CurrentFormVertices[line1Next].x - CurrentFormVertices[iLine1Vertex].x;
+					line1Delta.y = CurrentFormVertices[line1Next].y - CurrentFormVertices[iLine1Vertex].y;
+					iLine1Vertex = nxt(iLine1Vertex);
+					line1Step.x = line1Delta.x / line1Count;
+					line1Step.y = line1Delta.y / line1Count;
+				}
+				if (!line2Count) {
+					line2Count = line2StitchCounts[iLine2Count++];
+					line2Previous = prv(iLine2Vertex);
+					line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x;
+					line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y;
+					iLine2Vertex = prv(iLine2Vertex);
+					line2Step.x = line2Delta.x / line2Count;
+					line2Step.y = line2Delta.y / line2Count;
+				}
+				if ((line1Count || line2Count) && line1Count < MAXITEMS && line2Count < MAXITEMS) {
+					flag = true;
+				}
 			}
-			if (!line2Count) {
-				line2Count = line2StitchCounts[iLine2Count++];
-				line2Previous = prv(iLine2Vertex);
-				line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x;
-				line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y;
-				iLine2Vertex = prv(iLine2Vertex);
-				line2Step.x = line2Delta.x / line2Count;
-				line2Step.y = line2Delta.y / line2Count;
-			}
-			if ((line1Count || line2Count) && line1Count < MAXITEMS && line2Count < MAXITEMS)
-				goto nuseg;
-		}
+		} while (flag);
 	}
 }
 
