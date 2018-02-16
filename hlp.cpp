@@ -316,27 +316,26 @@ void msgstr(unsigned code) noexcept {
 
 void lodstr() {
 
-	unsigned	iString = 0, iStringData = 0, iStringTable = 0, count = 0;
+	unsigned		iString = 0, iStringData = 0, iStringTable = 0, count = 0;
 	// Over allocate storage to ensure no overflow
-	TCHAR*		stringStorage = new TCHAR[65535]();
-	TCHAR*		strings = stringStorage;
+	const unsigned	storageSize = 65535;
+	TCHAR*			stringStorage = new TCHAR[storageSize]();
+	unsigned int	offset = 0;
+	//LPTSTR		strings = stringStorage;
 
 	for (iString = 0; iString < STR_LEN; iString++) {
-
-		count = LoadString(ThrEdInstance, LoadStringList[iString], strings, 1000) + 1;
-		strings += count;
+		count = LoadString(ThrEdInstance, LoadStringList[iString], &stringStorage[offset], storageSize - offset) + 1;
+		offset += count;
 	}
-	count = strings - stringStorage;
+	//count = strings - stringStorage;
 	// Now allocate based on actual count
-	StringData = new TCHAR[count];
-	MoveMemory(StringData, stringStorage, count);
+	StringData = new TCHAR[offset+1];
+	MoveMemory(StringData, stringStorage, offset);
 	delete[] stringStorage;
 	StringTable[0] = StringData;
 	iStringTable = 1;
-	for (iStringData = 0; iStringData <= count; iStringData++) {
-
+	for (iStringData = 0; iStringData <= offset; iStringData++) {
 		if (!StringData[iStringData]) {
-
 			iStringData++;
 			StringTable[iStringTable] = &StringData[iStringData];
 			iStringTable++;
