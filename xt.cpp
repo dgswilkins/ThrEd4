@@ -975,7 +975,7 @@ void delwlk(unsigned code) {
 
 	if (PCSHeader.stitchCount) {
 		stitchCount = 0;
-		fPOINTATTR* highStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
+		fPOINTATTR* highStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount]();
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if ((StitchBuffer[iStitch].attribute&WLKFMSK) != code) {
 				MoveMemory(&highStitchBuffer[stitchCount++], &StitchBuffer[iStitch], sizeof(fPOINTATTR));
@@ -1379,7 +1379,7 @@ void srtcol() {
 		colorStartStitch[iColor] = startStitch;
 		startStitch += histogram[iColor];
 	}
-	fPOINTATTR* highStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
+	fPOINTATTR* highStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount]();
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 		moveStitch(&highStitchBuffer[colorStartStitch[StitchBuffer[iStitch].attribute&COLMSK]++], &StitchBuffer[iStitch]);
 	MoveMemory(&StitchBuffer, highStitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR));
@@ -1981,7 +1981,7 @@ void fsort() {
 	unsigned		minimumIndex = 0, minimumDirection = 0;
 	unsigned		typeCount = 0, jumps = 0, minimumJumps = 0;
 	// There cannot be more records than stitches
-	OREC*			stitchRegion = new OREC[PCSHeader.stitchCount];
+	OREC*			stitchRegion = new OREC[PCSHeader.stitchCount]();
 	SRTREC			sortRecord = {};
 	FILETIME		fileTime = {};
 	ULARGE_INTEGER	startTime = {};
@@ -2025,7 +2025,7 @@ void fsort() {
 	dmprec(*PRecs, lastRegion);
 #endif
 	if (srtchk(*PFRecs, lastRegion, &badForm)) {
-		RANGE* stitchRange = new RANGE[lastRegion];
+		RANGE* stitchRange = new RANGE[lastRegion]();
 		stitchRange[0].start = 0;
 		attribute = PRecs[0]->color;
 		currentForm = 0xffffffff;
@@ -5199,7 +5199,7 @@ void repflt() {
 	}
 	FormIndex = iDestination;
 	ZeroMemory(&badData, sizeof(BADCNTS));
-	fPOINT* vertexPoint = new fPOINT[vertexCount];
+	fPOINT* vertexPoint = new fPOINT[vertexCount]();
 	iVertex = 0;
 	bool flag = true;
 	for (iForm = 0; iForm < FormIndex; iForm++) {
@@ -5240,7 +5240,7 @@ void repflt() {
 void repclp() {
 	FRMHED*		formHeader = nullptr;
 	unsigned	iForm = 0, clipCount = 0, clipDifference = 0, badClipCount = 0;
-	fPOINT*		clipPoint = new fPOINT[MAXITEMS];
+	fPOINT*		clipPoint = new fPOINT[MAXITEMS]();
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		formHeader = &FormList[iForm];
 		if (isclp(iForm)) {

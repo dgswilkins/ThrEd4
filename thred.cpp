@@ -4620,7 +4620,7 @@ void savmap() {
 			}
 			WriteFile(BitmapFileHandle, &BitmapFileHeader, 14, &bytesWritten, NULL);
 			WriteFile(BitmapFileHandle, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14, &bytesWritten, NULL);
-			buffer = new unsigned char[(BitmapWidth*BitmapHeight * 3) + 1];
+			buffer = new unsigned char[(BitmapWidth*BitmapHeight * 3) + 1]();
 			movmap(BitmapWidth*BitmapHeight, buffer);
 			WriteFile(BitmapFileHandle, buffer, BitmapWidth*BitmapHeight * 3, &bytesWritten, NULL);
 			delete[] buffer;
@@ -4705,7 +4705,7 @@ void bfil() {
 			if (widthOverflow)
 				bitmapWidthBytes += 4;
 			bitmapSizeBytes = bitmapWidthBytes*BitmapHeight;
-			unsigned char* monoBitmapData = new unsigned char[bitmapSizeBytes];
+			unsigned char* monoBitmapData = new unsigned char[bitmapSizeBytes]();
 			ReadFile(BitmapFileHandle, monoBitmapData, bitmapSizeBytes, &BytesRead, NULL);
 			CloseHandle(BitmapFileHandle);
 			if (binv(monoBitmapData,bitmapWidthBytes)) {
@@ -4817,7 +4817,7 @@ void dstran() {
 	fPOINT			dstSize = {};
 	fPOINT			delta = {};
 	HANDLE			colorFile = {};
-	unsigned*		colors = new unsigned[1];
+	unsigned*		colors = new unsigned[1]();
 	unsigned		iColor = 0;
 	DWORD			bytesRead = 0;
 	LARGE_INTEGER	colorFileSize = {};
@@ -4829,7 +4829,7 @@ void dstran() {
 			retval = GetFileSizeEx(colorFile, &colorFileSize);
 			// There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
 			delete[] colors;
-			colors = new unsigned[colorFileSize.u.LowPart/sizeof(unsigned)];
+			colors = new unsigned[colorFileSize.u.LowPart/sizeof(unsigned)]();
 			ReadFile(colorFile, colors, colorFileSize.u.LowPart, &bytesRead, 0);
 			CloseHandle(colorFile);
 			if (bytesRead > (sizeof(colors[0]) * 2)) {
@@ -5303,7 +5303,7 @@ void nuFil() {
 						FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
 						MsgBuffer[0] = 0;
 						if (version < 2) {
-							formListOriginal = new FRMHEDO[FormIndex];
+							formListOriginal = new FRMHEDO[FormIndex]();
 							ReadFile(FileHandle, formListOriginal, FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
 							if (BytesRead != FormIndex * sizeof(FRMHEDO)) {
 
@@ -9226,10 +9226,10 @@ void dubuf(char *buffer, unsigned *count) {
 
 	if (FormIndex) {
 
-		FRMHED* forms = new FRMHED[FormIndex];
-		fPOINT* vertices = new fPOINT[vertexCount + 1];
-		SATCON* guides = new SATCON[guideCount];
-		fPOINT* points = new fPOINT[clipDataCount + 1];
+		FRMHED* forms = new FRMHED[FormIndex]();
+		fPOINT* vertices = new fPOINT[vertexCount + 1]();
+		SATCON* guides = new SATCON[guideCount]();
+		fPOINT* points = new fPOINT[clipDataCount + 1]();
 		for (iForm = 0; iForm < FormIndex; iForm++) {
 
 			frmcpy(&forms[iForm], &FormList[iForm]);
@@ -9336,7 +9336,7 @@ void thrsav() {
 		FileHandle = 0;
 	}
 	else {
-		output = new char[MAXITEMS * 4];
+		output = new char[MAXITEMS * 4]();
 		dubuf(output, &count);
 		WriteFile(FileHandle, output, count, &bytesWritten, 0);
 		delete[] output;
@@ -11618,7 +11618,7 @@ void insfil() {
 					if (fileHeader.vertexCount) {
 
 						if (version < 2) {
-							FRMHEDO* formHeader = new FRMHEDO[fileHeader.formCount];
+							FRMHEDO* formHeader = new FRMHEDO[fileHeader.formCount]();
 							ReadFile(InsertedFileHandle, formHeader, fileHeader.formCount * sizeof(FRMHEDO), &BytesRead, 0);
 							if (BytesRead != fileHeader.formCount * sizeof(FRMHEDO)) {
 
@@ -11742,7 +11742,7 @@ void insfil() {
 				if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16) {
 
 					savdo();
-					PCSTCH* pcsStitchBuffer = new PCSTCH[pcsFileHeader.stitchCount];
+					PCSTCH* pcsStitchBuffer = new PCSTCH[pcsFileHeader.stitchCount]();
 					ReadFile(InsertedFileHandle, pcsStitchBuffer, pcsFileHeader.stitchCount * sizeof(PCSTCH), &BytesRead, NULL);
 					iStitch = PCSHeader.stitchCount;
 					newAttribute = 0;
@@ -22044,8 +22044,8 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 				ratio = yRatio;
 			if (stitchHeader.stitchCount) {
 
-				stitchesToDraw = new fPOINTATTR[stitchHeader.stitchCount];
-				POINT* lines = new POINT[stitchHeader.stitchCount];
+				stitchesToDraw = new fPOINTATTR[stitchHeader.stitchCount]();
+				POINT* lines = new POINT[stitchHeader.stitchCount]();
 				bytesToRead = stitchHeader.stitchCount * sizeof(fPOINTATTR);
 				ReadFile(thrEdFile, stitchesToDraw, bytesToRead, &BytesRead, 0);
 				if (bytesToRead == BytesRead) {
@@ -22098,13 +22098,13 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 				SetFilePointer(thrEdFile, 84, 0, FILE_CURRENT);
 			if (stitchHeader.formCount) {
 
-				POINT* lines = new POINT[MAXFRMLINS];
+				POINT* lines = new POINT[MAXFRMLINS]();
 				SetFilePointer(thrEdFile, 80, 0, FILE_CURRENT);
 				FRMHED* formList = new FRMHED[stitchHeader.formCount]();
-				fPOINT* vertexList = new fPOINT[stitchHeader.vertexCount];
+				fPOINT* vertexList = new fPOINT[stitchHeader.vertexCount]();
 				do {
 					if (fileTypeVersion < 2) {
-						FRMHEDO* formListOriginal = new FRMHEDO[stitchHeader.formCount];
+						FRMHEDO* formListOriginal = new FRMHEDO[stitchHeader.formCount]();
 						bytesToRead = stitchHeader.formCount * sizeof(FRMHEDO);
 						ReadFile(thrEdFile, formListOriginal, bytesToRead, &BytesRead, 0);
 						if (BytesRead != bytesToRead)

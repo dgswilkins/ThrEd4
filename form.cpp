@@ -11915,7 +11915,7 @@ void clpcon() {
 		}
 	}
 	qsort(RegionCrossingData, segmentCount, sizeof(VCLPX), clpcmp);
-	iclpx = new unsigned[segmentCount + 1];
+	iclpx = new unsigned[segmentCount + 1]();
 	iRegion = 1; regionSegment = RegionCrossingData[0].segment;
 	iclpx[0] = 0;
 	for (iSegment = 1; iSegment < segmentCount; iSegment++) {
@@ -12016,7 +12016,6 @@ void clpcon() {
 					if (breakFlag) {
 						break;
 					}
-
 				}
 				LineSegmentStart.x = LineSegmentEnd.x;
 				LineSegmentStart.y = LineSegmentEnd.y;
@@ -12705,23 +12704,27 @@ void fxlen() noexcept {
 	double		length = 0.0;
 
 	AdjustedSpace = 0;
+	bool flag = true;
 	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
 		length = hypot(CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x, CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y);
-		if (length > SelectedForm->edgeSpacing)
-			goto fxlab;
+		if (length > SelectedForm->edgeSpacing) {
+			flag = false;
+			break;
+		}
 		else {
 			if (length > AdjustedSpace) {
 				AdjustedSpace = length;
 			}
 		}
 	}
-	ChainEndPoints[0].x = CurrentFormVertices[0].x;
-	ChainEndPoints[0].y = CurrentFormVertices[0].y;
-	ChainEndPoints[1].x = CurrentFormVertices[1].x;
-	ChainEndPoints[1].y = CurrentFormVertices[1].y;
-	ActivePointIndex = 2;
-	return;
-fxlab:;
+	if (flag) {
+		ChainEndPoints[0].x = CurrentFormVertices[0].x;
+		ChainEndPoints[0].y = CurrentFormVertices[0].y;
+		ChainEndPoints[1].x = CurrentFormVertices[1].x;
+		ChainEndPoints[1].y = CurrentFormVertices[1].y;
+		ActivePointIndex = 2;
+		return;
+	}
 	AdjustedSpace = minimumSpacing = SelectedForm->edgeSpacing;
 	halfSpacing = AdjustedSpace / 2;
 	interval = minimumInterval = 1e9;
@@ -13156,6 +13159,19 @@ void filclpx() {
 	}
 }
 
+inline void wavinit (HWND hwndlg) noexcept {
+	TCHAR	buffer[HBUFSIZ] = { 0 };
+
+	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.wavePoints);
+	SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer);
+	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.waveStart);
+	SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer);
+	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.waveEnd);
+	SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), buffer);
+	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.waveLobes);
+	SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer);
+}
+
 bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
 	UNREFERENCED_PARAMETER(lparam);
 
@@ -13165,15 +13181,7 @@ bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexc
 		case WM_INITDIALOG:
 
 			SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-reinit:;
-			sprintf_s(buffer, sizeof(buffer), "%d", IniFile.wavePoints);
-			SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer);
-			sprintf_s(buffer, sizeof(buffer), "%d", IniFile.waveStart);
-			SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer);
-			sprintf_s(buffer, sizeof(buffer), "%d", IniFile.waveEnd);
-			SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), buffer);
-			sprintf_s(buffer, sizeof(buffer), "%d", IniFile.waveLobes);
-			SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer);
+			wavinit (hwndlg);
 			break;
 
 		case WM_COMMAND:
@@ -13211,10 +13219,11 @@ reinit:;
 					IniFile.waveStart = IWAVSTRT;
 					IniFile.waveEnd = IWAVEND;
 					IniFile.waveLobes = IWAVS;
-					goto reinit;
+					wavinit (hwndlg);
+					break;
 			}
 	}
-	return 0;
+	return false;
 }
 
 void wavfrm() {
@@ -13311,7 +13320,6 @@ void srtfrm() {
 	
 	if (PCSHeader.stitchCount) {
 		savdo();
-		FillMemory(histogram, sizeof(unsigned)*MAXFORMS, 0);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 			histogram[(StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT]++;
 		totalStitches = 0;
@@ -13320,7 +13328,7 @@ void srtfrm() {
 			histogram[iForm] = totalStitches;
 			totalStitches += formStitchCount;
 		}
-		fPOINTATTR* highStitchBuffer = new fPOINTATTR[MAXITEMS];
+		fPOINTATTR* highStitchBuffer = new fPOINTATTR[MAXITEMS]();
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
 			iHighStitch = histogram[iForm]++;

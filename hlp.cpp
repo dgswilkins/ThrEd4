@@ -318,7 +318,7 @@ void lodstr() {
 
 	unsigned	iString = 0, iStringData = 0, iStringTable = 0, count = 0;
 	// Over allocate storage to ensure no overflow
-	TCHAR*		stringStorage = new TCHAR[65535];
+	TCHAR*		stringStorage = new TCHAR[65535]();
 	TCHAR*		strings = stringStorage;
 
 	for (iString = 0; iString < STR_LEN; iString++) {
