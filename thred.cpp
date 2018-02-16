@@ -14998,6 +14998,63 @@ void selfpnt() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
+void esccode() {
+	chkbit();
+	duhbit(MF_UNCHECKED);
+	unthum();
+	StateMap.reset(StateFlag::MOVSET);
+	StateMap.reset(StateFlag::HID);
+	StateMap.reset(StateFlag::FRMOF);
+	StateMap.reset(StateFlag::THRDS);
+	redraw(ButtonWin[HHID]);
+	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
+	StateMap.reset(StateFlag::COL);
+	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
+	StateMap.set(StateFlag::DUMEN);
+	StateMap.reset(StateFlag::RUNPAT);
+	StateMap.reset(StateFlag::WASPAT);
+	StateMap.reset(StateFlag::WASBLAK);
+	StateMap.reset(StateFlag::GTUANG);
+	StateMap.reset(StateFlag::GTUSPAC);
+	StateMap.reset(StateFlag::GTWLKIND);
+	StateMap.reset(StateFlag::GTWLKLEN);
+	DestroyWindow(SpeedScrollBar);
+	StateMap.reset(StateFlag::GMRK);
+}
+
+void qcode() {
+	untrace();
+	StateMap.reset(StateFlag::HIDMAP);
+	StateMap.reset(StateFlag::FILDIR);
+	ReleaseCapture();
+	if (PCSHeader.stitchCount == 1)
+		PCSHeader.stitchCount = 0;
+	if (!UserFlagMap.test(UserFlag::MARQ))
+		StateMap.reset(StateFlag::GMRK);
+	if (StateMap.testAndReset(StateFlag::PRFACT)) {
+
+		if (StateMap.testAndReset(StateFlag::WASRT)) {
+			StateMap.set(StateFlag::INSRT);
+			StateMap.set(StateFlag::RESTCH);
+			return;
+		}
+		else
+			rstAll();
+	}
+	else
+		rstAll();
+	StateMap.set(StateFlag::RESTCH);
+	if (BufferIndex) {
+
+		BufferIndex = 0;
+		StitchEntryBuffer[0] = 0;
+		ClosestPointIndex = 0;
+		movbox();
+	}
+	butxt(HNUM, "");
+	return;
+}
+
 unsigned chkMsg() {
 
 	double			colorBarPosition = 0.0, ratio = 0.0, swapCoordinate = 0.0, swapFactor = 0.0;
@@ -17692,10 +17749,13 @@ unsigned chkMsg() {
 				switch (code) {
 
 					case VK_ESCAPE:
+					case 'Q':
 
 						unthum();
 						StateMap.reset(StateFlag::BAKSHO);
-						goto thumout;
+						esccode();
+						qcode();
+						break;
 
 					case VK_DOWN:
 					case 0x22:		//page down
@@ -17928,28 +17988,7 @@ unsigned chkMsg() {
 
 				case VK_ESCAPE:
 
-thumout:;
-					chkbit();
-					duhbit(MF_UNCHECKED);
-					unthum();
-					StateMap.reset(StateFlag::MOVSET);
-					StateMap.reset(StateFlag::HID);
-					StateMap.reset(StateFlag::FRMOF);
-					StateMap.reset(StateFlag::THRDS);
-					redraw(ButtonWin[HHID]);
-					CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-					StateMap.reset(StateFlag::COL);
-					CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-					StateMap.set(StateFlag::DUMEN);
-					StateMap.reset(StateFlag::RUNPAT);
-					StateMap.reset(StateFlag::WASPAT);
-					StateMap.reset(StateFlag::WASBLAK);
-					StateMap.reset(StateFlag::GTUANG);
-					StateMap.reset(StateFlag::GTUSPAC);
-					StateMap.reset(StateFlag::GTWLKIND);
-					StateMap.reset(StateFlag::GTWLKLEN);
-					DestroyWindow(SpeedScrollBar);
-					StateMap.reset(StateFlag::GMRK);
+					esccode();
 
 				case 'Q':
 
@@ -17958,36 +17997,7 @@ thumout:;
 						ritcur();
 						return 1;
 					}
-					untrace();
-					StateMap.reset(StateFlag::HIDMAP);
-					StateMap.reset(StateFlag::FILDIR);
-					ReleaseCapture();
-					if (PCSHeader.stitchCount == 1)
-						PCSHeader.stitchCount = 0;
-					if (!UserFlagMap.test(UserFlag::MARQ))
-						StateMap.reset(StateFlag::GMRK);
-					if (StateMap.testAndReset(StateFlag::PRFACT)) {
-
-						if (StateMap.testAndReset(StateFlag::WASRT)) {
-
-							StateMap.set(StateFlag::INSRT);
-							StateMap.set(StateFlag::RESTCH);
-							return 1;
-						}
-						else
-							rstAll();
-					}
-					else
-						rstAll();
-					StateMap.set(StateFlag::RESTCH);
-					if (BufferIndex) {
-
-						BufferIndex = 0;
-						StitchEntryBuffer[0] = 0;
-						ClosestPointIndex = 0;
-						movbox();
-					}
-					butxt(HNUM, "");
+					qcode();
 					return 1;
 
 				case 0xc0:		//`
@@ -22104,7 +22114,7 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 				fPOINT* vertexList = new fPOINT[stitchHeader.vertexCount]();
 				do {
 					if (fileTypeVersion < 2) {
-						FRMHEDO* formListOriginal = new FRMHEDO[stitchHeader.formCount]();
+						FRMHEDO* formListOriginal = new FRMHEDO[stitchHeader.formCount];
 						bytesToRead = stitchHeader.formCount * sizeof(FRMHEDO);
 						ReadFile(thrEdFile, formListOriginal, bytesToRead, &BytesRead, 0);
 						if (BytesRead != bytesToRead)
