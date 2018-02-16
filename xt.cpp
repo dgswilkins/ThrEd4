@@ -975,7 +975,7 @@ void delwlk(unsigned code) {
 
 	if (PCSHeader.stitchCount) {
 		stitchCount = 0;
-		fPOINTATTR* highStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount]();
+		fPOINTATTR* highStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if ((StitchBuffer[iStitch].attribute&WLKFMSK) != code) {
 				MoveMemory(&highStitchBuffer[stitchCount++], &StitchBuffer[iStitch], sizeof(fPOINTATTR));
@@ -1379,10 +1379,10 @@ void srtcol() {
 		colorStartStitch[iColor] = startStitch;
 		startStitch += histogram[iColor];
 	}
-	fPOINTATTR* highStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount]();
+	fPOINTATTR* highStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 		moveStitch(&highStitchBuffer[colorStartStitch[StitchBuffer[iStitch].attribute&COLMSK]++], &StitchBuffer[iStitch]);
-	MoveMemory(&StitchBuffer, highStitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR));
+	MoveMemory(StitchBuffer, highStitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR));
 	delete[] highStitchBuffer;
 }
 
@@ -2025,7 +2025,7 @@ void fsort() {
 	dmprec(*PRecs, lastRegion);
 #endif
 	if (srtchk(*PFRecs, lastRegion, &badForm)) {
-		RANGE* stitchRange = new RANGE[lastRegion]();
+		RANGE* stitchRange = new RANGE[lastRegion];
 		stitchRange[0].start = 0;
 		attribute = PRecs[0]->color;
 		currentForm = 0xffffffff;
@@ -2034,8 +2034,7 @@ void fsort() {
 		for (iRegion = 0; iRegion < lastRegion; iRegion++) {
 			bool srtskp = true;
 			if (attribute != PRecs[iRegion]->color) {
-				stitchRange[iRange].finish = iRegion;
-				iRange++;
+				stitchRange[iRange++].finish = iRegion;
 				stitchRange[iRange].start = iRegion;
 				attribute = PRecs[iRegion]->color;
 				currentForm = PRecs[iRegion]->form;
@@ -5199,7 +5198,7 @@ void repflt() {
 	}
 	FormIndex = iDestination;
 	ZeroMemory(&badData, sizeof(BADCNTS));
-	fPOINT* vertexPoint = new fPOINT[vertexCount]();
+	fPOINT* vertexPoint = new fPOINT[vertexCount];
 	iVertex = 0;
 	bool flag = true;
 	for (iForm = 0; iForm < FormIndex; iForm++) {
