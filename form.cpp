@@ -13328,7 +13328,7 @@ void srtfrm() {
 			histogram[iForm] = totalStitches;
 			totalStitches += formStitchCount;
 		}
-		fPOINTATTR* highStitchBuffer = new fPOINTATTR[MAXITEMS]();
+		fPOINTATTR* highStitchBuffer = new fPOINTATTR[MAXITEMS];
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
 			iHighStitch = histogram[iForm]++;
