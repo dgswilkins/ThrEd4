@@ -2019,7 +2019,9 @@ void fsort() {
 		PRecs[iRegion] = &stitchRegion[iRegion];
 		PFRecs[iRegion] = &stitchRegion[iRegion];
 	}
+	// ToDo - replace with std::sort
 	qsort(PRecs, lastRegion, sizeof(OREC *), recmp);
+	// ToDo - replace with std::sort
 	qsort(PFRecs, lastRegion, sizeof(OREC *), refcmp);
 #ifdef _DEBUG
 	dmprec(*PRecs, lastRegion);
@@ -3987,6 +3989,7 @@ void nutx() {
 	int			iForm = 0, iPoint = 0;
 	FRMHED*		formHeader = nullptr;
 
+	// ToDo - replace with std::sort
 	qsort(TempTexturePoints, TextureScreen.index, sizeof(TXPNT), txcmp);
 	iPoint = 0;
 	if (FormIndex) {
@@ -4070,6 +4073,7 @@ void dutxfn(unsigned textureType) {
 }
 
 void txsrt() noexcept {
+	// ToDo - replace with std::sort
 	qsort(TempTexturePoints, TextureScreen.index, sizeof(TXPNT), txcmp);
 }
 

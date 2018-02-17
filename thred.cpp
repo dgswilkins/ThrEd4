@@ -11351,6 +11351,7 @@ void thumnail() {
 		}
 		FindClose(file);
 		ThumbnailCount = iThumbnail;
+		// ToDo - replace with std::sort
 		qsort(Thumbnails, iThumbnail, sizeof(TCHAR *), strcomp);
 		iThumbnail = ThumbnailIndex = 0;
 		while (iThumbnail < 4 && ThumbnailIndex < ThumbnailCount && iThumbnail < ThumbnailCount) {

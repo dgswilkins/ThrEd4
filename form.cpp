@@ -3647,6 +3647,7 @@ void lcon() {
 		SortedLines = new SMALPNTL*[StitchLineCount >> 1]();
 		for (iLine = 0; iLine < StitchLineCount; iLine += 2)
 			SortedLines[lineCount++] = &LineEndpoints[iLine];
+		// ToDo - replace with std::sort
 		qsort(SortedLines, lineCount, sizeof(SMALPNTL*), sqcomp);
 		RegionCount = 0;
 		// Count the regions. There cannot be more regions than lines
@@ -11696,6 +11697,7 @@ unsigned insect() noexcept {
 		}
 	}
 	if (count > 1) {
+		// ToDo - replace with std::sort
 		qsort(ArrayOfClipIntersectData, count, sizeof(CLIPSORT *), lencmp);
 		iDestination = 1;
 		for (iIntersection = 0; iIntersection < count - 1; iIntersection++) {
@@ -11921,6 +11923,7 @@ void clpcon() {
 			RegionCrossingData[segmentCount++].segment = iSegment;
 		}
 	}
+	// ToDo - replace with std::sort
 	qsort(RegionCrossingData, segmentCount, sizeof(VCLPX), clpcmp);
 	unsigned* iclpx = new unsigned[segmentCount + 1]();
 	iRegion = 1; regionSegment = RegionCrossingData[0].segment;
@@ -12113,6 +12116,7 @@ clp1skp:;
 			SortedLengths[sortedCount++] = &ClipSegments[iSegment].beginLength;
 			SortedLengths[sortedCount++] = &ClipSegments[iSegment].endLength;
 		}
+		// ToDo - replace with std::sort
 		qsort(SortedLengths, sortedCount, sizeof(float *), lencmp);
 		for (iSorted = 0; iSorted < sortedCount; iSorted++) {
 			// ToDo - what does lenref do exactly?
