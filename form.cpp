@@ -10452,85 +10452,90 @@ void ribon() {
 
 			HorizontalLength2 = BorderWidth / 2;
 			FRMHED* formHeader = &FormList[FormIndex];
-			frmclr(formHeader);
-			iNewVertex = 0;
-			formHeader->maxFillStitchLen = 9 * PFGRAN;
-			formHeader->minFillStitchLen = MinStitchLength;
-			MaxStitchLen = 9 * PFGRAN;
-			if (SelectedForm->type == FRMLINE) {
-				// Set blunt flags
-				if (UserFlagMap.test(UserFlag::BLUNT))
-					isBlunt = SBLNT | FBLNT;
+			if (formHeader) {
+				frmclr(formHeader);
+				iNewVertex = 0;
+				formHeader->maxFillStitchLen = 9 * PFGRAN;
+				formHeader->minFillStitchLen = MinStitchLength;
+				MaxStitchLen = 9 * PFGRAN;
+				if (SelectedForm->type == FRMLINE) {
+					// Set blunt flags
+					if (UserFlagMap.test(UserFlag::BLUNT))
+						isBlunt = SBLNT | FBLNT;
+					else
+						isBlunt = 0;
+					satends(isBlunt);
+					formHeader->vertices = adflt(VertexCount << 1);
+					formHeader->vertices[0].x = OutsidePoints[0].x;
+					formHeader->vertices[iNewVertex++].y = OutsidePoints[0].y;
+					for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+						formHeader->vertices[iNewVertex].x = InsidePoints[iVertex].x;
+						formHeader->vertices[iNewVertex++].y = InsidePoints[iVertex].y;
+					}
+					for (iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
+						formHeader->vertices[iNewVertex].x = OutsidePoints[iVertex].x;
+						formHeader->vertices[iNewVertex++].y = OutsidePoints[iVertex].y;
+					}
+				}
+				else {
+					formHeader->vertices = adflt((VertexCount << 1) + 2);
+					formHeader->vertices[0].x = OutsidePoints[0].x;
+					formHeader->vertices[iNewVertex++].y = OutsidePoints[0].y;
+					formHeader->underlayIndent = IniFile.underlayIndent;
+					for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+						formHeader->vertices[iNewVertex].x = InsidePoints[iVertex].x;
+						formHeader->vertices[iNewVertex++].y = InsidePoints[iVertex].y;
+					}
+					formHeader->vertices[iNewVertex].x = InsidePoints[0].x;
+					formHeader->vertices[iNewVertex++].y = InsidePoints[0].y;
+					formHeader->vertices[iNewVertex].x = OutsidePoints[0].x;
+					formHeader->vertices[iNewVertex++].y = OutsidePoints[0].y;
+					for (iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
+						formHeader->vertices[iNewVertex].x = OutsidePoints[iVertex].x;
+						formHeader->vertices[iNewVertex++].y = OutsidePoints[iVertex].y;
+					}
+				}
+				formHeader->type = SAT;
+				formHeader->fillColor = ActiveColor;
+				formHeader->fillSpacing = LineSpacing;
+				formHeader->lengthOrCount.stitchLength = IniFile.maxStitchLength;
+				formHeader->vertexCount = iNewVertex;
+				formHeader->attribute = 1;
+				formHeader->wordParam = iNewVertex >> 1;
+				formHeader->satinGuideCount = formHeader->wordParam - 2;
+				formHeader->satinOrAngle.guide = adsatk(formHeader->satinGuideCount);
+				if (StateMap.test(StateFlag::CNV2FTH)) {
+					formHeader->fillType = FTHF;
+					formHeader->fillInfo.feather.ratio = IniFile.featherRatio;
+					formHeader->fillInfo.feather.upCount = IniFile.featherUpCount;
+					formHeader->fillInfo.feather.downCount = IniFile.featherDownCount;
+					formHeader->fillInfo.feather.fillType = IniFile.featherFillType;
+					formHeader->fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
+					formHeader->extendedAttribute = IniFile.featherType;
+					formHeader->fillInfo.feather.count = IniFile.featherCount;
+					formHeader->fillInfo.feather.color = (ActiveColor + 1)&COLMSK;
+				}
 				else
-					isBlunt = 0;
-				satends(isBlunt);
-				formHeader->vertices = adflt(VertexCount << 1);
-				formHeader->vertices[0].x = OutsidePoints[0].x;
-				formHeader->vertices[iNewVertex++].y = OutsidePoints[0].y;
-				for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-					formHeader->vertices[iNewVertex].x = InsidePoints[iVertex].x;
-					formHeader->vertices[iNewVertex++].y = InsidePoints[iVertex].y;
+					formHeader->fillType = SATF;
+				for (iGuide = 0; iGuide < formHeader->satinGuideCount; iGuide++) {
+					formHeader->satinOrAngle.guide[iGuide].start = iGuide + 2;
+					formHeader->satinOrAngle.guide[iGuide].finish = formHeader->vertexCount - iGuide - 1;
 				}
-				for (iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
-					formHeader->vertices[iNewVertex].x = OutsidePoints[iVertex].x;
-					formHeader->vertices[iNewVertex++].y = OutsidePoints[iVertex].y;
-				}
+				FormIndex++;
+				frmout(FormIndex - 1);
+				ClosestFormToCursor = FormIndex - 1;
+				refilfn();
+				ClosestFormToCursor = savedFormIndex;
+				StateMap.set(StateFlag::DELTO);
+				frmdel();
+				ClosestFormToCursor = FormIndex - 1;
+				StateMap.set(StateFlag::FORMSEL);
+				StateMap.set(StateFlag::INIT);
+				StateMap.set(StateFlag::RESTCH);
 			}
 			else {
-				formHeader->vertices = adflt((VertexCount << 1) + 2);
-				formHeader->vertices[0].x = OutsidePoints[0].x;
-				formHeader->vertices[iNewVertex++].y = OutsidePoints[0].y;
-				formHeader->underlayIndent = IniFile.underlayIndent;
-				for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-					formHeader->vertices[iNewVertex].x = InsidePoints[iVertex].x;
-					formHeader->vertices[iNewVertex++].y = InsidePoints[iVertex].y;
-				}
-				formHeader->vertices[iNewVertex].x = InsidePoints[0].x;
-				formHeader->vertices[iNewVertex++].y = InsidePoints[0].y;
-				formHeader->vertices[iNewVertex].x = OutsidePoints[0].x;
-				formHeader->vertices[iNewVertex++].y = OutsidePoints[0].y;
-				for (iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
-					formHeader->vertices[iNewVertex].x = OutsidePoints[iVertex].x;
-					formHeader->vertices[iNewVertex++].y = OutsidePoints[iVertex].y;
-				}
+				throw;
 			}
-			formHeader->type = SAT;
-			formHeader->fillColor = ActiveColor;
-			formHeader->fillSpacing = LineSpacing;
-			formHeader->lengthOrCount.stitchLength = IniFile.maxStitchLength;
-			formHeader->vertexCount = iNewVertex;
-			formHeader->attribute = 1;
-			formHeader->wordParam = iNewVertex >> 1;
-			formHeader->satinGuideCount = formHeader->wordParam - 2;
-			formHeader->satinOrAngle.guide = adsatk(formHeader->satinGuideCount);
-			if (StateMap.test(StateFlag::CNV2FTH)) {
-				formHeader->fillType = FTHF;
-				formHeader->fillInfo.feather.ratio = IniFile.featherRatio;
-				formHeader->fillInfo.feather.upCount = IniFile.featherUpCount;
-				formHeader->fillInfo.feather.downCount = IniFile.featherDownCount;
-				formHeader->fillInfo.feather.fillType = IniFile.featherFillType;
-				formHeader->fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
-				formHeader->extendedAttribute = IniFile.featherType;
-				formHeader->fillInfo.feather.count = IniFile.featherCount;
-				formHeader->fillInfo.feather.color = (ActiveColor + 1)&COLMSK;
-			}
-			else
-				formHeader->fillType = SATF;
-			for (iGuide = 0; iGuide < formHeader->satinGuideCount; iGuide++) {
-				formHeader->satinOrAngle.guide[iGuide].start = iGuide + 2;
-				formHeader->satinOrAngle.guide[iGuide].finish = formHeader->vertexCount - iGuide - 1;
-			}
-			FormIndex++;
-			frmout(FormIndex - 1);
-			ClosestFormToCursor = FormIndex - 1;
-			refilfn();
-			ClosestFormToCursor = savedFormIndex;
-			StateMap.set(StateFlag::DELTO);
-			frmdel();
-			ClosestFormToCursor = FormIndex - 1;
-			StateMap.set(StateFlag::FORMSEL);
-			StateMap.set(StateFlag::INIT);
-			StateMap.set(StateFlag::RESTCH);
 		}
 		else
 			tabmsg(IDS_FRM2);
@@ -11354,14 +11359,15 @@ lcmp2 :
 lcmpx :
 	}
 #else
-	const float local1 = **static_cast<float * const *>(arg1), local2 = **static_cast<float * const *>(arg2);
+	if (arg1 && arg2) {
+		const float local1 = **static_cast<float * const *>(arg1), local2 = **static_cast<float * const *>(arg2);
 
-	if (local1 < local2)
-		return -1;
+		if (local1 < local2)
+			return -1;
 
-	if (local1 > local2)
-		return 1;
-
+		if (local1 > local2)
+			return 1;
+	}
 	return 0;
 #endif
 }
@@ -11831,7 +11837,6 @@ void clpcon() {
 	TXPNT*		tmpTexture = new TXPNT[1]();
 	TXPNT*		texture = tmpTexture;
 	bool		flag = false;
-	unsigned*	iclpx = nullptr;			//indices into region crossing data for vertical clipboard fills
 	unsigned	clplim = 0;			//vertical clipboard search limit
 
 	duflt();
@@ -11915,7 +11920,7 @@ void clpcon() {
 		}
 	}
 	qsort(RegionCrossingData, segmentCount, sizeof(VCLPX), clpcmp);
-	iclpx = new unsigned[segmentCount + 1]();
+	unsigned* iclpx = new unsigned[segmentCount + 1]();
 	iRegion = 1; regionSegment = RegionCrossingData[0].segment;
 	iclpx[0] = 0;
 	for (iSegment = 1; iSegment < segmentCount; iSegment++) {
