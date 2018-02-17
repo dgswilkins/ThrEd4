@@ -5094,7 +5094,6 @@ void nuFil() {
 	TCHAR		buffer[3] = { 0 };
 	TCHAR*		tnam = nullptr;
 	DSTHED		dstHeader = {};
-	FRMHEDO*	formListOriginal = nullptr;
 	long		totalBytesRead = 0;
 	fRECTANGLE	stitchRect = {};
 	unsigned long stitchesRead = 0;
@@ -5303,7 +5302,7 @@ void nuFil() {
 						FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
 						MsgBuffer[0] = 0;
 						if (version < 2) {
-							formListOriginal = new FRMHEDO[FormIndex]();
+							FRMHEDO* formListOriginal = new FRMHEDO[FormIndex]();
 							ReadFile(FileHandle, formListOriginal, FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
 							if (BytesRead != FormIndex * sizeof(FRMHEDO)) {
 
@@ -5311,6 +5310,7 @@ void nuFil() {
 								StateMap.set(StateFlag::BADFIL);
 							}
 							xofrm(formListOriginal);
+							delete[] formListOriginal;
 						}
 						else {
 
@@ -6135,11 +6135,10 @@ void sav() {
 		PCSFileHandle = 0;
 	}
 	else {
-
+		bool flag = true;
 		switch (IniFile.auxFileType) {
 
 			case AUXDST:
-
 				// There are always going to be more records in the DST format
 				DSTRecords = new DSTREC[2 * PCSHeader.stitchCount]();
 				ritdst(saveStitches);
@@ -6152,7 +6151,6 @@ void sav() {
 				pchr = strrchr(AuxName, '\\') + 1;
 				if (pchr) {
 					for (iHeader = 0; iHeader < sizeof(dstHeader.desc); iHeader++) {
-
 						if (pchr[iHeader] && pchr[iHeader] != '.')
 							dstHeader.desc[iHeader] = pchr[iHeader];
 						else
@@ -6191,7 +6189,6 @@ void sav() {
 #if PESACT
 
 			case AUXPES:
-
 				pchr = static_cast<TCHAR *>(static_cast<void *>(&pesHeader));
 				for (iHeader = 0; iHeader < sizeof(PESHED); iHeader++)
 					pchr[iHeader] = 0;
@@ -6199,13 +6196,10 @@ void sav() {
 				strncpy(pesHeader.ce, "CEmbOne", sizeof(pesHeader.ce));
 				strncpy(pesHeader.cs, "CSewSeg", sizeof(pesHeader.cs));
 				for (iColor = 0; iColor < 16; iColor++) {
-
 					matchMin = 0xffffffff;
 					for (iColorMatch = 0; iColorMatch < sizeof(PESColorTranslate) >> 2; iColorMatch++) {
-
 						match = pesmtch(UserColor[iColor], iColorMatch);
 						if (match < matchMin) {
-
 							matchIndex = iColorMatch;
 							matchMin = match;
 						}
@@ -6229,11 +6223,9 @@ void sav() {
 				ritpes(0);
 				pesColorCount = 0;
 				for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 					if (color == (StitchBuffer[iStitch].attribute&COLMSK))
 						ritpes(iStitch);
 					else {
-
 						ritpes(iStitch);
 						PESstitches[OutputIndex].x = -32767; // 0x8001
 						PESstitches[OutputIndex++].y = 0;
@@ -6296,63 +6288,65 @@ void sav() {
 				break;
 #endif
 			default:
-
 				for (iColor = 0; iColor < 16; iColor++)
 					PCSHeader.colors[iColor] = UserColor[iColor];
-				if (pcshup(saveStitches))
-					return;
-				if (!WriteFile(PCSFileHandle, &PCSHeader, 0x46, &bytesWritten, 0)) {
-
-					riter();
-					return;
-				}
 				PCSStitchBuffer = new PCSTCH[PCSHeader.stitchCount + ColorChanges + 2];
-				clrfbuf((sizeof(PCSTCH)*(PCSHeader.stitchCount + ColorChanges + 1)) >> 2);
-				iPCSstitch = 0;
-				savcol = 0xff;
-				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
-					if ((saveStitches[iStitch].attribute&COLMSK) != savcol) {
-
-						savcol = saveStitches[iStitch].attribute&COLMSK;
-						PCSStitchBuffer[iPCSstitch].tag = 3;
-						PCSStitchBuffer[iPCSstitch++].fx = savcol;
+				do {
+					if (pcshup(saveStitches)) {
+						flag = false;
+						break;
 					}
-					fractionalPart = modf(saveStitches[iStitch].x, &integerPart);
-					PCSStitchBuffer[iPCSstitch].fx = fractionalPart * 256;
-					PCSStitchBuffer[iPCSstitch].x = integerPart;
-					fractionalPart = modf(saveStitches[iStitch].y, &integerPart);
-					PCSStitchBuffer[iPCSstitch].fy = fractionalPart * 256;
-					PCSStitchBuffer[iPCSstitch++].y = integerPart;
-				}
-				if (!WriteFile(PCSFileHandle, PCSStitchBuffer, iPCSstitch * sizeof(PCSTCH), &bytesWritten, 0)) {
-
-					riter();
-					return;
-				}
-				if (UserFlagMap.test(UserFlag::BSAVOF)) {
-
-					*MsgBuffer = 0;
-					if (!WriteFile(PCSFileHandle, MsgBuffer, 15, &bytesWritten, 0)) {
-
+					if (!WriteFile(PCSFileHandle, &PCSHeader, 0x46, &bytesWritten, 0)) {
 						riter();
-						return;
+						flag = false;
+						break;
 					}
-				}
-				else {
-
-					if (!WriteFile(PCSFileHandle, PCSBMPFileName, 15, &bytesWritten, 0)) {
-
+					clrfbuf((sizeof(PCSTCH)*(PCSHeader.stitchCount + ColorChanges + 1)) >> 2);
+					iPCSstitch = 0;
+					savcol = 0xff;
+					for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+						if ((saveStitches[iStitch].attribute&COLMSK) != savcol) {
+							savcol = saveStitches[iStitch].attribute&COLMSK;
+							PCSStitchBuffer[iPCSstitch].tag = 3;
+							PCSStitchBuffer[iPCSstitch++].fx = savcol;
+						}
+						fractionalPart = modf(saveStitches[iStitch].x, &integerPart);
+						PCSStitchBuffer[iPCSstitch].fx = fractionalPart * 256;
+						PCSStitchBuffer[iPCSstitch].x = integerPart;
+						fractionalPart = modf(saveStitches[iStitch].y, &integerPart);
+						PCSStitchBuffer[iPCSstitch].fy = fractionalPart * 256;
+						PCSStitchBuffer[iPCSstitch++].y = integerPart;
+					}
+					if (!WriteFile(PCSFileHandle, PCSStitchBuffer, iPCSstitch * sizeof(PCSTCH), &bytesWritten, 0)) {
 						riter();
-						return;
+						flag = false;
+						break;
 					}
-				}
+					if (UserFlagMap.test(UserFlag::BSAVOF)) {
+						*MsgBuffer = 0;
+						if (!WriteFile(PCSFileHandle, MsgBuffer, 15, &bytesWritten, 0)) {
+							riter();
+							flag = false;
+							break;
+						}
+					}
+					else {
+						if (!WriteFile(PCSFileHandle, PCSBMPFileName, 15, &bytesWritten, 0)) {
+							riter();
+							flag = false;
+							break;
+						}
+					}
+				} while (false);
 				delete[] PCSStitchBuffer;
 		}
-		defNam(WorkingFileName);
-		CloseHandle(PCSFileHandle);
-		if (UserFlagMap.test(UserFlag::ROTAUX))
-			filnopn(IDS_FILROT, AuxName);
+		if (flag) {
+			defNam(WorkingFileName);
+			CloseHandle(PCSFileHandle);
+			if (UserFlagMap.test(UserFlag::ROTAUX)) {
+				filnopn(IDS_FILROT, AuxName);
+			}
+		}
 	}
 	delete[] saveStitches;
 }
@@ -22099,6 +22093,8 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 				}
 				else {
 					CloseHandle(thrEdFile);
+					delete[] stitchesToDraw;
+					delete[] lines;
 					return;
 				}
 				delete[] stitchesToDraw;
