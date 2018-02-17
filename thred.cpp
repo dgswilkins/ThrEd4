@@ -8266,6 +8266,9 @@ void duclip() {
 				}
 				SetClipboardData(ThrEdClip, ThrEdClipPointer);
 			}
+			else {
+				throw;
+			}
 			CloseClipboard();
 		}
 		return;
@@ -8366,6 +8369,7 @@ void duclip() {
 				clRmap(MAXITEMS);
 				for (iForm = 0; iForm < SelectedFormCount; iForm++)
 					setr(SelectedFormList[iForm]);
+				// ToDo - what is astch used for?
 				fPOINTATTR* astch = &StitchBuffer[MAXITEMS];
 				stitchCount = 0;
 				LowerLeftStitch.x = LowerLeftStitch.y = 1e30f;
@@ -21989,7 +21993,6 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 	unsigned	iStitch = 0, iForm = 0, iVertexInForm = 0, iVertex = 0, iColor = 0, iLine = 0, bytesToRead = 0;
 	POINT		drawingDestinationSize = { (drawItem->rcItem.right - drawItem->rcItem.left),
 										   (drawItem->rcItem.bottom - drawItem->rcItem.top)	};
-	fPOINTATTR*	stitchesToDraw = nullptr;
 	STRHED		stitchHeader = {};
 	fPOINT		stitchSourceSize = {1,1};
 	double		ratio = 0.0;
@@ -22054,7 +22057,7 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 				ratio = yRatio;
 			if (stitchHeader.stitchCount) {
 
-				stitchesToDraw = new fPOINTATTR[stitchHeader.stitchCount]();
+				fPOINTATTR* stitchesToDraw = new fPOINTATTR[stitchHeader.stitchCount]();
 				POINT* lines = new POINT[stitchHeader.stitchCount]();
 				bytesToRead = stitchHeader.stitchCount * sizeof(fPOINTATTR);
 				ReadFile(thrEdFile, stitchesToDraw, bytesToRead, &BytesRead, 0);
@@ -22093,16 +22096,13 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 					}
 					DeleteObject(brush);
 					DeleteObject(pen);
-					delete[] stitchesToDraw;
-					delete[] lines;
 				}
 				else {
-
-					delete[] stitchesToDraw;
-					delete[] lines;
 					CloseHandle(thrEdFile);
 					return;
 				}
+				delete[] stitchesToDraw;
+				delete[] lines;
 			}
 			else
 				SetFilePointer(thrEdFile, 84, 0, FILE_CURRENT);
