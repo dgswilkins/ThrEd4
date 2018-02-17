@@ -11852,8 +11852,10 @@ void clpcon() {
 	if (StateMap.test(StateFlag::TXFIL)) {
 		if (TextureIndex && SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count <= TextureIndex)
 			ClipWidth = SelectedForm->fillSpacing;
-		else
+		else {
+			delete[] tmpTexture;
 			return;
+		}
 	}
 	Lengths = new double[VertexCount + 1];
 	ClipSideLengths = new double[VertexCount];
