@@ -233,13 +233,10 @@ void			dufxlen ();
 void			duhart (unsigned nsids);
 void			durpoli (unsigned nsids);
 void			duxclp ();
-void			filang ();
 void			filinsb (dPOINT point) noexcept;
 void			filvrt ();
 void			flipv ();
 void			fmclp ();
-void			fnhor ();
-void			fnvrt ();
 void			frmpnts (unsigned typ) noexcept;
 void			frmsqr (unsigned ind);
 void			fvars (unsigned ind) noexcept;
@@ -2399,6 +2396,187 @@ void bold(double size) noexcept {
 	SequenceIndex = iOutput;
 }
 
+// find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
+bool projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT* intersection) noexcept {
+	double	swap = 0.0, slope = 0.0;
+	const double	deltaX = upperPoint.x - lowerPoint.x;
+
+	intersection->x = xCoordinate;
+
+	if (deltaX) {
+		slope = (upperPoint.y - lowerPoint.y) / deltaX;
+		intersection->y = (xCoordinate - lowerPoint.x)*slope + lowerPoint.y;
+		if (lowerPoint.x > upperPoint.x) {
+			swap = lowerPoint.x;
+			lowerPoint.x = upperPoint.x;
+			upperPoint.x = swap;
+		}
+		if (xCoordinate<lowerPoint.x || xCoordinate>upperPoint.x)
+			return false;
+		else
+			return true;
+	}
+	else
+		return false;
+}
+
+// find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
+bool projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersection) noexcept {
+
+	double	swap = 0.0, slope = 0.0;
+	const double	deltaX = point1.x - point0.x;
+	double	deltaY = 0.0;
+
+	intersection->y = yCoordinate;
+	if (deltaX) {
+		deltaY = point1.y - point0.y;
+		if (deltaY) {
+			slope = deltaY / deltaX;
+			intersection->x = (yCoordinate - point0.y) / slope + point0.x;
+		}
+		else
+			return false;
+	}
+	else
+		intersection->x = point0.x;
+	if (point0.y > point1.y) {
+		swap = point0.y;
+		point0.y = point1.y;
+		point1.y = swap;
+	}
+	if (yCoordinate<point0.y || yCoordinate>point1.y)
+		return false;
+	else
+		return true;
+}
+
+void fnvrt() {
+
+	unsigned		iVertex = 0, iNextVertex = 0, iLine = 0, iGroup = 0, evenPointCount = 0;
+	unsigned		iLineCounter = 0, iPoint = 0, fillLineCount = 0, savedLineCount = 0;
+	int				lineOffset = 0;
+	double			lowX = 0.0, highX = 0.0;
+	double			currentX = 0.0, step = 0.0;
+	dPOINT			point = {};
+	unsigned		maximumLines = 0;	//maximum angle fill lines for any adjusted y cordinate
+
+	CurrentFillVertices = SelectedForm->vertices;
+	highX = lowX = CurrentFillVertices[0].x;
+	VertexCount = SelectedForm->vertexCount;
+	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
+		if (CurrentFillVertices[iVertex].x > highX)
+			highX = CurrentFillVertices[iVertex].x;
+		if (CurrentFillVertices[iVertex].x < lowX)
+			lowX = CurrentFillVertices[iVertex].x;
+	}
+
+	lineOffset = lowX / LineSpacing;
+	lowX = LineSpacing * lineOffset;
+	fillLineCount = (highX - lowX) / LineSpacing + 1;
+	std::vector<dPOINTLINE> projectedPoints;
+	projectedPoints.reserve(VertexCount + 2);
+	step = (highX - lowX) / fillLineCount;
+	currentX = lowX;
+	for (iLine = 0; iLine < fillLineCount; iLine++) {
+		iLineCounter = 0;
+		currentX += step;
+		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+			iNextVertex = (iVertex + 1) % VertexCount;
+			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iNextVertex], &point))
+				iLineCounter++;
+		}
+		fillLineCount += iLineCounter;
+		if (iLineCounter > maximumLines)
+			maximumLines = iLineCounter;
+	}
+	maximumLines = (maximumLines >> 1);
+	LineEndpoints = new SMALPNTL[fillLineCount + 1](); //deleted in lcon
+	StitchLineCount = 0; LineGroupIndex = 0;
+	std::vector<unsigned> groupIndex;
+	// groupIndex cannot be more than fillLineCount so reserve that amount of memory to reduce re-allocations
+	groupIndex.reserve(fillLineCount);
+	GroupIndexCount = 0;
+	currentX = lowX;
+	for (iLine = 0; iLine < fillLineCount; iLine++) {
+		projectedPoints.clear();
+		currentX += step;
+		iPoint = 0;
+		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+			iNextVertex = (iVertex + 1) % VertexCount;
+			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iNextVertex], &point)) {
+				dPOINTLINE a = { point.x,point.y,gsl::narrow<unsigned short>(iVertex) };
+				projectedPoints.push_back(a);
+				iPoint++;
+			}
+		}
+		if (iPoint > 1) {
+			evenPointCount = iPoint &= 0xfffffffe;
+			groupIndex.push_back(StitchLineCount);
+			std::sort(projectedPoints.begin(), projectedPoints.end(), comp);
+			iPoint = 0;
+			savedLineCount = StitchLineCount;
+			while (iPoint < evenPointCount) {
+				if (StitchLineCount < fillLineCount) {
+					LineEndpoints[StitchLineCount].line = projectedPoints[iPoint].line;
+					LineEndpoints[StitchLineCount].group = LineGroupIndex;
+					LineEndpoints[StitchLineCount].x = projectedPoints[iPoint].x;
+					LineEndpoints[StitchLineCount++].y = projectedPoints[iPoint++].y;
+					LineEndpoints[StitchLineCount].line = projectedPoints[iPoint].line;
+					LineEndpoints[StitchLineCount].group = LineGroupIndex;
+					LineEndpoints[StitchLineCount].x = projectedPoints[iPoint].x;
+					LineEndpoints[StitchLineCount++].y = projectedPoints[iPoint++].y;
+				}
+			}
+			if (StitchLineCount != savedLineCount)
+				LineGroupIndex++;
+		}
+	}
+	groupIndex.push_back(StitchLineCount);
+	GroupIndexCount = groupIndex.size();
+	//ToDo convert GroupIndexSequence to vector that would be defined in refilfn
+	GroupIndexSequence = new unsigned[GroupIndexCount];
+	for (iGroup = 0; iGroup < GroupIndexCount; iGroup++)
+		GroupIndexSequence[iGroup] = groupIndex[iGroup];
+	LineGroupIndex--;
+}
+
+void fnang() {
+
+	unsigned	iVertex = 0;
+
+	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
+	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
+	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
+	AngledForm.vertices = AngledFormVertices;
+	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
+		AngledForm.vertices[iVertex].x = SelectedForm->vertices[iVertex].x;
+		AngledForm.vertices[iVertex].y = SelectedForm->vertices[iVertex].y;
+		rotflt(&AngledForm.vertices[iVertex]);
+	}
+	SelectedForm = &AngledForm;
+	fnvrt();
+	SelectedForm = &FormList[ClosestFormToCursor];
+}
+
+void fnhor() {
+
+	unsigned	iVertex = 0;
+
+	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
+	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
+	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
+	RotationAngle = PI / 2;
+	AngledForm.vertices = AngledFormVertices;
+	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
+		AngledForm.vertices[iVertex].x = SelectedForm->vertices[iVertex].x;
+		AngledForm.vertices[iVertex].y = SelectedForm->vertices[iVertex].y;
+		rotflt(&AngledForm.vertices[iVertex]);
+	}
+	SelectedForm = &AngledForm;
+	fnvrt();
+	SelectedForm = &FormList[ClosestFormToCursor];
+}
+
 void refilfn() {
 
 	double			spacing = 0.0;
@@ -2557,7 +2735,7 @@ void refilfn() {
 					case ANGF:
 
 						RotationAngle = PI / 2 - SelectedForm->angleOrClipData.angle;
-						filang();
+						fnang();
 						WorkingFormVertices = AngledForm.vertices;
 						break;
 
@@ -2769,78 +2947,6 @@ bool proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* inte
 		else
 			return true;
 	}
-}
-
-// find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
-bool projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT* intersection) noexcept {
-	double	swap = 0.0, slope = 0.0;
-	const double	deltaX = upperPoint.x - lowerPoint.x;
-
-	intersection->x = xCoordinate;
-	
-	if (deltaX) {
-		slope = (upperPoint.y - lowerPoint.y) / deltaX;
-		intersection->y = (xCoordinate - lowerPoint.x)*slope + lowerPoint.y;
-		if (lowerPoint.x > upperPoint.x) {
-			swap = lowerPoint.x;
-			lowerPoint.x = upperPoint.x;
-			upperPoint.x = swap;
-		}
-		if (xCoordinate<lowerPoint.x || xCoordinate>upperPoint.x)
-			return false;
-		else
-			return true;
-	}
-	else
-		return false;
-}
-
-// find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
-bool projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersection) noexcept {
-
-	double	swap = 0.0, slope = 0.0;
-	const double	deltaX = point1.x - point0.x; 
-	double	deltaY = 0.0;
-
-	intersection->y = yCoordinate;
-	if (deltaX) {
-		deltaY = point1.y - point0.y;
-		if (deltaY) {
-			slope = deltaY / deltaX;
-			intersection->x = (yCoordinate - point0.y) / slope + point0.x;
-		}
-		else
-			return false;
-	}
-	else
-		intersection->x = point0.x;
-	if (point0.y > point1.y) {
-		swap = point0.y;
-		point0.y = point1.y;
-		point1.y = swap;
-	}
-	if (yCoordinate<point0.y || yCoordinate>point1.y)
-		return false;
-	else
-		return true;
-}
-
-void filang() {
-
-	unsigned	iVertex = 0;
-
-	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
-	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
-	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
-	AngledForm.vertices = AngledFormVertices;
-	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
-		AngledForm.vertices[iVertex].x = SelectedForm->vertices[iVertex].x;
-		AngledForm.vertices[iVertex].y = SelectedForm->vertices[iVertex].y;
-		rotflt(&AngledForm.vertices[iVertex]);
-	}
-	SelectedForm = &AngledForm;
-	fnvrt();
-	SelectedForm = &FormList[ClosestFormToCursor];
 }
 
 void makpoli() noexcept {
@@ -3986,112 +4092,6 @@ void bakseq() {
 		iSequence--;
 	}
 #endif
-}
-
-void fnvrt() {
-
-	unsigned		iVertex = 0, iNextVertex = 0, iLine = 0, iGroup = 0, evenPointCount = 0;
-	unsigned		iLineCounter = 0, iPoint = 0, fillLineCount = 0, savedLineCount = 0;
-	int				lineOffset = 0;
-	double			lowX = 0.0, highX = 0.0;
-	double			currentX = 0.0, step = 0.0;
-	dPOINT			point = {};
-	unsigned		maximumLines = 0;	//maximum angle fill lines for any adjusted y cordinate
-
-	CurrentFillVertices = SelectedForm->vertices;
-	highX = lowX = CurrentFillVertices[0].x;
-	VertexCount = SelectedForm->vertexCount;
-	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
-		if (CurrentFillVertices[iVertex].x > highX)
-			highX = CurrentFillVertices[iVertex].x;
-		if (CurrentFillVertices[iVertex].x < lowX)
-			lowX = CurrentFillVertices[iVertex].x;
-	}
-
-	lineOffset = lowX / LineSpacing;
-	lowX = LineSpacing * lineOffset;
-	fillLineCount = (highX - lowX) / LineSpacing + 1;
-	std::vector<dPOINTLINE> projectedPoints;
-	projectedPoints.reserve(VertexCount + 2);
-	step = (highX - lowX) / fillLineCount;
-	currentX = lowX;
-	for (iLine = 0; iLine < fillLineCount; iLine++) {
-		iLineCounter = 0;
-		currentX += step;
-		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-			iNextVertex = (iVertex + 1) % VertexCount;
-			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iNextVertex], &point))
-				iLineCounter++;
-		}
-		fillLineCount += iLineCounter;
-		if (iLineCounter > maximumLines)
-			maximumLines = iLineCounter;
-	}
-	maximumLines = (maximumLines >> 1);
-	LineEndpoints = new SMALPNTL[fillLineCount + 1](); //deleted in lcon
-	StitchLineCount = 0; LineGroupIndex = 0;
-	unsigned* groupIndex = new unsigned[fillLineCount + 2]();
-	GroupIndexCount = 0;
-	currentX = lowX;
-	for (iLine = 0; iLine < fillLineCount; iLine++) {
-		projectedPoints.clear();
-		currentX += step;
-		iPoint = 0;
-		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-			iNextVertex = (iVertex + 1) % VertexCount;
-			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iNextVertex], &point)) {
-				dPOINTLINE a = { point.x,point.y,gsl::narrow<unsigned short>(iVertex) };
-				projectedPoints.push_back(a);
-				iPoint++;
-			}
-		}
-		if (iPoint > 1) {
-			evenPointCount = iPoint &= 0xfffffffe;
-			groupIndex[GroupIndexCount++] = StitchLineCount;
-			std::sort(projectedPoints.begin(), projectedPoints.end(), comp);
-			iPoint = 0;
-			savedLineCount = StitchLineCount;
-			while (iPoint < evenPointCount) {
-				if (StitchLineCount < fillLineCount) {
-					LineEndpoints[StitchLineCount].line = projectedPoints[iPoint].line;
-					LineEndpoints[StitchLineCount].group = LineGroupIndex;
-					LineEndpoints[StitchLineCount].x = projectedPoints[iPoint].x;
-					LineEndpoints[StitchLineCount++].y = projectedPoints[iPoint++].y;
-					LineEndpoints[StitchLineCount].line = projectedPoints[iPoint].line;
-					LineEndpoints[StitchLineCount].group = LineGroupIndex;
-					LineEndpoints[StitchLineCount].x = projectedPoints[iPoint].x;
-					LineEndpoints[StitchLineCount++].y = projectedPoints[iPoint++].y;
-				}
-			}
-			if (StitchLineCount != savedLineCount)
-				LineGroupIndex++;
-		}
-	}
-	groupIndex[GroupIndexCount++] = StitchLineCount;
-	GroupIndexSequence = new unsigned[GroupIndexCount];
-	for (iGroup = 0; iGroup < GroupIndexCount; iGroup++)
-		GroupIndexSequence[iGroup] = groupIndex[iGroup];
-	LineGroupIndex--;
-	delete[] groupIndex;
-}
-
-void fnhor() {
-
-	unsigned	iVertex = 0;
-
-	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
-	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
-	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
-	RotationAngle = PI / 2;
-	AngledForm.vertices = AngledFormVertices;
-	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
-		AngledForm.vertices[iVertex].x = SelectedForm->vertices[iVertex].x;
-		AngledForm.vertices[iVertex].y = SelectedForm->vertices[iVertex].y;
-		rotflt(&AngledForm.vertices[iVertex]);
-	}
-	SelectedForm = &AngledForm;
-	fnvrt();
-	SelectedForm = &FormList[ClosestFormToCursor];
 }
 
 void fsvrt() {
@@ -11836,8 +11836,8 @@ void clpcon() {
 	float		formNegativeOffset = 0.0;
 	unsigned	clipGridOffset = 0;
 	double		clipVerticalOffset = 0.0;
-	TXPNT*		tmpTexture = new TXPNT[1]();
-	TXPNT*		texture = tmpTexture;
+	std::vector<TXPNT>	tmpTexture(1);
+	TXPNT*		texture = &tmpTexture[0];
 	bool		flag = false;
 	unsigned	clplim = 0;			//vertical clipboard search limit
 
@@ -11855,7 +11855,6 @@ void clpcon() {
 		if (TextureIndex && SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count <= TextureIndex)
 			ClipWidth = SelectedForm->fillSpacing;
 		else {
-			delete[] tmpTexture;
 			return;
 		}
 	}
@@ -11925,7 +11924,7 @@ void clpcon() {
 	}
 	// ToDo - replace with std::sort
 	qsort(RegionCrossingData, segmentCount, sizeof(VCLPX), clpcmp);
-	unsigned* iclpx = new unsigned[segmentCount + 1]();
+	std::vector<unsigned> iclpx(segmentCount + 1);
 	iRegion = 1; regionSegment = RegionCrossingData[0].segment;
 	iclpx[0] = 0;
 	for (iSegment = 1; iSegment < segmentCount; iSegment++) {
@@ -12043,7 +12042,6 @@ void clpcon() {
 			break;
 		}
 	}
-	delete[] iclpx;
 	if (TextureSegments) {
 		delete[] TextureSegments; // this is allocated in setxt
 		TextureSegments = nullptr;
@@ -12193,7 +12191,6 @@ clp1skp:;
 	}
 	delete[] ClipStitchPoints;
 	delete[] ClipSegments;
-	delete[] tmpTexture;
 }
 
 void vrtsclp() {
@@ -13339,7 +13336,7 @@ void srtfrm() {
 			histogram[iForm] = totalStitches;
 			totalStitches += formStitchCount;
 		}
-		fPOINTATTR* highStitchBuffer = new fPOINTATTR[MAXITEMS];
+		std::vector<fPOINTATTR> highStitchBuffer(PCSHeader.stitchCount);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
 			iHighStitch = histogram[iForm]++;
@@ -13347,8 +13344,7 @@ void srtfrm() {
 			highStitchBuffer[iHighStitch].y = StitchBuffer[iStitch].y;
 			highStitchBuffer[iHighStitch].attribute = StitchBuffer[iStitch].attribute;
 		}
-		MoveMemory(StitchBuffer, highStitchBuffer, sizeof(fPOINTATTR)*PCSHeader.stitchCount);
-		delete[] highStitchBuffer;
+		MoveMemory(StitchBuffer, &highStitchBuffer[0], sizeof(fPOINTATTR)*PCSHeader.stitchCount);
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
