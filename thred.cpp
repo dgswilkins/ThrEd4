@@ -4817,7 +4817,7 @@ void dstran() {
 	fPOINT			dstSize = {};
 	fPOINT			delta = {};
 	HANDLE			colorFile = {};
-	unsigned*		colors = new unsigned[1]();
+	std::vector<unsigned>	colors;
 	unsigned		iColor = 0;
 	DWORD			bytesRead = 0;
 	LARGE_INTEGER	colorFileSize = {};
@@ -4828,9 +4828,8 @@ void dstran() {
 		if (colorFile != INVALID_HANDLE_VALUE) {
 			retval = GetFileSizeEx(colorFile, &colorFileSize);
 			// There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
-			delete[] colors;
-			colors = new unsigned[colorFileSize.u.LowPart/sizeof(unsigned)]();
-			ReadFile(colorFile, colors, colorFileSize.u.LowPart, &bytesRead, 0);
+			colors.resize(colorFileSize.u.LowPart / sizeof(colors[0]));
+			ReadFile(colorFile, &colors[0], colorFileSize.u.LowPart, &bytesRead, 0);
 			CloseHandle(colorFile);
 			if (bytesRead > (sizeof(colors[0]) * 2)) {
 				if (colors[0] == COLVER) {
@@ -4878,7 +4877,6 @@ void dstran() {
 			}
 		}
 	}
-	delete[] colors;
 	PCSHeader.stitchCount = iStitch;
 	dstSize.x = maximumCoordinate.x - mimimumCoordinate.x;
 	dstSize.y = maximumCoordinate.y - mimimumCoordinate.y;
@@ -5654,143 +5652,148 @@ void savdst(unsigned data) noexcept {
 #endif
 }
 
-void ritdst(const fPOINTATTR* stitches) {
+void ritdst(const std::vector<fPOINTATTR> &stitches) {
 
 #define DSTMAX 121
-	if (stitches) {
-		unsigned		iStitch = 0, dstType = 0, color = 0, count = 0, iColor = 0;
-		POINT			centerCoordinate = {}, lengths = {}, absoluteLengths = {}, difference = {}, stepSize = {};
-		fRECTANGLE		boundingRect = {};
-		std::vector<fPOINTATTR> dstStitchBuffer(PCSHeader.stitchCount);
-		// In this case, there could be as many colors as there are stitches
-		// And we have to account for at least one color/stitch
-		unsigned*		colorData = new unsigned[PCSHeader.stitchCount + 3]();
-		HANDLE			colorFile = {};
-		unsigned long	bytesWritten = 0;
+	unsigned		iStitch = 0, dstType = 0, color = 0, count = 0;
+	POINT			centerCoordinate = {}, lengths = {}, absoluteLengths = {}, difference = {}, stepSize = {};
+	fRECTANGLE		boundingRect = {};
+	std::vector<fPOINTATTR> dstStitchBuffer(PCSHeader.stitchCount);
+	std::vector<unsigned>	colorData;
+	// there could be as many colors as there are stitches
+	// but we only need to reserve a reasonable number
+	colorData.reserve(32);
+	HANDLE			colorFile = {};
+	unsigned long	bytesWritten = 0;
 
-		colorData[iColor++] = COLVER;
-		colorData[iColor++] = BackgroundColor;
-		colorData[iColor++] = UserColor[stitches[0].attribute&COLMSK];
-		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+	colorData.push_back(COLVER);
+	colorData.push_back(BackgroundColor);
+	colorData.push_back(UserColor[stitches[0].attribute&COLMSK]);
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			dstStitchBuffer[iStitch].x = stitches[iStitch].x * 5 / 3;
-			dstStitchBuffer[iStitch].y = stitches[iStitch].y * 5 / 3;
-			dstStitchBuffer[iStitch].attribute = stitches[iStitch].attribute;
+		dstStitchBuffer[iStitch].x = stitches[iStitch].x * 5 / 3;
+		dstStitchBuffer[iStitch].y = stitches[iStitch].y * 5 / 3;
+		dstStitchBuffer[iStitch].attribute = stitches[iStitch].attribute;
+	}
+	boundingRect.left = boundingRect.right = dstStitchBuffer[0].x;
+	boundingRect.bottom = boundingRect.top = dstStitchBuffer[0].y;
+	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
+
+		if (dstStitchBuffer[iStitch].x > boundingRect.right)
+			boundingRect.right = dstStitchBuffer[iStitch].x + 0.5;
+		if (dstStitchBuffer[iStitch].x < boundingRect.left)
+			boundingRect.left = dstStitchBuffer[iStitch].x - 0.5;
+		if (dstStitchBuffer[iStitch].y > boundingRect.top)
+			boundingRect.top = dstStitchBuffer[iStitch].y + 0.5;
+		if (dstStitchBuffer[iStitch].y < boundingRect.bottom)
+			boundingRect.bottom = dstStitchBuffer[iStitch].y - 0.5;
+	}
+	DSTRecordCount = 0;
+	centerCoordinate.x = (boundingRect.right - boundingRect.left) / 2 + boundingRect.left;
+	centerCoordinate.y = (boundingRect.top - boundingRect.bottom) / 2 + boundingRect.bottom;
+	DSTPositiveOffset.x = boundingRect.right - centerCoordinate.x + 1;
+	DSTPositiveOffset.y = boundingRect.top - centerCoordinate.y + 1;
+	DSTNegativeOffset.x = centerCoordinate.x - boundingRect.left - 1;
+	DSTNegativeOffset.y = centerCoordinate.y - boundingRect.bottom - 1;
+	color = dstStitchBuffer[0].attribute & 0xf;
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+
+		if (color != (dstStitchBuffer[iStitch].attribute & 0xf)) {
+
+			savdst(0xc30000);
+			color = dstStitchBuffer[iStitch].attribute & 0xf;
+			colorData.push_back(UserColor[color]);
 		}
-		boundingRect.left = boundingRect.right = dstStitchBuffer[0].x;
-		boundingRect.bottom = boundingRect.top = dstStitchBuffer[0].y;
-		for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
+		lengths.x = dstStitchBuffer[iStitch].x - centerCoordinate.x;
+		lengths.y = dstStitchBuffer[iStitch].y - centerCoordinate.y;
+		absoluteLengths.x = abs(lengths.x);
+		absoluteLengths.y = abs(lengths.y);
+		if (absoluteLengths.x > absoluteLengths.y)
+			count = absoluteLengths.x / DSTMAX + 1;
+		else
+			count = absoluteLengths.y / DSTMAX + 1;
+		stepSize.x = absoluteLengths.x / count + 1;
+		stepSize.y = absoluteLengths.y / count + 1;
+		while (lengths.x || lengths.y) {
 
-			if (dstStitchBuffer[iStitch].x > boundingRect.right)
-				boundingRect.right = dstStitchBuffer[iStitch].x + 0.5;
-			if (dstStitchBuffer[iStitch].x < boundingRect.left)
-				boundingRect.left = dstStitchBuffer[iStitch].x - 0.5;
-			if (dstStitchBuffer[iStitch].y > boundingRect.top)
-				boundingRect.top = dstStitchBuffer[iStitch].y + 0.5;
-			if (dstStitchBuffer[iStitch].y < boundingRect.bottom)
-				boundingRect.bottom = dstStitchBuffer[iStitch].y - 0.5;
-		}
-		DSTRecordCount = 0;
-		centerCoordinate.x = (boundingRect.right - boundingRect.left) / 2 + boundingRect.left;
-		centerCoordinate.y = (boundingRect.top - boundingRect.bottom) / 2 + boundingRect.bottom;
-		DSTPositiveOffset.x = boundingRect.right - centerCoordinate.x + 1;
-		DSTPositiveOffset.y = boundingRect.top - centerCoordinate.y + 1;
-		DSTNegativeOffset.x = centerCoordinate.x - boundingRect.left - 1;
-		DSTNegativeOffset.y = centerCoordinate.y - boundingRect.bottom - 1;
-		color = dstStitchBuffer[0].attribute & 0xf;
-		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+			dstType = REGTYP;
+			if (abs(lengths.x) > stepSize.x) {
 
-			if (color != (dstStitchBuffer[iStitch].attribute & 0xf)) {
-
-				savdst(0xc30000);
-				color = dstStitchBuffer[iStitch].attribute & 0xf;
-				colorData[iColor++] = UserColor[color];
+				dstType = JMPTYP;
+				if (lengths.x > 0)
+					difference.x = stepSize.x;
+				else
+					difference.x = -stepSize.x;
 			}
-			lengths.x = dstStitchBuffer[iStitch].x - centerCoordinate.x;
-			lengths.y = dstStitchBuffer[iStitch].y - centerCoordinate.y;
-			absoluteLengths.x = abs(lengths.x);
-			absoluteLengths.y = abs(lengths.y);
-			if (absoluteLengths.x > absoluteLengths.y)
-				count = absoluteLengths.x / DSTMAX + 1;
 			else
-				count = absoluteLengths.y / DSTMAX + 1;
-			stepSize.x = absoluteLengths.x / count + 1;
-			stepSize.y = absoluteLengths.y / count + 1;
-			while (lengths.x || lengths.y) {
+				difference.x = lengths.x;
+			if (abs(lengths.y) > stepSize.y) {
 
-				dstType = REGTYP;
-				if (abs(lengths.x) > stepSize.x) {
-
-					dstType = JMPTYP;
-					if (lengths.x > 0)
-						difference.x = stepSize.x;
-					else
-						difference.x = -stepSize.x;
-				}
+				dstType = JMPTYP;
+				if (lengths.y > 0)
+					difference.y = stepSize.y;
 				else
-					difference.x = lengths.x;
-				if (abs(lengths.y) > stepSize.y) {
-
-					dstType = JMPTYP;
-					if (lengths.y > 0)
-						difference.y = stepSize.y;
-					else
-						difference.y = -stepSize.y;
-				}
-				else
-					difference.y = lengths.y;
-				savdst(dudbits(difference) | dstType);
-				centerCoordinate.x += difference.x;
-				centerCoordinate.y += difference.y;
-				lengths.x -= difference.x;
-				lengths.y -= difference.y;
+					difference.y = -stepSize.y;
 			}
+			else
+				difference.y = lengths.y;
+			savdst(dudbits(difference) | dstType);
+			centerCoordinate.x += difference.x;
+			centerCoordinate.y += difference.y;
+			lengths.x -= difference.x;
+			lengths.y -= difference.y;
 		}
-		DSTRecords[DSTRecordCount].led = DSTRecords[DSTRecordCount].mid = 0;
-		DSTRecords[DSTRecordCount++].nd = gsl::narrow<TBYTE>(0xf3);
+	}
+	DSTRecords[DSTRecordCount].led = DSTRecords[DSTRecordCount].mid = 0;
+	DSTRecords[DSTRecordCount++].nd = gsl::narrow<TBYTE>(0xf3);
 
-		if (colfil()) {
+	if (colfil()) {
 
-			colorFile = CreateFile(ColorFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
-			if (colorFile != INVALID_HANDLE_VALUE)
-				WriteFile(colorFile, &colorData[0], iColor * sizeof(unsigned), &bytesWritten, 0);
-			CloseHandle(colorFile);
-			colorFile = CreateFile(RGBFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
-			if (colorFile != INVALID_HANDLE_VALUE)
-				WriteFile(colorFile, &colorData[2], (iColor - 2) * sizeof(unsigned), &bytesWritten, 0);
-			CloseHandle(colorFile);
-		}
-		delete[] colorData;
+		colorFile = CreateFile(ColorFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		if (colorFile != INVALID_HANDLE_VALUE)
+			WriteFile(colorFile, &colorData[0], colorData.size() * sizeof(colorData[0]), &bytesWritten, 0);
+		CloseHandle(colorFile);
+		colorFile = CreateFile(RGBFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		if (colorFile != INVALID_HANDLE_VALUE)
+			WriteFile(colorFile, &colorData[2], (colorData.size() - 2) * sizeof(colorData[0]), &bytesWritten, 0);
+		CloseHandle(colorFile);
 	}
 }
 
-bool pcshup(fPOINTATTR*	stitches) {
-	if (stitches) {
-		fRECTANGLE	boundingRect = { stitches[0].y ,stitches[0].x , stitches[0].x ,stitches[0].y };
-		fPOINT		boundingSize = {};
-		unsigned	iStitch = 0;
-		fPOINT		hoopSize = {};
-		fPOINT		delta = {};
+bool pcshup(std::vector<fPOINTATTR>	&stitches) {
+	fRECTANGLE	boundingRect = { stitches[0].y ,stitches[0].x , stitches[0].x ,stitches[0].y };
+	fPOINT		boundingSize = {};
+	unsigned	iStitch = 0;
+	fPOINT		hoopSize = {};
+	fPOINT		delta = {};
 
-		for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
+	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-			if (stitches[iStitch].x < boundingRect.left)
-				boundingRect.left = stitches[iStitch].x;
-			if (stitches[iStitch].x > boundingRect.right)
-				boundingRect.right = stitches[iStitch].x;
-			if (stitches[iStitch].y < boundingRect.bottom)
-				boundingRect.bottom = stitches[iStitch].y;
-			if (stitches[iStitch].y > boundingRect.top)
-				boundingRect.top = stitches[iStitch].y;
-		}
-		boundingSize.x = boundingRect.right - boundingRect.left;
-		boundingSize.y = boundingRect.top - boundingRect.bottom;
-		if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
+		if (stitches[iStitch].x < boundingRect.left)
+			boundingRect.left = stitches[iStitch].x;
+		if (stitches[iStitch].x > boundingRect.right)
+			boundingRect.right = stitches[iStitch].x;
+		if (stitches[iStitch].y < boundingRect.bottom)
+			boundingRect.bottom = stitches[iStitch].y;
+		if (stitches[iStitch].y > boundingRect.top)
+			boundingRect.top = stitches[iStitch].y;
+	}
+	boundingSize.x = boundingRect.right - boundingRect.left;
+	boundingSize.y = boundingRect.top - boundingRect.bottom;
+	if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
 
-			tabmsg(IDS_PFAF2L);
-			return true;
-		}
-		if (boundingSize.x > SHUPX || boundingSize.y > SHUPY) {
+		tabmsg(IDS_PFAF2L);
+		return true;
+	}
+	if (boundingSize.x > SHUPX || boundingSize.y > SHUPY) {
+
+		PCSHeader.hoopType = LARGHUP;
+		hoopSize.x = LHUPX;
+		hoopSize.y = LHUPY;
+	}
+	else {
+
+		if (IniFile.hoopSizeX == LHUPX && IniFile.hoopSizeY == LHUPY) {
 
 			PCSHeader.hoopType = LARGHUP;
 			hoopSize.x = LHUPX;
@@ -5798,35 +5801,26 @@ bool pcshup(fPOINTATTR*	stitches) {
 		}
 		else {
 
-			if (IniFile.hoopSizeX == LHUPX && IniFile.hoopSizeY == LHUPY) {
-
-				PCSHeader.hoopType = LARGHUP;
-				hoopSize.x = LHUPX;
-				hoopSize.y = LHUPY;
-			}
-			else {
-
-				PCSHeader.hoopType = SMALHUP;
-				hoopSize.x = SHUPX;
-				hoopSize.y = SHUPY;
-			}
+			PCSHeader.hoopType = SMALHUP;
+			hoopSize.x = SHUPX;
+			hoopSize.y = SHUPY;
 		}
-		delta.x = delta.y = 0;
-		if (boundingRect.right > hoopSize.x)
-			delta.x = hoopSize.x - boundingRect.right;
-		if (boundingRect.top > hoopSize.y)
-			delta.y = hoopSize.y - boundingRect.top;
-		if (boundingRect.left < 0)
-			delta.x = -boundingRect.left;
-		if (boundingRect.bottom < 0)
-			delta.y = -boundingRect.bottom;
-		if (delta.x || delta.y) {
+	}
+	delta.x = delta.y = 0;
+	if (boundingRect.right > hoopSize.x)
+		delta.x = hoopSize.x - boundingRect.right;
+	if (boundingRect.top > hoopSize.y)
+		delta.y = hoopSize.y - boundingRect.top;
+	if (boundingRect.left < 0)
+		delta.x = -boundingRect.left;
+	if (boundingRect.bottom < 0)
+		delta.y = -boundingRect.bottom;
+	if (delta.x || delta.y) {
 
-			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 
-				stitches[iStitch].x += delta.x;
-				stitches[iStitch].y += delta.y;
-			}
+			stitches[iStitch].x += delta.x;
+			stitches[iStitch].y += delta.y;
 		}
 	}
 	return false;
@@ -6108,7 +6102,7 @@ void sav() {
 		return;
 	chk1col();
 	coltab();
-	fPOINTATTR* saveStitches = new fPOINTATTR[PCSHeader.stitchCount]();
+	std::vector<fPOINTATTR> saveStitches(PCSHeader.stitchCount);
 	if (UserFlagMap.test(UserFlag::ROTAUX)) {
 
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -6348,7 +6342,6 @@ void sav() {
 			}
 		}
 	}
-	delete[] saveStitches;
 }
 #pragma warning(pop)
 
