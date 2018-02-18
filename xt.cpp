@@ -1161,25 +1161,6 @@ void fnwlk(unsigned find) {
 	ritwlk();
 }
 
-void fnuang() {
-
-	unsigned	iVertex = 0;
-
-	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
-	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
-	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
-	AngledForm.vertices = AngledFormVertices;
-	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
-
-		AngledForm.vertices[iVertex].x = UnderlayVertices[iVertex].x;
-		AngledForm.vertices[iVertex].y = UnderlayVertices[iVertex].y;
-		rotflt(&AngledForm.vertices[iVertex]);
-	}
-	SelectedForm = &AngledForm;
-	fnvrt();
-	fvars(ClosestFormToCursor);
-}
-
 void ritund() noexcept {
 	if (SequenceIndex) {
 
