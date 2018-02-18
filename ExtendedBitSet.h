@@ -9,8 +9,8 @@ template <typename Block = unsigned, typename Allocator = std::allocator<unsigne
 class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator> {
 	typedef boost::dynamic_bitset<Block, Allocator> super;
 public:
-	ExtendedBitSet (std::size_t bits) : super::dynamic_bitset(bits) {}
-
+	[[gsl::suppress(26434)]]ExtendedBitSet (std::size_t bits) : super::dynamic_bitset(bits) {}
+	
 	/*
 	bool testAndReset(std::size_t pos) const {
 		bool val = super::test(pos);
