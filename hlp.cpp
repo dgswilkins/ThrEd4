@@ -319,6 +319,7 @@ void lodstr() {
 	unsigned		iString = 0, iStringData = 0, iStringTable = 0, count = 0;
 	//ToDo - replace overallocation of storage and still ensure no overflow
 	const unsigned	storageSize = 65535;
+	//ToDo - Should this be std::string?
 	std::vector<TCHAR>	stringStorage(storageSize);
 	unsigned int	offset = 0;
 	//LPTSTR		strings = stringStorage;
