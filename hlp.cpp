@@ -317,9 +317,9 @@ void msgstr(unsigned code) noexcept {
 void lodstr() {
 
 	unsigned		iString = 0, iStringData = 0, iStringTable = 0, count = 0;
-	// Over allocate storage to ensure no overflow
+	//ToDo - replace overallocation of storage and still ensure no overflow
 	const unsigned	storageSize = 65535;
-	TCHAR*			stringStorage = new TCHAR[storageSize]();
+	std::vector<TCHAR>	stringStorage(storageSize);
 	unsigned int	offset = 0;
 	//LPTSTR		strings = stringStorage;
 
@@ -327,11 +327,9 @@ void lodstr() {
 		count = LoadString(ThrEdInstance, LoadStringList[iString], &stringStorage[offset], storageSize - offset) + 1;
 		offset += count;
 	}
-	//count = strings - stringStorage;
 	// Now allocate based on actual count
 	StringData = new TCHAR[offset+1];
-	MoveMemory(StringData, stringStorage, offset);
-	delete[] stringStorage;
+	MoveMemory(StringData, &stringStorage[0], offset);
 	StringTable[0] = StringData;
 	iStringTable = 1;
 	for (iStringData = 0; iStringData <= offset; iStringData++) {
