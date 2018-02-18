@@ -11836,9 +11836,7 @@ void clpcon() {
 	float		formNegativeOffset = 0.0;
 	unsigned	clipGridOffset = 0;
 	double		clipVerticalOffset = 0.0;
-	std::vector<TXPNT>	tmpTexture(1);
-	TXPNT*		texture = &tmpTexture[0];
-	bool		flag = false;
+	TXPNT*		texture = nullptr;
 	unsigned	clplim = 0;			//vertical clipboard search limit
 
 	duflt();
@@ -11958,7 +11956,6 @@ void clpcon() {
 			textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
 			ClipStitchCount = TextureSegments[textureLine].stitchCount;
 			texture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + TextureSegments[textureLine].line];
-			flag = true;
 			LineSegmentStart.x = pasteLocation.x;
 			if (SelectedForm->txof) {
 				lineOffset = (iRegion + clipGrid.left) / SelectedForm->fillInfo.texture.lines;
@@ -11983,9 +11980,9 @@ void clpcon() {
 			}
 			for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
 				if (StateMap.test(StateFlag::TXFIL)) {
-					if (flag) {
+					if (texture != nullptr) {
 						LineSegmentEnd.x = pasteLocation.x;
-						LineSegmentEnd.y = pasteLocation.y + texture[iStitch].y;
+						[[gsl::suppress(26413)]]LineSegmentEnd.y = pasteLocation.y + texture[iStitch].y;
 					}
 				}
 				else {
