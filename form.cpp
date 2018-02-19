@@ -675,10 +675,6 @@ unsigned fltind(const fPOINT* point) noexcept {
 	return point - FormVertices;
 }
 
-unsigned sacind(const SATCON* guide) noexcept {
-	return guide - SatinGuides;
-}
-
 unsigned clpind(const fPOINT* point) noexcept {
 	return point - ClipPoints;
 }
@@ -10764,7 +10760,7 @@ void spltsat(SATCON currentGuide) {
 	}
 	if (FormList[ClosestFormToCursor + 1].wordParam)
 		FormList[ClosestFormToCursor + 1].wordParam -= (currentGuide.start - 1);
-	mvsatk(&SelectedForm->satinOrAngle.guide[iOldVertex - 1], &SelectedForm->satinOrAngle.guide[iOldVertex], SatinGuideIndex - sacind(&SelectedForm->satinOrAngle.guide[iOldVertex]));
+	mvsatk(&SelectedForm->satinOrAngle.guide[iOldVertex - 1], &SelectedForm->satinOrAngle.guide[iOldVertex], SatinGuideIndex - satind(&SelectedForm->satinOrAngle.guide[iOldVertex]));
 	SatinGuideIndex--;
 	FormList[ClosestFormToCursor + 1].satinOrAngle.guide = &SelectedForm->satinOrAngle.guide[ActivePointIndex];
 	FormList[ClosestFormToCursor + 1].satinGuideCount = SelectedForm->satinGuideCount - ActivePointIndex - 1;
