@@ -4504,29 +4504,30 @@ void bitsiz() noexcept {
 
 // Get a rough estimate of whether black or white 
 // is dominant in the monochrome bitmap
-bool binv(const unsigned char* monoBitmapData, unsigned bitmapWidthInBytes) noexcept {
-	if (monoBitmapData) {
-		unsigned		iHeight = 0, iBytes = 0, whiteBits = 0, blackBits = 0;
-		const unsigned	byteCount = BitmapWidth >> 3;
+bool binv(const std::vector<unsigned char> &monoBitmapData, unsigned bitmapWidthInBytes) {
+	unsigned		iHeight = 0, iBytes = 0, whiteBits = 0, blackBits = 0;
+	const unsigned	byteCount = BitmapWidth >> 3;
 
-		for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
+	for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
+		[[gsl::suppress(26429)]]{
+		if ((bitmapWidthInBytes * iHeight) < monoBitmapData.size()) {
 			const unsigned char* bcpnt = &monoBitmapData[bitmapWidthInBytes * iHeight];
-			if (bcpnt) {
-				for (iBytes = 0; iBytes < byteCount; iBytes++) {
-					if (!bcpnt[iBytes])
-						blackBits++;
-					else {
-						if (bcpnt[iBytes] == 0xff)
-							whiteBits++;
-					}
+			for (iBytes = 0; iBytes < byteCount; iBytes++) {
+				if (!bcpnt[iBytes])
+					blackBits++;
+				else {
+					if (bcpnt[iBytes] == 0xff)
+						whiteBits++;
 				}
 			}
+		} 
+		else {
+			throw;
 		}
-		if (whiteBits > blackBits)
-			return true;
-		else
-			return false;
+		}
 	}
+	if (whiteBits > blackBits)
+		return true;
 	return false;
 }
 
@@ -4705,8 +4706,8 @@ void bfil() {
 			if (widthOverflow)
 				bitmapWidthBytes += 4;
 			bitmapSizeBytes = bitmapWidthBytes*BitmapHeight;
-			unsigned char* monoBitmapData = new unsigned char[bitmapSizeBytes]();
-			ReadFile(BitmapFileHandle, monoBitmapData, bitmapSizeBytes, &BytesRead, NULL);
+			std::vector<unsigned char> monoBitmapData(bitmapSizeBytes);
+			ReadFile(BitmapFileHandle, &monoBitmapData[0], bitmapSizeBytes, &BytesRead, NULL);
 			CloseHandle(BitmapFileHandle);
 			if (binv(monoBitmapData,bitmapWidthBytes)) {
 
@@ -4746,7 +4747,6 @@ void bfil() {
 				DeleteObject(bitmap);
 				ReleaseDC(ThrEdWindow, deviceContext);
 			}
-			delete[] monoBitmapData;
 		}
 		else {
 
@@ -5810,9 +5810,9 @@ bool pcshup(std::vector<fPOINTATTR>	&stitches) {
 	if (boundingRect.bottom < 0)
 		delta.y = -boundingRect.bottom;
 	if (delta.x || delta.y) {
-		for (auto stitch:stitches) {
-			stitch.x += delta.x;
-			stitch.y += delta.y;
+		for (auto offsetStitch : stitches) {
+			offsetStitch.x += delta.x;
+			offsetStitch.y += delta.y;
 		}
 	}
 	return false;
@@ -11548,25 +11548,20 @@ void insfil() {
 	int			newTextureIndex = TextureIndex;
 
 	if (StateMap.test(StateFlag::IGNORINS) || GetOpenFileName(&file)) {
-
 		InsertedFileHandle = CreateFile(InsertedFileName, (GENERIC_READ), 0, NULL,
 			OPEN_EXISTING, 0, NULL);
 		if (InsertedFileHandle == INVALID_HANDLE_VALUE) {
-
 			filnopn(IDS_FNOPN, InsertedFileName);
 			FileHandle = 0;
 			CloseHandle(InsertedFileHandle);
 		}
 		else {
-
 			InsertedStitchCount = PCSHeader.stitchCount;
 			if (isthr(InsertedFileName)) {
-
 				ReadFile(InsertedFileHandle, &fileHeader, sizeof(STRHED), &BytesRead, NULL);
 				if ((fileHeader.headerType & 0xffffff) != 0x746872)
 					tabmsg(IDS_NOTHR);
 				else {
-
 					version = (fileHeader.headerType & 0xff000000) >> 24;
 					if (version) {
 #define FRMW 5
@@ -11592,29 +11587,25 @@ void insfil() {
 					InsertedVertexIndex = FormVertexIndex;
 					InsertedFormIndex = FormIndex;
 					if (fileHeader.vertexCount) {
-
 						if (version < 2) {
-							FRMHEDO* formHeader = new FRMHEDO[fileHeader.formCount]();
-							ReadFile(InsertedFileHandle, formHeader, fileHeader.formCount * sizeof(FRMHEDO), &BytesRead, 0);
-							if (BytesRead != fileHeader.formCount * sizeof(FRMHEDO)) {
-
-								FormIndex = BytesRead / sizeof(FRMHEDO);
+							std::vector<FRMHEDO> formHeader(fileHeader.formCount);
+							ReadFile(InsertedFileHandle, &formHeader[0], fileHeader.formCount * sizeof(formHeader[0]), &BytesRead, 0);
+							if (BytesRead != fileHeader.formCount * sizeof(formHeader[0])) {
+								FormIndex = BytesRead / sizeof(formHeader[0]);
 								StateMap.set(StateFlag::BADFIL);
 							}
 							if (FormIndex + fileHeader.vertexCount < MAXFORMS) {
-
 								FillMemory(&FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), 0);
 								iFormList = FormIndex;
 								for (iForm = 0; iForm < fileHeader.formCount; iForm++) {
-
 									MoveMemory(&FormList[iFormList], &formHeader[iForm], sizeof(FRMHEDO));
 									iFormList++;
 								}
 							}
-							delete[] formHeader;
 						}
-						else
+						else {
 							ReadFile(InsertedFileHandle, &FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), &BytesRead, 0);
+						}
 						ReadFile(InsertedFileHandle, &FormVertices[FormVertexIndex], fileHeader.vertexCount * sizeof(fPOINT), &BytesRead, 0);
 						ReadFile(InsertedFileHandle, &SatinGuides[SatinGuideIndex], fileHeader.dlineCount * sizeof(SATCON), &BytesRead, 0);
 						ReadFile(InsertedFileHandle, &ClipPoints[ClipPointIndex], fileHeader.clipDataCount * sizeof(fPOINT), &BytesRead, 0);
@@ -11622,10 +11613,8 @@ void insfil() {
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = 0;
 						for (iFormList = FormIndex; iFormList < FormIndex + fileHeader.formCount; iFormList++) {
-
 							FormList[iFormList].vertices = adflt(FormList[iFormList].vertexCount);
 							if (FormList[iFormList].type == SAT) {
-
 								if (FormList[iFormList].satinGuideCount)
 									FormList[iFormList].satinOrAngle.guide = adsatk(FormList[iFormList].satinGuideCount);
 								if (isclpx(iFormList))
@@ -11643,11 +11632,9 @@ void insfil() {
 						TextureIndex = newTextureIndex;
 						FormIndex += fileHeader.formCount;
 						if (fileHeader.formCount) {
-
 							insertedRectangle.left = insertedRectangle.right = FormVertices[InsertedVertexIndex].x;
 							insertedRectangle.bottom = insertedRectangle.top = FormVertices[InsertedVertexIndex].y;
 							for (iVertex = InsertedVertexIndex + 1; iVertex < FormVertexIndex; iVertex++) {
-
 								if (FormVertices[iVertex].x < insertedRectangle.left)
 									insertedRectangle.left = FormVertices[iVertex].x;
 								if (FormVertices[iVertex].x > insertedRectangle.right)
@@ -11660,11 +11647,8 @@ void insfil() {
 						}
 					}
 					if (fileHeader.stitchCount) {
-
 						for (iStitch = PCSHeader.stitchCount; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) + fileHeader.stitchCount; iStitch++) {
-
 							if (StitchBuffer[iStitch].attribute&ALTYPMSK) {
-
 								newAttribute = (StitchBuffer[iStitch].attribute&FRMSK) + encodedFormIndex;
 								StitchBuffer[iStitch].attribute &= NFRMSK;
 								StitchBuffer[iStitch].attribute |= newAttribute;
@@ -11686,9 +11670,9 @@ void insfil() {
 							fileHeader.vertexLen*FRMPW +
 							fileHeader.stitchCount*STCHW;
 						if (filscor > homscor) {
-
-							for (iName = 0; iName < 50; iName++)
+							for (iName = 0; iName < 50; iName++) {
 								ExtendedHeader.creatorName[iName] = thredHeader.creatorName[iName];
+							}
 							redfnam(DesignerName);
 							sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRDBY], ThrName, DesignerName);
 							SetWindowText(ThrEdWindow, MsgBuffer);
@@ -11716,30 +11700,25 @@ void insfil() {
 				// ToDo - inserting PCS files is broken and needs to be fixed
 				ReadFile(InsertedFileHandle, &pcsFileHeader, 0x46, &BytesRead, NULL);
 				if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16) {
-
 					savdo();
-					PCSTCH* pcsStitchBuffer = new PCSTCH[pcsFileHeader.stitchCount]();
-					ReadFile(InsertedFileHandle, pcsStitchBuffer, pcsFileHeader.stitchCount * sizeof(PCSTCH), &BytesRead, NULL);
+					std::vector<PCSTCH> pcsStitchBuffer(pcsFileHeader.stitchCount);
+					ReadFile(InsertedFileHandle, &pcsStitchBuffer[0], pcsFileHeader.stitchCount * sizeof(pcsStitchBuffer[0]), &BytesRead, NULL);
 					iStitch = PCSHeader.stitchCount;
 					newAttribute = 0;
 					for (iPCSStitch = 0; iPCSStitch < pcsFileHeader.stitchCount; iPCSStitch++) {
-
 						if (pcsStitchBuffer[iPCSStitch].tag == 3)
 							newAttribute = pcsStitchBuffer[iPCSStitch++].fx;
 						else {
-
 							StitchBuffer[iStitch].x = pcsStitchBuffer[iPCSStitch].x + static_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256;
 							StitchBuffer[iStitch].y = pcsStitchBuffer[iPCSStitch].y + static_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256;
 							StitchBuffer[iStitch++].attribute = newAttribute;
 						}
 					}
-					delete[] pcsStitchBuffer;
 					newStitchCount = iStitch;
 					iStitch = PCSHeader.stitchCount;
 					insertedRectangle.left = insertedRectangle.right = StitchBuffer[iPCSStitch].x;
 					insertedRectangle.top = insertedRectangle.bottom = StitchBuffer[iPCSStitch++].y;
 					while (iStitch < gsl::narrow<unsigned>(newStitchCount)) {
-
 						if (StitchBuffer[iStitch].x < insertedRectangle.left)
 							insertedRectangle.left = StitchBuffer[iStitch].x;
 						if (StitchBuffer[iStitch].x > insertedRectangle.right)
@@ -20653,6 +20632,7 @@ dulup:
 		call	delsubt
 	}
 #else
+	[[gsl::suppress(26429)]]{
 	unsigned *zPnt = convert_ptr<unsigned *>(pnt);
 	unsigned *dst = zPnt;
 	if (dst) {
@@ -20749,6 +20729,7 @@ dulup:
 		delsubl(dst, 0x8400000, 4);
 
 		delsubt(dst, RightDownCursorFinish, 5);
+	}
 	}
 #endif
 }
@@ -21973,10 +21954,8 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 	COLORREF	colors[16] = { 0 };
 	HBRUSH		brush = {};
 	HPEN		pen = {};
-	//fPOINT*		vertexList = nullptr;
 	STREX		extendedHeader = {};
 	unsigned	fileTypeVersion = 0;
-	//FRMHEDO*	formListOriginal = nullptr;
 
 	HANDLE		thrEdFile = CreateFile(fileName, GENERIC_READ, 0, 0,
 		OPEN_EXISTING, 0, 0);
@@ -22029,10 +22008,10 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 				ratio = yRatio;
 			if (stitchHeader.stitchCount) {
 
-				fPOINTATTR* stitchesToDraw = new fPOINTATTR[stitchHeader.stitchCount]();
-				POINT* lines = new POINT[stitchHeader.stitchCount]();
+				std::vector<fPOINTATTR> stitchesToDraw(stitchHeader.stitchCount);
+				std::vector<POINT> lines(stitchHeader.stitchCount);
 				bytesToRead = stitchHeader.stitchCount * sizeof(fPOINTATTR);
-				ReadFile(thrEdFile, stitchesToDraw, bytesToRead, &BytesRead, 0);
+				ReadFile(thrEdFile, &stitchesToDraw[0], bytesToRead, &BytesRead, 0);
 				if (bytesToRead == BytesRead) {
 
 					SetFilePointer(thrEdFile, 16, 0, FILE_CURRENT);
@@ -22055,7 +22034,7 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 
 							pen = nuPen(pen, 1, colors[iColor]);
 							SelectObject(drawItem->hDC, pen);
-							Polyline(drawItem->hDC, lines, iLine);
+							Polyline(drawItem->hDC, &lines[0], iLine);
 							iLine = 0;
 							iColor = stitchesToDraw[iStitch].attribute & 0xf;
 						}
@@ -22064,56 +22043,46 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 
 						pen = nuPen(pen, 1, colors[iColor]);
 						SelectObject(drawItem->hDC, pen);
-						Polyline(drawItem->hDC, lines, iLine);
+						Polyline(drawItem->hDC, &lines[0], iLine);
 					}
 					DeleteObject(brush);
 					DeleteObject(pen);
 				}
 				else {
 					CloseHandle(thrEdFile);
-					delete[] stitchesToDraw;
-					delete[] lines;
 					return;
 				}
-				delete[] stitchesToDraw;
-				delete[] lines;
 			}
 			else
 				SetFilePointer(thrEdFile, 84, 0, FILE_CURRENT);
 			if (stitchHeader.formCount) {
-
-				POINT* lines = new POINT[MAXFRMLINS]();
-				SetFilePointer(thrEdFile, 80, 0, FILE_CURRENT);
-				FRMHED* formList = new FRMHED[stitchHeader.formCount]();
-				fPOINT* vertexList = new fPOINT[stitchHeader.vertexCount]();
 				do {
+					std::vector<POINT> lines(MAXFRMLINS);
+					SetFilePointer(thrEdFile, 80, 0, FILE_CURRENT);
+					std::vector<FRMHED> formList(stitchHeader.formCount);
+					std::vector<fPOINT> vertexList(stitchHeader.vertexCount);
 					if (fileTypeVersion < 2) {
-						FRMHEDO* formListOriginal = new FRMHEDO[stitchHeader.formCount];
-						bytesToRead = stitchHeader.formCount * sizeof(FRMHEDO);
-						ReadFile(thrEdFile, formListOriginal, bytesToRead, &BytesRead, 0);
+						std::vector<FRMHEDO> formListOriginal(stitchHeader.formCount);
+						bytesToRead = stitchHeader.formCount * sizeof(formListOriginal[0]);
+						ReadFile(thrEdFile, &formListOriginal[0], bytesToRead, &BytesRead, 0);
 						if (BytesRead != bytesToRead)
 							break;
 						for (iForm = 0; iForm < stitchHeader.formCount; iForm++) {
-
-							SelectedForm = &formList[iForm];
-							MoveMemory(SelectedForm, &formListOriginal[iForm], sizeof(FRMHEDO));
+							MoveMemory(&formList[iForm], &formListOriginal[iForm], sizeof(formListOriginal[0]));
 						}
-						delete[] formListOriginal;
 					}
 					else {
-
-						bytesToRead = stitchHeader.formCount * sizeof(FRMHED);
-						ReadFile(thrEdFile, formList, bytesToRead, &BytesRead, 0);
+						bytesToRead = stitchHeader.formCount * sizeof(formList[0]);
+						ReadFile(thrEdFile, &formList[0], bytesToRead, &BytesRead, 0);
 						if (BytesRead != bytesToRead)
 							break;
 					}
-					bytesToRead = stitchHeader.vertexCount * sizeof(fPOINT);
-					ReadFile(thrEdFile, vertexList, bytesToRead, &BytesRead, 0);
+					bytesToRead = stitchHeader.vertexCount * sizeof(vertexList[0]);
+					ReadFile(thrEdFile, &vertexList[0], bytesToRead, &BytesRead, 0);
 					if (BytesRead != bytesToRead)
 						break;
 					iVertex = 0;
 					for (iStitch = 0; iStitch < stitchHeader.formCount; iStitch++) {
-
 						iLine = iVertex;
 						for (iVertexInForm = 0; (iVertexInForm < formList[iStitch].vertexCount) && (iVertex < stitchHeader.vertexCount); iVertexInForm++) {
 
@@ -22125,15 +22094,12 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 						SelectObject(drawItem->hDC, FormPen);
 						SetROP2(drawItem->hDC, R2_XORPEN);
 						if (FormList[iStitch].type == FRMLINE)
-							Polyline(drawItem->hDC, lines, formList[iStitch].vertexCount);
+							Polyline(drawItem->hDC, &lines[0], formList[iStitch].vertexCount);
 						else
-							Polyline(drawItem->hDC, lines, formList[iStitch].vertexCount + 1);
+							Polyline(drawItem->hDC, &lines[0], formList[iStitch].vertexCount + 1);
 						SetROP2(StitchWindowMemDC, R2_COPYPEN);
 					}
 				} while (false);
-				delete[] formList;
-				delete[] vertexList;
-				delete[] lines;
 			}
 		}
 		CloseHandle(thrEdFile);
