@@ -5763,30 +5763,26 @@ void ritdst(const std::vector<fPOINTATTR> &stitches) {
 bool pcshup(std::vector<fPOINTATTR>	&stitches) {
 	fRECTANGLE	boundingRect = { stitches[0].y ,stitches[0].x , stitches[0].x ,stitches[0].y };
 	fPOINT		boundingSize = {};
-	unsigned	iStitch = 0;
 	fPOINT		hoopSize = {};
 	fPOINT		delta = {};
 
-	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
-
-		if (stitches[iStitch].x < boundingRect.left)
-			boundingRect.left = stitches[iStitch].x;
-		if (stitches[iStitch].x > boundingRect.right)
-			boundingRect.right = stitches[iStitch].x;
-		if (stitches[iStitch].y < boundingRect.bottom)
-			boundingRect.bottom = stitches[iStitch].y;
-		if (stitches[iStitch].y > boundingRect.top)
-			boundingRect.top = stitches[iStitch].y;
+	for (auto stitch : stitches) {
+		if (stitch.x < boundingRect.left)
+			boundingRect.left = stitch.x;
+		if (stitch.x > boundingRect.right)
+			boundingRect.right = stitch.x;
+		if (stitch.y < boundingRect.bottom)
+			boundingRect.bottom = stitch.y;
+		if (stitch.y > boundingRect.top)
+			boundingRect.top = stitch.y;
 	}
 	boundingSize.x = boundingRect.right - boundingRect.left;
 	boundingSize.y = boundingRect.top - boundingRect.bottom;
 	if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
-
 		tabmsg(IDS_PFAF2L);
 		return true;
 	}
 	if (boundingSize.x > SHUPX || boundingSize.y > SHUPY) {
-
 		PCSHeader.hoopType = LARGHUP;
 		hoopSize.x = LHUPX;
 		hoopSize.y = LHUPY;
@@ -5794,13 +5790,11 @@ bool pcshup(std::vector<fPOINTATTR>	&stitches) {
 	else {
 
 		if (IniFile.hoopSizeX == LHUPX && IniFile.hoopSizeY == LHUPY) {
-
 			PCSHeader.hoopType = LARGHUP;
 			hoopSize.x = LHUPX;
 			hoopSize.y = LHUPY;
 		}
 		else {
-
 			PCSHeader.hoopType = SMALHUP;
 			hoopSize.x = SHUPX;
 			hoopSize.y = SHUPY;
@@ -5816,11 +5810,9 @@ bool pcshup(std::vector<fPOINTATTR>	&stitches) {
 	if (boundingRect.bottom < 0)
 		delta.y = -boundingRect.bottom;
 	if (delta.x || delta.y) {
-
-		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
-			stitches[iStitch].x += delta.x;
-			stitches[iStitch].y += delta.y;
+		for (auto stitch:stitches) {
+			stitch.x += delta.x;
+			stitch.y += delta.y;
 		}
 	}
 	return false;
@@ -8233,6 +8225,7 @@ void duclip() {
 			EmptyClipboard();
 			ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 			ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, (SelectedFormVertices.vertexCount + 1) * sizeof(fPOINT) + sizeof(FORMVERTEXCLIP));
+			[[gsl::suppress(26429)]]{
 			if (ThrEdClipPointer) {
 				FORMVERTEXCLIP* clipHeader = *(static_cast<FORMVERTEXCLIP * *>(ThrEdClipPointer));
 				clipHeader->clipType = CLP_FRMPS;
@@ -8256,6 +8249,7 @@ void duclip() {
 			else {
 				throw;
 			}
+			}
 			CloseClipboard();
 		}
 		return;
@@ -8278,6 +8272,7 @@ void duclip() {
 					msiz += FileSize;
 				}
 				ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, msiz + length);
+				[[gsl::suppress(26429)]]{
 				if (ThrEdClipPointer) {
 					ClipFormsHeader = *(static_cast<FORMSCLIP * *>(ThrEdClipPointer));
 					ClipFormsHeader->clipType = CLP_FRMS;
@@ -8352,6 +8347,7 @@ void duclip() {
 					}
 					SetClipboardData(ThrEdClip, ThrEdClipPointer);
 				}
+				}
 				CloseClipboard();
 				clRmap(MAXITEMS);
 				for (iForm = 0; iForm < SelectedFormCount; iForm++)
@@ -8401,6 +8397,7 @@ void duclip() {
 					codedAttribute = ClosestFormToCursor << FRMSHFT;
 					FileSize += sizeof(FORMCLIP);
 					ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize);
+					[[gsl::suppress(26429)]]{
 					if (ThrEdClipPointer) {
 						ClipFormHeader = *(static_cast<FORMCLIP * *>(ThrEdClipPointer));
 						ClipFormHeader->clipType = CLP_FRM;
@@ -8431,7 +8428,7 @@ void duclip() {
 								mclp[iClip].y = SelectedForm->angleOrClipData.clip[iClip].y;
 							}
 						}
-						fPOINT* points =convert_ptr<fPOINT *>(&mclp[iClip]);
+						fPOINT* points = convert_ptr<fPOINT *>(&mclp[iClip]);
 						if (iseclpx(ClosestFormToCursor)) {
 
 							for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
@@ -8472,6 +8469,7 @@ void duclip() {
 							SetClipboardData(Clip, ClipPointer);
 						}
 						ispcdclp();
+					}
 					}
 					CloseClipboard();
 				}
@@ -9165,9 +9163,6 @@ void dubuf(char *buffer, unsigned *count) {
 	STRHED		stitchHeader = {};
 	unsigned	iForm = 0, iColor = 0, iVertex = 0, iGuide = 0, iClip = 0;
 	unsigned	vertexCount = 0, guideCount = 0, clipDataCount = 0;
-	unsigned	iDestinationVertex = 0;
-	unsigned	iDestinationGuide = 0;
-	unsigned	iDestinationClip = 0;
 	char*		output = buffer;
 
 	stitchHeader.headerType = 0x2746872;
@@ -9176,9 +9171,7 @@ void dubuf(char *buffer, unsigned *count) {
 	stitchHeader.hoopType = IniFile.hoopType;
 	strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
 	if (FormIndex) {
-
 		for (iForm = 0; iForm < FormIndex; iForm++) {
-
 			vertexCount += FormList[iForm].vertexCount;
 			if (FormList[iForm].type == SAT)
 				guideCount += FormList[iForm].satinGuideCount;
@@ -9203,7 +9196,6 @@ void dubuf(char *buffer, unsigned *count) {
 	durit(&output, &ExtendedHeader, sizeof(STREX));
 	durit(&output, StitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR));
 	if (!PCSBMPFileName[0]) {
-
 		for (iColor = 0; iColor < 16; iColor++)
 			PCSBMPFileName[iColor] = 0;
 	}
@@ -9214,64 +9206,56 @@ void dubuf(char *buffer, unsigned *count) {
 	for (iColor = 0; iColor < 16; iColor++)
 		MsgBuffer[iColor] = ThreadSize[iColor][0];
 	durit(&output, MsgBuffer, 16);
-
 	if (FormIndex) {
-
-		FRMHED* forms = new FRMHED[FormIndex]();
-		fPOINT* vertices = new fPOINT[vertexCount + 1]();
-		SATCON* guides = new SATCON[guideCount]();
-		fPOINT* points = new fPOINT[clipDataCount + 1]();
+		std::vector<FRMHED> forms;
+		forms.reserve(FormIndex);
+		std::vector<fPOINT> vertices;
+		vertices.reserve(vertexCount);
+		std::vector<SATCON> guides;
+		guides.reserve(guideCount);
+		std::vector<fPOINT> points;
+		points.reserve(clipDataCount);
 		for (iForm = 0; iForm < FormIndex; iForm++) {
-
-			frmcpy(&forms[iForm], &FormList[iForm]);
-			// ToDo - does this line make sense?
-			//forms[iForm].vertices = (fPOINT*)(&vertices[iDestinationVertex] - &vertices[0]);
+			forms.push_back(FormList[iForm]);
 			forms[iForm].vertices = nullptr;
 			for (iVertex = 0; iVertex < FormList[iForm].vertexCount; iVertex++) {
-
-				vertices[iDestinationVertex].x = FormList[iForm].vertices[iVertex].x;
-				vertices[iDestinationVertex++].y = FormList[iForm].vertices[iVertex].y;
+				vertices.push_back(FormList[iForm].vertices[iVertex]);
 			}
 			if (FormList[iForm].type == SAT) {
-				// ToDo - does this line make sense?
-				//forms[iForm].satinOrAngle.guide = (SATCON*)(&guides[iDestinationGuide] - &guides[0]);
 				forms[iForm].satinOrAngle.guide = nullptr;
 				forms[iForm].satinGuideCount = FormList[iForm].satinGuideCount;
 				for (iGuide = 0; iGuide < FormList[iForm].satinGuideCount; iGuide++) {
-
-					guides[iDestinationGuide].start = FormList[iForm].satinOrAngle.guide[iGuide].start;
-					guides[iDestinationGuide++].finish = FormList[iForm].satinOrAngle.guide[iGuide].finish;
+					guides.push_back(FormList[iForm].satinOrAngle.guide[iGuide]);
 				}
 			}
 			if (isclp(iForm)) {
-				// ToDo - does this line make sense?
-				//forms[iForm].angleOrClipData.clip = (fPOINT*)(&points[iDestinationClip] - &points[0]);
 				forms[iForm].angleOrClipData.clip = nullptr;
-				for (iClip = 0; (iClip < FormList[iForm].lengthOrCount.clipCount) && (iDestinationClip < clipDataCount); iClip++) {
-
-					points[iDestinationClip].x = FormList[iForm].angleOrClipData.clip[iClip].x;
-					points[iDestinationClip++].y = FormList[iForm].angleOrClipData.clip[iClip].y;
+				for (iClip = 0; iClip < FormList[iForm].lengthOrCount.clipCount; iClip++) {
+					points.push_back(FormList[iForm].angleOrClipData.clip[iClip]);
 				}
 			}
 			if (iseclpx(iForm)) {
-				// ToDo - does this line make sense?
-				//forms[iForm].borderClipData = (fPOINT*)(&points[iDestinationClip] - &points[0]);
 				forms[iForm].borderClipData = nullptr;
-				for (iClip = 0; (iClip < FormList[iForm].clipEntries) && ((iDestinationClip < clipDataCount)); iClip++) {
-					points[iDestinationClip].x = FormList[iForm].borderClipData[iClip].x;
-					points[iDestinationClip++].y = FormList[iForm].borderClipData[iClip].y;
+				for (iClip = 0; iClip < FormList[iForm].clipEntries; iClip++) {
+					points.push_back(FormList[iForm].borderClipData[iClip]);
 				}
 			}
 		}
-		durit(&output, forms, FormIndex * sizeof(FRMHED));
-		durit(&output, vertices, vertexCount * sizeof(fPOINT));
-		durit(&output, guides, guideCount * sizeof(SATCON));
-		durit(&output, points, clipDataCount * sizeof(fPOINT));
-		durit(&output, TexturePointsBuffer, TextureIndex * sizeof(TXPNT));
-		delete[] forms;
-		delete[] vertices;
-		delete[] guides;
-		delete[] points;
+		if (forms.size()) {
+			durit(&output, &forms[0], forms.size() * sizeof(forms[0]));
+		}
+		if (vertices.size()) {
+			durit(&output, &vertices[0], vertices.size() * sizeof(vertices[0]));
+		}
+		if (guides.size()) {
+			durit(&output, &guides[0], guides.size() * sizeof(guides[0]));
+		}
+		if (points.size()) {
+			durit(&output, &points[0], points.size() * sizeof(points[0]));
+		}
+		if (TextureIndex) {
+			durit(&output, TexturePointsBuffer, TextureIndex * sizeof(TXPNT));
+		}
 	}
 	if (count) {
 		*count = output - buffer;
