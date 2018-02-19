@@ -1960,7 +1960,7 @@ void fsort() {
 	unsigned		minimumIndex = 0, minimumDirection = 0;
 	unsigned		typeCount = 0, jumps = 0, minimumJumps = 0;
 	// There cannot be more records than stitches
-	OREC*			stitchRegion = new OREC[PCSHeader.stitchCount]();
+	std::vector<OREC>	stitchRegion(PCSHeader.stitchCount);
 	SRTREC			sortRecord = {};
 	FILETIME		fileTime = {};
 	ULARGE_INTEGER	startTime = {};
@@ -2078,7 +2078,6 @@ void fsort() {
 	}
 	delete[] PFRecs;
 	delete[] PRecs;
-	delete[] stitchRegion;
 }
 
 unsigned dutyp(unsigned attribute) noexcept {
@@ -5179,7 +5178,7 @@ void repflt() {
 	}
 	FormIndex = iDestination;
 	ZeroMemory(&badData, sizeof(BADCNTS));
-	fPOINT* vertexPoint = new fPOINT[vertexCount];
+	std::vector<fPOINT> vertexPoint(vertexCount);
 	iVertex = 0;
 	bool flag = true;
 	for (iForm = 0; iForm < FormIndex; iForm++) {
@@ -5213,14 +5212,13 @@ void repflt() {
 	if (flag) {
 		FormVertexIndex = iVertex;
 	}
-	MoveMemory(FormVertices, vertexPoint, sizeof(fPOINT)*FormVertexIndex);
-	delete[] vertexPoint;
+	MoveMemory(FormVertices, &vertexPoint[0], sizeof(fPOINT)*FormVertexIndex);
 }
 
 void repclp() {
 	FRMHED*		formHeader = nullptr;
 	unsigned	iForm = 0, clipCount = 0, clipDifference = 0, badClipCount = 0;
-	fPOINT*		clipPoint = new fPOINT[MAXITEMS]();
+	std::vector<fPOINT>	clipPoint(MAXITEMS);
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		formHeader = &FormList[iForm];
 		if (isclp(iForm)) {
@@ -5264,11 +5262,10 @@ void repclp() {
 			}
 		}
 	}
-	MoveMemory(&ClipPoints, clipPoint, clipCount * sizeof(fPOINT));
+	MoveMemory(&ClipPoints, &clipPoint[0], clipCount * sizeof(fPOINT));
 	ClipPointIndex = clipCount;
 	if (badClipCount)
 		adbad(IDS_CLPDAT, badClipCount);
-	delete[] clipPoint;
 }
 
 void repsat() {
