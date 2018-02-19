@@ -28,7 +28,6 @@
 #include "EnumMap.h"
 
 //compile switches
-#define		__UseASM__	0
 #define		PESACT		0			//compile pes code
 #define		BUGBAK		0			//turn bakseq off
 

@@ -610,9 +610,6 @@ unsigned		PEScolorIndex;			//pes color index
 #endif
 
 POINT			EndPointCross;			//point to draw at the end cross for form select points
-#if	 __UseASM__
-unsigned		fsizeof;				//size of form header divided by 4
-#endif
 HDC				TraceDC;				//trace device context
 HBITMAP			TraceBitmap;			//trace bitmap
 unsigned*		TraceBitmapData;		//trace bitmap data
@@ -2035,16 +2032,7 @@ void ladj() {
 }
 
 void stchcpy(unsigned count, fPOINTATTR* destination) noexcept {
-#if  __UseASM__
-	_asm {
-		mov		esi, offset StitchBuffer
-		mov		edi, destination
-		mov		ecx, count
-		rep		movsd
-	}
-#else
 	memcpy(destination, StitchBuffer, count * 4);
-#endif
 }
 
 void deldu() {
@@ -2062,31 +2050,11 @@ void deldu() {
 }
 
 void mvflpnt(fPOINT* destination, const fPOINT* source, unsigned count) noexcept {
-#if  __UseASM__
-	_asm {
-		mov		ecx, count
-		shl		ecx, 1
-		mov		esi, source
-		mov		edi, destination
-		rep		movsd
-		mov		eax, edi
-	}
-#else
 	memcpy(destination, source, count * sizeof(fPOINT));
-#endif
 }
 
 void mvsatk(SATCON* destination, const SATCON* source, unsigned count) noexcept {
-#if  __UseASM__
-	_asm {
-		mov		ecx, count
-		mov		esi, source
-		mov		edi, destination
-		rep		movsd
-	}
-#else
 	memcpy(destination, source, count * sizeof(SATCON));
-#endif
 }
 
 void dudat() {
@@ -2256,17 +2224,7 @@ void nunams() {
 }
 
 void moveStitch(fPOINTATTR* destination, const fPOINTATTR* source) noexcept {
-#if  __UseASM__
-	_asm {
-		mov		esi, source
-		mov		edi, destination
-		xor		ecx, ecx
-		mov		cl, 3
-		rep		movsd
-	}
-#else
 	MoveMemory(destination, source, sizeof(fPOINTATTR));
-#endif
 }
 
 void duzero() {
@@ -4098,16 +4056,7 @@ void delstch1(unsigned iStitch) {
 }
 
 void stchred(unsigned count, const fPOINTATTR* source) noexcept {
-#if  __UseASM__
-	_asm {
-		mov		edi, offset StitchBuffer
-		mov		esi, source
-		mov		ecx, count
-		rep		movsd
-	}
-#else
 	memcpy(StitchBuffer, source, count * 4);
-#endif
 }
 
 void redbak() {
@@ -4282,15 +4231,7 @@ void bitlin(const unsigned char* source, unsigned* destination, COLORREF foregro
 }
 
 COLORREF fswap(COLORREF color) noexcept {
-#if  __UseASM__
-	_asm {
-		mov		eax, color
-		bswap	eax
-		shr		eax, 8
-	}
-#else
 	return _byteswap_ulong(color) >> 8;
-#endif
 }
 
 bool gudtyp(WORD bitCount) noexcept {
@@ -4632,15 +4573,7 @@ void auxmen() {
 #if PESACT
 
 unsigned tripl(TCHAR* dat) {
-#if  __UseASM__
-	_asm {
-		mov		eax, dat
-		mov		eax, [eax]
-		and eax, 0xffffff
-	}
-#else
 	return (*static_cast<unsigned *>(static_cast<void *>(dat))) & 0xffffff;
-#endif
 }
 
 unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex) {
@@ -4681,34 +4614,6 @@ unsigned dupcol() {
 
 
 double dubl(unsigned char* pnt) {
-#if  __UseASM__
-	unsigned tdat;
-
-	_asm {
-		mov		ecx, pnt
-		mov		ecx, [ecx]
-		movzx	ebx, ch
-		test	cl, 8
-		je		short dubl1
-		mov		ch, 15
-		and		cl, ch
-		sub		ch, cl
-		movzx	ecx, ch
-		shl		ecx, 8
-		mov		eax, 256
-		sub		eax, ebx
-		add		ecx, eax
-		neg		ecx
-		jmp		short dubl2
-		dubl1 :
-		and		ecx, 0x7
-			shl		ecx, 8
-			add		ecx, ebx
-			dubl2 :
-		mov		tdat, ecx
-			fild	tdat
-	}
-#else
 	unsigned tdat = 0;
 
 	_asm {
@@ -4735,7 +4640,6 @@ double dubl(unsigned char* pnt) {
 		mov		tdat, ecx
 			fild	tdat
 	}
-#endif
 }
 #endif
 
@@ -5246,16 +5150,7 @@ void nuFil() {
 }
 
 void clrfbuf(unsigned count) noexcept {
-#if  __UseASM__
-	_asm {
-		mov		edi, PCSStitchBuffer
-		mov		ecx, count
-		xor		eax, eax
-		rep		stosd
-	}
-#else
 	memset(PCSStitchBuffer, 0, count * 4);
-#endif
 }
 
 constexpr unsigned dudbits(POINT dif) {
@@ -5437,19 +5332,6 @@ void ritpes(unsigned iStitch) {
 }
 
 void ritpcol(unsigned char colorIndex) {
-#if  __UseASM__
-	_asm {
-		mov		ebx, OutputIndex
-		mov		eax, ebx
-		inc		eax
-		mov		OutputIndex, eax
-		shl		ebx, 2
-		add		ebx, PESstitches
-		xor		eax, eax
-		mov		al, colorIndex
-		mov		[ebx], eax
-	}
-#else
 	// ToDo - (PES) Complete translation from assembler
 	_asm {
 		mov		ebx, OutputIndex
@@ -5462,16 +5344,15 @@ void ritpcol(unsigned char colorIndex) {
 		mov		al, colorIndex
 		mov		[ebx], eax
 	}
-#endif
 }
 
 unsigned pesnam() {
-#if  __UseASM__
+	// ToDo - (PES) Complete translation from assembler
 	_asm {
 		mov		ebx, offset AuxName
 		mov		ecx, _MAX_PATH
 		mov		edx, ebx
-		peslup0 :
+peslup0:
 		mov		al, [ebx]
 		or		al, al
 		je		short peslup1
@@ -5497,53 +5378,13 @@ peslup:
 		inc		ebx
 		cmp		al, '.'
 		je		pesnamx
-		mov[edi], al
+		mov		[edi], al
 		inc		edi
 		loop	peslup
 pesnamx:
 		mov		eax, edi
 		sub		eax, offset BSequence
 	}
-#else
-	// ToDo - (PES) Complete translation from assembler
-	_asm {
-		mov		ebx, offset AuxName
-		mov		ecx, _MAX_PATH
-		mov		edx, ebx
-peslup0:
-		mov		al, [ebx]
-		or al, al
-		je		short peslup1
-		cmp		al, '\\'
-		jne		short peslup0a
-		mov		edx, ebx
-peslup0a:
-		inc		ebx
-		loop	peslup0
-peslup1:
-		mov		ebx, edx
-		cmp		byte ptr[ebx], '\\'
-		jne		short peslup1a
-		inc		ebx
-peslup1a:
-		xor		ecx, ecx
-		mov		cl, 17
-		mov		edi, offset BSequence
-		mov		dword ptr[edi], ':AL'
-		add		edi, 3
-peslup:
-		mov		al, [ebx]
-		inc		ebx
-		cmp		al, '.'
-		je		pesnamx
-		mov[edi], al
-		inc		edi
-		loop	peslup
-pesnamx:
-		mov		eax, edi
-		sub		eax, offset BSequence
-	}
-#endif
 }
 
 void rpcrd(float stitchDelta) {
@@ -8051,67 +7892,14 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 }
 
 bool cmpstch(unsigned iStitchA, unsigned iStitchB) noexcept {
-#if  __UseASM__
-	_asm {
-		mov		eax, iStitchA
-		xor		ecx, ecx
-		mov		cl, 12
-		mul		ecx
-		mov		ebx, eax
-		add		ebx, offset StitchBuffer
-		mov		eax, iStitchB
-		mul		ecx
-		add		eax, offset StitchBuffer
-		mov		edx, eax
-		mov		eax, [edx]
-		cmp		eax, [ebx]
-		jne		short ncmpx
-		add		edx, 4
-		add		ebx, 4
-		mov		eax, [edx]
-		cmp		eax, [ebx]
-		jne		short ncmpx
-		mov		al, 1
-		jmp		short doscmpx
-		ncmpx :
-		xor		eax, eax
-			doscmpx :
-	}
-#else
 	if (StitchBuffer[iStitchA].x != StitchBuffer[iStitchB].x)
 		return 0;
 
 	return StitchBuffer[iStitchA].y == StitchBuffer[iStitchB].y;
-#endif
 }
 
 void mvstch(unsigned destination, unsigned source) noexcept {
-#if  __UseASM__
-	_asm {
-		mov		eax, destination
-		xor		ecx, ecx
-		mov		cl, 12
-		mul		ecx
-		mov		ebx, eax
-		add		ebx, offset StitchBuffer
-		mov		eax, source
-		mul		ecx
-		add		eax, offset StitchBuffer
-		mov		cl, 4
-		mov		edx, [eax]
-		mov		[ebx], edx
-		add		ebx, ecx
-		add		eax, ecx
-		mov		edx, [eax]
-		mov		[ebx], edx
-		add		ebx, ecx
-		add		eax, ecx
-		mov		edx, [eax]
-		mov		[ebx], edx
-	}
-#else
 	StitchBuffer[destination] = StitchBuffer[source];
-#endif
 }
 
 void ofstch(unsigned iSource, TCHAR offset) noexcept {
@@ -9037,15 +8825,7 @@ void redclp() {
 }
 
 constexpr unsigned nxtcrnr(unsigned corner) {
-#if  __UseASM__
-	_asm {
-		mov		eax, corner
-		inc		eax
-		and		al, 3
-	}
-#else
 	return (corner + 1) & 3;
-#endif
 }
 
 void drwmrk(HDC dc) noexcept {
@@ -9826,27 +9606,7 @@ void seldwn() {
 }
 
 void mvstchs(unsigned destination, unsigned source, unsigned count) noexcept {
-#if  __UseASM__
-	_asm {
-		xor		ecx, ecx
-		mov		cl, 12
-		mov		eax, destination
-		mul		ecx
-		mov		edi, eax
-		add		edi, offset StitchBuffer
-		mov		eax, source
-		mul		ecx
-		mov		esi, eax
-		add		esi, offset StitchBuffer
-		mov		cl, 3
-		mov		eax, count
-		mul		ecx
-		mov		ecx, eax
-		rep		movsd
-	}
-#else
 	memcpy(StitchBuffer + destination, StitchBuffer + source, count * sizeof(*StitchBuffer));
-#endif
 }
 
 bool movstchs(unsigned destination, unsigned start, unsigned finish) {
@@ -11398,14 +11158,7 @@ void srchk() {
 }
 
 unsigned duswap(unsigned data) noexcept {
-#if  __UseASM__
-	_asm {
-		mov		eax, data
-		bswap	eax
-	}
-#else
 	return _byteswap_ulong(data);
-#endif
 }
 
 void ritcur() noexcept {
@@ -11681,33 +11434,6 @@ void frmcursel(unsigned cursorType) {
 }
 
 void stchsnap(unsigned start, unsigned finish) noexcept {
-#if  __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		al, 12
-		mul		start
-		mov		ecx, finish
-		sub		ecx, start
-		je		short stchsnapx
-		add		eax, offset StitchBuffer
-		fld		IniFile.gridSize
-		snplup :
-		fld		dword ptr[eax]
-			fdiv	st, st(1)
-			frndint
-			fmul	st, st(1)
-			fstp	dword ptr[eax]
-			add		eax, 4
-			fld		dword ptr[eax]
-			fdiv	st, st(1)
-			frndint
-			fmul	st, st(1)
-			fstp	dword ptr[eax]
-			add		eax, 8
-			loop	snplup
-			stchsnapx :
-	}
-#else
 	fPOINTATTR *pnt = &StitchBuffer[start];
 
 	for (unsigned i = 0; i < finish - start; i++) {
@@ -11716,35 +11442,15 @@ void stchsnap(unsigned start, unsigned finish) noexcept {
 
 		pnt++;
 	}
-#endif
 }
 
 void frmsnap(fPOINT* start, unsigned count) noexcept {
-#if  __UseASM__
-	_asm {
-		mov		eax, start
-		mov		ecx, count
-		shl		ecx, 1
-		je		short frmsnapx
-		fld		IniFile.gridSize
-		snpflup :
-		fld		dword ptr[eax]
-			fdiv	st, st(1)
-			frndint
-			fmul	st, st(1)
-			fstp	dword ptr[eax]
-			add		eax, 4
-			loop	snpflup
-			frmsnapx :
-	}
-#else
 	for (unsigned i = 0; i < count; i++) {
 		start->x = rintf(start->x / IniFile.gridSize) * IniFile.gridSize;
 		start->y = rintf(start->y / IniFile.gridSize) * IniFile.gridSize;
 
 		start++;
 	}
-#endif
 }
 
 void gsnap() {
@@ -12547,36 +12253,6 @@ unsigned ducolm() {
 }
 
 void chkref() noexcept {
-#if  __UseASM__
-	_asm {
-		mov		eax, UpPixelColor
-		mov		ebx, DownPixelColor
-		cmp		al, bl
-		jc		short chklup1
-		mov		dl, al
-		mov		al, bl
-		mov		bl, dl
-chklup1:
-		cmp		ah, bh
-		jc		short chklup2
-		mov		dl, ah
-		mov		ah, bh
-		mov		bh, dl
-chklup2:
-		ror		eax, 16
-		ror		ebx, 16
-		cmp		al, bl
-		jc		short chklup3
-		mov		dl, al
-		mov		al, bl
-		mov		bl, dl
-chklup3:
-		rol		eax, 16
-		rol		ebx, 16
-		mov		UpPixelColor, eax
-		mov		DownPixelColor, ebx
-	}
-#else
 	// ToDo - check translation
 	union {
 		COLORREF color;
@@ -12616,7 +12292,6 @@ chklup3:
 
 	UpPixelColor = u.color;
 	DownPixelColor = d.color;
-#endif
 }
 
 void trnumwnd0(int position) noexcept {
@@ -12761,52 +12436,14 @@ void tracpar() {
 	}
 }
 
-#if __UseASM__ == 0
 //Check Translation
 static inline void difsub(unsigned *source, unsigned shift, unsigned *&destination) noexcept {
 	if (source && destination) {
 		*(destination++) = (*source >> (shift & 0x0f)) & 0xff;
 	}
 }
-#endif
 
 void difbits(unsigned shift, unsigned* point) noexcept {
-#if  __UseASM__
-	_asm {
-		jmp		short difbts
-difsub:
-		mov		eax, [esi]
-		shr		eax, cl
-		and		eax, ebx
-		mov		[edi], eax
-		add		edi, 4
-		ret
-difbts:
-		mov		esi, point
-		mov		ecx, shift
-		mov		edi, offset TraceAdjacentColors
-		mov		ebx, 0xff
-		mov		edx, BitmapWidth
-		shl		edx, 2
-		call	difsub		//4
-		sub		esi, edx
-		call	difsub		//1
-		sub		esi, 4
-		call	difsub		//0
-		add		esi, 8
-		call	difsub		//2
-		add		esi, edx
-		call	difsub		//5
-		sub		esi, 8
-		call	difsub		//3
-		add		esi, edx
-		call	difsub		//6
-		add		esi, 4
-		call	difsub		//7
-		add		esi, 4
-		call	difsub		//8
-	}
-#else
 	// ToDo - check translation
 	unsigned* testPoint = point;
 	unsigned *destination = TraceAdjacentColors;
@@ -12836,7 +12473,6 @@ difbts:
 
 	testPoint += 1;
 	difsub(testPoint, shift, destination);
-#endif
 }
 
 void blanklin(unsigned lineStart) noexcept {
@@ -18883,7 +18519,6 @@ void ritloc() {
 	}
 }
 
-#if __UseASM__ == 0
 static inline void delsubl(unsigned *&dst, unsigned val, unsigned cnt) noexcept {
 	if (dst) {
 		for (unsigned i = 0; i < cnt; i++) {
@@ -18909,7 +18544,6 @@ static inline void delsubt(unsigned *&dst, unsigned *src, unsigned cnt) noexcept
 		}
 	}
 }
-#endif
 
 void ducurs(unsigned char* pnt) noexcept {
 	[[gsl::suppress(26429)]]{
@@ -19056,62 +18690,26 @@ void duhom() {
 	if (lastCharacter) { *lastCharacter = 0; }
 }
 
-#if  __UseASM__
-void bcpy(TCHAR* destination, TCHAR* source) {
-	_asm {
-		mov		ebx, source
-		mov		edx, destination
-		xor		eax, eax
-		blup :
-		mov		al, [ebx]
-			mov[edx], al
-			or eax, eax
-			je		short blupx
-			inc		ebx
-			inc		edx
-			jmp		blup
-			blupx :
-	}
-}
-#endif
-
 void ducmd() {
 	unsigned long	bytesRead = 0;
 	int				iArgument = 0;
 	TCHAR*			balaradFileName = nullptr;
 
 	if (__argc > 1) {
-#if  __UseASM__
-		bcpy(WorkingFileName, __argv[1]);
-#else
 		strcpy_s(WorkingFileName, __argv[1]);
-#endif
 		if (!strncmp(WorkingFileName, "/F1:", 4)) {
 			balaradFileName = &WorkingFileName[4];
 			BalaradFile = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 			if (BalaradFile != INVALID_HANDLE_VALUE) {
 				CloseHandle(BalaradFile);
-
-#if  __UseASM__
-				bcpy(BalaradName0, balaradFileName);
-#else
 				strcpy_s(BalaradName0, balaradFileName);
-#endif
 				if (__argc > 2) {
-#if  __UseASM__
-					bcpy(WorkingFileName, __argv[2]);
-#else
 					strcpy_s(WorkingFileName, __argv[2]);
-#endif
 					if (!strncmp(WorkingFileName, "/F2:", 4)) {
 						balaradFileName = &WorkingFileName[4];
 						BalaradFile = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 						if (BalaradFile != INVALID_HANDLE_VALUE) {
-#if  __UseASM__
-							bcpy(BalaradName1, balaradFileName);
-#else
 							strcpy_s(BalaradName1, balaradFileName);
-#endif
 							ReadFile(BalaradFile, &BalaradName2, (_MAX_PATH + 1), &bytesRead, 0);
 							strcat_s(BalaradName2, "");
 							if (bytesRead)
@@ -19358,9 +18956,6 @@ void init() {
 
 	ReleaseDC(NULL, deviceContext);
 	TextureIndex = 0;
-#if	 __UseASM__
-	fsizeof = sizeof(FRMHED) >> 2;
-#endif
 	LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1));
 	MainMenu = GetMenu(ThrEdWindow);
 	GetWindowRect(ThrEdWindow, &wrct);
@@ -20815,26 +20410,11 @@ void sachk() {
 	}
 }
 
-#if __UseASM__ == 0
 #define BAD_FPU_EX (_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID)
 #define COMMON_FPU_EX (_EM_INEXACT | _EM_UNDERFLOW | _EM_DENORMAL)
 #define ALL_FPU_EX (BAD_FPU_EX | COMMON_FPU_EX)
-#endif
 
 int	fltex(int code) noexcept {
-#if  __UseASM__
-	short	cw;
-
-	_asm {
-		xor		eax, eax
-		cmp		code, 0x10
-		jne		short fltex1
-		mov		cw, 0x27f
-		fldcw	cw
-		dec		eax
-		fltex1 :
-	}
-#else
 	if (code != 0x10)
 		return 0;
 	unsigned int current_word = 0;
@@ -20842,7 +20422,6 @@ int	fltex(int code) noexcept {
 	_controlfp_s(&current_word, _RC_NEAR, _MCW_RC);
 
 	return -1;
-#endif
 }
 
 #ifdef ALLOCFAILURE

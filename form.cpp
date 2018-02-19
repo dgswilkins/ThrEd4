@@ -127,9 +127,6 @@ extern			unsigned		FormMenuChoice;
 extern			HPEN			FormPen;
 extern			HPEN			FormPen3px;
 extern			HPEN			FormSelectedPen;
-#if	 __UseASM__				
-extern			unsigned		fsizeof;
-#endif					
 extern			unsigned		GroupEndStitch;
 extern			unsigned		GroupStartStitch;
 extern			unsigned		GroupStitchIndex;
@@ -480,19 +477,7 @@ unsigned char* Levels[] = {
 
 
 void frmcpy(FRMHED* destination, const FRMHED* source) noexcept {
-#if	 __UseASM__
-	unsigned index = sizeof(FRMHED);
-
-	_asm {
-		mov		edi, destination
-		mov		ecx, index
-		shr		ecx, 2
-		mov		esi, source
-		rep		movsd
-	}
-#else
 	memcpy(destination, source, sizeof(FRMHED));
-#endif
 }
 
 void frmclr(FRMHED* destination) noexcept {
@@ -519,15 +504,7 @@ void getfinfo(unsigned iForm) noexcept {
 }
 
 unsigned satind(const SATCON* guide) noexcept {
-#if	 __UseASM__
-	_asm {
-		mov		eax, guide
-		sub		eax, offset SatinGuides
-		shr		eax, 2
-	}
-#else
 	return guide - SatinGuides;
-#endif
 }
 
 void dusqr() {
@@ -695,39 +672,15 @@ fPOINT* numclp() {
 }
 
 unsigned fltind(const fPOINT* point) noexcept {
-#if	 __UseASM__
-	_asm {
-		mov		eax, point
-		sub		eax, offset FormVertices
-		shr		eax, 3
-	}
-#else
 	return point - FormVertices;
-#endif
 }
 
 unsigned sacind(const SATCON* guide) noexcept {
-#if	 __UseASM__
-	_asm {
-		mov		eax, guide
-		sub		eax, offset SatinGuides
-		shr		eax, 2
-	}
-#else
 	return guide - SatinGuides;
-#endif
 }
 
 unsigned clpind(const fPOINT* point) noexcept {
-#if	 __UseASM__
-	_asm {
-		mov		eax, point
-		sub		eax, offset ClipPoints
-		shr		eax, 3
-	}
-#else
 	return point - ClipPoints;
-#endif
 }
 
 void fltspac(const fPOINT* start, unsigned count) noexcept {
@@ -2107,46 +2060,18 @@ void oclp(const fPOINT* clip, unsigned clipEntries) {
 }
 
 constexpr float getblen() {
-#if	 __UseASM__
-	float		fLength;
-	unsigned	iLength;
-
-	iLength = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
-
-	_asm {
-		mov		eax, iLength
-		mov		fLength, eax
-	}
-	return fLength;
-#else
 	unsigned	iLength = 0;
 
 	iLength = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
 	return static_cast<float>(iLength);
-#endif
 }
 
 void savblen(float fLength) {
-#if	 __UseASM__
-	unsigned short clipEntries;
-	unsigned short picoLength;
-
-	_asm {
-		mov		eax, fLength
-		mov		picoLength, ax
-		shr		eax, 16
-		mov		clipEntries, ax
-	}
-	FormList[ClosestFormToCursor].clipEntries = clipEntries;
-	FormList[ClosestFormToCursor].picoLength = picoLength;
-#else
-
 	unsigned	iLength;
 	iLength = gsl::narrow<int>(round(fLength));
 
 	FormList[ClosestFormToCursor].clipEntries = iLength >> 16;
 	FormList[ClosestFormToCursor].picoLength = iLength & 0xFFFF;
-#endif
 }
 
 constexpr float getplen() {
@@ -3552,46 +3477,6 @@ void nxtrgn(std::vector<REGION> RegionsList) noexcept {
 	DoneRegion = PathMap[RegionPath[iPath - 1].pcon].node;
 }
 
-#if	 __UseASM__
-SMALPNTL*	srtref(const void* arg) {
-	_asm {
-		mov		eax, arg
-		mov		eax, [eax]
-	}
-}
-
-int sqcomp(const void *arg1, const void *arg2) {
-	SMALPNTL*	lineEndPoint0;
-	SMALPNTL*	lineEndPoint1;
-
-	lineEndPoint0 = srtref(arg1);
-	lineEndPoint1 = srtref(arg2);
-
-	if (lineEndPoint0->line == lineEndPoint1->line) {
-		if (lineEndPoint0->group == lineEndPoint1->group) {
-			if (lineEndPoint0->y == lineEndPoint1->y)return 0;
-			else {
-				if (lineEndPoint0->y > lineEndPoint1->y)
-					return 1;
-				else
-					return -1;
-			}
-		}
-		else {
-			if (lineEndPoint0->group > lineEndPoint1->group)
-				return 1;
-			else
-				return -1;
-		}
-	}
-	else {
-		if (lineEndPoint0->line > lineEndPoint1->line)
-			return 1;
-		else
-			return -1;
-	}
-}
-#else
 int sqcomp(const void *arg1, const void *arg2) noexcept {
 	if (arg1 && arg2) {
 		const SMALPNTL	lineEnd1 = *(*static_cast<const SMALPNTL * const *>(arg1));
@@ -3625,8 +3510,6 @@ int sqcomp(const void *arg1, const void *arg2) noexcept {
 	}
 	return 0;
 }
-#endif
-
 
 void nxtseq(unsigned pathIndex) noexcept {
 	const unsigned	nextNode = SequencePath[pathIndex + 1].node;
@@ -5494,8 +5377,6 @@ void bdrlin(unsigned start, unsigned finish, double stitchSize) {
 	const double	length = hypot(delta.x, delta.y);
 	double		angle = 0.0;
 	unsigned	stitchCount = 0;
-
-	//_asm finit;
 
 	if (UserFlagMap.test(UserFlag::LINSPAC)) {
 		stitchCount = length / stitchSize + 0.5;
@@ -9381,16 +9262,7 @@ void setr(unsigned bit) noexcept {
 }
 
 void clRmap(unsigned mapSize) noexcept {
-#if	 __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ecx, mapSize
-		mov		edi, offset MarkedStitchMap
-		rep		stosd
-	}
-#else
 	memset(MarkedStitchMap, 0, mapSize * sizeof(*MarkedStitchMap));
-#endif
 }
 
 #if PESACT
@@ -10374,19 +10246,7 @@ void shrnk() {
 }
 
 void mvfrms(FRMHED* destination, const FRMHED* source, unsigned count) noexcept {
-#if	 __UseASM__
-	_asm {
-		mov		esi, source
-		mov		edi, destination
-		mov		eax, count
-		mov		ecx, fsizeof
-		mul		ecx
-		mov		ecx, eax
-		rep		movsd
-	}
-#else
 	memcpy(destination, source, count * sizeof (FRMHED));
-#endif
 }
 
 void dufdat(unsigned formIndex) {
@@ -10801,40 +10661,11 @@ void debean() {
 }
 
 void mvfrmsb(FRMHED* destination, const FRMHED* source, unsigned count) noexcept {
-#if	 __UseASM__
-	_asm {
-		std
-		mov		eax, fsizeof
-		mul		count
-		mov		ecx, eax
-		mov		edi, destination
-		add		edi, 64
-		mov		esi, source
-		add		esi, 64
-		rep		movsd
-		cld
-	}
-#else
 	memmove(destination, source, count * sizeof(FRMHED));
-#endif
 }
 
 void mvfltsb(fPOINT* destination, const fPOINT* source, unsigned count) noexcept {
-#if	 __UseASM__
-	_asm {
-		std
-		mov		ecx, count
-		shl		ecx, 1
-		mov		esi, source
-		add		esi, 4
-		mov		edi, destination
-		add		edi, 4
-		rep		movsd
-		cld
-	}
-#else
 	memmove(destination, source, count * sizeof(fPOINT));
-#endif
 }
 
 void clpspac(const fPOINT* insertPoint, unsigned count) noexcept {
@@ -11046,29 +10877,6 @@ void stchs2frm() {
 }
 
 int lencmp(const void *arg1, const void *arg2) noexcept {
-#if	 __UseASM__
-	_asm {
-		mov		ebx, arg1
-		mov		ebx, [ebx]
-		fld		dword ptr[ebx]
-		mov		ebx, arg2
-		mov		ebx, [ebx]
-		fld		dword ptr[ebx]
-		fcompp
-		fstsw	ax
-		mov		ebx, eax
-		xor		eax, eax
-		test	bh, 6
-		jne		short lcmpx
-		test	bh, 1
-		je		short lcmp2
-		inc		eax
-		jmp		short lcmpx
-		lcmp2 :
-		dec		eax
-			lcmpx :
-	}
-#else
 	if (arg1 && arg2) {
 		const float local1 = **static_cast<float * const *>(arg1), local2 = **static_cast<float * const *>(arg2);
 
@@ -11079,7 +10887,6 @@ int lencmp(const void *arg1, const void *arg2) noexcept {
 			return 1;
 	}
 	return 0;
-#endif
 }
 
 void chksid(unsigned vertexIndex) noexcept {
@@ -11228,31 +11035,6 @@ constexpr unsigned leftsid() {
 }
 
 int clpcmp(const void* arg1, const void* arg2) noexcept {
-#if	 __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, arg1
-		mov		esi, arg2
-		mov		ecx, [ebx]
-		mov		edx, [esi]
-		cmp		ecx, edx
-		jne		short clpcmp1
-		add		ebx, 4
-		add		esi, 4
-		mov		ecx, [ebx]
-		mov		edx, [esi]
-		cmp		ecx, edx
-		je		short clpcmpx
-		clpcmp1 :
-		jc		short clpcmp2
-			inc		eax
-			jmp		short clpcmpx
-			clpcmp2 :
-		dec		eax
-			clpcmpx :
-	}
-#else
-
 	const VCLPX	vclpx1 = *static_cast<const VCLPX *>(arg1);
 	const VCLPX	vclpx2 = *static_cast<const VCLPX *>(arg2);
 
@@ -11269,7 +11051,6 @@ int clpcmp(const void* arg1, const void* arg2) noexcept {
 		return -1;
 
 	return 1;
-#endif
 }
 
 bool isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* length) noexcept {
@@ -11429,36 +11210,10 @@ unsigned clpnseg(unsigned start, unsigned finish) noexcept {
 }
 
 bool vscmp(unsigned index1, unsigned index2) noexcept {
-#if	 __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		esi, index1
-		mov		edi, index2
-		shl		esi, 3
-		shl		edi, 3
-		mov		ecx, offset OSequence
-		add		esi, ecx
-		add		edi, ecx
-		mov		ecx, [esi]
-		cmp		ecx, [edi]
-		je		short vscmp1
-		inc		eax
-		jmp		short vscmpx
-		vscmp1 :
-		add		esi, 4
-			add		edi, 4
-			mov		ecx, [esi]
-			cmp		ecx, [edi]
-			je		short vscmpx
-			inc		eax
-			vscmpx :
-	}
-#else
 	if (OSequence[index1].x != OSequence[index2].x)
 		return 1;
 
 	return OSequence[index1].y != OSequence[index2].y ? 1 : 0;
-#endif
 }
 
 void duflt() {

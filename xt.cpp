@@ -1671,45 +1671,6 @@ void durec(OREC* record) noexcept {
 }
 
 
-#if  __UseASM__
-OREC*	recref(const void* arg) {
-	_asm
-	{
-		mov		eax, arg
-		mov		eax, [eax]
-	}
-}
-
-int recmp(const void *arg1, const void *arg2) {
-	OREC* record1;
-	OREC* record2;
-
-	record1 = recref((const void*)arg1);
-	record2 = recref((const void*)arg2);
-	if (ColorOrder[record1->color] == ColorOrder[record2->color]) {
-		if (record1->form == record2->form) {
-			if (record1->type == record2->type)
-				return (int)record1->start - record2->start;
-			else
-				return (int)record1->type - record2->type;
-		}
-		else
-			return (int)record1->form - record2->form;
-	}
-	return (int)ColorOrder[record1->color] - ColorOrder[record2->color];
-}
-
-int refcmp(const void *arg1, const void *arg2) {
-	OREC* record1;
-	OREC* record2;
-
-	record1 = recref((const void*)arg1);
-	record2 = recref((const void*)arg2);
-	if (record1->form == record2->form)
-		return (int)record1->type - record2->type;
-	return (int)record1->form - record2->form;
-}
-#else
 int recmp(const void *arg1, const void *arg2) {
 	if (arg1 && arg2) {
 		const OREC record1 = **static_cast<OREC * const *>(arg1);
@@ -1741,7 +1702,6 @@ int refcmp(const void *arg1, const void *arg2) {
 	}
 	return 0;
 }
-#endif
 
 bool chkrdun(const SRTREC* stitchRecord) noexcept {
 	unsigned iStitch;
@@ -2007,25 +1967,6 @@ void fsort() {
 }
 
 unsigned dutyp(unsigned attribute) noexcept {
-#if  __UseASM__
-	_asm
-	{
-		xor		eax, eax
-		mov		ebx, attribute
-		and		ebx, SRTYPMSK
-		bsr		eax, ebx
-		je		short dutypx
-		sub		al, 18
-		cmp		al, 12
-		jne		short dutypx
-		test	ebx, 0x20000000
-		je		short dutypx
-		mov		al, 1
-		dutypx :
-		and		eax, 0xf
-	}
-#else
-	//correct
 	char			result = 0;
 	DWORD			bit = 0;
 	const unsigned	maskedAttribute = attribute & SRTYPMSK;
@@ -2041,7 +1982,6 @@ unsigned dutyp(unsigned attribute) noexcept {
 		return result & 0xf;
 
 	return 1;
-#endif
 }
 
 #ifdef _DEBUG
