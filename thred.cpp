@@ -47,7 +47,7 @@ void		delet ();
 void		delsfrms (unsigned code);
 void		delsmal (unsigned startStitch, unsigned endStitch);
 void		delstchm () noexcept;
-void		drwLin (unsigned currentStitch, unsigned length, HPEN hPen) noexcept;
+void		drwLin (unsigned currentStitch, unsigned length, HPEN hPen);
 void		dstcurs () noexcept;
 void		duIns ();
 void		dufdef ();
@@ -20480,165 +20480,13 @@ static inline void delsubt(unsigned *&dst, unsigned *src, unsigned cnt) noexcept
 #endif
 
 void ducurs(unsigned char* pnt) noexcept {
-
-#if  __UseASM__
-	_asm {
-		jmp		short delups
-delsubl : 
-		bswap	eax
-		mov		[edi], eax
-		add		edi, 4
-		bswap	eax
-		shl		eax, 1
-		loop	delsubl
-		ret
-delsubr : 
-		bswap	eax
-		mov		[edi], eax
-		add		edi, 4
-		bswap	eax
-		shr		eax, 1
-		loop	delsubr
-		ret
-delsubt : 
-		mov		eax, [esi]
-		add		esi, 4
-		bswap	eax
-		mov		[edi], eax
-		add		edi, 4
-		loop	delsubt
-		ret
-//form cursor
-delups : 
-		mov		ebx, pnt
-		mov		edi, ebx
-		xor		ecx, ecx
-		mov		cl, 32
-		mov		eax, 0x00000100
-		rep		stosd
-		xor		eax, eax
-		dec		eax
-		mov		edi, ebx
-		add		edi, 64
-		mov		[edi], eax
-		mov		eax, 0x00ffff00
-		add		edi, 32
-		mov		[edi], eax
-		sub		edi, 64
-		mov		[edi], eax
-		mov		eax, 0x00018000
-		mov		cl, 16
-dulup0: 
-		or		[edi], eax
-		add		edi, 4
-		loop	dulup0
-//dline cursor
-		add		ebx, 128
-		mov		edi, ebx
-		mov		ecx, 32
-		xor		edx, edx
-		inc		edx
-		mov		esi, edx
-		ror		esi, 1
-dulup:	
-		mov		eax, edx
-		or		eax, esi
-		or		eax, 0x80000001
-		bswap	eax
-		mov		[edi], eax
-		add		edi, 4
-		shl		edx, 1
-		shr		esi, 1
-		loop	dulup
-		xor		eax, eax
-		dec		eax
-		sub		edi, 4
-		mov		[edi], eax
-		mov		[ebx], eax
-//straight up needle cursor
-		add		ebx, 128
-		mov		edi, ebx
-		mov		eax, 0x0003c000
-		bswap	eax
-		mov		cl, 24
-		rep		stosd
-		mov		eax, 0x00024000
-		bswap	eax
-		mov		cl, 5
-		rep		stosd
-		mov		eax, 0x00018000
-		bswap	eax
-		mov		cl, 2
-		rep		stosd
-//left up
-		add		ebx, 128
-		mov		edi, ebx
-		mov		cl, 5
-		mov		esi, offset LeftUpCursorStart
-		call	delsubt
-		mov		cl, 4
-		mov		eax, 0x88
-		call	delsubl
-		mov		cl, 19
-		mov		eax, 0x1f00
-		call	delsubl
-		mov		esi, offset LeftUpCursorEnd
-		mov		cl, 3
-		call	delsubt
-//left down
-		add		ebx, 128
-		mov		edi, ebx
-		mov		esi, offset LeftDownCursorStart
-		mov		cl, 4
-		call	delsubt
-		mov		cl, 19
-		mov		eax, 0x7c000000
-		call	delsubr
-		mov		cl, 4
-		mov		eax, 0x440
-		call	delsubr
-		mov		cl, 5
-		mov		esi, offset LeftDownCursorFinish
-		call	delsubt
-//right up
-		add		ebx, 128
-		mov		edi, ebx
-		mov		cl, 5
-		mov		esi, offset RightUpCursorStart
-		call	delsubt
-		mov		eax, 0x9000000
-		mov		cl, 4
-		call	delsubr
-		mov		cl, 19
-		mov		eax, 0x1f00000
-		call	delsubr
-		mov		esi, offset RightUpCursorFinish
-		mov		cl, 3
-		call	delsubt
-//right down
-		add		ebx, 128
-		mov		edi, ebx
-		mov		esi, offset RightDownCursorStart
-		mov		cl, 4
-		call	delsubt
-		mov		eax, 0xf8
-		mov		cl, 19
-		call	delsubl
-		mov		eax, 0x8400000
-		mov		cl, 4
-		call	delsubl
-		mov		esi, offset RightDownCursorFinish
-		mov		cl, 5
-		call	delsubt
-	}
-#else
 	[[gsl::suppress(26429)]]{
 	unsigned *zPnt = convert_ptr<unsigned *>(pnt);
 	unsigned *dst = zPnt;
 	if (dst) {
 		//form cursor
 		for (int i = 0; i < 32; i++) {
-			*(dst++) = 0x100;
+			*(dst++) = 0x0100;
 		}
 
 
@@ -20731,7 +20579,6 @@ dulup:
 		delsubt(dst, RightDownCursorFinish, 5);
 	}
 	}
-#endif
 }
 
 void crtcurs() noexcept {
@@ -21373,49 +21220,48 @@ setrm :
 #endif
 }
 
-void drwLin(unsigned currentStitch, unsigned length, HPEN hPen) noexcept {
+void drwLin(unsigned currentStitch, unsigned length, HPEN hPen) {
 
 	unsigned			iOffset = 0, layer = 0;
 	const fPOINTATTR*	activeStitch = &StitchBuffer[currentStitch];
 
-	if (ActiveLayer)
-		LineIndex = 0;
-	for (iOffset = 0; iOffset < length; iOffset++) {
-
+	if (activeStitch) {
+		if (ActiveLayer)
+			LineIndex = 0;
+		for (iOffset = 0; iOffset < length; iOffset++) {
+			layer = (activeStitch[iOffset].attribute&LAYMSK) >> LAYSHFT;
+			if (!ActiveLayer || !layer || (layer == ActiveLayer)) {
+				LinePoints[LineIndex].x = (activeStitch[iOffset].x - ZoomRect.left)*ZoomRatio.x;
+				LinePoints[LineIndex++].y = StitchWindowClientRect.bottom - (activeStitch[iOffset].y - ZoomRect.bottom)*ZoomRatio.y;
+			}
+		}
+		SelectObject(StitchWindowMemDC, hPen);
+		//ToDo - where did 16000 come from?
+		if (LineIndex < 16000)
+			Polyline(StitchWindowMemDC, LinePoints, LineIndex);
+		else {
+			iOffset = 0;
+			while (LineIndex) {
+				if (LineIndex > 16000) {
+					Polyline(StitchWindowMemDC, &LinePoints[iOffset], 16000);
+					iOffset += 15999;
+					LineIndex -= 15999;
+				}
+				else {
+					Polyline(StitchWindowMemDC, &LinePoints[iOffset], LineIndex);
+					break;
+				}
+			}
+		}
+		LineIndex = 1;
 		layer = (activeStitch[iOffset].attribute&LAYMSK) >> LAYSHFT;
-		if (!ActiveLayer || !layer || (layer == ActiveLayer)) {
-
-			LinePoints[LineIndex].x = (activeStitch[iOffset].x - ZoomRect.left)*ZoomRatio.x;
-			LinePoints[LineIndex++].y = StitchWindowClientRect.bottom - (activeStitch[iOffset].y - ZoomRect.bottom)*ZoomRatio.y;
+		if (!ActiveLayer || !layer || layer == ActiveLayer) {
+			LinePoints[0].x = (activeStitch[iOffset - 1].x - ZoomRect.left)*ZoomRatio.x;
+			LinePoints[0].y = StitchWindowClientRect.bottom - (activeStitch[iOffset - 1].y - ZoomRect.bottom)*ZoomRatio.y;
 		}
 	}
-	SelectObject(StitchWindowMemDC, hPen);
-	if (LineIndex < 16000)
-		Polyline(StitchWindowMemDC, LinePoints, LineIndex);
 	else {
-
-		iOffset = 0;
-		while (LineIndex) {
-
-			if (LineIndex > 16000) {
-
-				Polyline(StitchWindowMemDC, &LinePoints[iOffset], 16000);
-				iOffset += 15999;
-				LineIndex -= 15999;
-			}
-			else {
-
-				Polyline(StitchWindowMemDC, &LinePoints[iOffset], LineIndex);
-				break;
-			}
-		}
-	}
-	LineIndex = 1;
-	layer = (activeStitch[iOffset].attribute&LAYMSK) >> LAYSHFT;
-	if (!ActiveLayer || !layer || layer == ActiveLayer) {
-
-		LinePoints[0].x = (activeStitch[iOffset - 1].x - ZoomRect.left)*ZoomRatio.x;
-		LinePoints[0].y = StitchWindowClientRect.bottom - (activeStitch[iOffset - 1].y - ZoomRect.bottom)*ZoomRatio.y;
+		throw;
 	}
 }
 
@@ -21691,16 +21537,21 @@ void drwStch() {
 					if (ColorChangeTable[iColor].colorIndex != ActiveColor) {
 						stitchCount = ColorChangeTable[iColor + 1].stitchIndex - ColorChangeTable[iColor].stitchIndex;
 						const fPOINTATTR* currentStitches = &StitchBuffer[ColorChangeTable[iColor].stitchIndex];
-						for (iStitch = 0; iStitch < stitchCount; iStitch++) {
-							if (currentStitches[iStitch].x >= ZoomRect.left
-								&& currentStitches[iStitch].x <= ZoomRect.right
-								&& currentStitches[iStitch].y >= ZoomRect.bottom
-								&& currentStitches[iStitch].y <= ZoomRect.top) {
-								DisplayedColorBitmap.set(ColorChangeTable[iColor].colorIndex);
-								break;
+						if (currentStitches) {
+							for (iStitch = 0; iStitch < stitchCount; iStitch++) {
+								if (currentStitches[iStitch].x >= ZoomRect.left
+									&& currentStitches[iStitch].x <= ZoomRect.right
+									&& currentStitches[iStitch].y >= ZoomRect.bottom
+									&& currentStitches[iStitch].y <= ZoomRect.top) {
+									DisplayedColorBitmap.set(ColorChangeTable[iColor].colorIndex);
+									break;
+								}
 							}
+							break;
 						}
-						break;
+						else {
+							throw;
+						}
 					}
 					else {
 						wascol = 0;
@@ -21712,94 +21563,99 @@ void drwStch() {
 				SelectObject(StitchWindowMemDC, UserPen[ColorChangeTable[iColor].colorIndex]);
 				stitchCount = ColorChangeTable[iColor + 1].stitchIndex - ColorChangeTable[iColor].stitchIndex;
 				const fPOINTATTR* currentStitches = &StitchBuffer[ColorChangeTable[iColor].stitchIndex];
-				stitchCount = chkup(stitchCount, iColor);
-				for (iStitch = 0; iStitch < stitchCount; iStitch++) {
-					layer = (currentStitches[iStitch].attribute&LAYMSK) >> LAYSHFT;
-					if (!ActiveLayer || !layer || (layer == ActiveLayer)) {
-						if (currentStitches[iStitch].x >= ZoomRect.left
-							&& currentStitches[iStitch].x <= ZoomRect.right
-							&& currentStitches[iStitch].y >= ZoomRect.bottom
-							&& currentStitches[iStitch].y <= ZoomRect.top) {
-							wascol = 1;
-							if (StateMap.testAndSet(StateFlag::LINED)) {
-								if (StateMap.testAndSet(StateFlag::LININ)) {
-									LinePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-									LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+				if (currentStitches) {
+					stitchCount = chkup(stitchCount, iColor);
+					for (iStitch = 0; iStitch < stitchCount; iStitch++) {
+						layer = (currentStitches[iStitch].attribute&LAYMSK) >> LAYSHFT;
+						if (!ActiveLayer || !layer || (layer == ActiveLayer)) {
+							if (currentStitches[iStitch].x >= ZoomRect.left
+								&& currentStitches[iStitch].x <= ZoomRect.right
+								&& currentStitches[iStitch].y >= ZoomRect.bottom
+								&& currentStitches[iStitch].y <= ZoomRect.top) {
+								wascol = 1;
+								if (StateMap.testAndSet(StateFlag::LINED)) {
+									if (StateMap.testAndSet(StateFlag::LININ)) {
+										LinePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+									}
+									else {
+										LinePoints[LineIndex].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+										LinePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+									}
 								}
 								else {
-									LinePoints[LineIndex].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-									LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-									LinePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-									LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+									if (iStitch == 0 && iColor == 0) {
+										LinePoints[0].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										LinePoints[0].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+										LineIndex = 1;
+									}
+									else {
+										LinePoints[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										LinePoints[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+										LinePoints[1].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										LinePoints[1].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+										LineIndex = 2;
+									}
+									StateMap.set(StateFlag::LININ);
 								}
 							}
 							else {
-								if (iStitch == 0 && iColor == 0) {
-									LinePoints[0].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-									LinePoints[0].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-									LineIndex = 1;
+								if (StateMap.testAndReset(StateFlag::LININ)) {
+									LinePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+									LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+									Polyline(StitchWindowMemDC, LinePoints, LineIndex);
+									LineIndex = 0;
 								}
 								else {
-									LinePoints[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-									LinePoints[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-									LinePoints[1].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-									LinePoints[1].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-									LineIndex = 2;
-								}
-								StateMap.set(StateFlag::LININ);
-							}
-						}
-						else {
-							if (StateMap.testAndReset(StateFlag::LININ)) {
-								LinePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-								LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-								Polyline(StitchWindowMemDC, LinePoints, LineIndex);
-								LineIndex = 0;
-							}
-							else {
-								if (iStitch) {
-									//write an equation for this line
-									xDelta = currentStitches[iStitch].x - currentStitches[iStitch - 1].x;
-									yDelta = currentStitches[iStitch - 1].y - currentStitches[iStitch].y;
-									slope = static_cast<double>(xDelta) / yDelta;
-									offset = currentStitches[iStitch].x + slope*currentStitches[iStitch].y;
-									do {
-										//does the line intersect with the top of the screen?
-										gapToEdge = offset - slope * ZoomRect.top;
-										if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
-											stitchLine[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-											stitchLine[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.x + 0.5;
-											stitchLine[1].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-											stitchLine[1].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.x + 0.5;
-											Polyline(StitchWindowMemDC, stitchLine, 2);
-											break;
-										}
-										//does the line intersect the bottom of the screen?
-										gapToEdge = offset - slope * ZoomRect.bottom;
-										if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
-											stitchLine[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-											stitchLine[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-											stitchLine[1].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-											stitchLine[1].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-											Polyline(StitchWindowMemDC, stitchLine, 2);
-											break;
-										}
-										//does the line intersect the left side of the screen?
-										if (slope) {
-											gapToEdge = (offset - ZoomRect.left) / slope;
-											if (gapToEdge >= ZoomRect.bottom && gapToEdge <= ZoomRect.top) {
+									if (iStitch) {
+										//write an equation for this line
+										xDelta = currentStitches[iStitch].x - currentStitches[iStitch - 1].x;
+										yDelta = currentStitches[iStitch - 1].y - currentStitches[iStitch].y;
+										slope = static_cast<double>(xDelta) / yDelta;
+										offset = currentStitches[iStitch].x + slope * currentStitches[iStitch].y;
+										do {
+											//does the line intersect with the top of the screen?
+											gapToEdge = offset - slope * ZoomRect.top;
+											if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
+												stitchLine[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+												stitchLine[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.x + 0.5;
+												stitchLine[1].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+												stitchLine[1].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.x + 0.5;
+												Polyline(StitchWindowMemDC, stitchLine, 2);
+												break;
+											}
+											//does the line intersect the bottom of the screen?
+											gapToEdge = offset - slope * ZoomRect.bottom;
+											if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
 												stitchLine[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
 												stitchLine[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 												stitchLine[1].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
 												stitchLine[1].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 												Polyline(StitchWindowMemDC, stitchLine, 2);
+												break;
 											}
-										}
-									} while (false);
+											//does the line intersect the left side of the screen?
+											if (slope) {
+												gapToEdge = (offset - ZoomRect.left) / slope;
+												if (gapToEdge >= ZoomRect.bottom && gapToEdge <= ZoomRect.top) {
+													stitchLine[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+													stitchLine[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+													stitchLine[1].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+													stitchLine[1].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+													Polyline(StitchWindowMemDC, stitchLine, 2);
+												}
+											}
+										} while (false);
+									}
 								}
 							}
 						}
 					}
+				}
+				else {
+					throw;
 				}
 				if (LineIndex) {
 					Polyline(StitchWindowMemDC, LinePoints, LineIndex);
