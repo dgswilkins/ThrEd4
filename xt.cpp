@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <tchar.h>
+#include <vector>
 #include <CppCoreCheck\warnings.h>
 #pragma warning( push )  
 #pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
@@ -972,15 +973,15 @@ void delwlk(unsigned code) {
 
 	if (PCSHeader.stitchCount) {
 		stitchCount = 0;
-		fPOINTATTR* highStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
+		std::vector<fPOINTATTR> highStitchBuffer;
+		highStitchBuffer.reserve(PCSHeader.stitchCount);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if ((StitchBuffer[iStitch].attribute&WLKFMSK) != code) {
-				MoveMemory(&highStitchBuffer[stitchCount++], &StitchBuffer[iStitch], sizeof(fPOINTATTR));
+				highStitchBuffer.push_back(StitchBuffer[iStitch]);
 			}
 		}
-		MoveMemory(StitchBuffer, highStitchBuffer, stitchCount * sizeof(fPOINTATTR));
-		PCSHeader.stitchCount = stitchCount;
-		delete[] highStitchBuffer;
+		MoveMemory(StitchBuffer, &highStitchBuffer[0], highStitchBuffer.size() * sizeof(fPOINTATTR));
+		PCSHeader.stitchCount = gsl::narrow<unsigned short>(highStitchBuffer.size());
 	}
 }
 
@@ -1357,11 +1358,11 @@ void srtcol() {
 		colorStartStitch[iColor] = startStitch;
 		startStitch += histogram[iColor];
 	}
-	fPOINTATTR* highStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
-	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
-		moveStitch(&highStitchBuffer[colorStartStitch[StitchBuffer[iStitch].attribute&COLMSK]++], &StitchBuffer[iStitch]);
-	MoveMemory(StitchBuffer, highStitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR));
-	delete[] highStitchBuffer;
+	std::vector<fPOINTATTR> highStitchBuffer(PCSHeader.stitchCount);
+	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+		highStitchBuffer[colorStartStitch[StitchBuffer[iStitch].attribute&COLMSK]++] = StitchBuffer[iStitch];
+	}
+	MoveMemory(StitchBuffer, &highStitchBuffer[0], PCSHeader.stitchCount * sizeof(fPOINTATTR));
 }
 
 void dubit(unsigned bit) {
@@ -2005,7 +2006,7 @@ void fsort() {
 	dmprec(*PRecs, lastRegion);
 #endif
 	if (srtchk(*PFRecs, lastRegion, &badForm)) {
-		RANGE* stitchRange = new RANGE[lastRegion];
+		std::vector<RANGE> stitchRange(lastRegion);
 		stitchRange[0].start = 0;
 		attribute = PRecs[0]->color;
 		currentForm = 0xffffffff;
@@ -2069,7 +2070,6 @@ void fsort() {
 		delete[] TempStitchBuffer;
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
-		delete[] stitchRange;
 	}
 	else {
 		LoadString(ThrEdInstance, IDS_SRTER, HelpBuffer, HBUFSIZ);
@@ -3939,7 +3939,7 @@ void deltx() {
 		}
 		// Only if it is not shared, should the texture be deleted
 		if (!flag) {
-			TXPNT* textureBuffer = new TXPNT[TextureIndex]();
+			std::vector<TXPNT> textureBuffer(TextureIndex);
 			iBuffer = 0;
 			for (iForm = 0; iForm < ClosestFormToCursor; iForm++) {
 				if (istx(iForm)) {
@@ -3957,7 +3957,6 @@ void deltx() {
 			}
 			TextureIndex = iBuffer;
 			MoveMemory(&TexturePointsBuffer[0], &textureBuffer[0], iBuffer * sizeof(TXPNT));
-			delete[] textureBuffer;
 		}
 		FormList[ClosestFormToCursor].fillType = 0;
 	}
