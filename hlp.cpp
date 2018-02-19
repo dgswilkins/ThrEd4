@@ -34,7 +34,7 @@ extern	long			PreferenceWindowWidth;
 extern	RECT			scRct;
 extern	FRMHED*			SelectedForm;
 extern	unsigned		SelectedFormCount;
-extern	EnumMap<StateFlag>	StateMap; 
+extern	EnumMap<StateFlag>	StateMap;
 extern	HDC				StitchWindowMemDC;
 extern	HINSTANCE		ThrEdInstance;
 extern	HWND			ThrEdWindow;
@@ -219,7 +219,6 @@ TCHAR*	RepairString;			//Repair Type
 TCHAR	HelpBuffer[HBUFSIZ];	//message formatting buffer
 
 void adbad(unsigned code, unsigned count) noexcept {
-
 	LoadString(ThrEdInstance, code, RepairString, sizeof(MsgBuffer) - strlen(RepairString));
 	RepairString = &RepairString[strlen(RepairString)];
 	LoadString(ThrEdInstance, IDS_NOTREP, HelpBuffer, sizeof(HelpBuffer));
@@ -228,7 +227,6 @@ void adbad(unsigned code, unsigned count) noexcept {
 }
 
 void hsizmsg() {
-
 	TCHAR	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_HSIZ, buffer, HBUFSIZ);
@@ -237,7 +235,6 @@ void hsizmsg() {
 }
 
 void msgflt(unsigned messageId, float value) {
-
 	TCHAR	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, messageId, buffer, HBUFSIZ);
@@ -248,7 +245,6 @@ void msgflt(unsigned messageId, float value) {
 }
 
 void tsizmsg(TCHAR* threadSizeText, double threadSize) {
-
 	TCHAR	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_SIZ, buffer, HBUFSIZ);
@@ -259,7 +255,6 @@ void tsizmsg(TCHAR* threadSizeText, double threadSize) {
 }
 
 void bfilmsg() {
-
 	TCHAR	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_BADFIL, buffer, HBUFSIZ);
@@ -268,7 +263,6 @@ void bfilmsg() {
 }
 
 void filnopn(unsigned code, TCHAR* fileName) {
-
 	TCHAR	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, code, buffer, HBUFSIZ);
@@ -277,7 +271,6 @@ void filnopn(unsigned code, TCHAR* fileName) {
 }
 
 void crmsg(TCHAR* fileName) {
-
 	TCHAR	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_CREAT, buffer, HBUFSIZ);
@@ -286,11 +279,8 @@ void crmsg(TCHAR* fileName) {
 }
 
 void butxt(unsigned iButton, const TCHAR* buttonText) {
-
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
-
 		if (iButton == 5) {
-
 			if (StateMap.test(StateFlag::HIDMAP))
 				SetWindowText(ButtonWin[iButton], StringTable[STR_TRC1H]);
 			else
@@ -304,18 +294,15 @@ void butxt(unsigned iButton, const TCHAR* buttonText) {
 }
 
 void ritnum(unsigned code, unsigned value) {
-
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), "%s %d", StringTable[code], value);
 	butxt(HNUM, HelpBuffer);
 }
 
 void msgstr(unsigned code) noexcept {
-
 	LoadString(ThrEdInstance, code, MsgBuffer, MSGSIZ);
 }
 
 void lodstr() {
-
 	unsigned		iString = 0, iStringData = 0, iStringTable = 0, count = 0;
 	//ToDo - replace overallocation of storage and still ensure no overflow
 	const unsigned	storageSize = 65535;
@@ -329,7 +316,7 @@ void lodstr() {
 		offset += count;
 	}
 	// Now allocate based on actual count
-	StringData = new TCHAR[offset+1];
+	StringData = new TCHAR[offset + 1];
 	MoveMemory(StringData, &stringStorage[0], offset);
 	StringTable[0] = StringData;
 	iStringTable = 1;
@@ -349,7 +336,6 @@ void shoMsg(TCHAR* string) {
 		long		offset = 0;
 
 		while (string[iString]) {
-
 			if (string[iString++] == 10)
 				count++;
 		}
@@ -359,9 +345,7 @@ void shoMsg(TCHAR* string) {
 		iString = 0;
 		strings[0] = string;
 		while (string[iString]) {
-
 			if (string[iString] == 10) {
-
 				lengths[iLength] = iString - previousStringLength;
 				strings[++iLength] = &string[iString++];
 				previousStringLength = iString;
@@ -373,7 +357,6 @@ void shoMsg(TCHAR* string) {
 		iLength++;
 		textSize.cx = textSize.cy = messageSize.cy = messageSize.cx = 0;
 		for (index = 0; index < iLength; index++) {
-
 			GetTextExtentPoint32(StitchWindowMemDC, strings[index], lengths[index], &textSize);
 			if (textSize.cx > messageSize.cx)
 				messageSize.cx = textSize.cx;
@@ -401,18 +384,15 @@ void shoMsg(TCHAR* string) {
 }
 
 void tabmsg(unsigned code) {
-
 	LoadString(ThrEdInstance, code, HelpBuffer, HBUFSIZ);
 	shoMsg(HelpBuffer);
 }
 
 void riter() {
-
 	tabmsg(IDS_RITER);
 }
 
 void pntmsg(unsigned count) {
-
 	TCHAR	temp[HBUFSIZ];
 	TCHAR	buffer[HBUFSIZ];
 
@@ -423,7 +403,6 @@ void pntmsg(unsigned count) {
 }
 
 void shoseln(unsigned code0, unsigned code1) {
-
 	TCHAR	temp[HBUFSIZ];
 	TCHAR	buffer0[HBUFSIZ];
 	TCHAR	buffer1[HBUFSIZ];
@@ -436,10 +415,8 @@ void shoseln(unsigned code0, unsigned code1) {
 }
 
 bool clpmsgs(unsigned code) {
-
 	ispcdclp();
 	if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap.test(StateFlag::WASPCDCLP)) {
-
 		tabmsg(IDS_CLPS);
 		return 1;
 	}
@@ -447,35 +424,26 @@ bool clpmsgs(unsigned code) {
 }
 
 void frm1pnt() {
-
 	if (FormIndex == 1) {
-
 		StateMap.set(StateFlag::FORMSEL);
 		ClosestFormToCursor = 0;
 	}
 }
 
 bool filmsgs(unsigned code) {
-
 	if (SelectedFormCount)
 		return clpmsgs(code);
 	if (FormIndex) {
-
 		frm1pnt();
 		if (StateMap.test(StateFlag::FORMSEL)) {
-
 			SelectedForm = &FormList[ClosestFormToCursor];
 			if (SelectedForm->vertexCount == 2) {
-
 				if (code < FML_LIN) {
-
 					tabmsg(IDS_FRM3X);
 					return 1;
 				}
 				else {
-
 					if (code == FML_PRPS) {
-
 						tabmsg(IDS_ANGS);
 						return 1;
 					}
@@ -484,25 +452,21 @@ bool filmsgs(unsigned code) {
 			return clpmsgs(code);
 		}
 		else {
-
 			tabmsg(IDS_FILSEL);
 			return 1;
 		}
 	}
 	else {
-
 		tabmsg(IDS_FILCR);
 		return 1;
 	}
 }
 
 void grpmsg() {
-
 	shoseln(IDS_FGRPS, IDS_UNGRP);
 }
 
 void grpmsg1() {
-
 	tabmsg(IDS_NOGRP);
 }
 
@@ -520,7 +484,6 @@ void help() {
 }
 
 void sdmsg() {
-
 	TCHAR	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_SAVDISC, buffer, HBUFSIZ);
@@ -529,17 +492,14 @@ void sdmsg() {
 }
 
 void alrotmsg() {
-
 	shoseln(IDS_ALLX, IDS_ROTAGIN);
 }
 
 void shord() {
-
 	shoseln(IDS_FGRPF, IDS_ROTDUP);
 }
 
 void spltmsg() {
-
 	shoseln(IDS_FRMGUID, IDS_SPLT);
 }
 

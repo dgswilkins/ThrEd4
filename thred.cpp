@@ -498,7 +498,7 @@ double			ZoomFactor = 1;			//zoom factor
 POINT			UnzoomedRect;			//size of the unzoomed stitch window
 POINT			StitchCoordinatesPixels;	//converted from stitch to pixel
 POINT			NearestPixel[NERCNT];	//selected points
-POINT			BoxCoordinate = {0, 0};	//single select box point
+POINT			BoxCoordinate = { 0, 0 };	//single select box point
 double			DistanceToClick;		//distance of closest point to a mouse click
 unsigned		ClosestPointIndex;		//index of closest point
 unsigned		ClosestPointIndexClone;	//copy of index of closest point
@@ -514,9 +514,9 @@ unsigned		BufferDigitCount;		//number of decimal digits in the number of stitche
 POINT*			LinePoints;				//for drawing lines on the screen
 unsigned		LineIndex;				//line index for display routine
 double			StitchWindowAspectRatio;	//aspect ratio of the stitch window
-double			MinStitchLength = MINSIZ*PFAFGRAN;	//minimum stitch size
-double			UserStitchLength = USESIZ*PFAFGRAN;	//user selected stitch size
-double			SmallStitchLength = SMALSIZ*PFAFGRAN;	//user can remove stitches smaller than this
+double			MinStitchLength = MINSIZ * PFAFGRAN;	//minimum stitch size
+double			UserStitchLength = USESIZ * PFAFGRAN;	//user selected stitch size
+double			SmallStitchLength = SMALSIZ * PFAFGRAN;	//user can remove stitches smaller than this
 unsigned		MarkedStitchMap[MAXITEMS];	//bitmap to tell when stitches have been marked
 TCHAR*			PcdClipFormat = "PMust_Format";
 TCHAR*			ThrEdClipFormat = "threditor";
@@ -792,7 +792,6 @@ TCHAR*	LayerText[] = {
 };
 
 COLORREF DefaultColors[] = {
-
 	0x000000,
 	0x800000,
 	0xFF0000,
@@ -819,7 +818,6 @@ unsigned		ThreadSizeSelected;	//thread selected for size change
 //file open stuff
 
 MENUITEMINFO filinfo = {
-
 	sizeof(MENUITEMINFO),
 	MIIM_TYPE,
 	MFT_STRING,
@@ -860,7 +858,6 @@ TCHAR			IniFileName[_MAX_PATH];		//.ini file name
 TCHAR			PCSBMPFileName[16];			//bitmap file name from pcs file
 TCHAR			UserBMPFileName[_MAX_PATH];	//bitmap file name from user load
 OPENFILENAME	OpenFileName = {
-
 	sizeof(OPENFILENAME),	//lStructsize
 	ThrEdWindow,			//hwndOwner 
 	ThrEdInstance,			//hInstance 
@@ -923,7 +920,6 @@ BITMAPINFO			BitmapInfo;			//bitmap info
 BITMAPINFOHEADER	BitmapInfoHeader;	//bitmap info header
 
 COLORREF DefaultUserColors[] = {
-
 	0x00000000,
 	0x002dffff,
 	0x003f87e9,
@@ -943,7 +939,6 @@ COLORREF DefaultUserColors[] = {
 };
 
 COLORREF DefaultCustomColors[] = {
-
 	0x729674,
 	0x1a1eb9,
 	0x427347,
@@ -963,7 +958,6 @@ COLORREF DefaultCustomColors[] = {
 };
 
 COLORREF DefaultCustomBackgroundColors[] = {
-
 	0xa3c5dc,
 	0xadc7b6,
 	0xd1fcfb,
@@ -983,7 +977,6 @@ COLORREF DefaultCustomBackgroundColors[] = {
 };
 
 COLORREF DefaultBitmapBackgroundColors[] = {
-
 	0xc0d5bf,
 	0xc8dfee,
 	0x708189,
@@ -1023,7 +1016,6 @@ POINT		RotationCenterPixels;		//center of pixel rotation
 unsigned	FormFirstStitchIndex;		//points to the first stitch in a form
 
 typedef struct _dstdat {
-
 	TCHAR	cor;
 	TCHAR	val;
 }DSTDAT;
@@ -1032,7 +1024,6 @@ typedef struct _dstdat {
 #define YCOR 1
 
 DSTDAT	DSTValues[] = {
-
 	{XCOR,1},
 	{XCOR,-1},
 	{XCOR,9},
@@ -1067,7 +1058,6 @@ unsigned LeftUpCursorStart[] = { 0x2,0x6,0x14,0x24,0x44 };
 unsigned LeftUpCursorEnd[] = { 0x70000000,0x30000000,0x20000000 };
 
 unsigned Xdst[] = {
-
 	0x090a0a,	//-121
 	0x090a08,	//-120
 	0x090a09,	//-119
@@ -1314,7 +1304,6 @@ unsigned Xdst[] = {
 };
 
 unsigned Ydst[] = {
-
 	0x115050,	//-121
 	0x115010,	//-120
 	0x115090,	//-119
@@ -1563,7 +1552,6 @@ unsigned Ydst[] = {
 #if PESACT
 
 unsigned PESColorTranslate[] = {
-
 	0xf0f0f0, //00 
 	0x940a1a, //01 
 	0xff750f, //02 
@@ -1653,31 +1641,31 @@ BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noe
 
 	HWND hwnd = {};
 	switch (umsg) {
-		case WM_INITDIALOG:
+	case WM_INITDIALOG:
+
+		hwnd = GetDlgItem(hwndlg, IDC_DESED);
+		SetWindowText(hwnd, IniFile.designerName);
+		SetFocus(hwnd);
+		SendMessage(hwnd, EM_SETSEL, 0, -1);
+		break;
+
+	case WM_COMMAND:
+
+		switch (LOWORD(wparam)) {
+		case IDCANCEL:
+
+			EndDialog(hwndlg, 0);
+			return TRUE;
+
+		case IDOK:
 
 			hwnd = GetDlgItem(hwndlg, IDC_DESED);
-			SetWindowText(hwnd, IniFile.designerName);
-			SetFocus(hwnd);
-			SendMessage(hwnd, EM_SETSEL, 0, -1);
-			break;
-
-		case WM_COMMAND:
-
-			switch (LOWORD(wparam)) {
-				case IDCANCEL:
-
-					EndDialog(hwndlg, 0);
-					return TRUE;
-
-				case IDOK:
-
-					hwnd = GetDlgItem(hwndlg, IDC_DESED);
-					GetWindowText(hwnd, IniFile.designerName, 50);
-					EndDialog(hwndlg, 0);
-					sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED], IniFile.designerName);
-					SetWindowText(ThrEdWindow, MsgBuffer);
-					return TRUE;
-			}
+			GetWindowText(hwnd, IniFile.designerName, 50);
+			EndDialog(hwndlg, 0);
+			sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED], IniFile.designerName);
+			SetWindowText(ThrEdWindow, MsgBuffer);
+			return TRUE;
+		}
 	}
 	return 0;
 }
@@ -1687,63 +1675,52 @@ void getdes() noexcept {
 }
 
 bool isclp(unsigned iForm) noexcept {
-
 	if ((1 << FormList[iForm].fillType)&ClipTypeMap)
 		return 1;
 	return 0;
 }
 
 bool isclpx(unsigned iForm) noexcept {
-
 	if (isclp(iForm) && FormList[iForm].lengthOrCount.clipCount)
 		return 1;
 	return 0;
 }
 
 bool isfclp() noexcept {
-
 	if (isclp(ClosestFormToCursor) && FormList[ClosestFormToCursor].fillType != CLPF)
 		return 1;
 	return 0;
 }
 
 bool iseclp(unsigned iForm) noexcept {
-
 	if (FormList[iForm].edgeType == EDGECLIP || FormList[iForm].edgeType == EDGEPICOT || FormList[iForm].edgeType == EDGECLIPX)
 		return 1;
 	return 0;
 }
 
 bool iseclpx(unsigned iForm) noexcept {
-
 	if (iseclp(iForm) && FormList[iForm].clipEntries)
 		return 1;
 	return 0;
 }
 
 double stlen(unsigned iStitch) noexcept {
-
 	return hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
 }
 
 void undat() noexcept {
-
 	if (FormDataSheet) {
-
 		DestroyWindow(FormDataSheet);
 		FormDataSheet = 0;
 	}
 }
 
 void qchk() {
-
 	if (UserFlagMap.test(UserFlag::MARQ)) {
-
 		CheckMenuItem(MainMenu, ID_MARKESC, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_MARKQ, MF_UNCHECKED);
 	}
 	else {
-
 		CheckMenuItem(MainMenu, ID_MARKESC, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_MARKQ, MF_CHECKED);
 	}
@@ -1751,14 +1728,11 @@ void qchk() {
 }
 
 void nedmen() {
-
 	if (UserFlagMap.test(UserFlag::NEDOF)) {
-
 		CheckMenuItem(MainMenu, ID_SETNEDL, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_RSTNEDL, MF_CHECKED);
 	}
 	else {
-
 		CheckMenuItem(MainMenu, ID_SETNEDL, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_RSTNEDL, MF_UNCHECKED);
 	}
@@ -1766,44 +1740,35 @@ void nedmen() {
 }
 
 void knotmen() {
-
 	if (UserFlagMap.test(UserFlag::KNOTOF)) {
-
 		CheckMenuItem(MainMenu, ID_KNOTON, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_KNOTOF, MF_CHECKED);
 	}
 	else {
-
 		CheckMenuItem(MainMenu, ID_KNOTON, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_KNOTOF, MF_UNCHECKED);
 	}
-StateMap.set(StateFlag::DUMEN);
+	StateMap.set(StateFlag::DUMEN);
 }
 
 void bsavmen() {
-
 	if (UserFlagMap.test(UserFlag::BSAVOF)) {
-
 		CheckMenuItem(MainMenu, ID_BSAVON, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_BSAVOF, MF_CHECKED);
 	}
 	else {
-
 		CheckMenuItem(MainMenu, ID_BSAVON, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_BSAVOF, MF_UNCHECKED);
 	}
-StateMap.set(StateFlag::DUMEN);
+	StateMap.set(StateFlag::DUMEN);
 }
 
 void linbmen() {
-
 	if (UserFlagMap.test(UserFlag::LINSPAC)) {
-
 		CheckMenuItem(MainMenu, ID_LINBEXACT, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_LINBEVEN, MF_CHECKED);
 	}
 	else {
-
 		CheckMenuItem(MainMenu, ID_LINBEXACT, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_LINBEVEN, MF_UNCHECKED);
 	}
@@ -1832,7 +1797,6 @@ void chkmen() noexcept {
 }
 
 void duzrat() noexcept {
-
 	if (!ZoomRect.right)
 		ZoomRect.right = LHUPX;
 	if (!ZoomRect.top)
@@ -1842,7 +1806,6 @@ void duzrat() noexcept {
 }
 
 unsigned rsed() noexcept {
-
 	SYSTEMTIME time = {};
 
 	GetLocalTime(&time);
@@ -1864,7 +1827,6 @@ void ritfnam(const TCHAR* designerName) {
 				tmpName[iName] = NameEncoder[designerName[iName]];
 			}
 			else {
-
 				while (NameDecoder[tmpName[iName]])
 					tmpName[iName] = psg() & 0xff;
 				break;
@@ -1875,8 +1837,8 @@ void ritfnam(const TCHAR* designerName) {
 				tmpName[49] = psg() & 0xff;
 		}
 		for (iName = 0; iName < 50; iName++) {
-			if (NameOrder[iName] < 50) { 
-				ExtendedHeader.creatorName[NameOrder[iName]] = tmpName[iName]; 
+			if (NameOrder[iName] < 50) {
+				ExtendedHeader.creatorName[NameOrder[iName]] = tmpName[iName];
 			}
 		}
 	}
@@ -1901,7 +1863,6 @@ void redfnam(TCHAR* designerName) noexcept {
 }
 
 void fnamtabs() {
-
 	unsigned		iName = 0, swapInteger = 0, source = 0, destination = 0;
 	unsigned char	swapCharacter = 0;
 
@@ -1909,7 +1870,6 @@ void fnamtabs() {
 		NameOrder[iName] = iName;
 	PseudoRandomValue = NORDSED;
 	for (iName = 0; iName < 100; iName++) {
-
 		source = psg() % 50;
 		destination = psg() % 50;
 		swapInteger = NameOrder[destination];
@@ -1920,7 +1880,6 @@ void fnamtabs() {
 		NameEncoder[iName] = gsl::narrow<unsigned char>(iName) + NCODOF;
 	PseudoRandomValue = NCODSED;
 	for (iName = 0; iName < 256; iName++) {
-
 		source = psg() & 0x7f;
 		destination = psg() & 0x7f;
 		swapCharacter = NameEncoder[destination];
@@ -1937,9 +1896,7 @@ void dstin(unsigned number, POINT* pout) noexcept {
 	unsigned index = 0, shift = 1;
 	pout->x = pout->y = 0;
 	for (index = 0; index < 22; index++) {
-
 		if (number&shift) {
-
 			if (DSTValues[index].cor)
 				pout->y += DSTValues[index].val;
 			else
@@ -1950,7 +1907,6 @@ void dstin(unsigned number, POINT* pout) noexcept {
 }
 
 fPOINT* adflt(unsigned count) {
-
 	unsigned iFormVertex = FormVertexIndex;
 
 	if (FormVertexIndex + count > MAXITEMS)
@@ -1960,7 +1916,6 @@ fPOINT* adflt(unsigned count) {
 }
 
 SATCON* adsatk(unsigned count) noexcept {
-
 	unsigned iSatinConnect = SatinGuideIndex;
 
 	SatinGuideIndex += count;
@@ -1968,7 +1923,6 @@ SATCON* adsatk(unsigned count) noexcept {
 }
 
 fPOINT* adclp(unsigned count) noexcept {
-
 	unsigned iClipPoint = ClipPointIndex;
 
 	ClipPointIndex += count;
@@ -1976,14 +1930,11 @@ fPOINT* adclp(unsigned count) noexcept {
 }
 
 unsigned duthrsh(double threshold) noexcept {
-
 	unsigned	iZoomLevel = 0;
 	double		zoom = 1;
 
 	if (threshold > 0.0) {
-
 		while (zoom > threshold) {
-
 			zoom *= ZUMFCT;
 			iZoomLevel++;
 		}
@@ -1994,7 +1945,6 @@ unsigned duthrsh(double threshold) noexcept {
 }
 
 double unthrsh(unsigned level) noexcept {
-
 	double	zoom = 1;
 
 	if (level)
@@ -2002,7 +1952,6 @@ double unthrsh(unsigned level) noexcept {
 	else
 		return 0;
 	while (level) {
-
 		zoom *= ZUMFCT;
 		level--;
 	}
@@ -2010,20 +1959,17 @@ double unthrsh(unsigned level) noexcept {
 }
 
 void ritfcor(const fPOINT* point) {
-
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "x%.0f y%.0f", point->x / PFGRAN, point->y / PFGRAN);
 	butxt(HCOR, MsgBuffer);
 }
 
 void ritcor(const fPOINTATTR* pointAttribute) {
-
 	fPOINT	point = { pointAttribute->x , pointAttribute->y };
 
 	ritfcor(&point);
 }
 
 void coltab() {
-
 	unsigned	iStitch = 0, iColor = 0, nextColor = 0;
 	unsigned	currentColor = 0;
 	dRECTANGLE	range = {};
@@ -2077,11 +2023,9 @@ void coltab() {
 }
 
 void ladj() {
-
 	unsigned iLayer = 0;
 
 	for (iLayer = 0; iLayer < 5; iLayer++) {
-
 		if (iLayer == ActiveLayer)
 			EnableMenuItem(MainMenu, iLayer + M_ALL, MF_BYPOSITION | MF_GRAYED);
 		else
@@ -2091,7 +2035,6 @@ void ladj() {
 }
 
 void stchcpy(unsigned count, fPOINTATTR* destination) noexcept {
-
 #if  __UseASM__
 	_asm {
 		mov		esi, offset StitchBuffer
@@ -2105,11 +2048,9 @@ void stchcpy(unsigned count, fPOINTATTR* destination) noexcept {
 }
 
 void deldu() {
-
 	unsigned iBuffer = 0;
 
 	for (iBuffer = 0; iBuffer < 16; iBuffer++) {
-
 		if (UndoBuffer[iBuffer]) {
 			delete UndoBuffer[iBuffer];
 			UndoBuffer[iBuffer] = nullptr;
@@ -2121,7 +2062,6 @@ void deldu() {
 }
 
 void mvflpnt(fPOINT* destination, const fPOINT* source, unsigned count) noexcept {
-
 #if  __UseASM__
 	_asm {
 		mov		ecx, count
@@ -2137,7 +2077,6 @@ void mvflpnt(fPOINT* destination, const fPOINT* source, unsigned count) noexcept
 }
 
 void mvsatk(SATCON* destination, const SATCON* source, unsigned count) noexcept {
-
 #if  __UseASM__
 	_asm {
 		mov		ecx, count
@@ -2151,7 +2090,6 @@ void mvsatk(SATCON* destination, const SATCON* source, unsigned count) noexcept 
 }
 
 void dudat() {
-
 	unsigned	size = 0;
 	BAKHED*		backupData = nullptr;
 
@@ -2163,7 +2101,6 @@ void dudat() {
 	UndoBuffer[UndoBufferWriteIndex] = new unsigned[size];
 	backupData = static_cast<BAKHED *>(UndoBuffer[UndoBufferWriteIndex]);
 	if (backupData) {
-
 		backupData->zoomRect.x = UnzoomedRect.x;
 		backupData->zoomRect.y = UnzoomedRect.y;
 		backupData->formCount = FormIndex;
@@ -2186,7 +2123,6 @@ void dudat() {
 		backupData->clipPointCount = ClipPointIndex;
 		backupData->clipPoints = convert_ptr<fPOINT *>(&backupData->guide[SatinGuideIndex]);
 		if (ClipPointIndex) {
-
 			if (ClipPointIndex > MAXITEMS)
 				ClipPointIndex = MAXITEMS;
 			mvflpnt(backupData->clipPoints, &ClipPoints[0], ClipPointIndex);
@@ -2201,13 +2137,10 @@ void dudat() {
 }
 
 void savdo() {
-
 	StateMap.set(StateFlag::WASDO);
 	StateMap.set(StateFlag::CMPDO);
 	if (StateMap.testAndReset(StateFlag::SAVACT)) {
-
 		if (StateMap.testAndReset(StateFlag::BAKING)) {
-
 			StateMap.reset(StateFlag::REDUSHO);
 			EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
 		}
@@ -2223,7 +2156,6 @@ void savdo() {
 }
 
 void redfils() {
-
 	unsigned			iLRU = 0;
 	WIN32_FIND_DATA		findData = {};
 	HANDLE				fileHandle = nullptr;
@@ -2233,18 +2165,14 @@ void redfils() {
 			DeleteMenu(FileMenu, LRUMenuId[iLRU], MF_BYCOMMAND);
 	}
 	for (iLRU = 0; iLRU < OLDNUM; iLRU++) {
-
 		if (IniFile.prevNames[iLRU][0]) {
-
 			if (StateMap.test(StateFlag::SAVAS))
 				AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], IniFile.prevNames[iLRU]);
 			else {
-
 				fileHandle = FindFirstFile(IniFile.prevNames[iLRU], &findData);
 				if (fileHandle == INVALID_HANDLE_VALUE)
 					IniFile.prevNames[iLRU][0] = 0;
 				else {
-
 					AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], IniFile.prevNames[iLRU]);
 					FindClose(fileHandle);
 				}
@@ -2255,7 +2183,6 @@ void redfils() {
 }
 
 void nunams() {
-
 	TCHAR*		iFileExtention = nullptr;
 	unsigned	iPrevious = 0;
 	unsigned	nameLength = 0;
@@ -2273,24 +2200,23 @@ void nunams() {
 	strncpy_s(GeName, WorkingFileName, nameLength);
 	iFileExtention = AuxName + nameLength;
 	switch (IniFile.auxFileType) {
+	case AUXDST:
 
-		case AUXDST:
-
-			strcpy_s(iFileExtention, sizeof(AuxName) - nameLength, "dst");
-			break;
+		strcpy_s(iFileExtention, sizeof(AuxName) - nameLength, "dst");
+		break;
 
 #if PESACT
 
-		case AUXPES:
+	case AUXPES:
 
-			strcpy_s(iFileExtention, sizeof(AuxName) - nameLength, "pes");
-			break;
+		strcpy_s(iFileExtention, sizeof(AuxName) - nameLength, "pes");
+		break;
 
 #endif
 
-		default:
+	default:
 
-			strcpy_s(iFileExtention, sizeof(AuxName) - nameLength, "pcs");
+		strcpy_s(iFileExtention, sizeof(AuxName) - nameLength, "pcs");
 	}
 	iFileExtention = ThrName + nameLength;
 	strcpy_s(iFileExtention, sizeof(ThrName) - nameLength, "thr");
@@ -2298,11 +2224,8 @@ void nunams() {
 	strcpy_s(iFileExtention, sizeof(GeName) - nameLength, "th*");
 	bool flag = true;
 	for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
-
 		if (!strcmp(IniFile.prevNames[iPrevious], ThrName)) {
-
 			if (iPrevious) {
-
 				strcpy_s(swapName, sizeof(swapName), IniFile.prevNames[0]);
 				strcpy_s(IniFile.prevNames[0], sizeof(IniFile.prevNames[0]), IniFile.prevNames[iPrevious]);
 				strcpy_s(IniFile.prevNames[iPrevious], sizeof(IniFile.prevNames[iPrevious]), swapName);
@@ -2333,7 +2256,6 @@ void nunams() {
 }
 
 void moveStitch(fPOINTATTR* destination, const fPOINTATTR* source) noexcept {
-
 #if  __UseASM__
 	_asm {
 		mov		esi, source
@@ -2348,14 +2270,12 @@ void moveStitch(fPOINTATTR* destination, const fPOINTATTR* source) noexcept {
 }
 
 void duzero() {
-
 	unsigned		iStitch = 0, iForm = 0;
 	unsigned short	iDestination = 0;
 	double			stitchLength = 0.0;
 	fPOINTATTR*		currentStitch = nullptr;
 
 	if (SelectedFormCount) {
-
 		clRmap(MAXITEMS);
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			setr(SelectedFormList[iForm]);
@@ -2363,14 +2283,10 @@ void duzero() {
 		iDestination = 0;
 		currentStitch = StitchBuffer;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 			if (StitchBuffer[iStitch].attribute&TYPMSK && chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
-
 				if (StateMap.testAndSet(StateFlag::CONTIG)) {
-
 					stitchLength = hypot(StitchBuffer[iStitch].x - currentStitch->x, StitchBuffer[iStitch].y - currentStitch->y);
 					if (stitchLength > MinStitchLength) {
-
 						currentStitch = &StitchBuffer[iStitch];
 						moveStitch(&StitchBuffer[iDestination++], &StitchBuffer[iStitch]);
 					}
@@ -2379,7 +2295,6 @@ void duzero() {
 					currentStitch = &StitchBuffer[iStitch];
 			}
 			else {
-
 				moveStitch(&StitchBuffer[iDestination++], &StitchBuffer[iStitch]);
 				StateMap.reset(StateFlag::CONTIG);
 			}
@@ -2390,7 +2305,6 @@ void duzero() {
 		return;
 	}
 	if (StateMap.test(StateFlag::GRPSEL)) {
-
 		rngadj();
 		delsmal(GroupStartStitch, GroupEndStitch);
 	}
@@ -2399,7 +2313,6 @@ void duzero() {
 }
 
 void rshft(POINT shiftPoint) {
-
 	ZoomRect.right -= shiftPoint.x;
 	ZoomRect.left -= shiftPoint.x;
 	ZoomRect.top -= shiftPoint.y;
@@ -2409,11 +2322,9 @@ void rshft(POINT shiftPoint) {
 }
 
 void pgdwn() {
-
 	POINT scrollPosition = {};
 
 	if (StateMap.test(StateFlag::ZUMED)) {
-
 		scrollPosition.y = (ZoomRect.top - ZoomRect.bottom)*PAGSCROL;
 		scrollPosition.x = 0;
 		rshft(scrollPosition);
@@ -2421,11 +2332,9 @@ void pgdwn() {
 }
 
 void pgup() {
-
 	POINT scrollPosition = {};
 
 	if (StateMap.test(StateFlag::ZUMED)) {
-
 		scrollPosition.y = -(ZoomRect.top - ZoomRect.bottom)*PAGSCROL;
 		scrollPosition.x = 0;
 		rshft(scrollPosition);
@@ -2433,11 +2342,9 @@ void pgup() {
 }
 
 void pglft() {
-
 	POINT scrollPosition = {};
 
 	if (StateMap.test(StateFlag::ZUMED)) {
-
 		scrollPosition.x = (ZoomRect.right - ZoomRect.left)*PAGSCROL;
 		scrollPosition.y = 0;
 		rshft(scrollPosition);
@@ -2445,11 +2352,9 @@ void pglft() {
 }
 
 void pgrit() {
-
 	POINT scrollPosition = {};
 
 	if (StateMap.test(StateFlag::ZUMED)) {
-
 		scrollPosition.x = -(ZoomRect.right - ZoomRect.left)*PAGSCROL;
 		scrollPosition.y = 0;
 		rshft(scrollPosition);
@@ -2457,7 +2362,6 @@ void pgrit() {
 }
 
 void selin(unsigned start, unsigned end, HDC dc) {
-
 	unsigned		iStitch = 0, swap = 0;
 	double			coordinate = 0.0;
 	const long		hi = StitchWindowClientRect.bottom;
@@ -2467,14 +2371,12 @@ void selin(unsigned start, unsigned end, HDC dc) {
 	if (SearchLineIndex)
 		Polyline(dc, SearchLine, SearchLineIndex);
 	if (start > end) {
-
 		swap = start;
 		start = end;
 		end = swap;
 	}
 	SearchLineIndex = 0;
 	for (iStitch = start; iStitch <= end; iStitch++) {
-
 		coordinate = ((StitchBuffer[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5);
 		SearchLine[SearchLineIndex].x = gsl::narrow<long>(round(coordinate));
 		coordinate = (hi - (StitchBuffer[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5);
@@ -2485,11 +2387,9 @@ void selin(unsigned start, unsigned end, HDC dc) {
 }
 
 void uncros() {
-
 	if (StateMap.testAndReset(StateFlag::SCROS))
 		cros(GroupStartStitch);
 	if (StateMap.testAndReset(StateFlag::ECROS)) {
-
 		if (GroupEndStitch != GroupStartStitch)
 			cros(GroupEndStitch);
 		StateMap.set(StateFlag::ELIN);
@@ -2497,12 +2397,10 @@ void uncros() {
 }
 
 void ducros(HDC dc) {
-
 	uncros();
 	StateMap.set(StateFlag::SCROS);
 	cros(GroupStartStitch);
 	if (GroupStartStitch != GroupEndStitch) {
-
 		cros(GroupEndStitch);
 		StateMap.set(StateFlag::ECROS);
 	}
@@ -2510,13 +2408,11 @@ void ducros(HDC dc) {
 }
 
 void selRct(fRECTANGLE* sourceRect) noexcept {
-
 	unsigned iStitch = 0;
 
 	sourceRect->left = sourceRect->right = StitchBuffer[GroupStartStitch].x;
 	sourceRect->top = sourceRect->bottom = StitchBuffer[GroupStartStitch].y;
 	for (iStitch = GroupStartStitch + 1; iStitch <= GroupEndStitch; iStitch++) {
-
 		if (StitchBuffer[iStitch].x > sourceRect->right)
 			sourceRect->right = StitchBuffer[iStitch].x;
 		if (StitchBuffer[iStitch].x < sourceRect->left)
@@ -2527,37 +2423,31 @@ void selRct(fRECTANGLE* sourceRect) noexcept {
 			sourceRect->top = StitchBuffer[iStitch].y;
 	}
 	if (sourceRect->right - sourceRect->left == 0) {
-
 		sourceRect->right++;
 		sourceRect->left--;
 	}
 	if (sourceRect->top - sourceRect->bottom == 0) {
-
 		sourceRect->top++;
 		sourceRect->bottom--;
 	}
 }
 
 void rngadj() {
-
 	if (ClosestPointIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 		ClosestPointIndex = PCSHeader.stitchCount - 1;
 	if (GroupStitchIndex > PCSHeader.stitchCount)
 		GroupStitchIndex = ClosestPointIndex;
 	if (GroupStitchIndex > ClosestPointIndex) {
-
 		GroupStartStitch = ClosestPointIndex;
 		GroupEndStitch = GroupStitchIndex;
 	}
 	else {
-
 		GroupStartStitch = GroupStitchIndex;
 		GroupEndStitch = ClosestPointIndex;
 	}
 }
 
 void lenfn(unsigned start, unsigned end) {
-
 	unsigned	iStitch = 0;
 	double		maxLength = 0;
 	double		minLength = 1e99;
@@ -2566,15 +2456,12 @@ void lenfn(unsigned start, unsigned end) {
 
 	SmallestStitchIndex = 0; LargestStitchIndex = 0;
 	for (iStitch = start; iStitch < end; iStitch++) {
-
 		length = hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
 		if (length > maxLength) {
-
 			maxLength = length;
 			LargestStitchIndex = iStitch;
 		}
 		if (length < minLength) {
-
 			minLength = length;
 			SmallestStitchIndex = iStitch;
 		}
@@ -2586,65 +2473,51 @@ void lenfn(unsigned start, unsigned end) {
 }
 
 void frmcalc() {
-
 	unsigned	iStitch = 0, code = 0;
 	double		maxLength = 0;
 	double		minLength = 1e99;
 	double		length = 0.0;
 
 	if (FormList[ClosestFormToCursor].fillType || FormList[ClosestFormToCursor].edgeType) {
-
 		code = ClosestFormToCursor << FRMSHFT;
 		for (iStitch = 0; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
-
 			if ((StitchBuffer[iStitch].attribute&FRMSK) == code && !(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch + 1].attribute&FRMSK) == code && (StitchBuffer[iStitch + 1].attribute&TYPMSK)) {
-
 				length = hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
 				if (length > maxLength) {
-
 					maxLength = length;
 					LargestStitchIndex = iStitch;
 				}
 				if (length < minLength) {
-
 					minLength = length;
 					SmallestStitchIndex = iStitch;
 				}
 			}
 		}
 		if (fabs(maxLength < 10000)) {
-
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "max %.2f", maxLength / PFGRAN);
 			butxt(HMAXLEN, MsgBuffer);
 		}
 		if (fabs(minLength < 10000)) {
-
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "min %.2f", minLength / PFGRAN);
 			butxt(HMINLEN, MsgBuffer);
 		}
 	}
 	else {
-
 		butxt(HMAXLEN, "");
 		butxt(HMINLEN, "");
 	}
 }
 
 void lenCalc() {
-
 	if (StateMap.test(StateFlag::LENSRCH)) {
-
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", hypot(StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x, StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y) / PFGRAN);
 		butxt(HMINLEN, MsgBuffer);
 		msgstr(IDS_SRCH);
 		butxt(HMAXLEN, MsgBuffer);
 	}
 	else {
-
 		if (PCSHeader.stitchCount > 1) {
-
 			if (StateMap.test(StateFlag::FORMSEL)) {
-
 				frmcalc();
 				butxt(HCOR, "");
 				return;
@@ -2656,7 +2529,6 @@ void lenCalc() {
 				lenfn(0, PCSHeader.stitchCount - 1);
 		}
 		else {
-
 			butxt(HMAXLEN, "");
 			butxt(HMINLEN, "");
 		}
@@ -2664,7 +2536,6 @@ void lenCalc() {
 }
 
 void nuselrct() {
-
 	fPOINT		outline[9] = {};
 	unsigned	iLine = 0;
 
@@ -2680,7 +2551,6 @@ void nuselrct() {
 }
 
 void grpAdj() {
-
 	POINT		newSize = {};
 	double		coordinate = 0.0;
 
@@ -2691,36 +2561,30 @@ void grpAdj() {
 	lenCalc();
 	selRct(&StitchRangeRect);
 	if (StateMap.test(StateFlag::ZUMED) && GroupEndStitch != GroupStartStitch) {
-
 		if (StitchRangeRect.top > ZoomRect.top - 1 || StitchRangeRect.bottom < ZoomRect.bottom - 1
 			|| StitchRangeRect.left<ZoomRect.left + 1 || StitchRangeRect.right>ZoomRect.right - 1) {
-
 			newSize.x = StitchRangeRect.right - StitchRangeRect.left;
 			newSize.y = StitchRangeRect.top - StitchRangeRect.bottom;
 			if (newSize.x < MINZUM) {
-
 				if (newSize.x < TINY)
 					newSize.x = 1;
 				coordinate = MINZUM / newSize.x;
 				newSize.x = MINZUM;
-				newSize.y = coordinate*newSize.y;
+				newSize.y = coordinate * newSize.y;
 			}
 			if (newSize.x > newSize.y) {
-
 				coordinate = newSize.x*ZMARGIN;
 				newSize.x += gsl::narrow<long>(round(coordinate));
 				coordinate = newSize.x / StitchWindowAspectRatio;
 				newSize.y = gsl::narrow<long>(round(coordinate));
 			}
 			else {
-
 				coordinate = newSize.y*ZMARGIN;
 				newSize.y = gsl::narrow<long>(round(coordinate));
 				coordinate = newSize.y*StitchWindowAspectRatio;
 				newSize.x = gsl::narrow<long>(round(coordinate));
 			}
 			if (newSize.x > UnzoomedRect.x || newSize.y > UnzoomedRect.y) {
-
 				ZoomRect.left = ZoomRect.bottom = 0;
 				ZoomRect.right = UnzoomedRect.x;
 				ZoomRect.top = UnzoomedRect.y;
@@ -2729,7 +2593,6 @@ void grpAdj() {
 				movStch();
 			}
 			else {
-
 				ZoomRect.right = ZoomRect.left + (newSize.x);
 				ZoomFactor = static_cast<double>(newSize.x) / static_cast<double>(UnzoomedRect.x);
 				ZoomRect.top = ZoomRect.bottom + (newSize.y);
@@ -2743,7 +2606,6 @@ void grpAdj() {
 }
 
 void lensadj() {
-
 	uncros();
 	unsel();
 	ClosestPointIndex = CurrentStitchIndex;
@@ -2754,7 +2616,6 @@ void lensadj() {
 	selRct(&StitchRangeRect);
 	if (StitchRangeRect.top > ZoomRect.top - 1 || StitchRangeRect.bottom < ZoomRect.bottom - 1
 		|| StitchRangeRect.left<ZoomRect.left + 1 || StitchRangeRect.right>ZoomRect.right - 1) {
-
 		SelectedPoint.x = ((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left;
 		SelectedPoint.y = ((StitchRangeRect.top - StitchRangeRect.bottom) / 2) + StitchRangeRect.bottom;
 		shft(SelectedPoint);
@@ -2764,7 +2625,6 @@ void lensadj() {
 }
 
 void ritot(unsigned number) {
-
 	TCHAR	buffer[64] = { 0 };
 
 	sprintf_s(buffer, sizeof(buffer), StringTable[STR_TOT], number);
@@ -2773,21 +2633,18 @@ void ritot(unsigned number) {
 }
 
 void ritlayr() {
-
 	TCHAR buffer[12] = { 0 };
 	unsigned layer = 0xffffffff;
 
 	if (StateMap.test(StateFlag::SELBOX))
 		layer = (StitchBuffer[ClosestPointIndex].attribute&LAYMSK) >> LAYSHFT;
 	else {
-
 		if (StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::FRMPSEL))
 			layer = (FormList[ClosestFormToCursor].attribute&FRMLMSK) >> 1;
 	}
 	if (layer & 0xffff0000)
 		butxt(HLAYR, "");
 	else {
-
 		sprintf_s(buffer, sizeof(buffer), StringTable[STR_LAYR], layer);
 		BufferDigitCount = strlen(buffer);
 		butxt(HLAYR, buffer);
@@ -2795,7 +2652,6 @@ void ritlayr() {
 }
 
 void nuRct() noexcept {
-
 	GetClientRect(ThrEdWindow, &ThredWindowRect);
 	GetWindowRect(ColorBar, &ColorBarRect);
 	GetWindowRect(ButtonWin[HMINLEN], &MinLenRect);
@@ -2821,28 +2677,23 @@ void nuRct() noexcept {
 }
 
 HPEN nuPen(HPEN pen, unsigned width, COLORREF color) noexcept {
-
 	DeleteObject(pen);
 	return CreatePen(PS_SOLID, width, color);
 }
 
 void nuStchSiz(unsigned iColor, unsigned width) noexcept {
-
 	if (width != ThreadSizePixels[iColor]) {
-
 		UserPen[iColor] = nuPen(UserPen[iColor], width, UserColor[iColor]);
 		ThreadSizePixels[iColor] = width;
 	}
 }
 
 HBRUSH nuBrush(HBRUSH brush, COLORREF color) noexcept {
-
 	DeleteObject(brush);
 	return CreateSolidBrush(color);
 }
 
 void box(unsigned iNearest, HDC dc) noexcept {
-
 	const long boxWidth = BoxOffset[iNearest];
 	POINT line[5] = {};
 
@@ -2860,12 +2711,10 @@ void box(unsigned iNearest, HDC dc) noexcept {
 }
 
 void boxs() noexcept {
-
 	unsigned	iNear = 0;
 
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	for (iNear = 0; iNear < NearestCount; iNear++) {
-
 		SelectObject(StitchWindowDC, BoxPen[iNear]);
 		box(iNear, StitchWindowDC);
 	}
@@ -2873,7 +2722,6 @@ void boxs() noexcept {
 }
 
 void duar() {
-
 	POINT	arrowCenter = { (StitchCoordinatesPixels.x - 10),(StitchCoordinatesPixels.y + 10) };
 
 	StitchArrow[1].x = StitchCoordinatesPixels.x;
@@ -2894,7 +2742,6 @@ void duar() {
 }
 
 void dubox() {
-
 	RotateAngle = atan2(StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y, StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x);
 	duar();
 	StateMap.reset(StateFlag::ELIN);
@@ -2906,9 +2753,7 @@ void dubox() {
 }
 
 void unbox() {
-
 	if (StateMap.testAndReset(StateFlag::SELBOX)) {
-
 		SelectObject(StitchWindowDC, BoxPen[0]);
 		SetROP2(StitchWindowDC, R2_NOTXORPEN);
 		Polyline(StitchWindowDC, StitchArrow, 3);
@@ -2917,23 +2762,18 @@ void unbox() {
 }
 
 void unboxs() noexcept {
-
 	if (NearestCount) {
-
 		boxs();
 		NearestCount = 0;
 	}
 }
 
 void redraw(HWND window) noexcept {
-
 	unsigned	iWindow = 0;
 
 	RedrawWindow(window, NULL, NULL, RDW_INVALIDATE);
 	if (window == MainStitchWin) {
-
 		for (iWindow = 0; iWindow < 16; iWindow++) {
-
 			if (DefaultColorWin[iWindow])
 				RedrawWindow(DefaultColorWin[iWindow], NULL, NULL, RDW_INVALIDATE);
 		}
@@ -2942,12 +2782,11 @@ void redraw(HWND window) noexcept {
 }
 
 unsigned stch2px(unsigned iStitch) noexcept {
-
 	StitchCoordinatesPixels.x = (StitchBuffer[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
 	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-	if (StitchCoordinatesPixels.x >= 0 && 
-		StitchCoordinatesPixels.x <= StitchWindowClientRect.right && 
-		StitchCoordinatesPixels.y >= 0 && 
+	if (StitchCoordinatesPixels.x >= 0 &&
+		StitchCoordinatesPixels.x <= StitchWindowClientRect.right &&
+		StitchCoordinatesPixels.y >= 0 &&
 		StitchCoordinatesPixels.y <= StitchWindowClientRect.bottom)
 
 		return 1;
@@ -2956,23 +2795,18 @@ unsigned stch2px(unsigned iStitch) noexcept {
 }
 
 void stch2px1(unsigned iStitch) noexcept {
-
 	StitchCoordinatesPixels.x = (StitchBuffer[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
 	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 }
 
 void stch2pxr(fPOINT stitchCoordinate) noexcept {
-
 	StitchCoordinatesPixels.x = (stitchCoordinate.x - ZoomRect.left)*ZoomRatio.x + 0.5;
 	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (stitchCoordinate.y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 }
 
 void movins() {
-
 	if (StateMap.test(StateFlag::INSRT)) {
-
 		if (StateMap.test(StateFlag::LIN1)) {
-
 			if (StateMap.test(StateFlag::BAKEND))
 				stch2px1(PCSHeader.stitchCount - 1);
 			else
@@ -3013,13 +2847,11 @@ void defbNam() {
 }
 
 void ritini() noexcept {
-
 	unsigned	iColor = 0;
 	RECT		windowRect = {};
 
 	strcpy_s(IniFile.defaultDirectory, DefaultDirectory);
 	for (iColor = 0; iColor < 16; iColor++) {
-
 		IniFile.stitchColors[iColor] = UserColor[iColor];
 		IniFile.backgroundPreferredColors[iColor] = CustomBackgroundColor[iColor];
 		IniFile.stitchPreferredColors[iColor] = CustomColor[iColor];
@@ -3051,7 +2883,6 @@ void ritini() noexcept {
 	IniFile.buttonholeCornerLength = ButtonholeCornerLength;
 	IniFile.picotSpace = PicotSpacing;
 	if (!UserFlagMap.test(UserFlag::SAVMAX)) {
-
 		GetWindowRect(ThrEdWindow, &windowRect);
 		IniFile.initialWindowCoords.left = windowRect.left;
 		IniFile.initialWindowCoords.right = windowRect.right;
@@ -3066,7 +2897,6 @@ void ritini() noexcept {
 }
 
 bool savcmp() noexcept {
-
 #ifdef _DEBUG
 
 	return 1;
@@ -3078,8 +2908,7 @@ bool savcmp() noexcept {
 #endif
 }
 
-void thr2bal(unsigned destination, unsigned source, unsigned code)  {
-
+void thr2bal(unsigned destination, unsigned source, unsigned code) {
 #define BALRAT 1.6666666666667
 
 	BalaradStitch[destination].flag = 0;
@@ -3089,7 +2918,6 @@ void thr2bal(unsigned destination, unsigned source, unsigned code)  {
 }
 
 constexpr unsigned coldis(COLORREF colorA, COLORREF colorB) {
-
 	unsigned	distance = 0;
 
 	distance = ((colorA & 0xff) > (colorB & 0xff)) ? ((colorA & 0xff) - (colorB & 0xff)) : ((colorB & 0xff) - (colorA & 0xff));
@@ -3103,7 +2931,6 @@ constexpr unsigned coldis(COLORREF colorA, COLORREF colorB) {
 }
 
 void bal2thr(unsigned destination, unsigned source, unsigned code) noexcept {
-
 #define IBALRAT 0.6
 
 	StitchBuffer[destination].attribute = code;
@@ -3112,13 +2939,10 @@ void bal2thr(unsigned destination, unsigned source, unsigned code) noexcept {
 }
 
 unsigned colmatch(COLORREF color) noexcept {
-
 	unsigned	iColor = 0, distance = 0, minDistance = 0, iDistance = 0;
 
 	if (ColorChanges < 16) {
-
 		for (iColor = 0; iColor < ColorChanges; iColor++) {
-
 			if (color == UserColor[iColor])
 				return iColor;
 		}
@@ -3126,16 +2950,13 @@ unsigned colmatch(COLORREF color) noexcept {
 		return ColorChanges - 1;
 	}
 	else {
-
 		minDistance = 0xffffffff;
 		for (iColor = 0; iColor < ColorChanges; iColor++) {
-
 			distance = coldis(color, UserColor[iColor]);
 			if (!distance)
 				return iColor;
 			iDistance = 0;
 			if (distance < minDistance) {
-
 				iDistance = iColor;
 				minDistance = distance;
 			}
@@ -3145,7 +2966,6 @@ unsigned colmatch(COLORREF color) noexcept {
 }
 
 void redbal() {
-
 	HANDLE			balaradFile = {};
 	BALHED			balaradHeader = {};
 	unsigned long	bytesRead = 0;
@@ -3176,22 +2996,19 @@ void redbal() {
 			iBalaradStitch = 0;
 			ColorChanges = 1;
 			for (iStitch = 0; iStitch < stitchCount; iStitch++) {
-
 				switch (BalaradStitch[iStitch].code) {
+				case BALNORM:
 
-					case BALNORM:
+					bal2thr(iBalaradStitch++, iStitch, color);
+					break;
 
-						bal2thr(iBalaradStitch++, iStitch, color);
-						break;
+				case BALSTOP:
 
-					case BALSTOP:
-
-						color = colmatch(balaradHeader.color[iColor++]);
-						break;
+					color = colmatch(balaradHeader.color[iColor++]);
+					break;
 				}
 			}
 			for (iColor = 0; iColor < ColorChanges; iColor++) {
-
 				UserPen[iColor] = CreatePen(PS_SOLID, 1, UserColor[iColor]);
 				UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 			}
@@ -3207,7 +3024,6 @@ void redbal() {
 }
 
 void ritbal() {
-
 	BALHED			balaradHeader = {};
 	unsigned		iStitch = 0, iColor = 0, iOutput = 0, color = 0;
 	HANDLE			balaradFile = {};
@@ -3216,9 +3032,7 @@ void ritbal() {
 	unsigned long	bytesWritten = 0;
 
 	if (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount) {
-
 		if (!*WorkingFileName) {
-
 			strcpy_s(WorkingFileName, DefaultDirectory);
 			strcat_s(WorkingFileName, "\\balfil.thr");
 		}
@@ -3235,9 +3049,7 @@ void ritbal() {
 		balaradHeader.color[0] = UserColor[color];
 		iColor = 1;
 		for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 			if (color != (StitchBuffer[iStitch].attribute&COLMSK)) {
-
 				color = StitchBuffer[iStitch].attribute&COLMSK;
 				balaradHeader.color[iColor++] = UserColor[color];
 				if (iColor & 0xffffff00)
@@ -3257,10 +3069,8 @@ void ritbal() {
 		thr2bal(iOutput++, 0, BALJUMP);
 		BalaradStitch[iOutput].flag = gsl::narrow<unsigned char>(color);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount && iOutput < 2; iStitch++) {
-
 			thr2bal(iOutput++, iStitch, BALNORM);
 			if ((StitchBuffer[iStitch].attribute&COLMSK) != color) {
-
 				thr2bal(iOutput, iStitch, BALSTOP);
 				color = StitchBuffer[iStitch].attribute&COLMSK;
 				BalaradStitch[iOutput++].flag = gsl::narrow<unsigned char>(color);
@@ -3274,9 +3084,7 @@ void ritbal() {
 		delete[] BalaradStitch;
 	}
 	else {
-
 		if (*BalaradName1) {
-
 			balaradFile = CreateFile(BalaradName1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 			CloseHandle(balaradFile);
 		}
@@ -3286,7 +3094,6 @@ void ritbal() {
 }
 
 void savmsg() noexcept {
-
 	TCHAR	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_SAVFIL, buffer, HBUFSIZ);
@@ -3294,7 +3101,6 @@ void savmsg() noexcept {
 }
 
 void reldun() {
-
 	txdun();
 	ritbal();
 	ritini();
@@ -3303,12 +3109,10 @@ void reldun() {
 }
 
 void dun() {
-
 	savtxt();
 	txof();
 	rstxt();
 	if (StateMap.testAndReset(StateFlag::PRFACT)) {
-
 		DestroyWindow(PreferencesWindow);
 		StateMap.reset(StateFlag::WASRT);
 	}
@@ -3319,14 +3123,11 @@ void dun() {
 	if (savcmp() || (*BalaradName0))
 		reldun();
 	else {
-
 		if (StitchWindowClientRect.right) {
-
 			savdisc();
 			StateMap.set(StateFlag::SAVEX);
 		}
 		else {
-
 			savmsg();
 			if (MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_CLOS], MB_YESNO) == IDYES)
 				save();
@@ -3337,7 +3138,6 @@ void dun() {
 }
 
 void dusid(unsigned entry) noexcept {
-
 	SideWindow[entry] = CreateWindow(
 		"STATIC",
 		SideWindowsStrings[entry],
@@ -3473,7 +3273,6 @@ void sidmsg(HWND window, TCHAR** strings, unsigned entries) {
 
 
 void stchPars() {
-
 	AspectRatio = static_cast<double>(UnzoomedRect.x) / static_cast<double>(UnzoomedRect.y);
 	if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT))
 		StitchWindowSize.x = gsl::narrow<long>(round((ThredWindowRect.bottom - (SCROLSIZ << 1))*AspectRatio));
@@ -3481,14 +3280,12 @@ void stchPars() {
 		StitchWindowSize.x = gsl::narrow<long>(round((ThredWindowRect.bottom - SCROLSIZ)*AspectRatio));
 
 	if ((StitchWindowSize.x + gsl::narrow<long>(ButtonWidthX3) + RIGHTSIZ) < ThredWindowRect.right) {
-
 		if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT))
 			StitchWindowSize.y = ThredWindowRect.bottom - (SCROLSIZ << 1);
 		else
 			StitchWindowSize.y = ThredWindowRect.bottom - SCROLSIZ;
 	}
 	else {
-
 		StitchWindowSize.x = (ThredWindowRect.right - ButtonWidthX3 - COLSIZ);
 		StitchWindowSize.y = ThredWindowRect.bottom - ThredWindowRect.top;
 		if (static_cast<double>(StitchWindowSize.x) / static_cast<double>(StitchWindowSize.y) > AspectRatio)
@@ -3499,7 +3296,6 @@ void stchPars() {
 }
 
 void movStch() {
-
 	POINT		clientSize = { (ThredWindowRect.right - gsl::narrow<LONG>(ButtonWidthX3) - RIGHTSIZ),
 							   (ThredWindowRect.bottom) };
 	long		verticalOffset = 0;
@@ -3507,13 +3303,11 @@ void movStch() {
 
 	unboxs();
 	if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
-
 		verticalOffset = SCROLSIZ;
 		clientSize.y -= SCROLSIZ;
 		actualWindowHeight -= SCROLSIZ;
 	}
 	if (StateMap.test(StateFlag::ZUMED)) {
-
 		clientSize.y -= SCROLSIZ;
 		MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, clientSize.x, clientSize.y, FALSE);
 		MoveWindow(VerticalScrollBar, ButtonWidthX3 + clientSize.x, 0, SCROLSIZ, clientSize.y, TRUE);
@@ -3525,7 +3319,6 @@ void movStch() {
 		ShowWindow(HorizontalScrollBar, TRUE);
 	}
 	else {
-
 		stchPars();
 		actualWindowHeight = StitchWindowSize.y + SCROLSIZ;
 		MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, StitchWindowSize.x, actualWindowHeight, TRUE);
@@ -3541,35 +3334,29 @@ void movStch() {
 }
 
 void zRctAdj() noexcept {
-
 	double	adjustment = 0.0;
 
 	if (ZoomRect.top > UnzoomedRect.y) {
-
 		adjustment = ZoomRect.top - UnzoomedRect.y;
 		ZoomRect.top -= adjustment;
 		ZoomRect.bottom -= adjustment;
 	}
 	if (ZoomRect.bottom < 0) {
-
 		ZoomRect.top -= ZoomRect.bottom;
 		ZoomRect.bottom = 0;
 	}
 	if (ZoomRect.right > UnzoomedRect.x) {
-
 		adjustment = ZoomRect.right - UnzoomedRect.x;
 		ZoomRect.right -= adjustment;
 		ZoomRect.left -= adjustment;
 	}
 	if (ZoomRect.left < 0) {
-
 		ZoomRect.right -= ZoomRect.left;
 		ZoomRect.left = 0;
 	}
 }
 
 void shft(fPOINT delta) noexcept {
-
 	dPOINT	halfZoomRect = { ((ZoomRect.right - ZoomRect.left) / 2),
 							 ((ZoomRect.top - ZoomRect.bottom) / 2) };
 	dPOINT	center = { (ZoomRect.left + halfZoomRect.x),
@@ -3586,7 +3373,6 @@ void shft(fPOINT delta) noexcept {
 }
 
 void centr() noexcept {
-
 	POINT center = { static_cast<LONG>((ZoomRect.right - ZoomRect.left) / 2),
 					 static_cast<LONG>((ZoomRect.top - ZoomRect.bottom) / 2) };
 
@@ -3595,7 +3381,6 @@ void centr() noexcept {
 }
 
 double pxchk(double pixelSize) noexcept {
-
 	if (pixelSize < 0.2)
 		return 1;
 	if (pixelSize > 20)
@@ -3604,16 +3389,13 @@ double pxchk(double pixelSize) noexcept {
 }
 
 void chknum() {
-
 	double		value = atof(MsgBuffer);
 	unsigned	edgeType = 0, borderColor = 0;
 
 	clrstch();
 	if (StateMap.testAndReset(StateFlag::ENTRDUP)) {
-
 		if (value) {
-
-			RotationAngle = value*PI / 180;
+			RotationAngle = value * PI / 180;
 			IniFile.rotationAngle = RotationAngle;
 		}
 		else
@@ -3622,10 +3404,8 @@ void chknum() {
 		return;
 	}
 	if (StateMap.testAndReset(StateFlag::NUROT)) {
-
 		if (value) {
-
-			RotationAngle = value*PI / 180;
+			RotationAngle = value * PI / 180;
 			IniFile.rotationAngle = RotationAngle;
 		}
 		else
@@ -3633,9 +3413,7 @@ void chknum() {
 		return;
 	}
 	if (StateMap.testAndReset(StateFlag::ENTRSEG)) {
-
 		if (value) {
-
 			RotationAngle = 2 * PI / value;
 			IniFile.rotationAngle = RotationAngle;
 		}
@@ -3644,10 +3422,8 @@ void chknum() {
 		return;
 	}
 	if (StateMap.testAndReset(StateFlag::ENTROT)) {
-
 		if (value) {
-
-			RotationAngle = value*PI / 180;
+			RotationAngle = value * PI / 180;
 			IniFile.rotationAngle = RotationAngle;
 		}
 		else
@@ -3657,173 +3433,166 @@ void chknum() {
 	}
 	if (MsgIndex) {
 		if (FormMenuChoice) {
-
 			value = atof(SideWindowEntryBuffer)*PFGRAN;
 			switch (FormMenuChoice) {
+			case LTXOF:
 
-				case LTXOF:
+				savdo();
+				SelectedForm->txof = value;
+				break;
 
+			case LUANG:
+
+				savdo();
+				SelectedForm->underlayStitchAngle = value / 180 * PI / PFGRAN;
+				break;
+
+			case LUSPAC:
+
+				savdo();
+				SelectedForm->underlaySpacing = value;
+				break;
+
+			case LWLKIND:
+
+				savdo();
+				SelectedForm->underlayIndent = value;
+				break;
+
+			case LULEN:
+
+				savdo();
+				SelectedForm->underlayStitchLen = value;
+				break;
+
+			case LDSTRT:
+
+				savdo();
+				SelectedForm->fillStart = value / PFGRAN;
+				SelectedForm->fillStart %= VertexCount;
+				break;
+
+			case LDEND:
+
+				savdo();
+				SelectedForm->fillEnd = value / PFGRAN;
+				SelectedForm->fillEnd %= VertexCount;
+				break;
+
+			case LFTHUPCNT:
+
+				savdo();
+				value /= PFGRAN;
+				if (value > 255)
+					value = 255;
+				SelectedForm->fillInfo.feather.upCount = value;
+				break;
+
+			case LFTHCOL:
+
+				if (value) {
 					savdo();
-					SelectedForm->txof = value;
-					break;
+					nufthcol((atoi(SideWindowEntryBuffer) - 1) & 0xf);
+					SetWindowText(ValueWindow[LFRMCOL], SideWindowEntryBuffer);
+					coltab();
+				}
+				unsid();
+				StateMap.set(StateFlag::RESTCH);
+				return;
 
-				case LUANG:
+			case LFRMCOL:
 
+				if (value) {
 					savdo();
-					SelectedForm->underlayStitchAngle = value / 180 * PI / PFGRAN;
-					break;
+					nufilcol((atoi(SideWindowEntryBuffer) - 1) & 0xf);
+					SetWindowText(ValueWindow[LFRMCOL], SideWindowEntryBuffer);
+					coltab();
+				}
+				unsid();
+				StateMap.set(StateFlag::RESTCH);
+				return;
 
-				case LUSPAC:
+			case LUNDCOL:
 
+				if (value) {
 					savdo();
-					SelectedForm->underlaySpacing = value;
-					break;
+					SelectedForm->underlayColor = (atoi(SideWindowEntryBuffer) - 1) & 0xf;
+					SetWindowText(ValueWindow[LUNDCOL], SideWindowEntryBuffer);
+					refilfn();
+					coltab();
+				}
+				unsid();
+				StateMap.set(StateFlag::RESTCH);
+				return;
 
-				case LWLKIND:
+			case LBRDCOL:
 
+				if (value) {
 					savdo();
-					SelectedForm->underlayIndent = value;
-					break;
+					nubrdcol((atoi(SideWindowEntryBuffer) - 1) & 0xf);
+					SetWindowText(ValueWindow[LFRMCOL], SideWindowEntryBuffer);
+					coltab();
+				}
+				unsid();
+				StateMap.set(StateFlag::RESTCH);
+				return;
 
-				case LULEN:
+			case LBRDPIC:
 
-					savdo();
-					SelectedForm->underlayStitchLen = value;
-					break;
+				savdo();
+				SelectedForm->edgeSpacing = value;
+				refil();
+				return;
 
-				case LDSTRT:
+			case LFRMFAZ:
 
-					savdo();
-					SelectedForm->fillStart = value / PFGRAN;
-					SelectedForm->fillStart %= VertexCount;
-					break;
+				savdo();
+				SelectedForm->wordParam = floor(value) / PFGRAN;
+				unsid();
+				refil();
+				return;
 
-				case LDEND:
+			case LBRDPOS:
 
-					savdo();
-					SelectedForm->fillEnd = value / PFGRAN;
-					SelectedForm->fillEnd %= VertexCount;
-					break;
+				savdo();
+				SelectedForm->edgeStitchLen = value / PFGRAN;
+				unsid();
+				refil();
+				return;
 
-				case LFTHUPCNT:
+			case LMAXFIL:
 
-					savdo();
-					value /= PFGRAN;
-					if (value > 255)
-						value = 255;
-					SelectedForm->fillInfo.feather.upCount = value;
-					break;
+				savdo();
+				SelectedForm->maxFillStitchLen = value;
+				unsid();
+				refil();
+				return;
 
-				case LFTHCOL:
+			case LMINFIL:
 
-					if (value) {
+				savdo();
+				SelectedForm->minFillStitchLen = value;
+				unsid();
+				refil();
+				return;
 
-						savdo();
-						nufthcol((atoi(SideWindowEntryBuffer) - 1) & 0xf);
-						SetWindowText(ValueWindow[LFRMCOL], SideWindowEntryBuffer);
-						coltab();
-					}
-					unsid();
-					StateMap.set(StateFlag::RESTCH);
-					return;
+			case LMAXBRD:
 
-				case LFRMCOL:
+				savdo();
+				SelectedForm->maxBorderStitchLen = value;
+				unsid();
+				refil();
+				return;
 
-					if (value) {
+			case LMINBRD:
 
-						savdo();
-						nufilcol((atoi(SideWindowEntryBuffer) - 1) & 0xf);
-						SetWindowText(ValueWindow[LFRMCOL], SideWindowEntryBuffer);
-						coltab();
-					}
-					unsid();
-					StateMap.set(StateFlag::RESTCH);
-					return;
-
-				case LUNDCOL:
-
-					if (value) {
-
-						savdo();
-						SelectedForm->underlayColor = (atoi(SideWindowEntryBuffer) - 1) & 0xf;
-						SetWindowText(ValueWindow[LUNDCOL], SideWindowEntryBuffer);
-						refilfn();
-						coltab();
-					}
-					unsid();
-					StateMap.set(StateFlag::RESTCH);
-					return;
-
-				case LBRDCOL:
-
-					if (value) {
-
-						savdo();
-						nubrdcol((atoi(SideWindowEntryBuffer) - 1) & 0xf);
-						SetWindowText(ValueWindow[LFRMCOL], SideWindowEntryBuffer);
-						coltab();
-					}
-					unsid();
-					StateMap.set(StateFlag::RESTCH);
-					return;
-
-				case LBRDPIC:
-
-					savdo();
-					SelectedForm->edgeSpacing = value;
-					refil();
-					return;
-
-				case LFRMFAZ:
-
-					savdo();
-					SelectedForm->wordParam = floor(value) / PFGRAN;
-					unsid();
-					refil();
-					return;
-
-				case LBRDPOS:
-
-					savdo();
-					SelectedForm->edgeStitchLen = value / PFGRAN;
-					unsid();
-					refil();
-					return;
-
-				case LMAXFIL:
-
-					savdo();
-					SelectedForm->maxFillStitchLen = value;
-					unsid();
-					refil();
-					return;
-
-				case LMINFIL:
-
-					savdo();
-					SelectedForm->minFillStitchLen = value;
-					unsid();
-					refil();
-					return;
-
-				case LMAXBRD:
-
-					savdo();
-					SelectedForm->maxBorderStitchLen = value;
-					unsid();
-					refil();
-					return;
-
-				case LMINBRD:
-
-					savdo();
-					SelectedForm->minBorderStitchLen = value;
-					unsid();
-					refil();
-					return;
+				savdo();
+				SelectedForm->minBorderStitchLen = value;
+				unsid();
+				refil();
+				return;
 			}
 			if (FormMenuChoice == LBCSIZ) {
-
 				savdo();
 				if (SelectedForm->edgeType == EDGEBHOL)
 					savblen(static_cast<float>(value));
@@ -3831,111 +3600,106 @@ void chknum() {
 					savplen(static_cast<float>(value));
 			}
 			else {
-
 				if (value) {
-
 					switch (FormMenuChoice) {
+					case LFTHSIZ:
 
-						case LFTHSIZ:
+						savdo();
+						SelectedForm->fillInfo.feather.ratio = value / PFGRAN;
+						break;
 
-							savdo();
-							SelectedForm->fillInfo.feather.ratio = value / PFGRAN;
+					case LFTHNUM:
+
+						savdo();
+						SelectedForm->fillInfo.feather.count = value / PFGRAN;
+						break;
+
+					case LFTHFLR:
+
+						savdo();
+						SelectedForm->fillInfo.feather.minStitchSize = value;
+						break;
+
+					case LFTHDWNCNT:
+
+						savdo();
+						value /= PFGRAN;
+						if (value > 255)
+							value = 255;
+						SelectedForm->fillInfo.feather.downCount = value;
+						break;
+
+					case LFRMSPAC:
+
+						savdo();
+						SelectedForm->fillSpacing = value;
+						break;
+
+					case LFRMLEN:
+
+						savdo();
+						SelectedForm->lengthOrCount.stitchLength = value;
+						break;
+
+					case LBRDSPAC:
+
+						savdo();
+						edgeType = SelectedForm->edgeType&NEGUND;
+						switch (edgeType) {
+						case EDGEPROPSAT:
+
+							SelectedForm->edgeSpacing = value;
 							break;
 
-						case LFTHNUM:
+						case EDGEOCHAIN:
+						case EDGELCHAIN:
 
-							savdo();
-							SelectedForm->fillInfo.feather.count = value / PFGRAN;
+							SelectedForm->edgeSpacing = value;
 							break;
 
-						case LFTHFLR:
+						default:
 
-							savdo();
-							SelectedForm->fillInfo.feather.minStitchSize = value;
-							break;
+							SelectedForm->edgeSpacing = value / 2;
+						}
+						break;
 
-						case LFTHDWNCNT:
+					case LBRDLEN:
 
-							savdo();
-							value /= PFGRAN;
-							if (value > 255)
-								value = 255;
-							SelectedForm->fillInfo.feather.downCount = value;
-							break;
+						savdo();
+						SelectedForm->edgeStitchLen = value;
+						break;
 
-						case LFRMSPAC:
+					case LBRDSIZ:
 
-							savdo();
-							SelectedForm->fillSpacing = value;
-							break;
+						savdo();
+						SelectedForm->borderSize = value;
+						break;
 
-						case LFRMLEN:
+					case LFRMANG:
 
-							savdo();
-							SelectedForm->lengthOrCount.stitchLength = value;
-							break;
+						savdo();
+						SelectedForm->angleOrClipData.angle = value / 180 * PI / PFGRAN;
+						break;
 
-						case LBRDSPAC:
+					case LSACANG:
 
-							savdo();
-							edgeType = SelectedForm->edgeType&NEGUND;
-							switch (edgeType) {
+						savdo();
+						SelectedForm->satinOrAngle.angle = value / 180 * PI / PFGRAN;
+						break;
 
-								case EDGEPROPSAT:
+					case LAPCOL:
 
-									SelectedForm->edgeSpacing = value;
-									break;
-
-								case EDGEOCHAIN:
-								case EDGELCHAIN:
-
-									SelectedForm->edgeSpacing = value;
-									break;
-
-								default:
-
-									SelectedForm->edgeSpacing = value / 2;
-							}
-							break;
-
-						case LBRDLEN:
-
-							savdo();
-							SelectedForm->edgeStitchLen = value;
-							break;
-
-						case LBRDSIZ:
-
-							savdo();
-							SelectedForm->borderSize = value;
-							break;
-
-						case LFRMANG:
-
-							savdo();
-							SelectedForm->angleOrClipData.angle = value / 180 * PI / PFGRAN;
-							break;
-
-						case LSACANG:
-
-							savdo();
-							SelectedForm->satinOrAngle.angle = value / 180 * PI / PFGRAN;
-							break;
-
-						case LAPCOL:
-
-							savdo();
-							SelectedForm->borderColor &= COLMSK;
-							borderColor = value / PFGRAN;
-							if (borderColor)
-								borderColor--;
-							borderColor &= COLMSK;
-							SelectedForm->borderColor |= (borderColor << 4);
-							break;
+						savdo();
+						SelectedForm->borderColor &= COLMSK;
+						borderColor = value / PFGRAN;
+						if (borderColor)
+							borderColor--;
+						borderColor &= COLMSK;
+						SelectedForm->borderColor |= (borderColor << 4);
+						break;
 					}
 				}
 				else {
-
 					savdo();
 					if (FormMenuChoice == LFRMSPAC && isfclp())
 						SelectedForm->fillSpacing = 0;
@@ -3945,192 +3709,186 @@ void chknum() {
 			refil();
 		}
 		else {
-
 			if (PreferenceIndex) {
-
 				value = atof(SideWindowEntryBuffer);
 				switch (PreferenceIndex - 1) {
+				case PEG:
 
-					case PEG:
+					IniFile.eggRatio = value;
+					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
+					SetWindowText(ValueWindow[PEG], MsgBuffer);
+					break;
 
-						IniFile.eggRatio = value;
+				case PNUDG:
+
+					IniFile.cursorNudgeStep = value;
+					IniFile.nudgePixels = pxchk(value);
+					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
+					SetWindowText(ValueWindow[PNUDG], MsgBuffer);
+					break;
+
+				case PPIC:
+
+					PicotSpacing = value * PFGRAN;
+					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
+					SetWindowText(ValueWindow[PPIC], MsgBuffer);
+					break;
+
+				case PCLPOF:
+
+					IniFile.clipOffset = value * PFGRAN;
+					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f mm", value);
+					SetWindowText(ValueWindow[PCLPOF], MsgBuffer);
+					break;
+
+				case PFAZ:
+
+					IniFile.fillPhase = floor(value);
+					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", IniFile.fillPhase);
+					SetWindowText(ValueWindow[PFAZ], MsgBuffer);
+					break;
+
+				case PCHRAT:
+
+					IniFile.chainRatio = value;
+					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.chainRatio);
+					SetWindowText(ValueWindow[PCHRAT], MsgBuffer);
+					break;
+
+				case PMIN:
+
+					MinStitchLength = value * PFGRAN;
+					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
+					SetWindowText(ValueWindow[PMIN], MsgBuffer);
+					break;
+
+				default:
+
+					if (value) {
 						sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
-						SetWindowText(ValueWindow[PEG], MsgBuffer);
-						break;
+						switch (PreferenceIndex - 1) {
+						case PSPAC:
 
-					case PNUDG:
+							LineSpacing = value * PFGRAN;
+							SetWindowText(ValueWindow[PSPAC], MsgBuffer);
+							break;
 
-						IniFile.cursorNudgeStep = value;
-						IniFile.nudgePixels = pxchk(value);
-						sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
-						SetWindowText(ValueWindow[PNUDG], MsgBuffer);
-						break;
+						case PANGL:
 
-					case PPIC:
+							IniFile.fillAngle = value / 180 * PI;
+							SetWindowText(ValueWindow[PANGL], MsgBuffer);
+							break;
 
-						PicotSpacing = value*PFGRAN;
-						sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
-						SetWindowText(ValueWindow[PPIC], MsgBuffer);
-						break;
+						case PSAT:
 
-					case PCLPOF:
+							BorderWidth = value * PFGRAN;
+							IniFile.borderWidth = BorderWidth;
+							SetWindowText(ValueWindow[PSAT], MsgBuffer);
+							break;
 
-						IniFile.clipOffset = value*PFGRAN;
-						sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f mm", value);
-						SetWindowText(ValueWindow[PCLPOF], MsgBuffer);
-						break;
+						case PMAX:
 
-					case PFAZ:
+							IniFile.maxStitchLength = value * PFGRAN;
+							SetWindowText(ValueWindow[PMAX], MsgBuffer);
+							break;
 
-						IniFile.fillPhase = floor(value);
-						sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", IniFile.fillPhase);
-						SetWindowText(ValueWindow[PFAZ], MsgBuffer);
-						break;
+						case PUSE:
 
-					case PCHRAT:
+							UserStitchLength = value * PFGRAN;
+							SetWindowText(ValueWindow[PUSE], MsgBuffer);
+							break;
 
-						IniFile.chainRatio = value;
-						sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.chainRatio);
-						SetWindowText(ValueWindow[PCHRAT], MsgBuffer);
-						break;
+						case PSMAL:
 
-					case PMIN:
+							SmallStitchLength = value * PFGRAN;
+							SetWindowText(ValueWindow[PSMAL], MsgBuffer);
+							break;
 
-						MinStitchLength = value*PFGRAN;
-						sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
-						SetWindowText(ValueWindow[PMIN], MsgBuffer);
-						break;
+						case PAP:
 
-					default:
+							AppliqueColor = gsl::narrow<unsigned>(round(value - 1)) % 16;
+							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", AppliqueColor + 1);
+							SetWindowText(ValueWindow[PAP], MsgBuffer);
+							break;
 
-						if (value) {
+						case PSNP:
 
+							SnapLength = value * PFGRAN;
+							SetWindowText(ValueWindow[PSNP], MsgBuffer);
+							break;
+
+						case PSTAR:
+
+							StarRatio = value;
+							if (StarRatio > 1)
+								StarRatio = 1;
+							if (StarRatio < 0.05)
+								StarRatio = 0.05;
+							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", StarRatio);
+							SetWindowText(ValueWindow[PSTAR], MsgBuffer);
+							break;
+
+						case PSPIR:
+
+							SpiralWrap = value;
+							if (StarRatio > 20)
+								StarRatio = 20.;
+							if (StarRatio < 0.3)
+								StarRatio = 0.3;
+							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SpiralWrap);
+							SetWindowText(ValueWindow[PSPIR], MsgBuffer);
+							break;
+
+						case PBUT:
+
+							ButtonholeCornerLength = value * PFGRAN;
 							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
-							switch (PreferenceIndex - 1) {
+							SetWindowText(ValueWindow[PBUT], MsgBuffer);
+							break;
 
-								case PSPAC:
+						case PHUPX:
 
-									LineSpacing = value*PFGRAN;
-									SetWindowText(ValueWindow[PSPAC], MsgBuffer);
-									break;
+							IniFile.hoopSizeX = value * PFGRAN;
+							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.0f mm", value);
+							SetWindowText(ValueWindow[PHUPX], MsgBuffer);
+							sethup();
+							prfmsg();
+							chkhup();
+							break;
 
-								case PANGL:
+						case PHUPY:
 
-									IniFile.fillAngle = value / 180 * PI;
-									SetWindowText(ValueWindow[PANGL], MsgBuffer);
-									break;
+							IniFile.hoopSizeY = value * PFGRAN;
+							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.0f mm", value);
+							SetWindowText(ValueWindow[PHUPY], MsgBuffer);
+							sethup();
+							prfmsg();
+							chkhup();
+							break;
 
-								case PSAT:
+						case PGRD:
 
-									BorderWidth = value*PFGRAN;
-									IniFile.borderWidth = BorderWidth;
-									SetWindowText(ValueWindow[PSAT], MsgBuffer);
-									break;
+							IniFile.gridSize = value * PFGRAN;
+							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f mm", value);
+							SetWindowText(ValueWindow[PGRD], MsgBuffer);
+							break;
 
-								case PMAX:
+						case PCHN:
 
-									IniFile.maxStitchLength = value*PFGRAN;
-									SetWindowText(ValueWindow[PMAX], MsgBuffer);
-									break;
-
-								case PUSE:
-
-									UserStitchLength = value*PFGRAN;
-									SetWindowText(ValueWindow[PUSE], MsgBuffer);
-									break;
-
-								case PSMAL:
-
-									SmallStitchLength = value*PFGRAN;
-									SetWindowText(ValueWindow[PSMAL], MsgBuffer);
-									break;
-
-								case PAP:
-
-									AppliqueColor = gsl::narrow<unsigned>(round(value - 1)) % 16;
-									sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", AppliqueColor + 1);
-									SetWindowText(ValueWindow[PAP], MsgBuffer);
-									break;
-
-								case PSNP:
-
-									SnapLength = value*PFGRAN;
-									SetWindowText(ValueWindow[PSNP], MsgBuffer);
-									break;
-
-								case PSTAR:
-
-									StarRatio = value;
-									if (StarRatio > 1)
-										StarRatio = 1;
-									if (StarRatio < 0.05)
-										StarRatio = 0.05;
-									sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", StarRatio);
-									SetWindowText(ValueWindow[PSTAR], MsgBuffer);
-									break;
-
-								case PSPIR:
-
-									SpiralWrap = value;
-									if (StarRatio > 20)
-										StarRatio = 20.;
-									if (StarRatio < 0.3)
-										StarRatio = 0.3;
-									sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SpiralWrap);
-									SetWindowText(ValueWindow[PSPIR], MsgBuffer);
-									break;
-
-								case PBUT:
-
-									ButtonholeCornerLength = value*PFGRAN;
-									sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
-									SetWindowText(ValueWindow[PBUT], MsgBuffer);
-									break;
-
-								case PHUPX:
-
-									IniFile.hoopSizeX = value*PFGRAN;
-									sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.0f mm", value);
-									SetWindowText(ValueWindow[PHUPX], MsgBuffer);
-									sethup();
-									prfmsg();
-									chkhup();
-									break;
-
-								case PHUPY:
-
-									IniFile.hoopSizeY = value*PFGRAN;
-									sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.0f mm", value);
-									SetWindowText(ValueWindow[PHUPY], MsgBuffer);
-									sethup();
-									prfmsg();
-									chkhup();
-									break;
-
-								case PGRD:
-
-									IniFile.gridSize = value*PFGRAN;
-									sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f mm", value);
-									SetWindowText(ValueWindow[PGRD], MsgBuffer);
-									break;
-
-								case PCHN:
-
-									IniFile.chainSpace = value*PFGRAN;
-									sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
-									SetWindowText(ValueWindow[PCHN], MsgBuffer);
-									break;
-							}
+							IniFile.chainSpace = value * PFGRAN;
+							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
+							SetWindowText(ValueWindow[PCHN], MsgBuffer);
+							break;
 						}
+					}
 				}
 				unsid();
 				PreferenceIndex = 0;
 			}
 			else {
-
 				value = atof(MsgBuffer);
 				if (StateMap.testAndReset(StateFlag::SCLPSPAC))
-					IniFile.clipOffset = value*PFGRAN;
+					IniFile.clipOffset = value * PFGRAN;
 				if (StateMap.testAndReset(StateFlag::FSETFIND))
 					dufind(value);
 				if (StateMap.testAndReset(StateFlag::FSETFHI)) {
@@ -4191,13 +3949,13 @@ void chknum() {
 					IniFile.underlayAngle = value / 180 * PI;
 				if (StateMap.testAndReset(StateFlag::GTUSPAC)) {
 					if (value)
-						IniFile.underlaySpacing = value*PFGRAN;
+						IniFile.underlaySpacing = value * PFGRAN;
 				}
 				if (StateMap.testAndReset(StateFlag::GTWLKIND))
-					IniFile.underlayIndent = value*PFGRAN;
+					IniFile.underlayIndent = value * PFGRAN;
 				if (StateMap.testAndReset(StateFlag::GTWLKLEN)) {
 					if (value)
-						IniFile.underlayStitchLen = value*PFGRAN;
+						IniFile.underlayStitchLen = value * PFGRAN;
 				}
 				if (StateMap.testAndReset(StateFlag::PIXIN))
 					IniFile.nudgePixels = pxchk(value);
@@ -4208,7 +3966,7 @@ void chknum() {
 				if (StateMap.testAndReset(StateFlag::FRMBOXIN))
 					IniFile.formBoxSizePixels = value;
 				if (StateMap.testAndReset(StateFlag::GETMIN))
-					SmallStitchLength = value*PFGRAN;
+					SmallStitchLength = value * PFGRAN;
 				if (StateMap.testAndReset(StateFlag::ENTR30))
 					ThreadSize30 = value;
 				if (StateMap.testAndReset(StateFlag::ENTR40))
@@ -4216,7 +3974,6 @@ void chknum() {
 				if (StateMap.testAndReset(StateFlag::ENTR60))
 					ThreadSize60 = value;
 				if (StateMap.testAndReset(StateFlag::ENTRFNUM)) {
-
 					if (value < FormIndex)
 						frmnumfn(value);
 					else
@@ -4227,7 +3984,7 @@ void chknum() {
 				if (StateMap.testAndReset(StateFlag::ENTRPOL))
 					durpoli(value);
 				if (StateMap.testAndReset(StateFlag::ENTRSTAR))
-					dustar(value, 250 / value*ZoomFactor*(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY));
+					dustar(value, 250 / value * ZoomFactor*(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY));
 				if (StateMap.testAndReset(StateFlag::ENTRSPIR))
 					duspir(value);
 				if (StateMap.testAndReset(StateFlag::ENTRHART))
@@ -4245,7 +4002,6 @@ void chknum() {
 }
 
 void noMsg() {
-
 	if (DestroyWindow(MsgWindow))
 		MsgWindow = 0;
 	DestroyWindow(OKButton);
@@ -4261,7 +4017,6 @@ void noMsg() {
 }
 
 void stchWnd() {
-
 	stchPars();
 
 	MainStitchWin = nullptr;
@@ -4314,7 +4069,6 @@ void stchWnd() {
 //check if a click occurred in A vertical set of 16 windows
 // and calculate which window had the click
 unsigned chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept {
-
 	RECT	topRect = {};
 	RECT	bottomRect = {};
 
@@ -4322,7 +4076,6 @@ unsigned chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept {
 	GetWindowRect(bottomWindow, &bottomRect);
 
 	if (clickCoord.x > topRect.left && clickCoord.x<bottomRect.right && clickCoord.y>topRect.top && clickCoord.y < bottomRect.bottom) {
-
 		VerticalIndex = 15 - (bottomRect.bottom - clickCoord.y) / ButtonHeight;
 		return 1;
 	}
@@ -4331,11 +4084,8 @@ unsigned chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept {
 }
 
 void delstch1(unsigned iStitch) {
-
 	if (PCSHeader.stitchCount) {
-
 		while (iStitch <= PCSHeader.stitchCount) {
-
 			StitchBuffer[iStitch].attribute = StitchBuffer[iStitch + 1].attribute;
 			StitchBuffer[iStitch].x = StitchBuffer[iStitch + 1].x;
 			StitchBuffer[iStitch].y = StitchBuffer[iStitch + 1].y;
@@ -4348,7 +4098,6 @@ void delstch1(unsigned iStitch) {
 }
 
 void stchred(unsigned count, const fPOINTATTR* source) noexcept {
-
 #if  __UseASM__
 	_asm {
 		mov		edi, offset StitchBuffer
@@ -4362,7 +4111,6 @@ void stchred(unsigned count, const fPOINTATTR* source) noexcept {
 }
 
 void redbak() {
-
 	const BAKHED*	undoData = static_cast<BAKHED *>(UndoBuffer[UndoBufferWriteIndex]);
 	if (undoData) {
 		unsigned		iColor = 0;
@@ -4401,26 +4149,21 @@ void redbak() {
 }
 
 void redo() {
-
 	unsigned nextBufferIndex = 0;
 
 	if (StateMap.test(StateFlag::BAKACT) && StateMap.test(StateFlag::REDUSHO)) {
-
 		UndoBufferWriteIndex++;
 		UndoBufferWriteIndex &= 0xf;
 		nextBufferIndex = (UndoBufferWriteIndex + 1) & 0xf;
 		if (nextBufferIndex == UndoBufferReadIndex) {
-
 			EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
 			StateMap.reset(StateFlag::REDUSHO);
 		}
 		else {
-
 			if (!StateMap.testAndSet(StateFlag::REDUSHO))
 				EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED);
 		}
 		if (!StateMap.testAndSet(StateFlag::UNDUSHO)) {
-
 			EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED);
 		}
 		redbak();
@@ -4429,7 +4172,6 @@ void redo() {
 }
 
 void bak() {
-
 	unsigned	previousBufferIndex = 0;
 
 	unmsg();
@@ -4437,42 +4179,35 @@ void bak() {
 	StateMap.reset(StateFlag::FRMPSEL);
 	StateMap.reset(StateFlag::BIGBOX);
 	if (StateMap.testAndReset(StateFlag::PRFACT)) {
-
 		StateMap.reset(StateFlag::WASRT);
 		DestroyWindow(PreferencesWindow);
 		PreferenceIndex = 0;
 		unsid();
 	}
 	if (!StateMap.testAndSet(StateFlag::BAKING)) {
-
 		dudat();
 		UndoBufferReadIndex = UndoBufferWriteIndex + 1;
 	}
 	if (StateMap.test(StateFlag::BAKWRAP)) {
-
 		UndoBufferWriteIndex--;
 		UndoBufferWriteIndex &= 0xf;
 		previousBufferIndex = UndoBufferWriteIndex - 1;
 		if (previousBufferIndex == UndoBufferReadIndex) {
-
 			EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
 			StateMap.set(StateFlag::DUMEN);
 			StateMap.reset(StateFlag::UNDUSHO);
 		}
 	}
 	else {
-
 		if (UndoBufferWriteIndex)
 			UndoBufferWriteIndex--;
 		if (!UndoBufferWriteIndex) {
-
 			EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
 			StateMap.set(StateFlag::DUMEN);
 			StateMap.reset(StateFlag::UNDUSHO);
 		}
 	}
 	if (!StateMap.testAndSet(StateFlag::REDUSHO)) {
-
 		EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED);
 		StateMap.set(StateFlag::DUMEN);
 	}
@@ -4482,17 +4217,14 @@ void bak() {
 }
 
 void bitsiz() noexcept {
-
 	const double	screenAspectRatio = static_cast<double>(UnzoomedRect.x) / UnzoomedRect.y;
 	const double	bitmapAspectRatio = static_cast<double>(BitmapWidth) / BitmapHeight;
 
 	if (bitmapAspectRatio > screenAspectRatio) {
-
 		BitmapSizeinStitches.x = UnzoomedRect.x;
 		BitmapSizeinStitches.y = UnzoomedRect.x / bitmapAspectRatio;
 	}
 	else {
-
 		BitmapSizeinStitches.y = UnzoomedRect.y;
 		BitmapSizeinStitches.x = UnzoomedRect.y*bitmapAspectRatio;
 	}
@@ -4520,7 +4252,7 @@ bool binv(const std::vector<unsigned char> &monoBitmapData, unsigned bitmapWidth
 						whiteBits++;
 				}
 			}
-		} 
+		}
 		else {
 			throw;
 		}
@@ -4550,7 +4282,6 @@ void bitlin(const unsigned char* source, unsigned* destination, COLORREF foregro
 }
 
 COLORREF fswap(COLORREF color) noexcept {
-
 #if  __UseASM__
 	_asm {
 		mov		eax, color
@@ -4563,20 +4294,18 @@ COLORREF fswap(COLORREF color) noexcept {
 }
 
 bool gudtyp(WORD bitCount) noexcept {
-
 	switch (bitCount) {
+	case 1:
 
-		case 1:
+		return 1;
 
-			return 1;
+	case 24:
 
-		case 24:
+		return 1;
 
-			return 1;
+	case 32:
 
-		case 32:
-
-			return 1;
+		return 1;
 	}
 	return 0;
 }
@@ -4595,27 +4324,21 @@ void movmap(unsigned cnt, unsigned char *buffer) noexcept {
 }
 
 void savmap() {
-
 	unsigned long	bytesWritten = 0;
 	unsigned char*	buffer = nullptr;
 
 	if (PCSBMPFileName[0]) {
-
 		if (StateMap.test(StateFlag::MONOMAP)) {
-
 			tabmsg(IDS_SAVMAP);
 			return;
 		}
 		if (!StateMap.test(StateFlag::WASTRAC)) {
-
 			tabmsg(IDS_MAPCHG);
 			return;
 		}
 		if (GetSaveFileName(&OpenBitmapName)) {
-
 			BitmapFileHandle = CreateFile(UserBMPFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 			if (IniFileHandle == INVALID_HANDLE_VALUE) {
-
 				crmsg(UserBMPFileName);
 				return;
 			}
@@ -4651,7 +4374,6 @@ HBITMAP getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO *pbmi, _Outptr_ unsigned i
 }
 
 void bfil() {
-
 	unsigned		bitmapWidthBytes = 0, widthOverflow = 0, fileHeaderSize = 0, bitmapSizeBytes = 0, iHeight = 0;
 	unsigned int*	bits = nullptr;
 	HBITMAP			bitmap = {};
@@ -4663,7 +4385,6 @@ void bfil() {
 	InverseBackgroundColor = fswap(BackgroundColor);
 	BitmapFileHandle = CreateFile(UserBMPFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 	if (BitmapFileHandle == INVALID_HANDLE_VALUE) {
-
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Couldn't open bitmap file: %s\n", UserBMPFileName);
 		shoMsg(MsgBuffer);
 		CloseHandle(BitmapFileHandle);
@@ -4673,14 +4394,12 @@ void bfil() {
 	}
 	ReadFile(BitmapFileHandle, &BitmapFileHeader, 14, &BytesRead, NULL);
 	if (BitmapFileHeader.bfType == 'MB') {
-
 		fileHeaderSize = BitmapFileHeader.bfOffBits - 14;
 		if (fileHeaderSize > sizeof(BITMAPV4HEADER))
 			fileHeaderSize = sizeof(BITMAPV4HEADER);
 		ReadFile(BitmapFileHandle, &BitmapFileHeaderV4, fileHeaderSize, &BytesRead, NULL);
 	}
 	else {
-
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%s is not a Windows Bitmap\n", UserBMPFileName);
 		CloseHandle(BitmapFileHandle);
 		BitmapFileHandle = 0;
@@ -4688,7 +4407,6 @@ void bfil() {
 		return;
 	}
 	if (gudtyp(BitmapFileHeaderV4.bV4BitCount)) {
-
 		if (!StateMap.testAndReset(StateFlag::WASESC))
 			StateMap.reset(StateFlag::TRSET);
 		BitmapWidth = BitmapFileHeaderV4.bV4Width;
@@ -4699,23 +4417,20 @@ void bfil() {
 		ZoomRect.top = UnzoomedRect.y;
 		BitmapDC = CreateCompatibleDC(StitchWindowDC);
 		if (BitmapFileHeaderV4.bV4BitCount == 1) {
-
 			StateMap.set(StateFlag::MONOMAP);
 			bitmapWidthBytes = (BitmapWidth >> 5) << 2;
 			widthOverflow = BitmapWidth % 32;
 			if (widthOverflow)
 				bitmapWidthBytes += 4;
-			bitmapSizeBytes = bitmapWidthBytes*BitmapHeight;
+			bitmapSizeBytes = bitmapWidthBytes * BitmapHeight;
 			std::vector<unsigned char> monoBitmapData(bitmapSizeBytes);
 			ReadFile(BitmapFileHandle, &monoBitmapData[0], bitmapSizeBytes, &BytesRead, NULL);
 			CloseHandle(BitmapFileHandle);
-			if (binv(monoBitmapData,bitmapWidthBytes)) {
-
+			if (binv(monoBitmapData, bitmapWidthBytes)) {
 				background = BitmapColor;
 				foreground = InverseBackgroundColor;
 			}
 			else {
-
 				foreground = BitmapColor;
 				background = InverseBackgroundColor;
 			}
@@ -4728,15 +4443,15 @@ void bfil() {
 			BitmapInfoHeader.biCompression = BI_RGB;
 			BitmapInfo.bmiHeader = BitmapInfoHeader;
 			[[gsl::suppress(26413)]]
-			{ 
+			{
 				bitmap = getBitmap(BitmapDC, &BitmapInfo, &bits);
-				//Synchronize
-				GdiFlush();
-				if (bits) {
-					for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
-						bitlin(&monoBitmapData[iHeight * bitmapWidthBytes], &bits[iHeight * BitmapWidth], background, foreground);
-					}
+			//Synchronize
+			GdiFlush();
+			if (bits) {
+				for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
+					bitlin(&monoBitmapData[iHeight * bitmapWidthBytes], &bits[iHeight * BitmapWidth], background, foreground);
 				}
+			}
 			}
 			deviceContext = CreateCompatibleDC(StitchWindowDC);
 			if (bitmap && deviceContext) {
@@ -4749,7 +4464,6 @@ void bfil() {
 			}
 		}
 		else {
-
 			CloseHandle(BitmapFileHandle);
 			StateMap.reset(StateFlag::MONOMAP);
 			BitmapFileHandle = LoadImage(ThrEdInstance, UserBMPFileName, IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
@@ -4764,7 +4478,6 @@ void bfil() {
 		StateMap.reset(StateFlag::HIDMAP);
 	}
 	else {
-
 		CloseHandle(BitmapFileHandle);
 		BitmapFileHandle = 0;
 		PCSBMPFileName[0] = 0;
@@ -4773,7 +4486,6 @@ void bfil() {
 }
 
 void prtred() {
-
 	CloseHandle(FileHandle);
 	StateMap.reset(StateFlag::INIT);
 	FormIndex = 0;
@@ -4783,19 +4495,16 @@ void prtred() {
 }
 
 inline unsigned dtrn(DSTREC* dpnt) noexcept {
-
 	return *(convert_ptr<unsigned int *>(dpnt));
 }
 
 bool colfil() {
-
 	TCHAR*	extentionLocation = nullptr;
 
 	strcpy_s(ColorFileName, WorkingFileName);
 	strcpy_s(RGBFileName, WorkingFileName);
 	extentionLocation = strrchr(ColorFileName, '.');
 	if (extentionLocation) {
-
 		extentionLocation++;
 		strcpy_s(extentionLocation, sizeof(ColorFileName) - (extentionLocation - ColorFileName), "thw");
 		extentionLocation = strrchr(RGBFileName, '.');
@@ -4808,7 +4517,6 @@ bool colfil() {
 }
 
 void dstran() {
-
 	unsigned		iRecord = 0, iStitch = 0, color = 0;
 	POINT			localStitch = {};
 	POINT			dstStitch = {};
@@ -4897,28 +4605,25 @@ void dstran() {
 }
 
 bool chkdst(const DSTHED* dstHeader) noexcept {
-
 	if (strncmp(dstHeader->desched, "LA:", 3))
 		return 0;
 	return 1;
 }
 
 void auxmen() {
-
 	switch (IniFile.auxFileType) {
+	case AUXDST:
 
-		case AUXDST:
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_AUXTXT], "DST");
+		CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
+		CheckMenuItem(MainMenu, ID_AUXPCS, MF_UNCHECKED);
+		break;
 
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_AUXTXT], "DST");
-			CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
-			CheckMenuItem(MainMenu, ID_AUXPCS, MF_UNCHECKED);
-			break;
+	default:
 
-		default:
-
-			CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
-			CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_AUXTXT], "PCS");
+		CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
+		CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_AUXTXT], "PCS");
 	}
 	SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
 	StateMap.set(StateFlag::DUMEN);
@@ -4927,12 +4632,11 @@ void auxmen() {
 #if PESACT
 
 unsigned tripl(TCHAR* dat) {
-
 #if  __UseASM__
 	_asm {
 		mov		eax, dat
 		mov		eax, [eax]
-		and		eax, 0xffffff
+		and eax, 0xffffff
 	}
 #else
 	return (*static_cast<unsigned *>(static_cast<void *>(dat))) & 0xffffff;
@@ -4940,7 +4644,6 @@ unsigned tripl(TCHAR* dat) {
 }
 
 unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex) {
-
 	unsigned	colorDistance = 0, iRGB = 0;
 	COLORREF	color = {}, translatedColor = {};
 
@@ -4948,7 +4651,6 @@ unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex) {
 	translatedColor = PESColorTranslate[colorIndex];
 	colorDistance = 0;
 	for (iRGB = 0; iRGB < 3; iRGB++) {
-
 		colorDistance += ((color & 0xff) > (translatedColor & 0xff)) ? ((color & 0xff) - (translatedColor & 0xff)) : ((translatedColor & 0xff) - (color & 0xff));
 		translatedColor >>= 8;
 		color >>= 8;
@@ -4957,23 +4659,19 @@ unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex) {
 }
 
 unsigned dupcol() {
-
 	unsigned	iColor = 0;
 	COLORREF	color = {};
 	unsigned	matchDistance = 0, minimumDistance = 0, matchIndex = 0;
 
 	color = PESColorTranslate[PEScolors[PEScolorIndex++]];
 	for (iColor = 0; iColor < ActivePointIndex; iColor++) {
-
 		if (UserColor[iColor] == color)
 			return iColor;
 	}
 	minimumDistance = 0xffffff;
 	for (iColor = 1; iColor < ActivePointIndex; iColor++) {
-
 		matchDistance = pesmtch(color, PEScolors[iColor]);
 		if (matchDistance < minimumDistance) {
-
 			minimumDistance = matchDistance;
 			matchIndex = iColor;
 		}
@@ -4983,12 +4681,10 @@ unsigned dupcol() {
 
 
 double dubl(unsigned char* pnt) {
-
 #if  __UseASM__
 	unsigned tdat;
 
 	_asm {
-
 		mov		ecx, pnt
 		mov		ecx, [ecx]
 		movzx	ebx, ch
@@ -5004,19 +4700,18 @@ double dubl(unsigned char* pnt) {
 		add		ecx, eax
 		neg		ecx
 		jmp		short dubl2
-dubl1 :
+		dubl1 :
 		and		ecx, 0x7
-		shl		ecx, 8
-		add		ecx, ebx
-dubl2 : 
+			shl		ecx, 8
+			add		ecx, ebx
+			dubl2 :
 		mov		tdat, ecx
-		fild	tdat
+			fild	tdat
 	}
 #else
 	unsigned tdat = 0;
 
 	_asm {
-
 		mov		ecx, pnt
 		mov		ecx, [ecx]
 		movzx	ebx, ch
@@ -5032,13 +4727,13 @@ dubl2 :
 		add		ecx, eax
 		neg		ecx
 		jmp		short dubl2
-dubl1 : 
+		dubl1 :
 		and		ecx, 0x7
-		shl		ecx, 8
-		add		ecx, ebx
-dubl2 :
+			shl		ecx, 8
+			add		ecx, ebx
+			dubl2 :
 		mov		tdat, ecx
-		fild	tdat
+			fild	tdat
 	}
 #endif
 }
@@ -5079,7 +4774,6 @@ void xofrm(const FRMHEDO*	formListOriginal) noexcept {
 }
 
 void nuFil() {
-
 	unsigned	fileSize = 0, iStitch = 0;
 	unsigned	version = 0;
 	DWORD		fileSizeHigh = {};
@@ -5105,13 +4799,12 @@ void nuFil() {
 	unsigned		pecof = 0;
 	unsigned char*	pesColorCount = nullptr;
 	dPOINT			loc = {};
-	PESTCH*			pabstch= nullptr;
+	PESTCH*			pabstch = nullptr;
 	unsigned		pabind = 0;
 	double			locof = 0.0;
 #endif
 
 	if (StateMap.testAndReset(StateFlag::REDOLD) || GetOpenFileName(&OpenFileName)) {
-
 		fnamtabs();
 		untrace();
 		if (FormIndex)
@@ -5123,7 +4816,6 @@ void nuFil() {
 		unthum();
 		unbsho();
 		if (PCSBMPFileName[0]) {
-
 			DeleteObject(BitmapFileHandle);
 			ReleaseDC(ThrEdWindow, BitmapDC);
 			PCSBMPFileName[0] = 0;
@@ -5131,7 +4823,6 @@ void nuFil() {
 		FileHandle = CreateFile(WorkingFileName, GENERIC_READ, 0, NULL,
 			OPEN_EXISTING, 0, NULL);
 		if (FileHandle == INVALID_HANDLE_VALUE) {
-
 			if (GetLastError() == 32)
 				filnopn(IDS_FNOPNA, WorkingFileName);
 			else
@@ -5139,7 +4830,6 @@ void nuFil() {
 			FileHandle = 0;
 		}
 		else {
-
 			StateMap.reset(StateFlag::CMPDO);
 			StateMap.reset(StateFlag::SAVACT);
 			StateMap.reset(StateFlag::BAKING);
@@ -5153,7 +4843,6 @@ void nuFil() {
 			frmon();
 			SelectedFormCount = 0;
 			if (StateMap.testAndReset(StateFlag::PRFACT)) {
-
 				DestroyWindow(PreferencesWindow);
 				StateMap.reset(StateFlag::WASRT);
 				PreferenceIndex = 0;
@@ -5185,60 +4874,52 @@ void nuFil() {
 			if (fileExtention)
 				fileExtention++;
 			else {
-
 				strcat_s(WorkingFileName, ".thr");
 				fileExtention = strrchr(WorkingFileName, '.') + 1;
 			}
 			firstCharacter = tolower(fileExtention[0]);
 			if (firstCharacter == 't') {
-
 				ReadFile(FileHandle, &thredHeader, sizeof(STRHED), &BytesRead, NULL);
 				if ((thredHeader.headerType & 0xffffff) == 0x746872) {
-
 					if (BytesRead != sizeof(STRHED)) {
-
 						tabmsg(IDS_SHRTF);
 						return;
 					}
 					version = (thredHeader.headerType & 0xff000000) >> 24;
 					switch (version) {
+					case 0:
 
-						case 0:
+						if (PCSHeader.hoopType == SMALHUP) {
+							UnzoomedRect.x = IniFile.hoopSizeX = SHUPX;
+							UnzoomedRect.y = IniFile.hoopSizeY = SHUPY;
+						}
+						else {
+							UnzoomedRect.x = IniFile.hoopSizeX = LHUPX;
+							UnzoomedRect.y = IniFile.hoopSizeY = LHUPY;
+							PCSHeader.hoopType = LARGHUP;
+						}
+						ritfnam(IniFile.designerName);
+						strcpy_s(DesignerName, IniFile.designerName);
+						strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
+						break;
 
-							if (PCSHeader.hoopType == SMALHUP) {
+					case 1:
+					case 2:
 
-								UnzoomedRect.x = IniFile.hoopSizeX = SHUPX;
-								UnzoomedRect.y = IniFile.hoopSizeY = SHUPY;
-							}
-							else {
-
-								UnzoomedRect.x = IniFile.hoopSizeX = LHUPX;
-								UnzoomedRect.y = IniFile.hoopSizeY = LHUPY;
-								PCSHeader.hoopType = LARGHUP;
-							}
-							ritfnam(IniFile.designerName);
-							strcpy_s(DesignerName, IniFile.designerName);
-							strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
-							break;
-
-						case 1:
-						case 2:
-
-							ReadFile(FileHandle, &ExtendedHeader, sizeof(STREX), &BytesRead, NULL);
-							if (BytesRead != sizeof(STREX)) {
-
-								tabmsg(IDS_SHRTF);
-								return;
-							}
-							IniFile.hoopSizeX = UnzoomedRect.x = ExtendedHeader.hoopSizeX;
-							IniFile.hoopSizeY = UnzoomedRect.y = ExtendedHeader.hoopSizeY;
-							redfnam(DesignerName);
-							break;
-
-						default:
-
-							tabmsg(IDS_NOTVER);
+						ReadFile(FileHandle, &ExtendedHeader, sizeof(STREX), &BytesRead, NULL);
+						if (BytesRead != sizeof(STREX)) {
+							tabmsg(IDS_SHRTF);
 							return;
+						}
+						IniFile.hoopSizeX = UnzoomedRect.x = ExtendedHeader.hoopSizeX;
+						IniFile.hoopSizeY = UnzoomedRect.y = ExtendedHeader.hoopSizeY;
+						redfnam(DesignerName);
+						break;
+
+					default:
+
+						tabmsg(IDS_NOTVER);
+						return;
 					}
 					ZoomRect.bottom = ZoomRect.left = 0;
 					ZoomRect.right = UnzoomedRect.x = IniFile.hoopSizeX;
@@ -5246,7 +4927,6 @@ void nuFil() {
 					PCSHeader.stitchCount = thredHeader.stitchCount;
 					ReadFile(FileHandle, StitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR), &stitchesRead, NULL);
 					if (stitchesRead != PCSHeader.stitchCount * sizeof(fPOINTATTR)) {
-
 						PCSHeader.stitchCount = stitchesRead / sizeof(fPOINTATTR);
 						prtred();
 						return;
@@ -5254,7 +4934,6 @@ void nuFil() {
 					ReadFile(FileHandle, PCSBMPFileName, 16, &BytesRead, 0);
 					totalBytesRead = BytesRead;
 					if (BytesRead != 16) {
-
 						PCSBMPFileName[0] = 0;
 						prtred();
 						return;
@@ -5262,7 +4941,6 @@ void nuFil() {
 					ReadFile(FileHandle, &BackgroundColor, 4, &BytesRead, 0);
 					totalBytesRead += BytesRead;
 					if (BytesRead != 4) {
-
 						BackgroundColor = IniFile.backgroundColor;
 						prtred();
 						return;
@@ -5271,21 +4949,18 @@ void nuFil() {
 					ReadFile(FileHandle, (COLORREF*)UserColor, 64, &BytesRead, 0);
 					totalBytesRead += BytesRead;
 					if (BytesRead != 64) {
-
 						prtred();
 						return;
 					}
 					ReadFile(FileHandle, (COLORREF*)CustomColor, 64, &BytesRead, 0);
 					totalBytesRead += BytesRead;
 					if (BytesRead != 64) {
-
 						prtred();
 						return;
 					}
 					ReadFile(FileHandle, (TCHAR*)MsgBuffer, 16, &BytesRead, 0);
 					totalBytesRead += BytesRead;
 					if (BytesRead != 16) {
-
 						prtred();
 						return;
 					}
@@ -5296,14 +4971,12 @@ void nuFil() {
 						FormIndex = MAXFORMS;
 					pcsStitchCount = 0;
 					if (FormIndex) {
-
 						FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
 						MsgBuffer[0] = 0;
 						if (version < 2) {
 							FRMHEDO* formListOriginal = new FRMHEDO[FormIndex]();
 							ReadFile(FileHandle, formListOriginal, FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
 							if (BytesRead != FormIndex * sizeof(FRMHEDO)) {
-
 								FormIndex = BytesRead / sizeof(FRMHEDO);
 								StateMap.set(StateFlag::BADFIL);
 							}
@@ -5311,11 +4984,9 @@ void nuFil() {
 							delete[] formListOriginal;
 						}
 						else {
-
 							ReadFile(FileHandle, (FRMHED*)FormList, FormIndex * sizeof(FRMHED), &BytesRead, 0);
 							StateMap.reset(StateFlag::BADFIL);
 							if (BytesRead != FormIndex * sizeof(FRMHED)) {
-
 								FormIndex = BytesRead / sizeof(FRMHED);
 								StateMap.set(StateFlag::BADFIL);
 							}
@@ -5323,7 +4994,6 @@ void nuFil() {
 						//						nextBufferIndex=SetFilePointer(FileHandle,0,0,FILE_CURRENT);  //bug
 						ReadFile(FileHandle, (fPOINT*)FormVertices, thredHeader.vertexCount * sizeof(fPOINT), &BytesRead, 0);
 						if (BytesRead != sizeof(fPOINT)*thredHeader.vertexCount) {
-
 							FormVertexIndex = BytesRead / sizeof(fPOINT);
 							for (unsigned iVertex = FormVertexIndex; iVertex < thredHeader.vertexCount; iVertex++)
 								FormVertices[iVertex].x = FormVertices[iVertex].y = 0;
@@ -5331,13 +5001,11 @@ void nuFil() {
 						}
 						ReadFile(FileHandle, (SATCON*)SatinGuides, thredHeader.dlineCount * sizeof(SATCON), &BytesRead, 0);
 						if (BytesRead != thredHeader.dlineCount * sizeof(SATCON)) {
-
 							SatinGuideIndex = BytesRead / sizeof(SATCON);
 							StateMap.set(StateFlag::BADFIL);
 						}
 						ReadFile(FileHandle, (fPOINT*)ClipPoints, thredHeader.clipDataCount * sizeof(fPOINT), &BytesRead, 0);
 						if (BytesRead != thredHeader.clipDataCount * sizeof(fPOINT)) {
-
 							ClipPointIndex = BytesRead / sizeof(fPOINT);
 							StateMap.set(StateFlag::BADFIL);
 						}
@@ -5346,10 +5014,8 @@ void nuFil() {
 						if (StateMap.testAndReset(StateFlag::BADFIL))
 							bfilmsg();
 						for (unsigned iForm = 0; iForm < FormIndex; iForm++) {
-
 							FormList[iForm].vertices = adflt(FormList[iForm].vertexCount);
 							if (FormList[iForm].type == SAT) {
-
 								if (FormList[iForm].satinGuideCount)
 									FormList[iForm].satinOrAngle.guide = adsatk(FormList[iForm].satinGuideCount);
 							}
@@ -5365,19 +5031,15 @@ void nuFil() {
 					tabmsg(IDS_NOTHR);
 			}
 			else {
-
 				StateMap.set(StateFlag::NOTHRFIL);
 				if (firstCharacter == 'p') {
-
 					if (tolower(fileExtention[01]) == 'c') {
 						ReadFile(FileHandle, &PCSHeader, sizeof(PCSHeader), &BytesRead, NULL);
 						if (!fileSize) {
-
 							filnopn(IDS_ZEROL, WorkingFileName);
 							return;
 						}
 						if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == 16) {
-
 							for (iColor = 0; iColor < 16; iColor++)
 								UserColor[iColor] = PCSHeader.colors[iColor];
 							fileSize -= sizeof(PCSHeader);
@@ -5389,15 +5051,12 @@ void nuFil() {
 							color = 0;
 							iPCSstitch = 0;
 							while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
-
 								if (PCSStitchBuffer[iPCSstitch].tag == 3) {
-
 									ColorChangeTable[iColorChange].colorIndex = PCSStitchBuffer[iPCSstitch].fx;
 									ColorChangeTable[iColorChange++].stitchIndex = iStitch;
 									color = NOTFRM | PCSStitchBuffer[iPCSstitch++].fx;
 								}
 								else {
-
 									StitchBuffer[iStitch].x = PCSStitchBuffer[iPCSstitch].x + static_cast<float>(PCSStitchBuffer[iPCSstitch].fx) / 256;
 									StitchBuffer[iStitch].y = PCSStitchBuffer[iPCSstitch].y + static_cast<float>(PCSStitchBuffer[iPCSstitch].fy) / 256;
 									StitchBuffer[iStitch++].attribute = color;
@@ -5413,31 +5072,25 @@ void nuFil() {
 							IniFile.auxFileType = AUXPCS;
 							if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP)
 								PCSHeader.hoopType = LARGHUP;
-							sizstch(&stitchRect,StitchBuffer);
+							sizstch(&stitchRect, StitchBuffer);
 							if (stitchRect.left<0 || stitchRect.right>LHUPY || stitchRect.bottom<0 || stitchRect.top>LHUPY) {
-
 								IniFile.hoopSizeX = LHUPX;
 								IniFile.hoopSizeY = LHUPY;
 								chkhup();
 							}
 							else {
-
 								if (PCSHeader.hoopType == LARGHUP) {
-
 									IniFile.hoopType = LARGHUP;
 									IniFile.hoopSizeX = LHUPX;
 									IniFile.hoopSizeY = LHUPY;
 								}
 								else {
-
 									if (stitchRect.right > SHUPX || stitchRect.top > SHUPY || PCSHeader.hoopType == LARGHUP) {
-
 										IniFile.hoopType = LARGHUP;
 										IniFile.hoopSizeX = SHUPX;
 										IniFile.hoopSizeY = SHUPY;
 									}
 									else {
-
 										IniFile.hoopType = SMALHUP;
 										IniFile.hoopSizeX = SHUPX;
 										IniFile.hoopSizeY = SHUPY;
@@ -5454,7 +5107,6 @@ void nuFil() {
 						pesHeader = static_cast<PESHED *>(static_cast<void *>(fileBuffer));
 						l_peschr = static_cast<TCHAR *>(static_cast<void *>(pesHeader));
 						if (strncmp(pesHeader->led, "#PES00", 6)) {
-
 							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Not a PES file: %s\n", WorkingFileName);
 							shoMsg(MsgBuffer);
 							return;
@@ -5467,9 +5119,7 @@ void nuFil() {
 						MarkedStitchMap[0] = MarkedStitchMap[1] = 0;
 						ActivePointIndex = 0;
 						for (iColor = 0; iColor < gsl::narrow<unsigned>(*pesColorCount + 1); iColor++) {
-
 							if (setRmp(PEScolors[iColor])) {
-
 								UserColor[ActivePointIndex++] = PESColorTranslate[PEScolors[iColor] & PESCMSK];
 								if (ActivePointIndex >= 16)
 									break;
@@ -5485,23 +5135,18 @@ void nuFil() {
 						iActualPESstitches = 1;
 						StitchBuffer[0].x = StitchBuffer[0].y;
 						while (iPESstitch < BytesRead - pecof - 529) {
-
 							if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1] == 0)
 								break;
 							if (PESstitch[iPESstitch] == 0xfe && PESstitch[iPESstitch + 1] == 0xb0) {
-
 								color = dupcol();
 								iPESstitch += 2;
 							}
 							else {
-
 								if (PESstitch[iPESstitch] & 0x80) {
-
 									locof = dubl(&PESstitch[iPESstitch]);
 									iPESstitch++;
 								}
 								else {
-
 									if (PESstitch[iPESstitch] & 0x40)
 										locof = PESstitch[iPESstitch] - 128;
 									else
@@ -5510,7 +5155,6 @@ void nuFil() {
 								locof *= 0.6;
 								// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
 								if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-
 									loc.y -= locof;
 									StitchBuffer[iActualPESstitches].x = loc.x;
 									StitchBuffer[iActualPESstitches].y = loc.y;
@@ -5530,12 +5174,9 @@ void nuFil() {
 #endif
 				}
 				else {
-
 					ReadFile(FileHandle, &dstHeader, sizeof(DSTHED), &BytesRead, 0);
 					if (BytesRead == sizeof(DSTHED)) {
-
 						if (chkdst(&dstHeader)) {
-
 							PCSBMPFileName[0] = 0;
 							fileSize = GetFileSize(FileHandle, &BytesRead) - sizeof(DSTHED);
 							DSTRecordCount = fileSize / sizeof(DSTREC);
@@ -5547,7 +5188,6 @@ void nuFil() {
 						}
 					}
 					else {
-
 						tabmsg(IDS_DST2S);
 						CloseHandle(FileHandle);
 						return;
@@ -5555,7 +5195,6 @@ void nuFil() {
 				}
 			}
 			if (PCSBMPFileName[0]) {
-
 				SetCurrentDirectory(DefaultDirectory);
 				strcpy_s(UserBMPFileName, PCSBMPFileName);
 				bfil();
@@ -5571,7 +5210,6 @@ void nuFil() {
 			StateMap.reset(StateFlag::ZUMED);
 			buffer[2] = 0;
 			for (iColor = 0; iColor < 16; iColor++) {
-
 				UserPen[iColor] = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 				UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 				strncpy_s(buffer, ThreadSize[iColor], 2);
@@ -5608,7 +5246,6 @@ void nuFil() {
 }
 
 void clrfbuf(unsigned count) noexcept {
-
 #if  __UseASM__
 	_asm {
 		mov		edi, PCSStitchBuffer
@@ -5622,25 +5259,10 @@ void clrfbuf(unsigned count) noexcept {
 }
 
 constexpr unsigned dudbits(POINT dif) {
-
 	return Xdst[dif.x + 121] | Ydst[dif.y + 121];
 }
 
 void savdst(unsigned data) noexcept {
-
-#if  __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		al, 3
-		mov		ecx, DSTRecordCount
-		mul		ecx
-		inc		ecx
-		mov		DSTRecordCount, ecx
-		add		eax, DSTRecords
-		mov		ebx, data
-		mov		[eax], ebx
-	}
-#else
 	union {
 		unsigned data;
 		DSTREC dstRecord;
@@ -5649,11 +5271,9 @@ void savdst(unsigned data) noexcept {
 	x.data = data;
 
 	DSTRecords[DSTRecordCount++] = x.dstRecord;
-#endif
 }
 
 void ritdst(const std::vector<fPOINTATTR> &stitches) {
-
 #define DSTMAX 121
 	unsigned		iStitch = 0, dstType = 0, color = 0, count = 0;
 	POINT			centerCoordinate = {}, lengths = {}, absoluteLengths = {}, difference = {}, stepSize = {};
@@ -5670,7 +5290,6 @@ void ritdst(const std::vector<fPOINTATTR> &stitches) {
 	colorData.push_back(BackgroundColor);
 	colorData.push_back(UserColor[stitches[0].attribute&COLMSK]);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		dstStitchBuffer[iStitch].x = stitches[iStitch].x * 5 / 3;
 		dstStitchBuffer[iStitch].y = stitches[iStitch].y * 5 / 3;
 		dstStitchBuffer[iStitch].attribute = stitches[iStitch].attribute;
@@ -5678,7 +5297,6 @@ void ritdst(const std::vector<fPOINTATTR> &stitches) {
 	boundingRect.left = boundingRect.right = dstStitchBuffer[0].x;
 	boundingRect.bottom = boundingRect.top = dstStitchBuffer[0].y;
 	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		if (dstStitchBuffer[iStitch].x > boundingRect.right)
 			boundingRect.right = dstStitchBuffer[iStitch].x + 0.5;
 		if (dstStitchBuffer[iStitch].x < boundingRect.left)
@@ -5697,9 +5315,7 @@ void ritdst(const std::vector<fPOINTATTR> &stitches) {
 	DSTNegativeOffset.y = centerCoordinate.y - boundingRect.bottom - 1;
 	color = dstStitchBuffer[0].attribute & 0xf;
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		if (color != (dstStitchBuffer[iStitch].attribute & 0xf)) {
-
 			savdst(0xc30000);
 			color = dstStitchBuffer[iStitch].attribute & 0xf;
 			colorData.push_back(UserColor[color]);
@@ -5715,10 +5331,8 @@ void ritdst(const std::vector<fPOINTATTR> &stitches) {
 		stepSize.x = absoluteLengths.x / count + 1;
 		stepSize.y = absoluteLengths.y / count + 1;
 		while (lengths.x || lengths.y) {
-
 			dstType = REGTYP;
 			if (abs(lengths.x) > stepSize.x) {
-
 				dstType = JMPTYP;
 				if (lengths.x > 0)
 					difference.x = stepSize.x;
@@ -5728,7 +5342,6 @@ void ritdst(const std::vector<fPOINTATTR> &stitches) {
 			else
 				difference.x = lengths.x;
 			if (abs(lengths.y) > stepSize.y) {
-
 				dstType = JMPTYP;
 				if (lengths.y > 0)
 					difference.y = stepSize.y;
@@ -5748,7 +5361,6 @@ void ritdst(const std::vector<fPOINTATTR> &stitches) {
 	DSTRecords[DSTRecordCount++].nd = gsl::narrow<TBYTE>(0xf3);
 
 	if (colfil()) {
-
 		colorFile = CreateFile(ColorFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		if (colorFile != INVALID_HANDLE_VALUE)
 			WriteFile(colorFile, &colorData[0], colorData.size() * sizeof(colorData[0]), &bytesWritten, 0);
@@ -5788,7 +5400,6 @@ bool pcshup(std::vector<fPOINTATTR>	&stitches) {
 		hoopSize.y = LHUPY;
 	}
 	else {
-
 		if (IniFile.hoopSizeX == LHUPX && IniFile.hoopSizeY == LHUPY) {
 			PCSHeader.hoopType = LARGHUP;
 			hoopSize.x = LHUPX;
@@ -5821,13 +5432,11 @@ bool pcshup(std::vector<fPOINTATTR>	&stitches) {
 #if PESACT
 
 void ritpes(unsigned iStitch) {
-
 	PESstitches[OutputIndex].x = -RotatedStitches[iStitch].x * 3 / 5 + PESstitchCenterOffset.x;
 	PESstitches[OutputIndex++].y = RotatedStitches[iStitch].y * 3 / 5 - PESstitchCenterOffset.y;
 }
 
 void ritpcol(unsigned char colorIndex) {
-
 #if  __UseASM__
 	_asm {
 		mov		ebx, OutputIndex
@@ -5843,7 +5452,6 @@ void ritpcol(unsigned char colorIndex) {
 #else
 	// ToDo - (PES) Complete translation from assembler
 	_asm {
-
 		mov		ebx, OutputIndex
 		mov		eax, ebx
 		inc		eax
@@ -5852,13 +5460,12 @@ void ritpcol(unsigned char colorIndex) {
 		add		ebx, PESstitches
 		xor		eax, eax
 		mov		al, colorIndex
-		mov[ebx], eax
+		mov		[ebx], eax
 	}
 #endif
 }
 
 unsigned pesnam() {
-
 #if  __UseASM__
 	_asm {
 		mov		ebx, offset AuxName
@@ -5871,21 +5478,21 @@ unsigned pesnam() {
 		cmp		al, '\\'
 		jne		short peslup0a
 		mov		edx, ebx
-peslup0a :
+peslup0a:
 		inc		ebx
 		loop	peslup0
-peslup1 :
+peslup1:
 		mov		ebx, edx
 		cmp		byte ptr[ebx], '\\'
 		jne		short peslup1a
 		inc		ebx
-peslup1a :
+peslup1a:
 		xor		ecx, ecx
 		mov		cl, 17
 		mov		edi, offset BSequence
 		mov		dword ptr[edi], ':AL'
 		add		edi, 3
-peslup :
+peslup:
 		mov		al, [ebx]
 		inc		ebx
 		cmp		al, '.'
@@ -5893,7 +5500,7 @@ peslup :
 		mov[edi], al
 		inc		edi
 		loop	peslup
-pesnamx :
+pesnamx:
 		mov		eax, edi
 		sub		eax, offset BSequence
 	}
@@ -5903,56 +5510,52 @@ pesnamx :
 		mov		ebx, offset AuxName
 		mov		ecx, _MAX_PATH
 		mov		edx, ebx
-		peslup0 :
+peslup0:
 		mov		al, [ebx]
-			or al, al
-			je		short peslup1
-			cmp		al, '\\'
-			jne		short peslup0a
-			mov		edx, ebx
-			peslup0a :
+		or al, al
+		je		short peslup1
+		cmp		al, '\\'
+		jne		short peslup0a
+		mov		edx, ebx
+peslup0a:
 		inc		ebx
-			loop	peslup0
-			peslup1 :
+		loop	peslup0
+peslup1:
 		mov		ebx, edx
-			cmp		byte ptr[ebx], '\\'
-			jne		short peslup1a
-			inc		ebx
-			peslup1a :
+		cmp		byte ptr[ebx], '\\'
+		jne		short peslup1a
+		inc		ebx
+peslup1a:
 		xor		ecx, ecx
-			mov		cl, 17
-			mov		edi, offset BSequence
-			mov		dword ptr[edi], ':AL'
-			add		edi, 3
-			peslup :
-			mov		al, [ebx]
-			inc		ebx
-			cmp		al, '.'
-			je		pesnamx
-			mov[edi], al
-			inc		edi
-			loop	peslup
-			pesnamx :
+		mov		cl, 17
+		mov		edi, offset BSequence
+		mov		dword ptr[edi], ':AL'
+		add		edi, 3
+peslup:
+		mov		al, [ebx]
+		inc		ebx
+		cmp		al, '.'
+		je		pesnamx
+		mov[edi], al
+		inc		edi
+		loop	peslup
+pesnamx:
 		mov		eax, edi
-			sub		eax, offset BSequence
+		sub		eax, offset BSequence
 	}
 #endif
 }
 
 void rpcrd(float stitchDelta) {
-
 	int pesDelta = 0;
 
 	pesDelta = stitchDelta * 5 / 3;
 	if (pesDelta < 0) {
-
 		if (pesDelta > -64) {
-
 			PESdata[OutputIndex] = pesDelta - 128;
 			OutputIndex++;
 		}
 		else {
-
 			PESdata[OutputIndex] = pesDelta >> 8;
 			OutputIndex++;
 			PESdata[OutputIndex] = pesDelta & 0x8f;
@@ -5960,14 +5563,11 @@ void rpcrd(float stitchDelta) {
 		}
 	}
 	else {
-
 		if (pesDelta < 64) {
-
 			PESdata[OutputIndex] = pesDelta;
 			OutputIndex++;
 		}
 		else {
-
 			PESdata[OutputIndex] = (pesDelta >> 8) | 0x80;
 			OutputIndex++;
 			PESdata[OutputIndex] = pesDelta & 0xff;
@@ -5977,7 +5577,6 @@ void rpcrd(float stitchDelta) {
 }
 
 void pecdat(TCHAR* buffer) {
-
 	unsigned	iStitch = 0;
 	unsigned	color = StitchBuffer[0].attribute&COLMSK;
 	unsigned	iColor = 1;
@@ -5988,9 +5587,7 @@ void pecdat(TCHAR* buffer) {
 	rpcrd(StitchBuffer[0].x);
 	rpcrd(-StitchBuffer[0].y);
 	for (iStitch = 0; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
-
 		if ((StitchBuffer[iStitch].attribute&COLMSK) != color) {
-
 			color = StitchBuffer[iStitch].attribute&COLMSK;
 			PESdata[OutputIndex] = static_cast<TBYTE>(254);
 			OutputIndex++;
@@ -6011,15 +5608,12 @@ void pecdat(TCHAR* buffer) {
 #endif
 
 void chk1col() {
-
 	unsigned	iColorChange = 0, iStitch = 0, color = 0;
 
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 	for (iColorChange = 0; iColorChange < ColorChanges; iColorChange++) {
-
 		if (ColorChangeTable[iColorChange + 1].stitchIndex - ColorChangeTable[iColorChange].stitchIndex == 1) {
-
 			iStitch = ColorChangeTable[iColorChange].stitchIndex;
 			color = StitchBuffer[iStitch - 1].attribute&COLMSK;
 			StitchBuffer[iStitch].attribute &= NCOLMSK;
@@ -6029,7 +5623,6 @@ void chk1col() {
 }
 
 bool chkattr(TCHAR* filename) {
-
 	const unsigned	attributes = GetFileAttributes(filename);
 	unsigned		buttonPressed = 0;
 	TCHAR			drive[_MAX_PATH] = { 0 };
@@ -6041,7 +5634,6 @@ bool chkattr(TCHAR* filename) {
 	if (StateMap.testAndReset(StateFlag::NOTFREE))
 		return 1;
 	if (attributes&FILE_ATTRIBUTE_READONLY && attributes != 0xffffffff) {
-
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_OVRLOK], filename);
 		buttonPressed = MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_OVRIT], MB_YESNO);
 		if (buttonPressed == IDYES)
@@ -6053,7 +5645,6 @@ bool chkattr(TCHAR* filename) {
 	drive[3] = 0;
 	// ToDo - does a return value of 0 mean no free space?
 	if (!GetDiskFreeSpace(drive, &SectorsPerCluster, &BytesPerSector, &NumberOfFreeClusters, &TotalNumberOfClusters)) {
-
 		StateMap.set(StateFlag::NOTFREE);
 		return 1;
 	}
@@ -6064,7 +5655,6 @@ bool chkattr(TCHAR* filename) {
 #pragma warning(push)
 #pragma warning(disable : 4996)
 void sav() {
-
 	unsigned		iStitch = 0, iColor = 0, iHeader = 0, iPCSstitch = 0;
 	unsigned long	bytesWritten = 0;
 	double			fractionalPart = 0.0, integerPart = 0.0;
@@ -6096,18 +5686,14 @@ void sav() {
 	coltab();
 	std::vector<fPOINTATTR> saveStitches(PCSHeader.stitchCount);
 	if (UserFlagMap.test(UserFlag::ROTAUX)) {
-
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 			saveStitches[iStitch].y = -StitchBuffer[iStitch].x;
 			saveStitches[iStitch].x = StitchBuffer[iStitch].y;
 			saveStitches[iStitch].attribute = StitchBuffer[iStitch].attribute;
 		}
 	}
 	else {
-
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 			saveStitches[iStitch].x = StitchBuffer[iStitch].x;
 			saveStitches[iStitch].y = StitchBuffer[iStitch].y;
 			saveStitches[iStitch].attribute = StitchBuffer[iStitch].attribute;
@@ -6116,215 +5702,213 @@ void sav() {
 	PCSFileHandle = CreateFile(AuxName, (GENERIC_WRITE | GENERIC_READ), 0, NULL,
 		CREATE_ALWAYS, 0, NULL);
 	if (PCSFileHandle == INVALID_HANDLE_VALUE) {
-
 		crmsg(AuxName);
 		PCSFileHandle = 0;
 	}
 	else {
 		bool flag = true;
 		switch (IniFile.auxFileType) {
-
-			case AUXDST:
-				// There are always going to be more records in the DST format
-				DSTRecords = new DSTREC[2 * PCSHeader.stitchCount]();
-				ritdst(saveStitches);
-				pchr = convert_ptr<TCHAR *>(&dstHeader);
-				if (pchr) {
-					for (iHeader = 0; iHeader < sizeof(DSTHED); iHeader++)
-						pchr[iHeader] = ' ';
-					strncpy(dstHeader.desched, "LA:", 3);
+		case AUXDST:
+			// There are always going to be more records in the DST format
+			DSTRecords = new DSTREC[2 * PCSHeader.stitchCount]();
+			ritdst(saveStitches);
+			pchr = convert_ptr<TCHAR *>(&dstHeader);
+			if (pchr) {
+				for (iHeader = 0; iHeader < sizeof(DSTHED); iHeader++)
+					pchr[iHeader] = ' ';
+				strncpy(dstHeader.desched, "LA:", 3);
+			}
+			pchr = strrchr(AuxName, '\\') + 1;
+			if (pchr) {
+				for (iHeader = 0; iHeader < sizeof(dstHeader.desc); iHeader++) {
+					if (pchr[iHeader] && pchr[iHeader] != '.')
+						dstHeader.desc[iHeader] = pchr[iHeader];
+					else
+						break;
 				}
-				pchr = strrchr(AuxName, '\\') + 1;
-				if (pchr) {
-					for (iHeader = 0; iHeader < sizeof(dstHeader.desc); iHeader++) {
-						if (pchr[iHeader] && pchr[iHeader] != '.')
-							dstHeader.desc[iHeader] = pchr[iHeader];
-						else
-							break;
-					}
-				}
-				dstHeader.desc[16] = 0xd;
-				strncpy(dstHeader.recshed, "ST:", 3);
-				sprintf(dstHeader.recs, "%7d\r", DSTRecordCount);
-				strncpy(dstHeader.cohed, "CO:", 3);
-				strncpy(dstHeader.co, "  0\xd", 4);
-				strncpy(dstHeader.xplushed, "+X:", 3);
-				sprintf(dstHeader.xplus, "%5d\xd", DSTNegativeOffset.x);
-				strncpy(dstHeader.xminhed, "-X:", 3);
-				sprintf(dstHeader.xmin, "%5d\xd", DSTPositiveOffset.x);
-				strncpy(dstHeader.yplushed, "+Y:", 3);
-				sprintf(dstHeader.yplus, "%5d\xd", DSTPositiveOffset.y);
-				strncpy(dstHeader.yminhed, "-Y:", 3);
-				sprintf(dstHeader.ymin, "%5d\xd", DSTNegativeOffset.y);
-				strncpy(dstHeader.axhed, "AX:", 3);
-				strncpy(dstHeader.ax, "-    0\r", 7);
-				strncpy(dstHeader.ayhed, "AY:", 3);
-				strncpy(dstHeader.ay, "+    0\r", 7);
-				strncpy(dstHeader.mxhed, "MX:", 3);
-				strncpy(dstHeader.mx, "+    0\r", 7);
-				strncpy(dstHeader.myhed, "MY:", 3);
-				strncpy(dstHeader.my, "+    0\r", 7);
-				strncpy(dstHeader.pdhed, "PD", 2);
-				strncpy(dstHeader.pd, "******\r", 7);
-				strncpy(dstHeader.eof, "\x1a", 1);
-				WriteFile(PCSFileHandle, &dstHeader, sizeof(DSTHED), &bytesWritten, 0);
-				WriteFile(PCSFileHandle, DSTRecords, sizeof(DSTREC)*DSTRecordCount, &bytesWritten, 0);
-				delete[] DSTRecords;
-				break;
+			}
+			dstHeader.desc[16] = 0xd;
+			strncpy(dstHeader.recshed, "ST:", 3);
+			sprintf(dstHeader.recs, "%7d\r", DSTRecordCount);
+			strncpy(dstHeader.cohed, "CO:", 3);
+			strncpy(dstHeader.co, "  0\xd", 4);
+			strncpy(dstHeader.xplushed, "+X:", 3);
+			sprintf(dstHeader.xplus, "%5d\xd", DSTNegativeOffset.x);
+			strncpy(dstHeader.xminhed, "-X:", 3);
+			sprintf(dstHeader.xmin, "%5d\xd", DSTPositiveOffset.x);
+			strncpy(dstHeader.yplushed, "+Y:", 3);
+			sprintf(dstHeader.yplus, "%5d\xd", DSTPositiveOffset.y);
+			strncpy(dstHeader.yminhed, "-Y:", 3);
+			sprintf(dstHeader.ymin, "%5d\xd", DSTNegativeOffset.y);
+			strncpy(dstHeader.axhed, "AX:", 3);
+			strncpy(dstHeader.ax, "-    0\r", 7);
+			strncpy(dstHeader.ayhed, "AY:", 3);
+			strncpy(dstHeader.ay, "+    0\r", 7);
+			strncpy(dstHeader.mxhed, "MX:", 3);
+			strncpy(dstHeader.mx, "+    0\r", 7);
+			strncpy(dstHeader.myhed, "MY:", 3);
+			strncpy(dstHeader.my, "+    0\r", 7);
+			strncpy(dstHeader.pdhed, "PD", 2);
+			strncpy(dstHeader.pd, "******\r", 7);
+			strncpy(dstHeader.eof, "\x1a", 1);
+			WriteFile(PCSFileHandle, &dstHeader, sizeof(DSTHED), &bytesWritten, 0);
+			WriteFile(PCSFileHandle, DSTRecords, sizeof(DSTREC)*DSTRecordCount, &bytesWritten, 0);
+			delete[] DSTRecords;
+			break;
 
 #if PESACT
 
-			case AUXPES:
-				pchr = static_cast<TCHAR *>(static_cast<void *>(&pesHeader));
-				for (iHeader = 0; iHeader < sizeof(PESHED); iHeader++)
-					pchr[iHeader] = 0;
-				strncpy(pesHeader.led, "#PES0001", sizeof(pesHeader.led));
-				strncpy(pesHeader.ce, "CEmbOne", sizeof(pesHeader.ce));
-				strncpy(pesHeader.cs, "CSewSeg", sizeof(pesHeader.cs));
-				for (iColor = 0; iColor < 16; iColor++) {
-					matchMin = 0xffffffff;
-					for (iColorMatch = 0; iColorMatch < sizeof(PESColorTranslate) >> 2; iColorMatch++) {
-						match = pesmtch(UserColor[iColor], iColorMatch);
-						if (match < matchMin) {
-							matchIndex = iColorMatch;
-							matchMin = match;
-						}
-					}
-					PESequivColors[iColor] = static_cast<unsigned char>(matchIndex);
-				}
-				color = StitchBuffer[0].attribute&COLMSK;
-				pesColor = pesHeader.scol = PESequivColors[StitchBuffer[0].attribute&COLMSK];
-				sizstch(&boundingRect);
-				PESstitchCenterOffset.x = midl(boundingRect.right, boundingRect.left);
-				PESstitchCenterOffset.y = midl(boundingRect.top, boundingRect.bottom);
-				pesHeader.xsiz = boundingRect.right - boundingRect.left;
-				pesHeader.ysiz = boundingRect.top - boundingRect.bottom;
-				OutputIndex = 0;
-				// There cannot be more color changes than stitches
-				PESstitches = new PESTCH[PCSHeader.stitchCount * 2];
-				ritpes(0);
-				PESstitches[OutputIndex].x = -32765; // 0x8003
-				PESstitches[OutputIndex++].y = 0;
-				ritpcol(PESequivColors[color]);
-				ritpes(0);
-				pesColorCount = 0;
-				for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
-					if (color == (StitchBuffer[iStitch].attribute&COLMSK))
-						ritpes(iStitch);
-					else {
-						ritpes(iStitch);
-						PESstitches[OutputIndex].x = -32767; // 0x8001
-						PESstitches[OutputIndex++].y = 0;
-						ritpcol(PESequivColors[color]);
-						color = StitchBuffer[iStitch].attribute&COLMSK;
-						ritpes(iStitch++);
-						ritpes(iStitch);
-						PESstitches[OutputIndex].x = -32765; // 0x8003
-						PESstitches[OutputIndex++].y = 0;
-						ritpcol(PESequivColors[color]);
-						ritpes(iStitch);
-						pesColorCount++;
+		case AUXPES:
+			pchr = static_cast<TCHAR *>(static_cast<void *>(&pesHeader));
+			for (iHeader = 0; iHeader < sizeof(PESHED); iHeader++)
+				pchr[iHeader] = 0;
+			strncpy(pesHeader.led, "#PES0001", sizeof(pesHeader.led));
+			strncpy(pesHeader.ce, "CEmbOne", sizeof(pesHeader.ce));
+			strncpy(pesHeader.cs, "CSewSeg", sizeof(pesHeader.cs));
+			for (iColor = 0; iColor < 16; iColor++) {
+				matchMin = 0xffffffff;
+				for (iColorMatch = 0; iColorMatch < sizeof(PESColorTranslate) >> 2; iColorMatch++) {
+					match = pesmtch(UserColor[iColor], iColorMatch);
+					if (match < matchMin) {
+						matchIndex = iColorMatch;
+						matchMin = match;
 					}
 				}
-				PESstitches[OutputIndex].x = iColorMatch;
-				PESstitches[OutputIndex++].y = 0;
-				pesOffset = static_cast<unsigned *>(static_cast<void *>(&pesHeader.off));
-				*pesOffset = (OutputIndex << 2) + sizeof(PESHED);
-				*pesHeader.m1 = 0x20;
-				GroupStartStitch = 0;
-				GroupEndStitch = PCSHeader.stitchCount - 1;
-				pesHeader.xsiz = 10000;
-				pesHeader.ysiz = 10000;
-				WriteFile(PCSFileHandle, static_cast<PESHED *>(static_cast<void *>(&pesHeader)), sizeof(PESHED), &bytesWritten, 0);
-				WriteFile(PCSFileHandle, PESstitches, OutputIndex * sizeof(PESTCH), &bytesWritten, 0);
-				delete[] PESstitches;
-				// ToDo - (PES) is there a better estimate for data size?
-				pchr = new TCHAR[MAXITEMS * 4];
-				// ToDo - (PES) Add buffer parameter and remove use of BSequence in pesname
-				iHeader = pesnam();
-				while (iHeader < 512)
-					pchr[iHeader++] = ' ';
-				pchr[19] = 13;
-				pchr[48] = static_cast<TCHAR>(pesColorCount);
-				pecdat(pchr);
-				upnt = static_cast<unsigned *>(static_cast<void *>(&pchr[514]));
-				*upnt = OutputIndex - 512;
-				pchr[517] = 0x20;
-				pchr[518] = -1;
-				pchr[519] = -17;
-				psiz = static_cast<short *>(static_cast<void *>(&pchr[520]));
-				*psiz = pesHeader.xsiz;
-				psiz++;
-				*psiz = pesHeader.ysiz;
-				psiz++;
-				*psiz = 480;
-				pesOffset = static_cast<unsigned *>(static_cast<void *>(psiz));
-				*pesOffset = 11534816;
-				//			pchr[527]=(TCHAR)0x0;
-				//			pchr[528]=(TCHAR)0x90;
-				//			pchr[529]=(TCHAR)0x0;
-				//			pchr[530]=(TCHAR)0x8f;
-				pchr[527] = static_cast<TBYTE>(0x00);
-				pchr[528] = static_cast<TBYTE>(0x80);	//hor msb
-				pchr[529] = static_cast<TBYTE>(0x80);	//hor lsb
-				pchr[530] = static_cast<TBYTE>(0x82);	//vert msb
-				pchr[531] = static_cast<TBYTE>(0xff);	//vert lsb
-				WriteFile(PCSFileHandle, pchr, OutputIndex, &bytesWritten, 0);
-				delete[] pchr;
-				break;
+				PESequivColors[iColor] = static_cast<unsigned char>(matchIndex);
+			}
+			color = StitchBuffer[0].attribute&COLMSK;
+			pesColor = pesHeader.scol = PESequivColors[StitchBuffer[0].attribute&COLMSK];
+			sizstch(&boundingRect);
+			PESstitchCenterOffset.x = midl(boundingRect.right, boundingRect.left);
+			PESstitchCenterOffset.y = midl(boundingRect.top, boundingRect.bottom);
+			pesHeader.xsiz = boundingRect.right - boundingRect.left;
+			pesHeader.ysiz = boundingRect.top - boundingRect.bottom;
+			OutputIndex = 0;
+			// There cannot be more color changes than stitches
+			PESstitches = new PESTCH[PCSHeader.stitchCount * 2];
+			ritpes(0);
+			PESstitches[OutputIndex].x = -32765; // 0x8003
+			PESstitches[OutputIndex++].y = 0;
+			ritpcol(PESequivColors[color]);
+			ritpes(0);
+			pesColorCount = 0;
+			for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
+				if (color == (StitchBuffer[iStitch].attribute&COLMSK))
+					ritpes(iStitch);
+				else {
+					ritpes(iStitch);
+					PESstitches[OutputIndex].x = -32767; // 0x8001
+					PESstitches[OutputIndex++].y = 0;
+					ritpcol(PESequivColors[color]);
+					color = StitchBuffer[iStitch].attribute&COLMSK;
+					ritpes(iStitch++);
+					ritpes(iStitch);
+					PESstitches[OutputIndex].x = -32765; // 0x8003
+					PESstitches[OutputIndex++].y = 0;
+					ritpcol(PESequivColors[color]);
+					ritpes(iStitch);
+					pesColorCount++;
+				}
+			}
+			PESstitches[OutputIndex].x = iColorMatch;
+			PESstitches[OutputIndex++].y = 0;
+			pesOffset = static_cast<unsigned *>(static_cast<void *>(&pesHeader.off));
+			*pesOffset = (OutputIndex << 2) + sizeof(PESHED);
+			*pesHeader.m1 = 0x20;
+			GroupStartStitch = 0;
+			GroupEndStitch = PCSHeader.stitchCount - 1;
+			pesHeader.xsiz = 10000;
+			pesHeader.ysiz = 10000;
+			WriteFile(PCSFileHandle, static_cast<PESHED *>(static_cast<void *>(&pesHeader)), sizeof(PESHED), &bytesWritten, 0);
+			WriteFile(PCSFileHandle, PESstitches, OutputIndex * sizeof(PESTCH), &bytesWritten, 0);
+			delete[] PESstitches;
+			// ToDo - (PES) is there a better estimate for data size?
+			pchr = new TCHAR[MAXITEMS * 4];
+			// ToDo - (PES) Add buffer parameter and remove use of BSequence in pesname
+			iHeader = pesnam();
+			while (iHeader < 512)
+				pchr[iHeader++] = ' ';
+			pchr[19] = 13;
+			pchr[48] = static_cast<TCHAR>(pesColorCount);
+			pecdat(pchr);
+			upnt = static_cast<unsigned *>(static_cast<void *>(&pchr[514]));
+			*upnt = OutputIndex - 512;
+			pchr[517] = 0x20;
+			pchr[518] = -1;
+			pchr[519] = -17;
+			psiz = static_cast<short *>(static_cast<void *>(&pchr[520]));
+			*psiz = pesHeader.xsiz;
+			psiz++;
+			*psiz = pesHeader.ysiz;
+			psiz++;
+			*psiz = 480;
+			pesOffset = static_cast<unsigned *>(static_cast<void *>(psiz));
+			*pesOffset = 11534816;
+			//			pchr[527]=(TCHAR)0x0;
+			//			pchr[528]=(TCHAR)0x90;
+			//			pchr[529]=(TCHAR)0x0;
+			//			pchr[530]=(TCHAR)0x8f;
+			pchr[527] = static_cast<TBYTE>(0x00);
+			pchr[528] = static_cast<TBYTE>(0x80);	//hor msb
+			pchr[529] = static_cast<TBYTE>(0x80);	//hor lsb
+			pchr[530] = static_cast<TBYTE>(0x82);	//vert msb
+			pchr[531] = static_cast<TBYTE>(0xff);	//vert lsb
+			WriteFile(PCSFileHandle, pchr, OutputIndex, &bytesWritten, 0);
+			delete[] pchr;
+			break;
 #endif
-			default:
-				for (iColor = 0; iColor < 16; iColor++)
-					PCSHeader.colors[iColor] = UserColor[iColor];
-				PCSStitchBuffer = new PCSTCH[PCSHeader.stitchCount + ColorChanges + 2];
-				do {
-					if (pcshup(saveStitches)) {
-						flag = false;
-						break;
+		default:
+			for (iColor = 0; iColor < 16; iColor++)
+				PCSHeader.colors[iColor] = UserColor[iColor];
+			PCSStitchBuffer = new PCSTCH[PCSHeader.stitchCount + ColorChanges + 2];
+			do {
+				if (pcshup(saveStitches)) {
+					flag = false;
+					break;
+				}
+				if (!WriteFile(PCSFileHandle, &PCSHeader, 0x46, &bytesWritten, 0)) {
+					riter();
+					flag = false;
+					break;
+				}
+				clrfbuf((sizeof(PCSTCH)*(PCSHeader.stitchCount + ColorChanges + 1)) >> 2);
+				iPCSstitch = 0;
+				savcol = 0xff;
+				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+					if ((saveStitches[iStitch].attribute&COLMSK) != savcol) {
+						savcol = saveStitches[iStitch].attribute&COLMSK;
+						PCSStitchBuffer[iPCSstitch].tag = 3;
+						PCSStitchBuffer[iPCSstitch++].fx = savcol;
 					}
-					if (!WriteFile(PCSFileHandle, &PCSHeader, 0x46, &bytesWritten, 0)) {
+					fractionalPart = modf(saveStitches[iStitch].x, &integerPart);
+					PCSStitchBuffer[iPCSstitch].fx = fractionalPart * 256;
+					PCSStitchBuffer[iPCSstitch].x = integerPart;
+					fractionalPart = modf(saveStitches[iStitch].y, &integerPart);
+					PCSStitchBuffer[iPCSstitch].fy = fractionalPart * 256;
+					PCSStitchBuffer[iPCSstitch++].y = integerPart;
+				}
+				if (!WriteFile(PCSFileHandle, PCSStitchBuffer, iPCSstitch * sizeof(PCSTCH), &bytesWritten, 0)) {
+					riter();
+					flag = false;
+					break;
+				}
+				if (UserFlagMap.test(UserFlag::BSAVOF)) {
+					*MsgBuffer = 0;
+					if (!WriteFile(PCSFileHandle, MsgBuffer, 15, &bytesWritten, 0)) {
 						riter();
 						flag = false;
 						break;
 					}
-					clrfbuf((sizeof(PCSTCH)*(PCSHeader.stitchCount + ColorChanges + 1)) >> 2);
-					iPCSstitch = 0;
-					savcol = 0xff;
-					for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-						if ((saveStitches[iStitch].attribute&COLMSK) != savcol) {
-							savcol = saveStitches[iStitch].attribute&COLMSK;
-							PCSStitchBuffer[iPCSstitch].tag = 3;
-							PCSStitchBuffer[iPCSstitch++].fx = savcol;
-						}
-						fractionalPart = modf(saveStitches[iStitch].x, &integerPart);
-						PCSStitchBuffer[iPCSstitch].fx = fractionalPart * 256;
-						PCSStitchBuffer[iPCSstitch].x = integerPart;
-						fractionalPart = modf(saveStitches[iStitch].y, &integerPart);
-						PCSStitchBuffer[iPCSstitch].fy = fractionalPart * 256;
-						PCSStitchBuffer[iPCSstitch++].y = integerPart;
-					}
-					if (!WriteFile(PCSFileHandle, PCSStitchBuffer, iPCSstitch * sizeof(PCSTCH), &bytesWritten, 0)) {
+				}
+				else {
+					if (!WriteFile(PCSFileHandle, PCSBMPFileName, 15, &bytesWritten, 0)) {
 						riter();
 						flag = false;
 						break;
 					}
-					if (UserFlagMap.test(UserFlag::BSAVOF)) {
-						*MsgBuffer = 0;
-						if (!WriteFile(PCSFileHandle, MsgBuffer, 15, &bytesWritten, 0)) {
-							riter();
-							flag = false;
-							break;
-						}
-					}
-					else {
-						if (!WriteFile(PCSFileHandle, PCSBMPFileName, 15, &bytesWritten, 0)) {
-							riter();
-							flag = false;
-							break;
-						}
-					}
-				} while (false);
-				delete[] PCSStitchBuffer;
+				}
+			} while (false);
+			delete[] PCSStitchBuffer;
 		}
 		if (flag) {
 			defNam(WorkingFileName);
@@ -6338,38 +5922,34 @@ void sav() {
 #pragma warning(pop)
 
 void savAs() {
-
 	TCHAR*	pchr = nullptr;
 
 	if (PCSHeader.stitchCount || FormIndex || *PCSBMPFileName) {
-
 		OpenFileName.nFilterIndex = 0;
 		if (GetSaveFileName(&OpenFileName)) {
-
 			_strlwr_s(WorkingFileName);
 			pchr = strrchr(WorkingFileName, '.');
 			if (!pchr)
 				pchr = &WorkingFileName[strlen(WorkingFileName)];
 			switch (OpenFileName.nFilterIndex) {
+			case 1:
 
-				case 1:
+				strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), ".thr");
+				break;
 
-					strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), ".thr");
-					break;
+			case 2:
 
-				case 2:
+				strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), ".pcs");
+				IniFile.auxFileType = AUXPCS;
+				auxmen();
+				break;
 
-					strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), ".pcs");
-					IniFile.auxFileType = AUXPCS;
-					auxmen();
-					break;
+			case 3:
 
-				case 3:
-
-					strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), ".dst");
-					IniFile.auxFileType = AUXDST;
-					auxmen();
-					break;
+				strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), ".dst");
+				IniFile.auxFileType = AUXDST;
+				auxmen();
+				break;
 			}
 			StateMap.set(StateFlag::SAVAS);
 			nunams();
@@ -6384,16 +5964,13 @@ void savAs() {
 }
 
 void save() {
-
 	TCHAR*	pchr = nullptr;
 
 	if (WorkingFileName[0]) {
-
 		pchr = strrchr(WorkingFileName, '.');
 		if (pchr)
 			pchr++;
 		else {
-
 			strcat_s(WorkingFileName, ".thr");
 			pchr = strrchr(WorkingFileName, '.') + 1;
 		}
@@ -6406,7 +5983,6 @@ void save() {
 }
 
 COLORREF nuCol(COLORREF init) noexcept {
-
 	ColorStruct.Flags = CC_ANYCOLOR | CC_RGBINIT;
 	ColorStruct.hwndOwner = ThrEdWindow;
 	ColorStruct.lCustData = 0;
@@ -6419,7 +5995,6 @@ COLORREF nuCol(COLORREF init) noexcept {
 }
 
 COLORREF nuBak() noexcept {
-
 	BackgroundColorStruct.Flags = CC_ANYCOLOR | CC_RGBINIT;
 	BackgroundColorStruct.hwndOwner = ThrEdWindow;
 	BackgroundColorStruct.lCustData = 0;
@@ -6432,7 +6007,6 @@ COLORREF nuBak() noexcept {
 }
 
 COLORREF nuBit() noexcept {
-
 	BitMapColorStruct.Flags = CC_ANYCOLOR | CC_RGBINIT;
 	BitMapColorStruct.hwndOwner = ThrEdWindow;
 	BitMapColorStruct.lCustData = 0;
@@ -6448,22 +6022,20 @@ void pxCor2stch(POINT point) noexcept {
 	double	ratio;
 
 	ratio = static_cast<double>(point.x - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
-	SelectedPoint.x = ratio*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
+	SelectedPoint.x = ratio * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
 	ratio = static_cast<double>(StitchWindowAbsRect.bottom - point.y) / StitchWindowClientRect.bottom;
-	SelectedPoint.y = ratio*(ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
+	SelectedPoint.y = ratio * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
 }
 
 unsigned px2stch() noexcept {
-
 	double	tdub = 0;
 
 	if (Msg.pt.x >= StitchWindowAbsRect.left && Msg.pt.x <= StitchWindowAbsRect.right
 		&& Msg.pt.y >= StitchWindowAbsRect.top && Msg.pt.y <= StitchWindowAbsRect.bottom) {
-
 		tdub = static_cast<double>(Msg.pt.x - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
-		SelectedPoint.x = tdub*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
+		SelectedPoint.x = tdub * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
 		tdub = static_cast<double>(StitchWindowAbsRect.bottom - Msg.pt.y) / StitchWindowClientRect.bottom;
-		SelectedPoint.y = tdub*(ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
+		SelectedPoint.y = tdub * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
 		return 1;
 	}
 	else
@@ -6471,7 +6043,6 @@ unsigned px2stch() noexcept {
 }
 
 void shft2box() noexcept {
-
 	SelectedPoint.x = StitchBuffer[ClosestPointIndex].x;
 	SelectedPoint.y = StitchBuffer[ClosestPointIndex].y;
 	shft(SelectedPoint);
@@ -6479,7 +6050,6 @@ void shft2box() noexcept {
 }
 
 void zumin() {
-
 	dPOINT		newSize = {};
 	fRECTANGLE	groupBoundingRect = {};
 	fRECTANGLE*	boundingRect = nullptr;
@@ -6558,7 +6128,7 @@ void zumin() {
 			}
 			if (!px2stch())
 				centr();
-		} while (false); 
+		} while (false);
 	}
 	newSize.x = UnzoomedRect.x*ZoomFactor;
 	newSize.y = newSize.x / StitchWindowAspectRatio;
@@ -6570,7 +6140,6 @@ void zumin() {
 	if (!StateMap.test(StateFlag::GMRK) && StateMap.test(StateFlag::SELBOX))
 		shft2box();
 	if (StateMap.test(StateFlag::RUNPAT)) {
-
 		FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 		RunPoint = 0;
 	}
@@ -6581,7 +6150,6 @@ void zumin() {
 }
 
 void zumhom() {
-
 	ZoomRect.bottom = 0;
 	ZoomRect.left = 0;
 	ZoomRect.right = UnzoomedRect.x;
@@ -6591,7 +6159,6 @@ void zumhom() {
 	movStch();
 	NearestCount = 0;
 	if (StateMap.test(StateFlag::RUNPAT)) {
-
 		FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 		RunPoint = 0;
 	}
@@ -6603,15 +6170,12 @@ void zumhom() {
 }
 
 void zumshft() {
-
 	if (StateMap.test(StateFlag::ZUMED)) {
-
 		unboxs();
 		if (px2stch()) {
 			NearestCount = 0;
 			shft(SelectedPoint);
 			if (StateMap.test(StateFlag::RUNPAT)) {
-
 				FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 				RunPoint = 0;
 			}
@@ -6622,7 +6186,6 @@ void zumshft() {
 }
 
 void zumout() {
-
 	POINT		newSize = {};
 	fRECTANGLE	groupBoundingRect = {};
 	fRECTANGLE*	boundingRect = nullptr;
@@ -6631,39 +6194,33 @@ void zumout() {
 	if (StateMap.test(StateFlag::ZUMED)) {
 		do {
 			if (StateMap.test(StateFlag::GMRK)) {
-
 				SelectedPoint.x = ZoomMarkPoint.x;
 				SelectedPoint.y = ZoomMarkPoint.y;
 				break;
 			}
 			if (StateMap.test(StateFlag::FORMSEL)) {
-
 				boundingRect = &FormList[ClosestFormToCursor].rectangle;
 				SelectedPoint.x = ((boundingRect->right - boundingRect->left) / 2) + boundingRect->left;
 				SelectedPoint.y = ((boundingRect->top - boundingRect->bottom) / 2) + boundingRect->bottom;
 				break;
 			}
 			if (StateMap.test(StateFlag::FRMPSEL)) {
-
 				SelectedPoint.x = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].x;
 				SelectedPoint.y = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor].y;
 				break;
 			}
 			if (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::INSRT)) {
-
 				SelectedPoint.x = StitchBuffer[ClosestPointIndex].x;
 				SelectedPoint.y = StitchBuffer[ClosestPointIndex].y;
 				break;
 			}
 			if (StateMap.test(StateFlag::GRPSEL)) {
-
 				selRct(&groupBoundingRect);
 				SelectedPoint.x = ((groupBoundingRect.right - groupBoundingRect.left) / 2) + groupBoundingRect.left;
 				SelectedPoint.y = ((groupBoundingRect.top - groupBoundingRect.bottom) / 2) + groupBoundingRect.bottom;
 				break;
 			}
 			if (StateMap.test(StateFlag::SELBOX)) {
-
 				shft2box();
 				break;
 			}
@@ -6672,7 +6229,6 @@ void zumout() {
 		} while (false);
 		ZoomFactor /= ZUMFCT;
 		if (ZoomFactor > 0.98) {
-
 			ZoomFactor = 1;
 			StateMap.reset(StateFlag::ZUMED);
 			ZoomRect.bottom = 0;
@@ -6683,7 +6239,6 @@ void zumout() {
 			NearestCount = 0;
 		}
 		else {
-
 			newSize.x = UnzoomedRect.x*ZoomFactor;
 			newSize.y = newSize.x / StitchWindowAspectRatio;
 			ZoomRect.left = ZoomRect.bottom = 0;
@@ -6692,7 +6247,6 @@ void zumout() {
 			shft(SelectedPoint);
 		}
 		if (StateMap.test(StateFlag::RUNPAT)) {
-
 			FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 			RunPoint = 0;
 		}
@@ -6703,21 +6257,17 @@ void zumout() {
 }
 
 void duClos(unsigned startStitch, unsigned stitchCount) {
-
 	unsigned	iStitch = 0, iNear = 0, tind0 = 0, tind1 = 0;
 	double		sum = 0.0, lowestSum = 0.0;
 	long		cx = 0, cy = 0;
 
 	for (iStitch = startStitch; iStitch < startStitch + stitchCount; iStitch++) {
-
 		cx = ((StitchBuffer[iStitch].x > SelectedPoint.x) ? (StitchBuffer[iStitch].x - SelectedPoint.x) : (SelectedPoint.x - StitchBuffer[iStitch].x));
 		cy = ((StitchBuffer[iStitch].y > SelectedPoint.y) ? (StitchBuffer[iStitch].y - SelectedPoint.y) : (SelectedPoint.y - StitchBuffer[iStitch].y));
 		sum = hypot(cx, cy);
 		tind0 = iStitch;
 		for (iNear = 0; iNear < NERCNT; iNear++) {
-
 			if (sum < GapToNearest[iNear]) {
-
 				lowestSum = GapToNearest[iNear];
 				tind1 = NearestPoint[iNear];
 				GapToNearest[iNear] = sum;
@@ -6730,23 +6280,19 @@ void duClos(unsigned startStitch, unsigned stitchCount) {
 }
 
 void closPnt() {
-
 	unsigned	iColor = 0, iNear = 0, iStitch0 = 0, iStitch1 = 0;
 
 	unbox();
 	unboxs();
 	for (iNear = 0; iNear < 4; iNear++) {
-
 		GapToNearest[iNear] = 1e99;
 		NearestPoint[iNear] = -1;
 	}
 	px2stch();
 	for (iColor = 0; iColor < ColorChanges; iColor++) {
-
 		iStitch0 = ColorChangeTable[iColor].stitchIndex;
 		iStitch1 = ColorChangeTable[iColor + 1].stitchIndex;
 		if (StateMap.test(StateFlag::HID)) {
-
 			if (ColorChangeTable[iColor].colorIndex == ActiveColor)
 				duClos(iStitch0, iStitch1 - iStitch0);
 		}
@@ -6755,9 +6301,7 @@ void closPnt() {
 	}
 	GetClientRect(MainStitchWin, &StitchWindowClientRect);
 	for (iNear = 0; iNear < NERCNT; iNear++) {
-
 		if (stch2px(NearestPoint[iNear])) {
-
 			NearestPoint[NearestCount] = NearestPoint[iNear];
 			NearestPixel[NearestCount].x = StitchCoordinatesPixels.x;
 			NearestPixel[NearestCount++].y = StitchCoordinatesPixels.y;
@@ -6777,21 +6321,17 @@ bool closPnt1(unsigned* closestStitch) {
 		double		currentDistance = 1e99;
 
 		if (StateMap.test(StateFlag::SELBOX) && stch2px(ClosestPointIndex)) {
-
 			if (hypot(StitchCoordinatesPixels.x - pointToCheck.x, StitchCoordinatesPixels.y - pointToCheck.y) < CLOSENUF) {
-
 				*closestStitch = ClosestPointIndex;
 				return true;
 			}
 		}
 		for (iNear = 0; iNear < NearestCount; iNear++) {
-
 			offset = BoxOffset[iNear];
 			if (pointToCheck.x >= NearestPixel[iNear].x - offset &&
 				pointToCheck.x <= NearestPixel[iNear].x + offset &&
 				pointToCheck.y >= NearestPixel[iNear].y - offset &&
 				pointToCheck.y <= NearestPixel[iNear].y + offset) {
-
 				*closestStitch = NearestPoint[iNear];
 				return true;
 			}
@@ -6799,23 +6339,17 @@ bool closPnt1(unsigned* closestStitch) {
 		px2stch();
 		DistanceToClick = 1e99;
 		if (StateMap.test(StateFlag::HID)) {
-
 			for (iColor = 0; iColor < ColorChanges; iColor++) {
-
 				if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
-
 					for (iStitch = ColorChangeTable[iColor].stitchIndex; iStitch < ColorChangeTable[iColor + 1].stitchIndex; iStitch++) {
-
 						if (StitchBuffer[iStitch].x >= ZoomRect.left &&
 							StitchBuffer[iStitch].x <= ZoomRect.right &&
 							StitchBuffer[iStitch].y >= ZoomRect.bottom &&
 							StitchBuffer[iStitch].y <= ZoomRect.top) {
-
 							cx = ((StitchBuffer[iStitch].x > SelectedPoint.x) ? (StitchBuffer[iStitch].x - SelectedPoint.x) : (SelectedPoint.x - StitchBuffer[iStitch].x));
 							cy = ((StitchBuffer[iStitch].y > SelectedPoint.y) ? (StitchBuffer[iStitch].y - SelectedPoint.y) : (SelectedPoint.y - StitchBuffer[iStitch].y));
 							currentDistance = hypot(cx, cy);
 							if (currentDistance < DistanceToClick) {
-
 								DistanceToClick = currentDistance;
 								closestIndex = iStitch;
 							}
@@ -6825,22 +6359,17 @@ bool closPnt1(unsigned* closestStitch) {
 			}
 		}
 		else {
-
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 				layer = (StitchBuffer[iStitch].attribute&LAYMSK) >> LAYSHFT;
 				if (!ActiveLayer || !layer || layer == ActiveLayer) {
-
 					if (StitchBuffer[iStitch].x >= ZoomRect.left &&
 						StitchBuffer[iStitch].x <= ZoomRect.right &&
 						StitchBuffer[iStitch].y >= ZoomRect.bottom &&
 						StitchBuffer[iStitch].y <= ZoomRect.top) {
-
 						cx = StitchBuffer[iStitch].x - SelectedPoint.x;
 						cy = StitchBuffer[iStitch].y - SelectedPoint.y;
 						currentDistance = hypot(cx, cy);
 						if (currentDistance < DistanceToClick) {
-
 							DistanceToClick = currentDistance;
 							closestIndex = iStitch;
 						}
@@ -6851,17 +6380,13 @@ bool closPnt1(unsigned* closestStitch) {
 		if (DistanceToClick == 1e99)
 			return false;
 		else {
-
 			stch2px(closestIndex);
 			if (StateMap.test(StateFlag::IGNTHR)) {
-
 				*closestStitch = closestIndex;
 				return true;
 			}
 			else {
-
 				if (hypot(pointToCheck.x - StitchCoordinatesPixels.x, pointToCheck.y - StitchCoordinatesPixels.y) < CLOSENUF) {
-
 					*closestStitch = closestIndex;
 					return true;
 				}
@@ -6877,7 +6402,6 @@ constexpr unsigned pt2colInd(unsigned iStitch) {
 	unsigned iColor = 0;
 
 	for (iColor = 0; iColor < ColorChanges; iColor++) {
-
 		if (ColorChangeTable[iColor].stitchIndex > iStitch)
 			break;
 	}
@@ -6885,11 +6409,9 @@ constexpr unsigned pt2colInd(unsigned iStitch) {
 }
 
 void unthum() {
-
 	unsigned	iBackup = 0;
 
 	if (StateMap.testAndReset(StateFlag::THUMSHO)) {
-
 		for (iBackup = 0; iBackup < 4; iBackup++)
 			DestroyWindow(BackupViewer[iBackup]);
 		if (StateMap.test(StateFlag::UPTO))
@@ -6907,25 +6429,19 @@ void unthum() {
 }
 
 void toglup() {
-
 	if (StateMap.testAndFlip(StateFlag::UPTO))
 		butxt(HUPTO, StringTable[STR_UPOF]);
 	else {
-
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
-
 			rngadj();
 			ClosestPointIndex = GroupStartStitch;
 			StateMap.set(StateFlag::SELBOX);
 			StateMap.reset(StateFlag::FRMPSEL);
 		}
 		else {
-
 			if (!StateMap.test(StateFlag::SELBOX)) {
-
 				ClosestPointIndex = 0;
 				if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-
 					while (ClosestPointIndex < PCSHeader.stitchCount && notfstch(StitchBuffer[ClosestPointIndex].attribute))
 						ClosestPointIndex++;
 					StateMap.set(StateFlag::SELBOX);
@@ -6939,7 +6455,6 @@ void toglup() {
 }
 
 void toglHid() {
-
 	if (StateMap.testAndFlip(StateFlag::HID))
 		StateMap.reset(StateFlag::FRMOF);
 	else
@@ -6950,7 +6465,6 @@ void toglHid() {
 }
 
 void dulin() {
-
 	SelectObject(StitchWindowDC, LinePen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	if (MoveLine0[0].x == MoveLine1[1].x && MoveLine0[0].y == MoveLine1[1].y) {
@@ -6972,22 +6486,18 @@ void dulin() {
 }
 
 void unlin() {
-
 	if (StateMap.test(StateFlag::WASLIN))
 		dulin();
 }
 
 void movbox() {
-
 	if (stch2px(ClosestPointIndex)) {
-
 		unbox();
 		dubox();
 		if (StateMap.test(StateFlag::UPTO))
 			StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-
 		shft2box();
 		StateMap.set(StateFlag::SELBOX);
 		StateMap.reset(StateFlag::FRMPSEL);
@@ -6998,9 +6508,7 @@ void movbox() {
 }
 
 bool chkhid(unsigned colorToCheck) {
-
 	if (StateMap.test(StateFlag::HID)) {
-
 		if (ColorChangeTable[colorToCheck].colorIndex == ActiveColor)
 			return 1;
 		else
@@ -7088,40 +6596,34 @@ unsigned closlin() {
 #define		TOL	20
 	unboxs();
 	offset = static_cast<float>(Msg.pt.x - StitchWindowAbsRect.left) / (StitchWindowAbsRect.right - StitchWindowAbsRect.left);
-	checkedPoint.x = offset*(ZoomRect.right - ZoomRect.left) + ZoomRect.left;
+	checkedPoint.x = offset * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
 	offset = static_cast<float>(StitchWindowAbsRect.bottom - Msg.pt.y) / (StitchWindowAbsRect.bottom - StitchWindowAbsRect.top);
 	checkedPoint.y = (offset*(ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom);
 	offset = static_cast<double>(ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
-	tolerance = offset*TOL;
+	tolerance = offset * TOL;
 	for (iChange = 0; iChange < ColorChanges; iChange++) {
 		stitchCount = ColorChangeTable[iChange + 1].stitchIndex - ColorChangeTable[iChange].stitchIndex;
 		const fPOINTATTR* stitches = &StitchBuffer[ColorChangeTable[iChange].stitchIndex];
 		if (stitches) {
 			if (chkhid(iChange)) {
-
 				for (iStitch = 0; iStitch < stitchCount; iStitch++) {
 					layer = (stitches[iStitch].attribute&LAYMSK) >> LAYSHFT;
 					if (!ActiveLayer || !layer || (layer == ActiveLayer)) {
-
 						xba = stitches[iStitch + 1].x - stitches[iStitch].x;
 						yab = stitches[iStitch].y - stitches[iStitch + 1].y;
 						if (xba > 0) {
-
 							boundingRect.left = stitches[iStitch].x - tolerance;
 							boundingRect.right = stitches[iStitch + 1].x + tolerance;
 						}
 						else {
-
 							boundingRect.left = stitches[iStitch + 1].x - tolerance;
 							boundingRect.right = stitches[iStitch].x + tolerance;
 						}
 						if (yab < 0) {
-
 							boundingRect.bottom = stitches[iStitch].y - tolerance;
 							boundingRect.top = stitches[iStitch + 1].y + tolerance;
 						}
 						else {
-
 							boundingRect.bottom = stitches[iStitch + 1].y - tolerance;
 							boundingRect.top = stitches[iStitch].y + tolerance;
 						}
@@ -7129,7 +6631,6 @@ unsigned closlin() {
 							&& checkedPoint.y>boundingRect.bottom && checkedPoint.y < boundingRect.top) {
 							do {
 								if (yab == 0) {
-
 									//stitch is horizontal
 									intersection.x = checkedPoint.x;
 									intersection.y = stitches[iStitch].y;
@@ -7137,7 +6638,6 @@ unsigned closlin() {
 								}
 								else {
 									if (xba == 0) {
-
 										//stitch is vertical
 										dx = stitches[iStitch].x - checkedPoint.x;
 										boundingRect.top -= tolerance;
@@ -7193,7 +6693,6 @@ unsigned closlin() {
 								tsum = sqrt(dx*dx + dy * dy);
 							} while (false);
 							if (tsum < sum) {
-
 								sum = tsum;
 								closestPoint = iStitch + ColorChangeTable[iChange].stitchIndex;
 							}
@@ -7210,7 +6709,6 @@ unsigned closlin() {
 }
 
 void ilin() noexcept {
-
 	SelectObject(StitchWindowDC, LinePen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	Polyline(StitchWindowDC, InsertLine, 2);
@@ -7226,13 +6724,11 @@ void ilin() noexcept {
 }
 
 void xlin() {
-
 	if (StateMap.testAndReset(StateFlag::ILIN))
 		ilin();
 }
 
 void ilin1() noexcept {
-
 	SelectObject(StitchWindowDC, LinePen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	Polyline(StitchWindowDC, InsertLine, 2);
@@ -7240,13 +6736,11 @@ void ilin1() noexcept {
 }
 
 void xlin1() {
-
 	if (StateMap.testAndReset(StateFlag::ILIN1))
 		ilin1();
 }
 
 void duIns() {
-
 	POINT	tlin[2] = {};
 
 	// ToDo - what is tlin being used for?
@@ -7264,15 +6758,12 @@ void duIns() {
 }
 
 void istch() {
-
 	double	angb = 0.0, angf = 0.0, angt = 0.0;
 
 	xlin();
 	xlin1();
 	if (StateMap.test(StateFlag::SELBOX)) {
-
 		if (ClosestPointIndex && ClosestPointIndex != gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
-
 			px2stch();
 			angt = atan2(StitchBuffer[ClosestPointIndex].y - SelectedPoint.y, StitchBuffer[ClosestPointIndex].x - SelectedPoint.x);
 			angb = atan2(StitchBuffer[ClosestPointIndex].y - StitchBuffer[ClosestPointIndex - 1].y, StitchBuffer[ClosestPointIndex].x - StitchBuffer[ClosestPointIndex - 1].x);
@@ -7281,7 +6772,6 @@ void istch() {
 				ClosestPointIndex--;
 		}
 		else {
-
 			if (ClosestPointIndex == gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 				ClosestPointIndex--;
 		}
@@ -7291,7 +6781,6 @@ void istch() {
 	if (ClosestPointIndex == -1)
 		StateMap.reset(StateFlag::INSRT);
 	else {
-
 		StateMap.set(StateFlag::INSRT);
 		duIns();
 		SetCapture(ThrEdWindow);
@@ -7301,7 +6790,6 @@ void istch() {
 }
 
 void cros(unsigned iStitch) noexcept {
-
 	const long	armLength = BoxOffset[0];
 
 	stch2px1(iStitch);
@@ -7328,9 +6816,7 @@ void cros(unsigned iStitch) noexcept {
 }
 
 void mark() {
-
 	if (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::INSRT) || closPnt1(&ClosestPointIndex)) {
-
 		unbox();
 		xlin();
 		StateMap.reset(StateFlag::CAPT);
@@ -7344,7 +6830,6 @@ void mark() {
 }
 
 void selCol() {
-
 	unsigned	iStitch = 0, color = 0;
 
 	if (PCSHeader.stitchCount) {
@@ -7379,7 +6864,6 @@ void selCol() {
 }
 
 void nuAct(unsigned iStitch) noexcept {
-
 	unsigned	color;
 
 	color = ActiveColor;
@@ -7389,12 +6873,10 @@ void nuAct(unsigned iStitch) noexcept {
 }
 
 void newFil() {
-
 	unsigned	iColor = 0;
 
 	StateMap.reset(StateFlag::CMPDO);
 	if (PCSBMPFileName[0]) {
-
 		PCSBMPFileName[0] = 0;
 		DeleteObject(BitmapFileHandle);
 		ReleaseDC(ThrEdWindow, BitmapDC);
@@ -7433,7 +6915,6 @@ void newFil() {
 	ColorChanges = 0;
 	KnotCount = 0;
 	for (iColor = 0; iColor < 16; iColor++) {
-
 		redraw(DefaultColorWin[iColor]);
 		redraw(UserColorWin[iColor]);
 		redraw(ThreadSizeWin[iColor]);
@@ -7442,7 +6923,6 @@ void newFil() {
 }
 
 void bBox() noexcept {
-
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	SelectObject(StitchWindowDC, LinePen);
 	Polyline(StitchWindowDC, ZoomBoxLine, 5);
@@ -7450,23 +6930,19 @@ void bBox() noexcept {
 }
 
 void unbBox() {
-
 	if (StateMap.testAndReset(StateFlag::BZUM))
 		bBox();
 }
 
 void rebox() {
-
 	unsigned iColor = 0;
 
 	unbox();
 	if (closPnt1(&ClosestPointIndex)) {
-
 		nuAct(ClosestPointIndex);
 		if (stch2px(ClosestPointIndex))
 			dubox();
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
-
 			StateMap.reset(StateFlag::SCROS);
 			StateMap.reset(StateFlag::ECROS);
 			SearchLineIndex = 0;
@@ -7479,7 +6955,6 @@ void rebox() {
 }
 
 void endpnt() {
-
 	unbox();
 	xlin();
 	xlin1();
@@ -7493,13 +6968,11 @@ void endpnt() {
 }
 
 void delstchm() noexcept {
-
 	unsigned	iStitch = 0, destination = 0;
 
 	rngadj();
 	destination = GroupStartStitch;
 	for (iStitch = GroupEndStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		StitchBuffer[destination].attribute = StitchBuffer[iStitch].attribute;
 		StitchBuffer[destination].x = StitchBuffer[iStitch].x;
 		StitchBuffer[destination++].y = StitchBuffer[iStitch].y;
@@ -7508,21 +6981,17 @@ void delstchm() noexcept {
 }
 
 void unsid() noexcept {
-
 	FormMenuChoice = 0;
 	if (SideMessageWindow) {
-
 		DestroyWindow(SideMessageWindow);
 		SideMessageWindow = 0;
 	}
 }
 
 void unbsho() {
-
 	unsigned	iBackup = 0;
 
 	if (StateMap.testAndReset(StateFlag::BAKSHO)) {
-
 		for (iBackup = 0; iBackup < OLDVER; iBackup++)
 			DestroyWindow(BackupViewer[iBackup]);
 	}
@@ -7530,16 +6999,13 @@ void unbsho() {
 
 [[gsl::suppress(con.3)]]
 bool oldwnd(HWND window) noexcept {
-
 	unsigned	iWindow = 0, iColor = 0;
 
 	for (iColor = 0; iColor < 16; iColor++) {
-
 		if (DefaultColorWin[iColor] == window || UserColorWin[iColor] == window || ThreadSizeWin[iColor] == window)
 			return 0;
 	}
 	for (iWindow = 0; iWindow < 9; iWindow++) {
-
 		if (ButtonWin[iWindow] == window)
 			return 0;
 	}
@@ -7562,16 +7028,13 @@ BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
 	if (oldwnd(hwnd))
 		return DestroyWindow(hwnd);
 	else {
-
 		if (FirstWin) {
-
 			if (FirstWin == hwnd)
 				return 0;
 			else
 				return TRUE;
 		}
 		else {
-
 			FirstWin = hwnd;
 			return TRUE;
 		}
@@ -7579,7 +7042,6 @@ BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
 }
 
 void insadj() {
-
 	StateMap.reset(StateFlag::PRELIN);
 	fvars(ClosestFormToCursor);
 	refil();
@@ -7588,7 +7050,6 @@ void insadj() {
 }
 
 void rstAll() {
-
 	StateMap.reset(StateFlag::WASFPNT);
 	StateMap.reset(StateFlag::WASFRMFRM);
 	StateMap.reset(StateFlag::FPUNCLP);
@@ -7664,7 +7125,6 @@ void rstAll() {
 }
 
 void rstdu() {
-
 	deldu();
 	StateMap.reset(StateFlag::REDUSHO);
 	StateMap.reset(StateFlag::UNDUSHO);
@@ -7674,7 +7134,6 @@ void rstdu() {
 }
 
 void duclp() noexcept {
-
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	SelectObject(StitchWindowDC, LinePen);
 	Polyline(StitchWindowDC, ClipInsertBoxLine, 5);
@@ -7682,13 +7141,11 @@ void duclp() noexcept {
 }
 
 void unclp() {
-
 	if (StateMap.testAndReset(StateFlag::CLPSHO))
 		duclp();
 }
 
 void dusel(HDC dc) {
-
 	unsigned	ind;
 
 	SetROP2(dc, R2_NOTXORPEN);
@@ -7700,13 +7157,11 @@ void dusel(HDC dc) {
 }
 
 void unsel() {
-
 	if (StateMap.testAndReset(StateFlag::SELSHO))
 		dusel(StitchWindowDC);
 }
 
 void clpbox() {
-
 	SIZE	adjustedSize = {};
 	const double	ratio = static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
 
@@ -7730,7 +7185,6 @@ void clpbox() {
 }
 
 void lodclp(unsigned iStitch) {
-
 	fPOINT		adjustment = { (ClipOrigin.x - ClipRect.left),
 							   (ClipOrigin.y - ClipRect.bottom) };
 	unsigned	source = PCSHeader.stitchCount - 1;
@@ -7740,7 +7194,6 @@ void lodclp(unsigned iStitch) {
 		iStitch++;
 	if (iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) && StateMap.test(StateFlag::INIT)) {
 		while (source >= iStitch) {
-
 			StitchBuffer[destination].x = StitchBuffer[source].x;
 			StitchBuffer[destination].y = StitchBuffer[source--].y;
 			StitchBuffer[destination--].attribute = StitchBuffer[source].attribute;
@@ -7748,7 +7201,6 @@ void lodclp(unsigned iStitch) {
 	}
 	ClosestPointIndex = iStitch;
 	for (source = 0; source < ClipStitchCount; source++) {
-
 		StitchBuffer[iStitch].x = ClipBuffer[source].x + adjustment.x;
 		StitchBuffer[iStitch].y = ClipBuffer[source].y + adjustment.y;
 		StitchBuffer[iStitch++].attribute = ClipBuffer[source].attribute&COLMSK | LayerIndex | NOTFRM;
@@ -7761,7 +7213,6 @@ void lodclp(unsigned iStitch) {
 }
 
 void rSelbox() {
-
 	const double	ratio = static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
 	SIZE	adjustedSelectSize = { static_cast<LONG>(SelectBoxSize.cx*ratio + 0.5),
 								   static_cast<LONG>(SelectBoxSize.cy*ratio + 0.5) };
@@ -7789,7 +7240,6 @@ void rSelbox() {
 }
 
 void duSelbox() noexcept {
-
 	px2stch();
 	SelectBoxSize.cx = StitchRangeRect.right - StitchRangeRect.left;
 	SelectBoxSize.cy = StitchRangeRect.top - StitchRangeRect.bottom;
@@ -7798,18 +7248,15 @@ void duSelbox() noexcept {
 }
 
 void setbak(unsigned penWidth) noexcept {
-
 	if (BackgroundPenWidth != penWidth)
 		BackgroundPen = nuPen(BackgroundPen, penWidth, BackgroundColor);
 }
 
 void stchbox(unsigned iStitch, HDC dc) noexcept {
-
 	POINT		line[5] = {};
 	const unsigned	layer = (StitchBuffer[iStitch].attribute&LAYMSK) >> LAYSHFT;
 
 	if (!ActiveLayer || !layer || layer == ActiveLayer) {
-
 		stch2px1(iStitch);
 		line[0].x = line[3].x = line[4].x = StitchCoordinatesPixels.x - IniFile.stitchSizePixels;
 		line[0].y = line[1].y = StitchCoordinatesPixels.y - IniFile.stitchSizePixels;
@@ -7821,19 +7268,16 @@ void stchbox(unsigned iStitch, HDC dc) noexcept {
 }
 
 void sCor2px(dPOINT stitchCoordinate, POINT* pixelCoordinate) noexcept {
-
 	pixelCoordinate->x = (stitchCoordinate.x - ZoomRect.left)*ZoomRatio.x + 0.5;
 	pixelCoordinate->y = StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchCoordinate.y)*ZoomRatio.y + 0.5;
 }
 
 void sdCor2px(fPOINTATTR stitchPoint, POINT* pixelCoordinate) noexcept {
-
 	pixelCoordinate->x = (stitchPoint.x - ZoomRect.left)*ZoomRatio.x + 0.5;
 	pixelCoordinate->y = StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchPoint.y)*ZoomRatio.y + 0.5;
 }
 
 void durot() noexcept {
-
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	SelectObject(StitchWindowDC, LinePen);
 	Polyline(StitchWindowDC, RotateBoxOutline, 5);
@@ -7843,13 +7287,11 @@ void durot() noexcept {
 }
 
 void unrot() {
-
 	if (StateMap.testAndReset(StateFlag::ROTSHO))
 		durot();
 }
 
 void durotu() noexcept {
-
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	SelectObject(StitchWindowDC, LinePen);
 	Polyline(StitchWindowDC, RotateBoxToCursorLine, 2);
@@ -7857,51 +7299,44 @@ void durotu() noexcept {
 }
 
 void unrotu() {
-
 	if (StateMap.testAndReset(StateFlag::ROTUSHO))
 		durotu();
 }
 
 void rotang(dPOINT unrotatedPoint, POINT* rotatedPoint) {
-
 	double	distanceToCenter = 0.0, newAngle = 0.0;
 	dPOINT	point = {};
-	const long	dx = unrotatedPoint.x - RotationCenter.x; 
+	const long	dx = unrotatedPoint.x - RotationCenter.x;
 	const long	dy = unrotatedPoint.y - RotationCenter.y;
-		
-	if (dx) {
 
+	if (dx) {
 		distanceToCenter = hypot(dx, dy);
 		newAngle = atan2(dy, dx);
 		newAngle += RotationAngle;
 	}
 	else {
-
 		distanceToCenter = abs(dy);
 		if (dy > 0)
 			newAngle = PI / 2 + RotationAngle;
 		else
 			newAngle = RotationAngle - PI / 2;
 	}
-	point.y = RotationCenter.y + distanceToCenter*sin(newAngle);
-	point.x = RotationCenter.x + distanceToCenter*cos(newAngle);
+	point.y = RotationCenter.y + distanceToCenter * sin(newAngle);
+	point.x = RotationCenter.x + distanceToCenter * cos(newAngle);
 	sCor2px(point, rotatedPoint);
 }
 
 void rotang1(fPOINTATTR unrotatedPoint, fPOINT* rotatedPoint) noexcept {
-
 	double	distanceToCenter = 0.0, newAngle = 0.0;
-	const double	dx = unrotatedPoint.x - RotationCenter.x; 
+	const double	dx = unrotatedPoint.x - RotationCenter.x;
 	const double	dy = unrotatedPoint.y - RotationCenter.y;
-	
-	if (dx) {
 
+	if (dx) {
 		distanceToCenter = hypot(dx, dy);
 		newAngle = atan2(dy, dx);
 		newAngle += RotationAngle;
 	}
 	else {
-
 		if (dy > 0) {
 			distanceToCenter = dy;
 			newAngle = PI / 2 + RotationAngle;
@@ -7911,24 +7346,21 @@ void rotang1(fPOINTATTR unrotatedPoint, fPOINT* rotatedPoint) noexcept {
 			newAngle = RotationAngle - PI / 2;
 		}
 	}
-	rotatedPoint->y = RotationCenter.y + distanceToCenter*sin(newAngle);
-	rotatedPoint->x = RotationCenter.x + distanceToCenter*cos(newAngle);
+	rotatedPoint->y = RotationCenter.y + distanceToCenter * sin(newAngle);
+	rotatedPoint->x = RotationCenter.x + distanceToCenter * cos(newAngle);
 }
 
 void rotangf(fPOINT unrotatedPoint, fPOINT* rotatedPoint) noexcept {
-
 	double	distanceToCenter = 0.0, newAngle = 0.0;
-	const double	dx = unrotatedPoint.x - RotationCenter.x; 
+	const double	dx = unrotatedPoint.x - RotationCenter.x;
 	const double	dy = unrotatedPoint.y - RotationCenter.y;
 
 	if (dx) {
-
 		distanceToCenter = hypot(dx, dy);
 		newAngle = atan2(dy, dx);
 		newAngle += RotationAngle;
 	}
 	else {
-
 		if (dy > 0) {
 			distanceToCenter = dy;
 			newAngle = PI / 2 + RotationAngle;
@@ -7938,38 +7370,35 @@ void rotangf(fPOINT unrotatedPoint, fPOINT* rotatedPoint) noexcept {
 			newAngle = RotationAngle - PI / 2;
 		}
 	}
-	rotatedPoint->y = RotationCenter.y + distanceToCenter*sin(newAngle);
-	rotatedPoint->x = RotationCenter.x + distanceToCenter*cos(newAngle);
+	rotatedPoint->y = RotationCenter.y + distanceToCenter * sin(newAngle);
+	rotatedPoint->x = RotationCenter.x + distanceToCenter * cos(newAngle);
 }
 
 void rotpix(POINT unrotatedPoint, POINT* rotatedPoint) {
 	//won't handle vertical lines
 
 	double	distanceToCenter = 0.0, newAngle = 0.0;
-	const long	dx = unrotatedPoint.x - RotationCenterPixels.x; 
+	const long	dx = unrotatedPoint.x - RotationCenterPixels.x;
 	const long	dy = unrotatedPoint.y - RotationCenterPixels.y;
 
 	distanceToCenter = hypot(dx, dy);
 	newAngle = atan2(dy, dx);
 	newAngle -= RotateAngle;
-	rotatedPoint->y = RotationCenterPixels.y + distanceToCenter*sin(newAngle);
-	rotatedPoint->x = RotationCenterPixels.x + distanceToCenter*cos(newAngle);
+	rotatedPoint->y = RotationCenterPixels.y + distanceToCenter * sin(newAngle);
+	rotatedPoint->x = RotationCenterPixels.x + distanceToCenter * cos(newAngle);
 }
 
 void rotflt(fPOINT* point) noexcept {
-
 	double	len = 0.0, ang0 = 0.0;
-	const double	dx = point->x - RotationCenter.x; 
+	const double	dx = point->x - RotationCenter.x;
 	const double	dy = point->y - RotationCenter.y;
 
 	if (dx) {
-
 		len = hypot(dx, dy);
 		ang0 = atan2(dy, dx);
 		ang0 += RotationAngle;
 	}
 	else {
-
 		if (dy > 0) {
 			len = dy;
 			ang0 = PI / 2 + RotationAngle;
@@ -7979,24 +7408,21 @@ void rotflt(fPOINT* point) noexcept {
 			ang0 = RotationAngle - PI / 2;
 		}
 	}
-	point->y = RotationCenter.y + len*sin(ang0);
-	point->x = RotationCenter.x + len*cos(ang0);
+	point->y = RotationCenter.y + len * sin(ang0);
+	point->x = RotationCenter.x + len * cos(ang0);
 }
 
 void rotstch(fPOINTATTR* stitch) noexcept {
-
 	double	distanceToCenter = 0.0, newAngle = 0.0;
-	const double	dx = stitch->x - RotationCenter.x; 
+	const double	dx = stitch->x - RotationCenter.x;
 	const double	dy = stitch->y - RotationCenter.y;
 
 	if (dx) {
-
 		distanceToCenter = hypot(dx, dy);
 		newAngle = atan2(dy, dx);
 		newAngle += RotationAngle;
 	}
 	else {
-
 		if (dy > 0) {
 			distanceToCenter = dy;
 			newAngle = PI / 2 + RotationAngle;
@@ -8006,12 +7432,11 @@ void rotstch(fPOINTATTR* stitch) noexcept {
 			newAngle = RotationAngle - PI / 2;
 		}
 	}
-	stitch->y = RotationCenter.y + distanceToCenter*sin(newAngle);
-	stitch->x = RotationCenter.x + distanceToCenter*cos(newAngle);
+	stitch->y = RotationCenter.y + distanceToCenter * sin(newAngle);
+	stitch->x = RotationCenter.x + distanceToCenter * cos(newAngle);
 }
 
 void ritrot() {
-
 	POINT	rotated = {};
 	dPOINT	rotationReference = { (RotationRect.left),(RotationRect.top) };
 
@@ -8052,7 +7477,6 @@ void ritrot() {
 }
 
 void durcntr() {
-
 	RotationCenter.x = midl(RotationRect.right, RotationRect.left);
 	RotationCenter.y = midl(RotationRect.top, RotationRect.bottom);
 }
@@ -8093,7 +7517,6 @@ void rot() {
 }
 
 void savclp(unsigned destination, unsigned source) noexcept {
-
 	double	frct = 0.0, intg = 0.0;
 
 	ClipStitchData[destination].led = StitchBuffer[source].attribute&COLMSK;
@@ -8111,7 +7534,6 @@ void savclp(unsigned destination, unsigned source) noexcept {
 }
 
 void rtclpfn(unsigned destination, unsigned source) noexcept {
-
 	double	fractional = 0.0, integer = 0.0;
 
 	ClipStitchData[destination].led = 0;
@@ -8129,7 +7551,6 @@ void rtclpfn(unsigned destination, unsigned source) noexcept {
 }
 
 unsigned sizfclp() {
-
 	unsigned	clipSize;
 
 	clipSize = sizeof(FORMCLIP) + VertexCount * sizeof(fPOINT);
@@ -8145,7 +7566,6 @@ unsigned sizfclp() {
 }
 
 unsigned frmcnt(unsigned iForm) noexcept {
-
 	const unsigned	codedAttribute = iForm << FRMSHFT;
 	unsigned	stitchCount = 0, iStitch = 0;
 
@@ -8177,14 +7597,12 @@ unsigned frmcnt(unsigned iForm) noexcept {
 }
 
 unsigned sizclp() {
-
 	unsigned	length = 0;
 
 	length = FileSize = sizeof(FORMCLIP) + VertexCount * sizeof(fPOINT);
 	if (SelectedForm->type == SAT)
 		FileSize += SelectedForm->satinGuideCount * sizeof(SATCON);
 	if (SelectedForm->fillType || SelectedForm->edgeType) {
-
 		length += frmcnt(ClosestFormToCursor);
 		FileSize += length * sizeof(fPOINTATTR);
 	}
@@ -8199,7 +7617,6 @@ unsigned sizclp() {
 }
 
 constexpr unsigned lenclp() {
-
 	unsigned	codedAttribute = 0, iStitch = 0, stitchCount = 0;
 
 	stitchCount = 0;
@@ -8212,16 +7629,13 @@ constexpr unsigned lenclp() {
 }
 
 void duclip() {
-
 	unsigned		iClip = 0, iDestination = 0, iForm = 0, iGuide = 0;
 	unsigned		iSide = 0, iStitch = 0, iSource = 0, iTexture = 0, iVertex = 0;
 	unsigned		guideCount = 0, pointCount = 0, textureCount = 0, stitchCount = 0;
 	unsigned		length = 0, codedAttribute = 0, msiz = 0;
 
 	if (StateMap.test(StateFlag::FPSEL)) {
-
 		if (OpenClipboard(ThrEdWindow)) {
-
 			EmptyClipboard();
 			ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 			ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, (SelectedFormVertices.vertexCount + 1) * sizeof(fPOINT) + sizeof(FORMVERTEXCLIP));
@@ -8239,7 +7653,6 @@ void duclip() {
 				fvars(ClosestFormToCursor);
 				iSource = SelectedFormVertices.start;
 				for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
-
 					vertices[iVertex].x = CurrentFormVertices[iSource].x;
 					vertices[iVertex].y = CurrentFormVertices[iSource].y;
 					iSource = pdir(iSource);
@@ -8257,15 +7670,11 @@ void duclip() {
 	if (StateMap.test(StateFlag::BIGBOX))
 		tabmsg(IDS_INSF);
 	else {
-
 		if (OpenClipboard(ThrEdWindow)) {
-
 			EmptyClipboard();
 			ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 			if (SelectedFormCount) {
-
 				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-
 					ClosestFormToCursor = SelectedFormList[iForm];
 					fvars(ClosestFormToCursor);
 					length += sizfclp();
@@ -8280,7 +7689,6 @@ void duclip() {
 					// Skip past the header
 					FRMHED* forms = convert_ptr<FRMHED *>(&ClipFormsHeader[1]);
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-
 						SelectedForm = &FormList[SelectedFormList[iForm]];
 						frmcpy(&forms[iForm], &FormList[SelectedFormList[iForm]]);
 					}
@@ -8288,10 +7696,8 @@ void duclip() {
 					CurrentFormVertices = convert_ptr<fPOINT *>(&forms[iForm]);
 					iVertex = 0;
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-
 						SelectedForm = &FormList[SelectedFormList[iForm]];
 						for (iSide = 0; iSide < SelectedForm->vertexCount; iSide++) {
-
 							CurrentFormVertices[iVertex].x = SelectedForm->vertices[iSide].x;
 							CurrentFormVertices[iVertex++].y = SelectedForm->vertices[iSide].y;
 						}
@@ -8300,12 +7706,9 @@ void duclip() {
 					SATCON* guides = convert_ptr<SATCON *>(&CurrentFormVertices[iVertex]);
 					guideCount = 0;
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-
 						SelectedForm = &FormList[SelectedFormList[iForm]];
 						if (SelectedForm->type == SAT) {
-
 							for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-
 								guides[guideCount].start = SelectedForm->satinOrAngle.guide[iGuide].start;
 								guides[guideCount++].finish = SelectedForm->satinOrAngle.guide[iGuide].finish;
 							}
@@ -8315,20 +7718,15 @@ void duclip() {
 					fPOINT* points = convert_ptr<fPOINT *>(&guides[guideCount]);
 					pointCount = 0;
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-
 						SelectedForm = &FormList[SelectedFormList[iForm]];
 						if (isclpx(SelectedFormList[iForm])) {
-
 							for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
-
 								points[pointCount].x = SelectedForm->angleOrClipData.clip[iClip].x;
 								points[pointCount++].y = SelectedForm->angleOrClipData.clip[iClip].y;
 							}
 						}
 						if (iseclp(SelectedFormList[iForm])) {
-
 							for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
-
 								points[pointCount].x = SelectedForm->borderClipData[iClip].x;
 								points[pointCount++].y = SelectedForm->borderClipData[iClip].y;
 							}
@@ -8357,9 +7755,7 @@ void duclip() {
 				stitchCount = 0;
 				LowerLeftStitch.x = LowerLeftStitch.y = 1e30f;
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 					if (!(StitchBuffer[iStitch].attribute&NOTFRM) && chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
-
 						if (StitchBuffer[iStitch].x < LowerLeftStitch.x)
 							LowerLeftStitch.x = StitchBuffer[iStitch].x;
 						if (StitchBuffer[iStitch].y < LowerLeftStitch.y)
@@ -8370,7 +7766,6 @@ void duclip() {
 					}
 				}
 				if (PCSHeader.stitchCount && stitchCount) {
-
 					Clip = RegisterClipboardFormat(PcdClipFormat);
 					ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2);
 					if (ClipPointer) {
@@ -8389,9 +7784,7 @@ void duclip() {
 				}
 			}
 			else {
-
 				if (StateMap.test(StateFlag::FORMSEL)) {
-
 					length = sizclp();
 					fvars(ClosestFormToCursor);
 					codedAttribute = ClosestFormToCursor << FRMSHFT;
@@ -8404,16 +7797,13 @@ void duclip() {
 						frmcpy(&ClipFormHeader->form, &FormList[ClosestFormToCursor]);
 						CurrentFormVertices = convert_ptr<fPOINT *>(&ClipFormHeader[1]);
 						for (iSide = 0; iSide < SelectedForm->vertexCount; iSide++) {
-
 							CurrentFormVertices[iSide].x = SelectedForm->vertices[iSide].x;
 							CurrentFormVertices[iSide].y = SelectedForm->vertices[iSide].y;
 						}
 						SATCON* guides = convert_ptr<SATCON *>(&CurrentFormVertices[VertexCount]);
 						iGuide = 0;
 						if (SelectedForm->type == SAT) {
-
 							for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-
 								guides[iGuide].start = SelectedForm->satinOrAngle.guide[iGuide].start;
 								guides[iGuide].finish = SelectedForm->satinOrAngle.guide[iGuide].finish;
 							}
@@ -8421,18 +7811,14 @@ void duclip() {
 						fPOINT* mclp = convert_ptr<fPOINT *>(&guides[iGuide]);
 						iClip = 0;
 						if (isclpx(ClosestFormToCursor)) {
-
 							for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
-
 								mclp[iClip].x = SelectedForm->angleOrClipData.clip[iClip].x;
 								mclp[iClip].y = SelectedForm->angleOrClipData.clip[iClip].y;
 							}
 						}
 						fPOINT* points = convert_ptr<fPOINT *>(&mclp[iClip]);
 						if (iseclpx(ClosestFormToCursor)) {
-
 							for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
-
 								points[iClip].x = SelectedForm->borderClipData[iClip].x;
 								points[iClip].y = SelectedForm->borderClipData[iClip].y;
 							}
@@ -8461,7 +7847,6 @@ void duclip() {
 							iDestination = 1;
 							codedAttribute = ClosestFormToCursor << FRMSHFT;
 							while (iTexture < PCSHeader.stitchCount) {
-
 								if ((StitchBuffer[iTexture].attribute&FRMSK) == codedAttribute && !(StitchBuffer[iTexture].attribute&NOTFRM))
 									savclp(iDestination++, iTexture);
 								iTexture++;
@@ -8474,14 +7859,11 @@ void duclip() {
 					CloseClipboard();
 				}
 				else {
-
 					if (PCSHeader.stitchCount && StateMap.test(StateFlag::GRPSEL)) {
-
 						Clip = RegisterClipboardFormat(PcdClipFormat);
 						rngadj();
 						LowerLeftStitch.x = LowerLeftStitch.y = 1e30f;
 						for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
-
 							if (StitchBuffer[iStitch].x < LowerLeftStitch.x)
 								LowerLeftStitch.x = StitchBuffer[iStitch].x;
 							if (StitchBuffer[iStitch].y < LowerLeftStitch.y)
@@ -8509,21 +7891,16 @@ void duclip() {
 }
 
 void delfstchs() noexcept {
-
 	unsigned	iSourceStitch = 0, iDestinationStitch = 0;
 
 	for (iSourceStitch = 0; iSourceStitch < PCSHeader.stitchCount; iSourceStitch++) {
-
 		if (StitchBuffer[iSourceStitch].attribute&NOTFRM) {
-
 			StitchBuffer[iDestinationStitch].attribute = StitchBuffer[iSourceStitch].attribute;
 			StitchBuffer[iDestinationStitch].x = StitchBuffer[iSourceStitch].x;
 			StitchBuffer[iDestinationStitch++].y = StitchBuffer[iSourceStitch].y;
 		}
 		else {
-
 			if (((StitchBuffer[iSourceStitch].attribute&FRMSK) >> 4) != ClosestFormToCursor) {
-
 				StitchBuffer[iDestinationStitch].attribute = StitchBuffer[iSourceStitch].attribute;
 				StitchBuffer[iDestinationStitch].x = StitchBuffer[iSourceStitch].x;
 				StitchBuffer[iDestinationStitch++].y = StitchBuffer[iSourceStitch].y;
@@ -8534,7 +7911,6 @@ void delfstchs() noexcept {
 }
 
 void cut() {
-
 	duclip();
 	if (SelectedFormCount) {
 		StateMap.set(StateFlag::DELTO);
@@ -8542,12 +7918,10 @@ void cut() {
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-
 			delfstchs();
 			frmdel();
 		}
 		else {
-
 			if (StateMap.test(StateFlag::GRPSEL))
 				delstchm();
 		}
@@ -8558,7 +7932,6 @@ void cut() {
 }
 
 void numWnd() noexcept {
-
 	RECT	messageRect;
 
 	GetClientRect(MsgWindow, &messageRect);
@@ -8579,15 +7952,12 @@ void numWnd() noexcept {
 }
 
 void unmsg() {
-
 	if (MsgWindow)
 		noMsg();
 }
 
 void unpat() {
-
 	if (StateMap.testAndReset(StateFlag::WASPAT)) {
-
 		ShowWindow(SpeedScrollBar, FALSE);
 		DestroyWindow(SpeedScrollBar);
 		movStch();
@@ -8606,17 +7976,13 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-
 		iNextStitch = find1st();
 		iStitch = iNextStitch + 1;
 		while (iStitch<gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1 && stitchSize > SmallStitchLength) {
-
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute) {
-
 				if (StitchBuffer[iStitch].attribute&KNOTMSK)
 					iNextStitch = iStitch;
 				else {
-
 					dx = StitchBuffer[iStitch].x - StitchBuffer[iNextStitch].x;
 					dy = StitchBuffer[iStitch].y - StitchBuffer[iNextStitch].y;
 					stitchSize = hypot(dx, dy);
@@ -8625,15 +7991,11 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 			}
 		}
 		if (iStitch != endStitch - 2) {
-
 			iStitch--;
 			iNextStitch = iStitch + 2;
 			while (iNextStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
-
 				do {
-
 					if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == codedAttribute && !(StitchBuffer[iStitch].attribute&KNOTMSK)) {
-
 						dx = StitchBuffer[iNextStitch].x - StitchBuffer[iStitch].x;
 						dy = StitchBuffer[iNextStitch++].y - StitchBuffer[iStitch].y;
 						stitchSize = hypot(dx, dy);
@@ -8647,7 +8009,6 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 			}
 			iStitch++;
 			while (iNextStitch < PCSHeader.stitchCount) {
-
 				StitchBuffer[iStitch].attribute = StitchBuffer[iNextStitch].attribute;
 				StitchBuffer[iStitch].x = StitchBuffer[iNextStitch].x;
 				StitchBuffer[iStitch++].y = StitchBuffer[iNextStitch++].y;
@@ -8657,26 +8018,21 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 		}
 	}
 	else {
-
 		iStitch = startStitch;
 		iNextStitch = startStitch + 1;
 		SelectedPoint.x = StitchBuffer[iStitch].x;
 		SelectedPoint.y = StitchBuffer[iStitch].y;
 		for (inf = iNextStitch; inf < endStitch; inf++) {
-
 			if (StitchBuffer[iNextStitch].attribute&KNOTMSK) {
-
 				SelectedPoint.x = StitchBuffer[iNextStitch].x;
 				SelectedPoint.y = StitchBuffer[iNextStitch].y;
 				mvstch(iNextStitch++, inf);
 			}
 			else {
-
 				dx = StitchBuffer[inf].x - SelectedPoint.x;
 				dy = StitchBuffer[inf].y - SelectedPoint.y;
 				stitchSize = hypot(dx, dy);
 				if (stitchSize > SmallStitchLength) {
-
 					mvstch(iNextStitch++, inf);
 					SelectedPoint.x = StitchBuffer[inf].x;
 					SelectedPoint.y = StitchBuffer[inf].y;
@@ -8695,7 +8051,6 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 }
 
 bool cmpstch(unsigned iStitchA, unsigned iStitchB) noexcept {
-
 #if  __UseASM__
 	_asm {
 		mov		eax, iStitchA
@@ -8718,9 +8073,9 @@ bool cmpstch(unsigned iStitchA, unsigned iStitchB) noexcept {
 		jne		short ncmpx
 		mov		al, 1
 		jmp		short doscmpx
-ncmpx : 
+		ncmpx :
 		xor		eax, eax
-doscmpx :
+			doscmpx :
 	}
 #else
 	if (StitchBuffer[iStitchA].x != StitchBuffer[iStitchB].x)
@@ -8731,7 +8086,6 @@ doscmpx :
 }
 
 void mvstch(unsigned destination, unsigned source) noexcept {
-
 #if  __UseASM__
 	_asm {
 		mov		eax, destination
@@ -8761,14 +8115,12 @@ void mvstch(unsigned destination, unsigned source) noexcept {
 }
 
 void ofstch(unsigned iSource, TCHAR offset) noexcept {
-
 	StitchBuffer[OutputIndex].x = StitchBuffer[iSource].x + KnotStep.x*offset;
 	StitchBuffer[OutputIndex].y = StitchBuffer[iSource].y + KnotStep.y*offset;
 	StitchBuffer[OutputIndex++].attribute = KnotAttribute;
 }
 
 void endknt(unsigned finish) {
-
 	double		length = 0.0;
 	dPOINT		delta = {};
 	unsigned	iStart = finish - 1, iKnot = 0;
@@ -8776,7 +8128,6 @@ void endknt(unsigned finish) {
 
 	KnotAttribute = StitchBuffer[iStart].attribute | KNOTMSK;
 	do {
-
 		delta.x = StitchBuffer[finish].x - StitchBuffer[iStart].x;
 		delta.y = StitchBuffer[finish].y - StitchBuffer[iStart].y;
 		length = hypot(delta.x, delta.y);
@@ -8788,7 +8139,6 @@ void endknt(unsigned finish) {
 		knots = KnotAtEndOrder;
 	if (knots) {
 		if (!(iStart & 0x8000000)) {
-
 			KnotStep.x = 2 / length * delta.x;
 			KnotStep.y = 2 / length * delta.y;
 			for (iKnot = 0; iKnot < 5; iKnot++)
@@ -8800,24 +8150,21 @@ void endknt(unsigned finish) {
 }
 
 void strtknt(unsigned start) noexcept {
-
 	double		length = 0.0;
 	dPOINT		delta = {};
-	unsigned	finish = start + 1; 
+	unsigned	finish = start + 1;
 	unsigned	iKnot = 0;
 
 	do {
-
 		delta.x = StitchBuffer[finish].x - StitchBuffer[start].x;
 		delta.y = StitchBuffer[finish].y - StitchBuffer[start].y;
 		length = hypot(delta.x, delta.y);
 		finish++;
 	} while (length < 2 && finish < PCSHeader.stitchCount);
 	if (finish < PCSHeader.stitchCount) {
-
 		KnotAttribute = StitchBuffer[start].attribute | KNOTMSK;
-		KnotStep.x = 2 / length*delta.x;
-		KnotStep.y = 2 / length*delta.y;
+		KnotStep.x = 2 / length * delta.x;
+		KnotStep.y = 2 / length * delta.y;
 		for (iKnot = 0; iKnot < 5; iKnot++)
 			ofstch(start, KnotAtStartOrder[iKnot]);
 	}
@@ -8832,9 +8179,7 @@ void fndknt() {
 		flag = 0;
 		KnotCount = 0;
 		for (iStitch = 0; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 4; iStitch++) {
-
 			if (StitchBuffer[iStitch].attribute&KNOTMSK) {
-
 				if (!flag)
 					Knots[KnotCount++] = iStitch;
 			}
@@ -8849,7 +8194,6 @@ void delknt() noexcept {
 	unsigned	iStitch = 0, newStitchCount = 0;
 
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		if (!(StitchBuffer[iStitch].attribute&KNOTMSK))
 			mvstch(newStitchCount++, iStitch);
 	}
@@ -8860,7 +8204,6 @@ bool isknots() noexcept {
 	unsigned	iStitch;
 
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		if (StitchBuffer[iStitch].attribute&KNOTMSK)
 			return 1;
 	}
@@ -8868,9 +8211,7 @@ bool isknots() noexcept {
 }
 
 void delknot() {
-
 	if (isknots()) {
-
 		savdo();
 		delknt();
 		coltab();
@@ -8879,7 +8220,6 @@ void delknot() {
 }
 
 unsigned kjmp(unsigned start) {
-
 	while (start<gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1 && stlen(start)>KNOTLEN)
 		mvstch(OutputIndex++, start++);
 	strtknt(start);
@@ -8887,7 +8227,6 @@ unsigned kjmp(unsigned start) {
 }
 
 void setknt() {
-
 	unsigned	iStitch = 0;
 
 	// ToDo - Use a temp buffer rather than the high buffer
@@ -8900,10 +8239,8 @@ void setknt() {
 		iStitch = 1;
 	StateMap.reset(StateFlag::FILDIR);
 	while (iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
-
 		mvstch(OutputIndex++, iStitch);
 		if (stlen(iStitch) > KNOTLEN) {
-
 			endknt(iStitch);
 			iStitch = kjmp(iStitch + 1);
 			mvstch(OutputIndex++, iStitch);
@@ -8918,12 +8255,10 @@ void setknt() {
 }
 
 unsigned srchknot(unsigned source) noexcept {
-
 	while (Knots[ActivePointIndex] < source && ActivePointIndex < KnotCount)
 		ActivePointIndex++;
 	ActivePointIndex--;
 	if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5) {
-
 		ActivePointIndex++;
 		if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5)
 			return 0;
@@ -8931,7 +8266,6 @@ unsigned srchknot(unsigned source) noexcept {
 			return 2;
 	}
 	else {
-
 		ActivePointIndex++;
 		if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5)
 			return 1;
@@ -8941,7 +8275,6 @@ unsigned srchknot(unsigned source) noexcept {
 }
 
 void chkncol() {
-
 	unsigned	iStitch = 0, color = 0, code = 0;
 	unsigned	initialColor = StitchBuffer[0].attribute&COLMSK;
 
@@ -8949,16 +8282,13 @@ void chkncol() {
 	OutputIndex = MAXITEMS;
 	StateMap.reset(StateFlag::FILDIR);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		color = StitchBuffer[iStitch].attribute&COLMSK;
 		if (color == initialColor)
 			mvstch(OutputIndex++, iStitch);
 		else {
-
 			initialColor = StitchBuffer[iStitch].attribute&COLMSK;
 			code = srchknot(iStitch);
 			if (code & 1) {
-
 				endknt(iStitch - 1);
 			}
 			mvstch(OutputIndex++, iStitch);
@@ -8971,7 +8301,6 @@ void chkncol() {
 }
 
 void setknots() {
-
 	if (PCSHeader.stitchCount) {
 		savdo();
 		delknt();
@@ -8985,16 +8314,13 @@ void setknots() {
 }
 
 void lodbmp() {
-
 	TCHAR*	filename = nullptr;
 
 	if (PCSBMPFileName[0]) {
-
 		DeleteObject(BitmapFileHandle);
 		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
 	if (GetOpenFileName(&OpenBitmapName)) {
-
 		untrace();
 		filename = strrchr(UserBMPFileName, '\\') + 1;
 		// PCS file can only store a 16 character filename?
@@ -9014,7 +8340,6 @@ void duhbit(unsigned cod) noexcept {
 }
 
 void hidbit() {
-
 	if (StateMap.testAndFlip(StateFlag::HIDMAP))
 		duhbit(MF_UNCHECKED);
 	else
@@ -9024,7 +8349,6 @@ void hidbit() {
 }
 
 void patdun() {
-
 	StateMap.reset(StateFlag::RUNPAT);
 	KillTimer(ThrEdWindow, 0);
 	StateMap.set(StateFlag::WASPAT);
@@ -9034,18 +8358,15 @@ void patdun() {
 }
 
 void drwlstch(unsigned finish) {
-
 	unsigned	color = 0, iMovieFrame = 0;
 	unsigned	origin = RunPoint;
 	unsigned	flag = 1;
 
 	if (StateMap.test(StateFlag::HID)) {
-
 		while ((StitchBuffer[RunPoint].attribute&COLMSK) != ActiveColor && RunPoint < finish - 1)
 			RunPoint++;
 	}
 	if (StateMap.test(StateFlag::ZUMED)) {
-
 		iMovieFrame = 1;
 		while (RunPoint < StitchesPerFrame + 1 && RunPoint < finish - 2 && !stch2px(RunPoint))
 			RunPoint++;
@@ -9053,21 +8374,16 @@ void drwlstch(unsigned finish) {
 		color = StitchBuffer[RunPoint].attribute&COLMSK;
 		flag = 1;
 		while (iMovieFrame < StitchesPerFrame + 1 && RunPoint < finish - 2 && (StitchBuffer[RunPoint].attribute&COLMSK) == color) {
-
 			if (stch2px(RunPoint)) {
-
 				MovieLine[iMovieFrame].x = StitchCoordinatesPixels.x;
 				MovieLine[iMovieFrame++].y = StitchCoordinatesPixels.y;
 				if (flag) {
-
 					flag = 0;
 					if (stch2px(RunPoint - 1)) {
-
 						MovieLine[0].x = MovieLine[1].x;
 						MovieLine[0].y = MovieLine[1].y;
 					}
 					else {
-
 						MovieLine[0].x = StitchCoordinatesPixels.x;
 						MovieLine[0].y = StitchCoordinatesPixels.y;
 					}
@@ -9078,9 +8394,7 @@ void drwlstch(unsigned finish) {
 		if (RunPoint == origin)
 			RunPoint++;
 		if (!stch2px(RunPoint)) {
-
 			if ((StitchBuffer[RunPoint].attribute&COLMSK) == color) {
-
 				MovieLine[iMovieFrame].x = StitchCoordinatesPixels.x;
 				MovieLine[iMovieFrame++].y = StitchCoordinatesPixels.y;
 				RunPoint++;
@@ -9092,12 +8406,10 @@ void drwlstch(unsigned finish) {
 			RunPoint--;
 	}
 	else {
-
 		iMovieFrame = 0;
 		color = StitchBuffer[RunPoint].attribute&COLMSK;
 		SelectObject(StitchWindowDC, UserPen[color]);
 		while (iMovieFrame < StitchesPerFrame && (RunPoint + 1 < finish - 1) && ((StitchBuffer[RunPoint].attribute&COLMSK) == color)) {
-
 			stch2px1(RunPoint++);
 			MovieLine[iMovieFrame].x = StitchCoordinatesPixels.x;
 			MovieLine[iMovieFrame++].y = StitchCoordinatesPixels.y;
@@ -9113,7 +8425,6 @@ void drwlstch(unsigned finish) {
 }
 
 void stchout() {
-
 	if (StateMap.test(StateFlag::GRPSEL))
 		drwlstch(GroupEndStitch);
 	else
@@ -9141,7 +8452,6 @@ void duver(TCHAR* name) noexcept {
 		int			version = 0;
 
 		if (lastChar) {
-
 			version = tolower(name[lastChar]) - 'r';
 			name[_MAX_PATH - 1] = 0;
 			if (version >= 0 && version <= 3)
@@ -9159,7 +8469,6 @@ void durit(char **destination, const void* source, unsigned count) noexcept {
 
 
 void dubuf(char *buffer, unsigned *count) {
-
 	STRHED		stitchHeader = {};
 	unsigned	iForm = 0, iColor = 0, iVertex = 0, iGuide = 0, iClip = 0;
 	unsigned	vertexCount = 0, guideCount = 0, clipDataCount = 0;
@@ -9263,7 +8572,6 @@ void dubuf(char *buffer, unsigned *count) {
 }
 
 void thrsav() {
-
 	unsigned		iVersion = 0, lastCharacter = 0;
 	int				iBackup = 0;
 	unsigned long	bytesWritten = 0;
@@ -9276,11 +8584,9 @@ void thrsav() {
 	if (chkattr(WorkingFileName))
 		return;
 	if (!StateMap.testAndReset(StateFlag::IGNAM)) {
-
 		file = FindFirstFile(GeName, &fileData);
 		iVersion = 0;
 		if (file != INVALID_HANDLE_VALUE) {
-
 			StateMap.reset(StateFlag::CMPDO);
 			for (iVersion = 0; iVersion < OLDVER; iVersion++)
 				VersionNames[iVersion][0] = 0;
@@ -9291,9 +8597,7 @@ void thrsav() {
 			DeleteFile(VersionNames[OLDVER - 1]);
 			// ToDo - Does this loop have to decrement or could it increment?
 			for (iBackup = OLDVER - 2; iBackup >= 0; iBackup--) {
-
 				if (VersionNames[iBackup][0]) {
-
 					VersionNames[iBackup][_MAX_PATH - 1] = 0;
 					strcpy_s(newFileName, VersionNames[iBackup]);
 					lastCharacter = duth(newFileName);
@@ -9306,7 +8610,6 @@ void thrsav() {
 	FileHandle = CreateFile(ThrName, (GENERIC_WRITE), 0, NULL,
 		CREATE_ALWAYS, 0, NULL);
 	if (FileHandle == INVALID_HANDLE_VALUE) {
-
 		crmsg(ThrName);
 		FileHandle = 0;
 	}
@@ -9316,7 +8619,6 @@ void thrsav() {
 		WriteFile(FileHandle, output, count, &bytesWritten, 0);
 		delete[] output;
 		if (bytesWritten != count) {
-
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "File Write Error: %s\n", ThrName);
 			shoMsg(MsgBuffer);
 		}
@@ -9325,7 +8627,6 @@ void thrsav() {
 }
 
 void setsped() {
-
 	unsigned	elapsedTimePerFrame = 0;
 	double		userTimePerFrame = 0.0;
 
@@ -9333,14 +8634,12 @@ void setsped() {
 		MovieTimeStep = 1;
 	userTimePerFrame = static_cast<double>(MovieTimeStep) / 10;
 	if (userTimePerFrame < 10) {
-
 		elapsedTimePerFrame = 100;  // units are millseconds
 		StitchesPerFrame = gsl::narrow<unsigned>(round(elapsedTimePerFrame / userTimePerFrame));
 		if (StitchesPerFrame > 99)
 			StitchesPerFrame = 99;
 	}
 	else {
-
 		elapsedTimePerFrame = gsl::narrow<unsigned>(round(userTimePerFrame));
 		StitchesPerFrame = 2;
 	}
@@ -9350,11 +8649,9 @@ void setsped() {
 }
 
 void f1del() {
-
 	unsigned	cod = 0, iStitch = 0, stitchCount = 0;
 
 	if (StateMap.test(StateFlag::DELTO)) {
-
 		cod = ClosestFormToCursor << FRMSHFT;
 		stitchCount = 0;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -9376,7 +8673,6 @@ void f1del() {
 }
 
 void frmdel() {
-
 	unsigned	iForm = 0, iStitch = 0;
 	unsigned	stitchForm = 0, stitchAttributeFormBits = 0;
 
@@ -9385,15 +8681,11 @@ void frmdel() {
 	for (iForm = ClosestFormToCursor; iForm < gsl::narrow<unsigned>(FormIndex); iForm++)
 		frmcpy(&FormList[iForm], &FormList[iForm + 1]);
 	if (StateMap.testAndReset(StateFlag::DELTO)) {
-
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
-
 				stitchAttributeFormBits = (StitchBuffer[iStitch].attribute&FRMSK);
 				stitchForm = stitchAttributeFormBits >> 4;
 				if (stitchForm > ClosestFormToCursor) {
-
 					StitchBuffer[iStitch].attribute &= NFRMSK;
 					StitchBuffer[iStitch].attribute |= (stitchAttributeFormBits - 0x10);
 				}
@@ -9401,17 +8693,13 @@ void frmdel() {
 		}
 	}
 	else {
-
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
-
 				stitchAttributeFormBits = (StitchBuffer[iStitch].attribute&FRMSK);
 				stitchForm = stitchAttributeFormBits >> 4;
 				if (stitchForm == ClosestFormToCursor)
 					StitchBuffer[iStitch].attribute &= (NFRMSK&NTYPMSK);
 				if (stitchForm > ClosestFormToCursor) {
-
 					StitchBuffer[iStitch].attribute &= NFRMSK;
 					StitchBuffer[iStitch].attribute |= (stitchAttributeFormBits - 0x10);
 				}
@@ -9423,7 +8711,6 @@ void frmdel() {
 }
 
 void deltot() {
-
 	strcpy_s(DesignerName, IniFile.designerName);
 	FormIndex = PCSHeader.stitchCount = FormVertexIndex = ClipPointIndex = SatinGuideIndex = TextureIndex = 0;
 	StateMap.reset(StateFlag::GMRK);
@@ -9436,11 +8723,9 @@ void deltot() {
 }
 
 bool wastch() noexcept {
-
 	unsigned	iStitch;
 
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		if ((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT == ClosestFormToCursor)
 			return 1;
 	}
@@ -9462,7 +8747,6 @@ bool frmstch() {
 }
 
 void delet() {
-
 	unsigned	iVertex = 0, iForm = 0, iGuide = 0, currentFormVertex = 0;
 	// ToDo - check satinFlag
 	bool		satinFlag = false;
@@ -9566,49 +8850,49 @@ void delet() {
 		if (StateMap.test(StateFlag::FRMPSEL) || closfrm()) {
 			SelectedForm = &FormList[ClosestFormToCursor];
 			switch (SelectedForm->type) {
-				case FRMLINE:
-					if (SelectedForm->fillType == CONTF) {
-						if (ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.start || ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.finish) {
-							delmfil();
-							SelectedForm->fillType = 0;
-							coltab();
-							StateMap.set(StateFlag::RESTCH);
-							return;
-						}
-						if (SelectedForm->angleOrClipData.guide.start > ClosestVertexToCursor)
-							SelectedForm->angleOrClipData.guide.start--;
-						if (SelectedForm->angleOrClipData.guide.finish > ClosestVertexToCursor)
-							SelectedForm->angleOrClipData.guide.finish--;
+			case FRMLINE:
+				if (SelectedForm->fillType == CONTF) {
+					if (ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.start || ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.finish) {
+						delmfil();
+						SelectedForm->fillType = 0;
+						coltab();
+						StateMap.set(StateFlag::RESTCH);
+						return;
 					}
-					break;
+					if (SelectedForm->angleOrClipData.guide.start > ClosestVertexToCursor)
+						SelectedForm->angleOrClipData.guide.start--;
+					if (SelectedForm->angleOrClipData.guide.finish > ClosestVertexToCursor)
+						SelectedForm->angleOrClipData.guide.finish--;
+				}
+				break;
 
-				case SAT:
-					do {
-						if (ClosestVertexToCursor <= 1) {
-							if (SelectedForm->attribute&FRMEND) {
-								if (SelectedForm->wordParam)
-									SelectedForm->wordParam = 0;
-								else
-									SelectedForm->attribute &= 0xfe;
-								satinFlag = true;
-								break;
-							}
-						}
-						if (SatinEndGuide) {
-							if (ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) || ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) + 1) {
+			case SAT:
+				do {
+					if (ClosestVertexToCursor <= 1) {
+						if (SelectedForm->attribute&FRMEND) {
+							if (SelectedForm->wordParam)
 								SelectedForm->wordParam = 0;
-								satinFlag = true;
-								break;
-							}
+							else
+								SelectedForm->attribute &= 0xfe;
+							satinFlag = true;
+							break;
 						}
-						for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-							if (SelectedForm->satinOrAngle.guide[iGuide].start == ClosestVertexToCursor || SelectedForm->satinOrAngle.guide[iGuide].finish == ClosestVertexToCursor) {
-								delcon(iGuide);
-								satinFlag = true;
-								break;
-							}
+					}
+					if (SatinEndGuide) {
+						if (ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) || ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) + 1) {
+							SelectedForm->wordParam = 0;
+							satinFlag = true;
+							break;
 						}
-					} while (false);
+					}
+					for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+						if (SelectedForm->satinOrAngle.guide[iGuide].start == ClosestVertexToCursor || SelectedForm->satinOrAngle.guide[iGuide].finish == ClosestVertexToCursor) {
+							delcon(iGuide);
+							satinFlag = true;
+							break;
+						}
+					}
+				} while (false);
 			}
 			if (!satinFlag) {
 				delspnt();
@@ -9625,13 +8909,11 @@ void delet() {
 		}
 		if (!satinFlag && closPnt1(&ClosestPointIndex)) {
 			if (PCSHeader.stitchCount > 2) {
-
 				delstch1(ClosestPointIndex);
 				if (!stch2px(ClosestPointIndex))
 					movbox();
 			}
 			else {
-
 				PCSHeader.stitchCount = 0;
 				StateMap.reset(StateFlag::SELBOX);
 			}
@@ -9646,20 +8928,16 @@ void delet() {
 }
 
 void movi() {
-
 	double	stepCount = 0.0;
 
 	rstAll();
 	if (PCSHeader.stitchCount) {
-
 		if (MsgWindow) {
-
 			DestroyWindow(MsgWindow);
 			MsgWindow = 0;
 		}
 		StateMap.set(StateFlag::RUNPAT);
 		if (StateMap.test(StateFlag::GRPSEL)) {
-
 			rngadj();
 			RunPoint = GroupStartStitch;
 		}
@@ -9667,7 +8945,6 @@ void movi() {
 			RunPoint = 0;
 		movStch();
 		if (!StateMap.test(StateFlag::WASPAT)) {
-
 			SpeedScrollBar = CreateWindow(
 				"SCROLLBAR",
 				0,
@@ -9706,7 +8983,6 @@ void movi() {
 #define CLPBUG 0
 
 void redclp() {
-
 	int			iStitch = 0;
 	const int	codedLayer = ActiveLayer << LAYSHFT;
 
@@ -9726,7 +9002,6 @@ void redclp() {
 		ClipRect.left = ClipRect.right = ClipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
 		for (iStitch = 1; iStitch < gsl::narrow<long>(ClipStitchCount); iStitch++) {
-
 			ClipBuffer[iStitch].x = ClipStitchData[iStitch].x + static_cast<float>(ClipStitchData[iStitch].fx) / 256;
 			ClipBuffer[iStitch].y = ClipStitchData[iStitch].y + static_cast<float>(ClipStitchData[iStitch].fy) / 256;
 			ClipBuffer[iStitch].attribute = (ClipStitchData[iStitch].led & 0xf) | codedLayer;
@@ -9750,9 +9025,7 @@ void redclp() {
 		ClipRectSize.cy = ClipRect.top - ClipRect.bottom;
 		GlobalUnlock(ClipMemory);
 		if (ClipRect.left || ClipRect.bottom) {
-
 			for (iStitch = 0; iStitch < gsl::narrow<int>(ClipStitchCount); iStitch++) {
-
 				ClipBuffer[iStitch].x -= ClipRect.left;
 				ClipBuffer[iStitch].y -= ClipRect.bottom;
 			}
@@ -9764,7 +9037,6 @@ void redclp() {
 }
 
 constexpr unsigned nxtcrnr(unsigned corner) {
-
 #if  __UseASM__
 	_asm {
 		mov		eax, corner
@@ -9777,7 +9049,6 @@ constexpr unsigned nxtcrnr(unsigned corner) {
 }
 
 void drwmrk(HDC dc) noexcept {
-
 	POINT	markCoordinates = {};
 	POINT	markLine[2] = {};
 	const long	markOffset = 6;
@@ -9799,19 +9070,16 @@ void drwmrk(HDC dc) noexcept {
 }
 
 void vubak() {
-
 	unsigned	iVersion = 0;
 	long		dx = 0, dy = 0, verticalLocation = 0;
 
 	if (FileHandle || StateMap.test(StateFlag::THUMSHO)) {
-
 		StateMap.set(StateFlag::ZUMED);
 		movStch();
 		FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 		dx = (StitchWindowClientRect.right >> 1);
 		dy = (StitchWindowClientRect.bottom >> 1);
 		for (iVersion = 0; iVersion < OLDVER; iVersion++) {
-
 			if (iVersion & 2)
 				verticalLocation = dy;
 			else
@@ -9834,20 +9102,15 @@ void vubak() {
 }
 
 void getbak() {
-
 	if (StateMap.test(StateFlag::THUMSHO)) {
-
 		if (ThumbnailsSelected[FileVersionIndex]) {
-
 			if (StateMap.test(StateFlag::RBUT)) {
-
 				strcpy_s(InsertedFileName, ThumbnailsSelected[FileVersionIndex]);
 				StateMap.set(StateFlag::IGNORINS);
 				unthum();
 				StateMap.set(StateFlag::FRMOF);
 				insfil();
 				if (GetKeyState(VK_SHIFT) & 0X8000) {
-
 					StateMap.reset(StateFlag::INSFIL);
 					StateMap.reset(StateFlag::FRMOF);
 					StateMap.set(StateFlag::INIT);
@@ -9856,12 +9119,10 @@ void getbak() {
 				}
 			}
 			else {
-
 				strcpy_s(WorkingFileName, DefaultDirectory);
 				TCHAR* pchr = &WorkingFileName[strlen(WorkingFileName) - 1];
 				if (pchr) {
 					if (pchr[0] != '\\') {
-
 						pchr[1] = '\\';
 						pchr[2] = 0;
 					}
@@ -9877,7 +9138,6 @@ void getbak() {
 }
 
 void rebak() {
-
 	unsigned	iVersion = 0;
 	TCHAR		newFileName[_MAX_PATH] = { 0 };
 	TCHAR		safetyFileName[_MAX_PATH] = { 0 };
@@ -9899,7 +9159,6 @@ void rebak() {
 }
 
 void thumbak() {
-
 	unsigned	iVersion;
 
 	for (iVersion = 0; iVersion < OLDVER; iVersion++)
@@ -9908,7 +9167,6 @@ void thumbak() {
 }
 
 void movbak(TCHAR source, TCHAR destination) noexcept {
-
 	TCHAR		sourceFileName[_MAX_PATH] = { 0 };
 	TCHAR		destinationFileName[_MAX_PATH] = { 0 };
 	unsigned	lastChar = duth(ThrName);
@@ -9922,16 +9180,13 @@ void movbak(TCHAR source, TCHAR destination) noexcept {
 }
 
 void purg() {
-
 	TCHAR		fileName[_MAX_PATH] = { 0 };
 	unsigned	lastChar = 0, iLast = 0;
 
 	if (FileHandle) {
-
 		strcpy_s(fileName, ThrName);
 		lastChar = duth(fileName);
 		for (iLast = 1; iLast < 6; iLast++) {
-
 			fileName[lastChar] = gsl::narrow<TCHAR>(iLast) + 'r';
 			DeleteFile(fileName);
 		}
@@ -9939,7 +9194,6 @@ void purg() {
 }
 
 void purgdir() {
-
 	StateMap.set(StateFlag::PRGMSG);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Delete all backups in %s\n", DefaultDirectory);
 	shoMsg(MsgBuffer);
@@ -9947,7 +9201,6 @@ void purgdir() {
 }
 
 void deldir() {
-
 	unsigned		iLastChar = 0;
 	TCHAR			fileName[_MAX_PATH] = { 0 };
 	WIN32_FIND_DATA	findFileData = {};
@@ -9960,11 +9213,9 @@ void deldir() {
 	if (fileSpec) {
 		strcpy_s(fileSpec, sizeof(fileName) - (fileSpec - fileName), "\\*.th0");
 		for (iLastChar = 1; iLastChar < 6; iLastChar++) {
-
 			fileSpec[5] = gsl::narrow<TCHAR>(iLastChar) + 'r';
 			file = FindFirstFile(fileName, &findFileData);
 			if (file != INVALID_HANDLE_VALUE) {
-
 				DeleteFile(findFileData.cFileName);
 				while (FindNextFile(file, &findFileData))
 					DeleteFile(findFileData.cFileName);
@@ -9977,7 +9228,6 @@ void deldir() {
 }
 
 bool chkwnd(HWND window) noexcept {
-
 	RECT	windowRect;
 
 	GetWindowRect(window, &windowRect);
@@ -9989,31 +9239,25 @@ bool chkwnd(HWND window) noexcept {
 }
 
 bool chkok() noexcept {
-
 	return chkwnd(OKButton);
 }
 
 void mv2f() {
-
 	unsigned	attribute = 0, iLowBuffer = 0, iHighBuffer = 0, iStitch = 0;
 
 	if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-
 		// ToDo - Use a temp buffer rather than the high buffer
 		savdo();
 		iLowBuffer = 0;
 		iHighBuffer = MAXITEMS;
 		attribute = ClosestFormToCursor << 4;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == attribute) {
-
 				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
 				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
 				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
 			}
 			else {
-
 				StitchBuffer[iHighBuffer].attribute = StitchBuffer[iStitch].attribute;
 				StitchBuffer[iHighBuffer].x = StitchBuffer[iStitch].x;
 				StitchBuffer[iHighBuffer++].y = StitchBuffer[iStitch].y;
@@ -10021,7 +9265,6 @@ void mv2f() {
 		}
 		iStitch = MAXITEMS;
 		while (iStitch < iHighBuffer) {
-
 			StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
 			StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
 			StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch++].y;
@@ -10030,33 +9273,27 @@ void mv2f() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
-
 			savdo();
 			rngadj();
 			iHighBuffer = MAXITEMS;
 			iLowBuffer = 0;
 			for (iStitch = 0; iStitch < GroupStartStitch; iStitch++) {
-
 				StitchBuffer[iHighBuffer].attribute = StitchBuffer[iStitch].attribute;
 				StitchBuffer[iHighBuffer].x = StitchBuffer[iStitch].x;
 				StitchBuffer[iHighBuffer++].y = StitchBuffer[iStitch].y;
 			}
 			for (iStitch = GroupEndStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 				StitchBuffer[iHighBuffer].attribute = StitchBuffer[iStitch].attribute;
 				StitchBuffer[iHighBuffer].x = StitchBuffer[iStitch].x;
 				StitchBuffer[iHighBuffer++].y = StitchBuffer[iStitch].y;
 			}
 			for (iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
-
 				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
 				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
 				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
 			}
 			for (iStitch = MAXITEMS; iStitch < iHighBuffer; iStitch++) {
-
 				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
 				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
 				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
@@ -10068,26 +9305,21 @@ void mv2f() {
 }
 
 void mv2b() {
-
 	unsigned	attribute = 0, iLowBuffer = 0, iHighBuffer = 0, iStitch = 0;
 
 	if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-
 		// ToDo - Use a temp buffer rather than the high buffer
 		savdo();
 		iLowBuffer = 0;
 		iHighBuffer = MAXITEMS;
 		attribute = ClosestFormToCursor << 4;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == attribute) {
-
 				StitchBuffer[iHighBuffer].attribute = StitchBuffer[iStitch].attribute;
 				StitchBuffer[iHighBuffer].x = StitchBuffer[iStitch].x;
 				StitchBuffer[iHighBuffer++].y = StitchBuffer[iStitch].y;
 			}
 			else {
-
 				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
 				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
 				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
@@ -10095,7 +9327,6 @@ void mv2b() {
 		}
 		iStitch = MAXITEMS;
 		while (iStitch < iHighBuffer) {
-
 			StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
 			StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
 			StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch++].y;
@@ -10104,27 +9335,22 @@ void mv2b() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
-
 			savdo();
 			rngadj();
 			iHighBuffer = MAXITEMS;
 			for (iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
-
 				StitchBuffer[iHighBuffer].attribute = StitchBuffer[iStitch].attribute;
 				StitchBuffer[iHighBuffer].x = StitchBuffer[iStitch].x;
 				StitchBuffer[iHighBuffer++].y = StitchBuffer[iStitch].y;
 			}
 			iLowBuffer = GroupStartStitch;
 			for (iStitch = GroupEndStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
 				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
 				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
 			}
 			for (iStitch = MAXITEMS; iStitch < iHighBuffer; iStitch++) {
-
 				StitchBuffer[iLowBuffer].attribute = StitchBuffer[iStitch].attribute;
 				StitchBuffer[iLowBuffer].x = StitchBuffer[iStitch].x;
 				StitchBuffer[iLowBuffer++].y = StitchBuffer[iStitch].y;
@@ -10138,21 +9364,17 @@ void mv2b() {
 void infadj(float* xCoordinate, float* yCoordinate) noexcept {
 	if (xCoordinate && yCoordinate) {
 		if (!_finite(*xCoordinate)) {
-
 			if (*xCoordinate > UnzoomedRect.x)
 				*xCoordinate = UnzoomedRect.x;
 			else {
-
 				if (*xCoordinate < 0)
 					*xCoordinate = 0;
 			}
 		}
 		if (!_finite(*yCoordinate)) {
-
 			if (*yCoordinate > UnzoomedRect.y)
 				*yCoordinate = UnzoomedRect.y;
 			else {
-
 				if (*yCoordinate < 0)
 					*yCoordinate = 0;
 			}
@@ -10161,7 +9383,6 @@ void infadj(float* xCoordinate, float* yCoordinate) noexcept {
 }
 
 void delinf() noexcept {
-
 	unsigned	iStitch = 0, iVertex = 0;
 
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
@@ -10171,16 +9392,13 @@ void delinf() noexcept {
 }
 
 void chkrng(fPOINT* range) noexcept {
-
 	unsigned	iStitch = 0, stitchCount = 0;
 
 	delinf();
 	range->x = UnzoomedRect.x;
 	range->y = UnzoomedRect.y;
 	if (FormIndex) {
-
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 			if (StitchBuffer[iStitch].attribute&NOTFRM
 				|| ((StitchBuffer[iStitch].attribute&TYPMSK) && ((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT < FormIndex))) {
 				StitchBuffer[stitchCount].attribute = StitchBuffer[iStitch].attribute;
@@ -10200,9 +9418,7 @@ void chkrng(fPOINT* range) noexcept {
 		PCSHeader.stitchCount = stitchCount;
 	}
 	else {
-
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 			if (StitchBuffer[iStitch].x > range->x)
 				StitchBuffer[iStitch].x = range->x - 1;
 			if (StitchBuffer[iStitch].x < 0)
@@ -10216,18 +9432,15 @@ void chkrng(fPOINT* range) noexcept {
 }
 
 void ritmov() noexcept {
-
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
 	if (ClosestVertexToCursor) {
-
 		if (ClosestVertexToCursor == gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1 && SelectedForm->type == FRMLINE)
 			Polyline(StitchWindowDC, RubberBandLine, 2);
 		else
 			Polyline(StitchWindowDC, RubberBandLine, 3);
 	}
 	else {
-
 		RubberBandLine[2].x = FormLines[1].x;
 		RubberBandLine[2].y = FormLines[1].y;
 		if (SelectedForm->type == FRMLINE)
@@ -10239,20 +9452,17 @@ void ritmov() noexcept {
 }
 
 void unmov() {
-
 	if (StateMap.testAndReset(StateFlag::SHOMOV))
 		ritmov();
 }
 
 void duprct() {
-
 	unsigned	iVertex = 0, currentVertex = SelectedFormVertices.start;
 
 	SelectedVerticesRect.left = SelectedVerticesRect.right = CurrentFormVertices[currentVertex].x;
 	SelectedVerticesRect.top = SelectedVerticesRect.bottom = CurrentFormVertices[currentVertex].y;
 	currentVertex = pdir(currentVertex);
 	for (iVertex = 0; iVertex < SelectedFormVertices.vertexCount; iVertex++) {
-
 		if (CurrentFormVertices[currentVertex].x < SelectedVerticesRect.left)
 			SelectedVerticesRect.left = CurrentFormVertices[currentVertex].x;
 		if (CurrentFormVertices[currentVertex].x > SelectedVerticesRect.right)
@@ -10266,7 +9476,6 @@ void duprct() {
 }
 
 void setpsel() {
-
 	unpsel();
 	duprct();
 	sRct2px(SelectedVerticesRect, &SelectedPixelsRect);
@@ -10278,7 +9487,6 @@ void setpsel() {
 }
 
 void rotfn() {
-
 	unsigned	iVertex = 0, iStitch = 0, iForm = 0, currentVertex = 0;
 	double		length = 0.0;
 	double		angle = 0.0;
@@ -10286,11 +9494,9 @@ void rotfn() {
 
 	savdo();
 	if (StateMap.test(StateFlag::FPSEL)) {
-
 		fvars(ClosestFormToCursor);
 		currentVertex = SelectedFormVertices.start;
 		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
-
 			rotflt(&CurrentFormVertices[currentVertex]);
 			currentVertex = pdir(currentVertex);
 		}
@@ -10301,7 +9507,6 @@ void rotfn() {
 		return;
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-
 		for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
 			rotflt(&FormVertices[iVertex]);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
@@ -10312,12 +9517,10 @@ void rotfn() {
 		return;
 	}
 	if (StateMap.testAndReset(StateFlag::FRMSROT)) {
-
 		angle = RotationAngle;
 		center.x = RotationCenter.x;
 		center.y = RotationCenter.y;
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-
 			ClosestFormToCursor = SelectedFormList[iForm];
 			fvars(ClosestFormToCursor);
 			for (iVertex = 0; iVertex < VertexCount; iVertex++)
@@ -10331,9 +9534,7 @@ void rotfn() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-
 		if (StateMap.testAndReset(StateFlag::FRMROT)) {
-
 			fvars(ClosestFormToCursor);
 			for (iVertex = 0; iVertex < VertexCount; iVertex++)
 				rotflt(&CurrentFormVertices[iVertex]);
@@ -10342,7 +9543,6 @@ void rotfn() {
 			StateMap.set(StateFlag::RESTCH);
 		}
 		else {
-
 			length = GroupEndStitch - GroupStartStitch + 1;
 			for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++)
 				rotstch(&StitchBuffer[iStitch]);
@@ -10354,23 +9554,19 @@ void rotfn() {
 }
 
 void rotfns() {
-
 	savdo();
 	rotfn();
 }
 
 void nulayr(unsigned play) {
-
 	ActiveLayer = play;
 	LayerIndex = play >> 1;
 	ladj();
 	if (ActiveLayer) {
-
 		if (StateMap.test(StateFlag::FORMSEL) && (gsl::narrow<unsigned>((FormList[ClosestFormToCursor].attribute&FRMLMSK) >> 1) != ActiveLayer))
 			StateMap.reset(StateFlag::FORMSEL);
 		StateMap.reset(StateFlag::GRPSEL);
 		if (StateMap.test(StateFlag::SELBOX)) {
-
 			if (ActiveLayer != ((StitchBuffer[ClosestPointIndex].attribute&LAYMSK) >> LAYSHFT) + 1)
 				StateMap.reset(StateFlag::SELBOX);
 		}
@@ -10386,16 +9582,13 @@ bool iselpnt() {
 								(Msg.pt.y - StitchWindowOrigin.y) };
 
 	for (iControlPoint = 0; iControlPoint < 9; iControlPoint++) {
-
 		length = hypot(pointToTest.x - FormControlPoints[iControlPoint].x, pointToTest.y - FormControlPoints[iControlPoint].y);
 		if (length < minimumLength) {
-
 			minimumLength = length;
 			closestControlPoint = iControlPoint;
 		}
 	}
 	if (minimumLength < CLOSENUF) {
-
 		SelectedFormControlVertex = closestControlPoint;
 		return 1;
 	}
@@ -10404,27 +9597,21 @@ bool iselpnt() {
 }
 
 void rtrclpfn() {
-
 	unsigned	iStitch = 0, count = 0;
 
 	if (OpenClipboard(ThrEdWindow)) {
-
 		fvars(ClosestFormToCursor);
 		if (iseclp(ClosestFormToCursor)) {
-
 			count = SelectedForm->clipEntries;
 			oclp(SelectedForm->borderClipData, count);
 		}
 		else {
-
 			if (isclp(ClosestFormToCursor)) {
-
 				count = SelectedForm->lengthOrCount.clipCount;
 				oclp(SelectedForm->angleOrClipData.clip, count);
 			}
 		}
 		if (count) {
-
 			LowerLeftStitch.x = LowerLeftStitch.y = 0;
 			EmptyClipboard();
 			Clip = RegisterClipboardFormat(PcdClipFormat);
@@ -10443,32 +9630,26 @@ void rtrclpfn() {
 }
 
 bool chkbig() {
-
 	unsigned	iControlPoint = 0, iCorner = 0;
 	double		length = 0.0, minimumLength = 1e99;
 	POINT		pointToTest = { (Msg.pt.x - StitchWindowOrigin.x),
 								(Msg.pt.y - StitchWindowOrigin.y) };
 
 	for (iControlPoint = 0; iControlPoint < 9; iControlPoint++) {
-
 		length = hypot(pointToTest.x - SelectedFormsLine[iControlPoint].x, pointToTest.y - SelectedFormsLine[iControlPoint].y);
 		if (length < minimumLength) {
-
 			minimumLength = length;
 			SelectedFormControlVertex = iControlPoint;
 		}
 	}
 	for (iCorner = 0; iCorner < 4; iCorner++) {
-
 		FormLines[iCorner].x = SelectedFormsLine[iCorner << 1].x;
 		FormLines[iCorner].y = SelectedFormsLine[iCorner << 1].y;
 	}
 	FormLines[4].x = FormLines[0].x;
 	FormLines[4].y = FormLines[0].y;
 	if (minimumLength < CLOSENUF) {
-
 		for (iCorner = 0; iCorner < 4; iCorner++) {
-
 			StretchBoxLine[iCorner].x = SelectedFormsLine[iCorner << 1].x;
 			StretchBoxLine[iCorner].y = SelectedFormsLine[iCorner << 1].y;
 		}
@@ -10477,7 +9658,6 @@ bool chkbig() {
 		if (SelectedFormControlVertex & 1)
 			StateMap.set(StateFlag::STRTCH);
 		else {
-
 			StateMap.set(StateFlag::EXPAND);
 			XYratio = static_cast<double>(SelectedFormsRect.right - SelectedFormsRect.left) / (SelectedFormsRect.bottom - SelectedFormsRect.top);
 		}
@@ -10488,7 +9668,6 @@ bool chkbig() {
 	}
 	if (pointToTest.x >= SelectedFormsRect.left && pointToTest.x <= SelectedFormsRect.right
 		&& pointToTest.y >= SelectedFormsRect.top && pointToTest.y <= SelectedFormsRect.bottom) {
-
 		SelectedFormsSize.x = SelectedFormsRect.right - SelectedFormsRect.left;
 		SelectedFormsSize.y = SelectedFormsRect.bottom - SelectedFormsRect.top;
 		StateMap.set(StateFlag::MOVFRMS);
@@ -10502,14 +9681,11 @@ bool chkbig() {
 }
 
 void delfre() {
-
 	unsigned	iStitch = 0, currentStitchCount = 0;
 
 	savdo();
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
-
 			StitchBuffer[currentStitchCount].attribute = StitchBuffer[iStitch].attribute;
 			StitchBuffer[currentStitchCount].x = StitchBuffer[iStitch].x;
 			StitchBuffer[currentStitchCount++].y = StitchBuffer[iStitch].y;
@@ -10521,9 +9697,7 @@ void delfre() {
 }
 
 void setmov() {
-
 	if (StateMap.test(StateFlag::SELBOX)) {
-
 		MoveAnchor = ClosestPointIndex;
 		StateMap.set(StateFlag::MOVSET);
 		StateMap.set(StateFlag::RESTCH);
@@ -10531,7 +9705,6 @@ void setmov() {
 }
 
 void dufsel() noexcept {
-
 	unsigned	start = 0, finish = 0;
 
 	if (LastFormSelected > ClosestFormToCursor) {
@@ -10551,16 +9724,12 @@ void dufsel() noexcept {
 }
 
 void selup() {
-
 	unsigned	attribute = 0;
 
 	if (GetKeyState(VK_SHIFT) & 0X8000) {
-
 		StateMap.reset(StateFlag::SELBOX);
 		if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-
 			if (ClosestFormToCursor < FormIndex - 1) {
-
 				SelectedFormList[0] = ClosestFormToCursor;
 				LastFormSelected = ClosestFormToCursor + 1;
 				SelectedFormList[1] = LastFormSelected;
@@ -10570,7 +9739,6 @@ void selup() {
 				return;
 		}
 		else {
-
 			if (SelectedFormCount) {
 				if (LastFormSelected < FormIndex - 1) {
 					LastFormSelected++;
@@ -10583,9 +9751,7 @@ void selup() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-
 		if (StateMap.test(StateFlag::SELBOX)) {
-
 			unbox();
 			attribute = StitchBuffer[ClosestPointIndex].attribute&ATMSK;
 			while (ClosestPointIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1 && (StitchBuffer[ClosestPointIndex].attribute&ATMSK) == attribute)
@@ -10594,11 +9760,8 @@ void selup() {
 			dubox();
 		}
 		else {
-
 			if (FormIndex) {
-
 				if (StateMap.testAndSet(StateFlag::FORMSEL)) {
-
 					if (ClosestFormToCursor < gsl::narrow<unsigned>(FormIndex) - 1)
 						ClosestFormToCursor++;
 				}
@@ -10612,16 +9775,12 @@ void selup() {
 }
 
 void seldwn() {
-
 	unsigned	attribute = 0;
 
 	if (GetKeyState(VK_SHIFT) & 0X8000) {
-
 		StateMap.reset(StateFlag::SELBOX);
 		if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-
 			if (ClosestFormToCursor) {
-
 				SelectedFormList[0] = ClosestFormToCursor;
 				LastFormSelected = ClosestFormToCursor - 1;
 				SelectedFormList[1] = LastFormSelected;
@@ -10631,7 +9790,6 @@ void seldwn() {
 				return;
 		}
 		else {
-
 			if (SelectedFormCount) {
 				if (LastFormSelected) {
 					LastFormSelected--;
@@ -10644,9 +9802,7 @@ void seldwn() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-
 		if (StateMap.test(StateFlag::SELBOX)) {
-
 			unbox();
 			attribute = StitchBuffer[ClosestPointIndex].attribute&ATMSK;
 			while (ClosestPointIndex && (StitchBuffer[ClosestPointIndex].attribute&ATMSK) == attribute)
@@ -10655,11 +9811,8 @@ void seldwn() {
 			dubox();
 		}
 		else {
-
 			if (FormIndex) {
-
 				if (StateMap.testAndSet(StateFlag::FORMSEL)) {
-
 					if (ClosestFormToCursor)
 						ClosestFormToCursor--;
 				}
@@ -10673,7 +9826,6 @@ void seldwn() {
 }
 
 void mvstchs(unsigned destination, unsigned source, unsigned count) noexcept {
-
 #if  __UseASM__
 	_asm {
 		xor		ecx, ecx
@@ -10698,7 +9850,6 @@ void mvstchs(unsigned destination, unsigned source, unsigned count) noexcept {
 }
 
 bool movstchs(unsigned destination, unsigned start, unsigned finish) {
-
 	unsigned	count = 0, swap = 0;
 	unsigned	dind = MAXITEMS;
 
@@ -10706,18 +9857,15 @@ bool movstchs(unsigned destination, unsigned start, unsigned finish) {
 	if (destination < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 		destination++;
 	if (start > finish) {
-
 		swap = start;
 		start = finish;
 		finish = swap;
 	}
 	if (destination >= start && destination < finish) {
-
 		tabmsg(IDS_DST1);
 		return 0;
 	}
 	if (destination < start) {
-
 		count = finish - start;
 		mvstchs(dind, start, count);
 		dind += count;
@@ -10727,7 +9875,6 @@ bool movstchs(unsigned destination, unsigned start, unsigned finish) {
 		mvstchs(destination, MAXITEMS, dind - (MAXITEMS));
 	}
 	else {
-
 		count = destination - finish;
 		mvstchs(dind, finish, count);
 		dind += count;
@@ -10740,24 +9887,17 @@ bool movstchs(unsigned destination, unsigned start, unsigned finish) {
 }
 
 void movmrk() {
-
 	if (StateMap.test(StateFlag::MOVSET)) {
-
 		if (StateMap.test(StateFlag::GRPSEL)) {
-
 			rngadj();
 			if (movstchs(MoveAnchor, GroupStartStitch, GroupEndStitch)) {
-
 				coltab();
 				StateMap.set(StateFlag::RESTCH);
 			}
 		}
 		else {
-
 			if (StateMap.test(StateFlag::SELBOX)) {
-
 				if (movstchs(MoveAnchor, ClosestPointIndex, ClosestPointIndex + 1)) {
-
 					StateMap.set(StateFlag::RESTCH);
 					coltab();
 				}
@@ -10767,14 +9907,11 @@ void movmrk() {
 }
 
 void vuthrds() {
-
 	if (GetMenuState(ViewMenu, ID_VUTHRDS, MF_BYCOMMAND)&MF_CHECKED) {
-
 		CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
 		StateMap.reset(StateFlag::THRDS);
 	}
 	else {
-
 		CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_CHECKED);
 		StateMap.set(StateFlag::THRDS);
 	}
@@ -10782,14 +9919,11 @@ void vuthrds() {
 }
 
 void vuselthr() {
-
 	if (GetMenuState(ViewMenu, ID_VUSELTHRDS, MF_BYCOMMAND)&MF_CHECKED) {
-
 		CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
 		StateMap.reset(StateFlag::COL);
 	}
 	else {
-
 		CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_CHECKED);
 		StateMap.set(StateFlag::COL);
 	}
@@ -10797,14 +9931,11 @@ void vuselthr() {
 }
 
 void colchk() noexcept {
-
-	unsigned	color = StitchBuffer[0].attribute&COLMSK; 
+	unsigned	color = StitchBuffer[0].attribute&COLMSK;
 	unsigned	currentStitch = 0, iStitch = 0;
 
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		if (color != (StitchBuffer[iStitch].attribute&COLMSK)) {
-
 			if ((iStitch - currentStitch == 1) && (currentStitch))
 				StitchBuffer[iStitch - 1].attribute = StitchBuffer[iStitch].attribute&NCOLMSK | (StitchBuffer[currentStitch - 1].attribute&COLMSK);
 			color = StitchBuffer[iStitch].attribute&COLMSK;
@@ -10814,20 +9945,17 @@ void colchk() noexcept {
 }
 
 unsigned makbig(unsigned start, unsigned finish) {
-
 	unsigned	destination = MAXITEMS, source = 0, stitchCount = 0, iStitch = 0, adcnt = 0, attribute = 0;
 	double		length = 0.0;
 	dPOINT		delta = {}, step = {}, point = {};
 
 	// ToDo - Use a temp buffer rather than the high buffer
 	for (source = start; source < gsl::narrow<unsigned>(finish) - 1; source++) {
-
 		delta.x = StitchBuffer[source + 1].x - StitchBuffer[source].x;
 		delta.y = StitchBuffer[source + 1].y - StitchBuffer[source].y;
 		length = hypot(delta.x, delta.y);
 		mvstch(destination++, source);
 		if (length > IniFile.maxStitchLength) {
-
 			stitchCount = ceil(length / UserStitchLength);
 			step.x = delta.x / stitchCount;
 			step.y = delta.y / stitchCount;
@@ -10835,9 +9963,7 @@ unsigned makbig(unsigned start, unsigned finish) {
 			point.y = StitchBuffer[source].y + step.y;
 			attribute = StitchBuffer[source].attribute;
 			if (attribute != StitchBuffer[source + 1].attribute) {
-
 				if (!(attribute&NOTFRM) && StitchBuffer[source + 1].attribute&TYPMSK) {
-
 					if (!((attribute&FRMSK) == (StitchBuffer[source + 1].attribute&FRMSK)))
 						attribute &= NTYPMSK;
 				}
@@ -10846,7 +9972,6 @@ unsigned makbig(unsigned start, unsigned finish) {
 			}
 			attribute &= (~KNOTMSK);
 			for (iStitch = 0; iStitch < stitchCount - 1; iStitch++) {
-
 				StitchBuffer[destination].attribute = attribute;
 				StitchBuffer[destination].x = point.x;
 				StitchBuffer[destination++].y = point.y;
@@ -10870,31 +9995,25 @@ unsigned makbig(unsigned start, unsigned finish) {
 }
 
 void rembig() {
-
 	RANGE		range = {};
 	unsigned	iForm = 0;
 
 	if (UserStitchLength < IniFile.maxStitchLength) {
-
 		savdo();
 		do {
 			if (SelectedFormCount) {
-
 				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-
 					frmrng(SelectedFormList[iForm], &range);
 					makbig(range.start, range.finish);
 				}
 				break;
 			}
 			if (StateMap.test(StateFlag::FORMSEL)) {
-
 				frmrng(ClosestFormToCursor, &range);
 				makbig(range.start, range.finish);
 				break;
 			}
 			if (StateMap.test(StateFlag::GRPSEL)) {
-
 				rngadj();
 				if (GroupEndStitch < PCSHeader.stitchCount)
 					GroupEndStitch++;
@@ -10915,11 +10034,9 @@ void rembig() {
 }
 
 void duselrng() {
-
 	SelectedRange.start = 0;
 	SelectedRange.finish = PCSHeader.stitchCount;
 	if (StateMap.test(StateFlag::GRPSEL)) {
-
 		rngadj();
 		SelectedRange.start = GroupStartStitch;
 		SelectedRange.finish = GroupEndStitch;
@@ -10928,7 +10045,6 @@ void duselrng() {
 }
 
 void longer() {
-
 	unsigned	iStitch = 0, currentStitch = 0;
 	double		length = 0.0, minimumLength = 1e99;
 	double		currentLength = 0.0;
@@ -10938,7 +10054,6 @@ void longer() {
 		return;
 	currentLength = hypot(StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x, StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y);
 	for (iStitch = ClosestPointIndex + 1; iStitch < SelectedRange.finish; iStitch++) {
-
 		length = hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
 		if (length == currentLength) {
 			flag = false;
@@ -10947,10 +10062,8 @@ void longer() {
 	}
 	if (flag) {
 		for (currentStitch = SelectedRange.start; currentStitch < SelectedRange.finish - 1; currentStitch++) {
-
 			length = hypot(StitchBuffer[currentStitch + 1].x - StitchBuffer[currentStitch].x, StitchBuffer[currentStitch + 1].y - StitchBuffer[currentStitch].y);
 			if (length > currentLength && length < minimumLength) {
-
 				minimumLength = length;
 				iStitch = currentStitch;
 			}
@@ -10964,7 +10077,6 @@ void longer() {
 }
 
 void shorter() {
-
 	unsigned	iStitch = 0, currentStitch = 0;
 	double		length = 0.0, maximumLength = 0.0;
 	double		currentLength = 0.0;
@@ -10974,7 +10086,6 @@ void shorter() {
 		return;
 	currentLength = hypot(StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x, StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y);
 	for (currentStitch = ClosestPointIndex; currentStitch != 0; currentStitch--) {
-
 		length = hypot(StitchBuffer[currentStitch].x - StitchBuffer[currentStitch - 1].x, StitchBuffer[currentStitch].y - StitchBuffer[currentStitch - 1].y);
 		if (length == currentLength) {
 			currentStitch--;
@@ -10984,10 +10095,8 @@ void shorter() {
 	}
 	if (flag) {
 		for (iStitch = SelectedRange.start; iStitch < SelectedRange.finish - 1; iStitch++) {
-
 			length = hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
 			if (length<currentLength && length>maximumLength) {
-
 				maximumLength = length;
 				currentStitch = iStitch;
 			}
@@ -11001,14 +10110,12 @@ void shorter() {
 }
 
 void setsrch(unsigned stitch) {
-
 	CurrentStitchIndex = stitch;
 	lensadj();
 	ritnum(STR_NUMSCH, ClosestPointIndex);
 }
 
 bool inrng(unsigned stitch) noexcept {
-
 	if (StitchBuffer[stitch].x >= StitchRangeRect.left
 		&& StitchBuffer[stitch].x <= StitchRangeRect.right
 		&& StitchBuffer[stitch].y >= StitchRangeRect.bottom
@@ -11020,14 +10127,12 @@ bool inrng(unsigned stitch) noexcept {
 }
 
 bool finrng(unsigned find) noexcept {
-
 	unsigned cod = 0;
 
 	if (FormList[find].rectangle.left >= StitchRangeRect.left
 		&& FormList[find].rectangle.right <= StitchRangeRect.right
 		&& FormList[find].rectangle.bottom >= StitchRangeRect.bottom
 		&& FormList[find].rectangle.top <= StitchRangeRect.top) {
-
 		if (!ActiveLayer)
 			return 1;
 		cod = (FormList[find].attribute&FRMLMSK) >> 1;
@@ -11041,24 +10146,19 @@ bool finrng(unsigned find) noexcept {
 }
 
 void ungrplo() {
-
 	unsigned iStitch = 0;
 
 	if (StateMap.testAndReset(StateFlag::GRPSEL)) {
-
 		rngadj();
 		ClosestPointIndex = GroupStartStitch;
 		StateMap.set(StateFlag::SELBOX);
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			bool flag = true;
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 				if (!(StitchBuffer[iStitch].attribute&NOTFRM) && ((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
-
 					ClosestPointIndex = iStitch;
 					StateMap.set(StateFlag::SELBOX);
 					StateMap.set(StateFlag::RESTCH);
@@ -11077,24 +10177,19 @@ void ungrplo() {
 }
 
 void ungrphi() {
-
 	unsigned	iStitch = 0;
 
 	if (StateMap.testAndReset(StateFlag::GRPSEL)) {
-
 		rngadj();
 		ClosestPointIndex = GroupEndStitch;
 		StateMap.set(StateFlag::SELBOX);
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			bool flag = true;
 			for (iStitch = PCSHeader.stitchCount; iStitch != 0; iStitch--) {
-
 				if (!(StitchBuffer[iStitch - 1].attribute&NOTFRM) && ((StitchBuffer[iStitch - 1].attribute&FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
-
 					ClosestPointIndex = iStitch - 1;
 					StateMap.set(StateFlag::SELBOX);
 					StateMap.set(StateFlag::RESTCH);
@@ -11113,15 +10208,12 @@ void ungrphi() {
 }
 
 void sizstch(fRECTANGLE* rectangle, const fPOINTATTR* stitches) noexcept {
-
 	unsigned	iStitch = 0;
 
 	if (PCSHeader.stitchCount && stitches) {
-
 		rectangle->bottom = rectangle->top = stitches[0].y;
 		rectangle->left = rectangle->right = stitches[0].x;
 		for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 			if (stitches[iStitch].x < rectangle->left)
 				rectangle->left = stitches[iStitch].x;
 			if (stitches[iStitch].x > rectangle->right)
@@ -11137,7 +10229,6 @@ void sizstch(fRECTANGLE* rectangle, const fPOINTATTR* stitches) noexcept {
 }
 
 void hupfn() {
-
 	unsigned	iForm = 0, iVertex = 0, iStitch = 0;
 	dPOINT		hoopCenter = {};
 	dPOINT		designCenter = {};
@@ -11147,14 +10238,11 @@ void hupfn() {
 	StateMap.reset(StateFlag::HUPCHNG);
 	sizstch(&CheckHoopRect, StitchBuffer);
 	if (FormIndex) {
-
 		if (!PCSHeader.stitchCount) {
-
 			CheckHoopRect.bottom = CheckHoopRect.top = CurrentFormVertices[0].y;
 			CheckHoopRect.left = CheckHoopRect.right = CurrentFormVertices[0].x;
 		}
 		for (iVertex = 0; iVertex < FormVertexIndex; iVertex++) {
-
 			if (FormVertices[iVertex].x < CheckHoopRect.left)
 				CheckHoopRect.left = FormVertices[iVertex].x;
 			if (FormVertices[iVertex].x > CheckHoopRect.right)
@@ -11166,25 +10254,20 @@ void hupfn() {
 		}
 	}
 	if (PCSHeader.stitchCount || FormVertexIndex || StateMap.test(StateFlag::HUPEX)) {
-
 		if (CheckHoopRect.left<0 ||
 			CheckHoopRect.right>IniFile.hoopSizeX ||
-			CheckHoopRect.bottom < 0 || 
+			CheckHoopRect.bottom < 0 ||
 			CheckHoopRect.top>IniFile.hoopSizeY) {
-
 			StateMap.set(StateFlag::HUPEX);
 		}
 		if (StateMap.test(StateFlag::HUPEX)) {
-
 			hoopSize.x = CheckHoopRect.right - CheckHoopRect.left;
 			hoopSize.y = CheckHoopRect.top - CheckHoopRect.bottom;
 			if (hoopSize.x > IniFile.hoopSizeX) {
-
 				IniFile.hoopSizeX = hoopSize.x;
 				StateMap.set(StateFlag::HUPCHNG);
 			}
 			if (hoopSize.y > IniFile.hoopSizeY) {
-
 				IniFile.hoopSizeY = hoopSize.y;
 				StateMap.set(StateFlag::HUPCHNG);
 			}
@@ -11195,17 +10278,14 @@ void hupfn() {
 			delta.x = hoopCenter.x - designCenter.x;
 			delta.y = hoopCenter.y - designCenter.y;
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 				StitchBuffer[iStitch].x += delta.x;
 				StitchBuffer[iStitch].y += delta.y;
 			}
 			for (iVertex = 0; iVertex < FormVertexIndex; iVertex++) {
-
 				FormVertices[iVertex].x += delta.x;
 				FormVertices[iVertex].y += delta.y;
 			}
 			for (iForm = 0; iForm < FormIndex; iForm++) {
-
 				FormList[iForm].rectangle.left += delta.x;
 				FormList[iForm].rectangle.right += delta.x;
 				FormList[iForm].rectangle.top += delta.y;
@@ -11220,7 +10300,6 @@ void hupfn() {
 }
 
 void chkhup() {
-
 	StateMap.set(StateFlag::HUPEX);
 	hupfn();
 	if (StateMap.test(StateFlag::INIT))
@@ -11236,12 +10315,10 @@ int strcomp(const void *arg1, const void *arg2) noexcept {
 }
 
 void barnam(HWND window, unsigned iThumbnail) {
-
 	TCHAR		buffer[_MAX_PATH] = { 0 };
 	TCHAR*		lastCharacter = nullptr;
 
 	if (iThumbnail < ThumbnailDisplayCount && ThumbnailsSelected[iThumbnail]) {
-
 		strcpy_s(buffer, ThumbnailsSelected[iThumbnail]);
 		lastCharacter = strrchr(buffer, '.');
 		if (lastCharacter)
@@ -11253,28 +10330,26 @@ void barnam(HWND window, unsigned iThumbnail) {
 }
 
 void rthumnam(unsigned iThumbnail) {
-
 	switch (iThumbnail) {
+	case 0:
 
-		case 0:
+		barnam(ButtonWin[HNUM], iThumbnail);
+		break;
 
-			barnam(ButtonWin[HNUM], iThumbnail);
-			break;
+	case 1:
 
-		case 1:
+		barnam(ButtonWin[HTOT], iThumbnail);
+		break;
 
-			barnam(ButtonWin[HTOT], iThumbnail);
-			break;
+	case 2:
 
-		case 2:
+		barnam(ButtonWin[HMINLEN], iThumbnail);
+		break;
 
-			barnam(ButtonWin[HMINLEN], iThumbnail);
-			break;
+	case 3:
 
-		case 3:
-
-			barnam(ButtonWin[HMAXLEN], iThumbnail);
-			break;
+		barnam(ButtonWin[HMAXLEN], iThumbnail);
+		break;
 	}
 }
 
@@ -11282,7 +10357,6 @@ void rthumnam(unsigned iThumbnail) {
 #pragma warning(push)
 #pragma warning(disable : 4996)
 void thumnail() {
-
 	WIN32_FIND_DATA	fileData = {};
 	unsigned		iThumbnail = 0, iThumbnailName = 0;
 	HANDLE			file = {};
@@ -11299,7 +10373,6 @@ void thumnail() {
 	TCHAR* lastCharacter = &SearchName[strlen(SearchName) - 1];
 	if (lastCharacter) {
 		if (lastCharacter[0] != '\\') {
-
 			lastCharacter[1] = '\\';
 			lastCharacter[2] = 0;
 		}
@@ -11307,13 +10380,11 @@ void thumnail() {
 	strcat_s(SearchName, "*.thr");
 	file = FindFirstFile(SearchName, &fileData);
 	if (file == INVALID_HANDLE_VALUE) {
-
 		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Can't find %s\n", SearchName);
 		shoMsg(MsgBuffer);
 		unthum();
 	}
 	else {
-
 		iThumbnailName = 0;
 		Thumbnails[0] = ThumbnailNames;
 		strcpy(Thumbnails[0], fileData.cFileName);
@@ -11321,7 +10392,6 @@ void thumnail() {
 		Thumbnails[1] = &ThumbnailNames[iThumbnailName];
 		iThumbnail = 1;
 		while (FindNextFile(file, &fileData)) {
-
 			strcpy(Thumbnails[iThumbnail], fileData.cFileName);
 			iThumbnailName += strlen(fileData.cFileName) + 1;
 			Thumbnails[++iThumbnail] = &ThumbnailNames[iThumbnailName];
@@ -11332,7 +10402,6 @@ void thumnail() {
 		qsort(Thumbnails, iThumbnail, sizeof(TCHAR *), strcomp);
 		iThumbnail = ThumbnailIndex = 0;
 		while (iThumbnail < 4 && ThumbnailIndex < ThumbnailCount && iThumbnail < ThumbnailCount) {
-
 			ThumbnailsSelected[iThumbnail] = Thumbnails[iThumbnail];
 			iThumbnail++;
 		}
@@ -11350,21 +10419,16 @@ void thumnail() {
 #pragma warning(pop)
 
 void nuthsel() {
-
 	unsigned	iThumbnail = 0, length = 0, savedIndex = 0;
 
 	if (ThumbnailIndex < ThumbnailCount) {
-
 		savedIndex = ThumbnailIndex;
 		iThumbnail = 0;
 		length = strlen(ThumbnailSearchString);
 		StateMap.set(StateFlag::RESTCH);
 		if (length) {
-
 			while (iThumbnail < 4 && ThumbnailIndex < ThumbnailCount) {
-
 				if (!strncmp(ThumbnailSearchString, Thumbnails[ThumbnailIndex], length)) {
-
 					ThumbnailsSelected[iThumbnail] = Thumbnails[ThumbnailIndex];
 					redraw(BackupViewer[iThumbnail++]);
 				}
@@ -11372,16 +10436,13 @@ void nuthsel() {
 			}
 		}
 		else {
-
 			while (iThumbnail < 4 && ThumbnailIndex < ThumbnailCount) {
-
 				ThumbnailsSelected[iThumbnail] = Thumbnails[ThumbnailIndex];
 				redraw(BackupViewer[iThumbnail++]);
 				ThumbnailIndex++;
 			}
 		}
 		if (iThumbnail) {
-
 			ThumbnailDisplayCount = iThumbnail;
 			while (iThumbnail < 4)
 				rthumnam(iThumbnail++);
@@ -11392,18 +10453,13 @@ void nuthsel() {
 }
 
 void nuthbak(unsigned count) {
-
 	unsigned	length = 0;
 
 	if (ThumbnailIndex) {
-
 		length = strlen(ThumbnailSearchString);
 		if (length) {
-
 			while (count && ThumbnailIndex < MAXFORMS) {
-
 				if (ThumbnailIndex) {
-
 					ThumbnailIndex--;
 					if (!strncmp(ThumbnailSearchString, Thumbnails[ThumbnailIndex], length))
 						count--;
@@ -11421,12 +10477,10 @@ void nuthbak(unsigned count) {
 }
 
 void nuthum(TCHAR character) {
-
 	unsigned	iString;
 
 	iString = strlen(ThumbnailSearchString);
 	if (iString < 16) {
-
 		StateMap.set(StateFlag::RESTCH);
 		ThumbnailSearchString[iString++] = character;
 		ThumbnailSearchString[iString] = 0;
@@ -11437,12 +10491,10 @@ void nuthum(TCHAR character) {
 }
 
 void bakthum() {
-
 	unsigned	searchStringLength;
 
 	searchStringLength = strlen(ThumbnailSearchString);
 	if (searchStringLength) {
-
 		StateMap.set(StateFlag::RESTCH);
 		ThumbnailSearchString[--searchStringLength] = 0;
 		ThumbnailIndex = 0;
@@ -11452,9 +10504,7 @@ void bakthum() {
 }
 
 void selalstch() {
-
 	if (PCSHeader.stitchCount) {
-
 		ClosestPointIndex = 0;
 		GroupStitchIndex = PCSHeader.stitchCount - 1;
 		GroupStartStitch = ClosestPointIndex;
@@ -11468,7 +10518,6 @@ void selalstch() {
 }
 
 void insflin(POINT insertPoint) noexcept {
-
 	POINT	offset;
 
 	offset.x = InsertSize.x >> 1;
@@ -11481,12 +10530,10 @@ void insflin(POINT insertPoint) noexcept {
 }
 
 bool isthr(TCHAR* filename) {
-
 	TCHAR* lastCharacter;
 
 	lastCharacter = strrchr(filename, '.');
 	if (lastCharacter) {
-
 		lastCharacter++;
 		if (!_strnicmp(lastCharacter, "th", 2))
 			return 1;
@@ -11501,7 +10548,6 @@ unsigned gethand(const fPOINTATTR* stitch, unsigned stitchCount) noexcept {
 	unsigned	userStitchCount = 0;
 	if (stitch) {
 		for (unsigned iStitch = 0; iStitch < stitchCount; iStitch++) {
-
 			if (stitch[iStitch].attribute&USMSK)
 				userStitchCount++;
 		}
@@ -11510,9 +10556,7 @@ unsigned gethand(const fPOINTATTR* stitch, unsigned stitchCount) noexcept {
 }
 
 void insfil() {
-
 	OPENFILENAME	file = {
-
 		sizeof(OPENFILENAME),	//lStructsize
 		ThrEdWindow,			//hwndOwner 
 		ThrEdInstance,			//hInstance 
@@ -11573,7 +10617,7 @@ void insfil() {
 						homscor = static_cast<double>(
 							FormIndex)*FRMW +
 							gethand(StitchBuffer, PCSHeader.stitchCount)*HANDW +
-							FormVertexIndex*FRMPW +
+							FormVertexIndex * FRMPW +
 							PCSHeader.stitchCount*STCHW;
 						ReadFile(InsertedFileHandle, &thredHeader, sizeof(STREX), &BytesRead, 0);
 					}
@@ -11754,7 +10798,6 @@ void insfil() {
 }
 
 void duinsfil() {
-
 	fPOINT		offset = {};
 	unsigned	iForm = 0, iVertex = 0, iStitch = 0;
 	fRECTANGLE*	formRectangle = nullptr;
@@ -11763,7 +10806,6 @@ void duinsfil() {
 	offset.x = SelectedPoint.x - InsertCenter.x;
 	offset.y = SelectedPoint.y - InsertCenter.y;
 	for (iForm = InsertedFormIndex; iForm < FormIndex; iForm++) {
-
 		formRectangle = &FormList[iForm].rectangle;
 		formRectangle->bottom += offset.y;
 		formRectangle->top += offset.y;
@@ -11771,12 +10813,10 @@ void duinsfil() {
 		formRectangle->right += offset.x;
 	}
 	for (iVertex = InsertedVertexIndex; iVertex < FormVertexIndex; iVertex++) {
-
 		FormVertices[iVertex].x += offset.x;
 		FormVertices[iVertex].y += offset.y;
 	}
 	for (iStitch = InsertedStitchCount; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		StitchBuffer[iStitch].x += offset.x;
 		StitchBuffer[iStitch].y += offset.y;
 	}
@@ -11787,7 +10827,6 @@ void duinsfil() {
 }
 
 void gotbox() {
-
 	StateMap.reset(StateFlag::BZUMIN);
 	StateMap.reset(StateFlag::BOXSLCT);
 	StateMap.reset(StateFlag::FRMPSEL);
@@ -11795,30 +10834,23 @@ void gotbox() {
 }
 
 void rngal() {
-
 	unsigned	iStitch = 0, iRange = 0, rangeCount = 0;
 	bool		flagInRange = false;
 	unsigned	largestRange = 0, maximumLength = 0, length = 0;
-	
-	if (!StateMap.testAndReset(StateFlag::WASFPNT)) {
 
+	if (!StateMap.testAndReset(StateFlag::WASFPNT)) {
 		StateMap.reset(StateFlag::GRPSEL);
 		std::vector<RANGE> prng(MAXITEMS);
 		StateMap.reset(StateFlag::GRPSEL);
 		while (iStitch < PCSHeader.stitchCount) {
-
 			if (inrng(iStitch)) {
-
 				if (!flagInRange) {
-
 					prng[iRange].start = iStitch;
 					flagInRange = true;
 				}
 			}
 			else {
-
 				if (flagInRange) {
-
 					prng[iRange].finish = iStitch - 1;
 					iRange++;
 					flagInRange = false;
@@ -11827,25 +10859,20 @@ void rngal() {
 			iStitch++;
 		}
 		if (flagInRange) {
-
 			prng[iRange].finish = iStitch - 1;
 			iRange++;
 		}
 		rangeCount = iRange;
 		if (rangeCount) {
-
 			maximumLength = 0;
 			for (iRange = 0; iRange < rangeCount; iRange++) {
-
 				length = prng[iRange].finish - prng[iRange].start;
 				if (length > maximumLength) {
-
 					maximumLength = length;
 					largestRange = iRange;
 				}
 			}
 			if (maximumLength) {
-
 				ClosestPointIndex = prng[largestRange].start;
 				GroupStitchIndex = prng[largestRange].finish;
 				StateMap.set(StateFlag::GRPSEL);
@@ -11856,16 +10883,13 @@ void rngal() {
 }
 
 void nucols() {
-
 	unsigned	iForm = 0, iStitch = 0;
 
 	clRmap((FormIndex << 5) + 1);
 	for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-
 		setr(SelectedFormList[iForm]);
 		SelectedForm = &FormList[iForm];
 		if (SelectedForm->fillType) {
-
 			SelectedForm->fillColor = ActiveColor;
 			SelectedForm->fillInfo.feather.color = ActiveColor;
 		}
@@ -11875,9 +10899,7 @@ void nucols() {
 			SelectedForm->underlayColor = ActiveColor;
 	}
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		if (chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT) && (StitchBuffer[iStitch].attribute&TYPMSK) != TYPMSK) {
-
 			StitchBuffer[iStitch].attribute &= NCOLMSK;
 			StitchBuffer[iStitch].attribute |= ActiveColor;
 		}
@@ -11885,14 +10907,11 @@ void nucols() {
 }
 
 bool dunum(unsigned code) noexcept {
-
 	if (code >= '0' && code <= '9') {
-
 		NumericCode = code;
 		return 1;
 	}
 	if (code >= VK_NUMPAD0 && code <= VK_NUMPAD9) {
-
 		NumericCode = code - '0';
 		return 1;
 	}
@@ -11900,16 +10919,13 @@ bool dunum(unsigned code) noexcept {
 }
 
 void stchrct(fRECTANGLE* rectangle) noexcept {
-
 	unsigned	ind = 0;
 
 	if (PCSHeader.stitchCount) {
 		rectangle->bottom = rectangle->left = 1e10;
 		rectangle->top = rectangle->right = 0;
 		if (PCSHeader.stitchCount) {
-
 			for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-
 				if (StitchBuffer[ind].x < rectangle->left)
 					rectangle->left = StitchBuffer[ind].x;
 				if (StitchBuffer[ind].x > rectangle->right)
@@ -11929,7 +10945,6 @@ void frmrct(fRECTANGLE* rectangle) noexcept {
 	rectangle->left = rectangle->right = FormVertices[0].x;
 	rectangle->top = rectangle->bottom = FormVertices[0].y;
 	for (iVertex = 0; iVertex < FormVertexIndex; iVertex++) {
-
 		if (FormVertices[iVertex].x < rectangle->left)
 			rectangle->left = FormVertices[iVertex].x;
 		if (FormVertices[iVertex].x > rectangle->right)
@@ -11942,19 +10957,16 @@ void frmrct(fRECTANGLE* rectangle) noexcept {
 }
 
 void desiz() {
-
 	fRECTANGLE	rectangle = {};
 	FLOAT		xSize = 0.0, ySize = 0.0;
 	TCHAR*		message = MsgBuffer;
 	int			bufferRemaining = sizeof(MsgBuffer);
 
 	if (PCSHeader.stitchCount && message) {
-
 		stchrct(&rectangle);
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
 		if ((rectangle.left < 0) || (rectangle.bottom < 0) || (rectangle.right > IniFile.hoopSizeX) || (rectangle.top > IniFile.hoopSizeY)) {
-
 			strcpy_s(MsgBuffer, StringTable[STR_STCHOUT]);
 			message = &MsgBuffer[strlen(MsgBuffer)];
 			bufferRemaining -= strlen(MsgBuffer);
@@ -11981,12 +10993,10 @@ void desiz() {
 		message = &message[strlen(message)];
 	}
 	if (FormIndex) {
-
 		frmrct(&rectangle);
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
 		if (message) {
-
 #if LANG==ENG || LANG==HNG
 			bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable[STR_FORMS],
 				FormIndex,
@@ -12020,7 +11030,6 @@ void desiz() {
 }
 
 void sidhup() {
-
 	RECT		hoopRectangle = {};
 	RECT		preferencesRectangle = {};
 	unsigned	iHoop = 0;
@@ -12041,7 +11050,6 @@ void sidhup() {
 		ThrEdInstance,
 		NULL);
 	for (iHoop = 0; iHoop < HUPS; iHoop++) {
-
 		SideWindow[iHoop] = CreateWindow(
 			"STATIC",
 			StringTable[iHoop + STR_HUP0],
@@ -12058,42 +11066,34 @@ void sidhup() {
 }
 
 void setpcs() {
-
 	IniFile.auxFileType = AUXPCS;
 	auxmen();
 }
 
 void setdst() {
-
 	IniFile.auxFileType = AUXDST;
 	auxmen();
 }
 
 void fop() {
-
 	untrace();
 	if (FormIndex || PCSHeader.stitchCount) {
-
 		if (savcmp()) {
-
 			nuFil();
 			nulayr(0);
 		}
 		else {
-
 			savdisc();
 			StateMap.set(StateFlag::OSAV);
 		}
 	}
 	else {
-
 		nuFil();
 		nulayr(0);
 	}
 }
 
 void clpradj(fPOINTATTR stitch) noexcept {
-
 	if (stitch.x < ClipRectAdjusted.left)
 		ClipRectAdjusted.left = stitch.x;
 	if (stitch.x > ClipRectAdjusted.right)
@@ -12105,12 +11105,10 @@ void clpradj(fPOINTATTR stitch) noexcept {
 }
 
 void clpadj() {
-
 	double		clipMiddle = 0.0;
 	unsigned	iStitch = 0;
 
 	if (StateMap.test(StateFlag::GRPSEL)) {
-
 		rngadj();
 		iStitch = GroupStartStitch;
 		ClipRectAdjusted.left = ClipRect.right = StitchBuffer[iStitch++].x;
@@ -12125,12 +11123,10 @@ void clpadj() {
 		clipMiddle = (ClipRectAdjusted.right - ClipRectAdjusted.left) / 2 + ClipRectAdjusted.left;
 		StitchBuffer[GroupStartStitch].y = StitchBuffer[GroupEndStitch].y = (ClipRectAdjusted.top - ClipRectAdjusted.bottom) / 2 + ClipRectAdjusted.bottom;
 		if (StitchBuffer[GroupStartStitch].x < clipMiddle) {
-
 			StitchBuffer[GroupStartStitch].x = ClipRectAdjusted.left;
 			StitchBuffer[GroupEndStitch].x = ClipRectAdjusted.right;
 		}
 		else {
-
 			StitchBuffer[GroupEndStitch].x = ClipRectAdjusted.left;
 			StitchBuffer[GroupStartStitch].x = ClipRectAdjusted.right;
 		}
@@ -12142,20 +11138,16 @@ void clpadj() {
 }
 
 void shftflt(fPOINT point) noexcept {
-
 	if (point.x <= ZoomRect.left || point.x >= ZoomRect.right || point.y <= ZoomRect.bottom || point.y >= ZoomRect.top)
 		shft(point);
 }
 
 void fil2men() noexcept {
-
 	if (UserFlagMap.test(UserFlag::FIL2OF)) {
-
 		CheckMenuItem(MainMenu, ID_FIL2SEL_ON, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_FIL2SEL_OFF, MF_CHECKED);
 	}
 	else {
-
 		CheckMenuItem(MainMenu, ID_FIL2SEL_ON, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_FIL2SEL_OFF, MF_UNCHECKED);
 	}
@@ -12163,12 +11155,10 @@ void fil2men() noexcept {
 }
 
 void defpref() {
-
 	unsigned	iColor = 0;
 
 	UserFlagMap.reset();
 	for (iColor = 0; iColor < 16; iColor++) {
-
 		UserColor[iColor] = DefaultUserColors[iColor];
 		CustomColor[iColor] = DefaultCustomColors[iColor];
 		CustomBackgroundColor[iColor] = DefaultCustomBackgroundColors[iColor];
@@ -12182,7 +11172,7 @@ void defpref() {
 	IniFile.chainRatio = CHRDEF;
 	IniFile.fillAngle = DEFANG;
 	UserFlagMap.reset(UserFlag::SQRFIL);
-	LineSpacing = DEFSPACE*PFGRAN;
+	LineSpacing = DEFSPACE * PFGRAN;
 	ShowStitchThreshold = SHOPNTS;
 	IniFile.gridSize = 12;
 	IniFile.hoopType = LARGHUP;
@@ -12191,14 +11181,14 @@ void defpref() {
 	IniFile.cursorNudgeStep = NUGINI;
 	IniFile.nudgePixels = DEFPIX;
 	UserFlagMap.set(UserFlag::BLUNT);
-	SmallStitchLength = SMALSIZ*PFGRAN;
-	SnapLength = SNPLEN*PFGRAN;
+	SmallStitchLength = SMALSIZ * PFGRAN;
+	SnapLength = SNPLEN * PFGRAN;
 	SpiralWrap = SPIRWRAP;
 	StarRatio = STARAT;
 	StitchBoxesThreshold = STCHBOX;
-	IniFile.maxStitchLength = MAXSIZ*PFGRAN;
-	UserStitchLength = USESIZ*PFGRAN;
-	MinStitchLength = MINSIZ*PFGRAN;
+	IniFile.maxStitchLength = MAXSIZ * PFGRAN;
+	UserStitchLength = USESIZ * PFGRAN;
+	MinStitchLength = MINSIZ * PFGRAN;
 	IniFile.clipOffset = 0;
 	IniFile.fillPhase = 0;
 	BitmapColor = 0xc8dfee;
@@ -12231,7 +11221,6 @@ void defpref() {
 }
 
 void dumrk(double xCoord, double yCoord) {
-
 	if (StateMap.testAndReset(StateFlag::GMRK))
 		drwmrk(StitchWindowDC);
 	ZoomMarkPoint.x = xCoord;
@@ -12243,12 +11232,10 @@ void dumrk(double xCoord, double yCoord) {
 }
 
 void gselrng() noexcept {
-
 	unsigned	iForm = 1;
 
 	SelectedFormsRange.start = SelectedFormsRange.finish = *SelectedFormList;
 	for (iForm = 1; iForm < SelectedFormCount; iForm++) {
-
 		if (SelectedFormList[iForm] < SelectedFormsRange.start)
 			SelectedFormsRange.start = SelectedFormList[iForm];
 		if (SelectedFormList[iForm] > SelectedFormsRange.finish)
@@ -12257,13 +11244,11 @@ void gselrng() noexcept {
 }
 
 double nuang(double yDelta, double xDelta) noexcept {
-
 	double	angle = 0.0, relativeAngle = 0.0;
 
 	angle = atan2(yDelta, xDelta);
 	relativeAngle = angle - OriginalAngle;
 	if (fabs(relativeAngle) > PI) {
-
 		if (relativeAngle > 0)
 			relativeAngle = 2 * PI - relativeAngle;
 		else
@@ -12273,25 +11258,20 @@ double nuang(double yDelta, double xDelta) noexcept {
 }
 
 void angdif(double angle) noexcept {
-
 	if (angle > HighestAngle)
 		HighestAngle = angle;
 	else {
-
 		if (angle < LowestAngle)
 			LowestAngle = angle;
 	}
 }
 
 void rotmrk() {
-
 	unsigned	iVertex = 0, iStitch = 0, segments = 0, codedFormIndex = 0;
 	double		tang = 0.0;
 
 	if (StateMap.test(StateFlag::GMRK) && (StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::GRPSEL))) {
-
 		if (StateMap.test(StateFlag::FORMSEL)) {
-
 			codedFormIndex = ClosestFormToCursor << FRMSHFT;
 			fvars(ClosestFormToCursor);
 			LowestAngle = HighestAngle = 0;
@@ -12299,13 +11279,11 @@ void rotmrk() {
 			for (iVertex = 1; iVertex < VertexCount; iVertex++)
 				angdif(nuang(CurrentFormVertices[iVertex].y - ZoomMarkPoint.y, CurrentFormVertices[iVertex].x - ZoomMarkPoint.x));
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 				if ((StitchBuffer[iStitch].attribute&FRMSK) == codedFormIndex)
 					angdif(nuang(StitchBuffer[iStitch].y - ZoomMarkPoint.y, StitchBuffer[iStitch].x - ZoomMarkPoint.x));
 			}
 		}
 		else {
-
 			rngadj();
 			LowestAngle = HighestAngle = 0;
 			OriginalAngle = atan2(StitchBuffer[GroupStartStitch].y - ZoomMarkPoint.y, StitchBuffer[GroupStartStitch].x - ZoomMarkPoint.x);
@@ -12325,7 +11303,6 @@ void rotmrk() {
 }
 
 void segentr() {
-
 	if (!RotationAngle)
 		RotationAngle = PI / 180;
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_ENTROT], 2 * PI / RotationAngle);
@@ -12335,14 +11312,12 @@ void segentr() {
 }
 
 void rotseg() {
-
 	RotationAngle = IniFile.rotationAngle;
 	segentr();
 	StateMap.set(StateFlag::ENTRSEG);
 }
 
 void pntmrk() {
-
 	do {
 		if (StateMap.test(StateFlag::SELBOX)) {
 			dumrk(StitchBuffer[ClosestPointIndex].x, StitchBuffer[ClosestPointIndex].y);
@@ -12357,23 +11332,18 @@ void pntmrk() {
 }
 
 void filfrms() {
-
 	unsigned	iForm = 0;
 
 	if (SelectedFormCount) {
-
 		savdo();
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-
 			ClosestFormToCursor = SelectedFormList[iForm];
 			refilfn();
 		}
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-
 		if (StateMap.test(StateFlag::FORMSEL)) {
-
 			savdo();
 			refil();
 			StateMap.set(StateFlag::RESTCH);
@@ -12387,13 +11357,11 @@ void nuslst(unsigned find) noexcept {
 	gselrng();
 	do {
 		if (find < SelectedFormsRange.start) {
-
 			for (form = find; form < SelectedFormsRange.finish; form++)
 				SelectedFormList[iFormList++] = form;
 			break;
 		}
 		if (find > SelectedFormsRange.finish) {
-
 			for (form = SelectedFormsRange.start; form <= find; form++)
 				SelectedFormList[iFormList++] = form;
 			break;
@@ -12406,13 +11374,10 @@ void nuslst(unsigned find) noexcept {
 }
 
 void srchk() {
-
 	StateMap.reset(StateFlag::FORMSEL);
 	SelectedFormCount = 0;
 	if (StateMap.testAndSet(StateFlag::LENSRCH)) {
-
 		if (StateMap.test(StateFlag::WASGRP)) {
-
 			ClosestPointIndex = GroupStartStitch = PrevGroupStartStitch;
 			GroupStitchIndex = GroupEndStitch = PrevGroupEndStitch;
 		}
@@ -12420,9 +11385,7 @@ void srchk() {
 			StateMap.reset(StateFlag::GRPSEL);
 	}
 	else {
-
 		if (StateMap.test(StateFlag::GRPSEL)) {
-
 			StateMap.set(StateFlag::WASGRP);
 			rngadj();
 			PrevGroupStartStitch = GroupStartStitch;
@@ -12435,7 +11398,6 @@ void srchk() {
 }
 
 unsigned duswap(unsigned data) noexcept {
-
 #if  __UseASM__
 	_asm {
 		mov		eax, data
@@ -12447,7 +11409,6 @@ unsigned duswap(unsigned data) noexcept {
 }
 
 void ritcur() noexcept {
-
 	ICONINFO		iconInfo = {};
 	HCURSOR			currentCursor = GetCursor();
 	POINT			cursorPosition = {};
@@ -12464,16 +11425,12 @@ void ritcur() noexcept {
 	// ToDo - replace with GetDIBits
 	GetBitmapBits(iconInfo.hbmMask, 256, &bitmapBits);
 	if (currentCursor == ArrowCursor) {
-
 		for (iRow = 0; iRow < 32; iRow++) {
-
 			mask = duswap(bitmapBits[iRow]);
 			bitmapInverse = duswap(bitmapBits[iRow + 32]);
 			bitMask = 0x80000000;
 			for (iPixel = 0; iPixel < 32; iPixel++) {
-
 				if (!(bitMask&mask)) {
-
 					if (bitmapInverse&bitMask)
 						pixelColor = 0xffffff;
 					else
@@ -12485,13 +11442,10 @@ void ritcur() noexcept {
 		}
 	}
 	else {
-
 		for (iRow = 0; iRow < 32; iRow++) {
-
 			bitmapInverse = duswap(bitmapBits[iRow + 32]);
 			bitMask = 0x80000000;
 			for (iPixel = 0; iPixel < 32; iPixel++) {
-
 				if (bitMask&bitmapInverse)
 					SetPixel(StitchWindowDC, cursorPosition.x + iPixel, cursorPosition.y + iRow, GetPixel(StitchWindowDC, cursorPosition.x + iPixel, cursorPosition.y + iRow) ^ 0xffffff);
 				bitMask >>= 1;
@@ -12501,7 +11455,6 @@ void ritcur() noexcept {
 }
 
 void delsfrms(unsigned code) {
-
 	unsigned	iForm = 0, formFlagWordCount = 0, iWord = 0;
 	unsigned	validFormCount = 0, deletedFormCount = 0, iStitch = 0, validStitchCount = 0;
 
@@ -12520,9 +11473,7 @@ void delsfrms(unsigned code) {
 			}
 			validFormCount = 0; deletedFormCount = 0;
 			for (iForm = 0; iForm < FormIndex; iForm++) {
-
 				if (!chkr(iForm)) {
-
 					frmcpy(&FormList[validFormCount], &FormList[iForm]);
 					formIndices[iForm] = (iForm - deletedFormCount) << 4;
 					validFormCount++;
@@ -12533,14 +11484,10 @@ void delsfrms(unsigned code) {
 			FormIndex = validFormCount;
 			validStitchCount = 0;
 			if (StateMap.test(StateFlag::DELTO)) {
-
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 					if (StitchBuffer[iStitch].attribute&ALTYPMSK) {
-
 						iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
 						if (!chkr(iForm)) {
-
 							StitchBuffer[validStitchCount].attribute = StitchBuffer[iStitch].attribute &= NFRMSK;
 							StitchBuffer[validStitchCount].attribute |= formIndices[iForm];
 							StitchBuffer[validStitchCount].x = StitchBuffer[iStitch].x;
@@ -12548,7 +11495,6 @@ void delsfrms(unsigned code) {
 						}
 					}
 					else {
-
 						StitchBuffer[validStitchCount].attribute = StitchBuffer[iStitch].attribute;
 						StitchBuffer[validStitchCount].x = StitchBuffer[iStitch].x;
 						StitchBuffer[validStitchCount++].y = StitchBuffer[iStitch].y;
@@ -12557,11 +11503,8 @@ void delsfrms(unsigned code) {
 				PCSHeader.stitchCount = validStitchCount;
 			}
 			else {
-
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 					if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
-
 						iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
 						if (chkr(iForm))
 							StitchBuffer[iStitch].attribute &= (NFRMSK&NTYPMSK);
@@ -12577,65 +11520,54 @@ void delsfrms(unsigned code) {
 }
 
 void nedon() {
-
 	UserFlagMap.reset(UserFlag::NEDOF);
 	nedmen();
 }
 
 void nedof() {
-
 	UserFlagMap.set(UserFlag::NEDOF);
 	nedmen();
 }
 
 void shoknot() {
-
 	UserFlagMap.reset(UserFlag::KNOTOF);
 	knotmen();
 	StateMap.set(StateFlag::RESTCH);
 }
 
 void hidknot() {
-
 	UserFlagMap.set(UserFlag::KNOTOF);
 	knotmen();
 	StateMap.set(StateFlag::RESTCH);
 }
 
 void pcsbsavon() {
-
 	UserFlagMap.reset(UserFlag::BSAVOF);
 	bsavmen();
 	StateMap.set(StateFlag::RESTCH);
 }
 
 void pcsbsavof() {
-
 	UserFlagMap.set(UserFlag::BSAVOF);
 	bsavmen();
 	StateMap.set(StateFlag::RESTCH);
 }
 
 void tglhid() {
-
 	if (!StateMap.testAndFlip(StateFlag::HIDSTCH))
 		StateMap.reset(StateFlag::FRMOF);
 	StateMap.set(StateFlag::RESTCH);
 }
 
 void respac() {
-
 	if (isclp(ClosestFormToCursor)) {
-
 		SelectedForm->fillSpacing = LineSpacing;
 		fsizpar();
 	}
 }
 
 bool chkminus(unsigned code) noexcept {
-
 	if (code == 189 || code == 109) {
-
 		if (PreferenceIndex == PCLPOF + 1)
 			return 1;
 		if (FormMenuChoice == LFRMSPAC && isfclp())
@@ -12647,11 +11579,9 @@ bool chkminus(unsigned code) noexcept {
 }
 
 void retrac() {
-
 	unsigned	source = 0, destination = 0;
 
 	if (StateMap.test(StateFlag::GRPSEL)) {
-
 		savdo();
 		rngadj();
 		if (!GroupStartStitch)
@@ -12673,7 +11603,6 @@ void retrac() {
 }
 
 void setgrd(COLORREF color) {
-
 	unsigned		iCode = 0;
 	const GRDCOD	gridCodes[] = {
 		ID_GRDHI,HIGRD,
@@ -12685,7 +11614,6 @@ void setgrd(COLORREF color) {
 	};
 
 	for (iCode = 0; iCode < 6; iCode++) {
-
 		if (color == gridCodes[iCode].col)
 			CheckMenuItem(MainMenu, gridCodes[iCode].id, MF_CHECKED);
 		else
@@ -12698,7 +11626,6 @@ void setgrd(COLORREF color) {
 }
 
 void ovrlay() {
-
 	StateMap.reset(StateFlag::IGNORINS);
 	insfil();
 	StateMap.reset(StateFlag::INSFIL);
@@ -12709,7 +11636,6 @@ void ovrlay() {
 }
 
 void fil2sel(unsigned stat) noexcept {
-
 	UserFlagMap.set(UserFlag::FIL2OF);
 	if (stat)
 		UserFlagMap.reset(UserFlag::FIL2OF);
@@ -12717,21 +11643,17 @@ void fil2sel(unsigned stat) noexcept {
 }
 
 void rotauxmen() noexcept {
-
 	if (UserFlagMap.test(UserFlag::ROTAUX)) {
-
 		CheckMenuItem(MainMenu, ID_ROTAUXON, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_ROTAUXOFF, MF_UNCHECKED);
 	}
 	else {
-
 		CheckMenuItem(MainMenu, ID_ROTAUXON, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_ROTAUXOFF, MF_CHECKED);
 	}
 }
 
 void rotauxsel(unsigned stat) {
-
 	UserFlagMap.set(UserFlag::ROTAUX);
 	if (!stat)
 		UserFlagMap.reset(UserFlag::ROTAUX);
@@ -12740,21 +11662,17 @@ void rotauxsel(unsigned stat) {
 }
 
 void frmcurmen() noexcept {
-
 	if (UserFlagMap.test(UserFlag::FRMX)) {
-
 		CheckMenuItem(MainMenu, ID_FRMX, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_FRMBOX, MF_UNCHECKED);
 	}
 	else {
-
 		CheckMenuItem(MainMenu, ID_FRMX, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_FRMBOX, MF_CHECKED);
 	}
 }
 
 void frmcursel(unsigned cursorType) {
-
 	UserFlagMap.set(UserFlag::FRMX);
 	if (!cursorType)
 		UserFlagMap.reset(UserFlag::FRMX);
@@ -12763,7 +11681,6 @@ void frmcursel(unsigned cursorType) {
 }
 
 void stchsnap(unsigned start, unsigned finish) noexcept {
-
 #if  __UseASM__
 	_asm {
 		xor		eax, eax
@@ -12803,7 +11720,6 @@ void stchsnap(unsigned start, unsigned finish) noexcept {
 }
 
 void frmsnap(fPOINT* start, unsigned count) noexcept {
-
 #if  __UseASM__
 	_asm {
 		mov		eax, start
@@ -12811,15 +11727,15 @@ void frmsnap(fPOINT* start, unsigned count) noexcept {
 		shl		ecx, 1
 		je		short frmsnapx
 		fld		IniFile.gridSize
-snpflup : 
+		snpflup :
 		fld		dword ptr[eax]
-		fdiv	st, st(1)
-		frndint
-		fmul	st, st(1)
-		fstp	dword ptr[eax]
-		add		eax, 4
-		loop	snpflup
-frmsnapx :
+			fdiv	st, st(1)
+			frndint
+			fmul	st, st(1)
+			fstp	dword ptr[eax]
+			add		eax, 4
+			loop	snpflup
+			frmsnapx :
 	}
 #else
 	for (unsigned i = 0; i < count; i++) {
@@ -12832,7 +11748,6 @@ frmsnapx :
 }
 
 void gsnap() {
-
 	unsigned iForm = 0;
 
 	if (StateMap.test(StateFlag::TXTRED)) {
@@ -12840,10 +11755,8 @@ void gsnap() {
 		return;
 	}
 	if (SelectedFormCount) {
-
 		savdo();
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-
 			ClosestFormToCursor = SelectedFormList[iForm];
 			frmsnap(FormList[ClosestFormToCursor].vertices, FormList[ClosestFormToCursor].vertexCount);
 			frmout(ClosestFormToCursor);
@@ -12852,9 +11765,7 @@ void gsnap() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-
 		if (StateMap.test(StateFlag::FORMSEL)) {
-
 			savdo();
 			frmsnap(FormList[ClosestFormToCursor].vertices, FormList[ClosestFormToCursor].vertexCount);
 			frmout(ClosestFormToCursor);
@@ -12862,9 +11773,7 @@ void gsnap() {
 			StateMap.set(StateFlag::RESTCH);
 		}
 		else {
-
 			if (StateMap.test(StateFlag::GRPSEL)) {
-
 				savdo();
 				rngadj();
 				stchsnap(GroupStartStitch, GroupEndStitch + 1);
@@ -12883,7 +11792,6 @@ void ritlock(const WIN32_FIND_DATA* fileData, unsigned fileIndex, HWND hwndlg) n
 		SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_RESETCONTENT, 0, 0);
 		SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
 		for (iFile = 0; iFile < fileIndex; iFile++) {
-
 			if (fileData[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)
 				[[gsl::suppress(type.1)]]SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(fileData[iFile].cFileName));
 			else
@@ -12893,7 +11801,6 @@ void ritlock(const WIN32_FIND_DATA* fileData, unsigned fileIndex, HWND hwndlg) n
 }
 
 BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
-
 	FINDINFO	*fileInfo = nullptr;
 	HANDLE		searchResult = {};
 	TCHAR		searchName[_MAX_PATH] = { 0 };
@@ -12902,115 +11809,105 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	HWND		lockHandle = {}, unlockHandle = {};
 
 	switch (umsg) {
+	case WM_INITDIALOG:
 
-		case WM_INITDIALOG:
+		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+		SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
+		[[gsl::suppress(type.1)]]fileInfo = reinterpret_cast<FINDINFO *>(lparam);
+		if (fileInfo) {
+			strcpy_s(searchName, DefaultDirectory);
+			strcat_s(searchName, "\\*.thr");
+			searchResult = FindFirstFile(searchName, &(fileInfo->data[0]));
+			if (searchResult == INVALID_HANDLE_VALUE) {
+				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Directory: %s has no .thr files\n", DefaultDirectory);
+				shoMsg(MsgBuffer);
+				EndDialog(hwndlg, wparam);
+				return TRUE;
+			}
+			fileInfo->count = 1;
+			while (FindNextFile(searchResult, &fileInfo->data[fileInfo->count++]));
+			fileInfo->count--;
+			ritlock(fileInfo->data, fileInfo->count, hwndlg);
+		}
+		break;
 
-			SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-			SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
-			[[gsl::suppress(type.1)]]fileInfo = reinterpret_cast<FINDINFO *>(lparam);
-			if (fileInfo) {
-				strcpy_s(searchName, DefaultDirectory);
-				strcat_s(searchName, "\\*.thr");
-				searchResult = FindFirstFile(searchName, &(fileInfo->data[0]));
-				if (searchResult == INVALID_HANDLE_VALUE) {
+	case WM_COMMAND:
 
-					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Directory: %s has no .thr files\n", DefaultDirectory);
-					shoMsg(MsgBuffer);
-					EndDialog(hwndlg, wparam);
-					return TRUE;
-				}
-				fileInfo->count = 1;
-				while (FindNextFile(searchResult, &fileInfo->data[fileInfo->count++]));
-				fileInfo->count--;
+		[[gsl::suppress(type.1)]]fileInfo = reinterpret_cast<FINDINFO *>(GetWindowLongPtr(hwndlg, DWLP_USER));
+		if (fileInfo) {
+			switch (LOWORD(wparam)) {
+			case IDCANCEL:
+
+				EndDialog(hwndlg, wparam);
+				return TRUE;
+
+			case IDC_LOCKAL:
+
+				for (iFile = 0; iFile < fileInfo->count; iFile++)
+					fileInfo->data[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
 				ritlock(fileInfo->data, fileInfo->count, hwndlg);
-			}
-			break;
+				break;
 
-		case WM_COMMAND:
+			case IDC_UNLOCKAL:
 
-			[[gsl::suppress(type.1)]]fileInfo = reinterpret_cast<FINDINFO *>(GetWindowLongPtr(hwndlg, DWLP_USER));
-			if (fileInfo) {
-				switch (LOWORD(wparam)) {
+				for (iFile = 0; iFile < fileInfo->count; iFile++)
+					fileInfo->data[iFile].dwFileAttributes &= 0xffffffff ^ FILE_ATTRIBUTE_READONLY;
+				ritlock(fileInfo->data, fileInfo->count, hwndlg);
+				break;
 
-				case IDCANCEL:
+			case IDC_LOCK:
 
-					EndDialog(hwndlg, wparam);
-					return TRUE;
-
-				case IDC_LOCKAL:
-
-					for (iFile = 0; iFile < fileInfo->count; iFile++)
-						fileInfo->data[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
-					ritlock(fileInfo->data, fileInfo->count, hwndlg);
-					break;
-
-				case IDC_UNLOCKAL:
-
-					for (iFile = 0; iFile < fileInfo->count; iFile++)
-						fileInfo->data[iFile].dwFileAttributes &= 0xffffffff ^ FILE_ATTRIBUTE_READONLY;
-					ritlock(fileInfo->data, fileInfo->count, hwndlg);
-					break;
-
-				case IDC_LOCK:
-
-					fileError = 0;
-					unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
-					for (iFile = 0; iFile < fileInfo->count; iFile++) {
-
-						if (!(fileInfo->data[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
-
-							if (SendMessage(unlockHandle, LB_GETSEL, fileError, 0))
-								fileInfo->data[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
-							fileError++;
-						}
+				fileError = 0;
+				unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
+				for (iFile = 0; iFile < fileInfo->count; iFile++) {
+					if (!(fileInfo->data[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
+						if (SendMessage(unlockHandle, LB_GETSEL, fileError, 0))
+							fileInfo->data[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
+						fileError++;
 					}
-					ritlock(fileInfo->data, fileInfo->count, hwndlg);
-					break;
-
-				case IDC_UNLOCK:
-
-					fileError = 0;
-					lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
-					for (iFile = 0; iFile < fileInfo->count; iFile++) {
-
-						if ((fileInfo->data[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
-
-							if (SendMessage(lockHandle, LB_GETSEL, fileError, 0))
-								fileInfo->data[iFile].dwFileAttributes &= 0xffffffff ^ FILE_ATTRIBUTE_READONLY;
-							fileError++;
-						}
-					}
-					ritlock(fileInfo->data, fileInfo->count, hwndlg);
-					break;
-
-				case IDOK:
-
-					strcpy_s(searchName, DefaultDirectory);
-					strcat_s(searchName, "\\");
-					fileError = 0;
-					for (iFile = 0; iFile < fileInfo->count; iFile++) {
-
-						strcpy_s(fileName, searchName);
-						strcat_s(fileName, fileInfo->data[iFile].cFileName);
-						if (!SetFileAttributes(fileName, fileInfo->data[iFile].dwFileAttributes))
-							fileError++;
-					}
-					if (fileError) {
-
-						sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d files could not be locked or unlocked\n", fileError);
-						shoMsg(MsgBuffer);
-					}
-					EndDialog(hwndlg, wparam);
-					return TRUE;
-					break;
 				}
+				ritlock(fileInfo->data, fileInfo->count, hwndlg);
+				break;
+
+			case IDC_UNLOCK:
+
+				fileError = 0;
+				lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
+				for (iFile = 0; iFile < fileInfo->count; iFile++) {
+					if ((fileInfo->data[iFile].dwFileAttributes&FILE_ATTRIBUTE_READONLY)) {
+						if (SendMessage(lockHandle, LB_GETSEL, fileError, 0))
+							fileInfo->data[iFile].dwFileAttributes &= 0xffffffff ^ FILE_ATTRIBUTE_READONLY;
+						fileError++;
+					}
+				}
+				ritlock(fileInfo->data, fileInfo->count, hwndlg);
+				break;
+
+			case IDOK:
+
+				strcpy_s(searchName, DefaultDirectory);
+				strcat_s(searchName, "\\");
+				fileError = 0;
+				for (iFile = 0; iFile < fileInfo->count; iFile++) {
+					strcpy_s(fileName, searchName);
+					strcat_s(fileName, fileInfo->data[iFile].cFileName);
+					if (!SetFileAttributes(fileName, fileInfo->data[iFile].dwFileAttributes))
+						fileError++;
+				}
+				if (fileError) {
+					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d files could not be locked or unlocked\n", fileError);
+					shoMsg(MsgBuffer);
+				}
+				EndDialog(hwndlg, wparam);
+				return TRUE;
+				break;
 			}
+		}
 	}
 	return 0;
 }
 
 void lock() {
-
 	FINDINFO	lockInfo;
 
 	lockInfo.count = 0;
@@ -13024,13 +11921,11 @@ void lock() {
 }
 
 unsigned colsum(COLORREF color) {
-
 	unsigned	colorSum = 0;
 	unsigned	iRGB = 0;
 
 	trcols(color);
 	for (iRGB = 0; iRGB < 3; iRGB++) {
-
 		if (StateMap.test(TraceRGBFlag[iRGB]))
 			colorSum += PixelColors[iRGB];
 	}
@@ -13038,13 +11933,11 @@ unsigned colsum(COLORREF color) {
 }
 
 unsigned icolsum(COLORREF color) {
-
 	unsigned	colorSum = 0;
 	unsigned	iRGB = 0;
 
 	trcols(color);
 	for (iRGB = 0; iRGB < 3; iRGB++) {
-
 		if (StateMap.test(TraceRGBFlag[iRGB]))
 			colorSum += 255 - PixelColors[iRGB];
 	}
@@ -13052,21 +11945,17 @@ unsigned icolsum(COLORREF color) {
 }
 
 void shownd(HWND hwnd) noexcept {
-
 	ShowWindow(hwnd, SW_SHOW);
 }
 
 void hidwnd(HWND hwnd) noexcept {
-
 	ShowWindow(hwnd, SW_HIDE);
 }
 
 void untrace() {
-
 	unsigned	iColor = 0, iTrace = 0, iButton = 0;
 
 	if (StateMap.testAndReset(StateFlag::WASTRAC)) {
-
 		DeleteObject(TraceBitmap);
 		ReleaseDC(ThrEdWindow, TraceDC);
 		if (TracedEdges->size() != 0) {
@@ -13092,7 +11981,6 @@ void untrace() {
 		hidwnd(TraceStepWin);
 	}
 	else {
-
 		if (StateMap.test(StateFlag::TRCUP))
 			DownPixelColor = 0xffffff;
 		else
@@ -13121,7 +12009,6 @@ void tracwnd() {
 	unsigned	iColor = 0, iTrace = 0;
 
 	for (iColor = 0; iColor < 16; iColor++) {
-
 		hidwnd(DefaultColorWin[iColor]);
 		hidwnd(UserColorWin[iColor]);
 		hidwnd(ThreadSizeWin[iColor]);
@@ -13141,49 +12028,27 @@ void tracwnd() {
 }
 
 void trcols(COLORREF color) noexcept {
-
-#if  __UseASM__
-	_asm {
-		mov		eax, color
-		mov		ecx, offset PixelColors
-		movzx	ebx, al
-		mov		[ecx], ebx
-		add		ecx, 4
-		movzx	ebx, ah
-		mov		[ecx], ebx
-		shr		eax, 8
-		movzx	ebx, ah
-		add		ecx, 4
-		mov		[ecx], ebx
-	}
-#else
 	PixelColors[0] = color & 0xff;
 	PixelColors[1] = (color & 0xff00) >> 8;
 	PixelColors[2] = (color & 0xff0000) >> 16;
-#endif
 }
 
 bool trcin(COLORREF color) {
-
 	if (color) {
-
 		trcols(color);
 		if (StateMap.test(StateFlag::TRCRED)) {
-
 			if (PixelColors[0] > HighColors[0])
 				return 0;
 			if (PixelColors[0] < LowColors[0])
 				return 0;
 		}
 		if (StateMap.test(StateFlag::TRCGRN)) {
-
 			if (PixelColors[1] > HighColors[1])
 				return 0;
 			if (PixelColors[1] < LowColors[1])
 				return 0;
 		}
 		if (StateMap.test(StateFlag::TRCBLU)) {
-
 			if (PixelColors[2] > HighColors[2])
 				return 0;
 			if (PixelColors[2] < LowColors[2])
@@ -13195,7 +12060,6 @@ bool trcin(COLORREF color) {
 }
 
 void getrmap() {
-
 	BITMAPINFO			info = {};
 	BITMAPINFOHEADER	header = {};
 
@@ -13220,7 +12084,6 @@ void getrmap() {
 }
 
 void trace() {
-
 	unsigned	color = 0, iPixel = 0, iRGB = 0;
 	unsigned	traceColorMask = 0;
 
@@ -13230,24 +12093,20 @@ void trace() {
 #endif
 
 	if (PCSBMPFileName[0]) {
-
 		untrace();
 		tracwnd();
 		getrmap();
 		if (px2stch() && !StateMap.testAndReset(StateFlag::WASTRCOL)) {
-
 			if (StateMap.test(StateFlag::LANDSCAP))
 				SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 			BitmapPoint.x = BmpStitchRatio.x*SelectedPoint.x;
 			BitmapPoint.y = BmpStitchRatio.y*SelectedPoint.y - 1;
 			color = TraceBitmapData[BitmapPoint.y*BitmapWidth + BitmapPoint.x] ^ 0xffffff;
 			if (StateMap.test(StateFlag::TRCUP)) {
-
 				UpPixelColor = color;
 				DownPixelColor = 0xffffff;
 			}
 			else {
-
 				DownPixelColor = color;
 				UpPixelColor = 0;
 			}
@@ -13263,7 +12122,6 @@ void trace() {
 		if (!StateMap.test(StateFlag::TRCBLU))
 			traceColorMask &= BLUMSK;
 		if (traceColorMask != 0xffffff) {
-
 			for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++)
 				TraceBitmapData[iPixel] &= traceColorMask;
 		}
@@ -13276,7 +12134,6 @@ void trace() {
 			TracedMap = new unsigned[TraceDataSize]();
 		}
 		for (index = 0; index < BitmapWidth*BitmapHeight; index++) {
-
 			psum = colsum(TraceBitmapData[index]);
 			if (usum > psum && dsum < psum)
 				setrac(index);
@@ -13295,10 +12152,9 @@ void trace() {
 		for (iRGB = 0; iRGB < 3; iRGB++)
 			LowColors[iRGB] = PixelColors[iRGB];
 		if (TracedMap->size() == 0) {
-			TracedMap->resize(TraceDataSize,false);
+			TracedMap->resize(TraceDataSize, false);
 		}
 		for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
-
 			if (trcin(TraceBitmapData[iPixel]))
 				TracedMap->set(iPixel);
 			else
@@ -13319,14 +12175,12 @@ void tracedg() {
 
 	if (!StateMap.test(StateFlag::WASTRAC))
 		trace();
-	TracedEdges->resize(TraceDataSize,false);
+	TracedEdges->resize(TraceDataSize, false);
 	TracedEdges->reset();
 	pixelIndex = 0;
 	for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
-
 		flag = 0;
 		for (iWidth = 0; iWidth < BitmapWidth; iWidth++) {
-
 			if (TracedMap->test(pixelIndex)) {
 				if (!flag) {
 					TracedEdges->set(pixelIndex);
@@ -13345,11 +12199,9 @@ void tracedg() {
 			TracedEdges->set(pixelIndex - 1);
 	}
 	for (iWidth = 0; iWidth < BitmapWidth; iWidth++) {
-
 		pixelIndex = iWidth;
 		flag = 0;
 		for (iHeight = 0; iHeight < BitmapHeight; iHeight++) {
-
 			if (TracedMap->test(pixelIndex)) {
 				if (!flag) {
 					TracedEdges->set(pixelIndex);
@@ -13368,7 +12220,6 @@ void tracedg() {
 			TracedEdges->set(pixelIndex - BitmapWidth);
 	}
 	for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
-
 		if (TracedEdges->test(iPixel))
 			TraceBitmapData[iPixel] = 0xffffff;
 		else
@@ -13379,95 +12230,93 @@ void tracedg() {
 }
 
 bool trcbit() {
-
 	unsigned	pixelIndex;
 
 	pixelIndex = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
 	switch (TraceDirection) {
+	case TRCR:
 
-		case TRCR:
-
-			pixelIndex += (1 - BitmapWidth);
-			if (CurrentTracePoint.x == gsl::narrow<int>(BitmapWidth) - 1)
-				TraceDirection = TRCU;
-			else {
-				if (TracedEdges->test(pixelIndex)) {
-					CurrentTracePoint.x++;
-					CurrentTracePoint.y--;
-					TraceDirection = TRCD;
-				}
-				else {
-					pixelIndex += BitmapWidth;
-					if (TracedEdges->test(pixelIndex))
-						CurrentTracePoint.x++;
-					else
-						TraceDirection = TRCU;
-				}
-			}
-			break;
-
-		case TRCD:
-
-			pixelIndex -= (BitmapWidth + 1);
-			if (!CurrentTracePoint.y)
-				TraceDirection = TRCR;
-			else {
-				if (TracedEdges->test(pixelIndex)) {
-					CurrentTracePoint.x--;
-					CurrentTracePoint.y--;
-					TraceDirection = TRCL;
-				}
-				else {
-					pixelIndex++;
-					if (TracedEdges->test(pixelIndex))
-						CurrentTracePoint.y--;
-					else
-						TraceDirection = TRCR;
-				}
-			}
-			break;
-
-		case TRCL:
-
-			pixelIndex += (BitmapWidth - 1);
-			if (!CurrentTracePoint.x)
+		pixelIndex += (1 - BitmapWidth);
+		if (CurrentTracePoint.x == gsl::narrow<int>(BitmapWidth) - 1)
+			TraceDirection = TRCU;
+		else {
+			if (TracedEdges->test(pixelIndex)) {
+				CurrentTracePoint.x++;
+				CurrentTracePoint.y--;
 				TraceDirection = TRCD;
-			else {
-				if (TracedEdges->test(pixelIndex)) {
-					CurrentTracePoint.x--;
-					CurrentTracePoint.y++;
-					TraceDirection = TRCU;
-				}
-				else {
-					pixelIndex -= BitmapWidth;
-					if (TracedEdges->test(pixelIndex))
-						CurrentTracePoint.x--;
-					else
-						TraceDirection = TRCD;
-				}
 			}
-			break;
-
-		case TRCU:
-
-			pixelIndex += (1 + BitmapWidth);
-			if (CurrentTracePoint.y == gsl::narrow<int>(BitmapHeight) - 1)
-				TraceDirection = TRCL;
 			else {
-				if (TracedEdges->test(pixelIndex)) {
+				pixelIndex += BitmapWidth;
+				if (TracedEdges->test(pixelIndex))
 					CurrentTracePoint.x++;
-					CurrentTracePoint.y++;
-					TraceDirection = TRCR;
-				}
-				else {
-					pixelIndex--;
-					if (TracedEdges->test(pixelIndex))
-						CurrentTracePoint.y++;
-					else
-						TraceDirection = TRCL;
-				}
+				else
+					TraceDirection = TRCU;
 			}
-			break;
+		}
+		break;
+
+	case TRCD:
+
+		pixelIndex -= (BitmapWidth + 1);
+		if (!CurrentTracePoint.y)
+			TraceDirection = TRCR;
+		else {
+			if (TracedEdges->test(pixelIndex)) {
+				CurrentTracePoint.x--;
+				CurrentTracePoint.y--;
+				TraceDirection = TRCL;
+			}
+			else {
+				pixelIndex++;
+				if (TracedEdges->test(pixelIndex))
+					CurrentTracePoint.y--;
+				else
+					TraceDirection = TRCR;
+			}
+		}
+		break;
+
+	case TRCL:
+
+		pixelIndex += (BitmapWidth - 1);
+		if (!CurrentTracePoint.x)
+			TraceDirection = TRCD;
+		else {
+			if (TracedEdges->test(pixelIndex)) {
+				CurrentTracePoint.x--;
+				CurrentTracePoint.y++;
+				TraceDirection = TRCU;
+			}
+			else {
+				pixelIndex -= BitmapWidth;
+				if (TracedEdges->test(pixelIndex))
+					CurrentTracePoint.x--;
+				else
+					TraceDirection = TRCD;
+			}
+		}
+		break;
+
+	case TRCU:
+
+		pixelIndex += (1 + BitmapWidth);
+		if (CurrentTracePoint.y == gsl::narrow<int>(BitmapHeight) - 1)
+			TraceDirection = TRCL;
+		else {
+			if (TracedEdges->test(pixelIndex)) {
+				CurrentTracePoint.x++;
+				CurrentTracePoint.y++;
+				TraceDirection = TRCR;
+			}
+			else {
+				pixelIndex--;
+				if (TracedEdges->test(pixelIndex))
+					CurrentTracePoint.y++;
+				else
+					TraceDirection = TRCL;
+			}
+		}
+		break;
 	}
 	if (TracedPoints[ActivePointIndex - 1].x != CurrentTracePoint.x || TracedPoints[ActivePointIndex - 1].y != CurrentTracePoint.y) {
 		TracedPoints[ActivePointIndex].x = CurrentTracePoint.x;
@@ -13490,7 +12339,6 @@ void dutdif(const TRCPNT* point) noexcept {
 }
 
 void dutrac() {
-
 	unsigned	flag = 0;
 	RECT		findRectangle = {};
 	long		point = 0, limit = 0, savedPoint = 0;
@@ -13501,9 +12349,7 @@ void dutrac() {
 	float		landscapeOffset = 0.0;
 
 	if (px2stch()) {
-
 		if (!StateMap.test(StateFlag::WASEDG)) {
-
 			tracedg();
 			return;
 		}
@@ -13543,7 +12389,7 @@ void dutrac() {
 			else
 				findRectangle.bottom = 0;
 			point = savedPoint;
-			limit = BitmapWidth*BitmapHeight;
+			limit = BitmapWidth * BitmapHeight;
 			while (point < limit && !TracedEdges->test(point))
 				point += BitmapWidth;
 			if (point < limit)
@@ -13553,65 +12399,57 @@ void dutrac() {
 			flag = 0;
 			minimumEdgeDistance = 0x7fffffff;
 			if (findRectangle.left) {
-
 				minimumEdgeDistance = CurrentTracePoint.x - findRectangle.left;
 				flag = TRCL;
 			}
 			if (findRectangle.right < gsl::narrow<long>(BitmapWidth)) {
-
 				edgeDistance = findRectangle.right - CurrentTracePoint.x;
 				if (edgeDistance < minimumEdgeDistance) {
-
 					minimumEdgeDistance = edgeDistance;
 					flag = TRCR;
 				}
 			}
 			if (findRectangle.bottom) {
-
 				edgeDistance = CurrentTracePoint.y - findRectangle.bottom;
 				if (edgeDistance < minimumEdgeDistance) {
-
 					minimumEdgeDistance = edgeDistance;
 					flag = TRCD;
 				}
 			}
 			if (findRectangle.top < gsl::narrow<long>(BitmapHeight)) {
-
 				edgeDistance = findRectangle.top - CurrentTracePoint.y;
 				if (edgeDistance < minimumEdgeDistance) {
-
 					minimumEdgeDistance = edgeDistance;
 					flag = TRCU;
 				}
 			}
 			switch (flag) {
+			case TRCU:
 
-				case TRCU:
+				CurrentTracePoint.y = findRectangle.top;
+				TraceDirection = TRCR;
+				break;
 
-					CurrentTracePoint.y = findRectangle.top;
-					TraceDirection = TRCR;
-					break;
+			case TRCR:
 
-				case TRCR:
+				CurrentTracePoint.x = findRectangle.right;
+				TraceDirection = TRCD;
+				break;
 
-					CurrentTracePoint.x = findRectangle.right;
-					TraceDirection = TRCD;
-					break;
+			case TRCD:
 
-				case TRCD:
+				CurrentTracePoint.y = findRectangle.bottom;
+				TraceDirection = TRCL;
+				break;
 
-					CurrentTracePoint.y = findRectangle.bottom;
-					TraceDirection = TRCL;
-					break;
+			case TRCL:
 
-				case TRCL:
+				CurrentTracePoint.x = findRectangle.left;
+				TraceDirection = TRCU;
+				break;
 
-					CurrentTracePoint.x = findRectangle.left;
-					TraceDirection = TRCU;
-					break;
-
-				default:
-					return;
+			default:
+				return;
 			}
 		}
 		InitialDirection = TraceDirection;
@@ -13622,7 +12460,6 @@ void dutrac() {
 		TracedPoints[0].y = CurrentTracePoint.y;
 		while (trcbit());
 		if (ActivePointIndex >= 500000) {
-
 			tabmsg(IDS_FRM2L);
 			return;
 		}
@@ -13632,12 +12469,10 @@ void dutrac() {
 		dutdif(&TracedPoints[0]);
 		OutputIndex = 1;
 		for (iPoint = 1; iPoint < ActivePointIndex; iPoint++) {
-
 			TraceDiff1.x = TraceDiff0.x;
 			TraceDiff1.y = TraceDiff0.y;
 			dutdif(&TracedPoints[iPoint]);
 			if (TraceDiff1.x != TraceDiff0.x || TraceDiff1.y != TraceDiff0.y) {
-
 				DecimatedLine[OutputIndex].x = TracedPoints[iPoint].x;
 				DecimatedLine[OutputIndex++].y = TracedPoints[iPoint].y;
 			}
@@ -13647,10 +12482,8 @@ void dutrac() {
 		iNext = 0;
 		ActivePointIndex = 0;
 		for (iCurrent = 1; iCurrent < OutputIndex; iCurrent++) {
-
 			traceLength = hypot(DecimatedLine[iCurrent].x - DecimatedLine[iNext].x, DecimatedLine[iCurrent].y - DecimatedLine[iNext].y);
 			if (traceLength > IniFile.traceLength) {
-
 				TracedPoints[ActivePointIndex].x = DecimatedLine[iNext].x;
 				TracedPoints[ActivePointIndex].y = DecimatedLine[iNext].y;
 				iNext = iCurrent;
@@ -13658,7 +12491,6 @@ void dutrac() {
 			}
 		}
 		for (iCurrent = iNext + 1; iCurrent < OutputIndex; iCurrent++) {
-
 			TracedPoints[ActivePointIndex].x = DecimatedLine[iCurrent].x;
 			TracedPoints[ActivePointIndex].y = DecimatedLine[iCurrent].y;
 			ActivePointIndex++;
@@ -13676,11 +12508,9 @@ void dutrac() {
 		else
 			landscapeOffset = 0;
 		for (iCurrent = 1; iCurrent < ActivePointIndex; iCurrent++) {
-
 			traceLengthSum += hypot(TracedPoints[iCurrent].x - TracedPoints[iCurrent - 1].x, TracedPoints[iCurrent].y - TracedPoints[iCurrent - 1].y);
 			traceLength = hypot(TracedPoints[iCurrent].x - TracedPoints[iNext].x, TracedPoints[iCurrent].y - TracedPoints[iNext].y);
 			if (traceLengthSum > traceLength*IniFile.traceRatio) {
-
 				CurrentFormVertices[OutputIndex].x = TracedPoints[iCurrent - 1].x*StitchBmpRatio.x;
 				CurrentFormVertices[OutputIndex].y = TracedPoints[iCurrent - 1].y*StitchBmpRatio.y + landscapeOffset;
 				OutputIndex++;
@@ -13691,7 +12521,6 @@ void dutrac() {
 		}
 		delete[] TracedPoints;
 		if (FormVertexIndex + OutputIndex > MAXITEMS) {
-
 			tabmsg(IDS_FRMOVR);
 			return;
 		}
@@ -13709,7 +12538,6 @@ void dutrac() {
 }
 
 unsigned ducolm() {
-
 	if (TraceMsgPoint.x < gsl::narrow<int>(ButtonWidth))
 		return 0;
 	if (TraceMsgPoint.x < gsl::narrow<int>(ButtonWidth) << 1)
@@ -13719,7 +12547,6 @@ unsigned ducolm() {
 }
 
 void chkref() noexcept {
-
 #if  __UseASM__
 	_asm {
 		mov		eax, UpPixelColor
@@ -13729,13 +12556,13 @@ void chkref() noexcept {
 		mov		dl, al
 		mov		al, bl
 		mov		bl, dl
-chklup1 : 
+chklup1:
 		cmp		ah, bh
 		jc		short chklup2
 		mov		dl, ah
 		mov		ah, bh
 		mov		bh, dl
-chklup2 : 
+chklup2:
 		ror		eax, 16
 		ror		ebx, 16
 		cmp		al, bl
@@ -13743,7 +12570,7 @@ chklup2 :
 		mov		dl, al
 		mov		al, bl
 		mov		bl, dl
-chklup3 : 
+chklup3:
 		rol		eax, 16
 		rol		ebx, 16
 		mov		UpPixelColor, eax
@@ -13793,7 +12620,6 @@ chklup3 :
 }
 
 void trnumwnd0(int position) noexcept {
-
 	TraceNumberInput = CreateWindow(
 		"STATIC",
 		0,
@@ -13809,7 +12635,6 @@ void trnumwnd0(int position) noexcept {
 }
 
 void trnumwnd1(int position) noexcept {
-
 	GeneralNumberInputBox = CreateWindow(
 		"STATIC",
 		0,
@@ -13825,7 +12650,6 @@ void trnumwnd1(int position) noexcept {
 }
 
 void tracpar() {
-
 	unsigned	position = 0;
 	double		ratio = 0.0;
 	COLORREF	traceColor = {};
@@ -13843,9 +12667,7 @@ void tracpar() {
 		ColumnColor = ducolm();
 		if (TraceMsgPoint.y < gsl::narrow<int>(ButtonHeight) * 15) {
 			do {
-
 				if (GetKeyState(VK_SHIFT) & 0X8000) {
-
 					UpPixelColor &= TraceRGBMask[ColumnColor];
 					DownPixelColor |= TraceRGB[2 - ColumnColor];
 					break;
@@ -13855,25 +12677,21 @@ void tracpar() {
 				traceColor = UpPixelColor & TraceRGB[2 - ColumnColor];
 				tracePosition = position << TraceShift[ColumnColor];
 				if (tracePosition < traceColor) {
-
 					UpPixelColor &= TraceRGBMask[ColumnColor];
 					UpPixelColor |= tracePosition;
 					break;
 				}
 				traceColor = DownPixelColor & TraceRGB[2 - ColumnColor];
 				if (tracePosition > traceColor) {
-
 					DownPixelColor &= TraceRGBMask[ColumnColor];
 					DownPixelColor |= tracePosition;
 					break;
 				}
 				if (Msg.message == WM_LBUTTONDOWN) {
-
 					UpPixelColor &= TraceRGBMask[ColumnColor];
 					UpPixelColor |= position << TraceShift[ColumnColor];
 				}
 				else {
-
 					DownPixelColor &= TraceRGBMask[ColumnColor];
 					DownPixelColor |= position << TraceShift[ColumnColor];
 				}
@@ -13920,21 +12738,21 @@ void tracpar() {
 					}
 					else {
 						switch (position) {
-							case 20:
-								trdif();
-								break;
-							case 21:
-								hidbit();
-								break;
-							case 22:
-								blak();
-								break;
-							case 23:
-								trcsel();
-								break;
-							case 24:
-								tracedg();
-								break;
+						case 20:
+							trdif();
+							break;
+						case 21:
+							hidbit();
+							break;
+						case 22:
+							blak();
+							break;
+						case 23:
+							trcsel();
+							break;
+						case 24:
+							tracedg();
+							break;
 						}
 					}
 				}
@@ -13953,18 +12771,17 @@ static inline void difsub(unsigned *source, unsigned shift, unsigned *&destinati
 #endif
 
 void difbits(unsigned shift, unsigned* point) noexcept {
-
 #if  __UseASM__
 	_asm {
 		jmp		short difbts
-difsub : 
+difsub:
 		mov		eax, [esi]
 		shr		eax, cl
 		and		eax, ebx
 		mov		[edi], eax
 		add		edi, 4
 		ret
-difbts : 
+difbts:
 		mov		esi, point
 		mov		ecx, shift
 		mov		edi, offset TraceAdjacentColors
@@ -14023,7 +12840,6 @@ difbts :
 }
 
 void blanklin(unsigned lineStart) noexcept {
-
 	unsigned	iPoint;
 
 	for (iPoint = lineStart; iPoint < lineStart + BitmapWidth; iPoint++)
@@ -14031,7 +12847,6 @@ void blanklin(unsigned lineStart) noexcept {
 }
 
 constexpr unsigned trsum() {
-
 	unsigned	sumAdjacent = 0, iAdjacent = 1;
 
 	for (iAdjacent = 1; iAdjacent < 9; iAdjacent++)
@@ -14040,13 +12855,11 @@ constexpr unsigned trsum() {
 }
 
 void trdif() {
-
 	unsigned	iHeight = 0, iPixel = 0, iRGB = 0, iWidth = 0, adjustedColorSum = 0;
 	unsigned	iPoint = 0, colorSum = 0, colorSumMaximum = 0, colorSumMinimum = 0;
 	double		ratio = 0.0;
 
 	if (!PCSBMPFileName[0]) {
-
 		tabmsg(IDS_MAPLOD);
 		return;
 	}
@@ -14060,14 +12873,11 @@ void trdif() {
 		if (!StateMap.test(StateFlag::WASTRAC))
 			getrmap();
 		for (iRGB = 0; iRGB < 3; iRGB++) {
-
 			blanklin(0);
 			for (iHeight = 1; iHeight < gsl::narrow<unsigned>(BitmapHeight) - 1; iHeight++) {
-
-				iPoint = iHeight*BitmapWidth;
+				iPoint = iHeight * BitmapWidth;
 				DifferenceBitmap[iPoint++] = 0;
 				for (iWidth = 1; iWidth < BitmapWidth - 1; iWidth++) {
-
 					difbits(TraceShift[iRGB], &TraceBitmapData[iPoint]);
 					colorSum = DifferenceBitmap[iPoint] = trsum();
 					iPoint++;
@@ -14081,10 +12891,8 @@ void trdif() {
 			blanklin(iPoint);
 			ratio = static_cast<double>(255) / (colorSumMaximum - colorSumMinimum);
 			for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
-
 				TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
 				if (DifferenceBitmap[iPixel]) {
-
 					adjustedColorSum = (DifferenceBitmap[iPixel] - colorSumMinimum)*ratio;
 					TraceBitmapData[iPixel] |= adjustedColorSum << TraceShift[iRGB];
 				}
@@ -14099,7 +12907,6 @@ void trdif() {
 }
 
 void delstch() {
-
 	savdo();
 	PCSHeader.stitchCount = 0;
 	ClipPointIndex = 0;
@@ -14113,16 +12920,13 @@ void delstch() {
 }
 
 void chkbit() {
-
 	if (PCSBMPFileName[0] && (StateMap.test(StateFlag::WASDIF) || StateMap.test(StateFlag::WASDSEL) || StateMap.test(StateFlag::WASBLAK))) {
-
 		StateMap.set(StateFlag::WASESC);
 		bfil();
 	}
 }
 
 void trcnum(unsigned shift, COLORREF color, unsigned iRGB) noexcept {
-
 	unsigned	bufferLength = 0;
 	unsigned	xPosition = 0;
 	TCHAR		buffer[11] = { 0 };
@@ -14131,18 +12935,16 @@ void trcnum(unsigned shift, COLORREF color, unsigned iRGB) noexcept {
 	color &= 0xff;
 	_itoa_s(color, buffer, 10);
 	bufferLength = strlen(buffer);
-	xPosition = NumeralWidth*(3 - bufferLength) + 1;
+	xPosition = NumeralWidth * (3 - bufferLength) + 1;
 	SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 	TextOut(DrawItem->hDC, xPosition, 1, buffer, strlen(buffer));
 }
 
 void upnum(unsigned iRGB) noexcept {
-
 	trcnum(TraceShift[iRGB], InvertUpColor, iRGB);
 }
 
 void dwnum(unsigned iRGB) noexcept {
-
 	trcnum(TraceShift[iRGB], InvertDownColor, iRGB);
 }
 
@@ -14155,17 +12957,14 @@ void ritrcol(COLORREF* color, unsigned number) noexcept {
 }
 
 void dutrnum0(unsigned color) {
-
 	StateMap.reset(StateFlag::NUMIN);
 	StateMap.reset(StateFlag::TRNIN0);
 	if (StateMap.test(StateFlag::TRNUP)) {
-
 		ritrcol(&InvertUpColor, color);
 		UpPixelColor = InvertUpColor ^ 0xffffff;
 		redraw(TraceUpWindow[ColumnColor]);
 	}
 	else {
-
 		ritrcol(&InvertDownColor, color);
 		DownPixelColor = InvertDownColor ^ 0xffffff;
 		redraw(TraceDownWindow[ColumnColor]);
@@ -14177,7 +12976,6 @@ void dutrnum0(unsigned color) {
 }
 
 void dutrnum1() {
-
 	double	traceLength;
 
 	DestroyWindow(GeneralNumberInputBox);
@@ -14188,23 +12986,19 @@ void dutrnum1() {
 	if (traceLength > 9)
 		traceLength = 9;
 	if (StateMap.test(StateFlag::TRNUP)) {
-
-		IniFile.traceLength = traceLength*PFGRAN;
+		IniFile.traceLength = traceLength * PFGRAN;
 		trcstpnum();
 	}
 	else {
-
 		IniFile.traceRatio = 1 + pow(0.1, traceLength);
 		trcratnum();
 	}
 }
 
 void trcsel() {
-
 	unsigned	iPixel = 0, maximumColorComponent = 0, iRGB = 0;
 
 	if (PCSBMPFileName[0]) {
-
 		StateMap.set(StateFlag::WASTRCOL);
 		StateMap.set(StateFlag::TRCRED);
 		StateMap.set(StateFlag::TRCBLU);
@@ -14215,12 +13009,10 @@ void trcsel() {
 		StateMap.reset(StateFlag::HIDMAP);
 		StateMap.reset(StateFlag::TRSET);
 		for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
-
 			trcols(TraceBitmapData[iPixel]);
 			maximumColorComponent = PixelColors[0];
 			iRGB = 2;
 			if (PixelColors[1] > maximumColorComponent) {
-
 				maximumColorComponent = PixelColors[1];
 				iRGB = 1;
 			}
@@ -14238,7 +13030,6 @@ void trcsel() {
 }
 
 void trinit() {
-
 	unsigned	iPixel = 0, iRGB = 0, swapComponent = 0, iLevel = 0;
 	unsigned	histogramData[3][256] = { 0 };
 	unsigned	componentPeakCount[3] = { 0 };
@@ -14246,9 +13037,7 @@ void trinit() {
 	COLORREF	color = {};
 
 	if (PCSBMPFileName[0]) {
-
 		if (!StateMap.test(StateFlag::TRSET)) {
-
 			StateMap.set(StateFlag::TRCRED);
 			StateMap.set(StateFlag::TRCGRN);
 			StateMap.set(StateFlag::TRCBLU);
@@ -14258,21 +13047,17 @@ void trinit() {
 				// ToDo - Is this intializing correctly?
 				color = TraceBitmapData[0];
 				for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
-
 					if (TraceBitmapData[iPixel] != color)
 						break;
 				}
 				if (iPixel < BitmapWidth*BitmapHeight) {
-
 					trcols(TraceBitmapData[iPixel]);
 					HighColors[0] = PixelColors[0];
 					HighColors[1] = PixelColors[1];
 					HighColors[2] = PixelColors[2];
 					trcols(color);
 					for (iRGB = 0; iRGB < 3; iRGB++) {
-
 						if (PixelColors[iRGB] > HighColors[iRGB]) {
-
 							swapComponent = PixelColors[iRGB];
 							PixelColors[iRGB] = HighColors[iRGB];
 							HighColors[iRGB] = swapComponent;
@@ -14283,7 +13068,6 @@ void trinit() {
 			}
 			else {
 				for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
-
 					trcols(TraceBitmapData[iPixel]);
 					for (iRGB = 0; iRGB < 3; iRGB++)
 						histogramData[iRGB][PixelColors[iRGB]]++;
@@ -14291,11 +13075,8 @@ void trinit() {
 				for (iRGB = 0; iRGB < 3; iRGB++)
 					componentPeakCount[iRGB] = 0;
 				for (iLevel = 0; iLevel < 256; iLevel++) {
-
 					for (iRGB = 0; iRGB < 3; iRGB++) {
-
 						if (histogramData[iRGB][iLevel] > componentPeakCount[iRGB]) {
-
 							componentPeakCount[iRGB] = histogramData[iRGB][iLevel];
 							componentPeak[iRGB] = iLevel;
 						}
@@ -14304,7 +13085,6 @@ void trinit() {
 			}
 			InvertDownColor = 0;
 			for (iRGB = 0; iRGB < 3; iRGB++) {
-
 				if (componentPeak[iRGB])
 					componentPeak[iRGB]--;
 				InvertDownColor |= componentPeak[iRGB] << TraceShift[iRGB];
@@ -14321,7 +13101,6 @@ void trinit() {
 }
 
 void stch2bit(double xCoord, double yCoord) {
-
 	if (StateMap.test(StateFlag::LANDSCAP))
 		yCoord -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 	BitmapPoint.x = BmpStitchRatio.x*xCoord;
@@ -14329,7 +13108,6 @@ void stch2bit(double xCoord, double yCoord) {
 }
 
 void pxlin(unsigned start, unsigned finish) {
-
 	POINT		line[2];
 
 	stch2bit(CurrentFormVertices[start].x, CurrentFormVertices[start].y);
@@ -14343,11 +13121,9 @@ void pxlin(unsigned start, unsigned finish) {
 }
 
 void bfrm() {
-
 	unsigned	iVertex = 0;
 
 	if (VertexCount) {
-
 		for (iVertex = 0; iVertex < VertexCount - 1; iVertex++)
 			pxlin(iVertex, iVertex + 1);
 		if (SelectedForm->type != FRMLINE)
@@ -14356,24 +13132,20 @@ void bfrm() {
 }
 
 void blak() {
-
 	unsigned	iForm = 0;
 
 	if (!PCSBMPFileName[0]) {
-
 		tabmsg(IDS_MAPLOD);
 		return;
 	}
 	tracwnd();
 	if (FormIndex) {
-
 		BlackPen = CreatePen(PS_SOLID, 1, 0);
 		SelectObject(BitmapDC, BlackPen);
 		SelectObject(TraceDC, BlackPen);
 		if (!StateMap.test(StateFlag::WASTRAC))
 			getrmap();
 		for (iForm = 0; iForm < FormIndex; iForm++) {
-
 			fvars(iForm);
 			bfrm();
 		}
@@ -14386,13 +13158,11 @@ void blak() {
 }
 
 void delmap() {
-
 	PCSBMPFileName[0] = 0;
 	StateMap.set(StateFlag::RESTCH);
 }
 
 void closfn() {
-
 	deltot();
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED], IniFile.designerName);
 	KnotCount = 0;
@@ -14404,22 +13174,18 @@ void closfn() {
 }
 
 void filclos() {
-
 	if (savcmp())
 		closfn();
 	else {
-
 		StateMap.set(StateFlag::FCLOS);
 		savdisc();
 	}
 }
 
 void frmpos(float deltaX, float deltaY) noexcept {
-
 	unsigned	iVertex;
 
 	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
-
 		SelectedForm->vertices[iVertex].x += deltaX;
 		SelectedForm->vertices[iVertex].y += deltaY;
 	}
@@ -14430,21 +13196,17 @@ void frmpos(float deltaX, float deltaY) noexcept {
 }
 
 void nudgfn(float deltaX, float deltaY) {
-
 	unsigned	iForm = 0, iStitch = 0, wordCount = 0;
 	POINT		pixel = {};
 
 	if (StateMap.test(StateFlag::BIGBOX) || SelectedFormCount || StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::GRPSEL) || StateMap.test(StateFlag::SELBOX))
 		savdo();
 	if (StateMap.test(StateFlag::BIGBOX)) {
-
 		for (iForm = 0; iForm < FormIndex; iForm++) {
-
 			SelectedForm = &FormList[iForm];
 			frmpos(deltaX, deltaY);
 		}
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 			StitchBuffer[iStitch].x += deltaX;
 			StitchBuffer[iStitch].y += deltaY;
 		}
@@ -14457,21 +13219,17 @@ void nudgfn(float deltaX, float deltaY) {
 		return;
 	}
 	if (SelectedFormCount) {
-
 		wordCount = (FormIndex >> 5) + 1;
 		clRmap(wordCount);
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
 			setr(SelectedFormList[iForm]);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 			if (chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
-
 				StitchBuffer[iStitch].x += deltaX;
 				StitchBuffer[iStitch].y += deltaY;
 			}
 		}
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-
 			SelectedForm = &FormList[SelectedFormList[iForm]];
 			frmpos(deltaX, deltaY);
 		}
@@ -14479,15 +13237,11 @@ void nudgfn(float deltaX, float deltaY) {
 		return;
 	}
 	if (StateMap.test(StateFlag::FORMSEL)) {
-
 		SelectedForm = &FormList[ClosestFormToCursor];
 		frmpos(deltaX, deltaY);
 		if (SelectedForm->fillType || SelectedForm->edgeType) {
-
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 				if ((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT == ClosestFormToCursor) {
-
 					StitchBuffer[iStitch].x += deltaX;
 					StitchBuffer[iStitch].y += deltaY;
 				}
@@ -14497,10 +13251,8 @@ void nudgfn(float deltaX, float deltaY) {
 		return;
 	}
 	if (StateMap.test(StateFlag::GRPSEL)) {
-
 		rngadj();
 		for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
-
 			StitchBuffer[iStitch].x += deltaX;
 			StitchBuffer[iStitch].y += deltaY;
 		}
@@ -14509,7 +13261,6 @@ void nudgfn(float deltaX, float deltaY) {
 		return;
 	}
 	if (StateMap.test(StateFlag::SELBOX)) {
-
 		StitchBuffer[ClosestPointIndex].x += deltaX;
 		StitchBuffer[ClosestPointIndex].y += deltaY;
 		StateMap.set(StateFlag::RESTCH);
@@ -14517,14 +13268,12 @@ void nudgfn(float deltaX, float deltaY) {
 	}
 	pixel.x = pixel.y = 0;
 	if (deltaX) {
-
 		if (deltaX > 0)
 			pixel.x = IniFile.nudgePixels;
 		else
 			pixel.x = -IniFile.nudgePixels;
 	}
 	if (deltaY) {
-
 		if (deltaY > 0)
 			pixel.y = -IniFile.nudgePixels;
 		else
@@ -14535,13 +13284,11 @@ void nudgfn(float deltaX, float deltaY) {
 }
 
 void pixmsg(unsigned iString, unsigned pixelCount) {
-
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[iString], pixelCount);
 	shoMsg(MsgBuffer);
 }
 
 void getnpix() {
-
 	pixmsg(STR_NUDG, IniFile.nudgePixels);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::PIXIN);
@@ -14549,7 +13296,6 @@ void getnpix() {
 }
 
 void getstpix() {
-
 	pixmsg(STR_STCHP, IniFile.stitchSizePixels);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::STPXIN);
@@ -14557,7 +13303,6 @@ void getstpix() {
 }
 
 void getfrmpix() {
-
 	pixmsg(STR_FRMP, IniFile.formVertexSizePixels);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FRMPXIN);
@@ -14565,7 +13310,6 @@ void getfrmpix() {
 }
 
 void getfrmbox() {
-
 	pixmsg(STR_FRMBOX, IniFile.formBoxSizePixels);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FRMBOXIN);
@@ -14573,11 +13317,9 @@ void getfrmbox() {
 }
 
 void bakmrk() {
-
 	fPOINT	point = {};
 
 	if (StateMap.test(StateFlag::WASMRK)) {
-
 		if (ZoomMarkPoint.x > IniFile.hoopSizeX)
 			ZoomMarkPoint.x = IniFile.hoopSizeY / 2;
 		if (ZoomMarkPoint.y > IniFile.hoopSizeY)
@@ -14593,90 +13335,70 @@ void bakmrk() {
 }
 
 void nuscol(unsigned iColor) noexcept {
-
 	UserPen[iColor] = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 	UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 	redraw(UserColorWin[iColor]);
 }
 
 void movchk() {
-
 	unsigned	iStitch = 0, iForm = 0, color = 0, key = 0, swapColor = 0, switchColors = 0;
 	FRMHED*		pfrm = nullptr;
 
 	if (Msg.wParam&MK_LBUTTON) {
-
 		if (!StateMap.testAndSet(StateFlag::WASMOV)) {
-
 			if (chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
-
 				DraggedColor = VerticalIndex & 0xf;
 				StateMap.set(StateFlag::WASCOL);
 			}
 		}
 	}
 	else {
-
 		if (StateMap.testAndReset(StateFlag::WASMOV) && StateMap.testAndReset(StateFlag::WASCOL)) {
-
 			if (chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
-
 				key = GetKeyState(VK_SHIFT) & 0X8000;
 				switchColors = GetKeyState(VK_CONTROL) & 0X8000;
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 					color = StitchBuffer[iStitch].attribute&COLMSK;
 					if (color == VerticalIndex) {
-
 						StitchBuffer[iStitch].attribute &= NCOLMSK;
 						StitchBuffer[iStitch].attribute |= DraggedColor;
 					}
 					else {
-
 						if (!key && color == DraggedColor) {
-
 							StitchBuffer[iStitch].attribute &= NCOLMSK;
 							StitchBuffer[iStitch].attribute |= VerticalIndex;
 						}
 					}
 				}
 				for (iForm = 0; iForm < FormIndex; iForm++) {
-
 					pfrm = &FormList[iForm];
 					if (pfrm->fillType) {
-
 						if (pfrm->fillColor == VerticalIndex)
 							pfrm->fillColor = DraggedColor;
 						else {
-
 							if (!key && pfrm->fillColor == DraggedColor)
 								pfrm->fillColor = VerticalIndex;
 						}
 						if (pfrm->fillInfo.feather.color == VerticalIndex)
 							pfrm->fillInfo.feather.color = DraggedColor;
 						else {
-
 							if (!key && pfrm->fillInfo.feather.color == DraggedColor)
 								pfrm->fillInfo.feather.color = VerticalIndex;
 						}
 					}
 					if (pfrm->edgeType) {
-
 						if (pfrm->borderColor == VerticalIndex)
 							pfrm->borderColor = DraggedColor;
 						else {
-
 							if (!key && pfrm->borderColor == DraggedColor)
 								pfrm->borderColor = VerticalIndex;
 						}
 					}
 				}
 				if (!switchColors) {
-
 					swapColor = UserColor[VerticalIndex];
 					UserColor[VerticalIndex] = UserColor[DraggedColor];
 					if (!key) {
-
 						UserColor[DraggedColor] = swapColor;
 						nuscol(DraggedColor);
 					}
@@ -14690,50 +13412,41 @@ void movchk() {
 }
 
 void inscol() {
-
 	unsigned	iStitch = 0, iForm = 0, iColor = 0, nextColor = 0, color = 0;
 	FRMHED*		form = nullptr;
 
 	*MarkedStitchMap = 0;
 	if (chkMsgs(Msg.pt, DefaultColorWin[0], UserColorWin[15])) {
-
 		VerticalIndex &= COLMSK;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 			setr(StitchBuffer[iStitch].attribute&COLMSK);
 		if (*MarkedStitchMap == COLSMSK)
 			tabmsg(IDS_COLAL);
 		else {
-
 			nextColor = 15;
 			while (chkr(nextColor))
 				nextColor--;
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 				color = StitchBuffer[iStitch].attribute&COLMSK;
 				if (color >= VerticalIndex && color < nextColor) {
-
 					StitchBuffer[iStitch].attribute &= NCOLMSK;
 					StitchBuffer[iStitch].attribute |= color + 1;
 				}
 			}
 			for (iForm = 0; iForm < FormIndex; iForm++) {
-
 				form = &FormList[iForm];
 				if (form->fillType) {
-
 					if (form->fillColor >= VerticalIndex && form->fillColor < nextColor)
 						form->fillColor++;
 					if (form->fillInfo.feather.color >= VerticalIndex && form->fillInfo.feather.color < nextColor)
 						form->fillInfo.feather.color++;
 				}
 				if (form->edgeType) {
-
 					if (form->borderColor >= VerticalIndex && form->borderColor < nextColor)
 						form->borderColor++;
 				}
 			}
 			for (iColor = nextColor; iColor > VerticalIndex; iColor--) {
-
 				UserColor[iColor] = UserColor[iColor - 1];
 				nuscol(iColor);
 			}
@@ -14744,11 +13457,9 @@ void inscol() {
 }
 
 bool usedcol() noexcept {
-
 	unsigned	iStitch;
 
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		if ((StitchBuffer[iStitch].attribute&COLMSK) == VerticalIndex)
 			return 1;
 	}
@@ -14756,44 +13467,35 @@ bool usedcol() noexcept {
 }
 
 void delcol() {
-
 	unsigned	iStitch = 0, iForm = 0, iColor = 0, color = 0;
 	FRMHED*		form = nullptr;
 
 	if (chkMsgs(Msg.pt, DefaultColorWin[0], UserColorWin[15])) {
-
 		VerticalIndex &= 0xf;
 		if (usedcol())
 			tabmsg(IDS_COLU);
 		else {
-
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 				color = StitchBuffer[iStitch].attribute&COLMSK;
 				if (color > VerticalIndex && color) {
-
 					StitchBuffer[iStitch].attribute &= NCOLMSK;
 					StitchBuffer[iStitch].attribute |= color - 1;
 				}
 			}
 			for (iForm = 0; iForm < FormIndex; iForm++) {
-
 				form = &FormList[iForm];
 				if (form->fillType) {
-
 					if (form->fillColor > VerticalIndex)
 						form->fillColor--;
 					if (form->fillInfo.feather.color > VerticalIndex)
 						form->fillInfo.feather.color--;
 				}
 				if (form->edgeType) {
-
 					if (form->borderColor > VerticalIndex)
 						form->borderColor--;
 				}
 			}
 			for (iColor = VerticalIndex; iColor < 15; iColor++) {
-
 				UserColor[iColor] = UserColor[iColor + 1];
 				nuscol(iColor);
 			}
@@ -14804,20 +13506,16 @@ void delcol() {
 }
 
 void set1knot() {
-
 	unsigned	source = 0, destination = 0;
 
 	if (PCSHeader.stitchCount && StateMap.test(StateFlag::SELBOX)) {
-
 		savdo();
 		if (ClosestPointIndex == gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
-
 			StateMap.set(StateFlag::FILDIR);
 			OutputIndex = ClosestPointIndex + 1;
 			endknt(ClosestPointIndex);
 		}
 		else {
-
 			source = PCSHeader.stitchCount - 1;
 			destination = PCSHeader.stitchCount + 4;
 			while (source && source >= ClosestPointIndex)
@@ -14830,17 +13528,14 @@ void set1knot() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-
 		msgstr(IDS_NOSTCHSEL);
 		shoMsg(MsgBuffer);
 	}
 }
 
 void selfrm0() {
-
 	StateMap.reset(StateFlag::GRPSEL);
 	if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-
 		StateMap.set(StateFlag::FRMPSEL);
 		ClosestVertexToCursor = 0;
 	}
@@ -14848,10 +13543,8 @@ void selfrm0() {
 }
 
 void selfrmx() {
-
 	StateMap.reset(StateFlag::GRPSEL);
 	if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-
 		StateMap.set(StateFlag::FRMPSEL);
 		ClosestVertexToCursor = FormList[ClosestFormToCursor].vertexCount - 1;
 	}
@@ -14859,7 +13552,6 @@ void selfrmx() {
 }
 
 void setpclp() {
-
 	POINT		offset = {};
 	POINT		point = {};
 	unsigned	ind = 0, ine = 0;
@@ -14872,7 +13564,6 @@ void setpclp() {
 	offset.y = Msg.pt.y - StitchWindowOrigin.y - point.y;
 	// ToDo - Why use ine instead of ind
 	for (ind = 0; ind < OutputIndex - 2; ind++) {
-
 		ine = ind + 1;
 		sfCor2px(InterleaveSequence[ine], &point);
 		FormVerticesAsLine[ine].x = point.x + offset.x;
@@ -14885,7 +13576,6 @@ void setpclp() {
 }
 
 void dupclp() noexcept {
-
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
 	Polyline(StitchWindowDC, FormVerticesAsLine, OutputIndex);
@@ -14893,13 +13583,11 @@ void dupclp() noexcept {
 }
 
 void unpclp() {
-
 	if (StateMap.testAndReset(StateFlag::SHOP))
 		dupclp();
 }
 
 void fixpclp() {
-
 	POINT		point = { (Msg.pt.x + static_cast<LONG>(FormMoveDelta.x)),
 						  (Msg.pt.y + static_cast<LONG>(FormMoveDelta.y)) };
 	fPOINT		offset = {};
@@ -14912,7 +13600,6 @@ void fixpclp() {
 	count = OutputIndex - 2;
 	fltspac(&CurrentFormVertices[iNext], count);
 	for (iOutput = 1; iOutput < OutputIndex - 1; iOutput++) {
-
 		CurrentFormVertices[iNext].x = InterleaveSequence[iOutput].x + offset.x;
 		CurrentFormVertices[iNext].y = InterleaveSequence[iOutput].y + offset.y;
 		iNext++;
@@ -14924,14 +13611,11 @@ void fixpclp() {
 }
 
 bool sidclp() {
-
 	fvars(ClosestFormToCursor);
 	if (OpenClipboard(ThrEdWindow)) {
-
 		Clip = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory) {
-
 			redclp();
 			CloseClipboard();
 			return 1;
@@ -14942,7 +13626,6 @@ bool sidclp() {
 }
 
 void selfpnt() {
-
 	StateMap.reset(StateFlag::FORMSEL);
 	StateMap.set(StateFlag::FRMPSEL);
 	StateMap.reset(StateFlag::FPSEL);
@@ -14987,7 +13670,6 @@ void qcode() {
 	if (!UserFlagMap.test(UserFlag::MARQ))
 		StateMap.reset(StateFlag::GMRK);
 	if (StateMap.testAndReset(StateFlag::PRFACT)) {
-
 		if (StateMap.testAndReset(StateFlag::WASRT)) {
 			StateMap.set(StateFlag::INSRT);
 			StateMap.set(StateFlag::RESTCH);
@@ -15000,7 +13682,6 @@ void qcode() {
 		rstAll();
 	StateMap.set(StateFlag::RESTCH);
 	if (BufferIndex) {
-
 		BufferIndex = 0;
 		StitchEntryBuffer[0] = 0;
 		ClosestPointIndex = 0;
@@ -15011,7 +13692,6 @@ void qcode() {
 }
 
 unsigned chkMsg() {
-
 	double			colorBarPosition = 0.0, ratio = 0.0, swapCoordinate = 0.0, swapFactor = 0.0;
 	FRMHED*			forms = nullptr;
 	fPOINT			adjustedPoint = {};
@@ -15084,12 +13764,10 @@ unsigned chkMsg() {
 					break;
 				}
 				if (StateMap.test(StateFlag::BZUMIN) || StateMap.test(StateFlag::BOXZUM) || StateMap.test(StateFlag::SELPNT)) {
-
 					SetCursor(CrossCursor);
 					break;
 				}
 				if (StateMap.test(StateFlag::SATIN) || StateMap.test(StateFlag::SATPNT) || StateMap.test(StateFlag::INSFRM)) {
-
 					if (UserFlagMap.test(UserFlag::FRMX))
 						SetCursor(CrossCursor);
 					else
@@ -15253,7 +13931,6 @@ unsigned chkMsg() {
 				if (adjustedPoint.x)
 					RotationAngle = -atan2(adjustedPoint.y, adjustedPoint.x);
 				else {
-
 					if (adjustedPoint.y > 0)
 						RotationAngle = PI / 2;
 					else
@@ -15293,7 +13970,6 @@ unsigned chkMsg() {
 					SetCapture(ThrEdWindow);
 				if (StateMap.test(StateFlag::LIN1)) {
 					if (PCSHeader.stitchCount) {
-
 						xlin1();
 						InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 						InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
@@ -15323,7 +13999,6 @@ unsigned chkMsg() {
 			}
 		}
 		else {
-
 			if (StateMap.testAndReset(StateFlag::VCAPT))
 				ReleaseCapture();
 		}
@@ -15415,7 +14090,6 @@ unsigned chkMsg() {
 			adjustedPoint.x = (StitchRangeRect.left + SelectBoxOffset.x) - SelectedPoint.x;
 			adjustedPoint.y = (StitchRangeRect.bottom + SelectBoxOffset.y) - SelectedPoint.y;
 			for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
-
 				StitchBuffer[iStitch].x -= adjustedPoint.x;
 				StitchBuffer[iStitch].y -= adjustedPoint.y;
 			}
@@ -15447,7 +14121,6 @@ unsigned chkMsg() {
 			px2stch();
 			if (StateMap.testAndReset(StateFlag::BOXSLCT)) {
 				if (ZoomBoxOrigin.x > SelectedPoint.x) {
-
 					StitchRangeRect.right = ZoomBoxOrigin.x;
 					StitchRangeRect.left = SelectedPoint.x;
 				}
@@ -15619,14 +14292,14 @@ unsigned chkMsg() {
 			if (Msg.message == WM_RBUTTONDOWN) {
 				if (Msg.wParam&MK_SHIFT && (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::GRPSEL))) {
 					unbox();
-					GroupStitchIndex = colorBarPosition*PCSHeader.stitchCount;
+					GroupStitchIndex = colorBarPosition * PCSHeader.stitchCount;
 					StateMap.set(StateFlag::GRPSEL);
 					grpAdj();
 					nuAct(GroupStitchIndex);
 					StateMap.set(StateFlag::RESTCH);
 				}
 				else {
-					ClosestPointIndex = colorBarPosition*PCSHeader.stitchCount;
+					ClosestPointIndex = colorBarPosition * PCSHeader.stitchCount;
 					nuAct(ClosestPointIndex);
 					movbox();
 					if (StateMap.testAndReset(StateFlag::GRPSEL)) {
@@ -15637,7 +14310,7 @@ unsigned chkMsg() {
 				}
 			}
 			else {
-				ClosestPointIndex = colorBarPosition*PCSHeader.stitchCount;
+				ClosestPointIndex = colorBarPosition * PCSHeader.stitchCount;
 				nuAct(ClosestPointIndex);
 				rstAll();
 				StateMap.set(StateFlag::SELBOX);
@@ -15936,37 +14609,37 @@ unsigned chkMsg() {
 			for (iHoop = 0; iHoop < HUPS; iHoop++) {
 				if (Msg.hwnd == SideWindow[iHoop]) {
 					switch (iHoop + 1) {
-						case SETCUST:
-							IniFile.customHoopX = IniFile.hoopSizeX;
-							IniFile.customHoopY = IniFile.hoopSizeY;
-							StateMap.set(StateFlag::MSGOF);
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_CUSTHUP], IniFile.hoopSizeX / PFGRAN, IniFile.hoopSizeY / PFGRAN);
-							shoMsg(MsgBuffer);
-							break;
+					case SETCUST:
+						IniFile.customHoopX = IniFile.hoopSizeX;
+						IniFile.customHoopY = IniFile.hoopSizeY;
+						StateMap.set(StateFlag::MSGOF);
+						sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_CUSTHUP], IniFile.hoopSizeX / PFGRAN, IniFile.hoopSizeY / PFGRAN);
+						shoMsg(MsgBuffer);
+						break;
 
-						case SMALHUP:
-							IniFile.hoopSizeX = SHUPX;
-							IniFile.hoopSizeY = SHUPY;
-							IniFile.hoopType = SMALHUP;
-							break;
+					case SMALHUP:
+						IniFile.hoopSizeX = SHUPX;
+						IniFile.hoopSizeY = SHUPY;
+						IniFile.hoopType = SMALHUP;
+						break;
 
-						case LARGHUP:
-							IniFile.hoopSizeX = LHUPX;
-							IniFile.hoopSizeY = LHUPY;
-							IniFile.hoopType = LARGHUP;
-							break;
+					case LARGHUP:
+						IniFile.hoopSizeX = LHUPX;
+						IniFile.hoopSizeY = LHUPY;
+						IniFile.hoopType = LARGHUP;
+						break;
 
-						case CUSTHUP:
-							IniFile.hoopSizeX = IniFile.customHoopX;
-							IniFile.hoopSizeY = IniFile.customHoopY;
-							IniFile.hoopType = CUSTHUP;
-							break;
+					case CUSTHUP:
+						IniFile.hoopSizeX = IniFile.customHoopX;
+						IniFile.hoopSizeY = IniFile.customHoopY;
+						IniFile.hoopType = CUSTHUP;
+						break;
 
-						case HUP100:
-							IniFile.hoopSizeX = HUP100XY;
-							IniFile.hoopSizeY = HUP100XY;
-							IniFile.hoopType = CUSTHUP;
-							break;
+					case HUP100:
+						IniFile.hoopSizeX = HUP100XY;
+						IniFile.hoopSizeY = HUP100XY;
+						IniFile.hoopType = CUSTHUP;
+						break;
 					}
 					UnzoomedRect.x = IniFile.hoopSizeX;
 					UnzoomedRect.y = IniFile.hoopSizeY;
@@ -16225,15 +14898,14 @@ unsigned chkMsg() {
 					nuFil();
 					WorkingFileName[iName] = 'r';
 					switch (FileVersionIndex) {
+					case 3:
+						movbak('1', '2');
 
-						case 3:
-							movbak('1', '2');
+					case 2:
+						movbak('0', '1');
 
-						case 2:
-							movbak('0', '1');
-
-						case 1:
-							movbak('r', '0');
+					case 1:
+						movbak('r', '0');
 					}
 					movbak('t', 'r');
 					ThrName[iName] = 't';
@@ -16326,15 +14998,14 @@ unsigned chkMsg() {
 				else
 					duform(iFillType);
 				switch (iFillType) {
-
-					case FRMRPOLY - 1:
-					case FRMSTAR - 1:
-					case FRMSPIRAL - 1:
-					case FRMHEART - 2:
-					case FRMLENS - 2:
-					case FRMEGG - 2:
-					case FRMZIGZAG - 2:
-						return 1;
+				case FRMRPOLY - 1:
+				case FRMSTAR - 1:
+				case FRMSPIRAL - 1:
+				case FRMHEART - 2:
+				case FRMLENS - 2:
+				case FRMEGG - 2:
+				case FRMZIGZAG - 2:
+					return 1;
 				}
 			}
 			unmsg();
@@ -16423,7 +15094,6 @@ unsigned chkMsg() {
 					if (Msg.hwnd == SideWindow[4]) {
 						if (SelectedForm->edgeType) {
 							switch (SelectedForm->edgeType) {
-
 							case EDGECLIP:
 								bsizpar();
 
@@ -16477,7 +15147,6 @@ unsigned chkMsg() {
 					if (Msg.hwnd == SideWindow[6]) {
 						if (SelectedForm->edgeType) {
 							switch (SelectedForm->edgeType) {
-
 							case EDGECLIP:
 								bsizpar();
 
@@ -17047,13 +15716,11 @@ unsigned chkMsg() {
 			return 1;
 		}
 		if (StateMap.test(StateFlag::INSFRM)) {
-
 			savdo();
 			setins();
 			return 1;
 		}
 		if (StateMap.test(StateFlag::FUNCLP)) {
-
 			savdo();
 			FormIndex++;
 			StateMap.set(StateFlag::INIT);
@@ -17067,44 +15734,36 @@ unsigned chkMsg() {
 			return 1;
 		}
 		if (StateMap.test(StateFlag::SATCNKT)) {
-
 			savdo();
 			satknkt();
 			return 1;
 		}
 		if (StateMap.test(StateFlag::SATPNT)) {
-
 			satpnt1();
 			return 1;
 		}
 		if (StateMap.testAndReset(StateFlag::SATIN)) {
-
 			satpnt0();
 			return 1;
 		}
 		if (StateMap.test(StateFlag::FORMSEL)) {
-
 			if (!StateMap.test(StateFlag::FRMROT) && chkfrm())
 				return 1;
 		}
 		if (StateMap.testAndReset(StateFlag::MOVFRM)) {
-
 			savdo();
 			setfrm();
 			return 1;
 		}
 		unmsg();
 		if (px2stch() && !(StateMap.test(StateFlag::SIZSEL) && chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2]))) {
-
 			unpat();
 			if (StateMap.testAndReset(StateFlag::ROTAT)) {
-
 				RotateBoxToCursorLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 				RotateBoxToCursorLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 				adjustedPoint.x = RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x;
 				adjustedPoint.y = RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y;
 				if (hypot(adjustedPoint.x, adjustedPoint.y) < CLOSENUF) {
-
 					px2stch();
 					RotationCenter.x = SelectedPoint.x;
 					RotationCenter.y = SelectedPoint.y;
@@ -17113,11 +15772,9 @@ unsigned chkMsg() {
 					ritrot();
 				}
 				else {
-
 					if (adjustedPoint.x)
 						RotationHandleAngle = -atan2(adjustedPoint.y, adjustedPoint.x);
 					else {
-
 						if (adjustedPoint.y > 0)
 							RotationHandleAngle = PI / 2;
 						else
@@ -17130,7 +15787,6 @@ unsigned chkMsg() {
 				return 1;
 			}
 			if (StateMap.testAndReset(StateFlag::CLPSHO)) {
-
 				savdo();
 				if ((StateMap.testAndReset(StateFlag::SELBOX) || StateMap.testAndReset(StateFlag::INSRT)) && ClosestPointIndex != gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 					lodclp(ClosestPointIndex);
@@ -17151,7 +15807,6 @@ unsigned chkMsg() {
 				return 1;
 			}
 			if (StateMap.testAndReset(StateFlag::BOXZUM)) {
-
 				StateMap.set(StateFlag::BZUMIN);
 				ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
 				ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
@@ -17163,13 +15818,10 @@ unsigned chkMsg() {
 				return 1;
 			}
 			if (FormIndex && !StateMap.test(StateFlag::FRMOF)) {
-
 				if (!StateMap.test(StateFlag::INSRT)) {
-
 					if (StateMap.testAndReset(StateFlag::FORMSEL))
 						ritfrct(ClosestFormToCursor, StitchWindowDC);
 					if (closfrm()) {
-
 						StateMap.set(StateFlag::FRMPMOV);
 						fvars(ClosestFormToCursor);
 						frmovlin();
@@ -17178,17 +15830,13 @@ unsigned chkMsg() {
 				}
 			}
 			if (StateMap.test(StateFlag::INIT)) {
-
 				unlin();
 				savdo();
 				if (StateMap.test(StateFlag::INSRT) && PCSHeader.stitchCount < MAXITEMS) {
-
 					px2stch();
 					code = (ActiveColor | USMSK | (ActiveLayer << LAYSHFT) | NOTFRM)&NKNOTMSK;
 					if (StateMap.test(StateFlag::LIN1)) {
-
 						if (StateMap.test(StateFlag::BAKEND)) {
-
 							xlin1();
 							iStitch = PCSHeader.stitchCount;
 							StitchBuffer[iStitch].x = SelectedPoint.x;
@@ -17206,10 +15854,8 @@ unsigned chkMsg() {
 							return 1;
 						}
 						else {
-
 							xlin1();
 							for (iStitch = PCSHeader.stitchCount; iStitch; iStitch--) {
-
 								StitchBuffer[iStitch].attribute = StitchBuffer[iStitch - 1].attribute;
 								StitchBuffer[iStitch].x = StitchBuffer[iStitch - 1].x;
 								StitchBuffer[iStitch].y = StitchBuffer[iStitch - 1].y;
@@ -17230,7 +15876,6 @@ unsigned chkMsg() {
 						}
 					}
 					else {
-
 						xlin();
 						if (StitchBuffer[ClosestPointIndex].attribute&ALTYPMSK && StitchBuffer[ClosestPointIndex + 1].attribute&ALTYPMSK) {
 							if ((StitchBuffer[ClosestPointIndex].attribute&FRMSK) == (StitchBuffer[ClosestPointIndex + 1].attribute&FRMSK))
@@ -17238,7 +15883,6 @@ unsigned chkMsg() {
 						}
 						iStitch = PCSHeader.stitchCount;
 						do {
-
 							StitchBuffer[iStitch].x = StitchBuffer[iStitch - 1].x;
 							StitchBuffer[iStitch].y = StitchBuffer[iStitch - 1].y;
 							StitchBuffer[iStitch].attribute = StitchBuffer[iStitch - 1].attribute;
@@ -17265,7 +15909,6 @@ unsigned chkMsg() {
 					}
 				}
 				if ((!StateMap.test(StateFlag::HIDSTCH)) && closPnt1(&ClosestPointIndexClone)) {
-
 					ClosestPointIndex = ClosestPointIndexClone;
 					unbox();
 					unboxs();
@@ -17274,9 +15917,7 @@ unsigned chkMsg() {
 					LineIndex = 0;
 					SetROP2(StitchWindowDC, R2_NOTXORPEN);
 					if (ClosestPointIndex == 0) {
-
 						if (ZoomFactor < STCHBOX) {
-
 							SelectObject(StitchWindowDC, LinePen);
 							stchbox(0, StitchWindowDC);
 							stchbox(1, StitchWindowDC);
@@ -17285,11 +15926,8 @@ unsigned chkMsg() {
 						drwLin(0, 2, BackgroundPen);
 					}
 					else {
-
 						if (ClosestPointIndex == gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
-
 							if (ZoomFactor < STCHBOX) {
-
 								SelectObject(StitchWindowDC, LinePen);
 								stchbox(PCSHeader.stitchCount - 1, StitchWindowDC);
 								stchbox(PCSHeader.stitchCount - 2, StitchWindowDC);
@@ -17298,9 +15936,7 @@ unsigned chkMsg() {
 							drwLin(PCSHeader.stitchCount - 2, 2, BackgroundPen);
 						}
 						else {
-
 							if (ZoomFactor < STCHBOX) {
-
 								SelectObject(StitchWindowDC, LinePen);
 								stchbox(ClosestPointIndex - 1, StitchWindowDC);
 								stchbox(ClosestPointIndex, StitchWindowDC);
@@ -17316,7 +15952,6 @@ unsigned chkMsg() {
 					if (ClosestPointIndex <= 0)
 						StateMap.reset(StateFlag::ISDWN);
 					else {
-
 						StateMap.set(StateFlag::ISDWN);
 						stch2px1(ClosestPointIndex - 1);
 						MoveLine0[0].x = StitchCoordinatesPixels.x;
@@ -17326,7 +15961,6 @@ unsigned chkMsg() {
 					if (ClosestPointIndex >= iStitch)
 						StateMap.reset(StateFlag::ISUP);
 					else {
-
 						StateMap.set(StateFlag::ISUP);
 						stch2px1(ClosestPointIndex + 1);
 						MoveLine1[1].x = StitchCoordinatesPixels.x;
@@ -17339,9 +15973,7 @@ unsigned chkMsg() {
 				}
 			}
 			else {
-
 				if (px2stch()) {
-
 					savdo();
 					PCSHeader.stitchCount = 1;
 					InsertLine[0].x = Msg.pt.x - StitchWindowOrigin.x;
@@ -17375,31 +16007,25 @@ unsigned chkMsg() {
 			return 1;
 		}
 		if (Msg.hwnd == ButtonWin[HBOXSEL]) {
-
 			boxsel();
 			return 1;
 		}
 		if (Msg.hwnd == ButtonWin[HUPTO]) {
-
 			toglup();
 			return 1;
 		}
 		if (Msg.hwnd == ButtonWin[HHID]) {
-
 			toglHid();
 			return 1;
 		}
 		if (chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
-
 			if (Msg.message == WM_LBUTTONDOWN) {
-
 				savdo();
 				code = ActiveColor;
 				ActiveColor = VerticalIndex & 0xf;
 				redraw(UserColorWin[code]);
 				redraw(UserColorWin[ActiveColor]);
 				if (StateMap.test(StateFlag::HID)) {
-
 					StateMap.reset(StateFlag::SELBOX);
 					StateMap.reset(StateFlag::GRPSEL);
 					StateMap.reset(StateFlag::SCROS);
@@ -17408,23 +16034,17 @@ unsigned chkMsg() {
 					redraw(ButtonWin[HHID]);
 				}
 				else {
-
 					if (SelectedFormCount) {
-
 						nucols();
 						coltab();
 						StateMap.set(StateFlag::RESTCH);
 						return 1;
 					}
 					else {
-
 						if (StateMap.test(StateFlag::FORMSEL)) {
-
 							SelectedForm = &FormList[ClosestFormToCursor];
 							if (SelectedForm->fillType || SelectedForm->edgeType || SelectedForm->extendedAttribute&(AT_UND | AT_WALK | AT_CWLK)) {
-
 								if (FormList[ClosestFormToCursor].fillType) {
-
 									FormList[ClosestFormToCursor].fillColor = ActiveColor;
 									if (FormList[ClosestFormToCursor].fillType == FTHF)
 										FormList[ClosestFormToCursor].fillInfo.feather.color = ActiveColor;
@@ -17441,7 +16061,6 @@ unsigned chkMsg() {
 									FormList[ClosestFormToCursor].underlayColor = ActiveColor;
 								code = ClosestFormToCursor << FRMSHFT;
 								for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 									stitchAttribute = StitchBuffer[iStitch].attribute;
 									if (stitchAttribute&ALTYPMSK && (stitchAttribute&FRMSK) == code && (stitchAttribute&TYPMSK) != TYPMSK) {
 										stitchAttribute &= NCOLMSK;
@@ -17454,11 +16073,8 @@ unsigned chkMsg() {
 							}
 						}
 						else {
-
 							if (StateMap.test(StateFlag::GRPSEL)) {
-
 								for (iStitch = GroupStartStitch + 1; iStitch <= GroupEndStitch; iStitch++) {
-
 									StitchBuffer[iStitch].attribute &= 0xfffffff0;
 									StitchBuffer[iStitch].attribute |= ActiveColor;
 								}
@@ -17466,7 +16082,6 @@ unsigned chkMsg() {
 								StateMap.set(StateFlag::RESTCH);
 							}
 							else {
-
 								if (StateMap.test(StateFlag::COL))
 									StateMap.set(StateFlag::RESTCH);
 							}
@@ -17477,9 +16092,7 @@ unsigned chkMsg() {
 			return 1;
 		}
 		if (chkMsgs(Msg.pt, UserColorWin[0], UserColorWin[15])) {
-
 			if (Msg.message == WM_LBUTTONDOWN && nuCol(UserColor[VerticalIndex])) {
-
 				savdo();
 				UserColor[VerticalIndex] = ColorStruct.rgbResult;
 				UserPen[VerticalIndex] = nuPen(UserPen[VerticalIndex], 1, UserColor[VerticalIndex]);
@@ -17490,7 +16103,6 @@ unsigned chkMsg() {
 			return 1;
 		}
 		if (chkMsgs(Msg.pt, ThreadSizeWin[0], ThreadSizeWin[15])) {
-
 			if (Msg.message == WM_LBUTTONDOWN) {
 				const TCHAR*	const str[] = { "30","40","60" };
 
@@ -17516,2863 +16128,2684 @@ unsigned chkMsg() {
 		}
 	}
 	switch (Msg.message) {
+	case WM_TIMER:
 
-		case WM_TIMER:
+		if (StateMap.test(StateFlag::RUNPAT) && !Msg.wParam)
+			stchout();
+		break;
 
-			if (StateMap.test(StateFlag::RUNPAT) && !Msg.wParam)
-				stchout();
-			break;
+	case WM_CHAR:
 
-		case WM_CHAR:
+		if (isgraph(Msg.wParam))
+			nuthum(tolower(Msg.wParam));
+		break;
 
-			if (isgraph(Msg.wParam))
-				nuthum(tolower(Msg.wParam));
-			break;
+	case WM_KEYDOWN:
 
-		case WM_KEYDOWN:
-
-			code = Msg.wParam & 0xffff;
-			if (StateMap.test(StateFlag::TXTRED)) {
-				txtkey(code);
-				return 1;
-			}
-			fvars(ClosestFormToCursor);
+		code = Msg.wParam & 0xffff;
+		if (StateMap.test(StateFlag::TXTRED)) {
+			txtkey(code);
+			return 1;
+		}
+		fvars(ClosestFormToCursor);
 
 #if LANG==GRM
-			if (code >= 0x30 && code <= 0x39) {
+		if (code >= 0x30 && code <= 0x39) {
+			if (GetKeyState(VK_SHIFT) & 0X8000) {
+				switch (code) {
+				case 0x38:
 
-				if (GetKeyState(VK_SHIFT) & 0X8000) {
+					selfrm0();
+					break;
 
-					switch (code) {
+				case 0x39:
 
-						case 0x38:
-
-							selfrm0();
-							break;
-
-						case 0x39:
-
-							selfrmx();
-							break;
-					}
+					selfrmx();
+					break;
 				}
 			}
+		}
 #endif
-			// ToDo - value passed to duform is wierd because it is dependant on order of enumeration of the form types.
-			//        and value 'SAT' throws it off
-			if (StateMap.test(StateFlag::FORMIN)) {
+		// ToDo - value passed to duform is wierd because it is dependant on order of enumeration of the form types.
+		//        and value 'SAT' throws it off
+		if (StateMap.test(StateFlag::FORMIN)) {
+			if (GetKeyState(VK_CONTROL) & 0X8000)
+				return 1;
 
-				if (GetKeyState(VK_CONTROL) & 0X8000)
-					return 1;
+			switch (code) {
+			case 'E':
 
-				switch (code) {
+				StateMap.reset(StateFlag::FORMIN);
+				unmsg();
+				duform(FRMLINE - 1);
+				return 1;
 
-					case 'E':
+			case 'F':
 
-						StateMap.reset(StateFlag::FORMIN);
-						unmsg();
-						duform(FRMLINE - 1);
-						return 1;
+				StateMap.reset(StateFlag::FORMIN);
+				unmsg();
+				duform(FRMFPOLY - 1);
+				return 1;
 
-					case 'F':
+			case 'R':
 
-						StateMap.reset(StateFlag::FORMIN);
-						unmsg();
-						duform(FRMFPOLY - 1);
-						return 1;
+				duform(FRMRPOLY - 1);
+				return 1;
 
-					case 'R':
+			case 'S':
 
-						duform(FRMRPOLY - 1);
-						return 1;
+				duform(FRMSTAR - 1);
+				return 1;
 
-					case 'S':
+			case 'A':
 
-						duform(FRMSTAR - 1);
-						return 1;
+				duform(FRMSPIRAL - 1);
+				return 1;
 
-					case 'A':
+			case 'H':
 
-						duform(FRMSPIRAL - 1);
-						return 1;
+				duform(FRMHEART - 2);
+				return 1;
 
-					case 'H':
+			case 'L':
 
-						duform(FRMHEART - 2);
-						return 1;
+				duform(FRMLENS - 2);
+				return 1;
 
-					case 'L':
+			case 'G':
 
-						duform(FRMLENS - 2);
-						return 1;
+				duform(FRMEGG - 2);
+				return 1;
 
-					case 'G':
+			case 'T':
 
-						duform(FRMEGG - 2);
-						return 1;
+				duform(FRMTEAR - 2);
+				return 1;
 
-					case 'T':
+			case 'Z':
 
-						duform(FRMTEAR - 2);
-						return 1;
+				duform(FRMZIGZAG - 2);
+				return 1;
 
-					case 'Z':
+			case 'W':
 
-						duform(FRMZIGZAG - 2);
-						return 1;
+				duform(FRMWAVE - 2);
+				return 1;
 
-					case 'W':
+			case 'D':
 
-						duform(FRMWAVE - 2);
-						return 1;
-
-					case 'D':
-
-						duform(FRMDAISY - 2);
-						return 1;
-				}
+				duform(FRMDAISY - 2);
+				return 1;
 			}
-			if (StateMap.test(StateFlag::FILMSG)) {
-
-				if (code == VK_RETURN || code == 0xc0) {
-
-					savdo();
-					unfil();
-					coltab();
-					StateMap.set(StateFlag::RESTCH);
-					unmsg();
-					return 1;
-				}
+		}
+		if (StateMap.test(StateFlag::FILMSG)) {
+			if (code == VK_RETURN || code == 0xc0) {
+				savdo();
+				unfil();
+				coltab();
+				StateMap.set(StateFlag::RESTCH);
+				unmsg();
+				return 1;
 			}
-			if (StateMap.testAndReset(StateFlag::MOVMSG)) {
-
-				if (code == VK_RETURN || code == 0xc0) {
-
-					savdo();
-					refilfn();
-					unmsg();
-				}
+		}
+		if (StateMap.testAndReset(StateFlag::MOVMSG)) {
+			if (code == VK_RETURN || code == 0xc0) {
+				savdo();
+				refilfn();
+				unmsg();
+			}
+			else
+				unmsg();
+			if (StateMap.testAndReset(StateFlag::WASFRMFRM))
+				refrm();
+			return 1;
+		}
+		if (StateMap.testAndReset(StateFlag::PRGMSG)) {
+			if (code == VK_RETURN || code == 0xc0) {
+				deldir();
+				return 1;
+			}
+		}
+		if (StateMap.testAndReset(StateFlag::DELSFRMS)) {
+			if (code == 'S' || code == VK_RETURN || code == 0xc0) {
+				savdo();
+				if (code == 'S')
+					StateMap.set(StateFlag::DELTO);
 				else
-					unmsg();
-				if (StateMap.testAndReset(StateFlag::WASFRMFRM))
-					refrm();
+					StateMap.reset(StateFlag::DELTO);
+				delsfrms(code);
+				coltab();
+				StateMap.set(StateFlag::RESTCH);
+				unmsg();
 				return 1;
 			}
-			if (StateMap.testAndReset(StateFlag::PRGMSG)) {
-
-				if (code == VK_RETURN || code == 0xc0) {
-
-					deldir();
-					return 1;
-				}
-			}
-			if (StateMap.testAndReset(StateFlag::DELSFRMS)) {
-
-				if (code == 'S' || code == VK_RETURN || code == 0xc0) {
-
-					savdo();
-					if (code == 'S')
-						StateMap.set(StateFlag::DELTO);
-					else
-						StateMap.reset(StateFlag::DELTO);
-					delsfrms(code);
-					coltab();
-					StateMap.set(StateFlag::RESTCH);
-					unmsg();
-					return 1;
-				}
-			}
-			if (StateMap.testAndReset(StateFlag::DELFRM)) {
-
-				if (code == 'S' || code == VK_RETURN || code == 0xc0) {
-
-					savdo();
-					if (code == 'S')
-						StateMap.set(StateFlag::DELTO);
-					else
-						StateMap.reset(StateFlag::DELTO);
-					frmdel();
-					fndknt();
-					coltab();
-					StateMap.set(StateFlag::RESTCH);
-					unmsg();
-					return 1;
-				}
-			}
-			if (StateMap.test(StateFlag::THUMSHO)) {
-
-				switch (code) {
-
-					case VK_ESCAPE:
-					case 'Q':
-
-						unthum();
-						StateMap.reset(StateFlag::BAKSHO);
-						esccode();
-						qcode();
-						break;
-
-					case VK_DOWN:
-					case 0x22:		//page down
-
-						nuthsel();
-						break;
-
-					case VK_UP:
-					case 0x21:		//page up
-
-						nuthbak(8);
-						break;
-
-					case VK_HOME:
-
-						ThumbnailIndex = 0;
-						nuthsel();
-						break;
-
-					case VK_END:
-
-						ThumbnailIndex = ThumbnailCount;
-						nuthbak(4);
-						break;
-
-					case 8:			//backspace
-					case VK_LEFT:
-
-						bakthum();
-						break;
-
-					default:
-
-						TranslateMessage(&Msg);
-				}
+		}
+		if (StateMap.testAndReset(StateFlag::DELFRM)) {
+			if (code == 'S' || code == VK_RETURN || code == 0xc0) {
+				savdo();
+				if (code == 'S')
+					StateMap.set(StateFlag::DELTO);
+				else
+					StateMap.reset(StateFlag::DELTO);
+				frmdel();
+				fndknt();
+				coltab();
+				StateMap.set(StateFlag::RESTCH);
+				unmsg();
 				return 1;
 			}
-			if (StateMap.test(StateFlag::FSETFSPAC) || StateMap.test(StateFlag::GTWLKIND)) {
-				// Check for keycode 'dash' and numpad 'subtract'
-				if (code == 189 || code == 109) {
-					*MsgBuffer = '-';
-					MsgIndex = 1;
+		}
+		if (StateMap.test(StateFlag::THUMSHO)) {
+			switch (code) {
+			case VK_ESCAPE:
+			case 'Q':
+
+				unthum();
+				StateMap.reset(StateFlag::BAKSHO);
+				esccode();
+				qcode();
+				break;
+
+			case VK_DOWN:
+			case 0x22:		//page down
+
+				nuthsel();
+				break;
+
+			case VK_UP:
+			case 0x21:		//page up
+
+				nuthbak(8);
+				break;
+
+			case VK_HOME:
+
+				ThumbnailIndex = 0;
+				nuthsel();
+				break;
+
+			case VK_END:
+
+				ThumbnailIndex = ThumbnailCount;
+				nuthbak(4);
+				break;
+
+			case 8:			//backspace
+			case VK_LEFT:
+
+				bakthum();
+				break;
+
+			default:
+
+				TranslateMessage(&Msg);
+			}
+			return 1;
+		}
+		if (StateMap.test(StateFlag::FSETFSPAC) || StateMap.test(StateFlag::GTWLKIND)) {
+			// Check for keycode 'dash' and numpad 'subtract'
+			if (code == 189 || code == 109) {
+				*MsgBuffer = '-';
+				MsgIndex = 1;
+				MsgBuffer[1] = 0;
+				SetWindowText(GeneralNumberInputBox, MsgBuffer);
+				return 1;
+			}
+		}
+		if (FormMenuChoice || PreferenceIndex) {
+			if (chkminus(code)) {
+				MsgIndex = 1;
+				SideWindowEntryBuffer[0] = '-';
+				SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
+				return 1;
+			}
+			if (dunum(code)) {
+				if (PreferenceIndex == PSHO + 1 || PreferenceIndex == PBOX + 1) {
+					MsgBuffer[0] = gsl::narrow<TCHAR>(NumericCode);
 					MsgBuffer[1] = 0;
-					SetWindowText(GeneralNumberInputBox, MsgBuffer);
-					return 1;
-				}
-			}
-			if (FormMenuChoice || PreferenceIndex) {
-
-				if (chkminus(code)) {
-
-					MsgIndex = 1;
-					SideWindowEntryBuffer[0] = '-';
-					SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
-					return 1;
-				}
-				if (dunum(code)) {
-
-					if (PreferenceIndex == PSHO + 1 || PreferenceIndex == PBOX + 1) {
-
-						MsgBuffer[0] = gsl::narrow<TCHAR>(NumericCode);
-						MsgBuffer[1] = 0;
-						if (PreferenceIndex == PSHO + 1) {
-
-							ShowStitchThreshold = unthrsh(NumericCode - 0x30);
-							SetWindowText(ValueWindow[PSHO], MsgBuffer);
-						}
-						else {
-
-							StitchBoxesThreshold = unthrsh(NumericCode - 0x30);
-							SetWindowText(ValueWindow[PBOX], MsgBuffer);
-						}
-						unsid();
+					if (PreferenceIndex == PSHO + 1) {
+						ShowStitchThreshold = unthrsh(NumericCode - 0x30);
+						SetWindowText(ValueWindow[PSHO], MsgBuffer);
 					}
 					else {
-
-						SideWindowEntryBuffer[MsgIndex++] = NumericCode;
-						SideWindowEntryBuffer[MsgIndex] = 0;
-						SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
+						StitchBoxesThreshold = unthrsh(NumericCode - 0x30);
+						SetWindowText(ValueWindow[PBOX], MsgBuffer);
 					}
-					return 1;
+					unsid();
 				}
-				switch (code) {
-
-					case 0x6e://numpad period
-					case 0xbe://period
-
-						SideWindowEntryBuffer[MsgIndex++] = '.';
-						SideWindowEntryBuffer[MsgIndex] = 0;
-						SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
-						return 1;
-
-					case 8:	//backspace
-
-						if (MsgIndex) {
-
-							SideWindowEntryBuffer[--MsgIndex] = 0;
-							SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
-						}
-						return 1;
-
-					case VK_RETURN:
-
-						chknum();
-						FormMenuChoice = 0;
-						PreferenceIndex = 0;
-						return 1;
+				else {
+					SideWindowEntryBuffer[MsgIndex++] = NumericCode;
+					SideWindowEntryBuffer[MsgIndex] = 0;
+					SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
 				}
-			}
-			if (code == 'I') {
-
-				movi();
-				LastKeyCode = 'I';
 				return 1;
 			}
-			if (code == 'Q' && LastKeyCode == 'Q')
-				unpat();
-			LastKeyCode = code;
-			if (StateMap.test(StateFlag::NUMIN)) {
+			switch (code) {
+			case 0x6e://numpad period
+			case 0xbe://period
 
-				if (StateMap.test(StateFlag::SCLPSPAC) && code == 0xbd && !MsgIndex) {
-					MsgBuffer[0] = '-';
-					MsgBuffer[1] = 0;
-					MsgIndex = 1;
-					SetWindowText(GeneralNumberInputBox, MsgBuffer);
-					return 1;
+				SideWindowEntryBuffer[MsgIndex++] = '.';
+				SideWindowEntryBuffer[MsgIndex] = 0;
+				SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
+				return 1;
+
+			case 8:	//backspace
+
+				if (MsgIndex) {
+					SideWindowEntryBuffer[--MsgIndex] = 0;
+					SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
 				}
-				if (dunum(code)) {
+				return 1;
 
+			case VK_RETURN:
+
+				chknum();
+				FormMenuChoice = 0;
+				PreferenceIndex = 0;
+				return 1;
+			}
+		}
+		if (code == 'I') {
+			movi();
+			LastKeyCode = 'I';
+			return 1;
+		}
+		if (code == 'Q' && LastKeyCode == 'Q')
+			unpat();
+		LastKeyCode = code;
+		if (StateMap.test(StateFlag::NUMIN)) {
+			if (StateMap.test(StateFlag::SCLPSPAC) && code == 0xbd && !MsgIndex) {
+				MsgBuffer[0] = '-';
+				MsgBuffer[1] = 0;
+				MsgIndex = 1;
+				SetWindowText(GeneralNumberInputBox, MsgBuffer);
+				return 1;
+			}
+			if (dunum(code)) {
+				if (StateMap.test(StateFlag::TRNIN0)) {
+					TraceInputBuffer[MsgIndex++] = NumericCode;
+					TraceInputBuffer[MsgIndex] = 0;
+					traceColor = atoi(TraceInputBuffer);
+					switch (MsgIndex) {
+					case 2:
+
+						if (traceColor > 25)
+							dutrnum0(traceColor);
+						break;
+
+					case 3:
+
+						if (traceColor > 255)
+							traceColor = 255;
+						dutrnum0(traceColor);
+						break;
+					}
+					redraw(TraceNumberInput);
+				}
+				else {
+					MsgBuffer[MsgIndex++] = NumericCode;
+					MsgBuffer[MsgIndex] = 0;
+					SetWindowText(GeneralNumberInputBox, MsgBuffer);
+				}
+				return 1;
+			}
+			switch (code) {
+			case 0x6e://numpad period
+			case 0xbe://period
+
+				MsgBuffer[MsgIndex++] = '.';
+				MsgBuffer[MsgIndex] = 0;
+				SetWindowText(GeneralNumberInputBox, MsgBuffer);
+				return 1;
+
+			case 8:	//backspace
+
+				if (MsgIndex) {
+					MsgIndex--;
 					if (StateMap.test(StateFlag::TRNIN0)) {
-
-						TraceInputBuffer[MsgIndex++] = NumericCode;
 						TraceInputBuffer[MsgIndex] = 0;
-						traceColor = atoi(TraceInputBuffer);
-						switch (MsgIndex) {
-
-							case 2:
-
-								if (traceColor > 25)
-									dutrnum0(traceColor);
-								break;
-
-							case 3:
-
-								if (traceColor > 255)
-									traceColor = 255;
-								dutrnum0(traceColor);
-								break;
-						}
 						redraw(TraceNumberInput);
 					}
 					else {
-
-						MsgBuffer[MsgIndex++] = NumericCode;
 						MsgBuffer[MsgIndex] = 0;
 						SetWindowText(GeneralNumberInputBox, MsgBuffer);
 					}
-					return 1;
 				}
-				switch (code) {
+				return 1;
 
-					case 0x6e://numpad period
-					case 0xbe://period
+			case VK_RETURN:
 
-						MsgBuffer[MsgIndex++] = '.';
-						MsgBuffer[MsgIndex] = 0;
-						SetWindowText(GeneralNumberInputBox, MsgBuffer);
-						return 1;
-
-					case 8:	//backspace
-
-						if (MsgIndex) {
-
-							MsgIndex--;
-							if (StateMap.test(StateFlag::TRNIN0)) {
-
-								TraceInputBuffer[MsgIndex] = 0;
-								redraw(TraceNumberInput);
-							}
-							else {
-
-								MsgBuffer[MsgIndex] = 0;
-								SetWindowText(GeneralNumberInputBox, MsgBuffer);
-							}
-						}
-						return 1;
-
-					case VK_RETURN:
-
-						if (StateMap.test(StateFlag::TRNIN0))
-							dutrnum0(atoi(TraceInputBuffer));
-						else {
-
-							if (StateMap.test(StateFlag::TRNIN1))
-								dutrnum1();
-						}
-						break;
+				if (StateMap.test(StateFlag::TRNIN0))
+					dutrnum0(atoi(TraceInputBuffer));
+				else {
+					if (StateMap.test(StateFlag::TRNIN1))
+						dutrnum1();
 				}
+				break;
 			}
-			if (code == 8 && BufferIndex) {
+		}
+		if (code == 8 && BufferIndex) {
+			StitchEntryBuffer[--BufferIndex] = 0;
+			butxt(HNUM, StitchEntryBuffer);
+			ClosestPointIndex = atoi(StitchEntryBuffer);
+			movbox();
+			return 1;
+		}
+		if (!StateMap.test(StateFlag::WASTRAC) && dunum(code)) {
+			if (BufferIndex > BufferDigitCount - 1)
+				BufferIndex = 0;
+			if (StitchEntryBuffer[0] == '0' && BufferIndex)
+				BufferIndex--;
+			StitchEntryBuffer[BufferIndex++] = NumericCode;
+			StitchEntryBuffer[BufferIndex] = 0;
+			ClosestPointIndex = atoi(StitchEntryBuffer);
+			if (ClosestPointIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
+				sprintf_s(StitchEntryBuffer, sizeof(StitchEntryBuffer), "%d", PCSHeader.stitchCount - 1);
+				ClosestPointIndex = PCSHeader.stitchCount - 1;
+			}
+			butxt(HNUM, StitchEntryBuffer);
+			movbox();
+			StateMap.reset(StateFlag::NUMIN);
+			return 1;
+		}
+		BufferIndex = 0;
+		unmsg();
+		switch (code) {
+		case VK_ESCAPE:
 
-				StitchEntryBuffer[--BufferIndex] = 0;
-				butxt(HNUM, StitchEntryBuffer);
-				ClosestPointIndex = atoi(StitchEntryBuffer);
-				movbox();
+			esccode();
+
+		case 'Q':
+
+			if (GetKeyState(VK_SHIFT) & 0x8000) {
+				ritcur();
 				return 1;
 			}
-			if (!StateMap.test(StateFlag::WASTRAC) && dunum(code)) {
+			qcode();
+			return 1;
 
-				if (BufferIndex > BufferDigitCount - 1)
-					BufferIndex = 0;
-				if (StitchEntryBuffer[0] == '0' && BufferIndex)
-					BufferIndex--;
-				StitchEntryBuffer[BufferIndex++] = NumericCode;
-				StitchEntryBuffer[BufferIndex] = 0;
-				ClosestPointIndex = atoi(StitchEntryBuffer);
-				if (ClosestPointIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
+		case 0xc0:		//`
 
-					sprintf_s(StitchEntryBuffer, sizeof(StitchEntryBuffer), "%d", PCSHeader.stitchCount - 1);
-					ClosestPointIndex = PCSHeader.stitchCount - 1;
-				}
-				butxt(HNUM, StitchEntryBuffer);
-				movbox();
-				StateMap.reset(StateFlag::NUMIN);
-				return 1;
+			if (GetKeyState(VK_CONTROL) & 0x8000 && GetKeyState(VK_MENU) & 0x8000) {
+				BackgroundColor = 0x505050;
+				BackgroundPen = nuPen(BackgroundPen, 1, BackgroundColor);
+				BackgroundPenWidth = 1;
+				DeleteObject(BackgroundBrush);
+				BackgroundBrush = CreateSolidBrush(BackgroundColor);
+				if (PCSBMPFileName[0])
+					bfil();
+				StateMap.set(StateFlag::RESTCH);
 			}
-			BufferIndex = 0;
-			unmsg();
-			switch (code) {
-
-				case VK_ESCAPE:
-
-					esccode();
-
-				case 'Q':
-
-					if (GetKeyState(VK_SHIFT) & 0x8000) {
-
-						ritcur();
-						return 1;
-					}
-					qcode();
-					return 1;
-
-				case 0xc0:		//`
-
-					if (GetKeyState(VK_CONTROL) & 0x8000 && GetKeyState(VK_MENU) & 0x8000) {
-
-						BackgroundColor = 0x505050;
-						BackgroundPen = nuPen(BackgroundPen, 1, BackgroundColor);
-						BackgroundPenWidth = 1;
-						DeleteObject(BackgroundBrush);
-						BackgroundBrush = CreateSolidBrush(BackgroundColor);
-						if (PCSBMPFileName[0])
-							bfil();
-						StateMap.set(StateFlag::RESTCH);
-					}
-					else {
+			else {
 #if PESACT
-						//				IniFile.auxFileType=AUXPES;
-						//				strcpy_s(WorkingFileName,"u:\\mrd\\t.thr");
-						//				StateMap.set(StateFlag::REDOLD);
-						//				nuFil();
-						//				lodpes();
-						//				savpes();
+				//				IniFile.auxFileType=AUXPES;
+				//				strcpy_s(WorkingFileName,"u:\\mrd\\t.thr");
+				//				StateMap.set(StateFlag::REDOLD);
+				//				nuFil();
+				//				lodpes();
+				//				savpes();
 #endif
 
-						tst();
-					}
-					break;
-
-				case VK_INSERT:
-
-					inscol();
-					break;
-
-				case 0x6d:		//keypad -
-
-					toglup();
-					break;
-
-				case 0xbd:		//-
-
-					StateMap.reset(StateFlag::CNTRH);
-					StateMap.reset(StateFlag::CNTRV);
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						StateMap.set(StateFlag::CNTRV);
-					else {
-
-						if (GetKeyState(VK_CONTROL) & 0X8000)
-							StateMap.set(StateFlag::CNTRH);
-					}
-					cntrx();
-					break;
-
-				case 0xbf:		///forward slash /
-
-					frmnum();
-					break;
-
-				case 0xbb:		//=
-
-					shrnk();
-					break;
-
-				case 0x21:		//page up
-
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						redup();
-					else
-						rotagain();
-					break;
-
-				case 0x22:		//page down
-
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						bakdup();
-					else
-						bakagain();
-					break;
-
-				case 0xde:	//'
-
-					desiz();
-					break;
-
-				case 0xdb:		//[
-
-#if LANG==ENG || LANG==HNG
-
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						selfrm0();
-					else
-#endif
-						ungrplo();
-					break;
-
-				case 0xdd:		//]
-
-#if LANG==ENG || LANG==HNG
-
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						selfrmx();
-					else
-#endif
-						ungrphi();
-					break;
-
-				case 0xba:		//semicolon
-
-					movmrk();
-					break;
-
-				case VK_DOWN:
-
-					if (GetKeyState(VK_CONTROL) & 0X8000)
-						nudgfn(0, -IniFile.cursorNudgeStep);
-					else
-						seldwn();
-					break;
-
-				case VK_UP:
-
-					if (GetKeyState(VK_CONTROL) & 0X8000)
-						nudgfn(0, IniFile.cursorNudgeStep);
-					else
-						selup();
-					break;
-
-				case 0xbe:		//period
-
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						setfilend();
-					else
-						setmov();
-					break;
-
-				case 'W':
-
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						crop();
-					else {
-
-						if (GetKeyState(VK_CONTROL) & 0X8000)
-							pes2crd();
-						else
-							insat();
-					}
-					break;
-
-				case 'E':
-
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						dutxtfil();
-					else
-						infrm();
-					break;
-
-				case VK_F2:
-
-					snap();
-					break;
-
-				case VK_F1:
-
-					help();
-					break;
-
-				case VK_F3:
-
-					if (GetKeyState(VK_CONTROL) & 0X8000)
-						srtfrm();
-					else {
-
-						if (GetKeyState(VK_SHIFT) & 0X8000)
-							srtbyfrm();
-						else
-							fsort();
-					}
-					break;
-
-				case VK_F4:
-
-					rtrclp();
-					break;
-
-				case VK_F5:
-
-					filfrms();
-					break;
-
-				case VK_F6:
-
-					vuthrds();
-					break;
-
-				case VK_F7:
-
-					save();
-					break;
-
-				case VK_F8:
-
-					savAs();
-					break;
-
-				case VK_F9:
-
-					selCol();
-					break;
-
-				case VK_F11:
-
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						rembig();
-					else
-						duzero();
-					break;
-
-				case VK_F12:
-
-					if (GetKeyState(VK_CONTROL)&GetKeyState(VK_MENU) & 0X8000)
-						reldun();
-					else {
-#ifdef _DEBUG
-						if (GetKeyState(VK_SHIFT) & 0X8000)
-							dmpat();
-						else
-#endif
-							dun();
-					}
-					break;
-
-				case 'Y':
-
-					if (closfrm())
-						selfpnt();
-					break;
-
-				case 'O':
-
-					fop();
-					break;
-
-				case 'Z':
-
-					if (GetKeyState(VK_SHIFT) & 0X8000) {
-
-						ZoomFactor = ZoomMin;
-						zumin();
-					}
-					else {
-
-						if (GetKeyState(VK_CONTROL) & 0X8000)
-							bak();
-						else
-							zumin();
-					}
-					break;
-
-				case 'X':
-
-					if (GetKeyState(VK_CONTROL) & 0X8000)
-						cut();
-					else {
-
-						if (GetKeyState(VK_SHIFT) & 0X8000)
-							hidbit();
-						else
-							zumhom();
-					}
-					break;
-
-				case 'P':
-
-					prfmsg();
-					break;
-
-				case 'N':
-
-					if (GetKeyState(VK_CONTROL) & 0X8000)
-						nudsiz();
-					else {
-						if (GetKeyState(VK_SHIFT) & 0X8000)
-							pgdwn();
-						else {
-							StateMap.set(StateFlag::TRCUP);
-							trace();
-						}
-					}
-					break;
-
-				case 'U':
-
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						pgup();
-					else {
-
-						if (GetKeyState(VK_CONTROL) & 0X8000)
-							trdif();
-						else {
-
-							StateMap.reset(StateFlag::TRCUP);
-							trace();
-						}
-					}
-					break;
-
-				case 'H':
-
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						pglft();
-					else {
-
-						if (GetKeyState(VK_CONTROL) & 0X8000)
-							trcsel();
-						else
-							blak();
-					}
-					break;
-
-				case 'J':
-
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						pgrit();
-					else
-						refilal();
-					break;
-
-				case 0xbc:		//comma
-
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						setfilstrt();
-					else {
-						savdo();
-						join();
-					}
-					break;
-
-				case 'B':
-
-					if (GetKeyState(VK_CONTROL) & 0X8000)
-						redo();
-					else {
-
-						if (GetKeyState(VK_SHIFT) & 0X8000)
-							bakmrk();
-						else
-							bak();
-					}
-					break;
-
-				case 'D':
-
-					if (GetKeyState(VK_SHIFT) & 0X8000) {
-						if (StateMap.test(StateFlag::FORMSEL)) {
-							PostMessage(ThrEdWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
-							keybd_event('F', 0, 0, 0);
-						}
-					}
-					else
-						satsel();
-					break;
-
-				case 'K':
-
-					if (GetKeyState(VK_MENU)&GetKeyState(VK_CONTROL) & 0X8000)
-						setknots();
-					else {
-						if (GetKeyState(VK_SHIFT) & 0X8000)
-							tglhid();
-						else {
-
-							if (GetKeyState(VK_CONTROL) & 0X8000)
-								set1knot();
-							else
-								tglfrm();
-						}
-					}
-					break;
-
-				case 'A':
-
-					if (GetKeyState(VK_CONTROL) & 0X8000)
-						selalstch();
-					else {
-
-						if (GetKeyState(VK_SHIFT) & 0X8000)
-							selal();
-						else
-							zumout();
-					}
-					break;
-
-				case VK_SPACE:
-
-					if (StateMap.testAndFlip(StateFlag::INSRT)) {
-
-						ReleaseCapture();
-						StateMap.set(StateFlag::RESTCH);
-					}
-					else
-						istch();
-					unbox();
-					if (StateMap.testAndReset(StateFlag::GRPSEL) || StateMap.testAndReset(StateFlag::FORMSEL))
-						StateMap.set(StateFlag::RESTCH);
-					break;
-
-				case 'T':
-
-					if (GetKeyState(VK_SHIFT) & 0x8000)
-						retrac();
-					else {
-
-						if (GetKeyState(VK_CONTROL) & 0x8000)
-							trinit();
-						else
-							thumnail();
-					}
-					break;
-
-				case 'R':
-
-					if (GetKeyState(VK_CONTROL)&GetKeyState(VK_SHIFT) & 0x8000) {
-
-						movStch();
-						unbox();
-						StateMap.set(StateFlag::RESTCH);
-					}
-					else {
-
-						if (GetKeyState(VK_CONTROL) & 0x8000) {
-
-							setrang();
-							return 1;
-						}
-						if (GetKeyState(VK_SHIFT) & 0x8000) {
-
-							rotmrk();
-							return 1;
-						}
-						else
-							rotseg();
-					}
-					break;
-
-				case VK_TAB:
-
-					rot();
-					break;
-
-				case 'S':
-
-					if (GetKeyState(VK_CONTROL) & 0X8000) {
-
-						colchk();
-						save();
-					}
-					else {
-
-						if (GetKeyState(VK_SHIFT) & 0X8000)
-							gsnap();
-						else
-							zumshft();
-					}
-					break;
-
-				case 'F':
-
-					if (SelectedFormCount) {
-						PostMessage(ThrEdWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
-						keybd_event('F', 0, 0, 0);
-					}
-					else {
-
-						if (GetKeyState(VK_SHIFT) & 0X8000) {
-
-							StateMap.set(StateFlag::CNV2FTH);
-							ribon();
-						}
-						else {
-
-							frmon();
-							if (StateMap.test(StateFlag::FORMSEL))
-								refrm();
-							else
-								form();
-						}
-					}
-					break;
-
-				case 'V':
-
-					if (GetKeyState(VK_CONTROL) & 0X8000 && OpenClipboard(ThrEdWindow)) {
-
-						ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
-						ClipMemory = GetClipboardData(ThrEdClip);
-						if (ClipMemory) {
-
-							ClipPointer = GlobalLock(ClipMemory);
-							if (ClipPointer) {
-								ClipFormVerticesData = static_cast<FORMVERTEXCLIP *>(ClipPointer);
-								if (ClipFormVerticesData->clipType == CLP_FRMPS) {
-
-									duzrat();
-									byteCount = sizeof(FORMVERTEXCLIP) + (ClipFormVerticesData->vertexCount + 1) * sizeof(fPOINT);
-									clipCopyBuffer = new unsigned char[byteCount];
-									MoveMemory(clipCopyBuffer, ClipPointer, byteCount);
-									GlobalUnlock(ClipMemory);
-									CloseClipboard();
-									ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP *>(clipCopyBuffer);
-									if (StateMap.test(StateFlag::FRMPSEL)) {
-
-										fvars(ClosestFormToCursor);
-										InterleaveSequence[0].x = CurrentFormVertices[ClosestVertexToCursor].x;
-										InterleaveSequence[0].y = CurrentFormVertices[ClosestVertexToCursor].y;
-										clipData = convert_ptr<fPOINT *>(&ClipFormVerticesData[1]);
-										for (iVertex = 0; iVertex <= ClipFormVerticesData->vertexCount; iVertex++) {
-
-											InterleaveSequence[iVertex + 1].x = clipData[iVertex].x;
-											InterleaveSequence[iVertex + 1].y = clipData[iVertex].y;
-										}
-										nextVertex = nxt(ClosestVertexToCursor);
-										iVertex++;
-										InterleaveSequence[iVertex].x = CurrentFormVertices[nextVertex].x;
-										InterleaveSequence[iVertex].y = CurrentFormVertices[nextVertex].y;
-										OutputIndex = iVertex + 1;
-										FormVerticesAsLine = convert_ptr<POINT *>(&InterleaveSequence[OutputIndex]);
-										setpclp();
-										StateMap.set(StateFlag::FPUNCLP);
-										StateMap.set(StateFlag::SHOP);
-										dupclp();
-									}
-									else {
-
-										FormMoveDelta.x = FormMoveDelta.y = 0;
-										StateMap.set(StateFlag::FUNCLP);
-										ClosestFormToCursor = FormIndex;
-										SelectedForm = &FormList[FormIndex];
-										FillMemory(SelectedForm, sizeof(FRMHED), 0);
-										SelectedForm->type = FRMLINE;
-										SelectedForm->vertexCount = ClipFormVerticesData->vertexCount + 1;
-										SelectedForm->vertices = adflt(SelectedForm->vertexCount);
-										fvars(ClosestFormToCursor);
-										MoveMemory(SelectedForm->vertices, &ClipFormVerticesData[1], sizeof(fPOINT)*SelectedForm->vertexCount);
-										StateMap.set(StateFlag::INIT);
-										NewFormVertexCount = SelectedForm->vertexCount;
-										unfrm();
-										setmfrm();
-										StateMap.set(StateFlag::SHOFRM);
-										dufrm();
-									}
-									delete[] clipCopyBuffer;
-									return 1;
-								}
-								// ToDo - Add more information to the clipboard so that memory can be allocated 
-								ClipFormsHeader = static_cast<FORMSCLIP *>(ClipPointer);
-								if (ClipFormsHeader->clipType == CLP_FRMS) {
-
-									ClipFormsCount = ClipFormsHeader->formCount;
-									forms = convert_ptr<FRMHED *>(&ClipFormsHeader[1]);
-									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-
-										frmcpy(&FormList[FormIndex + iForm], &forms[iForm]);
-										FormList[FormIndex + iForm].attribute = (FormList[FormIndex + iForm].attribute&NFRMLMSK) | (ActiveLayer << 1);
-									}
-									CurrentFormVertices = convert_ptr<fPOINT *>(&forms[iForm]);
-									currentVertex = 0;
-									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-
-										SelectedForm = &FormList[FormIndex + iForm];
-										SelectedForm->vertices = adflt(SelectedForm->vertexCount);
-										for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
-
-											SelectedForm->vertices[iVertex].x = CurrentFormVertices[currentVertex].x;
-											SelectedForm->vertices[iVertex].y = CurrentFormVertices[currentVertex++].y;
-										}
-									}
-									guides = convert_ptr<SATCON *>(&CurrentFormVertices[currentVertex]);
-									currentGuide = 0;
-									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-
-										SelectedForm = &FormList[FormIndex + iForm];
-										if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
-
-											SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
-											for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-
-												SelectedForm->satinOrAngle.guide[iGuide].start = guides[currentGuide].start;
-												SelectedForm->satinOrAngle.guide[iGuide].finish = guides[currentGuide++].finish;
-											}
-										}
-									}
-									clipData = convert_ptr<fPOINT *>(&guides[currentGuide]);
-									currentClip = 0;
-									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-
-										SelectedForm = &FormList[FormIndex + iForm];
-										if (isclpx(FormIndex + iForm)) {
-
-											SelectedForm->angleOrClipData.clip = adclp(SelectedForm->lengthOrCount.clipCount);
-											for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
-
-												SelectedForm->angleOrClipData.clip[iClip].x = clipData[currentClip].x;
-												SelectedForm->angleOrClipData.clip[iClip].y = clipData[currentClip++].y;
-											}
-										}
-										if (iseclpx(FormIndex + iForm)) {
-
-											SelectedForm->borderClipData = adclp(SelectedForm->clipEntries);
-											for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
-
-												SelectedForm->borderClipData[iClip].x = clipData[currentClip].x;
-												SelectedForm->borderClipData[iClip].y = clipData[currentClip++].y;
-											}
-										}
-									}
-									textureSource = convert_ptr<TXPNT *>(&clipData[currentClip]);
-									textureDestination = &TexturePointsBuffer[TextureIndex];
-									textureCount = 0;
-									for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-										if (istx(FormIndex + iForm)) {
-											SelectedForm = &FormList[FormIndex + iForm];
-											textureCount += SelectedForm->fillInfo.texture.count;
-											SelectedForm->fillInfo.texture.index += TextureIndex;
-											MoveMemory(textureDestination, textureSource, (SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count - TextureIndex) * sizeof(TXPNT));
-										}
-									}
-									TextureIndex += textureCount;
-									GlobalUnlock(ClipMemory);
-									SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
-									SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
-									ratsr();
-									for (OutputIndex = 0; OutputIndex < gsl::narrow<unsigned>(ClipFormsCount); OutputIndex++) {
-
-										fselrct(OutputIndex + FormIndex);
-										SelectedFormList[OutputIndex] = OutputIndex + FormIndex;
-									}
-									SelectedFormCount = ClipFormsCount;
-									SelectedFormsSize.x = SelectedFormsRect.right - SelectedFormsRect.left;
-									SelectedFormsSize.y = SelectedFormsRect.bottom - SelectedFormsRect.top;
-									StateMap.set(StateFlag::INIT);
-									FormLines[0].x = FormLines[3].x = FormLines[4].x = SelectedFormsRect.left;
-									FormLines[1].x = FormLines[2].x = SelectedFormsRect.right;
-									FormLines[0].y = FormLines[1].y = FormLines[4].y = SelectedFormsRect.top;
-									FormLines[2].y = FormLines[3].y = SelectedFormsRect.bottom;
-									StateMap.set(StateFlag::SHOSTRTCH);
-									strtchbox();
-									FormMoveDelta.x = ((SelectedFormsRect.right - SelectedFormsRect.left) >> 1);
-									FormMoveDelta.y = ((SelectedFormsRect.bottom - SelectedFormsRect.top) >> 1);
-									StateMap.set(StateFlag::MOVFRMS);
-									StateMap.set(StateFlag::FUNSCLP);
-								}
-								else {
-
-									ClipFormHeader = static_cast<FORMCLIP *>(ClipPointer);
-									if (ClipFormHeader->clipType == CLP_FRM) {
-
-										FormMoveDelta.x = FormMoveDelta.y = 0;
-										StateMap.set(StateFlag::FUNCLP);
-										ClosestFormToCursor = FormIndex;
-										fvars(FormIndex);
-										frmcpy(&FormList[FormIndex], &ClipFormHeader->form);
-										FormList[FormIndex].attribute = (FormList[FormIndex].attribute&NFRMLMSK) | (ActiveLayer << 1);
-										SelectedForm->vertices = adflt(FormList[FormIndex].vertexCount);
-										CurrentFormVertices = convert_ptr<fPOINT *>(&ClipFormHeader[1]);
-										mvflpnt(&SelectedForm->vertices[0], &CurrentFormVertices[0], SelectedForm->vertexCount);
-										guides = convert_ptr<SATCON *>(&CurrentFormVertices[SelectedForm->vertexCount]);
-										if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
-
-											SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
-											mvsatk(&SelectedForm->satinOrAngle.guide[0], &guides[0], SelectedForm->satinGuideCount);
-										}
-										clipData = convert_ptr<fPOINT *>(&guides[0]);
-										clipCount = 0;
-										if (isclpx(FormIndex)) {
-
-											SelectedForm->angleOrClipData.clip = adclp(SelectedForm->lengthOrCount.clipCount);
-											mvflpnt(SelectedForm->angleOrClipData.clip, clipData, SelectedForm->lengthOrCount.clipCount);
-											clipCount += SelectedForm->lengthOrCount.clipCount;
-										}
-										if (iseclpx(FormIndex)) {
-
-											clipData = convert_ptr<fPOINT *>(&clipData[clipCount]);
-											SelectedForm->borderClipData = adclp(SelectedForm->clipEntries);
-											mvflpnt(SelectedForm->borderClipData, clipData, SelectedForm->clipEntries);
-											clipCount += SelectedForm->clipEntries;
-										}
-										textureSource = convert_ptr<TXPNT *>(&clipData[clipCount]);
-										if (istx(FormIndex)) {
-											SelectedForm->fillInfo.texture.index = TextureIndex;
-											textureDestination = adtx(SelectedForm->fillInfo.texture.count);
-											MoveMemory(textureDestination, textureSource, SelectedForm->fillInfo.texture.count * sizeof(TXPNT));
-										}
-									}
-									GlobalUnlock(ClipMemory);
-									StateMap.set(StateFlag::INIT);
-									NewFormVertexCount = SelectedForm->vertexCount;
-									if (SelectedForm->type != FRMLINE)
-										NewFormVertexCount++;
-									unfrm();
-									duzrat();
-									setmfrm();
-									StateMap.set(StateFlag::SHOFRM);
-									dufrm();
-								}
-							}
-							CloseClipboard();
-						}
-						else {
-
-							Clip = RegisterClipboardFormat(PcdClipFormat);
-							ClipMemory = GetClipboardData(Clip);
-							if (ClipMemory) {
-
-								redclp();
-								clpbox();
-								StateMap.set(StateFlag::CLPSHO);
-							}
-							CloseClipboard();
-						}
-					}
-					else
-						closPnt();
-					break;
-
-				case 'C':
-
-					if (GetKeyState(VK_CONTROL) & 0X8000)
-						duclip();
-					else {
-
-						if (GetKeyState(VK_SHIFT) & 0X8000) {
-
-							StateMap.reset(StateFlag::CNV2FTH);
-							ribon();
-						}
-						else {
-
-							StateMap.reset(StateFlag::HIDSTCH);
-							StateMap.set(StateFlag::IGNTHR);
-							rebox();
-							StateMap.reset(StateFlag::IGNTHR);
-							StateMap.set(StateFlag::RESTCH);
-						}
-					}
-					break;
-
-				case VK_HOME:
-
-					if (GetKeyState(VK_SHIFT) & 0X8000 && GetKeyState(VK_CONTROL) & 0X8000) {
-
-						if (StateMap.testAndReset(StateFlag::SELBOX)) {
-
-							GroupStitchIndex = 0;
-							StateMap.set(StateFlag::GRPSEL);
-						}
-						else {
-
-							if (StateMap.test(StateFlag::GRPSEL)) {
-
-								if (GroupStitchIndex > ClosestPointIndex)
-									ClosestPointIndex = 0;
-								else
-									GroupStitchIndex = 0;
-							}
-							else {
-
-								StateMap.set(StateFlag::SELBOX);
-								StateMap.set(StateFlag::RESTCH);
-							}
-						}
-						grpAdj();
-						redraw(ColorBar);
-						return 1;
-					}
-					if (GetKeyState(VK_SHIFT) & 0X8000) {
-
-						if (StateMap.testAndReset(StateFlag::SELBOX)) {
-
-							StateMap.set(StateFlag::GRPSEL);
-							iColor = pt2colInd(ClosestPointIndex);
-						}
-						else
-							iColor = pt2colInd(GroupStitchIndex);
-						iColor--;
-						GroupStitchIndex = ColorChangeTable[iColor].stitchIndex;
-						grpAdj();
-						redraw(ColorBar);
-					}
-					else {
-
-						if (GetKeyState(VK_CONTROL) & 0X8000) {
-
-							stch2px1(0);
-							endpnt();
-							StateMap.reset(StateFlag::BAKEND);
-							StateMap.set(StateFlag::RESTCH);
-						}
-						else {
-
-							if (StateMap.test(StateFlag::SELBOX)) {
-
-								iColor = pt2colInd(ClosestPointIndex);
-								if (iColor)
-									iColor--;
-								ClosestPointIndex = ColorChangeTable[iColor].stitchIndex;
-							}
-							else {
-
-								if (StateMap.test(StateFlag::LENSRCH)) {
-
-									setsrch(SmallestStitchIndex);
-									return 1;
-								}
-								else
-									ClosestPointIndex = 0;
-							}
-							movbox();
-						}
-					}
-					break;
-
-				case VK_END:
-
-					if (GetKeyState(VK_SHIFT) & 0X8000 && GetKeyState(VK_CONTROL) & 0X8000) {
-
-						if (StateMap.testAndReset(StateFlag::SELBOX)) {
-
-							GroupStitchIndex = PCSHeader.stitchCount - 1;
-							StateMap.set(StateFlag::GRPSEL);
-						}
-						else {
-
-							if (StateMap.test(StateFlag::GRPSEL)) {
-
-								if (GroupStitchIndex > ClosestPointIndex)
-									GroupStitchIndex = PCSHeader.stitchCount - 1;
-								else
-									ClosestPointIndex = PCSHeader.stitchCount - 1;
-							}
-							else {
-
-								StateMap.set(StateFlag::SELBOX);
-								ClosestPointIndex = PCSHeader.stitchCount - 1;
-								StateMap.set(StateFlag::RESTCH);
-								return 1;
-							}
-						}
-						grpAdj();
-						redraw(ColorBar);
-						break;
-					}
-					if (GetKeyState(VK_SHIFT) & 0X8000) {
-
-						if (StateMap.testAndReset(StateFlag::SELBOX)) {
-
-							StateMap.set(StateFlag::GRPSEL);
-							iColor = pt2colInd(ClosestPointIndex);
-						}
-						else
-							iColor = pt2colInd(GroupStitchIndex);
-						GroupStitchIndex = ColorChangeTable[iColor].stitchIndex - 1;
-						grpAdj();
-						redraw(ColorBar);
-					}
-					else {
-
-						if (GetKeyState(VK_CONTROL) & 0X8000) {
-
-							stch2px1(PCSHeader.stitchCount - 1);
-							endpnt();
-							StateMap.set(StateFlag::BAKEND);
-							StateMap.set(StateFlag::RESTCH);
-						}
-						else {
-
-							if (StateMap.test(StateFlag::SELBOX)) {
-
-								iColor = pt2colInd(ClosestPointIndex);
-								ClosestPointIndex = ColorChangeTable[iColor].stitchIndex - 1;
-							}
-							else {
-
-								if (StateMap.test(StateFlag::LENSRCH)) {
-
-									setsrch(LargestStitchIndex);
-									return 1;
-								}
-								else
-									ClosestPointIndex = PCSHeader.stitchCount - 1;
-							}
-							movbox();
-						}
-					}
-					break;
-
-				case VK_RIGHT:
-
-					fvars(ClosestFormToCursor);
-					if (GetKeyState(VK_SHIFT) & 0X8000) {
-
-						if (StateMap.test(StateFlag::FPSEL)) {
-
-							if (StateMap.test(StateFlag::PSELDIR)) {
-
-								++SelectedFormVertices.vertexCount %= VertexCount;
-								SelectedFormVertices.finish = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % VertexCount;
-							}
-							else {
-
-								if (SelectedFormVertices.vertexCount) {
-
-									SelectedFormVertices.vertexCount--;
-									SelectedFormVertices.finish = (SelectedFormVertices.start + VertexCount - SelectedFormVertices.vertexCount) % VertexCount;
-								}
-								else {
-
-									SelectedFormVertices.vertexCount = 1;
-									StateMap.set(StateFlag::PSELDIR);
-									SelectedFormVertices.finish = (SelectedFormVertices.start + 1) % VertexCount;
-								}
-							}
-							setpsel();
-						}
-						else {
-
-							if (StateMap.testAndReset(StateFlag::FRMPSEL)) {
-
-								unpsel();
-								SelectedFormVertices.start = ClosestVertexToCursor;
-								SelectedFormVertices.form = ClosestFormToCursor;
-								SelectedFormVertices.vertexCount = 1;
-								SelectedFormVertices.finish = (SelectedFormVertices.start + 1) % VertexCount;
-								StateMap.set(StateFlag::PSELDIR);
-								setpsel();
-							}
-							else {
-
-								StateMap.reset(StateFlag::LENSRCH);
-								StateMap.reset(StateFlag::FORMSEL);
-								if (StateMap.testAndReset(StateFlag::SELBOX)) {
-
-									if (ClosestPointIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
-
-										StateMap.set(StateFlag::GRPSEL);
-										GroupStitchIndex = ClosestPointIndex + 1;
-									}
-								}
-								else {
-
-									if (GroupStitchIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
-
-										GroupStitchIndex++;
-										nuAct(GroupStitchIndex);
-									}
-								}
-								grpAdj();
-								redraw(ColorBar);
-							}
-						}
-					}
-					else {
-
-						if (GetKeyState(VK_CONTROL) & 0X8000)
-							nudgfn(IniFile.cursorNudgeStep, 0);
-						else {
-
-							if (StateMap.test(StateFlag::LENSRCH)) {
-
-								longer();
-								StateMap.set(StateFlag::RESTCH);
-							}
-							else {
-
-								if (StateMap.test(StateFlag::FRMPSEL)) {
-
-									fvars(ClosestFormToCursor);
-									ClosestVertexToCursor = nxt(ClosestVertexToCursor);
-									ritnum(STR_NUMPNT, ClosestVertexToCursor);
-									ritfcor(&FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
-									shftflt(FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
-									StateMap.set(StateFlag::RESTCH);
-								}
-								else {
-
-									if (StateMap.test(StateFlag::SELBOX)) {
-
-										if (ClosestPointIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
-											ClosestPointIndex++;
-										movbox();
-										return 1;
-									}
-									if (StateMap.test(StateFlag::GRPSEL)) {
-
-										if (GroupStitchIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
-
-											GroupStitchIndex++;
-											grpAdj();
-											redraw(ColorBar);
-										}
-									}
-								}
-							}
-						}
-					}
-					break;
-
-				case VK_LEFT:
-
-					if (GetKeyState(VK_SHIFT) & 0X8000) {
-
-						if (StateMap.test(StateFlag::FPSEL)) {
-
-							if (!StateMap.test(StateFlag::PSELDIR)) {
-
-								++SelectedFormVertices.vertexCount %= VertexCount;
-								SelectedFormVertices.finish = (SelectedFormVertices.start + VertexCount - SelectedFormVertices.vertexCount) % VertexCount;
-							}
-							else {
-
-								if (SelectedFormVertices.vertexCount) {
-
-									SelectedFormVertices.vertexCount--;
-									SelectedFormVertices.finish = (SelectedFormVertices.start + VertexCount - SelectedFormVertices.vertexCount) % VertexCount;
-								}
-								else {
-
-									SelectedFormVertices.vertexCount = 1;
-									SelectedFormVertices.finish = (SelectedFormVertices.start + VertexCount - 1) % VertexCount;
-									StateMap.reset(StateFlag::PSELDIR);
-								}
-							}
-							setpsel();
-						}
-						else {
-
-							if (StateMap.testAndReset(StateFlag::FRMPSEL)) {
-
-								unpsel();
-								SelectedFormVertices.start = ClosestVertexToCursor;
-								SelectedFormVertices.vertexCount = 1;
-								StateMap.reset(StateFlag::PSELDIR);
-								setpsel();
-							}
-							else {
-
-								StateMap.reset(StateFlag::LENSRCH);
-								StateMap.reset(StateFlag::FORMSEL);
-								if (StateMap.testAndReset(StateFlag::SELBOX)) {
-
-									StateMap.set(StateFlag::GRPSEL);
-									GroupStitchIndex = ClosestPointIndex - 1;
-								}
-								else
-									if (GroupStitchIndex) {
-
-										GroupStitchIndex--;
-										nuAct(GroupStitchIndex);
-									}
-								grpAdj();
-								redraw(ColorBar);
-							}
-						}
-					}
-					else {
-
-						if (GetKeyState(VK_CONTROL) & 0X8000)
-							nudgfn(-IniFile.cursorNudgeStep, 0);
-						else {
-
-							if (StateMap.test(StateFlag::LENSRCH)) {
-
-								shorter();
-								StateMap.set(StateFlag::RESTCH);
-							}
-							else {
-
-								if (StateMap.test(StateFlag::FRMPSEL)) {
-
-									fvars(ClosestFormToCursor);
-									ClosestVertexToCursor = prv(ClosestVertexToCursor);
-									ritnum(STR_NUMPNT, ClosestVertexToCursor);
-									ritfcor(&FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
-									shftflt(FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
-									StateMap.set(StateFlag::RESTCH);
-								}
-								else {
-
-									if (StateMap.test(StateFlag::SELBOX)) {
-
-										if (ClosestPointIndex)
-											ClosestPointIndex--;
-										movbox();
-										return 1;
-									}
-									if (StateMap.test(StateFlag::GRPSEL)) {
-
-										if (GroupStitchIndex) {
-
-											GroupStitchIndex--;
-											grpAdj();
-											redraw(ColorBar);
-										}
-									}
-								}
-							}
-						}
-					}
-					break;
-
-				case 'G':
-
-					mark();
-					break;
-
-				case 'M':
-
-					if (GetKeyState(VK_CONTROL) & 0x8000)
-						pntmrk();
-					else {
-
-						if (GetKeyState(VK_SHIFT) & 0X8000)
-							dumrk(UnzoomedRect.x / 2, UnzoomedRect.y / 2);
-						else {
-
-							if (px2stch())
-								dumrk(SelectedPoint.x, SelectedPoint.y);
-						}
-						StateMap.set(StateFlag::RESTCH);
-					}
-					break;
-
-				case 'L':
-
-					if (GetKeyState(VK_SHIFT) & 0x8000)
-						delstch();
-					else
-						fcntr();
-					break;
-
-				case VK_DELETE:
-
-					if (chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15]))
-						delcol();
-					else
-						delet();
-					break;
+				tst();
 			}
 			break;
 
-		case WM_COMMAND:
+		case VK_INSERT:
 
-			unmsg();
-			if (StateMap.test(StateFlag::FORMSEL))
-				fvars(ClosestFormToCursor);
-			for (iVersion = 0; iVersion < OLDNUM; iVersion++) {
+			inscol();
+			break;
 
-				if (Msg.wParam == LRUMenuId[iVersion]) {
+		case 0x6d:		//keypad -
 
-					strcpy_s(WorkingFileName, IniFile.prevNames[iVersion]);
-					StateMap.set(StateFlag::REDOLD);
-					nuFil();
+			toglup();
+			break;
+
+		case 0xbd:		//-
+
+			StateMap.reset(StateFlag::CNTRH);
+			StateMap.reset(StateFlag::CNTRV);
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				StateMap.set(StateFlag::CNTRV);
+			else {
+				if (GetKeyState(VK_CONTROL) & 0X8000)
+					StateMap.set(StateFlag::CNTRH);
+			}
+			cntrx();
+			break;
+
+		case 0xbf:		///forward slash /
+
+			frmnum();
+			break;
+
+		case 0xbb:		//=
+
+			shrnk();
+			break;
+
+		case 0x21:		//page up
+
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				redup();
+			else
+				rotagain();
+			break;
+
+		case 0x22:		//page down
+
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				bakdup();
+			else
+				bakagain();
+			break;
+
+		case 0xde:	//'
+
+			desiz();
+			break;
+
+		case 0xdb:		//[
+
+#if LANG==ENG || LANG==HNG
+
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				selfrm0();
+			else
+#endif
+				ungrplo();
+			break;
+
+		case 0xdd:		//]
+
+#if LANG==ENG || LANG==HNG
+
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				selfrmx();
+			else
+#endif
+				ungrphi();
+			break;
+
+		case 0xba:		//semicolon
+
+			movmrk();
+			break;
+
+		case VK_DOWN:
+
+			if (GetKeyState(VK_CONTROL) & 0X8000)
+				nudgfn(0, -IniFile.cursorNudgeStep);
+			else
+				seldwn();
+			break;
+
+		case VK_UP:
+
+			if (GetKeyState(VK_CONTROL) & 0X8000)
+				nudgfn(0, IniFile.cursorNudgeStep);
+			else
+				selup();
+			break;
+
+		case 0xbe:		//period
+
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				setfilend();
+			else
+				setmov();
+			break;
+
+		case 'W':
+
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				crop();
+			else {
+				if (GetKeyState(VK_CONTROL) & 0X8000)
+					pes2crd();
+				else
+					insat();
+			}
+			break;
+
+		case 'E':
+
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				dutxtfil();
+			else
+				infrm();
+			break;
+
+		case VK_F2:
+
+			snap();
+			break;
+
+		case VK_F1:
+
+			help();
+			break;
+
+		case VK_F3:
+
+			if (GetKeyState(VK_CONTROL) & 0X8000)
+				srtfrm();
+			else {
+				if (GetKeyState(VK_SHIFT) & 0X8000)
+					srtbyfrm();
+				else
+					fsort();
+			}
+			break;
+
+		case VK_F4:
+
+			rtrclp();
+			break;
+
+		case VK_F5:
+
+			filfrms();
+			break;
+
+		case VK_F6:
+
+			vuthrds();
+			break;
+
+		case VK_F7:
+
+			save();
+			break;
+
+		case VK_F8:
+
+			savAs();
+			break;
+
+		case VK_F9:
+
+			selCol();
+			break;
+
+		case VK_F11:
+
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				rembig();
+			else
+				duzero();
+			break;
+
+		case VK_F12:
+
+			if (GetKeyState(VK_CONTROL)&GetKeyState(VK_MENU) & 0X8000)
+				reldun();
+			else {
+#ifdef _DEBUG
+				if (GetKeyState(VK_SHIFT) & 0X8000)
+					dmpat();
+				else
+#endif
+					dun();
+			}
+			break;
+
+		case 'Y':
+
+			if (closfrm())
+				selfpnt();
+			break;
+
+		case 'O':
+
+			fop();
+			break;
+
+		case 'Z':
+
+			if (GetKeyState(VK_SHIFT) & 0X8000) {
+				ZoomFactor = ZoomMin;
+				zumin();
+			}
+			else {
+				if (GetKeyState(VK_CONTROL) & 0X8000)
+					bak();
+				else
+					zumin();
+			}
+			break;
+
+		case 'X':
+
+			if (GetKeyState(VK_CONTROL) & 0X8000)
+				cut();
+			else {
+				if (GetKeyState(VK_SHIFT) & 0X8000)
+					hidbit();
+				else
+					zumhom();
+			}
+			break;
+
+		case 'P':
+
+			prfmsg();
+			break;
+
+		case 'N':
+
+			if (GetKeyState(VK_CONTROL) & 0X8000)
+				nudsiz();
+			else {
+				if (GetKeyState(VK_SHIFT) & 0X8000)
+					pgdwn();
+				else {
+					StateMap.set(StateFlag::TRCUP);
+					trace();
 				}
 			}
-			wParameter = LOWORD(Msg.wParam);
-			if (wParameter > 40000 && wParameter < 40400)
-				undat();
-			switch (wParameter) {
+			break;
 
-				case ID_CHKOF: // view / Set / Data check / Off
+		case 'U':
 
-					chgchk(0);
-					break;
-
-				case ID_CHKON: // view / Set / Data check / On
-
-					chgchk(1);
-					break;
-
-				case ID_CHKREP: // view / Set / Data Check / Auto Repair on
-
-					chgchk(2);
-					break;
-
-				case ID_CHKREPMSG: // view / Set / Data Check / Auto Repair with Message
-
-					chgchk(3);
-					break;
-
-				case ID_REPAIR: // edit / Repair Data
-
-					repar();
-					break;
-
-				case ID_WARNOF: // set / Warn if edited
-
-					chgwrn();
-					break;
-
-				case ID_CLPSPAC: // set / Clipboard Fill  Spacing
-
-					setclpspac();
-					break;
-
-				case ID_FRMIND: // edit / Form Update / Indent
-
-					setfind();
-					break;
-
-				case ID_SETSIZ: // edit / Set / Design Size
-
-					nudsiz();
-					break;
-
-				case ID_TXFIL: // Fill / Texture Editor
-
-					dutxtfil();
-					break;
-
-				case ID_FRMHI: // edit / Form Update / Height
-
-					setfhi();
-					break;
-
-				case ID_FRMWID: // edit / Form Update / Width
-
-					setfwid();
-					break;
-
-				case ID_MAXFLEN: // edit / Form Update / Fill /  Maximum Stitch Length
-
-					setfmax();
-					break;
-
-				case ID_MINFLEN: // edit / Form Update / Fill /  Minimum Stitch Length
-
-					setfmin();
-					break;
-
-				case ID_MAXBLEN: // edit / Form Update / Border /  Maximum Stitch Length
-
-					setbmax();
-					break;
-
-				case ID_MINBLEN: // edit / Form Update / Border /  Minimum Stitch Length
-
-					setbmin();
-					break;
-
-				case ID_SETBSPAC: // edit / Form Update / Border /  Spacing
-
-					setbspac();
-					break;
-
-				case ID_SETBLEN: // edit / Form Update / Border /  Stitch Length
-
-					setblen();
-					break;
-
-				case ID_SETBCOL: // edit / Form Update / Border /  Color
-
-					setbcol();
-					break;
-
-				case ID_SETFCOL: // edit / Form Update / Fill /  Color
-
-					setfcol();
-					break;
-
-				case ID_SETUCOL: // edit / Form Update / Underlay /  Color
-
-					setucol();
-					break;
-
-				case ID_SETFANG: // edit / Form Update / Fill /  Angle
-
-					setfang();
-					break;
-
-				case ID_SETFSPAC: // edit / Form Update / Fill /  Spacing
-
-					setfspac();
-					break;
-
-				case ID_SETFLEN: // edit / Form Update / Fill /  Stitch Length
-
-					setflen();
-					break;
-
-				case ID_SETUANG: // edit / Form Update / Underlay /  Angle
-
-					sfuang();
-					break;
-
-				case ID_SETUSPAC: // edit / Form Update / Underlay /  Spacing
-
-					uspac();
-					break;
-
-				case ID_UNDLEN: // edit / Form Update / Underlay / Stitch Length
-
-					undlen();
-					break;
-
-				case ID_SETCWLK: // edit / Form Update / Center Walk / On
-
-					setcwlk();
-					break;
-
-				case ID_SETWLK: // edit / Form Update / Edge Walk /  On
-
-					setwlk();
-					break;
-
-				case ID_SETUND: // edit / Form Update / Underlay / On
-
-					setund();
-					break;
-
-				case ID_NOTCWLK: // edit / Form Update / Center Walk / Off
-
-					notcwlk();
-					break;
-
-				case ID_NOTWLK: // edit / Form Update / Edge Walk / Off
-
-					notwlk();
-					break;
-
-				case ID_NOTUND: // edit / Form Update / Underlay / Off
-
-					notund();
-					break;
-
-				case ID_SELUND: // edit / Select / Form Underlay Stitches
-
-					selfil(UNDMSK);
-					break;
-
-				case ID_SELWLK: // edit / Select / Form Edge Walk Stitches
-
-					selfil(WLKMSK);
-					break;
-
-				case ID_ALFRM: // edit / Select / All Forms
-
-					selalfrm();
-					break;
-
-				case ID_USPAC: // view / Set / Underlay / Spacing
-
-					setuspac();
-					break;
-
-				case ID_UANG: // view / Set / Underlay / Angle
-
-					setuang();
-					break;
-
-				case ID_USTCH: // view / Set / Underlay / Stitch Length
-
-					setulen();
-					break;
-
-				case ID_WIND: // view / Set / Underlay / Indent
-
-					setwlkind();
-					break;
-
-				case ID_FILSTRT: //Edit / Set / Fill Start Point
-
-					setfilstrt();
-					break;
-
-				case ID_FILEND: //Edit / Set / Fill End Point
-
-					setfilend();
-					break;
-
-				case ID_PES2CRD: // file / PES2Card
-
-					pes2crd();
-					break;
-
-				case ID_2FTHR: // edit / Convert / to Feather Ribbon
-
-					StateMap.set(StateFlag::CNV2FTH);
-					ribon();
-					break;
-
-				case ID_FETHR: // fill / Feather
-
-					fethr();
-					break;
-
-				case ID_FTHDEF: // edit / Set / Feather Defaults
-
-					dufdef();
-					break;
-
-				case ID_SRTF: // edit / Sort / by Form
-
-					srtfrm();
-					break;
-
-				case ID_FILCLPX: // fill / Border / Clipboard, Even
-
-					filclpx();
-					break;
-
-				case ID_FRMX: // view / Set / Form Cursor / Cross
-
-					frmcursel(1);
-					break;
-
-				case ID_FRMBOX: // view / Set / Form Cursor / Box
-
-					frmcursel(0);
-					break;
-
-				case ID_KNOTAT: // edit / Set / Knot at Selected Stitch
-
-					set1knot();
-					break;
-
-				case ID_STCHPIX: // view / Set / Point Size / Stitch Point Boxes
-
-					getstpix();;
-					break;
-
-				case ID_FRMPIX: // view / Set / Point Size / Form Point Triangles
-
-					getfrmpix();
-					break;
-
-				case ID_FRMPBOX: // view / Set / Point Size / Form Box
-
-					getfrmbox();
-					break;
-
-				case ID_CROP: // edit / Crop to Form
-
-					crop();
-					break;
-
-				case ID_BAKMRK: // view / Retrieve Mark
-
-					bakmrk();
-					break;
-
-				case ID_MARKESC: // view / Set / Retrieve Mark / Escape
-
-					UserFlagMap.set(UserFlag::MARQ);
-					qchk();
-					break;
-
-				case ID_MARKQ: // view / Set / Retrieve Mark / Q
-
-					UserFlagMap.reset(UserFlag::MARQ);
-					qchk();
-					break;
-
-				case ID_NUDGPIX: // view / Set / Nudge Pixels
-
-					getnpix();
-					break;
-
-				case ID_LINCHN: // fill / Border / Line chain
-
-					StateMap.set(StateFlag::LINCHN);
-					chain();
-					break;
-
-				case ID_OPNCHN: // fill / Border / Open chain
-
-					StateMap.reset(StateFlag::LINCHN);
-					chain();
-					break;
-
-				case ID_CLOSE: // file / Close
-
-					filclos();
-					break;
-
-				case ID_DELMAP: // file / Remove Bitmap
-
-					delmap();
-					break;
-
-				case ID_BLAK: // edit / Trace / Reset Form Pixels
-
-					blak();
-					break;
-
-				case ID_SAVMAP: // file / Save Bitmap
-
-					savmap();
-					break;
-
-				case ID_TRDIF: // edit / Trace / Find Edges
-
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				pgup();
+			else {
+				if (GetKeyState(VK_CONTROL) & 0X8000)
 					trdif();
-					break;
+				else {
+					StateMap.reset(StateFlag::TRCUP);
+					trace();
+				}
+			}
+			break;
 
-				case ID_TRACEDG: // edit / Trace / Show Traced Edges
+		case 'H':
 
-					tracedg();
-					break;
-
-				case ID_TRCSEL: // edit / Trace / Select Colors
-
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				pglft();
+			else {
+				if (GetKeyState(VK_CONTROL) & 0X8000)
 					trcsel();
-					break;
-
-				case ID_TRACE: // edit / Trace / Trace Mode
-
-					trinit();
-					break;
-
-				case ID_FLOK: // file / Locking
-
-					lock();
-					break;
-
-				case ID_ROTAUXON: // view / Set / Rotate Machine File / On
-
-					rotauxsel(1);
-					break;
-
-				case ID_ROTAUXOFF: // view / Set / Rotate Machine File / Off
-
-					rotauxsel(0);
-					break;
-
-				case ID_FRM2COL: // edit / Set / Form Color to  stitch Color
-
-					col2frm();
-					break;
-
-				case ID_SNAP2GRD: // edit / Snap / to Grid
-
-					gsnap();
-					break;
-
-				case ID_FIL2SEL_ON: // view / Set / Fill at Select / On
-
-					fil2sel(1);
-					break;
-
-				case ID_FIL2SEL_OFF: // view / Set / Fill at Select / Off
-
-					fil2sel(0);
-					break;
-
-				case ID_OVRLAY: // file / Overlay
-
-					ovrlay();
-					break;
-
-				case ID_GRDHI: // view / Set / Grid Mask / High
-
-					setgrd(HIGRD);
-					break;
-
-				case ID_GRDMED: // view / Set / Grid Mask / Medium
-
-					setgrd(MEDGRD);
-					break;
-
-				case ID_GRDEF: // view / Set / Grid Mask / Default
-
-					setgrd(DEFGRD);
-					break;
-
-				case ID_GRDRED: // view / Set / Grid Mask / UnRed
-
-					setgrd(REDGRD);
-					break;
-
-				case ID_GRDBLU: // view / Set / Grid Mask / UnBlue
-
-					setgrd(BLUGRD);
-					break;
-
-				case ID_GRDGRN: // view / Set / Grid Mask / UnGreen
-
-					setgrd(GRNGRD);
-					break;
-
-				case ID_RETRACE: // edit / Retrace
-
-					retrac();
-					break;
-
-				case ID_DUBFIL: // fill / Border / Double
-
-					dubfil();
-					break;
-
-				case ID_HORCLP: // fill / Clipboard / Horizontal
-
-					if (StateMap.test(StateFlag::FORMSEL) || SelectedFormCount)
-						savdo();
-					horclp();
-					break;
-
-				case ID_ANGCLP: // fill / Clipboard / Angle
-
-					if (StateMap.test(StateFlag::FORMSEL) || SelectedFormCount)
-						savdo();
-					angclp();
-					break;
-
-				case ID_VRTCLP: // fill / Clipboard / Vertical
-
-					if (StateMap.test(StateFlag::FORMSEL) || SelectedFormCount)
-						savdo();
-					vrtclp();
-					break;
-
-				case ID_LINBEXACT: // view / Set / Line Border Spacing / Exact
-
-					UserFlagMap.reset(UserFlag::LINSPAC);
-					linbmen();
-					break;
-
-				case ID_LINBEVEN: // view / Set / Line Border Spacing / Even
-
-					UserFlagMap.set(UserFlag::LINSPAC);
-					linbmen();
-					break;
-
-				case ID_BSAVON: // view / Set / PCS Bitmap Save / On
-
-					pcsbsavon();
-					break;
-
-				case ID_BSAVOF: // view / Set / PCS Bitmap Save / Off
-
-					pcsbsavof();
-					break;
-
-				case ID_KNOTON: // view / Knots / On
-
-					shoknot();
-					break;
-
-				case ID_KNOTOF: // view / Knots / Off
-
-					hidknot();
-					break;
-
-				case ID_DELKNOT: // edit / Delete / Knots
-
-					delknot();
-					break;
-
-				case ID_RSTNEDL: // view / Set / Needle Cursor / Off
-
-					nedof();
-					break;
-
-				case ID_SETNEDL: // view / Set / Needle Cursor / On
-
-					nedon();
-					break;
-
-				case ID_STCHS2FRM: // edit / Convert / Stitches to Form
-
-					stchs2frm();
-					break;
-
-				case ID_SPLTFRM: // edit / Split Form
-
-					spltfrm();
-					break;
-
-				case ID_UNBEAN: // edit / Convert / from Bean to Line
-
-					debean();
-					break;
-
-				case ID_DUBEAN: // edit / Convert / to Bean
-
-					dubean();
-					break;
-
-				case ID_SRTBF: // edit / Sort / by Color then Form
-
-					srtbyfrm();
-					break;
-
-				case ID_CENTIRE: // edit / Center / Entire Design
-
-					centir();
-					break;
-
-				case ID_CNTRX: // edit / Center / Both
-
-					StateMap.reset(StateFlag::CNTRH);
-					StateMap.reset(StateFlag::CNTRV);
-					cntrx();
-					break;
-
-				case ID_CNTRH: // edit / Center / Horizontal
-
-					StateMap.reset(StateFlag::CNTRH);
-					StateMap.set(StateFlag::CNTRV);
-					cntrx();
-					break;
-
-				case ID_CNTRV: // edit / Center / Vertical
-
-					StateMap.set(StateFlag::CNTRH);
-					StateMap.reset(StateFlag::CNTRV);
-					cntrx();
-					break;
-
-				case ID_FRMNUM: // edit / Set / Form Number
-
-					frmnum();
-					break;
-
-				case ID_REFILF: // fill / Refill
-
-					filfrms();
-					break;
-
-				case ID_MRKPNT: // edit / Set / Zoom Mark at Selected Point
-
-					pntmrk();
-					break;
-
-				case ID_ROTSEG: // edit / Set / Rotation / Segments
-
-					rotseg();
-					break;
-
-				case ID_ROTMRK: // edit / Set / Rotation / Angle from Mark
-
-					rotmrk();
-					break;
-
-				case ID_MRKCNTR: // edit / Set / Zoom Mark at Center
-
-					dumrk(UnzoomedRect.x / 2, UnzoomedRect.y / 2);
-					StateMap.set(StateFlag::RESTCH);
-					break;
-
-				case ID_SETROT: // edit / Set / Rotation / Angle
-
-					setrang();
-					break;
-
-				case ID_SETPREF: // view / Set / Default Preferences
-
-					defpref();
-					break;
-
-				case ID_SHRINK: // edit / Shrink Clipboard Border
-
-					shrnk();
-					break;
-
-				case ID_DUPAGAIN: // edit / Rotate / and Duplicate again
-
-					redup();
-					break;
-
-				case ID_CLPADJ: // edit / Set / Range Ends for Clipboard Fills
-
-					clpadj();
-					break;
-
-				case ID_DELTOT: // edit / Delete / All Forms and Stitches
-
-					deltot();
-					break;
-
-				case ID_AUXPCS: // view / Set / Machine File Type / Pfaff PCS
-
-					setpcs();
-					break;
-
-				case ID_AUXDST: // view / Set / Machine File Type / Tajima DST
-
-					setdst();
-					break;
-
-				case ID_ABOUT: // view / About ThrEd4
-
-					tabmsg(IDS_CPYRIT);
-					break;
-
-				case ID_RIBON: // edit / Convert / to Satin Ribbon
-
-					StateMap.reset(StateFlag::CNV2FTH);
-					ribon();
-					break;
-
-				case ID_DESIZ: // view / Design Information
-
-					desiz();
-					break;
-
-				case ID_HLP: // help
-
-					help();
-					break;
-
-				case ID_CNTR: // edit / Center / Forms
-
-					fcntr();
-					break;
-
-				case ID_INSFIL: // file / Insert
-
-					StateMap.reset(StateFlag::IGNORINS);
-					insfil();
-					break;
-
-				case ID_SELALSTCH: // edit / Select / All Stitches
-
-					selalstch();
-					break;
-
-				case ID_UNGRPLO: // edit / Ungroup / First
-
-					ungrplo();
-					break;
-
-				case ID_UNGRPHI: // edit / Ungroup / Last
-
-					ungrphi();
-					break;
-
-				case ID_CONTF: // fill / Contour
-
-					contfil();
-					break;
-
-				case ID_THUM: // file / Thumbnails
-
-					thumnail();
-					break;
-
-				case ID_PICOT: // fill / Border / Picot
-
-					picot();
-					break;
-
-				case ID_FILBUT: // fill / Border / Buttonhole
-
-					bhol();
-					break;
-
-				case ID_REMBIG: // edit / Delete / Large Stitches
-
-					rembig();
-					break;
-
-				case ID_VUSELTHRDS: // view / Show Threads for Selected Color
-
-					vuselthr();
-					break;
-
-				case ID_VUTHRDS: // view / Show Threads
-
-					vuthrds();
-					break;
-
-				case ID_MOVMRK: // edit / Move / to Mark
-
-					movmrk();
-					break;
-
-				case ID_SELFIL: // edit / Select / Form Fill Stitches
-
-					selfil(FRMFIL);
-					break;
-
-				case ID_SELBRD: // edit / Select / Form Border Stitches
-
-					selfil(FRMBFIL);
-					break;
-
-				case ID_SELAP: // edit / Select / Form Applique Stitches
-
-					selfil(FRMAPFIL);
-					break;
-
-				case ID_SELFSTCHS: // edit / Select / Form Stitches
-
-					selalfil();
-					break;
-
-				case ID_SETMRK: // edit / Set / Order Mark
-
-					setmov();
-					break;
-
-				case ID_DELFRE: // edit / Delete / Free Stitches
-
-					delfre();
-					break;
-
-				case ID_SELAL: // edit / Select / All Forms and Stitches
-
-					selal();
-					break;
-
-				case ID_REFILAL: // edit / Refill All
-
-					refilal();
-					break;
-
-				case ID_CHK: // edit / Check Range
-
-					chkrng(&StitchRangeSize);
-					StateMap.set(StateFlag::RESTCH);
-					break;
-
-				case ID_RTRVCLP: // edit / Retrieve Clipboard Stitches
-
-					rtrclp();
-					break;
-
-				case ID_SORT: // edit / Sort / Auto
-
-					fsort();
-					break;
-
-				case ID_LAYMOV0: // edit / Move to Layer / 0
-
-					movlayr(0);
-					break;
-
-				case ID_LAYMOV1: // edit / Move to Layer / 1
-
-					movlayr(2);
-					break;
-
-				case ID_LAYMOV2: // edit / Move to Layer / 2
-
-					movlayr(4);
-					break;
-
-				case ID_LAYMOV3: // edit / Move to Layer / 3
-
-					movlayr(6);
-					break;
-
-				case ID_LAYMOV4: // edit / Move to Layer / 4
-
-					movlayr(8);
-					break;
-
-				case ID_LAYCPY0: // edit / Copy to Layer / 0
-
-					cpylayr(0);
-					break;
-
-				case ID_LAYCPY1: // edit / Copy to Layer / 1
-
-					cpylayr(2);
-					break;
-
-				case ID_LAYCPY2: // edit / Copy to Layer / 2
-
-					cpylayr(4);
-					break;
-
-				case ID_LAYCPY3: // edit / Copy to Layer / 3
-
-					cpylayr(6);
-					break;
-
-				case ID_LAYCPY4: // edit / Copy to Layer / 4
-
-					cpylayr(8);
-					break;
-
-				case ID_LA: // all (Show all layers)
-
-					nulayr(0);
-					break;
-
-				case ID_L1: // 1 (Show layer 1 only)
-
-					nulayr(1);
-					break;
-
-				case ID_L2: // 2 (Show layer 2 only)
-
-					nulayr(2);
-					break;
-
-				case ID_L3: // 3 (Show layer 3 only)
-
-					nulayr(3);
-					break;
-
-				case ID_L4: // 4 (Show layer 4 only)
-
-					nulayr(4);
-					break;
-
-				case ID_ROTDUP: // edit / Rotate / and Duplicate
-
-					rotdup();
-					break;
-
-				case ID_ROTAGAIN: // edit / Rotate / Again
-
-					rotagain();
-					break;
-
-				case ID_ROTCMD: // edit / Rotate / Command
-
-					rotcmd();
-					break;
-
-				case ID_DELFRMS: // edit / Delete / All Forms
-
-					delfrms();
-					rstAll();
-					StateMap.set(StateFlag::RESTCH);
-					break;
-
-				case ID_SNAP2: // edit / Snap / Together
-
-					snap();
-					break;
-
-				case ID_CLPFIL: // fill / Clipboard / Fan
-
-					clpfil();
-					break;
-
-				case ID_FLPORD: // edit / Flip / Order
-
-					flpord();
-					break;
-
-				case ID_FRMOF: // frm+
-
-					if (GetKeyState(VK_SHIFT) & 0X8000)
-						tglhid();
+				else
+					blak();
+			}
+			break;
+
+		case 'J':
+
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				pgrit();
+			else
+				refilal();
+			break;
+
+		case 0xbc:		//comma
+
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				setfilstrt();
+			else {
+				savdo();
+				join();
+			}
+			break;
+
+		case 'B':
+
+			if (GetKeyState(VK_CONTROL) & 0X8000)
+				redo();
+			else {
+				if (GetKeyState(VK_SHIFT) & 0X8000)
+					bakmrk();
+				else
+					bak();
+			}
+			break;
+
+		case 'D':
+
+			if (GetKeyState(VK_SHIFT) & 0X8000) {
+				if (StateMap.test(StateFlag::FORMSEL)) {
+					PostMessage(ThrEdWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
+					keybd_event('F', 0, 0, 0);
+				}
+			}
+			else
+				satsel();
+			break;
+
+		case 'K':
+
+			if (GetKeyState(VK_MENU)&GetKeyState(VK_CONTROL) & 0X8000)
+				setknots();
+			else {
+				if (GetKeyState(VK_SHIFT) & 0X8000)
+					tglhid();
+				else {
+					if (GetKeyState(VK_CONTROL) & 0X8000)
+						set1knot();
 					else
 						tglfrm();
-					break;
+				}
+			}
+			break;
 
-				case ID_MV2BAK: // edit / move / to End
+		case 'A':
 
-					mv2b();
-					break;
+			if (GetKeyState(VK_CONTROL) & 0X8000)
+				selalstch();
+			else {
+				if (GetKeyState(VK_SHIFT) & 0X8000)
+					selal();
+				else
+					zumout();
+			}
+			break;
 
-				case ID_MV2FRNT: // edit / move / to Start
+		case VK_SPACE:
 
-					mv2f();
-					break;
+			if (StateMap.testAndFlip(StateFlag::INSRT)) {
+				ReleaseCapture();
+				StateMap.set(StateFlag::RESTCH);
+			}
+			else
+				istch();
+			unbox();
+			if (StateMap.testAndReset(StateFlag::GRPSEL) || StateMap.testAndReset(StateFlag::FORMSEL))
+				StateMap.set(StateFlag::RESTCH);
+			break;
 
-				case ID_PERP: // fill / Border / Perpendicular Satin
+		case 'T':
 
-					if (StateMap.test(StateFlag::FORMSEL) || SelectedFormCount)
-						savdo();
-					prpbrd(LineSpacing);
-					break;
+			if (GetKeyState(VK_SHIFT) & 0x8000)
+				retrac();
+			else {
+				if (GetKeyState(VK_CONTROL) & 0x8000)
+					trinit();
+				else
+					thumnail();
+			}
+			break;
 
-				case ID_PURGDIR: // file / Delete Backups / All backups in the selected directory
+		case 'R':
 
-					purgdir();
-					break;
+			if (GetKeyState(VK_CONTROL)&GetKeyState(VK_SHIFT) & 0x8000) {
+				movStch();
+				unbox();
+				StateMap.set(StateFlag::RESTCH);
+			}
+			else {
+				if (GetKeyState(VK_CONTROL) & 0x8000) {
+					setrang();
+					return 1;
+				}
+				if (GetKeyState(VK_SHIFT) & 0x8000) {
+					rotmrk();
+					return 1;
+				}
+				else
+					rotseg();
+			}
+			break;
 
-				case ID_PURG: // file / Delete Backups / Backups for the selected file
+		case VK_TAB:
 
-					purg();
-					break;
+			rot();
+			break;
 
-				case ID_VUBAK: // view / Backups
+		case 'S':
 
-					vubak();
-					break;
+			if (GetKeyState(VK_CONTROL) & 0X8000) {
+				colchk();
+				save();
+			}
+			else {
+				if (GetKeyState(VK_SHIFT) & 0X8000)
+					gsnap();
+				else
+					zumshft();
+			}
+			break;
 
-				case ID_DELETE: // edit / Delete / Selected
+		case 'F':
 
-					delet();
-					break;
-
-				case ID_FLIPH: // edit / Flip / Horizontal
-
-					fliph();
-					break;
-
-				case ID_FLIPV: // edit / Flip / Vertical
-
-					flipv();
-					break;
-
-				case ID_FILANG: // fill / Angle 
-
-					if (StateMap.test(StateFlag::FORMSEL))
-						savdo();
-					filangl();
-					break;
-
-				case ID_PREF: // pref
-
-					prfmsg();
-					break;
-
-				case ID_BOLD: // fill / Border / Bean
-
-					if (StateMap.test(StateFlag::FORMSEL) || SelectedFormCount)
-						savdo();
-					dubold();
-					break;
-
-				case ID_ADEND: // add
-
-					stch2px1(PCSHeader.stitchCount - 1);
-					endpnt();
-					StateMap.set(StateFlag::BAKEND);
-					StateMap.set(StateFlag::RESTCH);
-					break;
-
-				case ID_SETAP: // view / Set / Applique Color
-
-					setap();
-					break;
-
-				case ID_APLIQ: // fill / Border / Applique
-
-					if (StateMap.test(StateFlag::FORMSEL))
-						savdo();
-					apliq();
-					break;
-
-				case ID_SATBRD: // fill / Border / Angle Satin
-
-					if (StateMap.test(StateFlag::FORMSEL))
-						savdo();
-					satbrd();
-					break;
-
-				case ID_FILCLP: // fill / Border / Clipboard
-
-					fclp();
-					break;
-
-				case ID_FILIN: // fill / Border / Line
-
-					if (StateMap.test(StateFlag::FORMSEL))
-						savdo();
-					bord();
-					break;
-
-				case ID_FRM0: // edit / Set / Form Zero Point
-
-					frm0();
-					break;
-
-				case ID_REDO: // redo
-
-					redo();
-					break;
-
-				case ID_UNFIL: // fill / Unfill
-
-					savdo();
-					unfil();
-					coltab();
-					StateMap.set(StateFlag::RESTCH);
-					break;
-
-				case ID_FORM: // Form
-
+			if (SelectedFormCount) {
+				PostMessage(ThrEdWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
+				keybd_event('F', 0, 0, 0);
+			}
+			else {
+				if (GetKeyState(VK_SHIFT) & 0X8000) {
+					StateMap.set(StateFlag::CNV2FTH);
+					ribon();
+				}
+				else {
 					frmon();
 					if (StateMap.test(StateFlag::FORMSEL))
 						refrm();
 					else
 						form();
-					break;
-
-				case ID_FILSAT: // fill / Fan
-
-					StateMap.reset(StateFlag::FTHR);
-					filsat();
-					break;
-
-				case ID_OPNPCD: // file / Open Auxiliary file
-
-					switch (IniFile.auxFileType) {
-
-						case AUXDST:
-
-							OpenFileName.nFilterIndex = 3;
-							break;
-
-						default:
-
-							OpenFileName.nFilterIndex = 2;
-					}
-					nuFil();
-					nulayr(0);
-					break;
-
-				case ID_DELSTCH: // edit / Delete / All Stitches
-
-					delstch();
-					break;
-
-				case ID_FILL_VERT: // fill / Vertical
-
-					if (StateMap.test(StateFlag::FORMSEL) || SelectedFormCount)
-						savdo();
-					filvrt();
-					break;
-
-				case ID_FILL_HOR: // fill / Horizontal
-
-					if (StateMap.test(StateFlag::FORMSEL))
-						savdo();
-					filhor();
-					break;
-
-				case ID_RUNPAT: // view / Movie
-
-					movi();
-					break;
-
-				case ID_LENDEF: // Todo - No menu item in thred.rc for this option
-
-					IniFile.maxStitchLength = MAXSIZ*PFGRAN;
-					UserStitchLength = USESIZ*PFGRAN;
-					MinStitchLength = MINSIZ*PFGRAN;
-					break;
-
-				case ID_TSIZDEF: // view / Thread Size / Set Defaults
-
-					ThreadSize30 = TSIZ30;
-					ThreadSize40 = TSIZ40;
-					ThreadSize60 = TSIZ60;
-					break;
-
-				case ID_SIZ30: // view / Thread Size / 30
-
-					tsizmsg("30", ThreadSize30);
-					StateMap.set(StateFlag::ENTR30);
-					break;
-
-				case ID_SIZ40: // view / Thread Size / 40
-
-					tsizmsg("40", ThreadSize40);
-					StateMap.set(StateFlag::ENTR40);
-					break;
-
-				case ID_SIZ60: // view / Thread Size / 60
-
-					tsizmsg("60", ThreadSize60);
-					StateMap.set(StateFlag::ENTR60);
-					break;
-
-				case ID_HIDBITF: // file / Hide Bitmap
-				case ID_HIDBIT:  // edit / Trace / Hide Bitmap
-
-					hidbit();
-					break;
-
-				case ID_LODBIT: // file / Load Bitmap
-
-					lodbmp();
-					break;
-
-				case ID_KNOTS: // edit / Set / Knots
-
-					setknots();
-					break;
-
-				case ID_REMZERO: // edit / Delete / Small Stitches
-
-					duzero();
-					break;
-
-				case ID_ROT: // rot
-
-					rot();
-					break;
-
-				case ZUMIN: // in
-
-					if (StateMap.test(StateFlag::GMRK) || StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::INSRT) || StateMap.test(StateFlag::GRPSEL) || StateMap.test(StateFlag::FORMSEL))
-						zumin();
-					else {
-
-						StateMap.reset(StateFlag::BZUM);
-						StateMap.set(StateFlag::BOXZUM);
-						StateMap.reset(StateFlag::BZUMIN);
-						StateMap.set(StateFlag::VCAPT);
-						SetCapture(ThrEdWindow);
-					}
-					break;
-
-				case ID_ZUMOUT: // out
-
-					zumout();
-					break;
-
-				case ID_FILE_OPEN1: // file / Open
-
-					fop();
-					break;
-
-				case ID_VIEW_STCHBAK: // view / Set / Background Color
-
-					if (nuBak()) {
-
-						BackgroundColor = BackgroundColorStruct.rgbResult;
-						BackgroundPen = nuPen(BackgroundPen, 1, BackgroundColor);
-						BackgroundPenWidth = 1;
-						DeleteObject(BackgroundBrush);
-						BackgroundBrush = CreateSolidBrush(BackgroundColor);
-						if (PCSBMPFileName[0])
-							bfil();
-						zumhom();
-					}
-					break;
-
-				case ID_BITCOL: // view / Set / Bitmap Color
-
-					if (nuBit()) {
-
-						BitmapColor = fswap(BitMapColorStruct.rgbResult);
-						if (PCSBMPFileName[0])
-							bfil();
-						BitmapPen = nuPen(BitmapPen, 1, BitmapColor);
-						zumhom();
-					}
-					break;
-
-				case ID_FILE_SAVE3: // file / Save As
-
-					colchk();
-					savAs();
-					break;
-
-				case ID_EDIT_RESET_COL: // edit / Reset Colors
-
-					for (iColor = 0; iColor < 16; iColor++) {
-
-						UserColor[iColor] = DefaultColors[iColor];
-						UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
-						UserPen[iColor] = nuPen(UserPen[iColor], 1, UserColor[iColor]);
-						redraw(UserColorWin[iColor]);
-					}
-					StateMap.set(StateFlag::RESTCH);
-					break;
-
-				case ID_FILE_SAVE2: // file / Save
-
-					colchk();
-					save();
-					break;
-
-				case VU_ZUMFUL: // view / Zoom Full
-
-					zumhom();
-					break;
-
-				case ID_EDIT_SELECTCOLOR: // edit / Select / Color
-
-					selCol();
-					break;
-
-				case ID_FILE_NEW1: // file / New
-
-					if (!savcmp()) {
-
-						savdisc();
-						StateMap.set(StateFlag::NEWBAK);
-						StateMap.reset(StateFlag::PRFACT);
-						undat();
-					}
-					else {
-
-						newFil();
-						nulayr(0);
-					}
-					break;
-
-				case ID_BACK: // undo
-
-					bak();
-					break;
-
-				case ID_DESNAM: // edit / Set / Designer Name
-
-					getdes();
-					break;
+				}
 			}
 			break;
+
+		case 'V':
+
+			if (GetKeyState(VK_CONTROL) & 0X8000 && OpenClipboard(ThrEdWindow)) {
+				ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
+				ClipMemory = GetClipboardData(ThrEdClip);
+				if (ClipMemory) {
+					ClipPointer = GlobalLock(ClipMemory);
+					if (ClipPointer) {
+						ClipFormVerticesData = static_cast<FORMVERTEXCLIP *>(ClipPointer);
+						if (ClipFormVerticesData->clipType == CLP_FRMPS) {
+							duzrat();
+							byteCount = sizeof(FORMVERTEXCLIP) + (ClipFormVerticesData->vertexCount + 1) * sizeof(fPOINT);
+							clipCopyBuffer = new unsigned char[byteCount];
+							MoveMemory(clipCopyBuffer, ClipPointer, byteCount);
+							GlobalUnlock(ClipMemory);
+							CloseClipboard();
+							ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP *>(clipCopyBuffer);
+							if (StateMap.test(StateFlag::FRMPSEL)) {
+								fvars(ClosestFormToCursor);
+								InterleaveSequence[0].x = CurrentFormVertices[ClosestVertexToCursor].x;
+								InterleaveSequence[0].y = CurrentFormVertices[ClosestVertexToCursor].y;
+								clipData = convert_ptr<fPOINT *>(&ClipFormVerticesData[1]);
+								for (iVertex = 0; iVertex <= ClipFormVerticesData->vertexCount; iVertex++) {
+									InterleaveSequence[iVertex + 1].x = clipData[iVertex].x;
+									InterleaveSequence[iVertex + 1].y = clipData[iVertex].y;
+								}
+								nextVertex = nxt(ClosestVertexToCursor);
+								iVertex++;
+								InterleaveSequence[iVertex].x = CurrentFormVertices[nextVertex].x;
+								InterleaveSequence[iVertex].y = CurrentFormVertices[nextVertex].y;
+								OutputIndex = iVertex + 1;
+								FormVerticesAsLine = convert_ptr<POINT *>(&InterleaveSequence[OutputIndex]);
+								setpclp();
+								StateMap.set(StateFlag::FPUNCLP);
+								StateMap.set(StateFlag::SHOP);
+								dupclp();
+							}
+							else {
+								FormMoveDelta.x = FormMoveDelta.y = 0;
+								StateMap.set(StateFlag::FUNCLP);
+								ClosestFormToCursor = FormIndex;
+								SelectedForm = &FormList[FormIndex];
+								FillMemory(SelectedForm, sizeof(FRMHED), 0);
+								SelectedForm->type = FRMLINE;
+								SelectedForm->vertexCount = ClipFormVerticesData->vertexCount + 1;
+								SelectedForm->vertices = adflt(SelectedForm->vertexCount);
+								fvars(ClosestFormToCursor);
+								MoveMemory(SelectedForm->vertices, &ClipFormVerticesData[1], sizeof(fPOINT)*SelectedForm->vertexCount);
+								StateMap.set(StateFlag::INIT);
+								NewFormVertexCount = SelectedForm->vertexCount;
+								unfrm();
+								setmfrm();
+								StateMap.set(StateFlag::SHOFRM);
+								dufrm();
+							}
+							delete[] clipCopyBuffer;
+							return 1;
+						}
+						// ToDo - Add more information to the clipboard so that memory can be allocated 
+						ClipFormsHeader = static_cast<FORMSCLIP *>(ClipPointer);
+						if (ClipFormsHeader->clipType == CLP_FRMS) {
+							ClipFormsCount = ClipFormsHeader->formCount;
+							forms = convert_ptr<FRMHED *>(&ClipFormsHeader[1]);
+							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
+								frmcpy(&FormList[FormIndex + iForm], &forms[iForm]);
+								FormList[FormIndex + iForm].attribute = (FormList[FormIndex + iForm].attribute&NFRMLMSK) | (ActiveLayer << 1);
+							}
+							CurrentFormVertices = convert_ptr<fPOINT *>(&forms[iForm]);
+							currentVertex = 0;
+							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
+								SelectedForm = &FormList[FormIndex + iForm];
+								SelectedForm->vertices = adflt(SelectedForm->vertexCount);
+								for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+									SelectedForm->vertices[iVertex].x = CurrentFormVertices[currentVertex].x;
+									SelectedForm->vertices[iVertex].y = CurrentFormVertices[currentVertex++].y;
+								}
+							}
+							guides = convert_ptr<SATCON *>(&CurrentFormVertices[currentVertex]);
+							currentGuide = 0;
+							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
+								SelectedForm = &FormList[FormIndex + iForm];
+								if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
+									SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
+									for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+										SelectedForm->satinOrAngle.guide[iGuide].start = guides[currentGuide].start;
+										SelectedForm->satinOrAngle.guide[iGuide].finish = guides[currentGuide++].finish;
+									}
+								}
+							}
+							clipData = convert_ptr<fPOINT *>(&guides[currentGuide]);
+							currentClip = 0;
+							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
+								SelectedForm = &FormList[FormIndex + iForm];
+								if (isclpx(FormIndex + iForm)) {
+									SelectedForm->angleOrClipData.clip = adclp(SelectedForm->lengthOrCount.clipCount);
+									for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
+										SelectedForm->angleOrClipData.clip[iClip].x = clipData[currentClip].x;
+										SelectedForm->angleOrClipData.clip[iClip].y = clipData[currentClip++].y;
+									}
+								}
+								if (iseclpx(FormIndex + iForm)) {
+									SelectedForm->borderClipData = adclp(SelectedForm->clipEntries);
+									for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
+										SelectedForm->borderClipData[iClip].x = clipData[currentClip].x;
+										SelectedForm->borderClipData[iClip].y = clipData[currentClip++].y;
+									}
+								}
+							}
+							textureSource = convert_ptr<TXPNT *>(&clipData[currentClip]);
+							textureDestination = &TexturePointsBuffer[TextureIndex];
+							textureCount = 0;
+							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
+								if (istx(FormIndex + iForm)) {
+									SelectedForm = &FormList[FormIndex + iForm];
+									textureCount += SelectedForm->fillInfo.texture.count;
+									SelectedForm->fillInfo.texture.index += TextureIndex;
+									MoveMemory(textureDestination, textureSource, (SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count - TextureIndex) * sizeof(TXPNT));
+								}
+							}
+							TextureIndex += textureCount;
+							GlobalUnlock(ClipMemory);
+							SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
+							SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
+							ratsr();
+							for (OutputIndex = 0; OutputIndex < gsl::narrow<unsigned>(ClipFormsCount); OutputIndex++) {
+								fselrct(OutputIndex + FormIndex);
+								SelectedFormList[OutputIndex] = OutputIndex + FormIndex;
+							}
+							SelectedFormCount = ClipFormsCount;
+							SelectedFormsSize.x = SelectedFormsRect.right - SelectedFormsRect.left;
+							SelectedFormsSize.y = SelectedFormsRect.bottom - SelectedFormsRect.top;
+							StateMap.set(StateFlag::INIT);
+							FormLines[0].x = FormLines[3].x = FormLines[4].x = SelectedFormsRect.left;
+							FormLines[1].x = FormLines[2].x = SelectedFormsRect.right;
+							FormLines[0].y = FormLines[1].y = FormLines[4].y = SelectedFormsRect.top;
+							FormLines[2].y = FormLines[3].y = SelectedFormsRect.bottom;
+							StateMap.set(StateFlag::SHOSTRTCH);
+							strtchbox();
+							FormMoveDelta.x = ((SelectedFormsRect.right - SelectedFormsRect.left) >> 1);
+							FormMoveDelta.y = ((SelectedFormsRect.bottom - SelectedFormsRect.top) >> 1);
+							StateMap.set(StateFlag::MOVFRMS);
+							StateMap.set(StateFlag::FUNSCLP);
+						}
+						else {
+							ClipFormHeader = static_cast<FORMCLIP *>(ClipPointer);
+							if (ClipFormHeader->clipType == CLP_FRM) {
+								FormMoveDelta.x = FormMoveDelta.y = 0;
+								StateMap.set(StateFlag::FUNCLP);
+								ClosestFormToCursor = FormIndex;
+								fvars(FormIndex);
+								frmcpy(&FormList[FormIndex], &ClipFormHeader->form);
+								FormList[FormIndex].attribute = (FormList[FormIndex].attribute&NFRMLMSK) | (ActiveLayer << 1);
+								SelectedForm->vertices = adflt(FormList[FormIndex].vertexCount);
+								CurrentFormVertices = convert_ptr<fPOINT *>(&ClipFormHeader[1]);
+								mvflpnt(&SelectedForm->vertices[0], &CurrentFormVertices[0], SelectedForm->vertexCount);
+								guides = convert_ptr<SATCON *>(&CurrentFormVertices[SelectedForm->vertexCount]);
+								if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
+									SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
+									mvsatk(&SelectedForm->satinOrAngle.guide[0], &guides[0], SelectedForm->satinGuideCount);
+								}
+								clipData = convert_ptr<fPOINT *>(&guides[0]);
+								clipCount = 0;
+								if (isclpx(FormIndex)) {
+									SelectedForm->angleOrClipData.clip = adclp(SelectedForm->lengthOrCount.clipCount);
+									mvflpnt(SelectedForm->angleOrClipData.clip, clipData, SelectedForm->lengthOrCount.clipCount);
+									clipCount += SelectedForm->lengthOrCount.clipCount;
+								}
+								if (iseclpx(FormIndex)) {
+									clipData = convert_ptr<fPOINT *>(&clipData[clipCount]);
+									SelectedForm->borderClipData = adclp(SelectedForm->clipEntries);
+									mvflpnt(SelectedForm->borderClipData, clipData, SelectedForm->clipEntries);
+									clipCount += SelectedForm->clipEntries;
+								}
+								textureSource = convert_ptr<TXPNT *>(&clipData[clipCount]);
+								if (istx(FormIndex)) {
+									SelectedForm->fillInfo.texture.index = TextureIndex;
+									textureDestination = adtx(SelectedForm->fillInfo.texture.count);
+									MoveMemory(textureDestination, textureSource, SelectedForm->fillInfo.texture.count * sizeof(TXPNT));
+								}
+							}
+							GlobalUnlock(ClipMemory);
+							StateMap.set(StateFlag::INIT);
+							NewFormVertexCount = SelectedForm->vertexCount;
+							if (SelectedForm->type != FRMLINE)
+								NewFormVertexCount++;
+							unfrm();
+							duzrat();
+							setmfrm();
+							StateMap.set(StateFlag::SHOFRM);
+							dufrm();
+						}
+					}
+					CloseClipboard();
+				}
+				else {
+					Clip = RegisterClipboardFormat(PcdClipFormat);
+					ClipMemory = GetClipboardData(Clip);
+					if (ClipMemory) {
+						redclp();
+						clpbox();
+						StateMap.set(StateFlag::CLPSHO);
+					}
+					CloseClipboard();
+				}
+			}
+			else
+				closPnt();
+			break;
+
+		case 'C':
+
+			if (GetKeyState(VK_CONTROL) & 0X8000)
+				duclip();
+			else {
+				if (GetKeyState(VK_SHIFT) & 0X8000) {
+					StateMap.reset(StateFlag::CNV2FTH);
+					ribon();
+				}
+				else {
+					StateMap.reset(StateFlag::HIDSTCH);
+					StateMap.set(StateFlag::IGNTHR);
+					rebox();
+					StateMap.reset(StateFlag::IGNTHR);
+					StateMap.set(StateFlag::RESTCH);
+				}
+			}
+			break;
+
+		case VK_HOME:
+
+			if (GetKeyState(VK_SHIFT) & 0X8000 && GetKeyState(VK_CONTROL) & 0X8000) {
+				if (StateMap.testAndReset(StateFlag::SELBOX)) {
+					GroupStitchIndex = 0;
+					StateMap.set(StateFlag::GRPSEL);
+				}
+				else {
+					if (StateMap.test(StateFlag::GRPSEL)) {
+						if (GroupStitchIndex > ClosestPointIndex)
+							ClosestPointIndex = 0;
+						else
+							GroupStitchIndex = 0;
+					}
+					else {
+						StateMap.set(StateFlag::SELBOX);
+						StateMap.set(StateFlag::RESTCH);
+					}
+				}
+				grpAdj();
+				redraw(ColorBar);
+				return 1;
+			}
+			if (GetKeyState(VK_SHIFT) & 0X8000) {
+				if (StateMap.testAndReset(StateFlag::SELBOX)) {
+					StateMap.set(StateFlag::GRPSEL);
+					iColor = pt2colInd(ClosestPointIndex);
+				}
+				else
+					iColor = pt2colInd(GroupStitchIndex);
+				iColor--;
+				GroupStitchIndex = ColorChangeTable[iColor].stitchIndex;
+				grpAdj();
+				redraw(ColorBar);
+			}
+			else {
+				if (GetKeyState(VK_CONTROL) & 0X8000) {
+					stch2px1(0);
+					endpnt();
+					StateMap.reset(StateFlag::BAKEND);
+					StateMap.set(StateFlag::RESTCH);
+				}
+				else {
+					if (StateMap.test(StateFlag::SELBOX)) {
+						iColor = pt2colInd(ClosestPointIndex);
+						if (iColor)
+							iColor--;
+						ClosestPointIndex = ColorChangeTable[iColor].stitchIndex;
+					}
+					else {
+						if (StateMap.test(StateFlag::LENSRCH)) {
+							setsrch(SmallestStitchIndex);
+							return 1;
+						}
+						else
+							ClosestPointIndex = 0;
+					}
+					movbox();
+				}
+			}
+			break;
+
+		case VK_END:
+
+			if (GetKeyState(VK_SHIFT) & 0X8000 && GetKeyState(VK_CONTROL) & 0X8000) {
+				if (StateMap.testAndReset(StateFlag::SELBOX)) {
+					GroupStitchIndex = PCSHeader.stitchCount - 1;
+					StateMap.set(StateFlag::GRPSEL);
+				}
+				else {
+					if (StateMap.test(StateFlag::GRPSEL)) {
+						if (GroupStitchIndex > ClosestPointIndex)
+							GroupStitchIndex = PCSHeader.stitchCount - 1;
+						else
+							ClosestPointIndex = PCSHeader.stitchCount - 1;
+					}
+					else {
+						StateMap.set(StateFlag::SELBOX);
+						ClosestPointIndex = PCSHeader.stitchCount - 1;
+						StateMap.set(StateFlag::RESTCH);
+						return 1;
+					}
+				}
+				grpAdj();
+				redraw(ColorBar);
+				break;
+			}
+			if (GetKeyState(VK_SHIFT) & 0X8000) {
+				if (StateMap.testAndReset(StateFlag::SELBOX)) {
+					StateMap.set(StateFlag::GRPSEL);
+					iColor = pt2colInd(ClosestPointIndex);
+				}
+				else
+					iColor = pt2colInd(GroupStitchIndex);
+				GroupStitchIndex = ColorChangeTable[iColor].stitchIndex - 1;
+				grpAdj();
+				redraw(ColorBar);
+			}
+			else {
+				if (GetKeyState(VK_CONTROL) & 0X8000) {
+					stch2px1(PCSHeader.stitchCount - 1);
+					endpnt();
+					StateMap.set(StateFlag::BAKEND);
+					StateMap.set(StateFlag::RESTCH);
+				}
+				else {
+					if (StateMap.test(StateFlag::SELBOX)) {
+						iColor = pt2colInd(ClosestPointIndex);
+						ClosestPointIndex = ColorChangeTable[iColor].stitchIndex - 1;
+					}
+					else {
+						if (StateMap.test(StateFlag::LENSRCH)) {
+							setsrch(LargestStitchIndex);
+							return 1;
+						}
+						else
+							ClosestPointIndex = PCSHeader.stitchCount - 1;
+					}
+					movbox();
+				}
+			}
+			break;
+
+		case VK_RIGHT:
+
+			fvars(ClosestFormToCursor);
+			if (GetKeyState(VK_SHIFT) & 0X8000) {
+				if (StateMap.test(StateFlag::FPSEL)) {
+					if (StateMap.test(StateFlag::PSELDIR)) {
+						++SelectedFormVertices.vertexCount %= VertexCount;
+						SelectedFormVertices.finish = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % VertexCount;
+					}
+					else {
+						if (SelectedFormVertices.vertexCount) {
+							SelectedFormVertices.vertexCount--;
+							SelectedFormVertices.finish = (SelectedFormVertices.start + VertexCount - SelectedFormVertices.vertexCount) % VertexCount;
+						}
+						else {
+							SelectedFormVertices.vertexCount = 1;
+							StateMap.set(StateFlag::PSELDIR);
+							SelectedFormVertices.finish = (SelectedFormVertices.start + 1) % VertexCount;
+						}
+					}
+					setpsel();
+				}
+				else {
+					if (StateMap.testAndReset(StateFlag::FRMPSEL)) {
+						unpsel();
+						SelectedFormVertices.start = ClosestVertexToCursor;
+						SelectedFormVertices.form = ClosestFormToCursor;
+						SelectedFormVertices.vertexCount = 1;
+						SelectedFormVertices.finish = (SelectedFormVertices.start + 1) % VertexCount;
+						StateMap.set(StateFlag::PSELDIR);
+						setpsel();
+					}
+					else {
+						StateMap.reset(StateFlag::LENSRCH);
+						StateMap.reset(StateFlag::FORMSEL);
+						if (StateMap.testAndReset(StateFlag::SELBOX)) {
+							if (ClosestPointIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
+								StateMap.set(StateFlag::GRPSEL);
+								GroupStitchIndex = ClosestPointIndex + 1;
+							}
+						}
+						else {
+							if (GroupStitchIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
+								GroupStitchIndex++;
+								nuAct(GroupStitchIndex);
+							}
+						}
+						grpAdj();
+						redraw(ColorBar);
+					}
+				}
+			}
+			else {
+				if (GetKeyState(VK_CONTROL) & 0X8000)
+					nudgfn(IniFile.cursorNudgeStep, 0);
+				else {
+					if (StateMap.test(StateFlag::LENSRCH)) {
+						longer();
+						StateMap.set(StateFlag::RESTCH);
+					}
+					else {
+						if (StateMap.test(StateFlag::FRMPSEL)) {
+							fvars(ClosestFormToCursor);
+							ClosestVertexToCursor = nxt(ClosestVertexToCursor);
+							ritnum(STR_NUMPNT, ClosestVertexToCursor);
+							ritfcor(&FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
+							shftflt(FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
+							StateMap.set(StateFlag::RESTCH);
+						}
+						else {
+							if (StateMap.test(StateFlag::SELBOX)) {
+								if (ClosestPointIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
+									ClosestPointIndex++;
+								movbox();
+								return 1;
+							}
+							if (StateMap.test(StateFlag::GRPSEL)) {
+								if (GroupStitchIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
+									GroupStitchIndex++;
+									grpAdj();
+									redraw(ColorBar);
+								}
+							}
+						}
+					}
+				}
+			}
+			break;
+
+		case VK_LEFT:
+
+			if (GetKeyState(VK_SHIFT) & 0X8000) {
+				if (StateMap.test(StateFlag::FPSEL)) {
+					if (!StateMap.test(StateFlag::PSELDIR)) {
+						++SelectedFormVertices.vertexCount %= VertexCount;
+						SelectedFormVertices.finish = (SelectedFormVertices.start + VertexCount - SelectedFormVertices.vertexCount) % VertexCount;
+					}
+					else {
+						if (SelectedFormVertices.vertexCount) {
+							SelectedFormVertices.vertexCount--;
+							SelectedFormVertices.finish = (SelectedFormVertices.start + VertexCount - SelectedFormVertices.vertexCount) % VertexCount;
+						}
+						else {
+							SelectedFormVertices.vertexCount = 1;
+							SelectedFormVertices.finish = (SelectedFormVertices.start + VertexCount - 1) % VertexCount;
+							StateMap.reset(StateFlag::PSELDIR);
+						}
+					}
+					setpsel();
+				}
+				else {
+					if (StateMap.testAndReset(StateFlag::FRMPSEL)) {
+						unpsel();
+						SelectedFormVertices.start = ClosestVertexToCursor;
+						SelectedFormVertices.vertexCount = 1;
+						StateMap.reset(StateFlag::PSELDIR);
+						setpsel();
+					}
+					else {
+						StateMap.reset(StateFlag::LENSRCH);
+						StateMap.reset(StateFlag::FORMSEL);
+						if (StateMap.testAndReset(StateFlag::SELBOX)) {
+							StateMap.set(StateFlag::GRPSEL);
+							GroupStitchIndex = ClosestPointIndex - 1;
+						}
+						else
+							if (GroupStitchIndex) {
+								GroupStitchIndex--;
+								nuAct(GroupStitchIndex);
+							}
+						grpAdj();
+						redraw(ColorBar);
+					}
+				}
+			}
+			else {
+				if (GetKeyState(VK_CONTROL) & 0X8000)
+					nudgfn(-IniFile.cursorNudgeStep, 0);
+				else {
+					if (StateMap.test(StateFlag::LENSRCH)) {
+						shorter();
+						StateMap.set(StateFlag::RESTCH);
+					}
+					else {
+						if (StateMap.test(StateFlag::FRMPSEL)) {
+							fvars(ClosestFormToCursor);
+							ClosestVertexToCursor = prv(ClosestVertexToCursor);
+							ritnum(STR_NUMPNT, ClosestVertexToCursor);
+							ritfcor(&FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
+							shftflt(FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
+							StateMap.set(StateFlag::RESTCH);
+						}
+						else {
+							if (StateMap.test(StateFlag::SELBOX)) {
+								if (ClosestPointIndex)
+									ClosestPointIndex--;
+								movbox();
+								return 1;
+							}
+							if (StateMap.test(StateFlag::GRPSEL)) {
+								if (GroupStitchIndex) {
+									GroupStitchIndex--;
+									grpAdj();
+									redraw(ColorBar);
+								}
+							}
+						}
+					}
+				}
+			}
+			break;
+
+		case 'G':
+
+			mark();
+			break;
+
+		case 'M':
+
+			if (GetKeyState(VK_CONTROL) & 0x8000)
+				pntmrk();
+			else {
+				if (GetKeyState(VK_SHIFT) & 0X8000)
+					dumrk(UnzoomedRect.x / 2, UnzoomedRect.y / 2);
+				else {
+					if (px2stch())
+						dumrk(SelectedPoint.x, SelectedPoint.y);
+				}
+				StateMap.set(StateFlag::RESTCH);
+			}
+			break;
+
+		case 'L':
+
+			if (GetKeyState(VK_SHIFT) & 0x8000)
+				delstch();
+			else
+				fcntr();
+			break;
+
+		case VK_DELETE:
+
+			if (chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15]))
+				delcol();
+			else
+				delet();
+			break;
+		}
+		break;
+
+	case WM_COMMAND:
+
+		unmsg();
+		if (StateMap.test(StateFlag::FORMSEL))
+			fvars(ClosestFormToCursor);
+		for (iVersion = 0; iVersion < OLDNUM; iVersion++) {
+			if (Msg.wParam == LRUMenuId[iVersion]) {
+				strcpy_s(WorkingFileName, IniFile.prevNames[iVersion]);
+				StateMap.set(StateFlag::REDOLD);
+				nuFil();
+			}
+		}
+		wParameter = LOWORD(Msg.wParam);
+		if (wParameter > 40000 && wParameter < 40400)
+			undat();
+		switch (wParameter) {
+		case ID_CHKOF: // view / Set / Data check / Off
+
+			chgchk(0);
+			break;
+
+		case ID_CHKON: // view / Set / Data check / On
+
+			chgchk(1);
+			break;
+
+		case ID_CHKREP: // view / Set / Data Check / Auto Repair on
+
+			chgchk(2);
+			break;
+
+		case ID_CHKREPMSG: // view / Set / Data Check / Auto Repair with Message
+
+			chgchk(3);
+			break;
+
+		case ID_REPAIR: // edit / Repair Data
+
+			repar();
+			break;
+
+		case ID_WARNOF: // set / Warn if edited
+
+			chgwrn();
+			break;
+
+		case ID_CLPSPAC: // set / Clipboard Fill  Spacing
+
+			setclpspac();
+			break;
+
+		case ID_FRMIND: // edit / Form Update / Indent
+
+			setfind();
+			break;
+
+		case ID_SETSIZ: // edit / Set / Design Size
+
+			nudsiz();
+			break;
+
+		case ID_TXFIL: // Fill / Texture Editor
+
+			dutxtfil();
+			break;
+
+		case ID_FRMHI: // edit / Form Update / Height
+
+			setfhi();
+			break;
+
+		case ID_FRMWID: // edit / Form Update / Width
+
+			setfwid();
+			break;
+
+		case ID_MAXFLEN: // edit / Form Update / Fill /  Maximum Stitch Length
+
+			setfmax();
+			break;
+
+		case ID_MINFLEN: // edit / Form Update / Fill /  Minimum Stitch Length
+
+			setfmin();
+			break;
+
+		case ID_MAXBLEN: // edit / Form Update / Border /  Maximum Stitch Length
+
+			setbmax();
+			break;
+
+		case ID_MINBLEN: // edit / Form Update / Border /  Minimum Stitch Length
+
+			setbmin();
+			break;
+
+		case ID_SETBSPAC: // edit / Form Update / Border /  Spacing
+
+			setbspac();
+			break;
+
+		case ID_SETBLEN: // edit / Form Update / Border /  Stitch Length
+
+			setblen();
+			break;
+
+		case ID_SETBCOL: // edit / Form Update / Border /  Color
+
+			setbcol();
+			break;
+
+		case ID_SETFCOL: // edit / Form Update / Fill /  Color
+
+			setfcol();
+			break;
+
+		case ID_SETUCOL: // edit / Form Update / Underlay /  Color
+
+			setucol();
+			break;
+
+		case ID_SETFANG: // edit / Form Update / Fill /  Angle
+
+			setfang();
+			break;
+
+		case ID_SETFSPAC: // edit / Form Update / Fill /  Spacing
+
+			setfspac();
+			break;
+
+		case ID_SETFLEN: // edit / Form Update / Fill /  Stitch Length
+
+			setflen();
+			break;
+
+		case ID_SETUANG: // edit / Form Update / Underlay /  Angle
+
+			sfuang();
+			break;
+
+		case ID_SETUSPAC: // edit / Form Update / Underlay /  Spacing
+
+			uspac();
+			break;
+
+		case ID_UNDLEN: // edit / Form Update / Underlay / Stitch Length
+
+			undlen();
+			break;
+
+		case ID_SETCWLK: // edit / Form Update / Center Walk / On
+
+			setcwlk();
+			break;
+
+		case ID_SETWLK: // edit / Form Update / Edge Walk /  On
+
+			setwlk();
+			break;
+
+		case ID_SETUND: // edit / Form Update / Underlay / On
+
+			setund();
+			break;
+
+		case ID_NOTCWLK: // edit / Form Update / Center Walk / Off
+
+			notcwlk();
+			break;
+
+		case ID_NOTWLK: // edit / Form Update / Edge Walk / Off
+
+			notwlk();
+			break;
+
+		case ID_NOTUND: // edit / Form Update / Underlay / Off
+
+			notund();
+			break;
+
+		case ID_SELUND: // edit / Select / Form Underlay Stitches
+
+			selfil(UNDMSK);
+			break;
+
+		case ID_SELWLK: // edit / Select / Form Edge Walk Stitches
+
+			selfil(WLKMSK);
+			break;
+
+		case ID_ALFRM: // edit / Select / All Forms
+
+			selalfrm();
+			break;
+
+		case ID_USPAC: // view / Set / Underlay / Spacing
+
+			setuspac();
+			break;
+
+		case ID_UANG: // view / Set / Underlay / Angle
+
+			setuang();
+			break;
+
+		case ID_USTCH: // view / Set / Underlay / Stitch Length
+
+			setulen();
+			break;
+
+		case ID_WIND: // view / Set / Underlay / Indent
+
+			setwlkind();
+			break;
+
+		case ID_FILSTRT: //Edit / Set / Fill Start Point
+
+			setfilstrt();
+			break;
+
+		case ID_FILEND: //Edit / Set / Fill End Point
+
+			setfilend();
+			break;
+
+		case ID_PES2CRD: // file / PES2Card
+
+			pes2crd();
+			break;
+
+		case ID_2FTHR: // edit / Convert / to Feather Ribbon
+
+			StateMap.set(StateFlag::CNV2FTH);
+			ribon();
+			break;
+
+		case ID_FETHR: // fill / Feather
+
+			fethr();
+			break;
+
+		case ID_FTHDEF: // edit / Set / Feather Defaults
+
+			dufdef();
+			break;
+
+		case ID_SRTF: // edit / Sort / by Form
+
+			srtfrm();
+			break;
+
+		case ID_FILCLPX: // fill / Border / Clipboard, Even
+
+			filclpx();
+			break;
+
+		case ID_FRMX: // view / Set / Form Cursor / Cross
+
+			frmcursel(1);
+			break;
+
+		case ID_FRMBOX: // view / Set / Form Cursor / Box
+
+			frmcursel(0);
+			break;
+
+		case ID_KNOTAT: // edit / Set / Knot at Selected Stitch
+
+			set1knot();
+			break;
+
+		case ID_STCHPIX: // view / Set / Point Size / Stitch Point Boxes
+
+			getstpix();;
+			break;
+
+		case ID_FRMPIX: // view / Set / Point Size / Form Point Triangles
+
+			getfrmpix();
+			break;
+
+		case ID_FRMPBOX: // view / Set / Point Size / Form Box
+
+			getfrmbox();
+			break;
+
+		case ID_CROP: // edit / Crop to Form
+
+			crop();
+			break;
+
+		case ID_BAKMRK: // view / Retrieve Mark
+
+			bakmrk();
+			break;
+
+		case ID_MARKESC: // view / Set / Retrieve Mark / Escape
+
+			UserFlagMap.set(UserFlag::MARQ);
+			qchk();
+			break;
+
+		case ID_MARKQ: // view / Set / Retrieve Mark / Q
+
+			UserFlagMap.reset(UserFlag::MARQ);
+			qchk();
+			break;
+
+		case ID_NUDGPIX: // view / Set / Nudge Pixels
+
+			getnpix();
+			break;
+
+		case ID_LINCHN: // fill / Border / Line chain
+
+			StateMap.set(StateFlag::LINCHN);
+			chain();
+			break;
+
+		case ID_OPNCHN: // fill / Border / Open chain
+
+			StateMap.reset(StateFlag::LINCHN);
+			chain();
+			break;
+
+		case ID_CLOSE: // file / Close
+
+			filclos();
+			break;
+
+		case ID_DELMAP: // file / Remove Bitmap
+
+			delmap();
+			break;
+
+		case ID_BLAK: // edit / Trace / Reset Form Pixels
+
+			blak();
+			break;
+
+		case ID_SAVMAP: // file / Save Bitmap
+
+			savmap();
+			break;
+
+		case ID_TRDIF: // edit / Trace / Find Edges
+
+			trdif();
+			break;
+
+		case ID_TRACEDG: // edit / Trace / Show Traced Edges
+
+			tracedg();
+			break;
+
+		case ID_TRCSEL: // edit / Trace / Select Colors
+
+			trcsel();
+			break;
+
+		case ID_TRACE: // edit / Trace / Trace Mode
+
+			trinit();
+			break;
+
+		case ID_FLOK: // file / Locking
+
+			lock();
+			break;
+
+		case ID_ROTAUXON: // view / Set / Rotate Machine File / On
+
+			rotauxsel(1);
+			break;
+
+		case ID_ROTAUXOFF: // view / Set / Rotate Machine File / Off
+
+			rotauxsel(0);
+			break;
+
+		case ID_FRM2COL: // edit / Set / Form Color to  stitch Color
+
+			col2frm();
+			break;
+
+		case ID_SNAP2GRD: // edit / Snap / to Grid
+
+			gsnap();
+			break;
+
+		case ID_FIL2SEL_ON: // view / Set / Fill at Select / On
+
+			fil2sel(1);
+			break;
+
+		case ID_FIL2SEL_OFF: // view / Set / Fill at Select / Off
+
+			fil2sel(0);
+			break;
+
+		case ID_OVRLAY: // file / Overlay
+
+			ovrlay();
+			break;
+
+		case ID_GRDHI: // view / Set / Grid Mask / High
+
+			setgrd(HIGRD);
+			break;
+
+		case ID_GRDMED: // view / Set / Grid Mask / Medium
+
+			setgrd(MEDGRD);
+			break;
+
+		case ID_GRDEF: // view / Set / Grid Mask / Default
+
+			setgrd(DEFGRD);
+			break;
+
+		case ID_GRDRED: // view / Set / Grid Mask / UnRed
+
+			setgrd(REDGRD);
+			break;
+
+		case ID_GRDBLU: // view / Set / Grid Mask / UnBlue
+
+			setgrd(BLUGRD);
+			break;
+
+		case ID_GRDGRN: // view / Set / Grid Mask / UnGreen
+
+			setgrd(GRNGRD);
+			break;
+
+		case ID_RETRACE: // edit / Retrace
+
+			retrac();
+			break;
+
+		case ID_DUBFIL: // fill / Border / Double
+
+			dubfil();
+			break;
+
+		case ID_HORCLP: // fill / Clipboard / Horizontal
+
+			if (StateMap.test(StateFlag::FORMSEL) || SelectedFormCount)
+				savdo();
+			horclp();
+			break;
+
+		case ID_ANGCLP: // fill / Clipboard / Angle
+
+			if (StateMap.test(StateFlag::FORMSEL) || SelectedFormCount)
+				savdo();
+			angclp();
+			break;
+
+		case ID_VRTCLP: // fill / Clipboard / Vertical
+
+			if (StateMap.test(StateFlag::FORMSEL) || SelectedFormCount)
+				savdo();
+			vrtclp();
+			break;
+
+		case ID_LINBEXACT: // view / Set / Line Border Spacing / Exact
+
+			UserFlagMap.reset(UserFlag::LINSPAC);
+			linbmen();
+			break;
+
+		case ID_LINBEVEN: // view / Set / Line Border Spacing / Even
+
+			UserFlagMap.set(UserFlag::LINSPAC);
+			linbmen();
+			break;
+
+		case ID_BSAVON: // view / Set / PCS Bitmap Save / On
+
+			pcsbsavon();
+			break;
+
+		case ID_BSAVOF: // view / Set / PCS Bitmap Save / Off
+
+			pcsbsavof();
+			break;
+
+		case ID_KNOTON: // view / Knots / On
+
+			shoknot();
+			break;
+
+		case ID_KNOTOF: // view / Knots / Off
+
+			hidknot();
+			break;
+
+		case ID_DELKNOT: // edit / Delete / Knots
+
+			delknot();
+			break;
+
+		case ID_RSTNEDL: // view / Set / Needle Cursor / Off
+
+			nedof();
+			break;
+
+		case ID_SETNEDL: // view / Set / Needle Cursor / On
+
+			nedon();
+			break;
+
+		case ID_STCHS2FRM: // edit / Convert / Stitches to Form
+
+			stchs2frm();
+			break;
+
+		case ID_SPLTFRM: // edit / Split Form
+
+			spltfrm();
+			break;
+
+		case ID_UNBEAN: // edit / Convert / from Bean to Line
+
+			debean();
+			break;
+
+		case ID_DUBEAN: // edit / Convert / to Bean
+
+			dubean();
+			break;
+
+		case ID_SRTBF: // edit / Sort / by Color then Form
+
+			srtbyfrm();
+			break;
+
+		case ID_CENTIRE: // edit / Center / Entire Design
+
+			centir();
+			break;
+
+		case ID_CNTRX: // edit / Center / Both
+
+			StateMap.reset(StateFlag::CNTRH);
+			StateMap.reset(StateFlag::CNTRV);
+			cntrx();
+			break;
+
+		case ID_CNTRH: // edit / Center / Horizontal
+
+			StateMap.reset(StateFlag::CNTRH);
+			StateMap.set(StateFlag::CNTRV);
+			cntrx();
+			break;
+
+		case ID_CNTRV: // edit / Center / Vertical
+
+			StateMap.set(StateFlag::CNTRH);
+			StateMap.reset(StateFlag::CNTRV);
+			cntrx();
+			break;
+
+		case ID_FRMNUM: // edit / Set / Form Number
+
+			frmnum();
+			break;
+
+		case ID_REFILF: // fill / Refill
+
+			filfrms();
+			break;
+
+		case ID_MRKPNT: // edit / Set / Zoom Mark at Selected Point
+
+			pntmrk();
+			break;
+
+		case ID_ROTSEG: // edit / Set / Rotation / Segments
+
+			rotseg();
+			break;
+
+		case ID_ROTMRK: // edit / Set / Rotation / Angle from Mark
+
+			rotmrk();
+			break;
+
+		case ID_MRKCNTR: // edit / Set / Zoom Mark at Center
+
+			dumrk(UnzoomedRect.x / 2, UnzoomedRect.y / 2);
+			StateMap.set(StateFlag::RESTCH);
+			break;
+
+		case ID_SETROT: // edit / Set / Rotation / Angle
+
+			setrang();
+			break;
+
+		case ID_SETPREF: // view / Set / Default Preferences
+
+			defpref();
+			break;
+
+		case ID_SHRINK: // edit / Shrink Clipboard Border
+
+			shrnk();
+			break;
+
+		case ID_DUPAGAIN: // edit / Rotate / and Duplicate again
+
+			redup();
+			break;
+
+		case ID_CLPADJ: // edit / Set / Range Ends for Clipboard Fills
+
+			clpadj();
+			break;
+
+		case ID_DELTOT: // edit / Delete / All Forms and Stitches
+
+			deltot();
+			break;
+
+		case ID_AUXPCS: // view / Set / Machine File Type / Pfaff PCS
+
+			setpcs();
+			break;
+
+		case ID_AUXDST: // view / Set / Machine File Type / Tajima DST
+
+			setdst();
+			break;
+
+		case ID_ABOUT: // view / About ThrEd4
+
+			tabmsg(IDS_CPYRIT);
+			break;
+
+		case ID_RIBON: // edit / Convert / to Satin Ribbon
+
+			StateMap.reset(StateFlag::CNV2FTH);
+			ribon();
+			break;
+
+		case ID_DESIZ: // view / Design Information
+
+			desiz();
+			break;
+
+		case ID_HLP: // help
+
+			help();
+			break;
+
+		case ID_CNTR: // edit / Center / Forms
+
+			fcntr();
+			break;
+
+		case ID_INSFIL: // file / Insert
+
+			StateMap.reset(StateFlag::IGNORINS);
+			insfil();
+			break;
+
+		case ID_SELALSTCH: // edit / Select / All Stitches
+
+			selalstch();
+			break;
+
+		case ID_UNGRPLO: // edit / Ungroup / First
+
+			ungrplo();
+			break;
+
+		case ID_UNGRPHI: // edit / Ungroup / Last
+
+			ungrphi();
+			break;
+
+		case ID_CONTF: // fill / Contour
+
+			contfil();
+			break;
+
+		case ID_THUM: // file / Thumbnails
+
+			thumnail();
+			break;
+
+		case ID_PICOT: // fill / Border / Picot
+
+			picot();
+			break;
+
+		case ID_FILBUT: // fill / Border / Buttonhole
+
+			bhol();
+			break;
+
+		case ID_REMBIG: // edit / Delete / Large Stitches
+
+			rembig();
+			break;
+
+		case ID_VUSELTHRDS: // view / Show Threads for Selected Color
+
+			vuselthr();
+			break;
+
+		case ID_VUTHRDS: // view / Show Threads
+
+			vuthrds();
+			break;
+
+		case ID_MOVMRK: // edit / Move / to Mark
+
+			movmrk();
+			break;
+
+		case ID_SELFIL: // edit / Select / Form Fill Stitches
+
+			selfil(FRMFIL);
+			break;
+
+		case ID_SELBRD: // edit / Select / Form Border Stitches
+
+			selfil(FRMBFIL);
+			break;
+
+		case ID_SELAP: // edit / Select / Form Applique Stitches
+
+			selfil(FRMAPFIL);
+			break;
+
+		case ID_SELFSTCHS: // edit / Select / Form Stitches
+
+			selalfil();
+			break;
+
+		case ID_SETMRK: // edit / Set / Order Mark
+
+			setmov();
+			break;
+
+		case ID_DELFRE: // edit / Delete / Free Stitches
+
+			delfre();
+			break;
+
+		case ID_SELAL: // edit / Select / All Forms and Stitches
+
+			selal();
+			break;
+
+		case ID_REFILAL: // edit / Refill All
+
+			refilal();
+			break;
+
+		case ID_CHK: // edit / Check Range
+
+			chkrng(&StitchRangeSize);
+			StateMap.set(StateFlag::RESTCH);
+			break;
+
+		case ID_RTRVCLP: // edit / Retrieve Clipboard Stitches
+
+			rtrclp();
+			break;
+
+		case ID_SORT: // edit / Sort / Auto
+
+			fsort();
+			break;
+
+		case ID_LAYMOV0: // edit / Move to Layer / 0
+
+			movlayr(0);
+			break;
+
+		case ID_LAYMOV1: // edit / Move to Layer / 1
+
+			movlayr(2);
+			break;
+
+		case ID_LAYMOV2: // edit / Move to Layer / 2
+
+			movlayr(4);
+			break;
+
+		case ID_LAYMOV3: // edit / Move to Layer / 3
+
+			movlayr(6);
+			break;
+
+		case ID_LAYMOV4: // edit / Move to Layer / 4
+
+			movlayr(8);
+			break;
+
+		case ID_LAYCPY0: // edit / Copy to Layer / 0
+
+			cpylayr(0);
+			break;
+
+		case ID_LAYCPY1: // edit / Copy to Layer / 1
+
+			cpylayr(2);
+			break;
+
+		case ID_LAYCPY2: // edit / Copy to Layer / 2
+
+			cpylayr(4);
+			break;
+
+		case ID_LAYCPY3: // edit / Copy to Layer / 3
+
+			cpylayr(6);
+			break;
+
+		case ID_LAYCPY4: // edit / Copy to Layer / 4
+
+			cpylayr(8);
+			break;
+
+		case ID_LA: // all (Show all layers)
+
+			nulayr(0);
+			break;
+
+		case ID_L1: // 1 (Show layer 1 only)
+
+			nulayr(1);
+			break;
+
+		case ID_L2: // 2 (Show layer 2 only)
+
+			nulayr(2);
+			break;
+
+		case ID_L3: // 3 (Show layer 3 only)
+
+			nulayr(3);
+			break;
+
+		case ID_L4: // 4 (Show layer 4 only)
+
+			nulayr(4);
+			break;
+
+		case ID_ROTDUP: // edit / Rotate / and Duplicate
+
+			rotdup();
+			break;
+
+		case ID_ROTAGAIN: // edit / Rotate / Again
+
+			rotagain();
+			break;
+
+		case ID_ROTCMD: // edit / Rotate / Command
+
+			rotcmd();
+			break;
+
+		case ID_DELFRMS: // edit / Delete / All Forms
+
+			delfrms();
+			rstAll();
+			StateMap.set(StateFlag::RESTCH);
+			break;
+
+		case ID_SNAP2: // edit / Snap / Together
+
+			snap();
+			break;
+
+		case ID_CLPFIL: // fill / Clipboard / Fan
+
+			clpfil();
+			break;
+
+		case ID_FLPORD: // edit / Flip / Order
+
+			flpord();
+			break;
+
+		case ID_FRMOF: // frm+
+
+			if (GetKeyState(VK_SHIFT) & 0X8000)
+				tglhid();
+			else
+				tglfrm();
+			break;
+
+		case ID_MV2BAK: // edit / move / to End
+
+			mv2b();
+			break;
+
+		case ID_MV2FRNT: // edit / move / to Start
+
+			mv2f();
+			break;
+
+		case ID_PERP: // fill / Border / Perpendicular Satin
+
+			if (StateMap.test(StateFlag::FORMSEL) || SelectedFormCount)
+				savdo();
+			prpbrd(LineSpacing);
+			break;
+
+		case ID_PURGDIR: // file / Delete Backups / All backups in the selected directory
+
+			purgdir();
+			break;
+
+		case ID_PURG: // file / Delete Backups / Backups for the selected file
+
+			purg();
+			break;
+
+		case ID_VUBAK: // view / Backups
+
+			vubak();
+			break;
+
+		case ID_DELETE: // edit / Delete / Selected
+
+			delet();
+			break;
+
+		case ID_FLIPH: // edit / Flip / Horizontal
+
+			fliph();
+			break;
+
+		case ID_FLIPV: // edit / Flip / Vertical
+
+			flipv();
+			break;
+
+		case ID_FILANG: // fill / Angle 
+
+			if (StateMap.test(StateFlag::FORMSEL))
+				savdo();
+			filangl();
+			break;
+
+		case ID_PREF: // pref
+
+			prfmsg();
+			break;
+
+		case ID_BOLD: // fill / Border / Bean
+
+			if (StateMap.test(StateFlag::FORMSEL) || SelectedFormCount)
+				savdo();
+			dubold();
+			break;
+
+		case ID_ADEND: // add
+
+			stch2px1(PCSHeader.stitchCount - 1);
+			endpnt();
+			StateMap.set(StateFlag::BAKEND);
+			StateMap.set(StateFlag::RESTCH);
+			break;
+
+		case ID_SETAP: // view / Set / Applique Color
+
+			setap();
+			break;
+
+		case ID_APLIQ: // fill / Border / Applique
+
+			if (StateMap.test(StateFlag::FORMSEL))
+				savdo();
+			apliq();
+			break;
+
+		case ID_SATBRD: // fill / Border / Angle Satin
+
+			if (StateMap.test(StateFlag::FORMSEL))
+				savdo();
+			satbrd();
+			break;
+
+		case ID_FILCLP: // fill / Border / Clipboard
+
+			fclp();
+			break;
+
+		case ID_FILIN: // fill / Border / Line
+
+			if (StateMap.test(StateFlag::FORMSEL))
+				savdo();
+			bord();
+			break;
+
+		case ID_FRM0: // edit / Set / Form Zero Point
+
+			frm0();
+			break;
+
+		case ID_REDO: // redo
+
+			redo();
+			break;
+
+		case ID_UNFIL: // fill / Unfill
+
+			savdo();
+			unfil();
+			coltab();
+			StateMap.set(StateFlag::RESTCH);
+			break;
+
+		case ID_FORM: // Form
+
+			frmon();
+			if (StateMap.test(StateFlag::FORMSEL))
+				refrm();
+			else
+				form();
+			break;
+
+		case ID_FILSAT: // fill / Fan
+
+			StateMap.reset(StateFlag::FTHR);
+			filsat();
+			break;
+
+		case ID_OPNPCD: // file / Open Auxiliary file
+
+			switch (IniFile.auxFileType) {
+			case AUXDST:
+
+				OpenFileName.nFilterIndex = 3;
+				break;
+
+			default:
+
+				OpenFileName.nFilterIndex = 2;
+			}
+			nuFil();
+			nulayr(0);
+			break;
+
+		case ID_DELSTCH: // edit / Delete / All Stitches
+
+			delstch();
+			break;
+
+		case ID_FILL_VERT: // fill / Vertical
+
+			if (StateMap.test(StateFlag::FORMSEL) || SelectedFormCount)
+				savdo();
+			filvrt();
+			break;
+
+		case ID_FILL_HOR: // fill / Horizontal
+
+			if (StateMap.test(StateFlag::FORMSEL))
+				savdo();
+			filhor();
+			break;
+
+		case ID_RUNPAT: // view / Movie
+
+			movi();
+			break;
+
+		case ID_LENDEF: // Todo - No menu item in thred.rc for this option
+
+			IniFile.maxStitchLength = MAXSIZ * PFGRAN;
+			UserStitchLength = USESIZ * PFGRAN;
+			MinStitchLength = MINSIZ * PFGRAN;
+			break;
+
+		case ID_TSIZDEF: // view / Thread Size / Set Defaults
+
+			ThreadSize30 = TSIZ30;
+			ThreadSize40 = TSIZ40;
+			ThreadSize60 = TSIZ60;
+			break;
+
+		case ID_SIZ30: // view / Thread Size / 30
+
+			tsizmsg("30", ThreadSize30);
+			StateMap.set(StateFlag::ENTR30);
+			break;
+
+		case ID_SIZ40: // view / Thread Size / 40
+
+			tsizmsg("40", ThreadSize40);
+			StateMap.set(StateFlag::ENTR40);
+			break;
+
+		case ID_SIZ60: // view / Thread Size / 60
+
+			tsizmsg("60", ThreadSize60);
+			StateMap.set(StateFlag::ENTR60);
+			break;
+
+		case ID_HIDBITF: // file / Hide Bitmap
+		case ID_HIDBIT:  // edit / Trace / Hide Bitmap
+
+			hidbit();
+			break;
+
+		case ID_LODBIT: // file / Load Bitmap
+
+			lodbmp();
+			break;
+
+		case ID_KNOTS: // edit / Set / Knots
+
+			setknots();
+			break;
+
+		case ID_REMZERO: // edit / Delete / Small Stitches
+
+			duzero();
+			break;
+
+		case ID_ROT: // rot
+
+			rot();
+			break;
+
+		case ZUMIN: // in
+
+			if (StateMap.test(StateFlag::GMRK) || StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::INSRT) || StateMap.test(StateFlag::GRPSEL) || StateMap.test(StateFlag::FORMSEL))
+				zumin();
+			else {
+				StateMap.reset(StateFlag::BZUM);
+				StateMap.set(StateFlag::BOXZUM);
+				StateMap.reset(StateFlag::BZUMIN);
+				StateMap.set(StateFlag::VCAPT);
+				SetCapture(ThrEdWindow);
+			}
+			break;
+
+		case ID_ZUMOUT: // out
+
+			zumout();
+			break;
+
+		case ID_FILE_OPEN1: // file / Open
+
+			fop();
+			break;
+
+		case ID_VIEW_STCHBAK: // view / Set / Background Color
+
+			if (nuBak()) {
+				BackgroundColor = BackgroundColorStruct.rgbResult;
+				BackgroundPen = nuPen(BackgroundPen, 1, BackgroundColor);
+				BackgroundPenWidth = 1;
+				DeleteObject(BackgroundBrush);
+				BackgroundBrush = CreateSolidBrush(BackgroundColor);
+				if (PCSBMPFileName[0])
+					bfil();
+				zumhom();
+			}
+			break;
+
+		case ID_BITCOL: // view / Set / Bitmap Color
+
+			if (nuBit()) {
+				BitmapColor = fswap(BitMapColorStruct.rgbResult);
+				if (PCSBMPFileName[0])
+					bfil();
+				BitmapPen = nuPen(BitmapPen, 1, BitmapColor);
+				zumhom();
+			}
+			break;
+
+		case ID_FILE_SAVE3: // file / Save As
+
+			colchk();
+			savAs();
+			break;
+
+		case ID_EDIT_RESET_COL: // edit / Reset Colors
+
+			for (iColor = 0; iColor < 16; iColor++) {
+				UserColor[iColor] = DefaultColors[iColor];
+				UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
+				UserPen[iColor] = nuPen(UserPen[iColor], 1, UserColor[iColor]);
+				redraw(UserColorWin[iColor]);
+			}
+			StateMap.set(StateFlag::RESTCH);
+			break;
+
+		case ID_FILE_SAVE2: // file / Save
+
+			colchk();
+			save();
+			break;
+
+		case VU_ZUMFUL: // view / Zoom Full
+
+			zumhom();
+			break;
+
+		case ID_EDIT_SELECTCOLOR: // edit / Select / Color
+
+			selCol();
+			break;
+
+		case ID_FILE_NEW1: // file / New
+
+			if (!savcmp()) {
+				savdisc();
+				StateMap.set(StateFlag::NEWBAK);
+				StateMap.reset(StateFlag::PRFACT);
+				undat();
+			}
+			else {
+				newFil();
+				nulayr(0);
+			}
+			break;
+
+		case ID_BACK: // undo
+
+			bak();
+			break;
+
+		case ID_DESNAM: // edit / Set / Designer Name
+
+			getdes();
+			break;
+		}
+		break;
 	}
 	return 0;
 }
 
 //return the width of a text item
 int txtWid(const TCHAR* string) noexcept {
-
 	GetTextExtentPoint32(ThredDC, string, strlen(string), &TextSize);
 	return TextSize.cx;
 }
 
 void makCol() noexcept {
-
 	unsigned	iColor = 0;
 	TCHAR		buffer[3] = { 0 };
 
 	buffer[1] = '0';
 	buffer[2] = 0;
 	for (iColor = 0; iColor < 16; iColor++) {
-
 		DefaultColorWin[iColor] = CreateWindow(
 			"STATIC",
 			0,
@@ -20416,7 +18849,6 @@ void makCol() noexcept {
 }
 
 void ritloc() {
-
 	TCHAR*	environment = nullptr;
 	TCHAR	lockFileName[_MAX_PATH] = { 0 };
 	HANDLE	lockFile = {};
@@ -20597,7 +19029,6 @@ void crtcurs() noexcept {
 }
 
 void dstcurs() noexcept {
-
 	DestroyCursor(FormCursor);
 	DestroyCursor(DLineCursor);
 	DestroyCursor(NeedleUpCursor);
@@ -20608,7 +19039,6 @@ void dstcurs() noexcept {
 }
 
 void duhom() {
-
 	unsigned	pathLength = 0;
 	TCHAR*		lastCharacter = nullptr;
 
@@ -20617,7 +19047,6 @@ void duhom() {
 	if (lastCharacter)
 		lastCharacter++;
 	else {
-
 		pathLength = GetCurrentDirectory(_MAX_PATH, HomeDirectory);
 		if (pathLength) {
 			HomeDirectory[pathLength++] = '\\';
@@ -20629,39 +19058,35 @@ void duhom() {
 
 #if  __UseASM__
 void bcpy(TCHAR* destination, TCHAR* source) {
-
 	_asm {
 		mov		ebx, source
 		mov		edx, destination
 		xor		eax, eax
-blup :	
+		blup :
 		mov		al, [ebx]
-		mov[edx], al
-		or eax, eax
-		je		short blupx
-		inc		ebx
-		inc		edx
-		jmp		blup
-blupx :
+			mov[edx], al
+			or eax, eax
+			je		short blupx
+			inc		ebx
+			inc		edx
+			jmp		blup
+			blupx :
 	}
 }
 #endif
 
 void ducmd() {
-
 	unsigned long	bytesRead = 0;
 	int				iArgument = 0;
 	TCHAR*			balaradFileName = nullptr;
 
 	if (__argc > 1) {
-
 #if  __UseASM__
 		bcpy(WorkingFileName, __argv[1]);
 #else
 		strcpy_s(WorkingFileName, __argv[1]);
 #endif
 		if (!strncmp(WorkingFileName, "/F1:", 4)) {
-
 			balaradFileName = &WorkingFileName[4];
 			BalaradFile = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 			if (BalaradFile != INVALID_HANDLE_VALUE) {
@@ -20673,18 +19098,15 @@ void ducmd() {
 				strcpy_s(BalaradName0, balaradFileName);
 #endif
 				if (__argc > 2) {
-
 #if  __UseASM__
 					bcpy(WorkingFileName, __argv[2]);
 #else
 					strcpy_s(WorkingFileName, __argv[2]);
 #endif
 					if (!strncmp(WorkingFileName, "/F2:", 4)) {
-
 						balaradFileName = &WorkingFileName[4];
 						BalaradFile = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 						if (BalaradFile != INVALID_HANDLE_VALUE) {
-
 #if  __UseASM__
 							bcpy(BalaradName1, balaradFileName);
 #else
@@ -20704,9 +19126,7 @@ void ducmd() {
 			DeleteFile(BalaradName1);
 		}
 		else {
-
 			for (iArgument = 2; iArgument < __argc; iArgument++) {
-
 				strcat_s(WorkingFileName, " ");
 				strcat_s(WorkingFileName, __argv[iArgument]);
 			}
@@ -20717,7 +19137,6 @@ void ducmd() {
 }
 
 void redini() {
-
 	unsigned		iUnDo = 0, iVersion = 0, iColor = 0, adjustedWidth = 0;
 	unsigned long	bytesRead = 0;
 	HDC				deviceContext = {};
@@ -20734,14 +19153,12 @@ void redini() {
 	if (IniFileHandle == INVALID_HANDLE_VALUE)
 		defpref();
 	else {
-
 		ReadFile(IniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, 0);
 		if (bytesRead < 2061)
 			IniFile.formBoxSizePixels = DEFBPIX;
 		strcpy_s(DefaultDirectory, IniFile.defaultDirectory);
 		strcpy_s(DefaultBMPDirectory, IniFile.defaultDirectory);
 		for (iColor = 0; iColor < 16; iColor++) {
-
 			UserColor[iColor] = IniFile.stitchColors[iColor];
 			CustomColor[iColor] = IniFile.stitchPreferredColors[iColor];
 			CustomBackgroundColor[iColor] = IniFile.backgroundPreferredColors[iColor];
@@ -20766,7 +19183,7 @@ void redini() {
 		if (IniFile.userStitchLength)
 			UserStitchLength = IniFile.userStitchLength;
 		if (!IniFile.maxStitchLength)
-			IniFile.maxStitchLength = MAXSIZ*PFGRAN;
+			IniFile.maxStitchLength = MAXSIZ * PFGRAN;
 		if (IniFile.smallStitchLength)
 			SmallStitchLength = IniFile.smallStitchLength;
 		StitchBoxesThreshold = IniFile.stitchBoxesThreshold;
@@ -20824,40 +19241,39 @@ void redini() {
 			IniFile.daisyPetalLen = DAZPLEN;
 
 		switch (IniFile.hoopType) {
+		case SMALHUP:
 
-			case SMALHUP:
+			IniFile.hoopSizeX = SHUPX;
+			IniFile.hoopSizeY = SHUPY;
+			break;
 
-				IniFile.hoopSizeX = SHUPX;
-				IniFile.hoopSizeY = SHUPY;
-				break;
+		case LARGHUP:
 
-			case LARGHUP:
+			IniFile.hoopSizeX = LHUPX;
+			IniFile.hoopSizeY = LHUPY;
+			break;
 
+		case CUSTHUP:
+
+			if (!IniFile.hoopSizeX)
 				IniFile.hoopSizeX = LHUPX;
+			if (!IniFile.hoopSizeY)
 				IniFile.hoopSizeY = LHUPY;
-				break;
+			break;
 
-			case CUSTHUP:
+		case HUP100:
 
-				if (!IniFile.hoopSizeX)
-					IniFile.hoopSizeX = LHUPX;
-				if (!IniFile.hoopSizeY)
-					IniFile.hoopSizeY = LHUPY;
-				break;
+			if (!IniFile.hoopSizeX)
+				IniFile.hoopSizeX = HUP100XY;
+			if (!IniFile.hoopSizeY)
+				IniFile.hoopSizeY = HUP100XY;
+			break;
 
-			case HUP100:
+		default:
 
-				if (!IniFile.hoopSizeX)
-					IniFile.hoopSizeX = HUP100XY;
-				if (!IniFile.hoopSizeY)
-					IniFile.hoopSizeY = HUP100XY;
-				break;
-
-			default:
-
-				IniFile.hoopType = LARGHUP;
-				IniFile.hoopSizeX = LHUPX;
-				IniFile.hoopSizeY = LHUPY;
+			IniFile.hoopType = LARGHUP;
+			IniFile.hoopSizeX = LHUPX;
+			IniFile.hoopSizeY = LHUPY;
 		}
 		UnzoomedRect.x = IniFile.hoopSizeX;
 		UnzoomedRect.y = IniFile.hoopSizeY;
@@ -20900,7 +19316,6 @@ void trcsub(HWND* window, unsigned xCoordinate, unsigned yCoordinate, unsigned b
 }
 
 void chkirct() noexcept {
-
 	POINT	screenLimits;
 
 	screenLimits.x = ScreenSizePixels.cx - 1;
@@ -20922,26 +19337,23 @@ void chkirct() noexcept {
 	if (IniFile.initialWindowCoords.bottom < 0)
 		IniFile.initialWindowCoords.bottom = 0;
 	if (IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left < 300) {
-
 		IniFile.initialWindowCoords.left = 0;
 		IniFile.initialWindowCoords.right = screenLimits.x >> 1;
 	}
 	if (IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top < 300) {
-
 		IniFile.initialWindowCoords.top = 0;
 		IniFile.initialWindowCoords.bottom = screenLimits.y >> 1;
 	}
 }
 
 void init() {
-
 	unsigned		iButton = 0, iRGB = 0, iRGBK = 0, iByte = 0, flag = 0, iColor = 0, iOffset = 0, iMenu = 0;
 	unsigned long	thwid = 0;
 	long			offsetStepSize = 0;
 	RECT			tRct = {};
 	RECT			wrct = {};
 	HDC				deviceContext = GetDC(NULL);
-	const unsigned long	screenHalfWidth = (GetDeviceCaps(deviceContext, HORZRES))>>1;
+	const unsigned long	screenHalfWidth = (GetDeviceCaps(deviceContext, HORZRES)) >> 1;
 	TCHAR*			buttonText = nullptr;
 
 	ReleaseDC(NULL, deviceContext);
@@ -20956,7 +19368,6 @@ void init() {
 	wrct.left = tRct.left;
 	wrct.right = tRct.right;
 	for (iMenu = 0; iMenu <= M_HELP; iMenu++) {
-
 		GetMenuItemRect(ThrEdWindow, MainMenu, iMenu, &tRct);
 		wrct.right += (tRct.right - tRct.left);
 	}
@@ -20992,19 +19403,17 @@ void init() {
 	NumeralWidth = txtWid("0");
 	offsetStepSize = txtWid("0");
 	for (iOffset = 0; iOffset < NERCNT; iOffset++)
-		BoxOffset[iOffset] = offsetStepSize*(iOffset + 1);
+		BoxOffset[iOffset] = offsetStepSize * (iOffset + 1);
 	GetClientRect(ThrEdWindow, &ThredWindowRect);
 	stchWnd();
 	lodstr();
 	maxwid(STR_PRF0, STR_PRF27);
 	if (!IniFileHandle) {
-
 		//initialize the user color and thread size arrays
 		for (iColor = 0; iColor < 16; iColor++)
 			UserColor[iColor] = DefaultColors[iColor];
 	}
 	for (iColor = 0; iColor < 16; iColor++) {
-
 		ThreadSize[iColor][0] = '4';
 		ThreadSize[iColor][1] = '0';
 	}
@@ -21037,31 +19446,29 @@ void init() {
 	setgrd(IniFile.gridColor);
 	makCol();		//make the color change windows
 	for (iButton = 0; iButton < 9; iButton++) {
-
 		switch (iButton) {
+		case HBOXSEL:
 
-			case HBOXSEL:
+			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
+			buttonText = StringTable[STR_BOXSEL];
+			break;
 
-				flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-				buttonText = StringTable[STR_BOXSEL];
-				break;
+		case HUPTO:
 
-			case HUPTO:
+			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
+			buttonText = StringTable[STR_UPOF];
+			break;
 
-				flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-				buttonText = StringTable[STR_UPOF];
-				break;
+		case HHID:
 
-			case HHID:
+			flag = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER;
+			buttonText = StringTable[STR_PIKOL];
+			break;
 
-				flag = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER;
-				buttonText = StringTable[STR_PIKOL];
-				break;
+		default:
 
-			default:
-
-				buttonText = "";
-				flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
+			buttonText = "";
+			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
 		}
 		ButtonWin[iButton] = CreateWindow(
 			"STATIC",
@@ -21104,7 +19511,6 @@ void init() {
 		NULL);
 
 	for (iRGB = 0; iRGB < 3; iRGB++) {
-
 		trcsub(&TraceControlWindow[iRGB], ButtonWidth*iRGB, 0, ButtonHeight * 15);
 		trcsub(&TraceSelectWindow[iRGB], ButtonWidth*iRGB, ButtonHeight * 15, ButtonHeight);
 		trcsub(&TraceUpWindow[iRGB], ButtonWidth*iRGB, ButtonHeight * 16, ButtonHeight);
@@ -21137,7 +19543,6 @@ void init() {
 	LayerPen[5] = CreatePen(PS_SOLID, 1, 0xc0c040);
 	BackgroundPenWidth = 1;
 	for (iColor = 0; iColor < 16; iColor++) {
-
 		ThreadSizePixels[iColor] = 1;
 		ThreadSizeIndex[iColor] = 1;
 		UserPen[iColor] = CreatePen(PS_SOLID, 1, UserColor[iColor]);
@@ -21145,7 +19550,6 @@ void init() {
 	BackgroundBrush = CreateSolidBrush(BackgroundColor);
 	//create brushes
 	for (iColor = 0; iColor < 16; iColor++) {
-
 		DefaultColorBrush[iColor] = CreateSolidBrush(DefaultColors[iColor]);
 		UserColorBrush[iColor] = CreateSolidBrush(UserColor[iColor]);
 	}
@@ -21192,7 +19596,6 @@ COLORREF defTxt(unsigned iColor) noexcept {
 }
 
 void relin() {
-
 	stch2px1(ClosestPointIndex - 1);
 	MoveLine0[0].x = StitchCoordinatesPixels.x;
 	MoveLine0[0].y = StitchCoordinatesPixels.y;
@@ -21204,24 +19607,10 @@ void relin() {
 }
 
 unsigned setRmp(unsigned bit) noexcept {
-
-#if  __UseASM__
-	_asm {
-		xor		eax, eax
-		mov		ebx, offset MarkedStitchMap
-		mov		ecx, bit
-		bts		[ebx], ecx
-		jc		short setrm
-		dec		eax
-setrm :
-	}
-#else
 	return _bittestandset((long *)MarkedStitchMap, bit) ? 0 : 0xffffffff;
-#endif
 }
 
 void drwLin(unsigned currentStitch, unsigned length, HPEN hPen) {
-
 	unsigned			iOffset = 0, layer = 0;
 	const fPOINTATTR*	activeStitch = &StitchBuffer[currentStitch];
 
@@ -21266,7 +19655,6 @@ void drwLin(unsigned currentStitch, unsigned length, HPEN hPen) {
 }
 
 void dumov() {
-
 	const fPOINTATTR*	anchorStitch = &StitchBuffer[MoveAnchor];
 	POINT				rotationOutline[8] = {};
 	POINT				OffsetFromCenter = {};
@@ -21274,7 +19662,6 @@ void dumov() {
 	RotateAngle = atan2(StitchBuffer[MoveAnchor + 1].y - StitchBuffer[MoveAnchor].y, StitchBuffer[MoveAnchor + 1].x - StitchBuffer[MoveAnchor].x);
 	if (anchorStitch->x >= ZoomRect.left && anchorStitch->x <= ZoomRect.right
 		&& anchorStitch->y >= ZoomRect.bottom && anchorStitch->y <= ZoomRect.top) {
-
 		sdCor2px(StitchBuffer[MoveAnchor], &RotationCenterPixels);
 		rotationOutline[0].x = rotationOutline[6].x = RotationCenterPixels.x;
 		rotationOutline[0].y = rotationOutline[6].y = RotationCenterPixels.y;
@@ -21298,11 +19685,8 @@ void dumov() {
 }
 
 unsigned chkup(unsigned count, unsigned iStitch) {
-
 	if (StateMap.test(StateFlag::UPTO) && ClosestPointIndex) {
-
 		if (ColorChangeTable[iStitch].stitchIndex < ClosestPointIndex) {
-
 			if (ColorChangeTable[iStitch + 1].stitchIndex < ClosestPointIndex)
 				return count;
 			else
@@ -21316,7 +19700,6 @@ unsigned chkup(unsigned count, unsigned iStitch) {
 }
 
 bool bitar() {
-
 	dRECTANGLE	backingRect = {};
 	dRECTANGLE	differenceRect = {};
 	dPOINT		bitmapStitchRatio = {};
@@ -21328,18 +19711,15 @@ bool bitar() {
 	if (zoomedInRect.top > BitmapSizeinStitches.y || zoomedInRect.left > BitmapSizeinStitches.x)
 		return 0;
 	else {
-
 		BitmapSrcRect.top = ceil(zoomedInRect.top*BmpStitchRatio.y);
 		BitmapSrcRect.left = ceil(ZoomRect.left*BmpStitchRatio.x);
 		BitmapSrcRect.right = floor(ZoomRect.right*BmpStitchRatio.x);
 		BitmapSrcRect.bottom = floor(zoomedInRect.bottom*BmpStitchRatio.y);
 		if (BitmapSrcRect.right > gsl::narrow<long>(BitmapWidth)) {
-
 			BitmapSrcRect.right = BitmapWidth;
 			StateMap.reset(StateFlag::LANDSCAP);
 		}
 		if (BitmapSrcRect.bottom > gsl::narrow<long>(BitmapHeight)) {
-
 			BitmapSrcRect.bottom = BitmapHeight;
 			StateMap.set(StateFlag::LANDSCAP);
 		}
@@ -21362,7 +19742,6 @@ bool bitar() {
 }
 
 void drwknot() {
-
 #define			KSIZ 5
 #define			KLSIZ 10
 
@@ -21371,9 +19750,7 @@ void drwknot() {
 	POINT		tlin[5] = {};
 
 	if (!UserFlagMap.test(UserFlag::KNOTOF) && KnotCount && PCSHeader.stitchCount) {
-
 		for (ind = 0; ind < KnotCount; ind++) {
-
 			stCor2px(StitchBuffer[Knots[ind]], &pnt);
 			SelectObject(StitchWindowMemDC, KnotPen);
 			SetROP2(StitchWindowMemDC, R2_XORPEN);
@@ -21392,13 +19769,11 @@ void drwknot() {
 }
 
 void dugrid() {
-
 	POINT		gridLine[2] = {};
 	RECT		gridRect = {};
 	unsigned	iGrid = 0;
 
 	if (ZoomFactor < ShowStitchThreshold || !ShowStitchThreshold) {
-
 		SetROP2(StitchWindowMemDC, R2_XORPEN);
 		SelectObject(StitchWindowMemDC, GridPen);
 		gridRect.left = ceil(ZoomRect.left / IniFile.gridSize);
@@ -21408,14 +19783,12 @@ void dugrid() {
 		gridLine[0].x = 0;
 		gridLine[1].x = StitchWindowClientRect.right;
 		for (iGrid = gridRect.bottom; iGrid <= gsl::narrow<unsigned>(gridRect.top); iGrid++) {
-
 			gridLine[0].y = gridLine[1].y = StitchWindowClientRect.bottom - (iGrid*IniFile.gridSize - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 			Polyline(StitchWindowMemDC, gridLine, 2);
 		}
 		gridLine[0].y = 0;
 		gridLine[1].y = StitchWindowClientRect.bottom;
 		for (iGrid = gridRect.left; iGrid <= gsl::narrow<unsigned>(gridRect.right); iGrid++) {
-
 			gridLine[0].x = gridLine[1].x = (iGrid*IniFile.gridSize - ZoomRect.left)*ZoomRatio.x + 0.5;
 			Polyline(StitchWindowMemDC, gridLine, 2);
 		}
@@ -21424,20 +19797,17 @@ void dugrid() {
 }
 
 void rint() noexcept {
-
 	const unsigned	size = StitchWindowClientRect.right*StitchWindowClientRect.bottom;
 
 	CellSize.x = (ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
 	CellSize.y = (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom;
 	if (size > RMAPBITS) {
-
 		CellSize.x *= size / RMAPBITS;
 		CellSize.y *= size / RMAPBITS;
 	}
 }
 
 unsigned setRmap(fPOINTATTR stitchPoint) noexcept {
-
 	unsigned	bitPoint;
 
 	bitPoint = floor((stitchPoint.x - ZoomRect.left) / CellSize.x)*floor((stitchPoint.y - ZoomRect.bottom) / CellSize.y);
@@ -21447,7 +19817,6 @@ unsigned setRmap(fPOINTATTR stitchPoint) noexcept {
 }
 
 void drwStch() {
-
 	unsigned	iColor = 0, iStitch = 0, stitchCount = 0, pwid = 0, wascol = 0;
 	unsigned	layer = 0;
 	double		slope = 0.0, offset = 0.0;
@@ -21502,21 +19871,19 @@ void drwStch() {
 			ShowWindow(VerticalScrollBar, TRUE);
 		}
 		else {
-
 			ShowWindow(VerticalScrollBar, FALSE);
 			ShowWindow(HorizontalScrollBar, FALSE);
 		}
 		duzrat();
 		dub6 = ZoomRatio.x * 6;
-		ThreadWidthPixels[0] = dub6*TSIZ30;
-		ThreadWidthPixels[1] = dub6*TSIZ40;
-		ThreadWidthPixels[2] = dub6*TSIZ60;
+		ThreadWidthPixels[0] = dub6 * TSIZ30;
+		ThreadWidthPixels[1] = dub6 * TSIZ40;
+		ThreadWidthPixels[2] = dub6 * TSIZ60;
 		for (iColor = 0; iColor < 16; iColor++) {
 			if (StateMap.test(StateFlag::THRDS))
 				nuStchSiz(iColor, ThreadWidthPixels[ThreadSizeIndex[iColor]]);
 			else {
 				if (StateMap.test(StateFlag::COL)) {
-
 					if (iColor == ActiveColor)
 						nuStchSiz(iColor, ThreadWidthPixels[ThreadSizeIndex[iColor]]);
 					else
@@ -21526,7 +19893,7 @@ void drwStch() {
 					nuStchSiz(iColor, 1);
 			}
 		}
-		LineIndex = 0; 
+		LineIndex = 0;
 		DisplayedColorBitmap.reset();
 		if (StateMap.test(StateFlag::ZUMED)) {
 			LineIndex = 0;
@@ -21762,7 +20129,6 @@ void drwStch() {
 }
 
 void dubar() {
-
 	unsigned	iColorChange = 0;
 	RECT		colorBarRect = { DrawItem->rcItem.left,
 								 0,
@@ -21773,7 +20139,7 @@ void dubar() {
 
 	for (iColorChange = 0; iColorChange < ColorChanges; iColorChange++) {
 		barSectionHeight = static_cast<double>(ColorChangeTable[iColorChange + 1].stitchIndex) / PCSHeader.stitchCount;
-		colorBarRect.bottom = barSectionHeight*DrawItem->rcItem.bottom;
+		colorBarRect.bottom = barSectionHeight * DrawItem->rcItem.bottom;
 		FillRect(DrawItem->hDC, &colorBarRect, UserColorBrush[ColorChangeTable[iColorChange].colorIndex]);
 		colorBarRect.top = colorBarRect.bottom;
 	}
@@ -21786,7 +20152,6 @@ void dubar() {
 		SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 		Polyline(DrawItem->hDC, indicatorLine, 2);
 		if (StateMap.test(StateFlag::GRPSEL)) {
-
 			selectedIndicator = static_cast<double>(GroupStitchIndex) / PCSHeader.stitchCount;
 			indicatorLine[0].y = indicatorLine[1].y = colorBarRect.bottom*selectedIndicator + 0.5;
 			indicatorLine[0].x = colorBarRect.left;
@@ -21798,12 +20163,11 @@ void dubar() {
 }
 
 void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
-
 	unsigned	iStitch = 0, iForm = 0, iVertexInForm = 0, iVertex = 0, iColor = 0, iLine = 0, bytesToRead = 0;
 	POINT		drawingDestinationSize = { (drawItem->rcItem.right - drawItem->rcItem.left),
-										   (drawItem->rcItem.bottom - drawItem->rcItem.top)	};
+										   (drawItem->rcItem.bottom - drawItem->rcItem.top) };
 	STRHED		stitchHeader = {};
-	fPOINT		stitchSourceSize = {1,1};
+	fPOINT		stitchSourceSize = { 1,1 };
 	double		ratio = 0.0;
 	double		xRatio = 0.0, yRatio = 0.0;
 	COLORREF	brushColor = {};
@@ -21817,43 +20181,37 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 		OPEN_EXISTING, 0, 0);
 
 	if (thrEdFile != INVALID_HANDLE_VALUE) {
-
 		ReadFile(thrEdFile, &stitchHeader, sizeof(STRHED), &BytesRead, NULL);
 		if (BytesRead == sizeof(STRHED)) {
-
 			if ((stitchHeader.headerType & 0xffffff) == 0x746872) {
-
 				fileTypeVersion = (stitchHeader.headerType & 0xff000000) >> 24;
 				switch (fileTypeVersion) {
+				case 0:
 
-					case 0:
+					if (PCSHeader.hoopType == SMALHUP) {
+						stitchSourceSize.x = IniFile.hoopSizeX = SHUPX;
+						stitchSourceSize.y = IniFile.hoopSizeY = SHUPY;
+					}
+					else {
+						stitchSourceSize.x = IniFile.hoopSizeX = LHUPX;
+						stitchSourceSize.y = IniFile.hoopSizeY = LHUPY;
+					}
+					break;
 
-						if (PCSHeader.hoopType == SMALHUP) {
+				case 1:
+				case 2:
 
-							stitchSourceSize.x = IniFile.hoopSizeX = SHUPX;
-							stitchSourceSize.y = IniFile.hoopSizeY = SHUPY;
-						}
-						else {
-
-							stitchSourceSize.x = IniFile.hoopSizeX = LHUPX;
-							stitchSourceSize.y = IniFile.hoopSizeY = LHUPY;
-						}
-						break;
-
-					case 1:
-					case 2:
-
-						ReadFile(thrEdFile, &extendedHeader, sizeof(STREX), &BytesRead, NULL);
-						if (BytesRead != sizeof(STREX))
-							return;
-						stitchSourceSize.x = extendedHeader.hoopSizeX;
-						stitchSourceSize.y = extendedHeader.hoopSizeY;
-
-						break;
-
-					default:
-
+					ReadFile(thrEdFile, &extendedHeader, sizeof(STREX), &BytesRead, NULL);
+					if (BytesRead != sizeof(STREX))
 						return;
+					stitchSourceSize.x = extendedHeader.hoopSizeX;
+					stitchSourceSize.y = extendedHeader.hoopSizeY;
+
+					break;
+
+				default:
+
+					return;
 				}
 			}
 			xRatio = static_cast<double>(drawingDestinationSize.x) / stitchSourceSize.x;
@@ -21863,13 +20221,11 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 			else
 				ratio = yRatio;
 			if (stitchHeader.stitchCount) {
-
 				std::vector<fPOINTATTR> stitchesToDraw(stitchHeader.stitchCount);
 				std::vector<POINT> lines(stitchHeader.stitchCount);
 				bytesToRead = stitchHeader.stitchCount * sizeof(fPOINTATTR);
 				ReadFile(thrEdFile, &stitchesToDraw[0], bytesToRead, &BytesRead, 0);
 				if (bytesToRead == BytesRead) {
-
 					SetFilePointer(thrEdFile, 16, 0, FILE_CURRENT);
 					ReadFile(thrEdFile, &brushColor, sizeof(COLORREF), &BytesRead, 0);
 					ReadFile(thrEdFile, colors, 16 * sizeof(COLORREF), &BytesRead, 0);
@@ -21880,14 +20236,11 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 					pen = CreatePen(PS_SOLID, 1, colors[iColor]);
 					iLine = 0;
 					for (iStitch = 0; iStitch < stitchHeader.stitchCount; iStitch++) {
-
 						if ((stitchesToDraw[iStitch].attribute & 0xf) == iColor) {
-
 							lines[iLine].x = stitchesToDraw[iStitch].x*ratio;
 							lines[iLine++].y = drawingDestinationSize.y - stitchesToDraw[iStitch].y*ratio;
 						}
 						else {
-
 							pen = nuPen(pen, 1, colors[iColor]);
 							SelectObject(drawItem->hDC, pen);
 							Polyline(drawItem->hDC, &lines[0], iLine);
@@ -21896,7 +20249,6 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 						}
 					}
 					if (iLine) {
-
 						pen = nuPen(pen, 1, colors[iColor]);
 						SelectObject(drawItem->hDC, pen);
 						Polyline(drawItem->hDC, &lines[0], iLine);
@@ -21941,7 +20293,6 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 					for (iStitch = 0; iStitch < stitchHeader.formCount; iStitch++) {
 						iLine = iVertex;
 						for (iVertexInForm = 0; (iVertexInForm < formList[iStitch].vertexCount) && (iVertex < stitchHeader.vertexCount); iVertexInForm++) {
-
 							lines[iVertexInForm].x = vertexList[iVertex].x*ratio;
 							lines[iVertexInForm].y = drawingDestinationSize.y - vertexList[iVertex++].y*ratio;
 						}
@@ -21963,30 +20314,27 @@ void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
 }
 
 void durct(unsigned shift, RECT traceControlRect, RECT* traceHighMask, RECT* traceMiddleMask, RECT* traceLowMask) {
-
-	const unsigned	lowerColor = (UpPixelColor >> shift) & 0xff; 
-	const unsigned	upperColor = (DownPixelColor >> shift) & 0xff; 
+	const unsigned	lowerColor = (UpPixelColor >> shift) & 0xff;
+	const unsigned	upperColor = (DownPixelColor >> shift) & 0xff;
 	const unsigned	controlHeight = traceControlRect.bottom - traceControlRect.top;
 	double			ratio = 0.0;
 
-	
-	
+
+
 	traceHighMask->left = traceLowMask->left = traceMiddleMask->left = traceControlRect.left;
 	traceHighMask->right = traceLowMask->right = traceMiddleMask->right = traceControlRect.right;
 	ratio = static_cast<double>(lowerColor) / 255;
-	traceMiddleMask->top = controlHeight*ratio + traceControlRect.top;
+	traceMiddleMask->top = controlHeight * ratio + traceControlRect.top;
 	ratio = static_cast<double>(upperColor) / 255;
-	traceMiddleMask->bottom = controlHeight*ratio + traceControlRect.top;
+	traceMiddleMask->bottom = controlHeight * ratio + traceControlRect.top;
 	StateMap.reset(StateFlag::DUHI);
 	StateMap.reset(StateFlag::DULO);
 	if (lowerColor) {
-
 		StateMap.set(StateFlag::DULO);
 		traceLowMask->bottom = traceMiddleMask->top;
 		traceLowMask->top = 0;
 	}
 	if (upperColor != 255) {
-
 		StateMap.set(StateFlag::DUHI);
 		traceHighMask->top = traceMiddleMask->bottom;
 		traceHighMask->bottom = traceControlRect.bottom;
@@ -21994,7 +20342,6 @@ void durct(unsigned shift, RECT traceControlRect, RECT* traceHighMask, RECT* tra
 }
 
 void dublk(HDC dc, const RECT* traceHighMask, const RECT* traceLowMask) {
-
 	if (StateMap.test(StateFlag::DUHI))
 		FillRect(dc, traceHighMask, BlackBrush);
 	if (StateMap.test(StateFlag::DULO))
@@ -22002,7 +20349,6 @@ void dublk(HDC dc, const RECT* traceHighMask, const RECT* traceLowMask) {
 }
 
 LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-
 	unsigned	position = 0, iRGB = 0, iColor = 0, iThumb = 0, iVersion = 0, lastCharacter = 0;
 	unsigned	screenCenterOffset = 0;
 	SIZE		maxWindowDimension = {};
@@ -22019,492 +20365,436 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 	RECT		traceLowMaskRect = {};		//low trace mask rectangle
 
 	switch (message) {
+	case WM_INITMENU:
 
-		case WM_INITMENU:
+		if (StateMap.testAndReset(StateFlag::PRFACT)) {
+			DestroyWindow(PreferencesWindow);
+			StateMap.reset(StateFlag::WASRT);
+		}
+		unmsg();
+		undat();
+		StateMap.reset(StateFlag::FORMIN);
+		StateMap.set(StateFlag::RESTCH);
+		break;
 
-			if (StateMap.testAndReset(StateFlag::PRFACT)) {
+	case WM_HSCROLL:
 
-				DestroyWindow(PreferencesWindow);
-				StateMap.reset(StateFlag::WASRT);
+		switch (gsl::narrow<long>(LOWORD(wParam))) {
+		case SB_LINELEFT:
+
+			if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+				MovieTimeStep += SPEDLIN;
+				if (MovieTimeStep > MAXDELAY)
+					MovieTimeStep = MAXDELAY;
+				setsped();
+				SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
 			}
-			unmsg();
-			undat();
-			StateMap.reset(StateFlag::FORMIN);
-			StateMap.set(StateFlag::RESTCH);
-			break;
-
-		case WM_HSCROLL:
-
-			switch (gsl::narrow<long>(LOWORD(wParam))) {
-
-				case SB_LINELEFT:
-
-					if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
-
-						MovieTimeStep += SPEDLIN;
-						if (MovieTimeStep > MAXDELAY)
-							MovieTimeStep = MAXDELAY;
-						setsped();
-						SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
-					}
-					else {
-
-						scrollPoint.x = (ZoomRect.right - ZoomRect.left)*LINSCROL;
-						if (!scrollPoint.x)
-							scrollPoint.x = 1;
-						scrollPoint.y = 0;
-						rshft(scrollPoint);
-					}
-					return 1;
-
-				case SB_LINERIGHT:
-
-					if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
-
-						MovieTimeStep -= SPEDLIN;
-						if (MovieTimeStep < MINDELAY)
-							MovieTimeStep = MINDELAY;
-						setsped();
-						SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
-					}
-					else {
-
-						scrollPoint.x = -(ZoomRect.right - ZoomRect.left)*LINSCROL;
-						if (!scrollPoint.x)
-							scrollPoint.x = -1;
-						scrollPoint.y = 0;
-						rshft(scrollPoint);
-					}
-					return 1;
-
-				case SB_PAGELEFT:
-
-					if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
-
-						MovieTimeStep += SPEDPAG;
-						if (MovieTimeStep < MINDELAY)
-							MovieTimeStep = MINDELAY;
-						setsped();
-						SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
-					}
-					else
-						pglft();
-					return 1;
-
-				case SB_PAGERIGHT:
-
-					if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
-
-						MovieTimeStep -= SPEDPAG;
-						if (MovieTimeStep < MINDELAY)
-							MovieTimeStep = MINDELAY;
-						setsped();
-						SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
-					}
-					else
-						pgrit();
-					return 1;
-
-				case SB_THUMBPOSITION:
-
-					if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
-						[[gsl::suppress(type.1)]]{
-							if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) {
-
-							position = HIWORD(wParam);
-							MovieTimeStep = MAXDELAY - position;
-							setsped();
-							SetScrollPos(SpeedScrollBar, SB_CTL, position, TRUE);
-						}
-						}
-					}
-					else {
-						[[gsl::suppress(type.1)]] {
-							if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) {
-
-							scrollPoint.x = ZoomRect.right - ZoomRect.left;
-							ZoomRect.left = gsl::narrow<long>(HIWORD(wParam));
-							ZoomRect.right = ZoomRect.left + scrollPoint.x;
-							if (ZoomRect.right > UnzoomedRect.x) {
-
-								ZoomRect.right = UnzoomedRect.x;
-								ZoomRect.left = UnzoomedRect.x - scrollPoint.x;
-							}
-							StateMap.set(StateFlag::RESTCH);
-							}
-						}
-					}
-					return 1;
+			else {
+				scrollPoint.x = (ZoomRect.right - ZoomRect.left)*LINSCROL;
+				if (!scrollPoint.x)
+					scrollPoint.x = 1;
+				scrollPoint.y = 0;
+				rshft(scrollPoint);
 			}
-			break;
+			return 1;
 
-		case WM_VSCROLL:
+		case SB_LINERIGHT:
 
-			switch (LOWORD(wParam)) {
+			if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+				MovieTimeStep -= SPEDLIN;
+				if (MovieTimeStep < MINDELAY)
+					MovieTimeStep = MINDELAY;
+				setsped();
+				SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
+			}
+			else {
+				scrollPoint.x = -(ZoomRect.right - ZoomRect.left)*LINSCROL;
+				if (!scrollPoint.x)
+					scrollPoint.x = -1;
+				scrollPoint.y = 0;
+				rshft(scrollPoint);
+			}
+			return 1;
 
-				//		unpat();
-				case SB_LINEDOWN:
+		case SB_PAGELEFT:
 
-					scrollPoint.y = (ZoomRect.top - ZoomRect.bottom)*LINSCROL;
-					if (!scrollPoint.y)
-						scrollPoint.y = 1;
-					scrollPoint.x = 0;
-					rshft(scrollPoint);
-					return 1;
+			if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+				MovieTimeStep += SPEDPAG;
+				if (MovieTimeStep < MINDELAY)
+					MovieTimeStep = MINDELAY;
+				setsped();
+				SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
+			}
+			else
+				pglft();
+			return 1;
 
-				case SB_LINEUP:
+		case SB_PAGERIGHT:
 
-					scrollPoint.y = -(ZoomRect.top - ZoomRect.bottom)*LINSCROL;
-					if (!scrollPoint.y)
-						scrollPoint.y = -1;
-					scrollPoint.x = 0;
-					rshft(scrollPoint);
-					return 1;
+			if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+				MovieTimeStep -= SPEDPAG;
+				if (MovieTimeStep < MINDELAY)
+					MovieTimeStep = MINDELAY;
+				setsped();
+				SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
+			}
+			else
+				pgrit();
+			return 1;
 
-				case SB_PAGEDOWN:
+		case SB_THUMBPOSITION:
 
-					pgdwn();
-					return 1;
-
-				case SB_PAGEUP:
-
-					pgup();
-					return 1;
-
-				case SB_THUMBPOSITION:
-
-					scrollPoint.y = ZoomRect.top - ZoomRect.bottom;
-					ZoomRect.top = UnzoomedRect.y - gsl::narrow<long>(HIWORD(wParam));
-					ZoomRect.bottom = ZoomRect.top - scrollPoint.y;
-					if (ZoomRect.bottom < 0) {
-
-						ZoomRect.bottom = 0;
-						ZoomRect.top = scrollPoint.y;
+			if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+				[[gsl::suppress(type.1)]]{
+					if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) {
+					position = HIWORD(wParam);
+					MovieTimeStep = MAXDELAY - position;
+					setsped();
+					SetScrollPos(SpeedScrollBar, SB_CTL, position, TRUE);
+				}
+				}
+			}
+			else {
+				[[gsl::suppress(type.1)]]{
+					if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) {
+					scrollPoint.x = ZoomRect.right - ZoomRect.left;
+					ZoomRect.left = gsl::narrow<long>(HIWORD(wParam));
+					ZoomRect.right = ZoomRect.left + scrollPoint.x;
+					if (ZoomRect.right > UnzoomedRect.x) {
+						ZoomRect.right = UnzoomedRect.x;
+						ZoomRect.left = UnzoomedRect.x - scrollPoint.x;
 					}
 					StateMap.set(StateFlag::RESTCH);
-					return 1;
-			}
-			break;
-
-		case WM_DRAWITEM:
-
-			//owner draw windows
-			[[gsl::suppress(type.1)]]DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
-			if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
-
-				if (StateMap.test(StateFlag::TXTRED)) {
-					drwtxtr();
-					return 1;
-				}
-				if (!StateMap.test(StateFlag::RUNPAT)) {
-
-					if (!StateMap.test(StateFlag::HIDSTCH) && (FileHandle || StateMap.test(StateFlag::INIT) || FormIndex || StateMap.test(StateFlag::SATPNT)) && !StateMap.test(StateFlag::BAKSHO))
-						drwStch();
-					else {
-
-						FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-						duzrat();
-						dugrid();
-						if (StateMap.test(StateFlag::HIDSTCH)) {
-
-							drwfrm();
-							if (StateMap.test(StateFlag::SATPNT))
-								satzum();
-						}
-						if (StateMap.test(StateFlag::PRFACT))
-							redraw(PreferencesWindow);
-						else {
-
-							if (StateMap.test(StateFlag::MOVFRM)) {
-
-								unfrm();
-								StateMap.set(StateFlag::SHOFRM);
-								dufrm();
-							}
-							if (StateMap.test(StateFlag::POLIMOV)) {
-
-								StateMap.set(StateFlag::SHOFRM);
-								mdufrm();
-							}
-						}
-					}
-					BitBlt(
-						StitchWindowDC,					// handle to destination DC
-						0,								// x-coord of destination upper-left corner
-						0,								// y-coord of destination upper-left corner
-						StitchWindowClientRect.right,	// width of destination rectangle
-						StitchWindowClientRect.bottom,	// height of destination rectangle
-						StitchWindowMemDC,				// handle to source DC
-						0,								// x-coordinate of source upper-left corner
-						0,								// y-coordinate of source upper-left corner
-						SRCCOPY							// raster operation code
-					);
-					if (StateMap.test(StateFlag::ROTSHO))
-						durot();
-					if (StateMap.test(StateFlag::SHOSAT))
-						dusat();
-					if (StateMap.test(StateFlag::SHOINSF))
-						duinsf();
-				}
-				return 1;
-			}
-			if (DrawItem->hwndItem == ColorBar && DrawItem->itemAction == ODA_DRAWENTIRE) {
-
-				if (PCSHeader.stitchCount)
-					dubar();
-				else
-					FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_WINDOW));
-				return 1;
-			}
-			if (DrawItem->hwndItem == ButtonWin[HHID] && DrawItem->itemAction == ODA_DRAWENTIRE) {
-
-				position = (ButtonWidthX3 - PickColorMsgSize.cx) >> 1;
-				if (StateMap.test(StateFlag::HID)) {
-
-					FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[ActiveColor]);
-					SetBkColor(DrawItem->hDC, UserColor[ActiveColor]);
-				}
-				else
-					FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_BTNFACE));
-				if (StateMap.test(StateFlag::TXTRED)) {
-					LoadString(ThrEdInstance, IDS_TXWID, fileName, _MAX_PATH);
-					sprintf_s(HelpBuffer, sizeof(HelpBuffer), fileName, TextureScreen.width / PFGRAN);
-					TextOut(DrawItem->hDC, position, 1, HelpBuffer, strlen(HelpBuffer));;
-				}
-				else
-					TextOut(DrawItem->hDC, position, 1, StringTable[STR_PIKOL], strlen(StringTable[STR_PIKOL]));;
-				return 1;
-			}
-			if (StateMap.test(StateFlag::WASTRAC)) {
-
-				for (iRGB = 0; iRGB < 3; iRGB++) {
-
-					if (DrawItem->hwndItem == TraceUpWindow[iRGB]) {
-
-						FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);
-						upnum(iRGB);
-						return 1;
-					}
-					if (DrawItem->hwndItem == TraceDownWindow[iRGB]) {
-
-						FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);
-						dwnum(iRGB);
-					}
-					if (DrawItem->hwndItem == TraceControlWindow[iRGB]) {
-
-						durct(TraceShift[iRGB], DrawItem->rcItem, &traceHighMaskRect, &traceMiddleMaskRect, &traceLowMaskRect);
-						FillRect(DrawItem->hDC, &traceMiddleMaskRect, TraceBrush[iRGB]);
-						dublk(DrawItem->hDC, &traceHighMaskRect, &traceLowMaskRect);
-						return 1;
-					}
-					if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
-
-						TempBrush = BlackBrush;
-						strcpy_s(buffer, StringTable[STR_OFF]);
-						SetBkColor(DrawItem->hDC, 0);
-						SetTextColor(DrawItem->hDC, TraceRGB[iRGB]);
-						if (StateMap.test(TraceRGBFlag[iRGB])) {
-
-							TempBrush = TraceBrush[iRGB];
-							strcpy_s(buffer, StringTable[STR_ON]);
-							SetTextColor(DrawItem->hDC, 0);
-							SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
-						}
-						FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
-						TextOut(DrawItem->hDC, 1, 1, buffer, strlen(buffer));
-						return 1;
-					}
-					if (DrawItem->hwndItem == TraceNumberInput) {
-
-						FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[ColumnColor]);
-						SetBkColor(DrawItem->hDC, TraceRGB[ColumnColor]);
-						TextOut(DrawItem->hDC, 1, 1, TraceInputBuffer, strlen(TraceInputBuffer));
-						return 1;
 					}
 				}
 			}
-			else {
+			return 1;
+		}
+		break;
 
-				for (iColor = 0; iColor < 16; iColor++) {
+	case WM_VSCROLL:
 
-					if (DrawItem->hwndItem == DefaultColorWin[iColor]) {
+		switch (LOWORD(wParam)) {
+			//		unpat();
+		case SB_LINEDOWN:
 
-						FillRect(DrawItem->hDC, &DrawItem->rcItem, DefaultColorBrush[iColor]);
-						if (DisplayedColorBitmap.test(iColor)) {
-							SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
-							SetTextColor(DrawItem->hDC, defTxt(iColor));
-							sprintf_s(buffer, sizeof(buffer), "%d", iColor + 1);
-							length = strlen(buffer);
-							GetTextExtentPoint32(DrawItem->hDC, buffer, length, &textSize);
-							TextOut(DrawItem->hDC, (ButtonWidth - textSize.cx) >> 1, 0, buffer, length);
-						}
-						return 1;
-					}
-					if (DrawItem->hwndItem == UserColorWin[iColor]) {
+			scrollPoint.y = (ZoomRect.top - ZoomRect.bottom)*LINSCROL;
+			if (!scrollPoint.y)
+				scrollPoint.y = 1;
+			scrollPoint.x = 0;
+			rshft(scrollPoint);
+			return 1;
 
-						FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[iColor]);
-						if (iColor == ActiveColor) {
+		case SB_LINEUP:
 
-							SelectObject(DrawItem->hDC, CrossPen);
-							SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-							line[0].x = line[1].x = DrawItem->rcItem.right >> 1;
-							line[0].y = 0;
-							line[1].y = DrawItem->rcItem.bottom;
-							Polyline(DrawItem->hDC, line, 2);
-							line[0].y = line[1].y = DrawItem->rcItem.bottom >> 1;
-							line[0].x = 0;
-							line[1].x = DrawItem->rcItem.right;
-							Polyline(DrawItem->hDC, line, 2);
-							SetROP2(StitchWindowMemDC, R2_COPYPEN);
-						}
-						return 1;
-					}
-				}
+			scrollPoint.y = -(ZoomRect.top - ZoomRect.bottom)*LINSCROL;
+			if (!scrollPoint.y)
+				scrollPoint.y = -1;
+			scrollPoint.x = 0;
+			rshft(scrollPoint);
+			return 1;
+
+		case SB_PAGEDOWN:
+
+			pgdwn();
+			return 1;
+
+		case SB_PAGEUP:
+
+			pgup();
+			return 1;
+
+		case SB_THUMBPOSITION:
+
+			scrollPoint.y = ZoomRect.top - ZoomRect.bottom;
+			ZoomRect.top = UnzoomedRect.y - gsl::narrow<long>(HIWORD(wParam));
+			ZoomRect.bottom = ZoomRect.top - scrollPoint.y;
+			if (ZoomRect.bottom < 0) {
+				ZoomRect.bottom = 0;
+				ZoomRect.top = scrollPoint.y;
 			}
-			if (StateMap.test(StateFlag::BAKSHO) && DrawItem->itemAction == ODA_DRAWENTIRE) {
-
-				if (StateMap.test(StateFlag::THUMSHO)) {
-
-					for (iThumb = 0; iThumb < 4; iThumb++) {
-
-						if (DrawItem->hwndItem == BackupViewer[iThumb] && iThumb < ThumbnailDisplayCount) {
-
-							ritbak(ThumbnailsSelected[iThumb], DrawItem);
-							rthumnam(iThumb);
-							return 1;
-						}
-					}
-				}
-				else {
-
-					for (iVersion = 0; iVersion < OLDVER; iVersion++) {
-
-						if (DrawItem->hwndItem == BackupViewer[iVersion]) {
-
-							strcpy_s(fileName, ThrName);
-							lastCharacter = duth(fileName);
-							fileName[lastCharacter] = gsl::narrow<TCHAR>(iVersion) + 's';
-							ritbak(fileName, DrawItem);
-							return 1;
-						}
-					}
-				}
-			}
-			break;
-
-		case WM_SIZE:
-
-			GetClientRect(p_hWnd, &ThredWindowRect);
-			switch (wParam) {
-
-				case SIZE_MAXIMIZED:
-
-					UserFlagMap.set(UserFlag::SAVMAX);
-					break;
-
-				case SIZE_MINIMIZED:
-
-					UserFlagMap.reset(UserFlag::SAVMAX);
-					break;
-
-				case SIZE_RESTORED:
-
-					UserFlagMap.reset(UserFlag::SAVMAX);
-					chkirct();
-					if (StateMap.testAndSet(StateFlag::SIZED)) {
-
-						screenCenterOffset = 0;
-						maxWindowDimension.cx = ScreenSizePixels.cx - 30;
-						if ((ThredWindowRect.right - ThredWindowRect.left) > maxWindowDimension.cx) {
-
-							screenCenterOffset = (ScreenSizePixels.cx - maxWindowDimension.cx) >> 1;
-							ThredWindowRect.left = screenCenterOffset;
-							ThredWindowRect.right = ScreenSizePixels.cx - screenCenterOffset;
-						}
-						maxWindowDimension.cy = ScreenSizePixels.cy - 30;
-						if ((ThredWindowRect.bottom - ThredWindowRect.top) > maxWindowDimension.cy) {
-
-							screenCenterOffset = (ScreenSizePixels.cy - maxWindowDimension.cy) >> 1;
-							ThredWindowRect.top = screenCenterOffset;
-							ThredWindowRect.bottom = ScreenSizePixels.cy - screenCenterOffset;
-						}
-						if (screenCenterOffset)
-							MoveWindow(p_hWnd, ThredWindowRect.left, ThredWindowRect.top, ThredWindowRect.right - ThredWindowRect.left, ThredWindowRect.bottom - ThredWindowRect.top, TRUE);
-					}
-					else {
-
-						MoveWindow(p_hWnd, IniFile.initialWindowCoords.left, IniFile.initialWindowCoords.top, IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left, IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top, TRUE);
-					}
-					ShowWindow(p_hWnd, SW_SHOW);
-					break;
-			}
-			GetClientRect(p_hWnd, &ThredWindowRect);
-			movStch();
-			if (StateMap.test(StateFlag::ZUMED)) {
-				tdub = static_cast<double>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
-				adjustedWidth = StitchWindowClientRect.right / tdub;
-				if (adjustedWidth + ZoomRect.left > UnzoomedRect.x) {
-
-					ZoomRect.right = UnzoomedRect.x;
-					ZoomRect.left = UnzoomedRect.x - adjustedWidth;
-				}
-				else
-					ZoomRect.right = adjustedWidth + ZoomRect.left;
-			}
-			else {
-
-				ZoomRect.left = ZoomRect.bottom = 0;
-				ZoomRect.right = UnzoomedRect.x;
-				ZoomRect.top = UnzoomedRect.y;
-			}
-			NearestCount = 0;
 			StateMap.set(StateFlag::RESTCH);
-			if (StateMap.test(StateFlag::SELBOX))
-				shft2box();
-			if (StateMap.test(StateFlag::RUNPAT)) {
-
-				FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-				if (StateMap.test(StateFlag::ZUMED))
-					RunPoint = GroupStartStitch;
-				else
-					RunPoint = 0;
-			}
 			return 1;
+		}
+		break;
 
-		case WM_MOVE:
+	case WM_DRAWITEM:
 
-			GetClientRect(p_hWnd, &ThredWindowRect);
-			if ((ThredWindowRect.right - ThredWindowRect.left) < 20) {
-
-				ThredWindowRect.left = 0;
-				ThredWindowRect.right = 300;
-			}
-			if ((ThredWindowRect.bottom - ThredWindowRect.top) < 20) {
-
-				ThredWindowRect.top = 0;
-				ThredWindowRect.bottom = 300;
-			}
-			movStch();
-			if (StateMap.test(StateFlag::RUNPAT)) {
-
-				duzrat();
-				RunPoint = 0;
-				FillRect(StitchWindowDC, &StitchWindowClientRect, BackgroundBrush);
-			}
-			return 1;
-
-		case WM_CLOSE:
-
-			dun();
-			if (StateMap.test(StateFlag::SAVEX))
+		//owner draw windows
+		[[gsl::suppress(type.1)]]DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
+		if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
+			if (StateMap.test(StateFlag::TXTRED)) {
+				drwtxtr();
 				return 1;
+			}
+			if (!StateMap.test(StateFlag::RUNPAT)) {
+				if (!StateMap.test(StateFlag::HIDSTCH) && (FileHandle || StateMap.test(StateFlag::INIT) || FormIndex || StateMap.test(StateFlag::SATPNT)) && !StateMap.test(StateFlag::BAKSHO))
+					drwStch();
+				else {
+					FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
+					duzrat();
+					dugrid();
+					if (StateMap.test(StateFlag::HIDSTCH)) {
+						drwfrm();
+						if (StateMap.test(StateFlag::SATPNT))
+							satzum();
+					}
+					if (StateMap.test(StateFlag::PRFACT))
+						redraw(PreferencesWindow);
+					else {
+						if (StateMap.test(StateFlag::MOVFRM)) {
+							unfrm();
+							StateMap.set(StateFlag::SHOFRM);
+							dufrm();
+						}
+						if (StateMap.test(StateFlag::POLIMOV)) {
+							StateMap.set(StateFlag::SHOFRM);
+							mdufrm();
+						}
+					}
+				}
+				BitBlt(
+					StitchWindowDC,					// handle to destination DC
+					0,								// x-coord of destination upper-left corner
+					0,								// y-coord of destination upper-left corner
+					StitchWindowClientRect.right,	// width of destination rectangle
+					StitchWindowClientRect.bottom,	// height of destination rectangle
+					StitchWindowMemDC,				// handle to source DC
+					0,								// x-coordinate of source upper-left corner
+					0,								// y-coordinate of source upper-left corner
+					SRCCOPY							// raster operation code
+				);
+				if (StateMap.test(StateFlag::ROTSHO))
+					durot();
+				if (StateMap.test(StateFlag::SHOSAT))
+					dusat();
+				if (StateMap.test(StateFlag::SHOINSF))
+					duinsf();
+			}
+			return 1;
+		}
+		if (DrawItem->hwndItem == ColorBar && DrawItem->itemAction == ODA_DRAWENTIRE) {
+			if (PCSHeader.stitchCount)
+				dubar();
+			else
+				FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_WINDOW));
+			return 1;
+		}
+		if (DrawItem->hwndItem == ButtonWin[HHID] && DrawItem->itemAction == ODA_DRAWENTIRE) {
+			position = (ButtonWidthX3 - PickColorMsgSize.cx) >> 1;
+			if (StateMap.test(StateFlag::HID)) {
+				FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[ActiveColor]);
+				SetBkColor(DrawItem->hDC, UserColor[ActiveColor]);
+			}
+			else
+				FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_BTNFACE));
+			if (StateMap.test(StateFlag::TXTRED)) {
+				LoadString(ThrEdInstance, IDS_TXWID, fileName, _MAX_PATH);
+				sprintf_s(HelpBuffer, sizeof(HelpBuffer), fileName, TextureScreen.width / PFGRAN);
+				TextOut(DrawItem->hDC, position, 1, HelpBuffer, strlen(HelpBuffer));;
+			}
+			else
+				TextOut(DrawItem->hDC, position, 1, StringTable[STR_PIKOL], strlen(StringTable[STR_PIKOL]));;
+			return 1;
+		}
+		if (StateMap.test(StateFlag::WASTRAC)) {
+			for (iRGB = 0; iRGB < 3; iRGB++) {
+				if (DrawItem->hwndItem == TraceUpWindow[iRGB]) {
+					FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);
+					upnum(iRGB);
+					return 1;
+				}
+				if (DrawItem->hwndItem == TraceDownWindow[iRGB]) {
+					FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);
+					dwnum(iRGB);
+				}
+				if (DrawItem->hwndItem == TraceControlWindow[iRGB]) {
+					durct(TraceShift[iRGB], DrawItem->rcItem, &traceHighMaskRect, &traceMiddleMaskRect, &traceLowMaskRect);
+					FillRect(DrawItem->hDC, &traceMiddleMaskRect, TraceBrush[iRGB]);
+					dublk(DrawItem->hDC, &traceHighMaskRect, &traceLowMaskRect);
+					return 1;
+				}
+				if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
+					TempBrush = BlackBrush;
+					strcpy_s(buffer, StringTable[STR_OFF]);
+					SetBkColor(DrawItem->hDC, 0);
+					SetTextColor(DrawItem->hDC, TraceRGB[iRGB]);
+					if (StateMap.test(TraceRGBFlag[iRGB])) {
+						TempBrush = TraceBrush[iRGB];
+						strcpy_s(buffer, StringTable[STR_ON]);
+						SetTextColor(DrawItem->hDC, 0);
+						SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
+					}
+					FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
+					TextOut(DrawItem->hDC, 1, 1, buffer, strlen(buffer));
+					return 1;
+				}
+				if (DrawItem->hwndItem == TraceNumberInput) {
+					FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[ColumnColor]);
+					SetBkColor(DrawItem->hDC, TraceRGB[ColumnColor]);
+					TextOut(DrawItem->hDC, 1, 1, TraceInputBuffer, strlen(TraceInputBuffer));
+					return 1;
+				}
+			}
+		}
+		else {
+			for (iColor = 0; iColor < 16; iColor++) {
+				if (DrawItem->hwndItem == DefaultColorWin[iColor]) {
+					FillRect(DrawItem->hDC, &DrawItem->rcItem, DefaultColorBrush[iColor]);
+					if (DisplayedColorBitmap.test(iColor)) {
+						SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
+						SetTextColor(DrawItem->hDC, defTxt(iColor));
+						sprintf_s(buffer, sizeof(buffer), "%d", iColor + 1);
+						length = strlen(buffer);
+						GetTextExtentPoint32(DrawItem->hDC, buffer, length, &textSize);
+						TextOut(DrawItem->hDC, (ButtonWidth - textSize.cx) >> 1, 0, buffer, length);
+					}
+					return 1;
+				}
+				if (DrawItem->hwndItem == UserColorWin[iColor]) {
+					FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[iColor]);
+					if (iColor == ActiveColor) {
+						SelectObject(DrawItem->hDC, CrossPen);
+						SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
+						line[0].x = line[1].x = DrawItem->rcItem.right >> 1;
+						line[0].y = 0;
+						line[1].y = DrawItem->rcItem.bottom;
+						Polyline(DrawItem->hDC, line, 2);
+						line[0].y = line[1].y = DrawItem->rcItem.bottom >> 1;
+						line[0].x = 0;
+						line[1].x = DrawItem->rcItem.right;
+						Polyline(DrawItem->hDC, line, 2);
+						SetROP2(StitchWindowMemDC, R2_COPYPEN);
+					}
+					return 1;
+				}
+			}
+		}
+		if (StateMap.test(StateFlag::BAKSHO) && DrawItem->itemAction == ODA_DRAWENTIRE) {
+			if (StateMap.test(StateFlag::THUMSHO)) {
+				for (iThumb = 0; iThumb < 4; iThumb++) {
+					if (DrawItem->hwndItem == BackupViewer[iThumb] && iThumb < ThumbnailDisplayCount) {
+						ritbak(ThumbnailsSelected[iThumb], DrawItem);
+						rthumnam(iThumb);
+						return 1;
+					}
+				}
+			}
+			else {
+				for (iVersion = 0; iVersion < OLDVER; iVersion++) {
+					if (DrawItem->hwndItem == BackupViewer[iVersion]) {
+						strcpy_s(fileName, ThrName);
+						lastCharacter = duth(fileName);
+						fileName[lastCharacter] = gsl::narrow<TCHAR>(iVersion) + 's';
+						ritbak(fileName, DrawItem);
+						return 1;
+					}
+				}
+			}
+		}
+		break;
+
+	case WM_SIZE:
+
+		GetClientRect(p_hWnd, &ThredWindowRect);
+		switch (wParam) {
+		case SIZE_MAXIMIZED:
+
+			UserFlagMap.set(UserFlag::SAVMAX);
 			break;
+
+		case SIZE_MINIMIZED:
+
+			UserFlagMap.reset(UserFlag::SAVMAX);
+			break;
+
+		case SIZE_RESTORED:
+
+			UserFlagMap.reset(UserFlag::SAVMAX);
+			chkirct();
+			if (StateMap.testAndSet(StateFlag::SIZED)) {
+				screenCenterOffset = 0;
+				maxWindowDimension.cx = ScreenSizePixels.cx - 30;
+				if ((ThredWindowRect.right - ThredWindowRect.left) > maxWindowDimension.cx) {
+					screenCenterOffset = (ScreenSizePixels.cx - maxWindowDimension.cx) >> 1;
+					ThredWindowRect.left = screenCenterOffset;
+					ThredWindowRect.right = ScreenSizePixels.cx - screenCenterOffset;
+				}
+				maxWindowDimension.cy = ScreenSizePixels.cy - 30;
+				if ((ThredWindowRect.bottom - ThredWindowRect.top) > maxWindowDimension.cy) {
+					screenCenterOffset = (ScreenSizePixels.cy - maxWindowDimension.cy) >> 1;
+					ThredWindowRect.top = screenCenterOffset;
+					ThredWindowRect.bottom = ScreenSizePixels.cy - screenCenterOffset;
+				}
+				if (screenCenterOffset)
+					MoveWindow(p_hWnd, ThredWindowRect.left, ThredWindowRect.top, ThredWindowRect.right - ThredWindowRect.left, ThredWindowRect.bottom - ThredWindowRect.top, TRUE);
+			}
+			else {
+				MoveWindow(p_hWnd, IniFile.initialWindowCoords.left, IniFile.initialWindowCoords.top, IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left, IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top, TRUE);
+			}
+			ShowWindow(p_hWnd, SW_SHOW);
+			break;
+		}
+		GetClientRect(p_hWnd, &ThredWindowRect);
+		movStch();
+		if (StateMap.test(StateFlag::ZUMED)) {
+			tdub = static_cast<double>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
+			adjustedWidth = StitchWindowClientRect.right / tdub;
+			if (adjustedWidth + ZoomRect.left > UnzoomedRect.x) {
+				ZoomRect.right = UnzoomedRect.x;
+				ZoomRect.left = UnzoomedRect.x - adjustedWidth;
+			}
+			else
+				ZoomRect.right = adjustedWidth + ZoomRect.left;
+		}
+		else {
+			ZoomRect.left = ZoomRect.bottom = 0;
+			ZoomRect.right = UnzoomedRect.x;
+			ZoomRect.top = UnzoomedRect.y;
+		}
+		NearestCount = 0;
+		StateMap.set(StateFlag::RESTCH);
+		if (StateMap.test(StateFlag::SELBOX))
+			shft2box();
+		if (StateMap.test(StateFlag::RUNPAT)) {
+			FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
+			if (StateMap.test(StateFlag::ZUMED))
+				RunPoint = GroupStartStitch;
+			else
+				RunPoint = 0;
+		}
+		return 1;
+
+	case WM_MOVE:
+
+		GetClientRect(p_hWnd, &ThredWindowRect);
+		if ((ThredWindowRect.right - ThredWindowRect.left) < 20) {
+			ThredWindowRect.left = 0;
+			ThredWindowRect.right = 300;
+		}
+		if ((ThredWindowRect.bottom - ThredWindowRect.top) < 20) {
+			ThredWindowRect.top = 0;
+			ThredWindowRect.bottom = 300;
+		}
+		movStch();
+		if (StateMap.test(StateFlag::RUNPAT)) {
+			duzrat();
+			RunPoint = 0;
+			FillRect(StitchWindowDC, &StitchWindowClientRect, BackgroundBrush);
+		}
+		return 1;
+
+	case WM_CLOSE:
+
+		dun();
+		if (StateMap.test(StateFlag::SAVEX))
+			return 1;
+		break;
 	}
 	return DefWindowProc(p_hWnd, message, wParam, lParam);
 }
 
 void sachk() {
-
 	unsigned	iForm = 0, iGuide = 0, bakclo = 0;
 
 	for (iForm = 0; iForm < FormIndex; iForm++) {
@@ -22513,9 +20803,7 @@ void sachk() {
 			const SATCON* guide = form->satinOrAngle.guide;
 			if (guide) {
 				for (iGuide = 0; iGuide < form->satinGuideCount; iGuide++) {
-
 					if (guide[iGuide].start > form->vertexCount || guide[iGuide].finish > form->vertexCount) {
-
 						bakclo = ClosestFormToCursor;
 						ClosestFormToCursor = iForm;
 						delsac(iForm);
@@ -22534,7 +20822,6 @@ void sachk() {
 #endif
 
 int	fltex(int code) noexcept {
-
 #if  __UseASM__
 	short	cw;
 
@@ -22545,7 +20832,7 @@ int	fltex(int code) noexcept {
 		mov		cw, 0x27f
 		fldcw	cw
 		dec		eax
-fltex1 :
+		fltex1 :
 	}
 #else
 	if (code != 0x10)
@@ -22600,10 +20887,8 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 	lpCmdLine;
 
 	if (RegisterClassEx(&wc)) {
-
 		redini();
 		if (IniFile.initialWindowCoords.right) {
-
 			ThrEdWindow = CreateWindow(
 				"thred",
 				"",
@@ -22618,7 +20903,6 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 				0);
 		}
 		else {
-
 			ThrEdWindow = CreateWindow(
 				"thred",
 				"",
@@ -22651,7 +20935,6 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		boost::dynamic_bitset<> private_TracedEdges(0);
 		TracedEdges = &private_TracedEdges;
 		while (GetMessage(&Msg, NULL, 0, 0)) {
-
 			StateMap.set(StateFlag::SAVACT);
 			if (!chkMsg())
 				DispatchMessage(&Msg);

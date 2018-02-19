@@ -305,7 +305,6 @@ bool istx(unsigned iForm) noexcept {
 }
 
 TXPNT* adtx(int count) noexcept {
-
 	unsigned iPoint = TextureIndex;
 
 	TextureIndex += count;
@@ -398,7 +397,6 @@ void deorg(POINT* point) noexcept {
 }
 
 void fthvars() {
-
 	StateMap.reset(StateFlag::BARSAT);
 	StateMap.reset(StateFlag::FTHR);
 	FeatherFillType = SelectedForm->fillInfo.feather.fillType;
@@ -416,33 +414,27 @@ void fthvars() {
 }
 
 constexpr float durat(float start, float finish) {
-
 	return (finish - start)*FeatherRatio + start;
 }
 
 constexpr float duxrat(float strt, float fin) {
-
 	return (fin - strt)*FeatherRatioLocal + strt;
 }
 
 void duxrats(unsigned start, unsigned finish, fPOINT* point) noexcept {
-
 	point->x = duxrat(BSequence[finish].x, BSequence[start].x);
 	point->y = duxrat(BSequence[finish].y, BSequence[start].y);
 }
 
 void durats(unsigned iSequence, fPOINT* point) noexcept {
-
 	const double	stitchLength = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x, BSequence[iSequence + 1].y - BSequence[iSequence].y);
 	fPOINT	adjustedPoint = {};
 
 	if (stitchLength < FeatherMinStitch) {
-
 		point->x = BSequence[iSequence].x;
 		point->y = BSequence[iSequence].y;
 	}
 	else {
-
 		FeatherRatioLocal = FeatherMinStitch / stitchLength;
 		adjustedPoint.x = duxrat(BSequence[iSequence + 1].x, BSequence[iSequence].x);
 		adjustedPoint.y = duxrat(BSequence[iSequence + 1].y, BSequence[iSequence].y);
@@ -452,21 +444,18 @@ void durats(unsigned iSequence, fPOINT* point) noexcept {
 }
 
 void xoseq(unsigned iSequence) noexcept {
-
 	OSequence[OutputIndex].x = BSequence[iSequence].x;
 	OSequence[OutputIndex].y = BSequence[iSequence].y;
 	OutputIndex++;
 }
 
 void xpfth(unsigned iSequence) noexcept {
-
 	FeatherSequence[ActivePointIndex].x = BSequence[iSequence].x;
 	FeatherSequence[ActivePointIndex].y = BSequence[iSequence].y;
 	ActivePointIndex++;
 }
 
 unsigned bpsg() noexcept {
-
 	unsigned testValue = 0;
 
 	if (!PseudoRandomValue)
@@ -479,109 +468,98 @@ unsigned bpsg() noexcept {
 }
 
 void nurat() {
-
 	float	remainder;
 
 	remainder = fmod(FeatherGlobalPosition, 1);
 	switch (FeatherFillType) {
+	case FTHPSG:
 
-		case FTHPSG:
-
-			if (FeatherUpCount) {
-
-				if (FeatherCountUp) {
-
-					FeatherRatio = static_cast<float>(FeatherTotalCount - (psg() % FeatherTotalCount)) / FeatherTotalCount;
-					FeatherCountUp--;
-				}
+		if (FeatherUpCount) {
+			if (FeatherCountUp) {
+				FeatherRatio = static_cast<float>(FeatherTotalCount - (psg() % FeatherTotalCount)) / FeatherTotalCount;
+				FeatherCountUp--;
+			}
+			else {
+				FeatherRatio = static_cast<float>(FeatherTotalCount - (bpsg() % FeatherTotalCount)) / FeatherTotalCount;
+				if (FeatherCountDown)
+					FeatherCountDown--;
 				else {
-
-					FeatherRatio = static_cast<float>(FeatherTotalCount - (bpsg() % FeatherTotalCount)) / FeatherTotalCount;
-					if (FeatherCountDown)
-						FeatherCountDown--;
-					else {
-
-						PseudoRandomValue = FSED;
-						FeatherCountUp = FeatherUpCount;
-						FeatherCountDown = FeatherDownCount;
-					}
+					PseudoRandomValue = FSED;
+					FeatherCountUp = FeatherUpCount;
+					FeatherCountDown = FeatherDownCount;
 				}
 			}
-			else
-				FeatherRatio = static_cast<float>(FeatherTotalCount - (psg() % FeatherTotalCount)) / FeatherTotalCount;
-			FeatherRatio *= FormFeatherRatio;
-			break;
+		}
+		else
+			FeatherRatio = static_cast<float>(FeatherTotalCount - (psg() % FeatherTotalCount)) / FeatherTotalCount;
+		FeatherRatio *= FormFeatherRatio;
+		break;
 
-		case FTHFAZ:
+	case FTHFAZ:
 
-			if (FeatherPhase >= FeatherUpCount)
-				FeatherRatio = 1;
-			else
-				FeatherRatio = FormFeatherRatio;
-			break;
-
-		case FTHSIN:
-
-			if (remainder > FeatherGlobalRatio)
-				FeatherRatio = sin((1 - remainder) / (1 - FeatherGlobalRatio)*PI + PI)*0.5 + 0.5;
-			else
-				FeatherRatio = sin(remainder / FeatherGlobalRatio*PI)*0.5 + 0.5;
-			FeatherRatio *= FormFeatherRatio;
-			break;
-
-		case FTHSIN2:
-
-			if (remainder > FeatherGlobalRatio)
-				FeatherRatio = sin((1 - remainder) / (1 - FeatherGlobalRatio)*PI);
-			else
-				FeatherRatio = sin(remainder / FeatherGlobalRatio*PI);
-			FeatherRatio *= FormFeatherRatio;
-			break;
-
-		case FTHRMP:
-
-			if (remainder > FeatherGlobalRatio)
-				FeatherRatio = (1 - remainder) / (1 - FeatherGlobalRatio);
-			else
-				FeatherRatio = remainder / FeatherGlobalRatio;
-			FeatherRatio *= FormFeatherRatio;
-			break;
-
-		case FTHLIN:
-		default:
-
+		if (FeatherPhase >= FeatherUpCount)
+			FeatherRatio = 1;
+		else
 			FeatherRatio = FormFeatherRatio;
+		break;
+
+	case FTHSIN:
+
+		if (remainder > FeatherGlobalRatio)
+			FeatherRatio = sin((1 - remainder) / (1 - FeatherGlobalRatio)*PI + PI)*0.5 + 0.5;
+		else
+			FeatherRatio = sin(remainder / FeatherGlobalRatio * PI)*0.5 + 0.5;
+		FeatherRatio *= FormFeatherRatio;
+		break;
+
+	case FTHSIN2:
+
+		if (remainder > FeatherGlobalRatio)
+			FeatherRatio = sin((1 - remainder) / (1 - FeatherGlobalRatio)*PI);
+		else
+			FeatherRatio = sin(remainder / FeatherGlobalRatio * PI);
+		FeatherRatio *= FormFeatherRatio;
+		break;
+
+	case FTHRMP:
+
+		if (remainder > FeatherGlobalRatio)
+			FeatherRatio = (1 - remainder) / (1 - FeatherGlobalRatio);
+		else
+			FeatherRatio = remainder / FeatherGlobalRatio;
+		FeatherRatio *= FormFeatherRatio;
+		break;
+
+	case FTHLIN:
+	default:
+
+		FeatherRatio = FormFeatherRatio;
 	}
 	++FeatherPhase %= FeatherPhaseIndex;
 	FeatherGlobalPosition += FeatherGlobalStep;
 }
 
 void fthfn(unsigned iSequence) {
-
 	nurat();
 	durats(iSequence, &OSequence[iSequence]);
 }
 
 void ratpnt(unsigned iPoint, unsigned iNextPoint, fPOINT* point) noexcept {
-
 	point->x = (BSequence[iNextPoint].x - BSequence[iPoint].x)*FeatherRatio + BSequence[iPoint].x;
 	point->y = (BSequence[iNextPoint].y - BSequence[iPoint].y)*FeatherRatio + BSequence[iPoint].y;
 }
 
 void midpnt(fPOINT startPoint, fPOINT endPoint, fPOINT* midPoint) noexcept {
-
 	midPoint->x = (endPoint.x - startPoint.x) * 0.5f + startPoint.x;
 	midPoint->y = (endPoint.y - startPoint.y) * 0.5f + startPoint.y;
 }
 
 void xratf(fPOINT startPoint, fPOINT endPoint, fPOINT* point) noexcept {
-
 	point->x = (endPoint.x - startPoint.x)*FeatherRatioLocal + startPoint.x;
 	point->y = (endPoint.y - startPoint.y)*FeatherRatioLocal + startPoint.y;
 }
 
 void fthrbfn(unsigned iSequence) {
-
 	fPOINT	currentPoint = {};
 	fPOINT	nextPoint = {};
 	fPOINT	currentHighPoint = {};
@@ -621,13 +599,11 @@ void fthrbfn(unsigned iSequence) {
 }
 
 void duoseq(unsigned iSequence) noexcept {
-
 	OSequence[iSequence].x = BSequence[iSequence].x;
 	OSequence[iSequence].y = BSequence[iSequence].y;
 }
 
 void fthdfn(unsigned iSequence) {
-
 	const double	length = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 	fPOINT	adjustedPoint = {};
 	fPOINT	currentPoint = {};
@@ -637,7 +613,6 @@ void fthdfn(unsigned iSequence) {
 	duoseq(iSequence);
 	duoseq(iSequence + 1);
 	if (length > FeatherMinStitch) {
-
 		FeatherRatioLocal = 0.5;
 		duxrats(iSequence + 1, iSequence, &adjustedPoint);
 		FeatherRatioLocal = FeatherMinStitch / length / 2;
@@ -650,7 +625,6 @@ void fthdfn(unsigned iSequence) {
 }
 
 void fthrfn() {
-
 	unsigned		ind = 0, res = 0;
 	const double	savedSpacing = LineSpacing;
 
@@ -668,10 +642,10 @@ void fthrfn() {
 	if (res > (FeatherPhaseIndex << 1))
 		ind++;
 	FeatherGlobalPosition = 0;
-	FeatherGlobalStep = 4.0 / SequenceIndex*ind;
+	FeatherGlobalStep = 4.0 / SequenceIndex * ind;
 	FeatherGlobalPhase = static_cast<float>(SequenceIndex) / ind;
 	FeatherGlobalRatio = static_cast<float>(FeatherCountUp) / FeatherPhaseIndex;
-	FeatherGlobalUp = FeatherGlobalPhase*FeatherGlobalRatio;
+	FeatherGlobalUp = FeatherGlobalPhase * FeatherGlobalRatio;
 	FeatherGlobalDown = FeatherGlobalPhase - FeatherGlobalUp;
 	SelectedForm->fillType = FTHF;
 	FeatherPhase = 1;
@@ -682,7 +656,6 @@ void fthrfn() {
 	BSequence[SequenceIndex + 1].y = BSequence[SequenceIndex - 1].y;
 	BSequence[SequenceIndex + 1].attribute = BSequence[SequenceIndex - 1].attribute;
 	if (ExtendedAttribute&AT_FTHBLND) {
-
 		OutputIndex = ActivePointIndex = 0;
 		for (ind = 0; ind < SequenceIndex; ind++) {
 			if (!BSequence[ind].attribute)
@@ -690,29 +663,22 @@ void fthrfn() {
 		}
 	}
 	else {
-
 		if (SelectedForm->extendedAttribute&AT_FTHBTH) {
-
 			for (ind = 0; ind <= SequenceIndex; ind++) {
-
 				if (!BSequence[ind].attribute)
 					fthdfn(ind);
 			}
 			ind--;
 		}
 		else {
-
 			for (ind = 0; ind <= SequenceIndex; ind++) {
-
 				if (BSequence[ind].attribute) {
-
 					if (ExtendedAttribute&AT_FTHUP)
 						fthfn(ind);
 					else
 						duoseq(ind);
 				}
 				else {
-
 					if (ExtendedAttribute&AT_FTHUP)
 						duoseq(ind);
 					else
@@ -730,11 +696,9 @@ void fthrfn() {
 }
 
 void fritfil() {
-
 	unsigned iSequence = 0, iReverseSequence = 0;
 
 	if (SequenceIndex) {
-
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = TYPFRM;
@@ -742,14 +706,12 @@ void fritfil() {
 		chkseq(false);
 		InterleaveSequenceIndex2++;
 		if (SelectedForm->extendedAttribute&AT_FTHBLND && ~(SelectedForm->extendedAttribute&(AT_FTHUP | AT_FTHBTH)) != (AT_FTHUP | AT_FTHBTH)) {
-
 			InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 			InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FTH;
 			InterleaveSequenceIndices[InterleaveSequenceIndex2].code = FTHMSK;
 			InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillInfo.feather.color;
 			iReverseSequence = ActivePointIndex - 1;
 			for (iSequence = 0; iSequence < ActivePointIndex; iSequence++) {
-
 				OSequence[iSequence].x = FeatherSequence[iReverseSequence].x;
 				OSequence[iSequence].y = FeatherSequence[iReverseSequence].y;
 				iReverseSequence--;
@@ -762,9 +724,7 @@ void fritfil() {
 }
 
 void fethrf() {
-
 	if (FormIndex) {
-
 		fvars(ClosestFormToCursor);
 		delclps(ClosestFormToCursor);
 		deltx();
@@ -787,16 +747,13 @@ void fethrf() {
 }
 
 void fethr() {
-
 	unsigned iForm = 0;
 
 	if (filmsgs(FMM_FTH))
 		return;
 	if (SelectedFormCount) {
-
 		savdo();
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-
 			ClosestFormToCursor = SelectedFormList[iForm];
 			fethrf();
 		}
@@ -805,9 +762,7 @@ void fethr() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-
 		if (StateMap.test(StateFlag::FORMSEL)) {
-
 			savdo();
 			fethrf();
 			StateMap.set(StateFlag::INIT);
@@ -818,7 +773,6 @@ void fethr() {
 }
 
 constexpr ULARGE_INTEGER  tim2int(FILETIME time) noexcept {
-
 	ULARGE_INTEGER  op = { {0,0} };
 
 	op.LowPart = time.dwLowDateTime;
@@ -852,13 +806,12 @@ int fil2crd(const char* fileName) noexcept {
 }
 
 bool chkp2cnam(const char* fileName) noexcept {
-
 	HANDLE	handleP2C;
 
 	handleP2C = CreateFile(fileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 	if (handleP2C == INVALID_HANDLE_VALUE) {
 		return 0;
-	} 
+	}
 	else {
 		CloseHandle(handleP2C);
 		return 1;
@@ -866,7 +819,6 @@ bool chkp2cnam(const char* fileName) noexcept {
 }
 
 void pes2crd() {
-
 #define P2CBUFSIZ 256
 
 	HKEY			registryKey = {};
@@ -876,7 +828,6 @@ void pes2crd() {
 	TCHAR			message[P2CBUFSIZ] = { 0 };
 	TCHAR			caption[P2CBUFSIZ] = { 0 };
 	OPENFILENAME	openFileName = {
-
 	sizeof(OPENFILENAME),	//lStructsize
 		ThrEdWindow,		//hwndOwner 
 		ThrEdInstance,		//hInstance 
@@ -902,35 +853,28 @@ void pes2crd() {
 	if (PCSHeader.stitchCount)
 		save();
 	else {
-
 		tabmsg(IDS_P2CNODAT);
 		return;
 	}
 	if (chkp2cnam(IniFile.p2cName)) {
-
 		fil2crd(ThrName);
 		return;
 	}
 	*IniFile.p2cName = 0;
 	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion", 0, KEY_READ, &registryKey) == ERROR_SUCCESS) {
-
 		size = _MAX_PATH;
 		keyType = REG_SZ;
 		if (RegQueryValueEx(registryKey, "ProgramFilesDir", 0, &keyType, (unsigned char*)programName, &size) == ERROR_SUCCESS) {
-
 			strcat_s(programName, "\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
 			if (!chkp2cnam(programName))
 				*programName = 0;
 		}
 	}
 	if (!*programName) {
-
 		LoadString(ThrEdInstance, IDS_P2CMSG, message, P2CBUFSIZ);
 		LoadString(ThrEdInstance, IDS_P2CTITL, caption, P2CBUFSIZ);
 		if (IDOK == MessageBox(ThrEdWindow, message, caption, MB_OKCANCEL)) {
-
 			if (GetOpenFileName(&openFileName)) {
-
 				if (!chkp2cnam(programName))
 					return;
 			}
@@ -1054,7 +998,6 @@ void ritwlk() noexcept {
 
 void ritcwlk() noexcept {
 	if (OutputIndex) {
-
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = CWLKMSK;
@@ -1065,8 +1008,8 @@ void ritcwlk() noexcept {
 
 unsigned gucon(fPOINT start, fPOINT finish, unsigned destination, unsigned code) {
 	double			length = hypot(finish.x - start.x, finish.y - start.y);
-	unsigned		startVertex = closflt(start.x, start.y); 
-	const unsigned	endVertex = closflt(finish.x, finish.y); 
+	unsigned		startVertex = closflt(start.x, start.y);
+	const unsigned	endVertex = closflt(finish.x, finish.y);
 	unsigned		stitchCount = 0, intermediateVertex = 0;
 	unsigned		up = 0, down = 0, iStitch = 0, iStep = 0;
 	fPOINT			localPoint = {}, step = {}, delta = {};
@@ -1161,7 +1104,6 @@ void fnwlk(unsigned find) {
 
 void ritund() noexcept {
 	if (SequenceIndex) {
-
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = UNDMSK;
@@ -1253,100 +1195,93 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) no
 	unsigned	iFeatherStyle = 0, state = 0, featherType = 0;
 
 	switch (umsg) {
+	case WM_INITDIALOG:
 
-		case WM_INITDIALOG:
+		featherType = IniFile.featherType;
+		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+		sprintf_s(buf, sizeof(buf), "%.2f", IniFile.featherRatio);
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf);
+		sprintf_s(buf, sizeof(buf), "%d", IniFile.featherUpCount);
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf);
+		sprintf_s(buf, sizeof(buf), "%d", IniFile.featherDownCount);
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf);
+		sprintf_s(buf, sizeof(buf), "%.2f", IniFile.featherMinStitchSize / PFGRAN);
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf);
+		sprintf_s(buf, sizeof(buf), "%d", IniFile.featherCount);
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf);
+		for (iFeatherStyle = 0; iFeatherStyle < 6; iFeatherStyle++) {
+			LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, buf, HBUFSIZ);
+			[[gsl::suppress(type.1)]]
+			SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(buf));
+		}
+		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
+		if (featherType&AT_FTHBLND)
+			state = BST_CHECKED;
+		else
+			state = BST_UNCHECKED;
+		CheckDlgButton(hwndlg, IDC_FDBLND, state);
+		if (featherType&AT_FTHUP)
+			state = BST_CHECKED;
+		else
+			state = BST_UNCHECKED;
+		CheckDlgButton(hwndlg, IDC_FDUP, state);
+		if (featherType&AT_FTHBTH)
+			state = BST_CHECKED;
+		else
+			state = BST_UNCHECKED;
+		CheckDlgButton(hwndlg, IDC_FBTH, state);
+		break;
 
-			featherType = IniFile.featherType;
-			SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-			sprintf_s(buf, sizeof(buf), "%.2f", IniFile.featherRatio);
-			SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf);
-			sprintf_s(buf, sizeof(buf), "%d", IniFile.featherUpCount);
-			SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf);
-			sprintf_s(buf, sizeof(buf), "%d", IniFile.featherDownCount);
-			SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf);
-			sprintf_s(buf, sizeof(buf), "%.2f", IniFile.featherMinStitchSize / PFGRAN);
-			SetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf);
-			sprintf_s(buf, sizeof(buf), "%d", IniFile.featherCount);
-			SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf);
+	case WM_COMMAND:
+
+		switch (LOWORD(wparam)) {
+		case IDCANCEL:
+
+			EndDialog(hwndlg, 0);
+			return TRUE;
+
+		case IDOK:
+
+			IniFile.featherType = 0;
+			if (IsDlgButtonChecked(hwndlg, IDC_FDBLND))
+				IniFile.featherType = AT_FTHBLND;
+			if (IsDlgButtonChecked(hwndlg, IDC_FDUP))
+				IniFile.featherType |= AT_FTHUP;
+			if (IsDlgButtonChecked(hwndlg, IDC_FBTH))
+				IniFile.featherType |= AT_FTHBTH;
+			GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf, HBUFSIZ);
+			IniFile.featherFillType = FDEFTYP;
 			for (iFeatherStyle = 0; iFeatherStyle < 6; iFeatherStyle++) {
-
-				LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, buf, HBUFSIZ);
-				[[gsl::suppress(type.1)]]
-				SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(buf));
-			}
-			SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
-			if (featherType&AT_FTHBLND)
-				state = BST_CHECKED;
-			else
-				state = BST_UNCHECKED;
-			CheckDlgButton(hwndlg, IDC_FDBLND, state);
-			if (featherType&AT_FTHUP)
-				state = BST_CHECKED;
-			else
-				state = BST_UNCHECKED;
-			CheckDlgButton(hwndlg, IDC_FDUP, state);
-			if (featherType&AT_FTHBTH)
-				state = BST_CHECKED;
-			else
-				state = BST_UNCHECKED;
-			CheckDlgButton(hwndlg, IDC_FBTH, state);
-			break;
-
-		case WM_COMMAND:
-
-			switch (LOWORD(wparam)) {
-
-				case IDCANCEL:
-
-					EndDialog(hwndlg, 0);
-					return TRUE;
-
-				case IDOK:
-
-					IniFile.featherType = 0;
-					if (IsDlgButtonChecked(hwndlg, IDC_FDBLND))
-						IniFile.featherType = AT_FTHBLND;
-					if (IsDlgButtonChecked(hwndlg, IDC_FDUP))
-						IniFile.featherType |= AT_FTHUP;
-					if (IsDlgButtonChecked(hwndlg, IDC_FBTH))
-						IniFile.featherType |= AT_FTHBTH;
-					GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf, HBUFSIZ);
-					IniFile.featherFillType = FDEFTYP;
-					for (iFeatherStyle = 0; iFeatherStyle < 6; iFeatherStyle++) {
-
-						LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, buf1, HBUFSIZ);
-						if (!strcmp(buf, buf1)) {
-
-							IniFile.featherFillType = iFeatherStyle + 1;
-							break;
-						}
-					}
-					GetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf, HBUFSIZ);
-					IniFile.featherRatio = atof(buf);
-					GetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf, HBUFSIZ);
-					IniFile.featherUpCount = atoi(buf);
-					GetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf, HBUFSIZ);
-					IniFile.featherDownCount = atoi(buf);
-					GetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf, HBUFSIZ);
-					IniFile.featherMinStitchSize = atof(buf)*PFGRAN;
-					GetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf, HBUFSIZ);
-					IniFile.featherCount = atoi(buf);
-					if (IniFile.featherCount < 1)
-						IniFile.featherCount = 1;
-					EndDialog(hwndlg, 1);
+				LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, buf1, HBUFSIZ);
+				if (!strcmp(buf, buf1)) {
+					IniFile.featherFillType = iFeatherStyle + 1;
 					break;
+				}
 			}
+			GetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf, HBUFSIZ);
+			IniFile.featherRatio = atof(buf);
+			GetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf, HBUFSIZ);
+			IniFile.featherUpCount = atoi(buf);
+			GetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf, HBUFSIZ);
+			IniFile.featherDownCount = atoi(buf);
+			GetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf, HBUFSIZ);
+			IniFile.featherMinStitchSize = atof(buf)*PFGRAN;
+			GetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf, HBUFSIZ);
+			IniFile.featherCount = atoi(buf);
+			if (IniFile.featherCount < 1)
+				IniFile.featherCount = 1;
+			EndDialog(hwndlg, 1);
+			break;
+		}
 	}
 	return 0;
 }
 
 void dufdef() noexcept {
-
 	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, (DLGPROC)fthdefprc);
 }
 
 void srtcol() {
-
 	unsigned		histogram[16] = { 0 }, colorStartStitch[16] = { 0 };
 	unsigned		iStitch = 0, iColor = 0, startStitch = 0;
 
@@ -1354,7 +1289,6 @@ void srtcol() {
 		histogram[StitchBuffer[iStitch].attribute&COLMSK]++;
 	startStitch = 0;
 	for (iColor = 0; iColor < 16; iColor++) {
-
 		colorStartStitch[iColor] = startStitch;
 		startStitch += histogram[iColor];
 	}
@@ -1441,7 +1375,6 @@ void selalfrm() {
 }
 
 void chkdaz() noexcept {
-
 	if (!IniFile.daisyPetalPoints)
 		IniFile.daisyPetalPoints = 1;
 	if (!IniFile.daisyInnerCount)
@@ -1502,82 +1435,79 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	unsigned	iType = 0;
 
 	switch (umsg) {
+	case WM_INITDIALOG:
 
-		case WM_INITDIALOG:
+		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+		initdaz(hwndlg);
+		break;
 
-			SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+	case WM_COMMAND:
+
+		switch (LOWORD(wparam)) {
+		case IDCANCEL:
+
+			EndDialog(hwndlg, 0);
+			return TRUE;
+
+		case IDOK:
+
+			GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer, HBUFSIZ);
+			IniFile.daisyPetalPoints = atoi(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer, HBUFSIZ);
+			IniFile.daisyHeartCount = atoi(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer, HBUFSIZ);
+			IniFile.daisyDiameter = atof(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer, HBUFSIZ);
+			IniFile.daisyHoleDiameter = atof(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer, HBUFSIZ);
+			IniFile.daisyInnerCount = atoi(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer, HBUFSIZ);
+			IniFile.daisyPetalCount = atoi(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer, HBUFSIZ);
+			IniFile.daisyPetalLen = atof(buffer);
+			if (IsDlgButtonChecked(hwndlg, IDC_HOLE))
+				UserFlagMap.set(UserFlag::DAZHOL);
+			else
+				UserFlagMap.reset(UserFlag::DAZHOL);
+			if (IsDlgButtonChecked(hwndlg, IDC_DLIN))
+				UserFlagMap.set(UserFlag::DAZD);
+			else
+				UserFlagMap.reset(UserFlag::DAZD);
+			GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer, HBUFSIZ);
+			for (iType = 0; iType < 6; iType++) {
+				LoadString(ThrEdInstance, DaisyTypeStrings[iType], compareBuffer, HBUFSIZ);
+				if (!strcmp(buffer, compareBuffer)) {
+					IniFile.daisyBorderType = iType;
+					break;
+				}
+			}
+			chkdaz();
+			EndDialog(hwndlg, 1);
+			break;
+
+		case IDC_DAZRST:
+
+			dazdef();
 			initdaz(hwndlg);
 			break;
 
-		case WM_COMMAND:
+		case IDC_DLIN:
 
-			switch (LOWORD(wparam)) {
+			if (IsDlgButtonChecked(hwndlg, IDC_DLIN))
+				CheckDlgButton(hwndlg, IDC_HOLE, BST_CHECKED);
+			break;
 
-				case IDCANCEL:
+		case IDC_HOLE:
 
-					EndDialog(hwndlg, 0);
-					return TRUE;
-
-				case IDOK:
-
-					GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer, HBUFSIZ);
-					IniFile.daisyPetalPoints = atoi(buffer);
-					GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer, HBUFSIZ);
-					IniFile.daisyHeartCount = atoi(buffer);
-					GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer, HBUFSIZ);
-					IniFile.daisyDiameter = atof(buffer);
-					GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer, HBUFSIZ);
-					IniFile.daisyHoleDiameter = atof(buffer);
-					GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer, HBUFSIZ);
-					IniFile.daisyInnerCount = atoi(buffer);
-					GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer, HBUFSIZ);
-					IniFile.daisyPetalCount = atoi(buffer);
-					GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer, HBUFSIZ);
-					IniFile.daisyPetalLen = atof(buffer);
-					if (IsDlgButtonChecked(hwndlg, IDC_HOLE))
-						UserFlagMap.set(UserFlag::DAZHOL);
-					else
-						UserFlagMap.reset(UserFlag::DAZHOL);
-					if (IsDlgButtonChecked(hwndlg, IDC_DLIN))
-						UserFlagMap.set(UserFlag::DAZD);
-					else
-						UserFlagMap.reset(UserFlag::DAZD);
-					GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer, HBUFSIZ);
-					for (iType = 0; iType < 6; iType++) {
-						LoadString(ThrEdInstance, DaisyTypeStrings[iType], compareBuffer, HBUFSIZ);
-						if (!strcmp(buffer, compareBuffer)) {
-							IniFile.daisyBorderType = iType;
-							break;
-						}
-					}
-					chkdaz();
-					EndDialog(hwndlg, 1);
-					break;
-
-				case IDC_DAZRST:
-
-					dazdef();
-					initdaz(hwndlg);
-					break;
-
-				case IDC_DLIN:
-
-					if (IsDlgButtonChecked(hwndlg, IDC_DLIN))
-						CheckDlgButton(hwndlg, IDC_HOLE, BST_CHECKED);
-					break;
-
-				case IDC_HOLE:
-
-					if (!IsDlgButtonChecked(hwndlg, IDC_HOLE))
-						CheckDlgButton(hwndlg, IDC_DLIN, BST_UNCHECKED);
-					break;
-			}
+			if (!IsDlgButtonChecked(hwndlg, IDC_HOLE))
+				CheckDlgButton(hwndlg, IDC_DLIN, BST_UNCHECKED);
+			break;
+		}
 	}
 	return 0;
 }
 
 void dasyfrm() {
-
 	double		holeSegmentAngle = 0.0, petalSegmentAngle = 0.0;
 	double		angle = 0.0;
 	double		deltaPetalAngle = 0.0;
@@ -1626,12 +1556,12 @@ void dasyfrm() {
 		angle = PI2;
 		holeVertexCount = IniFile.daisyPetalCount*IniFile.daisyInnerCount;
 		holeSegmentAngle = PI2 / holeVertexCount;
-		CurrentFormVertices[iVertex].x = referencePoint.x + diameter*cos(angle);
-		CurrentFormVertices[iVertex].y = referencePoint.y + diameter*sin(angle);
+		CurrentFormVertices[iVertex].x = referencePoint.x + diameter * cos(angle);
+		CurrentFormVertices[iVertex].y = referencePoint.y + diameter * sin(angle);
 		iVertex++;
 		for (iSegment = 0; iSegment < holeVertexCount + 1; iSegment++) {
-			CurrentFormVertices[iVertex].x = referencePoint.x + holeDiameter*cos(angle);
-			CurrentFormVertices[iVertex].y = referencePoint.y + holeDiameter*sin(angle);
+			CurrentFormVertices[iVertex].x = referencePoint.x + holeDiameter * cos(angle);
+			CurrentFormVertices[iVertex].y = referencePoint.y + holeDiameter * sin(angle);
 			iVertex++;
 			angle -= holeSegmentAngle;
 		}
@@ -1656,46 +1586,46 @@ void dasyfrm() {
 		PseudoRandomValue = SEED;
 		for (iPoint = 0; iPoint < petalPointCount; iPoint++) {
 			switch (borderType) {
-				case DSIN:
+			case DSIN:
 
-					distanceFromDaisyCenter = diameter + sin(petalPointAngle)*petalLength;
+				distanceFromDaisyCenter = diameter + sin(petalPointAngle)*petalLength;
+				petalPointAngle += deltaPetalAngle;
+				break;
+
+			case DRAMP:
+
+				distanceFromDaisyCenter = diameter + (static_cast<double>(iPoint) / IniFile.daisyPetalPoints*petalLength);
+				break;
+
+			case DSAW:
+
+				if (iPoint > halfPetalPointCount)
+					sawPointCount = IniFile.daisyPetalPoints - iPoint;
+				else
+					sawPointCount = iPoint;
+				distanceFromDaisyCenter = diameter + (static_cast<double>(sawPointCount) / IniFile.daisyPetalPoints*petalLength);
+				break;
+
+			case DRAG:
+
+				distanceFromDaisyCenter = diameter + (static_cast<double>(psg() % IniFile.daisyPetalPoints) / IniFile.daisyPetalPoints*petalLength);
+				break;
+
+			case DCOG:
+
+				distanceFromDaisyCenter = diameter;
+				if (iPoint > halfPetalPointCount)
+					distanceFromDaisyCenter += petalLength;
+				break;
+
+			case DHART:
+
+				distanceFromDaisyCenter = diameter + sin(petalPointAngle)*petalLength;
+				if (iPoint > IniFile.daisyHeartCount)
+					petalPointAngle -= deltaPetalAngle;
+				else
 					petalPointAngle += deltaPetalAngle;
-					break;
-
-				case DRAMP:
-
-					distanceFromDaisyCenter = diameter + (static_cast<double>(iPoint) / IniFile.daisyPetalPoints*petalLength);
-					break;
-
-				case DSAW:
-
-					if (iPoint > halfPetalPointCount)
-						sawPointCount = IniFile.daisyPetalPoints - iPoint;
-					else
-						sawPointCount = iPoint;
-					distanceFromDaisyCenter = diameter + (static_cast<double>(sawPointCount) / IniFile.daisyPetalPoints*petalLength);
-					break;
-
-				case DRAG:
-
-					distanceFromDaisyCenter = diameter + (static_cast<double>(psg() % IniFile.daisyPetalPoints) / IniFile.daisyPetalPoints*petalLength);
-					break;
-
-				case DCOG:
-
-					distanceFromDaisyCenter = diameter;
-					if (iPoint > halfPetalPointCount)
-						distanceFromDaisyCenter += petalLength;
-					break;
-
-				case DHART:
-
-					distanceFromDaisyCenter = diameter + sin(petalPointAngle)*petalLength;
-					if (iPoint > IniFile.daisyHeartCount)
-						petalPointAngle -= deltaPetalAngle;
-					else
-						petalPointAngle += deltaPetalAngle;
-					break;
+				break;
 			}
 			CurrentFormVertices[iVertex].x = referencePoint.x + cos(angle)*distanceFromDaisyCenter;
 			CurrentFormVertices[iVertex].y = referencePoint.y + sin(angle)*distanceFromDaisyCenter;
@@ -1720,7 +1650,6 @@ void dasyfrm() {
 	StateMap.set(StateFlag::INIT);
 	frmout(FormIndex);
 	for (iMacroPetal = 0; iMacroPetal < iVertex; iMacroPetal++) {
-
 		CurrentFormVertices[iMacroPetal].x -= SelectedForm->rectangle.left;
 		CurrentFormVertices[iMacroPetal].y -= SelectedForm->rectangle.bottom;
 	}
@@ -1732,10 +1661,9 @@ void dasyfrm() {
 }
 
 void durec(OREC* record) noexcept {
-
 	unsigned			attribute = 0;
 	const fPOINTATTR*	stitch = &StitchBuffer[record->start];
-	
+
 	record->type = StitchTypes[dutyp(stitch->attribute)];
 	attribute = stitch->attribute&SRTMSK;
 	record->color = attribute & 0xf;
@@ -1885,7 +1813,6 @@ double precjmps(const SRTREC* sortRecord) {
 }
 
 unsigned duprecs(SRTREC* sortRecord) {
-
 	sortRecord->direction = 0;
 	const unsigned	jumps0 = precjmps(sortRecord);
 
@@ -1973,7 +1900,6 @@ void fsort() {
 	stitchRegion[0].startStitch = StitchBuffer;
 	ColorOrder[AppliqueColor] = 0;
 	for (iColor = 0; iColor < 16; iColor++) {
-
 		if (iColor != AppliqueColor)
 			ColorOrder[iColor] = iColor + 1;
 	}
@@ -2095,7 +2021,7 @@ unsigned dutyp(unsigned attribute) noexcept {
 		test	ebx, 0x20000000
 		je		short dutypx
 		mov		al, 1
-dutypx :
+		dutypx :
 		and		eax, 0xf
 	}
 #else
@@ -2121,7 +2047,6 @@ dutypx :
 #ifdef _DEBUG
 
 typedef struct _atfld {
-
 	unsigned	color;
 	unsigned	form;
 	unsigned	type;
@@ -2136,7 +2061,7 @@ void duatf(unsigned ind) {
 										((attribute >> FRMSHFT)&FRMSK),
 										gsl::narrow<unsigned>(StitchTypes[dutyp(attribute)]),
 										((attribute >> LAYSHFT) & 7),
-										0};
+										0 };
 
 	if (attribute & 0x80000000)
 		attributeFields.user = 1;
@@ -2177,55 +2102,55 @@ void fdelstch(FILLSTARTS &FillStartsData) {
 		if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX) && iSourceStitch == ClosestPointIndex)
 			ClosestPointIndex = iDestinationStitch;
 		attribute = StitchBuffer[iSourceStitch].attribute;
- 		if (codedFormIndex == (attribute&(FRMSK | NOTFRM))) {
+		if (codedFormIndex == (attribute&(FRMSK | NOTFRM))) {
 			type = StitchTypes[dutyp(attribute)];
 			switch (type) {
-				case TYPE_APPLIQUE:
+			case TYPE_APPLIQUE:
 
-					if (!(tmap&M_AP)) {
-						tmap |= M_AP;
-						FillStartsData.fillNamed.applique = iDestinationStitch;
-					}
-					break;
+				if (!(tmap&M_AP)) {
+					tmap |= M_AP;
+					FillStartsData.fillNamed.applique = iDestinationStitch;
+				}
+				break;
 
-				case TYPE_FTHR:
+			case TYPE_FTHR:
 
-					if (!(tmap&M_FTH)) {
-						tmap |= M_FTH;
-						FillStartsData.fillNamed.feather = iDestinationStitch;
-					}
-					break;
+				if (!(tmap&M_FTH)) {
+					tmap |= M_FTH;
+					FillStartsData.fillNamed.feather = iDestinationStitch;
+				}
+				break;
 
-				case TYPE_FILL:
+			case TYPE_FILL:
 
-					if (!(tmap&M_FIL)) {
-						tmap |= M_FIL;
-						FillStartsData.fillNamed.fill = iDestinationStitch;
-					}
-					break;
+				if (!(tmap&M_FIL)) {
+					tmap |= M_FIL;
+					FillStartsData.fillNamed.fill = iDestinationStitch;
+				}
+				break;
 
-				case TYPE_BORDER:
+			case TYPE_BORDER:
 
-					if (!(tmap&M_BRD)) {
-						tmap |= M_BRD;
-						FillStartsData.fillNamed.border = iDestinationStitch;
-					}
-					break;
+				if (!(tmap&M_BRD)) {
+					tmap |= M_BRD;
+					FillStartsData.fillNamed.border = iDestinationStitch;
+				}
+				break;
 
-				default:
+			default:
 
-					if (SelectedForm->fillType && !(tmap&M_FIL)) {
-						tmap |= M_FIL;
-						FillStartsData.fillNamed.fill = iDestinationStitch;
-					}
-					break;
+				if (SelectedForm->fillType && !(tmap&M_FIL)) {
+					tmap |= M_FIL;
+					FillStartsData.fillNamed.fill = iDestinationStitch;
+				}
+				break;
 			}
 		}
 		else {
 			// ToDo - there is a potential problem here when the active color is 0
 			//        because the default color is 0 as well. Should the default color 
 			//        be e.g. -1 ?
-			color = attribute&COLMSK;
+			color = attribute & COLMSK;
 			if (color == SelectedForm->fillColor) {
 				tmap |= M_FCOL;
 				FillStartsData.fillNamed.fillColor = iDestinationStitch;
@@ -2385,40 +2310,40 @@ void intlv(const FILLSTARTS &FillStartsData) {
 		for (iSequence = 0; iSequence < InterleaveSequenceIndex2; iSequence++) {
 			ilData.pins = iSequence;
 			switch (InterleaveSequenceIndices[iSequence].seq) {
-				case I_AP:
+			case I_AP:
 
-					if (FillStartsMap&M_FIL && FillStartsData.fillNamed.applique >= ilData.coloc)
-						ilData.coloc = FillStartsData.fillNamed.applique;
-					else {
-						ilData.coloc = FillStartsData.fillNamed.appliqueColor;
-						if (ilData.coloc == 1)
-							ilData.coloc = 0;
-					}
-					break;
+				if (FillStartsMap&M_FIL && FillStartsData.fillNamed.applique >= ilData.coloc)
+					ilData.coloc = FillStartsData.fillNamed.applique;
+				else {
+					ilData.coloc = FillStartsData.fillNamed.appliqueColor;
+					if (ilData.coloc == 1)
+						ilData.coloc = 0;
+				}
+				break;
 
-				case I_FIL:
+			case I_FIL:
 
-					if (FillStartsMap&M_FIL && FillStartsData.fillNamed.fill >= ilData.coloc)
-						ilData.coloc = FillStartsData.fillNamed.fill;
-					else
-						ilData.coloc = FillStartsData.fillNamed.fillColor;
-					break;
+				if (FillStartsMap&M_FIL && FillStartsData.fillNamed.fill >= ilData.coloc)
+					ilData.coloc = FillStartsData.fillNamed.fill;
+				else
+					ilData.coloc = FillStartsData.fillNamed.fillColor;
+				break;
 
-				case I_FTH:
+			case I_FTH:
 
-					if (FillStartsMap&M_FIL && FillStartsData.fillNamed.feather >= ilData.coloc)
-						ilData.coloc = FillStartsData.fillNamed.feather;
-					else
-						ilData.coloc = FillStartsData.fillNamed.featherColor;
-					break;
+				if (FillStartsMap&M_FIL && FillStartsData.fillNamed.feather >= ilData.coloc)
+					ilData.coloc = FillStartsData.fillNamed.feather;
+				else
+					ilData.coloc = FillStartsData.fillNamed.featherColor;
+				break;
 
-				case I_BRD:
+			case I_BRD:
 
-					if (FillStartsMap&M_BRD && FillStartsData.fillNamed.border >= ilData.coloc)
-						ilData.coloc = FillStartsData.fillNamed.border;
-					else
-						ilData.coloc = FillStartsData.fillNamed.borderColor;
-					break;
+				if (FillStartsMap&M_BRD && FillStartsData.fillNamed.border >= ilData.coloc)
+					ilData.coloc = FillStartsData.fillNamed.border;
+				else
+					ilData.coloc = FillStartsData.fillNamed.borderColor;
+				break;
 			}
 			code = ilData.layerIndex | InterleaveSequenceIndices[ilData.pins].code | InterleaveSequenceIndices[ilData.pins].color;
 			duint(offset, code, &ilData);
@@ -2723,21 +2648,21 @@ void fangfn(unsigned find, float angle) {
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->type == FRMFPOLY && SelectedForm->fillType) {
 		switch (SelectedForm->fillType) {
-			case VRTF:
-			case HORF:
-			case ANGF:
+		case VRTF:
+		case HORF:
+		case ANGF:
 
-				SelectedForm->fillType = ANGF;
-				SelectedForm->angleOrClipData.angle = angle;
-				break;
+			SelectedForm->fillType = ANGF;
+			SelectedForm->angleOrClipData.angle = angle;
+			break;
 
-			case VCLPF:
-			case HCLPF:
-			case ANGCLPF:
+		case VCLPF:
+		case HCLPF:
+		case ANGCLPF:
 
-				SelectedForm->fillType = ANGCLPF;
-				SelectedForm->satinOrAngle.angle = angle;
-				break;
+			SelectedForm->fillType = ANGCLPF;
+			SelectedForm->satinOrAngle.angle = angle;
+			break;
 		}
 		refilfn();
 	}
@@ -3160,24 +3085,23 @@ void duauxnam() {
 		fileExtention = &WorkingFileName[strlen(WorkingFileName)];
 	*fileExtention = 0;
 	switch (IniFile.auxFileType) {
+	case AUXDST:
 
-		case AUXDST:
-
-			strcat_s(AuxName, "dst");
-			break;
+		strcat_s(AuxName, "dst");
+		break;
 
 #if PESACT
 
-		case AUXPES:
+	case AUXPES:
 
-			strcat_s(AuxName, "pes");
-			break;
+		strcat_s(AuxName, "pes");
+		break;
 
 #endif
 
-		default:
+	default:
 
-			strcat_s(AuxName, "pcs");
+		strcat_s(AuxName, "pcs");
 	}
 }
 
@@ -3532,7 +3456,7 @@ void dutxrct(TXTRCT* textureRect) noexcept {
 				textureRect->right = texturePoint->line;
 		}
 	}
-	else 
+	else
 		textureRect->left = textureRect->right = textureRect->top = textureRect->bottom = 0;
 }
 
@@ -3567,7 +3491,7 @@ void dutxlin(fPOINT point0, fPOINT point1) noexcept {
 	if (integerFinish > TextureScreen.lines)
 		integerFinish = TextureScreen.lines;
 	while (integerStart <= integerFinish) {
-		yOffset = slope*(-point0.x + integerStart*TextureScreen.spacing) + point0.y;
+		yOffset = slope * (-point0.x + integerStart * TextureScreen.spacing) + point0.y;
 		if (yOffset > 0 && yOffset < TextureScreen.areaHeight) {
 			TempTexturePoints[TextureScreen.index].line = integerStart;
 			TempTexturePoints[TextureScreen.index].y = yOffset;
@@ -3652,7 +3576,7 @@ void txtrup() {
 		offset.x -= SelectTexturePointsOrigin.x;
 		offset.y -= SelectTexturePointsOrigin.y;
 		Xmagnitude = abs(offset.x);
-		textureOffset.line = Xmagnitude*TextureScreen.editToPixelRatio / TextureScreen.spacing + 0.5;
+		textureOffset.line = Xmagnitude * TextureScreen.editToPixelRatio / TextureScreen.spacing + 0.5;
 		if (offset.x < 0)
 			textureOffset.line = -textureOffset.line;
 		textureOffset.y = static_cast<float>(-offset.y) / TextureScreen.height*TextureScreen.areaHeight;
@@ -3757,7 +3681,7 @@ void setxfrm() {
 	angrct(&angleRect);
 	height = angleRect.top - angleRect.bottom;
 	if (height > TextureScreen.areaHeight) {
-		ratio = TextureScreen.areaHeight / height*0.95;
+		ratio = TextureScreen.areaHeight / height * 0.95;
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 			AngledFormVertices[iVertex].x *= ratio;
 			AngledFormVertices[iVertex].y *= ratio;
@@ -3917,7 +3841,7 @@ void deltx() {
 	unsigned		iBuffer = 0;
 	unsigned		iForm = 0;
 	bool			flag = false;
-	
+
 	const unsigned short currentIndex = FormList[ClosestFormToCursor].fillInfo.texture.index;
 
 	if (TextureIndex && istx(ClosestFormToCursor) && SelectedForm->fillInfo.texture.count) {
@@ -4028,20 +3952,20 @@ void dutxfn(unsigned textureType) {
 		else
 			SelectedForm->extendedAttribute &= (~AT_SQR);
 		switch (textureType) {
-			case VRTYP:
+		case VRTYP:
 
-				txvrt();
-				break;
+			txvrt();
+			break;
 
-			case HORTYP:
+		case HORTYP:
 
-				txhor();
-				break;
+			txhor();
+			break;
 
-			case ANGTYP:
+		case ANGTYP:
 
-				txang();
-				break;
+			txang();
+			break;
 		}
 	}
 	txof();
@@ -4054,7 +3978,7 @@ void txsrt() noexcept {
 }
 
 void dutxmir() {
-	const int	centerLine = (TextureScreen.lines + 1) >> 1; 
+	const int	centerLine = (TextureScreen.lines + 1) >> 1;
 	int			iPoint = TextureScreen.index - 1;
 	int			iMirrorPoint = 0;
 
@@ -4162,7 +4086,7 @@ void txtlbut() {
 void redtbak() {
 	TXHST*		textureHistoryItem;
 
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer),"%d\n",TextureHistoryIndex);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d\n", TextureHistoryIndex);
 	OutputDebugString(MsgBuffer);
 	textureHistoryItem = &TextureHistory[TextureHistoryIndex];
 	TextureScreen.areaHeight = textureHistoryItem->height;
@@ -4257,30 +4181,30 @@ void chktxnum() {
 	if (value) {
 		value *= PFGRAN;
 		switch (TextureWindowId) {
-			case HTXHI:
+		case HTXHI:
 
-				savtxt();
-				TextureScreen.areaHeight = value;
-				IniFile.textureHeight = value;
-				StateMap.set(StateFlag::CHKTX);
-				break;
+			savtxt();
+			TextureScreen.areaHeight = value;
+			IniFile.textureHeight = value;
+			StateMap.set(StateFlag::CHKTX);
+			break;
 
-			case HTXWID:
+		case HTXWID:
 
-				savtxt();
-				TextureScreen.width = value;
-				IniFile.textureWidth = value;
-				StateMap.set(StateFlag::CHKTX);
-				break;
+			savtxt();
+			TextureScreen.width = value;
+			IniFile.textureWidth = value;
+			StateMap.set(StateFlag::CHKTX);
+			break;
 
-			case HTXSPAC:
+		case HTXSPAC:
 
-				savtxt();
-				TextureScreen.spacing = value;
-				IniFile.textureSpacing = value;
-				TextureScreen.width = value*TextureScreen.lines + value / 2;
-				StateMap.set(StateFlag::CHKTX);
-				break;
+			savtxt();
+			TextureScreen.spacing = value;
+			IniFile.textureSpacing = value;
+			TextureScreen.width = value * TextureScreen.lines + value / 2;
+			StateMap.set(StateFlag::CHKTX);
+			break;
 		}
 	}
 	TextureInputIndex = 0;
@@ -4373,7 +4297,7 @@ void txnudg(int deltaX, float deltaY) {
 
 	if (SelectedTexturePointsCount) {
 		if (deltaY) {
-			screenDeltaY = deltaY*TextureScreen.editToPixelRatio;
+			screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
 			for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++) {
 				yCoord = TempTexturePoints[SelectedTexturePointsList[iPoint]].y + screenDeltaY;
 				if (yCoord < 0)
@@ -4413,14 +4337,14 @@ void txsnap() {
 			for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++) {
 				texturePoint = &TempTexturePoints[SelectedTexturePointsList[iPoint]];
 				yStep = (texturePoint->y + halfGrid) / IniFile.gridSize;
-				texturePoint->y = yStep*IniFile.gridSize;
+				texturePoint->y = yStep * IniFile.gridSize;
 			}
 		}
 		else {
 			for (iPoint = 0; iPoint < TextureScreen.index; iPoint++) {
 				texturePoint = &TempTexturePoints[iPoint];
 				yStep = (texturePoint->y + halfGrid) / IniFile.gridSize;
-				texturePoint->y = yStep*IniFile.gridSize;
+				texturePoint->y = yStep * IniFile.gridSize;
 			}
 		}
 		StateMap.set(StateFlag::RESTCH);
@@ -4433,27 +4357,27 @@ void txtkey(unsigned keyCode) {
 
 	if (SideWindowButton) {
 		switch (keyCode) {
-			case VK_RETURN:
+		case VK_RETURN:
 
-				chktxnum();
-				return;
+			chktxnum();
+			return;
 
-			case VK_ESCAPE:
+		case VK_ESCAPE:
 
-				txof();
+			txof();
 
-			case 'Q':
+		case 'Q':
 
-				rstxt();
-				StateMap.set(StateFlag::RESTCH);
-				break;
+			rstxt();
+			StateMap.set(StateFlag::RESTCH);
+			break;
 
-			case 8:	//backspace
+		case 8:	//backspace
 
-				if (TextureInputIndex)
-					TextureInputIndex--;
-				flag = false;
-				break;
+			if (TextureInputIndex)
+				TextureInputIndex--;
+			flag = false;
+			break;
 		}
 		if (flag) {
 			if (txdig(keyCode, &character)) {
@@ -4466,117 +4390,117 @@ void txtkey(unsigned keyCode) {
 		return;
 	}
 	switch (keyCode) {
-		case VK_ESCAPE:
+	case VK_ESCAPE:
 
-			txof();
+		txof();
 
-		case 'Q':
+	case 'Q':
 
-			rstxt();
-			StateMap.set(StateFlag::RESTCH);
-			break;
+		rstxt();
+		StateMap.set(StateFlag::RESTCH);
+		break;
 
-		case 0xdb:	//[
+	case 0xdb:	//[
 
-			txshrnk();
-			break;
+		txshrnk();
+		break;
 
-		case 0xdd:	//]
+	case 0xdd:	//]
 
-			txgro();
-			break;
+		txgro();
+		break;
 
-		case 192: //`
+	case 192: //`
 
-			tst();
-			break;
+		tst();
+		break;
 
-		case 'R':
+	case 'R':
 
-			dutxfn(VRTYP);
-			break;
+		dutxfn(VRTYP);
+		break;
 
-		case 'A':
+	case 'A':
 
-			dutxfn(ANGTYP);
-			break;
+		dutxfn(ANGTYP);
+		break;
 
-		case 'H':
+	case 'H':
 
-			dutxfn(HORTYP);
-			break;
+		dutxfn(HORTYP);
+		break;
 
-		case 'E':
+	case 'E':
 
-			txtlin();
-			break;
+		txtlin();
+		break;
 
-		case 'Z':
-		case 'B':
+	case 'Z':
+	case 'B':
 
-			if (!StateMap.testAndSet(StateFlag::LASTXBAK)) {
-				savtxt();
+		if (!StateMap.testAndSet(StateFlag::LASTXBAK)) {
+			savtxt();
+			txrbak();
+		}
+		else {
+			if (StateMap.testAndReset(StateFlag::TXBDIR))
 				txrbak();
-			}
-			else {
-				if (StateMap.testAndReset(StateFlag::TXBDIR))
-					txrbak();
-			}
-			txbak();
-			return;
+		}
+		txbak();
+		return;
 
-		case 'V':
+	case 'V':
 
-			if (OpenClipboard(ThrEdWindow))
-				txtclp();
-			break;
+		if (OpenClipboard(ThrEdWindow))
+			txtclp();
+		break;
 
-		case 'N':
+	case 'N':
 
-			StateMap.set(StateFlag::LASTXBAK);
-			if (!StateMap.testAndSet(StateFlag::TXBDIR))
-				txrfor();
-			nxbak();
-			return;
+		StateMap.set(StateFlag::LASTXBAK);
+		if (!StateMap.testAndSet(StateFlag::TXBDIR))
+			txrfor();
+		nxbak();
+		return;
 
-		case 'D':
-		case VK_DELETE:
+	case 'D':
+	case VK_DELETE:
 
-			if (GetKeyState(VK_SHIFT)&GetKeyState(VK_CONTROL) & 0X8000)
-				txdelal();
-			else
-				txtdel();
-			break;
+		if (GetKeyState(VK_SHIFT)&GetKeyState(VK_CONTROL) & 0X8000)
+			txdelal();
+		else
+			txtdel();
+		break;
 
-		case 0xbd:		//-
+	case 0xbd:		//-
 
-			txcntrv();
-			break;
+		txcntrv();
+		break;
 
-		case VK_LEFT:
+	case VK_LEFT:
 
-			txnudg(-1, 0);
-			break;
+		txnudg(-1, 0);
+		break;
 
-		case VK_RIGHT:
+	case VK_RIGHT:
 
-			txnudg(1, 0);
-			break;
+		txnudg(1, 0);
+		break;
 
-		case VK_UP:
+	case VK_UP:
 
-			txnudg(0, IniFile.cursorNudgeStep);
-			break;
+		txnudg(0, IniFile.cursorNudgeStep);
+		break;
 
-		case VK_DOWN:
+	case VK_DOWN:
 
-			txnudg(0, -IniFile.cursorNudgeStep);
-			break;
+		txnudg(0, -IniFile.cursorNudgeStep);
+		break;
 
-		case 'S':
+	case 'S':
 
-			txsnap();
-			break;
+		txsnap();
+		break;
 	}
 	StateMap.reset(StateFlag::LASTXBAK);
 }
@@ -4655,56 +4579,56 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 	DesignSizeDialog = hwndlg;
 	switch (umsg) {
-		case WM_INITDIALOG:
+	case WM_INITDIALOG:
 
-			SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-			setstxt(IDC_DESWID, DesignSize.x);
-			setstxt(IDC_DESHI, DesignSize.y);
-			DesignAspectRatio = DesignSize.y / DesignSize.x;
-			CheckDlgButton(hwndlg, IDC_REFILF, UserFlagMap.test(UserFlag::CHREF));
+		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+		setstxt(IDC_DESWID, DesignSize.x);
+		setstxt(IDC_DESHI, DesignSize.y);
+		DesignAspectRatio = DesignSize.y / DesignSize.x;
+		CheckDlgButton(hwndlg, IDC_REFILF, UserFlagMap.test(UserFlag::CHREF));
+		break;
+
+	case WM_COMMAND:
+
+		switch (LOWORD(wparam)) {
+		case IDCANCEL:
+
+			EndDialog(hwndlg, 0);
+			return TRUE;
+
+		case IDOK:
+
+			DesignSize.x = getstxt(IDC_DESWID);
+			DesignSize.y = getstxt(IDC_DESHI);
+			if (IsDlgButtonChecked(hwndlg, IDC_REFILF))
+				UserFlagMap.set(UserFlag::CHREF);
+			else
+				UserFlagMap.reset(UserFlag::CHREF);
+			EndDialog(hwndlg, 1);
+			return TRUE;
+
+		case IDC_DESWID:
+
+			if ((wparam >> 16) == EN_CHANGE)
+				StateMap.reset(StateFlag::DESCHG);
 			break;
 
-		case WM_COMMAND:
+		case IDC_DESHI:
 
-			switch (LOWORD(wparam)) {
-				case IDCANCEL:
+			if ((wparam >> 16) == EN_CHANGE)
+				StateMap.set(StateFlag::DESCHG);
+			break;
 
-					EndDialog(hwndlg, 0);
-					return TRUE;
+		case IDC_DUASP:
 
-				case IDOK:
-
-					DesignSize.x = getstxt(IDC_DESWID);
-					DesignSize.y = getstxt(IDC_DESHI);
-					if (IsDlgButtonChecked(hwndlg, IDC_REFILF))
-						UserFlagMap.set(UserFlag::CHREF);
-					else
-						UserFlagMap.reset(UserFlag::CHREF);
-					EndDialog(hwndlg, 1);
-					return TRUE;
-
-				case IDC_DESWID:
-
-					if ((wparam >> 16) == EN_CHANGE)
-						StateMap.reset(StateFlag::DESCHG);
-					break;
-
-				case IDC_DESHI:
-
-					if ((wparam >> 16) == EN_CHANGE)
-						StateMap.set(StateFlag::DESCHG);
-					break;
-
-				case IDC_DUASP:
-
-					if (!chkasp(&designSize)) {
-						if (StateMap.test(StateFlag::DESCHG))
-							setstxt(IDC_DESWID, designSize.y / DesignAspectRatio);
-						else
-							setstxt(IDC_DESHI, designSize.x*DesignAspectRatio);
-					}
-					break;
+			if (!chkasp(&designSize)) {
+				if (StateMap.test(StateFlag::DESCHG))
+					setstxt(IDC_DESWID, designSize.y / DesignAspectRatio);
+				else
+					setstxt(IDC_DESHI, designSize.x*DesignAspectRatio);
 			}
+			break;
+		}
 	}
 	return 0;
 }
@@ -4922,7 +4846,7 @@ void redtx() {
 	char			name[_MAX_PATH] = { 0 };
 	HANDLE			handle = {};
 	DWORD			bytesRead = 0, historyBytesRead = 0;
-	unsigned int	ind = 0,ine = 0;
+	unsigned int	ind = 0, ine = 0;
 	char			sig[4] = { 0 };
 
 	TextureHistoryIndex = 15;
@@ -4999,16 +4923,12 @@ void lodchk() {
 
 	delinf();
 	for (iForm = 0; iForm < FormIndex; iForm++) {
-
 		SelectedForm = &FormList[iForm];
 		if (!SelectedForm->type)
 			SelectedForm->type = FRMFPOLY;
 		else {
-
 			if (SelectedForm->type == FRMLINE) {
-
 				if (SelectedForm->fillType != CONTF) {
-
 					SelectedForm->fillType = 0;
 					SelectedForm->lengthOrCount.clipCount = 0;
 				}
@@ -5022,26 +4942,22 @@ void lodchk() {
 	}
 	clRmap((MAXFORMS >> 5) + 1);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		attribute = StitchBuffer[iStitch].attribute;
 		if ((attribute&TYPMSK) == TYPFRM)
 			setr((attribute&FRMSK) >> FRMSHFT);
 
 	}
 	for (iForm = 0; iForm < FormIndex; iForm++) {
-
 		if (!chkr(iForm))
 			FormList[iForm].fillType = 0;
 	}
 	clRmap((MAXFORMS >> 5) + 1);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-
 		attribute = StitchBuffer[iStitch].attribute;
 		if (attribute&TYPBRD)
 			setr((attribute&FRMSK) >> FRMSHFT);
 	}
 	for (iForm = 0; iForm < FormIndex; iForm++) {
-
 		if (!chkr(iForm))
 			FormList[iForm].edgeType = 0;
 	}
@@ -5120,24 +5036,24 @@ void frmchkx() {
 	if (IniFile.dataCheck) {
 		code = frmchkfn();
 		switch (IniFile.dataCheck) {
-			case 1:
+		case 1:
 
-				if (code)
-					datmsg(code);
-				break;
+			if (code)
+				datmsg(code);
+			break;
 
-			case 2:
+		case 2:
 
-				if (code)
-					repar();
-				break;
+			if (code)
+				repar();
+			break;
 
-			case 3:
+		case 3:
 
-				if (code) {
-					repar();
-					tabmsg(IDS_DATREP);
-				}
+			if (code) {
+				repar();
+				tabmsg(IDS_DATREP);
+			}
 		}
 	}
 }
@@ -5157,7 +5073,7 @@ void bcup(unsigned find, BADCNTS* badData) {
 }
 
 void chkfstch() noexcept {
-	const unsigned	codedFormIndex = FormIndex << FRMSHFT; 
+	const unsigned	codedFormIndex = FormIndex << FRMSHFT;
 	unsigned		iStitch = 0;
 
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -5303,7 +5219,7 @@ void reptx() {
 	unsigned	iForm = 0, textureCount = 0;
 	FRMHED*		formHeader = nullptr;
 	BADCNTS		badData = {};
-		
+
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		if (istx(iForm)) {
 			formHeader = &FormList[iForm];
