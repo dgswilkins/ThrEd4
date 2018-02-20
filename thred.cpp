@@ -12437,7 +12437,7 @@ void tracpar() {
 }
 
 //Check Translation
-static inline void difsub(unsigned *source, unsigned shift, unsigned *&destination) noexcept {
+static inline void difsub(unsigned *source, unsigned shift, unsigned *destination) noexcept {
 	if (source && destination) {
 		*(destination++) = (*source >> (shift & 0x0f)) & 0xff;
 	}
@@ -18519,7 +18519,7 @@ void ritloc() {
 	}
 }
 
-static inline void delsubl(unsigned *&dst, unsigned val, unsigned cnt) noexcept {
+static inline void delsubl(unsigned *dst, unsigned val, unsigned cnt) noexcept {
 	if (dst) {
 		for (unsigned i = 0; i < cnt; i++) {
 			*(dst++) = _byteswap_ulong(val);
@@ -18527,7 +18527,7 @@ static inline void delsubl(unsigned *&dst, unsigned val, unsigned cnt) noexcept 
 		}
 	}
 }
-static inline void delsubr(unsigned *&dst, unsigned val, unsigned cnt) noexcept {
+static inline void delsubr(unsigned *dst, unsigned val, unsigned cnt) noexcept {
 	if (dst) {
 		for (unsigned i = 0; i < cnt; i++) {
 			*(dst++) = _byteswap_ulong(val);
@@ -18537,8 +18537,8 @@ static inline void delsubr(unsigned *&dst, unsigned val, unsigned cnt) noexcept 
 	}
 }
 
-static inline void delsubt(unsigned *&dst, unsigned *src, unsigned cnt) noexcept {
-	if (dst) {
+static inline void delsubt(unsigned *dst, unsigned *src, unsigned cnt) noexcept {
+	if (dst && src) {
 		for (unsigned i = 0; i < cnt; i++) {
 			*(dst++) = _byteswap_ulong(*(src++));
 		}
