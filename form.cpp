@@ -2906,12 +2906,12 @@ bool lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) no
 	return 0;
 }
 
-bool regclos(unsigned iRegion0, unsigned iRegion1, std::vector<REGION> RegionsList) noexcept {
+bool regclos(unsigned iRegion0, unsigned iRegion1, std::vector<REGION> &regionsList) noexcept {
 	//ToDo - More renaming required
 
-	const SMALPNTL*	lineEndPoint0Start = &*SortedLines[RegionsList[iRegion0].start];
+	const SMALPNTL*	lineEndPoint0Start = &*SortedLines[regionsList[iRegion0].start];
 	SMALPNTL*		lineEndPoint0End = nullptr;
-	const SMALPNTL*	lineEndPoint1Start = &*SortedLines[RegionsList[iRegion1].start];
+	const SMALPNTL*	lineEndPoint1Start = &*SortedLines[regionsList[iRegion1].start];
 	SMALPNTL*		lineEndPoint1End = nullptr;
 	const unsigned	group0Start = lineEndPoint0Start->group;
 	unsigned		group0End = 0;
@@ -2937,8 +2937,8 @@ bool regclos(unsigned iRegion0, unsigned iRegion1, std::vector<REGION> RegionsLi
 		return 1;
 	}
 	else {
-		lineEndPoint0End = &*SortedLines[RegionsList[iRegion0].end];
-		lineEndPoint1End = &*SortedLines[RegionsList[iRegion1].end];
+		lineEndPoint0End = &*SortedLines[regionsList[iRegion0].end];
+		lineEndPoint1End = &*SortedLines[regionsList[iRegion1].end];
 		group1End = lineEndPoint1End->group;
 		group0End = lineEndPoint0End->group;
 		if (group0End < group1End) {
@@ -3179,7 +3179,7 @@ void brkdun(unsigned start, unsigned finish) {
 	StateMap.set(StateFlag::BRKFIX);
 }
 
-void durgn(unsigned pthi, unsigned lineCount, std::vector<REGION> RegionsList) {
+void durgn(unsigned pthi, unsigned lineCount, std::vector<REGION> &regionsList) {
 	unsigned	dun = 0, gdif = 0, mindif = 0, iVertex = 0, ind = 0, fdif = 0, bdif = 0;
 	unsigned	seql = 0, seqn = 0;
 	unsigned	sequenceStart = 0;
@@ -3194,7 +3194,7 @@ void durgn(unsigned pthi, unsigned lineCount, std::vector<REGION> RegionsList) {
 	boost::dynamic_bitset<> sequenceMap(lineCount);
 
 	//ToDo - More renaming required
-	CurrentRegion = &RegionsList[iRegion];
+	CurrentRegion = &regionsList[iRegion];
 	sequenceStart = CurrentRegion->start;
 	sequenceEnd = CurrentRegion->end;
 	if (SequencePath[pthi].skp || StateMap.testAndReset(StateFlag::BRKFIX)) {
@@ -3398,15 +3398,15 @@ unsigned notdun(unsigned level) noexcept {
 	return 0;
 }
 
-double reglen(unsigned iRegion, std::array<fPOINT, 4> &lastRegionCorners, std::vector<REGION> RegionsList) noexcept {
+double reglen(unsigned iRegion, std::array<fPOINT, 4> &lastRegionCorners, std::vector<REGION> &regionsList) noexcept {
 	double		length = 0.0, minimumLength = 1e99;
 	unsigned	iCorner = 0, iPoint = 0;
 	SMALPNTL*	lineEndPoints[4] = {};
 
-	lineEndPoints[0] = SortedLines[RegionsList[iRegion].start];
-	lineEndPoints[1] = &SortedLines[RegionsList[iRegion].start][1];
-	lineEndPoints[2] = SortedLines[RegionsList[iRegion].end];
-	lineEndPoints[3] = &SortedLines[RegionsList[iRegion].end][1];
+	lineEndPoints[0] = SortedLines[regionsList[iRegion].start];
+	lineEndPoints[1] = &SortedLines[regionsList[iRegion].start][1];
+	lineEndPoints[2] = SortedLines[regionsList[iRegion].end];
+	lineEndPoints[3] = &SortedLines[regionsList[iRegion].end][1];
 	for (iCorner = 0; iCorner < 4; iCorner++) {
 		for (iPoint = 0; iPoint < 4; iPoint++) {
 			length = hypot(lastRegionCorners[iCorner].x - lineEndPoints[iPoint]->x, lastRegionCorners[iCorner].y - lineEndPoints[iPoint]->y);
@@ -3417,7 +3417,7 @@ double reglen(unsigned iRegion, std::array<fPOINT, 4> &lastRegionCorners, std::v
 	return minimumLength;
 }
 
-void nxtrgn(std::vector<REGION> RegionsList) noexcept {
+void nxtrgn(std::vector<REGION> &regionsList) noexcept {
 	unsigned	iRegion = 0, iPath = 0, newRegion = 0;
 	double		length = 0, minimumLength = 1e99;
 	unsigned	pathLength = 1;				//length of the path to the region
@@ -3427,13 +3427,13 @@ void nxtrgn(std::vector<REGION> RegionsList) noexcept {
 	while (notdun(pathLength)) {
 		pathLength++;
 		if (pathLength > 8) {
-			SMALPNTL* lineEndPoint = &*SortedLines[RegionsList[DoneRegion].start];
+			SMALPNTL* lineEndPoint = &*SortedLines[regionsList[DoneRegion].start];
 			if (lineEndPoint) {
 				lastRegionCorners[0].x = lineEndPoint[0].x;
 				lastRegionCorners[0].y = lineEndPoint[0].y;
 				lastRegionCorners[1].x = lineEndPoint[1].x;
 				lastRegionCorners[1].y = lineEndPoint[1].y;
-				lineEndPoint = &*SortedLines[RegionsList[DoneRegion].end];
+				lineEndPoint = &*SortedLines[regionsList[DoneRegion].end];
 				lastRegionCorners[2].x = lineEndPoint[0].x;
 				lastRegionCorners[2].y = lineEndPoint[0].y;
 				lastRegionCorners[3].x = lineEndPoint[1].x;
@@ -3441,7 +3441,7 @@ void nxtrgn(std::vector<REGION> RegionsList) noexcept {
 				newRegion = 0;
 				for (iRegion = 0; iRegion < RegionCount; iRegion++) {
 					if (!VisitedRegions[iRegion]) {
-						length = reglen(iRegion, lastRegionCorners, RegionsList);
+						length = reglen(iRegion, lastRegionCorners, regionsList);
 						if (length < minimumLength) {
 							minimumLength = length;
 							newRegion = iRegion;
@@ -3473,38 +3473,38 @@ void nxtrgn(std::vector<REGION> RegionsList) noexcept {
 	DoneRegion = PathMap[RegionPath[iPath - 1].pcon].node;
 }
 
-int sqcomp(const void *arg1, const void *arg2) noexcept {
+bool sqcomp(const SMALPNTL *arg1, const SMALPNTL *arg2) noexcept {
 	if (arg1 && arg2) {
-		const SMALPNTL	lineEnd1 = *(*static_cast<const SMALPNTL * const *>(arg1));
-		const SMALPNTL	lineEnd2 = *(*static_cast<const SMALPNTL * const *>(arg2));
+		const SMALPNTL	lineEnd1 = *arg1;
+		const SMALPNTL	lineEnd2 = *arg2;
 
 		if (lineEnd1.line == lineEnd2.line) {
 			if (lineEnd1.group == lineEnd2.group) {
 				if (lineEnd1.y == lineEnd2.y) {
-					return 0;
+					return false;
 				}
 				else {
-					if (lineEnd1.y > lineEnd2.y)
-						return 1;
+					if (lineEnd1.y < lineEnd2.y)
+						return true;
 					else
-						return -1;
+						return false;
 				}
 			}
 			else {
-				if (lineEnd1.group > lineEnd2.group)
-					return 1;
+				if (lineEnd1.group < lineEnd2.group)
+					return true;
 				else
-					return -1;
+					return false;
 			}
 		}
 		else {
-			if (lineEnd1.line > lineEnd2.line)
-				return 1;
+			if (lineEnd1.line < lineEnd2.line)
+				return true;
 			else
-				return -1;
+				return false;
 		}
 	}
-	return 0;
+	return false;
 }
 
 void nxtseq(unsigned pathIndex) noexcept {
@@ -3533,11 +3533,14 @@ void lcon() {
 #endif
 
 	if (StitchLineCount) {
-		SortedLines = new SMALPNTL*[StitchLineCount >> 1]();
-		for (iLine = 0; iLine < StitchLineCount; iLine += 2)
-			SortedLines[lineCount++] = &LineEndpoints[iLine];
-		// ToDo - replace with std::sort
-		qsort(SortedLines, lineCount, sizeof(SMALPNTL*), sqcomp);
+		std::vector<SMALPNTL*> vSortedLines;
+		vSortedLines.reserve(StitchLineCount >> 1);
+		for (iLine = 0; iLine < StitchLineCount; iLine += 2) {
+			vSortedLines.push_back(&LineEndpoints[iLine]);
+		}
+		std::sort(vSortedLines.begin(), vSortedLines.end(), sqcomp);
+		SortedLines = &vSortedLines[0];
+		lineCount = vSortedLines.size();
 		RegionCount = 0;
 		// Count the regions. There cannot be more regions than lines
 		std::vector<REGION> regions(lineCount);
@@ -3719,7 +3722,7 @@ void lcon() {
 		seqskip : ;
 #endif
 				  delete[] SequencePath;
-				  delete[] SortedLines;
+				  SortedLines = nullptr;
 				  delete[] LineEndpoints;
 				  delete[] MapIndexSequence;
 				  delete[] VisitedRegions;
