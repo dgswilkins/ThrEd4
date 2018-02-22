@@ -293,7 +293,6 @@ unsigned		StitchLineCount;		//count of stitch lines
 SMALPNTL*		LineEndpoints;			//pairs of fill line endpoints
 unsigned		ActivePointIndex;		//pointer to the active form in the sequencing algorithm
 unsigned		LineGroupIndex;			//pointer for groups of fill line segments
-SMALPNTL**		SortedLines;			//sorted pointers to LineEndpoints
 unsigned		VertexCount;			//sides of the selected form to fill
 unsigned		SequenceIndex;			//sequencing pointer
 BSEQPNT			BSequence[BSEQLEN];		//reverse sequence for polygon fills
@@ -2906,12 +2905,12 @@ bool lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) no
 	return 0;
 }
 
-bool regclos(unsigned iRegion0, unsigned iRegion1, std::vector<REGION> &regionsList) noexcept {
+bool regclos(std::vector<SMALPNTL*> &sortedLines, unsigned iRegion0, unsigned iRegion1, std::vector<REGION> &regionsList) noexcept {
 	//ToDo - More renaming required
 
-	const SMALPNTL*	lineEndPoint0Start = &*SortedLines[regionsList[iRegion0].start];
+	const SMALPNTL*	lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
 	SMALPNTL*		lineEndPoint0End = nullptr;
-	const SMALPNTL*	lineEndPoint1Start = &*SortedLines[regionsList[iRegion1].start];
+	const SMALPNTL*	lineEndPoint1Start = sortedLines[regionsList[iRegion1].start];
 	SMALPNTL*		lineEndPoint1End = nullptr;
 	const unsigned	group0Start = lineEndPoint0Start->group;
 	unsigned		group0End = 0;
@@ -2937,8 +2936,8 @@ bool regclos(unsigned iRegion0, unsigned iRegion1, std::vector<REGION> &regionsL
 		return 1;
 	}
 	else {
-		lineEndPoint0End = &*SortedLines[regionsList[iRegion0].end];
-		lineEndPoint1End = &*SortedLines[regionsList[iRegion1].end];
+		lineEndPoint0End = sortedLines[regionsList[iRegion0].end];
+		lineEndPoint1End = sortedLines[regionsList[iRegion1].end];
 		group1End = lineEndPoint1End->group;
 		group0End = lineEndPoint0End->group;
 		if (group0End < group1End) {
@@ -2997,35 +2996,47 @@ void rspnt(float xCoordinate, float yCoordinate) noexcept {
 	BSequence[OutputIndex++].attribute = 0;
 }
 
-void dunseq(unsigned start, unsigned finish) noexcept {
-	SMALPNTL*		lineEndPoint0 = &*SortedLines[start];
-	const SMALPNTL*	lineEndPoint1 = &*SortedLines[finish];
+void dunseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish) {
+	SMALPNTL*		lineEndPoint0 = sortedLines[start];
+	const SMALPNTL*	lineEndPoint1 = sortedLines[finish];
 	if (lineEndPoint0 && lineEndPoint1) {
 		unsigned		iLine = 0;
 		double			deltaY = 0.0, minimumY = 1e30;
 
 		for (iLine = start; iLine <= finish; iLine++) {
-			lineEndPoint0 = &*SortedLines[iLine];
-			deltaY = lineEndPoint0[1].y - lineEndPoint0[0].y;
-			if (deltaY < minimumY)
-				minimumY = deltaY;
+			lineEndPoint0 = sortedLines[iLine];
+			if (lineEndPoint0) {
+				deltaY = lineEndPoint0[1].y - lineEndPoint0[0].y;
+				if (deltaY < minimumY) {
+					minimumY = deltaY;
+				}
+			}
+			else {
+				throw;
+			}
 		}
 		minimumY /= 2;
-		if (minimumY == 1e30 / 2)
+		if (minimumY == 1e30 / 2) {
 			minimumY = 0;
+		}
 		rspnt(lineEndPoint0[0].x, lineEndPoint0[0].y + minimumY);
 		rspnt(lineEndPoint1[0].x, lineEndPoint1[0].y + minimumY);
 		LastGroup = lineEndPoint1->group;
 	}
+	else {
+		throw;
+	}
 }
 
-void movseq(unsigned ind) noexcept {
-	SMALPNTL*	lineEndPoint = &*SortedLines[ind];
+void movseq(std::vector<SMALPNTL*> &sortedLines, unsigned ind) noexcept {
+	SMALPNTL*	lineEndPoint = sortedLines[ind];
 
 	BSequence[OutputIndex].attribute = SEQBOT;
 	BSequence[OutputIndex].x = lineEndPoint->x;
 	BSequence[OutputIndex].y = lineEndPoint->y;
 	OutputIndex++;
+	//Be careful - this makes lineEndPoint point to the next entry in LineEndPoints
+	//             and not the next entry in sortedLines
 	lineEndPoint++;
 	BSequence[OutputIndex].attribute = SEQTOP;
 	BSequence[OutputIndex].x = lineEndPoint->x;
@@ -3033,21 +3044,21 @@ void movseq(unsigned ind) noexcept {
 	OutputIndex++;
 }
 
-void duseq2(unsigned iLine) noexcept {
-	SequenceLines = &*SortedLines[iLine];
+void duseq2(std::vector<SMALPNTL*> &sortedLines, unsigned iLine) noexcept {
+	SequenceLines = sortedLines[iLine];
 	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x, (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
-}
+	}
 
 void duseq1() noexcept {
 	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x, (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
 }
 
-void duseq(unsigned start, unsigned finish, boost::dynamic_bitset<> &sequenceMap) {
+void duseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish, boost::dynamic_bitset<> &sequenceMap) {
 	unsigned	iLine = 0, iLineDec = 0;
-	unsigned	savedTopLine = SortedLines[start][1].line;
+	unsigned	savedTopLine = sortedLines[start][1].line;
 	bool		flag = false;
 
-	SequenceLines = &*SortedLines[start];
+	SequenceLines = sortedLines[start];
 	StateMap.reset(StateFlag::SEQDUN);
 	if (start > finish) {
 		// This odd construction for iLine is used to ensure loop terminates when finish = 0
@@ -3056,130 +3067,143 @@ void duseq(unsigned start, unsigned finish, boost::dynamic_bitset<> &sequenceMap
 			if (sequenceMap.test_set(iLineDec)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
 					flag = true;
-					duseq2(iLineDec);
+					duseq2(sortedLines, iLineDec);
 				}
 				else {
-					if (savedTopLine != SortedLines[iLineDec][1].line) {
-						if (iLineDec)
-							duseq2(iLineDec + 1);
+					if (savedTopLine != sortedLines[iLineDec][1].line) {
+						if (iLineDec) {
+							duseq2(sortedLines, iLineDec + 1);
+						}
 						flag = true;
-						duseq2(iLineDec);
-						savedTopLine = SequenceLines[1].line;
-					}
-				}
-			}
-			else {
-				if (StateMap.testAndReset(StateFlag::SEQDUN))
-					duseq2(iLineDec + 1);
-				flag = true;
-				SequenceLines = &*SortedLines[iLineDec];
-				movseq(iLineDec);
-			}
-		}
-		if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-			flag = true;
-			duseq2(iLine);
-		}
-		if (flag) { LastGroup = SequenceLines->group; }
-	}
-	else {
-		for (iLine = start; iLine <= finish; iLine++) {
-			if (sequenceMap.test_set(iLine)) {
-				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
-					flag = true;
-					duseq2(iLine);
-				}
-				else {
-					if (savedTopLine != SortedLines[iLine][1].line) {
-						if (iLine)
-							duseq2(iLine - 1);
-						flag = true;
-						duseq2(iLine);
+						duseq2(sortedLines, iLineDec);
 						savedTopLine = SequenceLines[1].line;
 					}
 				}
 			}
 			else {
 				if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-					if (iLine)
-						duseq2(iLine - 1);
+					duseq2(sortedLines, (iLineDec + 1));
 				}
 				flag = true;
-				SequenceLines = &*SortedLines[iLine];
-				movseq(iLine);
+				SequenceLines = sortedLines[iLineDec];
+				movseq(sortedLines, iLineDec);
+			}
+		}
+		if (StateMap.testAndReset(StateFlag::SEQDUN)) {
+			flag = true;
+			duseq2(sortedLines, iLine);
+		}
+		if (flag) { 
+			LastGroup = SequenceLines->group;
+		}
+	}
+	else {
+		for (iLine = start; iLine <= finish; iLine++) {
+			if (sequenceMap.test_set(iLine)) {
+				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
+					flag = true;
+					duseq2(sortedLines, iLine);
+				}
+				else {
+					if (savedTopLine != sortedLines[iLine][1].line) {
+						if (iLine) {
+							duseq2(sortedLines, (iLine - 1));
+						}
+						flag = true;
+						duseq2(sortedLines, iLine);
+						savedTopLine = SequenceLines[1].line;
+					}
+				}
+			}
+			else {
+				if (StateMap.testAndReset(StateFlag::SEQDUN)) {
+					if (iLine) {
+						duseq2(sortedLines, (iLine - 1));
+					}
+				}
+				flag = true;
+				SequenceLines = sortedLines[iLine];
+				movseq(sortedLines, iLine);
 			}
 		}
 		if (StateMap.testAndReset(StateFlag::SEQDUN)) {
 			if (iLine) {
 				flag = true;
-				duseq2(iLine - 1);
+				duseq2(sortedLines, (iLine - 1));
 			}
 		}
-		if (flag) { LastGroup = SequenceLines->group; }
+		if (flag) { 
+			LastGroup = SequenceLines->group;
+		}
 	}
 }
 
-void brkseq(unsigned start, unsigned finish, boost::dynamic_bitset<> &sequenceMap) {
+void brkseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish, boost::dynamic_bitset<> &sequenceMap) {
 	unsigned	iLine = 0, iLineDec = 0, savedGroup = 0;
 
 	StateMap.reset(StateFlag::SEQDUN);
 	if (start > finish) {
-		savedGroup = SortedLines[start]->group + 1;
+		savedGroup = sortedLines[start]->group + 1;
 		// This odd construction for iLine is used to ensure
 		// loop terminates when finish = 0
 		for (iLine = start + 1; iLine != finish; iLine--) {
 			iLineDec = iLine - 1;
 			savedGroup--;
-			if (SortedLines[iLineDec]->group != savedGroup) {
+			if (sortedLines[iLineDec]->group != savedGroup) {
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
-				SequenceLines = &*SortedLines[iLineDec];
+				SequenceLines = sortedLines[iLineDec];
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
 				savedGroup = SequenceLines[0].group;
 			}
-			else
-				SequenceLines = &*SortedLines[iLineDec];
+			else {
+				SequenceLines = sortedLines[iLineDec];
+			}
 			if (sequenceMap.test_set(iLineDec)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN))
 					duseq1();
 			}
-			else
-				movseq(iLineDec);
+			else {
+				movseq(sortedLines, iLineDec);
+			}
 		}
 		LastGroup = SequenceLines->group;
 	}
 	else {
-		savedGroup = SortedLines[start]->group - 1;
+		savedGroup = sortedLines[start]->group - 1;
 		for (iLine = start; iLine <= finish; iLine++) {
 			savedGroup++;
-			if (SortedLines[iLine]->group != savedGroup) {
+			if (sortedLines[iLine]->group != savedGroup) {
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
-				SequenceLines = &*SortedLines[iLine];
+				SequenceLines = sortedLines[iLine];
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
 				savedGroup = SequenceLines[0].group;
 			}
-			else
-				SequenceLines = &*SortedLines[iLine];
+			else {
+				SequenceLines = sortedLines[iLine];
+			}
 			if (sequenceMap.test_set(iLine)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN))
 					duseq1();
 			}
-			else
-				movseq(iLine);
+			else {
+				movseq(sortedLines, iLine);
+			}
 		}
 		LastGroup = SequenceLines->group;
 	}
-	if (StateMap.testAndReset(StateFlag::SEQDUN))
+	if (StateMap.testAndReset(StateFlag::SEQDUN)) {
 		duseq1();
+	}
 }
 
-void brkdun(unsigned start, unsigned finish) {
-	rspnt(SortedLines[start]->x, SortedLines[start]->y);
-	rspnt(SortedLines[finish]->x, SortedLines[finish]->y);
-	rspnt(WorkingFormVertices[SortedLines[start]->line].x, WorkingFormVertices[SortedLines[start]->line].y);
+void brkdun(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish) {
+	rspnt(sortedLines[start]->x, sortedLines[start]->y);
+	rspnt(sortedLines[finish]->x, sortedLines[finish]->y);
+	rspnt(WorkingFormVertices[sortedLines[start]->line].x, WorkingFormVertices[sortedLines[start]->line].y);
 	StateMap.set(StateFlag::BRKFIX);
 }
 
-void durgn(unsigned pthi, unsigned lineCount, std::vector<REGION> &regionsList) {
+void durgn(std::vector<SMALPNTL*> &sortedLines, unsigned pthi, unsigned lineCount, std::vector<REGION> &regionsList) {
 	unsigned	dun = 0, gdif = 0, mindif = 0, iVertex = 0, ind = 0, fdif = 0, bdif = 0;
 	unsigned	seql = 0, seqn = 0;
 	unsigned	sequenceStart = 0;
@@ -3187,8 +3211,6 @@ void durgn(unsigned pthi, unsigned lineCount, std::vector<REGION> &regionsList) 
 	const unsigned	nextGroup = SequencePath[pthi].nextGroup;
 	unsigned	groupStart = 0, groupEnd = 0;
 	unsigned	iRegion = SequencePath[pthi].node;
-	SMALPNTL*	lineEndPointStart = nullptr;
-	SMALPNTL*	lineEndPointEnd = nullptr;
 	double		length = 0.0, minimumLength = 0.0;
 	BSEQPNT*	bpnt = nullptr;
 	boost::dynamic_bitset<> sequenceMap(lineCount);
@@ -3198,10 +3220,10 @@ void durgn(unsigned pthi, unsigned lineCount, std::vector<REGION> &regionsList) 
 	sequenceStart = CurrentRegion->start;
 	sequenceEnd = CurrentRegion->end;
 	if (SequencePath[pthi].skp || StateMap.testAndReset(StateFlag::BRKFIX)) {
-		if (BSequence[OutputIndex - 1].attribute != SEQBOT)
+		if (BSequence[OutputIndex - 1].attribute != SEQBOT) {
 			rspnt(BSequence[OutputIndex - 2].x, BSequence[OutputIndex - 2].y);
-		lineEndPointStart = &*SortedLines[iRegion];
-		dun = SortedLines[sequenceStart]->line;
+		}
+		dun = sortedLines[sequenceStart]->line;
 		bpnt = &BSequence[OutputIndex - 1];
 		minimumLength = 1e99;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
@@ -3211,8 +3233,9 @@ void durgn(unsigned pthi, unsigned lineCount, std::vector<REGION> &regionsList) 
 				mindif = iVertex;
 			}
 		}
-		if (minimumLength)
+		if (minimumLength) {
 			rspnt(WorkingFormVertices[mindif].x, WorkingFormVertices[mindif].y);
+		}
 		fdif = (VertexCount + dun - mindif) % VertexCount;
 		bdif = (VertexCount - dun + mindif) % VertexCount;
 		if (fdif < bdif) {
@@ -3232,45 +3255,54 @@ void durgn(unsigned pthi, unsigned lineCount, std::vector<REGION> &regionsList) 
 			rspnt(WorkingFormVertices[ind].x, WorkingFormVertices[ind].y);
 		}
 	}
-	if (VisitedRegions[iRegion])
+	if (VisitedRegions[iRegion]) {
 		dun = 1;
+	}
 	else {
 		dun = 0;
 		VisitedRegions[iRegion]++;
 	}
-	lineEndPointStart = &*SortedLines[CurrentRegion->start];
-	lineEndPointEnd = &*SortedLines[CurrentRegion->end];
-	groupStart = lineEndPointStart->group;
-	groupEnd = lineEndPointEnd->group;
-	if (groupEnd != groupStart)
+	groupStart = sortedLines[CurrentRegion->start]->group;
+	groupEnd = sortedLines[CurrentRegion->end]->group;
+	if (groupEnd != groupStart) {
 		seql = static_cast<double>(LastGroup - groupStart) / (groupEnd - groupStart)*(sequenceEnd - sequenceStart) + sequenceStart;
-	else
+	}
+	else {
 		seql = 0;
-	if (seql > lineCount)
+	}
+	if (seql > lineCount) {
 		seql = 0;
+	}
 	length = static_cast<double>(groupEnd - groupStart)*(sequenceEnd - sequenceStart);
-	if (length)
+	if (length) {
 		seqn = static_cast<double>(nextGroup - groupStart) / length + sequenceStart;
-	else
+	}
+	else {
 		seqn = sequenceEnd;
-	if (seql < sequenceStart)
+	}
+	if (seql < sequenceStart) {
 		seql = sequenceStart;
-	if (seql > sequenceEnd)
+	}
+	if (seql > sequenceEnd) {
 		seql = sequenceEnd;
-	if (seqn < sequenceStart)
+	}
+	if (seqn < sequenceStart) {
 		seqn = sequenceStart;
-	if (seqn > sequenceEnd)
+	}
+	if (seqn > sequenceEnd) {
 		seqn = sequenceEnd;
-	if (SortedLines[seql]->group != LastGroup) {
-		if (seql < sequenceEnd && SortedLines[seql + 1]->group == LastGroup)
+	}
+	if (sortedLines[seql]->group != LastGroup) {
+		if (seql < sequenceEnd && sortedLines[seql + 1]->group == LastGroup) {
 			seql++;
+		}
 		else {
-			if (seql > sequenceStart && SortedLines[seql - 1]->group == LastGroup)
+			if (seql > sequenceStart && sortedLines[seql - 1]->group == LastGroup)
 				seql--;
 			else {
 				mindif = 0xffffffff;
 				for (ind = sequenceStart; ind <= sequenceEnd; ind++) {
-					gdif = ((SortedLines[ind]->group > LastGroup) ? (SortedLines[ind]->group - LastGroup) : (LastGroup - SortedLines[ind]->group));
+					gdif = ((sortedLines[ind]->group > LastGroup) ? (sortedLines[ind]->group - LastGroup) : (LastGroup - sortedLines[ind]->group));
 					if (gdif < mindif) {
 						mindif = gdif;
 						seql = ind;
@@ -3279,16 +3311,18 @@ void durgn(unsigned pthi, unsigned lineCount, std::vector<REGION> &regionsList) 
 			}
 		}
 	}
-	if (SortedLines[seqn]->group != nextGroup) {
-		if (seqn < sequenceEnd && SortedLines[seqn + 1]->group == nextGroup)
+	if (sortedLines[seqn]->group != nextGroup) {
+		if (seqn < sequenceEnd && sortedLines[seqn + 1]->group == nextGroup) {
 			seqn++;
+		}
 		else {
-			if (seqn > sequenceStart && SortedLines[seqn - 1]->group == nextGroup)
+			if (seqn > sequenceStart && sortedLines[seqn - 1]->group == nextGroup) {
 				seqn--;
+			}
 			else {
 				mindif = 0xffffffff;
 				for (ind = sequenceStart; ind <= sequenceEnd; ind++) {
-					gdif = ((SortedLines[ind]->group > nextGroup) ? (SortedLines[ind]->group - nextGroup) : (nextGroup - SortedLines[ind]->group));
+					gdif = ((sortedLines[ind]->group > nextGroup) ? (sortedLines[ind]->group - nextGroup) : (nextGroup - sortedLines[ind]->group));
 					if (gdif < mindif) {
 						mindif = gdif;
 						seqn = ind;
@@ -3299,54 +3333,64 @@ void durgn(unsigned pthi, unsigned lineCount, std::vector<REGION> &regionsList) 
 	}
 	if (CurrentRegion->breakCount) {
 		if (dun) {
-			brkdun(seql, seqn);
+			brkdun(sortedLines, seql, seqn);
 		}
 		else {
 			if (LastGroup >= groupEnd) {
-				brkseq(sequenceEnd, sequenceStart, sequenceMap);
-				if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn)
-					brkseq(sequenceStart, seqn, sequenceMap);
+				brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap);
+				if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn) {
+					brkseq(sortedLines, sequenceStart, seqn, sequenceMap);
+				}
 			}
 			else {
 				if (groupStart <= nextGroup) {
-					if (seql != sequenceStart)
-						brkseq(seql, sequenceStart, sequenceMap);
-					brkseq(sequenceStart, sequenceEnd, sequenceMap);
-					if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn)
-						brkseq(sequenceEnd, seqn, sequenceMap);
+					if (seql != sequenceStart) {
+						brkseq(sortedLines, seql, sequenceStart, sequenceMap);
+					}
+					brkseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap);
+					if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn) {
+						brkseq(sortedLines, sequenceEnd, seqn, sequenceMap);
+					}
 				}
 				else {
-					if (seql != sequenceEnd)
-						brkseq(seql, sequenceEnd, sequenceMap);
-					brkseq(sequenceEnd, sequenceStart, sequenceMap);
-					if (pthi < SequencePathIndex - 1 && sequenceStart != seqn)
-						brkseq(sequenceStart, seqn, sequenceMap);
+					if (seql != sequenceEnd) {
+						brkseq(sortedLines, seql, sequenceEnd, sequenceMap);
+					}
+					brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap);
+					if (pthi < SequencePathIndex - 1 && sequenceStart != seqn) {
+						brkseq(sortedLines, sequenceStart, seqn, sequenceMap);
+					}
 				}
 			}
 		}
 	}
 	else {
-		if (dun)
-			dunseq(seql, seqn);
+		if (dun) {
+			dunseq(sortedLines, seql, seqn);
+		}
 		else {
 			if (LastGroup >= groupEnd) {
-				duseq(sequenceEnd, sequenceStart, sequenceMap);
-				duseq(sequenceStart, seqn, sequenceMap);
+				duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap);
+				duseq(sortedLines, sequenceStart, seqn, sequenceMap);
 			}
 			else {
 				if (groupStart <= nextGroup) {
-					if (seql != sequenceStart)
-						duseq(seql, sequenceStart, sequenceMap);
-					duseq(sequenceStart, sequenceEnd, sequenceMap);
-					if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn)
-						duseq(sequenceEnd, seqn, sequenceMap);
+					if (seql != sequenceStart) {
+						duseq(sortedLines, seql, sequenceStart, sequenceMap);
+					}
+					duseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap);
+					if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn) {
+						duseq(sortedLines, sequenceEnd, seqn, sequenceMap);
+					}
 				}
 				else {
-					if (seql != sequenceEnd)
-						duseq(seql, sequenceEnd, sequenceMap);
-					duseq(sequenceEnd, sequenceStart, sequenceMap);
-					if (pthi < SequencePathIndex - 1 && sequenceStart != seqn)
-						duseq(sequenceStart, seqn, sequenceMap);
+					if (seql != sequenceEnd) {
+						duseq(sortedLines, seql, sequenceEnd, sequenceMap);
+					}
+					duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap);
+					if (pthi < SequencePathIndex - 1 && sequenceStart != seqn) {
+						duseq(sortedLines, sequenceStart, seqn, sequenceMap);
+					}
 				}
 			}
 		}
@@ -3366,19 +3410,22 @@ unsigned notdun(unsigned level) noexcept {
 		RegionPath[iPath].count = MapIndexSequence[PathMap[RegionPath[iPath - 1].pcon].node + 1] - RegionPath[iPath].pcon;
 	}
 	while (VisitedRegions[PathMap[RegionPath[previousLevel].pcon].node] && previousLevel >= 0) {
-		if (--RegionPath[previousLevel].count > 0)
+		if (--RegionPath[previousLevel].count > 0) {
 			RegionPath[previousLevel].pcon++;
+		}
 		else {
 			pivot = previousLevel;
 			do {
 				pivot--;
-				if (pivot < 0)
+				if (pivot < 0) {
 					return 1;
+				}
 				RegionPath[pivot].count--;
 				RegionPath[pivot].pcon++;
 			} while (!RegionPath[pivot].count);
-			if (pivot < 0)
+			if (pivot < 0) {
 				return 1;
+			}
 			pivot++;
 			while (pivot <= previousLevel) {
 				if (pivot) {
@@ -3386,10 +3433,12 @@ unsigned notdun(unsigned level) noexcept {
 					RegionPath[pivot].count = MapIndexSequence[PathMap[RegionPath[pivot - 1].pcon].node + 1] - RegionPath[pivot].pcon;
 				}
 				else {
-					if (--RegionPath[0].count)
+					if (--RegionPath[0].count) {
 						RegionPath[0].pcon++;
-					else
+					}
+					else {
 						return 1;
+					}
 				}
 				pivot++;
 			}
@@ -3398,26 +3447,27 @@ unsigned notdun(unsigned level) noexcept {
 	return 0;
 }
 
-double reglen(unsigned iRegion, std::array<fPOINT, 4> &lastRegionCorners, std::vector<REGION> &regionsList) noexcept {
+double reglen(std::vector<SMALPNTL*> &sortedLines, unsigned iRegion, std::array<fPOINT, 4> &lastRegionCorners, std::vector<REGION> &regionsList) noexcept {
 	double		length = 0.0, minimumLength = 1e99;
 	unsigned	iCorner = 0, iPoint = 0;
 	SMALPNTL*	lineEndPoints[4] = {};
 
-	lineEndPoints[0] = SortedLines[regionsList[iRegion].start];
-	lineEndPoints[1] = &SortedLines[regionsList[iRegion].start][1];
-	lineEndPoints[2] = SortedLines[regionsList[iRegion].end];
-	lineEndPoints[3] = &SortedLines[regionsList[iRegion].end][1];
+	lineEndPoints[0] = sortedLines[regionsList[iRegion].start];
+	lineEndPoints[1] = &sortedLines[regionsList[iRegion].start][1];
+	lineEndPoints[2] = sortedLines[regionsList[iRegion].end];
+	lineEndPoints[3] = &sortedLines[regionsList[iRegion].end][1];
 	for (iCorner = 0; iCorner < 4; iCorner++) {
 		for (iPoint = 0; iPoint < 4; iPoint++) {
 			length = hypot(lastRegionCorners[iCorner].x - lineEndPoints[iPoint]->x, lastRegionCorners[iCorner].y - lineEndPoints[iPoint]->y);
-			if (length < minimumLength)
+			if (length < minimumLength) {
 				minimumLength = length;
+			}
 		}
 	}
 	return minimumLength;
 }
 
-void nxtrgn(std::vector<REGION> &regionsList) noexcept {
+void nxtrgn(std::vector<SMALPNTL*> &sortedLines, std::vector<REGION> &regionsList) noexcept {
 	unsigned	iRegion = 0, iPath = 0, newRegion = 0;
 	double		length = 0, minimumLength = 1e99;
 	unsigned	pathLength = 1;				//length of the path to the region
@@ -3427,42 +3477,44 @@ void nxtrgn(std::vector<REGION> &regionsList) noexcept {
 	while (notdun(pathLength)) {
 		pathLength++;
 		if (pathLength > 8) {
-			SMALPNTL* lineEndPoint = &*SortedLines[regionsList[DoneRegion].start];
+			SMALPNTL* lineEndPoint = sortedLines[regionsList[DoneRegion].start];
 			if (lineEndPoint) {
 				lastRegionCorners[0].x = lineEndPoint[0].x;
 				lastRegionCorners[0].y = lineEndPoint[0].y;
 				lastRegionCorners[1].x = lineEndPoint[1].x;
 				lastRegionCorners[1].y = lineEndPoint[1].y;
-				lineEndPoint = &*SortedLines[regionsList[DoneRegion].end];
+			}
+			lineEndPoint = sortedLines[regionsList[DoneRegion].end];
+			if (lineEndPoint) {
 				lastRegionCorners[2].x = lineEndPoint[0].x;
 				lastRegionCorners[2].y = lineEndPoint[0].y;
 				lastRegionCorners[3].x = lineEndPoint[1].x;
 				lastRegionCorners[3].y = lineEndPoint[1].y;
-				newRegion = 0;
-				for (iRegion = 0; iRegion < RegionCount; iRegion++) {
-					if (!VisitedRegions[iRegion]) {
-						length = reglen(iRegion, lastRegionCorners, regionsList);
-						if (length < minimumLength) {
-							minimumLength = length;
-							newRegion = iRegion;
-						}
-					}
-				}
-				TempPath[SequencePathIndex].skp = 1;
-				for (iPath = 0; iPath < PathMapIndex; iPath++) {
-					if (PathMap[iPath].node == newRegion) {
-						TempPath[SequencePathIndex++].pcon = iPath;
-						VisitedRegions[newRegion] = 1;
-						DoneRegion = newRegion;
-						return;
-					}
-				}
-				TempPath[SequencePathIndex].count = VisitedIndex;
-				TempPath[SequencePathIndex++].pcon = 0xffffffff;
-				VisitedRegions[VisitedIndex] = 1;
-				DoneRegion = VisitedIndex;
-				return;
 			}
+			newRegion = 0;
+			for (iRegion = 0; iRegion < RegionCount; iRegion++) {
+				if (!VisitedRegions[iRegion]) {
+					length = reglen(sortedLines, iRegion, lastRegionCorners, regionsList);
+					if (length < minimumLength) {
+						minimumLength = length;
+						newRegion = iRegion;
+					}
+				}
+			}
+			TempPath[SequencePathIndex].skp = 1;
+			for (iPath = 0; iPath < PathMapIndex; iPath++) {
+				if (PathMap[iPath].node == newRegion) {
+					TempPath[SequencePathIndex++].pcon = iPath;
+					VisitedRegions[newRegion] = 1;
+					DoneRegion = newRegion;
+					return;
+				}
+			}
+			TempPath[SequencePathIndex].count = VisitedIndex;
+			TempPath[SequencePathIndex++].pcon = 0xffffffff;
+			VisitedRegions[VisitedIndex] = 1;
+			DoneRegion = VisitedIndex;
+			return;
 		}
 	}
 	for (iPath = 0; iPath < pathLength; iPath++) {
@@ -3484,24 +3536,15 @@ bool sqcomp(const SMALPNTL *arg1, const SMALPNTL *arg2) noexcept {
 					return false;
 				}
 				else {
-					if (lineEnd1.y < lineEnd2.y)
-						return true;
-					else
-						return false;
+					return (lineEnd1.y < lineEnd2.y);
 				}
 			}
 			else {
-				if (lineEnd1.group < lineEnd2.group)
-					return true;
-				else
-					return false;
+				return (lineEnd1.group < lineEnd2.group);
 			}
 		}
 		else {
-			if (lineEnd1.line < lineEnd2.line)
-				return true;
-			else
-				return false;
+			return (lineEnd1.line < lineEnd2.line);
 		}
 	}
 	return false;
@@ -3533,24 +3576,23 @@ void lcon() {
 #endif
 
 	if (StitchLineCount) {
-		std::vector<SMALPNTL*> vSortedLines;
-		vSortedLines.reserve(StitchLineCount >> 1);
+		std::vector<SMALPNTL*> sortedLines;
+		sortedLines.reserve(StitchLineCount >> 1);
 		for (iLine = 0; iLine < StitchLineCount; iLine += 2) {
-			vSortedLines.push_back(&LineEndpoints[iLine]);
+			sortedLines.push_back(&LineEndpoints[iLine]);
 		}
-		std::sort(vSortedLines.begin(), vSortedLines.end(), sqcomp);
-		SortedLines = &vSortedLines[0];
-		lineCount = vSortedLines.size();
+		std::sort(sortedLines.begin(), sortedLines.end(), sqcomp);
+		lineCount = sortedLines.size();
 		RegionCount = 0;
 		// Count the regions. There cannot be more regions than lines
 		std::vector<REGION> regions(lineCount);
 		regions[0].start = 0;
-		breakLine = SortedLines[0]->line;
+		breakLine = sortedLines[0]->line;
 		for (iLine = 0; iLine < lineCount; iLine++) {
-			if (breakLine != SortedLines[iLine]->line) {
+			if (breakLine != sortedLines[iLine]->line) {
 				regions[RegionCount++].end = iLine - 1;
 				regions[RegionCount].start = iLine;
-				breakLine = SortedLines[iLine]->line;
+				breakLine = sortedLines[iLine]->line;
 			}
 		}
 		regions[RegionCount++].end = iLine - 1;
@@ -3565,14 +3607,15 @@ void lcon() {
 		for (iRegion = 0; iRegion < RegionCount; iRegion++) {
 			count = 0;
 			if ((RegionsList[iRegion].end - RegionsList[iRegion].start) > 1) {
-				startGroup = SortedLines[RegionsList[iRegion].start]->group;
+				startGroup = sortedLines[RegionsList[iRegion].start]->group;
 				for (iLine = RegionsList[iRegion].start + 1; iLine <= RegionsList[iRegion].end; iLine++) {
 					startGroup++;
-					if (SortedLines[iLine]->group != startGroup) {
-						if (!count)
+					if (sortedLines[iLine]->group != startGroup) {
+						if (!count) {
 							RegionsList[iRegion].regionBreak = iStartLine;
+						}
 						count++;
-						startGroup = SortedLines[iLine]->group;
+						startGroup = sortedLines[iLine]->group;
 					}
 				}
 			}
@@ -3609,7 +3652,7 @@ void lcon() {
 				count = 0; GapToClosestRegion = 0;
 				for (iNode = 0; iNode < RegionCount; iNode++) {
 					if (iSequence != iNode) {
-						isConnected = regclos(iSequence, iNode, RegionsList);
+						isConnected = regclos(sortedLines, iSequence, iNode, RegionsList);
 						if (isConnected) {
 							tempPathMap[PathMapIndex].isConnected = isConnected;
 							tempPathMap[PathMapIndex].nextGroup = NextGroup;
@@ -3623,7 +3666,7 @@ void lcon() {
 					count = 0;
 					for (iNode = 0; iNode < RegionCount; iNode++) {
 						if (iSequence != iNode) {
-							isConnected = regclos(iSequence, iNode, RegionsList);
+							isConnected = regclos(sortedLines, iSequence, iNode, RegionsList);
 							if (isConnected) {
 								tempPathMap[PathMapIndex].isConnected = isConnected;
 								tempPathMap[PathMapIndex].nextGroup = NextGroup;
@@ -3644,7 +3687,7 @@ void lcon() {
 			//find the leftmost region
 			startGroup = 0xffffffff; leftRegion = 0;
 			for (iRegion = 0; iRegion < RegionCount; iRegion++) {
-				lineGroupPoint = &*SortedLines[RegionsList[iRegion].start];
+				lineGroupPoint = sortedLines[RegionsList[iRegion].start];
 				if (lineGroupPoint->group < startGroup) {
 					startGroup = lineGroupPoint->group;
 					leftRegion = iRegion;
@@ -3673,8 +3716,9 @@ void lcon() {
 			TempPath[0].skp = 0;
 			VisitedRegions[leftRegion] = 1;
 			DoneRegion = leftRegion;
-			while (unvis())
-				nxtrgn(RegionsList);
+			while (unvis()) {
+				nxtrgn(sortedLines, RegionsList);
+			}
 			iOutPath = 0;
 			count = 0xffffffff;
 			SequencePath = new FSEQ[((RegionCount * (RegionCount - 1)) / 2) + 1]();
@@ -3703,7 +3747,7 @@ void lcon() {
 				OutputDebugString(MsgBuffer);
 				if (!unvis())
 					break;
-				durgn(iPath, lineCount, RegionsList);
+				durgn(sortedLines, iPath, lineCount, RegionsList);
 			}
 		}
 		else {
@@ -3711,9 +3755,9 @@ void lcon() {
 			SequencePath = new FSEQ[1]();
 			LastGroup = 0;
 			SequencePath[0].node = 0;
-			SequencePath[0].nextGroup = SortedLines[RegionsList[0].end]->group;
+			SequencePath[0].nextGroup = sortedLines[RegionsList[0].end]->group;
 			SequencePath[0].skp = 0;
-			durgn(0, lineCount, RegionsList);
+			durgn(sortedLines, 0, lineCount, RegionsList);
 		}
 		//skip:;
 
@@ -3722,7 +3766,6 @@ void lcon() {
 		seqskip : ;
 #endif
 				  delete[] SequencePath;
-				  SortedLines = nullptr;
 				  delete[] LineEndpoints;
 				  delete[] MapIndexSequence;
 				  delete[] VisitedRegions;
