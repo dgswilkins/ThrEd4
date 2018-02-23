@@ -11171,6 +11171,7 @@ unsigned insect(std::vector<CLIPSORT *> &ArrayOfClipIntersectData) noexcept {
 		lineSegmentRect.bottom = LineSegmentEnd.y;
 	}
 	iIntersection = count = 0;
+	ArrayOfClipIntersectData.clear();
 	for (iRegions = RegionCrossingStart; iRegions < RegionCrossingEnd; iRegions++) {
 		currentVertex = RegionCrossingData[iRegions].vertex;
 		nextVertex = nxt(currentVertex);
