@@ -11003,6 +11003,7 @@ void ritseg() {
 unsigned lenref(const float *lineLength) noexcept {
 	//Correct (randomization?)
 	[[gsl::suppress(type.1)]]{
+		//ToDo - this is very brittle. There has to be a better way
 		unsigned eax = reinterpret_cast<unsigned>(lineLength) - reinterpret_cast<unsigned>(ClipSegments);
 
 		const unsigned edx = eax % 29;
@@ -11582,7 +11583,6 @@ void clpcon() {
 					sortedLengths.push_back(&ClipSegments[iSegment].beginLength);
 					sortedLengths.push_back(&ClipSegments[iSegment].endLength);
 				}
-				// ToDo - replace with std::sort
 				std::sort(sortedLengths.begin(), sortedLengths.end(), lencmp);
 				for (iSorted = 0; iSorted < sortedLengths.size(); iSorted++) {
 					// ToDo - what does lenref do exactly?
