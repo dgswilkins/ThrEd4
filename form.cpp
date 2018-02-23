@@ -402,7 +402,6 @@ fPOINT			LineSegmentEnd;			//vertical clipboard line segment end
 double*			ClipSideLengths;		//lengths of form sides for vertical clipboard fill
 CLIPSORT*		ClipIntersectData;		//intersect points for vertical clipboard fill
 CLIPNT*			ClipStitchPoints;		//points for vertical clipboard fills
-VCLPX			RegionCrossingData[MAXFRMLINS];	//region crossing data for vertical clipboard fills
 unsigned		RegionCrossingStart;	//start of region crossing data for a particular region
 unsigned		RegionCrossingEnd;		//end of region crossing data for a particular region
 float			ClipWidth;				//horizontal spacing for vertical clipboard fill
@@ -11075,23 +11074,9 @@ constexpr unsigned leftsid() {
 	return leftVertex;
 }
 
-int clpcmp(const void* arg1, const void* arg2) noexcept {
-	const VCLPX	vclpx1 = *static_cast<const VCLPX *>(arg1);
-	const VCLPX	vclpx2 = *static_cast<const VCLPX *>(arg2);
+bool clpcmp(const VCLPX &vclpx1, const VCLPX &vclpx2) noexcept {
 
-	if (vclpx1.segment < vclpx2.segment)
-		return -1;
-
-	if (vclpx1.segment > vclpx2.segment)
-		return 1;
-
-	if (vclpx1.vertex == vclpx2.vertex)
-		return 0;
-
-	if (vclpx1.vertex < vclpx2.vertex)
-		return -1;
-
-	return 1;
+	return(vclpx1.segment < vclpx2.segment);
 }
 
 bool isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* length) noexcept {
@@ -11148,7 +11133,7 @@ bool isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* leng
 	return flag;
 }
 
-unsigned insect(std::vector<CLIPSORT *> &ArrayOfClipIntersectData) noexcept {
+unsigned insect(std::vector<VCLPX>	regionCrossingData, std::vector<CLIPSORT *> &ArrayOfClipIntersectData) noexcept {
 	unsigned	iRegions = 0, iDestination = 0, iIntersection = 0, count = 0;
 	unsigned	currentVertex = 0, nextVertex = 0;
 	fRECTANGLE	lineSegmentRect = {};
@@ -11173,7 +11158,7 @@ unsigned insect(std::vector<CLIPSORT *> &ArrayOfClipIntersectData) noexcept {
 	iIntersection = count = 0;
 	ArrayOfClipIntersectData.clear();
 	for (iRegions = RegionCrossingStart; iRegions < RegionCrossingEnd; iRegions++) {
-		currentVertex = RegionCrossingData[iRegions].vertex;
+		currentVertex = regionCrossingData[iRegions].vertex;
 		nextVertex = nxt(currentVertex);
 		if (isect(currentVertex, nextVertex, &ClipIntersectData[iIntersection].point, &ClipIntersectData[iIntersection].sideLength)) {
 			intersection = &ClipIntersectData[iIntersection].point;
@@ -11190,7 +11175,6 @@ unsigned insect(std::vector<CLIPSORT *> &ArrayOfClipIntersectData) noexcept {
 		}
 	}
 	if (count > 1) {
-		// ToDo - replace with std::sort
 		std::sort(ArrayOfClipIntersectData.begin(), ArrayOfClipIntersectData.end(), lencmpa);
 		iDestination = 1;
 		for (iIntersection = 0; iIntersection < count - 1; iIntersection++) {
@@ -11202,7 +11186,7 @@ unsigned insect(std::vector<CLIPSORT *> &ArrayOfClipIntersectData) noexcept {
 	return count;
 }
 
-bool isin(float xCoordinate, float yCoordinate) noexcept {
+bool isin(std::vector<VCLPX> regionCrossingData, float xCoordinate, float yCoordinate) noexcept {
 	// ToDo - rename local variables
 
 	unsigned	iRegion = 0, acnt = 0;
@@ -11218,7 +11202,7 @@ bool isin(float xCoordinate, float yCoordinate) noexcept {
 	if (yCoordinate > BoundingRect.top)
 		return 0;
 	for (iRegion = RegionCrossingStart; iRegion < RegionCrossingEnd; iRegion++) {
-		svrt = RegionCrossingData[iRegion].vertex;
+		svrt = regionCrossingData[iRegion].vertex;
 		nvrt = nxt(svrt);
 		if (projv(xCoordinate, CurrentFormVertices[svrt], CurrentFormVertices[nvrt], &ipnt)) {
 			if (ipnt.y > yCoordinate) {
@@ -11290,9 +11274,9 @@ void inspnt() noexcept {
 void clpcon() {
 	RECT		clipGrid = {};
 	unsigned	iSegment = 0, iStitchPoint = 0, iVertex = 0, iPoint = 0, iSorted = 0, iSequence = 0, vertex = 0;
-	unsigned	swap = 0, iRegion = 0, ine = 0, nextVertex = 0, regionSegment = 0, iStitch = 0;
+	unsigned	iRegion = 0, ine = 0, nextVertex = 0, regionSegment = 0, iStitch = 0;
 	unsigned	lineOffset = 0, negativeOffset = 0, clipNegative = 0;
-	unsigned	start = 0, finish = 0, segmentCount = 0, regionCount = 0, previousPoint = 0;
+	unsigned	start = 0, finish = 0, segmentCount = 0, previousPoint = 0;
 	// ToDo - rename variables
 	unsigned	inf = 0, ing = 0, cnt = 0;
 	int			iVerticalGrid = 0, textureLine = 0;
@@ -11367,11 +11351,13 @@ void clpcon() {
 	}
 	ClipStitchPoints = new CLIPNT[MAXITEMS];
 	segmentCount = 0;
+	std::vector<VCLPX>	regionCrossingData; //region crossing data for vertical clipboard fills
+	regionCrossingData.reserve(MAXFRMLINS);	
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 		start = floor(CurrentFormVertices[iVertex].x / ClipWidth);
 		finish = floor((CurrentFormVertices[nxt(iVertex)].x) / ClipWidth);
 		if (start > finish) {
-			swap = start;
+			unsigned int swap = start;
 			start = finish;
 			finish = swap;
 		}
@@ -11382,23 +11368,21 @@ void clpcon() {
 		if (clipNegative)
 			start -= static_cast<unsigned int>(ClipRectSize.cx / ClipWidth);
 		for (iSegment = start; iSegment <= finish; iSegment++) {
-			RegionCrossingData[segmentCount].vertex = iVertex;
-			RegionCrossingData[segmentCount++].segment = iSegment;
+			regionCrossingData.push_back({ iSegment, iVertex });
 		}
 	}
-	// ToDo - replace with std::sort
-	qsort(RegionCrossingData, segmentCount, sizeof(VCLPX), clpcmp);
-	std::vector<unsigned> iclpx(segmentCount + 1);
-	iRegion = 1; regionSegment = RegionCrossingData[0].segment;
-	iclpx[0] = 0;
-	for (iSegment = 1; iSegment < segmentCount; iSegment++) {
-		if (RegionCrossingData[iSegment].segment != regionSegment) {
-			iclpx[iRegion++] = iSegment;
-			regionSegment = RegionCrossingData[iSegment].segment;
+	std::sort(regionCrossingData.begin(), regionCrossingData.end(), clpcmp);
+	std::vector<unsigned> iclpx;
+	iclpx.reserve(regionCrossingData.size());
+	regionSegment = regionCrossingData[0].segment;
+	iclpx.push_back(0);
+	for (iSegment = 1; iSegment < regionCrossingData.size(); iSegment++) {
+		if (regionCrossingData[iSegment].segment != regionSegment) {
+			iclpx.push_back(iSegment);
+			regionSegment = regionCrossingData[iSegment].segment;
 		}
 	}
-	iclpx[iRegion] = iSegment;
-	regionCount = iRegion;
+	iclpx.push_back(iSegment);
 	BoundingRect.left = BoundingRect.right = CurrentFormVertices[0].x;
 	BoundingRect.top = BoundingRect.bottom = CurrentFormVertices[0].y;
 	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
@@ -11413,7 +11397,7 @@ void clpcon() {
 	}
 	ActivePointIndex = 0;
 	bool breakFlag = false;
-	for (iRegion = 0; iRegion < regionCount; iRegion++) {
+	for (iRegion = 0; iRegion < (iclpx.size() - 1); iRegion++) {
 		RegionCrossingStart = iclpx[iRegion];
 		RegionCrossingEnd = iclpx[iRegion + 1];
 		pasteLocation.x = ClipWidth * (iRegion + clipGrid.left);
@@ -11458,7 +11442,7 @@ void clpcon() {
 
 				ClipStitchPoints[ActivePointIndex].x = LineSegmentStart.x;
 				ClipStitchPoints[ActivePointIndex].y = LineSegmentStart.y;
-				if (isin(LineSegmentStart.x, LineSegmentStart.y)) {
+				if (isin(regionCrossingData, LineSegmentStart.x, LineSegmentStart.y)) {
 					if (ActivePointIndex && ClipStitchPoints[ActivePointIndex - 1].flag == 2)
 						inspnt();
 					ClipStitchPoints[ActivePointIndex].flag = 0;
@@ -11469,7 +11453,7 @@ void clpcon() {
 					ClipStitchPoints[ActivePointIndex].flag = 2;
 				}
 				ActivePointIndex++;
-				cnt = insect(ArrayOfClipIntersectData);
+				cnt = insect(regionCrossingData, ArrayOfClipIntersectData);
 				if (cnt) {
 					for (ing = 0; ing < cnt; ing++) {
 						ClipStitchPoints[ActivePointIndex].vertexIndex = ArrayOfClipIntersectData[ing]->vertexIndex;
@@ -11480,7 +11464,6 @@ void clpcon() {
 						if (ActivePointIndex > MAXITEMS << 2) {
 							breakFlag = true;
 							break;
-							//goto clpskp;
 						}
 					}
 					if (breakFlag) {
