@@ -397,7 +397,6 @@ fPOINT			AngledFormVertices[MAXFRMLINS];	//form formOrigin data for angle fills
 CLPSEG*			ClipSegments;			//clipboard segments for virtual clipboard fill
 unsigned		ClipSegmentIndex;		//clipboard segment pointer
 unsigned short	ClipIntersectSide;		//clipboard intersect side;
-float**			SortedLengths;			//array of sorted side lengths for vertical clipboard fill
 fPOINT			LineSegmentStart;		//vertical clipboard line segment start
 fPOINT			LineSegmentEnd;			//vertical clipboard line segment end
 double*			ClipSideLengths;		//lengths of form sides for vertical clipboard fill
@@ -10918,7 +10917,13 @@ void stchs2frm() {
 		shoseln(IDS_GRPMSG, IDS_STCH2FRM);
 }
 
-int lencmp(const void *arg1, const void *arg2) noexcept {
+bool lencmp(const float *arg1, const float *arg2) noexcept {
+		const float local1 = *arg1, local2 = *arg2;
+
+		return (local1 < local2);
+}
+
+int lencmpa(const void *arg1, const void *arg2) noexcept {
 	if (arg1 && arg2) {
 		const float local1 = **static_cast<float * const *>(arg1), local2 = **static_cast<float * const *>(arg2);
 
@@ -10930,6 +10935,7 @@ int lencmp(const void *arg1, const void *arg2) noexcept {
 	}
 	return 0;
 }
+
 
 void chksid(unsigned vertexIndex) noexcept {
 	unsigned	iVertex = 0, limit = 0;
@@ -11011,7 +11017,7 @@ unsigned lenref(const float *lineLength) noexcept {
 	}
 }
 
-bool clpnxt(unsigned sind) {
+bool clpnxt(std::vector<float *> &sortedLengths, unsigned sind) {
 	// ToDo - rename local variables
 
 	unsigned	ind = 1;
@@ -11021,29 +11027,29 @@ bool clpnxt(unsigned sind) {
 	while (ind < ClipSegmentIndex) {
 		if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 			OutputIndex = (sind + ind) % indexDoubled;
-			if (!ClipSegments[lenref(SortedLengths[OutputIndex]) >> 1].dun)
+			if (!ClipSegments[lenref(sortedLengths[OutputIndex]) >> 1].dun)
 				return 0;
 			ind++;
 		}
 		else {
 			OutputIndex = (sind + indexDoubled - ind) % indexDoubled;
-			if (!ClipSegments[lenref(SortedLengths[OutputIndex]) >> 1].dun)
+			if (!ClipSegments[lenref(sortedLengths[OutputIndex]) >> 1].dun)
 				return 0;
 		}
 	}
 	return 1;
 }
 
-bool nucseg() {
+bool nucseg(std::vector<float *> &sortedLengths) {
 	unsigned	ind = 0;
 
 	if (StateMap.test(StateFlag::FILDIR))
 		ind = ClipSegments[ActivePointIndex].endIndex;
 	else
 		ind = ClipSegments[ActivePointIndex].beginIndex;
-	if (clpnxt(ind))
+	if (clpnxt(sortedLengths, ind))
 		return 0;
-	ind = lenref(SortedLengths[OutputIndex]);
+	ind = lenref(sortedLengths[OutputIndex]);
 	if (ind & 1)
 		StateMap.reset(StateFlag::FILDIR);
 	else
@@ -11191,7 +11197,7 @@ unsigned insect() noexcept {
 	}
 	if (count > 1) {
 		// ToDo - replace with std::sort
-		qsort(ArrayOfClipIntersectData, count, sizeof(CLIPSORT *), lencmp);
+		qsort(ArrayOfClipIntersectData, count, sizeof(CLIPSORT *), lencmpa);
 		iDestination = 1;
 		for (iIntersection = 0; iIntersection < count - 1; iIntersection++) {
 			if (fabs(ArrayOfClipIntersectData[iIntersection]->segmentLength - ArrayOfClipIntersectData[iIntersection + 1]->segmentLength) > TINY)
@@ -11290,7 +11296,7 @@ void inspnt() noexcept {
 void clpcon() {
 	RECT		clipGrid = {};
 	unsigned	iSegment = 0, iStitchPoint = 0, iVertex = 0, iPoint = 0, iSorted = 0, iSequence = 0, vertex = 0;
-	unsigned	swap = 0, iRegion = 0, sortedCount = 0, ine = 0, nextVertex = 0, regionSegment = 0, iStitch = 0;
+	unsigned	swap = 0, iRegion = 0, ine = 0, nextVertex = 0, regionSegment = 0, iStitch = 0;
 	unsigned	lineOffset = 0, negativeOffset = 0, clipNegative = 0;
 	unsigned	start = 0, finish = 0, segmentCount = 0, regionCount = 0, previousPoint = 0;
 	// ToDo - rename variables
@@ -11570,17 +11576,17 @@ void clpcon() {
 					clplim = 1;
 				if (clplim > 12)
 					clplim = 12;
-				SortedLengths = new float*[ClipSegmentIndex * 2];
-				sortedCount = 0;
+				std::vector<float *> sortedLengths;
+				sortedLengths.reserve(ClipSegmentIndex * 2);
 				for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
-					SortedLengths[sortedCount++] = &ClipSegments[iSegment].beginLength;
-					SortedLengths[sortedCount++] = &ClipSegments[iSegment].endLength;
+					sortedLengths.push_back(&ClipSegments[iSegment].beginLength);
+					sortedLengths.push_back(&ClipSegments[iSegment].endLength);
 				}
 				// ToDo - replace with std::sort
-				qsort(SortedLengths, sortedCount, sizeof(float *), lencmp);
-				for (iSorted = 0; iSorted < sortedCount; iSorted++) {
+				std::sort(sortedLengths.begin(), sortedLengths.end(), lencmp);
+				for (iSorted = 0; iSorted < sortedLengths.size(); iSorted++) {
 					// ToDo - what does lenref do exactly?
-					inf = lenref(SortedLengths[iSorted]);
+					inf = lenref(sortedLengths[iSorted]);
 					ing = inf >> 1;
 					if (inf & 1)
 						ClipSegments[ing].endIndex = iSorted;
@@ -11621,7 +11627,7 @@ void clpcon() {
 				SequenceIndex = 0;
 				ClipIntersectSide = ClipSegments[0].asid;
 				ritseg();
-				while (nucseg()) {
+				while (nucseg(sortedLengths)) {
 					if (SequenceIndex > MAXITEMS - 3)
 						break;
 					ritseg();
@@ -11648,7 +11654,6 @@ void clpcon() {
 					SelectedForm->rectangle.left -= FormOffset;
 					SelectedForm->rectangle.right -= FormOffset;
 				}
-				delete[] SortedLengths;
 #endif
 			}
 			delete[] ClipStitchPoints;
