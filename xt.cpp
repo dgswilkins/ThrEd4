@@ -246,9 +246,6 @@ float		FeatherGlobalUp;
 float		FeatherGlobalDown;
 float		FeatherGlobalRatio;
 
-OREC**		PRecs;
-OREC**		PFRecs;
-
 enum {
 	TYPE_APPLIQUE = 1,	// applique
 	TYPE_CWALK,			// center walk
@@ -1671,49 +1668,43 @@ void durec(OREC* record) noexcept {
 }
 
 
-int recmp(const void *arg1, const void *arg2) {
-	if (arg1 && arg2) {
-		const OREC record1 = **static_cast<OREC * const *>(arg1);
-		const OREC record2 = **static_cast<OREC * const *>(arg2);
-
-		if (ColorOrder[record1.color] == ColorOrder[record2.color]) {
-			if (record1.form == record2.form) {
-				if (record1.type == record2.type)
-					return gsl::narrow<int>(record1.start) - gsl::narrow<int>(record2.start);
-				else
-					return gsl::narrow<int>(record1.type) - gsl::narrow<int>(record2.type);
-			}
+bool recmp(const OREC* record1, const OREC* record2) {
+	if (ColorOrder[record1->color] == ColorOrder[record2->color]) {
+		if (record1->form == record2->form) {
+			if (record1->type == record2->type)
+				return (record1->start < record2->start);
 			else
-				return gsl::narrow<int>(record1.form) - gsl::narrow<int>(record2.form);
+				return (record1->type < record2->type);
 		}
-		return gsl::narrow<int>(ColorOrder[record1.color]) - gsl::narrow<int>(ColorOrder[record2.color]);
+		else {
+			return (record1->form < record2->form);
+		}
 	}
-	return 0;
+	else {
+		return (ColorOrder[record1->color] < ColorOrder[record2->color]);
+	}
 }
 
-int refcmp(const void *arg1, const void *arg2) {
-	if (arg1 && arg2) {
-		const OREC record1 = **static_cast<OREC * const *>(arg1);
-		const OREC record2 = **static_cast<OREC * const *>(arg2);
-
-		if (record1.form == record2.form)
-			return gsl::narrow<int>(record1.type) - gsl::narrow<int>(record2.type);
-		return gsl::narrow<int>(record1.form) - gsl::narrow<int>(record2.form);
+bool refcmp(const OREC* record1, const OREC* record2) {
+	if (record1->form == record2->form) {
+		return (record1->type < record2->type);
 	}
-	return 0;
+	else {
+		return (record1->form < record2->form);
+	}
 }
 
-bool chkrdun(const SRTREC* stitchRecord) noexcept {
+bool chkrdun(std::vector<OREC *> &pRecs, const SRTREC* stitchRecord) noexcept {
 	unsigned iStitch;
 
 	for (iStitch = stitchRecord->start; iStitch < stitchRecord->finish; iStitch++) {
-		if (PRecs[iStitch]->otyp == FormFillCounter[PRecs[iStitch]->form])
+		if (pRecs[iStitch]->otyp == FormFillCounter[pRecs[iStitch]->form])
 			return 1;
 	}
 	return 0;
 }
 
-double precjmps(const SRTREC* sortRecord) {
+double precjmps(std::vector<OREC *> &pRecs, const SRTREC* sortRecord) {
 	unsigned		totalJumps;
 	double			length;
 	double			minimumLength;
@@ -1725,21 +1716,21 @@ double precjmps(const SRTREC* sortRecord) {
 	currentRegion = sortRecord->currentRegion;
 	direction = sortRecord->direction;
 	totalJumps = 0;
-	while (chkrdun(sortRecord)) {
+	while (chkrdun(pRecs, sortRecord)) {
 		minimumLength = 1e9;
 		if (direction)
-			currentStitch = &StitchBuffer[PRecs[currentRegion]->finish];
+			currentStitch = &StitchBuffer[pRecs[currentRegion]->finish];
 		else
-			currentStitch = &StitchBuffer[PRecs[currentRegion]->start];
+			currentStitch = &StitchBuffer[pRecs[currentRegion]->start];
 		for (iRegion = sortRecord->start; iRegion < sortRecord->finish; iRegion++) {
-			if (PRecs[iRegion]->otyp == FormFillCounter[PRecs[iRegion]->form]) {
-				length = hypot(PRecs[iRegion]->startStitch->x - currentStitch->x, PRecs[iRegion]->startStitch->y - currentStitch->y);
+			if (pRecs[iRegion]->otyp == FormFillCounter[pRecs[iRegion]->form]) {
+				length = hypot(pRecs[iRegion]->startStitch->x - currentStitch->x, pRecs[iRegion]->startStitch->y - currentStitch->y);
 				if (length < minimumLength) {
 					minimumLength = length;
 					direction = 0;
 					currentRegion = iRegion;
 				}
-				length = hypot(PRecs[iRegion]->endStitch->x - currentStitch->x, PRecs[iRegion]->endStitch->y - currentStitch->y);
+				length = hypot(pRecs[iRegion]->endStitch->x - currentStitch->x, pRecs[iRegion]->endStitch->y - currentStitch->y);
 				if (length < minimumLength) {
 					minimumLength = length;
 					direction = 1;
@@ -1749,21 +1740,21 @@ double precjmps(const SRTREC* sortRecord) {
 		}
 		if (minimumLength > 9 * PFGRAN)
 			totalJumps++;
-		FormFillCounter[PRecs[currentRegion]->form]++;
+		FormFillCounter[pRecs[currentRegion]->form]++;
 		if (StateMap.test(StateFlag::DUSRT)) {
 			if (direction) {
-				if (PRecs[currentRegion]->start) {
-					for (iRegion = PRecs[currentRegion]->finish - 1; iRegion >= PRecs[currentRegion]->start; iRegion--)
+				if (pRecs[currentRegion]->start) {
+					for (iRegion = pRecs[currentRegion]->finish - 1; iRegion >= pRecs[currentRegion]->start; iRegion--)
 						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[iRegion]);
 				}
 				else {
-					iRegion = PRecs[currentRegion]->finish;
+					iRegion = pRecs[currentRegion]->finish;
 					while (iRegion)
 						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[--iRegion]);
 				}
 			}
 			else {
-				for (iRegion = PRecs[currentRegion]->start; iRegion < PRecs[currentRegion]->finish; iRegion++)
+				for (iRegion = pRecs[currentRegion]->start; iRegion < pRecs[currentRegion]->finish; iRegion++)
 					moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[iRegion]);
 			}
 		}
@@ -1772,12 +1763,12 @@ double precjmps(const SRTREC* sortRecord) {
 	return totalJumps;
 }
 
-unsigned duprecs(SRTREC* sortRecord) {
+unsigned duprecs(std::vector<OREC *> pRecs, SRTREC* sortRecord) {
 	sortRecord->direction = 0;
-	const unsigned	jumps0 = precjmps(sortRecord);
+	const unsigned	jumps0 = precjmps(pRecs, sortRecord);
 
 	sortRecord->direction = 1;
-	const unsigned	jumps1 = precjmps(sortRecord);
+	const unsigned	jumps1 = precjmps(pRecs, sortRecord);
 
 	if (jumps0 < jumps1) {
 		sortRecord->direction = 0;
@@ -1789,55 +1780,50 @@ unsigned duprecs(SRTREC* sortRecord) {
 
 #ifdef _DEBUG
 
-void dmprec(const OREC* stitchRegion, unsigned count) noexcept {
-	if (stitchRegion) {
-		unsigned iRegion;
+void dmprec(std::vector<OREC *> &stitchRegion, unsigned count) noexcept {
+	unsigned iRegion;
 
-		for (iRegion = 0; iRegion < count; iRegion++) {
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%4d off: %4d at: %08x frm: %4d typ: %d col: %2d st: %5d fin: %5d\n",
-				iRegion,
-				&stitchRegion[iRegion] - &stitchRegion[0],
-				StitchBuffer[stitchRegion[iRegion].start].attribute,
-				stitchRegion[iRegion].form,
-				stitchRegion[iRegion].type,
-				stitchRegion[iRegion].color,
-				stitchRegion[iRegion].start,
-				stitchRegion[iRegion].finish);
-			OutputDebugString(MsgBuffer);
-		}
+	for (iRegion = 0; iRegion < count; iRegion++) {
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%4d off: %4d at: %08x frm: %4d typ: %d col: %2d st: %5d fin: %5d\n",
+			iRegion,
+			&stitchRegion[iRegion] - &stitchRegion[0],
+			StitchBuffer[stitchRegion[iRegion]->start].attribute,
+			stitchRegion[iRegion]->form,
+			stitchRegion[iRegion]->type,
+			stitchRegion[iRegion]->color,
+			stitchRegion[iRegion]->start,
+			stitchRegion[iRegion]->finish);
+		OutputDebugString(MsgBuffer);
 	}
 }
 #endif
 
-bool srtchk(const OREC* stitchRegion, unsigned count, unsigned* badForm) noexcept {
-	if (stitchRegion) {
-		unsigned	iRegion = 1;
-		unsigned	form = stitchRegion[0].form;
-		unsigned	color = stitchRegion[0].color;
-		FRMHED*		formHeader = nullptr;
+bool srtchk(std::vector<OREC *> &stitchRegion, unsigned count, unsigned* badForm) noexcept {
+	unsigned	iRegion = 1;
+	unsigned	form = stitchRegion[0]->form;
+	unsigned	color = stitchRegion[0]->color;
+	FRMHED*		formHeader = nullptr;
 
-		for (iRegion = 1; iRegion < count; iRegion++) {
-			if (stitchRegion[iRegion].form == form) {
-				if (ColorOrder[stitchRegion[iRegion].color] < ColorOrder[color]) {
-					formHeader = &FormList[form];
-					if (formHeader->fillType == FTHF && formHeader->extendedAttribute&AT_FTHBLND && stitchRegion[iRegion].color == formHeader->fillColor)
-						continue;
-					if (badForm) {
-						*badForm = iRegion;
-					}
-					return 0;
+	for (iRegion = 1; iRegion < count; iRegion++) {
+		if (stitchRegion[iRegion]->form == form) {
+			if (ColorOrder[stitchRegion[iRegion]->color] < ColorOrder[color]) {
+				formHeader = &FormList[form];
+				if (formHeader->fillType == FTHF && formHeader->extendedAttribute&AT_FTHBLND && stitchRegion[iRegion]->color == formHeader->fillColor)
+					continue;
+				if (badForm) {
+					*badForm = iRegion;
 				}
-				else
-					color = stitchRegion[iRegion].color;
+				return false;
 			}
-			else {
-				color = stitchRegion[iRegion].color;
-				form = stitchRegion[iRegion].form;
-			}
+			else
+				color = stitchRegion[iRegion]->color;
 		}
-		return 1;
+		else {
+			color = stitchRegion[iRegion]->color;
+			form = stitchRegion[iRegion]->form;
+		}
 	}
-	return 0;
+	return true;
 }
 
 void fsort() {
@@ -1877,46 +1863,44 @@ void fsort() {
 	stitchRegion[iRegion].finish = PCSHeader.stitchCount;
 	iRegion++;
 	lastRegion = iRegion;
-	PRecs = new OREC*[lastRegion];
-	PFRecs = new OREC*[lastRegion];
+	std::vector<OREC *> pRecs(lastRegion);
+	std::vector<OREC *> pFRecs(lastRegion);
 	for (iRegion = 0; iRegion < lastRegion; iRegion++) {
 		durec(&stitchRegion[iRegion]);
-		PRecs[iRegion] = &stitchRegion[iRegion];
-		PFRecs[iRegion] = &stitchRegion[iRegion];
+		pRecs[iRegion] = &stitchRegion[iRegion];
+		pFRecs[iRegion] = &stitchRegion[iRegion];
 	}
-	// ToDo - replace with std::sort
-	qsort(PRecs, lastRegion, sizeof(OREC *), recmp);
-	// ToDo - replace with std::sort
-	qsort(PFRecs, lastRegion, sizeof(OREC *), refcmp);
+	std::sort(pRecs.begin(), pRecs.end(), recmp);
+	std::sort(pFRecs.begin(), pFRecs.end(), refcmp);
 #ifdef _DEBUG
-	dmprec(*PRecs, lastRegion);
+	dmprec(pRecs, lastRegion);
 #endif
-	if (srtchk(*PFRecs, lastRegion, &badForm)) {
+	if (srtchk(pFRecs, lastRegion, &badForm)) {
 		std::vector<RANGE> stitchRange(lastRegion);
 		stitchRange[0].start = 0;
-		attribute = PRecs[0]->color;
+		attribute = pRecs[0]->color;
 		currentForm = 0xffffffff;
 		typeCount = 0;
 		iRange = 0;
 		for (iRegion = 0; iRegion < lastRegion; iRegion++) {
 			bool srtskp = true;
-			if (attribute != PRecs[iRegion]->color) {
+			if (attribute != pRecs[iRegion]->color) {
 				stitchRange[iRange++].finish = iRegion;
 				stitchRange[iRange].start = iRegion;
-				attribute = PRecs[iRegion]->color;
-				currentForm = PRecs[iRegion]->form;
+				attribute = pRecs[iRegion]->color;
+				currentForm = pRecs[iRegion]->form;
 				typeCount = 0;
 				srtskp = false;
 			}
 			if (srtskp) {
-				if (PRecs[iRegion]->form == currentForm)
+				if (pRecs[iRegion]->form == currentForm)
 					typeCount++;
 				else {
 					typeCount = 0;
-					currentForm = PRecs[iRegion]->form;
+					currentForm = pRecs[iRegion]->form;
 				}
 			}
-			PRecs[iRegion]->otyp = typeCount;
+			pRecs[iRegion]->otyp = typeCount;
 		}
 		stitchRange[iRange].finish = lastRegion;
 		lastRange = ++iRange;
@@ -1933,8 +1917,8 @@ void fsort() {
 			startTime = tim2int(fileTime);
 			for (iRegion = sortRecord.start; iRegion < sortRecord.finish; iRegion++) {
 				sortRecord.currentRegion = iRegion;
-				if (!PRecs[iRegion]->otyp) {
-					jumps = duprecs(&sortRecord);
+				if (!pRecs[iRegion]->otyp) {
+					jumps = duprecs(pRecs, &sortRecord);
 					if (jumps < minimumJumps) {
 						minimumJumps = jumps;
 						minimumIndex = iRegion;
@@ -1949,7 +1933,7 @@ void fsort() {
 			StateMap.set(StateFlag::DUSRT);
 			sortRecord.currentRegion = minimumIndex;
 			sortRecord.direction = minimumDirection;
-			precjmps(&sortRecord);
+			precjmps(pRecs, &sortRecord);
 		}
 		MoveMemory(StitchBuffer, TempStitchBuffer, OutputIndex * sizeof(fPOINTATTR));
 		PCSHeader.stitchCount = OutputIndex;
@@ -1959,11 +1943,9 @@ void fsort() {
 	}
 	else {
 		LoadString(ThrEdInstance, IDS_SRTER, HelpBuffer, HBUFSIZ);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, PFRecs[badForm]->form);
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, pFRecs[badForm]->form);
 		shoMsg(MsgBuffer);
 	}
-	delete[] PFRecs;
-	delete[] PRecs;
 }
 
 unsigned dutyp(unsigned attribute) noexcept {
