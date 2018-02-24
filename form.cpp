@@ -4661,28 +4661,30 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 			stitchCount = fabs(line1Length) / LineSpacing;
 		line1Segments = ((line1End > line1Start) ? (line1End - line1Start) : (line1Start - line1End));
 		line2Segments = ((line2Start > line2End) ? (line2Start - line2End) : (line2End - line2Start));
-		std::vector<unsigned> line1StitchCounts(line1Segments);
-		std::vector<unsigned> line2StitchCounts(line2Segments + 1);
+		std::vector<unsigned> line1StitchCounts;
+		line1StitchCounts.reserve(line1Segments + 1);
+		std::vector<unsigned> line2StitchCounts;
+		line2StitchCounts.reserve(line2Segments + 1);
 		iVertex = line1Start;
 		segmentStitchCount = 0;
-		for (iSegment = 0; iSegment < line1Segments - 1; iSegment++) {
+		for (iSegment = 0; iSegment < line1Segments; iSegment++) {
 			iNextVertex = nxt(iVertex);
-			line1StitchCounts[iSegment] = ((Lengths[iNextVertex] - Lengths[iVertex]) / line1Length)*stitchCount + 0.5;
+			line1StitchCounts.push_back(((Lengths[iNextVertex] - Lengths[iVertex]) / line1Length)*stitchCount + 0.5);
 			segmentStitchCount += line1StitchCounts[iSegment];
 			iVertex = nxt(iVertex);
 		}
-		line1StitchCounts[iSegment] = stitchCount - segmentStitchCount;
+		line1StitchCounts.push_back(stitchCount - segmentStitchCount);
 		iNextVertex = line2Start;
 		iVertex = prv(iNextVertex);
 		iSegment = 0;
 		segmentStitchCount = 0;
 		while (iVertex > line2End) {
-			line2StitchCounts[iSegment] = ((Lengths[iNextVertex] - Lengths[iVertex]) / line2Length)*stitchCount + 0.5;
+			line2StitchCounts.push_back(((Lengths[iNextVertex] - Lengths[iVertex]) / line2Length)*stitchCount + 0.5);
 			segmentStitchCount += line2StitchCounts[iSegment++];
 			iNextVertex = prv(iNextVertex);
 			iVertex = prv(iNextVertex);
 		}
-		line2StitchCounts[iSegment] = stitchCount - segmentStitchCount;
+		line2StitchCounts.push_back(stitchCount - segmentStitchCount);
 		line1Point.x = CurrentFormVertices[line1Start].x;
 		line1Point.y = CurrentFormVertices[line1Start].y;
 		line1Next = nxt(line1Start);
@@ -4790,7 +4792,7 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 					}
 				}
 			}
-			if ((iLine1Count < line1Segments || iLine2Count < line2Segments)) {
+			if (iLine1Count < line1Segments) {
 				if (!line1Count) {
 					line1Count = line1StitchCounts[iLine1Count++];
 					line1Next = nxt(iLine1Vertex);
@@ -4800,14 +4802,16 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 					line1Step.x = line1Delta.x / line1Count;
 					line1Step.y = line1Delta.y / line1Count;
 				}
-				if (!line2Count) {
-					line2Count = line2StitchCounts[iLine2Count++];
-					line2Previous = prv(iLine2Vertex);
-					line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x;
-					line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y;
-					iLine2Vertex = prv(iLine2Vertex);
-					line2Step.x = line2Delta.x / line2Count;
-					line2Step.y = line2Delta.y / line2Count;
+				if (iLine2Count < line2Segments) {
+					if (!line2Count) {
+						line2Count = line2StitchCounts[iLine2Count++];
+						line2Previous = prv(iLine2Vertex);
+						line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x;
+						line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y;
+						iLine2Vertex = prv(iLine2Vertex);
+						line2Step.x = line2Delta.x / line2Count;
+						line2Step.y = line2Delta.y / line2Count;
+					}
 				}
 				if ((line1Count || line2Count) && line1Count < MAXITEMS && line2Count < MAXITEMS) {
 					flag = true;
