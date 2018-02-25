@@ -62,7 +62,6 @@ extern	TCHAR			HelpBuffer[HBUFSIZ];
 extern	INIFILE			IniFile;
 extern	fPOINT*			InsidePoints;
 extern	HWND			MainStitchWin;
-extern	unsigned		MarkedStitchMap[MAXITEMS];
 extern	MSG				Msg;
 extern	TCHAR			MsgBuffer[MSGSIZ];
 extern	unsigned		NewFormVertexCount;
