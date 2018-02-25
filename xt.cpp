@@ -1668,7 +1668,7 @@ void durec(OREC* record) noexcept {
 }
 
 
-bool recmp(const OREC* record1, const OREC* record2) {
+bool recmp(const OREC* record1, const OREC* record2) noexcept {
 	if (ColorOrder[record1->color] == ColorOrder[record2->color]) {
 		if (record1->form == record2->form) {
 			if (record1->type == record2->type)
@@ -1685,7 +1685,7 @@ bool recmp(const OREC* record1, const OREC* record2) {
 	}
 }
 
-bool refcmp(const OREC* record1, const OREC* record2) {
+bool refcmp(const OREC* record1, const OREC* record2) noexcept {
 	if (record1->form == record2->form) {
 		return (record1->type < record2->type);
 	}
@@ -3994,22 +3994,22 @@ void txtlbut() {
 }
 
 void redtbak() {
-	TXHST*		textureHistoryItem;
-
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d\n", TextureHistoryIndex);
 	OutputDebugString(MsgBuffer);
-	textureHistoryItem = &TextureHistory[TextureHistoryIndex];
-	TextureScreen.areaHeight = textureHistoryItem->height;
-	TextureScreen.width = textureHistoryItem->width;
-	TextureScreen.spacing = textureHistoryItem->spacing;
-	if (textureHistoryItem->texturePoint) {
-		TempTexturePoints.clear();
-		TempTexturePoints.reserve(textureHistoryItem->count);
-		for (auto i = 0u; i < textureHistoryItem->count; i++) {
-			TempTexturePoints.push_back(textureHistoryItem->texturePoint[i]);
+	const TXHST* textureHistoryItem = &TextureHistory[TextureHistoryIndex];
+	if (textureHistoryItem) {
+		TextureScreen.areaHeight = textureHistoryItem->height;
+		TextureScreen.width = textureHistoryItem->width;
+		TextureScreen.spacing = textureHistoryItem->spacing;
+		if (textureHistoryItem->texturePoint) {
+			TempTexturePoints.clear();
+			TempTexturePoints.reserve(textureHistoryItem->count);
+			for (auto i = 0u; i < textureHistoryItem->count; i++) {
+				TempTexturePoints.push_back(textureHistoryItem->texturePoint[i]);
+			}
 		}
+		StateMap.set(StateFlag::RESTCH);
 	}
-	StateMap.set(StateFlag::RESTCH);
 }
 
 void txbak() {
@@ -4439,20 +4439,20 @@ void setxt() {
 }
 
 void rtrtx() {
-	TXPNT*	currentFormTexture;
-
 	fvars(ClosestFormToCursor);
-	currentFormTexture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
-	TempTexturePoints.clear();
-	TempTexturePoints.reserve(SelectedForm->fillInfo.texture.count);
-	for (auto i = 0u; i < SelectedForm->fillInfo.texture.count; i++) {
-		TempTexturePoints.push_back(currentFormTexture[i]);
+	const TXPNT* currentFormTexture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
+	if (currentFormTexture) {
+		TempTexturePoints.clear();
+		TempTexturePoints.reserve(SelectedForm->fillInfo.texture.count);
+		for (auto i = 0u; i < SelectedForm->fillInfo.texture.count; i++) {
+			TempTexturePoints.push_back(currentFormTexture[i]);
+		}
+		TextureScreen.areaHeight = SelectedForm->fillInfo.texture.height;
+		TextureScreen.spacing = SelectedForm->fillSpacing;
+		TextureScreen.lines = SelectedForm->fillInfo.texture.lines;
+		TextureScreen.width = TextureScreen.lines*TextureScreen.spacing + TextureScreen.spacing / 2;
+		savtxt();
 	}
-	TextureScreen.areaHeight = SelectedForm->fillInfo.texture.height;
-	TextureScreen.spacing = SelectedForm->fillSpacing;
-	TextureScreen.lines = SelectedForm->fillInfo.texture.lines;
-	TextureScreen.width = TextureScreen.lines*TextureScreen.spacing + TextureScreen.spacing / 2;
-	savtxt();
 }
 
 void rtrclp() {
