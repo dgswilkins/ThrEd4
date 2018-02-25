@@ -1768,7 +1768,6 @@ typedef struct _txtscr	{
 	int				halfHeight;	//pixel middle of area
 	float			xOffset;	//edit x offset of area
 	float			yOffset;	//edit y offset of area
-	unsigned		index;		//index into temporary texture fill point table
 	float			areaHeight;	//edit height of area
 	float			screenHeight;	//edit height of screen
 	float			width;		//edit width of area
