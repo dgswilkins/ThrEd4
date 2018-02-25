@@ -10918,9 +10918,12 @@ void stchs2frm() {
 }
 
 bool lencmp(const float *arg1, const float *arg2) noexcept {
+	if (arg1 && arg2) {
 		const float local1 = *arg1, local2 = *arg2;
 
 		return (local1 < local2);
+	}
+	return false;
 }
 
 bool lencmpa(const CLIPSORT *arg1, const CLIPSORT *arg2) noexcept {
@@ -11362,7 +11365,7 @@ void clpcon() {
 		start = floor(CurrentFormVertices[iVertex].x / ClipWidth);
 		finish = floor((CurrentFormVertices[nxt(iVertex)].x) / ClipWidth);
 		if (start > finish) {
-			unsigned int swap = start;
+			const unsigned int swap = start;
 			start = finish;
 			finish = swap;
 		}
