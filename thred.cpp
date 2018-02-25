@@ -876,10 +876,8 @@ OPENFILENAME	OpenFileName = {
 	0,						//lpfnHook
 	0,						//lpTemplateName
 };
-TCHAR*				ThumbnailNames;			//pointer to storage for thumbnail names
-TCHAR**				Thumbnails;				//pointers to the thumbnail names
-TCHAR*				ThumbnailsSelected[4];	//pointers to thumbnails selected for display
-unsigned			ThumbnailCount;			//number of thumbnail file names
+std::vector<std::string>	Thumbnails;		//vector of thumbnail names
+int					ThumbnailsSelected[4];	//indexes of thumbnails selected for display
 unsigned			ThumbnailDisplayCount;	//number of thumbnail file names selected for display
 unsigned			ThumbnailIndex;			//index into the thumbnail filname table
 TCHAR				ThumbnailSearchString[32];	//storage for the thumnail search string
@@ -6262,10 +6260,6 @@ void unthum() {
 		butxt(HNUM, "");
 		redraw(ButtonWin[HHID]);
 		butxt(HBOXSEL, StringTable[STR_BOXSEL]);
-		// allocated in thumnail
-		delete[] ThumbnailNames;
-		delete[] Thumbnails;
-
 	}
 }
 
@@ -8885,7 +8879,7 @@ void getbak() {
 	if (StateMap.test(StateFlag::THUMSHO)) {
 		if (ThumbnailsSelected[FileVersionIndex]) {
 			if (StateMap.test(StateFlag::RBUT)) {
-				strcpy_s(InsertedFileName, ThumbnailsSelected[FileVersionIndex]);
+				strcpy_s(InsertedFileName, Thumbnails[ThumbnailsSelected[FileVersionIndex]].data());
 				StateMap.set(StateFlag::IGNORINS);
 				unthum();
 				StateMap.set(StateFlag::FRMOF);
@@ -8907,7 +8901,7 @@ void getbak() {
 						pchr[2] = 0;
 					}
 				}
-				strcat_s(WorkingFileName, ThumbnailsSelected[FileVersionIndex]);
+				strcat_s(WorkingFileName, Thumbnails[ThumbnailsSelected[FileVersionIndex]].data());
 				StateMap.set(StateFlag::REDOLD);
 				nuFil();
 			}
@@ -10078,8 +10072,8 @@ void barnam(HWND window, unsigned iThumbnail) {
 	TCHAR		buffer[_MAX_PATH] = { 0 };
 	TCHAR*		lastCharacter = nullptr;
 
-	if (iThumbnail < ThumbnailDisplayCount && ThumbnailsSelected[iThumbnail]) {
-		strcpy_s(buffer, ThumbnailsSelected[iThumbnail]);
+	if (iThumbnail < ThumbnailDisplayCount) {
+		strcpy_s(buffer, Thumbnails[ThumbnailsSelected[iThumbnail]].data());
 		lastCharacter = strrchr(buffer, '.');
 		if (lastCharacter)
 			lastCharacter[0] = 0;
@@ -10118,16 +10112,13 @@ void rthumnam(unsigned iThumbnail) {
 #pragma warning(disable : 4996)
 void thumnail() {
 	WIN32_FIND_DATA	fileData = {};
-	unsigned		iThumbnail = 0, iThumbnailName = 0;
+	unsigned		iThumbnail = 0;
 	HANDLE			file = {};
 
 	unbsho();
 	undat();
 	untrace();
-	// ToDo - Check for a better value than MAXITEMS/2
-	ThumbnailNames = new TCHAR[MAXITEMS >> 1];
-	Thumbnails = new TCHAR*[MAXITEMS >> 1];
-
+	
 	SetCurrentDirectory(DefaultDirectory);
 	strcpy_s(SearchName, DefaultDirectory);
 	TCHAR* lastCharacter = &SearchName[strlen(SearchName) - 1];
@@ -10140,33 +10131,26 @@ void thumnail() {
 	strcat_s(SearchName, "*.thr");
 	file = FindFirstFile(SearchName, &fileData);
 	if (file == INVALID_HANDLE_VALUE) {
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Can't find %s\n", SearchName);
+		const DWORD dwError = GetLastError();
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Can't find %s. Error %d\n", SearchName, dwError);
 		shoMsg(MsgBuffer);
 		unthum();
 	}
 	else {
-		iThumbnailName = 0;
-		Thumbnails[0] = ThumbnailNames;
-		strcpy(Thumbnails[0], fileData.cFileName);
-		iThumbnailName += strlen(fileData.cFileName) + 1;
-		Thumbnails[1] = &ThumbnailNames[iThumbnailName];
-		iThumbnail = 1;
+		Thumbnails.clear();
+		Thumbnails.push_back(fileData.cFileName);
 		while (FindNextFile(file, &fileData)) {
-			strcpy(Thumbnails[iThumbnail], fileData.cFileName);
-			iThumbnailName += strlen(fileData.cFileName) + 1;
-			Thumbnails[++iThumbnail] = &ThumbnailNames[iThumbnailName];
+			Thumbnails.push_back(fileData.cFileName);
 		}
 		FindClose(file);
-		ThumbnailCount = iThumbnail;
-		// ToDo - replace with std::sort
-		qsort(Thumbnails, iThumbnail, sizeof(TCHAR *), strcomp);
+		std::sort(Thumbnails.begin(), Thumbnails.end());
 		iThumbnail = ThumbnailIndex = 0;
-		while (iThumbnail < 4 && ThumbnailIndex < ThumbnailCount && iThumbnail < ThumbnailCount) {
-			ThumbnailsSelected[iThumbnail] = Thumbnails[iThumbnail];
+		while (iThumbnail < 4 && iThumbnail < Thumbnails.size()) {
+			ThumbnailsSelected[iThumbnail] = iThumbnail;
 			iThumbnail++;
 		}
 		ThumbnailIndex = ThumbnailDisplayCount = iThumbnail;
-		while (iThumbnail < 4 && iThumbnail < ThumbnailCount)
+		while (iThumbnail < 4 && iThumbnail < Thumbnails.size())
 			rthumnam(iThumbnail++);
 		StateMap.set(StateFlag::THUMSHO);
 		ThumbnailSearchString[0] = 0;
@@ -10181,23 +10165,23 @@ void thumnail() {
 void nuthsel() {
 	unsigned	iThumbnail = 0, length = 0, savedIndex = 0;
 
-	if (ThumbnailIndex < ThumbnailCount) {
+	if (ThumbnailIndex < Thumbnails.size()) {
 		savedIndex = ThumbnailIndex;
 		iThumbnail = 0;
 		length = strlen(ThumbnailSearchString);
 		StateMap.set(StateFlag::RESTCH);
 		if (length) {
-			while (iThumbnail < 4 && ThumbnailIndex < ThumbnailCount) {
-				if (!strncmp(ThumbnailSearchString, Thumbnails[ThumbnailIndex], length)) {
-					ThumbnailsSelected[iThumbnail] = Thumbnails[ThumbnailIndex];
+			while (iThumbnail < 4 && ThumbnailIndex < Thumbnails.size()) {
+				if (!strncmp(ThumbnailSearchString, Thumbnails[ThumbnailIndex].data(), length)) {
+					ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
 					redraw(BackupViewer[iThumbnail++]);
 				}
 				ThumbnailIndex++;
 			}
 		}
 		else {
-			while (iThumbnail < 4 && ThumbnailIndex < ThumbnailCount) {
-				ThumbnailsSelected[iThumbnail] = Thumbnails[ThumbnailIndex];
+			while (iThumbnail < 4 && ThumbnailIndex < Thumbnails.size()) {
+				ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
 				redraw(BackupViewer[iThumbnail++]);
 				ThumbnailIndex++;
 			}
@@ -10221,7 +10205,7 @@ void nuthbak(unsigned count) {
 			while (count && ThumbnailIndex < MAXFORMS) {
 				if (ThumbnailIndex) {
 					ThumbnailIndex--;
-					if (!strncmp(ThumbnailSearchString, Thumbnails[ThumbnailIndex], length))
+					if (!strncmp(ThumbnailSearchString, Thumbnails[ThumbnailIndex].data(), length))
 						count--;
 				}
 				else
@@ -15962,7 +15946,7 @@ unsigned chkMsg() {
 
 			case VK_END:
 
-				ThumbnailIndex = ThumbnailCount;
+				ThumbnailIndex = Thumbnails.size();
 				nuthbak(4);
 				break;
 
@@ -20269,7 +20253,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			if (StateMap.test(StateFlag::THUMSHO)) {
 				for (iThumb = 0; iThumb < 4; iThumb++) {
 					if (DrawItem->hwndItem == BackupViewer[iThumb] && iThumb < ThumbnailDisplayCount) {
-						ritbak(ThumbnailsSelected[iThumb], DrawItem);
+						ritbak(Thumbnails[ThumbnailsSelected[iThumb]].data(), DrawItem);
 						rthumnam(iThumb);
 						return 1;
 					}
