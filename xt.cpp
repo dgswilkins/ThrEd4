@@ -215,7 +215,7 @@ unsigned*	SelectedTexturePointsList;	//list of selected points
 POINT		TextureCursorLocation;		//texture editor move cursor location
 HPEN		TextureCrossPen;			//texture editor cross pen
 TXTSCR		TextureScreen;				//texture editor layout parameters
-TXPNT		TempTexturePoints[16384];	//temporary storage for textured fill data
+std::vector<TXPNT>	TempTexturePoints;	//temporary storage for textured fill data
 unsigned	ColorOrder[16];				//color order adjusted for applique
 fPOINT		InterleaveSequence[MAXITEMS]; //storage for interleave points
 unsigned	InterleaveSequenceIndex;	//index into the interleave sequence
@@ -346,21 +346,21 @@ bool chktxh(_In_ const TXHST* historyItem) noexcept {
 		unsigned iPoint = 0;
 
 		if (historyItem->count != TextureScreen.index)
-			return 1;
+			return true;
 		if (historyItem->height != TextureScreen.areaHeight)
-			return 1;
+			return true;
 		if (historyItem->spacing != TextureScreen.spacing)
-			return 1;
+			return true;
 		if (historyItem->width != TextureScreen.width)
-			return 1;
+			return true;
 		for (iPoint = 0; iPoint < TextureScreen.index; iPoint++) {
 			if (TempTexturePoints[iPoint].line != historyItem->texturePoint[iPoint].line)
-				return 1;
+				return true;
 			if (TempTexturePoints[iPoint].y != historyItem->texturePoint[iPoint].y)
-				return 1;
+				return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
 void savtxt() {
@@ -383,7 +383,7 @@ void savtxt() {
 				currentHistoryItem->texturePoint = nullptr;
 			}
 			currentHistoryItem->texturePoint = new TXPNT[currentHistoryItem->count];
-			MoveMemory(currentHistoryItem->texturePoint, TempTexturePoints, currentHistoryItem->count * sizeof(TXPNT));
+			MoveMemory(currentHistoryItem->texturePoint, &TempTexturePoints[0], currentHistoryItem->count * sizeof(TXPNT));
 		}
 	}
 }
@@ -3061,6 +3061,7 @@ void dutxtfil() {
 	}
 	else {
 		TextureScreen.index = 0;
+		TempTexturePoints.clear();
 		TextureScreen.areaHeight = IniFile.textureHeight;
 		TextureScreen.width = IniFile.textureWidth;
 		TextureScreen.spacing = IniFile.textureSpacing;
@@ -3154,16 +3155,16 @@ void drwtxbut() {
 }
 
 void chktx() noexcept {
-	unsigned iPoint = 0, iNextPoint = 0;
-
-	for (iPoint = 0; iPoint < TextureScreen.index; iPoint++) {
-		if (TempTexturePoints[iPoint].line <= TextureScreen.lines && TempTexturePoints[iPoint].y < TextureScreen.areaHeight) {
-			TempTexturePoints[iNextPoint].line = TempTexturePoints[iPoint].line;
-			TempTexturePoints[iNextPoint].y = TempTexturePoints[iPoint].y;
+	unsigned iNextPoint = 0;
+	if (TempTexturePoints.size()) {
+		do {
+			if (TempTexturePoints[iNextPoint].line > TextureScreen.lines || TempTexturePoints[iNextPoint].y > TextureScreen.areaHeight) {
+				TempTexturePoints.erase(TempTexturePoints.begin() + iNextPoint--);
+			}
 			iNextPoint++;
-		}
+		} while (iNextPoint < TempTexturePoints.size());
+		TextureScreen.index = TempTexturePoints.size();
 	}
-	TextureScreen.index = iNextPoint;
 }
 
 void drwtxtr() {
@@ -3262,37 +3263,40 @@ void drwtxtr() {
 	drwtxbut();
 }
 
-bool px2txt(POINT offset, TXPNT* textureRecord) noexcept {
+bool px2txt(POINT offset) noexcept {
 	fPOINT editPoint;
 
 	px2ed(offset, &editPoint);
-	textureRecord->line = (editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5;
-	if (textureRecord->line > TextureScreen.lines)
-		return 0;
-	if (textureRecord->line < 1)
-		return 0;
+	TXPNT tmp = { 0, gsl::narrow<short>(floor((editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5)) };
+	if (tmp.line > TextureScreen.lines)
+		return false;
+	if (tmp.line < 1)
+		return false;
 	if (offset.y > TextureScreen.top) {
 		if (offset.y > TextureScreen.bottom)
-			return 0;
-		else
-			textureRecord->y = TextureScreen.areaHeight - (static_cast<float>(offset.y - TextureScreen.top) / TextureScreen.height*TextureScreen.areaHeight);
+			return false;
+		else {
+			tmp.y = TextureScreen.areaHeight - (static_cast<float>(offset.y - TextureScreen.top) / TextureScreen.height*TextureScreen.areaHeight);
+			TempTexturePoints.push_back(tmp);
+			TextureScreen.index++;
+			return true;
+		}
 	}
-	else
-		return 0;
-	return 1;
+	else {
+		return false;
+	}
 }
 
-bool txbutfn(TXPNT* textureRecord) noexcept {
+bool txbutfn() noexcept {
 	POINT	offset;
 
 	deorg(&offset);
-	return px2txt(offset, textureRecord);
+	return px2txt(offset);
 }
 
 void txtrbut() {
-	if (txbutfn(&TempTexturePoints[TextureScreen.index])) {
+	if (txbutfn()) {
 		savtxt();
-		TextureScreen.index++;
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
@@ -3318,9 +3322,9 @@ bool txtclos(unsigned* closestTexturePoint) {
 			}
 		}
 		if (minimumLength < CLOSENUF)
-			return 1;
+			return true;
 	}
-	return 0;
+	return false;
 }
 
 void tritx() noexcept {
@@ -3412,11 +3416,11 @@ void dutxlin(fPOINT point0, fPOINT point1) noexcept {
 		integerStart = 1;
 	if (integerFinish > TextureScreen.lines)
 		integerFinish = TextureScreen.lines;
+	TempTexturePoints.reserve(TempTexturePoints.size() + (integerFinish - integerStart));
 	while (integerStart <= integerFinish) {
 		yOffset = slope * (-point0.x + integerStart * TextureScreen.spacing) + point0.y;
 		if (yOffset > 0 && yOffset < TextureScreen.areaHeight) {
-			TempTexturePoints[TextureScreen.index].line = integerStart;
-			TempTexturePoints[TextureScreen.index].y = yOffset;
+			TempTexturePoints.push_back({ yOffset, gsl::narrow<short>(integerStart) });
 			TextureScreen.index++;
 		}
 		integerStart++;
@@ -3697,23 +3701,13 @@ void butsid(unsigned windowId) {
 		NULL);
 }
 
-int txcmp(const void *arg1, const void *arg2) noexcept {
-	const TXPNT	texturePoint0 = *static_cast<const TXPNT *>(arg1);
-	const TXPNT	texturePoint1 = *static_cast<const TXPNT *>(arg2);
-
+bool txcmp(const TXPNT &texturePoint0, const TXPNT &texturePoint1) noexcept {
 	if (texturePoint0.line == texturePoint1.line) {
-		if (texturePoint0.y == texturePoint1.y)
-			return 0;
-		else {
-			if (texturePoint0.y > texturePoint1.y)
-				return 1;
-			else
-				return -1;
-		}
+		return (texturePoint0.y < texturePoint1.y);
 	}
-	else
-		return texturePoint0.line - texturePoint1.line;
-	//	return 0;
+	else {
+		return (texturePoint0.line < texturePoint1.line);
+	}
 }
 
 void txpar() {
@@ -3812,7 +3806,7 @@ void nutx() {
 	FRMHED*		formHeader = nullptr;
 
 	// ToDo - replace with std::sort
-	qsort(TempTexturePoints, TextureScreen.index, sizeof(TXPNT), txcmp);
+	std::sort(TempTexturePoints.begin(), TempTexturePoints.end(), txcmp);
 	iPoint = 0;
 	if (FormIndex) {
 		if (istx(ClosestFormToCursor)) {
@@ -3830,7 +3824,8 @@ void nutx() {
 		}
 	}
 	txspac(iPoint, TextureScreen.index);
-	MoveMemory(&TexturePointsBuffer[iPoint], &TempTexturePoints, TextureScreen.index * sizeof(TXPNT));
+	//ToDo is there a better way to copy?
+	MoveMemory(&TexturePointsBuffer[iPoint], &TempTexturePoints[0], TextureScreen.index * sizeof(TXPNT));
 	SelectedForm->fillInfo.texture.index = iPoint;
 	SelectedForm->fillInfo.texture.count = TextureScreen.index;
 }
@@ -3847,8 +3842,7 @@ void altx() {
 			setr(TempTexturePoints[iPoint].line);
 		for (iLine = 1; iLine <= TextureScreen.lines; iLine++) {
 			if (!chkr(iLine)) {
-				TempTexturePoints[TextureScreen.index].line = iLine;
-				TempTexturePoints[TextureScreen.index].y = halfHeight;
+				TempTexturePoints.push_back({ halfHeight , gsl::narrow<short>(iLine) });
 				TextureScreen.index++;
 			}
 		}
@@ -3896,7 +3890,7 @@ void dutxfn(unsigned textureType) {
 
 void txsrt() noexcept {
 	// ToDo - replace with std::sort
-	qsort(TempTexturePoints, TextureScreen.index, sizeof(TXPNT), txcmp);
+	std::sort(TempTexturePoints.begin(), TempTexturePoints.end(), txcmp);
 }
 
 void dutxmir() {
@@ -4016,7 +4010,11 @@ void redtbak() {
 	TextureScreen.spacing = textureHistoryItem->spacing;
 	TextureScreen.index = textureHistoryItem->count;
 	if (textureHistoryItem->texturePoint) {
-		MoveMemory (TempTexturePoints, textureHistoryItem->texturePoint, textureHistoryItem->count * sizeof (TXPNT));
+		TempTexturePoints.clear();
+		TempTexturePoints.reserve(textureHistoryItem->count);
+		for (auto i = 0u; i < textureHistoryItem->count; i++) {
+			TempTexturePoints.push_back(textureHistoryItem->texturePoint[i]);
+		}
 	}
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -4068,21 +4066,19 @@ void txtdel() {
 		clRmap(MAXITEMS);
 		for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
 			setr(SelectedTexturePointsList[iPoint]);
-		iOutputPoint = 0;
 		for (iSourcePoint = 0; iSourcePoint < TextureScreen.index; iSourcePoint++) {
-			if (!chkr(iSourcePoint)) {
-				TempTexturePoints[iOutputPoint].line = TempTexturePoints[iSourcePoint].line;
-				TempTexturePoints[iOutputPoint].y = TempTexturePoints[iSourcePoint].y;
-				iOutputPoint++;
+			if (chkr(iSourcePoint)) {
+				TempTexturePoints.erase(TempTexturePoints.begin() + iOutputPoint--);
 			}
+			iOutputPoint++;
 		}
 		SelectedTexturePointsCount = 0;
-		TextureScreen.index = iOutputPoint;
+		TextureScreen.index = TempTexturePoints.size();
 		StateMap.set(StateFlag::RESTCH);
 		return;
-	}
+	} 
 	if (TextureScreen.index && txtclos(&iClosestPoint)) {
-		MoveMemory(&TempTexturePoints[iClosestPoint], &TempTexturePoints[iClosestPoint + 1], (TextureScreen.index - iClosestPoint) * sizeof(TXPNT));
+		TempTexturePoints.erase(TempTexturePoints.begin() + iClosestPoint);
 		TextureScreen.index--;
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -4092,6 +4088,7 @@ void txdelal() {
 	chktxnum();
 	savtxt();
 	TextureScreen.index = 0;
+	TempTexturePoints.clear();
 	rstxt();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -4457,7 +4454,11 @@ void rtrtx() {
 	fvars(ClosestFormToCursor);
 	currentFormTexture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
 	TextureScreen.index = SelectedForm->fillInfo.texture.count;
-	MoveMemory(TempTexturePoints, currentFormTexture, sizeof(TXPNT)*TextureScreen.index);
+	TempTexturePoints.clear();
+	TempTexturePoints.reserve(TextureScreen.index);
+	for (auto i = 0u; i < TextureScreen.index; i++) {
+		TempTexturePoints.push_back(currentFormTexture[i]);
+	}
 	TextureScreen.areaHeight = SelectedForm->fillInfo.texture.height;
 	TextureScreen.spacing = SelectedForm->fillSpacing;
 	TextureScreen.lines = SelectedForm->fillInfo.texture.lines;
@@ -4691,8 +4692,7 @@ void setshft() {
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (inrct(selectionRect, StitchBuffer[iStitch])) {
 			StateMap.set(StateFlag::TXIN);
-			TempTexturePoints[TextureScreen.index].line = line;
-			TempTexturePoints[TextureScreen.index].y = StitchBuffer[iStitch].y - selectionRect.bottom;
+			TempTexturePoints.push_back({ (StitchBuffer[iStitch].y - selectionRect.bottom), gsl::narrow<short>(line) });
 			TextureScreen.index++;
 		}
 		else {
