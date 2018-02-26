@@ -11764,8 +11764,9 @@ void getrmap() {
 		SelectObject(TraceDC, TraceBitmap);
 		BitBlt(TraceDC, 0, 0, BitmapWidth, BitmapHeight, BitmapDC, 0, 0, SRCCOPY);
 		StateMap.set(StateFlag::WASTRAC);
-		TraceDataSize = (BitmapWidth*BitmapHeight) + 1;
+		TraceDataSize = (BitmapWidth + 1)*(BitmapHeight + 1);
 		TracedMap->resize(TraceDataSize);
+		TracedMap->reset();
 		StretchBlt(StitchWindowMemDC, BitmapDstRect.left, BitmapDstRect.top, BitmapDstRect.right - BitmapDstRect.left, BitmapDstRect.bottom - BitmapDstRect.top,
 			BitmapDC, BitmapSrcRect.left, BitmapSrcRect.top, BitmapSrcRect.right - BitmapSrcRect.left, BitmapSrcRect.bottom - BitmapSrcRect.top, SRCCOPY);
 	}
