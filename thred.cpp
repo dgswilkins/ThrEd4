@@ -517,7 +517,6 @@ double			StitchWindowAspectRatio;	//aspect ratio of the stitch window
 double			MinStitchLength = MINSIZ * PFAFGRAN;	//minimum stitch size
 double			UserStitchLength = USESIZ * PFAFGRAN;	//user selected stitch size
 double			SmallStitchLength = SMALSIZ * PFAFGRAN;	//user can remove stitches smaller than this
-unsigned		MarkedStitchMap[MAXITEMS];	//bitmap to tell when stitches have been marked
 TCHAR*			PcdClipFormat = "PMust_Format";
 TCHAR*			ThrEdClipFormat = "threditor";
 CLPSTCH*		ClipStitchData;			//for pcs clipboard data
@@ -19181,10 +19180,6 @@ void relin() {
 	MoveLine1[1].y = StitchCoordinatesPixels.y;
 	StateMap.reset(StateFlag::WASLIN);
 	dulin();
-}
-
-unsigned setRmp(unsigned bit) noexcept {
-	return _bittestandset((long *)MarkedStitchMap, bit) ? 0 : 0xffffffff;
 }
 
 void drwLin(unsigned currentStitch, unsigned length, HPEN hPen) {
