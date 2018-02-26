@@ -2232,14 +2232,14 @@ void duzero() {
 	fPOINTATTR*		currentStitch = nullptr;
 
 	if (SelectedFormCount) {
-		clRmap(MAXITEMS);
+		boost::dynamic_bitset<> formMap(FormIndex);
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			setr(SelectedFormList[iForm]);
+			formMap.set(SelectedFormList[iForm]);
 		StateMap.reset(StateFlag::CONTIG);
 		iDestination = 0;
 		currentStitch = StitchBuffer;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (StitchBuffer[iStitch].attribute&TYPMSK && chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
+			if (StitchBuffer[iStitch].attribute&TYPMSK && formMap.test((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
 				if (StateMap.testAndSet(StateFlag::CONTIG)) {
 					stitchLength = hypot(StitchBuffer[iStitch].x - currentStitch->x, StitchBuffer[iStitch].y - currentStitch->y);
 					if (stitchLength > MinStitchLength) {
@@ -7582,15 +7582,15 @@ void duclip() {
 				}
 				}
 				CloseClipboard();
-				clRmap(MAXITEMS);
+				boost::dynamic_bitset<> formMap(FormIndex);
 				for (iForm = 0; iForm < SelectedFormCount; iForm++)
-					setr(SelectedFormList[iForm]);
+					formMap.set(SelectedFormList[iForm]);
 				// ToDo - what is astch used for?
 				fPOINTATTR* astch = &StitchBuffer[MAXITEMS];
 				stitchCount = 0;
 				LowerLeftStitch.x = LowerLeftStitch.y = 1e30f;
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-					if (!(StitchBuffer[iStitch].attribute&NOTFRM) && chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
+					if (!(StitchBuffer[iStitch].attribute&NOTFRM) && formMap.test((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
 						if (StitchBuffer[iStitch].x < LowerLeftStitch.x)
 							LowerLeftStitch.x = StitchBuffer[iStitch].x;
 						if (StitchBuffer[iStitch].y < LowerLeftStitch.y)
@@ -8517,15 +8517,16 @@ bool wastch() noexcept {
 bool frmstch() {
 	unsigned	iForm = 0, iStitch = 0, formCode = 0;
 
-	clRmap((FormIndex >> 5) >> 1);
-	for (iForm = 0; iForm < FormIndex; iForm++)
-		setr(SelectedFormList[iForm]);
+	boost::dynamic_bitset<> formMap(FormIndex); 
+	for (iForm = 0; iForm < FormIndex; iForm++) {
+		formMap.set(SelectedFormList[iForm]);
+	}
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		formCode = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
-		if (chkr(formCode))
-			return 1;
+		if (formMap.test(formCode))
+			return true;
 	}
-	return 0;
+	return false;
 }
 
 void delet() {
@@ -8537,15 +8538,15 @@ void delet() {
 	if (StateMap.testAndReset(StateFlag::FPSEL)) {
 		savdo();
 		fvars(ClosestFormToCursor);
-		clRmap((VertexCount >> 5) + 1);
+		boost::dynamic_bitset<> vertexMap(VertexCount);
 		currentFormVertex = SelectedFormVertices.start;
 		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
-			setr(currentFormVertex);
+			vertexMap.set(currentFormVertex);
 			currentFormVertex = pdir(currentFormVertex);
 		}
 		currentFormVertex = 0;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-			if (!chkr(iVertex)) {
+			if (!vertexMap.test(iVertex)) {
 				CurrentFormVertices[currentFormVertex].x = CurrentFormVertices[iVertex].x;
 				CurrentFormVertices[currentFormVertex].y = CurrentFormVertices[iVertex].y;
 				currentFormVertex++;
@@ -10629,9 +10630,9 @@ void rngal() {
 void nucols() {
 	unsigned	iForm = 0, iStitch = 0;
 
-	clRmap((FormIndex << 5) + 1);
+	boost::dynamic_bitset<> formMap(FormIndex); 
 	for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-		setr(SelectedFormList[iForm]);
+		formMap.set(SelectedFormList[iForm]);
 		SelectedForm = &FormList[iForm];
 		if (SelectedForm->fillType) {
 			SelectedForm->fillColor = ActiveColor;
@@ -10643,7 +10644,7 @@ void nucols() {
 			SelectedForm->underlayColor = ActiveColor;
 	}
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT) && (StitchBuffer[iStitch].attribute&TYPMSK) != TYPMSK) {
+		if (formMap.test((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT) && (StitchBuffer[iStitch].attribute&TYPMSK) != TYPMSK) {
 			StitchBuffer[iStitch].attribute &= NCOLMSK;
 			StitchBuffer[iStitch].attribute |= ActiveColor;
 		}
@@ -11192,25 +11193,22 @@ void ritcur() noexcept {
 }
 
 void delsfrms(unsigned code) {
-	unsigned	iForm = 0, formFlagWordCount = 0, iWord = 0;
+	unsigned	iForm = 0;
 	unsigned	validFormCount = 0, deletedFormCount = 0, iStitch = 0, validStitchCount = 0;
 
 	if (code) {
 		if (FormIndex) {
 			std::vector<unsigned> formIndices(FormIndex);
-			formFlagWordCount = (FormIndex >> 5) + 1;
-			// ToDo - use local memory allocation for map of deleted forms instead of MarkedStitchMap
-			for (iWord = 0; iWord < formFlagWordCount; iWord++)
-				MarkedStitchMap[iWord] = 0;
+			boost::dynamic_bitset<> formMap(FormIndex);
 			for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 				ClosestFormToCursor = SelectedFormList[iForm];
-				setr(ClosestFormToCursor);
+				formMap.set(ClosestFormToCursor);
 				fvars(ClosestFormToCursor);
 				f1del();
 			}
 			validFormCount = 0; deletedFormCount = 0;
 			for (iForm = 0; iForm < FormIndex; iForm++) {
-				if (!chkr(iForm)) {
+				if (!formMap.test(iForm)) {
 					frmcpy(&FormList[validFormCount], &FormList[iForm]);
 					formIndices[iForm] = (iForm - deletedFormCount) << 4;
 					validFormCount++;
@@ -11224,7 +11222,7 @@ void delsfrms(unsigned code) {
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 					if (StitchBuffer[iStitch].attribute&ALTYPMSK) {
 						iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
-						if (!chkr(iForm)) {
+						if (!formMap.test(iForm)) {
 							StitchBuffer[validStitchCount].attribute = StitchBuffer[iStitch].attribute &= NFRMSK;
 							StitchBuffer[validStitchCount].attribute |= formIndices[iForm];
 							StitchBuffer[validStitchCount].x = StitchBuffer[iStitch].x;
@@ -11243,7 +11241,7 @@ void delsfrms(unsigned code) {
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 					if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
 						iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
-						if (chkr(iForm))
+						if (formMap.test(iForm))
 							StitchBuffer[iStitch].attribute &= (NFRMSK&NTYPMSK);
 					}
 				}
@@ -12816,7 +12814,7 @@ void frmpos(float deltaX, float deltaY) noexcept {
 }
 
 void nudgfn(float deltaX, float deltaY) {
-	unsigned	iForm = 0, iStitch = 0, wordCount = 0;
+	unsigned	iForm = 0, iStitch = 0;
 	POINT		pixel = {};
 
 	if (StateMap.test(StateFlag::BIGBOX) || SelectedFormCount || StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::GRPSEL) || StateMap.test(StateFlag::SELBOX))
@@ -12839,12 +12837,11 @@ void nudgfn(float deltaX, float deltaY) {
 		return;
 	}
 	if (SelectedFormCount) {
-		wordCount = (FormIndex >> 5) + 1;
-		clRmap(wordCount);
+		boost::dynamic_bitset<> formMap(FormIndex);
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			setr(SelectedFormList[iForm]);
+			formMap.set(SelectedFormList[iForm]);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
+			if (formMap.test((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
 				StitchBuffer[iStitch].x += deltaX;
 				StitchBuffer[iStitch].y += deltaY;
 			}
@@ -13035,16 +13032,16 @@ void inscol() {
 	unsigned	iStitch = 0, iForm = 0, iColor = 0, nextColor = 0, color = 0;
 	FRMHED*		form = nullptr;
 
-	*MarkedStitchMap = 0;
+	boost::dynamic_bitset<> colorMap(16); 
 	if (chkMsgs(Msg.pt, DefaultColorWin[0], UserColorWin[15])) {
 		VerticalIndex &= COLMSK;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
-			setr(StitchBuffer[iStitch].attribute&COLMSK);
-		if (*MarkedStitchMap == COLSMSK)
+			colorMap.set(StitchBuffer[iStitch].attribute&COLMSK);
+		if (colorMap.all())
 			tabmsg(IDS_COLAL);
 		else {
 			nextColor = 15;
-			while (chkr(nextColor))
+			while (colorMap.test(nextColor))
 				nextColor--;
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 				color = StitchBuffer[iStitch].attribute&COLMSK;

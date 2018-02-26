@@ -10,6 +10,7 @@
 #pragma warning( push )  
 #pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #include <gsl/gsl>
+#include <boost/dynamic_bitset.hpp>
 #pragma warning( pop )  
 
 #include "lang.h"
@@ -3264,7 +3265,7 @@ bool px2txt(POINT offset) noexcept {
 	fPOINT editPoint;
 
 	px2ed(offset, &editPoint);
-	TXPNT tmp = { 0, gsl::narrow<short>(floor((editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5)) };
+	TXPNT tmp = { 0, gsl::narrow<unsigned short>(floor((editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5)) };
 	if (tmp.line > TextureScreen.lines)
 		return false;
 	if (tmp.line < 1)
@@ -3416,7 +3417,7 @@ void dutxlin(fPOINT point0, fPOINT point1) noexcept {
 	while (integerStart <= integerFinish) {
 		yOffset = slope * (-point0.x + integerStart * TextureScreen.spacing) + point0.y;
 		if (yOffset > 0 && yOffset < TextureScreen.areaHeight) {
-			TempTexturePoints.push_back({ yOffset, gsl::narrow<short>(integerStart) });
+			TempTexturePoints.push_back({ yOffset, gsl::narrow<unsigned short>(integerStart) });
 		}
 		integerStart++;
 	}
@@ -3827,17 +3828,19 @@ void nutx() {
 
 //Ensure all lines in the texture have at least 1 point
 void altx() {
-	unsigned	iLine = 0, iPoint = 0;
-	float		halfHeight = 0.0;
-
+	unsigned short	iLine = 0;
+	unsigned		iPoint = 0;
+	float			halfHeight = 0.0;
+	
+	boost::dynamic_bitset<> txtLines(TextureScreen.lines + 1);
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		halfHeight = TextureScreen.areaHeight / 2;
-		clRmap((TextureScreen.lines >> 5) + 1);
-		for (iPoint = 0; iPoint < TempTexturePoints.size(); iPoint++)
-			setr(TempTexturePoints[iPoint].line);
+		for (iPoint = 0; iPoint < TempTexturePoints.size(); iPoint++) {
+			txtLines.set(TempTexturePoints[iPoint].line);
+		}
 		for (iLine = 1; iLine <= TextureScreen.lines; iLine++) {
-			if (!chkr(iLine)) {
-				TempTexturePoints.push_back({ halfHeight , gsl::narrow<short>(iLine) });
+			if (!txtLines.test(iLine)) {
+				TempTexturePoints.push_back({ halfHeight , iLine });
 			}
 		}
 	}
@@ -4055,11 +4058,11 @@ void txtdel() {
 
 	if (SelectedTexturePointsCount) {
 		savtxt();
-		clRmap(MAXITEMS);
+		boost::dynamic_bitset<> texturePointsMap(TempTexturePoints.size());
 		for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
-			setr(SelectedTexturePointsList[iPoint]);
+			texturePointsMap.set(SelectedTexturePointsList[iPoint]);
 		for (iSourcePoint = 0; iSourcePoint < TempTexturePoints.size(); iSourcePoint++) {
-			if (chkr(iSourcePoint)) {
+			if (texturePointsMap.test(iSourcePoint)) {
 				TempTexturePoints.erase(TempTexturePoints.begin() + iOutputPoint--);
 			}
 			iOutputPoint++;
@@ -4679,7 +4682,7 @@ void setshft() {
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (inrct(selectionRect, StitchBuffer[iStitch])) {
 			StateMap.set(StateFlag::TXIN);
-			TempTexturePoints.push_back({ (StitchBuffer[iStitch].y - selectionRect.bottom), gsl::narrow<short>(line) });
+			TempTexturePoints.push_back({ (StitchBuffer[iStitch].y - selectionRect.bottom), gsl::narrow<unsigned short>(line) });
 		}
 		else {
 			if (StateMap.testAndReset(StateFlag::TXIN))
@@ -4850,25 +4853,25 @@ void lodchk() {
 		if (!SelectedForm->maxBorderStitchLen)
 			SelectedForm->maxBorderStitchLen = IniFile.maxStitchLength;
 	}
-	clRmap((MAXFORMS >> 5) + 1);
+	boost::dynamic_bitset<> formMap(FormIndex);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		attribute = StitchBuffer[iStitch].attribute;
 		if ((attribute&TYPMSK) == TYPFRM)
-			setr((attribute&FRMSK) >> FRMSHFT);
+			formMap.set((attribute&FRMSK) >> FRMSHFT);
 
 	}
 	for (iForm = 0; iForm < FormIndex; iForm++) {
-		if (!chkr(iForm))
+		if (!formMap.test(iForm))
 			FormList[iForm].fillType = 0;
 	}
-	clRmap((MAXFORMS >> 5) + 1);
+	formMap.reset();
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		attribute = StitchBuffer[iStitch].attribute;
 		if (attribute&TYPBRD)
-			setr((attribute&FRMSK) >> FRMSHFT);
+			formMap.set((attribute&FRMSK) >> FRMSHFT);
 	}
 	for (iForm = 0; iForm < FormIndex; iForm++) {
-		if (!chkr(iForm))
+		if (!formMap.test(iForm))
 			FormList[iForm].edgeType = 0;
 	}
 }

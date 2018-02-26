@@ -1144,8 +1144,8 @@ typedef struct _strhed {		//thred file header
 }STRHED;
 
 typedef struct _txpnt {	//textured fill point
-	float	y;
-	short	line;
+	float			y;
+	unsigned short	line;
 }TXPNT;
 
 #define RES_SIZE	26
@@ -1779,8 +1779,8 @@ typedef struct _txtscr	{
 
 
 typedef struct _txtrct	{
-	short left;
-	short right;
+	unsigned short left;
+	unsigned short right;
 	float top;
 	float bottom;
 }TXTRCT;

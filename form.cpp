@@ -5184,22 +5184,20 @@ void delspnt() {
 }
 
 void unfil() {
-	unsigned	iMap = 0, iForm = 0, iStitch = 0, iSource = 0, iDestination = 0;
+	unsigned	iForm = 0, iStitch = 0, iSource = 0, iDestination = 0;
 	unsigned	codedForm = 0, attribute = 0;
 	unsigned	mapLength = 0;
 
 	if (filmsgs(FMX_UNF))
 		return;
 	if (SelectedFormCount) {
-		mapLength = (SelectedFormCount >> 5) + 1;
-		for (iMap = 0; iMap < mapLength; iMap++)
-			MarkedStitchMap[iMap] = 0;
+		boost::dynamic_bitset<> formMap(FormIndex);
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 			SelectedForm = &FormList[SelectedFormList[iForm]];
 			if (SelectedForm->fillType || SelectedForm->edgeType) {
 				delclps(SelectedFormList[iForm]);
 				deltx();
-				setr(SelectedFormList[iForm]);
+				formMap.set(SelectedFormList[iForm]);
 				SelectedForm->fillType = 0;
 				SelectedForm->edgeType = 0;
 				SelectedForm->extendedAttribute &= !(AT_UND | AT_CWLK | AT_WALK);
@@ -5207,7 +5205,7 @@ void unfil() {
 		}
 		iDestination = 0;
 		for (iSource = 0; iSource < PCSHeader.stitchCount; iSource++) {
-			if (!chkr((StitchBuffer[iSource].attribute&FRMSK) >> FRMSHFT)) {
+			if (!formMap.test((StitchBuffer[iSource].attribute&FRMSK) >> FRMSHFT)) {
 				StitchBuffer[iDestination].attribute = StitchBuffer[iSource].attribute;
 				StitchBuffer[iDestination].x = StitchBuffer[iSource].x;
 				StitchBuffer[iDestination++].y = StitchBuffer[iSource].y;
@@ -7867,12 +7865,12 @@ void fliph() {
 	}
 	if (SelectedFormCount) {
 		savdo();
-		clRmap((FormIndex >> 5) + 1);
+		boost::dynamic_bitset<> formMap(FormIndex);
 		pxrct2stch(SelectedFormsRect, &rectangle);
 		midpoint = (rectangle.right - rectangle.left) / 2 + rectangle.left;
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 			ClosestFormToCursor = SelectedFormList[iForm];
-			setr(ClosestFormToCursor);
+			formMap.set(ClosestFormToCursor);
 			fvars(ClosestFormToCursor);
 			for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++)
 				CurrentFormVertices[iVertex].x = midpoint + midpoint - CurrentFormVertices[iVertex].x;
@@ -7880,7 +7878,7 @@ void fliph() {
 		}
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			decodedForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
-			if (chkr(decodedForm) && !(StitchBuffer[iStitch].attribute&NOTFRM))
+			if (formMap.test(decodedForm) && !(StitchBuffer[iStitch].attribute&NOTFRM))
 				StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
 		}
 		StateMap.set(StateFlag::RESTCH);
@@ -7945,12 +7943,12 @@ void flipv() {
 	}
 	if (SelectedFormCount) {
 		savdo();
-		clRmap((FormIndex >> 5) + 1);
+		boost::dynamic_bitset<> formMap(FormIndex);
 		pxrct2stch(SelectedFormsRect, &rectangle);
 		midpoint = (rectangle.top - rectangle.bottom) / 2 + rectangle.bottom;
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 			ClosestFormToCursor = SelectedFormList[iForm];
-			setr(ClosestFormToCursor);
+			formMap.set(ClosestFormToCursor);
 			fvars(ClosestFormToCursor);
 			for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++)
 				CurrentFormVertices[iVertex].y = midpoint + midpoint - CurrentFormVertices[iVertex].y;
@@ -7958,7 +7956,7 @@ void flipv() {
 		}
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			decodedForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
-			if (chkr(decodedForm) && !(StitchBuffer[iStitch].attribute&NOTFRM))
+			if (formMap.test(decodedForm) && !(StitchBuffer[iStitch].attribute&NOTFRM))
 				StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
 		}
 		StateMap.set(StateFlag::RESTCH);
@@ -9150,16 +9148,16 @@ void movlayr(unsigned codedLayer) {
 	if (SelectedFormCount) {
 		savdo();
 		//  ToDo - use a form map rather than a marked stitch map 
-		clRmap((FormIndex >> 5) + 1);
+		boost::dynamic_bitset<> formMap(FormIndex);
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 			iCurrentForm = SelectedFormList[iForm];
 			FormList[iCurrentForm].attribute = (FormList[iCurrentForm].attribute&NFRMLMSK) | codedLayer;
-			setr(iCurrentForm);
+			formMap.set(iCurrentForm);
 		}
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (StitchBuffer[iStitch].attribute&ALTYPMSK) {
 				iCurrentForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
-				if (chkr(iCurrentForm))
+				if (formMap.test(iCurrentForm))
 					StitchBuffer[iStitch].attribute = StitchBuffer[iStitch].attribute&NLAYMSK | codedStitchLayer;
 			}
 		}
@@ -9298,10 +9296,6 @@ void frmadj(unsigned formIndex) noexcept {
 	frmout(formIndex);
 }
 
-void setr(unsigned bit) noexcept {
-	_bittestandset((long *)MarkedStitchMap, bit);
-}
-
 void clRmap(unsigned mapSize) noexcept {
 	memset(MarkedStitchMap, 0, mapSize * sizeof(*MarkedStitchMap));
 }
@@ -9321,11 +9315,12 @@ bool chkr(unsigned bit) noexcept {
 void frmsadj() noexcept {
 	unsigned	iForm = 0, iStitch = 0;
 
-	clRmap(MAXITEMS);
-	for (iForm = 0; iForm < SelectedFormCount; iForm++)
-		setr(SelectedFormList[iForm]);
+	boost::dynamic_bitset<> formMap(FormIndex); 
+	for (iForm = 0; iForm < SelectedFormCount; iForm++) {
+		formMap.set(SelectedFormList[iForm]);
+	}
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (StitchBuffer[iStitch].attribute&ALTYPMSK && chkr((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
+		if (StitchBuffer[iStitch].attribute&ALTYPMSK && formMap.test((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
 			StitchBuffer[iStitch].x += FormMoveDelta.x;
 			StitchBuffer[iStitch].y -= FormMoveDelta.y;
 		}
