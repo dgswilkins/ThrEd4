@@ -9308,10 +9308,6 @@ bool setrc(unsigned bit) {
 
 #endif
 
-bool chkr(unsigned bit) noexcept {
-	return _bittest((long *)MarkedStitchMap, bit);
-}
-
 void frmsadj() noexcept {
 	unsigned	iForm = 0, iStitch = 0;
 
