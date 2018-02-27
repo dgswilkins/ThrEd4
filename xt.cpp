@@ -124,7 +124,6 @@ extern	void		chkseq(bool border);
 extern	bool		cisin(float xCoordinate, float yCoordinate);
 extern	unsigned	closflt(float xCoordinate, float yCoordinate);
 extern	void		clpfil();
-extern	void		clRmap(unsigned mapSize);
 extern	void		coltab();
 extern	void		datmsg(unsigned code);
 extern	void		delclps(unsigned iForm);
