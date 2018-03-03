@@ -33,6 +33,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -65,9 +66,18 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <EnableCppCoreCheck>true</EnableCppCoreCheck>
+    <EnableExperimentalCppCoreCheck>true</EnableExperimentalCppCoreCheck>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\Public\Documents\Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\Public\Documents\Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\Public\Documents\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -76,6 +86,7 @@
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -90,6 +101,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -107,12 +119,17 @@
     <ClCompile Include="xt.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EnumMap.h" />
+    <ClInclude Include="ExtendedBitSet.h" />
     <ClInclude Include="lang.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="thred.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="thred.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

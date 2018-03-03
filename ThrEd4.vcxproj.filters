@@ -38,10 +38,21 @@
     <ClInclude Include="thred.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EnumMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExtendedBitSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="thred.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
