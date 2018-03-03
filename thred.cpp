@@ -127,9 +127,7 @@ extern	void			chgchk (int code);
 extern	void			chgwrn ();
 extern	void			chkcont ();
 extern	unsigned		chkfrm ();
-extern	bool			chkr (unsigned bit);
 extern	unsigned		closfrm ();
-extern	void			clRmap (unsigned mapSize);
 extern	void			clpfil ();
 extern	void			clpic (unsigned short start);
 extern	void			clrfills ();
@@ -19370,7 +19368,7 @@ void dugrid() {
 
 void rint() noexcept {
 	const unsigned	size = StitchWindowClientRect.right*StitchWindowClientRect.bottom;
-
+	
 	CellSize.x = (ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
 	CellSize.y = (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom;
 	if (size > RMAPBITS) {
@@ -19379,13 +19377,13 @@ void rint() noexcept {
 	}
 }
 
-unsigned setRmap(fPOINTATTR stitchPoint) noexcept {
+bool setRmap(boost::dynamic_bitset<> &MarkedStitchMap, fPOINTATTR stitchPoint) noexcept {
 	unsigned	bitPoint;
 
 	bitPoint = floor((stitchPoint.x - ZoomRect.left) / CellSize.x)*floor((stitchPoint.y - ZoomRect.bottom) / CellSize.y);
-	if (bitPoint < RMAPBITS)
-		return setRmp(bitPoint);
-	return 0;
+	if (bitPoint < MarkedStitchMap.size())
+		return !MarkedStitchMap.test_set(bitPoint);
+	return false;
 }
 
 void drwStch() {
@@ -19640,7 +19638,7 @@ void drwStch() {
 			dusel(StitchWindowMemDC);
 		}
 		if (ZoomFactor < StitchBoxesThreshold) {
-			clRmap(MAXITEMS);
+			boost::dynamic_bitset<> MarkedStitchMap(StitchWindowClientRect.right*StitchWindowClientRect.bottom);
 			SelectObject(StitchWindowMemDC, LinePen);
 			SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 			rint();
@@ -19650,7 +19648,7 @@ void drwStch() {
 						for (iStitch = ColorChangeTable[iColor].stitchIndex; iStitch < ColorChangeTable[iColor + 1].stitchIndex; iStitch++) {
 							if (StitchBuffer[iStitch].x >= ZoomRect.left && StitchBuffer[iStitch].x <= ZoomRect.right
 								&& StitchBuffer[iStitch].y >= ZoomRect.bottom && StitchBuffer[iStitch].y <= ZoomRect.top
-								&& setRmap(StitchBuffer[iStitch]))
+								&& setRmap(MarkedStitchMap, StitchBuffer[iStitch]))
 								stchbox(iStitch, StitchWindowMemDC);
 						}
 					}
@@ -19660,7 +19658,7 @@ void drwStch() {
 				for (iColor = 0; iColor < PCSHeader.stitchCount; iColor++) {
 					if (StitchBuffer[iColor].x >= ZoomRect.left && StitchBuffer[iColor].x <= ZoomRect.right
 						&& StitchBuffer[iColor].y >= ZoomRect.bottom && StitchBuffer[iColor].y <= ZoomRect.top
-						&& setRmap(StitchBuffer[iColor]))
+						&& setRmap(MarkedStitchMap, StitchBuffer[iColor]))
 						stchbox(iColor, StitchWindowMemDC);
 				}
 			}

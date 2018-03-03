@@ -217,7 +217,6 @@ void			clpcon ();
 void			clpic (unsigned short strtlin);
 void			clpout ();
 void			clpxadj () noexcept;
-void			clRmap (unsigned len) noexcept;
 void			contf ();
 void			deleclp (unsigned ind);
 void			delmclp (unsigned ind);
@@ -410,7 +409,6 @@ FLOAT			FormOffset;				//form offset for clipboard fills
 long			PreferenceWindowWidth;	//width of the preference window
 double			EggRatio;				//ratio for shrinking eggs
 unsigned		PreferenceWindowTextWidth;	//size of the text part of the preference window
-unsigned		MarkedStitchMap[MAXITEMS];	//bitmap to tell when stitches have been marked
 
 TCHAR		FormOnOff[16];
 
@@ -9294,14 +9292,6 @@ void frmadj(unsigned formIndex) noexcept {
 		CurrentFormVertices[iVertex].y -= FormMoveDelta.y;
 	}
 	frmout(formIndex);
-}
-
-unsigned setRmp(unsigned bit) noexcept {
-	return _bittestandset((long *)MarkedStitchMap, bit) ? 0 : 0xffffffff;
-}
-
-void clRmap(unsigned mapSize) noexcept {
-	memset(MarkedStitchMap, 0, mapSize * sizeof(*MarkedStitchMap));
 }
 
 #if PESACT
