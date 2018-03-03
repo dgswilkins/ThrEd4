@@ -2992,35 +2992,22 @@ void rspnt(float xCoordinate, float yCoordinate) noexcept {
 }
 
 void dunseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish) {
-	SMALPNTL*		lineEndPoint0 = sortedLines[start];
-	const SMALPNTL*	lineEndPoint1 = sortedLines[finish];
-	if (lineEndPoint0 && lineEndPoint1) {
-		unsigned		iLine = 0;
-		double			deltaY = 0.0, minimumY = 1e30;
+	double minimumY = 1e30;
 
-		for (iLine = start; iLine <= finish; iLine++) {
-			lineEndPoint0 = sortedLines[iLine];
-			if (lineEndPoint0) {
-				deltaY = lineEndPoint0[1].y - lineEndPoint0[0].y;
-				if (deltaY < minimumY) {
-					minimumY = deltaY;
-				}
-			}
-			else {
-				throw;
-			}
-		}
-		minimumY /= 2;
-		if (minimumY == 1e30 / 2) {
-			minimumY = 0;
-		}
-		rspnt(lineEndPoint0[0].x, lineEndPoint0[0].y + minimumY);
-		rspnt(lineEndPoint1[0].x, lineEndPoint1[0].y + minimumY);
-		LastGroup = lineEndPoint1->group;
+	for (unsigned iLine = start; iLine <= finish; iLine++) {
+		const double deltaY = sortedLines[start][1].y - sortedLines[start][0].y;
+		if (deltaY < minimumY)
+			minimumY = deltaY;
+	}
+	if (minimumY == 1e30) {
+		minimumY = 0;
 	}
 	else {
-		throw;
+		minimumY /= 2;
 	}
+	rspnt(sortedLines[start][0].x, sortedLines[start][0].y + minimumY);
+	rspnt(sortedLines[finish][0].x, sortedLines[finish][0].y + minimumY);
+	LastGroup = sortedLines[finish][0].group;
 }
 
 void movseq(std::vector<SMALPNTL*> &sortedLines, unsigned ind) noexcept {
