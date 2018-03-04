@@ -209,7 +209,6 @@ void			blbrd (double spac);
 void			bold (double pd_Size) noexcept;
 void			brdfil (double pd_Size);
 void			chan ();
-bool			chkr (unsigned pbit) noexcept;
 void			chnfn ();
 bool			cisin (float pntx, float pnty) noexcept;
 void			clpbrd (unsigned short slin);
@@ -241,7 +240,7 @@ void			horsclp ();
 bool			iseclp (unsigned find);
 bool			iseclpx (unsigned find);
 void			lapbrd ();
-void			lcon ();
+void			lcon(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints);
 constexpr unsigned	nxt (unsigned int iVertex);
 void			oclp (const fPOINT* clip, unsigned clipEntries);
 void			pbrd (double spac);
@@ -289,7 +288,6 @@ fPOINT*			CurrentFillVertices;	//pointer to the line of the polygon being filled
 fPOINT*			ClipFillData;			//data for clipboard fills
 fPOINT*			ClipReversedData;		//data for clipboard fills
 unsigned		StitchLineCount;		//count of stitch lines
-SMALPNTL*		LineEndpoints;			//pairs of fill line endpoints
 unsigned		ActivePointIndex;		//pointer to the active form in the sequencing algorithm
 unsigned		LineGroupIndex;			//pointer for groups of fill line segments
 unsigned		VertexCount;			//sides of the selected form to fill
@@ -335,20 +333,14 @@ unsigned*		Xpoints;				//stitch indices sorted according to x values
 double			StarRatio = STARAT;		//star formOrigin to body ratio
 double			SpiralWrap = SPIRWRAP;	//number of revolutions in a spiral
 fRECTANGLE		BoundingRect;			//isin rectangle
-RCON*			PathMap;				//path map for sequencing
 unsigned		PathMapIndex;			//number of entries in the path map
-TCHAR*			VisitedRegions;			//visited character map for sequencing
 unsigned		VisitedIndex;			//next unvisited region for sequencing
 unsigned		RegionCount;			//number of regions to be sequenced
 unsigned		DoneRegion;				//last region sequenced
 double			GapToClosestRegion;		//region close enough threshold for sequencing
-unsigned*		MapIndexSequence;		//pointers to sets of adjacent regions
 RGSEQ*			RegionPath;				//path to a region
 unsigned		GroupIndexCount;		//number of group indices
-unsigned*		GroupIndexSequence;		//array of group indices for sequencing
 unsigned		LastGroup;				//group of the last line written in the previous region;
-FSEQ*			SequencePath;			//path of sequenced regions
-RGSEQ*			TempPath;				//temporary path connections
 unsigned		SequencePathIndex;		//index to path of sequenced regions
 unsigned		NextGroup;				//group that connects to the next region
 REGION*			CurrentRegion;			//region currently being sequenced
@@ -2291,8 +2283,8 @@ bool projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersectio
 		return true;
 }
 
-void fnvrt() {
-	unsigned		iVertex = 0, iNextVertex = 0, iLine = 0, iGroup = 0, evenPointCount = 0;
+void fnvrt(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints) {
+	unsigned		iVertex = 0, iNextVertex = 0, iLine = 0, evenPointCount = 0;
 	unsigned		iLineCounter = 0, iPoint = 0, fillLineCount = 0, savedLineCount = 0;
 	int				lineOffset = 0;
 	double			lowX = 0.0, highX = 0.0;
@@ -2330,11 +2322,10 @@ void fnvrt() {
 			maximumLines = iLineCounter;
 	}
 	maximumLines = (maximumLines >> 1);
-	LineEndpoints = new SMALPNTL[fillLineCount + 1](); //deleted in lcon
+	lineEndpoints.reserve(fillLineCount + 1);
 	StitchLineCount = 0; LineGroupIndex = 0;
-	std::vector<unsigned> groupIndex;
 	// groupIndex cannot be more than fillLineCount so reserve that amount of memory to reduce re-allocations
-	groupIndex.reserve(fillLineCount);
+	groupIndexSequence.reserve(fillLineCount);
 	GroupIndexCount = 0;
 	currentX = lowX;
 	for (iLine = 0; iLine < fillLineCount; iLine++) {
@@ -2351,36 +2342,29 @@ void fnvrt() {
 		}
 		if (iPoint > 1) {
 			evenPointCount = iPoint &= 0xfffffffe;
-			groupIndex.push_back(StitchLineCount);
+			groupIndexSequence.push_back(StitchLineCount);
 			std::sort(projectedPoints.begin(), projectedPoints.end(), comp);
 			iPoint = 0;
 			savedLineCount = StitchLineCount;
 			while (iPoint < evenPointCount) {
 				if (StitchLineCount < fillLineCount) {
-					LineEndpoints[StitchLineCount].line = projectedPoints[iPoint].line;
-					LineEndpoints[StitchLineCount].group = LineGroupIndex;
-					LineEndpoints[StitchLineCount].x = projectedPoints[iPoint].x;
-					LineEndpoints[StitchLineCount++].y = projectedPoints[iPoint++].y;
-					LineEndpoints[StitchLineCount].line = projectedPoints[iPoint].line;
-					LineEndpoints[StitchLineCount].group = LineGroupIndex;
-					LineEndpoints[StitchLineCount].x = projectedPoints[iPoint].x;
-					LineEndpoints[StitchLineCount++].y = projectedPoints[iPoint++].y;
+					lineEndpoints.push_back({ projectedPoints[iPoint].line, LineGroupIndex, projectedPoints[iPoint].x, projectedPoints[iPoint].y });
+					iPoint++;
+					lineEndpoints.push_back({ projectedPoints[iPoint].line, LineGroupIndex, projectedPoints[iPoint].x, projectedPoints[iPoint].y });
+					iPoint++;
+					StitchLineCount += 2;
 				}
 			}
 			if (StitchLineCount != savedLineCount)
 				LineGroupIndex++;
 		}
 	}
-	groupIndex.push_back(StitchLineCount);
-	GroupIndexCount = groupIndex.size();
-	//ToDo convert GroupIndexSequence to vector that would be defined in refilfn
-	GroupIndexSequence = new unsigned[GroupIndexCount];
-	for (iGroup = 0; iGroup < GroupIndexCount; iGroup++)
-		GroupIndexSequence[iGroup] = groupIndex[iGroup];
+	groupIndexSequence.push_back(StitchLineCount);
+	GroupIndexCount = groupIndexSequence.size();
 	LineGroupIndex--;
 }
 
-void fnang() {
+void fnang(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints) {
 	unsigned	iVertex = 0;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
@@ -2393,11 +2377,11 @@ void fnang() {
 		rotflt(&AngledForm.vertices[iVertex]);
 	}
 	SelectedForm = &AngledForm;
-	fnvrt();
+	fnvrt(groupIndexSequence, lineEndpoints);
 	SelectedForm = &FormList[ClosestFormToCursor];
 }
 
-void fnhor() {
+void fnhor(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints) {
 	unsigned	iVertex = 0;
 
 	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
@@ -2411,7 +2395,7 @@ void fnhor() {
 		rotflt(&AngledForm.vertices[iVertex]);
 	}
 	SelectedForm = &AngledForm;
-	fnvrt();
+	fnvrt(groupIndexSequence, lineEndpoints);
 	SelectedForm = &FormList[ClosestFormToCursor];
 }
 
@@ -2555,24 +2539,26 @@ void refilfn() {
 		if (SelectedForm->fillType) {
 			spacing = LineSpacing;
 			LineSpacing = SelectedForm->fillSpacing;
+			std::vector<SMALPNTL> lineEndpoints;
+			std::vector<unsigned> groupIndexSequence;
 			bool doFill = true;
 			switch (gsl::narrow<unsigned>(SelectedForm->fillType)) {
 			case VRTF:
 
-				fnvrt();
+				fnvrt(groupIndexSequence, lineEndpoints);
 				WorkingFormVertices = SelectedForm->vertices;
 				break;
 
 			case HORF:
 
-				fnhor();
+				fnhor(groupIndexSequence, lineEndpoints);
 				WorkingFormVertices = AngledForm.vertices;
 				break;
 
 			case ANGF:
 
 				RotationAngle = PI / 2 - SelectedForm->angleOrClipData.angle;
-				fnang();
+				fnang(groupIndexSequence, lineEndpoints);
 				WorkingFormVertices = AngledForm.vertices;
 				break;
 
@@ -2624,7 +2610,7 @@ void refilfn() {
 				break;
 			}
 			if (doFill) {
-				lcon();
+				lcon(groupIndexSequence, lineEndpoints);
 				bakseq();
 				if (SelectedForm->fillType != VRTF && SelectedForm->fillType != TXVRTF) {
 					RotationAngle = -RotationAngle;
@@ -2865,11 +2851,11 @@ unsigned short isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoin
 	return 1;
 }
 
-bool lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) noexcept {
+bool lnclos(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints, unsigned group0, unsigned line0, unsigned group1, unsigned line1) noexcept {
 	unsigned		index0 = 0, index1 = 0;
-	unsigned		count0 = (GroupIndexSequence[group0 + 1] - GroupIndexSequence[group0]) >> 1;
+	unsigned		count0 = (groupIndexSequence[group0 + 1] - groupIndexSequence[group0]) >> 1;
 	unsigned		count1 = 0;
-	const SMALPNTL*	lineEndPoint0 = &LineEndpoints[GroupIndexSequence[group0]];
+	const SMALPNTL*	lineEndPoint0 = &lineEndpoints[groupIndexSequence[group0]];
 
 	if (group1 > GroupIndexCount - 2)
 		return 0;
@@ -2881,9 +2867,9 @@ bool lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) no
 			index0 += 2;
 		}
 		if (count0) {
-			count1 = (GroupIndexSequence[group1 + 1] - GroupIndexSequence[group1]) >> 1;
+			count1 = (groupIndexSequence[group1 + 1] - groupIndexSequence[group1]) >> 1;
 			index1 = 0;
-			if (const SMALPNTL* lineEndPoint1 = &LineEndpoints[GroupIndexSequence[group1]]) {
+			if (const SMALPNTL* lineEndPoint1 = &lineEndpoints[groupIndexSequence[group1]]) {
 				while (count1 && lineEndPoint1[index1].line != line1) {
 					count1--;
 					index1 += 2;
@@ -2900,7 +2886,7 @@ bool lnclos(unsigned group0, unsigned line0, unsigned group1, unsigned line1) no
 	return 0;
 }
 
-bool regclos(std::vector<SMALPNTL*> &sortedLines, unsigned iRegion0, unsigned iRegion1, std::vector<REGION> &regionsList) noexcept {
+bool regclos(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints, std::vector<SMALPNTL*> &sortedLines, unsigned iRegion0, unsigned iRegion1, std::vector<REGION> &regionsList) noexcept {
 	//ToDo - More renaming required
 
 	const SMALPNTL*	lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
@@ -2926,7 +2912,7 @@ bool regclos(std::vector<SMALPNTL*> &sortedLines, unsigned iRegion0, unsigned iR
 		lineStart = lineEndPoint1Start->line;
 		prevLine = lineEndPoint0Start->line;
 	}
-	if (groupStart && lnclos(groupStart - 1, prevLine, groupStart, lineStart)) {
+	if (groupStart && lnclos(groupIndexSequence, lineEndpoints, groupStart - 1, prevLine, groupStart, lineStart)) {
 		NextGroup = groupStart;
 		return 1;
 	}
@@ -2945,7 +2931,7 @@ bool regclos(std::vector<SMALPNTL*> &sortedLines, unsigned iRegion0, unsigned iR
 			lineEnd = lineEndPoint1End->line;
 			lastLine = lineEndPoint0End->line;
 		}
-		if (lnclos(groupEnd, lineEnd, groupEnd + 1, lastLine)) {
+		if (lnclos(groupIndexSequence, lineEndpoints, groupEnd, lineEnd, groupEnd + 1, lastLine)) {
 			NextGroup = groupEnd;
 			return 1;
 		}
@@ -2977,12 +2963,12 @@ bool regclos(std::vector<SMALPNTL*> &sortedLines, unsigned iRegion0, unsigned iR
 	return 0;
 }
 
-bool unvis() noexcept {
+bool unvis(boost::dynamic_bitset<> &visitedRegions) noexcept {
 	for (VisitedIndex = 0; VisitedIndex < RegionCount; VisitedIndex++) {
-		if (!VisitedRegions[VisitedIndex])
-			return 1;
+		if (!visitedRegions[VisitedIndex])
+			return true;
 	}
-	return 0;
+	return false;
 }
 
 void rspnt(float xCoordinate, float yCoordinate) noexcept {
@@ -3185,14 +3171,14 @@ void brkdun(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish
 	StateMap.set(StateFlag::BRKFIX);
 }
 
-void durgn(std::vector<SMALPNTL*> &sortedLines, unsigned pthi, unsigned lineCount, std::vector<REGION> &regionsList) {
+void durgn(std::vector<FSEQ> &sequencePath, boost::dynamic_bitset<> &visitedRegions, std::vector<SMALPNTL*> &sortedLines, unsigned pthi, unsigned lineCount, std::vector<REGION> &regionsList) {
 	unsigned	dun = 0, gdif = 0, mindif = 0, iVertex = 0, ind = 0, fdif = 0, bdif = 0;
 	unsigned	seql = 0, seqn = 0;
 	unsigned	sequenceStart = 0;
 	unsigned	sequenceEnd = 0;
-	const unsigned	nextGroup = SequencePath[pthi].nextGroup;
+	const unsigned	nextGroup = sequencePath[pthi].nextGroup;
 	unsigned	groupStart = 0, groupEnd = 0;
-	unsigned	iRegion = SequencePath[pthi].node;
+	unsigned	iRegion = sequencePath[pthi].node;
 	double		length = 0.0, minimumLength = 0.0;
 	BSEQPNT*	bpnt = nullptr;
 	boost::dynamic_bitset<> sequenceMap(lineCount);
@@ -3201,7 +3187,7 @@ void durgn(std::vector<SMALPNTL*> &sortedLines, unsigned pthi, unsigned lineCoun
 	CurrentRegion = &regionsList[iRegion];
 	sequenceStart = CurrentRegion->start;
 	sequenceEnd = CurrentRegion->end;
-	if (SequencePath[pthi].skp || StateMap.testAndReset(StateFlag::BRKFIX)) {
+	if (sequencePath[pthi].skp || StateMap.testAndReset(StateFlag::BRKFIX)) {
 		if (BSequence[OutputIndex - 1].attribute != SEQBOT) {
 			rspnt(BSequence[OutputIndex - 2].x, BSequence[OutputIndex - 2].y);
 		}
@@ -3237,12 +3223,12 @@ void durgn(std::vector<SMALPNTL*> &sortedLines, unsigned pthi, unsigned lineCoun
 			rspnt(WorkingFormVertices[ind].x, WorkingFormVertices[ind].y);
 		}
 	}
-	if (VisitedRegions[iRegion]) {
+	if (visitedRegions[iRegion]) {
 		dun = 1;
 	}
 	else {
 		dun = 0;
-		VisitedRegions[iRegion]++;
+		visitedRegions.set(iRegion);
 	}
 	groupStart = sortedLines[CurrentRegion->start]->group;
 	groupEnd = sortedLines[CurrentRegion->end]->group;
@@ -3379,19 +3365,19 @@ void durgn(std::vector<SMALPNTL*> &sortedLines, unsigned pthi, unsigned lineCoun
 	}
 }
 
-unsigned notdun(unsigned level) noexcept {
+unsigned notdun(std::vector<RGSEQ> &tempPath, std::vector<RCON> &pathMap, std::vector<unsigned> &MapIndexSequence, boost::dynamic_bitset<> &VisitedRegions, unsigned level) noexcept {
 	unsigned	iPath = 1;
 	int			pivot = 0;
 	int			previousLevel = level - 1;
 
-	RegionPath = &TempPath[SequencePathIndex];
+	RegionPath = &tempPath[SequencePathIndex];
 	RegionPath[0].pcon = MapIndexSequence[DoneRegion];
 	RegionPath[0].count = MapIndexSequence[DoneRegion + 1] - RegionPath[0].pcon;
 	for (iPath = 1; iPath < level; iPath++) {
-		RegionPath[iPath].pcon = MapIndexSequence[PathMap[RegionPath[iPath - 1].pcon].node];
-		RegionPath[iPath].count = MapIndexSequence[PathMap[RegionPath[iPath - 1].pcon].node + 1] - RegionPath[iPath].pcon;
+		RegionPath[iPath].pcon = MapIndexSequence[pathMap[RegionPath[iPath - 1].pcon].node];
+		RegionPath[iPath].count = MapIndexSequence[pathMap[RegionPath[iPath - 1].pcon].node + 1] - RegionPath[iPath].pcon;
 	}
-	while (VisitedRegions[PathMap[RegionPath[previousLevel].pcon].node] && previousLevel >= 0) {
+	while (VisitedRegions[pathMap[RegionPath[previousLevel].pcon].node] && previousLevel >= 0) {
 		if (--RegionPath[previousLevel].count > 0) {
 			RegionPath[previousLevel].pcon++;
 		}
@@ -3411,8 +3397,8 @@ unsigned notdun(unsigned level) noexcept {
 			pivot++;
 			while (pivot <= previousLevel) {
 				if (pivot) {
-					RegionPath[pivot].pcon = MapIndexSequence[PathMap[RegionPath[pivot - 1].pcon].node];
-					RegionPath[pivot].count = MapIndexSequence[PathMap[RegionPath[pivot - 1].pcon].node + 1] - RegionPath[pivot].pcon;
+					RegionPath[pivot].pcon = MapIndexSequence[pathMap[RegionPath[pivot - 1].pcon].node];
+					RegionPath[pivot].count = MapIndexSequence[pathMap[RegionPath[pivot - 1].pcon].node + 1] - RegionPath[pivot].pcon;
 				}
 				else {
 					if (--RegionPath[0].count) {
@@ -3449,14 +3435,14 @@ double reglen(std::vector<SMALPNTL*> &sortedLines, unsigned iRegion, std::array<
 	return minimumLength;
 }
 
-void nxtrgn(std::vector<SMALPNTL*> &sortedLines, std::vector<REGION> &regionsList) noexcept {
+void nxtrgn(std::vector<RGSEQ> &tempPath, std::vector<RCON> &pathMap, std::vector<unsigned> &mapIndexSequence, boost::dynamic_bitset<> &visitedRegions, std::vector<SMALPNTL*> &sortedLines, std::vector<REGION> &regionsList) noexcept {
 	unsigned	iRegion = 0, iPath = 0, newRegion = 0;
 	double		length = 0, minimumLength = 1e99;
 	unsigned	pathLength = 1;				//length of the path to the region
 
 	std::array<fPOINT, 4> lastRegionCorners = {};	//corners of last region sequenced
 
-	while (notdun(pathLength)) {
+	while (notdun(tempPath, pathMap, mapIndexSequence, visitedRegions, pathLength)) {
 		pathLength++;
 		if (pathLength > 8) {
 			SMALPNTL* lineEndPoint = sortedLines[regionsList[DoneRegion].start];
@@ -3475,7 +3461,7 @@ void nxtrgn(std::vector<SMALPNTL*> &sortedLines, std::vector<REGION> &regionsLis
 			}
 			newRegion = 0;
 			for (iRegion = 0; iRegion < RegionCount; iRegion++) {
-				if (!VisitedRegions[iRegion]) {
+				if (!visitedRegions[iRegion]) {
 					length = reglen(sortedLines, iRegion, lastRegionCorners, regionsList);
 					if (length < minimumLength) {
 						minimumLength = length;
@@ -3483,28 +3469,28 @@ void nxtrgn(std::vector<SMALPNTL*> &sortedLines, std::vector<REGION> &regionsLis
 					}
 				}
 			}
-			TempPath[SequencePathIndex].skp = 1;
+			tempPath[SequencePathIndex].skp = true;
 			for (iPath = 0; iPath < PathMapIndex; iPath++) {
-				if (PathMap[iPath].node == newRegion) {
-					TempPath[SequencePathIndex++].pcon = iPath;
-					VisitedRegions[newRegion] = 1;
+				if (pathMap[iPath].node == newRegion) {
+					tempPath[SequencePathIndex++].pcon = iPath;
+					visitedRegions.set(newRegion);
 					DoneRegion = newRegion;
 					return;
 				}
 			}
-			TempPath[SequencePathIndex].count = VisitedIndex;
-			TempPath[SequencePathIndex++].pcon = 0xffffffff;
-			VisitedRegions[VisitedIndex] = 1;
+			tempPath[SequencePathIndex].count = VisitedIndex;
+			tempPath[SequencePathIndex++].pcon = 0xffffffff;
+			visitedRegions.set(VisitedIndex);
 			DoneRegion = VisitedIndex;
 			return;
 		}
 	}
 	for (iPath = 0; iPath < pathLength; iPath++) {
-		TempPath[SequencePathIndex].skp = 0;
-		TempPath[SequencePathIndex++].pcon = RegionPath[iPath].pcon;
-		VisitedRegions[PathMap[RegionPath[iPath].pcon].node] = 1;
+		tempPath[SequencePathIndex].skp = false;
+		tempPath[SequencePathIndex++].pcon = RegionPath[iPath].pcon;
+		visitedRegions.set(pathMap[RegionPath[iPath].pcon].node);
 	}
-	DoneRegion = PathMap[RegionPath[iPath - 1].pcon].node;
+	DoneRegion = pathMap[RegionPath[iPath - 1].pcon].node;
 }
 
 bool sqcomp(const SMALPNTL *arg1, const SMALPNTL *arg2) noexcept {
@@ -3532,21 +3518,23 @@ bool sqcomp(const SMALPNTL *arg1, const SMALPNTL *arg2) noexcept {
 	return false;
 }
 
-void nxtseq(unsigned pathIndex) noexcept {
-	const unsigned	nextNode = SequencePath[pathIndex + 1].node;
-	unsigned	iPath = MapIndexSequence[SequencePath[pathIndex].node];
-
-	while (iPath < MapIndexSequence[SequencePath[pathIndex].node + 1] && PathMap[iPath].node != nextNode) {
+void nxtseq(std::vector<FSEQ> &sequencePath, std::vector<RCON> &pathMap, std::vector<unsigned> &mapIndexSequence, unsigned pathIndex) noexcept {
+	unsigned	iPath = mapIndexSequence[sequencePath[pathIndex].node];
+	unsigned	nextNode = 0;
+	if ((pathIndex + 1) < sequencePath.size()) {
+		nextNode = sequencePath[pathIndex + 1].node;
+	}
+	while (iPath < mapIndexSequence[sequencePath[pathIndex].node + 1] && pathMap[iPath].node != nextNode) {
 		iPath++;
 	}
-	SequencePath[PathIndex++].nextGroup = PathMap[iPath].nextGroup;
+	sequencePath[PathIndex++].nextGroup = pathMap[iPath].nextGroup;
 }
 
 #define BUGSEQ 0
 
-void lcon() {
+void lcon(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints) {
 	unsigned		iPath = 0, iLine = 0, iRegion = 0, iSequence = 0, iNode = 0;
-	unsigned		leftRegion = 0, iOutPath = 0, breakLine = 0, count = 0, startGroup = 0;
+	unsigned		leftRegion = 0, breakLine = 0, count = 0, startGroup = 0;
 	bool			isConnected = false;
 	SMALPNTL*		lineGroupPoint = nullptr;
 	unsigned		iStartLine = 0;
@@ -3561,7 +3549,7 @@ void lcon() {
 		std::vector<SMALPNTL*> sortedLines;
 		sortedLines.reserve(StitchLineCount >> 1);
 		for (iLine = 0; iLine < StitchLineCount; iLine += 2) {
-			sortedLines.push_back(&LineEndpoints[iLine]);
+			sortedLines.push_back(&lineEndpoints[iLine]);
 		}
 		std::sort(sortedLines.begin(), sortedLines.end(), sqcomp);
 		lineCount = sortedLines.size();
@@ -3579,7 +3567,7 @@ void lcon() {
 		}
 		regions[RegionCount++].end = iLine - 1;
 		std::vector<REGION> RegionsList(RegionCount);
-		VisitedRegions = new char[RegionCount]();
+		boost::dynamic_bitset<> visitedRegions(RegionCount);
 		for (iRegion = 0; iRegion < RegionCount; iRegion++) {
 			RegionsList[iRegion].start = regions[iRegion].start;
 			RegionsList[iRegion].end = regions[iRegion].end;
@@ -3603,9 +3591,6 @@ void lcon() {
 			}
 			RegionsList[iRegion].breakCount = count;
 		}
-		// use the number of possible pairs of nodes n(n - 1)/2 and account for RegionCount possibly being odd
-		std::vector<RCON> tempPathMap(((RegionCount * (RegionCount - 1)) / 2) + 2);
-		MapIndexSequence = new unsigned[RegionCount + 1]();
 
 #if BUGSEQ
 		bugColor = 0; SequenceIndex = 0;
@@ -3627,18 +3612,24 @@ void lcon() {
 #endif
 		OutputIndex = 0;
 
+		std::vector<unsigned> mapIndexSequence;
+		mapIndexSequence.reserve(RegionCount + 1);
+		std::vector<RCON> pathMap;
+		std::vector<FSEQ> sequencePath;
+
 		if (RegionCount > 1) {
 			PathMapIndex = 0;
+			// use the number of possible pairs of nodes n(n - 1)/2 and account for RegionCount possibly being odd
+			pathMap.reserve(((RegionCount * (RegionCount - 1)) / 2) + 2);
 			for (iSequence = 0; iSequence < RegionCount; iSequence++) {
-				MapIndexSequence[iSequence] = PathMapIndex;
+				mapIndexSequence.push_back(PathMapIndex);
 				count = 0; GapToClosestRegion = 0;
 				for (iNode = 0; iNode < RegionCount; iNode++) {
 					if (iSequence != iNode) {
-						isConnected = regclos(sortedLines, iSequence, iNode, RegionsList);
+						isConnected = regclos(groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, RegionsList);
 						if (isConnected) {
-							tempPathMap[PathMapIndex].isConnected = isConnected;
-							tempPathMap[PathMapIndex].nextGroup = NextGroup;
-							tempPathMap[PathMapIndex++].node = iNode;
+							pathMap.push_back({iNode, isConnected, NextGroup});
+							PathMapIndex++;
 							count++;
 						}
 					}
@@ -3648,24 +3639,17 @@ void lcon() {
 					count = 0;
 					for (iNode = 0; iNode < RegionCount; iNode++) {
 						if (iSequence != iNode) {
-							isConnected = regclos(sortedLines, iSequence, iNode, RegionsList);
+							isConnected = regclos(groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, RegionsList);
 							if (isConnected) {
-								tempPathMap[PathMapIndex].isConnected = isConnected;
-								tempPathMap[PathMapIndex].nextGroup = NextGroup;
-								tempPathMap[PathMapIndex++].node = iNode;
+								pathMap.push_back({iNode, isConnected, NextGroup });
+								PathMapIndex++;
 								count++;
 							}
 						}
 					}
 				}
 			}
-			MapIndexSequence[iSequence] = PathMapIndex;
-			PathMap = new RCON[PathMapIndex + 1]();
-			for (iPath = 0; iPath < PathMapIndex; iPath++) {
-				PathMap[iPath].isConnected = tempPathMap[iPath].isConnected;
-				PathMap[iPath].node = tempPathMap[iPath].node;
-				PathMap[iPath].nextGroup = tempPathMap[iPath].nextGroup;
-			}
+			mapIndexSequence.push_back(PathMapIndex);
 			//find the leftmost region
 			startGroup = 0xffffffff; leftRegion = 0;
 			for (iRegion = 0; iRegion < RegionCount; iRegion++) {
@@ -3676,83 +3660,75 @@ void lcon() {
 				}
 			}
 			OutputIndex = 0;
-			TempPath = new RGSEQ[((RegionCount * (RegionCount - 1)) / 2) + 1]();
+			std::vector<RGSEQ> tempPath(((RegionCount * (RegionCount - 1)) / 2) + 1);
 
-			//find the leftmost region in PathMap
+			//find the leftmost region in pathMap
 			SequencePathIndex = 1;
 			bool dontSkip = true;
 			for (iPath = 0; iPath < PathMapIndex; iPath++) {
-				if (PathMap[iPath].node == leftRegion) {
+				if (pathMap[iPath].node == leftRegion) {
 					dontSkip = false;
 					break;
 				}
 			}
 			if (dontSkip) {
-				PathMap[PathMapIndex].node = leftRegion;
-				PathMap[PathMapIndex].nextGroup = 0;
+				pathMap[PathMapIndex].node = leftRegion;
+				pathMap[PathMapIndex].nextGroup = 0;
 				iPath = PathMapIndex;
 			}
 			//set the first entry in the temporary path to the leftmost region
-			TempPath[0].pcon = iPath;
-			TempPath[0].count = 1;
-			TempPath[0].skp = 0;
-			VisitedRegions[leftRegion] = 1;
+			tempPath[0].pcon = iPath;
+			tempPath[0].count = 1;
+			tempPath[0].skp = false;
+			visitedRegions.set(leftRegion);
 			DoneRegion = leftRegion;
-			while (unvis()) {
-				nxtrgn(sortedLines, RegionsList);
+			while (unvis(visitedRegions)) {
+				nxtrgn(tempPath, pathMap, mapIndexSequence, visitedRegions, sortedLines, RegionsList);
 			}
-			iOutPath = 0;
 			count = 0xffffffff;
-			SequencePath = new FSEQ[((RegionCount * (RegionCount - 1)) / 2) + 1]();
+			sequencePath.reserve(SequencePathIndex);
 			for (iPath = 0; iPath < SequencePathIndex; iPath++) {
-				SequencePath[iOutPath].skp = TempPath[iPath].skp;
-				if (TempPath[iPath].pcon == 0xffffffff) {
-					SequencePath[iOutPath++].node = TempPath[iPath].count;
-					count = TempPath[iPath].count;
+				bool tmpSkip = tempPath[iPath].skp;
+				unsigned short tmpNode = 0;
+				if (tempPath[iPath].pcon == 0xffffffff) {
+					tmpNode = tempPath[iPath].count;
+					count = tempPath[iPath].count;
 				}
 				else {
-					if (TempPath[iPath].pcon != count) {
-						count = TempPath[iPath].pcon;
-						SequencePath[iOutPath++].node = PathMap[TempPath[iPath].pcon].node;
+					if (tempPath[iPath].pcon != count) {
+						count = tempPath[iPath].pcon;
+						tmpNode = pathMap[tempPath[iPath].pcon].node;
 					}
 				}
+				sequencePath.push_back({ tmpNode, 0, tmpSkip });
 			}
-			delete[] TempPath;
 			PathIndex = 0;
-			for (iPath = 0; iPath < SequencePathIndex; iPath++)
-				nxtseq(iPath);
-			for (iRegion = 0; iRegion < RegionCount; iRegion++)
-				VisitedRegions[iRegion] = 0;
+			for (iPath = 0; iPath < SequencePathIndex; iPath++) {
+				nxtseq(sequencePath, pathMap, mapIndexSequence, iPath);
+			}
+			visitedRegions.reset();
 			LastGroup = 0;
 			for (iPath = 0; iPath < PathIndex; iPath++) {
-				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "iterator %d,vrt %d,grpn %d\n", iPath, PathMap[iPath].node, PathMap[iPath].nextGroup);
+				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "iterator %d,vrt %d,grpn %d\n", iPath, pathMap[iPath].node, pathMap[iPath].nextGroup);
 				OutputDebugString(MsgBuffer);
-				if (!unvis())
+				if (!unvis(visitedRegions))
 					break;
-				durgn(sortedLines, iPath, lineCount, RegionsList);
+				durgn(sequencePath, visitedRegions, sortedLines, iPath, lineCount, RegionsList);
 			}
 		}
 		else {
-			PathMap = new RCON[1]();
-			SequencePath = new FSEQ[1]();
+			sequencePath.resize(1);
 			LastGroup = 0;
-			SequencePath[0].node = 0;
-			SequencePath[0].nextGroup = sortedLines[RegionsList[0].end]->group;
-			SequencePath[0].skp = 0;
-			durgn(sortedLines, 0, lineCount, RegionsList);
+			sequencePath[0].node = 0;
+			sequencePath[0].nextGroup = sortedLines[RegionsList[0].end]->group;
+			sequencePath[0].skp = false;
+			durgn(sequencePath, visitedRegions, sortedLines, 0, lineCount, RegionsList);
 		}
-		//skip:;
 
 #if BUGSEQ
 
 		seqskip : ;
 #endif
-				  delete[] SequencePath;
-				  delete[] LineEndpoints;
-				  delete[] MapIndexSequence;
-				  delete[] VisitedRegions;
-				  delete[] PathMap;
-				  delete[] GroupIndexSequence;
 	}
 }
 
