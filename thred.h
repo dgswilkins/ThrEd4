@@ -1204,10 +1204,10 @@ typedef struct _dstrec {	//dst stitch record
 }DSTREC;
 
 typedef struct _smalpntl {
-	unsigned short	line;	//line and group must remain in this order for sort to work
-	unsigned short	group;
-	float			x;
-	float			y;
+	unsigned	line;	//line and group must remain in this order for sort to work
+	unsigned	group;
+	double		x;
+	double		y;
 }SMALPNTL;
 
 typedef struct _pcstch {
@@ -1267,21 +1267,21 @@ typedef struct _region {	//region for sequencing vertical fills
 }REGION;
 
 typedef struct _rcon {		//PathMap: path map for sequencing
-	unsigned	short	node;
+	unsigned	node;
 	bool		isConnected;
-	unsigned	short	nextGroup;
+	unsigned	nextGroup;
 }RCON;
 
 typedef struct _rgseq {		//TempPath: temporary path connections
 	unsigned	pcon;		//pointer to PathMap entry
 	int			count;
-	TCHAR		skp;		//path not found
+	bool		skp;		//path not found
 }RGSEQ;
 
 typedef struct _fseq {		//SequencePath: path of sequenced regions
 	unsigned short	node;
 	unsigned short	nextGroup;
-	TCHAR			skp;	//path not found
+	bool			skp;	//path not found
 }FSEQ;
 
 #define SEQTOP 2
