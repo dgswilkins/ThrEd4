@@ -3523,11 +3523,14 @@ void nxtseq(std::vector<FSEQ> &sequencePath, std::vector<RCON> &pathMap, std::ve
 	unsigned	nextNode = 0;
 	if ((pathIndex + 1) < sequencePath.size()) {
 		nextNode = sequencePath[pathIndex + 1].node;
+		while (iPath < mapIndexSequence[sequencePath[pathIndex].node + 1] && pathMap[iPath].node != nextNode) {
+			iPath++;
+		}
+		sequencePath[PathIndex++].nextGroup = pathMap[iPath].nextGroup;
 	}
-	while (iPath < mapIndexSequence[sequencePath[pathIndex].node + 1] && pathMap[iPath].node != nextNode) {
-		iPath++;
+	else {
+		sequencePath[PathIndex++].nextGroup = 0;
 	}
-	sequencePath[PathIndex++].nextGroup = pathMap[iPath].nextGroup;
 }
 
 #define BUGSEQ 0
