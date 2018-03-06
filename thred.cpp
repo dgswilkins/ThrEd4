@@ -14888,7 +14888,7 @@ unsigned chkMsg() {
 						StateMap.set(StateFlag::RESTCH);
 						return 1;
 					}
-					if (Msg.hwnd == SideWindow[1]) {
+					if (Msg.hwnd == SideWindow[1]) { //vertical fill
 						savdo();
 						SelectedForm->type = FRMFPOLY;
 						if (SelectedForm->fillType) {
@@ -14904,7 +14904,7 @@ unsigned chkMsg() {
 							return 1;
 						}
 					}
-					if (Msg.hwnd == SideWindow[2]) {
+					if (Msg.hwnd == SideWindow[2]) { //horizontal fill
 						SelectedForm->type = FRMFPOLY;
 						if (SelectedForm->fillType) {
 							respac();
@@ -14918,7 +14918,7 @@ unsigned chkMsg() {
 							return 1;
 						}
 					}
-					if (Msg.hwnd == SideWindow[3]) {
+					if (Msg.hwnd == SideWindow[3]) { //angle fill
 						SelectedForm->type = FRMFPOLY;
 						if (SelectedForm->fillType) {
 							respac();
@@ -14933,7 +14933,7 @@ unsigned chkMsg() {
 							return 1;
 						}
 					}
-					if (Msg.hwnd == SideWindow[4]) {
+					if (Msg.hwnd == SideWindow[4]) { //fan fill
 						SelectedForm->type = SAT;
 						if (SelectedForm->fillType) {
 							respac();
@@ -14955,7 +14955,7 @@ unsigned chkMsg() {
 						clpfil();
 						return 1;
 					}
-					if (Msg.hwnd == SideWindow[6]) {
+					if (Msg.hwnd == SideWindow[6]) { // contour fill
 						if (SelectedForm->fillType) {
 							if (SelectedForm->fillType == CLPF)
 								SelectedForm->fillSpacing = LineSpacing;
@@ -14999,7 +14999,7 @@ unsigned chkMsg() {
 						StateMap.set(StateFlag::RESTCH);
 						return 1;
 					}
-					if (Msg.hwnd == SideWindow[10]) {
+					if (Msg.hwnd == SideWindow[10]) { //feather fill
 						unmsg();
 						unsid();
 						if (SelectedForm->fillType == FTHF) {
