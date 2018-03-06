@@ -14879,7 +14879,7 @@ unsigned chkMsg() {
 						SelectedForm->edgeType |= EGUND;
 				}
 				do {
-					if (Msg.hwnd == SideWindow[0]) {
+					if (Msg.hwnd == SideWindow[0]) { // none
 						SelectedForm->type = FRMFPOLY;
 						delmfil();
 						SelectedForm->fillType = 0;
@@ -14948,7 +14948,7 @@ unsigned chkMsg() {
 							return 1;
 						}
 					}
-					if (Msg.hwnd == SideWindow[5]) {
+					if (Msg.hwnd == SideWindow[5]) { // fan clip
 						SelectedForm->type = SAT;
 						unmsg();
 						unsid();
@@ -14969,7 +14969,7 @@ unsigned chkMsg() {
 							return 1;
 						}
 					}
-					if (Msg.hwnd == SideWindow[7]) {
+					if (Msg.hwnd == SideWindow[7]) { // vertical clip
 						unmsg();
 						unsid();
 						if (sidclp())
@@ -14979,7 +14979,7 @@ unsigned chkMsg() {
 						StateMap.set(StateFlag::RESTCH);
 						return 1;
 					}
-					if (Msg.hwnd == SideWindow[8]) {
+					if (Msg.hwnd == SideWindow[8]) { // horizontal clip
 						unmsg();
 						unsid();
 						if (sidclp())
@@ -14989,7 +14989,7 @@ unsigned chkMsg() {
 						StateMap.set(StateFlag::RESTCH);
 						return 1;
 					}
-					if (Msg.hwnd == SideWindow[9]) {
+					if (Msg.hwnd == SideWindow[9]) { // angle clip
 						unmsg();
 						unsid();
 						if (sidclp())
