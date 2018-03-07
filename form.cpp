@@ -213,7 +213,7 @@ void			chnfn ();
 bool			cisin(float xCoordinate, float yCoordinate) noexcept;
 void			clpbrd(unsigned short startVertex);
 void			clpcon ();
-void			clpic(unsigned short start);
+void			clpic();
 void			clpout ();
 void			clpxadj () noexcept;
 void			contf ();
@@ -2134,7 +2134,7 @@ void chkbrd() {
 		case EDGEPICOT: // Picot
 
 			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
-			clpic(0);
+			clpic();
 			break;
 
 		case EDGEDOUBLE: // Double
@@ -2490,7 +2490,7 @@ void refilfn() {
 			SequenceIndex = 0;
 			length = ButtonholeCornerLength;
 			ButtonholeCornerLength = getplen();
-			clpic(0);
+			clpic();
 			ButtonholeCornerLength = length;
 			ritbrd();
 			break;
@@ -9759,7 +9759,8 @@ void picfn(std::vector<fPOINT> clipFillData, unsigned start, unsigned finish, do
 	}
 }
 
-void clpic(unsigned short start) {
+void clpic() {
+	unsigned short start = 0;
 	unsigned	iVertex = 0;
 	unsigned	currentVertex = start, nextVertex = 0;
 
