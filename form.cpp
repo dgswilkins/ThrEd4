@@ -203,38 +203,37 @@ void			angclpfn ();
 void			angsclp ();
 void			apbrd ();
 void			bakseq ();
-void			bdrlin (unsigned strt, unsigned fin, double pd_Size);
-void			bhbrd (double spac);
-void			blbrd (double spac);
-void			bold (double pd_Size) noexcept;
+void			bdrlin(unsigned start, unsigned finish, double stitchSize);
+void			bhbrd(double spacing);
+void			blbrd (double spacing);
+void			bold (double size) noexcept;
 void			brdfil (double pd_Size);
 void			chan ();
 void			chnfn ();
-bool			cisin (float pntx, float pnty) noexcept;
-void			clpbrd (unsigned short slin);
+bool			cisin(float xCoordinate, float yCoordinate) noexcept;
+void			clpbrd(unsigned short startVertex);
 void			clpcon ();
-void			clpic (unsigned short strtlin);
+void			clpic(unsigned short start);
 void			clpout ();
 void			clpxadj () noexcept;
-void			clRmap (unsigned len) noexcept;
 void			contf ();
-void			deleclp (unsigned ind);
-void			delmclp (unsigned ind);
+void			deleclp (unsigned iForm);
+void			delmclp (unsigned iForm);
 void			duangs () noexcept;
 void			dubfn ();
-void			dufcntr (dPOINT* cntr) noexcept;
+void			dufcntr (dPOINT* center) noexcept;
 void			dulast () noexcept;
 void			dufxlen ();
-void			duhart (unsigned nsids);
-void			durpoli (unsigned nsids);
+void			duhart (unsigned sideCount);
+void			durpoli (unsigned vertexCount);
 void			duxclp ();
 void			filinsb (dPOINT point) noexcept;
 void			filvrt ();
 void			flipv ();
 void			fmclp ();
 void			frmpnts (unsigned typ) noexcept;
-void			frmsqr (unsigned ind);
-void			fvars (unsigned ind) noexcept;
+void			frmsqr (unsigned iVertex);
+void			fvars (unsigned iForm) noexcept;
 void			horclpfn ();
 void			horsclp ();
 bool			iseclp (unsigned find);
@@ -244,18 +243,18 @@ void			lcon(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &li
 constexpr unsigned	nxt (unsigned int iVertex);
 void			oclp (const fPOINT* clip, unsigned clipEntries);
 void			pbrd (double spac);
-void			plbrd (double spac);
-void			prpbrd (double spac);
+void			plbrd (double edgeSpacing);
+void			prpbrd (double borderStitchSpacing);
 constexpr unsigned	prv (unsigned iVertex);
 unsigned		psg () noexcept;
-void			rotfrm (unsigned nu0);
+void			rotfrm (unsigned newStartVertex);
 void			satfil ();
-void			satout (double satwid);
+void			satout (double satinWidth);
 void			sbrd ();
 void			selal ();
 void			setr (unsigned pbit) noexcept;
 void			slbrd ();
-void			sRct2px (fRECTANGLE strct, RECT* pxrct) noexcept;
+void			sRct2px (fRECTANGLE stitchRect, RECT* screenRect) noexcept;
 void			uncon ();
 void			uninsf ();
 void		wavfrm ();
@@ -285,7 +284,6 @@ FRMHED			FormList[MAXFORMS];		//a list of form headers
 unsigned		FormIndex = 0;			//index into the list of forms
 double			LineSpacing = DEFSPACE * PFGRAN;//stitch spacing in stitch units
 fPOINT*			CurrentFillVertices;	//pointer to the line of the polygon being filled
-fPOINT*			ClipFillData;			//data for clipboard fills
 fPOINT*			ClipReversedData;		//data for clipboard fills
 unsigned		StitchLineCount;		//count of stitch lines
 unsigned		ActivePointIndex;		//pointer to the active form in the sequencing algorithm
@@ -5478,7 +5476,7 @@ void bord() {
 	}
 }
 
-bool ritclp(fPOINT point) noexcept {
+bool ritclp(std::vector<fPOINT> clipFillData, fPOINT point) noexcept {
 	fPOINT		adjustedPoint = { (point.x - ClipReference.x),
 								  (point.y - ClipReference.y) };
 	unsigned	iStitch = 0;
@@ -5486,13 +5484,13 @@ bool ritclp(fPOINT point) noexcept {
 	if (chkmax(ClipStitchCount, SequenceIndex))
 		return 1;
 	for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
-		OSequence[SequenceIndex].x = ClipFillData[iStitch].x + adjustedPoint.x;
-		OSequence[SequenceIndex++].y = ClipFillData[iStitch].y + adjustedPoint.y;
+		OSequence[SequenceIndex].x = clipFillData[iStitch].x + adjustedPoint.x;
+		OSequence[SequenceIndex++].y = clipFillData[iStitch].y + adjustedPoint.y;
 	}
 	return 0;
 }
 
-bool clpsid(unsigned start, unsigned finish) {
+bool clpsid(std::vector<fPOINT> clipFillData, unsigned start, unsigned finish) {
 	unsigned	ind = 0, clipCount = 0;
 	fPOINT		delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
 						  (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
@@ -5515,9 +5513,9 @@ bool clpsid(unsigned start, unsigned finish) {
 		insertPoint.y = CurrentFormVertices[start].y;
 		RotationAngle = atan2(delta.y, delta.x);
 		for (ind = 0; ind < ClipStitchCount; ind++)
-			rotangf(ClipReversedData[ind], &ClipFillData[ind]);
+			rotangf(ClipReversedData[ind], &clipFillData[ind]);
 		for (ind = 0; ind < clipCount; ind++) {
-			if (ritclp(insertPoint))
+			if (ritclp(clipFillData, insertPoint))
 				break;
 			insertPoint.x += step.x;
 			insertPoint.y += step.y;
@@ -5527,7 +5525,7 @@ bool clpsid(unsigned start, unsigned finish) {
 	return 0;
 }
 
-void linsid() {
+void linsid(std::vector<fPOINT> clipFillData) {
 	fPOINT		delta = { (CurrentFormVertices[CurrentSide + 1].x - SelectedPoint.x),
 						  (CurrentFormVertices[CurrentSide + 1].y - SelectedPoint.y) };
 	const double	length = hypot(delta.x, delta.y);
@@ -5538,9 +5536,9 @@ void linsid() {
 		RotationAngle = ClipAngle;
 		rotangf(BorderClipReference, &ClipReference);
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotangf(ClipReversedData[iStitch], &ClipFillData[iStitch]);
+			rotangf(ClipReversedData[iStitch], &clipFillData[iStitch]);
 		for (iClip = 0; iClip < clipCount; iClip++) {
-			ritclp(SelectedPoint);
+			ritclp(clipFillData, SelectedPoint);
 			SelectedPoint.x += Vector0.x;
 			SelectedPoint.y += Vector0.y;
 		}
@@ -5568,7 +5566,7 @@ bool nupnt() noexcept {
 	return 0;
 }
 
-void lincrnr() {
+void lincrnr(std::vector<fPOINT> clipFillData) {
 	dPOINT		delta = {};
 	unsigned	iStitch = 0;
 
@@ -5580,8 +5578,8 @@ void lincrnr() {
 		RotationAngle = atan2(delta.y, delta.x);
 		rotangf(BorderClipReference, &ClipReference);
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotangf(ClipReversedData[iStitch], &ClipFillData[iStitch]);
-		ritclp(SelectedPoint);
+			rotangf(ClipReversedData[iStitch], &clipFillData[iStitch]);
+		ritclp(clipFillData, SelectedPoint);
 		SelectedPoint.x = MoveToCoords.x;
 		SelectedPoint.y = MoveToCoords.y;
 	}
@@ -5619,7 +5617,7 @@ void clpbrd(unsigned short startVertex) {
 	StateMap.reset(StateFlag::CLPBAK);
 	HorizontalLength2 = ClipRectSize.cx / 2;
 	HorizontalLength = ClipRectSize.cx;
-	ClipFillData = new fPOINT[ClipStitchCount];
+	std::vector<fPOINT> clipFillData(ClipStitchCount);
 	ClipReversedData = new fPOINT[ClipStitchCount];
 	RotationCenter.x = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
 	ClipReference.y = RotationCenter.y = (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom;
@@ -5636,23 +5634,22 @@ void clpbrd(unsigned short startVertex) {
 		BorderClipReference.x = 0;
 		// BorderClipReference.x = ClipRect.right / 2;
 		for (CurrentSide = 0; CurrentSide < VertexCount - 2; CurrentSide++) {
-			linsid();
+			linsid(clipFillData);
 			setvct(CurrentSide + 1, CurrentSide + 2);
-			lincrnr();
+			lincrnr(clipFillData);
 		}
-		linsid();
+		linsid(clipFillData);
 	}
 	else {
 		clpout();
 		reference = currentVertex = startVertex;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 			nextVertex = prv(currentVertex);
-			if (clpsid(reference, nextVertex))
+			if (clpsid(clipFillData, reference, nextVertex))
 				reference = nextVertex;
 			currentVertex = nextVertex;
 		}
 	}
-	delete[] ClipFillData;
 	delete[] ClipReversedData;
 }
 
@@ -9650,7 +9647,7 @@ void boxsel() {
 	}
 }
 
-void clpcrnr(unsigned vertex) {
+void clpcrnr(std::vector<fPOINT> clipFillData, unsigned vertex) {
 	const unsigned	nextVertex = nxt(vertex);
 	unsigned	iStitch = 0;
 	dPOINT		delta = {}, point = {};
@@ -9669,7 +9666,7 @@ void clpcrnr(unsigned vertex) {
 	RotationAngle = atan2(delta.y, delta.x) + PI / 2;
 	rotang1(referencePoint, &ClipReference);
 	for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-		rotang1(ClipBuffer[iStitch], &ClipFillData[iStitch]);
+		rotang1(ClipBuffer[iStitch], &clipFillData[iStitch]);
 	length = hypot(delta.x, delta.y);
 	ratio = getplen() / length;
 	delta.x *= ratio;
@@ -9686,7 +9683,7 @@ void clpcrnr(unsigned vertex) {
 	OSequence[SequenceIndex++].y = point.y;
 	tpnt.x = static_cast<float>(point.x);
 	tpnt.y = static_cast<float>(point.y);
-	if (!ritclp(tpnt)) {
+	if (!ritclp(clipFillData, tpnt)) {
 		OSequence[SequenceIndex].x = point.x;
 		OSequence[SequenceIndex++].y = point.y;
 		OSequence[SequenceIndex].x = CurrentFormVertices[nextVertex].x;
@@ -9694,7 +9691,7 @@ void clpcrnr(unsigned vertex) {
 	}
 }
 
-void picfn(unsigned start, unsigned finish, double spacing) {
+void picfn(std::vector<fPOINT> clipFillData, unsigned start, unsigned finish, double spacing) {
 	dPOINT		delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
 						  (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
 	const double	length = hypot(delta.x, delta.y);
@@ -9721,7 +9718,7 @@ void picfn(unsigned start, unsigned finish, double spacing) {
 			step.y = delta.y*tdub;
 		}
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotang1(ClipBuffer[iStitch], &ClipFillData[iStitch]);
+			rotang1(ClipBuffer[iStitch], &clipFillData[iStitch]);
 		bool flag = true;
 		for (iStep = 0; iStep < count - 1; iStep++) {
 			firstPoint.x = innerPoint.x + step.x;
@@ -9742,7 +9739,7 @@ void picfn(unsigned start, unsigned finish, double spacing) {
 			OSequence[SequenceIndex++].y = outerPoint.y;
 			tpnt.x = static_cast<float>(outerPoint.x);
 			tpnt.y = static_cast<float>(outerPoint.y);
-			if (ritclp(tpnt)) {
+			if (ritclp(clipFillData, tpnt)) {
 				flag = false;
 				break;
 			}
@@ -9770,17 +9767,17 @@ void clpic(unsigned short start) {
 	StateMap.reset(StateFlag::CLPBAK);
 	HorizontalLength2 = ClipRectSize.cx / 2;
 	HorizontalLength = ClipRectSize.cx;
-	ClipFillData = new fPOINT[ClipStitchCount];
+	std::vector<fPOINT> clipFillData(ClipStitchCount);
 	RotationCenter.x = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
 	ClipReference.y = RotationCenter.y = (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom;
 	ClipReference.x = ClipRect.left;
 	satout(20);
 	if (SelectedForm->type == FRMLINE) {
 		for (iVertex = 0; iVertex < VertexCount - 2; iVertex++) {
-			picfn(iVertex, iVertex + 1, SelectedForm->edgeSpacing);
-			clpcrnr(iVertex);
+			picfn(clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing);
+			clpcrnr(clipFillData, iVertex);
 		}
-		picfn(iVertex, iVertex + 1, SelectedForm->edgeSpacing);
+		picfn(clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing);
 	}
 	else {
 		if (!SelectedForm->fillType) {
@@ -9790,14 +9787,13 @@ void clpic(unsigned short start) {
 		currentVertex = start;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 			nextVertex = nxt(currentVertex);
-			picfn(currentVertex, nextVertex, SelectedForm->edgeSpacing);
-			clpcrnr(currentVertex);
+			picfn(clipFillData, currentVertex, nextVertex, SelectedForm->edgeSpacing);
+			clpcrnr(clipFillData, currentVertex);
 			currentVertex = nextVertex;
 		}
 		OSequence[SequenceIndex].x = CurrentFormVertices[currentVertex].x;
 		OSequence[SequenceIndex++].y = CurrentFormVertices[currentVertex].y;
 	}
-	delete[] ClipFillData;
 }
 
 void fspic() {
