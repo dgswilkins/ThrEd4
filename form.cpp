@@ -9760,7 +9760,7 @@ void picfn(std::vector<fPOINT> clipFillData, unsigned start, unsigned finish, do
 }
 
 void clpic() {
-	unsigned short start = 0;
+	const unsigned short start = 0;
 	unsigned	iVertex = 0;
 	unsigned	currentVertex = start, nextVertex = 0;
 
