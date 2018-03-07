@@ -10961,7 +10961,7 @@ void defpref() {
 	IniFile.formBoxSizePixels = DEFBPIX;
 	IniFile.textureHeight = ITXHI;
 	IniFile.textureWidth = ITXWID;
-	IniFile.textureSpacing = (float)ITXSPAC;
+	IniFile.textureSpacing = static_cast<float>(ITXSPAC);
 }
 
 void dumrk(double xCoord, double yCoord) {

@@ -3032,7 +3032,7 @@ void dutxtfil() {
 	if (!IniFile.textureWidth)
 		IniFile.textureWidth = ITXWID;
 	if (!IniFile.textureSpacing)
-		IniFile.textureSpacing = (float)ITXSPAC;
+		IniFile.textureSpacing = static_cast<float>(ITXSPAC);
 	if (!IniFile.textureEditorSize)
 		IniFile.textureEditorSize = ITXPIX;
 	AngledForm.vertexCount = 0;
