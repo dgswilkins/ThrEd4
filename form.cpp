@@ -321,7 +321,6 @@ RECT			ValueWindowCoords;		//location of right windows in the form data sheet
 POINT			LabelWindowSize;		//size of the left windows in the form data sheet
 POINT			ValueWindowSize;		//size of the right windows in the form data sheet
 fPOINT			LowerLeftStitch;		//lower left formOrigin in a form
-VRCT2*			UnderlayVerticalRect;	//underlay fill points for vertical satin fill
 POINT			RubberBandLine[3];		//points to form points to be moved
 unsigned*		Xhistogram;				//x histogram for snap together
 double			SnapLength = SNPLEN * PFGRAN;	//snap together length
@@ -8089,11 +8088,11 @@ void spurfn(const dPOINT* innerPoint, const dPOINT* outerPoint, dPOINT* underlay
 	underlayOuterPoint->y = delta.y*DOURAT + innerPoint->y;
 }
 
-void spurct(std::vector<VRCT2> &fillVerticalRect, unsigned iRect) noexcept {
-	spurfn(&fillVerticalRect[iRect].aipnt, &fillVerticalRect[iRect].aopnt, &UnderlayVerticalRect[iRect].aipnt, &UnderlayVerticalRect[iRect].aopnt);
-	spurfn(&fillVerticalRect[iRect].bipnt, &fillVerticalRect[iRect].bopnt, &UnderlayVerticalRect[iRect].bipnt, &UnderlayVerticalRect[iRect].bopnt);
-	spurfn(&fillVerticalRect[iRect].cipnt, &fillVerticalRect[iRect].copnt, &UnderlayVerticalRect[iRect].cipnt, &UnderlayVerticalRect[iRect].copnt);
-	spurfn(&fillVerticalRect[iRect].dipnt, &fillVerticalRect[iRect].dopnt, &UnderlayVerticalRect[iRect].dipnt, &UnderlayVerticalRect[iRect].dopnt);
+void spurct(std::vector<VRCT2> &underlayVerticalRect, std::vector<VRCT2> &fillVerticalRect, unsigned iRect) noexcept {
+	spurfn(&fillVerticalRect[iRect].aipnt, &fillVerticalRect[iRect].aopnt, &underlayVerticalRect[iRect].aipnt, &underlayVerticalRect[iRect].aopnt);
+	spurfn(&fillVerticalRect[iRect].bipnt, &fillVerticalRect[iRect].bopnt, &underlayVerticalRect[iRect].bipnt, &underlayVerticalRect[iRect].bopnt);
+	spurfn(&fillVerticalRect[iRect].cipnt, &fillVerticalRect[iRect].copnt, &underlayVerticalRect[iRect].cipnt, &underlayVerticalRect[iRect].copnt);
+	spurfn(&fillVerticalRect[iRect].dipnt, &fillVerticalRect[iRect].dopnt, &underlayVerticalRect[iRect].dipnt, &underlayVerticalRect[iRect].dopnt);
 }
 
 unsigned psg() noexcept {
@@ -8210,47 +8209,47 @@ void spend(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish
 	}
 }
 
-void duspnd(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish) {
+void duspnd(std::vector<VRCT2> &underlayVerticalRect, std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish) {
 	double	length = 0.0, angle = 0.0;
 	dPOINT	point = {}, delta = {};
 
 	if (StateMap.test(StateFlag::UND)) {
 		if (StateMap.test(StateFlag::UNDPHAS)) {
-			filinsb(UnderlayVerticalRect[start].copnt);
-			filinsb(UnderlayVerticalRect[start].cipnt);
-			delta.x = UnderlayVerticalRect[finish].bipnt.x - UnderlayVerticalRect[start].cipnt.x;
-			delta.y = UnderlayVerticalRect[finish].bipnt.y - UnderlayVerticalRect[start].cipnt.y;
+			filinsb(underlayVerticalRect[start].copnt);
+			filinsb(underlayVerticalRect[start].cipnt);
+			delta.x = underlayVerticalRect[finish].bipnt.x - underlayVerticalRect[start].cipnt.x;
+			delta.y = underlayVerticalRect[finish].bipnt.y - underlayVerticalRect[start].cipnt.y;
 			length = hypot(delta.x, delta.y);
 			if (length > SelectedForm->edgeStitchLen) {
 				angle = atan2(InsidePoints[finish].y - OutsidePoints[finish].y, InsidePoints[finish].x - OutsidePoints[finish].x);
-				point.x = UnderlayVerticalRect[finish].bopnt.x + cos(angle)*HorizontalLength2;
-				point.y = UnderlayVerticalRect[finish].bopnt.y + sin(angle)*HorizontalLength2;
+				point.x = underlayVerticalRect[finish].bopnt.x + cos(angle)*HorizontalLength2;
+				point.y = underlayVerticalRect[finish].bopnt.y + sin(angle)*HorizontalLength2;
 				filinsb(point);
 			}
-			filinsb(UnderlayVerticalRect[finish].bipnt);
-			filinsb(UnderlayVerticalRect[finish].bopnt);
+			filinsb(underlayVerticalRect[finish].bipnt);
+			filinsb(underlayVerticalRect[finish].bopnt);
 		}
 		else {
-			filinsb(UnderlayVerticalRect[start].cipnt);
-			filinsb(UnderlayVerticalRect[start].copnt);
-			delta.x = UnderlayVerticalRect[finish].bopnt.x - UnderlayVerticalRect[start].copnt.x;
-			delta.y = UnderlayVerticalRect[finish].bopnt.y - UnderlayVerticalRect[start].copnt.y;
+			filinsb(underlayVerticalRect[start].cipnt);
+			filinsb(underlayVerticalRect[start].copnt);
+			delta.x = underlayVerticalRect[finish].bopnt.x - underlayVerticalRect[start].copnt.x;
+			delta.y = underlayVerticalRect[finish].bopnt.y - underlayVerticalRect[start].copnt.y;
 			length = hypot(delta.x, delta.y);
 			if (length > SelectedForm->edgeStitchLen) {
 				angle = atan2(OutsidePoints[finish].y - InsidePoints[finish].y, OutsidePoints[finish].x - InsidePoints[finish].x);
-				point.x = UnderlayVerticalRect[finish].bipnt.x + cos(angle)*HorizontalLength2;
-				point.y = UnderlayVerticalRect[finish].bipnt.y + sin(angle)*HorizontalLength2;
+				point.x = underlayVerticalRect[finish].bipnt.x + cos(angle)*HorizontalLength2;
+				point.y = underlayVerticalRect[finish].bipnt.y + sin(angle)*HorizontalLength2;
 				filinsb(point);
 			}
-			filinsb(UnderlayVerticalRect[finish].bopnt);
-			filinsb(UnderlayVerticalRect[finish].bipnt);
+			filinsb(underlayVerticalRect[finish].bopnt);
+			filinsb(underlayVerticalRect[finish].bipnt);
 		}
 	}
 	else
 		spend(fillVerticalRect, start, finish);
 }
 
-void pfn(std::vector<VRCT2> &fillVerticalRect, unsigned startVertex, const VRCT2* vrct) {
+void pfn(std::vector<VRCT2> &underlayVerticalRect, std::vector<VRCT2> &fillVerticalRect, unsigned startVertex, const VRCT2* vrct) {
 	if (vrct) {
 		unsigned	iVertex = 0;
 		unsigned	currentVertex = startVertex;
@@ -8260,22 +8259,22 @@ void pfn(std::vector<VRCT2> &fillVerticalRect, unsigned startVertex, const VRCT2
 		SelectedPoint.y = CurrentFormVertices[startVertex].y;
 		for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
 			duromb(vrct[currentVertex].bipnt, vrct[currentVertex].cipnt, vrct[currentVertex].bopnt, vrct[currentVertex].copnt);
-			duspnd(fillVerticalRect, currentVertex, nextVertex);
+			duspnd(underlayVerticalRect, fillVerticalRect, currentVertex, nextVertex);
 			currentVertex = nextVertex;
 			nextVertex = nxt(nextVertex);
 		}
 	}
 }
 
-void plfn(std::vector<VRCT2> &fillVerticalRect, const VRCT2* prct) {
+void plfn(std::vector<VRCT2> &underlayVerticalRect, std::vector<VRCT2> &fillVerticalRect, const VRCT2* prct) {
 	if (prct) {
 		unsigned	iVertex;
 
 		duromb(prct[1].aipnt, prct[1].cipnt, prct[1].aopnt, prct[1].copnt);
-		duspnd(fillVerticalRect, 1, 2);
+		duspnd(underlayVerticalRect, fillVerticalRect, 1, 2);
 		for (iVertex = 2; iVertex < VertexCount - 4; iVertex++) {
 			duromb(prct[iVertex].bipnt, prct[iVertex].cipnt, prct[iVertex].bopnt, prct[iVertex].copnt);
-			duspnd(fillVerticalRect, iVertex, iVertex + 1);
+			duspnd(underlayVerticalRect, fillVerticalRect, iVertex, iVertex + 1);
 		}
 		duromb(prct[VertexCount - 4].bipnt, prct[VertexCount - 4].dipnt, prct[VertexCount - 4].bopnt, prct[VertexCount - 4].dopnt);
 	}
@@ -8352,7 +8351,7 @@ void plbrd(double edgeSpacing) {
 	prebrd();
 	// Ensure that we have at least 4 array members
 	std::vector<VRCT2> fillVerticalRect(VertexCount + 5);
-	UnderlayVerticalRect = new VRCT2[VertexCount + 5];
+	std::vector<VRCT2> underlayVerticalRect(VertexCount + 5);
 	satout(SelectedForm->borderSize);
 	InsidePoints[VertexCount].x = InsidePoints[0].x;
 	InsidePoints[VertexCount].y = InsidePoints[0].y;
@@ -8360,17 +8359,17 @@ void plbrd(double edgeSpacing) {
 	OutsidePoints[VertexCount].y = OutsidePoints[0].y;
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		sprct(fillVerticalRect, iVertex, iVertex + 1);
-		spurct(fillVerticalRect, iVertex);
+		spurct(underlayVerticalRect, fillVerticalRect, iVertex);
 	}
 	sprct(fillVerticalRect, iVertex, 0);
-	spurct(fillVerticalRect, iVertex);
+	spurct(underlayVerticalRect, fillVerticalRect, iVertex);
 	if (!(SelectedForm->attribute&SBLNT)) {
-		fillVerticalRect[1].aipnt.x = fillVerticalRect[1].aopnt.x = UnderlayVerticalRect[1].aipnt.x = UnderlayVerticalRect[1].aopnt.x = SelectedForm->vertices[1].x;
-		fillVerticalRect[1].aipnt.y = fillVerticalRect[1].aopnt.y = UnderlayVerticalRect[1].aipnt.y = UnderlayVerticalRect[1].aopnt.y = SelectedForm->vertices[1].y;
+		fillVerticalRect[1].aipnt.x = fillVerticalRect[1].aopnt.x = underlayVerticalRect[1].aipnt.x = underlayVerticalRect[1].aopnt.x = SelectedForm->vertices[1].x;
+		fillVerticalRect[1].aipnt.y = fillVerticalRect[1].aopnt.y = underlayVerticalRect[1].aipnt.y = underlayVerticalRect[1].aopnt.y = SelectedForm->vertices[1].y;
 	}
 	if (!(SelectedForm->attribute&FBLNT)) {
-		fillVerticalRect[VertexCount - 4].dipnt.x = fillVerticalRect[VertexCount - 4].dopnt.x = UnderlayVerticalRect[VertexCount - 4].dipnt.x = UnderlayVerticalRect[VertexCount - 4].dopnt.x = SelectedForm->vertices[VertexCount - 1].x;
-		fillVerticalRect[VertexCount - 4].dipnt.y = fillVerticalRect[VertexCount - 4].dopnt.y = UnderlayVerticalRect[VertexCount - 4].dipnt.y = UnderlayVerticalRect[VertexCount - 4].dopnt.y = SelectedForm->vertices[VertexCount - 1].y;
+		fillVerticalRect[VertexCount - 4].dipnt.x = fillVerticalRect[VertexCount - 4].dopnt.x = underlayVerticalRect[VertexCount - 4].dipnt.x = underlayVerticalRect[VertexCount - 4].dopnt.x = SelectedForm->vertices[VertexCount - 1].x;
+		fillVerticalRect[VertexCount - 4].dipnt.y = fillVerticalRect[VertexCount - 4].dopnt.y = underlayVerticalRect[VertexCount - 4].dipnt.y = underlayVerticalRect[VertexCount - 4].dopnt.y = SelectedForm->vertices[VertexCount - 1].y;
 	}
 	SequenceIndex = 0;
 	SelectedPoint.x = CurrentFormVertices[0].x;
@@ -8381,13 +8380,13 @@ void plbrd(double edgeSpacing) {
 		HorizontalLength2 = SelectedForm->borderSize*URAT;
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
-		plfn(fillVerticalRect, &UnderlayVerticalRect[0]);
+		plfn(underlayVerticalRect, fillVerticalRect, &underlayVerticalRect[0]);
 		savedIndex = SequenceIndex;
 		StateMap.reset(StateFlag::UNDPHAS);
 		SelectedPoint.x = CurrentFormVertices[0].x;
 		SelectedPoint.y = CurrentFormVertices[0].y;
 		StateMap.set(StateFlag::FILDIR);
-		plfn(fillVerticalRect, &UnderlayVerticalRect[0]);
+		plfn(underlayVerticalRect, fillVerticalRect, &underlayVerticalRect[0]);
 		plbak(savedIndex);
 		prsmal();
 		if (SequenceIndex) { //ensure that we can do a valid read from OSequence
@@ -8397,10 +8396,9 @@ void plbrd(double edgeSpacing) {
 	}
 	StateMap.reset(StateFlag::UND);
 	LineSpacing = SelectedForm->edgeSpacing;
-	plfn(fillVerticalRect, &fillVerticalRect[0]);
+	plfn(underlayVerticalRect, fillVerticalRect, &fillVerticalRect[0]);
 	LineSpacing = edgeSpacing;
 	fvars(ClosestFormToCursor);
-	delete[] UnderlayVerticalRect;
 }
 
 void pbrd(double edgeSpacing) {
@@ -8411,14 +8409,14 @@ void pbrd(double edgeSpacing) {
 	LineSpacing = SelectedForm->edgeSpacing;
 	SequenceIndex = 0;
 	std::vector<VRCT2> fillVerticalRect(VertexCount);
-	UnderlayVerticalRect = new VRCT2[VertexCount];
+	std::vector<VRCT2> UnderlayVerticalRect(VertexCount);
 	satout(SelectedForm->borderSize);
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		sprct(fillVerticalRect, iVertex, iVertex + 1);
-		spurct(fillVerticalRect, iVertex);
+		spurct(UnderlayVerticalRect, fillVerticalRect, iVertex);
 	}
 	sprct(fillVerticalRect, iVertex, 0);
-	spurct(fillVerticalRect, iVertex);
+	spurct(UnderlayVerticalRect, fillVerticalRect, iVertex);
 	if (SelectedForm->edgeType&EGUND) {
 		StateMap.reset(StateFlag::SAT1);
 		LineSpacing = USPAC;
@@ -8427,18 +8425,18 @@ void pbrd(double edgeSpacing) {
 		satout(HorizontalLength2);
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.set(StateFlag::FILDIR);
-		pfn(fillVerticalRect, start, &UnderlayVerticalRect[0]);
+		pfn(UnderlayVerticalRect, fillVerticalRect, start, &UnderlayVerticalRect[0]);
 		StateMap.reset(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
-		pfn(fillVerticalRect, start, &UnderlayVerticalRect[0]);
+		pfn(UnderlayVerticalRect, fillVerticalRect, start, &UnderlayVerticalRect[0]);
 		LineSpacing = edgeSpacing;
 		prsmal();
 		HorizontalLength2 = SelectedForm->borderSize;
 		StateMap.reset(StateFlag::UND);
 	}
-	pfn(fillVerticalRect, start, &fillVerticalRect[0]);
+	pfn(UnderlayVerticalRect, fillVerticalRect, start, &fillVerticalRect[0]);
 	LineSpacing = spacing;
-	delete[] UnderlayVerticalRect;
+	//delete[] UnderlayVerticalRect;
 }
 
 void prpsbrd() {
