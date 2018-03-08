@@ -8409,14 +8409,14 @@ void pbrd(double edgeSpacing) {
 	LineSpacing = SelectedForm->edgeSpacing;
 	SequenceIndex = 0;
 	std::vector<VRCT2> fillVerticalRect(VertexCount);
-	std::vector<VRCT2> UnderlayVerticalRect(VertexCount);
+	std::vector<VRCT2> underlayVerticalRect(VertexCount);
 	satout(SelectedForm->borderSize);
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		sprct(fillVerticalRect, iVertex, iVertex + 1);
-		spurct(UnderlayVerticalRect, fillVerticalRect, iVertex);
+		spurct(underlayVerticalRect, fillVerticalRect, iVertex);
 	}
 	sprct(fillVerticalRect, iVertex, 0);
-	spurct(UnderlayVerticalRect, fillVerticalRect, iVertex);
+	spurct(underlayVerticalRect, fillVerticalRect, iVertex);
 	if (SelectedForm->edgeType&EGUND) {
 		StateMap.reset(StateFlag::SAT1);
 		LineSpacing = USPAC;
@@ -8425,18 +8425,17 @@ void pbrd(double edgeSpacing) {
 		satout(HorizontalLength2);
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.set(StateFlag::FILDIR);
-		pfn(UnderlayVerticalRect, fillVerticalRect, start, &UnderlayVerticalRect[0]);
+		pfn(underlayVerticalRect, fillVerticalRect, start, &underlayVerticalRect[0]);
 		StateMap.reset(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
-		pfn(UnderlayVerticalRect, fillVerticalRect, start, &UnderlayVerticalRect[0]);
+		pfn(underlayVerticalRect, fillVerticalRect, start, &underlayVerticalRect[0]);
 		LineSpacing = edgeSpacing;
 		prsmal();
 		HorizontalLength2 = SelectedForm->borderSize;
 		StateMap.reset(StateFlag::UND);
 	}
-	pfn(UnderlayVerticalRect, fillVerticalRect, start, &fillVerticalRect[0]);
+	pfn(underlayVerticalRect, fillVerticalRect, start, &fillVerticalRect[0]);
 	LineSpacing = spacing;
-	//delete[] UnderlayVerticalRect;
 }
 
 void prpsbrd() {
