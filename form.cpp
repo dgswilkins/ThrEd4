@@ -322,7 +322,6 @@ POINT			LabelWindowSize;		//size of the left windows in the form data sheet
 POINT			ValueWindowSize;		//size of the right windows in the form data sheet
 fPOINT			LowerLeftStitch;		//lower left formOrigin in a form
 POINT			RubberBandLine[3];		//points to form points to be moved
-unsigned*		Xhistogram;				//x histogram for snap together
 double			SnapLength = SNPLEN * PFGRAN;	//snap together length
 unsigned*		Xpoints;				//stitch indices sorted according to x values
 double			StarRatio = STARAT;		//star formOrigin to body ratio
@@ -8752,14 +8751,14 @@ void clpfil() {
 	}
 }
 
-void snpfn(unsigned xIndex, unsigned length) noexcept {
-	unsigned	current = Xhistogram[xIndex];
-	const unsigned	finish = Xhistogram[xIndex + length];
+void snpfn(std::vector<unsigned> &xHistogram, unsigned xIndex, unsigned length) noexcept {
+	unsigned	current = xHistogram[xIndex];
+	const unsigned	finish = xHistogram[xIndex + length];
 	unsigned	iPoint = 0, reference = 0, check = 0;
 	double		CheckLength = 0.0;
 
 	if (finish - current) {
-		for (current = Xhistogram[xIndex]; current < Xhistogram[xIndex + 1]; current++) {
+		for (current = xHistogram[xIndex]; current < xHistogram[xIndex + 1]; current++) {
 			reference = Xpoints[current];
 			for (iPoint = current + 1; iPoint < finish; iPoint++) {
 				check = Xpoints[iPoint];
@@ -8804,60 +8803,56 @@ void nxtim() noexcept {
 void snp(unsigned start, unsigned finish) {
 	unsigned	iColumn = 0, iStitch = 0, swap = 0, accumulator = 0, checkLength = 0, attribute = 0;
 	fPOINT		range = {};
-	unsigned*	txhst = nullptr;
 
 	chkrng(&range);
-	txhst = new unsigned[gsl::narrow<int>(round(range.x)) + 1]();
 	Xpoints = new unsigned[MAXITEMS]();
-	Xhistogram = txhst;
+	std::vector<unsigned> xHistogram((round(range.x)) + 1);
 	for (iColumn = 0; iColumn < range.x; iColumn++)
-		Xhistogram[iColumn] = 0;
+		xHistogram[iColumn] = 0;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		attribute = (ClosestFormToCursor << 4)&FRMSK;
 		for (iStitch = start; iStitch < finish; iStitch++) {
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == attribute) {
 				iColumn = StitchBuffer[iStitch].x;
-				Xhistogram[iColumn]++;
+				xHistogram[iColumn]++;
 			}
 		}
 	}
 	else {
 		for (iStitch = start; iStitch < finish; iStitch++) {
 			iColumn = StitchBuffer[iStitch].x;
-			Xhistogram[iColumn]++;
+			xHistogram[iColumn]++;
 		}
 	}
 	accumulator = 0;
 	for (iColumn = 0; iColumn < range.x; iColumn++) {
-		swap = Xhistogram[iColumn];
-		Xhistogram[iColumn] = accumulator;
+		swap = xHistogram[iColumn];
+		xHistogram[iColumn] = accumulator;
 		accumulator += swap;
 	}
-	Xhistogram[iColumn] = accumulator;
+	xHistogram[iColumn] = accumulator;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == attribute) {
 				iColumn = StitchBuffer[iStitch].x;
-				Xpoints[Xhistogram[iColumn]++] = iStitch;
+				Xpoints[xHistogram[iColumn]++] = iStitch;
 			}
 		}
 	}
 	else {
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			iColumn = StitchBuffer[iStitch].x;
-			Xpoints[Xhistogram[iColumn]++] = iStitch;
+			Xpoints[xHistogram[iColumn]++] = iStitch;
 		}
 	}
-	Xhistogram = &Xhistogram[1];
 	checkLength = SnapLength * 2 + 1;
 	nutim(range.x);
 	for (iColumn = 0; iColumn < range.x - checkLength; iColumn++) {
-		snpfn(iColumn, checkLength);
+		snpfn(xHistogram, iColumn + 1, checkLength);
 		nxtim();
 	}
 	DestroyWindow(TimeWindow);
 	delete[] Xpoints;
-	delete[] txhst;
 }
 
 void snap() {
