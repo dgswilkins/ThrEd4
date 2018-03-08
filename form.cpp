@@ -284,7 +284,6 @@ FRMHED			FormList[MAXFORMS];		//a list of form headers
 unsigned		FormIndex = 0;			//index into the list of forms
 double			LineSpacing = DEFSPACE * PFGRAN;//stitch spacing in stitch units
 fPOINT*			CurrentFillVertices;	//pointer to the line of the polygon being filled
-fPOINT*			ClipReversedData;		//data for clipboard fills
 unsigned		StitchLineCount;		//count of stitch lines
 unsigned		ActivePointIndex;		//pointer to the active form in the sequencing algorithm
 unsigned		LineGroupIndex;			//pointer for groups of fill line segments
@@ -322,7 +321,6 @@ RECT			ValueWindowCoords;		//location of right windows in the form data sheet
 POINT			LabelWindowSize;		//size of the left windows in the form data sheet
 POINT			ValueWindowSize;		//size of the right windows in the form data sheet
 fPOINT			LowerLeftStitch;		//lower left formOrigin in a form
-VRCT2*			FillVerticalRect;		//fill points for vertical satin fill
 VRCT2*			UnderlayVerticalRect;	//underlay fill points for vertical satin fill
 POINT			RubberBandLine[3];		//points to form points to be moved
 unsigned*		Xhistogram;				//x histogram for snap together
@@ -5490,7 +5488,7 @@ bool ritclp(std::vector<fPOINT> clipFillData, fPOINT point) noexcept {
 	return 0;
 }
 
-bool clpsid(std::vector<fPOINT> clipFillData, unsigned start, unsigned finish) {
+bool clpsid(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFillData, unsigned start, unsigned finish) {
 	unsigned	ind = 0, clipCount = 0;
 	fPOINT		delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
 						  (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
@@ -5513,7 +5511,7 @@ bool clpsid(std::vector<fPOINT> clipFillData, unsigned start, unsigned finish) {
 		insertPoint.y = CurrentFormVertices[start].y;
 		RotationAngle = atan2(delta.y, delta.x);
 		for (ind = 0; ind < ClipStitchCount; ind++)
-			rotangf(ClipReversedData[ind], &clipFillData[ind]);
+			rotangf(clipReversedData[ind], &clipFillData[ind]);
 		for (ind = 0; ind < clipCount; ind++) {
 			if (ritclp(clipFillData, insertPoint))
 				break;
@@ -5525,7 +5523,7 @@ bool clpsid(std::vector<fPOINT> clipFillData, unsigned start, unsigned finish) {
 	return 0;
 }
 
-void linsid(std::vector<fPOINT> clipFillData) {
+void linsid(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFillData) {
 	fPOINT		delta = { (CurrentFormVertices[CurrentSide + 1].x - SelectedPoint.x),
 						  (CurrentFormVertices[CurrentSide + 1].y - SelectedPoint.y) };
 	const double	length = hypot(delta.x, delta.y);
@@ -5536,7 +5534,7 @@ void linsid(std::vector<fPOINT> clipFillData) {
 		RotationAngle = ClipAngle;
 		rotangf(BorderClipReference, &ClipReference);
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotangf(ClipReversedData[iStitch], &clipFillData[iStitch]);
+			rotangf(clipReversedData[iStitch], &clipFillData[iStitch]);
 		for (iClip = 0; iClip < clipCount; iClip++) {
 			ritclp(clipFillData, SelectedPoint);
 			SelectedPoint.x += Vector0.x;
@@ -5566,7 +5564,7 @@ bool nupnt() noexcept {
 	return 0;
 }
 
-void lincrnr(std::vector<fPOINT> clipFillData) {
+void lincrnr(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFillData) {
 	dPOINT		delta = {};
 	unsigned	iStitch = 0;
 
@@ -5578,27 +5576,27 @@ void lincrnr(std::vector<fPOINT> clipFillData) {
 		RotationAngle = atan2(delta.y, delta.x);
 		rotangf(BorderClipReference, &ClipReference);
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotangf(ClipReversedData[iStitch], &clipFillData[iStitch]);
+			rotangf(clipReversedData[iStitch], &clipFillData[iStitch]);
 		ritclp(clipFillData, SelectedPoint);
 		SelectedPoint.x = MoveToCoords.x;
 		SelectedPoint.y = MoveToCoords.y;
 	}
 }
 
-void durev() noexcept {
+void durev(std::vector<fPOINT> &clipReversedData) noexcept {
 	unsigned	iStitch = 0;
 	const double	midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
 
 	if (ClipBuffer[0].x > midpoint) {
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
-			ClipReversedData[iStitch].x = ClipRect.right - ClipBuffer[iStitch].x;
-			ClipReversedData[iStitch].y = ClipBuffer[iStitch].y;
+			clipReversedData[iStitch].x = ClipRect.right - ClipBuffer[iStitch].x;
+			clipReversedData[iStitch].y = ClipBuffer[iStitch].y;
 		}
 	}
 	else {
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
-			ClipReversedData[iStitch].x = ClipBuffer[iStitch].x;
-			ClipReversedData[iStitch].y = ClipBuffer[iStitch].y;
+			clipReversedData[iStitch].x = ClipBuffer[iStitch].x;
+			clipReversedData[iStitch].y = ClipBuffer[iStitch].y;
 		}
 	}
 }
@@ -5618,11 +5616,11 @@ void clpbrd(unsigned short startVertex) {
 	HorizontalLength2 = ClipRectSize.cx / 2;
 	HorizontalLength = ClipRectSize.cx;
 	std::vector<fPOINT> clipFillData(ClipStitchCount);
-	ClipReversedData = new fPOINT[ClipStitchCount];
+	std::vector<fPOINT> clipReversedData(ClipStitchCount);
 	RotationCenter.x = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
 	ClipReference.y = RotationCenter.y = (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom;
 	ClipReference.x = ClipRect.left;
-	durev();
+	durev(clipReversedData);
 	if (SelectedForm->type == FRMLINE) {
 		SelectedPoint.x = CurrentFormVertices[0].x;
 		SelectedPoint.y = CurrentFormVertices[0].y;
@@ -5634,23 +5632,22 @@ void clpbrd(unsigned short startVertex) {
 		BorderClipReference.x = 0;
 		// BorderClipReference.x = ClipRect.right / 2;
 		for (CurrentSide = 0; CurrentSide < VertexCount - 2; CurrentSide++) {
-			linsid(clipFillData);
+			linsid(clipReversedData, clipFillData);
 			setvct(CurrentSide + 1, CurrentSide + 2);
-			lincrnr(clipFillData);
+			lincrnr(clipReversedData, clipFillData);
 		}
-		linsid(clipFillData);
+		linsid(clipReversedData, clipFillData);
 	}
 	else {
 		clpout();
 		reference = currentVertex = startVertex;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 			nextVertex = prv(currentVertex);
-			if (clpsid(clipFillData, reference, nextVertex))
+			if (clpsid(clipReversedData, clipFillData, reference, nextVertex))
 				reference = nextVertex;
 			currentVertex = nextVertex;
 		}
 	}
-	delete[] ClipReversedData;
 }
 
 void outfn(unsigned start, unsigned finish, double satinWidth) noexcept {
@@ -7974,11 +7971,11 @@ void tomsg() noexcept {
 		NULL);
 }
 
-void sprct(unsigned start, unsigned finish) noexcept {
+void sprct(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish) noexcept {
 	dPOINT	delta = { (OutsidePoints[finish].x - OutsidePoints[start].x),
 					  (OutsidePoints[finish].y - OutsidePoints[start].y) };
 	dPOINT	point = {};
-	VRCT2*	verticalRect = &FillVerticalRect[start];
+	VRCT2*	verticalRect = &fillVerticalRect[start];
 
 	if (delta.x && delta.y) {
 		Slope = -delta.x / delta.y;
@@ -8092,11 +8089,11 @@ void spurfn(const dPOINT* innerPoint, const dPOINT* outerPoint, dPOINT* underlay
 	underlayOuterPoint->y = delta.y*DOURAT + innerPoint->y;
 }
 
-void spurct(unsigned iRect) noexcept {
-	spurfn(&FillVerticalRect[iRect].aipnt, &FillVerticalRect[iRect].aopnt, &UnderlayVerticalRect[iRect].aipnt, &UnderlayVerticalRect[iRect].aopnt);
-	spurfn(&FillVerticalRect[iRect].bipnt, &FillVerticalRect[iRect].bopnt, &UnderlayVerticalRect[iRect].bipnt, &UnderlayVerticalRect[iRect].bopnt);
-	spurfn(&FillVerticalRect[iRect].cipnt, &FillVerticalRect[iRect].copnt, &UnderlayVerticalRect[iRect].cipnt, &UnderlayVerticalRect[iRect].copnt);
-	spurfn(&FillVerticalRect[iRect].dipnt, &FillVerticalRect[iRect].dopnt, &UnderlayVerticalRect[iRect].dipnt, &UnderlayVerticalRect[iRect].dopnt);
+void spurct(std::vector<VRCT2> &fillVerticalRect, unsigned iRect) noexcept {
+	spurfn(&fillVerticalRect[iRect].aipnt, &fillVerticalRect[iRect].aopnt, &UnderlayVerticalRect[iRect].aipnt, &UnderlayVerticalRect[iRect].aopnt);
+	spurfn(&fillVerticalRect[iRect].bipnt, &fillVerticalRect[iRect].bopnt, &UnderlayVerticalRect[iRect].bipnt, &UnderlayVerticalRect[iRect].bopnt);
+	spurfn(&fillVerticalRect[iRect].cipnt, &fillVerticalRect[iRect].copnt, &UnderlayVerticalRect[iRect].cipnt, &UnderlayVerticalRect[iRect].copnt);
+	spurfn(&fillVerticalRect[iRect].dipnt, &fillVerticalRect[iRect].dopnt, &UnderlayVerticalRect[iRect].dipnt, &UnderlayVerticalRect[iRect].dopnt);
 }
 
 unsigned psg() noexcept {
@@ -8152,12 +8149,12 @@ void duromb(dPOINT start0, dPOINT finish0, dPOINT start1, dPOINT finish1) {
 	}
 }
 
-void spend(unsigned start, unsigned finish) noexcept {
-	dPOINT		innerDelta = { (FillVerticalRect[finish].cipnt.x - FillVerticalRect[start].bipnt.x),
-							   (FillVerticalRect[finish].cipnt.y - FillVerticalRect[start].bipnt.y) };
+void spend(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish) noexcept {
+	dPOINT		innerDelta = { (fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
+							   (fillVerticalRect[finish].cipnt.y - fillVerticalRect[start].bipnt.y) };
 	const double	innerLength = hypot(innerDelta.x, innerDelta.y);
-	dPOINT		outerDelta = { (FillVerticalRect[finish].copnt.x - FillVerticalRect[start].bopnt.x),
-							   (FillVerticalRect[finish].copnt.y - FillVerticalRect[start].bopnt.y) };
+	dPOINT		outerDelta = { (fillVerticalRect[finish].copnt.x - fillVerticalRect[start].bopnt.x),
+							   (fillVerticalRect[finish].copnt.y - fillVerticalRect[start].bopnt.y) };
 	const double	outerLength = hypot(outerDelta.x, outerDelta.y);
 	double		startAngle = 0.0, finishAngle = 0.0, deltaAngle = 0.0, stepAngle = 0.0;
 	dPOINT		startDelta = {}, finishDelta = {};
@@ -8167,20 +8164,20 @@ void spend(unsigned start, unsigned finish) noexcept {
 	dPOINT		innerPoint = {}, outerPoint = {};
 
 	if (outerLength > innerLength) {
-		pivot.x = FillVerticalRect[start].cipnt.x;
-		pivot.y = FillVerticalRect[start].cipnt.y;
-		startDelta.x = FillVerticalRect[start].copnt.x - pivot.x;
-		startDelta.y = FillVerticalRect[start].copnt.y - pivot.y;
-		finishDelta.x = FillVerticalRect[finish].bopnt.x - pivot.x;
-		finishDelta.y = FillVerticalRect[finish].bopnt.y - pivot.y;
+		pivot.x = fillVerticalRect[start].cipnt.x;
+		pivot.y = fillVerticalRect[start].cipnt.y;
+		startDelta.x = fillVerticalRect[start].copnt.x - pivot.x;
+		startDelta.y = fillVerticalRect[start].copnt.y - pivot.y;
+		finishDelta.x = fillVerticalRect[finish].bopnt.x - pivot.x;
+		finishDelta.y = fillVerticalRect[finish].bopnt.y - pivot.y;
 	}
 	else {
-		pivot.x = FillVerticalRect[start].copnt.x;
-		pivot.y = FillVerticalRect[start].copnt.y;
-		startDelta.x = FillVerticalRect[start].cipnt.x - pivot.x;
-		startDelta.y = FillVerticalRect[start].cipnt.y - pivot.y;
-		finishDelta.x = FillVerticalRect[finish].bipnt.x - pivot.x;
-		finishDelta.y = FillVerticalRect[finish].bipnt.y - pivot.y;
+		pivot.x = fillVerticalRect[start].copnt.x;
+		pivot.y = fillVerticalRect[start].copnt.y;
+		startDelta.x = fillVerticalRect[start].cipnt.x - pivot.x;
+		startDelta.y = fillVerticalRect[start].cipnt.y - pivot.y;
+		finishDelta.x = fillVerticalRect[finish].bipnt.x - pivot.x;
+		finishDelta.y = fillVerticalRect[finish].bipnt.y - pivot.y;
 	}
 	if (hypot(SelectedPoint.x - pivot.x, SelectedPoint.y - pivot.y) > 2 * PI)
 		filinsb(pivot);
@@ -8213,7 +8210,7 @@ void spend(unsigned start, unsigned finish) noexcept {
 	}
 }
 
-void duspnd(unsigned start, unsigned finish) {
+void duspnd(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish) {
 	double	length = 0.0, angle = 0.0;
 	dPOINT	point = {}, delta = {};
 
@@ -8250,10 +8247,10 @@ void duspnd(unsigned start, unsigned finish) {
 		}
 	}
 	else
-		spend(start, finish);
+		spend(fillVerticalRect, start, finish);
 }
 
-void pfn(unsigned startVertex, const VRCT2* vrct) {
+void pfn(std::vector<VRCT2> &fillVerticalRect, unsigned startVertex, const VRCT2* vrct) {
 	if (vrct) {
 		unsigned	iVertex = 0;
 		unsigned	currentVertex = startVertex;
@@ -8263,22 +8260,22 @@ void pfn(unsigned startVertex, const VRCT2* vrct) {
 		SelectedPoint.y = CurrentFormVertices[startVertex].y;
 		for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
 			duromb(vrct[currentVertex].bipnt, vrct[currentVertex].cipnt, vrct[currentVertex].bopnt, vrct[currentVertex].copnt);
-			duspnd(currentVertex, nextVertex);
+			duspnd(fillVerticalRect, currentVertex, nextVertex);
 			currentVertex = nextVertex;
 			nextVertex = nxt(nextVertex);
 		}
 	}
 }
 
-void plfn(const VRCT2* prct) {
+void plfn(std::vector<VRCT2> &fillVerticalRect, const VRCT2* prct) {
 	if (prct) {
 		unsigned	iVertex;
 
 		duromb(prct[1].aipnt, prct[1].cipnt, prct[1].aopnt, prct[1].copnt);
-		duspnd(1, 2);
+		duspnd(fillVerticalRect, 1, 2);
 		for (iVertex = 2; iVertex < VertexCount - 4; iVertex++) {
 			duromb(prct[iVertex].bipnt, prct[iVertex].cipnt, prct[iVertex].bopnt, prct[iVertex].copnt);
-			duspnd(iVertex, iVertex + 1);
+			duspnd(fillVerticalRect, iVertex, iVertex + 1);
 		}
 		duromb(prct[VertexCount - 4].bipnt, prct[VertexCount - 4].dipnt, prct[VertexCount - 4].bopnt, prct[VertexCount - 4].dopnt);
 	}
@@ -8354,7 +8351,7 @@ void plbrd(double edgeSpacing) {
 
 	prebrd();
 	// Ensure that we have at least 4 array members
-	FillVerticalRect = new VRCT2[VertexCount + 5];
+	std::vector<VRCT2> fillVerticalRect(VertexCount + 5);
 	UnderlayVerticalRect = new VRCT2[VertexCount + 5];
 	satout(SelectedForm->borderSize);
 	InsidePoints[VertexCount].x = InsidePoints[0].x;
@@ -8362,18 +8359,18 @@ void plbrd(double edgeSpacing) {
 	OutsidePoints[VertexCount].x = OutsidePoints[0].x;
 	OutsidePoints[VertexCount].y = OutsidePoints[0].y;
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
-		sprct(iVertex, iVertex + 1);
-		spurct(iVertex);
+		sprct(fillVerticalRect, iVertex, iVertex + 1);
+		spurct(fillVerticalRect, iVertex);
 	}
-	sprct(iVertex, 0);
-	spurct(iVertex);
+	sprct(fillVerticalRect, iVertex, 0);
+	spurct(fillVerticalRect, iVertex);
 	if (!(SelectedForm->attribute&SBLNT)) {
-		FillVerticalRect[1].aipnt.x = FillVerticalRect[1].aopnt.x = UnderlayVerticalRect[1].aipnt.x = UnderlayVerticalRect[1].aopnt.x = SelectedForm->vertices[1].x;
-		FillVerticalRect[1].aipnt.y = FillVerticalRect[1].aopnt.y = UnderlayVerticalRect[1].aipnt.y = UnderlayVerticalRect[1].aopnt.y = SelectedForm->vertices[1].y;
+		fillVerticalRect[1].aipnt.x = fillVerticalRect[1].aopnt.x = UnderlayVerticalRect[1].aipnt.x = UnderlayVerticalRect[1].aopnt.x = SelectedForm->vertices[1].x;
+		fillVerticalRect[1].aipnt.y = fillVerticalRect[1].aopnt.y = UnderlayVerticalRect[1].aipnt.y = UnderlayVerticalRect[1].aopnt.y = SelectedForm->vertices[1].y;
 	}
 	if (!(SelectedForm->attribute&FBLNT)) {
-		FillVerticalRect[VertexCount - 4].dipnt.x = FillVerticalRect[VertexCount - 4].dopnt.x = UnderlayVerticalRect[VertexCount - 4].dipnt.x = UnderlayVerticalRect[VertexCount - 4].dopnt.x = SelectedForm->vertices[VertexCount - 1].x;
-		FillVerticalRect[VertexCount - 4].dipnt.y = FillVerticalRect[VertexCount - 4].dopnt.y = UnderlayVerticalRect[VertexCount - 4].dipnt.y = UnderlayVerticalRect[VertexCount - 4].dopnt.y = SelectedForm->vertices[VertexCount - 1].y;
+		fillVerticalRect[VertexCount - 4].dipnt.x = fillVerticalRect[VertexCount - 4].dopnt.x = UnderlayVerticalRect[VertexCount - 4].dipnt.x = UnderlayVerticalRect[VertexCount - 4].dopnt.x = SelectedForm->vertices[VertexCount - 1].x;
+		fillVerticalRect[VertexCount - 4].dipnt.y = fillVerticalRect[VertexCount - 4].dopnt.y = UnderlayVerticalRect[VertexCount - 4].dipnt.y = UnderlayVerticalRect[VertexCount - 4].dopnt.y = SelectedForm->vertices[VertexCount - 1].y;
 	}
 	SequenceIndex = 0;
 	SelectedPoint.x = CurrentFormVertices[0].x;
@@ -8384,13 +8381,13 @@ void plbrd(double edgeSpacing) {
 		HorizontalLength2 = SelectedForm->borderSize*URAT;
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
-		plfn(&UnderlayVerticalRect[0]);
+		plfn(fillVerticalRect, &UnderlayVerticalRect[0]);
 		savedIndex = SequenceIndex;
 		StateMap.reset(StateFlag::UNDPHAS);
 		SelectedPoint.x = CurrentFormVertices[0].x;
 		SelectedPoint.y = CurrentFormVertices[0].y;
 		StateMap.set(StateFlag::FILDIR);
-		plfn(&UnderlayVerticalRect[0]);
+		plfn(fillVerticalRect, &UnderlayVerticalRect[0]);
 		plbak(savedIndex);
 		prsmal();
 		if (SequenceIndex) { //ensure that we can do a valid read from OSequence
@@ -8400,11 +8397,10 @@ void plbrd(double edgeSpacing) {
 	}
 	StateMap.reset(StateFlag::UND);
 	LineSpacing = SelectedForm->edgeSpacing;
-	plfn(&FillVerticalRect[0]);
+	plfn(fillVerticalRect, &fillVerticalRect[0]);
 	LineSpacing = edgeSpacing;
 	fvars(ClosestFormToCursor);
 	delete[] UnderlayVerticalRect;
-	delete[] FillVerticalRect;
 }
 
 void pbrd(double edgeSpacing) {
@@ -8414,15 +8410,15 @@ void pbrd(double edgeSpacing) {
 
 	LineSpacing = SelectedForm->edgeSpacing;
 	SequenceIndex = 0;
-	FillVerticalRect = new VRCT2[VertexCount];
+	std::vector<VRCT2> fillVerticalRect(VertexCount);
 	UnderlayVerticalRect = new VRCT2[VertexCount];
 	satout(SelectedForm->borderSize);
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
-		sprct(iVertex, iVertex + 1);
-		spurct(iVertex);
+		sprct(fillVerticalRect, iVertex, iVertex + 1);
+		spurct(fillVerticalRect, iVertex);
 	}
-	sprct(iVertex, 0);
-	spurct(iVertex);
+	sprct(fillVerticalRect, iVertex, 0);
+	spurct(fillVerticalRect, iVertex);
 	if (SelectedForm->edgeType&EGUND) {
 		StateMap.reset(StateFlag::SAT1);
 		LineSpacing = USPAC;
@@ -8431,19 +8427,18 @@ void pbrd(double edgeSpacing) {
 		satout(HorizontalLength2);
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.set(StateFlag::FILDIR);
-		pfn(start, &UnderlayVerticalRect[0]);
+		pfn(fillVerticalRect, start, &UnderlayVerticalRect[0]);
 		StateMap.reset(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
-		pfn(start, &UnderlayVerticalRect[0]);
+		pfn(fillVerticalRect, start, &UnderlayVerticalRect[0]);
 		LineSpacing = edgeSpacing;
 		prsmal();
 		HorizontalLength2 = SelectedForm->borderSize;
 		StateMap.reset(StateFlag::UND);
 	}
-	pfn(start, &FillVerticalRect[0]);
+	pfn(fillVerticalRect, start, &fillVerticalRect[0]);
 	LineSpacing = spacing;
 	delete[] UnderlayVerticalRect;
-	delete[] FillVerticalRect;
 }
 
 void prpsbrd() {
