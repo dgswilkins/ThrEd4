@@ -8751,14 +8751,12 @@ void clpfil() {
 	}
 }
 
-void snpfn(std::vector<unsigned> &xHistogram, unsigned xIndex, unsigned length) noexcept {
-	unsigned	current = xHistogram[xIndex];
-	const unsigned	finish = xHistogram[xIndex + length];
+void snpfn(unsigned start, unsigned end, unsigned finish) noexcept {
 	unsigned	iPoint = 0, reference = 0, check = 0;
 	double		CheckLength = 0.0;
 
-	if (finish - current) {
-		for (current = xHistogram[xIndex]; current < xHistogram[xIndex + 1]; current++) {
+	if (finish - start) {
+		for (unsigned current = start; current < end; current++) {
 			reference = Xpoints[current];
 			for (iPoint = current + 1; iPoint < finish; iPoint++) {
 				check = Xpoints[iPoint];
@@ -8847,8 +8845,8 @@ void snp(unsigned start, unsigned finish) {
 	}
 	checkLength = SnapLength * 2 + 1;
 	nutim(range.x);
-	for (iColumn = 0; iColumn < range.x - checkLength; iColumn++) {
-		snpfn(xHistogram, iColumn + 1, checkLength);
+	for (iColumn = 1; iColumn < range.x - checkLength - 1; iColumn++) {
+		snpfn(xHistogram[iColumn], xHistogram[iColumn + 1], xHistogram[(iColumn) + checkLength]);
 		nxtim();
 	}
 	DestroyWindow(TimeWindow);
