@@ -10942,14 +10942,12 @@ unsigned lenref(const float *lineLength) noexcept {
 		//ToDo - this is very brittle. There has to be a better way
 		unsigned eax = reinterpret_cast<unsigned>(lineLength) - reinterpret_cast<unsigned>(ClipSegments);
 
-		const unsigned edx = eax % 29;
-		eax /= 29;
-
+		const unsigned edx = eax % sizeof(CLPSEG);
+		eax /= sizeof(CLPSEG);
 		eax <<= 1;
-
-		if ((edx & 0xFF) == 18)
+		if ((edx & 0xFF) == offsetof(CLPSEG, endLength)) {
 			eax++;
-
+		}
 		return eax;
 	}
 }
