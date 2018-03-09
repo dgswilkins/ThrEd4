@@ -11001,9 +11001,9 @@ void mvpclp(std::vector<CLIPSORT *> &ArrayOfClipIntersectData, unsigned destinat
 	memcpy(ArrayOfClipIntersectData[destination], ArrayOfClipIntersectData[source], sizeof(CLIPSORT));
 }
 
-float getlen(unsigned iPoint) noexcept {
+float getlen(std::vector<double> &lengths, unsigned iPoint) noexcept {
 	ClipStitchPoints[iPoint].vertexIndex %= VertexCount;
-	return	Lengths[ClipStitchPoints[iPoint].vertexIndex] +
+	return	lengths[ClipStitchPoints[iPoint].vertexIndex] +
 		hypot(CurrentFormVertices[ClipStitchPoints[iPoint].vertexIndex].x - ClipStitchPoints[iPoint].x,
 			CurrentFormVertices[ClipStitchPoints[iPoint].vertexIndex].y - ClipStitchPoints[iPoint].y);
 }
@@ -11171,11 +11171,11 @@ bool isin(std::vector<VCLPX> regionCrossingData, float xCoordinate, float yCoord
 	return acnt & 1;
 }
 
-unsigned clpnseg(unsigned start, unsigned finish) noexcept {
+unsigned clpnseg(std::vector<double> &lengths, unsigned start, unsigned finish) noexcept {
 	ClipSegments[ClipSegmentIndex].start = start;
-	ClipSegments[ClipSegmentIndex].beginLength = getlen(start);
+	ClipSegments[ClipSegmentIndex].beginLength = getlen(lengths, start);
 	ClipSegments[ClipSegmentIndex].asid = ClipStitchPoints[start].vertexIndex;
-	ClipSegments[ClipSegmentIndex].endLength = getlen(finish);
+	ClipSegments[ClipSegmentIndex].endLength = getlen(lengths, finish);
 	ClipSegments[ClipSegmentIndex].zsid = ClipStitchPoints[finish].vertexIndex;
 	ClipSegments[ClipSegmentIndex].finish = finish;
 	ClipSegments[ClipSegmentIndex++].dun = 0;
@@ -11255,18 +11255,17 @@ void clpcon() {
 			return;
 		}
 	}
-	Lengths = new double[VertexCount + 1];
+	std::vector<double> lengths(VertexCount + 1);
 	ClipSideLengths = new double[VertexCount];
 	ClipIntersectData = new CLIPSORT[VertexCount];
 	std::vector<CLIPSORT *> ArrayOfClipIntersectData;
 	ArrayOfClipIntersectData.reserve(VertexCount + 1);
 	vertex = leftsid();
 	totalLength = 0;
-	Lengths[vertex] = 0;
 	vertex = nxt(vertex);
 	for (iVertex = 0; iVertex <= VertexCount; iVertex++) {
 		nextVertex = nxt(vertex);
-		Lengths[vertex] = totalLength;
+		lengths[vertex] = totalLength;
 		ClipSideLengths[vertex] = hypot(CurrentFormVertices[nextVertex].x - CurrentFormVertices[vertex].x, CurrentFormVertices[nextVertex].y - CurrentFormVertices[vertex].y);
 		totalLength += ClipSideLengths[vertex];
 		vertex = nextVertex;
@@ -11471,7 +11470,7 @@ void clpcon() {
 			case 1:		//line
 
 				if (StateMap.testAndFlip(StateFlag::FILDIR))
-					clpnseg(previousPoint, iPoint);
+					clpnseg(lengths, previousPoint, iPoint);
 				else
 					previousPoint = iPoint;
 				break;
@@ -11490,7 +11489,6 @@ void clpcon() {
 
 #endif
 
-			delete[] Lengths;
 			delete[] ClipSideLengths;
 			delete[] ClipIntersectData;
 
