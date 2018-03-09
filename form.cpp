@@ -381,7 +381,6 @@ unsigned		ClipSegmentIndex;		//clipboard segment pointer
 unsigned short	ClipIntersectSide;		//clipboard intersect side;
 fPOINT			LineSegmentStart;		//vertical clipboard line segment start
 fPOINT			LineSegmentEnd;			//vertical clipboard line segment end
-double*			ClipSideLengths;		//lengths of form sides for vertical clipboard fill
 CLIPSORT*		ClipIntersectData;		//intersect points for vertical clipboard fill
 CLIPNT*			ClipStitchPoints;		//points for vertical clipboard fills
 float			ClipWidth;				//horizontal spacing for vertical clipboard fill
@@ -11255,8 +11254,8 @@ void clpcon() {
 			return;
 		}
 	}
-	std::vector<double> lengths(VertexCount + 1);
-	ClipSideLengths = new double[VertexCount];
+	std::vector<double> lengths(VertexCount);
+	std::vector<double> clipSideLengths(VertexCount); //lengths of form sides for clipboard fill
 	ClipIntersectData = new CLIPSORT[VertexCount];
 	std::vector<CLIPSORT *> ArrayOfClipIntersectData;
 	ArrayOfClipIntersectData.reserve(VertexCount + 1);
@@ -11266,8 +11265,8 @@ void clpcon() {
 	for (iVertex = 0; iVertex <= VertexCount; iVertex++) {
 		nextVertex = nxt(vertex);
 		lengths[vertex] = totalLength;
-		ClipSideLengths[vertex] = hypot(CurrentFormVertices[nextVertex].x - CurrentFormVertices[vertex].x, CurrentFormVertices[nextVertex].y - CurrentFormVertices[vertex].y);
-		totalLength += ClipSideLengths[vertex];
+		clipSideLengths[vertex] = hypot(CurrentFormVertices[nextVertex].x - CurrentFormVertices[vertex].x, CurrentFormVertices[nextVertex].y - CurrentFormVertices[vertex].y);
+		totalLength += clipSideLengths[vertex];
 		vertex = nextVertex;
 	}
 	ClipSegments = new CLPSEG[MAXITEMS];
@@ -11489,7 +11488,6 @@ void clpcon() {
 
 #endif
 
-			delete[] ClipSideLengths;
 			delete[] ClipIntersectData;
 
 			if (ClipSegmentIndex) {
