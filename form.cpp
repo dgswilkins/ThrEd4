@@ -381,7 +381,6 @@ unsigned		ClipSegmentIndex;		//clipboard segment pointer
 unsigned short	ClipIntersectSide;		//clipboard intersect side;
 fPOINT			LineSegmentStart;		//vertical clipboard line segment start
 fPOINT			LineSegmentEnd;			//vertical clipboard line segment end
-CLIPSORT*		ClipIntersectData;		//intersect points for vertical clipboard fill
 CLIPNT*			ClipStitchPoints;		//points for vertical clipboard fills
 float			ClipWidth;				//horizontal spacing for vertical clipboard fill
 HWND			TimeWindow;				//progress bar
@@ -10996,8 +10995,10 @@ bool nucseg(std::vector<float *> &sortedLengths) {
 	return 1;
 }
 
-void mvpclp(std::vector<CLIPSORT *> &ArrayOfClipIntersectData, unsigned destination, unsigned source) noexcept {
-	memcpy(ArrayOfClipIntersectData[destination], ArrayOfClipIntersectData[source], sizeof(CLIPSORT));
+void mvpclp(std::vector<CLIPSORT *> &arrayOfClipIntersectData, unsigned destination, unsigned source) noexcept {
+	if (destination != source) {
+		arrayOfClipIntersectData[destination] = arrayOfClipIntersectData[source];
+	}
 }
 
 float getlen(std::vector<double> &lengths, unsigned iPoint) noexcept {
@@ -11079,7 +11080,7 @@ bool isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* leng
 	return flag;
 }
 
-unsigned insect(std::vector<VCLPX>	regionCrossingData, std::vector<CLIPSORT *> &ArrayOfClipIntersectData, unsigned regionCrossingStart, unsigned regionCrossingEnd) noexcept {
+unsigned insect(std::vector<CLIPSORT> &clipIntersectData, std::vector<VCLPX> &regionCrossingData, std::vector<CLIPSORT *> &arrayOfClipIntersectData, unsigned regionCrossingStart, unsigned regionCrossingEnd) noexcept {
 	unsigned	iRegions = 0, iDestination = 0, iIntersection = 0, count = 0;
 	unsigned	currentVertex = 0, nextVertex = 0;
 	fRECTANGLE	lineSegmentRect = {};
@@ -11102,30 +11103,30 @@ unsigned insect(std::vector<VCLPX>	regionCrossingData, std::vector<CLIPSORT *> &
 		lineSegmentRect.bottom = LineSegmentEnd.y;
 	}
 	iIntersection = count = 0;
-	ArrayOfClipIntersectData.clear();
+	arrayOfClipIntersectData.clear();
 	for (iRegions = regionCrossingStart; iRegions < regionCrossingEnd; iRegions++) {
 		currentVertex = regionCrossingData[iRegions].vertex;
 		nextVertex = nxt(currentVertex);
-		if (isect(currentVertex, nextVertex, &ClipIntersectData[iIntersection].point, &ClipIntersectData[iIntersection].sideLength)) {
-			intersection = &ClipIntersectData[iIntersection].point;
+		if (isect(currentVertex, nextVertex, &clipIntersectData[iIntersection].point, &clipIntersectData[iIntersection].sideLength)) {
+			intersection = &clipIntersectData[iIntersection].point;
 			if (intersection->x >= lineSegmentRect.left &&
 				intersection->x <= lineSegmentRect.right &&
 				intersection->y >= lineSegmentRect.bottom &&
 				intersection->y <= lineSegmentRect.top) {
-				ClipIntersectData[iIntersection].segmentLength = hypot(ClipIntersectData[iIntersection].point.x - LineSegmentStart.x, ClipIntersectData[iIntersection].point.y - LineSegmentStart.y);
-				ClipIntersectData[iIntersection].vertexIndex = currentVertex;
-				ArrayOfClipIntersectData.push_back(&ClipIntersectData[iIntersection]);
+				clipIntersectData[iIntersection].segmentLength = hypot(clipIntersectData[iIntersection].point.x - LineSegmentStart.x, clipIntersectData[iIntersection].point.y - LineSegmentStart.y);
+				clipIntersectData[iIntersection].vertexIndex = currentVertex;
+				arrayOfClipIntersectData.push_back(&clipIntersectData[iIntersection]);
 				iIntersection++;
 				count++;
 			}
 		}
 	}
 	if (count > 1) {
-		std::sort(ArrayOfClipIntersectData.begin(), ArrayOfClipIntersectData.end(), lencmpa);
+		std::sort(arrayOfClipIntersectData.begin(), arrayOfClipIntersectData.end(), lencmpa);
 		iDestination = 1;
 		for (iIntersection = 0; iIntersection < count - 1; iIntersection++) {
-			if (fabs(ArrayOfClipIntersectData[iIntersection]->segmentLength - ArrayOfClipIntersectData[iIntersection + 1]->segmentLength) > TINY)
-				mvpclp(ArrayOfClipIntersectData, iDestination++, iIntersection + 1);
+			if (fabs(arrayOfClipIntersectData[iIntersection]->segmentLength - arrayOfClipIntersectData[iIntersection + 1]->segmentLength) > TINY)
+				mvpclp(arrayOfClipIntersectData, iDestination++, iIntersection + 1);
 		}
 		count = iDestination;
 	}
@@ -11256,9 +11257,9 @@ void clpcon() {
 	}
 	std::vector<double> lengths(VertexCount);
 	std::vector<double> clipSideLengths(VertexCount); //lengths of form sides for clipboard fill
-	ClipIntersectData = new CLIPSORT[VertexCount];
-	std::vector<CLIPSORT *> ArrayOfClipIntersectData;
-	ArrayOfClipIntersectData.reserve(VertexCount + 1);
+	std::vector<CLIPSORT> clipIntersectData(VertexCount); //intersect points for clipboard fill
+	std::vector<CLIPSORT *> arrayOfClipIntersectData;
+	arrayOfClipIntersectData.reserve(VertexCount);
 	vertex = leftsid();
 	totalLength = 0;
 	vertex = nxt(vertex);
@@ -11401,12 +11402,12 @@ void clpcon() {
 					ClipStitchPoints[ActivePointIndex].flag = 2;
 				}
 				ActivePointIndex++;
-				cnt = insect(regionCrossingData, ArrayOfClipIntersectData, regionCrossingStart, regionCrossingEnd);
+				cnt = insect(clipIntersectData, regionCrossingData, arrayOfClipIntersectData, regionCrossingStart, regionCrossingEnd);
 				if (cnt) {
 					for (ing = 0; ing < cnt; ing++) {
-						ClipStitchPoints[ActivePointIndex].vertexIndex = ArrayOfClipIntersectData[ing]->vertexIndex;
-						ClipStitchPoints[ActivePointIndex].x = ArrayOfClipIntersectData[ing]->point.x;
-						ClipStitchPoints[ActivePointIndex].y = ArrayOfClipIntersectData[ing]->point.y;
+						ClipStitchPoints[ActivePointIndex].vertexIndex = arrayOfClipIntersectData[ing]->vertexIndex;
+						ClipStitchPoints[ActivePointIndex].x = arrayOfClipIntersectData[ing]->point.x;
+						ClipStitchPoints[ActivePointIndex].y = arrayOfClipIntersectData[ing]->point.y;
 						ClipStitchPoints[ActivePointIndex].flag = 1;
 						ActivePointIndex++;
 						if (ActivePointIndex > MAXITEMS << 2) {
@@ -11487,8 +11488,6 @@ void clpcon() {
 	clp1skp:;
 
 #endif
-
-			delete[] ClipIntersectData;
 
 			if (ClipSegmentIndex) {
 				clplim = ClipSegmentIndex >> 3;
