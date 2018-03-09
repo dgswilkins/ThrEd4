@@ -10344,21 +10344,22 @@ constexpr unsigned duat(unsigned attribute) {
 	return type | frm;
 }
 
-void srtf(unsigned start, unsigned finish) {
+void srtf(std::vector<fPOINTATTR> &tempStitchBuffer, unsigned start, unsigned finish) {
 	unsigned	iForm = 0, iStitch = 0, stitchAccumulator = 0, swap = 0;
 
 	if (start != finish) {
 		std::vector<unsigned> stitchHistogram(FormIndex << 2);
 		for (iStitch = start; iStitch < finish; iStitch++)
-			stitchHistogram[duat(TempStitchBuffer[iStitch].attribute)]++;
+			stitchHistogram[duat(tempStitchBuffer[iStitch].attribute)]++;
 		stitchAccumulator = start;
 		for (iForm = 0; iForm < FormIndex << 2; iForm++) {
 			swap = stitchHistogram[iForm];
 			stitchHistogram[iForm] = stitchAccumulator;
 			stitchAccumulator += swap;
 		}
-		for (iStitch = start; iStitch < finish; iStitch++)
-			moveStitch(&StitchBuffer[stitchHistogram[duat(TempStitchBuffer[iStitch].attribute)]++], &TempStitchBuffer[iStitch]);
+		for (iStitch = start; iStitch < finish; iStitch++) {
+			StitchBuffer[stitchHistogram[duat(tempStitchBuffer[iStitch].attribute)]++] = tempStitchBuffer[iStitch];
+		}
 	}
 }
 
@@ -10374,7 +10375,7 @@ void srtbyfrm() {
 			if (iColor != AppliqueColor)
 				color[iColor] = iColor + 1;
 		}
-		TempStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
+		std::vector<fPOINTATTR> tempStitchBuffer(PCSHeader.stitchCount);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 			colorHistogram[color[StitchBuffer[iStitch].attribute & 0xf]]++;
 		colorAccumulator = 0;
@@ -10383,12 +10384,13 @@ void srtbyfrm() {
 			colorHistogram[iColor] = colorAccumulator;
 			colorAccumulator += swap;
 		}
-		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
-			moveStitch(&TempStitchBuffer[colorHistogram[color[StitchBuffer[iStitch].attribute & 0xf]]++], &StitchBuffer[iStitch]);
-		srtf(0, colorHistogram[0]);
-		for (iColor = 0; iColor < 15; iColor++)
-			srtf(colorHistogram[iColor], colorHistogram[iColor + 1]);
-		delete[] TempStitchBuffer;
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+			tempStitchBuffer[colorHistogram[color[StitchBuffer[iStitch].attribute & 0xf]]++] = StitchBuffer[iStitch];
+		}
+		srtf(tempStitchBuffer, 0, colorHistogram[0]);
+		for (iColor = 0; iColor < 15; iColor++) {
+			srtf(tempStitchBuffer, colorHistogram[iColor], colorHistogram[iColor + 1]);
+		}
 	}
 	else
 		srtcol();
