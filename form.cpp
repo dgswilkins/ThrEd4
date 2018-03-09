@@ -376,8 +376,6 @@ SMALPNTL*		SequenceLines;			//line for vertical/horizontal/angle fills
 unsigned		PathIndex;				//formOrigin to the next path element for vertical fill sequencing
 fPOINT*			WorkingFormVertices;	//form points for angle fills
 fPOINT			AngledFormVertices[MAXFRMLINS];	//form formOrigin data for angle fills
-CLPSEG*			ClipSegments;			//clipboard segments for virtual clipboard fill
-unsigned		ClipSegmentIndex;		//clipboard segment pointer
 unsigned short	ClipIntersectSide;		//clipboard intersect side;
 fPOINT			LineSegmentStart;		//vertical clipboard line segment start
 fPOINT			LineSegmentEnd;			//vertical clipboard line segment end
@@ -10892,7 +10890,7 @@ void chksid(unsigned vertexIndex) noexcept {
 	}
 }
 
-void ritseg() {
+void ritseg(std::vector<CLPSEG> &ClipSegments) {
 	unsigned	iPoint = 0;
 	bool		isPointedEnd = true;
 
@@ -10931,14 +10929,14 @@ void ritseg() {
 	ClipSegments[ActivePointIndex].dun = 1;
 }
 
-bool clpnxt(std::vector<LENINFO> &sortedLengths, unsigned sind) {
+bool clpnxt(std::vector<CLPSEG> &ClipSegments, std::vector<LENINFO> &sortedLengths, unsigned sind) {
 	// ToDo - rename local variables
 
 	unsigned	ind = 1;
-	const unsigned	indexDoubled = ClipSegmentIndex << 1;
+	const unsigned	indexDoubled = ClipSegments.size() << 1;
 
 	StateMap.reset(StateFlag::FILDIR);
-	while (ind < ClipSegmentIndex) {
+	while (ind < ClipSegments.size()) {
 		if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 			OutputIndex = (sind + ind) % indexDoubled;
 			if (!ClipSegments[sortedLengths[OutputIndex].index].dun)
@@ -10954,14 +10952,14 @@ bool clpnxt(std::vector<LENINFO> &sortedLengths, unsigned sind) {
 	return 1;
 }
 
-bool nucseg(std::vector<LENINFO> &sortedLengths) {
+bool nucseg(std::vector<CLPSEG> &ClipSegments, std::vector<LENINFO> &sortedLengths) {
 	unsigned	ind = 0;
 
 	if (StateMap.test(StateFlag::FILDIR))
 		ind = ClipSegments[ActivePointIndex].endIndex;
 	else
 		ind = ClipSegments[ActivePointIndex].beginIndex;
-	if (clpnxt(sortedLengths, ind))
+	if (clpnxt(ClipSegments, sortedLengths, ind))
 		return 0;
 	if (sortedLengths[OutputIndex].isEnd)
 		StateMap.reset(StateFlag::FILDIR);
@@ -11147,14 +11145,18 @@ bool isin(std::vector<VCLPX> regionCrossingData, float xCoordinate, float yCoord
 	return acnt & 1;
 }
 
-unsigned clpnseg(std::vector<double> &lengths, unsigned start, unsigned finish) noexcept {
-	ClipSegments[ClipSegmentIndex].start = start;
-	ClipSegments[ClipSegmentIndex].beginLength = getlen(lengths, start);
-	ClipSegments[ClipSegmentIndex].asid = ClipStitchPoints[start].vertexIndex;
-	ClipSegments[ClipSegmentIndex].endLength = getlen(lengths, finish);
-	ClipSegments[ClipSegmentIndex].zsid = ClipStitchPoints[finish].vertexIndex;
-	ClipSegments[ClipSegmentIndex].finish = finish;
-	ClipSegments[ClipSegmentIndex++].dun = 0;
+unsigned clpnseg(std::vector<CLPSEG> &ClipSegments, std::vector<double> &lengths, unsigned start, unsigned finish) noexcept {
+	CLPSEG clipSegment;
+	
+	clipSegment.start = start;
+	clipSegment.beginLength = getlen(lengths, start);
+	clipSegment.asid = ClipStitchPoints[start].vertexIndex;
+	clipSegment.endLength = getlen(lengths, finish);
+	clipSegment.zsid = ClipStitchPoints[finish].vertexIndex;
+	clipSegment.finish = finish;
+	clipSegment.dun = 0;
+	ClipSegments.push_back(clipSegment);
+	//ClipSegmentIndex++;
 	return finish + 1;
 }
 
@@ -11246,7 +11248,6 @@ void clpcon() {
 		totalLength += clipSideLengths[vertex];
 		vertex = nextVertex;
 	}
-	ClipSegments = new CLPSEG[MAXITEMS];
 	clipGrid.left = floor(SelectedForm->rectangle.left / ClipWidth);
 	clipGrid.right = ceil(SelectedForm->rectangle.right / ClipWidth);
 	clipGrid.bottom = floor(SelectedForm->rectangle.bottom / ClipRectSize.cy - 1);
@@ -11432,10 +11433,12 @@ void clpcon() {
 
 #endif
 
-	ClipSegmentIndex = 0;
 	StateMap.reset(StateFlag::FILDIR);
 	previousPoint = 0;
+	std::vector<CLPSEG> ClipSegments;
 	if (ActivePointIndex) {
+		ClipSegments.reserve(ActivePointIndex);
+
 		for (iPoint = 0; iPoint < ActivePointIndex - 1; iPoint++) {
 			switch (ClipStitchPoints[iPoint].flag) {
 			case 0:		//inside
@@ -11446,7 +11449,7 @@ void clpcon() {
 			case 1:		//line
 
 				if (StateMap.testAndFlip(StateFlag::FILDIR))
-					clpnseg(lengths, previousPoint, iPoint);
+					clpnseg(ClipSegments, lengths, previousPoint, iPoint);
 				else
 					previousPoint = iPoint;
 				break;
@@ -11465,91 +11468,90 @@ void clpcon() {
 
 #endif
 
-			if (ClipSegmentIndex) {
-				clplim = ClipSegmentIndex >> 3;
-				clplim = ClipSegmentIndex >> 1;
-				if (!clplim)
-					clplim = 1;
-				if (clplim > 12)
-					clplim = 12;
-				std::vector<LENINFO> sortedLengths;
-				sortedLengths.reserve(ClipSegmentIndex * 2);
-				for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
-					sortedLengths.push_back({ iSegment, false, ClipSegments[iSegment].beginLength });
-					sortedLengths.push_back({ iSegment, true, ClipSegments[iSegment].endLength });
-				}
-				std::sort(sortedLengths.begin(), sortedLengths.end(), lencmp);
-				for (iSorted = 0; iSorted < sortedLengths.size(); iSorted++) {
-					if (sortedLengths[iSorted].isEnd)
-						ClipSegments[sortedLengths[iSorted].index].endIndex = iSorted;
-					else
-						ClipSegments[sortedLengths[iSorted].index].beginIndex = iSorted;
-				}
+	if (ClipSegments.size()) {
+		clplim = ClipSegments.size() >> 3;
+		clplim = ClipSegments.size() >> 1;
+		if (!clplim)
+			clplim = 1;
+		if (clplim > 12)
+			clplim = 12;
+		std::vector<LENINFO> sortedLengths;
+		sortedLengths.reserve(ClipSegments.size() * 2);
+		for (iSegment = 0; iSegment < ClipSegments.size(); iSegment++) {
+			sortedLengths.push_back({ iSegment, false, ClipSegments[iSegment].beginLength });
+			sortedLengths.push_back({ iSegment, true, ClipSegments[iSegment].endLength });
+		}
+		std::sort(sortedLengths.begin(), sortedLengths.end(), lencmp);
+		for (iSorted = 0; iSorted < sortedLengths.size(); iSorted++) {
+			if (sortedLengths[iSorted].isEnd)
+				ClipSegments[sortedLengths[iSorted].index].endIndex = iSorted;
+			else
+				ClipSegments[sortedLengths[iSorted].index].beginIndex = iSorted;
+		}
 
 #if CLPVU==1
 
-				for (unsigned iStitch = 0; iStitch < ActivePointIndex; iStitch++) {
-					StitchBuffer[iStitch].x = ClipStitchPoints[iStitch].x;
-					StitchBuffer[iStitch].y = ClipStitchPoints[iStitch].y;
-					StitchBuffer[iStitch].attribute = 0;
-				}
-				PCSHeader.stitchCount = ActivePointIndex;
+		for (unsigned iStitch = 0; iStitch < ActivePointIndex; iStitch++) {
+			StitchBuffer[iStitch].x = ClipStitchPoints[iStitch].x;
+			StitchBuffer[iStitch].y = ClipStitchPoints[iStitch].y;
+			StitchBuffer[iStitch].attribute = 0;
+		}
+		PCSHeader.stitchCount = ActivePointIndex;
 #endif
 
 #if CLPVU==2
 
-				inf = 0;
-				for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
-					for (iStitchPoint = ClipSegments[iSegment].start; iStitchPoint <= ClipSegments[iSegment].finish; iStitchPoint++) {
-						StitchBuffer[inf].x = ClipStitchPoints[iStitchPoint].x;
-						StitchBuffer[inf].y = ClipStitchPoints[iStitchPoint].y;
-						StitchBuffer[inf++].attribute = iSegment & 0xf;
-					}
-				}
-				PCSHeader.stitchCount = inf;
+		inf = 0;
+		for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
+			for (iStitchPoint = ClipSegments[iSegment].start; iStitchPoint <= ClipSegments[iSegment].finish; iStitchPoint++) {
+				StitchBuffer[inf].x = ClipStitchPoints[iStitchPoint].x;
+				StitchBuffer[inf].y = ClipStitchPoints[iStitchPoint].y;
+				StitchBuffer[inf++].attribute = iSegment & 0xf;
+			}
+		}
+		PCSHeader.stitchCount = inf;
 
 #endif
 
-				minx = 1e99;
+		minx = 1e99;
 
 #if CLPVU==0
 
-				ActivePointIndex = 0;
-				StateMap.set(StateFlag::FILDIR);
-				SequenceIndex = 0;
-				ClipIntersectSide = ClipSegments[0].asid;
-				ritseg();
-				while (nucseg(sortedLengths)) {
-					if (SequenceIndex > MAXITEMS - 3)
-						break;
-					ritseg();
-				}
-				chksid(0);
-				if (SequenceIndex > MAXITEMS - 100)
-					SequenceIndex = MAXITEMS - 100;
-				ine = 0; inf = 0;
-				for (iSequence = 0; iSequence < SequenceIndex; iSequence++) {
-					if (vscmp(iSequence, ine)) {
-						ine++;
-						OSequence[ine].x = OSequence[iSequence].x;
-						OSequence[ine].y = OSequence[iSequence].y;
-					}
-					else
-						inf++;
-				}
-				SequenceIndex = ine;
-				if (StateMap.test(StateFlag::WASNEG)) {
-					for (iSequence = 0; iSequence < SequenceIndex; iSequence++)
-						OSequence[iSequence].x -= FormOffset;
-					for (iVertex = 0; iVertex < VertexCount; iVertex++)
-						CurrentFormVertices[iVertex].x -= FormOffset;
-					SelectedForm->rectangle.left -= FormOffset;
-					SelectedForm->rectangle.right -= FormOffset;
-				}
-#endif
+		ActivePointIndex = 0;
+		StateMap.set(StateFlag::FILDIR);
+		SequenceIndex = 0;
+		ClipIntersectSide = ClipSegments[0].asid;
+		ritseg(ClipSegments);
+		while (nucseg(ClipSegments, sortedLengths)) {
+			if (SequenceIndex > MAXITEMS - 3)
+				break;
+			ritseg(ClipSegments);
+		}
+		chksid(0);
+		if (SequenceIndex > MAXITEMS - 100)
+			SequenceIndex = MAXITEMS - 100;
+		ine = 0; inf = 0;
+		for (iSequence = 0; iSequence < SequenceIndex; iSequence++) {
+			if (vscmp(iSequence, ine)) {
+				ine++;
+				OSequence[ine].x = OSequence[iSequence].x;
+				OSequence[ine].y = OSequence[iSequence].y;
 			}
-			delete[] ClipStitchPoints;
-			delete[] ClipSegments;
+			else
+				inf++;
+		}
+		SequenceIndex = ine;
+		if (StateMap.test(StateFlag::WASNEG)) {
+			for (iSequence = 0; iSequence < SequenceIndex; iSequence++)
+				OSequence[iSequence].x -= FormOffset;
+			for (iVertex = 0; iVertex < VertexCount; iVertex++)
+				CurrentFormVertices[iVertex].x -= FormOffset;
+			SelectedForm->rectangle.left -= FormOffset;
+			SelectedForm->rectangle.right -= FormOffset;
+		}
+#endif
+	}
+	delete[] ClipStitchPoints;
 }
 
 void vrtsclp() {
