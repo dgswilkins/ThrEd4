@@ -1824,3 +1824,11 @@ enum {
 	POINT_AFTER_LINE
 };
 
+// Sorted line length info
+typedef struct _lengthInfo {
+	unsigned	index;
+	bool		isEnd;
+	float		length;
+}LENINFO;
+
+

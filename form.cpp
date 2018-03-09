@@ -10857,19 +10857,14 @@ void stchs2frm() {
 		shoseln(IDS_GRPMSG, IDS_STCH2FRM);
 }
 
-bool lencmp(const float *arg1, const float *arg2) noexcept {
-	if (arg1 && arg2) {
-		const float local1 = *arg1, local2 = *arg2;
-
-		return (local1 < local2);
-	}
-	return false;
+bool lencmp(const LENINFO &arg1, const LENINFO &arg2) noexcept {
+		return (arg1.length < arg2.length);
 }
 
 bool lencmpa(const CLIPSORT *arg1, const CLIPSORT *arg2) noexcept {
-		const float local1 = arg1->segmentLength, local2 = arg2->segmentLength;
+	const float local1 = arg1->segmentLength, local2 = arg2->segmentLength;
 
-		return (local1 < local2);
+	return (local1 < local2);
 }
 
 
@@ -10936,23 +10931,7 @@ void ritseg() {
 	ClipSegments[ActivePointIndex].dun = 1;
 }
 
-unsigned lenref(const float *lineLength) noexcept {
-	//Correct (randomization?)
-	[[gsl::suppress(type.1)]]{
-		//ToDo - this is very brittle. There has to be a better way
-		unsigned eax = reinterpret_cast<unsigned>(lineLength) - reinterpret_cast<unsigned>(ClipSegments);
-
-		const unsigned edx = eax % sizeof(CLPSEG);
-		eax /= sizeof(CLPSEG);
-		eax <<= 1;
-		if ((edx & 0xFF) == offsetof(CLPSEG, endLength)) {
-			eax++;
-		}
-		return eax;
-	}
-}
-
-bool clpnxt(std::vector<float *> &sortedLengths, unsigned sind) {
+bool clpnxt(std::vector<LENINFO> &sortedLengths, unsigned sind) {
 	// ToDo - rename local variables
 
 	unsigned	ind = 1;
@@ -10962,20 +10941,20 @@ bool clpnxt(std::vector<float *> &sortedLengths, unsigned sind) {
 	while (ind < ClipSegmentIndex) {
 		if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 			OutputIndex = (sind + ind) % indexDoubled;
-			if (!ClipSegments[lenref(sortedLengths[OutputIndex]) >> 1].dun)
+			if (!ClipSegments[sortedLengths[OutputIndex].index].dun)
 				return 0;
 			ind++;
 		}
 		else {
 			OutputIndex = (sind + indexDoubled - ind) % indexDoubled;
-			if (!ClipSegments[lenref(sortedLengths[OutputIndex]) >> 1].dun)
+			if (!ClipSegments[sortedLengths[OutputIndex].index].dun)
 				return 0;
 		}
 	}
 	return 1;
 }
 
-bool nucseg(std::vector<float *> &sortedLengths) {
+bool nucseg(std::vector<LENINFO> &sortedLengths) {
 	unsigned	ind = 0;
 
 	if (StateMap.test(StateFlag::FILDIR))
@@ -10984,12 +10963,11 @@ bool nucseg(std::vector<float *> &sortedLengths) {
 		ind = ClipSegments[ActivePointIndex].beginIndex;
 	if (clpnxt(sortedLengths, ind))
 		return 0;
-	ind = lenref(sortedLengths[OutputIndex]);
-	if (ind & 1)
+	if (sortedLengths[OutputIndex].isEnd)
 		StateMap.reset(StateFlag::FILDIR);
 	else
 		StateMap.set(StateFlag::FILDIR);
-	ActivePointIndex = ind >> 1;
+	ActivePointIndex = sortedLengths[OutputIndex].index;
 	return 1;
 }
 
@@ -11494,21 +11472,18 @@ void clpcon() {
 					clplim = 1;
 				if (clplim > 12)
 					clplim = 12;
-				std::vector<float *> sortedLengths;
+				std::vector<LENINFO> sortedLengths;
 				sortedLengths.reserve(ClipSegmentIndex * 2);
 				for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
-					sortedLengths.push_back(&ClipSegments[iSegment].beginLength);
-					sortedLengths.push_back(&ClipSegments[iSegment].endLength);
+					sortedLengths.push_back({ iSegment, false, ClipSegments[iSegment].beginLength });
+					sortedLengths.push_back({ iSegment, true, ClipSegments[iSegment].endLength });
 				}
 				std::sort(sortedLengths.begin(), sortedLengths.end(), lencmp);
 				for (iSorted = 0; iSorted < sortedLengths.size(); iSorted++) {
-					// ToDo - what does lenref do exactly?
-					inf = lenref(sortedLengths[iSorted]);
-					ing = inf >> 1;
-					if (inf & 1)
-						ClipSegments[ing].endIndex = iSorted;
+					if (sortedLengths[iSorted].isEnd)
+						ClipSegments[sortedLengths[iSorted].index].endIndex = iSorted;
 					else
-						ClipSegments[ing].beginIndex = iSorted;
+						ClipSegments[sortedLengths[iSorted].index].beginIndex = iSorted;
 				}
 
 #if CLPVU==1
