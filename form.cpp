@@ -262,8 +262,6 @@ void		wavfrm ();
 unsigned		FormMenuEntryCount;		//lines in the form-form
 float			MaxStitchLen;			//maximum stitch length
 float			UserStitchLen;			//user stitch length
-double*			ListSINEs;				//a list of sins of form angles
-double*			ListCOSINEs;			//a list of cosins of form angles
 double			AdjustedSpace;			//adjusted space
 unsigned		NextStart;				//index of the endpoint of the line segment being processed
 fPOINT*			ChainEndPoints;			//end points of chain stitches
@@ -12012,7 +12010,7 @@ void col2frm() {
 	shoMsg(MsgBuffer);
 }
 
-bool fxpnt() noexcept {
+bool fxpnt(std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) noexcept {
 	double		length = 0.0, delta = 0.0;
 	unsigned	iGuess = 0;
 
@@ -12033,12 +12031,12 @@ bool fxpnt() noexcept {
 	return 0;
 }
 
-void fxlit() noexcept {
+void fxlit(std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) noexcept {
 	double		length = 0.0;
 	unsigned	count = 0;
 	dPOINT		delta = {};
 
-	if (fxpnt()) {
+	if (fxpnt(ListSINEs, ListCOSINEs)) {
 		SelectedPoint.x = MoveToCoords.x;
 		SelectedPoint.y = MoveToCoords.y;
 		BeanCount++;
@@ -12052,13 +12050,13 @@ void fxlit() noexcept {
 	}
 }
 
-void fxlin() noexcept {
+void fxlin(std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) noexcept {
 	double		length = 0.0;
 	unsigned	count = 0;
 	unsigned	iChain = 0;
 	dPOINT		delta = {};
 
-	if (fxpnt()) {
+	if (fxpnt(ListSINEs, ListCOSINEs)) {
 		ChainEndPoints[ActivePointIndex].x = SelectedPoint.x = MoveToCoords.x;
 		ChainEndPoints[ActivePointIndex].y = SelectedPoint.y = MoveToCoords.y;
 		ActivePointIndex++;
@@ -12076,7 +12074,7 @@ void fxlin() noexcept {
 	}
 }
 
-void fxlen() noexcept {
+void fxlen(std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) noexcept {
 	double		interval = 0.0;
 	double		minimumInterval = 0.0;
 	double		minimumSpacing = 0.0;
@@ -12126,11 +12124,11 @@ void fxlen() noexcept {
 		ChainEndPoints[0].y = SelectedPoint.y;
 		for (CurrentSide = 0; CurrentSide < VertexCount - 1; CurrentSide++) {
 			NextStart = CurrentSide + 1;
-			fxlit();
+			fxlit(ListSINEs, ListCOSINEs);
 		}
 		if (SelectedForm->type != FRMLINE) {
 			NextStart = 0;
-			fxlit();
+			fxlit(ListSINEs, ListCOSINEs);
 		}
 		else
 			NextStart = VertexCount - 1;
@@ -12169,11 +12167,11 @@ void fxlen() noexcept {
 	AdjustedSpace = minimumSpacing;
 	for (CurrentSide = 0; CurrentSide < VertexCount - 1; CurrentSide++) {
 		NextStart = CurrentSide + 1;
-		fxlin();
+		fxlin(ListSINEs, ListCOSINEs);
 	}
 	if (SelectedForm->type != FRMLINE) {
 		NextStart = 0;
-		fxlin();
+		fxlin(ListSINEs, ListCOSINEs);
 	}
 	interval = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
 	if (interval < halfSpacing)
@@ -12250,16 +12248,16 @@ void dufxlen() {
 	unsigned	iVertex = 0;
 
 	duangs();
-	ListSINEs = new double[VertexCount + 1];
-	ListCOSINEs = new double[VertexCount];
+	std::vector<double> ListSINEs;
+	ListSINEs.reserve(VertexCount + 1);
+	std::vector<double> ListCOSINEs;
+	ListCOSINEs.reserve(VertexCount);
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-		ListSINEs[iVertex] = sin(FormAngles[iVertex]);
-		ListCOSINEs[iVertex] = cos(FormAngles[iVertex]);
+		ListSINEs.push_back(sin(FormAngles[iVertex]));
+		ListCOSINEs.push_back(cos(FormAngles[iVertex]));
 	}
-	ListSINEs[iVertex] = sin((FormAngles[0] > FormAngles[iVertex]) ? (FormAngles[0] - FormAngles[iVertex]) : (FormAngles[iVertex] - FormAngles[0]));
-	fxlen();
-	delete[] ListCOSINEs;
-	delete[] ListSINEs;
+	ListSINEs.push_back(sin((FormAngles[0] > FormAngles[iVertex]) ? (FormAngles[0] - FormAngles[iVertex]) : (FormAngles[iVertex] - FormAngles[0])));
+	fxlen(ListSINEs, ListCOSINEs);
 }
 
 void chnfn() {
