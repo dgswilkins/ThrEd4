@@ -1361,8 +1361,8 @@ typedef struct _clipsort {
 typedef struct _clipnt {
 	float			x;
 	float			y;
-	unsigned short	vertexIndex;
-	unsigned short	flag;
+	unsigned		vertexIndex;
+	unsigned		flag;
 }CLIPNT;
 
 typedef struct _vclpx {
