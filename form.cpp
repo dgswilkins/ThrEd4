@@ -215,15 +215,15 @@ void			clpbrd(unsigned short startVertex);
 void			clpcon ();
 void			clpic();
 void			clpout ();
-void			clpxadj () noexcept;
+void			clpxadj (std::vector<fPOINT> &ChainEndPoints) noexcept;
 void			contf ();
 void			deleclp (unsigned iForm);
 void			delmclp (unsigned iForm);
 void			duangs () noexcept;
 void			dubfn ();
 void			dufcntr (dPOINT* center) noexcept;
-void			dulast () noexcept;
-void			dufxlen ();
+void			dulast (std::vector<fPOINT> &ChainEndPoints) noexcept;
+void			dufxlen (std::vector<fPOINT> &ChainEndPoints);
 void			duhart (unsigned sideCount);
 void			durpoli (unsigned vertexCount);
 void			duxclp ();
@@ -264,7 +264,6 @@ float			MaxStitchLen;			//maximum stitch length
 float			UserStitchLen;			//user stitch length
 double			AdjustedSpace;			//adjusted space
 unsigned		NextStart;				//index of the endpoint of the line segment being processed
-fPOINT*			ChainEndPoints;			//end points of chain stitches
 unsigned		ChainSequence[] = { 0,1,2,3,0,1,4,3,0,3 };//chain stitch sequence
 double			Div4;					//chain space divided by four
 unsigned		ChainCount;				//number of elements of the chain sequence to process
@@ -12022,7 +12021,7 @@ void fxlit(std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) noe
 	}
 }
 
-void fxlin(std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) noexcept {
+void fxlin(std::vector<fPOINT> &ChainEndPoints, std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) noexcept {
 	double		length = 0.0;
 	unsigned	count = 0;
 	unsigned	iChain = 0;
@@ -12046,7 +12045,7 @@ void fxlin(std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) noe
 	}
 }
 
-void fxlen(std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) noexcept {
+void fxlen(std::vector<fPOINT> &ChainEndPoints, std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) noexcept {
 	double		interval = 0.0;
 	double		minimumInterval = 0.0;
 	double		minimumSpacing = 0.0;
@@ -12139,11 +12138,11 @@ void fxlen(std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) noe
 	AdjustedSpace = minimumSpacing;
 	for (CurrentSide = 0; CurrentSide < VertexCount - 1; CurrentSide++) {
 		NextStart = CurrentSide + 1;
-		fxlin(ListSINEs, ListCOSINEs);
+		fxlin(ChainEndPoints, ListSINEs, ListCOSINEs);
 	}
 	if (SelectedForm->type != FRMLINE) {
 		NextStart = 0;
-		fxlin(ListSINEs, ListCOSINEs);
+		fxlin(ChainEndPoints, ListSINEs, ListCOSINEs);
 	}
 	interval = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
 	if (interval < halfSpacing)
@@ -12153,7 +12152,7 @@ void fxlen(std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) noe
 	ActivePointIndex++;
 }
 
-void duchfn(unsigned start, unsigned finish) noexcept {
+void duchfn(std::vector<fPOINT> &ChainEndPoints, unsigned start, unsigned finish) noexcept {
 	unsigned		iChain = 0;
 	fPOINT			chainPoint[5] = {};
 	dPOINT			delta = { (ChainEndPoints[finish].x - ChainEndPoints[start].x),
@@ -12185,16 +12184,16 @@ void duchfn(unsigned start, unsigned finish) noexcept {
 	}
 }
 
-void duch() {
+void duch(std::vector<fPOINT> &ChainEndPoints) {
 	unsigned	iPoint = 0, backupAt = 0;
 
 	Div4 = AdjustedSpace / 4;
 	SequenceIndex = 0;
 	if (ActivePointIndex > 1) {
 		for (iPoint = 0; iPoint < gsl::narrow<unsigned>(ActivePointIndex) - 2; iPoint++)
-			duchfn(iPoint, iPoint + 1);
+			duchfn(ChainEndPoints, iPoint, iPoint + 1);
 		if (SelectedForm->type == FRMLINE) {
-			duchfn(iPoint, iPoint + 1);
+			duchfn(ChainEndPoints, iPoint, iPoint + 1);
 			backupAt = 8;
 			if (StateMap.test(StateFlag::LINCHN))
 				backupAt--;
@@ -12206,7 +12205,7 @@ void duch() {
 			OSequence[SequenceIndex++].y = ChainEndPoints[iPoint + 1].y;
 		}
 		else {
-			duchfn(iPoint, 0);
+			duchfn(ChainEndPoints, iPoint, 0);
 			OSequence[SequenceIndex].x = ChainEndPoints[ActivePointIndex - 1].x;
 			OSequence[SequenceIndex].y = ChainEndPoints[ActivePointIndex - 1].y;
 			SequenceIndex++;
@@ -12216,7 +12215,7 @@ void duch() {
 		tabmsg(IDS_CHANSMAL);
 }
 
-void dufxlen() {
+void dufxlen(std::vector<fPOINT> &ChainEndPoints) {
 	unsigned	iVertex = 0;
 
 	duangs();
@@ -12229,22 +12228,21 @@ void dufxlen() {
 		ListCOSINEs.push_back(cos(FormAngles[iVertex]));
 	}
 	ListSINEs.push_back(sin((FormAngles[0] > FormAngles[iVertex]) ? (FormAngles[0] - FormAngles[iVertex]) : (FormAngles[iVertex] - FormAngles[0])));
-	fxlen(ListSINEs, ListCOSINEs);
+	fxlen(ChainEndPoints, ListSINEs, ListCOSINEs);
 }
 
 void chnfn() {
 	// ToDo - Can we do better than MAXITEMS?
-	ChainEndPoints = new fPOINT[MAXITEMS];
+	std::vector<fPOINT> ChainEndPoints(MAXITEMS);
 	ChainCount = 10;
 	if (StateMap.test(StateFlag::LINCHN))
 		ChainCount--;
 	fvars(ClosestFormToCursor);
 	deleclp(ClosestFormToCursor);
-	dufxlen();
-	dulast();
+	dufxlen(ChainEndPoints);
+	dulast(ChainEndPoints);
 	SequenceIndex = 0;
-	duch();
-	delete[] ChainEndPoints;
+	duch(ChainEndPoints);
 }
 
 void chan() {
@@ -12349,7 +12347,7 @@ void crop() {
 		shoseln(IDS_FRM1MSG, IDS_CROP);
 }
 
-void xclpfn(unsigned start, unsigned finish) {
+void xclpfn(std::vector<fPOINT> &ChainEndPoints, unsigned start, unsigned finish) {
 	dPOINT			delta = { (ChainEndPoints[finish].x - ChainEndPoints[start].x),
 								(ChainEndPoints[finish].y - ChainEndPoints[start].y) };
 	unsigned		iPoint = 0;
@@ -12371,27 +12369,27 @@ void duxclp() {
 	unsigned	iPoint;
 
 	// ToDo - Can we do better than MAXITEMS?
-	ChainEndPoints = new fPOINT[MAXITEMS]();
+	std::vector<fPOINT> ChainEndPoints(MAXITEMS);
 	duangs();
-	dufxlen();
-	clpxadj();
+	dufxlen(ChainEndPoints);
+	clpxadj(ChainEndPoints);
 	SequenceIndex = 0;
 	RotationCenter.x = RotationCenter.y = 0;
 	for (iPoint = 1; iPoint < ActivePointIndex; iPoint++)
-		xclpfn(iPoint - 1, iPoint);
+		xclpfn(ChainEndPoints, iPoint - 1, iPoint);
 	if (SelectedForm->type != FRMLINE) {
 		OSequence[SequenceIndex].x = ChainEndPoints[0].x;
 		OSequence[SequenceIndex++].y = ChainEndPoints[0].y;
 	}
-	delete[] ChainEndPoints;
 }
 
-void dulast() noexcept {
+void dulast(std::vector<fPOINT> &ChainEndPoints) noexcept {
 	unsigned	iPoint = 0, iDestination = 0, minimumIndex = 0;
 	double		minimumLength = 0.0;
 	double		length = 0.0;
 
-	TempClipPoints = &ChainEndPoints[ActivePointIndex];
+	std::vector<fPOINT> tempClipPoints;
+	tempClipPoints.reserve(ActivePointIndex);
 	if (lastch()) {
 		minimumLength = 1e99;
 		minimumIndex = 0;
@@ -12405,23 +12403,21 @@ void dulast() noexcept {
 		if (minimumIndex) {
 			iDestination = 0;
 			for (iPoint = minimumIndex; iPoint < ActivePointIndex - 1; iPoint++) {
-				TempClipPoints[iDestination].x = ChainEndPoints[iPoint].x;
-				TempClipPoints[iDestination++].y = ChainEndPoints[iPoint].y;
+				tempClipPoints.push_back(ChainEndPoints[iPoint]);
 			}
 			for (iPoint = 0; iPoint <= minimumIndex; iPoint++) {
-				TempClipPoints[iDestination].x = ChainEndPoints[iPoint].x;
-				TempClipPoints[iDestination++].y = ChainEndPoints[iPoint].y;
+				tempClipPoints.push_back(ChainEndPoints[iPoint]);
 			}
-			MoveMemory(ChainEndPoints, TempClipPoints, sizeof(fPOINT)*iDestination);
+			ChainEndPoints = tempClipPoints;
 		}
 	}
 }
 
-void clpxadj() noexcept {
+void clpxadj(std::vector<fPOINT> &ChainEndPoints) noexcept {
 	unsigned	iPoint = 0;
 	double		pivot = 0.0;
 
-	dulast();
+	dulast(ChainEndPoints);
 	if (SelectedForm->type == FRMLINE) {
 		pivot = ClipRectSize.cy / 2;
 		for (iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
