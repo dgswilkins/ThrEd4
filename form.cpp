@@ -215,7 +215,7 @@ void			clpbrd(unsigned short startVertex);
 void			clpcon ();
 void			clpic();
 void			clpout ();
-void			clpxadj (std::vector<fPOINT> &chainEndPoints) noexcept;
+void			clpxadj(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPoints) noexcept;
 void			contf ();
 void			deleclp (unsigned iForm);
 void			delmclp (unsigned iForm);
@@ -12346,7 +12346,7 @@ void crop() {
 		shoseln(IDS_FRM1MSG, IDS_CROP);
 }
 
-void xclpfn(std::vector<fPOINT> &chainEndPoints, unsigned start, unsigned finish) {
+void xclpfn(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPoints, unsigned start, unsigned finish) {
 	dPOINT			delta = { (chainEndPoints[finish].x - chainEndPoints[start].x),
 								(chainEndPoints[finish].y - chainEndPoints[start].y) };
 	unsigned		iPoint = 0;
@@ -12356,8 +12356,8 @@ void xclpfn(std::vector<fPOINT> &chainEndPoints, unsigned start, unsigned finish
 
 	RotationAngle = atan2(delta.y, delta.x);
 	for (iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
-		points[iPoint].x = TempClipPoints[iPoint].x*ratio;
-		points[iPoint].y = TempClipPoints[iPoint].y;
+		points[iPoint].x = tempClipPoints[iPoint].x*ratio;
+		points[iPoint].y = tempClipPoints[iPoint].y;
 		rotflt(&points[iPoint]);
 		OSequence[SequenceIndex].x = chainEndPoints[start].x + points[iPoint].x;
 		OSequence[SequenceIndex++].y = chainEndPoints[start].y + points[iPoint].y;
@@ -12372,11 +12372,13 @@ void duxclp() {
 	chainEndPoints.reserve(50);
 	duangs();
 	dufxlen(chainEndPoints);
-	clpxadj(chainEndPoints);
+	std::vector<fPOINT> tempClipPoints;
+	tempClipPoints.reserve(ActivePointIndex);
+	clpxadj(tempClipPoints, chainEndPoints);
 	SequenceIndex = 0;
 	RotationCenter.x = RotationCenter.y = 0;
 	for (iPoint = 1; iPoint < ActivePointIndex; iPoint++)
-		xclpfn(chainEndPoints, iPoint - 1, iPoint);
+		xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint);
 	if (SelectedForm->type != FRMLINE) {
 		OSequence[SequenceIndex++] = chainEndPoints[0];
 	}
@@ -12412,22 +12414,20 @@ void dulast(std::vector<fPOINT> &chainEndPoints) noexcept {
 	}
 }
 
-void clpxadj(std::vector<fPOINT> &chainEndPoints) noexcept {
+void clpxadj(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPoints) noexcept {
 	unsigned	iPoint = 0;
-	double		pivot = 0.0;
+	float		pivot = 0.0;
 
 	dulast(chainEndPoints);
 	if (SelectedForm->type == FRMLINE) {
 		pivot = ClipRectSize.cy / 2;
 		for (iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
-			TempClipPoints[iPoint].x = ClipBuffer[iPoint].x;
-			TempClipPoints[iPoint].y = -ClipBuffer[iPoint].y + pivot;
+			tempClipPoints.push_back({ ClipBuffer[iPoint].x, (-ClipBuffer[iPoint].y + pivot) });
 		}
 	}
 	else {
 		for (iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
-			TempClipPoints[iPoint].x = ClipBuffer[iPoint].x;
-			TempClipPoints[iPoint].y = -ClipBuffer[iPoint].y;
+			tempClipPoints.push_back({ ClipBuffer[iPoint].x, (-ClipBuffer[iPoint].y) });
 		}
 	}
 }
