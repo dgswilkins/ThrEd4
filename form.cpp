@@ -690,8 +690,7 @@ void delflt(unsigned formIndex) noexcept {
 		destination = fltind(FormList[formIndex].vertices);
 		source = destination + FormList[formIndex].vertexCount;
 		while (source < FormVertexIndex) {
-			FormVertices[destination].x = FormVertices[source].x;
-			FormVertices[destination++].y = FormVertices[source++].y;
+			FormVertices[destination++] = FormVertices[source++];
 		}
 		for (iForm = formIndex + 1; iForm < FormIndex; iForm++)
 			FormList[iForm].vertices -= FormList[formIndex].vertexCount;
