@@ -221,7 +221,6 @@ extern	void			frm0 ();
 extern	void			frmadj (unsigned formIndex);
 extern	void			frmchkx ();
 extern	void			frmclr (FRMHED* destination);
-extern	void			frmcpy (FRMHED* destination, const FRMHED* source);
 extern	void			frmlin (fPOINT* vertices, unsigned vertexCount);
 extern	void			frmnum ();
 extern	void			frmnumfn (unsigned newFormIndex);
@@ -7529,7 +7528,7 @@ void duclip() {
 					FRMHED* forms = convert_ptr<FRMHED *>(&ClipFormsHeader[1]);
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 						SelectedForm = &FormList[SelectedFormList[iForm]];
-						frmcpy(&forms[iForm], &FormList[SelectedFormList[iForm]]);
+						forms[iForm] = FormList[SelectedFormList[iForm]];
 					}
 					// skip past the forms
 					CurrentFormVertices = convert_ptr<fPOINT *>(&forms[iForm]);
@@ -7633,7 +7632,7 @@ void duclip() {
 					if (ThrEdClipPointer) {
 						ClipFormHeader = *(static_cast<FORMCLIP * *>(ThrEdClipPointer));
 						ClipFormHeader->clipType = CLP_FRM;
-						frmcpy(&ClipFormHeader->form, &FormList[ClosestFormToCursor]);
+						ClipFormHeader->form = FormList[ClosestFormToCursor];
 						CurrentFormVertices = convert_ptr<fPOINT *>(&ClipFormHeader[1]);
 						for (iSide = 0; iSide < SelectedForm->vertexCount; iSide++) {
 							CurrentFormVertices[iSide].x = SelectedForm->vertices[iSide].x;
@@ -8464,8 +8463,9 @@ void frmdel() {
 
 	fvars(ClosestFormToCursor);
 	f1del();
-	for (iForm = ClosestFormToCursor; iForm < gsl::narrow<unsigned>(FormIndex); iForm++)
-		frmcpy(&FormList[iForm], &FormList[iForm + 1]);
+	for (iForm = ClosestFormToCursor; iForm < FormIndex; iForm++) {
+		FormList[iForm] = FormList[iForm + 1];
+	}
 	if (StateMap.testAndReset(StateFlag::DELTO)) {
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
@@ -11213,7 +11213,9 @@ void delsfrms(unsigned code) {
 			validFormCount = 0; deletedFormCount = 0;
 			for (iForm = 0; iForm < FormIndex; iForm++) {
 				if (!formMap.test(iForm)) {
-					frmcpy(&FormList[validFormCount], &FormList[iForm]);
+					if (validFormCount != iForm) {
+						FormList[validFormCount] = FormList[iForm];
+					}
 					formIndices[iForm] = (iForm - deletedFormCount) << 4;
 					validFormCount++;
 				}
@@ -16673,7 +16675,7 @@ unsigned chkMsg() {
 							ClipFormsCount = ClipFormsHeader->formCount;
 							forms = convert_ptr<FRMHED *>(&ClipFormsHeader[1]);
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-								frmcpy(&FormList[FormIndex + iForm], &forms[iForm]);
+								FormList[FormIndex + iForm] = forms[iForm];
 								FormList[FormIndex + iForm].attribute = (FormList[FormIndex + iForm].attribute&NFRMLMSK) | (ActiveLayer << 1);
 							}
 							CurrentFormVertices = convert_ptr<fPOINT *>(&forms[iForm]);
@@ -16759,7 +16761,7 @@ unsigned chkMsg() {
 								StateMap.set(StateFlag::FUNCLP);
 								ClosestFormToCursor = FormIndex;
 								fvars(FormIndex);
-								frmcpy(&FormList[FormIndex], &ClipFormHeader->form);
+								FormList[FormIndex] = ClipFormHeader->form;
 								FormList[FormIndex].attribute = (FormList[FormIndex].attribute&NFRMLMSK) | (ActiveLayer << 1);
 								SelectedForm->vertices = adflt(FormList[FormIndex].vertexCount);
 								CurrentFormVertices = convert_ptr<fPOINT *>(&ClipFormHeader[1]);

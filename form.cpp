@@ -446,10 +446,6 @@ unsigned char* Levels[] = {
 };
 
 
-void frmcpy(FRMHED* destination, const FRMHED* source) noexcept {
-	memcpy(destination, source, sizeof(FRMHED));
-}
-
 void frmclr(FRMHED* destination) noexcept {
 	memset(destination, 0, sizeof(FRMHED));
 }
@@ -2351,7 +2347,7 @@ void fnvrt(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lin
 void fnang(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints) {
 	unsigned	iVertex = 0;
 
-	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
+	AngledForm = FormList[ClosestFormToCursor];
 	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
 	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;
@@ -2368,7 +2364,7 @@ void fnang(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lin
 void fnhor(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints) {
 	unsigned	iVertex = 0;
 
-	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
+	AngledForm = FormList[ClosestFormToCursor];
 	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
 	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	RotationAngle = PI / 2;
@@ -8963,7 +8959,7 @@ void adfrm(unsigned iForm) {
 	FRMHED*		formHeader = &FormList[FormIndex];
 
 	SelectedForm = &FormList[iForm];
-	frmcpy(formHeader, SelectedForm);
+	*formHeader = *SelectedForm;
 	ClosestFormToCursor = FormIndex;
 	formHeader->vertices = adflt(SelectedForm->vertexCount);
 	mvflpnt(formHeader->vertices, SelectedForm->vertices, SelectedForm->vertexCount);
@@ -9028,7 +9024,7 @@ void cplayfn(unsigned iForm, unsigned play) {
 	const FRMHED*	formHeader = &FormList[iForm];
 
 	fvars(FormIndex);
-	frmcpy(SelectedForm, formHeader);
+	*SelectedForm = *formHeader;
 	fvars(FormIndex);
 	SelectedForm->vertices = adflt(SelectedForm->vertexCount);
 	MoveMemory(SelectedForm->vertices, formHeader->vertices, VertexCount * sizeof(fPOINT));
@@ -11643,7 +11639,7 @@ void angout() noexcept {
 void horclpfn() {
 	unsigned	iVertex = 0;
 
-	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
+	AngledForm = FormList[ClosestFormToCursor];
 	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
 	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;
@@ -11731,7 +11727,7 @@ void horclp() {
 void angclpfn() {
 	unsigned	iVertex = 0;
 
-	frmcpy(&AngledForm, &FormList[ClosestFormToCursor]);
+	AngledForm = FormList[ClosestFormToCursor];
 	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
 	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;

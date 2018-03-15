@@ -137,7 +137,6 @@ extern	void		filsfn();
 extern	void		filvrt();
 extern	unsigned	find1st();
 extern	void		frmclr(FRMHED* destination);
-extern	void		frmcpy(FRMHED* destination, const FRMHED* source);
 extern	void		frmout(unsigned formIndex);
 extern	void		frmrct(fRECTANGLE* rectangle);
 extern	void		fshor();
@@ -3622,7 +3621,7 @@ void txtclp() {
 		if (ClipFormHeader) {
 			if (ClipFormHeader->clipType == CLP_FRM) {
 				SelectedForm = &ClipFormHeader->form;
-				frmcpy(&AngledForm, SelectedForm);
+				AngledForm = *SelectedForm;
 				MoveMemory(&AngledFormVertices, &SelectedForm[1], sizeof(fPOINT)*SelectedForm->vertexCount);
 				AngledForm.vertices = AngledFormVertices;
 				StateMap.reset(StateFlag::TXTLIN);
