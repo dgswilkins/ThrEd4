@@ -8551,9 +8551,7 @@ void delet() {
 		currentFormVertex = 0;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 			if (!vertexMap.test(iVertex)) {
-				CurrentFormVertices[currentFormVertex].x = CurrentFormVertices[iVertex].x;
-				CurrentFormVertices[currentFormVertex].y = CurrentFormVertices[iVertex].y;
-				currentFormVertex++;
+				CurrentFormVertices[currentFormVertex++] = CurrentFormVertices[iVertex];
 			}
 		}
 		currentFormVertex = fltind(&CurrentFormVertices[currentFormVertex]);
