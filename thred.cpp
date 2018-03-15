@@ -6327,6 +6327,8 @@ void unlin() {
 void movbox() {
 	if (stch2px(ClosestPointIndex)) {
 		unbox();
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Stitch:%d form:%d type:%d\n", ClosestPointIndex, ((StitchBuffer[ClosestPointIndex].attribute&FRMSK) >> FRMSHFT), ((StitchBuffer[ClosestPointIndex].attribute&TYPMSK) >> TYPSHFT));
+		OutputDebugString(MsgBuffer);
 		dubox();
 		if (StateMap.test(StateFlag::UPTO))
 			StateMap.set(StateFlag::RESTCH);
@@ -6774,8 +6776,11 @@ void rebox() {
 	unbox();
 	if (closPnt1(&ClosestPointIndex)) {
 		nuAct(ClosestPointIndex);
-		if (stch2px(ClosestPointIndex))
+		if (stch2px(ClosestPointIndex)) {
 			dubox();
+			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Stitch:%d form:%d type:%d\n", ClosestPointIndex, ((StitchBuffer[ClosestPointIndex].attribute&FRMSK) >> FRMSHFT), ((StitchBuffer[ClosestPointIndex].attribute&TYPMSK) >> TYPSHFT));
+			OutputDebugString(MsgBuffer);
+		}
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
 			StateMap.reset(StateFlag::SCROS);
 			StateMap.reset(StateFlag::ECROS);
@@ -19618,8 +19623,9 @@ void drwStch() {
 		}
 		if (StateMap.test(StateFlag::SELBOX)) {
 			ritcor(&StitchBuffer[ClosestPointIndex]);
-			if (stch2px(ClosestPointIndex))
+			if (stch2px(ClosestPointIndex)) {
 				dubox();
+			}
 		}
 		if (StateMap.test(StateFlag::FRMPSEL))
 			ritfcor(&FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
