@@ -8482,12 +8482,12 @@ void frmdel() {
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
 				stitchAttributeFormBits = (StitchBuffer[iStitch].attribute&FRMSK);
-				stitchForm = stitchAttributeFormBits >> 4;
+				stitchForm = stitchAttributeFormBits >> FRMSHFT;
 				if (stitchForm == ClosestFormToCursor)
 					StitchBuffer[iStitch].attribute &= (NFRMSK&NTYPMSK);
 				if (stitchForm > ClosestFormToCursor) {
 					StitchBuffer[iStitch].attribute &= NFRMSK;
-					StitchBuffer[iStitch].attribute |= (stitchAttributeFormBits - 0x10);
+					StitchBuffer[iStitch].attribute |= (stitchForm - 1)  << FRMSHFT;
 				}
 			}
 		}
@@ -11216,7 +11216,7 @@ void delsfrms(unsigned code) {
 					if (validFormCount != iForm) {
 						FormList[validFormCount] = FormList[iForm];
 					}
-					formIndices[iForm] = (iForm - deletedFormCount) << 4;
+					formIndices[iForm] = (iForm - deletedFormCount) << FRMSHFT;
 					validFormCount++;
 				}
 				else
@@ -11247,8 +11247,13 @@ void delsfrms(unsigned code) {
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 					if (!(StitchBuffer[iStitch].attribute&NOTFRM)) {
 						iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
-						if (formMap.test(iForm))
+						if (formMap.test(iForm)) {
 							StitchBuffer[iStitch].attribute &= (NFRMSK&NTYPMSK);
+						}
+						else {
+							StitchBuffer[iStitch].attribute = StitchBuffer[iStitch].attribute &= NFRMSK;
+							StitchBuffer[iStitch].attribute |= formIndices[iForm];
+						}
 					}
 				}
 			}
