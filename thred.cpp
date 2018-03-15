@@ -8557,10 +8557,7 @@ void delet() {
 		currentFormVertex = fltind(&CurrentFormVertices[currentFormVertex]);
 		iVertex = fltind(&CurrentFormVertices[iVertex]);
 		while (iVertex < FormVertexIndex) {
-			FormVertices[currentFormVertex].x = FormVertices[iVertex].x;
-			FormVertices[currentFormVertex].y = FormVertices[iVertex].y;
-			currentFormVertex++;
-			iVertex++;
+			FormVertices[currentFormVertex++] = FormVertices[iVertex++];
 		}
 		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 			FormList[iForm].vertices -= (SelectedFormVertices.vertexCount + 1);
