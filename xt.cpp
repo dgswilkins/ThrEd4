@@ -4855,8 +4855,16 @@ void lodchk() {
 	boost::dynamic_bitset<> formMap(FormIndex);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		attribute = StitchBuffer[iStitch].attribute;
-		if ((attribute&TYPMSK) == TYPFRM)
-			formMap.set((attribute&FRMSK) >> FRMSHFT);
+		if ((attribute&TYPMSK) == TYPFRM) {
+			unsigned tform = (attribute&FRMSK) >> FRMSHFT;
+			if (tform < formMap.size()) {
+				formMap.set(tform);
+			}
+			else {
+				//ToDo - unassign the stitch from any form
+				StitchBuffer[iStitch].attribute &= (NFRMSK&NTYPMSK);
+			}
+		}
 
 	}
 	for (iForm = 0; iForm < FormIndex; iForm++) {
