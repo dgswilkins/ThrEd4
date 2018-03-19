@@ -4741,7 +4741,7 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 				}
 			}
 			if ((iLine1Count < line1Segments || iLine2Count < line2Segments)) {
-				if (!line1Count) {
+				if (!line1Count && iLine1Count < line1StitchCounts.size()) {
 					line1Count = line1StitchCounts[iLine1Count++];
 					line1Next = nxt(iLine1Vertex);
 					line1Delta.x = CurrentFormVertices[line1Next].x - CurrentFormVertices[iLine1Vertex].x;
@@ -4751,7 +4751,7 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 					line1Step.y = line1Delta.y / line1Count;
 				}
 
-				if (!line2Count) {
+				if (!line2Count && iLine2Count < line2StitchCounts.size()) {
 					line2Count = line2StitchCounts[iLine2Count++];
 					line2Previous = prv(iLine2Vertex);
 					line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x;
