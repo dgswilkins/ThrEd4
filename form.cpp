@@ -4570,7 +4570,7 @@ void ritseq1(unsigned ind) noexcept {
 	SequenceIndex++;
 }
 
-void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned line2End) {
+void satfn(std::vector<double> &lengths, unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned line2End) {
 	unsigned	line1Next = 0, line2Previous = 0, stitchCount = 0;
 	unsigned	iSegment = 0, line1Count = 0, line2Count = 0, iVertex = 0;
 	unsigned	iNextVertex = 0, segmentStitchCount = 0, iLine1Vertex = 0;
@@ -4599,8 +4599,8 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 				}
 			}
 		}
-		line1Length = Lengths[line1End] - Lengths[line1Start];
-		line2Length = Lengths[line2Start] - Lengths[line2End];
+		line1Length = lengths[line1End] - lengths[line1Start];
+		line2Length = lengths[line2Start] - lengths[line2End];
 		if (fabs(line1Length) > fabs(line2Length))
 			stitchCount = fabs(line2Length) / LineSpacing;
 		else
@@ -4615,7 +4615,7 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 		segmentStitchCount = 0;
 		for (iSegment = 0; iSegment < line1Segments - 1; iSegment++) {
 			iNextVertex = nxt(iVertex);
-			const unsigned val = ((Lengths[iNextVertex] - Lengths[iVertex]) / line1Length)*stitchCount + 0.5;
+			const unsigned val = ((lengths[iNextVertex] - lengths[iVertex]) / line1Length)*stitchCount + 0.5;
 			line1StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iVertex = nxt(iVertex);
@@ -4626,7 +4626,7 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 		iSegment = 0;
 		segmentStitchCount = 0;
 		while (iVertex > line2End) {
-			const unsigned val = ((Lengths[iNextVertex] - Lengths[iVertex]) / line2Length)*stitchCount + 0.5;
+			const unsigned val = ((lengths[iNextVertex] - lengths[iVertex]) / line2Length)*stitchCount + 0.5;
 			line2StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iNextVertex = prv(iNextVertex);
@@ -4769,31 +4769,31 @@ void satfn(unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned
 	}
 }
 
-void satmf() {
+void satmf(std::vector<double> &lengths) {
 	unsigned	iGuide = 0, iVertex = 0;
 	double		length = 0.0, deltaX = 0.0, deltaY = 0.0;
 
 	if (SelectedForm->attribute&FRMEND)
 		iGuide = 1;
-	satfn(iGuide, CurrentFormGuides[0].start, VertexCount, CurrentFormGuides[0].finish);
+	satfn(lengths, iGuide, CurrentFormGuides[0].start, VertexCount, CurrentFormGuides[0].finish);
 	for (iGuide = 0; iGuide < gsl::narrow<unsigned>(CurrentFormGuidesCount) - 1; iGuide++)
-		satfn(CurrentFormGuides[iGuide].start, CurrentFormGuides[iGuide + 1].start, CurrentFormGuides[iGuide].finish, CurrentFormGuides[iGuide + 1].finish);
+		satfn(lengths, CurrentFormGuides[iGuide].start, CurrentFormGuides[iGuide + 1].start, CurrentFormGuides[iGuide].finish, CurrentFormGuides[iGuide + 1].finish);
 	if (SatinEndGuide)
-		satfn(CurrentFormGuides[iGuide].start, SatinEndGuide, CurrentFormGuides[iGuide].finish, SatinEndGuide + 1);
+		satfn(lengths,CurrentFormGuides[iGuide].start, SatinEndGuide, CurrentFormGuides[iGuide].finish, SatinEndGuide + 1);
 	else {
 		if (CurrentFormGuides[iGuide].finish - CurrentFormGuides[iGuide].start > 2) {
-			length = (Lengths[CurrentFormGuides[iGuide].finish] - Lengths[CurrentFormGuides[iGuide].start]) / 2 + Lengths[CurrentFormGuides[iGuide].start];
+			length = (lengths[CurrentFormGuides[iGuide].finish] - lengths[CurrentFormGuides[iGuide].start]) / 2 + lengths[CurrentFormGuides[iGuide].start];
 			iVertex = CurrentFormGuides[iGuide].start;
-			while (length > Lengths[iVertex])
+			while (length > lengths[iVertex])
 				iVertex++;
-			deltaX = Lengths[iVertex] - length;
-			deltaY = length - Lengths[iVertex - 1];
+			deltaX = lengths[iVertex] - length;
+			deltaY = length - lengths[iVertex - 1];
 			if (deltaY > deltaX)
 				iVertex--;
-			satfn(CurrentFormGuides[iGuide].start, iVertex, CurrentFormGuides[iGuide].finish, iVertex);
+			satfn(lengths, CurrentFormGuides[iGuide].start, iVertex, CurrentFormGuides[iGuide].finish, iVertex);
 		}
 		else
-			satfn(CurrentFormGuides[iGuide].start, CurrentFormGuides[iGuide].start + 1, CurrentFormGuides[iGuide].finish, CurrentFormGuides[iGuide].start + 1);
+			satfn(lengths, CurrentFormGuides[iGuide].start, CurrentFormGuides[iGuide].start + 1, CurrentFormGuides[iGuide].finish, CurrentFormGuides[iGuide].start + 1);
 	}
 }
 
@@ -4811,61 +4811,64 @@ void satfil() {
 	StateMap.reset(StateFlag::SAT1);
 	StateMap.reset(StateFlag::FILDIR);
 	SelectedForm->fillType = SATF;
-	Lengths = new double[VertexCount + 2];
+	std::vector<double> lengths;
+	lengths.reserve(VertexCount + 1);
 	length = 0;
-	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
-		Lengths[iVertex] = length;
+	lengths.push_back(length);
+	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
 		deltaX = CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x;
 		deltaY = CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y;
 		length += hypot(deltaX, deltaY);
+		lengths.push_back(length);
 	}
-	Lengths[iVertex] = length;
 	deltaX = CurrentFormVertices[0].x - CurrentFormVertices[iVertex].x;
 	deltaY = CurrentFormVertices[0].y - CurrentFormVertices[iVertex].y;
 	length += hypot(deltaX, deltaY);
-	Lengths[iVertex + 1] = length;
+	lengths.push_back(length);
 	do {
 		if (SatinEndGuide) {
 			if (CurrentFormGuidesCount) {
-				satmf();
+				satmf(lengths);
 				break;
 			}
 			else {
-				satfn(1, SatinEndGuide, VertexCount, SatinEndGuide + 1);
+				satfn(lengths, 1, SatinEndGuide, VertexCount, SatinEndGuide + 1);
 				break;
 			}
 		}
 		if (SelectedForm->attribute&FRMEND) {
 			if (CurrentFormGuidesCount) {
-				satmf();
+				satmf(lengths);
 				break;
 			}
 			else {
 				if (VertexCount == 3 && FormList[ClosestFormToCursor].attribute & 1) {
-					satfn(2, 3, 2, 1);
+					satfn(lengths, 2, 3, 2, 1);
 					break;;
 				}
 				else {
-					length = (length - Lengths[1]) / 2;
+					length = (length - lengths[1]) / 2;
 					iVertex = 1;
 					if (!StateMap.test(StateFlag::BARSAT)) {
 						OSequence[0].x = SelectedPoint.x = CurrentFormVertices[1].x;
 						OSequence[0].y = SelectedPoint.y = CurrentFormVertices[1].y;
 						SequenceIndex = 1;
 					}
-					while ((length > Lengths[iVertex]) && (iVertex < (VertexCount + 1)))
+					while ((length > lengths[iVertex]) && (iVertex < (VertexCount + 1))) {
 						iVertex++;
-					deltaX = Lengths[iVertex] - length;
-					deltaY = length - Lengths[iVertex - 1];
-					if (deltaY > deltaX)
+					}
+					deltaX = lengths[iVertex] - length;
+					deltaY = length - lengths[iVertex - 1];
+					if (deltaY > deltaX) {
 						iVertex--;
-					satfn(1, iVertex, VertexCount, iVertex);
+					}
+					satfn(lengths, 1, iVertex, VertexCount, iVertex);
 				}
 				break;
 			}
 		}
 		if (CurrentFormGuidesCount) {
-			satmf();
+			satmf(lengths);
 			break;
 		}
 		length /= 2;
@@ -4875,16 +4878,17 @@ void satfil() {
 			OSequence[0].y = SelectedPoint.y = CurrentFormVertices[0].y;
 			SequenceIndex = 1;
 		}
-		while (length > Lengths[iVertex])
+		while (length > lengths[iVertex]) {
 			iVertex++;
-		deltaX = Lengths[iVertex] - length;
-		deltaY = length - Lengths[iVertex - 1];
+		}
+		deltaX = lengths[iVertex] - length;
+		deltaY = length - lengths[iVertex - 1];
 		if (deltaY > deltaX)
 			iVertex--;
-		satfn(0, iVertex, VertexCount, iVertex);
+		satfn(lengths, 0, iVertex, VertexCount, iVertex);
 	} while (false);
 
-	delete[] Lengths;
+	//delete[] lengths;
 	LineSpacing = spacing;
 }
 
