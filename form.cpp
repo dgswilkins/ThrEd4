@@ -11319,6 +11319,7 @@ void clpcon() {
 	}
 	ActivePointIndex = 0;
 	std::vector<CLIPNT> clipStitchPoints;
+	// ToDo - find a better number than MAXITEMS
 	clipStitchPoints.reserve(MAXITEMS);
 	bool breakFlag = false;
 	for (iRegion = 0; iRegion < (iclpx.size() - 1); iRegion++) {
@@ -11415,7 +11416,9 @@ void clpcon() {
 		delete[] TextureSegments; // this is allocated in setxt
 		TextureSegments = nullptr;
 	}
-	clipStitchPoints[clipStitchPoints.size() - 1].flag = 2;
+	if (clipStitchPoints.size()) {
+		clipStitchPoints[clipStitchPoints.size() - 1].flag = 2;
+	};
 	if (negativeOffset) {
 		formNegativeOffset = negativeOffset * ClipRectSize.cy;
 		for (iStitchPoint = 0; iStitchPoint < clipStitchPoints.size(); iStitchPoint++)
