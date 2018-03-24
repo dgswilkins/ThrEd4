@@ -25,7 +25,7 @@ extern void		angrct (fRECTANGLE* rectangle);
 extern void		centr ();
 extern void		chkcwlk ();
 extern void		chkrng (fPOINT* range);
-extern void		chkund ();
+extern void		chkund(std::vector<RNGCNT> &textureSegments);
 extern void		chkwlk ();
 extern void		coltab ();
 extern void		dasyfrm ();
@@ -49,7 +49,6 @@ extern bool		isclp (unsigned find);
 extern bool		isclpx (unsigned find);
 extern bool		isfclp ();
 extern bool		istx (unsigned find);
-extern void		moveStitch (fPOINTATTR* destination, const fPOINTATTR* source);
 extern void		movStch ();
 extern void		mvflpnt (fPOINT* destination, const fPOINT* source, unsigned count);
 extern void		mvsatk (SATCON* destination, const SATCON* source, unsigned count);
@@ -80,7 +79,7 @@ extern void		setangf (double angle);
 extern void		setfchk ();
 extern void		setpsel ();
 extern unsigned	setRmap (fPOINTATTR stitchPoint);
-extern void		setxt ();
+extern void		setxt(std::vector<RNGCNT> &textureSegments);
 extern void		shft (fPOINT delta);
 extern void		shoMsg (TCHAR* string);
 extern void		shord ();
@@ -182,7 +181,6 @@ extern			POINT			StretchBoxLine[5];
 extern			TCHAR*			StringTable[STR_LEN];
 extern			int				TextureIndex;
 extern			TXPNT			TexturePointsBuffer[MAXITEMS];
-extern			RNGCNT*			TextureSegments;
 extern			HINSTANCE		ThrEdInstance;
 extern			HWND			ThrEdWindow;
 extern			POINT			ThredWindowOrigin;
@@ -199,7 +197,7 @@ extern			dPOINT			ZoomMarkPoint;
 extern			dPOINT			ZoomRatio;
 extern			dRECTANGLE		ZoomRect;
 
-void			angclpfn ();
+void			angclpfn(std::vector<RNGCNT> &textureSegments);
 void			angsclp ();
 void			apbrd ();
 void			bakseq ();
@@ -212,7 +210,7 @@ void			chan ();
 void			chnfn ();
 bool			cisin(float xCoordinate, float yCoordinate) noexcept;
 void			clpbrd(unsigned short startVertex);
-void			clpcon ();
+void			clpcon(std::vector<RNGCNT> &textureSegments);
 void			clpic();
 void			clpout ();
 void			clpxadj(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPoints) noexcept;
@@ -234,7 +232,7 @@ void			fmclp ();
 void			frmpnts (unsigned typ) noexcept;
 void			frmsqr (unsigned iVertex);
 void			fvars (unsigned iForm) noexcept;
-void			horclpfn ();
+void			horclpfn(std::vector<RNGCNT> &textureSegments);
 void			horsclp ();
 bool			iseclp (unsigned find);
 bool			iseclpx (unsigned find);
@@ -2398,6 +2396,7 @@ void refilfn() {
 		SelectedForm->type = FRMFPOLY;
 	InterleaveSequenceIndex = InterleaveSequenceIndex2 = 0;
 	StateMap.reset(StateFlag::ISUND);
+	std::vector<RNGCNT> textureSegments(SelectedForm->fillInfo.texture.lines);
 	switch (SelectedForm->type) {
 	case FRMLINE:
 
@@ -2508,7 +2507,7 @@ void refilfn() {
 
 		chkcwlk();
 		chkwlk();
-		chkund();
+		chkund(textureSegments);
 		StateMap.reset(StateFlag::ISUND);
 		if (SelectedForm->fillType) {
 			spacing = LineSpacing;
@@ -2541,14 +2540,14 @@ void refilfn() {
 				oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 				setangf(0);
 				fvars(ClosestFormToCursor);
-				clpcon();
+				clpcon(textureSegments);
 				doFill = false;
 				break;
 
 			case HCLPF:
 
 				oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
-				horclpfn();
+				horclpfn(textureSegments);
 				doFill = false;
 				break;
 
@@ -2556,30 +2555,30 @@ void refilfn() {
 
 				oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 				StateMap.reset(StateFlag::ISUND);
-				angclpfn();
+				angclpfn(textureSegments);
 				doFill = false;
 				break;
 
 			case TXVRTF:
 
 				setangf(0);
-				setxt();
-				clpcon();
+				setxt(textureSegments);
+				clpcon(textureSegments);
 				doFill = false;
 				break;
 
 			case TXHORF:
 
-				setxt();
-				horclpfn();
+				setxt(textureSegments);
+				horclpfn(textureSegments);
 				doFill = false;
 				break;
 
 			case TXANGF:
 
-				setxt();
+				setxt(textureSegments);
 				StateMap.reset(StateFlag::ISUND);
-				angclpfn();
+				angclpfn(textureSegments);
 				doFill = false;
 				break;
 			}
@@ -2601,7 +2600,7 @@ void refilfn() {
 
 		chkcwlk();
 		chkwlk();
-		chkund();
+		chkund(textureSegments);
 		StateMap.reset(StateFlag::ISUND);
 		switch (SelectedForm->fillType) {
 		case SATF:
@@ -11188,7 +11187,7 @@ void inspnt(std::vector<CLIPNT> &clipStitchPoints) noexcept {
 	clipStitchPoints.push_back(clipStitchPoint);
 }
 
-void clpcon() {
+void clpcon(std::vector<RNGCNT> &textureSegments) {
 	RECT		clipGrid = {};
 	unsigned	iSegment = 0, iStitchPoint = 0, iVertex = 0, iPoint = 0, iSorted = 0, iSequence = 0, vertex = 0;
 	unsigned	iRegion = 0, ine = 0, nextVertex = 0, regionSegment = 0, iStitch = 0;
@@ -11324,8 +11323,8 @@ void clpcon() {
 		clipVerticalOffset = 0;
 		if (StateMap.test(StateFlag::TXFIL)) {
 			textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
-			ClipStitchCount = TextureSegments[textureLine].stitchCount;
-			texture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + TextureSegments[textureLine].line];
+			ClipStitchCount = textureSegments[textureLine].stitchCount;
+			texture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + textureSegments[textureLine].line];
 			LineSegmentStart.x = pasteLocation.x;
 			if (SelectedForm->txof) {
 				lineOffset = (iRegion + clipGrid.left) / SelectedForm->fillInfo.texture.lines;
@@ -11406,10 +11405,6 @@ void clpcon() {
 		else {
 			break;
 		}
-	}
-	if (TextureSegments) {
-		delete[] TextureSegments; // this is allocated in setxt
-		TextureSegments = nullptr;
 	}
 	if (clipStitchPoints.size()) {
 		clipStitchPoints[clipStitchPoints.size() - 1].flag = 2;
@@ -11637,7 +11632,7 @@ void angout() noexcept {
 	}
 }
 
-void horclpfn() {
+void horclpfn(std::vector<RNGCNT> &textureSegments) {
 	unsigned	iVertex = 0;
 
 	AngledForm = FormList[ClosestFormToCursor];
@@ -11653,7 +11648,7 @@ void horclpfn() {
 	angout();
 	SelectedForm = &AngledForm;
 	CurrentFormVertices = AngledForm.vertices;
-	clpcon();
+	clpcon(textureSegments);
 	RotationAngle = -PI / 2;
 	rotbak();
 	fvars(ClosestFormToCursor);
@@ -11725,7 +11720,7 @@ void horclp() {
 	}
 }
 
-void angclpfn() {
+void angclpfn(std::vector<RNGCNT> &textureSegments) {
 	unsigned	iVertex = 0;
 
 	AngledForm = FormList[ClosestFormToCursor];
@@ -11755,7 +11750,7 @@ void angclpfn() {
 	angout();
 	SelectedForm = &AngledForm;
 	CurrentFormVertices = AngledFormVertices;
-	clpcon();
+	clpcon(textureSegments);
 	RotationAngle = -RotationAngle;
 	rotbak();
 	fvars(ClosestFormToCursor);

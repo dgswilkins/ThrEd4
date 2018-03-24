@@ -111,14 +111,13 @@ extern	dRECTANGLE		ZoomRect;
 extern	void		adbad(unsigned code, unsigned count);
 extern	fPOINT*		adflt(unsigned count);
 extern	SATCON*		adsatk(unsigned	count);
-extern	void		angclpfn();
+extern	void		angclpfn(std::vector<RNGCNT> &textureSegments);
 extern	void		bakseq();
 extern	void		butxt(unsigned iButton, const TCHAR* buttonText);
 extern	void		centir();
 extern	void		chkhup();
 extern	bool		chkmax(unsigned arg0, unsigned arg1);
 extern	void		chkmen();
-extern	bool		chkr(unsigned bit);
 extern	void		chkseq(bool border);
 extern	bool		cisin(float xCoordinate, float yCoordinate);
 extern	unsigned	closflt(float xCoordinate, float yCoordinate);
@@ -144,12 +143,9 @@ extern	unsigned	getlast();
 extern	void		hsizmsg();
 extern	bool		isclp(unsigned iForm);
 extern	bool		iseclp(unsigned iForm);
-extern	bool		isin(float xCoordinate, float yCoordinate);
-extern	void		lcon();
 extern	void		makspac(unsigned start, unsigned count);
 extern	void		mdufrm();
 extern	float		midl(float high, float low);
-extern	void		moveStitch(fPOINTATTR* destination, const fPOINTATTR* source);
 extern	void		movStch();
 extern	void		movStch();
 extern	void		msgflt(unsigned messageId, float value);
@@ -172,7 +168,6 @@ extern	void		savdo();
 extern	void		save();
 extern	void		setknots();
 extern	void		setmfrm();
-extern	void		setr(unsigned bit);
 extern	void		shoMsg(TCHAR* string);
 extern	void		shoseln(unsigned code0, unsigned code1);
 extern	void		stchrct(fRECTANGLE* rectangle);
@@ -192,7 +187,6 @@ unsigned short DaisyTypeStrings[] =
 	IDS_DAZHART,
 };
 
-RNGCNT*		TextureSegments;			//texture fill groups of points
 dPOINT		DesignSizeRatio;			//design size ratio
 fRECTANGLE	DesignSizeRect;				//design size rectangle
 float		DesignAspectRatio;			//design aspect ratio
@@ -1112,24 +1106,6 @@ void undclp() noexcept {
 	ClipStitchCount = 2;
 }
 
-void fnund(unsigned find) {
-	const float	savedStitchSize = UserStitchLength;
-
-	UnderlayVertices = insid();
-	UserStitchLength = 1e99;
-	if (!SelectedForm->underlaySpacing)
-		SelectedForm->underlaySpacing = IniFile.underlaySpacing;
-	if (!SelectedForm->underlayStitchLen)
-		SelectedForm->underlayStitchLen = IniFile.underlayStitchLen;
-	undclp();
-	StateMap.set(StateFlag::ISUND);
-	angclpfn();
-	OutputIndex = SequenceIndex;
-	ritund();
-	fvars(find);
-	UserStitchLength = savedStitchSize;
-}
-
 void fncwlk() {
 	unsigned	iGuide = 0, iVertex = 0, start = 0, finish = 0;
 
@@ -1355,9 +1331,27 @@ void chkwlk() {
 		delwlk((ClosestFormToCursor << FRMSHFT) | WLKMSK);
 }
 
-void chkund() {
+void fnund(std::vector<RNGCNT> &textureSegments, unsigned find) {
+	const float	savedStitchSize = UserStitchLength;
+
+	UnderlayVertices = insid();
+	UserStitchLength = 1e99;
+	if (!SelectedForm->underlaySpacing)
+		SelectedForm->underlaySpacing = IniFile.underlaySpacing;
+	if (!SelectedForm->underlayStitchLen)
+		SelectedForm->underlayStitchLen = IniFile.underlayStitchLen;
+	undclp();
+	StateMap.set(StateFlag::ISUND);
+	angclpfn(textureSegments);
+	OutputIndex = SequenceIndex;
+	ritund();
+	fvars(find);
+	UserStitchLength = savedStitchSize;
+}
+
+void chkund(std::vector<RNGCNT> &textureSegments) {
 	if (SelectedForm->extendedAttribute&AT_UND)
-		fnund(ClosestFormToCursor);
+		fnund(textureSegments, ClosestFormToCursor);
 	else
 		delwlk((ClosestFormToCursor << FRMSHFT) | UNDMSK);
 }
@@ -3469,17 +3463,6 @@ void ed2txp(POINT offset, TXPNT* textureRecord) noexcept {
 	textureRecord->y = TextureScreen.areaHeight - (static_cast<float>(offset.y - TextureScreen.top) / TextureScreen.height*TextureScreen.areaHeight);
 }
 
-constexpr int	hitxlin() {
-	unsigned	iPoint = 0;
-	short		highestLine = 0;
-
-	for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++) {
-		if (TempTexturePoints[SelectedTexturePointsList[iPoint]].line > highestLine)
-			highestLine = TempTexturePoints[SelectedTexturePointsList[iPoint]].line;
-	}
-	return highestLine;
-}
-
 void txtrup() {
 	TXPNT		highestTexturePoint = {};
 	TXPNT		lowestTexturePoint = {};
@@ -4415,7 +4398,7 @@ void txtkey(unsigned keyCode) {
 	StateMap.reset(StateFlag::LASTXBAK);
 }
 
-void setxt() {
+void setxt(std::vector<RNGCNT> &textureSegments) {
 	const TXPNT *	currentFormTexture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
 	if (currentFormTexture) {
 		int				iTexturePoint = 0, iSegment = 0;
@@ -4426,13 +4409,13 @@ void setxt() {
 		StateMap.set(StateFlag::TXFIL);
 		ClipRectSize.cx = SelectedForm->fillSpacing;
 		ClipRectSize.cy = SelectedForm->fillInfo.texture.height;
-		TextureSegments = new RNGCNT[SelectedForm->fillInfo.texture.lines](); //this is deleted in clpcon
 		if (count) {
+			//ToDo - why is this reversed?
 			for (iTexturePoint = count - 1; iTexturePoint >= 0; iTexturePoint--) {
 				if (currentFormTexture[iTexturePoint].line) {
 					iSegment = currentFormTexture[iTexturePoint].line - 1;
-					TextureSegments[iSegment].line = iTexturePoint;
-					TextureSegments[iSegment].stitchCount++;
+					textureSegments[iSegment].line = iTexturePoint;
+					textureSegments[iSegment].stitchCount++;
 				}
 			}
 		}
