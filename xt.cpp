@@ -91,7 +91,6 @@ extern	RECT			StitchWindowClientRect;
 extern	HDC				StitchWindowDC;
 extern	HDC				StitchWindowMemDC;
 extern	POINT			StitchWindowOrigin;
-extern	fPOINTATTR*		TempStitchBuffer;
 extern	unsigned		ThrEdClip;
 extern	TCHAR*			ThrEdClipFormat;
 extern	HINSTANCE		ThrEdInstance;
@@ -1702,7 +1701,7 @@ bool chkrdun(std::vector<unsigned> &formFillCounter, std::vector<OREC *> &pRecs,
 	return 0;
 }
 
-double precjmps(std::vector<OREC *> &pRecs, const SRTREC* sortRecord) {
+double precjmps(std::vector<fPOINTATTR> &tempStitchBuffer, std::vector<OREC *> &pRecs, const SRTREC* sortRecord) {
 	unsigned		totalJumps;
 	double			length;
 	double			minimumLength;
@@ -1742,18 +1741,21 @@ double precjmps(std::vector<OREC *> &pRecs, const SRTREC* sortRecord) {
 		if (StateMap.test(StateFlag::DUSRT)) {
 			if (direction) {
 				if (pRecs[currentRegion]->start) {
-					for (iRegion = pRecs[currentRegion]->finish - 1; iRegion >= pRecs[currentRegion]->start; iRegion--)
-						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[iRegion]);
+					for (iRegion = pRecs[currentRegion]->finish - 1; iRegion >= pRecs[currentRegion]->start; iRegion--) {
+						tempStitchBuffer[OutputIndex++] = StitchBuffer[iRegion];
+					}
 				}
 				else {
 					iRegion = pRecs[currentRegion]->finish;
-					while (iRegion)
-						moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[--iRegion]);
+					while (iRegion) {
+						tempStitchBuffer[OutputIndex++] = StitchBuffer[--iRegion];
+					}
 				}
 			}
 			else {
-				for (iRegion = pRecs[currentRegion]->start; iRegion < pRecs[currentRegion]->finish; iRegion++)
-					moveStitch(&TempStitchBuffer[OutputIndex++], &StitchBuffer[iRegion]);
+				for (iRegion = pRecs[currentRegion]->start; iRegion < pRecs[currentRegion]->finish; iRegion++) {
+					tempStitchBuffer[OutputIndex++] = StitchBuffer[iRegion];
+				}
 			}
 		}
 	}
@@ -1761,12 +1763,12 @@ double precjmps(std::vector<OREC *> &pRecs, const SRTREC* sortRecord) {
 	return totalJumps;
 }
 
-unsigned duprecs(std::vector<OREC *> pRecs, SRTREC* sortRecord) {
+unsigned duprecs(std::vector<fPOINTATTR> &tempStitchBuffer, std::vector<OREC *> pRecs, SRTREC* sortRecord) {
 	sortRecord->direction = 0;
-	const unsigned	jumps0 = precjmps(pRecs, sortRecord);
+	const unsigned	jumps0 = precjmps(tempStitchBuffer, pRecs, sortRecord);
 
 	sortRecord->direction = 1;
-	const unsigned	jumps1 = precjmps(pRecs, sortRecord);
+	const unsigned	jumps1 = precjmps(tempStitchBuffer, pRecs, sortRecord);
 
 	if (jumps0 < jumps1) {
 		sortRecord->direction = 0;
@@ -1902,7 +1904,7 @@ void fsort() {
 		}
 		stitchRange[iRange].finish = lastRegion;
 		lastRange = ++iRange;
-		TempStitchBuffer = new fPOINTATTR[PCSHeader.stitchCount];
+		std::vector<fPOINTATTR> tempStitchBuffer(PCSHeader.stitchCount);
 		OutputIndex = 0;
 		for (iRange = 0; iRange < lastRange; iRange++) {
 			StateMap.reset(StateFlag::DUSRT);
@@ -1916,7 +1918,7 @@ void fsort() {
 			for (iRegion = sortRecord.start; iRegion < sortRecord.finish; iRegion++) {
 				sortRecord.currentRegion = iRegion;
 				if (!pRecs[iRegion]->otyp) {
-					jumps = duprecs(pRecs, &sortRecord);
+					jumps = duprecs(tempStitchBuffer, pRecs, &sortRecord);
 					if (jumps < minimumJumps) {
 						minimumJumps = jumps;
 						minimumIndex = iRegion;
@@ -1931,11 +1933,10 @@ void fsort() {
 			StateMap.set(StateFlag::DUSRT);
 			sortRecord.currentRegion = minimumIndex;
 			sortRecord.direction = minimumDirection;
-			precjmps(pRecs, &sortRecord);
+			precjmps(tempStitchBuffer, pRecs, &sortRecord);
 		}
-		MoveMemory(StitchBuffer, TempStitchBuffer, OutputIndex * sizeof(fPOINTATTR));
+		MoveMemory(StitchBuffer, &tempStitchBuffer[0], OutputIndex * sizeof(fPOINTATTR));
 		PCSHeader.stitchCount = OutputIndex;
-		delete[] TempStitchBuffer;
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}

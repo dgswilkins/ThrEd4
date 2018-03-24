@@ -2221,10 +2221,6 @@ void nunams() {
 	redfils();
 }
 
-void moveStitch(fPOINTATTR* destination, const fPOINTATTR* source) noexcept {
-	MoveMemory(destination, source, sizeof(fPOINTATTR));
-}
-
 void duzero() {
 	unsigned		iStitch = 0, iForm = 0;
 	unsigned short	iDestination = 0;
@@ -2244,14 +2240,14 @@ void duzero() {
 					stitchLength = hypot(StitchBuffer[iStitch].x - currentStitch->x, StitchBuffer[iStitch].y - currentStitch->y);
 					if (stitchLength > MinStitchLength) {
 						currentStitch = &StitchBuffer[iStitch];
-						moveStitch(&StitchBuffer[iDestination++], &StitchBuffer[iStitch]);
+						StitchBuffer[iDestination++] = StitchBuffer[iStitch];
 					}
 				}
 				else
 					currentStitch = &StitchBuffer[iStitch];
 			}
 			else {
-				moveStitch(&StitchBuffer[iDestination++], &StitchBuffer[iStitch]);
+				StitchBuffer[iDestination++] = StitchBuffer[iStitch];
 				StateMap.reset(StateFlag::CONTIG);
 			}
 		}

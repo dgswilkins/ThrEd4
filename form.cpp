@@ -361,7 +361,6 @@ fPOINT			BorderClipReference;	//reference for clipboard line border
 unsigned		CurrentSide;			//active form formOrigin for line clipboard fill
 dPOINT			Vector0;				//x size of the clipboard fill at the fill angle
 unsigned		FormRelocationIndex;	//form relocator pointer
-fPOINTATTR*		TempStitchBuffer;		//pointer to high stitch area for form sort
 unsigned		BeanCount;				//number of stitches added by convert to bean
 FRMHED*			FormForInsert;			//insert form vertex in this form
 unsigned		FormVertexPrev;			//form vertex storage for form vertex insert
