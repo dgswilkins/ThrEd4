@@ -220,7 +220,7 @@ unsigned	InterleaveSequenceIndex;	//index into the interleave sequence
 INSREC		InterleaveSequenceIndices[10];	//indices into interleave points
 unsigned	InterleaveSequenceIndex2;	//index into interleave indices
 unsigned	FillStartsMap;				//fill starts bitmap
-unsigned*	FormFillCounter;			//form fill type counters for sort
+//unsigned*	FormFillCounter;			//form fill type counters for sort
 fPOINT*		UnderlayVertices;			//underlay offset points
 unsigned	FeatherFillType;			//type of feather fill
 float		FeatherRatio;				//feather ratio
@@ -1692,11 +1692,11 @@ bool refcmp(const OREC* record1, const OREC* record2) noexcept {
 	}
 }
 
-bool chkrdun(std::vector<OREC *> &pRecs, const SRTREC* stitchRecord) noexcept {
+bool chkrdun(std::vector<unsigned> &formFillCounter, std::vector<OREC *> &pRecs, const SRTREC* stitchRecord) noexcept {
 	unsigned iStitch;
 
 	for (iStitch = stitchRecord->start; iStitch < stitchRecord->finish; iStitch++) {
-		if (pRecs[iStitch]->otyp == FormFillCounter[pRecs[iStitch]->form])
+		if (pRecs[iStitch]->otyp == formFillCounter[pRecs[iStitch]->form])
 			return 1;
 	}
 	return 0;
@@ -1710,18 +1710,18 @@ double precjmps(std::vector<OREC *> &pRecs, const SRTREC* sortRecord) {
 	fPOINTATTR*		currentStitch;
 	bool			direction;
 
-	FormFillCounter = new unsigned[(FormIndex + 2) << 2]();
+	std::vector<unsigned> formFillCounter((FormIndex + 2) << 2);
 	currentRegion = sortRecord->currentRegion;
 	direction = sortRecord->direction;
 	totalJumps = 0;
-	while (chkrdun(pRecs, sortRecord)) {
+	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
 		minimumLength = 1e9;
 		if (direction)
 			currentStitch = &StitchBuffer[pRecs[currentRegion]->finish];
 		else
 			currentStitch = &StitchBuffer[pRecs[currentRegion]->start];
 		for (iRegion = sortRecord->start; iRegion < sortRecord->finish; iRegion++) {
-			if (pRecs[iRegion]->otyp == FormFillCounter[pRecs[iRegion]->form]) {
+			if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
 				length = hypot(pRecs[iRegion]->startStitch->x - currentStitch->x, pRecs[iRegion]->startStitch->y - currentStitch->y);
 				if (length < minimumLength) {
 					minimumLength = length;
@@ -1738,7 +1738,7 @@ double precjmps(std::vector<OREC *> &pRecs, const SRTREC* sortRecord) {
 		}
 		if (minimumLength > 9 * PFGRAN)
 			totalJumps++;
-		FormFillCounter[pRecs[currentRegion]->form]++;
+		formFillCounter[pRecs[currentRegion]->form]++;
 		if (StateMap.test(StateFlag::DUSRT)) {
 			if (direction) {
 				if (pRecs[currentRegion]->start) {
@@ -1757,7 +1757,7 @@ double precjmps(std::vector<OREC *> &pRecs, const SRTREC* sortRecord) {
 			}
 		}
 	}
-	delete[] FormFillCounter;
+	//delete[] formFillCounter;
 	return totalJumps;
 }
 
