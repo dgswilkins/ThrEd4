@@ -47,7 +47,7 @@ void		delet ();
 void		delsfrms (unsigned code);
 void		delsmal (unsigned startStitch, unsigned endStitch);
 void		delstchm () noexcept;
-void		drwLin (unsigned currentStitch, unsigned length, HPEN hPen);
+void		drwLin(std::vector<POINT> &linePoints, unsigned currentStitch, unsigned length, HPEN hPen);
 void		dstcurs () noexcept;
 void		duIns ();
 void		dufdef ();
@@ -510,7 +510,6 @@ TCHAR			StitchEntryBuffer[5];	//stitch number entered by user
 TCHAR			SideWindowEntryBuffer[11];	//side window number for entering form data sheet numbers
 unsigned		BufferIndex = 0;		//pointer to the next number to be entered
 unsigned		BufferDigitCount;		//number of decimal digits in the number of stitches
-POINT*			LinePoints;				//for drawing lines on the screen
 unsigned		LineIndex;				//line index for display routine
 double			StitchWindowAspectRatio;	//aspect ratio of the stitch window
 double			MinStitchLength = MINSIZ * PFAFGRAN;	//minimum stitch size
@@ -5348,7 +5347,7 @@ unsigned pesnam() {
 		mov		edx, ebx
 peslup0:
 		mov		al, [ebx]
-		or		al, al
+		or		 al, al
 		je		short peslup1
 		cmp		al, '\\'
 		jne		short peslup0a
@@ -8485,7 +8484,7 @@ void frmdel() {
 					StitchBuffer[iStitch].attribute &= (NFRMSK&NTYPMSK);
 				if (stitchForm > ClosestFormToCursor) {
 					StitchBuffer[iStitch].attribute &= NFRMSK;
-					StitchBuffer[iStitch].attribute |= (stitchForm - 1)  << FRMSHFT;
+					StitchBuffer[iStitch].attribute |= (stitchForm - 1) << FRMSHFT;
 				}
 			}
 		}
@@ -8519,7 +8518,7 @@ bool wastch() noexcept {
 bool frmstch() {
 	unsigned	iForm = 0, iStitch = 0, formCode = 0;
 
-	boost::dynamic_bitset<> formMap(FormIndex); 
+	boost::dynamic_bitset<> formMap(FormIndex);
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		formMap.set(SelectedFormList[iForm]);
 	}
@@ -10116,7 +10115,7 @@ void thumnail() {
 	unbsho();
 	undat();
 	untrace();
-	
+
 	SetCurrentDirectory(DefaultDirectory);
 	strcpy_s(SearchName, DefaultDirectory);
 	TCHAR* lastCharacter = &SearchName[strlen(SearchName) - 1];
@@ -10627,7 +10626,7 @@ void rngal() {
 void nucols() {
 	unsigned	iForm = 0, iStitch = 0;
 
-	boost::dynamic_bitset<> formMap(FormIndex); 
+	boost::dynamic_bitset<> formMap(FormIndex);
 	for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 		formMap.set(SelectedFormList[iForm]);
 		SelectedForm = &FormList[iForm];
@@ -13037,7 +13036,7 @@ void inscol() {
 	unsigned	iStitch = 0, iForm = 0, iColor = 0, nextColor = 0, color = 0;
 	FRMHED*		form = nullptr;
 
-	boost::dynamic_bitset<> colorMap(16); 
+	boost::dynamic_bitset<> colorMap(16);
 	if (chkMsgs(Msg.pt, DefaultColorWin[0], UserColorWin[15])) {
 		VerticalIndex &= COLMSK;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
@@ -15535,7 +15534,7 @@ unsigned chkMsg() {
 					unbox();
 					unboxs();
 					setbak(ThreadSizePixels[StitchBuffer[ClosestPointIndex].attribute & 0xf] + 3);
-					LinePoints = new POINT[3];
+					std::vector<POINT> linePoints(3);
 					LineIndex = 0;
 					SetROP2(StitchWindowDC, R2_NOTXORPEN);
 					if (ClosestPointIndex == 0) {
@@ -15545,7 +15544,7 @@ unsigned chkMsg() {
 							stchbox(1, StitchWindowDC);
 						}
 						SetROP2(StitchWindowDC, R2_COPYPEN);
-						drwLin(0, 2, BackgroundPen);
+						drwLin(linePoints, 0, 2, BackgroundPen);
 					}
 					else {
 						if (ClosestPointIndex == gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
@@ -15555,7 +15554,7 @@ unsigned chkMsg() {
 								stchbox(PCSHeader.stitchCount - 2, StitchWindowDC);
 							}
 							SetROP2(StitchWindowDC, R2_COPYPEN);
-							drwLin(PCSHeader.stitchCount - 2, 2, BackgroundPen);
+							drwLin(linePoints, PCSHeader.stitchCount - 2, 2, BackgroundPen);
 						}
 						else {
 							if (ZoomFactor < STCHBOX) {
@@ -15565,10 +15564,9 @@ unsigned chkMsg() {
 								stchbox(ClosestPointIndex + 1, StitchWindowDC);
 							}
 							SetROP2(StitchWindowDC, R2_COPYPEN);
-							drwLin(ClosestPointIndex - 1, 3, BackgroundPen);
+							drwLin(linePoints, ClosestPointIndex - 1, 3, BackgroundPen);
 						}
 					}
-					delete[] LinePoints;
 					MoveLine0[1].x = MoveLine1[0].x = Msg.pt.x - StitchWindowOrigin.x;
 					MoveLine0[1].y = MoveLine1[0].y = Msg.pt.y - StitchWindowOrigin.y;
 					if (ClosestPointIndex <= 0)
@@ -19187,7 +19185,7 @@ void relin() {
 	dulin();
 }
 
-void drwLin(unsigned currentStitch, unsigned length, HPEN hPen) {
+void drwLin(std::vector<POINT> &linePoints, unsigned currentStitch, unsigned length, HPEN hPen) {
 	unsigned			iOffset = 0, layer = 0;
 	const fPOINTATTR*	activeStitch = &StitchBuffer[currentStitch];
 
@@ -19197,24 +19195,24 @@ void drwLin(unsigned currentStitch, unsigned length, HPEN hPen) {
 		for (iOffset = 0; iOffset < length; iOffset++) {
 			layer = (activeStitch[iOffset].attribute&LAYMSK) >> LAYSHFT;
 			if (!ActiveLayer || !layer || (layer == ActiveLayer)) {
-				LinePoints[LineIndex].x = (activeStitch[iOffset].x - ZoomRect.left)*ZoomRatio.x;
-				LinePoints[LineIndex++].y = StitchWindowClientRect.bottom - (activeStitch[iOffset].y - ZoomRect.bottom)*ZoomRatio.y;
+				linePoints[LineIndex].x = (activeStitch[iOffset].x - ZoomRect.left)*ZoomRatio.x;
+				linePoints[LineIndex++].y = StitchWindowClientRect.bottom - (activeStitch[iOffset].y - ZoomRect.bottom)*ZoomRatio.y;
 			}
 		}
 		SelectObject(StitchWindowMemDC, hPen);
 		//ToDo - where did 16000 come from?
 		if (LineIndex < 16000)
-			Polyline(StitchWindowMemDC, LinePoints, LineIndex);
+			Polyline(StitchWindowMemDC, &linePoints[0], LineIndex);
 		else {
 			iOffset = 0;
 			while (LineIndex) {
 				if (LineIndex > 16000) {
-					Polyline(StitchWindowMemDC, &LinePoints[iOffset], 16000);
+					Polyline(StitchWindowMemDC, &linePoints[iOffset], 16000);
 					iOffset += 15999;
 					LineIndex -= 15999;
 				}
 				else {
-					Polyline(StitchWindowMemDC, &LinePoints[iOffset], LineIndex);
+					Polyline(StitchWindowMemDC, &linePoints[iOffset], LineIndex);
 					break;
 				}
 			}
@@ -19222,8 +19220,8 @@ void drwLin(unsigned currentStitch, unsigned length, HPEN hPen) {
 		LineIndex = 1;
 		layer = (activeStitch[iOffset].attribute&LAYMSK) >> LAYSHFT;
 		if (!ActiveLayer || !layer || layer == ActiveLayer) {
-			LinePoints[0].x = (activeStitch[iOffset - 1].x - ZoomRect.left)*ZoomRatio.x;
-			LinePoints[0].y = StitchWindowClientRect.bottom - (activeStitch[iOffset - 1].y - ZoomRect.bottom)*ZoomRatio.y;
+			linePoints[0].x = (activeStitch[iOffset - 1].x - ZoomRect.left)*ZoomRatio.x;
+			linePoints[0].y = StitchWindowClientRect.bottom - (activeStitch[iOffset - 1].y - ZoomRect.bottom)*ZoomRatio.y;
 		}
 	}
 	else {
@@ -19418,7 +19416,7 @@ void drwStch() {
 		if (LineIndex > stitchCount)
 			stitchCount = LineIndex;
 	}
-	LinePoints = new POINT[stitchCount + 2];
+	std::vector<POINT> linePoints(stitchCount + 2);
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	duzrat();
 	if (PCSBMPFileName[0] && !StateMap.test(StateFlag::HIDMAP) && !StateMap.test(StateFlag::UPTO)) {
@@ -19519,27 +19517,27 @@ void drwStch() {
 								wascol = 1;
 								if (StateMap.testAndSet(StateFlag::LINED)) {
 									if (StateMap.testAndSet(StateFlag::LININ)) {
-										LinePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-										LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+										linePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										linePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 									}
 									else {
-										LinePoints[LineIndex].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-										LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-										LinePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-										LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+										linePoints[LineIndex].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										linePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+										linePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										linePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 									}
 								}
 								else {
 									if (iStitch == 0 && iColor == 0) {
-										LinePoints[0].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-										LinePoints[0].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+										linePoints[0].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										linePoints[0].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 										LineIndex = 1;
 									}
 									else {
-										LinePoints[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-										LinePoints[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-										LinePoints[1].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-										LinePoints[1].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+										linePoints[0].x = (currentStitches[iStitch - 1].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										linePoints[0].y = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+										linePoints[1].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+										linePoints[1].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
 										LineIndex = 2;
 									}
 									StateMap.set(StateFlag::LININ);
@@ -19547,9 +19545,9 @@ void drwStch() {
 							}
 							else {
 								if (StateMap.testAndReset(StateFlag::LININ)) {
-									LinePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
-									LinePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
-									Polyline(StitchWindowMemDC, LinePoints, LineIndex);
+									linePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left)*ZoomRatio.x + 0.5;
+									linePoints[LineIndex++].y = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom)*ZoomRatio.y + 0.5;
+									Polyline(StitchWindowMemDC, &linePoints[0], LineIndex);
 									LineIndex = 0;
 								}
 								else {
@@ -19602,9 +19600,8 @@ void drwStch() {
 					throw;
 				}
 				if (LineIndex) {
-					Polyline(StitchWindowMemDC, LinePoints, LineIndex);
-					LinePoints[0].x = LinePoints[LineIndex - 1].x;
-					LinePoints[0].y = LinePoints[LineIndex - 1].y;
+					Polyline(StitchWindowMemDC, &linePoints[0], LineIndex);
+					linePoints[0] = linePoints[LineIndex - 1];
 					LineIndex = 1;
 				}
 				if (wascol)
@@ -19618,7 +19615,7 @@ void drwStch() {
 				stitchCount = ColorChangeTable[iColor + 1].stitchIndex - ColorChangeTable[iColor].stitchIndex;
 				stitchCount = chkup(stitchCount, iColor);
 				if (!pwid || (pwid && ColorChangeTable[iColor].colorIndex == ActiveColor))
-					drwLin(ColorChangeTable[iColor].stitchIndex, stitchCount, UserPen[ColorChangeTable[iColor].colorIndex]);
+					drwLin(linePoints, ColorChangeTable[iColor].stitchIndex, stitchCount, UserPen[ColorChangeTable[iColor].colorIndex]);
 			}
 		}
 		if (StateMap.test(StateFlag::SELBOX)) {
@@ -19674,9 +19671,9 @@ void drwStch() {
 		}
 		if (StateMap.test(StateFlag::CLPSHO))
 			duclp();
-		if (StateMap.test(StateFlag::ROTAT) || StateMap.test(StateFlag::ROTCAPT) || StateMap.test(StateFlag::MOVCNTR))
+		if (StateMap.test(StateFlag::ROTAT) || StateMap.test(StateFlag::ROTCAPT) || StateMap.test(StateFlag::MOVCNTR)) {
 			ritrot();
-		delete[] LinePoints;
+		}
 	}
 	if (FormIndex && !StateMap.test(StateFlag::FRMOF))
 		drwfrm();
