@@ -4817,8 +4817,8 @@ void satfil() {
 		length += hypot(deltaX, deltaY);
 		lengths.push_back(length);
 	}
-	deltaX = CurrentFormVertices[0].x - CurrentFormVertices[iVertex].x;
-	deltaY = CurrentFormVertices[0].y - CurrentFormVertices[iVertex].y;
+	deltaX = CurrentFormVertices[0].x - CurrentFormVertices[iVertex - 1].x;
+	deltaY = CurrentFormVertices[0].y - CurrentFormVertices[iVertex - 1].y;
 	length += hypot(deltaX, deltaY);
 	lengths.push_back(length);
 	do {
