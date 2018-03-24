@@ -580,7 +580,6 @@ RANGE			SelectedFormsRange;		//range of selected forms
 unsigned		TmpFormIndex;			//saved form index
 double			ZoomMin;				//minimum allowed zoom value
 fRECTANGLE		CheckHoopRect;			//for checking the hoop size
-BALSTCH*		BalaradStitch;			//balarad stitch pointer
 fPOINT			BalaradOffset;			//balarad offset
 unsigned		ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; //for checking if a fill is a clipboard fill
 unsigned		SideWindowLocation;		//side message window location
@@ -2859,13 +2858,13 @@ bool savcmp() noexcept {
 #endif
 }
 
-void thr2bal(unsigned destination, unsigned source, unsigned code) {
+void thr2bal(std::vector<BALSTCH> &balaradStitch, unsigned destination, unsigned source, unsigned code) {
 #define BALRAT 1.6666666666667
 
-	BalaradStitch[destination].flag = 0;
-	BalaradStitch[destination].code = gsl::narrow<unsigned char>(code);
-	BalaradStitch[destination].x = (StitchBuffer[source].x - BalaradOffset.x)*BALRAT;
-	BalaradStitch[destination].y = (StitchBuffer[source].y - BalaradOffset.y)*BALRAT;
+	balaradStitch[destination].flag = 0;
+	balaradStitch[destination].code = gsl::narrow<unsigned char>(code);
+	balaradStitch[destination].x = (StitchBuffer[source].x - BalaradOffset.x)*BALRAT;
+	balaradStitch[destination].y = (StitchBuffer[source].y - BalaradOffset.y)*BALRAT;
 }
 
 constexpr unsigned coldis(COLORREF colorA, COLORREF colorB) {
@@ -2881,12 +2880,12 @@ constexpr unsigned coldis(COLORREF colorA, COLORREF colorB) {
 	return distance;
 }
 
-void bal2thr(unsigned destination, unsigned source, unsigned code) noexcept {
+void bal2thr(std::vector<BALSTCH> &balaradStitch, unsigned destination, unsigned source, unsigned code) noexcept {
 #define IBALRAT 0.6
 
 	StitchBuffer[destination].attribute = code;
-	StitchBuffer[destination].x = BalaradStitch[source].x*IBALRAT + BalaradOffset.x;
-	StitchBuffer[destination].y = BalaradStitch[source].y*IBALRAT + BalaradOffset.y;
+	StitchBuffer[destination].x = balaradStitch[source].x*IBALRAT + BalaradOffset.x;
+	StitchBuffer[destination].y = balaradStitch[source].y*IBALRAT + BalaradOffset.y;
 }
 
 unsigned colmatch(COLORREF color) noexcept {
@@ -2928,8 +2927,8 @@ void redbal() {
 	if (balaradFile != INVALID_HANDLE_VALUE) {
 		ReadFile(balaradFile, &balaradHeader, sizeof(BALHED), &bytesRead, 0);
 		if (bytesRead == sizeof(BALHED)) {
-			BalaradStitch = new BALSTCH[MAXITEMS];
-			ReadFile(balaradFile, BalaradStitch, MAXITEMS * sizeof(BALSTCH), &bytesRead, 0);
+			std::vector<BALSTCH> balaradStitch(MAXITEMS);
+			ReadFile(balaradFile, &balaradStitch[0], MAXITEMS * sizeof(BALSTCH), &bytesRead, 0);
 			stitchCount = bytesRead / sizeof(BALSTCH);
 			IniFile.backgroundColor = BackgroundColor = balaradHeader.backgroundColor;
 			BackgroundPen = nuPen(BackgroundPen, 1, BackgroundColor);
@@ -2947,10 +2946,10 @@ void redbal() {
 			iBalaradStitch = 0;
 			ColorChanges = 1;
 			for (iStitch = 0; iStitch < stitchCount; iStitch++) {
-				switch (BalaradStitch[iStitch].code) {
+				switch (balaradStitch[iStitch].code) {
 				case BALNORM:
 
-					bal2thr(iBalaradStitch++, iStitch, color);
+					bal2thr(balaradStitch, iBalaradStitch++, iStitch, color);
 					break;
 
 				case BALSTOP:
@@ -2968,7 +2967,6 @@ void redbal() {
 			redraw(ColorBar);
 			StateMap.set(StateFlag::INIT);
 			StateMap.set(StateFlag::RESTCH);
-			delete[] BalaradStitch;
 		}
 	}
 	CloseHandle(balaradFile);
@@ -3014,25 +3012,24 @@ void ritbal() {
 		WriteFile(balaradFile, &balaradHeader, sizeof(BALHED), &bytesWritten, 0);
 		BalaradOffset.x = IniFile.hoopSizeX / 2;
 		BalaradOffset.y = IniFile.hoopSizeY / 2;
-		BalaradStitch = new BALSTCH[PCSHeader.stitchCount + 2];
+		std::vector<BALSTCH> balaradStitch(PCSHeader.stitchCount + 2);
 		color = StitchBuffer[0].attribute&COLMSK;
 		iOutput = 0;
-		thr2bal(iOutput++, 0, BALJUMP);
-		BalaradStitch[iOutput].flag = gsl::narrow<unsigned char>(color);
+		thr2bal(balaradStitch, iOutput++, 0, BALJUMP);
+		balaradStitch[iOutput].flag = gsl::narrow<unsigned char>(color);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount && iOutput < 2; iStitch++) {
-			thr2bal(iOutput++, iStitch, BALNORM);
+			thr2bal(balaradStitch, iOutput++, iStitch, BALNORM);
 			if ((StitchBuffer[iStitch].attribute&COLMSK) != color) {
-				thr2bal(iOutput, iStitch, BALSTOP);
+				thr2bal(balaradStitch, iOutput, iStitch, BALSTOP);
 				color = StitchBuffer[iStitch].attribute&COLMSK;
-				BalaradStitch[iOutput++].flag = gsl::narrow<unsigned char>(color);
+				balaradStitch[iOutput++].flag = gsl::narrow<unsigned char>(color);
 			}
 		}
-		WriteFile(balaradFile, BalaradStitch, iOutput * sizeof(BALSTCH), &bytesWritten, 0);
+		WriteFile(balaradFile, &balaradStitch[0], iOutput * sizeof(BALSTCH), &bytesWritten, 0);
 		CloseHandle(balaradFile);
 		balaradFile = CreateFile(BalaradName1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		WriteFile(balaradFile, (TCHAR*)outputName, strlen(outputName) + 1, &bytesWritten, 0);
 		CloseHandle(balaradFile);
-		delete[] BalaradStitch;
 	}
 	else {
 		if (*BalaradName1) {
