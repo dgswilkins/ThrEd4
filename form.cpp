@@ -360,10 +360,6 @@ double			SinAngle;				//sine for clipboard fill
 fPOINT			BorderClipReference;	//reference for clipboard line border
 unsigned		CurrentSide;			//active form formOrigin for line clipboard fill
 dPOINT			Vector0;				//x size of the clipboard fill at the fill angle
-FRMHED*			TempFormList;			//temporary form header storage for reordering forms
-fPOINT*			TempFormVertices;		//temporary form vertex storage for reordering forms
-SATCON*			TempGuides;				//temporary satin guideline storage for reordering forms
-fPOINT*			TempClipPoints;			//temporary clipboard formOrigin storage for reordering forms
 unsigned		FormRelocationIndex;	//form relocator pointer
 fPOINTATTR*		TempStitchBuffer;		//pointer to high stitch area for form sort
 unsigned		BeanCount;				//number of stitches added by convert to bean
@@ -10222,26 +10218,26 @@ void mvfrms(FRMHED* destination, const FRMHED* source, unsigned count) noexcept 
 	memcpy(destination, source, count * sizeof (FRMHED));
 }
 
-void dufdat(unsigned formIndex) {
-	FRMHED*			destination = &TempFormList[FormRelocationIndex++];
+void dufdat(std::vector<fPOINT> &tempClipPoints, std::vector<SATCON> &tempGuides, std::vector<fPOINT> &destinationFormVertices, std::vector<FRMHED> &destinationFormList, unsigned formIndex) {
+	FRMHED*			destination = &destinationFormList[FormRelocationIndex++];
 	const FRMHED*	source = &FormList[formIndex];
 
 	mvfrms(destination, source, 1);
-	mvflpnt(&TempFormVertices[FormVertexIndex], destination->vertices, destination->vertexCount);
+	mvflpnt(&destinationFormVertices[FormVertexIndex], destination->vertices, destination->vertexCount);
 	destination->vertices = &FormVertices[FormVertexIndex];
 	FormVertexIndex += destination->vertexCount;
 	if (destination->satinGuideCount) {
-		mvsatk(&TempGuides[SatinGuideIndex], destination->satinOrAngle.guide, destination->satinGuideCount);
+		mvsatk(&tempGuides[SatinGuideIndex], destination->satinOrAngle.guide, destination->satinGuideCount);
 		destination->satinOrAngle.guide = &SatinGuides[SatinGuideIndex];
 		SatinGuideIndex += destination->satinGuideCount;
 	}
 	if (iseclpx(formIndex)) {
-		mvflpnt(&TempClipPoints[ClipPointIndex], destination->borderClipData, destination->clipEntries);
+		mvflpnt(&tempClipPoints[ClipPointIndex], destination->borderClipData, destination->clipEntries);
 		destination->borderClipData = &ClipPoints[ClipPointIndex];
 		ClipPointIndex += destination->clipEntries;
 	}
 	if (isclpx(formIndex)) {
-		mvflpnt(&TempClipPoints[ClipPointIndex], destination->angleOrClipData.clip, destination->lengthOrCount.clipCount);
+		mvflpnt(&tempClipPoints[ClipPointIndex], destination->angleOrClipData.clip, destination->lengthOrCount.clipCount);
 		destination->angleOrClipData.clip = &ClipPoints[ClipPointIndex];
 		ClipPointIndex += destination->lengthOrCount.clipCount;
 	}
@@ -10268,25 +10264,30 @@ void frmnumfn(unsigned newFormIndex) {
 		}
 		sourceForm = FormRelocationIndex = 0;
 
-		TempFormList = new FRMHED[FormIndex];
-		TempFormVertices = new fPOINT[MAXITEMS];
-		TempGuides = new SATCON[SatinGuideIndex];
-		TempClipPoints = new fPOINT[MAXITEMS];
+		std::vector<FRMHED> tempFormList(FormIndex);
+		// ToDo - find something better than MAXITEMS
+		std::vector<fPOINT> tempFormVertices(MAXITEMS);
+		std::vector<SATCON> tempGuides(SatinGuideIndex);
+		std::vector<fPOINT> tempClipPoints(MAXITEMS);
 
 		FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
 		for (iForm = 0; iForm < FormIndex; iForm++) {
 			if (iForm == newFormIndex)
-				dufdat(ClosestFormToCursor);
+				dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, ClosestFormToCursor);
 			else {
-				if (sourceForm == ClosestFormToCursor)
+				if (sourceForm == ClosestFormToCursor) {
 					sourceForm++;
-				dufdat(sourceForm++);
+				}
+				dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, sourceForm++);
 			}
 		}
-		mvfrms(FormList, TempFormList, FormIndex);
-		mvflpnt(FormVertices, TempFormVertices, FormVertexIndex);
-		mvsatk(SatinGuides, TempGuides, SatinGuideIndex);
-		mvflpnt(ClipPoints, TempClipPoints, ClipPointIndex);
+		mvfrms(FormList, &tempFormList[0], FormIndex);
+		mvflpnt(FormVertices, &tempFormVertices[0], FormVertexIndex);
+		// ToDo - 'if' is only required while we are passing memory rather than vector
+		if (SatinGuideIndex) {
+			mvsatk(SatinGuides, &tempGuides[0], SatinGuideIndex);
+		}
+		mvflpnt(ClipPoints, &tempClipPoints[0], ClipPointIndex);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (StitchBuffer[iStitch].attribute&SRTYPMSK) {
 				decodedFormIndex = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
@@ -10304,11 +10305,6 @@ void frmnumfn(unsigned newFormIndex) {
 		}
 		ClosestFormToCursor = newFormIndex;
 		ritnum(STR_NUMFRM, ClosestFormToCursor);
-
-		delete[] TempClipPoints;
-		delete[] TempGuides;
-		delete[] TempFormVertices;
-		delete[] TempFormList;
 	}
 }
 

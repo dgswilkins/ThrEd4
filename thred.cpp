@@ -2046,10 +2046,12 @@ void deldu() {
 }
 
 void mvflpnt(fPOINT* destination, const fPOINT* source, unsigned count) noexcept {
+	//ToDo - convert this to a vector copy operation
 	memcpy(destination, source, count * sizeof(fPOINT));
 }
 
 void mvsatk(SATCON* destination, const SATCON* source, unsigned count) noexcept {
+	//ToDo - convert this to a vector copy operation
 	memcpy(destination, source, count * sizeof(SATCON));
 }
 
