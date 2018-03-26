@@ -1609,11 +1609,6 @@ unsigned PESColorTranslate[] = {
 };
 #endif
 
-DSTREC*		DSTRecords;			//pointer to destination stitch records
-unsigned	DSTRecordCount;		//number of destination stitch records
-POINT		DSTPositiveOffset;	//plus offset written into the destination file header
-POINT		DSTNegativeOffset;	//minus offset written into the destination file header
-
 EnumMap<StateFlag>	StateMap(0);				// Flags indicating current run state
 EnumMap<UserFlag>	UserFlagMap(0);				//for storage of persistent binary variables set by the user
 fPOINTATTR			StitchBuffer[MAXITEMS * 2];	//main stitch buffer
@@ -4446,7 +4441,7 @@ bool colfil() {
 		return 0;
 }
 
-void dstran() {
+void dstran(std::vector<DSTREC> &DSTData) {
 	unsigned		iRecord = 0, iStitch = 0, color = 0;
 	POINT			localStitch = {};
 	POINT			dstStitch = {};
@@ -4486,8 +4481,8 @@ void dstran() {
 	localStitch.x = localStitch.y = 0;
 	maximumCoordinate.x = maximumCoordinate.y = -1e12f;
 	mimimumCoordinate.x = mimimumCoordinate.y = 1e12f;
-	for (iRecord = 0; iRecord < DSTRecordCount; iRecord++) {
-		if (DSTRecords[iRecord].nd & 0x40) {
+	for (iRecord = 0; iRecord < DSTData.size(); iRecord++) {
+		if (DSTData[iRecord].nd & 0x40) {
 			if (bytesRead >= ((iColor + 1) * sizeof(colors[0])))
 				color = colmatch(colors[iColor++]);
 			else {
@@ -4496,10 +4491,10 @@ void dstran() {
 			}
 		}
 		else {
-			dstin(dtrn(&DSTRecords[iRecord]), &dstStitch);
+			dstin(dtrn(&DSTData[iRecord]), &dstStitch);
 			localStitch.x += dstStitch.x;
 			localStitch.y += dstStitch.y;
-			if (!(DSTRecords[iRecord].nd & 0x80)) {
+			if (!(DSTData[iRecord].nd & 0x80)) {
 				StitchBuffer[iStitch].attribute = color | NOTFRM;
 				StitchBuffer[iStitch].x = localStitch.x*0.6;
 				StitchBuffer[iStitch].y = localStitch.y*0.6;
@@ -5069,11 +5064,9 @@ void nuFil() {
 						if (chkdst(&dstHeader)) {
 							PCSBMPFileName[0] = 0;
 							fileSize = GetFileSize(FileHandle, &BytesRead) - sizeof(DSTHED);
-							DSTRecordCount = fileSize / sizeof(DSTREC);
-							DSTRecords = new DSTREC[DSTRecordCount];
-							ReadFile(FileHandle, DSTRecords, sizeof(DSTREC)*DSTRecordCount, &BytesRead, 0);
-							dstran();
-							delete[] DSTRecords;
+							std::vector<DSTREC> DSTData(fileSize / sizeof(DSTREC));
+							ReadFile(FileHandle, &DSTData[0], sizeof(DSTREC)*DSTData.size(), &BytesRead, 0);
+							dstran(DSTData);
 							IniFile.auxFileType = AUXDST;
 						}
 					}
@@ -5139,7 +5132,7 @@ constexpr unsigned dudbits(POINT dif) {
 	return Xdst[dif.x + 121] | Ydst[dif.y + 121];
 }
 
-void savdst(unsigned data) noexcept {
+void savdst(std::vector<DSTREC> &DSTRecords, unsigned data) noexcept {
 	union {
 		unsigned data;
 		DSTREC dstRecord;
@@ -5147,10 +5140,10 @@ void savdst(unsigned data) noexcept {
 
 	x.data = data;
 
-	DSTRecords[DSTRecordCount++] = x.dstRecord;
+	DSTRecords.push_back(x.dstRecord);
 }
 
-void ritdst(const std::vector<fPOINTATTR> &stitches) {
+void ritdst(DSTOffsets &DSTOffsetData, std::vector<DSTREC> &DSTRecords, const std::vector<fPOINTATTR> &stitches) {
 #define DSTMAX 121
 	unsigned		iStitch = 0, dstType = 0, color = 0, count = 0;
 	POINT			centerCoordinate = {}, lengths = {}, absoluteLengths = {}, difference = {}, stepSize = {};
@@ -5183,17 +5176,16 @@ void ritdst(const std::vector<fPOINTATTR> &stitches) {
 		if (dstStitchBuffer[iStitch].y < boundingRect.bottom)
 			boundingRect.bottom = dstStitchBuffer[iStitch].y - 0.5;
 	}
-	DSTRecordCount = 0;
 	centerCoordinate.x = (boundingRect.right - boundingRect.left) / 2 + boundingRect.left;
 	centerCoordinate.y = (boundingRect.top - boundingRect.bottom) / 2 + boundingRect.bottom;
-	DSTPositiveOffset.x = boundingRect.right - centerCoordinate.x + 1;
-	DSTPositiveOffset.y = boundingRect.top - centerCoordinate.y + 1;
-	DSTNegativeOffset.x = centerCoordinate.x - boundingRect.left - 1;
-	DSTNegativeOffset.y = centerCoordinate.y - boundingRect.bottom - 1;
+	DSTOffsetData.Positive.x = boundingRect.right - centerCoordinate.x + 1;
+	DSTOffsetData.Positive.y = boundingRect.top - centerCoordinate.y + 1;
+	DSTOffsetData.Negative.x = centerCoordinate.x - boundingRect.left - 1;
+	DSTOffsetData.Negative.y = centerCoordinate.y - boundingRect.bottom - 1;
 	color = dstStitchBuffer[0].attribute & 0xf;
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (color != (dstStitchBuffer[iStitch].attribute & 0xf)) {
-			savdst(0xc30000);
+			savdst(DSTRecords, 0xc30000);
 			color = dstStitchBuffer[iStitch].attribute & 0xf;
 			colorData.push_back(UserColor[color]);
 		}
@@ -5227,15 +5219,14 @@ void ritdst(const std::vector<fPOINTATTR> &stitches) {
 			}
 			else
 				difference.y = lengths.y;
-			savdst(dudbits(difference) | dstType);
+			savdst(DSTRecords, dudbits(difference) | dstType);
 			centerCoordinate.x += difference.x;
 			centerCoordinate.y += difference.y;
 			lengths.x -= difference.x;
 			lengths.y -= difference.y;
 		}
 	}
-	DSTRecords[DSTRecordCount].led = DSTRecords[DSTRecordCount].mid = 0;
-	DSTRecords[DSTRecordCount++].nd = gsl::narrow<TBYTE>(0xf3);
+	DSTRecords.push_back({ 0, 0, gsl::narrow<TBYTE>(0xf3) });
 
 	if (colfil()) {
 		colorFile = CreateFile(ColorFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
@@ -5530,11 +5521,13 @@ void sav() {
 	}
 	else {
 		bool flag = true;
+		std::vector<DSTREC> DSTRecords;
+		// There are always going to be more records in the DST format because color changes and jumps count as stitches
+		DSTRecords.reserve(PCSHeader.stitchCount + 128);
+		DSTOffsets DSTOffsetData = {};
 		switch (IniFile.auxFileType) {
 		case AUXDST:
-			// There are always going to be more records in the DST format
-			DSTRecords = new DSTREC[2 * PCSHeader.stitchCount]();
-			ritdst(saveStitches);
+			ritdst(DSTOffsetData, DSTRecords, saveStitches);
 			pchr = convert_ptr<TCHAR *>(&dstHeader);
 			if (pchr) {
 				for (iHeader = 0; iHeader < sizeof(DSTHED); iHeader++)
@@ -5552,17 +5545,17 @@ void sav() {
 			}
 			dstHeader.desc[16] = 0xd;
 			strncpy(dstHeader.recshed, "ST:", 3);
-			sprintf(dstHeader.recs, "%7d\r", DSTRecordCount);
+			sprintf(dstHeader.recs, "%7d\r", DSTRecords.size());
 			strncpy(dstHeader.cohed, "CO:", 3);
 			strncpy(dstHeader.co, "  0\xd", 4);
 			strncpy(dstHeader.xplushed, "+X:", 3);
-			sprintf(dstHeader.xplus, "%5d\xd", DSTNegativeOffset.x);
+			sprintf(dstHeader.xplus, "%5d\xd", DSTOffsetData.Negative.x);
 			strncpy(dstHeader.xminhed, "-X:", 3);
-			sprintf(dstHeader.xmin, "%5d\xd", DSTPositiveOffset.x);
+			sprintf(dstHeader.xmin, "%5d\xd", DSTOffsetData.Positive.x);
 			strncpy(dstHeader.yplushed, "+Y:", 3);
-			sprintf(dstHeader.yplus, "%5d\xd", DSTPositiveOffset.y);
+			sprintf(dstHeader.yplus, "%5d\xd", DSTOffsetData.Positive.y);
 			strncpy(dstHeader.yminhed, "-Y:", 3);
-			sprintf(dstHeader.ymin, "%5d\xd", DSTNegativeOffset.y);
+			sprintf(dstHeader.ymin, "%5d\xd", DSTOffsetData.Negative.y);
 			strncpy(dstHeader.axhed, "AX:", 3);
 			strncpy(dstHeader.ax, "-    0\r", 7);
 			strncpy(dstHeader.ayhed, "AY:", 3);
@@ -5575,8 +5568,7 @@ void sav() {
 			strncpy(dstHeader.pd, "******\r", 7);
 			strncpy(dstHeader.eof, "\x1a", 1);
 			WriteFile(PCSFileHandle, &dstHeader, sizeof(DSTHED), &bytesWritten, 0);
-			WriteFile(PCSFileHandle, DSTRecords, sizeof(DSTREC)*DSTRecordCount, &bytesWritten, 0);
-			delete[] DSTRecords;
+			WriteFile(PCSFileHandle, &DSTRecords[0], sizeof(DSTREC)*DSTRecords.size(), &bytesWritten, 0);
 			break;
 
 #if PESACT
@@ -6310,8 +6302,8 @@ void unlin() {
 void movbox() {
 	if (stch2px(ClosestPointIndex)) {
 		unbox();
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Stitch:%d form:%d type:%d\n", ClosestPointIndex, ((StitchBuffer[ClosestPointIndex].attribute&FRMSK) >> FRMSHFT), ((StitchBuffer[ClosestPointIndex].attribute&TYPMSK) >> TYPSHFT));
-		OutputDebugString(MsgBuffer);
+		//sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Stitch:%d form:%d type:%d\n", ClosestPointIndex, ((StitchBuffer[ClosestPointIndex].attribute&FRMSK) >> FRMSHFT), ((StitchBuffer[ClosestPointIndex].attribute&TYPMSK) >> TYPSHFT));
+		//OutputDebugString(MsgBuffer);
 		dubox();
 		if (StateMap.test(StateFlag::UPTO))
 			StateMap.set(StateFlag::RESTCH);

@@ -1199,10 +1199,15 @@ typedef struct _dsthed {		//dst file header
 #define REGTYP 0x030000
 
 typedef struct _dstrec {	//dst stitch record
-	TCHAR	led;
-	TCHAR	mid;
-	TCHAR	nd;
+	TBYTE	led;
+	TBYTE	mid;
+	TBYTE	nd;
 }DSTREC;
+
+typedef struct _dstoffsets {
+	POINT		Positive;	//plus offset written into the destination file header
+	POINT		Negative;	//minus offset written into the destination file header
+}DSTOffsets;
 
 typedef struct _smalpntl {
 	unsigned	line;	//line and group must remain in this order for sort to work
