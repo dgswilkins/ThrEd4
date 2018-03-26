@@ -12352,8 +12352,6 @@ void xclpfn(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPo
 }
 
 void duxclp() {
-	unsigned	iPoint;
-
 	std::vector<fPOINT> chainEndPoints;
 	// reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
 	chainEndPoints.reserve(50);
@@ -12364,9 +12362,9 @@ void duxclp() {
 	clpxadj(tempClipPoints, chainEndPoints);
 	SequenceIndex = 0;
 	RotationCenter.x = RotationCenter.y = 0;
-	for (iPoint = 1; iPoint < chainEndPoints.size(); iPoint++) {}
-	for (iPoint = 1; iPoint < chainEndPoints.size(); iPoint++)
+	for (unsigned iPoint = 1; iPoint < chainEndPoints.size(); iPoint++) {
 		xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint);
+	}
 	if (SelectedForm->type != FRMLINE) {
 		OSequence[SequenceIndex++] = chainEndPoints[0];
 	}

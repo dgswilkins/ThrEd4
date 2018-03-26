@@ -1696,26 +1696,22 @@ bool chkrdun(std::vector<unsigned> &formFillCounter, std::vector<OREC *> &pRecs,
 }
 
 double precjmps(std::vector<fPOINTATTR> &tempStitchBuffer, std::vector<OREC *> &pRecs, const SRTREC* sortRecord) {
-	unsigned		totalJumps;
-	double			length;
-	double			minimumLength;
-	unsigned		iRegion, currentRegion;
-	fPOINTATTR*		currentStitch;
-	bool			direction;
+	unsigned		iRegion = 0;
+	unsigned		currentRegion = sortRecord->currentRegion;
+	fPOINTATTR*		currentStitch = nullptr;
+	bool			direction = sortRecord->direction;
 
 	std::vector<unsigned> formFillCounter((FormIndex + 2) << 2);
-	currentRegion = sortRecord->currentRegion;
-	direction = sortRecord->direction;
-	totalJumps = 0;
+	unsigned totalJumps = 0;
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
-		minimumLength = 1e9;
+		double minimumLength = 1e9;
 		if (direction)
 			currentStitch = &StitchBuffer[pRecs[currentRegion]->finish];
 		else
 			currentStitch = &StitchBuffer[pRecs[currentRegion]->start];
 		for (iRegion = sortRecord->start; iRegion < sortRecord->finish; iRegion++) {
 			if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
-				length = hypot(pRecs[iRegion]->startStitch->x - currentStitch->x, pRecs[iRegion]->startStitch->y - currentStitch->y);
+				double length = hypot(pRecs[iRegion]->startStitch->x - currentStitch->x, pRecs[iRegion]->startStitch->y - currentStitch->y);
 				if (length < minimumLength) {
 					minimumLength = length;
 					direction = 0;
@@ -1753,7 +1749,6 @@ double precjmps(std::vector<fPOINTATTR> &tempStitchBuffer, std::vector<OREC *> &
 			}
 		}
 	}
-	//delete[] formFillCounter;
 	return totalJumps;
 }
 
@@ -4839,7 +4834,7 @@ void lodchk() {
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		attribute = StitchBuffer[iStitch].attribute;
 		if ((attribute&TYPMSK) == TYPFRM) {
-			unsigned tform = (attribute&FRMSK) >> FRMSHFT;
+			const unsigned tform = (attribute&FRMSK) >> FRMSHFT;
 			if (tform < formMap.size()) {
 				formMap.set(tform);
 			}
