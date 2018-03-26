@@ -838,7 +838,6 @@ TCHAR			BalaradName1[_MAX_PATH + 1] = { 0 };	//balarad data file
 TCHAR			BalaradName2[_MAX_PATH + 1];
 TCHAR			SearchName[_MAX_PATH + 1];
 TCHAR			HomeDirectory[_MAX_PATH + 1];			//directory from which thred was executed
-PCSTCH*			PCSStitchBuffer;
 HANDLE			FileHandle = 0;
 HANDLE			PCSFileHandle = 0;
 HANDLE			IniFileHandle = 0;
@@ -4936,30 +4935,29 @@ void nuFil() {
 								UserColor[iColor] = PCSHeader.colors[iColor];
 							fileSize -= sizeof(PCSHeader);
 							pcsStitchCount = fileSize / sizeof(PCSTCH) + 2;
-							PCSStitchBuffer = new PCSTCH[pcsStitchCount];
-							ReadFile(FileHandle, PCSStitchBuffer, fileSize, &BytesRead, NULL);
+							std::vector<PCSTCH> PCSDataBuffer(pcsStitchCount);
+							ReadFile(FileHandle, &PCSDataBuffer[0], fileSize, &BytesRead, NULL);
 							iStitch = 0;
 							iColorChange = 0;
 							color = 0;
 							iPCSstitch = 0;
 							while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
-								if (PCSStitchBuffer[iPCSstitch].tag == 3) {
-									ColorChangeTable[iColorChange].colorIndex = PCSStitchBuffer[iPCSstitch].fx;
+								if (PCSDataBuffer[iPCSstitch].tag == 3) {
+									ColorChangeTable[iColorChange].colorIndex = PCSDataBuffer[iPCSstitch].fx;
 									ColorChangeTable[iColorChange++].stitchIndex = iStitch;
-									color = NOTFRM | PCSStitchBuffer[iPCSstitch++].fx;
+									color = NOTFRM | PCSDataBuffer[iPCSstitch++].fx;
 								}
 								else {
-									StitchBuffer[iStitch].x = PCSStitchBuffer[iPCSstitch].x + static_cast<float>(PCSStitchBuffer[iPCSstitch].fx) / 256;
-									StitchBuffer[iStitch].y = PCSStitchBuffer[iPCSstitch].y + static_cast<float>(PCSStitchBuffer[iPCSstitch].fy) / 256;
+									StitchBuffer[iStitch].x = PCSDataBuffer[iPCSstitch].x + static_cast<float>(PCSDataBuffer[iPCSstitch].fx) / 256;
+									StitchBuffer[iStitch].y = PCSDataBuffer[iPCSstitch].y + static_cast<float>(PCSDataBuffer[iPCSstitch].fy) / 256;
 									StitchBuffer[iStitch++].attribute = color;
 									iPCSstitch++;
 								}
 							}
 							PCSHeader.stitchCount = iStitch;
 							// Grab the bitmap filename
-							tnam = convert_ptr<TCHAR *>(&PCSStitchBuffer[iPCSstitch]);
+							tnam = convert_ptr<TCHAR *>(&PCSDataBuffer[iPCSstitch]);
 							strcpy_s(PCSBMPFileName, tnam);
-							delete[] PCSStitchBuffer;
 							strcpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), "thr");
 							IniFile.auxFileType = AUXPCS;
 							if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP)
@@ -5135,10 +5133,6 @@ void nuFil() {
 		}
 		lodchk();
 	}
-}
-
-void clrfbuf(unsigned count) noexcept {
-	memset(PCSStitchBuffer, 0, count * 4);
 }
 
 constexpr unsigned dudbits(POINT dif) {
@@ -5689,7 +5683,7 @@ void sav() {
 		default:
 			for (iColor = 0; iColor < 16; iColor++)
 				PCSHeader.colors[iColor] = UserColor[iColor];
-			PCSStitchBuffer = new PCSTCH[PCSHeader.stitchCount + ColorChanges + 2];
+			std::vector<PCSTCH> PCSStitchBuffer(PCSHeader.stitchCount + ColorChanges + 2);
 			do {
 				if (pcshup(saveStitches)) {
 					flag = false;
@@ -5700,7 +5694,6 @@ void sav() {
 					flag = false;
 					break;
 				}
-				clrfbuf((sizeof(PCSTCH)*(PCSHeader.stitchCount + ColorChanges + 1)) >> 2);
 				iPCSstitch = 0;
 				savcol = 0xff;
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -5716,7 +5709,7 @@ void sav() {
 					PCSStitchBuffer[iPCSstitch].fy = fractionalPart * 256;
 					PCSStitchBuffer[iPCSstitch++].y = integerPart;
 				}
-				if (!WriteFile(PCSFileHandle, PCSStitchBuffer, iPCSstitch * sizeof(PCSTCH), &bytesWritten, 0)) {
+				if (!WriteFile(PCSFileHandle, &PCSStitchBuffer[0], iPCSstitch * sizeof(PCSTCH), &bytesWritten, 0)) {
 					riter();
 					flag = false;
 					break;
@@ -5737,7 +5730,6 @@ void sav() {
 					}
 				}
 			} while (false);
-			delete[] PCSStitchBuffer;
 		}
 		if (flag) {
 			defNam(WorkingFileName);
