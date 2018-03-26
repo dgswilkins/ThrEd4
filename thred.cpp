@@ -4633,37 +4633,35 @@ double dubl(unsigned char* pnt) {
 }
 #endif
 
-void xofrm(const FRMHEDO*	formListOriginal) noexcept {
-	if (formListOriginal) {
-		unsigned	iForm = 0;
-		FRMHED		dstForm = {};
-		FRMHEDO		srcForm = {};
+void xofrm(std::vector<FRMHEDO> &formListOriginal) noexcept {
+	unsigned	iForm = 0;
+	FRMHED		dstForm = {};
+	FRMHEDO		srcForm = {};
 
-		FillMemory(FormList, sizeof(FRMHED)*FormIndex, 0);
-		for (iForm = 0; iForm < FormIndex; iForm++) {
-			srcForm = formListOriginal[iForm];
-			dstForm = FormList[iForm];
-			dstForm.attribute = srcForm.attribute;
-			dstForm.vertexCount = srcForm.vertexCount;
-			dstForm.type = srcForm.type;
-			dstForm.fillColor = srcForm.fillColor;
-			dstForm.borderColor = srcForm.borderColor;
-			dstForm.clipEntries = srcForm.clipEntries;
-			dstForm.vertices = srcForm.vertices;
-			dstForm.satinOrAngle = srcForm.satinOrAngle;
-			dstForm.borderClipData = srcForm.borderClipData;
-			dstForm.satinGuideCount = srcForm.satinGuideCount;
-			dstForm.wordParam = srcForm.wordParam;
-			dstForm.rectangle = srcForm.rectangle;
-			dstForm.fillType = srcForm.fillType;
-			dstForm.edgeType = srcForm.edgeType;
-			dstForm.fillSpacing = srcForm.fillSpacing;
-			dstForm.lengthOrCount = srcForm.lengthOrCount;
-			dstForm.angleOrClipData = srcForm.angleOrClipData;
-			dstForm.borderSize = srcForm.borderSize;
-			dstForm.edgeSpacing = srcForm.edgeSpacing;
-			dstForm.edgeStitchLen = srcForm.edgeStitchLen;
-		}
+	FillMemory(FormList, sizeof(FRMHED)*FormIndex, 0);
+	for (iForm = 0; iForm < FormIndex; iForm++) {
+		srcForm = formListOriginal[iForm];
+		dstForm = FormList[iForm];
+		dstForm.attribute = srcForm.attribute;
+		dstForm.vertexCount = srcForm.vertexCount;
+		dstForm.type = srcForm.type;
+		dstForm.fillColor = srcForm.fillColor;
+		dstForm.borderColor = srcForm.borderColor;
+		dstForm.clipEntries = srcForm.clipEntries;
+		dstForm.vertices = srcForm.vertices;
+		dstForm.satinOrAngle = srcForm.satinOrAngle;
+		dstForm.borderClipData = srcForm.borderClipData;
+		dstForm.satinGuideCount = srcForm.satinGuideCount;
+		dstForm.wordParam = srcForm.wordParam;
+		dstForm.rectangle = srcForm.rectangle;
+		dstForm.fillType = srcForm.fillType;
+		dstForm.edgeType = srcForm.edgeType;
+		dstForm.fillSpacing = srcForm.fillSpacing;
+		dstForm.lengthOrCount = srcForm.lengthOrCount;
+		dstForm.angleOrClipData = srcForm.angleOrClipData;
+		dstForm.borderSize = srcForm.borderSize;
+		dstForm.edgeSpacing = srcForm.edgeSpacing;
+		dstForm.edgeStitchLen = srcForm.edgeStitchLen;
 	}
 }
 
@@ -4868,14 +4866,14 @@ void nuFil() {
 						FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
 						MsgBuffer[0] = 0;
 						if (version < 2) {
-							FRMHEDO* formListOriginal = new FRMHEDO[FormIndex]();
-							ReadFile(FileHandle, formListOriginal, FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
+							std::vector<FRMHEDO> formListOriginal(FormIndex);
+							ReadFile(FileHandle, &formListOriginal[0], FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
 							if (BytesRead != FormIndex * sizeof(FRMHEDO)) {
 								FormIndex = BytesRead / sizeof(FRMHEDO);
 								StateMap.set(StateFlag::BADFIL);
 							}
 							xofrm(formListOriginal);
-							delete[] formListOriginal;
+							//delete[] formListOriginal;
 						}
 						else {
 							ReadFile(FileHandle, (FRMHED*)FormList, FormIndex * sizeof(FRMHED), &BytesRead, 0);
