@@ -4385,7 +4385,7 @@ void bfil() {
 				SelectObject(BitmapDC, BitmapFileHandle);
 				BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, deviceContext, 0, 0, SRCCOPY);
 				DeleteObject(bitmap);
-				ReleaseDC(ThrEdWindow, deviceContext);
+				DeleteObject(deviceContext);
 			}
 		}
 		else {
@@ -11627,7 +11627,7 @@ void untrace() {
 
 	if (StateMap.testAndReset(StateFlag::WASTRAC)) {
 		DeleteObject(TraceBitmap);
-		ReleaseDC(ThrEdWindow, TraceDC);
+		DeleteObject(TraceDC);
 		if (TracedEdges->size() != 0) {
 			TracedEdges->resize(0); // allocated in tracedg
 		}
