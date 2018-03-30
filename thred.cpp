@@ -4239,7 +4239,6 @@ void movmap(unsigned cnt, unsigned char *buffer) noexcept {
 
 void savmap() {
 	unsigned long	bytesWritten = 0;
-	unsigned char*	buffer = nullptr;
 
 	if (PCSBMPFileName[0]) {
 		if (StateMap.test(StateFlag::MONOMAP)) {
@@ -4258,10 +4257,9 @@ void savmap() {
 			}
 			WriteFile(BitmapFileHandle, &BitmapFileHeader, 14, &bytesWritten, NULL);
 			WriteFile(BitmapFileHandle, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14, &bytesWritten, NULL);
-			buffer = new unsigned char[(BitmapWidth*BitmapHeight * 3) + 1]();
-			movmap(BitmapWidth*BitmapHeight, buffer);
-			WriteFile(BitmapFileHandle, buffer, BitmapWidth*BitmapHeight * 3, &bytesWritten, NULL);
-			delete[] buffer;
+			auto buffer = std::make_unique<unsigned char[]>((BitmapWidth*BitmapHeight * 3) + 1);
+			movmap(BitmapWidth*BitmapHeight, buffer.get());
+			WriteFile(BitmapFileHandle, buffer.get(), BitmapWidth*BitmapHeight * 3, &bytesWritten, NULL);
 			CloseHandle(BitmapFileHandle);
 		}
 	}
@@ -18678,7 +18676,7 @@ void ducmd() {
 }
 
 void redini() {
-	unsigned		iUnDo = 0, iVersion = 0, iColor = 0, adjustedWidth = 0;
+	unsigned		iVersion = 0, iColor = 0, adjustedWidth = 0;
 	unsigned long	bytesRead = 0;
 	HDC				deviceContext = {};
 
