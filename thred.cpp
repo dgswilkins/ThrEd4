@@ -18682,10 +18682,6 @@ void redini() {
 	unsigned long	bytesRead = 0;
 	HDC				deviceContext = {};
 
-	// Probably not needed as UndoBuffer should be initialized
-	for (iUnDo = 0; iUnDo < 16; iUnDo++) {
-			UndoBuffer[iUnDo].reset(nullptr);
-	}
 	for (iVersion = 0; iVersion < OLDNUM; iVersion++)
 		IniFile.prevNames[iVersion][0] = 0;
 	duhom();
