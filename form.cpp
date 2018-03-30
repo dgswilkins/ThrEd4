@@ -186,8 +186,6 @@ extern			HWND			ThrEdWindow;
 extern			POINT			ThredWindowOrigin;
 extern			TCHAR			ThrName[_MAX_PATH];
 extern			unsigned		AppliqueColor;
-extern			void*			UndoBuffer[16];
-extern			unsigned		UndoBufferWriteIndex;
 extern			POINT			UnzoomedRect;
 extern			EnumMap<UserFlag>	UserFlagMap;
 extern			HPEN			UserPen[16];

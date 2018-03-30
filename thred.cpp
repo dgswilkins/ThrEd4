@@ -555,7 +555,7 @@ double			StitchBoxesThreshold = STCHBOX;//threshold for drawing stitch boxes
 //WARNING the size of the following array must be changed if the maximum movie speed is changed
 POINT			MovieLine[100];			//line for movie stitch draw
 RECT			MsgRect;				//rectangle containing the text message
-void*			UndoBuffer[16];			//backup data
+std::vector<std::unique_ptr<unsigned[]>>	UndoBuffer(16);			//backup data
 unsigned		UndoBufferWriteIndex = 0;	//undo storage pointer
 unsigned		UndoBufferReadIndex = 0;	//undo retrieval pointers
 unsigned		AppliqueColor = 15;		//underlay color
@@ -2020,10 +2020,7 @@ void deldu() {
 	unsigned iBuffer = 0;
 
 	for (iBuffer = 0; iBuffer < 16; iBuffer++) {
-		if (UndoBuffer[iBuffer]) {
-			delete UndoBuffer[iBuffer];
-			UndoBuffer[iBuffer] = nullptr;
-		}
+			UndoBuffer[iBuffer].reset(nullptr);
 	}
 	UndoBufferWriteIndex = 0;
 	StateMap.reset(StateFlag::BAKWRAP);
@@ -2044,13 +2041,12 @@ void dudat() {
 	unsigned	size = 0;
 	BAKHED*		backupData = nullptr;
 
-	if (UndoBuffer[UndoBufferWriteIndex])
-		delete UndoBuffer[UndoBufferWriteIndex];
+	UndoBuffer[UndoBufferWriteIndex].reset(nullptr);
 	size = sizeof(BAKHED) + sizeof(FRMHED)*FormIndex + sizeof(fPOINTATTR)*PCSHeader.stitchCount
 		+ sizeof(fPOINT)*(FormVertexIndex + ClipPointIndex) + sizeof(SATCON)*SatinGuideIndex + sizeof(COLORREF) * 16 +
 		sizeof(TXPNT)*TextureIndex;
-	UndoBuffer[UndoBufferWriteIndex] = new unsigned[size];
-	backupData = static_cast<BAKHED *>(UndoBuffer[UndoBufferWriteIndex]);
+	UndoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);
+	backupData = convert_ptr<BAKHED *>(UndoBuffer[UndoBufferWriteIndex].get());
 	if (backupData) {
 		backupData->zoomRect.x = UnzoomedRect.x;
 		backupData->zoomRect.y = UnzoomedRect.y;
@@ -4037,7 +4033,7 @@ void stchred(unsigned count, const fPOINTATTR* source) noexcept {
 }
 
 void redbak() {
-	const BAKHED*	undoData = static_cast<BAKHED *>(UndoBuffer[UndoBufferWriteIndex]);
+	const BAKHED*	undoData = convert_ptr<BAKHED *>(UndoBuffer[UndoBufferWriteIndex].get());
 	if (undoData) {
 		unsigned		iColor = 0;
 
@@ -18686,8 +18682,10 @@ void redini() {
 	unsigned long	bytesRead = 0;
 	HDC				deviceContext = {};
 
-	for (iUnDo = 0; iUnDo < 16; iUnDo++)
-		UndoBuffer[iUnDo] = 0;
+	// Probably not needed as UndoBuffer should be initialized
+	for (iUnDo = 0; iUnDo < 16; iUnDo++) {
+			UndoBuffer[iUnDo].reset(nullptr);
+	}
 	for (iVersion = 0; iVersion < OLDNUM; iVersion++)
 		IniFile.prevNames[iVersion][0] = 0;
 	duhom();
