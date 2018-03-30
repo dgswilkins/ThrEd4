@@ -614,12 +614,6 @@ unsigned		TraceDataSize;			//size of the trace bitmap in double words
 unsigned*		TracedPixels;			//bitmap of selected trace pixels
 boost::dynamic_bitset<>	*TracedEdges;	//detected edges of trace areas
 boost::dynamic_bitset<>	*TracedMap;		//in/out state of trace areas
-TRCPNT*			TracedPoints;			//collection of traced points
-TRCPNT*			DecimatedLine;			//differenced collection of traced points
-unsigned		TraceDirection;			//trace direction
-unsigned		InitialDirection;		//initial trace direction
-TRCPNT			TraceDiff0;				//difference from one trace pixel to the next
-TRCPNT			TraceDiff1;				//difference from one trace pixel to the next
 COLORREF		UpPixelColor;			//color of the up reference pixel
 COLORREF		DownPixelColor;			//color of the down reference pixel
 COLORREF		InvertUpColor;			//complement color of the up reference pixel
@@ -632,7 +626,6 @@ StateFlag		TraceRGBFlag[] = { StateFlag::TRCRED,StateFlag::TRCGRN,StateFlag::TRC
 unsigned		TraceRGBMask[] = { REDMSK,GRNMSK,BLUMSK };	//trace masks
 unsigned		TraceRGB[] = { BLUCOL,GRNCOL,REDCOL };	//trace colors
 unsigned		TraceAdjacentColors[9];	//separated colors for adjacent pixels
-unsigned*		DifferenceBitmap;		//difference bitmap
 TCHAR			TraceInputBuffer[4];	//for user input color numbers
 unsigned		ColumnColor;			//trace color column
 POINT			BitmapPoint;			//a point on the bitmap
@@ -11900,28 +11893,28 @@ void tracedg() {
 	StateMap.set(StateFlag::WASEDG);
 }
 
-bool trcbit() {
+bool trcbit(const unsigned initialDirection, unsigned &traceDirection, std::vector<TRCPNT> &tracedPoints) {
 	unsigned	pixelIndex;
 
 	pixelIndex = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
-	switch (TraceDirection) {
+	switch (traceDirection) {
 	case TRCR:
 
 		pixelIndex += (1 - BitmapWidth);
 		if (CurrentTracePoint.x == gsl::narrow<int>(BitmapWidth) - 1)
-			TraceDirection = TRCU;
+			traceDirection = TRCU;
 		else {
 			if (TracedEdges->test(pixelIndex)) {
 				CurrentTracePoint.x++;
 				CurrentTracePoint.y--;
-				TraceDirection = TRCD;
+				traceDirection = TRCD;
 			}
 			else {
 				pixelIndex += BitmapWidth;
 				if (TracedEdges->test(pixelIndex))
 					CurrentTracePoint.x++;
 				else
-					TraceDirection = TRCU;
+					traceDirection = TRCU;
 			}
 		}
 		break;
@@ -11930,19 +11923,19 @@ bool trcbit() {
 
 		pixelIndex -= (BitmapWidth + 1);
 		if (!CurrentTracePoint.y)
-			TraceDirection = TRCR;
+			traceDirection = TRCR;
 		else {
 			if (TracedEdges->test(pixelIndex)) {
 				CurrentTracePoint.x--;
 				CurrentTracePoint.y--;
-				TraceDirection = TRCL;
+				traceDirection = TRCL;
 			}
 			else {
 				pixelIndex++;
 				if (TracedEdges->test(pixelIndex))
 					CurrentTracePoint.y--;
 				else
-					TraceDirection = TRCR;
+					traceDirection = TRCR;
 			}
 		}
 		break;
@@ -11951,19 +11944,19 @@ bool trcbit() {
 
 		pixelIndex += (BitmapWidth - 1);
 		if (!CurrentTracePoint.x)
-			TraceDirection = TRCD;
+			traceDirection = TRCD;
 		else {
 			if (TracedEdges->test(pixelIndex)) {
 				CurrentTracePoint.x--;
 				CurrentTracePoint.y++;
-				TraceDirection = TRCU;
+				traceDirection = TRCU;
 			}
 			else {
 				pixelIndex -= BitmapWidth;
 				if (TracedEdges->test(pixelIndex))
 					CurrentTracePoint.x--;
 				else
-					TraceDirection = TRCD;
+					traceDirection = TRCD;
 			}
 		}
 		break;
@@ -11972,40 +11965,39 @@ bool trcbit() {
 
 		pixelIndex += (1 + BitmapWidth);
 		if (CurrentTracePoint.y == gsl::narrow<int>(BitmapHeight) - 1)
-			TraceDirection = TRCL;
+			traceDirection = TRCL;
 		else {
 			if (TracedEdges->test(pixelIndex)) {
 				CurrentTracePoint.x++;
 				CurrentTracePoint.y++;
-				TraceDirection = TRCR;
+				traceDirection = TRCR;
 			}
 			else {
 				pixelIndex--;
 				if (TracedEdges->test(pixelIndex))
 					CurrentTracePoint.y++;
 				else
-					TraceDirection = TRCL;
+					traceDirection = TRCL;
 			}
 		}
 		break;
 	}
-	if (TracedPoints[ActivePointIndex - 1].x != CurrentTracePoint.x || TracedPoints[ActivePointIndex - 1].y != CurrentTracePoint.y) {
-		TracedPoints[ActivePointIndex].x = CurrentTracePoint.x;
-		TracedPoints[ActivePointIndex++].y = CurrentTracePoint.y;
-		if (ActivePointIndex >= 500000)
+	if (tracedPoints.back().x != CurrentTracePoint.x || tracedPoints.back().y != CurrentTracePoint.y) {
+		tracedPoints.push_back({ gsl::narrow<short>(CurrentTracePoint.x), gsl::narrow<short>(CurrentTracePoint.y) });
+		if (tracedPoints.size() >= 500000)
 			return 0;
 	}
-	if (TraceDirection == InitialDirection && CurrentTracePoint.x == TracedPoints[0].x && CurrentTracePoint.y == TracedPoints[0].y)
+	if (traceDirection == initialDirection && CurrentTracePoint.x == tracedPoints[0].x && CurrentTracePoint.y == tracedPoints[0].y)
 		return 0;
 	else
 		return 1;
 }
 
-void dutdif(const TRCPNT* point) noexcept {
+void dutdif(TRCPNT &traceDiff, const TRCPNT* point) noexcept {
 	if (point) {
-		TraceDiff0.x = point[1].x - point[0].x;
+		traceDiff.x = point[1].x - point[0].x;
 		// ToDo - this is likely incorrect
-		TraceDiff0.y = point[1].x - point[0].y;
+		traceDiff.y = point[1].y - point[0].y;
 	}
 }
 
@@ -12018,6 +12010,7 @@ void dutrac() {
 	double		traceLength = 0.0;
 	double		traceLengthSum = 0.0;
 	float		landscapeOffset = 0.0;
+	unsigned	traceDirection = 0;
 
 	if (px2stch()) {
 		if (!StateMap.test(StateFlag::WASEDG)) {
@@ -12098,79 +12091,72 @@ void dutrac() {
 			case TRCU:
 
 				CurrentTracePoint.y = findRectangle.top;
-				TraceDirection = TRCR;
+				traceDirection = TRCR;
 				break;
 
 			case TRCR:
 
 				CurrentTracePoint.x = findRectangle.right;
-				TraceDirection = TRCD;
+				traceDirection = TRCD;
 				break;
 
 			case TRCD:
 
 				CurrentTracePoint.y = findRectangle.bottom;
-				TraceDirection = TRCL;
+				traceDirection = TRCL;
 				break;
 
 			case TRCL:
 
 				CurrentTracePoint.x = findRectangle.left;
-				TraceDirection = TRCU;
+				traceDirection = TRCU;
 				break;
 
 			default:
 				return;
 			}
 		}
-		InitialDirection = TraceDirection;
+		unsigned initialDirection = traceDirection;
 		point = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
-		ActivePointIndex = 1;
-		TracedPoints = new TRCPNT[MAXITEMS * 8];
-		TracedPoints[0].x = CurrentTracePoint.x;
-		TracedPoints[0].y = CurrentTracePoint.y;
-		while (trcbit());
-		if (ActivePointIndex >= 500000) {
+		std::vector<TRCPNT> tracedPoints;
+		tracedPoints.push_back({ gsl::narrow<short>(CurrentTracePoint.x), gsl::narrow<short>(CurrentTracePoint.y) });
+		while (trcbit(initialDirection, traceDirection, tracedPoints));
+		if (tracedPoints.size() >= 500000) {
 			tabmsg(IDS_FRM2L);
 			return;
 		}
-		DecimatedLine = &TracedPoints[ActivePointIndex];
-		DecimatedLine[0].x = TracedPoints[0].x;
-		DecimatedLine[0].y = TracedPoints[0].y;
-		dutdif(&TracedPoints[0]);
+		std::vector<TRCPNT> decimatedLine;
+		decimatedLine.reserve(tracedPoints.size());
+		TRCPNT traceDiff[2] = {};
+		decimatedLine.push_back(tracedPoints[0]);
+		dutdif(traceDiff[0], &tracedPoints[0]);
 		OutputIndex = 1;
-		for (iPoint = 1; iPoint < ActivePointIndex; iPoint++) {
-			TraceDiff1.x = TraceDiff0.x;
-			TraceDiff1.y = TraceDiff0.y;
-			dutdif(&TracedPoints[iPoint]);
-			if (TraceDiff1.x != TraceDiff0.x || TraceDiff1.y != TraceDiff0.y) {
-				DecimatedLine[OutputIndex].x = TracedPoints[iPoint].x;
-				DecimatedLine[OutputIndex++].y = TracedPoints[iPoint].y;
+		for (iPoint = 1; iPoint < tracedPoints.size(); iPoint++) {
+			traceDiff[1].x = traceDiff[0].x;
+			traceDiff[1].y = traceDiff[0].y;
+			dutdif(traceDiff[0], &tracedPoints[iPoint]);
+			if (traceDiff[1].x != traceDiff[0].x || traceDiff[1].y != traceDiff[0].y) {
+				decimatedLine.push_back(tracedPoints[iPoint]);
 			}
 		}
-		TracedPoints[0].x = DecimatedLine[0].x;
-		TracedPoints[0].y = DecimatedLine[0].y;
+		tracedPoints.clear();
+		tracedPoints.push_back(decimatedLine[0]);
 		iNext = 0;
-		ActivePointIndex = 0;
-		for (iCurrent = 1; iCurrent < OutputIndex; iCurrent++) {
-			traceLength = hypot(DecimatedLine[iCurrent].x - DecimatedLine[iNext].x, DecimatedLine[iCurrent].y - DecimatedLine[iNext].y);
+		for (iCurrent = 1; iCurrent < decimatedLine.size(); iCurrent++) {
+			traceLength = hypot(decimatedLine[iCurrent].x - decimatedLine[iNext].x, decimatedLine[iCurrent].y - decimatedLine[iNext].y);
 			if (traceLength > IniFile.traceLength) {
-				TracedPoints[ActivePointIndex].x = DecimatedLine[iNext].x;
-				TracedPoints[ActivePointIndex].y = DecimatedLine[iNext].y;
+				tracedPoints.push_back(decimatedLine[iNext]);
 				iNext = iCurrent;
-				ActivePointIndex++;
 			}
 		}
-		for (iCurrent = iNext + 1; iCurrent < OutputIndex; iCurrent++) {
-			TracedPoints[ActivePointIndex].x = DecimatedLine[iCurrent].x;
-			TracedPoints[ActivePointIndex].y = DecimatedLine[iCurrent].y;
-			ActivePointIndex++;
+		for (iCurrent = iNext + 1; iCurrent < decimatedLine.size(); iCurrent++) {
+			tracedPoints.push_back(decimatedLine[iCurrent]);
 		}
 		SelectedForm = &FormList[FormIndex];
 		frmclr(SelectedForm);
 		CurrentFormVertices = &FormVertices[FormVertexIndex];
-		CurrentFormVertices[0].x = TracedPoints[0].x*StitchBmpRatio.x;
-		CurrentFormVertices[0].y = TracedPoints[0].y*StitchBmpRatio.y;
+		CurrentFormVertices[0].x = tracedPoints[0].x*StitchBmpRatio.x;
+		CurrentFormVertices[0].y = tracedPoints[0].y*StitchBmpRatio.y;
 		iNext = 0;
 		OutputIndex = 0;
 		traceLengthSum = 0;
@@ -12178,19 +12164,18 @@ void dutrac() {
 			landscapeOffset = UnzoomedRect.y - BitmapSizeinStitches.y;
 		else
 			landscapeOffset = 0;
-		for (iCurrent = 1; iCurrent < ActivePointIndex; iCurrent++) {
-			traceLengthSum += hypot(TracedPoints[iCurrent].x - TracedPoints[iCurrent - 1].x, TracedPoints[iCurrent].y - TracedPoints[iCurrent - 1].y);
-			traceLength = hypot(TracedPoints[iCurrent].x - TracedPoints[iNext].x, TracedPoints[iCurrent].y - TracedPoints[iNext].y);
+		for (iCurrent = 1; iCurrent < tracedPoints.size(); iCurrent++) {
+			traceLengthSum += hypot(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1].x, tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1].y);
+			traceLength = hypot(tracedPoints[iCurrent].x - tracedPoints[iNext].x, tracedPoints[iCurrent].y - tracedPoints[iNext].y);
 			if (traceLengthSum > traceLength*IniFile.traceRatio) {
-				CurrentFormVertices[OutputIndex].x = TracedPoints[iCurrent - 1].x*StitchBmpRatio.x;
-				CurrentFormVertices[OutputIndex].y = TracedPoints[iCurrent - 1].y*StitchBmpRatio.y + landscapeOffset;
+				CurrentFormVertices[OutputIndex].x = tracedPoints[iCurrent - 1].x*StitchBmpRatio.x;
+				CurrentFormVertices[OutputIndex].y = tracedPoints[iCurrent - 1].y*StitchBmpRatio.y + landscapeOffset;
 				OutputIndex++;
 				iCurrent--;
 				iNext = iCurrent;
 				traceLengthSum = 0;
 			}
 		}
-		delete[] TracedPoints;
 		if (FormVertexIndex + OutputIndex > MAXITEMS) {
 			tabmsg(IDS_FRMOVR);
 			return;
@@ -12440,11 +12425,11 @@ void difbits(unsigned shift, unsigned* point) noexcept {
 	difsub(testPoint, shift, destination);
 }
 
-void blanklin(unsigned lineStart) noexcept {
+void blanklin(std::vector<unsigned> &differenceBitmap, unsigned lineStart) noexcept {
 	unsigned	iPoint;
 
 	for (iPoint = lineStart; iPoint < lineStart + BitmapWidth; iPoint++)
-		DifferenceBitmap[iPoint] = 0;
+		differenceBitmap[iPoint] = 0;
 }
 
 constexpr unsigned trsum() {
@@ -12468,33 +12453,33 @@ void trdif() {
 	StateMap.reset(StateFlag::HIDMAP);
 	untrace();
 	if (BitmapHeight*BitmapWidth) {
-		DifferenceBitmap = new unsigned[BitmapHeight*BitmapWidth]();
+		std::vector<unsigned> differenceBitmap(BitmapHeight*BitmapWidth);
 		colorSumMaximum = 0;
 		colorSumMinimum = 0xffffffff;
 		if (!StateMap.test(StateFlag::WASTRAC))
 			getrmap();
 		for (iRGB = 0; iRGB < 3; iRGB++) {
-			blanklin(0);
-			for (iHeight = 1; iHeight < gsl::narrow<unsigned>(BitmapHeight) - 1; iHeight++) {
+			blanklin(differenceBitmap, 0);
+			for (iHeight = 1; iHeight < BitmapHeight - 1; iHeight++) {
 				iPoint = iHeight * BitmapWidth;
-				DifferenceBitmap[iPoint++] = 0;
+				differenceBitmap[iPoint++] = 0;
 				for (iWidth = 1; iWidth < BitmapWidth - 1; iWidth++) {
 					difbits(TraceShift[iRGB], &TraceBitmapData[iPoint]);
-					colorSum = DifferenceBitmap[iPoint] = trsum();
+					colorSum = differenceBitmap[iPoint] = trsum();
 					iPoint++;
 					if (colorSum > colorSumMaximum)
 						colorSumMaximum = colorSum;
 					if (colorSum < colorSumMinimum)
 						colorSumMinimum = colorSum;
 				}
-				DifferenceBitmap[iPoint++] = 0;
+				differenceBitmap[iPoint++] = 0;
 			}
-			blanklin(iPoint);
+			blanklin(differenceBitmap, iPoint);
 			ratio = static_cast<double>(255) / (colorSumMaximum - colorSumMinimum);
 			for (iPixel = 0; iPixel < BitmapWidth*BitmapHeight; iPixel++) {
 				TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
-				if (DifferenceBitmap[iPixel]) {
-					adjustedColorSum = (DifferenceBitmap[iPixel] - colorSumMinimum)*ratio;
+				if (differenceBitmap[iPixel]) {
+					adjustedColorSum = (differenceBitmap[iPixel] - colorSumMinimum)*ratio;
 					TraceBitmapData[iPixel] |= adjustedColorSum << TraceShift[iRGB];
 				}
 			}
@@ -12503,7 +12488,6 @@ void trdif() {
 		StateMap.set(StateFlag::WASDIF);
 		StateMap.set(StateFlag::RESTCH);
 		tracwnd();
-		delete[] DifferenceBitmap;
 	}
 }
 
