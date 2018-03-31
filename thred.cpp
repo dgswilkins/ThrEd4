@@ -4257,9 +4257,9 @@ void savmap() {
 			}
 			WriteFile(BitmapFileHandle, &BitmapFileHeader, 14, &bytesWritten, NULL);
 			WriteFile(BitmapFileHandle, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14, &bytesWritten, NULL);
-			auto buffer = std::make_unique<unsigned char[]>((BitmapWidth*BitmapHeight * 3) + 1);
-			movmap(BitmapWidth*BitmapHeight, buffer.get());
-			WriteFile(BitmapFileHandle, buffer.get(), BitmapWidth*BitmapHeight * 3, &bytesWritten, NULL);
+			auto buffer = std::vector<unsigned char>((BitmapWidth*BitmapHeight * 3) + 1);
+			movmap(BitmapWidth*BitmapHeight, buffer.data());
+			WriteFile(BitmapFileHandle, buffer.data(), BitmapWidth*BitmapHeight * 3, &bytesWritten, NULL);
 			CloseHandle(BitmapFileHandle);
 		}
 	}
@@ -5512,6 +5512,7 @@ void sav() {
 		// There are always going to be more records in the DST format because color changes and jumps count as stitches
 		DSTRecords.reserve(PCSHeader.stitchCount + 128);
 		DSTOffsets DSTOffsetData = {};
+		std::vector<PCSTCH> PCSStitchBuffer; 
 		switch (IniFile.auxFileType) {
 		case AUXDST:
 			ritdst(DSTOffsetData, DSTRecords, saveStitches);
@@ -5660,9 +5661,9 @@ void sav() {
 			break;
 #endif
 		default:
-			for (iColor = 0; iColor < 16; iColor++)
+			for (iColor = 0; iColor < 16; iColor++) {
 				PCSHeader.colors[iColor] = UserColor[iColor];
-			std::vector<PCSTCH> PCSStitchBuffer(PCSHeader.stitchCount + ColorChanges + 2);
+			}
 			do {
 				if (pcshup(saveStitches)) {
 					flag = false;
@@ -5675,6 +5676,7 @@ void sav() {
 				}
 				iPCSstitch = 0;
 				savcol = 0xff;
+				PCSStitchBuffer.resize(PCSHeader.stitchCount + ColorChanges + 2);
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 					if ((saveStitches[iStitch].attribute&COLMSK) != savcol) {
 						savcol = saveStitches[iStitch].attribute&COLMSK;
@@ -8361,9 +8363,9 @@ void thrsav() {
 		FileHandle = 0;
 	}
 	else {
-		auto output = std::make_unique<char[]>(MAXITEMS * 4);
-		dubuf(output.get(), &count);
-		WriteFile(FileHandle, output.get(), count, &bytesWritten, 0);
+		auto output = std::vector<char>(MAXITEMS * 4);
+		dubuf(output.data(), &count);
+		WriteFile(FileHandle, output.data(), count, &bytesWritten, 0);
 		if (bytesWritten != count) {
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "File Write Error: %s\n", ThrName);
 			shoMsg(MsgBuffer);
@@ -12108,7 +12110,7 @@ void dutrac() {
 				return;
 			}
 		}
-		unsigned initialDirection = traceDirection;
+		const unsigned initialDirection = traceDirection;
 		point = CurrentTracePoint.y*BitmapWidth + CurrentTracePoint.x;
 		std::vector<TRCPNT> tracedPoints;
 		tracedPoints.push_back({ gsl::narrow<short>(CurrentTracePoint.x), gsl::narrow<short>(CurrentTracePoint.y) });
