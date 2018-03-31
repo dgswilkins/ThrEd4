@@ -13279,7 +13279,6 @@ unsigned chkMsg() {
 	RECT			windowRect = {};
 	SATCON*			guides = nullptr;
 	TCHAR			buffer[20] = { 0 };
-	unsigned char*	clipCopyBuffer = nullptr;
 	TCHAR			threadSizeMap[] = { '3','4','6' };
 	TXPNT*			textureDestination = nullptr;
 	TXPNT*			textureSource = nullptr;
@@ -16574,11 +16573,11 @@ unsigned chkMsg() {
 						if (ClipFormVerticesData->clipType == CLP_FRMPS) {
 							duzrat();
 							byteCount = sizeof(FORMVERTEXCLIP) + (ClipFormVerticesData->vertexCount + 1) * sizeof(fPOINT);
-							clipCopyBuffer = new unsigned char[byteCount];
-							MoveMemory(clipCopyBuffer, ClipPointer, byteCount);
+							auto clipCopyBuffer = std::make_unique<unsigned char[]>(byteCount);
+							MoveMemory(clipCopyBuffer.get(), ClipPointer, byteCount);
 							GlobalUnlock(ClipMemory);
 							CloseClipboard();
-							ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP *>(clipCopyBuffer);
+							ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP *>(clipCopyBuffer.get());
 							if (StateMap.test(StateFlag::FRMPSEL)) {
 								fvars(ClosestFormToCursor);
 								InterleaveSequence[0].x = CurrentFormVertices[ClosestVertexToCursor].x;
@@ -16617,7 +16616,6 @@ unsigned chkMsg() {
 								StateMap.set(StateFlag::SHOFRM);
 								dufrm();
 							}
-							delete[] clipCopyBuffer;
 							return 1;
 						}
 						// ToDo - Add more information to the clipboard so that memory can be allocated 
