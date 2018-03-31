@@ -1572,7 +1572,7 @@ void duform(unsigned formType) {
 	}
 }
 
-float findDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point, double &length) noexcept {
+float findDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point, double &distance) noexcept {
 	const double A = point.x - lineStart.x;
 	const double B = point.y - lineStart.y;
 	const double C = lineEnd.x - lineStart.x;
@@ -1584,7 +1584,9 @@ float findDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point, double 
 	{
 		diffX = A;
 		diffY = B;
-		return sqrt(diffX * diffX + diffY * diffY);
+		distance = sqrt(diffX * diffX + diffY * diffY);
+		//Arbitrarily choose the first point since start and end are the same
+		return -0.1f;
 	}
 
 	const double dot = A * C + B * D;
@@ -1611,7 +1613,7 @@ float findDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point, double 
 	}
 
 	//returning shortest distance
-	length = sqrt(diffX * diffX + diffY * diffY);
+	distance = sqrt(diffX * diffX + diffY * diffY);
 	return param;
 }
 
@@ -4311,7 +4313,7 @@ void satadj() {
 		}
 	}
 	if (CurrentFormGuidesCount != iDestination) {
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Removed %d zero length guides\n", (CurrentFormGuidesCount - iDestination));
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Removed %d zero distance guides\n", (CurrentFormGuidesCount - iDestination));
 		OutputDebugString(MsgBuffer);
 		CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
 		satcpy (CurrentFormGuides, interiorGuides, iDestination);
