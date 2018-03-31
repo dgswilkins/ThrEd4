@@ -8326,7 +8326,6 @@ void thrsav() {
 	WIN32_FIND_DATA	fileData = {};
 	HANDLE			file = {};
 	TCHAR			newFileName[_MAX_PATH] = { 0 };
-	char*			output = nullptr;
 	unsigned		count = 0;
 
 	if (chkattr(WorkingFileName))
@@ -8362,10 +8361,9 @@ void thrsav() {
 		FileHandle = 0;
 	}
 	else {
-		output = new char[MAXITEMS * 4]();
-		dubuf(output, &count);
-		WriteFile(FileHandle, output, count, &bytesWritten, 0);
-		delete[] output;
+		auto output = std::make_unique<char[]>(MAXITEMS * 4);
+		dubuf(output.get(), &count);
+		WriteFile(FileHandle, output.get(), count, &bytesWritten, 0);
 		if (bytesWritten != count) {
 			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "File Write Error: %s\n", ThrName);
 			shoMsg(MsgBuffer);
