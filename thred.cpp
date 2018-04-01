@@ -20396,6 +20396,16 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 	lpCmdLine;
 
 	if (RegisterClassEx(&wc)) {
+		boost::dynamic_bitset<> private_TracedMap(0);
+		TracedMap = &private_TracedMap;
+		boost::dynamic_bitset<> private_TracedEdges(0);
+		TracedEdges = &private_TracedEdges;
+		std::vector<std::string> private_Thumbnails;
+		Thumbnails = &private_Thumbnails;
+		std::vector<std::unique_ptr<unsigned[]>> private_UndoBuffer(16);
+		UndoBuffer = &private_UndoBuffer;
+		std::vector<TXPNT>	private_TempTexturePoints;
+		TempTexturePoints = &private_TempTexturePoints;
 		redini();
 		if (IniFile.initialWindowCoords.right) {
 			ThrEdWindow = CreateWindow(
@@ -20439,16 +20449,6 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 			LoadString(ThrEdInstance, IDS_UNAM, IniFile.designerName, 50);
 			getdes();
 		}
-		boost::dynamic_bitset<> private_TracedMap(0);
-		TracedMap = &private_TracedMap;
-		boost::dynamic_bitset<> private_TracedEdges(0);
-		TracedEdges = &private_TracedEdges;
-		std::vector<std::string> private_Thumbnails;
-		Thumbnails = &private_Thumbnails;
-		std::vector<std::unique_ptr<unsigned[]>> private_UndoBuffer(16);
-		UndoBuffer = &private_UndoBuffer;
-		std::vector<TXPNT>	private_TempTexturePoints;
-		TempTexturePoints = &private_TempTexturePoints;
 		while (GetMessage(&Msg, NULL, 0, 0)) {
 			StateMap.set(StateFlag::SAVACT);
 			if (!chkMsg())
