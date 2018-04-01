@@ -201,7 +201,6 @@ HWND		SideWindowButton;			//button side window
 RECT		TexturePixelRect;			//screen selected texture points rectangle
 TXTRCT		TextureRect;				//selected texture points rectangle
 POINT		SelectTexturePointsOrigin;	//original location of selected texture points
-unsigned	SelectedTexturePointsCount;	//number of selected texture points
 std::vector<unsigned>	*SelectedTexturePointsList;	//list of selected points
 POINT		TextureCursorLocation;		//texture editor move cursor location
 HPEN		TextureCrossPen;			//texture editor cross pen
@@ -311,7 +310,7 @@ void txspac(int start, unsigned count) noexcept {
 }
 
 void rstxt() {
-	SelectedTexturePointsCount = 0;
+	SelectedTexturePointsList->clear();
 	StateMap.reset(StateFlag::TXTMOV);
 	StateMap.reset(StateFlag::BZUM);
 	StateMap.reset(StateFlag::BZUMIN);
@@ -3032,7 +3031,7 @@ void dutxtfil() {
 	movStch();
 	ShowWindow(VerticalScrollBar, FALSE);
 	ShowWindow(HorizontalScrollBar, FALSE);
-	SelectedTexturePointsCount = 0;
+	SelectedTexturePointsList->clear();
 	StateMap.set(StateFlag::INIT);
 	SideWindowButton = 0;
 	if (StateMap.test(StateFlag::WASTXBAK)) {
@@ -3224,7 +3223,7 @@ void drwtxtr() {
 	for (index = 0; index < TempTexturePoints->size(); index++) {
 		dutxtx(index, IniFile.textureEditorSize);
 	}
-	if (SelectedTexturePointsCount) {
+	if (SelectedTexturePointsList->size()) {
 		txrct2rct(TextureRect, &TexturePixelRect);
 		line[0].y = line[1].y = TexturePixelRect.top;
 		line[0].x = TexturePixelRect.left;
@@ -3240,7 +3239,7 @@ void drwtxtr() {
 		line[1].y = TexturePixelRect.top;
 		Polyline(StitchWindowMemDC, line, 2);
 	}
-	for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++) {
+	for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
 		dutxtx(SelectedTexturePointsList->at(iPoint), IniFile.textureEditorSize);
 		dutxtx(SelectedTexturePointsList->at(iPoint), IniFile.textureEditorSize << 1);
 	}
@@ -3350,11 +3349,11 @@ void dutxrct(TXTRCT* textureRect) noexcept {
 	unsigned	iPoint = 0;
 	TXPNT*		texturePoint = nullptr;
 
-	if (SelectedTexturePointsCount) {
+	if (SelectedTexturePointsList->size()) {
 		texturePoint = &TempTexturePoints->at(SelectedTexturePointsList->at(0));
 		textureRect->left = textureRect->right = texturePoint->line;
 		textureRect->top = textureRect->bottom = texturePoint->y;
-		for (iPoint = 1; iPoint < SelectedTexturePointsCount; iPoint++) {
+		for (iPoint = 1; iPoint < SelectedTexturePointsList->size(); iPoint++) {
 			texturePoint = &TempTexturePoints->at(SelectedTexturePointsList->at(iPoint));
 			if (texturePoint->y > textureRect->top)
 				textureRect->top = texturePoint->y;
@@ -3495,7 +3494,7 @@ void txtrup() {
 		xCoord = TextureRect.right + textureOffset.line - TextureScreen.lines;
 		if (xCoord > 0)
 			textureOffset.line -= xCoord;
-		for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++) {
+		for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
 			texturePoint = &TempTexturePoints->at(SelectedTexturePointsList->at(iPoint));
 			texturePoint->line += textureOffset.line;
 			texturePoint->y += textureOffset.y;
@@ -3517,14 +3516,13 @@ void txtrup() {
 				highestTexturePoint.y = lowestTexturePoint.y;
 				lowestTexturePoint.y = swap;
 			}
-			SelectedTexturePointsCount = 0;
+			SelectedTexturePointsList->clear();
 			for (iPoint = 0; iPoint < TempTexturePoints->size(); iPoint++) {
 				if (TempTexturePoints->at(iPoint).y < highestTexturePoint.y &&
 					TempTexturePoints->at(iPoint).y > lowestTexturePoint.y &&
 					TempTexturePoints->at(iPoint).line <= highestTexturePoint.line &&
 					TempTexturePoints->at(iPoint).line >= lowestTexturePoint.line) {
 					SelectedTexturePointsList->push_back(iPoint);
-					SelectedTexturePointsCount++;
 				}
 			}
 			dutxrct(&TextureRect);
@@ -3641,7 +3639,7 @@ void txtrmov() {
 		ritxfrm();
 	}
 	else {
-		if (SelectedTexturePointsCount) {
+		if (SelectedTexturePointsList->size()) {
 			ritxrct();
 			TextureCursorLocation.x = Msg.pt.x - StitchWindowOrigin.x;
 			TextureCursorLocation.y = Msg.pt.y - StitchWindowOrigin.y;
@@ -3943,7 +3941,7 @@ void txtlbut() {
 		stxlin();
 		return;
 	}
-	if (SelectedTexturePointsCount) {
+	if (SelectedTexturePointsList->size()) {
 		deorg(&point);
 		if (point.x > TexturePixelRect.left &&
 			point.x<TexturePixelRect.right &&
@@ -3954,17 +3952,16 @@ void txtlbut() {
 			return;
 		}
 	}
-	// ToDo - can this code ever be reached?
 	if (SelectedTexturePointsList->size()) {
 		if (txtclos(&SelectedTexturePointsList->at(0))) {
-			SelectedTexturePointsCount = 1;
+			SelectedTexturePointsList->resize(1);
 			setxmov();
 			dutxrct(&TextureRect);
 			StateMap.set(StateFlag::RESTCH);
 			return;
 		}
 	}
-	SelectedTexturePointsCount = 0;
+	SelectedTexturePointsList->clear();
 	StateMap.set(StateFlag::BZUMIN);
 	StateMap.reset(StateFlag::BZUM);
 	ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
@@ -3996,7 +3993,7 @@ void txbak() {
 	bool flag = false;
 
 	if (StateMap.test(StateFlag::WASTXBAK)) {
-		SelectedTexturePointsCount = 0;
+		SelectedTexturePointsList->clear();
 		for (iHistory = 0; iHistory < 16; iHistory++) {
 			if (TextureHistory[TextureHistoryIndex].width) {
 				flag = true;
@@ -4033,10 +4030,10 @@ void txtdel() {
 	unsigned	iPoint = 0, iSourcePoint = 0, iOutputPoint = 0;
 	unsigned	iClosestPoint = 0;
 
-	if (SelectedTexturePointsCount) {
+	if (SelectedTexturePointsList->size()) {
 		savtxt();
 		boost::dynamic_bitset<> texturePointsMap(TempTexturePoints->size());
-		for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
+		for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++)
 			texturePointsMap.set(SelectedTexturePointsList->at(iPoint));
 		for (iSourcePoint = 0; iSourcePoint < TempTexturePoints->size(); iSourcePoint++) {
 			if (texturePointsMap.test(iSourcePoint)) {
@@ -4044,7 +4041,7 @@ void txtdel() {
 			}
 			iOutputPoint++;
 		}
-		SelectedTexturePointsCount = 0;
+		SelectedTexturePointsList->clear();
 		StateMap.set(StateFlag::RESTCH);
 		return;
 	} 
@@ -4181,28 +4178,28 @@ void txnudg(int deltaX, float deltaY) {
 	unsigned	iPoint = 0;
 	int			textureLine = 0;
 
-	if (SelectedTexturePointsCount) {
+	if (SelectedTexturePointsList->size()) {
 		if (deltaY) {
 			screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
-			for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++) {
+			for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
 				yCoord = TempTexturePoints->at(SelectedTexturePointsList->at(iPoint)).y + screenDeltaY;
 				if (yCoord < 0)
 					return;
 				if (yCoord > TextureScreen.areaHeight)
 					return;
 			}
-			for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
+			for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++)
 				TempTexturePoints->at(SelectedTexturePointsList->at(iPoint)).y += screenDeltaY;
 		}
 		else {
-			for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++) {
+			for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
 				textureLine = TempTexturePoints->at(SelectedTexturePointsList->at(iPoint)).line + deltaX;
 				if (textureLine < 1)
 					return;
 				if (textureLine > TextureScreen.lines)
 					return;
 			}
-			for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++)
+			for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++)
 				TempTexturePoints->at(SelectedTexturePointsList->at(iPoint)).line += deltaX;
 		}
 	}
@@ -4219,8 +4216,8 @@ void txsnap() {
 	if (TempTexturePoints->size()) {
 		savtxt();
 		halfGrid = IniFile.gridSize / 2;
-		if (SelectedTexturePointsCount) {
-			for (iPoint = 0; iPoint < SelectedTexturePointsCount; iPoint++) {
+		if (SelectedTexturePointsList->size()) {
+			for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
 				texturePoint = &TempTexturePoints->at(SelectedTexturePointsList->at(iPoint));
 				yStep = (texturePoint->y + halfGrid) / IniFile.gridSize;
 				texturePoint->y = yStep * IniFile.gridSize;
