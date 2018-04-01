@@ -127,11 +127,9 @@ extern	void			chgchk (int code);
 extern	void			chgwrn ();
 extern	void			chkcont ();
 extern	unsigned		chkfrm ();
-extern	bool			chkr (unsigned bit);
 extern	unsigned		closfrm ();
 extern	void			clRmap (unsigned mapSize);
 extern	void			clpfil ();
-extern	void			clpic (unsigned short start);
 extern	void			clrfills ();
 extern	void			clrstch ();
 extern	void			cntrx ();
@@ -242,7 +240,6 @@ extern	void			grpmsg ();
 extern	void			grpmsg1 ();
 extern	void			help ();
 extern	void			horclp ();
-extern	void			horclpfn ();
 extern	void			horsclp ();
 extern	void			hsizmsg ();
 extern	void			infrm ();
@@ -353,7 +350,6 @@ extern	void			setfwid ();
 extern	void			sethup ();
 extern	void			setins ();
 extern	void			setmfrm ();
-extern	void			setr (unsigned bit);
 extern	void			setrang ();
 #if PESACT
 extern	bool			setrc (unsigned bit);
@@ -430,6 +426,7 @@ extern	fPOINT			FormVertices[MAXITEMS];
 extern	TCHAR			HelpBuffer[HBUFSIZ];
 extern	double			HorizontalRatio;
 extern	fPOINT			InterleaveSequence[MAXITEMS];
+extern	double			LineSpacing;
 extern	fPOINT			LowerLeftStitch;
 extern	HWND			MsgWindow;
 extern	unsigned		NewFormVertexCount;
@@ -453,7 +450,7 @@ extern	double			SpiralWrap;
 extern	TCHAR*			StringData;
 extern	TCHAR*			StringTable[STR_LEN];
 extern	double			StarRatio;
-extern	double			LineSpacing;
+extern	std::vector<TXPNT>	*TempTexturePoints;
 extern	int				TextureHistoryIndex;
 extern	TXHST			TextureHistory[16];
 extern	TXTSCR			TextureScreen;
@@ -555,7 +552,7 @@ double			StitchBoxesThreshold = STCHBOX;//threshold for drawing stitch boxes
 //WARNING the size of the following array must be changed if the maximum movie speed is changed
 POINT			MovieLine[100];			//line for movie stitch draw
 RECT			MsgRect;				//rectangle containing the text message
-std::vector<std::unique_ptr<unsigned[]>>	UndoBuffer(16);			//backup data
+std::vector<std::unique_ptr<unsigned[]>>	*UndoBuffer;			//backup data
 unsigned		UndoBufferWriteIndex = 0;	//undo storage pointer
 unsigned		UndoBufferReadIndex = 0;	//undo retrieval pointers
 unsigned		AppliqueColor = 15;		//underlay color
@@ -864,7 +861,7 @@ OPENFILENAME	OpenFileName = {
 	0,						//lpfnHook
 	0,						//lpTemplateName
 };
-std::vector<std::string>	Thumbnails;		//vector of thumbnail names
+std::vector<std::string>	*Thumbnails;		//vector of thumbnail names
 int					ThumbnailsSelected[4];	//indexes of thumbnails selected for display
 unsigned			ThumbnailDisplayCount;	//number of thumbnail file names selected for display
 unsigned			ThumbnailIndex;			//index into the thumbnail filname table
@@ -2020,7 +2017,7 @@ void deldu() {
 	unsigned iBuffer = 0;
 
 	for (iBuffer = 0; iBuffer < 16; iBuffer++) {
-			UndoBuffer[iBuffer].reset(nullptr);
+			UndoBuffer->at(iBuffer).reset(nullptr);
 	}
 	UndoBufferWriteIndex = 0;
 	StateMap.reset(StateFlag::BAKWRAP);
@@ -2041,12 +2038,12 @@ void dudat() {
 	unsigned	size = 0;
 	BAKHED*		backupData = nullptr;
 
-	UndoBuffer[UndoBufferWriteIndex].reset(nullptr);
+	UndoBuffer->at(UndoBufferWriteIndex).reset(nullptr);
 	size = sizeof(BAKHED) + sizeof(FRMHED)*FormIndex + sizeof(fPOINTATTR)*PCSHeader.stitchCount
 		+ sizeof(fPOINT)*(FormVertexIndex + ClipPointIndex) + sizeof(SATCON)*SatinGuideIndex + sizeof(COLORREF) * 16 +
 		sizeof(TXPNT)*TextureIndex;
-	UndoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);
-	backupData = convert_ptr<BAKHED *>(UndoBuffer[UndoBufferWriteIndex].get());
+	UndoBuffer->at(UndoBufferWriteIndex) = std::make_unique<unsigned[]>(size);
+	backupData = convert_ptr<BAKHED *>(UndoBuffer->at(UndoBufferWriteIndex).get());
 	if (backupData) {
 		backupData->zoomRect.x = UnzoomedRect.x;
 		backupData->zoomRect.y = UnzoomedRect.y;
@@ -4033,7 +4030,7 @@ void stchred(unsigned count, const fPOINTATTR* source) noexcept {
 }
 
 void redbak() {
-	const BAKHED*	undoData = convert_ptr<BAKHED *>(UndoBuffer[UndoBufferWriteIndex].get());
+	const BAKHED*	undoData = convert_ptr<BAKHED *>(UndoBuffer->at(UndoBufferWriteIndex).get());
 	if (undoData) {
 		unsigned		iColor = 0;
 
@@ -8842,7 +8839,7 @@ void getbak() {
 	if (StateMap.test(StateFlag::THUMSHO)) {
 		if (ThumbnailsSelected[FileVersionIndex]) {
 			if (StateMap.test(StateFlag::RBUT)) {
-				strcpy_s(InsertedFileName, Thumbnails[ThumbnailsSelected[FileVersionIndex]].data());
+				strcpy_s(InsertedFileName, Thumbnails->at(ThumbnailsSelected[FileVersionIndex]).data());
 				StateMap.set(StateFlag::IGNORINS);
 				unthum();
 				StateMap.set(StateFlag::FRMOF);
@@ -8864,7 +8861,7 @@ void getbak() {
 						pchr[2] = 0;
 					}
 				}
-				strcat_s(WorkingFileName, Thumbnails[ThumbnailsSelected[FileVersionIndex]].data());
+				strcat_s(WorkingFileName, Thumbnails->at(ThumbnailsSelected[FileVersionIndex]).data());
 				StateMap.set(StateFlag::REDOLD);
 				nuFil();
 			}
@@ -10036,7 +10033,7 @@ void barnam(HWND window, unsigned iThumbnail) {
 	TCHAR*		lastCharacter = nullptr;
 
 	if (iThumbnail < ThumbnailDisplayCount) {
-		strcpy_s(buffer, Thumbnails[ThumbnailsSelected[iThumbnail]].data());
+		strcpy_s(buffer, Thumbnails->at(ThumbnailsSelected[iThumbnail]).data());
 		lastCharacter = strrchr(buffer, '.');
 		if (lastCharacter)
 			lastCharacter[0] = 0;
@@ -10100,20 +10097,20 @@ void thumnail() {
 		unthum();
 	}
 	else {
-		Thumbnails.clear();
-		Thumbnails.push_back(fileData.cFileName);
+		Thumbnails->clear();
+		Thumbnails->push_back(fileData.cFileName);
 		while (FindNextFile(file, &fileData)) {
-			Thumbnails.push_back(fileData.cFileName);
+			Thumbnails->push_back(fileData.cFileName);
 		}
 		FindClose(file);
-		std::sort(Thumbnails.begin(), Thumbnails.end());
+		std::sort(Thumbnails->begin(), Thumbnails->end());
 		iThumbnail = ThumbnailIndex = 0;
-		while (iThumbnail < 4 && iThumbnail < Thumbnails.size()) {
+		while (iThumbnail < 4 && iThumbnail < Thumbnails->size()) {
 			ThumbnailsSelected[iThumbnail] = iThumbnail;
 			iThumbnail++;
 		}
 		ThumbnailIndex = ThumbnailDisplayCount = iThumbnail;
-		while (iThumbnail < 4 && iThumbnail < Thumbnails.size())
+		while (iThumbnail < 4 && iThumbnail < Thumbnails->size())
 			rthumnam(iThumbnail++);
 		StateMap.set(StateFlag::THUMSHO);
 		ThumbnailSearchString[0] = 0;
@@ -10128,14 +10125,14 @@ void thumnail() {
 void nuthsel() {
 	unsigned	iThumbnail = 0, length = 0, savedIndex = 0;
 
-	if (ThumbnailIndex < Thumbnails.size()) {
+	if (ThumbnailIndex < Thumbnails->size()) {
 		savedIndex = ThumbnailIndex;
 		iThumbnail = 0;
 		length = strlen(ThumbnailSearchString);
 		StateMap.set(StateFlag::RESTCH);
 		if (length) {
-			while (iThumbnail < 4 && ThumbnailIndex < Thumbnails.size()) {
-				if (!strncmp(ThumbnailSearchString, Thumbnails[ThumbnailIndex].data(), length)) {
+			while (iThumbnail < 4 && ThumbnailIndex < Thumbnails->size()) {
+				if (!strncmp(ThumbnailSearchString, Thumbnails->at(ThumbnailIndex).data(), length)) {
 					ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
 					redraw(BackupViewer[iThumbnail++]);
 				}
@@ -10143,7 +10140,7 @@ void nuthsel() {
 			}
 		}
 		else {
-			while (iThumbnail < 4 && ThumbnailIndex < Thumbnails.size()) {
+			while (iThumbnail < 4 && ThumbnailIndex < Thumbnails->size()) {
 				ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
 				redraw(BackupViewer[iThumbnail++]);
 				ThumbnailIndex++;
@@ -10168,7 +10165,7 @@ void nuthbak(unsigned count) {
 			while (count && ThumbnailIndex < MAXFORMS) {
 				if (ThumbnailIndex) {
 					ThumbnailIndex--;
-					if (!strncmp(ThumbnailSearchString, Thumbnails[ThumbnailIndex].data(), length))
+					if (!strncmp(ThumbnailSearchString, Thumbnails->at(ThumbnailIndex).data(), length))
 						count--;
 				}
 				else
@@ -15902,7 +15899,7 @@ unsigned chkMsg() {
 
 			case VK_END:
 
-				ThumbnailIndex = Thumbnails.size();
+				ThumbnailIndex = Thumbnails->size();
 				nuthbak(4);
 				break;
 
@@ -20202,7 +20199,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			if (StateMap.test(StateFlag::THUMSHO)) {
 				for (iThumb = 0; iThumb < 4; iThumb++) {
 					if (DrawItem->hwndItem == BackupViewer[iThumb] && iThumb < ThumbnailDisplayCount) {
-						ritbak(Thumbnails[ThumbnailsSelected[iThumb]].data(), DrawItem);
+						ritbak(Thumbnails->at(ThumbnailsSelected[iThumb]).data(), DrawItem);
 						rthumnam(iThumb);
 						return 1;
 					}
@@ -20399,6 +20396,16 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 	lpCmdLine;
 
 	if (RegisterClassEx(&wc)) {
+		boost::dynamic_bitset<> private_TracedMap(0);
+		TracedMap = &private_TracedMap;
+		boost::dynamic_bitset<> private_TracedEdges(0);
+		TracedEdges = &private_TracedEdges;
+		std::vector<std::string> private_Thumbnails;
+		Thumbnails = &private_Thumbnails;
+		std::vector<std::unique_ptr<unsigned[]>> private_UndoBuffer(16);
+		UndoBuffer = &private_UndoBuffer;
+		std::vector<TXPNT>	private_TempTexturePoints;
+		TempTexturePoints = &private_TempTexturePoints;
 		redini();
 		if (IniFile.initialWindowCoords.right) {
 			ThrEdWindow = CreateWindow(
@@ -20442,10 +20449,6 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 			LoadString(ThrEdInstance, IDS_UNAM, IniFile.designerName, 50);
 			getdes();
 		}
-		boost::dynamic_bitset<> private_TracedMap(0);
-		TracedMap = &private_TracedMap;
-		boost::dynamic_bitset<> private_TracedEdges(0);
-		TracedEdges = &private_TracedEdges;
 		while (GetMessage(&Msg, NULL, 0, 0)) {
 			StateMap.set(StateFlag::SAVACT);
 			if (!chkMsg())
