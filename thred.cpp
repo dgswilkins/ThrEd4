@@ -445,6 +445,7 @@ extern	unsigned short	SelectedFormList[MAXFORMS];
 extern	POINT			SelectedFormsLine[9];
 extern	RECT			SelectedFormsRect;
 extern	POINT			SelectedPointsLine[9];
+extern	std::vector<unsigned>	*SelectedTexturePointsList; 
 extern	double			SnapLength;
 extern	double			SpiralWrap;
 extern	TCHAR*			StringData;
@@ -20406,6 +20407,8 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		UndoBuffer = &private_UndoBuffer;
 		std::vector<TXPNT>	private_TempTexturePoints;
 		TempTexturePoints = &private_TempTexturePoints;
+		std::vector<unsigned>	private_SelectedTexturePointsList;
+		SelectedTexturePointsList = &private_SelectedTexturePointsList;
 		redini();
 		if (IniFile.initialWindowCoords.right) {
 			ThrEdWindow = CreateWindow(
