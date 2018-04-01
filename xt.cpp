@@ -3885,10 +3885,9 @@ void dutxmir() {
 			else { break; }
 		}
 	}
+	TempTexturePoints.resize(iMirrorPoint);
 	while (iPoint >= 0) {
-		TempTexturePoints[iMirrorPoint].line = TextureScreen.lines - TempTexturePoints[iPoint].line + 1;
-		TempTexturePoints[iMirrorPoint].y = TempTexturePoints[iPoint].y;
-		iMirrorPoint++;
+		TempTexturePoints.push_back({ TempTexturePoints[iPoint].y, gsl::narrow<unsigned short>(TextureScreen.lines - TempTexturePoints[iPoint].line + 1) });
 		iPoint--;
 	}
 	StateMap.set(StateFlag::RESTCH);
