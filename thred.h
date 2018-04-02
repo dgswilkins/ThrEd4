@@ -1795,7 +1795,6 @@ typedef struct _txtrct	{
 
 typedef struct _txhst	{
 	std::vector<TXPNT>	texturePoint;
-	unsigned	count;
 	float		height;
 	float		width;
 	float		spacing;

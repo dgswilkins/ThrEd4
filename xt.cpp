@@ -334,7 +334,7 @@ bool chktxh(_In_ const TXHST* historyItem) noexcept {
 	if (historyItem) {
 		unsigned iPoint = 0;
 
-		if (historyItem->count != TempTexturePoints->size())
+		if (historyItem->texturePoint.size() != TempTexturePoints->size())
 			return true;
 		if (historyItem->height != TextureScreen.areaHeight)
 			return true;
@@ -363,12 +363,11 @@ void savtxt() {
 			StateMap.reset(StateFlag::LASTXBAK);
 			txrfor();
 			currentHistoryItem = &TextureHistory[TextureHistoryIndex];
-			currentHistoryItem->count = TempTexturePoints->size();
 			currentHistoryItem->height = TextureScreen.areaHeight;
 			currentHistoryItem->width = TextureScreen.width;
 			currentHistoryItem->spacing = TextureScreen.spacing;
 			currentHistoryItem->texturePoint.clear();
-			currentHistoryItem->texturePoint.reserve(currentHistoryItem->count);
+			currentHistoryItem->texturePoint.reserve(TempTexturePoints->size());
 			for (auto i = 0u; i < TempTexturePoints->size(); i++) {
 				currentHistoryItem->texturePoint.push_back(TempTexturePoints->at(i));
 			}
@@ -3977,8 +3976,8 @@ void redtbak() {
 		TextureScreen.spacing = textureHistoryItem->spacing;
 		if (textureHistoryItem->texturePoint.size()) {
 			TempTexturePoints->clear();
-			TempTexturePoints->reserve(textureHistoryItem->count);
-			for (auto i = 0u; i < textureHistoryItem->count; i++) {
+			TempTexturePoints->reserve(textureHistoryItem->texturePoint.size());
+			for (auto i = 0u; i < textureHistoryItem->texturePoint.size(); i++) {
 				TempTexturePoints->push_back(textureHistoryItem->texturePoint[i]);
 			}
 		}
@@ -4708,7 +4707,7 @@ void txdun() {
 	const char		signature[4] = "txh";
 	TXHSTBUF		textureHistoryBuffer[16];
 
-	if (TextureHistory[0].count) {
+	if (TextureHistory[0].texturePoint.size()) {
 		if (txnam(name, sizeof(name))) {
 			handle = CreateFile(name, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 			if (handle != INVALID_HANDLE_VALUE) {
@@ -4716,15 +4715,15 @@ void txdun() {
 				WriteFile(handle, &TextureHistoryIndex, sizeof(int), &bytesWritten, 0);
 				for (auto i = 0; i < 16; i++) {
 					textureHistoryBuffer[i].placeholder = nullptr;
-					textureHistoryBuffer[i].count = TextureHistory[i].count;
+					textureHistoryBuffer[i].count = TextureHistory[i].texturePoint.size();
 					textureHistoryBuffer[i].height = TextureHistory[i].height;
 					textureHistoryBuffer[i].width = TextureHistory[i].width;
 					textureHistoryBuffer[i].spacing = TextureHistory[i].spacing;
 				}
 				WriteFile(handle, &textureHistoryBuffer, sizeof(TXHSTBUF) * 16, &bytesWritten, 0);
 				for (iHistory = 0; iHistory < 16; iHistory++) {
-					if (TextureHistory[iHistory].count)
-						WriteFile(handle, TextureHistory[iHistory].texturePoint.data(), TextureHistory[iHistory].count * sizeof(TXPNT), &bytesWritten, 0);
+					if (TextureHistory[iHistory].texturePoint.size())
+						WriteFile(handle, TextureHistory[iHistory].texturePoint.data(), TextureHistory[iHistory].texturePoint.size() * sizeof(TXPNT), &bytesWritten, 0);
 				}
 			}
 			CloseHandle(handle);
@@ -4749,13 +4748,12 @@ void redtx() {
 					if (ReadFile(handle, &TextureHistoryIndex, sizeof(int), &bytesRead, 0)) {
 						if (ReadFile(handle, &textureHistoryBuffer, sizeof(TXHSTBUF) * 16, &historyBytesRead, 0)) {
 							for (ind = 0; ind < (historyBytesRead / sizeof(TXHSTBUF)); ind++) {
-								TextureHistory[ind].count = textureHistoryBuffer[ind].count;
 								TextureHistory[ind].height = textureHistoryBuffer[ind].height;
 								TextureHistory[ind].width = textureHistoryBuffer[ind].width;
 								TextureHistory[ind].spacing = textureHistoryBuffer[ind].spacing;
-								if (TextureHistory[ind].count) {
-									TextureHistory[ind].texturePoint.resize(TextureHistory[ind].count);
-									if (!ReadFile(handle, TextureHistory[ind].texturePoint.data(), sizeof(TXPNT)*TextureHistory[ind].count, &bytesRead, 0)) {
+								if (textureHistoryBuffer[ind].count) {
+									TextureHistory[ind].texturePoint.resize(textureHistoryBuffer[ind].count);
+									if (!ReadFile(handle, TextureHistory[ind].texturePoint.data(), sizeof(TXPNT)*textureHistoryBuffer[ind].count, &bytesRead, 0)) {
 										TextureHistory[ind].texturePoint.clear();
 										TextureHistory[ind].texturePoint.shrink_to_fit();
 									}
