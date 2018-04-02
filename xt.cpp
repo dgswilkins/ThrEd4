@@ -4745,7 +4745,7 @@ void redtx() {
 	DWORD			bytesRead = 0, historyBytesRead = 0;
 	unsigned int	ind = 0;
 	char			sig[4] = { 0 };
-	TXHSTBUF		textureHistoryBuffer[16];
+	TXHSTBUF		textureHistoryBuffer[ITXBUFLEN];
 
 	TextureHistoryIndex = ITXBUFLEN - 1;
 	if (txnam(name, sizeof(name))) {
