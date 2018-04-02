@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <tchar.h>
-#include <vector>
 #include <CppCoreCheck\warnings.h>
 #pragma warning( push )  
 #pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
@@ -368,12 +367,11 @@ void savtxt() {
 			currentHistoryItem->height = TextureScreen.areaHeight;
 			currentHistoryItem->width = TextureScreen.width;
 			currentHistoryItem->spacing = TextureScreen.spacing;
-			if (currentHistoryItem->texturePoint) {
-				delete[](currentHistoryItem->texturePoint);
-				currentHistoryItem->texturePoint = nullptr;
+			currentHistoryItem->texturePoint.clear();
+			currentHistoryItem->texturePoint.reserve(currentHistoryItem->count);
+			for (auto i = 0u; i < TempTexturePoints->size(); i++) {
+				currentHistoryItem->texturePoint.push_back(TempTexturePoints->at(i));
 			}
-			currentHistoryItem->texturePoint = new TXPNT[currentHistoryItem->count];
-			MoveMemory(currentHistoryItem->texturePoint, TempTexturePoints->data(), currentHistoryItem->count * sizeof(TXPNT));
 		}
 	}
 }
@@ -3970,14 +3968,14 @@ void txtlbut() {
 }
 
 void redtbak() {
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d\n", TextureHistoryIndex);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "retrieving texture history %d\n", TextureHistoryIndex);
 	OutputDebugString(MsgBuffer);
 	const TXHST* textureHistoryItem = &TextureHistory[TextureHistoryIndex];
 	if (textureHistoryItem) {
 		TextureScreen.areaHeight = textureHistoryItem->height;
 		TextureScreen.width = textureHistoryItem->width;
 		TextureScreen.spacing = textureHistoryItem->spacing;
-		if (textureHistoryItem->texturePoint) {
+		if (textureHistoryItem->texturePoint.size()) {
 			TempTexturePoints->clear();
 			TempTexturePoints->reserve(textureHistoryItem->count);
 			for (auto i = 0u; i < textureHistoryItem->count; i++) {
@@ -4708,6 +4706,7 @@ void txdun() {
 	unsigned long	bytesWritten = 0;
 	int				iHistory = 0;
 	const char		signature[4] = "txh";
+	TXHSTBUF		textureHistoryBuffer[16];
 
 	if (TextureHistory[0].count) {
 		if (txnam(name, sizeof(name))) {
@@ -4715,10 +4714,17 @@ void txdun() {
 			if (handle != INVALID_HANDLE_VALUE) {
 				WriteFile(handle, &signature, sizeof(signature), &bytesWritten, 0);
 				WriteFile(handle, &TextureHistoryIndex, sizeof(int), &bytesWritten, 0);
-				WriteFile(handle, &TextureHistory, sizeof(TXHST) * 16, &bytesWritten, 0);
+				for (auto i = 0; i < 16; i++) {
+					textureHistoryBuffer[i].placeholder = nullptr;
+					textureHistoryBuffer[i].count = TextureHistory[i].count;
+					textureHistoryBuffer[i].height = TextureHistory[i].height;
+					textureHistoryBuffer[i].width = TextureHistory[i].width;
+					textureHistoryBuffer[i].spacing = TextureHistory[i].spacing;
+				}
+				WriteFile(handle, &textureHistoryBuffer, sizeof(TXHSTBUF) * 16, &bytesWritten, 0);
 				for (iHistory = 0; iHistory < 16; iHistory++) {
 					if (TextureHistory[iHistory].count)
-						WriteFile(handle, TextureHistory[iHistory].texturePoint, TextureHistory[iHistory].count * sizeof(TXPNT), &bytesWritten, 0);
+						WriteFile(handle, TextureHistory[iHistory].texturePoint.data(), TextureHistory[iHistory].count * sizeof(TXPNT), &bytesWritten, 0);
 				}
 			}
 			CloseHandle(handle);
@@ -4730,33 +4736,28 @@ void redtx() {
 	char			name[_MAX_PATH] = { 0 };
 	HANDLE			handle = {};
 	DWORD			bytesRead = 0, historyBytesRead = 0;
-	unsigned int	ind = 0, ine = 0;
+	unsigned int	ind = 0;
 	char			sig[4] = { 0 };
+	TXHSTBUF		textureHistoryBuffer[16];
 
 	TextureHistoryIndex = 15;
-	ZeroMemory(&TextureHistory, sizeof(TXHST) * 16);
 	if (txnam(name, sizeof(name))) {
 		handle = CreateFile(name, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 		if (handle != INVALID_HANDLE_VALUE) {
 			if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, 0)) {
 				if (!strcmp(sig, "txh")) {
 					if (ReadFile(handle, &TextureHistoryIndex, sizeof(int), &bytesRead, 0)) {
-						if (ReadFile(handle, &TextureHistory, sizeof(TXHST) * 16, &historyBytesRead, 0)) {
-							// texturePoint should be a null pointer at this point as no memory has been allocated, but it is not
-							// because the old pointer value is read in from the file, so zero it out here as it is easier than 
-							// writing a zero to the file
-							for (ind = 0; ind < 16; ind++) {
-								TextureHistory[ind].texturePoint = 0;
-							}
-
-							for (ind = 0; ind < (historyBytesRead / sizeof(TXHST)); ind++) {
+						if (ReadFile(handle, &textureHistoryBuffer, sizeof(TXHSTBUF) * 16, &historyBytesRead, 0)) {
+							for (ind = 0; ind < (historyBytesRead / sizeof(TXHSTBUF)); ind++) {
+								TextureHistory[ind].count = textureHistoryBuffer[ind].count;
+								TextureHistory[ind].height = textureHistoryBuffer[ind].height;
+								TextureHistory[ind].width = textureHistoryBuffer[ind].width;
+								TextureHistory[ind].spacing = textureHistoryBuffer[ind].spacing;
 								if (TextureHistory[ind].count) {
-									TextureHistory[ind].texturePoint = new TXPNT[TextureHistory[ind].count];
-									if (!ReadFile(handle, TextureHistory[ind].texturePoint, sizeof(TXPNT)*TextureHistory[ind].count, &bytesRead, 0)) {
-										for (ine = 0; ine < TextureHistory[ind].count; ine++) {
-											TextureHistory[ine].texturePoint->line = 0;
-											TextureHistory[ine].texturePoint->y = 0;
-										}
+									TextureHistory[ind].texturePoint.resize(TextureHistory[ind].count);
+									if (!ReadFile(handle, TextureHistory[ind].texturePoint.data(), sizeof(TXPNT)*TextureHistory[ind].count, &bytesRead, 0)) {
+										TextureHistory[ind].texturePoint.clear();
+										TextureHistory[ind].texturePoint.shrink_to_fit();
 									}
 								}
 							}

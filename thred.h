@@ -26,6 +26,8 @@
 //#pragma warning(disable:26497)	// f.4		This function could be marked constexpr if compile-time evaluation is desired
 #pragma warning(disable:26499)	//			Could not find any lifetime tracking information
 
+#include <vector>
+
 #include "EnumMap.h"
 
 //compile switches
@@ -1792,12 +1794,20 @@ typedef struct _txtrct	{
 }TXTRCT;
 
 typedef struct _txhst	{
-	TXPNT*		texturePoint;
+	std::vector<TXPNT>	texturePoint;
 	unsigned	count;
 	float		height;
 	float		width;
 	float		spacing;
 }TXHST;
+
+typedef struct _txhstbuff {
+	unsigned	*placeholder;
+	unsigned	count;
+	float		height;
+	float		width;
+	float		spacing;
+}TXHSTBUF;
 
 typedef struct _rngcnt	{
 	int	line;

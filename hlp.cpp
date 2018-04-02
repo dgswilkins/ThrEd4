@@ -3,7 +3,6 @@
 #include <tchar.h>
 #include <htmlhelp.h>
 #include <locale.h>
-#include <vector>
 
 #include "lang.h"
 #include "resource.h"
