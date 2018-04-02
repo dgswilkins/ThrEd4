@@ -195,6 +195,7 @@ const unsigned long	RMAPBITS = MAXITEMS << 5;	//a bit for each stitch
 #define		ITXWID		9*PFGRAN	//default texture editor width
 #define		ITXSPAC		0.40*PFGRAN	//default texture editor spacing
 #define		ITXPIX		5			//default texture editor cross pixels
+#define		ITXBUFLEN	16			//texture buffer depth
 
 enum {
 	STR_PIKOL,
