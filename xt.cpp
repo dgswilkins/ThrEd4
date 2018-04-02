@@ -262,7 +262,7 @@ char StitchTypes[] =
 	TYPE_BORDER,	//12 border
 };
 
-TXHST	TextureHistory[16];		//texture editor history headers
+TXHST	TextureHistory[ITXBUFLEN];		//texture editor history headers
 int		TextureHistoryIndex;	//pointer to the next texture history buffer
 
 void setfchk() {
@@ -321,13 +321,21 @@ void rstxt() {
 }
 
 void txrbak() noexcept {
-	TextureHistoryIndex--;
-	TextureHistoryIndex &= 0xf;
+	if (TextureHistoryIndex > 0) {
+		TextureHistoryIndex--;
+	}
+	else {
+		TextureHistoryIndex = ITXBUFLEN - 1;
+	}
 }
 
 void txrfor() noexcept {
-	TextureHistoryIndex++;
-	TextureHistoryIndex &= 0xf;
+	if (TextureHistoryIndex < (ITXBUFLEN - 1)) {
+		TextureHistoryIndex++;
+	}
+	else {
+		TextureHistoryIndex = 0;
+	}
 }
 
 bool chktxh(_In_ const TXHST* historyItem) noexcept {
@@ -3991,7 +3999,7 @@ void txbak() {
 
 	if (StateMap.test(StateFlag::WASTXBAK)) {
 		SelectedTexturePointsList->clear();
-		for (iHistory = 0; iHistory < 16; iHistory++) {
+		for (iHistory = 0; iHistory < ITXBUFLEN; iHistory++) {
 			if (TextureHistory[TextureHistoryIndex].width) {
 				flag = true;
 				break;
@@ -4010,7 +4018,7 @@ void nxbak() {
 	bool flag = false;
 
 	if (StateMap.test(StateFlag::WASTXBAK)) {
-		for (iHistory = 0; iHistory < 16; iHistory++) {
+		for (iHistory = 0; iHistory < ITXBUFLEN; iHistory++) {
 			txrfor();
 			if (TextureHistory[TextureHistoryIndex].width) {
 				flag = true;
@@ -4705,7 +4713,7 @@ void txdun() {
 	unsigned long	bytesWritten = 0;
 	int				iHistory = 0;
 	const char		signature[4] = "txh";
-	TXHSTBUF		textureHistoryBuffer[16];
+	TXHSTBUF		textureHistoryBuffer[ITXBUFLEN];
 
 	if (TextureHistory[0].texturePoint.size()) {
 		if (txnam(name, sizeof(name))) {
@@ -4713,15 +4721,15 @@ void txdun() {
 			if (handle != INVALID_HANDLE_VALUE) {
 				WriteFile(handle, &signature, sizeof(signature), &bytesWritten, 0);
 				WriteFile(handle, &TextureHistoryIndex, sizeof(int), &bytesWritten, 0);
-				for (auto i = 0; i < 16; i++) {
+				for (auto i = 0; i < ITXBUFLEN; i++) {
 					textureHistoryBuffer[i].placeholder = nullptr;
 					textureHistoryBuffer[i].count = TextureHistory[i].texturePoint.size();
 					textureHistoryBuffer[i].height = TextureHistory[i].height;
 					textureHistoryBuffer[i].width = TextureHistory[i].width;
 					textureHistoryBuffer[i].spacing = TextureHistory[i].spacing;
 				}
-				WriteFile(handle, &textureHistoryBuffer, sizeof(TXHSTBUF) * 16, &bytesWritten, 0);
-				for (iHistory = 0; iHistory < 16; iHistory++) {
+				WriteFile(handle, &textureHistoryBuffer, sizeof(TXHSTBUF) * ITXBUFLEN, &bytesWritten, 0);
+				for (iHistory = 0; iHistory < ITXBUFLEN; iHistory++) {
 					if (TextureHistory[iHistory].texturePoint.size())
 						WriteFile(handle, TextureHistory[iHistory].texturePoint.data(), TextureHistory[iHistory].texturePoint.size() * sizeof(TXPNT), &bytesWritten, 0);
 				}
@@ -4739,14 +4747,14 @@ void redtx() {
 	char			sig[4] = { 0 };
 	TXHSTBUF		textureHistoryBuffer[16];
 
-	TextureHistoryIndex = 15;
+	TextureHistoryIndex = ITXBUFLEN - 1;
 	if (txnam(name, sizeof(name))) {
 		handle = CreateFile(name, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 		if (handle != INVALID_HANDLE_VALUE) {
 			if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, 0)) {
 				if (!strcmp(sig, "txh")) {
 					if (ReadFile(handle, &TextureHistoryIndex, sizeof(int), &bytesRead, 0)) {
-						if (ReadFile(handle, &textureHistoryBuffer, sizeof(TXHSTBUF) * 16, &historyBytesRead, 0)) {
+						if (ReadFile(handle, &textureHistoryBuffer, sizeof(TXHSTBUF) * ITXBUFLEN, &historyBytesRead, 0)) {
 							for (ind = 0; ind < (historyBytesRead / sizeof(TXHSTBUF)); ind++) {
 								TextureHistory[ind].height = textureHistoryBuffer[ind].height;
 								TextureHistory[ind].width = textureHistoryBuffer[ind].width;
