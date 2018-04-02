@@ -452,8 +452,6 @@ extern	TCHAR*			StringData;
 extern	TCHAR*			StringTable[STR_LEN];
 extern	double			StarRatio;
 extern	std::vector<TXPNT>	*TempTexturePoints;
-extern	int				TextureHistoryIndex;
-extern	TXHST			TextureHistory[16];
 extern	TXTSCR			TextureScreen;
 extern	int				TextureIndex;
 extern	TXPNT			TexturePointsBuffer[MAXITEMS];
