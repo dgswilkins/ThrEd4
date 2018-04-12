@@ -211,7 +211,7 @@ unsigned short LoadStringList[] = {	//strings to load into memory at init time
 	IDS_TXOF,
 };
 
-std::vector<std::string> StringTable;
+std::vector<std::string> *StringTable;
 
 char*	StringData;				//string storage
 char*	RepairString;			//Repair Type
@@ -295,12 +295,12 @@ void butxt(unsigned iButton, const std::string &buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
 		if (iButton == 5) {
 			if (StateMap.test(StateFlag::HIDMAP))
-				SetWindowText(ButtonWin[iButton], StringTable[STR_TRC1H].c_str());
+				SetWindowText(ButtonWin[iButton], StringTable->at(STR_TRC1H).c_str());
 			else
-				SetWindowText(ButtonWin[iButton], StringTable[STR_TRC1S].c_str());
+				SetWindowText(ButtonWin[iButton], StringTable->at(STR_TRC1S).c_str());
 		}
 		else
-			SetWindowText(ButtonWin[iButton], StringTable[iButton - 4 + STR_TRC0].c_str());
+			SetWindowText(ButtonWin[iButton], StringTable->at(iButton - 4 + STR_TRC0).c_str());
 	}
 	else
 		SetWindowText(ButtonWin[iButton], buttonText.c_str());
@@ -310,7 +310,7 @@ void ritnum(unsigned code, unsigned value) {
 	std::stringstream ss;
 	ss.precision(2);
 	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
-	ss << StringTable[code] << value;
+	ss << StringTable->at(code) << value;
 	//ToDo - is there a better way to avoid the error?
 	std::string txt(ss.str());
 	butxt(HNUM, txt);
@@ -322,9 +322,8 @@ void msgstr(unsigned code) noexcept {
 
 void lodstr() {
 	unsigned int	count = 0, offset = 0;
-	StringTable.resize(STR_LEN);
 	for (auto iString = 0; iString < STR_LEN; iString++) {
-		count = loadString(StringTable[iString], LoadStringList[iString]);
+		count = loadString(StringTable->at(iString), LoadStringList[iString]);
 		offset += count;
 	}
 }

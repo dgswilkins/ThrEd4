@@ -83,7 +83,7 @@ extern	unsigned		SelectedFormCount;
 extern	unsigned short	SelectedFormList[MAXFORMS];
 extern	fPOINT			SelectedPoint;
 extern	unsigned		SequenceIndex;
-extern	std::vector<std::string> StringTable;
+extern	std::vector<std::string> *StringTable;
 extern	fPOINTATTR		StitchBuffer[MAXITEMS * 2];
 extern	double			LineSpacing;
 extern	RECT			StitchWindowClientRect;
@@ -1935,7 +1935,7 @@ void fsort() {
 	}
 	else {
 		std::stringstream ss;
-		ss << StringTable[IDS_SRTER] << pFRecs[badForm]->form;
+		ss << StringTable->at(IDS_SRTER) << pFRecs[badForm]->form;
 		std::string str = ss.str();
 		shoMsg(str);
 	}
@@ -4119,12 +4119,12 @@ void txcntrv() {
 }
 
 void txof() {
-	butxt(HBOXSEL, StringTable[STR_BOXSEL]);
+	butxt(HBOXSEL, StringTable->at(STR_BOXSEL));
 	redraw(ButtonWin[HHID]);
 	if (StateMap.test(StateFlag::UPTO))
-		butxt(HUPTO, StringTable[STR_UPON]);
+		butxt(HUPTO, StringTable->at(STR_UPON));
 	else
-		butxt(HUPTO, StringTable[STR_UPOF]);
+		butxt(HUPTO, StringTable->at(STR_UPOF));
 	SetWindowText(ButtonWin[HTXSPAC], "");
 	savtxt();
 	zumhom();

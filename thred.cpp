@@ -451,7 +451,7 @@ extern	std::vector<unsigned>	*SelectedTexturePointsList;
 extern	double			SnapLength;
 extern	double			SpiralWrap;
 extern	char*			StringData;
-extern	std::vector<std::string>	StringTable;
+extern	std::vector<std::string>	*StringTable;
 extern	double			StarRatio;
 extern	std::vector<TXPNT>	*TempTexturePoints;
 extern	TXTSCR			TextureScreen;
@@ -1639,7 +1639,7 @@ BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noe
 			hwnd = GetDlgItem(hwndlg, IDC_DESED);
 			GetWindowText(hwnd, IniFile.designerName, 50);
 			EndDialog(hwndlg, 0);
-			ss << StringTable[STR_THRED] << IniFile.designerName;
+			ss << StringTable->at(STR_THRED) << IniFile.designerName;
 			SetWindowText(ThrEdWindow, ss.str().c_str());
 			return TRUE;
 		}
@@ -2590,7 +2590,7 @@ void ritot(unsigned number) {
 	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
 	std::string txt;
 
-	ss << StringTable[STR_TOT] << number;
+	ss << StringTable->at(STR_TOT) << number;
 	txt = ss.str();
 	BufferDigitCount = txt.size();
 	butxt(HTOT, txt);
@@ -2614,7 +2614,7 @@ void ritlayr() {
 		ss.precision(2);
 		ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
 		std::string txt;
-		ss << StringTable[STR_LAYR] << layer;
+		ss << StringTable->at(STR_LAYR) << layer;
 		txt = ss.str();
 		BufferDigitCount = txt.size();
 		butxt(HLAYR, txt);
@@ -3097,7 +3097,7 @@ void dun() {
 		}
 		else {
 			savmsg();
-			if (MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_CLOS].c_str(), MB_YESNO) == IDYES)
+			if (MessageBox(ThrEdWindow, MsgBuffer, StringTable->at(STR_CLOS).c_str(), MB_YESNO) == IDYES)
 				save();
 			reldun();
 		}
@@ -4568,7 +4568,7 @@ void auxmen() {
 	switch (IniFile.auxFileType) {
 	case AUXDST:
 
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_AUXTXT].c_str(), "DST");
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_AUXTXT).c_str(), "DST");
 		CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_UNCHECKED);
 		break;
@@ -4577,7 +4577,7 @@ void auxmen() {
 
 		CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_AUXTXT].c_str(), "PCS");
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_AUXTXT).c_str(), "PCS");
 	}
 	SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
 	StateMap.set(StateFlag::DUMEN);
@@ -5145,7 +5145,7 @@ void nuFil() {
 			auxmen();
 		}
 		lenCalc();
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRDBY].c_str(), WorkingFileName, DesignerName);
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_THRDBY).c_str(), WorkingFileName, DesignerName);
 		SetWindowText(ThrEdWindow, MsgBuffer);
 		CloseHandle(FileHandle);
 		StateMap.set(StateFlag::INIT);
@@ -5478,8 +5478,8 @@ bool chkattr(char* filename) {
 	if (StateMap.testAndReset(StateFlag::NOTFREE))
 		return 1;
 	if (attributes&FILE_ATTRIBUTE_READONLY && attributes != 0xffffffff) {
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_OVRLOK].c_str(), filename);
-		buttonPressed = MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_OVRIT].c_str(), MB_YESNO);
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_OVRLOK).c_str(), filename);
+		buttonPressed = MessageBox(ThrEdWindow, MsgBuffer, StringTable->at(STR_OVRIT).c_str(), MB_YESNO);
 		if (buttonPressed == IDYES)
 			SetFileAttributes(filename, attributes&(0xffffffff ^ FILE_ATTRIBUTE_READONLY));
 		else
@@ -6260,19 +6260,19 @@ void unthum() {
 		for (iBackup = 0; iBackup < 4; iBackup++)
 			DestroyWindow(BackupViewer[iBackup]);
 		if (StateMap.test(StateFlag::UPTO))
-			butxt(HUPTO, StringTable[STR_UPON]);
+			butxt(HUPTO, StringTable->at(STR_UPON));
 		else
-			butxt(HUPTO, StringTable[STR_UPOF]);
+			butxt(HUPTO, StringTable->at(STR_UPOF));
 		std::string blank("");
 		butxt(HNUM, blank);
 		redraw(ButtonWin[HHID]);
-		butxt(HBOXSEL, StringTable[STR_BOXSEL]);
+		butxt(HBOXSEL, StringTable->at(STR_BOXSEL));
 	}
 }
 
 void toglup() {
 	if (StateMap.testAndFlip(StateFlag::UPTO))
-		butxt(HUPTO, StringTable[STR_UPOF]);
+		butxt(HUPTO, StringTable->at(STR_UPOF));
 	else {
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
 			rngadj();
@@ -6291,7 +6291,7 @@ void toglup() {
 				}
 			}
 		}
-		butxt(HUPTO, StringTable[STR_UPON]);
+		butxt(HUPTO, StringTable->at(STR_UPON));
 	}
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -6728,10 +6728,10 @@ void newFil() {
 		DeleteObject(BitmapFileHandle);
 		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
-	ss << StringTable[STR_THRED] << IniFile.designerName;
+	ss << StringTable->at(STR_THRED) << IniFile.designerName;
 	deldu();
 	SetWindowText(ThrEdWindow, ss.str().c_str());
-	strcpy_s(ThrName, StringTable[STR_NUFIL].c_str());
+	strcpy_s(ThrName, StringTable->at(STR_NUFIL).c_str());
 	ritfnam(IniFile.designerName);
 	strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
 	rstdu();
@@ -6947,7 +6947,7 @@ void rstAll() {
 	StateMap.reset(StateFlag::GTWLKLEN);
 	untrace();
 	StateMap.reset(StateFlag::WASEDG);
-	butxt(HUPTO, StringTable[STR_UPOF]);
+	butxt(HUPTO, StringTable->at(STR_UPOF));
 	if (ZoomFactor == 1)
 		StateMap.reset(StateFlag::ZUMED);
 	movStch();
@@ -8515,7 +8515,7 @@ void deltot() {
 	zumhom();
 	strcpy_s(DesignerName, IniFile.designerName);
 	std::stringstream ss;
-	ss << StringTable[STR_THRDBY] << ThrName << DesignerName;
+	ss << StringTable->at(STR_THRDBY) << ThrName << DesignerName;
 	SetWindowText(ThrEdWindow, ss.str().c_str());
 }
 
@@ -10481,7 +10481,7 @@ void insfil() {
 								ExtendedHeader.creatorName[iName] = thredHeader.creatorName[iName];
 							}
 							redfnam(DesignerName);
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRDBY].c_str(), ThrName, DesignerName);
+							sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_THRDBY).c_str(), ThrName, DesignerName);
 							SetWindowText(ThrEdWindow, MsgBuffer);
 						}
 					}
@@ -10730,14 +10730,14 @@ void desiz() {
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
 		if ((rectangle.left < 0) || (rectangle.bottom < 0) || (rectangle.right > IniFile.hoopSizeX) || (rectangle.top > IniFile.hoopSizeY)) {
-			strcpy_s(MsgBuffer, StringTable[STR_STCHOUT].c_str());
+			strcpy_s(MsgBuffer, StringTable->at(STR_STCHOUT).c_str());
 			message = &MsgBuffer[strlen(MsgBuffer)];
 			bufferRemaining -= strlen(MsgBuffer);
 		}
 #if LANG==ENG || LANG==HNG
 		if (message) {
 			bufferRemaining -= sprintf_s(message, bufferRemaining,
-				StringTable[STR_STCHS].c_str(),
+				StringTable->at(STR_STCHS).c_str(),
 				PCSHeader.stitchCount,
 				xSize, xSize / 25.4,
 				ySize, ySize / 25.4);
@@ -10747,7 +10747,7 @@ void desiz() {
 #if LANG==GRM
 		if (message) {
 			bufferRemaining -= sprintf_s(message, sizeof(MsgBuffer),
-				StringTable[STR_STCHS],
+				StringTable->at(STR_STCHS],
 				PCSHeader.stitchCount,
 				xSize,
 				ySize);
@@ -10761,14 +10761,14 @@ void desiz() {
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
 		if (message) {
 #if LANG==ENG || LANG==HNG
-			bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable[STR_FORMS].c_str(),
+			bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable->at(STR_FORMS).c_str(),
 				FormIndex,
 				xSize, xSize / 25.4,
 				ySize, ySize / 25.4);
 #endif
 
 #if LANG==GRM
-			bufferRemaining -= sprintf_s(message, sizeof(MsgBuffer), StringTable[STR_FORMS],
+			bufferRemaining -= sprintf_s(message, sizeof(MsgBuffer), StringTable->at(STR_FORMS],
 				FormIndex,
 				xSize,
 				ySize);
@@ -10777,14 +10777,14 @@ void desiz() {
 		}
 	}
 	if (message) {
-		bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable[STR_HUPWID].c_str(),
+		bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable->at(STR_HUPWID).c_str(),
 			IniFile.hoopSizeX / PFGRAN,
 			IniFile.hoopSizeY / PFGRAN);
 	}
 	message = &message[strlen(message)];
 	if (PCSHeader.stitchCount) {
 		if (message) {
-			bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable[STR_CREATBY].c_str(),
+			bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable->at(STR_CREATBY).c_str(),
 				DesignerName,
 				ExtendedHeader.modifierName);
 		}
@@ -10815,7 +10815,7 @@ void sidhup() {
 	for (iHoop = 0; iHoop < HUPS; iHoop++) {
 		SideWindow[iHoop] = CreateWindow(
 			"STATIC",
-			StringTable[iHoop + STR_HUP0].c_str(),
+			StringTable->at(iHoop + STR_HUP0).c_str(),
 			SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 			3,
 			ButtonHeight*iHoop + 3,
@@ -11068,7 +11068,7 @@ void rotmrk() {
 void segentr() {
 	if (!RotationAngle)
 		RotationAngle = PI / 180;
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_ENTROT].c_str(), 2 * PI / RotationAngle);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_ENTROT).c_str(), 2 * PI / RotationAngle);
 	shoMsg(MsgBuffer);
 	StateMap.set(StateFlag::NUMIN);
 	numWnd();
@@ -12799,7 +12799,7 @@ void delmap() {
 
 void closfn() {
 	deltot();
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED].c_str(), IniFile.designerName);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_THRED).c_str(), IniFile.designerName);
 	KnotCount = 0;
 	*WorkingFileName = 0;
 	PCSBMPFileName[0] = 0;
@@ -12918,7 +12918,7 @@ void nudgfn(float deltaX, float deltaY) {
 }
 
 void pixmsg(unsigned iString, unsigned pixelCount) {
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[iString].c_str(), pixelCount);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(iString).c_str(), pixelCount);
 	shoMsg(MsgBuffer);
 }
 
@@ -14250,7 +14250,7 @@ unsigned chkMsg() {
 						IniFile.customHoopX = IniFile.hoopSizeX;
 						IniFile.customHoopY = IniFile.hoopSizeY;
 						StateMap.set(StateFlag::MSGOF);
-						sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_CUSTHUP].c_str(), IniFile.hoopSizeX / PFGRAN, IniFile.hoopSizeY / PFGRAN);
+						sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_CUSTHUP).c_str(), IniFile.hoopSizeX / PFGRAN, IniFile.hoopSizeY / PFGRAN);
 						shoMsg(MsgBuffer);
 						break;
 
@@ -14428,23 +14428,23 @@ unsigned chkMsg() {
 			chknum();
 			if (Msg.hwnd == ValueWindow[PSQR]) {
 				if (UserFlagMap.testAndFlip(UserFlag::SQRFIL))
-					SetWindowText(ValueWindow[PSQR], StringTable[STR_PNTD].c_str());
+					SetWindowText(ValueWindow[PSQR], StringTable->at(STR_PNTD).c_str());
 				else
-					SetWindowText(ValueWindow[PSQR], StringTable[STR_SQR].c_str());
+					SetWindowText(ValueWindow[PSQR], StringTable->at(STR_SQR).c_str());
 				return 1;
 			}
 			if (Msg.hwnd == ValueWindow[PBLNT]) {
 				if (UserFlagMap.testAndFlip(UserFlag::BLUNT))
-					SetWindowText(ValueWindow[PBLNT], StringTable[STR_TAPR].c_str());
+					SetWindowText(ValueWindow[PBLNT], StringTable->at(STR_TAPR).c_str());
 				else
-					SetWindowText(ValueWindow[PBLNT], StringTable[STR_BLUNT].c_str());
+					SetWindowText(ValueWindow[PBLNT], StringTable->at(STR_BLUNT).c_str());
 				return 1;
 			}
 			if (Msg.hwnd == ValueWindow[PUND]) {
 				if (UserFlagMap.testAndFlip(UserFlag::DUND))
-					SetWindowText(ValueWindow[PUND], StringTable[STR_OFF].c_str());
+					SetWindowText(ValueWindow[PUND], StringTable->at(STR_OFF).c_str());
 				else
-					SetWindowText(ValueWindow[PUND], StringTable[STR_ON].c_str());
+					SetWindowText(ValueWindow[PUND], StringTable->at(STR_ON).c_str());
 				return 1;
 			}
 			if (Msg.hwnd == ValueWindow[PHUP]) {
@@ -15146,7 +15146,7 @@ unsigned chkMsg() {
 				}
 				if (Msg.hwnd == ValueWindow[LFTHTYP]) {
 					FormMenuChoice = LFTHTYP;
-					sidmsg(ValueWindow[LFTHTYP], &StringTable[STR_FTH0], 6);
+					sidmsg(ValueWindow[LFTHTYP], &StringTable->at(STR_FTH0), 6);
 					break;
 				}
 				if (Msg.hwnd == ValueWindow[LFRM]) {
@@ -15170,7 +15170,7 @@ unsigned chkMsg() {
 				if (Msg.hwnd == ValueWindow[LFRMFIL]) {
 					StateMap.reset(StateFlag::FILTYP);
 					FormMenuChoice = LFRMFIL;
-					sidmsg(ValueWindow[LFRMFIL], &StringTable[STR_FIL0], 14);
+					sidmsg(ValueWindow[LFRMFIL], &StringTable->at(STR_FIL0), 14);
 					break;
 				}
 				if (Msg.hwnd == ValueWindow[LFRMCOL]) {
@@ -15205,7 +15205,7 @@ unsigned chkMsg() {
 				}
 				if (Msg.hwnd == ValueWindow[LBRD]) {
 					StateMap.set(StateFlag::FILTYP);
-					sidmsg(ValueWindow[LBRD], &StringTable[STR_EDG0], EDGETYPS + 1);
+					sidmsg(ValueWindow[LBRD], &StringTable->at(STR_EDG0), EDGETYPS + 1);
 					StateMap.set(StateFlag::BRDACT);
 					break;
 				}
@@ -18718,7 +18718,7 @@ void ducmd() {
 						}
 					}
 				}
-				SetWindowText(ThrEdWindow, StringTable[STR_EMB].c_str());
+				SetWindowText(ThrEdWindow, StringTable->at(STR_EMB).c_str());
 			}
 			*WorkingFileName = 0;
 			DeleteFile(BalaradName1);
@@ -19044,19 +19044,19 @@ void init() {
 		case HBOXSEL:
 
 			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-			buttonTxt = &StringTable[STR_BOXSEL];
+			buttonTxt = &StringTable->at(STR_BOXSEL);
 			break;
 
 		case HUPTO:
 
 			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-			buttonTxt = &StringTable[STR_UPOF];
+			buttonTxt = &StringTable->at(STR_UPOF);
 			break;
 
 		case HHID:
 
 			flag = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER;
-			buttonTxt = &StringTable[STR_PIKOL];
+			buttonTxt = &StringTable->at(STR_PIKOL);
 			break;
 
 		default:
@@ -19156,7 +19156,7 @@ void init() {
 	PCSHeader.stitchCount = 0;
 	GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
 	ladj();
-	GetTextExtentPoint(StitchWindowMemDC, StringTable[STR_PIKOL].c_str(), StringTable[STR_PIKOL].size(), &PickColorMsgSize);
+	GetTextExtentPoint(StitchWindowMemDC, StringTable->at(STR_PIKOL).c_str(), StringTable->at(STR_PIKOL).size(), &PickColorMsgSize);
 	auxmen();
 	fnamtabs();
 	ritfnam(IniFile.designerName);
@@ -19180,7 +19180,7 @@ void init() {
 	chkmen();
 	//check command line-should be last item in init
 	ducmd();
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED].c_str(), IniFile.designerName);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_THRED).c_str(), IniFile.designerName);
 	SetWindowText(ThrEdWindow, MsgBuffer);
 }
 
@@ -20188,7 +20188,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				TextOut(DrawItem->hDC, position, 1, HelpBuffer, strlen(HelpBuffer));;
 			}
 			else
-				TextOut(DrawItem->hDC, position, 1, StringTable[STR_PIKOL].c_str(), StringTable[STR_PIKOL].size());;
+				TextOut(DrawItem->hDC, position, 1, StringTable->at(STR_PIKOL).c_str(), StringTable->at(STR_PIKOL).size());;
 			return 1;
 		}
 		if (StateMap.test(StateFlag::WASTRAC)) {
@@ -20210,12 +20210,12 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				}
 				if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
 					TempBrush = BlackBrush;
-					strcpy_s(buffer, StringTable[STR_OFF].c_str());
+					strcpy_s(buffer, StringTable->at(STR_OFF).c_str());
 					SetBkColor(DrawItem->hDC, 0);
 					SetTextColor(DrawItem->hDC, TraceRGB[iRGB]);
 					if (StateMap.test(TraceRGBFlag[iRGB])) {
 						TempBrush = TraceBrush[iRGB];
-						strcpy_s(buffer, StringTable[STR_ON].c_str());
+						strcpy_s(buffer, StringTable->at(STR_ON).c_str());
 						SetTextColor(DrawItem->hDC, 0);
 						SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 					}
@@ -20477,6 +20477,8 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		TempTexturePoints = &private_TempTexturePoints;
 		std::vector<unsigned>	private_SelectedTexturePointsList;
 		SelectedTexturePointsList = &private_SelectedTexturePointsList;
+		std::vector<std::string> private_StringTable(STR_LEN);
+		StringTable = &private_StringTable;
 		redini();
 		if (IniFile.initialWindowCoords.right) {
 			ThrEdWindow = CreateWindow(
