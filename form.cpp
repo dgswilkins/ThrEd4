@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <math.h>
-#include <tchar.h>
+#include <sstream>
 #include <CppCoreCheck\warnings.h>
 #pragma warning( push )  
 #pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
@@ -81,7 +81,7 @@ extern void		setpsel ();
 extern unsigned	setRmap (fPOINTATTR stitchPoint);
 extern void		setxt(std::vector<RNGCNT> &textureSegments);
 extern void		shft (fPOINT delta);
-extern void		shoMsg (TCHAR* string);
+extern void		shoMsg (const std::string &message);
 extern void		shord ();
 extern void		shoseln (unsigned code0, unsigned code1);
 extern void		spltmsg ();
@@ -140,14 +140,14 @@ extern			HMENU			MainMenu;
 extern			HWND			MainStitchWin;
 extern			double			MinStitchLength;
 extern			MSG				Msg;
-extern			TCHAR			MsgBuffer[MSGSIZ];
+extern			char			MsgBuffer[MSGSIZ];
 extern			unsigned		MsgIndex;
 extern			RECT			MsgRect;
 extern			HWND			MsgWindow;
 extern			HPEN			MultiFormPen;
 extern			unsigned		NearestCount;
 extern			HWND			OKButton;
-extern			TCHAR*			PcdClipFormat;
+extern			char*			PcdClipFormat;
 extern			PCSHEADER		PCSHeader;
 extern			unsigned		PreferenceIndex;
 extern			HWND			PreferencesWindow;
@@ -165,7 +165,7 @@ extern			fRECTANGLE		SelectedVerticesRect;
 extern			double			ShowStitchThreshold;
 extern			HWND			SideMessageWindow;
 extern			HWND			SideWindow[11];
-extern			TCHAR			SideWindowEntryBuffer[11];
+extern			char			SideWindowEntryBuffer[11];
 extern			double			SmallStitchLength;
 extern			EnumMap<StateFlag>	StateMap;
 extern			double			StitchBoxesThreshold;
@@ -178,13 +178,13 @@ extern			HDC				StitchWindowMemDC;
 extern			POINT			StitchWindowOrigin;
 extern			POINT			StitchWindowSize;
 extern			POINT			StretchBoxLine[5];
-extern			TCHAR*			StringTable[STR_LEN];
+extern			std::vector<std::string> StringTable;
 extern			int				TextureIndex;
 extern			TXPNT			TexturePointsBuffer[MAXITEMS];
 extern			HINSTANCE		ThrEdInstance;
 extern			HWND			ThrEdWindow;
 extern			POINT			ThredWindowOrigin;
-extern			TCHAR			ThrName[_MAX_PATH];
+extern			char			ThrName[_MAX_PATH];
 extern			unsigned		AppliqueColor;
 extern			POINT			UnzoomedRect;
 extern			EnumMap<UserFlag>	UserFlagMap;
@@ -379,7 +379,7 @@ double			EggRatio;				//ratio for shrinking eggs
 unsigned		PreferenceWindowTextWidth;	//size of the text part of the preference window
 unsigned		MarkedStitchMap[MAXITEMS];	//bitmap to tell when stitches have been marked
 
-TCHAR		FormOnOff[16];
+char		FormOnOff[16];
 
 MENUITEMINFO MenuInfo = {
 	sizeof(MENUITEMINFO),	// Size
@@ -1365,7 +1365,7 @@ void setzig() {
 }
 
 inline void initTearDlg(HWND hwndlg) noexcept {
-	TCHAR		buffer[HBUFSIZ] = { 0 };
+	char	buffer[HBUFSIZ] = { 0 };
 
 	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.formSides);
 	SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer);
@@ -1380,7 +1380,7 @@ inline void initTearDlg(HWND hwndlg) noexcept {
 BOOL CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
 	UNREFERENCED_PARAMETER(lparam);
 
-	TCHAR		buffer[HBUFSIZ] = { 0 };
+	char	buffer[HBUFSIZ] = { 0 };
 
 	switch (umsg) {
 	case WM_INITDIALOG:
@@ -1859,7 +1859,7 @@ void okcan() noexcept {
 
 	OKButton = CreateWindow(
 		"STATIC",
-		StringTable[STR_OKENT],
+		StringTable[STR_OKENT].c_str(),
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		5,
 		MsgRect.bottom + 15,
@@ -1872,7 +1872,7 @@ void okcan() noexcept {
 
 	CancelButton = CreateWindow(
 		"STATIC",
-		StringTable[STR_CANCEL],
+		StringTable[STR_CANCEL].c_str(),
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		ButtonWidth * 5,
 		MsgRect.bottom + 15,
@@ -1885,7 +1885,7 @@ void okcan() noexcept {
 }
 
 void savdisc() {
-	TCHAR	buffer[HBUFSIZ];
+	char	buffer[HBUFSIZ];
 
 	sdmsg();
 	StateMap.reset(StateFlag::BIGBOX);
@@ -1922,7 +1922,7 @@ void savdisc() {
 
 	CancelButton = CreateWindow(
 		"STATIC",
-		StringTable[STR_CANCEL],
+		StringTable[STR_CANCEL].c_str(),
 		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		2 * ButtonWidthX3 + 25,
 		MsgRect.bottom + 15,
@@ -2988,7 +2988,7 @@ void movseq(std::vector<SMALPNTL*> &sortedLines, unsigned ind) noexcept {
 void duseq2(std::vector<SMALPNTL*> &sortedLines, unsigned iLine) noexcept {
 	SequenceLines = sortedLines[iLine];
 	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x, (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
-	}
+}
 
 void duseq1() noexcept {
 	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x, (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
@@ -3034,7 +3034,7 @@ void duseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish,
 			flag = true;
 			duseq2(sortedLines, iLine);
 		}
-		if (flag) { 
+		if (flag) {
 			LastGroup = SequenceLines->group;
 		}
 	}
@@ -3073,7 +3073,7 @@ void duseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish,
 				duseq2(sortedLines, (iLine - 1));
 			}
 		}
-		if (flag) { 
+		if (flag) {
 			LastGroup = SequenceLines->group;
 		}
 	}
@@ -3605,7 +3605,7 @@ void lcon(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &line
 					if (iSequence != iNode) {
 						isConnected = regclos(groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, RegionsList);
 						if (isConnected) {
-							pathMap.push_back({iNode, isConnected, NextGroup});
+							pathMap.push_back({ iNode, isConnected, NextGroup });
 							PathMapIndex++;
 							count++;
 						}
@@ -3618,7 +3618,7 @@ void lcon(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &line
 						if (iSequence != iNode) {
 							isConnected = regclos(groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, RegionsList);
 							if (isConnected) {
-								pathMap.push_back({iNode, isConnected, NextGroup });
+								pathMap.push_back({ iNode, isConnected, NextGroup });
 								PathMapIndex++;
 								count++;
 							}
@@ -4773,7 +4773,7 @@ void satmf(std::vector<double> &lengths) {
 	for (iGuide = 0; iGuide < gsl::narrow<unsigned>(CurrentFormGuidesCount) - 1; iGuide++)
 		satfn(lengths, CurrentFormGuides[iGuide].start, CurrentFormGuides[iGuide + 1].start, CurrentFormGuides[iGuide].finish, CurrentFormGuides[iGuide + 1].finish);
 	if (SatinEndGuide)
-		satfn(lengths,CurrentFormGuides[iGuide].start, SatinEndGuide, CurrentFormGuides[iGuide].finish, SatinEndGuide + 1);
+		satfn(lengths, CurrentFormGuides[iGuide].start, SatinEndGuide, CurrentFormGuides[iGuide].finish, SatinEndGuide + 1);
 	else {
 		if (CurrentFormGuides[iGuide].finish - CurrentFormGuides[iGuide].start > 2) {
 			length = (lengths[CurrentFormGuides[iGuide].finish] - lengths[CurrentFormGuides[iGuide].start]) / 2 + lengths[CurrentFormGuides[iGuide].start];
@@ -4882,7 +4882,6 @@ void satfil() {
 		satfn(lengths, 0, iVertex, VertexCount, iVertex);
 	} while (false);
 
-	//delete[] lengths;
 	LineSpacing = spacing;
 }
 
@@ -6167,21 +6166,21 @@ void apliq() {
 }
 
 void setap() {
-	TCHAR	buffer[HBUFSIZ] = { 0 };
+	std::stringstream ss;
 
 	AppliqueColor = ActiveColor;
-	LoadString(ThrEdInstance, IDS_APCOL, buffer, HBUFSIZ);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buffer, AppliqueColor + 1);
-	shoMsg(MsgBuffer);
+	ss << StringTable[IDS_APCOL] << AppliqueColor + 1;
+	std::string txt = ss.str();
+	shoMsg(txt);
 }
 
-void maxtsiz(const TCHAR* string, POINT* textSize) noexcept {
-	SIZE	size;
+void maxtsiz(const std::string &label, POINT &textSize) noexcept {
+	SIZE	labelSize;
 
-	GetTextExtentPoint32(StitchWindowMemDC, string, strlen(string), &size);
-	textSize->y = size.cy;
-	if (size.cx > textSize->x)
-		textSize->x = size.cx;
+	GetTextExtentPoint32(StitchWindowMemDC, label.data(), label.size(), &labelSize);
+	textSize.y = labelSize.cy;
+	if (labelSize.cx > textSize.x)
+		textSize.x = labelSize.cx;
 }
 
 void maxwid(unsigned start, unsigned finish) noexcept {
@@ -6189,19 +6188,20 @@ void maxwid(unsigned start, unsigned finish) noexcept {
 
 	textSize.x = 0;
 	textSize.y = 0;
-	while (start <= finish)
-		maxtsiz(StringTable[start++], &textSize);
+	while (start <= finish) {
+		maxtsiz(StringTable[start++], textSize);
+	}
 	PreferenceWindowTextWidth = textSize.x + 6;
 }
 
-HWND txtwin(const TCHAR* string, RECT location) {
+HWND txtwin(const std::string &windowName, RECT location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
-		maxtsiz(string, &LabelWindowSize);
+		maxtsiz(windowName, LabelWindowSize);
 		return 0;
 	}
 	return CreateWindow(
 		"STATIC",
-		string,
+		windowName.c_str(),
 		WS_CHILD | WS_VISIBLE,
 		location.left,
 		location.top,
@@ -6213,14 +6213,14 @@ HWND txtwin(const TCHAR* string, RECT location) {
 		NULL);
 }
 
-HWND txtrwin(const TCHAR* string, RECT location) {
+HWND txtrwin(std::string winName, RECT location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
-		maxtsiz(string, &ValueWindowSize);
+		maxtsiz(winName, ValueWindowSize);
 		return 0;
 	}
 	return CreateWindow(
 		"STATIC",
-		string,
+		winName.c_str(),
 		SS_NOTIFY | WS_BORDER | WS_CHILD | WS_VISIBLE,
 		location.left,
 		location.top,
@@ -6232,14 +6232,14 @@ HWND txtrwin(const TCHAR* string, RECT location) {
 		NULL);
 }
 
-HWND numwin(const TCHAR* string, RECT location) {
+HWND numwin(std::string winName, RECT location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
-		maxtsiz(string, &ValueWindowSize);
+		maxtsiz(winName, ValueWindowSize);
 		return 0;
 	}
 	return CreateWindow(
 		"STATIC",
-		string,
+		winName.c_str(),
 		SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
 		location.left,
 		location.top,
@@ -6266,7 +6266,10 @@ BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam) noexcept {
 }
 
 void refrmfn() {
-	char*		string = { 0 };
+	std::stringstream ss;
+	ss.precision(2);
+	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+
 	unsigned	edgeFillType = 0, iEdge = 0;
 
 	edgeFillType = SelectedForm->edgeType&NEGUND;
@@ -6287,8 +6290,8 @@ void refrmfn() {
 		ValueWindow[LFRM] = txtrwin(StringTable[STR_FREH], ValueWindowCoords);
 	nxtlin();
 	LabelWindow[LLAYR] = txtwin(StringTable[STR_TXT1], LabelWindowCoords);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", (SelectedForm->attribute&FRMLMSK) >> 1);
-	ValueWindow[LLAYR] = txtrwin(MsgBuffer, ValueWindowCoords);
+	ss << ((SelectedForm->attribute&FRMLMSK) >> 1);
+	ValueWindow[LLAYR] = txtrwin(ss.str(), ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->type != FRMLINE) {
 		LabelWindow[LCWLK] = txtwin(StringTable[STR_CWLK], LabelWindowCoords);
@@ -6311,26 +6314,36 @@ void refrmfn() {
 		nxtlin();
 		if (SelectedForm->extendedAttribute&(AT_WALK | AT_UND | AT_CWLK)) {
 			LabelWindow[LUNDCOL] = txtwin(StringTable[STR_UNDCOL], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->underlayColor + 1);
-			ValueWindow[LUNDCOL] = txtrwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->underlayColor + 1);
+			ValueWindow[LUNDCOL] = txtrwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 			LabelWindow[LULEN] = txtwin(StringTable[STR_ULEN], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->underlayStitchLen / PFGRAN);
-			ValueWindow[LULEN] = txtrwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->underlayStitchLen / PFGRAN);
+			ValueWindow[LULEN] = txtrwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		LabelWindow[LWLKIND] = txtwin(StringTable[STR_UWLKIND], LabelWindowCoords);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->underlayIndent / PFGRAN);
-		ValueWindow[LWLKIND] = txtrwin(MsgBuffer, ValueWindowCoords);
+		ss.clear();
+		ss.str("");
+		ss << (SelectedForm->underlayIndent / PFGRAN);
+		ValueWindow[LWLKIND] = txtrwin(ss.str(), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->extendedAttribute&AT_UND) {
 			LabelWindow[LUSPAC] = txtwin(StringTable[STR_FUSPAC], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->underlaySpacing / PFGRAN);
-			ValueWindow[LUSPAC] = txtrwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->underlaySpacing / PFGRAN);
+			ValueWindow[LUSPAC] = txtrwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 			LabelWindow[LUANG] = txtwin(StringTable[STR_FUANG], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->underlayStitchAngle * 180 / PI);
-			ValueWindow[LUANG] = txtrwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->underlayStitchAngle * 180 / PI);
+			ValueWindow[LUANG] = txtrwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 	}
@@ -6339,143 +6352,186 @@ void refrmfn() {
 	nxtlin();
 	if (SelectedForm->fillType) {
 		LabelWindow[LFRMCOL] = txtwin(StringTable[STR_TXT3], LabelWindowCoords);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillColor + 1);
-		ValueWindow[LFRMCOL] = numwin(MsgBuffer, ValueWindowCoords);
+		ss.clear();
+		ss.str("");
+		ss << (SelectedForm->fillColor + 1);
+		ValueWindow[LFRMCOL] = numwin(ss.str(), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == FTHF) {
 			LabelWindow[LFTHCOL] = txtwin(StringTable[STR_FTHCOL], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillInfo.feather.color + 1);
-			ValueWindow[LFTHCOL] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->fillInfo.feather.color + 1);
+			ValueWindow[LFTHCOL] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 			LabelWindow[LFTHTYP] = txtwin(StringTable[STR_FTHTYP], LabelWindowCoords);
 			ValueWindow[LFTHTYP] = numwin(StringTable[STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1], ValueWindowCoords);
 			nxtlin();
 			LabelWindow[LFTHBLND] = txtwin(StringTable[STR_FTHBLND], LabelWindowCoords);
-			if (SelectedForm->extendedAttribute&AT_FTHBLND)
-				string = StringTable[STR_ON];
-			else
-				string = StringTable[STR_OFF];
-			ValueWindow[LFTHBLND] = txtrwin(string, ValueWindowCoords);
+			if (SelectedForm->extendedAttribute&AT_FTHBLND) {
+				ValueWindow[LFTHBLND] = txtrwin(StringTable[STR_ON], ValueWindowCoords);
+			}
+			else {
+				ValueWindow[LFTHBLND] = txtrwin(StringTable[STR_OFF], ValueWindowCoords);
+			}
 			nxtlin();
 			if (!(SelectedForm->extendedAttribute&AT_FTHBLND)) {
 				LabelWindow[LFTHBTH] = txtwin(StringTable[STR_FTHBOTH], LabelWindowCoords);
-				if (SelectedForm->extendedAttribute&(AT_FTHBTH))
-					string = StringTable[STR_ON];
-				else
-					string = StringTable[STR_OFF];
-				ValueWindow[LFTHBTH] = txtrwin(string, ValueWindowCoords);
+				if (SelectedForm->extendedAttribute&(AT_FTHBTH)) {
+					ValueWindow[LFTHBTH] = txtrwin(StringTable[STR_ON], ValueWindowCoords);
+				}
+				else {
+					ValueWindow[LFTHBTH] = txtrwin(StringTable[STR_OFF], ValueWindowCoords);
+				}
 				nxtlin();
 				if (!(SelectedForm->extendedAttribute&AT_FTHBTH)) {
 					LabelWindow[LFTHUP] = txtwin(StringTable[STR_FTHUP], LabelWindowCoords);
-					if (SelectedForm->extendedAttribute&AT_FTHUP)
-						string = StringTable[STR_ON];
-					else
-						string = StringTable[STR_OFF];
-					ValueWindow[LFTHUP] = txtrwin(string, ValueWindowCoords);
+					if (SelectedForm->extendedAttribute&AT_FTHUP) {
+						ValueWindow[LFTHUP] = txtrwin(StringTable[STR_ON], ValueWindowCoords);
+					}
+					else {
+						ValueWindow[LFTHUP] = txtrwin(StringTable[STR_OFF], ValueWindowCoords);
+					}
 					nxtlin();
 				}
 			}
 			LabelWindow[LFTHUPCNT] = txtwin(StringTable[STR_FTHUPCNT], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillInfo.feather.upCount);
-			ValueWindow[LFTHUPCNT] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << SelectedForm->fillInfo.feather.upCount;
+			ValueWindow[LFTHUPCNT] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 			LabelWindow[LFTHDWNCNT] = txtwin(StringTable[STR_FTHDWNCNT], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillInfo.feather.downCount);
-			ValueWindow[LFTHDWNCNT] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << SelectedForm->fillInfo.feather.downCount;
+			ValueWindow[LFTHDWNCNT] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 			LabelWindow[LFTHSIZ] = txtwin(StringTable[STR_FTHSIZ], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->fillInfo.feather.ratio);
-			ValueWindow[LFTHSIZ] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << SelectedForm->fillInfo.feather.ratio;
+			ValueWindow[LFTHSIZ] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 			if (SelectedForm->fillInfo.feather.fillType == FTHPSG) {
 				LabelWindow[LFTHNUM] = txtwin(StringTable[STR_FTHNUM], LabelWindowCoords);
-				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillInfo.feather.count);
-				ValueWindow[LFTHNUM] = numwin(MsgBuffer, ValueWindowCoords);
+				ss.clear();
+				ss.str("");
+				ss << SelectedForm->fillInfo.feather.count;
+				ValueWindow[LFTHNUM] = numwin(ss.str(), ValueWindowCoords);
 				nxtlin();
 			}
 			LabelWindow[LFTHFLR] = txtwin(StringTable[STR_FTHFLR], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->fillInfo.feather.minStitchSize / PFGRAN);
-			ValueWindow[LFTHFLR] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->fillInfo.feather.minStitchSize / PFGRAN);
+			ValueWindow[LFTHFLR] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType != CLPF) {
 			LabelWindow[LFRMSPAC] = txtwin(StringTable[STR_TXT4], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->fillSpacing / PFGRAN);
-			ValueWindow[LFRMSPAC] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->fillSpacing / PFGRAN);
+			ValueWindow[LFRMSPAC] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (istx(ClosestFormToCursor)) {
 			LabelWindow[LTXOF] = txtwin(StringTable[STR_TXOF], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->txof / PFGRAN);
-			ValueWindow[LTXOF] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->txof / PFGRAN);
+			ValueWindow[LTXOF] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		LabelWindow[LMAXFIL] = txtwin(StringTable[STR_TXT20], LabelWindowCoords);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->maxFillStitchLen / PFGRAN);
-		ValueWindow[LMAXFIL] = numwin(MsgBuffer, ValueWindowCoords);
+		ss.clear();
+		ss.str("");
+		ss << (SelectedForm->maxFillStitchLen / PFGRAN);
+		ValueWindow[LMAXFIL] = numwin(ss.str(), ValueWindowCoords);
 		nxtlin();
 		if (!isclp(ClosestFormToCursor) && !istx(ClosestFormToCursor)) {
 			LabelWindow[LFRMLEN] = txtwin(StringTable[STR_TXT5], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->lengthOrCount.stitchLength / PFGRAN);
-			ValueWindow[LFRMLEN] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->lengthOrCount.stitchLength / PFGRAN);
+			ValueWindow[LFRMLEN] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		LabelWindow[LMINFIL] = txtwin(StringTable[STR_TXT21], LabelWindowCoords);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->minFillStitchLen / PFGRAN);
-		ValueWindow[LMINFIL] = numwin(MsgBuffer, ValueWindowCoords);
+		ss.clear();
+		ss.str("");
+		ss << (SelectedForm->minFillStitchLen / PFGRAN);
+		ValueWindow[LMINFIL] = numwin(ss.str(), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
 			LabelWindow[LFRMANG] = txtwin(StringTable[STR_TXT6], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->angleOrClipData.angle * 180 / PI);
-			ValueWindow[LFRMANG] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->angleOrClipData.angle * 180 / PI);
+			ValueWindow[LFRMANG] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == ANGCLPF) {
 			LabelWindow[LSACANG] = txtwin(StringTable[STR_TXT6], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->satinOrAngle.angle * 180 / PI);
-			ValueWindow[LSACANG] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->satinOrAngle.angle * 180 / PI);
+			ValueWindow[LSACANG] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VCLPF || SelectedForm->fillType == HCLPF || SelectedForm->fillType == ANGCLPF) {
 			LabelWindow[LFRMFAZ] = txtwin(StringTable[STR_TXT18], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->wordParam);
-			ValueWindow[LFRMFAZ] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << SelectedForm->wordParam;
+			ValueWindow[LFRMFAZ] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VRTF || SelectedForm->fillType == HORF || SelectedForm->fillType == ANGF || istx(ClosestFormToCursor)) {
 			LabelWindow[LBFILSQR] = txtwin(StringTable[STR_PRF2], LabelWindowCoords);
-			if (SelectedForm->extendedAttribute&AT_SQR)
-				strcpy_s(MsgBuffer, StringTable[STR_SQR]);
-			else
-				strcpy_s(MsgBuffer, StringTable[STR_PNTD]);
-			ValueWindow[LBFILSQR] = txtrwin(MsgBuffer, ValueWindowCoords);
+			if (SelectedForm->extendedAttribute&AT_SQR) {
+				ValueWindow[LBFILSQR] = txtrwin(StringTable[STR_SQR], ValueWindowCoords);
+			}
+			else {
+				ValueWindow[LBFILSQR] = txtrwin(StringTable[STR_PNTD], ValueWindowCoords);
+			}
+
 			nxtlin();
 		}
 	}
 	LabelWindow[LFSTRT] = txtwin(StringTable[STR_FSTRT], LabelWindowCoords);
-	if (SelectedForm->extendedAttribute&AT_STRT)
-		strcpy_s(MsgBuffer, StringTable[STR_ON]);
-	else
-		strcpy_s(MsgBuffer, StringTable[STR_OFF]);
-	ValueWindow[LFSTRT] = txtrwin(MsgBuffer, ValueWindowCoords);
+	if (SelectedForm->extendedAttribute&AT_STRT) {
+		ValueWindow[LFSTRT] = txtrwin(StringTable[STR_ON], ValueWindowCoords);
+	}
+	else {
+		ValueWindow[LFSTRT] = txtrwin(StringTable[STR_OFF], ValueWindowCoords);
+	}
+
 	nxtlin();
 	if (SelectedForm->extendedAttribute&AT_STRT) {
 		LabelWindow[LDSTRT] = txtwin(StringTable[STR_FSTRT], LabelWindowCoords);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillStart);
-		ValueWindow[LDSTRT] = numwin(MsgBuffer, ValueWindowCoords);
+		ss.clear();
+		ss.str("");
+		ss << SelectedForm->fillStart;
+		ValueWindow[LDSTRT] = numwin(ss.str(), ValueWindowCoords);
 		nxtlin();
 	}
 	LabelWindow[LFEND] = txtwin(StringTable[STR_FEND], LabelWindowCoords);
-	if (SelectedForm->extendedAttribute&AT_END)
-		strcpy_s(MsgBuffer, StringTable[STR_ON]);
-	else
-		strcpy_s(MsgBuffer, StringTable[STR_OFF]);
-	ValueWindow[LFEND] = txtrwin(MsgBuffer, ValueWindowCoords);
+	if (SelectedForm->extendedAttribute&AT_END) {
+		ValueWindow[LFEND] = txtrwin(StringTable[STR_ON], ValueWindowCoords);
+	}
+	else {
+		ValueWindow[LFEND] = txtrwin(StringTable[STR_OFF], ValueWindowCoords);
+	}
+
 	nxtlin();
 	if (SelectedForm->extendedAttribute&AT_END) {
 		LabelWindow[LDEND] = txtwin(StringTable[STR_FEND], LabelWindowCoords);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", SelectedForm->fillEnd);
-		ValueWindow[LDEND] = numwin(MsgBuffer, ValueWindowCoords);
+		ss.clear();
+		ss.str("");
+		ss << SelectedForm->fillEnd;
+		ValueWindow[LDEND] = numwin(ss.str(), ValueWindowCoords);
 		nxtlin();
 	}
 	LabelWindow[LBRD] = txtwin(StringTable[STR_TXT7], LabelWindowCoords);
@@ -6483,64 +6539,88 @@ void refrmfn() {
 	nxtlin();
 	if (edgeFillType) {
 		LabelWindow[LBRDCOL] = txtwin(StringTable[STR_TXT8], LabelWindowCoords);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", (SelectedForm->borderColor & COLMSK) + 1);
-		ValueWindow[LBRDCOL] = numwin(MsgBuffer, ValueWindowCoords);
+		ss.clear();
+		ss.str("");
+		ss << ((SelectedForm->borderColor & COLMSK) + 1);
+		ValueWindow[LBRDCOL] = numwin(ss.str(), ValueWindowCoords);
 		nxtlin();
 		if (EdgeArray[iEdge] & BESPAC) {
 			LabelWindow[LBRDSPAC] = txtwin(StringTable[STR_TXT9], LabelWindowCoords);
-			if (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN)
-				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN);
-			else
-				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN * 2);
-			ValueWindow[LBRDSPAC] = numwin(MsgBuffer, ValueWindowCoords);
+			if (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN) {
+				ss.clear();
+				ss.str("");
+				ss << (SelectedForm->edgeSpacing / PFGRAN);
+			}
+			else {
+				ss.clear();
+				ss.str("");
+				ss << (SelectedForm->edgeSpacing / PFGRAN * 2);
+			}
+			ValueWindow[LBRDSPAC] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BPICSPAC) {
 			LabelWindow[LBRDPIC] = txtwin(StringTable[STR_TXT16], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeSpacing / PFGRAN);
-			ValueWindow[LBRDPIC] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->edgeSpacing / PFGRAN);
+			ValueWindow[LBRDPIC] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BEMAX) {
 			LabelWindow[LMAXBRD] = txtwin(StringTable[STR_TXT22], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->maxBorderStitchLen / PFGRAN);
-			ValueWindow[LMAXBRD] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->maxBorderStitchLen / PFGRAN);
+			ValueWindow[LMAXBRD] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BELEN) {
 			LabelWindow[LBRDLEN] = txtwin(StringTable[STR_TXT10], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeStitchLen / PFGRAN);
-			ValueWindow[LBRDLEN] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->edgeStitchLen / PFGRAN);
+			ValueWindow[LBRDLEN] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BEMIN) {
 			LabelWindow[LMINBRD] = txtwin(StringTable[STR_TXT23], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->minBorderStitchLen / PFGRAN);
-			ValueWindow[LMINBRD] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->minBorderStitchLen / PFGRAN);
+			ValueWindow[LMINBRD] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BESIZ) {
 			LabelWindow[LBRDSIZ] = txtwin(StringTable[STR_TXT11], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->borderSize / PFGRAN);
-			ValueWindow[LBRDSIZ] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->borderSize / PFGRAN);
+			ValueWindow[LBRDSIZ] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BRDPOS) {
 			LabelWindow[LBRDPOS] = txtwin(StringTable[STR_TXT18], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeStitchLen);
-			ValueWindow[LBRDPOS] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->edgeStitchLen);
+			ValueWindow[LBRDPOS] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & CHNPOS) {
 			LabelWindow[LBRDPOS] = txtwin(StringTable[STR_TXT19], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SelectedForm->edgeStitchLen);
-			ValueWindow[LBRDPOS] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << (SelectedForm->edgeStitchLen);
+			ValueWindow[LBRDPOS] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (edgeFillType == EDGEAPPL) {
 			LabelWindow[LAPCOL] = txtwin(StringTable[STR_TXT12], LabelWindowCoords);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", (SelectedForm->borderColor >> 4) + 1);
-			ValueWindow[LAPCOL] = numwin(MsgBuffer, ValueWindowCoords);
+			ss.clear();
+			ss.str("");
+			ss << ((SelectedForm->borderColor >> 4) + 1);
+			ValueWindow[LAPCOL] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (edgeFillType == EDGEANGSAT || edgeFillType == EDGEAPPL || edgeFillType == EDGEPROPSAT) {
@@ -6552,12 +6632,18 @@ void refrmfn() {
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BCNRSIZ) {
-			if (SelectedForm->edgeType == EDGEBHOL)
-				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", getblen() / PFGRAN);
-			else
-				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", getplen() / PFGRAN);
+			if (SelectedForm->edgeType == EDGEBHOL) {
+				ss.clear();
+				ss.str("");
+				ss << (getblen() / PFGRAN);
+			}
+			else {
+				ss.clear();
+				ss.str("");
+				ss << (getplen() / PFGRAN);
+			}
 			LabelWindow[LBCSIZ] = txtwin(StringTable[STR_TXT13], LabelWindowCoords);
-			ValueWindow[LBCSIZ] = numwin(MsgBuffer, ValueWindowCoords);
+			ValueWindow[LBCSIZ] = numwin(ss.str(), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->type == FRMLINE && EdgeArray[iEdge] & BRDEND) {
@@ -7156,10 +7242,10 @@ void dubold() {
 	}
 }
 
-void prftwin(const TCHAR* text) noexcept {
+void prftwin(const std::string &text) noexcept {
 	CreateWindow(
 		"STATIC",
-		text,
+		text.c_str(),
 		WS_CHILD | WS_VISIBLE,
 		LabelWindowCoords.left,
 		LabelWindowCoords.top,
@@ -7171,10 +7257,10 @@ void prftwin(const TCHAR* text) noexcept {
 		NULL);
 }
 
-HWND prfnwin(const TCHAR* text) noexcept {
+HWND prfnwin(const std::string &text) noexcept {
 	return CreateWindow(
 		"STATIC",
-		text,
+		text.c_str(),
 		SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
 		ValueWindowCoords.left,
 		ValueWindowCoords.top,
@@ -7186,9 +7272,9 @@ HWND prfnwin(const TCHAR* text) noexcept {
 		NULL);
 }
 
-void prflin(unsigned row) noexcept {
+void prflin(std::string msg, unsigned row) noexcept {
 	prftwin(StringTable[row]);
-	ValueWindow[row - STR_PRF0] = prfnwin(MsgBuffer);
+	ValueWindow[row - STR_PRF0] = prfnwin(msg);
 	nxtlin();
 }
 
@@ -7211,6 +7297,10 @@ void sethup() noexcept {
 #if LANG==ENG || LANG==HNG
 
 void prfmsg() {
+	std::stringstream ss;
+	ss.precision(2);
+	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+
 	HDC		preferenceDC = {};
 	RECT	preferenceRect = {};
 
@@ -7225,8 +7315,8 @@ void prfmsg() {
 	}
 	LabelWindowSize.x = LabelWindowSize.y = 0;
 	ValueWindowSize.x = ValueWindowSize.y = 0;
-	maxtsiz(StringTable[STR_PRF0 + 4], &LabelWindowSize);
-	maxtsiz(StringTable[STR_TAPR], &ValueWindowSize);
+	maxtsiz(StringTable[STR_PRF0 + 4], LabelWindowSize);
+	maxtsiz(StringTable[STR_TAPR], ValueWindowSize);
 	LabelWindowSize.x = PreferenceWindowTextWidth;
 	LabelWindowSize.x += 4;
 #if LANG==HNG
@@ -7255,72 +7345,130 @@ void prfmsg() {
 	LabelWindowCoords.right = 3 + LabelWindowSize.x;
 	ValueWindowCoords.left = 6 + LabelWindowSize.x;
 	ValueWindowCoords.right = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", AppliqueColor + 1);
-	prflin(STR_PRF10);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", BorderWidth / PFGRAN);
-	prflin(STR_PRF3);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", ButtonholeCornerLength / PFGRAN);
-	prflin(STR_PRF14);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.chainSpace / PFGRAN);
-	prflin(STR_PRF23);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.chainRatio);
-	prflin(STR_PRF24);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f mm", IniFile.clipOffset / PFGRAN);
-	prflin(STR_PRF21);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", IniFile.fillPhase);
-	prflin(STR_PRF22);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.eggRatio);
-	prflin(STR_PRF26);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.fillAngle / PI * 180);
-	prflin(STR_PRF1);
+	ss << (AppliqueColor + 1);
+	prflin(ss.str(), STR_PRF10);
+	ss.clear();
+	ss.str("");
+	ss << (BorderWidth / PFGRAN);
+	prflin(ss.str(), STR_PRF3);
+	ss.clear();
+	ss.str("");
+	ss << (ButtonholeCornerLength / PFGRAN);
+	prflin(ss.str(), STR_PRF14);
+	ss.clear();
+	ss.str("");
+	ss << (IniFile.chainSpace / PFGRAN);
+	prflin(ss.str(), STR_PRF23);
+	ss.clear();
+	ss.str("");
+	ss << (IniFile.chainSpace / PFGRAN);
+	prflin(ss.str(), STR_PRF24);
+	ss.clear();
+	ss.str("");
+	ss << (IniFile.clipOffset / PFGRAN) << " mm";
+	prflin(ss.str(), STR_PRF21);
+	ss.clear();
+	ss.str("");
+	ss << IniFile.fillPhase;
+	prflin(ss.str(), STR_PRF22);
+	ss.clear();
+	ss.str("");
+	ss << IniFile.eggRatio;
+	prflin(ss.str(), STR_PRF26);
+	ss.clear();
+	ss.str("");
+	ss << (IniFile.fillAngle / PI * 180);
+	prflin(ss.str(), STR_PRF1);
+	ss.clear();
+	ss.str("");
 	if (UserFlagMap.test(UserFlag::SQRFIL))
-		strcpy_s(MsgBuffer, StringTable[STR_SQR]);
+		ss << StringTable[STR_SQR];
 	else
-		strcpy_s(MsgBuffer, StringTable[STR_PNTD]);
-	prflin(STR_PRF2);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", LineSpacing / PFGRAN);
-	prflin(STR_PRF0);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", duthrsh(ShowStitchThreshold));
-	prflin(STR_PRF7);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f mm", IniFile.gridSize / PFGRAN);
-	prflin(STR_PRF20);
+		ss << StringTable[STR_PNTD];
+	prflin(ss.str(), STR_PRF2);
+	ss.clear();
+	ss.str("");
+	ss << (LineSpacing / PFGRAN);
+	prflin(ss.str(), STR_PRF0);
+	ss.clear();
+	ss.str("");
+	ss << duthrsh(ShowStitchThreshold);
+	prflin(ss.str(), STR_PRF7);
+	ss.clear();
+	ss.str("");
+	ss << (IniFile.gridSize / PFGRAN) << " mm";
+	prflin(ss.str(), STR_PRF20);
 	sethup();
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%s", StringTable[STR_HUP0 + IniFile.hoopType - 1]);
-	prflin(STR_PRF17);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.0f mm", IniFile.hoopSizeY / PFGRAN);
-	prflin(STR_PRF27);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.0f mm", IniFile.hoopSizeX / PFGRAN);
-	prflin(STR_PRF18);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.cursorNudgeStep);
-	prflin(STR_PRF25);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", PicotSpacing / PFGRAN);
-	prflin(STR_PRF16);
-	if (UserFlagMap.test(UserFlag::BLUNT))
-		strcpy_s(MsgBuffer, StringTable[STR_BLUNT]);
-	else
-		strcpy_s(MsgBuffer, StringTable[STR_TAPR]);
-	prflin(STR_PRF15);
-	if (UserFlagMap.test(UserFlag::DUND))
-		strcpy_s(MsgBuffer, StringTable[STR_ON]);
-	else
-		strcpy_s(MsgBuffer, StringTable[STR_OFF]);
-	prflin(STR_PRF19);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SmallStitchLength / PFGRAN);
-	prflin(STR_PRF9);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SnapLength / PFGRAN);
-	prflin(STR_PRF11);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SpiralWrap);
-	prflin(STR_PRF13);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", StarRatio);
-	prflin(STR_PRF12);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", duthrsh(StitchBoxesThreshold));
-	prflin(STR_PRF8);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.maxStitchLength / PFGRAN);
-	prflin(STR_PRF4);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", UserStitchLength / PFGRAN);
-	prflin(STR_PRF5);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", MinStitchLength / PFGRAN);
-	prflin(STR_PRF6);
+	ss.clear();
+	ss.str("");
+	ss << StringTable[STR_HUP0 + IniFile.hoopType - 1];
+	prflin(ss.str(), STR_PRF17);
+	ss.clear();
+	ss.str("");
+	ss << (IniFile.hoopSizeY / PFGRAN) << " mm";
+	prflin(ss.str(), STR_PRF27);
+	ss.clear();
+	ss.str("");
+	ss << (IniFile.hoopSizeX / PFGRAN) << " mm";
+	prflin(ss.str(), STR_PRF18);
+	ss.clear();
+	ss.str("");
+	ss << IniFile.cursorNudgeStep;
+	prflin(ss.str(), STR_PRF25);
+	ss.clear();
+	ss.str("");
+	ss << (PicotSpacing / PFGRAN);
+	prflin(ss.str(), STR_PRF16);
+	ss.clear();
+	ss.str("");
+	if (UserFlagMap.test(UserFlag::BLUNT)) {
+		ss << StringTable[STR_BLUNT];
+	}
+	else {
+		ss << StringTable[STR_TAPR];
+	}
+	prflin(ss.str(), STR_PRF15);
+	ss.clear();
+	ss.str("");
+	if (UserFlagMap.test(UserFlag::DUND)) {
+		ss << StringTable[STR_ON];
+	}
+	else {
+		ss << StringTable[STR_OFF];
+	}
+	prflin(ss.str(), STR_PRF19);
+	ss.clear();
+	ss.str("");
+	ss << SmallStitchLength / PFGRAN;
+	prflin(ss.str(), STR_PRF9);
+	ss.clear();
+	ss.str("");
+	ss << (SnapLength / PFGRAN);
+	prflin(ss.str(), STR_PRF11);
+	ss.clear();
+	ss.str("");
+	ss << SpiralWrap;
+	prflin(ss.str(), STR_PRF13);
+	ss.clear();
+	ss.str("");
+	ss << StarRatio;
+	prflin(ss.str(), STR_PRF12);
+	ss.clear();
+	ss.str("");
+	ss << duthrsh(StitchBoxesThreshold);
+	prflin(ss.str(), STR_PRF8);
+	ss.clear();
+	ss.str("");
+	ss << (IniFile.maxStitchLength / PFGRAN);
+	prflin(ss.str(), STR_PRF4);
+	ss.clear();
+	ss.str("");
+	ss << (UserStitchLength / PFGRAN);
+	prflin(ss.str(), STR_PRF5);
+	ss.clear();
+	ss.str("");
+	ss << MinStitchLength / PFGRAN;
+	prflin(ss.str(), STR_PRF6);
 	StateMap.set(StateFlag::PRFACT);
 	ReleaseDC(ThrEdWindow, preferenceDC);
 }
@@ -7937,10 +8085,10 @@ void tomsg() noexcept {
 	SIZE	textSize;
 
 	GetWindowRect(OKButton, &OKrect);
-	GetTextExtentPoint32(StitchWindowMemDC, StringTable[STR_DELST2], strlen(StringTable[STR_DELST2]), &textSize);
+	GetTextExtentPoint32(StitchWindowMemDC, StringTable[STR_DELST2].c_str(), StringTable[STR_DELST2].size(), &textSize);
 	DeleteStitchesDialog = CreateWindow(
 		"STATIC",
-		StringTable[STR_DELST2],
+		StringTable[STR_DELST2].c_str(),
 		SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		3,
 		OKrect.bottom - StitchWindowOrigin.y + 6 + textSize.cy,
@@ -8477,10 +8625,11 @@ void tglfrm() {
 	if (StateMap.testAndReset(StateFlag::SATPNT))
 		satfix();
 	StateMap.reset(StateFlag::HIDSTCH);
-	if (StateMap.testAndFlip(StateFlag::FRMOF))
-		strcpy_s(FormOnOff, StringTable[STR_FRMPLUS]);
+	if (StateMap.testAndFlip(StateFlag::FRMOF)) {
+		strcpy_s(FormOnOff, StringTable[STR_FRMPLUS].c_str());
+	}
 	else {
-		strcpy_s(FormOnOff, StringTable[STR_FRMINUS]);
+		strcpy_s(FormOnOff, StringTable[STR_FRMINUS].c_str());
 		StateMap.reset(StateFlag::FORMSEL);
 		StateMap.reset(StateFlag::FORMIN);
 		StateMap.reset(StateFlag::MOVFRM);
@@ -8502,7 +8651,7 @@ void tglfrm() {
 void frmon() {
 	unbsho();
 	StateMap.reset(StateFlag::FRMOF);
-	strcpy_s(FormOnOff, StringTable[STR_FRMPLUS]);
+	strcpy_s(FormOnOff, StringTable[STR_FRMPLUS].c_str());
 	SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, &MenuInfo);
 	StateMap.set(StateFlag::DUMEN);
 }
@@ -8827,7 +8976,7 @@ void snp(unsigned start, unsigned finish) {
 	checkLength = SnapLength * 2 + 1;
 	nutim(range.x);
 	for (iColumn = 1; iColumn < range.x - checkLength - 1; iColumn++) {
-		snpfn(xPoints, xHistogram[iColumn], xHistogram[iColumn + 1], xHistogram[(iColumn) + checkLength]);
+		snpfn(xPoints, xHistogram[iColumn], xHistogram[iColumn + 1], xHistogram[(iColumn)+checkLength]);
 		nxtim();
 	}
 	DestroyWindow(TimeWindow);
@@ -8896,11 +9045,12 @@ void rotpar() {
 }
 
 void rotentr() {
-	TCHAR	buffer[HBUFSIZ];
+	std::stringstream ss;
+	ss.precision(2);
+	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
 
-	LoadString(ThrEdInstance, IDS_ROTA, buffer, HBUFSIZ);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buffer, RotationAngle / PI * 180);
-	shoMsg(MsgBuffer);
+	ss << StringTable[IDS_ROTA] << (RotationAngle / PI * 180);
+	shoMsg(ss.str());
 	StateMap.set(StateFlag::NUMIN);
 	numWnd();
 }
@@ -9246,7 +9396,7 @@ bool setrc(unsigned bit) {
 void frmsadj() noexcept {
 	unsigned	iForm = 0, iStitch = 0;
 
-	boost::dynamic_bitset<> formMap(FormIndex); 
+	boost::dynamic_bitset<> formMap(FormIndex);
 	for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 		formMap.set(SelectedFormList[iForm]);
 	}
@@ -10307,12 +10457,13 @@ void frmnumfn(unsigned newFormIndex) {
 }
 
 void frmnum() {
-	TCHAR	buffer[HBUFSIZ] = { 0 };
+	std::stringstream ss;
+	ss.precision(2);
+	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
 
 	if (FormIndex && StateMap.test(StateFlag::FORMSEL)) {
-		LoadString(ThrEdInstance, IDS_FRML, buffer, HBUFSIZ);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), buffer, FormIndex);
-		shoMsg(MsgBuffer);
+		ss << StringTable[IDS_FRML] << FormIndex;
+		shoMsg(ss.str());
 		StateMap.set(StateFlag::NUMIN);
 		StateMap.set(StateFlag::ENTRFNUM);
 		numWnd();
@@ -10846,7 +10997,7 @@ void stchs2frm() {
 }
 
 bool lencmp(const LENINFO &arg1, const LENINFO &arg2) noexcept {
-		return (arg1.length < arg2.length);
+	return (arg1.length < arg2.length);
 }
 
 bool lencmpa(const CLIPSORT *arg1, const CLIPSORT *arg2) noexcept {
@@ -11137,7 +11288,7 @@ bool isin(std::vector<VCLPX> regionCrossingData, float xCoordinate, float yCoord
 
 unsigned clpnseg(std::vector<CLIPNT> &clipStitchPoints, std::vector<CLPSEG> &clipSegments, std::vector<double> &lengths, unsigned start, unsigned finish) noexcept {
 	CLPSEG clipSegment;
-	
+
 	clipSegment.start = start;
 	clipSegment.beginLength = getlen(clipStitchPoints, lengths, start);
 	clipSegment.asid = clipStitchPoints[start].vertexIndex;
@@ -11177,7 +11328,7 @@ void duflt() {
 }
 
 void inspnt(std::vector<CLIPNT> &clipStitchPoints) noexcept {
-	CLIPNT	clipStitchPoint	{ clipStitchPoints.back().x,
+	CLIPNT	clipStitchPoint{ clipStitchPoints.back().x,
 								clipStitchPoints.back().y,
 								0,
 								0 };
@@ -11268,7 +11419,7 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 	}
 	segmentCount = 0;
 	std::vector<VCLPX>	regionCrossingData; //region crossing data for vertical clipboard fills
-	regionCrossingData.reserve(MAXFRMLINS);	
+	regionCrossingData.reserve(MAXFRMLINS);
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 		start = floor(CurrentFormVertices[iVertex].x / ClipWidth);
 		finish = floor((CurrentFormVertices[nxt(iVertex)].x) / ClipWidth);
@@ -11361,7 +11512,7 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 					LineSegmentEnd.y = pasteLocation.y + ClipBuffer[iStitch].y;
 				}
 
-				clipStitchPoints.push_back({ LineSegmentStart.x, LineSegmentStart.y, 0, 0});
+				clipStitchPoints.push_back({ LineSegmentStart.x, LineSegmentStart.y, 0, 0 });
 				if (isin(regionCrossingData, LineSegmentStart.x, LineSegmentStart.y, regionCrossingStart, regionCrossingEnd)) {
 					if ((clipStitchPoints.size() > 1) && clipStitchPoints[clipStitchPoints.size() - 1].flag == 2) {
 						inspnt(clipStitchPoints);
@@ -11369,7 +11520,7 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 					clipStitchPoints.back().flag = 0;
 				}
 				else {
-					if ((clipStitchPoints.size() > 1)  && !clipStitchPoints[clipStitchPoints.size() - 1].flag) {
+					if ((clipStitchPoints.size() > 1) && !clipStitchPoints[clipStitchPoints.size() - 1].flag) {
 						inspnt(clipStitchPoints);
 					}
 					clipStitchPoints.back().flag = 2;
@@ -11461,89 +11612,89 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 
 #endif
 
-	if (clipSegments.size()) {
-		clplim = clipSegments.size() >> 3;
-		clplim = clipSegments.size() >> 1;
-		if (!clplim)
-			clplim = 1;
-		if (clplim > 12)
-			clplim = 12;
-		std::vector<LENINFO> sortedLengths;
-		sortedLengths.reserve(clipSegments.size() * 2);
-		for (iSegment = 0; iSegment < clipSegments.size(); iSegment++) {
-			sortedLengths.push_back({ iSegment, false, clipSegments[iSegment].beginLength });
-			sortedLengths.push_back({ iSegment, true, clipSegments[iSegment].endLength });
-		}
-		std::sort(sortedLengths.begin(), sortedLengths.end(), lencmp);
-		for (iSorted = 0; iSorted < sortedLengths.size(); iSorted++) {
-			if (sortedLengths[iSorted].isEnd)
-				clipSegments[sortedLengths[iSorted].index].endIndex = iSorted;
-			else
-				clipSegments[sortedLengths[iSorted].index].beginIndex = iSorted;
-		}
+			if (clipSegments.size()) {
+				clplim = clipSegments.size() >> 3;
+				clplim = clipSegments.size() >> 1;
+				if (!clplim)
+					clplim = 1;
+				if (clplim > 12)
+					clplim = 12;
+				std::vector<LENINFO> sortedLengths;
+				sortedLengths.reserve(clipSegments.size() * 2);
+				for (iSegment = 0; iSegment < clipSegments.size(); iSegment++) {
+					sortedLengths.push_back({ iSegment, false, clipSegments[iSegment].beginLength });
+					sortedLengths.push_back({ iSegment, true, clipSegments[iSegment].endLength });
+				}
+				std::sort(sortedLengths.begin(), sortedLengths.end(), lencmp);
+				for (iSorted = 0; iSorted < sortedLengths.size(); iSorted++) {
+					if (sortedLengths[iSorted].isEnd)
+						clipSegments[sortedLengths[iSorted].index].endIndex = iSorted;
+					else
+						clipSegments[sortedLengths[iSorted].index].beginIndex = iSorted;
+				}
 
 #if CLPVU==1
 
-		for (unsigned iStitch = 0; iStitch < ActivePointIndex; iStitch++) {
-			StitchBuffer[iStitch].x = ClipStitchPoints[iStitch].x;
-			StitchBuffer[iStitch].y = ClipStitchPoints[iStitch].y;
-			StitchBuffer[iStitch].attribute = 0;
-		}
-		PCSHeader.stitchCount = ActivePointIndex;
+				for (unsigned iStitch = 0; iStitch < ActivePointIndex; iStitch++) {
+					StitchBuffer[iStitch].x = ClipStitchPoints[iStitch].x;
+					StitchBuffer[iStitch].y = ClipStitchPoints[iStitch].y;
+					StitchBuffer[iStitch].attribute = 0;
+				}
+				PCSHeader.stitchCount = ActivePointIndex;
 #endif
 
 #if CLPVU==2
 
-		inf = 0;
-		for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
-			for (iStitchPoint = clipSegments[iSegment].start; iStitchPoint <= clipSegments[iSegment].finish; iStitchPoint++) {
-				StitchBuffer[inf].x = ClipStitchPoints[iStitchPoint].x;
-				StitchBuffer[inf].y = ClipStitchPoints[iStitchPoint].y;
-				StitchBuffer[inf++].attribute = iSegment & 0xf;
-			}
-		}
-		PCSHeader.stitchCount = inf;
+				inf = 0;
+				for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
+					for (iStitchPoint = clipSegments[iSegment].start; iStitchPoint <= clipSegments[iSegment].finish; iStitchPoint++) {
+						StitchBuffer[inf].x = ClipStitchPoints[iStitchPoint].x;
+						StitchBuffer[inf].y = ClipStitchPoints[iStitchPoint].y;
+						StitchBuffer[inf++].attribute = iSegment & 0xf;
+					}
+				}
+				PCSHeader.stitchCount = inf;
 
 #endif
 
-		minx = 1e99;
+				minx = 1e99;
 
 #if CLPVU==0
 
-		unsigned currentSegmentIndex = 0;
-		StateMap.set(StateFlag::FILDIR);
-		SequenceIndex = 0;
-		ClipIntersectSide = clipSegments[0].asid;
-		ritseg(clipStitchPoints, clipSegments, currentSegmentIndex);
-		while (nucseg(clipSegments, sortedLengths, currentSegmentIndex)) {
-			if (SequenceIndex > MAXITEMS - 3)
-				break;
-			ritseg(clipStitchPoints, clipSegments, currentSegmentIndex);
-		}
-		chksid(0);
-		if (SequenceIndex > MAXITEMS - 100)
-			SequenceIndex = MAXITEMS - 100;
-		ine = 0; inf = 0;
-		for (iSequence = 0; iSequence < SequenceIndex; iSequence++) {
-			if (vscmp(iSequence, ine)) {
-				ine++;
-				OSequence[ine].x = OSequence[iSequence].x;
-				OSequence[ine].y = OSequence[iSequence].y;
-			}
-			else
-				inf++;
-		}
-		SequenceIndex = ine;
-		if (StateMap.test(StateFlag::WASNEG)) {
-			for (iSequence = 0; iSequence < SequenceIndex; iSequence++)
-				OSequence[iSequence].x -= FormOffset;
-			for (iVertex = 0; iVertex < VertexCount; iVertex++)
-				CurrentFormVertices[iVertex].x -= FormOffset;
-			SelectedForm->rectangle.left -= FormOffset;
-			SelectedForm->rectangle.right -= FormOffset;
-		}
+				unsigned currentSegmentIndex = 0;
+				StateMap.set(StateFlag::FILDIR);
+				SequenceIndex = 0;
+				ClipIntersectSide = clipSegments[0].asid;
+				ritseg(clipStitchPoints, clipSegments, currentSegmentIndex);
+				while (nucseg(clipSegments, sortedLengths, currentSegmentIndex)) {
+					if (SequenceIndex > MAXITEMS - 3)
+						break;
+					ritseg(clipStitchPoints, clipSegments, currentSegmentIndex);
+				}
+				chksid(0);
+				if (SequenceIndex > MAXITEMS - 100)
+					SequenceIndex = MAXITEMS - 100;
+				ine = 0; inf = 0;
+				for (iSequence = 0; iSequence < SequenceIndex; iSequence++) {
+					if (vscmp(iSequence, ine)) {
+						ine++;
+						OSequence[ine].x = OSequence[iSequence].x;
+						OSequence[ine].y = OSequence[iSequence].y;
+					}
+					else
+						inf++;
+				}
+				SequenceIndex = ine;
+				if (StateMap.test(StateFlag::WASNEG)) {
+					for (iSequence = 0; iSequence < SequenceIndex; iSequence++)
+						OSequence[iSequence].x -= FormOffset;
+					for (iVertex = 0; iVertex < VertexCount; iVertex++)
+						CurrentFormVertices[iVertex].x -= FormOffset;
+					SelectedForm->rectangle.left -= FormOffset;
+					SelectedForm->rectangle.right -= FormOffset;
+				}
 #endif
-	}
+			}
 }
 
 void vrtsclp() {
@@ -11965,11 +12116,9 @@ void col2frm() {
 			endColorOffset += 16;
 		}
 	}
-	TCHAR		buffer[HBUFSIZ] = { 0 };
-
-	LoadString(ThrEdInstance, IDS_NCOLCHG, buffer, HBUFSIZ);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buffer, colorChangedCount);
-	shoMsg(MsgBuffer);
+	std::stringstream ss;
+	ss << colorChangedCount << StringTable[IDS_NCOLCHG];
+	shoMsg(ss.str());
 }
 
 bool fxpnt(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) noexcept {
@@ -12158,7 +12307,7 @@ void duchfn(std::vector<fPOINT> &chainEndPoints, unsigned start, unsigned finish
 	if (finish < chainEndPoints.size() - 1) {
 		delta.x = chainEndPoints[finish + 1].x - chainEndPoints[finish].x;
 		delta.y = chainEndPoints[finish + 1].y - chainEndPoints[finish].y;
-	} 
+	}
 	else {
 		delta.x = chainEndPoints[finish].x - chainEndPoints[finish - 1].x;
 		delta.y = chainEndPoints[finish].y - chainEndPoints[finish - 1].y;
@@ -12475,14 +12624,15 @@ void filclpx() {
 				tabmsg(IDS_CLP);
 		}
 		else {
-			shoMsg("no clipboard data");
+			std::string str("no clipboard data");
+			shoMsg(str);
 			CloseClipboard();
 		}
 	}
 }
 
 inline void wavinit (HWND hwndlg) noexcept {
-	TCHAR	buffer[HBUFSIZ] = { 0 };
+	char	buffer[HBUFSIZ] = { 0 };
 
 	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.wavePoints);
 	SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer);
@@ -12497,7 +12647,7 @@ inline void wavinit (HWND hwndlg) noexcept {
 bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
 	UNREFERENCED_PARAMETER(lparam);
 
-	TCHAR	buffer[HBUFSIZ] = { 0 };
+	char	buffer[HBUFSIZ] = { 0 };
 
 	switch (umsg) {
 	case WM_INITDIALOG:

@@ -1,8 +1,8 @@
 #include <windows.h>
 #include <stdio.h>
-#include <tchar.h>
 #include <htmlhelp.h>
 #include <locale.h>
+#include <sstream>
 
 #include "lang.h"
 #include "resource.h"
@@ -13,7 +13,7 @@ extern void				movStch();
 extern	void			numWnd();
 extern void				okcan();
 extern void				rstAll();
-extern void				shoMsg(TCHAR* string);
+extern void				shoMsg(const std::string &message);
 
 extern	unsigned		ButtonHeight;
 extern	unsigned		ButtonWidthX3;
@@ -22,11 +22,11 @@ extern	unsigned		ClosestFormToCursor;
 extern	DRAWITEMSTRUCT*	DrawItem;
 extern	unsigned		FormIndex;
 extern	FRMHED			FormList[MAXFORMS];
-extern	TCHAR			HomeDirectory[_MAX_PATH];
+extern	char			HomeDirectory[_MAX_PATH];
 extern	INIFILE			IniFile;
 extern	HWND			MainStitchWin;
 extern	MSG				Msg;
-extern	TCHAR			MsgBuffer[MSGSIZ];
+extern	char			MsgBuffer[MSGSIZ];
 extern	fPOINT			OSequence[OSEQLEN];
 extern	PCSHEADER		PCSHeader;
 extern	long			PreferenceWindowWidth;
@@ -37,12 +37,12 @@ extern	EnumMap<StateFlag>	StateMap;
 extern	HDC				StitchWindowMemDC;
 extern	HINSTANCE		ThrEdInstance;
 extern	HWND			ThrEdWindow;
-extern	TCHAR			ThrName[_MAX_PATH];
+extern	char			ThrName[_MAX_PATH];
 extern	POINT			UnzoomedRect;
-extern	TCHAR			WorkingFileName[_MAX_PATH];
+extern	char			WorkingFileName[_MAX_PATH];
 
 HANDLE					HelpFile;					//handle to the help file
-TCHAR					HelpFileName[_MAX_PATH];	//help file name
+char					HelpFileName[_MAX_PATH];	//help file name
 unsigned				HelpFileLength;				//help file length
 HWND					HelpWindow;				//help window
 HWND					MsgWindow = 0;				//message window
@@ -211,11 +211,23 @@ unsigned short LoadStringList[] = {	//strings to load into memory at init time
 	IDS_TXOF,
 };
 
-TCHAR*	StringTable[256];		//memory string pointers
-TCHAR*	StringData;				//string storage
-TCHAR*	RepairString;			//Repair Type
+std::vector<std::string> StringTable;
 
-TCHAR	HelpBuffer[HBUFSIZ];	//message formatting buffer
+char*	StringData;				//string storage
+char*	RepairString;			//Repair Type
+
+char	HelpBuffer[HBUFSIZ];	//message formatting buffer
+
+inline int loadString(std::string & sDest, unsigned stringID) {
+	WCHAR sBuf[HBUFSIZ] = { 0 };
+	LPWSTR psBuf = sBuf;
+	sDest.clear();
+	if (auto len = ::LoadStringW(ThrEdInstance, stringID, psBuf, 0) * sizeof(WCHAR)) {
+		sDest.resize(++len);
+		sDest.resize(::LoadStringA(ThrEdInstance, stringID, &*sDest.begin(), len));
+	}
+	return sDest.length();
+}
 
 void adbad(unsigned code, unsigned count) noexcept {
 	LoadString(ThrEdInstance, code, RepairString, sizeof(MsgBuffer) - strlen(RepairString));
@@ -234,17 +246,19 @@ void hsizmsg() {
 }
 
 void msgflt(unsigned messageId, float value) {
-	TCHAR	buffer[HBUFSIZ];
-
-	LoadString(ThrEdInstance, messageId, buffer, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, value);
-	shoMsg(HelpBuffer);
+	std::string str;
+	std::stringstream ss;
+	ss.precision(2);
+	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+	loadString(str, messageId);
+	ss << str << value;
+	shoMsg(ss.str());
 	StateMap.set(StateFlag::NUMIN);
 	numWnd();
 }
 
-void tsizmsg(TCHAR* threadSizeText, double threadSize) {
-	TCHAR	buffer[HBUFSIZ];
+void tsizmsg(char* threadSizeText, double threadSize) {
+	char	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_SIZ, buffer, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, threadSizeText, threadSize);
@@ -254,47 +268,52 @@ void tsizmsg(TCHAR* threadSizeText, double threadSize) {
 }
 
 void bfilmsg() {
-	TCHAR	buffer[HBUFSIZ];
-
-	LoadString(ThrEdInstance, IDS_BADFIL, buffer, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, WorkingFileName);
-	shoMsg(HelpBuffer);
+	std::string str;
+	std::stringstream ss;
+	loadString(str, IDS_BADFIL);
+	ss << str << WorkingFileName;
+	shoMsg(ss.str());
 }
 
-void filnopn(unsigned code, TCHAR* fileName) {
-	TCHAR	buffer[HBUFSIZ];
-
-	LoadString(ThrEdInstance, code, buffer, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, fileName);
-	shoMsg(HelpBuffer);
+void filnopn(unsigned code, const char* fileName) {
+	std::string str;
+	std::stringstream ss;
+	loadString(str, code);
+	ss << str << fileName;
+	shoMsg(ss.str());
 }
 
-void crmsg(TCHAR* fileName) {
-	TCHAR	buffer[HBUFSIZ];
-
-	LoadString(ThrEdInstance, IDS_CREAT, buffer, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, fileName);
-	shoMsg(HelpBuffer);
+void crmsg(const char* fileName) {
+	std::string str;
+	std::stringstream ss;
+	loadString(str, IDS_CREAT);
+	ss << str << fileName;
+	shoMsg(ss.str());
 }
 
-void butxt(unsigned iButton, const TCHAR* buttonText) {
+void butxt(unsigned iButton, const std::string &buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
 		if (iButton == 5) {
 			if (StateMap.test(StateFlag::HIDMAP))
-				SetWindowText(ButtonWin[iButton], StringTable[STR_TRC1H]);
+				SetWindowText(ButtonWin[iButton], StringTable[STR_TRC1H].c_str());
 			else
-				SetWindowText(ButtonWin[iButton], StringTable[STR_TRC1S]);
+				SetWindowText(ButtonWin[iButton], StringTable[STR_TRC1S].c_str());
 		}
 		else
-			SetWindowText(ButtonWin[iButton], StringTable[iButton - 4 + STR_TRC0]);
+			SetWindowText(ButtonWin[iButton], StringTable[iButton - 4 + STR_TRC0].c_str());
 	}
 	else
-		SetWindowText(ButtonWin[iButton], buttonText);
+		SetWindowText(ButtonWin[iButton], buttonText.c_str());
 }
 
 void ritnum(unsigned code, unsigned value) {
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), "%s %d", StringTable[code], value);
-	butxt(HNUM, HelpBuffer);
+	std::stringstream ss;
+	ss.precision(2);
+	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+	ss << StringTable[code] << value;
+	//ToDo - is there a better way to avoid the error?
+	std::string txt(ss.str());
+	butxt(HNUM, txt);
 }
 
 void msgstr(unsigned code) noexcept {
@@ -302,74 +321,47 @@ void msgstr(unsigned code) noexcept {
 }
 
 void lodstr() {
-	unsigned		iString = 0, iStringData = 0, iStringTable = 0, count = 0;
-	//ToDo - replace overallocation of storage and still ensure no overflow
-	const unsigned	storageSize = 65535;
-	//ToDo - Should this be std::string?
-	std::vector<TCHAR>	stringStorage(storageSize);
-	unsigned int	offset = 0;
-	//LPTSTR		strings = stringStorage;
-
-	for (iString = 0; iString < STR_LEN; iString++) {
-		count = LoadString(ThrEdInstance, LoadStringList[iString], &stringStorage[offset], storageSize - offset) + 1;
+	unsigned int	count = 0, offset = 0;
+	StringTable.resize(STR_LEN);
+	for (auto iString = 0; iString < STR_LEN; iString++) {
+		count = loadString(StringTable[iString], LoadStringList[iString]);
 		offset += count;
-	}
-	// Now allocate based on actual count
-	StringData = new TCHAR[offset + 1];
-	MoveMemory(StringData, &stringStorage[0], offset);
-	StringTable[0] = StringData;
-	iStringTable = 1;
-	for (iStringData = 0; iStringData <= offset; iStringData++) {
-		if (!StringData[iStringData]) {
-			iStringData++;
-			StringTable[iStringTable] = &StringData[iStringData];
-			iStringTable++;
-		}
 	}
 }
 
-void shoMsg(TCHAR* string) {
-	if (string) {
+void shoMsg(const std::string &message) {
+	if (message.size()) {
 		SIZE		textSize = {}, messageSize = {};
-		unsigned	count = 0, iString = 0, index = 0, iLength = 0, previousStringLength = 0;
+		unsigned	iString = 0, index = 0, previousStringLength = 0;
 		long		offset = 0;
 
-		while (string[iString]) {
-			if (string[iString++] == 10)
-				count++;
-		}
-		count++;
-		std::vector<TCHAR*> strings(count + 1);
-		std::vector<unsigned> lengths(count + 1);
+		std::vector<std::string> strings;
 		iString = 0;
-		strings[0] = string;
-		while (string[iString]) {
-			if (string[iString] == 10) {
-				lengths[iLength] = iString - previousStringLength;
-				strings[++iLength] = &string[iString++];
+		while (iString < message.size()) {
+			if (message[iString] == 10) {
+				strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
 				previousStringLength = iString;
 			}
 			else
 				iString++;
 		}
-		lengths[iLength] = iString - previousStringLength;
-		iLength++;
+		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
 		textSize.cx = textSize.cy = messageSize.cy = messageSize.cx = 0;
-		for (index = 0; index < iLength; index++) {
-			GetTextExtentPoint32(StitchWindowMemDC, strings[index], lengths[index], &textSize);
+		for (index = 0; index < strings.size(); index++) {
+			GetTextExtentPoint32(StitchWindowMemDC, strings[index].c_str(), strings[index].size(), &textSize);
 			if (textSize.cx > messageSize.cx)
 				messageSize.cx = textSize.cx;
 			if (textSize.cy > messageSize.cy)
 				messageSize.cy = textSize.cy;
 		}
-		messageSize.cy *= count;
+		messageSize.cy *= strings.size();
 		if (StateMap.testAndReset(StateFlag::MSGOF))
 			offset = PreferenceWindowWidth + 6;
 		else
 			offset = 3;
 		MsgWindow = CreateWindow(
 			"STATIC",
-			string,
+			message.c_str(),
 			SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 			offset,
 			3,
@@ -392,8 +384,8 @@ void riter() {
 }
 
 void pntmsg(unsigned count) {
-	TCHAR	temp[HBUFSIZ];
-	TCHAR	buffer[HBUFSIZ];
+	char	temp[HBUFSIZ];
+	char	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_PNT, temp, HBUFSIZ);
 	LoadString(ThrEdInstance, count, buffer, HBUFSIZ);
@@ -402,9 +394,9 @@ void pntmsg(unsigned count) {
 }
 
 void shoseln(unsigned code0, unsigned code1) {
-	TCHAR	temp[HBUFSIZ];
-	TCHAR	buffer0[HBUFSIZ];
-	TCHAR	buffer1[HBUFSIZ];
+	char	temp[HBUFSIZ];
+	char	buffer0[HBUFSIZ];
+	char	buffer1[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_SHOSEL, temp, HBUFSIZ);
 	LoadString(ThrEdInstance, code0, buffer0, HBUFSIZ);
@@ -483,7 +475,7 @@ void help() {
 }
 
 void sdmsg() {
-	TCHAR	buffer[HBUFSIZ];
+	char	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_SAVDISC, buffer, HBUFSIZ);
 	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, ThrName);
@@ -503,7 +495,7 @@ void spltmsg() {
 }
 
 void datmsg(unsigned code) {
-	TCHAR*	pchr;
+	char*	pchr;
 
 	pchr = MsgBuffer;
 	if (pchr) {

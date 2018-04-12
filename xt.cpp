@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <math.h>
-#include <tchar.h>
+#include <sstream>
 #include <CppCoreCheck\warnings.h>
 #pragma warning( push )  
 #pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
@@ -32,7 +32,7 @@ extern	unsigned		ActiveLayer;
 extern	unsigned		ActivePointIndex;
 extern	fPOINT			AngledFormVertices[MAXFRMLINS];
 extern	FRMHED			AngledForm;
-extern	TCHAR			AuxName[_MAX_PATH];
+extern	char			AuxName[_MAX_PATH];
 extern	HBRUSH			BackgroundBrush;
 extern	BSEQPNT			BSequence[BSEQLEN];
 extern	unsigned		ButtonHeight;
@@ -58,32 +58,32 @@ extern	FRMHED			FormList[MAXFORMS];
 extern	fPOINT			FormVertices[MAXITEMS];
 extern	HPEN			GridPen;
 extern	HWND			HorizontalScrollBar;
-extern	TCHAR			HelpBuffer[HBUFSIZ];
+extern	char			HelpBuffer[HBUFSIZ];
 extern	INIFILE			IniFile;
 extern	fPOINT*			InsidePoints;
 extern	HWND			MainStitchWin;
 extern	MSG				Msg;
-extern	TCHAR			MsgBuffer[MSGSIZ];
+extern	char			MsgBuffer[MSGSIZ];
 extern	unsigned		NewFormVertexCount;
 extern	unsigned		OutputIndex;
 extern	fPOINT*			OutsidePoints;
 extern	fPOINT			OSequence[OSEQLEN];
 extern	PCSHEADER		PCSHeader;
 extern	unsigned		PseudoRandomValue;
-extern	TCHAR*			RepairString;
+extern	char*			RepairString;
 extern	double			RotationAngle;
 extern	dPOINT			RotationCenter;
 extern	FRMHED*			SelectedForm;
 extern	unsigned		SatinGuideIndex;
 extern	SATCON			SatinGuides[MAXSAC];
 extern	EnumMap<StateFlag>	StateMap;
-extern	TCHAR*			StringData;
+extern	char*			StringData;
 extern	unsigned		SelectedFormCount;
 extern	unsigned		SelectedFormCount;
 extern	unsigned short	SelectedFormList[MAXFORMS];
 extern	fPOINT			SelectedPoint;
 extern	unsigned		SequenceIndex;
-extern	TCHAR*			StringTable[STR_LEN];
+extern	std::vector<std::string> StringTable;
 extern	fPOINTATTR		StitchBuffer[MAXITEMS * 2];
 extern	double			LineSpacing;
 extern	RECT			StitchWindowClientRect;
@@ -91,10 +91,10 @@ extern	HDC				StitchWindowDC;
 extern	HDC				StitchWindowMemDC;
 extern	POINT			StitchWindowOrigin;
 extern	unsigned		ThrEdClip;
-extern	TCHAR*			ThrEdClipFormat;
+extern	char*			ThrEdClipFormat;
 extern	HINSTANCE		ThrEdInstance;
 extern	HWND			ThrEdWindow;
-extern	TCHAR			ThrName[_MAX_PATH];
+extern	char			ThrName[_MAX_PATH];
 extern	unsigned		AppliqueColor;
 extern	POINT			UnzoomedRect;
 extern	COLORREF		UserColor[16];
@@ -102,7 +102,7 @@ extern	EnumMap<UserFlag>	UserFlagMap;
 extern	double			UserStitchLength;
 extern	unsigned		VertexCount;
 extern	HWND			VerticalScrollBar;
-extern	TCHAR			WorkingFileName[_MAX_PATH];
+extern	char			WorkingFileName[_MAX_PATH];
 extern	POINT			ZoomBoxLine[5];
 extern	fPOINT			ZoomBoxOrigin;
 extern	dRECTANGLE		ZoomRect;
@@ -112,7 +112,7 @@ extern	fPOINT*		adflt(unsigned count);
 extern	SATCON*		adsatk(unsigned	count);
 extern	void		angclpfn(std::vector<RNGCNT> &textureSegments);
 extern	void		bakseq();
-extern	void		butxt(unsigned iButton, const TCHAR* buttonText);
+extern	void		butxt(unsigned iButton, const std::string &buttonText);
 extern	void		centir();
 extern	void		chkhup();
 extern	bool		chkmax(unsigned arg0, unsigned arg1);
@@ -167,7 +167,7 @@ extern	void		savdo();
 extern	void		save();
 extern	void		setknots();
 extern	void		setmfrm();
-extern	void		shoMsg(TCHAR* string);
+extern	void		shoMsg(const std::string &message);
 extern	void		shoseln(unsigned code0, unsigned code1);
 extern	void		stchrct(fRECTANGLE* rectangle);
 extern	void		tabmsg(unsigned code);
@@ -194,7 +194,7 @@ fPOINT		DesignSize;					//design size
 TXPNT		TexturePointsBuffer[MAXITEMS];	//buffer for textured fill points
 int			TextureIndex;				//next textured fill point index
 unsigned	TextureWindowId;			//id of the window being updated
-TCHAR		TextureInputBuffer[16];		//texture fill number buffer
+char		TextureInputBuffer[16];		//texture fill number buffer
 int			TextureInputIndex;			//text number pointer
 HWND		SideWindowButton;			//button side window
 RECT		TexturePixelRect;			//screen selected texture points rectangle
@@ -815,10 +815,10 @@ void pes2crd() {
 
 	HKEY			registryKey = {};
 	unsigned long	keyType = 0, size = 0;
-	TCHAR			programName[_MAX_PATH] = { 0 };
+	char			programName[_MAX_PATH] = { 0 };
 	const char		filter[] = "ComputerService (Lind2PC.exe)\0LinkP2C.exe\0\0";
-	TCHAR			message[P2CBUFSIZ] = { 0 };
-	TCHAR			caption[P2CBUFSIZ] = { 0 };
+	char			message[P2CBUFSIZ] = { 0 };
+	char			caption[P2CBUFSIZ] = { 0 };
 	OPENFILENAME	openFileName = {
 	sizeof(OPENFILENAME),	//lStructsize
 		ThrEdWindow,		//hwndOwner 
@@ -1164,8 +1164,8 @@ void fncwlk() {
 BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
 	UNREFERENCED_PARAMETER(lparam);
 
-	TCHAR		buf[HBUFSIZ] = { 0 };
-	TCHAR		buf1[HBUFSIZ] = { 0 };
+	char		buf[HBUFSIZ] = { 0 };
+	char		buf1[HBUFSIZ] = { 0 };
 	unsigned	iFeatherStyle = 0, state = 0, featherType = 0;
 
 	switch (umsg) {
@@ -1391,7 +1391,7 @@ void dazdef() {
 }
 
 void initdaz(HWND hWinDialog) {
-	TCHAR		buffer[HBUFSIZ] = { 0 };
+	char		buffer[HBUFSIZ] = { 0 };
 	unsigned	iType = 0;
 
 	chkdaz();
@@ -1422,8 +1422,8 @@ void initdaz(HWND hWinDialog) {
 BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	TCHAR		buffer[HBUFSIZ] = { 0 };
-	TCHAR		compareBuffer[HBUFSIZ] = { 0 };
+	char		buffer[HBUFSIZ] = { 0 };
+	char		compareBuffer[HBUFSIZ] = { 0 };
 	unsigned	iType = 0;
 
 	switch (umsg) {
@@ -1934,9 +1934,10 @@ void fsort() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-		LoadString(ThrEdInstance, IDS_SRTER, HelpBuffer, HBUFSIZ);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, pFRecs[badForm]->form);
-		shoMsg(MsgBuffer);
+		std::stringstream ss;
+		ss << StringTable[IDS_SRTER] << pFRecs[badForm]->form;
+		std::string str = ss.str();
+		shoMsg(str);
 	}
 }
 
@@ -2988,7 +2989,7 @@ void setfilend() {
 }
 
 void duauxnam() {
-	TCHAR* fileExtention;
+	char* fileExtention;
 
 	_strlwr_s(WorkingFileName);
 	strcpy_s(AuxName, WorkingFileName);
@@ -3059,9 +3060,9 @@ void dutxtfil() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void txt2pix(TXPNT texturePoint, POINT* screenPoint) noexcept {
-	screenPoint->y = TextureScreen.height - texturePoint.y / TextureScreen.areaHeight*TextureScreen.height + TextureScreen.top;
-	screenPoint->x = (texturePoint.line*TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
+void txt2pix(const TXPNT &texturePoint, POINT* screenPoint) noexcept {
+	screenPoint->y = TextureScreen.height - texturePoint.y / TextureScreen.areaHeight * TextureScreen.height + TextureScreen.top;
+	screenPoint->x = (texturePoint.line * TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
 }
 
 void txtxfn(POINT reference, int offsetPixels) noexcept {
@@ -3113,7 +3114,7 @@ void px2ed(POINT point, fPOINT* editPoint) noexcept {
 	editPoint->y = TextureScreen.screenHeight - point.y*TextureScreen.editToPixelRatio;
 }
 
-void bxtxt(unsigned iButton, const TCHAR* string) noexcept {
+void bxtxt(unsigned iButton, const char* string) noexcept {
 	SetWindowText(ButtonWin[iButton], string);
 }
 
@@ -3145,15 +3146,13 @@ void drwtxbut() {
 }
 
 void chktx() noexcept {
-	unsigned iNextPoint = 0;
-	if (TempTexturePoints->size()) {
-		do {
-			if (TempTexturePoints->at(iNextPoint).line > TextureScreen.lines || TempTexturePoints->at(iNextPoint).y > TextureScreen.areaHeight) {
-				TempTexturePoints->erase(TempTexturePoints->begin() + iNextPoint--);
-			}
-			iNextPoint++;
-		} while (iNextPoint < TempTexturePoints->size());
+	std::vector<TXPNT> tmpTexture;
+	for (auto &p : *TempTexturePoints) {
+		if (p.line <= TextureScreen.lines && p.y <= TextureScreen.areaHeight) {
+			tmpTexture.push_back(p);
+		}
 	}
+	*TempTexturePoints = tmpTexture;
 }
 
 void drwtxtr() {
@@ -3406,7 +3405,7 @@ void dutxlin(fPOINT point0, fPOINT point1) noexcept {
 	if (integerFinish > TextureScreen.lines) {
 		integerFinish = TextureScreen.lines;
 	}
-	auto lineRange = integerFinish - integerStart;
+	const auto lineRange = integerFinish - integerStart;
 	if (lineRange >= 0) {
 		TempTexturePoints->reserve(TempTexturePoints->size() + lineRange);
 		while (integerStart <= integerFinish) {
@@ -4032,26 +4031,33 @@ void nxbak() {
 }
 
 void txtdel() {
-	unsigned	iPoint = 0, iSourcePoint = 0, iOutputPoint = 0;
+	unsigned	iSourcePoint = 0;
 	unsigned	iClosestPoint = 0;
 
 	if (SelectedTexturePointsList->size()) {
 		savtxt();
 		boost::dynamic_bitset<> texturePointsMap(TempTexturePoints->size());
-		for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++)
-			texturePointsMap.set(SelectedTexturePointsList->at(iPoint));
-		for (iSourcePoint = 0; iSourcePoint < TempTexturePoints->size(); iSourcePoint++) {
-			if (texturePointsMap.test(iSourcePoint)) {
-				TempTexturePoints->erase(TempTexturePoints->begin() + iOutputPoint--);
-			}
-			iOutputPoint++;
+		for (auto &p : *SelectedTexturePointsList) {
+			texturePointsMap.set(p);
 		}
+		// Another potential pattern for this:
+		// myVector.erase(remove_if(myVector.begin(), myVector.end(), testFunction), myVector.end());
+		std::vector<TXPNT> tmpTexture;
+		tmpTexture.reserve(TempTexturePoints->size() - SelectedTexturePointsList->size());
+		for (iSourcePoint = 0; iSourcePoint < TempTexturePoints->size(); iSourcePoint++) {
+			if (!texturePointsMap.test(iSourcePoint)) {
+				tmpTexture.push_back(TempTexturePoints->at(iSourcePoint));
+			}
+		}
+		*TempTexturePoints = tmpTexture;
 		SelectedTexturePointsList->clear();
 		StateMap.set(StateFlag::RESTCH);
 		return;
 	} 
 	if (TempTexturePoints->size() && txtclos(&iClosestPoint)) {
-		TempTexturePoints->erase(TempTexturePoints->begin() + iClosestPoint);
+		auto it = TempTexturePoints->begin();
+		std::advance(it, iClosestPoint);
+		it = TempTexturePoints->erase(it);
 		StateMap.set(StateFlag::RESTCH);
 	}
 }
@@ -4159,14 +4165,14 @@ void txgro() {
 	txsiz(1 / TXTRAT);
 }
 
-bool txdig(unsigned keyCode, TCHAR* character) {
+bool txdig(unsigned keyCode, char* character) {
 	if (character) {
 		if (isdigit(keyCode)) {
-			*character = gsl::narrow<TCHAR>(keyCode);
+			*character = gsl::narrow<char>(keyCode);
 			return 1;
 		}
 		if (keyCode >= VK_NUMPAD0 && keyCode <= VK_NUMPAD9) {
-			*character = gsl::narrow<TCHAR>(keyCode) - VK_NUMPAD0 + 0x30;
+			*character = gsl::narrow<char>(keyCode) - VK_NUMPAD0 + 0x30;
 			return 1;
 		}
 		if (keyCode == 0xbe || keyCode == 0x6e) {
@@ -4240,7 +4246,7 @@ void txsnap() {
 }
 
 void txtkey(unsigned keyCode) {
-	TCHAR	character = {};
+	char	character = {};
 	bool flag = true;
 
 	if (SideWindowButton) {
@@ -4713,7 +4719,7 @@ void txdun() {
 	unsigned long	bytesWritten = 0;
 	int				iHistory = 0;
 	const char		signature[4] = "txh";
-	TXHSTBUF		textureHistoryBuffer[ITXBUFLEN];
+	std::vector<TXHSTBUF>	textureHistoryBuffer(ITXBUFLEN);
 
 	if (TextureHistory[0].texturePoint.size()) {
 		if (txnam(name, sizeof(name))) {
@@ -4722,13 +4728,14 @@ void txdun() {
 				WriteFile(handle, &signature, sizeof(signature), &bytesWritten, 0);
 				WriteFile(handle, &TextureHistoryIndex, sizeof(int), &bytesWritten, 0);
 				for (auto i = 0; i < ITXBUFLEN; i++) {
+					// ToDo - can this be written better?
 					textureHistoryBuffer[i].placeholder = nullptr;
 					textureHistoryBuffer[i].count = TextureHistory[i].texturePoint.size();
 					textureHistoryBuffer[i].height = TextureHistory[i].height;
 					textureHistoryBuffer[i].width = TextureHistory[i].width;
 					textureHistoryBuffer[i].spacing = TextureHistory[i].spacing;
 				}
-				WriteFile(handle, &textureHistoryBuffer, sizeof(TXHSTBUF) * ITXBUFLEN, &bytesWritten, 0);
+				WriteFile(handle, textureHistoryBuffer.data(), textureHistoryBuffer.size() * ITXBUFLEN, &bytesWritten, 0);
 				for (iHistory = 0; iHistory < ITXBUFLEN; iHistory++) {
 					if (TextureHistory[iHistory].texturePoint.size())
 						WriteFile(handle, TextureHistory[iHistory].texturePoint.data(), TextureHistory[iHistory].texturePoint.size() * sizeof(TXPNT), &bytesWritten, 0);
@@ -4745,7 +4752,7 @@ void redtx() {
 	DWORD			bytesRead = 0, historyBytesRead = 0;
 	unsigned int	ind = 0;
 	char			sig[4] = { 0 };
-	TXHSTBUF		textureHistoryBuffer[ITXBUFLEN];
+	std::vector<TXHSTBUF>	textureHistoryBuffer(ITXBUFLEN);
 
 	TextureHistoryIndex = ITXBUFLEN - 1;
 	if (txnam(name, sizeof(name))) {
@@ -4754,7 +4761,7 @@ void redtx() {
 			if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, 0)) {
 				if (!strcmp(sig, "txh")) {
 					if (ReadFile(handle, &TextureHistoryIndex, sizeof(int), &bytesRead, 0)) {
-						if (ReadFile(handle, &textureHistoryBuffer, sizeof(TXHSTBUF) * ITXBUFLEN, &historyBytesRead, 0)) {
+						if (ReadFile(handle, textureHistoryBuffer.data(), textureHistoryBuffer.size() * ITXBUFLEN, &historyBytesRead, 0)) {
 							for (ind = 0; ind < (historyBytesRead / sizeof(TXHSTBUF)); ind++) {
 								TextureHistory[ind].height = textureHistoryBuffer[ind].height;
 								TextureHistory[ind].width = textureHistoryBuffer[ind].width;

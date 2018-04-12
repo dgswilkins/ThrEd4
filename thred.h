@@ -687,8 +687,8 @@ enum {			//feather fill types
 
 //pcs file header structure
 typedef struct _pcsheader {
-	TCHAR			leadIn;
-	TCHAR			hoopType;
+	char			leadIn;
+	char			hoopType;
 	unsigned short	colorCount;
 	COLORREF		colors[16];
 	unsigned short	stitchCount;
@@ -696,7 +696,7 @@ typedef struct _pcsheader {
 
 //ini file structure
 typedef struct _iniFil {
-	TCHAR			defaultDirectory[180];	//default directory
+	char			defaultDirectory[180];	//default directory
 	COLORREF		stitchColors[16];		//colors
 	COLORREF		stitchPreferredColors[16];	//stitch preference colors
 	COLORREF		backgroundPreferredColors[16];	//background preference colors
@@ -716,15 +716,15 @@ typedef struct _iniFil {
 	unsigned		userFlagMap;			//bitmap for user variables
 	double			borderWidth;			//border width
 	unsigned		appliqueColor;			//applique color
-	TCHAR			prevNames[OLDNUM][_MAX_PATH];	//last file names
+	char			prevNames[OLDNUM][_MAX_PATH];	//last file names
 	double			snapLength;				//snap together length
 	double			starRatio;				//star ratio
 	double			spiralWrap;				//spiral wrap
 	COLORREF		bitmapBackgroundColors[16];	//bitmap background color preferences
 	double			buttonholeCornerLength;	//buttonhole fill corner length		
 	float			picotSpace;				//space between border picots
-	TCHAR			hoopType;				//hoop type
-	TCHAR			auxFileType;			//machine file type
+	char			hoopType;				//hoop type
+	char			auxFileType;			//machine file type
 	float			hoopSizeX;				//hoop x size
 	float			hoopSizeY;				//hoop y size
 	double			rotationAngle;			//rotation angle
@@ -759,7 +759,7 @@ typedef struct _iniFil {
 	float			featherRatio;			//feather ratio
 	float			featherMinStitchSize;	//feather floor
 	unsigned short	featherCount;			//feather fill psg granularity
-	TCHAR			p2cName[_MAX_PATH];		//pes2card file
+	char			p2cName[_MAX_PATH];		//pes2card file
 	float			underlayIndent;			//edge walk/underlay indent
 	float			underlayAngle;			//underlay angle
 	float			underlaySpacing;		//underlay spacing
@@ -779,7 +779,7 @@ typedef struct _iniFil {
 	unsigned short	daisyHeartCount;		//daisy heart count
 	unsigned short  textureEditorSize;		//texture editor pixels
 	float			clpspc;					//clipboard fill spacing
-	TCHAR			designerName[50];		//designer name
+	char			designerName[50];		//designer name
 }INIFILE;
 
 enum {
@@ -1158,41 +1158,41 @@ typedef struct _strex {				//thred v1.0 file header extension
 	float		hoopSizeX;			//hoop size x dimension
 	float		hoopSizeY;			//hoop size y dimension
 	float		stgran;				//stitches per millimeter
-	TCHAR		creatorName[50];	//name of the file creator
-	TCHAR		modifierName[50];	//name of last file modifier
-	TCHAR		auxFormat;			//auxillary file format
-	TCHAR		stres;				//reserved
+	char		creatorName[50];	//name of the file creator
+	char		modifierName[50];	//name of last file modifier
+	char		auxFormat;			//auxillary file format
+	char		stres;				//reserved
 	unsigned	texturePointCount;	//textured fill point count
-	TCHAR		res[RES_SIZE];		//reserved for expansion
+	char		res[RES_SIZE];		//reserved for expansion
 }STREX;
 
 typedef struct _dsthed {		//dst file header
-	TCHAR desched	[3];	// 0 0		description
-	TCHAR desc		[17];	// 3 3
-	TCHAR recshed	[3];	// 20 14	record count
-	TCHAR recs		[8];	// 23 17
-	TCHAR cohed		[3];	// 31 1F
-	TCHAR co		[4];	// 34 22
-	TCHAR xplushed	[3];	// 38 26	x+ size
-	TCHAR xplus		[6];	// 41 29
-	TCHAR xminhed	[3];	// 47 2F	x- size
-	TCHAR xmin		[6];	// 50 32
-	TCHAR yplushed	[3];	// 56 38
-	TCHAR yplus		[6];	// 59 3B	y+ size
-	TCHAR yminhed	[3];	// 65 41
-	TCHAR ymin		[6];	// 68 44	y- size
-	TCHAR axhed		[3];	// 74 4A
-	TCHAR ax		[7];	// 77 4D
-	TCHAR ayhed		[3];	// 84 54
-	TCHAR ay		[7];	// 87 57
-	TCHAR mxhed		[3];	// 94 5E
-	TCHAR mx		[7];	// 97 61
-	TCHAR myhed		[3];	// 104 68
-	TCHAR my		[7];	// 107 6B
-	TCHAR pdhed		[2];	// 114 72
-	TCHAR pd		[7];	// 116 74
-	TCHAR eof		[1];	// 123 7B
-	TCHAR res		[388];	// 124 7C
+	char desched	[3];	// 0 0		description
+	char desc		[17];	// 3 3
+	char recshed	[3];	// 20 14	record count
+	char recs		[8];	// 23 17
+	char cohed		[3];	// 31 1F
+	char co		[4];	// 34 22
+	char xplushed	[3];	// 38 26	x+ size
+	char xplus		[6];	// 41 29
+	char xminhed	[3];	// 47 2F	x- size
+	char xmin		[6];	// 50 32
+	char yplushed	[3];	// 56 38
+	char yplus		[6];	// 59 3B	y+ size
+	char yminhed	[3];	// 65 41
+	char ymin		[6];	// 68 44	y- size
+	char axhed		[3];	// 74 4A
+	char ax		[7];	// 77 4D
+	char ayhed		[3];	// 84 54
+	char ay		[7];	// 87 57
+	char mxhed		[3];	// 94 5E
+	char mx		[7];	// 97 61
+	char myhed		[3];	// 104 68
+	char my		[7];	// 107 6B
+	char pdhed		[2];	// 114 72
+	char pd		[7];	// 116 74
+	char eof		[1];	// 123 7B
+	char res		[388];	// 124 7C
 }DSTHED;
 
 //dst type masks
@@ -1356,7 +1356,7 @@ typedef struct _clpseg {
 	float			endLength;
 	unsigned		endIndex;
 	unsigned short	zsid;
-	TCHAR			dun;
+	char			dun;
 }CLPSEG;
 
 typedef struct _clipsort {
@@ -1381,23 +1381,23 @@ typedef struct _vclpx {
 #if PESACT
 
 typedef struct _pesled {
-	TCHAR			ver[8];
+	char			ver[8];
 	unsigned		pec;
 }PESLED;
 
 typedef struct _peshed {
-	TCHAR	led[8];
-	TCHAR	off[3];
-	TCHAR	m1[13];
-	TCHAR	ce[6];
-	TCHAR	m2[47];
+	char	led[8];
+	char	off[3];
+	char	m1[13];
+	char	ce[6];
+	char	m2[47];
 	short	xsiz;
 	short	ysiz;
-	TCHAR	m3[16];
-	TCHAR	cs[6];
-	TCHAR	m4[3];
-	TCHAR	scol;
-	TCHAR	m5[3];
+	char	m3[16];
+	char	cs[6];
+	char	m4[3];
+	char	scol;
+	char	m5[3];
 }PESHED;
 
 typedef struct _pestch {
@@ -1415,7 +1415,7 @@ typedef struct _trcpnt {
 // ToDo - Is this struct needed?
 typedef struct _txtmsg {
 	unsigned	cod;
-	TCHAR*		str;
+	char*		str;
 }TXTMSG;
 
 typedef struct _grdcod {
@@ -1796,9 +1796,9 @@ typedef struct _txtrct	{
 
 typedef struct _txhst	{
 	std::vector<TXPNT>	texturePoint;
-	float		height;
-	float		width;
-	float		spacing;
+	float		height = 0.0;
+	float		width = 0.0;
+	float		spacing = 0.0;
 }TXHST;
 
 typedef struct _txhstbuff {

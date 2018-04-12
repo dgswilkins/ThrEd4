@@ -5,13 +5,14 @@
 #include <stdio.h>
 #include <math.h>
 #include <float.h>
-#include <tchar.h>
 #include <bitset>
+#include <sstream>
 #include <CppCoreCheck\warnings.h>
 #pragma warning( push )  
 #pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #include <gsl/gsl>
 #include <boost/dynamic_bitset.hpp>
+# include <boost/endian/conversion.hpp>
 #pragma warning( pop )  
 
 #ifdef ALLOCFAILURE
@@ -119,7 +120,7 @@ extern	void			bholbrd ();
 extern	void			bord ();
 extern	void			boxsel ();
 extern	void			bsizpar ();
-extern	void			butxt (unsigned iButton, const TCHAR* buttonText);
+extern	void			butxt (unsigned iButton, const std::string &buttonText);
 extern	void			centir ();
 extern	void			chain ();
 extern	void			chan ();
@@ -136,7 +137,7 @@ extern	void			cntrx ();
 extern	void			col2frm ();
 extern	void			contfil ();
 extern	void			cpylayr (unsigned codedLayer);
-extern	void			crmsg (TCHAR* fileName);
+extern	void			crmsg (const char* fileName);
 extern	void			crop ();
 extern	void			dazdef ();
 extern	void			debean ();
@@ -204,7 +205,7 @@ extern	void			fethrf ();
 extern	void			filangl ();
 extern	void			filclpx ();
 extern	void			filhor ();
-extern	void			filnopn (unsigned code, TCHAR* fileName);
+extern	void			filnopn (unsigned code, const char* fileName);
 extern	void			filsat ();
 extern	void			filvrt ();
 extern	unsigned		find1st ();
@@ -249,8 +250,9 @@ extern	bool			istx (unsigned iForm);
 extern	void			join ();
 extern	void			lodchk ();
 extern	void			lodstr ();
+extern	inline int		loadString(std::string & sDest, unsigned stringID);
 extern	void			makspac (unsigned start, unsigned count);
-extern	void			maxtsiz (const TCHAR* string, POINT* textSize);
+extern	void			maxtsiz(const std::string &label, POINT &textSize);
 extern	void			maxwid (unsigned start, unsigned finish);
 extern	float			midl (float high, float low);
 extern	void			mdufrm ();
@@ -365,7 +367,7 @@ extern	void			setwlk ();
 extern	void			setwlkind ();
 extern	void			sfCor2px (fPOINT stitchPoint, POINT* screen);
 extern	void			sfuang ();
-extern	void			shoMsg (TCHAR* string);
+extern	void			shoMsg (const std::string &message);
 extern	void			shoseln (unsigned code0, unsigned code1);
 extern	void			shrnk ();
 extern	void			sidwnd (HWND wnd);
@@ -380,7 +382,7 @@ extern	void			strtchbox ();
 extern	void			tabmsg (unsigned code);
 extern	void			tglfrm ();
 extern	void			tomsg ();
-extern	void			tsizmsg (TCHAR* threadSizeText, double threadSize);
+extern	void			tsizmsg (char* threadSizeText, double threadSize);
 extern	void			tst ();
 extern	void			txdun ();
 extern	void			txof ();
@@ -423,7 +425,7 @@ extern	unsigned		FormIndex;
 extern	FRMHED			FormList[MAXFORMS];
 extern	POINT			FormControlPoints[10];
 extern	fPOINT			FormVertices[MAXITEMS];
-extern	TCHAR			HelpBuffer[HBUFSIZ];
+extern	char			HelpBuffer[HBUFSIZ];
 extern	double			HorizontalRatio;
 extern	fPOINT			InterleaveSequence[MAXITEMS];
 extern	double			LineSpacing;
@@ -445,11 +447,11 @@ extern	unsigned short	SelectedFormList[MAXFORMS];
 extern	POINT			SelectedFormsLine[9];
 extern	RECT			SelectedFormsRect;
 extern	POINT			SelectedPointsLine[9];
-extern	std::vector<unsigned>	*SelectedTexturePointsList; 
+extern	std::vector<unsigned>	*SelectedTexturePointsList;
 extern	double			SnapLength;
 extern	double			SpiralWrap;
-extern	TCHAR*			StringData;
-extern	TCHAR*			StringTable[STR_LEN];
+extern	char*			StringData;
+extern	std::vector<std::string>	StringTable;
 extern	double			StarRatio;
 extern	std::vector<TXPNT>	*TempTexturePoints;
 extern	TXTSCR			TextureScreen;
@@ -502,8 +504,8 @@ unsigned		GroupStartStitch;		//lower end of selected stitches
 unsigned		GroupEndStitch;			//higher end of selected stitches
 unsigned		PrevGroupStartStitch;	//lower end of previous selection
 unsigned		PrevGroupEndStitch;		//higher end of previous selection
-TCHAR			StitchEntryBuffer[5];	//stitch number entered by user
-TCHAR			SideWindowEntryBuffer[11];	//side window number for entering form data sheet numbers
+char			StitchEntryBuffer[5];	//stitch number entered by user
+char			SideWindowEntryBuffer[11];	//side window number for entering form data sheet numbers
 unsigned		BufferIndex = 0;		//pointer to the next number to be entered
 unsigned		BufferDigitCount;		//number of decimal digits in the number of stitches
 unsigned		LineIndex;				//line index for display routine
@@ -511,8 +513,8 @@ double			StitchWindowAspectRatio;	//aspect ratio of the stitch window
 double			MinStitchLength = MINSIZ * PFAFGRAN;	//minimum stitch size
 double			UserStitchLength = USESIZ * PFAFGRAN;	//user selected stitch size
 double			SmallStitchLength = SMALSIZ * PFAFGRAN;	//user can remove stitches smaller than this
-TCHAR*			PcdClipFormat = "PMust_Format";
-TCHAR*			ThrEdClipFormat = "threditor";
+char*			PcdClipFormat = "PMust_Format";
+char*			ThrEdClipFormat = "threditor";
 CLPSTCH*		ClipStitchData;			//for pcs clipboard data
 FORMCLIP*		ClipFormHeader;			//for thred form clipboard data
 FORMSCLIP*		ClipFormsHeader;		//multiple form clipboard header
@@ -538,7 +540,7 @@ unsigned		BitmapWidth;			//bitmap width
 unsigned		BitmapHeight;			//bitmap height
 dPOINT			BitmapSizeinStitches;	//bitmap end points in stitch points
 unsigned		BitmapColor = BITCOL;	//bitmap color
-TCHAR			MsgBuffer[MSGSIZ];		//for user messages
+char			MsgBuffer[MSGSIZ];		//for user messages
 unsigned		MsgIndex;				//pointer to the message buffer
 double			ShowStitchThreshold = SHOPNTS;	//show stitch grid below this zoom level
 double			ThreadSize30 = TSIZ30;	//#30 thread size
@@ -560,7 +562,7 @@ unsigned		FormMenuChoice = 0;		//data type for form data form numerical entry
 dPOINT			ZoomMarkPoint;			//stitch coordinates of the zoom mark
 unsigned		PreferenceIndex = 0;	//index to the active preference window
 unsigned		LRUMenuId[] = { FM_ONAM0,FM_ONAM1,FM_ONAM2,FM_ONAM3 };	//recently used file menu ID's
-TCHAR			VersionNames[OLDVER][_MAX_PATH];	//temporary storage for old file version names
+char			VersionNames[OLDVER][_MAX_PATH];	//temporary storage for old file version names
 unsigned		FileVersionIndex;		//points to old version to be read
 unsigned		ActiveLayer = 0;		//active layer
 unsigned		LayerIndex;				//active layer code
@@ -570,7 +572,7 @@ RANGE			SelectedRange;			//first and last stitch for min/max stitch select
 unsigned		NameOrder[50];			//designer name order table
 unsigned char	NameEncoder[128];		//designer name encoding
 unsigned char	NameDecoder[256];		//designer name decode
-TCHAR			DesignerName[50];		//designer name in clear
+char			DesignerName[50];		//designer name in clear
 HWND			FirstWin;				//first window not destroyed for exiting enumerate loop
 RANGE			SelectedFormsRange;		//range of selected forms
 unsigned		TmpFormIndex;			//saved form index
@@ -580,9 +582,9 @@ fPOINT			BalaradOffset;			//balarad offset
 unsigned		ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; //for checking if a fill is a clipboard fill
 unsigned		SideWindowLocation;		//side message window location
 POINT			SideWindowSize;			//size of the side message window
-TCHAR**			SideWindowsStrings;		//string array displayed in sidmsg
-TCHAR			ColorFileName[_MAX_PATH];	//.thw file name
-TCHAR			RGBFileName[_MAX_PATH];	//.rgb file name
+std::string		*SideWindowsStrings;		//string array displayed in sidmsg
+char			ColorFileName[_MAX_PATH];	//.thw file name
+char			RGBFileName[_MAX_PATH];	//.rgb file name
 dPOINT			CellSize;				//size of an MarkedStitchMap cell for drawing stitch boxes
 unsigned		DraggedColor;			//color being dragged
 FORMVERTICES	SelectedFormVertices;	//selected form vertices
@@ -593,7 +595,7 @@ unsigned		LastFormSelected;		//end point of selected range of forms
 
 #if	PESACT
 unsigned char*	PEScolors;				//pes colors
-TCHAR*			PESdata;				//pes card data buffer
+char*			PESdata;				//pes card data buffer
 fPOINT			PESstitchCenterOffset;	//offset for writing pes files
 PESTCH*			PESstitches;			//pes stitch buffer
 unsigned char	PESequivColors[16];		//pes equivalent colors
@@ -622,7 +624,7 @@ StateFlag		TraceRGBFlag[] = { StateFlag::TRCRED,StateFlag::TRCGRN,StateFlag::TRC
 unsigned		TraceRGBMask[] = { REDMSK,GRNMSK,BLUMSK };	//trace masks
 unsigned		TraceRGB[] = { BLUCOL,GRNCOL,REDCOL };	//trace colors
 unsigned		TraceAdjacentColors[9];	//separated colors for adjacent pixels
-TCHAR			TraceInputBuffer[4];	//for user input color numbers
+char			TraceInputBuffer[4];	//for user input color numbers
 unsigned		ColumnColor;			//trace color column
 POINT			BitmapPoint;			//a point on the bitmap
 
@@ -676,7 +678,7 @@ COLORREF		CustomBackgroundColor[16];
 CHOOSECOLOR		BitMapColorStruct;
 COLORREF		BitmapBackgroundColors[16];
 
-TCHAR			ThreadSize[16][2];		//user selected thread sizes
+char			ThreadSize[16][2];		//user selected thread sizes
 unsigned		ThreadSizePixels[16];	//thread sizes in pixels
 unsigned		ThreadSizeIndex[16];	//thread size indices
 
@@ -751,9 +753,9 @@ unsigned		Knots[MAXKNOTS];		//pointers to knots
 unsigned		KnotCount;				//number of knots in the design
 unsigned		KnotAttribute;			//knot stitch attribute
 fPOINT			KnotStep;				//knot stepSize
-TCHAR			KnotAtStartOrder[] = { 2,3,1,4,0 };		//knot spacings
-TCHAR			KnotAtEndOrder[] = { -2,-3,-1,-4,0 };	//reverse knot spacings
-TCHAR			KnotAtLastOrder[] = { 0,-4,-1,-3,-2 };	//reverse knot spacings
+char			KnotAtStartOrder[] = { 2,3,1,4,0 };		//knot spacings
+char			KnotAtEndOrder[] = { -2,-3,-1,-4,0 };	//reverse knot spacings
+char			KnotAtLastOrder[] = { 0,-4,-1,-3,-2 };	//reverse knot spacings
 fRECTANGLE		ClipRectAdjusted;		//rectangle for adjust range ends for clipboard fills
 HANDLE			BalaradFile;			//balarad file handle
 
@@ -765,7 +767,7 @@ fPOINT			SelectedPoint;			//for converting stitch coordinates
 										// to metric cordinates (mm)
 fPOINT			ZoomBoxOrigin;			//zoom box origin
 
-TCHAR*	LayerText[] = {
+std::string	LayerText[] = {
 	"0",
 	"1",
 	"2",
@@ -813,20 +815,20 @@ MENUITEMINFO filinfo = {
 	13,
 };
 
-const TCHAR		AllFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
-const TCHAR		BmpFilter[_MAX_PATH + 1] = "Microsoft (BMP)\0*.bmp\0";
-TCHAR			CustomFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0";
-TCHAR			WorkingFileName[_MAX_PATH + 1] = { 0 };
-TCHAR			ThrName[_MAX_PATH + 1];
-TCHAR			AuxName[_MAX_PATH + 1];
-TCHAR			GeName[_MAX_PATH + 1];
-TCHAR			DefaultDirectory[_MAX_PATH + 1] = "c:\\";
-TCHAR			DefaultBMPDirectory[_MAX_PATH + 1] = "c:\\";
-TCHAR			BalaradName0[_MAX_PATH + 1] = { 0 };	//balarad semaphore file
-TCHAR			BalaradName1[_MAX_PATH + 1] = { 0 };	//balarad data file
-TCHAR			BalaradName2[_MAX_PATH + 1];
-TCHAR			SearchName[_MAX_PATH + 1];
-TCHAR			HomeDirectory[_MAX_PATH + 1];			//directory from which thred was executed
+const char		AllFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
+const char		BmpFilter[_MAX_PATH + 1] = "Microsoft (BMP)\0*.bmp\0";
+char			CustomFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0";
+char			WorkingFileName[_MAX_PATH + 1] = { 0 };
+char			ThrName[_MAX_PATH + 1];
+char			AuxName[_MAX_PATH + 1];
+char			GeName[_MAX_PATH + 1];
+char			DefaultDirectory[_MAX_PATH + 1] = "c:\\";
+char			DefaultBMPDirectory[_MAX_PATH + 1] = "c:\\";
+char			BalaradName0[_MAX_PATH + 1] = { 0 };	//balarad semaphore file
+char			BalaradName1[_MAX_PATH + 1] = { 0 };	//balarad data file
+char			BalaradName2[_MAX_PATH + 1];
+char			SearchName[_MAX_PATH + 1];
+char			HomeDirectory[_MAX_PATH + 1];			//directory from which thred was executed
 HANDLE			FileHandle = 0;
 HANDLE			PCSFileHandle = 0;
 HANDLE			IniFileHandle = 0;
@@ -835,9 +837,9 @@ HANDLE			BitmapFileHandle;			//bitmap handle
 unsigned		FileSize;					//size of file
 unsigned long	BytesRead;					//bytes actually read from file
 unsigned		ColorChanges;				//number of color changes
-TCHAR			IniFileName[_MAX_PATH];		//.ini file name
-TCHAR			PCSBMPFileName[16];			//bitmap file name from pcs file
-TCHAR			UserBMPFileName[_MAX_PATH];	//bitmap file name from user load
+char			IniFileName[_MAX_PATH];		//.ini file name
+char			PCSBMPFileName[16];			//bitmap file name from pcs file
+char			UserBMPFileName[_MAX_PATH];	//bitmap file name from user load
 OPENFILENAME	OpenFileName = {
 	sizeof(OPENFILENAME),	//lStructsize
 	ThrEdWindow,			//hwndOwner 
@@ -864,8 +866,8 @@ std::vector<std::string>	*Thumbnails;		//vector of thumbnail names
 int					ThumbnailsSelected[4];	//indexes of thumbnails selected for display
 unsigned			ThumbnailDisplayCount;	//number of thumbnail file names selected for display
 unsigned			ThumbnailIndex;			//index into the thumbnail filname table
-TCHAR				ThumbnailSearchString[32];	//storage for the thumnail search string
-TCHAR				InsertedFileName[_MAX_PATH] = { 0 };	//insert file name
+char				ThumbnailSearchString[32];	//storage for the thumnail search string
+char				InsertedFileName[_MAX_PATH] = { 0 };	//insert file name
 unsigned			InsertedVertexIndex;	//saved float pointer for inserting files
 unsigned			InsertedFormIndex;		//saved form pointer for inserting files
 unsigned			InsertedStitchCount;	//saved stitch pointer for inserting files
@@ -995,8 +997,8 @@ POINT		RotationCenterPixels;		//center of pixel rotation
 unsigned	FormFirstStitchIndex;		//points to the first stitch in a form
 
 typedef struct _dstdat {
-	TCHAR	cor;
-	TCHAR	val;
+	char	cor;
+	char	val;
 }DSTDAT;
 
 #define XCOR 0
@@ -1613,6 +1615,7 @@ unsigned			FeatherFillTypes[] =		//feather fill types
 BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
 	UNREFERENCED_PARAMETER(lparam);
 
+	std::stringstream ss;
 	HWND hwnd = {};
 	switch (umsg) {
 	case WM_INITDIALOG:
@@ -1636,8 +1639,8 @@ BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noe
 			hwnd = GetDlgItem(hwndlg, IDC_DESED);
 			GetWindowText(hwnd, IniFile.designerName, 50);
 			EndDialog(hwndlg, 0);
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED], IniFile.designerName);
-			SetWindowText(ThrEdWindow, MsgBuffer);
+			ss << StringTable[STR_THRED] << IniFile.designerName;
+			SetWindowText(ThrEdWindow, ss.str().c_str());
 			return TRUE;
 		}
 	}
@@ -1786,7 +1789,7 @@ unsigned rsed() noexcept {
 	return (time.wSecond << 16) | time.wMilliseconds;
 }
 
-void ritfnam(const TCHAR* designerName) {
+void ritfnam(const char* designerName) {
 	if (designerName) {
 		unsigned		iName = 0;
 		unsigned char	tmpName[50] = { 0 };
@@ -1818,7 +1821,7 @@ void ritfnam(const TCHAR* designerName) {
 	}
 }
 
-void redfnam(TCHAR* designerName) noexcept {
+void redfnam(char* designerName) noexcept {
 	if (designerName) {
 		unsigned iName = 0;
 		unsigned char tmpName[50] = { 0 };
@@ -1933,8 +1936,12 @@ double unthrsh(unsigned level) noexcept {
 }
 
 void ritfcor(const fPOINT* point) {
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "x%.0f y%.0f", point->x / PFGRAN, point->y / PFGRAN);
-	butxt(HCOR, MsgBuffer);
+	std::stringstream ss;
+	ss.precision(0);
+	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+	ss << "x" << (point->x / PFGRAN) << " y" << (point->y / PFGRAN);
+	std::string txt(ss.str());
+	butxt(HCOR, txt);
 }
 
 void ritcor(const fPOINTATTR* pointAttribute) {
@@ -2016,7 +2023,7 @@ void deldu() {
 	unsigned iBuffer = 0;
 
 	for (iBuffer = 0; iBuffer < 16; iBuffer++) {
-			UndoBuffer->at(iBuffer).reset(nullptr);
+		UndoBuffer->at(iBuffer).reset(nullptr);
 	}
 	UndoBufferWriteIndex = 0;
 	StateMap.reset(StateFlag::BAKWRAP);
@@ -2126,10 +2133,10 @@ void redfils() {
 }
 
 void nunams() {
-	TCHAR*		iFileExtention = nullptr;
+	char*		iFileExtention = nullptr;
 	unsigned	iPrevious = 0;
 	unsigned	nameLength = 0;
-	TCHAR		swapName[_MAX_PATH] = { 0 };
+	char		swapName[_MAX_PATH] = { 0 };
 
 	_strlwr_s(WorkingFileName);
 	iFileExtention = strrchr(WorkingFileName, '.');
@@ -2381,7 +2388,6 @@ void lenfn(unsigned start, unsigned end) {
 	double		maxLength = 0;
 	double		minLength = 1e99;
 	double		length = 0.0;
-	TCHAR		buffer[50] = { 0 };
 
 	SmallestStitchIndex = 0; LargestStitchIndex = 0;
 	for (iStitch = start; iStitch < end; iStitch++) {
@@ -2395,10 +2401,19 @@ void lenfn(unsigned start, unsigned end) {
 			SmallestStitchIndex = iStitch;
 		}
 	}
-	sprintf_s(buffer, sizeof(buffer), "max %.2f", maxLength / PFGRAN);
-	butxt(HMAXLEN, buffer);
-	sprintf_s(buffer, sizeof(buffer), "min %.2f", minLength / PFGRAN);
-	butxt(HMINLEN, buffer);
+	std::stringstream ss;
+	ss.precision(2);
+	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+
+	//ToDo - Move strings to string table
+	ss << "max " << (maxLength / PFGRAN);
+	std::string txt = ss.str();
+	butxt(HMAXLEN, txt);
+	ss.clear();
+	ss.str("");
+	ss << "min " << (minLength / PFGRAN);
+	txt = ss.str();
+	butxt(HMINLEN, txt);
 }
 
 void frmcalc() {
@@ -2406,7 +2421,10 @@ void frmcalc() {
 	double		maxLength = 0;
 	double		minLength = 1e99;
 	double		length = 0.0;
-
+	std::stringstream ss;
+	ss.precision(2);
+	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+	std::string txt;
 	if (FormList[ClosestFormToCursor].fillType || FormList[ClosestFormToCursor].edgeType) {
 		code = ClosestFormToCursor << FRMSHFT;
 		for (iStitch = 0; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
@@ -2422,33 +2440,46 @@ void frmcalc() {
 				}
 			}
 		}
+		//ToDo - Move text to string table
 		if (fabs(maxLength < 10000)) {
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "max %.2f", maxLength / PFGRAN);
-			butxt(HMAXLEN, MsgBuffer);
+			ss << "max " << (maxLength / PFGRAN);
+			txt = ss.str();
+			butxt(HMAXLEN, txt);
 		}
 		if (fabs(minLength < 10000)) {
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "min %.2f", minLength / PFGRAN);
-			butxt(HMINLEN, MsgBuffer);
+			ss.clear();
+			ss.str("");
+			ss << "min " << (minLength / PFGRAN);
+			txt = ss.str();
+			butxt(HMINLEN, txt);
 		}
 	}
 	else {
-		butxt(HMAXLEN, "");
-		butxt(HMINLEN, "");
+		std::string blank("");
+		butxt(HMAXLEN, blank);
+		butxt(HMINLEN, blank);
 	}
 }
 
 void lenCalc() {
+	std::stringstream ss;
+	ss.precision(2);
+	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+	std::string txt;
+	std::string blank("");
+
 	if (StateMap.test(StateFlag::LENSRCH)) {
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", hypot(StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x, StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y) / PFGRAN);
-		butxt(HMINLEN, MsgBuffer);
-		msgstr(IDS_SRCH);
-		butxt(HMAXLEN, MsgBuffer);
+		ss << (hypot(StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x, StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y) / PFGRAN);
+		txt = ss.str();
+		butxt(HMINLEN, txt);
+		loadString(txt, IDS_SRCH);
+		butxt(HMAXLEN, txt);
 	}
 	else {
 		if (PCSHeader.stitchCount > 1) {
 			if (StateMap.test(StateFlag::FORMSEL)) {
 				frmcalc();
-				butxt(HCOR, "");
+				butxt(HCOR, blank);
 				return;
 			}
 			rngadj();
@@ -2458,8 +2489,8 @@ void lenCalc() {
 				lenfn(0, PCSHeader.stitchCount - 1);
 		}
 		else {
-			butxt(HMAXLEN, "");
-			butxt(HMINLEN, "");
+			butxt(HMAXLEN, blank);
+			butxt(HMINLEN, blank);
 		}
 	}
 }
@@ -2554,15 +2585,18 @@ void lensadj() {
 }
 
 void ritot(unsigned number) {
-	TCHAR	buffer[64] = { 0 };
+	std::stringstream ss;
+	ss.precision(2);
+	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+	std::string txt;
 
-	sprintf_s(buffer, sizeof(buffer), StringTable[STR_TOT], number);
-	BufferDigitCount = strlen(buffer);
-	butxt(HTOT, buffer);
+	ss << StringTable[STR_TOT] << number;
+	txt = ss.str();
+	BufferDigitCount = txt.size();
+	butxt(HTOT, txt);
 }
 
 void ritlayr() {
-	TCHAR buffer[12] = { 0 };
 	unsigned layer = 0xffffffff;
 
 	if (StateMap.test(StateFlag::SELBOX))
@@ -2571,12 +2605,19 @@ void ritlayr() {
 		if (StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::FRMPSEL))
 			layer = (FormList[ClosestFormToCursor].attribute&FRMLMSK) >> 1;
 	}
-	if (layer & 0xffff0000)
-		butxt(HLAYR, "");
+	if (layer & 0xffff0000) {
+		std::string blank("");
+		butxt(HLAYR, blank);
+	}
 	else {
-		sprintf_s(buffer, sizeof(buffer), StringTable[STR_LAYR], layer);
-		BufferDigitCount = strlen(buffer);
-		butxt(HLAYR, buffer);
+		std::stringstream ss;
+		ss.precision(2);
+		ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+		std::string txt;
+		ss << StringTable[STR_LAYR] << layer;
+		txt = ss.str();
+		BufferDigitCount = txt.size();
+		butxt(HLAYR, txt);
 	}
 }
 
@@ -2747,11 +2788,11 @@ void movins() {
 	}
 }
 
-void defNam(const TCHAR* fileName) {
+void defNam(const char* fileName) {
 	if (fileName) {
 		if (fileName[0]) {
 			strcpy_s(DefaultDirectory, fileName);
-			TCHAR* iLast = strrchr(DefaultDirectory, '\\');
+			char* iLast = strrchr(DefaultDirectory, '\\');
 			if (iLast) {
 				if (iLast - DefaultDirectory == 2)
 					iLast[1] = 0;
@@ -2765,7 +2806,7 @@ void defNam(const TCHAR* fileName) {
 void defbNam() {
 	if (UserBMPFileName[0]) {
 		strcpy_s(DefaultBMPDirectory, UserBMPFileName);
-		TCHAR* iLast = strrchr(DefaultBMPDirectory, '\\');
+		char* iLast = strrchr(DefaultBMPDirectory, '\\');
 		if (iLast) {
 			if (iLast - DefaultBMPDirectory == 2)
 				iLast[1] = 0;
@@ -2955,8 +2996,8 @@ void ritbal() {
 	BALHED			balaradHeader = {};
 	unsigned		iStitch = 0, iColor = 0, iOutput = 0, color = 0;
 	HANDLE			balaradFile = {};
-	TCHAR*			lastNameCharacter = nullptr;
-	TCHAR			outputName[_MAX_PATH] = { 0 };
+	char*			lastNameCharacter = nullptr;
+	char			outputName[_MAX_PATH] = { 0 };
 	unsigned long	bytesWritten = 0;
 
 	if (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount) {
@@ -3007,7 +3048,7 @@ void ritbal() {
 		WriteFile(balaradFile, &balaradStitch[0], iOutput * sizeof(BALSTCH), &bytesWritten, 0);
 		CloseHandle(balaradFile);
 		balaradFile = CreateFile(BalaradName1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
-		WriteFile(balaradFile, (TCHAR*)outputName, strlen(outputName) + 1, &bytesWritten, 0);
+		WriteFile(balaradFile, (char*)outputName, strlen(outputName) + 1, &bytesWritten, 0);
 		CloseHandle(balaradFile);
 	}
 	else {
@@ -3021,7 +3062,7 @@ void ritbal() {
 }
 
 void savmsg() noexcept {
-	TCHAR	buffer[HBUFSIZ];
+	char	buffer[HBUFSIZ];
 
 	LoadString(ThrEdInstance, IDS_SAVFIL, buffer, HBUFSIZ);
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buffer, ThrName);
@@ -3056,7 +3097,7 @@ void dun() {
 		}
 		else {
 			savmsg();
-			if (MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_CLOS], MB_YESNO) == IDYES)
+			if (MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_CLOS].c_str(), MB_YESNO) == IDYES)
 				save();
 			reldun();
 		}
@@ -3067,7 +3108,7 @@ void dun() {
 void dusid(unsigned entry) noexcept {
 	SideWindow[entry] = CreateWindow(
 		"STATIC",
-		SideWindowsStrings[entry],
+		SideWindowsStrings[entry].c_str(),
 		SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		3,
 		SideWindowLocation*SideWindowSize.y + 3,
@@ -3080,7 +3121,7 @@ void dusid(unsigned entry) noexcept {
 	SideWindowLocation++;
 }
 
-void sidmsg(HWND window, TCHAR** strings, unsigned entries) {
+void sidmsg(HWND window, std::string *strings, unsigned entries) {
 	if (strings) {
 		RECT		childListRect = {};
 		RECT		parentListRect = {};
@@ -3100,12 +3141,12 @@ void sidmsg(HWND window, TCHAR** strings, unsigned entries) {
 				else {
 					if (EdgeFillTypes[iEntry] == EDGECLIP || EdgeFillTypes[iEntry] == EDGEPICOT || EdgeFillTypes[iEntry] == EDGECLIPX) {
 						if (StateMap.test(StateFlag::WASPCDCLP))
-							maxtsiz(strings[iEntry], &SideWindowSize);
+							maxtsiz(strings[iEntry], SideWindowSize);
 						else
 							entryCount--;
 					}
 					else
-						maxtsiz(strings[iEntry], &SideWindowSize);
+						maxtsiz(strings[iEntry], SideWindowSize);
 				}
 			}
 			SideMessageWindow = CreateWindow(
@@ -3132,8 +3173,10 @@ void sidmsg(HWND window, TCHAR** strings, unsigned entries) {
 			}
 		}
 		else {
-			if (FormMenuChoice == LLAYR)
-				maxtsiz("0", &SideWindowSize);
+			if (FormMenuChoice == LLAYR) {
+				std::string zero = "0";
+				maxtsiz(zero, SideWindowSize);
+			}
 			else {
 				if (FormMenuChoice == LFTHTYP) {
 					entryCount = 5;
@@ -3144,7 +3187,7 @@ void sidmsg(HWND window, TCHAR** strings, unsigned entries) {
 					for (iEntry = 0; iEntry < entries; iEntry++) {
 						if ((1 << FillTypes[iEntry])&ClipTypeMap) {
 							if (StateMap.test(StateFlag::WASPCDCLP))
-								maxtsiz(strings[iEntry], &SideWindowSize);
+								maxtsiz(strings[iEntry], SideWindowSize);
 							else
 								entryCount--;
 						}
@@ -3152,7 +3195,7 @@ void sidmsg(HWND window, TCHAR** strings, unsigned entries) {
 							if (FillTypes[iEntry] == SelectedForm->fillType)
 								entryCount--;
 							else
-								maxtsiz(strings[iEntry], &SideWindowSize);
+								maxtsiz(strings[iEntry], SideWindowSize);
 						}
 					}
 				}
@@ -4293,8 +4336,11 @@ void bfil() {
 	InverseBackgroundColor = fswap(BackgroundColor);
 	BitmapFileHandle = CreateFile(UserBMPFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 	if (BitmapFileHandle == INVALID_HANDLE_VALUE) {
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Couldn't open bitmap file: %s\n", UserBMPFileName);
-		shoMsg(MsgBuffer);
+		std::string fmtstr;
+		loadString(fmtstr, IDS_UNOPEN);
+		std::stringstream ss;
+		ss << fmtstr << UserBMPFileName;
+		shoMsg(ss.str());
 		CloseHandle(BitmapFileHandle);
 		BitmapFileHandle = 0;
 		PCSBMPFileName[0] = 0;
@@ -4407,7 +4453,7 @@ inline unsigned dtrn(DSTREC* dpnt) noexcept {
 }
 
 bool colfil() {
-	TCHAR*	extentionLocation = nullptr;
+	char*	extentionLocation = nullptr;
 
 	strcpy_s(ColorFileName, WorkingFileName);
 	strcpy_s(RGBFileName, WorkingFileName);
@@ -4522,7 +4568,7 @@ void auxmen() {
 	switch (IniFile.auxFileType) {
 	case AUXDST:
 
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_AUXTXT], "DST");
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_AUXTXT].c_str(), "DST");
 		CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_UNCHECKED);
 		break;
@@ -4531,7 +4577,7 @@ void auxmen() {
 
 		CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_AUXTXT], "PCS");
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_AUXTXT].c_str(), "PCS");
 	}
 	SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
 	StateMap.set(StateFlag::DUMEN);
@@ -4539,7 +4585,7 @@ void auxmen() {
 
 #if PESACT
 
-unsigned tripl(TCHAR* dat) {
+unsigned tripl(char* dat) {
 	return (*static_cast<unsigned *>(static_cast<void *>(dat))) & 0xffffff;
 }
 
@@ -4599,13 +4645,13 @@ double dubl(unsigned char* pnt) {
 		add		ecx, eax
 		neg		ecx
 		jmp		short dubl2
-		dubl1 :
+dubl1 :
 		and		ecx, 0x7
-			shl		ecx, 8
-			add		ecx, ebx
-			dubl2 :
+		shl		ecx, 8
+		add		ecx, ebx
+dubl2 :
 		mov		tdat, ecx
-			fild	tdat
+		fild	tdat
 	}
 }
 #endif
@@ -4649,11 +4695,11 @@ void nuFil() {
 	unsigned	textureHistoryFlag = 0, pcsStitchCount = 0;
 	unsigned	iPCSstitch = 0, color = 0, iColor = 0;
 	unsigned	iColorChange = 0;
-	TCHAR*		fileExtention = nullptr;
-	TCHAR		firstCharacter = 0;
+	char*		fileExtention = nullptr;
+	char		firstCharacter = 0;
 	STRHED		thredHeader = {};
-	TCHAR		buffer[3] = { 0 };
-	TCHAR*		tnam = nullptr;
+	char		buffer[3] = { 0 };
+	char*		tnam = nullptr;
 	DSTHED		dstHeader = {};
 	long		totalBytesRead = 0;
 	fRECTANGLE	stitchRect = {};
@@ -4664,7 +4710,7 @@ void nuFil() {
 	unsigned char*	fileBuffer = nullptr;
 	unsigned		iActualPESstitches = 0, iPESstitch = 0;
 	PESHED*			pesHeader = nullptr;
-	TCHAR*			l_peschr = nullptr;
+	char*			l_peschr = nullptr;
 	unsigned		pecof = 0;
 	unsigned char*	pesColorCount = nullptr;
 	dPOINT			loc = {};
@@ -4827,7 +4873,7 @@ void nuFil() {
 						prtred();
 						return;
 					}
-					ReadFile(FileHandle, (TCHAR*)MsgBuffer, 16, &BytesRead, 0);
+					ReadFile(FileHandle, (char*)MsgBuffer, 16, &BytesRead, 0);
 					totalBytesRead += BytesRead;
 					if (BytesRead != 16) {
 						prtred();
@@ -4934,7 +4980,7 @@ void nuFil() {
 							}
 							PCSHeader.stitchCount = iStitch;
 							// Grab the bitmap filename
-							tnam = convert_ptr<TCHAR *>(&PCSDataBuffer[iPCSstitch]);
+							tnam = convert_ptr<char *>(&PCSDataBuffer[iPCSstitch]);
 							strcpy_s(PCSBMPFileName, tnam);
 							strcpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), "thr");
 							IniFile.auxFileType = AUXPCS;
@@ -4973,7 +5019,7 @@ void nuFil() {
 						fileBuffer = new unsigned char[MAXITEMS * 8];
 						ReadFile(FileHandle, fileBuffer, MAXITEMS * 8, &BytesRead, 0);
 						pesHeader = static_cast<PESHED *>(static_cast<void *>(fileBuffer));
-						l_peschr = static_cast<TCHAR *>(static_cast<void *>(pesHeader));
+						l_peschr = static_cast<char *>(static_cast<void *>(pesHeader));
 						if (strncmp(pesHeader->led, "#PES00", 6)) {
 							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Not a PES file: %s\n", WorkingFileName);
 							shoMsg(MsgBuffer);
@@ -5090,7 +5136,8 @@ void nuFil() {
 			StateMap.set(StateFlag::RESTCH);
 			nunams();
 			ritini();
-			butxt(HNUM, "");
+			std::string blank("");
+			butxt(HNUM, blank);
 			if (PCSHeader.stitchCount)
 				nuAct(StitchBuffer[0].attribute&COLMSK);
 			else
@@ -5098,7 +5145,7 @@ void nuFil() {
 			auxmen();
 		}
 		lenCalc();
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRDBY], WorkingFileName, DesignerName);
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRDBY].c_str(), WorkingFileName, DesignerName);
 		SetWindowText(ThrEdWindow, MsgBuffer);
 		CloseHandle(FileHandle);
 		StateMap.set(StateFlag::INIT);
@@ -5298,7 +5345,7 @@ void ritpcol(unsigned char colorIndex) {
 		add		ebx, PESstitches
 		xor		eax, eax
 		mov		al, colorIndex
-		mov		[ebx], eax
+		mov[ebx], eax
 	}
 }
 
@@ -5310,7 +5357,7 @@ unsigned pesnam() {
 		mov		edx, ebx
 peslup0:
 		mov		al, [ebx]
-		or		 al, al
+		or		al, al
 		je		short peslup1
 		cmp		al, '\\'
 		jne		short peslup0a
@@ -5373,7 +5420,7 @@ void rpcrd(float stitchDelta) {
 	}
 }
 
-void pecdat(TCHAR* buffer) {
+void pecdat(char* buffer) {
 	unsigned	iStitch = 0;
 	unsigned	color = StitchBuffer[0].attribute&COLMSK;
 	unsigned	iColor = 1;
@@ -5419,10 +5466,10 @@ void chk1col() {
 	}
 }
 
-bool chkattr(TCHAR* filename) {
+bool chkattr(char* filename) {
 	const unsigned	attributes = GetFileAttributes(filename);
 	unsigned		buttonPressed = 0;
-	TCHAR			drive[_MAX_PATH] = { 0 };
+	char			drive[_MAX_PATH] = { 0 };
 	DWORD			SectorsPerCluster = 0;
 	DWORD			BytesPerSector = 0;
 	DWORD			NumberOfFreeClusters = 0;
@@ -5431,8 +5478,8 @@ bool chkattr(TCHAR* filename) {
 	if (StateMap.testAndReset(StateFlag::NOTFREE))
 		return 1;
 	if (attributes&FILE_ATTRIBUTE_READONLY && attributes != 0xffffffff) {
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_OVRLOK], filename);
-		buttonPressed = MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_OVRIT], MB_YESNO);
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_OVRLOK].c_str(), filename);
+		buttonPressed = MessageBox(ThrEdWindow, MsgBuffer, StringTable[STR_OVRIT].c_str(), MB_YESNO);
 		if (buttonPressed == IDYES)
 			SetFileAttributes(filename, attributes&(0xffffffff ^ FILE_ATTRIBUTE_READONLY));
 		else
@@ -5456,7 +5503,7 @@ void sav() {
 	unsigned long	bytesWritten = 0;
 	double			fractionalPart = 0.0, integerPart = 0.0;
 	DSTHED			dstHeader = {};
-	TCHAR*			pchr = nullptr;
+	char*			pchr = nullptr;
 	unsigned		savcol = 0;
 
 #if PESACT
@@ -5508,11 +5555,11 @@ void sav() {
 		// There are always going to be more records in the DST format because color changes and jumps count as stitches
 		DSTRecords.reserve(PCSHeader.stitchCount + 128);
 		DSTOffsets DSTOffsetData = {};
-		std::vector<PCSTCH> PCSStitchBuffer; 
+		std::vector<PCSTCH> PCSStitchBuffer;
 		switch (IniFile.auxFileType) {
 		case AUXDST:
 			ritdst(DSTOffsetData, DSTRecords, saveStitches);
-			pchr = convert_ptr<TCHAR *>(&dstHeader);
+			pchr = convert_ptr<char *>(&dstHeader);
 			if (pchr) {
 				for (iHeader = 0; iHeader < sizeof(DSTHED); iHeader++)
 					pchr[iHeader] = ' ';
@@ -5558,7 +5605,7 @@ void sav() {
 #if PESACT
 
 		case AUXPES:
-			pchr = static_cast<TCHAR *>(static_cast<void *>(&pesHeader));
+			pchr = static_cast<char *>(static_cast<void *>(&pesHeader));
 			for (iHeader = 0; iHeader < sizeof(PESHED); iHeader++)
 				pchr[iHeader] = 0;
 			strncpy(pesHeader.led, "#PES0001", sizeof(pesHeader.led));
@@ -5622,13 +5669,13 @@ void sav() {
 			WriteFile(PCSFileHandle, PESstitches, OutputIndex * sizeof(PESTCH), &bytesWritten, 0);
 			delete[] PESstitches;
 			// ToDo - (PES) is there a better estimate for data size?
-			pchr = new TCHAR[MAXITEMS * 4];
+			pchr = new char[MAXITEMS * 4];
 			// ToDo - (PES) Add buffer parameter and remove use of BSequence in pesname
 			iHeader = pesnam();
 			while (iHeader < 512)
 				pchr[iHeader++] = ' ';
 			pchr[19] = 13;
-			pchr[48] = static_cast<TCHAR>(pesColorCount);
+			pchr[48] = static_cast<char>(pesColorCount);
 			pecdat(pchr);
 			upnt = static_cast<unsigned *>(static_cast<void *>(&pchr[514]));
 			*upnt = OutputIndex - 512;
@@ -5643,10 +5690,10 @@ void sav() {
 			*psiz = 480;
 			pesOffset = static_cast<unsigned *>(static_cast<void *>(psiz));
 			*pesOffset = 11534816;
-			//			pchr[527]=(TCHAR)0x0;
-			//			pchr[528]=(TCHAR)0x90;
-			//			pchr[529]=(TCHAR)0x0;
-			//			pchr[530]=(TCHAR)0x8f;
+			//			pchr[527]=(char)0x0;
+			//			pchr[528]=(char)0x90;
+			//			pchr[529]=(char)0x0;
+			//			pchr[530]=(char)0x8f;
 			pchr[527] = static_cast<TBYTE>(0x00);
 			pchr[528] = static_cast<TBYTE>(0x80);	//hor msb
 			pchr[529] = static_cast<TBYTE>(0x80);	//hor lsb
@@ -5720,7 +5767,7 @@ void sav() {
 #pragma warning(pop)
 
 void savAs() {
-	TCHAR*	pchr = nullptr;
+	char*	pchr = nullptr;
 
 	if (PCSHeader.stitchCount || FormIndex || *PCSBMPFileName) {
 		OpenFileName.nFilterIndex = 0;
@@ -5762,7 +5809,7 @@ void savAs() {
 }
 
 void save() {
-	TCHAR*	pchr = nullptr;
+	char*	pchr = nullptr;
 
 	if (WorkingFileName[0]) {
 		pchr = strrchr(WorkingFileName, '.');
@@ -6216,7 +6263,8 @@ void unthum() {
 			butxt(HUPTO, StringTable[STR_UPON]);
 		else
 			butxt(HUPTO, StringTable[STR_UPOF]);
-		butxt(HNUM, "");
+		std::string blank("");
+		butxt(HNUM, blank);
 		redraw(ButtonWin[HHID]);
 		butxt(HBOXSEL, StringTable[STR_BOXSEL]);
 	}
@@ -6670,6 +6718,9 @@ void nuAct(unsigned iStitch) noexcept {
 
 void newFil() {
 	unsigned	iColor = 0;
+	std::stringstream ss;
+	ss.precision(2);
+	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
 
 	StateMap.reset(StateFlag::CMPDO);
 	if (PCSBMPFileName[0]) {
@@ -6677,10 +6728,10 @@ void newFil() {
 		DeleteObject(BitmapFileHandle);
 		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED], IniFile.designerName);
+	ss << StringTable[STR_THRED] << IniFile.designerName;
 	deldu();
-	SetWindowText(ThrEdWindow, MsgBuffer);
-	strcpy_s(ThrName, StringTable[STR_NUFIL]);
+	SetWindowText(ThrEdWindow, ss.str().c_str());
+	strcpy_s(ThrName, StringTable[STR_NUFIL].c_str());
 	ritfnam(IniFile.designerName);
 	strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
 	rstdu();
@@ -7860,7 +7911,7 @@ void mvstch(unsigned destination, unsigned source) noexcept {
 	StitchBuffer[destination] = StitchBuffer[source];
 }
 
-void ofstch(unsigned iSource, TCHAR offset) noexcept {
+void ofstch(unsigned iSource, char offset) noexcept {
 	StitchBuffer[OutputIndex].x = StitchBuffer[iSource].x + KnotStep.x*offset;
 	StitchBuffer[OutputIndex].y = StitchBuffer[iSource].y + KnotStep.y*offset;
 	StitchBuffer[OutputIndex++].attribute = KnotAttribute;
@@ -7870,7 +7921,7 @@ void endknt(unsigned finish) {
 	double		length = 0.0;
 	dPOINT		delta = {};
 	unsigned	iStart = finish - 1, iKnot = 0;
-	TCHAR*		knots = nullptr;
+	char*		knots = nullptr;
 
 	KnotAttribute = StitchBuffer[iStart].attribute | KNOTMSK;
 	do {
@@ -8060,7 +8111,7 @@ void setknots() {
 }
 
 void lodbmp() {
-	TCHAR*	filename = nullptr;
+	char*	filename = nullptr;
 
 	if (PCSBMPFileName[0]) {
 		DeleteObject(BitmapFileHandle);
@@ -8177,7 +8228,7 @@ void stchout() {
 		drwlstch(PCSHeader.stitchCount - 1);
 }
 
-unsigned duth(const TCHAR* name) noexcept {
+unsigned duth(const char* name) noexcept {
 	// ToDo - Can I use strrchr here?
 	if (name) {
 		unsigned	iLast = strlen(name);
@@ -8192,7 +8243,7 @@ unsigned duth(const TCHAR* name) noexcept {
 	return 0;
 }
 
-void duver(TCHAR* name) noexcept {
+void duver(char* name) noexcept {
 	if (name) {
 		const unsigned	lastChar = duth(name);
 		int			version = 0;
@@ -8323,7 +8374,7 @@ void thrsav() {
 	unsigned long	bytesWritten = 0;
 	WIN32_FIND_DATA	fileData = {};
 	HANDLE			file = {};
-	TCHAR			newFileName[_MAX_PATH] = { 0 };
+	char			newFileName[_MAX_PATH] = { 0 };
 	unsigned		count = 0;
 
 	if (chkattr(WorkingFileName))
@@ -8463,8 +8514,9 @@ void deltot() {
 	coltab();
 	zumhom();
 	strcpy_s(DesignerName, IniFile.designerName);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRDBY], ThrName, DesignerName);
-	SetWindowText(ThrEdWindow, MsgBuffer);
+	std::stringstream ss;
+	ss << StringTable[STR_THRDBY] << ThrName << DesignerName;
+	SetWindowText(ThrEdWindow, ss.str().c_str());
 }
 
 bool wastch() noexcept {
@@ -8853,7 +8905,7 @@ void getbak() {
 			}
 			else {
 				strcpy_s(WorkingFileName, DefaultDirectory);
-				TCHAR* pchr = &WorkingFileName[strlen(WorkingFileName) - 1];
+				char* pchr = &WorkingFileName[strlen(WorkingFileName) - 1];
 				if (pchr) {
 					if (pchr[0] != '\\') {
 						pchr[1] = '\\';
@@ -8872,8 +8924,8 @@ void getbak() {
 
 void rebak() {
 	unsigned	iVersion = 0;
-	TCHAR		newFileName[_MAX_PATH] = { 0 };
-	TCHAR		safetyFileName[_MAX_PATH] = { 0 };
+	char		newFileName[_MAX_PATH] = { 0 };
+	char		safetyFileName[_MAX_PATH] = { 0 };
 
 	for (iVersion = 0; iVersion < OLDVER; iVersion++)
 		DestroyWindow(BackupViewer[iVersion]);
@@ -8899,9 +8951,9 @@ void thumbak() {
 	getbak();
 }
 
-void movbak(TCHAR source, TCHAR destination) noexcept {
-	TCHAR		sourceFileName[_MAX_PATH] = { 0 };
-	TCHAR		destinationFileName[_MAX_PATH] = { 0 };
+void movbak(char source, char destination) noexcept {
+	char		sourceFileName[_MAX_PATH] = { 0 };
+	char		destinationFileName[_MAX_PATH] = { 0 };
 	unsigned	lastChar = duth(ThrName);
 
 	strcpy_s(sourceFileName, ThrName);
@@ -8913,14 +8965,14 @@ void movbak(TCHAR source, TCHAR destination) noexcept {
 }
 
 void purg() {
-	TCHAR		fileName[_MAX_PATH] = { 0 };
+	char		fileName[_MAX_PATH] = { 0 };
 	unsigned	lastChar = 0, iLast = 0;
 
 	if (FileHandle) {
 		strcpy_s(fileName, ThrName);
 		lastChar = duth(fileName);
 		for (iLast = 1; iLast < 6; iLast++) {
-			fileName[lastChar] = gsl::narrow<TCHAR>(iLast) + 'r';
+			fileName[lastChar] = gsl::narrow<char>(iLast) + 'r';
 			DeleteFile(fileName);
 		}
 	}
@@ -8935,18 +8987,18 @@ void purgdir() {
 
 void deldir() {
 	unsigned		iLastChar = 0;
-	TCHAR			fileName[_MAX_PATH] = { 0 };
+	char			fileName[_MAX_PATH] = { 0 };
 	WIN32_FIND_DATA	findFileData = {};
 	HANDLE			file = {};
 
 	unmsg();
 	tabmsg(IDS_BAKDEL);
 	strcpy_s(fileName, DefaultDirectory);
-	TCHAR* fileSpec = &fileName[strlen(fileName)];
+	char* fileSpec = &fileName[strlen(fileName)];
 	if (fileSpec) {
 		strcpy_s(fileSpec, sizeof(fileName) - (fileSpec - fileName), "\\*.th0");
 		for (iLastChar = 1; iLastChar < 6; iLastChar++) {
-			fileSpec[5] = gsl::narrow<TCHAR>(iLastChar) + 'r';
+			fileSpec[5] = gsl::narrow<char>(iLastChar) + 'r';
 			file = FindFirstFile(fileName, &findFileData);
 			if (file != INVALID_HANDLE_VALUE) {
 				DeleteFile(findFileData.cFileName);
@@ -9814,8 +9866,13 @@ void shorter() {
 				currentStitch = iStitch;
 			}
 		}
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y));
-		butxt(HMINLEN, MsgBuffer);
+		std::stringstream ss;
+		ss.precision(2);
+		ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+		std::string txt;
+		ss << hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
+		txt = ss.str();
+		butxt(HMINLEN, txt);
 	}
 	CurrentStitchIndex = currentStitch;
 	lensadj();
@@ -10022,14 +10079,14 @@ void chkhup() {
 
 int strcomp(const void *arg1, const void *arg2) noexcept {
 	if (arg1 && arg2) {
-		return _stricmp(*static_cast<TCHAR * const *>(arg1), *static_cast<TCHAR * const *>(arg2));
+		return _stricmp(*static_cast<char * const *>(arg1), *static_cast<char * const *>(arg2));
 	}
 	return 0;
 }
 
 void barnam(HWND window, unsigned iThumbnail) {
-	TCHAR		buffer[_MAX_PATH] = { 0 };
-	TCHAR*		lastCharacter = nullptr;
+	char		buffer[_MAX_PATH] = { 0 };
+	char*		lastCharacter = nullptr;
 
 	if (iThumbnail < ThumbnailDisplayCount) {
 		strcpy_s(buffer, Thumbnails->at(ThumbnailsSelected[iThumbnail]).data());
@@ -10080,7 +10137,7 @@ void thumnail() {
 
 	SetCurrentDirectory(DefaultDirectory);
 	strcpy_s(SearchName, DefaultDirectory);
-	TCHAR* lastCharacter = &SearchName[strlen(SearchName) - 1];
+	char* lastCharacter = &SearchName[strlen(SearchName) - 1];
 	if (lastCharacter) {
 		if (lastCharacter[0] != '\\') {
 			lastCharacter[1] = '\\';
@@ -10114,7 +10171,8 @@ void thumnail() {
 		StateMap.set(StateFlag::THUMSHO);
 		ThumbnailSearchString[0] = 0;
 		SetWindowText(ButtonWin[HBOXSEL], "");
-		butxt(HBOXSEL, "");
+		std::string blank("");
+		butxt(HBOXSEL, blank);
 		vubak();
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -10179,7 +10237,7 @@ void nuthbak(unsigned count) {
 	}
 }
 
-void nuthum(TCHAR character) {
+void nuthum(char character) {
 	unsigned	iString;
 
 	iString = strlen(ThumbnailSearchString);
@@ -10187,7 +10245,8 @@ void nuthum(TCHAR character) {
 		StateMap.set(StateFlag::RESTCH);
 		ThumbnailSearchString[iString++] = character;
 		ThumbnailSearchString[iString] = 0;
-		butxt(HBOXSEL, ThumbnailSearchString);
+		std::string txt(ThumbnailSearchString);
+		butxt(HBOXSEL, txt);
 		ThumbnailIndex = 0;
 		nuthsel();
 	}
@@ -10201,7 +10260,8 @@ void bakthum() {
 		StateMap.set(StateFlag::RESTCH);
 		ThumbnailSearchString[--searchStringLength] = 0;
 		ThumbnailIndex = 0;
-		butxt(HBOXSEL, ThumbnailSearchString);
+		std::string txt(ThumbnailSearchString);
+		butxt(HBOXSEL, txt);
 		nuthsel();
 	}
 }
@@ -10232,8 +10292,8 @@ void insflin(POINT insertPoint) noexcept {
 	FormLines[2].y = FormLines[3].y = insertPoint.y + offset.y;
 }
 
-bool isthr(TCHAR* filename) {
-	TCHAR* lastCharacter;
+bool isthr(char* filename) {
+	char* lastCharacter;
 
 	lastCharacter = strrchr(filename, '.');
 	if (lastCharacter) {
@@ -10421,7 +10481,7 @@ void insfil() {
 								ExtendedHeader.creatorName[iName] = thredHeader.creatorName[iName];
 							}
 							redfnam(DesignerName);
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRDBY], ThrName, DesignerName);
+							sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRDBY].c_str(), ThrName, DesignerName);
 							SetWindowText(ThrEdWindow, MsgBuffer);
 						}
 					}
@@ -10662,7 +10722,7 @@ void frmrct(fRECTANGLE* rectangle) noexcept {
 void desiz() {
 	fRECTANGLE	rectangle = {};
 	FLOAT		xSize = 0.0, ySize = 0.0;
-	TCHAR*		message = MsgBuffer;
+	char*		message = MsgBuffer;
 	int			bufferRemaining = sizeof(MsgBuffer);
 
 	if (PCSHeader.stitchCount && message) {
@@ -10670,14 +10730,14 @@ void desiz() {
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
 		if ((rectangle.left < 0) || (rectangle.bottom < 0) || (rectangle.right > IniFile.hoopSizeX) || (rectangle.top > IniFile.hoopSizeY)) {
-			strcpy_s(MsgBuffer, StringTable[STR_STCHOUT]);
+			strcpy_s(MsgBuffer, StringTable[STR_STCHOUT].c_str());
 			message = &MsgBuffer[strlen(MsgBuffer)];
 			bufferRemaining -= strlen(MsgBuffer);
 		}
 #if LANG==ENG || LANG==HNG
 		if (message) {
 			bufferRemaining -= sprintf_s(message, bufferRemaining,
-				StringTable[STR_STCHS],
+				StringTable[STR_STCHS].c_str(),
 				PCSHeader.stitchCount,
 				xSize, xSize / 25.4,
 				ySize, ySize / 25.4);
@@ -10701,7 +10761,7 @@ void desiz() {
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
 		if (message) {
 #if LANG==ENG || LANG==HNG
-			bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable[STR_FORMS],
+			bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable[STR_FORMS].c_str(),
 				FormIndex,
 				xSize, xSize / 25.4,
 				ySize, ySize / 25.4);
@@ -10717,14 +10777,14 @@ void desiz() {
 		}
 	}
 	if (message) {
-		bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable[STR_HUPWID],
+		bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable[STR_HUPWID].c_str(),
 			IniFile.hoopSizeX / PFGRAN,
 			IniFile.hoopSizeY / PFGRAN);
 	}
 	message = &message[strlen(message)];
 	if (PCSHeader.stitchCount) {
 		if (message) {
-			bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable[STR_CREATBY],
+			bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable[STR_CREATBY].c_str(),
 				DesignerName,
 				ExtendedHeader.modifierName);
 		}
@@ -10755,7 +10815,7 @@ void sidhup() {
 	for (iHoop = 0; iHoop < HUPS; iHoop++) {
 		SideWindow[iHoop] = CreateWindow(
 			"STATIC",
-			StringTable[iHoop + STR_HUP0],
+			StringTable[iHoop + STR_HUP0].c_str(),
 			SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 			3,
 			ButtonHeight*iHoop + 3,
@@ -11008,7 +11068,7 @@ void rotmrk() {
 void segentr() {
 	if (!RotationAngle)
 		RotationAngle = PI / 180;
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_ENTROT], 2 * PI / RotationAngle);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_ENTROT].c_str(), 2 * PI / RotationAngle);
 	shoMsg(MsgBuffer);
 	StateMap.set(StateFlag::NUMIN);
 	numWnd();
@@ -11456,8 +11516,8 @@ void ritlock(const WIN32_FIND_DATA* fileData, unsigned fileIndex, HWND hwndlg) n
 BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	FINDINFO	*fileInfo = nullptr;
 	HANDLE		searchResult = {};
-	TCHAR		searchName[_MAX_PATH] = { 0 };
-	TCHAR		fileName[_MAX_PATH] = { 0 };
+	char		searchName[_MAX_PATH] = { 0 };
+	char		fileName[_MAX_PATH] = { 0 };
 	unsigned	iFile = 0, fileError = 0;
 	HWND		lockHandle = {}, unlockHandle = {};
 
@@ -11648,7 +11708,8 @@ void trcstpnum() noexcept {
 
 void trcratnum() {
 	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "pnts: %.2f", -log10(IniFile.traceRatio - 1));
-	butxt(HLIN, MsgBuffer);
+	std::string txt(MsgBuffer);
+	butxt(HLIN, txt);
 }
 
 void clrhbut(unsigned startButton) noexcept {
@@ -12377,42 +12438,40 @@ void tracpar() {
 }
 
 //Check Translation
-static inline void difsub(unsigned *source, unsigned shift, unsigned *&destination) noexcept {
-	if (source && destination) {
-		*(destination++) = (*source >> (shift & 0x0f)) & 0xff;
-	}
+static inline void difsub(const unsigned source, unsigned shift, unsigned &destination) noexcept {
+		destination = (source >> (shift & 0x0f)) & 0xff;
 }
 
 void difbits(unsigned shift, unsigned* point) noexcept {
-	// ToDo - check translation
 	unsigned* testPoint = point;
-	unsigned *destination = TraceAdjacentColors;
 
-	difsub(testPoint, shift, destination);
+	if (testPoint) {
+		difsub(*testPoint, shift, TraceAdjacentColors[0]);
 
-	testPoint -= BitmapWidth;
-	difsub(testPoint, shift, destination);
+		testPoint -= BitmapWidth;
+		difsub(*testPoint, shift, TraceAdjacentColors[1]);
 
-	testPoint -= 1;
-	difsub(testPoint, shift, destination);
+		testPoint -= 1;
+		difsub(*testPoint, shift, TraceAdjacentColors[2]);
 
-	testPoint += 2;
-	difsub(testPoint, shift, destination);
+		testPoint += 2;
+		difsub(*testPoint, shift, TraceAdjacentColors[3]);
 
-	testPoint += BitmapWidth;
-	difsub(testPoint, shift, destination);
+		testPoint += BitmapWidth;
+		difsub(*testPoint, shift, TraceAdjacentColors[4]);
 
-	testPoint -= 2;
-	difsub(testPoint, shift, destination);
+		testPoint -= 2;
+		difsub(*testPoint, shift, TraceAdjacentColors[5]);
 
-	testPoint += BitmapWidth;
-	difsub(testPoint, shift, destination);
+		testPoint += BitmapWidth;
+		difsub(*testPoint, shift, TraceAdjacentColors[6]);
 
-	testPoint += 1;
-	difsub(testPoint, shift, destination);
+		testPoint += 1;
+		difsub(*testPoint, shift, TraceAdjacentColors[7]);
 
-	testPoint += 1;
-	difsub(testPoint, shift, destination);
+		testPoint += 1;
+		difsub(*testPoint, shift, TraceAdjacentColors[8]);
+	}
 }
 
 void blanklin(std::vector<unsigned> &differenceBitmap, unsigned lineStart) noexcept {
@@ -12489,8 +12548,9 @@ void delstch() {
 	rstAll();
 	clrfills();
 	ColorChanges = 0;
-	butxt(HNUM, "");
-	butxt(HTOT, "");
+	std::string blank("");
+	butxt(HNUM, blank);
+	butxt(HTOT, blank);
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -12504,7 +12564,7 @@ void chkbit() {
 void trcnum(unsigned shift, COLORREF color, unsigned iRGB) noexcept {
 	unsigned	bufferLength = 0;
 	unsigned	xPosition = 0;
-	TCHAR		buffer[11] = { 0 };
+	char		buffer[11] = { 0 };
 
 	color >>= shift;
 	color &= 0xff;
@@ -12739,7 +12799,7 @@ void delmap() {
 
 void closfn() {
 	deltot();
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED], IniFile.designerName);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED].c_str(), IniFile.designerName);
 	KnotCount = 0;
 	*WorkingFileName = 0;
 	PCSBMPFileName[0] = 0;
@@ -12858,7 +12918,7 @@ void nudgfn(float deltaX, float deltaY) {
 }
 
 void pixmsg(unsigned iString, unsigned pixelCount) {
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[iString], pixelCount);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[iString].c_str(), pixelCount);
 	shoMsg(MsgBuffer);
 }
 
@@ -13261,7 +13321,8 @@ void qcode() {
 		ClosestPointIndex = 0;
 		movbox();
 	}
-	butxt(HNUM, "");
+	std::string blank("");
+	butxt(HNUM, blank);
 	return;
 }
 
@@ -13276,8 +13337,8 @@ unsigned chkMsg() {
 	POINT			point = {};
 	RECT			windowRect = {};
 	SATCON*			guides = nullptr;
-	TCHAR			buffer[20] = { 0 };
-	TCHAR			threadSizeMap[] = { '3','4','6' };
+	char			buffer[20] = { 0 };
+	char			threadSizeMap[] = { '3','4','6' };
 	TXPNT*			textureDestination = nullptr;
 	TXPNT*			textureSource = nullptr;
 	unsigned		byteCount = 0, clipCount = 0, code = 0, currentClip = 0, currentGuide = 0, currentVertex = 0;
@@ -14015,10 +14076,13 @@ unsigned chkMsg() {
 					}
 					if (closfrm())
 						nufsel();
-					if (SelectedFormCount > 1)
-						butxt(HNUM, "");
-					else
+					if (SelectedFormCount > 1) {
+						std::string blank("");
+						butxt(HNUM, blank);
+					}
+					else {
 						ritnum(STR_NUMFORM, SelectedFormList[0] + 1);
+					}
 					return 1;
 				}
 				if (StateMap.test(StateFlag::FORMSEL)) {
@@ -14186,7 +14250,7 @@ unsigned chkMsg() {
 						IniFile.customHoopX = IniFile.hoopSizeX;
 						IniFile.customHoopY = IniFile.hoopSizeY;
 						StateMap.set(StateFlag::MSGOF);
-						sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_CUSTHUP], IniFile.hoopSizeX / PFGRAN, IniFile.hoopSizeY / PFGRAN);
+						sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_CUSTHUP].c_str(), IniFile.hoopSizeX / PFGRAN, IniFile.hoopSizeY / PFGRAN);
 						shoMsg(MsgBuffer);
 						break;
 
@@ -14315,7 +14379,7 @@ unsigned chkMsg() {
 				}
 				nufilcol(VerticalIndex);
 			} while (false);
-			MsgBuffer[0] = gsl::narrow<TCHAR>(VerticalIndex) + 0x30;
+			MsgBuffer[0] = gsl::narrow<char>(VerticalIndex) + 0x30;
 			MsgBuffer[1] = 0;
 			SetWindowText(ValueWindow[LBRDCOL], MsgBuffer);
 			unsid();
@@ -14364,23 +14428,23 @@ unsigned chkMsg() {
 			chknum();
 			if (Msg.hwnd == ValueWindow[PSQR]) {
 				if (UserFlagMap.testAndFlip(UserFlag::SQRFIL))
-					SetWindowText(ValueWindow[PSQR], StringTable[STR_PNTD]);
+					SetWindowText(ValueWindow[PSQR], StringTable[STR_PNTD].c_str());
 				else
-					SetWindowText(ValueWindow[PSQR], StringTable[STR_SQR]);
+					SetWindowText(ValueWindow[PSQR], StringTable[STR_SQR].c_str());
 				return 1;
 			}
 			if (Msg.hwnd == ValueWindow[PBLNT]) {
 				if (UserFlagMap.testAndFlip(UserFlag::BLUNT))
-					SetWindowText(ValueWindow[PBLNT], StringTable[STR_TAPR]);
+					SetWindowText(ValueWindow[PBLNT], StringTable[STR_TAPR].c_str());
 				else
-					SetWindowText(ValueWindow[PBLNT], StringTable[STR_BLUNT]);
+					SetWindowText(ValueWindow[PBLNT], StringTable[STR_BLUNT].c_str());
 				return 1;
 			}
 			if (Msg.hwnd == ValueWindow[PUND]) {
 				if (UserFlagMap.testAndFlip(UserFlag::DUND))
-					SetWindowText(ValueWindow[PUND], StringTable[STR_OFF]);
+					SetWindowText(ValueWindow[PUND], StringTable[STR_OFF].c_str());
 				else
-					SetWindowText(ValueWindow[PUND], StringTable[STR_ON]);
+					SetWindowText(ValueWindow[PUND], StringTable[STR_ON].c_str());
 				return 1;
 			}
 			if (Msg.hwnd == ValueWindow[PHUP]) {
@@ -15676,7 +15740,7 @@ unsigned chkMsg() {
 		}
 		if (chkMsgs(Msg.pt, ThreadSizeWin[0], ThreadSizeWin[15])) {
 			if (Msg.message == WM_LBUTTONDOWN) {
-				const TCHAR*	const str[] = { "30","40","60" };
+				const char*	const str[] = { "30","40","60" };
 
 				savdo();
 				ThreadSizeSelected = VerticalIndex;
@@ -15933,7 +15997,7 @@ unsigned chkMsg() {
 			}
 			if (dunum(code)) {
 				if (PreferenceIndex == PSHO + 1 || PreferenceIndex == PBOX + 1) {
-					MsgBuffer[0] = gsl::narrow<TCHAR>(NumericCode);
+					MsgBuffer[0] = gsl::narrow<char>(NumericCode);
 					MsgBuffer[1] = 0;
 					if (PreferenceIndex == PSHO + 1) {
 						ShowStitchThreshold = unthrsh(NumericCode - 0x30);
@@ -16058,7 +16122,8 @@ unsigned chkMsg() {
 		}
 		if (code == 8 && BufferIndex) {
 			StitchEntryBuffer[--BufferIndex] = 0;
-			butxt(HNUM, StitchEntryBuffer);
+			std::string txt(StitchEntryBuffer);
+			butxt(HNUM, txt);
 			ClosestPointIndex = atoi(StitchEntryBuffer);
 			movbox();
 			return 1;
@@ -16075,7 +16140,8 @@ unsigned chkMsg() {
 				sprintf_s(StitchEntryBuffer, sizeof(StitchEntryBuffer), "%d", PCSHeader.stitchCount - 1);
 				ClosestPointIndex = PCSHeader.stitchCount - 1;
 			}
-			butxt(HNUM, StitchEntryBuffer);
+			std::string txt(StitchEntryBuffer);
+			butxt(HNUM, txt);
 			movbox();
 			StateMap.reset(StateFlag::NUMIN);
 			return 1;
@@ -18365,14 +18431,14 @@ unsigned chkMsg() {
 }
 
 //return the width of a text item
-int txtWid(const TCHAR* string) noexcept {
+int txtWid(const char* string) noexcept {
 	GetTextExtentPoint32(ThredDC, string, strlen(string), &TextSize);
 	return TextSize.cx;
 }
 
 void makCol() noexcept {
 	unsigned	iColor = 0;
-	TCHAR		buffer[3] = { 0 };
+	char		buffer[3] = { 0 };
 
 	buffer[1] = '0';
 	buffer[2] = 0;
@@ -18420,8 +18486,8 @@ void makCol() noexcept {
 }
 
 void ritloc() {
-	TCHAR*	environment = nullptr;
-	TCHAR	lockFileName[_MAX_PATH] = { 0 };
+	char*	environment = nullptr;
+	char	lockFileName[_MAX_PATH] = { 0 };
 	HANDLE	lockFile = {};
 	DWORD	bytesWritten = 0;
 	size_t	length = 0;
@@ -18449,33 +18515,32 @@ void ritloc() {
 	strcpy_s(environment, sizeof(lockFileName) - (environment - lockFileName), "thredloc.txt");
 	lockFile = CreateFile(lockFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (lockFile != INVALID_HANDLE_VALUE) {
-		WriteFile(lockFile, (TCHAR*)HomeDirectory, strlen(HomeDirectory) + 1, &bytesWritten, 0);
+		WriteFile(lockFile, (char*)HomeDirectory, strlen(HomeDirectory) + 1, &bytesWritten, 0);
 		CloseHandle(lockFile);
 	}
 }
 
-static inline void delsubl(unsigned *&dst, unsigned val, unsigned cnt) noexcept {
+static inline void delsubl(unsigned *dst, unsigned val, unsigned cnt) noexcept {
 	if (dst) {
 		for (unsigned i = 0; i < cnt; i++) {
-			*(dst++) = _byteswap_ulong(val);
+			*(dst++) = boost::endian::endian_reverse(gsl::narrow<uint32_t>(val));
 			val <<= 1;
 		}
 	}
 }
-static inline void delsubr(unsigned *&dst, unsigned val, unsigned cnt) noexcept {
+static inline void delsubr(unsigned *dst, unsigned val, unsigned cnt) noexcept {
 	if (dst) {
 		for (unsigned i = 0; i < cnt; i++) {
-			*(dst++) = _byteswap_ulong(val);
-
+			*(dst++) = boost::endian::endian_reverse(gsl::narrow<uint32_t>(val));
 			val >>= 1;
 		}
 	}
 }
 
-static inline void delsubt(unsigned *&dst, unsigned *src, unsigned cnt) noexcept {
+static inline void delsubt(unsigned *dst, unsigned *src, unsigned cnt) noexcept {
 	if (dst && src) {
 		for (unsigned i = 0; i < cnt; i++) {
-			*(dst++) = _byteswap_ulong(*(src++));
+			*(dst++) = boost::endian::endian_reverse(gsl::narrow<uint32_t>(*(src++)));
 		}
 	}
 }
@@ -18609,7 +18674,7 @@ void dstcurs() noexcept {
 
 void duhom() {
 	unsigned	pathLength = 0;
-	TCHAR*		lastCharacter = nullptr;
+	char*		lastCharacter = nullptr;
 
 	strcpy_s(HomeDirectory, __argv[0]);
 	lastCharacter = strrchr(HomeDirectory, '\\');
@@ -18628,7 +18693,7 @@ void duhom() {
 void ducmd() {
 	unsigned long	bytesRead = 0;
 	int				iArgument = 0;
-	TCHAR*			balaradFileName = nullptr;
+	char*			balaradFileName = nullptr;
 
 	if (__argc > 1) {
 		strcpy_s(WorkingFileName, __argv[1]);
@@ -18653,7 +18718,7 @@ void ducmd() {
 						}
 					}
 				}
-				SetWindowText(ThrEdWindow, StringTable[STR_EMB]);
+				SetWindowText(ThrEdWindow, StringTable[STR_EMB].c_str());
 			}
 			*WorkingFileName = 0;
 			DeleteFile(BalaradName1);
@@ -18885,7 +18950,8 @@ void init() {
 	RECT			wrct = {};
 	HDC				deviceContext = GetDC(NULL);
 	const unsigned long	screenHalfWidth = (GetDeviceCaps(deviceContext, HORZRES)) >> 1;
-	TCHAR*			buttonText = nullptr;
+	std::string		blank("");
+	std::string		*buttonTxt = &blank;
 
 	ReleaseDC(NULL, deviceContext);
 	TextureIndex = 0;
@@ -18978,38 +19044,40 @@ void init() {
 		case HBOXSEL:
 
 			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-			buttonText = StringTable[STR_BOXSEL];
+			buttonTxt = &StringTable[STR_BOXSEL];
 			break;
 
 		case HUPTO:
 
 			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-			buttonText = StringTable[STR_UPOF];
+			buttonTxt = &StringTable[STR_UPOF];
 			break;
 
 		case HHID:
 
 			flag = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER;
-			buttonText = StringTable[STR_PIKOL];
+			buttonTxt = &StringTable[STR_PIKOL];
 			break;
 
 		default:
 
-			buttonText = "";
+			buttonTxt = &blank;
 			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
 		}
-		ButtonWin[iButton] = CreateWindow(
-			"STATIC",
-			buttonText,
-			flag,
-			0,
-			ButtonHeight*(16 + iButton),
-			ButtonWidthX3,
-			ButtonHeight,
-			ThrEdWindow,
-			NULL,
-			ThrEdInstance,
-			NULL);
+		if (buttonTxt) {
+			ButtonWin[iButton] = CreateWindow(
+				"STATIC",
+				buttonTxt->c_str(),
+				flag,
+				0,
+				ButtonHeight*(16 + iButton),
+				ButtonWidthX3,
+				ButtonHeight,
+				ThrEdWindow,
+				NULL,
+				ThrEdInstance,
+				NULL);
+		}
 	}
 	TraceStepWin = CreateWindow(
 
@@ -19088,7 +19156,7 @@ void init() {
 	PCSHeader.stitchCount = 0;
 	GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
 	ladj();
-	GetTextExtentPoint(StitchWindowMemDC, StringTable[STR_PIKOL], strlen(StringTable[STR_PIKOL]), &PickColorMsgSize);
+	GetTextExtentPoint(StitchWindowMemDC, StringTable[STR_PIKOL].c_str(), StringTable[STR_PIKOL].size(), &PickColorMsgSize);
 	auxmen();
 	fnamtabs();
 	ritfnam(IniFile.designerName);
@@ -19112,7 +19180,7 @@ void init() {
 	chkmen();
 	//check command line-should be last item in init
 	ducmd();
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED], IniFile.designerName);
+	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable[STR_THRED].c_str(), IniFile.designerName);
 	SetWindowText(ThrEdWindow, MsgBuffer);
 }
 
@@ -19575,8 +19643,10 @@ void drwStch() {
 		}
 		if (StateMap.test(StateFlag::FRMPSEL))
 			ritfcor(&FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
-		if (!StateMap.test(StateFlag::SELBOX) && !StateMap.test(StateFlag::FRMPSEL))
-			butxt(HCOR, "");
+		if (!StateMap.test(StateFlag::SELBOX) && !StateMap.test(StateFlag::FRMPSEL)) {
+			std::string blank("");
+			butxt(HCOR, blank);
+		}
 		if (StateMap.test(StateFlag::WASLIN))
 			relin();
 		if (StateMap.test(StateFlag::GRPSEL)) {
@@ -19686,7 +19756,7 @@ void dubar() {
 	}
 }
 
-void ritbak(const TCHAR* fileName, DRAWITEMSTRUCT* drawItem) {
+void ritbak(const char* fileName, DRAWITEMSTRUCT* drawItem) {
 	unsigned	iStitch = 0, iForm = 0, iVertexInForm = 0, iVertex = 0, iColor = 0, iLine = 0, bytesToRead = 0;
 	POINT		drawingDestinationSize = { (drawItem->rcItem.right - drawItem->rcItem.left),
 										   (drawItem->rcItem.bottom - drawItem->rcItem.top) };
@@ -19876,14 +19946,14 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 	unsigned	position = 0, iRGB = 0, iColor = 0, iThumb = 0, iVersion = 0, lastCharacter = 0;
 	unsigned	screenCenterOffset = 0;
 	SIZE		maxWindowDimension = {};
-	TCHAR		buffer[10] = { 0 };		//for integer to string conversion
+	char		buffer[10] = { 0 };		//for integer to string conversion
 	unsigned	length = 0;			//string length
 	SIZE		textSize = {};		//for measuring text items
 	POINT		scrollPoint = {};	//for scroll bar functions
 	POINT		line[2] = {};
 	long		adjustedWidth = 0;
 	double		tdub = 0.0;
-	TCHAR		fileName[_MAX_PATH] = { 0 };
+	char		fileName[_MAX_PATH] = { 0 };
 	RECT		traceHighMaskRect = {};		//high trace mask rectangle
 	RECT		traceMiddleMaskRect = {};	//middle trace mask rectangle
 	RECT		traceLowMaskRect = {};		//low trace mask rectangle
@@ -20118,7 +20188,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				TextOut(DrawItem->hDC, position, 1, HelpBuffer, strlen(HelpBuffer));;
 			}
 			else
-				TextOut(DrawItem->hDC, position, 1, StringTable[STR_PIKOL], strlen(StringTable[STR_PIKOL]));;
+				TextOut(DrawItem->hDC, position, 1, StringTable[STR_PIKOL].c_str(), StringTable[STR_PIKOL].size());;
 			return 1;
 		}
 		if (StateMap.test(StateFlag::WASTRAC)) {
@@ -20140,12 +20210,12 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				}
 				if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
 					TempBrush = BlackBrush;
-					strcpy_s(buffer, StringTable[STR_OFF]);
+					strcpy_s(buffer, StringTable[STR_OFF].c_str());
 					SetBkColor(DrawItem->hDC, 0);
 					SetTextColor(DrawItem->hDC, TraceRGB[iRGB]);
 					if (StateMap.test(TraceRGBFlag[iRGB])) {
 						TempBrush = TraceBrush[iRGB];
-						strcpy_s(buffer, StringTable[STR_ON]);
+						strcpy_s(buffer, StringTable[STR_ON].c_str());
 						SetTextColor(DrawItem->hDC, 0);
 						SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 					}
@@ -20209,7 +20279,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 					if (DrawItem->hwndItem == BackupViewer[iVersion]) {
 						strcpy_s(fileName, ThrName);
 						lastCharacter = duth(fileName);
-						fileName[lastCharacter] = gsl::narrow<TCHAR>(iVersion) + 's';
+						fileName[lastCharacter] = gsl::narrow<char>(iVersion) + 's';
 						ritbak(fileName, DrawItem);
 						return 1;
 					}
@@ -20391,8 +20461,8 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 	wc.hIconSm = NULL;
 
 	//to keep the compiler from complaining
-	hPrevInstance;
-	lpCmdLine;
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	if (RegisterClassEx(&wc)) {
 		boost::dynamic_bitset<> private_TracedMap(0);

@@ -723,13 +723,13 @@ BEGIN
     IDS_SELC                "You must select more than one form to center forms"
     IDS_NSEL                "Nothing to select"
     IDS_CONT                "A form must have at least five sides for the contour fill"
-    IDS_ROTA                "Please enter a rotate angle.\nThe current value is: %.2f"
+    IDS_ROTA                "Please enter a rotate angle.\nThe current value is: "
 END
 
 STRINGTABLE
 BEGIN
     IDS_FRM2                "A form must have more than two sides\nfor Convert to Satin Ribbon"
-    IDS_FRML                "Please enter a form number less than %d"
+    IDS_FRML                "Please enter a form number less than "
     IDS_FRM3                "Can't create a form with less than two points"
     IDS_STMAX               "Can't convert more than 12,000 stitches"
     IDS_FRMN1               "Form number too large"
@@ -841,17 +841,17 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_TOT                 "tot %d"
-    IDS_LAYR                "layer %d"
-    IDS_CREAT               "Couldn't create file %s"
+    IDS_TOT                 "tot "
+    IDS_LAYR                "layer "
+    IDS_CREAT               "Couldn't create file "
     IDS_FNOPNA              "Couldn't open file %s\nTry closing ThrEd and opening the file again"
     IDS_NOTVER              "This THR file is a newer version\nthan this copy of Thread can read.\nPlease download the latest version\nof ThrEd from Thredworks.com to read this file"
-    IDS_BADFIL              "Corrupted Thred file: %s"
+    IDS_BADFIL              "Corrupted Thred file: "
     IDS_ZEROL               "Zero length file: %s"
     IDS_OVRLOK              "%s is locked\nOverwrite anyway"
     IDS_OVRIT               "Overwrite locked file"
     IDS_FILROT              "File: %s was rotated"
-    IDS_THRED               "ThrEd: %s"
+    IDS_THRED               "ThrEd: "
     IDS_NUFIL               "nufil.thr"
     IDS_SIZ                 "Enter a new size for #%s thread\nThe current size is %.2f millimeters"
     IDS_EMB                 "Thred: Embird File Exchange"
@@ -952,7 +952,7 @@ BEGIN
     IDS_FRMINUS             "frm-"
     IDS_OKENT               "OK=Enter or `"
     IDS_CANCEL              "Cancel"
-    IDS_APCOL               "Applique color number has been set to %d"
+    IDS_APCOL               "Applique color number has been set to "
     IDS_FREH                "Free Hand"
     IDS_BLUNT               "Blunt"
 END
@@ -963,7 +963,7 @@ BEGIN
     IDS_PNTD                "Pointed"
     IDS_SQR                 "Square"
     IDS_DELST2              "Delete stitches too? (S to delete)"
-    IDS_NCOLCHG             "%d colors changed"
+    IDS_NCOLCHG             " colors changed"
     IDS_SAV                 "Save"
     IDS_DISC                "Discard"
     IDS_THRDBY              "Thred: %s by %s"
@@ -1018,15 +1018,15 @@ BEGIN
     IDS_P2CMSG              "Can't locate PES2Card Software.\nWould you like to browse for\nComputerservice file: LinkP2C.exe?\n"
     IDS_P2CTITL             "PES2Card Software Not Found"
     IDS_P2CNODAT            "No data to send to PES2Card"
-    IDS_CLPSPAC             "Enter clipboard fill spacing\ncurrently: %.2f"
+    IDS_CLPSPAC             "Enter clipboard fill spacing\ncurrently: "
     IDS_CHANSMAL            "Chain stitch length too large for form"
     IDS_FSTRT               "Fill Start"
     IDS_FEND                "Fill end"
     IDS_FORMP               "a form point"
-    IDS_WLKIND              "Edge walk/underlay indent\ncurrently %.2f"
-    IDS_WLKLEN              "Edge Walk/Underlay stitch length\ncurrently %.2f"
-    IDS_UANG                "Underlay angle\ncurrently %.2f"
-    IDS_USPAC               "Underlay spacing\ncurrently %.2f"
+    IDS_WLKIND              "Edge walk/underlay indent\ncurrently "
+    IDS_WLKLEN              "Edge Walk/Underlay stitch length\ncurrently "
+    IDS_UANG                "Underlay angle\ncurrently "
+    IDS_USPAC               "Underlay spacing\ncurrently "
     IDS_WALK                "Edge walk"
 END
 
@@ -1051,7 +1051,7 @@ BEGIN
     IDS_CWLK                "Center Walk"
     IDS_UCOL                "Underlay Color"
     IDS_SETULEN             "Underlay Stitch Length"
-    IDS_SRTER               "Color order error in form %d"
+    IDS_SRTER               "Color order error in form "
     IDS_SETUSPAC            "Underlay Spacing"
     IDS_SETUANG             "Underlay Angle"
     IDS_SETFLEN             "Stitch Length"
@@ -1094,6 +1094,7 @@ BEGIN
     IDS_NOTREP              " data not repaired in %d forms\n"
     IDS_DATREP              "Data Repaired"
     IDS_UNAM                "Uknown Designer"
+    IDS_UNOPEN              "Couldn't open bitmap file: "
 END
 
 #endif    // English (United States) resources
