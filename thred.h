@@ -1172,7 +1172,7 @@ typedef struct _dsthed {		//dst file header
 	char recshed	[3];	// 20 14	record count
 	char recs		[8];	// 23 17
 	char cohed		[3];	// 31 1F
-	char co		[4];	// 34 22
+	char co			[4];	// 34 22
 	char xplushed	[3];	// 38 26	x+ size
 	char xplus		[6];	// 41 29
 	char xminhed	[3];	// 47 2F	x- size
@@ -1182,15 +1182,15 @@ typedef struct _dsthed {		//dst file header
 	char yminhed	[3];	// 65 41
 	char ymin		[6];	// 68 44	y- size
 	char axhed		[3];	// 74 4A
-	char ax		[7];	// 77 4D
+	char ax			[7];	// 77 4D
 	char ayhed		[3];	// 84 54
-	char ay		[7];	// 87 57
+	char ay			[7];	// 87 57
 	char mxhed		[3];	// 94 5E
-	char mx		[7];	// 97 61
+	char mx			[7];	// 97 61
 	char myhed		[3];	// 104 68
-	char my		[7];	// 107 6B
+	char my			[7];	// 107 6B
 	char pdhed		[2];	// 114 72
-	char pd		[7];	// 116 74
+	char pd			[7];	// 116 74
 	char eof		[1];	// 123 7B
 	char res		[388];	// 124 7C
 }DSTHED;

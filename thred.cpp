@@ -799,22 +799,6 @@ long			BoxOffset[4];
 unsigned		VerticalIndex;		//vertical index of the color window, calculated from mouse click
 unsigned		ThreadSizeSelected;	//thread selected for size change
 
-//file open stuff
-
-MENUITEMINFO filinfo = {
-	sizeof(MENUITEMINFO),
-	MIIM_TYPE,
-	MFT_STRING,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	MsgBuffer,
-	13,
-};
-
 const char		AllFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
 const char		BmpFilter[_MAX_PATH + 1] = "Microsoft (BMP)\0*.bmp\0";
 char			CustomFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0";
@@ -4565,6 +4549,21 @@ bool chkdst(const DSTHED* dstHeader) noexcept {
 }
 
 void auxmen() {
+	MENUITEMINFO filinfo = {
+		sizeof(MENUITEMINFO),
+		MIIM_TYPE,
+		MFT_STRING,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		nullptr,  //dwTypeData
+		13,
+		0
+	};
+
 	switch (IniFile.auxFileType) {
 	case AUXDST:
 
@@ -4575,10 +4574,11 @@ void auxmen() {
 
 	default:
 
+		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_AUXTXT).c_str(), "PCS");
 		CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_AUXTXT).c_str(), "PCS");
 	}
+	filinfo.dwTypeData = MsgBuffer;
 	SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
 	StateMap.set(StateFlag::DUMEN);
 }
@@ -14266,15 +14266,15 @@ unsigned chkMsg() {
 						IniFile.hoopType = LARGHUP;
 						break;
 
-					case CUSTHUP:
-						IniFile.hoopSizeX = IniFile.customHoopX;
-						IniFile.hoopSizeY = IniFile.customHoopY;
-						IniFile.hoopType = CUSTHUP;
-						break;
-
 					case HUP100:
 						IniFile.hoopSizeX = HUP100XY;
 						IniFile.hoopSizeY = HUP100XY;
+						IniFile.hoopType = HUP100;
+						break;
+
+					case CUSTHUP:
+						IniFile.hoopSizeX = IniFile.customHoopX;
+						IniFile.hoopSizeY = IniFile.customHoopY;
 						IniFile.hoopType = CUSTHUP;
 						break;
 					}

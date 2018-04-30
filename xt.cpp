@@ -1973,10 +1973,10 @@ void duatf(unsigned ind) {
 	char			attributeBuffer[256] = { 0 };
 	const unsigned	attribute = StitchBuffer[ind].attribute;
 	ATFLD			attributeFields = { (attribute&COLMSK),
-										((attribute >> FRMSHFT)&FRMSK),
-										gsl::narrow<unsigned>(StitchTypes[dutyp(attribute)]),
-										((attribute >> LAYSHFT) & 7),
-										0 };
+					((attribute  & FRMSK) >> FRMSHFT),
+					gsl::narrow<unsigned>(StitchTypes[dutyp(attribute)]),
+					((attribute >> LAYSHFT) & 7),
+					0 };
 
 	if (attribute & 0x80000000)
 		attributeFields.user = 1;
