@@ -50,7 +50,7 @@ extern bool		isclp (unsigned find);
 extern bool		isclpx (unsigned find);
 extern bool		isfclp ();
 extern bool		istx (unsigned find);
-extern	inline int		loadString(std::string & sDest, unsigned stringID);
+extern	inline void		loadString(std::string & sDest, unsigned stringID);
 extern void		movStch ();
 extern void		mvflpnt (fPOINT* destination, const fPOINT* source, unsigned count);
 extern void		mvsatk (SATCON* destination, const SATCON* source, unsigned count);

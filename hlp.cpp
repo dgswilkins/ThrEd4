@@ -218,7 +218,7 @@ char*	RepairString;			//Repair Type
 
 char	HelpBuffer[HBUFSIZ];	//message formatting buffer
 
-inline int loadString(std::string & sDest, unsigned stringID) {
+inline void loadString(std::string & sDest, unsigned stringID) {
 	WCHAR sBuf[HBUFSIZ] = { 0 };
 	LPWSTR psBuf = sBuf;
 	sDest.clear();
@@ -226,7 +226,6 @@ inline int loadString(std::string & sDest, unsigned stringID) {
 		sDest.resize(++len);
 		sDest.resize(::LoadStringA(ThrEdInstance, stringID, &*sDest.begin(), len));
 	}
-	return sDest.length();
 }
 
 void adbad(unsigned code, unsigned count) noexcept {
@@ -321,10 +320,9 @@ void msgstr(unsigned code) noexcept {
 }
 
 void lodstr() {
-	unsigned int	count = 0, offset = 0;
+	unsigned int	count = 0;
 	for (auto iString = 0; iString < STR_LEN; iString++) {
-		count = loadString(StringTable->at(iString), LoadStringList[iString]);
-		offset += count;
+		loadString(StringTable->at(iString), LoadStringList[iString]);
 	}
 }
 

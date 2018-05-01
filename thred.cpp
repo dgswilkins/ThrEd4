@@ -250,7 +250,7 @@ extern	bool			istx (unsigned iForm);
 extern	void			join ();
 extern	void			lodchk ();
 extern	void			lodstr ();
-extern	inline int		loadString(std::string & sDest, unsigned stringID);
+extern	inline void		loadString(std::string & sDest, unsigned stringID);
 extern	void			makspac (unsigned start, unsigned count);
 extern	void			maxtsiz(const std::string &label, POINT &textSize);
 extern	void			maxwid (unsigned start, unsigned finish);
