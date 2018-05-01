@@ -6158,12 +6158,11 @@ void apliq() {
 }
 
 void setap() {
-	std::stringstream ss;
+	std::string fmtStr;
+	loadString(fmtStr, IDS_APCOL);
 
 	AppliqueColor = ActiveColor;
-	ss << StringTable->at(IDS_APCOL) << AppliqueColor + 1;
-	std::string txt = ss.str();
-	shoMsg(txt);
+	shoMsg(fmt::format(fmtStr, (AppliqueColor + 1)));
 }
 
 void maxtsiz(const std::string &label, POINT &textSize) noexcept {

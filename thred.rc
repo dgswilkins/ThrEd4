@@ -952,7 +952,7 @@ BEGIN
     IDS_FRMINUS             "frm-"
     IDS_OKENT               "OK=Enter or `"
     IDS_CANCEL              "Cancel"
-    IDS_APCOL               "Applique color number has been set to "
+    IDS_APCOL               "Applique color number has been set to {}"
     IDS_FREH                "Free Hand"
     IDS_BLUNT               "Blunt"
 END
