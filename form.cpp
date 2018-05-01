@@ -11906,9 +11906,9 @@ void col2frm() {
 			endColorOffset += 16;
 		}
 	}
-	std::stringstream ss;
-	ss << colorChangedCount << StringTable->at(IDS_NCOLCHG);
-	shoMsg(ss.str());
+	std::string fmtStr;
+	loadString(fmtStr, IDS_NCOLCHG);
+	shoMsg(fmt::format(fmtStr, colorChangedCount));
 }
 
 bool fxpnt(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) noexcept {

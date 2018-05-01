@@ -963,7 +963,7 @@ BEGIN
     IDS_PNTD                "Pointed"
     IDS_SQR                 "Square"
     IDS_DELST2              "Delete stitches too? (S to delete)"
-    IDS_NCOLCHG             " colors changed"
+    IDS_NCOLCHG             "{} colors changed"
     IDS_SAV                 "Save"
     IDS_DISC                "Discard"
     IDS_THRDBY              "Thred: %s by %s"
