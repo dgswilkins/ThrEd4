@@ -50,6 +50,7 @@ extern bool		isclp (unsigned find);
 extern bool		isclpx (unsigned find);
 extern bool		isfclp ();
 extern bool		istx (unsigned find);
+extern	inline int		loadString(std::string & sDest, unsigned stringID);
 extern void		movStch ();
 extern void		mvflpnt (fPOINT* destination, const fPOINT* source, unsigned count);
 extern void		mvsatk (SATCON* destination, const SATCON* source, unsigned count);
@@ -8839,12 +8840,10 @@ void rotpar() {
 }
 
 void rotentr() {
-	std::stringstream ss;
-	ss.precision(2);
-	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+	std::string fmtStr;
 
-	ss << StringTable->at(IDS_ROTA) << (RotationAngle / PI * 180);
-	shoMsg(ss.str());
+	loadString(fmtStr, IDS_ROTA);
+	shoMsg(fmt::format(fmtStr, (RotationAngle / PI * 180)));
 	StateMap.set(StateFlag::NUMIN);
 	numWnd();
 }

@@ -723,7 +723,7 @@ BEGIN
     IDS_SELC                "You must select more than one form to center forms"
     IDS_NSEL                "Nothing to select"
     IDS_CONT                "A form must have at least five sides for the contour fill"
-    IDS_ROTA                "Please enter a rotate angle.\nThe current value is: "
+    IDS_ROTA                "Please enter a rotate angle.\nThe current value is: {:.2f}"
 END
 
 STRINGTABLE
