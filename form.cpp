@@ -7177,10 +7177,7 @@ void sethup() noexcept {
 #if LANG==ENG || LANG==HNG
 
 void prfmsg() {
-	std::stringstream ss;
-	ss.precision(2);
-	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
-
+	std::string choice;
 	HDC		preferenceDC = {};
 	RECT	preferenceRect = {};
 
@@ -7225,130 +7222,47 @@ void prfmsg() {
 	LabelWindowCoords.right = 3 + LabelWindowSize.x;
 	ValueWindowCoords.left = 6 + LabelWindowSize.x;
 	ValueWindowCoords.right = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
-	ss << (AppliqueColor + 1);
-	prflin(ss.str(), STR_PRF10);
-	ss.clear();
-	ss.str("");
-	ss << (BorderWidth / PFGRAN);
-	prflin(ss.str(), STR_PRF3);
-	ss.clear();
-	ss.str("");
-	ss << (ButtonholeCornerLength / PFGRAN);
-	prflin(ss.str(), STR_PRF14);
-	ss.clear();
-	ss.str("");
-	ss << (IniFile.chainSpace / PFGRAN);
-	prflin(ss.str(), STR_PRF23);
-	ss.clear();
-	ss.str("");
-	ss << (IniFile.chainSpace / PFGRAN);
-	prflin(ss.str(), STR_PRF24);
-	ss.clear();
-	ss.str("");
-	ss << (IniFile.clipOffset / PFGRAN) << " mm";
-	prflin(ss.str(), STR_PRF21);
-	ss.clear();
-	ss.str("");
-	ss << IniFile.fillPhase;
-	prflin(ss.str(), STR_PRF22);
-	ss.clear();
-	ss.str("");
-	ss << IniFile.eggRatio;
-	prflin(ss.str(), STR_PRF26);
-	ss.clear();
-	ss.str("");
-	ss << (IniFile.fillAngle / PI * 180);
-	prflin(ss.str(), STR_PRF1);
-	ss.clear();
-	ss.str("");
+	prflin(fmt::format("{}",(AppliqueColor + 1)), STR_PRF10);
+	prflin(fmt::format("{:.2f}", (BorderWidth / PFGRAN)), STR_PRF3);
+	prflin(fmt::format("{:.2f}", (ButtonholeCornerLength / PFGRAN)), STR_PRF14);
+	prflin(fmt::format("{:.2f}", (IniFile.chainSpace / PFGRAN)), STR_PRF23);
+	prflin(fmt::format("{:.2f}", (IniFile.chainRatio)), STR_PRF24);
+	prflin(fmt::format("{:.2f} mm", (IniFile.clipOffset / PFGRAN)), STR_PRF21);
+	prflin(fmt::format("{}", (IniFile.fillPhase)), STR_PRF22);
+	prflin(fmt::format("{:.2f}", (IniFile.eggRatio)), STR_PRF26);
+	prflin(fmt::format("{:.2f}", (IniFile.fillAngle / PI * 180)), STR_PRF1);
 	if (UserFlagMap.test(UserFlag::SQRFIL))
-		ss << StringTable->at(STR_SQR);
+		choice = StringTable->at(STR_SQR);
 	else
-		ss << StringTable->at(STR_PNTD);
-	prflin(ss.str(), STR_PRF2);
-	ss.clear();
-	ss.str("");
-	ss << (LineSpacing / PFGRAN);
-	prflin(ss.str(), STR_PRF0);
-	ss.clear();
-	ss.str("");
-	ss << duthrsh(ShowStitchThreshold);
-	prflin(ss.str(), STR_PRF7);
-	ss.clear();
-	ss.str("");
-	ss << (IniFile.gridSize / PFGRAN) << " mm";
-	prflin(ss.str(), STR_PRF20);
+		choice = StringTable->at(STR_PNTD);
+	prflin(choice, STR_PRF2);
+	prflin(fmt::format("{:.2f}", (LineSpacing / PFGRAN)), STR_PRF0);
+	prflin(fmt::format("{}", (duthrsh(ShowStitchThreshold))), STR_PRF7);
+	prflin(fmt::format("{:.2f} mm", (IniFile.gridSize / PFGRAN)), STR_PRF20);
 	sethup();
-	ss.clear();
-	ss.str("");
-	ss << StringTable->at(STR_HUP0 + IniFile.hoopType - 1);
-	prflin(ss.str(), STR_PRF17);
-	ss.clear();
-	ss.str("");
-	ss << (IniFile.hoopSizeY / PFGRAN) << " mm";
-	prflin(ss.str(), STR_PRF27);
-	ss.clear();
-	ss.str("");
-	ss << (IniFile.hoopSizeX / PFGRAN) << " mm";
-	prflin(ss.str(), STR_PRF18);
-	ss.clear();
-	ss.str("");
-	ss << IniFile.cursorNudgeStep;
-	prflin(ss.str(), STR_PRF25);
-	ss.clear();
-	ss.str("");
-	ss << (PicotSpacing / PFGRAN);
-	prflin(ss.str(), STR_PRF16);
-	ss.clear();
-	ss.str("");
-	if (UserFlagMap.test(UserFlag::BLUNT)) {
-		ss << StringTable->at(STR_BLUNT);
-	}
-	else {
-		ss << StringTable->at(STR_TAPR);
-	}
-	prflin(ss.str(), STR_PRF15);
-	ss.clear();
-	ss.str("");
-	if (UserFlagMap.test(UserFlag::DUND)) {
-		ss << StringTable->at(STR_ON);
-	}
-	else {
-		ss << StringTable->at(STR_OFF);
-	}
-	prflin(ss.str(), STR_PRF19);
-	ss.clear();
-	ss.str("");
-	ss << SmallStitchLength / PFGRAN;
-	prflin(ss.str(), STR_PRF9);
-	ss.clear();
-	ss.str("");
-	ss << (SnapLength / PFGRAN);
-	prflin(ss.str(), STR_PRF11);
-	ss.clear();
-	ss.str("");
-	ss << SpiralWrap;
-	prflin(ss.str(), STR_PRF13);
-	ss.clear();
-	ss.str("");
-	ss << StarRatio;
-	prflin(ss.str(), STR_PRF12);
-	ss.clear();
-	ss.str("");
-	ss << duthrsh(StitchBoxesThreshold);
-	prflin(ss.str(), STR_PRF8);
-	ss.clear();
-	ss.str("");
-	ss << (IniFile.maxStitchLength / PFGRAN);
-	prflin(ss.str(), STR_PRF4);
-	ss.clear();
-	ss.str("");
-	ss << (UserStitchLength / PFGRAN);
-	prflin(ss.str(), STR_PRF5);
-	ss.clear();
-	ss.str("");
-	ss << MinStitchLength / PFGRAN;
-	prflin(ss.str(), STR_PRF6);
+	prflin(fmt::format("{}", StringTable->at(STR_HUP0 + IniFile.hoopType - 1)), STR_PRF17);
+	prflin(fmt::format("{:.0f} mm", (IniFile.hoopSizeY / PFGRAN)), STR_PRF27);
+	prflin(fmt::format("{:.0f} mm", (IniFile.hoopSizeX / PFGRAN)), STR_PRF18);
+	prflin(fmt::format("{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);
+	prflin(fmt::format("{:.2f}", (PicotSpacing / PFGRAN)), STR_PRF16);
+	if (UserFlagMap.test(UserFlag::BLUNT))
+		choice = StringTable->at(STR_BLUNT);
+	else
+		choice = StringTable->at(STR_TAPR);
+	prflin(choice, STR_PRF15);
+	if (UserFlagMap.test(UserFlag::DUND))
+		choice = StringTable->at(STR_ON);
+	else
+		choice = StringTable->at(STR_OFF);
+	prflin(choice, STR_PRF19);
+	prflin(fmt::format("{:.2f}", (SmallStitchLength / PFGRAN)), STR_PRF9);
+	prflin(fmt::format("{:.2f}", (SnapLength / PFGRAN)), STR_PRF11);
+	prflin(fmt::format("{:.2f}", (SpiralWrap)), STR_PRF13);
+	prflin(fmt::format("{:.2f}", (StarRatio)), STR_PRF12);
+	prflin(fmt::format("{}", (duthrsh(StitchBoxesThreshold))), STR_PRF8);
+	prflin(fmt::format("{:.2f}", (IniFile.maxStitchLength / PFGRAN)), STR_PRF4);
+	prflin(fmt::format("{:.2f}", (UserStitchLength / PFGRAN)), STR_PRF5);
+	prflin(fmt::format("{:.2f}", (MinStitchLength / PFGRAN)), STR_PRF6);
 	StateMap.set(StateFlag::PRFACT);
 	ReleaseDC(ThrEdWindow, preferenceDC);
 }
