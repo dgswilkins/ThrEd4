@@ -729,7 +729,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_FRM2                "A form must have more than two sides\nfor Convert to Satin Ribbon"
-    IDS_FRML                "Please enter a form number less than "
+    IDS_FRML                "Please enter a form number less than {}"
     IDS_FRM3                "Can't create a form with less than two points"
     IDS_STMAX               "Can't convert more than 12,000 stitches"
     IDS_FRMN1               "Form number too large"

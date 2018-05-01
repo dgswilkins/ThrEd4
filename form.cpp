@@ -10249,13 +10249,11 @@ void frmnumfn(unsigned newFormIndex) {
 }
 
 void frmnum() {
-	std::stringstream ss;
-	ss.precision(2);
-	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+	std::string fmtStr;
 
+	loadString(fmtStr, IDS_FRML);
 	if (FormIndex && StateMap.test(StateFlag::FORMSEL)) {
-		ss << StringTable->at(IDS_FRML) << FormIndex;
-		shoMsg(ss.str());
+		shoMsg(fmt::format(fmtStr, FormIndex));
 		StateMap.set(StateFlag::NUMIN);
 		StateMap.set(StateFlag::ENTRFNUM);
 		numWnd();
