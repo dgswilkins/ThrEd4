@@ -1919,12 +1919,7 @@ double unthrsh(unsigned level) noexcept {
 }
 
 void ritfcor(const fPOINT* point) {
-	std::stringstream ss;
-	ss.precision(0);
-	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
-	ss << "x" << (point->x / PFGRAN) << " y" << (point->y / PFGRAN);
-	std::string txt(ss.str());
-	butxt(HCOR, txt);
+	butxt(HCOR, fmt::format("x{:.0f} y{:.0f}", (point->x / PFGRAN), (point->y / PFGRAN)));
 }
 
 void ritcor(const fPOINTATTR* pointAttribute) {
