@@ -7,6 +7,7 @@
 #include <float.h>
 #include <bitset>
 #include <sstream>
+#include <fmt/format.h>
 #include <CppCoreCheck\warnings.h>
 #pragma warning( push )  
 #pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
@@ -1599,7 +1600,6 @@ unsigned			FeatherFillTypes[] =		//feather fill types
 BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
 	UNREFERENCED_PARAMETER(lparam);
 
-	std::stringstream ss;
 	HWND hwnd = {};
 	switch (umsg) {
 	case WM_INITDIALOG:
@@ -1623,8 +1623,7 @@ BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noe
 			hwnd = GetDlgItem(hwndlg, IDC_DESED);
 			GetWindowText(hwnd, IniFile.designerName, 50);
 			EndDialog(hwndlg, 0);
-			ss << StringTable->at(STR_THRED) << IniFile.designerName;
-			SetWindowText(ThrEdWindow, ss.str().c_str());
+			SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRED), IniFile.designerName).c_str());
 			return TRUE;
 		}
 	}
@@ -6718,9 +6717,6 @@ void nuAct(unsigned iStitch) noexcept {
 
 void newFil() {
 	unsigned	iColor = 0;
-	std::stringstream ss;
-	ss.precision(2);
-	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
 
 	StateMap.reset(StateFlag::CMPDO);
 	if (PCSBMPFileName[0]) {
@@ -6728,9 +6724,8 @@ void newFil() {
 		DeleteObject(BitmapFileHandle);
 		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
-	ss << StringTable->at(STR_THRED) << IniFile.designerName;
 	deldu();
-	SetWindowText(ThrEdWindow, ss.str().c_str());
+	SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRED), IniFile.designerName).c_str()); 
 	strcpy_s(ThrName, StringTable->at(STR_NUFIL).c_str());
 	ritfnam(IniFile.designerName);
 	strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
@@ -12799,13 +12794,12 @@ void delmap() {
 
 void closfn() {
 	deltot();
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_THRED).c_str(), IniFile.designerName);
 	KnotCount = 0;
 	*WorkingFileName = 0;
 	PCSBMPFileName[0] = 0;
 	deldu();
 	clrhbut(3);
-	SetWindowText(ThrEdWindow, MsgBuffer);
+	SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRED), IniFile.designerName).c_str());
 }
 
 void filclos() {
@@ -19180,8 +19174,7 @@ void init() {
 	chkmen();
 	//check command line-should be last item in init
 	ducmd();
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_THRED).c_str(), IniFile.designerName);
-	SetWindowText(ThrEdWindow, MsgBuffer);
+	SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRED), IniFile.designerName).c_str()); 
 }
 
 COLORREF defTxt(unsigned iColor) noexcept {

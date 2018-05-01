@@ -851,7 +851,7 @@ BEGIN
     IDS_OVRLOK              "%s is locked\nOverwrite anyway"
     IDS_OVRIT               "Overwrite locked file"
     IDS_FILROT              "File: %s was rotated"
-    IDS_THRED               "ThrEd: "
+    IDS_THRED               "ThrEd: {}"
     IDS_NUFIL               "nufil.thr"
     IDS_SIZ                 "Enter a new size for #%s thread\nThe current size is %.2f millimeters"
     IDS_EMB                 "Thred: Embird File Exchange"
