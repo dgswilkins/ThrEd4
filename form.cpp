@@ -7173,8 +7173,6 @@ void sethup() noexcept {
 	IniFile.hoopType = CUSTHUP;
 }
 
-#if LANG==ENG || LANG==HNG
-
 void prfmsg() {
 	std::string choice;
 	HDC		preferenceDC = {};
@@ -7195,9 +7193,6 @@ void prfmsg() {
 	maxtsiz(StringTable->at(STR_TAPR), ValueWindowSize);
 	LabelWindowSize.x = PreferenceWindowTextWidth;
 	LabelWindowSize.x += 4;
-#if LANG==HNG
-	LabelWindowSize.x += 10;
-#endif
 	DestroyWindow(PreferencesWindow);
 	PreferenceWindowWidth = LabelWindowSize.x + ValueWindowSize.x + 18;
 	PreferencesWindow = CreateWindow(
@@ -7265,122 +7260,6 @@ void prfmsg() {
 	StateMap.set(StateFlag::PRFACT);
 	ReleaseDC(ThrEdWindow, preferenceDC);
 }
-#endif
-
-#if LANG==GRM
-
-void prfmsg() {
-	HDC		preferenceDC;
-	RECT	preferenceRect;
-
-	if (StateMap.testAndReset(StateFlag::INSRT))
-		StateMap.set(StateFlag::WASRT);
-	StateMap.reset(StateFlag::BIGBOX);
-	SelectedFormCount = 0;
-	if (FormDataSheet) {
-		undat();
-		unsid();
-		FormMenuChoice = 0;
-	}
-	LabelWindowSize.x = LabelWindowSize.y = 0;
-	ValueWindowSize.x = ValueWindowSize.y = 0;
-	maxtsiz(StringTable->at(STR_PRF0 + 4), &LabelWindowSize);
-	maxtsiz(StringTable->at(STR_BLUNT), &ValueWindowSize);
-	LabelWindowSize.x = PreferenceWindowTextWidth;
-	ValueWindowSize.x += 4;
-	DestroyWindow(PreferencesWindow);
-	PreferenceWindowWidth = LabelWindowSize.x + ValueWindowSize.x + 18;
-	PreferencesWindow = CreateWindow(
-		"STATIC",
-		0,
-		WS_CHILD | WS_VISIBLE | WS_BORDER,
-		ButtonWidthX3 + 3,
-		3,
-		PreferenceWindowWidth,
-		LabelWindowSize.y*PRFLINS + 12,
-		ThrEdWindow,
-		NULL,
-		ThrEdInstance,
-		NULL);
-	preferenceDC = GetDC(PreferencesWindow);
-	GetClientRect(PreferencesWindow, &preferenceRect);
-	FillRect(preferenceDC, &preferenceRect, GetSysColorBrush(COLOR_WINDOW));
-	LabelWindowCoords.top = ValueWindowCoords.top = 3;
-	LabelWindowCoords.bottom = ValueWindowCoords.bottom = 3 + LabelWindowSize.y;
-	LabelWindowCoords.left = 3;
-	LabelWindowCoords.right = 3 + LabelWindowSize.x;
-	ValueWindowCoords.left = 6 + LabelWindowSize.x;
-	ValueWindowCoords.right = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", UserStitchLength / PFGRAN);
-	prflin(STR_PRF5);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.maxStitchLength / PFGRAN);
-	prflin(STR_PRF4);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", MinStitchLength / PFGRAN);
-	prflin(STR_PRF6);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SmallStitchLength / PFGRAN);
-	prflin(STR_PRF9);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.fillAngle / PI * 180);
-	prflin(STR_PRF1);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", StitchSpacing / PFGRAN);
-	prflin(STR_PRF0);
-	if (UserFlagMap.test(UserFlag::SQRFIL))
-		strcpy_s(MsgBuffer, StringTable->at(STR_SQR]);
-	else
-		strcpy_s(MsgBuffer, StringTable->at(STR_PNTD]);
-	prflin(STR_PRF2);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", BorderWidth / PFGRAN);
-	prflin(STR_PRF3);
-	if (UserFlagMap.test(UserFlag::BLUNT))
-		strcpy_s(MsgBuffer, StringTable->at(STR_BLUNT]);
-	else
-		strcpy_s(MsgBuffer, StringTable->at(STR_TAPR]);
-	prflin(STR_PRF15);
-	if (UserFlagMap.test(UserFlag::DUND))
-		strcpy_s(MsgBuffer, StringTable->at(STR_ON]);
-	else
-		strcpy_s(MsgBuffer, StringTable->at(STR_OFF]);
-	prflin(STR_PRF19);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", ButtonholeCornerLength / PFGRAN);
-	prflin(STR_PRF14);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.chainSpace / PFGRAN);
-	prflin(STR_PRF23);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.chainRatio);
-	prflin(STR_PRF24);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f mm", IniFile.clipOffset / PFGRAN);
-	prflin(STR_PRF21);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", IniFile.fillPhase);
-	prflin(STR_PRF22);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", PicotSpacing / PFGRAN);
-	prflin(STR_PRF16);
-	sethup();
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_HUP0 + IniFile.hoopType - 1]);
-	prflin(STR_PRF17);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.0f mm", IniFile.hoopSizeY / PFGRAN);
-	prflin(STR_PRF27);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.0f mm", IniFile.hoopSizeX / PFGRAN);
-	prflin(STR_PRF18);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f mm", IniFile.gridSize / PFGRAN);
-	prflin(STR_PRF20);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", duthrsh(ShowStitchThreshold));
-	prflin(STR_PRF7);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.cursorNudgeStep);
-	prflin(STR_PRF25);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SnapLength / PFGRAN);
-	prflin(STR_PRF11);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", duthrsh(StitchBoxesThreshold));
-	prflin(STR_PRF8);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.EggRatio);
-	prflin(STR_PRF26);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SpiralWrap);
-	prflin(STR_PRF13);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", StarRatio);
-	prflin(STR_PRF12);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", AppliqueColor + 1);
-	prflin(STR_PRF10);
-	StateMap.set(StateFlag::PRFACT);
-	ReleaseDC(ThrEdWindow, preferenceDC);
-}
-#endif
 
 void durpoli(unsigned vertexCount) {
 	double		stepAngle = 0.0;
