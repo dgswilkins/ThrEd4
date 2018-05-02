@@ -5,12 +5,11 @@
 #include <windows.h>
 #include <stdio.h>
 #include <math.h>
-#include <sstream>
 #include <CppCoreCheck\warnings.h>
-#include <fmt/format.h>
 #pragma warning( push )  
 #pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #include <gsl/gsl>
+#include <fmt/format.h>
 #pragma warning( pop )  
 
 #include "lang.h"

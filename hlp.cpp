@@ -2,8 +2,11 @@
 #include <stdio.h>
 #include <htmlhelp.h>
 #include <locale.h>
-#include <sstream>
+#include <CppCoreCheck\warnings.h>
+#pragma warning( push )  
+#pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #include <fmt/format.h>
+#pragma warning( pop )  
 
 #include "lang.h"
 #include "resource.h"

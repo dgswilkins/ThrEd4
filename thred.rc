@@ -1051,7 +1051,7 @@ BEGIN
     IDS_CWLK                "Center Walk"
     IDS_UCOL                "Underlay Color"
     IDS_SETULEN             "Underlay Stitch Length"
-    IDS_SRTER               "Color order error in form "
+    IDS_SRTER               "Color order error in form {}"
     IDS_SETUSPAC            "Underlay Spacing"
     IDS_SETUANG             "Underlay Angle"
     IDS_SETFLEN             "Stitch Length"

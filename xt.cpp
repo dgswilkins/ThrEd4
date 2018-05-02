@@ -4,12 +4,12 @@
 #include <windows.h>
 #include <stdio.h>
 #include <math.h>
-#include <sstream>
 #include <CppCoreCheck\warnings.h>
 #pragma warning( push )  
 #pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #include <gsl/gsl>
 #include <boost/dynamic_bitset.hpp>
+#include <fmt/format.h>
 #pragma warning( pop )  
 
 #include "lang.h"
@@ -142,6 +142,7 @@ extern	unsigned	getlast();
 extern	void		hsizmsg();
 extern	bool		isclp(unsigned iForm);
 extern	bool		iseclp(unsigned iForm);
+extern	inline void	loadString(std::string & sDest, unsigned stringID);
 extern	void		makspac(unsigned start, unsigned count);
 extern	void		mdufrm();
 extern	float		midl(float high, float low);
@@ -1934,10 +1935,9 @@ void fsort() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-		std::stringstream ss;
-		ss << StringTable->at(IDS_SRTER) << pFRecs[badForm]->form;
-		std::string str = ss.str();
-		shoMsg(str);
+		std::string str;
+		loadString(str, IDS_SRTER);
+		shoMsg(fmt::format(str, pFRecs[badForm]->form));
 	}
 }
 

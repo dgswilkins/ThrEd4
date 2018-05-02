@@ -6,14 +6,13 @@
 #include <math.h>
 #include <float.h>
 #include <bitset>
-#include <sstream>
-#include <fmt/format.h>
 #include <CppCoreCheck\warnings.h>
 #pragma warning( push )  
 #pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #include <gsl/gsl>
 #include <boost/dynamic_bitset.hpp>
 # include <boost/endian/conversion.hpp>
+#include <fmt/format.h>
 #pragma warning( pop )  
 
 #ifdef ALLOCFAILURE
@@ -2391,10 +2390,7 @@ void frmcalc() {
 	double		maxLength = 0;
 	double		minLength = 1e99;
 	double		length = 0.0;
-	std::stringstream ss;
-	ss.precision(2);
-	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
-	std::string txt;
+
 	if (FormList[ClosestFormToCursor].fillType || FormList[ClosestFormToCursor].edgeType) {
 		code = ClosestFormToCursor << FRMSHFT;
 		for (iStitch = 0; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
@@ -2433,7 +2429,7 @@ void lenCalc() {
 
 	if (StateMap.test(StateFlag::LENSRCH)) {
 		std::string txt;
-		float lenMax = (hypot(StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x, StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y) / PFGRAN);
+		const float lenMax = (hypot(StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x, StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y) / PFGRAN);
 		butxt(HMINLEN, fmt::format("{:.2f}", lenMax));
 		loadString(txt, IDS_SRCH);
 		butxt(HMAXLEN, txt);
@@ -9827,7 +9823,7 @@ void shorter() {
 				currentStitch = iStitch;
 			}
 		}
-		float minLength = hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
+		const float minLength = hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
 		butxt(HMINLEN, fmt::format("{:.2f}", minLength));
 	}
 	CurrentStitchIndex = currentStitch;
