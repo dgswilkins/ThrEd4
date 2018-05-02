@@ -396,6 +396,8 @@
 #define IDS_DATREP                      1101
 #define IDS_UNAM                        1102
 #define IDS_UNOPEN                      1103
+#define IDS_LENMAX                      1104
+#define IDS_LENMIN                      1105
 #define ID_FILE_OPEN1                   40002
 #define ID_VIEW_STCHBAK                 40003
 #define ID_EDIT_RESET_COL               40006

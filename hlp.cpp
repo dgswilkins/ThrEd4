@@ -3,6 +3,7 @@
 #include <htmlhelp.h>
 #include <locale.h>
 #include <sstream>
+#include <fmt/format.h>
 
 #include "lang.h"
 #include "resource.h"
@@ -245,49 +246,42 @@ void hsizmsg() {
 }
 
 void msgflt(unsigned messageId, float value) {
-	std::string str;
-	std::stringstream ss;
-	ss.precision(2);
-	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
-	loadString(str, messageId);
-	ss << str << value;
-	shoMsg(ss.str());
+	std::string fmtStr;
+
+	loadString(fmtStr, messageId);
+	shoMsg(fmt::format(fmtStr, value));
 	StateMap.set(StateFlag::NUMIN);
 	numWnd();
 }
 
 void tsizmsg(char* threadSizeText, double threadSize) {
-	char	buffer[HBUFSIZ];
-
-	LoadString(ThrEdInstance, IDS_SIZ, buffer, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, threadSizeText, threadSize);
-	shoMsg(HelpBuffer);
+	std::string fmtStr;
+	
+	loadString(fmtStr, IDS_SIZ);
+	shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
 	StateMap.set(StateFlag::NUMIN);
 	numWnd();
 }
 
 void bfilmsg() {
-	std::string str;
-	std::stringstream ss;
-	loadString(str, IDS_BADFIL);
-	ss << str << WorkingFileName;
-	shoMsg(ss.str());
+	std::string fmtStr;
+
+	loadString(fmtStr, IDS_BADFIL);
+	shoMsg(fmt::format(fmtStr, WorkingFileName));
 }
 
 void filnopn(unsigned code, const char* fileName) {
-	std::string str;
-	std::stringstream ss;
-	loadString(str, code);
-	ss << str << fileName;
-	shoMsg(ss.str());
+	std::string fmtStr;
+
+	loadString(fmtStr, code);
+	shoMsg(fmt::format(fmtStr, fileName));
 }
 
 void crmsg(const char* fileName) {
-	std::string str;
-	std::stringstream ss;
-	loadString(str, IDS_CREAT);
-	ss << str << fileName;
-	shoMsg(ss.str());
+	std::string fmtStr;
+
+	loadString(fmtStr, IDS_CREAT);
+	shoMsg(fmt::format(fmtStr, fileName));
 }
 
 void butxt(unsigned iButton, const std::string &buttonText) {
@@ -306,13 +300,7 @@ void butxt(unsigned iButton, const std::string &buttonText) {
 }
 
 void ritnum(unsigned code, unsigned value) {
-	std::stringstream ss;
-	ss.precision(2);
-	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
-	ss << StringTable->at(code) << value;
-	//ToDo - is there a better way to avoid the error?
-	std::string txt(ss.str());
-	butxt(HNUM, txt);
+	butxt(HNUM, fmt::format(StringTable->at(code), value));
 }
 
 void msgstr(unsigned code) noexcept {
@@ -320,7 +308,6 @@ void msgstr(unsigned code) noexcept {
 }
 
 void lodstr() {
-	unsigned int	count = 0;
 	for (auto iString = 0; iString < STR_LEN; iString++) {
 		loadString(StringTable->at(iString), LoadStringList[iString]);
 	}

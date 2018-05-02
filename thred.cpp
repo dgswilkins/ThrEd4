@@ -2379,19 +2379,11 @@ void lenfn(unsigned start, unsigned end) {
 			SmallestStitchIndex = iStitch;
 		}
 	}
-	std::stringstream ss;
-	ss.precision(2);
-	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
-
-	//ToDo - Move strings to string table
-	ss << "max " << (maxLength / PFGRAN);
-	std::string txt = ss.str();
-	butxt(HMAXLEN, txt);
-	ss.clear();
-	ss.str("");
-	ss << "min " << (minLength / PFGRAN);
-	txt = ss.str();
-	butxt(HMINLEN, txt);
+	std::string strMax, strMin;
+	loadString(strMax, IDS_LENMAX);
+	loadString(strMin, IDS_LENMIN);
+	butxt(HMAXLEN, fmt::format(strMax, (maxLength / PFGRAN)));
+	butxt(HMINLEN, fmt::format(strMin, (minLength / PFGRAN)));
 }
 
 void frmcalc() {
@@ -2418,18 +2410,15 @@ void frmcalc() {
 				}
 			}
 		}
-		//ToDo - Move text to string table
 		if (fabs(maxLength < 10000)) {
-			ss << "max " << (maxLength / PFGRAN);
-			txt = ss.str();
-			butxt(HMAXLEN, txt);
+			std::string strMax;
+			loadString(strMax, IDS_LENMAX);
+			butxt(HMAXLEN, fmt::format(strMax, (maxLength / PFGRAN)));
 		}
 		if (fabs(minLength < 10000)) {
-			ss.clear();
-			ss.str("");
-			ss << "min " << (minLength / PFGRAN);
-			txt = ss.str();
-			butxt(HMINLEN, txt);
+			std::string strMin;
+			loadString(strMin, IDS_LENMIN);
+			butxt(HMINLEN, fmt::format(strMin, (minLength / PFGRAN)));
 		}
 	}
 	else {
@@ -2440,16 +2429,12 @@ void frmcalc() {
 }
 
 void lenCalc() {
-	std::stringstream ss;
-	ss.precision(2);
-	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
-	std::string txt;
 	std::string blank("");
 
 	if (StateMap.test(StateFlag::LENSRCH)) {
-		ss << (hypot(StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x, StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y) / PFGRAN);
-		txt = ss.str();
-		butxt(HMINLEN, txt);
+		std::string txt;
+		float lenMax = (hypot(StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x, StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y) / PFGRAN);
+		butxt(HMINLEN, fmt::format("{:.2f}", lenMax));
 		loadString(txt, IDS_SRCH);
 		butxt(HMAXLEN, txt);
 	}
@@ -2563,13 +2548,8 @@ void lensadj() {
 }
 
 void ritot(unsigned number) {
-	std::stringstream ss;
-	ss.precision(2);
-	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
 	std::string txt;
-
-	ss << StringTable->at(STR_TOT) << number;
-	txt = ss.str();
+	txt = fmt::format(StringTable->at(STR_TOT), number);
 	BufferDigitCount = txt.size();
 	butxt(HTOT, txt);
 }
@@ -2588,12 +2568,8 @@ void ritlayr() {
 		butxt(HLAYR, blank);
 	}
 	else {
-		std::stringstream ss;
-		ss.precision(2);
-		ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
 		std::string txt;
-		ss << StringTable->at(STR_LAYR) << layer;
-		txt = ss.str();
+		txt = fmt::format(StringTable->at(STR_LAYR), layer);
 		BufferDigitCount = txt.size();
 		butxt(HLAYR, txt);
 	}
@@ -4314,11 +4290,9 @@ void bfil() {
 	InverseBackgroundColor = fswap(BackgroundColor);
 	BitmapFileHandle = CreateFile(UserBMPFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 	if (BitmapFileHandle == INVALID_HANDLE_VALUE) {
-		std::string fmtstr;
-		loadString(fmtstr, IDS_UNOPEN);
-		std::stringstream ss;
-		ss << fmtstr << UserBMPFileName;
-		shoMsg(ss.str());
+		std::string fmtStr;
+		loadString(fmtStr, IDS_UNOPEN);
+		shoMsg(fmt::format(fmtStr, UserBMPFileName));
 		CloseHandle(BitmapFileHandle);
 		BitmapFileHandle = 0;
 		PCSBMPFileName[0] = 0;
@@ -5139,8 +5113,7 @@ void nuFil() {
 			auxmen();
 		}
 		lenCalc();
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_THRDBY).c_str(), WorkingFileName, DesignerName);
-		SetWindowText(ThrEdWindow, MsgBuffer);
+		SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRDBY), WorkingFileName, DesignerName).c_str());
 		CloseHandle(FileHandle);
 		StateMap.set(StateFlag::INIT);
 		StateMap.reset(StateFlag::TRSET);
@@ -8504,9 +8477,7 @@ void deltot() {
 	coltab();
 	zumhom();
 	strcpy_s(DesignerName, IniFile.designerName);
-	std::stringstream ss;
-	ss << StringTable->at(STR_THRDBY) << ThrName << DesignerName;
-	SetWindowText(ThrEdWindow, ss.str().c_str());
+	SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRDBY), ThrName, DesignerName).c_str());
 }
 
 bool wastch() noexcept {
@@ -9856,13 +9827,8 @@ void shorter() {
 				currentStitch = iStitch;
 			}
 		}
-		std::stringstream ss;
-		ss.precision(2);
-		ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
-		std::string txt;
-		ss << hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
-		txt = ss.str();
-		butxt(HMINLEN, txt);
+		float minLength = hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
+		butxt(HMINLEN, fmt::format("{:.2f}", minLength));
 	}
 	CurrentStitchIndex = currentStitch;
 	lensadj();
@@ -10471,8 +10437,7 @@ void insfil() {
 								ExtendedHeader.creatorName[iName] = thredHeader.creatorName[iName];
 							}
 							redfnam(DesignerName);
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_THRDBY).c_str(), ThrName, DesignerName);
-							SetWindowText(ThrEdWindow, MsgBuffer);
+							SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRDBY), ThrName, DesignerName).c_str());
 						}
 					}
 					InsertCenter.x = (insertedRectangle.right - insertedRectangle.left) / 2 + insertedRectangle.left;

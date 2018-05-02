@@ -739,7 +739,7 @@ BEGIN
     IDS_FRMNO               "No forms"
     IDS_FRM2L               "Traced form too large"
     IDS_NOTHR               "Not a THR file"
-    IDS_FNOPN               "Couldn't open file: %s"
+    IDS_FNOPN               "Couldn't open file: {}"
     IDS_REM1                "To remove large stitches,\nset user stitch length less than maximum stitch length"
     IDS_DST1                "The destination is within the move range"
     IDS_BAKDT               "Backups deleted"
@@ -828,11 +828,11 @@ BEGIN
     IDS_TRC4                "show edges"
     IDS_TRC1H               "hide bmap"
     IDS_SRCH                "search"
-    IDS_NUMPNT              "pnt"
-    IDS_NUMFRM              "frm"
-    IDS_NUMSEL              "sel"
-    IDS_NUMSCH              "sch"
-    IDS_NUMFORM             "form"
+    IDS_NUMPNT              "pnt {}"
+    IDS_NUMFRM              "frm {}"
+    IDS_NUMSEL              "sel {}"
+    IDS_NUMSCH              "sch {}"
+    IDS_NUMFORM             "form {}"
     IDS_BOXSEL              "box select"
     IDS_RITER               "PCS file write error"
     IDS_SAVFIL              "Save File %s"
@@ -841,19 +841,19 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_TOT                 "tot "
-    IDS_LAYR                "layer "
-    IDS_CREAT               "Couldn't create file "
-    IDS_FNOPNA              "Couldn't open file %s\nTry closing ThrEd and opening the file again"
+    IDS_TOT                 "tot {}"
+    IDS_LAYR                "layer {}"
+    IDS_CREAT               "Couldn't create file {}"
+    IDS_FNOPNA              "Couldn't open file {}\nTry closing ThrEd and opening the file again"
     IDS_NOTVER              "This THR file is a newer version\nthan this copy of Thread can read.\nPlease download the latest version\nof ThrEd from Thredworks.com to read this file"
-    IDS_BADFIL              "Corrupted Thred file: "
-    IDS_ZEROL               "Zero length file: %s"
+    IDS_BADFIL              "Corrupted Thred file: {}"
+    IDS_ZEROL               "Zero length file: {}"
     IDS_OVRLOK              "%s is locked\nOverwrite anyway"
     IDS_OVRIT               "Overwrite locked file"
-    IDS_FILROT              "File: %s was rotated"
+    IDS_FILROT              "File: {} was rotated"
     IDS_THRED               "ThrEd: {}"
     IDS_NUFIL               "nufil.thr"
-    IDS_SIZ                 "Enter a new size for #%s thread\nThe current size is %.2f millimeters"
+    IDS_SIZ                 "Enter a new size for #{} thread\nThe current size is {:.2f} millimeters"
     IDS_EMB                 "Thred: Embird File Exchange"
     IDS_ON                  "on"
 END
@@ -966,7 +966,7 @@ BEGIN
     IDS_NCOLCHG             "{} colors changed"
     IDS_SAV                 "Save"
     IDS_DISC                "Discard"
-    IDS_THRDBY              "Thred: %s by %s"
+    IDS_THRDBY              "Thred: {} by {}"
     IDS_STCHOUT             "WARNING\nStitches outside of hoop\n\n"
     IDS_STCHS               "Stitches: %d\nStitch Width: %.2f mm, %.2f in\nStitch Height: %.2f mm, %.2f in\n\n"
     IDS_FORMS               "Forms: %d\nForms Width: %.2f mm, %.2f in\nForms Height: %.2f mm, %.2f in\n\n"
@@ -1018,15 +1018,15 @@ BEGIN
     IDS_P2CMSG              "Can't locate PES2Card Software.\nWould you like to browse for\nComputerservice file: LinkP2C.exe?\n"
     IDS_P2CTITL             "PES2Card Software Not Found"
     IDS_P2CNODAT            "No data to send to PES2Card"
-    IDS_CLPSPAC             "Enter clipboard fill spacing\ncurrently: "
+    IDS_CLPSPAC             "Enter clipboard fill spacing\ncurrently: {:.2f}"
     IDS_CHANSMAL            "Chain stitch length too large for form"
     IDS_FSTRT               "Fill Start"
     IDS_FEND                "Fill end"
     IDS_FORMP               "a form point"
-    IDS_WLKIND              "Edge walk/underlay indent\ncurrently "
-    IDS_WLKLEN              "Edge Walk/Underlay stitch length\ncurrently "
-    IDS_UANG                "Underlay angle\ncurrently "
-    IDS_USPAC               "Underlay spacing\ncurrently "
+    IDS_WLKIND              "Edge walk/underlay indent\ncurrently {:.2f}"
+    IDS_WLKLEN              "Edge Walk/Underlay stitch length\ncurrently {:.2f}"
+    IDS_UANG                "Underlay angle\ncurrently {:.2f}"
+    IDS_USPAC               "Underlay spacing\ncurrently {:.2f}"
     IDS_WALK                "Edge walk"
 END
 
@@ -1094,7 +1094,13 @@ BEGIN
     IDS_NOTREP              " data not repaired in %d forms\n"
     IDS_DATREP              "Data Repaired"
     IDS_UNAM                "Uknown Designer"
-    IDS_UNOPEN              "Couldn't open bitmap file: "
+    IDS_UNOPEN              "Couldn't open bitmap file: {}"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LENMAX              "max {:.2f}"
+    IDS_LENMIN              "min {:.2f}"
 END
 
 #endif    // English (United States) resources
