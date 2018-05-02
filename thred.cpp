@@ -4528,21 +4528,22 @@ void auxmen() {
 		0
 	};
 
+	std::string auxTxt;
 	switch (IniFile.auxFileType) {
 	case AUXDST:
 
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_AUXTXT).c_str(), "DST");
+		auxTxt = "DST";
 		CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_UNCHECKED);
 		break;
 
 	default:
 
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_AUXTXT).c_str(), "PCS");
+		auxTxt = "PCS";
 		CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
 	}
-	filinfo.dwTypeData = MsgBuffer;
+	filinfo.dwTypeData = fmt::format(StringTable->at(STR_AUXTXT), auxTxt).c_str();
 	SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
 	StateMap.set(StateFlag::DUMEN);
 }

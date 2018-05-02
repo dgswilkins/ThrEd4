@@ -703,7 +703,7 @@ BEGIN
     IDS_UPOF                "up to: off"
     IDS_FGRPF               "a form, a group of forms, or a group of stitches"
     IDS_ALL                 "all forms and stitches, a form,\na group of forms, or a group of stitches"
-    IDS_AUXTXT              "Open %s file"
+    IDS_AUXTXT              "Open {} file"
     IDS_CPYRIT              "Thred Digitizing Program for Machine Embroidery\n(c)2000 Marion and Alfie McCoskey 1201 Locust Ave., Shasta Lake, CA\nAll rights reserved\nVersion: 4.000"
     IDS_PNT                 "Please enter the points for the %s"
     IDS_HUP0                "Set Custom"
