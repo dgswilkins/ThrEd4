@@ -12302,14 +12302,10 @@ void filclpx() {
 inline void wavinit (HWND hwndlg) noexcept {
 	char	buffer[HBUFSIZ] = { 0 };
 
-	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.wavePoints);
-	SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer);
-	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.waveStart);
-	SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer);
-	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.waveEnd);
-	SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), buffer);
-	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.waveLobes);
-	SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer);
+	SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), fmt::format("{}", IniFile.wavePoints).c_str());
+	SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), fmt::format("{}", IniFile.waveStart).c_str());
+	SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), fmt::format("{}", IniFile.waveEnd).c_str());
+	SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), fmt::format("{}", IniFile.waveLobes).c_str());
 }
 
 bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {

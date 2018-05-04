@@ -3011,13 +3011,6 @@ void ritbal() {
 		DeleteFile(BalaradName0);
 }
 
-void savmsg() noexcept {
-	char	buffer[HBUFSIZ];
-
-	LoadString(ThrEdInstance, IDS_SAVFIL, buffer, HBUFSIZ);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), buffer, ThrName);
-}
-
 void reldun() {
 	txdun();
 	ritbal();
@@ -3046,8 +3039,9 @@ void dun() {
 			StateMap.set(StateFlag::SAVEX);
 		}
 		else {
-			savmsg();
-			if (MessageBox(ThrEdWindow, MsgBuffer, StringTable->at(STR_CLOS).c_str(), MB_YESNO) == IDYES)
+			std::string fmtStr;
+			loadString(fmtStr, IDS_SAVFIL);
+			if (MessageBox(ThrEdWindow, fmt::format(fmtStr, ThrName).c_str(), StringTable->at(STR_CLOS).c_str(), MB_YESNO) == IDYES)
 				save();
 			reldun();
 		}

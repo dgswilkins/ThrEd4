@@ -835,7 +835,7 @@ BEGIN
     IDS_NUMFORM             "form {}"
     IDS_BOXSEL              "box select"
     IDS_RITER               "PCS file write error"
-    IDS_SAVFIL              "Save File %s"
+    IDS_SAVFIL              "Save File {}"
     IDS_CLOS                "Closing ThrEd"
 END
 
