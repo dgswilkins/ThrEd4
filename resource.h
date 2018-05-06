@@ -398,6 +398,9 @@
 #define IDS_UNOPEN                      1103
 #define IDS_LENMAX                      1104
 #define IDS_LENMIN                      1105
+#define IDS_FWERR                       1106
+#define IDS_DELBAK                      1107
+#define IDS_FFINDERR                    1108
 #define ID_FILE_OPEN1                   40002
 #define ID_VIEW_STCHBAK                 40003
 #define ID_EDIT_RESET_COL               40006

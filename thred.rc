@@ -968,14 +968,14 @@ BEGIN
     IDS_DISC                "Discard"
     IDS_THRDBY              "Thred: {} by {}"
     IDS_STCHOUT             "WARNING\nStitches outside of hoop\n\n"
-    IDS_STCHS               "Stitches: %d\nStitch Width: %.2f mm, %.2f in\nStitch Height: %.2f mm, %.2f in\n\n"
-    IDS_FORMS               "Forms: %d\nForms Width: %.2f mm, %.2f in\nForms Height: %.2f mm, %.2f in\n\n"
-    IDS_HUPWID              "Hoop Width: %.2f mm\nHoop Height: %.2f mm\n\n"
+    IDS_STCHS               "Stitches: {}\nStitch Width: {:.2f} mm, {:.2f} in\nStitch Height: {:.2f} mm, {:.2f} in\n\n"
+    IDS_FORMS               "Forms: {}\nForms Width: {:.2f} mm, {:.2f} in\nForms Height: {:.2f} mm, {:.2f} in\n\n"
+    IDS_HUPWID              "Hoop Width: {:.2f} mm\nHoop Height: {:.2f} mm\n\n"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CREATBY             "Created by: %s\nModified by: %s"
+    IDS_CREATBY             "Created by: {}\nModified by: {}"
     IDS_CUSTHUP             "Custom Hoop\n%.2f\n%.2f"
     IDS_STCHP               "Enter stitch point pixels\ncurrently: %d"
     IDS_FRMP                "Enter form point pixels\ncurrently: %d"
@@ -1101,6 +1101,9 @@ STRINGTABLE
 BEGIN
     IDS_LENMAX              "max {:.2f}"
     IDS_LENMIN              "min {:.2f}"
+    IDS_FWERR               "File Write Error: {}\n"
+    IDS_DELBAK              "Delete all backups in {} ?\n"
+    IDS_FFINDERR            "Can't find {}. Error {}\n"
 END
 
 #endif    // English (United States) resources

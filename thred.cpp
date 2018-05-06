@@ -6278,8 +6278,11 @@ void unlin() {
 void movbox() {
 	if (stch2px(ClosestPointIndex)) {
 		unbox();
-		//sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Stitch:%d form:%d type:%d\n", ClosestPointIndex, ((StitchBuffer[ClosestPointIndex].attribute&FRMSK) >> FRMSHFT), ((StitchBuffer[ClosestPointIndex].attribute&TYPMSK) >> TYPSHFT));
-		//OutputDebugString(MsgBuffer);
+		OutputDebugString(fmt::format("Stitch:{} form:{} type:{}\n", 
+			ClosestPointIndex, 
+			((StitchBuffer[ClosestPointIndex].attribute&FRMSK) >> FRMSHFT), 
+			((StitchBuffer[ClosestPointIndex].attribute&TYPMSK) >> TYPSHFT)
+		).c_str());
 		dubox();
 		if (StateMap.test(StateFlag::UPTO))
 			StateMap.set(StateFlag::RESTCH);
@@ -6728,8 +6731,11 @@ void rebox() {
 		nuAct(ClosestPointIndex);
 		if (stch2px(ClosestPointIndex)) {
 			dubox();
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Stitch:%d form:%d type:%d\n", ClosestPointIndex, ((StitchBuffer[ClosestPointIndex].attribute&FRMSK) >> FRMSHFT), ((StitchBuffer[ClosestPointIndex].attribute&TYPMSK) >> TYPSHFT));
-			OutputDebugString(MsgBuffer);
+			OutputDebugString(fmt::format("Stitch:{} form:{} type:{}\n", 
+				ClosestPointIndex, 
+				((StitchBuffer[ClosestPointIndex].attribute&FRMSK) >> FRMSHFT), 
+				((StitchBuffer[ClosestPointIndex].attribute&TYPMSK) >> TYPSHFT)
+			).c_str());
 		}
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
 			StateMap.reset(StateFlag::SCROS);
@@ -8349,12 +8355,14 @@ void thrsav() {
 		FileHandle = 0;
 	}
 	else {
+		// ToDo - Is MAXITEMS the best option here
 		auto output = std::vector<char>(MAXITEMS * 4);
 		dubuf(output.data(), &count);
 		WriteFile(FileHandle, output.data(), count, &bytesWritten, 0);
 		if (bytesWritten != count) {
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "File Write Error: %s\n", ThrName);
-			shoMsg(MsgBuffer);
+			std::string fmtStr;
+			loadString(fmtStr, IDS_FWERR);
+			shoMsg(fmt::format(fmtStr, ThrName));
 		}
 		CloseHandle(FileHandle);
 	}
@@ -8725,9 +8733,7 @@ void redclp() {
 		ClipBuffer[0].attribute = 0;
 
 #if CLPBUG
-
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "interator: 0 x: %6.2f,y: %6.2f\n", ClipBuffer[0].x, ClipBuffer[0].y);
-		OutputDebugString(MsgBuffer);
+		OutputDebugString(fmt::format("interator: 0 x: {:6.2f},y: {:6.2f}\n", ClipBuffer[0].x, ClipBuffer[0].y).c_str());
 #endif
 		ClipRect.left = ClipRect.right = ClipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
@@ -8737,9 +8743,7 @@ void redclp() {
 			ClipBuffer[iStitch].attribute = (ClipStitchData[iStitch].led & 0xf) | codedLayer;
 
 #if CLPBUG
-
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "iterator: %d x: %6.2f,y: %6.2f\n", iStitch, ClipBuffer[iStitch].x, ClipBuffer[iStitch].y);
-			OutputDebugString(MsgBuffer);
+			OutputDebugString(fmt::format("interator: {} x: {:6.2f},y: {:6.2f}\n", iStitch, ClipBuffer[iStitch].x, ClipBuffer[iStitch].y).c_str());
 #endif
 			if (ClipBuffer[iStitch].x < ClipRect.left)
 				ClipRect.left = ClipBuffer[iStitch].x;
@@ -8917,8 +8921,9 @@ void purg() {
 
 void purgdir() {
 	StateMap.set(StateFlag::PRGMSG);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Delete all backups in %s\n", DefaultDirectory);
-	shoMsg(MsgBuffer);
+	std::string fmtStr;
+	loadString(fmtStr, IDS_DELBAK);
+	shoMsg(fmt::format(fmtStr, DefaultDirectory));
 	okcan();
 }
 
@@ -10080,8 +10085,9 @@ void thumnail() {
 	file = FindFirstFile(SearchName, &fileData);
 	if (file == INVALID_HANDLE_VALUE) {
 		const DWORD dwError = GetLastError();
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Can't find %s. Error %d\n", SearchName, dwError);
-		shoMsg(MsgBuffer);
+		std::string fmtStr;
+		loadString(fmtStr, IDS_FFINDERR);
+		shoMsg(fmt::format(fmtStr, SearchName, dwError));
 		unthum();
 	}
 	else {
@@ -10653,74 +10659,28 @@ void frmrct(fRECTANGLE* rectangle) noexcept {
 void desiz() {
 	fRECTANGLE	rectangle = {};
 	FLOAT		xSize = 0.0, ySize = 0.0;
-	char*		message = MsgBuffer;
-	int			bufferRemaining = sizeof(MsgBuffer);
+	fmt::MemoryWriter mw;
 
-	if (PCSHeader.stitchCount && message) {
+	if (PCSHeader.stitchCount) {
 		stchrct(&rectangle);
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
 		if ((rectangle.left < 0) || (rectangle.bottom < 0) || (rectangle.right > IniFile.hoopSizeX) || (rectangle.top > IniFile.hoopSizeY)) {
-			strcpy_s(MsgBuffer, StringTable->at(STR_STCHOUT).c_str());
-			message = &MsgBuffer[strlen(MsgBuffer)];
-			bufferRemaining -= strlen(MsgBuffer);
+			mw << StringTable->at(STR_STCHOUT);
 		}
-#if LANG==ENG || LANG==HNG
-		if (message) {
-			bufferRemaining -= sprintf_s(message, bufferRemaining,
-				StringTable->at(STR_STCHS).c_str(),
-				PCSHeader.stitchCount,
-				xSize, xSize / 25.4,
-				ySize, ySize / 25.4);
-		}
-#endif
-
-#if LANG==GRM
-		if (message) {
-			bufferRemaining -= sprintf_s(message, sizeof(MsgBuffer),
-				StringTable->at(STR_STCHS],
-				PCSHeader.stitchCount,
-				xSize,
-				ySize);
-		}
-#endif
-		message = &message[strlen(message)];
+		mw.write(StringTable->at(STR_STCHS), PCSHeader.stitchCount, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
 	}
 	if (FormIndex) {
 		frmrct(&rectangle);
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
-		if (message) {
-#if LANG==ENG || LANG==HNG
-			bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable->at(STR_FORMS).c_str(),
-				FormIndex,
-				xSize, xSize / 25.4,
-				ySize, ySize / 25.4);
-#endif
-
-#if LANG==GRM
-			bufferRemaining -= sprintf_s(message, sizeof(MsgBuffer), StringTable->at(STR_FORMS],
-				FormIndex,
-				xSize,
-				ySize);
-#endif
-			message = &message[strlen(message)];
-		}
+		mw.write(StringTable->at(STR_FORMS), FormIndex, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
 	}
-	if (message) {
-		bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable->at(STR_HUPWID).c_str(),
-			IniFile.hoopSizeX / PFGRAN,
-			IniFile.hoopSizeY / PFGRAN);
-	}
-	message = &message[strlen(message)];
+	mw.write(StringTable->at(STR_HUPWID), (IniFile.hoopSizeX / PFGRAN), (IniFile.hoopSizeY / PFGRAN));
 	if (PCSHeader.stitchCount) {
-		if (message) {
-			bufferRemaining -= sprintf_s(message, bufferRemaining, StringTable->at(STR_CREATBY).c_str(),
-				DesignerName,
-				ExtendedHeader.modifierName);
-		}
+		mw.write(StringTable->at(STR_CREATBY), DesignerName, ExtendedHeader.modifierName);
 	}
-	shoMsg(MsgBuffer);
+	shoMsg(mw.str());
 }
 
 void sidhup() {
