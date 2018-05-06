@@ -3629,106 +3629,98 @@ void chknum() {
 				case PEG:
 
 					IniFile.eggRatio = value;
-					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
-					SetWindowText(ValueWindow[PEG], MsgBuffer);
+					SetWindowText(ValueWindow[PEG], fmt::format("{:.2f}", value).c_str());
 					break;
 
 				case PNUDG:
 
 					IniFile.cursorNudgeStep = value;
 					IniFile.nudgePixels = pxchk(value);
-					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
-					SetWindowText(ValueWindow[PNUDG], MsgBuffer);
+					SetWindowText(ValueWindow[PNUDG], fmt::format("{:.2f}", value).c_str());
 					break;
 
 				case PPIC:
 
 					PicotSpacing = value * PFGRAN;
-					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
-					SetWindowText(ValueWindow[PPIC], MsgBuffer);
+					SetWindowText(ValueWindow[PPIC], fmt::format("{:.2f}", value).c_str());
 					break;
 
 				case PCLPOF:
 
 					IniFile.clipOffset = value * PFGRAN;
-					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f mm", value);
-					SetWindowText(ValueWindow[PCLPOF], MsgBuffer);
+					SetWindowText(ValueWindow[PCLPOF], fmt::format("{:.2f} mm", value).c_str());
 					break;
 
 				case PFAZ:
 
 					IniFile.fillPhase = floor(value);
-					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", IniFile.fillPhase);
-					SetWindowText(ValueWindow[PFAZ], MsgBuffer);
+					SetWindowText(ValueWindow[PFAZ], fmt::format("{}", IniFile.fillPhase).c_str());
 					break;
 
 				case PCHRAT:
 
 					IniFile.chainRatio = value;
-					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", IniFile.chainRatio);
-					SetWindowText(ValueWindow[PCHRAT], MsgBuffer);
+					SetWindowText(ValueWindow[PCHRAT], fmt::format("{:.2f}", value).c_str());
 					break;
 
 				case PMIN:
 
 					MinStitchLength = value * PFGRAN;
-					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
-					SetWindowText(ValueWindow[PMIN], MsgBuffer);
+					SetWindowText(ValueWindow[PMIN], fmt::format("{:.2f}", value).c_str());
 					break;
 
 				default:
 
 					if (value) {
-						sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
+						std::string bufVal(fmt::format("{:.2f}", value));
 						switch (PreferenceIndex - 1) {
 						case PSPAC:
 
 							LineSpacing = value * PFGRAN;
-							SetWindowText(ValueWindow[PSPAC], MsgBuffer);
+							SetWindowText(ValueWindow[PSPAC], bufVal.c_str());
 							break;
 
 						case PANGL:
 
 							IniFile.fillAngle = value / 180 * PI;
-							SetWindowText(ValueWindow[PANGL], MsgBuffer);
+							SetWindowText(ValueWindow[PANGL], bufVal.c_str());
 							break;
 
 						case PSAT:
 
 							BorderWidth = value * PFGRAN;
 							IniFile.borderWidth = BorderWidth;
-							SetWindowText(ValueWindow[PSAT], MsgBuffer);
+							SetWindowText(ValueWindow[PSAT], bufVal.c_str());
 							break;
 
 						case PMAX:
 
 							IniFile.maxStitchLength = value * PFGRAN;
-							SetWindowText(ValueWindow[PMAX], MsgBuffer);
+							SetWindowText(ValueWindow[PMAX], bufVal.c_str());
 							break;
 
 						case PUSE:
 
 							UserStitchLength = value * PFGRAN;
-							SetWindowText(ValueWindow[PUSE], MsgBuffer);
+							SetWindowText(ValueWindow[PUSE], bufVal.c_str());
 							break;
 
 						case PSMAL:
 
 							SmallStitchLength = value * PFGRAN;
-							SetWindowText(ValueWindow[PSMAL], MsgBuffer);
+							SetWindowText(ValueWindow[PSMAL], bufVal.c_str());
 							break;
 
 						case PAP:
 
 							AppliqueColor = gsl::narrow<unsigned>(round(value - 1)) % 16;
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", AppliqueColor + 1);
-							SetWindowText(ValueWindow[PAP], MsgBuffer);
+							SetWindowText(ValueWindow[PAP], fmt::format("{}", (AppliqueColor + 1)).c_str());
 							break;
 
 						case PSNP:
 
 							SnapLength = value * PFGRAN;
-							SetWindowText(ValueWindow[PSNP], MsgBuffer);
+							SetWindowText(ValueWindow[PSNP], bufVal.c_str());
 							break;
 
 						case PSTAR:
@@ -3738,8 +3730,7 @@ void chknum() {
 								StarRatio = 1;
 							if (StarRatio < 0.05)
 								StarRatio = 0.05;
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", StarRatio);
-							SetWindowText(ValueWindow[PSTAR], MsgBuffer);
+							SetWindowText(ValueWindow[PSTAR], fmt::format("{:.2f}", StarRatio).c_str());
 							break;
 
 						case PSPIR:
@@ -3749,22 +3740,19 @@ void chknum() {
 								StarRatio = 20.;
 							if (StarRatio < 0.3)
 								StarRatio = 0.3;
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", SpiralWrap);
-							SetWindowText(ValueWindow[PSPIR], MsgBuffer);
+							SetWindowText(ValueWindow[PSPIR], fmt::format("{:.2f}", SpiralWrap).c_str());
 							break;
 
 						case PBUT:
 
 							ButtonholeCornerLength = value * PFGRAN;
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
-							SetWindowText(ValueWindow[PBUT], MsgBuffer);
+							SetWindowText(ValueWindow[PBUT], fmt::format("{:.2f}", value).c_str());
 							break;
 
 						case PHUPX:
 
 							IniFile.hoopSizeX = value * PFGRAN;
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.0f mm", value);
-							SetWindowText(ValueWindow[PHUPX], MsgBuffer);
+							SetWindowText(ValueWindow[PHUPX], fmt::format("{:.0f} mm", value).c_str());
 							sethup();
 							prfmsg();
 							chkhup();
@@ -3773,8 +3761,7 @@ void chknum() {
 						case PHUPY:
 
 							IniFile.hoopSizeY = value * PFGRAN;
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.0f mm", value);
-							SetWindowText(ValueWindow[PHUPY], MsgBuffer);
+							SetWindowText(ValueWindow[PHUPY], fmt::format("{:.0f} mm", value).c_str());
 							sethup();
 							prfmsg();
 							chkhup();
@@ -3783,15 +3770,13 @@ void chknum() {
 						case PGRD:
 
 							IniFile.gridSize = value * PFGRAN;
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f mm", value);
-							SetWindowText(ValueWindow[PGRD], MsgBuffer);
+							SetWindowText(ValueWindow[PGRD], fmt::format("{:.2f} mm", value).c_str());
 							break;
 
 						case PCHN:
 
 							IniFile.chainSpace = value * PFGRAN;
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", value);
-							SetWindowText(ValueWindow[PCHN], MsgBuffer);
+							SetWindowText(ValueWindow[PCHN], fmt::format("{:.2f}", value).c_str());
 							break;
 						}
 					}
