@@ -12300,8 +12300,6 @@ void filclpx() {
 }
 
 inline void wavinit (HWND hwndlg) noexcept {
-	char	buffer[HBUFSIZ] = { 0 };
-
 	SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), fmt::format("{}", IniFile.wavePoints).c_str());
 	SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), fmt::format("{}", IniFile.waveStart).c_str());
 	SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), fmt::format("{}", IniFile.waveEnd).c_str());

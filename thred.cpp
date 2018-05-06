@@ -5503,12 +5503,10 @@ void sav() {
 		switch (IniFile.auxFileType) {
 		case AUXDST:
 			ritdst(DSTOffsetData, DSTRecords, saveStitches);
-			pchr = convert_ptr<char *>(&dstHeader);
-			if (pchr) {
-				for (iHeader = 0; iHeader < sizeof(DSTHED); iHeader++)
-					pchr[iHeader] = ' ';
-				strncpy(dstHeader.desched, "LA:", 3);
-			}
+			// dstHeader fields are fixed width, so use strncpy in its intended way. 
+			// Use sizeof to ensure no overrun if the format string is wrong length
+			strncpy(dstHeader.desched, "LA:", sizeof(dstHeader.desched));
+			std::fill_n(dstHeader.desc, sizeof(dstHeader.desc), ' ');
 			pchr = strrchr(AuxName, '\\') + 1;
 			if (pchr) {
 				for (iHeader = 0; iHeader < sizeof(dstHeader.desc); iHeader++) {
@@ -5519,29 +5517,30 @@ void sav() {
 				}
 			}
 			dstHeader.desc[16] = 0xd;
-			strncpy(dstHeader.recshed, "ST:", 3);
-			sprintf(dstHeader.recs, "%7d\r", DSTRecords.size());
-			strncpy(dstHeader.cohed, "CO:", 3);
-			strncpy(dstHeader.co, "  0\xd", 4);
-			strncpy(dstHeader.xplushed, "+X:", 3);
-			sprintf(dstHeader.xplus, "%5d\xd", DSTOffsetData.Negative.x);
-			strncpy(dstHeader.xminhed, "-X:", 3);
-			sprintf(dstHeader.xmin, "%5d\xd", DSTOffsetData.Positive.x);
-			strncpy(dstHeader.yplushed, "+Y:", 3);
-			sprintf(dstHeader.yplus, "%5d\xd", DSTOffsetData.Positive.y);
-			strncpy(dstHeader.yminhed, "-Y:", 3);
-			sprintf(dstHeader.ymin, "%5d\xd", DSTOffsetData.Negative.y);
-			strncpy(dstHeader.axhed, "AX:", 3);
-			strncpy(dstHeader.ax, "-    0\r", 7);
-			strncpy(dstHeader.ayhed, "AY:", 3);
-			strncpy(dstHeader.ay, "+    0\r", 7);
-			strncpy(dstHeader.mxhed, "MX:", 3);
-			strncpy(dstHeader.mx, "+    0\r", 7);
-			strncpy(dstHeader.myhed, "MY:", 3);
-			strncpy(dstHeader.my, "+    0\r", 7);
-			strncpy(dstHeader.pdhed, "PD", 2);
-			strncpy(dstHeader.pd, "******\r", 7);
-			strncpy(dstHeader.eof, "\x1a", 1);
+			strncpy(dstHeader.recshed, "ST:", sizeof(dstHeader.recshed));
+			strncpy(dstHeader.recs, fmt::format("{:7d}\r", DSTRecords.size()).c_str(), sizeof(dstHeader.recs));
+			strncpy(dstHeader.cohed, "CO:", sizeof(dstHeader.cohed));
+			strncpy(dstHeader.co, "  0\xd", sizeof(dstHeader.co));
+			strncpy(dstHeader.xplushed, "+X:", sizeof(dstHeader.xplushed));
+			strncpy(dstHeader.xplus, fmt::format("{:5d}\xd", DSTOffsetData.Negative.x).c_str(), sizeof(dstHeader.xplus));
+			strncpy(dstHeader.xminhed, "-X:", sizeof(dstHeader.xminhed));
+			strncpy(dstHeader.xmin, fmt::format("{:5d}\xd", DSTOffsetData.Positive.x).c_str(), sizeof(dstHeader.xmin));
+			strncpy(dstHeader.yplushed, "+Y:", sizeof(dstHeader.yplushed));
+			strncpy(dstHeader.yplus, fmt::format("{:5d}\xd", DSTOffsetData.Positive.y).c_str(), sizeof(dstHeader.yplus));
+			strncpy(dstHeader.yminhed, "-Y:", sizeof(dstHeader.yminhed));
+			strncpy(dstHeader.ymin, fmt::format("{:5d}\xd", DSTOffsetData.Negative.y).c_str(), sizeof(dstHeader.ymin));
+			strncpy(dstHeader.axhed, "AX:", sizeof(dstHeader.axhed));
+			strncpy(dstHeader.ax, "-    0\r", sizeof(dstHeader.ax));
+			strncpy(dstHeader.ayhed, "AY:", sizeof(dstHeader.ayhed));
+			strncpy(dstHeader.ay, "+    0\r", sizeof(dstHeader.ay));
+			strncpy(dstHeader.mxhed, "MX:", sizeof(dstHeader.mxhed));
+			strncpy(dstHeader.mx, "+    0\r", sizeof(dstHeader.mx));
+			strncpy(dstHeader.myhed, "MY:", sizeof(dstHeader.myhed));
+			strncpy(dstHeader.my, "+    0\r", sizeof(dstHeader.my));
+			strncpy(dstHeader.pdhed, "PD", sizeof(dstHeader.pdhed));
+			strncpy(dstHeader.pd, "******\r", sizeof(dstHeader.pd));
+			strncpy(dstHeader.eof, "\x1a", sizeof(dstHeader.eof));
+			std::fill_n(dstHeader.res, sizeof(dstHeader.res), ' ');
 			WriteFile(PCSFileHandle, &dstHeader, sizeof(DSTHED), &bytesWritten, 0);
 			WriteFile(PCSFileHandle, &DSTRecords[0], sizeof(DSTREC)*DSTRecords.size(), &bytesWritten, 0);
 			break;
