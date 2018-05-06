@@ -450,7 +450,6 @@ extern	POINT			SelectedPointsLine[9];
 extern	std::vector<unsigned>	*SelectedTexturePointsList;
 extern	double			SnapLength;
 extern	double			SpiralWrap;
-extern	char*			StringData;
 extern	std::vector<std::string>	*StringTable;
 extern	double			StarRatio;
 extern	std::vector<TXPNT>	*TempTexturePoints;
@@ -3046,7 +3045,6 @@ void dun() {
 			reldun();
 		}
 	}
-	delete[] StringData; // This is allocated in lodstr
 }
 
 void dusid(unsigned entry) noexcept {

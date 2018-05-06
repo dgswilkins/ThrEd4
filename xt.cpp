@@ -77,7 +77,6 @@ extern	FRMHED*			SelectedForm;
 extern	unsigned		SatinGuideIndex;
 extern	SATCON			SatinGuides[MAXSAC];
 extern	EnumMap<StateFlag>	StateMap;
-extern	char*			StringData;
 extern	unsigned		SelectedFormCount;
 extern	unsigned		SelectedFormCount;
 extern	unsigned short	SelectedFormList[MAXFORMS];

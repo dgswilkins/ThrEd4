@@ -217,7 +217,6 @@ unsigned short LoadStringList[] = {	//strings to load into memory at init time
 
 std::vector<std::string> *StringTable;
 
-char*	StringData;				//string storage
 char*	RepairString;			//Repair Type
 
 char	HelpBuffer[HBUFSIZ];	//message formatting buffer
