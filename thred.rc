@@ -848,7 +848,7 @@ BEGIN
     IDS_NOTVER              "This THR file is a newer version\nthan this copy of Thread can read.\nPlease download the latest version\nof ThrEd from Thredworks.com to read this file"
     IDS_BADFIL              "Corrupted Thred file: {}"
     IDS_ZEROL               "Zero length file: {}"
-    IDS_OVRLOK              "%s is locked\nOverwrite anyway"
+    IDS_OVRLOK              "{} is locked\nOverwrite anyway?"
     IDS_OVRIT               "Overwrite locked file"
     IDS_FILROT              "File: {} was rotated"
     IDS_THRED               "ThrEd: {}"

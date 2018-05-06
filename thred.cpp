@@ -4279,7 +4279,6 @@ void bfil() {
 		ReadFile(BitmapFileHandle, &BitmapFileHeaderV4, fileHeaderSize, &BytesRead, NULL);
 	}
 	else {
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%s is not a Windows Bitmap\n", UserBMPFileName);
 		CloseHandle(BitmapFileHandle);
 		BitmapFileHandle = 0;
 		PCSBMPFileName[0] = 0;
@@ -5421,8 +5420,10 @@ bool chkattr(char* filename) {
 	if (StateMap.testAndReset(StateFlag::NOTFREE))
 		return 1;
 	if (attributes&FILE_ATTRIBUTE_READONLY && attributes != 0xffffffff) {
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_OVRLOK).c_str(), filename);
-		buttonPressed = MessageBox(ThrEdWindow, MsgBuffer, StringTable->at(STR_OVRIT).c_str(), MB_YESNO);
+		buttonPressed = MessageBox(ThrEdWindow, 
+								   fmt::format(StringTable->at(STR_OVRLOK), filename).c_str(),
+								   StringTable->at(STR_OVRIT).c_str(), 
+								   MB_YESNO);
 		if (buttonPressed == IDYES)
 			SetFileAttributes(filename, attributes&(0xffffffff ^ FILE_ATTRIBUTE_READONLY));
 		else
