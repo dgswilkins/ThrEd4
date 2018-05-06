@@ -701,6 +701,7 @@ BEGIN
     IDS_PIKOL               "pick color"
     IDS_UPON                "up to: on"
     IDS_UPOF                "up to: off"
+    IDS_NOTHRDFIL           "Directory: {} has no .thr files\n"
     IDS_FGRPF               "a form, a group of forms, or a group of stitches"
     IDS_ALL                 "all forms and stitches, a form,\na group of forms, or a group of stitches"
     IDS_AUXTXT              "Open {} file"
@@ -715,7 +716,10 @@ BEGIN
     IDS_HUP2                "Large Pfaff"
     IDS_HUP3                "100mm"
     IDS_HUP4                "Custom"
+    IDS_LOCKNOT             "{} files could not be locked or unlocked\n"
     IDS_CLP                 "Clipboard data too small for clipboard fill"
+    IDS_TRCSTP              "len: {:.2f}"
+    IDS_TRCRAT              "pnts: {:.2f}"
     IDS_CNTR                "Design re-centered"
     IDS_MAPLOD              "You must have a bitmap loaded\nto use the autotrace functions"
     IDS_FRMOVR              "Too many form points"
@@ -798,6 +802,7 @@ BEGIN
     IDS_SETMRK              "Set Mark at Selected Point"
     IDS_FSZ                 "a form or a group of stitches\n and set the zoom mark"
     IDS_SETROTM             "Set Rotation Angle from Mark"
+    IDS_NOTHRFIL            "Directory: {} has no .thr files\n"
     IDS_RNGEND              "Set Range Ends For Clipboard Fills"
     IDS_ROT                 "Rotate"
     IDS_ROTCMD              "Rotate Command"
@@ -979,7 +984,7 @@ BEGIN
     IDS_CUSTHUP             "Custom Hoop\n%.2f\n%.2f"
     IDS_STCHP               "Enter stitch point pixels\ncurrently: %d"
     IDS_FRMP                "Enter form point pixels\ncurrently: %d"
-    IDS_ENTROT              "Please enter rotate segments.\nThe current value is: %.2f"
+    IDS_ENTROT              "Please enter rotate segments.\nThe current value is: {:.2f}"
     IDS_NUDG                "Enter nudge pixels\ncurrently: %d"
     IDS_NOSTCHSEL           "No stitch selected"
     IDS_ZIG                 "Zig-Zag"
@@ -1104,6 +1109,7 @@ BEGIN
     IDS_FWERR               "File Write Error: {}\n"
     IDS_DELBAK              "Delete all backups in {} ?\n"
     IDS_FFINDERR            "Can't find {}. Error {}\n"
+    IDS_ROTMARK             "Rotation Angle: {:.2f}\nSegments: {}\n"
 END
 
 #endif    // English (United States) resources

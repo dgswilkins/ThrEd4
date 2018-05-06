@@ -10947,10 +10947,10 @@ void rotmrk() {
 		tang = HighestAngle - LowestAngle;
 		segments = 2 * PI / tang;
 		IniFile.rotationAngle = 2 * PI / segments;
+		std::string fmtStr;
+		loadString(fmtStr, IDS_ROTMARK);
 		// ToDo - should this be IniFile.rotationAngle?
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Rotation Angle: %.2f\n"
-			"Segments: %d\n", IniFile.fillAngle * 180 / PI, segments);
-		shoMsg(MsgBuffer);
+		shoMsg(fmt::format(fmtStr, IniFile.fillAngle * 180 / PI, segments));
 	}
 	else
 		shoseln(IDS_FSZ, IDS_SETROTM);
@@ -10959,8 +10959,7 @@ void rotmrk() {
 void segentr() {
 	if (!RotationAngle)
 		RotationAngle = PI / 180;
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_ENTROT).c_str(), 2 * PI / RotationAngle);
-	shoMsg(MsgBuffer);
+	shoMsg(fmt::format(StringTable->at(STR_ENTROT), (2 * PI / RotationAngle)));
 	StateMap.set(StateFlag::NUMIN);
 	numWnd();
 }
@@ -11423,8 +11422,9 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			strcat_s(searchName, "\\*.thr");
 			searchResult = FindFirstFile(searchName, &(fileInfo->data[0]));
 			if (searchResult == INVALID_HANDLE_VALUE) {
-				sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Directory: %s has no .thr files\n", DefaultDirectory);
-				shoMsg(MsgBuffer);
+				std::string fmtStr;
+				loadString(fmtStr, IDS_NOTHRFIL);
+				shoMsg(fmt::format(fmtStr, DefaultDirectory));
 				EndDialog(hwndlg, wparam);
 				return TRUE;
 			}
@@ -11499,8 +11499,9 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 						fileError++;
 				}
 				if (fileError) {
-					sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d files could not be locked or unlocked\n", fileError);
-					shoMsg(MsgBuffer);
+					std::string fmtStr;
+					loadString(fmtStr, IDS_LOCKNOT);
+					shoMsg(fmt::format(fmtStr, fileError));
 				}
 				EndDialog(hwndlg, wparam);
 				return TRUE;
@@ -11593,14 +11594,15 @@ void untrace() {
 }
 
 void trcstpnum() noexcept {
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "len: %.2f", IniFile.traceLength / PFGRAN);
-	SetWindowText(TraceStepWin, MsgBuffer);
+	std::string fmtStr;
+	loadString(fmtStr, IDS_TRCSTP);
+	SetWindowText(TraceStepWin, fmt::format(fmtStr, (IniFile.traceLength / PFGRAN)).c_str());
 }
 
 void trcratnum() {
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "pnts: %.2f", -log10(IniFile.traceRatio - 1));
-	std::string txt(MsgBuffer);
-	butxt(HLIN, txt);
+	std::string fmtStr;
+	loadString(fmtStr, IDS_TRCRAT);
+	butxt(HLIN, fmt::format(fmtStr, -log10(IniFile.traceRatio - 1)));
 }
 
 void clrhbut(unsigned startButton) noexcept {

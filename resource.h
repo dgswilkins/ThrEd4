@@ -10,6 +10,7 @@
 #define IDS_PIKOL                       6
 #define IDS_UPON                        7
 #define IDS_UPOF                        8
+#define IDS_NOTHRDFIL                   9
 #define IDS_FGRPF                       10
 #define IDS_ALL                         11
 #define IDS_AUXTXT                      12
@@ -20,7 +21,10 @@
 #define IDS_HUP2                        17
 #define IDS_HUP3                        18
 #define IDS_HUP4                        19
+#define IDS_LOCKNOT                     20
 #define IDS_CLP                         21
+#define IDS_TRCSTP                      22
+#define IDS_TRCRAT                      23
 #define IDS_CNTR                        24
 #define IDS_MAPLOD                      25
 #define IDS_FRMOVR                      26
@@ -87,6 +91,7 @@
 #define IDS_SETMRK                      87
 #define IDS_FSZ                         88
 #define IDS_SETROTM                     89
+#define IDS_NOTHRFIL                    90
 #define IDS_RNGEND                      91
 #define IDS_ROT                         92
 #define IDS_ROTCMD                      93
@@ -401,6 +406,7 @@
 #define IDS_FWERR                       1106
 #define IDS_DELBAK                      1107
 #define IDS_FFINDERR                    1108
+#define IDS_ROTMARK                     1109
 #define ID_FILE_OPEN1                   40002
 #define ID_VIEW_STCHBAK                 40003
 #define ID_EDIT_RESET_COL               40006
