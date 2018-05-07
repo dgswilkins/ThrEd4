@@ -12510,7 +12510,6 @@ void dutrnum1() {
 	StateMap.reset(StateFlag::NUMIN);
 	StateMap.reset(StateFlag::TRNIN1);
 	traceLength = atof(MsgBuffer);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%.2f", traceLength);
 	if (traceLength > 9)
 		traceLength = 9;
 	if (StateMap.test(StateFlag::TRNUP)) {
