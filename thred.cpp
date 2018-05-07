@@ -12808,9 +12808,8 @@ void nudgfn(float deltaX, float deltaY) {
 	mouse_event(MOUSEEVENTF_MOVE, pixel.x, pixel.y, 0, 0);
 }
 
-void pixmsg(unsigned iString, unsigned pixelCount) {
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(iString).c_str(), pixelCount);
-	shoMsg(MsgBuffer);
+void inline pixmsg(unsigned iString, unsigned pixelCount) {
+	shoMsg(fmt::format(StringTable->at(iString), pixelCount));
 }
 
 void getnpix() {
