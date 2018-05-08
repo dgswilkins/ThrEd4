@@ -1386,30 +1386,24 @@ void dazdef() {
 }
 
 void initdaz(HWND hWinDialog) {
-	char		buffer[HBUFSIZ] = { 0 };
 	unsigned	iType = 0;
 
 	chkdaz();
-	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyPetalPoints);
-	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS), buffer);
-	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyHeartCount);
-	SetWindowText(GetDlgItem(hWinDialog, IDC_DAZPCNT), buffer);
-	sprintf_s(buffer, sizeof(buffer), "%.2f", IniFile.daisyDiameter);
-	SetWindowText(GetDlgItem(hWinDialog, IDC_CNTLEN), buffer);
-	sprintf_s(buffer, sizeof(buffer), "%.2f", IniFile.daisyHoleDiameter);
-	SetWindowText(GetDlgItem(hWinDialog, IDC_HOLSIZ), buffer);
-	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyInnerCount);
-	SetWindowText(GetDlgItem(hWinDialog, IDC_INPNTS), buffer);
-	sprintf_s(buffer, sizeof(buffer), "%d", IniFile.daisyPetalCount);
-	SetWindowText(GetDlgItem(hWinDialog, IDC_PETALS), buffer);
-	sprintf_s(buffer, sizeof(buffer), "%.2f", IniFile.daisyPetalLen);
-	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLEN), buffer);
+	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS), fmt::format("{}", IniFile.daisyPetalPoints).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_DAZPCNT), fmt::format("{}", IniFile.daisyHeartCount).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_CNTLEN), fmt::format("{:.2f}", IniFile.daisyDiameter).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_HOLSIZ), fmt::format("%.2f", IniFile.daisyHoleDiameter).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_INPNTS), fmt::format("{}", IniFile.daisyInnerCount).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_PETALS), fmt::format("{}", IniFile.daisyPetalCount).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLEN), fmt::format("{:.2f}", IniFile.daisyPetalLen).c_str());
 	CheckDlgButton(hWinDialog, IDC_HOLE, UserFlagMap.test(UserFlag::DAZHOL));
 	CheckDlgButton(hWinDialog, IDC_DLIN, UserFlagMap.test(UserFlag::DAZD));
+	std::string daisyType;
 	for (iType = 0; iType < 6; iType++) {
-		LoadString(ThrEdInstance, DaisyTypeStrings[iType], buffer, HBUFSIZ);
-		[[gsl::suppress(type.1)]]
-		SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(buffer));
+		// ToDo - move DaisyTypeStrings into resource file. See fthdefprc for example
+		loadString(daisyType, DaisyTypeStrings[iType]);
+		//[[gsl::suppress(type.1)]]
+		SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str()));
 	}
 	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 }
@@ -1772,16 +1766,14 @@ void dmprec(std::vector<OREC *> &stitchRegion, unsigned count) noexcept {
 	unsigned iRegion;
 
 	for (iRegion = 0; iRegion < count; iRegion++) {
-		sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%4d off: %4d at: %08x frm: %4d typ: %d col: %2d st: %5d fin: %5d\n",
+		OutputDebugString(fmt::format("{:4d} attrb: 0x{:08x} form: {:4d} type: {} color: {:2d} start: {:5d} finish: {:5d}\n",
 			iRegion,
-			&stitchRegion[iRegion] - &stitchRegion[0],
 			StitchBuffer[stitchRegion[iRegion]->start].attribute,
 			stitchRegion[iRegion]->form,
 			stitchRegion[iRegion]->type,
 			stitchRegion[iRegion]->color,
 			stitchRegion[iRegion]->start,
-			stitchRegion[iRegion]->finish);
-		OutputDebugString(MsgBuffer);
+			stitchRegion[iRegion]->finish).c_str());
 	}
 }
 #endif
@@ -1964,7 +1956,6 @@ typedef struct _atfld {
 }ATFLD;
 
 void duatf(unsigned ind) {
-	char			attributeBuffer[256] = { 0 };
 	const unsigned	attribute = StitchBuffer[ind].attribute;
 	ATFLD			attributeFields = { (attribute&COLMSK),
 					((attribute  & FRMSK) >> FRMSHFT),
@@ -1976,15 +1967,14 @@ void duatf(unsigned ind) {
 		attributeFields.user = 1;
 	else
 		attributeFields.user = 0;
-	sprintf_s(attributeBuffer, sizeof(attributeBuffer), "%5d: col: %2d frm: %5d typ: %2d, lay: %1d: usr: %1d at: %08x\n",
+	OutputDebugString(fmt::format("{:5d}: color: {:2d} form: {:5d} type: {:2d}, layer: {:1d}: user: {:1d} attrib: 0x{:08x}\n",
 		ind,
 		attributeFields.color,
 		attributeFields.form,
 		attributeFields.type,
 		attributeFields.layer,
 		attributeFields.user,
-		attribute);
-	OutputDebugString(attributeBuffer);
+		attribute).c_str());
 }
 
 void dmpat() noexcept {
