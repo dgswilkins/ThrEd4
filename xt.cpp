@@ -1167,26 +1167,21 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) no
 	char		buf[HBUFSIZ] = { 0 };
 	char		buf1[HBUFSIZ] = { 0 };
 	unsigned	iFeatherStyle = 0, state = 0, featherType = 0;
+	std::string featherStyle;
 
 	switch (umsg) {
 	case WM_INITDIALOG:
 
 		featherType = IniFile.featherType;
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-		sprintf_s(buf, sizeof(buf), "%.2f", IniFile.featherRatio);
-		SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf);
-		sprintf_s(buf, sizeof(buf), "%d", IniFile.featherUpCount);
-		SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf);
-		sprintf_s(buf, sizeof(buf), "%d", IniFile.featherDownCount);
-		SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf);
-		sprintf_s(buf, sizeof(buf), "%.2f", IniFile.featherMinStitchSize / PFGRAN);
-		SetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf);
-		sprintf_s(buf, sizeof(buf), "%d", IniFile.featherCount);
-		SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf);
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), fmt::format("{:.2f}", IniFile.featherRatio).c_str());
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), fmt::format("{}", IniFile.featherUpCount).c_str());
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), fmt::format("{}", IniFile.featherDownCount).c_str());
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFLR), fmt::format("{:.2f}", (IniFile.featherMinStitchSize / PFGRAN)).c_str());
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), fmt::format("{}", IniFile.featherCount).c_str());
 		for (iFeatherStyle = 0; iFeatherStyle < 6; iFeatherStyle++) {
-			LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, buf, HBUFSIZ);
-			[[gsl::suppress(type.1)]]
-			SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(buf));
+			loadString(featherStyle, (IDS_FTH0 + iFeatherStyle));
+			SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(featherStyle.c_str()));
 		}
 		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
 		if (featherType&AT_FTHBLND)

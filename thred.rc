@@ -981,7 +981,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_CREATBY             "Created by: {}\nModified by: {}"
-    IDS_CUSTHUP             "Custom Hoop\n%.2f\n%.2f"
+    IDS_CUSTHUP             "Custom Hoop\n{:.2f}\n{:.2f}"
     IDS_STCHP               "Enter stitch point pixels\ncurrently: {}"
     IDS_FRMP                "Enter form point pixels\ncurrently: {}"
     IDS_ENTROT              "Please enter rotate segments.\nThe current value is: {:.2f}"
@@ -1074,7 +1074,7 @@ BEGIN
     IDS_DAZHART             "Mirror"
     IDS_CLEAR               "Clear"
     IDS_TXHI                "hi: %.2f"
-    IDS_TXWID               "wid: %.2f"
+    IDS_TXWID               "wid: {:.2f}"
     IDS_TXSPAC              "spc: %.2f"
     IDS_TXVRT               "vert"
     IDS_TXHOR               "horz"

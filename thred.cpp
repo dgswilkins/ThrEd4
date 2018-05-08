@@ -14140,8 +14140,7 @@ unsigned chkMsg() {
 						IniFile.customHoopX = IniFile.hoopSizeX;
 						IniFile.customHoopY = IniFile.hoopSizeY;
 						StateMap.set(StateFlag::MSGOF);
-						sprintf_s(MsgBuffer, sizeof(MsgBuffer), StringTable->at(STR_CUSTHUP).c_str(), IniFile.hoopSizeX / PFGRAN, IniFile.hoopSizeY / PFGRAN);
-						shoMsg(MsgBuffer);
+						shoMsg(fmt::format(StringTable->at(STR_CUSTHUP), IniFile.hoopSizeX / PFGRAN, IniFile.hoopSizeY / PFGRAN));
 						break;
 
 					case SMALHUP:
@@ -14539,9 +14538,8 @@ unsigned chkMsg() {
 			return 1;
 		}
 		if (PreferenceIndex == PAP + 1 && chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
-			sprintf_s(MsgBuffer, sizeof(MsgBuffer), "%d", VerticalIndex);
 			AppliqueColor = VerticalIndex;
-			SetWindowText(ValueWindow[PAP], MsgBuffer);
+			SetWindowText(ValueWindow[PAP], fmt::format("{}", VerticalIndex).c_str());
 			unsid();
 			return 1;
 		}
@@ -19836,7 +19834,6 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 	unsigned	screenCenterOffset = 0;
 	SIZE		maxWindowDimension = {};
 	char		buffer[10] = { 0 };		//for integer to string conversion
-	unsigned	length = 0;			//string length
 	SIZE		textSize = {};		//for measuring text items
 	POINT		scrollPoint = {};	//for scroll bar functions
 	POINT		line[2] = {};
@@ -20072,9 +20069,10 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			else
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_BTNFACE));
 			if (StateMap.test(StateFlag::TXTRED)) {
-				LoadString(ThrEdInstance, IDS_TXWID, fileName, _MAX_PATH);
-				sprintf_s(HelpBuffer, sizeof(HelpBuffer), fileName, TextureScreen.width / PFGRAN);
-				TextOut(DrawItem->hDC, position, 1, HelpBuffer, strlen(HelpBuffer));;
+				std::string fmtStr;
+				loadString(fmtStr, IDS_TXWID);
+				std::string scrWidth(fmt::format(fmtStr, (TextureScreen.width / PFGRAN)));
+				TextOut(DrawItem->hDC, position, 1, scrWidth.c_str(), scrWidth.size());;
 			}
 			else
 				TextOut(DrawItem->hDC, position, 1, StringTable->at(STR_PIKOL).c_str(), StringTable->at(STR_PIKOL).size());;
@@ -20127,10 +20125,9 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 					if (DisplayedColorBitmap.test(iColor)) {
 						SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
 						SetTextColor(DrawItem->hDC, defTxt(iColor));
-						sprintf_s(buffer, sizeof(buffer), "%d", iColor + 1);
-						length = strlen(buffer);
-						GetTextExtentPoint32(DrawItem->hDC, buffer, length, &textSize);
-						TextOut(DrawItem->hDC, (ButtonWidth - textSize.cx) >> 1, 0, buffer, length);
+						std::string colorNum(fmt::format("{}", iColor + 1));
+						GetTextExtentPoint32(DrawItem->hDC, colorNum.c_str(), colorNum.size(), &textSize);
+						TextOut(DrawItem->hDC, (ButtonWidth - textSize.cx) >> 1, 0, colorNum.c_str(), colorNum.size());
 					}
 					return 1;
 				}
