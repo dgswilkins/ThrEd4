@@ -231,12 +231,13 @@ inline void loadString(std::string & sDest, unsigned stringID) {
 	}
 }
 
-void adbad(unsigned code, unsigned count) noexcept {
-	LoadString(ThrEdInstance, code, RepairString, sizeof(MsgBuffer) - strlen(RepairString));
-	RepairString = &RepairString[strlen(RepairString)];
-	LoadString(ThrEdInstance, IDS_NOTREP, HelpBuffer, sizeof(HelpBuffer));
-	sprintf_s(RepairString, sizeof(MsgBuffer) - strlen(RepairString), HelpBuffer, count);
-	RepairString = &RepairString[strlen(RepairString)];
+void adbad(fmt::MemoryWriter &repairMessage, unsigned code, unsigned count) noexcept {
+	std::string fmtStr;
+
+	loadString(fmtStr, code);
+	repairMessage.write(fmtStr);
+	loadString(fmtStr, IDS_NOTREP);
+	repairMessage.write(fmtStr, count);
 }
 
 void hsizmsg() {

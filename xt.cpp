@@ -106,7 +106,7 @@ extern	POINT			ZoomBoxLine[5];
 extern	fPOINT			ZoomBoxOrigin;
 extern	dRECTANGLE		ZoomRect;
 
-extern	void		adbad(unsigned code, unsigned count);
+extern	void		adbad(fmt::MemoryWriter &repairMessage, unsigned code, unsigned count);
 extern	fPOINT*		adflt(unsigned count);
 extern	SATCON*		adsatk(unsigned	count);
 extern	void		angclpfn(std::vector<RNGCNT> &textureSegments);
@@ -3098,38 +3098,32 @@ void px2ed(POINT point, fPOINT* editPoint) noexcept {
 	editPoint->y = TextureScreen.screenHeight - point.y*TextureScreen.editToPixelRatio;
 }
 
-void bxtxt(unsigned iButton, const char* string) noexcept {
-	SetWindowText(ButtonWin[iButton], string);
+void bxtxt(unsigned iButton, unsigned iMessage) noexcept {
+	std::string message;
+	loadString(message, iMessage);
+	SetWindowText(ButtonWin[iButton], message.c_str());
 }
 
-void lodhbuf(unsigned iString) noexcept {
-	LoadString(ThrEdInstance, iString, HelpBuffer, HBUFSIZ);
-}
-
-void hlpflt(unsigned iMessage, unsigned iButton, float data) noexcept {
-	lodhbuf(iMessage);
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), HelpBuffer, data);
-	bxtxt(iButton, MsgBuffer);
+void hlpflt(unsigned iButton, unsigned iMessage, float data) noexcept {
+	std::string fmtStr;
+	loadString(fmtStr, iMessage);
+	SetWindowText(ButtonWin[iButton], fmt::format(fmtStr, data).c_str());
 }
 
 void drwtxbut() {
-	lodhbuf(IDS_CLEAR);
-	bxtxt(HTXCLR, HelpBuffer);
-	hlpflt(IDS_TXHI, HTXHI, TextureScreen.areaHeight / PFGRAN);
+	bxtxt(HTXCLR, IDS_CLEAR);
+	hlpflt(HTXHI, IDS_TXHI, TextureScreen.areaHeight / PFGRAN);
 	redraw(ButtonWin[HTXWID]);
-	hlpflt(IDS_TXSPAC, HTXSPAC, TextureScreen.spacing / PFGRAN);
-	lodhbuf(IDS_TXVRT);
-	bxtxt(HTXVRT, HelpBuffer);
-	lodhbuf(IDS_TXHOR);
-	bxtxt(HTXHOR, HelpBuffer);
-	lodhbuf(IDS_TXANG);
-	bxtxt(HTXANG, HelpBuffer);
-	lodhbuf(IDS_TXMIR);
-	bxtxt(HTXMIR, HelpBuffer);
+	hlpflt(HTXSPAC, IDS_TXSPAC, TextureScreen.spacing / PFGRAN);
+	bxtxt(HTXVRT, IDS_TXVRT);
+	bxtxt(HTXHOR, IDS_TXHOR);
+	bxtxt(HTXANG, IDS_TXANG);
+	bxtxt(HTXMIR, IDS_TXMIR);
 	SetWindowText(ButtonWin[HTXMIR + 1], "");
 }
 
 void chktx() noexcept {
+	// ToDo - this should be allocated in the calling function
 	std::vector<TXPNT> tmpTexture;
 	for (auto &p : *TempTexturePoints) {
 		if (p.line <= TextureScreen.lines && p.y <= TextureScreen.areaHeight) {
@@ -3958,8 +3952,7 @@ void txtlbut() {
 }
 
 void redtbak() {
-	sprintf_s(MsgBuffer, sizeof(MsgBuffer), "retrieving texture history %d\n", TextureHistoryIndex);
-	OutputDebugString(MsgBuffer);
+	OutputDebugString(fmt::format("retrieving texture history {}\n", TextureHistoryIndex).c_str());
 	const TXHST* textureHistoryItem = &TextureHistory[TextureHistoryIndex];
 	if (textureHistoryItem) {
 		TextureScreen.areaHeight = textureHistoryItem->height;
@@ -4435,8 +4428,7 @@ void rtrclp() {
 }
 
 void setstxt(unsigned stringIndex, float value) noexcept {
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), "%.2f", (value / PFGRAN));
-	SetWindowText(GetDlgItem(DesignSizeDialog, stringIndex), HelpBuffer);
+	SetWindowText(GetDlgItem(DesignSizeDialog, stringIndex), fmt::format("{:.2f}", (value / PFGRAN)).c_str());
 }
 
 float getstxt(unsigned stringIndex) noexcept {
@@ -4972,7 +4964,7 @@ void chkfstch() noexcept {
 	}
 }
 
-void repflt() {
+void repflt(fmt::MemoryWriter &repairMessage) {
 	unsigned	iForm = 0, iDestination = 0, iVertex = 0, vertexDifference = 0, vertexCount = 0;
 	BADCNTS		badData = {};
 
@@ -5009,7 +5001,7 @@ void repflt() {
 				SatinGuideIndex = badData.guideCount;
 				TextureIndex = badData.tx;
 				chkfstch();
-				adbad(IDS_FRMDAT, FormIndex - iForm + 1);
+				adbad(repairMessage, IDS_FRMDAT, FormIndex - iForm + 1);
 				flag = false;
 				break;
 			}
@@ -5021,7 +5013,7 @@ void repflt() {
 	MoveMemory(FormVertices, &vertexPoint[0], sizeof(fPOINT)*FormVertexIndex);
 }
 
-void repclp() {
+void repclp(fmt::MemoryWriter &repairMessage) {
 	FRMHED*		formHeader = nullptr;
 	unsigned	iForm = 0, clipCount = 0, clipDifference = 0, badClipCount = 0;
 	std::vector<fPOINT>	clipPoint(MAXITEMS);
@@ -5071,7 +5063,7 @@ void repclp() {
 	MoveMemory(&ClipPoints, &clipPoint[0], clipCount * sizeof(fPOINT));
 	ClipPointIndex = clipCount;
 	if (badClipCount)
-		adbad(IDS_CLPDAT, badClipCount);
+		adbad(repairMessage, IDS_CLPDAT, badClipCount);
 }
 
 void repsat() {
@@ -5136,25 +5128,22 @@ void reptx() {
 }
 
 void repar() {
+	fmt::MemoryWriter repairMessage;
 	const unsigned	repairType = frmchkfn();
 
 	savdo();
-	RepairString = MsgBuffer;
+	//RepairString = MsgBuffer;
 	if (repairType&BADFLT)
-		repflt();
+		repflt(repairMessage);
 	if (repairType&BADCLP)
-		repclp();
+		repclp(repairMessage);
 	if (repairType&BADSAT)
 		repsat();
 	if (repairType&BADTX)
 		reptx();
 	lodchk();
 	StateMap.set(StateFlag::RESTCH);
-	if (RepairString != MsgBuffer) {
-		RepairString--;
-		*RepairString = 0;
-		shoMsg(MsgBuffer);
-	}
+	shoMsg(repairMessage.str());
 }
 
 void tst() {
