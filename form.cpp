@@ -212,14 +212,14 @@ void			clpbrd(unsigned short startVertex);
 void			clpcon(std::vector<RNGCNT> &textureSegments);
 void			clpic();
 void			clpout ();
-void			clpxadj(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPoints) noexcept;
+void			clpxadj(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPoints);
 void			contf ();
 void			deleclp (unsigned iForm);
 void			delmclp (unsigned iForm);
 void			duangs () noexcept;
 void			dubfn ();
 void			dufcntr (dPOINT* center) noexcept;
-void			dulast (std::vector<fPOINT> &chainEndPoints) noexcept;
+void			dulast (std::vector<fPOINT> &chainEndPoints);
 void			dufxlen (std::vector<fPOINT> &chainEndPoints);
 void			duhart (unsigned sideCount);
 void			durpoli (unsigned vertexCount);
@@ -1365,14 +1365,14 @@ void setzig() {
 	numWnd();
 }
 
-inline void initTearDlg(HWND hwndlg) noexcept {
+inline void initTearDlg(HWND hwndlg) {
 	SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), fmt::format("{:d}", IniFile.formSides).c_str());
 	SetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), fmt::format("{:.3f}", IniFile.tearTailLength).c_str());
 	SetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), fmt::format("{:.3f}", IniFile.tearTwistStep / PFGRAN).c_str());
 	SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), fmt::format("{:.3f}", IniFile.tearTwistRatio).c_str());
 }
 
-BOOL CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
+BOOL CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
 	char	buffer[HBUFSIZ] = { 0 };
@@ -1849,7 +1849,7 @@ void ritfil() {
 	}
 }
 
-void okcan() noexcept {
+void okcan() {
 	GetClientRect(MsgWindow, &MsgRect);
 
 	OKButton = CreateWindow(
@@ -2819,7 +2819,7 @@ unsigned short isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoin
 	return 1;
 }
 
-bool lnclos(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints, unsigned group0, unsigned line0, unsigned group1, unsigned line1) noexcept {
+bool lnclos(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints, unsigned group0, unsigned line0, unsigned group1, unsigned line1) {
 	unsigned		index0 = 0, index1 = 0;
 	unsigned		count0 = (groupIndexSequence[group0 + 1] - groupIndexSequence[group0]) >> 1;
 	unsigned		count1 = 0;
@@ -2854,7 +2854,7 @@ bool lnclos(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &li
 	return 0;
 }
 
-bool regclos(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints, std::vector<SMALPNTL*> &sortedLines, unsigned iRegion0, unsigned iRegion1, std::vector<REGION> &regionsList) noexcept {
+bool regclos(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints, std::vector<SMALPNTL*> &sortedLines, unsigned iRegion0, unsigned iRegion1, std::vector<REGION> &regionsList) {
 	//ToDo - More renaming required
 
 	const SMALPNTL*	lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
@@ -2931,7 +2931,7 @@ bool regclos(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &l
 	return 0;
 }
 
-bool unvis(boost::dynamic_bitset<> &visitedRegions) noexcept {
+bool unvis(boost::dynamic_bitset<> &visitedRegions) {
 	for (VisitedIndex = 0; VisitedIndex < RegionCount; VisitedIndex++) {
 		if (!visitedRegions[VisitedIndex])
 			return true;
@@ -2964,7 +2964,7 @@ void dunseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish
 	LastGroup = sortedLines[finish][0].group;
 }
 
-void movseq(std::vector<SMALPNTL*> &sortedLines, unsigned ind) noexcept {
+void movseq(std::vector<SMALPNTL*> &sortedLines, unsigned ind) {
 	SMALPNTL*	lineEndPoint = sortedLines[ind];
 
 	BSequence[OutputIndex].attribute = SEQBOT;
@@ -2980,7 +2980,7 @@ void movseq(std::vector<SMALPNTL*> &sortedLines, unsigned ind) noexcept {
 	OutputIndex++;
 }
 
-void duseq2(std::vector<SMALPNTL*> &sortedLines, unsigned iLine) noexcept {
+void duseq2(std::vector<SMALPNTL*> &sortedLines, unsigned iLine) {
 	SequenceLines = sortedLines[iLine];
 	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x, (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
 }
@@ -3334,7 +3334,7 @@ void durgn(std::vector<FSEQ> &sequencePath, boost::dynamic_bitset<> &visitedRegi
 	}
 }
 
-unsigned notdun(std::vector<RGSEQ> &tempPath, std::vector<RCON> &pathMap, std::vector<unsigned> &MapIndexSequence, boost::dynamic_bitset<> &VisitedRegions, unsigned level) noexcept {
+unsigned notdun(std::vector<RGSEQ> &tempPath, std::vector<RCON> &pathMap, std::vector<unsigned> &MapIndexSequence, boost::dynamic_bitset<> &VisitedRegions, unsigned level) {
 	unsigned	iPath = 1;
 	int			pivot = 0;
 	int			previousLevel = level - 1;
@@ -3384,7 +3384,7 @@ unsigned notdun(std::vector<RGSEQ> &tempPath, std::vector<RCON> &pathMap, std::v
 	return 0;
 }
 
-double reglen(std::vector<SMALPNTL*> &sortedLines, unsigned iRegion, std::array<fPOINT, 4> &lastRegionCorners, std::vector<REGION> &regionsList) noexcept {
+double reglen(std::vector<SMALPNTL*> &sortedLines, unsigned iRegion, std::array<fPOINT, 4> &lastRegionCorners, std::vector<REGION> &regionsList) {
 	double		length = 0.0, minimumLength = 1e99;
 	unsigned	iCorner = 0, iPoint = 0;
 	SMALPNTL*	lineEndPoints[4] = {};
@@ -3404,7 +3404,7 @@ double reglen(std::vector<SMALPNTL*> &sortedLines, unsigned iRegion, std::array<
 	return minimumLength;
 }
 
-void nxtrgn(std::vector<RGSEQ> &tempPath, std::vector<RCON> &pathMap, std::vector<unsigned> &mapIndexSequence, boost::dynamic_bitset<> &visitedRegions, std::vector<SMALPNTL*> &sortedLines, std::vector<REGION> &regionsList) noexcept {
+void nxtrgn(std::vector<RGSEQ> &tempPath, std::vector<RCON> &pathMap, std::vector<unsigned> &mapIndexSequence, boost::dynamic_bitset<> &visitedRegions, std::vector<SMALPNTL*> &sortedLines, std::vector<REGION> &regionsList) {
 	unsigned	iRegion = 0, iPath = 0, newRegion = 0;
 	double		length = 0, minimumLength = 1e99;
 	unsigned	pathLength = 1;				//length of the path to the region
@@ -3487,7 +3487,7 @@ bool sqcomp(const SMALPNTL *arg1, const SMALPNTL *arg2) noexcept {
 	return false;
 }
 
-void nxtseq(std::vector<FSEQ> &sequencePath, std::vector<RCON> &pathMap, std::vector<unsigned> &mapIndexSequence, unsigned pathIndex) noexcept {
+void nxtseq(std::vector<FSEQ> &sequencePath, std::vector<RCON> &pathMap, std::vector<unsigned> &mapIndexSequence, unsigned pathIndex) {
 	unsigned	iPath = mapIndexSequence[sequencePath[pathIndex].node];
 	unsigned	nextNode = 0;
 	if ((pathIndex + 1) < sequencePath.size()) {
@@ -4270,7 +4270,7 @@ bool scomp(const SATCON &arg1, const SATCON &arg2) noexcept {
 	return (arg1.start < arg2.start);
 }
 
-void satcpy(SATCON* destination, std::vector<SATCON> source, unsigned int size) noexcept {
+void satcpy(SATCON* destination, std::vector<SATCON> source, unsigned int size) {
 	if (destination) {
 		for (unsigned int iSource = 0; iSource < size; iSource++) {
 			destination[iSource].start = source[iSource].start;
@@ -5445,7 +5445,7 @@ void bord() {
 	}
 }
 
-bool ritclp(std::vector<fPOINT> clipFillData, fPOINT point) noexcept {
+bool ritclp(std::vector<fPOINT> clipFillData, fPOINT point) {
 	fPOINT		adjustedPoint = { (point.x - ClipReference.x),
 								  (point.y - ClipReference.y) };
 	unsigned	iStitch = 0;
@@ -5554,7 +5554,7 @@ void lincrnr(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFil
 	}
 }
 
-void durev(std::vector<fPOINT> &clipReversedData) noexcept {
+void durev(std::vector<fPOINT> &clipReversedData) {
 	unsigned	iStitch = 0;
 	const double	midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
 
@@ -6173,7 +6173,7 @@ void maxtsiz(const std::string &label, POINT &textSize) noexcept {
 		textSize.x = labelSize.cx;
 }
 
-void maxwid(unsigned start, unsigned finish) noexcept {
+void maxwid(unsigned start, unsigned finish) {
 	POINT	textSize;
 
 	textSize.x = 0;
@@ -7151,7 +7151,7 @@ HWND prfnwin(const std::string &text) noexcept {
 		NULL);
 }
 
-void prflin(std::string msg, unsigned row) noexcept {
+void prflin(std::string msg, unsigned row) {
 	prftwin(StringTable->at(row));
 	ValueWindow[row - STR_PRF0] = prfnwin(msg);
 	nxtlin();
@@ -7752,7 +7752,7 @@ void flipv() {
 	}
 }
 
-void tomsg() noexcept {
+void tomsg() {
 	RECT	OKrect;
 	SIZE	textSize;
 
@@ -7772,7 +7772,7 @@ void tomsg() noexcept {
 		NULL);
 }
 
-void sprct(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish) noexcept {
+void sprct(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish) {
 	dPOINT	delta = { (OutsidePoints[finish].x - OutsidePoints[start].x),
 					  (OutsidePoints[finish].y - OutsidePoints[start].y) };
 	dPOINT	point = {};
@@ -7890,7 +7890,7 @@ void spurfn(const dPOINT* innerPoint, const dPOINT* outerPoint, dPOINT* underlay
 	underlayOuterPoint->y = delta.y*DOURAT + innerPoint->y;
 }
 
-void spurct(std::vector<VRCT2> &underlayVerticalRect, std::vector<VRCT2> &fillVerticalRect, unsigned iRect) noexcept {
+void spurct(std::vector<VRCT2> &underlayVerticalRect, std::vector<VRCT2> &fillVerticalRect, unsigned iRect) {
 	spurfn(&fillVerticalRect[iRect].aipnt, &fillVerticalRect[iRect].aopnt, &underlayVerticalRect[iRect].aipnt, &underlayVerticalRect[iRect].aopnt);
 	spurfn(&fillVerticalRect[iRect].bipnt, &fillVerticalRect[iRect].bopnt, &underlayVerticalRect[iRect].bipnt, &underlayVerticalRect[iRect].bopnt);
 	spurfn(&fillVerticalRect[iRect].cipnt, &fillVerticalRect[iRect].copnt, &underlayVerticalRect[iRect].cipnt, &underlayVerticalRect[iRect].copnt);
@@ -7950,7 +7950,7 @@ void duromb(dPOINT start0, dPOINT finish0, dPOINT start1, dPOINT finish1) {
 	}
 }
 
-void spend(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish) noexcept {
+void spend(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish) {
 	dPOINT		innerDelta = { (fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
 							   (fillVerticalRect[finish].cipnt.y - fillVerticalRect[start].bipnt.y) };
 	const double	innerLength = hypot(innerDelta.x, innerDelta.y);
@@ -8555,7 +8555,7 @@ void clpfil() {
 	}
 }
 
-void snpfn(std::vector<unsigned> &xPoints, unsigned start, unsigned end, unsigned finish) noexcept {
+void snpfn(std::vector<unsigned> &xPoints, unsigned start, unsigned end, unsigned finish) {
 	unsigned	iPoint = 0, reference = 0, check = 0;
 	double		CheckLength = 0.0;
 
@@ -9063,7 +9063,7 @@ bool setrc(unsigned bit) {
 
 #endif
 
-void frmsadj() noexcept {
+void frmsadj() {
 	unsigned	iForm = 0, iStitch = 0;
 
 	boost::dynamic_bitset<> formMap(FormIndex);
@@ -10778,13 +10778,13 @@ bool nucseg(std::vector<CLPSEG> &clipSegments, std::vector<LENINFO> &sortedLengt
 	return true;
 }
 
-void mvpclp(std::vector<CLIPSORT *> &arrayOfClipIntersectData, unsigned destination, unsigned source) noexcept {
+void mvpclp(std::vector<CLIPSORT *> &arrayOfClipIntersectData, unsigned destination, unsigned source) {
 	if (destination != source) {
 		arrayOfClipIntersectData[destination] = arrayOfClipIntersectData[source];
 	}
 }
 
-float getlen(std::vector<CLIPNT> &clipStitchPoints, std::vector<double> &lengths, unsigned iPoint) noexcept {
+float getlen(std::vector<CLIPNT> &clipStitchPoints, std::vector<double> &lengths, unsigned iPoint) {
 	clipStitchPoints[iPoint].vertexIndex %= VertexCount;
 	return	lengths[clipStitchPoints[iPoint].vertexIndex] +
 		hypot(CurrentFormVertices[clipStitchPoints[iPoint].vertexIndex].x - clipStitchPoints[iPoint].x,
@@ -10863,7 +10863,7 @@ bool isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* leng
 	return flag;
 }
 
-unsigned insect(std::vector<CLIPSORT> &clipIntersectData, std::vector<VCLPX> &regionCrossingData, std::vector<CLIPSORT *> &arrayOfClipIntersectData, unsigned regionCrossingStart, unsigned regionCrossingEnd) noexcept {
+unsigned insect(std::vector<CLIPSORT> &clipIntersectData, std::vector<VCLPX> &regionCrossingData, std::vector<CLIPSORT *> &arrayOfClipIntersectData, unsigned regionCrossingStart, unsigned regionCrossingEnd) {
 	unsigned	iRegions = 0, iDestination = 0, iIntersection = 0, count = 0;
 	unsigned	currentVertex = 0, nextVertex = 0;
 	fRECTANGLE	lineSegmentRect = {};
@@ -10916,7 +10916,7 @@ unsigned insect(std::vector<CLIPSORT> &clipIntersectData, std::vector<VCLPX> &re
 	return count;
 }
 
-bool isin(std::vector<VCLPX> regionCrossingData, float xCoordinate, float yCoordinate, unsigned regionCrossingStart, unsigned regionCrossingEnd) noexcept {
+bool isin(std::vector<VCLPX> regionCrossingData, float xCoordinate, float yCoordinate, unsigned regionCrossingStart, unsigned regionCrossingEnd) {
 	// ToDo - rename local variables
 
 	unsigned	iRegion = 0, acnt = 0;
@@ -10954,7 +10954,7 @@ bool isin(std::vector<VCLPX> regionCrossingData, float xCoordinate, float yCoord
 	return acnt & 1;
 }
 
-unsigned clpnseg(std::vector<CLIPNT> &clipStitchPoints, std::vector<CLPSEG> &clipSegments, std::vector<double> &lengths, unsigned start, unsigned finish) noexcept {
+unsigned clpnseg(std::vector<CLIPNT> &clipStitchPoints, std::vector<CLPSEG> &clipSegments, std::vector<double> &lengths, unsigned start, unsigned finish) {
 	CLPSEG clipSegment;
 
 	clipSegment.start = start;
@@ -10995,7 +10995,7 @@ void duflt() {
 		StateMap.reset(StateFlag::WASNEG);
 }
 
-void inspnt(std::vector<CLIPNT> &clipStitchPoints) noexcept {
+void inspnt(std::vector<CLIPNT> &clipStitchPoints) {
 	CLIPNT	clipStitchPoint{ clipStitchPoints.back().x,
 								clipStitchPoints.back().y,
 								0,
@@ -11789,7 +11789,7 @@ void col2frm() {
 	shoMsg(fmt::format(fmtStr, colorChangedCount));
 }
 
-bool fxpnt(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) noexcept {
+bool fxpnt(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) {
 	double		length = 0.0, delta = 0.0;
 	unsigned	iGuess = 0;
 
@@ -11810,7 +11810,7 @@ bool fxpnt(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) noe
 	return 0;
 }
 
-void fxlit(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) noexcept {
+void fxlit(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) {
 	double		length = 0.0;
 	unsigned	count = 0;
 	dPOINT		delta = {};
@@ -11829,7 +11829,7 @@ void fxlit(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) noe
 	}
 }
 
-void fxlin(std::vector<fPOINT> &chainEndPoints, std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) noexcept {
+void fxlin(std::vector<fPOINT> &chainEndPoints, std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) {
 	double		length = 0.0;
 	unsigned	count = 0;
 	unsigned	iChain = 0;
@@ -11851,7 +11851,7 @@ void fxlin(std::vector<fPOINT> &chainEndPoints, std::vector<double> &ListSINEs, 
 	}
 }
 
-void fxlen(std::vector<fPOINT> &chainEndPoints, std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) noexcept {
+void fxlen(std::vector<fPOINT> &chainEndPoints, std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) {
 	double		interval = 0.0;
 	double		minimumInterval = 0.0;
 	double		minimumSpacing = 0.0;
@@ -11952,7 +11952,7 @@ void fxlen(std::vector<fPOINT> &chainEndPoints, std::vector<double> &listSINEs, 
 	}
 }
 
-void duchfn(std::vector<fPOINT> &chainEndPoints, unsigned start, unsigned finish) noexcept {
+void duchfn(std::vector<fPOINT> &chainEndPoints, unsigned start, unsigned finish) {
 	unsigned		iChain = 0;
 	fPOINT			chainPoint[5] = {};
 	dPOINT			delta = { (chainEndPoints[finish].x - chainEndPoints[start].x),
@@ -12187,7 +12187,7 @@ void duxclp() {
 	}
 }
 
-void dulast(std::vector<fPOINT> &chainEndPoints) noexcept {
+void dulast(std::vector<fPOINT> &chainEndPoints) {
 	unsigned	iPoint = 0, iDestination = 0, minimumIndex = 0;
 	double		minimumLength = 0.0;
 	double		length = 0.0;
@@ -12217,7 +12217,7 @@ void dulast(std::vector<fPOINT> &chainEndPoints) noexcept {
 	}
 }
 
-void clpxadj(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPoints) noexcept {
+void clpxadj(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPoints) {
 	unsigned	iPoint = 0;
 	float		pivot = 0.0;
 
@@ -12299,14 +12299,14 @@ void filclpx() {
 	}
 }
 
-inline void wavinit (HWND hwndlg) noexcept {
+inline void wavinit (HWND hwndlg) {
 	SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), fmt::format("{}", IniFile.wavePoints).c_str());
 	SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), fmt::format("{}", IniFile.waveStart).c_str());
 	SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), fmt::format("{}", IniFile.waveEnd).c_str());
 	SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), fmt::format("{}", IniFile.waveLobes).c_str());
 }
 
-bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
+bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
 	char	buffer[HBUFSIZ] = { 0 };

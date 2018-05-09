@@ -231,7 +231,7 @@ inline void loadString(std::string & sDest, unsigned stringID) {
 	}
 }
 
-void adbad(fmt::MemoryWriter &repairMessage, unsigned code, unsigned count) noexcept {
+void adbad(fmt::MemoryWriter &repairMessage, unsigned code, unsigned count) {
 	std::string fmtStr;
 
 	loadString(fmtStr, code);
@@ -475,9 +475,8 @@ void spltmsg() {
 }
 
 void datmsg(unsigned code) {
-	char*	pchr;
+	char*	pchr = MsgBuffer;
 
-	pchr = MsgBuffer;
 	if (pchr) {
 		if (code&BADFLT) {
 			LoadString(ThrEdInstance, IDS_BADFLT, pchr, HBUFSIZ);

@@ -338,7 +338,7 @@ void txrfor() noexcept {
 	}
 }
 
-bool chktxh(_In_ const TXHST* historyItem) noexcept {
+bool chktxh(_In_ const TXHST* historyItem) {
 	if (historyItem) {
 		unsigned iPoint = 0;
 
@@ -1161,7 +1161,7 @@ void fncwlk() {
 	ritcwlk();
 }
 
-BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
+BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
 	char		buf[HBUFSIZ] = { 0 };
@@ -1678,7 +1678,7 @@ bool refcmp(const OREC* record1, const OREC* record2) noexcept {
 	}
 }
 
-bool chkrdun(std::vector<unsigned> &formFillCounter, std::vector<OREC *> &pRecs, const SRTREC* stitchRecord) noexcept {
+bool chkrdun(std::vector<unsigned> &formFillCounter, std::vector<OREC *> &pRecs, const SRTREC* stitchRecord) {
 	unsigned iStitch;
 
 	for (iStitch = stitchRecord->start; iStitch < stitchRecord->finish; iStitch++) {
@@ -1762,7 +1762,7 @@ unsigned duprecs(std::vector<fPOINTATTR> &tempStitchBuffer, std::vector<OREC *> 
 
 #ifdef _DEBUG
 
-void dmprec(std::vector<OREC *> &stitchRegion, unsigned count) noexcept {
+void dmprec(std::vector<OREC *> &stitchRegion, unsigned count) {
 	unsigned iRegion;
 
 	for (iRegion = 0; iRegion < count; iRegion++) {
@@ -1778,7 +1778,7 @@ void dmprec(std::vector<OREC *> &stitchRegion, unsigned count) noexcept {
 }
 #endif
 
-bool srtchk(std::vector<OREC *> &stitchRegion, unsigned count, unsigned* badForm) noexcept {
+bool srtchk(std::vector<OREC *> &stitchRegion, unsigned count, unsigned* badForm) {
 	unsigned	iRegion = 1;
 	unsigned	form = stitchRegion[0]->form;
 	unsigned	color = stitchRegion[0]->color;
@@ -1977,7 +1977,7 @@ void duatf(unsigned ind) {
 		attribute).c_str());
 }
 
-void dmpat() noexcept {
+void dmpat() {
 	unsigned iStitch = 0, attribute = StitchBuffer[0].attribute;
 
 	duatf(0);
@@ -2973,11 +2973,10 @@ void setfilend() {
 }
 
 void duauxnam() {
-	char* fileExtention;
+	char* fileExtention = strrchr(AuxName, '.');
 
 	_strlwr_s(WorkingFileName);
 	strcpy_s(AuxName, WorkingFileName);
-	fileExtention = strrchr(AuxName, '.');
 	if (fileExtention)
 		fileExtention++;
 	else
@@ -3062,7 +3061,7 @@ void txtxfn(POINT reference, int offsetPixels) noexcept {
 	Polyline(StitchWindowMemDC, line, 2);
 }
 
-void dutxtx(int index, int offsetPixels) noexcept {
+void dutxtx(int index, int offsetPixels) {
 	POINT	ref;
 
 	txt2pix(TempTexturePoints->at(index), &ref);
@@ -3098,13 +3097,13 @@ void px2ed(POINT point, fPOINT* editPoint) noexcept {
 	editPoint->y = TextureScreen.screenHeight - point.y*TextureScreen.editToPixelRatio;
 }
 
-void bxtxt(unsigned iButton, unsigned iMessage) noexcept {
+void bxtxt(unsigned iButton, unsigned iMessage) {
 	std::string message;
 	loadString(message, iMessage);
 	SetWindowText(ButtonWin[iButton], message.c_str());
 }
 
-void hlpflt(unsigned iButton, unsigned iMessage, float data) noexcept {
+void hlpflt(unsigned iButton, unsigned iMessage, float data) {
 	std::string fmtStr;
 	loadString(fmtStr, iMessage);
 	SetWindowText(ButtonWin[iButton], fmt::format(fmtStr, data).c_str());
@@ -3122,7 +3121,7 @@ void drwtxbut() {
 	SetWindowText(ButtonWin[HTXMIR + 1], "");
 }
 
-void chktx() noexcept {
+void chktx() {
 	// ToDo - this should be allocated in the calling function
 	std::vector<TXPNT> tmpTexture;
 	for (auto &p : *TempTexturePoints) {
@@ -3229,7 +3228,7 @@ void drwtxtr() {
 	drwtxbut();
 }
 
-bool px2txt(POINT offset) noexcept {
+bool px2txt(POINT offset) {
 	fPOINT editPoint;
 
 	px2ed(offset, &editPoint);
@@ -3252,7 +3251,7 @@ bool px2txt(POINT offset) noexcept {
 	}
 }
 
-bool txbutfn() noexcept {
+bool txbutfn() {
 	POINT	offset;
 
 	deorg(&offset);
@@ -3327,7 +3326,7 @@ void ritxrct() noexcept {
 	Polyline(StitchWindowDC, line, 5);
 }
 
-void dutxrct(TXTRCT* textureRect) noexcept {
+void dutxrct(TXTRCT* textureRect) {
 	unsigned	iPoint = 0;
 	TXPNT*		texturePoint = nullptr;
 
@@ -3356,7 +3355,7 @@ void ed2stch(fPOINT* pt) noexcept {
 	pt->y -= TextureScreen.yOffset;
 }
 
-void dutxlin(fPOINT point0, fPOINT point1) noexcept {
+void dutxlin(fPOINT point0, fPOINT point1) {
 	double	slope = 0.0;
 	float	deltaX = 0.0;
 	float	start = 0.0, finish = 0.0, swap = 0.0, yOffset = 0.0;
@@ -4427,7 +4426,7 @@ void rtrclp() {
 	}
 }
 
-void setstxt(unsigned stringIndex, float value) noexcept {
+void setstxt(unsigned stringIndex, float value) {
 	SetWindowText(GetDlgItem(DesignSizeDialog, stringIndex), fmt::format("{:.2f}", (value / PFGRAN)).c_str());
 }
 

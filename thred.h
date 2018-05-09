@@ -19,13 +19,14 @@
 #pragma warning(disable:26481)	// bounds.1	Don't use pointer arithmetic. Use span instead
 #pragma warning(disable:26482)	// bounds.2	Only index into arrays using constant expressions
 #pragma warning(disable:26485)	// bounds.3	No array to pointer decay
+#pragma warning(disable:26446)	// bounds.4 Prefer to use gsl::at() instead of unchecked subscript operator 
+#pragma warning(disable:26489)	// lifetime.1 Don't dereference a pointer that may be invalid
 //#pragma warning(disable:26490)	// type.1	Don't use reinterpret_cast
 //#pragma warning(disable:26493)	// type.4	Don't use C-style casts
 //#pragma warning(disable:26494)	// type.5	Variable is uninitialized
 //#pragma warning(disable:26496)	// Con.4	Value is assigned only once, mark it as a pointer to const
 //#pragma warning(disable:26497)	// f.4		This function could be marked constexpr if compile-time evaluation is desired
 #pragma warning(disable:26499)	//			Could not find any lifetime tracking information
-
 #include <vector>
 
 #include "EnumMap.h"

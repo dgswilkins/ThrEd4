@@ -47,7 +47,7 @@ void		cros (unsigned iStitch) noexcept;
 void		delet ();
 void		delsfrms (unsigned code);
 void		delsmal (unsigned startStitch, unsigned endStitch);
-void		delstchm () noexcept;
+void		delstchm ();
 void		drwLin(std::vector<POINT> &linePoints, unsigned currentStitch, unsigned length, HPEN hPen);
 void		dstcurs () noexcept;
 void		duIns ();
@@ -1595,7 +1595,7 @@ unsigned			EdgeFillTypes[] =			//edge fill type array for side window display
 unsigned			FeatherFillTypes[] =		//feather fill types
 { FTHSIN,FTHSIN2,FTHLIN,FTHPSG,FTHRMP,FTHFAZ };
 
-BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) noexcept {
+BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
 	HWND hwnd = {};
@@ -1733,7 +1733,7 @@ void linbmen() {
 	StateMap.set(StateFlag::DUMEN);
 }
 
-void wrnmen() noexcept {
+void wrnmen() {
 	unsigned code = MF_CHECKED;
 
 	if (UserFlagMap.test(UserFlag::WRNOF))
@@ -2765,7 +2765,7 @@ void defbNam() {
 	}
 }
 
-void ritini() noexcept {
+void ritini() {
 	unsigned	iColor = 0;
 	RECT		windowRect = {};
 
@@ -2849,7 +2849,7 @@ constexpr unsigned coldis(COLORREF colorA, COLORREF colorB) {
 	return distance;
 }
 
-void bal2thr(std::vector<BALSTCH> &balaradStitch, unsigned destination, unsigned source, unsigned code) noexcept {
+void bal2thr(std::vector<BALSTCH> &balaradStitch, unsigned destination, unsigned source, unsigned code) {
 #define IBALRAT 0.6
 
 	StitchBuffer[destination].attribute = code;
@@ -4151,7 +4151,7 @@ bool binv(const std::vector<unsigned char> &monoBitmapData, unsigned bitmapWidth
 	return false;
 }
 
-void bitlin(const unsigned char* source, unsigned* destination, COLORREF foreground, COLORREF background) noexcept {
+void bitlin(const unsigned char* source, unsigned* destination, COLORREF foreground, COLORREF background) {
 	if (source && destination) {
 		unsigned i = 0;
 		for (i = 0; i < (BitmapWidth >> 3); i++) {
@@ -4191,7 +4191,7 @@ bool gudtyp(WORD bitCount) noexcept {
 }
 
 // Move unpacked 24BPP data into packed 24BPP data
-void movmap(unsigned cnt, unsigned char *buffer) noexcept {
+void movmap(unsigned cnt, unsigned char *buffer) {
 	unsigned*		source = TraceBitmapData;
 	if (source) {
 		unsigned char*	destination = buffer;
@@ -4372,7 +4372,7 @@ void prtred() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-inline unsigned dtrn(DSTREC* dpnt) noexcept {
+inline unsigned dtrn(DSTREC* dpnt) {
 	return *(convert_ptr<unsigned int *>(dpnt));
 }
 
@@ -4599,7 +4599,7 @@ dubl2 :
 }
 #endif
 
-void xofrm(std::vector<FRMHEDO> &formListOriginal) noexcept {
+void xofrm(std::vector<FRMHEDO> &formListOriginal) {
 	unsigned	iForm = 0;
 	FRMHED		dstForm = {};
 	FRMHEDO		srcForm = {};
@@ -5105,7 +5105,7 @@ constexpr unsigned dudbits(POINT dif) {
 	return Xdst[dif.x + 121] | Ydst[dif.y + 121];
 }
 
-void savdst(std::vector<DSTREC> &DSTRecords, unsigned data) noexcept {
+void savdst(std::vector<DSTREC> &DSTRecords, unsigned data) {
 	union {
 		unsigned data;
 		DSTREC dstRecord;
@@ -6763,7 +6763,7 @@ void endpnt() {
 	InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 }
 
-void delstchm() noexcept {
+void delstchm() {
 	unsigned	iStitch = 0, destination = 0;
 
 	rngadj();
@@ -9159,7 +9159,7 @@ void chkrng(fPOINT* range) noexcept {
 	}
 }
 
-void ritmov() noexcept {
+void ritmov() {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
 	if (ClosestVertexToCursor) {
@@ -10797,7 +10797,7 @@ void shftflt(fPOINT point) noexcept {
 		shft(point);
 }
 
-void fil2men() noexcept {
+void fil2men() {
 	if (UserFlagMap.test(UserFlag::FIL2OF)) {
 		CheckMenuItem(MainMenu, ID_FIL2SEL_ON, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_FIL2SEL_OFF, MF_CHECKED);
@@ -11286,14 +11286,14 @@ void ovrlay() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void fil2sel(unsigned stat) noexcept {
+void fil2sel(unsigned stat) {
 	UserFlagMap.set(UserFlag::FIL2OF);
 	if (stat)
 		UserFlagMap.reset(UserFlag::FIL2OF);
 	fil2men();
 }
 
-void rotauxmen() noexcept {
+void rotauxmen() {
 	if (UserFlagMap.test(UserFlag::ROTAUX)) {
 		CheckMenuItem(MainMenu, ID_ROTAUXON, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_ROTAUXOFF, MF_UNCHECKED);
@@ -11312,7 +11312,7 @@ void rotauxsel(unsigned stat) {
 	StateMap.set(StateFlag::DUMEN);
 }
 
-void frmcurmen() noexcept {
+void frmcurmen() {
 	if (UserFlagMap.test(UserFlag::FRMX)) {
 		CheckMenuItem(MainMenu, ID_FRMX, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_FRMBOX, MF_UNCHECKED);
@@ -11594,7 +11594,7 @@ void untrace() {
 	}
 }
 
-void trcstpnum() noexcept {
+void trcstpnum() {
 	std::string fmtStr;
 	loadString(fmtStr, IDS_TRCSTP);
 	SetWindowText(TraceStepWin, fmt::format(fmtStr, (IniFile.traceLength / PFGRAN)).c_str());
@@ -12368,7 +12368,7 @@ void difbits(unsigned shift, unsigned* point) noexcept {
 	}
 }
 
-void blanklin(std::vector<unsigned> &differenceBitmap, unsigned lineStart) noexcept {
+void blanklin(std::vector<unsigned> &differenceBitmap, unsigned lineStart) {
 	unsigned	iPoint;
 
 	for (iPoint = lineStart; iPoint < lineStart + BitmapWidth; iPoint++)
@@ -18409,7 +18409,7 @@ void ritloc() {
 	}
 }
 
-static inline void delsubl(unsigned *dst, unsigned val, unsigned cnt) noexcept {
+static inline void delsubl(unsigned *dst, unsigned val, unsigned cnt) {
 	if (dst) {
 		for (unsigned i = 0; i < cnt; i++) {
 			*(dst++) = boost::endian::endian_reverse(gsl::narrow<uint32_t>(val));
@@ -18417,7 +18417,7 @@ static inline void delsubl(unsigned *dst, unsigned val, unsigned cnt) noexcept {
 		}
 	}
 }
-static inline void delsubr(unsigned *dst, unsigned val, unsigned cnt) noexcept {
+static inline void delsubr(unsigned *dst, unsigned val, unsigned cnt) {
 	if (dst) {
 		for (unsigned i = 0; i < cnt; i++) {
 			*(dst++) = boost::endian::endian_reverse(gsl::narrow<uint32_t>(val));
@@ -18426,7 +18426,7 @@ static inline void delsubr(unsigned *dst, unsigned val, unsigned cnt) noexcept {
 	}
 }
 
-static inline void delsubt(unsigned *dst, unsigned *src, unsigned cnt) noexcept {
+static inline void delsubt(unsigned *dst, unsigned *src, unsigned cnt) {
 	if (dst && src) {
 		for (unsigned i = 0; i < cnt; i++) {
 			*(dst++) = boost::endian::endian_reverse(gsl::narrow<uint32_t>(*(src++)));
@@ -18434,7 +18434,7 @@ static inline void delsubt(unsigned *dst, unsigned *src, unsigned cnt) noexcept 
 	}
 }
 
-void ducurs(unsigned char* pnt) noexcept {
+void ducurs(unsigned char* pnt) {
 	[[gsl::suppress(26429)]]{
 	unsigned *zPnt = convert_ptr<unsigned *>(pnt);
 	unsigned *dst = zPnt;
@@ -18536,7 +18536,7 @@ void ducurs(unsigned char* pnt) noexcept {
 	}
 }
 
-void crtcurs() noexcept {
+void crtcurs() {
 	unsigned char	cursorMask[128];		//cursor 'and' mask
 	CURSORMASK		cursorMasks;			//cursor mask structure
 
@@ -19072,7 +19072,7 @@ void init() {
 	SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRED), IniFile.designerName).c_str()); 
 }
 
-COLORREF defTxt(unsigned iColor) noexcept {
+COLORREF defTxt(unsigned iColor) {
 	const std::bitset<16>	textColorMap(0xbaf);	//bitmap for color number colors chosen for contrast against the default background colors
 	const unsigned int white = 0xffffff;
 	const unsigned int black = 0;
