@@ -108,7 +108,7 @@
 #define IDS_SHRNK                       103
 #define IDI_ICON1                       104
 #define IDS_PRT                         104
-#define IDS_SHRTKEY                     105
+#define IDS_NOTPES                      105
 #define IDS_INVKEY                      106
 #define IDS_DAYKEY                      108
 #define IDS_SHRTF                       109

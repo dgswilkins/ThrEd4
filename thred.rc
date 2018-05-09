@@ -706,7 +706,7 @@ BEGIN
     IDS_ALL                 "all forms and stitches, a form,\na group of forms, or a group of stitches"
     IDS_AUXTXT              "Open {} file"
     IDS_CPYRIT              "Thred Digitizing Program for Machine Embroidery\n(c)2000 Marion and Alfie McCoskey 1201 Locust Ave., Shasta Lake, CA\nAll rights reserved\nVersion: 4.000"
-    IDS_PNT                 "Please enter the points for the %s"
+    IDS_PNT                 "Please enter the points for the {}"
     IDS_HUP0                "Set Custom"
 END
 
@@ -765,7 +765,6 @@ BEGIN
     IDS_FILSTCH             "fill stitches"
     IDS_BRDSTCH             "border stitches"
     IDS_APSTCH              "applique stitches"
-    IDS_FRMSEL              "form select %s"
     IDS_FRM1MSG             "a form"
     IDS_GRPMSG              "a group of stitches"
 END
@@ -773,7 +772,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ROTAGIN             "Rotate Again"
-    IDS_SHOSEL              "Select %s\n to use %s"
+    IDS_SHOSEL              "Select {}\n to use {}"
     IDS_REGP                "regular polygon"
     IDS_STAR                "star"
     IDS_SPIR                "spiral"
@@ -821,6 +820,7 @@ BEGIN
     IDS_FRMCLP              "a form with a clipboard border fill"
     IDS_SHRNK               "Shrink Clipboard Border"
     IDS_PRT                 "Partial file read"
+    IDS_NOTPES              "Not a PES file: {}\n"
     IDS_SHRTF               "File too short"
     IDS_TRC0                "find edges"
     IDS_TRC1S               "show bmap"
@@ -1070,7 +1070,7 @@ BEGIN
     IDS_WID                 "Width"
     IDS_HI                  "Height"
     IDS_FRMBOX              "Form box pixels\nCurrently {}"
-    IDS_HSIZ                "Hoop size changed to %d wide by %d high"
+    IDS_HSIZ                "Hoop size changed to {} wide by {} high"
     IDS_DAZHART             "Mirror"
     IDS_CLEAR               "Clear"
     IDS_TXHI                "hi: {:.2f}"

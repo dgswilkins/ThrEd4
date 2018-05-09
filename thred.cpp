@@ -4964,8 +4964,9 @@ void nuFil() {
 						pesHeader = static_cast<PESHED *>(static_cast<void *>(fileBuffer));
 						l_peschr = static_cast<char *>(static_cast<void *>(pesHeader));
 						if (strncmp(pesHeader->led, "#PES00", 6)) {
-							sprintf_s(MsgBuffer, sizeof(MsgBuffer), "Not a PES file: %s\n", WorkingFileName);
-							shoMsg(MsgBuffer);
+							std::string fmtStr;
+							loadString(fmtStr, IDS_NOTPES);
+							shoMsg(fmt::format(fmtStr, WorkingFileName));
 							return;
 						}
 						pecof = tripl(pesHeader->off);

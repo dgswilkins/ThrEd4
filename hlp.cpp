@@ -241,11 +241,10 @@ void adbad(fmt::MemoryWriter &repairMessage, unsigned code, unsigned count) noex
 }
 
 void hsizmsg() {
-	TCHAR	buffer[HBUFSIZ];
+	std::string fmtStr;
 
-	LoadString(ThrEdInstance, IDS_HSIZ, buffer, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, UnzoomedRect.x / PFGRAN, UnzoomedRect.y / PFGRAN);
-	shoMsg(HelpBuffer);
+	loadString(fmtStr, IDS_HSIZ);
+	shoMsg(fmt::format(fmtStr, (UnzoomedRect.x / PFGRAN), (UnzoomedRect.y / PFGRAN)));
 }
 
 void msgflt(unsigned messageId, float value) {
@@ -370,26 +369,21 @@ void riter() {
 	tabmsg(IDS_RITER);
 }
 
-void pntmsg(unsigned count) {
-	char	temp[HBUFSIZ];
-	char	buffer[HBUFSIZ];
-
-	LoadString(ThrEdInstance, IDS_PNT, temp, HBUFSIZ);
-	LoadString(ThrEdInstance, count, buffer, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), temp, buffer);
-	shoMsg(HelpBuffer);
+void pntmsg(unsigned msgID) {
+	std::string fmtStr, message;
+	
+	loadString(fmtStr, IDS_PNT);
+	loadString(message, msgID);
+	shoMsg(fmt::format(fmtStr, message));
 }
 
 void shoseln(unsigned code0, unsigned code1) {
-	char	temp[HBUFSIZ];
-	char	buffer0[HBUFSIZ];
-	char	buffer1[HBUFSIZ];
+	std::string fmtStr, msg0, msg1;
 
-	LoadString(ThrEdInstance, IDS_SHOSEL, temp, HBUFSIZ);
-	LoadString(ThrEdInstance, code0, buffer0, HBUFSIZ);
-	LoadString(ThrEdInstance, code1, buffer1, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), temp, buffer0, buffer1);
-	shoMsg(HelpBuffer);
+	loadString(fmtStr, IDS_SHOSEL);
+	loadString(msg0, code0);
+	loadString(msg1, code1);
+	shoMsg(fmt::format(fmtStr, msg0, msg1));
 }
 
 bool clpmsgs(unsigned code) {
@@ -462,11 +456,10 @@ void help() {
 }
 
 void sdmsg() {
-	char	buffer[HBUFSIZ];
+	std::string fmtStr;
 
-	LoadString(ThrEdInstance, IDS_SAVDISC, buffer, HBUFSIZ);
-	sprintf_s(HelpBuffer, sizeof(HelpBuffer), buffer, ThrName);
-	shoMsg(HelpBuffer);
+	loadString(fmtStr, IDS_SAVDISC);
+	shoMsg(fmt::format(fmtStr, ThrName));
 }
 
 void alrotmsg() {
