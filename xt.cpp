@@ -1,6 +1,7 @@
 #ifndef NOMINMAX
 # define NOMINMAX
 #endif
+
 #include <windows.h>
 #include <stdio.h>
 #include <math.h>
@@ -1181,6 +1182,7 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), fmt::format("{}", IniFile.featherCount).c_str());
 		for (iFeatherStyle = 0; iFeatherStyle < 6; iFeatherStyle++) {
 			loadString(featherStyle, (IDS_FTH0 + iFeatherStyle));
+			[[gsl::suppress(type.1)]]
 			SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(featherStyle.c_str()));
 		}
 		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
@@ -1402,7 +1404,7 @@ void initdaz(HWND hWinDialog) {
 	for (iType = 0; iType < 6; iType++) {
 		// ToDo - move DaisyTypeStrings into resource file. See fthdefprc for example
 		loadString(daisyType, DaisyTypeStrings[iType]);
-		//[[gsl::suppress(type.1)]]
+		[[gsl::suppress(type.1)]]
 		SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str()));
 	}
 	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
