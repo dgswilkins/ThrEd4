@@ -19,7 +19,7 @@
 #pragma warning(disable:26481)	// bounds.1	Don't use pointer arithmetic. Use span instead
 #pragma warning(disable:26482)	// bounds.2	Only index into arrays using constant expressions
 #pragma warning(disable:26485)	// bounds.3	No array to pointer decay
-#pragma warning(disable:26446)	// bounds.4 Prefer to use gsl::at() instead of unchecked subscript operator 
+//#pragma warning(disable:26446)	// bounds.4 Prefer to use gsl::at() instead of unchecked subscript operator 
 #pragma warning(disable:26489)	// lifetime.1 Don't dereference a pointer that may be invalid
 //#pragma warning(disable:26490)	// type.1	Don't use reinterpret_cast
 //#pragma warning(disable:26493)	// type.4	Don't use C-style casts

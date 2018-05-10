@@ -21,7 +21,7 @@ extern void				shoMsg(const std::string &message);
 
 extern	unsigned		ButtonHeight;
 extern	unsigned		ButtonWidthX3;
-extern	HWND			ButtonWin[9];
+extern	std::vector<HWND>	ButtonWin;
 extern	unsigned		ClosestFormToCursor;
 extern	DRAWITEMSTRUCT*	DrawItem;
 extern	unsigned		FormIndex;
@@ -290,15 +290,15 @@ void butxt(unsigned iButton, const std::string &buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
 		if (iButton == 5) {
 			if (StateMap.test(StateFlag::HIDMAP))
-				SetWindowText(ButtonWin[iButton], StringTable->at(STR_TRC1H).c_str());
+				SetWindowText(ButtonWin.at(iButton), StringTable->at(STR_TRC1H).c_str());
 			else
-				SetWindowText(ButtonWin[iButton], StringTable->at(STR_TRC1S).c_str());
+				SetWindowText(ButtonWin.at(iButton), StringTable->at(STR_TRC1S).c_str());
 		}
 		else
-			SetWindowText(ButtonWin[iButton], StringTable->at(iButton - 4 + STR_TRC0).c_str());
+			SetWindowText(ButtonWin.at(iButton), StringTable->at(iButton - 4 + STR_TRC0).c_str());
 	}
 	else
-		SetWindowText(ButtonWin[iButton], buttonText.c_str());
+		SetWindowText(ButtonWin.at(iButton), buttonText.c_str());
 }
 
 void ritnum(unsigned code, unsigned value) {

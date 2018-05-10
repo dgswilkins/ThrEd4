@@ -37,7 +37,7 @@ extern	HBRUSH			BackgroundBrush;
 extern	BSEQPNT			BSequence[BSEQLEN];
 extern	unsigned		ButtonHeight;
 extern	unsigned		ButtonWidthX3;
-extern	HWND			ButtonWin[9];
+extern	std::vector<HWND>	ButtonWin;
 extern	FORMCLIP*		ClipFormHeader;
 extern	HGLOBAL			ClipMemory;
 extern	fPOINT			ClipPoints[MAXITEMS];
@@ -3100,25 +3100,25 @@ void px2ed(POINT point, fPOINT* editPoint) noexcept {
 void bxtxt(unsigned iButton, unsigned iMessage) {
 	std::string message;
 	loadString(message, iMessage);
-	SetWindowText(ButtonWin[iButton], message.c_str());
+	SetWindowText(ButtonWin.at(iButton), message.c_str());
 }
 
 void hlpflt(unsigned iButton, unsigned iMessage, float data) {
 	std::string fmtStr;
 	loadString(fmtStr, iMessage);
-	SetWindowText(ButtonWin[iButton], fmt::format(fmtStr, data).c_str());
+	SetWindowText(ButtonWin.at(iButton), fmt::format(fmtStr, data).c_str());
 }
 
 void drwtxbut() {
 	bxtxt(HTXCLR, IDS_CLEAR);
 	hlpflt(HTXHI, IDS_TXHI, TextureScreen.areaHeight / PFGRAN);
-	redraw(ButtonWin[HTXWID]);
+	redraw(ButtonWin.at(HTXWID));
 	hlpflt(HTXSPAC, IDS_TXSPAC, TextureScreen.spacing / PFGRAN);
 	bxtxt(HTXVRT, IDS_TXVRT);
 	bxtxt(HTXHOR, IDS_TXHOR);
 	bxtxt(HTXANG, IDS_TXANG);
 	bxtxt(HTXMIR, IDS_TXMIR);
-	SetWindowText(ButtonWin[HTXMIR + 1], "");
+	SetWindowText(ButtonWin.at(HTXMIR + 1), "");
 }
 
 void chktx() {
@@ -3642,7 +3642,7 @@ void butsid(unsigned windowId) {
 
 	chktxnum();
 	TextureWindowId = windowId;
-	GetWindowRect(ButtonWin[windowId], &buttonRect);
+	GetWindowRect(ButtonWin.at(windowId), &buttonRect);
 	SideWindowButton = CreateWindow(
 		"STATIC",
 		0,
@@ -3871,35 +3871,35 @@ void dutxmir() {
 }
 
 bool chkbut() {
-	if (Msg.hwnd == ButtonWin[HTXCLR]) {
+	if (Msg.hwnd == ButtonWin.at(HTXCLR)) {
 		txdelal();
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin[HTXHI]) {
+	if (Msg.hwnd == ButtonWin.at(HTXHI)) {
 		butsid(HTXHI);
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin[HTXWID]) {
+	if (Msg.hwnd == ButtonWin.at(HTXWID)) {
 		butsid(HTXWID);
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin[HTXSPAC]) {
+	if (Msg.hwnd == ButtonWin.at(HTXSPAC)) {
 		butsid(HTXSPAC);
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin[HTXVRT]) {
+	if (Msg.hwnd == ButtonWin.at(HTXVRT)) {
 		dutxfn(VRTYP);
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin[HTXHOR]) {
+	if (Msg.hwnd == ButtonWin.at(HTXHOR)) {
 		dutxfn(HORTYP);
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin[HTXANG]) {
+	if (Msg.hwnd == ButtonWin.at(HTXANG)) {
 		dutxfn(ANGTYP);
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin[HTXMIR]) {
+	if (Msg.hwnd == ButtonWin.at(HTXMIR)) {
 		dutxmir();
 		return 1;
 	}
@@ -4096,12 +4096,12 @@ void txcntrv() {
 
 void txof() {
 	butxt(HBOXSEL, StringTable->at(STR_BOXSEL));
-	redraw(ButtonWin[HHID]);
+	redraw(ButtonWin.at(HHID));
 	if (StateMap.test(StateFlag::UPTO))
 		butxt(HUPTO, StringTable->at(STR_UPON));
 	else
 		butxt(HUPTO, StringTable->at(STR_UPOF));
-	SetWindowText(ButtonWin[HTXSPAC], "");
+	SetWindowText(ButtonWin.at(HTXSPAC), "");
 	savtxt();
 	zumhom();
 	SelectedTexturePointsList->clear();
