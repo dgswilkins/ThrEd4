@@ -393,6 +393,7 @@
 #define IDS_BADCLP                      1092
 #define IDS_BADSAT                      1093
 #define IDS_BADTX                       1094
+#define IDS_BADUKN                      1095
 #define IDS_FRMDAT                      1096
 #define IDS_CLPDAT                      1097
 #define IDS_SATDAT                      1098

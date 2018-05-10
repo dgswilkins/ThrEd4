@@ -12,6 +12,7 @@
 #pragma warning(disable:26425)	//			Assigning 'return of new[]' to a static variable
 //#pragma warning(disable:26429)	// f.23		Symbol is never tested for nullness, it can be marked as not_null
 //#pragma warning(disable:26438)	// es.76	Avoid 'goto'
+//#pragma warning(disable:26446)	// bounds.4 Prefer to use gsl::at() instead of unchecked subscript operator 
 #pragma warning(disable:26451)	// io.2		Arithmetic overflow	
 //#pragma warning(disable:26461)	// con.3	The pointer argument can be marked as a pointer to const
 //#pragma warning(disable:26472)	// type.1	Don't use a static_cast for arithmetic conversions
@@ -19,14 +20,15 @@
 #pragma warning(disable:26481)	// bounds.1	Don't use pointer arithmetic. Use span instead
 #pragma warning(disable:26482)	// bounds.2	Only index into arrays using constant expressions
 #pragma warning(disable:26485)	// bounds.3	No array to pointer decay
-//#pragma warning(disable:26446)	// bounds.4 Prefer to use gsl::at() instead of unchecked subscript operator 
-#pragma warning(disable:26489)	// lifetime.1 Don't dereference a pointer that may be invalid
+#pragma warning(disable:26486)	// lifetime.1	Don't pass a pointer that may be invalid to a function
+#pragma warning(disable:26489)	// lifetime.1	Don't dereference a pointer that may be invalid
 //#pragma warning(disable:26490)	// type.1	Don't use reinterpret_cast
 //#pragma warning(disable:26493)	// type.4	Don't use C-style casts
 //#pragma warning(disable:26494)	// type.5	Variable is uninitialized
 //#pragma warning(disable:26496)	// Con.4	Value is assigned only once, mark it as a pointer to const
 //#pragma warning(disable:26497)	// f.4		This function could be marked constexpr if compile-time evaluation is desired
 #pragma warning(disable:26499)	//			Could not find any lifetime tracking information
+
 #include <vector>
 
 #include "EnumMap.h"

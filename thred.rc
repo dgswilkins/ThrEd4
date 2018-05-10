@@ -1092,6 +1092,7 @@ BEGIN
     IDS_BADCLP              "Clipboard data error\n"
     IDS_BADSAT              "D-line data error\n"
     IDS_BADTX               "Texture data error\n"
+    IDS_BADUKN              "Unknown data error/n"
     IDS_FRMDAT              "Form point"
     IDS_CLPDAT              "Clipboard"
     IDS_SATDAT              "D-line"
