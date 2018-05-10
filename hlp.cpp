@@ -323,8 +323,9 @@ void shoMsg(const std::string &message) {
 
 		std::vector<std::string> strings;
 		iString = 0;
-		while (iString < message.size()) {
-			if (message[iString] == 10) {
+		const auto sizeLim = message.size();
+		while (iString < sizeLim) {
+			if (message.at(iString) == 10) {
 				strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
 				previousStringLength = iString;
 			}
@@ -334,7 +335,7 @@ void shoMsg(const std::string &message) {
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
 		textSize.cx = textSize.cy = messageSize.cy = messageSize.cx = 0;
 		for (index = 0; index < strings.size(); index++) {
-			GetTextExtentPoint32(StitchWindowMemDC, strings[index].c_str(), strings[index].size(), &textSize);
+			GetTextExtentPoint32(StitchWindowMemDC, strings.at(index).c_str(), strings.at(index).size(), &textSize);
 			if (textSize.cx > messageSize.cx)
 				messageSize.cx = textSize.cx;
 			if (textSize.cy > messageSize.cy)
@@ -475,27 +476,22 @@ void spltmsg() {
 }
 
 void datmsg(unsigned code) {
-	char*	pchr = MsgBuffer;
+	unsigned dataErrorID = 0;
+	std::string dataError;
 
-	if (pchr) {
-		if (code&BADFLT) {
-			LoadString(ThrEdInstance, IDS_BADFLT, pchr, HBUFSIZ);
-			pchr = &pchr[strlen(pchr)];
-		}
-		if (code&BADCLP) {
-			LoadString(ThrEdInstance, IDS_BADCLP, pchr, HBUFSIZ);
-			pchr = &pchr[strlen(pchr)];
-		}
-		if (code&BADSAT) {
-			LoadString(ThrEdInstance, IDS_BADSAT, pchr, HBUFSIZ);
-			pchr = &pchr[strlen(pchr)];
-		}
-		if (code&BADTX) {
-			LoadString(ThrEdInstance, IDS_BADTX, pchr, HBUFSIZ);
-			pchr = &pchr[strlen(pchr)];
-		}
-		pchr--;
-		*pchr = 0;
-		shoMsg(MsgBuffer);
+	switch (code) {
+	case BADFLT:
+		dataErrorID = IDS_BADFLT;
+	case BADCLP:
+		dataErrorID = IDS_BADCLP;
+	case BADSAT:
+		dataErrorID = IDS_BADSAT;
+	case BADTX:
+		dataErrorID = IDS_BADTX;
+	default:
+		dataErrorID = IDS_BADUKN;
 	}
+	loadString(dataError, dataErrorID);
+	shoMsg(dataError);
+
 }
