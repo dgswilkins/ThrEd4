@@ -766,14 +766,6 @@ fPOINT			SelectedPoint;			//for converting stitch coordinates
 										// to metric cordinates (mm)
 fPOINT			ZoomBoxOrigin;			//zoom box origin
 
-std::string	LayerText[] = {
-	"0",
-	"1",
-	"2",
-	"3",
-	"4"
-};
-
 COLORREF DefaultColors[] = {
 	0x000000,
 	0x800000,
@@ -15053,6 +15045,13 @@ unsigned chkMsg() {
 					break;
 				}
 				if (Msg.hwnd == ValueWindow[LLAYR]) {
+					std::string	LayerText[] = {
+						"0",
+						"1",
+						"2",
+						"3",
+						"4"
+					};
 					FormMenuChoice = LLAYR;
 					StateMap.reset(StateFlag::FILTYP);
 					sidmsg(ValueWindow[LLAYR], LayerText, 5);
@@ -20369,6 +20368,8 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		SelectedTexturePointsList = &private_SelectedTexturePointsList;
 		std::vector<std::string> private_StringTable(STR_LEN);
 		StringTable = &private_StringTable;
+		std::vector<HWND> private_ButtonWin;
+		ButtonWin = &private_ButtonWin;
 
 		redini();
 		if (IniFile.initialWindowCoords.right) {
