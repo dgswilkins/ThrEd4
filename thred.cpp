@@ -695,7 +695,7 @@ HWND			ChangeThreadSizeWin[3];	//thread size change windows
 HWND			MainStitchWin;			//stitch window
 HWND			VerticalScrollBar;		//vertical scroll bar
 HWND			HorizontalScrollBar;	//horizontal scroll bar
-std::vector<HWND>	ButtonWin;			//button windows
+std::vector<HWND>	*ButtonWin;			//button windows
 HWND			TraceStepWin;			//trace stepSize window
 HWND			ColorBar;				//color bar
 HWND			OKButton;				//ok button
@@ -2573,9 +2573,9 @@ void ritlayr() {
 void nuRct() noexcept {
 	GetClientRect(ThrEdWindow, &ThredWindowRect);
 	GetWindowRect(ColorBar, &ColorBarRect);
-	if (ButtonWin.size() != 0) {
-		GetWindowRect(ButtonWin.at(HMINLEN), &MinLenRect);
-		GetWindowRect(ButtonWin.at(HMAXLEN), &MaxLenRect);
+	if (ButtonWin->size() != 0) {
+		GetWindowRect(ButtonWin->at(HMINLEN), &MinLenRect);
+		GetWindowRect(ButtonWin->at(HMAXLEN), &MaxLenRect);
 	}
 	ReleaseDC(ColorBar, ColorBarDC);
 	ColorBarDC = GetDC(ColorBar);
@@ -6211,7 +6211,7 @@ void unthum() {
 			butxt(HUPTO, StringTable->at(STR_UPOF));
 		std::string blank("");
 		butxt(HNUM, blank);
-		redraw(ButtonWin.at(HHID));
+		redraw(ButtonWin->at(HHID));
 		butxt(HBOXSEL, StringTable->at(STR_BOXSEL));
 	}
 }
@@ -6248,7 +6248,7 @@ void toglHid() {
 	else
 		StateMap.set(StateFlag::FRMOF);
 	unthum();
-	redraw(ButtonWin.at(HHID));
+	redraw(ButtonWin->at(HHID));
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -6804,7 +6804,7 @@ bool oldwnd(HWND window) noexcept {
 			return 0;
 	}
 	for (iWindow = 0; iWindow < 9; iWindow++) {
-		if (ButtonWin.at(iWindow) == window)
+		if (ButtonWin->at(iWindow) == window)
 			return 0;
 	}
 	if (MainStitchWin == window)
@@ -10043,22 +10043,22 @@ void rthumnam(unsigned iThumbnail) {
 	switch (iThumbnail) {
 	case 0:
 
-		barnam(ButtonWin.at(HNUM), iThumbnail);
+		barnam(ButtonWin->at(HNUM), iThumbnail);
 		break;
 
 	case 1:
 
-		barnam(ButtonWin.at(HTOT), iThumbnail);
+		barnam(ButtonWin->at(HTOT), iThumbnail);
 		break;
 
 	case 2:
 
-		barnam(ButtonWin.at(HMINLEN), iThumbnail);
+		barnam(ButtonWin->at(HMINLEN), iThumbnail);
 		break;
 
 	case 3:
 
-		barnam(ButtonWin.at(HMAXLEN), iThumbnail);
+		barnam(ButtonWin->at(HMAXLEN), iThumbnail);
 		break;
 	}
 }
@@ -10111,7 +10111,7 @@ void thumnail() {
 			rthumnam(iThumbnail++);
 		StateMap.set(StateFlag::THUMSHO);
 		ThumbnailSearchString[0] = 0;
-		SetWindowText(ButtonWin.at(HBOXSEL), "");
+		SetWindowText(ButtonWin->at(HBOXSEL), "");
 		std::string blank("");
 		butxt(HBOXSEL, blank);
 		vubak();
@@ -11585,7 +11585,7 @@ void untrace() {
 			hidwnd(TraceDownWindow[iTrace]);
 		}
 		for (iButton = 0; iButton < 9; iButton++)
-			shownd(ButtonWin.at(iButton));
+			shownd(ButtonWin->at(iButton));
 		hidwnd(TraceStepWin);
 	}
 	else {
@@ -11612,7 +11612,7 @@ void clrhbut(unsigned startButton) noexcept {
 	unsigned	iButton;
 
 	for (iButton = startButton; iButton < 9; iButton++)
-		SetWindowText(ButtonWin.at(iButton), "");
+		SetWindowText(ButtonWin->at(iButton), "");
 }
 
 void tracwnd() {
@@ -11629,8 +11629,8 @@ void tracwnd() {
 		shownd(TraceUpWindow[iTrace]);
 		shownd(TraceDownWindow[iTrace]);
 	}
-	hidwnd(ButtonWin.at(HBOXSEL));
-	hidwnd(ButtonWin.at(HUPTO));
+	hidwnd(ButtonWin->at(HBOXSEL));
+	hidwnd(ButtonWin->at(HUPTO));
 	shownd(TraceStepWin);
 	trcstpnum();
 	trcratnum();
@@ -13171,7 +13171,7 @@ void esccode() {
 	StateMap.reset(StateFlag::HID);
 	StateMap.reset(StateFlag::FRMOF);
 	StateMap.reset(StateFlag::THRDS);
-	redraw(ButtonWin.at(HHID));
+	redraw(ButtonWin->at(HHID));
 	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
 	StateMap.reset(StateFlag::COL);
 	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
@@ -15533,15 +15533,15 @@ unsigned chkMsg() {
 			StateMap.set(StateFlag::VCAPT);
 			return 1;
 		}
-		if (Msg.hwnd == ButtonWin.at(HBOXSEL)) {
+		if (Msg.hwnd == ButtonWin->at(HBOXSEL)) {
 			boxsel();
 			return 1;
 		}
-		if (Msg.hwnd == ButtonWin.at(HUPTO)) {
+		if (Msg.hwnd == ButtonWin->at(HUPTO)) {
 			toglup();
 			return 1;
 		}
-		if (Msg.hwnd == ButtonWin.at(HHID)) {
+		if (Msg.hwnd == ButtonWin->at(HHID)) {
 			toglHid();
 			return 1;
 		}
@@ -15558,7 +15558,7 @@ unsigned chkMsg() {
 					StateMap.reset(StateFlag::SCROS);
 					StateMap.reset(StateFlag::ECROS);
 					StateMap.set(StateFlag::RESTCH);
-					redraw(ButtonWin.at(HHID));
+					redraw(ButtonWin->at(HHID));
 				}
 				else {
 					if (SelectedFormCount) {
@@ -18930,7 +18930,7 @@ void init() {
 		IniFile.underlaySpacing = DEFUSPAC;
 	setgrd(IniFile.gridColor);
 	makCol();		//make the color change windows
-	ButtonWin.resize(9);
+	ButtonWin->resize(9);
 	for (iButton = 0; iButton < 9; iButton++) {
 		switch (iButton) {
 		case HBOXSEL:
@@ -18957,7 +18957,7 @@ void init() {
 			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
 		}
 		if (buttonTxt) {
-			ButtonWin.at(iButton) = CreateWindow(
+			ButtonWin->at(iButton) = CreateWindow(
 				"STATIC",
 				buttonTxt->c_str(),
 				flag,
@@ -20064,7 +20064,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_WINDOW));
 			return 1;
 		}
-		if (DrawItem->hwndItem == ButtonWin.at(HHID) && DrawItem->itemAction == ODA_DRAWENTIRE) {
+		if (DrawItem->hwndItem == ButtonWin->at(HHID) && DrawItem->itemAction == ODA_DRAWENTIRE) {
 			position = (ButtonWidthX3 - PickColorMsgSize.cx) >> 1;
 			if (StateMap.test(StateFlag::HID)) {
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[ActiveColor]);
@@ -20369,6 +20369,7 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		SelectedTexturePointsList = &private_SelectedTexturePointsList;
 		std::vector<std::string> private_StringTable(STR_LEN);
 		StringTable = &private_StringTable;
+
 		redini();
 		if (IniFile.initialWindowCoords.right) {
 			ThrEdWindow = CreateWindow(
