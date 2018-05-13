@@ -261,7 +261,6 @@ float			MaxStitchLen;			//maximum stitch length
 float			UserStitchLen;			//user stitch length
 double			AdjustedSpace;			//adjusted space
 unsigned		NextStart;				//index of the endpoint of the line segment being processed
-unsigned		ChainSequence[] = { 0,1,2,3,0,1,4,3,0,3 };//chain stitch sequence
 double			Div4;					//chain space divided by four
 unsigned		ClosestFormToCursor;	//closest form to the cursor
 unsigned		ClosestVertexToCursor;	//formOrigin closest to the cursor
@@ -11954,40 +11953,41 @@ void fxlen(std::vector<fPOINT> &chainEndPoints, std::vector<double> &listSINEs, 
 
 void duchfn(std::vector<fPOINT> &chainEndPoints, unsigned start, unsigned finish) {
 	unsigned		iChain = 0;
-	fPOINT			chainPoint[5] = {};
-	dPOINT			delta = { (chainEndPoints[finish].x - chainEndPoints[start].x),
-							  (chainEndPoints[finish].y - chainEndPoints[start].y) };
-	dPOINT			lengthDelta = { (delta.x*SelectedForm->edgeStitchLen),
+	std::vector<unsigned>	chainSequence = { 0,1,2,3,0,1,4,3,0,3 };//chain stitch sequence
+
+	std::vector<fPOINT>	chainPoint(5);
+	dPOINT			delta = { (chainEndPoints.at(finish).x - chainEndPoints.at(start).x),
+							  (chainEndPoints.at(finish).y - chainEndPoints.at(start).y) };
+	const dPOINT	lengthDelta = { (delta.x*SelectedForm->edgeStitchLen),
 									(delta.y*SelectedForm->edgeStitchLen) };
 	const double	angle = atan2(delta.y, delta.x) + PI / 2;
-	dPOINT			offset = { (cos(angle)*SelectedForm->borderSize),
+	const dPOINT	offset = { (cos(angle)*SelectedForm->borderSize),
 								(sin(angle)*SelectedForm->borderSize) };
-	const float		middleXcoord = chainEndPoints[start].x + lengthDelta.x;
-	const float		middleYcoord = chainEndPoints[start].y + lengthDelta.y;
+	const float		middleXcoord = chainEndPoints.at(start).x + lengthDelta.x;
+	const float		middleYcoord = chainEndPoints.at(start).y + lengthDelta.y;
 
-	chainPoint[0] = chainEndPoints[start];
-	chainPoint[4] = chainEndPoints[finish];
-	chainPoint[1].x = middleXcoord + offset.x;
-	chainPoint[1].y = middleYcoord + offset.y;
-	chainPoint[3].x = middleXcoord - offset.x;
-	chainPoint[3].y = middleYcoord - offset.y;
+	chainPoint.at(0) = chainEndPoints.at(start);
+	chainPoint.at(4) = chainEndPoints.at(finish);
+	chainPoint.at(1).x = middleXcoord + offset.x;
+	chainPoint.at(1).y = middleYcoord + offset.y;
+	chainPoint.at(3).x = middleXcoord - offset.x;
+	chainPoint.at(3).y = middleYcoord - offset.y;
 	//ToDo - This may not be correct
 	if (finish < chainEndPoints.size() - 1) {
-		delta.x = chainEndPoints[finish + 1].x - chainEndPoints[finish].x;
-		delta.y = chainEndPoints[finish + 1].y - chainEndPoints[finish].y;
+		delta.x = chainEndPoints.at(finish + 1).x - chainEndPoints.at(finish).x;
+		delta.y = chainEndPoints.at(finish + 1).y - chainEndPoints.at(finish).y;
 	}
 	else {
-		delta.x = chainEndPoints[finish].x - chainEndPoints[finish - 1].x;
-		delta.y = chainEndPoints[finish].y - chainEndPoints[finish - 1].y;
+		delta.x = chainEndPoints.at(finish).x - chainEndPoints.at(finish - 1).x;
+		delta.y = chainEndPoints.at(finish).y - chainEndPoints.at(finish - 1).y;
 	}
-	chainPoint[2].x = chainEndPoints[finish].x + delta.x / 4;
-	chainPoint[2].y = chainEndPoints[finish].y + delta.y / 4;
-	unsigned chainCount = 10;
+	chainPoint.at(2).x = chainEndPoints.at(finish).x + delta.x / 4;
+	chainPoint.at(2).y = chainEndPoints.at(finish).y + delta.y / 4;
+	unsigned chainCount = chainSequence.size();
 	if (StateMap.test(StateFlag::LINCHN))
 		chainCount--;
-
 	for (iChain = 0; iChain < chainCount; iChain++) {
-		OSequence[SequenceIndex] = chainPoint[ChainSequence[iChain]];
+		OSequence[SequenceIndex] = chainPoint.at(chainSequence.at(iChain));
 		SequenceIndex++;
 	}
 }
@@ -12007,13 +12007,13 @@ void duch(std::vector<fPOINT> &chainEndPoints) {
 			if (StateMap.test(StateFlag::LINCHN))
 				backupAt--;
 			if ((SequenceIndex >= backupAt)) {
-				OSequence[SequenceIndex - backupAt] = chainEndPoints[iPoint + 1];
+				OSequence[SequenceIndex - backupAt] = chainEndPoints.at(iPoint + 1);
 			}
-			OSequence[SequenceIndex++] = chainEndPoints[iPoint + 1];
+			OSequence[SequenceIndex++] = chainEndPoints.at(iPoint + 1);
 		}
 		else {
 			duchfn(chainEndPoints, iPoint, 0);
-			OSequence[SequenceIndex++] = chainEndPoints[chainEndPoints.size() - 1];
+			OSequence[SequenceIndex++] = chainEndPoints.at(chainEndPoints.size() - 1);
 		}
 	}
 	else
@@ -12151,8 +12151,8 @@ void crop() {
 }
 
 void xclpfn(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPoints, unsigned start, unsigned finish) {
-	dPOINT			delta = { (chainEndPoints[finish].x - chainEndPoints[start].x),
-								(chainEndPoints[finish].y - chainEndPoints[start].y) };
+	dPOINT			delta = { (chainEndPoints.at(finish).x - chainEndPoints.at(start).x),
+								(chainEndPoints.at(finish).y - chainEndPoints.at(start).y) };
 	unsigned		iPoint = 0;
 	const double	length = hypot(delta.x, delta.y);
 	const double	ratio = length / ClipRectSize.cx;
@@ -12163,8 +12163,8 @@ void xclpfn(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPo
 		points[iPoint].x = tempClipPoints[iPoint].x*ratio;
 		points[iPoint].y = tempClipPoints[iPoint].y;
 		rotflt(&points[iPoint]);
-		OSequence[SequenceIndex].x = chainEndPoints[start].x + points[iPoint].x;
-		OSequence[SequenceIndex++].y = chainEndPoints[start].y + points[iPoint].y;
+		OSequence[SequenceIndex].x = chainEndPoints.at(start).x + points[iPoint].x;
+		OSequence[SequenceIndex++].y = chainEndPoints.at(start).y + points[iPoint].y;
 	}
 }
 
@@ -12183,7 +12183,7 @@ void duxclp() {
 		xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint);
 	}
 	if (SelectedForm->type != FRMLINE) {
-		OSequence[SequenceIndex++] = chainEndPoints[0];
+		OSequence[SequenceIndex++] = chainEndPoints.at(0);
 	}
 }
 
@@ -12198,7 +12198,7 @@ void dulast(std::vector<fPOINT> &chainEndPoints) {
 		minimumLength = 1e99;
 		minimumIndex = 0;
 		for (iPoint = 0; iPoint < chainEndPoints.size() - 1; iPoint++) {
-			length = hypot(LastPoint.x - chainEndPoints[iPoint].x, LastPoint.y - chainEndPoints[iPoint].y);
+			length = hypot(LastPoint.x - chainEndPoints.at(iPoint).x, LastPoint.y - chainEndPoints.at(iPoint).y);
 			if (length < minimumLength) {
 				minimumLength = length;
 				minimumIndex = iPoint;
@@ -12207,10 +12207,10 @@ void dulast(std::vector<fPOINT> &chainEndPoints) {
 		if (minimumIndex) {
 			iDestination = 0;
 			for (iPoint = minimumIndex; iPoint < chainEndPoints.size() - 2; iPoint++) {
-				tempClipPoints.push_back(chainEndPoints[iPoint]);
+				tempClipPoints.push_back(chainEndPoints.at(iPoint));
 			}
 			for (iPoint = 0; iPoint <= minimumIndex; iPoint++) {
-				tempClipPoints.push_back(chainEndPoints[iPoint]);
+				tempClipPoints.push_back(chainEndPoints.at(iPoint));
 			}
 			chainEndPoints = tempClipPoints;
 		}
@@ -12381,8 +12381,8 @@ void wavfrm() {
 		iVertex = IniFile.waveStart;
 		while (iVertex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 			iNextVertex = (iVertex + 1) % IniFile.wavePoints;
-			points[iPoint].x = -CurrentFormVertices[iNextVertex].x + CurrentFormVertices[iVertex].x;
-			points[iPoint].y = -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[iVertex].y;
+			points.at(iPoint).x = -CurrentFormVertices[iNextVertex].x + CurrentFormVertices[iVertex].x;
+			points.at(iPoint).y = -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[iVertex].y;
 			iPoint++;
 			iVertex = iNextVertex;
 		}
@@ -12392,8 +12392,7 @@ void wavfrm() {
 		for (iLobe = 0; iLobe < IniFile.waveLobes; iLobe++) {
 			if (iLobe & 1) {
 				for (iPoint = 0; iPoint < count; iPoint++) {
-					CurrentFormVertices[iVertex].x = currentPosition.x;
-					CurrentFormVertices[iVertex].y = currentPosition.y;
+					CurrentFormVertices[iVertex] = currentPosition;
 					iVertex++;
 					currentPosition.x += points[iPoint].x;
 					currentPosition.y += points[iPoint].y;
@@ -12401,8 +12400,7 @@ void wavfrm() {
 			}
 			else {
 				for (iPoint = count; iPoint != 0; iPoint--) {
-					CurrentFormVertices[iVertex].x = currentPosition.x;
-					CurrentFormVertices[iVertex].y = currentPosition.y;
+					CurrentFormVertices[iVertex] = currentPosition;
 					iVertex++;
 					currentPosition.x += points[iPoint - 1].x;
 					currentPosition.y += points[iPoint - 1].y;
@@ -12448,25 +12446,25 @@ void wavfrm() {
 
 void srtfrm() {
 	unsigned	iStitch = 0, iForm = 0, iHighStitch = 0, totalStitches = 0, formStitchCount = 0;
-	unsigned	histogram[MAXFORMS] = { 0 };
+	std::vector<unsigned>	histogram(FormIndex);
 
 	if (PCSHeader.stitchCount) {
 		savdo();
-		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
-			histogram[(StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT]++;
+		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+			iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
+			histogram.at(iForm)++;
+		}
 		totalStitches = 0;
-		for (iForm = 0; iForm < MAXFORMS; iForm++) {
-			formStitchCount = histogram[iForm];
-			histogram[iForm] = totalStitches;
+		for (auto& entry:histogram) {
+			formStitchCount = entry;
+			entry = totalStitches;
 			totalStitches += formStitchCount;
 		}
 		std::vector<fPOINTATTR> highStitchBuffer(PCSHeader.stitchCount);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
-			iHighStitch = histogram[iForm]++;
-			highStitchBuffer[iHighStitch].x = StitchBuffer[iStitch].x;
-			highStitchBuffer[iHighStitch].y = StitchBuffer[iStitch].y;
-			highStitchBuffer[iHighStitch].attribute = StitchBuffer[iStitch].attribute;
+			iHighStitch = histogram.at(iForm)++;
+			highStitchBuffer.at(iHighStitch) = StitchBuffer[iStitch];
 		}
 		MoveMemory(StitchBuffer, &highStitchBuffer[0], sizeof(fPOINTATTR)*PCSHeader.stitchCount);
 		coltab();
