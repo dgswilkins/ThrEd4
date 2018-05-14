@@ -128,10 +128,13 @@
     <ClInclude Include="thred.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="thred.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="icon1.ico" />
+    <None Include="Resources\dlin.cur" />
+    <None Include="Resources\Form.cur" />
+    <None Include="Resources\LeftDown.cur" />
+    <None Include="Resources\LeftUp.cur" />
+    <None Include="Resources\RightDown.cur" />
+    <None Include="Resources\RightUp.cur" />
+    <None Include="Resources\Upright.cur" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

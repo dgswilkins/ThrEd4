@@ -46,13 +46,26 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="thred.rc">
+    <None Include="Resources\dlin.cur">
       <Filter>Resource Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="icon1.ico">
+    </None>
+    <None Include="Resources\Form.cur">
       <Filter>Resource Files</Filter>
-    </Image>
+    </None>
+    <None Include="Resources\LeftDown.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\LeftUp.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\RightDown.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\RightUp.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\Upright.cur">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

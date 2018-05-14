@@ -134,12 +134,19 @@
 #define IDS_BOXSEL                      124
 #define IDD_DESNAM                      124
 #define IDS_RITER                       125
+#define IDC_LeftUp                      125
 #define IDS_SAVFIL                      126
+#define IDC_RightDown                   126
 #define IDS_CLOS                        127
+#define IDC_RightUp                     127
 #define IDS_TOT                         128
+#define IDC_LeftDown                    128
 #define IDS_LAYR                        129
+#define IDC_Upright                     129
 #define IDS_CREAT                       130
 #define IDS_FNOPNA                      131
+#define IDC_CURSOR1                     131
+#define IDC_Form                        131
 #define IDS_NOTVER                      132
 #define IDS_BADFIL                      133
 #define IDS_ZEROL                       134
@@ -652,7 +659,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        125
+#define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         40293
 #define _APS_NEXT_CONTROL_VALUE         1077
 #define _APS_NEXT_SYMED_VALUE           101

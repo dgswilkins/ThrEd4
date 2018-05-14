@@ -688,6 +688,26 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Cursor
+//
+
+IDC_LeftUp              CURSOR                  "Resources\LeftUp.cur"
+
+IDC_RightDown           CURSOR                  "Resources\RightDown.cur"
+
+IDC_RightUp             CURSOR                  "Resources\RightUp.cur"
+
+IDC_LeftDown            CURSOR                  "Resources\LeftDown.cur"
+
+IDC_Upright             CURSOR                  "Resources\Upright.cur"
+
+IDC_DLIN                CURSOR                  "Resources\dlin.cur"
+
+IDC_Form                CURSOR                  "Resources\Form.cur"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 
