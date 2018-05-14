@@ -8,7 +8,6 @@
 #include <fmt/format.h>
 #pragma warning( pop )  
 
-#include "lang.h"
 #include "resource.h"
 #include "thred.h"
 
@@ -445,12 +444,7 @@ void grpmsg1() {
 
 void help() {
 	strcpy_s(HelpFileName, HomeDirectory);
-#if LANG==ENG || LANG==HNG
 	strcat_s(HelpFileName, "thred.chm");
-#endif
-#if LANG==GRM
-	strcat_s(HelpFileName, "aladin.chm");
-#endif
 	HelpWindow = HtmlHelp(ThrEdWindow, HelpFileName, HH_DISPLAY_TOPIC, 0);
 	if (!HelpWindow)
 		tabmsg(IDS_NOHLP);

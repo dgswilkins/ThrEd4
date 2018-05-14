@@ -18,7 +18,6 @@
 #ifdef ALLOCFAILURE
 #include <new.h>
 #endif
-#include "lang.h"
 #include "resource.h"
 #include "thred.h"
 
@@ -16134,23 +16133,17 @@ unsigned chkMsg() {
 
 		case 0xdb:		//[
 
-#if LANG==ENG || LANG==HNG
-
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				selfrm0();
 			else
-#endif
 				ungrplo();
 			break;
 
 		case 0xdd:		//]
 
-#if LANG==ENG || LANG==HNG
-
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				selfrmx();
 			else
-#endif
 				ungrphi();
 			break;
 

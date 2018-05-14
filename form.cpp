@@ -12,7 +12,6 @@
 #include <fmt/format.h>
 #pragma warning( pop )  
 
-#include "lang.h"
 #include "resource.h"
 #include "thred.h"
 #include "ExtendedBitSet.h"

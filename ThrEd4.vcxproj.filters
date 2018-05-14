@@ -41,9 +41,6 @@
     <ClInclude Include="ExtendedBitSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lang.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\dlin.cur">
