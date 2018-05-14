@@ -159,7 +159,7 @@ extern	void		refil();
 extern	void		refilal();
 extern	void		refilfn();
 extern	void		ritfil();
-extern	void		rotflt(fPOINT* point);
+extern	void		rotflt(fPOINT &point);
 extern	void		rtrclpfn();
 extern	void		satfil();
 extern	void		satout(double satinWidth);
@@ -4773,7 +4773,7 @@ void setangf(double angle) {
 	AngledForm.vertices = AngledFormVertices;
 	if (RotationAngle) {
 		for (iVertex = 0; iVertex < VertexCount; iVertex++)
-			rotflt(&AngledFormVertices[iVertex]);
+			rotflt(AngledFormVertices[iVertex]);
 	}
 	SelectedForm = &AngledForm;
 	CurrentFormVertices = AngledFormVertices;

@@ -68,7 +68,7 @@ extern void		ritot (unsigned number);
 extern void		rngadj ();
 extern void		rotang1 (fPOINTATTR unrotatedPoint, fPOINT* rotatedPoint);
 extern void		rotangf (fPOINT unrotatedPoint, fPOINT* rotatedPoint);
-extern void		rotflt (fPOINT* point);
+extern void		rotflt (fPOINT &point);
 extern void		rotfn ();
 extern void		rstAll ();
 extern void		savdo ();
@@ -702,7 +702,7 @@ void rotbak() {
 	unsigned	iSequence;
 
 	for (iSequence = 0; iSequence < SequenceIndex; iSequence++)
-		rotflt(&OSequence[iSequence]);
+		rotflt(OSequence[iSequence]);
 }
 
 void delfil(unsigned attribute) {
@@ -2339,7 +2339,7 @@ void fnang(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lin
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 		AngledForm.vertices[iVertex].x = SelectedForm->vertices[iVertex].x;
 		AngledForm.vertices[iVertex].y = SelectedForm->vertices[iVertex].y;
-		rotflt(&AngledForm.vertices[iVertex]);
+		rotflt(AngledForm.vertices[iVertex]);
 	}
 	SelectedForm = &AngledForm;
 	fnvrt(groupIndexSequence, lineEndpoints);
@@ -2357,7 +2357,7 @@ void fnhor(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lin
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 		AngledForm.vertices[iVertex].x = SelectedForm->vertices[iVertex].x;
 		AngledForm.vertices[iVertex].y = SelectedForm->vertices[iVertex].y;
-		rotflt(&AngledForm.vertices[iVertex]);
+		rotflt(AngledForm.vertices[iVertex]);
 	}
 	SelectedForm = &AngledForm;
 	fnvrt(groupIndexSequence, lineEndpoints);
@@ -11460,7 +11460,7 @@ void horclpfn(std::vector<RNGCNT> &textureSegments) {
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 		AngledForm.vertices[iVertex].x = SelectedForm->vertices[iVertex].x;
 		AngledForm.vertices[iVertex].y = SelectedForm->vertices[iVertex].y;
-		rotflt(&AngledForm.vertices[iVertex]);
+		rotflt(AngledForm.vertices[iVertex]);
 	}
 	angout();
 	SelectedForm = &AngledForm;
@@ -11550,7 +11550,7 @@ void angclpfn(std::vector<RNGCNT> &textureSegments) {
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 			AngledFormVertices[iVertex].x = vertexList[iVertex].x;
 			AngledFormVertices[iVertex].y = vertexList[iVertex].y;
-			rotflt(&AngledFormVertices[iVertex]);
+			rotflt(AngledFormVertices[iVertex]);
 		}
 	}
 	else {
@@ -11561,7 +11561,7 @@ void angclpfn(std::vector<RNGCNT> &textureSegments) {
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 			AngledFormVertices[iVertex].x = SelectedForm->vertices[iVertex].x;
 			AngledFormVertices[iVertex].y = SelectedForm->vertices[iVertex].y;
-			rotflt(&AngledFormVertices[iVertex]);
+			rotflt(AngledFormVertices[iVertex]);
 		}
 	}
 	angout();
@@ -12161,7 +12161,7 @@ void xclpfn(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPo
 	for (iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
 		points[iPoint].x = tempClipPoints[iPoint].x*ratio;
 		points[iPoint].y = tempClipPoints[iPoint].y;
-		rotflt(&points[iPoint]);
+		rotflt(points.at(iPoint));
 		OSequence[SequenceIndex].x = chainEndPoints.at(start).x + points[iPoint].x;
 		OSequence[SequenceIndex++].y = chainEndPoints.at(start).y + points[iPoint].y;
 	}
@@ -12393,16 +12393,16 @@ void wavfrm() {
 				for (iPoint = 0; iPoint < count; iPoint++) {
 					CurrentFormVertices[iVertex] = currentPosition;
 					iVertex++;
-					currentPosition.x += points[iPoint].x;
-					currentPosition.y += points[iPoint].y;
+					currentPosition.x += points.at(iPoint).x;
+					currentPosition.y += points.at(iPoint).y;
 				}
 			}
 			else {
 				for (iPoint = count; iPoint != 0; iPoint--) {
 					CurrentFormVertices[iVertex] = currentPosition;
 					iVertex++;
-					currentPosition.x += points[iPoint - 1].x;
-					currentPosition.y += points[iPoint - 1].y;
+					currentPosition.x += points.at(iPoint - 1).x;
+					currentPosition.y += points.at(iPoint - 1).y;
 				}
 			}
 		}
@@ -12411,7 +12411,7 @@ void wavfrm() {
 		vertexCount = iVertex + 1;
 		RotationAngle = -atan2(CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y, CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x);
 		for (iVertex = 0; iVertex < vertexCount; iVertex++)
-			rotflt(&CurrentFormVertices[iVertex]);
+			rotflt(CurrentFormVertices[iVertex]);
 		SelectedForm->type = FRMLINE;
 		SelectedForm->vertexCount = vertexCount;
 		FormVertexIndex += vertexCount;
@@ -12465,7 +12465,7 @@ void srtfrm() {
 			iHighStitch = histogram.at(iForm)++;
 			highStitchBuffer.at(iHighStitch) = StitchBuffer[iStitch];
 		}
-		MoveMemory(StitchBuffer, &highStitchBuffer[0], sizeof(fPOINTATTR)*PCSHeader.stitchCount);
+		MoveMemory(StitchBuffer, &highStitchBuffer.at(0), sizeof(fPOINTATTR)*PCSHeader.stitchCount);
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}

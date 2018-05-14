@@ -7177,10 +7177,10 @@ void rotpix(POINT unrotatedPoint, POINT* rotatedPoint) {
 	rotatedPoint->x = RotationCenterPixels.x + distanceToCenter * cos(newAngle);
 }
 
-void rotflt(fPOINT* point) noexcept {
+void rotflt(fPOINT &point) noexcept {
 	double	len = 0.0, ang0 = 0.0;
-	const double	dx = point->x - RotationCenter.x;
-	const double	dy = point->y - RotationCenter.y;
+	const double	dx = point.x - RotationCenter.x;
+	const double	dy = point.y - RotationCenter.y;
 
 	if (dx) {
 		len = hypot(dx, dy);
@@ -7197,8 +7197,8 @@ void rotflt(fPOINT* point) noexcept {
 			ang0 = RotationAngle - PI / 2;
 		}
 	}
-	point->y = RotationCenter.y + len * sin(ang0);
-	point->x = RotationCenter.x + len * cos(ang0);
+	point.y = RotationCenter.y + len * sin(ang0);
+	point.x = RotationCenter.x + len * cos(ang0);
 }
 
 void rotstch(fPOINTATTR* stitch) noexcept {
@@ -9218,7 +9218,7 @@ void rotfn() {
 		fvars(ClosestFormToCursor);
 		currentVertex = SelectedFormVertices.start;
 		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
-			rotflt(&CurrentFormVertices[currentVertex]);
+			rotflt(CurrentFormVertices[currentVertex]);
 			currentVertex = pdir(currentVertex);
 		}
 		frmout(ClosestFormToCursor);
@@ -9229,7 +9229,7 @@ void rotfn() {
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
 		for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
-			rotflt(&FormVertices[iVertex]);
+			rotflt(FormVertices[iVertex]);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 			rotstch(&StitchBuffer[iStitch]);
 		for (iForm = 0; iForm < FormIndex; iForm++)
@@ -9245,7 +9245,7 @@ void rotfn() {
 			ClosestFormToCursor = SelectedFormList[iForm];
 			fvars(ClosestFormToCursor);
 			for (iVertex = 0; iVertex < VertexCount; iVertex++)
-				rotflt(&CurrentFormVertices[iVertex]);
+				rotflt(CurrentFormVertices[iVertex]);
 			frmout(ClosestFormToCursor);
 			refilfn();
 			RotationAngle = angle;
@@ -9258,7 +9258,7 @@ void rotfn() {
 		if (StateMap.testAndReset(StateFlag::FRMROT)) {
 			fvars(ClosestFormToCursor);
 			for (iVertex = 0; iVertex < VertexCount; iVertex++)
-				rotflt(&CurrentFormVertices[iVertex]);
+				rotflt(CurrentFormVertices[iVertex]);
 			frmout(ClosestFormToCursor);
 			refil();
 			StateMap.set(StateFlag::RESTCH);
