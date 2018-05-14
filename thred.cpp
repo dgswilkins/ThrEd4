@@ -8350,8 +8350,8 @@ void thrsav() {
 		FileHandle = 0;
 	}
 	else {
-		// ToDo - Is MAXITEMS the best option here
-		auto output = std::vector<char>(MAXITEMS * 4);
+		// ToDo - MAXITEMS * 8 is not the best option here. Need something better
+		auto output = std::vector<char>(MAXITEMS * 8);
 		dubuf(output.data(), &count);
 		WriteFile(FileHandle, output.data(), count, &bytesWritten, 0);
 		if (bytesWritten != count) {
