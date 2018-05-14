@@ -136,6 +136,9 @@
     <None Include="Resources\RightUp.cur" />
     <None Include="Resources\Upright.cur" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ThrEd4.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
