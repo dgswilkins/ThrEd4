@@ -1726,19 +1726,19 @@ double precjmps(std::vector<fPOINTATTR> &tempStitchBuffer, std::vector<OREC *> &
 			if (direction) {
 				if (pRecs[currentRegion]->start) {
 					for (iRegion = pRecs[currentRegion]->finish - 1; iRegion >= pRecs[currentRegion]->start; iRegion--) {
-						tempStitchBuffer[OutputIndex++] = StitchBuffer[iRegion];
+						tempStitchBuffer.at(OutputIndex++) = StitchBuffer[iRegion];
 					}
 				}
 				else {
 					iRegion = pRecs[currentRegion]->finish;
 					while (iRegion) {
-						tempStitchBuffer[OutputIndex++] = StitchBuffer[--iRegion];
+						tempStitchBuffer.at(OutputIndex++) = StitchBuffer[--iRegion];
 					}
 				}
 			}
 			else {
 				for (iRegion = pRecs[currentRegion]->start; iRegion < pRecs[currentRegion]->finish; iRegion++) {
-					tempStitchBuffer[OutputIndex++] = StitchBuffer[iRegion];
+					tempStitchBuffer.at(OutputIndex++) = StitchBuffer[iRegion];
 				}
 			}
 		}
@@ -1916,7 +1916,7 @@ void fsort() {
 			sortRecord.direction = minimumDirection;
 			precjmps(tempStitchBuffer, pRecs, &sortRecord);
 		}
-		MoveMemory(StitchBuffer, &tempStitchBuffer[0], OutputIndex * sizeof(fPOINTATTR));
+		MoveMemory(StitchBuffer, &tempStitchBuffer.at(0), OutputIndex * sizeof(fPOINTATTR));
 		PCSHeader.stitchCount = OutputIndex;
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
@@ -4392,8 +4392,8 @@ void setxt(std::vector<RNGCNT> &textureSegments) {
 			for (iTexturePoint = count - 1; iTexturePoint >= 0; iTexturePoint--) {
 				if (currentFormTexture[iTexturePoint].line) {
 					iSegment = currentFormTexture[iTexturePoint].line - 1;
-					textureSegments[iSegment].line = iTexturePoint;
-					textureSegments[iSegment].stitchCount++;
+					textureSegments.at(iSegment).line = iTexturePoint;
+					textureSegments.at(iSegment).stitchCount++;
 				}
 			}
 		}

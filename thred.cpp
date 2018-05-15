@@ -19630,19 +19630,19 @@ void ritbak(const char* fileName, DRAWITEMSTRUCT* drawItem) {
 						if (BytesRead != bytesToRead)
 							break;
 					}
-					bytesToRead = stitchHeader.vertexCount * sizeof(vertexList[0]);
-					ReadFile(thrEdFile, &vertexList[0], bytesToRead, &BytesRead, 0);
+					bytesToRead = stitchHeader.vertexCount * sizeof(vertexList.at(0));
+					ReadFile(thrEdFile, &vertexList.at(0), bytesToRead, &BytesRead, 0);
 					if (BytesRead != bytesToRead)
 						break;
 					iVertex = 0;
 					for (iStitch = 0; iStitch < stitchHeader.formCount; iStitch++) {
 						iLine = iVertex;
 						for (iVertexInForm = 0; (iVertexInForm < formList[iStitch].vertexCount) && (iVertex < stitchHeader.vertexCount); iVertexInForm++) {
-							lines[iVertexInForm].x = vertexList[iVertex].x*ratio;
-							lines[iVertexInForm].y = drawingDestinationSize.y - vertexList[iVertex++].y*ratio;
+							lines[iVertexInForm].x = vertexList.at(iVertex).x*ratio;
+							lines[iVertexInForm].y = drawingDestinationSize.y - vertexList.at(iVertex++).y*ratio;
 						}
-						lines[iVertexInForm].x = vertexList[iLine].x*ratio;
-						lines[iVertexInForm].y = drawingDestinationSize.y - vertexList[iLine].y*ratio;
+						lines[iVertexInForm].x = vertexList.at(iLine).x*ratio;
+						lines[iVertexInForm].y = drawingDestinationSize.y - vertexList.at(iLine).y*ratio;
 						SelectObject(drawItem->hDC, FormPen);
 						SetROP2(drawItem->hDC, R2_XORPEN);
 						if (FormList[iStitch].type == FRMLINE)
