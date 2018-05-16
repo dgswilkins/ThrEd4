@@ -581,12 +581,10 @@ void fthrbfn(unsigned iSequence) {
 	}
 	midpnt(currentPoint, nextPoint, &midPoint);
 	xoseq(iSequence);
-	OSequence[OutputIndex].x = midPoint.x;
-	OSequence[OutputIndex].y = midPoint.y;
+	OSequence[OutputIndex] = midPoint;
 	OutputIndex++;
 	xpfth(iSequence + 1);
-	FeatherSequence[ActivePointIndex].x = midPoint.x;
-	FeatherSequence[ActivePointIndex].y = midPoint.y;
+	FeatherSequence[ActivePointIndex] = midPoint;
 	ActivePointIndex++;
 }
 
@@ -641,12 +639,8 @@ void fthrfn() {
 	FeatherGlobalDown = FeatherGlobalPhase - FeatherGlobalUp;
 	SelectedForm->fillType = FTHF;
 	FeatherPhase = 1;
-	BSequence[SequenceIndex].x = BSequence[SequenceIndex - 2].x;
-	BSequence[SequenceIndex].y = BSequence[SequenceIndex - 2].y;
-	BSequence[SequenceIndex].attribute = BSequence[SequenceIndex - 2].attribute;
-	BSequence[SequenceIndex + 1].x = BSequence[SequenceIndex - 1].x;
-	BSequence[SequenceIndex + 1].y = BSequence[SequenceIndex - 1].y;
-	BSequence[SequenceIndex + 1].attribute = BSequence[SequenceIndex - 1].attribute;
+	BSequence[SequenceIndex] = BSequence[SequenceIndex - 2];
+	BSequence[SequenceIndex + 1] = BSequence[SequenceIndex - 1];
 	if (ExtendedAttribute&AT_FTHBLND) {
 		OutputIndex = ActivePointIndex = 0;
 		for (ind = 0; ind < SequenceIndex; ind++) {
@@ -704,8 +698,7 @@ void fritfil() {
 			InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillInfo.feather.color;
 			iReverseSequence = ActivePointIndex - 1;
 			for (iSequence = 0; iSequence < ActivePointIndex; iSequence++) {
-				OSequence[iSequence].x = FeatherSequence[iReverseSequence].x;
-				OSequence[iSequence].y = FeatherSequence[iReverseSequence].y;
+				OSequence[iSequence] = FeatherSequence[iReverseSequence];
 				iReverseSequence--;
 			}
 			SequenceIndex = ActivePointIndex;
@@ -916,7 +909,7 @@ void delwlk(unsigned code) {
 				highStitchBuffer.push_back(StitchBuffer[iStitch]);
 			}
 		}
-		MoveMemory(StitchBuffer, &highStitchBuffer[0], highStitchBuffer.size() * sizeof(fPOINTATTR));
+		MoveMemory(StitchBuffer, &highStitchBuffer.at(0), highStitchBuffer.size() * sizeof(fPOINTATTR));
 		PCSHeader.stitchCount = gsl::narrow<unsigned short>(highStitchBuffer.size());
 	}
 }
@@ -954,24 +947,20 @@ void chkuseq() noexcept {
 			if (stitchCount) {
 				step.x = delta.x / stitchCount;
 				step.y = delta.y / stitchCount;
-				point.x = OSequence[iSequence].x;
-				point.y = OSequence[iSequence].y;
+				point = OSequence[iSequence];
 				for (index = 0; index < stitchCount; index++) {
-					InterleaveSequence[InterleaveSequenceIndex].x = point.x;
-					InterleaveSequence[InterleaveSequenceIndex].y = point.y;
+					InterleaveSequence[InterleaveSequenceIndex] = point;
 					InterleaveSequenceIndex++;
 					point.x += step.x;
 					point.y += step.y;
 				}
 			}
 			else {
-				InterleaveSequence[InterleaveSequenceIndex].x = OSequence[iSequence].x;
-				InterleaveSequence[InterleaveSequenceIndex].y = OSequence[iSequence].y;
+				InterleaveSequence[InterleaveSequenceIndex] = OSequence[iSequence];
 				InterleaveSequenceIndex++;
 			}
 		}
-		InterleaveSequence[InterleaveSequenceIndex].x = OSequence[iSequence].x;
-		InterleaveSequence[InterleaveSequenceIndex].y = OSequence[iSequence].y;
+		InterleaveSequence[InterleaveSequenceIndex] = OSequence[iSequence];
 		InterleaveSequenceIndex++;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->underlayColor;
 	}
@@ -1085,8 +1074,7 @@ void fnwlk(unsigned find) {
 	const fPOINT* walkPoints = insid();
 	OutputIndex = 0;
 	while (count) {
-		OSequence[OutputIndex].x = walkPoints[start].x;
-		OSequence[OutputIndex].y = walkPoints[start].y;
+		OSequence[OutputIndex] = walkPoints[start];
 		start = nxt(start);
 		OutputIndex++;
 		count--;
@@ -1141,8 +1129,7 @@ void fncwlk() {
 			start = SelectedForm->fillStart;
 		else
 			start = 0;
-		OSequence[OutputIndex].x = CurrentFormVertices[start].x;
-		OSequence[OutputIndex].y = CurrentFormVertices[start].y;
+		OSequence[OutputIndex] = CurrentFormVertices[start];
 		OutputIndex++;
 		finish = prv(start);
 		start = nxt(start);
@@ -1154,8 +1141,7 @@ void fncwlk() {
 			start = nxt(start);
 			finish = prv(finish);
 		}
-		OSequence[OutputIndex].x = CurrentFormVertices[start].x;
-		OSequence[OutputIndex].y = CurrentFormVertices[start].y;
+		OSequence[OutputIndex] = CurrentFormVertices[start];
 		OutputIndex++;
 	}
 	ritcwlk();
@@ -1252,21 +1238,25 @@ void dufdef() noexcept {
 }
 
 void srtcol() {
-	unsigned		histogram[16] = { 0 }, colorStartStitch[16] = { 0 };
-	unsigned		iStitch = 0, iColor = 0, startStitch = 0;
+	const int colorSize = 16;
+	std::vector<unsigned>	histogram(colorSize);
+	std::vector<unsigned>	colorStartStitch(colorSize);
+	unsigned		iStitch = 0, startStitch = 0;
 
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
-		histogram[StitchBuffer[iStitch].attribute&COLMSK]++;
+		histogram.at(StitchBuffer[iStitch].attribute&COLMSK)++;
 	startStitch = 0;
-	for (iColor = 0; iColor < 16; iColor++) {
-		colorStartStitch[iColor] = startStitch;
-		startStitch += histogram[iColor];
+	auto it = histogram.begin();
+	for (auto &stitchColor: colorStartStitch) {
+		stitchColor = startStitch;
+		startStitch += *it;
+		it++;
 	}
 	std::vector<fPOINTATTR> highStitchBuffer(PCSHeader.stitchCount);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-		highStitchBuffer[colorStartStitch[StitchBuffer[iStitch].attribute&COLMSK]++] = StitchBuffer[iStitch];
+		highStitchBuffer.at(colorStartStitch.at(StitchBuffer[iStitch].attribute&COLMSK)++) = StitchBuffer[iStitch];
 	}
-	MoveMemory(StitchBuffer, &highStitchBuffer[0], PCSHeader.stitchCount * sizeof(fPOINTATTR));
+	MoveMemory(StitchBuffer, &highStitchBuffer.at(0), PCSHeader.stitchCount * sizeof(fPOINTATTR));
 }
 
 void dubit(unsigned bit) {
@@ -1683,7 +1673,7 @@ bool chkrdun(std::vector<unsigned> &formFillCounter, std::vector<OREC *> &pRecs,
 	unsigned iStitch;
 
 	for (iStitch = stitchRecord->start; iStitch < stitchRecord->finish; iStitch++) {
-		if (pRecs[iStitch]->otyp == formFillCounter[pRecs[iStitch]->form])
+		if (pRecs.at(iStitch)->otyp == formFillCounter[pRecs.at(iStitch)->form])
 			return 1;
 	}
 	return 0;
@@ -1700,18 +1690,18 @@ double precjmps(std::vector<fPOINTATTR> &tempStitchBuffer, std::vector<OREC *> &
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
 		double minimumLength = 1e9;
 		if (direction)
-			currentStitch = &StitchBuffer[pRecs[currentRegion]->finish];
+			currentStitch = &StitchBuffer[pRecs.at(currentRegion)->finish];
 		else
-			currentStitch = &StitchBuffer[pRecs[currentRegion]->start];
+			currentStitch = &StitchBuffer[pRecs.at(currentRegion)->start];
 		for (iRegion = sortRecord->start; iRegion < sortRecord->finish; iRegion++) {
-			if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
-				double length = hypot(pRecs[iRegion]->startStitch->x - currentStitch->x, pRecs[iRegion]->startStitch->y - currentStitch->y);
+			if (pRecs.at(iRegion)->otyp == formFillCounter[pRecs.at(iRegion)->form]) {
+				double length = hypot(pRecs.at(iRegion)->startStitch->x - currentStitch->x, pRecs.at(iRegion)->startStitch->y - currentStitch->y);
 				if (length < minimumLength) {
 					minimumLength = length;
 					direction = 0;
 					currentRegion = iRegion;
 				}
-				length = hypot(pRecs[iRegion]->endStitch->x - currentStitch->x, pRecs[iRegion]->endStitch->y - currentStitch->y);
+				length = hypot(pRecs.at(iRegion)->endStitch->x - currentStitch->x, pRecs.at(iRegion)->endStitch->y - currentStitch->y);
 				if (length < minimumLength) {
 					minimumLength = length;
 					direction = 1;
@@ -1721,23 +1711,23 @@ double precjmps(std::vector<fPOINTATTR> &tempStitchBuffer, std::vector<OREC *> &
 		}
 		if (minimumLength > 9 * PFGRAN)
 			totalJumps++;
-		formFillCounter[pRecs[currentRegion]->form]++;
+		formFillCounter[pRecs.at(currentRegion)->form]++;
 		if (StateMap.test(StateFlag::DUSRT)) {
 			if (direction) {
-				if (pRecs[currentRegion]->start) {
-					for (iRegion = pRecs[currentRegion]->finish - 1; iRegion >= pRecs[currentRegion]->start; iRegion--) {
+				if (pRecs.at(currentRegion)->start) {
+					for (iRegion = pRecs.at(currentRegion)->finish - 1; iRegion >= pRecs.at(currentRegion)->start; iRegion--) {
 						tempStitchBuffer.at(OutputIndex++) = StitchBuffer[iRegion];
 					}
 				}
 				else {
-					iRegion = pRecs[currentRegion]->finish;
+					iRegion = pRecs.at(currentRegion)->finish;
 					while (iRegion) {
 						tempStitchBuffer.at(OutputIndex++) = StitchBuffer[--iRegion];
 					}
 				}
 			}
 			else {
-				for (iRegion = pRecs[currentRegion]->start; iRegion < pRecs[currentRegion]->finish; iRegion++) {
+				for (iRegion = pRecs.at(currentRegion)->start; iRegion < pRecs.at(currentRegion)->finish; iRegion++) {
 					tempStitchBuffer.at(OutputIndex++) = StitchBuffer[iRegion];
 				}
 			}
@@ -1769,27 +1759,27 @@ void dmprec(std::vector<OREC *> &stitchRegion, unsigned count) {
 	for (iRegion = 0; iRegion < count; iRegion++) {
 		OutputDebugString(fmt::format("{:4d} attrb: 0x{:08x} form: {:4d} type: {} color: {:2d} start: {:5d} finish: {:5d}\n",
 			iRegion,
-			StitchBuffer[stitchRegion[iRegion]->start].attribute,
-			stitchRegion[iRegion]->form,
-			stitchRegion[iRegion]->type,
-			stitchRegion[iRegion]->color,
-			stitchRegion[iRegion]->start,
-			stitchRegion[iRegion]->finish).c_str());
+			StitchBuffer[stitchRegion.at(iRegion)->start].attribute,
+			stitchRegion.at(iRegion)->form,
+			stitchRegion.at(iRegion)->type,
+			stitchRegion.at(iRegion)->color,
+			stitchRegion.at(iRegion)->start,
+			stitchRegion.at(iRegion)->finish).c_str());
 	}
 }
 #endif
 
 bool srtchk(std::vector<OREC *> &stitchRegion, unsigned count, unsigned* badForm) {
 	unsigned	iRegion = 1;
-	unsigned	form = stitchRegion[0]->form;
-	unsigned	color = stitchRegion[0]->color;
+	unsigned	form = stitchRegion.at(0)->form;
+	unsigned	color = stitchRegion.at(0)->color;
 	FRMHED*		formHeader = nullptr;
 
 	for (iRegion = 1; iRegion < count; iRegion++) {
-		if (stitchRegion[iRegion]->form == form) {
-			if (ColorOrder[stitchRegion[iRegion]->color] < ColorOrder[color]) {
+		if (stitchRegion.at(iRegion)->form == form) {
+			if (ColorOrder[stitchRegion.at(iRegion)->color] < ColorOrder[color]) {
 				formHeader = &FormList[form];
-				if (formHeader->fillType == FTHF && formHeader->extendedAttribute&AT_FTHBLND && stitchRegion[iRegion]->color == formHeader->fillColor)
+				if (formHeader->fillType == FTHF && formHeader->extendedAttribute&AT_FTHBLND && stitchRegion.at(iRegion)->color == formHeader->fillColor)
 					continue;
 				if (badForm) {
 					*badForm = iRegion;
@@ -1797,11 +1787,11 @@ bool srtchk(std::vector<OREC *> &stitchRegion, unsigned count, unsigned* badForm
 				return false;
 			}
 			else
-				color = stitchRegion[iRegion]->color;
+				color = stitchRegion.at(iRegion)->color;
 		}
 		else {
-			color = stitchRegion[iRegion]->color;
-			form = stitchRegion[iRegion]->form;
+			color = stitchRegion.at(iRegion)->color;
+			form = stitchRegion.at(iRegion)->form;
 		}
 	}
 	return true;
@@ -1823,8 +1813,8 @@ void fsort() {
 	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors 
 	//        in a single form are not in ascending order already. 
 	savdo();
-	stitchRegion[0].start = 0;
-	stitchRegion[0].startStitch = StitchBuffer;
+	stitchRegion.at(0).start = 0;
+	stitchRegion.at(0).startStitch = StitchBuffer;
 	ColorOrder[AppliqueColor] = 0;
 	for (iColor = 0; iColor < 16; iColor++) {
 		if (iColor != AppliqueColor)
@@ -1832,24 +1822,24 @@ void fsort() {
 	}
 	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute&SRTMSK) != attribute) {
-			stitchRegion[iRegion].finish = iStitch;
-			stitchRegion[iRegion].endStitch = &StitchBuffer[iStitch - 1];
+			stitchRegion.at(iRegion).finish = iStitch;
+			stitchRegion.at(iRegion).endStitch = &StitchBuffer[iStitch - 1];
 			iRegion++;
-			stitchRegion[iRegion].start = iStitch;
-			stitchRegion[iRegion].startStitch = &StitchBuffer[iStitch];
+			stitchRegion.at(iRegion).start = iStitch;
+			stitchRegion.at(iRegion).startStitch = &StitchBuffer[iStitch];
 			attribute = StitchBuffer[iStitch].attribute&SRTMSK;
 		}
 	}
-	stitchRegion[iRegion].endStitch = &StitchBuffer[PCSHeader.stitchCount - 1];
-	stitchRegion[iRegion].finish = PCSHeader.stitchCount;
+	stitchRegion.at(iRegion).endStitch = &StitchBuffer[PCSHeader.stitchCount - 1];
+	stitchRegion.at(iRegion).finish = PCSHeader.stitchCount;
 	iRegion++;
 	lastRegion = iRegion;
 	std::vector<OREC *> pRecs(lastRegion);
 	std::vector<OREC *> pFRecs(lastRegion);
 	for (iRegion = 0; iRegion < lastRegion; iRegion++) {
-		durec(&stitchRegion[iRegion]);
-		pRecs[iRegion] = &stitchRegion[iRegion];
-		pFRecs[iRegion] = &stitchRegion[iRegion];
+		durec(&stitchRegion.at(iRegion));
+		pRecs.at(iRegion) = &stitchRegion.at(iRegion);
+		pFRecs.at(iRegion) = &stitchRegion.at(iRegion);
 	}
 	std::sort(pRecs.begin(), pRecs.end(), recmp);
 	std::sort(pFRecs.begin(), pFRecs.end(), refcmp);
@@ -1858,39 +1848,39 @@ void fsort() {
 #endif
 	if (srtchk(pFRecs, lastRegion, &badForm)) {
 		std::vector<RANGE> stitchRange(lastRegion);
-		stitchRange[0].start = 0;
-		attribute = pRecs[0]->color;
+		stitchRange.at(0).start = 0;
+		attribute = pRecs.at(0)->color;
 		currentForm = 0xffffffff;
 		typeCount = 0;
 		iRange = 0;
 		for (iRegion = 0; iRegion < lastRegion; iRegion++) {
 			bool srtskp = true;
-			if (attribute != pRecs[iRegion]->color) {
-				stitchRange[iRange++].finish = iRegion;
-				stitchRange[iRange].start = iRegion;
-				attribute = pRecs[iRegion]->color;
-				currentForm = pRecs[iRegion]->form;
+			if (attribute != pRecs.at(iRegion)->color) {
+				stitchRange.at(iRange++).finish = iRegion;
+				stitchRange.at(iRange).start = iRegion;
+				attribute = pRecs.at(iRegion)->color;
+				currentForm = pRecs.at(iRegion)->form;
 				typeCount = 0;
 				srtskp = false;
 			}
 			if (srtskp) {
-				if (pRecs[iRegion]->form == currentForm)
+				if (pRecs.at(iRegion)->form == currentForm)
 					typeCount++;
 				else {
 					typeCount = 0;
-					currentForm = pRecs[iRegion]->form;
+					currentForm = pRecs.at(iRegion)->form;
 				}
 			}
-			pRecs[iRegion]->otyp = typeCount;
+			pRecs.at(iRegion)->otyp = typeCount;
 		}
-		stitchRange[iRange].finish = lastRegion;
+		stitchRange.at(iRange).finish = lastRegion;
 		lastRange = ++iRange;
 		std::vector<fPOINTATTR> tempStitchBuffer(PCSHeader.stitchCount);
 		OutputIndex = 0;
 		for (iRange = 0; iRange < lastRange; iRange++) {
 			StateMap.reset(StateFlag::DUSRT);
-			sortRecord.start = stitchRange[iRange].start;
-			sortRecord.finish = stitchRange[iRange].finish;
+			sortRecord.start = stitchRange.at(iRange).start;
+			sortRecord.finish = stitchRange.at(iRange).finish;
 			sortRecord.count = sortRecord.finish - sortRecord.start;
 			minimumJumps = 0xffffffff;
 			// timeout used to put an upper bound on the number of sorting permutations checked
@@ -1898,7 +1888,7 @@ void fsort() {
 			startTime = tim2int(fileTime);
 			for (iRegion = sortRecord.start; iRegion < sortRecord.finish; iRegion++) {
 				sortRecord.currentRegion = iRegion;
-				if (!pRecs[iRegion]->otyp) {
+				if (!pRecs.at(iRegion)->otyp) {
 					jumps = duprecs(tempStitchBuffer, pRecs, &sortRecord);
 					if (jumps < minimumJumps) {
 						minimumJumps = jumps;
@@ -1924,7 +1914,7 @@ void fsort() {
 	else {
 		std::string str;
 		loadString(str, IDS_SRTER);
-		shoMsg(fmt::format(str, pFRecs[badForm]->form));
+		shoMsg(fmt::format(str, pFRecs.at(badForm)->form));
 	}
 }
 
@@ -2067,9 +2057,7 @@ void fdelstch(FILLSTARTS &FillStartsData) {
 				tmap |= M_APCOL;
 				FillStartsData.fillNamed.appliqueColor = iDestinationStitch;
 			}
-			StitchBuffer[iDestinationStitch].x = StitchBuffer[iSourceStitch].x;
-			StitchBuffer[iDestinationStitch].y = StitchBuffer[iSourceStitch].y;
-			StitchBuffer[iDestinationStitch].attribute = StitchBuffer[iSourceStitch].attribute;
+			StitchBuffer[iDestinationStitch] = StitchBuffer[iSourceStitch];
 			iDestinationStitch++;
 		}
 	}
@@ -2132,15 +2120,14 @@ void fdelstch(FILLSTARTS &FillStartsData) {
 	}
 }
 
-bool lastcol(unsigned index, fPOINT* point) noexcept {
+bool lastcol(unsigned index, fPOINT &point) noexcept {
 	unsigned color;
 
 	color = InterleaveSequenceIndices[index].color;
 	while (index) {
 		index--;
 		if (InterleaveSequenceIndices[index].color == color) {
-			point->x = InterleaveSequence[InterleaveSequenceIndices[index + 1].index - 1].x;
-			point->y = InterleaveSequence[InterleaveSequenceIndices[index + 1].index - 1].y;
+			point = InterleaveSequence[InterleaveSequenceIndices[index + 1].index - 1];
 			return 1;
 		}
 	}
@@ -2162,7 +2149,7 @@ void duint(unsigned offset, unsigned code, INTINF *ilData) {
 			if (!StateMap.testAndSet(StateFlag::DIDSTRT))
 				ilData->output += gucon(CurrentFormVertices[SelectedForm->fillStart], InterleaveSequence[InterleaveSequenceIndices[ilData->pins].index], ilData->output + offset, code);
 		}
-		if (lastcol(ilData->pins, &point))
+		if (lastcol(ilData->pins, point))
 			ilData->output += gucon(point, InterleaveSequence[InterleaveSequenceIndices[ilData->pins].index], ilData->output + MAXITEMS, code);
 		for (iSequence = InterleaveSequenceIndices[ilData->pins].index; iSequence < InterleaveSequenceIndices[ilData->pins + 1].index; iSequence++) {
 			ilData->highStitchBuffer[ilData->output].x = InterleaveSequence[iSequence].x;
@@ -2264,7 +2251,7 @@ void intlv(const FILLSTARTS &FillStartsData) {
 				if (!StateMap.testAndSet(StateFlag::DIDSTRT))
 					ilData.output += gucon(CurrentFormVertices[SelectedForm->fillStart], InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index], ilData.output + offset, code);
 			}
-			if (lastcol(iSequence, &colpnt))
+			if (lastcol(iSequence, colpnt))
 				ilData.output += gucon(colpnt, InterleaveSequence[InterleaveSequenceIndices[iSequence].index], ilData.output, code);
 			for (ine = InterleaveSequenceIndices[iSequence].index; ine < InterleaveSequenceIndices[iSequence + 1].index; ine++) {
 				StitchBuffer[ilData.output].x = InterleaveSequence[ine].x;
@@ -3739,20 +3726,20 @@ void deltx() {
 			iBuffer = 0;
 			for (iForm = 0; iForm < ClosestFormToCursor; iForm++) {
 				if (istx(iForm)) {
-					MoveMemory(&textureBuffer[iBuffer], &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index], FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
+					MoveMemory(&textureBuffer.at(iBuffer), &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index], FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
 					FormList[iForm].fillInfo.texture.index = iBuffer;
 					iBuffer += FormList[iForm].fillInfo.texture.count;
 				}
 			}
 			for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 				if (istx(iForm)) {
-					MoveMemory(&textureBuffer[iBuffer], &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index], FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
+					MoveMemory(&textureBuffer.at(iBuffer), &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index], FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
 					FormList[iForm].fillInfo.texture.index = iBuffer;
 					iBuffer += FormList[iForm].fillInfo.texture.count;
 				}
 			}
 			TextureIndex = iBuffer;
-			MoveMemory(&TexturePointsBuffer[0], &textureBuffer[0], iBuffer * sizeof(TXPNT));
+			MoveMemory(&TexturePointsBuffer[0], &textureBuffer.at(0), iBuffer * sizeof(TXPNT));
 		}
 		FormList[ClosestFormToCursor].fillType = 0;
 	}
@@ -4704,12 +4691,13 @@ void txdun() {
 				WriteFile(handle, &signature, sizeof(signature), &bytesWritten, 0);
 				WriteFile(handle, &TextureHistoryIndex, sizeof(int), &bytesWritten, 0);
 				for (auto i = 0; i < ITXBUFLEN; i++) {
-					// ToDo - can this be written better?
-					textureHistoryBuffer[i].placeholder = nullptr;
-					textureHistoryBuffer[i].count = TextureHistory[i].texturePoint.size();
-					textureHistoryBuffer[i].height = TextureHistory[i].height;
-					textureHistoryBuffer[i].width = TextureHistory[i].width;
-					textureHistoryBuffer[i].spacing = TextureHistory[i].spacing;
+					auto &bufferEntry = textureHistoryBuffer.at(i);
+					auto &historyEntry = TextureHistory[i];
+					bufferEntry.placeholder = nullptr;
+					bufferEntry.count = historyEntry.texturePoint.size();
+					bufferEntry.height = historyEntry.height;
+					bufferEntry.width = historyEntry.width;
+					bufferEntry.spacing = historyEntry.spacing;
 				}
 				WriteFile(handle, textureHistoryBuffer.data(), textureHistoryBuffer.size() * ITXBUFLEN, &bytesWritten, 0);
 				for (iHistory = 0; iHistory < ITXBUFLEN; iHistory++) {
@@ -4739,12 +4727,12 @@ void redtx() {
 					if (ReadFile(handle, &TextureHistoryIndex, sizeof(int), &bytesRead, 0)) {
 						if (ReadFile(handle, textureHistoryBuffer.data(), textureHistoryBuffer.size() * ITXBUFLEN, &historyBytesRead, 0)) {
 							for (ind = 0; ind < (historyBytesRead / sizeof(TXHSTBUF)); ind++) {
-								TextureHistory[ind].height = textureHistoryBuffer[ind].height;
-								TextureHistory[ind].width = textureHistoryBuffer[ind].width;
-								TextureHistory[ind].spacing = textureHistoryBuffer[ind].spacing;
-								if (textureHistoryBuffer[ind].count) {
-									TextureHistory[ind].texturePoint.resize(textureHistoryBuffer[ind].count);
-									if (!ReadFile(handle, TextureHistory[ind].texturePoint.data(), sizeof(TXPNT)*textureHistoryBuffer[ind].count, &bytesRead, 0)) {
+								TextureHistory[ind].height = textureHistoryBuffer.at(ind).height;
+								TextureHistory[ind].width = textureHistoryBuffer.at(ind).width;
+								TextureHistory[ind].spacing = textureHistoryBuffer.at(ind).spacing;
+								if (textureHistoryBuffer.at(ind).count) {
+									TextureHistory[ind].texturePoint.resize(textureHistoryBuffer.at(ind).count);
+									if (!ReadFile(handle, TextureHistory[ind].texturePoint.data(), sizeof(TXPNT)*textureHistoryBuffer.at(ind).count, &bytesRead, 0)) {
 										TextureHistory[ind].texturePoint.clear();
 										TextureHistory[ind].texturePoint.shrink_to_fit();
 									}
@@ -4983,7 +4971,7 @@ void repflt(fmt::MemoryWriter &repairMessage) {
 		FRMHED* formHeader = &FormList[iForm];
 		vertexDifference = formHeader->vertices - FormVertices;
 		if (FormVertexIndex >= vertexDifference + formHeader->vertexCount) {
-			MoveMemory(&vertexPoint[iVertex], formHeader->vertices, formHeader->vertexCount * sizeof(fPOINT));
+			MoveMemory(&vertexPoint.at(iVertex), formHeader->vertices, formHeader->vertexCount * sizeof(fPOINT));
 			formHeader->vertices = &FormVertices[iVertex];
 			iVertex += formHeader->vertexCount;
 			bcup(iForm, &badData);
@@ -4992,7 +4980,7 @@ void repflt(fmt::MemoryWriter &repairMessage) {
 			if (vertexDifference < FormVertexIndex) {
 				formHeader->vertexCount = FormVertexIndex - vertexDifference;
 				delsac(iForm);
-				MoveMemory(&vertexPoint[iVertex], formHeader->vertices, formHeader->vertexCount * sizeof(fPOINT));
+				MoveMemory(&vertexPoint.at(iVertex), formHeader->vertices, formHeader->vertexCount * sizeof(fPOINT));
 				bcup(iForm, &badData);
 			}
 			else {
@@ -5010,7 +4998,7 @@ void repflt(fmt::MemoryWriter &repairMessage) {
 	if (flag) {
 		FormVertexIndex = iVertex;
 	}
-	MoveMemory(FormVertices, &vertexPoint[0], sizeof(fPOINT)*FormVertexIndex);
+	MoveMemory(FormVertices, &vertexPoint.at(0), sizeof(fPOINT)*FormVertexIndex);
 }
 
 void repclp(fmt::MemoryWriter &repairMessage) {
@@ -5022,14 +5010,14 @@ void repclp(fmt::MemoryWriter &repairMessage) {
 		if (isclp(iForm)) {
 			clipDifference = formHeader->angleOrClipData.clip - ClipPoints;
 			if (clipDifference + formHeader->lengthOrCount.clipCount < ClipPointIndex) {
-				MoveMemory(&clipPoint[clipCount], formHeader->angleOrClipData.clip, sizeof(fPOINT)*formHeader->lengthOrCount.clipCount);
+				MoveMemory(&clipPoint.at(clipCount), formHeader->angleOrClipData.clip, sizeof(fPOINT)*formHeader->lengthOrCount.clipCount);
 				formHeader->angleOrClipData.clip = &ClipPoints[clipCount];
 				clipCount += formHeader->lengthOrCount.clipCount;
 			}
 			else {
 				if (clipDifference < ClipPointIndex) {
 					formHeader->lengthOrCount.clipCount = FormVertexIndex - clipDifference;
-					MoveMemory(&clipPoint[clipCount], formHeader->angleOrClipData.clip, sizeof(fPOINT)*formHeader->lengthOrCount.clipCount);
+					MoveMemory(&clipPoint.at(clipCount), formHeader->angleOrClipData.clip, sizeof(fPOINT)*formHeader->lengthOrCount.clipCount);
 					formHeader->angleOrClipData.clip = &ClipPoints[clipCount];
 					clipCount += formHeader->lengthOrCount.clipCount;
 				}
@@ -5042,14 +5030,14 @@ void repclp(fmt::MemoryWriter &repairMessage) {
 		if (iseclp(iForm)) {
 			clipDifference = formHeader->borderClipData - ClipPoints;
 			if (clipDifference + formHeader->clipEntries < ClipPointIndex) {
-				MoveMemory(&clipPoint[clipCount], formHeader->borderClipData, sizeof(fPOINT)*formHeader->clipEntries);
+				MoveMemory(&clipPoint.at(clipCount), formHeader->borderClipData, sizeof(fPOINT)*formHeader->clipEntries);
 				formHeader->borderClipData = &ClipPoints[clipCount];
 				clipCount += formHeader->clipEntries;
 			}
 			else {
 				if (clipDifference < ClipPointIndex) {
 					formHeader->clipEntries = FormVertexIndex - clipDifference;
-					MoveMemory(&clipPoint[clipCount], formHeader->borderClipData, sizeof(fPOINT)*formHeader->clipEntries);
+					MoveMemory(&clipPoint.at(clipCount), formHeader->borderClipData, sizeof(fPOINT)*formHeader->clipEntries);
 					formHeader->borderClipData = &ClipPoints[clipCount];
 					clipCount += formHeader->clipEntries;
 				}
@@ -5060,7 +5048,7 @@ void repclp(fmt::MemoryWriter &repairMessage) {
 			}
 		}
 	}
-	MoveMemory(&ClipPoints, &clipPoint[0], clipCount * sizeof(fPOINT));
+	MoveMemory(&ClipPoints, &clipPoint.at(0), clipCount * sizeof(fPOINT));
 	ClipPointIndex = clipCount;
 	if (badClipCount)
 		adbad(repairMessage, IDS_CLPDAT, badClipCount);
