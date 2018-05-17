@@ -127,6 +127,7 @@ extern	void		delinf();
 extern	void		delmclp(unsigned iForm);
 extern	void		delsac(unsigned formIndex);
 extern	void		dumrk(double xCoord, double yCoord);
+extern	void		dusqr();
 extern	bool		filmsgs(unsigned code);
 extern	void		filsat();
 extern	void		filsfn();
@@ -719,7 +720,7 @@ void fethrf() {
 		SelectedForm->fillInfo.feather.downCount = IniFile.featherDownCount;
 		SelectedForm->fillInfo.feather.fillType = IniFile.featherFillType;
 		SelectedForm->fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
-		SelectedForm->extendedAttribute &= !(AT_FTHUP | AT_FTHBTH | AT_FTHBLND);
+		SelectedForm->extendedAttribute &= ~(AT_FTHUP | AT_FTHBTH | AT_FTHBLND);
 		SelectedForm->extendedAttribute |= IniFile.featherType;
 		SelectedForm->fillInfo.feather.count = IniFile.featherCount;
 		SelectedForm->lengthOrCount.stitchLength = UserStitchLength;
@@ -1279,7 +1280,7 @@ void dubit(unsigned bit) {
 	}
 	code = SelectedForm->extendedAttribute&bit;
 	if (code)
-		SelectedForm->extendedAttribute &= (~bit);
+		SelectedForm->extendedAttribute &= ~(bit);
 	else
 		SelectedForm->extendedAttribute |= bit;
 	refil();
@@ -3808,10 +3809,7 @@ void dutxfn(unsigned textureType) {
 		deltx();
 		savtxt();
 		nutx();
-		if (UserFlagMap.test(UserFlag::SQRFIL))
-			SelectedForm->extendedAttribute |= AT_SQR;
-		else
-			SelectedForm->extendedAttribute &= (~AT_SQR);
+		dusqr();
 		switch (textureType) {
 		case VRTYP:
 

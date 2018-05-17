@@ -202,7 +202,7 @@ void			bakseq ();
 void			bdrlin(unsigned start, unsigned finish, double stitchSize);
 void			bhbrd(double spacing);
 void			blbrd (double spacing);
-void			bold (double size) noexcept;
+void			bold (double size);
 void			brdfil (double pd_Size);
 void			chan ();
 void			chnfn ();
@@ -467,7 +467,7 @@ void dusqr() {
 	if (UserFlagMap.test(UserFlag::SQRFIL))
 		SelectedForm->extendedAttribute |= AT_SQR;
 	else
-		SelectedForm->extendedAttribute &= (~AT_SQR);
+		SelectedForm->extendedAttribute &= ~(AT_SQR);
 }
 
 void sacspac(const SATCON* startGuide, unsigned guideCount) noexcept {
@@ -1706,8 +1706,8 @@ bool ritlin(fPOINT start, fPOINT finish) {
 		if (!chkmax(InterleaveSequenceIndex, count)) {
 			step.x = delta.x / count;
 			step.y = delta.y / count;
-			point.x = start.x + gsl::narrow<float>(step.x);
-			point.y = start.y + gsl::narrow<float>(step.y);
+			point.x = start.x + step.x;
+			point.y = start.y + step.y;
 			for (iStep = 0; iStep < count - 1; iStep++) {
 				if (InterleaveSequenceIndex&MAXMSK) {
 					InterleaveSequenceIndex = MAXITEMS - 2;
@@ -4086,7 +4086,7 @@ void clrfills() noexcept {
 		FormList[iForm].edgeType = 0;
 		FormList[iForm].fillType = 0;
 		FormList[iForm].attribute &= NFRECONT;
-		FormList[iForm].extendedAttribute &= !(AT_UND | AT_WALK);
+		FormList[iForm].extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
 	}
 	ClipPointIndex = 0;
 }
@@ -5105,7 +5105,7 @@ void unfil() {
 				formMap.set(SelectedFormList[iForm]);
 				SelectedForm->fillType = 0;
 				SelectedForm->edgeType = 0;
-				SelectedForm->extendedAttribute &= !(AT_UND | AT_CWLK | AT_WALK);
+				SelectedForm->extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
 			}
 		}
 		iDestination = 0;
@@ -5145,7 +5145,7 @@ void unfil() {
 			deltx();
 			SelectedForm->fillType = 0;
 			SelectedForm->edgeType = 0;
-			SelectedForm->extendedAttribute &= !(AT_UND | AT_CWLK | AT_WALK);
+			SelectedForm->extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
 			PCSHeader.stitchCount = iDestination;
 			ritot(PCSHeader.stitchCount);
 		}
@@ -8801,6 +8801,8 @@ void cplayfn(unsigned iForm, unsigned play) {
 	SelectedForm->fillInfo.texture.index = 0;
 	SelectedForm->attribute = FormList[FormIndex].attribute&NFRMLMSK;
 	SelectedForm->attribute |= play;
+	SelectedForm->extendedAttribute = 0;
+	dusqr();
 	FormIndex++;
 }
 
@@ -9847,6 +9849,7 @@ void ribon() {
 					formHeader->fillInfo.feather.downCount = IniFile.featherDownCount;
 					formHeader->fillInfo.feather.fillType = IniFile.featherFillType;
 					formHeader->fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
+					// ToDo - should this be ORed in to keep other attributes?
 					formHeader->extendedAttribute = IniFile.featherType;
 					formHeader->fillInfo.feather.count = IniFile.featherCount;
 					formHeader->fillInfo.feather.color = (ActiveColor + 1)&COLMSK;
