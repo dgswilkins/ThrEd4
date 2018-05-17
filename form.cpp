@@ -2147,7 +2147,7 @@ void boldlin(unsigned start, unsigned finish, double size) {
 	}
 }
 
-void bold(double size) noexcept {
+void bold(double size) {
 	unsigned	iVertex = 0, iSequence = 0, iOutput = 0;
 	unsigned	iNextLine = getlast();
 	unsigned	iLine = iNextLine;
