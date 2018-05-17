@@ -8266,7 +8266,7 @@ void dubuf(char *buffer, unsigned *count) {
 			durit(&output, &vertices.at(0), vertices.size() * sizeof(vertices.at(0)));
 		}
 		if (guides.size()) {
-			durit(&output, &guides.at(0), guides.size() * sizeof(guides.at(0));
+			durit(&output, &guides.at(0), guides.size() * sizeof(guides.at(0)));
 		}
 		if (points.size()) {
 			durit(&output, &points.at(0), points.size() * sizeof(points.at(0)));
@@ -19501,7 +19501,7 @@ void ritbak(const char* fileName, DRAWITEMSTRUCT* drawItem) {
 				if (bytesToRead == BytesRead) {
 					SetFilePointer(thrEdFile, 16, 0, FILE_CURRENT);
 					ReadFile(thrEdFile, &brushColor, sizeof(COLORREF), &BytesRead, 0);
-					ReadFile(thrEdFile, colors, 16 * sizeof(COLORREF), &BytesRead, 0);
+					ReadFile(thrEdFile, &colors.at(0), colors.size() * sizeof(COLORREF), &BytesRead, 0);
 					brush = CreateSolidBrush(brushColor);
 					SelectObject(drawItem->hDC, brush);
 					FillRect(drawItem->hDC, &drawItem->rcItem, brush);
