@@ -2292,9 +2292,9 @@ void fnvrt(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lin
 			savedLineCount = StitchLineCount;
 			while (iPoint < evenPointCount) {
 				if (StitchLineCount < fillLineCount) {
-					lineEndpoints.push_back({ projectedPoints.at(iPoint).line, LineGroupIndex, projectedPoints.at(iPoint).x, projectedPoints.at(iPoint).y });
+					lineEndpoints.push_back({ projectedPoints[iPoint].line, LineGroupIndex, projectedPoints[iPoint].x, projectedPoints[iPoint].y });
 					iPoint++;
-					lineEndpoints.push_back({ projectedPoints.at(iPoint).line, LineGroupIndex, projectedPoints.at(iPoint).x, projectedPoints.at(iPoint).y });
+					lineEndpoints.push_back({ projectedPoints[iPoint].line, LineGroupIndex, projectedPoints[iPoint].x, projectedPoints[iPoint].y });
 					iPoint++;
 					StitchLineCount += 2;
 				}
@@ -2798,9 +2798,9 @@ unsigned short isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoin
 
 bool lnclos(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints, unsigned group0, unsigned line0, unsigned group1, unsigned line1) {
 	unsigned		index0 = 0, index1 = 0;
-	unsigned		count0 = (groupIndexSequence.at(group0 + 1) - groupIndexSequence.at(group0)) >> 1;
+	unsigned		count0 = (groupIndexSequence[group0 + 1] - groupIndexSequence[group0]) >> 1;
 	unsigned		count1 = 0;
-	const SMALPNTL*	lineEndPoint0 = &lineEndpoints.at(groupIndexSequence.at(group0));
+	const SMALPNTL*	lineEndPoint0 = &lineEndpoints[groupIndexSequence[group0]];
 
 	if (group1 > GroupIndexCount - 2)
 		return 0;
@@ -2812,9 +2812,9 @@ bool lnclos(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &li
 			index0 += 2;
 		}
 		if (count0) {
-			count1 = (groupIndexSequence.at(group1 + 1) - groupIndexSequence.at(group1)) >> 1;
+			count1 = (groupIndexSequence[group1 + 1] - groupIndexSequence[group1]) >> 1;
 			index1 = 0;
-			if (const SMALPNTL* lineEndPoint1 = &lineEndpoints.at(groupIndexSequence.at(group1))) {
+			if (const SMALPNTL* lineEndPoint1 = &lineEndpoints[groupIndexSequence[group1]]) {
 				while (count1 && lineEndPoint1[index1].line != line1) {
 					count1--;
 					index1 += 2;
@@ -2834,9 +2834,9 @@ bool lnclos(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &li
 bool regclos(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &lineEndpoints, std::vector<SMALPNTL*> &sortedLines, unsigned iRegion0, unsigned iRegion1, std::vector<REGION> &regionsList) {
 	//ToDo - More renaming required
 
-	const SMALPNTL*	lineEndPoint0Start = sortedLines.at(regionsList.at(iRegion0).start);
+	const SMALPNTL*	lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
 	SMALPNTL*		lineEndPoint0End = nullptr;
-	const SMALPNTL*	lineEndPoint1Start = sortedLines.at(regionsList.at(iRegion1).start);
+	const SMALPNTL*	lineEndPoint1Start = sortedLines[regionsList[iRegion1].start];
 	SMALPNTL*		lineEndPoint1End = nullptr;
 	const unsigned	group0Start = lineEndPoint0Start->group;
 	unsigned		group0End = 0;
@@ -2862,8 +2862,8 @@ bool regclos(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &l
 		return 1;
 	}
 	else {
-		lineEndPoint0End = sortedLines.at(regionsList.at(iRegion0).end);
-		lineEndPoint1End = sortedLines.at(regionsList.at(iRegion1).end);
+		lineEndPoint0End = sortedLines[regionsList[iRegion0].end];
+		lineEndPoint1End = sortedLines[regionsList[iRegion1].end];
 		group1End = lineEndPoint1End->group;
 		group0End = lineEndPoint0End->group;
 		if (group0End < group1End) {
@@ -2926,7 +2926,7 @@ void dunseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish
 	double minimumY = 1e30;
 
 	for (unsigned iLine = start; iLine <= finish; iLine++) {
-		const double deltaY = sortedLines.at(start)[1].y - sortedLines.at(start)[0].y;
+		const double deltaY = sortedLines[start][1].y - sortedLines[start][0].y;
 		if (deltaY < minimumY)
 			minimumY = deltaY;
 	}
@@ -2936,13 +2936,13 @@ void dunseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish
 	else {
 		minimumY /= 2;
 	}
-	rspnt(sortedLines.at(start)[0].x, sortedLines.at(start)[0].y + minimumY);
-	rspnt(sortedLines.at(finish)[0].x, sortedLines.at(finish)[0].y + minimumY);
-	LastGroup = sortedLines.at(finish)[0].group;
+	rspnt(sortedLines[start][0].x, sortedLines[start][0].y + minimumY);
+	rspnt(sortedLines[finish][0].x, sortedLines[finish][0].y + minimumY);
+	LastGroup = sortedLines[finish][0].group;
 }
 
 void movseq(std::vector<SMALPNTL*> &sortedLines, unsigned ind) {
-	SMALPNTL*	lineEndPoint = sortedLines.at(ind);
+	SMALPNTL*	lineEndPoint = sortedLines[ind];
 
 	BSequence[OutputIndex].attribute = SEQBOT;
 	BSequence[OutputIndex].x = lineEndPoint->x;
@@ -2958,7 +2958,7 @@ void movseq(std::vector<SMALPNTL*> &sortedLines, unsigned ind) {
 }
 
 void duseq2(std::vector<SMALPNTL*> &sortedLines, unsigned iLine) {
-	SequenceLines = sortedLines.at(iLine);
+	SequenceLines = sortedLines[iLine];
 	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x, (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
 }
 
@@ -2968,10 +2968,10 @@ void duseq1() noexcept {
 
 void duseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish, boost::dynamic_bitset<> &sequenceMap) {
 	unsigned	iLine = 0, iLineDec = 0;
-	unsigned	savedTopLine = sortedLines.at(start)[1].line;
+	unsigned	savedTopLine = sortedLines[start][1].line;
 	bool		flag = false;
 
-	SequenceLines = sortedLines.at(start);
+	SequenceLines = sortedLines[start];
 	StateMap.reset(StateFlag::SEQDUN);
 	if (start > finish) {
 		// This odd construction for iLine is used to ensure loop terminates when finish = 0
@@ -2983,7 +2983,7 @@ void duseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish,
 					duseq2(sortedLines, iLineDec);
 				}
 				else {
-					if (savedTopLine != sortedLines.at(iLineDec)[1].line) {
+					if (savedTopLine != sortedLines[iLineDec][1].line) {
 						if (iLineDec) {
 							duseq2(sortedLines, iLineDec + 1);
 						}
@@ -2998,7 +2998,7 @@ void duseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish,
 					duseq2(sortedLines, (iLineDec + 1));
 				}
 				flag = true;
-				SequenceLines = sortedLines.at(iLineDec);
+				SequenceLines = sortedLines[iLineDec];
 				movseq(sortedLines, iLineDec);
 			}
 		}
@@ -3018,7 +3018,7 @@ void duseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish,
 					duseq2(sortedLines, iLine);
 				}
 				else {
-					if (savedTopLine != sortedLines.at(iLine)[1].line) {
+					if (savedTopLine != sortedLines[iLine][1].line) {
 						if (iLine) {
 							duseq2(sortedLines, (iLine - 1));
 						}
@@ -3035,7 +3035,7 @@ void duseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish,
 					}
 				}
 				flag = true;
-				SequenceLines = sortedLines.at(iLine);
+				SequenceLines = sortedLines[iLine];
 				movseq(sortedLines, iLine);
 			}
 		}
@@ -3056,20 +3056,20 @@ void brkseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish
 
 	StateMap.reset(StateFlag::SEQDUN);
 	if (start > finish) {
-		savedGroup = sortedLines.at(start)->group + 1;
+		savedGroup = sortedLines[start]->group + 1;
 		// This odd construction for iLine is used to ensure
 		// loop terminates when finish = 0
 		for (iLine = start + 1; iLine != finish; iLine--) {
 			iLineDec = iLine - 1;
 			savedGroup--;
-			if (sortedLines.at(iLineDec)->group != savedGroup) {
+			if (sortedLines[iLineDec]->group != savedGroup) {
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
-				SequenceLines = sortedLines.at(iLineDec);
+				SequenceLines = sortedLines[iLineDec];
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
 				savedGroup = SequenceLines[0].group;
 			}
 			else {
-				SequenceLines = sortedLines.at(iLineDec);
+				SequenceLines = sortedLines[iLineDec];
 			}
 			if (sequenceMap.test_set(iLineDec)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN))
@@ -3082,17 +3082,17 @@ void brkseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish
 		LastGroup = SequenceLines->group;
 	}
 	else {
-		savedGroup = sortedLines.at(start)->group - 1;
+		savedGroup = sortedLines[start]->group - 1;
 		for (iLine = start; iLine <= finish; iLine++) {
 			savedGroup++;
-			if (sortedLines.at(iLine)->group != savedGroup) {
+			if (sortedLines[iLine]->group != savedGroup) {
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
-				SequenceLines = sortedLines.at(iLine);
+				SequenceLines = sortedLines[iLine];
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
 				savedGroup = SequenceLines[0].group;
 			}
 			else {
-				SequenceLines = sortedLines.at(iLine);
+				SequenceLines = sortedLines[iLine];
 			}
 			if (sequenceMap.test_set(iLine)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN))
@@ -3110,9 +3110,9 @@ void brkseq(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish
 }
 
 void brkdun(std::vector<SMALPNTL*> &sortedLines, unsigned start, unsigned finish) {
-	rspnt(sortedLines.at(start)->x, sortedLines.at(start)->y);
-	rspnt(sortedLines.at(finish)->x, sortedLines.at(finish)->y);
-	rspnt(WorkingFormVertices[sortedLines.at(start)->line].x, WorkingFormVertices[sortedLines.at(start)->line].y);
+	rspnt(sortedLines[start]->x, sortedLines[start]->y);
+	rspnt(sortedLines[finish]->x, sortedLines[finish]->y);
+	rspnt(WorkingFormVertices[sortedLines[start]->line].x, WorkingFormVertices[sortedLines[start]->line].y);
 	StateMap.set(StateFlag::BRKFIX);
 }
 
@@ -3124,20 +3124,20 @@ void durgn(std::vector<FSEQ> &sequencePath, boost::dynamic_bitset<> &visitedRegi
 	unsigned	groupStart = 0, groupEnd = 0;
 	double		length = 0.0, minimumLength = 0.0;
 	BSEQPNT*	bpnt = nullptr;
-	const unsigned	nextGroup = sequencePath.at(pthi).nextGroup;
-	const unsigned	iRegion = sequencePath.at(pthi).node;
+	const unsigned	nextGroup = sequencePath[pthi].nextGroup;
+	const unsigned	iRegion = sequencePath[pthi].node;
 
 	boost::dynamic_bitset<> sequenceMap(lineCount);
 
 	//ToDo - More renaming required
-	CurrentRegion = &regionsList.at(iRegion);
+	CurrentRegion = &regionsList[iRegion];
 	sequenceStart = CurrentRegion->start;
 	sequenceEnd = CurrentRegion->end;
-	if (sequencePath.at(pthi).skp || StateMap.testAndReset(StateFlag::BRKFIX)) {
+	if (sequencePath[pthi].skp || StateMap.testAndReset(StateFlag::BRKFIX)) {
 		if (BSequence[OutputIndex - 1].attribute != SEQBOT) {
 			rspnt(BSequence[OutputIndex - 2].x, BSequence[OutputIndex - 2].y);
 		}
-		dun = sortedLines.at(sequenceStart)->line;
+		dun = sortedLines[sequenceStart]->line;
 		bpnt = &BSequence[OutputIndex - 1];
 		minimumLength = 1e99;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
@@ -3176,8 +3176,8 @@ void durgn(std::vector<FSEQ> &sequencePath, boost::dynamic_bitset<> &visitedRegi
 		dun = 0;
 		visitedRegions.set(iRegion);
 	}
-	groupStart = sortedLines.at(CurrentRegion->start)->group;
-	groupEnd = sortedLines.at(CurrentRegion->end)->group;
+	groupStart = sortedLines[CurrentRegion->start]->group;
+	groupEnd = sortedLines[CurrentRegion->end]->group;
 	if (groupEnd != groupStart) {
 		seql = static_cast<double>(LastGroup - groupStart) / (groupEnd - groupStart)*(sequenceEnd - sequenceStart) + sequenceStart;
 	}
@@ -3206,17 +3206,17 @@ void durgn(std::vector<FSEQ> &sequencePath, boost::dynamic_bitset<> &visitedRegi
 	if (seqn > sequenceEnd) {
 		seqn = sequenceEnd;
 	}
-	if (sortedLines.at(seql)->group != LastGroup) {
-		if (seql < sequenceEnd && sortedLines.at(seql + 1)->group == LastGroup) {
+	if (sortedLines[seql]->group != LastGroup) {
+		if (seql < sequenceEnd && sortedLines[seql + 1]->group == LastGroup) {
 			seql++;
 		}
 		else {
-			if (seql > sequenceStart && sortedLines.at(seql - 1)->group == LastGroup)
+			if (seql > sequenceStart && sortedLines[seql - 1]->group == LastGroup)
 				seql--;
 			else {
 				mindif = 0xffffffff;
 				for (ind = sequenceStart; ind <= sequenceEnd; ind++) {
-					gdif = ((sortedLines.at(ind)->group > LastGroup) ? (sortedLines.at(ind)->group - LastGroup) : (LastGroup - sortedLines.at(ind)->group));
+					gdif = ((sortedLines[ind]->group > LastGroup) ? (sortedLines[ind]->group - LastGroup) : (LastGroup - sortedLines[ind]->group));
 					if (gdif < mindif) {
 						mindif = gdif;
 						seql = ind;
@@ -3225,18 +3225,18 @@ void durgn(std::vector<FSEQ> &sequencePath, boost::dynamic_bitset<> &visitedRegi
 			}
 		}
 	}
-	if (sortedLines.at(seqn)->group != nextGroup) {
-		if (seqn < sequenceEnd && sortedLines.at(seqn + 1)->group == nextGroup) {
+	if (sortedLines[seqn]->group != nextGroup) {
+		if (seqn < sequenceEnd && sortedLines[seqn + 1]->group == nextGroup) {
 			seqn++;
 		}
 		else {
-			if (seqn > sequenceStart && sortedLines.at(seqn - 1)->group == nextGroup) {
+			if (seqn > sequenceStart && sortedLines[seqn - 1]->group == nextGroup) {
 				seqn--;
 			}
 			else {
 				mindif = 0xffffffff;
 				for (ind = sequenceStart; ind <= sequenceEnd; ind++) {
-					gdif = ((sortedLines.at(ind)->group > nextGroup) ? (sortedLines.at(ind)->group - nextGroup) : (nextGroup - sortedLines.at(ind)->group));
+					gdif = ((sortedLines[ind]->group > nextGroup) ? (sortedLines[ind]->group - nextGroup) : (nextGroup - sortedLines[ind]->group));
 					if (gdif < mindif) {
 						mindif = gdif;
 						seqn = ind;
@@ -3316,14 +3316,14 @@ unsigned notdun(std::vector<RGSEQ> &tempPath, std::vector<RCON> &pathMap, std::v
 	int			pivot = 0;
 	int			previousLevel = level - 1;
 
-	RegionPath = &tempPath.at(SequencePathIndex);
-	RegionPath[0].pcon = mapIndexSequence.at(DoneRegion);
-	RegionPath[0].count = mapIndexSequence.at(DoneRegion + 1) - RegionPath[0].pcon;
+	RegionPath = &tempPath[SequencePathIndex];
+	RegionPath[0].pcon = mapIndexSequence[DoneRegion];
+	RegionPath[0].count = mapIndexSequence[DoneRegion + 1] - RegionPath[0].pcon;
 	for (iPath = 1; iPath < level; iPath++) {
-		RegionPath[iPath].pcon = mapIndexSequence.at(pathMap.at(RegionPath[iPath - 1].pcon).node);
-		RegionPath[iPath].count = mapIndexSequence.at(pathMap.at(RegionPath[iPath - 1].pcon).node + 1) - RegionPath[iPath].pcon;
+		RegionPath[iPath].pcon = mapIndexSequence[pathMap[RegionPath[iPath - 1].pcon].node];
+		RegionPath[iPath].count = mapIndexSequence[pathMap[RegionPath[iPath - 1].pcon].node + 1] - RegionPath[iPath].pcon;
 	}
-	while (VisitedRegions[pathMap.at(RegionPath[previousLevel].pcon).node] && previousLevel >= 0) {
+	while (VisitedRegions[pathMap[RegionPath[previousLevel].pcon].node] && previousLevel >= 0) {
 		if (--RegionPath[previousLevel].count > 0) {
 			RegionPath[previousLevel].pcon++;
 		}
@@ -3343,8 +3343,8 @@ unsigned notdun(std::vector<RGSEQ> &tempPath, std::vector<RCON> &pathMap, std::v
 			pivot++;
 			while (pivot <= previousLevel) {
 				if (pivot) {
-					RegionPath[pivot].pcon = mapIndexSequence.at(pathMap.at(RegionPath[pivot - 1].pcon).node);
-					RegionPath[pivot].count = mapIndexSequence.at(pathMap.at(RegionPath[pivot - 1].pcon).node + 1) - RegionPath[pivot].pcon;
+					RegionPath[pivot].pcon = mapIndexSequence[pathMap[RegionPath[pivot - 1].pcon].node];
+					RegionPath[pivot].count = mapIndexSequence[pathMap[RegionPath[pivot - 1].pcon].node + 1] - RegionPath[pivot].pcon;
 				}
 				else {
 					if (--RegionPath[0].count) {
@@ -3366,13 +3366,13 @@ double reglen(std::vector<SMALPNTL*> &sortedLines, unsigned iRegion, std::vector
 	unsigned	iCorner = 0, iPoint = 0;
 	std::vector<SMALPNTL*>	lineEndPoints(4);
 
-	lineEndPoints.at(0) = sortedLines.at(regionsList.at(iRegion).start);
-	lineEndPoints.at(1) = &sortedLines.at(regionsList.at(iRegion).start)[1];
-	lineEndPoints.at(2) = sortedLines.at(regionsList.at(iRegion).end);
-	lineEndPoints.at(3) = &sortedLines.at(regionsList.at(iRegion).end)[1];
+	lineEndPoints[0] = sortedLines[regionsList[iRegion].start];
+	lineEndPoints[1] = &sortedLines[regionsList[iRegion].start][1];
+	lineEndPoints[2] = sortedLines[regionsList[iRegion].end];
+	lineEndPoints[3] = &sortedLines[regionsList[iRegion].end][1];
 	for (iCorner = 0; iCorner < 4; iCorner++) {
 		for (iPoint = 0; iPoint < 4; iPoint++) {
-			length = hypot(lastRegionCorners.at(iCorner).x - lineEndPoints.at(iPoint)->x, lastRegionCorners.at(iCorner).y - lineEndPoints.at(iPoint)->y);
+			length = hypot(lastRegionCorners[iCorner].x - lineEndPoints[iPoint]->x, lastRegionCorners[iCorner].y - lineEndPoints[iPoint]->y);
 			if (length < minimumLength) {
 				minimumLength = length;
 			}
@@ -3391,19 +3391,19 @@ void nxtrgn(std::vector<RGSEQ> &tempPath, std::vector<RCON> &pathMap, std::vecto
 	while (notdun(tempPath, pathMap, mapIndexSequence, visitedRegions, pathLength)) {
 		pathLength++;
 		if (pathLength > 8) {
-			SMALPNTL* lineEndPoint = sortedLines.at(regionsList.at(DoneRegion).start);
+			SMALPNTL* lineEndPoint = sortedLines[regionsList[DoneRegion].start];
 			if (lineEndPoint) {
-				lastRegionCorners.at(0).x = lineEndPoint[0].x;
-				lastRegionCorners.at(0).y = lineEndPoint[0].y;
-				lastRegionCorners.at(1).x = lineEndPoint[1].x;
-				lastRegionCorners.at(1).y = lineEndPoint[1].y;
+				lastRegionCorners[0].x = lineEndPoint[0].x;
+				lastRegionCorners[0].y = lineEndPoint[0].y;
+				lastRegionCorners[1].x = lineEndPoint[1].x;
+				lastRegionCorners[1].y = lineEndPoint[1].y;
 			}
-			lineEndPoint = sortedLines.at(regionsList.at(DoneRegion).end);
+			lineEndPoint = sortedLines[regionsList[DoneRegion].end];
 			if (lineEndPoint) {
-				lastRegionCorners.at(2).x = lineEndPoint[0].x;
-				lastRegionCorners.at(2).y = lineEndPoint[0].y;
-				lastRegionCorners.at(3).x = lineEndPoint[1].x;
-				lastRegionCorners.at(3).y = lineEndPoint[1].y;
+				lastRegionCorners[2].x = lineEndPoint[0].x;
+				lastRegionCorners[2].y = lineEndPoint[0].y;
+				lastRegionCorners[3].x = lineEndPoint[1].x;
+				lastRegionCorners[3].y = lineEndPoint[1].y;
 			}
 			newRegion = 0;
 			for (iRegion = 0; iRegion < RegionCount; iRegion++) {
@@ -3415,28 +3415,28 @@ void nxtrgn(std::vector<RGSEQ> &tempPath, std::vector<RCON> &pathMap, std::vecto
 					}
 				}
 			}
-			tempPath.at(SequencePathIndex).skp = true;
+			tempPath[SequencePathIndex].skp = true;
 			for (iPath = 0; iPath < PathMapIndex; iPath++) {
-				if (pathMap.at(iPath).node == newRegion) {
-					tempPath.at(SequencePathIndex++).pcon = iPath;
+				if (pathMap[iPath].node == newRegion) {
+					tempPath[SequencePathIndex++].pcon = iPath;
 					visitedRegions.set(newRegion);
 					DoneRegion = newRegion;
 					return;
 				}
 			}
-			tempPath.at(SequencePathIndex).count = VisitedIndex;
-			tempPath.at(SequencePathIndex++).pcon = 0xffffffff;
+			tempPath[SequencePathIndex].count = VisitedIndex;
+			tempPath[SequencePathIndex++].pcon = 0xffffffff;
 			visitedRegions.set(VisitedIndex);
 			DoneRegion = VisitedIndex;
 			return;
 		}
 	}
 	for (iPath = 0; iPath < pathLength; iPath++) {
-		tempPath.at(SequencePathIndex).skp = false;
-		tempPath.at(SequencePathIndex++).pcon = RegionPath[iPath].pcon;
-		visitedRegions.set(pathMap.at(RegionPath[iPath].pcon).node);
+		tempPath[SequencePathIndex].skp = false;
+		tempPath[SequencePathIndex++].pcon = RegionPath[iPath].pcon;
+		visitedRegions.set(pathMap[RegionPath[iPath].pcon].node);
 	}
-	DoneRegion = pathMap.at(RegionPath[iPath - 1].pcon).node;
+	DoneRegion = pathMap[RegionPath[iPath - 1].pcon].node;
 }
 
 bool sqcomp(const SMALPNTL *arg1, const SMALPNTL *arg2) noexcept {
@@ -3465,17 +3465,17 @@ bool sqcomp(const SMALPNTL *arg1, const SMALPNTL *arg2) noexcept {
 }
 
 void nxtseq(std::vector<FSEQ> &sequencePath, std::vector<RCON> &pathMap, std::vector<unsigned> &mapIndexSequence, unsigned pathIndex) {
-	unsigned	iPath = mapIndexSequence.at(sequencePath.at(pathIndex).node);
+	unsigned	iPath = mapIndexSequence[sequencePath[pathIndex].node];
 	unsigned	nextNode = 0;
 	if ((pathIndex + 1) < sequencePath.size()) {
-		nextNode = sequencePath.at(pathIndex + 1).node;
-		while (iPath < mapIndexSequence.at(sequencePath.at(pathIndex).node + 1) && pathMap.at(iPath).node != nextNode) {
+		nextNode = sequencePath[pathIndex + 1].node;
+		while (iPath < mapIndexSequence[sequencePath[pathIndex].node + 1] && pathMap[iPath].node != nextNode) {
 			iPath++;
 		}
-		sequencePath.at(PathIndex++).nextGroup = pathMap.at(iPath).nextGroup;
+		sequencePath[PathIndex++].nextGroup = pathMap[iPath].nextGroup;
 	}
 	else {
-		sequencePath.at(PathIndex++).nextGroup = 0;
+		sequencePath[PathIndex++].nextGroup = 0;
 	}
 }
 
@@ -3498,53 +3498,53 @@ void lcon(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &line
 		std::vector<SMALPNTL*> sortedLines;
 		sortedLines.reserve(StitchLineCount >> 1);
 		for (iLine = 0; iLine < StitchLineCount; iLine += 2) {
-			sortedLines.push_back(&lineEndpoints.at(iLine));
+			sortedLines.push_back(&lineEndpoints[iLine]);
 		}
 		std::sort(sortedLines.begin(), sortedLines.end(), sqcomp);
 		lineCount = sortedLines.size();
 		RegionCount = 0;
 		// Count the regions. There cannot be more regions than lines
 		std::vector<REGION> regions(lineCount);
-		regions.at(0).start = 0;
-		breakLine = sortedLines.at(0)->line;
+		regions[0].start = 0;
+		breakLine = sortedLines[0]->line;
 		for (iLine = 0; iLine < lineCount; iLine++) {
-			if (breakLine != sortedLines.at(iLine)->line) {
-				regions.at(RegionCount++).end = iLine - 1;
-				regions.at(RegionCount).start = iLine;
-				breakLine = sortedLines.at(iLine)->line;
+			if (breakLine != sortedLines[iLine]->line) {
+				regions[RegionCount++].end = iLine - 1;
+				regions[RegionCount].start = iLine;
+				breakLine = sortedLines[iLine]->line;
 			}
 		}
-		regions.at(RegionCount++).end = iLine - 1;
+		regions[RegionCount++].end = iLine - 1;
 		std::vector<REGION> RegionsList(RegionCount);
 		boost::dynamic_bitset<> visitedRegions(RegionCount);
 		for (iRegion = 0; iRegion < RegionCount; iRegion++) {
-			RegionsList.at(iRegion).start = regions.at(iRegion).start;
-			RegionsList.at(iRegion).end = regions.at(iRegion).end;
-			RegionsList.at(iRegion).breakCount = 0;
+			RegionsList[iRegion].start = regions[iRegion].start;
+			RegionsList[iRegion].end = regions[iRegion].end;
+			RegionsList[iRegion].breakCount = 0;
 		}
 		iStartLine = 0;
 		for (iRegion = 0; iRegion < RegionCount; iRegion++) {
 			count = 0;
-			if ((RegionsList.at(iRegion).end - RegionsList.at(iRegion).start) > 1) {
-				startGroup = sortedLines.at(RegionsList.at(iRegion).start)->group;
-				for (iLine = RegionsList.at(iRegion).start + 1; iLine <= RegionsList.at(iRegion).end; iLine++) {
+			if ((RegionsList[iRegion].end - RegionsList[iRegion].start) > 1) {
+				startGroup = sortedLines[RegionsList[iRegion].start]->group;
+				for (iLine = RegionsList[iRegion].start + 1; iLine <= RegionsList[iRegion].end; iLine++) {
 					startGroup++;
-					if (sortedLines.at(iLine)->group != startGroup) {
+					if (sortedLines[iLine]->group != startGroup) {
 						if (!count) {
-							RegionsList.at(iRegion).regionBreak = iStartLine;
+							RegionsList[iRegion].regionBreak = iStartLine;
 						}
 						count++;
-						startGroup = sortedLines.at(iLine)->group;
+						startGroup = sortedLines[iLine]->group;
 					}
 				}
 			}
-			RegionsList.at(iRegion).breakCount = count;
+			RegionsList[iRegion].breakCount = count;
 		}
 
 #if BUGSEQ
 		bugColor = 0; SequenceIndex = 0;
 		for (iRegion = 0; iRegion < RegionCount; iRegion++) {
-			for (iLine = RegionsList.at(iRegion).start; iLine <= RegionsList.at(iRegion).end; iLine++) {
+			for (iLine = RegionsList[iRegion].start; iLine <= RegionsList[iRegion].end; iLine++) {
 				lineGroupPoint = &*SortedLines[iLine];
 				StitchBuffer[SequenceIndex].attribute = bugColor;
 				StitchBuffer[SequenceIndex].x = lineGroupPoint[0].x;
@@ -3602,7 +3602,7 @@ void lcon(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &line
 			//find the leftmost region
 			startGroup = 0xffffffff; leftRegion = 0;
 			for (iRegion = 0; iRegion < RegionCount; iRegion++) {
-				lineGroupPoint = sortedLines.at(RegionsList.at(iRegion).start);
+				lineGroupPoint = sortedLines[RegionsList[iRegion].start];
 				if (lineGroupPoint->group < startGroup) {
 					startGroup = lineGroupPoint->group;
 					leftRegion = iRegion;
@@ -3615,20 +3615,20 @@ void lcon(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &line
 			SequencePathIndex = 1;
 			bool dontSkip = true;
 			for (iPath = 0; iPath < PathMapIndex; iPath++) {
-				if (pathMap.at(iPath).node == leftRegion) {
+				if (pathMap[iPath].node == leftRegion) {
 					dontSkip = false;
 					break;
 				}
 			}
 			if (dontSkip) {
-				pathMap.at(PathMapIndex).node = leftRegion;
-				pathMap.at(PathMapIndex).nextGroup = 0;
+				pathMap[PathMapIndex].node = leftRegion;
+				pathMap[PathMapIndex].nextGroup = 0;
 				iPath = PathMapIndex;
 			}
 			//set the first entry in the temporary path to the leftmost region
-			tempPath.at(0).pcon = iPath;
-			tempPath.at(0).count = 1;
-			tempPath.at(0).skp = false;
+			tempPath[0].pcon = iPath;
+			tempPath[0].count = 1;
+			tempPath[0].skp = false;
 			visitedRegions.set(leftRegion);
 			DoneRegion = leftRegion;
 			while (unvis(visitedRegions)) {
@@ -3637,16 +3637,16 @@ void lcon(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &line
 			count = 0xffffffff;
 			sequencePath.reserve(SequencePathIndex);
 			for (iPath = 0; iPath < SequencePathIndex; iPath++) {
-				const bool tmpSkip = tempPath.at(iPath).skp;
+				const bool tmpSkip = tempPath[iPath].skp;
 				unsigned short tmpNode = 0;
-				if (tempPath.at(iPath).pcon == 0xffffffff) {
-					tmpNode = tempPath.at(iPath).count;
-					count = tempPath.at(iPath).count;
+				if (tempPath[iPath].pcon == 0xffffffff) {
+					tmpNode = tempPath[iPath].count;
+					count = tempPath[iPath].count;
 				}
 				else {
-					if (tempPath.at(iPath).pcon != count) {
-						count = tempPath.at(iPath).pcon;
-						tmpNode = pathMap.at(tempPath.at(iPath).pcon).node;
+					if (tempPath[iPath].pcon != count) {
+						count = tempPath[iPath].pcon;
+						tmpNode = pathMap[tempPath[iPath].pcon].node;
 					}
 				}
 				sequencePath.push_back({ tmpNode, 0, tmpSkip });
@@ -3658,7 +3658,7 @@ void lcon(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &line
 			visitedRegions.reset();
 			LastGroup = 0;
 			for (iPath = 0; iPath < PathIndex; iPath++) {
-				OutputDebugString(fmt::format("iterator {},vrt {},grpn {}\n", iPath, pathMap.at(iPath).node, pathMap.at(iPath).nextGroup).c_str());
+				OutputDebugString(fmt::format("iterator {},vrt {},grpn {}\n", iPath, pathMap[iPath].node, pathMap[iPath].nextGroup).c_str());
 				if (!unvis(visitedRegions))
 					break;
 				durgn(sequencePath, visitedRegions, sortedLines, iPath, lineCount, RegionsList);
@@ -3667,9 +3667,9 @@ void lcon(std::vector<unsigned> &groupIndexSequence, std::vector<SMALPNTL> &line
 		else {
 			sequencePath.resize(1);
 			LastGroup = 0;
-			sequencePath.at(0).node = 0;
-			sequencePath.at(0).nextGroup = sortedLines.at(RegionsList.at(0).end)->group;
-			sequencePath.at(0).skp = false;
+			sequencePath[0].node = 0;
+			sequencePath[0].nextGroup = sortedLines[RegionsList[0].end]->group;
+			sequencePath[0].skp = false;
 			durgn(sequencePath, visitedRegions, sortedLines, 0, lineCount, RegionsList);
 		}
 
@@ -4248,7 +4248,7 @@ bool scomp(const SATCON &arg1, const SATCON &arg2) noexcept {
 void satcpy(SATCON* destination, std::vector<SATCON> source, unsigned int size) {
 	if (destination) {
 		for (unsigned int iSource = 0; iSource < size; iSource++) {
-			destination[iSource] = source.at(iSource);
+			destination[iSource] = source[iSource];
 		}
 	}
 }
@@ -4276,7 +4276,7 @@ void satadj() {
 	iDestination = 0;
 	for (iSource = 0; iSource < CurrentFormGuidesCount; iSource++) {
 		if (CurrentFormGuides[iSource].start != CurrentFormGuides[iSource].finish) {
-			interiorGuides.at(iDestination++) = CurrentFormGuides[iSource];
+			interiorGuides[iDestination++] = CurrentFormGuides[iSource];
 		}
 	}
 	if (CurrentFormGuidesCount != iDestination) {
@@ -4299,7 +4299,7 @@ void satadj() {
 		iDestination = 0;
 		for (iSource = 0; iSource < CurrentFormGuidesCount; iSource++) {
 			if (!satinMap.test(CurrentFormGuides[iSource].start) && !satinMap.test(CurrentFormGuides[iSource].finish)) {
-				interiorGuides.at(iDestination++) = CurrentFormGuides[iSource];
+				interiorGuides[iDestination++] = CurrentFormGuides[iSource];
 			}
 		}
 		if (CurrentFormGuidesCount != iDestination) {
@@ -4312,7 +4312,7 @@ void satadj() {
 			iDestination = 0;
 			for (iSource = 0; iSource < CurrentFormGuidesCount; iSource++) {
 				if (CurrentFormGuides[iSource].start < SatinEndGuide) {
-					interiorGuides.at(iDestination++) = CurrentFormGuides[iSource];
+					interiorGuides[iDestination++] = CurrentFormGuides[iSource];
 				}
 			}
 			if (CurrentFormGuidesCount != iDestination) {
@@ -4553,8 +4553,8 @@ void satfn(std::vector<double> &lengths, unsigned line1Start, unsigned line1End,
 				}
 			}
 		}
-		line1Length = lengths.at(line1End) - lengths.at(line1Start);
-		line2Length = lengths.at(line2Start) - lengths.at(line2End);
+		line1Length = lengths[line1End] - lengths[line1Start];
+		line2Length = lengths[line2Start] - lengths[line2End];
 		if (fabs(line1Length) > fabs(line2Length))
 			stitchCount = fabs(line2Length) / LineSpacing;
 		else
@@ -4569,7 +4569,7 @@ void satfn(std::vector<double> &lengths, unsigned line1Start, unsigned line1End,
 		segmentStitchCount = 0;
 		for (iSegment = 0; iSegment < line1Segments - 1; iSegment++) {
 			iNextVertex = nxt(iVertex);
-			const unsigned val = ((lengths.at(iNextVertex) - lengths.at(iVertex)) / line1Length)*stitchCount + 0.5;
+			const unsigned val = ((lengths[iNextVertex] - lengths[iVertex]) / line1Length)*stitchCount + 0.5;
 			line1StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iVertex = nxt(iVertex);
@@ -4580,7 +4580,7 @@ void satfn(std::vector<double> &lengths, unsigned line1Start, unsigned line1End,
 		iSegment = 0;
 		segmentStitchCount = 0;
 		while (iVertex > line2End) {
-			const unsigned val = ((lengths.at(iNextVertex) - lengths.at(iVertex)) / line2Length)*stitchCount + 0.5;
+			const unsigned val = ((lengths[iNextVertex] - lengths[iVertex]) / line2Length)*stitchCount + 0.5;
 			line2StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iNextVertex = prv(iNextVertex);
@@ -4591,8 +4591,8 @@ void satfn(std::vector<double> &lengths, unsigned line1Start, unsigned line1End,
 		line1Point.y = CurrentFormVertices[line1Start].y;
 		line1Next = nxt(line1Start);
 		line2Previous = prv(line2Start);
-		line1Count = line1StitchCounts.at(iLine1Count++);
-		line2Count = line2StitchCounts.at(iLine2Count++);
+		line1Count = line1StitchCounts[iLine1Count++];
+		line2Count = line2StitchCounts[iLine2Count++];
 		iLine1Vertex = line1Start;
 		iLine2Vertex = line2Start;
 		line1Delta.x = CurrentFormVertices[line1Next].x - CurrentFormVertices[iLine1Vertex].x;
@@ -4696,7 +4696,7 @@ void satfn(std::vector<double> &lengths, unsigned line1Start, unsigned line1End,
 			}
 			if ((iLine1Count < line1Segments || iLine2Count < line2Segments)) {
 				if (!line1Count && iLine1Count < line1StitchCounts.size()) {
-					line1Count = line1StitchCounts.at(iLine1Count++);
+					line1Count = line1StitchCounts[iLine1Count++];
 					line1Next = nxt(iLine1Vertex);
 					line1Delta.x = CurrentFormVertices[line1Next].x - CurrentFormVertices[iLine1Vertex].x;
 					line1Delta.y = CurrentFormVertices[line1Next].y - CurrentFormVertices[iLine1Vertex].y;
@@ -4706,7 +4706,7 @@ void satfn(std::vector<double> &lengths, unsigned line1Start, unsigned line1End,
 				}
 
 				if (!line2Count && iLine2Count < line2StitchCounts.size()) {
-					line2Count = line2StitchCounts.at(iLine2Count++);
+					line2Count = line2StitchCounts[iLine2Count++];
 					line2Previous = prv(iLine2Vertex);
 					line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x;
 					line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y;
@@ -4736,12 +4736,12 @@ void satmf(std::vector<double> &lengths) {
 		satfn(lengths, CurrentFormGuides[iGuide].start, SatinEndGuide, CurrentFormGuides[iGuide].finish, SatinEndGuide + 1);
 	else {
 		if (CurrentFormGuides[iGuide].finish - CurrentFormGuides[iGuide].start > 2) {
-			length = (lengths.at(CurrentFormGuides[iGuide].finish) - lengths.at(CurrentFormGuides[iGuide].start)) / 2 + lengths.at(CurrentFormGuides[iGuide].start);
+			length = (lengths[CurrentFormGuides[iGuide].finish] - lengths[CurrentFormGuides[iGuide].start]) / 2 + lengths[CurrentFormGuides[iGuide].start];
 			iVertex = CurrentFormGuides[iGuide].start;
-			while (length > lengths.at(iVertex))
+			while (length > lengths[iVertex])
 				iVertex++;
-			deltaX = lengths.at(iVertex) - length;
-			deltaY = length - lengths.at(iVertex - 1);
+			deltaX = lengths[iVertex] - length;
+			deltaY = length - lengths[iVertex - 1];
 			if (deltaY > deltaX)
 				iVertex--;
 			satfn(lengths, CurrentFormGuides[iGuide].start, iVertex, CurrentFormGuides[iGuide].finish, iVertex);
@@ -4801,18 +4801,18 @@ void satfil() {
 					break;;
 				}
 				else {
-					length = (length - lengths.at(1)) / 2;
+					length = (length - lengths[1]) / 2;
 					iVertex = 1;
 					if (!StateMap.test(StateFlag::BARSAT)) {
 						OSequence[0].x = SelectedPoint.x = CurrentFormVertices[1].x;
 						OSequence[0].y = SelectedPoint.y = CurrentFormVertices[1].y;
 						SequenceIndex = 1;
 					}
-					while ((length > lengths.at(iVertex)) && (iVertex < (VertexCount + 1))) {
+					while ((length > lengths[iVertex]) && (iVertex < (VertexCount + 1))) {
 						iVertex++;
 					}
-					deltaX = lengths.at(iVertex) - length;
-					deltaY = length - lengths.at(iVertex - 1);
+					deltaX = lengths[iVertex] - length;
+					deltaY = length - lengths[iVertex - 1];
 					if (deltaY > deltaX) {
 						iVertex--;
 					}
@@ -4832,11 +4832,11 @@ void satfil() {
 			OSequence[0].y = SelectedPoint.y = CurrentFormVertices[0].y;
 			SequenceIndex = 1;
 		}
-		while (length > lengths.at(iVertex)) {
+		while (length > lengths[iVertex]) {
 			iVertex++;
 		}
-		deltaX = lengths.at(iVertex) - length;
-		deltaY = length - lengths.at(iVertex - 1);
+		deltaX = lengths[iVertex] - length;
+		deltaY = length - lengths[iVertex - 1];
 		if (deltaY > deltaX)
 			iVertex--;
 		satfn(lengths, 0, iVertex, VertexCount, iVertex);
@@ -5174,12 +5174,12 @@ void rotfrm(unsigned newStartVertex) {
 		unsigned short	tlin = 0;
 
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-			rotatedVertices.at(iVertex).x = selectedVertices[iVertex].x;
-			rotatedVertices.at(iVertex).y = selectedVertices[iVertex].y;
+			rotatedVertices[iVertex].x = selectedVertices[iVertex].x;
+			rotatedVertices[iVertex].y = selectedVertices[iVertex].y;
 		}
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-			selectedVertices[iVertex].x = rotatedVertices.at(iRotated).x;
-			selectedVertices[iVertex].y = rotatedVertices.at(iRotated).y;
+			selectedVertices[iVertex].x = rotatedVertices[iRotated].x;
+			selectedVertices[iVertex].y = rotatedVertices[iRotated].y;
 			iRotated = nxt(iRotated);
 		}
 		iRotatedGuide = 0;
@@ -5205,11 +5205,11 @@ void rotfrm(unsigned newStartVertex) {
 			// ToDo - Can we do the sort in place?
 			std::vector<SATCON> rotatedGuides(iRotatedGuide);
 			for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
-				rotatedGuides.at(iGuide) = CurrentFormGuides[iGuide];
+				rotatedGuides[iGuide] = CurrentFormGuides[iGuide];
 			}
 			std::sort(rotatedGuides.begin(), rotatedGuides.end(), scomp);
 			for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
-				CurrentFormGuides[iGuide] = rotatedGuides.at(iGuide);
+				CurrentFormGuides[iGuide] = rotatedGuides[iGuide];
 			}
 		}
 		if (SelectedForm->extendedAttribute&AT_STRT)
@@ -5412,8 +5412,8 @@ bool ritclp(std::vector<fPOINT> clipFillData, fPOINT point) {
 	if (chkmax(ClipStitchCount, SequenceIndex))
 		return 1;
 	for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
-		OSequence[SequenceIndex].x = clipFillData.at(iStitch).x + adjustedPoint.x;
-		OSequence[SequenceIndex++].y = clipFillData.at(iStitch).y + adjustedPoint.y;
+		OSequence[SequenceIndex].x = clipFillData[iStitch].x + adjustedPoint.x;
+		OSequence[SequenceIndex++].y = clipFillData[iStitch].y + adjustedPoint.y;
 	}
 	return 0;
 }
@@ -5441,7 +5441,7 @@ bool clpsid(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFill
 		insertPoint.y = CurrentFormVertices[start].y;
 		RotationAngle = atan2(delta.y, delta.x);
 		for (ind = 0; ind < ClipStitchCount; ind++)
-			rotangf(clipReversedData.at(ind), &clipFillData.at(ind));
+			rotangf(clipReversedData[ind], &clipFillData[ind]);
 		for (ind = 0; ind < clipCount; ind++) {
 			if (ritclp(clipFillData, insertPoint))
 				break;
@@ -5464,7 +5464,7 @@ void linsid(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFill
 		RotationAngle = ClipAngle;
 		rotangf(BorderClipReference, &ClipReference);
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotangf(clipReversedData.at(iStitch), &clipFillData.at(iStitch));
+			rotangf(clipReversedData[iStitch], &clipFillData[iStitch]);
 		for (iClip = 0; iClip < clipCount; iClip++) {
 			ritclp(clipFillData, SelectedPoint);
 			SelectedPoint.x += Vector0.x;
@@ -5506,7 +5506,7 @@ void lincrnr(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFil
 		RotationAngle = atan2(delta.y, delta.x);
 		rotangf(BorderClipReference, &ClipReference);
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotangf(clipReversedData.at(iStitch), &clipFillData.at(iStitch));
+			rotangf(clipReversedData[iStitch], &clipFillData[iStitch]);
 		ritclp(clipFillData, SelectedPoint);
 		SelectedPoint.x = MoveToCoords.x;
 		SelectedPoint.y = MoveToCoords.y;
@@ -5519,14 +5519,14 @@ void durev(std::vector<fPOINT> &clipReversedData) {
 
 	if (ClipBuffer[0].x > midpoint) {
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
-			clipReversedData.at(iStitch).x = ClipRect.right - ClipBuffer[iStitch].x;
-			clipReversedData.at(iStitch).y = ClipBuffer[iStitch].y;
+			clipReversedData[iStitch].x = ClipRect.right - ClipBuffer[iStitch].x;
+			clipReversedData[iStitch].y = ClipBuffer[iStitch].y;
 		}
 	}
 	else {
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
-			clipReversedData.at(iStitch).x = ClipBuffer[iStitch].x;
-			clipReversedData.at(iStitch).y = ClipBuffer[iStitch].y;
+			clipReversedData[iStitch].x = ClipBuffer[iStitch].x;
+			clipReversedData[iStitch].y = ClipBuffer[iStitch].y;
 		}
 	}
 }
@@ -7336,23 +7336,23 @@ void duspir(unsigned stepCount) {
 	point.x = SelectedPoint.x;
 	point.y = SelectedPoint.y;
 	for (iStep = 0; iStep < stepCount; iStep++) {
-		firstSpiral.at(iStep).x = point.x;
-		firstSpiral.at(iStep).y = point.y;
+		firstSpiral[iStep].x = point.x;
+		firstSpiral[iStep].y = point.y;
 		point.x += length * cos(angle);
 		point.y += length * sin(angle);
 		angle += stepAngle;
 	}
-	center.x = (firstSpiral.at(stepCount >> 1).x - firstSpiral.at(0).x) / 2 + firstSpiral.at(0).x;
-	center.y = (firstSpiral.at(stepCount >> 1).y - firstSpiral.at(0).y) / 2 + firstSpiral.at(0).y;
+	center.x = (firstSpiral[stepCount >> 1].x - firstSpiral[0].x) / 2 + firstSpiral[0].x;
+	center.y = (firstSpiral[stepCount >> 1].y - firstSpiral[0].y) / 2 + firstSpiral[0].y;
 	for (iStep = 0; iStep < stepCount; iStep++) {
-		centeredSpiral.at(iStep).x = firstSpiral.at(iStep).x - center.x;
-		centeredSpiral.at(iStep).y = firstSpiral.at(iStep).y - center.y;
+		centeredSpiral[iStep].x = firstSpiral[iStep].x - center.x;
+		centeredSpiral[iStep].y = firstSpiral[iStep].y - center.y;
 	}
 	stepRatio = 1.0 / vertexCount;
 	ratio = stepRatio;
 	for (iVertex = 0; iVertex < vertexCount; iVertex++) {
-		SelectedForm->vertices[iVertex].x = centeredSpiral.at(iVertex%stepCount).x*ratio + center.x;
-		SelectedForm->vertices[iVertex].y = centeredSpiral.at(iVertex%stepCount).y*ratio + center.y;
+		SelectedForm->vertices[iVertex].x = centeredSpiral[iVertex%stepCount].x*ratio + center.x;
+		SelectedForm->vertices[iVertex].y = centeredSpiral[iVertex%stepCount].y*ratio + center.y;
 		ratio += stepRatio;
 	}
 	SelectedForm->type = FRMLINE;
@@ -7733,7 +7733,7 @@ void sprct(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish
 	dPOINT	delta = { (OutsidePoints[finish].x - OutsidePoints[start].x),
 					  (OutsidePoints[finish].y - OutsidePoints[start].y) };
 	dPOINT	point = {};
-	VRCT2*	verticalRect = &fillVerticalRect.at(start);
+	VRCT2*	verticalRect = &fillVerticalRect[start];
 
 	if (delta.x && delta.y) {
 		Slope = -delta.x / delta.y;
@@ -7848,10 +7848,10 @@ void spurfn(const dPOINT* innerPoint, const dPOINT* outerPoint, dPOINT* underlay
 }
 
 void spurct(std::vector<VRCT2> &underlayVerticalRect, std::vector<VRCT2> &fillVerticalRect, unsigned iRect) {
-	spurfn(&fillVerticalRect.at(iRect).aipnt, &fillVerticalRect.at(iRect).aopnt, &underlayVerticalRect.at(iRect).aipnt, &underlayVerticalRect.at(iRect).aopnt);
-	spurfn(&fillVerticalRect.at(iRect).bipnt, &fillVerticalRect.at(iRect).bopnt, &underlayVerticalRect.at(iRect).bipnt, &underlayVerticalRect.at(iRect).bopnt);
-	spurfn(&fillVerticalRect.at(iRect).cipnt, &fillVerticalRect.at(iRect).copnt, &underlayVerticalRect.at(iRect).cipnt, &underlayVerticalRect.at(iRect).copnt);
-	spurfn(&fillVerticalRect.at(iRect).dipnt, &fillVerticalRect.at(iRect).dopnt, &underlayVerticalRect.at(iRect).dipnt, &underlayVerticalRect.at(iRect).dopnt);
+	spurfn(&fillVerticalRect[iRect].aipnt, &fillVerticalRect[iRect].aopnt, &underlayVerticalRect[iRect].aipnt, &underlayVerticalRect[iRect].aopnt);
+	spurfn(&fillVerticalRect[iRect].bipnt, &fillVerticalRect[iRect].bopnt, &underlayVerticalRect[iRect].bipnt, &underlayVerticalRect[iRect].bopnt);
+	spurfn(&fillVerticalRect[iRect].cipnt, &fillVerticalRect[iRect].copnt, &underlayVerticalRect[iRect].cipnt, &underlayVerticalRect[iRect].copnt);
+	spurfn(&fillVerticalRect[iRect].dipnt, &fillVerticalRect[iRect].dopnt, &underlayVerticalRect[iRect].dipnt, &underlayVerticalRect[iRect].dopnt);
 }
 
 unsigned psg() noexcept {
@@ -7908,11 +7908,11 @@ void duromb(dPOINT start0, dPOINT finish0, dPOINT start1, dPOINT finish1) {
 }
 
 void spend(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish) {
-	dPOINT		innerDelta = { (fillVerticalRect.at(finish).cipnt.x - fillVerticalRect.at(start).bipnt.x),
-							   (fillVerticalRect.at(finish).cipnt.y - fillVerticalRect.at(start).bipnt.y) };
+	dPOINT		innerDelta = { (fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
+							   (fillVerticalRect[finish].cipnt.y - fillVerticalRect[start].bipnt.y) };
 	const double	innerLength = hypot(innerDelta.x, innerDelta.y);
-	dPOINT		outerDelta = { (fillVerticalRect.at(finish).copnt.x - fillVerticalRect.at(start).bopnt.x),
-							   (fillVerticalRect.at(finish).copnt.y - fillVerticalRect.at(start).bopnt.y) };
+	dPOINT		outerDelta = { (fillVerticalRect[finish].copnt.x - fillVerticalRect[start].bopnt.x),
+							   (fillVerticalRect[finish].copnt.y - fillVerticalRect[start].bopnt.y) };
 	const double	outerLength = hypot(outerDelta.x, outerDelta.y);
 	double		startAngle = 0.0, finishAngle = 0.0, deltaAngle = 0.0, stepAngle = 0.0;
 	dPOINT		startDelta = {}, finishDelta = {};
@@ -7922,20 +7922,20 @@ void spend(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish
 	dPOINT		innerPoint = {}, outerPoint = {};
 
 	if (outerLength > innerLength) {
-		pivot.x = fillVerticalRect.at(start).cipnt.x;
-		pivot.y = fillVerticalRect.at(start).cipnt.y;
-		startDelta.x = fillVerticalRect.at(start).copnt.x - pivot.x;
-		startDelta.y = fillVerticalRect.at(start).copnt.y - pivot.y;
-		finishDelta.x = fillVerticalRect.at(finish).bopnt.x - pivot.x;
-		finishDelta.y = fillVerticalRect.at(finish).bopnt.y - pivot.y;
+		pivot.x = fillVerticalRect[start].cipnt.x;
+		pivot.y = fillVerticalRect[start].cipnt.y;
+		startDelta.x = fillVerticalRect[start].copnt.x - pivot.x;
+		startDelta.y = fillVerticalRect[start].copnt.y - pivot.y;
+		finishDelta.x = fillVerticalRect[finish].bopnt.x - pivot.x;
+		finishDelta.y = fillVerticalRect[finish].bopnt.y - pivot.y;
 	}
 	else {
-		pivot.x = fillVerticalRect.at(start).copnt.x;
-		pivot.y = fillVerticalRect.at(start).copnt.y;
-		startDelta.x = fillVerticalRect.at(start).cipnt.x - pivot.x;
-		startDelta.y = fillVerticalRect.at(start).cipnt.y - pivot.y;
-		finishDelta.x = fillVerticalRect.at(finish).bipnt.x - pivot.x;
-		finishDelta.y = fillVerticalRect.at(finish).bipnt.y - pivot.y;
+		pivot.x = fillVerticalRect[start].copnt.x;
+		pivot.y = fillVerticalRect[start].copnt.y;
+		startDelta.x = fillVerticalRect[start].cipnt.x - pivot.x;
+		startDelta.y = fillVerticalRect[start].cipnt.y - pivot.y;
+		finishDelta.x = fillVerticalRect[finish].bipnt.x - pivot.x;
+		finishDelta.y = fillVerticalRect[finish].bipnt.y - pivot.y;
 	}
 	if (hypot(SelectedPoint.x - pivot.x, SelectedPoint.y - pivot.y) > 2 * PI)
 		filinsb(pivot);
@@ -7974,34 +7974,34 @@ void duspnd(std::vector<VRCT2> &underlayVerticalRect, std::vector<VRCT2> &fillVe
 
 	if (StateMap.test(StateFlag::UND)) {
 		if (StateMap.test(StateFlag::UNDPHAS)) {
-			filinsb(underlayVerticalRect.at(start).copnt);
-			filinsb(underlayVerticalRect.at(start).cipnt);
-			delta.x = underlayVerticalRect.at(finish).bipnt.x - underlayVerticalRect.at(start).cipnt.x;
-			delta.y = underlayVerticalRect.at(finish).bipnt.y - underlayVerticalRect.at(start).cipnt.y;
+			filinsb(underlayVerticalRect[start].copnt);
+			filinsb(underlayVerticalRect[start].cipnt);
+			delta.x = underlayVerticalRect[finish].bipnt.x - underlayVerticalRect[start].cipnt.x;
+			delta.y = underlayVerticalRect[finish].bipnt.y - underlayVerticalRect[start].cipnt.y;
 			length = hypot(delta.x, delta.y);
 			if (length > SelectedForm->edgeStitchLen) {
 				angle = atan2(InsidePoints[finish].y - OutsidePoints[finish].y, InsidePoints[finish].x - OutsidePoints[finish].x);
-				point.x = underlayVerticalRect.at(finish).bopnt.x + cos(angle)*HorizontalLength2;
-				point.y = underlayVerticalRect.at(finish).bopnt.y + sin(angle)*HorizontalLength2;
+				point.x = underlayVerticalRect[finish].bopnt.x + cos(angle)*HorizontalLength2;
+				point.y = underlayVerticalRect[finish].bopnt.y + sin(angle)*HorizontalLength2;
 				filinsb(point);
 			}
-			filinsb(underlayVerticalRect.at(finish).bipnt);
-			filinsb(underlayVerticalRect.at(finish).bopnt);
+			filinsb(underlayVerticalRect[finish].bipnt);
+			filinsb(underlayVerticalRect[finish].bopnt);
 		}
 		else {
-			filinsb(underlayVerticalRect.at(start).cipnt);
-			filinsb(underlayVerticalRect.at(start).copnt);
-			delta.x = underlayVerticalRect.at(finish).bopnt.x - underlayVerticalRect.at(start).copnt.x;
-			delta.y = underlayVerticalRect.at(finish).bopnt.y - underlayVerticalRect.at(start).copnt.y;
+			filinsb(underlayVerticalRect[start].cipnt);
+			filinsb(underlayVerticalRect[start].copnt);
+			delta.x = underlayVerticalRect[finish].bopnt.x - underlayVerticalRect[start].copnt.x;
+			delta.y = underlayVerticalRect[finish].bopnt.y - underlayVerticalRect[start].copnt.y;
 			length = hypot(delta.x, delta.y);
 			if (length > SelectedForm->edgeStitchLen) {
 				angle = atan2(OutsidePoints[finish].y - InsidePoints[finish].y, OutsidePoints[finish].x - InsidePoints[finish].x);
-				point.x = underlayVerticalRect.at(finish).bipnt.x + cos(angle)*HorizontalLength2;
-				point.y = underlayVerticalRect.at(finish).bipnt.y + sin(angle)*HorizontalLength2;
+				point.x = underlayVerticalRect[finish].bipnt.x + cos(angle)*HorizontalLength2;
+				point.y = underlayVerticalRect[finish].bipnt.y + sin(angle)*HorizontalLength2;
 				filinsb(point);
 			}
-			filinsb(underlayVerticalRect.at(finish).bopnt);
-			filinsb(underlayVerticalRect.at(finish).bipnt);
+			filinsb(underlayVerticalRect[finish].bopnt);
+			filinsb(underlayVerticalRect[finish].bipnt);
 		}
 	}
 	else
@@ -8119,12 +8119,12 @@ void plbrd(double edgeSpacing) {
 	sprct(fillVerticalRect, iVertex, 0);
 	spurct(underlayVerticalRect, fillVerticalRect, iVertex);
 	if (!(SelectedForm->attribute&SBLNT)) {
-		fillVerticalRect.at(1).aipnt.x = fillVerticalRect.at(1).aopnt.x = underlayVerticalRect.at(1).aipnt.x = underlayVerticalRect.at(1).aopnt.x = SelectedForm->vertices[1].x;
-		fillVerticalRect.at(1).aipnt.y = fillVerticalRect.at(1).aopnt.y = underlayVerticalRect.at(1).aipnt.y = underlayVerticalRect.at(1).aopnt.y = SelectedForm->vertices[1].y;
+		fillVerticalRect[1].aipnt.x = fillVerticalRect[1].aopnt.x = underlayVerticalRect[1].aipnt.x = underlayVerticalRect[1].aopnt.x = SelectedForm->vertices[1].x;
+		fillVerticalRect[1].aipnt.y = fillVerticalRect[1].aopnt.y = underlayVerticalRect[1].aipnt.y = underlayVerticalRect[1].aopnt.y = SelectedForm->vertices[1].y;
 	}
 	if (!(SelectedForm->attribute&FBLNT)) {
-		fillVerticalRect.at(VertexCount - 4).dipnt.x = fillVerticalRect.at(VertexCount - 4).dopnt.x = underlayVerticalRect.at(VertexCount - 4).dipnt.x = underlayVerticalRect.at(VertexCount - 4).dopnt.x = SelectedForm->vertices[VertexCount - 1].x;
-		fillVerticalRect.at(VertexCount - 4).dipnt.y = fillVerticalRect.at(VertexCount - 4).dopnt.y = underlayVerticalRect.at(VertexCount - 4).dipnt.y = underlayVerticalRect.at(VertexCount - 4).dopnt.y = SelectedForm->vertices[VertexCount - 1].y;
+		fillVerticalRect[VertexCount - 4].dipnt.x = fillVerticalRect[VertexCount - 4].dopnt.x = underlayVerticalRect[VertexCount - 4].dipnt.x = underlayVerticalRect[VertexCount - 4].dopnt.x = SelectedForm->vertices[VertexCount - 1].x;
+		fillVerticalRect[VertexCount - 4].dipnt.y = fillVerticalRect[VertexCount - 4].dopnt.y = underlayVerticalRect[VertexCount - 4].dipnt.y = underlayVerticalRect[VertexCount - 4].dopnt.y = SelectedForm->vertices[VertexCount - 1].y;
 	}
 	SequenceIndex = 0;
 	SelectedPoint.x = CurrentFormVertices[0].x;
@@ -8135,13 +8135,13 @@ void plbrd(double edgeSpacing) {
 		HorizontalLength2 = SelectedForm->borderSize*URAT;
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
-		plfn(underlayVerticalRect, fillVerticalRect, &underlayVerticalRect.at(0));
+		plfn(underlayVerticalRect, fillVerticalRect, &underlayVerticalRect[0]);
 		savedIndex = SequenceIndex;
 		StateMap.reset(StateFlag::UNDPHAS);
 		SelectedPoint.x = CurrentFormVertices[0].x;
 		SelectedPoint.y = CurrentFormVertices[0].y;
 		StateMap.set(StateFlag::FILDIR);
-		plfn(underlayVerticalRect, fillVerticalRect, &underlayVerticalRect.at(0));
+		plfn(underlayVerticalRect, fillVerticalRect, &underlayVerticalRect[0]);
 		plbak(savedIndex);
 		prsmal();
 		if (SequenceIndex) { //ensure that we can do a valid read from OSequence
@@ -8150,7 +8150,7 @@ void plbrd(double edgeSpacing) {
 	}
 	StateMap.reset(StateFlag::UND);
 	LineSpacing = SelectedForm->edgeSpacing;
-	plfn(underlayVerticalRect, fillVerticalRect, &fillVerticalRect.at(0));
+	plfn(underlayVerticalRect, fillVerticalRect, &fillVerticalRect[0]);
 	LineSpacing = edgeSpacing;
 	fvars(ClosestFormToCursor);
 }
@@ -8179,16 +8179,16 @@ void pbrd(double edgeSpacing) {
 		satout(HorizontalLength2);
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.set(StateFlag::FILDIR);
-		pfn(underlayVerticalRect, fillVerticalRect, start, &underlayVerticalRect.at(0));
+		pfn(underlayVerticalRect, fillVerticalRect, start, &underlayVerticalRect[0]);
 		StateMap.reset(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
-		pfn(underlayVerticalRect, fillVerticalRect, start, &underlayVerticalRect.at(0));
+		pfn(underlayVerticalRect, fillVerticalRect, start, &underlayVerticalRect[0]);
 		LineSpacing = edgeSpacing;
 		prsmal();
 		HorizontalLength2 = SelectedForm->borderSize;
 		StateMap.reset(StateFlag::UND);
 	}
-	pfn(underlayVerticalRect, fillVerticalRect, start, &fillVerticalRect.at(0));
+	pfn(underlayVerticalRect, fillVerticalRect, start, &fillVerticalRect[0]);
 	LineSpacing = spacing;
 }
 
@@ -8507,9 +8507,9 @@ void snpfn(std::vector<unsigned> &xPoints, unsigned start, unsigned end, unsigne
 
 	if (finish - start) {
 		for (unsigned current = start; current < end; current++) {
-			reference = xPoints.at(current);
+			reference = xPoints[current];
 			for (iPoint = current + 1; iPoint < finish; iPoint++) {
-				check = xPoints.at(iPoint);
+				check = xPoints[iPoint];
 				CheckLength = hypot(StitchBuffer[check].x - StitchBuffer[reference].x, StitchBuffer[check].y - StitchBuffer[reference].y);
 				if (CheckLength < SnapLength) {
 					StitchBuffer[check] = StitchBuffer[reference];
@@ -8559,41 +8559,41 @@ void snp(unsigned start, unsigned finish) {
 		for (iStitch = start; iStitch < finish; iStitch++) {
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == attribute) {
 				iColumn = gsl::narrow<unsigned>(floor(StitchBuffer[iStitch].x));
-				xHistogram.at(iColumn)++;
+				xHistogram[iColumn]++;
 			}
 		}
 	}
 	else {
 		for (iStitch = start; iStitch < finish; iStitch++) {
 			iColumn = gsl::narrow<unsigned>(floor(StitchBuffer[iStitch].x));
-			xHistogram.at(iColumn)++;
+			xHistogram[iColumn]++;
 		}
 	}
 	accumulator = 0;
 	for (iColumn = 0; iColumn < range.x; iColumn++) {
-		swap = xHistogram.at(iColumn);
-		xHistogram.at(iColumn) = accumulator;
+		swap = xHistogram[iColumn];
+		xHistogram[iColumn] = accumulator;
 		accumulator += swap;
 	}
-	xHistogram.at(iColumn) = accumulator;
+	xHistogram[iColumn] = accumulator;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (!(StitchBuffer[iStitch].attribute&NOTFRM) && (StitchBuffer[iStitch].attribute&FRMSK) == attribute) {
 				iColumn = gsl::narrow<unsigned>(floor(StitchBuffer[iStitch].x));
-				xPoints.at(xHistogram.at(iColumn)++) = iStitch;
+				xPoints[xHistogram[iColumn]++] = iStitch;
 			}
 		}
 	}
 	else {
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			iColumn = gsl::narrow<unsigned>(floor(StitchBuffer[iStitch].x));
-			xPoints.at(xHistogram.at(iColumn)++) = iStitch;
+			xPoints[xHistogram[iColumn]++] = iStitch;
 		}
 	}
 	checkLength = SnapLength * 2 + 1;
 	nutim(range.x);
 	for (iColumn = 1; iColumn < range.x - checkLength - 1; iColumn++) {
-		snpfn(xPoints, xHistogram.at(iColumn), xHistogram.at(iColumn + 1), xHistogram.at(iColumn+checkLength));
+		snpfn(xPoints, xHistogram[iColumn], xHistogram[iColumn + 1], xHistogram[iColumn+checkLength]);
 		nxtim();
 	}
 	DestroyWindow(TimeWindow);
@@ -8894,7 +8894,7 @@ void join() {
 		vertexCount = FormList[ClosestFormToCursor].vertexCount;
 		std::vector<fPOINT> vertexList(vertexCount);
 		for (iVertex = 0; iVertex < vertexCount; iVertex++) {
-			vertexList.at(iVertex) = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor];
+			vertexList[iVertex] = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor];
 			ClosestVertexToCursor = nxt(ClosestVertexToCursor);
 		}
 		StateMap.set(StateFlag::DELTO);
@@ -8907,7 +8907,7 @@ void join() {
 		if (insertedVertex) {
 			fltspac(insertedVertex, vertexCount);
 			for (iVertex = 0; iVertex < vertexCount; iVertex++) {
-				insertedVertex[iVertex] = vertexList.at(iVertex);
+				insertedVertex[iVertex] = vertexList[iVertex];
 			}
 		}
 		SelectedForm = &FormList[ClosestFormToCursor];
@@ -9388,7 +9388,7 @@ void clpcrnr(std::vector<fPOINT> clipFillData, unsigned vertex) {
 	RotationAngle = atan2(delta.y, delta.x) + PI / 2;
 	rotang1(referencePoint, &ClipReference);
 	for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-		rotang1(ClipBuffer[iStitch], &clipFillData.at(iStitch));
+		rotang1(ClipBuffer[iStitch], &clipFillData[iStitch]);
 	length = hypot(delta.x, delta.y);
 	ratio = getplen() / length;
 	delta.x *= ratio;
@@ -9437,7 +9437,7 @@ void picfn(std::vector<fPOINT> clipFillData, unsigned start, unsigned finish, do
 			step.y = delta.y*tdub;
 		}
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotang1(ClipBuffer[iStitch], &clipFillData.at(iStitch));
+			rotang1(ClipBuffer[iStitch], &clipFillData[iStitch]);
 		bool flag = true;
 		for (iStep = 0; iStep < count - 1; iStep++) {
 			firstPoint.x = innerPoint.x + step.x;
@@ -9605,29 +9605,29 @@ void contf() {
 
 		SequenceIndex = 0;
 		for (iVertex = lowVertexIndex; iVertex != 0; iVertex--) {
-			lowVertices.at(lowIndex) = CurrentFormVertices[iVertex];
-			lowDeltas.at(lowIndex).x = CurrentFormVertices[iVertex - 1].x - CurrentFormVertices[iVertex].x;
-			lowDeltas.at(lowIndex).y = CurrentFormVertices[iVertex - 1].y - CurrentFormVertices[iVertex].y;
-			lowLengths.at(lowIndex) = hypot(lowDeltas.at(lowIndex).x, lowDeltas.at(lowIndex).y);
-			lowLength += lowLengths.at(lowIndex);
+			lowVertices[lowIndex] = CurrentFormVertices[iVertex];
+			lowDeltas[lowIndex].x = CurrentFormVertices[iVertex - 1].x - CurrentFormVertices[iVertex].x;
+			lowDeltas[lowIndex].y = CurrentFormVertices[iVertex - 1].y - CurrentFormVertices[iVertex].y;
+			lowLengths[lowIndex] = hypot(lowDeltas[lowIndex].x, lowDeltas[lowIndex].y);
+			lowLength += lowLengths[lowIndex];
 			lowIndex++;
 		}
 		selind = 0;
 		for (iVertex = start + 1; iVertex <= finish; iVertex++) {
 			delta.x = CurrentFormVertices[iVertex].x - selectionStart[0].x;
 			delta.y = CurrentFormVertices[iVertex].y - selectionStart[0].y;
-			pols.at(selind).length = hypot(delta.x, delta.y);
-			pols.at(selind).angle = atan2(delta.y, delta.x);
+			pols[selind].length = hypot(delta.x, delta.y);
+			pols[selind].angle = atan2(delta.y, delta.x);
 			selind++;
 		}
 		highIndex = 0; highLength = 0;
 		for (iVertex = finish; iVertex < VertexCount - 1; iVertex++) {
-			highVertices.at(highIndex).x = CurrentFormVertices[iVertex].x;
-			highVertices.at(highIndex).y = CurrentFormVertices[iVertex].y;
-			highDeltas.at(highIndex).x = CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x;
-			highDeltas.at(highIndex).y = CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y;
-			highLengths.at(highIndex) = hypot(highDeltas.at(highIndex).x, highDeltas.at(highIndex).y);
-			highLength += highLengths.at(highIndex);
+			highVertices[highIndex].x = CurrentFormVertices[iVertex].x;
+			highVertices[highIndex].y = CurrentFormVertices[iVertex].y;
+			highDeltas[highIndex].x = CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x;
+			highDeltas[highIndex].y = CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y;
+			highLengths[highIndex] = hypot(highDeltas[highIndex].x, highDeltas[highIndex].y);
+			highLength += highLengths[highIndex];
 			highIndex++;
 		}
 		if (highLength > lowLength)
@@ -9644,14 +9644,14 @@ void contf() {
 			lowSpacing = SelectedForm->fillSpacing*lowLength / highLength;
 		}
 		for (iVertex = 0; iVertex < lowVertexIndex; iVertex++) {
-			lowCounts.at(iVertex) = lowLengths.at(iVertex) / lowSpacing;
-			lowSteps.at(iVertex).x = lowDeltas.at(iVertex).x / lowCounts.at(iVertex);
-			lowSteps.at(iVertex).y = lowDeltas.at(iVertex).y / lowCounts.at(iVertex);
+			lowCounts[iVertex] = lowLengths[iVertex] / lowSpacing;
+			lowSteps[iVertex].x = lowDeltas[iVertex].x / lowCounts[iVertex];
+			lowSteps[iVertex].y = lowDeltas[iVertex].y / lowCounts[iVertex];
 		}
 		for (iVertex = 0; iVertex < highVertexIndex; iVertex++) {
-			highCounts.at(iVertex) = highLengths.at(iVertex) / highSpacing;
-			highSteps.at(iVertex).x = highDeltas.at(iVertex).x / highCounts.at(iVertex);
-			highSteps.at(iVertex).y = highDeltas.at(iVertex).y / highCounts.at(iVertex);
+			highCounts[iVertex] = highLengths[iVertex] / highSpacing;
+			highSteps[iVertex].x = highDeltas[iVertex].x / highCounts[iVertex];
+			highSteps[iVertex].y = highDeltas[iVertex].y / highCounts[iVertex];
 		}
 		lowIndex = highIndex = 0;
 		StateMap.reset(StateFlag::FILDIR);
@@ -9665,10 +9665,10 @@ void contf() {
 				lowCount--;
 			else {
 				if (lowIndex < lowVertexIndex) {
-					lowCount = lowCounts.at(lowIndex);
-					lowStep = lowSteps.at(lowIndex);
-					lowPoint.x = lowVertices.at(lowIndex).x;
-					lowPoint.y = lowVertices.at(lowIndex).y;
+					lowCount = lowCounts[lowIndex];
+					lowStep = lowSteps[lowIndex];
+					lowPoint.x = lowVertices[lowIndex].x;
+					lowPoint.y = lowVertices[lowIndex].y;
 					lowIndex++;
 				}
 			}
@@ -9676,9 +9676,9 @@ void contf() {
 				highCount--;
 			else {
 				if (highIndex < highVertexIndex) {
-					highCount = highCounts.at(highIndex);
-					highStep = highSteps.at(highIndex);
-					highPoint = highVertices.at(highIndex);
+					highCount = highCounts[highIndex];
+					highStep = highSteps[highIndex];
+					highPoint = highVertices[highIndex];
 					highIndex++;
 				}
 			}
@@ -9694,8 +9694,8 @@ void contf() {
 					OSequence[SequenceIndex].y = lowPoint.y;
 					SequenceIndex++;
 					for (iVertex = 0; iVertex < (selectedVertexCount - 1); iVertex++) {
-						RotationAngle = pols.at(iVertex).angle + poldif.angle;
-						length = pols.at(iVertex).length*poldif.length;
+						RotationAngle = pols[iVertex].angle + poldif.angle;
+						length = pols[iVertex].length*poldif.length;
 						OSequence[SequenceIndex].x = lowPoint.x + cos(RotationAngle)*length;
 						OSequence[SequenceIndex].y = lowPoint.y + sin(RotationAngle)*length;
 						SequenceIndex++;
@@ -9706,8 +9706,8 @@ void contf() {
 					OSequence[SequenceIndex].y = highPoint.y;
 					SequenceIndex++;
 					for (iVertex = selectedVertexCount - 1; iVertex != 0; iVertex--) {
-						RotationAngle = pols.at(iVertex - 1).angle + poldif.angle;
-						length = pols.at(iVertex - 1).length*poldif.length;
+						RotationAngle = pols[iVertex - 1].angle + poldif.angle;
+						length = pols[iVertex - 1].length*poldif.length;
 						OSequence[SequenceIndex].x = lowPoint.x + cos(RotationAngle)*length;
 						OSequence[SequenceIndex].y = lowPoint.y + sin(RotationAngle)*length;
 						SequenceIndex++;
@@ -9977,12 +9977,12 @@ void dufdat(std::vector<fPOINT> &tempClipPoints, std::vector<SATCON> &tempGuides
 		SatinGuideIndex += destination->satinGuideCount;
 	}
 	if (iseclpx(formIndex)) {
-		mvflpnt(&tempClipPoints.at(ClipPointIndex), destination->borderClipData, destination->clipEntries);
+		mvflpnt(&tempClipPoints[ClipPointIndex], destination->borderClipData, destination->clipEntries);
 		destination->borderClipData = &ClipPoints[ClipPointIndex];
 		ClipPointIndex += destination->clipEntries;
 	}
 	if (isclpx(formIndex)) {
-		mvflpnt(&tempClipPoints.at(ClipPointIndex), destination->angleOrClipData.clip, destination->lengthOrCount.clipCount);
+		mvflpnt(&tempClipPoints[ClipPointIndex], destination->angleOrClipData.clip, destination->lengthOrCount.clipCount);
 		destination->angleOrClipData.clip = &ClipPoints[ClipPointIndex];
 		ClipPointIndex += destination->lengthOrCount.clipCount;
 	}
@@ -10026,13 +10026,13 @@ void frmnumfn(unsigned newFormIndex) {
 				dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, sourceForm++);
 			}
 		}
-		mvfrms(FormList, &tempFormList.at(0), FormIndex);
-		mvflpnt(FormVertices, &tempFormVertices.at(0), FormVertexIndex);
+		mvfrms(FormList, &tempFormList[0], FormIndex);
+		mvflpnt(FormVertices, &tempFormVertices[0], FormVertexIndex);
 		// ToDo - 'if' is only required while we are passing memory rather than vector
 		if (SatinGuideIndex) {
 			mvsatk(SatinGuides, &tempGuides[0], SatinGuideIndex);
 		}
-		mvflpnt(ClipPoints, &tempClipPoints.at(0), ClipPointIndex);
+		mvflpnt(ClipPoints, &tempClipPoints[0], ClipPointIndex);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (StitchBuffer[iStitch].attribute&SRTYPMSK) {
 				decodedFormIndex = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
@@ -10080,15 +10080,15 @@ void srtf(std::vector<fPOINTATTR> &tempStitchBuffer, unsigned start, unsigned fi
 	if (start != finish) {
 		std::vector<unsigned> stitchHistogram(FormIndex << 2);
 		for (iStitch = start; iStitch < finish; iStitch++)
-			stitchHistogram.at(duat(tempStitchBuffer.at(iStitch).attribute))++;
+			stitchHistogram[duat(tempStitchBuffer[iStitch].attribute)]++;
 		stitchAccumulator = start;
 		for (iForm = 0; iForm < FormIndex << 2; iForm++) {
-			swap = stitchHistogram.at(iForm);
-			stitchHistogram.at(iForm) = stitchAccumulator;
+			swap = stitchHistogram[iForm];
+			stitchHistogram[iForm] = stitchAccumulator;
 			stitchAccumulator += swap;
 		}
 		for (iStitch = start; iStitch < finish; iStitch++) {
-			StitchBuffer[stitchHistogram.at(duat(tempStitchBuffer.at(iStitch).attribute))++] = tempStitchBuffer.at(iStitch);
+			StitchBuffer[stitchHistogram[duat(tempStitchBuffer[iStitch].attribute)]++] = tempStitchBuffer[iStitch];
 		}
 	}
 }
@@ -10100,26 +10100,26 @@ void srtbyfrm() {
 
 	if (FormIndex) {
 		savdo();
-		color.at(AppliqueColor) = 0;
+		color[AppliqueColor] = 0;
 		for (iColor = 0; iColor < 16; iColor++) {
 			if (iColor != AppliqueColor)
-				color.at(iColor) = iColor + 1;
+				color[iColor] = iColor + 1;
 		}
 		std::vector<fPOINTATTR> tempStitchBuffer(PCSHeader.stitchCount);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
-			colorHistogram.at(color.at(StitchBuffer[iStitch].attribute & 0xf))++;
+			colorHistogram[color[StitchBuffer[iStitch].attribute & 0xf]]++;
 		colorAccumulator = 0;
 		for (iColor = 0; iColor < 16; iColor++) {
-			swap = colorHistogram.at(iColor);
-			colorHistogram.at(iColor) = colorAccumulator;
+			swap = colorHistogram[iColor];
+			colorHistogram[iColor] = colorAccumulator;
 			colorAccumulator += swap;
 		}
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-			tempStitchBuffer.at(colorHistogram.at(color.at(StitchBuffer[iStitch].attribute & 0xf))++) = StitchBuffer[iStitch];
+			tempStitchBuffer[colorHistogram[color[StitchBuffer[iStitch].attribute & 0xf]]++] = StitchBuffer[iStitch];
 		}
-		srtf(tempStitchBuffer, 0, colorHistogram.at(0));
+		srtf(tempStitchBuffer, 0, colorHistogram[0]);
 		for (iColor = 0; iColor < 15; iColor++) {
-			srtf(tempStitchBuffer, colorHistogram.at(iColor), colorHistogram.at(iColor + 1));
+			srtf(tempStitchBuffer, colorHistogram[iColor], colorHistogram[iColor + 1]);
 		}
 	}
 	else
@@ -10429,36 +10429,36 @@ void spltsat(SATCON currentGuide) {
 	iNewVertex = oldLastVertex + 1;
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 		if (iVertex == currentGuide.start || iVertex == currentGuide.finish) {
-			vertexBuffer.at(iOldVertex).x = CurrentFormVertices[iVertex].x;
-			vertexBuffer.at(iOldVertex++).y = CurrentFormVertices[iVertex].y;
+			vertexBuffer[iOldVertex].x = CurrentFormVertices[iVertex].x;
+			vertexBuffer[iOldVertex++].y = CurrentFormVertices[iVertex].y;
 			if (iVertex == currentGuide.start) {
-				vertexBuffer.at(iNewVertex).x = CurrentFormVertices[iVertex].x;
-				vertexBuffer.at(iNewVertex++).y = CurrentFormVertices[iVertex].y;
+				vertexBuffer[iNewVertex].x = CurrentFormVertices[iVertex].x;
+				vertexBuffer[iNewVertex++].y = CurrentFormVertices[iVertex].y;
 			}
 			else {
-				vertexBuffer.at(oldLastVertex).x = CurrentFormVertices[iVertex].x;
-				vertexBuffer.at(oldLastVertex).y = CurrentFormVertices[iVertex].y;
+				vertexBuffer[oldLastVertex].x = CurrentFormVertices[iVertex].x;
+				vertexBuffer[oldLastVertex].y = CurrentFormVertices[iVertex].y;
 			}
 		}
 		else {
 			if (iVertex < currentGuide.start) {
-				vertexBuffer.at(iOldVertex).x = CurrentFormVertices[iVertex].x;
-				vertexBuffer.at(iOldVertex++).y = CurrentFormVertices[iVertex].y;
+				vertexBuffer[iOldVertex].x = CurrentFormVertices[iVertex].x;
+				vertexBuffer[iOldVertex++].y = CurrentFormVertices[iVertex].y;
 			}
 			else {
 				if (iVertex < currentGuide.finish) {
-					vertexBuffer.at(iNewVertex).x = CurrentFormVertices[iVertex].x;
-					vertexBuffer.at(iNewVertex++).y = CurrentFormVertices[iVertex].y;
+					vertexBuffer[iNewVertex].x = CurrentFormVertices[iVertex].x;
+					vertexBuffer[iNewVertex++].y = CurrentFormVertices[iVertex].y;
 				}
 				else {
-					vertexBuffer.at(iOldVertex).x = CurrentFormVertices[iVertex].x;
-					vertexBuffer.at(iOldVertex++).y = CurrentFormVertices[iVertex].y;
+					vertexBuffer[iOldVertex].x = CurrentFormVertices[iVertex].x;
+					vertexBuffer[iOldVertex++].y = CurrentFormVertices[iVertex].y;
 				}
 			}
 		}
 	}
 	for (iVertex = 0; iVertex < iNewVertex; iVertex++) {
-		CurrentFormVertices[iVertex] = vertexBuffer.at(iVertex);
+		CurrentFormVertices[iVertex] = vertexBuffer[iVertex];
 	}
 	SelectedForm->vertexCount = iOldVertex;
 	FormList[ClosestFormToCursor + 1].vertexCount = iNewVertex - iOldVertex;
@@ -10630,36 +10630,36 @@ void ritseg(std::vector<CLIPNT> &clipStitchPoints, std::vector<CLPSEG> &clipSegm
 	if (SelectedForm->extendedAttribute&AT_SQR)
 		isPointedEnd = false;
 	if (StateMap.test(StateFlag::FILDIR)) {
-		iPoint = clipSegments.at(currentSegmentIndex).start;
+		iPoint = clipSegments[currentSegmentIndex].start;
 		if (StateMap.test(StateFlag::TXFIL) && isPointedEnd)
 			iPoint++;
-		chksid(clipSegments.at(currentSegmentIndex).asid);
-		while (iPoint <= clipSegments.at(currentSegmentIndex).finish) {
-			OSequence[SequenceIndex].x = clipStitchPoints.at(iPoint).x;
-			OSequence[SequenceIndex++].y = clipStitchPoints.at(iPoint++).y;
+		chksid(clipSegments[currentSegmentIndex].asid);
+		while (iPoint <= clipSegments[currentSegmentIndex].finish) {
+			OSequence[SequenceIndex].x = clipStitchPoints[iPoint].x;
+			OSequence[SequenceIndex++].y = clipStitchPoints[iPoint++].y;
 		}
-		ClipIntersectSide = clipSegments.at(currentSegmentIndex).zsid;
+		ClipIntersectSide = clipSegments[currentSegmentIndex].zsid;
 	}
 	else {
-		iPoint = clipSegments.at(currentSegmentIndex).finish;
+		iPoint = clipSegments[currentSegmentIndex].finish;
 		if (StateMap.test(StateFlag::TXFIL) && isPointedEnd)
 			iPoint--;
-		chksid(clipSegments.at(currentSegmentIndex).zsid);
-		if (clipSegments.at(currentSegmentIndex).start) {
-			while (iPoint >= clipSegments.at(currentSegmentIndex).start) {
-				OSequence[SequenceIndex].x = clipStitchPoints.at(iPoint).x;
-				OSequence[SequenceIndex++].y = clipStitchPoints.at(iPoint--).y;
+		chksid(clipSegments[currentSegmentIndex].zsid);
+		if (clipSegments[currentSegmentIndex].start) {
+			while (iPoint >= clipSegments[currentSegmentIndex].start) {
+				OSequence[SequenceIndex].x = clipStitchPoints[iPoint].x;
+				OSequence[SequenceIndex++].y = clipStitchPoints[iPoint--].y;
 			}
 		}
 		else {
-			while (iPoint < clipSegments.at(currentSegmentIndex).start) {
-				OSequence[SequenceIndex].x = clipStitchPoints.at(iPoint).x;
-				OSequence[SequenceIndex++].y = clipStitchPoints.at(iPoint--).y;
+			while (iPoint < clipSegments[currentSegmentIndex].start) {
+				OSequence[SequenceIndex].x = clipStitchPoints[iPoint].x;
+				OSequence[SequenceIndex++].y = clipStitchPoints[iPoint--].y;
 			}
 		}
-		ClipIntersectSide = clipSegments.at(currentSegmentIndex).asid;
+		ClipIntersectSide = clipSegments[currentSegmentIndex].asid;
 	}
-	clipSegments.at(currentSegmentIndex).dun = 1;
+	clipSegments[currentSegmentIndex].dun = 1;
 }
 
 bool clpnxt(std::vector<CLPSEG> &clipSegments, std::vector<LENINFO> &sortedLengths, unsigned sind) {
@@ -10672,13 +10672,13 @@ bool clpnxt(std::vector<CLPSEG> &clipSegments, std::vector<LENINFO> &sortedLengt
 	while (ind < clipSegments.size()) {
 		if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 			OutputIndex = (sind + ind) % indexDoubled;
-			if (!clipSegments.at(sortedLengths.at(OutputIndex).index).dun)
+			if (!clipSegments[sortedLengths[OutputIndex].index].dun)
 				return 0;
 			ind++;
 		}
 		else {
 			OutputIndex = (sind + indexDoubled - ind) % indexDoubled;
-			if (!clipSegments.at(sortedLengths.at(OutputIndex).index).dun)
+			if (!clipSegments[sortedLengths[OutputIndex].index].dun)
 				return 0;
 		}
 	}
@@ -10689,30 +10689,30 @@ bool nucseg(std::vector<CLPSEG> &clipSegments, std::vector<LENINFO> &sortedLengt
 	unsigned	ind = 0;
 
 	if (StateMap.test(StateFlag::FILDIR))
-		ind = clipSegments.at(currentSegmentIndex).endIndex;
+		ind = clipSegments[currentSegmentIndex].endIndex;
 	else
-		ind = clipSegments.at(currentSegmentIndex).beginIndex;
+		ind = clipSegments[currentSegmentIndex].beginIndex;
 	if (clpnxt(clipSegments, sortedLengths, ind))
 		return false;
-	if (sortedLengths.at(OutputIndex).isEnd)
+	if (sortedLengths[OutputIndex].isEnd)
 		StateMap.reset(StateFlag::FILDIR);
 	else
 		StateMap.set(StateFlag::FILDIR);
-	currentSegmentIndex = sortedLengths.at(OutputIndex).index;
+	currentSegmentIndex = sortedLengths[OutputIndex].index;
 	return true;
 }
 
 void mvpclp(std::vector<CLIPSORT *> &arrayOfClipIntersectData, unsigned destination, unsigned source) {
 	if (destination != source) {
-		arrayOfClipIntersectData.at(destination) = arrayOfClipIntersectData.at(source);
+		arrayOfClipIntersectData[destination] = arrayOfClipIntersectData[source];
 	}
 }
 
 float getlen(std::vector<CLIPNT> &clipStitchPoints, std::vector<double> &lengths, unsigned iPoint) {
-	clipStitchPoints.at(iPoint).vertexIndex %= VertexCount;
-	return	lengths.at(clipStitchPoints.at(iPoint).vertexIndex) +
-		hypot(CurrentFormVertices[clipStitchPoints.at(iPoint).vertexIndex].x - clipStitchPoints.at(iPoint).x,
-			CurrentFormVertices[clipStitchPoints.at(iPoint).vertexIndex].y - clipStitchPoints.at(iPoint).y);
+	clipStitchPoints[iPoint].vertexIndex %= VertexCount;
+	return	lengths[clipStitchPoints[iPoint].vertexIndex] +
+		hypot(CurrentFormVertices[clipStitchPoints[iPoint].vertexIndex].x - clipStitchPoints[iPoint].x,
+			CurrentFormVertices[clipStitchPoints[iPoint].vertexIndex].y - clipStitchPoints[iPoint].y);
 }
 
 constexpr unsigned leftsid() {
@@ -10812,17 +10812,17 @@ unsigned insect(std::vector<CLIPSORT> &clipIntersectData, std::vector<VCLPX> &re
 	iIntersection = count = 0;
 	arrayOfClipIntersectData.clear();
 	for (iRegions = regionCrossingStart; iRegions < regionCrossingEnd; iRegions++) {
-		currentVertex = regionCrossingData.at(iRegions).vertex;
+		currentVertex = regionCrossingData[iRegions].vertex;
 		nextVertex = nxt(currentVertex);
-		if (isect(currentVertex, nextVertex, &clipIntersectData.at(iIntersection).point, &clipIntersectData.at(iIntersection).sideLength)) {
-			intersection = &clipIntersectData.at(iIntersection).point;
+		if (isect(currentVertex, nextVertex, &clipIntersectData[iIntersection].point, &clipIntersectData[iIntersection].sideLength)) {
+			intersection = &clipIntersectData[iIntersection].point;
 			if (intersection->x >= lineSegmentRect.left &&
 				intersection->x <= lineSegmentRect.right &&
 				intersection->y >= lineSegmentRect.bottom &&
 				intersection->y <= lineSegmentRect.top) {
-				clipIntersectData.at(iIntersection).segmentLength = hypot(clipIntersectData.at(iIntersection).point.x - LineSegmentStart.x, clipIntersectData.at(iIntersection).point.y - LineSegmentStart.y);
-				clipIntersectData.at(iIntersection).vertexIndex = currentVertex;
-				arrayOfClipIntersectData.push_back(&clipIntersectData.at(iIntersection));
+				clipIntersectData[iIntersection].segmentLength = hypot(clipIntersectData[iIntersection].point.x - LineSegmentStart.x, clipIntersectData[iIntersection].point.y - LineSegmentStart.y);
+				clipIntersectData[iIntersection].vertexIndex = currentVertex;
+				arrayOfClipIntersectData.push_back(&clipIntersectData[iIntersection]);
 				iIntersection++;
 				count++;
 			}
@@ -10832,7 +10832,7 @@ unsigned insect(std::vector<CLIPSORT> &clipIntersectData, std::vector<VCLPX> &re
 		std::sort(arrayOfClipIntersectData.begin(), arrayOfClipIntersectData.end(), lencmpa);
 		iDestination = 1;
 		for (iIntersection = 0; iIntersection < count - 1; iIntersection++) {
-			if (fabs(arrayOfClipIntersectData.at(iIntersection)->segmentLength - arrayOfClipIntersectData.at(iIntersection + 1)->segmentLength) > TINY)
+			if (fabs(arrayOfClipIntersectData[iIntersection]->segmentLength - arrayOfClipIntersectData[iIntersection + 1]->segmentLength) > TINY)
 				mvpclp(arrayOfClipIntersectData, iDestination++, iIntersection + 1);
 		}
 		count = iDestination;
@@ -10856,7 +10856,7 @@ bool isin(std::vector<VCLPX> regionCrossingData, float xCoordinate, float yCoord
 	if (yCoordinate > BoundingRect.top)
 		return 0;
 	for (iRegion = regionCrossingStart; iRegion < regionCrossingEnd; iRegion++) {
-		svrt = regionCrossingData.at(iRegion).vertex;
+		svrt = regionCrossingData[iRegion].vertex;
 		nvrt = nxt(svrt);
 		if (projv(xCoordinate, CurrentFormVertices[svrt], CurrentFormVertices[nvrt], &ipnt)) {
 			if (ipnt.y > yCoordinate) {
@@ -10883,9 +10883,9 @@ unsigned clpnseg(std::vector<CLIPNT> &clipStitchPoints, std::vector<CLPSEG> &cli
 
 	clipSegment.start = start;
 	clipSegment.beginLength = getlen(clipStitchPoints, lengths, start);
-	clipSegment.asid = clipStitchPoints.at(start).vertexIndex;
+	clipSegment.asid = clipStitchPoints[start].vertexIndex;
 	clipSegment.endLength = getlen(clipStitchPoints, lengths, finish);
-	clipSegment.zsid = clipStitchPoints.at(finish).vertexIndex;
+	clipSegment.zsid = clipStitchPoints[finish].vertexIndex;
 	clipSegment.finish = finish;
 	clipSegment.dun = 0;
 	clipSegments.push_back(clipSegment);
@@ -10924,8 +10924,8 @@ void inspnt(std::vector<CLIPNT> &clipStitchPoints) {
 								clipStitchPoints.back().y,
 								0,
 								0 };
-	clipStitchPoints.back().x = midl(clipStitchPoint.x, clipStitchPoints.at(clipStitchPoints.size() - 2).x);
-	clipStitchPoints.back().y = midl(clipStitchPoint.y, clipStitchPoints.at(clipStitchPoints.size() - 2).y);
+	clipStitchPoints.back().x = midl(clipStitchPoint.x, clipStitchPoints[clipStitchPoints.size() - 2].x);
+	clipStitchPoints.back().y = midl(clipStitchPoint.y, clipStitchPoints[clipStitchPoints.size() - 2].y);
 	clipStitchPoints.back().flag = 1;
 	clipStitchPoints.push_back(clipStitchPoint);
 }
@@ -10977,9 +10977,9 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 	vertex = nxt(vertex);
 	for (iVertex = 0; iVertex <= VertexCount; iVertex++) {
 		nextVertex = nxt(vertex);
-		lengths.at(vertex) = totalLength;
-		clipSideLengths.at(vertex) = hypot(CurrentFormVertices[nextVertex].x - CurrentFormVertices[vertex].x, CurrentFormVertices[nextVertex].y - CurrentFormVertices[vertex].y);
-		totalLength += clipSideLengths.at(vertex);
+		lengths[vertex] = totalLength;
+		clipSideLengths[vertex] = hypot(CurrentFormVertices[nextVertex].x - CurrentFormVertices[vertex].x, CurrentFormVertices[nextVertex].y - CurrentFormVertices[vertex].y);
+		totalLength += clipSideLengths[vertex];
 		vertex = nextVertex;
 	}
 	clipGrid.left = floor(SelectedForm->rectangle.left / ClipWidth);
@@ -11033,12 +11033,12 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 	std::sort(regionCrossingData.begin(), regionCrossingData.end(), clpcmp);
 	std::vector<unsigned> iclpx;
 	iclpx.reserve(regionCrossingData.size());
-	regionSegment = regionCrossingData.at(0).segment;
+	regionSegment = regionCrossingData[0].segment;
 	iclpx.push_back(0);
 	for (iSegment = 1; iSegment < regionCrossingData.size(); iSegment++) {
-		if (regionCrossingData.at(iSegment).segment != regionSegment) {
+		if (regionCrossingData[iSegment].segment != regionSegment) {
 			iclpx.push_back(iSegment);
-			regionSegment = regionCrossingData.at(iSegment).segment;
+			regionSegment = regionCrossingData[iSegment].segment;
 		}
 	}
 	iclpx.push_back(iSegment);
@@ -11060,14 +11060,14 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 	clipStitchPoints.reserve(MAXITEMS);
 	bool breakFlag = false;
 	for (iRegion = 0; iRegion < (iclpx.size() - 1); iRegion++) {
-		regionCrossingStart = iclpx.at(iRegion);
-		regionCrossingEnd = iclpx.at(iRegion + 1);
+		regionCrossingStart = iclpx[iRegion];
+		regionCrossingEnd = iclpx[iRegion + 1];
 		pasteLocation.x = ClipWidth * (iRegion + clipGrid.left);
 		clipVerticalOffset = 0;
 		if (StateMap.test(StateFlag::TXFIL)) {
 			textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
-			ClipStitchCount = textureSegments.at(textureLine).stitchCount;
-			texture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + textureSegments.at(textureLine).line];
+			ClipStitchCount = textureSegments[textureLine].stitchCount;
+			texture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + textureSegments[textureLine].line];
 			LineSegmentStart.x = pasteLocation.x;
 			if (SelectedForm->txof) {
 				lineOffset = (iRegion + clipGrid.left) / SelectedForm->fillInfo.texture.lines;
@@ -11106,13 +11106,13 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 
 				clipStitchPoints.push_back({ LineSegmentStart.x, LineSegmentStart.y, 0, 0 });
 				if (isin(regionCrossingData, LineSegmentStart.x, LineSegmentStart.y, regionCrossingStart, regionCrossingEnd)) {
-					if ((clipStitchPoints.size() > 1) && clipStitchPoints.at(clipStitchPoints.size() - 1).flag == 2) {
+					if ((clipStitchPoints.size() > 1) && clipStitchPoints[clipStitchPoints.size() - 1].flag == 2) {
 						inspnt(clipStitchPoints);
 					}
 					clipStitchPoints.back().flag = 0;
 				}
 				else {
-					if ((clipStitchPoints.size() > 1) && !clipStitchPoints.at(clipStitchPoints.size() - 1).flag) {
+					if ((clipStitchPoints.size() > 1) && !clipStitchPoints[clipStitchPoints.size() - 1].flag) {
 						inspnt(clipStitchPoints);
 					}
 					clipStitchPoints.back().flag = 2;
@@ -11120,9 +11120,9 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 				cnt = insect(clipIntersectData, regionCrossingData, arrayOfClipIntersectData, regionCrossingStart, regionCrossingEnd);
 				if (cnt) {
 					for (ing = 0; ing < cnt; ing++) {
-						clipStitchPoints.push_back({ arrayOfClipIntersectData.at(ing)->point.x,
-													arrayOfClipIntersectData.at(ing)->point.y,
-													arrayOfClipIntersectData.at(ing)->vertexIndex,
+						clipStitchPoints.push_back({ arrayOfClipIntersectData[ing]->point.x,
+													arrayOfClipIntersectData[ing]->point.y,
+													arrayOfClipIntersectData[ing]->vertexIndex,
 													1 });
 						if (clipStitchPoints.size() > MAXITEMS << 2) {
 							breakFlag = true;
@@ -11142,7 +11142,7 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 		}
 		if (!breakFlag) {
 			if (clipStitchPoints.size()) {
-				clipStitchPoints.at(clipStitchPoints.size() - 1).flag = 2;
+				clipStitchPoints[clipStitchPoints.size() - 1].flag = 2;
 			};
 		}
 		else {
@@ -11150,12 +11150,12 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 		}
 	}
 	if (clipStitchPoints.size()) {
-		clipStitchPoints.at(clipStitchPoints.size() - 1).flag = 2;
+		clipStitchPoints[clipStitchPoints.size() - 1].flag = 2;
 	};
 	if (negativeOffset) {
 		formNegativeOffset = negativeOffset * ClipRectSize.cy;
 		for (iStitchPoint = 0; iStitchPoint < clipStitchPoints.size(); iStitchPoint++)
-			clipStitchPoints.at(iStitchPoint).y -= formNegativeOffset;
+			clipStitchPoints[iStitchPoint].y -= formNegativeOffset;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++)
 			CurrentFormVertices[iVertex].y -= formNegativeOffset;
 	}
@@ -11176,7 +11176,7 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 		clipSegments.reserve(clipStitchPoints.size() / 10);
 
 		for (iPoint = 0; iPoint < clipStitchPoints.size() - 1; iPoint++) {
-			switch (clipStitchPoints.at(iPoint).flag) {
+			switch (clipStitchPoints[iPoint].flag) {
 			case 0:		//inside
 
 				StateMap.set(StateFlag::FILDIR);
@@ -11214,15 +11214,15 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 				std::vector<LENINFO> sortedLengths;
 				sortedLengths.reserve(clipSegments.size() * 2);
 				for (iSegment = 0; iSegment < clipSegments.size(); iSegment++) {
-					sortedLengths.push_back({ iSegment, false, clipSegments.at(iSegment).beginLength });
-					sortedLengths.push_back({ iSegment, true, clipSegments.at(iSegment).endLength });
+					sortedLengths.push_back({ iSegment, false, clipSegments[iSegment].beginLength });
+					sortedLengths.push_back({ iSegment, true, clipSegments[iSegment].endLength });
 				}
 				std::sort(sortedLengths.begin(), sortedLengths.end(), lencmp);
 				for (iSorted = 0; iSorted < sortedLengths.size(); iSorted++) {
-					if (sortedLengths.at(iSorted).isEnd)
-						clipSegments.at(sortedLengths.at(iSorted).index).endIndex = iSorted;
+					if (sortedLengths[iSorted].isEnd)
+						clipSegments[sortedLengths[iSorted].index].endIndex = iSorted;
 					else
-						clipSegments.at(sortedLengths.at(iSorted).index).beginIndex = iSorted;
+						clipSegments[sortedLengths[iSorted].index].beginIndex = iSorted;
 				}
 
 #if CLPVU==1
@@ -11239,7 +11239,7 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 
 				inf = 0;
 				for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
-					for (iStitchPoint = clipSegments.at(iSegment).start; iStitchPoint <= clipSegments.at(iSegment).finish; iStitchPoint++) {
+					for (iStitchPoint = clipSegments[iSegment].start; iStitchPoint <= clipSegments[iSegment].finish; iStitchPoint++) {
 						StitchBuffer[inf].x = ClipStitchPoints[iStitchPoint].x;
 						StitchBuffer[inf].y = ClipStitchPoints[iStitchPoint].y;
 						StitchBuffer[inf++].attribute = iSegment & 0xf;
@@ -11256,7 +11256,7 @@ void clpcon(std::vector<RNGCNT> &textureSegments) {
 				unsigned currentSegmentIndex = 0;
 				StateMap.set(StateFlag::FILDIR);
 				SequenceIndex = 0;
-				ClipIntersectSide = clipSegments.at(0).asid;
+				ClipIntersectSide = clipSegments[0].asid;
 				ritseg(clipStitchPoints, clipSegments, currentSegmentIndex);
 				while (nucseg(clipSegments, sortedLengths, currentSegmentIndex)) {
 					if (SequenceIndex > MAXITEMS - 3)
@@ -11625,20 +11625,20 @@ void col2frm() {
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			formColorCode = StitchBuffer[iStitch].attribute & 0x3fff;
 			if (StitchBuffer[iStitch].attribute&(WLKMSK | CWLKMSK | UNDMSK))
-				underlayColorHistogram.at(formColorCode)++;
+				underlayColorHistogram[formColorCode]++;
 			else {
 				if (StitchBuffer[iStitch].attribute&FTHMSK)
-					featherColorHistogram.at(formColorCode)++;
+					featherColorHistogram[formColorCode]++;
 				else {
 					switch (StitchBuffer[iStitch].attribute&TYPMSK) {
 					case FRMFIL:
 
-						fillColorHistogram.at(formColorCode)++;
+						fillColorHistogram[formColorCode]++;
 						break;
 
 					case FRMBFIL:
 
-						borderColorHistogram.at(formColorCode)++;
+						borderColorHistogram[formColorCode]++;
 						break;
 					}
 				}
@@ -11649,8 +11649,8 @@ void col2frm() {
 			if (FormList[iForm].fillType) {
 				count = majorityColor = 0;
 				for (iColor = startColorOffset; iColor < endColorOffset; iColor++) {
-					if (fillColorHistogram.at(iColor) > count) {
-						count = fillColorHistogram.at(iColor);
+					if (fillColorHistogram[iColor] > count) {
+						count = fillColorHistogram[iColor];
 						majorityColor = iColor;
 					}
 				}
@@ -11662,8 +11662,8 @@ void col2frm() {
 				if (FormList[iForm].fillType == FTHF && FormList[iForm].extendedAttribute&AT_FTHBLND) {
 					count = majorityColor = 0;
 					for (iColor = startColorOffset; iColor < endColorOffset; iColor++) {
-						if (featherColorHistogram.at(iColor) > count) {
-							count = fillColorHistogram.at(iColor);
+						if (featherColorHistogram[iColor] > count) {
+							count = fillColorHistogram[iColor];
 							majorityColor = iColor;
 						}
 					}
@@ -11677,8 +11677,8 @@ void col2frm() {
 			if (FormList[iForm].edgeType) {
 				count = majorityColor = 0;
 				for (iColor = startColorOffset; iColor < endColorOffset; iColor++) {
-					if (borderColorHistogram.at(iColor) > count) {
-						count = borderColorHistogram.at(iColor);
+					if (borderColorHistogram[iColor] > count) {
+						count = borderColorHistogram[iColor];
 						majorityColor = iColor;
 					}
 				}
@@ -11691,8 +11691,8 @@ void col2frm() {
 			if (FormList[iForm].extendedAttribute&(AT_WALK | AT_CWLK | AT_UND)) {
 				count = majorityColor = 0;
 				for (iColor = startColorOffset; iColor < endColorOffset; iColor++) {
-					if (underlayColorHistogram.at(iColor) > count) {
-						count = borderColorHistogram.at(iColor);
+					if (underlayColorHistogram[iColor] > count) {
+						count = borderColorHistogram[iColor];
 						majorityColor = iColor;
 					}
 				}
@@ -11722,8 +11722,8 @@ bool fxpnt(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) {
 		for (iGuess = 0; iGuess < 10; iGuess++) {
 			length = hypot(MoveToCoords.x - SelectedPoint.x, MoveToCoords.y - SelectedPoint.y);
 			delta = AdjustedSpace - length;
-			MoveToCoords.x += delta * listCOSINEs.at(CurrentSide);
-			MoveToCoords.y += delta * listSINEs.at(CurrentSide);
+			MoveToCoords.x += delta * listCOSINEs[CurrentSide];
+			MoveToCoords.y += delta * listSINEs[CurrentSide];
 			if (fabs(delta) < 0.2)
 				break;
 		}
@@ -11743,8 +11743,8 @@ void fxlit(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) {
 		BeanCount++;
 		length = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
 		count = floor(length / AdjustedSpace);
-		delta.x = AdjustedSpace * listCOSINEs.at(CurrentSide);
-		delta.y = AdjustedSpace * listSINEs.at(CurrentSide);
+		delta.x = AdjustedSpace * listCOSINEs[CurrentSide];
+		delta.y = AdjustedSpace * listSINEs[CurrentSide];
 		SelectedPoint.x += delta.x*count;
 		SelectedPoint.y += delta.y*count;
 		BeanCount += count;
@@ -11763,8 +11763,8 @@ void fxlin(std::vector<fPOINT> &chainEndPoints, std::vector<double> &ListSINEs, 
 		chainEndPoints.push_back(SelectedPoint);
 		length = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
 		count = floor(length / AdjustedSpace);
-		delta.x = AdjustedSpace * ListCOSINEs.at(CurrentSide);
-		delta.y = AdjustedSpace * ListSINEs.at(CurrentSide);
+		delta.x = AdjustedSpace * ListCOSINEs[CurrentSide];
+		delta.y = AdjustedSpace * ListSINEs[CurrentSide];
 		for (iChain = 0; iChain < count; iChain++) {
 			SelectedPoint.x += delta.x;
 			SelectedPoint.y += delta.y;
@@ -11879,38 +11879,38 @@ void duchfn(std::vector<fPOINT> &chainEndPoints, unsigned start, unsigned finish
 	std::vector<unsigned>	chainSequence = { 0,1,2,3,0,1,4,3,0,3 };//chain stitch sequence
 
 	std::vector<fPOINT>	chainPoint(5);
-	dPOINT			delta = { (chainEndPoints.at(finish).x - chainEndPoints.at(start).x),
-							  (chainEndPoints.at(finish).y - chainEndPoints.at(start).y) };
+	dPOINT			delta = { (chainEndPoints[finish].x - chainEndPoints[start].x),
+							  (chainEndPoints[finish].y - chainEndPoints[start].y) };
 	const dPOINT	lengthDelta = { (delta.x*SelectedForm->edgeStitchLen),
 									(delta.y*SelectedForm->edgeStitchLen) };
 	const double	angle = atan2(delta.y, delta.x) + PI / 2;
 	const dPOINT	offset = { (cos(angle)*SelectedForm->borderSize),
 								(sin(angle)*SelectedForm->borderSize) };
-	const float		middleXcoord = chainEndPoints.at(start).x + lengthDelta.x;
-	const float		middleYcoord = chainEndPoints.at(start).y + lengthDelta.y;
+	const float		middleXcoord = chainEndPoints[start].x + lengthDelta.x;
+	const float		middleYcoord = chainEndPoints[start].y + lengthDelta.y;
 
-	chainPoint.at(0) = chainEndPoints.at(start);
-	chainPoint.at(4) = chainEndPoints.at(finish);
-	chainPoint.at(1).x = middleXcoord + offset.x;
-	chainPoint.at(1).y = middleYcoord + offset.y;
-	chainPoint.at(3).x = middleXcoord - offset.x;
-	chainPoint.at(3).y = middleYcoord - offset.y;
+	chainPoint[0] = chainEndPoints[start];
+	chainPoint[4] = chainEndPoints[finish];
+	chainPoint[1].x = middleXcoord + offset.x;
+	chainPoint[1].y = middleYcoord + offset.y;
+	chainPoint[3].x = middleXcoord - offset.x;
+	chainPoint[3].y = middleYcoord - offset.y;
 	//ToDo - This may not be correct
 	if (finish < chainEndPoints.size() - 1) {
-		delta.x = chainEndPoints.at(finish + 1).x - chainEndPoints.at(finish).x;
-		delta.y = chainEndPoints.at(finish + 1).y - chainEndPoints.at(finish).y;
+		delta.x = chainEndPoints[finish + 1].x - chainEndPoints[finish].x;
+		delta.y = chainEndPoints[finish + 1].y - chainEndPoints[finish].y;
 	}
 	else {
-		delta.x = chainEndPoints.at(finish).x - chainEndPoints.at(finish - 1).x;
-		delta.y = chainEndPoints.at(finish).y - chainEndPoints.at(finish - 1).y;
+		delta.x = chainEndPoints[finish].x - chainEndPoints[finish - 1].x;
+		delta.y = chainEndPoints[finish].y - chainEndPoints[finish - 1].y;
 	}
-	chainPoint.at(2).x = chainEndPoints.at(finish).x + delta.x / 4;
-	chainPoint.at(2).y = chainEndPoints.at(finish).y + delta.y / 4;
+	chainPoint[2].x = chainEndPoints[finish].x + delta.x / 4;
+	chainPoint[2].y = chainEndPoints[finish].y + delta.y / 4;
 	unsigned chainCount = chainSequence.size();
 	if (StateMap.test(StateFlag::LINCHN))
 		chainCount--;
 	for (iChain = 0; iChain < chainCount; iChain++) {
-		OSequence[SequenceIndex] = chainPoint.at(chainSequence.at(iChain));
+		OSequence[SequenceIndex] = chainPoint[chainSequence[iChain]];
 		SequenceIndex++;
 	}
 }
@@ -11930,13 +11930,13 @@ void duch(std::vector<fPOINT> &chainEndPoints) {
 			if (StateMap.test(StateFlag::LINCHN))
 				backupAt--;
 			if ((SequenceIndex >= backupAt)) {
-				OSequence[SequenceIndex - backupAt] = chainEndPoints.at(iPoint + 1);
+				OSequence[SequenceIndex - backupAt] = chainEndPoints[iPoint + 1];
 			}
-			OSequence[SequenceIndex++] = chainEndPoints.at(iPoint + 1);
+			OSequence[SequenceIndex++] = chainEndPoints[iPoint + 1];
 		}
 		else {
 			duchfn(chainEndPoints, iPoint, 0);
-			OSequence[SequenceIndex++] = chainEndPoints.at(chainEndPoints.size() - 1);
+			OSequence[SequenceIndex++] = chainEndPoints[chainEndPoints.size() - 1];
 		}
 	}
 	else
@@ -12072,8 +12072,8 @@ void crop() {
 }
 
 void xclpfn(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPoints, unsigned start, unsigned finish) {
-	dPOINT			delta = { (chainEndPoints.at(finish).x - chainEndPoints.at(start).x),
-								(chainEndPoints.at(finish).y - chainEndPoints.at(start).y) };
+	dPOINT			delta = { (chainEndPoints[finish].x - chainEndPoints[start].x),
+								(chainEndPoints[finish].y - chainEndPoints[start].y) };
 	unsigned		iPoint = 0;
 	const double	length = hypot(delta.x, delta.y);
 	const double	ratio = length / ClipRectSize.cx;
@@ -12081,10 +12081,10 @@ void xclpfn(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEndPo
 
 	RotationAngle = atan2(delta.y, delta.x);
 	for (iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
-		points.at(iPoint) = tempClipPoints.at(iPoint);
-		rotflt(points.at(iPoint));
-		OSequence[SequenceIndex].x = chainEndPoints.at(start).x + points.at(iPoint).x;
-		OSequence[SequenceIndex++].y = chainEndPoints.at(start).y + points.at(iPoint).y;
+		points[iPoint] = tempClipPoints[iPoint];
+		rotflt(points[iPoint]);
+		OSequence[SequenceIndex].x = chainEndPoints[start].x + points[iPoint].x;
+		OSequence[SequenceIndex++].y = chainEndPoints[start].y + points[iPoint].y;
 	}
 }
 
@@ -12103,7 +12103,7 @@ void duxclp() {
 		xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint);
 	}
 	if (SelectedForm->type != FRMLINE) {
-		OSequence[SequenceIndex++] = chainEndPoints.at(0);
+		OSequence[SequenceIndex++] = chainEndPoints[0];
 	}
 }
 
@@ -12118,7 +12118,7 @@ void dulast(std::vector<fPOINT> &chainEndPoints) {
 		minimumLength = 1e99;
 		minimumIndex = 0;
 		for (iPoint = 0; iPoint < chainEndPoints.size() - 1; iPoint++) {
-			length = hypot(LastPoint.x - chainEndPoints.at(iPoint).x, LastPoint.y - chainEndPoints.at(iPoint).y);
+			length = hypot(LastPoint.x - chainEndPoints[iPoint].x, LastPoint.y - chainEndPoints[iPoint].y);
 			if (length < minimumLength) {
 				minimumLength = length;
 				minimumIndex = iPoint;
@@ -12127,10 +12127,10 @@ void dulast(std::vector<fPOINT> &chainEndPoints) {
 		if (minimumIndex) {
 			iDestination = 0;
 			for (iPoint = minimumIndex; iPoint < chainEndPoints.size() - 2; iPoint++) {
-				tempClipPoints.push_back(chainEndPoints.at(iPoint));
+				tempClipPoints.push_back(chainEndPoints[iPoint]);
 			}
 			for (iPoint = 0; iPoint <= minimumIndex; iPoint++) {
-				tempClipPoints.push_back(chainEndPoints.at(iPoint));
+				tempClipPoints.push_back(chainEndPoints[iPoint]);
 			}
 			chainEndPoints = tempClipPoints;
 		}
@@ -12301,8 +12301,8 @@ void wavfrm() {
 		iVertex = IniFile.waveStart;
 		while (iVertex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 			iNextVertex = (iVertex + 1) % IniFile.wavePoints;
-			points.at(iPoint).x = -CurrentFormVertices[iNextVertex].x + CurrentFormVertices[iVertex].x;
-			points.at(iPoint).y = -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[iVertex].y;
+			points[iPoint].x = -CurrentFormVertices[iNextVertex].x + CurrentFormVertices[iVertex].x;
+			points[iPoint].y = -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[iVertex].y;
 			iPoint++;
 			iVertex = iNextVertex;
 		}
@@ -12314,16 +12314,16 @@ void wavfrm() {
 				for (iPoint = 0; iPoint < count; iPoint++) {
 					CurrentFormVertices[iVertex] = currentPosition;
 					iVertex++;
-					currentPosition.x += points.at(iPoint).x;
-					currentPosition.y += points.at(iPoint).y;
+					currentPosition.x += points[iPoint].x;
+					currentPosition.y += points[iPoint].y;
 				}
 			}
 			else {
 				for (iPoint = count; iPoint != 0; iPoint--) {
 					CurrentFormVertices[iVertex] = currentPosition;
 					iVertex++;
-					currentPosition.x += points.at(iPoint - 1).x;
-					currentPosition.y += points.at(iPoint - 1).y;
+					currentPosition.x += points[iPoint - 1].x;
+					currentPosition.y += points[iPoint - 1].y;
 				}
 			}
 		}
@@ -12372,7 +12372,7 @@ void srtfrm() {
 		savdo();
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
-			histogram.at(iForm)++;
+			histogram[iForm]++;
 		}
 		totalStitches = 0;
 		for (auto& entry:histogram) {
@@ -12383,10 +12383,10 @@ void srtfrm() {
 		std::vector<fPOINTATTR> highStitchBuffer(PCSHeader.stitchCount);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			iForm = (StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT;
-			iHighStitch = histogram.at(iForm)++;
-			highStitchBuffer.at(iHighStitch) = StitchBuffer[iStitch];
+			iHighStitch = histogram[iForm]++;
+			highStitchBuffer[iHighStitch] = StitchBuffer[iStitch];
 		}
-		MoveMemory(StitchBuffer, &highStitchBuffer.at(0), sizeof(fPOINTATTR)*PCSHeader.stitchCount);
+		MoveMemory(StitchBuffer, &highStitchBuffer[0], sizeof(fPOINTATTR)*PCSHeader.stitchCount);
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
