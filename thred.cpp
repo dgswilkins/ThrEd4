@@ -40,7 +40,7 @@ inline _Ret_notnull_ T2 convert_ptr(T1 *pointer)
 //Forward Declarations
 void		blak ();
 void		chkhup ();
-void		clrhbut (unsigned startButton) noexcept;
+void		clrhbut (unsigned startButton);
 bool		cmpstch (unsigned iStitchA, unsigned iStitchB) noexcept;
 void		cros (unsigned iStitch) noexcept;
 void		delet ();
@@ -2561,7 +2561,7 @@ void ritlayr() {
 	}
 }
 
-void nuRct() noexcept {
+void nuRct() {
 	GetClientRect(ThrEdWindow, &ThredWindowRect);
 	GetWindowRect(ColorBar, &ColorBarRect);
 	if (ButtonWin->size() != 0) {
@@ -6799,7 +6799,7 @@ bool oldwnd(HWND window) {
 	return 1;
 }
 
-BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
+BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
 
 	if (oldwnd(hwnd))
@@ -11530,7 +11530,7 @@ void trcratnum() {
 	butxt(HLIN, fmt::format(fmtStr, -log10(IniFile.traceRatio - 1)));
 }
 
-void clrhbut(unsigned startButton) noexcept {
+void clrhbut(unsigned startButton) {
 	unsigned	iButton;
 
 	for (iButton = startButton; iButton < 9; iButton++)
@@ -18331,7 +18331,7 @@ void ritloc() {
 	}
 }
 
-void crtcurs() {
+void crtcurs() noexcept {
 	FormCursor = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Form));
 	DLineCursor = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_DLIN));
 	NeedleUpCursor = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Upright));

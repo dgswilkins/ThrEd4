@@ -1250,7 +1250,7 @@ void srtcol() {
 	for (auto &stitchColor: colorStartStitch) {
 		stitchColor = startStitch;
 		startStitch += *it;
-		it++;
+		const auto _ = it++;
 	}
 	std::vector<fPOINTATTR> highStitchBuffer(PCSHeader.stitchCount);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -4689,7 +4689,7 @@ void txdun() {
 				WriteFile(handle, &TextureHistoryIndex, sizeof(int), &bytesWritten, 0);
 				for (auto i = 0; i < ITXBUFLEN; i++) {
 					auto &bufferEntry = textureHistoryBuffer[i];
-					auto &historyEntry = TextureHistory[i];
+					const auto &historyEntry = TextureHistory[i];
 					bufferEntry.placeholder = nullptr;
 					bufferEntry.count = historyEntry.texturePoint.size();
 					bufferEntry.height = historyEntry.height;
