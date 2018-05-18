@@ -424,7 +424,6 @@ extern	unsigned		FormIndex;
 extern	FRMHED			FormList[MAXFORMS];
 extern	POINT			FormControlPoints[10];
 extern	fPOINT			FormVertices[MAXITEMS];
-extern	char			HelpBuffer[HBUFSIZ];
 extern	double			HorizontalRatio;
 extern	fPOINT			InterleaveSequence[MAXITEMS];
 extern	double			LineSpacing;

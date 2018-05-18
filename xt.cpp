@@ -58,7 +58,6 @@ extern	FRMHED			FormList[MAXFORMS];
 extern	fPOINT			FormVertices[MAXITEMS];
 extern	HPEN			GridPen;
 extern	HWND			HorizontalScrollBar;
-extern	char			HelpBuffer[HBUFSIZ];
 extern	INIFILE			IniFile;
 extern	fPOINT*			InsidePoints;
 extern	HWND			MainStitchWin;
@@ -70,7 +69,6 @@ extern	fPOINT*			OutsidePoints;
 extern	fPOINT			OSequence[OSEQLEN];
 extern	PCSHEADER		PCSHeader;
 extern	unsigned		PseudoRandomValue;
-extern	char*			RepairString;
 extern	double			RotationAngle;
 extern	dPOINT			RotationCenter;
 extern	FRMHED*			SelectedForm;
@@ -4416,8 +4414,10 @@ void setstxt(unsigned stringIndex, float value) {
 }
 
 float getstxt(unsigned stringIndex) noexcept {
-	GetWindowText(GetDlgItem(DesignSizeDialog, stringIndex), HelpBuffer, HBUFSIZ);
-	return atof(HelpBuffer)*PFGRAN;
+	//ToDo - This is not great code.
+	char buffer[16] = {};
+	GetWindowText(GetDlgItem(DesignSizeDialog, stringIndex), buffer, sizeof(buffer));
+	return atof(buffer)*PFGRAN;
 }
 
 bool chkasp(fPOINT* point) noexcept {

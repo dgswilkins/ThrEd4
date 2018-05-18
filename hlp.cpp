@@ -216,10 +216,6 @@ unsigned short LoadStringList[] = {	//strings to load into memory at init time
 
 std::vector<std::string> *StringTable;
 
-char*	RepairString;			//Repair Type
-
-char	HelpBuffer[HBUFSIZ];	//message formatting buffer
-
 inline void loadString(std::string & sDest, unsigned stringID) {
 	WCHAR sBuf[HBUFSIZ] = { 0 };
 	LPWSTR psBuf = sBuf;
@@ -361,8 +357,9 @@ void shoMsg(const std::string &message) {
 }
 
 void tabmsg(unsigned code) {
-	LoadString(ThrEdInstance, code, HelpBuffer, HBUFSIZ);
-	shoMsg(HelpBuffer);
+	std::string message;
+	loadString(message, code);
+	shoMsg(message);
 }
 
 void riter() {
