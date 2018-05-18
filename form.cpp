@@ -1687,7 +1687,7 @@ void makspac(unsigned start, unsigned count) noexcept {
 	}
 }
 
-bool ritlin(fPOINT start, fPOINT finish) {
+bool ritlin(fPOINT start, fPOINT finish) noexcept {
 	dPOINT		delta = {}, step = {};
 	fPOINT		point = {};
 	double		length = 0.0;

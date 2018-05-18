@@ -888,8 +888,7 @@ fPOINT* insid() {
 	if (SelectedForm->underlayIndent > 0) {
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 			if (!cisin(InsidePoints[iVertex].x, InsidePoints[iVertex].y)) {
-				InsidePoints[iVertex].x = CurrentFormVertices[iVertex].x;
-				InsidePoints[iVertex].y = CurrentFormVertices[iVertex].y;
+				InsidePoints[iVertex] = CurrentFormVertices[iVertex];
 			}
 		}
 		return InsidePoints;
