@@ -285,19 +285,19 @@ void butxt(unsigned iButton, const std::string &buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
 		if (iButton == 5) {
 			if (StateMap.test(StateFlag::HIDMAP))
-				SetWindowText(ButtonWin->at(iButton), StringTable->at(STR_TRC1H).c_str());
+				SetWindowText(ButtonWin->operator[](iButton), StringTable->operator[](STR_TRC1H).c_str());
 			else
-				SetWindowText(ButtonWin->at(iButton), StringTable->at(STR_TRC1S).c_str());
+				SetWindowText(ButtonWin->operator[](iButton), StringTable->operator[](STR_TRC1S).c_str());
 		}
 		else
-			SetWindowText(ButtonWin->at(iButton), StringTable->at(iButton - 4 + STR_TRC0).c_str());
+			SetWindowText(ButtonWin->operator[](iButton), StringTable->operator[](iButton - 4 + STR_TRC0).c_str());
 	}
 	else
-		SetWindowText(ButtonWin->at(iButton), buttonText.c_str());
+		SetWindowText(ButtonWin->operator[](iButton), buttonText.c_str());
 }
 
 void ritnum(unsigned code, unsigned value) {
-	butxt(HNUM, fmt::format(StringTable->at(code), value));
+	butxt(HNUM, fmt::format(StringTable->operator[](code), value));
 }
 
 void msgstr(unsigned code) noexcept {
@@ -306,7 +306,7 @@ void msgstr(unsigned code) noexcept {
 
 void lodstr() {
 	for (auto iString = 0; iString < STR_LEN; iString++) {
-		loadString(StringTable->at(iString), LoadStringList[iString]);
+		loadString(StringTable->operator[](iString), LoadStringList[iString]);
 	}
 }
 

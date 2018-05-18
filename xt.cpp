@@ -350,9 +350,9 @@ bool chktxh(_In_ const TXHST* historyItem) {
 		if (historyItem->width != TextureScreen.width)
 			return true;
 		for (iPoint = 0; iPoint < TempTexturePoints->size(); iPoint++) {
-			if (TempTexturePoints->at(iPoint).line != historyItem->texturePoint[iPoint].line)
+			if (TempTexturePoints->operator[](iPoint).line != historyItem->texturePoint[iPoint].line)
 				return true;
-			if (TempTexturePoints->at(iPoint).y != historyItem->texturePoint[iPoint].y)
+			if (TempTexturePoints->operator[](iPoint).y != historyItem->texturePoint[iPoint].y)
 				return true;
 		}
 	}
@@ -376,7 +376,7 @@ void savtxt() {
 			currentHistoryItem->texturePoint.clear();
 			currentHistoryItem->texturePoint.reserve(TempTexturePoints->size());
 			for (auto i = 0u; i < TempTexturePoints->size(); i++) {
-				currentHistoryItem->texturePoint.push_back(TempTexturePoints->at(i));
+				currentHistoryItem->texturePoint.push_back(TempTexturePoints->operator[](i));
 			}
 		}
 	}
@@ -3050,7 +3050,7 @@ void txtxfn(POINT reference, int offsetPixels) noexcept {
 void dutxtx(int index, int offsetPixels) {
 	POINT	ref;
 
-	txt2pix(TempTexturePoints->at(index), &ref);
+	txt2pix(TempTexturePoints->operator[](index), &ref);
 	txtxfn(ref, offsetPixels);
 	if (ref.y > TextureScreen.halfHeight)
 		ref.y -= TextureScreen.height;
@@ -3086,25 +3086,25 @@ void px2ed(POINT point, fPOINT* editPoint) noexcept {
 void bxtxt(unsigned iButton, unsigned iMessage) {
 	std::string message;
 	loadString(message, iMessage);
-	SetWindowText(ButtonWin->at(iButton), message.c_str());
+	SetWindowText(ButtonWin->operator[](iButton), message.c_str());
 }
 
 void hlpflt(unsigned iButton, unsigned iMessage, float data) {
 	std::string fmtStr;
 	loadString(fmtStr, iMessage);
-	SetWindowText(ButtonWin->at(iButton), fmt::format(fmtStr, data).c_str());
+	SetWindowText(ButtonWin->operator[](iButton), fmt::format(fmtStr, data).c_str());
 }
 
 void drwtxbut() {
 	bxtxt(HTXCLR, IDS_CLEAR);
 	hlpflt(HTXHI, IDS_TXHI, TextureScreen.areaHeight / PFGRAN);
-	redraw(ButtonWin->at(HTXWID));
+	redraw(ButtonWin->operator[](HTXWID));
 	hlpflt(HTXSPAC, IDS_TXSPAC, TextureScreen.spacing / PFGRAN);
 	bxtxt(HTXVRT, IDS_TXVRT);
 	bxtxt(HTXHOR, IDS_TXHOR);
 	bxtxt(HTXANG, IDS_TXANG);
 	bxtxt(HTXMIR, IDS_TXMIR);
-	SetWindowText(ButtonWin->at(HTXMIR + 1), "");
+	SetWindowText(ButtonWin->operator[](HTXMIR + 1), "");
 }
 
 void chktx() {
@@ -3207,8 +3207,8 @@ void drwtxtr() {
 		Polyline(StitchWindowMemDC, line, 2);
 	}
 	for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-		dutxtx(SelectedTexturePointsList->at(iPoint), IniFile.textureEditorSize);
-		dutxtx(SelectedTexturePointsList->at(iPoint), IniFile.textureEditorSize << 1);
+		dutxtx(SelectedTexturePointsList->operator[](iPoint), IniFile.textureEditorSize);
+		dutxtx(SelectedTexturePointsList->operator[](iPoint), IniFile.textureEditorSize << 1);
 	}
 	BitBlt(StitchWindowDC, 0, 0, StitchWindowClientRect.right, StitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
 	drwtxbut();
@@ -3264,7 +3264,7 @@ bool txtclos(unsigned* closestTexturePoint) {
 		deorg(&reference);
 		*closestTexturePoint = 0;
 		for (iPoint = 0; iPoint < TempTexturePoints->size(); iPoint++) {
-			txt2pix(TempTexturePoints->at(iPoint), &point);
+			txt2pix(TempTexturePoints->operator[](iPoint), &point);
 			length = hypot(point.x - reference.x, point.y - reference.y);
 			if (length < minimumLength) {
 				minimumLength = length;
@@ -3317,11 +3317,11 @@ void dutxrct(TXTRCT* textureRect) {
 	TXPNT*		texturePoint = nullptr;
 
 	if (SelectedTexturePointsList->size()) {
-		texturePoint = &TempTexturePoints->at(SelectedTexturePointsList->at(0));
+		texturePoint = &TempTexturePoints->operator[](SelectedTexturePointsList->operator[](0));
 		textureRect->left = textureRect->right = texturePoint->line;
 		textureRect->top = textureRect->bottom = texturePoint->y;
 		for (iPoint = 1; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-			texturePoint = &TempTexturePoints->at(SelectedTexturePointsList->at(iPoint));
+			texturePoint = &TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint));
 			if (texturePoint->y > textureRect->top)
 				textureRect->top = texturePoint->y;
 			if (texturePoint->y < textureRect->bottom)
@@ -3462,7 +3462,7 @@ void txtrup() {
 		if (xCoord > 0)
 			textureOffset.line -= xCoord;
 		for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-			texturePoint = &TempTexturePoints->at(SelectedTexturePointsList->at(iPoint));
+			texturePoint = &TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint));
 			texturePoint->line += textureOffset.line;
 			texturePoint->y += textureOffset.y;
 		}
@@ -3485,10 +3485,10 @@ void txtrup() {
 			}
 			SelectedTexturePointsList->clear();
 			for (iPoint = 0; iPoint < TempTexturePoints->size(); iPoint++) {
-				if (TempTexturePoints->at(iPoint).y < highestTexturePoint.y &&
-					TempTexturePoints->at(iPoint).y > lowestTexturePoint.y &&
-					TempTexturePoints->at(iPoint).line <= highestTexturePoint.line &&
-					TempTexturePoints->at(iPoint).line >= lowestTexturePoint.line) {
+				if (TempTexturePoints->operator[](iPoint).y < highestTexturePoint.y &&
+					TempTexturePoints->operator[](iPoint).y > lowestTexturePoint.y &&
+					TempTexturePoints->operator[](iPoint).line <= highestTexturePoint.line &&
+					TempTexturePoints->operator[](iPoint).line >= lowestTexturePoint.line) {
 					SelectedTexturePointsList->push_back(iPoint);
 				}
 			}
@@ -3628,7 +3628,7 @@ void butsid(unsigned windowId) {
 
 	chktxnum();
 	TextureWindowId = windowId;
-	GetWindowRect(ButtonWin->at(windowId), &buttonRect);
+	GetWindowRect(ButtonWin->operator[](windowId), &buttonRect);
 	SideWindowButton = CreateWindow(
 		"STATIC",
 		0,
@@ -3782,7 +3782,7 @@ void altx() {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		halfHeight = TextureScreen.areaHeight / 2;
 		for (iPoint = 0; iPoint < TempTexturePoints->size(); iPoint++) {
-			txtLines.set(TempTexturePoints->at(iPoint).line);
+			txtLines.set(TempTexturePoints->operator[](iPoint).line);
 		}
 		for (iLine = 1; iLine <= TextureScreen.lines; iLine++) {
 			if (!txtLines.test(iLine)) {
@@ -3835,12 +3835,12 @@ void dutxmir() {
 
 	savtxt();
 	std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txcmp);
-	while (TempTexturePoints->at(iPoint).line > centerLine && iPoint >= 0)
+	while (TempTexturePoints->operator[](iPoint).line > centerLine && iPoint >= 0)
 		iPoint--;
 	iMirrorPoint = iPoint + 1;
 	if (TextureScreen.lines & 1) {
 		while (iPoint >= 0) {
-			if (TempTexturePoints->at(iPoint).line == centerLine) {
+			if (TempTexturePoints->operator[](iPoint).line == centerLine) {
 				iPoint--;
 			}
 			else { break; }
@@ -3848,41 +3848,41 @@ void dutxmir() {
 	}
 	TempTexturePoints->resize(iMirrorPoint);
 	for (iPoint = 0; iPoint < iMirrorPoint; iPoint++) {
-		TempTexturePoints->push_back({ TempTexturePoints->at(iPoint).y, gsl::narrow<unsigned short>(TextureScreen.lines - TempTexturePoints->at(iPoint).line + 1) });
+		TempTexturePoints->push_back({ TempTexturePoints->operator[](iPoint).y, gsl::narrow<unsigned short>(TextureScreen.lines - TempTexturePoints->operator[](iPoint).line + 1) });
 	}
 	StateMap.set(StateFlag::RESTCH);
 }
 
 bool chkbut() {
-	if (Msg.hwnd == ButtonWin->at(HTXCLR)) {
+	if (Msg.hwnd == ButtonWin->operator[](HTXCLR)) {
 		txdelal();
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin->at(HTXHI)) {
+	if (Msg.hwnd == ButtonWin->operator[](HTXHI)) {
 		butsid(HTXHI);
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin->at(HTXWID)) {
+	if (Msg.hwnd == ButtonWin->operator[](HTXWID)) {
 		butsid(HTXWID);
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin->at(HTXSPAC)) {
+	if (Msg.hwnd == ButtonWin->operator[](HTXSPAC)) {
 		butsid(HTXSPAC);
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin->at(HTXVRT)) {
+	if (Msg.hwnd == ButtonWin->operator[](HTXVRT)) {
 		dutxfn(VRTYP);
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin->at(HTXHOR)) {
+	if (Msg.hwnd == ButtonWin->operator[](HTXHOR)) {
 		dutxfn(HORTYP);
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin->at(HTXANG)) {
+	if (Msg.hwnd == ButtonWin->operator[](HTXANG)) {
 		dutxfn(ANGTYP);
 		return 1;
 	}
-	if (Msg.hwnd == ButtonWin->at(HTXMIR)) {
+	if (Msg.hwnd == ButtonWin->operator[](HTXMIR)) {
 		dutxmir();
 		return 1;
 	}
@@ -3917,7 +3917,7 @@ void txtlbut() {
 		}
 	}
 	if (SelectedTexturePointsList->size()) {
-		if (txtclos(&SelectedTexturePointsList->at(0))) {
+		if (txtclos(&SelectedTexturePointsList->operator[](0))) {
 			SelectedTexturePointsList->resize(1);
 			setxmov();
 			dutxrct(&TextureRect);
@@ -4005,7 +4005,7 @@ void txtdel() {
 		tmpTexture.reserve(TempTexturePoints->size() - SelectedTexturePointsList->size());
 		for (iSourcePoint = 0; iSourcePoint < TempTexturePoints->size(); iSourcePoint++) {
 			if (!texturePointsMap.test(iSourcePoint)) {
-				tmpTexture.push_back(TempTexturePoints->at(iSourcePoint));
+				tmpTexture.push_back(TempTexturePoints->operator[](iSourcePoint));
 			}
 		}
 		*TempTexturePoints = tmpTexture;
@@ -4078,13 +4078,13 @@ void txcntrv() {
 }
 
 void txof() {
-	butxt(HBOXSEL, StringTable->at(STR_BOXSEL));
-	redraw(ButtonWin->at(HHID));
+	butxt(HBOXSEL, StringTable->operator[](STR_BOXSEL));
+	redraw(ButtonWin->operator[](HHID));
 	if (StateMap.test(StateFlag::UPTO))
-		butxt(HUPTO, StringTable->at(STR_UPON));
+		butxt(HUPTO, StringTable->operator[](STR_UPON));
 	else
-		butxt(HUPTO, StringTable->at(STR_UPOF));
-	SetWindowText(ButtonWin->at(HTXSPAC), "");
+		butxt(HUPTO, StringTable->operator[](STR_UPOF));
+	SetWindowText(ButtonWin->operator[](HTXSPAC), "");
 	savtxt();
 	zumhom();
 	SelectedTexturePointsList->clear();
@@ -4152,25 +4152,25 @@ void txnudg(int deltaX, float deltaY) {
 		if (deltaY) {
 			screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
 			for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-				yCoord = TempTexturePoints->at(SelectedTexturePointsList->at(iPoint)).y + screenDeltaY;
+				yCoord = TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint)).y + screenDeltaY;
 				if (yCoord < 0)
 					return;
 				if (yCoord > TextureScreen.areaHeight)
 					return;
 			}
 			for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++)
-				TempTexturePoints->at(SelectedTexturePointsList->at(iPoint)).y += screenDeltaY;
+				TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint)).y += screenDeltaY;
 		}
 		else {
 			for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-				textureLine = TempTexturePoints->at(SelectedTexturePointsList->at(iPoint)).line + deltaX;
+				textureLine = TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint)).line + deltaX;
 				if (textureLine < 1)
 					return;
 				if (textureLine > TextureScreen.lines)
 					return;
 			}
 			for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++)
-				TempTexturePoints->at(SelectedTexturePointsList->at(iPoint)).line += deltaX;
+				TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint)).line += deltaX;
 		}
 	}
 	dutxrct(&TextureRect);
@@ -4188,14 +4188,14 @@ void txsnap() {
 		halfGrid = IniFile.gridSize / 2;
 		if (SelectedTexturePointsList->size()) {
 			for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-				texturePoint = &TempTexturePoints->at(SelectedTexturePointsList->at(iPoint));
+				texturePoint = &TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint));
 				yStep = (texturePoint->y + halfGrid) / IniFile.gridSize;
 				texturePoint->y = yStep * IniFile.gridSize;
 			}
 		}
 		else {
 			for (iPoint = 0; iPoint < TempTexturePoints->size(); iPoint++) {
-				texturePoint = &TempTexturePoints->at(iPoint);
+				texturePoint = &TempTexturePoints->operator[](iPoint);
 				yStep = (texturePoint->y + halfGrid) / IniFile.gridSize;
 				texturePoint->y = yStep * IniFile.gridSize;
 			}

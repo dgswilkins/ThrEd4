@@ -1611,7 +1611,7 @@ BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			hwnd = GetDlgItem(hwndlg, IDC_DESED);
 			GetWindowText(hwnd, IniFile.designerName, 50);
 			EndDialog(hwndlg, 0);
-			SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRED), IniFile.designerName).c_str());
+			SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), IniFile.designerName).c_str());
 			return TRUE;
 		}
 	}
@@ -1989,7 +1989,7 @@ void deldu() {
 	unsigned iBuffer = 0;
 
 	for (iBuffer = 0; iBuffer < 16; iBuffer++) {
-		UndoBuffer->at(iBuffer).reset(nullptr);
+		UndoBuffer->operator[](iBuffer).reset(nullptr);
 	}
 	UndoBufferWriteIndex = 0;
 	StateMap.reset(StateFlag::BAKWRAP);
@@ -2010,12 +2010,12 @@ void dudat() {
 	unsigned	size = 0;
 	BAKHED*		backupData = nullptr;
 
-	UndoBuffer->at(UndoBufferWriteIndex).reset(nullptr);
+	UndoBuffer->operator[](UndoBufferWriteIndex).reset(nullptr);
 	size = sizeof(BAKHED) + sizeof(FRMHED)*FormIndex + sizeof(fPOINTATTR)*PCSHeader.stitchCount
 		+ sizeof(fPOINT)*(FormVertexIndex + ClipPointIndex) + sizeof(SATCON)*SatinGuideIndex + sizeof(COLORREF) * 16 +
 		sizeof(TXPNT)*TextureIndex;
-	UndoBuffer->at(UndoBufferWriteIndex) = std::make_unique<unsigned[]>(size);
-	backupData = convert_ptr<BAKHED *>(UndoBuffer->at(UndoBufferWriteIndex).get());
+	UndoBuffer->operator[](UndoBufferWriteIndex) = std::make_unique<unsigned[]>(size);
+	backupData = convert_ptr<BAKHED *>(UndoBuffer->operator[](UndoBufferWriteIndex).get());
 	if (backupData) {
 		backupData->zoomRect.x = UnzoomedRect.x;
 		backupData->zoomRect.y = UnzoomedRect.y;
@@ -2534,7 +2534,7 @@ void lensadj() {
 
 void ritot(unsigned number) {
 	std::string txt;
-	txt = fmt::format(StringTable->at(STR_TOT), number);
+	txt = fmt::format(StringTable->operator[](STR_TOT), number);
 	BufferDigitCount = txt.size();
 	butxt(HTOT, txt);
 }
@@ -2554,7 +2554,7 @@ void ritlayr() {
 	}
 	else {
 		std::string txt;
-		txt = fmt::format(StringTable->at(STR_LAYR), layer);
+		txt = fmt::format(StringTable->operator[](STR_LAYR), layer);
 		BufferDigitCount = txt.size();
 		butxt(HLAYR, txt);
 	}
@@ -2564,8 +2564,8 @@ void nuRct() {
 	GetClientRect(ThrEdWindow, &ThredWindowRect);
 	GetWindowRect(ColorBar, &ColorBarRect);
 	if (ButtonWin->size() != 0) {
-		GetWindowRect(ButtonWin->at(HMINLEN), &MinLenRect);
-		GetWindowRect(ButtonWin->at(HMAXLEN), &MaxLenRect);
+		GetWindowRect(ButtonWin->operator[](HMINLEN), &MinLenRect);
+		GetWindowRect(ButtonWin->operator[](HMAXLEN), &MaxLenRect);
 	}
 	ReleaseDC(ColorBar, ColorBarDC);
 	ColorBarDC = GetDC(ColorBar);
@@ -3032,7 +3032,7 @@ void dun() {
 		else {
 			std::string fmtStr;
 			loadString(fmtStr, IDS_SAVFIL);
-			if (MessageBox(ThrEdWindow, fmt::format(fmtStr, ThrName).c_str(), StringTable->at(STR_CLOS).c_str(), MB_YESNO) == IDYES)
+			if (MessageBox(ThrEdWindow, fmt::format(fmtStr, ThrName).c_str(), StringTable->operator[](STR_CLOS).c_str(), MB_YESNO) == IDYES)
 				save();
 			reldun();
 		}
@@ -3989,7 +3989,7 @@ void stchred(unsigned count, const fPOINTATTR* source) noexcept {
 }
 
 void redbak() {
-	const BAKHED*	undoData = convert_ptr<BAKHED *>(UndoBuffer->at(UndoBufferWriteIndex).get());
+	const BAKHED*	undoData = convert_ptr<BAKHED *>(UndoBuffer->operator[](UndoBufferWriteIndex).get());
 	if (undoData) {
 		unsigned		iColor = 0;
 
@@ -4499,14 +4499,14 @@ void auxmen() {
 	switch (IniFile.auxFileType) {
 	case AUXDST:
 
-		auxMsg = fmt::format(StringTable->at(STR_AUXTXT), "DST"); 
+		auxMsg = fmt::format(StringTable->operator[](STR_AUXTXT), "DST"); 
 		CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_UNCHECKED);
 		break;
 
 	default:
 
-		auxMsg = fmt::format(StringTable->at(STR_AUXTXT), "PCS"); 
+		auxMsg = fmt::format(StringTable->operator[](STR_AUXTXT), "PCS"); 
 		CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
 	}
@@ -5079,7 +5079,7 @@ void nuFil() {
 			auxmen();
 		}
 		lenCalc();
-		SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRDBY), WorkingFileName, DesignerName).c_str());
+		SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRDBY), WorkingFileName, DesignerName).c_str());
 		CloseHandle(FileHandle);
 		StateMap.set(StateFlag::INIT);
 		StateMap.reset(StateFlag::TRSET);
@@ -5412,8 +5412,8 @@ bool chkattr(char* filename) {
 		return 1;
 	if (attributes&FILE_ATTRIBUTE_READONLY && attributes != 0xffffffff) {
 		buttonPressed = MessageBox(ThrEdWindow, 
-								   fmt::format(StringTable->at(STR_OVRLOK), filename).c_str(),
-								   StringTable->at(STR_OVRIT).c_str(), 
+								   fmt::format(StringTable->operator[](STR_OVRLOK), filename).c_str(),
+								   StringTable->operator[](STR_OVRIT).c_str(), 
 								   MB_YESNO);
 		if (buttonPressed == IDYES)
 			SetFileAttributes(filename, attributes&(0xffffffff ^ FILE_ATTRIBUTE_READONLY));
@@ -6187,19 +6187,19 @@ void unthum() {
 		for (iBackup = 0; iBackup < 4; iBackup++)
 			DestroyWindow(BackupViewer[iBackup]);
 		if (StateMap.test(StateFlag::UPTO))
-			butxt(HUPTO, StringTable->at(STR_UPON));
+			butxt(HUPTO, StringTable->operator[](STR_UPON));
 		else
-			butxt(HUPTO, StringTable->at(STR_UPOF));
+			butxt(HUPTO, StringTable->operator[](STR_UPOF));
 		std::string blank("");
 		butxt(HNUM, blank);
-		redraw(ButtonWin->at(HHID));
-		butxt(HBOXSEL, StringTable->at(STR_BOXSEL));
+		redraw(ButtonWin->operator[](HHID));
+		butxt(HBOXSEL, StringTable->operator[](STR_BOXSEL));
 	}
 }
 
 void toglup() {
 	if (StateMap.testAndFlip(StateFlag::UPTO))
-		butxt(HUPTO, StringTable->at(STR_UPOF));
+		butxt(HUPTO, StringTable->operator[](STR_UPOF));
 	else {
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
 			rngadj();
@@ -6218,7 +6218,7 @@ void toglup() {
 				}
 			}
 		}
-		butxt(HUPTO, StringTable->at(STR_UPON));
+		butxt(HUPTO, StringTable->operator[](STR_UPON));
 	}
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -6229,7 +6229,7 @@ void toglHid() {
 	else
 		StateMap.set(StateFlag::FRMOF);
 	unthum();
-	redraw(ButtonWin->at(HHID));
+	redraw(ButtonWin->operator[](HHID));
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -6656,8 +6656,8 @@ void newFil() {
 		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
 	deldu();
-	SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRED), IniFile.designerName).c_str()); 
-	strcpy_s(ThrName, StringTable->at(STR_NUFIL).c_str());
+	SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), IniFile.designerName).c_str()); 
+	strcpy_s(ThrName, StringTable->operator[](STR_NUFIL).c_str());
 	ritfnam(IniFile.designerName);
 	strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
 	rstdu();
@@ -6782,7 +6782,7 @@ bool oldwnd(HWND window) {
 			return 0;
 	}
 	for (iWindow = 0; iWindow < 9; iWindow++) {
-		if (ButtonWin->at(iWindow) == window)
+		if (ButtonWin->operator[](iWindow) == window)
 			return 0;
 	}
 	if (MainStitchWin == window)
@@ -6873,7 +6873,7 @@ void rstAll() {
 	StateMap.reset(StateFlag::GTWLKLEN);
 	untrace();
 	StateMap.reset(StateFlag::WASEDG);
-	butxt(HUPTO, StringTable->at(STR_UPOF));
+	butxt(HUPTO, StringTable->operator[](STR_UPOF));
 	if (ZoomFactor == 1)
 		StateMap.reset(StateFlag::ZUMED);
 	movStch();
@@ -8424,7 +8424,7 @@ void deltot() {
 	coltab();
 	zumhom();
 	strcpy_s(DesignerName, IniFile.designerName);
-	SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRDBY), ThrName, DesignerName).c_str());
+	SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRDBY), ThrName, DesignerName).c_str());
 }
 
 bool wastch() noexcept {
@@ -8794,7 +8794,7 @@ void getbak() {
 	if (StateMap.test(StateFlag::THUMSHO)) {
 		if (ThumbnailsSelected[FileVersionIndex]) {
 			if (StateMap.test(StateFlag::RBUT)) {
-				strcpy_s(InsertedFileName, Thumbnails->at(ThumbnailsSelected[FileVersionIndex]).data());
+				strcpy_s(InsertedFileName, Thumbnails->operator[](ThumbnailsSelected[FileVersionIndex]).data());
 				StateMap.set(StateFlag::IGNORINS);
 				unthum();
 				StateMap.set(StateFlag::FRMOF);
@@ -8816,7 +8816,7 @@ void getbak() {
 						pchr[2] = 0;
 					}
 				}
-				strcat_s(WorkingFileName, Thumbnails->at(ThumbnailsSelected[FileVersionIndex]).data());
+				strcat_s(WorkingFileName, Thumbnails->operator[](ThumbnailsSelected[FileVersionIndex]).data());
 				StateMap.set(StateFlag::REDOLD);
 				nuFil();
 			}
@@ -9955,7 +9955,7 @@ void barnam(HWND window, unsigned iThumbnail) {
 	char*		lastCharacter = nullptr;
 
 	if (iThumbnail < ThumbnailDisplayCount) {
-		strcpy_s(buffer, Thumbnails->at(ThumbnailsSelected[iThumbnail]).data());
+		strcpy_s(buffer, Thumbnails->operator[](ThumbnailsSelected[iThumbnail]).data());
 		lastCharacter = strrchr(buffer, '.');
 		if (lastCharacter)
 			lastCharacter[0] = 0;
@@ -9969,22 +9969,22 @@ void rthumnam(unsigned iThumbnail) {
 	switch (iThumbnail) {
 	case 0:
 
-		barnam(ButtonWin->at(HNUM), iThumbnail);
+		barnam(ButtonWin->operator[](HNUM), iThumbnail);
 		break;
 
 	case 1:
 
-		barnam(ButtonWin->at(HTOT), iThumbnail);
+		barnam(ButtonWin->operator[](HTOT), iThumbnail);
 		break;
 
 	case 2:
 
-		barnam(ButtonWin->at(HMINLEN), iThumbnail);
+		barnam(ButtonWin->operator[](HMINLEN), iThumbnail);
 		break;
 
 	case 3:
 
-		barnam(ButtonWin->at(HMAXLEN), iThumbnail);
+		barnam(ButtonWin->operator[](HMAXLEN), iThumbnail);
 		break;
 	}
 }
@@ -10037,7 +10037,7 @@ void thumnail() {
 			rthumnam(iThumbnail++);
 		StateMap.set(StateFlag::THUMSHO);
 		ThumbnailSearchString[0] = 0;
-		SetWindowText(ButtonWin->at(HBOXSEL), "");
+		SetWindowText(ButtonWin->operator[](HBOXSEL), "");
 		std::string blank("");
 		butxt(HBOXSEL, blank);
 		vubak();
@@ -10056,7 +10056,7 @@ void nuthsel() {
 		StateMap.set(StateFlag::RESTCH);
 		if (length) {
 			while (iThumbnail < 4 && ThumbnailIndex < Thumbnails->size()) {
-				if (!strncmp(ThumbnailSearchString, Thumbnails->at(ThumbnailIndex).data(), length)) {
+				if (!strncmp(ThumbnailSearchString, Thumbnails->operator[](ThumbnailIndex).data(), length)) {
 					ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
 					redraw(BackupViewer[iThumbnail++]);
 				}
@@ -10089,7 +10089,7 @@ void nuthbak(unsigned count) {
 			while (count && ThumbnailIndex < MAXFORMS) {
 				if (ThumbnailIndex) {
 					ThumbnailIndex--;
-					if (!strncmp(ThumbnailSearchString, Thumbnails->at(ThumbnailIndex).data(), length))
+					if (!strncmp(ThumbnailSearchString, Thumbnails->operator[](ThumbnailIndex).data(), length))
 						count--;
 				}
 				else
@@ -10348,7 +10348,7 @@ void insfil() {
 								ExtendedHeader.creatorName[iName] = thredHeader.creatorName[iName];
 							}
 							redfnam(DesignerName);
-							SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRDBY), ThrName, DesignerName).c_str());
+							SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRDBY), ThrName, DesignerName).c_str());
 						}
 					}
 					InsertCenter.x = (insertedRectangle.right - insertedRectangle.left) / 2 + insertedRectangle.left;
@@ -10595,19 +10595,19 @@ void desiz() {
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
 		if ((rectangle.left < 0) || (rectangle.bottom < 0) || (rectangle.right > IniFile.hoopSizeX) || (rectangle.top > IniFile.hoopSizeY)) {
-			mw << StringTable->at(STR_STCHOUT);
+			mw << StringTable->operator[](STR_STCHOUT);
 		}
-		mw.write(StringTable->at(STR_STCHS), PCSHeader.stitchCount, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
+		mw.write(StringTable->operator[](STR_STCHS), PCSHeader.stitchCount, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
 	}
 	if (FormIndex) {
 		frmrct(&rectangle);
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
-		mw.write(StringTable->at(STR_FORMS), FormIndex, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
+		mw.write(StringTable->operator[](STR_FORMS), FormIndex, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
 	}
-	mw.write(StringTable->at(STR_HUPWID), (IniFile.hoopSizeX / PFGRAN), (IniFile.hoopSizeY / PFGRAN));
+	mw.write(StringTable->operator[](STR_HUPWID), (IniFile.hoopSizeX / PFGRAN), (IniFile.hoopSizeY / PFGRAN));
 	if (PCSHeader.stitchCount) {
-		mw.write(StringTable->at(STR_CREATBY), DesignerName, ExtendedHeader.modifierName);
+		mw.write(StringTable->operator[](STR_CREATBY), DesignerName, ExtendedHeader.modifierName);
 	}
 	shoMsg(mw.str());
 }
@@ -10635,7 +10635,7 @@ void sidhup() {
 	for (iHoop = 0; iHoop < HUPS; iHoop++) {
 		SideWindow[iHoop] = CreateWindow(
 			"STATIC",
-			StringTable->at(iHoop + STR_HUP0).c_str(),
+			StringTable->operator[](iHoop + STR_HUP0).c_str(),
 			SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 			3,
 			ButtonHeight*iHoop + 3,
@@ -10888,7 +10888,7 @@ void rotmrk() {
 void segentr() {
 	if (!RotationAngle)
 		RotationAngle = PI / 180;
-	shoMsg(fmt::format(StringTable->at(STR_ENTROT), (2 * PI / RotationAngle)));
+	shoMsg(fmt::format(StringTable->operator[](STR_ENTROT), (2 * PI / RotationAngle)));
 	StateMap.set(StateFlag::NUMIN);
 	numWnd();
 }
@@ -11506,7 +11506,7 @@ void untrace() {
 			hidwnd(TraceDownWindow[iTrace]);
 		}
 		for (iButton = 0; iButton < 9; iButton++)
-			shownd(ButtonWin->at(iButton));
+			shownd(ButtonWin->operator[](iButton));
 		hidwnd(TraceStepWin);
 	}
 	else {
@@ -11533,7 +11533,7 @@ void clrhbut(unsigned startButton) {
 	unsigned	iButton;
 
 	for (iButton = startButton; iButton < 9; iButton++)
-		SetWindowText(ButtonWin->at(iButton), "");
+		SetWindowText(ButtonWin->operator[](iButton), "");
 }
 
 void tracwnd() {
@@ -11550,8 +11550,8 @@ void tracwnd() {
 		shownd(TraceUpWindow[iTrace]);
 		shownd(TraceDownWindow[iTrace]);
 	}
-	hidwnd(ButtonWin->at(HBOXSEL));
-	hidwnd(ButtonWin->at(HUPTO));
+	hidwnd(ButtonWin->operator[](HBOXSEL));
+	hidwnd(ButtonWin->operator[](HUPTO));
 	shownd(TraceStepWin);
 	trcstpnum();
 	trcratnum();
@@ -12620,7 +12620,7 @@ void closfn() {
 	PCSBMPFileName[0] = 0;
 	deldu();
 	clrhbut(3);
-	SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRED), IniFile.designerName).c_str());
+	SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), IniFile.designerName).c_str());
 }
 
 void filclos() {
@@ -12733,7 +12733,7 @@ void nudgfn(float deltaX, float deltaY) {
 }
 
 void inline pixmsg(unsigned iString, unsigned pixelCount) {
-	shoMsg(fmt::format(StringTable->at(iString), pixelCount));
+	shoMsg(fmt::format(StringTable->operator[](iString), pixelCount));
 }
 
 void getnpix() {
@@ -13092,7 +13092,7 @@ void esccode() {
 	StateMap.reset(StateFlag::HID);
 	StateMap.reset(StateFlag::FRMOF);
 	StateMap.reset(StateFlag::THRDS);
-	redraw(ButtonWin->at(HHID));
+	redraw(ButtonWin->operator[](HHID));
 	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
 	StateMap.reset(StateFlag::COL);
 	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
@@ -14064,7 +14064,7 @@ unsigned chkMsg() {
 						IniFile.customHoopX = IniFile.hoopSizeX;
 						IniFile.customHoopY = IniFile.hoopSizeY;
 						StateMap.set(StateFlag::MSGOF);
-						shoMsg(fmt::format(StringTable->at(STR_CUSTHUP), IniFile.hoopSizeX / PFGRAN, IniFile.hoopSizeY / PFGRAN));
+						shoMsg(fmt::format(StringTable->operator[](STR_CUSTHUP), IniFile.hoopSizeX / PFGRAN, IniFile.hoopSizeY / PFGRAN));
 						break;
 
 					case SMALHUP:
@@ -14241,23 +14241,23 @@ unsigned chkMsg() {
 			chknum();
 			if (Msg.hwnd == ValueWindow[PSQR]) {
 				if (UserFlagMap.testAndFlip(UserFlag::SQRFIL))
-					SetWindowText(ValueWindow[PSQR], StringTable->at(STR_PNTD).c_str());
+					SetWindowText(ValueWindow[PSQR], StringTable->operator[](STR_PNTD).c_str());
 				else
-					SetWindowText(ValueWindow[PSQR], StringTable->at(STR_SQR).c_str());
+					SetWindowText(ValueWindow[PSQR], StringTable->operator[](STR_SQR).c_str());
 				return 1;
 			}
 			if (Msg.hwnd == ValueWindow[PBLNT]) {
 				if (UserFlagMap.testAndFlip(UserFlag::BLUNT))
-					SetWindowText(ValueWindow[PBLNT], StringTable->at(STR_TAPR).c_str());
+					SetWindowText(ValueWindow[PBLNT], StringTable->operator[](STR_TAPR).c_str());
 				else
-					SetWindowText(ValueWindow[PBLNT], StringTable->at(STR_BLUNT).c_str());
+					SetWindowText(ValueWindow[PBLNT], StringTable->operator[](STR_BLUNT).c_str());
 				return 1;
 			}
 			if (Msg.hwnd == ValueWindow[PUND]) {
 				if (UserFlagMap.testAndFlip(UserFlag::DUND))
-					SetWindowText(ValueWindow[PUND], StringTable->at(STR_OFF).c_str());
+					SetWindowText(ValueWindow[PUND], StringTable->operator[](STR_OFF).c_str());
 				else
-					SetWindowText(ValueWindow[PUND], StringTable->at(STR_ON).c_str());
+					SetWindowText(ValueWindow[PUND], StringTable->operator[](STR_ON).c_str());
 				return 1;
 			}
 			if (Msg.hwnd == ValueWindow[PHUP]) {
@@ -14956,7 +14956,7 @@ unsigned chkMsg() {
 				}
 				if (Msg.hwnd == ValueWindow[LFTHTYP]) {
 					FormMenuChoice = LFTHTYP;
-					sidmsg(ValueWindow[LFTHTYP], &StringTable->at(STR_FTH0), 6);
+					sidmsg(ValueWindow[LFTHTYP], &StringTable->operator[](STR_FTH0), 6);
 					break;
 				}
 				if (Msg.hwnd == ValueWindow[LFRM]) {
@@ -14987,7 +14987,7 @@ unsigned chkMsg() {
 				if (Msg.hwnd == ValueWindow[LFRMFIL]) {
 					StateMap.reset(StateFlag::FILTYP);
 					FormMenuChoice = LFRMFIL;
-					sidmsg(ValueWindow[LFRMFIL], &StringTable->at(STR_FIL0), 14);
+					sidmsg(ValueWindow[LFRMFIL], &StringTable->operator[](STR_FIL0), 14);
 					break;
 				}
 				if (Msg.hwnd == ValueWindow[LFRMCOL]) {
@@ -15022,7 +15022,7 @@ unsigned chkMsg() {
 				}
 				if (Msg.hwnd == ValueWindow[LBRD]) {
 					StateMap.set(StateFlag::FILTYP);
-					sidmsg(ValueWindow[LBRD], &StringTable->at(STR_EDG0), EDGETYPS + 1);
+					sidmsg(ValueWindow[LBRD], &StringTable->operator[](STR_EDG0), EDGETYPS + 1);
 					StateMap.set(StateFlag::BRDACT);
 					break;
 				}
@@ -15458,15 +15458,15 @@ unsigned chkMsg() {
 			StateMap.set(StateFlag::VCAPT);
 			return 1;
 		}
-		if (Msg.hwnd == ButtonWin->at(HBOXSEL)) {
+		if (Msg.hwnd == ButtonWin->operator[](HBOXSEL)) {
 			boxsel();
 			return 1;
 		}
-		if (Msg.hwnd == ButtonWin->at(HUPTO)) {
+		if (Msg.hwnd == ButtonWin->operator[](HUPTO)) {
 			toglup();
 			return 1;
 		}
-		if (Msg.hwnd == ButtonWin->at(HHID)) {
+		if (Msg.hwnd == ButtonWin->operator[](HHID)) {
 			toglHid();
 			return 1;
 		}
@@ -15483,7 +15483,7 @@ unsigned chkMsg() {
 					StateMap.reset(StateFlag::SCROS);
 					StateMap.reset(StateFlag::ECROS);
 					StateMap.set(StateFlag::RESTCH);
-					redraw(ButtonWin->at(HHID));
+					redraw(ButtonWin->operator[](HHID));
 				}
 				else {
 					if (SelectedFormCount) {
@@ -18396,7 +18396,7 @@ void ducmd() {
 						}
 					}
 				}
-				SetWindowText(ThrEdWindow, StringTable->at(STR_EMB).c_str());
+				SetWindowText(ThrEdWindow, StringTable->operator[](STR_EMB).c_str());
 			}
 			*WorkingFileName = 0;
 			DeleteFile(BalaradName1);
@@ -18723,19 +18723,19 @@ void init() {
 		case HBOXSEL:
 
 			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-			buttonTxt = &StringTable->at(STR_BOXSEL);
+			buttonTxt = &StringTable->operator[](STR_BOXSEL);
 			break;
 
 		case HUPTO:
 
 			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-			buttonTxt = &StringTable->at(STR_UPOF);
+			buttonTxt = &StringTable->operator[](STR_UPOF);
 			break;
 
 		case HHID:
 
 			flag = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER;
-			buttonTxt = &StringTable->at(STR_PIKOL);
+			buttonTxt = &StringTable->operator[](STR_PIKOL);
 			break;
 
 		default:
@@ -18744,7 +18744,7 @@ void init() {
 			flag = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
 		}
 		if (buttonTxt) {
-			ButtonWin->at(iButton) = CreateWindow(
+			ButtonWin->operator[](iButton) = CreateWindow(
 				"STATIC",
 				buttonTxt->c_str(),
 				flag,
@@ -18835,7 +18835,7 @@ void init() {
 	PCSHeader.stitchCount = 0;
 	GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
 	ladj();
-	GetTextExtentPoint(StitchWindowMemDC, StringTable->at(STR_PIKOL).c_str(), StringTable->at(STR_PIKOL).size(), &PickColorMsgSize);
+	GetTextExtentPoint(StitchWindowMemDC, StringTable->operator[](STR_PIKOL).c_str(), StringTable->operator[](STR_PIKOL).size(), &PickColorMsgSize);
 	auxmen();
 	fnamtabs();
 	ritfnam(IniFile.designerName);
@@ -18859,7 +18859,7 @@ void init() {
 	chkmen();
 	//check command line-should be last item in init
 	ducmd();
-	SetWindowText(ThrEdWindow, fmt::format(StringTable->at(STR_THRED), IniFile.designerName).c_str()); 
+	SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), IniFile.designerName).c_str()); 
 }
 
 COLORREF defTxt(unsigned iColor) {
@@ -19851,7 +19851,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_WINDOW));
 			return 1;
 		}
-		if (DrawItem->hwndItem == ButtonWin->at(HHID) && DrawItem->itemAction == ODA_DRAWENTIRE) {
+		if (DrawItem->hwndItem == ButtonWin->operator[](HHID) && DrawItem->itemAction == ODA_DRAWENTIRE) {
 			position = (ButtonWidthX3 - PickColorMsgSize.cx) >> 1;
 			if (StateMap.test(StateFlag::HID)) {
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[ActiveColor]);
@@ -19866,7 +19866,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				TextOut(DrawItem->hDC, position, 1, scrWidth.c_str(), scrWidth.size());;
 			}
 			else
-				TextOut(DrawItem->hDC, position, 1, StringTable->at(STR_PIKOL).c_str(), StringTable->at(STR_PIKOL).size());;
+				TextOut(DrawItem->hDC, position, 1, StringTable->operator[](STR_PIKOL).c_str(), StringTable->operator[](STR_PIKOL).size());;
 			return 1;
 		}
 		if (StateMap.test(StateFlag::WASTRAC)) {
@@ -19888,12 +19888,12 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				}
 				if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
 					TempBrush = BlackBrush;
-					strcpy_s(buffer, StringTable->at(STR_OFF).c_str());
+					strcpy_s(buffer, StringTable->operator[](STR_OFF).c_str());
 					SetBkColor(DrawItem->hDC, 0);
 					SetTextColor(DrawItem->hDC, TraceRGB[iRGB]);
 					if (StateMap.test(TraceRGBFlag[iRGB])) {
 						TempBrush = TraceBrush[iRGB];
-						strcpy_s(buffer, StringTable->at(STR_ON).c_str());
+						strcpy_s(buffer, StringTable->operator[](STR_ON).c_str());
 						SetTextColor(DrawItem->hDC, 0);
 						SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 					}
@@ -19945,7 +19945,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			if (StateMap.test(StateFlag::THUMSHO)) {
 				for (iThumb = 0; iThumb < 4; iThumb++) {
 					if (DrawItem->hwndItem == BackupViewer[iThumb] && iThumb < ThumbnailDisplayCount) {
-						ritbak(Thumbnails->at(ThumbnailsSelected[iThumb]).data(), DrawItem);
+						ritbak(Thumbnails->operator[](ThumbnailsSelected[iThumb]).data(), DrawItem);
 						rthumnam(iThumb);
 						return 1;
 					}
