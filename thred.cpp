@@ -415,7 +415,6 @@ extern	unsigned		ClosestVertexToCursor;
 extern	unsigned		ClipPointIndex;
 extern	SATCON*			CurrentFormGuides;
 extern	fPOINT*			CurrentFormVertices;
-extern	HWND			LabelWindow[LASTLIN];
 extern	std::vector<HWND>	*ValueWindow;
 extern	POINT			FormLines[MAXFRMLINS];
 extern	unsigned		FormVertexIndex;
@@ -427,6 +426,7 @@ extern	std::string*	FormOnOff;
 extern	fPOINT			FormVertices[MAXITEMS];
 extern	double			HorizontalRatio;
 extern	fPOINT			InterleaveSequence[MAXITEMS];
+extern	std::vector<HWND>*	LabelWindow;
 extern	double			LineSpacing;
 extern	fPOINT			LowerLeftStitch;
 extern	MENUITEMINFO*	MenuInfo;
@@ -20195,6 +20195,8 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		InsidePointList = &private_InsidePointList;
 		std::vector<HWND>	private_ValueWindow(LASTLIN);
 		ValueWindow = &private_ValueWindow;
+		std::vector<HWND>	private_LabelWindow(LASTLIN);
+		LabelWindow = &private_LabelWindow;
 
 		redini();
 		if (IniFile.initialWindowCoords.right) {

@@ -305,7 +305,7 @@ unsigned		SelectedFormControlVertex;	//user selected form control formOrigin
 POINT			FormControlPoints[10];	//form control rectangle in pixel coordinates
 double			XYratio;				//expand form aspect ratio
 std::vector<HWND>*	ValueWindow;		//data handles for the form data sheet
-HWND			LabelWindow[LASTLIN];	//text handles for the form data sheet
+std::vector<HWND>*	LabelWindow;	//text handles for the form data sheet
 RECT			LabelWindowCoords;		//location of left windows in the form data sheet
 RECT			ValueWindowCoords;		//location of right windows in the form data sheet
 POINT			LabelWindowSize;		//size of the left windows in the form data sheet
@@ -6229,32 +6229,32 @@ void refrmfn() {
 	LabelWindowCoords.right = 3 + LabelWindowSize.x;
 	ValueWindowCoords.left = 6 + LabelWindowSize.x;
 	ValueWindowCoords.right = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
-	LabelWindow[LFRM] = txtwin(StringTable->operator[](STR_TXT0), LabelWindowCoords);
+	LabelWindow->operator[](LFRM) = txtwin(StringTable->operator[](STR_TXT0), LabelWindowCoords);
 	if (SelectedForm->type == FRMLINE)
 		choice = StringTable->operator[](STR_EDG1);
 	else
 		choice = StringTable->operator[](STR_FREH);
 	ValueWindow->operator[](LFRM) = txtrwin(choice, ValueWindowCoords);
 	nxtlin();
-	LabelWindow[LLAYR] = txtwin(StringTable->operator[](STR_TXT1), LabelWindowCoords);
+	LabelWindow->operator[](LLAYR) = txtwin(StringTable->operator[](STR_TXT1), LabelWindowCoords);
 	ValueWindow->operator[](LLAYR) = txtrwin(fmt::format("{}", ((SelectedForm->attribute&FRMLMSK) >> 1)), ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->type != FRMLINE) {
-		LabelWindow[LCWLK] = txtwin(StringTable->operator[](STR_CWLK), LabelWindowCoords);
+		LabelWindow->operator[](LCWLK) = txtwin(StringTable->operator[](STR_CWLK), LabelWindowCoords);
 		if (SelectedForm->extendedAttribute&AT_CWLK)
 			choice = StringTable->operator[](STR_ON);
 		else
 			choice = StringTable->operator[](STR_OFF);
 		ValueWindow->operator[](LCWLK) = txtrwin(choice, ValueWindowCoords);
 		nxtlin();
-		LabelWindow[LWALK] = txtwin(StringTable->operator[](STR_WALK), LabelWindowCoords);
+		LabelWindow->operator[](LWALK) = txtwin(StringTable->operator[](STR_WALK), LabelWindowCoords);
 		if (SelectedForm->extendedAttribute&AT_WALK)
 			choice = StringTable->operator[](STR_ON);
 		else
 			choice = StringTable->operator[](STR_OFF);
 		ValueWindow->operator[](LWALK) = txtrwin(choice, ValueWindowCoords);
 		nxtlin();
-		LabelWindow[LUND] = txtwin(StringTable->operator[](STR_UND), LabelWindowCoords);
+		LabelWindow->operator[](LUND) = txtwin(StringTable->operator[](STR_UND), LabelWindowCoords);
 		if (SelectedForm->extendedAttribute&AT_UND)
 			choice = StringTable->operator[](STR_ON);
 		else
@@ -6262,40 +6262,40 @@ void refrmfn() {
 		ValueWindow->operator[](LUND) = txtrwin(choice, ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->extendedAttribute&(AT_WALK | AT_UND | AT_CWLK)) {
-			LabelWindow[LUNDCOL] = txtwin(StringTable->operator[](STR_UNDCOL), LabelWindowCoords);
+			LabelWindow->operator[](LUNDCOL) = txtwin(StringTable->operator[](STR_UNDCOL), LabelWindowCoords);
 			ValueWindow->operator[](LUNDCOL) = txtrwin(fmt::format("{}", (SelectedForm->underlayColor + 1)), ValueWindowCoords);
 			nxtlin();
-			LabelWindow[LULEN] = txtwin(StringTable->operator[](STR_ULEN), LabelWindowCoords);
+			LabelWindow->operator[](LULEN) = txtwin(StringTable->operator[](STR_ULEN), LabelWindowCoords);
 			ValueWindow->operator[](LULEN) = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
-		LabelWindow[LWLKIND] = txtwin(StringTable->operator[](STR_UWLKIND), LabelWindowCoords);
+		LabelWindow->operator[](LWLKIND) = txtwin(StringTable->operator[](STR_UWLKIND), LabelWindowCoords);
 		ValueWindow->operator[](LWLKIND) = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayIndent / PFGRAN)), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->extendedAttribute&AT_UND) {
-			LabelWindow[LUSPAC] = txtwin(StringTable->operator[](STR_FUSPAC), LabelWindowCoords);
+			LabelWindow->operator[](LUSPAC) = txtwin(StringTable->operator[](STR_FUSPAC), LabelWindowCoords);
 			ValueWindow->operator[](LUSPAC) = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlaySpacing / PFGRAN)), ValueWindowCoords);
 			nxtlin();
-			LabelWindow[LUANG] = txtwin(StringTable->operator[](STR_FUANG), LabelWindowCoords);
+			LabelWindow->operator[](LUANG) = txtwin(StringTable->operator[](STR_FUANG), LabelWindowCoords);
 			ValueWindow->operator[](LUANG) = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayStitchAngle * 180 / PI)), ValueWindowCoords);
 			nxtlin();
 		}
 	}
-	LabelWindow[LFRMFIL] = txtwin(StringTable->operator[](STR_TXT2), LabelWindowCoords);
+	LabelWindow->operator[](LFRMFIL) = txtwin(StringTable->operator[](STR_TXT2), LabelWindowCoords);
 	ValueWindow->operator[](LFRMFIL) = txtrwin(StringTable->operator[](STR_FIL0 + SelectedForm->fillType), ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->fillType) {
-		LabelWindow[LFRMCOL] = txtwin(StringTable->operator[](STR_TXT3), LabelWindowCoords);
+		LabelWindow->operator[](LFRMCOL) = txtwin(StringTable->operator[](STR_TXT3), LabelWindowCoords);
 		ValueWindow->operator[](LFRMCOL) = numwin(fmt::format("{}", (SelectedForm->fillColor + 1)), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == FTHF) {
-			LabelWindow[LFTHCOL] = txtwin(StringTable->operator[](STR_FTHCOL), LabelWindowCoords);
+			LabelWindow->operator[](LFTHCOL) = txtwin(StringTable->operator[](STR_FTHCOL), LabelWindowCoords);
 			ValueWindow->operator[](LFTHCOL) = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.color + 1)), ValueWindowCoords);
 			nxtlin();
-			LabelWindow[LFTHTYP] = txtwin(StringTable->operator[](STR_FTHTYP), LabelWindowCoords);
+			LabelWindow->operator[](LFTHTYP) = txtwin(StringTable->operator[](STR_FTHTYP), LabelWindowCoords);
 			ValueWindow->operator[](LFTHTYP) = numwin(StringTable->operator[](STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1), ValueWindowCoords);
 			nxtlin();
-			LabelWindow[LFTHBLND] = txtwin(StringTable->operator[](STR_FTHBLND), LabelWindowCoords);
+			LabelWindow->operator[](LFTHBLND) = txtwin(StringTable->operator[](STR_FTHBLND), LabelWindowCoords);
 			if (SelectedForm->extendedAttribute&AT_FTHBLND)
 				choice = StringTable->operator[](STR_ON);
 			else
@@ -6303,7 +6303,7 @@ void refrmfn() {
 			ValueWindow->operator[](LFTHBLND) = txtrwin(choice, ValueWindowCoords);
 			nxtlin();
 			if (!(SelectedForm->extendedAttribute&AT_FTHBLND)) {
-				LabelWindow[LFTHBTH] = txtwin(StringTable->operator[](STR_FTHBOTH), LabelWindowCoords);
+				LabelWindow->operator[](LFTHBTH) = txtwin(StringTable->operator[](STR_FTHBOTH), LabelWindowCoords);
 				if (SelectedForm->extendedAttribute&(AT_FTHBTH))
 					choice = StringTable->operator[](STR_ON);
 				else
@@ -6311,7 +6311,7 @@ void refrmfn() {
 				ValueWindow->operator[](LFTHBTH) = txtrwin(choice, ValueWindowCoords);
 				nxtlin();
 				if (!(SelectedForm->extendedAttribute&AT_FTHBTH)) {
-					LabelWindow[LFTHUP] = txtwin(StringTable->operator[](STR_FTHUP), LabelWindowCoords);
+					LabelWindow->operator[](LFTHUP) = txtwin(StringTable->operator[](STR_FTHUP), LabelWindowCoords);
 					if (SelectedForm->extendedAttribute&AT_FTHUP)
 						choice = StringTable->operator[](STR_ON);
 					else
@@ -6320,62 +6320,62 @@ void refrmfn() {
 					nxtlin();
 				}
 			}
-			LabelWindow[LFTHUPCNT] = txtwin(StringTable->operator[](STR_FTHUPCNT), LabelWindowCoords);
+			LabelWindow->operator[](LFTHUPCNT) = txtwin(StringTable->operator[](STR_FTHUPCNT), LabelWindowCoords);
 			ValueWindow->operator[](LFTHUPCNT) = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.upCount)), ValueWindowCoords);
 			nxtlin();
-			LabelWindow[LFTHDWNCNT] = txtwin(StringTable->operator[](STR_FTHDWNCNT), LabelWindowCoords);
+			LabelWindow->operator[](LFTHDWNCNT) = txtwin(StringTable->operator[](STR_FTHDWNCNT), LabelWindowCoords);
 			ValueWindow->operator[](LFTHDWNCNT) = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.downCount)), ValueWindowCoords);
 			nxtlin();
-			LabelWindow[LFTHSIZ] = txtwin(StringTable->operator[](STR_FTHSIZ), LabelWindowCoords);
+			LabelWindow->operator[](LFTHSIZ) = txtwin(StringTable->operator[](STR_FTHSIZ), LabelWindowCoords);
 			ValueWindow->operator[](LFTHSIZ) = numwin(fmt::format("{:.2f}", (SelectedForm->fillInfo.feather.ratio)), ValueWindowCoords);
 			nxtlin();
 			if (SelectedForm->fillInfo.feather.fillType == FTHPSG) {
-				LabelWindow[LFTHNUM] = txtwin(StringTable->operator[](STR_FTHNUM), LabelWindowCoords);
+				LabelWindow->operator[](LFTHNUM) = txtwin(StringTable->operator[](STR_FTHNUM), LabelWindowCoords);
 				ValueWindow->operator[](LFTHNUM) = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.count)), ValueWindowCoords);
 				nxtlin();
 			}
-			LabelWindow[LFTHFLR] = txtwin(StringTable->operator[](STR_FTHFLR), LabelWindowCoords);
+			LabelWindow->operator[](LFTHFLR) = txtwin(StringTable->operator[](STR_FTHFLR), LabelWindowCoords);
 			ValueWindow->operator[](LFTHFLR) = numwin(fmt::format("{:.2f}", (SelectedForm->fillInfo.feather.minStitchSize / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType != CLPF) {
-			LabelWindow[LFRMSPAC] = txtwin(StringTable->operator[](STR_TXT4), LabelWindowCoords);
+			LabelWindow->operator[](LFRMSPAC) = txtwin(StringTable->operator[](STR_TXT4), LabelWindowCoords);
 			ValueWindow->operator[](LFRMSPAC) = numwin(fmt::format("{:.2f}", (SelectedForm->fillSpacing / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (istx(ClosestFormToCursor)) {
-			LabelWindow[LTXOF] = txtwin(StringTable->operator[](STR_TXOF), LabelWindowCoords);
+			LabelWindow->operator[](LTXOF) = txtwin(StringTable->operator[](STR_TXOF), LabelWindowCoords);
 			ValueWindow->operator[](LTXOF) = numwin(fmt::format("{:.2f}", (SelectedForm->txof / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
-		LabelWindow[LMAXFIL] = txtwin(StringTable->operator[](STR_TXT20), LabelWindowCoords);
+		LabelWindow->operator[](LMAXFIL) = txtwin(StringTable->operator[](STR_TXT20), LabelWindowCoords);
 		ValueWindow->operator[](LMAXFIL) = numwin(fmt::format("{:.2f}", (SelectedForm->maxFillStitchLen / PFGRAN)), ValueWindowCoords);
 		nxtlin();
 		if (!isclp(ClosestFormToCursor) && !istx(ClosestFormToCursor)) {
-			LabelWindow[LFRMLEN] = txtwin(StringTable->operator[](STR_TXT5), LabelWindowCoords);
+			LabelWindow->operator[](LFRMLEN) = txtwin(StringTable->operator[](STR_TXT5), LabelWindowCoords);
 			ValueWindow->operator[](LFRMLEN) = numwin(fmt::format("{:.2f}", (SelectedForm->lengthOrCount.stitchLength / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
-		LabelWindow[LMINFIL] = txtwin(StringTable->operator[](STR_TXT21), LabelWindowCoords);
+		LabelWindow->operator[](LMINFIL) = txtwin(StringTable->operator[](STR_TXT21), LabelWindowCoords);
 		ValueWindow->operator[](LMINFIL) = numwin(fmt::format("{:.2f}", (SelectedForm->minFillStitchLen / PFGRAN)), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
-			LabelWindow[LFRMANG] = txtwin(StringTable->operator[](STR_TXT6), LabelWindowCoords);
+			LabelWindow->operator[](LFRMANG) = txtwin(StringTable->operator[](STR_TXT6), LabelWindowCoords);
 			ValueWindow->operator[](LFRMANG) = numwin(fmt::format("{:.2f}", (SelectedForm->angleOrClipData.angle * 180 / PI)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == ANGCLPF) {
-			LabelWindow[LSACANG] = txtwin(StringTable->operator[](STR_TXT6), LabelWindowCoords);
+			LabelWindow->operator[](LSACANG) = txtwin(StringTable->operator[](STR_TXT6), LabelWindowCoords);
 			ValueWindow->operator[](LSACANG) = numwin(fmt::format("{:.2f}", (SelectedForm->satinOrAngle.angle * 180 / PI)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VCLPF || SelectedForm->fillType == HCLPF || SelectedForm->fillType == ANGCLPF) {
-			LabelWindow[LFRMFAZ] = txtwin(StringTable->operator[](STR_TXT18), LabelWindowCoords);
+			LabelWindow->operator[](LFRMFAZ) = txtwin(StringTable->operator[](STR_TXT18), LabelWindowCoords);
 			ValueWindow->operator[](LFRMFAZ) = numwin(fmt::format("{}", (SelectedForm->wordParam)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VRTF || SelectedForm->fillType == HORF || SelectedForm->fillType == ANGF || istx(ClosestFormToCursor)) {
-			LabelWindow[LBFILSQR] = txtwin(StringTable->operator[](STR_PRF2), LabelWindowCoords);
+			LabelWindow->operator[](LBFILSQR) = txtwin(StringTable->operator[](STR_PRF2), LabelWindowCoords);
 			if (SelectedForm->extendedAttribute&AT_SQR)
 				choice = StringTable->operator[](STR_SQR);
 			else
@@ -6384,7 +6384,7 @@ void refrmfn() {
 			nxtlin();
 		}
 	}
-	LabelWindow[LFSTRT] = txtwin(StringTable->operator[](STR_FSTRT), LabelWindowCoords);
+	LabelWindow->operator[](LFSTRT) = txtwin(StringTable->operator[](STR_FSTRT), LabelWindowCoords);
 	if (SelectedForm->extendedAttribute&AT_STRT)
 		choice = StringTable->operator[](STR_ON);
 	else
@@ -6392,11 +6392,11 @@ void refrmfn() {
 	ValueWindow->operator[](LFSTRT) = txtrwin(choice, ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->extendedAttribute&AT_STRT) {
-		LabelWindow[LDSTRT] = txtwin(StringTable->operator[](STR_FSTRT), LabelWindowCoords);
+		LabelWindow->operator[](LDSTRT) = txtwin(StringTable->operator[](STR_FSTRT), LabelWindowCoords);
 		ValueWindow->operator[](LDSTRT) = numwin(fmt::format("{}", (SelectedForm->fillStart)), ValueWindowCoords);
 		nxtlin();
 	}
-	LabelWindow[LFEND] = txtwin(StringTable->operator[](STR_FEND), LabelWindowCoords);
+	LabelWindow->operator[](LFEND) = txtwin(StringTable->operator[](STR_FEND), LabelWindowCoords);
 	if (SelectedForm->extendedAttribute&AT_END)
 		choice = StringTable->operator[](STR_ON);
 	else
@@ -6404,19 +6404,19 @@ void refrmfn() {
 	ValueWindow->operator[](LFEND) = txtrwin(choice, ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->extendedAttribute&AT_END) {
-		LabelWindow[LDEND] = txtwin(StringTable->operator[](STR_FEND), LabelWindowCoords);
+		LabelWindow->operator[](LDEND) = txtwin(StringTable->operator[](STR_FEND), LabelWindowCoords);
 		ValueWindow->operator[](LDEND) = numwin(fmt::format("{}", (SelectedForm->fillEnd)), ValueWindowCoords);
 		nxtlin();
 	}
-	LabelWindow[LBRD] = txtwin(StringTable->operator[](STR_TXT7), LabelWindowCoords);
+	LabelWindow->operator[](LBRD) = txtwin(StringTable->operator[](STR_TXT7), LabelWindowCoords);
 	ValueWindow->operator[](LBRD) = txtrwin(StringTable->operator[](STR_EDG0 + edgeFillType), ValueWindowCoords);
 	nxtlin();
 	if (edgeFillType) {
-		LabelWindow[LBRDCOL] = txtwin(StringTable->operator[](STR_TXT8), LabelWindowCoords);
+		LabelWindow->operator[](LBRDCOL) = txtwin(StringTable->operator[](STR_TXT8), LabelWindowCoords);
 		ValueWindow->operator[](LBRDCOL) = numwin(fmt::format("{}", ((SelectedForm->borderColor & COLMSK) + 1)), ValueWindowCoords);
 		nxtlin();
 		if (EdgeArray[iEdge] & BESPAC) {
-			LabelWindow[LBRDSPAC] = txtwin(StringTable->operator[](STR_TXT9), LabelWindowCoords);
+			LabelWindow->operator[](LBRDSPAC) = txtwin(StringTable->operator[](STR_TXT9), LabelWindowCoords);
 			if (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN)
 				choice = fmt::format("{:.2f}", (SelectedForm->edgeSpacing / PFGRAN));
 			else
@@ -6425,47 +6425,47 @@ void refrmfn() {
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BPICSPAC) {
-			LabelWindow[LBRDPIC] = txtwin(StringTable->operator[](STR_TXT16), LabelWindowCoords);
+			LabelWindow->operator[](LBRDPIC) = txtwin(StringTable->operator[](STR_TXT16), LabelWindowCoords);
 			ValueWindow->operator[](LBRDPIC) = numwin(fmt::format("{:.2f}", (SelectedForm->edgeSpacing / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BEMAX) {
-			LabelWindow[LMAXBRD] = txtwin(StringTable->operator[](STR_TXT22), LabelWindowCoords);
+			LabelWindow->operator[](LMAXBRD) = txtwin(StringTable->operator[](STR_TXT22), LabelWindowCoords);
 			ValueWindow->operator[](LMAXBRD) = numwin(fmt::format("{:.2f}", (SelectedForm->maxBorderStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BELEN) {
-			LabelWindow[LBRDLEN] = txtwin(StringTable->operator[](STR_TXT10), LabelWindowCoords);
+			LabelWindow->operator[](LBRDLEN) = txtwin(StringTable->operator[](STR_TXT10), LabelWindowCoords);
 			ValueWindow->operator[](LBRDLEN) = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BEMIN) {
-			LabelWindow[LMINBRD] = txtwin(StringTable->operator[](STR_TXT23), LabelWindowCoords);
+			LabelWindow->operator[](LMINBRD) = txtwin(StringTable->operator[](STR_TXT23), LabelWindowCoords);
 			ValueWindow->operator[](LMINBRD) = numwin(fmt::format("{:.2f}", (SelectedForm->minBorderStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BESIZ) {
-			LabelWindow[LBRDSIZ] = txtwin(StringTable->operator[](STR_TXT11), LabelWindowCoords);
+			LabelWindow->operator[](LBRDSIZ) = txtwin(StringTable->operator[](STR_TXT11), LabelWindowCoords);
 			ValueWindow->operator[](LBRDSIZ) = numwin(fmt::format("{:.2f}", (SelectedForm->borderSize / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BRDPOS) {
-			LabelWindow[LBRDPOS] = txtwin(StringTable->operator[](STR_TXT18), LabelWindowCoords);
+			LabelWindow->operator[](LBRDPOS) = txtwin(StringTable->operator[](STR_TXT18), LabelWindowCoords);
 			ValueWindow->operator[](LBRDPOS) = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & CHNPOS) {
-			LabelWindow[LBRDPOS] = txtwin(StringTable->operator[](STR_TXT19), LabelWindowCoords);
+			LabelWindow->operator[](LBRDPOS) = txtwin(StringTable->operator[](STR_TXT19), LabelWindowCoords);
 			ValueWindow->operator[](LBRDPOS) = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (edgeFillType == EDGEAPPL) {
-			LabelWindow[LAPCOL] = txtwin(StringTable->operator[](STR_TXT12), LabelWindowCoords);
+			LabelWindow->operator[](LAPCOL) = txtwin(StringTable->operator[](STR_TXT12), LabelWindowCoords);
 			ValueWindow->operator[](LAPCOL) = numwin(fmt::format("{}", ((SelectedForm->borderColor >> 4) + 1)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (edgeFillType == EDGEANGSAT || edgeFillType == EDGEAPPL || edgeFillType == EDGEPROPSAT) {
-			LabelWindow[LBRDUND] = txtwin(StringTable->operator[](STR_TXT17), LabelWindowCoords);
+			LabelWindow->operator[](LBRDUND) = txtwin(StringTable->operator[](STR_TXT17), LabelWindowCoords);
 			if (SelectedForm->edgeType&EGUND)
 				choice = StringTable->operator[](STR_ON);
 			else
@@ -6478,19 +6478,19 @@ void refrmfn() {
 				choice = fmt::format("{:.2f}", (getblen() / PFGRAN));
 			else
 				choice = fmt::format("{:.2f}", (getplen() / PFGRAN));
-			LabelWindow[LBCSIZ] = txtwin(StringTable->operator[](STR_TXT13), LabelWindowCoords);
+			LabelWindow->operator[](LBCSIZ) = txtwin(StringTable->operator[](STR_TXT13), LabelWindowCoords);
 			ValueWindow->operator[](LBCSIZ) = numwin(choice, ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->type == FRMLINE && EdgeArray[iEdge] & BRDEND) {
-			LabelWindow[LBSTRT] = txtwin(StringTable->operator[](STR_TXT14), LabelWindowCoords);
+			LabelWindow->operator[](LBSTRT) = txtwin(StringTable->operator[](STR_TXT14), LabelWindowCoords);
 			if (SelectedForm->attribute&SBLNT)
 				choice = StringTable->operator[](STR_BLUNT);
 			else
 				choice = StringTable->operator[](STR_TAPR);
 			ValueWindow->operator[](LBSTRT) = numwin(choice, ValueWindowCoords);
 			nxtlin();
-			LabelWindow[LBFIN] = txtwin(StringTable->operator[](STR_TXT15), LabelWindowCoords);
+			LabelWindow->operator[](LBFIN) = txtwin(StringTable->operator[](STR_TXT15), LabelWindowCoords);
 			if (SelectedForm->attribute&FBLNT)
 				choice = StringTable->operator[](STR_BLUNT);
 			else
