@@ -42,7 +42,7 @@ extern void		frmdel ();
 extern void		fthrfn ();
 extern void		grpAdj ();
 extern void		insadj ();
-extern fPOINT*	insid ();
+extern std::vector<fPOINT>*	insid ();
 extern void		intlv (const FILLSTARTS &FillStartsData);
 extern bool		isclp (unsigned find);
 extern bool		isclpx (unsigned find);
@@ -295,10 +295,10 @@ unsigned short	StartPoint;				//starting formOrigin for a satin stitch guide-lin
 double			HorizontalLength2;		//horizontal length of a clipboard fill/2
 double			HorizontalLength;		//horizontal length of a clipboard fill
 fPOINT			LastPoint;				//last formOrigin written by line connect routine
-fPOINT			OutsidePointList[MAXFRMLINS];	//list of outside outline points for satin or clipboard fills
-fPOINT			InsidePointList[MAXFRMLINS];	//list of inside outline points for satin or clipboard fills
-fPOINT*			OutsidePoints;			//pointer to the list of outside outline points
-fPOINT*			InsidePoints;			//pointer to the list of inside outline points
+std::vector<fPOINT>	*OutsidePointList;	//list of outside outline points for satin or clipboard fills
+std::vector<fPOINT>	*InsidePointList;	//list of inside outline points for satin or clipboard fills
+std::vector<fPOINT>*	OutsidePoints;	//pointer to the list of outside outline points
+std::vector<fPOINT>*	InsidePoints;	//pointer to the list of inside outline points
 fPOINT			ClipReference;			//clipboard reference formOrigin
 double			BorderWidth = BRDWID;	//border width for satin borders
 unsigned		SelectedFormControlVertex;	//user selected form control formOrigin
@@ -856,9 +856,10 @@ void frmlin(const fPOINT* vertices, unsigned vertexCount) noexcept {
 }
 
 void frmlin(const std::vector<fPOINT> &vertices) {
-	unsigned	iVertex = 0, vertexMax = vertices.size();
+	unsigned	iVertex = 0;
+	const unsigned vertexMax = vertices.size();
 
-	if (VertexCount) {
+	if (vertexMax) {
 		for (iVertex = 0; iVertex < vertexMax; iVertex++) {
 			FormLines[iVertex].x = (vertices[iVertex].x - ZoomRect.left)*ZoomRatio.x;
 			FormLines[iVertex].y = StitchWindowClientRect.bottom - (vertices[iVertex].y - ZoomRect.bottom)*ZoomRatio.y;
@@ -5151,7 +5152,7 @@ void satzum() {
 	StateMap.reset(StateFlag::SHOSAT);
 	duzrat();
 	VertexCount = SatinIndex;
-	frmlin(*TempPolygon, SatinIndex);
+	frmlin(*TempPolygon);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	SelectObject(StitchWindowMemDC, FormPen);
 	Polyline(StitchWindowMemDC, FormLines, SatinIndex);
@@ -5575,7 +5576,7 @@ void clpbrd(unsigned short startVertex) {
 	}
 }
 
-void outfn(unsigned start, unsigned finish, double satinWidth) noexcept {
+void outfn(unsigned start, unsigned finish, double satinWidth) {
 	double	angle = 0.0;
 	double	length = 0.0;
 	double	xOffset = 0.0, yOffset = 0.0;
@@ -5597,10 +5598,10 @@ void outfn(unsigned start, unsigned finish, double satinWidth) noexcept {
 		xOffset = length * cos(angle);
 		yOffset = length * sin(angle);
 	}
-	InsidePoints[finish].x = CurrentFormVertices[finish].x - xOffset;
-	InsidePoints[finish].y = CurrentFormVertices[finish].y - yOffset;
-	OutsidePoints[finish].x = CurrentFormVertices[finish].x + xOffset;
-	OutsidePoints[finish].y = CurrentFormVertices[finish].y + yOffset;
+	InsidePoints->operator[](finish).x = CurrentFormVertices[finish].x - xOffset;
+	InsidePoints->operator[](finish).y = CurrentFormVertices[finish].y - yOffset;
+	OutsidePoints->operator[](finish).x = CurrentFormVertices[finish].x + xOffset;
+	OutsidePoints->operator[](finish).y = CurrentFormVertices[finish].y + yOffset;
 }
 
 void duangs() noexcept {
@@ -5617,13 +5618,15 @@ void satout(double satinWidth) {
 
 	if (VertexCount) {
 		duangs();
+		OutsidePointList->resize(VertexCount);
+		InsidePointList->resize(VertexCount);
 		OutsidePoints = OutsidePointList;
 		InsidePoints = InsidePointList;
 		for (iVertex = 0; iVertex < VertexCount - 1; iVertex++)
 			outfn(iVertex, iVertex + 1, 0.1);
 		count = 0;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-			if (cisin(InsidePoints[iVertex].x, InsidePoints[iVertex].y))
+			if (cisin(InsidePoints->operator[](iVertex).x, InsidePoints->operator[](iVertex).y))
 				count++;
 		}
 		satinWidth /= 2;
@@ -5644,7 +5647,11 @@ void clpout() {
 		satout(HorizontalLength2);
 	else {
 		satout(ClipRectSize.cy);
-		InsidePoints = SelectedForm->vertices;
+		InsidePointList->clear();
+		//ToDo - insert should be replaced with this line once vertices is a std::vector * as a copy will not be required
+		//InsidePoints = SelectedForm->vertices;
+		auto _ = InsidePointList->insert(InsidePointList->end(), &SelectedForm->vertices[0], &SelectedForm->vertices[VertexCount]);
+		InsidePoints = InsidePointList;
 	}
 }
 
@@ -5749,22 +5756,22 @@ bool chkbak(dPOINT pnt) noexcept {
 	return 0;
 }
 
-bool linx(const fPOINT* points, unsigned start, unsigned finish, dPOINT* intersection) noexcept {
+bool linx(const std::vector<fPOINT>* points, unsigned start, unsigned finish, dPOINT* intersection) {
 	if (OutsidePoints && points) {
-		dPOINT	delta = { (OutsidePoints[start].x - points[start].x),
-						  (OutsidePoints[start].y - points[start].y) };
-		dPOINT	point = { (points[start].x),(points[start].y) };
+		dPOINT	delta = { (OutsidePoints->operator[](start).x - points->operator[](start).x),
+						  (OutsidePoints->operator[](start).y - points->operator[](start).y) };
+		dPOINT	point = { (points->operator[](start).x),(points->operator[](start).y) };
 
 		if (!delta.x && !delta.y)
 			return 0;
 		if (delta.x) {
-			if (proj(point, delta.y / delta.x, OutsidePoints[finish], points[finish], intersection))
+			if (proj(point, delta.y / delta.x, OutsidePoints->operator[](finish), points->operator[](finish), intersection))
 				return 1;
 			else
 				return 0;
 		}
 		else {
-			if (projv(point.x, points[finish], OutsidePoints[finish], intersection))
+			if (projv(point.x, points->operator[](finish), OutsidePoints->operator[](finish), intersection))
 				return 1;
 			else
 				return 0;
@@ -5781,16 +5788,16 @@ void filinsbw(dPOINT point) noexcept {
 	filinsb(point);
 }
 
-void sbfn(const fPOINT* insidePoints, unsigned start, unsigned finish) {
+void sbfn(const std::vector<fPOINT>* insidePoints, unsigned start, unsigned finish) {
 	if (insidePoints && OutsidePoints && SatinBackup) {
-		dPOINT		innerDelta = { (insidePoints[finish].x - insidePoints[start].x),
-								   (insidePoints[finish].y - insidePoints[start].y) };
+		dPOINT		innerDelta = { (insidePoints->operator[](finish).x - insidePoints->operator[](start).x),
+								   (insidePoints->operator[](finish).y - insidePoints->operator[](start).y) };
 		double		innerLength = hypot(innerDelta.x, innerDelta.y);
-		dPOINT		outerDelta = { (OutsidePoints[finish].x - OutsidePoints[start].x),
-								   (OutsidePoints[finish].y - OutsidePoints[start].y) };
+		dPOINT		outerDelta = { (OutsidePoints->operator[](finish).x - OutsidePoints->operator[](start).x),
+								   (OutsidePoints->operator[](finish).y - OutsidePoints->operator[](start).y) };
 		double		outerLength = hypot(outerDelta.x, outerDelta.y);
-		dPOINT		innerPoint = { insidePoints[start].x ,insidePoints[start].y };
-		dPOINT		outerPoint = { OutsidePoints[start].x ,OutsidePoints[start].y };
+		dPOINT		innerPoint = { insidePoints->operator[](start).x ,insidePoints->operator[](start).y };
+		dPOINT		outerPoint = { OutsidePoints->operator[](start).x ,OutsidePoints->operator[](start).y };
 		dPOINT		innerStep = {}, outerStep = {};
 		dPOINT		offsetDelta = {}, offsetStep = {}, offset = {};
 		dPOINT		intersection = {};
@@ -5799,8 +5806,8 @@ void sbfn(const fPOINT* insidePoints, unsigned start, unsigned finish) {
 		unsigned	ind = 0, intersectFlag = 0;
 
 		if (!StateMap.testAndSet(StateFlag::SAT1)) {
-			SelectedPoint.x = insidePoints[start].x;
-			SelectedPoint.y = insidePoints[start].y;
+			SelectedPoint.x = insidePoints->operator[](start).x;
+			SelectedPoint.y = insidePoints->operator[](start).y;
 		}
 		SatinBackupIndex = 0;
 		for (ind = 0; ind < 8; ind++) {
@@ -5927,14 +5934,14 @@ void satends(unsigned isBlunt) {
 			step.x = -step.x;
 			step.y = -step.y;
 		}
-		InsidePoints[0].x = SelectedForm->vertices[0].x + step.x;
-		InsidePoints[0].y = SelectedForm->vertices[0].y - step.y;
-		OutsidePoints[0].x = SelectedForm->vertices[0].x - step.x;
-		OutsidePoints[0].y = SelectedForm->vertices[0].y + step.y;
+		InsidePoints->operator[](0).x = SelectedForm->vertices[0].x + step.x;
+		InsidePoints->operator[](0).y = SelectedForm->vertices[0].y - step.y;
+		OutsidePoints->operator[](0).x = SelectedForm->vertices[0].x - step.x;
+		OutsidePoints->operator[](0).y = SelectedForm->vertices[0].y + step.y;
 	}
 	else {
-		InsidePoints[0].x = OutsidePoints[0].x = CurrentFormVertices[0].x;
-		InsidePoints[0].y = OutsidePoints[0].y = CurrentFormVertices[0].y;
+		InsidePoints->operator[](0).x = OutsidePoints->operator[](0).x = CurrentFormVertices[0].x;
+		InsidePoints->operator[](0).y = OutsidePoints->operator[](0).y = CurrentFormVertices[0].y;
 	}
 	if (isBlunt&FBLNT) {
 		step.x = sin(FormAngles[VertexCount - 2])*HorizontalLength2 / 2;
@@ -5943,14 +5950,14 @@ void satends(unsigned isBlunt) {
 			step.x = -step.x;
 			step.y = -step.y;
 		}
-		InsidePoints[VertexCount - 1].x = SelectedForm->vertices[VertexCount - 1].x + step.x;
-		InsidePoints[VertexCount - 1].y = SelectedForm->vertices[VertexCount - 1].y - step.y;
-		OutsidePoints[VertexCount - 1].x = SelectedForm->vertices[VertexCount - 1].x - step.x;
-		OutsidePoints[VertexCount - 1].y = SelectedForm->vertices[VertexCount - 1].y + step.y;
+		InsidePoints->operator[](VertexCount - 1).x = SelectedForm->vertices[VertexCount - 1].x + step.x;
+		InsidePoints->operator[](VertexCount - 1).y = SelectedForm->vertices[VertexCount - 1].y - step.y;
+		OutsidePoints->operator[](VertexCount - 1).x = SelectedForm->vertices[VertexCount - 1].x - step.x;
+		OutsidePoints->operator[](VertexCount - 1).y = SelectedForm->vertices[VertexCount - 1].y + step.y;
 	}
 	else {
-		InsidePoints[VertexCount - 1].x = OutsidePoints[VertexCount - 1].x = CurrentFormVertices[VertexCount - 1].x;
-		InsidePoints[VertexCount - 1].y = OutsidePoints[VertexCount - 1].y = CurrentFormVertices[VertexCount - 1].y;
+		InsidePoints->operator[](VertexCount - 1).x = OutsidePoints->operator[](VertexCount - 1).x = CurrentFormVertices[VertexCount - 1].x;
+		InsidePoints->operator[](VertexCount - 1).y = OutsidePoints->operator[](VertexCount - 1).y = CurrentFormVertices[VertexCount - 1].y;
 	}
 }
 
@@ -7725,8 +7732,8 @@ void tomsg() {
 }
 
 void sprct(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish) {
-	dPOINT	delta = { (OutsidePoints[finish].x - OutsidePoints[start].x),
-					  (OutsidePoints[finish].y - OutsidePoints[start].y) };
+	dPOINT	delta = { (OutsidePoints->operator[](finish).x - OutsidePoints->operator[](start).x),
+					  (OutsidePoints->operator[](finish).y - OutsidePoints->operator[](start).y) };
 	dPOINT	point = {};
 	VRCT2*	verticalRect = &fillVerticalRect[start];
 
@@ -7734,98 +7741,98 @@ void sprct(std::vector<VRCT2> &fillVerticalRect, unsigned start, unsigned finish
 		Slope = -delta.x / delta.y;
 		point.x = CurrentFormVertices[finish].x;
 		point.y = CurrentFormVertices[finish].y;
-		proj(point, Slope, OutsidePoints[start], OutsidePoints[finish], &verticalRect->dopnt);
-		proj(point, Slope, InsidePoints[start], InsidePoints[finish], &verticalRect->dipnt);
+		proj(point, Slope, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->dopnt);
+		proj(point, Slope, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->dipnt);
 		point.x = CurrentFormVertices[start].x;
 		point.y = CurrentFormVertices[start].y;
-		proj(point, Slope, OutsidePoints[start], OutsidePoints[finish], &verticalRect->aopnt);
-		proj(point, Slope, InsidePoints[start], InsidePoints[finish], &verticalRect->aipnt);
-		point.x = InsidePoints[start].x;
-		point.y = InsidePoints[start].y;
-		if (proj(point, Slope, OutsidePoints[start], OutsidePoints[finish], &verticalRect->bopnt)) {
-			verticalRect->bipnt.x = InsidePoints[start].x;
-			verticalRect->bipnt.y = InsidePoints[start].y;
+		proj(point, Slope, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->aopnt);
+		proj(point, Slope, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->aipnt);
+		point.x = InsidePoints->operator[](start).x;
+		point.y = InsidePoints->operator[](start).y;
+		if (proj(point, Slope, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->bopnt)) {
+			verticalRect->bipnt.x = InsidePoints->operator[](start).x;
+			verticalRect->bipnt.y = InsidePoints->operator[](start).y;
 		}
 		else {
-			verticalRect->bopnt.x = OutsidePoints[start].x;
-			verticalRect->bopnt.y = OutsidePoints[start].y;
-			point.x = OutsidePoints[start].x;
-			point.y = OutsidePoints[start].y;
-			proj(point, Slope, InsidePoints[start], InsidePoints[finish], &verticalRect->bipnt);
+			verticalRect->bopnt.x = OutsidePoints->operator[](start).x;
+			verticalRect->bopnt.y = OutsidePoints->operator[](start).y;
+			point.x = OutsidePoints->operator[](start).x;
+			point.y = OutsidePoints->operator[](start).y;
+			proj(point, Slope, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->bipnt);
 		}
-		point.x = InsidePoints[finish].x;
-		point.y = InsidePoints[finish].y;
-		if (proj(point, Slope, OutsidePoints[start], OutsidePoints[finish], &verticalRect->copnt)) {
-			verticalRect->cipnt.x = InsidePoints[finish].x;
-			verticalRect->cipnt.y = InsidePoints[finish].y;
+		point.x = InsidePoints->operator[](finish).x;
+		point.y = InsidePoints->operator[](finish).y;
+		if (proj(point, Slope, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->copnt)) {
+			verticalRect->cipnt.x = InsidePoints->operator[](finish).x;
+			verticalRect->cipnt.y = InsidePoints->operator[](finish).y;
 		}
 		else {
-			verticalRect->copnt.x = OutsidePoints[finish].x;
-			verticalRect->copnt.y = OutsidePoints[finish].y;
-			point.x = OutsidePoints[finish].x;
-			point.y = OutsidePoints[finish].y;
-			proj(point, Slope, InsidePoints[start], InsidePoints[finish], &verticalRect->cipnt);
+			verticalRect->copnt.x = OutsidePoints->operator[](finish).x;
+			verticalRect->copnt.y = OutsidePoints->operator[](finish).y;
+			point.x = OutsidePoints->operator[](finish).x;
+			point.y = OutsidePoints->operator[](finish).y;
+			proj(point, Slope, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->cipnt);
 		}
 	}
 	else {
 		if (delta.x) {
 			point.x = CurrentFormVertices[finish].x;
-			projv(point.x, OutsidePoints[start], OutsidePoints[finish], &verticalRect->dopnt);
-			projv(point.x, InsidePoints[start], InsidePoints[finish], &verticalRect->dipnt);
+			projv(point.x, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->dopnt);
+			projv(point.x, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->dipnt);
 			point.x = CurrentFormVertices[start].x;
-			projv(point.x, OutsidePoints[start], OutsidePoints[finish], &verticalRect->aopnt);
-			projv(point.x, InsidePoints[start], InsidePoints[finish], &verticalRect->aipnt);
-			point.x = InsidePoints[start].x;
-			if (projv(point.x, OutsidePoints[start], OutsidePoints[finish], &verticalRect->bopnt)) {
-				verticalRect->bipnt.x = InsidePoints[start].x;
-				verticalRect->bipnt.y = InsidePoints[start].y;
+			projv(point.x, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->aopnt);
+			projv(point.x, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->aipnt);
+			point.x = InsidePoints->operator[](start).x;
+			if (projv(point.x, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->bopnt)) {
+				verticalRect->bipnt.x = InsidePoints->operator[](start).x;
+				verticalRect->bipnt.y = InsidePoints->operator[](start).y;
 			}
 			else {
-				verticalRect->bopnt.x = OutsidePoints[start].x;
-				verticalRect->bopnt.y = OutsidePoints[start].y;
-				point.x = OutsidePoints[start].x;
-				projv(point.x, InsidePoints[start], InsidePoints[finish], &verticalRect->bipnt);
+				verticalRect->bopnt.x = OutsidePoints->operator[](start).x;
+				verticalRect->bopnt.y = OutsidePoints->operator[](start).y;
+				point.x = OutsidePoints->operator[](start).x;
+				projv(point.x, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->bipnt);
 			}
-			point.x = InsidePoints[finish].x;
-			if (projv(point.x, OutsidePoints[start], OutsidePoints[finish], &verticalRect->copnt)) {
-				verticalRect->cipnt.x = InsidePoints[finish].x;
-				verticalRect->cipnt.y = InsidePoints[finish].y;
+			point.x = InsidePoints->operator[](finish).x;
+			if (projv(point.x, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->copnt)) {
+				verticalRect->cipnt.x = InsidePoints->operator[](finish).x;
+				verticalRect->cipnt.y = InsidePoints->operator[](finish).y;
 			}
 			else {
-				verticalRect->copnt.x = OutsidePoints[finish].x;
-				verticalRect->copnt.y = OutsidePoints[finish].y;
-				point.x = OutsidePoints[finish].x;
-				projv(point.x, InsidePoints[start], InsidePoints[finish], &verticalRect->cipnt);
+				verticalRect->copnt.x = OutsidePoints->operator[](finish).x;
+				verticalRect->copnt.y = OutsidePoints->operator[](finish).y;
+				point.x = OutsidePoints->operator[](finish).x;
+				projv(point.x, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->cipnt);
 			}
 		}
 		else {
 			point.y = CurrentFormVertices[finish].y;
-			projh(point.y, OutsidePoints[start], OutsidePoints[finish], &verticalRect->dopnt);
-			projh(point.y, InsidePoints[start], InsidePoints[finish], &verticalRect->dipnt);
+			projh(point.y, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->dopnt);
+			projh(point.y, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->dipnt);
 			point.y = CurrentFormVertices[start].y;
-			projh(point.y, OutsidePoints[start], OutsidePoints[finish], &verticalRect->aopnt);
-			projh(point.y, InsidePoints[start], InsidePoints[finish], &verticalRect->aipnt);
-			point.y = InsidePoints[start].y;
-			if (projh(point.y, OutsidePoints[start], OutsidePoints[finish], &verticalRect->bopnt)) {
-				verticalRect->bipnt.x = InsidePoints[start].x;
-				verticalRect->bipnt.y = InsidePoints[start].y;
+			projh(point.y, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->aopnt);
+			projh(point.y, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->aipnt);
+			point.y = InsidePoints->operator[](start).y;
+			if (projh(point.y, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->bopnt)) {
+				verticalRect->bipnt.x = InsidePoints->operator[](start).x;
+				verticalRect->bipnt.y = InsidePoints->operator[](start).y;
 			}
 			else {
-				verticalRect->bopnt.x = OutsidePoints[start].x;
-				verticalRect->bopnt.y = OutsidePoints[start].y;
-				point.y = OutsidePoints[start].y;
-				projh(point.y, InsidePoints[start], InsidePoints[finish], &verticalRect->bipnt);
+				verticalRect->bopnt.x = OutsidePoints->operator[](start).x;
+				verticalRect->bopnt.y = OutsidePoints->operator[](start).y;
+				point.y = OutsidePoints->operator[](start).y;
+				projh(point.y, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->bipnt);
 			}
-			point.y = InsidePoints[finish].y;
-			if (projh(point.y, OutsidePoints[start], OutsidePoints[finish], &verticalRect->copnt)) {
-				verticalRect->cipnt.x = InsidePoints[finish].x;
-				verticalRect->cipnt.y = InsidePoints[finish].y;
+			point.y = InsidePoints->operator[](finish).y;
+			if (projh(point.y, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->copnt)) {
+				verticalRect->cipnt.x = InsidePoints->operator[](finish).x;
+				verticalRect->cipnt.y = InsidePoints->operator[](finish).y;
 			}
 			else {
-				verticalRect->copnt.x = OutsidePoints[finish].x;
-				verticalRect->copnt.y = OutsidePoints[finish].y;
-				point.y = OutsidePoints[finish].y;
-				projh(OutsidePoints[finish].y, InsidePoints[start], InsidePoints[finish], &verticalRect->cipnt);
+				verticalRect->copnt.x = OutsidePoints->operator[](finish).x;
+				verticalRect->copnt.y = OutsidePoints->operator[](finish).y;
+				point.y = OutsidePoints->operator[](finish).y;
+				projh(OutsidePoints->operator[](finish).y, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->cipnt);
 			}
 		}
 	}
@@ -7975,7 +7982,7 @@ void duspnd(std::vector<VRCT2> &underlayVerticalRect, std::vector<VRCT2> &fillVe
 			delta.y = underlayVerticalRect[finish].bipnt.y - underlayVerticalRect[start].cipnt.y;
 			length = hypot(delta.x, delta.y);
 			if (length > SelectedForm->edgeStitchLen) {
-				angle = atan2(InsidePoints[finish].y - OutsidePoints[finish].y, InsidePoints[finish].x - OutsidePoints[finish].x);
+				angle = atan2(InsidePoints->operator[](finish).y - OutsidePoints->operator[](finish).y, InsidePoints->operator[](finish).x - OutsidePoints->operator[](finish).x);
 				point.x = underlayVerticalRect[finish].bopnt.x + cos(angle)*HorizontalLength2;
 				point.y = underlayVerticalRect[finish].bopnt.y + sin(angle)*HorizontalLength2;
 				filinsb(point);
@@ -7990,7 +7997,7 @@ void duspnd(std::vector<VRCT2> &underlayVerticalRect, std::vector<VRCT2> &fillVe
 			delta.y = underlayVerticalRect[finish].bopnt.y - underlayVerticalRect[start].copnt.y;
 			length = hypot(delta.x, delta.y);
 			if (length > SelectedForm->edgeStitchLen) {
-				angle = atan2(OutsidePoints[finish].y - InsidePoints[finish].y, OutsidePoints[finish].x - InsidePoints[finish].x);
+				angle = atan2(OutsidePoints->operator[](finish).y - InsidePoints->operator[](finish).y, OutsidePoints->operator[](finish).x - InsidePoints->operator[](finish).x);
 				point.x = underlayVerticalRect[finish].bipnt.x + cos(angle)*HorizontalLength2;
 				point.y = underlayVerticalRect[finish].bipnt.y + sin(angle)*HorizontalLength2;
 				filinsb(point);
@@ -8103,10 +8110,10 @@ void plbrd(double edgeSpacing) {
 	std::vector<VRCT2> fillVerticalRect(VertexCount + 5);
 	std::vector<VRCT2> underlayVerticalRect(VertexCount + 5);
 	satout(SelectedForm->borderSize);
-	InsidePoints[VertexCount].x = InsidePoints[0].x;
-	InsidePoints[VertexCount].y = InsidePoints[0].y;
-	OutsidePoints[VertexCount].x = OutsidePoints[0].x;
-	OutsidePoints[VertexCount].y = OutsidePoints[0].y;
+	InsidePoints->operator[](VertexCount).x = InsidePoints->operator[](0).x;
+	InsidePoints->operator[](VertexCount).y = InsidePoints->operator[](0).y;
+	OutsidePoints->operator[](VertexCount).x = OutsidePoints->operator[](0).x;
+	OutsidePoints->operator[](VertexCount).y = OutsidePoints->operator[](0).y;
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		sprct(fillVerticalRect, iVertex, iVertex + 1);
 		spurct(underlayVerticalRect, fillVerticalRect, iVertex);
@@ -9228,12 +9235,12 @@ void bhcrnr(unsigned vertex) {
 	double		length = 0.0, ratio = 0.0;
 
 	if (StateMap.test(StateFlag::INDIR)) {
-		delta.x = OutsidePoints[nextVertex].x - CurrentFormVertices[nextVertex].x;
-		delta.y = OutsidePoints[nextVertex].y - CurrentFormVertices[nextVertex].y;
+		delta.x = OutsidePoints->operator[](nextVertex).x - CurrentFormVertices[nextVertex].x;
+		delta.y = OutsidePoints->operator[](nextVertex).y - CurrentFormVertices[nextVertex].y;
 	}
 	else {
-		delta.x = InsidePoints[nextVertex].x - CurrentFormVertices[nextVertex].x;
-		delta.y = InsidePoints[nextVertex].y - CurrentFormVertices[nextVertex].y;
+		delta.x = InsidePoints->operator[](nextVertex).x - CurrentFormVertices[nextVertex].x;
+		delta.y = InsidePoints->operator[](nextVertex).y - CurrentFormVertices[nextVertex].y;
 	}
 	length = hypot(delta.x, delta.y);
 	ratio = ButtonholeCornerLength / length;
@@ -9375,12 +9382,12 @@ void clpcrnr(std::vector<fPOINT> clipFillData, unsigned vertex) {
 	fPOINTATTR	referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left),ClipRect.top };
 
 	if (StateMap.test(StateFlag::INDIR)) {
-		delta.x = OutsidePoints[nextVertex].x - CurrentFormVertices[nextVertex].x;
-		delta.y = OutsidePoints[nextVertex].y - CurrentFormVertices[nextVertex].y;
+		delta.x = OutsidePoints->operator[](nextVertex).x - CurrentFormVertices[nextVertex].x;
+		delta.y = OutsidePoints->operator[](nextVertex).y - CurrentFormVertices[nextVertex].y;
 	}
 	else {
-		delta.x = InsidePoints[nextVertex].x - CurrentFormVertices[nextVertex].x;
-		delta.y = InsidePoints[nextVertex].y - CurrentFormVertices[nextVertex].y;
+		delta.x = InsidePoints->operator[](nextVertex).x - CurrentFormVertices[nextVertex].x;
+		delta.y = InsidePoints->operator[](nextVertex).y - CurrentFormVertices[nextVertex].y;
 	}
 	RotationAngle = atan2(delta.y, delta.x) + PI / 2;
 	rotang1(referencePoint, &ClipReference);
@@ -9799,33 +9806,33 @@ void ribon() {
 						isBlunt = 0;
 					satends(isBlunt);
 					formHeader->vertices = adflt(VertexCount << 1);
-					formHeader->vertices[0].x = OutsidePoints[0].x;
-					formHeader->vertices[iNewVertex++].y = OutsidePoints[0].y;
+					formHeader->vertices[0].x = OutsidePoints->operator[](0).x;
+					formHeader->vertices[iNewVertex++].y = OutsidePoints->operator[](0).y;
 					for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-						formHeader->vertices[iNewVertex].x = InsidePoints[iVertex].x;
-						formHeader->vertices[iNewVertex++].y = InsidePoints[iVertex].y;
+						formHeader->vertices[iNewVertex].x = InsidePoints->operator[](iVertex).x;
+						formHeader->vertices[iNewVertex++].y = InsidePoints->operator[](iVertex).y;
 					}
 					for (iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
-						formHeader->vertices[iNewVertex].x = OutsidePoints[iVertex].x;
-						formHeader->vertices[iNewVertex++].y = OutsidePoints[iVertex].y;
+						formHeader->vertices[iNewVertex].x = OutsidePoints->operator[](iVertex).x;
+						formHeader->vertices[iNewVertex++].y = OutsidePoints->operator[](iVertex).y;
 					}
 				}
 				else {
 					formHeader->vertices = adflt((VertexCount << 1) + 2);
-					formHeader->vertices[0].x = OutsidePoints[0].x;
-					formHeader->vertices[iNewVertex++].y = OutsidePoints[0].y;
+					formHeader->vertices[0].x = OutsidePoints->operator[](0).x;
+					formHeader->vertices[iNewVertex++].y = OutsidePoints->operator[](0).y;
 					formHeader->underlayIndent = IniFile.underlayIndent;
 					for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-						formHeader->vertices[iNewVertex].x = InsidePoints[iVertex].x;
-						formHeader->vertices[iNewVertex++].y = InsidePoints[iVertex].y;
+						formHeader->vertices[iNewVertex].x = InsidePoints->operator[](iVertex).x;
+						formHeader->vertices[iNewVertex++].y = InsidePoints->operator[](iVertex).y;
 					}
-					formHeader->vertices[iNewVertex].x = InsidePoints[0].x;
-					formHeader->vertices[iNewVertex++].y = InsidePoints[0].y;
-					formHeader->vertices[iNewVertex].x = OutsidePoints[0].x;
-					formHeader->vertices[iNewVertex++].y = OutsidePoints[0].y;
+					formHeader->vertices[iNewVertex].x = InsidePoints->operator[](0).x;
+					formHeader->vertices[iNewVertex++].y = InsidePoints->operator[](0).y;
+					formHeader->vertices[iNewVertex].x = OutsidePoints->operator[](0).x;
+					formHeader->vertices[iNewVertex++].y = OutsidePoints->operator[](0).y;
 					for (iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
-						formHeader->vertices[iNewVertex].x = OutsidePoints[iVertex].x;
-						formHeader->vertices[iNewVertex++].y = OutsidePoints[iVertex].y;
+						formHeader->vertices[iNewVertex].x = OutsidePoints->operator[](iVertex).x;
+						formHeader->vertices[iNewVertex++].y = OutsidePoints->operator[](iVertex).y;
 					}
 				}
 				formHeader->type = SAT;
@@ -11469,10 +11476,9 @@ void angclpfn(std::vector<RNGCNT> &textureSegments) {
 	AngledForm.vertices = AngledFormVertices;
 	if (StateMap.test(StateFlag::ISUND)) {
 		RotationAngle = PI / 2 - SelectedForm->underlayStitchAngle;
-		const fPOINT* vertexList = insid();
+		const std::vector<fPOINT>* vertexList = insid();
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
-			AngledFormVertices[iVertex].x = vertexList[iVertex].x;
-			AngledFormVertices[iVertex].y = vertexList[iVertex].y;
+			AngledFormVertices[iVertex] = vertexList->operator[](iVertex);
 			rotflt(AngledFormVertices[iVertex]);
 		}
 	}
@@ -11482,8 +11488,7 @@ void angclpfn(std::vector<RNGCNT> &textureSegments) {
 		else
 			RotationAngle = PI / 2 - SelectedForm->satinOrAngle.angle;
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
-			AngledFormVertices[iVertex].x = SelectedForm->vertices[iVertex].x;
-			AngledFormVertices[iVertex].y = SelectedForm->vertices[iVertex].y;
+			AngledFormVertices[iVertex] = SelectedForm->vertices[iVertex];
 			rotflt(AngledFormVertices[iVertex]);
 		}
 	}

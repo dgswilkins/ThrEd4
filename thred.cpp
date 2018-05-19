@@ -434,6 +434,8 @@ extern	HWND			MsgWindow;
 extern	unsigned		NewFormVertexCount;
 extern	unsigned		OutputIndex;
 extern	fPOINT			OSequence[OSEQLEN];
+extern	std::vector<fPOINT>	*OutsidePointList;
+extern	std::vector<fPOINT>	*InsidePointList;
 extern	float			PicotSpacing;
 extern	long			PreferenceWindowWidth;
 extern	unsigned		PreviousFormIndex;
@@ -20183,6 +20185,10 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		MenuInfo = &private_MenuInfo;
 		std::vector<fPOINT>	private_TempPolygon;
 		TempPolygon = &private_TempPolygon;
+		std::vector<fPOINT>	private_OutsidePointList;
+		OutsidePointList = &private_OutsidePointList;
+		std::vector<fPOINT>	private_InsidePointList;
+		InsidePointList = &private_InsidePointList;
 
 		redini();
 		if (IniFile.initialWindowCoords.right) {

@@ -59,13 +59,13 @@ extern	fPOINT			FormVertices[MAXITEMS];
 extern	HPEN			GridPen;
 extern	HWND			HorizontalScrollBar;
 extern	INIFILE			IniFile;
-extern	fPOINT*			InsidePoints;
+extern	std::vector<fPOINT>*	InsidePoints;
 extern	HWND			MainStitchWin;
 extern	MSG				Msg;
 extern	char			MsgBuffer[MSGSIZ];
 extern	unsigned		NewFormVertexCount;
 extern	unsigned		OutputIndex;
-extern	fPOINT*			OutsidePoints;
+extern	std::vector<fPOINT>*	OutsidePoints;
 extern	fPOINT			OSequence[OSEQLEN];
 extern	PCSHEADER		PCSHeader;
 extern	unsigned		PseudoRandomValue;
@@ -210,8 +210,6 @@ unsigned	InterleaveSequenceIndex;	//index into the interleave sequence
 INSREC		InterleaveSequenceIndices[10];	//indices into interleave points
 unsigned	InterleaveSequenceIndex2;	//index into interleave indices
 unsigned	FillStartsMap;				//fill starts bitmap
-//unsigned*	FormFillCounter;			//form fill type counters for sort
-fPOINT*		UnderlayVertices;			//underlay offset points
 unsigned	FeatherFillType;			//type of feather fill
 float		FeatherRatio;				//feather ratio
 float		FeatherMinStitch;			//smallest stitch allowed
@@ -874,19 +872,19 @@ void pes2crd() {
 
 void sidlen(unsigned start, unsigned finish, double* insideLength, double* outsideLength) noexcept {
 	if (insideLength && outsideLength) {
-		*insideLength += hypot(InsidePoints[finish].x - InsidePoints[start].x, InsidePoints[finish].x - InsidePoints[start].x);
-		*outsideLength += hypot(OutsidePoints[finish].x - OutsidePoints[start].x, OutsidePoints[finish].x - OutsidePoints[start].x);
+		*insideLength += hypot(InsidePoints->operator[](finish).x - InsidePoints->operator[](start).x, InsidePoints->operator[](finish).x - InsidePoints->operator[](start).x);
+		*outsideLength += hypot(OutsidePoints->operator[](finish).x - OutsidePoints->operator[](start).x, OutsidePoints->operator[](finish).x - OutsidePoints->operator[](start).x);
 	}
 }
 
-fPOINT* insid() {
+std::vector<fPOINT>* insid() {
 	unsigned iVertex = 0;
 
 	satout(fabs(SelectedForm->underlayIndent));
 	if (SelectedForm->underlayIndent > 0) {
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-			if (!cisin(InsidePoints[iVertex].x, InsidePoints[iVertex].y)) {
-				InsidePoints[iVertex] = CurrentFormVertices[iVertex];
+			if (!cisin(InsidePoints->operator[](iVertex).x, InsidePoints->operator[](iVertex).y)) {
+				InsidePoints->operator[](iVertex) = CurrentFormVertices[iVertex];
 			}
 		}
 		return InsidePoints;
@@ -997,7 +995,7 @@ unsigned gucon(fPOINT start, fPOINT finish, unsigned destination, unsigned code)
 		return 0;
 	if (startVertex == endVertex)
 		return 0;
-	const fPOINT* indentedPoint = insid();
+	const std::vector<fPOINT>* indentedPoint = insid();
 	up = down = startVertex;
 	do {
 		if (up == endVertex) {
@@ -1013,8 +1011,8 @@ unsigned gucon(fPOINT start, fPOINT finish, unsigned destination, unsigned code)
 	} while (true);
 	iStitch = destination;
 	while (startVertex != endVertex) {
-		StitchBuffer[iStitch].x = indentedPoint[startVertex].x;
-		StitchBuffer[iStitch].y = indentedPoint[startVertex].y;
+		StitchBuffer[iStitch].x = indentedPoint->operator[](startVertex).x;
+		StitchBuffer[iStitch].y = indentedPoint->operator[](startVertex).y;
 		StitchBuffer[iStitch].attribute = code;
 		if (iStitch) {
 			if (StitchBuffer[iStitch - 1].x != StitchBuffer[iStitch].x || StitchBuffer[iStitch - 1].y != StitchBuffer[iStitch].y)
@@ -1026,15 +1024,15 @@ unsigned gucon(fPOINT start, fPOINT finish, unsigned destination, unsigned code)
 			intermediateVertex = prv(startVertex);
 		else
 			intermediateVertex = nxt(startVertex);
-		delta.x = indentedPoint[intermediateVertex].x - indentedPoint[startVertex].x;
-		delta.y = indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y;
+		delta.x = indentedPoint->operator[](intermediateVertex).x - indentedPoint->operator[](startVertex).x;
+		delta.y = indentedPoint->operator[](intermediateVertex).y - indentedPoint->operator[](startVertex).y;
 		length = hypot(delta.x, delta.y);
 		stitchCount = length / SelectedForm->lengthOrCount.stitchLength;
 		if (stitchCount > 1) {
 			step.x = delta.x / stitchCount;
 			step.y = delta.y / stitchCount;
-			localPoint.x = indentedPoint[startVertex].x + step.x;
-			localPoint.y = indentedPoint[startVertex].y + step.y;
+			localPoint.x = indentedPoint->operator[](startVertex).x + step.x;
+			localPoint.y = indentedPoint->operator[](startVertex).y + step.y;
 			for (iStep = 0; iStep < stitchCount - 1; iStep++) {
 				StitchBuffer[iStitch].x = localPoint.x;
 				StitchBuffer[iStitch].y = localPoint.y;
@@ -1049,8 +1047,8 @@ unsigned gucon(fPOINT start, fPOINT finish, unsigned destination, unsigned code)
 		else
 			startVertex = nxt(startVertex);
 	}
-	StitchBuffer[iStitch].x = indentedPoint[startVertex].x;
-	StitchBuffer[iStitch].y = indentedPoint[startVertex].y;
+	StitchBuffer[iStitch].x = indentedPoint->operator[](startVertex).x;
+	StitchBuffer[iStitch].y = indentedPoint->operator[](startVertex).y;
 	StitchBuffer[iStitch].attribute = code;
 	iStitch++;
 	return iStitch - destination;
@@ -1069,10 +1067,10 @@ void fnwlk(unsigned find) {
 	count = VertexCount;
 	if (SelectedForm->type != FRMLINE)
 		count++;
-	const fPOINT* walkPoints = insid();
+	const std::vector<fPOINT>* walkPoints = insid();
 	OutputIndex = 0;
 	while (count) {
-		OSequence[OutputIndex] = walkPoints[start];
+		OSequence[OutputIndex] = walkPoints->operator[](start);
 		start = nxt(start);
 		OutputIndex++;
 		count--;
@@ -1322,7 +1320,6 @@ void chkwlk() {
 void fnund(std::vector<RNGCNT> &textureSegments, unsigned find) {
 	const float	savedStitchSize = UserStitchLength;
 
-	UnderlayVertices = insid();
 	UserStitchLength = 1e99;
 	if (!SelectedForm->underlaySpacing)
 		SelectedForm->underlaySpacing = IniFile.underlaySpacing;
