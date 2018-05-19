@@ -248,12 +248,11 @@ void			satfil ();
 void			satout (double satinWidth);
 void			sbrd ();
 void			selal ();
-void			setr (unsigned pbit) noexcept;
 void			slbrd ();
 void			sRct2px (fRECTANGLE stitchRect, RECT* screenRect) noexcept;
 void			uncon ();
 void			uninsf ();
-void		wavfrm ();
+void			wavfrm ();
 
 unsigned		FormMenuEntryCount;		//lines in the form-form
 float			MaxStitchLen;			//maximum stitch length
@@ -285,7 +284,7 @@ fPOINT			OSequence[OSEQLEN];		//temporary storage for sequencing
 double			Slope;					//slope of line in angle fills
 unsigned		SatinIndex;				//pointer to next satin formOrigin to enter
 fPOINT			FormMoveDelta;			//offset for moving forms
-fPOINT			TempPolygon[MAXFRMLINS];	//temporary storage when user is entering a polygon;
+std::vector<fPOINT>	*TempPolygon;	//temporary storage when user is entering a polygon;
 unsigned		OutputIndex;			//output pointer for sequencing
 double*			Lengths;				//array of cumulative lengths used in satin fills
 fPOINT*			CurrentFormVertices;	//points in the currently selected form
@@ -378,24 +377,9 @@ double			EggRatio;				//ratio for shrinking eggs
 unsigned		PreferenceWindowTextWidth;	//size of the text part of the preference window
 unsigned		MarkedStitchMap[MAXITEMS];	//bitmap to tell when stitches have been marked
 
-char		FormOnOff[16];
+std::string *FormOnOff;
 
-MENUITEMINFO MenuInfo = {
-	sizeof(MENUITEMINFO),	// Size
-	MIIM_TYPE,				// Mask
-	MFT_STRING,				// Type
-	0,						// State
-	0,						// ID
-	0,						// SubMenu
-	0,						// bmpChecked
-	0,						// bmpUnchecked
-	0,						// ItemData
-	FormOnOff,				// TypeData
-	16,						// cch
-#if(WINVER >= 0x0500)
-	0						// bmpItem
-#endif /* WINVER >= 0x0500 */
-};
+MENUITEMINFO *MenuInfo;
 
 unsigned short EdgeArray[] = {
 	MEGLIN,
@@ -868,6 +852,19 @@ void frmlin(const fPOINT* vertices, unsigned vertexCount) noexcept {
 			FormLines[iVertex].x = (vertices[0].x - ZoomRect.left)*ZoomRatio.x;
 			FormLines[iVertex].y = StitchWindowClientRect.bottom - (vertices[0].y - ZoomRect.bottom)*ZoomRatio.y;
 		}
+	}
+}
+
+void frmlin(const std::vector<fPOINT> &vertices) {
+	unsigned	iVertex = 0, vertexMax = vertices.size();
+
+	if (VertexCount) {
+		for (iVertex = 0; iVertex < vertexMax; iVertex++) {
+			FormLines[iVertex].x = (vertices[iVertex].x - ZoomRect.left)*ZoomRatio.x;
+			FormLines[iVertex].y = StitchWindowClientRect.bottom - (vertices[iVertex].y - ZoomRect.bottom)*ZoomRatio.y;
+		}
+		FormLines[iVertex].x = (vertices[0].x - ZoomRect.left)*ZoomRatio.x;
+		FormLines[iVertex].y = StitchWindowClientRect.bottom - (vertices[0].y - ZoomRect.bottom)*ZoomRatio.y;
 	}
 }
 
@@ -4118,8 +4115,7 @@ void satpnt0() {
 	px2stch();
 	FormLines[0].x = Msg.pt.x - StitchWindowOrigin.x;
 	FormLines[0].y = Msg.pt.y - StitchWindowOrigin.y;
-	TempPolygon[0].x = SelectedPoint.x;
-	TempPolygon[0].y = SelectedPoint.y;
+	TempPolygon->push_back(SelectedPoint);
 	SatinIndex = 1;
 	StateMap.set(StateFlag::SATPNT);
 }
@@ -4130,8 +4126,7 @@ void satpnt1() {
 	FormLines[SatinIndex].x = Msg.pt.x - StitchWindowOrigin.x;
 	FormLines[SatinIndex].y = Msg.pt.y - StitchWindowOrigin.y;
 	dusat();
-	TempPolygon[SatinIndex].x = SelectedPoint.x;
-	TempPolygon[SatinIndex].y = SelectedPoint.y;
+	TempPolygon->push_back(SelectedPoint);
 	SatinIndex++;
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -4142,9 +4137,9 @@ void satfix() {
 	if (SatinIndex > 1) {
 		FormList[FormIndex].vertices = adflt(SatinIndex);
 		for (iVertex = 0; iVertex < SatinIndex; iVertex++) {
-			FormList[FormIndex].vertices[iVertex].x = TempPolygon[iVertex].x;
-			FormList[FormIndex].vertices[iVertex].y = TempPolygon[iVertex].y;
+			FormList[FormIndex].vertices[iVertex] = TempPolygon->operator[](iVertex);
 		}
+		TempPolygon->clear();
 		FormList[FormIndex].vertexCount = SatinIndex;
 		frmout(FormIndex);
 		FormList[FormIndex].satinGuideCount = 0;
@@ -5156,7 +5151,7 @@ void satzum() {
 	StateMap.reset(StateFlag::SHOSAT);
 	duzrat();
 	VertexCount = SatinIndex;
-	frmlin(TempPolygon, SatinIndex);
+	frmlin(*TempPolygon, SatinIndex);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	SelectObject(StitchWindowMemDC, FormPen);
 	Polyline(StitchWindowMemDC, FormLines, SatinIndex);
@@ -8250,10 +8245,10 @@ void tglfrm() {
 		satfix();
 	StateMap.reset(StateFlag::HIDSTCH);
 	if (StateMap.testAndFlip(StateFlag::FRMOF)) {
-		strcpy_s(FormOnOff, StringTable->operator[](STR_FRMPLUS).c_str());
+		FormOnOff->assign(StringTable->operator[](STR_FRMPLUS));
 	}
 	else {
-		strcpy_s(FormOnOff, StringTable->operator[](STR_FRMINUS).c_str());
+		FormOnOff->assign(StringTable->operator[](STR_FRMINUS));
 		StateMap.reset(StateFlag::FORMSEL);
 		StateMap.reset(StateFlag::FORMIN);
 		StateMap.reset(StateFlag::MOVFRM);
@@ -8267,7 +8262,7 @@ void tglfrm() {
 		StateMap.reset(StateFlag::FRMPSEL);
 		StateMap.reset(StateFlag::INSFRM);
 	}
-	SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, &MenuInfo);
+	SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, MenuInfo);
 	StateMap.set(StateFlag::DUMEN);
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -8275,8 +8270,8 @@ void tglfrm() {
 void frmon() {
 	unbsho();
 	StateMap.reset(StateFlag::FRMOF);
-	strcpy_s(FormOnOff, StringTable->operator[](STR_FRMPLUS).c_str());
-	SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, &MenuInfo);
+	FormOnOff->assign(StringTable->operator[](STR_FRMPLUS));
+	SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, MenuInfo);
 	StateMap.set(StateFlag::DUMEN);
 }
 

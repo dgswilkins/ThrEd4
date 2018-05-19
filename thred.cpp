@@ -423,11 +423,13 @@ extern	fPOINT			FormMoveDelta;
 extern	unsigned		FormIndex;
 extern	FRMHED			FormList[MAXFORMS];
 extern	POINT			FormControlPoints[10];
+extern	std::string*	FormOnOff;
 extern	fPOINT			FormVertices[MAXITEMS];
 extern	double			HorizontalRatio;
 extern	fPOINT			InterleaveSequence[MAXITEMS];
 extern	double			LineSpacing;
 extern	fPOINT			LowerLeftStitch;
+extern	MENUITEMINFO*	MenuInfo;
 extern	HWND			MsgWindow;
 extern	unsigned		NewFormVertexCount;
 extern	unsigned		OutputIndex;
@@ -450,6 +452,7 @@ extern	double			SnapLength;
 extern	double			SpiralWrap;
 extern	std::vector<std::string>	*StringTable;
 extern	double			StarRatio;
+extern	std::vector<fPOINT>	*TempPolygon;
 extern	std::vector<TXPNT>	*TempTexturePoints;
 extern	TXTSCR			TextureScreen;
 extern	int				TextureIndex;
@@ -20158,6 +20161,28 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		StringTable = &private_StringTable;
 		std::vector<HWND> private_ButtonWin;
 		ButtonWin = &private_ButtonWin;
+		std::string private_FormOnOff;
+		FormOnOff = &private_FormOnOff;
+		LPSTR formOnOff = const_cast<LPSTR>(private_FormOnOff.data());
+		MENUITEMINFO private_MenuInfo = {
+			sizeof(MENUITEMINFO),	// Size
+			MIIM_TYPE,				// Mask
+			MFT_STRING,				// Type
+			0,						// State
+			0,						// ID
+			0,						// SubMenu
+			0,						// bmpChecked
+			0,						// bmpUnchecked
+			0,						// ItemData
+			formOnOff,				// TypeData
+			16,						// cch
+#if(WINVER >= 0x0500)
+			0						// bmpItem
+#endif /* WINVER >= 0x0500 */
+		};
+		MenuInfo = &private_MenuInfo;
+		std::vector<fPOINT>	private_TempPolygon;
+		TempPolygon = &private_TempPolygon;
 
 		redini();
 		if (IniFile.initialWindowCoords.right) {
