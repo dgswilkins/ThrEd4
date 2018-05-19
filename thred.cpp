@@ -416,7 +416,7 @@ extern	unsigned		ClipPointIndex;
 extern	SATCON*			CurrentFormGuides;
 extern	fPOINT*			CurrentFormVertices;
 extern	HWND			LabelWindow[LASTLIN];
-extern	HWND			ValueWindow[LASTLIN];
+extern	std::vector<HWND>	*ValueWindow;
 extern	POINT			FormLines[MAXFRMLINS];
 extern	unsigned		FormVertexIndex;
 extern	fPOINT			FormMoveDelta;
@@ -3402,7 +3402,7 @@ void chknum() {
 				if (value) {
 					savdo();
 					nufthcol((atoi(SideWindowEntryBuffer) - 1) & 0xf);
-					SetWindowText(ValueWindow[LFRMCOL], SideWindowEntryBuffer);
+					SetWindowText(ValueWindow->operator[](LFRMCOL), SideWindowEntryBuffer);
 					coltab();
 				}
 				unsid();
@@ -3414,7 +3414,7 @@ void chknum() {
 				if (value) {
 					savdo();
 					nufilcol((atoi(SideWindowEntryBuffer) - 1) & 0xf);
-					SetWindowText(ValueWindow[LFRMCOL], SideWindowEntryBuffer);
+					SetWindowText(ValueWindow->operator[](LFRMCOL), SideWindowEntryBuffer);
 					coltab();
 				}
 				unsid();
@@ -3426,7 +3426,7 @@ void chknum() {
 				if (value) {
 					savdo();
 					SelectedForm->underlayColor = (atoi(SideWindowEntryBuffer) - 1) & 0xf;
-					SetWindowText(ValueWindow[LUNDCOL], SideWindowEntryBuffer);
+					SetWindowText(ValueWindow->operator[](LUNDCOL), SideWindowEntryBuffer);
 					refilfn();
 					coltab();
 				}
@@ -3439,7 +3439,7 @@ void chknum() {
 				if (value) {
 					savdo();
 					nubrdcol((atoi(SideWindowEntryBuffer) - 1) & 0xf);
-					SetWindowText(ValueWindow[LFRMCOL], SideWindowEntryBuffer);
+					SetWindowText(ValueWindow->operator[](LFRMCOL), SideWindowEntryBuffer);
 					coltab();
 				}
 				unsid();
@@ -3624,44 +3624,44 @@ void chknum() {
 				case PEG:
 
 					IniFile.eggRatio = value;
-					SetWindowText(ValueWindow[PEG], fmt::format("{:.2f}", value).c_str());
+					SetWindowText(ValueWindow->operator[](PEG), fmt::format("{:.2f}", value).c_str());
 					break;
 
 				case PNUDG:
 
 					IniFile.cursorNudgeStep = value;
 					IniFile.nudgePixels = pxchk(value);
-					SetWindowText(ValueWindow[PNUDG], fmt::format("{:.2f}", value).c_str());
+					SetWindowText(ValueWindow->operator[](PNUDG), fmt::format("{:.2f}", value).c_str());
 					break;
 
 				case PPIC:
 
 					PicotSpacing = value * PFGRAN;
-					SetWindowText(ValueWindow[PPIC], fmt::format("{:.2f}", value).c_str());
+					SetWindowText(ValueWindow->operator[](PPIC), fmt::format("{:.2f}", value).c_str());
 					break;
 
 				case PCLPOF:
 
 					IniFile.clipOffset = value * PFGRAN;
-					SetWindowText(ValueWindow[PCLPOF], fmt::format("{:.2f} mm", value).c_str());
+					SetWindowText(ValueWindow->operator[](PCLPOF), fmt::format("{:.2f} mm", value).c_str());
 					break;
 
 				case PFAZ:
 
 					IniFile.fillPhase = floor(value);
-					SetWindowText(ValueWindow[PFAZ], fmt::format("{}", IniFile.fillPhase).c_str());
+					SetWindowText(ValueWindow->operator[](PFAZ), fmt::format("{}", IniFile.fillPhase).c_str());
 					break;
 
 				case PCHRAT:
 
 					IniFile.chainRatio = value;
-					SetWindowText(ValueWindow[PCHRAT], fmt::format("{:.2f}", value).c_str());
+					SetWindowText(ValueWindow->operator[](PCHRAT), fmt::format("{:.2f}", value).c_str());
 					break;
 
 				case PMIN:
 
 					MinStitchLength = value * PFGRAN;
-					SetWindowText(ValueWindow[PMIN], fmt::format("{:.2f}", value).c_str());
+					SetWindowText(ValueWindow->operator[](PMIN), fmt::format("{:.2f}", value).c_str());
 					break;
 
 				default:
@@ -3672,50 +3672,50 @@ void chknum() {
 						case PSPAC:
 
 							LineSpacing = value * PFGRAN;
-							SetWindowText(ValueWindow[PSPAC], bufVal.c_str());
+							SetWindowText(ValueWindow->operator[](PSPAC), bufVal.c_str());
 							break;
 
 						case PANGL:
 
 							IniFile.fillAngle = value / 180 * PI;
-							SetWindowText(ValueWindow[PANGL], bufVal.c_str());
+							SetWindowText(ValueWindow->operator[](PANGL), bufVal.c_str());
 							break;
 
 						case PSAT:
 
 							BorderWidth = value * PFGRAN;
 							IniFile.borderWidth = BorderWidth;
-							SetWindowText(ValueWindow[PSAT], bufVal.c_str());
+							SetWindowText(ValueWindow->operator[](PSAT), bufVal.c_str());
 							break;
 
 						case PMAX:
 
 							IniFile.maxStitchLength = value * PFGRAN;
-							SetWindowText(ValueWindow[PMAX], bufVal.c_str());
+							SetWindowText(ValueWindow->operator[](PMAX), bufVal.c_str());
 							break;
 
 						case PUSE:
 
 							UserStitchLength = value * PFGRAN;
-							SetWindowText(ValueWindow[PUSE], bufVal.c_str());
+							SetWindowText(ValueWindow->operator[](PUSE), bufVal.c_str());
 							break;
 
 						case PSMAL:
 
 							SmallStitchLength = value * PFGRAN;
-							SetWindowText(ValueWindow[PSMAL], bufVal.c_str());
+							SetWindowText(ValueWindow->operator[](PSMAL), bufVal.c_str());
 							break;
 
 						case PAP:
 
 							AppliqueColor = gsl::narrow<unsigned>(round(value - 1)) % 16;
-							SetWindowText(ValueWindow[PAP], fmt::format("{}", (AppliqueColor + 1)).c_str());
+							SetWindowText(ValueWindow->operator[](PAP), fmt::format("{}", (AppliqueColor + 1)).c_str());
 							break;
 
 						case PSNP:
 
 							SnapLength = value * PFGRAN;
-							SetWindowText(ValueWindow[PSNP], bufVal.c_str());
+							SetWindowText(ValueWindow->operator[](PSNP), bufVal.c_str());
 							break;
 
 						case PSTAR:
@@ -3725,7 +3725,7 @@ void chknum() {
 								StarRatio = 1;
 							if (StarRatio < 0.05)
 								StarRatio = 0.05;
-							SetWindowText(ValueWindow[PSTAR], fmt::format("{:.2f}", StarRatio).c_str());
+							SetWindowText(ValueWindow->operator[](PSTAR), fmt::format("{:.2f}", StarRatio).c_str());
 							break;
 
 						case PSPIR:
@@ -3735,19 +3735,19 @@ void chknum() {
 								StarRatio = 20.;
 							if (StarRatio < 0.3)
 								StarRatio = 0.3;
-							SetWindowText(ValueWindow[PSPIR], fmt::format("{:.2f}", SpiralWrap).c_str());
+							SetWindowText(ValueWindow->operator[](PSPIR), fmt::format("{:.2f}", SpiralWrap).c_str());
 							break;
 
 						case PBUT:
 
 							ButtonholeCornerLength = value * PFGRAN;
-							SetWindowText(ValueWindow[PBUT], fmt::format("{:.2f}", value).c_str());
+							SetWindowText(ValueWindow->operator[](PBUT), fmt::format("{:.2f}", value).c_str());
 							break;
 
 						case PHUPX:
 
 							IniFile.hoopSizeX = value * PFGRAN;
-							SetWindowText(ValueWindow[PHUPX], fmt::format("{:.0f} mm", value).c_str());
+							SetWindowText(ValueWindow->operator[](PHUPX), fmt::format("{:.0f} mm", value).c_str());
 							sethup();
 							prfmsg();
 							chkhup();
@@ -3756,7 +3756,7 @@ void chknum() {
 						case PHUPY:
 
 							IniFile.hoopSizeY = value * PFGRAN;
-							SetWindowText(ValueWindow[PHUPY], fmt::format("{:.0f} mm", value).c_str());
+							SetWindowText(ValueWindow->operator[](PHUPY), fmt::format("{:.0f} mm", value).c_str());
 							sethup();
 							prfmsg();
 							chkhup();
@@ -3765,13 +3765,13 @@ void chknum() {
 						case PGRD:
 
 							IniFile.gridSize = value * PFGRAN;
-							SetWindowText(ValueWindow[PGRD], fmt::format("{:.2f} mm", value).c_str());
+							SetWindowText(ValueWindow->operator[](PGRD), fmt::format("{:.2f} mm", value).c_str());
 							break;
 
 						case PCHN:
 
 							IniFile.chainSpace = value * PFGRAN;
-							SetWindowText(ValueWindow[PCHN], fmt::format("{:.2f}", value).c_str());
+							SetWindowText(ValueWindow->operator[](PCHN), fmt::format("{:.2f}", value).c_str());
 							break;
 						}
 					}
@@ -4515,9 +4515,10 @@ void auxmen() {
 		CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
 	}
-	
+	[[gsl::suppress(type.3)]]{
 	filinfo.dwTypeData = const_cast<LPSTR>(auxMsg.c_str());
 	SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
+	}
 	StateMap.set(StateFlag::DUMEN);
 }
 
@@ -10623,7 +10624,7 @@ void sidhup() {
 	unsigned	iHoop = 0;
 
 	StateMap.set(StateFlag::HUPMSG);
-	GetWindowRect(ValueWindow[PHUP], &hoopRectangle);
+	GetWindowRect(ValueWindow->operator[](PHUP), &hoopRectangle);
 	GetWindowRect(PreferencesWindow, &preferencesRectangle);
 	SideMessageWindow = CreateWindow(
 		"STATIC",
@@ -14199,7 +14200,7 @@ unsigned chkMsg() {
 			} while (false);
 			MsgBuffer[0] = gsl::narrow<char>(VerticalIndex) + 0x30;
 			MsgBuffer[1] = 0;
-			SetWindowText(ValueWindow[LBRDCOL], MsgBuffer);
+			SetWindowText(ValueWindow->operator[](LBRDCOL), MsgBuffer);
 			unsid();
 			coltab();
 			StateMap.set(StateFlag::RESTCH);
@@ -14244,35 +14245,35 @@ unsigned chkMsg() {
 		}
 		if (StateMap.test(StateFlag::PRFACT)) {
 			chknum();
-			if (Msg.hwnd == ValueWindow[PSQR]) {
+			if (Msg.hwnd == ValueWindow->operator[](PSQR)) {
 				if (UserFlagMap.testAndFlip(UserFlag::SQRFIL))
-					SetWindowText(ValueWindow[PSQR], StringTable->operator[](STR_PNTD).c_str());
+					SetWindowText(ValueWindow->operator[](PSQR), StringTable->operator[](STR_PNTD).c_str());
 				else
-					SetWindowText(ValueWindow[PSQR], StringTable->operator[](STR_SQR).c_str());
+					SetWindowText(ValueWindow->operator[](PSQR), StringTable->operator[](STR_SQR).c_str());
 				return 1;
 			}
-			if (Msg.hwnd == ValueWindow[PBLNT]) {
+			if (Msg.hwnd == ValueWindow->operator[](PBLNT)) {
 				if (UserFlagMap.testAndFlip(UserFlag::BLUNT))
-					SetWindowText(ValueWindow[PBLNT], StringTable->operator[](STR_TAPR).c_str());
+					SetWindowText(ValueWindow->operator[](PBLNT), StringTable->operator[](STR_TAPR).c_str());
 				else
-					SetWindowText(ValueWindow[PBLNT], StringTable->operator[](STR_BLUNT).c_str());
+					SetWindowText(ValueWindow->operator[](PBLNT), StringTable->operator[](STR_BLUNT).c_str());
 				return 1;
 			}
-			if (Msg.hwnd == ValueWindow[PUND]) {
+			if (Msg.hwnd == ValueWindow->operator[](PUND)) {
 				if (UserFlagMap.testAndFlip(UserFlag::DUND))
-					SetWindowText(ValueWindow[PUND], StringTable->operator[](STR_OFF).c_str());
+					SetWindowText(ValueWindow->operator[](PUND), StringTable->operator[](STR_OFF).c_str());
 				else
-					SetWindowText(ValueWindow[PUND], StringTable->operator[](STR_ON).c_str());
+					SetWindowText(ValueWindow->operator[](PUND), StringTable->operator[](STR_ON).c_str());
 				return 1;
 			}
-			if (Msg.hwnd == ValueWindow[PHUP]) {
+			if (Msg.hwnd == ValueWindow->operator[](PHUP)) {
 				sidhup();
 				return 1;
 			}
 			for (iPreference = 0; iPreference < PRFLINS; iPreference++) {
-				if (Msg.hwnd == ValueWindow[iPreference]) {
+				if (Msg.hwnd == ValueWindow->operator[](iPreference)) {
 					PreferenceIndex = iPreference + 1;
-					prfsid(ValueWindow[iPreference]);
+					prfsid(ValueWindow->operator[](iPreference));
 					break;
 				}
 			}
@@ -14466,7 +14467,7 @@ unsigned chkMsg() {
 		}
 		if (PreferenceIndex == PAP + 1 && chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
 			AppliqueColor = VerticalIndex;
-			SetWindowText(ValueWindow[PAP], fmt::format("{}", VerticalIndex).c_str());
+			SetWindowText(ValueWindow->operator[](PAP), fmt::format("{}", VerticalIndex).c_str());
 			unsid();
 			return 1;
 		}
@@ -14885,57 +14886,57 @@ unsigned chkMsg() {
 			chknum();
 			unsid();
 			do {
-				if (Msg.hwnd == ValueWindow[LTXOF]) {
+				if (Msg.hwnd == ValueWindow->operator[](LTXOF)) {
 					FormMenuChoice = LTXOF;
-					sidwnd(ValueWindow[LTXOF]);
+					sidwnd(ValueWindow->operator[](LTXOF));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LUSPAC]) {
+				if (Msg.hwnd == ValueWindow->operator[](LUSPAC)) {
 					FormMenuChoice = LUSPAC;
-					sidwnd(ValueWindow[LUSPAC]);
+					sidwnd(ValueWindow->operator[](LUSPAC));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LUANG]) {
+				if (Msg.hwnd == ValueWindow->operator[](LUANG)) {
 					FormMenuChoice = LUANG;
-					sidwnd(ValueWindow[LUANG]);
+					sidwnd(ValueWindow->operator[](LUANG));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LULEN]) {
+				if (Msg.hwnd == ValueWindow->operator[](LULEN)) {
 					FormMenuChoice = LULEN;
-					sidwnd(ValueWindow[LULEN]);
+					sidwnd(ValueWindow->operator[](LULEN));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LWLKIND]) {
+				if (Msg.hwnd == ValueWindow->operator[](LWLKIND)) {
 					FormMenuChoice = LWLKIND;
-					sidwnd(ValueWindow[LWLKIND]);
+					sidwnd(ValueWindow->operator[](LWLKIND));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFTHSIZ]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFTHSIZ)) {
 					FormMenuChoice = LFTHSIZ;
-					sidwnd(ValueWindow[LFTHSIZ]);
+					sidwnd(ValueWindow->operator[](LFTHSIZ));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFTHNUM]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFTHNUM)) {
 					FormMenuChoice = LFTHNUM;
-					sidwnd(ValueWindow[LFTHNUM]);
+					sidwnd(ValueWindow->operator[](LFTHNUM));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFTHFLR]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFTHFLR)) {
 					FormMenuChoice = LFTHFLR;
-					sidwnd(ValueWindow[LFTHFLR]);
+					sidwnd(ValueWindow->operator[](LFTHFLR));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFTHUPCNT]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFTHUPCNT)) {
 					FormMenuChoice = LFTHUPCNT;
-					sidwnd(ValueWindow[LFTHUPCNT]);
+					sidwnd(ValueWindow->operator[](LFTHUPCNT));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFTHDWNCNT]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFTHDWNCNT)) {
 					FormMenuChoice = LFTHDWNCNT;
-					sidwnd(ValueWindow[LFTHDWNCNT]);
+					sidwnd(ValueWindow->operator[](LFTHDWNCNT));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFTHBLND]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFTHBLND)) {
 					StateMap.set(StateFlag::FLPBLND);
 					refrm();
 					refil();
@@ -14943,7 +14944,7 @@ unsigned chkMsg() {
 					StateMap.set(StateFlag::RESTCH);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFTHUP]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFTHUP)) {
 					SelectedForm->extendedAttribute ^= AT_FTHUP;
 					refrm();
 					refil();
@@ -14951,7 +14952,7 @@ unsigned chkMsg() {
 					StateMap.set(StateFlag::RESTCH);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFTHBTH]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFTHBTH)) {
 					SelectedForm->extendedAttribute ^= AT_FTHBTH;
 					refrm();
 					refil();
@@ -14959,12 +14960,12 @@ unsigned chkMsg() {
 					StateMap.set(StateFlag::RESTCH);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFTHTYP]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFTHTYP)) {
 					FormMenuChoice = LFTHTYP;
-					sidmsg(ValueWindow[LFTHTYP], &StringTable->operator[](STR_FTH0), 6);
+					sidmsg(ValueWindow->operator[](LFTHTYP), &StringTable->operator[](STR_FTH0), 6);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFRM]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFRM)) {
 					savdo();
 					unfil();
 					if (SelectedForm->type == FRMLINE)
@@ -14976,7 +14977,7 @@ unsigned chkMsg() {
 					StateMap.set(StateFlag::RESTCH);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LLAYR]) {
+				if (Msg.hwnd == ValueWindow->operator[](LLAYR)) {
 					std::string	LayerText[] = {
 						"0",
 						"1",
@@ -14986,86 +14987,86 @@ unsigned chkMsg() {
 					};
 					FormMenuChoice = LLAYR;
 					StateMap.reset(StateFlag::FILTYP);
-					sidmsg(ValueWindow[LLAYR], LayerText, 5);
+					sidmsg(ValueWindow->operator[](LLAYR), LayerText, 5);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFRMFIL]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFRMFIL)) {
 					StateMap.reset(StateFlag::FILTYP);
 					FormMenuChoice = LFRMFIL;
-					sidmsg(ValueWindow[LFRMFIL], &StringTable->operator[](STR_FIL0), 14);
+					sidmsg(ValueWindow->operator[](LFRMFIL), &StringTable->operator[](STR_FIL0), 14);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFRMCOL]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFRMCOL)) {
 					FormMenuChoice = LFRMCOL;
-					sidwnd(ValueWindow[LFRMCOL]);
+					sidwnd(ValueWindow->operator[](LFRMCOL));
 					StateMap.set(StateFlag::SIDCOL);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LUNDCOL]) {
+				if (Msg.hwnd == ValueWindow->operator[](LUNDCOL)) {
 					FormMenuChoice = LUNDCOL;
-					sidwnd(ValueWindow[LUNDCOL]);
+					sidwnd(ValueWindow->operator[](LUNDCOL));
 					StateMap.set(StateFlag::SIDCOL);
 					StateMap.set(StateFlag::UNDCOL);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFTHCOL]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFTHCOL)) {
 					FormMenuChoice = LFTHCOL;
-					sidwnd(ValueWindow[LFTHCOL]);
+					sidwnd(ValueWindow->operator[](LFTHCOL));
 					StateMap.set(StateFlag::SIDCOL);
 					StateMap.set(StateFlag::FTHSID);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFRMSPAC]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFRMSPAC)) {
 					FormMenuChoice = LFRMSPAC;
-					sidwnd(ValueWindow[LFRMSPAC]);
+					sidwnd(ValueWindow->operator[](LFRMSPAC));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFRMLEN]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFRMLEN)) {
 					FormMenuChoice = LFRMLEN;
-					sidwnd(ValueWindow[LFRMLEN]);
+					sidwnd(ValueWindow->operator[](LFRMLEN));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LBRD]) {
+				if (Msg.hwnd == ValueWindow->operator[](LBRD)) {
 					StateMap.set(StateFlag::FILTYP);
-					sidmsg(ValueWindow[LBRD], &StringTable->operator[](STR_EDG0), EDGETYPS + 1);
+					sidmsg(ValueWindow->operator[](LBRD), &StringTable->operator[](STR_EDG0), EDGETYPS + 1);
 					StateMap.set(StateFlag::BRDACT);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LBRDCOL]) {
+				if (Msg.hwnd == ValueWindow->operator[](LBRDCOL)) {
 					FormMenuChoice = LBRDCOL;
-					sidwnd(ValueWindow[LBRDCOL]);
+					sidwnd(ValueWindow->operator[](LBRDCOL));
 					StateMap.set(StateFlag::SIDCOL);
 					StateMap.set(StateFlag::BRDSID);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LBRDSPAC]) {
+				if (Msg.hwnd == ValueWindow->operator[](LBRDSPAC)) {
 					FormMenuChoice = LBRDSPAC;
-					sidwnd(ValueWindow[LBRDSPAC]);
+					sidwnd(ValueWindow->operator[](LBRDSPAC));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LBRDLEN]) {
+				if (Msg.hwnd == ValueWindow->operator[](LBRDLEN)) {
 					FormMenuChoice = LBRDLEN;
-					sidwnd(ValueWindow[LBRDLEN]);
+					sidwnd(ValueWindow->operator[](LBRDLEN));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LBRDSIZ]) {
+				if (Msg.hwnd == ValueWindow->operator[](LBRDSIZ)) {
 					FormMenuChoice = LBRDSIZ;
-					sidwnd(ValueWindow[LBRDSIZ]);
+					sidwnd(ValueWindow->operator[](LBRDSIZ));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LAPCOL]) {
+				if (Msg.hwnd == ValueWindow->operator[](LAPCOL)) {
 					FormMenuChoice = LAPCOL;
 					StateMap.set(StateFlag::SIDCOL);
 					StateMap.set(StateFlag::APSID);
-					sidwnd(ValueWindow[LAPCOL]);
+					sidwnd(ValueWindow->operator[](LAPCOL));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LBCSIZ]) {
+				if (Msg.hwnd == ValueWindow->operator[](LBCSIZ)) {
 					FormMenuChoice = LBCSIZ;
-					sidwnd(ValueWindow[LBCSIZ]);
+					sidwnd(ValueWindow->operator[](LBCSIZ));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LBSTRT]) {
+				if (Msg.hwnd == ValueWindow->operator[](LBSTRT)) {
 					code = SelectedForm->attribute&SBLNT;
 					if (code)
 						SelectedForm->attribute &= NSBLNT;
@@ -15076,7 +15077,7 @@ unsigned chkMsg() {
 					StateMap.set(StateFlag::RESTCH);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LBFIN]) {
+				if (Msg.hwnd == ValueWindow->operator[](LBFIN)) {
 					code = SelectedForm->attribute&FBLNT;
 					if (code)
 						SelectedForm->attribute &= NFBLNT;
@@ -15087,88 +15088,88 @@ unsigned chkMsg() {
 					StateMap.set(StateFlag::RESTCH);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFRMANG]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFRMANG)) {
 					FormMenuChoice = LFRMANG;
-					sidwnd(ValueWindow[LFRMANG]);
+					sidwnd(ValueWindow->operator[](LFRMANG));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LBRDPIC]) {
+				if (Msg.hwnd == ValueWindow->operator[](LBRDPIC)) {
 					FormMenuChoice = LBRDPIC;
-					sidwnd(ValueWindow[LBRDPIC]);
+					sidwnd(ValueWindow->operator[](LBRDPIC));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LBRDUND]) {
+				if (Msg.hwnd == ValueWindow->operator[](LBRDUND)) {
 					SelectedForm->edgeType ^= EGUND;
 					refil();
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LSACANG]) {
+				if (Msg.hwnd == ValueWindow->operator[](LSACANG)) {
 					FormMenuChoice = LSACANG;
-					sidwnd(ValueWindow[LSACANG]);
+					sidwnd(ValueWindow->operator[](LSACANG));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFRMFAZ]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFRMFAZ)) {
 					FormMenuChoice = LFRMFAZ;
-					sidwnd(ValueWindow[LFRMFAZ]);
+					sidwnd(ValueWindow->operator[](LFRMFAZ));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LBRDPOS]) {
+				if (Msg.hwnd == ValueWindow->operator[](LBRDPOS)) {
 					FormMenuChoice = LBRDPOS;
-					sidwnd(ValueWindow[LBRDPOS]);
+					sidwnd(ValueWindow->operator[](LBRDPOS));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LBFILSQR]) {
+				if (Msg.hwnd == ValueWindow->operator[](LBFILSQR)) {
 					dubit(AT_SQR);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFSTRT]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFSTRT)) {
 					dubit(AT_STRT);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LDSTRT]) {
+				if (Msg.hwnd == ValueWindow->operator[](LDSTRT)) {
 					FormMenuChoice = LDSTRT;
-					sidwnd(ValueWindow[LDSTRT]);
+					sidwnd(ValueWindow->operator[](LDSTRT));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LFEND]) {
+				if (Msg.hwnd == ValueWindow->operator[](LFEND)) {
 					dubit(AT_END);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LDEND]) {
+				if (Msg.hwnd == ValueWindow->operator[](LDEND)) {
 					FormMenuChoice = LDEND;
-					sidwnd(ValueWindow[LDEND]);
+					sidwnd(ValueWindow->operator[](LDEND));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LWALK]) {
+				if (Msg.hwnd == ValueWindow->operator[](LWALK)) {
 					dubit(AT_WALK);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LCWLK]) {
+				if (Msg.hwnd == ValueWindow->operator[](LCWLK)) {
 					dubit(AT_CWLK);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LUND]) {
+				if (Msg.hwnd == ValueWindow->operator[](LUND)) {
 					dubit(AT_UND);
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LMAXFIL]) {
+				if (Msg.hwnd == ValueWindow->operator[](LMAXFIL)) {
 					FormMenuChoice = LMAXFIL;
-					sidwnd(ValueWindow[LMAXFIL]);
+					sidwnd(ValueWindow->operator[](LMAXFIL));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LMINFIL]) {
+				if (Msg.hwnd == ValueWindow->operator[](LMINFIL)) {
 					FormMenuChoice = LMINFIL;
-					sidwnd(ValueWindow[LMINFIL]);
+					sidwnd(ValueWindow->operator[](LMINFIL));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LMAXBRD]) {
+				if (Msg.hwnd == ValueWindow->operator[](LMAXBRD)) {
 					FormMenuChoice = LMAXBRD;
-					sidwnd(ValueWindow[LMAXBRD]);
+					sidwnd(ValueWindow->operator[](LMAXBRD));
 					break;
 				}
-				if (Msg.hwnd == ValueWindow[LMINBRD]) {
+				if (Msg.hwnd == ValueWindow->operator[](LMINBRD)) {
 					FormMenuChoice = LMINBRD;
-					sidwnd(ValueWindow[LMINBRD]);
+					sidwnd(ValueWindow->operator[](LMINBRD));
 					break;
 				}
 			} while (false);
@@ -15822,11 +15823,11 @@ unsigned chkMsg() {
 					MsgBuffer[1] = 0;
 					if (PreferenceIndex == PSHO + 1) {
 						ShowStitchThreshold = unthrsh(NumericCode - 0x30);
-						SetWindowText(ValueWindow[PSHO], MsgBuffer);
+						SetWindowText(ValueWindow->operator[](PSHO), MsgBuffer);
 					}
 					else {
 						StitchBoxesThreshold = unthrsh(NumericCode - 0x30);
-						SetWindowText(ValueWindow[PBOX], MsgBuffer);
+						SetWindowText(ValueWindow->operator[](PBOX), MsgBuffer);
 					}
 					unsid();
 				}
@@ -20165,7 +20166,9 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		ButtonWin = &private_ButtonWin;
 		std::string private_FormOnOff;
 		FormOnOff = &private_FormOnOff;
+		[[gsl::suppress(type.3)]]{
 		LPSTR formOnOff = const_cast<LPSTR>(private_FormOnOff.data());
+
 		MENUITEMINFO private_MenuInfo = {
 			sizeof(MENUITEMINFO),	// Size
 			MIIM_TYPE,				// Mask
@@ -20183,12 +20186,15 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 #endif /* WINVER >= 0x0500 */
 		};
 		MenuInfo = &private_MenuInfo;
+		}
 		std::vector<fPOINT>	private_TempPolygon;
 		TempPolygon = &private_TempPolygon;
 		std::vector<fPOINT>	private_OutsidePointList;
 		OutsidePointList = &private_OutsidePointList;
 		std::vector<fPOINT>	private_InsidePointList;
 		InsidePointList = &private_InsidePointList;
+		std::vector<HWND>	private_ValueWindow(LASTLIN);
+		ValueWindow = &private_ValueWindow;
 
 		redini();
 		if (IniFile.initialWindowCoords.right) {
