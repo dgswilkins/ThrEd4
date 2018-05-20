@@ -13877,6 +13877,7 @@ unsigned chkMsg() {
 				if (Msg.wParam&MK_SHIFT) {
 					TmpFormIndex = ClosestFormToCursor;
 					if (closfrm()) {
+						//ToDo - I don't think this can ever be hit with closfrm
 						if (SelectedFormCount) {
 							nuslst(ClosestFormToCursor);
 							StateMap.set(StateFlag::RESTCH);
@@ -13891,7 +13892,8 @@ unsigned chkMsg() {
 									TmpFormIndex = formCount;
 								}
 								for (iForm = TmpFormIndex; iForm <= ClosestFormToCursor; iForm++) {
-									SelectedFormList->operator[](formCount++) = iForm;
+									SelectedFormList->push_back(iForm);
+									formCount++;
 								}
 								SelectedFormCount = formCount;
 								StateMap.set(StateFlag::RESTCH);
