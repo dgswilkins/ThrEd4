@@ -328,7 +328,7 @@ unsigned		SequencePathIndex;		//index to path of sequenced regions
 unsigned		NextGroup;				//group that connects to the next region
 REGION*			CurrentRegion;			//region currently being sequenced
 FRMHED			AngledForm;				//a temporary rotated form for angle fills
-unsigned short	SelectedFormList[MAXFORMS];	//a list of selected forms
+std::vector<unsigned>*	SelectedFormList;	//a list of selected forms
 unsigned		SelectedFormCount = 0;	//number of selected forms
 unsigned		PreviousFormIndex;		//previously selected form
 RECT			SelectedFormsRect;		//for multiple selections;
@@ -1261,7 +1261,7 @@ void drwfrm() {
 		SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
 		SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fselrct(SelectedFormList[iForm]);
+			fselrct(SelectedFormList->operator[](iForm));
 		SelectedFormsSize.x = SelectedFormsRect.right - SelectedFormsRect.left;
 		SelectedFormsSize.y = SelectedFormsRect.bottom - SelectedFormsRect.top;
 		dubig();
@@ -3849,7 +3849,7 @@ void filvrt() {
 	if (SelectedFormCount) {
 		savdo();
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			if (SelectedForm->type != FRMLINE)
 				fsvrt();
@@ -3890,7 +3890,7 @@ void filhor() {
 		return;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			if (SelectedForm->type != FRMLINE)
 				fshor();
@@ -3937,7 +3937,7 @@ void filangl() {
 	if (SelectedFormCount) {
 		savdo();
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			if (SelectedForm->type != FRMLINE)
 				fsangl();
@@ -4861,7 +4861,7 @@ void filsat() {
 	if (SelectedFormCount) {
 		savdo();
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			if (SelectedForm->type != FRMLINE)
 				filsfn();
@@ -5094,11 +5094,11 @@ void unfil() {
 	if (SelectedFormCount) {
 		boost::dynamic_bitset<> formMap(FormIndex);
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			SelectedForm = &FormList[SelectedFormList[iForm]];
+			SelectedForm = &FormList[SelectedFormList->operator[](iForm)];
 			if (SelectedForm->fillType || SelectedForm->edgeType) {
-				delclps(SelectedFormList[iForm]);
+				delclps(SelectedFormList->operator[](iForm));
 				deltx();
-				formMap.set(SelectedFormList[iForm]);
+				formMap.set(SelectedFormList->operator[](iForm));
 				SelectedForm->fillType = 0;
 				SelectedForm->edgeType = 0;
 				SelectedForm->extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
@@ -5380,7 +5380,7 @@ void bord() {
 		return;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			SelectedForm->borderColor = ActiveColor;
 			sbord();
@@ -5691,7 +5691,7 @@ void fclp() {
 			if (ClipRectSize.cx > CLPMIN) {
 				if (SelectedFormCount) {
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-						ClosestFormToCursor = SelectedFormList[iForm];
+						ClosestFormToCursor = SelectedFormList->operator[](iForm);
 						fvars(ClosestFormToCursor);
 						fsclp();
 					}
@@ -6008,7 +6008,7 @@ void satbrd() {
 		return;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			if (UserFlagMap.test(UserFlag::BLUNT))
 				SelectedForm->attribute |= (SBLNT | FBLNT);
@@ -6089,7 +6089,7 @@ void apliq() {
 		return;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			if (UserFlagMap.test(UserFlag::BLUNT))
 				SelectedForm->attribute |= (SBLNT | FBLNT);
@@ -6684,8 +6684,8 @@ void setstrtch() {
 		else {
 			if (SelectedFormCount) {
 				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-					CurrentFormVertices = FormList[SelectedFormList[iForm]].vertices;
-					for (iVertex = 0; iVertex < FormList[SelectedFormList[iForm]].vertexCount; iVertex++)
+					CurrentFormVertices = FormList[SelectedFormList->operator[](iForm)].vertices;
+					for (iVertex = 0; iVertex < FormList[SelectedFormList->operator[](iForm)].vertexCount; iVertex++)
 						CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - reference)*ratio + reference;
 				}
 			}
@@ -6730,8 +6730,8 @@ void setstrtch() {
 		else {
 			if (SelectedFormCount) {
 				for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-					CurrentFormVertices = FormList[SelectedFormList[iForm]].vertices;
-					for (iVertex = 0; iVertex < FormList[SelectedFormList[iForm]].vertexCount; iVertex++)
+					CurrentFormVertices = FormList[SelectedFormList->operator[](iForm)].vertices;
+					for (iVertex = 0; iVertex < FormList[SelectedFormList->operator[](iForm)].vertexCount; iVertex++)
 						CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - reference)*ratio + reference;
 				}
 			}
@@ -6749,7 +6749,7 @@ void setstrtch() {
 	}
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			currentForm = SelectedFormList[iForm];
+			currentForm = SelectedFormList->operator[](iForm);
 			frmout(currentForm);
 			ClosestFormToCursor = currentForm;
 			refil();
@@ -6911,13 +6911,13 @@ void setexpand() {
 	else {
 		if (SelectedFormCount) {
 			for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-				fvars(SelectedFormList[iForm]);
+				fvars(SelectedFormList->operator[](iForm));
 				for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
 					CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - stitchReference.x)*ratio.x + stitchReference.x;
 					CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - stitchReference.y)*ratio.y + stitchReference.y;
 				}
-				frmout(SelectedFormList[iForm]);
-				ClosestFormToCursor = SelectedFormList[iForm];
+				frmout(SelectedFormList->operator[](iForm));
+				ClosestFormToCursor = SelectedFormList->operator[](iForm);
 				refil();
 			}
 		}
@@ -7061,7 +7061,7 @@ void dubold() {
 		return;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			sbold();
 		}
@@ -7592,7 +7592,7 @@ void fliph() {
 		pxrct2stch(SelectedFormsRect, &rectangle);
 		midpoint = (rectangle.right - rectangle.left) / 2 + rectangle.left;
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			formMap.set(ClosestFormToCursor);
 			fvars(ClosestFormToCursor);
 			for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++)
@@ -7670,7 +7670,7 @@ void flipv() {
 		pxrct2stch(SelectedFormsRect, &rectangle);
 		midpoint = (rectangle.top - rectangle.bottom) / 2 + rectangle.bottom;
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			formMap.set(ClosestFormToCursor);
 			fvars(ClosestFormToCursor);
 			for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++)
@@ -8217,7 +8217,7 @@ void prpbrd(double borderStitchSpacing) {
 	LineSpacing = borderStitchSpacing;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			SelectedForm->borderSize = LineSpacing;
 			if (UserFlagMap.test(UserFlag::BLUNT))
@@ -8327,7 +8327,7 @@ void flpord() {
 	if (SelectedFormCount) {
 		savdo();
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fnord();
 		}
 		coltab();
@@ -8477,7 +8477,7 @@ void clpfil() {
 			if (ClipRectSize.cx > CLPMIN && ClipRectSize.cy > CLPMIN) {
 				if (SelectedFormCount) {
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-						ClosestFormToCursor = SelectedFormList[iForm];
+						ClosestFormToCursor = SelectedFormList->operator[](iForm);
 						fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE)
 							filsclp();
@@ -8757,10 +8757,10 @@ void duprotfs() {
 
 	rotpar();
 	for (iForm = 0; iForm < SelectedFormCount; iForm++)
-		adfrm(SelectedFormList[iForm]);
+		adfrm(SelectedFormList->operator[](iForm));
 	FormIndex = savedFormIndex;
 	for (iForm = 0; iForm < SelectedFormCount; iForm++)
-		SelectedFormList[iForm] = FormIndex++;
+		SelectedFormList->operator[](iForm) = FormIndex++;
 	fnagain();
 }
 
@@ -8815,7 +8815,7 @@ void cpylayr(unsigned codedLayer) {
 	if (SelectedFormCount) {
 		savdo();
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			cplayfn(SelectedFormList[iForm], codedLayer);
+			cplayfn(SelectedFormList->operator[](iForm), codedLayer);
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
@@ -8850,7 +8850,7 @@ void movlayr(unsigned codedLayer) {
 		//  ToDo - use a form map rather than a marked stitch map 
 		boost::dynamic_bitset<> formMap(FormIndex);
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			iCurrentForm = SelectedFormList[iForm];
+			iCurrentForm = SelectedFormList->operator[](iForm);
 			FormList[iCurrentForm].attribute = (FormList[iCurrentForm].attribute&NFRMLMSK) | codedLayer;
 			formMap.set(iCurrentForm);
 		}
@@ -8966,7 +8966,7 @@ bool notsel() {
 	unsigned	iForm;
 
 	for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-		if (gsl::narrow<unsigned>(SelectedFormList[iForm]) == ClosestFormToCursor)
+		if (gsl::narrow<unsigned>(SelectedFormList->operator[](iForm)) == ClosestFormToCursor)
 			return 0;
 	}
 	return 1;
@@ -8975,10 +8975,14 @@ bool notsel() {
 void nufsel() {
 	if (FormIndex) {
 		StateMap.reset(StateFlag::FORMSEL);
-		if (StateMap.testAndReset(StateFlag::WASEL))
-			SelectedFormList[SelectedFormCount++] = PreviousFormIndex;
-		if (notsel())
-			SelectedFormList[SelectedFormCount++] = gsl::narrow<unsigned short>(ClosestFormToCursor);
+		if (StateMap.testAndReset(StateFlag::WASEL)) {
+			SelectedFormList->push_back(PreviousFormIndex);
+			SelectedFormCount++;
+		}
+		if (notsel()) {
+			SelectedFormList->push_back(ClosestFormToCursor);
+			SelectedFormCount++;
+		}
 		StateMap.set(StateFlag::RESTCH);
 	}
 }
@@ -9015,7 +9019,7 @@ void frmsadj() {
 
 	boost::dynamic_bitset<> formMap(FormIndex);
 	for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-		formMap.set(SelectedFormList[iForm]);
+		formMap.set(SelectedFormList->operator[](iForm));
 	}
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (StitchBuffer[iStitch].attribute&ALTYPMSK && formMap.test((StitchBuffer[iStitch].attribute&FRMSK) >> FRMSHFT)) {
@@ -9304,7 +9308,7 @@ void bhol() {
 	LineSpacing = savedSpacing;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			bholbrd();
 		}
@@ -9333,11 +9337,11 @@ void fcntr() {
 
 	if (SelectedFormCount) {
 		savdo();
-		iCurrentForm = SelectedFormList[0];
+		iCurrentForm = SelectedFormList->operator[](0);
 		initialCenter.x = (FormList[iCurrentForm].rectangle.right - FormList[iCurrentForm].rectangle.left) / 2 + FormList[iCurrentForm].rectangle.left;
 		initialCenter.y = (FormList[iCurrentForm].rectangle.top - FormList[iCurrentForm].rectangle.bottom) / 2 + FormList[iCurrentForm].rectangle.bottom;
 		for (iForm = 1; iForm < SelectedFormCount; iForm++) {
-			iCurrentForm = SelectedFormList[iForm];
+			iCurrentForm = SelectedFormList->operator[](iForm);
 			currentCenter.x = (FormList[iCurrentForm].rectangle.right - FormList[iCurrentForm].rectangle.left) / 2 + FormList[iCurrentForm].rectangle.left;
 			currentCenter.y = (FormList[iCurrentForm].rectangle.top - FormList[iCurrentForm].rectangle.bottom) / 2 + FormList[iCurrentForm].rectangle.bottom;
 			delta.x = initialCenter.x - currentCenter.x;
@@ -9553,7 +9557,7 @@ void picot() {
 			if (ClipRectSize.cx > CLPMIN) {
 				if (SelectedFormCount) {
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-						ClosestFormToCursor = SelectedFormList[iForm];
+						ClosestFormToCursor = SelectedFormList->operator[](iForm);
 						fvars(ClosestFormToCursor);
 						fspic();
 					}
@@ -9761,7 +9765,7 @@ void contfil() {
 	if (SelectedFormCount) {
 		savdo();
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			contsf(SelectedFormList[iForm]);
+			contsf(SelectedFormList->operator[](iForm));
 		StateMap.set(StateFlag::INIT);
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
@@ -10138,13 +10142,13 @@ void dufcntr(dPOINT* center) noexcept {
 	fRECTANGLE*	formRect = nullptr;
 	fRECTANGLE	bigRect = {};
 
-	formRect = &FormList[SelectedFormList[0]].rectangle;
+	formRect = &FormList[SelectedFormList->operator[](0)].rectangle;
 	bigRect.left = formRect->left;
 	bigRect.right = formRect->right;
 	bigRect.top = formRect->top;
 	bigRect.bottom = formRect->bottom;
 	for (iForm = 1; iForm < SelectedFormCount; iForm++) {
-		formRect = &FormList[SelectedFormList[iForm]].rectangle;
+		formRect = &FormList[SelectedFormList->operator[](iForm)].rectangle;
 		if (formRect->left < bigRect.left)
 			bigRect.left = formRect->left;
 		if (formRect->right > bigRect.right)
@@ -10185,7 +10189,7 @@ void cntrx() {
 		if (StateMap.test(StateFlag::CNTRH))
 			FormMoveDelta.x = 0;
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			frmadj(SelectedFormList[iForm]);
+			frmadj(SelectedFormList->operator[](iForm));
 		frmsadj();
 	}
 	else {
@@ -11329,7 +11333,7 @@ void vrtclp() {
 				if (SelectedFormCount) {
 					StateMap.set(StateFlag::NOCLP);
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-						ClosestFormToCursor = SelectedFormList[iForm];
+						ClosestFormToCursor = SelectedFormList->operator[](iForm);
 						fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE)
 							vrtsclp();
@@ -11439,7 +11443,7 @@ void horclp() {
 				if (SelectedFormCount) {
 					StateMap.set(StateFlag::NOCLP);
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-						ClosestFormToCursor = SelectedFormList[iForm];
+						ClosestFormToCursor = SelectedFormList->operator[](iForm);
 						fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE)
 							horsclp();
@@ -11538,7 +11542,7 @@ void angclp() {
 				if (SelectedFormCount) {
 					StateMap.set(StateFlag::NOCLP);
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-						ClosestFormToCursor = SelectedFormList[iForm];
+						ClosestFormToCursor = SelectedFormList->operator[](iForm);
 						fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE)
 							angsclp();
@@ -11595,7 +11599,7 @@ void dubfil() {
 		return;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			dubsfil();
 		}
@@ -11996,7 +12000,7 @@ void chain() {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			chan();
 		}
@@ -12194,7 +12198,7 @@ void filclpx() {
 			if (ClipRectSize.cx > CLPMIN) {
 				if (SelectedFormCount) {
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-						ClosestFormToCursor = SelectedFormList[iForm];
+						ClosestFormToCursor = SelectedFormList->operator[](iForm);
 						fvars(ClosestFormToCursor);
 						fsclpx();
 					}

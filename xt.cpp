@@ -77,7 +77,7 @@ extern	SATCON			SatinGuides[MAXSAC];
 extern	EnumMap<StateFlag>	StateMap;
 extern	unsigned		SelectedFormCount;
 extern	unsigned		SelectedFormCount;
-extern	unsigned short	SelectedFormList[MAXFORMS];
+extern	std::vector<unsigned>*	SelectedFormList;
 extern	fPOINT			SelectedPoint;
 extern	unsigned		SequenceIndex;
 extern	std::vector<std::string> *StringTable;
@@ -736,7 +736,7 @@ void fethr() {
 	if (SelectedFormCount) {
 		savdo();
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fethrf();
 		}
 		StateMap.set(StateFlag::INIT);
@@ -1343,7 +1343,7 @@ void chkund(std::vector<RNGCNT> &textureSegments) {
 
 void selalfrm() {
 	for (SelectedFormCount = 0; SelectedFormCount < FormIndex; SelectedFormCount++)
-		SelectedFormList[SelectedFormCount] = SelectedFormCount;
+		SelectedFormList->operator[](SelectedFormCount) = SelectedFormCount;
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -2274,7 +2274,7 @@ void setundfn(unsigned code) {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList[iForm];
+			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			if (SelectedForm->type == FRMLINE)
 				continue;
@@ -2362,7 +2362,7 @@ void dusulen(float length) {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			ulenfn(SelectedFormList[iForm], length);
+			ulenfn(SelectedFormList->operator[](iForm), length);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		ulenfn(ClosestFormToCursor, length);
@@ -2392,7 +2392,7 @@ void duspac(float spacing) {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			uspacfn(SelectedFormList[iForm], spacing);
+			uspacfn(SelectedFormList->operator[](iForm), spacing);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		uspacfn(ClosestFormToCursor, spacing);
@@ -2423,7 +2423,7 @@ void dufang(float angle) {
 	angle *= (float)PI / 180;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			uangfn(SelectedFormList[iForm], angle);
+			uangfn(SelectedFormList->operator[](iForm), angle);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		uangfn(ClosestFormToCursor, angle);
@@ -2453,7 +2453,7 @@ void duflen(float length) {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			flenfn(SelectedFormList[iForm], length);
+			flenfn(SelectedFormList->operator[](iForm), length);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		flenfn(ClosestFormToCursor, length);
@@ -2487,7 +2487,7 @@ void dufspac(float spacing) {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fspacfn(SelectedFormList[iForm], spacing);
+			fspacfn(SelectedFormList->operator[](iForm), spacing);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		fspacfn(ClosestFormToCursor, spacing);
@@ -2517,7 +2517,7 @@ void dufind(float indent) {
 	indent *= PFGRAN;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			findfn(SelectedFormList[iForm], indent);
+			findfn(SelectedFormList->operator[](iForm), indent);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		findfn(ClosestFormToCursor, indent);
@@ -2557,7 +2557,7 @@ void dufxang(float angle) {
 	angle *= (float)PI / 180;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fangfn(SelectedFormList[iForm], angle);
+			fangfn(SelectedFormList->operator[](iForm), angle);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		fangfn(ClosestFormToCursor, angle);
@@ -2590,7 +2590,7 @@ void dundcol(unsigned color) {
 	color &= COLMSK;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			ucolfn(SelectedFormList[iForm], color);
+			ucolfn(SelectedFormList->operator[](iForm), color);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		ucolfn(ClosestFormToCursor, color);
@@ -2623,7 +2623,7 @@ void dufcol(unsigned color) {
 	color &= COLMSK;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fcolfn(SelectedFormList[iForm], color);
+			fcolfn(SelectedFormList->operator[](iForm), color);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		fcolfn(ClosestFormToCursor, color);
@@ -2656,7 +2656,7 @@ void dubcol(unsigned color) {
 	color &= COLMSK;
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			bcolfn(SelectedFormList[iForm], color);
+			bcolfn(SelectedFormList->operator[](iForm), color);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		bcolfn(ClosestFormToCursor, color);
@@ -2686,7 +2686,7 @@ void dublen(float length) {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			blenfn(SelectedFormList[iForm], length);
+			blenfn(SelectedFormList->operator[](iForm), length);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		blenfn(ClosestFormToCursor, length);
@@ -2716,7 +2716,7 @@ void dubspac(float length) {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			bspacfn(SelectedFormList[iForm], length);
+			bspacfn(SelectedFormList->operator[](iForm), length);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		bspacfn(ClosestFormToCursor, length);
@@ -2746,7 +2746,7 @@ void dubmin(float length) {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			bminfn(SelectedFormList[iForm], length);
+			bminfn(SelectedFormList->operator[](iForm), length);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		bminfn(ClosestFormToCursor, length);
@@ -2776,7 +2776,7 @@ void dubmax(float length) {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			bmaxfn(SelectedFormList[iForm], length);
+			bmaxfn(SelectedFormList->operator[](iForm), length);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		bmaxfn(ClosestFormToCursor, length);
@@ -2806,7 +2806,7 @@ void dufmin(float length) {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fminfn(SelectedFormList[iForm], length);
+			fminfn(SelectedFormList->operator[](iForm), length);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		fminfn(ClosestFormToCursor, length);
@@ -2836,7 +2836,7 @@ void dufmax(float length) {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fmaxfn(SelectedFormList[iForm], length);
+			fmaxfn(SelectedFormList->operator[](iForm), length);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		fmaxfn(ClosestFormToCursor, length);
@@ -2872,7 +2872,7 @@ void dufwid(float length) {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fwidfn(SelectedFormList[iForm], length);
+			fwidfn(SelectedFormList->operator[](iForm), length);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		fwidfn(ClosestFormToCursor, length);
@@ -2916,7 +2916,7 @@ void dufhi(float length) {
 	savdo();
 	if (SelectedFormCount) {
 		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fhifn(SelectedFormList[iForm], length);
+			fhifn(SelectedFormList->operator[](iForm), length);
 	}
 	if (StateMap.test(StateFlag::FORMSEL))
 		fhifn(ClosestFormToCursor, length);
