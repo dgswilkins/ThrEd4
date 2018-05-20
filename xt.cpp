@@ -1342,8 +1342,10 @@ void chkund(std::vector<RNGCNT> &textureSegments) {
 }
 
 void selalfrm() {
+	//ToDo - Can this reserve and loop be replaced with a direct copy of FormList?
+	SelectedFormList->reserve(FormIndex);
 	for (SelectedFormCount = 0; SelectedFormCount < FormIndex; SelectedFormCount++)
-		SelectedFormList->operator[](SelectedFormCount) = SelectedFormCount;
+		SelectedFormList->push_back(SelectedFormCount);
 	StateMap.set(StateFlag::RESTCH);
 }
 

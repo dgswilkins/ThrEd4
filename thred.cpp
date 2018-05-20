@@ -9381,6 +9381,7 @@ void dufsel() noexcept {
 	}
 	SelectedFormCount = 0;
 	SelectedFormList->clear();
+	SelectedFormList->reserve(finish - start + 1);
 	while (start <= finish) {
 		SelectedFormList->push_back(start);
 		start++;
@@ -13608,6 +13609,8 @@ unsigned chkMsg() {
 				if (StateMap.testAndReset(StateFlag::NOSEL)) {
 					SelectedFormCount = 0;
 					SelectedFormList->clear();
+					// We potentially reserve too much memory, but the cost of reallocatioon is higher than the small amount overallocated
+					SelectedFormList->reserve(FormIndex);
 					StateMap.reset(StateFlag::FORMSEL);
 					for (iForm = 0; iForm < FormIndex; iForm++) {
 						if (finrng(iForm)) {
