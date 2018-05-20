@@ -302,7 +302,7 @@ std::vector<fPOINT>*	InsidePoints;	//pointer to the list of inside outline point
 fPOINT			ClipReference;			//clipboard reference formOrigin
 double			BorderWidth = BRDWID;	//border width for satin borders
 unsigned		SelectedFormControlVertex;	//user selected form control formOrigin
-POINT			FormControlPoints[10];	//form control rectangle in pixel coordinates
+std::vector<POINT>*	FormControlPoints;	//form control rectangle in pixel coordinates
 double			XYratio;				//expand form aspect ratio
 std::vector<HWND>*	ValueWindow;		//data handles for the form data sheet
 std::vector<HWND>*	LabelWindow;	//text handles for the form data sheet
@@ -4005,14 +4005,15 @@ unsigned chkfrm() {
 	NewFormVertexCount = SelectedForm->vertexCount + 1;
 	duzrat();
 	sRct2px(SelectedForm->rectangle, &rectangle);
-	FormControlPoints[0].x = FormControlPoints[6].x = FormControlPoints[7].x = FormControlPoints[8].x = rectangle.left;
-	FormControlPoints[1].x = FormControlPoints[5].x = midl(rectangle.right, rectangle.left);
-	FormControlPoints[0].y = FormControlPoints[1].y = FormControlPoints[2].y = FormControlPoints[8].y = rectangle.top;
-	FormControlPoints[3].y = FormControlPoints[7].y = midl(rectangle.top, rectangle.bottom);
-	FormControlPoints[4].y = FormControlPoints[5].y = FormControlPoints[6].y = rectangle.bottom;
-	FormControlPoints[2].x = FormControlPoints[3].x = FormControlPoints[4].x = rectangle.right;
+	auto& formControls = *FormControlPoints;
+	formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x = rectangle.left;
+	formControls[1].x = formControls[5].x = midl(rectangle.right, rectangle.left);
+	formControls[0].y = formControls[1].y = formControls[2].y = formControls[8].y = rectangle.top;
+	formControls[3].y = formControls[7].y = midl(rectangle.top, rectangle.bottom);
+	formControls[4].y = formControls[5].y = formControls[6].y = rectangle.bottom;
+	formControls[2].x = formControls[3].x = formControls[4].x = rectangle.right;
 	for (iControl = 0; iControl < 10; iControl++) {
-		length = hypot(FormControlPoints[iControl].x - point.x, FormControlPoints[iControl].y - point.y);
+		length = hypot(formControls[iControl].x - point.x, formControls[iControl].y - point.y);
 		if (length < minimumLength) {
 			minimumLength = length;
 			SelectedFormControlVertex = iControl;
@@ -4020,7 +4021,7 @@ unsigned chkfrm() {
 		if (minimumLength < CLOSENUF) {
 			ritfrct(ClosestFormToCursor, StitchWindowDC);
 			for (iControl = 0; iControl < 4; iControl++) {
-				StretchBoxLine[iControl] = FormControlPoints[iControl << 1];
+				StretchBoxLine[iControl] = formControls[iControl << 1];
 			}
 			StretchBoxLine[4].x = StretchBoxLine[0].x;
 			StretchBoxLine[4].y = StretchBoxLine[0].y;
