@@ -10947,19 +10947,25 @@ void nuslst(unsigned find) noexcept {
 	unsigned	form = 0, iFormList = 0;
 
 	gselrng();
+	//ToDo - Check this code. Does it do what is intended?
 	do {
 		if (find < SelectedFormsRange.start) {
-			for (form = find; form < SelectedFormsRange.finish; form++)
-				SelectedFormList->operator[](iFormList++) = form;
+			for (form = find; form < SelectedFormsRange.finish; form++) {
+				SelectedFormList->push_back(form);
+				iFormList++;
+			}
 			break;
 		}
 		if (find > SelectedFormsRange.finish) {
-			for (form = SelectedFormsRange.start; form <= find; form++)
-				SelectedFormList->operator[](iFormList++) = form;
+			for (form = SelectedFormsRange.start; form <= find; form++) {
+				SelectedFormList->push_back(form);
+				iFormList++;
+			}
 			break;
 		}
 		for (form = SelectedFormsRange.start; form <= find; form++) {
-			SelectedFormList->operator[](iFormList++) = form;
+			SelectedFormList->push_back(form);
+			iFormList++;
 		}
 	} while (false);
 	SelectedFormCount = iFormList;
