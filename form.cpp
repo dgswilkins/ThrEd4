@@ -7141,6 +7141,7 @@ void prfmsg() {
 		StateMap.set(StateFlag::WASRT);
 	StateMap.reset(StateFlag::BIGBOX);
 	SelectedFormCount = 0;
+	SelectedFormList->clear();
 	if (FormDataSheet) {
 		undat();
 		unsid();
@@ -8862,6 +8863,7 @@ void movlayr(unsigned codedLayer) {
 			}
 		}
 		SelectedFormCount = 0;
+		SelectedFormList->clear();
 		StateMap.reset(StateFlag::FORMSEL);
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -9075,6 +9077,7 @@ void getbig() noexcept {
 void selal() {
 	StateMap.reset(StateFlag::FORMSEL);
 	SelectedFormCount = 0;
+	SelectedFormList->clear();
 	StateMap.reset(StateFlag::SELBOX);
 	StateMap.reset(StateFlag::GRPSEL);
 	getbig();

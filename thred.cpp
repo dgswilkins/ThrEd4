@@ -9240,6 +9240,7 @@ void nulayr(unsigned play) {
 				StateMap.reset(StateFlag::SELBOX);
 		}
 		SelectedFormCount = 0;
+		SelectedFormList->clear();
 	}
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -10966,6 +10967,7 @@ void nuslst(unsigned find) noexcept {
 void srchk() {
 	StateMap.reset(StateFlag::FORMSEL);
 	SelectedFormCount = 0;
+	SelectedFormList->clear();
 	if (StateMap.testAndSet(StateFlag::LENSRCH)) {
 		if (StateMap.test(StateFlag::WASGRP)) {
 			ClosestPointIndex = GroupStartStitch = PrevGroupStartStitch;
@@ -11097,6 +11099,7 @@ void delsfrms(unsigned code) {
 				}
 			}
 			SelectedFormCount = 0;
+			SelectedFormList->clear();
 			StateMap.reset(StateFlag::FORMSEL);
 			coltab();
 			StateMap.set(StateFlag::RESTCH);
@@ -13907,9 +13910,6 @@ unsigned chkMsg() {
 					if (SelectedFormCount > 1) {
 						std::string blank("");
 						butxt(HNUM, blank);
-					}
-					else {
-						ritnum(STR_NUMFORM, SelectedFormList->operator[](0) + 1);
 					}
 					return 1;
 				}
