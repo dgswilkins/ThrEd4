@@ -311,7 +311,7 @@ RECT			ValueWindowCoords;		//location of right windows in the form data sheet
 POINT			LabelWindowSize;		//size of the left windows in the form data sheet
 POINT			ValueWindowSize;		//size of the right windows in the form data sheet
 fPOINT			LowerLeftStitch;		//lower left formOrigin in a form
-POINT			RubberBandLine[3];		//points to form points to be moved
+std::vector<POINT>*	RubberBandLine;		//points to form points to be moved
 double			SnapLength = SNPLEN * PFGRAN;	//snap together length
 double			StarRatio = STARAT;		//star formOrigin to body ratio
 double			SpiralWrap = SPIRWRAP;	//number of revolutions in a spiral
@@ -1271,8 +1271,8 @@ void drwfrm() {
 			ritfrct(ClosestFormToCursor, StitchWindowMemDC);
 		if (StateMap.test(StateFlag::FRMPMOV)) {
 			ritmov();
-			RubberBandLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
-			RubberBandLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
+			RubberBandLine->operator[](1).x = Msg.pt.x - StitchWindowOrigin.x;
+			RubberBandLine->operator[](1).y = Msg.pt.y - StitchWindowOrigin.y;
 			StateMap.set(StateFlag::SHOMOV);
 			ritmov();
 		}
@@ -1672,7 +1672,7 @@ void frmovlin() {
 	frmlin(SelectedForm->vertices, SelectedForm->vertexCount);
 	previousPoint = prv(ClosestVertexToCursor);
 	for (iPoint = 0; iPoint < 3; iPoint++) {
-		RubberBandLine[iPoint] = FormLines[previousPoint];
+		RubberBandLine->operator[](iPoint) = FormLines[previousPoint];
 		previousPoint++;
 	}
 	ritmov();

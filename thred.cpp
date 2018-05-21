@@ -440,7 +440,7 @@ extern	float			PicotSpacing;
 extern	long			PreferenceWindowWidth;
 extern	unsigned		PreviousFormIndex;
 extern	unsigned		PseudoRandomValue;
-extern	POINT			RubberBandLine[3];
+extern	std::vector<POINT>*	RubberBandLine;
 extern	unsigned		SatinGuideIndex;
 extern	SATCON			SatinGuides[MAXSAC];
 extern	unsigned		SelectedFormControlVertex;
@@ -9106,17 +9106,17 @@ void ritmov() {
 	SelectObject(StitchWindowDC, FormPen);
 	if (ClosestVertexToCursor) {
 		if (ClosestVertexToCursor == gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1 && SelectedForm->type == FRMLINE)
-			Polyline(StitchWindowDC, RubberBandLine, 2);
+			Polyline(StitchWindowDC, RubberBandLine->data(), 2);
 		else
-			Polyline(StitchWindowDC, RubberBandLine, 3);
+			Polyline(StitchWindowDC, RubberBandLine->data(), 3);
 	}
 	else {
-		RubberBandLine[2].x = FormLines[1].x;
-		RubberBandLine[2].y = FormLines[1].y;
+		RubberBandLine->operator[](2).x = FormLines[1].x;
+		RubberBandLine->operator[](2).y = FormLines[1].y;
 		if (SelectedForm->type == FRMLINE)
-			Polyline(StitchWindowDC, &RubberBandLine[1], 2);
+			Polyline(StitchWindowDC, &RubberBandLine->operator[](1), 2);
 		else
-			Polyline(StitchWindowDC, RubberBandLine, 3);
+			Polyline(StitchWindowDC, RubberBandLine->data(), 3);
 	}
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
@@ -13372,8 +13372,8 @@ unsigned chkMsg() {
 			}
 			if (StateMap.test(StateFlag::FRMPMOV)) {
 				unmov();
-				RubberBandLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
-				RubberBandLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
+				RubberBandLine->operator[](1).x = Msg.pt.x - StitchWindowOrigin.x;
+				RubberBandLine->operator[](1).y = Msg.pt.y - StitchWindowOrigin.y;
 				StateMap.set(StateFlag::SHOMOV);
 				ritmov();
 				if (px2stch())
@@ -20223,6 +20223,8 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		SelectedFormList = &private_SelectedFormList;
 		std::vector<POINT>	private_FormControlPoints(10);
 		FormControlPoints = &private_FormControlPoints;
+		std::vector<POINT>	private_RubberBandLine(3);
+		RubberBandLine = &private_RubberBandLine;
 
 		redini();
 		if (IniFile.initialWindowCoords.right) {
