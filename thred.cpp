@@ -7265,19 +7265,18 @@ void durcntr() {
 	RotationCenter.y = midl(RotationRect.top, RotationRect.bottom);
 }
 
-void rectFromLine (fRECTANGLE &rectangle, std::vector<POINT> *ptrLine) {
-	auto& line = *ptrLine;
-	rectangle.top = line[0].x;
-	rectangle.left = line[0].y;
-	rectangle.right = line[1].x;
-	rectangle.bottom = line[1].y;
+void rectFloatFromRect (fRECTANGLE &rectangle, RECT &source) {
+	rectangle.top = source.top;
+	rectangle.left = source.left;
+	rectangle.right = source.right;
+	rectangle.bottom = source.bottom;
 }
 
 void rot() {
 	do {
 		if (StateMap.test(StateFlag::FPSEL)) {
 			//MoveMemory(&RotationRect, &SelectedPointsLine, sizeof(fRECTANGLE));
-			rectFromLine(RotationRect, SelectedPointsLine);
+			rectFloatFromRect(RotationRect, SelectedFormsRect);
 			break;
 		}
 		if (StateMap.test(StateFlag::BIGBOX)) {
