@@ -332,8 +332,8 @@ std::vector<unsigned>*	SelectedFormList;	//a list of selected forms
 unsigned		SelectedFormCount = 0;	//number of selected forms
 unsigned		PreviousFormIndex;		//previously selected form
 RECT			SelectedFormsRect;		//for multiple selections;
-POINT			SelectedFormsLine[9];	//line derived from the big rectangle
-POINT			SelectedPointsLine[9];	//line derived from the formOrigin select rectangle
+std::vector<POINT>*	SelectedFormsLine;	//line derived from the big rectangle
+std::vector<POINT>*	SelectedPointsLine;	//line derived from the formOrigin select rectangle
 fRECTANGLE		AllItemsRect;			//rectangle enclosing all forms and stitches
 double			FormAngles[MAXFRMLINS];	//angles of a form for satin border fills
 fPOINT			FormVertices[MAXITEMS];	//form points
@@ -1127,15 +1127,15 @@ void fselrct(unsigned iForm) noexcept {
 	Polyline(StitchWindowMemDC, line, 5);
 }
 
-void rct2sel(RECT rectangle, POINT* line) noexcept {
-	if (line) {
-		line[0].x = line[6].x = line[7].x = line[8].x = rectangle.left;
-		line[1].x = line[5].x = ((rectangle.right - rectangle.left) >> 1) + rectangle.left;
-		line[2].x = line[3].x = line[4].x = rectangle.right;
-		line[0].y = line[1].y = line[2].y = line[8].y = rectangle.top;
-		line[3].y = line[7].y = ((rectangle.bottom - rectangle.top) >> 1) + rectangle.top;
-		line[4].y = line[5].y = line[6].y = rectangle.bottom;
-	}
+void rct2sel(RECT& rectangle, std::vector<POINT>* ptrLine) noexcept {
+	auto& line = *ptrLine;
+
+	line[0].x = line[6].x = line[7].x = line[8].x = rectangle.left;
+	line[1].x = line[5].x = ((rectangle.right - rectangle.left) >> 1) + rectangle.left;
+	line[2].x = line[3].x = line[4].x = rectangle.right;
+	line[0].y = line[1].y = line[2].y = line[8].y = rectangle.top;
+	line[3].y = line[7].y = ((rectangle.bottom - rectangle.top) >> 1) + rectangle.top;
+	line[4].y = line[5].y = line[6].y = rectangle.bottom;
 }
 
 void dubig() noexcept {
@@ -1143,9 +1143,9 @@ void dubig() noexcept {
 
 	rct2sel(SelectedFormsRect, SelectedFormsLine);
 	SelectObject(StitchWindowMemDC, SelectAllPen);
-	Polyline(StitchWindowMemDC, SelectedFormsLine, 9);
+	Polyline(StitchWindowMemDC, SelectedFormsLine->data(), 9);
 	for (iPoint = 0; iPoint < 8; iPoint++)
-		selsqr(SelectedFormsLine[iPoint], StitchWindowMemDC);
+		selsqr(SelectedFormsLine->operator[](iPoint), StitchWindowMemDC);
 }
 
 void frmpoly(const POINT* line, unsigned count) noexcept {
@@ -1164,10 +1164,10 @@ void dupsel(HDC dc) noexcept {
 
 	SelectObject(dc, FormPen);
 	SetROP2(dc, R2_XORPEN);
-	Polyline(dc, SelectedPointsLine, 9);
+	Polyline(dc, SelectedPointsLine->data(), 9);
 	iPoint = SelectedFormVertices.start;
 	for (iPoint = 0; iPoint < 8; iPoint++)
-		selsqr(SelectedPointsLine[iPoint], dc);
+		selsqr(SelectedPointsLine->operator[](iPoint), dc);
 	frmx(EndPointCross, dc);
 }
 

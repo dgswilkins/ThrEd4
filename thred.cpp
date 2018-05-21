@@ -286,7 +286,7 @@ extern	void			px2stchf (POINT screen, fPOINT* stitchPoint);
 extern	void			pxrct2stch (RECT screenRect, fRECTANGLE* stitchRect);
 extern	void			rats ();
 extern	void			ratsr ();
-extern	void			rct2sel (RECT rectangle, POINT* line);
+extern	void			rct2sel(RECT& rectangle, std::vector<POINT>* ptrLine);
 extern	void			redtx ();
 extern	void			redup ();
 extern	void			refil ();
@@ -446,9 +446,9 @@ extern	SATCON			SatinGuides[MAXSAC];
 extern	unsigned		SelectedFormControlVertex;
 extern	unsigned		SelectedFormCount;
 extern	std::vector<unsigned>*	SelectedFormList;
-extern	POINT			SelectedFormsLine[9];
+extern	std::vector<POINT>*	SelectedFormsLine;
 extern	RECT			SelectedFormsRect;
-extern	POINT			SelectedPointsLine[9];
+extern	std::vector<POINT>*	SelectedPointsLine;
 extern	std::vector<unsigned>	*SelectedTexturePointsList;
 extern	double			SnapLength;
 extern	double			SpiralWrap;
@@ -7265,14 +7265,24 @@ void durcntr() {
 	RotationCenter.y = midl(RotationRect.top, RotationRect.bottom);
 }
 
+void rectFromLine (fRECTANGLE &rectangle, std::vector<POINT> *ptrLine) {
+	auto& line = *ptrLine;
+	rectangle.top = line[0].x;
+	rectangle.left = line[0].y;
+	rectangle.right = line[1].x;
+	rectangle.bottom = line[1].y;
+}
+
 void rot() {
 	do {
 		if (StateMap.test(StateFlag::FPSEL)) {
-			MoveMemory(&RotationRect, &SelectedPointsLine, sizeof(fRECTANGLE));
+			//MoveMemory(&RotationRect, &SelectedPointsLine, sizeof(fRECTANGLE));
+			rectFromLine(RotationRect, SelectedPointsLine);
 			break;
 		}
 		if (StateMap.test(StateFlag::BIGBOX)) {
-			MoveMemory(&RotationRect, &AllItemsRect, sizeof(fRECTANGLE));
+			//MoveMemory(&RotationRect, &AllItemsRect, sizeof(fRECTANGLE));
+			RotationRect = AllItemsRect;
 			break;
 		}
 		if (SelectedFormCount) {
@@ -7283,7 +7293,8 @@ void rot() {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			fvars(ClosestFormToCursor);
 			StateMap.set(StateFlag::FRMROT);
-			MoveMemory(&RotationRect, &SelectedForm->rectangle, sizeof(fRECTANGLE));
+			//MoveMemory(&RotationRect, &SelectedForm->rectangle, sizeof(fRECTANGLE));
+			RotationRect = SelectedForm->rectangle;
 			break;
 		}
 		if (StateMap.test(StateFlag::GRPSEL)) {
@@ -9307,19 +9318,19 @@ bool chkbig() {
 								(Msg.pt.y - StitchWindowOrigin.y) };
 
 	for (iControlPoint = 0; iControlPoint < 9; iControlPoint++) {
-		length = hypot(pointToTest.x - SelectedFormsLine[iControlPoint].x, pointToTest.y - SelectedFormsLine[iControlPoint].y);
+		length = hypot(pointToTest.x - SelectedFormsLine->operator[](iControlPoint).x, pointToTest.y - SelectedFormsLine->operator[](iControlPoint).y);
 		if (length < minimumLength) {
 			minimumLength = length;
 			SelectedFormControlVertex = iControlPoint;
 		}
 	}
 	for (iCorner = 0; iCorner < 4; iCorner++) {
-		FormLines[iCorner] = SelectedFormsLine[iCorner << 1];
+		FormLines[iCorner] = SelectedFormsLine->operator[](iCorner << 1);
 	}
 	FormLines[4] = FormLines[0];
 	if (minimumLength < CLOSENUF) {
 		for (iCorner = 0; iCorner < 4; iCorner++) {
-			StretchBoxLine[iCorner] = SelectedFormsLine[iCorner << 1];
+			StretchBoxLine[iCorner] = SelectedFormsLine->operator[](iCorner << 1);
 		}
 		StretchBoxLine[4] = StretchBoxLine[0];
 		if (SelectedFormControlVertex & 1)
@@ -14075,8 +14086,8 @@ unsigned chkMsg() {
 			return 1;
 		}
 		if (StateMap.test(StateFlag::FPSEL) && !StateMap.test(StateFlag::FUNCLP) && !StateMap.test(StateFlag::ROTAT)) {
-			MoveMemory(&SelectedFormsLine, &SelectedPointsLine, sizeof(POINT) * 9);
-			MoveMemory(&SelectedFormsRect, &SelectedPixelsRect, sizeof(RECT));
+			*SelectedFormsLine = *SelectedPointsLine;
+			SelectedFormsRect = SelectedPixelsRect;
 			if (chkbig())
 				return 1;
 		}
@@ -20225,6 +20236,10 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		FormControlPoints = &private_FormControlPoints;
 		std::vector<POINT>	private_RubberBandLine(3);
 		RubberBandLine = &private_RubberBandLine;
+		std::vector<POINT>	private_SelectedFormsLine(9);
+		SelectedFormsLine = &private_SelectedFormsLine;
+		std::vector<POINT>	private_SelectedPointsLine(9);
+		SelectedPointsLine = &private_SelectedPointsLine;
 
 		redini();
 		if (IniFile.initialWindowCoords.right) {
