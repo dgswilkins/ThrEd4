@@ -416,6 +416,7 @@ extern	unsigned		ClipPointIndex;
 extern	SATCON*			CurrentFormGuides;
 extern	fPOINT*			CurrentFormVertices;
 extern	std::vector<HWND>	*ValueWindow;
+extern	std::vector<double>*	FormAngles;
 extern	POINT			FormLines[MAXFRMLINS];
 extern	unsigned		FormVertexIndex;
 extern	fPOINT			FormMoveDelta;
@@ -7265,22 +7266,13 @@ void durcntr() {
 	RotationCenter.y = midl(RotationRect.top, RotationRect.bottom);
 }
 
-void rectFloatFromRect (fRECTANGLE &rectangle, RECT &source) {
-	rectangle.top = source.top;
-	rectangle.left = source.left;
-	rectangle.right = source.right;
-	rectangle.bottom = source.bottom;
-}
-
 void rot() {
 	do {
 		if (StateMap.test(StateFlag::FPSEL)) {
-			//MoveMemory(&RotationRect, &SelectedPointsLine, sizeof(fRECTANGLE));
-			rectFloatFromRect(RotationRect, SelectedFormsRect);
+			RotationRect = SelectedVerticesRect;
 			break;
 		}
 		if (StateMap.test(StateFlag::BIGBOX)) {
-			//MoveMemory(&RotationRect, &AllItemsRect, sizeof(fRECTANGLE));
 			RotationRect = AllItemsRect;
 			break;
 		}
@@ -7292,7 +7284,6 @@ void rot() {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			fvars(ClosestFormToCursor);
 			StateMap.set(StateFlag::FRMROT);
-			//MoveMemory(&RotationRect, &SelectedForm->rectangle, sizeof(fRECTANGLE));
 			RotationRect = SelectedForm->rectangle;
 			break;
 		}
@@ -20239,6 +20230,8 @@ int APIENTRY WinMain(_In_     HINSTANCE hInstance,
 		SelectedFormsLine = &private_SelectedFormsLine;
 		std::vector<POINT>	private_SelectedPointsLine(9);
 		SelectedPointsLine = &private_SelectedPointsLine;
+		std::vector<double>	private_FormAngles;
+		FormAngles = &private_FormAngles;
 
 		redini();
 		if (IniFile.initialWindowCoords.right) {

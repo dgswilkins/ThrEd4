@@ -335,7 +335,7 @@ RECT			SelectedFormsRect;		//for multiple selections;
 std::vector<POINT>*	SelectedFormsLine;	//line derived from the big rectangle
 std::vector<POINT>*	SelectedPointsLine;	//line derived from the formOrigin select rectangle
 fRECTANGLE		AllItemsRect;			//rectangle enclosing all forms and stitches
-double			FormAngles[MAXFRMLINS];	//angles of a form for satin border fills
+std::vector<double>*	FormAngles;		//angles of a form for satin border fills
 fPOINT			FormVertices[MAXITEMS];	//form points
 unsigned		FormVertexIndex;		//next index to append form points
 fPOINT			ClipPoints[MAXITEMS];	//main clipboard fill points for forms
@@ -5582,20 +5582,20 @@ void outfn(unsigned start, unsigned finish, double satinWidth) {
 	double	length = 0.0;
 	double	xOffset = 0.0, yOffset = 0.0;
 
-	if (fabs(FormAngles[start]) < TINY && fabs(FormAngles[finish]) < TINY) {
+	if (fabs(FormAngles->operator[](start)) < TINY && fabs(FormAngles->operator[](finish)) < TINY) {
 		xOffset = 0.0;
 		yOffset = satinWidth;
 	}
 	else {
 #define SATHRESH 10
 
-		angle = (FormAngles[finish] - FormAngles[start]) / 2;
+		angle = (FormAngles->operator[](finish) - FormAngles->operator[](start)) / 2;
 		length = satinWidth / cos(angle);
 		if (length < -satinWidth * SATHRESH)
 			length = -satinWidth * SATHRESH;
 		if (length > satinWidth*SATHRESH)
 			length = satinWidth * SATHRESH;
-		angle += FormAngles[start] + PI / 2;
+		angle += FormAngles->operator[](start) + PI / 2;
 		xOffset = length * cos(angle);
 		yOffset = length * sin(angle);
 	}
@@ -5608,9 +5608,13 @@ void outfn(unsigned start, unsigned finish, double satinWidth) {
 void duangs() noexcept {
 	unsigned int	iVertex;
 
-	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++)
-		FormAngles[iVertex] = atan2(CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y, CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x);
-	FormAngles[iVertex] = atan2(CurrentFormVertices[0].y - CurrentFormVertices[iVertex].y, CurrentFormVertices[0].x - CurrentFormVertices[iVertex].x);
+	FormAngles->clear();
+	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
+		FormAngles->push_back(atan2(CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y, 
+									CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x));
+	}
+	FormAngles->push_back(atan2(CurrentFormVertices[0].y - CurrentFormVertices[iVertex].y, 
+								CurrentFormVertices[0].x - CurrentFormVertices[iVertex].x));
 }
 
 void satout(double satinWidth) {
@@ -5929,8 +5933,8 @@ void satends(unsigned isBlunt) {
 	fPOINT		step = {};
 
 	if (isBlunt&SBLNT) {
-		step.x = sin(FormAngles[0])*HorizontalLength2 / 2;
-		step.y = cos(FormAngles[0])*HorizontalLength2 / 2;
+		step.x = sin(FormAngles->operator[](0))*HorizontalLength2 / 2;
+		step.y = cos(FormAngles->operator[](0))*HorizontalLength2 / 2;
 		if (StateMap.test(StateFlag::INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
@@ -5945,8 +5949,8 @@ void satends(unsigned isBlunt) {
 		InsidePoints->operator[](0).y = OutsidePoints->operator[](0).y = CurrentFormVertices[0].y;
 	}
 	if (isBlunt&FBLNT) {
-		step.x = sin(FormAngles[VertexCount - 2])*HorizontalLength2 / 2;
-		step.y = cos(FormAngles[VertexCount - 2])*HorizontalLength2 / 2;
+		step.x = sin(FormAngles->operator[](VertexCount - 2))*HorizontalLength2 / 2;
+		step.y = cos(FormAngles->operator[](VertexCount - 2))*HorizontalLength2 / 2;
 		if (StateMap.test(StateFlag::INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
@@ -11963,10 +11967,10 @@ void dufxlen(std::vector<fPOINT> &chainEndPoints) {
 	std::vector<double> listCOSINEs;
 	listCOSINEs.reserve(VertexCount);
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-		listSINEs.push_back(sin(FormAngles[iVertex]));
-		listCOSINEs.push_back(cos(FormAngles[iVertex]));
+		listSINEs.push_back(sin(FormAngles->operator[](iVertex)));
+		listCOSINEs.push_back(cos(FormAngles->operator[](iVertex)));
 	}
-	listSINEs.push_back(sin((FormAngles[0] > FormAngles[iVertex]) ? (FormAngles[0] - FormAngles[iVertex]) : (FormAngles[iVertex] - FormAngles[0])));
+	listSINEs.push_back(sin((FormAngles->operator[](0) > FormAngles->operator[](iVertex)) ? (FormAngles->operator[](0) - FormAngles->operator[](iVertex)) : (FormAngles->operator[](iVertex) - FormAngles->operator[](0))));
 	fxlen(chainEndPoints, listSINEs, listCOSINEs);
 }
 
