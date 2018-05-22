@@ -202,7 +202,7 @@ void			bakseq ();
 void			bdrlin(unsigned start, unsigned finish, double stitchSize);
 void			bhbrd(double spacing);
 void			blbrd (double spacing);
-void			bold (double size);
+void			bold (double size) noexcept;
 void			brdfil (double pd_Size);
 void			chan ();
 void			chnfn ();
@@ -215,9 +215,9 @@ void			clpxadj(std::vector<fPOINT> &tempClipPoints, std::vector<fPOINT> &chainEn
 void			contf ();
 void			deleclp (unsigned iForm);
 void			delmclp (unsigned iForm);
-void			duangs () noexcept;
+void			duangs ();
 void			dubfn ();
-void			dufcntr (dPOINT* center) noexcept;
+void			dufcntr (dPOINT* center);
 void			dulast (std::vector<fPOINT> &chainEndPoints);
 void			dufxlen (std::vector<fPOINT> &chainEndPoints);
 void			duhart (unsigned sideCount);
@@ -1127,7 +1127,7 @@ void fselrct(unsigned iForm) noexcept {
 	Polyline(StitchWindowMemDC, line, 5);
 }
 
-void rct2sel(RECT& rectangle, std::vector<POINT>* ptrLine) noexcept {
+void rct2sel(const RECT& rectangle, std::vector<POINT>* ptrLine) {
 	auto& line = *ptrLine;
 
 	line[0].x = line[6].x = line[7].x = line[8].x = rectangle.left;
@@ -1138,7 +1138,7 @@ void rct2sel(RECT& rectangle, std::vector<POINT>* ptrLine) noexcept {
 	line[4].y = line[5].y = line[6].y = rectangle.bottom;
 }
 
-void dubig() noexcept {
+void dubig() {
 	unsigned	iPoint;
 
 	rct2sel(SelectedFormsRect, SelectedFormsLine);
@@ -1159,7 +1159,7 @@ void frmpoly(const POINT* line, unsigned count) noexcept {
 	}
 }
 
-void dupsel(HDC dc) noexcept {
+void dupsel(HDC dc) {
 	unsigned	iPoint;
 
 	SelectObject(dc, FormPen);
@@ -2112,10 +2112,10 @@ void chkbrd() {
 	}
 }
 
-void boldlin(unsigned start, unsigned finish, double size) {
+void boldlin(unsigned start, unsigned finish, double size) noexcept {
 	dPOINT		delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
 						  (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
-	dPOINT		step = {};
+	fPOINT		step = {};
 	fPOINT		point0 = {}, point1 = {};
 	const double	length = hypot(delta.x, delta.y);
 	unsigned	count = length / size;
@@ -2124,16 +2124,16 @@ void boldlin(unsigned start, unsigned finish, double size) {
 		step.x = delta.x / count;
 		step.y = delta.y / count;
 		point0 = CurrentFormVertices[start];
-		point1.x = point0.x + gsl::narrow<float>(step.x);
-		point1.y = point0.y + gsl::narrow<float>(step.y);
+		point1.x = point0.x + step.x;
+		point1.y = point0.y + step.y;
 		while (count) {
 			OSequence[SequenceIndex++] = point1;
 			OSequence[SequenceIndex++] = point0;
 			OSequence[SequenceIndex++] = point1;
-			point0.x += gsl::narrow<float>(step.x);
-			point0.y += gsl::narrow<float>(step.y);
-			point1.x += gsl::narrow<float>(step.x);
-			point1.y += gsl::narrow<float>(step.y);
+			point0.x += step.x;
+			point0.y += step.y;
+			point1.x += step.x;
+			point1.y += step.y;
 			count--;
 		}
 		OSequence[SequenceIndex++] = CurrentFormVertices[finish];
@@ -2145,7 +2145,7 @@ void boldlin(unsigned start, unsigned finish, double size) {
 	}
 }
 
-void bold(double size) {
+void bold(double size) noexcept {
 	unsigned	iVertex = 0, iSequence = 0, iOutput = 0;
 	unsigned	iNextLine = getlast();
 	unsigned	iLine = iNextLine;
@@ -5605,7 +5605,7 @@ void outfn(unsigned start, unsigned finish, double satinWidth) {
 	OutsidePoints->operator[](finish).y = CurrentFormVertices[finish].y + yOffset;
 }
 
-void duangs() noexcept {
+void duangs() {
 	unsigned int	iVertex;
 
 	FormAngles->clear();
@@ -10145,7 +10145,7 @@ void srtbyfrm() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void dufcntr(dPOINT* center) noexcept {
+void dufcntr(dPOINT* center) {
 	unsigned	iForm = 0;
 	fRECTANGLE*	formRect = nullptr;
 	fRECTANGLE	bigRect = {};
