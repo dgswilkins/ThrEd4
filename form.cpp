@@ -2698,13 +2698,13 @@ bool proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* inte
 			yMinimum = yMaximum;
 			yMaximum = swap;
 		}
-		if (intersectionPoint->x<xMinimum || intersectionPoint->x>xMaximum || intersectionPoint->y<yMinimum || intersectionPoint->y>yMaximum)
+		if (intersectionPoint->x <= xMinimum || intersectionPoint->x > xMaximum || intersectionPoint->y < yMinimum || intersectionPoint->y > yMaximum)
 			return false;
 		else
 			return true;
 	}
 	else {
-		if (intersectionPoint->x<xMinimum || intersectionPoint->x>xMaximum)
+		if (intersectionPoint->x <= xMinimum || intersectionPoint->x > xMaximum)
 			return false;
 		else
 			return true;
