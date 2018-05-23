@@ -345,7 +345,6 @@ unsigned		SatinGuideIndex;		//next index to append satin connect points
 float			ButtonholeCornerLength = IBFCLEN;	//buttonhole corner length
 float			PicotSpacing = IPICSPAC;	//space between border picots
 unsigned		PseudoRandomValue;		//pseudo-random sequence register
-dPOINT			SatinBackup[8];			//backup stitches in satin fills
 unsigned		SatinBackupIndex;		//pointer for backup stitches in satin fills
 double			ClipAngle;				//for clipboard border fill
 dPOINT			MoveToCoords;			//moving formOrigin for clipboard fill
@@ -2711,7 +2710,7 @@ void makpoli() noexcept {
 	SelectedForm->type = FRMFPOLY;
 }
 
-void filinu(dPOINT &inPoint) {
+void filinu(const dPOINT &inPoint) {
 	dPOINT		point = { SelectedPoint.x ,SelectedPoint.y };
 	dPOINT		delta = { (inPoint.x - SelectedPoint.x),(inPoint.y - SelectedPoint.y) };
 	const double		length = hypot(delta.x, delta.y);
@@ -5728,12 +5727,12 @@ void filinsb(dPOINT point) noexcept {
 	SelectedPoint.y = point.y;
 }
 
-bool chkbak(dPOINT pnt) noexcept {
+bool chkbak(std::vector<dPOINT> &satinBackup, dPOINT pnt) {
 	unsigned	iBackup = 0;
 	double		length = 0.0;
-
-	for (iBackup = 0; iBackup < 8; iBackup++) {
-		length = hypot(SatinBackup[iBackup].x - pnt.x, SatinBackup[iBackup].y - pnt.y);
+	auto		maxSB = satinBackup.size();
+	for (iBackup = 0; iBackup < maxSB; iBackup++) {
+		length = hypot(satinBackup[iBackup].x - pnt.x, satinBackup[iBackup].y - pnt.y);
 		if (length < LineSpacing)
 			return 1;
 	}
@@ -5766,106 +5765,104 @@ bool linx(const std::vector<fPOINT>* points, unsigned start, unsigned finish, dP
 	}
 }
 
-void filinsbw(dPOINT point) noexcept {
-	SatinBackup[SatinBackupIndex++] = point;
-	SatinBackupIndex &= 0x7;
+void filinsbw(std::vector<dPOINT> &satinBackup, dPOINT point) {
+	satinBackup[SatinBackupIndex++] = point;
+	SatinBackupIndex &= (satinBackup.size() - 1);
 	filinsb(point);
 }
 
 void sbfn(const std::vector<fPOINT>* insidePoints, unsigned start, unsigned finish) {
-	if (insidePoints && OutsidePoints && SatinBackup) {
-		dPOINT		innerDelta = { (insidePoints->operator[](finish).x - insidePoints->operator[](start).x),
-								   (insidePoints->operator[](finish).y - insidePoints->operator[](start).y) };
-		double		innerLength = hypot(innerDelta.x, innerDelta.y);
-		dPOINT		outerDelta = { (OutsidePoints->operator[](finish).x - OutsidePoints->operator[](start).x),
-								   (OutsidePoints->operator[](finish).y - OutsidePoints->operator[](start).y) };
-		double		outerLength = hypot(outerDelta.x, outerDelta.y);
-		dPOINT		innerPoint = { insidePoints->operator[](start).x ,insidePoints->operator[](start).y };
-		dPOINT		outerPoint = { OutsidePoints->operator[](start).x ,OutsidePoints->operator[](start).y };
-		dPOINT		innerStep = {}, outerStep = {};
-		dPOINT		offsetDelta = {}, offsetStep = {}, offset = {};
-		dPOINT		intersection = {};
-		double		offsetLength = 0.0;
-		unsigned	count = 0, innerFlag = 0, outerFlag = 0, offsetCount = 0, iStep = 0;
-		unsigned	ind = 0, intersectFlag = 0;
+	std::vector<dPOINT>	satinBackup(8);			//backup stitches in satin fills
+	dPOINT		innerDelta = { (insidePoints->operator[](finish).x - insidePoints->operator[](start).x),
+							   (insidePoints->operator[](finish).y - insidePoints->operator[](start).y) };
+	double		innerLength = hypot(innerDelta.x, innerDelta.y);
+	dPOINT		outerDelta = { (OutsidePoints->operator[](finish).x - OutsidePoints->operator[](start).x),
+							   (OutsidePoints->operator[](finish).y - OutsidePoints->operator[](start).y) };
+	double		outerLength = hypot(outerDelta.x, outerDelta.y);
+	dPOINT		innerPoint = { insidePoints->operator[](start).x ,insidePoints->operator[](start).y };
+	dPOINT		outerPoint = { OutsidePoints->operator[](start).x ,OutsidePoints->operator[](start).y };
+	dPOINT		innerStep = {}, outerStep = {};
+	dPOINT		offsetDelta = {}, offsetStep = {}, offset = {};
+	dPOINT		intersection = {};
+	double		offsetLength = 0.0;
+	unsigned	count = 0, innerFlag = 0, outerFlag = 0, offsetCount = 0, iStep = 0;
+	unsigned	ind = 0, intersectFlag = 0;
 
-		if (!StateMap.testAndSet(StateFlag::SAT1)) {
-			SelectedPoint.x = insidePoints->operator[](start).x;
-			SelectedPoint.y = insidePoints->operator[](start).y;
+	if (!StateMap.testAndSet(StateFlag::SAT1)) {
+		SelectedPoint = insidePoints->operator[](start);
+	}
+	SatinBackupIndex = 0;
+	for (auto& sb: satinBackup) {
+		sb = { 1e12f, 1e12f };
+	}
+	if (outerLength > innerLength) {
+		count = outerLength / LineSpacing;
+		innerFlag = 1;
+		if (linx(insidePoints, start, finish, &intersection)) {
+			intersectFlag = 1;
+			innerDelta.x = innerDelta.y = innerLength = 0;
+			innerPoint = intersection;
 		}
-		SatinBackupIndex = 0;
-		for (ind = 0; ind < 8; ind++) {
-			SatinBackup[ind] = { 1e12f, 1e12f };
+	}
+	else {
+		count = innerLength / LineSpacing;
+		outerFlag = 1;
+		if (linx(insidePoints, start, finish, &intersection)) {
+			intersectFlag = 1;
+			outerDelta.x = outerDelta.y = outerLength = 0;
+			outerPoint = intersection;
 		}
-		if (outerLength > innerLength) {
-			count = outerLength / LineSpacing;
-			innerFlag = 1;
-			if (linx(insidePoints, start, finish, &intersection)) {
-				intersectFlag = 1;
-				innerDelta.x = innerDelta.y = innerLength = 0;
-				innerPoint = intersection;
+	}
+	if (!count)
+		count = 1;
+	if (chkmax(count, SequenceIndex))
+		return;
+	innerStep.x = innerDelta.x / count;
+	innerStep.y = innerDelta.y / count;
+	outerStep.x = outerDelta.x / count;
+	outerStep.y = outerDelta.y / count;
+	for (iStep = 0; iStep < count; iStep++) {
+		innerPoint.x += innerStep.x;
+		innerPoint.y += innerStep.y;
+		outerPoint.x += outerStep.x;
+		outerPoint.y += outerStep.y;
+		if (StateMap.testAndFlip(StateFlag::FILDIR)) {
+			if (innerFlag) {
+				offsetDelta.x = innerPoint.x - SelectedPoint.x;
+				offsetDelta.y = innerPoint.y - SelectedPoint.y;
+				offsetLength = hypot(offsetDelta.x, offsetDelta.y);
+				offsetCount = offsetLength / LineSpacing;
+				offsetStep.x = offsetDelta.x / offsetCount;
+				offsetStep.y = offsetDelta.y / offsetCount;
+				offset.x = innerPoint.x;
+				offset.y = innerPoint.y;
+				while (chkbak(satinBackup, offset)) {
+					offset.x -= offsetStep.x;
+					offset.y -= offsetStep.y;
+				}
+				filinsbw(satinBackup, offset);
 			}
+			else
+				filinsb(innerPoint);
 		}
 		else {
-			count = innerLength / LineSpacing;
-			outerFlag = 1;
-			if (linx(insidePoints, start, finish, &intersection)) {
-				intersectFlag = 1;
-				outerDelta.x = outerDelta.y = outerLength = 0;
-				outerPoint = intersection;
-			}
-		}
-		if (!count)
-			count = 1;
-		if (chkmax(count, SequenceIndex))
-			return;
-		innerStep.x = innerDelta.x / count;
-		innerStep.y = innerDelta.y / count;
-		outerStep.x = outerDelta.x / count;
-		outerStep.y = outerDelta.y / count;
-		for (iStep = 0; iStep < count; iStep++) {
-			innerPoint.x += innerStep.x;
-			innerPoint.y += innerStep.y;
-			outerPoint.x += outerStep.x;
-			outerPoint.y += outerStep.y;
-			if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-				if (innerFlag) {
-					offsetDelta.x = innerPoint.x - SelectedPoint.x;
-					offsetDelta.y = innerPoint.y - SelectedPoint.y;
-					offsetLength = hypot(offsetDelta.x, offsetDelta.y);
-					offsetCount = offsetLength / LineSpacing;
-					offsetStep.x = offsetDelta.x / offsetCount;
-					offsetStep.y = offsetDelta.y / offsetCount;
-					offset.x = innerPoint.x;
-					offset.y = innerPoint.y;
-					while (chkbak(offset)) {
-						offset.x -= offsetStep.x;
-						offset.y -= offsetStep.y;
-					}
-					filinsbw(offset);
+			if (outerFlag) {
+				offsetDelta.x = outerPoint.x - SelectedPoint.x;
+				offsetDelta.y = outerPoint.y - SelectedPoint.y;
+				offsetLength = hypot(offsetDelta.x, offsetDelta.y);
+				offsetCount = offsetLength / LineSpacing;
+				offsetStep.x = offsetDelta.x / offsetCount;
+				offsetStep.y = offsetDelta.y / offsetCount;
+				offset.x = outerPoint.x;
+				offset.y = outerPoint.y;
+				while (chkbak(satinBackup, offset)) {
+					offset.x -= offsetStep.x;
+					offset.y -= offsetStep.y;
 				}
-				else
-					filinsb(innerPoint);
+				filinsbw(satinBackup, offset);
 			}
-			else {
-				if (outerFlag) {
-					offsetDelta.x = outerPoint.x - SelectedPoint.x;
-					offsetDelta.y = outerPoint.y - SelectedPoint.y;
-					offsetLength = hypot(offsetDelta.x, offsetDelta.y);
-					offsetCount = offsetLength / LineSpacing;
-					offsetStep.x = offsetDelta.x / offsetCount;
-					offsetStep.y = offsetDelta.y / offsetCount;
-					offset.x = outerPoint.x;
-					offset.y = outerPoint.y;
-					while (chkbak(offset)) {
-						offset.x -= offsetStep.x;
-						offset.y -= offsetStep.y;
-					}
-					filinsbw(offset);
-				}
-				else
-					filinsb(outerPoint);
-			}
+			else
+				filinsb(outerPoint);
 		}
 	}
 }
