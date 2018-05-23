@@ -1965,7 +1965,8 @@ void oclp(const fPOINT* clip, unsigned clipEntries) {
 
 		if (!StateMap.test(StateFlag::NOCLP)) {
 			for (iClip = 0; iClip < clipEntries; iClip++) {
-				ClipBuffer[iClip] = clip[iClip];
+				ClipBuffer[iClip].x = clip[iClip].x;
+				ClipBuffer[iClip].y = clip[iClip].y;
 			}
 			ClipRect.left = ClipRect.right = ClipBuffer[0].x;
 			ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
@@ -8278,7 +8279,8 @@ void fnord() {
 void flpord() {
 	int			iStitch = 0;
 	unsigned	iVertex = 0, iForm = 0, iForward = 0, start = 0, finish = 0;
-	fPOINT	swapPoint = {};
+	fPOINT		swapPoint = {};
+	fPOINTATTR	swapStitch = {};
 
 	fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
@@ -8319,9 +8321,9 @@ void flpord() {
 				rngadj();
 				iForward = GroupStartStitch;
 				for (iStitch = 0; iStitch < (gsl::narrow<signed>(GroupEndStitch - GroupStartStitch) >> 1) + 1; iStitch++) {
-					swapPoint = StitchBuffer[iForward];
+					swapStitch = StitchBuffer[iForward];
 					StitchBuffer[iForward] = StitchBuffer[GroupEndStitch - iStitch];
-					StitchBuffer[GroupEndStitch - iStitch] = swapPoint;
+					StitchBuffer[GroupEndStitch - iStitch] = swapStitch;
 					iForward++;
 				}
 				coltab();
@@ -8430,7 +8432,8 @@ void filsclp() {
 	SelectedForm->angleOrClipData.clip = numclp();
 	SelectedForm->lengthOrCount.clipCount = ClipStitchCount;
 	for (iClip = 0; iClip < ClipStitchCount; iClip++) {
-		SelectedForm->angleOrClipData.clip[iClip] = ClipBuffer[iClip];
+		SelectedForm->angleOrClipData.clip[iClip].x = ClipBuffer[iClip].x;
+		SelectedForm->angleOrClipData.clip[iClip].y = ClipBuffer[iClip].y;
 	}
 	refilfn();
 }
