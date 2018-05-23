@@ -8096,10 +8096,10 @@ void prebrd() noexcept {
 	AngledForm.vertexCount += 3;
 	delta.x = CurrentFormVertices[VertexCount - 1].x - CurrentFormVertices[VertexCount - 2].x;
 	delta.y = CurrentFormVertices[VertexCount - 1].y - CurrentFormVertices[VertexCount - 2].y;
-	if (delta.x > delta.y)
-		ratio = 0.1 / delta.x;
+	if (fabs(delta.x) > fabs(delta.y))
+		ratio = fabs(0.1 / delta.x);
 	else
-		ratio = 0.1 / delta.y;
+		ratio = fabs(0.1 / delta.y);
 	AngledFormVertices[AngledForm.vertexCount - 1].x = CurrentFormVertices[VertexCount - 1].x + delta.x*ratio;
 	AngledFormVertices[AngledForm.vertexCount - 1].y = CurrentFormVertices[VertexCount - 1].y + delta.y*ratio;
 	SelectedForm = &AngledForm;
@@ -8111,15 +8111,13 @@ void plbrd(double edgeSpacing) {
 	unsigned		savedIndex = 0;
 	unsigned		iVertex = 0;
 
-	prebrd();
 	// Ensure that we have at least 4 array members
-	std::vector<VRCT2> fillVerticalRect(VertexCount + 5);
-	std::vector<VRCT2> underlayVerticalRect(VertexCount + 5);
+	std::vector<VRCT2> fillVerticalRect(VertexCount + 3);
+	std::vector<VRCT2> underlayVerticalRect(VertexCount + 3);
+	prebrd();
 	satout(SelectedForm->borderSize);
-	InsidePoints->operator[](VertexCount).x = InsidePoints->operator[](0).x;
-	InsidePoints->operator[](VertexCount).y = InsidePoints->operator[](0).y;
-	OutsidePoints->operator[](VertexCount).x = OutsidePoints->operator[](0).x;
-	OutsidePoints->operator[](VertexCount).y = OutsidePoints->operator[](0).y;
+	InsidePoints->push_back(InsidePoints->operator[](0));
+	OutsidePoints->push_back(OutsidePoints->operator[](0));
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		sprct(fillVerticalRect, iVertex, iVertex + 1);
 		spurct(underlayVerticalRect, fillVerticalRect, iVertex);
