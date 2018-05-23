@@ -2641,10 +2641,8 @@ void boxs() noexcept {
 void duar() {
 	POINT	arrowCenter = { (StitchCoordinatesPixels.x - 10),(StitchCoordinatesPixels.y + 10) };
 
-	StitchArrow[1].x = StitchCoordinatesPixels.x;
-	StitchArrow[1].y = StitchCoordinatesPixels.y;
-	RotationCenterPixels.x = StitchCoordinatesPixels.x;
-	RotationCenterPixels.y = StitchCoordinatesPixels.y;
+	StitchArrow[1] = StitchCoordinatesPixels;
+	RotationCenterPixels = StitchCoordinatesPixels;
 	rotpix(arrowCenter, &StitchArrow[0]);
 	arrowCenter.y = StitchCoordinatesPixels.y - 10;
 	rotpix(arrowCenter, &StitchArrow[2]);
@@ -6529,11 +6527,9 @@ void duIns() {
 	InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 	InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 	stch2px1(ClosestPointIndex);
-	tlin[0].x = InsertLine[0].x = StitchCoordinatesPixels.x;
-	tlin[0].y = InsertLine[0].y = StitchCoordinatesPixels.y;
+	tlin[0] = InsertLine[0] = StitchCoordinatesPixels;
 	stch2px1(ClosestPointIndex + 1);
-	tlin[1].x = InsertLine[2].x = StitchCoordinatesPixels.x;
-	tlin[1].y = InsertLine[2].y = StitchCoordinatesPixels.y;
+	tlin[1] = InsertLine[2] = StitchCoordinatesPixels;
 	xlin();
 	StateMap.set(StateFlag::ILIN);
 	ilin();
@@ -7226,36 +7222,28 @@ void ritrot() {
 	dPOINT	rotationReference = { (RotationRect.left),(RotationRect.top) };
 
 	rotang(rotationReference, &rotated);
-	RotateBoxOutline[0].x = RotateBoxOutline[4].x = rotated.x;
-	RotateBoxOutline[0].y = RotateBoxOutline[4].y = rotated.y;
+	RotateBoxOutline[0] = RotateBoxOutline[4] = rotated;
 	rotationReference.x = RotationCenter.x;
 	rotang(rotationReference, &rotated);
-	RotateBoxCrossVertLine[0].x = rotated.x;
-	RotateBoxCrossVertLine[0].y = rotated.y;
+	RotateBoxCrossVertLine[0] = rotated;
 	rotationReference.x = RotationRect.right;
 	rotang(rotationReference, &rotated);
-	RotateBoxOutline[1].x = rotated.x;
-	RotateBoxOutline[1].y = rotated.y;
+	RotateBoxOutline[1] = rotated;
 	rotationReference.y = RotationCenter.y;
 	rotang(rotationReference, &rotated);
-	RotateBoxCrossHorzLine[1].x = rotated.x;
-	RotateBoxCrossHorzLine[1].y = rotated.y;
+	RotateBoxCrossHorzLine[1] = rotated;
 	rotationReference.y = RotationRect.bottom;
 	rotang(rotationReference, &rotated);
-	RotateBoxOutline[2].x = rotated.x;
-	RotateBoxOutline[2].y = rotated.y;
+	RotateBoxOutline[2] = rotated;
 	rotationReference.x = RotationCenter.x;
 	rotang(rotationReference, &rotated);
-	RotateBoxCrossVertLine[1].x = rotated.x;
-	RotateBoxCrossVertLine[1].y = rotated.y;
+	RotateBoxCrossVertLine[1] = rotated;
 	rotationReference.x = RotationRect.left;
 	rotang(rotationReference, &rotated);
-	RotateBoxOutline[3].x = rotated.x;
-	RotateBoxOutline[3].y = rotated.y;
+	RotateBoxOutline[3] = rotated;
 	rotationReference.y = RotationCenter.y;
 	rotang(rotationReference, &rotated);
-	RotateBoxCrossHorzLine[0].x = rotated.x;
-	RotateBoxCrossHorzLine[0].y = rotated.y;
+	RotateBoxCrossHorzLine[0] = rotated;
 	sCor2px(RotationCenter, &RotateBoxToCursorLine[0]);
 	StateMap.set(StateFlag::ROTSHO);
 	durot();
@@ -7438,8 +7426,7 @@ void duclip() {
 				fvars(ClosestFormToCursor);
 				iSource = SelectedFormVertices.start;
 				for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
-					vertices[iVertex].x = CurrentFormVertices[iSource].x;
-					vertices[iVertex].y = CurrentFormVertices[iSource].y;
+					vertices[iVertex] = CurrentFormVertices[iSource];
 					iSource = pdir(iSource);
 				}
 				SetClipboardData(ThrEdClip, ThrEdClipPointer);
@@ -7483,8 +7470,7 @@ void duclip() {
 					for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 						SelectedForm = &FormList[SelectedFormList->operator[](iForm)];
 						for (iSide = 0; iSide < SelectedForm->vertexCount; iSide++) {
-							CurrentFormVertices[iVertex].x = SelectedForm->vertices[iSide].x;
-							CurrentFormVertices[iVertex++].y = SelectedForm->vertices[iSide].y;
+							CurrentFormVertices[iVertex++] = SelectedForm->vertices[iSide];
 						}
 					}
 					// skip past the vertex list
@@ -7494,8 +7480,7 @@ void duclip() {
 						SelectedForm = &FormList[SelectedFormList->operator[](iForm)];
 						if (SelectedForm->type == SAT) {
 							for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-								guides[guideCount].start = SelectedForm->satinOrAngle.guide[iGuide].start;
-								guides[guideCount++].finish = SelectedForm->satinOrAngle.guide[iGuide].finish;
+								guides[guideCount++] = SelectedForm->satinOrAngle.guide[iGuide];
 							}
 						}
 					}
@@ -7506,14 +7491,12 @@ void duclip() {
 						SelectedForm = &FormList[SelectedFormList->operator[](iForm)];
 						if (isclpx(SelectedFormList->operator[](iForm))) {
 							for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
-								points[pointCount].x = SelectedForm->angleOrClipData.clip[iClip].x;
-								points[pointCount++].y = SelectedForm->angleOrClipData.clip[iClip].y;
+								points[pointCount++] = SelectedForm->angleOrClipData.clip[iClip];
 							}
 						}
 						if (iseclp(SelectedFormList->operator[](iForm))) {
 							for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
-								points[pointCount].x = SelectedForm->borderClipData[iClip].x;
-								points[pointCount++].y = SelectedForm->borderClipData[iClip].y;
+								points[pointCount++] = SelectedForm->borderClipData[iClip];
 							}
 						}
 					}
@@ -7580,38 +7563,33 @@ void duclip() {
 						ClipFormHeader->form = FormList[ClosestFormToCursor];
 						CurrentFormVertices = convert_ptr<fPOINT *>(&ClipFormHeader[1]);
 						for (iSide = 0; iSide < SelectedForm->vertexCount; iSide++) {
-							CurrentFormVertices[iSide].x = SelectedForm->vertices[iSide].x;
-							CurrentFormVertices[iSide].y = SelectedForm->vertices[iSide].y;
+							CurrentFormVertices[iSide] = SelectedForm->vertices[iSide];
 						}
 						SATCON* guides = convert_ptr<SATCON *>(&CurrentFormVertices[VertexCount]);
 						iGuide = 0;
 						if (SelectedForm->type == SAT) {
 							for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-								guides[iGuide].start = SelectedForm->satinOrAngle.guide[iGuide].start;
-								guides[iGuide].finish = SelectedForm->satinOrAngle.guide[iGuide].finish;
+								guides[iGuide] = SelectedForm->satinOrAngle.guide[iGuide];
 							}
 						}
 						fPOINT* mclp = convert_ptr<fPOINT *>(&guides[iGuide]);
 						iClip = 0;
 						if (isclpx(ClosestFormToCursor)) {
 							for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
-								mclp[iClip].x = SelectedForm->angleOrClipData.clip[iClip].x;
-								mclp[iClip].y = SelectedForm->angleOrClipData.clip[iClip].y;
+								mclp[iClip] = SelectedForm->angleOrClipData.clip[iClip];
 							}
 						}
 						fPOINT* points = convert_ptr<fPOINT *>(&mclp[iClip]);
 						if (iseclpx(ClosestFormToCursor)) {
 							for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
-								points[iClip].x = SelectedForm->borderClipData[iClip].x;
-								points[iClip].y = SelectedForm->borderClipData[iClip].y;
+								points[iClip] = SelectedForm->borderClipData[iClip];
 							}
 						}
 						TXPNT* textures = convert_ptr<TXPNT *>(&points[iClip]);
 						if (istx(ClosestFormToCursor)) {
 							const TXPNT* ptxs = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
 							for (iTexture = 0; iTexture < SelectedForm->fillInfo.texture.count; iTexture++) {
-								textures[iTexture].line = ptxs[iTexture].line;
-								textures[iTexture].y = ptxs[iTexture].y;
+								textures[iTexture] = ptxs[iTexture];
 							}
 						}
 						SetClipboardData(ThrEdClip, ThrEdClipPointer);
@@ -9112,8 +9090,7 @@ void ritmov() {
 			Polyline(StitchWindowDC, RubberBandLine->data(), 3);
 	}
 	else {
-		RubberBandLine->operator[](2).x = FormLines[1].x;
-		RubberBandLine->operator[](2).y = FormLines[1].y;
+		RubberBandLine->operator[](2) = FormLines[1];
 		if (SelectedForm->type == FRMLINE)
 			Polyline(StitchWindowDC, &RubberBandLine->operator[](1), 2);
 		else
@@ -12020,8 +11997,7 @@ void dutrac() {
 		dutdif(traceDiff[0], &tracedPoints[0]);
 		OutputIndex = 1;
 		for (iPoint = 1; iPoint < tracedPoints.size(); iPoint++) {
-			traceDiff[1].x = traceDiff[0].x;
-			traceDiff[1].y = traceDiff[0].y;
+			traceDiff[1] = traceDiff[0];
 			dutdif(traceDiff[0], &tracedPoints[iPoint]);
 			if (traceDiff[1].x != traceDiff[0].x || traceDiff[1].y != traceDiff[0].y) {
 				decimatedLine.push_back(tracedPoints[iPoint]);
@@ -12043,8 +12019,8 @@ void dutrac() {
 		SelectedForm = &FormList[FormIndex];
 		frmclr(SelectedForm);
 		CurrentFormVertices = &FormVertices[FormVertexIndex];
-		CurrentFormVertices[0].x = tracedPoints[0].x*StitchBmpRatio.x;
-		CurrentFormVertices[0].y = tracedPoints[0].y*StitchBmpRatio.y;
+		CurrentFormVertices[0].x = tracedPoints[0].x * StitchBmpRatio.x;
+		CurrentFormVertices[0].y = tracedPoints[0].y * StitchBmpRatio.y;
 		iNext = 0;
 		OutputIndex = 0;
 		traceLengthSum = 0;
@@ -12056,8 +12032,8 @@ void dutrac() {
 			traceLengthSum += hypot(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1].x, tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1].y);
 			traceLength = hypot(tracedPoints[iCurrent].x - tracedPoints[iNext].x, tracedPoints[iCurrent].y - tracedPoints[iNext].y);
 			if (traceLengthSum > traceLength*IniFile.traceRatio) {
-				CurrentFormVertices[OutputIndex].x = tracedPoints[iCurrent - 1].x*StitchBmpRatio.x;
-				CurrentFormVertices[OutputIndex].y = tracedPoints[iCurrent - 1].y*StitchBmpRatio.y + landscapeOffset;
+				CurrentFormVertices[OutputIndex].x = tracedPoints[iCurrent - 1].x * StitchBmpRatio.x;
+				CurrentFormVertices[OutputIndex].y = tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset;
 				OutputIndex++;
 				iCurrent--;
 				iNext = iCurrent;
@@ -12571,22 +12547,20 @@ void trinit() {
 		tabmsg(IDS_MAPLOD);
 }
 
-void stch2bit(double xCoord, double yCoord) {
+void stch2bit(fPOINT &point) {
 	if (StateMap.test(StateFlag::LANDSCAP))
-		yCoord -= (UnzoomedRect.y - BitmapSizeinStitches.y);
-	BitmapPoint.x = BmpStitchRatio.x*xCoord;
-	BitmapPoint.y = (BitmapHeight - BmpStitchRatio.y*yCoord);
+		point.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
+	BitmapPoint.x = BmpStitchRatio.x * point.x;
+	BitmapPoint.y = (BitmapHeight - BmpStitchRatio.y * point.y);
 }
 
 void pxlin(unsigned start, unsigned finish) {
 	POINT		line[2];
 
-	stch2bit(CurrentFormVertices[start].x, CurrentFormVertices[start].y);
-	line[0].x = BitmapPoint.x;
-	line[0].y = BitmapPoint.y;
-	stch2bit(CurrentFormVertices[finish].x, CurrentFormVertices[finish].y);
-	line[1].x = BitmapPoint.x;
-	line[1].y = BitmapPoint.y;
+	stch2bit(CurrentFormVertices[start]);
+	line[0] = BitmapPoint;
+	stch2bit(CurrentFormVertices[finish]);
+	line[1] = BitmapPoint;
 	Polyline(BitmapDC, line, 2);
 	Polyline(TraceDC, line, 2);
 }
@@ -13025,8 +12999,7 @@ void setpclp() {
 	unsigned	ind = 0, ine = 0;
 
 	sfCor2px(InterleaveSequence[0], &point);
-	FormVerticesAsLine[0].x = point.x;
-	FormVerticesAsLine[0].y = point.y;
+	FormVerticesAsLine[0] = point;
 	sfCor2px(InterleaveSequence[1], &point);
 	offset.x = Msg.pt.x - StitchWindowOrigin.x - point.x;
 	offset.y = Msg.pt.y - StitchWindowOrigin.y - point.y;
@@ -13039,8 +13012,7 @@ void setpclp() {
 	}
 	ind++;
 	sfCor2px(InterleaveSequence[ind], &point);
-	FormVerticesAsLine[ind].x = point.x;
-	FormVerticesAsLine[ind].y = point.y;
+	FormVerticesAsLine[ind] = point;
 }
 
 void dupclp() noexcept {
@@ -13313,8 +13285,7 @@ unsigned chkMsg() {
 					iSide = nxtcrnr(iSide);
 					StretchBoxLine[iSide].y = gsl::narrow<long>(round(newSize.y));
 				}
-				StretchBoxLine[4].x = StretchBoxLine[0].x;
-				StretchBoxLine[4].y = StretchBoxLine[0].y;
+				StretchBoxLine[4] = StretchBoxLine[0];
 				StateMap.set(StateFlag::SHOSTRTCH);
 				strtchbox();
 				return 1;
@@ -13335,8 +13306,7 @@ unsigned chkMsg() {
 							StretchBoxLine[iSide].y = lineLength;
 					}
 				}
-				StretchBoxLine[4].x = StretchBoxLine[0].x;
-				StretchBoxLine[4].y = StretchBoxLine[0].y;
+				StretchBoxLine[4] = StretchBoxLine[0];
 				StateMap.set(StateFlag::SHOSTRTCH);
 				strtchbox();
 				return 1;
@@ -15327,8 +15297,7 @@ unsigned chkMsg() {
 							StitchBuffer[iStitch].attribute = code;
 							duzrat();
 							stch2px1(iStitch);
-							InsertLine[0].x = StitchCoordinatesPixels.x;
-							InsertLine[0].y = StitchCoordinatesPixels.y;
+							InsertLine[0] = StitchCoordinatesPixels;
 							InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 							InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 							PCSHeader.stitchCount++;
@@ -15339,9 +15308,7 @@ unsigned chkMsg() {
 						else {
 							xlin1();
 							for (iStitch = PCSHeader.stitchCount; iStitch; iStitch--) {
-								StitchBuffer[iStitch].attribute = StitchBuffer[iStitch - 1].attribute;
-								StitchBuffer[iStitch].x = StitchBuffer[iStitch - 1].x;
-								StitchBuffer[iStitch].y = StitchBuffer[iStitch - 1].y;
+								StitchBuffer[iStitch] = StitchBuffer[iStitch - 1];
 							}
 							StitchBuffer[0].attribute = code;
 							StitchBuffer[iStitch].attribute &= (~KNOTMSK);
@@ -15365,9 +15332,7 @@ unsigned chkMsg() {
 						}
 						iStitch = PCSHeader.stitchCount;
 						do {
-							StitchBuffer[iStitch].x = StitchBuffer[iStitch - 1].x;
-							StitchBuffer[iStitch].y = StitchBuffer[iStitch - 1].y;
-							StitchBuffer[iStitch].attribute = StitchBuffer[iStitch - 1].attribute;
+							StitchBuffer[iStitch] = StitchBuffer[iStitch - 1];
 							iStitch--;
 						} while (iStitch > ClosestPointIndex);
 						PCSHeader.stitchCount++;
@@ -15379,11 +15344,9 @@ unsigned chkMsg() {
 						InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 						InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 						stch2px1(ClosestPointIndex);
-						InsertLine[0].x = StitchCoordinatesPixels.x;
-						InsertLine[0].y = StitchCoordinatesPixels.y;
+						InsertLine[0] = StitchCoordinatesPixels;
 						stch2px1(ClosestPointIndex + 1);
-						InsertLine[2].x = StitchCoordinatesPixels.x;
-						InsertLine[2].y = StitchCoordinatesPixels.y;
+						InsertLine[2] = StitchCoordinatesPixels;
 						coltab();
 						StateMap.set(StateFlag::RESTCH);
 						ritnum(STR_NUMSEL, ClosestPointIndex);
@@ -15435,8 +15398,7 @@ unsigned chkMsg() {
 					else {
 						StateMap.set(StateFlag::ISDWN);
 						stch2px1(ClosestPointIndex - 1);
-						MoveLine0[0].x = StitchCoordinatesPixels.x;
-						MoveLine0[0].y = StitchCoordinatesPixels.y;
+						MoveLine0[0] = StitchCoordinatesPixels;
 					}
 					iStitch = PCSHeader.stitchCount - 1;
 					if (ClosestPointIndex >= iStitch)
@@ -15444,8 +15406,7 @@ unsigned chkMsg() {
 					else {
 						StateMap.set(StateFlag::ISUP);
 						stch2px1(ClosestPointIndex + 1);
-						MoveLine1[1].x = StitchCoordinatesPixels.x;
-						MoveLine1[1].y = StitchCoordinatesPixels.y;
+						MoveLine1[1] = StitchCoordinatesPixels;
 					}
 					dulin();
 					SetCapture(ThrEdWindow);
@@ -16483,17 +16444,14 @@ unsigned chkMsg() {
 							ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP *>(clipCopyBuffer.get());
 							if (StateMap.test(StateFlag::FRMPSEL)) {
 								fvars(ClosestFormToCursor);
-								InterleaveSequence[0].x = CurrentFormVertices[ClosestVertexToCursor].x;
-								InterleaveSequence[0].y = CurrentFormVertices[ClosestVertexToCursor].y;
+								InterleaveSequence[0] = CurrentFormVertices[ClosestVertexToCursor];
 								clipData = convert_ptr<fPOINT *>(&ClipFormVerticesData[1]);
 								for (iVertex = 0; iVertex <= ClipFormVerticesData->vertexCount; iVertex++) {
-									InterleaveSequence[iVertex + 1].x = clipData[iVertex].x;
-									InterleaveSequence[iVertex + 1].y = clipData[iVertex].y;
+									InterleaveSequence[iVertex + 1] = clipData[iVertex];
 								}
 								nextVertex = nxt(ClosestVertexToCursor);
 								iVertex++;
-								InterleaveSequence[iVertex].x = CurrentFormVertices[nextVertex].x;
-								InterleaveSequence[iVertex].y = CurrentFormVertices[nextVertex].y;
+								InterleaveSequence[iVertex] = CurrentFormVertices[nextVertex];
 								OutputIndex = iVertex + 1;
 								FormVerticesAsLine = convert_ptr<POINT *>(&InterleaveSequence[OutputIndex]);
 								setpclp();
@@ -16536,8 +16494,7 @@ unsigned chkMsg() {
 								SelectedForm = &FormList[FormIndex + iForm];
 								SelectedForm->vertices = adflt(SelectedForm->vertexCount);
 								for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
-									SelectedForm->vertices[iVertex].x = CurrentFormVertices[currentVertex].x;
-									SelectedForm->vertices[iVertex].y = CurrentFormVertices[currentVertex++].y;
+									SelectedForm->vertices[iVertex] = CurrentFormVertices[currentVertex++];
 								}
 							}
 							guides = convert_ptr<SATCON *>(&CurrentFormVertices[currentVertex]);
@@ -16547,8 +16504,7 @@ unsigned chkMsg() {
 								if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
 									SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
 									for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-										SelectedForm->satinOrAngle.guide[iGuide].start = guides[currentGuide].start;
-										SelectedForm->satinOrAngle.guide[iGuide].finish = guides[currentGuide++].finish;
+										SelectedForm->satinOrAngle.guide[iGuide] = guides[currentGuide++];
 									}
 								}
 							}
@@ -16559,15 +16515,13 @@ unsigned chkMsg() {
 								if (isclpx(FormIndex + iForm)) {
 									SelectedForm->angleOrClipData.clip = adclp(SelectedForm->lengthOrCount.clipCount);
 									for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
-										SelectedForm->angleOrClipData.clip[iClip].x = clipData[currentClip].x;
-										SelectedForm->angleOrClipData.clip[iClip].y = clipData[currentClip++].y;
+										SelectedForm->angleOrClipData.clip[iClip] = clipData[currentClip++];
 									}
 								}
 								if (iseclpx(FormIndex + iForm)) {
 									SelectedForm->borderClipData = adclp(SelectedForm->clipEntries);
 									for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
-										SelectedForm->borderClipData[iClip].x = clipData[currentClip].x;
-										SelectedForm->borderClipData[iClip].y = clipData[currentClip++].y;
+										SelectedForm->borderClipData[iClip] = clipData[currentClip++];
 									}
 								}
 							}
@@ -18900,11 +18854,9 @@ COLORREF defTxt(unsigned iColor) {
 
 void relin() {
 	stch2px1(ClosestPointIndex - 1);
-	MoveLine0[0].x = StitchCoordinatesPixels.x;
-	MoveLine0[0].y = StitchCoordinatesPixels.y;
+	MoveLine0[0] = StitchCoordinatesPixels;
 	stch2px1(ClosestPointIndex + 1);
-	MoveLine1[1].x = StitchCoordinatesPixels.x;
-	MoveLine1[1].y = StitchCoordinatesPixels.y;
+	MoveLine1[1] = StitchCoordinatesPixels;
 	StateMap.reset(StateFlag::WASLIN);
 	dulin();
 }
@@ -18962,8 +18914,7 @@ void dumov() {
 	if (anchorStitch->x >= ZoomRect.left && anchorStitch->x <= ZoomRect.right
 		&& anchorStitch->y >= ZoomRect.bottom && anchorStitch->y <= ZoomRect.top) {
 		sdCor2px(StitchBuffer[MoveAnchor], &RotationCenterPixels);
-		rotationOutline[0].x = rotationOutline[6].x = RotationCenterPixels.x;
-		rotationOutline[0].y = rotationOutline[6].y = RotationCenterPixels.y;
+		rotationOutline[0] = rotationOutline[6] = RotationCenterPixels;
 		OffsetFromCenter.x = RotationCenterPixels.x + 12;
 		OffsetFromCenter.y = RotationCenterPixels.y + 2;
 		rotpix(OffsetFromCenter, &rotationOutline[1]);

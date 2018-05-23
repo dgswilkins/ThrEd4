@@ -682,17 +682,17 @@ void fritfil() {
 	unsigned iSequence = 0, iReverseSequence = 0;
 
 	if (SequenceIndex) {
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = TYPFRM;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillColor;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
 		chkseq(false);
 		InterleaveSequenceIndex2++;
 		if (SelectedForm->extendedAttribute&AT_FTHBLND && ~(SelectedForm->extendedAttribute&(AT_FTHUP | AT_FTHBTH)) != (AT_FTHUP | AT_FTHBTH)) {
-			InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
-			InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FTH;
 			InterleaveSequenceIndices[InterleaveSequenceIndex2].code = FTHMSK;
 			InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillInfo.feather.color;
+			InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
+			InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FTH;
 			iReverseSequence = ActivePointIndex - 1;
 			for (iSequence = 0; iSequence < ActivePointIndex; iSequence++) {
 				OSequence[iSequence] = FeatherSequence[iReverseSequence];
@@ -915,8 +915,7 @@ void chkuseq() noexcept {
 	unsigned index;
 
 	for (index = 0; index < OutputIndex; index++) {
-		InterleaveSequence[index].x = OSequence[index].x;
-		InterleaveSequence[index].y = OSequence[index].y;
+		InterleaveSequence[index] = OSequence[index];
 	}
 	InterleaveSequenceIndex = index;
 	InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->UnderlayColor;
@@ -965,9 +964,9 @@ void chkuseq() noexcept {
 
 void ritwlk() noexcept {
 	if (OutputIndex) {
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = WLKMSK;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = WLKMSK;
 		chkuseq();
 		InterleaveSequenceIndex2++;
 	}
@@ -975,9 +974,9 @@ void ritwlk() noexcept {
 
 void ritcwlk() noexcept {
 	if (OutputIndex) {
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = CWLKMSK;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = CWLKMSK;
 		chkuseq();
 		InterleaveSequenceIndex2++;
 	}
@@ -1080,9 +1079,9 @@ void fnwlk(unsigned find) {
 
 void ritund() noexcept {
 	if (SequenceIndex) {
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = UNDMSK;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq = I_FIL;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].code = UNDMSK;
 		chkuseq();
 		InterleaveSequenceIndex2++;
 	}
@@ -3525,8 +3524,7 @@ void ritxfrm() noexcept {
 		FormLines[iVertex].x += offset.x;
 		FormLines[iVertex].y += offset.y;
 	}
-	FormLines[iVertex].x = FormLines[0].x;
-	FormLines[iVertex].y = FormLines[0].y;
+	FormLines[iVertex] = FormLines[0];
 	vertexCount = AngledForm.vertexCount;
 	if (AngledForm.type != FRMLINE)
 		vertexCount++;
