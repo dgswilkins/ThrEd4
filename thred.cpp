@@ -286,7 +286,7 @@ extern	void			px2stchf (POINT screen, fPOINT* stitchPoint);
 extern	void			pxrct2stch (RECT screenRect, fRECTANGLE* stitchRect);
 extern	void			rats ();
 extern	void			ratsr ();
-extern	void			rct2sel(const RECT& rectangle, std::vector<POINT>* ptrLine);
+extern	void			rct2sel(const RECT& rectangle, std::vector<POINT> &line);
 extern	void			redtx ();
 extern	void			redup ();
 extern	void			refil ();
@@ -9127,7 +9127,7 @@ void setpsel() {
 	unpsel();
 	duprct();
 	sRct2px(SelectedVerticesRect, &SelectedPixelsRect);
-	rct2sel(SelectedPixelsRect, SelectedPointsLine);
+	rct2sel(SelectedPixelsRect, *SelectedPointsLine);
 	sfCor2px(CurrentFormVertices[SelectedFormVertices.finish], &EndPointCross);
 	StateMap.set(StateFlag::SHOPSEL);
 	dupsel(StitchWindowDC);

@@ -1122,9 +1122,7 @@ void fselrct(unsigned iForm) noexcept {
 	Polyline(StitchWindowMemDC, line, 5);
 }
 
-void rct2sel(const RECT& rectangle, std::vector<POINT>* ptrLine) {
-	auto& line = *ptrLine;
-
+void rct2sel(const RECT& rectangle, std::vector<POINT> &line) {
 	line[0].x = line[6].x = line[7].x = line[8].x = rectangle.left;
 	line[1].x = line[5].x = ((rectangle.right - rectangle.left) >> 1) + rectangle.left;
 	line[2].x = line[3].x = line[4].x = rectangle.right;
@@ -1136,7 +1134,7 @@ void rct2sel(const RECT& rectangle, std::vector<POINT>* ptrLine) {
 void dubig() {
 	unsigned	iPoint;
 
-	rct2sel(SelectedFormsRect, SelectedFormsLine);
+	rct2sel(SelectedFormsRect, *SelectedFormsLine);
 	SelectObject(StitchWindowMemDC, SelectAllPen);
 	Polyline(StitchWindowMemDC, SelectedFormsLine->data(), 9);
 	for (iPoint = 0; iPoint < 8; iPoint++)
@@ -1244,7 +1242,7 @@ void drwfrm() {
 			}
 			if (StateMap.test(StateFlag::FPSEL) && ClosestFormToCursor == iForm) {
 				sRct2px(SelectedVerticesRect, &SelectedPixelsRect);
-				rct2sel(SelectedPixelsRect, SelectedPointsLine);
+				rct2sel(SelectedPixelsRect, *SelectedPointsLine);
 				StateMap.set(StateFlag::SHOPSEL);
 				dupsel(StitchWindowMemDC);
 			}
@@ -5730,7 +5728,7 @@ void filinsb(dPOINT point) noexcept {
 bool chkbak(std::vector<dPOINT> &satinBackup, dPOINT pnt) {
 	unsigned	iBackup = 0;
 	double		length = 0.0;
-	auto		maxSB = satinBackup.size();
+	const auto	maxSB = satinBackup.size();
 	for (iBackup = 0; iBackup < maxSB; iBackup++) {
 		length = hypot(satinBackup[iBackup].x - pnt.x, satinBackup[iBackup].y - pnt.y);
 		if (length < LineSpacing)
@@ -5739,22 +5737,22 @@ bool chkbak(std::vector<dPOINT> &satinBackup, dPOINT pnt) {
 	return 0;
 }
 
-bool linx(const std::vector<fPOINT>* points, unsigned start, unsigned finish, dPOINT* intersection) {
-	if (OutsidePoints && points) {
-		dPOINT	delta = { (OutsidePoints->operator[](start).x - points->operator[](start).x),
-						  (OutsidePoints->operator[](start).y - points->operator[](start).y) };
-		dPOINT	point = { (points->operator[](start).x),(points->operator[](start).y) };
+bool linx(const std::vector<fPOINT> &points, unsigned start, unsigned finish, dPOINT* intersection) {
+	if (OutsidePoints) {
+		dPOINT	delta = { (OutsidePoints->operator[](start).x - points[start].x),
+						  (OutsidePoints->operator[](start).y - points[start].y) };
+		dPOINT	point = { (points[start].x),(points[start].y) };
 
 		if (!delta.x && !delta.y)
 			return 0;
 		if (delta.x) {
-			if (proj(point, delta.y / delta.x, OutsidePoints->operator[](finish), points->operator[](finish), intersection))
+			if (proj(point, delta.y / delta.x, OutsidePoints->operator[](finish), points[finish], intersection))
 				return 1;
 			else
 				return 0;
 		}
 		else {
-			if (projv(point.x, points->operator[](finish), OutsidePoints->operator[](finish), intersection))
+			if (projv(point.x, points[finish], OutsidePoints->operator[](finish), intersection))
 				return 1;
 			else
 				return 0;
@@ -5771,25 +5769,25 @@ void filinsbw(std::vector<dPOINT> &satinBackup, dPOINT point) {
 	filinsb(point);
 }
 
-void sbfn(const std::vector<fPOINT>* insidePoints, unsigned start, unsigned finish) {
+void sbfn(const std::vector<fPOINT> &insidePoints, unsigned start, unsigned finish) {
 	std::vector<dPOINT>	satinBackup(8);			//backup stitches in satin fills
-	dPOINT		innerDelta = { (insidePoints->operator[](finish).x - insidePoints->operator[](start).x),
-							   (insidePoints->operator[](finish).y - insidePoints->operator[](start).y) };
+	dPOINT		innerDelta = { (insidePoints[finish].x - insidePoints[start].x),
+							   (insidePoints[finish].y - insidePoints[start].y) };
 	double		innerLength = hypot(innerDelta.x, innerDelta.y);
 	dPOINT		outerDelta = { (OutsidePoints->operator[](finish).x - OutsidePoints->operator[](start).x),
 							   (OutsidePoints->operator[](finish).y - OutsidePoints->operator[](start).y) };
 	double		outerLength = hypot(outerDelta.x, outerDelta.y);
-	dPOINT		innerPoint = { insidePoints->operator[](start).x ,insidePoints->operator[](start).y };
+	dPOINT		innerPoint = { insidePoints[start].x ,insidePoints[start].y };
 	dPOINT		outerPoint = { OutsidePoints->operator[](start).x ,OutsidePoints->operator[](start).y };
 	dPOINT		innerStep = {}, outerStep = {};
 	dPOINT		offsetDelta = {}, offsetStep = {}, offset = {};
 	dPOINT		intersection = {};
 	double		offsetLength = 0.0;
 	unsigned	count = 0, innerFlag = 0, outerFlag = 0, offsetCount = 0, iStep = 0;
-	unsigned	ind = 0, intersectFlag = 0;
+	unsigned	intersectFlag = 0;
 
 	if (!StateMap.testAndSet(StateFlag::SAT1)) {
-		SelectedPoint = insidePoints->operator[](start);
+		SelectedPoint = insidePoints[start];
 	}
 	SatinBackupIndex = 0;
 	for (auto& sb: satinBackup) {
@@ -5873,7 +5871,7 @@ void sfn(unsigned startVertex) {
 
 	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
 		nextVertex = nxt(startVertex);
-		sbfn(InsidePoints, startVertex, nextVertex);
+		sbfn(*InsidePoints, startVertex, nextVertex);
 		startVertex = nextVertex;
 	}
 	OSequence[0] = OSequence[SequenceIndex - 1];
@@ -5952,10 +5950,10 @@ void slbrd() {
 		StateMap.reset(StateFlag::FILDIR);
 		LineSpacing = USPAC;
 		for (iVertex = 0; iVertex < gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
-			sbfn(InsidePoints, iVertex, iVertex + 1);
+			sbfn(*InsidePoints, iVertex, iVertex + 1);
 		StateMap.flip(StateFlag::FILDIR);
 		for (iVertex = SelectedForm->vertexCount - 1; iVertex != 0; iVertex--)
-			sbfn(InsidePoints, iVertex, iVertex - 1);
+			sbfn(*InsidePoints, iVertex, iVertex - 1);
 	}
 	HorizontalLength2 = SelectedForm->borderSize;
 	satout(HorizontalLength2);
@@ -5963,7 +5961,7 @@ void slbrd() {
 	LineSpacing = SelectedForm->edgeSpacing;
 	StateMap.reset(StateFlag::SAT1);
 	for (iVertex = 0; iVertex < gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
-		sbfn(InsidePoints, iVertex, iVertex + 1);
+		sbfn(*InsidePoints, iVertex, iVertex + 1);
 	LineSpacing = spacing;
 }
 
