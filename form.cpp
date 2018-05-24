@@ -1086,16 +1086,15 @@ void delfrms() {
 }
 
 void fselrct(unsigned iForm) noexcept {
-	const FRMHED*	formHeader = &FormList[iForm];
-	//ToDo - Should these be vectors instead? Is memory allocated on heap or stack for vector?
+	const FRMHED&	formHeader = FormList[iForm];
 	fPOINT			formOutline[5] = {};
 	POINT			line[6] = {};
 	unsigned		iPoint = 0;
 
-	formOutline[0].x = formOutline[3].x = formOutline[4].x = formHeader->rectangle.left;
-	formOutline[1].x = formOutline[2].x = formHeader->rectangle.right;
-	formOutline[0].y = formOutline[1].y = formOutline[4].y = formHeader->rectangle.top;
-	formOutline[2].y = formOutline[3].y = formHeader->rectangle.bottom;
+	formOutline[0].x = formOutline[3].x = formOutline[4].x = formHeader.rectangle.left;
+	formOutline[1].x = formOutline[2].x = formHeader.rectangle.right;
+	formOutline[0].y = formOutline[1].y = formOutline[4].y = formHeader.rectangle.top;
+	formOutline[2].y = formOutline[3].y = formHeader.rectangle.bottom;
 	for (iPoint = 0; iPoint < 5; iPoint++) {
 		line[iPoint].x = (formOutline[iPoint].x - ZoomRect.left)*HorizontalRatio;
 		line[iPoint].y = (ZoomRect.top - formOutline[iPoint].y)*VerticalRatio;
