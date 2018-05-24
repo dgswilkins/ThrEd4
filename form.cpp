@@ -346,7 +346,6 @@ float			ButtonholeCornerLength = IBFCLEN;	//buttonhole corner length
 float			PicotSpacing = IPICSPAC;	//space between border picots
 unsigned		PseudoRandomValue;		//pseudo-random sequence register
 unsigned		SatinBackupIndex;		//pointer for backup stitches in satin fills
-dPOINT			MoveToCoords;			//moving formOrigin for clipboard fill
 fPOINT			BorderClipReference;	//reference for clipboard line border
 unsigned		CurrentSide;			//active form formOrigin for line clipboard fill
 unsigned		FormRelocationIndex;	//form relocator pointer
@@ -5442,21 +5441,21 @@ void linsid(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFill
 	}
 }
 
-bool nupnt(double &clipAngle) noexcept {
+bool nupnt(double &clipAngle, dPOINT &moveToCoords) noexcept {
 	double		length = 0.0, delta = 0.0;
 	unsigned	step = 0;
 	double		sinAngle = sin(clipAngle);
 	double		cosAngle = cos(clipAngle);
 
-	MoveToCoords.x = CurrentFormVertices[CurrentSide + 2].x;
-	MoveToCoords.y = CurrentFormVertices[CurrentSide + 2].y;
-	length = hypot(MoveToCoords.x - SelectedPoint.x, MoveToCoords.y - SelectedPoint.y);
+	moveToCoords.x = CurrentFormVertices[CurrentSide + 2].x;
+	moveToCoords.y = CurrentFormVertices[CurrentSide + 2].y;
+	length = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > ClipRectSize.cx) {
 		for (step = 0; step < 10; step++) {
-			length = hypot(MoveToCoords.x - SelectedPoint.x, MoveToCoords.y - SelectedPoint.y);
+			length = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 			delta = ClipRectSize.cx - length;
-			MoveToCoords.x += delta * cosAngle;
-			MoveToCoords.y += delta * sinAngle;
+			moveToCoords.x += delta * cosAngle;
+			moveToCoords.y += delta * sinAngle;
 			if (fabs(delta) < 0.01)
 				break;
 		}
@@ -5465,20 +5464,20 @@ bool nupnt(double &clipAngle) noexcept {
 	return 0;
 }
 
-void lincrnr(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFillData, double &clipAngle) {
+void lincrnr(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFillData, double &clipAngle, dPOINT &moveToCoords) {
 	dPOINT		delta = {};
 	unsigned	iStitch = 0;
 
-	if (nupnt(clipAngle)) {
-		delta.x = MoveToCoords.x - SelectedPoint.x;
-		delta.y = MoveToCoords.y - SelectedPoint.y;
+	if (nupnt(clipAngle, moveToCoords)) {
+		delta.x = moveToCoords.x - SelectedPoint.x;
+		delta.y = moveToCoords.y - SelectedPoint.y;
 		RotationAngle = atan2(delta.y, delta.x);
 		rotangf(BorderClipReference, &ClipReference);
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
 			rotangf(clipReversedData[iStitch], &clipFillData[iStitch]);
 		ritclp(clipFillData, SelectedPoint);
-		SelectedPoint.x = MoveToCoords.x;
-		SelectedPoint.y = MoveToCoords.y;
+		SelectedPoint.x = moveToCoords.x;
+		SelectedPoint.y = moveToCoords.y;
 	}
 }
 
@@ -5511,6 +5510,7 @@ void clpbrd(unsigned short startVertex) {
 	unsigned	currentVertex = 0, nextVertex = 0;
 	double		clipAngle;				//for clipboard border fill
 	dPOINT		vector0;				//x size of the clipboard fill at the fill angle
+	dPOINT		moveToCoords;			//moving formOrigin for clipboard fill
 
 	SequenceIndex = 0;
 	StateMap.reset(StateFlag::CLPBAK);
@@ -5535,7 +5535,7 @@ void clpbrd(unsigned short startVertex) {
 		for (CurrentSide = 0; CurrentSide < VertexCount - 2; CurrentSide++) {
 			linsid(clipReversedData, clipFillData, clipAngle, vector0);
 			setvct(CurrentSide + 1, CurrentSide + 2, clipAngle, vector0);
-			lincrnr(clipReversedData, clipFillData, clipAngle);
+			lincrnr(clipReversedData, clipFillData, clipAngle, moveToCoords);
 		}
 		linsid(clipReversedData, clipFillData, clipAngle, vector0);
 	}
@@ -11663,19 +11663,19 @@ void col2frm() {
 	shoMsg(fmt::format(fmtStr, colorChangedCount));
 }
 
-bool fxpnt(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) {
+bool fxpnt(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs, dPOINT &moveToCoords) {
 	double		length = 0.0, delta = 0.0;
 	unsigned	iGuess = 0;
 
-	MoveToCoords.x = CurrentFormVertices[NextStart].x;
-	MoveToCoords.y = CurrentFormVertices[NextStart].y;
-	length = hypot(MoveToCoords.x - SelectedPoint.x, MoveToCoords.y - SelectedPoint.y);
+	moveToCoords.x = CurrentFormVertices[NextStart].x;
+	moveToCoords.y = CurrentFormVertices[NextStart].y;
+	length = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > AdjustedSpace) {
 		for (iGuess = 0; iGuess < 10; iGuess++) {
-			length = hypot(MoveToCoords.x - SelectedPoint.x, MoveToCoords.y - SelectedPoint.y);
+			length = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 			delta = AdjustedSpace - length;
-			MoveToCoords.x += delta * listCOSINEs[CurrentSide];
-			MoveToCoords.y += delta * listSINEs[CurrentSide];
+			moveToCoords.x += delta * listCOSINEs[CurrentSide];
+			moveToCoords.y += delta * listSINEs[CurrentSide];
 			if (fabs(delta) < 0.2)
 				break;
 		}
@@ -11684,14 +11684,14 @@ bool fxpnt(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) {
 	return 0;
 }
 
-void fxlit(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) {
+void fxlit(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs, dPOINT &moveToCoords) {
 	double		length = 0.0;
 	unsigned	count = 0;
 	dPOINT		delta = {};
 
-	if (fxpnt(listSINEs, listCOSINEs)) {
-		SelectedPoint.x = MoveToCoords.x;
-		SelectedPoint.y = MoveToCoords.y;
+	if (fxpnt(listSINEs, listCOSINEs, moveToCoords)) {
+		SelectedPoint.x = moveToCoords.x;
+		SelectedPoint.y = moveToCoords.y;
 		BeanCount++;
 		length = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
 		count = floor(length / AdjustedSpace);
@@ -11703,15 +11703,15 @@ void fxlit(std::vector<double> &listSINEs, std::vector<double> &listCOSINEs) {
 	}
 }
 
-void fxlin(std::vector<fPOINT> &chainEndPoints, std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs) {
+void fxlin(std::vector<fPOINT> &chainEndPoints, std::vector<double> &ListSINEs, std::vector<double> &ListCOSINEs, dPOINT &moveToCoords) {
 	double		length = 0.0;
 	unsigned	count = 0;
 	unsigned	iChain = 0;
 	dPOINT		delta = {};
 
-	if (fxpnt(ListSINEs, ListCOSINEs)) {
-		SelectedPoint.x = MoveToCoords.x;
-		SelectedPoint.y = MoveToCoords.y;
+	if (fxpnt(ListSINEs, ListCOSINEs, moveToCoords)) {
+		SelectedPoint.x = moveToCoords.x;
+		SelectedPoint.y = moveToCoords.y;
 		chainEndPoints.push_back(SelectedPoint);
 		length = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
 		count = floor(length / AdjustedSpace);
@@ -11736,6 +11736,7 @@ void fxlen(std::vector<fPOINT> &chainEndPoints, std::vector<double> &listSINEs, 
 	unsigned	loopCount = 0;
 	unsigned	iVertex = 0;
 	double		length = 0.0;
+	dPOINT		moveToCoords;			//moving formOrigin for clipboard fill
 
 	AdjustedSpace = 0;
 	bool flag = true;
@@ -11768,11 +11769,11 @@ void fxlen(std::vector<fPOINT> &chainEndPoints, std::vector<double> &listSINEs, 
 		SelectedPoint = CurrentFormVertices[0];
 		for (CurrentSide = 0; CurrentSide < VertexCount - 1; CurrentSide++) {
 			NextStart = CurrentSide + 1;
-			fxlit(listSINEs, listCOSINEs);
+			fxlit(listSINEs, listCOSINEs, moveToCoords);
 		}
 		if (SelectedForm->type != FRMLINE) {
 			NextStart = 0;
-			fxlit(listSINEs, listCOSINEs);
+			fxlit(listSINEs, listCOSINEs, moveToCoords);
 		}
 		else
 			NextStart = VertexCount - 1;
@@ -11811,11 +11812,11 @@ void fxlen(std::vector<fPOINT> &chainEndPoints, std::vector<double> &listSINEs, 
 	chainEndPoints.push_back(SelectedPoint);
 	for (CurrentSide = 0; CurrentSide < VertexCount - 1; CurrentSide++) {
 		NextStart = CurrentSide + 1;
-		fxlin(chainEndPoints, listSINEs, listCOSINEs);
+		fxlin(chainEndPoints, listSINEs, listCOSINEs, moveToCoords);
 	}
 	if (SelectedForm->type != FRMLINE) {
 		NextStart = 0;
-		fxlin(chainEndPoints, listSINEs, listCOSINEs);
+		fxlin(chainEndPoints, listSINEs, listCOSINEs, moveToCoords);
 	}
 	interval = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
 	if (interval > halfSpacing) {
@@ -11907,7 +11908,7 @@ void dufxlen(std::vector<fPOINT> &chainEndPoints) {
 		listSINEs.push_back(sin(FormAngles->operator[](iVertex)));
 		listCOSINEs.push_back(cos(FormAngles->operator[](iVertex)));
 	}
-	listSINEs.push_back(sin((FormAngles->operator[](0) > FormAngles->operator[](iVertex)) ? (FormAngles->operator[](0) - FormAngles->operator[](iVertex)) : (FormAngles->operator[](iVertex) - FormAngles->operator[](0))));
+	listSINEs.push_back(sin((FormAngles->operator[](0) > FormAngles->operator[](VertexCount - 1)) ? (FormAngles->operator[](0) - FormAngles->operator[](VertexCount - 1)) : (FormAngles->operator[](VertexCount - 1) - FormAngles->operator[](0))));
 	fxlen(chainEndPoints, listSINEs, listCOSINEs);
 }
 
