@@ -346,13 +346,9 @@ float			ButtonholeCornerLength = IBFCLEN;	//buttonhole corner length
 float			PicotSpacing = IPICSPAC;	//space between border picots
 unsigned		PseudoRandomValue;		//pseudo-random sequence register
 unsigned		SatinBackupIndex;		//pointer for backup stitches in satin fills
-double			ClipAngle;				//for clipboard border fill
 dPOINT			MoveToCoords;			//moving formOrigin for clipboard fill
-double			CosAngle;				//cosine for clipboard fill
-double			SinAngle;				//sine for clipboard fill
 fPOINT			BorderClipReference;	//reference for clipboard line border
 unsigned		CurrentSide;			//active form formOrigin for line clipboard fill
-dPOINT			Vector0;				//x size of the clipboard fill at the fill angle
 unsigned		FormRelocationIndex;	//form relocator pointer
 unsigned		BeanCount;				//number of stitches added by convert to bean
 FRMHED*			FormForInsert;			//insert form vertex in this form
@@ -5426,29 +5422,31 @@ bool clpsid(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFill
 	return 0;
 }
 
-void linsid(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFillData) {
-	fPOINT		delta = { (CurrentFormVertices[CurrentSide + 1].x - SelectedPoint.x),
-						  (CurrentFormVertices[CurrentSide + 1].y - SelectedPoint.y) };
+void linsid(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFillData, double &clipAngle, dPOINT &vector0) {
+	fPOINT			delta = { (CurrentFormVertices[CurrentSide + 1].x - SelectedPoint.x),
+							  (CurrentFormVertices[CurrentSide + 1].y - SelectedPoint.y) };
 	const double	length = hypot(delta.x, delta.y);
 	const unsigned	clipCount = length / ClipRectSize.cx;
-	unsigned	iStitch = 0, iClip = 0;
+	unsigned		iStitch = 0, iClip = 0;
 
 	if (clipCount) {
-		RotationAngle = ClipAngle;
+		RotationAngle = clipAngle;
 		rotangf(BorderClipReference, &ClipReference);
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
 			rotangf(clipReversedData[iStitch], &clipFillData[iStitch]);
 		for (iClip = 0; iClip < clipCount; iClip++) {
 			ritclp(clipFillData, SelectedPoint);
-			SelectedPoint.x += Vector0.x;
-			SelectedPoint.y += Vector0.y;
+			SelectedPoint.x += vector0.x;
+			SelectedPoint.y += vector0.y;
 		}
 	}
 }
 
-bool nupnt() noexcept {
+bool nupnt(double &clipAngle) noexcept {
 	double		length = 0.0, delta = 0.0;
 	unsigned	step = 0;
+	double		sinAngle = sin(clipAngle);
+	double		cosAngle = cos(clipAngle);
 
 	MoveToCoords.x = CurrentFormVertices[CurrentSide + 2].x;
 	MoveToCoords.y = CurrentFormVertices[CurrentSide + 2].y;
@@ -5457,8 +5455,8 @@ bool nupnt() noexcept {
 		for (step = 0; step < 10; step++) {
 			length = hypot(MoveToCoords.x - SelectedPoint.x, MoveToCoords.y - SelectedPoint.y);
 			delta = ClipRectSize.cx - length;
-			MoveToCoords.x += delta * CosAngle;
-			MoveToCoords.y += delta * SinAngle;
+			MoveToCoords.x += delta * cosAngle;
+			MoveToCoords.y += delta * sinAngle;
 			if (fabs(delta) < 0.01)
 				break;
 		}
@@ -5467,13 +5465,11 @@ bool nupnt() noexcept {
 	return 0;
 }
 
-void lincrnr(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFillData) {
+void lincrnr(std::vector<fPOINT> &clipReversedData, std::vector<fPOINT> &clipFillData, double &clipAngle) {
 	dPOINT		delta = {};
 	unsigned	iStitch = 0;
 
-	SinAngle = sin(ClipAngle);
-	CosAngle = cos(ClipAngle);
-	if (nupnt()) {
+	if (nupnt(clipAngle)) {
 		delta.x = MoveToCoords.x - SelectedPoint.x;
 		delta.y = MoveToCoords.y - SelectedPoint.y;
 		RotationAngle = atan2(delta.y, delta.x);
@@ -5504,15 +5500,17 @@ void durev(std::vector<fPOINT> &clipReversedData) {
 	}
 }
 
-void setvct(unsigned start, unsigned finish) noexcept {
+void setvct(unsigned start, unsigned finish, double &ClipAngle, dPOINT &vector0) noexcept {
 	ClipAngle = atan2(CurrentFormVertices[finish].y - CurrentFormVertices[start].y, CurrentFormVertices[finish].x - CurrentFormVertices[start].x);
-	Vector0.x = ClipRectSize.cx*cos(ClipAngle);
-	Vector0.y = ClipRectSize.cx*sin(ClipAngle);
+	vector0.x = ClipRectSize.cx*cos(ClipAngle);
+	vector0.y = ClipRectSize.cx*sin(ClipAngle);
 }
 
 void clpbrd(unsigned short startVertex) {
 	unsigned	iVertex = 0, reference = 0;
 	unsigned	currentVertex = 0, nextVertex = 0;
+	double		clipAngle;				//for clipboard border fill
+	dPOINT		vector0;				//x size of the clipboard fill at the fill angle
 
 	SequenceIndex = 0;
 	StateMap.reset(StateFlag::CLPBAK);
@@ -5527,7 +5525,7 @@ void clpbrd(unsigned short startVertex) {
 	if (SelectedForm->type == FRMLINE) {
 		SelectedPoint.x = CurrentFormVertices[0].x;
 		SelectedPoint.y = CurrentFormVertices[0].y;
-		setvct(0, 1);
+		setvct(0, 1, clipAngle, vector0);
 		// Since ClipRect.bottom is always 0 
 		BorderClipReference.y = ClipRect.top / 2;
 		// Use 0 to align left edge of clip with beginning of line, ClipRect.right / 2 if you want to align 
@@ -5535,11 +5533,11 @@ void clpbrd(unsigned short startVertex) {
 		BorderClipReference.x = 0;
 		// BorderClipReference.x = ClipRect.right / 2;
 		for (CurrentSide = 0; CurrentSide < VertexCount - 2; CurrentSide++) {
-			linsid(clipReversedData, clipFillData);
-			setvct(CurrentSide + 1, CurrentSide + 2);
-			lincrnr(clipReversedData, clipFillData);
+			linsid(clipReversedData, clipFillData, clipAngle, vector0);
+			setvct(CurrentSide + 1, CurrentSide + 2, clipAngle, vector0);
+			lincrnr(clipReversedData, clipFillData, clipAngle);
 		}
-		linsid(clipReversedData, clipFillData);
+		linsid(clipReversedData, clipFillData, clipAngle, vector0);
 	}
 	else {
 		clpout();
