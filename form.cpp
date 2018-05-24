@@ -374,7 +374,6 @@ FLOAT			FormOffset;				//form offset for clipboard fills
 long			PreferenceWindowWidth;	//width of the preference window
 double			EggRatio;				//ratio for shrinking eggs
 unsigned		PreferenceWindowTextWidth;	//size of the text part of the preference window
-unsigned		MarkedStitchMap[MAXITEMS];	//bitmap to tell when stitches have been marked
 
 std::string *FormOnOff;
 
@@ -8967,14 +8966,6 @@ void frmadj(unsigned formIndex) noexcept {
 		CurrentFormVertices[iVertex].y -= FormMoveDelta.y;
 	}
 	frmout(formIndex);
-}
-
-unsigned setRmp(unsigned bit) noexcept {
-	return _bittestandset((long *)MarkedStitchMap, bit) ? 0 : 0xffffffff;
-}
-
-void clRmap(unsigned mapSize) noexcept {
-	memset(MarkedStitchMap, 0, mapSize * sizeof(*MarkedStitchMap));
 }
 
 #if PESACT

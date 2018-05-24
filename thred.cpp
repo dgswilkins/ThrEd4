@@ -87,7 +87,6 @@ void		rstdu ();
 void		save ();
 void		sCor2px (dPOINT stitchCoordinate, POINT* pixelCoordinate) noexcept;
 void		selRct (fRECTANGLE* sourceRect) noexcept;
-unsigned	setRmp (unsigned bit) noexcept;
 void		setpsel ();
 void		shft (fPOINT delta) noexcept;
 void		sizstch(fRECTANGLE* rectangle, const fPOINTATTR* stitches) noexcept;
@@ -588,7 +587,7 @@ POINT			SideWindowSize;			//size of the side message window
 std::string		*SideWindowsStrings;		//string array displayed in sidmsg
 char			ColorFileName[_MAX_PATH];	//.thw file name
 char			RGBFileName[_MAX_PATH];	//.rgb file name
-dPOINT			CellSize;				//size of an MarkedStitchMap cell for drawing stitch boxes
+dPOINT			CellSize;				//size of an stitchMap cell for drawing stitch boxes
 unsigned		DraggedColor;			//color being dragged
 FORMVERTICES	SelectedFormVertices;	//selected form vertices
 fRECTANGLE		SelectedVerticesRect;	//rectangle enclosing selected form verticess
@@ -19051,19 +19050,13 @@ void rint() noexcept {
 
 	CellSize.x = (ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
 	CellSize.y = (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom;
-	if (size > RMAPBITS) {
-		CellSize.x *= size / RMAPBITS;
-		CellSize.y *= size / RMAPBITS;
-	}
 }
 
-unsigned setRmap(fPOINTATTR stitchPoint) noexcept {
+bool setRmap(boost::dynamic_bitset<> &stitchMap, fPOINTATTR stitchPoint) noexcept {
 	unsigned	bitPoint;
 
 	bitPoint = floor((stitchPoint.x - ZoomRect.left) / CellSize.x)*floor((stitchPoint.y - ZoomRect.bottom) / CellSize.y);
-	if (bitPoint < RMAPBITS)
-		return setRmp(bitPoint);
-	return 0;
+	return !stitchMap.test_set(bitPoint);
 }
 
 void drwStch() {
@@ -19320,17 +19313,20 @@ void drwStch() {
 			dusel(StitchWindowMemDC);
 		}
 		if (ZoomFactor < StitchBoxesThreshold) {
-			clRmap(MAXITEMS);
+			rint();
+			const auto maxMapSize = StitchWindowClientRect.right * StitchWindowClientRect.bottom;
+
+			boost::dynamic_bitset<> stitchMap(0);
+			stitchMap.resize(maxMapSize, false);
 			SelectObject(StitchWindowMemDC, LinePen);
 			SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-			rint();
 			if (StateMap.test(StateFlag::HID)) {
 				for (iColor = 0; iColor < ColorChanges; iColor++) {
 					if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
 						for (iStitch = ColorChangeTable[iColor].stitchIndex; iStitch < ColorChangeTable[iColor + 1].stitchIndex; iStitch++) {
 							if (StitchBuffer[iStitch].x >= ZoomRect.left && StitchBuffer[iStitch].x <= ZoomRect.right
 								&& StitchBuffer[iStitch].y >= ZoomRect.bottom && StitchBuffer[iStitch].y <= ZoomRect.top
-								&& setRmap(StitchBuffer[iStitch]))
+								&& setRmap(stitchMap, StitchBuffer[iStitch]))
 								stchbox(iStitch, StitchWindowMemDC);
 						}
 					}
@@ -19340,7 +19336,7 @@ void drwStch() {
 				for (iColor = 0; iColor < PCSHeader.stitchCount; iColor++) {
 					if (StitchBuffer[iColor].x >= ZoomRect.left && StitchBuffer[iColor].x <= ZoomRect.right
 						&& StitchBuffer[iColor].y >= ZoomRect.bottom && StitchBuffer[iColor].y <= ZoomRect.top
-						&& setRmap(StitchBuffer[iColor]))
+						&& setRmap(stitchMap, StitchBuffer[iColor]))
 						stchbox(iColor, StitchWindowMemDC);
 				}
 			}
