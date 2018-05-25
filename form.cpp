@@ -7494,9 +7494,6 @@ void duzig(unsigned vertices) {
 	SelectedForm->attribute = ActiveLayer << 1;
 	fvars(FormIndex);
 	px2stch();
-	//ToD0 - Why these two lines?
-	SelectedPoint.x;
-	SelectedPoint.y;
 	offset.x = UnzoomedRect.x / 6;
 	offset.y = UnzoomedRect.y / (6 * vertices);
 	for (iVertex = 0; iVertex < vertices; iVertex++) {
