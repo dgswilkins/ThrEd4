@@ -454,7 +454,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON1               ICON                    "icon1.ico"
+IDI_ICON1               ICON                    "Resources\\ThrEd4.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -691,19 +691,19 @@ END
 // Cursor
 //
 
-IDC_LeftUp              CURSOR                  "Resources\LeftUp.cur"
+IDC_LeftUp              CURSOR                  "Resources\\LeftUp.cur"
 
-IDC_RightDown           CURSOR                  "Resources\RightDown.cur"
+IDC_RightDown           CURSOR                  "Resources\\RightDown.cur"
 
-IDC_RightUp             CURSOR                  "Resources\RightUp.cur"
+IDC_RightUp             CURSOR                  "Resources\\RightUp.cur"
 
-IDC_LeftDown            CURSOR                  "Resources\LeftDown.cur"
+IDC_LeftDown            CURSOR                  "Resources\\LeftDown.cur"
 
-IDC_Upright             CURSOR                  "Resources\Upright.cur"
+IDC_Upright             CURSOR                  "Resources\\Upright.cur"
 
-IDC_DLIN                CURSOR                  "Resources\dlin.cur"
+IDC_DLIN                CURSOR                  "Resources\\dlin.cur"
 
-IDC_Form                CURSOR                  "Resources\Form.cur"
+IDC_Form                CURSOR                  "Resources\\Form.cur"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -785,6 +785,7 @@ BEGIN
     IDS_FILSTCH             "fill stitches"
     IDS_BRDSTCH             "border stitches"
     IDS_APSTCH              "applique stitches"
+    IDS_HELPFN              "thred.chm"
     IDS_FRM1MSG             "a form"
     IDS_GRPMSG              "a group of stitches"
 END

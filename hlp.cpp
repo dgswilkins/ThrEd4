@@ -45,7 +45,6 @@ extern	POINT			UnzoomedRect;
 extern	char			WorkingFileName[_MAX_PATH];
 
 HANDLE					HelpFile;					//handle to the help file
-char					HelpFileName[_MAX_PATH];	//help file name
 unsigned				HelpFileLength;				//help file length
 HWND					HelpWindow;				//help window
 HWND					MsgWindow = 0;				//message window
@@ -440,9 +439,10 @@ void grpmsg1() {
 }
 
 void help() {
-	strcpy_s(HelpFileName, HomeDirectory);
-	strcat_s(HelpFileName, "thred.chm");
-	HelpWindow = HtmlHelp(ThrEdWindow, HelpFileName, HH_DISPLAY_TOPIC, 0);
+	std::string helpFileName;
+
+	loadString(helpFileName, IDS_HELPFN);
+		HelpWindow = HtmlHelp(ThrEdWindow, fmt::format("{}{}", HomeDirectory, helpFileName).c_str(), HH_DISPLAY_TOPIC, 0);
 	if (!HelpWindow)
 		tabmsg(IDS_NOHLP);
 }

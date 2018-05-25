@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by thred.rc
+// Used by ThrEd4.rc
 //
 #define IDS_FSELB                       1
 #define IDS_FSELF                       2
@@ -63,6 +63,7 @@
 #define IDS_BRDSTCH                     59
 #define IDS_APSTCH                      60
 #define IDS_FRMSEL                      61
+#define IDS_HELPFN                      61
 #define IDS_FRM1MSG                     62
 #define IDS_GRPMSG                      63
 #define IDS_ROTAGIN                     64
