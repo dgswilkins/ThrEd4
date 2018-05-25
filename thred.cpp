@@ -70,7 +70,7 @@ void		movbox ();
 void		mvstch (unsigned destination, unsigned source) noexcept;
 void		mvstchs (unsigned destination, unsigned source, unsigned count) noexcept;
 void		nuAct (unsigned iStitch) noexcept;
-void		nuslst (unsigned find) noexcept;
+void		nuslst (unsigned find);
 void		okcan ();
 void		patdun ();
 constexpr unsigned	pt2colInd (unsigned iStitch);
@@ -79,8 +79,8 @@ void		redraw (HWND window) noexcept;
 void		ritnum (unsigned code, unsigned value);
 void		ritot (unsigned number);
 void		rngadj ();
-void		rotfn ();
-void		rotfns ();
+void		rotfn (double rotationAngle);
+void		rotfns (double rotationAngle);
 void		rotpix (POINT unrotatedPoint, POINT* rotatedPoint);
 void		rstAll ();
 void		rstdu ();
@@ -184,7 +184,7 @@ extern	void			duhart (unsigned sideCount);
 extern	void			duinsf ();
 extern	void			dulens (unsigned sides);
 extern	void			dundcol (unsigned color);
-extern	void			duprot ();
+extern	void			duprot (double rotationAngle);
 extern	void			dupsel (HDC dc);
 extern	void			durpoli (unsigned vertexCount);
 extern	void			dusat ();
@@ -531,7 +531,6 @@ HGLOBAL			ClipMemory;				//handle to the clipboard memory
 SIZE			SelectBoxSize;			//size of the select box
 POINT			SelectBoxOffset;		//offset of the spot the user selected from the lower left of the select box
 dPOINT			ZoomRatio;				//zoom ratio used to draw stitch window
-double			RotationAngle;			//rotation angle
 double			RotationHandleAngle;	//angle of the rotation handle
 fRECTANGLE		RotationRect;			//rotation rectangle
 dPOINT			BmpStitchRatio;			//bitmap to stitch hoop ratios
@@ -3301,41 +3300,37 @@ void chknum() {
 
 	clrstch();
 	if (StateMap.testAndReset(StateFlag::ENTRDUP)) {
+		double rotationAngle = 0;
 		if (value) {
-			RotationAngle = value * PI / 180;
-			IniFile.rotationAngle = RotationAngle;
+			rotationAngle = value * PI / 180;
+			IniFile.rotationAngle = rotationAngle;
 		}
 		else
-			RotationAngle = IniFile.rotationAngle;
-		duprot();
+			rotationAngle = IniFile.rotationAngle;
+		duprot(rotationAngle);
 		return;
 	}
 	if (StateMap.testAndReset(StateFlag::NUROT)) {
 		if (value) {
-			RotationAngle = value * PI / 180;
-			IniFile.rotationAngle = RotationAngle;
+			IniFile.rotationAngle = value * PI / 180;
 		}
-		else
-			RotationAngle = IniFile.rotationAngle;
 		return;
 	}
 	if (StateMap.testAndReset(StateFlag::ENTRSEG)) {
 		if (value) {
-			RotationAngle = 2 * PI / value;
-			IniFile.rotationAngle = RotationAngle;
+			IniFile.rotationAngle = 2 * PI / value;
 		}
-		else
-			RotationAngle = IniFile.rotationAngle;
 		return;
 	}
 	if (StateMap.testAndReset(StateFlag::ENTROT)) {
+		double rotationAngle = 0;
 		if (value) {
-			RotationAngle = value * PI / 180;
-			IniFile.rotationAngle = RotationAngle;
+			rotationAngle = value * PI / 180;
+			IniFile.rotationAngle = rotationAngle;
 		}
 		else
-			RotationAngle = IniFile.rotationAngle;
-		rotfns();
+			rotationAngle = IniFile.rotationAngle;
+		rotfns(rotationAngle);
 		return;
 	}
 	if (MsgIndex) {
@@ -7083,7 +7078,7 @@ void unrotu() {
 		durotu();
 }
 
-void rotang(dPOINT unrotatedPoint, POINT* rotatedPoint) {
+void rotang(dPOINT unrotatedPoint, POINT* rotatedPoint, double rotationAngle) {
 	double	distanceToCenter = 0.0, newAngle = 0.0;
 	dPOINT	point = {};
 	const long	dx = unrotatedPoint.x - RotationCenter.x;
@@ -7092,21 +7087,21 @@ void rotang(dPOINT unrotatedPoint, POINT* rotatedPoint) {
 	if (dx) {
 		distanceToCenter = hypot(dx, dy);
 		newAngle = atan2(dy, dx);
-		newAngle += RotationAngle;
+		newAngle += rotationAngle;
 	}
 	else {
 		distanceToCenter = abs(dy);
 		if (dy > 0)
-			newAngle = PI / 2 + RotationAngle;
+			newAngle = PI / 2 + rotationAngle;
 		else
-			newAngle = RotationAngle - PI / 2;
+			newAngle = rotationAngle - PI / 2;
 	}
 	point.y = RotationCenter.y + distanceToCenter * sin(newAngle);
 	point.x = RotationCenter.x + distanceToCenter * cos(newAngle);
 	sCor2px(point, rotatedPoint);
 }
 
-void rotang1(fPOINTATTR unrotatedPoint, fPOINT* rotatedPoint) noexcept {
+void rotang1(fPOINTATTR unrotatedPoint, fPOINT* rotatedPoint, const double &rotationAngle) noexcept {
 	double	distanceToCenter = 0.0, newAngle = 0.0;
 	const double	dx = unrotatedPoint.x - RotationCenter.x;
 	const double	dy = unrotatedPoint.y - RotationCenter.y;
@@ -7114,23 +7109,23 @@ void rotang1(fPOINTATTR unrotatedPoint, fPOINT* rotatedPoint) noexcept {
 	if (dx) {
 		distanceToCenter = hypot(dx, dy);
 		newAngle = atan2(dy, dx);
-		newAngle += RotationAngle;
+		newAngle += rotationAngle;
 	}
 	else {
 		if (dy > 0) {
 			distanceToCenter = dy;
-			newAngle = PI / 2 + RotationAngle;
+			newAngle = PI / 2 + rotationAngle;
 		}
 		else {
 			distanceToCenter = -dy;
-			newAngle = RotationAngle - PI / 2;
+			newAngle = rotationAngle - PI / 2;
 		}
 	}
 	rotatedPoint->y = RotationCenter.y + distanceToCenter * sin(newAngle);
 	rotatedPoint->x = RotationCenter.x + distanceToCenter * cos(newAngle);
 }
 
-void rotangf(fPOINT unrotatedPoint, fPOINT* rotatedPoint) noexcept {
+void rotangf(fPOINT unrotatedPoint, fPOINT* rotatedPoint, const double rotationAngle) noexcept {
 	double	distanceToCenter = 0.0, newAngle = 0.0;
 	const double	dx = unrotatedPoint.x - RotationCenter.x;
 	const double	dy = unrotatedPoint.y - RotationCenter.y;
@@ -7138,16 +7133,16 @@ void rotangf(fPOINT unrotatedPoint, fPOINT* rotatedPoint) noexcept {
 	if (dx) {
 		distanceToCenter = hypot(dx, dy);
 		newAngle = atan2(dy, dx);
-		newAngle += RotationAngle;
+		newAngle += rotationAngle;
 	}
 	else {
 		if (dy > 0) {
 			distanceToCenter = dy;
-			newAngle = PI / 2 + RotationAngle;
+			newAngle = PI / 2 + rotationAngle;
 		}
 		else {
 			distanceToCenter = -dy;
-			newAngle = RotationAngle - PI / 2;
+			newAngle = rotationAngle - PI / 2;
 		}
 	}
 	rotatedPoint->y = RotationCenter.y + distanceToCenter * sin(newAngle);
@@ -7168,31 +7163,31 @@ void rotpix(POINT unrotatedPoint, POINT* rotatedPoint) {
 	rotatedPoint->x = RotationCenterPixels.x + distanceToCenter * cos(newAngle);
 }
 
-void rotflt(fPOINT &point) noexcept {
-	double	len = 0.0, ang0 = 0.0;
+void rotflt(fPOINT &point, const double rotationAngle) noexcept {
+	double	len = 0.0, newAngle = 0.0;
 	const double	dx = point.x - RotationCenter.x;
 	const double	dy = point.y - RotationCenter.y;
 
 	if (dx) {
 		len = hypot(dx, dy);
-		ang0 = atan2(dy, dx);
-		ang0 += RotationAngle;
+		newAngle = atan2(dy, dx);
+		newAngle += rotationAngle;
 	}
 	else {
 		if (dy > 0) {
 			len = dy;
-			ang0 = PI / 2 + RotationAngle;
+			newAngle = PI / 2 + rotationAngle;
 		}
 		else {
 			len = -dy;
-			ang0 = RotationAngle - PI / 2;
+			newAngle = rotationAngle - PI / 2;
 		}
 	}
-	point.y = RotationCenter.y + len * sin(ang0);
-	point.x = RotationCenter.x + len * cos(ang0);
+	point.y = RotationCenter.y + len * sin(newAngle);
+	point.x = RotationCenter.x + len * cos(newAngle);
 }
 
-void rotstch(fPOINTATTR* stitch) noexcept {
+void rotstch(fPOINTATTR* stitch, double rotationAngle) noexcept {
 	double	distanceToCenter = 0.0, newAngle = 0.0;
 	const double	dx = stitch->x - RotationCenter.x;
 	const double	dy = stitch->y - RotationCenter.y;
@@ -7200,48 +7195,48 @@ void rotstch(fPOINTATTR* stitch) noexcept {
 	if (dx) {
 		distanceToCenter = hypot(dx, dy);
 		newAngle = atan2(dy, dx);
-		newAngle += RotationAngle;
+		newAngle += rotationAngle;
 	}
 	else {
 		if (dy > 0) {
 			distanceToCenter = dy;
-			newAngle = PI / 2 + RotationAngle;
+			newAngle = PI / 2 + rotationAngle;
 		}
 		else {
 			distanceToCenter = -dy;
-			newAngle = RotationAngle - PI / 2;
+			newAngle = rotationAngle - PI / 2;
 		}
 	}
 	stitch->y = RotationCenter.y + distanceToCenter * sin(newAngle);
 	stitch->x = RotationCenter.x + distanceToCenter * cos(newAngle);
 }
 
-void ritrot() {
+void ritrot(double rotationAngle) {
 	POINT	rotated = {};
 	dPOINT	rotationReference = { (RotationRect.left),(RotationRect.top) };
 
-	rotang(rotationReference, &rotated);
+	rotang(rotationReference, &rotated, rotationAngle);
 	RotateBoxOutline[0] = RotateBoxOutline[4] = rotated;
 	rotationReference.x = RotationCenter.x;
-	rotang(rotationReference, &rotated);
+	rotang(rotationReference, &rotated, rotationAngle);
 	RotateBoxCrossVertLine[0] = rotated;
 	rotationReference.x = RotationRect.right;
-	rotang(rotationReference, &rotated);
+	rotang(rotationReference, &rotated, rotationAngle);
 	RotateBoxOutline[1] = rotated;
 	rotationReference.y = RotationCenter.y;
-	rotang(rotationReference, &rotated);
+	rotang(rotationReference, &rotated, rotationAngle);
 	RotateBoxCrossHorzLine[1] = rotated;
 	rotationReference.y = RotationRect.bottom;
-	rotang(rotationReference, &rotated);
+	rotang(rotationReference, &rotated, rotationAngle);
 	RotateBoxOutline[2] = rotated;
 	rotationReference.x = RotationCenter.x;
-	rotang(rotationReference, &rotated);
+	rotang(rotationReference, &rotated, rotationAngle);
 	RotateBoxCrossVertLine[1] = rotated;
 	rotationReference.x = RotationRect.left;
-	rotang(rotationReference, &rotated);
+	rotang(rotationReference, &rotated, rotationAngle);
 	RotateBoxOutline[3] = rotated;
 	rotationReference.y = RotationCenter.y;
-	rotang(rotationReference, &rotated);
+	rotang(rotationReference, &rotated, rotationAngle);
 	RotateBoxCrossHorzLine[0] = rotated;
 	sCor2px(RotationCenter, &RotateBoxToCursorLine[0]);
 	StateMap.set(StateFlag::ROTSHO);
@@ -7284,8 +7279,7 @@ void rot() {
 	} while (false);
 	StateMap.set(StateFlag::ROTAT);
 	durcntr();
-	RotationAngle = 0;
-	ritrot();
+	ritrot(0);
 }
 
 void savclp(unsigned destination, unsigned source) noexcept {
@@ -9133,7 +9127,7 @@ void setpsel() {
 	StateMap.set(StateFlag::FPSEL);
 }
 
-void rotfn() {
+void rotfn(double rotationAngle) {
 	unsigned	iVertex = 0, iStitch = 0, iForm = 0, currentVertex = 0;
 	double		length = 0.0;
 	double		angle = 0.0;
@@ -9144,7 +9138,7 @@ void rotfn() {
 		fvars(ClosestFormToCursor);
 		currentVertex = SelectedFormVertices.start;
 		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
-			rotflt(CurrentFormVertices[currentVertex]);
+			rotflt(CurrentFormVertices[currentVertex], rotationAngle);
 			currentVertex = pdir(currentVertex);
 		}
 		frmout(ClosestFormToCursor);
@@ -9155,26 +9149,26 @@ void rotfn() {
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
 		for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
-			rotflt(FormVertices[iVertex]);
+			rotflt(FormVertices[iVertex], rotationAngle);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
-			rotstch(&StitchBuffer[iStitch]);
+			rotstch(&StitchBuffer[iStitch], rotationAngle);
 		for (iForm = 0; iForm < FormIndex; iForm++)
 			frmout(iForm);
 		selal();
 		return;
 	}
 	if (StateMap.testAndReset(StateFlag::FRMSROT)) {
-		angle = RotationAngle;
+		angle = rotationAngle;
 		center.x = RotationCenter.x;
 		center.y = RotationCenter.y;
 		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
 			ClosestFormToCursor = SelectedFormList->operator[](iForm);
 			fvars(ClosestFormToCursor);
 			for (iVertex = 0; iVertex < VertexCount; iVertex++)
-				rotflt(CurrentFormVertices[iVertex]);
+				rotflt(CurrentFormVertices[iVertex], rotationAngle);
 			frmout(ClosestFormToCursor);
 			refilfn();
-			RotationAngle = angle;
+			rotationAngle = angle;
 			RotationCenter.x = center.x;
 			RotationCenter.y = center.y;
 		}
@@ -9184,7 +9178,7 @@ void rotfn() {
 		if (StateMap.testAndReset(StateFlag::FRMROT)) {
 			fvars(ClosestFormToCursor);
 			for (iVertex = 0; iVertex < VertexCount; iVertex++)
-				rotflt(CurrentFormVertices[iVertex]);
+				rotflt(CurrentFormVertices[iVertex], rotationAngle);
 			frmout(ClosestFormToCursor);
 			refil();
 			StateMap.set(StateFlag::RESTCH);
@@ -9192,7 +9186,7 @@ void rotfn() {
 		else {
 			length = GroupEndStitch - GroupStartStitch + 1;
 			for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++)
-				rotstch(&StitchBuffer[iStitch]);
+				rotstch(&StitchBuffer[iStitch], rotationAngle);
 			rngadj();
 			selin(GroupStartStitch, GroupEndStitch, StitchWindowDC);
 			StateMap.set(StateFlag::RESTCH);
@@ -9200,9 +9194,9 @@ void rotfn() {
 	}
 }
 
-void rotfns() {
+void rotfns(double rotationAngle) {
 	savdo();
-	rotfn();
+	rotfn(rotationAngle);
 }
 
 void nulayr(unsigned play) {
@@ -9346,7 +9340,7 @@ void setmov() {
 	}
 }
 
-void dufsel() noexcept {
+void dufsel() {
 	unsigned	start = 0, finish = 0;
 
 	if (LastFormSelected > ClosestFormToCursor) {
@@ -10802,7 +10796,7 @@ void dumrk(double xCoord, double yCoord) {
 	StateMap.set(StateFlag::WASMRK);
 }
 
-void gselrng() noexcept {
+void gselrng() {
 	unsigned	iForm = 1;
 
 	SelectedFormsRange.start = SelectedFormsRange.finish = SelectedFormList->operator[](0);
@@ -10873,17 +10867,16 @@ void rotmrk() {
 		shoseln(IDS_FSZ, IDS_SETROTM);
 }
 
-void segentr() {
-	if (!RotationAngle)
-		RotationAngle = PI / 180;
-	shoMsg(fmt::format(StringTable->operator[](STR_ENTROT), (2 * PI / RotationAngle)));
+void segentr(double rotationAngle) {
+	if (!rotationAngle)
+		rotationAngle = PI / 180;
+	shoMsg(fmt::format(StringTable->operator[](STR_ENTROT), (2 * PI / rotationAngle)));
 	StateMap.set(StateFlag::NUMIN);
 	numWnd();
 }
 
 void rotseg() {
-	RotationAngle = IniFile.rotationAngle;
-	segentr();
+	segentr(IniFile.rotationAngle);
 	StateMap.set(StateFlag::ENTRSEG);
 }
 
@@ -10921,7 +10914,7 @@ void filfrms() {
 	}
 }
 
-void nuslst(unsigned find) noexcept {
+void nuslst(unsigned find) {
 	unsigned	form = 0, iFormList = 0;
 
 	gselrng();
@@ -13152,6 +13145,7 @@ unsigned chkMsg() {
 	unsigned		iThreadSize = 0, iVersion = 0, iVertex = 0, iWindow = 0, nextVertex = 0, selectedVertexCount = 0;
 	unsigned		stitchAttribute = 0, textureCount = 0, traceColor = 0;
 	WPARAM			wParameter = {};
+	static double	RotationAngle;
 
 	if (Msg.message == WM_MOUSEMOVE) {
 		if (StateMap.test(StateFlag::TXTMOV)) {
@@ -13355,7 +13349,7 @@ unsigned chkMsg() {
 				px2stch();
 				RotationCenter.x = SelectedPoint.x;
 				RotationCenter.y = SelectedPoint.y;
-				ritrot();
+				ritrot(RotationAngle);
 				return 1;
 			}
 			if (StateMap.test(StateFlag::ROTCAPT)) {
@@ -13365,8 +13359,9 @@ unsigned chkMsg() {
 				RotateBoxToCursorLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 				adjustedPoint.x = RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x;
 				adjustedPoint.y = RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y;
-				if (adjustedPoint.x)
+				if (adjustedPoint.x) {
 					RotationAngle = -atan2(adjustedPoint.y, adjustedPoint.x);
+				}
 				else {
 					if (adjustedPoint.y > 0)
 						RotationAngle = PI / 2;
@@ -13374,7 +13369,7 @@ unsigned chkMsg() {
 						RotationAngle = -PI / 2;
 				}
 				RotationAngle -= RotationHandleAngle;
-				ritrot();
+				ritrot(RotationAngle);
 				StateMap.set(StateFlag::ROTUSHO);
 				durotu();
 				return 1;
@@ -13517,7 +13512,7 @@ unsigned chkMsg() {
 			return 1;
 		}
 		if (StateMap.testAndReset(StateFlag::ROTCAPT)) {
-			rotfn();
+			rotfn(RotationAngle);
 			return 1;
 		}
 		if (StateMap.testAndReset(StateFlag::SELPNT)) {
@@ -14750,6 +14745,7 @@ unsigned chkMsg() {
 						SelectedForm->type = FRMFPOLY;
 						if (SelectedForm->fillType) {
 							respac();
+							//ToDo - should we be using the angle information already present
 							SelectedForm->fillType = ANGF;
 							SelectedForm->angleOrClipData.angle = IniFile.fillAngle;
 							break;
@@ -15221,7 +15217,7 @@ unsigned chkMsg() {
 					RotationCenter.y = SelectedPoint.y;
 					StateMap.set(StateFlag::MOVCNTR);
 					unrot();
-					ritrot();
+					ritrot(RotationAngle);
 				}
 				else {
 					if (adjustedPoint.x)
@@ -16371,16 +16367,19 @@ unsigned chkMsg() {
 				StateMap.set(StateFlag::RESTCH);
 			}
 			else {
-				if (GetKeyState(VK_CONTROL) & 0x8000) {
-					setrang();
-					return 1;
+				if (!FormDataSheet) {
+					if (GetKeyState(VK_CONTROL) & 0x8000) {
+						setrang();
+						return 1;
+					}
+					if (GetKeyState(VK_SHIFT) & 0x8000) {
+						rotmrk();
+						return 1;
+					}
+					else {
+						rotseg();
+					}
 				}
-				if (GetKeyState(VK_SHIFT) & 0x8000) {
-					rotmrk();
-					return 1;
-				}
-				else
-					rotseg();
 			}
 			break;
 
@@ -19052,7 +19051,7 @@ void rint() noexcept {
 	CellSize.y = (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom;
 }
 
-bool setRmap(boost::dynamic_bitset<> &stitchMap, fPOINTATTR stitchPoint) noexcept {
+bool setRmap(boost::dynamic_bitset<> &stitchMap, fPOINTATTR stitchPoint) {
 	unsigned	bitPoint;
 
 	bitPoint = floor((stitchPoint.x - ZoomRect.left) / CellSize.x)*floor((stitchPoint.y - ZoomRect.bottom) / CellSize.y);
@@ -19345,7 +19344,7 @@ void drwStch() {
 		if (StateMap.test(StateFlag::CLPSHO))
 			duclp();
 		if (StateMap.test(StateFlag::ROTAT) || StateMap.test(StateFlag::ROTCAPT) || StateMap.test(StateFlag::MOVCNTR)) {
-			ritrot();
+			ritrot(0);
 		}
 	}
 	if (FormIndex && !StateMap.test(StateFlag::FRMOF))

@@ -69,7 +69,6 @@ extern	std::vector<fPOINT>*	OutsidePoints;
 extern	fPOINT			OSequence[OSEQLEN];
 extern	PCSHEADER		PCSHeader;
 extern	unsigned		PseudoRandomValue;
-extern	double			RotationAngle;
 extern	dPOINT			RotationCenter;
 extern	FRMHED*			SelectedForm;
 extern	unsigned		SatinGuideIndex;
@@ -158,7 +157,7 @@ extern	void		refil();
 extern	void		refilal();
 extern	void		refilfn();
 extern	void		ritfil();
-extern	void		rotflt(fPOINT &point);
+extern	void		rotflt(fPOINT &point, const double rotationAngle);
 extern	void		rtrclpfn();
 extern	void		satfil();
 extern	void		satout(double satinWidth);
@@ -870,7 +869,7 @@ void pes2crd() {
 	fil2crd(AuxName);
 }
 
-void sidlen(unsigned start, unsigned finish, double* insideLength, double* outsideLength) noexcept {
+void sidlen(unsigned start, unsigned finish, double* insideLength, double* outsideLength) {
 	if (insideLength && outsideLength) {
 		*insideLength += hypot(InsidePoints->operator[](finish).x - InsidePoints->operator[](start).x, InsidePoints->operator[](finish).x - InsidePoints->operator[](start).x);
 		*outsideLength += hypot(OutsidePoints->operator[](finish).x - OutsidePoints->operator[](start).x, OutsidePoints->operator[](finish).x - OutsidePoints->operator[](start).x);
@@ -2529,6 +2528,7 @@ void dufind(float indent) {
 void fangfn(unsigned find, float angle) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
+	//ToDo - also do angle updates for texture filled forms
 	if (SelectedForm->type == FRMFPOLY && SelectedForm->fillType) {
 		switch (SelectedForm->fillType) {
 		case VRTF:
@@ -4745,21 +4745,18 @@ void redtx() {
 
 void setangf(double angle) {
 	unsigned		iVertex = 0;
-	const double	savedAngle = RotationAngle;
 
-	RotationAngle = angle;
 	MoveMemory(&AngledForm, SelectedForm, sizeof(FRMHED));
 	MoveMemory(&AngledFormVertices, CurrentFormVertices, sizeof(fPOINT)*VertexCount);
 	RotationCenter.x = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
 	RotationCenter.y = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
 	AngledForm.vertices = AngledFormVertices;
-	if (RotationAngle) {
+	if (angle) {
 		for (iVertex = 0; iVertex < VertexCount; iVertex++)
-			rotflt(AngledFormVertices[iVertex]);
+			rotflt(AngledFormVertices[iVertex], angle);
 	}
 	SelectedForm = &AngledForm;
 	CurrentFormVertices = AngledFormVertices;
-	RotationAngle = savedAngle;
 }
 
 void chgwrn() {
