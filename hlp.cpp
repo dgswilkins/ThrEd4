@@ -1,223 +1,84 @@
 #include <windows.h>
-#include <stdio.h>
+#include <CppCoreCheck\warnings.h>
 #include <htmlhelp.h>
 #include <locale.h>
-#include <CppCoreCheck\warnings.h>
-#pragma warning( push )  
-#pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
+#include <stdio.h>
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include <fmt/format.h>
-#pragma warning( pop )  
+#pragma warning(pop)
 
 #include "resource.h"
 #include "thred.h"
 
-extern void				ispcdclp();
-extern void				movStch();
-extern	void			numWnd();
-extern void				okcan();
-extern void				rstAll();
-extern void				shoMsg(const std::string &message);
+extern void ispcdclp();
+extern void movStch();
+extern void numWnd();
+extern void okcan();
+extern void rstAll();
+extern void shoMsg(const std::string& message);
 
-extern	unsigned		ButtonHeight;
-extern	unsigned		ButtonWidthX3;
-extern	std::vector<HWND>	*ButtonWin;
-extern	unsigned		ClosestFormToCursor;
-extern	DRAWITEMSTRUCT*	DrawItem;
-extern	unsigned		FormIndex;
-extern	FRMHED			FormList[MAXFORMS];
-extern	char			HomeDirectory[_MAX_PATH];
-extern	INIFILE			IniFile;
-extern	HWND			MainStitchWin;
-extern	MSG				Msg;
-extern	char			MsgBuffer[MSGSIZ];
-extern	fPOINT			OSequence[OSEQLEN];
-extern	PCSHEADER		PCSHeader;
-extern	long			PreferenceWindowWidth;
-extern	RECT			scRct;
-extern	FRMHED*			SelectedForm;
-extern	unsigned		SelectedFormCount;
-extern	EnumMap<StateFlag>	StateMap;
-extern	HDC				StitchWindowMemDC;
-extern	HINSTANCE		ThrEdInstance;
-extern	HWND			ThrEdWindow;
-extern	char			ThrName[_MAX_PATH];
-extern	POINT			UnzoomedRect;
-extern	char			WorkingFileName[_MAX_PATH];
+extern unsigned           ButtonHeight;
+extern unsigned           ButtonWidthX3;
+extern std::vector<HWND>* ButtonWin;
+extern unsigned           ClosestFormToCursor;
+extern DRAWITEMSTRUCT*    DrawItem;
+extern unsigned           FormIndex;
+extern FRMHED             FormList[MAXFORMS];
+extern char               HomeDirectory[_MAX_PATH];
+extern INIFILE            IniFile;
+extern HWND               MainStitchWin;
+extern MSG                Msg;
+extern char               MsgBuffer[MSGSIZ];
+extern fPOINT             OSequence[OSEQLEN];
+extern PCSHEADER          PCSHeader;
+extern long               PreferenceWindowWidth;
+extern RECT               scRct;
+extern FRMHED*            SelectedForm;
+extern unsigned           SelectedFormCount;
+extern EnumMap<StateFlag> StateMap;
+extern HDC                StitchWindowMemDC;
+extern HINSTANCE          ThrEdInstance;
+extern HWND               ThrEdWindow;
+extern char               ThrName[_MAX_PATH];
+extern POINT              UnzoomedRect;
+extern char               WorkingFileName[_MAX_PATH];
 
-HANDLE					HelpFile;					//handle to the help file
-unsigned				HelpFileLength;				//help file length
-HWND					HelpWindow;				//help window
-HWND					MsgWindow = 0;				//message window
+HANDLE   HelpFile;       // handle to the help file
+unsigned HelpFileLength; // help file length
+HWND     HelpWindow;     // help window
+HWND     MsgWindow = 0;  // message window
 
-unsigned short LoadStringList[] = {	//strings to load into memory at init time
-	IDS_PIKOL,
-	IDS_UPON,
-	IDS_UPOF,
-	IDS_AUXTXT,
-	IDS_HUP0,
-	IDS_HUP1,
-	IDS_HUP2,
-	IDS_HUP3,
-	IDS_HUP4,
-	IDS_TRC0,
-	IDS_TRC1S,
-	IDS_TRC2,
-	IDS_TRC3,
-	IDS_TRC4,
-	IDS_TRC1H,
-	IDS_NUMPNT,
-	IDS_NUMFRM,
-	IDS_NUMSCH,
-	IDS_NUMFORM,
-	IDS_NUMSEL,
-	IDS_BOXSEL,
-	IDS_CLOS,
-	IDS_TOT,
-	IDS_LAYR,
-	IDS_OVRLOK,
-	IDS_OVRIT,
-	IDS_THRED,
-	IDS_NUFIL,
-	IDS_EMB,
-	IDS_ON,
-	IDS_OFF,
-	IDS_FMEN,
-	IDS_TXT0,
-	IDS_TXT1,
-	IDS_TXT2,
-	IDS_TXT3,
-	IDS_TXT4,
-	IDS_TXT5,
-	IDS_TXT6,
-	IDS_TXT7,
-	IDS_TXT8,
-	IDS_TXT9,
-	IDS_TXT10,
-	IDS_TXT11,
-	IDS_TXT12,
-	IDS_TXT13,
-	IDS_TXT14,
-	IDS_TXT15,
-	IDS_TXT16,
-	IDS_TXT17,
-	IDS_TXT18,
-	IDS_TXT19,
-	IDS_TXT20,
-	IDS_TXT21,
-	IDS_TXT22,
-	IDS_TXT23,
-	IDS_FIL0,
-	IDS_FIL1,
-	IDS_FIL2,
-	IDS_FIL3,
-	IDS_FIL4,
-	IDS_FIL5,
-	IDS_FIL6,
-	IDS_FIL7,
-	IDS_FIL8,
-	IDS_FIL9,
-	IDS_FIL10,
-	IDS_FIL11,
-	IDS_FIL12,
-	IDS_FIL13,
-	IDS_EDG0,
-	IDS_EDG1,
-	IDS_EDG2,
-	IDS_EDG3,
-	IDS_EDG4,
-	IDS_EDG5,
-	IDS_EDG6,
-	IDS_EDG7,
-	IDS_EDG8,
-	IDS_EDG9,
-	IDS_EDG10,
-	IDS_EDG11,
-	IDS_EDG12,
-	IDS_PRF0,
-	IDS_PRF1,
-	IDS_PRF2,
-	IDS_PRF3,
-	IDS_PRF4,
-	IDS_PRF5,
-	IDS_PRF6,
-	IDS_PRF7,
-	IDS_PRF8,
-	IDS_PRF9,
-	IDS_PRF10,
-	IDS_PRF11,
-	IDS_PRF12,
-	IDS_PRF13,
-	IDS_PRF14,
-	IDS_PRF15,
-	IDS_PRF16,
-	IDS_PRF17,
-	IDS_PRF18,
-	IDS_PRF19,
-	IDS_PRF20,
-	IDS_PRF21,
-	IDS_PRF22,
-	IDS_PRF23,
-	IDS_PRF24,
-	IDS_PRF25,
-	IDS_PRF26,
-	IDS_PRF27,
-	IDS_FRMPLUS,
-	IDS_FRMINUS,
-	IDS_OKENT,
-	IDS_CANCEL,
-	IDS_FREH,
-	IDS_BLUNT,
-	IDS_TAPR,
-	IDS_PNTD,
-	IDS_SQR,
-	IDS_DELST2,
-	IDS_THRDBY,
-	IDS_STCHOUT,
-	IDS_STCHS,
-	IDS_FORMS,
-	IDS_HUPWID,
-	IDS_CREATBY,
-	IDS_CUSTHUP,
-	IDS_STCHP,
-	IDS_FRMP,
-	IDS_ENTROT,
-	IDS_NUDG,
-	IDS_ALLX,
-	IDS_FTHCOL,
-	IDS_FTHTYP,
-	IDS_FTH0,
-	IDS_FTH1,
-	IDS_FTH2,
-	IDS_FTH3,
-	IDS_FTH4,
-	IDS_FTH5,
-	IDS_FTHBLND,
-	IDS_FTHUP,
-	IDS_FTHBOTH,
-	IDS_FTHUPCNT,
-	IDS_FTHDWNCNT,
-	IDS_FTHSIZ,
-	IDS_FTHNUM,
-	IDS_FTHFLR,
-	IDS_FSTRT,
-	IDS_FEND,
-	IDS_WALK,
-	IDS_UWLKIND,
-	IDS_UND,
-	IDS_ULEN,
-	IDS_FUANG,
-	IDS_FUSPAC,
-	IDS_CWLK,
-	IDS_UNDCOL,
-	IDS_FRMBOX,
+unsigned short LoadStringList[] = {
+	// strings to load into memory at init time
+	IDS_PIKOL,    IDS_UPON,      IDS_UPOF,    IDS_AUXTXT, IDS_HUP0,   IDS_HUP1,    IDS_HUP2,    IDS_HUP3,
+	IDS_HUP4,     IDS_TRC0,      IDS_TRC1S,   IDS_TRC2,   IDS_TRC3,   IDS_TRC4,    IDS_TRC1H,   IDS_NUMPNT,
+	IDS_NUMFRM,   IDS_NUMSCH,    IDS_NUMFORM, IDS_NUMSEL, IDS_BOXSEL, IDS_CLOS,    IDS_TOT,     IDS_LAYR,
+	IDS_OVRLOK,   IDS_OVRIT,     IDS_THRED,   IDS_NUFIL,  IDS_EMB,    IDS_ON,      IDS_OFF,     IDS_FMEN,
+	IDS_TXT0,     IDS_TXT1,      IDS_TXT2,    IDS_TXT3,   IDS_TXT4,   IDS_TXT5,    IDS_TXT6,    IDS_TXT7,
+	IDS_TXT8,     IDS_TXT9,      IDS_TXT10,   IDS_TXT11,  IDS_TXT12,  IDS_TXT13,   IDS_TXT14,   IDS_TXT15,
+	IDS_TXT16,    IDS_TXT17,     IDS_TXT18,   IDS_TXT19,  IDS_TXT20,  IDS_TXT21,   IDS_TXT22,   IDS_TXT23,
+	IDS_FIL0,     IDS_FIL1,      IDS_FIL2,    IDS_FIL3,   IDS_FIL4,   IDS_FIL5,    IDS_FIL6,    IDS_FIL7,
+	IDS_FIL8,     IDS_FIL9,      IDS_FIL10,   IDS_FIL11,  IDS_FIL12,  IDS_FIL13,   IDS_EDG0,    IDS_EDG1,
+	IDS_EDG2,     IDS_EDG3,      IDS_EDG4,    IDS_EDG5,   IDS_EDG6,   IDS_EDG7,    IDS_EDG8,    IDS_EDG9,
+	IDS_EDG10,    IDS_EDG11,     IDS_EDG12,   IDS_PRF0,   IDS_PRF1,   IDS_PRF2,    IDS_PRF3,    IDS_PRF4,
+	IDS_PRF5,     IDS_PRF6,      IDS_PRF7,    IDS_PRF8,   IDS_PRF9,   IDS_PRF10,   IDS_PRF11,   IDS_PRF12,
+	IDS_PRF13,    IDS_PRF14,     IDS_PRF15,   IDS_PRF16,  IDS_PRF17,  IDS_PRF18,   IDS_PRF19,   IDS_PRF20,
+	IDS_PRF21,    IDS_PRF22,     IDS_PRF23,   IDS_PRF24,  IDS_PRF25,  IDS_PRF26,   IDS_PRF27,   IDS_FRMPLUS,
+	IDS_FRMINUS,  IDS_OKENT,     IDS_CANCEL,  IDS_FREH,   IDS_BLUNT,  IDS_TAPR,    IDS_PNTD,    IDS_SQR,
+	IDS_DELST2,   IDS_THRDBY,    IDS_STCHOUT, IDS_STCHS,  IDS_FORMS,  IDS_HUPWID,  IDS_CREATBY, IDS_CUSTHUP,
+	IDS_STCHP,    IDS_FRMP,      IDS_ENTROT,  IDS_NUDG,   IDS_ALLX,   IDS_FTHCOL,  IDS_FTHTYP,  IDS_FTH0,
+	IDS_FTH1,     IDS_FTH2,      IDS_FTH3,    IDS_FTH4,   IDS_FTH5,   IDS_FTHBLND, IDS_FTHUP,   IDS_FTHBOTH,
+	IDS_FTHUPCNT, IDS_FTHDWNCNT, IDS_FTHSIZ,  IDS_FTHNUM, IDS_FTHFLR, IDS_FSTRT,   IDS_FEND,    IDS_WALK,
+	IDS_UWLKIND,  IDS_UND,       IDS_ULEN,    IDS_FUANG,  IDS_FUSPAC, IDS_CWLK,    IDS_UNDCOL,  IDS_FRMBOX,
 	IDS_TXOF,
 };
 
-std::vector<std::string> *StringTable;
+std::vector<std::string>* StringTable;
 
-inline void loadString(std::string & sDest, unsigned stringID) {
-	WCHAR sBuf[HBUFSIZ] = { 0 };
-	LPWSTR psBuf = sBuf;
+inline void loadString(std::string& sDest, unsigned stringID) {
+	WCHAR  sBuf[HBUFSIZ] = { 0 };
+	LPWSTR psBuf         = sBuf;
 	sDest.clear();
 	if (auto len = ::LoadStringW(ThrEdInstance, stringID, psBuf, 0) * sizeof(WCHAR)) {
 		sDest.resize(++len);
@@ -225,7 +86,7 @@ inline void loadString(std::string & sDest, unsigned stringID) {
 	}
 }
 
-void adbad(fmt::MemoryWriter &repairMessage, unsigned code, unsigned count) {
+void adbad(fmt::MemoryWriter& repairMessage, unsigned code, unsigned count) {
 	std::string fmtStr;
 
 	loadString(fmtStr, code);
@@ -252,7 +113,7 @@ void msgflt(unsigned messageId, float value) {
 
 void tsizmsg(char* threadSizeText, double threadSize) {
 	std::string fmtStr;
-	
+
 	loadString(fmtStr, IDS_SIZ);
 	shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
 	StateMap.set(StateFlag::NUMIN);
@@ -280,7 +141,7 @@ void crmsg(const char* fileName) {
 	shoMsg(fmt::format(fmtStr, fileName));
 }
 
-void butxt(unsigned iButton, const std::string &buttonText) {
+void butxt(unsigned iButton, const std::string& buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
 		if (iButton == 5) {
 			if (StateMap.test(StateFlag::HIDMAP))
@@ -309,14 +170,14 @@ void lodstr() {
 	}
 }
 
-void shoMsg(const std::string &message) {
+void shoMsg(const std::string& message) {
 	if (message.size()) {
-		SIZE		textSize = {}, messageSize = {};
-		unsigned	iString = 0, index = 0, previousStringLength = 0;
-		long		offset = 0;
-
+		SIZE                     textSize = {}, messageSize = {};
+		unsigned                 iString = 0, index = 0, previousStringLength = 0;
+		long                     offset = 0;
 		std::vector<std::string> strings;
-		iString = 0;
+
+		iString            = 0;
 		const auto sizeLim = message.size();
 		while (iString < sizeLim) {
 			if (message[iString] == 10) {
@@ -340,18 +201,17 @@ void shoMsg(const std::string &message) {
 			offset = PreferenceWindowWidth + 6;
 		else
 			offset = 3;
-		MsgWindow = CreateWindow(
-			"STATIC",
-			message.c_str(),
-			SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-			offset,
-			3,
-			messageSize.cx + 20,
-			messageSize.cy + 6,
-			MainStitchWin,
-			NULL,
-			ThrEdInstance,
-			NULL);
+		MsgWindow = CreateWindow("STATIC",
+		                         message.c_str(),
+		                         SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+		                         offset,
+		                         3,
+		                         messageSize.cx + 20,
+		                         messageSize.cy + 6,
+		                         MainStitchWin,
+		                         NULL,
+		                         ThrEdInstance,
+		                         NULL);
 	}
 }
 
@@ -367,7 +227,7 @@ void riter() {
 
 void pntmsg(unsigned msgID) {
 	std::string fmtStr, message;
-	
+
 	loadString(fmtStr, IDS_PNT);
 	loadString(message, msgID);
 	shoMsg(fmt::format(fmtStr, message));
@@ -442,7 +302,7 @@ void help() {
 	std::string helpFileName;
 
 	loadString(helpFileName, IDS_HELPFN);
-		HelpWindow = HtmlHelp(ThrEdWindow, fmt::format("{}{}", HomeDirectory, helpFileName).c_str(), HH_DISPLAY_TOPIC, 0);
+	HelpWindow = HtmlHelp(ThrEdWindow, fmt::format("{}{}", HomeDirectory, helpFileName).c_str(), HH_DISPLAY_TOPIC, 0);
 	if (!HelpWindow)
 		tabmsg(IDS_NOHLP);
 }
@@ -467,7 +327,7 @@ void spltmsg() {
 }
 
 void datmsg(unsigned code) {
-	unsigned dataErrorID = 0;
+	unsigned    dataErrorID = 0;
 	std::string dataError;
 
 	switch (code) {
@@ -484,5 +344,4 @@ void datmsg(unsigned code) {
 	}
 	loadString(dataError, dataErrorID);
 	shoMsg(dataError);
-
 }

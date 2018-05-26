@@ -1,21 +1,25 @@
 #pragma once
 #include <CppCoreCheck\warnings.h>
-#pragma warning( push )  
-#pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include <boost/dynamic_bitset.hpp>
-#pragma warning( pop )  
+#pragma warning(pop)
 
 template <typename Block = unsigned, typename Allocator = std::allocator<unsigned>>
-class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator> {
+class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator>
+{
 	typedef boost::dynamic_bitset<Block, Allocator> super;
+
 public:
-	[[gsl::suppress(26434)]]ExtendedBitSet (std::size_t bits) : super::dynamic_bitset(bits) {}
-	
+	[[gsl::suppress(26434)]] ExtendedBitSet(std::size_t bits)
+	    : super::dynamic_bitset(bits) {
+	}
+
 	/*
 	bool testAndReset(std::size_t pos) const {
-		bool val = super::test(pos);
-		super::reset(pos);
-		return val;
+	    bool val = super::test(pos);
+	    super::reset(pos);
+	    return val;
 	}
 	*/
 
@@ -28,7 +32,6 @@ public:
 			return 0xFFFFFFFF;
 		}
 		return foundBit;
-
 	}
 
 	unsigned getLast() {
@@ -47,7 +50,5 @@ public:
 			return 0xFFFFFFFF;
 		}
 		return foundBit;
-
 	}
 };
-
