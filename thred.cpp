@@ -893,8 +893,6 @@ INIFILE   IniFile;              // initialization file
 dPOINT    RotationCenter;       // center of stitch rotation
 POINT     RotationCenterPixels; // center of pixel rotation
 
-unsigned FormFirstStitchIndex; // points to the first stitch in a form
-
 typedef struct _dstdat {
 	char cor;
 	char val;
@@ -908,15 +906,6 @@ DSTDAT DSTValues[] = {
 	{ XCOR, 3 }, { XCOR, -3 }, { XCOR, 27 }, { XCOR, -27 }, { YCOR, -27 }, { YCOR, 27 }, { YCOR, -3 }, { YCOR, 3 },
 	{ XCOR, 0 }, { XCOR, 0 },  { XCOR, 81 }, { XCOR, -81 }, { YCOR, -81 }, { YCOR, 81 },
 };
-
-unsigned RightDownCursorStart[]  = { 0x8, 0x18, 0x3c, 0x7c };
-unsigned RightDownCursorFinish[] = { 0x48000000, 0x50000000, 0xa0000000, 0xc0000000, 0x80000000 };
-unsigned RightUpCursorStart[]    = { 0x80000000, 0xa0000000, 0x48000000, 0x24000000, 0x12000000 };
-unsigned RightUpCursorFinish[]   = { 0x3c, 0x1c, 0xc };
-unsigned LeftDownCursorStart[]   = { 0x20000000, 0x60000000, 0xf0000000, 0xf8000000 };
-unsigned LeftDownCursorFinish[]  = { 0x44, 0x24, 0x14, 0x6, 0x4 };
-unsigned LeftUpCursorStart[]     = { 0x2, 0x6, 0x14, 0x24, 0x44 };
-unsigned LeftUpCursorEnd[]       = { 0x70000000, 0x30000000, 0x20000000 };
 
 unsigned Xdst[] = {
 	0x090a0a, //-121
@@ -7133,7 +7122,7 @@ unsigned sizfclp() {
 	return clipSize;
 }
 
-unsigned frmcnt(unsigned iForm) noexcept {
+unsigned frmcnt(unsigned iForm, unsigned formFirstStitchIndex) noexcept {
 	const unsigned codedAttribute = iForm << FRMSHFT;
 	unsigned       stitchCount = 0, iStitch = 0;
 
@@ -7149,7 +7138,7 @@ unsigned frmcnt(unsigned iForm) noexcept {
 		return 0;
 	}
 	else {
-		FormFirstStitchIndex = iStitch;
+		formFirstStitchIndex = iStitch;
 		while (iStitch < PCSHeader.stitchCount) {
 			if ((StitchBuffer[iStitch].attribute & FRMSK) == codedAttribute
 			    && StitchBuffer[iStitch].attribute & TYPMSK) {
@@ -7165,14 +7154,14 @@ unsigned frmcnt(unsigned iForm) noexcept {
 	}
 }
 
-unsigned sizclp() {
+unsigned sizclp(unsigned formFirstStitchIndex) {
 	unsigned length = 0;
 
 	length = FileSize = sizeof(FORMCLIP) + VertexCount * sizeof(fPOINT);
 	if (SelectedForm->type == SAT)
 		FileSize += SelectedForm->satinGuideCount * sizeof(SATCON);
 	if (SelectedForm->fillType || SelectedForm->edgeType) {
-		length += frmcnt(ClosestFormToCursor);
+		length += frmcnt(ClosestFormToCursor, formFirstStitchIndex);
 		FileSize += length * sizeof(fPOINTATTR);
 	}
 	if (iseclp(ClosestFormToCursor))
@@ -7202,6 +7191,7 @@ void duclip() {
 	unsigned iSide = 0, iStitch = 0, iSource = 0, iTexture = 0, iVertex = 0;
 	unsigned guideCount = 0, pointCount = 0, textureCount = 0, stitchCount = 0;
 	unsigned length = 0, codedAttribute = 0, msiz = 0;
+	unsigned formFirstStitchIndex; // points to the first stitch in a form
 
 	if (StateMap.test(StateFlag::FPSEL)) {
 		if (OpenClipboard(ThrEdWindow)) {
@@ -7352,7 +7342,7 @@ void duclip() {
 			}
 			else {
 				if (StateMap.test(StateFlag::FORMSEL)) {
-					length = sizclp();
+					length = sizclp(formFirstStitchIndex);
 					fvars(ClosestFormToCursor);
 					codedAttribute = ClosestFormToCursor << FRMSHFT;
 					FileSize += sizeof(FORMCLIP);
@@ -7402,7 +7392,7 @@ void duclip() {
 							ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length * sizeof(CLPSTCH) + 2);
 							if (ClipPointer) {
 								ClipStitchData = *(static_cast<CLPSTCH**>(ClipPointer));
-								iStitch        = FormFirstStitchIndex;
+								iStitch        = formFirstStitchIndex;
 								savclp(0, iTexture);
 								ClipStitchData[0].led = length;
 								iTexture++;
