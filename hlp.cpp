@@ -44,8 +44,6 @@ extern char               ThrName[_MAX_PATH];
 extern POINT              UnzoomedRect;
 extern char               WorkingFileName[_MAX_PATH];
 
-HANDLE   HelpFile;       // handle to the help file
-unsigned HelpFileLength; // help file length
 HWND     HelpWindow;     // help window
 HWND     MsgWindow = 0;  // message window
 
