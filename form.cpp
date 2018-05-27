@@ -98,6 +98,7 @@ extern void                 zumhom();
 
 extern unsigned                  ActiveColor;
 extern unsigned                  ActiveLayer;
+extern unsigned                  AppliqueColor;
 extern HCURSOR                   ArrowCursor;
 extern unsigned                  BitmapHeight;
 extern unsigned                  BitmapWidth;
@@ -183,7 +184,6 @@ extern HINSTANCE                 ThrEdInstance;
 extern HWND                      ThrEdWindow;
 extern POINT                     ThredWindowOrigin;
 extern char                      ThrName[_MAX_PATH];
-extern unsigned                  AppliqueColor;
 extern POINT                     UnzoomedRect;
 extern EnumMap<UserFlag>         UserFlagMap;
 extern HPEN                      UserPen[16];
@@ -252,125 +252,121 @@ void               uncon();
 void               uninsf();
 void               wavfrm();
 
-unsigned FormMenuEntryCount;                  // lines in the form-form
-float    MaxStitchLen;                        // maximum stitch length
-float    UserStitchLen;                       // user stitch length
-double   AdjustedSpace;                       // adjusted space
-unsigned NextStart;                           // index of the endpoint of the line segment being processed
-double   Div4;                                // chain space divided by four
-unsigned ClosestFormToCursor;                 // closest form to the cursor
-unsigned ClosestVertexToCursor;               // formOrigin closest to the cursor
-unsigned InOutFlag;                           // is intersection of line and cursor before, in or after the line
-double   VerticalRatio;                       // vertical ratio between the zoom window
-                                              // and the entire stitch space
-double HorizontalRatio;                       // horizontal ratio between the zoom window
-                                              // and the entire stitch space
-POINT                  FormLines[MAXFRMLINS]; // used in the form drawing routines
-unsigned               NewFormVertexCount;    // points in the new form
-FORMINFO               FormInfo;              // form info used in drawing forms
-FRMHED                 FormList[MAXFORMS];    // a list of form headers
-unsigned               FormIndex   = 0;       // index into the list of forms
-double                 LineSpacing = DEFSPACE * PFGRAN;   // stitch spacing in stitch units
-fPOINT*                CurrentFillVertices;               // pointer to the line of the polygon being filled
-unsigned               StitchLineCount;                   // count of stitch lines
-unsigned               ActivePointIndex;                  // pointer to the active form in the sequencing algorithm
-unsigned               LineGroupIndex;                    // pointer for groups of fill line segments
-unsigned               VertexCount;                       // sides of the selected form to fill
-unsigned               SequenceIndex;                     // sequencing pointer
-BSEQPNT                BSequence[BSEQLEN];                // reverse sequence for polygon fills
-fPOINT                 OSequence[OSEQLEN];                // temporary storage for sequencing
-double                 Slope;                             // slope of line in angle fills
-unsigned               SatinIndex;                        // pointer to next satin formOrigin to enter
-fPOINT                 FormMoveDelta;                     // offset for moving forms
-std::vector<fPOINT>*   TempPolygon;                       // temporary storage when user is entering a polygon;
-unsigned               OutputIndex;                       // output pointer for sequencing
-double*                Lengths;                           // array of cumulative lengths used in satin fills
-fPOINT*                CurrentFormVertices;               // points in the currently selected form
-SATCON*                CurrentFormGuides;                 // connections in the currently selecteed form
-unsigned short         CurrentFormGuidesCount;            // number of connections in the currently selected form
-unsigned short         SatinEndGuide;                     // satin end guide for the currently selected form
-unsigned short         StartPoint;                        // starting formOrigin for a satin stitch guide-line
-double                 HorizontalLength2;                 // horizontal length of a clipboard fill/2
-double                 HorizontalLength;                  // horizontal length of a clipboard fill
-fPOINT                 LastPoint;                         // last formOrigin written by line connect routine
-std::vector<fPOINT>*   OutsidePointList;                  // list of outside outline points for satin or clipboard fills
-std::vector<fPOINT>*   InsidePointList;                   // list of inside outline points for satin or clipboard fills
-std::vector<fPOINT>*   OutsidePoints;                     // pointer to the list of outside outline points
-std::vector<fPOINT>*   InsidePoints;                      // pointer to the list of inside outline points
-fPOINT                 ClipReference;                     // clipboard reference formOrigin
-double                 BorderWidth = BRDWID;              // border width for satin borders
-unsigned               SelectedFormControlVertex;         // user selected form control formOrigin
-std::vector<POINT>*    FormControlPoints;                 // form control rectangle in pixel coordinates
-double                 XYratio;                           // expand form aspect ratio
-std::vector<HWND>*     ValueWindow;                       // data handles for the form data sheet
-std::vector<HWND>*     LabelWindow;                       // text handles for the form data sheet
-RECT                   LabelWindowCoords;                 // location of left windows in the form data sheet
-RECT                   ValueWindowCoords;                 // location of right windows in the form data sheet
-POINT                  LabelWindowSize;                   // size of the left windows in the form data sheet
-POINT                  ValueWindowSize;                   // size of the right windows in the form data sheet
-fPOINT                 LowerLeftStitch;                   // lower left formOrigin in a form
-std::vector<POINT>*    RubberBandLine;                    // points to form points to be moved
-double                 SnapLength = SNPLEN * PFGRAN;      // snap together length
-double                 StarRatio  = STARAT;               // star formOrigin to body ratio
-double                 SpiralWrap = SPIRWRAP;             // number of revolutions in a spiral
-fRECTANGLE             BoundingRect;                      // isin rectangle
-unsigned               PathMapIndex;                      // number of entries in the path map
-unsigned               VisitedIndex;                      // next unvisited region for sequencing
-unsigned               RegionCount;                       // number of regions to be sequenced
-unsigned               DoneRegion;                        // last region sequenced
-double                 GapToClosestRegion;                // region close enough threshold for sequencing
-RGSEQ*                 RegionPath;                        // path to a region
-unsigned               GroupIndexCount;                   // number of group indices
-unsigned               LastGroup;                         // group of the last line written in the previous region;
-unsigned               SequencePathIndex;                 // index to path of sequenced regions
-unsigned               NextGroup;                         // group that connects to the next region
-REGION*                CurrentRegion;                     // region currently being sequenced
-FRMHED                 AngledForm;                        // a temporary rotated form for angle fills
-std::vector<unsigned>* SelectedFormList;                  // a list of selected forms
-unsigned               SelectedFormCount = 0;             // number of selected forms
-unsigned               PreviousFormIndex;                 // previously selected form
-RECT                   SelectedFormsRect;                 // for multiple selections;
-std::vector<POINT>*    SelectedFormsLine;                 // line derived from the big rectangle
-std::vector<POINT>*    SelectedPointsLine;                // line derived from the formOrigin select rectangle
-fRECTANGLE             AllItemsRect;                      // rectangle enclosing all forms and stitches
-std::vector<double>*   FormAngles;                        // angles of a form for satin border fills
-fPOINT                 FormVertices[MAXITEMS];            // form points
-unsigned               FormVertexIndex;                   // next index to append form points
-fPOINT                 ClipPoints[MAXITEMS];              // main clipboard fill points for forms
-unsigned               ClipPointIndex;                    // next index to append main clipboard points
-SATCON                 SatinGuides[MAXSAC];               // satin form connects
-unsigned               SatinGuideIndex;                   // next index to append satin connect points
-float                  ButtonholeCornerLength = IBFCLEN;  // buttonhole corner length
-float                  PicotSpacing           = IPICSPAC; // space between border picots
-unsigned               PseudoRandomValue;                 // pseudo-random sequence register
-unsigned               SatinBackupIndex;                  // pointer for backup stitches in satin fills
-fPOINT                 BorderClipReference;               // reference for clipboard line border
-unsigned               CurrentSide;                       // active form formOrigin for line clipboard fill
-unsigned               FormRelocationIndex;               // form relocator pointer
-unsigned               BeanCount;                         // number of stitches added by convert to bean
-FRMHED*                FormForInsert;                     // insert form vertex in this form
-unsigned               FormVertexPrev;                    // form vertex storage for form vertex insert
-unsigned               FormVertexNext;                    // form vertex storage for form vertex insert
-SMALPNTL*              SequenceLines;                     // line for vertical/horizontal/angle fills
-unsigned               PathIndex;           // formOrigin to the next path element for vertical fill sequencing
+unsigned               ActivePointIndex;                 // pointer to the active form in the sequencing algorithm
+double                 AdjustedSpace;                    // adjusted space
+fRECTANGLE             AllItemsRect;                     // rectangle enclosing all forms and stitches
+FRMHED                 AngledForm;                       // a temporary rotated form for angle fills
+fPOINT                 AngledFormVertices[MAXFRMLINS];   // form formOrigin data for angle fills
+BSEQPNT                BSequence[BSEQLEN];               // reverse sequence for polygon fills
+unsigned               BeanCount;                        // number of stitches added by convert to bean
+fPOINT                 BorderClipReference;              // reference for clipboard line border
+double                 BorderWidth = BRDWID;             // border width for satin borders
+fRECTANGLE             BoundingRect;                     // isin rectangle
+float                  ButtonholeCornerLength = IBFCLEN; // buttonhole corner length
+unsigned short         ClipIntersectSide;                // clipboard intersect side;
+unsigned               ClipPointIndex;                   // next index to append main clipboard points
+fPOINT                 ClipPoints[MAXITEMS];             // main clipboard fill points for forms
+fPOINT                 ClipReference;                    // clipboard reference formOrigin
+float                  ClipWidth;                        // horizontal spacing for vertical clipboard fill
+unsigned               ClosestFormToCursor;              // closest form to the cursor
+unsigned               ClosestVertexToCursor;            // formOrigin closest to the cursor
+fPOINT*                CurrentFillVertices;              // pointer to the line of the polygon being filled
+SATCON*                CurrentFormGuides;                // connections in the currently selecteed form
+unsigned short         CurrentFormGuidesCount;           // number of connections in the currently selected form
+fPOINT*                CurrentFormVertices;              // points in the currently selected form
+REGION*                CurrentRegion;                    // region currently being sequenced
+unsigned               CurrentSide;                      // active form formOrigin for line clipboard fill
+double                 Div4;                             // chain space divided by four
+unsigned               DoneRegion;                       // last region sequenced
+double                 EggRatio;                         // ratio for shrinking eggs
+std::vector<double>*   FormAngles;                       // angles of a form for satin border fills
+std::vector<POINT>*    FormControlPoints;                // form control rectangle in pixel coordinates
+FRMHED*                FormForInsert;                    // insert form vertex in this form
+unsigned               FormIndex = 0;                    // index into the list of forms
+FORMINFO               FormInfo;                         // form info used in drawing forms
+POINT                  FormLines[MAXFRMLINS];            // used in the form drawing routines
+FRMHED                 FormList[MAXFORMS];               // a list of form headers
+unsigned               FormMenuEntryCount;               // lines in the form-form
+fPOINT                 FormMoveDelta;                    // offset for moving forms
+FLOAT                  FormOffset;                       // form offset for clipboard fills
+std::string*           FormOnOff;
+unsigned               FormRelocationIndex;    // form relocator pointer
+unsigned               FormVertexIndex;        // next index to append form points
+unsigned               FormVertexNext;         // form vertex storage for form vertex insert
+unsigned               FormVertexPrev;         // form vertex storage for form vertex insert
+fPOINT                 FormVertices[MAXITEMS]; // form points
+double                 GapToClosestRegion;     // region close enough threshold for sequencing
+unsigned               GroupIndexCount;        // number of group indices
+double                 HorizontalLength2;      // horizontal length of a clipboard fill/2
+double                 HorizontalLength;       // horizontal length of a clipboard fill
+double                 HorizontalRatio;        // horizontal ratio between the zoom window and the entire stitch space
+unsigned               InOutFlag;              // is intersection of line and cursor before, in or after the line
+std::vector<fPOINT>*   InsidePointList;        // list of inside outline points for satin or clipboard fills
+std::vector<fPOINT>*   InsidePoints;           // pointer to the list of inside outline points
+std::vector<HWND>*     LabelWindow;            // text handles for the form data sheet
+RECT                   LabelWindowCoords;      // location of left windows in the form data sheet
+POINT                  LabelWindowSize;        // size of the left windows in the form data sheet
+unsigned               LastGroup;              // group of the last line written in the previous region;
+fPOINT                 LastPoint;              // last formOrigin written by line connect routine
+double*                Lengths;                // array of cumulative lengths used in satin fills
+unsigned               LineGroupIndex;         // pointer for groups of fill line segments
+fPOINT                 LineSegmentEnd;         // vertical clipboard line segment end
+fPOINT                 LineSegmentStart;       // vertical clipboard line segment start
+double                 LineSpacing = DEFSPACE * PFGRAN; // stitch spacing in stitch units
+fPOINT                 LowerLeftStitch;                 // lower left formOrigin in a form
+float                  MaxStitchLen;                    // maximum stitch length
+MENUITEMINFO*          MenuInfo;
+unsigned               NewFormVertexCount;           // points in the new form
+unsigned               NextGroup;                    // group that connects to the next region
+unsigned               NextStart;                    // index of the endpoint of the line segment being processed
+fPOINT                 OSequence[OSEQLEN];           // temporary storage for sequencing
+unsigned               OutputIndex;                  // output pointer for sequencing
+std::vector<fPOINT>*   OutsidePointList;             // list of outside outline points for satin or clipboard fills
+std::vector<fPOINT>*   OutsidePoints;                // pointer to the list of outside outline points
+unsigned               PathIndex;                    // formOrigin to the next path element for vertical fill sequencing
+unsigned               PathMapIndex;                 // number of entries in the path map
+float                  PicotSpacing = IPICSPAC;      // space between border picots
+unsigned               PreferenceWindowTextWidth;    // size of the text part of the preference window
+long                   PreferenceWindowWidth;        // width of the preference window
+unsigned               PreviousFormIndex;            // previously selected form
+unsigned               PseudoRandomValue;            // pseudo-random sequence register
+unsigned               RegionCount;                  // number of regions to be sequenced
+RGSEQ*                 RegionPath;                   // path to a region
+std::vector<POINT>*    RubberBandLine;               // points to form points to be moved
+unsigned               SatinBackupIndex;             // pointer for backup stitches in satin fills
+unsigned short         SatinEndGuide;                // satin end guide for the currently selected form
+unsigned               SatinGuideIndex;              // next index to append satin connect points
+SATCON                 SatinGuides[MAXSAC];          // satin form connects
+unsigned               SatinIndex;                   // pointer to next satin formOrigin to enter
+unsigned               SelectedFormControlVertex;    // user selected form control formOrigin
+unsigned               SelectedFormCount = 0;        // number of selected forms
+std::vector<unsigned>* SelectedFormList;             // a list of selected forms
+std::vector<POINT>*    SelectedFormsLine;            // line derived from the big rectangle
+RECT                   SelectedFormsRect;            // for multiple selections;
+std::vector<POINT>*    SelectedPointsLine;           // line derived from the formOrigin select rectangle
+unsigned               SequenceIndex;                // sequencing pointer
+SMALPNTL*              SequenceLines;                // line for vertical/horizontal/angle fills
+unsigned               SequencePathIndex;            // index to path of sequenced regions
+double                 Slope;                        // slope of line in angle fills
+double                 SnapLength = SNPLEN * PFGRAN; // snap together length
+double                 SpiralWrap = SPIRWRAP;        // number of revolutions in a spiral
+double                 StarRatio  = STARAT;          // star formOrigin to body ratio
+unsigned short         StartPoint;                   // starting formOrigin for a satin stitch guide-line
+unsigned               StitchLineCount;              // count of stitch lines
+std::vector<fPOINT>*   TempPolygon;                  // temporary storage when user is entering a polygon;
+HDC                    TimeDC;                       // progress bar device context
+double                 TimePosition;                 // progress bar postiion
+double                 TimeStep;                     // progress bar step
+HWND                   TimeWindow;                   // progress bar
+float                  UserStitchLen;                // user stitch length
+std::vector<HWND>*     ValueWindow;                  // data handles for the form data sheet
+RECT                   ValueWindowCoords;            // location of right windows in the form data sheet
+POINT                  ValueWindowSize;              // size of the right windows in the form data sheet
+unsigned               VertexCount;                  // sides of the selected form to fill
+double                 VerticalRatio;       // vertical ratio between the zoom window and the entire stitch space
+unsigned               VisitedIndex;        // next unvisited region for sequencing
 fPOINT*                WorkingFormVertices; // form points for angle fills
-fPOINT                 AngledFormVertices[MAXFRMLINS]; // form formOrigin data for angle fills
-unsigned short         ClipIntersectSide;              // clipboard intersect side;
-fPOINT                 LineSegmentStart;               // vertical clipboard line segment start
-fPOINT                 LineSegmentEnd;                 // vertical clipboard line segment end
-float                  ClipWidth;                      // horizontal spacing for vertical clipboard fill
-HWND                   TimeWindow;                     // progress bar
-HDC                    TimeDC;                         // progress bar device context
-double                 TimeStep;                       // progress bar step
-double                 TimePosition;                   // progress bar postiion
-FLOAT                  FormOffset;                     // form offset for clipboard fills
-long                   PreferenceWindowWidth;          // width of the preference window
-double                 EggRatio;                       // ratio for shrinking eggs
-unsigned               PreferenceWindowTextWidth;      // size of the text part of the preference window
-
-std::string* FormOnOff;
-
-MENUITEMINFO* MenuInfo;
+double                 XYratio;             // expand form aspect ratio
 
 unsigned short EdgeArray[]
     = { MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0 };
