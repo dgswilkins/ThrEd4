@@ -66,35 +66,39 @@ extern void                 ritmov();
 extern void                 ritnum(unsigned code, unsigned value);
 extern void                 ritot(unsigned number);
 extern void                 rngadj();
-extern void                 rotang1(fPOINTATTR unrotatedPoint, fPOINT* rotatedPoint, const double& rotationAngle);
-extern void                 rotangf(fPOINT unrotatedPoint, fPOINT* rotatedPoint, const double rotationAngle);
-extern void                 rotflt(fPOINT& point, const double rotationAngle);
-extern void                 rotfn(double rotationAngle);
-extern void                 rstAll();
-extern void                 savdo();
-extern void                 sCor2px(dPOINT stitchCoordinate, POINT* pixelCoordinate);
-extern void                 sdmsg();
-extern void                 selRct(fRECTANGLE* sourceRect);
-extern void                 setangf(double angle);
-extern void                 setfchk();
-extern void                 setpsel();
-extern void                 setxt(std::vector<RNGCNT>& textureSegments);
-extern void                 shft(fPOINT delta);
-extern void                 shoMsg(const std::string& message);
-extern void                 shord();
-extern void                 shoseln(unsigned code0, unsigned code1);
-extern void                 spltmsg();
-extern void                 srtcol();
-extern void                 stch2pxr(fPOINT stitchCoordinate);
-extern void                 tabmsg(unsigned code);
-extern void                 unbsho();
-extern void                 uncros();
-extern void                 undat();
-extern void                 unlin();
-extern void                 unmsg();
-extern void                 unsel();
-extern void                 unsid();
-extern void                 zumhom();
+extern void                 rotang1(const fPOINTATTR& unrotatedPoint,
+                                    fPOINT&           rotatedPoint,
+                                    const double&     rotationAngle,
+                                    const dPOINT&     rotationCenter);
+extern void
+            rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, const double rotationAngle, const dPOINT& rotationCenter);
+extern void rotflt(fPOINT& point, const double rotationAngle, const dPOINT& rotationCenter);
+extern void rotfn(double rotationAngle, dPOINT& rotationCenter);
+extern void rstAll();
+extern void savdo();
+extern void sCor2px(const dPOINT& stitchCoordinate, POINT* pixelCoordinate);
+extern void sdmsg();
+extern void selRct(fRECTANGLE* sourceRect);
+// extern void                 setangf(double angle);
+extern void setfchk();
+extern void setpsel();
+extern void setxt(std::vector<RNGCNT>& textureSegments);
+extern void shft(fPOINT delta);
+extern void shoMsg(const std::string& message);
+extern void shord();
+extern void shoseln(unsigned code0, unsigned code1);
+extern void spltmsg();
+extern void srtcol();
+extern void stch2pxr(fPOINT stitchCoordinate);
+extern void tabmsg(unsigned code);
+extern void unbsho();
+extern void uncros();
+extern void undat();
+extern void unlin();
+extern void unmsg();
+extern void unsel();
+extern void unsid();
+extern void zumhom();
 
 extern unsigned                  ActiveColor;
 extern unsigned                  ActiveLayer;
@@ -151,7 +155,6 @@ extern char*                     PcdClipFormat;
 extern PCSHEADER                 PCSHeader;
 extern unsigned                  PreferenceIndex;
 extern HWND                      PreferencesWindow;
-extern dPOINT                    RotationCenter;
 extern fRECTANGLE                RotationRect;
 extern unsigned                  SearchLineIndex;
 extern HPEN                      SelectAllPen;
@@ -648,11 +651,11 @@ bool chk2of() {
 	return 1;
 }
 
-void rotbak(double rotationAngle) {
+void rotbak(double rotationAngle, const dPOINT& rotationCenter) {
 	unsigned iSequence;
 
 	for (iSequence = 0; iSequence < SequenceIndex; iSequence++)
-		rotflt(OSequence[iSequence], rotationAngle);
+		rotflt(OSequence[iSequence], rotationAngle, rotationCenter);
 }
 
 void delfil(unsigned attribute) {
@@ -2224,36 +2227,40 @@ void fnvrt(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lin
 
 void fnang(std::vector<unsigned>& groupIndexSequence,
            std::vector<SMALPNTL>& lineEndpoints,
-           const double           rotationAngle) {
+           const double           rotationAngle,
+           dPOINT&                rotationCenter) {
 	unsigned iVertex = 0;
 
-	AngledForm = FormList[ClosestFormToCursor];
-	RotationCenter.x
-	    = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
-	RotationCenter.y
-	    = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
+	AngledForm     = FormList[ClosestFormToCursor];
+	rotationCenter = {
+		(static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left),
+		(static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom)
+	};
 	AngledForm.vertices = AngledFormVertices;
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 		AngledForm.vertices[iVertex] = SelectedForm->vertices[iVertex];
-		rotflt(AngledForm.vertices[iVertex], rotationAngle);
+		rotflt(AngledForm.vertices[iVertex], rotationAngle, rotationCenter);
 	}
 	SelectedForm = &AngledForm;
 	fnvrt(groupIndexSequence, lineEndpoints);
 	SelectedForm = &FormList[ClosestFormToCursor];
 }
 
-void fnhor(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints) {
+void fnhor(std::vector<unsigned>& groupIndexSequence,
+           std::vector<SMALPNTL>& lineEndpoints,
+           const double           rotationAngle,
+           dPOINT&                rotationCenter) {
 	unsigned iVertex = 0;
 
-	AngledForm = FormList[ClosestFormToCursor];
-	RotationCenter.x
-	    = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
-	RotationCenter.y
-	    = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
+	AngledForm     = FormList[ClosestFormToCursor];
+	rotationCenter = {
+		(static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left),
+		(static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom)
+	};
 	AngledForm.vertices = AngledFormVertices;
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 		AngledForm.vertices[iVertex] = SelectedForm->vertices[iVertex];
-		rotflt(AngledForm.vertices[iVertex], (PI / 2));
+		rotflt(AngledForm.vertices[iVertex], rotationAngle, rotationCenter);
 	}
 	SelectedForm = &AngledForm;
 	fnvrt(groupIndexSequence, lineEndpoints);
@@ -2266,6 +2273,7 @@ void refilfn() {
 	float        length         = 0.0;
 	FILLSTARTS   FillStartsData = {}; // fill start data for refill
 	double       rotationAngle  = 0;
+	dPOINT       rotationCenter = {};
 
 	StateMap.reset(StateFlag::TXFIL);
 	fvars(ClosestFormToCursor);
@@ -2386,12 +2394,13 @@ void refilfn() {
 				WorkingFormVertices = SelectedForm->vertices;
 				break;
 			case HORF:
-				fnhor(groupIndexSequence, lineEndpoints);
+				rotationAngle = PI / 2;
+				fnhor(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter);
 				WorkingFormVertices = AngledForm.vertices;
 				break;
 			case ANGF:
 				rotationAngle = PI / 2 - SelectedForm->angleOrClipData.angle;
-				fnang(groupIndexSequence, lineEndpoints, rotationAngle);
+				fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter);
 				WorkingFormVertices = AngledForm.vertices;
 				break;
 			case VCLPF:
@@ -2433,7 +2442,7 @@ void refilfn() {
 				bakseq();
 				if (SelectedForm->fillType != VRTF && SelectedForm->fillType != TXVRTF) {
 					rotationAngle = -rotationAngle;
-					rotbak(rotationAngle);
+					rotbak(rotationAngle, rotationCenter);
 				}
 			}
 			ritfil();
@@ -5342,7 +5351,11 @@ bool ritclp(std::vector<fPOINT> clipFillData, fPOINT point) {
 	return 0;
 }
 
-bool clpsid(std::vector<fPOINT>& clipReversedData, std::vector<fPOINT>& clipFillData, unsigned start, unsigned finish) {
+bool clpsid(std::vector<fPOINT>& clipReversedData,
+            std::vector<fPOINT>& clipFillData,
+            unsigned             start,
+            unsigned             finish,
+            const dPOINT&        rotationCenter) {
 	unsigned     ind = 0, clipCount = 0;
 	fPOINT       delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
                      (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
@@ -5352,7 +5365,7 @@ bool clpsid(std::vector<fPOINT>& clipReversedData, std::vector<fPOINT>& clipFill
 	fPOINTATTR   clipReferencePoint = { ClipRect.left, ClipRect.bottom };
 	double       rotationAngle      = atan2(delta.y, delta.x);
 
-	rotang1(clipReferencePoint, &ClipReference, rotationAngle);
+	rotang1(clipReferencePoint, ClipReference, rotationAngle, rotationCenter);
 	clipCount = length / ClipRectSize.cx;
 	if (clipCount) {
 		if (clipCount > 1)
@@ -5365,7 +5378,7 @@ bool clpsid(std::vector<fPOINT>& clipReversedData, std::vector<fPOINT>& clipFill
 		insertPoint.y = CurrentFormVertices[start].y;
 		rotationAngle = atan2(delta.y, delta.x);
 		for (ind = 0; ind < ClipStitchCount; ind++)
-			rotangf(clipReversedData[ind], &clipFillData[ind], rotationAngle);
+			rotangf(clipReversedData[ind], clipFillData[ind], rotationAngle, rotationCenter);
 		for (ind = 0; ind < clipCount; ind++) {
 			if (ritclp(clipFillData, insertPoint))
 				break;
@@ -5380,7 +5393,8 @@ bool clpsid(std::vector<fPOINT>& clipReversedData, std::vector<fPOINT>& clipFill
 void linsid(std::vector<fPOINT>& clipReversedData,
             std::vector<fPOINT>& clipFillData,
             const double&        clipAngle,
-            const dPOINT&        vector0) {
+            const dPOINT&        vector0,
+            const dPOINT&        rotationCenter) {
 	fPOINT         delta     = { (CurrentFormVertices[CurrentSide + 1].x - SelectedPoint.x),
                      (CurrentFormVertices[CurrentSide + 1].y - SelectedPoint.y) };
 	const double   length    = hypot(delta.x, delta.y);
@@ -5388,9 +5402,9 @@ void linsid(std::vector<fPOINT>& clipReversedData,
 	unsigned       iStitch = 0, iClip = 0;
 
 	if (clipCount) {
-		rotangf(BorderClipReference, &ClipReference, clipAngle);
+		rotangf(BorderClipReference, ClipReference, clipAngle, rotationCenter);
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotangf(clipReversedData[iStitch], &clipFillData[iStitch], clipAngle);
+			rotangf(clipReversedData[iStitch], clipFillData[iStitch], clipAngle, rotationCenter);
 		for (iClip = 0; iClip < clipCount; iClip++) {
 			ritclp(clipFillData, SelectedPoint);
 			SelectedPoint.x += vector0.x;
@@ -5425,7 +5439,8 @@ bool nupnt(const double& clipAngle, dPOINT& moveToCoords) noexcept {
 void lincrnr(std::vector<fPOINT>& clipReversedData,
              std::vector<fPOINT>& clipFillData,
              const double&        clipAngle,
-             dPOINT&              moveToCoords) {
+             dPOINT&              moveToCoords,
+             const dPOINT&        rotationCenter) {
 	dPOINT   delta   = {};
 	unsigned iStitch = 0;
 
@@ -5433,9 +5448,9 @@ void lincrnr(std::vector<fPOINT>& clipReversedData,
 		delta.x                    = moveToCoords.x - SelectedPoint.x;
 		delta.y                    = moveToCoords.y - SelectedPoint.y;
 		const double rotationAngle = atan2(delta.y, delta.x);
-		rotangf(BorderClipReference, &ClipReference, rotationAngle);
+		rotangf(BorderClipReference, ClipReference, rotationAngle, rotationCenter);
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotangf(clipReversedData[iStitch], &clipFillData[iStitch], rotationAngle);
+			rotangf(clipReversedData[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
 		ritclp(clipFillData, SelectedPoint);
 		SelectedPoint.x = moveToCoords.x;
 		SelectedPoint.y = moveToCoords.y;
@@ -5473,6 +5488,7 @@ void clpbrd(unsigned short startVertex) {
 	double   clipAngle    = 0;  // for clipboard border fill
 	dPOINT   vector0      = {}; // x size of the clipboard fill at the fill angle
 	dPOINT   moveToCoords = {}; // moving formOrigin for clipboard fill
+	dPOINT   rotationCenter;
 
 	SequenceIndex = 0;
 	StateMap.reset(StateFlag::CLPBAK);
@@ -5480,8 +5496,8 @@ void clpbrd(unsigned short startVertex) {
 	HorizontalLength  = ClipRectSize.cx;
 	std::vector<fPOINT> clipFillData(ClipStitchCount);
 	std::vector<fPOINT> clipReversedData(ClipStitchCount);
-	RotationCenter.x = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
-	ClipReference.y = RotationCenter.y = (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom;
+	rotationCenter.x = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
+	ClipReference.y = rotationCenter.y = (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom;
 	ClipReference.x                    = ClipRect.left;
 	durev(clipReversedData);
 	if (SelectedForm->type == FRMLINE) {
@@ -5495,18 +5511,18 @@ void clpbrd(unsigned short startVertex) {
 		BorderClipReference.x = 0;
 		// BorderClipReference.x = ClipRect.right / 2;
 		for (CurrentSide = 0; CurrentSide < VertexCount - 2; CurrentSide++) {
-			linsid(clipReversedData, clipFillData, clipAngle, vector0);
+			linsid(clipReversedData, clipFillData, clipAngle, vector0, rotationCenter);
 			setvct(CurrentSide + 1, CurrentSide + 2, clipAngle, vector0);
-			lincrnr(clipReversedData, clipFillData, clipAngle, moveToCoords);
+			lincrnr(clipReversedData, clipFillData, clipAngle, moveToCoords, rotationCenter);
 		}
-		linsid(clipReversedData, clipFillData, clipAngle, vector0);
+		linsid(clipReversedData, clipFillData, clipAngle, vector0, rotationCenter);
 	}
 	else {
 		clpout();
 		reference = currentVertex = startVertex;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 			nextVertex = prv(currentVertex);
-			if (clpsid(clipReversedData, clipFillData, reference, nextVertex))
+			if (clpsid(clipReversedData, clipFillData, reference, nextVertex, rotationCenter))
 				reference = nextVertex;
 			currentVertex = nextVertex;
 		}
@@ -7838,37 +7854,37 @@ void sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish
 	}
 }
 
-void spurfn(const dPOINT* innerPoint,
-            const dPOINT* outerPoint,
-            dPOINT*       underlayInnerPoint,
-            dPOINT*       underlayOuterPoint) noexcept {
+void spurfn(const dPOINT& innerPoint,
+            const dPOINT& outerPoint,
+            dPOINT&       underlayInnerPoint,
+            dPOINT&       underlayOuterPoint) noexcept {
 	dPOINT delta;
 
-	delta.x               = outerPoint->x - innerPoint->x;
-	delta.y               = outerPoint->y - innerPoint->y;
-	underlayInnerPoint->x = delta.x * DIURAT + innerPoint->x;
-	underlayInnerPoint->y = delta.y * DIURAT + innerPoint->y;
-	underlayOuterPoint->x = delta.x * DOURAT + innerPoint->x;
-	underlayOuterPoint->y = delta.y * DOURAT + innerPoint->y;
+	delta.x              = outerPoint.x - innerPoint.x;
+	delta.y              = outerPoint.y - innerPoint.y;
+	underlayInnerPoint.x = delta.x * DIURAT + innerPoint.x;
+	underlayInnerPoint.y = delta.y * DIURAT + innerPoint.y;
+	underlayOuterPoint.x = delta.x * DOURAT + innerPoint.x;
+	underlayOuterPoint.y = delta.y * DOURAT + innerPoint.y;
 }
 
 void spurct(std::vector<VRCT2>& underlayVerticalRect, std::vector<VRCT2>& fillVerticalRect, unsigned iRect) {
-	spurfn(&fillVerticalRect[iRect].aipnt,
-	       &fillVerticalRect[iRect].aopnt,
-	       &underlayVerticalRect[iRect].aipnt,
-	       &underlayVerticalRect[iRect].aopnt);
-	spurfn(&fillVerticalRect[iRect].bipnt,
-	       &fillVerticalRect[iRect].bopnt,
-	       &underlayVerticalRect[iRect].bipnt,
-	       &underlayVerticalRect[iRect].bopnt);
-	spurfn(&fillVerticalRect[iRect].cipnt,
-	       &fillVerticalRect[iRect].copnt,
-	       &underlayVerticalRect[iRect].cipnt,
-	       &underlayVerticalRect[iRect].copnt);
-	spurfn(&fillVerticalRect[iRect].dipnt,
-	       &fillVerticalRect[iRect].dopnt,
-	       &underlayVerticalRect[iRect].dipnt,
-	       &underlayVerticalRect[iRect].dopnt);
+	spurfn(fillVerticalRect[iRect].aipnt,
+	       fillVerticalRect[iRect].aopnt,
+	       underlayVerticalRect[iRect].aipnt,
+	       underlayVerticalRect[iRect].aopnt);
+	spurfn(fillVerticalRect[iRect].bipnt,
+	       fillVerticalRect[iRect].bopnt,
+	       underlayVerticalRect[iRect].bipnt,
+	       underlayVerticalRect[iRect].bopnt);
+	spurfn(fillVerticalRect[iRect].cipnt,
+	       fillVerticalRect[iRect].copnt,
+	       underlayVerticalRect[iRect].cipnt,
+	       underlayVerticalRect[iRect].copnt);
+	spurfn(fillVerticalRect[iRect].dipnt,
+	       fillVerticalRect[iRect].dopnt,
+	       underlayVerticalRect[iRect].dipnt,
+	       underlayVerticalRect[iRect].dopnt);
 }
 
 unsigned psg() noexcept {
@@ -8645,26 +8661,26 @@ void snap() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void rotpar() {
+void rotpar(dPOINT& rotationCenter) {
 	if (IniFile.rotationAngle < (PI / 180))
 		tabmsg(IDS_ROTIN);
 	if (StateMap.test(StateFlag::FPSEL)) {
-		RotationCenter.x = midl(SelectedVerticesRect.right, SelectedVerticesRect.left);
-		RotationCenter.y = midl(SelectedVerticesRect.top, SelectedVerticesRect.bottom);
+		rotationCenter.x = midl(SelectedVerticesRect.right, SelectedVerticesRect.left);
+		rotationCenter.y = midl(SelectedVerticesRect.top, SelectedVerticesRect.bottom);
 		return;
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-		RotationCenter.x = midl(AllItemsRect.right, AllItemsRect.left);
-		RotationCenter.y = midl(AllItemsRect.top, AllItemsRect.bottom);
+		rotationCenter.x = midl(AllItemsRect.right, AllItemsRect.left);
+		rotationCenter.y = midl(AllItemsRect.top, AllItemsRect.bottom);
 		return;
 	}
 	if (SelectedFormCount) {
 		if (StateMap.test(StateFlag::GMRK)) {
-			RotationCenter.x = ZoomMarkPoint.x;
-			RotationCenter.y = ZoomMarkPoint.y;
+			rotationCenter.x = ZoomMarkPoint.x;
+			rotationCenter.y = ZoomMarkPoint.y;
 		}
 		else
-			dufcntr(&RotationCenter);
+			dufcntr(&rotationCenter);
 		StateMap.set(StateFlag::FRMSROT);
 		return;
 	}
@@ -8674,8 +8690,8 @@ void rotpar() {
 		RotationRect.top    = SelectedForm->rectangle.top;
 		RotationRect.bottom = SelectedForm->rectangle.bottom;
 		if (!StateMap.test(StateFlag::GMRK)) {
-			RotationCenter.x = static_cast<double>(RotationRect.right - RotationRect.left) / 2 + RotationRect.left;
-			RotationCenter.y = static_cast<double>(RotationRect.top - RotationRect.bottom) / 2 + RotationRect.bottom;
+			rotationCenter.x = static_cast<double>(RotationRect.right - RotationRect.left) / 2 + RotationRect.left;
+			rotationCenter.y = static_cast<double>(RotationRect.top - RotationRect.bottom) / 2 + RotationRect.bottom;
 		}
 		StateMap.set(StateFlag::FRMROT);
 	}
@@ -8686,12 +8702,12 @@ void rotpar() {
 		}
 	}
 	if (StateMap.test(StateFlag::GMRK)) {
-		RotationCenter.x = ZoomMarkPoint.x;
-		RotationCenter.y = ZoomMarkPoint.y;
+		rotationCenter.x = ZoomMarkPoint.x;
+		rotationCenter.y = ZoomMarkPoint.y;
 	}
 	else {
-		RotationCenter.x = static_cast<double>(RotationRect.right - RotationRect.left) / 2 + RotationRect.left;
-		RotationCenter.y = static_cast<double>(RotationRect.top - RotationRect.bottom) / 2 + RotationRect.bottom;
+		rotationCenter.x = static_cast<double>(RotationRect.right - RotationRect.left) / 2 + RotationRect.left;
+		rotationCenter.y = static_cast<double>(RotationRect.top - RotationRect.bottom) / 2 + RotationRect.bottom;
 	}
 }
 
@@ -8709,10 +8725,10 @@ void setrang() {
 	StateMap.set(StateFlag::NUROT);
 }
 
-void rotcmd() {
+void rotcmd(dPOINT& rotationCenter) {
 	if (StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::GRPSEL) || SelectedFormCount
 	    || StateMap.test(StateFlag::BIGBOX) || StateMap.test(StateFlag::FPSEL)) {
-		rotpar();
+		rotpar(rotationCenter);
 		rotentr(IniFile.rotationAngle);
 		StateMap.set(StateFlag::ENTROT);
 	}
@@ -8723,8 +8739,9 @@ void rotcmd() {
 void fnagain(double rotationAngle) {
 	if (StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::GRPSEL) || SelectedFormCount
 	    || StateMap.test(StateFlag::BIGBOX) || StateMap.test(StateFlag::FPSEL)) {
-		rotpar();
-		rotfn(rotationAngle);
+		dPOINT rotationCenter;
+		rotpar(rotationCenter);
+		rotfn(rotationAngle, rotationCenter);
 	}
 	else
 		alrotmsg();
@@ -8740,7 +8757,8 @@ void bakagain() {
 
 void rotdup() {
 	if (StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::GRPSEL) || SelectedFormCount) {
-		rotpar();
+		dPOINT rotationCenter;
+		rotpar(rotationCenter);
 		rotentr(IniFile.rotationAngle);
 		StateMap.set(StateFlag::ENTRDUP);
 	}
@@ -8773,9 +8791,9 @@ void adfrm(unsigned iForm) {
 	FormIndex++;
 }
 
-void duprot(double rotationAngle) {
+void duprot(double rotationAngle, dPOINT& rotationCenter) {
 	adfrm(ClosestFormToCursor);
-	rotfn(rotationAngle);
+	rotfn(rotationAngle, rotationCenter);
 	refil();
 	StateMap.set(StateFlag::FORMSEL);
 	StateMap.set(StateFlag::RESTCH);
@@ -8784,8 +8802,9 @@ void duprot(double rotationAngle) {
 void duprotfs(double rotationAngle) {
 	const unsigned savedFormIndex = FormIndex;
 	unsigned       iForm          = 0;
+	dPOINT         rotationCenter;
 
-	rotpar();
+	rotpar(rotationCenter);
 	for (iForm = 0; iForm < SelectedFormCount; iForm++)
 		adfrm(SelectedFormList->operator[](iForm));
 	FormIndex = savedFormIndex;
@@ -8794,7 +8813,7 @@ void duprotfs(double rotationAngle) {
 	fnagain(rotationAngle);
 }
 
-void duprots(double rotationAngle) {
+void duprots(double rotationAngle, dPOINT rotationCenter) {
 	unsigned source = 0, destination = PCSHeader.stitchCount;
 
 	rngadj();
@@ -8809,7 +8828,7 @@ void duprots(double rotationAngle) {
 	GroupStitchIndex = PCSHeader.stitchCount;
 	PCSHeader.stitchCount++;
 	rngadj();
-	rotfn(rotationAngle);
+	rotfn(rotationAngle, rotationCenter);
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -9408,7 +9427,7 @@ void boxsel() {
 	}
 }
 
-void clpcrnr(std::vector<fPOINT> clipFillData, unsigned vertex) {
+void clpcrnr(std::vector<fPOINT> clipFillData, unsigned vertex, const dPOINT& rotationCenter) {
 	const unsigned nextVertex = nxt(vertex);
 	unsigned       iStitch    = 0;
 	dPOINT         delta = {}, point = {};
@@ -9425,9 +9444,9 @@ void clpcrnr(std::vector<fPOINT> clipFillData, unsigned vertex) {
 		delta.y = InsidePoints->operator[](nextVertex).y - CurrentFormVertices[nextVertex].y;
 	}
 	const double rotationAngle = atan2(delta.y, delta.x) + PI / 2;
-	rotang1(referencePoint, &ClipReference, rotationAngle);
+	rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-		rotang1(ClipBuffer[iStitch], &clipFillData[iStitch], rotationAngle);
+		rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
 	length = hypot(delta.x, delta.y);
 	ratio  = getplen() / length;
 	delta.x *= ratio;
@@ -9449,7 +9468,11 @@ void clpcrnr(std::vector<fPOINT> clipFillData, unsigned vertex) {
 	}
 }
 
-void picfn(std::vector<fPOINT> clipFillData, unsigned start, unsigned finish, double spacing) {
+void picfn(std::vector<fPOINT> clipFillData,
+           unsigned            start,
+           unsigned            finish,
+           double              spacing,
+           const dPOINT&       rotationCenter) {
 	dPOINT       delta          = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
                      (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
 	const double length         = hypot(delta.x, delta.y);
@@ -9466,7 +9489,7 @@ void picfn(std::vector<fPOINT> clipFillData, unsigned start, unsigned finish, do
 	spacing += ClipRectSize.cx;
 	count         = length / spacing;
 	rotationAngle = atan2(delta.y, delta.x);
-	rotang1(referencePoint, &ClipReference, rotationAngle);
+	rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	if (count) {
 		step.x = 0;
 		step.y = 0;
@@ -9476,7 +9499,7 @@ void picfn(std::vector<fPOINT> clipFillData, unsigned start, unsigned finish, do
 			step.y = delta.y * tdub;
 		}
 		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotang1(ClipBuffer[iStitch], &clipFillData[iStitch], rotationAngle);
+			rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
 		bool flag = true;
 		for (iStep = 0; iStep < count - 1; iStep++) {
 			firstPoint.x                 = innerPoint.x + step.x;
@@ -9520,22 +9543,24 @@ void clpic() {
 	const unsigned short start         = 0;
 	unsigned             iVertex       = 0;
 	unsigned             currentVertex = start, nextVertex = 0;
+	std::vector<fPOINT>  clipFillData(ClipStitchCount);
+
+	dPOINT rotationCenter = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left),
+		                      ((ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom) };
 
 	SequenceIndex = 0;
 	StateMap.reset(StateFlag::CLPBAK);
 	HorizontalLength2 = ClipRectSize.cx / 2;
 	HorizontalLength  = ClipRectSize.cx;
-	std::vector<fPOINT> clipFillData(ClipStitchCount);
-	RotationCenter.x = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
-	ClipReference.y = RotationCenter.y = (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom;
-	ClipReference.x                    = ClipRect.left;
+	ClipReference.y   = rotationCenter.y;
+	ClipReference.x   = ClipRect.left;
 	satout(20);
 	if (SelectedForm->type == FRMLINE) {
 		for (iVertex = 0; iVertex < VertexCount - 2; iVertex++) {
-			picfn(clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing);
-			clpcrnr(clipFillData, iVertex);
+			picfn(clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing, rotationCenter);
+			clpcrnr(clipFillData, iVertex, rotationCenter);
 		}
-		picfn(clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing);
+		picfn(clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing, rotationCenter);
 	}
 	else {
 		if (!SelectedForm->fillType) {
@@ -9544,8 +9569,8 @@ void clpic() {
 		currentVertex = start;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 			nextVertex = nxt(currentVertex);
-			picfn(clipFillData, currentVertex, nextVertex, SelectedForm->edgeSpacing);
-			clpcrnr(clipFillData, currentVertex);
+			picfn(clipFillData, currentVertex, nextVertex, SelectedForm->edgeSpacing, rotationCenter);
+			clpcrnr(clipFillData, currentVertex, rotationCenter);
 			currentVertex = nextVertex;
 		}
 		OSequence[SequenceIndex++] = CurrentFormVertices[currentVertex];
@@ -9914,14 +9939,15 @@ void ribon() {
 }
 
 void dupfn(double rotationAngle) {
+	dPOINT rotationCenter;
 	savdo();
-	rotpar();
+	rotpar(rotationCenter);
 	if (IniFile.rotationAngle) {
 		if (StateMap.test(StateFlag::FORMSEL))
-			duprot(rotationAngle);
+			duprot(rotationAngle, rotationCenter);
 		else {
 			if (StateMap.test(StateFlag::GRPSEL))
-				duprots(rotationAngle);
+				duprots(rotationAngle, rotationCenter);
 			else {
 				if (SelectedFormCount)
 					duprotfs(rotationAngle);
@@ -11440,21 +11466,21 @@ void angout() noexcept {
 void horclpfn(std::vector<RNGCNT>& textureSegments) {
 	unsigned iVertex = 0;
 
-	AngledForm = FormList[ClosestFormToCursor];
-	RotationCenter.x
-	    = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
-	RotationCenter.y
-	    = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
+	AngledForm            = FormList[ClosestFormToCursor];
+	dPOINT rotationCenter = {
+		(static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left),
+		(static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom)
+	};
 	AngledForm.vertices = AngledFormVertices;
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 		AngledForm.vertices[iVertex] = SelectedForm->vertices[iVertex];
-		rotflt(AngledForm.vertices[iVertex], (PI / 2));
+		rotflt(AngledForm.vertices[iVertex], (PI / 2), rotationCenter);
 	}
 	angout();
 	SelectedForm        = &AngledForm;
 	CurrentFormVertices = AngledForm.vertices;
 	clpcon(textureSegments);
-	rotbak(-PI / 2);
+	rotbak((-PI / 2), rotationCenter);
 	fvars(ClosestFormToCursor);
 }
 
@@ -11528,18 +11554,18 @@ void angclpfn(std::vector<RNGCNT>& textureSegments) {
 	unsigned iVertex       = 0;
 	double   rotationAngle = 0;
 
-	AngledForm = FormList[ClosestFormToCursor];
-	RotationCenter.x
-	    = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
-	RotationCenter.y
-	    = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
+	AngledForm            = FormList[ClosestFormToCursor];
+	dPOINT rotationCenter = {
+		(static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left),
+		(static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom)
+	};
 	AngledForm.vertices = AngledFormVertices;
 	if (StateMap.test(StateFlag::ISUND)) {
 		rotationAngle                         = PI / 2 - SelectedForm->underlayStitchAngle;
 		const std::vector<fPOINT>* vertexList = insid();
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 			AngledFormVertices[iVertex] = vertexList->operator[](iVertex);
-			rotflt(AngledFormVertices[iVertex], rotationAngle);
+			rotflt(AngledFormVertices[iVertex], rotationAngle, rotationCenter);
 		}
 	}
 	else {
@@ -11549,14 +11575,14 @@ void angclpfn(std::vector<RNGCNT>& textureSegments) {
 			rotationAngle = PI / 2 - SelectedForm->satinOrAngle.angle;
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 			AngledFormVertices[iVertex] = SelectedForm->vertices[iVertex];
-			rotflt(AngledFormVertices[iVertex], rotationAngle);
+			rotflt(AngledFormVertices[iVertex], rotationAngle, rotationCenter);
 		}
 	}
 	angout();
 	SelectedForm        = &AngledForm;
 	CurrentFormVertices = AngledFormVertices;
 	clpcon(textureSegments);
-	rotbak(-rotationAngle);
+	rotbak(-rotationAngle, rotationCenter);
 	fvars(ClosestFormToCursor);
 }
 
@@ -12139,7 +12165,11 @@ void crop() {
 		shoseln(IDS_FRM1MSG, IDS_CROP);
 }
 
-void xclpfn(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints, unsigned start, unsigned finish) {
+void xclpfn(std::vector<fPOINT>& tempClipPoints,
+            std::vector<fPOINT>& chainEndPoints,
+            unsigned             start,
+            unsigned             finish,
+            const dPOINT&        rotationCenter) {
 	dPOINT              delta  = { (chainEndPoints[finish].x - chainEndPoints[start].x),
                      (chainEndPoints[finish].y - chainEndPoints[start].y) };
 	unsigned            iPoint = 0;
@@ -12150,7 +12180,7 @@ void xclpfn(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPo
 	const double rotationAngle = atan2(delta.y, delta.x);
 	for (iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
 		points[iPoint] = tempClipPoints[iPoint];
-		rotflt(points[iPoint], rotationAngle);
+		rotflt(points[iPoint], rotationAngle, rotationCenter);
 		OSequence[SequenceIndex].x   = chainEndPoints[start].x + points[iPoint].x;
 		OSequence[SequenceIndex++].y = chainEndPoints[start].y + points[iPoint].y;
 	}
@@ -12160,15 +12190,14 @@ void duxclp() {
 	std::vector<fPOINT> chainEndPoints;
 	// reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
 	chainEndPoints.reserve(50);
-	duangs();
 	dufxlen(chainEndPoints);
 	std::vector<fPOINT> tempClipPoints;
 	tempClipPoints.reserve(ClipStitchCount);
 	clpxadj(tempClipPoints, chainEndPoints);
-	SequenceIndex    = 0;
-	RotationCenter.x = RotationCenter.y = 0;
-	for (unsigned iPoint = 1; iPoint < chainEndPoints.size(); iPoint++) {
-		xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint);
+	SequenceIndex         = 0;
+	dPOINT rotationCenter = {};
+	for (unsigned iPoint = 0; iPoint < chainEndPoints.size(); iPoint++) {
+		xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
 	}
 	if (SelectedForm->type != FRMLINE) {
 		OSequence[SequenceIndex++] = chainEndPoints[0];
@@ -12238,7 +12267,6 @@ void fsclpx() {
 		SelectedForm->borderClipData[iPoint].x = ClipBuffer[iPoint].x;
 		SelectedForm->borderClipData[iPoint].y = ClipBuffer[iPoint].y;
 	}
-	RotationCenter.x = RotationCenter.y = 0;
 	duxclp();
 	refilfn();
 }
@@ -12392,7 +12420,7 @@ void wavfrm() {
 		const double rotationAngle   = -atan2(CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y,
                                             CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x);
 		for (iVertex = 0; iVertex < vertexCount; iVertex++)
-			rotflt(CurrentFormVertices[iVertex], rotationAngle);
+			rotflt(CurrentFormVertices[iVertex], rotationAngle, { 0.0, 0.0 });
 		SelectedForm->type        = FRMLINE;
 		SelectedForm->vertexCount = vertexCount;
 		FormVertexIndex += vertexCount;

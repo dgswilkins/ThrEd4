@@ -69,7 +69,6 @@ extern std::vector<fPOINT>*      OutsidePoints;
 extern fPOINT                    OSequence[OSEQLEN];
 extern PCSHEADER                 PCSHeader;
 extern unsigned                  PseudoRandomValue;
-extern dPOINT                    RotationCenter;
 extern FRMHED*                   SelectedForm;
 extern unsigned                  SatinGuideIndex;
 extern SATCON                    SatinGuides[MAXSAC];
@@ -156,7 +155,7 @@ extern void               refil();
 extern void               refilal();
 extern void               refilfn();
 extern void               ritfil();
-extern void               rotflt(fPOINT& point, const double rotationAngle);
+extern void               rotflt(fPOINT& point, const double rotationAngle, const dPOINT& rotationCenter);
 extern void               rtrclpfn();
 extern void               satfil();
 extern void               satout(double satinWidth);
@@ -4691,24 +4690,6 @@ void redtx() {
 		CloseHandle(handle);
 	}
 	redtbak();
-}
-
-void setangf(double angle) {
-	unsigned iVertex = 0;
-
-	MoveMemory(&AngledForm, SelectedForm, sizeof(FRMHED));
-	MoveMemory(&AngledFormVertices, CurrentFormVertices, sizeof(fPOINT) * VertexCount);
-	RotationCenter.x
-	    = static_cast<double>(AngledForm.rectangle.right - AngledForm.rectangle.left) / 2 + AngledForm.rectangle.left;
-	RotationCenter.y
-	    = static_cast<double>(AngledForm.rectangle.top - AngledForm.rectangle.bottom) / 2 + AngledForm.rectangle.bottom;
-	AngledForm.vertices = AngledFormVertices;
-	if (angle) {
-		for (iVertex = 0; iVertex < VertexCount; iVertex++)
-			rotflt(AngledFormVertices[iVertex], angle);
-	}
-	SelectedForm        = &AngledForm;
-	CurrentFormVertices = AngledFormVertices;
 }
 
 void chgwrn() {
