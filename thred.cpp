@@ -374,7 +374,6 @@ extern void srtfrm();
 extern void stCor2px(fPOINTATTR stitch, POINT* screen);
 extern void stchrct2px(fRECTANGLE stitchRect, RECT* screenRect);
 extern void stchs2frm();
-extern void strtchbox();
 extern void tabmsg(unsigned code);
 extern void tglfrm();
 extern void tomsg();
@@ -395,7 +394,7 @@ extern void unfil();
 extern void unfrm();
 extern void uninsf();
 extern void unpsel();
-extern void unstrtch();
+extern void unstrtch(std::vector<POINT>& stretchBoxLine);
 extern void uspac();
 extern void vrtclp();
 extern void vrtsclp();
@@ -875,16 +874,15 @@ COLORREF DefaultBitmapBackgroundColors[]
     = { 0xc0d5bf, 0xc8dfee, 0x708189, 0xa5a97a, 0xb8d6fe, 0x8a8371, 0x4b6cb8, 0x9cdcc2,
 	    0x366d39, 0xdcfcfb, 0x3c4f75, 0x95b086, 0xc9dcba, 0x43377b, 0xb799ae, 0x54667a };
 
-POINT MoveLine0[2];              // move point line
-POINT MoveLine1[2];              // move point line
-POINT InsertLine[3];             // the insert line
-POINT ZoomBoxLine[5];            // the zoom box
-POINT ClipInsertBoxLine[5];      // for displaying clipboard insert rectangle
-POINT RotateBoxOutline[5];       // for drawing the rotate rectangle
-POINT RotateBoxCrossVertLine[2]; // vertical part of the rotate cross
-POINT RotateBoxCrossHorzLine[2]; // horizontal part of the rotate cross
-POINT RotateBoxToCursorLine[2];  // line from the cursor to the center of the rotate cross
-POINT StretchBoxLine[5];         // stretch and expand
+POINT              MoveLine0[2];              // move point line
+POINT              MoveLine1[2];              // move point line
+POINT              InsertLine[3];             // the insert line
+POINT              ZoomBoxLine[5];            // the zoom box
+POINT              ClipInsertBoxLine[5];      // for displaying clipboard insert rectangle
+POINT              RotateBoxOutline[5];       // for drawing the rotate rectangle
+POINT              RotateBoxCrossVertLine[2]; // vertical part of the rotate cross
+POINT              RotateBoxCrossHorzLine[2]; // horizontal part of the rotate cross
+POINT              RotateBoxToCursorLine[2];  // line from the cursor to the center of the rotate cross
 
 COLCHNG   ColorChangeTable[MAXCHNG];
 PCSHEADER PCSHeader;      // pcs file header
@@ -6868,7 +6866,10 @@ void rotang(dPOINT unrotatedPoint, POINT* rotatedPoint, double rotationAngle, co
 	sCor2px(point, rotatedPoint);
 }
 
-void rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, const double& rotationAngle, const dPOINT& rotationCenter) noexcept {
+void rotang1(const fPOINTATTR& unrotatedPoint,
+             fPOINT&           rotatedPoint,
+             const double&     rotationAngle,
+             const dPOINT&     rotationCenter) noexcept {
 	double       distanceToCenter = 0.0, newAngle = 0.0;
 	const double dx = unrotatedPoint.x - rotationCenter.x;
 	const double dy = unrotatedPoint.y - rotationCenter.y;
@@ -6892,7 +6893,10 @@ void rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, const doubl
 	rotatedPoint.x = rotationCenter.x + distanceToCenter * cos(newAngle);
 }
 
-void rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, const double rotationAngle, const dPOINT& rotationCenter) noexcept {
+void rotangf(const fPOINT& unrotatedPoint,
+             fPOINT&       rotatedPoint,
+             const double  rotationAngle,
+             const dPOINT& rotationCenter) noexcept {
 	double       distanceToCenter = 0.0, newAngle = 0.0;
 	const double dx = unrotatedPoint.x - rotationCenter.x;
 	const double dy = unrotatedPoint.y - rotationCenter.y;
@@ -6997,7 +7001,7 @@ void ritrot(double rotationAngle, dPOINT& rotationCenter) {
 	rotang(rotationReference, &rotated, rotationAngle, rotationCenter);
 	RotateBoxOutline[2] = rotated;
 	rotationReference.x = rotationCenter.x;
-	rotang(rotationReference, &rotated, rotationAngle, rotationCenter );
+	rotang(rotationReference, &rotated, rotationAngle, rotationCenter);
 	RotateBoxCrossVertLine[1] = rotated;
 	rotationReference.x       = RotationRect.left;
 	rotang(rotationReference, &rotated, rotationAngle, rotationCenter);
@@ -9062,7 +9066,19 @@ void rtrclpfn() {
 	}
 }
 
-bool chkbig() {
+void strtchbox(std::vector<POINT>& stretchBoxLine) noexcept {
+	SetROP2(StitchWindowDC, R2_XORPEN);
+	SelectObject(StitchWindowDC, FormPen);
+	Polyline(StitchWindowDC, stretchBoxLine.data(), 5);
+	SetROP2(StitchWindowDC, R2_COPYPEN);
+}
+
+void unstrtch(std::vector<POINT>& stretchBoxLine) {
+	if (StateMap.testAndReset(StateFlag::SHOSTRTCH))
+		strtchbox(stretchBoxLine);
+}
+
+bool chkbig(std::vector<POINT>& stretchBoxLine) {
 	unsigned iControlPoint = 0, iCorner = 0;
 	double   length = 0.0, minimumLength = 1e99;
 	POINT    pointToTest = { (Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y) };
@@ -9081,9 +9097,10 @@ bool chkbig() {
 	FormLines[4] = FormLines[0];
 	if (minimumLength < CLOSENUF) {
 		for (iCorner = 0; iCorner < 4; iCorner++) {
-			StretchBoxLine[iCorner] = SelectedFormsLine->operator[](iCorner << 1);
+			stretchBoxLine[iCorner] = SelectedFormsLine->operator[](iCorner << 1);
 		}
-		StretchBoxLine[4] = StretchBoxLine[0];
+		stretchBoxLine[4] = stretchBoxLine[0];
+		strtchbox(stretchBoxLine);
 		if (SelectedFormControlVertex & 1)
 			StateMap.set(StateFlag::STRTCH);
 		else {
@@ -9093,7 +9110,6 @@ bool chkbig() {
 		}
 		SelectedFormControlVertex >>= 1;
 		StateMap.set(StateFlag::SHOSTRTCH);
-		strtchbox();
 		return 1;
 	}
 	if (pointToTest.x >= SelectedFormsRect.left && pointToTest.x <= SelectedFormsRect.right
@@ -9104,7 +9120,7 @@ bool chkbig() {
 		FormMoveDelta.x = pointToTest.x - SelectedFormsRect.left;
 		FormMoveDelta.y = pointToTest.y - SelectedFormsRect.top;
 		StateMap.set(StateFlag::SHOSTRTCH);
-		strtchbox();
+		strtchbox(stretchBoxLine);
 		return 1;
 	}
 	return 0;
@@ -12972,6 +12988,8 @@ unsigned chkMsg() {
 	unsigned      iThreadSize = 0, iVersion = 0, iVertex = 0, iWindow = 0, nextVertex = 0, selectedVertexCount = 0;
 	unsigned      stitchAttribute = 0, textureCount = 0, traceColor = 0;
 	WPARAM        wParameter = {};
+	static std::vector<POINT> stretchBoxLine(5); // stretch and expand
+
 	static double RotationAngle;
 	static dPOINT RotationCenter;
 
@@ -13062,17 +13080,17 @@ unsigned chkMsg() {
 				return 1;
 			}
 			if (StateMap.test(StateFlag::MOVFRMS)) {
-				unstrtch();
-				StretchBoxLine[0].x = StretchBoxLine[3].x = StretchBoxLine[4].x
+				unstrtch(stretchBoxLine);
+				stretchBoxLine[0].x = stretchBoxLine[3].x = stretchBoxLine[4].x
 				    = Msg.pt.x - FormMoveDelta.x - StitchWindowOrigin.x;
-				StretchBoxLine[1].x = StretchBoxLine[2].x
+				stretchBoxLine[1].x = stretchBoxLine[2].x
 				    = Msg.pt.x + SelectedFormsSize.x - FormMoveDelta.x - StitchWindowOrigin.x;
-				StretchBoxLine[0].y = StretchBoxLine[1].y = StretchBoxLine[4].y
+				stretchBoxLine[0].y = stretchBoxLine[1].y = stretchBoxLine[4].y
 				    = Msg.pt.y - FormMoveDelta.y - StitchWindowOrigin.y;
-				StretchBoxLine[2].y = StretchBoxLine[3].y
+				stretchBoxLine[2].y = stretchBoxLine[3].y
 				    = Msg.pt.y + SelectedFormsSize.y - FormMoveDelta.y - StitchWindowOrigin.y;
 				StateMap.set(StateFlag::SHOSTRTCH);
-				strtchbox();
+				strtchbox(stretchBoxLine);
 				return 1;
 			}
 			if (StateMap.test(StateFlag::POLIMOV)) {
@@ -13083,45 +13101,45 @@ unsigned chkMsg() {
 				return 1;
 			}
 			if (StateMap.test(StateFlag::EXPAND)) {
-				unstrtch();
+				unstrtch(stretchBoxLine);
 				newSize.x = Msg.pt.x - StitchWindowOrigin.x;
 				newSize.y = Msg.pt.y - StitchWindowOrigin.y;
 				iSide     = (SelectedFormControlVertex + 2) % 4;
-				ratio     = fabs(static_cast<double>(newSize.x - StretchBoxLine[iSide].x)
-                             / (newSize.y - StretchBoxLine[iSide].y));
+				ratio     = fabs(static_cast<double>(newSize.x - stretchBoxLine[iSide].x)
+                             / (newSize.y - stretchBoxLine[iSide].y));
 				if (iSide & 1) {
 					if (ratio < XYratio)
-						newSize.x = (StretchBoxLine[iSide].y - newSize.y) * XYratio + StretchBoxLine[iSide].x;
+						newSize.x = (stretchBoxLine[iSide].y - newSize.y) * XYratio + stretchBoxLine[iSide].x;
 					else
-						newSize.y = (StretchBoxLine[iSide].x - newSize.x) / XYratio + StretchBoxLine[iSide].y;
+						newSize.y = (stretchBoxLine[iSide].x - newSize.x) / XYratio + stretchBoxLine[iSide].y;
 					iSide                   = nxtcrnr(iSide);
-					StretchBoxLine[iSide].y = gsl::narrow<long>(round(newSize.y));
+					stretchBoxLine[iSide].y = gsl::narrow<long>(round(newSize.y));
 					iSide                   = nxtcrnr(iSide);
-					StretchBoxLine[iSide].x = gsl::narrow<long>(round(newSize.x));
-					StretchBoxLine[iSide].y = gsl::narrow<long>(round(newSize.y));
+					stretchBoxLine[iSide].x = gsl::narrow<long>(round(newSize.x));
+					stretchBoxLine[iSide].y = gsl::narrow<long>(round(newSize.y));
 					iSide                   = nxtcrnr(iSide);
-					StretchBoxLine[iSide].x = gsl::narrow<long>(round(newSize.x));
+					stretchBoxLine[iSide].x = gsl::narrow<long>(round(newSize.x));
 				}
 				else {
 					if (ratio < XYratio)
-						newSize.x = (newSize.y - StretchBoxLine[iSide].y) * XYratio + StretchBoxLine[iSide].x;
+						newSize.x = (newSize.y - stretchBoxLine[iSide].y) * XYratio + stretchBoxLine[iSide].x;
 					else
-						newSize.y = (newSize.x - StretchBoxLine[iSide].x) / XYratio + StretchBoxLine[iSide].y;
+						newSize.y = (newSize.x - stretchBoxLine[iSide].x) / XYratio + stretchBoxLine[iSide].y;
 					iSide                   = nxtcrnr(iSide);
-					StretchBoxLine[iSide].x = gsl::narrow<long>(round(newSize.x));
+					stretchBoxLine[iSide].x = gsl::narrow<long>(round(newSize.x));
 					iSide                   = nxtcrnr(iSide);
-					StretchBoxLine[iSide].x = gsl::narrow<long>(round(newSize.x));
-					StretchBoxLine[iSide].y = gsl::narrow<long>(round(newSize.y));
+					stretchBoxLine[iSide].x = gsl::narrow<long>(round(newSize.x));
+					stretchBoxLine[iSide].y = gsl::narrow<long>(round(newSize.y));
 					iSide                   = nxtcrnr(iSide);
-					StretchBoxLine[iSide].y = gsl::narrow<long>(round(newSize.y));
+					stretchBoxLine[iSide].y = gsl::narrow<long>(round(newSize.y));
 				}
-				StretchBoxLine[4] = StretchBoxLine[0];
+				stretchBoxLine[4] = stretchBoxLine[0];
 				StateMap.set(StateFlag::SHOSTRTCH);
-				strtchbox();
+				strtchbox(stretchBoxLine);
 				return 1;
 			}
 			if (StateMap.test(StateFlag::STRTCH)) {
-				unstrtch();
+				unstrtch(stretchBoxLine);
 				if (SelectedFormControlVertex & 1)
 					lineLength = Msg.pt.x - StitchWindowOrigin.x;
 				else
@@ -13131,14 +13149,14 @@ unsigned chkMsg() {
 				for (iSide = 0; iSide < 4; iSide++) {
 					if (iSide != dst && iSide != code) {
 						if (SelectedFormControlVertex & 1)
-							StretchBoxLine[iSide].x = lineLength;
+							stretchBoxLine[iSide].x = lineLength;
 						else
-							StretchBoxLine[iSide].y = lineLength;
+							stretchBoxLine[iSide].y = lineLength;
 					}
 				}
-				StretchBoxLine[4] = StretchBoxLine[0];
+				stretchBoxLine[4] = stretchBoxLine[0];
 				StateMap.set(StateFlag::SHOSTRTCH);
-				strtchbox();
+				strtchbox(stretchBoxLine);
 				return 1;
 			}
 			if (StateMap.test(StateFlag::INSFRM)) {
@@ -13884,7 +13902,7 @@ unsigned chkMsg() {
 		if (StateMap.test(StateFlag::FPSEL) && !StateMap.test(StateFlag::FUNCLP) && !StateMap.test(StateFlag::ROTAT)) {
 			*SelectedFormsLine = *SelectedPointsLine;
 			SelectedFormsRect  = SelectedPixelsRect;
-			if (chkbig())
+			if (chkbig(stretchBoxLine))
 				return 1;
 		}
 		if (StateMap.test(StateFlag::WASTRAC)) {
@@ -13939,7 +13957,7 @@ unsigned chkMsg() {
 			duinsfil();
 			return 1;
 		}
-		if (StateMap.test(StateFlag::BIGBOX) && chkbig())
+		if (StateMap.test(StateFlag::BIGBOX) && chkbig(stretchBoxLine))
 			return 1;
 		if (StateMap.testAndReset(StateFlag::DELSFRMS)) {
 			code = 0;
@@ -13992,7 +14010,7 @@ unsigned chkMsg() {
 			StateMap.set(StateFlag::RESTCH);
 			return 1;
 		}
-		if (SelectedFormCount && !StateMap.test(StateFlag::ROTAT) && chkbig())
+		if (SelectedFormCount && !StateMap.test(StateFlag::ROTAT) && chkbig(stretchBoxLine))
 			return 1;
 		if (StateMap.test(StateFlag::SIDCOL) && chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
 			do {
@@ -14109,9 +14127,9 @@ unsigned chkMsg() {
 		if (!StateMap.test(StateFlag::ROTAT) && StateMap.test(StateFlag::GRPSEL)) {
 			if (iselpnt()) {
 				for (iSide = 0; iSide < 4; iSide++) {
-					StretchBoxLine[iSide] = FormControlPoints->operator[](iSide << 1);
+					stretchBoxLine[iSide] = FormControlPoints->operator[](iSide << 1);
 				}
-				StretchBoxLine[4] = StretchBoxLine[0];
+				stretchBoxLine[4] = stretchBoxLine[0];
 				if (SelectedFormControlVertex & 1)
 					StateMap.set(StateFlag::STRTCH);
 				else {
@@ -14121,7 +14139,7 @@ unsigned chkMsg() {
 				}
 				SelectedFormControlVertex >>= 1;
 				StateMap.set(StateFlag::SHOSTRTCH);
-				strtchbox();
+				strtchbox(stretchBoxLine);
 				return 1;
 			}
 			else {
@@ -16266,7 +16284,7 @@ unsigned chkMsg() {
 							FormLines[0].y = FormLines[1].y = FormLines[4].y = SelectedFormsRect.top;
 							FormLines[2].y = FormLines[3].y = SelectedFormsRect.bottom;
 							StateMap.set(StateFlag::SHOSTRTCH);
-							strtchbox();
+							strtchbox(stretchBoxLine);
 							FormMoveDelta.x = ((SelectedFormsRect.right - SelectedFormsRect.left) >> 1);
 							FormMoveDelta.y = ((SelectedFormsRect.bottom - SelectedFormsRect.top) >> 1);
 							StateMap.set(StateFlag::MOVFRMS);
@@ -18662,11 +18680,11 @@ void drwStch() {
 		}
 		if (StateMap.test(StateFlag::CLPSHO))
 			duclp();
-/*
-		if (StateMap.test(StateFlag::ROTAT) || StateMap.test(StateFlag::ROTCAPT) || StateMap.test(StateFlag::MOVCNTR)) {
-			ritrot(0, RotationCenter);
-		}
-*/
+		/*
+		        if (StateMap.test(StateFlag::ROTAT) || StateMap.test(StateFlag::ROTCAPT) ||
+		   StateMap.test(StateFlag::MOVCNTR)) { ritrot(0, RotationCenter);
+		        }
+		*/
 	}
 	if (FormIndex && !StateMap.test(StateFlag::FRMOF))
 		drwfrm();

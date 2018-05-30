@@ -79,7 +79,6 @@ extern void savdo();
 extern void sCor2px(const dPOINT& stitchCoordinate, POINT* pixelCoordinate);
 extern void sdmsg();
 extern void selRct(fRECTANGLE* sourceRect);
-// extern void                 setangf(double angle);
 extern void setfchk();
 extern void setpsel();
 extern void setxt(std::vector<RNGCNT>& textureSegments);
@@ -90,6 +89,7 @@ extern void shoseln(unsigned code0, unsigned code1);
 extern void spltmsg();
 extern void srtcol();
 extern void stch2pxr(fPOINT stitchCoordinate);
+extern void strtchbox(std::vector<POINT>& stretchBoxLine);
 extern void tabmsg(unsigned code);
 extern void unbsho();
 extern void uncros();
@@ -179,7 +179,6 @@ extern HDC                       StitchWindowDC;
 extern HDC                       StitchWindowMemDC;
 extern POINT                     StitchWindowOrigin;
 extern POINT                     StitchWindowSize;
-extern POINT                     StretchBoxLine[5];
 extern std::vector<std::string>* StringTable;
 extern int                       TextureIndex;
 extern TXPNT                     TexturePointsBuffer[MAXITEMS];
@@ -3897,18 +3896,6 @@ void setmfrm() noexcept {
 	FormLines[iForm] = FormLines[0];
 }
 
-void strtchbox() noexcept {
-	SetROP2(StitchWindowDC, R2_XORPEN);
-	SelectObject(StitchWindowDC, FormPen);
-	Polyline(StitchWindowDC, StretchBoxLine, 5);
-	SetROP2(StitchWindowDC, R2_COPYPEN);
-}
-
-void unstrtch() {
-	if (StateMap.testAndReset(StateFlag::SHOSTRTCH))
-		strtchbox();
-}
-
 unsigned chkfrm() {
 	fvars(ClosestFormToCursor);
 
@@ -3936,10 +3923,12 @@ unsigned chkfrm() {
 		}
 		if (minimumLength < CLOSENUF) {
 			ritfrct(ClosestFormToCursor, StitchWindowDC);
+			std::vector<POINT> stretchBoxLine(5);
 			for (iControl = 0; iControl < 4; iControl++) {
-				StretchBoxLine[iControl] = formControls[iControl << 1];
+				stretchBoxLine[iControl] = formControls[iControl << 1];
 			}
-			StretchBoxLine[4] = StretchBoxLine[0];
+			stretchBoxLine[4] = stretchBoxLine[0];
+			strtchbox(stretchBoxLine);
 			if (SelectedFormControlVertex & 1)
 				StateMap.set(StateFlag::STRTCH);
 			else {
@@ -3949,7 +3938,6 @@ unsigned chkfrm() {
 			}
 			SelectedFormControlVertex >>= 1;
 			StateMap.set(StateFlag::SHOSTRTCH);
-			strtchbox();
 			return 1;
 		}
 	}
