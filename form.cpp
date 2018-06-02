@@ -8,7 +8,7 @@
 #include <windows.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include <fmt/format.h>
+#include <fmt/core.h>
 #include <gsl/gsl>
 #pragma warning(pop)
 

@@ -9,7 +9,7 @@
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include <boost/dynamic_bitset.hpp>
-#include <fmt/format.h>
+#include <fmt/core.h>
 #include <gsl/gsl>
 #pragma warning(pop)
 

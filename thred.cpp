@@ -11,7 +11,7 @@
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include <boost/dynamic_bitset.hpp>
 #include <boost/endian/conversion.hpp>
-#include <fmt/format.h>
+#include <fmt/core.h>
 #include <gsl/gsl>
 #pragma warning(pop)
 
