@@ -10415,7 +10415,7 @@ void frmrct(fRECTANGLE* rectangle) noexcept {
 void desiz() {
 	fRECTANGLE        rectangle = {};
 	FLOAT             xSize = 0.0, ySize = 0.0;
-	fmt::MemoryWriter mw;
+	std::string designInfo;
 
 	if (PCSHeader.stitchCount) {
 		stchrct(&rectangle);
@@ -10423,22 +10423,22 @@ void desiz() {
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
 		if ((rectangle.left < 0) || (rectangle.bottom < 0) || (rectangle.right > IniFile.hoopSizeX)
 		    || (rectangle.top > IniFile.hoopSizeY)) {
-			mw << StringTable->operator[](STR_STCHOUT);
+			designInfo += StringTable->operator[](STR_STCHOUT);
 		}
-		mw.write(
+		designInfo += fmt::format(
 		    StringTable->operator[](STR_STCHS), PCSHeader.stitchCount, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
 	}
 	if (FormIndex) {
 		frmrct(&rectangle);
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
-		mw.write(StringTable->operator[](STR_FORMS), FormIndex, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
+		designInfo += fmt::format(StringTable->operator[](STR_FORMS), FormIndex, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
 	}
-	mw.write(StringTable->operator[](STR_HUPWID), (IniFile.hoopSizeX / PFGRAN), (IniFile.hoopSizeY / PFGRAN));
+	designInfo += fmt::format(StringTable->operator[](STR_HUPWID), (IniFile.hoopSizeX / PFGRAN), (IniFile.hoopSizeY / PFGRAN));
 	if (PCSHeader.stitchCount) {
-		mw.write(StringTable->operator[](STR_CREATBY), DesignerName, ExtendedHeader.modifierName);
+		designInfo += fmt::format(StringTable->operator[](STR_CREATBY), DesignerName, ExtendedHeader.modifierName);
 	}
-	shoMsg(mw.str());
+	shoMsg(designInfo);
 }
 
 void sidhup() {

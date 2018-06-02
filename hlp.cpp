@@ -84,13 +84,13 @@ inline void loadString(std::string& sDest, unsigned stringID) {
 	}
 }
 
-void adbad(fmt::MemoryWriter& repairMessage, unsigned code, unsigned count) {
+void adbad(std::string& repairMessage, unsigned code, unsigned count) {
 	std::string fmtStr;
 
 	loadString(fmtStr, code);
-	repairMessage.write(fmtStr);
+	repairMessage += fmtStr;
 	loadString(fmtStr, IDS_NOTREP);
-	repairMessage.write(fmtStr, count);
+	repairMessage += fmt::format(fmtStr, count);
 }
 
 void hsizmsg() {

@@ -101,7 +101,7 @@ extern POINT                     ZoomBoxLine[5];
 extern fPOINT                    ZoomBoxOrigin;
 extern dRECTANGLE                ZoomRect;
 
-extern void               adbad(fmt::MemoryWriter& repairMessage, unsigned code, unsigned count);
+extern void               adbad(std::string& repairMessage, unsigned code, unsigned count);
 extern fPOINT*            adflt(unsigned count);
 extern SATCON*            adsatk(unsigned count);
 extern void               angclpfn(std::vector<RNGCNT>& textureSegments);
@@ -4870,7 +4870,7 @@ void chkfstch() noexcept {
 	}
 }
 
-void repflt(fmt::MemoryWriter& repairMessage) {
+void repflt(std::string& repairMessage) {
 	unsigned iForm = 0, iDestination = 0, iVertex = 0, vertexDifference = 0, vertexCount = 0;
 	BADCNTS  badData = {};
 
@@ -4919,7 +4919,7 @@ void repflt(fmt::MemoryWriter& repairMessage) {
 	MoveMemory(FormVertices, &vertexPoint[0], sizeof(fPOINT) * FormVertexIndex);
 }
 
-void repclp(fmt::MemoryWriter& repairMessage) {
+void repclp(std::string& repairMessage) {
 	FRMHED*             formHeader = nullptr;
 	unsigned            iForm = 0, clipCount = 0, clipDifference = 0, badClipCount = 0;
 	std::vector<fPOINT> clipPoint(MAXITEMS);
@@ -5047,7 +5047,7 @@ void reptx() {
 }
 
 void repar() {
-	fmt::MemoryWriter repairMessage;
+	std::string repairMessage;
 	const unsigned    repairType = frmchkfn();
 
 	savdo();
@@ -5062,7 +5062,7 @@ void repar() {
 		reptx();
 	lodchk();
 	StateMap.set(StateFlag::RESTCH);
-	shoMsg(repairMessage.str());
+	shoMsg(repairMessage);
 }
 
 void tst() {
