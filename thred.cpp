@@ -8206,10 +8206,11 @@ bool wastch() noexcept {
 }
 
 bool frmstch() {
-	unsigned iForm = 0, iStitch = 0, formCode = 0;
-
+	unsigned                iForm = 0, iStitch = 0, formCode = 0;
 	boost::dynamic_bitset<> formMap(FormIndex);
-	for (iForm = 0; iForm < FormIndex; iForm++) {
+	auto                    count = SelectedFormList->size();
+
+	for (iForm = 0; iForm < count; iForm++) {
 		formMap.set(SelectedFormList->operator[](iForm));
 	}
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
