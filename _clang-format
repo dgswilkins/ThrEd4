@@ -23,7 +23,7 @@ BraceWrapping:
   BeforeCatch: true
   BeforeElse: true 
   SplitEmptyFunction: false
-ColumnLimit: '120'
+ColumnLimit: '130'
 IndentCaseLabels: 'false' 
 KeepEmptyLinesAtTheStartOfBlocks: 'false'
 Language: Cpp
