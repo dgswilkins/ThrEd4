@@ -8210,8 +8210,8 @@ bool frmstch() {
 	boost::dynamic_bitset<> formMap(FormIndex);
 	auto                    count = SelectedFormList->size();
 
-	for (iForm = 0; iForm < count; iForm++) {
-		formMap.set(SelectedFormList->operator[](iForm));
+	for (auto form : *SelectedFormList) {
+		formMap.set(form);
 	}
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		formCode = (StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT;
