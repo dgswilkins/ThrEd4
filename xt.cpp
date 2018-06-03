@@ -73,8 +73,6 @@ extern FRMHED*                   SelectedForm;
 extern unsigned                  SatinGuideIndex;
 extern SATCON                    SatinGuides[MAXSAC];
 extern EnumMap<StateFlag>        StateMap;
-extern unsigned                  SelectedFormCount;
-extern unsigned                  SelectedFormCount;
 extern std::vector<unsigned>*    SelectedFormList;
 extern fPOINT                    SelectedPoint;
 extern unsigned                  SequenceIndex;
@@ -288,8 +286,7 @@ TXPNT* adtx(int count) noexcept {
 void txspac(int start, unsigned count) noexcept {
 	unsigned iForm;
 
-	MoveMemory(
-	    &TexturePointsBuffer[start + count], &TexturePointsBuffer[start], (TextureIndex - start) * sizeof(TXPNT));
+	MoveMemory(&TexturePointsBuffer[start + count], &TexturePointsBuffer[start], (TextureIndex - start) * sizeof(TXPNT));
 	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 		if (istx(iForm))
 			FormList[iForm].fillInfo.texture.index += count;
@@ -408,9 +405,9 @@ void duxrats(unsigned start, unsigned finish, fPOINT* point) noexcept {
 }
 
 void durats(unsigned iSequence, fPOINT* point) noexcept {
-	const double stitchLength  = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x,
-                                      BSequence[iSequence + 1].y - BSequence[iSequence].y);
-	fPOINT       adjustedPoint = {};
+	const double stitchLength
+	    = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x, BSequence[iSequence + 1].y - BSequence[iSequence].y);
+	fPOINT adjustedPoint = {};
 
 	if (stitchLength < FeatherMinStitch) {
 		point->x = BSequence[iSequence].x;
@@ -539,8 +536,8 @@ void fthrbfn(unsigned iSequence) {
 	fPOINT nextLowPoint     = {};
 	fPOINT midPoint         = {};
 
-	const double length = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y,
-	                            BSequence[iSequence + 1].x - BSequence[iSequence].x);
+	const double length
+	    = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 
 	nurat();
 	if (length < (FeatherMinStitch * 2)) {
@@ -574,11 +571,11 @@ void duoseq(unsigned iSequence) noexcept {
 }
 
 void fthdfn(unsigned iSequence) {
-	const double length        = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y,
-                                BSequence[iSequence + 1].x - BSequence[iSequence].x);
-	fPOINT       adjustedPoint = {};
-	fPOINT       currentPoint  = {};
-	fPOINT       nextPoint     = {};
+	const double length
+	    = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
+	fPOINT adjustedPoint = {};
+	fPOINT currentPoint  = {};
+	fPOINT nextPoint     = {};
 
 	nurat();
 	duoseq(iSequence);
@@ -714,29 +711,21 @@ void fethrf() {
 }
 
 void fethr() {
-	unsigned iForm = 0;
-
 	if (filmsgs(FMM_FTH))
 		return;
-	if (SelectedFormCount) {
-		savdo();
-		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList->operator[](iForm);
-			fethrf();
-		}
-		StateMap.set(StateFlag::INIT);
-		coltab();
-		StateMap.set(StateFlag::RESTCH);
+	savdo();
+	if (StateMap.test(StateFlag::FORMSEL)) {
+		fethrf();
 	}
 	else {
-		if (StateMap.test(StateFlag::FORMSEL)) {
-			savdo();
+		for (auto selectedForm : (*SelectedFormList)) {
+			ClosestFormToCursor = selectedForm;
 			fethrf();
-			StateMap.set(StateFlag::INIT);
-			coltab();
-			StateMap.set(StateFlag::RESTCH);
 		}
 	}
+	StateMap.set(StateFlag::INIT);
+	coltab();
+	StateMap.set(StateFlag::RESTCH);
 }
 
 constexpr ULARGE_INTEGER tim2int(FILETIME time) noexcept {
@@ -832,8 +821,7 @@ void pes2crd() {
 	    == ERROR_SUCCESS) {
 		size    = _MAX_PATH;
 		keyType = REG_SZ;
-		if (RegQueryValueEx(registryKey, "ProgramFilesDir", 0, &keyType, (unsigned char*)programName, &size)
-		    == ERROR_SUCCESS) {
+		if (RegQueryValueEx(registryKey, "ProgramFilesDir", 0, &keyType, (unsigned char*)programName, &size) == ERROR_SUCCESS) {
 			strcat_s(programName, "\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
 			if (!chkp2cnam(programName))
 				*programName = 0;
@@ -1003,8 +991,7 @@ unsigned gucon(fPOINT start, fPOINT finish, unsigned destination, unsigned code)
 		StitchBuffer[iStitch].y         = indentedPoint->operator[](startVertex).y;
 		StitchBuffer[iStitch].attribute = code;
 		if (iStitch) {
-			if (StitchBuffer[iStitch - 1].x != StitchBuffer[iStitch].x
-			    || StitchBuffer[iStitch - 1].y != StitchBuffer[iStitch].y)
+			if (StitchBuffer[iStitch - 1].x != StitchBuffer[iStitch].x || StitchBuffer[iStitch - 1].y != StitchBuffer[iStitch].y)
 				iStitch++;
 		}
 		else
@@ -1078,8 +1065,7 @@ void ritund() noexcept {
 }
 
 void undclp() noexcept {
-	ClipRectSize.cx = ClipRect.bottom = ClipRect.left = ClipRect.right = ClipBuffer[0].x = ClipBuffer[1].x
-	    = ClipBuffer[0].y                                                                = 0;
+	ClipRectSize.cx = ClipRect.bottom = ClipRect.left = ClipRect.right = ClipBuffer[0].x = ClipBuffer[1].x = ClipBuffer[0].y = 0;
 	ClipRectSize.cy = ClipRect.top = ClipBuffer[1].y = SelectedForm->underlayStitchLen;
 	ClipStitchCount                                  = 2;
 }
@@ -1099,10 +1085,10 @@ void fncwlk() {
 		const SATCON* guide = SelectedForm->satinOrAngle.guide;
 		if (guide) {
 			for (iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--) {
-				OSequence[OutputIndex].x = midl(CurrentFormVertices[guide[iGuide - 1].finish].x,
-				                                CurrentFormVertices[guide[iGuide - 1].start].x);
-				OSequence[OutputIndex].y = midl(CurrentFormVertices[guide[iGuide - 1].finish].y,
-				                                CurrentFormVertices[guide[iGuide - 1].start].y);
+				OSequence[OutputIndex].x
+				    = midl(CurrentFormVertices[guide[iGuide - 1].finish].x, CurrentFormVertices[guide[iGuide - 1].start].x);
+				OSequence[OutputIndex].y
+				    = midl(CurrentFormVertices[guide[iGuide - 1].finish].y, CurrentFormVertices[guide[iGuide - 1].start].y);
 				OutputIndex++;
 			}
 		}
@@ -1150,8 +1136,7 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), fmt::format("{:.2f}", IniFile.featherRatio).c_str());
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), fmt::format("{}", IniFile.featherUpCount).c_str());
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), fmt::format("{}", IniFile.featherDownCount).c_str());
-		SetWindowText(GetDlgItem(hwndlg, IDC_DFLR),
-		              fmt::format("{:.2f}", (IniFile.featherMinStitchSize / PFGRAN)).c_str());
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFLR), fmt::format("{:.2f}", (IniFile.featherMinStitchSize / PFGRAN)).c_str());
 		SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), fmt::format("{}", IniFile.featherCount).c_str());
 		for (iFeatherStyle = 0; iFeatherStyle < 6; iFeatherStyle++) {
 			loadString(featherStyle, (IDS_FTH0 + iFeatherStyle));
@@ -1329,10 +1314,9 @@ void chkund(std::vector<RNGCNT>& textureSegments) {
 }
 
 void selalfrm() {
-	// ToDo - Can this reserve and loop be replaced with a direct copy of FormList?
 	SelectedFormList->reserve(FormIndex);
-	for (SelectedFormCount = 0; SelectedFormCount < FormIndex; SelectedFormCount++)
-		SelectedFormList->push_back(SelectedFormCount);
+	for (auto formIndex = 0u; formIndex < FormIndex; formIndex++)
+		SelectedFormList->push_back(formIndex);
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1535,8 +1519,7 @@ void dasyfrm() {
 				petalPointAngle += deltaPetalAngle;
 				break;
 			case DRAMP:
-				distanceFromDaisyCenter
-				    = diameter + (static_cast<double>(iPoint) / IniFile.daisyPetalPoints * petalLength);
+				distanceFromDaisyCenter = diameter + (static_cast<double>(iPoint) / IniFile.daisyPetalPoints * petalLength);
 				break;
 			case DSAW:
 				if (iPoint > halfPetalPointCount)
@@ -1547,9 +1530,8 @@ void dasyfrm() {
 				    = diameter + (static_cast<double>(sawPointCount) / IniFile.daisyPetalPoints * petalLength);
 				break;
 			case DRAG:
-				distanceFromDaisyCenter = diameter
-				                          + (static_cast<double>(psg() % IniFile.daisyPetalPoints)
-				                             / IniFile.daisyPetalPoints * petalLength);
+				distanceFromDaisyCenter
+				    = diameter + (static_cast<double>(psg() % IniFile.daisyPetalPoints) / IniFile.daisyPetalPoints * petalLength);
 				break;
 			case DCOG:
 				distanceFromDaisyCenter = diameter;
@@ -1660,15 +1642,14 @@ double precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, std::vector<OREC*>& p
 			currentStitch = &StitchBuffer[pRecs[currentRegion]->start];
 		for (iRegion = sortRecord->start; iRegion < sortRecord->finish; iRegion++) {
 			if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
-				double length = hypot(pRecs[iRegion]->startStitch->x - currentStitch->x,
-				                      pRecs[iRegion]->startStitch->y - currentStitch->y);
+				double length
+				    = hypot(pRecs[iRegion]->startStitch->x - currentStitch->x, pRecs[iRegion]->startStitch->y - currentStitch->y);
 				if (length < minimumLength) {
 					minimumLength = length;
 					direction     = 0;
 					currentRegion = iRegion;
 				}
-				length = hypot(pRecs[iRegion]->endStitch->x - currentStitch->x,
-				               pRecs[iRegion]->endStitch->y - currentStitch->y);
+				length = hypot(pRecs[iRegion]->endStitch->x - currentStitch->x, pRecs[iRegion]->endStitch->y - currentStitch->y);
 				if (length < minimumLength) {
 					minimumLength = length;
 					direction     = 1;
@@ -1682,8 +1663,7 @@ double precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, std::vector<OREC*>& p
 		if (StateMap.test(StateFlag::DUSRT)) {
 			if (direction) {
 				if (pRecs[currentRegion]->start) {
-					for (iRegion = pRecs[currentRegion]->finish - 1; iRegion >= pRecs[currentRegion]->start;
-					     iRegion--) {
+					for (iRegion = pRecs[currentRegion]->finish - 1; iRegion >= pRecs[currentRegion]->start; iRegion--) {
 						tempStitchBuffer[OutputIndex++] = StitchBuffer[iRegion];
 					}
 				}
@@ -1725,16 +1705,15 @@ void dmprec(std::vector<OREC*>& stitchRegion, unsigned count) {
 	unsigned iRegion;
 
 	for (iRegion = 0; iRegion < count; iRegion++) {
-		OutputDebugString(
-		    fmt::format("{:4d} attrb: 0x{:08x} form: {:4d} type: {} color: {:2d} start: {:5d} finish: {:5d}\n",
-		                iRegion,
-		                StitchBuffer[stitchRegion[iRegion]->start].attribute,
-		                stitchRegion[iRegion]->form,
-		                stitchRegion[iRegion]->type,
-		                stitchRegion[iRegion]->color,
-		                stitchRegion[iRegion]->start,
-		                stitchRegion[iRegion]->finish)
-		        .c_str());
+		OutputDebugString(fmt::format("{:4d} attrb: 0x{:08x} form: {:4d} type: {} color: {:2d} start: {:5d} finish: {:5d}\n",
+		                              iRegion,
+		                              StitchBuffer[stitchRegion[iRegion]->start].attribute,
+		                              stitchRegion[iRegion]->form,
+		                              stitchRegion[iRegion]->type,
+		                              stitchRegion[iRegion]->color,
+		                              stitchRegion[iRegion]->start,
+		                              stitchRegion[iRegion]->finish)
+		                      .c_str());
 	}
 }
 #endif
@@ -1929,16 +1908,15 @@ void duatf(unsigned ind) {
 		attributeFields.user = 1;
 	else
 		attributeFields.user = 0;
-	OutputDebugString(
-	    fmt::format("{:5d}: color: {:2d} form: {:5d} type: {:2d}, layer: {:1d}: user: {:1d} attrib: 0x{:08x}\n",
-	                ind,
-	                attributeFields.color,
-	                attributeFields.form,
-	                attributeFields.type,
-	                attributeFields.layer,
-	                attributeFields.user,
-	                attribute)
-	        .c_str());
+	OutputDebugString(fmt::format("{:5d}: color: {:2d} form: {:5d} type: {:2d}, layer: {:1d}: user: {:1d} attrib: 0x{:08x}\n",
+	                              ind,
+	                              attributeFields.color,
+	                              attributeFields.form,
+	                              attributeFields.type,
+	                              attributeFields.layer,
+	                              attributeFields.user,
+	                              attribute)
+	                      .c_str());
 }
 
 void dmpat() {
@@ -1955,16 +1933,15 @@ void dmpat() {
 #endif
 
 void fdelstch(FILLSTARTS& FillStartsData) {
-	unsigned iSourceStitch = 0, ind = 0, iDestinationStitch = 0, codedFormIndex = 0, attribute = 0, type = 0, tmap = 0,
-	         color = 0, bordercolor = 0, tapcol = 0;
+	unsigned iSourceStitch = 0, ind = 0, iDestinationStitch = 0, codedFormIndex = 0, attribute = 0, type = 0, tmap = 0, color = 0,
+	         bordercolor = 0, tapcol = 0;
 	// ToDo - Still not sure what this function does?
 	//        I suspect the FillStartsData members are not correctly named
 	codedFormIndex = (ClosestFormToCursor << FRMSHFT);
 	bordercolor    = SelectedForm->borderColor & COLMSK;
 	tapcol         = SelectedForm->borderColor >> 4;
 	for (iSourceStitch = 0; iSourceStitch < PCSHeader.stitchCount; iSourceStitch++) {
-		if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX)
-		    && iSourceStitch == ClosestPointIndex)
+		if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX) && iSourceStitch == ClosestPointIndex)
 			ClosestPointIndex = iDestinationStitch;
 		attribute = StitchBuffer[iSourceStitch].attribute;
 		if (codedFormIndex == (attribute & (FRMSK | NOTFRM))) {
@@ -2107,8 +2084,7 @@ void duint(unsigned offset, unsigned code, INTINF* ilData) {
 
 		if (ilData->coloc > ilData->start) {
 			count = ilData->coloc - ilData->start;
-			MoveMemory(
-			    &ilData->highStitchBuffer[ilData->output], &StitchBuffer[ilData->start], sizeof(fPOINTATTR) * count);
+			MoveMemory(&ilData->highStitchBuffer[ilData->output], &StitchBuffer[ilData->start], sizeof(fPOINTATTR) * count);
 			ilData->start += count;
 			ilData->output += count;
 		}
@@ -2120,10 +2096,8 @@ void duint(unsigned offset, unsigned code, INTINF* ilData) {
 				                        code);
 		}
 		if (lastcol(ilData->pins, point))
-			ilData->output += gucon(point,
-			                        InterleaveSequence[InterleaveSequenceIndices[ilData->pins].index],
-			                        ilData->output + MAXITEMS,
-			                        code);
+			ilData->output += gucon(
+			    point, InterleaveSequence[InterleaveSequenceIndices[ilData->pins].index], ilData->output + MAXITEMS, code);
 		for (iSequence = InterleaveSequenceIndices[ilData->pins].index;
 		     iSequence < InterleaveSequenceIndices[ilData->pins + 1].index;
 		     iSequence++) {
@@ -2203,8 +2177,7 @@ void intlv(const FILLSTARTS& FillStartsData) {
 					ilData.coloc = FillStartsData.fillNamed.borderColor;
 				break;
 			}
-			code = ilData.layerIndex | InterleaveSequenceIndices[ilData.pins].code
-			       | InterleaveSequenceIndices[ilData.pins].color;
+			code = ilData.layerIndex | InterleaveSequenceIndices[ilData.pins].code | InterleaveSequenceIndices[ilData.pins].color;
 			duint(offset, code, &ilData);
 		}
 		chkend(MAXITEMS, code, &ilData);
@@ -2218,8 +2191,7 @@ void intlv(const FILLSTARTS& FillStartsData) {
 	else {
 		offset = 0;
 		for (iSequence = 0; iSequence < InterleaveSequenceIndex2; iSequence++) {
-			code = ilData.layerIndex | InterleaveSequenceIndices[iSequence].code
-			       | InterleaveSequenceIndices[iSequence].color;
+			code = ilData.layerIndex | InterleaveSequenceIndices[iSequence].code | InterleaveSequenceIndices[iSequence].color;
 			if (SelectedForm->extendedAttribute & AT_STRT) {
 				if (!StateMap.testAndSet(StateFlag::DIDSTRT))
 					ilData.output += gucon(CurrentFormVertices[SelectedForm->fillStart],
@@ -2228,10 +2200,9 @@ void intlv(const FILLSTARTS& FillStartsData) {
 					                       code);
 			}
 			if (lastcol(iSequence, colpnt))
-				ilData.output += gucon(
-				    colpnt, InterleaveSequence[InterleaveSequenceIndices[iSequence].index], ilData.output, code);
-			for (ine = InterleaveSequenceIndices[iSequence].index; ine < InterleaveSequenceIndices[iSequence + 1].index;
-			     ine++) {
+				ilData.output
+				    += gucon(colpnt, InterleaveSequence[InterleaveSequenceIndices[iSequence].index], ilData.output, code);
+			for (ine = InterleaveSequenceIndices[iSequence].index; ine < InterleaveSequenceIndices[iSequence + 1].index; ine++) {
 				StitchBuffer[ilData.output].x         = InterleaveSequence[ine].x;
 				StitchBuffer[ilData.output].y         = InterleaveSequence[ine].y;
 				StitchBuffer[ilData.output].attribute = code;
@@ -2252,29 +2223,33 @@ void intlv(const FILLSTARTS& FillStartsData) {
 }
 
 void setundfn(unsigned code) {
-	unsigned iForm = 0;
-
 	savdo();
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList->operator[](iForm);
-			fvars(ClosestFormToCursor);
-			if (SelectedForm->type == FRMLINE)
-				continue;
-			SelectedForm->extendedAttribute |= code;
-			refilfn();
-		}
-		coltab();
-		StateMap.set(StateFlag::RESTCH);
-		return;
-	}
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		fvars(ClosestFormToCursor);
-		SelectedForm->extendedAttribute |= code;
-		refilfn();
-		coltab();
-		StateMap.set(StateFlag::RESTCH);
+		if (SelectedForm->type != FRMLINE) {
+			auto savedAttribute = SelectedForm->extendedAttribute;
+			SelectedForm->extendedAttribute |= code;
+			if (savedAttribute != SelectedForm->extendedAttribute) {
+				refilfn();
+			}
+		}
 	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			ClosestFormToCursor = selectedForm;
+			fvars(ClosestFormToCursor);
+			if (SelectedForm->type == FRMLINE) {
+				continue;
+			}
+			auto savedAttribute = SelectedForm->extendedAttribute;
+			SelectedForm->extendedAttribute |= code;
+			if (savedAttribute != SelectedForm->extendedAttribute) {
+				refilfn();
+			}
+		}
+	}
+	coltab();
+	StateMap.set(StateFlag::RESTCH);
 }
 
 void setund() {
@@ -2290,32 +2265,34 @@ void setcwlk() {
 }
 
 void notundfn(unsigned code) {
-	unsigned iForm = 0;
-
 	savdo();
-	code = !code;
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = iForm;
-			fvars(ClosestFormToCursor);
-			if (SelectedForm->type == FRMLINE)
-				continue;
-			SelectedForm->extendedAttribute &= code;
-			refilfn();
-		}
-		coltab();
-		StateMap.set(StateFlag::RESTCH);
-		return;
-	}
+	code = ~code;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		fvars(ClosestFormToCursor);
-		if (SelectedForm->type == FRMLINE)
-			return;
-		SelectedForm->extendedAttribute &= code;
-		refilfn();
-		coltab();
-		StateMap.set(StateFlag::RESTCH);
+		if (SelectedForm->type != FRMLINE) {
+			auto savedAttribute = SelectedForm->extendedAttribute;
+			SelectedForm->extendedAttribute &= code;
+			if (savedAttribute != SelectedForm->extendedAttribute) {
+				refilfn();
+			}
+		}
 	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			ClosestFormToCursor = selectedForm;
+			fvars(ClosestFormToCursor);
+			if (SelectedForm->type == FRMLINE) {
+				continue;
+			}
+			auto savedAttribute = SelectedForm->extendedAttribute;
+			SelectedForm->extendedAttribute &= code;
+			if (savedAttribute != SelectedForm->extendedAttribute) {
+				refilfn();
+			}
+		}
+	}
+	coltab();
+	StateMap.set(StateFlag::RESTCH);
 }
 
 void notund() {
@@ -2340,15 +2317,15 @@ void ulenfn(unsigned find, float length) {
 }
 
 void dusulen(float length) {
-	unsigned iForm = 0;
-
 	savdo();
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			ulenfn(SelectedFormList->operator[](iForm), length);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		ulenfn(ClosestFormToCursor, length);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			ulenfn(selectedForm, length);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2370,15 +2347,15 @@ void uspacfn(unsigned find, float spacing) {
 }
 
 void duspac(float spacing) {
-	unsigned iForm = 0;
-
 	savdo();
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			uspacfn(SelectedFormList->operator[](iForm), spacing);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		uspacfn(ClosestFormToCursor, spacing);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			uspacfn(selectedForm, spacing);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2400,16 +2377,16 @@ void uangfn(unsigned find, float angle) {
 }
 
 void dufang(float angle) {
-	unsigned iForm = 0;
-
 	savdo();
 	angle *= (float)PI / 180;
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			uangfn(SelectedFormList->operator[](iForm), angle);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		uangfn(ClosestFormToCursor, angle);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			uangfn(selectedForm, angle);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2431,15 +2408,15 @@ void flenfn(unsigned find, float length) {
 }
 
 void duflen(float length) {
-	unsigned iForm = 0;
-
 	savdo();
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			flenfn(SelectedFormList->operator[](iForm), length);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		flenfn(ClosestFormToCursor, length);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			flenfn(selectedForm, length);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2465,15 +2442,15 @@ void fspacfn(unsigned find, float spacing) {
 }
 
 void dufspac(float spacing) {
-	unsigned iForm = 0;
-
 	savdo();
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fspacfn(SelectedFormList->operator[](iForm), spacing);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		fspacfn(ClosestFormToCursor, spacing);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			fspacfn(selectedForm, spacing);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2494,16 +2471,16 @@ void findfn(unsigned find, float indent) {
 }
 
 void dufind(float indent) {
-	unsigned iForm = 0;
-
 	savdo();
 	indent *= PFGRAN;
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			findfn(SelectedFormList->operator[](iForm), indent);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		findfn(ClosestFormToCursor, indent);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			findfn(selectedForm, indent);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2532,16 +2509,16 @@ void fangfn(unsigned find, float angle) {
 }
 
 void dufxang(float angle) {
-	unsigned iForm = 0;
-
 	savdo();
 	angle *= (float)PI / 180;
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fangfn(SelectedFormList->operator[](iForm), angle);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		fangfn(ClosestFormToCursor, angle);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			fangfn(selectedForm, angle);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2563,18 +2540,18 @@ void ucolfn(unsigned find, unsigned color) {
 }
 
 void dundcol(unsigned color) {
-	unsigned iForm = 0;
-
 	savdo();
 	if (color)
 		color--;
 	color &= COLMSK;
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			ucolfn(SelectedFormList->operator[](iForm), color);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		ucolfn(ClosestFormToCursor, color);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			ucolfn(selectedForm, color);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2596,18 +2573,18 @@ void fcolfn(unsigned find, unsigned color) {
 }
 
 void dufcol(unsigned color) {
-	unsigned iForm = 0;
-
 	savdo();
 	if (color)
 		color--;
 	color &= COLMSK;
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fcolfn(SelectedFormList->operator[](iForm), color);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		fcolfn(ClosestFormToCursor, color);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			fcolfn(selectedForm, color);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2629,18 +2606,18 @@ void bcolfn(unsigned find, unsigned color) {
 }
 
 void dubcol(unsigned color) {
-	unsigned iForm = 0;
-
 	savdo();
 	if (color)
 		color--;
 	color &= COLMSK;
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			bcolfn(SelectedFormList->operator[](iForm), color);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		bcolfn(ClosestFormToCursor, color);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			bcolfn(selectedForm, color);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2662,15 +2639,15 @@ void blenfn(unsigned find, float length) {
 }
 
 void dublen(float length) {
-	unsigned iForm = 0;
-
 	savdo();
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			blenfn(SelectedFormList->operator[](iForm), length);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		blenfn(ClosestFormToCursor, length);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			blenfn(selectedForm, length);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2692,15 +2669,15 @@ void bspacfn(unsigned find, float length) {
 }
 
 void dubspac(float length) {
-	unsigned iForm = 0;
-
 	savdo();
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			bspacfn(SelectedFormList->operator[](iForm), length);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		bspacfn(ClosestFormToCursor, length);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			bspacfn(selectedForm, length);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2722,15 +2699,15 @@ void bminfn(unsigned find, float length) {
 }
 
 void dubmin(float length) {
-	unsigned iForm = 0;
-
 	savdo();
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			bminfn(SelectedFormList->operator[](iForm), length);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		bminfn(ClosestFormToCursor, length);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			bminfn(selectedForm, length);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2752,15 +2729,15 @@ void bmaxfn(unsigned find, float length) {
 }
 
 void dubmax(float length) {
-	unsigned iForm = 0;
-
 	savdo();
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			bmaxfn(SelectedFormList->operator[](iForm), length);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		bmaxfn(ClosestFormToCursor, length);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			bmaxfn(selectedForm, length);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2782,15 +2759,15 @@ void fminfn(unsigned find, float length) {
 }
 
 void dufmin(float length) {
-	unsigned iForm = 0;
-
 	savdo();
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fminfn(SelectedFormList->operator[](iForm), length);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		fminfn(ClosestFormToCursor, length);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			fminfn(selectedForm, length);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2812,15 +2789,15 @@ void fmaxfn(unsigned find, float length) {
 }
 
 void dufmax(float length) {
-	unsigned iForm = 0;
-
 	savdo();
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fmaxfn(SelectedFormList->operator[](iForm), length);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		fmaxfn(ClosestFormToCursor, length);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			fmaxfn(selectedForm, length);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2848,15 +2825,15 @@ void fwidfn(unsigned find, float length) {
 }
 
 void dufwid(float length) {
-	unsigned iForm = 0;
-
 	savdo();
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fwidfn(SelectedFormList->operator[](iForm), length);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		fwidfn(ClosestFormToCursor, length);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			fwidfn(selectedForm, length);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -2891,15 +2868,15 @@ void fhifn(unsigned find, float length) {
 }
 
 void dufhi(float length) {
-	unsigned iForm = 0;
-
 	savdo();
-	if (SelectedFormCount) {
-		for (iForm = 0; iForm < SelectedFormCount; iForm++)
-			fhifn(SelectedFormList->operator[](iForm), length);
-	}
-	if (StateMap.test(StateFlag::FORMSEL))
+	if (StateMap.test(StateFlag::FORMSEL)) {
 		fhifn(ClosestFormToCursor, length);
+	}
+	else {
+		for (auto selectedForm : (*SelectedFormList)) {
+			fhifn(selectedForm, length);
+		}
+	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -3000,10 +2977,8 @@ void dutxtfil() {
 }
 
 void txt2pix(const TXPNT& texturePoint, POINT* screenPoint) noexcept {
-	screenPoint->y
-	    = TextureScreen.height - texturePoint.y / TextureScreen.areaHeight * TextureScreen.height + TextureScreen.top;
-	screenPoint->x
-	    = (texturePoint.line * TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
+	screenPoint->y = TextureScreen.height - texturePoint.y / TextureScreen.areaHeight * TextureScreen.height + TextureScreen.top;
+	screenPoint->x = (texturePoint.line * TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
 }
 
 void txtxfn(POINT reference, int offsetPixels) noexcept {
@@ -3118,9 +3093,9 @@ void drwtxtr() {
 	else {
 		TextureScreen.editToPixelRatio = TextureScreen.areaHeight * 2 / StitchWindowClientRect.bottom;
 		yOffset                        = StitchWindowClientRect.bottom >> 2;
-		TextureScreen.xOffset          = (StitchWindowClientRect.right * TextureScreen.editToPixelRatio
-                                 - (TextureScreen.lines + 2) * TextureScreen.spacing)
-		                        / 2;
+		TextureScreen.xOffset
+		    = (StitchWindowClientRect.right * TextureScreen.editToPixelRatio - (TextureScreen.lines + 2) * TextureScreen.spacing)
+		      / 2;
 	}
 	TextureScreen.top          = yOffset;
 	TextureScreen.bottom       = StitchWindowClientRect.bottom - yOffset;
@@ -3148,8 +3123,7 @@ void drwtxtr() {
 	line[0].y = 0;
 	line[1].y = StitchWindowClientRect.bottom;
 	for (iVertical = 1; iVertical < TextureScreen.lines + 1; iVertical++) {
-		line[0].x = line[1].x
-		    = (iVertical * TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
+		line[0].x = line[1].x = (iVertical * TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
 		Polyline(StitchWindowMemDC, line, 2);
 	}
 	line[0].x = 0;
@@ -3185,15 +3159,7 @@ void drwtxtr() {
 		dutxtx(SelectedTexturePointsList->operator[](iPoint), IniFile.textureEditorSize);
 		dutxtx(SelectedTexturePointsList->operator[](iPoint), IniFile.textureEditorSize << 1);
 	}
-	BitBlt(StitchWindowDC,
-	       0,
-	       0,
-	       StitchWindowClientRect.right,
-	       StitchWindowClientRect.bottom,
-	       StitchWindowMemDC,
-	       0,
-	       0,
-	       SRCCOPY);
+	BitBlt(StitchWindowDC, 0, 0, StitchWindowClientRect.right, StitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
 	drwtxbut();
 }
 
@@ -3201,9 +3167,7 @@ bool px2txt(POINT offset) {
 	fPOINT editPoint;
 
 	px2ed(offset, &editPoint);
-	TXPNT tmp
-	    = { 0,
-		    gsl::narrow<unsigned short>(floor((editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5)) };
+	TXPNT tmp = { 0, gsl::narrow<unsigned short>(floor((editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5)) };
 	if (tmp.line > TextureScreen.lines)
 		return false;
 	if (tmp.line < 1)
@@ -3213,8 +3177,7 @@ bool px2txt(POINT offset) {
 			return false;
 		else {
 			tmp.y = TextureScreen.areaHeight
-			        - (static_cast<float>(offset.y - TextureScreen.top) / TextureScreen.height
-			           * TextureScreen.areaHeight);
+			        - (static_cast<float>(offset.y - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
 			TempTexturePoints->push_back(tmp);
 			return true;
 		}
@@ -3285,8 +3248,8 @@ void setxmov() {
 }
 
 void ritxrct() noexcept {
-	POINT offset    = { (TextureCursorLocation.x - SelectTexturePointsOrigin.x),
-                     (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
+	POINT offset
+	    = { (TextureCursorLocation.x - SelectTexturePointsOrigin.x), (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
 	RECT  rectangle = { (TexturePixelRect.left + offset.x),
                        (TexturePixelRect.top + offset.y),
                        (TexturePixelRect.right + offset.x),
@@ -3377,8 +3340,8 @@ void setxclp() {
 	deorg(&screenOffset);
 	px2ed(screenOffset, &editorOffset);
 	if (StateMap.testAndReset(StateFlag::TXHCNTR))
-		editorOffset.x = (TextureScreen.lines * TextureScreen.spacing) / 2 + TextureScreen.xOffset
-		                 - TextureScreen.formCenter.x + TextureScreen.spacing / 2;
+		editorOffset.x = (TextureScreen.lines * TextureScreen.spacing) / 2 + TextureScreen.xOffset - TextureScreen.formCenter.x
+		                 + TextureScreen.spacing / 2;
 	else
 		editorOffset.x -= TextureScreen.formCenter.x;
 	editorOffset.y -= TextureScreen.formCenter.y;
@@ -3414,9 +3377,8 @@ void ed2txp(POINT offset, TXPNT* textureRecord) noexcept {
 
 	px2ed(offset, &point);
 	textureRecord->line = (point.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5;
-	textureRecord->y
-	    = TextureScreen.areaHeight
-	      - (static_cast<float>(offset.y - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
+	textureRecord->y    = TextureScreen.areaHeight
+	                   - (static_cast<float>(offset.y - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
 }
 
 void txtrup() {
@@ -3508,8 +3470,8 @@ void angrct(fRECTANGLE* rectangle) noexcept {
 
 void ritxfrm() noexcept {
 	unsigned iVertex = 0, vertexCount = 0;
-	POINT    offset = { (TextureCursorLocation.x - SelectTexturePointsOrigin.x),
-                     (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
+	POINT    offset
+	    = { (TextureCursorLocation.x - SelectTexturePointsOrigin.x), (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
 
 	offset.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
 	offset.y = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
@@ -4149,8 +4111,7 @@ void txnudg(int deltaX, float deltaY) {
 		}
 		else {
 			for (iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-				textureLine
-				    = TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint)).line + deltaX;
+				textureLine = TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint)).line + deltaX;
 				if (textureLine < 1)
 					return;
 				if (textureLine > TextureScreen.lines)
@@ -4555,8 +4516,7 @@ void setshft() {
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (inrct(selectionRect, StitchBuffer[iStitch])) {
 			StateMap.set(StateFlag::TXIN);
-			TempTexturePoints->push_back(
-			    { (StitchBuffer[iStitch].y - selectionRect.bottom), gsl::narrow<unsigned short>(line) });
+			TempTexturePoints->push_back({ (StitchBuffer[iStitch].y - selectionRect.bottom), gsl::narrow<unsigned short>(line) });
 		}
 		else {
 			if (StateMap.testAndReset(StateFlag::TXIN))
@@ -4629,8 +4589,7 @@ void txdun() {
 					bufferEntry.width        = historyEntry.width;
 					bufferEntry.spacing      = historyEntry.spacing;
 				}
-				WriteFile(
-				    handle, textureHistoryBuffer.data(), textureHistoryBuffer.size() * ITXBUFLEN, &bytesWritten, 0);
+				WriteFile(handle, textureHistoryBuffer.data(), textureHistoryBuffer.size() * ITXBUFLEN, &bytesWritten, 0);
 				for (iHistory = 0; iHistory < ITXBUFLEN; iHistory++) {
 					if (TextureHistory[iHistory].texturePoint.size())
 						WriteFile(handle,
@@ -4959,8 +4918,7 @@ void repclp(std::string& repairMessage) {
 			else {
 				if (clipDifference < ClipPointIndex) {
 					formHeader->clipEntries = FormVertexIndex - clipDifference;
-					MoveMemory(
-					    &clipPoint[clipCount], formHeader->borderClipData, sizeof(fPOINT) * formHeader->clipEntries);
+					MoveMemory(&clipPoint[clipCount], formHeader->borderClipData, sizeof(fPOINT) * formHeader->clipEntries);
 					formHeader->borderClipData = &ClipPoints[clipCount];
 					clipCount += formHeader->clipEntries;
 				}
@@ -4987,9 +4945,8 @@ void repsat() {
 		if (formHeader->type == SAT) {
 			guideDifference = formHeader->satinOrAngle.guide - SatinGuides;
 			if (FormVertexIndex > guideDifference + formHeader->vertexCount) {
-				MoveMemory(&SatinGuides[guideCount],
-				           formHeader->satinOrAngle.guide,
-				           formHeader->satinGuideCount * sizeof(SATCON));
+				MoveMemory(
+				    &SatinGuides[guideCount], formHeader->satinOrAngle.guide, formHeader->satinGuideCount * sizeof(SATCON));
 				formHeader->satinOrAngle.guide = &SatinGuides[guideCount];
 				guideCount += formHeader->satinGuideCount;
 				bcup(iForm, &badData);
@@ -4997,9 +4954,8 @@ void repsat() {
 			else {
 				if (guideDifference < SatinGuideIndex) {
 					formHeader->satinGuideCount = SatinGuideIndex - guideDifference;
-					MoveMemory(&SatinGuides[guideCount],
-					           formHeader->satinOrAngle.guide,
-					           formHeader->satinGuideCount * sizeof(SATCON));
+					MoveMemory(
+					    &SatinGuides[guideCount], formHeader->satinOrAngle.guide, formHeader->satinGuideCount * sizeof(SATCON));
 					bcup(iForm, &badData);
 				}
 				else {
@@ -5047,8 +5003,8 @@ void reptx() {
 }
 
 void repar() {
-	std::string repairMessage;
-	const unsigned    repairType = frmchkfn();
+	std::string    repairMessage;
+	const unsigned repairType = frmchkfn();
 
 	savdo();
 	// RepairString = MsgBuffer;

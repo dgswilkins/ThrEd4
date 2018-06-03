@@ -1894,7 +1894,7 @@ void mvsatk(SATCON* destination, const SATCON* source, unsigned count) noexcept 
 void dudat() {
 	unsigned size       = 0;
 	BAKHED*  backupData = nullptr;
-	auto     undoBuffer = *UndoBuffer;
+	auto&    undoBuffer = *UndoBuffer;
 
 	undoBuffer[UndoBufferWriteIndex].reset(nullptr);
 	size = sizeof(BAKHED) + sizeof(FRMHED) * FormIndex + sizeof(fPOINTATTR) * PCSHeader.stitchCount
@@ -10651,7 +10651,7 @@ void rotmrk() {
 void segentr(double rotationAngle) {
 	if (!rotationAngle)
 		rotationAngle = PI / 180;
-	shoMsg(fmt::format(StringTable->operator[](STR_ENTROT), (2 * PI / rotationAngle)));
+	shoMsg(fmt::format((*StringTable)[STR_ENTROT], (2 * PI / rotationAngle)));
 	StateMap.set(StateFlag::NUMIN);
 	numWnd();
 }
@@ -10677,12 +10677,10 @@ void pntmrk() {
 }
 
 void filfrms() {
-	unsigned iForm = 0;
-
 	if (SelectedFormCount) {
 		savdo();
-		for (iForm = 0; iForm < SelectedFormCount; iForm++) {
-			ClosestFormToCursor = SelectedFormList->operator[](iForm);
+		for (auto selectedForm : (*SelectedFormList)) {
+			ClosestFormToCursor = selectedForm;
 			refilfn();
 		}
 		StateMap.set(StateFlag::RESTCH);
