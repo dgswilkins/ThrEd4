@@ -7628,8 +7628,8 @@ void sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish
 		else {
 			verticalRect->bopnt.x = (*OutsidePoints)[start].x;
 			verticalRect->bopnt.y = (*OutsidePoints)[start].y;
-			point.x               = OutsidePoints->operator[](start).x;
-			point.y               = OutsidePoints->operator[](start).y;
+			point.x               = (*OutsidePoints)[start].x;
+			point.y               = (*OutsidePoints)[start].y;
 			proj(point, Slope, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->bipnt);
 		}
 		point.x = (*InsidePoints)[finish].x;
@@ -7641,8 +7641,8 @@ void sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish
 		else {
 			verticalRect->copnt.x = (*OutsidePoints)[finish].x;
 			verticalRect->copnt.y = (*OutsidePoints)[finish].y;
-			point.x               = OutsidePoints->operator[](finish).x;
-			point.y               = OutsidePoints->operator[](finish).y;
+			point.x               = (*OutsidePoints)[finish].x;
+			point.y               = (*OutsidePoints)[finish].y;
 			proj(point, Slope, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->cipnt);
 		}
 	}
@@ -7662,7 +7662,7 @@ void sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish
 			else {
 				verticalRect->bopnt.x = (*OutsidePoints)[start].x;
 				verticalRect->bopnt.y = (*OutsidePoints)[start].y;
-				point.x               = OutsidePoints->operator[](start).x;
+				point.x               = (*OutsidePoints)[start].x;
 				projv(point.x, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->bipnt);
 			}
 			point.x = (*InsidePoints)[finish].x;
@@ -7673,7 +7673,7 @@ void sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish
 			else {
 				verticalRect->copnt.x = (*OutsidePoints)[finish].x;
 				verticalRect->copnt.y = (*OutsidePoints)[finish].y;
-				point.x               = OutsidePoints->operator[](finish).x;
+				point.x               = (*OutsidePoints)[finish].x;
 				projv(point.x, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->cipnt);
 			}
 		}
@@ -7692,7 +7692,7 @@ void sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish
 			else {
 				verticalRect->bopnt.x = (*OutsidePoints)[start].x;
 				verticalRect->bopnt.y = (*OutsidePoints)[start].y;
-				point.y               = OutsidePoints->operator[](start).y;
+				point.y               = (*OutsidePoints)[start].y;
 				projh(point.y, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->bipnt);
 			}
 			point.y = (*InsidePoints)[finish].y;
@@ -7703,10 +7703,10 @@ void sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish
 			else {
 				verticalRect->copnt.x = (*OutsidePoints)[finish].x;
 				verticalRect->copnt.y = (*OutsidePoints)[finish].y;
-				point.y               = OutsidePoints->operator[](finish).y;
+				point.y               = (*OutsidePoints)[finish].y;
 				projh((*OutsidePoints)[finish].y,
-				      InsidePoints->operator[](start),
-				      InsidePoints->operator[](finish),
+				      (*InsidePoints)[start],
+				      (*InsidePoints)[finish],
 				      &verticalRect->cipnt);
 			}
 		}
@@ -9690,7 +9690,7 @@ void ribon() {
 						isBlunt = 0;
 					satends(isBlunt);
 					formHeader->vertices                 = adflt(VertexCount << 1);
-					formHeader->vertices[0].x            = OutsidePoints->operator[](0).x;
+					formHeader->vertices[0].x            = (*OutsidePoints)[0].x;
 					formHeader->vertices[iNewVertex++].y = (*OutsidePoints)[0].y;
 					for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 						formHeader->vertices[iNewVertex++] = (*InsidePoints)[iVertex];
@@ -9701,13 +9701,13 @@ void ribon() {
 				}
 				else {
 					formHeader->vertices                 = adflt((VertexCount << 1) + 2);
-					formHeader->vertices[0].x            = OutsidePoints->operator[](0).x;
+					formHeader->vertices[0].x            = (*OutsidePoints)[0].x;
 					formHeader->vertices[iNewVertex++].y = (*OutsidePoints)[0].y;
 					formHeader->underlayIndent           = IniFile.underlayIndent;
 					for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 						formHeader->vertices[iNewVertex++] = (*InsidePoints)[iVertex];
 					}
-					formHeader->vertices[iNewVertex++] = InsidePoints->operator[](0);
+					formHeader->vertices[iNewVertex++] = (*InsidePoints)[0];
 					formHeader->vertices[iNewVertex++] = (*OutsidePoints)[0];
 					for (iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
 						formHeader->vertices[iNewVertex++] = (*OutsidePoints)[iVertex];

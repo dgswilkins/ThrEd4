@@ -3386,7 +3386,7 @@ void txtrup() {
 	TXPNT    lowestTexturePoint  = {};
 	TXPNT    textureOffset       = {};
 	float    yOffset             = 0.0;
-	short    swap                = 0;
+	//short    swap                = 0;
 	unsigned iPoint              = 0;
 	int      xCoord = 0, Xmagnitude = 0;
 	POINT    offset       = {};
@@ -3427,18 +3427,20 @@ void txtrup() {
 			ed2txp(ZoomBoxLine[0], &highestTexturePoint);
 			ed2txp(offset, &lowestTexturePoint);
 			if (highestTexturePoint.line < lowestTexturePoint.line) {
-				swap                     = highestTexturePoint.line;
-				highestTexturePoint.line = lowestTexturePoint.line;
-				lowestTexturePoint.line  = swap;
+				std::swap(highestTexturePoint.line, lowestTexturePoint.line);
+				//swap                     = highestTexturePoint.line;
+				//highestTexturePoint.line = lowestTexturePoint.line;
+				//lowestTexturePoint.line  = swap;
 			}
 			if (highestTexturePoint.y < lowestTexturePoint.y) {
-				swap                  = highestTexturePoint.y;
-				highestTexturePoint.y = lowestTexturePoint.y;
-				lowestTexturePoint.y  = swap;
+				std::swap(highestTexturePoint.y, lowestTexturePoint.y);
+				//swap                  = highestTexturePoint.y;
+				//highestTexturePoint.y = lowestTexturePoint.y;
+				//lowestTexturePoint.y  = swap;
 			}
 			SelectedTexturePointsList->clear();
 			for (iPoint = 0; iPoint < TempTexturePoints->size(); iPoint++) {
-				if (TempTexturePoints->   operator[](iPoint).y < highestTexturePoint.y
+				if ((*TempTexturePoints)[iPoint].y < highestTexturePoint.y
 				    && (*TempTexturePoints)[iPoint].y > lowestTexturePoint.y
 				    && (*TempTexturePoints)[iPoint].line <= highestTexturePoint.line
 				    && (*TempTexturePoints)[iPoint].line >= lowestTexturePoint.line) {
