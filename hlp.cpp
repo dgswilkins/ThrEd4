@@ -18,31 +18,31 @@ extern void okcan();
 extern void rstAll();
 extern void shoMsg(const std::string& message);
 
-extern unsigned           ButtonHeight;
-extern unsigned           ButtonWidthX3;
-extern std::vector<HWND>* ButtonWin;
-extern unsigned           ClosestFormToCursor;
-extern DRAWITEMSTRUCT*    DrawItem;
-extern unsigned           FormIndex;
-extern FRMHED             FormList[MAXFORMS];
-extern char               HomeDirectory[_MAX_PATH];
-extern INIFILE            IniFile;
-extern HWND               MainStitchWin;
-extern MSG                Msg;
-extern char               MsgBuffer[MSGSIZ];
-extern fPOINT             OSequence[OSEQLEN];
-extern PCSHEADER          PCSHeader;
-extern long               PreferenceWindowWidth;
-extern RECT               scRct;
-extern FRMHED*            SelectedForm;
-extern unsigned           SelectedFormCount;
-extern EnumMap<StateFlag> StateMap;
-extern HDC                StitchWindowMemDC;
-extern HINSTANCE          ThrEdInstance;
-extern HWND               ThrEdWindow;
-extern char               ThrName[_MAX_PATH];
-extern POINT              UnzoomedRect;
-extern char               WorkingFileName[_MAX_PATH];
+extern unsigned               ButtonHeight;
+extern unsigned               ButtonWidthX3;
+extern std::vector<HWND>*     ButtonWin;
+extern unsigned               ClosestFormToCursor;
+extern DRAWITEMSTRUCT*        DrawItem;
+extern unsigned               FormIndex;
+extern FRMHED                 FormList[MAXFORMS];
+extern char                   HomeDirectory[_MAX_PATH];
+extern INIFILE                IniFile;
+extern HWND                   MainStitchWin;
+extern MSG                    Msg;
+extern char                   MsgBuffer[MSGSIZ];
+extern fPOINT                 OSequence[OSEQLEN];
+extern PCSHEADER              PCSHeader;
+extern long                   PreferenceWindowWidth;
+extern RECT                   scRct;
+extern FRMHED*                SelectedForm;
+extern std::vector<unsigned>* SelectedFormList;
+extern EnumMap<StateFlag>     StateMap;
+extern HDC                    StitchWindowMemDC;
+extern HINSTANCE              ThrEdInstance;
+extern HWND                   ThrEdWindow;
+extern char                   ThrName[_MAX_PATH];
+extern POINT                  UnzoomedRect;
+extern char                   WorkingFileName[_MAX_PATH];
 
 HWND HelpWindow;    // help window
 HWND MsgWindow = 0; // message window
@@ -254,7 +254,7 @@ void frm1pnt() {
 }
 
 bool filmsgs(unsigned code) {
-	if (SelectedFormCount)
+	if (SelectedFormList->size())
 		return clpmsgs(code);
 	if (FormIndex) {
 		frm1pnt();
