@@ -908,7 +908,7 @@ void setfrm() {
 }
 
 void form() {
-	shoMsg(StringTable->operator[](STR_FMEN));
+	shoMsg((*StringTable)[STR_FMEN]);
 	StateMap.set(StateFlag::FORMIN);
 	StateMap.reset(StateFlag::INSRT);
 	duzrat();
@@ -1108,7 +1108,7 @@ void dubig() {
 	SelectObject(StitchWindowMemDC, SelectAllPen);
 	Polyline(StitchWindowMemDC, SelectedFormsLine->data(), 9);
 	for (iPoint = 0; iPoint < 8; iPoint++)
-		selsqr(SelectedFormsLine->operator[](iPoint), StitchWindowMemDC);
+		selsqr((*SelectedFormsLine)[iPoint], StitchWindowMemDC);
 }
 
 void frmpoly(const POINT* line, unsigned count) noexcept {
@@ -1130,7 +1130,7 @@ void dupsel(HDC dc) {
 	Polyline(dc, SelectedPointsLine->data(), 9);
 	iPoint = SelectedFormVertices.start;
 	for (iPoint = 0; iPoint < 8; iPoint++)
-		selsqr(SelectedPointsLine->operator[](iPoint), dc);
+		selsqr((*SelectedPointsLine)[iPoint], dc);
 	frmx(EndPointCross, dc);
 }
 
@@ -1235,8 +1235,8 @@ void drwfrm() {
 			ritfrct(ClosestFormToCursor, StitchWindowMemDC);
 		if (StateMap.test(StateFlag::FRMPMOV)) {
 			ritmov();
-			RubberBandLine->operator[](1).x = Msg.pt.x - StitchWindowOrigin.x;
-			RubberBandLine->operator[](1).y = Msg.pt.y - StitchWindowOrigin.y;
+			(*RubberBandLine)[1].x = Msg.pt.x - StitchWindowOrigin.x;
+			(*RubberBandLine)[1].y = Msg.pt.y - StitchWindowOrigin.y;
 			StateMap.set(StateFlag::SHOMOV);
 			ritmov();
 		}
@@ -1600,7 +1600,7 @@ void frmovlin() {
 	frmlin(SelectedForm->vertices, SelectedForm->vertexCount);
 	previousPoint = prv(ClosestVertexToCursor);
 	for (iPoint = 0; iPoint < 3; iPoint++) {
-		RubberBandLine->operator[](iPoint) = FormLines[previousPoint];
+		(*RubberBandLine)[iPoint] = FormLines[previousPoint];
 		previousPoint++;
 	}
 	ritmov();
@@ -1767,7 +1767,7 @@ void okcan() {
 	GetClientRect(MsgWindow, &MsgRect);
 
 	OKButton = CreateWindow("STATIC",
-	                        StringTable->operator[](STR_OKENT).c_str(),
+	                        (*StringTable)[STR_OKENT].c_str(),
 	                        SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                        5,
 	                        MsgRect.bottom + 15,
@@ -1779,7 +1779,7 @@ void okcan() {
 	                        NULL);
 
 	CancelButton = CreateWindow("STATIC",
-	                            StringTable->operator[](STR_CANCEL).c_str(),
+	                            (*StringTable)[STR_CANCEL].c_str(),
 	                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                            ButtonWidth * 5,
 	                            MsgRect.bottom + 15,
@@ -1826,7 +1826,7 @@ void savdisc() {
 	                             NULL);
 
 	CancelButton = CreateWindow("STATIC",
-	                            StringTable->operator[](STR_CANCEL).c_str(),
+	                            (*StringTable)[STR_CANCEL].c_str(),
 	                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                            2 * ButtonWidthX3 + 25,
 	                            MsgRect.bottom + 15,
@@ -4010,7 +4010,7 @@ void satfix() {
 	if (SatinIndex > 1) {
 		FormList[FormIndex].vertices = adflt(SatinIndex);
 		for (iVertex = 0; iVertex < SatinIndex; iVertex++) {
-			FormList[FormIndex].vertices[iVertex] = TempPolygon->operator[](iVertex);
+			FormList[FormIndex].vertices[iVertex] = (*TempPolygon)[iVertex];
 		}
 		TempPolygon->clear();
 		FormList[FormIndex].vertexCount = SatinIndex;
@@ -5470,27 +5470,27 @@ void outfn(unsigned start, unsigned finish, double satinWidth) {
 	double length  = 0.0;
 	double xOffset = 0.0, yOffset = 0.0;
 
-	if (fabs(FormAngles->operator[](start)) < TINY && fabs(FormAngles->operator[](finish)) < TINY) {
+	if (fabs((*FormAngles)[start]) < TINY && fabs((*FormAngles)[finish]) < TINY) {
 		xOffset = 0.0;
 		yOffset = satinWidth;
 	}
 	else {
 #define SATHRESH 10
 
-		angle  = (FormAngles->operator[](finish) - FormAngles->operator[](start)) / 2;
+		angle  = ((*FormAngles)[finish] - (*FormAngles)[start]) / 2;
 		length = satinWidth / cos(angle);
 		if (length < -satinWidth * SATHRESH)
 			length = -satinWidth * SATHRESH;
 		if (length > satinWidth * SATHRESH)
 			length = satinWidth * SATHRESH;
-		angle += FormAngles->operator[](start) + PI / 2;
+		angle += (*FormAngles)[start] + PI / 2;
 		xOffset = length * cos(angle);
 		yOffset = length * sin(angle);
 	}
-	InsidePoints-> operator[](finish).x = CurrentFormVertices[finish].x - xOffset;
-	InsidePoints-> operator[](finish).y = CurrentFormVertices[finish].y - yOffset;
-	OutsidePoints->operator[](finish).x = CurrentFormVertices[finish].x + xOffset;
-	OutsidePoints->operator[](finish).y = CurrentFormVertices[finish].y + yOffset;
+	(*InsidePoints)[finish].x  = CurrentFormVertices[finish].x - xOffset;
+	(*InsidePoints)[finish].y  = CurrentFormVertices[finish].y - yOffset;
+	(*OutsidePoints)[finish].x = CurrentFormVertices[finish].x + xOffset;
+	(*OutsidePoints)[finish].y = CurrentFormVertices[finish].y + yOffset;
 }
 
 void duangs() {
@@ -5519,7 +5519,7 @@ void satout(double satinWidth) {
 			outfn(iVertex, iVertex + 1, 0.1);
 		count = 0;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-			if (cisin(InsidePoints->operator[](iVertex).x, InsidePoints->operator[](iVertex).y))
+			if (cisin((*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y))
 				count++;
 		}
 		satinWidth /= 2;
@@ -5647,20 +5647,19 @@ bool chkbak(std::vector<dPOINT>& satinBackup, dPOINT pnt) {
 
 bool linx(const std::vector<fPOINT>& points, unsigned start, unsigned finish, dPOINT* intersection) {
 	if (OutsidePoints) {
-		dPOINT delta
-		    = { (OutsidePoints->operator[](start).x - points[start].x), (OutsidePoints->operator[](start).y - points[start].y) };
+		dPOINT delta = { ((*OutsidePoints)[start].x - points[start].x), ((*OutsidePoints)[start].y - points[start].y) };
 		dPOINT point = { (points[start].x), (points[start].y) };
 
 		if (!delta.x && !delta.y)
 			return 0;
 		if (delta.x) {
-			if (proj(point, delta.y / delta.x, OutsidePoints->operator[](finish), points[finish], intersection))
+			if (proj(point, delta.y / delta.x, (*OutsidePoints)[finish], points[finish], intersection))
 				return 1;
 			else
 				return 0;
 		}
 		else {
-			if (projv(point.x, points[finish], OutsidePoints->operator[](finish), intersection))
+			if (projv(point.x, points[finish], (*OutsidePoints)[finish], intersection))
 				return 1;
 			else
 				return 0;
@@ -5679,13 +5678,13 @@ void filinsbw(std::vector<dPOINT>& satinBackup, dPOINT point) {
 
 void sbfn(const std::vector<fPOINT>& insidePoints, unsigned start, unsigned finish) {
 	std::vector<dPOINT> satinBackup(8); // backup stitches in satin fills
-	dPOINT   innerDelta  = { (insidePoints[finish].x - insidePoints[start].x), (insidePoints[finish].y - insidePoints[start].y) };
-	double   innerLength = hypot(innerDelta.x, innerDelta.y);
-	dPOINT   outerDelta  = { (OutsidePoints->operator[](finish).x - OutsidePoints->operator[](start).x),
-                          (OutsidePoints->operator[](finish).y - OutsidePoints->operator[](start).y) };
+	dPOINT innerDelta  = { (insidePoints[finish].x - insidePoints[start].x), (insidePoints[finish].y - insidePoints[start].y) };
+	double innerLength = hypot(innerDelta.x, innerDelta.y);
+	dPOINT outerDelta
+	    = { ((*OutsidePoints)[finish].x - (*OutsidePoints)[start].x), ((*OutsidePoints)[finish].y - (*OutsidePoints)[start].y) };
 	double   outerLength = hypot(outerDelta.x, outerDelta.y);
 	dPOINT   innerPoint  = { insidePoints[start].x, insidePoints[start].y };
-	dPOINT   outerPoint  = { OutsidePoints->operator[](start).x, OutsidePoints->operator[](start).y };
+	dPOINT   outerPoint  = { (*OutsidePoints)[start].x, (*OutsidePoints)[start].y };
 	dPOINT   innerStep = {}, outerStep = {};
 	dPOINT   offsetDelta = {}, offsetStep = {}, offset = {};
 	dPOINT   intersection = {};
@@ -5811,38 +5810,36 @@ void satends(unsigned isBlunt) {
 	fPOINT step = {};
 
 	if (isBlunt & SBLNT) {
-		step.x = sin(FormAngles->operator[](0)) * HorizontalLength2 / 2;
-		step.y = cos(FormAngles->operator[](0)) * HorizontalLength2 / 2;
+		step.x = sin((*FormAngles)[0]) * HorizontalLength2 / 2;
+		step.y = cos((*FormAngles)[0]) * HorizontalLength2 / 2;
 		if (StateMap.test(StateFlag::INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
 		}
-		InsidePoints-> operator[](0).x = SelectedForm->vertices[0].x + step.x;
-		InsidePoints-> operator[](0).y = SelectedForm->vertices[0].y - step.y;
-		OutsidePoints->operator[](0).x = SelectedForm->vertices[0].x - step.x;
-		OutsidePoints->operator[](0).y = SelectedForm->vertices[0].y + step.y;
+		(*InsidePoints)[0].x  = SelectedForm->vertices[0].x + step.x;
+		(*InsidePoints)[0].y  = SelectedForm->vertices[0].y - step.y;
+		(*OutsidePoints)[0].x = SelectedForm->vertices[0].x - step.x;
+		(*OutsidePoints)[0].y = SelectedForm->vertices[0].y + step.y;
 	}
 	else {
-		InsidePoints->operator[](0).x = OutsidePoints->operator[](0).x = CurrentFormVertices[0].x;
-		InsidePoints->operator[](0).y = OutsidePoints->operator[](0).y = CurrentFormVertices[0].y;
+		(*InsidePoints)[0].x = (*OutsidePoints)[0].x = CurrentFormVertices[0].x;
+		(*InsidePoints)[0].y = (*OutsidePoints)[0].y = CurrentFormVertices[0].y;
 	}
 	if (isBlunt & FBLNT) {
-		step.x = sin(FormAngles->operator[](VertexCount - 2)) * HorizontalLength2 / 2;
-		step.y = cos(FormAngles->operator[](VertexCount - 2)) * HorizontalLength2 / 2;
+		step.x = sin((*FormAngles)[VertexCount - 2]) * HorizontalLength2 / 2;
+		step.y = cos((*FormAngles)[VertexCount - 2]) * HorizontalLength2 / 2;
 		if (StateMap.test(StateFlag::INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
 		}
-		InsidePoints-> operator[](VertexCount - 1).x = SelectedForm->vertices[VertexCount - 1].x + step.x;
-		InsidePoints-> operator[](VertexCount - 1).y = SelectedForm->vertices[VertexCount - 1].y - step.y;
-		OutsidePoints->operator[](VertexCount - 1).x = SelectedForm->vertices[VertexCount - 1].x - step.x;
-		OutsidePoints->operator[](VertexCount - 1).y = SelectedForm->vertices[VertexCount - 1].y + step.y;
+		(*InsidePoints)[VertexCount - 1].x  = SelectedForm->vertices[VertexCount - 1].x + step.x;
+		(*InsidePoints)[VertexCount - 1].y  = SelectedForm->vertices[VertexCount - 1].y - step.y;
+		(*OutsidePoints)[VertexCount - 1].x = SelectedForm->vertices[VertexCount - 1].x - step.x;
+		(*OutsidePoints)[VertexCount - 1].y = SelectedForm->vertices[VertexCount - 1].y + step.y;
 	}
 	else {
-		InsidePoints->operator[](VertexCount - 1).x = OutsidePoints->operator[](VertexCount - 1).x
-		    = CurrentFormVertices[VertexCount - 1].x;
-		InsidePoints->operator[](VertexCount - 1).y = OutsidePoints->operator[](VertexCount - 1).y
-		    = CurrentFormVertices[VertexCount - 1].y;
+		(*InsidePoints)[VertexCount - 1].x = (*OutsidePoints)[VertexCount - 1].x = CurrentFormVertices[VertexCount - 1].x;
+		(*InsidePoints)[VertexCount - 1].y = (*OutsidePoints)[VertexCount - 1].y = CurrentFormVertices[VertexCount - 1].y;
 	}
 }
 
@@ -6019,7 +6016,7 @@ void maxwid(unsigned start, unsigned finish) {
 	textSize.x = 0;
 	textSize.y = 0;
 	while (start <= finish) {
-		maxtsiz(StringTable->operator[](start++), textSize);
+		maxtsiz((*StringTable)[start++], textSize);
 	}
 	PreferenceWindowTextWidth = textSize.x + 6;
 }
@@ -6108,273 +6105,257 @@ void refrmfn() {
 	LabelWindowCoords.right                             = 3 + LabelWindowSize.x;
 	ValueWindowCoords.left                              = 6 + LabelWindowSize.x;
 	ValueWindowCoords.right                             = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
-	LabelWindow->operator[](LFRM)                       = txtwin(StringTable->operator[](STR_TXT0), LabelWindowCoords);
+	(*LabelWindow)[LFRM]                                = txtwin((*StringTable)[STR_TXT0], LabelWindowCoords);
 	if (SelectedForm->type == FRMLINE)
-		choice = StringTable->operator[](STR_EDG1);
+		choice = (*StringTable)[STR_EDG1];
 	else
-		choice = StringTable->operator[](STR_FREH);
-	ValueWindow->operator[](LFRM) = txtrwin(choice, ValueWindowCoords);
+		choice = (*StringTable)[STR_FREH];
+	(*ValueWindow)[LFRM] = txtrwin(choice, ValueWindowCoords);
 	nxtlin();
-	LabelWindow->operator[](LLAYR) = txtwin(StringTable->operator[](STR_TXT1), LabelWindowCoords);
-	ValueWindow->operator[](LLAYR) = txtrwin(fmt::format("{}", ((SelectedForm->attribute & FRMLMSK) >> 1)), ValueWindowCoords);
+	(*LabelWindow)[LLAYR] = txtwin((*StringTable)[STR_TXT1], LabelWindowCoords);
+	(*ValueWindow)[LLAYR] = txtrwin(fmt::format("{}", ((SelectedForm->attribute & FRMLMSK) >> 1)), ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->type != FRMLINE) {
-		LabelWindow->operator[](LCWLK) = txtwin(StringTable->operator[](STR_CWLK), LabelWindowCoords);
+		(*LabelWindow)[LCWLK] = txtwin((*StringTable)[STR_CWLK], LabelWindowCoords);
 		if (SelectedForm->extendedAttribute & AT_CWLK)
-			choice = StringTable->operator[](STR_ON);
+			choice = (*StringTable)[STR_ON];
 		else
-			choice = StringTable->operator[](STR_OFF);
-		ValueWindow->operator[](LCWLK) = txtrwin(choice, ValueWindowCoords);
+			choice = (*StringTable)[STR_OFF];
+		(*ValueWindow)[LCWLK] = txtrwin(choice, ValueWindowCoords);
 		nxtlin();
-		LabelWindow->operator[](LWALK) = txtwin(StringTable->operator[](STR_WALK), LabelWindowCoords);
+		(*LabelWindow)[LWALK] = txtwin((*StringTable)[STR_WALK], LabelWindowCoords);
 		if (SelectedForm->extendedAttribute & AT_WALK)
-			choice = StringTable->operator[](STR_ON);
+			choice = (*StringTable)[STR_ON];
 		else
-			choice = StringTable->operator[](STR_OFF);
-		ValueWindow->operator[](LWALK) = txtrwin(choice, ValueWindowCoords);
+			choice = (*StringTable)[STR_OFF];
+		(*ValueWindow)[LWALK] = txtrwin(choice, ValueWindowCoords);
 		nxtlin();
-		LabelWindow->operator[](LUND) = txtwin(StringTable->operator[](STR_UND), LabelWindowCoords);
+		(*LabelWindow)[LUND] = txtwin((*StringTable)[STR_UND], LabelWindowCoords);
 		if (SelectedForm->extendedAttribute & AT_UND)
-			choice = StringTable->operator[](STR_ON);
+			choice = (*StringTable)[STR_ON];
 		else
-			choice = StringTable->operator[](STR_OFF);
-		ValueWindow->operator[](LUND) = txtrwin(choice, ValueWindowCoords);
+			choice = (*StringTable)[STR_OFF];
+		(*ValueWindow)[LUND] = txtrwin(choice, ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->extendedAttribute & (AT_WALK | AT_UND | AT_CWLK)) {
-			LabelWindow->operator[](LUNDCOL) = txtwin(StringTable->operator[](STR_UNDCOL), LabelWindowCoords);
-			ValueWindow->operator[](LUNDCOL) = txtrwin(fmt::format("{}", (SelectedForm->underlayColor + 1)), ValueWindowCoords);
+			(*LabelWindow)[LUNDCOL] = txtwin((*StringTable)[STR_UNDCOL], LabelWindowCoords);
+			(*ValueWindow)[LUNDCOL] = txtrwin(fmt::format("{}", (SelectedForm->underlayColor + 1)), ValueWindowCoords);
 			nxtlin();
-			LabelWindow->operator[](LULEN) = txtwin(StringTable->operator[](STR_ULEN), LabelWindowCoords);
-			ValueWindow->operator[](LULEN)
-			    = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayStitchLen / PFGRAN)), ValueWindowCoords);
+			(*LabelWindow)[LULEN] = txtwin((*StringTable)[STR_ULEN], LabelWindowCoords);
+			(*ValueWindow)[LULEN] = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
-		LabelWindow->operator[](LWLKIND) = txtwin(StringTable->operator[](STR_UWLKIND), LabelWindowCoords);
-		ValueWindow->operator[](LWLKIND)
-		    = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayIndent / PFGRAN)), ValueWindowCoords);
+		(*LabelWindow)[LWLKIND] = txtwin((*StringTable)[STR_UWLKIND], LabelWindowCoords);
+		(*ValueWindow)[LWLKIND] = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayIndent / PFGRAN)), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->extendedAttribute & AT_UND) {
-			LabelWindow->operator[](LUSPAC) = txtwin(StringTable->operator[](STR_FUSPAC), LabelWindowCoords);
-			ValueWindow->operator[](LUSPAC)
-			    = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlaySpacing / PFGRAN)), ValueWindowCoords);
+			(*LabelWindow)[LUSPAC] = txtwin((*StringTable)[STR_FUSPAC], LabelWindowCoords);
+			(*ValueWindow)[LUSPAC] = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlaySpacing / PFGRAN)), ValueWindowCoords);
 			nxtlin();
-			LabelWindow->operator[](LUANG) = txtwin(StringTable->operator[](STR_FUANG), LabelWindowCoords);
-			ValueWindow->operator[](LUANG)
+			(*LabelWindow)[LUANG] = txtwin((*StringTable)[STR_FUANG], LabelWindowCoords);
+			(*ValueWindow)[LUANG]
 			    = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayStitchAngle * 180 / PI)), ValueWindowCoords);
 			nxtlin();
 		}
 	}
-	LabelWindow->operator[](LFRMFIL) = txtwin(StringTable->operator[](STR_TXT2), LabelWindowCoords);
-	ValueWindow->operator[](LFRMFIL) = txtrwin(StringTable->operator[](STR_FIL0 + SelectedForm->fillType), ValueWindowCoords);
+	(*LabelWindow)[LFRMFIL] = txtwin((*StringTable)[STR_TXT2], LabelWindowCoords);
+	(*ValueWindow)[LFRMFIL] = txtrwin((*StringTable)[STR_FIL0 + SelectedForm->fillType], ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->fillType) {
-		LabelWindow->operator[](LFRMCOL) = txtwin(StringTable->operator[](STR_TXT3), LabelWindowCoords);
-		ValueWindow->operator[](LFRMCOL) = numwin(fmt::format("{}", (SelectedForm->fillColor + 1)), ValueWindowCoords);
+		(*LabelWindow)[LFRMCOL] = txtwin((*StringTable)[STR_TXT3], LabelWindowCoords);
+		(*ValueWindow)[LFRMCOL] = numwin(fmt::format("{}", (SelectedForm->fillColor + 1)), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == FTHF) {
-			LabelWindow->operator[](LFTHCOL) = txtwin(StringTable->operator[](STR_FTHCOL), LabelWindowCoords);
-			ValueWindow->operator[](LFTHCOL)
-			    = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.color + 1)), ValueWindowCoords);
+			(*LabelWindow)[LFTHCOL] = txtwin((*StringTable)[STR_FTHCOL], LabelWindowCoords);
+			(*ValueWindow)[LFTHCOL] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.color + 1)), ValueWindowCoords);
 			nxtlin();
-			LabelWindow->operator[](LFTHTYP) = txtwin(StringTable->operator[](STR_FTHTYP), LabelWindowCoords);
-			ValueWindow->operator[](LFTHTYP)
-			    = numwin(StringTable->operator[](STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1), ValueWindowCoords);
+			(*LabelWindow)[LFTHTYP] = txtwin((*StringTable)[STR_FTHTYP], LabelWindowCoords);
+			(*ValueWindow)[LFTHTYP]
+			    = numwin((*StringTable)[STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1], ValueWindowCoords);
 			nxtlin();
-			LabelWindow->operator[](LFTHBLND) = txtwin(StringTable->operator[](STR_FTHBLND), LabelWindowCoords);
+			(*LabelWindow)[LFTHBLND] = txtwin((*StringTable)[STR_FTHBLND], LabelWindowCoords);
 			if (SelectedForm->extendedAttribute & AT_FTHBLND)
-				choice = StringTable->operator[](STR_ON);
+				choice = (*StringTable)[STR_ON];
 			else
-				choice = StringTable->operator[](STR_OFF);
-			ValueWindow->operator[](LFTHBLND) = txtrwin(choice, ValueWindowCoords);
+				choice = (*StringTable)[STR_OFF];
+			(*ValueWindow)[LFTHBLND] = txtrwin(choice, ValueWindowCoords);
 			nxtlin();
 			if (!(SelectedForm->extendedAttribute & AT_FTHBLND)) {
-				LabelWindow->operator[](LFTHBTH) = txtwin(StringTable->operator[](STR_FTHBOTH), LabelWindowCoords);
+				(*LabelWindow)[LFTHBTH] = txtwin((*StringTable)[STR_FTHBOTH], LabelWindowCoords);
 				if (SelectedForm->extendedAttribute & (AT_FTHBTH))
-					choice = StringTable->operator[](STR_ON);
+					choice = (*StringTable)[STR_ON];
 				else
-					choice = StringTable->operator[](STR_OFF);
-				ValueWindow->operator[](LFTHBTH) = txtrwin(choice, ValueWindowCoords);
+					choice = (*StringTable)[STR_OFF];
+				(*ValueWindow)[LFTHBTH] = txtrwin(choice, ValueWindowCoords);
 				nxtlin();
 				if (!(SelectedForm->extendedAttribute & AT_FTHBTH)) {
-					LabelWindow->operator[](LFTHUP) = txtwin(StringTable->operator[](STR_FTHUP), LabelWindowCoords);
+					(*LabelWindow)[LFTHUP] = txtwin((*StringTable)[STR_FTHUP], LabelWindowCoords);
 					if (SelectedForm->extendedAttribute & AT_FTHUP)
-						choice = StringTable->operator[](STR_ON);
+						choice = (*StringTable)[STR_ON];
 					else
-						choice = StringTable->operator[](STR_OFF);
-					ValueWindow->operator[](LFTHUP) = txtrwin(choice, ValueWindowCoords);
+						choice = (*StringTable)[STR_OFF];
+					(*ValueWindow)[LFTHUP] = txtrwin(choice, ValueWindowCoords);
 					nxtlin();
 				}
 			}
-			LabelWindow->operator[](LFTHUPCNT) = txtwin(StringTable->operator[](STR_FTHUPCNT), LabelWindowCoords);
-			ValueWindow->operator[](LFTHUPCNT)
-			    = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.upCount)), ValueWindowCoords);
+			(*LabelWindow)[LFTHUPCNT] = txtwin((*StringTable)[STR_FTHUPCNT], LabelWindowCoords);
+			(*ValueWindow)[LFTHUPCNT] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.upCount)), ValueWindowCoords);
 			nxtlin();
-			LabelWindow->operator[](LFTHDWNCNT) = txtwin(StringTable->operator[](STR_FTHDWNCNT), LabelWindowCoords);
-			ValueWindow->operator[](LFTHDWNCNT)
-			    = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.downCount)), ValueWindowCoords);
+			(*LabelWindow)[LFTHDWNCNT] = txtwin((*StringTable)[STR_FTHDWNCNT], LabelWindowCoords);
+			(*ValueWindow)[LFTHDWNCNT] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.downCount)), ValueWindowCoords);
 			nxtlin();
-			LabelWindow->operator[](LFTHSIZ) = txtwin(StringTable->operator[](STR_FTHSIZ), LabelWindowCoords);
-			ValueWindow->operator[](LFTHSIZ)
-			    = numwin(fmt::format("{:.2f}", (SelectedForm->fillInfo.feather.ratio)), ValueWindowCoords);
+			(*LabelWindow)[LFTHSIZ] = txtwin((*StringTable)[STR_FTHSIZ], LabelWindowCoords);
+			(*ValueWindow)[LFTHSIZ] = numwin(fmt::format("{:.2f}", (SelectedForm->fillInfo.feather.ratio)), ValueWindowCoords);
 			nxtlin();
 			if (SelectedForm->fillInfo.feather.fillType == FTHPSG) {
-				LabelWindow->operator[](LFTHNUM) = txtwin(StringTable->operator[](STR_FTHNUM), LabelWindowCoords);
-				ValueWindow->operator[](LFTHNUM)
-				    = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.count)), ValueWindowCoords);
+				(*LabelWindow)[LFTHNUM] = txtwin((*StringTable)[STR_FTHNUM], LabelWindowCoords);
+				(*ValueWindow)[LFTHNUM] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.count)), ValueWindowCoords);
 				nxtlin();
 			}
-			LabelWindow->operator[](LFTHFLR) = txtwin(StringTable->operator[](STR_FTHFLR), LabelWindowCoords);
-			ValueWindow->operator[](LFTHFLR)
+			(*LabelWindow)[LFTHFLR] = txtwin((*StringTable)[STR_FTHFLR], LabelWindowCoords);
+			(*ValueWindow)[LFTHFLR]
 			    = numwin(fmt::format("{:.2f}", (SelectedForm->fillInfo.feather.minStitchSize / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType != CLPF) {
-			LabelWindow->operator[](LFRMSPAC) = txtwin(StringTable->operator[](STR_TXT4), LabelWindowCoords);
-			ValueWindow->operator[](LFRMSPAC)
-			    = numwin(fmt::format("{:.2f}", (SelectedForm->fillSpacing / PFGRAN)), ValueWindowCoords);
+			(*LabelWindow)[LFRMSPAC] = txtwin((*StringTable)[STR_TXT4], LabelWindowCoords);
+			(*ValueWindow)[LFRMSPAC] = numwin(fmt::format("{:.2f}", (SelectedForm->fillSpacing / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (istx(ClosestFormToCursor)) {
-			LabelWindow->operator[](LTXOF) = txtwin(StringTable->operator[](STR_TXOF), LabelWindowCoords);
-			ValueWindow->operator[](LTXOF) = numwin(fmt::format("{:.2f}", (SelectedForm->txof / PFGRAN)), ValueWindowCoords);
+			(*LabelWindow)[LTXOF] = txtwin((*StringTable)[STR_TXOF], LabelWindowCoords);
+			(*ValueWindow)[LTXOF] = numwin(fmt::format("{:.2f}", (SelectedForm->txof / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
-		LabelWindow->operator[](LMAXFIL) = txtwin(StringTable->operator[](STR_TXT20), LabelWindowCoords);
-		ValueWindow->operator[](LMAXFIL)
-		    = numwin(fmt::format("{:.2f}", (SelectedForm->maxFillStitchLen / PFGRAN)), ValueWindowCoords);
+		(*LabelWindow)[LMAXFIL] = txtwin((*StringTable)[STR_TXT20], LabelWindowCoords);
+		(*ValueWindow)[LMAXFIL] = numwin(fmt::format("{:.2f}", (SelectedForm->maxFillStitchLen / PFGRAN)), ValueWindowCoords);
 		nxtlin();
 		if (!isclp(ClosestFormToCursor) && !istx(ClosestFormToCursor)) {
-			LabelWindow->operator[](LFRMLEN) = txtwin(StringTable->operator[](STR_TXT5), LabelWindowCoords);
-			ValueWindow->operator[](LFRMLEN)
+			(*LabelWindow)[LFRMLEN] = txtwin((*StringTable)[STR_TXT5], LabelWindowCoords);
+			(*ValueWindow)[LFRMLEN]
 			    = numwin(fmt::format("{:.2f}", (SelectedForm->lengthOrCount.stitchLength / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
-		LabelWindow->operator[](LMINFIL) = txtwin(StringTable->operator[](STR_TXT21), LabelWindowCoords);
-		ValueWindow->operator[](LMINFIL)
-		    = numwin(fmt::format("{:.2f}", (SelectedForm->minFillStitchLen / PFGRAN)), ValueWindowCoords);
+		(*LabelWindow)[LMINFIL] = txtwin((*StringTable)[STR_TXT21], LabelWindowCoords);
+		(*ValueWindow)[LMINFIL] = numwin(fmt::format("{:.2f}", (SelectedForm->minFillStitchLen / PFGRAN)), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
-			LabelWindow->operator[](LFRMANG) = txtwin(StringTable->operator[](STR_TXT6), LabelWindowCoords);
-			ValueWindow->operator[](LFRMANG)
+			(*LabelWindow)[LFRMANG] = txtwin((*StringTable)[STR_TXT6], LabelWindowCoords);
+			(*ValueWindow)[LFRMANG]
 			    = numwin(fmt::format("{:.2f}", (SelectedForm->angleOrClipData.angle * 180 / PI)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == ANGCLPF) {
-			LabelWindow->operator[](LSACANG) = txtwin(StringTable->operator[](STR_TXT6), LabelWindowCoords);
-			ValueWindow->operator[](LSACANG)
+			(*LabelWindow)[LSACANG] = txtwin((*StringTable)[STR_TXT6], LabelWindowCoords);
+			(*ValueWindow)[LSACANG]
 			    = numwin(fmt::format("{:.2f}", (SelectedForm->satinOrAngle.angle * 180 / PI)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VCLPF || SelectedForm->fillType == HCLPF || SelectedForm->fillType == ANGCLPF) {
-			LabelWindow->operator[](LFRMFAZ) = txtwin(StringTable->operator[](STR_TXT18), LabelWindowCoords);
-			ValueWindow->operator[](LFRMFAZ) = numwin(fmt::format("{}", (SelectedForm->wordParam)), ValueWindowCoords);
+			(*LabelWindow)[LFRMFAZ] = txtwin((*StringTable)[STR_TXT18], LabelWindowCoords);
+			(*ValueWindow)[LFRMFAZ] = numwin(fmt::format("{}", (SelectedForm->wordParam)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VRTF || SelectedForm->fillType == HORF || SelectedForm->fillType == ANGF
 		    || istx(ClosestFormToCursor)) {
-			LabelWindow->operator[](LBFILSQR) = txtwin(StringTable->operator[](STR_PRF2), LabelWindowCoords);
+			(*LabelWindow)[LBFILSQR] = txtwin((*StringTable)[STR_PRF2], LabelWindowCoords);
 			if (SelectedForm->extendedAttribute & AT_SQR)
-				choice = StringTable->operator[](STR_SQR);
+				choice = (*StringTable)[STR_SQR];
 			else
-				choice = StringTable->operator[](STR_PNTD);
-			ValueWindow->operator[](LBFILSQR) = txtrwin(choice, ValueWindowCoords);
+				choice = (*StringTable)[STR_PNTD];
+			(*ValueWindow)[LBFILSQR] = txtrwin(choice, ValueWindowCoords);
 			nxtlin();
 		}
 	}
-	LabelWindow->operator[](LFSTRT) = txtwin(StringTable->operator[](STR_FSTRT), LabelWindowCoords);
+	(*LabelWindow)[LFSTRT] = txtwin((*StringTable)[STR_FSTRT], LabelWindowCoords);
 	if (SelectedForm->extendedAttribute & AT_STRT)
-		choice = StringTable->operator[](STR_ON);
+		choice = (*StringTable)[STR_ON];
 	else
-		choice = StringTable->operator[](STR_OFF);
-	ValueWindow->operator[](LFSTRT) = txtrwin(choice, ValueWindowCoords);
+		choice = (*StringTable)[STR_OFF];
+	(*ValueWindow)[LFSTRT] = txtrwin(choice, ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->extendedAttribute & AT_STRT) {
-		LabelWindow->operator[](LDSTRT) = txtwin(StringTable->operator[](STR_FSTRT), LabelWindowCoords);
-		ValueWindow->operator[](LDSTRT) = numwin(fmt::format("{}", (SelectedForm->fillStart)), ValueWindowCoords);
+		(*LabelWindow)[LDSTRT] = txtwin((*StringTable)[STR_FSTRT], LabelWindowCoords);
+		(*ValueWindow)[LDSTRT] = numwin(fmt::format("{}", (SelectedForm->fillStart)), ValueWindowCoords);
 		nxtlin();
 	}
-	LabelWindow->operator[](LFEND) = txtwin(StringTable->operator[](STR_FEND), LabelWindowCoords);
+	(*LabelWindow)[LFEND] = txtwin((*StringTable)[STR_FEND], LabelWindowCoords);
 	if (SelectedForm->extendedAttribute & AT_END)
-		choice = StringTable->operator[](STR_ON);
+		choice = (*StringTable)[STR_ON];
 	else
-		choice = StringTable->operator[](STR_OFF);
-	ValueWindow->operator[](LFEND) = txtrwin(choice, ValueWindowCoords);
+		choice = (*StringTable)[STR_OFF];
+	(*ValueWindow)[LFEND] = txtrwin(choice, ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->extendedAttribute & AT_END) {
-		LabelWindow->operator[](LDEND) = txtwin(StringTable->operator[](STR_FEND), LabelWindowCoords);
-		ValueWindow->operator[](LDEND) = numwin(fmt::format("{}", (SelectedForm->fillEnd)), ValueWindowCoords);
+		(*LabelWindow)[LDEND] = txtwin((*StringTable)[STR_FEND], LabelWindowCoords);
+		(*ValueWindow)[LDEND] = numwin(fmt::format("{}", (SelectedForm->fillEnd)), ValueWindowCoords);
 		nxtlin();
 	}
-	LabelWindow->operator[](LBRD) = txtwin(StringTable->operator[](STR_TXT7), LabelWindowCoords);
-	ValueWindow->operator[](LBRD) = txtrwin(StringTable->operator[](STR_EDG0 + edgeFillType), ValueWindowCoords);
+	(*LabelWindow)[LBRD] = txtwin((*StringTable)[STR_TXT7], LabelWindowCoords);
+	(*ValueWindow)[LBRD] = txtrwin((*StringTable)[STR_EDG0 + edgeFillType], ValueWindowCoords);
 	nxtlin();
 	if (edgeFillType) {
-		LabelWindow->operator[](LBRDCOL) = txtwin(StringTable->operator[](STR_TXT8), LabelWindowCoords);
-		ValueWindow->operator[](LBRDCOL)
-		    = numwin(fmt::format("{}", ((SelectedForm->borderColor & COLMSK) + 1)), ValueWindowCoords);
+		(*LabelWindow)[LBRDCOL] = txtwin((*StringTable)[STR_TXT8], LabelWindowCoords);
+		(*ValueWindow)[LBRDCOL] = numwin(fmt::format("{}", ((SelectedForm->borderColor & COLMSK) + 1)), ValueWindowCoords);
 		nxtlin();
 		if (EdgeArray[iEdge] & BESPAC) {
-			LabelWindow->operator[](LBRDSPAC) = txtwin(StringTable->operator[](STR_TXT9), LabelWindowCoords);
+			(*LabelWindow)[LBRDSPAC] = txtwin((*StringTable)[STR_TXT9], LabelWindowCoords);
 			if (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN)
 				choice = fmt::format("{:.2f}", (SelectedForm->edgeSpacing / PFGRAN));
 			else
 				choice = fmt::format("{:.2f}", (SelectedForm->edgeSpacing / PFGRAN * 2));
-			ValueWindow->operator[](LBRDSPAC) = numwin(choice, ValueWindowCoords);
+			(*ValueWindow)[LBRDSPAC] = numwin(choice, ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BPICSPAC) {
-			LabelWindow->operator[](LBRDPIC) = txtwin(StringTable->operator[](STR_TXT16), LabelWindowCoords);
-			ValueWindow->operator[](LBRDPIC)
-			    = numwin(fmt::format("{:.2f}", (SelectedForm->edgeSpacing / PFGRAN)), ValueWindowCoords);
+			(*LabelWindow)[LBRDPIC] = txtwin((*StringTable)[STR_TXT16], LabelWindowCoords);
+			(*ValueWindow)[LBRDPIC] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeSpacing / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BEMAX) {
-			LabelWindow->operator[](LMAXBRD) = txtwin(StringTable->operator[](STR_TXT22), LabelWindowCoords);
-			ValueWindow->operator[](LMAXBRD)
+			(*LabelWindow)[LMAXBRD] = txtwin((*StringTable)[STR_TXT22], LabelWindowCoords);
+			(*ValueWindow)[LMAXBRD]
 			    = numwin(fmt::format("{:.2f}", (SelectedForm->maxBorderStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BELEN) {
-			LabelWindow->operator[](LBRDLEN) = txtwin(StringTable->operator[](STR_TXT10), LabelWindowCoords);
-			ValueWindow->operator[](LBRDLEN)
-			    = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen / PFGRAN)), ValueWindowCoords);
+			(*LabelWindow)[LBRDLEN] = txtwin((*StringTable)[STR_TXT10], LabelWindowCoords);
+			(*ValueWindow)[LBRDLEN] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BEMIN) {
-			LabelWindow->operator[](LMINBRD) = txtwin(StringTable->operator[](STR_TXT23), LabelWindowCoords);
-			ValueWindow->operator[](LMINBRD)
+			(*LabelWindow)[LMINBRD] = txtwin((*StringTable)[STR_TXT23], LabelWindowCoords);
+			(*ValueWindow)[LMINBRD]
 			    = numwin(fmt::format("{:.2f}", (SelectedForm->minBorderStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BESIZ) {
-			LabelWindow->operator[](LBRDSIZ) = txtwin(StringTable->operator[](STR_TXT11), LabelWindowCoords);
-			ValueWindow->operator[](LBRDSIZ)
-			    = numwin(fmt::format("{:.2f}", (SelectedForm->borderSize / PFGRAN)), ValueWindowCoords);
+			(*LabelWindow)[LBRDSIZ] = txtwin((*StringTable)[STR_TXT11], LabelWindowCoords);
+			(*ValueWindow)[LBRDSIZ] = numwin(fmt::format("{:.2f}", (SelectedForm->borderSize / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BRDPOS) {
-			LabelWindow->operator[](LBRDPOS) = txtwin(StringTable->operator[](STR_TXT18), LabelWindowCoords);
-			ValueWindow->operator[](LBRDPOS) = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
+			(*LabelWindow)[LBRDPOS] = txtwin((*StringTable)[STR_TXT18], LabelWindowCoords);
+			(*ValueWindow)[LBRDPOS] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & CHNPOS) {
-			LabelWindow->operator[](LBRDPOS) = txtwin(StringTable->operator[](STR_TXT19), LabelWindowCoords);
-			ValueWindow->operator[](LBRDPOS) = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
+			(*LabelWindow)[LBRDPOS] = txtwin((*StringTable)[STR_TXT19], LabelWindowCoords);
+			(*ValueWindow)[LBRDPOS] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (edgeFillType == EDGEAPPL) {
-			LabelWindow->operator[](LAPCOL) = txtwin(StringTable->operator[](STR_TXT12), LabelWindowCoords);
-			ValueWindow->operator[](LAPCOL)
-			    = numwin(fmt::format("{}", ((SelectedForm->borderColor >> 4) + 1)), ValueWindowCoords);
+			(*LabelWindow)[LAPCOL] = txtwin((*StringTable)[STR_TXT12], LabelWindowCoords);
+			(*ValueWindow)[LAPCOL] = numwin(fmt::format("{}", ((SelectedForm->borderColor >> 4) + 1)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (edgeFillType == EDGEANGSAT || edgeFillType == EDGEAPPL || edgeFillType == EDGEPROPSAT) {
-			LabelWindow->operator[](LBRDUND) = txtwin(StringTable->operator[](STR_TXT17), LabelWindowCoords);
+			(*LabelWindow)[LBRDUND] = txtwin((*StringTable)[STR_TXT17], LabelWindowCoords);
 			if (SelectedForm->edgeType & EGUND)
-				choice = StringTable->operator[](STR_ON);
+				choice = (*StringTable)[STR_ON];
 			else
-				choice = StringTable->operator[](STR_OFF);
-			ValueWindow->operator[](LBRDUND) = numwin(choice, ValueWindowCoords);
+				choice = (*StringTable)[STR_OFF];
+			(*ValueWindow)[LBRDUND] = numwin(choice, ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BCNRSIZ) {
@@ -6382,24 +6363,24 @@ void refrmfn() {
 				choice = fmt::format("{:.2f}", (getblen() / PFGRAN));
 			else
 				choice = fmt::format("{:.2f}", (getplen() / PFGRAN));
-			LabelWindow->operator[](LBCSIZ) = txtwin(StringTable->operator[](STR_TXT13), LabelWindowCoords);
-			ValueWindow->operator[](LBCSIZ) = numwin(choice, ValueWindowCoords);
+			(*LabelWindow)[LBCSIZ] = txtwin((*StringTable)[STR_TXT13], LabelWindowCoords);
+			(*ValueWindow)[LBCSIZ] = numwin(choice, ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->type == FRMLINE && EdgeArray[iEdge] & BRDEND) {
-			LabelWindow->operator[](LBSTRT) = txtwin(StringTable->operator[](STR_TXT14), LabelWindowCoords);
+			(*LabelWindow)[LBSTRT] = txtwin((*StringTable)[STR_TXT14], LabelWindowCoords);
 			if (SelectedForm->attribute & SBLNT)
-				choice = StringTable->operator[](STR_BLUNT);
+				choice = (*StringTable)[STR_BLUNT];
 			else
-				choice = StringTable->operator[](STR_TAPR);
-			ValueWindow->operator[](LBSTRT) = numwin(choice, ValueWindowCoords);
+				choice = (*StringTable)[STR_TAPR];
+			(*ValueWindow)[LBSTRT] = numwin(choice, ValueWindowCoords);
 			nxtlin();
-			LabelWindow->operator[](LBFIN) = txtwin(StringTable->operator[](STR_TXT15), LabelWindowCoords);
+			(*LabelWindow)[LBFIN] = txtwin((*StringTable)[STR_TXT15], LabelWindowCoords);
 			if (SelectedForm->attribute & FBLNT)
-				choice = StringTable->operator[](STR_BLUNT);
+				choice = (*StringTable)[STR_BLUNT];
 			else
-				choice = StringTable->operator[](STR_TAPR);
-			ValueWindow->operator[](LBFIN) = numwin(choice, ValueWindowCoords);
+				choice = (*StringTable)[STR_TAPR];
+			(*ValueWindow)[LBFIN] = numwin(choice, ValueWindowCoords);
 			nxtlin();
 		}
 	}
@@ -7002,8 +6983,8 @@ HWND prfnwin(const std::string& text) noexcept {
 }
 
 void prflin(std::string msg, unsigned row) {
-	prftwin(StringTable->operator[](row));
-	ValueWindow->operator[](row - STR_PRF0) = prfnwin(msg);
+	prftwin((*StringTable)[row]);
+	(*ValueWindow)[row - STR_PRF0] = prfnwin(msg);
 	nxtlin();
 }
 
@@ -7039,8 +7020,8 @@ void prfmsg() {
 	}
 	LabelWindowSize.x = LabelWindowSize.y = 0;
 	ValueWindowSize.x = ValueWindowSize.y = 0;
-	maxtsiz(StringTable->operator[](STR_PRF0 + 4), LabelWindowSize);
-	maxtsiz(StringTable->operator[](STR_TAPR), ValueWindowSize);
+	maxtsiz((*StringTable)[STR_PRF0 + 4], LabelWindowSize);
+	maxtsiz((*StringTable)[STR_TAPR], ValueWindowSize);
 	LabelWindowSize.x = PreferenceWindowTextWidth;
 	LabelWindowSize.x += 4;
 	DestroyWindow(PreferencesWindow);
@@ -7075,28 +7056,28 @@ void prfmsg() {
 	prflin(fmt::format("{:.2f}", (IniFile.eggRatio)), STR_PRF26);
 	prflin(fmt::format("{:.2f}", (IniFile.fillAngle / PI * 180)), STR_PRF1);
 	if (UserFlagMap.test(UserFlag::SQRFIL))
-		choice = StringTable->operator[](STR_SQR);
+		choice = (*StringTable)[STR_SQR];
 	else
-		choice = StringTable->operator[](STR_PNTD);
+		choice = (*StringTable)[STR_PNTD];
 	prflin(choice, STR_PRF2);
 	prflin(fmt::format("{:.2f}", (LineSpacing / PFGRAN)), STR_PRF0);
 	prflin(fmt::format("{}", (duthrsh(ShowStitchThreshold))), STR_PRF7);
 	prflin(fmt::format("{:.2f} mm", (IniFile.gridSize / PFGRAN)), STR_PRF20);
 	sethup();
-	prflin(fmt::format("{}", StringTable->operator[](STR_HUP0 + IniFile.hoopType - 1)), STR_PRF17);
+	prflin(fmt::format("{}", (*StringTable)[STR_HUP0 + IniFile.hoopType - 1]), STR_PRF17);
 	prflin(fmt::format("{:.0f} mm", (IniFile.hoopSizeY / PFGRAN)), STR_PRF27);
 	prflin(fmt::format("{:.0f} mm", (IniFile.hoopSizeX / PFGRAN)), STR_PRF18);
 	prflin(fmt::format("{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);
 	prflin(fmt::format("{:.2f}", (PicotSpacing / PFGRAN)), STR_PRF16);
 	if (UserFlagMap.test(UserFlag::BLUNT))
-		choice = StringTable->operator[](STR_BLUNT);
+		choice = (*StringTable)[STR_BLUNT];
 	else
-		choice = StringTable->operator[](STR_TAPR);
+		choice = (*StringTable)[STR_TAPR];
 	prflin(choice, STR_PRF15);
 	if (UserFlagMap.test(UserFlag::DUND))
-		choice = StringTable->operator[](STR_ON);
+		choice = (*StringTable)[STR_ON];
 	else
-		choice = StringTable->operator[](STR_OFF);
+		choice = (*StringTable)[STR_OFF];
 	prflin(choice, STR_PRF19);
 	prflin(fmt::format("{:.2f}", (SmallStitchLength / PFGRAN)), STR_PRF9);
 	prflin(fmt::format("{:.2f}", (SnapLength / PFGRAN)), STR_PRF11);
@@ -7608,10 +7589,9 @@ void tomsg() {
 	SIZE textSize;
 
 	GetWindowRect(OKButton, &OKrect);
-	GetTextExtentPoint32(
-	    StitchWindowMemDC, StringTable->operator[](STR_DELST2).c_str(), StringTable->operator[](STR_DELST2).size(), &textSize);
+	GetTextExtentPoint32(StitchWindowMemDC, (*StringTable)[STR_DELST2].c_str(), (*StringTable)[STR_DELST2].size(), &textSize);
 	DeleteStitchesDialog = CreateWindow("STATIC",
-	                                    StringTable->operator[](STR_DELST2).c_str(),
+	                                    (*StringTable)[STR_DELST2].c_str(),
 	                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                    3,
 	                                    OKrect.bottom - StitchWindowOrigin.y + 6 + textSize.cy,
@@ -7624,8 +7604,8 @@ void tomsg() {
 }
 
 void sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish) {
-	dPOINT delta        = { (OutsidePoints->operator[](finish).x - OutsidePoints->operator[](start).x),
-                     (OutsidePoints->operator[](finish).y - OutsidePoints->operator[](start).y) };
+	dPOINT delta
+	    = { ((*OutsidePoints)[finish].x - (*OutsidePoints)[start].x), ((*OutsidePoints)[finish].y - (*OutsidePoints)[start].y) };
 	dPOINT point        = {};
 	VRCT2* verticalRect = &fillVerticalRect[start];
 
@@ -7633,100 +7613,100 @@ void sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish
 		Slope   = -delta.x / delta.y;
 		point.x = CurrentFormVertices[finish].x;
 		point.y = CurrentFormVertices[finish].y;
-		proj(point, Slope, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->dopnt);
-		proj(point, Slope, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->dipnt);
+		proj(point, Slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], &verticalRect->dopnt);
+		proj(point, Slope, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->dipnt);
 		point.x = CurrentFormVertices[start].x;
 		point.y = CurrentFormVertices[start].y;
-		proj(point, Slope, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->aopnt);
-		proj(point, Slope, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->aipnt);
-		point.x = InsidePoints->operator[](start).x;
-		point.y = InsidePoints->operator[](start).y;
-		if (proj(point, Slope, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->bopnt)) {
-			verticalRect->bipnt.x = InsidePoints->operator[](start).x;
-			verticalRect->bipnt.y = InsidePoints->operator[](start).y;
+		proj(point, Slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], &verticalRect->aopnt);
+		proj(point, Slope, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->aipnt);
+		point.x = (*InsidePoints)[start].x;
+		point.y = (*InsidePoints)[start].y;
+		if (proj(point, Slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], &verticalRect->bopnt)) {
+			verticalRect->bipnt.x = (*InsidePoints)[start].x;
+			verticalRect->bipnt.y = (*InsidePoints)[start].y;
 		}
 		else {
-			verticalRect->bopnt.x = OutsidePoints->operator[](start).x;
-			verticalRect->bopnt.y = OutsidePoints->operator[](start).y;
-			point.x               = OutsidePoints->              operator[](start).x;
-			point.y               = OutsidePoints->              operator[](start).y;
-			proj(point, Slope, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->bipnt);
+			verticalRect->bopnt.x = (*OutsidePoints)[start].x;
+			verticalRect->bopnt.y = (*OutsidePoints)[start].y;
+			point.x               = OutsidePoints->operator[](start).x;
+			point.y               = OutsidePoints->operator[](start).y;
+			proj(point, Slope, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->bipnt);
 		}
-		point.x = InsidePoints->operator[](finish).x;
-		point.y = InsidePoints->operator[](finish).y;
-		if (proj(point, Slope, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->copnt)) {
-			verticalRect->cipnt.x = InsidePoints->operator[](finish).x;
-			verticalRect->cipnt.y = InsidePoints->operator[](finish).y;
+		point.x = (*InsidePoints)[finish].x;
+		point.y = (*InsidePoints)[finish].y;
+		if (proj(point, Slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], &verticalRect->copnt)) {
+			verticalRect->cipnt.x = (*InsidePoints)[finish].x;
+			verticalRect->cipnt.y = (*InsidePoints)[finish].y;
 		}
 		else {
-			verticalRect->copnt.x = OutsidePoints->operator[](finish).x;
-			verticalRect->copnt.y = OutsidePoints->operator[](finish).y;
-			point.x               = OutsidePoints->              operator[](finish).x;
-			point.y               = OutsidePoints->              operator[](finish).y;
-			proj(point, Slope, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->cipnt);
+			verticalRect->copnt.x = (*OutsidePoints)[finish].x;
+			verticalRect->copnt.y = (*OutsidePoints)[finish].y;
+			point.x               = OutsidePoints->operator[](finish).x;
+			point.y               = OutsidePoints->operator[](finish).y;
+			proj(point, Slope, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->cipnt);
 		}
 	}
 	else {
 		if (delta.x) {
 			point.x = CurrentFormVertices[finish].x;
-			projv(point.x, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->dopnt);
-			projv(point.x, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->dipnt);
+			projv(point.x, (*OutsidePoints)[start], (*OutsidePoints)[finish], &verticalRect->dopnt);
+			projv(point.x, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->dipnt);
 			point.x = CurrentFormVertices[start].x;
-			projv(point.x, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->aopnt);
-			projv(point.x, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->aipnt);
-			point.x = InsidePoints->operator[](start).x;
-			if (projv(point.x, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->bopnt)) {
-				verticalRect->bipnt.x = InsidePoints->operator[](start).x;
-				verticalRect->bipnt.y = InsidePoints->operator[](start).y;
+			projv(point.x, (*OutsidePoints)[start], (*OutsidePoints)[finish], &verticalRect->aopnt);
+			projv(point.x, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->aipnt);
+			point.x = (*InsidePoints)[start].x;
+			if (projv(point.x, (*OutsidePoints)[start], (*OutsidePoints)[finish], &verticalRect->bopnt)) {
+				verticalRect->bipnt.x = (*InsidePoints)[start].x;
+				verticalRect->bipnt.y = (*InsidePoints)[start].y;
 			}
 			else {
-				verticalRect->bopnt.x = OutsidePoints->operator[](start).x;
-				verticalRect->bopnt.y = OutsidePoints->operator[](start).y;
-				point.x               = OutsidePoints->              operator[](start).x;
-				projv(point.x, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->bipnt);
+				verticalRect->bopnt.x = (*OutsidePoints)[start].x;
+				verticalRect->bopnt.y = (*OutsidePoints)[start].y;
+				point.x               = OutsidePoints->operator[](start).x;
+				projv(point.x, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->bipnt);
 			}
-			point.x = InsidePoints->operator[](finish).x;
-			if (projv(point.x, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->copnt)) {
-				verticalRect->cipnt.x = InsidePoints->operator[](finish).x;
-				verticalRect->cipnt.y = InsidePoints->operator[](finish).y;
+			point.x = (*InsidePoints)[finish].x;
+			if (projv(point.x, (*OutsidePoints)[start], (*OutsidePoints)[finish], &verticalRect->copnt)) {
+				verticalRect->cipnt.x = (*InsidePoints)[finish].x;
+				verticalRect->cipnt.y = (*InsidePoints)[finish].y;
 			}
 			else {
-				verticalRect->copnt.x = OutsidePoints->operator[](finish).x;
-				verticalRect->copnt.y = OutsidePoints->operator[](finish).y;
-				point.x               = OutsidePoints->              operator[](finish).x;
-				projv(point.x, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->cipnt);
+				verticalRect->copnt.x = (*OutsidePoints)[finish].x;
+				verticalRect->copnt.y = (*OutsidePoints)[finish].y;
+				point.x               = OutsidePoints->operator[](finish).x;
+				projv(point.x, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->cipnt);
 			}
 		}
 		else {
 			point.y = CurrentFormVertices[finish].y;
-			projh(point.y, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->dopnt);
-			projh(point.y, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->dipnt);
+			projh(point.y, (*OutsidePoints)[start], (*OutsidePoints)[finish], &verticalRect->dopnt);
+			projh(point.y, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->dipnt);
 			point.y = CurrentFormVertices[start].y;
-			projh(point.y, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->aopnt);
-			projh(point.y, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->aipnt);
-			point.y = InsidePoints->operator[](start).y;
-			if (projh(point.y, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->bopnt)) {
-				verticalRect->bipnt.x = InsidePoints->operator[](start).x;
-				verticalRect->bipnt.y = InsidePoints->operator[](start).y;
+			projh(point.y, (*OutsidePoints)[start], (*OutsidePoints)[finish], &verticalRect->aopnt);
+			projh(point.y, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->aipnt);
+			point.y = (*InsidePoints)[start].y;
+			if (projh(point.y, (*OutsidePoints)[start], (*OutsidePoints)[finish], &verticalRect->bopnt)) {
+				verticalRect->bipnt.x = (*InsidePoints)[start].x;
+				verticalRect->bipnt.y = (*InsidePoints)[start].y;
 			}
 			else {
-				verticalRect->bopnt.x = OutsidePoints->operator[](start).x;
-				verticalRect->bopnt.y = OutsidePoints->operator[](start).y;
-				point.y               = OutsidePoints->              operator[](start).y;
-				projh(point.y, InsidePoints->operator[](start), InsidePoints->operator[](finish), &verticalRect->bipnt);
+				verticalRect->bopnt.x = (*OutsidePoints)[start].x;
+				verticalRect->bopnt.y = (*OutsidePoints)[start].y;
+				point.y               = OutsidePoints->operator[](start).y;
+				projh(point.y, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->bipnt);
 			}
-			point.y = InsidePoints->operator[](finish).y;
-			if (projh(point.y, OutsidePoints->operator[](start), OutsidePoints->operator[](finish), &verticalRect->copnt)) {
-				verticalRect->cipnt.x = InsidePoints->operator[](finish).x;
-				verticalRect->cipnt.y = InsidePoints->operator[](finish).y;
+			point.y = (*InsidePoints)[finish].y;
+			if (projh(point.y, (*OutsidePoints)[start], (*OutsidePoints)[finish], &verticalRect->copnt)) {
+				verticalRect->cipnt.x = (*InsidePoints)[finish].x;
+				verticalRect->cipnt.y = (*InsidePoints)[finish].y;
 			}
 			else {
-				verticalRect->copnt.x = OutsidePoints->operator[](finish).x;
-				verticalRect->copnt.y = OutsidePoints->operator[](finish).y;
-				point.y               = OutsidePoints->              operator[](finish).y;
-				projh(OutsidePoints->operator[](finish).y,
-				      InsidePoints-> operator[](start),
-				      InsidePoints-> operator[](finish),
+				verticalRect->copnt.x = (*OutsidePoints)[finish].x;
+				verticalRect->copnt.y = (*OutsidePoints)[finish].y;
+				point.y               = OutsidePoints->operator[](finish).y;
+				projh((*OutsidePoints)[finish].y,
+				      InsidePoints->operator[](start),
+				      InsidePoints->operator[](finish),
 				      &verticalRect->cipnt);
 			}
 		}
@@ -7889,8 +7869,8 @@ void duspnd(std::vector<VRCT2>& underlayVerticalRect, std::vector<VRCT2>& fillVe
 			delta.y = underlayVerticalRect[finish].bipnt.y - underlayVerticalRect[start].cipnt.y;
 			length  = hypot(delta.x, delta.y);
 			if (length > SelectedForm->edgeStitchLen) {
-				angle   = atan2(InsidePoints->operator[](finish).y - OutsidePoints->operator[](finish).y,
-                              InsidePoints->operator[](finish).x - OutsidePoints->operator[](finish).x);
+				angle   = atan2((*InsidePoints)[finish].y - (*OutsidePoints)[finish].y,
+                              (*InsidePoints)[finish].x - (*OutsidePoints)[finish].x);
 				point.x = underlayVerticalRect[finish].bopnt.x + cos(angle) * HorizontalLength2;
 				point.y = underlayVerticalRect[finish].bopnt.y + sin(angle) * HorizontalLength2;
 				filinsb(point);
@@ -7905,8 +7885,8 @@ void duspnd(std::vector<VRCT2>& underlayVerticalRect, std::vector<VRCT2>& fillVe
 			delta.y = underlayVerticalRect[finish].bopnt.y - underlayVerticalRect[start].copnt.y;
 			length  = hypot(delta.x, delta.y);
 			if (length > SelectedForm->edgeStitchLen) {
-				angle   = atan2(OutsidePoints->operator[](finish).y - InsidePoints->operator[](finish).y,
-                              OutsidePoints->operator[](finish).x - InsidePoints->operator[](finish).x);
+				angle   = atan2((*OutsidePoints)[finish].y - (*InsidePoints)[finish].y,
+                              (*OutsidePoints)[finish].x - (*InsidePoints)[finish].x);
 				point.x = underlayVerticalRect[finish].bipnt.x + cos(angle) * HorizontalLength2;
 				point.y = underlayVerticalRect[finish].bipnt.y + sin(angle) * HorizontalLength2;
 				filinsb(point);
@@ -8024,8 +8004,8 @@ void plbrd(double edgeSpacing) {
 	std::vector<VRCT2> underlayVerticalRect(VertexCount + 3);
 	prebrd();
 	satout(SelectedForm->borderSize);
-	InsidePoints->push_back(InsidePoints->operator[](0));
-	OutsidePoints->push_back(OutsidePoints->operator[](0));
+	InsidePoints->push_back((*InsidePoints)[0]);
+	OutsidePoints->push_back((*OutsidePoints)[0]);
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		sprct(fillVerticalRect, iVertex, iVertex + 1);
 		spurct(underlayVerticalRect, fillVerticalRect, iVertex);
@@ -8169,10 +8149,10 @@ void tglfrm() {
 		satfix();
 	StateMap.reset(StateFlag::HIDSTCH);
 	if (StateMap.testAndFlip(StateFlag::FRMOF)) {
-		FormOnOff->assign(StringTable->operator[](STR_FRMPLUS));
+		FormOnOff->assign((*StringTable)[STR_FRMPLUS]);
 	}
 	else {
-		FormOnOff->assign(StringTable->operator[](STR_FRMINUS));
+		FormOnOff->assign((*StringTable)[STR_FRMINUS]);
 		StateMap.reset(StateFlag::FORMSEL);
 		StateMap.reset(StateFlag::FORMIN);
 		StateMap.reset(StateFlag::MOVFRM);
@@ -8194,7 +8174,7 @@ void tglfrm() {
 void frmon() {
 	unbsho();
 	StateMap.reset(StateFlag::FRMOF);
-	FormOnOff->assign(StringTable->operator[](STR_FRMPLUS));
+	FormOnOff->assign((*StringTable)[STR_FRMPLUS]);
 	SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, MenuInfo);
 	StateMap.set(StateFlag::DUMEN);
 }
@@ -9137,12 +9117,12 @@ void bhcrnr(unsigned vertex) {
 	double         length = 0.0, ratio = 0.0;
 
 	if (StateMap.test(StateFlag::INDIR)) {
-		delta.x = OutsidePoints->operator[](nextVertex).x - CurrentFormVertices[nextVertex].x;
-		delta.y = OutsidePoints->operator[](nextVertex).y - CurrentFormVertices[nextVertex].y;
+		delta.x = (*OutsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x;
+		delta.y = (*OutsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y;
 	}
 	else {
-		delta.x = InsidePoints->operator[](nextVertex).x - CurrentFormVertices[nextVertex].x;
-		delta.y = InsidePoints->operator[](nextVertex).y - CurrentFormVertices[nextVertex].y;
+		delta.x = (*InsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x;
+		delta.y = (*InsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y;
 	}
 	length = hypot(delta.x, delta.y);
 	ratio  = ButtonholeCornerLength / length;
@@ -9236,7 +9216,7 @@ void fcntr() {
 
 	if (SelectedFormList->size()) {
 		savdo();
-		auto firstForm = SelectedFormList->operator[](0);
+		auto firstForm = (*SelectedFormList)[0];
 		initialCenter.x
 		    = (FormList[firstForm].rectangle.right - FormList[firstForm].rectangle.left) / 2 + FormList[firstForm].rectangle.left;
 		initialCenter.y = (FormList[firstForm].rectangle.top - FormList[firstForm].rectangle.bottom) / 2
@@ -9288,12 +9268,12 @@ void clpcrnr(std::vector<fPOINT> clipFillData, unsigned vertex, const dPOINT& ro
 	fPOINTATTR     referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
 
 	if (StateMap.test(StateFlag::INDIR)) {
-		delta.x = OutsidePoints->operator[](nextVertex).x - CurrentFormVertices[nextVertex].x;
-		delta.y = OutsidePoints->operator[](nextVertex).y - CurrentFormVertices[nextVertex].y;
+		delta.x = (*OutsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x;
+		delta.y = (*OutsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y;
 	}
 	else {
-		delta.x = InsidePoints->operator[](nextVertex).x - CurrentFormVertices[nextVertex].x;
-		delta.y = InsidePoints->operator[](nextVertex).y - CurrentFormVertices[nextVertex].y;
+		delta.x = (*InsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x;
+		delta.y = (*InsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y;
 	}
 	const double rotationAngle = atan2(delta.y, delta.x) + PI / 2;
 	rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
@@ -9710,27 +9690,27 @@ void ribon() {
 						isBlunt = 0;
 					satends(isBlunt);
 					formHeader->vertices                 = adflt(VertexCount << 1);
-					formHeader->vertices[0].x            = OutsidePoints->           operator[](0).x;
-					formHeader->vertices[iNewVertex++].y = OutsidePoints->operator[](0).y;
+					formHeader->vertices[0].x            = OutsidePoints->operator[](0).x;
+					formHeader->vertices[iNewVertex++].y = (*OutsidePoints)[0].y;
 					for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-						formHeader->vertices[iNewVertex++] = InsidePoints->operator[](iVertex);
+						formHeader->vertices[iNewVertex++] = (*InsidePoints)[iVertex];
 					}
 					for (iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
-						formHeader->vertices[iNewVertex++] = OutsidePoints->operator[](iVertex);
+						formHeader->vertices[iNewVertex++] = (*OutsidePoints)[iVertex];
 					}
 				}
 				else {
 					formHeader->vertices                 = adflt((VertexCount << 1) + 2);
-					formHeader->vertices[0].x            = OutsidePoints->           operator[](0).x;
-					formHeader->vertices[iNewVertex++].y = OutsidePoints->operator[](0).y;
+					formHeader->vertices[0].x            = OutsidePoints->operator[](0).x;
+					formHeader->vertices[iNewVertex++].y = (*OutsidePoints)[0].y;
 					formHeader->underlayIndent           = IniFile.underlayIndent;
 					for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-						formHeader->vertices[iNewVertex++] = InsidePoints->operator[](iVertex);
+						formHeader->vertices[iNewVertex++] = (*InsidePoints)[iVertex];
 					}
-					formHeader->vertices[iNewVertex++] = InsidePoints-> operator[](0);
-					formHeader->vertices[iNewVertex++] = OutsidePoints->operator[](0);
+					formHeader->vertices[iNewVertex++] = InsidePoints->operator[](0);
+					formHeader->vertices[iNewVertex++] = (*OutsidePoints)[0];
 					for (iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
-						formHeader->vertices[iNewVertex++] = OutsidePoints->operator[](iVertex);
+						formHeader->vertices[iNewVertex++] = (*OutsidePoints)[iVertex];
 					}
 				}
 				formHeader->type                       = SAT;
@@ -10038,7 +10018,7 @@ void dufcntr(dPOINT* center) {
 	fRECTANGLE* formRect = nullptr;
 	fRECTANGLE  bigRect  = {};
 
-	formRect       = &FormList[SelectedFormList->operator[](0)].rectangle;
+	formRect       = &FormList[(*SelectedFormList)[0]].rectangle;
 	bigRect.left   = formRect->left;
 	bigRect.right  = formRect->right;
 	bigRect.top    = formRect->top;
@@ -11389,7 +11369,7 @@ void angclpfn(std::vector<RNGCNT>& textureSegments) {
 		rotationAngle                         = PI / 2 - SelectedForm->underlayStitchAngle;
 		const std::vector<fPOINT>* vertexList = insid();
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
-			AngledFormVertices[iVertex] = vertexList->operator[](iVertex);
+			AngledFormVertices[iVertex] = (*vertexList)[iVertex];
 			rotflt(AngledFormVertices[iVertex], rotationAngle, rotationCenter);
 		}
 	}
@@ -11861,12 +11841,12 @@ void dufxlen(std::vector<fPOINT>& chainEndPoints) {
 	std::vector<double> listCOSINEs;
 	listCOSINEs.reserve(VertexCount);
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-		listSINEs.push_back(sin(FormAngles->operator[](iVertex)));
-		listCOSINEs.push_back(cos(FormAngles->operator[](iVertex)));
+		listSINEs.push_back(sin((*FormAngles)[iVertex]));
+		listCOSINEs.push_back(cos((*FormAngles)[iVertex]));
 	}
-	listSINEs.push_back(sin((FormAngles->operator[](0) > FormAngles->operator[](VertexCount - 1))
-	                            ? (FormAngles->operator[](0) - FormAngles->operator[](VertexCount - 1))
-	                            : (FormAngles->operator[](VertexCount - 1) - FormAngles->operator[](0))));
+	listSINEs.push_back(sin(((*FormAngles)[0] > (*FormAngles)[VertexCount - 1])
+	                            ? ((*FormAngles)[0] - (*FormAngles)[VertexCount - 1])
+	                            : ((*FormAngles)[VertexCount - 1] - (*FormAngles)[0])));
 	fxlen(chainEndPoints, listSINEs, listCOSINEs);
 }
 
