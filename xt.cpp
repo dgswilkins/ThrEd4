@@ -3295,7 +3295,7 @@ void ed2stch(fPOINT* pt) noexcept {
 void dutxlin(fPOINT point0, fPOINT point1) {
 	double slope  = 0.0;
 	float  deltaX = 0.0;
-	float  start = 0.0, finish = 0.0, swap = 0.0, yOffset = 0.0;
+	float  start = 0.0, finish = 0.0, yOffset = 0.0;
 	int    integerStart = 0, integerFinish = 0;
 
 	ed2stch(&point0);
@@ -3307,9 +3307,7 @@ void dutxlin(fPOINT point0, fPOINT point1) {
 	start  = point0.x;
 	finish = point1.x;
 	if (start > finish) {
-		swap   = start;
-		start  = finish;
-		finish = swap;
+		std::swap(start, finish);
 	}
 	integerStart  = ceil(start / TextureScreen.spacing);
 	integerFinish = floor(finish / TextureScreen.spacing);

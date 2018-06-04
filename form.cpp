@@ -2074,7 +2074,7 @@ void bold(double size) noexcept {
 
 // find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
 bool projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT* intersection) noexcept {
-	double       swap = 0.0, slope = 0.0;
+	double       slope = 0.0;
 	const double deltaX = upperPoint.x - lowerPoint.x;
 
 	intersection->x = xCoordinate;
@@ -2083,9 +2083,7 @@ bool projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT* int
 		slope           = (upperPoint.y - lowerPoint.y) / deltaX;
 		intersection->y = (xCoordinate - lowerPoint.x) * slope + lowerPoint.y;
 		if (lowerPoint.x > upperPoint.x) {
-			swap         = lowerPoint.x;
-			lowerPoint.x = upperPoint.x;
-			upperPoint.x = swap;
+			std::swap(lowerPoint.x, upperPoint.x);
 		}
 		if (xCoordinate < lowerPoint.x || xCoordinate > upperPoint.x)
 			return false;
@@ -2098,7 +2096,7 @@ bool projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT* int
 
 // find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
 bool projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersection) noexcept {
-	double       swap = 0.0, slope = 0.0;
+	double       slope = 0.0;
 	const double deltaX = point1.x - point0.x;
 	double       deltaY = 0.0;
 
@@ -2115,9 +2113,7 @@ bool projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersectio
 	else
 		intersection->x = point0.x;
 	if (point0.y > point1.y) {
-		swap     = point0.y;
-		point0.y = point1.y;
-		point1.y = swap;
+		std::swap(point0.y, point1.y);
 	}
 	if (yCoordinate < point0.y || yCoordinate > point1.y)
 		return false;
@@ -2525,7 +2521,7 @@ constexpr unsigned prv(unsigned iVertex) {
 bool proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* intersectionPoint) noexcept {
 	dPOINT delta     = {};
 	double sideSlope = 0.0, pointConstant = 0.0, sideConstant = 0.0, xMinimum = 0.0;
-	double xMaximum = 0.0, yMinimum = 0.0, yMaximum = 0.0, swap = 0.0;
+	double xMaximum = 0.0, yMinimum = 0.0, yMaximum = 0.0;
 
 	delta.x = point1.x - point0.x;
 	delta.y = point1.y - point0.y;
@@ -2544,17 +2540,13 @@ bool proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* inte
 	xMinimum = point0.x;
 	xMaximum = point1.x;
 	if (xMinimum > xMaximum) {
-		swap     = xMinimum;
-		xMinimum = xMaximum;
-		xMaximum = swap;
+		std::swap(xMinimum, xMaximum);
 	}
 	if (delta.y) {
 		yMinimum = point0.y;
 		yMaximum = point1.y;
 		if (yMinimum > yMaximum) {
-			swap     = yMinimum;
-			yMinimum = yMaximum;
-			yMaximum = swap;
+			std::swap(yMinimum, yMaximum);
 		}
 		if (intersectionPoint->x <= xMinimum || intersectionPoint->x > xMaximum || intersectionPoint->y < yMinimum
 		    || intersectionPoint->y > yMaximum)
@@ -4313,9 +4305,10 @@ void satclos() {
 		SelectedForm->fillType = CONTF;
 		closestVertex          = ClosestVertexToCursor;
 		if (StartPoint > closestVertex) {
+			//std::swap(closestVertex, StartPoint);
 			swap          = closestVertex;
 			closestVertex = StartPoint;
-			StartPoint    = swap;
+			StartPoint    = gsl::narrow<unsigned short>(swap);
 		}
 		if (!StartPoint)
 			StartPoint++;
@@ -4342,9 +4335,7 @@ void satclos() {
 	}
 	else {
 		if (ClosestVertexToCursor < closestVertex) {
-			swap                  = ClosestVertexToCursor;
-			ClosestVertexToCursor = closestVertex;
-			closestVertex         = swap;
+			std::swap(ClosestVertexToCursor, closestVertex);
 		}
 		if (closestVertex == 0 && ClosestVertexToCursor == VertexCount - 1) {
 			closestVertex         = VertexCount - 1;
@@ -8181,14 +8172,11 @@ void frmon() {
 
 void fnord() {
 	int    iVertex   = 0;
-	fPOINT swapPoint = {};
 
 	fvars(ClosestFormToCursor);
 	SelectedForm = &FormList[ClosestFormToCursor];
 	for (iVertex = 0; iVertex<SelectedForm->vertexCount>> 1; iVertex++) {
-		swapPoint                       = SelectedForm->vertices[iVertex];
-		SelectedForm->vertices[iVertex] = SelectedForm->vertices[SelectedForm->vertexCount - iVertex - 1];
-		SelectedForm->vertices[SelectedForm->vertexCount - iVertex - 1] = swapPoint;
+		std::swap(SelectedForm->vertices[iVertex], SelectedForm->vertices[SelectedForm->vertexCount - iVertex - 1]);
 	}
 	refil();
 }
@@ -8196,8 +8184,6 @@ void fnord() {
 void flpord() {
 	int        iStitch = 0;
 	unsigned   iVertex = 0, iForward = 0, start = 0, finish = 0;
-	fPOINT     swapPoint  = {};
-	fPOINTATTR swapStitch = {};
 
 	fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
@@ -8205,9 +8191,7 @@ void flpord() {
 		start  = SelectedFormVertices.start;
 		finish = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % VertexCount;
 		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount >> 1; iVertex++) {
-			swapPoint                      = SelectedForm->vertices[start];
-			SelectedForm->vertices[start]  = SelectedForm->vertices[finish];
-			SelectedForm->vertices[finish] = swapPoint;
+			std::swap(SelectedForm->vertices[start], SelectedForm->vertices[finish]);
 			start                          = pdir(start);
 			StateMap.flip(StateFlag::PSELDIR);
 			finish = pdir(finish);
@@ -8238,9 +8222,7 @@ void flpord() {
 				rngadj();
 				iForward = GroupStartStitch;
 				for (iStitch = 0; iStitch < (gsl::narrow<signed>(GroupEndStitch - GroupStartStitch) >> 1) + 1; iStitch++) {
-					swapStitch                             = StitchBuffer[iForward];
-					StitchBuffer[iForward]                 = StitchBuffer[GroupEndStitch - iStitch];
-					StitchBuffer[GroupEndStitch - iStitch] = swapStitch;
+					std::swap(StitchBuffer[iForward], StitchBuffer[GroupEndStitch - iStitch]);
 					iForward++;
 				}
 				coltab();
@@ -8442,7 +8424,7 @@ void nxtim() noexcept {
 }
 
 void snp(unsigned start, unsigned finish) {
-	unsigned iColumn = 0, iStitch = 0, swap = 0, accumulator = 0, checkLength = 0, attribute = 0;
+	unsigned iColumn = 0, iStitch = 0, value = 0, accumulator = 0, checkLength = 0, attribute = 0;
 	fPOINT   range = {};
 
 	chkrng(&range);
@@ -8465,9 +8447,9 @@ void snp(unsigned start, unsigned finish) {
 	}
 	accumulator = 0;
 	for (iColumn = 0; iColumn < range.x; iColumn++) {
-		swap                = xHistogram[iColumn];
+		value               = xHistogram[iColumn];
 		xHistogram[iColumn] = accumulator;
-		accumulator += swap;
+		accumulator += value;
 	}
 	xHistogram[iColumn] = accumulator;
 	if (StateMap.test(StateFlag::FORMSEL)) {
@@ -9961,7 +9943,7 @@ constexpr unsigned duat(unsigned attribute) {
 }
 
 void srtf(std::vector<fPOINTATTR>& tempStitchBuffer, unsigned start, unsigned finish) {
-	unsigned iForm = 0, iStitch = 0, stitchAccumulator = 0, swap = 0;
+	unsigned iForm = 0, iStitch = 0, stitchAccumulator = 0, value = 0;
 
 	if (start != finish) {
 		std::vector<unsigned> stitchHistogram(FormIndex << 2);
@@ -9969,9 +9951,9 @@ void srtf(std::vector<fPOINTATTR>& tempStitchBuffer, unsigned start, unsigned fi
 			stitchHistogram[duat(tempStitchBuffer[iStitch].attribute)]++;
 		stitchAccumulator = start;
 		for (iForm = 0; iForm < FormIndex << 2; iForm++) {
-			swap                   = stitchHistogram[iForm];
+			value                   = stitchHistogram[iForm];
 			stitchHistogram[iForm] = stitchAccumulator;
-			stitchAccumulator += swap;
+			stitchAccumulator += value;
 		}
 		for (iStitch = start; iStitch < finish; iStitch++) {
 			StitchBuffer[stitchHistogram[duat(tempStitchBuffer[iStitch].attribute)]++] = tempStitchBuffer[iStitch];
@@ -9980,7 +9962,7 @@ void srtf(std::vector<fPOINTATTR>& tempStitchBuffer, unsigned start, unsigned fi
 }
 
 void srtbyfrm() {
-	unsigned              iStitch = 0, iColor = 0, colorAccumulator = 0, swap = 0;
+	unsigned              iStitch = 0, iColor = 0, colorAccumulator = 0, value = 0;
 	std::vector<unsigned> colorHistogram(16);
 	std::vector<unsigned> color(16);
 
@@ -9996,9 +9978,9 @@ void srtbyfrm() {
 			colorHistogram[color[StitchBuffer[iStitch].attribute & 0xf]]++;
 		colorAccumulator = 0;
 		for (iColor = 0; iColor < 16; iColor++) {
-			swap                   = colorHistogram[iColor];
+			value                   = colorHistogram[iColor];
 			colorHistogram[iColor] = colorAccumulator;
-			colorAccumulator += swap;
+			colorAccumulator += value;
 		}
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			tempStitchBuffer[colorHistogram[color[StitchBuffer[iStitch].attribute & 0xf]]++] = StitchBuffer[iStitch];
