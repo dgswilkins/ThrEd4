@@ -123,9 +123,8 @@ extern void     chan();
 extern void     chgchk(int code);
 extern void     chgwrn();
 extern void     chkcont();
-extern unsigned chkfrm();
+extern unsigned chkfrm(std::vector<POINT>& stretchBoxLine);
 extern unsigned closfrm();
-extern void     clRmap(unsigned mapSize);
 extern void     clpfil();
 extern void     clrfills();
 extern void     clrstch();
@@ -9020,8 +9019,9 @@ void strtchbox(std::vector<POINT>& stretchBoxLine) noexcept {
 }
 
 void unstrtch(std::vector<POINT>& stretchBoxLine) {
-	if (StateMap.testAndReset(StateFlag::SHOSTRTCH))
+	if (StateMap.testAndReset(StateFlag::SHOSTRTCH)) {
 		strtchbox(stretchBoxLine);
+	}
 }
 
 bool chkbig(std::vector<POINT>& stretchBoxLine) {
@@ -14941,7 +14941,7 @@ unsigned chkMsg() {
 			return 1;
 		}
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			if (!StateMap.test(StateFlag::FRMROT) && chkfrm())
+			if (!StateMap.test(StateFlag::FRMROT) && chkfrm(stretchBoxLine))
 				return 1;
 		}
 		if (StateMap.testAndReset(StateFlag::MOVFRM)) {

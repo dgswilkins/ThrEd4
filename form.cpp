@@ -3854,7 +3854,7 @@ void setmfrm() noexcept {
 	FormLines[iForm] = FormLines[0];
 }
 
-unsigned chkfrm() {
+unsigned chkfrm(std::vector<POINT>& stretchBoxLine) {
 	fvars(ClosestFormToCursor);
 
 	POINT    point      = { (Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y) };
@@ -3881,7 +3881,6 @@ unsigned chkfrm() {
 		}
 		if (minimumLength < CLOSENUF) {
 			ritfrct(ClosestFormToCursor, StitchWindowDC);
-			std::vector<POINT> stretchBoxLine(5);
 			for (iControl = 0; iControl < 4; iControl++) {
 				stretchBoxLine[iControl] = formControls[iControl << 1];
 			}
