@@ -8192,7 +8192,7 @@ void flpord() {
 		finish = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % VertexCount;
 		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount >> 1; iVertex++) {
 			std::swap(SelectedForm->vertices[start], SelectedForm->vertices[finish]);
-			start                          = pdir(start);
+			start = pdir(start);
 			StateMap.flip(StateFlag::PSELDIR);
 			finish = pdir(finish);
 			StateMap.flip(StateFlag::PSELDIR);

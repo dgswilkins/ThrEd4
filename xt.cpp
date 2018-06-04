@@ -3426,15 +3426,9 @@ void txtrup() {
 			ed2txp(offset, &lowestTexturePoint);
 			if (highestTexturePoint.line < lowestTexturePoint.line) {
 				std::swap(highestTexturePoint.line, lowestTexturePoint.line);
-				//swap                     = highestTexturePoint.line;
-				//highestTexturePoint.line = lowestTexturePoint.line;
-				//lowestTexturePoint.line  = swap;
 			}
 			if (highestTexturePoint.y < lowestTexturePoint.y) {
 				std::swap(highestTexturePoint.y, lowestTexturePoint.y);
-				//swap                  = highestTexturePoint.y;
-				//highestTexturePoint.y = lowestTexturePoint.y;
-				//lowestTexturePoint.y  = swap;
 			}
 			SelectedTexturePointsList->clear();
 			for (iPoint = 0; iPoint < TempTexturePoints->size(); iPoint++) {

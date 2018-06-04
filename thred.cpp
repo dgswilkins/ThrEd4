@@ -13620,9 +13620,6 @@ unsigned chkMsg() {
 							if (StateMap.testAndReset(StateFlag::FORMSEL) && TmpFormIndex != ClosestFormToCursor) {
 								if (TmpFormIndex > ClosestFormToCursor) {
 									std::swap(ClosestFormToCursor, TmpFormIndex);
-									// auto swap           = ClosestFormToCursor;
-									// ClosestFormToCursor = TmpFormIndex;
-									// TmpFormIndex        = swap;
 								}
 								for (iForm = TmpFormIndex; iForm <= ClosestFormToCursor; iForm++) {
 									SelectedFormList->push_back(iForm);
