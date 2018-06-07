@@ -1901,10 +1901,9 @@ void dudat() {
 	undoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);
 	backupData                       = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
 	if (backupData) {
-		backupData->zoomRect.x = UnzoomedRect.x;
-		backupData->zoomRect.y = UnzoomedRect.y;
-		backupData->formCount  = FormIndex;
-		backupData->forms      = convert_ptr<FRMHED*>(&backupData[1]);
+		backupData->zoomRect  = UnzoomedRect;
+		backupData->formCount = FormIndex;
+		backupData->forms     = convert_ptr<FRMHED*>(&backupData[1]);
 		//		for(unsigned iStitch=0;iStitch<FormIndex;iStitch++)
 		//			frmcpy(&backupData->forms[iStitch],&FormList[iStitch]);
 		MoveMemory(backupData->forms, &FormList, sizeof(FRMHED) * FormIndex);
@@ -2938,9 +2937,9 @@ void sidmsg(HWND window, std::string* strings, unsigned entries) {
 		unsigned iEntry = 0, entryCount = entries;
 
 		std::fill(ValueWindow->begin(), ValueWindow->end(), nullptr);
-		SideWindowSize.x = SideWindowSize.y = 0;
-		SideWindowLocation                  = 0;
-		SideWindowsStrings                  = strings;
+		SideWindowSize     = {};
+		SideWindowLocation = 0;
+		SideWindowsStrings = strings;
 		GetWindowRect(window, &childListRect);
 		GetWindowRect(FormDataSheet, &parentListRect);
 		ispcdclp();
@@ -3730,9 +3729,8 @@ void redbak() {
 		PCSHeader.stitchCount = undoData->stitchCount;
 		if (PCSHeader.stitchCount)
 			stchred((sizeof(fPOINTATTR) * PCSHeader.stitchCount) >> 2, undoData->stitches);
-		UnzoomedRect.x = undoData->zoomRect.x;
-		UnzoomedRect.y = undoData->zoomRect.y;
-		FormIndex      = undoData->formCount;
+		UnzoomedRect = undoData->zoomRect;
+		FormIndex    = undoData->formCount;
 		//	for(nextBufferIndex=0;nextBufferIndex<FormIndex;nextBufferIndex++)
 		//		frmcpy(&FormList[nextBufferIndex],&undoData->forms[nextBufferIndex]);
 		MoveMemory(&FormList, undoData->forms, sizeof(FRMHED) * FormIndex);
@@ -4149,9 +4147,9 @@ void dstran(std::vector<DSTREC>& DSTData) {
 		color = colmatch(colors[iColor++]);
 	else
 		color = 0;
-	localStitch.x = localStitch.y = 0;
-	maximumCoordinate.x = maximumCoordinate.y = -1e12f;
-	mimimumCoordinate.x = mimimumCoordinate.y = 1e12f;
+	localStitch       = {};
+	maximumCoordinate = { -1e12f, -1e12f };
+	mimimumCoordinate = { 1e12f, 1e12f };
 	for (iRecord = 0; iRecord < DSTData.size(); iRecord++) {
 		if (DSTData[iRecord].nd & 0x40) {
 			if (bytesRead >= ((iColor + 1) * sizeof(colors[0])))
@@ -4967,7 +4965,7 @@ bool pcshup(std::vector<fPOINTATTR>& stitches) {
 			hoopSize.y         = SHUPY;
 		}
 	}
-	delta.x = delta.y = 0;
+	delta = {};
 	if (boundingRect.right > hoopSize.x)
 		delta.x = hoopSize.x - boundingRect.right;
 	if (boundingRect.top > hoopSize.y)
@@ -5533,8 +5531,7 @@ unsigned px2stch() noexcept {
 }
 
 void shft2box() noexcept {
-	SelectedPoint.x = StitchBuffer[ClosestPointIndex].x;
-	SelectedPoint.y = StitchBuffer[ClosestPointIndex].y;
+	SelectedPoint = StitchBuffer[ClosestPointIndex];
 	shft(SelectedPoint);
 	stch2px1(ClosestPointIndex);
 }
@@ -5553,8 +5550,7 @@ void zumin() {
 	if (!StateMap.testAndReset(StateFlag::BZUMIN)) {
 		do {
 			if (StateMap.test(StateFlag::GMRK)) {
-				SelectedPoint.x = ZoomMarkPoint.x;
-				SelectedPoint.y = ZoomMarkPoint.y;
+				SelectedPoint = ZoomMarkPoint;
 				break;
 			}
 			if (StateMap.test(StateFlag::FORMSEL)) {
@@ -5568,8 +5564,7 @@ void zumin() {
 				break;
 			}
 			if (StateMap.test(StateFlag::SELBOX)) {
-				SelectedPoint.x = StitchBuffer[ClosestPointIndex].x;
-				SelectedPoint.y = StitchBuffer[ClosestPointIndex].y;
+				SelectedPoint = StitchBuffer[ClosestPointIndex];
 				break;
 			}
 			if (StateMap.test(StateFlag::GRPSEL)) {
@@ -5581,12 +5576,10 @@ void zumin() {
 			if (StateMap.test(StateFlag::INSRT)) {
 				if (StateMap.test(StateFlag::LIN1)) {
 					if (StateMap.test(StateFlag::BAKEND)) {
-						SelectedPoint.x = StitchBuffer[PCSHeader.stitchCount - 1].x;
-						SelectedPoint.y = StitchBuffer[PCSHeader.stitchCount - 1].y;
+						SelectedPoint = StitchBuffer[PCSHeader.stitchCount - 1];
 					}
 					else {
-						SelectedPoint.x = StitchBuffer[0].x;
-						SelectedPoint.y = StitchBuffer[0].y;
+						SelectedPoint = StitchBuffer[0];
 					}
 				}
 				else {
@@ -5685,8 +5678,7 @@ void zumout() {
 	if (StateMap.test(StateFlag::ZUMED)) {
 		do {
 			if (StateMap.test(StateFlag::GMRK)) {
-				SelectedPoint.x = ZoomMarkPoint.x;
-				SelectedPoint.y = ZoomMarkPoint.y;
+				SelectedPoint = ZoomMarkPoint;
 				break;
 			}
 			if (StateMap.test(StateFlag::FORMSEL)) {
@@ -5700,8 +5692,7 @@ void zumout() {
 				break;
 			}
 			if (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::INSRT)) {
-				SelectedPoint.x = StitchBuffer[ClosestPointIndex].x;
-				SelectedPoint.y = StitchBuffer[ClosestPointIndex].y;
+				SelectedPoint = StitchBuffer[ClosestPointIndex];
 				break;
 			}
 			if (StateMap.test(StateFlag::GRPSEL)) {
@@ -7499,14 +7490,12 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 		}
 	}
 	else {
-		iStitch         = startStitch;
-		iNextStitch     = startStitch + 1;
-		SelectedPoint.x = StitchBuffer[iStitch].x;
-		SelectedPoint.y = StitchBuffer[iStitch].y;
+		iStitch       = startStitch;
+		iNextStitch   = startStitch + 1;
+		SelectedPoint = StitchBuffer[iStitch];
 		for (inf = iNextStitch; inf < endStitch; inf++) {
 			if (StitchBuffer[iNextStitch].attribute & KNOTMSK) {
-				SelectedPoint.x = StitchBuffer[iNextStitch].x;
-				SelectedPoint.y = StitchBuffer[iNextStitch].y;
+				SelectedPoint = StitchBuffer[iNextStitch];
 				mvstch(iNextStitch++, inf);
 			}
 			else {
@@ -7515,8 +7504,7 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 				stitchSize = hypot(dx, dy);
 				if (stitchSize > SmallStitchLength) {
 					mvstch(iNextStitch++, inf);
-					SelectedPoint.x = StitchBuffer[inf].x;
-					SelectedPoint.y = StitchBuffer[inf].y;
+					SelectedPoint = StitchBuffer[inf];
 				}
 			}
 		}
@@ -8898,9 +8886,8 @@ void rotfn(double rotationAngle, dPOINT& rotationCenter) {
 		return;
 	}
 	if (StateMap.testAndReset(StateFlag::FRMSROT)) {
-		angle    = rotationAngle;
-		center.x = rotationCenter.x;
-		center.y = rotationCenter.y;
+		angle  = rotationAngle;
+		center = rotationCenter;
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			fvars(ClosestFormToCursor);
@@ -8908,9 +8895,8 @@ void rotfn(double rotationAngle, dPOINT& rotationCenter) {
 				rotflt(CurrentFormVertices[iVertex], rotationAngle, rotationCenter);
 			frmout(ClosestFormToCursor);
 			refilfn();
-			rotationAngle    = angle;
-			rotationCenter.x = center.x;
-			rotationCenter.y = center.y;
+			rotationAngle  = angle;
+			rotationCenter = center;
 		}
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -8994,7 +8980,7 @@ void rtrclpfn() {
 			}
 		}
 		if (count) {
-			LowerLeftStitch.x = LowerLeftStitch.y = 0;
+			LowerLeftStitch = {};
 			EmptyClipboard();
 			Clip        = RegisterClipboardFormat(PcdClipFormat);
 			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, count * sizeof(CLPSTCH) + 2);
@@ -10561,8 +10547,7 @@ void defpref() {
 void dumrk(double xCoord, double yCoord) {
 	if (StateMap.testAndReset(StateFlag::GMRK))
 		drwmrk(StitchWindowDC);
-	ZoomMarkPoint.x = xCoord;
-	ZoomMarkPoint.y = yCoord;
+	ZoomMarkPoint = { xCoord, yCoord };
 	StateMap.set(StateFlag::INIT);
 	StateMap.set(StateFlag::GMRK);
 	drwmrk(StitchWindowDC);
@@ -12457,7 +12442,7 @@ void nudgfn(float deltaX, float deltaY) {
 		StateMap.set(StateFlag::RESTCH);
 		return;
 	}
-	pixel.x = pixel.y = 0;
+	pixel = {};
 	if (deltaX) {
 		if (deltaX > 0)
 			pixel.x = IniFile.nudgePixels;
@@ -12515,8 +12500,7 @@ void bakmrk() {
 		if (ZoomMarkPoint.y > IniFile.hoopSizeY)
 			ZoomMarkPoint.y = IniFile.hoopSizeY / 2;
 		dumrk(ZoomMarkPoint.x, ZoomMarkPoint.y);
-		point.x = ZoomMarkPoint.x;
-		point.y = ZoomMarkPoint.y;
+		point = ZoomMarkPoint;
 		shft(point);
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -13110,8 +13094,7 @@ unsigned chkMsg() {
 			if (StateMap.test(StateFlag::MOVCNTR)) {
 				unrot();
 				px2stch();
-				RotationCenter.x = SelectedPoint.x;
-				RotationCenter.y = SelectedPoint.y;
+				RotationCenter = SelectedPoint;
 				ritrot(RotationAngle, RotationCenter);
 				return 1;
 			}
@@ -14959,8 +14942,7 @@ unsigned chkMsg() {
 				adjustedPoint.y            = RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y;
 				if (hypot(adjustedPoint.x, adjustedPoint.y) < CLOSENUF) {
 					px2stch();
-					RotationCenter.x = SelectedPoint.x;
-					RotationCenter.y = SelectedPoint.y;
+					RotationCenter = SelectedPoint;
 					StateMap.set(StateFlag::MOVCNTR);
 					unrot();
 					ritrot(RotationAngle, RotationCenter);
@@ -15007,8 +14989,7 @@ unsigned chkMsg() {
 				ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 				ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
 				px2stch();
-				ZoomBoxOrigin.x = SelectedPoint.x;
-				ZoomBoxOrigin.y = SelectedPoint.y;
+				ZoomBoxOrigin = SelectedPoint;
 				StateMap.set(StateFlag::VCAPT);
 				return 1;
 			}
@@ -15187,8 +15168,7 @@ unsigned chkMsg() {
 			ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 			ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
 			px2stch();
-			ZoomBoxOrigin.x = SelectedPoint.x;
-			ZoomBoxOrigin.y = SelectedPoint.y;
+			ZoomBoxOrigin = SelectedPoint;
 			StateMap.set(StateFlag::VCAPT);
 			return 1;
 		}
@@ -16072,7 +16052,7 @@ unsigned chkMsg() {
 								dupclp();
 							}
 							else {
-								FormMoveDelta.x = FormMoveDelta.y = 0;
+								FormMoveDelta = {};
 								StateMap.set(StateFlag::FUNCLP);
 								ClosestFormToCursor = FormIndex;
 								SelectedForm        = &FormList[FormIndex];
@@ -16181,7 +16161,7 @@ unsigned chkMsg() {
 						else {
 							ClipFormHeader = static_cast<FORMCLIP*>(ClipPointer);
 							if (ClipFormHeader->clipType == CLP_FRM) {
-								FormMoveDelta.x = FormMoveDelta.y = 0;
+								FormMoveDelta = {};
 								StateMap.set(StateFlag::FUNCLP);
 								ClosestFormToCursor = FormIndex;
 								fvars(FormIndex);

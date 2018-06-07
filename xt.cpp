@@ -423,14 +423,12 @@ void durats(unsigned iSequence, fPOINT* point) noexcept {
 }
 
 void xoseq(unsigned iSequence) noexcept {
-	OSequence[OutputIndex].x = BSequence[iSequence].x;
-	OSequence[OutputIndex].y = BSequence[iSequence].y;
+	OSequence[OutputIndex] = BSequence[iSequence];
 	OutputIndex++;
 }
 
 void xpfth(unsigned iSequence) noexcept {
-	FeatherSequence[ActivePointIndex].x = BSequence[iSequence].x;
-	FeatherSequence[ActivePointIndex].y = BSequence[iSequence].y;
+	FeatherSequence[ActivePointIndex] = BSequence[iSequence];
 	ActivePointIndex++;
 }
 
@@ -565,11 +563,6 @@ void fthrbfn(unsigned iSequence) {
 	ActivePointIndex++;
 }
 
-void duoseq(unsigned iSequence) noexcept {
-	OSequence[iSequence].x = BSequence[iSequence].x;
-	OSequence[iSequence].y = BSequence[iSequence].y;
-}
-
 void fthdfn(unsigned iSequence) {
 	const double length
 	    = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
@@ -578,8 +571,8 @@ void fthdfn(unsigned iSequence) {
 	fPOINT nextPoint     = {};
 
 	nurat();
-	duoseq(iSequence);
-	duoseq(iSequence + 1);
+	OSequence[iSequence]     = BSequence[iSequence];
+	OSequence[iSequence + 1] = BSequence[iSequence + 1];
 	if (length > FeatherMinStitch) {
 		FeatherRatioLocal = 0.5;
 		duxrats(iSequence + 1, iSequence, &adjustedPoint);
@@ -640,11 +633,12 @@ void fthrfn() {
 					if (ExtendedAttribute & AT_FTHUP)
 						fthfn(ind);
 					else
-						duoseq(ind);
+						OSequence[ind] = BSequence[ind];
+					;
 				}
 				else {
 					if (ExtendedAttribute & AT_FTHUP)
-						duoseq(ind);
+						OSequence[ind] = BSequence[ind];
 					else
 						fthfn(ind);
 				}
@@ -4456,8 +4450,7 @@ void dushft() {
 	ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 	ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
 	px2stch();
-	ZoomBoxOrigin.x = SelectedPoint.x;
-	ZoomBoxOrigin.y = SelectedPoint.y;
+	ZoomBoxOrigin = SelectedPoint;
 }
 
 extern void unbBox();
