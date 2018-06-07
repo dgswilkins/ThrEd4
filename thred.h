@@ -4,8 +4,7 @@
 #pragma warning(disable : 6031)
 
 // C++ Code Checker rules - disable them as required
-#pragma warning(                                                                                                       \
-    disable : 26400)             //			Do not assign the result of an allocation or a function call with an owner<T>
+#pragma warning(disable : 26400) //			Do not assign the result of an allocation or a function call with an owner<T>
 #pragma warning(disable : 26401) //	i.11	Do not delete a raw pointer that is not an owner<T>
 #pragma warning(disable : 26409) //			Avoid calling new and delete explicitly, use std::make_unique<T> instead
 #pragma warning(disable : 26423) //			The allocation was not directly assigned to an owner
@@ -29,7 +28,7 @@
 //#pragma warning(disable:26494)	// type.5	Variable is uninitialized
 //#pragma warning(disable:26496)	// Con.4	Value is assigned only once, mark it as a pointer to const
 //#pragma warning(disable:26497)	// f.4		This function could be marked constexpr if compile-time evaluation is
-//desired
+// desired
 #pragma warning(disable : 26499) //			Could not find any lifetime tracking information
 
 #include <vector>
@@ -398,31 +397,31 @@ enum
 // bitmap
 enum class StateFlag
 {
-	SATIN,   // user is entering a satin stitch form
-	SATPNT,  // user is entering points for a satin stitch form
-	BOXZUM,  // box zoom select mode
-	BZUMIN,  // display the zoom box
-	BZUM,    // zoom box displayed on screen
-	INSRT,   // insert mode active
-	SELPNT,  // user has clicked on a selected point
-	SATCNKT, // user is connecting points in a satin form
-	INSFRM,  // user is inserting points in a form
-	FORMIN,  // user is selecting a form
-	PRFACT,  // user is selecting preferences
-	POLIMOV, // user is placing a pre defined form
-	SIZSEL,  // thread size select boxes displayed
-	THRDS,   // State of the threads/lines box
-	LINED,   // line has been started
-	LININ,   // line is in the zoom rectangle
-	ZUMED,   // stitch window is zoomed
-	COL,     // state of the color/all box
-	HID,     // state of the show/hide button
-	ISDWN,   // down stitch exists
-	ISUP,    // up stitch exists
-	WASLIN,  // a move stitch line has been drawn
-	CAPT,    // screen capture in effect
-	VCAPT,   // keep screen capture as long as the mouse cursor
-	       // is in the edit window
+	SATIN,     // user is entering a satin stitch form
+	SATPNT,    // user is entering points for a satin stitch form
+	BOXZUM,    // box zoom select mode
+	BZUMIN,    // display the zoom box
+	BZUM,      // zoom box displayed on screen
+	INSRT,     // insert mode active
+	SELPNT,    // user has clicked on a selected point
+	SATCNKT,   // user is connecting points in a satin form
+	INSFRM,    // user is inserting points in a form
+	FORMIN,    // user is selecting a form
+	PRFACT,    // user is selecting preferences
+	POLIMOV,   // user is placing a pre defined form
+	SIZSEL,    // thread size select boxes displayed
+	THRDS,     // State of the threads/lines box
+	LINED,     // line has been started
+	LININ,     // line is in the zoom rectangle
+	ZUMED,     // stitch window is zoomed
+	COL,       // state of the color/all box
+	HID,       // state of the show/hide button
+	ISDWN,     // down stitch exists
+	ISUP,      // up stitch exists
+	WASLIN,    // a move stitch line has been drawn
+	CAPT,      // screen capture in effect
+	VCAPT,     // keep screen capture as long as the mouse cursor
+	           // is in the edit window
 	SELBOX,    // the select box is showing
 	ILIN,      // insert line is showing on the screen
 	INIT,      // set when a stitch is entered in the stitch buffer,a form is entered, or the mark is set
@@ -707,90 +706,90 @@ typedef struct _pcsheader {
 
 // ini file structure
 typedef struct _iniFil {
-	char     defaultDirectory[180];         // default directory
-	COLORREF stitchColors[16];              // colors
-	COLORREF stitchPreferredColors[16];     // stitch preference colors
-	COLORREF backgroundPreferredColors[16]; // background preference colors
-	COLORREF backgroundColor;               // background color
-	COLORREF bitmapColor;                   // bitmap color
-	double   minStitchLength;               // minimum stitch length
-	double   showStitchThreshold;           // show stitch points
-	double   threadSize30;                  // millimeter size of 30 weight thread
-	double   threadSize40;                  // millimeter size of 40 weight thread
-	double   threadSize60;                  // millimeter size of 60 weight thread
-	double   userStitchLength;              // user stitch length
-	double   maxStitchLength;               // maximum stitch length
-	double   smallStitchLength;             // small stitch size
-	double   stitchBoxesThreshold;          // show sitch box level
-	double   stitchSpace;                   // stitch spacing between lines of stitches
-	double   fillAngle;                     // fill angle
-	unsigned userFlagMap;                   // bitmap for user variables
-	double   borderWidth;                   // border width
-	unsigned appliqueColor;                 // applique color
-	char     prevNames[OLDNUM][_MAX_PATH];  // last file names
-	double   snapLength;                    // snap together length
-	double   starRatio;                     // star ratio
-	double   spiralWrap;                    // spiral wrap
-	COLORREF bitmapBackgroundColors[16];    // bitmap background color preferences
-	double   buttonholeCornerLength;        // buttonhole fill corner length
-	float    picotSpace;                    // space between border picots
-	char     hoopType;                      // hoop type
-	char     auxFileType;                   // machine file type
-	float    hoopSizeX;                     // hoop x size
-	float    hoopSizeY;                     // hoop y size
-	double   rotationAngle;                 // rotation angle
-	float    gridSize;                      // grid size
-	float    clipOffset;                    // clipboard offset
-	RECT     initialWindowCoords;           // initial window coordinates
-	COLORREF gridColor;                     // grid color
-	unsigned fillPhase;                     // clipboard fill phase
-	float    customHoopX;                   // custom hoop width
-	float    customHoopY;                   // custom hoop height
-	float    traceLength;                   // lens points
-	double   traceRatio;                    // trace ratio
-	float    chainSpace;                    // chain space
-	float    chainRatio;                    // chain ratio
-	float    cursorNudgeStep;               // cursor nudge step
-	unsigned short nudgePixels;             // nudge pixels
-	float          eggRatio;                // egg ratio
-	unsigned short stitchSizePixels;        // size of stitch points in pixels
-	unsigned short formVertexSizePixels;    // size of form points in pixels
-	unsigned short formSides;               // sides of a created form
-	float          tearTailLength;          // length of the tear tail
-	float          tearTwistStep;           // tear twist step
-	float          tearTwistRatio;          // tear twist ratio
-	unsigned short wavePoints;              // wave points
-	unsigned short waveStart;               // wave strting point
-	unsigned short waveEnd;                 // wave ending point;
-	unsigned short waveLobes;               // wave lobes
-	unsigned char  featherFillType;         // feather fill type
-	unsigned char  featherUpCount;          // feather up count
-	unsigned char  featherDownCount;        // feather down count
-	unsigned char  featherType;             // feather bits
-	float          featherRatio;            // feather ratio
-	float          featherMinStitchSize;    // feather floor
-	unsigned short featherCount;            // feather fill psg granularity
-	char           p2cName[_MAX_PATH];      // pes2card file
-	float          underlayIndent;          // edge walk/underlay indent
-	float          underlayAngle;           // underlay angle
-	float          underlaySpacing;         // underlay spacing
-	float          underlayStitchLen;       // underlay stitch length
-	float          daisyDiameter;           // daisy diameter
-	float          daisyPetalLen;           // daisy petal length
-	float          daisyHoleDiameter;       // daisy hole diameter
-	unsigned       daisyPetalCount;         // daisy petals
-	unsigned       daisyPetalPoints;        // daisy petal points
-	unsigned       daisyInnerCount;         // daisy inner count
-	unsigned char  daisyBorderType;         // daisy border type
-	unsigned char  dataCheck;               // data check
-	float          textureHeight;           // textured fill height
-	float          textureWidth;            // textured fill width
-	float          textureSpacing;          // textured fill spacing
-	unsigned short formBoxSizePixels;       // form box pixels
-	unsigned short daisyHeartCount;         // daisy heart count
-	unsigned short textureEditorSize;       // texture editor pixels
-	float          clpspc;                  // clipboard fill spacing
-	char           designerName[50];        // designer name
+	char           defaultDirectory[180];         // default directory
+	COLORREF       stitchColors[16];              // colors
+	COLORREF       stitchPreferredColors[16];     // stitch preference colors
+	COLORREF       backgroundPreferredColors[16]; // background preference colors
+	COLORREF       backgroundColor;               // background color
+	COLORREF       bitmapColor;                   // bitmap color
+	double         minStitchLength;               // minimum stitch length
+	double         showStitchThreshold;           // show stitch points
+	double         threadSize30;                  // millimeter size of 30 weight thread
+	double         threadSize40;                  // millimeter size of 40 weight thread
+	double         threadSize60;                  // millimeter size of 60 weight thread
+	double         userStitchLength;              // user stitch length
+	double         maxStitchLength;               // maximum stitch length
+	double         smallStitchLength;             // small stitch size
+	double         stitchBoxesThreshold;          // show sitch box level
+	double         stitchSpace;                   // stitch spacing between lines of stitches
+	double         fillAngle;                     // fill angle
+	unsigned       userFlagMap;                   // bitmap for user variables
+	double         borderWidth;                   // border width
+	unsigned       appliqueColor;                 // applique color
+	char           prevNames[OLDNUM][_MAX_PATH];  // last file names
+	double         snapLength;                    // snap together length
+	double         starRatio;                     // star ratio
+	double         spiralWrap;                    // spiral wrap
+	COLORREF       bitmapBackgroundColors[16];    // bitmap background color preferences
+	double         buttonholeCornerLength;        // buttonhole fill corner length
+	float          picotSpace;                    // space between border picots
+	char           hoopType;                      // hoop type
+	char           auxFileType;                   // machine file type
+	float          hoopSizeX;                     // hoop x size
+	float          hoopSizeY;                     // hoop y size
+	double         rotationAngle;                 // rotation angle
+	float          gridSize;                      // grid size
+	float          clipOffset;                    // clipboard offset
+	RECT           initialWindowCoords;           // initial window coordinates
+	COLORREF       gridColor;                     // grid color
+	unsigned       fillPhase;                     // clipboard fill phase
+	float          customHoopX;                   // custom hoop width
+	float          customHoopY;                   // custom hoop height
+	float          traceLength;                   // lens points
+	double         traceRatio;                    // trace ratio
+	float          chainSpace;                    // chain space
+	float          chainRatio;                    // chain ratio
+	float          cursorNudgeStep;               // cursor nudge step
+	unsigned short nudgePixels;                   // nudge pixels
+	float          eggRatio;                      // egg ratio
+	unsigned short stitchSizePixels;              // size of stitch points in pixels
+	unsigned short formVertexSizePixels;          // size of form points in pixels
+	unsigned short formSides;                     // sides of a created form
+	float          tearTailLength;                // length of the tear tail
+	float          tearTwistStep;                 // tear twist step
+	float          tearTwistRatio;                // tear twist ratio
+	unsigned short wavePoints;                    // wave points
+	unsigned short waveStart;                     // wave strting point
+	unsigned short waveEnd;                       // wave ending point;
+	unsigned short waveLobes;                     // wave lobes
+	unsigned char  featherFillType;               // feather fill type
+	unsigned char  featherUpCount;                // feather up count
+	unsigned char  featherDownCount;              // feather down count
+	unsigned char  featherType;                   // feather bits
+	float          featherRatio;                  // feather ratio
+	float          featherMinStitchSize;          // feather floor
+	unsigned short featherCount;                  // feather fill psg granularity
+	char           p2cName[_MAX_PATH];            // pes2card file
+	float          underlayIndent;                // edge walk/underlay indent
+	float          underlayAngle;                 // underlay angle
+	float          underlaySpacing;               // underlay spacing
+	float          underlayStitchLen;             // underlay stitch length
+	float          daisyDiameter;                 // daisy diameter
+	float          daisyPetalLen;                 // daisy petal length
+	float          daisyHoleDiameter;             // daisy hole diameter
+	unsigned       daisyPetalCount;               // daisy petals
+	unsigned       daisyPetalPoints;              // daisy petal points
+	unsigned       daisyInnerCount;               // daisy inner count
+	unsigned char  daisyBorderType;               // daisy border type
+	unsigned char  dataCheck;                     // data check
+	float          textureHeight;                 // textured fill height
+	float          textureWidth;                  // textured fill width
+	float          textureSpacing;                // textured fill spacing
+	unsigned short formBoxSizePixels;             // form box pixels
+	unsigned short daisyHeartCount;               // daisy heart count
+	unsigned short textureEditorSize;             // texture editor pixels
+	float          clpspc;                        // clipboard fill spacing
+	char           designerName[50];              // designer name
 } INIFILE;
 
 enum
@@ -802,22 +801,111 @@ enum
 };
 
 typedef struct _formVertices {
-
 	unsigned start;
 	unsigned vertexCount;
 	unsigned finish;
 	unsigned form;
 } FORMVERTICES;
 
-typedef struct _doublePoint {
+class fPOINT;
+class fPOINTATTR;
+class SMALPNTL;
+class BSEQPNT;
 
+class dPOINT
+{
+public:
 	double x;
 	double y;
 
-} dPOINT;
+	inline bool operator==(const dPOINT& rhs) const;
+	inline dPOINT& operator=(const fPOINT& rhs);
+	inline dPOINT& operator=(const BSEQPNT& rhs);
+};
+
+class fPOINT
+{
+public:
+	float x;
+	float y;
+
+	inline bool    operator==(const fPOINT& rhs) const;
+	inline fPOINT& operator=(const dPOINT& rhs);
+	inline fPOINT& operator=(const fPOINTATTR& rhs);
+	inline fPOINT& operator=(const SMALPNTL& rhs);
+	inline fPOINT& operator=(const BSEQPNT& rhs);
+};
+
+class fPOINTATTR
+{
+public:
+	float    x;
+	float    y;
+	unsigned attribute;
+};
+
+class SMALPNTL
+{
+public:
+	unsigned line; // line and group must remain in this order for sort to work
+	unsigned group;
+	double   x;
+	double   y;
+};
+
+class BSEQPNT
+{
+public:
+	float x;
+	float y;
+	char  attribute;
+};
+
+inline bool fPOINT::operator==(const fPOINT& rhs) const {
+	return (x == rhs.x) && (y == rhs.y);
+}
+
+inline fPOINT& fPOINT::operator=(const dPOINT& rhs) {
+	x = rhs.x;
+	y = rhs.y;
+	return *this;
+}
+
+inline fPOINT& fPOINT::operator=(const fPOINTATTR& rhs) {
+	x = rhs.x;
+	y = rhs.y;
+	return *this;
+}
+
+inline fPOINT& fPOINT::operator=(const SMALPNTL& rhs) {
+	x = rhs.x;
+	y = rhs.y;
+	return *this;
+}
+
+inline fPOINT& fPOINT::operator=(const BSEQPNT& rhs) {
+	x = rhs.x;
+	y = rhs.y;
+	return *this;
+}
+
+inline bool dPOINT::operator==(const dPOINT& rhs) const {
+	return (x == rhs.x) && (y == rhs.y);
+}
+
+inline dPOINT& dPOINT::operator=(const fPOINT& rhs) {
+	x = rhs.x;
+	y = rhs.y;
+	return *this;
+}
+
+inline dPOINT& dPOINT::operator=(const BSEQPNT& rhs) {
+	x = rhs.x;
+	y = rhs.y;
+	return *this;
+}
 
 typedef struct _doublePointLine {
-
 	double         x;
 	double         y;
 	unsigned short line;
@@ -825,7 +913,6 @@ typedef struct _doublePointLine {
 } dPOINTLINE;
 
 typedef struct _doublerectangle {
-
 	double top;
 	double bottom;
 	double left;
@@ -834,17 +921,9 @@ typedef struct _doublerectangle {
 } dRECTANGLE;
 
 typedef struct _colChng {
-
 	unsigned short stitchIndex; // stitch index
 	unsigned short colorIndex;  // color index
 } COLCHNG;
-
-typedef struct _fPointAttribute {
-
-	float    x;
-	float    y;
-	unsigned attribute;
-} fPOINTATTR;
 
 #define COLMSK 0x0000000f    // 0000 0000 0000 0000 0000 0000 0000 1111
 #define APCOLMSK 0x000000f0  // 0000 0000 0000 0000 0000 0000 1111 0000
@@ -907,14 +986,7 @@ bit definitions for fPOINTATTR.attribute
 #define FRMBFIL 0x40000000
 #define FRMAPFIL 0x60000000
 
-typedef struct _floatPoint {
-
-	float x;
-	float y;
-} fPOINT;
-
 typedef struct _floatRectangle {
-
 	float top;
 	float left;
 	float right;
@@ -922,33 +994,28 @@ typedef struct _floatRectangle {
 } fRECTANGLE;
 
 typedef struct _forminfo {
-
 	unsigned type;
 	unsigned attribute;
 	unsigned sideCount;
 } FORMINFO;
 
 typedef struct _satcon {
-
 	unsigned short start;
 	unsigned short finish;
 } SATCON;
 
 typedef union _fangclp {
-
 	float   angle;
 	fPOINT* clip;
 	SATCON  guide;
 } FANGCLP;
 
 typedef union _flencnt {
-
 	float    stitchLength;
 	unsigned clipCount;
 } FLENCNT;
 
 typedef union _satinOrAngle {
-
 	SATCON* guide;
 	float   angle;
 } SATINANGLE;
@@ -1003,7 +1070,6 @@ typedef union _satinOrAngle {
 
 // Original form header used prior to version 2
 typedef struct _frmhedo {
-
 	unsigned char  attribute;       // attribute
 	unsigned short vertexCount;     // number of sides
 	unsigned char  type;            // type
@@ -1011,8 +1077,8 @@ typedef struct _frmhedo {
 	unsigned char  borderColor;     // border color
 	unsigned short clipEntries;     // number of border clipboard entries
 	fPOINT*        vertices;        // points
-	SATINANGLE satinOrAngle;        // satin guidlines or angle clipboard fill angle
-	fPOINT*    borderClipData;      // border clipboard data
+	SATINANGLE     satinOrAngle;    // satin guidlines or angle clipboard fill angle
+	fPOINT*        borderClipData;  // border clipboard data
 	unsigned short satinGuideCount; // number of satin guidlines
 	unsigned short wordParam;       // word parameter
 	fRECTANGLE     rectangle;       // rectangle
@@ -1074,7 +1140,6 @@ typedef union _tfhed {
 } TFINFO;
 
 typedef struct _frmhed {
-
 	unsigned char  attribute;       // attribute
 	unsigned short vertexCount;     // number of sides
 	unsigned char  type;            // type
@@ -1082,8 +1147,8 @@ typedef struct _frmhed {
 	unsigned char  borderColor;     // border color
 	unsigned short clipEntries;     // number of border clipboard entries
 	fPOINT*        vertices;        // points
-	SATINANGLE satinOrAngle;        // satin guidlines or angle clipboard fill angle
-	fPOINT*    borderClipData;      // border clipboard data
+	SATINANGLE     satinOrAngle;    // satin guidlines or angle clipboard fill angle
+	fPOINT*        borderClipData;  // border clipboard data
 	unsigned short satinGuideCount; // number of satin guidlines
 	unsigned short wordParam;       // clipboard/textured fill phase or satin end guide
 	fRECTANGLE     rectangle;       // rectangle
@@ -1223,13 +1288,6 @@ typedef struct _dstoffsets {
 	POINT Negative; // minus offset written into the destination file header
 } DSTOffsets;
 
-typedef struct _smalpntl {
-	unsigned line; // line and group must remain in this order for sort to work
-	unsigned group;
-	double   x;
-	double   y;
-} SMALPNTL;
-
 typedef struct _pcstch {
 	unsigned char fx; // fractional part of x coord or color if tag = 3
 	short         x;  // integer part of x coord
@@ -1306,12 +1364,6 @@ typedef struct _fseq { // SequencePath: path of sequenced regions
 
 #define SEQTOP 2
 #define SEQBOT 3
-
-typedef struct _bseqpnt {
-	float x;
-	float y;
-	char  attribute;
-} BSEQPNT;
 
 typedef struct _pvec {
 	double angle;
