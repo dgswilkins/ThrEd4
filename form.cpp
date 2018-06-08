@@ -364,7 +364,6 @@ unsigned               VertexCount;                  // sides of the selected fo
 double                 VerticalRatio;                // vertical ratio between the zoom window and the entire stitch space
 unsigned               VisitedIndex;                 // next unvisited region for sequencing
 fPOINT*                WorkingFormVertices;          // form points for angle fills
-double                 XYratio;                      // expand form aspect ratio
 
 unsigned short EdgeArray[]
     = { MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0 };
@@ -3835,7 +3834,7 @@ void setmfrm() noexcept {
 	FormLines[iForm] = FormLines[0];
 }
 
-unsigned chkfrm(std::vector<POINT>& stretchBoxLine) {
+unsigned chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio) {
 	fvars(ClosestFormToCursor);
 
 	POINT    point      = { (Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y) };
@@ -3871,7 +3870,7 @@ unsigned chkfrm(std::vector<POINT>& stretchBoxLine) {
 				StateMap.set(StateFlag::STRTCH);
 			else {
 				StateMap.set(StateFlag::EXPAND);
-				XYratio = static_cast<double>(SelectedForm->rectangle.right - SelectedForm->rectangle.left)
+				xyRatio = static_cast<double>(SelectedForm->rectangle.right - SelectedForm->rectangle.left)
 				          / (SelectedForm->rectangle.top - SelectedForm->rectangle.bottom);
 			}
 			SelectedFormControlVertex >>= 1;
@@ -6601,7 +6600,7 @@ void setstrtch() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setexpand() {
+void setexpand(const double& xyRatio) {
 	dPOINT     reference        = {};
 	POINT      integerReference = {};
 	fPOINT     stitchReference  = {};
@@ -6645,10 +6644,10 @@ void setexpand() {
 		size1.x     = fabs(SelectedPoint.x - reference.x);
 		size1.y     = fabs(SelectedPoint.y - reference.y);
 		aspect      = size1.x / size1.y;
-		if (aspect < XYratio)
-			size1.x = size1.y * XYratio;
+		if (aspect < xyRatio)
+			size1.x = size1.y * xyRatio;
 		else
-			size1.y = size1.x / XYratio;
+			size1.y = size1.x / xyRatio;
 		ratio.x = size1.x / size0.x;
 		ratio.y = size1.y / size0.y;
 		if (!SelectedFormList->size() && StateMap.test(StateFlag::FORMSEL)) {
@@ -6662,10 +6661,10 @@ void setexpand() {
 		size1.x     = fabs(SelectedPoint.x - reference.x);
 		size1.y     = fabs(SelectedPoint.y - reference.y);
 		aspect      = size1.x / size1.y;
-		if (aspect < XYratio)
-			size1.x = size1.y * XYratio;
+		if (aspect < xyRatio)
+			size1.x = size1.y * xyRatio;
 		else
-			size1.y = size1.x / XYratio;
+			size1.y = size1.x / xyRatio;
 		ratio.x = size1.x / size0.x;
 		ratio.y = size1.y / size0.y;
 		if (!SelectedFormList->size() && StateMap.test(StateFlag::FORMSEL)) {
@@ -6679,10 +6678,10 @@ void setexpand() {
 		size1.x     = fabs(SelectedPoint.x - reference.x);
 		size1.y     = fabs(SelectedPoint.y - reference.y);
 		aspect      = size1.x / size1.y;
-		if (aspect < XYratio)
-			size1.x = size1.y * XYratio;
+		if (aspect < xyRatio)
+			size1.x = size1.y * xyRatio;
 		else
-			size1.y = size1.x / XYratio;
+			size1.y = size1.x / xyRatio;
 		ratio.x = size1.x / size0.x;
 		ratio.y = size1.y / size0.y;
 		if (!SelectedFormList->size() && StateMap.test(StateFlag::FORMSEL)) {
@@ -6696,10 +6695,10 @@ void setexpand() {
 		size1.x     = fabs(SelectedPoint.x - reference.x);
 		size1.y     = fabs(SelectedPoint.y - reference.y);
 		aspect      = size1.x / size1.y;
-		if (aspect < XYratio)
-			size1.x = size1.y * XYratio;
+		if (aspect < xyRatio)
+			size1.x = size1.y * xyRatio;
 		else
-			size1.y = size1.x / XYratio;
+			size1.y = size1.x / xyRatio;
 		ratio.x = size1.x / size0.x;
 		ratio.y = size1.y / size0.y;
 		if (!SelectedFormList->size() && StateMap.test(StateFlag::FORMSEL)) {
@@ -7948,14 +7947,14 @@ void plbrd(double edgeSpacing) {
 	sprct(fillVerticalRect, iVertex, 0);
 	spurct(underlayVerticalRect, fillVerticalRect, iVertex);
 	if (!(SelectedForm->attribute & SBLNT)) {
-		auto val                      = SelectedForm->vertices[1];
+		const auto val                      = SelectedForm->vertices[1];
 		fillVerticalRect[1].aipnt     = val;
 		fillVerticalRect[1].aopnt     = val;
 		underlayVerticalRect[1].aipnt = val;
 		underlayVerticalRect[1].aopnt = val;
 	}
 	if (!(SelectedForm->attribute & FBLNT)) {
-		auto val                                    = SelectedForm->vertices[VertexCount - 1];
+		const auto val                                    = SelectedForm->vertices[VertexCount - 1];
 		fillVerticalRect[VertexCount - 4].dipnt     = val;
 		fillVerticalRect[VertexCount - 4].dopnt     = val;
 		underlayVerticalRect[VertexCount - 4].dipnt = val;

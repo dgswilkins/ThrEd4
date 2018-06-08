@@ -818,9 +818,9 @@ public:
 	double x;
 	double y;
 
-	inline bool    operator==(const dPOINT& rhs) const;
-	inline dPOINT& operator=(const fPOINT& rhs);
-	inline dPOINT& operator=(const BSEQPNT& rhs);
+	inline bool    operator==(const dPOINT& rhs) const noexcept;
+	inline dPOINT& operator=(const fPOINT& rhs) noexcept;
+	inline dPOINT& operator=(const BSEQPNT& rhs) noexcept;
 };
 
 class fPOINT
@@ -829,11 +829,11 @@ public:
 	float x;
 	float y;
 
-	inline bool    operator==(const fPOINT& rhs) const;
-	inline fPOINT& operator=(const dPOINT& rhs);
-	inline fPOINT& operator=(const fPOINTATTR& rhs);
-	inline fPOINT& operator=(const SMALPNTL& rhs);
-	inline fPOINT& operator=(const BSEQPNT& rhs);
+	inline bool    operator==(const fPOINT& rhs) const noexcept;
+	inline fPOINT& operator=(const dPOINT& rhs) noexcept;
+	inline fPOINT& operator=(const fPOINTATTR& rhs) noexcept;
+	inline fPOINT& operator=(const SMALPNTL& rhs) noexcept;
+	inline fPOINT& operator=(const BSEQPNT& rhs) noexcept;
 };
 
 class fPOINTATTR
@@ -861,45 +861,45 @@ public:
 	char  attribute;
 };
 
-inline bool fPOINT::operator==(const fPOINT& rhs) const {
+inline bool fPOINT::operator==(const fPOINT& rhs) const noexcept {
 	return (x == rhs.x) && (y == rhs.y);
 }
 
-inline fPOINT& fPOINT::operator=(const dPOINT& rhs) {
+inline fPOINT& fPOINT::operator=(const dPOINT& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
 }
 
-inline fPOINT& fPOINT::operator=(const fPOINTATTR& rhs) {
+inline fPOINT& fPOINT::operator=(const fPOINTATTR& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
 }
 
-inline fPOINT& fPOINT::operator=(const SMALPNTL& rhs) {
+inline fPOINT& fPOINT::operator=(const SMALPNTL& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
 }
 
-inline fPOINT& fPOINT::operator=(const BSEQPNT& rhs) {
+inline fPOINT& fPOINT::operator=(const BSEQPNT& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
 }
 
-inline bool dPOINT::operator==(const dPOINT& rhs) const {
+inline bool dPOINT::operator==(const dPOINT& rhs) const noexcept {
 	return (x == rhs.x) && (y == rhs.y);
 }
 
-inline dPOINT& dPOINT::operator=(const fPOINT& rhs) {
+inline dPOINT& dPOINT::operator=(const fPOINT& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
 }
 
-inline dPOINT& dPOINT::operator=(const BSEQPNT& rhs) {
+inline dPOINT& dPOINT::operator=(const BSEQPNT& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
