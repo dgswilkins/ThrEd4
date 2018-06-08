@@ -818,7 +818,7 @@ public:
 	double x;
 	double y;
 
-	inline bool operator==(const dPOINT& rhs) const;
+	inline bool    operator==(const dPOINT& rhs) const;
 	inline dPOINT& operator=(const fPOINT& rhs);
 	inline dPOINT& operator=(const BSEQPNT& rhs);
 };

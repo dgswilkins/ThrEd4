@@ -8644,9 +8644,9 @@ void cpylayr(unsigned codedLayer) {
 				rngadj();
 				iCurrentStitch = PCSHeader.stitchCount;
 				for (iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
-					StitchBuffer[iCurrentStitch].attribute = StitchBuffer[iStitch].attribute & NLAYMSK | codedStitchLayer;
-					StitchBuffer[iCurrentStitch].x         = StitchBuffer[iStitch].x;
-					StitchBuffer[iCurrentStitch++].y       = StitchBuffer[iStitch].y;
+					StitchBuffer[iCurrentStitch].x           = StitchBuffer[iStitch].x;
+					StitchBuffer[iCurrentStitch].y           = StitchBuffer[iStitch].y;
+					StitchBuffer[iCurrentStitch++].attribute = StitchBuffer[iStitch].attribute & NLAYMSK | codedStitchLayer;
 				}
 				PCSHeader.stitchCount = iCurrentStitch;
 				coltab();
