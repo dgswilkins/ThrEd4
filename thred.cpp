@@ -1788,14 +1788,14 @@ double unthrsh(unsigned level) noexcept {
 	return zoom;
 }
 
-void ritfcor(const fPOINT* point) {
-	butxt(HCOR, fmt::format("x{:.0f} y{:.0f}", (point->x / PFGRAN), (point->y / PFGRAN)));
+void ritfcor(const fPOINT& point) {
+	butxt(HCOR, fmt::format("x{:.0f} y{:.0f}", (point.x / PFGRAN), (point.y / PFGRAN)));
 }
 
 void ritcor(const fPOINTATTR* pointAttribute) {
 	fPOINT point = { pointAttribute->x, pointAttribute->y };
 
-	ritfcor(&point);
+	ritfcor(point);
 }
 
 void coltab() {
@@ -2185,28 +2185,28 @@ void ducros(HDC dc) {
 	selin(GroupStartStitch, GroupEndStitch, dc);
 }
 
-void selRct(fRECTANGLE* sourceRect) noexcept {
+void selRct(fRECTANGLE& sourceRect) noexcept {
 	unsigned iStitch = 0;
 
-	sourceRect->left = sourceRect->right = StitchBuffer[GroupStartStitch].x;
-	sourceRect->top = sourceRect->bottom = StitchBuffer[GroupStartStitch].y;
+	sourceRect.left = sourceRect.right = StitchBuffer[GroupStartStitch].x;
+	sourceRect.top = sourceRect.bottom = StitchBuffer[GroupStartStitch].y;
 	for (iStitch = GroupStartStitch + 1; iStitch <= GroupEndStitch; iStitch++) {
-		if (StitchBuffer[iStitch].x > sourceRect->right)
-			sourceRect->right = StitchBuffer[iStitch].x;
-		if (StitchBuffer[iStitch].x < sourceRect->left)
-			sourceRect->left = StitchBuffer[iStitch].x;
-		if (StitchBuffer[iStitch].y < sourceRect->bottom)
-			sourceRect->bottom = StitchBuffer[iStitch].y;
-		if (StitchBuffer[iStitch].y > sourceRect->top)
-			sourceRect->top = StitchBuffer[iStitch].y;
+		if (StitchBuffer[iStitch].x > sourceRect.right)
+			sourceRect.right = StitchBuffer[iStitch].x;
+		if (StitchBuffer[iStitch].x < sourceRect.left)
+			sourceRect.left = StitchBuffer[iStitch].x;
+		if (StitchBuffer[iStitch].y < sourceRect.bottom)
+			sourceRect.bottom = StitchBuffer[iStitch].y;
+		if (StitchBuffer[iStitch].y > sourceRect.top)
+			sourceRect.top = StitchBuffer[iStitch].y;
 	}
-	if (sourceRect->right - sourceRect->left == 0) {
-		sourceRect->right++;
-		sourceRect->left--;
+	if (sourceRect.right - sourceRect.left == 0) {
+		sourceRect.right++;
+		sourceRect.left--;
 	}
-	if (sourceRect->top - sourceRect->bottom == 0) {
-		sourceRect->top++;
-		sourceRect->bottom--;
+	if (sourceRect.top - sourceRect.bottom == 0) {
+		sourceRect.top++;
+		sourceRect.bottom--;
 	}
 }
 
@@ -2349,7 +2349,7 @@ void grpAdj() {
 	rngadj();
 	ducros(StitchWindowDC);
 	lenCalc();
-	selRct(&StitchRangeRect);
+	selRct(StitchRangeRect);
 	if (StateMap.test(StateFlag::ZUMED) && GroupEndStitch != GroupStartStitch) {
 		if (StitchRangeRect.top > ZoomRect.top - 1 || StitchRangeRect.bottom < ZoomRect.bottom - 1
 		    || StitchRangeRect.left < ZoomRect.left + 1 || StitchRangeRect.right > ZoomRect.right - 1) {
@@ -2403,7 +2403,7 @@ void lensadj() {
 	rngadj();
 	ducros(StitchWindowDC);
 	lenCalc();
-	selRct(&StitchRangeRect);
+	selRct(StitchRangeRect);
 	if (StitchRangeRect.top > ZoomRect.top - 1 || StitchRangeRect.bottom < ZoomRect.bottom - 1
 	    || StitchRangeRect.left < ZoomRect.left + 1 || StitchRangeRect.right > ZoomRect.right - 1) {
 		SelectedPoint.x = ((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left;
@@ -5567,7 +5567,7 @@ void zumin() {
 				break;
 			}
 			if (StateMap.test(StateFlag::GRPSEL)) {
-				selRct(&groupBoundingRect);
+				selRct(groupBoundingRect);
 				SelectedPoint.x = ((groupBoundingRect.right - groupBoundingRect.left) / 2) + groupBoundingRect.left;
 				SelectedPoint.y = ((groupBoundingRect.top - groupBoundingRect.bottom) / 2) + groupBoundingRect.bottom;
 				break;
@@ -5695,7 +5695,7 @@ void zumout() {
 				break;
 			}
 			if (StateMap.test(StateFlag::GRPSEL)) {
-				selRct(&groupBoundingRect);
+				selRct(groupBoundingRect);
 				SelectedPoint.x = ((groupBoundingRect.right - groupBoundingRect.left) / 2) + groupBoundingRect.left;
 				SelectedPoint.y = ((groupBoundingRect.top - groupBoundingRect.bottom) / 2) + groupBoundingRect.bottom;
 				break;
@@ -6752,9 +6752,9 @@ void stchbox(unsigned iStitch, HDC dc) noexcept {
 	}
 }
 
-void sCor2px(const dPOINT& stitchCoordinate, POINT* pixelCoordinate) noexcept {
-	pixelCoordinate->x = (stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x + 0.5;
-	pixelCoordinate->y = StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchCoordinate.y) * ZoomRatio.y + 0.5;
+void sCor2px(const dPOINT& stitchCoordinate, POINT& pixelCoordinate) noexcept {
+	pixelCoordinate.x = (stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x + 0.5;
+	pixelCoordinate.y = StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchCoordinate.y) * ZoomRatio.y + 0.5;
 }
 
 void sdCor2px(const fPOINTATTR stitchPoint, POINT& pixelCoordinate) noexcept {
@@ -6788,7 +6788,7 @@ void unrotu() {
 		durotu();
 }
 
-void rotang(dPOINT unrotatedPoint, POINT* rotatedPoint, double rotationAngle, const dPOINT& rotationCenter) {
+void rotang(dPOINT unrotatedPoint, POINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter) {
 	double     distanceToCenter = 0.0, newAngle = 0.0;
 	dPOINT     point = {};
 	const long dx    = unrotatedPoint.x - rotationCenter.x;
@@ -6931,30 +6931,30 @@ void ritrot(double rotationAngle, const dPOINT& rotationCenter) {
 	POINT  rotated           = {};
 	dPOINT rotationReference = { (RotationRect.left), (RotationRect.top) };
 
-	rotang(rotationReference, &rotated, rotationAngle, rotationCenter);
+	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxOutline[0] = RotateBoxOutline[4] = rotated;
 	rotationReference.x                       = rotationCenter.x;
-	rotang(rotationReference, &rotated, rotationAngle, rotationCenter);
+	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxCrossVertLine[0] = rotated;
 	rotationReference.x       = RotationRect.right;
-	rotang(rotationReference, &rotated, rotationAngle, rotationCenter);
+	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxOutline[1] = rotated;
 	rotationReference.y = rotationCenter.y;
-	rotang(rotationReference, &rotated, rotationAngle, rotationCenter);
+	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxCrossHorzLine[1] = rotated;
 	rotationReference.y       = RotationRect.bottom;
-	rotang(rotationReference, &rotated, rotationAngle, rotationCenter);
+	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxOutline[2] = rotated;
 	rotationReference.x = rotationCenter.x;
-	rotang(rotationReference, &rotated, rotationAngle, rotationCenter);
+	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxCrossVertLine[1] = rotated;
 	rotationReference.x       = RotationRect.left;
-	rotang(rotationReference, &rotated, rotationAngle, rotationCenter);
+	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxOutline[3] = rotated;
 	rotationReference.y = rotationCenter.y;
-	rotang(rotationReference, &rotated, rotationAngle, rotationCenter);
+	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxCrossHorzLine[0] = rotated;
-	sCor2px(rotationCenter, &RotateBoxToCursorLine[0]);
+	sCor2px(rotationCenter, RotateBoxToCursorLine[0]);
 	StateMap.set(StateFlag::ROTSHO);
 	durot();
 }
@@ -6987,7 +6987,7 @@ void rot(dPOINT& rotationCenter) {
 		}
 		if (StateMap.test(StateFlag::GRPSEL)) {
 			rngadj();
-			selRct(&RotationRect);
+			selRct(RotationRect);
 			break;
 		}
 		shoseln(IDS_FGRPF, IDS_ROT);
@@ -8449,7 +8449,7 @@ void drwmrk(HDC dc) noexcept {
 	POINT      markLine[2]     = {};
 	const long markOffset      = 6;
 
-	sCor2px(ZoomMarkPoint, &markCoordinates);
+	sCor2px(ZoomMarkPoint, markCoordinates);
 	SelectObject(dc, ZoomMarkPen);
 	SetROP2(dc, R2_XORPEN);
 	markLine[0].x = markCoordinates.x - markOffset;
@@ -12797,7 +12797,7 @@ void selfpnt() {
 	StateMap.reset(StateFlag::SELBOX);
 	SelectedFormVertices.start = ClosestVertexToCursor;
 	SelectedFormVertices.form  = ClosestFormToCursor;
-	ritfcor(&FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
+	ritfcor(FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -12893,7 +12893,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			}
 			do {
 				if (GetKeyState(VK_SHIFT) & 0x8000 && px2stch())
-					ritfcor(&SelectedPoint);
+					ritfcor(SelectedPoint);
 				if ((StateMap.test(StateFlag::PRFACT) || StateMap.test(StateFlag::FORMIN) || StateMap.test(StateFlag::POLIMOV))
 				    || FormDataSheet) {
 					SetCursor(ArrowCursor);
@@ -13078,7 +13078,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				StateMap.set(StateFlag::SHOMOV);
 				ritmov();
 				if (px2stch())
-					ritfcor(&SelectedPoint);
+					ritfcor(SelectedPoint);
 				return 1;
 			}
 			if (StateMap.test(StateFlag::MOVCNTR)) {
@@ -13124,7 +13124,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			}
 			if (StateMap.test(StateFlag::CAPT)) {
 				if (px2stch())
-					ritfcor(&SelectedPoint);
+					ritfcor(SelectedPoint);
 				unlin();
 				MoveLine0[1].x = MoveLine1[0].x = Msg.pt.x - StitchWindowOrigin.x;
 				MoveLine0[1].y = MoveLine1[0].y = Msg.pt.y - StitchWindowOrigin.y;
@@ -13133,7 +13133,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			}
 			if (StateMap.test(StateFlag::INSRT)) {
 				if (px2stch())
-					ritfcor(&SelectedPoint);
+					ritfcor(SelectedPoint);
 				if (StateMap.testAndSet(StateFlag::VCAPT))
 					SetCapture(ThrEdWindow);
 				if (StateMap.test(StateFlag::LIN1)) {
@@ -14960,7 +14960,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				else
 					lodclp(PCSHeader.stitchCount);
 				rngadj();
-				selRct(&formsRect);
+				selRct(formsRect);
 				// ToDo - windowRect should be be formsRect? windowRect is not initialized before use here
 				auto& formControls = *FormControlPoints;
 				formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x = windowRect.left;
@@ -16416,7 +16416,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 							fvars(ClosestFormToCursor);
 							ClosestVertexToCursor = nxt(ClosestVertexToCursor);
 							ritnum(STR_NUMPNT, ClosestVertexToCursor);
-							ritfcor(&FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
+							ritfcor(FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
 							shftflt(FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
 							StateMap.set(StateFlag::RESTCH);
 						}
@@ -16498,7 +16498,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 							fvars(ClosestFormToCursor);
 							ClosestVertexToCursor = prv(ClosestVertexToCursor);
 							ritnum(STR_NUMPNT, ClosestVertexToCursor);
-							ritfcor(&FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
+							ritfcor(FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
 							shftflt(FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
 							StateMap.set(StateFlag::RESTCH);
 						}
@@ -18447,7 +18447,7 @@ void drwStch() {
 			}
 		}
 		if (StateMap.test(StateFlag::FRMPSEL))
-			ritfcor(&FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
+			ritfcor(FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
 		if (!StateMap.test(StateFlag::SELBOX) && !StateMap.test(StateFlag::FRMPSEL)) {
 			std::string blank("");
 			butxt(HCOR, blank);
@@ -18461,7 +18461,7 @@ void drwStch() {
 				SearchLineIndex = 0;
 				ducros(StitchWindowMemDC);
 			}
-			selRct(&StitchRangeRect);
+			selRct(StitchRangeRect);
 			nuselrct();
 			StateMap.set(StateFlag::SELSHO);
 			dusel(StitchWindowMemDC);

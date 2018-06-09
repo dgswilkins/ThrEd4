@@ -61,7 +61,7 @@ extern unsigned             px2stch();
 extern void                 pxCor2stch(POINT point);
 extern void                 redclp();
 extern void                 redraw(HWND window);
-extern void                 ritfcor(const fPOINT* point);
+extern void                 ritfcor(const fPOINT& point);
 extern void                 ritmov();
 extern void                 ritnum(unsigned code, unsigned value);
 extern void                 ritot(unsigned number);
@@ -73,9 +73,9 @@ extern void rotflt(fPOINT& point, const double rotationAngle, const dPOINT& rota
 extern void rotfn(double rotationAngle, const dPOINT& rotationCenter);
 extern void rstAll();
 extern void savdo();
-extern void sCor2px(const dPOINT& stitchCoordinate, POINT* pixelCoordinate);
+extern void sCor2px(const dPOINT& stitchCoordinate, POINT& pixelCoordinate);
 extern void sdmsg();
-extern void selRct(fRECTANGLE* sourceRect);
+extern void selRct(fRECTANGLE& sourceRect);
 extern void setfchk();
 extern void setpsel();
 extern void setxt(std::vector<RNGCNT>& textureSegments);
@@ -1180,9 +1180,9 @@ void drwfrm() {
 				frmpoly(FormLines, VertexCount);
 				if (SelectedForm->fillType == CONTF) {
 					point = CurrentFormVertices[SelectedForm->angleOrClipData.guide.start];
-					sCor2px(point, &line[0]);
+					sCor2px(point, line[0]);
 					point = CurrentFormVertices[SelectedForm->angleOrClipData.guide.finish];
-					sCor2px(point, &line[1]);
+					sCor2px(point, line[1]);
 					Polyline(StitchWindowMemDC, line, 2);
 				}
 			}
@@ -2494,7 +2494,7 @@ void setfpnt() {
 		StateMap.set(StateFlag::WASFPNT);
 		StateMap.reset(StateFlag::SELBOX);
 		StateMap.set(StateFlag::FRMPSEL);
-		ritfcor(&CurrentFormVertices[ClosestVertexToCursor]);
+		ritfcor(CurrentFormVertices[ClosestVertexToCursor]);
 		StateMap.set(StateFlag::RESTCH);
 	}
 }
@@ -4924,7 +4924,7 @@ void delspnt() {
 	StateMap.set(StateFlag::FRMPSEL);
 	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 		FormList[iForm].vertices--;
-	ritfcor(&CurrentFormVertices[ClosestVertexToCursor]);
+	ritfcor(CurrentFormVertices[ClosestVertexToCursor]);
 	ritnum(STR_NUMPNT, ClosestVertexToCursor);
 	frmout(ClosestFormToCursor);
 	vertex = SelectedForm->vertices[ClosestVertexToCursor];
@@ -7456,7 +7456,7 @@ void fliph() {
 			if (StateMap.test(StateFlag::GRPSEL)) {
 				savdo();
 				rngadj();
-				selRct(&rectangle);
+				selRct(rectangle);
 				midpoint = (rectangle.right - rectangle.left) / 2 + rectangle.left;
 				for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++)
 					StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
@@ -7535,7 +7535,7 @@ void flipv() {
 			if (StateMap.test(StateFlag::GRPSEL)) {
 				savdo();
 				rngadj();
-				selRct(&rectangle);
+				selRct(rectangle);
 				midpoint = (rectangle.top - rectangle.bottom) / 2 + rectangle.bottom;
 				for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++)
 					StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
@@ -8476,7 +8476,7 @@ void rotpar(dPOINT& rotationCenter) {
 	else {
 		if (StateMap.test(StateFlag::GRPSEL)) {
 			rngadj();
-			selRct(&RotationRect);
+			selRct(RotationRect);
 		}
 	}
 	if (StateMap.test(StateFlag::GMRK)) {
@@ -8847,12 +8847,12 @@ void stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect) {
 	dPOINT stitchCoord = { stitchRect.left, stitchRect.top };
 	POINT  screenCoord = {};
 
-	sCor2px(stitchCoord, &screenCoord);
+	sCor2px(stitchCoord, screenCoord);
 	screenRect.left = screenCoord.x;
 	screenRect.top  = screenCoord.y;
 	stitchCoord.x   = stitchRect.right;
 	stitchCoord.y   = stitchRect.bottom;
-	sCor2px(stitchCoord, &screenCoord);
+	sCor2px(stitchCoord, screenCoord);
 	screenRect.right  = screenCoord.x;
 	screenRect.bottom = screenCoord.y;
 }
