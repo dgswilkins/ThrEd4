@@ -77,8 +77,8 @@ void               redraw(HWND window) noexcept;
 void               ritnum(unsigned code, unsigned value);
 void               ritot(unsigned number);
 void               rngadj();
-void               rotfn(double rotationAngle, dPOINT& rotationCenter);
-void               rotfns(double rotationAngle, dPOINT& rotationCenter);
+void               rotfn(double rotationAngle, const dPOINT& rotationCenter);
+void               rotfns(double rotationAngle, const dPOINT& rotationCenter);
 void               rotpix(POINT unrotatedPoint, POINT* rotatedPoint, const POINT& rotationCenterPixels);
 void               rstAll();
 void               rstdu();
@@ -181,7 +181,7 @@ extern void               duhart(unsigned sideCount);
 extern void               duinsf();
 extern void               dulens(unsigned sides);
 extern void               dundcol(unsigned color);
-extern void               duprot(double rotationAngle, dPOINT& rotationCenter);
+extern void               duprot(double rotationAngle, const dPOINT& rotationCenter);
 extern void               dupsel(HDC dc);
 extern void               durpoli(unsigned vertexCount);
 extern void               dusat();
@@ -207,21 +207,21 @@ extern unsigned           find1st();
 extern void               fliph();
 extern void               flipv();
 extern void               flpord();
-extern unsigned           fltind(const fPOINT* point);
-extern void               fltspac(const fPOINT* start, unsigned count);
+extern unsigned           fltind(const fPOINT* const point);
+extern void               fltspac(const fPOINT* const start, unsigned count);
 extern void               form();
 extern void               fritfil();
 extern void               frm0();
 extern void               frmadj(unsigned formIndex);
 extern void               frmchkx();
-extern void               frmclr(FRMHED* destination);
+extern void               frmclr(FRMHED* const destination);
 extern void               frmlin(fPOINT* vertices, unsigned vertexCount);
 extern void               frmnum();
 extern void               frmnumfn(unsigned newFormIndex);
 extern void               frmon();
 extern void               frmout(unsigned formIndex);
 extern void               frmovlin();
-extern bool               frmrng(unsigned iForm, RANGE* range);
+extern bool               frmrng(unsigned iForm, RANGE& range);
 extern void               frmsadj();
 extern void               frmsqr(unsigned iVertex);
 extern void               frmx(POINT controlPoint, HDC dc);
@@ -278,8 +278,8 @@ extern unsigned           projh(double yCoordinate, fPOINT point0, fPOINT point1
 extern void               prpbrd(double borderStitchSpacing);
 extern constexpr unsigned prv(unsigned iVertex);
 extern unsigned           psg();
-extern void               px2stchf(POINT screen, fPOINT* stitchPoint);
-extern void               pxrct2stch(RECT screenRect, fRECTANGLE* stitchRect);
+extern void               px2stchf(const POINT& screen, fPOINT* const stitchPoint);
+extern void               pxrct2stch(const RECT& screenRect, fRECTANGLE* const stitchRect);
 extern void               rats();
 extern void               ratsr();
 extern void               rct2sel(const RECT& rectangle, std::vector<POINT>& line);
@@ -319,7 +319,7 @@ extern void               selal();
 extern void               selalfil();
 extern void               selalfrm();
 extern void               selfil(unsigned type);
-extern void               selsqr(POINT controlPoint, HDC dc);
+extern void               selsqr(const POINT& controlPoint, HDC dc);
 extern void               setap();
 extern void               setbcol();
 extern void               setblen();
@@ -329,7 +329,7 @@ extern void               setbspac();
 extern void               setclpspac();
 extern void               setcwlk();
 extern void               setear();
-extern void               setexpand(double& xyRatio);
+extern void               setexpand(const double& xyRatio);
 extern void               setfang();
 extern void               setfchk();
 extern void               setfcol();
@@ -360,7 +360,7 @@ extern void setund();
 extern void setuspac();
 extern void setwlk();
 extern void setwlkind();
-extern void sfCor2px(fPOINT stitchPoint, POINT* screen);
+extern void sfCor2px(const fPOINT& stitchPoint, POINT* const screen);
 extern void sfuang();
 extern void shoMsg(const std::string& message);
 extern void shoseln(unsigned code0, unsigned code1);
@@ -370,8 +370,8 @@ extern void snap();
 extern void spltfrm();
 extern void srtbyfrm();
 extern void srtfrm();
-extern void stCor2px(fPOINTATTR stitch, POINT* screen);
-extern void stchrct2px(fRECTANGLE stitchRect, RECT* screenRect);
+extern void stCor2px(const fPOINTATTR& stitch, POINT* const screen);
+extern void stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect);
 extern void stchs2frm();
 extern void tabmsg(unsigned code);
 extern void tglfrm();
@@ -8761,24 +8761,24 @@ void delinf() noexcept {
 		infadj(&FormVertices[iVertex].x, &FormVertices[iVertex].y);
 }
 
-void chkrng(fPOINT* range) noexcept {
+void chkrng(fPOINT& range) noexcept {
 	unsigned iStitch = 0, stitchCount = 0;
 
 	delinf();
-	range->x = UnzoomedRect.x;
-	range->y = UnzoomedRect.y;
+	range.x = UnzoomedRect.x;
+	range.y = UnzoomedRect.y;
 	if (FormIndex) {
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (StitchBuffer[iStitch].attribute & NOTFRM
 			    || ((StitchBuffer[iStitch].attribute & TYPMSK)
 			        && ((StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT < FormIndex))) {
 				StitchBuffer[stitchCount] = StitchBuffer[iStitch];
-				if (StitchBuffer[stitchCount].x > range->x)
-					StitchBuffer[stitchCount].x = range->x - 1;
+				if (StitchBuffer[stitchCount].x > range.x)
+					StitchBuffer[stitchCount].x = range.x - 1;
 				if (StitchBuffer[stitchCount].x < 0)
 					StitchBuffer[stitchCount].x = 0;
-				if (StitchBuffer[stitchCount].y > range->y)
-					StitchBuffer[stitchCount].y = range->y - 1;
+				if (StitchBuffer[stitchCount].y > range.y)
+					StitchBuffer[stitchCount].y = range.y - 1;
 				if (StitchBuffer[stitchCount].y < 0)
 					StitchBuffer[stitchCount].y = 0;
 				stitchCount++;
@@ -8788,12 +8788,12 @@ void chkrng(fPOINT* range) noexcept {
 	}
 	else {
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (StitchBuffer[iStitch].x > range->x)
-				StitchBuffer[iStitch].x = range->x - 1;
+			if (StitchBuffer[iStitch].x > range.x)
+				StitchBuffer[iStitch].x = range.x - 1;
 			if (StitchBuffer[iStitch].x < 0)
 				StitchBuffer[iStitch].x = 0;
-			if (StitchBuffer[iStitch].y > range->y)
-				StitchBuffer[iStitch].y = range->y - 1;
+			if (StitchBuffer[iStitch].y > range.y)
+				StitchBuffer[iStitch].y = range.y - 1;
 			if (StitchBuffer[iStitch].y < 0)
 				StitchBuffer[iStitch].y = 0;
 		}
@@ -8854,10 +8854,9 @@ void setpsel() {
 	StateMap.set(StateFlag::FPSEL);
 }
 
-void rotfn(double rotationAngle, dPOINT& rotationCenter) {
+void rotfn(double rotationAngle, const dPOINT& rotationCenter) {
 	unsigned iVertex = 0, iStitch = 0, iForm = 0, currentVertex = 0;
 	double   length = 0.0;
-	double   angle  = 0.0;
 	dPOINT   center = {};
 
 	savdo();
@@ -8885,8 +8884,6 @@ void rotfn(double rotationAngle, dPOINT& rotationCenter) {
 		return;
 	}
 	if (StateMap.testAndReset(StateFlag::FRMSROT)) {
-		angle  = rotationAngle;
-		center = rotationCenter;
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			fvars(ClosestFormToCursor);
@@ -8894,8 +8891,6 @@ void rotfn(double rotationAngle, dPOINT& rotationCenter) {
 				rotflt(CurrentFormVertices[iVertex], rotationAngle, rotationCenter);
 			frmout(ClosestFormToCursor);
 			refilfn();
-			rotationAngle  = angle;
-			rotationCenter = center;
 		}
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -8919,7 +8914,7 @@ void rotfn(double rotationAngle, dPOINT& rotationCenter) {
 	}
 }
 
-void rotfns(double rotationAngle, dPOINT& rotationCenter) {
+void rotfns(double rotationAngle, const dPOINT& rotationCenter) {
 	savdo();
 	rotfn(rotationAngle, rotationCenter);
 }
@@ -9357,13 +9352,13 @@ void rembig() {
 		do {
 			if (SelectedFormList->size()) {
 				for (auto selectedForm : (*SelectedFormList)) {
-					frmrng(selectedForm, &range);
+					frmrng(selectedForm, range);
 					makbig(range.start, range.finish);
 				}
 				break;
 			}
 			if (StateMap.test(StateFlag::FORMSEL)) {
-				frmrng(ClosestFormToCursor, &range);
+				frmrng(ClosestFormToCursor, range);
 				makbig(range.start, range.finish);
 				break;
 			}
@@ -12389,7 +12384,7 @@ void nudgfn(float deltaX, float deltaY) {
 		AllItemsRect.top += deltaY;
 		AllItemsRect.left += deltaX;
 		AllItemsRect.right += deltaX;
-		stchrct2px(AllItemsRect, &SelectedFormsRect);
+		stchrct2px(AllItemsRect, SelectedFormsRect);
 		StateMap.set(StateFlag::RESTCH);
 		return;
 	}
@@ -17030,7 +17025,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			refilal();
 			break;
 		case ID_CHK: // edit / Check Range
-			chkrng(&StitchRangeSize);
+			chkrng(StitchRangeSize);
 			StateMap.set(StateFlag::RESTCH);
 			break;
 		case ID_RTRVCLP: // edit / Retrieve Clipboard Stitches

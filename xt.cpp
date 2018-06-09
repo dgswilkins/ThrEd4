@@ -102,7 +102,7 @@ extern dRECTANGLE                ZoomRect;
 extern void               adbad(std::string& repairMessage, unsigned code, unsigned count);
 extern fPOINT*            adflt(unsigned count);
 extern SATCON*            adsatk(unsigned count);
-extern void               angclpfn(std::vector<RNGCNT>& textureSegments);
+extern void               angclpfn(const std::vector<RNGCNT>& textureSegments);
 extern void               bakseq();
 extern void               butxt(unsigned iButton, const std::string& buttonText);
 extern void               centir();
@@ -126,7 +126,7 @@ extern void               filsat();
 extern void               filsfn();
 extern void               filvrt();
 extern unsigned           find1st();
-extern void               frmclr(FRMHED* destination);
+extern void               frmclr(FRMHED* const destination);
 extern void               frmout(unsigned formIndex);
 extern void               frmrct(fRECTANGLE* rectangle);
 extern void               fshor();
@@ -3000,18 +3000,18 @@ void dutxtx(int index, int offsetPixels) {
 	txtxfn(ref, offsetPixels);
 }
 
-void txrct2rct(TXTRCT textureRect, RECT* rectangle) noexcept {
+void txrct2rct(TXTRCT textureRect, RECT& rectangle) noexcept {
 	TXPNT texturePoint = { textureRect.top, textureRect.left };
 	POINT point        = {};
 
 	txt2pix(texturePoint, &point);
-	rectangle->left   = point.x - IniFile.textureEditorSize;
-	rectangle->top    = point.y - IniFile.textureEditorSize;
+	rectangle.left   = point.x - IniFile.textureEditorSize;
+	rectangle.top    = point.y - IniFile.textureEditorSize;
 	texturePoint.y    = textureRect.bottom;
 	texturePoint.line = textureRect.right;
 	txt2pix(texturePoint, &point);
-	rectangle->right  = point.x + IniFile.textureEditorSize;
-	rectangle->bottom = point.y + IniFile.textureEditorSize;
+	rectangle.right  = point.x + IniFile.textureEditorSize;
+	rectangle.bottom = point.y + IniFile.textureEditorSize;
 }
 
 void ed2px(fPOINT editPoint, POINT* point) noexcept {
@@ -3134,7 +3134,7 @@ void drwtxtr() {
 		dutxtx(index, IniFile.textureEditorSize);
 	}
 	if (SelectedTexturePointsList->size()) {
-		txrct2rct(TextureRect, &TexturePixelRect);
+		txrct2rct(TextureRect, TexturePixelRect);
 		line[0].y = line[1].y = TexturePixelRect.top;
 		line[0].x             = TexturePixelRect.left;
 		line[1].x             = TexturePixelRect.right;
@@ -3439,20 +3439,20 @@ void txtrup() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void angrct(fRECTANGLE* rectangle) noexcept {
+void angrct(fRECTANGLE& rectangle) noexcept {
 	unsigned iVertex = 0;
 
-	rectangle->left = rectangle->right = AngledFormVertices[0].x;
-	rectangle->bottom = rectangle->top = AngledFormVertices[0].y;
+	rectangle.left = rectangle.right = AngledFormVertices[0].x;
+	rectangle.bottom = rectangle.top = AngledFormVertices[0].y;
 	for (iVertex = 1; iVertex < AngledForm.vertexCount; iVertex++) {
-		if (AngledFormVertices[iVertex].x < rectangle->left)
-			rectangle->left = AngledFormVertices[iVertex].x;
-		if (AngledFormVertices[iVertex].x > rectangle->right)
-			rectangle->right = AngledFormVertices[iVertex].x;
-		if (AngledFormVertices[iVertex].y > rectangle->top)
-			rectangle->top = AngledFormVertices[iVertex].y;
-		if (AngledFormVertices[iVertex].y < rectangle->bottom)
-			rectangle->bottom = AngledFormVertices[iVertex].y;
+		if (AngledFormVertices[iVertex].x < rectangle.left)
+			rectangle.left = AngledFormVertices[iVertex].x;
+		if (AngledFormVertices[iVertex].x > rectangle.right)
+			rectangle.right = AngledFormVertices[iVertex].x;
+		if (AngledFormVertices[iVertex].y > rectangle.top)
+			rectangle.top = AngledFormVertices[iVertex].y;
+		if (AngledFormVertices[iVertex].y < rectangle.bottom)
+			rectangle.bottom = AngledFormVertices[iVertex].y;
 	}
 }
 
@@ -3482,12 +3482,12 @@ void setxfrm() {
 	float      height    = 0.0;
 	double     ratio     = 0.0;
 
-	angrct(&angleRect);
+	angrct(angleRect);
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 		AngledFormVertices[iVertex].x -= angleRect.left;
 		AngledFormVertices[iVertex].y -= angleRect.bottom;
 	}
-	angrct(&angleRect);
+	angrct(angleRect);
 	height = angleRect.top - angleRect.bottom;
 	if (height > TextureScreen.areaHeight) {
 		ratio = TextureScreen.areaHeight / height * 0.95;
@@ -3495,7 +3495,7 @@ void setxfrm() {
 			AngledFormVertices[iVertex].x *= ratio;
 			AngledFormVertices[iVertex].y *= ratio;
 		}
-		angrct(&angleRect);
+		angrct(angleRect);
 	}
 	TextureScreen.formCenter.x = midl(angleRect.right, angleRect.left);
 	TextureScreen.formCenter.y = midl(angleRect.top, angleRect.bottom);
@@ -4045,7 +4045,7 @@ void txsiz(double ratio) {
 		AngledFormVertices[iVertex].x *= ratio;
 		AngledFormVertices[iVertex].y *= ratio;
 	}
-	angrct(&angleRect);
+	angrct(angleRect);
 	TextureScreen.formCenter.x = midl(angleRect.right, angleRect.left);
 	TextureScreen.formCenter.y = midl(angleRect.top, angleRect.bottom);
 	ed2px(TextureScreen.formCenter, &SelectTexturePointsOrigin);

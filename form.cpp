@@ -20,10 +20,10 @@ extern fPOINT*              adclp(unsigned count);
 extern fPOINT*              adflt(unsigned count);
 extern SATCON*              adsatk(unsigned count);
 extern void                 alrotmsg();
-extern void                 angrct(fRECTANGLE* rectangle);
+extern void                 angrct(fRECTANGLE& rectangle);
 extern void                 centr();
 extern void                 chkcwlk();
-extern void                 chkrng(fPOINT* range);
+extern void                 chkrng(fPOINT& range);
 extern void                 chkund(std::vector<RNGCNT>& textureSegments);
 extern void                 chkwlk();
 extern void                 coltab();
@@ -70,7 +70,7 @@ extern void
             rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, const double& rotationAngle, const dPOINT& rotationCenter);
 extern void rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, const double rotationAngle, const dPOINT& rotationCenter);
 extern void rotflt(fPOINT& point, const double rotationAngle, const dPOINT& rotationCenter);
-extern void rotfn(double rotationAngle, dPOINT& rotationCenter);
+extern void rotfn(double rotationAngle, const dPOINT& rotationCenter);
 extern void rstAll();
 extern void savdo();
 extern void sCor2px(const dPOINT& stitchCoordinate, POINT* pixelCoordinate);
@@ -192,7 +192,7 @@ extern dPOINT                    ZoomMarkPoint;
 extern dPOINT                    ZoomRatio;
 extern dRECTANGLE                ZoomRect;
 
-void               angclpfn(std::vector<RNGCNT>& textureSegments);
+void               angclpfn(const std::vector<RNGCNT>& textureSegments);
 void               angsclp();
 void               apbrd();
 void               bakseq();
@@ -205,7 +205,7 @@ void               chan();
 void               chnfn();
 bool               cisin(float xCoordinate, float yCoordinate) noexcept;
 void               clpbrd(unsigned short startVertex);
-void               clpcon(std::vector<RNGCNT>& textureSegments);
+void               clpcon(const std::vector<RNGCNT>& textureSegments);
 void               clpic();
 void               clpout();
 void               clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints);
@@ -214,20 +214,20 @@ void               deleclp(unsigned iForm);
 void               delmclp(unsigned iForm);
 void               duangs();
 void               dubfn();
-void               dufcntr(dPOINT* center);
+void               dufcntr(dPOINT& center);
 void               dulast(std::vector<fPOINT>& chainEndPoints);
 void               dufxlen(std::vector<fPOINT>& chainEndPoints);
 void               duhart(unsigned sideCount);
 void               durpoli(unsigned vertexCount);
 void               duxclp();
-void               filinsb(dPOINT point) noexcept;
+void               filinsb(const dPOINT& point) noexcept;
 void               filvrt();
 void               flipv();
 void               fmclp();
 void               frmpnts(unsigned typ) noexcept;
 void               frmsqr(unsigned iVertex);
 void               fvars(unsigned iForm) noexcept;
-void               horclpfn(std::vector<RNGCNT>& textureSegments);
+void               horclpfn(const std::vector<RNGCNT>& textureSegments);
 void               horsclp();
 bool               iseclp(unsigned find);
 bool               iseclpx(unsigned find);
@@ -389,18 +389,18 @@ unsigned char* Levels[]
     = { &Level00,    &Level01,    &Level02[0], &Level03[0], &Level04[0], &Level05[0], &Level06[0], &Level07[0],
 	    &Level08[0], &Level09[0], &Level10[0], &Level11[0], &Level12[0], &Level13[0], &Level14[0], &Level15[0] };
 
-void frmclr(FRMHED* destination) noexcept {
+void frmclr(FRMHED* const destination) noexcept {
 	memset(destination, 0, sizeof(FRMHED));
 }
 
-void duinf(const FRMHED* formHeader) noexcept {
+void duinf(const FRMHED* const formHeader) noexcept {
 	// Correct
 	FormInfo.type      = formHeader->attribute & 0xf;
 	FormInfo.attribute = (formHeader->attribute >> 4) & 0xf;
 	FormInfo.sideCount = formHeader->vertexCount;
 }
 
-bool comp(const dPOINTLINE point1, const dPOINTLINE point2) noexcept {
+bool comp(const dPOINTLINE& point1, const dPOINTLINE& point2) noexcept {
 	if (point1.y < point2.y)
 		return true;
 	if (point1.x < point2.x)
@@ -412,7 +412,7 @@ void getfinfo(unsigned iForm) noexcept {
 	duinf(&FormList[iForm]);
 }
 
-unsigned satind(const SATCON* guide) noexcept {
+unsigned satind(const SATCON* const guide) noexcept {
 	return guide - SatinGuides;
 }
 
@@ -423,7 +423,7 @@ void dusqr() {
 		SelectedForm->extendedAttribute &= ~(AT_SQR);
 }
 
-void sacspac(const SATCON* startGuide, unsigned guideCount) noexcept {
+void sacspac(const SATCON* const startGuide, unsigned guideCount) noexcept {
 	int      iStartGuide = 0;
 	int      source = 0, destination = 0;
 	unsigned iForm = 0;
@@ -576,15 +576,15 @@ fPOINT* numclp() {
 	return &ClipPoints[find];
 }
 
-unsigned fltind(const fPOINT* point) noexcept {
+unsigned fltind(const fPOINT* const point) noexcept {
 	return point - FormVertices;
 }
 
-unsigned clpind(const fPOINT* point) noexcept {
+unsigned clpind(const fPOINT* const point) noexcept {
 	return point - ClipPoints;
 }
 
-void fltspac(const fPOINT* start, unsigned count) noexcept {
+void fltspac(const fPOINT* const start, unsigned count) noexcept {
 	const int startIndex  = fltind(start);
 	int       source      = FormVertexIndex - 1;
 	int       destination = FormVertexIndex + count - 1;
@@ -789,17 +789,17 @@ void frmout(unsigned formIndex) noexcept {
 	}
 }
 
-void sfCor2px(fPOINT stitchPoint, POINT* screen) noexcept {
+void sfCor2px(const fPOINT& stitchPoint, POINT* const screen) noexcept {
 	screen->x = (stitchPoint.x - ZoomRect.left) * ZoomRatio.x + 0.5;
 	screen->y = StitchWindowClientRect.bottom - (stitchPoint.y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
 }
 
-void stCor2px(fPOINTATTR stitch, POINT* screen) noexcept {
+void stCor2px(const fPOINTATTR& stitch, POINT* const screen) noexcept {
 	screen->x = (stitch.x - ZoomRect.left) * ZoomRatio.x + 0.5;
 	screen->y = StitchWindowClientRect.bottom - (stitch.y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
 }
 
-void px2stchf(POINT screen, fPOINT* stitchPoint) noexcept {
+void px2stchf(const POINT& screen, fPOINT* const stitchPoint) noexcept {
 	double factorX = 0.0, factorY = 0.0;
 
 	factorX        = static_cast<double>(screen.x) / static_cast<double>(StitchWindowClientRect.right);
@@ -808,7 +808,7 @@ void px2stchf(POINT screen, fPOINT* stitchPoint) noexcept {
 	stitchPoint->y = factorY * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
 }
 
-void frmlin(const fPOINT* vertices, unsigned vertexCount) noexcept {
+void frmlin(const fPOINT* const vertices, unsigned vertexCount) noexcept {
 	if (vertices) {
 		unsigned iVertex = 0;
 
@@ -949,7 +949,7 @@ void frmsqr(unsigned iVertex) {
 	Polyline(StitchWindowMemDC, line, 4);
 }
 
-void selsqr(POINT controlPoint, HDC dc) noexcept {
+void selsqr(const POINT& controlPoint, HDC dc) noexcept {
 	POINT line[5];
 
 	line[0].x = line[3].x = line[4].x = controlPoint.x - IniFile.formVertexSizePixels;
@@ -960,7 +960,7 @@ void selsqr(POINT controlPoint, HDC dc) noexcept {
 	Polyline(dc, line, 5);
 }
 
-void frmsqr0(POINT controlPoint) noexcept {
+void frmsqr0(const POINT& controlPoint) noexcept {
 	POINT          line[5] = {};
 	const unsigned offset  = IniFile.formBoxSizePixels;
 
@@ -974,7 +974,7 @@ void frmsqr0(POINT controlPoint) noexcept {
 	}
 }
 
-void frmx(POINT controlPoint, HDC dc) noexcept {
+void frmx(const POINT& controlPoint, HDC dc) noexcept {
 	POINT line[2];
 
 	SelectObject(dc, FormSelectedPen);
@@ -1110,7 +1110,7 @@ void dubig() {
 		selsqr((*SelectedFormsLine)[iPoint], StitchWindowMemDC);
 }
 
-void frmpoly(const POINT* line, unsigned count) noexcept {
+void frmpoly(const POINT* const line, unsigned count) noexcept {
 	if (line) {
 		unsigned iPoint = 0;
 
@@ -1486,7 +1486,7 @@ void duform(unsigned formType) {
 	}
 }
 
-float findDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point, double& distance) noexcept {
+float findDistanceToSide(const fPOINT& lineStart, const fPOINT& lineEnd, const fPOINT& point, double distance) noexcept {
 	const double A     = point.x - lineStart.x;
 	const double B     = point.y - lineStart.y;
 	const double C     = lineEnd.x - lineStart.x;
@@ -1528,11 +1528,12 @@ float findDistanceToSide(fPOINT lineStart, fPOINT lineEnd, fPOINT point, double&
 }
 
 unsigned closfrm() {
-	unsigned iForm = 0, iVertex = 0, closestForm = 0, closestVertex = 0, layerCoded = 0, formLayer = 0;
-	fPOINT   point            = {};
-	POINT    screenCoordinate = {};
-	double   length = 0, minimumLength = 1e99;
-	float    param = 0.0;
+	unsigned     iForm = 0, iVertex = 0, closestForm = 0, closestVertex = 0, layerCoded = 0, formLayer = 0;
+	fPOINT       point            = {};
+	POINT        screenCoordinate = {};
+	const double length           = 0;
+	double       minimumLength    = 1e99;
+	float        param            = 0.0;
 
 	if (FormIndex) {
 		screenCoordinate.x = Msg.pt.x - StitchWindowOrigin.x;
@@ -1553,7 +1554,7 @@ unsigned closfrm() {
 					// find the closest line first and then find the closest vertex on that line
 					for (iVertex = 0; iVertex < FormInfo.sideCount; iVertex++) {
 						param = findDistanceToSide(vertices[iVertex], vertices[nxt(iVertex)], point, length);
-						if (length < minimumLength && length >= 0) {
+						if ((length < minimumLength) & (length >= 0)) {
 							minimumLength = length;
 							closestForm   = iForm;
 							if (param < 0.5) {
@@ -2515,7 +2516,7 @@ constexpr unsigned prv(unsigned iVertex) {
 
 /* find the intersection of two lines, one defined by point and slope, the other by the coordinates
    of the endpoints. */
-bool proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* intersectionPoint) noexcept {
+bool proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT* const intersectionPoint) noexcept {
 	dPOINT delta     = {};
 	double sideSlope = 0.0, pointConstant = 0.0, sideConstant = 0.0, xMinimum = 0.0;
 	double xMaximum = 0.0, yMinimum = 0.0, yMaximum = 0.0;
@@ -3620,7 +3621,7 @@ void bakseq() {
 						OSequence[SequenceIndex++].x = BSequence[iSequence].x;
 						count++;
 					} while (true);
-				OSequence[SequenceIndex++] = BSequence[iSequence];
+					OSequence[SequenceIndex++] = BSequence[iSequence];
 				}
 				else {
 					OSequence[SequenceIndex++] = BSequence[iSequence];
@@ -4438,12 +4439,12 @@ void satfn(std::vector<double>& lengths, unsigned line1Start, unsigned line1End,
 		if (iLine2Vertex == VertexCount) {
 			line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[0].x;
 			line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[0].y;
-			line2Point = CurrentFormVertices[0];
+			line2Point   = CurrentFormVertices[0];
 		}
 		else {
 			line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x;
 			line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y;
-			line2Point = CurrentFormVertices[iLine2Vertex];
+			line2Point   = CurrentFormVertices[iLine2Vertex];
 		}
 		iLine1Vertex = nxt(iLine1Vertex);
 		iLine2Vertex = prv(iLine2Vertex);
@@ -4728,9 +4729,10 @@ void filsat() {
 
 unsigned closat() {
 	unsigned     iForm = 0, iVertex = 0, lastVertex = 0;
-	double       minimumLength = 1e99, length = 0;
-	unsigned int savedVertex = 0;
-	float        param       = 0.0;
+	double       minimumLength = 1e99;
+	const double length        = 0;
+	unsigned int savedVertex   = 0;
+	float        param         = 0.0;
 
 	px2stch();
 	for (iForm = 0; iForm < FormIndex; iForm++) {
@@ -4809,7 +4811,7 @@ void nufpnt(unsigned vertex) noexcept {
 	frmlin(FormForInsert->vertices, FormForInsert->vertexCount);
 }
 
-double p2p(fPOINT point0, fPOINT point1) noexcept {
+double p2p(const fPOINT& point0, const fPOINT& point1) noexcept {
 	return hypot(point0.x - point1.x, point0.y - point1.y);
 }
 
@@ -5242,7 +5244,7 @@ void bord() {
 	}
 }
 
-bool ritclp(std::vector<fPOINT> clipFillData, fPOINT point) {
+bool ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) {
 	fPOINT   adjustedPoint = { (point.x - ClipReference.x), (point.y - ClipReference.y) };
 	unsigned iStitch       = 0;
 
@@ -5276,8 +5278,8 @@ bool clpsid(std::vector<fPOINT>& clipReversedData,
 			tdub = ((length - clipCount * ClipRectSize.cx) / (clipCount - 1) + ClipRectSize.cx) / length;
 		else
 			tdub = (length - ClipRectSize.cx) / 2;
-		step.x = delta.x * tdub;
-		step.y = delta.y * tdub;
+		step.x        = delta.x * tdub;
+		step.y        = delta.y * tdub;
 		insertPoint   = CurrentFormVertices[start];
 		rotationAngle = atan2(delta.y, delta.x);
 		for (ind = 0; ind < ClipStitchCount; ind++)
@@ -5295,7 +5297,7 @@ bool clpsid(std::vector<fPOINT>& clipReversedData,
 
 void linsid(std::vector<fPOINT>& clipReversedData,
             std::vector<fPOINT>& clipFillData,
-            const double&        clipAngle,
+            double               clipAngle,
             const dPOINT&        vector0,
             const dPOINT&        rotationCenter) {
 	fPOINT         delta     = { (CurrentFormVertices[CurrentSide + 1].x - SelectedPoint.x),
@@ -5316,12 +5318,13 @@ void linsid(std::vector<fPOINT>& clipReversedData,
 	}
 }
 
-bool nupnt(const double& clipAngle, dPOINT& moveToCoords) noexcept {
+bool nupnt(double clipAngle, dPOINT& moveToCoords) noexcept {
 	double       length = 0.0, delta = 0.0;
 	unsigned     step     = 0;
 	const double sinAngle = sin(clipAngle);
 	const double cosAngle = cos(clipAngle);
 
+	// ToDo - should we use a temp variable and assign to moveToCoords before return?
 	moveToCoords = CurrentFormVertices[CurrentSide + 2];
 	length       = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > ClipRectSize.cx) {
@@ -5340,7 +5343,7 @@ bool nupnt(const double& clipAngle, dPOINT& moveToCoords) noexcept {
 
 void lincrnr(std::vector<fPOINT>& clipReversedData,
              std::vector<fPOINT>& clipFillData,
-             const double&        clipAngle,
+             double               clipAngle,
              dPOINT&              moveToCoords,
              const dPOINT&        rotationCenter) {
 	dPOINT   delta   = {};
@@ -5570,7 +5573,7 @@ void fclp() {
 	}
 }
 
-void filinsb(dPOINT point) noexcept {
+void filinsb(const dPOINT& point) noexcept {
 	dPOINT       delta  = { (point.x - SelectedPoint.x), (point.y - SelectedPoint.y) };
 	const double length = hypot(delta.x, delta.y);
 	unsigned     count  = length / MAXSTCH + 1;
@@ -5595,7 +5598,7 @@ void filinsb(dPOINT point) noexcept {
 	SelectedPoint.y              = point.y;
 }
 
-bool chkbak(std::vector<dPOINT>& satinBackup, dPOINT pnt) {
+bool chkbak(std::vector<dPOINT>& satinBackup, const dPOINT& pnt) {
 	unsigned   iBackup = 0;
 	double     length  = 0.0;
 	const auto maxSB   = satinBackup.size();
@@ -5607,7 +5610,7 @@ bool chkbak(std::vector<dPOINT>& satinBackup, dPOINT pnt) {
 	return 0;
 }
 
-bool linx(const std::vector<fPOINT>& points, unsigned start, unsigned finish, dPOINT* intersection) {
+bool linx(const std::vector<fPOINT>& points, unsigned start, unsigned finish, dPOINT* const intersection) {
 	if (OutsidePoints) {
 		dPOINT delta = { ((*OutsidePoints)[start].x - points[start].x), ((*OutsidePoints)[start].y - points[start].y) };
 		dPOINT point = { (points[start].x), (points[start].y) };
@@ -6051,269 +6054,271 @@ BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam) noexcept {
 void refrmfn() {
 	std::string choice;
 	unsigned    edgeFillType = 0, iEdge = 0;
+	auto&       stringTable = *StringTable;
+	auto&       labelWindow = *LabelWindow;
+	auto&       valueWindow = *ValueWindow;
 
 	edgeFillType = SelectedForm->edgeType & NEGUND;
 	if (edgeFillType >= EDGELAST) {
 		edgeFillType = EDGELAST - 1;
 	}
-	iEdge                 = edgeFillType - 1;
-	LabelWindowCoords.top = ValueWindowCoords.top = 3;
-	LabelWindowCoords.bottom = ValueWindowCoords.bottom = 3 + LabelWindowSize.y;
-	LabelWindowCoords.left                              = 3;
-	LabelWindowCoords.right                             = 3 + LabelWindowSize.x;
-	ValueWindowCoords.left                              = 6 + LabelWindowSize.x;
-	ValueWindowCoords.right                             = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
-	(*LabelWindow)[LFRM]                                = txtwin((*StringTable)[STR_TXT0], LabelWindowCoords);
+	iEdge                    = edgeFillType - 1;
+	ValueWindowCoords.top    = 3;
+	LabelWindowCoords.top    = ValueWindowCoords.top;
+	ValueWindowCoords.bottom = 3 + LabelWindowSize.y;
+	LabelWindowCoords.bottom = ValueWindowCoords.bottom;
+	LabelWindowCoords.left   = 3;
+	LabelWindowCoords.right  = 3 + LabelWindowSize.x;
+	ValueWindowCoords.left   = 6 + LabelWindowSize.x;
+	ValueWindowCoords.right  = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
+	labelWindow[LFRM]        = txtwin(stringTable[STR_TXT0], LabelWindowCoords);
 	if (SelectedForm->type == FRMLINE)
-		choice = (*StringTable)[STR_EDG1];
+		choice = stringTable[STR_EDG1];
 	else
-		choice = (*StringTable)[STR_FREH];
-	(*ValueWindow)[LFRM] = txtrwin(choice, ValueWindowCoords);
+		choice = stringTable[STR_FREH];
+	valueWindow[LFRM] = txtrwin(choice, ValueWindowCoords);
 	nxtlin();
-	(*LabelWindow)[LLAYR] = txtwin((*StringTable)[STR_TXT1], LabelWindowCoords);
-	(*ValueWindow)[LLAYR] = txtrwin(fmt::format("{}", ((SelectedForm->attribute & FRMLMSK) >> 1)), ValueWindowCoords);
+	labelWindow[LLAYR] = txtwin(stringTable[STR_TXT1], LabelWindowCoords);
+	valueWindow[LLAYR] = txtrwin(fmt::format("{}", ((SelectedForm->attribute & FRMLMSK) >> 1)), ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->type != FRMLINE) {
-		(*LabelWindow)[LCWLK] = txtwin((*StringTable)[STR_CWLK], LabelWindowCoords);
+		labelWindow[LCWLK] = txtwin(stringTable[STR_CWLK], LabelWindowCoords);
 		if (SelectedForm->extendedAttribute & AT_CWLK)
-			choice = (*StringTable)[STR_ON];
+			choice = stringTable[STR_ON];
 		else
-			choice = (*StringTable)[STR_OFF];
-		(*ValueWindow)[LCWLK] = txtrwin(choice, ValueWindowCoords);
+			choice = stringTable[STR_OFF];
+		valueWindow[LCWLK] = txtrwin(choice, ValueWindowCoords);
 		nxtlin();
-		(*LabelWindow)[LWALK] = txtwin((*StringTable)[STR_WALK], LabelWindowCoords);
+		labelWindow[LWALK] = txtwin(stringTable[STR_WALK], LabelWindowCoords);
 		if (SelectedForm->extendedAttribute & AT_WALK)
-			choice = (*StringTable)[STR_ON];
+			choice = stringTable[STR_ON];
 		else
-			choice = (*StringTable)[STR_OFF];
-		(*ValueWindow)[LWALK] = txtrwin(choice, ValueWindowCoords);
+			choice = stringTable[STR_OFF];
+		valueWindow[LWALK] = txtrwin(choice, ValueWindowCoords);
 		nxtlin();
-		(*LabelWindow)[LUND] = txtwin((*StringTable)[STR_UND], LabelWindowCoords);
+		labelWindow[LUND] = txtwin(stringTable[STR_UND], LabelWindowCoords);
 		if (SelectedForm->extendedAttribute & AT_UND)
-			choice = (*StringTable)[STR_ON];
+			choice = stringTable[STR_ON];
 		else
-			choice = (*StringTable)[STR_OFF];
-		(*ValueWindow)[LUND] = txtrwin(choice, ValueWindowCoords);
+			choice = stringTable[STR_OFF];
+		valueWindow[LUND] = txtrwin(choice, ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->extendedAttribute & (AT_WALK | AT_UND | AT_CWLK)) {
-			(*LabelWindow)[LUNDCOL] = txtwin((*StringTable)[STR_UNDCOL], LabelWindowCoords);
-			(*ValueWindow)[LUNDCOL] = txtrwin(fmt::format("{}", (SelectedForm->underlayColor + 1)), ValueWindowCoords);
+			labelWindow[LUNDCOL] = txtwin(stringTable[STR_UNDCOL], LabelWindowCoords);
+			valueWindow[LUNDCOL] = txtrwin(fmt::format("{}", (SelectedForm->underlayColor + 1)), ValueWindowCoords);
 			nxtlin();
-			(*LabelWindow)[LULEN] = txtwin((*StringTable)[STR_ULEN], LabelWindowCoords);
-			(*ValueWindow)[LULEN] = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayStitchLen / PFGRAN)), ValueWindowCoords);
+			labelWindow[LULEN] = txtwin(stringTable[STR_ULEN], LabelWindowCoords);
+			valueWindow[LULEN] = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
-		(*LabelWindow)[LWLKIND] = txtwin((*StringTable)[STR_UWLKIND], LabelWindowCoords);
-		(*ValueWindow)[LWLKIND] = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayIndent / PFGRAN)), ValueWindowCoords);
+		labelWindow[LWLKIND] = txtwin(stringTable[STR_UWLKIND], LabelWindowCoords);
+		valueWindow[LWLKIND] = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayIndent / PFGRAN)), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->extendedAttribute & AT_UND) {
-			(*LabelWindow)[LUSPAC] = txtwin((*StringTable)[STR_FUSPAC], LabelWindowCoords);
-			(*ValueWindow)[LUSPAC] = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlaySpacing / PFGRAN)), ValueWindowCoords);
+			labelWindow[LUSPAC] = txtwin(stringTable[STR_FUSPAC], LabelWindowCoords);
+			valueWindow[LUSPAC] = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlaySpacing / PFGRAN)), ValueWindowCoords);
 			nxtlin();
-			(*LabelWindow)[LUANG] = txtwin((*StringTable)[STR_FUANG], LabelWindowCoords);
-			(*ValueWindow)[LUANG]
+			labelWindow[LUANG] = txtwin(stringTable[STR_FUANG], LabelWindowCoords);
+			valueWindow[LUANG]
 			    = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayStitchAngle * 180 / PI)), ValueWindowCoords);
 			nxtlin();
 		}
 	}
-	(*LabelWindow)[LFRMFIL] = txtwin((*StringTable)[STR_TXT2], LabelWindowCoords);
-	(*ValueWindow)[LFRMFIL] = txtrwin((*StringTable)[STR_FIL0 + SelectedForm->fillType], ValueWindowCoords);
+	labelWindow[LFRMFIL] = txtwin(stringTable[STR_TXT2], LabelWindowCoords);
+	valueWindow[LFRMFIL] = txtrwin(stringTable[STR_FIL0 + SelectedForm->fillType], ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->fillType) {
-		(*LabelWindow)[LFRMCOL] = txtwin((*StringTable)[STR_TXT3], LabelWindowCoords);
-		(*ValueWindow)[LFRMCOL] = numwin(fmt::format("{}", (SelectedForm->fillColor + 1)), ValueWindowCoords);
+		labelWindow[LFRMCOL] = txtwin(stringTable[STR_TXT3], LabelWindowCoords);
+		valueWindow[LFRMCOL] = numwin(fmt::format("{}", (SelectedForm->fillColor + 1)), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == FTHF) {
-			(*LabelWindow)[LFTHCOL] = txtwin((*StringTable)[STR_FTHCOL], LabelWindowCoords);
-			(*ValueWindow)[LFTHCOL] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.color + 1)), ValueWindowCoords);
+			labelWindow[LFTHCOL] = txtwin(stringTable[STR_FTHCOL], LabelWindowCoords);
+			valueWindow[LFTHCOL] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.color + 1)), ValueWindowCoords);
 			nxtlin();
-			(*LabelWindow)[LFTHTYP] = txtwin((*StringTable)[STR_FTHTYP], LabelWindowCoords);
-			(*ValueWindow)[LFTHTYP]
-			    = numwin((*StringTable)[STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1], ValueWindowCoords);
+			labelWindow[LFTHTYP] = txtwin(stringTable[STR_FTHTYP], LabelWindowCoords);
+			valueWindow[LFTHTYP] = numwin(stringTable[STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1], ValueWindowCoords);
 			nxtlin();
-			(*LabelWindow)[LFTHBLND] = txtwin((*StringTable)[STR_FTHBLND], LabelWindowCoords);
+			labelWindow[LFTHBLND] = txtwin(stringTable[STR_FTHBLND], LabelWindowCoords);
 			if (SelectedForm->extendedAttribute & AT_FTHBLND)
-				choice = (*StringTable)[STR_ON];
+				choice = stringTable[STR_ON];
 			else
-				choice = (*StringTable)[STR_OFF];
-			(*ValueWindow)[LFTHBLND] = txtrwin(choice, ValueWindowCoords);
+				choice = stringTable[STR_OFF];
+			valueWindow[LFTHBLND] = txtrwin(choice, ValueWindowCoords);
 			nxtlin();
 			if (!(SelectedForm->extendedAttribute & AT_FTHBLND)) {
-				(*LabelWindow)[LFTHBTH] = txtwin((*StringTable)[STR_FTHBOTH], LabelWindowCoords);
+				labelWindow[LFTHBTH] = txtwin(stringTable[STR_FTHBOTH], LabelWindowCoords);
 				if (SelectedForm->extendedAttribute & (AT_FTHBTH))
-					choice = (*StringTable)[STR_ON];
+					choice = stringTable[STR_ON];
 				else
-					choice = (*StringTable)[STR_OFF];
-				(*ValueWindow)[LFTHBTH] = txtrwin(choice, ValueWindowCoords);
+					choice = stringTable[STR_OFF];
+				valueWindow[LFTHBTH] = txtrwin(choice, ValueWindowCoords);
 				nxtlin();
 				if (!(SelectedForm->extendedAttribute & AT_FTHBTH)) {
-					(*LabelWindow)[LFTHUP] = txtwin((*StringTable)[STR_FTHUP], LabelWindowCoords);
+					labelWindow[LFTHUP] = txtwin(stringTable[STR_FTHUP], LabelWindowCoords);
 					if (SelectedForm->extendedAttribute & AT_FTHUP)
-						choice = (*StringTable)[STR_ON];
+						choice = stringTable[STR_ON];
 					else
-						choice = (*StringTable)[STR_OFF];
-					(*ValueWindow)[LFTHUP] = txtrwin(choice, ValueWindowCoords);
+						choice = stringTable[STR_OFF];
+					valueWindow[LFTHUP] = txtrwin(choice, ValueWindowCoords);
 					nxtlin();
 				}
 			}
-			(*LabelWindow)[LFTHUPCNT] = txtwin((*StringTable)[STR_FTHUPCNT], LabelWindowCoords);
-			(*ValueWindow)[LFTHUPCNT] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.upCount)), ValueWindowCoords);
+			labelWindow[LFTHUPCNT] = txtwin(stringTable[STR_FTHUPCNT], LabelWindowCoords);
+			valueWindow[LFTHUPCNT] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.upCount)), ValueWindowCoords);
 			nxtlin();
-			(*LabelWindow)[LFTHDWNCNT] = txtwin((*StringTable)[STR_FTHDWNCNT], LabelWindowCoords);
-			(*ValueWindow)[LFTHDWNCNT] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.downCount)), ValueWindowCoords);
+			labelWindow[LFTHDWNCNT] = txtwin(stringTable[STR_FTHDWNCNT], LabelWindowCoords);
+			valueWindow[LFTHDWNCNT] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.downCount)), ValueWindowCoords);
 			nxtlin();
-			(*LabelWindow)[LFTHSIZ] = txtwin((*StringTable)[STR_FTHSIZ], LabelWindowCoords);
-			(*ValueWindow)[LFTHSIZ] = numwin(fmt::format("{:.2f}", (SelectedForm->fillInfo.feather.ratio)), ValueWindowCoords);
+			labelWindow[LFTHSIZ] = txtwin(stringTable[STR_FTHSIZ], LabelWindowCoords);
+			valueWindow[LFTHSIZ] = numwin(fmt::format("{:.2f}", (SelectedForm->fillInfo.feather.ratio)), ValueWindowCoords);
 			nxtlin();
 			if (SelectedForm->fillInfo.feather.fillType == FTHPSG) {
-				(*LabelWindow)[LFTHNUM] = txtwin((*StringTable)[STR_FTHNUM], LabelWindowCoords);
-				(*ValueWindow)[LFTHNUM] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.count)), ValueWindowCoords);
+				labelWindow[LFTHNUM] = txtwin(stringTable[STR_FTHNUM], LabelWindowCoords);
+				valueWindow[LFTHNUM] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.count)), ValueWindowCoords);
 				nxtlin();
 			}
-			(*LabelWindow)[LFTHFLR] = txtwin((*StringTable)[STR_FTHFLR], LabelWindowCoords);
-			(*ValueWindow)[LFTHFLR]
+			labelWindow[LFTHFLR] = txtwin(stringTable[STR_FTHFLR], LabelWindowCoords);
+			valueWindow[LFTHFLR]
 			    = numwin(fmt::format("{:.2f}", (SelectedForm->fillInfo.feather.minStitchSize / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType != CLPF) {
-			(*LabelWindow)[LFRMSPAC] = txtwin((*StringTable)[STR_TXT4], LabelWindowCoords);
-			(*ValueWindow)[LFRMSPAC] = numwin(fmt::format("{:.2f}", (SelectedForm->fillSpacing / PFGRAN)), ValueWindowCoords);
+			labelWindow[LFRMSPAC] = txtwin(stringTable[STR_TXT4], LabelWindowCoords);
+			valueWindow[LFRMSPAC] = numwin(fmt::format("{:.2f}", (SelectedForm->fillSpacing / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (istx(ClosestFormToCursor)) {
-			(*LabelWindow)[LTXOF] = txtwin((*StringTable)[STR_TXOF], LabelWindowCoords);
-			(*ValueWindow)[LTXOF] = numwin(fmt::format("{:.2f}", (SelectedForm->txof / PFGRAN)), ValueWindowCoords);
+			labelWindow[LTXOF] = txtwin(stringTable[STR_TXOF], LabelWindowCoords);
+			valueWindow[LTXOF] = numwin(fmt::format("{:.2f}", (SelectedForm->txof / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
-		(*LabelWindow)[LMAXFIL] = txtwin((*StringTable)[STR_TXT20], LabelWindowCoords);
-		(*ValueWindow)[LMAXFIL] = numwin(fmt::format("{:.2f}", (SelectedForm->maxFillStitchLen / PFGRAN)), ValueWindowCoords);
+		labelWindow[LMAXFIL] = txtwin(stringTable[STR_TXT20], LabelWindowCoords);
+		valueWindow[LMAXFIL] = numwin(fmt::format("{:.2f}", (SelectedForm->maxFillStitchLen / PFGRAN)), ValueWindowCoords);
 		nxtlin();
 		if (!isclp(ClosestFormToCursor) && !istx(ClosestFormToCursor)) {
-			(*LabelWindow)[LFRMLEN] = txtwin((*StringTable)[STR_TXT5], LabelWindowCoords);
-			(*ValueWindow)[LFRMLEN]
+			labelWindow[LFRMLEN] = txtwin(stringTable[STR_TXT5], LabelWindowCoords);
+			valueWindow[LFRMLEN]
 			    = numwin(fmt::format("{:.2f}", (SelectedForm->lengthOrCount.stitchLength / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
-		(*LabelWindow)[LMINFIL] = txtwin((*StringTable)[STR_TXT21], LabelWindowCoords);
-		(*ValueWindow)[LMINFIL] = numwin(fmt::format("{:.2f}", (SelectedForm->minFillStitchLen / PFGRAN)), ValueWindowCoords);
+		labelWindow[LMINFIL] = txtwin(stringTable[STR_TXT21], LabelWindowCoords);
+		valueWindow[LMINFIL] = numwin(fmt::format("{:.2f}", (SelectedForm->minFillStitchLen / PFGRAN)), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
-			(*LabelWindow)[LFRMANG] = txtwin((*StringTable)[STR_TXT6], LabelWindowCoords);
-			(*ValueWindow)[LFRMANG]
+			labelWindow[LFRMANG] = txtwin(stringTable[STR_TXT6], LabelWindowCoords);
+			valueWindow[LFRMANG]
 			    = numwin(fmt::format("{:.2f}", (SelectedForm->angleOrClipData.angle * 180 / PI)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == ANGCLPF) {
-			(*LabelWindow)[LSACANG] = txtwin((*StringTable)[STR_TXT6], LabelWindowCoords);
-			(*ValueWindow)[LSACANG]
+			labelWindow[LSACANG] = txtwin(stringTable[STR_TXT6], LabelWindowCoords);
+			valueWindow[LSACANG]
 			    = numwin(fmt::format("{:.2f}", (SelectedForm->satinOrAngle.angle * 180 / PI)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VCLPF || SelectedForm->fillType == HCLPF || SelectedForm->fillType == ANGCLPF) {
-			(*LabelWindow)[LFRMFAZ] = txtwin((*StringTable)[STR_TXT18], LabelWindowCoords);
-			(*ValueWindow)[LFRMFAZ] = numwin(fmt::format("{}", (SelectedForm->wordParam)), ValueWindowCoords);
+			labelWindow[LFRMFAZ] = txtwin(stringTable[STR_TXT18], LabelWindowCoords);
+			valueWindow[LFRMFAZ] = numwin(fmt::format("{}", (SelectedForm->wordParam)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VRTF || SelectedForm->fillType == HORF || SelectedForm->fillType == ANGF
 		    || istx(ClosestFormToCursor)) {
-			(*LabelWindow)[LBFILSQR] = txtwin((*StringTable)[STR_PRF2], LabelWindowCoords);
+			labelWindow[LBFILSQR] = txtwin(stringTable[STR_PRF2], LabelWindowCoords);
 			if (SelectedForm->extendedAttribute & AT_SQR)
-				choice = (*StringTable)[STR_SQR];
+				choice = stringTable[STR_SQR];
 			else
-				choice = (*StringTable)[STR_PNTD];
-			(*ValueWindow)[LBFILSQR] = txtrwin(choice, ValueWindowCoords);
+				choice = stringTable[STR_PNTD];
+			valueWindow[LBFILSQR] = txtrwin(choice, ValueWindowCoords);
 			nxtlin();
 		}
 	}
-	(*LabelWindow)[LFSTRT] = txtwin((*StringTable)[STR_FSTRT], LabelWindowCoords);
+	labelWindow[LFSTRT] = txtwin(stringTable[STR_FSTRT], LabelWindowCoords);
 	if (SelectedForm->extendedAttribute & AT_STRT)
-		choice = (*StringTable)[STR_ON];
+		choice = stringTable[STR_ON];
 	else
-		choice = (*StringTable)[STR_OFF];
-	(*ValueWindow)[LFSTRT] = txtrwin(choice, ValueWindowCoords);
+		choice = stringTable[STR_OFF];
+	valueWindow[LFSTRT] = txtrwin(choice, ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->extendedAttribute & AT_STRT) {
-		(*LabelWindow)[LDSTRT] = txtwin((*StringTable)[STR_FSTRT], LabelWindowCoords);
-		(*ValueWindow)[LDSTRT] = numwin(fmt::format("{}", (SelectedForm->fillStart)), ValueWindowCoords);
+		labelWindow[LDSTRT] = txtwin(stringTable[STR_FSTRT], LabelWindowCoords);
+		valueWindow[LDSTRT] = numwin(fmt::format("{}", (SelectedForm->fillStart)), ValueWindowCoords);
 		nxtlin();
 	}
-	(*LabelWindow)[LFEND] = txtwin((*StringTable)[STR_FEND], LabelWindowCoords);
+	labelWindow[LFEND] = txtwin(stringTable[STR_FEND], LabelWindowCoords);
 	if (SelectedForm->extendedAttribute & AT_END)
-		choice = (*StringTable)[STR_ON];
+		choice = stringTable[STR_ON];
 	else
-		choice = (*StringTable)[STR_OFF];
-	(*ValueWindow)[LFEND] = txtrwin(choice, ValueWindowCoords);
+		choice = stringTable[STR_OFF];
+	valueWindow[LFEND] = txtrwin(choice, ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->extendedAttribute & AT_END) {
-		(*LabelWindow)[LDEND] = txtwin((*StringTable)[STR_FEND], LabelWindowCoords);
-		(*ValueWindow)[LDEND] = numwin(fmt::format("{}", (SelectedForm->fillEnd)), ValueWindowCoords);
+		labelWindow[LDEND] = txtwin(stringTable[STR_FEND], LabelWindowCoords);
+		valueWindow[LDEND] = numwin(fmt::format("{}", (SelectedForm->fillEnd)), ValueWindowCoords);
 		nxtlin();
 	}
-	(*LabelWindow)[LBRD] = txtwin((*StringTable)[STR_TXT7], LabelWindowCoords);
-	(*ValueWindow)[LBRD] = txtrwin((*StringTable)[STR_EDG0 + edgeFillType], ValueWindowCoords);
+	labelWindow[LBRD] = txtwin(stringTable[STR_TXT7], LabelWindowCoords);
+	valueWindow[LBRD] = txtrwin(stringTable[STR_EDG0 + edgeFillType], ValueWindowCoords);
 	nxtlin();
 	if (edgeFillType) {
-		(*LabelWindow)[LBRDCOL] = txtwin((*StringTable)[STR_TXT8], LabelWindowCoords);
-		(*ValueWindow)[LBRDCOL] = numwin(fmt::format("{}", ((SelectedForm->borderColor & COLMSK) + 1)), ValueWindowCoords);
+		labelWindow[LBRDCOL] = txtwin(stringTable[STR_TXT8], LabelWindowCoords);
+		valueWindow[LBRDCOL] = numwin(fmt::format("{}", ((SelectedForm->borderColor & COLMSK) + 1)), ValueWindowCoords);
 		nxtlin();
 		if (EdgeArray[iEdge] & BESPAC) {
-			(*LabelWindow)[LBRDSPAC] = txtwin((*StringTable)[STR_TXT9], LabelWindowCoords);
+			labelWindow[LBRDSPAC] = txtwin(stringTable[STR_TXT9], LabelWindowCoords);
 			if (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN)
 				choice = fmt::format("{:.2f}", (SelectedForm->edgeSpacing / PFGRAN));
 			else
 				choice = fmt::format("{:.2f}", (SelectedForm->edgeSpacing / PFGRAN * 2));
-			(*ValueWindow)[LBRDSPAC] = numwin(choice, ValueWindowCoords);
+			valueWindow[LBRDSPAC] = numwin(choice, ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BPICSPAC) {
-			(*LabelWindow)[LBRDPIC] = txtwin((*StringTable)[STR_TXT16], LabelWindowCoords);
-			(*ValueWindow)[LBRDPIC] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeSpacing / PFGRAN)), ValueWindowCoords);
+			labelWindow[LBRDPIC] = txtwin(stringTable[STR_TXT16], LabelWindowCoords);
+			valueWindow[LBRDPIC] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeSpacing / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BEMAX) {
-			(*LabelWindow)[LMAXBRD] = txtwin((*StringTable)[STR_TXT22], LabelWindowCoords);
-			(*ValueWindow)[LMAXBRD]
-			    = numwin(fmt::format("{:.2f}", (SelectedForm->maxBorderStitchLen / PFGRAN)), ValueWindowCoords);
+			labelWindow[LMAXBRD] = txtwin(stringTable[STR_TXT22], LabelWindowCoords);
+			valueWindow[LMAXBRD] = numwin(fmt::format("{:.2f}", (SelectedForm->maxBorderStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BELEN) {
-			(*LabelWindow)[LBRDLEN] = txtwin((*StringTable)[STR_TXT10], LabelWindowCoords);
-			(*ValueWindow)[LBRDLEN] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen / PFGRAN)), ValueWindowCoords);
+			labelWindow[LBRDLEN] = txtwin(stringTable[STR_TXT10], LabelWindowCoords);
+			valueWindow[LBRDLEN] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BEMIN) {
-			(*LabelWindow)[LMINBRD] = txtwin((*StringTable)[STR_TXT23], LabelWindowCoords);
-			(*ValueWindow)[LMINBRD]
-			    = numwin(fmt::format("{:.2f}", (SelectedForm->minBorderStitchLen / PFGRAN)), ValueWindowCoords);
+			labelWindow[LMINBRD] = txtwin(stringTable[STR_TXT23], LabelWindowCoords);
+			valueWindow[LMINBRD] = numwin(fmt::format("{:.2f}", (SelectedForm->minBorderStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BESIZ) {
-			(*LabelWindow)[LBRDSIZ] = txtwin((*StringTable)[STR_TXT11], LabelWindowCoords);
-			(*ValueWindow)[LBRDSIZ] = numwin(fmt::format("{:.2f}", (SelectedForm->borderSize / PFGRAN)), ValueWindowCoords);
+			labelWindow[LBRDSIZ] = txtwin(stringTable[STR_TXT11], LabelWindowCoords);
+			valueWindow[LBRDSIZ] = numwin(fmt::format("{:.2f}", (SelectedForm->borderSize / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BRDPOS) {
-			(*LabelWindow)[LBRDPOS] = txtwin((*StringTable)[STR_TXT18], LabelWindowCoords);
-			(*ValueWindow)[LBRDPOS] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
+			labelWindow[LBRDPOS] = txtwin(stringTable[STR_TXT18], LabelWindowCoords);
+			valueWindow[LBRDPOS] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & CHNPOS) {
-			(*LabelWindow)[LBRDPOS] = txtwin((*StringTable)[STR_TXT19], LabelWindowCoords);
-			(*ValueWindow)[LBRDPOS] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
+			labelWindow[LBRDPOS] = txtwin(stringTable[STR_TXT19], LabelWindowCoords);
+			valueWindow[LBRDPOS] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (edgeFillType == EDGEAPPL) {
-			(*LabelWindow)[LAPCOL] = txtwin((*StringTable)[STR_TXT12], LabelWindowCoords);
-			(*ValueWindow)[LAPCOL] = numwin(fmt::format("{}", ((SelectedForm->borderColor >> 4) + 1)), ValueWindowCoords);
+			labelWindow[LAPCOL] = txtwin(stringTable[STR_TXT12], LabelWindowCoords);
+			valueWindow[LAPCOL] = numwin(fmt::format("{}", ((SelectedForm->borderColor >> 4) + 1)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (edgeFillType == EDGEANGSAT || edgeFillType == EDGEAPPL || edgeFillType == EDGEPROPSAT) {
-			(*LabelWindow)[LBRDUND] = txtwin((*StringTable)[STR_TXT17], LabelWindowCoords);
+			labelWindow[LBRDUND] = txtwin(stringTable[STR_TXT17], LabelWindowCoords);
 			if (SelectedForm->edgeType & EGUND)
-				choice = (*StringTable)[STR_ON];
+				choice = stringTable[STR_ON];
 			else
-				choice = (*StringTable)[STR_OFF];
-			(*ValueWindow)[LBRDUND] = numwin(choice, ValueWindowCoords);
+				choice = stringTable[STR_OFF];
+			valueWindow[LBRDUND] = numwin(choice, ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BCNRSIZ) {
@@ -6321,24 +6326,24 @@ void refrmfn() {
 				choice = fmt::format("{:.2f}", (getblen() / PFGRAN));
 			else
 				choice = fmt::format("{:.2f}", (getplen() / PFGRAN));
-			(*LabelWindow)[LBCSIZ] = txtwin((*StringTable)[STR_TXT13], LabelWindowCoords);
-			(*ValueWindow)[LBCSIZ] = numwin(choice, ValueWindowCoords);
+			labelWindow[LBCSIZ] = txtwin(stringTable[STR_TXT13], LabelWindowCoords);
+			valueWindow[LBCSIZ] = numwin(choice, ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->type == FRMLINE && EdgeArray[iEdge] & BRDEND) {
-			(*LabelWindow)[LBSTRT] = txtwin((*StringTable)[STR_TXT14], LabelWindowCoords);
+			labelWindow[LBSTRT] = txtwin(stringTable[STR_TXT14], LabelWindowCoords);
 			if (SelectedForm->attribute & SBLNT)
-				choice = (*StringTable)[STR_BLUNT];
+				choice = stringTable[STR_BLUNT];
 			else
-				choice = (*StringTable)[STR_TAPR];
-			(*ValueWindow)[LBSTRT] = numwin(choice, ValueWindowCoords);
+				choice = stringTable[STR_TAPR];
+			valueWindow[LBSTRT] = numwin(choice, ValueWindowCoords);
 			nxtlin();
-			(*LabelWindow)[LBFIN] = txtwin((*StringTable)[STR_TXT15], LabelWindowCoords);
+			labelWindow[LBFIN] = txtwin(stringTable[STR_TXT15], LabelWindowCoords);
 			if (SelectedForm->attribute & FBLNT)
-				choice = (*StringTable)[STR_BLUNT];
+				choice = stringTable[STR_BLUNT];
 			else
-				choice = (*StringTable)[STR_TAPR];
-			(*ValueWindow)[LBFIN] = numwin(choice, ValueWindowCoords);
+				choice = stringTable[STR_TAPR];
+			valueWindow[LBFIN] = numwin(choice, ValueWindowCoords);
 			nxtlin();
 		}
 	}
@@ -6382,7 +6387,7 @@ void refrm() {
 	refrmfn();
 }
 
-void pxrct2stch(RECT screenRect, fRECTANGLE* stitchRect) {
+void pxrct2stch(const RECT& screenRect, fRECTANGLE* const stitchRect) {
 	POINT corner;
 
 	corner.x = screenRect.left + StitchWindowOrigin.x;
@@ -6940,7 +6945,7 @@ HWND prfnwin(const std::string& text) noexcept {
 	                    NULL);
 }
 
-void prflin(std::string msg, unsigned row) {
+void prflin(const std::string& msg, unsigned row) {
 	prftwin((*StringTable)[row]);
 	(*ValueWindow)[row - STR_PRF0] = prfnwin(msg);
 	nxtlin();
@@ -7579,7 +7584,7 @@ void sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish
 		}
 		else {
 			verticalRect->bopnt = (*OutsidePoints)[start];
-			point = (*OutsidePoints)[start];
+			point               = (*OutsidePoints)[start];
 			proj(point, Slope, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->bipnt);
 		}
 		point = (*InsidePoints)[finish];
@@ -7588,7 +7593,7 @@ void sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish
 		}
 		else {
 			verticalRect->copnt = (*OutsidePoints)[finish];
-			point = (*OutsidePoints)[finish];
+			point               = (*OutsidePoints)[finish];
 			proj(point, Slope, (*InsidePoints)[start], (*InsidePoints)[finish], &verticalRect->cipnt);
 		}
 	}
@@ -7690,7 +7695,7 @@ unsigned psg() noexcept {
 	return PseudoRandomValue;
 }
 
-void duromb(dPOINT start0, dPOINT finish0, dPOINT start1, dPOINT finish1) {
+void duromb(const dPOINT& start0, const dPOINT& finish0, const dPOINT& start1, const dPOINT& finish1) {
 	dPOINT   delta0 = {}, delta1 = {}, step0 = {}, step1 = {};
 	double   length0 = 0.0, length1 = 0.0;
 	unsigned count = 0, iStep = 0;
@@ -7719,19 +7724,22 @@ void duromb(dPOINT start0, dPOINT finish0, dPOINT start1, dPOINT finish1) {
 	step0.y = delta0.y / count;
 	step1.x = delta1.x / count;
 	step1.y = delta1.y / count;
+	
+	dPOINT start00 = start0;
+	dPOINT start11 = start1;
 	for (iStep = 0; iStep < count; iStep++) {
 		if (StateMap.testAndFlip(StateFlag::FILDIR))
-			filinsb(start0);
+			filinsb(start00);
 		else
-			filinsb(start1);
-		start0.x += step0.x;
-		start0.y += step0.y;
-		start1.x += step1.x;
-		start1.y += step1.y;
+			filinsb(start11);
+		start00.x += step0.x;
+		start00.y += step0.y;
+		start11.x += step1.x;
+		start11.y += step1.y;
 	}
 }
 
-void spend(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish) {
+void spend(const std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish) {
 	dPOINT       innerDelta  = { (fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
                           (fillVerticalRect[finish].cipnt.y - fillVerticalRect[start].bipnt.y) };
 	const double innerLength = hypot(innerDelta.x, innerDelta.y);
@@ -7792,7 +7800,10 @@ void spend(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish
 	}
 }
 
-void duspnd(std::vector<VRCT2>& underlayVerticalRect, std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish) {
+void duspnd(const std::vector<VRCT2>& underlayVerticalRect,
+            const std::vector<VRCT2>& fillVerticalRect,
+            unsigned                  start,
+            unsigned                  finish) {
 	double length = 0.0, angle = 0.0;
 	dPOINT point = {}, delta = {};
 
@@ -7834,10 +7845,10 @@ void duspnd(std::vector<VRCT2>& underlayVerticalRect, std::vector<VRCT2>& fillVe
 		spend(fillVerticalRect, start, finish);
 }
 
-void pfn(std::vector<VRCT2>& underlayVerticalRect,
-         std::vector<VRCT2>& fillVerticalRect,
-         unsigned            startVertex,
-         const VRCT2*        vrct) {
+void pfn(const std::vector<VRCT2>& underlayVerticalRect,
+         const std::vector<VRCT2>& fillVerticalRect,
+         unsigned                  startVertex,
+         const VRCT2*              vrct) {
 	if (vrct) {
 		unsigned iVertex       = 0;
 		unsigned currentVertex = startVertex;
@@ -7853,7 +7864,7 @@ void pfn(std::vector<VRCT2>& underlayVerticalRect,
 	}
 }
 
-void plfn(std::vector<VRCT2>& underlayVerticalRect, std::vector<VRCT2>& fillVerticalRect, const VRCT2* prct) {
+void plfn(const std::vector<VRCT2>& underlayVerticalRect, const std::vector<VRCT2>& fillVerticalRect, const VRCT2* prct) {
 	if (prct) {
 		unsigned iVertex;
 
@@ -7947,14 +7958,14 @@ void plbrd(double edgeSpacing) {
 	sprct(fillVerticalRect, iVertex, 0);
 	spurct(underlayVerticalRect, fillVerticalRect, iVertex);
 	if (!(SelectedForm->attribute & SBLNT)) {
-		const auto val                      = SelectedForm->vertices[1];
+		const auto val                = SelectedForm->vertices[1];
 		fillVerticalRect[1].aipnt     = val;
 		fillVerticalRect[1].aopnt     = val;
 		underlayVerticalRect[1].aipnt = val;
 		underlayVerticalRect[1].aopnt = val;
 	}
 	if (!(SelectedForm->attribute & FBLNT)) {
-		const auto val                                    = SelectedForm->vertices[VertexCount - 1];
+		const auto val                              = SelectedForm->vertices[VertexCount - 1];
 		fillVerticalRect[VertexCount - 4].dipnt     = val;
 		fillVerticalRect[VertexCount - 4].dopnt     = val;
 		underlayVerticalRect[VertexCount - 4].dipnt = val;
@@ -8173,12 +8184,15 @@ void flpord() {
 	}
 }
 
-void dudif(dPOINT start, dPOINT finish, dPOINT* delta) noexcept {
+void dudif(const dPOINT& start, const dPOINT& finish, dPOINT* const delta) noexcept {
 	delta->x = finish.x - start.x;
 	delta->y = finish.y - start.y;
 }
 
-void trfrm(dPOINT bottomLeftPoint, dPOINT topLeftPoint, dPOINT bottomRightPoint, dPOINT topRightPoint) noexcept {
+void trfrm(const dPOINT& bottomLeftPoint,
+           const dPOINT& topLeftPoint,
+           const dPOINT& bottomRightPoint,
+           const dPOINT& topRightPoint) noexcept {
 	unsigned iStitch  = 0;
 	dPOINT   topDelta = {}, bottomDelta = {}, leftDelta = {}, rightDelta = {};
 	dPOINT   clipRatio = {}, topMidpoint = {}, bottomMidpoint = {}, middleDelta = {};
@@ -8234,7 +8248,7 @@ void clpfm() noexcept {
 		topRight.x  = BSequence[iSequence + 3].x;
 		topRight.y  = BSequence[iSequence + 3].y;
 		for (iStep = 0; iStep < count; iStep++) {
-			bottomLeft = topLeft;
+			bottomLeft  = topLeft;
 			bottomRight = topRight;
 			topLeft.x += leftStep.x;
 			topLeft.y += leftStep.y;
@@ -8315,7 +8329,7 @@ void clpfil() {
 	}
 }
 
-void snpfn(std::vector<unsigned>& xPoints, unsigned start, unsigned end, unsigned finish) {
+void snpfn(const std::vector<unsigned>& xPoints, unsigned start, unsigned end, unsigned finish) {
 	unsigned iPoint = 0, reference = 0, check = 0;
 	double   CheckLength = 0.0;
 
@@ -8365,7 +8379,7 @@ void snp(unsigned start, unsigned finish) {
 	unsigned iColumn = 0, iStitch = 0, value = 0, accumulator = 0, checkLength = 0, attribute = 0;
 	fPOINT   range = {};
 
-	chkrng(&range);
+	chkrng(range);
 	std::vector<unsigned> xPoints(PCSHeader.stitchCount);
 	std::vector<unsigned> xHistogram((round(range.x)) + 1);
 	if (StateMap.test(StateFlag::FORMSEL)) {
@@ -8444,7 +8458,7 @@ void rotpar(dPOINT& rotationCenter) {
 			rotationCenter.y = ZoomMarkPoint.y;
 		}
 		else
-			dufcntr(&rotationCenter);
+			dufcntr(rotationCenter);
 		StateMap.set(StateFlag::FRMSROT);
 		return;
 	}
@@ -8475,7 +8489,7 @@ void rotpar(dPOINT& rotationCenter) {
 	}
 }
 
-void rotentr(const double rotationAngle) {
+void rotentr(double rotationAngle) {
 	std::string fmtStr;
 
 	loadString(fmtStr, IDS_ROTA);
@@ -8553,7 +8567,7 @@ void adfrm(unsigned iForm) {
 	FormIndex++;
 }
 
-void duprot(double rotationAngle, dPOINT& rotationCenter) {
+void duprot(double rotationAngle, const dPOINT& rotationCenter) {
 	adfrm(ClosestFormToCursor);
 	rotfn(rotationAngle, rotationCenter);
 	refil();
@@ -8576,7 +8590,7 @@ void duprotfs(double rotationAngle) {
 	fnagain(rotationAngle);
 }
 
-void duprots(double rotationAngle, dPOINT rotationCenter) {
+void duprots(double rotationAngle, const dPOINT& rotationCenter) {
 	unsigned source = 0, destination = PCSHeader.stitchCount;
 
 	rngadj();
@@ -8829,18 +8843,18 @@ void frmsadj() {
 	}
 }
 
-void stchrct2px(fRECTANGLE stitchRect, RECT* screenRect) {
+void stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect) {
 	dPOINT stitchCoord = { stitchRect.left, stitchRect.top };
 	POINT  screenCoord = {};
 
 	sCor2px(stitchCoord, &screenCoord);
-	screenRect->left = screenCoord.x;
-	screenRect->top  = screenCoord.y;
-	stitchCoord.x    = stitchRect.right;
-	stitchCoord.y    = stitchRect.bottom;
+	screenRect.left = screenCoord.x;
+	screenRect.top  = screenCoord.y;
+	stitchCoord.x   = stitchRect.right;
+	stitchCoord.y   = stitchRect.bottom;
 	sCor2px(stitchCoord, &screenCoord);
-	screenRect->right  = screenCoord.x;
-	screenRect->bottom = screenCoord.y;
+	screenRect.right  = screenCoord.x;
+	screenRect.bottom = screenCoord.y;
 }
 
 void getbig() noexcept {
@@ -8888,7 +8902,7 @@ void selal() {
 	NearestCount = 0;
 	StateMap.reset(StateFlag::RUNPAT);
 	duzrat();
-	stchrct2px(AllItemsRect, &SelectedFormsRect);
+	stchrct2px(AllItemsRect, SelectedFormsRect);
 	StateMap.set(StateFlag::BIGBOX);
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -8968,16 +8982,16 @@ void selalfil() {
 		tabmsg(IDS_SEL1FRM);
 }
 
-bool frmrng(unsigned iForm, RANGE* range) noexcept {
-	range->start  = 0;
-	range->finish = PCSHeader.stitchCount;
+bool frmrng(unsigned iForm, RANGE& range) noexcept {
+	range.start  = 0;
+	range.finish = PCSHeader.stitchCount;
 	if (FormList[iForm].fillType || FormList[iForm].edgeType) {
-		while (range->start < PCSHeader.stitchCount && notfstch(StitchBuffer[range->start].attribute))
-			range->start++;
-		range->finish = PCSHeader.stitchCount - 1;
-		while (range->finish > range->start && notfstch(StitchBuffer[range->finish].attribute))
-			range->finish--;
-		if (range->finish > range->start)
+		while (range.start < PCSHeader.stitchCount && notfstch(StitchBuffer[range.start].attribute))
+			range.start++;
+		range.finish = PCSHeader.stitchCount - 1;
+		while (range.finish > range.start && notfstch(StitchBuffer[range.finish].attribute))
+			range.finish--;
+		if (range.finish > range.start)
 			return 1;
 		else
 			return 0;
@@ -9179,7 +9193,7 @@ void boxsel() {
 	}
 }
 
-void clpcrnr(std::vector<fPOINT> clipFillData, unsigned vertex, const dPOINT& rotationCenter) {
+void clpcrnr(std::vector<fPOINT>& clipFillData, unsigned vertex, const dPOINT& rotationCenter) {
 	const unsigned nextVertex = nxt(vertex);
 	unsigned       iStitch    = 0;
 	dPOINT         delta = {}, point = {};
@@ -9220,7 +9234,7 @@ void clpcrnr(std::vector<fPOINT> clipFillData, unsigned vertex, const dPOINT& ro
 	}
 }
 
-void picfn(std::vector<fPOINT> clipFillData, unsigned start, unsigned finish, double spacing, const dPOINT& rotationCenter) {
+void picfn(std::vector<fPOINT>& clipFillData, unsigned start, unsigned finish, double spacing, const dPOINT& rotationCenter) {
 	dPOINT       delta          = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
                      (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
 	const double length         = hypot(delta.x, delta.y);
@@ -9761,7 +9775,7 @@ void shrnk() {
 		shoseln(IDS_FRMCLP, IDS_SHRNK);
 }
 
-void mvfrms(FRMHED* destination, const FRMHED* source, unsigned count) noexcept {
+void mvfrms(FRMHED* const destination, const FRMHED* const source, unsigned count) noexcept {
 	memcpy(destination, source, count * sizeof(FRMHED));
 }
 
@@ -9880,7 +9894,7 @@ constexpr unsigned duat(unsigned attribute) {
 	return type | frm;
 }
 
-void srtf(std::vector<fPOINTATTR>& tempStitchBuffer, unsigned start, unsigned finish) {
+void srtf(const std::vector<fPOINTATTR>& tempStitchBuffer, unsigned start, unsigned finish) {
 	unsigned iForm = 0, iStitch = 0, stitchAccumulator = 0, value = 0;
 
 	if (start != finish) {
@@ -9934,7 +9948,7 @@ void srtbyfrm() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void dufcntr(dPOINT* center) {
+void dufcntr(dPOINT& center) {
 	fRECTANGLE* formRect = nullptr;
 	fRECTANGLE  bigRect  = {};
 
@@ -9954,8 +9968,8 @@ void dufcntr(dPOINT* center) {
 		if (formRect->top > bigRect.top)
 			bigRect.top = formRect->top;
 	}
-	center->x = (bigRect.right - bigRect.left) / 2 + bigRect.left;
-	center->y = (bigRect.top - bigRect.bottom) / 2 + bigRect.bottom;
+	center.x = (bigRect.right - bigRect.left) / 2 + bigRect.left;
+	center.y = (bigRect.top - bigRect.bottom) / 2 + bigRect.bottom;
 }
 
 void cntrx() {
@@ -9977,7 +9991,7 @@ void cntrx() {
 	if (SelectedFormList->size()) {
 		flag = true;
 		savdo();
-		dufcntr(&selectedCenter);
+		dufcntr(selectedCenter);
 		FormMoveDelta.x = markCenter.x - selectedCenter.x;
 		FormMoveDelta.y = -markCenter.y + selectedCenter.y;
 		if (StateMap.test(StateFlag::CNTRV))
@@ -10225,7 +10239,7 @@ void stchadj() {
 	StateMap.reset(StateFlag::FRMPSEL);
 }
 
-void spltsat(SATCON currentGuide) {
+void spltsat(const SATCON& currentGuide) {
 	// We are adding two additional vertices when splitting the form
 	std::vector<fPOINT> vertexBuffer(VertexCount + 2);
 	unsigned            iForm = 0, iGuide = 0, iVertex = 0, iOldVertex = 0, iNewVertex = 0, oldLastVertex = 0;
@@ -10434,7 +10448,7 @@ void chksid(unsigned vertexIndex) noexcept {
 	}
 }
 
-void ritseg(std::vector<CLIPNT>& clipStitchPoints, std::vector<CLPSEG>& clipSegments, const unsigned currentSegmentIndex) {
+void ritseg(const std::vector<CLIPNT>& clipStitchPoints, std::vector<CLPSEG>& clipSegments, const unsigned currentSegmentIndex) {
 	unsigned iPoint       = 0;
 	bool     isPointedEnd = true;
 
@@ -10473,7 +10487,7 @@ void ritseg(std::vector<CLIPNT>& clipStitchPoints, std::vector<CLPSEG>& clipSegm
 	clipSegments[currentSegmentIndex].dun = 1;
 }
 
-bool clpnxt(std::vector<CLPSEG>& clipSegments, std::vector<LENINFO>& sortedLengths, unsigned sind) {
+bool clpnxt(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned sind) {
 	// ToDo - rename local variables
 
 	unsigned       ind          = 1;
@@ -10496,7 +10510,7 @@ bool clpnxt(std::vector<CLPSEG>& clipSegments, std::vector<LENINFO>& sortedLengt
 	return 1;
 }
 
-bool nucseg(std::vector<CLPSEG>& clipSegments, std::vector<LENINFO>& sortedLengths, unsigned& currentSegmentIndex) {
+bool nucseg(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned& currentSegmentIndex) {
 	unsigned ind = 0;
 
 	if (StateMap.test(StateFlag::FILDIR))
@@ -10519,7 +10533,7 @@ void mvpclp(std::vector<CLIPSORT*>& arrayOfClipIntersectData, unsigned destinati
 	}
 }
 
-float getlen(std::vector<CLIPNT>& clipStitchPoints, std::vector<double>& lengths, unsigned iPoint) {
+float getlen(std::vector<CLIPNT>& clipStitchPoints, const std::vector<double>& lengths, unsigned iPoint) {
 	clipStitchPoints[iPoint].vertexIndex %= VertexCount;
 	return lengths[clipStitchPoints[iPoint].vertexIndex]
 	       + hypot(CurrentFormVertices[clipStitchPoints[iPoint].vertexIndex].x - clipStitchPoints[iPoint].x,
@@ -10543,7 +10557,7 @@ bool clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept {
 	return (vclpx1.segment < vclpx2.segment);
 }
 
-bool isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* length) noexcept {
+bool isect(unsigned vertex0, unsigned vertex1, fPOINT& intersection, float& length) noexcept {
 	dPOINT delta            = { (LineSegmentEnd.x - LineSegmentStart.x), (LineSegmentEnd.y - LineSegmentStart.y) };
 	dPOINT point            = { (LineSegmentStart.x), (LineSegmentStart.y) };
 	dPOINT tempIntersection = {};
@@ -10570,11 +10584,9 @@ bool isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* leng
 					right = CurrentFormVertices[vertex0].x;
 				}
 				if (LineSegmentStart.x > left && LineSegmentStart.x < right) {
-					intersection->x = LineSegmentStart.x;
-					intersection->y = LineSegmentStart.y;
-					if (length) {
-						*length = 0;
-					}
+					intersection.x = LineSegmentStart.x;
+					intersection.y = LineSegmentStart.y;
+					length         = 0;
 					return true;
 				}
 				return false;
@@ -10587,21 +10599,19 @@ bool isect(unsigned vertex0, unsigned vertex1, fPOINT* intersection, float* leng
 		tempIntersection.x = 0;
 	if (tempIntersection.y < TINY)
 		tempIntersection.y = 0;
-	intersection->x = static_cast<float>(tempIntersection.x);
-	intersection->y = static_cast<float>(tempIntersection.y);
-	if (length) {
-		*length = hypot(tempIntersection.x - LineSegmentStart.x, tempIntersection.y - LineSegmentStart.y);
-	}
+	intersection.x = static_cast<float>(tempIntersection.x);
+	intersection.y = static_cast<float>(tempIntersection.y);
+	length         = hypot(tempIntersection.x - LineSegmentStart.x, tempIntersection.y - LineSegmentStart.y);
 	// ToDo - should length be determined from start or end?
 	//	 hypot(tipnt.x-LineSegmentEnd.x,tipnt.y-LineSegmentEnd.y);
 	return flag;
 }
 
-unsigned insect(std::vector<CLIPSORT>&  clipIntersectData,
-                std::vector<VCLPX>&     regionCrossingData,
-                std::vector<CLIPSORT*>& arrayOfClipIntersectData,
-                unsigned                regionCrossingStart,
-                unsigned                regionCrossingEnd) {
+unsigned insect(std::vector<CLIPSORT>&    clipIntersectData,
+                const std::vector<VCLPX>& regionCrossingData,
+                std::vector<CLIPSORT*>&   arrayOfClipIntersectData,
+                unsigned                  regionCrossingStart,
+                unsigned                  regionCrossingEnd) {
 	unsigned   iRegions = 0, iDestination = 0, iIntersection = 0, count = 0;
 	unsigned   currentVertex = 0, nextVertex = 0;
 	fRECTANGLE lineSegmentRect = {};
@@ -10628,10 +10638,8 @@ unsigned insect(std::vector<CLIPSORT>&  clipIntersectData,
 	for (iRegions = regionCrossingStart; iRegions < regionCrossingEnd; iRegions++) {
 		currentVertex = regionCrossingData[iRegions].vertex;
 		nextVertex    = nxt(currentVertex);
-		if (isect(currentVertex,
-		          nextVertex,
-		          &clipIntersectData[iIntersection].point,
-		          &clipIntersectData[iIntersection].sideLength)) {
+		if (isect(
+		        currentVertex, nextVertex, clipIntersectData[iIntersection].point, clipIntersectData[iIntersection].sideLength)) {
 			intersection = &clipIntersectData[iIntersection].point;
 			if (intersection->x >= lineSegmentRect.left && intersection->x <= lineSegmentRect.right
 			    && intersection->y >= lineSegmentRect.bottom && intersection->y <= lineSegmentRect.top) {
@@ -10659,11 +10667,11 @@ unsigned insect(std::vector<CLIPSORT>&  clipIntersectData,
 	return count;
 }
 
-bool isin(std::vector<VCLPX> regionCrossingData,
-          float              xCoordinate,
-          float              yCoordinate,
-          unsigned           regionCrossingStart,
-          unsigned           regionCrossingEnd) {
+bool isin(const std::vector<VCLPX> regionCrossingData,
+          float                    xCoordinate,
+          float                    yCoordinate,
+          unsigned                 regionCrossingStart,
+          unsigned                 regionCrossingEnd) {
 	// ToDo - rename local variables
 
 	unsigned iRegion = 0, acnt = 0;
@@ -10703,7 +10711,7 @@ bool isin(std::vector<VCLPX> regionCrossingData,
 
 unsigned clpnseg(std::vector<CLIPNT>& clipStitchPoints,
                  std::vector<CLPSEG>& clipSegments,
-                 std::vector<double>& lengths,
+                 const std::vector<double>& lengths,
                  unsigned             start,
                  unsigned             finish) {
 	CLPSEG clipSegment;
@@ -10754,7 +10762,7 @@ void inspnt(std::vector<CLIPNT>& clipStitchPoints) {
 	clipStitchPoints.push_back(clipStitchPoint);
 }
 
-void clpcon(std::vector<RNGCNT>& textureSegments) {
+void clpcon(const std::vector<RNGCNT>& textureSegments) {
 	RECT     clipGrid = {};
 	unsigned iSegment = 0, iStitchPoint = 0, iVertex = 0, iPoint = 0, iSorted = 0, iSequence = 0, vertex = 0;
 	unsigned iRegion = 0, ine = 0, nextVertex = 0, regionSegment = 0, iStitch = 0;
@@ -10958,8 +10966,7 @@ void clpcon(std::vector<RNGCNT>& textureSegments) {
 						break;
 					}
 				}
-				LineSegmentStart.x = LineSegmentEnd.x;
-				LineSegmentStart.y = LineSegmentEnd.y;
+				LineSegmentStart = LineSegmentEnd;
 			}
 			if (breakFlag) {
 				break;
@@ -11192,7 +11199,7 @@ void angout() noexcept {
 	}
 }
 
-void horclpfn(std::vector<RNGCNT>& textureSegments) {
+void horclpfn(const std::vector<RNGCNT>& textureSegments) {
 	unsigned iVertex = 0;
 
 	AngledForm = FormList[ClosestFormToCursor];
@@ -11276,7 +11283,7 @@ void horclp() {
 	}
 }
 
-void angclpfn(std::vector<RNGCNT>& textureSegments) {
+void angclpfn(const std::vector<RNGCNT>& textureSegments) {
 	unsigned iVertex       = 0;
 	double   rotationAngle = 0;
 
@@ -11516,7 +11523,7 @@ void col2frm() {
 	shoMsg(fmt::format(fmtStr, colorChangedCount));
 }
 
-bool fxpnt(std::vector<double>& listSINEs, std::vector<double>& listCOSINEs, dPOINT& moveToCoords) {
+bool fxpnt(const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs, dPOINT& moveToCoords) {
 	double   length = 0.0, delta = 0.0;
 	unsigned iGuess = 0;
 
@@ -11537,7 +11544,7 @@ bool fxpnt(std::vector<double>& listSINEs, std::vector<double>& listCOSINEs, dPO
 	return 0;
 }
 
-void fxlit(std::vector<double>& listSINEs, std::vector<double>& listCOSINEs, dPOINT& moveToCoords) {
+void fxlit(const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs, dPOINT& moveToCoords) {
 	double   length = 0.0;
 	unsigned count  = 0;
 	dPOINT   delta  = {};
@@ -11557,8 +11564,8 @@ void fxlit(std::vector<double>& listSINEs, std::vector<double>& listCOSINEs, dPO
 }
 
 void fxlin(std::vector<fPOINT>& chainEndPoints,
-           std::vector<double>& ListSINEs,
-           std::vector<double>& ListCOSINEs,
+           const std::vector<double>& ListSINEs,
+           const std::vector<double>& ListCOSINEs,
            dPOINT&              moveToCoords) {
 	double   length = 0.0;
 	unsigned count  = 0;
@@ -11581,7 +11588,7 @@ void fxlin(std::vector<fPOINT>& chainEndPoints,
 	}
 }
 
-void fxlen(std::vector<fPOINT>& chainEndPoints, std::vector<double>& listSINEs, std::vector<double>& listCOSINEs) {
+void fxlen(std::vector<fPOINT>& chainEndPoints, const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs) {
 	double   interval        = 0.0;
 	double   minimumInterval = 0.0;
 	double   minimumSpacing  = 0.0;
@@ -11686,7 +11693,7 @@ void fxlen(std::vector<fPOINT>& chainEndPoints, std::vector<double>& listSINEs, 
 	}
 }
 
-void duchfn(std::vector<fPOINT>& chainEndPoints, unsigned start, unsigned finish) {
+void duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned start, unsigned finish) {
 	unsigned              iChain        = 0;
 	std::vector<unsigned> chainSequence = { 0, 1, 2, 3, 0, 1, 4, 3, 0, 3 }; // chain stitch sequence
 
@@ -11880,8 +11887,8 @@ void crop() {
 		shoseln(IDS_FRM1MSG, IDS_CROP);
 }
 
-void xclpfn(std::vector<fPOINT>& tempClipPoints,
-            std::vector<fPOINT>& chainEndPoints,
+void xclpfn(const std::vector<fPOINT>& tempClipPoints,
+            const std::vector<fPOINT>& chainEndPoints,
             unsigned             start,
             unsigned             finish,
             const dPOINT&        rotationCenter) {
