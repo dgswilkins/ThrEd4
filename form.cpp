@@ -24,7 +24,7 @@ extern void                 angrct(fRECTANGLE& rectangle);
 extern void                 centr();
 extern void                 chkcwlk();
 extern void                 chkrng(fPOINT& range);
-extern void                 chkund(std::vector<RNGCNT>& textureSegments);
+extern void                 chkund(const std::vector<RNGCNT>& textureSegments);
 extern void                 chkwlk();
 extern void                 coltab();
 extern void                 dasyfrm();
@@ -58,7 +58,7 @@ extern void                 numWnd();
 extern void                 nuRct();
 extern void                 pntmsg(unsigned count);
 extern unsigned             px2stch();
-extern void                 pxCor2stch(POINT point);
+extern void                 pxCor2stch(const POINT& point);
 extern void                 redclp();
 extern void                 redraw(HWND window);
 extern void                 ritfcor(const fPOINT& point);
@@ -6387,19 +6387,19 @@ void refrm() {
 	refrmfn();
 }
 
-void pxrct2stch(const RECT& screenRect, fRECTANGLE* const stitchRect) {
+void pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) {
 	POINT corner;
 
 	corner.x = screenRect.left + StitchWindowOrigin.x;
 	corner.y = screenRect.top + StitchWindowOrigin.y;
 	pxCor2stch(corner);
-	stitchRect->left = SelectedPoint.x;
-	stitchRect->top  = SelectedPoint.y;
+	stitchRect.left = SelectedPoint.x;
+	stitchRect.top  = SelectedPoint.y;
 	corner.x         = screenRect.right + StitchWindowOrigin.x;
 	corner.y         = screenRect.bottom + StitchWindowOrigin.y;
 	pxCor2stch(corner);
-	stitchRect->right  = SelectedPoint.x;
-	stitchRect->bottom = SelectedPoint.y;
+	stitchRect.right  = SelectedPoint.x;
+	stitchRect.bottom = SelectedPoint.y;
 }
 
 unsigned pdir(unsigned vertex) {
@@ -6421,7 +6421,7 @@ void setstrtch() {
 		MoveMemory(&stitchRect, &SelectedPointsLine, sizeof(fRECTANGLE));
 	else {
 		if (SelectedFormList->size() || StateMap.test(StateFlag::BIGBOX))
-			pxrct2stch(SelectedFormsRect, &stitchRect);
+			pxrct2stch(SelectedFormsRect, stitchRect);
 		else {
 			fvars(ClosestFormToCursor);
 			px2stch();
@@ -6605,7 +6605,7 @@ void setstrtch() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setexpand(const double& xyRatio) {
+void setexpand(double xyRatio) {
 	dPOINT     reference        = {};
 	POINT      integerReference = {};
 	fPOINT     stitchReference  = {};
@@ -7421,7 +7421,7 @@ void fliph() {
 	if (SelectedFormList->size()) {
 		savdo();
 		boost::dynamic_bitset<> formMap(FormIndex);
-		pxrct2stch(SelectedFormsRect, &rectangle);
+		pxrct2stch(SelectedFormsRect, rectangle);
 		midpoint = (rectangle.right - rectangle.left) / 2 + rectangle.left;
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
@@ -7500,7 +7500,7 @@ void flipv() {
 	if (SelectedFormList->size()) {
 		savdo();
 		boost::dynamic_bitset<> formMap(FormIndex);
-		pxrct2stch(SelectedFormsRect, &rectangle);
+		pxrct2stch(SelectedFormsRect, rectangle);
 		midpoint = (rectangle.top - rectangle.bottom) / 2 + rectangle.bottom;
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;

@@ -279,7 +279,7 @@ extern void               prpbrd(double borderStitchSpacing);
 extern constexpr unsigned prv(unsigned iVertex);
 extern unsigned           psg();
 extern void               px2stchf(const POINT& screen, fPOINT* const stitchPoint);
-extern void               pxrct2stch(const RECT& screenRect, fRECTANGLE* const stitchRect);
+extern void               pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect);
 extern void               rats();
 extern void               ratsr();
 extern void               rct2sel(const RECT& rectangle, std::vector<POINT>& line);
@@ -329,7 +329,7 @@ extern void               setbspac();
 extern void               setclpspac();
 extern void               setcwlk();
 extern void               setear();
-extern void               setexpand(const double& xyRatio);
+extern void               setexpand(double xyRatio);
 extern void               setfang();
 extern void               setfchk();
 extern void               setfcol();
@@ -5505,7 +5505,7 @@ COLORREF nuBit() noexcept {
 	return ChooseColor(&BitMapColorStruct);
 }
 
-void pxCor2stch(POINT point) noexcept {
+void pxCor2stch(const POINT& point) noexcept {
 	double ratio;
 
 	ratio           = static_cast<double>(point.x - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
@@ -6975,7 +6975,7 @@ void rot(dPOINT& rotationCenter) {
 			break;
 		}
 		if (SelectedFormList->size()) {
-			pxrct2stch(SelectedFormsRect, &RotationRect);
+			pxrct2stch(SelectedFormsRect, RotationRect);
 			StateMap.set(StateFlag::FRMSROT);
 			break;
 		}
@@ -10303,20 +10303,20 @@ void stchrct(fRECTANGLE* rectangle) noexcept {
 	}
 }
 
-void frmrct(fRECTANGLE* rectangle) noexcept {
+void frmrct(fRECTANGLE& rectangle) noexcept {
 	unsigned iVertex = 0;
 
-	rectangle->left = rectangle->right = FormVertices[0].x;
-	rectangle->top = rectangle->bottom = FormVertices[0].y;
+	rectangle.left = rectangle.right = FormVertices[0].x;
+	rectangle.top = rectangle.bottom = FormVertices[0].y;
 	for (iVertex = 0; iVertex < FormVertexIndex; iVertex++) {
-		if (FormVertices[iVertex].x < rectangle->left)
-			rectangle->left = FormVertices[iVertex].x;
-		if (FormVertices[iVertex].x > rectangle->right)
-			rectangle->right = FormVertices[iVertex].x;
-		if (FormVertices[iVertex].y > rectangle->top)
-			rectangle->top = FormVertices[iVertex].y;
-		if (FormVertices[iVertex].y < rectangle->bottom)
-			rectangle->bottom = FormVertices[iVertex].y;
+		if (FormVertices[iVertex].x < rectangle.left)
+			rectangle.left = FormVertices[iVertex].x;
+		if (FormVertices[iVertex].x > rectangle.right)
+			rectangle.right = FormVertices[iVertex].x;
+		if (FormVertices[iVertex].y > rectangle.top)
+			rectangle.top = FormVertices[iVertex].y;
+		if (FormVertices[iVertex].y < rectangle.bottom)
+			rectangle.bottom = FormVertices[iVertex].y;
 	}
 }
 
@@ -10337,7 +10337,7 @@ void desiz() {
 		info += fmt::format(stringTable[STR_STCHS], PCSHeader.stitchCount, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
 	}
 	if (FormIndex) {
-		frmrct(&rectangle);
+		frmrct(rectangle);
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
 		info += fmt::format(stringTable[STR_FORMS], FormIndex, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
@@ -13857,7 +13857,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		if (StateMap.testAndReset(StateFlag::FUNSCLP)) {
 			savdo();
 			StateMap.reset(StateFlag::MOVFRMS);
-			pxrct2stch(SelectedFormsRect, &formsRect);
+			pxrct2stch(SelectedFormsRect, formsRect);
 			px2stch();
 			FormMoveDelta.x = SelectedPoint.x - ((formsRect.right - formsRect.left) / 2 + formsRect.left);
 			FormMoveDelta.y = SelectedPoint.y - ((formsRect.top - formsRect.bottom) / 2 + formsRect.bottom);
