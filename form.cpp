@@ -1749,7 +1749,7 @@ void duform(unsigned formType) {
 	}
 }
 
-float findDistanceToSide(const fPOINT& lineStart, const fPOINT& lineEnd, const fPOINT& point, double distance) noexcept {
+float findDistanceToSide(const fPOINT& lineStart, const fPOINT& lineEnd, const fPOINT& point, double& distance) noexcept {
 	const double A     = point.x - lineStart.x;
 	const double B     = point.y - lineStart.y;
 	const double C     = lineEnd.x - lineStart.x;
@@ -1791,12 +1791,12 @@ float findDistanceToSide(const fPOINT& lineStart, const fPOINT& lineEnd, const f
 }
 
 unsigned closfrm() {
-	unsigned     iForm = 0, iVertex = 0, closestForm = 0, closestVertex = 0, layerCoded = 0, formLayer = 0;
-	fPOINT       point            = {};
-	POINT        screenCoordinate = {};
-	const double length           = 0;
-	double       minimumLength    = 1e99;
-	float        param            = 0.0;
+	unsigned iForm = 0, iVertex = 0, closestForm = 0, closestVertex = 0, layerCoded = 0, formLayer = 0;
+	fPOINT   point            = {};
+	POINT    screenCoordinate = {};
+	double   length           = 0;
+	double   minimumLength    = 1e99;
+	float    param            = 0.0;
 
 	if (FormIndex) {
 		screenCoordinate.x = Msg.pt.x - StitchWindowOrigin.x;
@@ -7777,7 +7777,7 @@ void filsat() {
 unsigned closat() {
 	unsigned     iForm = 0, iVertex = 0, lastVertex = 0;
 	double       minimumLength = 1e99;
-	const double length        = 0;
+	double       length        = 0;
 	unsigned int savedVertex   = 0;
 	float        param         = 0.0;
 
