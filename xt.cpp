@@ -522,9 +522,9 @@ fPOINT midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept {
 	return {(endPoint.x - startPoint.x) * 0.5f + startPoint.x,(endPoint.y - startPoint.y) * 0.5f + startPoint.y};
 }
 
-void xratf(fPOINT startPoint, fPOINT endPoint, fPOINT* point) noexcept {
-	point->x = (endPoint.x - startPoint.x) * FeatherRatioLocal + startPoint.x;
-	point->y = (endPoint.y - startPoint.y) * FeatherRatioLocal + startPoint.y;
+void xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point) noexcept {
+	point.x = (endPoint.x - startPoint.x) * FeatherRatioLocal + startPoint.x;
+	point.y = (endPoint.y - startPoint.y) * FeatherRatioLocal + startPoint.y;
 }
 
 void fthrbfn(unsigned iSequence) {
@@ -553,8 +553,8 @@ void fthrbfn(unsigned iSequence) {
 		duxrats(iSequence, iSequence + 1, currentHighPoint);
 		duxrats(iSequence + 3, iSequence + 2, nextHighPoint);
 		FeatherRatioLocal = FeatherRatio;
-		xratf(currentLowPoint, currentHighPoint, &currentPoint);
-		xratf(nextLowPoint, nextHighPoint, &nextPoint);
+		xratf(currentLowPoint, currentHighPoint, currentPoint);
+		xratf(nextLowPoint, nextHighPoint, nextPoint);
 	}
 	midPoint = midpnt(currentPoint, nextPoint);
 	xoseq(iSequence);
@@ -579,11 +579,11 @@ void fthdfn(unsigned iSequence) {
 		FeatherRatioLocal = 0.5;
 		duxrats(iSequence + 1, iSequence, adjustedPoint);
 		FeatherRatioLocal = FeatherMinStitch / length / 2;
-		xratf(adjustedPoint, OSequence[iSequence], &currentPoint);
-		xratf(adjustedPoint, OSequence[iSequence + 1], &nextPoint);
+		xratf(adjustedPoint, OSequence[iSequence], currentPoint);
+		xratf(adjustedPoint, OSequence[iSequence + 1], nextPoint);
 		FeatherRatioLocal = FeatherRatio;
-		xratf(currentPoint, OSequence[iSequence], &OSequence[iSequence]);
-		xratf(nextPoint, OSequence[iSequence + 1], &OSequence[iSequence + 1]);
+		xratf(currentPoint, OSequence[iSequence], OSequence[iSequence]);
+		xratf(nextPoint, OSequence[iSequence + 1], OSequence[iSequence + 1]);
 	}
 }
 
@@ -4372,7 +4372,7 @@ void mvshft() {
 	}
 }
 
-bool inrct(fRECTANGLE rectangle, fPOINTATTR stitch) noexcept {
+bool inrct(const fRECTANGLE& rectangle, const fPOINTATTR& stitch) noexcept {
 	if (stitch.x < rectangle.left)
 		return 0;
 	if (stitch.x > rectangle.right)
