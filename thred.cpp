@@ -196,7 +196,7 @@ extern void               nufsel();
 extern void               nufthcol(unsigned color);
 extern void               nulapcol(unsigned color);
 extern constexpr unsigned nxt(unsigned int iVertex);
-extern void               oclp(const fPOINT* clip, unsigned clipEntries);
+extern void               oclp(const fPOINT* const clip, unsigned clipEntries);
 extern void               okcan();
 extern unsigned           pdir(unsigned vertex);
 extern void               pes2crd();
@@ -1646,16 +1646,16 @@ void redfnam(char* designerName) noexcept {
 	}
 }
 
-void dstin(unsigned number, POINT* pout) noexcept {
+void dstin(unsigned number, POINT& pout) noexcept {
 	// ToDo - what is this code doing?
 	unsigned index = 0, shift = 1;
-	pout->x = pout->y = 0;
+	pout = {};
 	for (index = 0; index < 22; index++) {
 		if (number & shift) {
 			if (DSTValues[index].cor)
-				pout->y += DSTValues[index].val;
+				pout.y += DSTValues[index].val;
 			else
-				pout->x += DSTValues[index].val;
+				pout.x += DSTValues[index].val;
 		}
 		shift <<= 1;
 	}
@@ -1717,8 +1717,8 @@ void ritfcor(const fPOINT& point) {
 	butxt(HCOR, fmt::format("x{:.0f} y{:.0f}", (point.x / PFGRAN), (point.y / PFGRAN)));
 }
 
-void ritcor(const fPOINTATTR* pointAttribute) {
-	fPOINT point = { pointAttribute->x, pointAttribute->y };
+void ritcor(const fPOINTATTR& pointAttribute) {
+	fPOINT point = { pointAttribute.x, pointAttribute.y };
 
 	ritfcor(point);
 }
@@ -1809,7 +1809,7 @@ void ladj() {
 	StateMap.set(StateFlag::DUMEN);
 }
 
-void stchcpy(unsigned count, fPOINTATTR* destination) noexcept {
+void stchcpy(unsigned count, fPOINTATTR* const destination) noexcept {
 	memcpy(destination, StitchBuffer, count * 4);
 }
 
@@ -1824,12 +1824,12 @@ void deldu() {
 	StateMap.reset(StateFlag::BAKACT);
 }
 
-void mvflpnt(fPOINT* destination, const fPOINT* source, unsigned count) noexcept {
+void mvflpnt(fPOINT* const destination, const fPOINT* const source, unsigned count) noexcept {
 	// ToDo - convert this to a vector copy operation
 	memcpy(destination, source, count * sizeof(fPOINT));
 }
 
-void mvsatk(SATCON* destination, const SATCON* source, unsigned count) noexcept {
+void mvsatk(SATCON* const destination, const SATCON* const source, unsigned count) noexcept {
 	// ToDo - convert this to a vector copy operation
 	memcpy(destination, source, count * sizeof(SATCON));
 }
@@ -2232,25 +2232,25 @@ double pxchk(double pixelSize) noexcept {
 	return pixelSize;
 }
 
-void sizstch(fRECTANGLE* rectangle, const fPOINTATTR* stitches) noexcept {
+void sizstch(fRECTANGLE& rectangle, const fPOINTATTR* const stitches) noexcept {
 	unsigned iStitch = 0;
 
 	if (PCSHeader.stitchCount && stitches) {
-		rectangle->bottom = rectangle->top = stitches[0].y;
-		rectangle->left = rectangle->right = stitches[0].x;
+		rectangle.bottom = rectangle.top = stitches[0].y;
+		rectangle.left = rectangle.right = stitches[0].x;
 		for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (stitches[iStitch].x < rectangle->left)
-				rectangle->left = stitches[iStitch].x;
-			if (stitches[iStitch].x > rectangle->right)
-				rectangle->right = stitches[iStitch].x;
-			if (stitches[iStitch].y < rectangle->bottom)
-				rectangle->bottom = stitches[iStitch].y;
-			if (stitches[iStitch].y > rectangle->top)
-				rectangle->top = stitches[iStitch].y;
+			if (stitches[iStitch].x < rectangle.left)
+				rectangle.left = stitches[iStitch].x;
+			if (stitches[iStitch].x > rectangle.right)
+				rectangle.right = stitches[iStitch].x;
+			if (stitches[iStitch].y < rectangle.bottom)
+				rectangle.bottom = stitches[iStitch].y;
+			if (stitches[iStitch].y > rectangle.top)
+				rectangle.top = stitches[iStitch].y;
 		}
 	}
 	else
-		rectangle->top = rectangle->bottom = rectangle->left = rectangle->right = 0;
+		rectangle = {};
 }
 
 void zRctAdj() noexcept {
@@ -2276,7 +2276,7 @@ void zRctAdj() noexcept {
 	}
 }
 
-void shft(fPOINT delta) noexcept {
+void shft(const fPOINT& delta) noexcept {
 	dPOINT halfZoomRect = { ((ZoomRect.right - ZoomRect.left) / 2), ((ZoomRect.top - ZoomRect.bottom) / 2) };
 	dPOINT center       = { (ZoomRect.left + halfZoomRect.x), (ZoomRect.bottom + halfZoomRect.y) };
 	dPOINT shift        = { (center.x - delta.x), (center.y - delta.y) };
@@ -2410,7 +2410,7 @@ void hupfn() {
 	dPOINT   delta        = {};
 
 	StateMap.reset(StateFlag::HUPCHNG);
-	sizstch(&CheckHoopRect, StitchBuffer);
+	sizstch(CheckHoopRect, StitchBuffer);
 	if (FormIndex) {
 		if (!PCSHeader.stitchCount) {
 			CheckHoopRect.bottom = CheckHoopRect.top = CurrentFormVertices[0].y;
@@ -3312,7 +3312,7 @@ void duzero() {
 		delsmal(0, PCSHeader.stitchCount);
 }
 
-void rshft(POINT shiftPoint) {
+void rshft(const POINT& shiftPoint) {
 	ZoomRect.right -= shiftPoint.x;
 	ZoomRect.left -= shiftPoint.x;
 	ZoomRect.top -= shiftPoint.y;
@@ -3610,7 +3610,7 @@ HBRUSH nuBrush(HBRUSH brush, COLORREF color) noexcept {
 	return CreateSolidBrush(color);
 }
 
-void rotpix(POINT unrotatedPoint, POINT* rotatedPoint, const POINT& rotationCenterPixels) {
+void rotpix(const POINT& unrotatedPoint, POINT& rotatedPoint, const POINT& rotationCenterPixels) {
 	// won't handle vertical lines
 
 	double     distanceToCenter = 0.0, newAngle = 0.0;
@@ -3620,17 +3620,17 @@ void rotpix(POINT unrotatedPoint, POINT* rotatedPoint, const POINT& rotationCent
 	distanceToCenter = hypot(dx, dy);
 	newAngle         = atan2(dy, dx);
 	newAngle -= RotateAngle;
-	rotatedPoint->y = rotationCenterPixels.y + distanceToCenter * sin(newAngle);
-	rotatedPoint->x = rotationCenterPixels.x + distanceToCenter * cos(newAngle);
+	rotatedPoint.y = rotationCenterPixels.y + distanceToCenter * sin(newAngle);
+	rotatedPoint.x = rotationCenterPixels.x + distanceToCenter * cos(newAngle);
 }
 
 void duar() {
 	POINT arrowCenter = { (StitchCoordinatesPixels.x - 10), (StitchCoordinatesPixels.y + 10) };
 
 	StitchArrow[1] = StitchCoordinatesPixels;
-	rotpix(arrowCenter, &StitchArrow[0], StitchCoordinatesPixels);
+	rotpix(arrowCenter, StitchArrow[0], StitchCoordinatesPixels);
 	arrowCenter.y = StitchCoordinatesPixels.y - 10;
-	rotpix(arrowCenter, &StitchArrow[2], StitchCoordinatesPixels);
+	rotpix(arrowCenter, StitchArrow[2], StitchCoordinatesPixels);
 	SelectObject(StitchWindowMemDC, BoxPen[0]);
 	SelectObject(StitchWindowDC, BoxPen[0]);
 	SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
@@ -3664,7 +3664,7 @@ unsigned stch2px(unsigned iStitch) noexcept {
 		return 0;
 }
 
-void stch2pxr(fPOINT stitchCoordinate) noexcept {
+void stch2pxr(const fPOINT& stitchCoordinate) noexcept {
 	StitchCoordinatesPixels.x = (stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x + 0.5;
 	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
 }
@@ -3956,7 +3956,7 @@ void reldun() {
 	PostQuitMessage(0);
 }
 
-bool chkattr(char* filename) {
+bool chkattr(const char* const filename) {
 	const unsigned attributes            = GetFileAttributes(filename);
 	unsigned       buttonPressed         = 0;
 	char           drive[_MAX_PATH]      = { 0 };
@@ -3985,7 +3985,7 @@ bool chkattr(char* filename) {
 	return 0;
 }
 
-unsigned duth(const char* name) noexcept {
+unsigned duth(const char* const name) noexcept {
 	// ToDo - Can I use strrchr here?
 	if (name) {
 		unsigned iLast = strlen(name);
@@ -4001,7 +4001,7 @@ unsigned duth(const char* name) noexcept {
 	return 0;
 }
 
-void duver(char* name) noexcept {
+void duver(char* const name) noexcept {
 	if (name) {
 		const unsigned lastChar = duth(name);
 		int            version  = 0;
@@ -4015,14 +4015,14 @@ void duver(char* name) noexcept {
 	}
 }
 
-void durit(char** destination, const void* source, unsigned count) noexcept {
+void durit(char** destination, const void* const source, unsigned count) noexcept {
 	if (destination && source) {
 		CopyMemory(static_cast<void*>(*destination), source, count);
 		*destination += count;
 	}
 }
 
-void dubuf(char* buffer, unsigned* count) {
+void dubuf(char* const buffer, unsigned& count) {
 	STRHED   stitchHeader = {};
 	unsigned iForm = 0, iColor = 0, iVertex = 0, iGuide = 0, iClip = 0;
 	unsigned vertexCount = 0, guideCount = 0, clipDataCount = 0;
@@ -4120,9 +4120,7 @@ void dubuf(char* buffer, unsigned* count) {
 			durit(&output, TexturePointsBuffer, TextureIndex * sizeof(TXPNT));
 		}
 	}
-	if (count) {
-		*count = output - buffer;
-	}
+	count = output - buffer;
 }
 
 void thrsav() {
@@ -4168,7 +4166,7 @@ void thrsav() {
 	else {
 		// ToDo - MAXITEMS * 8 is not the best option here. Need something better
 		auto output = std::vector<char>(MAXITEMS * 8);
-		dubuf(output.data(), &count);
+		dubuf(output.data(), count);
 		WriteFile(FileHandle, output.data(), count, &bytesWritten, 0);
 		if (bytesWritten != count) {
 			std::string fmtStr;
@@ -4205,7 +4203,7 @@ void savdst(std::vector<DSTREC>& DSTRecords, unsigned data) {
 	DSTRecords.push_back(x.dstRecord);
 }
 
-constexpr unsigned dudbits(POINT dif) {
+constexpr unsigned dudbits(const POINT& dif) {
 	return Xdst[dif.x + 121] | Ydst[dif.y + 121];
 }
 
@@ -4779,7 +4777,7 @@ void dusid(unsigned entry) noexcept {
 	SideWindowLocation++;
 }
 
-void sidmsg(HWND window, std::string* strings, unsigned entries) {
+void sidmsg(HWND window, std::string* const strings, unsigned entries) {
 	if (strings) {
 		RECT     childListRect  = {};
 		RECT     parentListRect = {};
@@ -5409,7 +5407,7 @@ void dstran(std::vector<DSTREC>& DSTData) {
 			}
 		}
 		else {
-			dstin(dtrn(&DSTData[iRecord]), &dstStitch);
+			dstin(dtrn(&DSTData[iRecord]), dstStitch);
 			localStitch.x += dstStitch.x;
 			localStitch.y += dstStitch.y;
 			if (!(DSTData[iRecord].nd & 0x80)) {
@@ -5882,7 +5880,7 @@ void nuFil() {
 							IniFile.auxFileType = AUXPCS;
 							if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP)
 								PCSHeader.hoopType = LARGHUP;
-							sizstch(&stitchRect, StitchBuffer);
+							sizstch(stitchRect, StitchBuffer);
 							if (stitchRect.left < 0 || stitchRect.right > LHUPY || stitchRect.bottom < 0
 							    || stitchRect.top > LHUPY) {
 								IniFile.hoopSizeX = LHUPX;
@@ -6650,7 +6648,7 @@ void movbox() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	nuAct(ClosestPointIndex);
-	ritcor(&StitchBuffer[ClosestPointIndex]);
+	ritcor(StitchBuffer[ClosestPointIndex]);
 }
 
 bool chkhid(unsigned colorToCheck) {
@@ -7028,7 +7026,7 @@ void rebox() {
 			for (iColor = 0; iColor < 16; iColor++)
 				redraw(UserColorWin[iColor]);
 		}
-		ritcor(&StitchBuffer[ClosestPointIndex]);
+		ritcor(StitchBuffer[ClosestPointIndex]);
 	}
 }
 
@@ -18042,16 +18040,16 @@ void dumov() {
 		rotationOutline[0] = rotationOutline[6] = rotationCenterPixels;
 		OffsetFromCenter.x                      = rotationCenterPixels.x + 12;
 		OffsetFromCenter.y                      = rotationCenterPixels.y + 2;
-		rotpix(OffsetFromCenter, &rotationOutline[1], rotationCenterPixels);
+		rotpix(OffsetFromCenter, rotationOutline[1], rotationCenterPixels);
 		OffsetFromCenter.y = rotationCenterPixels.y - 2;
-		rotpix(OffsetFromCenter, &rotationOutline[5], rotationCenterPixels);
+		rotpix(OffsetFromCenter, rotationOutline[5], rotationCenterPixels);
 		OffsetFromCenter.y = rotationCenterPixels.y + 6;
-		rotpix(OffsetFromCenter, &rotationOutline[2], rotationCenterPixels);
+		rotpix(OffsetFromCenter, rotationOutline[2], rotationCenterPixels);
 		OffsetFromCenter.y = rotationCenterPixels.y - 6;
-		rotpix(OffsetFromCenter, &rotationOutline[4], rotationCenterPixels);
+		rotpix(OffsetFromCenter, rotationOutline[4], rotationCenterPixels);
 		OffsetFromCenter.x = rotationCenterPixels.x + 20;
 		OffsetFromCenter.y = rotationCenterPixels.y;
-		rotpix(OffsetFromCenter, &rotationOutline[3], rotationCenterPixels);
+		rotpix(OffsetFromCenter, rotationOutline[3], rotationCenterPixels);
 		SelectObject(StitchWindowMemDC, FormPen);
 		SetROP2(StitchWindowMemDC, R2_XORPEN);
 		Polyline(StitchWindowMemDC, rotationOutline, 7);
@@ -18182,7 +18180,7 @@ void rint() noexcept {
 	CellSize.y = (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom;
 }
 
-bool setRmap(boost::dynamic_bitset<>& stitchMap, fPOINTATTR stitchPoint) {
+bool setRmap(boost::dynamic_bitset<>& stitchMap, const fPOINTATTR& stitchPoint) {
 	unsigned bitPoint;
 
 	bitPoint = floor((stitchPoint.x - ZoomRect.left) / CellSize.x) * floor((stitchPoint.y - ZoomRect.bottom) / CellSize.y);
@@ -18455,7 +18453,7 @@ void drwStch() {
 			}
 		}
 		if (StateMap.test(StateFlag::SELBOX)) {
-			ritcor(&StitchBuffer[ClosestPointIndex]);
+			ritcor(StitchBuffer[ClosestPointIndex]);
 			if (stch2px(ClosestPointIndex)) {
 				dubox();
 			}
@@ -18573,7 +18571,7 @@ void dubar() {
 	}
 }
 
-void ritbak(const char* fileName, DRAWITEMSTRUCT* drawItem) {
+void ritbak(const char* const fileName, DRAWITEMSTRUCT* drawItem) {
 	unsigned iStitch = 0, iForm = 0, iVertexInForm = 0, iVertex = 0, iColor = 0, iLine = 0, bytesToRead = 0;
 	POINT    drawingDestinationSize
 	    = { (drawItem->rcItem.right - drawItem->rcItem.left), (drawItem->rcItem.bottom - drawItem->rcItem.top) };
@@ -18719,37 +18717,38 @@ void ritbak(const char* fileName, DRAWITEMSTRUCT* drawItem) {
 	}
 }
 
-void durct(unsigned shift, RECT traceControlRect, RECT* traceHighMask, RECT* traceMiddleMask, RECT* traceLowMask) {
+void durct(unsigned shift, const RECT& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask) {
 	const unsigned lowerColor    = (UpPixelColor >> shift) & 0xff;
 	const unsigned upperColor    = (DownPixelColor >> shift) & 0xff;
 	const unsigned controlHeight = traceControlRect.bottom - traceControlRect.top;
 	double         ratio         = 0.0;
 
-	traceHighMask->left = traceLowMask->left = traceMiddleMask->left = traceControlRect.left;
-	traceHighMask->right = traceLowMask->right = traceMiddleMask->right = traceControlRect.right;
-	ratio                                                               = static_cast<double>(lowerColor) / 255;
-	traceMiddleMask->top                                                = controlHeight * ratio + traceControlRect.top;
-	ratio                                                               = static_cast<double>(upperColor) / 255;
-	traceMiddleMask->bottom                                             = controlHeight * ratio + traceControlRect.top;
+	traceHighMask.left = traceLowMask.left = traceMiddleMask.left = traceControlRect.left;
+	traceHighMask.right = traceLowMask.right = traceMiddleMask.right = traceControlRect.right;
+
+	ratio                  = static_cast<double>(lowerColor) / 255;
+	traceMiddleMask.top    = controlHeight * ratio + traceControlRect.top;
+	ratio                  = static_cast<double>(upperColor) / 255;
+	traceMiddleMask.bottom = controlHeight * ratio + traceControlRect.top;
 	StateMap.reset(StateFlag::DUHI);
 	StateMap.reset(StateFlag::DULO);
 	if (lowerColor) {
 		StateMap.set(StateFlag::DULO);
-		traceLowMask->bottom = traceMiddleMask->top;
-		traceLowMask->top    = 0;
+		traceLowMask.bottom = traceMiddleMask.top;
+		traceLowMask.top    = 0;
 	}
 	if (upperColor != 255) {
 		StateMap.set(StateFlag::DUHI);
-		traceHighMask->top    = traceMiddleMask->bottom;
-		traceHighMask->bottom = traceControlRect.bottom;
+		traceHighMask.top    = traceMiddleMask.bottom;
+		traceHighMask.bottom = traceControlRect.bottom;
 	}
 }
 
-void dublk(HDC dc, const RECT* traceHighMask, const RECT* traceLowMask) {
+void dublk(HDC dc, const RECT& traceHighMask, const RECT& traceLowMask) {
 	if (StateMap.test(StateFlag::DUHI))
-		FillRect(dc, traceHighMask, BlackBrush);
+		FillRect(dc, &traceHighMask, BlackBrush);
 	if (StateMap.test(StateFlag::DULO))
-		FillRect(dc, traceLowMask, BlackBrush);
+		FillRect(dc, &traceLowMask, BlackBrush);
 }
 
 LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -18991,9 +18990,9 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 					dwnum(iRGB);
 				}
 				if (DrawItem->hwndItem == TraceControlWindow[iRGB]) {
-					durct(TraceShift[iRGB], DrawItem->rcItem, &traceHighMaskRect, &traceMiddleMaskRect, &traceLowMaskRect);
+					durct(TraceShift[iRGB], DrawItem->rcItem, traceHighMaskRect, traceMiddleMaskRect, traceLowMaskRect);
 					FillRect(DrawItem->hDC, &traceMiddleMaskRect, TraceBrush[iRGB]);
-					dublk(DrawItem->hDC, &traceHighMaskRect, &traceLowMaskRect);
+					dublk(DrawItem->hDC, traceHighMaskRect, traceLowMaskRect);
 					return 1;
 				}
 				if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {

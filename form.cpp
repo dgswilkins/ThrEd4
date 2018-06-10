@@ -50,8 +50,8 @@ extern bool                 isfclp();
 extern bool                 istx(unsigned find);
 extern inline void          loadString(std::string& sDest, unsigned stringID);
 extern void                 movStch();
-extern void                 mvflpnt(fPOINT* destination, const fPOINT* source, unsigned count);
-extern void                 mvsatk(SATCON* destination, const SATCON* source, unsigned count);
+extern void                 mvflpnt(fPOINT* const destination, const fPOINT* const source, unsigned count);
+extern void                 mvsatk(SATCON* const destination, const SATCON* const source, unsigned count);
 extern void                 mvstch(unsigned destination, unsigned source);
 extern void                 mvstchs(unsigned destination, unsigned source, unsigned count);
 extern void                 numWnd();
@@ -79,13 +79,13 @@ extern void selRct(fRECTANGLE& sourceRect);
 extern void setfchk();
 extern void setpsel();
 extern void setxt(std::vector<RNGCNT>& textureSegments);
-extern void shft(fPOINT delta);
+extern void shft(const fPOINT& delta);
 extern void shoMsg(const std::string& message);
 extern void shord();
 extern void shoseln(unsigned code0, unsigned code1);
 extern void spltmsg();
 extern void srtcol();
-extern void stch2pxr(fPOINT stitchCoordinate);
+extern void stch2pxr(const fPOINT& stitchCoordinate);
 extern void strtchbox(std::vector<POINT>& stretchBoxLine);
 extern void tabmsg(unsigned code);
 extern void unbsho();
@@ -395,7 +395,7 @@ SATCON* nusac(unsigned formIndex, unsigned guideCount) noexcept {
 	return FormList[formIndex].satinOrAngle.guide;
 }
 
-bool iseclpx(unsigned iForm) noexcept {
+bool iseclpx(unsigned iForm) {
 	if (iseclp(iForm) && FormList[iForm].clipEntries)
 		return 1;
 	return 0;
@@ -745,9 +745,9 @@ void sfCor2px(const fPOINT& stitchPoint, POINT& screen) noexcept {
 void px2stchf(const POINT& screen, fPOINT& stitchPoint) noexcept {
 	double factorX = 0.0, factorY = 0.0;
 
-	factorX        = static_cast<double>(screen.x) / static_cast<double>(StitchWindowClientRect.right);
+	factorX       = static_cast<double>(screen.x) / static_cast<double>(StitchWindowClientRect.right);
 	stitchPoint.x = factorX * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-	factorY        = static_cast<double>(StitchWindowClientRect.bottom - screen.y) / StitchWindowClientRect.bottom;
+	factorY       = static_cast<double>(StitchWindowClientRect.bottom - screen.y) / StitchWindowClientRect.bottom;
 	stitchPoint.y = factorY * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
 }
 
@@ -2169,7 +2169,7 @@ void linrutb(unsigned start) noexcept {
 	LineSpacing = spacing;
 }
 
-void oclp(const fPOINT* clip, unsigned clipEntries) {
+void oclp(const fPOINT* const clip, unsigned clipEntries) {
 	if (clip) {
 		unsigned iClip = 1;
 
@@ -2407,11 +2407,11 @@ bool ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) {
 	return 0;
 }
 
-void lincrnr(std::vector<fPOINT>& clipReversedData,
-             std::vector<fPOINT>& clipFillData,
-             double               clipAngle,
-             dPOINT&              moveToCoords,
-             const dPOINT&        rotationCenter) {
+void lincrnr(const std::vector<fPOINT>& clipReversedData,
+             std::vector<fPOINT>&       clipFillData,
+             double                     clipAngle,
+             dPOINT&                    moveToCoords,
+             const dPOINT&              rotationCenter) {
 	dPOINT   delta   = {};
 	unsigned iStitch = 0;
 
@@ -2427,11 +2427,11 @@ void lincrnr(std::vector<fPOINT>& clipReversedData,
 	}
 }
 
-void linsid(std::vector<fPOINT>& clipReversedData,
-            std::vector<fPOINT>& clipFillData,
-            double               clipAngle,
-            const dPOINT&        vector0,
-            const dPOINT&        rotationCenter) {
+void linsid(const std::vector<fPOINT>& clipReversedData,
+            std::vector<fPOINT>&       clipFillData,
+            double                     clipAngle,
+            const dPOINT&              vector0,
+            const dPOINT&              rotationCenter) {
 	fPOINT         delta     = { (CurrentFormVertices[CurrentSide + 1].x - SelectedPoint.x),
                      (CurrentFormVertices[CurrentSide + 1].y - SelectedPoint.y) };
 	const double   length    = hypot(delta.x, delta.y);
@@ -2491,7 +2491,7 @@ void outfn(unsigned start, unsigned finish, double satinWidth) {
 }
 
 // find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
-bool projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT& intersection) noexcept {
+bool projv(double xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, dPOINT& intersection) noexcept {
 	double       slope  = 0.0;
 	const double deltaX = upperPoint.x - lowerPoint.x;
 
@@ -2500,10 +2500,12 @@ bool projv(double xCoordinate, fPOINT lowerPoint, fPOINT upperPoint, dPOINT& int
 	if (deltaX) {
 		slope          = (upperPoint.y - lowerPoint.y) / deltaX;
 		intersection.y = (xCoordinate - lowerPoint.x) * slope + lowerPoint.y;
-		if (lowerPoint.x > upperPoint.x) {
-			std::swap(lowerPoint.x, upperPoint.x);
+		auto lower     = lowerPoint.x;
+		auto upper     = upperPoint.x;
+		if (lower > upper) {
+			std::swap(lower, upper);
 		}
-		if (xCoordinate < lowerPoint.x || xCoordinate > upperPoint.x)
+		if (xCoordinate < lower || xCoordinate > upper)
 			return false;
 		else
 			return true;
@@ -2593,11 +2595,11 @@ void clpout() {
 	}
 }
 
-bool clpsid(std::vector<fPOINT>& clipReversedData,
-            std::vector<fPOINT>& clipFillData,
-            unsigned             start,
-            unsigned             finish,
-            const dPOINT&        rotationCenter) {
+bool clpsid(const std::vector<fPOINT>& clipReversedData,
+            std::vector<fPOINT>&       clipFillData,
+            unsigned                   start,
+            unsigned                   finish,
+            const dPOINT&              rotationCenter) {
 	unsigned     ind = 0, clipCount = 0;
 	fPOINT       delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
                      (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
@@ -2953,7 +2955,7 @@ void duxclp() {
 
 /* find the intersection of two lines, one defined by point and slope, the other by the coordinates
    of the endpoints. */
-bool proj(dPOINT point, double slope, fPOINT point0, fPOINT point1, dPOINT& intersectionPoint) noexcept {
+bool proj(const dPOINT& point, double slope, const fPOINT& point0, const fPOINT& point1, dPOINT& intersectionPoint) noexcept {
 	dPOINT delta     = {};
 	double sideSlope = 0.0, pointConstant = 0.0, sideConstant = 0.0, xMinimum = 0.0;
 	double xMaximum = 0.0, yMinimum = 0.0, yMaximum = 0.0;
@@ -3022,7 +3024,7 @@ bool linx(const std::vector<fPOINT>& points, unsigned start, unsigned finish, dP
 	}
 }
 
-bool chkbak(std::vector<dPOINT>& satinBackup, const dPOINT& pnt) {
+bool chkbak(const std::vector<dPOINT>& satinBackup, const dPOINT& pnt) {
 	unsigned   iBackup = 0;
 	double     length  = 0.0;
 	const auto maxSB   = satinBackup.size();
@@ -3034,7 +3036,7 @@ bool chkbak(std::vector<dPOINT>& satinBackup, const dPOINT& pnt) {
 	return 0;
 }
 
-void filinsbw(std::vector<dPOINT>& satinBackup, dPOINT point) {
+void filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point) {
 	satinBackup[SatinBackupIndex++] = point;
 	SatinBackupIndex &= (satinBackup.size() - 1);
 	filinsb(point);
@@ -3171,7 +3173,7 @@ void sbrd() {
 }
 
 // find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
-bool projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT& intersection) noexcept {
+bool projh(double yCoordinate, const fPOINT& point0, const fPOINT& point1, dPOINT& intersection) noexcept {
 	double       slope  = 0.0;
 	const double deltaX = point1.x - point0.x;
 	double       deltaY = 0.0;
@@ -3188,10 +3190,12 @@ bool projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT& intersectio
 	}
 	else
 		intersection.x = point0.x;
-	if (point0.y > point1.y) {
-		std::swap(point0.y, point1.y);
+	auto leftY  = point0.y;
+	auto rightY = point1.y;
+	if (leftY > rightY) {
+		std::swap(leftY, rightY);
 	}
-	if (yCoordinate < point0.y || yCoordinate > point1.y)
+	if (yCoordinate < leftY || yCoordinate > rightY)
 		return false;
 	else
 		return true;
@@ -3297,7 +3301,7 @@ void spurfn(const dPOINT& innerPoint, const dPOINT& outerPoint, dPOINT& underlay
 	underlayOuterPoint.y = delta.y * DOURAT + innerPoint.y;
 }
 
-void spurct(std::vector<VRCT2>& underlayVerticalRect, std::vector<VRCT2>& fillVerticalRect, unsigned iRect) {
+void spurct(std::vector<VRCT2>& underlayVerticalRect, const std::vector<VRCT2>& fillVerticalRect, unsigned iRect) {
 	spurfn(fillVerticalRect[iRect].aipnt,
 	       fillVerticalRect[iRect].aopnt,
 	       underlayVerticalRect[iRect].aipnt,
@@ -4038,7 +4042,7 @@ void fnvrt(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lin
 
 void fnang(std::vector<unsigned>& groupIndexSequence,
            std::vector<SMALPNTL>& lineEndpoints,
-           const double           rotationAngle,
+           double                 rotationAngle,
            dPOINT&                rotationCenter) {
 	unsigned iVertex = 0;
 
@@ -4167,7 +4171,7 @@ void prebrd() noexcept {
 	CurrentFormVertices                              = AngledForm.vertices;
 }
 
-void plfn(const std::vector<VRCT2>& underlayVerticalRect, const std::vector<VRCT2>& fillVerticalRect, const VRCT2* prct) {
+void plfn(const std::vector<VRCT2>& underlayVerticalRect, const std::vector<VRCT2>& fillVerticalRect, const VRCT2* const prct) {
 	if (prct) {
 		unsigned iVertex;
 
@@ -4574,7 +4578,7 @@ bool isect(unsigned vertex0, unsigned vertex1, fPOINT& intersection, float& leng
 	return flag;
 }
 
-bool lencmpa(const CLIPSORT* arg1, const CLIPSORT* arg2) noexcept {
+bool lencmpa(const CLIPSORT* const arg1, const CLIPSORT* const arg2) noexcept {
 	const float local1 = arg1->segmentLength, local2 = arg2->segmentLength;
 
 	return (local1 < local2);
@@ -5238,7 +5242,7 @@ bool sqcomp(const SMALPNTL* arg1, const SMALPNTL* arg2) noexcept {
 	return false;
 }
 
-unsigned short isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoint1) noexcept {
+unsigned short isclos(const SMALPNTL* const lineEndPoint0, const SMALPNTL* const lineEndPoint1) noexcept {
 	if (lineEndPoint0 && lineEndPoint1) {
 		const float low0  = lineEndPoint0[0].y - GapToClosestRegion;
 		const float high0 = lineEndPoint0[1].y + GapToClosestRegion;
@@ -5293,12 +5297,12 @@ bool lnclos(std::vector<unsigned>& groupIndexSequence,
 	return 0;
 }
 
-bool regclos(std::vector<unsigned>&  groupIndexSequence,
-             std::vector<SMALPNTL>&  lineEndpoints,
-             std::vector<SMALPNTL*>& sortedLines,
-             unsigned                iRegion0,
-             unsigned                iRegion1,
-             std::vector<REGION>&    regionsList) {
+bool regclos(std::vector<unsigned>&        groupIndexSequence,
+             std::vector<SMALPNTL>&        lineEndpoints,
+             const std::vector<SMALPNTL*>& sortedLines,
+             unsigned                      iRegion0,
+             unsigned                      iRegion1,
+             const std::vector<REGION>&    regionsList) {
 	// ToDo - More renaming required
 
 	const SMALPNTL* lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
@@ -5375,7 +5379,7 @@ bool regclos(std::vector<unsigned>&  groupIndexSequence,
 	return 0;
 }
 
-bool unvis(boost::dynamic_bitset<>& visitedRegions) {
+bool unvis(const boost::dynamic_bitset<>& visitedRegions) {
 	for (VisitedIndex = 0; VisitedIndex < RegionCount; VisitedIndex++) {
 		if (!visitedRegions[VisitedIndex])
 			return true;
@@ -5383,11 +5387,11 @@ bool unvis(boost::dynamic_bitset<>& visitedRegions) {
 	return false;
 }
 
-unsigned notdun(std::vector<RGSEQ>&      tempPath,
-                std::vector<RCON>&       pathMap,
-                std::vector<unsigned>&   mapIndexSequence,
-                boost::dynamic_bitset<>& VisitedRegions,
-                unsigned                 level) {
+unsigned notdun(std::vector<RGSEQ>&            tempPath,
+                const std::vector<RCON>&       pathMap,
+                const std::vector<unsigned>&   mapIndexSequence,
+                const boost::dynamic_bitset<>& VisitedRegions,
+                unsigned                       level) {
 	unsigned iPath         = 1;
 	int      pivot         = 0;
 	int      previousLevel = level - 1;
@@ -5438,10 +5442,10 @@ unsigned notdun(std::vector<RGSEQ>&      tempPath,
 	return 0;
 }
 
-double reglen(std::vector<SMALPNTL*>& sortedLines,
-              unsigned                iRegion,
-              std::vector<fPOINT>&    lastRegionCorners,
-              std::vector<REGION>&    regionsList) {
+double reglen(const std::vector<SMALPNTL*>& sortedLines,
+              unsigned                      iRegion,
+              const std::vector<fPOINT>&    lastRegionCorners,
+              const std::vector<REGION>&    regionsList) {
 	double                 length = 0.0, minimumLength = 1e99;
 	unsigned               iCorner = 0, iPoint = 0;
 	std::vector<SMALPNTL*> lineEndPoints(4);
@@ -5462,12 +5466,12 @@ double reglen(std::vector<SMALPNTL*>& sortedLines,
 	return minimumLength;
 }
 
-void nxtrgn(std::vector<RGSEQ>&      tempPath,
-            std::vector<RCON>&       pathMap,
-            std::vector<unsigned>&   mapIndexSequence,
-            boost::dynamic_bitset<>& visitedRegions,
-            std::vector<SMALPNTL*>&  sortedLines,
-            std::vector<REGION>&     regionsList) {
+void nxtrgn(std::vector<RGSEQ>&           tempPath,
+            const std::vector<RCON>&      pathMap,
+            const std::vector<unsigned>&  mapIndexSequence,
+            boost::dynamic_bitset<>&      visitedRegions,
+            const std::vector<SMALPNTL*>& sortedLines,
+            const std::vector<REGION>&    regionsList) {
 	unsigned iRegion = 0, iPath = 0, newRegion = 0;
 	double   length = 0, minimumLength = 1e99;
 	unsigned pathLength = 1; // length of the path to the region
@@ -5521,10 +5525,10 @@ void nxtrgn(std::vector<RGSEQ>&      tempPath,
 	DoneRegion = pathMap[RegionPath[iPath - 1].pcon].node;
 }
 
-void nxtseq(std::vector<FSEQ>&     sequencePath,
-            std::vector<RCON>&     pathMap,
-            std::vector<unsigned>& mapIndexSequence,
-            unsigned               pathIndex) {
+void nxtseq(std::vector<FSEQ>&           sequencePath,
+            const std::vector<RCON>&     pathMap,
+            const std::vector<unsigned>& mapIndexSequence,
+            unsigned                     pathIndex) {
 	unsigned iPath    = mapIndexSequence[sequencePath[pathIndex].node];
 	unsigned nextNode = 0;
 	if ((pathIndex + 1) < sequencePath.size()) {
@@ -5545,7 +5549,7 @@ void rspnt(float xCoordinate, float yCoordinate) noexcept {
 	BSequence[OutputIndex++].attribute = 0;
 }
 
-void brkdun(std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish) {
+void brkdun(const std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish) {
 	rspnt(sortedLines[start]->x, sortedLines[start]->y);
 	rspnt(sortedLines[finish]->x, sortedLines[finish]->y);
 	rspnt(WorkingFormVertices[sortedLines[start]->line].x, WorkingFormVertices[sortedLines[start]->line].y);
@@ -5557,7 +5561,7 @@ void duseq1() noexcept {
 	      (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
 }
 
-void movseq(std::vector<SMALPNTL*>& sortedLines, unsigned ind) {
+void movseq(const std::vector<SMALPNTL*>& sortedLines, unsigned ind) {
 	SMALPNTL* lineEndPoint = sortedLines[ind];
 
 	BSequence[OutputIndex].attribute = SEQBOT;
@@ -5573,7 +5577,7 @@ void movseq(std::vector<SMALPNTL*>& sortedLines, unsigned ind) {
 	OutputIndex++;
 }
 
-void brkseq(std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish, boost::dynamic_bitset<>& sequenceMap) {
+void brkseq(const std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish, boost::dynamic_bitset<>& sequenceMap) {
 	unsigned iLine = 0, iLineDec = 0, savedGroup = 0;
 
 	StateMap.reset(StateFlag::SEQDUN);
@@ -5631,7 +5635,7 @@ void brkseq(std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish
 	}
 }
 
-void dunseq(std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish) {
+void dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish) {
 	double minimumY = 1e30;
 
 	for (unsigned iLine = start; iLine <= finish; iLine++) {
@@ -5650,13 +5654,13 @@ void dunseq(std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish
 	LastGroup = sortedLines[finish][0].group;
 }
 
-void duseq2(std::vector<SMALPNTL*>& sortedLines, unsigned iLine) {
+void duseq2(const std::vector<SMALPNTL*>& sortedLines, unsigned iLine) {
 	SequenceLines = sortedLines[iLine];
 	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x,
 	      (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
 }
 
-void duseq(std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish, boost::dynamic_bitset<>& sequenceMap) {
+void duseq(const std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish, boost::dynamic_bitset<>& sequenceMap) {
 	unsigned iLine = 0, iLineDec = 0;
 	unsigned savedTopLine = sortedLines[start][1].line;
 	bool     flag         = false;
@@ -5741,12 +5745,12 @@ void duseq(std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish,
 	}
 }
 
-void durgn(std::vector<FSEQ>&       sequencePath,
-           boost::dynamic_bitset<>& visitedRegions,
-           std::vector<SMALPNTL*>&  sortedLines,
-           unsigned                 pthi,
-           unsigned                 lineCount,
-           std::vector<REGION>&     regionsList) {
+void durgn(const std::vector<FSEQ>&      sequencePath,
+           boost::dynamic_bitset<>&      visitedRegions,
+           const std::vector<SMALPNTL*>& sortedLines,
+           unsigned                      pthi,
+           unsigned                      lineCount,
+           std::vector<REGION>&          regionsList) {
 	unsigned       dun = 0, gdif = 0, mindif = 0, iVertex = 0, ind = 0, fdif = 0, bdif = 0;
 	unsigned       seql = 0, seqn = 0;
 	unsigned       sequenceStart = 0;
@@ -6281,7 +6285,7 @@ void bakseq() {
 #endif
 }
 
-void satcpy(SATCON* destination, std::vector<SATCON> source, unsigned int size) {
+void satcpy(SATCON* const destination, const std::vector<SATCON> source, unsigned int size) {
 	if (destination) {
 		for (unsigned int iSource = 0; iSource < size; iSource++) {
 			destination[iSource] = source[iSource];
@@ -6524,7 +6528,7 @@ void filin(dPOINT currentPoint) {
 	SelectedPoint = currentPoint;
 }
 
-void satfn(std::vector<double>& lengths, unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned line2End) {
+void satfn(const std::vector<double>& lengths, unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned line2End) {
 	unsigned line1Next = 0, line2Previous = 0, stitchCount = 0;
 	unsigned iSegment = 0, line1Count = 0, line2Count = 0, iVertex = 0;
 	unsigned iNextVertex = 0, segmentStitchCount = 0, iLine1Vertex = 0;
@@ -6718,7 +6722,7 @@ void satfn(std::vector<double>& lengths, unsigned line1Start, unsigned line1End,
 	}
 }
 
-void satmf(std::vector<double>& lengths) {
+void satmf(const std::vector<double>& lengths) {
 	unsigned iGuide = 0, iVertex = 0;
 	double   length = 0.0, deltaX = 0.0, deltaY = 0.0;
 
@@ -8342,7 +8346,7 @@ void maxwid(unsigned start, unsigned finish) {
 	PreferenceWindowTextWidth = textSize.x + 6;
 }
 
-HWND txtwin(const std::string& windowName, RECT location) {
+HWND txtwin(const std::string& windowName, const RECT& location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		maxtsiz(windowName, LabelWindowSize);
 		return 0;
@@ -8360,7 +8364,7 @@ HWND txtwin(const std::string& windowName, RECT location) {
 	                    NULL);
 }
 
-HWND txtrwin(std::string winName, RECT location) {
+HWND txtrwin(std::string winName, const RECT& location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		maxtsiz(winName, ValueWindowSize);
 		return 0;
@@ -8378,7 +8382,7 @@ HWND txtrwin(std::string winName, RECT location) {
 	                    NULL);
 }
 
-HWND numwin(std::string winName, RECT location) {
+HWND numwin(std::string winName, const RECT& location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		maxtsiz(winName, ValueWindowSize);
 		return 0;
@@ -11455,15 +11459,15 @@ void debean() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void mvfrmsb(FRMHED* destination, const FRMHED* source, unsigned count) noexcept {
+void mvfrmsb(FRMHED* const destination, const FRMHED* const source, unsigned count) noexcept {
 	memmove(destination, source, count * sizeof(FRMHED));
 }
 
-void mvfltsb(fPOINT* destination, const fPOINT* source, unsigned count) noexcept {
+void mvfltsb(fPOINT* const destination, const fPOINT* const source, unsigned count) noexcept {
 	memmove(destination, source, count * sizeof(fPOINT));
 }
 
-void clpspac(const fPOINT* insertPoint, unsigned count) noexcept {
+void clpspac(const fPOINT* const insertPoint, unsigned count) noexcept {
 	mvfltsb(&ClipPoints[ClipPointIndex + count - 1], &ClipPoints[ClipPointIndex - 1], ClipPointIndex - clpind(insertPoint));
 }
 
