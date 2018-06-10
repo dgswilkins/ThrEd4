@@ -3194,8 +3194,8 @@ void dutxlin(const fPOINT& point0in, const fPOINT& point1in) {
 	float  deltaX = 0.0;
 	float  start = 0.0, finish = 0.0, yOffset = 0.0;
 	int    integerStart = 0, integerFinish = 0;
-	fPOINT point0 = ed2stch(point0in);
-	fPOINT point1 = ed2stch(point1in);
+	const fPOINT point0 = ed2stch(point0in);
+	const fPOINT point1 = ed2stch(point1in);
 
 	deltaX = point1.x - point0.x;
 	if (fabs(deltaX) < TINY)

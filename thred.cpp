@@ -35,50 +35,47 @@ template <class T2, class T1> inline _Ret_notnull_ T2 convert_ptr(T1* pointer) {
 	}
 }
 
-extern TXPNT*   adtx(int count);
-extern void     angclp();
-extern void     angsclp();
-extern void     apliq();
-extern void     bakagain();
-extern void     bakdup();
-extern void     bfilmsg();
-extern void     bhol();
-extern void     bholbrd();
-extern void     bord();
-extern void     boxsel();
-extern void     bsizpar();
-extern void     butxt(unsigned iButton, const std::string& buttonText);
-extern void     centir();
-extern void     chain();
-extern void     chan();
-extern void     chgchk(int code);
-extern void     chgwrn();
-extern void     chkcont();
-extern unsigned chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
-extern unsigned closfrm();
-extern void     clpfil();
-extern void     clrfills();
-extern void     clrstch();
-extern void     cntrx();
-extern void     col2frm();
-extern void     contfil();
-extern void     cpylayr(unsigned codedLayer);
-extern void     crmsg(const char* fileName);
-extern void     crop();
-extern void     dazdef();
-extern void     debean();
-extern void     delcon(unsigned GuideIndex);
-extern void     deleclp(unsigned iForm);
-extern void     delflt(unsigned formIndex);
-extern void     delfrms();
-extern void     delmclp(unsigned iForm);
-extern void     delmfil();
-extern void     delsac(unsigned formIndex);
-extern void     delspnt();
-extern void     deltx();
-#ifdef _DEBUG
-extern void dmpat();
-#endif
+extern TXPNT*             adtx(int count);
+extern void               angclp();
+extern void               angsclp();
+extern void               apliq();
+extern void               bakagain();
+extern void               bakdup();
+extern void               bfilmsg();
+extern void               bhol();
+extern void               bholbrd();
+extern void               bord();
+extern void               boxsel();
+extern void               bsizpar();
+extern void               butxt(unsigned iButton, const std::string& buttonText);
+extern void               centir();
+extern void               chain();
+extern void               chan();
+extern void               chgchk(int code);
+extern void               chgwrn();
+extern void               chkcont();
+extern unsigned           chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
+extern unsigned           closfrm();
+extern void               clpfil();
+extern void               clrfills();
+extern void               clrstch();
+extern void               cntrx();
+extern void               col2frm();
+extern void               contfil();
+extern void               cpylayr(unsigned codedLayer);
+extern void               crmsg(const char* fileName);
+extern void               crop();
+extern void               dazdef();
+extern void               debean();
+extern void               delcon(unsigned GuideIndex);
+extern void               deleclp(unsigned iForm);
+extern void               delflt(unsigned formIndex);
+extern void               delfrms();
+extern void               delmclp(unsigned iForm);
+extern void               delmfil();
+extern void               delsac(unsigned formIndex);
+extern void               delspnt();
+extern void               deltx();
 extern void               drwcon();
 extern void               drwfrm();
 extern void               drwsat();
@@ -171,6 +168,7 @@ extern void               horsclp();
 extern void               hsizmsg();
 extern void               infrm();
 extern void               insat();
+extern bool               iseclpx(unsigned iForm) noexcept;
 extern void               ispcdclp();
 extern bool               istx(unsigned iForm);
 extern void               join();
@@ -206,11 +204,9 @@ extern void               picot();
 extern void               prbug();
 extern void               prfmsg();
 extern void               prfsid(HWND wnd);
-extern unsigned           projh(double yCoordinate, fPOINT point0, fPOINT point1, dPOINT* intersection);
 extern void               prpbrd(double borderStitchSpacing);
 extern constexpr unsigned prv(unsigned iVertex);
 extern unsigned           psg();
-extern void               px2stchf(const POINT& screen, fPOINT* const stitchPoint);
 extern void               pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect);
 extern void               rats();
 extern void               ratsr();
@@ -235,7 +231,7 @@ extern void               rstfrm();
 extern void               rstxt();
 extern void               rstxt();
 extern void               rtrclp();
-extern void               sRct2px(fRECTANGLE stitchRect, RECT* screenRect);
+extern void               sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect) noexcept;
 extern void               satadj();
 extern void               satbrd();
 extern void               satfix();
@@ -281,56 +277,58 @@ extern void               sethup();
 extern void               setins();
 extern void               setmfrm();
 extern void               setrang();
+extern void               setshft();
+extern void               setstrtch();
+extern void               setuang();
+extern void               setucol();
+extern void               setulen();
+extern void               setund();
+extern void               setuspac();
+extern void               setwlk();
+extern void               setwlkind();
+extern void               sfCor2px(const fPOINT& stitchPoint, POINT& screen);
+extern void               sfuang();
+extern void               shoMsg(const std::string& message);
+extern void               shoseln(unsigned code0, unsigned code1);
+extern void               shrnk();
+extern void               sidwnd(HWND wnd);
+extern void               snap();
+extern void               spltfrm();
+extern void               srtbyfrm();
+extern void               srtfrm();
+extern void               stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect);
+extern void               stchs2frm();
+extern void               tabmsg(unsigned code);
+extern void               tglfrm();
+extern void               tomsg();
+extern void               tsizmsg(char* threadSizeText, double threadSize);
+extern void               tst();
+extern void               txdun();
+extern void               txof();
+extern void               txsnap();
+extern void               txtclp();
+extern void               txtkey(unsigned keyCode);
+extern void               txtlbut();
+extern void               txtlin();
+extern void               txtrbut();
+extern void               txtrmov();
+extern void               txtrup();
+extern void               undlen();
+extern void               unfil();
+extern void               unfrm();
+extern void               uninsf();
+extern void               unpsel();
+extern void               unstrtch(std::vector<POINT>& stretchBoxLine);
+extern void               uspac();
+extern void               vrtclp();
+extern void               vrtsclp();
+extern void               wavfrm();
+#ifdef _DEBUG
+extern void dmpat();
+#endif
 #if PESACT
 extern bool setrc(unsigned bit);
 #endif
-extern void setshft();
-extern void setstrtch();
-extern void setuang();
-extern void setucol();
-extern void setulen();
-extern void setund();
-extern void setuspac();
-extern void setwlk();
-extern void setwlkind();
-extern void sfCor2px(const fPOINT& stitchPoint, POINT* const screen);
-extern void sfuang();
-extern void shoMsg(const std::string& message);
-extern void shoseln(unsigned code0, unsigned code1);
-extern void shrnk();
-extern void sidwnd(HWND wnd);
-extern void snap();
-extern void spltfrm();
-extern void srtbyfrm();
-extern void srtfrm();
-extern void stCor2px(const fPOINTATTR& stitch, POINT* const screen);
-extern void stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect);
-extern void stchs2frm();
-extern void tabmsg(unsigned code);
-extern void tglfrm();
-extern void tomsg();
-extern void tsizmsg(char* threadSizeText, double threadSize);
-extern void tst();
-extern void txdun();
-extern void txof();
-extern void txsnap();
-extern void txtclp();
-extern void txtkey(unsigned keyCode);
-extern void txtlbut();
-extern void txtlin();
-extern void txtrbut();
-extern void txtrmov();
-extern void txtrup();
-extern void undlen();
-extern void unfil();
-extern void unfrm();
-extern void uninsf();
-extern void unpsel();
-extern void unstrtch(std::vector<POINT>& stretchBoxLine);
-extern void uspac();
-extern void vrtclp();
-extern void vrtsclp();
-extern void wavfrm();
 
 extern unsigned                  ActivePointIndex;
 extern fRECTANGLE                AllItemsRect;
@@ -1457,12 +1455,6 @@ bool isfclp() noexcept {
 
 bool iseclp(unsigned iForm) noexcept {
 	if (FormList[iForm].edgeType == EDGECLIP || FormList[iForm].edgeType == EDGEPICOT || FormList[iForm].edgeType == EDGECLIPX)
-		return 1;
-	return 0;
-}
-
-bool iseclpx(unsigned iForm) noexcept {
-	if (iseclp(iForm) && FormList[iForm].clipEntries)
 		return 1;
 	return 0;
 }
@@ -3494,7 +3486,7 @@ void nuselrct() {
 	outline[4].y = outline[5].y = outline[6].y = StitchRangeRect.bottom;
 	outline[2].x = outline[3].x = outline[4].x = StitchRangeRect.right;
 	for (iLine = 0; iLine < 9; iLine++)
-		sfCor2px(outline[iLine], &(*FormControlPoints)[iLine]);
+		sfCor2px(outline[iLine], (*FormControlPoints)[iLine]);
 }
 
 void grpAdj() {
@@ -9314,9 +9306,9 @@ void duprct() {
 void setpsel() {
 	unpsel();
 	duprct();
-	sRct2px(SelectedVerticesRect, &SelectedPixelsRect);
+	sRct2px(SelectedVerticesRect, SelectedPixelsRect);
 	rct2sel(SelectedPixelsRect, *SelectedPointsLine);
-	sfCor2px(CurrentFormVertices[SelectedFormVertices.finish], &EndPointCross);
+	sfCor2px(CurrentFormVertices[SelectedFormVertices.finish], EndPointCross);
 	StateMap.set(StateFlag::SHOPSEL);
 	dupsel(StitchWindowDC);
 	StateMap.set(StateFlag::FPSEL);
@@ -12667,20 +12659,20 @@ void setpclp() {
 	POINT    point  = {};
 	unsigned ind = 0, ine = 0;
 
-	sfCor2px(InterleaveSequence[0], &point);
+	sfCor2px(InterleaveSequence[0], point);
 	FormVerticesAsLine[0] = point;
-	sfCor2px(InterleaveSequence[1], &point);
+	sfCor2px(InterleaveSequence[1], point);
 	offset.x = Msg.pt.x - StitchWindowOrigin.x - point.x;
 	offset.y = Msg.pt.y - StitchWindowOrigin.y - point.y;
 	// ToDo - Why use ine instead of ind
 	for (ind = 0; ind < OutputIndex - 2; ind++) {
 		ine = ind + 1;
-		sfCor2px(InterleaveSequence[ine], &point);
+		sfCor2px(InterleaveSequence[ine], point);
 		FormVerticesAsLine[ine].x = point.x + offset.x;
 		FormVerticesAsLine[ine].y = point.y + offset.y;
 	}
 	ind++;
-	sfCor2px(InterleaveSequence[ind], &point);
+	sfCor2px(InterleaveSequence[ind], point);
 	FormVerticesAsLine[ind] = point;
 }
 
@@ -15684,7 +15676,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		}
 		BufferIndex = 0;
 		if (StateMap.testAndReset(StateFlag::ENTRDUP)) {
-			const double value         = atof(MsgBuffer);
+			const double value    = atof(MsgBuffer);
 			double       newAngle = 0;
 			if (value) {
 				rotationAngle         = value * PI / 180;
@@ -15695,10 +15687,10 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			duprot(newAngle, rotationCenter);
 		}
 		if (StateMap.testAndReset(StateFlag::ENTROT)) {
-			const double value         = atof(MsgBuffer);
+			const double value    = atof(MsgBuffer);
 			double       newAngle = 0;
 			if (value) {
-				newAngle         = value * PI / 180;
+				newAngle              = value * PI / 180;
 				IniFile.rotationAngle = newAngle;
 			}
 			else
@@ -18122,27 +18114,32 @@ bool bitar() {
 	}
 }
 
+inline void stCor2px(const fPOINTATTR& stitch, POINT& point) noexcept {
+	point.x = (stitch.x - ZoomRect.left) * ZoomRatio.x + 0.5;
+	point.y = StitchWindowClientRect.bottom - (stitch.y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
+}
+
 void drwknot() {
 #define KSIZ 5
 #define KLSIZ 10
 
 	unsigned ind     = 0;
-	POINT    pnt     = {};
+	POINT    point   = {};
 	POINT    tlin[5] = {};
 
 	if (!UserFlagMap.test(UserFlag::KNOTOF) && KnotCount && PCSHeader.stitchCount) {
 		for (ind = 0; ind < KnotCount; ind++) {
-			stCor2px(StitchBuffer[Knots[ind]], &pnt);
+			stCor2px(StitchBuffer[Knots[ind]], point);
 			SelectObject(StitchWindowMemDC, KnotPen);
 			SetROP2(StitchWindowMemDC, R2_XORPEN);
-			tlin[0].x = tlin[3].x = tlin[4].x = pnt.x - KSIZ;
-			tlin[1].x = tlin[2].x = pnt.x + KSIZ;
-			tlin[0].y = tlin[1].y = tlin[4].y = pnt.y + KSIZ;
-			tlin[2].y = tlin[3].y = pnt.y - KSIZ;
+			tlin[0].x = tlin[3].x = tlin[4].x = point.x - KSIZ;
+			tlin[1].x = tlin[2].x = point.x + KSIZ;
+			tlin[0].y = tlin[1].y = tlin[4].y = point.y + KSIZ;
+			tlin[2].y = tlin[3].y = point.y - KSIZ;
 			Polyline(StitchWindowMemDC, tlin, 5);
-			tlin[0].x = pnt.x - KLSIZ;
-			tlin[1].x = pnt.x + KLSIZ;
-			tlin[0].y = tlin[1].y = pnt.y;
+			tlin[0].x = point.x - KLSIZ;
+			tlin[1].x = point.x + KLSIZ;
+			tlin[0].y = tlin[1].y = point.y;
 			Polyline(StitchWindowMemDC, tlin, 2);
 			SetROP2(StitchWindowMemDC, R2_COPYPEN);
 		}
