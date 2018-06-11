@@ -2845,7 +2845,8 @@ void duauxnam() {
 		fileExtention++;
 	else
 		fileExtention = &WorkingFileName[strlen(WorkingFileName)];
-	*fileExtention = 0;
+	if (fileExtention)
+		*fileExtention = 0;
 	switch (IniFile.auxFileType) {
 	case AUXDST:
 		strcat_s(AuxName, "dst");
