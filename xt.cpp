@@ -420,8 +420,8 @@ void durats(unsigned iSequence, fPOINT& point) noexcept {
 		FeatherRatioLocal = FeatherMinStitch / stitchLength;
 		adjustedPoint.x   = duxrat(BSequence[iSequence + 1].x, BSequence[iSequence].x);
 		adjustedPoint.y   = duxrat(BSequence[iSequence + 1].y, BSequence[iSequence].y);
-		point.x          = durat(adjustedPoint.x, BSequence[iSequence].x);
-		point.y          = durat(adjustedPoint.y, BSequence[iSequence].y);
+		point.x           = durat(adjustedPoint.x, BSequence[iSequence].x);
+		point.y           = durat(adjustedPoint.y, BSequence[iSequence].y);
 	}
 }
 
@@ -519,7 +519,7 @@ void ratpnt(unsigned iPoint, unsigned iNextPoint, fPOINT& point) noexcept {
 }
 
 fPOINT midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept {
-	return {(endPoint.x - startPoint.x) * 0.5f + startPoint.x,(endPoint.y - startPoint.y) * 0.5f + startPoint.y};
+	return { (endPoint.x - startPoint.x) * 0.5f + startPoint.x, (endPoint.y - startPoint.y) * 0.5f + startPoint.y };
 }
 
 void xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point) noexcept {
@@ -841,7 +841,7 @@ void pes2crd() {
 	fil2crd(AuxName);
 }
 
-std::vector<fPOINT>* insid() {
+std::vector<fPOINT>& insid() {
 	unsigned iVertex = 0;
 
 	satout(fabs(SelectedForm->underlayIndent));
@@ -851,10 +851,10 @@ std::vector<fPOINT>* insid() {
 				(*InsidePoints)[iVertex] = CurrentFormVertices[iVertex];
 			}
 		}
-		return InsidePoints;
+		return *InsidePoints;
 	}
 	else
-		return OutsidePoints;
+		return *OutsidePoints;
 }
 
 void delwlk(unsigned code) {
@@ -958,7 +958,7 @@ unsigned gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, 
 		return 0;
 	if (startVertex == endVertex)
 		return 0;
-	const std::vector<fPOINT>* indentedPoint = insid();
+	const std::vector<fPOINT>& indentedPoint = insid();
 	up = down = startVertex;
 	do {
 		if (up == endVertex) {
@@ -974,8 +974,8 @@ unsigned gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, 
 	} while (true);
 	iStitch = destination;
 	while (startVertex != endVertex) {
-		StitchBuffer[iStitch].x         = (*indentedPoint)[startVertex].x;
-		StitchBuffer[iStitch].y         = (*indentedPoint)[startVertex].y;
+		StitchBuffer[iStitch].x         = indentedPoint[startVertex].x;
+		StitchBuffer[iStitch].y         = indentedPoint[startVertex].y;
 		StitchBuffer[iStitch].attribute = code;
 		if (iStitch) {
 			if (StitchBuffer[iStitch - 1].x != StitchBuffer[iStitch].x || StitchBuffer[iStitch - 1].y != StitchBuffer[iStitch].y)
@@ -987,15 +987,15 @@ unsigned gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, 
 			intermediateVertex = prv(startVertex);
 		else
 			intermediateVertex = nxt(startVertex);
-		delta.x     = (*indentedPoint)[intermediateVertex].x - (*indentedPoint)[startVertex].x;
-		delta.y     = (*indentedPoint)[intermediateVertex].y - (*indentedPoint)[startVertex].y;
+		delta.x     = indentedPoint[intermediateVertex].x - indentedPoint[startVertex].x;
+		delta.y     = indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y;
 		length      = hypot(delta.x, delta.y);
 		stitchCount = length / SelectedForm->lengthOrCount.stitchLength;
 		if (stitchCount > 1) {
 			step.x       = delta.x / stitchCount;
 			step.y       = delta.y / stitchCount;
-			localPoint.x = (*indentedPoint)[startVertex].x + step.x;
-			localPoint.y = (*indentedPoint)[startVertex].y + step.y;
+			localPoint.x = indentedPoint[startVertex].x + step.x;
+			localPoint.y = indentedPoint[startVertex].y + step.y;
 			for (iStep = 0; iStep < stitchCount - 1; iStep++) {
 				StitchBuffer[iStitch].x         = localPoint.x;
 				StitchBuffer[iStitch].y         = localPoint.y;
@@ -1010,8 +1010,8 @@ unsigned gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, 
 		else
 			startVertex = nxt(startVertex);
 	}
-	StitchBuffer[iStitch].x         = (*indentedPoint)[startVertex].x;
-	StitchBuffer[iStitch].y         = (*indentedPoint)[startVertex].y;
+	StitchBuffer[iStitch].x         = indentedPoint[startVertex].x;
+	StitchBuffer[iStitch].y         = indentedPoint[startVertex].y;
 	StitchBuffer[iStitch].attribute = code;
 	iStitch++;
 	return iStitch - destination;
@@ -1030,10 +1030,10 @@ void fnwlk(unsigned find) {
 	count = VertexCount;
 	if (SelectedForm->type != FRMLINE)
 		count++;
-	const std::vector<fPOINT>* walkPoints = insid();
+	const std::vector<fPOINT>& walkPoints = insid();
 	OutputIndex                           = 0;
 	while (count) {
-		OSequence[OutputIndex] = (*walkPoints)[start];
+		OSequence[OutputIndex] = walkPoints[start];
 		start                  = nxt(start);
 		OutputIndex++;
 		count--;
@@ -1488,7 +1488,7 @@ void durec(OREC& record) noexcept {
 	const fPOINTATTR* stitch    = &StitchBuffer[record.start];
 
 	record.type  = StitchTypes[dutyp(stitch->attribute)];
-	attribute     = stitch->attribute & SRTMSK;
+	attribute    = stitch->attribute & SRTMSK;
 	record.color = attribute & 0xf;
 	record.form  = (attribute & FRMSK) >> FRMSHFT;
 }
@@ -1588,10 +1588,10 @@ double precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<ORE
 }
 
 unsigned duprecs(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, SRTREC& sortRecord) {
-	sortRecord.direction = 0;
+	sortRecord.direction  = 0;
 	const unsigned jumps0 = precjmps(tempStitchBuffer, pRecs, sortRecord);
 
-	sortRecord.direction = 1;
+	sortRecord.direction  = 1;
 	const unsigned jumps1 = precjmps(tempStitchBuffer, pRecs, sortRecord);
 
 	if (jumps0 < jumps1) {
@@ -2024,9 +2024,9 @@ void chkend(unsigned offset, unsigned code, INTINF& ilData) {
 		StateMap.set(StateFlag::ISEND);
 		if (SelectedForm->extendedAttribute & AT_END)
 			ilData.output += gucon(InterleaveSequence[InterleaveSequenceIndex - 1],
-			                        CurrentFormVertices[SelectedForm->fillEnd],
-			                        ilData.output + offset,
-			                        code);
+			                       CurrentFormVertices[SelectedForm->fillEnd],
+			                       ilData.output + offset,
+			                       code);
 	}
 }
 
@@ -2811,6 +2811,32 @@ void setfilend() {
 }
 
 void duauxnam() {
+//ToDo - use string rather than char *
+/*
+	std::string fileName = { WorkingFileName };
+
+	auto        pos = fileName.rfind('.');
+	std::string workingFileName;
+	if (pos == 0) {
+		workingFileName = fileName;
+	}
+	else {
+		workingFileName = fileName.substr(0, pos);
+	}
+	switch (IniFile.auxFileType) {
+	case AUXDST:
+		workingFileName.append(".dst");
+		break;
+#if PESACT
+	case AUXPES:
+		workingFileName.append(".pes");
+		break;
+#endif
+	default:
+		workingFileName.append(".pcs");
+	}
+	AuxName = workingFileName;
+*/
 	char* fileExtention = strrchr(AuxName, '.');
 
 	_strlwr_s(WorkingFileName);
@@ -2909,8 +2935,8 @@ void txrct2rct(const TXTRCT& textureRect, RECT& rectangle) noexcept {
 	POINT point        = {};
 
 	txt2pix(texturePoint, point);
-	rectangle.left   = point.x - IniFile.textureEditorSize;
-	rectangle.top    = point.y - IniFile.textureEditorSize;
+	rectangle.left    = point.x - IniFile.textureEditorSize;
+	rectangle.top     = point.y - IniFile.textureEditorSize;
 	texturePoint.y    = textureRect.bottom;
 	texturePoint.line = textureRect.right;
 	txt2pix(texturePoint, point);
@@ -3114,7 +3140,7 @@ bool txtclos(unsigned& closestTexturePoint) {
 			txt2pix((*TempTexturePoints)[iPoint], point);
 			length = hypot(point.x - reference.x, point.y - reference.y);
 			if (length < minimumLength) {
-				minimumLength        = length;
+				minimumLength       = length;
 				closestTexturePoint = iPoint;
 			}
 		}
@@ -3166,7 +3192,7 @@ void dutxrct(TXTRCT& textureRect) {
 	TXPNT*   texturePoint = nullptr;
 
 	if (SelectedTexturePointsList->size()) {
-		texturePoint      = &(*TempTexturePoints)[(*SelectedTexturePointsList)[0]];
+		texturePoint     = &(*TempTexturePoints)[(*SelectedTexturePointsList)[0]];
 		textureRect.left = textureRect.right = texturePoint->line;
 		textureRect.top = textureRect.bottom = texturePoint->y;
 		for (iPoint = 1; iPoint < SelectedTexturePointsList->size(); iPoint++) {
@@ -3186,14 +3212,14 @@ void dutxrct(TXTRCT& textureRect) {
 }
 
 fPOINT ed2stch(const fPOINT& point) noexcept {
-	return {(point.x - TextureScreen.xOffset),(point.y - TextureScreen.yOffset)};
+	return { (point.x - TextureScreen.xOffset), (point.y - TextureScreen.yOffset) };
 }
 
 void dutxlin(const fPOINT& point0in, const fPOINT& point1in) {
-	double slope  = 0.0;
-	float  deltaX = 0.0;
-	float  start = 0.0, finish = 0.0, yOffset = 0.0;
-	int    integerStart = 0, integerFinish = 0;
+	double       slope  = 0.0;
+	float        deltaX = 0.0;
+	float        start = 0.0, finish = 0.0, yOffset = 0.0;
+	int          integerStart = 0, integerFinish = 0;
 	const fPOINT point0 = ed2stch(point0in);
 	const fPOINT point1 = ed2stch(point1in);
 
@@ -3273,16 +3299,16 @@ void ed2txp(const POINT& offset, TXPNT& textureRecord) noexcept {
 	px2ed(offset, point);
 	textureRecord.line = (point.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5;
 	textureRecord.y    = TextureScreen.areaHeight
-	                   - (static_cast<float>(offset.y - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
+	                  - (static_cast<float>(offset.y - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
 }
 
 void txtrup() {
-	TXPNT    highestTexturePoint = {};
-	TXPNT    lowestTexturePoint  = {};
-	TXPNT    textureOffset       = {};
-	float    yOffset             = 0.0;
-	//short    swap                = 0;
-	unsigned iPoint              = 0;
+	TXPNT highestTexturePoint = {};
+	TXPNT lowestTexturePoint  = {};
+	TXPNT textureOffset       = {};
+	float yOffset             = 0.0;
+	// short    swap                = 0;
+	unsigned iPoint = 0;
 	int      xCoord = 0, Xmagnitude = 0;
 	POINT    offset       = {};
 	TXPNT*   texturePoint = nullptr;
@@ -3964,19 +3990,17 @@ void txgro() {
 }
 
 bool txdig(unsigned keyCode, char& character) {
-	if (character) {
-		if (isdigit(keyCode)) {
-			character = gsl::narrow<char>(keyCode);
-			return 1;
-		}
-		if (keyCode >= VK_NUMPAD0 && keyCode <= VK_NUMPAD9) {
-			character = gsl::narrow<char>(keyCode) - VK_NUMPAD0 + 0x30;
-			return 1;
-		}
-		if (keyCode == 0xbe || keyCode == 0x6e) {
-			character = '.';
-			return 1;
-		}
+	if (isdigit(keyCode)) {
+		character = gsl::narrow<char>(keyCode);
+		return 1;
+	}
+	if (keyCode >= VK_NUMPAD0 && keyCode <= VK_NUMPAD9) {
+		character = gsl::narrow<char>(keyCode) - VK_NUMPAD0 + 0x30;
+		return 1;
+	}
+	if (keyCode == 0xbe || keyCode == 0x6e) {
+		character = '.';
+		return 1;
 	}
 	return 0;
 }

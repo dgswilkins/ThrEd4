@@ -42,7 +42,7 @@ extern void                 frmdel();
 extern void                 fthrfn();
 extern void                 grpAdj();
 extern void                 insadj();
-extern std::vector<fPOINT>* insid();
+extern std::vector<fPOINT>& insid();
 extern void                 intlv(const FILLSTARTS& FillStartsData);
 extern bool                 isclp(unsigned find);
 extern bool                 isclpx(unsigned find);
@@ -5193,9 +5193,9 @@ void angclpfn(const std::vector<RNGCNT>& textureSegments) {
 	AngledForm.vertices = AngledFormVertices;
 	if (StateMap.test(StateFlag::ISUND)) {
 		rotationAngle                         = PI / 2 - SelectedForm->underlayStitchAngle;
-		const std::vector<fPOINT>* vertexList = insid();
+		const std::vector<fPOINT>& vertexList = insid();
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
-			AngledFormVertices[iVertex] = (*vertexList)[iVertex];
+			AngledFormVertices[iVertex] = vertexList[iVertex];
 			rotflt(AngledFormVertices[iVertex], rotationAngle, rotationCenter);
 		}
 	}
