@@ -6,6 +6,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <windows.h>
+#include <filesystem>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include <boost/dynamic_bitset.hpp>
@@ -2811,54 +2812,21 @@ void setfilend() {
 }
 
 void duauxnam() {
-//ToDo - use string rather than char *
-/*
-	std::string fileName = { WorkingFileName };
-
-	auto        pos = fileName.rfind('.');
-	std::string workingFileName;
-	if (pos == 0) {
-		workingFileName = fileName;
-	}
-	else {
-		workingFileName = fileName.substr(0, pos);
-	}
+	std::experimental::filesystem::path workingFileName = { WorkingFileName };
 	switch (IniFile.auxFileType) {
 	case AUXDST:
-		workingFileName.append(".dst");
+		workingFileName.replace_extension(".dst");
 		break;
 #if PESACT
 	case AUXPES:
-		workingFileName.append(".pes");
+		workingFileName.replace_extension(".pes");
 		break;
 #endif
 	default:
-		workingFileName.append(".pcs");
+		workingFileName.replace_extension("pcs");
 	}
-	AuxName = workingFileName;
-*/
-	char* fileExtention = strrchr(AuxName, '.');
 
-	_strlwr_s(WorkingFileName);
-	strcpy_s(AuxName, WorkingFileName);
-	if (fileExtention)
-		fileExtention++;
-	else
-		fileExtention = &WorkingFileName[strlen(WorkingFileName)];
-	if (fileExtention)
-		*fileExtention = 0;
-	switch (IniFile.auxFileType) {
-	case AUXDST:
-		strcat_s(AuxName, "dst");
-		break;
-#if PESACT
-	case AUXPES:
-		strcat_s(AuxName, "pes");
-		break;
-#endif
-	default:
-		strcat_s(AuxName, "pcs");
-	}
+	strcpy(AuxName, workingFileName.string().c_str());
 }
 
 void dutxtfil() {

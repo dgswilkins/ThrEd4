@@ -10568,14 +10568,6 @@ void frmadj(unsigned formIndex) noexcept {
 	frmout(formIndex);
 }
 
-#if PESACT
-
-bool setrc(unsigned bit) {
-	return _bittestandset((long*)MarkedStitchMap, bit);
-}
-
-#endif
-
 void frmsadj() {
 	unsigned iStitch = 0;
 

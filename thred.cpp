@@ -326,9 +326,6 @@ extern void               wavfrm();
 #ifdef _DEBUG
 extern void dmpat();
 #endif
-#if PESACT
-extern bool setrc(unsigned bit);
-#endif
 
 extern unsigned                  ActivePointIndex;
 extern fRECTANGLE                AllItemsRect;
@@ -4379,6 +4376,46 @@ bool pcshup(std::vector<fPOINTATTR>& stitches) {
 	return false;
 }
 
+#if PESACT
+
+unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex) {
+	unsigned colorDistance = 0, iRGB = 0;
+	COLORREF color = {}, translatedColor = {};
+
+	color           = referenceColor;
+	translatedColor = PESColorTranslate[colorIndex];
+	colorDistance   = 0;
+	for (iRGB = 0; iRGB < 3; iRGB++) {
+		colorDistance += ((color & 0xff) > (translatedColor & 0xff)) ? ((color & 0xff) - (translatedColor & 0xff))
+		                                                             : ((translatedColor & 0xff) - (color & 0xff));
+		translatedColor >>= 8;
+		color >>= 8;
+	}
+	return colorDistance;
+}
+
+void ritpes(unsigned iStitch) {
+	PESstitches[OutputIndex].x   = -RotatedStitches[iStitch].x * 3 / 5 + PESstitchCenterOffset.x;
+	PESstitches[OutputIndex++].y = RotatedStitches[iStitch].y * 3 / 5 - PESstitchCenterOffset.y;
+}
+
+void ritpcol(unsigned char colorIndex) {
+	// ToDo - (PES) Complete translation from assembler
+	_asm {
+		mov		ebx, OutputIndex
+		mov		eax, ebx
+		inc		eax
+		mov		OutputIndex, eax
+		shl		ebx, 2
+		add		ebx, PESstitches
+		xor		eax, eax
+		mov		al, colorIndex
+		mov[ebx], eax
+	}
+}
+
+#endif
+
 // Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
 #pragma warning(push)
 #pragma warning(disable : 4996)
@@ -4500,7 +4537,7 @@ void sav() {
 			}
 			color    = StitchBuffer[0].attribute & COLMSK;
 			pesColor = pesHeader.scol = PESequivColors[StitchBuffer[0].attribute & COLMSK];
-			sizstch(&boundingRect);
+			sizstch(boundingRect, StitchBuffer);
 			PESstitchCenterOffset.x = midl(boundingRect.right, boundingRect.left);
 			PESstitchCenterOffset.y = midl(boundingRect.top, boundingRect.bottom);
 			pesHeader.xsiz          = boundingRect.right - boundingRect.left;
@@ -5457,22 +5494,6 @@ unsigned tripl(char* dat) {
 	return (*static_cast<unsigned*>(static_cast<void*>(dat))) & 0xffffff;
 }
 
-unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex) {
-	unsigned colorDistance = 0, iRGB = 0;
-	COLORREF color = {}, translatedColor = {};
-
-	color           = referenceColor;
-	translatedColor = PESColorTranslate[colorIndex];
-	colorDistance   = 0;
-	for (iRGB = 0; iRGB < 3; iRGB++) {
-		colorDistance += ((color & 0xff) > (translatedColor & 0xff)) ? ((color & 0xff) - (translatedColor & 0xff))
-		                                                             : ((translatedColor & 0xff) - (color & 0xff));
-		translatedColor >>= 8;
-		color >>= 8;
-	}
-	return colorDistance;
-}
-
 unsigned dupcol() {
 	unsigned iColor        = 0;
 	COLORREF color         = {};
@@ -6054,26 +6075,6 @@ void nuFil() {
 }
 
 #if PESACT
-
-void ritpes(unsigned iStitch) {
-	PESstitches[OutputIndex].x   = -RotatedStitches[iStitch].x * 3 / 5 + PESstitchCenterOffset.x;
-	PESstitches[OutputIndex++].y = RotatedStitches[iStitch].y * 3 / 5 - PESstitchCenterOffset.y;
-}
-
-void ritpcol(unsigned char colorIndex) {
-	// ToDo - (PES) Complete translation from assembler
-	_asm {
-		mov		ebx, OutputIndex
-		mov		eax, ebx
-		inc		eax
-		mov		OutputIndex, eax
-		shl		ebx, 2
-		add		ebx, PESstitches
-		xor		eax, eax
-		mov		al, colorIndex
-		mov[ebx], eax
-	}
-}
 
 unsigned pesnam() {
 	// ToDo - (PES) Complete translation from assembler
