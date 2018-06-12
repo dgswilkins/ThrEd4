@@ -698,7 +698,11 @@ long BoxOffset[4];
 unsigned VerticalIndex;      // vertical index of the color window, calculated from mouse click
 unsigned ThreadSizeSelected; // thread selected for size change
 
-const char    AllFilter[_MAX_PATH + 1]       = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
+#if PESACT
+const TCHAR AllFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Brother (PES)\0*.pes\0Tajima (DST)\0*.dst\0";
+#else
+const TCHAR AllFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
+#endif
 const char    BmpFilter[_MAX_PATH + 1]       = "Microsoft (BMP)\0*.bmp\0";
 char          CustomFilter[_MAX_PATH + 1]    = "Thredworks (THR)\0*.thr\0";
 char          WorkingFileName[_MAX_PATH + 1] = { 0 };
@@ -6047,8 +6051,8 @@ void nuFil() {
 						ActivePointIndex   = 0;
 						pesColorCount      = static_cast<unsigned char*>(static_cast<void*>(&l_peschr[pecof + 48]));
 						PEScolors          = &pesColorCount[1];
-						boost::dynamic_bitset<> colorMap(*pesColorCount);
-						//MarkedStitchMap[0] = MarkedStitchMap[1] = 0;
+						//allow all the colors described by a char  
+						boost::dynamic_bitset<> colorMap(256);
 						ActivePointIndex                        = 0;
 						for (iColor = 0; iColor < gsl::narrow<unsigned>(*pesColorCount + 1); iColor++) {
 							if (!colorMap.test_set(PEScolors[iColor])) {
