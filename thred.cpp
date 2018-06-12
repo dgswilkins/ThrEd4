@@ -4414,6 +4414,106 @@ void ritpcol(unsigned char colorIndex) {
 	}
 }
 
+unsigned pesnam() {
+	// ToDo - (PES) Complete translation from assembler
+	_asm {
+		mov		ebx, offset AuxName
+		mov		ecx, _MAX_PATH
+		mov		edx, ebx
+peslup0:
+		mov		al, [ebx]
+		or		al, al
+		je		short peslup1
+		cmp		al, '\\'
+		jne		short peslup0a
+		mov		edx, ebx
+peslup0a:
+		inc		ebx
+		loop	peslup0
+peslup1:
+		mov		ebx, edx
+		cmp		byte ptr[ebx], '\\'
+		jne		short peslup1a
+		inc		ebx
+peslup1a:
+		xor		ecx, ecx
+		mov		cl, 17
+		mov		edi, offset BSequence
+		mov		dword ptr[edi], ':AL'
+		add		edi, 3
+peslup:
+		mov		al, [ebx]
+		inc		ebx
+		cmp		al, '.'
+		je		pesnamx
+		mov		[edi], al
+		inc		edi
+		loop	peslup
+pesnamx:
+		mov		eax, edi
+		sub		eax, offset BSequence
+	}
+}
+
+void rpcrd(float stitchDelta) {
+	int pesDelta = 0;
+
+	pesDelta = stitchDelta * 5 / 3;
+	if (pesDelta < 0) {
+		if (pesDelta > -64) {
+			PESdata[OutputIndex] = pesDelta - 128;
+			OutputIndex++;
+		}
+		else {
+			PESdata[OutputIndex] = pesDelta >> 8;
+			OutputIndex++;
+			PESdata[OutputIndex] = pesDelta & 0x8f;
+			OutputIndex++;
+		}
+	}
+	else {
+		if (pesDelta < 64) {
+			PESdata[OutputIndex] = pesDelta;
+			OutputIndex++;
+		}
+		else {
+			PESdata[OutputIndex] = (pesDelta >> 8) | 0x80;
+			OutputIndex++;
+			PESdata[OutputIndex] = pesDelta & 0xff;
+			OutputIndex++;
+		}
+	}
+}
+
+void pecdat(char* buffer) {
+	unsigned iStitch = 0;
+	unsigned color   = StitchBuffer[0].attribute & COLMSK;
+	unsigned iColor  = 1;
+
+	OutputIndex = 532;
+	PESdata     = buffer;
+	PEScolors   = static_cast<unsigned char*>(static_cast<void*>(&PESdata[49]));
+	rpcrd(StitchBuffer[0].x);
+	rpcrd(-StitchBuffer[0].y);
+	for (iStitch = 0; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
+		if ((StitchBuffer[iStitch].attribute & COLMSK) != color) {
+			color                = StitchBuffer[iStitch].attribute & COLMSK;
+			PESdata[OutputIndex] = static_cast<TBYTE>(254);
+			OutputIndex++;
+			PESdata[OutputIndex] = static_cast<TBYTE>(176);
+			OutputIndex++;
+			PESdata[OutputIndex] = iColor;
+			OutputIndex++;
+			PEScolors[iColor] = PESequivColors[color];
+			iColor++;
+		}
+		rpcrd(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x);
+		rpcrd(-StitchBuffer[iStitch + 1].y + StitchBuffer[iStitch].y);
+	}
+	PESdata[OutputIndex++] = static_cast<TBYTE>(0xff);
+	PESdata[OutputIndex++] = 0;
+}
+
 #endif
 
 // Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
@@ -6075,106 +6175,6 @@ void nuFil() {
 }
 
 #if PESACT
-
-unsigned pesnam() {
-	// ToDo - (PES) Complete translation from assembler
-	_asm {
-		mov		ebx, offset AuxName
-		mov		ecx, _MAX_PATH
-		mov		edx, ebx
-peslup0:
-		mov		al, [ebx]
-		or		al, al
-		je		short peslup1
-		cmp		al, '\\'
-		jne		short peslup0a
-		mov		edx, ebx
-peslup0a:
-		inc		ebx
-		loop	peslup0
-peslup1:
-		mov		ebx, edx
-		cmp		byte ptr[ebx], '\\'
-		jne		short peslup1a
-		inc		ebx
-peslup1a:
-		xor		ecx, ecx
-		mov		cl, 17
-		mov		edi, offset BSequence
-		mov		dword ptr[edi], ':AL'
-		add		edi, 3
-peslup:
-		mov		al, [ebx]
-		inc		ebx
-		cmp		al, '.'
-		je		pesnamx
-		mov		[edi], al
-		inc		edi
-		loop	peslup
-pesnamx:
-		mov		eax, edi
-		sub		eax, offset BSequence
-	}
-}
-
-void rpcrd(float stitchDelta) {
-	int pesDelta = 0;
-
-	pesDelta = stitchDelta * 5 / 3;
-	if (pesDelta < 0) {
-		if (pesDelta > -64) {
-			PESdata[OutputIndex] = pesDelta - 128;
-			OutputIndex++;
-		}
-		else {
-			PESdata[OutputIndex] = pesDelta >> 8;
-			OutputIndex++;
-			PESdata[OutputIndex] = pesDelta & 0x8f;
-			OutputIndex++;
-		}
-	}
-	else {
-		if (pesDelta < 64) {
-			PESdata[OutputIndex] = pesDelta;
-			OutputIndex++;
-		}
-		else {
-			PESdata[OutputIndex] = (pesDelta >> 8) | 0x80;
-			OutputIndex++;
-			PESdata[OutputIndex] = pesDelta & 0xff;
-			OutputIndex++;
-		}
-	}
-}
-
-void pecdat(char* buffer) {
-	unsigned iStitch = 0;
-	unsigned color   = StitchBuffer[0].attribute & COLMSK;
-	unsigned iColor  = 1;
-
-	OutputIndex = 532;
-	PESdata     = buffer;
-	PEScolors   = static_cast<unsigned char*>(static_cast<void*>(&PESdata[49]));
-	rpcrd(StitchBuffer[0].x);
-	rpcrd(-StitchBuffer[0].y);
-	for (iStitch = 0; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
-		if ((StitchBuffer[iStitch].attribute & COLMSK) != color) {
-			color                = StitchBuffer[iStitch].attribute & COLMSK;
-			PESdata[OutputIndex] = static_cast<TBYTE>(254);
-			OutputIndex++;
-			PESdata[OutputIndex] = static_cast<TBYTE>(176);
-			OutputIndex++;
-			PESdata[OutputIndex] = iColor;
-			OutputIndex++;
-			PEScolors[iColor] = PESequivColors[color];
-			iColor++;
-		}
-		rpcrd(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x);
-		rpcrd(-StitchBuffer[iStitch + 1].y + StitchBuffer[iStitch].y);
-	}
-	PESdata[OutputIndex++] = static_cast<TBYTE>(0xff);
-	PESdata[OutputIndex++] = 0;
-}
 
 #endif
 
