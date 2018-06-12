@@ -6047,10 +6047,11 @@ void nuFil() {
 						ActivePointIndex   = 0;
 						pesColorCount      = static_cast<unsigned char*>(static_cast<void*>(&l_peschr[pecof + 48]));
 						PEScolors          = &pesColorCount[1];
-						MarkedStitchMap[0] = MarkedStitchMap[1] = 0;
+						boost::dynamic_bitset<> colorMap(*pesColorCount);
+						//MarkedStitchMap[0] = MarkedStitchMap[1] = 0;
 						ActivePointIndex                        = 0;
 						for (iColor = 0; iColor < gsl::narrow<unsigned>(*pesColorCount + 1); iColor++) {
-							if (setRmp(PEScolors[iColor])) {
+							if (!colorMap.test_set(PEScolors[iColor])) {
 								UserColor[ActivePointIndex++] = PESColorTranslate[PEScolors[iColor] & PESCMSK];
 								if (ActivePointIndex >= 16)
 									break;
