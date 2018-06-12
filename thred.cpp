@@ -4394,9 +4394,9 @@ unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex) {
 	return colorDistance;
 }
 
-void ritpes(unsigned iStitch) {
-	PESstitches[OutputIndex].x   = -RotatedStitches[iStitch].x * 3 / 5 + PESstitchCenterOffset.x;
-	PESstitches[OutputIndex++].y = RotatedStitches[iStitch].y * 3 / 5 - PESstitchCenterOffset.y;
+void ritpes(unsigned iStitch, const std::vector<fPOINTATTR>& stitches) {
+	PESstitches[OutputIndex].x   = -stitches[iStitch].x * 3 / 5 + PESstitchCenterOffset.x;
+	PESstitches[OutputIndex++].y = stitches[iStitch].y * 3 / 5 - PESstitchCenterOffset.y;
 }
 
 void ritpcol(unsigned char colorIndex) {
@@ -4645,27 +4645,27 @@ void sav() {
 			OutputIndex             = 0;
 			// There cannot be more color changes than stitches
 			PESstitches = new PESTCH[PCSHeader.stitchCount * 2];
-			ritpes(0);
+			ritpes(0, saveStitches);
 			PESstitches[OutputIndex].x   = -32765; // 0x8003
 			PESstitches[OutputIndex++].y = 0;
 			ritpcol(PESequivColors[color]);
-			ritpes(0);
+			ritpes(0, saveStitches);
 			pesColorCount = 0;
 			for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
 				if (color == (StitchBuffer[iStitch].attribute & COLMSK))
-					ritpes(iStitch);
+					ritpes(iStitch, saveStitches);
 				else {
-					ritpes(iStitch);
+					ritpes(iStitch, saveStitches);
 					PESstitches[OutputIndex].x   = -32767; // 0x8001
 					PESstitches[OutputIndex++].y = 0;
 					ritpcol(PESequivColors[color]);
 					color = StitchBuffer[iStitch].attribute & COLMSK;
-					ritpes(iStitch++);
-					ritpes(iStitch);
+					ritpes(iStitch++, saveStitches);
+					ritpes(iStitch, saveStitches);
 					PESstitches[OutputIndex].x   = -32765; // 0x8003
 					PESstitches[OutputIndex++].y = 0;
 					ritpcol(PESequivColors[color]);
-					ritpes(iStitch);
+					ritpes(iStitch, saveStitches);
 					pesColorCount++;
 				}
 			}
