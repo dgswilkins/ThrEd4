@@ -120,6 +120,7 @@ BEGIN
             POPUP "Machine File Type"
             BEGIN
                 MENUITEM "Pfaff PCS",                   ID_AUXPCS
+                MENUITEM "Brother PES",                 40293
                 MENUITEM "Tajima DST",                  ID_AUXDST
             END
             POPUP "Needle Cursor"

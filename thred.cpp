@@ -518,7 +518,7 @@ std::vector<std::unique_ptr<unsigned[]>>* UndoBuffer;           // backup data
 
 #if PESACT
 unsigned char* PEScolors;             // pes colors
-char*          PESdata;               // pes card data buffer
+unsigned char* PESdata;               // pes card data buffer
 fPOINT         PESstitchCenterOffset; // offset for writing pes files
 PESTCH*        PESstitches;           // pes stitch buffer
 unsigned char  PESequivColors[16];    // pes equivalent colors
@@ -4382,7 +4382,7 @@ bool pcshup(std::vector<fPOINTATTR>& stitches) {
 
 #if PESACT
 
-unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex) {
+unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex) noexcept {
 	unsigned colorDistance = 0, iRGB = 0;
 	COLORREF color = {}, translatedColor = {};
 
@@ -4403,7 +4403,7 @@ void ritpes(unsigned iStitch, const std::vector<fPOINTATTR>& stitches) {
 	PESstitches[OutputIndex++].y = stitches[iStitch].y * 3 / 5 - PESstitchCenterOffset.y;
 }
 
-void ritpcol(unsigned char colorIndex) {
+void ritpcol(unsigned char colorIndex) noexcept {
 	// ToDo - (PES) Complete translation from assembler
 	_asm {
 		mov		ebx, OutputIndex
@@ -4418,7 +4418,7 @@ void ritpcol(unsigned char colorIndex) {
 	}
 }
 
-unsigned pesnam() {
+unsigned pesnam() noexcept {
 	// ToDo - (PES) Complete translation from assembler
 	_asm {
 		mov		ebx, offset AuxName
@@ -4459,7 +4459,7 @@ pesnamx:
 	}
 }
 
-void rpcrd(float stitchDelta) {
+void rpcrd(float stitchDelta) noexcept {
 	int pesDelta = 0;
 
 	pesDelta = stitchDelta * 5 / 3;
@@ -4489,22 +4489,22 @@ void rpcrd(float stitchDelta) {
 	}
 }
 
-void pecdat(char* buffer) {
+void pecdat(unsigned char* buffer) {
 	unsigned iStitch = 0;
 	unsigned color   = StitchBuffer[0].attribute & COLMSK;
 	unsigned iColor  = 1;
 
 	OutputIndex = 532;
 	PESdata     = buffer;
-	PEScolors   = static_cast<unsigned char*>(static_cast<void*>(&PESdata[49]));
+	PEScolors   = convert_ptr<unsigned char*>(&PESdata[49]);
 	rpcrd(StitchBuffer[0].x);
 	rpcrd(-StitchBuffer[0].y);
 	for (iStitch = 0; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute & COLMSK) != color) {
 			color                = StitchBuffer[iStitch].attribute & COLMSK;
-			PESdata[OutputIndex] = static_cast<TBYTE>(254);
+			PESdata[OutputIndex] = 254;
 			OutputIndex++;
-			PESdata[OutputIndex] = static_cast<TBYTE>(176);
+			PESdata[OutputIndex] = 176;
 			OutputIndex++;
 			PESdata[OutputIndex] = iColor;
 			OutputIndex++;
@@ -4514,7 +4514,7 @@ void pecdat(char* buffer) {
 		rpcrd(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x);
 		rpcrd(-StitchBuffer[iStitch + 1].y + StitchBuffer[iStitch].y);
 	}
-	PESdata[OutputIndex++] = static_cast<TBYTE>(0xff);
+	PESdata[OutputIndex++] = 0xff;
 	PESdata[OutputIndex++] = 0;
 }
 
@@ -4528,8 +4528,11 @@ void sav() {
 	unsigned long bytesWritten   = 0;
 	double        fractionalPart = 0.0, integerPart = 0.0;
 	DSTHED        dstHeader = {};
-	char*         pchr      = nullptr;
-	unsigned      savcol    = 0;
+#if PESACT
+	unsigned char* pchr = nullptr;
+#endif
+	char*    desc   = nullptr;
+	unsigned savcol = 0;
 
 #if PESACT
 
@@ -4583,11 +4586,11 @@ void sav() {
 			// Use sizeof to ensure no overrun if the format string is wrong length
 			strncpy(dstHeader.desched, "LA:", sizeof(dstHeader.desched));
 			std::fill_n(dstHeader.desc, sizeof(dstHeader.desc), ' ');
-			pchr = strrchr(AuxName, '\\') + 1;
-			if (pchr) {
+			desc = strrchr(AuxName, '\\') + 1;
+			if (desc) {
 				for (iHeader = 0; iHeader < sizeof(dstHeader.desc); iHeader++) {
-					if (pchr[iHeader] && pchr[iHeader] != '.')
-						dstHeader.desc[iHeader] = pchr[iHeader];
+					if (desc[iHeader] && desc[iHeader] != '.')
+						dstHeader.desc[iHeader] = desc[iHeader];
 					else
 						break;
 				}
@@ -4622,7 +4625,7 @@ void sav() {
 			break;
 #if PESACT
 		case AUXPES:
-			pchr = static_cast<char*>(static_cast<void*>(&pesHeader));
+			pchr = convert_ptr<unsigned char*>(&pesHeader);
 			for (iHeader = 0; iHeader < sizeof(PESHED); iHeader++)
 				pchr[iHeader] = 0;
 			strncpy(pesHeader.led, "#PES0001", sizeof(pesHeader.led));
@@ -4637,7 +4640,7 @@ void sav() {
 						matchMin   = match;
 					}
 				}
-				PESequivColors[iColor] = static_cast<unsigned char>(matchIndex);
+				PESequivColors[iColor] = gsl::narrow<unsigned char>(matchIndex);
 			}
 			color    = StitchBuffer[0].attribute & COLMSK;
 			pesColor = pesHeader.scol = PESequivColors[StitchBuffer[0].attribute & COLMSK];
@@ -4675,47 +4678,47 @@ void sav() {
 			}
 			PESstitches[OutputIndex].x   = iColorMatch;
 			PESstitches[OutputIndex++].y = 0;
-			pesOffset                    = static_cast<unsigned*>(static_cast<void*>(&pesHeader.off));
+			pesOffset                    = convert_ptr<unsigned*>(&pesHeader.off);
 			*pesOffset                   = (OutputIndex << 2) + sizeof(PESHED);
 			*pesHeader.m1                = 0x20;
 			GroupStartStitch             = 0;
 			GroupEndStitch               = PCSHeader.stitchCount - 1;
 			pesHeader.xsiz               = 10000;
 			pesHeader.ysiz               = 10000;
-			WriteFile(PCSFileHandle, static_cast<PESHED*>(static_cast<void*>(&pesHeader)), sizeof(PESHED), &bytesWritten, 0);
+			WriteFile(PCSFileHandle, convert_ptr<PESHED*>(&pesHeader), sizeof(PESHED), &bytesWritten, 0);
 			WriteFile(PCSFileHandle, PESstitches, OutputIndex * sizeof(PESTCH), &bytesWritten, 0);
 			delete[] PESstitches;
 			// ToDo - (PES) is there a better estimate for data size?
-			pchr = new char[MAXITEMS * 4];
+			pchr = new unsigned char[MAXITEMS * 4];
 			// ToDo - (PES) Add buffer parameter and remove use of BSequence in pesname
 			iHeader = pesnam();
 			while (iHeader < 512)
 				pchr[iHeader++] = ' ';
 			pchr[19] = 13;
-			pchr[48] = static_cast<char>(pesColorCount);
+			pchr[48] = gsl::narrow<unsigned char>(pesColorCount);
 			pecdat(pchr);
-			upnt      = static_cast<unsigned*>(static_cast<void*>(&pchr[514]));
+			upnt      = convert_ptr<unsigned*>(&pchr[514]);
 			*upnt     = OutputIndex - 512;
 			pchr[517] = 0x20;
-			pchr[518] = -1;
-			pchr[519] = -17;
-			psiz      = static_cast<short*>(static_cast<void*>(&pchr[520]));
+			pchr[518] = 0xff;
+			pchr[519] = 0xef;
+			psiz      = convert_ptr<short*>(&pchr[520]);
 			*psiz     = pesHeader.xsiz;
 			psiz++;
 			*psiz = pesHeader.ysiz;
 			psiz++;
 			*psiz      = 480;
-			pesOffset  = static_cast<unsigned*>(static_cast<void*>(psiz));
+			pesOffset  = convert_ptr<unsigned*>(psiz);
 			*pesOffset = 11534816;
 			//			pchr[527]=(char)0x0;
 			//			pchr[528]=(char)0x90;
 			//			pchr[529]=(char)0x0;
 			//			pchr[530]=(char)0x8f;
-			pchr[527] = static_cast<TBYTE>(0x00);
-			pchr[528] = static_cast<TBYTE>(0x80); // hor msb
-			pchr[529] = static_cast<TBYTE>(0x80); // hor lsb
-			pchr[530] = static_cast<TBYTE>(0x82); // vert msb
-			pchr[531] = static_cast<TBYTE>(0xff); // vert lsb
+			pchr[527] = 0x00;
+			pchr[528] = 0x80; // hor msb
+			pchr[529] = 0x80; // hor lsb
+			pchr[530] = 0x82; // vert msb
+			pchr[531] = 0xff; // vert lsb
 			WriteFile(PCSFileHandle, pchr, OutputIndex, &bytesWritten, 0);
 			delete[] pchr;
 			break;
@@ -4799,15 +4802,28 @@ void auxmen() {
 
 	std::string auxMsg;
 
+	CheckMenuItem(MainMenu, ID_AUXPCS, MF_UNCHECKED);
+#if PESACT
+	CheckMenuItem(MainMenu, ID_AUXPES, MF_UNCHECKED);
+#else
+	EnableMenuItem(MainMenu, ID_AUXPES, MF_DISABLED | MF_GRAYED);
+#endif
+	CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
 	switch (IniFile.auxFileType) {
 	case AUXDST:
 		auxMsg = fmt::format((*StringTable)[STR_AUXTXT], "DST");
 		CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
-		CheckMenuItem(MainMenu, ID_AUXPCS, MF_UNCHECKED);
 		break;
+	case AUXPES:
+#if PESACT
+		auxMsg = fmt::format((*StringTable)[STR_AUXTXT], "PES");
+		CheckMenuItem(MainMenu, ID_AUXPES, MF_CHECKED);
+		break;
+#else
+		IniFile.auxFileType = AUXPCS;
+#endif
 	default:
 		auxMsg = fmt::format((*StringTable)[STR_AUXTXT], "PCS");
-		CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
 	}
 	[[gsl::suppress(type .3)]] {
@@ -4837,6 +4853,13 @@ void savAs() {
 				auxmen();
 				break;
 			case 3:
+#if PESACT
+				strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), ".pes");
+				IniFile.auxFileType = AUXPES;
+				auxmen();
+				break;
+			case 4:
+#endif
 				strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), ".dst");
 				IniFile.auxFileType = AUXDST;
 				auxmen();
@@ -5595,10 +5618,10 @@ bool chkdst(const DSTHED* dstHeader) noexcept {
 #if PESACT
 
 unsigned tripl(char* dat) {
-	return (*static_cast<unsigned*>(static_cast<void*>(dat))) & 0xffffff;
+	return (*convert_ptr<unsigned*>(dat)) & 0xffffff;
 }
 
-unsigned dupcol() {
+unsigned dupcol() noexcept {
 	unsigned iColor        = 0;
 	COLORREF color         = {};
 	unsigned matchDistance = 0, minimumDistance = 0, matchIndex = 0;
@@ -5619,7 +5642,7 @@ unsigned dupcol() {
 	return matchIndex;
 }
 
-double dubl(unsigned char* pnt) {
+double dubl(unsigned char* pnt) noexcept {
 	unsigned tdat = 0;
 
 	_asm {
@@ -6038,22 +6061,22 @@ void nuFil() {
 						// ToDo - (PES) is there a better estimate for data size?
 						fileBuffer = new unsigned char[MAXITEMS * 8];
 						ReadFile(FileHandle, fileBuffer, MAXITEMS * 8, &BytesRead, 0);
-						pesHeader = static_cast<PESHED*>(static_cast<void*>(fileBuffer));
-						l_peschr  = static_cast<char*>(static_cast<void*>(pesHeader));
+						pesHeader = convert_ptr<PESHED*>(fileBuffer);
+						l_peschr  = convert_ptr<char*>(pesHeader);
 						if (strncmp(pesHeader->led, "#PES00", 6)) {
 							std::string fmtStr;
 							loadString(fmtStr, IDS_NOTPES);
 							shoMsg(fmt::format(fmtStr, WorkingFileName));
 							return;
 						}
-						pecof              = tripl(pesHeader->off);
-						PESstitch          = fileBuffer + (pecof + 532);
-						ActivePointIndex   = 0;
-						pesColorCount      = static_cast<unsigned char*>(static_cast<void*>(&l_peschr[pecof + 48]));
-						PEScolors          = &pesColorCount[1];
-						//allow all the colors described by a char  
+						pecof            = tripl(pesHeader->off);
+						PESstitch        = fileBuffer + (pecof + 532);
+						ActivePointIndex = 0;
+						pesColorCount    = convert_ptr<unsigned char*>(&l_peschr[pecof + 48]);
+						PEScolors        = &pesColorCount[1];
+						// allow all the colors described by a char
 						boost::dynamic_bitset<> colorMap(256);
-						ActivePointIndex                        = 0;
+						ActivePointIndex = 0;
 						for (iColor = 0; iColor < gsl::narrow<unsigned>(*pesColorCount + 1); iColor++) {
 							if (!colorMap.test_set(PEScolors[iColor])) {
 								UserColor[ActivePointIndex++] = PESColorTranslate[PEScolors[iColor] & PESCMSK];
@@ -6066,7 +6089,7 @@ void nuFil() {
 						loc.x = loc.y = 0;
 						pabind        = 0;
 						StateMap.reset(StateFlag::FILDIR);
-						pabstch            = static_cast<PESTCH*>(static_cast<void*>(&l_peschr[sizeof(PESHED) + 4]));
+						pabstch            = convert_ptr<PESTCH*>(&l_peschr[sizeof(PESHED) + 4]);
 						iPESstitch         = 0;
 						iActualPESstitches = 1;
 						StitchBuffer[0].x  = StitchBuffer[0].y;
@@ -10445,6 +10468,13 @@ void setpcs() {
 	IniFile.auxFileType = AUXPCS;
 	auxmen();
 }
+
+#if PESACT
+void setpes() {
+	IniFile.auxFileType = AUXPES;
+	auxmen();
+}
+#endif
 
 void setdst() {
 	IniFile.auxFileType = AUXDST;
@@ -17012,6 +17042,11 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		case ID_AUXPCS: // view / Set / Machine File Type / Pfaff PCS
 			setpcs();
 			break;
+#if PESACT
+		case ID_AUXPES: // view / Set / Machine File Type / Brother PES
+			setpes();
+			break;
+#endif
 		case ID_AUXDST: // view / Set / Machine File Type / Tajima DST
 			setdst();
 			break;
