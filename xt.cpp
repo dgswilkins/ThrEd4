@@ -426,16 +426,6 @@ void durats(unsigned iSequence, fPOINT& point) noexcept {
 	}
 }
 
-void xoseq(unsigned iSequence) noexcept {
-	OSequence[OutputIndex] = BSequence[iSequence];
-	OutputIndex++;
-}
-
-void xpfth(unsigned iSequence) noexcept {
-	FeatherSequence[ActivePointIndex] = BSequence[iSequence];
-	ActivePointIndex++;
-}
-
 unsigned bpsg() noexcept {
 	unsigned testValue = 0;
 
@@ -558,12 +548,10 @@ void fthrbfn(unsigned iSequence) {
 		xratf(nextLowPoint, nextHighPoint, nextPoint);
 	}
 	midPoint = midpnt(currentPoint, nextPoint);
-	xoseq(iSequence);
-	OSequence[OutputIndex] = midPoint;
-	OutputIndex++;
-	xpfth(iSequence + 1);
-	FeatherSequence[ActivePointIndex] = midPoint;
-	ActivePointIndex++;
+	OSequence[OutputIndex++] = BSequence[iSequence];
+	OSequence[OutputIndex++] = midPoint;
+	FeatherSequence[ActivePointIndex++] = BSequence[iSequence + 1];
+	FeatherSequence[ActivePointIndex++] = midPoint;
 }
 
 void fthdfn(unsigned iSequence) {
