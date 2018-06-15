@@ -925,7 +925,31 @@ typedef struct _colChng {
 	unsigned short colorIndex;  // color index
 } COLCHNG;
 
-#define COLMSK 0x0000000f    // 0000 0000 0000 0000 0000 0000 0000 1111
+class FEATHER
+{
+public:
+	unsigned fillType;          // type of feather fill
+	float    ratio;             // feather ratio
+	float    minStitch;         // smallest stitch allowed
+	float    ratioLocal;        // local feather ratio
+	float    formRatio;         // feather ratio from form
+	unsigned extendedAttribute; // extended form attribute
+	unsigned upCount;           // feather up count
+	unsigned downCount;         // feather down count
+	unsigned totalCount;        // up count plus down count
+	unsigned phaseIndex;
+	unsigned phase;
+	unsigned countUp;
+	unsigned countDown;
+	float    globalStep;
+	float    globalPosition;
+	float    globalPhase;
+	float    globalUp;
+	float    globalDown;
+	float    globalRatio;
+};
+
+#define COLMSK 0x0000000f   // 0000 0000 0000 0000 0000 0000 0000 1111
 #define APCOLMSK 0x000000f0  // 0000 0000 0000 0000 0000 0000 1111 0000
 #define NCOLMSK 0xfffffff0   // 1111 1111 1111 1111 1111 1111 1111 0000
 #define COLSMSK 0x0000ffff   // 0000 0000 0000 0000 1111 1111 1111 1111

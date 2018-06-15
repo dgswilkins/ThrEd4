@@ -203,27 +203,7 @@ unsigned               InterleaveSequenceIndex;       // index into the interlea
 INSREC                 InterleaveSequenceIndices[10]; // indices into interleave points
 unsigned               InterleaveSequenceIndex2;      // index into interleave indices
 unsigned               FillStartsMap;                 // fill starts bitmap
-unsigned               FeatherFillType;               // type of feather fill
-float                  FeatherRatio;                  // feather ratio
-float                  FeatherMinStitch;              // smallest stitch allowed
-float                  FeatherRatioLocal;             // local feather ratio
-float                  FormFeatherRatio;              // feather ratio from form
-unsigned               ExtendedAttribute;             // extended form attribute
-unsigned               FeatherUpCount;                // feather up count
-unsigned               FeatherDownCount;              // feather down count
-unsigned               FeatherTotalCount;             // up count plus down count
-unsigned               FeatherPhaseIndex;
-unsigned               FeatherPhase;
 fPOINT                 FeatherSequence[MAXITEMS];
-unsigned               FeatherCountUp;
-unsigned               FeatherCountDown;
-
-float FeatherGlobalStep;
-float FeatherGlobalPosition;
-float FeatherGlobalPhase;
-float FeatherGlobalUp;
-float FeatherGlobalDown;
-float FeatherGlobalRatio;
 
 enum
 {
@@ -378,51 +358,54 @@ void deorg(POINT& point) noexcept {
 	point.y = Msg.pt.y - StitchWindowOrigin.y;
 }
 
-void fthvars() {
+void fthvars(FEATHER& feather) {
 	StateMap.reset(StateFlag::BARSAT);
 	StateMap.reset(StateFlag::FTHR);
-	FeatherFillType   = SelectedForm->fillInfo.feather.fillType;
-	FormFeatherRatio  = SelectedForm->fillInfo.feather.ratio;
-	FeatherMinStitch  = SelectedForm->fillInfo.feather.minStitchSize;
-	FeatherTotalCount = SelectedForm->fillInfo.feather.count;
-	ExtendedAttribute = SelectedForm->extendedAttribute;
-	FeatherCountUp = FeatherUpCount = SelectedForm->fillInfo.feather.upCount;
-	FeatherCountDown = FeatherDownCount = SelectedForm->fillInfo.feather.downCount;
-	FeatherPhaseIndex                   = FeatherUpCount + FeatherDownCount;
-	if (ExtendedAttribute & AT_FTHBLND)
+
+	feather.fillType          = SelectedForm->fillInfo.feather.fillType;
+	feather.formRatio         = SelectedForm->fillInfo.feather.ratio;
+	feather.minStitch         = SelectedForm->fillInfo.feather.minStitchSize;
+	feather.totalCount        = SelectedForm->fillInfo.feather.count;
+	feather.extendedAttribute = SelectedForm->extendedAttribute;
+	feather.countUp           = SelectedForm->fillInfo.feather.upCount;
+	feather.upCount           = feather.countUp;
+	feather.countDown         = SelectedForm->fillInfo.feather.downCount;
+	feather.downCount         = feather.countDown;
+	feather.phaseIndex        = feather.upCount + feather.downCount;
+	if (feather.extendedAttribute & AT_FTHBLND)
 		StateMap.set(StateFlag::BARSAT);
 	else
 		StateMap.set(StateFlag::FTHR);
 }
 
-constexpr float durat(float start, float finish) {
-	return (finish - start) * FeatherRatio + start;
+constexpr float durat(float start, float finish, float featherRatio) {
+	return (finish - start) * featherRatio + start;
 }
 
-constexpr float duxrat(float strt, float fin) {
-	return (fin - strt) * FeatherRatioLocal + strt;
+constexpr float duxrat(float strt, float fin, float featherRatioLocal) {
+	return (fin - strt) * featherRatioLocal + strt;
 }
 
-void duxrats(unsigned start, unsigned finish, fPOINT& point) noexcept {
-	point.x = duxrat(BSequence[finish].x, BSequence[start].x);
-	point.y = duxrat(BSequence[finish].y, BSequence[start].y);
+void duxrats(unsigned start, unsigned finish, fPOINT& point, float featherRatioLocal) noexcept {
+	point.x = duxrat(BSequence[finish].x, BSequence[start].x, featherRatioLocal);
+	point.y = duxrat(BSequence[finish].y, BSequence[start].y, featherRatioLocal);
 }
 
-void durats(unsigned iSequence, fPOINT& point) noexcept {
+void durats(unsigned iSequence, fPOINT& point, FEATHER& feather) noexcept {
 	const double stitchLength
 	    = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x, BSequence[iSequence + 1].y - BSequence[iSequence].y);
 	fPOINT adjustedPoint = {};
 
-	if (stitchLength < FeatherMinStitch) {
+	if (stitchLength < feather.minStitch) {
 		point.x = BSequence[iSequence].x;
 		point.y = BSequence[iSequence].y;
 	}
 	else {
-		FeatherRatioLocal = FeatherMinStitch / stitchLength;
-		adjustedPoint.x   = duxrat(BSequence[iSequence + 1].x, BSequence[iSequence].x);
-		adjustedPoint.y   = duxrat(BSequence[iSequence + 1].y, BSequence[iSequence].y);
-		point.x           = durat(adjustedPoint.x, BSequence[iSequence].x);
-		point.y           = durat(adjustedPoint.y, BSequence[iSequence].y);
+		feather.ratioLocal = feather.minStitch / stitchLength;
+		adjustedPoint.x    = duxrat(BSequence[iSequence + 1].x, BSequence[iSequence].x, feather.ratioLocal);
+		adjustedPoint.y    = duxrat(BSequence[iSequence + 1].y, BSequence[iSequence].y, feather.ratioLocal);
+		point.x            = durat(adjustedPoint.x, BSequence[iSequence].x, feather.ratio);
+		point.y            = durat(adjustedPoint.y, BSequence[iSequence].y, feather.ratio);
 	}
 }
 
@@ -438,87 +421,87 @@ unsigned bpsg() noexcept {
 	return PseudoRandomValue;
 }
 
-void nurat() {
+void nurat(FEATHER& feather) {
 	float remainder;
 
-	remainder = fmod(FeatherGlobalPosition, 1);
-	switch (FeatherFillType) {
+	remainder = fmod(feather.globalPosition, 1);
+	switch (feather.fillType) {
 	case FTHPSG:
-		if (FeatherUpCount) {
-			if (FeatherCountUp) {
-				FeatherRatio = static_cast<float>(FeatherTotalCount - (psg() % FeatherTotalCount)) / FeatherTotalCount;
-				FeatherCountUp--;
+		if (feather.upCount) {
+			if (feather.countUp) {
+				feather.ratio = static_cast<float>(feather.totalCount - (psg() % feather.totalCount)) / feather.totalCount;
+				feather.countUp--;
 			}
 			else {
-				FeatherRatio = static_cast<float>(FeatherTotalCount - (bpsg() % FeatherTotalCount)) / FeatherTotalCount;
-				if (FeatherCountDown)
-					FeatherCountDown--;
+				feather.ratio = static_cast<float>(feather.totalCount - (bpsg() % feather.totalCount)) / feather.totalCount;
+				if (feather.countDown)
+					feather.countDown--;
 				else {
 					PseudoRandomValue = FSED;
-					FeatherCountUp    = FeatherUpCount;
-					FeatherCountDown  = FeatherDownCount;
+					feather.countUp   = feather.upCount;
+					feather.countDown = feather.downCount;
 				}
 			}
 		}
 		else
-			FeatherRatio = static_cast<float>(FeatherTotalCount - (psg() % FeatherTotalCount)) / FeatherTotalCount;
-		FeatherRatio *= FormFeatherRatio;
+			feather.ratio = static_cast<float>(feather.totalCount - (psg() % feather.totalCount)) / feather.totalCount;
+		feather.ratio *= feather.formRatio;
 		break;
 	case FTHFAZ:
-		if (FeatherPhase >= FeatherUpCount)
-			FeatherRatio = 1;
+		if (feather.phase >= feather.upCount)
+			feather.ratio = 1;
 		else
-			FeatherRatio = FormFeatherRatio;
+			feather.ratio = feather.formRatio;
 		break;
 	case FTHSIN:
-		if (remainder > FeatherGlobalRatio)
-			FeatherRatio = sin((1 - remainder) / (1 - FeatherGlobalRatio) * PI + PI) * 0.5 + 0.5;
+		if (remainder > feather.globalRatio)
+			feather.ratio = sin((1 - remainder) / (1 - feather.globalRatio) * PI + PI) * 0.5 + 0.5;
 		else
-			FeatherRatio = sin(remainder / FeatherGlobalRatio * PI) * 0.5 + 0.5;
-		FeatherRatio *= FormFeatherRatio;
+			feather.ratio = sin(remainder / feather.globalRatio * PI) * 0.5 + 0.5;
+		feather.ratio *= feather.formRatio;
 		break;
 	case FTHSIN2:
-		if (remainder > FeatherGlobalRatio)
-			FeatherRatio = sin((1 - remainder) / (1 - FeatherGlobalRatio) * PI);
+		if (remainder > feather.globalRatio)
+			feather.ratio = sin((1 - remainder) / (1 - feather.globalRatio) * PI);
 		else
-			FeatherRatio = sin(remainder / FeatherGlobalRatio * PI);
-		FeatherRatio *= FormFeatherRatio;
+			feather.ratio = sin(remainder / feather.globalRatio * PI);
+		feather.ratio *= feather.formRatio;
 		break;
 	case FTHRMP:
-		if (remainder > FeatherGlobalRatio)
-			FeatherRatio = (1 - remainder) / (1 - FeatherGlobalRatio);
+		if (remainder > feather.globalRatio)
+			feather.ratio = (1 - remainder) / (1 - feather.globalRatio);
 		else
-			FeatherRatio = remainder / FeatherGlobalRatio;
-		FeatherRatio *= FormFeatherRatio;
+			feather.ratio = remainder / feather.globalRatio;
+		feather.ratio *= feather.formRatio;
 		break;
 	case FTHLIN:
 	default:
-		FeatherRatio = FormFeatherRatio;
+		feather.ratio = feather.formRatio;
 	}
-	++FeatherPhase %= FeatherPhaseIndex;
-	FeatherGlobalPosition += FeatherGlobalStep;
+	++feather.phase %= feather.phaseIndex;
+	feather.globalPosition += feather.globalStep;
 }
 
-void fthfn(unsigned iSequence) {
-	nurat();
-	durats(iSequence, OSequence[iSequence]);
+void fthfn(unsigned iSequence, FEATHER& feather) {
+	nurat(feather);
+	durats(iSequence, OSequence[iSequence], feather);
 }
 
-void ratpnt(unsigned iPoint, unsigned iNextPoint, fPOINT& point) noexcept {
-	point.x = (BSequence[iNextPoint].x - BSequence[iPoint].x) * FeatherRatio + BSequence[iPoint].x;
-	point.y = (BSequence[iNextPoint].y - BSequence[iPoint].y) * FeatherRatio + BSequence[iPoint].y;
+void ratpnt(unsigned iPoint, unsigned iNextPoint, fPOINT& point, float featherRatio) noexcept {
+	point.x = (BSequence[iNextPoint].x - BSequence[iPoint].x) * featherRatio + BSequence[iPoint].x;
+	point.y = (BSequence[iNextPoint].y - BSequence[iPoint].y) * featherRatio + BSequence[iPoint].y;
 }
 
 fPOINT midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept {
 	return { (endPoint.x - startPoint.x) * 0.5f + startPoint.x, (endPoint.y - startPoint.y) * 0.5f + startPoint.y };
 }
 
-void xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point) noexcept {
-	point.x = (endPoint.x - startPoint.x) * FeatherRatioLocal + startPoint.x;
-	point.y = (endPoint.y - startPoint.y) * FeatherRatioLocal + startPoint.y;
+void xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point, float featherRatioLocal) noexcept {
+	point.x = (endPoint.x - startPoint.x) * featherRatioLocal + startPoint.x;
+	point.y = (endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y;
 }
 
-void fthrbfn(unsigned iSequence) {
+void fthrbfn(unsigned iSequence, FEATHER& feather) {
 	fPOINT currentPoint     = {};
 	fPOINT nextPoint        = {};
 	fPOINT currentHighPoint = {};
@@ -530,108 +513,109 @@ void fthrbfn(unsigned iSequence) {
 	const double length
 	    = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 
-	nurat();
-	if (length < (FeatherMinStitch * 2)) {
-		FeatherRatio = 0.5;
-		ratpnt(iSequence, iSequence + 1, currentPoint);
-		ratpnt(iSequence + 3, iSequence + 2, nextPoint);
+	nurat(feather);
+	if (length < (feather.minStitch * 2)) {
+		feather.ratio = 0.5;
+		ratpnt(iSequence, iSequence + 1, currentPoint, feather.ratio);
+		ratpnt(iSequence + 3, iSequence + 2, nextPoint, feather.ratio);
 	}
 	else {
-		FeatherRatioLocal = FeatherMinStitch / length;
-		duxrats(iSequence, iSequence + 1, currentLowPoint);
-		duxrats(iSequence + 3, iSequence + 2, nextLowPoint);
-		FeatherRatioLocal = 1 - FeatherRatioLocal;
-		duxrats(iSequence, iSequence + 1, currentHighPoint);
-		duxrats(iSequence + 3, iSequence + 2, nextHighPoint);
-		FeatherRatioLocal = FeatherRatio;
-		xratf(currentLowPoint, currentHighPoint, currentPoint);
-		xratf(nextLowPoint, nextHighPoint, nextPoint);
+		feather.ratioLocal = feather.minStitch / length;
+		duxrats(iSequence, iSequence + 1, currentLowPoint, feather.ratioLocal);
+		duxrats(iSequence + 3, iSequence + 2, nextLowPoint, feather.ratioLocal);
+		feather.ratioLocal = 1 - feather.ratioLocal;
+		duxrats(iSequence, iSequence + 1, currentHighPoint, feather.ratioLocal);
+		duxrats(iSequence + 3, iSequence + 2, nextHighPoint, feather.ratioLocal);
+		feather.ratioLocal = feather.ratio;
+		xratf(currentLowPoint, currentHighPoint, currentPoint, feather.ratioLocal);
+		xratf(nextLowPoint, nextHighPoint, nextPoint, feather.ratioLocal);
 	}
-	midPoint = midpnt(currentPoint, nextPoint);
-	OSequence[OutputIndex++] = BSequence[iSequence];
-	OSequence[OutputIndex++] = midPoint;
+	midPoint                            = midpnt(currentPoint, nextPoint);
+	OSequence[OutputIndex++]            = BSequence[iSequence];
+	OSequence[OutputIndex++]            = midPoint;
 	FeatherSequence[ActivePointIndex++] = BSequence[iSequence + 1];
 	FeatherSequence[ActivePointIndex++] = midPoint;
 }
 
-void fthdfn(unsigned iSequence) {
+void fthdfn(unsigned iSequence, FEATHER& feather) {
 	const double length
 	    = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 	fPOINT adjustedPoint = {};
 	fPOINT currentPoint  = {};
 	fPOINT nextPoint     = {};
 
-	nurat();
+	nurat(feather);
 	OSequence[iSequence]     = BSequence[iSequence];
 	OSequence[iSequence + 1] = BSequence[iSequence + 1];
-	if (length > FeatherMinStitch) {
-		FeatherRatioLocal = 0.5;
-		duxrats(iSequence + 1, iSequence, adjustedPoint);
-		FeatherRatioLocal = FeatherMinStitch / length / 2;
-		xratf(adjustedPoint, OSequence[iSequence], currentPoint);
-		xratf(adjustedPoint, OSequence[iSequence + 1], nextPoint);
-		FeatherRatioLocal = FeatherRatio;
-		xratf(currentPoint, OSequence[iSequence], OSequence[iSequence]);
-		xratf(nextPoint, OSequence[iSequence + 1], OSequence[iSequence + 1]);
+	if (length > feather.minStitch) {
+		feather.ratioLocal = 0.5;
+		duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
+		feather.ratioLocal = feather.minStitch / length / 2;
+		xratf(adjustedPoint, OSequence[iSequence], currentPoint, feather.ratioLocal);
+		xratf(adjustedPoint, OSequence[iSequence + 1], nextPoint, feather.ratioLocal);
+		feather.ratioLocal = feather.ratio;
+		xratf(currentPoint, OSequence[iSequence], OSequence[iSequence], feather.ratioLocal);
+		xratf(nextPoint, OSequence[iSequence + 1], OSequence[iSequence + 1], feather.ratioLocal);
 	}
 }
 
 void fthrfn() {
 	unsigned     ind = 0, res = 0;
 	const double savedSpacing = LineSpacing;
+	FEATHER      feather      = {};
 
 	// ToDo - what does this function do
 	PseudoRandomValue = FSED;
-	fthvars();
+	fthvars(feather);
 	LineSpacing = SelectedForm->fillSpacing;
 	satfil();
 	BSequence[0].attribute = 0;
 	BSequence[1].attribute = 1;
-	if (!FeatherPhaseIndex)
-		FeatherPhaseIndex = 1;
-	ind = SequenceIndex / (FeatherPhaseIndex << 2);
-	res = SequenceIndex % (FeatherPhaseIndex << 2);
-	if (res > (FeatherPhaseIndex << 1))
+	if (!feather.phaseIndex)
+		feather.phaseIndex = 1;
+	ind = SequenceIndex / (feather.phaseIndex << 2);
+	res = SequenceIndex % (feather.phaseIndex << 2);
+	if (res > (feather.phaseIndex << 1))
 		ind++;
-	FeatherGlobalPosition        = 0;
-	FeatherGlobalStep            = 4.0 / SequenceIndex * ind;
-	FeatherGlobalPhase           = static_cast<float>(SequenceIndex) / ind;
-	FeatherGlobalRatio           = static_cast<float>(FeatherCountUp) / FeatherPhaseIndex;
-	FeatherGlobalUp              = FeatherGlobalPhase * FeatherGlobalRatio;
-	FeatherGlobalDown            = FeatherGlobalPhase - FeatherGlobalUp;
+	feather.globalPosition       = 0;
+	feather.globalStep           = 4.0 / SequenceIndex * ind;
+	feather.globalPhase          = static_cast<float>(SequenceIndex) / ind;
+	feather.globalRatio          = static_cast<float>(feather.countUp) / feather.phaseIndex;
+	feather.globalUp             = feather.globalPhase * feather.globalRatio;
+	feather.globalDown           = feather.globalPhase - feather.globalUp;
 	SelectedForm->fillType       = FTHF;
-	FeatherPhase                 = 1;
+	feather.phase                = 1;
 	BSequence[SequenceIndex]     = BSequence[SequenceIndex - 2];
 	BSequence[SequenceIndex + 1] = BSequence[SequenceIndex - 1];
-	if (ExtendedAttribute & AT_FTHBLND) {
+	if (feather.extendedAttribute & AT_FTHBLND) {
 		OutputIndex = ActivePointIndex = 0;
 		for (ind = 0; ind < SequenceIndex; ind++) {
 			if (!BSequence[ind].attribute)
-				fthrbfn(ind);
+				fthrbfn(ind, feather);
 		}
 	}
 	else {
 		if (SelectedForm->extendedAttribute & AT_FTHBTH) {
 			for (ind = 0; ind <= SequenceIndex; ind++) {
 				if (!BSequence[ind].attribute)
-					fthdfn(ind);
+					fthdfn(ind, feather);
 			}
 			ind--;
 		}
 		else {
 			for (ind = 0; ind <= SequenceIndex; ind++) {
 				if (BSequence[ind].attribute) {
-					if (ExtendedAttribute & AT_FTHUP)
-						fthfn(ind);
+					if (feather.extendedAttribute & AT_FTHUP)
+						fthfn(ind, feather);
 					else
 						OSequence[ind] = BSequence[ind];
 					;
 				}
 				else {
-					if (ExtendedAttribute & AT_FTHUP)
+					if (feather.extendedAttribute & AT_FTHUP)
 						OSequence[ind] = BSequence[ind];
 					else
-						fthfn(ind);
+						fthfn(ind, feather);
 				}
 			}
 			ind--;
