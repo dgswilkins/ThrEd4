@@ -29,7 +29,6 @@ void     txof();
 
 extern unsigned                  ActiveColor;
 extern unsigned                  ActiveLayer;
-extern unsigned                  ActivePointIndex;
 extern fPOINT                    AngledFormVertices[MAXFRMLINS];
 extern FRMHED                    AngledForm;
 extern char                      AuxName[_MAX_PATH];
@@ -203,7 +202,6 @@ unsigned               InterleaveSequenceIndex;       // index into the interlea
 INSREC                 InterleaveSequenceIndices[10]; // indices into interleave points
 unsigned               InterleaveSequenceIndex2;      // index into interleave indices
 unsigned               FillStartsMap;                 // fill starts bitmap
-fPOINT                 FeatherSequence[MAXITEMS];
 
 enum
 {
@@ -501,7 +499,7 @@ void xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point, floa
 	point.y = (endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y;
 }
 
-void fthrbfn(unsigned iSequence, FEATHER& feather) {
+void fthrbfn(unsigned iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence) {
 	fPOINT currentPoint     = {};
 	fPOINT nextPoint        = {};
 	fPOINT currentHighPoint = {};
@@ -533,8 +531,8 @@ void fthrbfn(unsigned iSequence, FEATHER& feather) {
 	midPoint                            = midpnt(currentPoint, nextPoint);
 	OSequence[OutputIndex++]            = BSequence[iSequence];
 	OSequence[OutputIndex++]            = midPoint;
-	FeatherSequence[ActivePointIndex++] = BSequence[iSequence + 1];
-	FeatherSequence[ActivePointIndex++] = midPoint;
+	featherSequence.push_back({ BSequence[iSequence + 1].x, BSequence[iSequence + 1].y });
+	featherSequence.push_back(midPoint);
 }
 
 void fthdfn(unsigned iSequence, FEATHER& feather) {
@@ -559,10 +557,41 @@ void fthdfn(unsigned iSequence, FEATHER& feather) {
 	}
 }
 
+void fritfil(std::vector<fPOINT>& featherSequence) {
+	unsigned iSequence = 0, iReverseSequence = 0;
+
+	if (SequenceIndex) {
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].code  = TYPFRM;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillColor;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq   = I_FIL;
+		chkseq(false);
+		InterleaveSequenceIndex2++;
+		if (SelectedForm->extendedAttribute & AT_FTHBLND
+		    && ~(SelectedForm->extendedAttribute & (AT_FTHUP | AT_FTHBTH)) != (AT_FTHUP | AT_FTHBTH)) {
+			InterleaveSequenceIndices[InterleaveSequenceIndex2].code  = FTHMSK;
+			InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillInfo.feather.color;
+			InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
+			InterleaveSequenceIndices[InterleaveSequenceIndex2].seq   = I_FTH;
+
+			const auto sequenceMax = featherSequence.size();
+			iReverseSequence = sequenceMax - 1;
+			for (iSequence = 0; iSequence < sequenceMax; iSequence++) {
+				OSequence[iSequence] = featherSequence[iReverseSequence];
+				iReverseSequence--;
+			}
+			SequenceIndex = sequenceMax;
+			chkseq(false);
+			InterleaveSequenceIndex2++;
+		}
+	}
+}
+
 void fthrfn() {
 	unsigned     ind = 0, res = 0;
 	const double savedSpacing = LineSpacing;
 	FEATHER      feather      = {};
+	std::vector<fPOINT> featherSequence;
 
 	// ToDo - what does this function do
 	PseudoRandomValue = FSED;
@@ -588,10 +617,10 @@ void fthrfn() {
 	BSequence[SequenceIndex]     = BSequence[SequenceIndex - 2];
 	BSequence[SequenceIndex + 1] = BSequence[SequenceIndex - 1];
 	if (feather.extendedAttribute & AT_FTHBLND) {
-		OutputIndex = ActivePointIndex = 0;
+		OutputIndex = 0;
 		for (ind = 0; ind < SequenceIndex; ind++) {
 			if (!BSequence[ind].attribute)
-				fthrbfn(ind, feather);
+				fthrbfn(ind, feather, featherSequence);
 		}
 	}
 	else {
@@ -626,34 +655,7 @@ void fthrfn() {
 	StateMap.reset(StateFlag::BARSAT);
 	LineSpacing   = savedSpacing;
 	SequenceIndex = OutputIndex;
-}
-
-void fritfil() {
-	unsigned iSequence = 0, iReverseSequence = 0;
-
-	if (SequenceIndex) {
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].code  = TYPFRM;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillColor;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq   = I_FIL;
-		chkseq(false);
-		InterleaveSequenceIndex2++;
-		if (SelectedForm->extendedAttribute & AT_FTHBLND
-		    && ~(SelectedForm->extendedAttribute & (AT_FTHUP | AT_FTHBTH)) != (AT_FTHUP | AT_FTHBTH)) {
-			InterleaveSequenceIndices[InterleaveSequenceIndex2].code  = FTHMSK;
-			InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillInfo.feather.color;
-			InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
-			InterleaveSequenceIndices[InterleaveSequenceIndex2].seq   = I_FTH;
-			iReverseSequence                                          = ActivePointIndex - 1;
-			for (iSequence = 0; iSequence < ActivePointIndex; iSequence++) {
-				OSequence[iSequence] = FeatherSequence[iReverseSequence];
-				iReverseSequence--;
-			}
-			SequenceIndex = ActivePointIndex;
-			chkseq(false);
-			InterleaveSequenceIndex2++;
-		}
-	}
+	fritfil(featherSequence);
 }
 
 void fethrf() {

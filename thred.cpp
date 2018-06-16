@@ -138,7 +138,6 @@ extern void               flpord();
 extern unsigned           fltind(const fPOINT* const point);
 extern void               fltspac(const fPOINT* const start, unsigned count);
 extern void               form();
-extern void               fritfil();
 extern void               frm0();
 extern void               frmadj(unsigned formIndex);
 extern void               frmchkx();
@@ -14651,7 +14650,6 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 						unsid();
 						if (SelectedForm->fillType == FTHF) {
 							fthrfn();
-							fritfil();
 						}
 						else
 							fethrf();

@@ -36,7 +36,6 @@ extern unsigned             duthrsh(double threshold);
 extern void                 duzrat();
 extern void                 fdelstch(FILLSTARTS& FillStartsData);
 extern bool                 filmsgs(unsigned code);
-extern void                 fritfil();
 extern void                 frm1pnt();
 extern void                 frmdel();
 extern void                 fthrfn();
@@ -7146,7 +7145,6 @@ void refilfn() {
 				SelectedForm->extendedAttribute ^= AT_FTHBLND;
 			StateMap.set(StateFlag::CNV2FTH);
 			fthrfn();
-			fritfil();
 			break;
 		}
 		chkbrd();
