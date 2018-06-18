@@ -14648,11 +14648,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 					if (Msg.hwnd == SideWindow[10]) { // feather fill
 						unmsg();
 						unsid();
-						if (SelectedForm->fillType == FTHF) {
-							fthrfn();
-						}
-						else
-							fethrf();
+						fethrf();
 						StateMap.set(StateFlag::INIT);
 						coltab();
 						StateMap.set(StateFlag::RESTCH);

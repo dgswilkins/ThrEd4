@@ -200,8 +200,6 @@ unsigned               ColorOrder[16];                // color order adjusted fo
 fPOINT                 InterleaveSequence[MAXITEMS];  // storage for interleave points
 unsigned               InterleaveSequenceIndex;       // index into the interleave sequence
 INSREC                 InterleaveSequenceIndices[10]; // indices into interleave points
-unsigned               InterleaveSequenceIndex2;      // index into interleave indices
-unsigned               FillStartsMap;                 // fill starts bitmap
 
 enum
 {
@@ -557,7 +555,7 @@ void fthdfn(unsigned iSequence, FEATHER& feather) {
 	}
 }
 
-void fritfil(std::vector<fPOINT>& featherSequence) {
+void fritfil(std::vector<fPOINT>& featherSequence, unsigned& InterleaveSequenceIndex2) {
 	unsigned iSequence = 0, iReverseSequence = 0;
 
 	if (SequenceIndex) {
@@ -587,7 +585,7 @@ void fritfil(std::vector<fPOINT>& featherSequence) {
 	}
 }
 
-void fthrfn() {
+void fthrfn(unsigned& InterleaveSequenceIndex2) {
 	unsigned     ind = 0, res = 0;
 	const double savedSpacing = LineSpacing;
 	FEATHER      feather      = {};
@@ -655,7 +653,7 @@ void fthrfn() {
 	StateMap.reset(StateFlag::BARSAT);
 	LineSpacing   = savedSpacing;
 	SequenceIndex = OutputIndex;
-	fritfil(featherSequence);
+	fritfil(featherSequence, InterleaveSequenceIndex2);
 }
 
 void fethrf() {
@@ -849,7 +847,7 @@ void delwlk(unsigned code) {
 	}
 }
 
-void chkuseq() noexcept {
+void chkuseq(const unsigned InterleaveSequenceIndex2) noexcept {
 #if BUGBAK
 	unsigned index;
 
@@ -901,22 +899,22 @@ void chkuseq() noexcept {
 #endif
 }
 
-void ritwlk() noexcept {
+void ritwlk(unsigned& InterleaveSequenceIndex2) noexcept {
 	if (OutputIndex) {
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].code  = WLKMSK;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq   = I_FIL;
-		chkuseq();
+		chkuseq(InterleaveSequenceIndex2);
 		InterleaveSequenceIndex2++;
 	}
 }
 
-void ritcwlk() noexcept {
+void ritcwlk(unsigned& InterleaveSequenceIndex2) noexcept {
 	if (OutputIndex) {
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].code  = CWLKMSK;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq   = I_FIL;
-		chkuseq();
+		chkuseq(InterleaveSequenceIndex2);
 		InterleaveSequenceIndex2++;
 	}
 }
@@ -992,7 +990,7 @@ unsigned gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, 
 	return iStitch - destination;
 }
 
-void fnwlk(unsigned find) {
+void fnwlk(unsigned find, unsigned& InterleaveSequenceIndex2) {
 	unsigned start = 0, count = 0;
 
 	fvars(find);
@@ -1013,15 +1011,15 @@ void fnwlk(unsigned find) {
 		OutputIndex++;
 		count--;
 	}
-	ritwlk();
+	ritwlk(InterleaveSequenceIndex2);
 }
 
-void ritund() noexcept {
+void ritund(unsigned& InterleaveSequenceIndex2) noexcept {
 	if (SequenceIndex) {
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].code  = UNDMSK;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq   = I_FIL;
-		chkuseq();
+		chkuseq(InterleaveSequenceIndex2);
 		InterleaveSequenceIndex2++;
 	}
 }
@@ -1032,7 +1030,7 @@ void undclp() noexcept {
 	ClipStitchCount                                  = 2;
 }
 
-void fncwlk() {
+void fncwlk(unsigned& InterleaveSequenceIndex2) {
 	unsigned iGuide = 0, iVertex = 0, start = 0, finish = 0;
 
 	OutputIndex = 0;
@@ -1080,7 +1078,7 @@ void fncwlk() {
 		OSequence[OutputIndex] = CurrentFormVertices[start];
 		OutputIndex++;
 	}
-	ritcwlk();
+	ritcwlk(InterleaveSequenceIndex2);
 }
 
 void srtcol() {
@@ -1153,21 +1151,21 @@ void setulen() {
 	msgflt(IDS_WLKLEN, IniFile.underlayStitchLen / PFGRAN);
 }
 
-void chkcwlk() {
+void chkcwlk(unsigned& InterleaveSequenceIndex2) {
 	if (SelectedForm->extendedAttribute & AT_CWLK)
-		fncwlk();
+		fncwlk(InterleaveSequenceIndex2);
 	else
 		delwlk((ClosestFormToCursor << FRMSHFT) | CWLKMSK);
 }
 
-void chkwlk() {
+void chkwlk(unsigned& InterleaveSequenceIndex2) {
 	if (SelectedForm->extendedAttribute & AT_WALK)
-		fnwlk(ClosestFormToCursor);
+		fnwlk(ClosestFormToCursor, InterleaveSequenceIndex2);
 	else
 		delwlk((ClosestFormToCursor << FRMSHFT) | WLKMSK);
 }
 
-void fnund(const std::vector<RNGCNT>& textureSegments, unsigned find) {
+void fnund(const std::vector<RNGCNT>& textureSegments, unsigned find, unsigned& InterleaveSequenceIndex2) {
 	const float savedStitchSize = UserStitchLength;
 
 	UserStitchLength = 1e99;
@@ -1179,14 +1177,14 @@ void fnund(const std::vector<RNGCNT>& textureSegments, unsigned find) {
 	StateMap.set(StateFlag::ISUND);
 	angclpfn(textureSegments);
 	OutputIndex = SequenceIndex;
-	ritund();
+	ritund(InterleaveSequenceIndex2);
 	fvars(find);
 	UserStitchLength = savedStitchSize;
 }
 
-void chkund(const std::vector<RNGCNT>& textureSegments) {
+void chkund(const std::vector<RNGCNT>& textureSegments, unsigned& InterleaveSequenceIndex2) {
 	if (SelectedForm->extendedAttribute & AT_UND)
-		fnund(textureSegments, ClosestFormToCursor);
+		fnund(textureSegments, ClosestFormToCursor, InterleaveSequenceIndex2);
 	else
 		delwlk((ClosestFormToCursor << FRMSHFT) | UNDMSK);
 }
@@ -1808,7 +1806,7 @@ void dmpat() {
 }
 #endif
 
-void fdelstch(FILLSTARTS& FillStartsData) {
+void fdelstch(FILLSTARTS& FillStartsData, unsigned& FillStartsMap) {
 	unsigned iSourceStitch = 0, ind = 0, iDestinationStitch = 0, codedFormIndex = 0, attribute = 0, type = 0, tmap = 0, color = 0,
 	         bordercolor = 0, tapcol = 0;
 	// ToDo - Still not sure what this function does?
@@ -2005,7 +2003,7 @@ void chkend(unsigned offset, unsigned code, INTINF& ilData) {
 	}
 }
 
-void intlv(const FILLSTARTS& FillStartsData) {
+void intlv(const FILLSTARTS& FillStartsData, unsigned FillStartsMap, const unsigned InterleaveSequenceIndex2) {
 	unsigned iSequence = 0, ine = 0, code = 0, offset = 0;
 	fPOINT   colpnt = {};
 	INTINF   ilData = {};

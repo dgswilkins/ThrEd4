@@ -22,10 +22,10 @@ extern SATCON*              adsatk(unsigned count);
 extern void                 alrotmsg();
 extern void                 angrct(fRECTANGLE& rectangle);
 extern void                 centr();
-extern void                 chkcwlk();
+extern void                 chkcwlk(unsigned& InterleaveSequenceIndex2);
 extern void                 chkrng(fPOINT& range);
-extern void                 chkund(const std::vector<RNGCNT>& textureSegments);
-extern void                 chkwlk();
+extern void                 chkund(const std::vector<RNGCNT>& textureSegments, unsigned& InterleaveSequenceIndex2);
+extern void                 chkwlk(unsigned& InterleaveSequenceIndex2);
 extern void                 coltab();
 extern void                 dasyfrm();
 extern void                 delfstchs();
@@ -34,37 +34,37 @@ extern void                 delstchm();
 extern void                 deltx();
 extern unsigned             duthrsh(double threshold);
 extern void                 duzrat();
-extern void                 fdelstch(FILLSTARTS& FillStartsData);
+extern void                 fdelstch(FILLSTARTS& FillStartsData, unsigned& FillStartsMap);
 extern bool                 filmsgs(unsigned code);
 extern void                 frm1pnt();
 extern void                 frmdel();
-extern void                 fthrfn();
+extern void                 fthrfn(unsigned& InterleaveSequenceIndex2);
 extern void                 grpAdj();
 extern void                 insadj();
 extern std::vector<fPOINT>& insid();
-extern void                 intlv(const FILLSTARTS& FillStartsData);
-extern bool                 isclp(unsigned find);
-extern bool                 isclpx(unsigned find);
-extern bool                 isfclp();
-extern bool                 istx(unsigned find);
-extern inline void          loadString(std::string& sDest, unsigned stringID);
-extern void                 movStch();
-extern void                 mvflpnt(fPOINT* const destination, const fPOINT* const source, unsigned count);
-extern void                 mvsatk(SATCON* const destination, const SATCON* const source, unsigned count);
-extern void                 mvstch(unsigned destination, unsigned source);
-extern void                 mvstchs(unsigned destination, unsigned source, unsigned count);
-extern void                 numWnd();
-extern void                 nuRct();
-extern void                 pntmsg(unsigned count);
-extern unsigned             px2stch();
-extern void                 pxCor2stch(const POINT& point);
-extern void                 redclp();
-extern void                 redraw(HWND window);
-extern void                 ritfcor(const fPOINT& point);
-extern void                 ritmov();
-extern void                 ritnum(unsigned code, unsigned value);
-extern void                 ritot(unsigned number);
-extern void                 rngadj();
+extern void        intlv(const FILLSTARTS& FillStartsData, unsigned FillStartsMap, const unsigned InterleaveSequenceIndex2);
+extern bool        isclp(unsigned find);
+extern bool        isclpx(unsigned find);
+extern bool        isfclp();
+extern bool        istx(unsigned find);
+extern inline void loadString(std::string& sDest, unsigned stringID);
+extern void        movStch();
+extern void        mvflpnt(fPOINT* const destination, const fPOINT* const source, unsigned count);
+extern void        mvsatk(SATCON* const destination, const SATCON* const source, unsigned count);
+extern void        mvstch(unsigned destination, unsigned source);
+extern void        mvstchs(unsigned destination, unsigned source, unsigned count);
+extern void        numWnd();
+extern void        nuRct();
+extern void        pntmsg(unsigned count);
+extern unsigned    px2stch();
+extern void        pxCor2stch(const POINT& point);
+extern void        redclp();
+extern void        redraw(HWND window);
+extern void        ritfcor(const fPOINT& point);
+extern void        ritmov();
+extern void        ritnum(unsigned code, unsigned value);
+extern void        ritot(unsigned number);
+extern void        rngadj();
 extern void
             rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, const double& rotationAngle, const dPOINT& rotationCenter);
 extern void rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, const double rotationAngle, const dPOINT& rotationCenter);
@@ -96,44 +96,44 @@ extern void unsel();
 extern void unsid();
 extern void zumhom();
 
-extern unsigned                  ActiveColor;
-extern unsigned                  ActiveLayer;
-extern unsigned                  AppliqueColor;
-extern HCURSOR                   ArrowCursor;
-extern unsigned                  BitmapHeight;
-extern unsigned                  BitmapWidth;
-extern unsigned                  ButtonHeight;
-extern unsigned                  ButtonWidth;
-extern unsigned                  ButtonWidthX3;
-extern HWND                      CancelButton;
-extern unsigned                  Clip;
-extern fPOINTATTR                ClipBuffer[MAXFRMLINS];
-extern HGLOBAL                   ClipMemory;
-extern void*                     ClipPointer;
-extern fRECTANGLE                ClipRect;
-extern FLSIZ                     ClipRectSize;
-extern unsigned                  ClipStitchCount;
-extern CLPSTCH*                  ClipStitchData;
-extern unsigned                  ClosestPointIndex;
-extern HCURSOR                   CrossCursor;
-extern HWND                      DeleteStitchesDialog;
-extern HWND                      DiscardButton;
-extern POINT                     EndPointCross;
-extern HMENU                     FillMenu;
-extern unsigned                  FillStartsMap;
-extern HWND                      FormDataSheet;
-extern unsigned                  FormMenuChoice;
-extern HPEN                      FormPen;
-extern HPEN                      FormPen3px;
-extern HPEN                      FormSelectedPen;
-extern unsigned                  GroupEndStitch;
-extern unsigned                  GroupStartStitch;
-extern unsigned                  GroupStitchIndex;
-extern INIFILE                   IniFile;
-extern POINT                     InsertLine[3];
-extern fPOINT                    InterleaveSequence[MAXITEMS];
-extern unsigned                  InterleaveSequenceIndex;
-extern unsigned                  InterleaveSequenceIndex2;
+extern unsigned   ActiveColor;
+extern unsigned   ActiveLayer;
+extern unsigned   AppliqueColor;
+extern HCURSOR    ArrowCursor;
+extern unsigned   BitmapHeight;
+extern unsigned   BitmapWidth;
+extern unsigned   ButtonHeight;
+extern unsigned   ButtonWidth;
+extern unsigned   ButtonWidthX3;
+extern HWND       CancelButton;
+extern unsigned   Clip;
+extern fPOINTATTR ClipBuffer[MAXFRMLINS];
+extern HGLOBAL    ClipMemory;
+extern void*      ClipPointer;
+extern fRECTANGLE ClipRect;
+extern FLSIZ      ClipRectSize;
+extern unsigned   ClipStitchCount;
+extern CLPSTCH*   ClipStitchData;
+extern unsigned   ClosestPointIndex;
+extern HCURSOR    CrossCursor;
+extern HWND       DeleteStitchesDialog;
+extern HWND       DiscardButton;
+extern POINT      EndPointCross;
+extern HMENU      FillMenu;
+// extern unsigned                  FillStartsMap;
+extern HWND     FormDataSheet;
+extern unsigned FormMenuChoice;
+extern HPEN     FormPen;
+extern HPEN     FormPen3px;
+extern HPEN     FormSelectedPen;
+extern unsigned GroupEndStitch;
+extern unsigned GroupStartStitch;
+extern unsigned GroupStitchIndex;
+extern INIFILE  IniFile;
+extern POINT    InsertLine[3];
+extern fPOINT   InterleaveSequence[MAXITEMS];
+extern unsigned InterleaveSequenceIndex;
+// extern unsigned                  InterleaveSequenceIndex2;
 extern INSREC                    InterleaveSequenceIndices[10];
 extern bool                      iseclp(unsigned find);
 extern HPEN                      LayerPen[5];
@@ -1990,7 +1990,7 @@ void chkseq(bool border) {
 #endif
 }
 
-void ritbrd() {
+void ritbrd(unsigned& InterleaveSequenceIndex2) {
 	if (SequenceIndex) {
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq   = I_BRD;
@@ -2001,7 +2001,7 @@ void ritbrd() {
 	}
 }
 
-void ritapbrd() {
+void ritapbrd(unsigned& InterleaveSequenceIndex2) {
 	if (SequenceIndex) {
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq   = I_AP;
@@ -2012,7 +2012,7 @@ void ritapbrd() {
 	}
 }
 
-void ritfil() {
+void ritfil(unsigned& InterleaveSequenceIndex2) {
 	if (SequenceIndex) {
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq   = I_FIL;
@@ -3892,7 +3892,7 @@ void chnfn() {
 	duch(chainEndPoints);
 }
 
-void chkbrd() {
+void chkbrd(unsigned& InterleaveSequenceIndex2) {
 	float length = 0.0;
 
 	fvars(ClosestFormToCursor);
@@ -3923,7 +3923,7 @@ void chkbrd() {
 		case EDGEAPPL: // Applique
 			SequenceIndex = 0;
 			apbrd();
-			ritapbrd();
+			ritapbrd(InterleaveSequenceIndex2);
 			HorizontalLength2 = SelectedForm->borderSize;
 			sbrd();
 			break;
@@ -3951,7 +3951,7 @@ void chkbrd() {
 			chnfn();
 			break;
 		}
-		ritbrd();
+		ritbrd(InterleaveSequenceIndex2);
 	}
 }
 
@@ -6940,19 +6940,21 @@ void fmclp() {
 }
 
 void refilfn() {
-	double       spacing        = 0.0;
-	const double stitchLength   = UserStitchLength;
-	float        length         = 0.0;
-	FILLSTARTS   FillStartsData = {}; // fill start data for refill
-	double       rotationAngle  = 0;
-	dPOINT       rotationCenter = {};
+	double       spacing                  = 0.0;
+	const double stitchLength             = UserStitchLength;
+	float        length                   = 0.0;
+	FILLSTARTS   FillStartsData           = {}; // fill start data for refill
+	unsigned     FillStartsMap            = 0;  // fill starts bitmap
+	double       rotationAngle            = 0;
+	dPOINT       rotationCenter           = {};
+	unsigned     InterleaveSequenceIndex2 = 0; // index into interleave indices
 
 	StateMap.reset(StateFlag::TXFIL);
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->type == FRMLINE)
 		SelectedForm->underlayIndent = 0;
 	savdo();
-	fdelstch(FillStartsData);
+	fdelstch(FillStartsData, FillStartsMap);
 	StateMap.set(StateFlag::WASREFIL);
 	if (SelectedForm->fillSpacing < 0.5 && !isclp(ClosestFormToCursor))
 		SelectedForm->fillSpacing = 0.5;
@@ -6964,7 +6966,7 @@ void refilfn() {
 	StateMap.reset(StateFlag::WASDO);
 	if (SelectedForm->extendedAttribute & (AT_UND | AT_WALK) && SelectedForm->type == FRMLINE && SelectedForm->fillType != CONTF)
 		SelectedForm->type = FRMFPOLY;
-	InterleaveSequenceIndex = InterleaveSequenceIndex2 = 0;
+	InterleaveSequenceIndex = 0;
 	StateMap.reset(StateFlag::ISUND);
 	std::vector<RNGCNT> textureSegments(SelectedForm->fillInfo.texture.lines);
 	switch (SelectedForm->type) {
@@ -6973,37 +6975,37 @@ void refilfn() {
 		switch (SelectedForm->edgeType & NEGUND) {
 		case EDGELINE:
 			brdfil(SelectedForm->edgeStitchLen);
-			ritbrd();
+			ritbrd(InterleaveSequenceIndex2);
 			break;
 		case EDGEBEAN:
 			bold(SelectedForm->edgeStitchLen);
-			ritbrd();
+			ritbrd(InterleaveSequenceIndex2);
 			break;
 		case EDGECLIP:
 			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
 			clpout();
 			SequenceIndex = 0;
 			clpbrd(0);
-			ritbrd();
+			ritbrd(InterleaveSequenceIndex2);
 			break;
 		case EDGEANGSAT:
 			StateMap.reset(StateFlag::SAT1);
 			slbrd();
-			ritbrd();
+			ritbrd(InterleaveSequenceIndex2);
 			break;
 		case EDGEPROPSAT:
 			if (SelectedForm->vertexCount > 2) {
 				StateMap.reset(StateFlag::SAT1);
 				plbrd(SelectedForm->edgeSpacing);
-				ritbrd();
+				ritbrd(InterleaveSequenceIndex2);
 			}
 			break;
 		case EDGEAPPL:
 			lapbrd();
-			ritapbrd();
+			ritapbrd(InterleaveSequenceIndex2);
 			StateMap.reset(StateFlag::SAT1);
 			slbrd();
-			ritbrd();
+			ritbrd(InterleaveSequenceIndex2);
 			break;
 		case EDGEBHOL:
 			HorizontalLength2      = SelectedForm->borderSize * 2;
@@ -7012,7 +7014,7 @@ void refilfn() {
 			satout(20);
 			blbrd(SelectedForm->edgeSpacing);
 			ButtonholeCornerLength = length;
-			ritbrd();
+			ritbrd(InterleaveSequenceIndex2);
 			break;
 		case EDGEPICOT:
 			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
@@ -7021,37 +7023,37 @@ void refilfn() {
 			ButtonholeCornerLength = getplen();
 			clpic();
 			ButtonholeCornerLength = length;
-			ritbrd();
+			ritbrd(InterleaveSequenceIndex2);
 			break;
 		case EDGEDOUBLE:
 			dubfn();
-			ritbrd();
+			ritbrd(InterleaveSequenceIndex2);
 			break;
 		case EDGELCHAIN:
 			StateMap.set(StateFlag::LINCHN);
 			chnfn();
-			ritbrd();
+			ritbrd(InterleaveSequenceIndex2);
 			break;
 		case EDGEOCHAIN:
 			StateMap.reset(StateFlag::LINCHN);
 			chnfn();
-			ritbrd();
+			ritbrd(InterleaveSequenceIndex2);
 			break;
 		case EDGECLIPX:
 			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
 			duxclp();
-			ritbrd();
+			ritbrd(InterleaveSequenceIndex2);
 			break;
 		}
 		if (SelectedForm->fillType == CONTF && SelectedForm->attribute & FRECONT) {
 			contf();
-			ritfil();
+			ritfil(InterleaveSequenceIndex2);
 		}
 		break;
 	case FRMFPOLY:
-		chkcwlk();
-		chkwlk();
-		chkund(textureSegments);
+		chkcwlk(InterleaveSequenceIndex2);
+		chkwlk(InterleaveSequenceIndex2);
+		chkund(textureSegments, InterleaveSequenceIndex2);
 		StateMap.reset(StateFlag::ISUND);
 		if (SelectedForm->fillType) {
 			spacing     = LineSpacing;
@@ -7116,15 +7118,15 @@ void refilfn() {
 					rotbak(rotationAngle, rotationCenter);
 				}
 			}
-			ritfil();
+			ritfil(InterleaveSequenceIndex2);
 			LineSpacing = spacing;
 		}
-		chkbrd();
+		chkbrd(InterleaveSequenceIndex2);
 		break;
 	case SAT:
-		chkcwlk();
-		chkwlk();
-		chkund(textureSegments);
+		chkcwlk(InterleaveSequenceIndex2);
+		chkwlk(InterleaveSequenceIndex2);
+		chkund(textureSegments, InterleaveSequenceIndex2);
 		StateMap.reset(StateFlag::ISUND);
 		switch (SelectedForm->fillType) {
 		case SATF:
@@ -7133,24 +7135,24 @@ void refilfn() {
 			UserStitchLength = SelectedForm->lengthOrCount.stitchLength;
 			satfil();
 			LineSpacing = spacing;
-			ritfil();
+			ritfil(InterleaveSequenceIndex2);
 			break;
 		case CLPF:
 			oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 			fmclp();
-			ritfil();
+			ritfil(InterleaveSequenceIndex2);
 			break;
 		case FTHF:
 			if (StateMap.testAndReset(StateFlag::FLPBLND))
 				SelectedForm->extendedAttribute ^= AT_FTHBLND;
 			StateMap.set(StateFlag::CNV2FTH);
-			fthrfn();
+			fthrfn(InterleaveSequenceIndex2);
 			break;
 		}
-		chkbrd();
+		chkbrd(InterleaveSequenceIndex2);
 	}
 	UserStitchLength = stitchLength;
-	intlv(FillStartsData);
+	intlv(FillStartsData, FillStartsMap, InterleaveSequenceIndex2);
 	ritot(PCSHeader.stitchCount);
 	setfchk();
 }
