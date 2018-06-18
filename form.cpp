@@ -22,10 +22,10 @@ extern SATCON*              adsatk(unsigned count);
 extern void                 alrotmsg();
 extern void                 angrct(fRECTANGLE& rectangle);
 extern void                 centr();
-extern void                 chkcwlk(unsigned& InterleaveSequenceIndex2);
+extern void                 chkcwlk(unsigned& interleaveSequenceIndex2);
 extern void                 chkrng(fPOINT& range);
-extern void                 chkund(const std::vector<RNGCNT>& textureSegments, unsigned& InterleaveSequenceIndex2);
-extern void                 chkwlk(unsigned& InterleaveSequenceIndex2);
+extern void                 chkund(const std::vector<RNGCNT>& textureSegments, unsigned& interleaveSequenceIndex2);
+extern void                 chkwlk(unsigned& interleaveSequenceIndex2);
 extern void                 coltab();
 extern void                 dasyfrm();
 extern void                 delfstchs();
@@ -34,15 +34,15 @@ extern void                 delstchm();
 extern void                 deltx();
 extern unsigned             duthrsh(double threshold);
 extern void                 duzrat();
-extern void                 fdelstch(FILLSTARTS& FillStartsData, unsigned& FillStartsMap);
+extern void                 fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap);
 extern bool                 filmsgs(unsigned code);
 extern void                 frm1pnt();
 extern void                 frmdel();
-extern void                 fthrfn(unsigned& InterleaveSequenceIndex2);
+extern void                 fthrfn(unsigned& interleaveSequenceIndex2);
 extern void                 grpAdj();
 extern void                 insadj();
 extern std::vector<fPOINT>& insid();
-extern void        intlv(const FILLSTARTS& FillStartsData, unsigned FillStartsMap, const unsigned InterleaveSequenceIndex2);
+extern void        intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsigned interleaveSequenceIndex2);
 extern bool        isclp(unsigned find);
 extern bool        isclpx(unsigned find);
 extern bool        isfclp();
@@ -1988,36 +1988,36 @@ void chkseq(bool border) {
 #endif
 }
 
-void ritbrd(unsigned& InterleaveSequenceIndex2) {
+void ritbrd(unsigned& interleaveSequenceIndex2) {
 	if (SequenceIndex) {
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq   = I_BRD;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].code  = TYPBRD;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->borderColor & COLMSK;
+		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[interleaveSequenceIndex2].seq   = I_BRD;
+		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = TYPBRD;
+		InterleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->borderColor & COLMSK;
 		chkseq(true);
-		InterleaveSequenceIndex2++;
+		interleaveSequenceIndex2++;
 	}
 }
 
-void ritapbrd(unsigned& InterleaveSequenceIndex2) {
+void ritapbrd(unsigned& interleaveSequenceIndex2) {
 	if (SequenceIndex) {
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq   = I_AP;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].code  = TYPMSK;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->borderColor >> 4;
+		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[interleaveSequenceIndex2].seq   = I_AP;
+		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = TYPMSK;
+		InterleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->borderColor >> 4;
 		chkseq(true);
-		InterleaveSequenceIndex2++;
+		interleaveSequenceIndex2++;
 	}
 }
 
-void ritfil(unsigned& InterleaveSequenceIndex2) {
+void ritfil(unsigned& interleaveSequenceIndex2) {
 	if (SequenceIndex) {
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].index = InterleaveSequenceIndex;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].seq   = I_FIL;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].code  = TYPFRM;
-		InterleaveSequenceIndices[InterleaveSequenceIndex2].color = SelectedForm->fillColor;
+		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
+		InterleaveSequenceIndices[interleaveSequenceIndex2].seq   = I_FIL;
+		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = TYPFRM;
+		InterleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->fillColor;
 		chkseq(false);
-		InterleaveSequenceIndex2++;
+		interleaveSequenceIndex2++;
 	}
 }
 
@@ -3890,7 +3890,7 @@ void chnfn() {
 	duch(chainEndPoints);
 }
 
-void chkbrd(unsigned& InterleaveSequenceIndex2) {
+void chkbrd(unsigned& interleaveSequenceIndex2) {
 	float length = 0.0;
 
 	fvars(ClosestFormToCursor);
@@ -3921,7 +3921,7 @@ void chkbrd(unsigned& InterleaveSequenceIndex2) {
 		case EDGEAPPL: // Applique
 			SequenceIndex = 0;
 			apbrd();
-			ritapbrd(InterleaveSequenceIndex2);
+			ritapbrd(interleaveSequenceIndex2);
 			HorizontalLength2 = SelectedForm->borderSize;
 			sbrd();
 			break;
@@ -3949,7 +3949,7 @@ void chkbrd(unsigned& InterleaveSequenceIndex2) {
 			chnfn();
 			break;
 		}
-		ritbrd(InterleaveSequenceIndex2);
+		ritbrd(interleaveSequenceIndex2);
 	}
 }
 
@@ -6941,18 +6941,18 @@ void refilfn() {
 	double       spacing                  = 0.0;
 	const double stitchLength             = UserStitchLength;
 	float        length                   = 0.0;
-	FILLSTARTS   FillStartsData           = {}; // fill start data for refill
-	unsigned     FillStartsMap            = 0;  // fill starts bitmap
+	FILLSTARTS   fillStartsData           = {}; // fill start data for refill
+	unsigned     fillStartsMap            = 0;  // fill starts bitmap
 	double       rotationAngle            = 0;
 	dPOINT       rotationCenter           = {};
-	unsigned     InterleaveSequenceIndex2 = 0; // index into interleave indices
+	unsigned     interleaveSequenceIndex2 = 0; // index into interleave indices
 
 	StateMap.reset(StateFlag::TXFIL);
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->type == FRMLINE)
 		SelectedForm->underlayIndent = 0;
 	savdo();
-	fdelstch(FillStartsData, FillStartsMap);
+	fdelstch(fillStartsData, fillStartsMap);
 	StateMap.set(StateFlag::WASREFIL);
 	if (SelectedForm->fillSpacing < 0.5 && !isclp(ClosestFormToCursor))
 		SelectedForm->fillSpacing = 0.5;
@@ -6973,37 +6973,37 @@ void refilfn() {
 		switch (SelectedForm->edgeType & NEGUND) {
 		case EDGELINE:
 			brdfil(SelectedForm->edgeStitchLen);
-			ritbrd(InterleaveSequenceIndex2);
+			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGEBEAN:
 			bold(SelectedForm->edgeStitchLen);
-			ritbrd(InterleaveSequenceIndex2);
+			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGECLIP:
 			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
 			clpout();
 			SequenceIndex = 0;
 			clpbrd(0);
-			ritbrd(InterleaveSequenceIndex2);
+			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGEANGSAT:
 			StateMap.reset(StateFlag::SAT1);
 			slbrd();
-			ritbrd(InterleaveSequenceIndex2);
+			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGEPROPSAT:
 			if (SelectedForm->vertexCount > 2) {
 				StateMap.reset(StateFlag::SAT1);
 				plbrd(SelectedForm->edgeSpacing);
-				ritbrd(InterleaveSequenceIndex2);
+				ritbrd(interleaveSequenceIndex2);
 			}
 			break;
 		case EDGEAPPL:
 			lapbrd();
-			ritapbrd(InterleaveSequenceIndex2);
+			ritapbrd(interleaveSequenceIndex2);
 			StateMap.reset(StateFlag::SAT1);
 			slbrd();
-			ritbrd(InterleaveSequenceIndex2);
+			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGEBHOL:
 			HorizontalLength2      = SelectedForm->borderSize * 2;
@@ -7012,7 +7012,7 @@ void refilfn() {
 			satout(20);
 			blbrd(SelectedForm->edgeSpacing);
 			ButtonholeCornerLength = length;
-			ritbrd(InterleaveSequenceIndex2);
+			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGEPICOT:
 			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
@@ -7021,37 +7021,37 @@ void refilfn() {
 			ButtonholeCornerLength = getplen();
 			clpic();
 			ButtonholeCornerLength = length;
-			ritbrd(InterleaveSequenceIndex2);
+			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGEDOUBLE:
 			dubfn();
-			ritbrd(InterleaveSequenceIndex2);
+			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGELCHAIN:
 			StateMap.set(StateFlag::LINCHN);
 			chnfn();
-			ritbrd(InterleaveSequenceIndex2);
+			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGEOCHAIN:
 			StateMap.reset(StateFlag::LINCHN);
 			chnfn();
-			ritbrd(InterleaveSequenceIndex2);
+			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGECLIPX:
 			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
 			duxclp();
-			ritbrd(InterleaveSequenceIndex2);
+			ritbrd(interleaveSequenceIndex2);
 			break;
 		}
 		if (SelectedForm->fillType == CONTF && SelectedForm->attribute & FRECONT) {
 			contf();
-			ritfil(InterleaveSequenceIndex2);
+			ritfil(interleaveSequenceIndex2);
 		}
 		break;
 	case FRMFPOLY:
-		chkcwlk(InterleaveSequenceIndex2);
-		chkwlk(InterleaveSequenceIndex2);
-		chkund(textureSegments, InterleaveSequenceIndex2);
+		chkcwlk(interleaveSequenceIndex2);
+		chkwlk(interleaveSequenceIndex2);
+		chkund(textureSegments, interleaveSequenceIndex2);
 		StateMap.reset(StateFlag::ISUND);
 		if (SelectedForm->fillType) {
 			spacing     = LineSpacing;
@@ -7116,15 +7116,15 @@ void refilfn() {
 					rotbak(rotationAngle, rotationCenter);
 				}
 			}
-			ritfil(InterleaveSequenceIndex2);
+			ritfil(interleaveSequenceIndex2);
 			LineSpacing = spacing;
 		}
-		chkbrd(InterleaveSequenceIndex2);
+		chkbrd(interleaveSequenceIndex2);
 		break;
 	case SAT:
-		chkcwlk(InterleaveSequenceIndex2);
-		chkwlk(InterleaveSequenceIndex2);
-		chkund(textureSegments, InterleaveSequenceIndex2);
+		chkcwlk(interleaveSequenceIndex2);
+		chkwlk(interleaveSequenceIndex2);
+		chkund(textureSegments, interleaveSequenceIndex2);
 		StateMap.reset(StateFlag::ISUND);
 		switch (SelectedForm->fillType) {
 		case SATF:
@@ -7133,24 +7133,24 @@ void refilfn() {
 			UserStitchLength = SelectedForm->lengthOrCount.stitchLength;
 			satfil();
 			LineSpacing = spacing;
-			ritfil(InterleaveSequenceIndex2);
+			ritfil(interleaveSequenceIndex2);
 			break;
 		case CLPF:
 			oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 			fmclp();
-			ritfil(InterleaveSequenceIndex2);
+			ritfil(interleaveSequenceIndex2);
 			break;
 		case FTHF:
 			if (StateMap.testAndReset(StateFlag::FLPBLND))
 				SelectedForm->extendedAttribute ^= AT_FTHBLND;
 			StateMap.set(StateFlag::CNV2FTH);
-			fthrfn(InterleaveSequenceIndex2);
+			fthrfn(interleaveSequenceIndex2);
 			break;
 		}
-		chkbrd(InterleaveSequenceIndex2);
+		chkbrd(interleaveSequenceIndex2);
 	}
 	UserStitchLength = stitchLength;
-	intlv(FillStartsData, FillStartsMap, InterleaveSequenceIndex2);
+	intlv(fillStartsData, fillStartsMap, interleaveSequenceIndex2);
 	ritot(PCSHeader.stitchCount);
 	setfchk();
 }
