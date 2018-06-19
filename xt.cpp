@@ -158,7 +158,6 @@ unsigned short DaisyTypeStrings[] = {
 	IDS_DAZCRV, IDS_DAZSAW, IDS_DAZRMP, IDS_DAZRAG, IDS_DAZCOG, IDS_DAZHART,
 };
 
-HWND                   DesignSizeDialog;              // change design size dialog window
 fPOINT                 DesignSize;                    // design size
 TXPNT                  TexturePointsBuffer[MAXITEMS]; // buffer for textured fill points
 int                    TextureIndex;                  // next textured fill point index
@@ -4147,20 +4146,20 @@ void rtrclp() {
 	}
 }
 
-void setstxt(unsigned stringIndex, float value) {
-	SetWindowText(GetDlgItem(DesignSizeDialog, stringIndex), fmt::format("{:.2f}", (value / PFGRAN)).c_str());
+void setstxt(unsigned stringIndex, float value, HWND dialog) {
+	SetWindowText(GetDlgItem(dialog, stringIndex), fmt::format("{:.2f}", (value / PFGRAN)).c_str());
 }
 
-float getstxt(unsigned stringIndex) noexcept {
+float getstxt(unsigned stringIndex, HWND dialog) noexcept {
 	// ToDo - This is not great code.
 	char buffer[16] = {};
-	GetWindowText(GetDlgItem(DesignSizeDialog, stringIndex), buffer, sizeof(buffer));
+	GetWindowText(GetDlgItem(dialog, stringIndex), buffer, sizeof(buffer));
 	return atof(buffer) * PFGRAN;
 }
 
-bool chkasp(fPOINT& point, float aspectRatio) noexcept {
-	point.x = getstxt(IDC_DESWID);
-	point.y = getstxt(IDC_DESHI);
+bool chkasp(fPOINT& point, float aspectRatio, HWND dialog) noexcept {
+	point.x = getstxt(IDC_DESWID, dialog);
+	point.y = getstxt(IDC_DESHI, dialog);
 	if ((point.y / point.x) == aspectRatio)
 		return 1;
 	else
@@ -4171,14 +4170,14 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
 	fPOINT designSize        = {};
-	float  designAspectRatio = 0.0; // design aspect ratio
+	float  designAspectRatio = 0.0;    // design aspect ratio
+	HWND   designSizeDialog  = hwndlg; // change design size dialog window
 
-	DesignSizeDialog = hwndlg;
 	switch (umsg) {
 	case WM_INITDIALOG:
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-		setstxt(IDC_DESWID, DesignSize.x);
-		setstxt(IDC_DESHI, DesignSize.y);
+		setstxt(IDC_DESWID, DesignSize.x, designSizeDialog);
+		setstxt(IDC_DESHI, DesignSize.y, designSizeDialog);
 		CheckDlgButton(hwndlg, IDC_REFILF, UserFlagMap.test(UserFlag::CHREF));
 		break;
 	case WM_COMMAND:
@@ -4187,8 +4186,8 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			EndDialog(hwndlg, 0);
 			return TRUE;
 		case IDOK:
-			DesignSize.x = getstxt(IDC_DESWID);
-			DesignSize.y = getstxt(IDC_DESHI);
+			DesignSize.x = getstxt(IDC_DESWID, designSizeDialog);
+			DesignSize.y = getstxt(IDC_DESHI, designSizeDialog);
 			if (IsDlgButtonChecked(hwndlg, IDC_REFILF))
 				UserFlagMap.set(UserFlag::CHREF);
 			else
@@ -4205,11 +4204,11 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			break;
 		case IDC_DUASP:
 			designAspectRatio = DesignSize.y / DesignSize.x;
-			if (!chkasp(designSize, designAspectRatio)) {
+			if (!chkasp(designSize, designAspectRatio, designSizeDialog)) {
 				if (StateMap.test(StateFlag::DESCHG))
-					setstxt(IDC_DESWID, designSize.y / designAspectRatio);
+					setstxt(IDC_DESWID, designSize.y / designAspectRatio, designSizeDialog);
 				else
-					setstxt(IDC_DESHI, designSize.x * designAspectRatio);
+					setstxt(IDC_DESHI, designSize.x * designAspectRatio, designSizeDialog);
 			}
 			break;
 		}
