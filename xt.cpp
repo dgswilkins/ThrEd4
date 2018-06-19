@@ -158,7 +158,6 @@ unsigned short DaisyTypeStrings[] = {
 	IDS_DAZCRV, IDS_DAZSAW, IDS_DAZRMP, IDS_DAZRAG, IDS_DAZCOG, IDS_DAZHART,
 };
 
-dPOINT                 DesignSizeRatio;               // design size ratio
 fRECTANGLE             DesignSizeRect;                // design size rectangle
 float                  DesignAspectRatio;             // design aspect ratio
 HWND                   DesignSizeDialog;              // change design size dialog window
@@ -4220,28 +4219,27 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 }
 
 // ToDo - Find a better name
-void sadj(fPOINTATTR& stitch) noexcept {
-	stitch.x = (stitch.x - DesignSizeRect.left) * DesignSizeRatio.x + DesignSizeRect.left;
-	stitch.y = (stitch.y - DesignSizeRect.bottom) * DesignSizeRatio.y + DesignSizeRect.bottom;
+void sadj(fPOINTATTR& stitch, const dPOINT& designSizeRatio) noexcept {
+	stitch.x = (stitch.x - DesignSizeRect.left) * designSizeRatio.x + DesignSizeRect.left;
+	stitch.y = (stitch.y - DesignSizeRect.bottom) * designSizeRatio.y + DesignSizeRect.bottom;
 }
 
-void sadj(fPOINT& point) noexcept {
-	point.x = (point.x - DesignSizeRect.left) * DesignSizeRatio.x + DesignSizeRect.left;
-	point.y = (point.y - DesignSizeRect.bottom) * DesignSizeRatio.y + DesignSizeRect.bottom;
+void sadj(fPOINT& point, const dPOINT& designSizeRatio) noexcept {
+	point.x = (point.x - DesignSizeRect.left) * designSizeRatio.x + DesignSizeRect.left;
+	point.y = (point.y - DesignSizeRect.bottom) * designSizeRatio.y + DesignSizeRect.bottom;
 }
 
 void nudfn() {
 	unsigned iStitch = 0, iVertex = 0;
 	fPOINT   newSize = { (DesignSizeRect.right - DesignSizeRect.left), (DesignSizeRect.top - DesignSizeRect.bottom) };
 
-	newSize.x         = DesignSizeRect.right - DesignSizeRect.left;
-	newSize.y         = DesignSizeRect.top - DesignSizeRect.bottom;
-	DesignSizeRatio.x = DesignSize.x / newSize.x;
-	DesignSizeRatio.y = DesignSize.y / newSize.y;
+	newSize.x              = DesignSizeRect.right - DesignSizeRect.left;
+	newSize.y              = DesignSizeRect.top - DesignSizeRect.bottom;
+	dPOINT designSizeRatio = { (DesignSize.x / newSize.x), (DesignSize.y / newSize.y) };
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
-		sadj(StitchBuffer[iStitch]);
+		sadj(StitchBuffer[iStitch], designSizeRatio);
 	for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
-		sadj(FormVertices[iVertex]);
+		sadj(FormVertices[iVertex], designSizeRatio);
 	frmout(ClosestFormToCursor);
 }
 
