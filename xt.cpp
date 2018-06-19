@@ -17,16 +17,6 @@
 #include "resource.h"
 #include "thred.h"
 
-void     chktxnum();
-void     deltx();
-unsigned dutyp(unsigned attribute) noexcept;
-void     redtbak();
-void     repar();
-void     tst();
-void     txbak();
-void     txdelal();
-void     txof();
-
 extern unsigned                  ActiveColor;
 extern unsigned                  ActiveLayer;
 extern fPOINT                    AngledFormVertices[MAXFRMLINS];
@@ -631,6 +621,58 @@ void fthrfn(unsigned& interleaveSequenceIndex2) {
 	LineSpacing   = savedSpacing;
 	SequenceIndex = OutputIndex;
 	fritfil(featherSequence, interleaveSequenceIndex2);
+}
+
+void deltx() {
+	unsigned iBuffer = 0;
+	unsigned iForm   = 0;
+	bool     flag    = false;
+
+	const unsigned short currentIndex = FormList[ClosestFormToCursor].fillInfo.texture.index;
+
+	if (TextureIndex && istx(ClosestFormToCursor) && SelectedForm->fillInfo.texture.count) {
+		// First check to see if the texture is shared between forms
+		for (iForm = 0; iForm < ClosestFormToCursor; iForm++) {
+			if (istx(iForm)) {
+				if (FormList[iForm].fillInfo.texture.index == currentIndex) {
+					flag = true;
+				}
+			}
+		}
+		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+			if (istx(iForm)) {
+				if (FormList[iForm].fillInfo.texture.index == currentIndex) {
+					flag = true;
+				}
+			}
+		}
+		// Only if it is not shared, should the texture be deleted
+		if (!flag) {
+			std::vector<TXPNT> textureBuffer(TextureIndex);
+			iBuffer = 0;
+			for (iForm = 0; iForm < ClosestFormToCursor; iForm++) {
+				if (istx(iForm)) {
+					MoveMemory(&textureBuffer[iBuffer],
+					           &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index],
+					           FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
+					FormList[iForm].fillInfo.texture.index = iBuffer;
+					iBuffer += FormList[iForm].fillInfo.texture.count;
+				}
+			}
+			for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+				if (istx(iForm)) {
+					MoveMemory(&textureBuffer[iBuffer],
+					           &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index],
+					           FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
+					FormList[iForm].fillInfo.texture.index = iBuffer;
+					iBuffer += FormList[iForm].fillInfo.texture.count;
+				}
+			}
+			TextureIndex = iBuffer;
+			MoveMemory(&TexturePointsBuffer[0], &textureBuffer[0], iBuffer * sizeof(TXPNT));
+		}
+		FormList[ClosestFormToCursor].fillType = 0;
+	}
 }
 
 void fethrf() {
@@ -1433,6 +1475,24 @@ void dasyfrm() {
 	mdufrm();
 }
 
+unsigned dutyp(unsigned attribute) noexcept {
+	char           result          = 0;
+	DWORD          bit             = 0;
+	const unsigned maskedAttribute = attribute & SRTYPMSK;
+
+	_BitScanReverse(&bit, maskedAttribute);
+
+	if (bit == 0)
+		return 0;
+
+	result = ((bit & 0xff) - 18);
+
+	if ((result != 12) || ((maskedAttribute & TYPATMSK) == 0))
+		return result & 0xf;
+
+	return 1;
+}
+
 void durec(OREC& record) noexcept {
 	unsigned          attribute = 0;
 	const fPOINTATTR* stitch    = &StitchBuffer[record.start];
@@ -1717,24 +1777,6 @@ void fsort() {
 		loadString(str, IDS_SRTER);
 		shoMsg(fmt::format(str, pFRecs[badForm]->form));
 	}
-}
-
-unsigned dutyp(unsigned attribute) noexcept {
-	char           result          = 0;
-	DWORD          bit             = 0;
-	const unsigned maskedAttribute = attribute & SRTYPMSK;
-
-	_BitScanReverse(&bit, maskedAttribute);
-
-	if (bit == 0)
-		return 0;
-
-	result = ((bit & 0xff) - 18);
-
-	if ((result != 12) || ((maskedAttribute & TYPATMSK) == 0))
-		return result & 0xf;
-
-	return 1;
 }
 
 #ifdef _DEBUG
@@ -2778,6 +2820,24 @@ void duauxnam() {
 	strcpy(AuxName, workingFileName.string().c_str());
 }
 
+void redtbak() {
+	OutputDebugString(fmt::format("retrieving texture history {}\n", TextureHistoryIndex).c_str());
+	const TXHST* textureHistoryItem = &TextureHistory[TextureHistoryIndex];
+	if (textureHistoryItem) {
+		TextureScreen.areaHeight = textureHistoryItem->height;
+		TextureScreen.width      = textureHistoryItem->width;
+		TextureScreen.spacing    = textureHistoryItem->spacing;
+		if (textureHistoryItem->texturePoint.size()) {
+			TempTexturePoints->clear();
+			TempTexturePoints->reserve(textureHistoryItem->texturePoint.size());
+			for (auto i = 0u; i < textureHistoryItem->texturePoint.size(); i++) {
+				TempTexturePoints->push_back(textureHistoryItem->texturePoint[i]);
+			}
+		}
+		StateMap.set(StateFlag::RESTCH);
+	}
+}
+
 void dutxtfil() {
 	if (!IniFile.textureHeight)
 		IniFile.textureHeight = ITXHI;
@@ -3411,6 +3471,40 @@ void txtlin() {
 	StateMap.set(StateFlag::TXTMOV);
 }
 
+void chktxnum() {
+	float value;
+
+	value = atof(TextureInputBuffer);
+	if (value) {
+		value *= PFGRAN;
+		switch (TextureWindowId) {
+		case HTXHI:
+			savtxt();
+			TextureScreen.areaHeight = value;
+			IniFile.textureHeight    = value;
+			StateMap.set(StateFlag::CHKTX);
+			break;
+		case HTXWID:
+			savtxt();
+			TextureScreen.width  = value;
+			IniFile.textureWidth = value;
+			StateMap.set(StateFlag::CHKTX);
+			break;
+		case HTXSPAC:
+			savtxt();
+			TextureScreen.spacing  = value;
+			IniFile.textureSpacing = value;
+			TextureScreen.width    = value * TextureScreen.lines + value / 2;
+			StateMap.set(StateFlag::CHKTX);
+			break;
+		}
+	}
+	TextureInputIndex = 0;
+	DestroyWindow(SideWindowButton);
+	SideWindowButton = 0;
+	StateMap.set(StateFlag::RESTCH);
+}
+
 void butsid(unsigned windowId) {
 	RECT buttonRect = {};
 
@@ -3482,58 +3576,6 @@ void txang() {
 	}
 }
 
-void deltx() {
-	unsigned iBuffer = 0;
-	unsigned iForm   = 0;
-	bool     flag    = false;
-
-	const unsigned short currentIndex = FormList[ClosestFormToCursor].fillInfo.texture.index;
-
-	if (TextureIndex && istx(ClosestFormToCursor) && SelectedForm->fillInfo.texture.count) {
-		// First check to see if the texture is shared between forms
-		for (iForm = 0; iForm < ClosestFormToCursor; iForm++) {
-			if (istx(iForm)) {
-				if (FormList[iForm].fillInfo.texture.index == currentIndex) {
-					flag = true;
-				}
-			}
-		}
-		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-			if (istx(iForm)) {
-				if (FormList[iForm].fillInfo.texture.index == currentIndex) {
-					flag = true;
-				}
-			}
-		}
-		// Only if it is not shared, should the texture be deleted
-		if (!flag) {
-			std::vector<TXPNT> textureBuffer(TextureIndex);
-			iBuffer = 0;
-			for (iForm = 0; iForm < ClosestFormToCursor; iForm++) {
-				if (istx(iForm)) {
-					MoveMemory(&textureBuffer[iBuffer],
-					           &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index],
-					           FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
-					FormList[iForm].fillInfo.texture.index = iBuffer;
-					iBuffer += FormList[iForm].fillInfo.texture.count;
-				}
-			}
-			for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-				if (istx(iForm)) {
-					MoveMemory(&textureBuffer[iBuffer],
-					           &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index],
-					           FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
-					FormList[iForm].fillInfo.texture.index = iBuffer;
-					iBuffer += FormList[iForm].fillInfo.texture.count;
-				}
-			}
-			TextureIndex = iBuffer;
-			MoveMemory(&TexturePointsBuffer[0], &textureBuffer[0], iBuffer * sizeof(TXPNT));
-		}
-		FormList[ClosestFormToCursor].fillType = 0;
-	}
-}
-
 void nutx() {
 	int     iForm = 0, iPoint = 0;
 	FRMHED* formHeader = nullptr;
@@ -3581,6 +3623,21 @@ void altx() {
 			}
 		}
 	}
+}
+
+void txof() {
+	butxt(HBOXSEL, (*StringTable)[STR_BOXSEL]);
+	redraw((*ButtonWin)[HHID]);
+	if (StateMap.test(StateFlag::UPTO))
+		butxt(HUPTO, (*StringTable)[STR_UPON]);
+	else
+		butxt(HUPTO, (*StringTable)[STR_UPOF]);
+	SetWindowText((*ButtonWin)[HTXSPAC], "");
+	savtxt();
+	zumhom();
+	SelectedTexturePointsList->clear();
+	SelectedTexturePointsList->shrink_to_fit();
+	StateMap.reset(StateFlag::TXTRED);
 }
 
 enum
@@ -3641,6 +3698,14 @@ void dutxmir() {
 		    { (*TempTexturePoints)[iPoint].y,
 		      gsl::narrow<unsigned short>(TextureScreen.lines - (*TempTexturePoints)[iPoint].line + 1) });
 	}
+	StateMap.set(StateFlag::RESTCH);
+}
+
+void txdelal() {
+	chktxnum();
+	savtxt();
+	TempTexturePoints->clear();
+	rstxt();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -3722,24 +3787,6 @@ void txtlbut() {
 	ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
 }
 
-void redtbak() {
-	OutputDebugString(fmt::format("retrieving texture history {}\n", TextureHistoryIndex).c_str());
-	const TXHST* textureHistoryItem = &TextureHistory[TextureHistoryIndex];
-	if (textureHistoryItem) {
-		TextureScreen.areaHeight = textureHistoryItem->height;
-		TextureScreen.width      = textureHistoryItem->width;
-		TextureScreen.spacing    = textureHistoryItem->spacing;
-		if (textureHistoryItem->texturePoint.size()) {
-			TempTexturePoints->clear();
-			TempTexturePoints->reserve(textureHistoryItem->texturePoint.size());
-			for (auto i = 0u; i < textureHistoryItem->texturePoint.size(); i++) {
-				TempTexturePoints->push_back(textureHistoryItem->texturePoint[i]);
-			}
-		}
-		StateMap.set(StateFlag::RESTCH);
-	}
-}
-
 void txbak() {
 	unsigned iHistory = 0;
 	bool     flag     = false;
@@ -3810,48 +3857,6 @@ void txtdel() {
 	}
 }
 
-void txdelal() {
-	chktxnum();
-	savtxt();
-	TempTexturePoints->clear();
-	rstxt();
-	StateMap.set(StateFlag::RESTCH);
-}
-
-void chktxnum() {
-	float value;
-
-	value = atof(TextureInputBuffer);
-	if (value) {
-		value *= PFGRAN;
-		switch (TextureWindowId) {
-		case HTXHI:
-			savtxt();
-			TextureScreen.areaHeight = value;
-			IniFile.textureHeight    = value;
-			StateMap.set(StateFlag::CHKTX);
-			break;
-		case HTXWID:
-			savtxt();
-			TextureScreen.width  = value;
-			IniFile.textureWidth = value;
-			StateMap.set(StateFlag::CHKTX);
-			break;
-		case HTXSPAC:
-			savtxt();
-			TextureScreen.spacing  = value;
-			IniFile.textureSpacing = value;
-			TextureScreen.width    = value * TextureScreen.lines + value / 2;
-			StateMap.set(StateFlag::CHKTX);
-			break;
-		}
-	}
-	TextureInputIndex = 0;
-	DestroyWindow(SideWindowButton);
-	SideWindowButton = 0;
-	StateMap.set(StateFlag::RESTCH);
-}
-
 void txcntrv() {
 	if (StateMap.testAndReset(StateFlag::TXTCLP)) {
 		StateMap.set(StateFlag::TXHCNTR);
@@ -3859,21 +3864,6 @@ void txcntrv() {
 		setxclp();
 		StateMap.set(StateFlag::RESTCH);
 	}
-}
-
-void txof() {
-	butxt(HBOXSEL, (*StringTable)[STR_BOXSEL]);
-	redraw((*ButtonWin)[HHID]);
-	if (StateMap.test(StateFlag::UPTO))
-		butxt(HUPTO, (*StringTable)[STR_UPON]);
-	else
-		butxt(HUPTO, (*StringTable)[STR_UPOF]);
-	SetWindowText((*ButtonWin)[HTXSPAC], "");
-	savtxt();
-	zumhom();
-	SelectedTexturePointsList->clear();
-	SelectedTexturePointsList->shrink_to_fit();
-	StateMap.reset(StateFlag::TXTRED);
 }
 
 bool istxclp() {
@@ -3983,6 +3973,12 @@ void txsnap() {
 		}
 		StateMap.set(StateFlag::RESTCH);
 	}
+}
+
+void tst() {
+	strcpy_s(IniFile.designerName, "Mr");
+	strcpy_s(ThrName, IniFile.designerName);
+	StateMap.set(StateFlag::RESTCH);
 }
 
 void txtkey(unsigned keyCode) {
@@ -4611,29 +4607,6 @@ unsigned frmchkfn() {
 	return badData.attribute;
 }
 
-void frmchkx() {
-	unsigned code = 0;
-
-	if (IniFile.dataCheck) {
-		code = frmchkfn();
-		switch (IniFile.dataCheck) {
-		case 1:
-			if (code)
-				datmsg(code);
-			break;
-		case 2:
-			if (code)
-				repar();
-			break;
-		case 3:
-			if (code) {
-				repar();
-				tabmsg(IDS_DATREP);
-			}
-		}
-	}
-}
-
 void bcup(unsigned find, BADCNTS& badData) {
 	FRMHED* formHeader;
 
@@ -4850,8 +4823,26 @@ void repar() {
 	shoMsg(repairMessage);
 }
 
-void tst() {
-	strcpy_s(IniFile.designerName, "Mr");
-	strcpy_s(ThrName, IniFile.designerName);
-	StateMap.set(StateFlag::RESTCH);
+void frmchkx() {
+	unsigned code = 0;
+
+	if (IniFile.dataCheck) {
+		code = frmchkfn();
+		switch (IniFile.dataCheck) {
+		case 1:
+			if (code)
+				datmsg(code);
+			break;
+		case 2:
+			if (code)
+				repar();
+			break;
+		case 3:
+			if (code) {
+				repar();
+				tabmsg(IDS_DATREP);
+			}
+		}
+	}
 }
+
