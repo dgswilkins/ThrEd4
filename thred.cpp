@@ -10362,22 +10362,22 @@ bool dunum(unsigned code) noexcept {
 	return 0;
 }
 
-void stchrct(fRECTANGLE* rectangle) noexcept {
+void stchrct(fRECTANGLE& rectangle) noexcept {
 	unsigned ind = 0;
 
 	if (PCSHeader.stitchCount) {
-		rectangle->bottom = rectangle->left = 1e10;
-		rectangle->top = rectangle->right = 0;
+		rectangle.bottom = rectangle.left = 1e10;
+		rectangle.top = rectangle.right = 0;
 		if (PCSHeader.stitchCount) {
 			for (ind = 0; ind < PCSHeader.stitchCount; ind++) {
-				if (StitchBuffer[ind].x < rectangle->left)
-					rectangle->left = StitchBuffer[ind].x;
-				if (StitchBuffer[ind].x > rectangle->right)
-					rectangle->right = StitchBuffer[ind].x;
-				if (StitchBuffer[ind].y < rectangle->bottom)
-					rectangle->bottom = StitchBuffer[ind].y;
-				if (StitchBuffer[ind].y > rectangle->top)
-					rectangle->top = StitchBuffer[ind].y;
+				if (StitchBuffer[ind].x < rectangle.left)
+					rectangle.left = StitchBuffer[ind].x;
+				if (StitchBuffer[ind].x > rectangle.right)
+					rectangle.right = StitchBuffer[ind].x;
+				if (StitchBuffer[ind].y < rectangle.bottom)
+					rectangle.bottom = StitchBuffer[ind].y;
+				if (StitchBuffer[ind].y > rectangle.top)
+					rectangle.top = StitchBuffer[ind].y;
 			}
 		}
 	}
@@ -10407,7 +10407,7 @@ void desiz() {
 	auto        stringTable = *StringTable;
 
 	if (PCSHeader.stitchCount) {
-		stchrct(&rectangle);
+		stchrct(rectangle);
 		xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
 		if ((rectangle.left < 0) || (rectangle.bottom < 0) || (rectangle.right > IniFile.hoopSizeX)

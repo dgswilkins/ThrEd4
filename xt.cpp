@@ -147,7 +147,7 @@ extern void               save();
 extern void               setmfrm();
 extern void               shoMsg(const std::string& message);
 extern void               shoseln(unsigned code0, unsigned code1);
-extern void               stchrct(fRECTANGLE* rectangle);
+extern void               stchrct(fRECTANGLE& rectangle);
 extern void               tabmsg(unsigned code);
 extern void               unbBox();
 extern void               unmsg();
@@ -158,7 +158,6 @@ unsigned short DaisyTypeStrings[] = {
 	IDS_DAZCRV, IDS_DAZSAW, IDS_DAZRMP, IDS_DAZRAG, IDS_DAZCOG, IDS_DAZHART,
 };
 
-fRECTANGLE             DesignSizeRect;                // design size rectangle
 float                  DesignAspectRatio;             // design aspect ratio
 HWND                   DesignSizeDialog;              // change design size dialog window
 fPOINT                 DesignSize;                    // design size
@@ -4219,49 +4218,50 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 }
 
 // ToDo - Find a better name
-void sadj(fPOINTATTR& stitch, const dPOINT& designSizeRatio) noexcept {
-	stitch.x = (stitch.x - DesignSizeRect.left) * designSizeRatio.x + DesignSizeRect.left;
-	stitch.y = (stitch.y - DesignSizeRect.bottom) * designSizeRatio.y + DesignSizeRect.bottom;
+void sadj(fPOINTATTR& stitch, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept {
+	stitch.x = (stitch.x - designSizeRect.left) * designSizeRatio.x + designSizeRect.left;
+	stitch.y = (stitch.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
 }
 
-void sadj(fPOINT& point, const dPOINT& designSizeRatio) noexcept {
-	point.x = (point.x - DesignSizeRect.left) * designSizeRatio.x + DesignSizeRect.left;
-	point.y = (point.y - DesignSizeRect.bottom) * designSizeRatio.y + DesignSizeRect.bottom;
+void sadj(fPOINT& point, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept {
+	point.x = (point.x - designSizeRect.left) * designSizeRatio.x + designSizeRect.left;
+	point.y = (point.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
 }
 
-void nudfn() {
+void nudfn(const fRECTANGLE& designSizeRect) {
 	unsigned iStitch = 0, iVertex = 0;
-	fPOINT   newSize = { (DesignSizeRect.right - DesignSizeRect.left), (DesignSizeRect.top - DesignSizeRect.bottom) };
+	fPOINT   newSize = { (designSizeRect.right - designSizeRect.left), (designSizeRect.top - designSizeRect.bottom) };
 
-	newSize.x              = DesignSizeRect.right - DesignSizeRect.left;
-	newSize.y              = DesignSizeRect.top - DesignSizeRect.bottom;
+	newSize.x              = designSizeRect.right - designSizeRect.left;
+	newSize.y              = designSizeRect.top - designSizeRect.bottom;
 	dPOINT designSizeRatio = { (DesignSize.x / newSize.x), (DesignSize.y / newSize.y) };
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
-		sadj(StitchBuffer[iStitch], designSizeRatio);
+		sadj(StitchBuffer[iStitch], designSizeRatio, designSizeRect);
 	for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
-		sadj(FormVertices[iVertex], designSizeRatio);
+		sadj(FormVertices[iVertex], designSizeRatio, designSizeRect);
 	frmout(ClosestFormToCursor);
 }
 
 void nudsiz() {
 	int      flag  = 0;
 	unsigned iForm = 0;
+	fRECTANGLE designSizeRect; // design size rectangle
 
 	savdo();
 	flag = 0;
 	if (PCSHeader.stitchCount) {
-		stchrct(&DesignSizeRect);
+		stchrct(designSizeRect);
 		flag = 1;
 	}
 	else {
 		if (FormIndex) {
-			frmrct(DesignSizeRect);
+			frmrct(designSizeRect);
 			flag = 2;
 		}
 	}
 	if (flag) {
-		DesignSize.x = DesignSizeRect.right - DesignSizeRect.left;
-		DesignSize.y = DesignSizeRect.top - DesignSizeRect.bottom;
+		DesignSize.x = designSizeRect.right - designSizeRect.left;
+		DesignSize.y = designSizeRect.top - designSizeRect.bottom;
 		if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, (DLGPROC)setsprc)) {
 			flag = 0;
 			if (DesignSize.x > IniFile.hoopSizeX) {
@@ -4274,7 +4274,7 @@ void nudsiz() {
 				UnzoomedRect.y    = IniFile.hoopSizeY;
 				flag              = 1;
 			}
-			nudfn();
+			nudfn(designSizeRect);
 			if (UserFlagMap.test(UserFlag::CHREF))
 				refilal();
 			if (flag) {
