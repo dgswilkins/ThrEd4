@@ -158,7 +158,6 @@ unsigned short DaisyTypeStrings[] = {
 	IDS_DAZCRV, IDS_DAZSAW, IDS_DAZRMP, IDS_DAZRAG, IDS_DAZCOG, IDS_DAZHART,
 };
 
-float                  DesignAspectRatio;             // design aspect ratio
 HWND                   DesignSizeDialog;              // change design size dialog window
 fPOINT                 DesignSize;                    // design size
 TXPNT                  TexturePointsBuffer[MAXITEMS]; // buffer for textured fill points
@@ -4159,10 +4158,10 @@ float getstxt(unsigned stringIndex) noexcept {
 	return atof(buffer) * PFGRAN;
 }
 
-bool chkasp(fPOINT& point) noexcept {
+bool chkasp(fPOINT& point, float aspectRatio) noexcept {
 	point.x = getstxt(IDC_DESWID);
 	point.y = getstxt(IDC_DESHI);
-	if ((point.y / point.x) == DesignAspectRatio)
+	if ((point.y / point.x) == aspectRatio)
 		return 1;
 	else
 		return 0;
@@ -4171,7 +4170,8 @@ bool chkasp(fPOINT& point) noexcept {
 BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	fPOINT designSize = {};
+	fPOINT designSize        = {};
+	float  designAspectRatio = 0.0; // design aspect ratio
 
 	DesignSizeDialog = hwndlg;
 	switch (umsg) {
@@ -4179,7 +4179,6 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 		setstxt(IDC_DESWID, DesignSize.x);
 		setstxt(IDC_DESHI, DesignSize.y);
-		DesignAspectRatio = DesignSize.y / DesignSize.x;
 		CheckDlgButton(hwndlg, IDC_REFILF, UserFlagMap.test(UserFlag::CHREF));
 		break;
 	case WM_COMMAND:
@@ -4205,11 +4204,12 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 				StateMap.set(StateFlag::DESCHG);
 			break;
 		case IDC_DUASP:
-			if (!chkasp(designSize)) {
+			designAspectRatio = DesignSize.y / DesignSize.x;
+			if (!chkasp(designSize, designAspectRatio)) {
 				if (StateMap.test(StateFlag::DESCHG))
-					setstxt(IDC_DESWID, designSize.y / DesignAspectRatio);
+					setstxt(IDC_DESWID, designSize.y / designAspectRatio);
 				else
-					setstxt(IDC_DESHI, designSize.x * DesignAspectRatio);
+					setstxt(IDC_DESHI, designSize.x * designAspectRatio);
 			}
 			break;
 		}
@@ -4243,9 +4243,9 @@ void nudfn(const fRECTANGLE& designSizeRect) {
 }
 
 void nudsiz() {
-	int      flag  = 0;
-	unsigned iForm = 0;
-	fRECTANGLE designSizeRect; // design size rectangle
+	int        flag           = 0;
+	unsigned   iForm          = 0;
+	fRECTANGLE designSizeRect = {}; // design size rectangle
 
 	savdo();
 	flag = 0;
