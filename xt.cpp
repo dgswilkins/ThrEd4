@@ -152,8 +152,7 @@ fPOINT                 DesignSize;                    // design size
 TXPNT                  TexturePointsBuffer[MAXITEMS]; // buffer for textured fill points
 int                    TextureIndex;                  // next textured fill point index
 unsigned               TextureWindowId;               // id of the window being updated
-char                   TextureInputBuffer[16];        // texture fill number buffer
-int                    TextureInputIndex;             // text number pointer
+std::string*           TextureInputBuffer;            // texture fill number buffer
 HWND                   SideWindowButton;              // button side window
 RECT                   TexturePixelRect;              // screen selected texture points rectangle
 TXTRCT                 TextureRect;                   // selected texture points rectangle
@@ -3472,10 +3471,13 @@ void txtlin() {
 }
 
 void chktxnum() {
-	float value;
-
-	value = atof(TextureInputBuffer);
+	float  value = 0;
+	size_t lastChar;
+	if (TextureInputBuffer->size()) {
+		value = stof(*TextureInputBuffer, &lastChar);
+	}
 	if (value) {
+		TextureInputBuffer->clear();
 		value *= PFGRAN;
 		switch (TextureWindowId) {
 		case HTXHI:
@@ -3499,7 +3501,6 @@ void chktxnum() {
 			break;
 		}
 	}
-	TextureInputIndex = 0;
 	DestroyWindow(SideWindowButton);
 	SideWindowButton = 0;
 	StateMap.set(StateFlag::RESTCH);
@@ -3991,25 +3992,27 @@ void txtkey(unsigned keyCode) {
 			chktxnum();
 			return;
 		case VK_ESCAPE:
-			txof();
+			rstxt();
+			StateMap.set(StateFlag::RESTCH);
+			break;
 		case 'Q':
 			rstxt();
 			StateMap.set(StateFlag::RESTCH);
 			break;
 		case 8: // backspace
-			if (TextureInputIndex)
-				TextureInputIndex--;
+			if (TextureInputBuffer->size())
+				TextureInputBuffer->pop_back();
 			flag = false;
 			break;
 		}
 		if (flag) {
-			if (txdig(keyCode, character)) {
-				TextureInputBuffer[TextureInputIndex] = character;
-				TextureInputIndex++;
+			if (TextureInputBuffer->size() < 8) { // floating point 7 digits of precision + '.'
+				if (txdig(keyCode, character)) {
+					TextureInputBuffer->push_back(character);
+				}
 			}
 		}
-		TextureInputBuffer[TextureInputIndex] = 0;
-		SetWindowText(SideWindowButton, TextureInputBuffer);
+		SetWindowText(SideWindowButton, TextureInputBuffer->c_str());
 		return;
 	}
 	switch (keyCode) {
@@ -4845,4 +4848,3 @@ void frmchkx() {
 		}
 	}
 }
-

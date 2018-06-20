@@ -380,6 +380,7 @@ extern std::vector<fPOINT>*      TempPolygon;
 extern std::vector<TXPNT>*       TempTexturePoints;
 extern TXTSCR                    TextureScreen;
 extern int                       TextureIndex;
+extern std::string*              TextureInputBuffer; // texture editor number buffer
 extern TXPNT                     TexturePointsBuffer[MAXITEMS];
 extern unsigned                  VertexCount;
 extern double                    VerticalRatio;
@@ -19348,6 +19349,8 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 		SelectedPointsLine = &private_SelectedPointsLine;
 		std::vector<double> private_FormAngles;
 		FormAngles = &private_FormAngles;
+		std::string private_textureInputBuffer;
+		TextureInputBuffer = &private_textureInputBuffer;
 
 		redini();
 		if (IniFile.initialWindowCoords.right) {
