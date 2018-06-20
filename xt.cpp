@@ -3471,8 +3471,9 @@ void txtlin() {
 }
 
 void chktxnum() {
-	float  value = 0;
-	size_t lastChar;
+	float  value    = 0;
+	size_t lastChar = 0;
+
 	if (TextureInputBuffer->size()) {
 		value = stof(*TextureInputBuffer, &lastChar);
 	}
