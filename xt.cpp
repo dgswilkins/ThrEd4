@@ -149,7 +149,7 @@ unsigned short DaisyTypeStrings[] = {
 };
 
 fPOINT                 DesignSize;                    // design size
-TXPNT                  TexturePointsBuffer[MAXITEMS]; // buffer for textured fill points
+std::vector<TXPNT>     TexturePointsBuffer;           // buffer for textured fill points
 int                    TextureIndex;                  // next textured fill point index
 unsigned               TextureWindowId;               // id of the window being updated
 std::string*           TextureInputBuffer;            // texture fill number buffer
@@ -220,24 +220,6 @@ bool istx(unsigned iForm) noexcept {
 	if (pfrm->fillType == TXANGF)
 		return 1;
 	return 0;
-}
-
-TXPNT* adtx(int count) noexcept {
-	unsigned iPoint = TextureIndex;
-
-	TextureIndex += count;
-	return &TexturePointsBuffer[iPoint];
-}
-
-void txspac(int start, unsigned count) noexcept {
-	unsigned iForm;
-
-	MoveMemory(&TexturePointsBuffer[start + count], &TexturePointsBuffer[start], (TextureIndex - start) * sizeof(TXPNT));
-	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-		if (istx(iForm))
-			FormList[iForm].fillInfo.texture.index += count;
-	}
-	TextureIndex += count;
 }
 
 void rstxt() {
@@ -647,28 +629,33 @@ void deltx() {
 		}
 		// Only if it is not shared, should the texture be deleted
 		if (!flag) {
-			std::vector<TXPNT> textureBuffer(TextureIndex);
+			std::vector<TXPNT> textureBuffer;
+			textureBuffer.reserve(TextureIndex);
 			iBuffer = 0;
 			for (iForm = 0; iForm < ClosestFormToCursor; iForm++) {
 				if (istx(iForm)) {
-					MoveMemory(&textureBuffer[iBuffer],
-					           &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index],
-					           FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
+					auto startSource = TexturePointsBuffer.cbegin() + FormList[iForm].fillInfo.texture.index;
+					auto endSource   = startSource + FormList[iForm].fillInfo.texture.count;
+					textureBuffer.resize(textureBuffer.size() + FormList[iForm].fillInfo.texture.count);
+					auto destination = textureBuffer.begin() + iBuffer;
+					auto _ = std::copy(startSource, endSource, destination);
 					FormList[iForm].fillInfo.texture.index = iBuffer;
 					iBuffer += FormList[iForm].fillInfo.texture.count;
 				}
 			}
 			for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 				if (istx(iForm)) {
-					MoveMemory(&textureBuffer[iBuffer],
-					           &TexturePointsBuffer[FormList[iForm].fillInfo.texture.index],
-					           FormList[iForm].fillInfo.texture.count * sizeof(TXPNT));
+					auto startSource = TexturePointsBuffer.cbegin() + FormList[iForm].fillInfo.texture.index;
+					auto endSource   = startSource + FormList[iForm].fillInfo.texture.count;
+					textureBuffer.resize(textureBuffer.size() + FormList[iForm].fillInfo.texture.count);
+					auto destination = textureBuffer.begin() + iBuffer;
+					auto _ = std::copy(startSource, endSource, destination);
 					FormList[iForm].fillInfo.texture.index = iBuffer;
 					iBuffer += FormList[iForm].fillInfo.texture.count;
 				}
 			}
-			TextureIndex = iBuffer;
-			MoveMemory(&TexturePointsBuffer[0], &textureBuffer[0], iBuffer * sizeof(TXPNT));
+			TextureIndex        = iBuffer;
+			TexturePointsBuffer = textureBuffer;
 		}
 		FormList[ClosestFormToCursor].fillType = 0;
 	}
@@ -3579,19 +3566,17 @@ void txang() {
 }
 
 void nutx() {
-	int     iForm = 0, iPoint = 0;
-	FRMHED* formHeader = nullptr;
+	unsigned iForm = 0, iPoint = 0;
+	FRMHED*  formHeader = nullptr;
 
-	// ToDo - replace with std::sort
 	std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txcmp);
-	iPoint = 0;
 	if (FormIndex) {
 		if (istx(ClosestFormToCursor)) {
 			iPoint = FormList[ClosestFormToCursor].fillInfo.texture.index;
 			deltx();
 		}
 		else {
-			for (iForm = ClosestFormToCursor - 1; iForm >= 0; iForm--) {
+			for (iForm = ClosestFormToCursor; iForm-- > 0;) {
 				if (istx(iForm)) {
 					formHeader = &FormList[iForm];
 					iPoint     = formHeader->fillInfo.texture.index + formHeader->fillInfo.texture.count;
@@ -3600,11 +3585,25 @@ void nutx() {
 			}
 		}
 	}
-	txspac(iPoint, TempTexturePoints->size());
-	// ToDo is there a better way to copy?
-	MoveMemory(&TexturePointsBuffer[iPoint], TempTexturePoints->data(), TempTexturePoints->size() * sizeof(TXPNT));
-	SelectedForm->fillInfo.texture.index = iPoint;
-	SelectedForm->fillInfo.texture.count = gsl::narrow<unsigned short>(TempTexturePoints->size());
+	if (TempTexturePoints->size()) {
+		const auto tempPointCount = TempTexturePoints->size();
+		const auto pointCount     = TextureIndex - iPoint;
+		TexturePointsBuffer.resize(TexturePointsBuffer.size() + tempPointCount);
+		TextureIndex += tempPointCount;
+		auto startSource = TexturePointsBuffer.begin() + iPoint;
+		if (pointCount) {
+			auto endSource   = startSource + pointCount;
+			auto destination = startSource + tempPointCount;
+			auto _           = std::copy(startSource, endSource, destination);
+		}
+		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+			if (istx(iForm))
+				FormList[iForm].fillInfo.texture.index += gsl::narrow<unsigned short>(tempPointCount);
+		}
+		auto _ = std::copy(TempTexturePoints->cbegin(), TempTexturePoints->cend(), startSource);
+		SelectedForm->fillInfo.texture.index = iPoint;
+		SelectedForm->fillInfo.texture.count = gsl::narrow<unsigned short>(tempPointCount);
+	}
 }
 
 // Ensure all lines in the texture have at least 1 point
@@ -4096,24 +4095,22 @@ void txtkey(unsigned keyCode) {
 }
 
 void setxt(std::vector<RNGCNT>& textureSegments) {
-	const TXPNT* currentFormTexture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
-	if (currentFormTexture) {
-		int       iTexturePoint = 0, iSegment = 0;
-		const int count = SelectedForm->fillInfo.texture.count;
+	const auto currentIndex = SelectedForm->fillInfo.texture.index;
+	const auto currentCount = SelectedForm->fillInfo.texture.count;
 
-		savtxt();
-		SelectedForm->wordParam = 0;
-		StateMap.set(StateFlag::TXFIL);
-		ClipRectSize.cx = SelectedForm->fillSpacing;
-		ClipRectSize.cy = SelectedForm->fillInfo.texture.height;
-		if (count) {
-			// ToDo - why is this reversed?
-			for (iTexturePoint = count - 1; iTexturePoint >= 0; iTexturePoint--) {
-				if (currentFormTexture[iTexturePoint].line) {
-					iSegment                       = currentFormTexture[iTexturePoint].line - 1;
-					textureSegments[iSegment].line = iTexturePoint;
-					textureSegments[iSegment].stitchCount++;
-				}
+	savtxt();
+	SelectedForm->wordParam = 0;
+	StateMap.set(StateFlag::TXFIL);
+	ClipRectSize.cx = SelectedForm->fillSpacing;
+	ClipRectSize.cy = SelectedForm->fillInfo.texture.height;
+	if (currentCount) {
+		int iSegment = 0;
+		for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; iTexturePoint--) {
+			const auto currentPoint = TexturePointsBuffer[currentIndex + iTexturePoint];
+			if (currentPoint.line) {
+				iSegment                       = currentPoint.line - 1;
+				textureSegments[iSegment].line = iTexturePoint;
+				textureSegments[iSegment].stitchCount++;
 			}
 		}
 	}
@@ -4121,13 +4118,18 @@ void setxt(std::vector<RNGCNT>& textureSegments) {
 
 void rtrtx() {
 	fvars(ClosestFormToCursor);
-	const TXPNT* currentFormTexture = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index];
-	if (currentFormTexture) {
-		TempTexturePoints->clear();
-		TempTexturePoints->reserve(SelectedForm->fillInfo.texture.count);
-		for (auto i = 0u; i < SelectedForm->fillInfo.texture.count; i++) {
-			TempTexturePoints->push_back(currentFormTexture[i]);
+	TempTexturePoints->clear();
+
+	const auto currentIndex = SelectedForm->fillInfo.texture.index;
+	if (TexturePointsBuffer.size() > gsl::narrow<size_t>(currentIndex)) {
+		auto currentCount = SelectedForm->fillInfo.texture.count;
+		if (TexturePointsBuffer.size() < gsl::narrow<size_t>(currentIndex + currentCount)) {
+			currentCount = gsl::narrow<unsigned short>(TexturePointsBuffer.size()) - currentIndex;
 		}
+		TempTexturePoints->resize(currentCount);
+		auto startSource = TexturePointsBuffer.cbegin() + currentIndex;
+		auto endSource   = startSource + currentCount;
+		auto _ = std::copy(startSource, endSource, TempTexturePoints->begin());
 		TextureScreen.areaHeight = SelectedForm->fillInfo.texture.height;
 		TextureScreen.spacing    = SelectedForm->fillSpacing;
 		TextureScreen.lines      = SelectedForm->fillInfo.texture.lines;

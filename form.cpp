@@ -176,7 +176,7 @@ extern POINT                     StitchWindowOrigin;
 extern POINT                     StitchWindowSize;
 extern std::vector<std::string>* StringTable;
 extern int                       TextureIndex;
-extern TXPNT                     TexturePointsBuffer[MAXITEMS];
+extern std::vector<TXPNT>        TexturePointsBuffer;
 extern HINSTANCE                 ThrEdInstance;
 extern HWND                      ThrEdWindow;
 extern POINT                     ThredWindowOrigin;
