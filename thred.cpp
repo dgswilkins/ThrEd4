@@ -380,7 +380,7 @@ extern std::vector<TXPNT>*       TempTexturePoints;
 extern TXTSCR                    TextureScreen;
 extern int                       TextureIndex;
 extern std::string*              TextureInputBuffer; // texture editor number buffer
-extern std::vector<TXPNT>        TexturePointsBuffer;
+extern std::vector<TXPNT>*        TexturePointsBuffer;
 extern unsigned                  VertexCount;
 extern double                    VerticalRatio;
 extern unsigned short            SatinEndGuide;
@@ -1876,8 +1876,8 @@ void dudat() {
 		backupData->texturePoints     = convert_ptr<TXPNT*>(&backupData->colors[16]);
 		backupData->texturePointCount = TextureIndex;
 		if (TextureIndex) {
-			std::copy(TexturePointsBuffer.cbegin(),
-			          TexturePointsBuffer.cend(),
+			std::copy(TexturePointsBuffer->cbegin(),
+			          TexturePointsBuffer->cend(),
 			          stdext::make_checked_array_iterator(backupData->texturePoints, TextureIndex));
 		}
 	}
@@ -4120,7 +4120,7 @@ void dubuf(char* const buffer, unsigned& count) {
 			durit(&output, &points[0], points.size() * sizeof(points[0]));
 		}
 		if (TextureIndex) {
-			durit(&output, TexturePointsBuffer.data(), TextureIndex * sizeof(TXPNT));
+			durit(&output, TexturePointsBuffer->data(), TextureIndex * sizeof(TXPNT));
 		}
 	}
 	count = output - buffer;
@@ -5181,11 +5181,11 @@ void redbak() {
 		}
 		for (iColor = 0; iColor < 16; iColor++)
 			redraw(UserColorWin[iColor]);
-		TexturePointsBuffer.resize(undoData->texturePointCount);
+		TexturePointsBuffer->resize(undoData->texturePointCount);
 		TextureIndex = undoData->texturePointCount;
 		if (TextureIndex) {
-			std::copy(TexturePointsBuffer.cbegin(),
-			          TexturePointsBuffer.cend(),
+			std::copy(TexturePointsBuffer->cbegin(),
+			          TexturePointsBuffer->cend(),
 			          stdext::make_checked_array_iterator(undoData->texturePoints, TextureIndex));
 		}
 		coltab();
@@ -5969,9 +5969,9 @@ void nuFil() {
 							StateMap.set(StateFlag::BADFIL);
 						}
 						if (ExtendedHeader.texturePointCount) {
-							TexturePointsBuffer.resize(ExtendedHeader.texturePointCount);
+							TexturePointsBuffer->resize(ExtendedHeader.texturePointCount);
 							ReadFile(FileHandle,
-							         TexturePointsBuffer.data(),
+							         TexturePointsBuffer->data(),
 							         ExtendedHeader.texturePointCount * sizeof(TXPNT),
 							         &BytesRead,
 							         0);
@@ -7657,7 +7657,7 @@ void duclip() {
 						for (auto selectedForm : (*SelectedFormList)) {
 							SelectedForm = &FormList[selectedForm];
 							if (istx(selectedForm)) {
-								auto startPoint = TexturePointsBuffer.cbegin() + SelectedForm->fillInfo.texture.index;
+								auto startPoint = TexturePointsBuffer->cbegin() + SelectedForm->fillInfo.texture.index;
 								auto endPoint   = startPoint + SelectedForm->fillInfo.texture.count;
 								std::copy(startPoint,
 								          endPoint,
@@ -7745,7 +7745,7 @@ void duclip() {
 							}
 							TXPNT* textures = convert_ptr<TXPNT*>(&points[iClip]);
 							if (istx(ClosestFormToCursor)) {
-								auto startPoint = TexturePointsBuffer.cbegin() + SelectedForm->fillInfo.texture.index;
+								auto startPoint = TexturePointsBuffer->cbegin() + SelectedForm->fillInfo.texture.index;
 								auto endPoint   = startPoint + SelectedForm->fillInfo.texture.count;
 								std::copy(startPoint,
 								          endPoint,
@@ -8847,7 +8847,7 @@ void insfil() {
 						         fileHeader.clipDataCount * sizeof(fPOINT),
 						         &BytesRead,
 						         0);
-						TexturePointsBuffer.resize(TexturePointsBuffer.size() + ExtendedHeader.texturePointCount);
+						TexturePointsBuffer->resize(TexturePointsBuffer->size() + ExtendedHeader.texturePointCount);
 						ReadFile(InsertedFileHandle,
 						         &TexturePointsBuffer[TextureIndex],
 						         ExtendedHeader.texturePointCount * sizeof(TXPNT),
@@ -16230,8 +16230,8 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 									SelectedForm->fillInfo.texture.index += TextureIndex;
 								}
 							}
-							TexturePointsBuffer.resize(TexturePointsBuffer.size() + textureCount);
-							auto textureDestination = TexturePointsBuffer.begin() + TextureIndex;
+							TexturePointsBuffer->resize(TexturePointsBuffer->size() + textureCount);
+							auto textureDestination = TexturePointsBuffer->begin() + TextureIndex;
 							auto _ = std::copy(textureSource, textureSource + textureCount, textureDestination);
 							TextureIndex += textureCount;
 							GlobalUnlock(ClipMemory);
@@ -16292,8 +16292,8 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 									SelectedForm->fillInfo.texture.index = TextureIndex;
 
 									auto currentCount = SelectedForm->fillInfo.texture.count;
-									TexturePointsBuffer.resize(TexturePointsBuffer.size() + currentCount);
-									auto iter = TexturePointsBuffer.begin() + TextureIndex;
+									TexturePointsBuffer->resize(TexturePointsBuffer->size() + currentCount);
+									auto iter = TexturePointsBuffer->begin() + TextureIndex;
 									TextureIndex += currentCount;
 									const auto _ = std::copy(textureSource, textureSource + currentCount, iter);
 								}
@@ -19370,6 +19370,8 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 		FormAngles = &private_FormAngles;
 		std::string private_textureInputBuffer;
 		TextureInputBuffer = &private_textureInputBuffer;
+		std::vector<TXPNT> private_TexturePointsBuffer;
+		TexturePointsBuffer = &private_TexturePointsBuffer;
 
 		redini();
 		if (IniFile.initialWindowCoords.right) {

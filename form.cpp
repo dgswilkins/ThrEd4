@@ -176,7 +176,7 @@ extern POINT                     StitchWindowOrigin;
 extern POINT                     StitchWindowSize;
 extern std::vector<std::string>* StringTable;
 extern int                       TextureIndex;
-extern std::vector<TXPNT>        TexturePointsBuffer;
+extern std::vector<TXPNT>*        TexturePointsBuffer;
 extern HINSTANCE                 ThrEdInstance;
 extern HWND                      ThrEdWindow;
 extern POINT                     ThredWindowOrigin;
@@ -4145,14 +4145,14 @@ void prebrd() noexcept {
 	    = { (CurrentFormVertices[1].x - CurrentFormVertices[0].x), (CurrentFormVertices[1].y - CurrentFormVertices[0].y) };
 	double ratio = 0.0;
 
-	MoveMemory(&AngledFormVertices[1], CurrentFormVertices, sizeof(fPOINT) * VertexCount);
+	std::copy(CurrentFormVertices, CurrentFormVertices + VertexCount, stdext::make_checked_array_iterator((AngledFormVertices + 1), (20000 - 1)));
 	if (fabs(delta.x) > fabs(delta.y))
 		ratio = fabs(0.1 / delta.x);
 	else
 		ratio = fabs(0.1 / delta.y);
 	AngledFormVertices[0].x = CurrentFormVertices[0].x - delta.x * ratio;
 	AngledFormVertices[0].y = CurrentFormVertices[0].y - delta.y * ratio;
-	MoveMemory(&AngledForm, SelectedForm, sizeof(FRMHED));
+	AngledForm              = *SelectedForm;
 	AngledForm.vertices = AngledFormVertices;
 	AngledForm.vertexCount += 3;
 	delta.x = CurrentFormVertices[VertexCount - 1].x - CurrentFormVertices[VertexCount - 2].x;
@@ -4921,7 +4921,7 @@ void clpcon(const std::vector<RNGCNT>& textureSegments) {
 		if (StateMap.test(StateFlag::TXFIL)) {
 			textureLine        = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
 			ClipStitchCount    = textureSegments[textureLine].stitchCount;
-			texture            = &TexturePointsBuffer[SelectedForm->fillInfo.texture.index + textureSegments[textureLine].line];
+			texture            = &TexturePointsBuffer->at(SelectedForm->fillInfo.texture.index + textureSegments[textureLine].line);
 			LineSegmentStart.x = pasteLocation.x;
 			if (SelectedForm->txof) {
 				lineOffset         = (iRegion + clipGrid.left) / SelectedForm->fillInfo.texture.lines;
