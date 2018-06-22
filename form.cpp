@@ -176,7 +176,7 @@ extern POINT                     StitchWindowOrigin;
 extern POINT                     StitchWindowSize;
 extern std::vector<std::string>* StringTable;
 extern int                       TextureIndex;
-extern std::vector<TXPNT>*        TexturePointsBuffer;
+extern std::vector<TXPNT>*       TexturePointsBuffer;
 extern HINSTANCE                 ThrEdInstance;
 extern HWND                      ThrEdWindow;
 extern POINT                     ThredWindowOrigin;
@@ -428,7 +428,9 @@ void delmclp(unsigned iForm) {
 		if (isclp(iForm)) {
 			destination = findclp(iForm);
 			source      = destination + FormList[iForm].lengthOrCount.clipCount;
-			MoveMemory(&ClipPoints[destination], &ClipPoints[source], sizeof(fPOINT) * (ClipPointIndex - source));
+			std::copy(ClipPoints + source,
+			          ClipPoints + ClipPointIndex,
+			          stdext::make_checked_array_iterator((ClipPoints + destination), (MAXITEMS - destination)));
 			if (iseclp(iForm))
 				FormList[iForm].borderClipData -= FormList[iForm].lengthOrCount.clipCount;
 			clpsub(iForm, FormList[iForm].lengthOrCount.clipCount);
@@ -1866,7 +1868,9 @@ void frmovlin() {
 
 void makspac(unsigned start, unsigned count) noexcept {
 	if (!chkmax(PCSHeader.stitchCount, count)) {
-		MoveMemory(&StitchBuffer[start + count], &StitchBuffer[start], sizeof(fPOINTATTR) * (PCSHeader.stitchCount - start));
+		std::copy(StitchBuffer + start,
+		          StitchBuffer + PCSHeader.stitchCount,
+		          stdext::make_checked_array_iterator(StitchBuffer + start + count, MAXITEMS - (start + count)));
 		PCSHeader.stitchCount += count;
 	}
 }
@@ -4145,7 +4149,9 @@ void prebrd() noexcept {
 	    = { (CurrentFormVertices[1].x - CurrentFormVertices[0].x), (CurrentFormVertices[1].y - CurrentFormVertices[0].y) };
 	double ratio = 0.0;
 
-	std::copy(CurrentFormVertices, CurrentFormVertices + VertexCount, stdext::make_checked_array_iterator((AngledFormVertices + 1), (20000 - 1)));
+	std::copy(CurrentFormVertices,
+	          CurrentFormVertices + VertexCount,
+	          stdext::make_checked_array_iterator((AngledFormVertices + 1), (20000 - 1)));
 	if (fabs(delta.x) > fabs(delta.y))
 		ratio = fabs(0.1 / delta.x);
 	else
@@ -4153,7 +4159,7 @@ void prebrd() noexcept {
 	AngledFormVertices[0].x = CurrentFormVertices[0].x - delta.x * ratio;
 	AngledFormVertices[0].y = CurrentFormVertices[0].y - delta.y * ratio;
 	AngledForm              = *SelectedForm;
-	AngledForm.vertices = AngledFormVertices;
+	AngledForm.vertices     = AngledFormVertices;
 	AngledForm.vertexCount += 3;
 	delta.x = CurrentFormVertices[VertexCount - 1].x - CurrentFormVertices[VertexCount - 2].x;
 	delta.y = CurrentFormVertices[VertexCount - 1].y - CurrentFormVertices[VertexCount - 2].y;
@@ -4919,9 +4925,9 @@ void clpcon(const std::vector<RNGCNT>& textureSegments) {
 		pasteLocation.x     = ClipWidth * (iRegion + clipGrid.left);
 		clipVerticalOffset  = 0;
 		if (StateMap.test(StateFlag::TXFIL)) {
-			textureLine        = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
-			ClipStitchCount    = textureSegments[textureLine].stitchCount;
-			texture            = &TexturePointsBuffer->at(SelectedForm->fillInfo.texture.index + textureSegments[textureLine].line);
+			textureLine     = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
+			ClipStitchCount = textureSegments[textureLine].stitchCount;
+			texture         = &TexturePointsBuffer->at(SelectedForm->fillInfo.texture.index + textureSegments[textureLine].line);
 			LineSegmentStart.x = pasteLocation.x;
 			if (SelectedForm->txof) {
 				lineOffset         = (iRegion + clipGrid.left) / SelectedForm->fillInfo.texture.lines;
@@ -6451,7 +6457,9 @@ void satadj() {
 		sourceGuide = destinationGuide = SelectedForm->satinOrAngle.guide;
 		destinationGuide += SelectedForm->satinGuideCount;
 		sourceGuide += savedGuideCount;
-		MoveMemory(destinationGuide, sourceGuide, sizeof(SATCON) * (&SatinGuides[SatinGuideIndex] - sourceGuide + 1));
+		std::copy(sourceGuide,
+		          (&SatinGuides[SatinGuideIndex] + 1),
+		          stdext::make_checked_array_iterator(destinationGuide, 10000 - SatinGuideIndex));
 		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			formHeader = &FormList[iForm];
 			if (formHeader->type == SAT)
@@ -7487,8 +7495,11 @@ void delcon(unsigned GuideIndex) {
 	SATCON*        guide  = &SelectedForm->satinOrAngle.guide[GuideIndex];
 
 	if (guide) {
-		if (SatinGuideIndex > iGuide)
-			MoveMemory(guide, &guide[1], (SatinGuideIndex - iGuide + 1) * sizeof(SATCON));
+		if (SatinGuideIndex > iGuide) {
+			// Todo - use std::vector & member erase() ?
+			std::copy(
+			    guide + 1, guide + (SatinGuideIndex - iGuide + 1), stdext::make_checked_array_iterator(guide, SatinGuideIndex));
+		}
 		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			FRMHED* formHeader = &FormList[iForm];
 			if (formHeader->type == SAT && formHeader->satinGuideCount)
@@ -7958,9 +7969,11 @@ void delspnt() {
 			}
 		}
 	}
-	MoveMemory(&SelectedForm->vertices[ClosestVertexToCursor],
-	           &SelectedForm->vertices[ClosestVertexToCursor + 1],
-	           (FormVertexIndex - ClosestVertexToCursor) * sizeof(fPOINTATTR));
+	// ToDo - convert to vector and use erase()
+	std::copy(SelectedForm->vertices + ClosestVertexToCursor + 1,
+	          SelectedForm->vertices + FormVertexIndex,
+	          stdext::make_checked_array_iterator(SelectedForm->vertices + ClosestVertexToCursor,
+	                                              FormVertexIndex - (ClosestVertexToCursor + 1)));
 	SelectedForm->vertexCount--;
 	FormVertexIndex--;
 	fvars(ClosestFormToCursor);
@@ -8821,8 +8834,9 @@ void setstrtch() {
 	long       offsetY = 0, offsetX = 0;
 
 	savdo();
-	if (StateMap.test(StateFlag::FPSEL))
-		MoveMemory(&stitchRect, &SelectedPointsLine, sizeof(fRECTANGLE));
+	if (StateMap.test(StateFlag::FPSEL)) {
+		stitchRect = SelectedVerticesRect;
+	}
 	else {
 		if (SelectedFormList->size() || StateMap.test(StateFlag::BIGBOX))
 			pxrct2stch(SelectedFormsRect, stitchRect);
@@ -8833,7 +8847,7 @@ void setstrtch() {
 		}
 	}
 	switch (SelectedFormControlVertex) {
-	case 0:
+	case 0: // top control
 		if (SelectedFormList->size() || StateMap.test(StateFlag::BIGBOX) || StateMap.test(StateFlag::FPSEL)) {
 			reference = stitchRect.bottom;
 			offsetY   = Msg.pt.y - StitchWindowOrigin.y;
@@ -8851,7 +8865,7 @@ void setstrtch() {
 			}
 		}
 		break;
-	case 1:
+	case 1: // right control
 		if (SelectedFormList->size() || StateMap.test(StateFlag::BIGBOX) || StateMap.test(StateFlag::FPSEL)) {
 			reference = stitchRect.left;
 			offsetX   = Msg.pt.x - StitchWindowOrigin.x;
@@ -8869,7 +8883,7 @@ void setstrtch() {
 			}
 		}
 		break;
-	case 2:
+	case 2: // bottom control
 		if (SelectedFormList->size() || StateMap.test(StateFlag::BIGBOX) || StateMap.test(StateFlag::FPSEL)) {
 			reference = stitchRect.top;
 			offsetY   = Msg.pt.y - StitchWindowOrigin.y;
@@ -8887,7 +8901,7 @@ void setstrtch() {
 			}
 		}
 		break;
-	case 3:
+	case 3: // left control
 		if (SelectedFormList->size() || StateMap.test(StateFlag::BIGBOX) || StateMap.test(StateFlag::FPSEL)) {
 			reference = stitchRect.right;
 			offsetX   = Msg.pt.x - StitchWindowOrigin.x;
@@ -8906,7 +8920,7 @@ void setstrtch() {
 		}
 		break;
 	}
-	if (SelectedFormControlVertex & 1) {
+	if (SelectedFormControlVertex & 1) { // right or left control selected
 		if (StateMap.test(StateFlag::FPSEL)) {
 			fvars(ClosestFormToCursor);
 			currentVertex = SelectedFormVertices.start;
@@ -8916,6 +8930,7 @@ void setstrtch() {
 			}
 			frmout(ClosestFormToCursor);
 			setpsel();
+			refil();
 			StateMap.set(StateFlag::RESTCH);
 			return;
 		}
@@ -10363,11 +10378,15 @@ void cplayfn(unsigned iForm, unsigned play) {
 	*SelectedForm = *formHeader;
 	fvars(FormIndex);
 	SelectedForm->vertices = adflt(SelectedForm->vertexCount);
-	MoveMemory(SelectedForm->vertices, formHeader->vertices, VertexCount * sizeof(fPOINT));
+	std::copy(formHeader->vertices,
+	          formHeader->vertices + VertexCount,
+	          stdext::make_checked_array_iterator(SelectedForm->vertices, MAXITEMS - FormVertexIndex));
 	if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
 		SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
-		MoveMemory(
-		    SelectedForm->satinOrAngle.guide, formHeader->satinOrAngle.guide, SelectedForm->satinGuideCount * sizeof(SATCON));
+		auto sourceStart                 = formHeader->satinOrAngle.guide;
+		auto sourceEnd                   = sourceStart + SelectedForm->satinGuideCount;
+		auto destination = stdext::make_checked_array_iterator(SelectedForm->satinOrAngle.guide, 10000 - SatinGuideIndex);
+		std::copy(sourceStart, sourceEnd, destination);
 	}
 	SelectedForm->clipEntries             = 0;
 	SelectedForm->fillType                = 0;
@@ -12127,7 +12146,8 @@ void srtfrm() {
 			iHighStitch                   = histogram[iForm]++;
 			highStitchBuffer[iHighStitch] = StitchBuffer[iStitch];
 		}
-		MoveMemory(StitchBuffer, &highStitchBuffer[0], sizeof(fPOINTATTR) * PCSHeader.stitchCount);
+		std::copy(
+		    highStitchBuffer.cbegin(), highStitchBuffer.cend(), stdext::make_checked_array_iterator(StitchBuffer, MAXITEMS));
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
