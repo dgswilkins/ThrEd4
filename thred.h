@@ -1092,55 +1092,6 @@ typedef union _satinOrAngle {
 #define EGPIC_LINS 7
 #define EGCHN_LINS 6
 
-// Original form header used prior to version 2
-typedef struct _frmhedo {
-	unsigned char  attribute;       // attribute
-	unsigned short vertexCount;     // number of sides
-	unsigned char  type;            // type
-	unsigned char  fillColor;       // fill color
-	unsigned char  borderColor;     // border color
-	unsigned short clipEntries;     // number of border clipboard entries
-	fPOINT*        vertices;        // points
-	SATINANGLE     satinOrAngle;    // satin guidlines or angle clipboard fill angle
-	fPOINT*        borderClipData;  // border clipboard data
-	unsigned short satinGuideCount; // number of satin guidlines
-	unsigned short wordParam;       // word parameter
-	fRECTANGLE     rectangle;       // rectangle
-	unsigned char  fillType;        // fill type
-	unsigned char  edgeType;        // edge type
-	float          fillSpacing;     // fill spacing
-	FLENCNT        lengthOrCount;   // fill stitch length or clipboard count
-	FANGCLP        angleOrClipData; // fill angle or clipboard data pointer
-	float          borderSize;      // border size
-	float          edgeSpacing;     // edge spacing
-	float          edgeStitchLen;   // edge stitch length
-	unsigned short res;             // pico length
-} FRMHEDO;
-
-#define FRMEND 1
-#define FRMLMSK 0x0e
-#define NFRMLMSK 0xf1
-
-/*form attribute bits
-
-  1		end teflon line
-  2-4	layer bits
-  5		finish blunt
-  6		start blunt
-  7		refill bit for contour fill
-*/
-
-// blunt bits
-#define FBLNT 0x20
-#define SBLNT 0x40
-#define NFBLNT 0xdf
-#define NSBLNT 0xbf
-#define NOBLNT 0x9f
-
-// contour refil
-#define FRECONT 0x80
-#define NFRECONT 0x7f
-
 typedef struct _featherInfo {
 	unsigned char  fillType;      // feather fill type
 	unsigned char  upCount;       // feather up count
@@ -1163,7 +1114,36 @@ typedef union _tfhed {
 	TXTRINFO texture;
 } TFINFO;
 
-typedef struct _frmhed {
+// Original form header used prior to version 2
+class FRMHEDO
+{
+public:
+	unsigned char  attribute;       // attribute
+	unsigned short vertexCount;     // number of sides
+	unsigned char  type;            // type
+	unsigned char  fillColor;       // fill color
+	unsigned char  borderColor;     // border color
+	unsigned short clipEntries;     // number of border clipboard entries
+	fPOINT*        vertices;        // points
+	SATINANGLE     satinOrAngle;    // satin guidlines or angle clipboard fill angle
+	fPOINT*        borderClipData;  // border clipboard data
+	unsigned short satinGuideCount; // number of satin guidlines
+	unsigned short wordParam;       // word parameter
+	fRECTANGLE     rectangle;       // rectangle
+	unsigned char  fillType;        // fill type
+	unsigned char  edgeType;        // edge type
+	float          fillSpacing;     // fill spacing
+	FLENCNT        lengthOrCount;   // fill stitch length or clipboard count
+	FANGCLP        angleOrClipData; // fill angle or clipboard data pointer
+	float          borderSize;      // border size
+	float          edgeSpacing;     // edge spacing
+	float          edgeStitchLen;   // edge stitch length
+	unsigned short res;             // pico length
+} ;
+
+class FRMHED
+{
+public:
 	unsigned char  attribute;       // attribute
 	unsigned short vertexCount;     // number of sides
 	unsigned char  type;            // type
@@ -1201,7 +1181,54 @@ typedef struct _frmhed {
 	float          txof;                // gradient end density
 	unsigned char  underlayColor;       // underlay color
 	unsigned char  cres;                // reserved
-} FRMHED;
+
+	inline FRMHED& operator=(const FRMHEDO& rhs) noexcept;
+};
+
+inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
+	attribute       = rhs.attribute;
+	vertexCount     = rhs.vertexCount;
+	type            = rhs.type;
+	fillColor       = rhs.fillColor;
+	borderColor     = rhs.borderColor;
+	clipEntries     = rhs.clipEntries;
+	vertices        = rhs.vertices;
+	satinOrAngle    = rhs.satinOrAngle;
+	borderClipData  = rhs.borderClipData;
+	satinGuideCount = rhs.satinGuideCount;
+	wordParam       = rhs.wordParam;
+	rectangle       = rhs.rectangle;
+	fillType        = rhs.fillType;
+	edgeType        = rhs.edgeType;
+	fillSpacing     = rhs.fillSpacing;
+	lengthOrCount   = rhs.lengthOrCount;
+	angleOrClipData = rhs.angleOrClipData;
+	borderSize      = rhs.borderSize;
+	edgeSpacing     = rhs.edgeSpacing;
+	edgeStitchLen   = rhs.edgeStitchLen;
+	picoLength      = rhs.res;
+	return *this;
+}
+
+#define FRMEND 1
+#define FRMLMSK 0x0e
+#define NFRMLMSK 0xf1
+
+/*form attribute bits
+
+  1		end teflon line
+  2-4	layer bits
+  5		finish blunt
+  6		start blunt
+  7		refill bit for contour fill
+*/
+
+// blunt bits
+#define FBLNT 0x20
+#define SBLNT 0x40
+#define NFBLNT 0xdf
+#define NSBLNT 0xbf
+#define NOBLNT 0x9f
 
 // frmhed extended attribute bits
 
@@ -1214,6 +1241,10 @@ typedef struct _frmhed {
 #define AT_UND 64    // underlay flag
 #define AT_WALK 128  // edge walk
 #define AT_CWLK 256  // center walk
+
+// contour refil
+#define FRECONT 0x80
+#define NFRECONT 0x7f
 
 typedef struct _frmclp {
 	unsigned clipType;

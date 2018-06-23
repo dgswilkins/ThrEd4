@@ -1866,7 +1866,7 @@ void frmovlin() {
 	ritmov();
 }
 
-void makspac(unsigned start, unsigned count) noexcept {
+void makspac(unsigned start, unsigned count) {
 	if (!chkmax(PCSHeader.stitchCount, count)) {
 		std::copy(StitchBuffer + start,
 		          StitchBuffer + PCSHeader.stitchCount,
@@ -4144,7 +4144,7 @@ void slbrd() {
 	LineSpacing = spacing;
 }
 
-void prebrd() noexcept {
+void prebrd() {
 	fPOINT delta
 	    = { (CurrentFormVertices[1].x - CurrentFormVertices[0].x), (CurrentFormVertices[1].y - CurrentFormVertices[0].y) };
 	double ratio = 0.0;
@@ -10383,9 +10383,9 @@ void cplayfn(unsigned iForm, unsigned play) {
 	          stdext::make_checked_array_iterator(SelectedForm->vertices, MAXITEMS - FormVertexIndex));
 	if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
 		SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
-		auto sourceStart                 = formHeader->satinOrAngle.guide;
-		auto sourceEnd                   = sourceStart + SelectedForm->satinGuideCount;
-		auto destination = stdext::make_checked_array_iterator(SelectedForm->satinOrAngle.guide, 10000 - SatinGuideIndex);
+		auto       sourceStart           = formHeader->satinOrAngle.guide;
+		auto       sourceEnd             = sourceStart + SelectedForm->satinGuideCount;
+		const auto destination = stdext::make_checked_array_iterator(SelectedForm->satinOrAngle.guide, 10000 - SatinGuideIndex);
 		std::copy(sourceStart, sourceEnd, destination);
 	}
 	SelectedForm->clipEntries             = 0;
