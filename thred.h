@@ -1977,3 +1977,17 @@ typedef struct _lengthInfo {
 	bool     isEnd;
 	float    length;
 } LENINFO;
+
+// Do the type punning while ensuring that the returned pointer is non_null
+// use the encapsulation recommended in I.30
+// (https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#i30-encapsulate-rule-violations)
+template <class T2, class T1> inline _Ret_notnull_ T2 convert_ptr(T1* pointer) {
+	[[gsl::suppress(26474)]] {
+		if (pointer) {
+			return static_cast<T2>(static_cast<void*>(pointer));
+		}
+		else {
+			throw;
+		}
+	}
+}
