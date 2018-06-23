@@ -3486,19 +3486,17 @@ void duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 void pfn(const std::vector<VRCT2>& underlayVerticalRect,
          const std::vector<VRCT2>& fillVerticalRect,
          unsigned                  startVertex,
-         const VRCT2*              vrct) {
-	if (vrct) {
-		unsigned iVertex       = 0;
-		unsigned currentVertex = startVertex;
-		unsigned nextVertex    = nxt(currentVertex);
+         const std::vector<VRCT2>& vrct) {
+	unsigned iVertex       = 0;
+	unsigned currentVertex = startVertex;
+	unsigned nextVertex    = nxt(currentVertex);
 
-		SelectedPoint = CurrentFormVertices[startVertex];
-		for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
-			duromb(vrct[currentVertex].bipnt, vrct[currentVertex].cipnt, vrct[currentVertex].bopnt, vrct[currentVertex].copnt);
-			duspnd(underlayVerticalRect, fillVerticalRect, currentVertex, nextVertex);
-			currentVertex = nextVertex;
-			nextVertex    = nxt(nextVertex);
-		}
+	SelectedPoint = CurrentFormVertices[startVertex];
+	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+		duromb(vrct[currentVertex].bipnt, vrct[currentVertex].cipnt, vrct[currentVertex].bopnt, vrct[currentVertex].copnt);
+		duspnd(underlayVerticalRect, fillVerticalRect, currentVertex, nextVertex);
+		currentVertex = nextVertex;
+		nextVertex    = nxt(nextVertex);
 	}
 }
 
@@ -3546,16 +3544,16 @@ void pbrd(double edgeSpacing) {
 		satout(HorizontalLength2);
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.set(StateFlag::FILDIR);
-		pfn(underlayVerticalRect, fillVerticalRect, start, &underlayVerticalRect[0]);
+		pfn(underlayVerticalRect, fillVerticalRect, start, underlayVerticalRect);
 		StateMap.reset(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
-		pfn(underlayVerticalRect, fillVerticalRect, start, &underlayVerticalRect[0]);
+		pfn(underlayVerticalRect, fillVerticalRect, start, underlayVerticalRect);
 		LineSpacing = edgeSpacing;
 		prsmal();
 		HorizontalLength2 = SelectedForm->borderSize;
 		StateMap.reset(StateFlag::UND);
 	}
-	pfn(underlayVerticalRect, fillVerticalRect, start, &fillVerticalRect[0]);
+	pfn(underlayVerticalRect, fillVerticalRect, start, fillVerticalRect);
 	LineSpacing = spacing;
 }
 
@@ -4174,19 +4172,18 @@ void prebrd() {
 	CurrentFormVertices                              = AngledForm.vertices;
 }
 
-void plfn(const std::vector<VRCT2>& underlayVerticalRect, const std::vector<VRCT2>& fillVerticalRect, const VRCT2* const prct) {
-	if (prct) {
-		unsigned iVertex;
+void plfn(const std::vector<VRCT2>& underlayVerticalRect,
+          const std::vector<VRCT2>& fillVerticalRect,
+          const std::vector<VRCT2>& prct) {
+	unsigned iVertex;
 
-		duromb(prct[1].aipnt, prct[1].cipnt, prct[1].aopnt, prct[1].copnt);
-		duspnd(underlayVerticalRect, fillVerticalRect, 1, 2);
-		for (iVertex = 2; iVertex < VertexCount - 4; iVertex++) {
-			duromb(prct[iVertex].bipnt, prct[iVertex].cipnt, prct[iVertex].bopnt, prct[iVertex].copnt);
-			duspnd(underlayVerticalRect, fillVerticalRect, iVertex, iVertex + 1);
-		}
-		duromb(
-		    prct[VertexCount - 4].bipnt, prct[VertexCount - 4].dipnt, prct[VertexCount - 4].bopnt, prct[VertexCount - 4].dopnt);
+	duromb(prct[1].aipnt, prct[1].cipnt, prct[1].aopnt, prct[1].copnt);
+	duspnd(underlayVerticalRect, fillVerticalRect, 1, 2);
+	for (iVertex = 2; iVertex < VertexCount - 4; iVertex++) {
+		duromb(prct[iVertex].bipnt, prct[iVertex].cipnt, prct[iVertex].bopnt, prct[iVertex].copnt);
+		duspnd(underlayVerticalRect, fillVerticalRect, iVertex, iVertex + 1);
 	}
+	duromb(prct[VertexCount - 4].bipnt, prct[VertexCount - 4].dipnt, prct[VertexCount - 4].bopnt, prct[VertexCount - 4].dopnt);
 }
 
 void plbak(unsigned backPoint) noexcept {
@@ -4241,12 +4238,12 @@ void plbrd(double edgeSpacing) {
 		HorizontalLength2 = SelectedForm->borderSize * URAT;
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
-		plfn(underlayVerticalRect, fillVerticalRect, &underlayVerticalRect[0]);
+		plfn(underlayVerticalRect, fillVerticalRect, underlayVerticalRect);
 		savedIndex = SequenceIndex;
 		StateMap.reset(StateFlag::UNDPHAS);
 		SelectedPoint = CurrentFormVertices[0];
 		StateMap.set(StateFlag::FILDIR);
-		plfn(underlayVerticalRect, fillVerticalRect, &underlayVerticalRect[0]);
+		plfn(underlayVerticalRect, fillVerticalRect, underlayVerticalRect);
 		plbak(savedIndex);
 		prsmal();
 		if (SequenceIndex) { // ensure that we can do a valid read from OSequence
@@ -4255,7 +4252,7 @@ void plbrd(double edgeSpacing) {
 	}
 	StateMap.reset(StateFlag::UND);
 	LineSpacing = SelectedForm->edgeSpacing;
-	plfn(underlayVerticalRect, fillVerticalRect, &fillVerticalRect[0]);
+	plfn(underlayVerticalRect, fillVerticalRect, fillVerticalRect);
 	LineSpacing = edgeSpacing;
 	fvars(ClosestFormToCursor);
 }
@@ -11136,13 +11133,13 @@ void frmnumfn(unsigned newFormIndex) {
 				dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, sourceForm++);
 			}
 		}
-		mvfrms(FormList, &tempFormList[0], FormIndex);
-		mvflpnt(FormVertices, &tempFormVertices[0], FormVertexIndex);
+		mvfrms(FormList, tempFormList.data(), FormIndex);
+		mvflpnt(FormVertices, tempFormVertices.data(), FormVertexIndex);
 		// ToDo - 'if' is only required while we are passing memory rather than vector
 		if (SatinGuideIndex) {
-			mvsatk(SatinGuides, &tempGuides[0], SatinGuideIndex);
+			mvsatk(SatinGuides, tempGuides.data(), SatinGuideIndex);
 		}
-		mvflpnt(ClipPoints, &tempClipPoints[0], ClipPointIndex);
+		mvflpnt(ClipPoints, tempClipPoints.data(), ClipPointIndex);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (StitchBuffer[iStitch].attribute & SRTYPMSK) {
 				decodedFormIndex = (StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT;

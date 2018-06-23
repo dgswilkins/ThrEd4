@@ -3830,7 +3830,7 @@ void redbal() {
 		ReadFile(balaradFile, &balaradHeader, sizeof(BALHED), &bytesRead, 0);
 		if (bytesRead == sizeof(BALHED)) {
 			std::vector<BALSTCH> balaradStitch(MAXITEMS);
-			ReadFile(balaradFile, &balaradStitch[0], MAXITEMS * sizeof(BALSTCH), &bytesRead, 0);
+			ReadFile(balaradFile, balaradStitch.data(), MAXITEMS * sizeof(BALSTCH), &bytesRead, 0);
 			stitchCount             = bytesRead / sizeof(BALSTCH);
 			IniFile.backgroundColor = BackgroundColor = balaradHeader.backgroundColor;
 			BackgroundPen                             = nuPen(BackgroundPen, 1, BackgroundColor);
@@ -3924,7 +3924,7 @@ void ritbal() {
 				balaradStitch[iOutput++].flag = gsl::narrow<unsigned char>(color);
 			}
 		}
-		WriteFile(balaradFile, &balaradStitch[0], iOutput * sizeof(BALSTCH), &bytesWritten, 0);
+		WriteFile(balaradFile, balaradStitch.data(), iOutput * sizeof(BALSTCH), &bytesWritten, 0);
 		CloseHandle(balaradFile);
 		balaradFile = CreateFile(BalaradName1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		WriteFile(balaradFile, (char*)outputName, strlen(outputName) + 1, &bytesWritten, 0);
@@ -4107,16 +4107,16 @@ void dubuf(char* const buffer, unsigned& count) {
 			}
 		}
 		if (forms.size()) {
-			durit(&output, &forms[0], forms.size() * sizeof(forms[0]));
+			durit(&output, forms.data(), forms.size() * sizeof(forms[0]));
 		}
 		if (vertices.size()) {
-			durit(&output, &vertices[0], vertices.size() * sizeof(vertices[0]));
+			durit(&output, vertices.data(), vertices.size() * sizeof(vertices[0]));
 		}
 		if (guides.size()) {
-			durit(&output, &guides[0], guides.size() * sizeof(guides[0]));
+			durit(&output, guides.data(), guides.size() * sizeof(guides[0]));
 		}
 		if (points.size()) {
-			durit(&output, &points[0], points.size() * sizeof(points[0]));
+			durit(&output, points.data(), points.size() * sizeof(points[0]));
 		}
 		if (TextureIndex) {
 			durit(&output, TexturePointsBuffer->data(), TextureIndex * sizeof(TXPNT));
@@ -4622,7 +4622,7 @@ void sav() {
 			strncpy(dstHeader.eof, "\x1a", sizeof(dstHeader.eof));
 			std::fill_n(dstHeader.res, sizeof(dstHeader.res), ' ');
 			WriteFile(PCSFileHandle, &dstHeader, sizeof(DSTHED), &bytesWritten, 0);
-			WriteFile(PCSFileHandle, &DSTRecords[0], sizeof(DSTREC) * DSTRecords.size(), &bytesWritten, 0);
+			WriteFile(PCSFileHandle, DSTRecords.data(), sizeof(DSTREC) * DSTRecords.size(), &bytesWritten, 0);
 			break;
 #if PESACT
 		case AUXPES:
@@ -4754,7 +4754,7 @@ void sav() {
 					PCSStitchBuffer[iPCSstitch].fy  = fractionalPart * 256;
 					PCSStitchBuffer[iPCSstitch++].y = integerPart;
 				}
-				if (!WriteFile(PCSFileHandle, &PCSStitchBuffer[0], iPCSstitch * sizeof(PCSTCH), &bytesWritten, 0)) {
+				if (!WriteFile(PCSFileHandle, PCSStitchBuffer.data(), iPCSstitch * sizeof(PCSTCH), &bytesWritten, 0)) {
 					riter();
 					flag = false;
 					break;
@@ -5451,7 +5451,7 @@ void bfil() {
 				bitmapWidthBytes += 4;
 			bitmapSizeBytes = bitmapWidthBytes * BitmapHeight;
 			std::vector<unsigned char> monoBitmapData(bitmapSizeBytes);
-			ReadFile(BitmapFileHandle, &monoBitmapData[0], bitmapSizeBytes, &BytesRead, NULL);
+			ReadFile(BitmapFileHandle, monoBitmapData.data(), bitmapSizeBytes, &BytesRead, NULL);
 			CloseHandle(BitmapFileHandle);
 			if (binv(monoBitmapData, bitmapWidthBytes)) {
 				background = BitmapColor;
@@ -5546,7 +5546,7 @@ void dstran(std::vector<DSTREC>& DSTData) {
 			retval = GetFileSizeEx(colorFile, &colorFileSize);
 			// There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
 			colors.resize(colorFileSize.u.LowPart / sizeof(colors[0]));
-			ReadFile(colorFile, &colors[0], colorFileSize.u.LowPart, &bytesRead, 0);
+			ReadFile(colorFile, colors.data(), colorFileSize.u.LowPart, &bytesRead, 0);
 			CloseHandle(colorFile);
 			if (bytesRead > (sizeof(colors[0]) * 2)) {
 				if (colors[0] == COLVER) {
@@ -5978,7 +5978,7 @@ void nuFil() {
 							fileSize -= sizeof(PCSHeader);
 							pcsStitchCount = fileSize / sizeof(PCSTCH) + 2;
 							std::vector<PCSTCH> PCSDataBuffer(pcsStitchCount);
-							ReadFile(FileHandle, &PCSDataBuffer[0], fileSize, &BytesRead, NULL);
+							ReadFile(FileHandle, PCSDataBuffer.data(), fileSize, &BytesRead, NULL);
 							iStitch      = 0;
 							iColorChange = 0;
 							color        = 0;
@@ -6117,7 +6117,7 @@ void nuFil() {
 							PCSBMPFileName[0] = 0;
 							fileSize          = GetFileSize(FileHandle, &BytesRead) - sizeof(DSTHED);
 							std::vector<DSTREC> DSTData(fileSize / sizeof(DSTREC));
-							ReadFile(FileHandle, &DSTData[0], sizeof(DSTREC) * DSTData.size(), &BytesRead, 0);
+							ReadFile(FileHandle, DSTData.data(), sizeof(DSTREC) * DSTData.size(), &BytesRead, 0);
 							dstran(DSTData);
 							IniFile.auxFileType = AUXDST;
 						}
@@ -8778,7 +8778,7 @@ void insfil() {
 						if (version < 2) {
 							std::vector<FRMHEDO> formHeader(fileHeader.formCount);
 							ReadFile(
-							    InsertedFileHandle, &formHeader[0], fileHeader.formCount * sizeof(formHeader[0]), &BytesRead, 0);
+							    InsertedFileHandle, formHeader.data(), fileHeader.formCount * sizeof(formHeader[0]), &BytesRead, 0);
 							if (BytesRead != fileHeader.formCount * sizeof(formHeader[0])) {
 								FormIndex = BytesRead / sizeof(formHeader[0]);
 								StateMap.set(StateFlag::BADFIL);
@@ -8907,7 +8907,7 @@ void insfil() {
 					savdo();
 					std::vector<PCSTCH> pcsStitchBuffer(pcsFileHeader.stitchCount);
 					ReadFile(InsertedFileHandle,
-					         &pcsStitchBuffer[0],
+					         pcsStitchBuffer.data(),
 					         pcsFileHeader.stitchCount * sizeof(pcsStitchBuffer[0]),
 					         &BytesRead,
 					         NULL);
@@ -11158,6 +11158,7 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 }
 
 void lock() {
+	// ToDo - investigate C++17 option shown here: http://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
 	FINDINFO lockInfo;
 
 	lockInfo.count = 0;
@@ -11664,7 +11665,7 @@ void dutrac() {
 		decimatedLine.reserve(tracedPoints.size());
 		TRCPNT traceDiff[2] = {};
 		decimatedLine.push_back(tracedPoints[0]);
-		dutdif(traceDiff[0], &tracedPoints[0]);
+		dutdif(traceDiff[0], tracedPoints.data());
 		OutputIndex = 1;
 		for (iPoint = 1; iPoint < tracedPoints.size(); iPoint++) {
 			traceDiff[1] = traceDiff[0];
@@ -12824,7 +12825,7 @@ void drwLin(std::vector<POINT>& linePoints, unsigned currentStitch, unsigned len
 		SelectObject(StitchWindowMemDC, hPen);
 		// ToDo - where did 16000 come from?
 		if (LineIndex < 16000)
-			Polyline(StitchWindowMemDC, &linePoints[0], LineIndex);
+			Polyline(StitchWindowMemDC, linePoints.data(), LineIndex);
 		else {
 			iOffset = 0;
 			while (LineIndex) {
@@ -18378,7 +18379,7 @@ void drwStch() {
 									linePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5;
 									linePoints[LineIndex++].y
 									    = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
-									Polyline(StitchWindowMemDC, &linePoints[0], LineIndex);
+									Polyline(StitchWindowMemDC, linePoints.data(), LineIndex);
 									LineIndex = 0;
 								}
 								else {
@@ -18450,7 +18451,7 @@ void drwStch() {
 					throw;
 				}
 				if (LineIndex) {
-					Polyline(StitchWindowMemDC, &linePoints[0], LineIndex);
+					Polyline(StitchWindowMemDC, linePoints.data(), LineIndex);
 					linePoints[0] = linePoints[LineIndex - 1];
 					LineIndex     = 1;
 				}
@@ -18645,11 +18646,11 @@ void ritbak(const char* const fileName, DRAWITEMSTRUCT* drawItem) {
 				std::vector<fPOINTATTR> stitchesToDraw(stitchHeader.stitchCount);
 				std::vector<POINT>      lines(stitchHeader.stitchCount);
 				bytesToRead = stitchHeader.stitchCount * sizeof(fPOINTATTR);
-				ReadFile(thrEdFile, &stitchesToDraw[0], bytesToRead, &BytesRead, 0);
+				ReadFile(thrEdFile, stitchesToDraw.data(), bytesToRead, &BytesRead, 0);
 				if (bytesToRead == BytesRead) {
 					SetFilePointer(thrEdFile, 16, 0, FILE_CURRENT);
 					ReadFile(thrEdFile, &brushColor, sizeof(COLORREF), &BytesRead, 0);
-					ReadFile(thrEdFile, &colors[0], colors.size() * sizeof(COLORREF), &BytesRead, 0);
+					ReadFile(thrEdFile, colors.data(), colors.size() * sizeof(COLORREF), &BytesRead, 0);
 					brush = CreateSolidBrush(brushColor);
 					SelectObject(drawItem->hDC, brush);
 					FillRect(drawItem->hDC, &drawItem->rcItem, brush);
@@ -18664,7 +18665,7 @@ void ritbak(const char* const fileName, DRAWITEMSTRUCT* drawItem) {
 						else {
 							pen = nuPen(pen, 1, colors[iColor]);
 							SelectObject(drawItem->hDC, pen);
-							Polyline(drawItem->hDC, &lines[0], iLine);
+							Polyline(drawItem->hDC, lines.data(), iLine);
 							iLine  = 0;
 							iColor = stitchesToDraw[iStitch].attribute & 0xf;
 						}
@@ -18672,7 +18673,7 @@ void ritbak(const char* const fileName, DRAWITEMSTRUCT* drawItem) {
 					if (iLine) {
 						pen = nuPen(pen, 1, colors[iColor]);
 						SelectObject(drawItem->hDC, pen);
-						Polyline(drawItem->hDC, &lines[0], iLine);
+						Polyline(drawItem->hDC, lines.data(), iLine);
 					}
 					DeleteObject(brush);
 					DeleteObject(pen);
@@ -18722,9 +18723,9 @@ void ritbak(const char* const fileName, DRAWITEMSTRUCT* drawItem) {
 						SelectObject(drawItem->hDC, FormPen);
 						SetROP2(drawItem->hDC, R2_XORPEN);
 						if (FormList[iStitch].type == FRMLINE)
-							Polyline(drawItem->hDC, &lines[0], formList[iStitch].vertexCount);
+							Polyline(drawItem->hDC, lines.data(), formList[iStitch].vertexCount);
 						else
-							Polyline(drawItem->hDC, &lines[0], formList[iStitch].vertexCount + 1);
+							Polyline(drawItem->hDC, lines.data(), formList[iStitch].vertexCount + 1);
 						SetROP2(StitchWindowMemDC, R2_COPYPEN);
 					}
 				} while (false);

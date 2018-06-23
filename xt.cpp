@@ -1109,7 +1109,7 @@ void srtcol() {
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		highStitchBuffer[colorStartStitch[StitchBuffer[iStitch].attribute & COLMSK]++] = StitchBuffer[iStitch];
 	}
-	MoveMemory(StitchBuffer, &highStitchBuffer[0], PCSHeader.stitchCount * sizeof(fPOINTATTR));
+	MoveMemory(StitchBuffer, highStitchBuffer.data(), PCSHeader.stitchCount * sizeof(fPOINTATTR));
 }
 
 void dubit(unsigned bit) {
@@ -1757,7 +1757,7 @@ void fsort() {
 			sortRecord.direction     = minimumDirection;
 			precjmps(tempStitchBuffer, pRecs, sortRecord);
 		}
-		MoveMemory(StitchBuffer, &tempStitchBuffer[0], OutputIndex * sizeof(fPOINTATTR));
+		MoveMemory(StitchBuffer, tempStitchBuffer.data(), OutputIndex * sizeof(fPOINTATTR));
 		PCSHeader.stitchCount = OutputIndex;
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
@@ -4687,7 +4687,7 @@ void repflt(std::string& repairMessage) {
 	if (flag) {
 		FormVertexIndex = iVertex;
 	}
-	MoveMemory(FormVertices, &vertexPoint[0], sizeof(fPOINT) * FormVertexIndex);
+	MoveMemory(FormVertices, vertexPoint.data(), sizeof(fPOINT) * FormVertexIndex);
 }
 
 void repclp(std::string& repairMessage) {
@@ -4741,7 +4741,7 @@ void repclp(std::string& repairMessage) {
 			}
 		}
 	}
-	MoveMemory(&ClipPoints, &clipPoint[0], clipCount * sizeof(fPOINT));
+	MoveMemory(&ClipPoints, clipPoint.data(), clipCount * sizeof(fPOINT));
 	ClipPointIndex = clipCount;
 	if (badClipCount)
 		adbad(repairMessage, IDS_CLPDAT, badClipCount);
