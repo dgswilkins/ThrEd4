@@ -329,7 +329,7 @@ unsigned char* Levels[]
 	    &Level08[0], &Level09[0], &Level10[0], &Level11[0], &Level12[0], &Level13[0], &Level14[0], &Level15[0] };
 
 void frmclr(FRMHED* const destination) noexcept {
-	memset(destination, 0, sizeof(FRMHED));
+	*destination = {};
 }
 
 void duinf(const FRMHED& formHeader) noexcept {

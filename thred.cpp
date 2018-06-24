@@ -1577,7 +1577,8 @@ void fnamtabs() {
 		NameEncoder[destination] = NameEncoder[source];
 		NameEncoder[source]      = swapCharacter;
 	}
-	memset(NameDecoder, 0, sizeof(NameDecoder));
+	unsigned char fillval = {};
+	std::fill_n(NameDecoder, sizeof(NameDecoder), fillval);
 	for (iName = 32; iName < 127; iName++)
 		NameDecoder[NameEncoder[iName]] = gsl::narrow<unsigned char>(iName);
 }
@@ -4005,7 +4006,7 @@ void duver(char* const name) noexcept {
 
 void durit(char** destination, const void* const source, unsigned count) noexcept {
 	if (destination && source) {
-		CopyMemory(static_cast<void*>(*destination), source, count);
+		memcpy(static_cast<void*>(*destination), source, count);
 		*destination += count;
 	}
 }
@@ -5447,7 +5448,7 @@ void bfil() {
 				foreground = BitmapColor;
 				background = InverseBackgroundColor;
 			}
-			memset(&BitmapInfoHeader, 0, sizeof(BITMAPINFOHEADER));
+			BitmapInfoHeader = {};
 			BitmapInfoHeader.biSize        = sizeof(BITMAPINFOHEADER);
 			BitmapInfoHeader.biWidth       = BitmapWidth;
 			BitmapInfoHeader.biHeight      = BitmapHeight;
@@ -8760,17 +8761,21 @@ void insfil() {
 					encodedFormIndex                                = FormIndex << FRMSHFT;
 					InsertedVertexIndex                             = FormVertexIndex;
 					InsertedFormIndex                               = FormIndex;
-					if (fileHeader.vertexCount) {
+					if (fileHeader.formCount) {
 						if (version < 2) {
 							std::vector<FRMHEDO> formHeader(fileHeader.formCount);
-							ReadFile(
-							    InsertedFileHandle, formHeader.data(), fileHeader.formCount * sizeof(formHeader[0]), &BytesRead, 0);
+							ReadFile(InsertedFileHandle,
+							         formHeader.data(),
+							         fileHeader.formCount * sizeof(formHeader[0]),
+							         &BytesRead,
+							         0);
 							if (BytesRead != fileHeader.formCount * sizeof(formHeader[0])) {
 								FormIndex = BytesRead / sizeof(formHeader[0]);
 								StateMap.set(StateFlag::BADFIL);
 							}
 							if (FormIndex + fileHeader.formCount < MAXFORMS) {
-								FillMemory(&FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), 0);
+								FRMHED fillval = {};
+								std::fill_n(FormList + FormIndex, fileHeader.formCount, fillval);
 								iFormList = FormIndex;
 								std::copy(formHeader.cbegin(), formHeader.cend(), FormList);
 							}

@@ -721,7 +721,7 @@ int fil2crd(const char* fileName) noexcept {
 	strcat_s(command, "\" \"");
 	strcat_s(command, fileName);
 	strcat_s(command, "\"");
-	memset(&startupInfo, 0, sizeof(STARTUPINFO));
+	startupInfo = {};
 	startupInfo.cb = sizeof(STARTUPINFO);
 	if (!CreateProcess(0, command, 0, 0, 0, NORMAL_PRIORITY_CLASS, 0, 0, &startupInfo, &processInfo)) {
 		errorCode = GetLastError();
