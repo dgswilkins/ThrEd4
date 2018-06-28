@@ -1577,7 +1577,7 @@ void fnamtabs() {
 		NameEncoder[destination] = NameEncoder[source];
 		NameEncoder[source]      = swapCharacter;
 	}
-	unsigned char fillval = {};
+	const unsigned char fillval = {};
 	std::fill_n(NameDecoder, sizeof(NameDecoder), fillval);
 	for (iName = 32; iName < 127; iName++)
 		NameDecoder[NameEncoder[iName]] = gsl::narrow<unsigned char>(iName);
@@ -1796,10 +1796,6 @@ void ladj() {
 	StateMap.set(StateFlag::DUMEN);
 }
 
-void stchcpy(unsigned count, fPOINTATTR* const destination) noexcept {
-	memcpy(destination, StitchBuffer, count * 4);
-}
-
 void deldu() {
 	unsigned iBuffer = 0;
 
@@ -1809,16 +1805,6 @@ void deldu() {
 	UndoBufferWriteIndex = 0;
 	StateMap.reset(StateFlag::BAKWRAP);
 	StateMap.reset(StateFlag::BAKACT);
-}
-
-void mvflpnt(fPOINT* const destination, const fPOINT* const source, unsigned count) noexcept {
-	// ToDo - convert this to a vector copy operation
-	memcpy(destination, source, count * sizeof(fPOINT));
-}
-
-void mvsatk(SATCON* const destination, const SATCON* const source, unsigned count) noexcept {
-	// ToDo - convert this to a vector copy operation
-	memcpy(destination, source, count * sizeof(SATCON));
 }
 
 void dudat() {
@@ -1839,22 +1825,33 @@ void dudat() {
 		std::copy(FormList, FormList + FormIndex, stdext::make_checked_array_iterator(backupData->forms, FormIndex));
 		backupData->stitchCount = PCSHeader.stitchCount;
 		backupData->stitches    = convert_ptr<fPOINTATTR*>(&backupData->forms[FormIndex]);
-		if (PCSHeader.stitchCount)
-			stchcpy((sizeof(fPOINTATTR) * PCSHeader.stitchCount) >> 2, backupData->stitches);
+		if (PCSHeader.stitchCount) {
+			std::copy(StitchBuffer,
+			          StitchBuffer + PCSHeader.stitchCount,
+			          stdext::make_checked_array_iterator(backupData->stitches, PCSHeader.stitchCount));
+		}
 		backupData->vertexCount = FormVertexIndex;
 		backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[PCSHeader.stitchCount]);
-		if (FormVertexIndex)
-			mvflpnt(backupData->vertices, &FormVertices[0], FormVertexIndex);
+		if (FormVertexIndex) {
+			std::copy(FormVertices,
+			          FormVertices + FormVertexIndex,
+			          stdext::make_checked_array_iterator(backupData->vertices, backupData->vertexCount));
+		}
 		backupData->guideCount = SatinGuideIndex;
 		backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertexIndex]);
-		if (SatinGuideIndex)
-			mvsatk(backupData->guide, &SatinGuides[0], SatinGuideIndex);
+		if (SatinGuideIndex) {
+			std::copy(SatinGuides,
+			          SatinGuides + SatinGuideIndex,
+			          stdext::make_checked_array_iterator(backupData->guide, backupData->guideCount));
+		}
 		backupData->clipPointCount = ClipPointIndex;
 		backupData->clipPoints     = convert_ptr<fPOINT*>(&backupData->guide[SatinGuideIndex]);
 		if (ClipPointIndex) {
 			if (ClipPointIndex > MAXITEMS)
 				ClipPointIndex = MAXITEMS;
-			mvflpnt(backupData->clipPoints, &ClipPoints[0], ClipPointIndex);
+			std::copy(ClipPoints,
+			          ClipPoints + ClipPointIndex,
+			          stdext::make_checked_array_iterator(backupData->clipPoints, backupData->clipPointCount));
 		}
 		backupData->colors = convert_ptr<COLORREF*>(&backupData->clipPoints[ClipPointIndex]);
 		auto sizeColors    = (sizeof(UserColor) / sizeof(COLORREF));
@@ -1864,7 +1861,7 @@ void dudat() {
 		if (TextureIndex) {
 			std::copy(TexturePointsBuffer->cbegin(),
 			          TexturePointsBuffer->cend(),
-			          stdext::make_checked_array_iterator(backupData->texturePoints, TextureIndex));
+			          stdext::make_checked_array_iterator(backupData->texturePoints, backupData->texturePointCount));
 		}
 	}
 }
@@ -4013,12 +4010,12 @@ void durit(char** destination, const void* const source, unsigned count) noexcep
 
 void dubuf(char* const buffer, unsigned& count) {
 	STRHED   stitchHeader = {};
-	unsigned iForm = 0, iColor = 0, iVertex = 0, iGuide = 0, iClip = 0;
+	unsigned iForm = 0, iVertex = 0, iGuide = 0, iClip = 0;
 	unsigned vertexCount = 0, guideCount = 0, clipDataCount = 0;
 	char*    output = buffer;
 
 	stitchHeader.headerType  = 0x2746872;
-	stitchHeader.fileLength  = PCSHeader.stitchCount * sizeof(fPOINTATTR) + sizeof(STRHED) + 16;
+	stitchHeader.fileLength  = PCSHeader.stitchCount * sizeof(fPOINTATTR) + sizeof(STRHED) + sizeof(PCSBMPFileName);
 	stitchHeader.stitchCount = PCSHeader.stitchCount;
 	stitchHeader.hoopType    = IniFile.hoopType;
 	strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
@@ -4037,9 +4034,12 @@ void dubuf(char* const buffer, unsigned& count) {
 	stitchHeader.vertexCount   = vertexCount;
 	stitchHeader.dlineCount    = guideCount;
 	stitchHeader.clipDataCount = clipDataCount;
-	stitchHeader.vertexLen     = sizeof(STRHED) + PCSHeader.stitchCount * sizeof(fPOINTATTR) + 164;
-	stitchHeader.dlineLen      = sizeof(fPOINT) * vertexCount;
-	stitchHeader.clipDataLen   = sizeof(fPOINT) * clipDataCount;
+	const auto threadLength    = sizeof(ThreadSize) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
+	const auto formDataOffset
+	    = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor) + sizeof(CustomColor) + threadLength;
+	stitchHeader.vertexLen   = sizeof(STRHED) + PCSHeader.stitchCount * sizeof(fPOINTATTR) + formDataOffset;
+	stitchHeader.dlineLen    = sizeof(fPOINT) * vertexCount;
+	stitchHeader.clipDataLen = sizeof(fPOINT) * clipDataCount;
 	durit(&output, &stitchHeader, sizeof(STRHED));
 	ExtendedHeader.auxFormat         = IniFile.auxFileType;
 	ExtendedHeader.hoopSizeX         = IniFile.hoopSizeX;
@@ -4048,16 +4048,16 @@ void dubuf(char* const buffer, unsigned& count) {
 	durit(&output, &ExtendedHeader, sizeof(STREX));
 	durit(&output, StitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR));
 	if (!PCSBMPFileName[0]) {
-		for (iColor = 0; iColor < 16; iColor++)
-			PCSBMPFileName[iColor] = 0;
+		for (auto iName = 0; iName < sizeof(PCSBMPFileName); iName++)
+			PCSBMPFileName[iName] = 0;
 	}
-	durit(&output, PCSBMPFileName, 16);
-	durit(&output, &BackgroundColor, 4);
-	durit(&output, UserColor, 64);
-	durit(&output, CustomColor, 64);
-	for (iColor = 0; iColor < 16; iColor++)
-		MsgBuffer[iColor] = ThreadSize[iColor][0];
-	durit(&output, MsgBuffer, 16);
+	durit(&output, PCSBMPFileName, sizeof(PCSBMPFileName));
+	durit(&output, &BackgroundColor, sizeof(COLORREF));
+	durit(&output, UserColor, sizeof(UserColor));
+	durit(&output, CustomColor, sizeof(CustomColor));
+	for (auto iThread = 0; iThread < threadLength; iThread++)
+		MsgBuffer[iThread] = ThreadSize[iThread][0];
+	durit(&output, MsgBuffer, threadLength * sizeof(char));
 	if (FormIndex) {
 		std::vector<FRMHED> forms;
 		forms.reserve(FormIndex);
@@ -5134,30 +5134,32 @@ void delstch1(unsigned iStitch) {
 	}
 }
 
-void stchred(unsigned count, const fPOINTATTR* source) noexcept {
-	memcpy(StitchBuffer, source, count * 4);
-}
-
 void redbak() {
 	const BAKHED* undoData = convert_ptr<BAKHED*>((*UndoBuffer)[UndoBufferWriteIndex].get());
 	if (undoData) {
 		unsigned iColor = 0;
 
+		if (undoData->stitchCount) {
+			std::copy(undoData->stitches, undoData->stitches + undoData->stitchCount, StitchBuffer);
+		}
 		PCSHeader.stitchCount = undoData->stitchCount;
-		if (PCSHeader.stitchCount)
-			stchred((sizeof(fPOINTATTR) * PCSHeader.stitchCount) >> 2, undoData->stitches);
-		UnzoomedRect = undoData->zoomRect;
-		FormIndex    = undoData->formCount;
-		std::copy(undoData->forms, undoData->forms + FormIndex, FormList);
+		UnzoomedRect          = undoData->zoomRect;
+		if (undoData->formCount) {
+			std::copy(undoData->forms, undoData->forms + undoData->formCount, FormList);
+		}
+		FormIndex = undoData->formCount;
+		if (undoData->vertexCount) {
+			std::copy(undoData->vertices, undoData->vertices + undoData->vertexCount, FormVertices);
+		}
 		FormVertexIndex = undoData->vertexCount;
-		if (FormVertexIndex)
-			mvflpnt(&FormVertices[0], &undoData->vertices[0], FormVertexIndex);
+		if (undoData->guideCount) {
+			std::copy(undoData->guide, undoData->guide + undoData->guideCount, SatinGuides);
+		}
 		SatinGuideIndex = undoData->guideCount;
-		if (SatinGuideIndex)
-			mvsatk(&SatinGuides[0], &undoData->guide[0], SatinGuideIndex);
-		ClipPointIndex = undoData->clipPointCount;
-		if (ClipPointIndex)
-			mvflpnt(&ClipPoints[0], &undoData->clipPoints[0], ClipPointIndex);
+		if (undoData->clipPointCount) {
+			std::copy(undoData->clipPoints, undoData->clipPoints + undoData->clipPointCount, ClipPoints);
+		}
+		ClipPointIndex  = undoData->clipPointCount;
 		auto sizeColors = (sizeof(UserColor) / sizeof(COLORREF));
 		std::copy(undoData->colors, undoData->colors + sizeColors, UserColor);
 		for (iColor = 0; iColor < sizeColors; iColor++) {
@@ -5167,12 +5169,11 @@ void redbak() {
 		for (iColor = 0; iColor < sizeColors; iColor++)
 			redraw(UserColorWin[iColor]);
 		TexturePointsBuffer->resize(undoData->texturePointCount);
-		TextureIndex = undoData->texturePointCount;
-		if (TextureIndex) {
-			std::copy(TexturePointsBuffer->cbegin(),
-			          TexturePointsBuffer->cend(),
-			          stdext::make_checked_array_iterator(undoData->texturePoints, TextureIndex));
+		if (undoData->texturePointCount) {
+			const auto _ = std::copy(
+			    undoData->texturePoints, undoData->texturePoints + undoData->texturePointCount, TexturePointsBuffer->begin());
 		}
+		TextureIndex = undoData->texturePointCount;
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -5448,7 +5449,7 @@ void bfil() {
 				foreground = BitmapColor;
 				background = InverseBackgroundColor;
 			}
-			BitmapInfoHeader = {};
+			BitmapInfoHeader               = {};
 			BitmapInfoHeader.biSize        = sizeof(BITMAPINFOHEADER);
 			BitmapInfoHeader.biWidth       = BitmapWidth;
 			BitmapInfoHeader.biHeight      = BitmapHeight;
@@ -5843,40 +5844,41 @@ void nuFil() {
 						prtred();
 						return;
 					}
-					ReadFile(FileHandle, PCSBMPFileName, 16, &BytesRead, 0);
+					ReadFile(FileHandle, PCSBMPFileName, sizeof(PCSBMPFileName), &BytesRead, 0);
 					totalBytesRead = BytesRead;
-					if (BytesRead != 16) {
+					if (BytesRead != sizeof(PCSBMPFileName)) {
 						PCSBMPFileName[0] = 0;
 						prtred();
 						return;
 					}
-					ReadFile(FileHandle, &BackgroundColor, 4, &BytesRead, 0);
+					ReadFile(FileHandle, &BackgroundColor, sizeof(BackgroundColor), &BytesRead, 0);
 					totalBytesRead += BytesRead;
-					if (BytesRead != 4) {
+					if (BytesRead != sizeof(COLORREF)) {
 						BackgroundColor = IniFile.backgroundColor;
 						prtred();
 						return;
 					}
 					BackgroundBrush = CreateSolidBrush(BackgroundColor);
-					ReadFile(FileHandle, (COLORREF*)UserColor, 64, &BytesRead, 0);
+					ReadFile(FileHandle, (COLORREF*)UserColor, sizeof(UserColor), &BytesRead, 0);
 					totalBytesRead += BytesRead;
-					if (BytesRead != 64) {
+					if (BytesRead != sizeof(UserColor)) {
 						prtred();
 						return;
 					}
-					ReadFile(FileHandle, (COLORREF*)CustomColor, 64, &BytesRead, 0);
+					ReadFile(FileHandle, (COLORREF*)CustomColor, sizeof(CustomColor), &BytesRead, 0);
 					totalBytesRead += BytesRead;
-					if (BytesRead != 64) {
+					if (BytesRead != sizeof(CustomColor)) {
 						prtred();
 						return;
 					}
-					ReadFile(FileHandle, (char*)MsgBuffer, 16, &BytesRead, 0);
+					const auto threadLength = sizeof(ThreadSize) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
+					ReadFile(FileHandle, (char*)MsgBuffer, threadLength, &BytesRead, 0);
 					totalBytesRead += BytesRead;
-					if (BytesRead != 16) {
+					if (BytesRead != threadLength) {
 						prtred();
 						return;
 					}
-					for (int iThread = 0; iThread < 16; iThread++)
+					for (int iThread = 0; iThread < threadLength; iThread++)
 						ThreadSize[iThread][0] = MsgBuffer[iThread];
 					FormIndex = thredHeader.formCount;
 					if (FormIndex > MAXFORMS)
@@ -8053,8 +8055,11 @@ unsigned kjmp(unsigned start) {
 	return start;
 }
 
-void mvstchs(unsigned destination, unsigned source, unsigned count) noexcept {
-	memcpy(StitchBuffer + destination, StitchBuffer + source, count * sizeof(*StitchBuffer));
+void mvstchs(unsigned destination, unsigned source, unsigned count) {
+	auto       sourceStart     = StitchBuffer + source;
+	auto       sourceEnd       = sourceStart + count;
+	const auto destinationSpan = stdext::make_checked_array_iterator(StitchBuffer + destination, (MAXITEMS * 2) - destination);
+	std::copy(sourceStart, sourceEnd, destinationSpan);
 }
 
 void setknt() {
@@ -8754,8 +8759,10 @@ void insfil() {
 					         fileHeader.stitchCount * sizeof(fPOINTATTR),
 					         &BytesRead,
 					         NULL);
-					// ToDo - replace magic number 164
-					SetFilePointer(InsertedFileHandle, 164, 0, FILE_CURRENT);
+					const auto threadLength   = sizeof(ThreadSize) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
+					const auto formDataOffset = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor)
+					                            + sizeof(CustomColor) + threadLength;
+					SetFilePointer(InsertedFileHandle, formDataOffset, 0, FILE_CURRENT);
 					insertedRectangle.left = insertedRectangle.bottom = 1e9f;
 					insertedRectangle.top = insertedRectangle.right = 1e-9f;
 					encodedFormIndex                                = FormIndex << FRMSHFT;
@@ -8776,8 +8783,9 @@ void insfil() {
 							if (FormIndex + fileHeader.formCount < MAXFORMS) {
 								FRMHED fillval = {};
 								std::fill_n(FormList + FormIndex, fileHeader.formCount, fillval);
-								iFormList = FormIndex;
-								std::copy(formHeader.cbegin(), formHeader.cend(), FormList);
+								std::copy(formHeader.cbegin(),
+								          formHeader.cend(),
+								          stdext::make_checked_array_iterator(FormList + FormIndex, MAXITEMS - FormIndex));
 							}
 						}
 						else {
@@ -16224,23 +16232,34 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 								FormList[FormIndex].attribute = (FormList[FormIndex].attribute & NFRMLMSK) | (ActiveLayer << 1);
 								SelectedForm->vertices        = adflt(FormList[FormIndex].vertexCount);
 								CurrentFormVertices           = convert_ptr<fPOINT*>(&ClipFormHeader[1]);
-								mvflpnt(&SelectedForm->vertices[0], &CurrentFormVertices[0], SelectedForm->vertexCount);
+								std::copy(CurrentFormVertices,
+								          CurrentFormVertices + SelectedForm->vertexCount,
+								          stdext::make_checked_array_iterator(SelectedForm->vertices, SelectedForm->vertexCount));
 								guides = convert_ptr<SATCON*>(&CurrentFormVertices[SelectedForm->vertexCount]);
 								if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
 									SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
-									mvsatk(&SelectedForm->satinOrAngle.guide[0], &guides[0], SelectedForm->satinGuideCount);
+									std::copy(guides,
+									          guides + SelectedForm->satinGuideCount,
+									          stdext::make_checked_array_iterator(SelectedForm->satinOrAngle.guide,
+									                                              SelectedForm->satinGuideCount));
 								}
 								clipData  = convert_ptr<fPOINT*>(&guides[0]);
 								clipCount = 0;
 								if (isclpx(FormIndex)) {
 									SelectedForm->angleOrClipData.clip = adclp(SelectedForm->lengthOrCount.clipCount);
-									mvflpnt(SelectedForm->angleOrClipData.clip, clipData, SelectedForm->lengthOrCount.clipCount);
+									std::copy(clipData,
+									          clipData + SelectedForm->lengthOrCount.clipCount,
+									          stdext::make_checked_array_iterator(SelectedForm->angleOrClipData.clip,
+									                                              SelectedForm->lengthOrCount.clipCount));
 									clipCount += SelectedForm->lengthOrCount.clipCount;
 								}
 								if (iseclpx(FormIndex)) {
 									clipData                     = convert_ptr<fPOINT*>(&clipData[clipCount]);
 									SelectedForm->borderClipData = adclp(SelectedForm->clipEntries);
-									mvflpnt(SelectedForm->borderClipData, clipData, SelectedForm->clipEntries);
+									std::copy(clipData,
+									          clipData + SelectedForm->clipEntries,
+									          stdext::make_checked_array_iterator(SelectedForm->borderClipData,
+									                                              SelectedForm->clipEntries));
 									clipCount += SelectedForm->clipEntries;
 								}
 								textureSource = convert_ptr<TXPNT*>(&clipData[clipCount]);
@@ -18688,7 +18707,7 @@ void ritbak(const char* const fileName, DRAWITEMSTRUCT* drawItem) {
 						ReadFile(thrEdFile, formListOriginal.data(), bytesToRead, &BytesRead, 0);
 						if (BytesRead != bytesToRead)
 							break;
-						auto _ = std::copy(formListOriginal.cbegin(), formListOriginal.cend(), formList.begin());
+						const auto _ = std::copy(formListOriginal.cbegin(), formListOriginal.cend(), formList.begin());
 					}
 					else {
 						bytesToRead = stitchHeader.formCount * sizeof(formList[0]);

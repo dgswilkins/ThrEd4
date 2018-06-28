@@ -721,7 +721,7 @@ int fil2crd(const char* fileName) noexcept {
 	strcat_s(command, "\" \"");
 	strcat_s(command, fileName);
 	strcat_s(command, "\"");
-	startupInfo = {};
+	startupInfo    = {};
 	startupInfo.cb = sizeof(STARTUPINFO);
 	if (!CreateProcess(0, command, 0, 0, 0, NORMAL_PRIORITY_CLASS, 0, 0, &startupInfo, &processInfo)) {
 		errorCode = GetLastError();
@@ -1968,7 +1968,9 @@ void duint(unsigned offset, unsigned code, INTINF& ilData) {
 		count            = ilData.coloc - ilData.start;
 		auto sourceStart = &StitchBuffer[ilData.start];
 		auto sourceEnd   = sourceStart + count;
-		auto destination = stdext::make_checked_array_iterator(&ilData.highStitchBuffer[ilData.output], MAXITEMS - ilData.output);
+
+		const auto destination
+		    = stdext::make_checked_array_iterator(&ilData.highStitchBuffer[ilData.output], MAXITEMS - ilData.output);
 		std::copy(sourceStart, sourceEnd, destination);
 		ilData.start += count;
 		ilData.output += count;
@@ -2068,7 +2070,8 @@ void intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsig
 			ine              = PCSHeader.stitchCount - ilData.start;
 			auto sourceStart = &StitchBuffer[ilData.start];
 			auto sourceEnd   = sourceStart + ine;
-			auto destination
+
+			const auto destination
 			    = stdext::make_checked_array_iterator(&StitchBuffer[ilData.output + MAXITEMS], MAXITEMS - ilData.output);
 			std::copy(sourceStart, sourceEnd, destination);
 			ilData.output += ine;
@@ -4672,11 +4675,11 @@ void repflt(std::string& repairMessage) {
 		vertexDifference   = formHeader->vertices - FormVertices;
 		if (FormVertexIndex >= vertexDifference + formHeader->vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + formHeader->vertexCount);
-			auto sourceStart = formHeader->vertices;
-			auto sourceEnd   = sourceStart + formHeader->vertexCount;
-			auto destination = vertexPoint.begin() + iVertex;
-			std::copy(sourceStart, sourceEnd, destination);
-			formHeader->vertices = &FormVertices[iVertex];
+			auto       sourceStart = formHeader->vertices;
+			auto       sourceEnd   = sourceStart + formHeader->vertexCount;
+			auto       destination = vertexPoint.begin() + iVertex;
+			const auto _           = std::copy(sourceStart, sourceEnd, destination);
+			formHeader->vertices   = &FormVertices[iVertex];
 			iVertex += formHeader->vertexCount;
 			bcup(iForm, badData);
 		}
@@ -4689,7 +4692,7 @@ void repflt(std::string& repairMessage) {
 				auto sourceStart = formHeader->vertices;
 				auto sourceEnd   = sourceStart + formHeader->vertexCount;
 				auto destination = vertexPoint.begin() + iVertex;
-				std::copy(sourceStart, sourceEnd, destination);
+				auto _           = std::copy(sourceStart, sourceEnd, destination);
 				bcup(iForm, badData);
 			}
 			else {
@@ -4723,7 +4726,8 @@ void repclp(std::string& repairMessage) {
 				auto sourceStart = formHeader->angleOrClipData.clip;
 				auto sourceEnd   = sourceStart + formHeader->lengthOrCount.clipCount;
 				auto destination = clipPoint.begin() + clipCount;
-				std::copy(sourceStart, sourceEnd, destination);
+				auto _           = std::copy(sourceStart, sourceEnd, destination);
+
 				formHeader->angleOrClipData.clip = &ClipPoints[clipCount];
 				clipCount += formHeader->lengthOrCount.clipCount;
 			}
@@ -4734,7 +4738,8 @@ void repclp(std::string& repairMessage) {
 					auto sourceStart = formHeader->angleOrClipData.clip;
 					auto sourceEnd   = sourceStart + formHeader->lengthOrCount.clipCount;
 					auto destination = clipPoint.begin() + clipCount;
-					std::copy(sourceStart, sourceEnd, destination);
+					auto _           = std::copy(sourceStart, sourceEnd, destination);
+
 					formHeader->angleOrClipData.clip = &ClipPoints[clipCount];
 					clipCount += formHeader->lengthOrCount.clipCount;
 				}
@@ -4751,7 +4756,8 @@ void repclp(std::string& repairMessage) {
 				auto sourceStart = formHeader->borderClipData;
 				auto sourceEnd   = sourceStart + formHeader->clipEntries;
 				auto destination = clipPoint.begin() + clipCount;
-				std::copy(sourceStart, sourceEnd, destination);
+				auto _           = std::copy(sourceStart, sourceEnd, destination);
+
 				formHeader->borderClipData = &ClipPoints[clipCount];
 				clipCount += formHeader->clipEntries;
 			}
@@ -4762,7 +4768,8 @@ void repclp(std::string& repairMessage) {
 					auto sourceStart = formHeader->borderClipData;
 					auto sourceEnd   = sourceStart + formHeader->clipEntries;
 					auto destination = clipPoint.begin() + clipCount;
-					std::copy(sourceStart, sourceEnd, destination);
+					auto _           = std::copy(sourceStart, sourceEnd, destination);
+
 					formHeader->borderClipData = &ClipPoints[clipCount];
 					clipCount += formHeader->clipEntries;
 				}
@@ -4789,9 +4796,9 @@ void repsat() {
 		if (formHeader->type == SAT) {
 			guideDifference = formHeader->satinOrAngle.guide - SatinGuides;
 			if (FormVertexIndex > guideDifference + formHeader->vertexCount) {
-				auto sourceStart = formHeader->satinOrAngle.guide;
-				auto sourceEnd   = sourceStart + formHeader->satinGuideCount;
-				auto destination = stdext::make_checked_array_iterator(&SatinGuides[guideCount], 10000 - guideCount);
+				auto       sourceStart = formHeader->satinOrAngle.guide;
+				auto       sourceEnd   = sourceStart + formHeader->satinGuideCount;
+				const auto destination = stdext::make_checked_array_iterator(&SatinGuides[guideCount], 10000 - guideCount);
 				std::copy(sourceStart, sourceEnd, destination);
 				formHeader->satinOrAngle.guide = &SatinGuides[guideCount];
 				guideCount += formHeader->satinGuideCount;
@@ -4800,9 +4807,9 @@ void repsat() {
 			else {
 				if (guideDifference < SatinGuideIndex) {
 					formHeader->satinGuideCount = SatinGuideIndex - guideDifference;
-					auto sourceStart            = formHeader->satinOrAngle.guide;
-					auto sourceEnd              = sourceStart + formHeader->satinGuideCount;
-					auto destination = stdext::make_checked_array_iterator(&SatinGuides[guideCount], 10000 - guideCount);
+					auto       sourceStart      = formHeader->satinOrAngle.guide;
+					auto       sourceEnd        = sourceStart + formHeader->satinGuideCount;
+					const auto destination = stdext::make_checked_array_iterator(&SatinGuides[guideCount], 10000 - guideCount);
 					std::copy(sourceStart, sourceEnd, destination);
 					bcup(iForm, badData);
 				}
@@ -4825,9 +4832,9 @@ void reptx() {
 		if (istx(iForm)) {
 			formHeader = &FormList[iForm];
 			if (TextureIndex > formHeader->fillInfo.texture.index + formHeader->fillInfo.texture.count) {
-				auto sourceStart = &SatinGuides[formHeader->fillInfo.texture.index];
-				auto sourceEnd   = sourceStart + formHeader->fillInfo.texture.count;
-				auto destination = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
+				auto       sourceStart = &SatinGuides[formHeader->fillInfo.texture.index];
+				auto       sourceEnd   = sourceStart + formHeader->fillInfo.texture.count;
+				const auto destination = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
 				std::copy(sourceStart, sourceEnd, destination);
 				formHeader->fillInfo.texture.index = textureCount;
 				textureCount += formHeader->fillInfo.texture.count;
@@ -4836,9 +4843,10 @@ void reptx() {
 			else {
 				if (TextureIndex > formHeader->fillInfo.texture.index) {
 					formHeader->fillInfo.texture.count = TextureIndex - formHeader->fillInfo.texture.index;
-					auto sourceStart                   = &SatinGuides[formHeader->fillInfo.texture.index];
-					auto sourceEnd                     = sourceStart + formHeader->fillInfo.texture.count;
-					auto destination = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
+					auto       sourceStart             = &SatinGuides[formHeader->fillInfo.texture.index];
+					auto       sourceEnd               = sourceStart + formHeader->fillInfo.texture.count;
+					const auto destination
+					    = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
 					std::copy(sourceStart, sourceEnd, destination);
 					formHeader->fillInfo.texture.index = textureCount;
 					bcup(iForm, badData);

@@ -49,8 +49,6 @@ extern bool        isfclp();
 extern bool        istx(unsigned find);
 extern inline void loadString(std::string& sDest, unsigned stringID);
 extern void        movStch();
-extern void        mvflpnt(fPOINT* const destination, const fPOINT* const source, unsigned count);
-extern void        mvsatk(SATCON* const destination, const SATCON* const source, unsigned count);
 extern void        mvstch(unsigned destination, unsigned source);
 extern void        mvstchs(unsigned destination, unsigned source, unsigned count);
 extern void        numWnd();
@@ -1192,8 +1190,7 @@ void drwfrm() {
 
 void setpoli() {
 	frmclr(&FormList[FormIndex]);
-	FormList[FormIndex].type = FRMFPOLY;
-	// frmtyp = FRMFPOLY;
+	FormList[FormIndex].type           = FRMFPOLY;
 	FormList[FormIndex].attribute      = ActiveLayer << 1;
 	FormList[FormIndex].underlayIndent = IniFile.underlayIndent;
 	StateMap.set(StateFlag::SATIN);
@@ -1202,8 +1199,7 @@ void setpoli() {
 
 void setlin() {
 	frmclr(&FormList[FormIndex]);
-	FormList[FormIndex].type = FRMLINE;
-	// frmtyp = FRMLINE;
+	FormList[FormIndex].type      = FRMLINE;
 	FormList[FormIndex].attribute = ActiveLayer << 1;
 	StateMap.set(StateFlag::SATIN);
 	StateMap.set(StateFlag::INIT);
@@ -10309,18 +10305,26 @@ void adfrm(unsigned iForm) {
 	*formHeader          = *SelectedForm;
 	ClosestFormToCursor  = FormIndex;
 	formHeader->vertices = adflt(SelectedForm->vertexCount);
-	mvflpnt(formHeader->vertices, SelectedForm->vertices, SelectedForm->vertexCount);
+	std::copy(SelectedForm->vertices,
+	          SelectedForm->vertices + SelectedForm->vertexCount,
+	          stdext::make_checked_array_iterator(formHeader->vertices, SelectedForm->vertexCount));
 	if (formHeader->type == SAT && formHeader->satinGuideCount) {
 		formHeader->satinOrAngle.guide = adsatk(formHeader->satinGuideCount);
-		mvsatk(formHeader->satinOrAngle.guide, SelectedForm->satinOrAngle.guide, SelectedForm->satinGuideCount);
+		std::copy(SelectedForm->satinOrAngle.guide,
+		          SelectedForm->satinOrAngle.guide + SelectedForm->satinGuideCount,
+		          stdext::make_checked_array_iterator(formHeader->satinOrAngle.guide, SelectedForm->satinGuideCount));
 	}
 	if (iseclpx(FormIndex)) {
 		formHeader->borderClipData = adclp(formHeader->clipEntries);
-		mvflpnt(formHeader->borderClipData, SelectedForm->borderClipData, SelectedForm->clipEntries);
+		std::copy(SelectedForm->borderClipData,
+		          SelectedForm->borderClipData + SelectedForm->clipEntries,
+		          stdext::make_checked_array_iterator(formHeader->borderClipData, formHeader->clipEntries));
 	}
 	if (isclpx(FormIndex)) {
 		formHeader->angleOrClipData.clip = adclp(formHeader->lengthOrCount.clipCount);
-		mvflpnt(formHeader->angleOrClipData.clip, SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
+		std::copy(SelectedForm->angleOrClipData.clip,
+		          SelectedForm->angleOrClipData.clip + SelectedForm->lengthOrCount.clipCount,
+		          stdext::make_checked_array_iterator(formHeader->angleOrClipData.clip, formHeader->lengthOrCount.clipCount));
 	}
 	FormIndex++;
 }
@@ -11062,36 +11066,38 @@ void shrnk() {
 		shoseln(IDS_FRMCLP, IDS_SHRNK);
 }
 
-void mvfrms(FRMHED* const destination, const FRMHED* const source, unsigned count) noexcept {
-	memcpy(destination, source, count * sizeof(FRMHED));
-}
-
 void dufdat(std::vector<fPOINT>& tempClipPoints,
             std::vector<SATCON>& tempGuides,
             std::vector<fPOINT>& destinationFormVertices,
             std::vector<FRMHED>& destinationFormList,
             unsigned             formIndex) {
-	FRMHED*       destination = &destinationFormList[FormRelocationIndex++];
-	const FRMHED* source      = &FormList[formIndex];
+	FRMHED& destination = destinationFormList[FormRelocationIndex];
 
-	mvfrms(destination, source, 1);
-	mvflpnt(&destinationFormVertices[FormVertexIndex], destination->vertices, destination->vertexCount);
-	destination->vertices = &FormVertices[FormVertexIndex];
-	FormVertexIndex += destination->vertexCount;
-	if (destination->satinGuideCount) {
-		mvsatk(&tempGuides[SatinGuideIndex], destination->satinOrAngle.guide, destination->satinGuideCount);
-		destination->satinOrAngle.guide = &SatinGuides[SatinGuideIndex];
-		SatinGuideIndex += destination->satinGuideCount;
+	destinationFormList[FormRelocationIndex++] = FormList[formIndex];
+	const auto res                             = std::copy(
+        destination.vertices, destination.vertices + destination.vertexCount, destinationFormVertices.begin() + FormVertexIndex);
+	destination.vertices = &FormVertices[FormVertexIndex];
+	FormVertexIndex += destination.vertexCount;
+	if (destination.satinGuideCount) {
+		const auto _                   = std::copy(destination.satinOrAngle.guide,
+                                 destination.satinOrAngle.guide + destination.satinGuideCount,
+                                 tempGuides.begin() + SatinGuideIndex);
+		destination.satinOrAngle.guide = &SatinGuides[SatinGuideIndex];
+		SatinGuideIndex += destination.satinGuideCount;
 	}
 	if (iseclpx(formIndex)) {
-		mvflpnt(&tempClipPoints[ClipPointIndex], destination->borderClipData, destination->clipEntries);
-		destination->borderClipData = &ClipPoints[ClipPointIndex];
-		ClipPointIndex += destination->clipEntries;
+		const auto _               = std::copy(destination.borderClipData,
+                                 destination.borderClipData + destination.clipEntries,
+                                 tempClipPoints.begin() + ClipPointIndex);
+		destination.borderClipData = &ClipPoints[ClipPointIndex];
+		ClipPointIndex += destination.clipEntries;
 	}
 	if (isclpx(formIndex)) {
-		mvflpnt(&tempClipPoints[ClipPointIndex], destination->angleOrClipData.clip, destination->lengthOrCount.clipCount);
-		destination->angleOrClipData.clip = &ClipPoints[ClipPointIndex];
-		ClipPointIndex += destination->lengthOrCount.clipCount;
+		const auto _                     = std::copy(destination.angleOrClipData.clip,
+                                 destination.angleOrClipData.clip + destination.lengthOrCount.clipCount,
+                                 tempClipPoints.begin() + ClipPointIndex);
+		destination.angleOrClipData.clip = &ClipPoints[ClipPointIndex];
+		ClipPointIndex += destination.lengthOrCount.clipCount;
 	}
 }
 
@@ -11105,6 +11111,7 @@ void stchfrm(unsigned formIndex, unsigned* attribute) noexcept {
 void frmnumfn(unsigned newFormIndex) {
 	unsigned iForm = 0, iStitch = 0, sourceForm = 0, start = 0, finish = 0, decodedFormIndex = 0;
 
+	savdo();
 	if (newFormIndex != ClosestFormToCursor) {
 		if (ClosestFormToCursor > newFormIndex) {
 			start  = newFormIndex;
@@ -11117,10 +11124,9 @@ void frmnumfn(unsigned newFormIndex) {
 		sourceForm = FormRelocationIndex = 0;
 
 		std::vector<FRMHED> tempFormList(FormIndex);
-		// ToDo - find something better than MAXITEMS
-		std::vector<fPOINT> tempFormVertices(MAXITEMS);
+		std::vector<fPOINT> tempFormVertices(FormVertexIndex);
 		std::vector<SATCON> tempGuides(SatinGuideIndex);
-		std::vector<fPOINT> tempClipPoints(MAXITEMS);
+		std::vector<fPOINT> tempClipPoints(ClipPointIndex);
 
 		FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
 		for (iForm = 0; iForm < FormIndex; iForm++) {
@@ -11133,13 +11139,10 @@ void frmnumfn(unsigned newFormIndex) {
 				dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, sourceForm++);
 			}
 		}
-		mvfrms(FormList, tempFormList.data(), FormIndex);
-		mvflpnt(FormVertices, tempFormVertices.data(), FormVertexIndex);
-		// ToDo - 'if' is only required while we are passing memory rather than vector
-		if (SatinGuideIndex) {
-			mvsatk(SatinGuides, tempGuides.data(), SatinGuideIndex);
-		}
-		mvflpnt(ClipPoints, tempClipPoints.data(), ClipPointIndex);
+		std::copy(tempFormList.cbegin(), tempFormList.cend(), FormList);
+		std::copy(tempFormVertices.cbegin(), tempFormVertices.cend(), FormVertices);
+		std::copy(tempGuides.cbegin(), tempGuides.cend(), SatinGuides);
+		std::copy(tempClipPoints.cbegin(), tempClipPoints.cend(), ClipPoints);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (StitchBuffer[iStitch].attribute & SRTYPMSK) {
 				decodedFormIndex = (StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT;
@@ -11564,9 +11567,11 @@ void spltsat(const SATCON& currentGuide) {
 	}
 	if (FormList[ClosestFormToCursor + 1].wordParam)
 		FormList[ClosestFormToCursor + 1].wordParam -= (currentGuide.start - 1);
-	mvsatk(&SelectedForm->satinOrAngle.guide[iOldVertex - 1],
-	       &SelectedForm->satinOrAngle.guide[iOldVertex],
-	       SatinGuideIndex - satind(&SelectedForm->satinOrAngle.guide[iOldVertex]));
+	auto       sourceStart = SelectedForm->satinOrAngle.guide + iOldVertex;
+	auto       sourceRange = SatinGuideIndex - satind(&SelectedForm->satinOrAngle.guide[iOldVertex]);
+	auto       sourceEnd   = sourceStart + sourceRange;
+	const auto destination = stdext::make_checked_array_iterator((sourceStart - 1), sourceRange);
+	std::copy(sourceStart, sourceEnd, destination);
 	SatinGuideIndex--;
 	FormList[ClosestFormToCursor + 1].satinOrAngle.guide = &SelectedForm->satinOrAngle.guide[ActivePointIndex];
 	FormList[ClosestFormToCursor + 1].satinGuideCount    = SelectedForm->satinGuideCount - ActivePointIndex - 1;
