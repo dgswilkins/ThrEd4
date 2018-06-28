@@ -814,7 +814,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_NOHLP               "HTML Help is not available\nthred.chm needs to be in the same directory as thred4.exe\nand Internet Explorer version 3.0 or greater\nneeds to be installed on your computer"
-    IDS_SAVDISC             "Save changes to %s"
+    IDS_SAVDISC             "Save changes to {}"
     IDS_UNFIL               "Stitches in the form are edited, unfill anyway?"
     IDS_REFIL               "Stitches in the form are edited, refill anyway?"
     IDS_SNAP2GRD            "Snap to Grid"
