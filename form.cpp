@@ -8368,7 +8368,7 @@ HWND txtwin(const std::string& windowName, const RECT& location) {
 	                    NULL);
 }
 
-HWND txtrwin(std::string winName, const RECT& location) {
+HWND txtrwin(std::string& winName, const RECT& location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		maxtsiz(winName, ValueWindowSize);
 		return 0;
@@ -8386,7 +8386,7 @@ HWND txtrwin(std::string winName, const RECT& location) {
 	                    NULL);
 }
 
-HWND numwin(std::string winName, const RECT& location) {
+HWND numwin(std::string& winName, const RECT& location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		maxtsiz(winName, ValueWindowSize);
 		return 0;
