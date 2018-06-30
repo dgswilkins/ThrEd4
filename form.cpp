@@ -8368,7 +8368,7 @@ HWND txtwin(const std::string& windowName, const RECT& location) {
 	                    NULL);
 }
 
-HWND txtrwin(std::string& winName, const RECT& location) {
+HWND txtrwin(const std::string& winName, const RECT& location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		maxtsiz(winName, ValueWindowSize);
 		return 0;
@@ -8386,7 +8386,7 @@ HWND txtrwin(std::string& winName, const RECT& location) {
 	                    NULL);
 }
 
-HWND numwin(std::string& winName, const RECT& location) {
+HWND numwin(const std::string& winName, const RECT& location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		maxtsiz(winName, ValueWindowSize);
 		return 0;
@@ -10525,21 +10525,6 @@ void join() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	StateMap.reset(StateFlag::FRMSAM);
-}
-
-bool chkbfil() noexcept {
-	switch (SelectedForm->edgeType) {
-	case EDGELINE:
-	case EDGEBEAN:
-	case EDGEANGSAT:
-	case EDGEAPPL:
-	case EDGEPROPSAT:
-	case EDGEBHOL:
-	case EDGEPICOT:
-	case EDGECLIP:
-		return 1;
-	}
-	return 0;
 }
 
 void refilal() {
