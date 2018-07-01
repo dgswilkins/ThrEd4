@@ -1236,7 +1236,7 @@ void initdaz(HWND hWinDialog) {
 	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS), fmt::format("{}", IniFile.daisyPetalPoints).c_str());
 	SetWindowText(GetDlgItem(hWinDialog, IDC_DAZPCNT), fmt::format("{}", IniFile.daisyHeartCount).c_str());
 	SetWindowText(GetDlgItem(hWinDialog, IDC_CNTLEN), fmt::format("{:.2f}", IniFile.daisyDiameter).c_str());
-	SetWindowText(GetDlgItem(hWinDialog, IDC_HOLSIZ), fmt::format("%.2f", IniFile.daisyHoleDiameter).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_HOLSIZ), fmt::format("{:.2f}", IniFile.daisyHoleDiameter).c_str());
 	SetWindowText(GetDlgItem(hWinDialog, IDC_INPNTS), fmt::format("{}", IniFile.daisyInnerCount).c_str());
 	SetWindowText(GetDlgItem(hWinDialog, IDC_PETALS), fmt::format("{}", IniFile.daisyPetalCount).c_str());
 	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLEN), fmt::format("{:.2f}", IniFile.daisyPetalLen).c_str());
