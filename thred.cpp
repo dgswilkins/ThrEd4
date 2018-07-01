@@ -18779,6 +18779,10 @@ void dublk(HDC dc, const RECT& traceHighMask, const RECT& traceLowMask) {
 		FillRect(dc, &traceLowMask, BlackBrush);
 }
 
+struct CreateParams {
+	BOOL bEnableNonClientDpiScaling;
+};
+
 LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	unsigned position = 0, iRGB = 0, iColor = 0, iThumb = 0, iVersion = 0, lastCharacter = 0;
 	unsigned screenCenterOffset  = 0;
@@ -18795,6 +18799,29 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 	RECT     traceLowMaskRect    = {}; // low trace mask rectangle
 
 	switch (message) {
+#if HIGHDPI
+	case WM_NCCREATE: {
+		// Enable per-monitor DPI scaling for caption, menu, and top-level
+		// scroll bars.
+		//
+		// Non-client area (scroll bars, caption bar, etc.) does not DPI scale
+		// automatically on Windows 8.1. In Windows 10 (1607) support was added
+		// for this via a call to EnableNonClientDpiScaling. Windows 10 (1703)
+		// supports this automatically when the DPI_AWARENESS_CONTEXT is
+		// DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2.
+		//
+		// Here we are detecting if a BOOL was set to enable non-client DPI scaling
+		// via the call to CreateWindow that resulted in this window. Doing this
+		// detection is only necessary in the context of this sample.
+		auto createStruct = reinterpret_cast<const CREATESTRUCT*>(lParam);
+		auto createParams = static_cast<const CreateParams*>(createStruct->lpCreateParams);
+		if (createParams->bEnableNonClientDpiScaling) {
+			EnableNonClientDpiScaling(p_hWnd);
+		}
+
+		return DefWindowProc(p_hWnd, message, wParam, lParam);
+	}
+#endif
 	case WM_INITMENU:
 		if (StateMap.testAndReset(StateFlag::PRFACT)) {
 			DestroyWindow(PreferencesWindow);
@@ -19275,6 +19302,10 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	wc.lpszClassName = "thred";
 	wc.hIconSm       = NULL;
 
+#if HIGHDPI
+	DPI_AWARENESS_CONTEXT previousDpiContext = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+#endif
+
 	// to keep the compiler from complaining
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
@@ -19347,6 +19378,10 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 		TexturePointsBuffer = &private_TexturePointsBuffer;
 
 		redini();
+
+		CreateParams createParams;
+		createParams.bEnableNonClientDpiScaling = true;
+
 		if (IniFile.initialWindowCoords.right) {
 			ThrEdWindow = CreateWindow("thred",
 			                           "",
@@ -19358,11 +19393,20 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 			                           0,
 			                           0,
 			                           hInstance,
-			                           0);
+			                           &createParams);
 		}
 		else {
-			ThrEdWindow = CreateWindow(
-			    "thred", "", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, hInstance, 0);
+			ThrEdWindow = CreateWindow("thred",
+			                           "",
+			                           WS_OVERLAPPEDWINDOW,
+			                           CW_USEDEFAULT,
+			                           CW_USEDEFAULT,
+			                           CW_USEDEFAULT,
+			                           CW_USEDEFAULT,
+			                           0,
+			                           0,
+			                           hInstance,
+			                           &createParams);
 			GetClientRect(ThrEdWindow, &ThredWindowRect);
 			IniFile.initialWindowCoords.left   = ThredWindowRect.left;
 			IniFile.initialWindowCoords.right  = ThredWindowRect.right;
@@ -19401,5 +19445,11 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 #ifdef ALLOCFAILURE
 	_set_new_handler(old_handler);
 #endif
+
+#if HIGHDPI
+	// Restore the current thread's DPI awareness context
+	SetThreadDpiAwarenessContext(previousDpiContext);
+#endif
+
 	return -1;
 }
