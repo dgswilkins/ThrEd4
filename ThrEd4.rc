@@ -170,7 +170,8 @@ BEGIN
         END
         MENUITEM "Show Threads (F6)",           ID_VUTHRDS
         MENUITEM "Show Threads for Selected Color", ID_VUSELTHRDS
-        MENUITEM "Design Information (')",      ID_DESIZ
+//        MENUITEM "Design Information (')",      ID_DESIZ
+
         POPUP "Knots"
         BEGIN
             MENUITEM "On",                          ID_KNOTON

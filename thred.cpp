@@ -1,6 +1,10 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
+
+#include <exception> // For std::exception
+#include <stdexcept> // For std::overflow_error
+#include <Shlwapi.h>
 #include <CppCoreCheck\warnings.h>
 #include <bitset>
 #include <float.h>
@@ -18,6 +22,7 @@
 #ifdef ALLOCFAILURE
 #include <new.h>
 #endif
+#include "utf8conv.h" // UTF-8 conversion functions
 #include "resource.h"
 #include "thred.h"
 
@@ -32,7 +37,7 @@ extern void               bholbrd();
 extern void               bord();
 extern void               boxsel();
 extern void               bsizpar();
-extern void               butxt(unsigned iButton, const std::string& buttonText);
+extern void               butxt(unsigned iButton, const std::wstring& buttonText);
 extern void               centir();
 extern void               chain();
 extern void               chan();
@@ -48,7 +53,7 @@ extern void               cntrx();
 extern void               col2frm();
 extern void               contfil();
 extern void               cpylayr(unsigned codedLayer);
-extern void               crmsg(const char* fileName);
+extern void               crmsg(const wchar_t* fileName);
 extern void               crop();
 extern void               dazdef();
 extern void               debean();
@@ -113,7 +118,7 @@ extern void               fethrf();
 extern void               filangl();
 extern void               filclpx();
 extern void               filhor();
-extern void               filnopn(unsigned code, const char* fileName);
+extern void               filnopn(unsigned code, const wchar_t* fileName);
 extern void               filsat();
 extern void               filvrt();
 extern unsigned           find1st();
@@ -158,9 +163,9 @@ extern bool               istx(unsigned iForm);
 extern void               join();
 extern void               lodchk();
 extern void               lodstr();
-extern inline void        loadString(std::string& sDest, unsigned stringID);
+extern inline void        loadString(std::wstring& sDest, unsigned stringID);
 extern void               makspac(unsigned start, unsigned count);
-extern void               maxtsiz(const std::string& label, POINT& textSize);
+extern void               maxtsiz(const std::wstring& label, POINT& textSize);
 extern void               maxwid(unsigned start, unsigned finish);
 extern float              midl(float high, float low);
 extern void               mdufrm();
@@ -272,7 +277,7 @@ extern void               setwlk();
 extern void               setwlkind();
 extern void               sfCor2px(const fPOINT& stitchPoint, POINT& screen);
 extern void               sfuang();
-extern void               shoMsg(const std::string& message);
+extern void               shoMsg(const std::wstring& message);
 extern void               shoseln(unsigned code0, unsigned code1);
 extern void               shrnk();
 extern void               sidwnd(HWND wnd);
@@ -285,7 +290,7 @@ extern void               stchs2frm();
 extern void               tabmsg(unsigned code);
 extern void               tglfrm();
 extern void               tomsg();
-extern void               tsizmsg(char* threadSizeText, double threadSize);
+extern void               tsizmsg(wchar_t* threadSizeText, double threadSize);
 extern void               tst();
 extern void               txdun();
 extern void               txof();
@@ -311,65 +316,65 @@ extern void               wavfrm();
 extern void dmpat();
 #endif
 
-extern unsigned                  ActivePointIndex;
-extern fRECTANGLE                AllItemsRect;
-extern double                    BorderWidth;
-extern BSEQPNT                   BSequence[BSEQLEN];
-extern float                     ButtonholeCornerLength;
-extern fPOINT                    ClipPoints[MAXITEMS];
-extern unsigned                  ClosestFormToCursor;
-extern unsigned                  ClosestVertexToCursor;
-extern unsigned                  ClipPointIndex;
-extern SATCON*                   CurrentFormGuides;
-extern fPOINT*                   CurrentFormVertices;
-extern std::vector<HWND>*        ValueWindow;
-extern std::vector<double>*      FormAngles;
-extern POINT                     FormLines[MAXFRMLINS];
-extern unsigned                  FormVertexIndex;
-extern fPOINT                    FormMoveDelta;
-extern unsigned                  FormIndex;
-extern FRMHED                    FormList[MAXFORMS];
-extern std::vector<POINT>*       FormControlPoints;
-extern std::string*              FormOnOff;
-extern fPOINT                    FormVertices[MAXITEMS];
-extern double                    HorizontalRatio;
-extern fPOINT                    InterleaveSequence[MAXITEMS];
-extern std::vector<HWND>*        LabelWindow;
-extern double                    LineSpacing;
-extern fPOINT                    LowerLeftStitch;
-extern MENUITEMINFO*             MenuInfo;
-extern HWND                      MsgWindow;
-extern unsigned                  NewFormVertexCount;
-extern unsigned                  OutputIndex;
-extern fPOINT                    OSequence[OSEQLEN];
-extern std::vector<fPOINT>*      OutsidePointList;
-extern std::vector<fPOINT>*      InsidePointList;
-extern float                     PicotSpacing;
-extern long                      PreferenceWindowWidth;
-extern unsigned                  PreviousFormIndex;
-extern unsigned                  PseudoRandomValue;
-extern std::vector<POINT>*       RubberBandLine;
-extern unsigned                  SatinGuideIndex;
-extern SATCON                    SatinGuides[MAXSAC];
-extern unsigned                  SelectedFormControlVertex;
-extern std::vector<unsigned>*    SelectedFormList;
-extern std::vector<POINT>*       SelectedFormsLine;
-extern RECT                      SelectedFormsRect;
-extern std::vector<POINT>*       SelectedPointsLine;
-extern std::vector<unsigned>*    SelectedTexturePointsList;
-extern double                    SnapLength;
-extern double                    SpiralWrap;
-extern std::vector<std::string>* StringTable;
-extern double                    StarRatio;
-extern std::vector<fPOINT>*      TempPolygon;
-extern std::vector<TXPNT>*       TempTexturePoints;
-extern TXTSCR                    TextureScreen;
-extern int                       TextureIndex;
-extern std::string*              TextureInputBuffer; // texture editor number buffer
-extern std::vector<TXPNT>*       TexturePointsBuffer;
-extern unsigned                  VertexCount;
-extern double                    VerticalRatio;
-extern unsigned short            SatinEndGuide;
+extern unsigned                   ActivePointIndex;
+extern fRECTANGLE                 AllItemsRect;
+extern double                     BorderWidth;
+extern BSEQPNT                    BSequence[BSEQLEN];
+extern float                      ButtonholeCornerLength;
+extern fPOINT                     ClipPoints[MAXITEMS];
+extern unsigned                   ClosestFormToCursor;
+extern unsigned                   ClosestVertexToCursor;
+extern unsigned                   ClipPointIndex;
+extern SATCON*                    CurrentFormGuides;
+extern fPOINT*                    CurrentFormVertices;
+extern std::vector<HWND>*         ValueWindow;
+extern std::vector<double>*       FormAngles;
+extern POINT                      FormLines[MAXFRMLINS];
+extern unsigned                   FormVertexIndex;
+extern fPOINT                     FormMoveDelta;
+extern unsigned                   FormIndex;
+extern FRMHED                     FormList[MAXFORMS];
+extern std::vector<POINT>*        FormControlPoints;
+extern std::wstring*              FormOnOff;
+extern fPOINT                     FormVertices[MAXITEMS];
+extern double                     HorizontalRatio;
+extern fPOINT                     InterleaveSequence[MAXITEMS];
+extern std::vector<HWND>*         LabelWindow;
+extern double                     LineSpacing;
+extern fPOINT                     LowerLeftStitch;
+extern MENUITEMINFO*              MenuInfo;
+extern HWND                       MsgWindow;
+extern unsigned                   NewFormVertexCount;
+extern unsigned                   OutputIndex;
+extern fPOINT                     OSequence[OSEQLEN];
+extern std::vector<fPOINT>*       OutsidePointList;
+extern std::vector<fPOINT>*       InsidePointList;
+extern float                      PicotSpacing;
+extern long                       PreferenceWindowWidth;
+extern unsigned                   PreviousFormIndex;
+extern unsigned                   PseudoRandomValue;
+extern std::vector<POINT>*        RubberBandLine;
+extern unsigned                   SatinGuideIndex;
+extern SATCON                     SatinGuides[MAXSAC];
+extern unsigned                   SelectedFormControlVertex;
+extern std::vector<unsigned>*     SelectedFormList;
+extern std::vector<POINT>*        SelectedFormsLine;
+extern RECT                       SelectedFormsRect;
+extern std::vector<POINT>*        SelectedPointsLine;
+extern std::vector<unsigned>*     SelectedTexturePointsList;
+extern double                     SnapLength;
+extern double                     SpiralWrap;
+extern std::vector<std::wstring>* StringTable;
+extern double                     StarRatio;
+extern std::vector<fPOINT>*       TempPolygon;
+extern std::vector<TXPNT>*        TempTexturePoints;
+extern TXTSCR                     TextureScreen;
+extern int                        TextureIndex;
+extern std::wstring*              TextureInputBuffer; // texture editor number buffer
+extern std::vector<TXPNT>*        TexturePointsBuffer;
+extern unsigned                   VertexCount;
+extern double                     VerticalRatio;
+extern unsigned short             SatinEndGuide;
 
 // select box
 #define NERCNT 4 // number of entries in the near array
@@ -413,8 +418,8 @@ unsigned        GroupStartStitch;                       // lower end of selected
 unsigned        GroupEndStitch;                         // higher end of selected stitches
 unsigned        PrevGroupStartStitch;                   // lower end of previous selection
 unsigned        PrevGroupEndStitch;                     // higher end of previous selection
-char            StitchEntryBuffer[5];                   // stitch number entered by user
-char            SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
+wchar_t         StitchEntryBuffer[5];                   // stitch number entered by user
+wchar_t         SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
 unsigned        BufferIndex = 0;                        // pointer to the next number to be entered
 unsigned        BufferDigitCount;                       // number of decimal digits in the number of stitches
 unsigned        LineIndex;                              // line index for display routine
@@ -422,8 +427,8 @@ double          StitchWindowAspectRatio;                // aspect ratio of the s
 double          MinStitchLength   = MINSIZ * PFAFGRAN;  // minimum stitch size
 double          UserStitchLength  = USESIZ * PFAFGRAN;  // user selected stitch size
 double          SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
-char*           PcdClipFormat     = "PMust_Format";
-char*           ThrEdClipFormat   = "threditor";
+wchar_t*        PcdClipFormat     = L"PMust_Format";
+wchar_t*        ThrEdClipFormat   = L"threditor";
 CLPSTCH*        ClipStitchData;                 // for pcs clipboard data
 FORMCLIP*       ClipFormHeader;                 // for thred form clipboard data
 FORMSCLIP*      ClipFormsHeader;                // multiple form clipboard header
@@ -448,7 +453,7 @@ unsigned        BitmapWidth;                    // bitmap width
 unsigned        BitmapHeight;                   // bitmap height
 dPOINT          BitmapSizeinStitches;           // bitmap end points in stitch points
 unsigned        BitmapColor = BITCOL;           // bitmap color
-char            MsgBuffer[MSGSIZ];              // for user messages
+wchar_t         MsgBuffer[MSGSIZ];              // for user messages
 unsigned        MsgIndex;                       // pointer to the message buffer
 double          ShowStitchThreshold = SHOPNTS;  // show stitch grid below this zoom level
 double          ThreadSize30        = TSIZ30;   //#30 thread size
@@ -458,48 +463,52 @@ unsigned        RunPoint;                       // point for animating stitchout
 unsigned        StitchesPerFrame;               // number of stitches to draw in each frame
 int             MovieTimeStep;                  // time delay for stitchout
 double          StitchBoxesThreshold = STCHBOX; // threshold for drawing stitch boxes
+
 // WARNING the size of the following array must be changed if the maximum movie speed is changed
-POINT         MovieLine[100];                                               // line for movie stitch draw
-RECT          MsgRect;                                                      // rectangle containing the text message
-unsigned      UndoBufferWriteIndex = 0;                                     // undo storage pointer
-unsigned      UndoBufferReadIndex  = 0;                                     // undo retrieval pointers
-unsigned      AppliqueColor        = 15;                                    // underlay color
-unsigned      LastKeyCode          = 0xffff;                                // last key code
-unsigned      FormMenuChoice       = 0;                                     // data type for form data form numerical entry
-dPOINT        ZoomMarkPoint;                                                // stitch coordinates of the zoom mark
-unsigned      PreferenceIndex = 0;                                          // index to the active preference window
-unsigned      LRUMenuId[]     = { FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3 }; // recently used file menu ID's
-char          VersionNames[OLDVER][_MAX_PATH];                              // temporary storage for old file version names
-unsigned      FileVersionIndex;                                             // points to old version to be read
-unsigned      ActiveLayer = 0;                                              // active layer
-unsigned      LayerIndex;                                                   // active layer code
-unsigned      ClipFormsCount;                                               // number of forms the on the clipboard
-POINT         StitchArrow[3];                                               // arrow for selected stitch
-RANGE         SelectedRange;                                                // first and last stitch for min/max stitch select
-unsigned      NameOrder[50];                                                // designer name order table
-unsigned char NameEncoder[128];                                             // designer name encoding
-unsigned char NameDecoder[256];                                             // designer name decode
-char          DesignerName[50];                                             // designer name in clear
-HWND          FirstWin;                                         // first window not destroyed for exiting enumerate loop
-RANGE         SelectedFormsRange;                               // range of selected forms
-unsigned      TmpFormIndex;                                     // saved form index
-double        ZoomMin;                                          // minimum allowed zoom value
-fRECTANGLE    CheckHoopRect;                                    // for checking the hoop size
-fPOINT        BalaradOffset;                                    // balarad offset
-unsigned      ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
-unsigned      SideWindowLocation;                               // side message window location
-POINT         SideWindowSize;                                   // size of the side message window
-std::string*  SideWindowsStrings;                               // string array displayed in sidmsg
-char          ColorFileName[_MAX_PATH];                         //.thw file name
-char          RGBFileName[_MAX_PATH];                           //.rgb file name
-dPOINT        CellSize;                                         // size of an stitchMap cell for drawing stitch boxes
-unsigned      DraggedColor;                                     // color being dragged
-FORMVERTICES  SelectedFormVertices;                             // selected form vertices
-fRECTANGLE    SelectedVerticesRect;                             // rectangle enclosing selected form verticess
-RECT          SelectedPixelsRect;                               // display form vertex select rectangle
-POINT*        FormVerticesAsLine;                               // form vertex clipboard paste into form line
-unsigned      LastFormSelected;                                 // end point of selected range of forms
-std::vector<std::unique_ptr<unsigned[]>>* UndoBuffer;           // backup data
+POINT MovieLine[100]; // line for movie stitch draw
+
+unsigned LRUMenuId[] = { FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3 }; // recently used file menu ID's
+unsigned ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF;         // for checking if a fill is a clipboard fill
+
+RECT          MsgRect;                         // rectangle containing the text message
+unsigned      UndoBufferWriteIndex = 0;        // undo storage pointer
+unsigned      UndoBufferReadIndex  = 0;        // undo retrieval pointers
+unsigned      AppliqueColor        = 15;       // underlay color
+unsigned      LastKeyCode          = 0xffff;   // last key code
+unsigned      FormMenuChoice       = 0;        // data type for form data form numerical entry
+dPOINT        ZoomMarkPoint;                   // stitch coordinates of the zoom mark
+unsigned      PreferenceIndex = 0;             // index to the active preference window
+wchar_t       VersionNames[OLDVER][_MAX_PATH]; // temporary storage for old file version names
+unsigned      FileVersionIndex;                // points to old version to be read
+unsigned      ActiveLayer = 0;                 // active layer
+unsigned      LayerIndex;                      // active layer code
+unsigned      ClipFormsCount;                  // number of forms the on the clipboard
+POINT         StitchArrow[3];                  // arrow for selected stitch
+RANGE         SelectedRange;                   // first and last stitch for min/max stitch select
+unsigned      NameOrder[50];                   // designer name order table
+unsigned char NameEncoder[128];                // designer name encoding
+unsigned char NameDecoder[256];                // designer name decode
+wchar_t       DesignerName[50];                // designer name in clear
+HWND          FirstWin;                        // first window not destroyed for exiting enumerate loop
+RANGE         SelectedFormsRange;              // range of selected forms
+unsigned      TmpFormIndex;                    // saved form index
+double        ZoomMin;                         // minimum allowed zoom value
+fRECTANGLE    CheckHoopRect;                   // for checking the hoop size
+fPOINT        BalaradOffset;                   // balarad offset
+unsigned      SideWindowLocation;              // side message window location
+POINT         SideWindowSize;                  // size of the side message window
+std::wstring* SideWindowsStrings;              // string array displayed in sidmsg
+wchar_t       ColorFileName[_MAX_PATH];        //.thw file name
+wchar_t       RGBFileName[_MAX_PATH];          //.rgb file name
+dPOINT        CellSize;                        // size of an stitchMap cell for drawing stitch boxes
+unsigned      DraggedColor;                    // color being dragged
+FORMVERTICES  SelectedFormVertices;            // selected form vertices
+fRECTANGLE    SelectedVerticesRect;            // rectangle enclosing selected form verticess
+RECT          SelectedPixelsRect;              // display form vertex select rectangle
+POINT*        FormVerticesAsLine;              // form vertex clipboard paste into form line
+unsigned      LastFormSelected;                // end point of selected range of forms
+
+std::vector<std::unique_ptr<unsigned[]>>* UndoBuffer; // backup data
 
 #if PESACT
 unsigned char* PEScolors;             // pes colors
@@ -532,7 +541,7 @@ StateFlag                TraceRGBFlag[] = { StateFlag::TRCRED, StateFlag::TRCGRN
 unsigned                 TraceRGBMask[] = { REDMSK, GRNMSK, BLUMSK };                                  // trace masks
 unsigned                 TraceRGB[]     = { BLUCOL, GRNCOL, REDCOL };                                  // trace colors
 unsigned                 TraceAdjacentColors[9]; // separated colors for adjacent pixels
-char                     TraceInputBuffer[4];    // for user input color numbers
+wchar_t                  TraceInputBuffer[4];    // for user input color numbers
 unsigned                 ColumnColor;            // trace color column
 POINT                    BitmapPoint;            // a point on the bitmap
 
@@ -586,7 +595,7 @@ COLORREF    CustomBackgroundColor[16];
 CHOOSECOLOR BitMapColorStruct;
 COLORREF    BitmapBackgroundColors[16];
 
-char     ThreadSize[16][2];    // user selected thread sizes
+wchar_t  ThreadSize[16][2];    // user selected thread sizes
 unsigned ThreadSizePixels[16]; // thread sizes in pixels
 unsigned ThreadSizeIndex[16];  // thread size indices
 
@@ -686,21 +695,21 @@ unsigned ThreadSizeSelected; // thread selected for size change
 #if PESACT
 const TCHAR AllFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Brother (PES)\0*.pes\0Tajima (DST)\0*.dst\0";
 #else
-const TCHAR AllFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
+const wchar_t AllFilter[_MAX_PATH + 1] = L"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
 #endif
-const char    BmpFilter[_MAX_PATH + 1]       = "Microsoft (BMP)\0*.bmp\0";
-char          CustomFilter[_MAX_PATH + 1]    = "Thredworks (THR)\0*.thr\0";
-char          WorkingFileName[_MAX_PATH + 1] = { 0 };
-char          ThrName[_MAX_PATH + 1];
-char          AuxName[_MAX_PATH + 1];
-char          GeName[_MAX_PATH + 1];
-char          DefaultDirectory[_MAX_PATH + 1]    = "c:\\";
-char          DefaultBMPDirectory[_MAX_PATH + 1] = "c:\\";
-char          BalaradName0[_MAX_PATH + 1]        = { 0 }; // balarad semaphore file
-char          BalaradName1[_MAX_PATH + 1]        = { 0 }; // balarad data file
-char          BalaradName2[_MAX_PATH + 1];
-char          SearchName[_MAX_PATH + 1];
-char          HomeDirectory[_MAX_PATH + 1]; // directory from which thred was executed
+const wchar_t BmpFilter[_MAX_PATH + 1]       = L"Microsoft (BMP)\0*.bmp\0";
+wchar_t       CustomFilter[_MAX_PATH + 1]    = L"Thredworks (THR)\0*.thr\0";
+wchar_t       WorkingFileName[_MAX_PATH + 1] = { 0 };
+wchar_t       ThrName[_MAX_PATH + 1];
+wchar_t       AuxName[_MAX_PATH + 1];
+wchar_t       GeName[_MAX_PATH + 1];
+wchar_t       DefaultDirectory[_MAX_PATH + 1]    = L"c:\\";
+wchar_t       DefaultBMPDirectory[_MAX_PATH + 1] = L"c:\\";
+wchar_t       BalaradName0[_MAX_PATH + 1]        = { 0 }; // balarad semaphore file
+wchar_t       BalaradName1[_MAX_PATH + 1]        = { 0 }; // balarad data file
+wchar_t       BalaradName2[_MAX_PATH + 1];
+wchar_t       SearchName[_MAX_PATH + 1];
+wchar_t       HomeDirectory[_MAX_PATH + 1]; // directory from which thred was executed
 HANDLE        FileHandle    = 0;
 HANDLE        PCSFileHandle = 0;
 HANDLE        IniFileHandle = 0;
@@ -709,9 +718,9 @@ HANDLE        BitmapFileHandle;           // bitmap handle
 unsigned      FileSize;                   // size of file
 unsigned long BytesRead;                  // bytes actually read from file
 unsigned      ColorChanges;               // number of color changes
-char          IniFileName[_MAX_PATH];     //.ini file name
+wchar_t       IniFileName[_MAX_PATH];     //.ini file name
 char          PCSBMPFileName[16];         // bitmap file name from pcs file
-char          UserBMPFileName[_MAX_PATH]; // bitmap file name from user load
+wchar_t       UserBMPFileName[_MAX_PATH]; // bitmap file name from user load
 OPENFILENAME  OpenFileName = {
     sizeof(OPENFILENAME), // lStructsize
     ThrEdWindow,          // hwndOwner
@@ -729,20 +738,20 @@ OPENFILENAME  OpenFileName = {
     OFN_OVERWRITEPROMPT,  // Flags
     0,                    // nFileOffset
     0,                    // nFileExtension
-    "thr",                // lpstrDefExt
+    L"thr",               // lpstrDefExt
     0,                    // lCustData
     0,                    // lpfnHook
     0,                    // lpTemplateName
 };
-std::vector<std::string>* Thumbnails;                          // vector of thumbnail names
-int                       ThumbnailsSelected[4];               // indexes of thumbnails selected for display
-unsigned                  ThumbnailDisplayCount;               // number of thumbnail file names selected for display
-unsigned                  ThumbnailIndex;                      // index into the thumbnail filname table
-char                      ThumbnailSearchString[32];           // storage for the thumnail search string
-char                      InsertedFileName[_MAX_PATH] = { 0 }; // insert file name
-unsigned                  InsertedVertexIndex;                 // saved float pointer for inserting files
-unsigned                  InsertedFormIndex;                   // saved form pointer for inserting files
-unsigned                  InsertedStitchCount;                 // saved stitch pointer for inserting files
+std::vector<std::wstring>* Thumbnails;                          // vector of thumbnail names
+int                        ThumbnailsSelected[4];               // indexes of thumbnails selected for display
+unsigned                   ThumbnailDisplayCount;               // number of thumbnail file names selected for display
+unsigned                   ThumbnailIndex;                      // index into the thumbnail filname table
+wchar_t                    ThumbnailSearchString[32];           // storage for the thumnail search string
+wchar_t                    InsertedFileName[_MAX_PATH] = { 0 }; // insert file name
+unsigned                   InsertedVertexIndex;                 // saved float pointer for inserting files
+unsigned                   InsertedFormIndex;                   // saved form pointer for inserting files
+unsigned                   InsertedStitchCount;                 // saved stitch pointer for inserting files
 
 OPENFILENAME OpenBitmapName = {
 	sizeof(OPENFILENAME), // lStructsize
@@ -761,7 +770,7 @@ OPENFILENAME OpenBitmapName = {
 	OFN_OVERWRITEPROMPT,  // Flags
 	0,                    // nFileOffset
 	0,                    // nFileExtension
-	"bmp",                // lpstrDefExt
+	L"bmp",               // lpstrDefExt
 	0,                    // lCustData
 	0,                    // lpfnHook
 	0,                    // lpTemplateName
@@ -1583,8 +1592,9 @@ void fnamtabs() {
 		NameDecoder[NameEncoder[iName]] = gsl::narrow<unsigned char>(iName);
 }
 
-void ritfnam(const char* designerName) {
+void ritfnam(const wchar_t* designerName) {
 	if (designerName) {
+		auto          designer    = win32::Utf16ToUtf8(designerName);
 		unsigned      iName       = 0;
 		unsigned char tmpName[50] = { 0 };
 
@@ -1594,8 +1604,8 @@ void ritfnam(const char* designerName) {
 		for (iName = 0; iName < 50; iName++)
 			tmpName[iName] = psg() & 0xff;
 		for (iName = 0; iName < 50; iName++) {
-			if (designerName[iName]) {
-				tmpName[iName] = NameEncoder[designerName[iName]];
+			if (designer[iName]) {
+				tmpName[iName] = NameEncoder[designer[iName]];
 			}
 			else {
 				while (NameDecoder[tmpName[iName]])
@@ -1615,21 +1625,26 @@ void ritfnam(const char* designerName) {
 	}
 }
 
-void redfnam(char* designerName) noexcept {
+void redfnam(wchar_t* designerName) {
 	if (designerName) {
 		unsigned      iName       = 0;
 		unsigned char tmpName[50] = { 0 };
+		std::string   designer;
 
-		for (iName = 0; iName < 50; iName++)
+		for (iName = 0; iName < 50; iName++) {
 			if (NameOrder[iName] < 50)
 				tmpName[iName] = ExtendedHeader.creatorName[NameOrder[iName]];
 			else
 				tmpName[iName] = 111;
-		for (iName = 0; iName < 50; iName++) {
-			designerName[iName] = NameDecoder[tmpName[iName]];
-			if (!designerName[iName])
-				return;
 		}
+		designer.resize(50);
+		for (iName = 0; iName < 50; iName++) {
+			designer[iName] = NameDecoder[tmpName[iName]];
+			if (!designer[iName])
+				break;
+		}
+		auto decoded = win32::Utf8ToUtf16(designer);
+		wcscpy_s(designerName, decoded.size(), decoded.data());
 	}
 }
 
@@ -1701,7 +1716,7 @@ double unthrsh(unsigned level) noexcept {
 }
 
 void ritfcor(const fPOINT& point) {
-	butxt(HCOR, fmt::format("x{:.0f} y{:.0f}", (point.x / PFGRAN), (point.y / PFGRAN)));
+	butxt(HCOR, fmt::format(L"x{:.0f} y{:.0f}", (point.x / PFGRAN), (point.y / PFGRAN)));
 }
 
 void ritcor(const fPOINTATTR& pointAttribute) {
@@ -1913,25 +1928,25 @@ void redfils() {
 }
 
 void nunams() {
-	char*    iFileExtention      = nullptr;
+	wchar_t* iFileExtention      = nullptr;
 	unsigned iPrevious           = 0;
 	unsigned nameLength          = 0;
-	char     swapName[_MAX_PATH] = { 0 };
+	wchar_t  swapName[_MAX_PATH] = { 0 };
 
-	_strlwr_s(WorkingFileName);
-	iFileExtention = strrchr(WorkingFileName, '.');
+	_wcslwr_s(WorkingFileName);
+	iFileExtention = StrRChrW(WorkingFileName, 0, L'.');
 	if (iFileExtention)
 		iFileExtention++;
 	else
-		iFileExtention = &WorkingFileName[strlen(WorkingFileName)];
+		iFileExtention = &WorkingFileName[wcslen(WorkingFileName)];
 	nameLength = iFileExtention - WorkingFileName;
-	strncpy_s(AuxName, WorkingFileName, nameLength);
-	strncpy_s(ThrName, WorkingFileName, nameLength);
-	strncpy_s(GeName, WorkingFileName, nameLength);
+	wcsncpy_s(AuxName, WorkingFileName, nameLength);
+	wcsncpy_s(ThrName, WorkingFileName, nameLength);
+	wcsncpy_s(GeName, WorkingFileName, nameLength);
 	iFileExtention = AuxName + nameLength;
 	switch (IniFile.auxFileType) {
 	case AUXDST:
-		strcpy_s(iFileExtention, sizeof(AuxName) - nameLength, "dst");
+		wcscpy_s(iFileExtention, sizeof(AuxName) - nameLength, L"dst");
 		break;
 #if PESACT
 	case AUXPES:
@@ -1939,19 +1954,19 @@ void nunams() {
 		break;
 #endif
 	default:
-		strcpy_s(iFileExtention, sizeof(AuxName) - nameLength, "pcs");
+		wcscpy_s(iFileExtention, sizeof(AuxName) - nameLength, L"pcs");
 	}
 	iFileExtention = ThrName + nameLength;
-	strcpy_s(iFileExtention, sizeof(ThrName) - nameLength, "thr");
+	wcscpy_s(iFileExtention, sizeof(ThrName) - nameLength, L"thr");
 	iFileExtention = GeName + nameLength;
-	strcpy_s(iFileExtention, sizeof(GeName) - nameLength, "th*");
+	wcscpy_s(iFileExtention, sizeof(GeName) - nameLength, L"th*");
 	bool flag = true;
 	for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
-		if (!strcmp(IniFile.prevNames[iPrevious], ThrName)) {
+		if (!StrCmpW(IniFile.prevNames[iPrevious], ThrName)) {
 			if (iPrevious) {
-				strcpy_s(swapName, sizeof(swapName), IniFile.prevNames[0]);
-				strcpy_s(IniFile.prevNames[0], sizeof(IniFile.prevNames[0]), IniFile.prevNames[iPrevious]);
-				strcpy_s(IniFile.prevNames[iPrevious], sizeof(IniFile.prevNames[iPrevious]), swapName);
+				wcscpy_s(swapName, sizeof(swapName), IniFile.prevNames[0]);
+				wcscpy_s(IniFile.prevNames[0], sizeof(IniFile.prevNames[0]), IniFile.prevNames[iPrevious]);
+				wcscpy_s(IniFile.prevNames[iPrevious], sizeof(IniFile.prevNames[iPrevious]), swapName);
 				flag = false;
 				break;
 			}
@@ -1963,17 +1978,17 @@ void nunams() {
 	if (flag) {
 		for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
 			if (!IniFile.prevNames[iPrevious][0]) {
-				strcpy_s(IniFile.prevNames[iPrevious], ThrName);
+				wcscpy_s(IniFile.prevNames[iPrevious], ThrName);
 				flag = false;
 				break;
 			}
 		}
 	}
 	if (flag) {
-		strcpy_s(IniFile.prevNames[3], IniFile.prevNames[2]);
-		strcpy_s(IniFile.prevNames[2], IniFile.prevNames[1]);
-		strcpy_s(IniFile.prevNames[1], IniFile.prevNames[0]);
-		strcpy_s(IniFile.prevNames[0], ThrName);
+		wcscpy_s(IniFile.prevNames[3], IniFile.prevNames[2]);
+		wcscpy_s(IniFile.prevNames[2], IniFile.prevNames[1]);
+		wcscpy_s(IniFile.prevNames[1], IniFile.prevNames[0]);
+		wcscpy_s(IniFile.prevNames[0], ThrName);
 	}
 	redfils();
 }
@@ -2466,7 +2481,7 @@ void chkhup() {
 }
 
 void chknum() {
-	double   value    = atof(MsgBuffer);
+	double   value    = std::stof(MsgBuffer);
 	unsigned edgeType = 0, borderColor = 0;
 
 	clrstch();
@@ -2484,7 +2499,7 @@ void chknum() {
 	}
 	if (MsgIndex) {
 		if (FormMenuChoice) {
-			value = atof(SideWindowEntryBuffer) * PFGRAN;
+			value = std::stof(SideWindowEntryBuffer) * PFGRAN;
 			switch (FormMenuChoice) {
 			case LTXOF:
 				savdo();
@@ -2526,7 +2541,7 @@ void chknum() {
 			case LFTHCOL:
 				if (value) {
 					savdo();
-					nufthcol((atoi(SideWindowEntryBuffer) - 1) & 0xf);
+					nufthcol((std::stoi(SideWindowEntryBuffer) - 1) & 0xf);
 					SetWindowText((*ValueWindow)[LFRMCOL], SideWindowEntryBuffer);
 					coltab();
 				}
@@ -2536,7 +2551,7 @@ void chknum() {
 			case LFRMCOL:
 				if (value) {
 					savdo();
-					nufilcol((atoi(SideWindowEntryBuffer) - 1) & 0xf);
+					nufilcol((std::stoi(SideWindowEntryBuffer) - 1) & 0xf);
 					SetWindowText((*ValueWindow)[LFRMCOL], SideWindowEntryBuffer);
 					coltab();
 				}
@@ -2546,7 +2561,7 @@ void chknum() {
 			case LUNDCOL:
 				if (value) {
 					savdo();
-					SelectedForm->underlayColor = (atoi(SideWindowEntryBuffer) - 1) & 0xf;
+					SelectedForm->underlayColor = (std::stoi(SideWindowEntryBuffer) - 1) & 0xf;
 					SetWindowText((*ValueWindow)[LUNDCOL], SideWindowEntryBuffer);
 					refilfn();
 					coltab();
@@ -2557,7 +2572,7 @@ void chknum() {
 			case LBRDCOL:
 				if (value) {
 					savdo();
-					nubrdcol((atoi(SideWindowEntryBuffer) - 1) & 0xf);
+					nubrdcol((std::stoi(SideWindowEntryBuffer) - 1) & 0xf);
 					SetWindowText((*ValueWindow)[LFRMCOL], SideWindowEntryBuffer);
 					coltab();
 				}
@@ -2696,40 +2711,40 @@ void chknum() {
 		}
 		else {
 			if (PreferenceIndex) {
-				value = atof(SideWindowEntryBuffer);
+				value = std::stof(SideWindowEntryBuffer);
 				switch (PreferenceIndex - 1) {
 				case PEG:
 					IniFile.eggRatio = value;
-					SetWindowText((*ValueWindow)[PEG], fmt::format("{:.2f}", value).c_str());
+					SetWindowText((*ValueWindow)[PEG], fmt::format(L"{:.2f}", value).c_str());
 					break;
 				case PNUDG:
 					IniFile.cursorNudgeStep = value;
 					IniFile.nudgePixels     = pxchk(value);
-					SetWindowText((*ValueWindow)[PNUDG], fmt::format("{:.2f}", value).c_str());
+					SetWindowText((*ValueWindow)[PNUDG], fmt::format(L"{:.2f}", value).c_str());
 					break;
 				case PPIC:
 					PicotSpacing = value * PFGRAN;
-					SetWindowText((*ValueWindow)[PPIC], fmt::format("{:.2f}", value).c_str());
+					SetWindowText((*ValueWindow)[PPIC], fmt::format(L"{:.2f}", value).c_str());
 					break;
 				case PCLPOF:
 					IniFile.clipOffset = value * PFGRAN;
-					SetWindowText((*ValueWindow)[PCLPOF], fmt::format("{:.2f} mm", value).c_str());
+					SetWindowText((*ValueWindow)[PCLPOF], fmt::format(L"{:.2f} mm", value).c_str());
 					break;
 				case PFAZ:
 					IniFile.fillPhase = floor(value);
-					SetWindowText((*ValueWindow)[PFAZ], fmt::format("{}", IniFile.fillPhase).c_str());
+					SetWindowText((*ValueWindow)[PFAZ], fmt::format(L"{}", IniFile.fillPhase).c_str());
 					break;
 				case PCHRAT:
 					IniFile.chainRatio = value;
-					SetWindowText((*ValueWindow)[PCHRAT], fmt::format("{:.2f}", value).c_str());
+					SetWindowText((*ValueWindow)[PCHRAT], fmt::format(L"{:.2f}", value).c_str());
 					break;
 				case PMIN:
 					MinStitchLength = value * PFGRAN;
-					SetWindowText((*ValueWindow)[PMIN], fmt::format("{:.2f}", value).c_str());
+					SetWindowText((*ValueWindow)[PMIN], fmt::format(L"{:.2f}", value).c_str());
 					break;
 				default:
 					if (value) {
-						std::string bufVal(fmt::format("{:.2f}", value));
+						std::wstring bufVal(fmt::format(L"{:.2f}", value));
 						switch (PreferenceIndex - 1) {
 						case PSPAC:
 							LineSpacing = value * PFGRAN;
@@ -2758,7 +2773,7 @@ void chknum() {
 							break;
 						case PAP:
 							AppliqueColor = gsl::narrow<unsigned>(round(value - 1)) % 16;
-							SetWindowText((*ValueWindow)[PAP], fmt::format("{}", (AppliqueColor + 1)).c_str());
+							SetWindowText((*ValueWindow)[PAP], fmt::format(L"{}", (AppliqueColor + 1)).c_str());
 							break;
 						case PSNP:
 							SnapLength = value * PFGRAN;
@@ -2770,7 +2785,7 @@ void chknum() {
 								StarRatio = 1;
 							if (StarRatio < 0.05)
 								StarRatio = 0.05;
-							SetWindowText((*ValueWindow)[PSTAR], fmt::format("{:.2f}", StarRatio).c_str());
+							SetWindowText((*ValueWindow)[PSTAR], fmt::format(L"{:.2f}", StarRatio).c_str());
 							break;
 						case PSPIR:
 							SpiralWrap = value;
@@ -2778,33 +2793,33 @@ void chknum() {
 								StarRatio = 20.;
 							if (StarRatio < 0.3)
 								StarRatio = 0.3;
-							SetWindowText((*ValueWindow)[PSPIR], fmt::format("{:.2f}", SpiralWrap).c_str());
+							SetWindowText((*ValueWindow)[PSPIR], fmt::format(L"{:.2f}", SpiralWrap).c_str());
 							break;
 						case PBUT:
 							ButtonholeCornerLength = value * PFGRAN;
-							SetWindowText((*ValueWindow)[PBUT], fmt::format("{:.2f}", value).c_str());
+							SetWindowText((*ValueWindow)[PBUT], fmt::format(L"{:.2f}", value).c_str());
 							break;
 						case PHUPX:
 							IniFile.hoopSizeX = value * PFGRAN;
-							SetWindowText((*ValueWindow)[PHUPX], fmt::format("{:.0f} mm", value).c_str());
+							SetWindowText((*ValueWindow)[PHUPX], fmt::format(L"{:.0f} mm", value).c_str());
 							sethup();
 							prfmsg();
 							chkhup();
 							break;
 						case PHUPY:
 							IniFile.hoopSizeY = value * PFGRAN;
-							SetWindowText((*ValueWindow)[PHUPY], fmt::format("{:.0f} mm", value).c_str());
+							SetWindowText((*ValueWindow)[PHUPY], fmt::format(L"{:.0f} mm", value).c_str());
 							sethup();
 							prfmsg();
 							chkhup();
 							break;
 						case PGRD:
 							IniFile.gridSize = value * PFGRAN;
-							SetWindowText((*ValueWindow)[PGRD], fmt::format("{:.2f} mm", value).c_str());
+							SetWindowText((*ValueWindow)[PGRD], fmt::format(L"{:.2f} mm", value).c_str());
 							break;
 						case PCHN:
 							IniFile.chainSpace = value * PFGRAN;
-							SetWindowText((*ValueWindow)[PCHN], fmt::format("{:.2f}", value).c_str());
+							SetWindowText((*ValueWindow)[PCHN], fmt::format(L"{:.2f}", value).c_str());
 							break;
 						}
 					}
@@ -2813,7 +2828,7 @@ void chknum() {
 				PreferenceIndex = 0;
 			}
 			else {
-				value = atof(MsgBuffer);
+				value = std::stof(MsgBuffer);
 				if (StateMap.testAndReset(StateFlag::SCLPSPAC))
 					IniFile.clipOffset = value * PFGRAN;
 				if (StateMap.testAndReset(StateFlag::FSETFIND))
@@ -3068,7 +3083,7 @@ void rstAll() {
 }
 
 void ritot(unsigned number) {
-	std::string txt;
+	std::wstring txt;
 	txt              = fmt::format((*StringTable)[STR_TOT], number);
 	BufferDigitCount = txt.size();
 	butxt(HTOT, txt);
@@ -3098,18 +3113,18 @@ void frmcalc() {
 			}
 		}
 		if (fabs(maxLength < 10000)) {
-			std::string strMax;
+			std::wstring strMax;
 			loadString(strMax, IDS_LENMAX);
 			butxt(HMAXLEN, fmt::format(strMax, (maxLength / PFGRAN)));
 		}
 		if (fabs(minLength < 10000)) {
-			std::string strMin;
+			std::wstring strMin;
 			loadString(strMin, IDS_LENMIN);
 			butxt(HMINLEN, fmt::format(strMin, (minLength / PFGRAN)));
 		}
 	}
 	else {
-		std::string blank("");
+		const std::wstring blank(L"");
 		butxt(HMAXLEN, blank);
 		butxt(HMINLEN, blank);
 	}
@@ -3135,7 +3150,7 @@ void lenfn(unsigned start, unsigned end) {
 			SmallestStitchIndex = iStitch;
 		}
 	}
-	std::string strMax, strMin;
+	std::wstring strMax, strMin;
 	loadString(strMax, IDS_LENMAX);
 	loadString(strMin, IDS_LENMIN);
 	butxt(HMAXLEN, fmt::format(strMax, (maxLength / PFGRAN)));
@@ -3143,14 +3158,14 @@ void lenfn(unsigned start, unsigned end) {
 }
 
 void lenCalc() {
-	std::string blank("");
+	const std::wstring blank(L"");
 
 	if (StateMap.test(StateFlag::LENSRCH)) {
-		std::string txt;
-		const float lenMax = (hypot(StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x,
-		                            StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y)
-		                      / PFGRAN);
-		butxt(HMINLEN, fmt::format("{:.2f}", lenMax));
+		std::wstring txt;
+		const float  lenMax = (hypot(StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x,
+                                    StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y)
+                              / PFGRAN);
+		butxt(HMINLEN, fmt::format(L"{:.2f}", lenMax));
 		loadString(txt, IDS_SRCH);
 		butxt(HMAXLEN, txt);
 	}
@@ -3568,11 +3583,11 @@ void ritlayr() {
 			layer = (FormList[ClosestFormToCursor].attribute & FRMLMSK) >> 1;
 	}
 	if (layer & 0xffff0000) {
-		std::string blank("");
+		const std::wstring blank(L"");
 		butxt(HLAYR, blank);
 	}
 	else {
-		std::string txt;
+		std::wstring txt;
 		txt              = fmt::format((*StringTable)[STR_LAYR], layer);
 		BufferDigitCount = txt.size();
 		butxt(HLAYR, txt);
@@ -3655,11 +3670,11 @@ void stch2pxr(const fPOINT& stitchCoordinate) noexcept {
 	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
 }
 
-void defNam(const char* fileName) {
+void defNam(const wchar_t* fileName) noexcept {
 	if (fileName) {
 		if (fileName[0]) {
-			strcpy_s(DefaultDirectory, fileName);
-			char* iLast = strrchr(DefaultDirectory, '\\');
+			wcscpy_s(DefaultDirectory, fileName);
+			wchar_t* iLast = StrRChrW(DefaultDirectory, 0, L'\\');
 			if (iLast) {
 				if (iLast - DefaultDirectory == 2)
 					iLast[1] = 0;
@@ -3670,10 +3685,10 @@ void defNam(const char* fileName) {
 	}
 }
 
-void defbNam() {
+void defbNam() noexcept {
 	if (UserBMPFileName[0]) {
-		strcpy_s(DefaultBMPDirectory, UserBMPFileName);
-		char* iLast = strrchr(DefaultBMPDirectory, '\\');
+		wcscpy_s(DefaultBMPDirectory, UserBMPFileName);
+		wchar_t* iLast = StrRChrW(DefaultBMPDirectory, 0, '\\');
 		if (iLast) {
 			if (iLast - DefaultBMPDirectory == 2)
 				iLast[1] = 0;
@@ -3687,7 +3702,7 @@ void ritini() {
 	unsigned iColor     = 0;
 	RECT     windowRect = {};
 
-	strcpy_s(IniFile.defaultDirectory, DefaultDirectory);
+	wcscpy_s(IniFile.defaultDirectory, DefaultDirectory);
 	for (iColor = 0; iColor < 16; iColor++) {
 		IniFile.stitchColors[iColor]              = UserColor[iColor];
 		IniFile.backgroundPreferredColors[iColor] = CustomBackgroundColor[iColor];
@@ -3859,21 +3874,21 @@ void ritbal() {
 	BALHED        balaradHeader = {};
 	unsigned      iStitch = 0, iColor = 0, iOutput = 0, color = 0;
 	HANDLE        balaradFile           = {};
-	char*         lastNameCharacter     = nullptr;
-	char          outputName[_MAX_PATH] = { 0 };
+	wchar_t*      lastNameCharacter     = nullptr;
+	wchar_t       outputName[_MAX_PATH] = { 0 };
 	unsigned long bytesWritten          = 0;
 
 	if (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount) {
 		if (!*WorkingFileName) {
-			strcpy_s(WorkingFileName, DefaultDirectory);
-			strcat_s(WorkingFileName, "\\balfil.thr");
+			wcscpy_s(WorkingFileName, DefaultDirectory);
+			wcscat_s(WorkingFileName, L"\\balfil.thr");
 		}
-		strcpy_s(outputName, WorkingFileName);
-		lastNameCharacter = strrchr(outputName, '.');
+		wcscpy_s(outputName, WorkingFileName);
+		lastNameCharacter = StrRChrW(outputName, 0, L'.');
 		if (lastNameCharacter)
-			strcpy_s(lastNameCharacter, sizeof(outputName) - (lastNameCharacter - outputName), ".thv");
+			wcscpy_s(lastNameCharacter, sizeof(outputName) - (lastNameCharacter - outputName), L".thv");
 		else
-			strcat_s(outputName, sizeof(outputName) - strlen(outputName), ".thv");
+			wcscat_s(outputName, sizeof(outputName)/sizeof(wchar_t) - wcslen(outputName), L".thv");
 		balaradFile = CreateFile(outputName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		if (balaradFile == INVALID_HANDLE_VALUE)
 			return;
@@ -3911,7 +3926,7 @@ void ritbal() {
 		WriteFile(balaradFile, balaradStitch.data(), iOutput * sizeof(BALSTCH), &bytesWritten, 0);
 		CloseHandle(balaradFile);
 		balaradFile = CreateFile(BalaradName1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
-		WriteFile(balaradFile, (char*)outputName, strlen(outputName) + 1, &bytesWritten, 0);
+		WriteFile(balaradFile, (char*)outputName, wcslen(outputName) + 1, &bytesWritten, 0);
 		CloseHandle(balaradFile);
 	}
 	else {
@@ -3942,10 +3957,10 @@ void reldun() {
 	PostQuitMessage(0);
 }
 
-bool chkattr(const char* const filename) {
+bool chkattr(const wchar_t* const filename) {
 	const unsigned attributes            = GetFileAttributes(filename);
 	unsigned       buttonPressed         = 0;
-	char           drive[_MAX_PATH]      = { 0 };
+	wchar_t        drive[_MAX_PATH]      = { 0 };
 	DWORD          SectorsPerCluster     = 0;
 	DWORD          BytesPerSector        = 0;
 	DWORD          NumberOfFreeClusters  = 0;
@@ -3961,7 +3976,7 @@ bool chkattr(const char* const filename) {
 		else
 			return 1;
 	}
-	strcpy_s(drive, HomeDirectory);
+	wcscpy_s(drive, HomeDirectory);
 	drive[3] = 0;
 	// ToDo - does a return value of 0 mean no free space?
 	if (!GetDiskFreeSpace(drive, &SectorsPerCluster, &BytesPerSector, &NumberOfFreeClusters, &TotalNumberOfClusters)) {
@@ -3971,10 +3986,10 @@ bool chkattr(const char* const filename) {
 	return 0;
 }
 
-unsigned duth(const char* const name) noexcept {
+unsigned duth(const wchar_t* const name) noexcept {
 	// ToDo - Can I use strrchr here?
 	if (name) {
-		unsigned iLast = strlen(name);
+		unsigned iLast = wcslen(name);
 
 		do
 			iLast--;
@@ -3987,7 +4002,7 @@ unsigned duth(const char* const name) noexcept {
 	return 0;
 }
 
-void duver(char* const name) noexcept {
+void duver(wchar_t* const name) noexcept {
 	if (name) {
 		const unsigned lastChar = duth(name);
 		int            version  = 0;
@@ -3996,7 +4011,7 @@ void duver(char* const name) noexcept {
 			version             = tolower(name[lastChar]) - 'r';
 			name[_MAX_PATH - 1] = 0;
 			if (version >= 0 && version <= 3)
-				strcpy_s(VersionNames[version], name);
+				wcscpy_s(VersionNames[version], name);
 		}
 	}
 }
@@ -4018,7 +4033,8 @@ void dubuf(char* const buffer, unsigned& count) {
 	stitchHeader.fileLength  = PCSHeader.stitchCount * sizeof(fPOINTATTR) + sizeof(STRHED) + sizeof(PCSBMPFileName);
 	stitchHeader.stitchCount = PCSHeader.stitchCount;
 	stitchHeader.hoopType    = IniFile.hoopType;
-	strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
+	auto designer            = win32::Utf16ToUtf8(IniFile.designerName);
+	strcpy_s(ExtendedHeader.modifierName, designer.data());
 	if (FormIndex) {
 		for (iForm = 0; iForm < FormIndex; iForm++) {
 			vertexCount += FormList[iForm].vertexCount;
@@ -4034,7 +4050,7 @@ void dubuf(char* const buffer, unsigned& count) {
 	stitchHeader.vertexCount   = vertexCount;
 	stitchHeader.dlineCount    = guideCount;
 	stitchHeader.clipDataCount = clipDataCount;
-	const auto threadLength    = sizeof(ThreadSize) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
+	const auto threadLength    = (sizeof(ThreadSize)/sizeof(wchar_t)) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
 	const auto formDataOffset
 	    = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor) + sizeof(CustomColor) + threadLength;
 	stitchHeader.vertexLen   = sizeof(STRHED) + PCSHeader.stitchCount * sizeof(fPOINTATTR) + formDataOffset;
@@ -4118,7 +4134,7 @@ void thrsav() {
 	unsigned long   bytesWritten           = 0;
 	WIN32_FIND_DATA fileData               = {};
 	HANDLE          file                   = {};
-	char            newFileName[_MAX_PATH] = { 0 };
+	wchar_t         newFileName[_MAX_PATH] = { 0 };
 	unsigned        count                  = 0;
 
 	if (chkattr(WorkingFileName))
@@ -4139,7 +4155,7 @@ void thrsav() {
 			for (iBackup = OLDVER - 2; iBackup >= 0; iBackup--) {
 				if (VersionNames[iBackup][0]) {
 					VersionNames[iBackup][_MAX_PATH - 1] = 0;
-					strcpy_s(newFileName, VersionNames[iBackup]);
+					wcscpy_s(newFileName, VersionNames[iBackup]);
 					lastCharacter              = duth(newFileName);
 					newFileName[lastCharacter] = iBackup + 's';
 					MoveFile(VersionNames[iBackup], newFileName);
@@ -4158,7 +4174,7 @@ void thrsav() {
 		dubuf(output.data(), count);
 		WriteFile(FileHandle, output.data(), count, &bytesWritten, 0);
 		if (bytesWritten != count) {
-			std::string fmtStr;
+			std::wstring fmtStr;
 			loadString(fmtStr, IDS_FWERR);
 			shoMsg(fmt::format(fmtStr, ThrName));
 		}
@@ -4196,18 +4212,18 @@ constexpr unsigned dudbits(const POINT& dif) {
 	return Xdst[dif.x + 121] | Ydst[dif.y + 121];
 }
 
-bool colfil() {
-	char* extentionLocation = nullptr;
+bool colfil() noexcept {
+	wchar_t* extentionLocation = nullptr;
 
-	strcpy_s(ColorFileName, WorkingFileName);
-	strcpy_s(RGBFileName, WorkingFileName);
-	extentionLocation = strrchr(ColorFileName, '.');
+	wcscpy_s(ColorFileName, WorkingFileName);
+	wcscpy_s(RGBFileName, WorkingFileName);
+	extentionLocation = StrRChrW(ColorFileName, 0, L'.');
 	if (extentionLocation) {
 		extentionLocation++;
-		strcpy_s(extentionLocation, sizeof(ColorFileName) - (extentionLocation - ColorFileName), "thw");
-		extentionLocation = strrchr(RGBFileName, '.');
+		wcscpy_s(extentionLocation, sizeof(ColorFileName) - (extentionLocation - ColorFileName), L"thw");
+		extentionLocation = StrRChrW(RGBFileName, 0, L'.');
 		extentionLocation++;
-		strcpy_s(extentionLocation, sizeof(RGBFileName) - (extentionLocation - RGBFileName), "rgb");
+		wcscpy_s(extentionLocation, sizeof(RGBFileName) - (extentionLocation - RGBFileName), L"rgb");
 		return 1;
 	}
 	else
@@ -4519,7 +4535,6 @@ void sav() {
 #if PESACT
 	unsigned char* pchr = nullptr;
 #endif
-	char*    desc   = nullptr;
 	unsigned savcol = 0;
 
 #if PESACT
@@ -4567,6 +4582,8 @@ void sav() {
 		DSTRecords.reserve(PCSHeader.stitchCount + 128);
 		DSTOffsets          DSTOffsetData = {};
 		std::vector<PCSTCH> PCSStitchBuffer;
+		auto                auxName = win32::Utf16ToUtf8(AuxName);
+		auto                desc    = strrchr(auxName.data(), '\\') + 1;
 		switch (IniFile.auxFileType) {
 		case AUXDST:
 			ritdst(DSTOffsetData, DSTRecords, saveStitches);
@@ -4574,7 +4591,6 @@ void sav() {
 			// Use sizeof to ensure no overrun if the format string is wrong length
 			strncpy(dstHeader.desched, "LA:", sizeof(dstHeader.desched));
 			std::fill_n(dstHeader.desc, sizeof(dstHeader.desc), ' ');
-			desc = strrchr(AuxName, '\\') + 1;
 			if (desc) {
 				for (iHeader = 0; iHeader < sizeof(dstHeader.desc); iHeader++) {
 					if (desc[iHeader] && desc[iHeader] != '.')
@@ -4788,7 +4804,7 @@ void auxmen() {
 		                     13,
 		                     0 };
 
-	std::string auxMsg;
+	std::wstring auxMsg;
 
 	CheckMenuItem(MainMenu, ID_AUXPCS, MF_UNCHECKED);
 #if PESACT
@@ -4799,56 +4815,56 @@ void auxmen() {
 	CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
 	switch (IniFile.auxFileType) {
 	case AUXDST:
-		auxMsg = fmt::format((*StringTable)[STR_AUXTXT], "DST");
+		auxMsg = fmt::format((*StringTable)[STR_AUXTXT], L"DST");
 		CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
 		break;
 	case AUXPES:
 #if PESACT
-		auxMsg = fmt::format((*StringTable)[STR_AUXTXT], "PES");
+		auxMsg = fmt::format((*StringTable)[STR_AUXTXT], L"PES");
 		CheckMenuItem(MainMenu, ID_AUXPES, MF_CHECKED);
 		break;
 #else
 		IniFile.auxFileType = AUXPCS;
 #endif
 	default:
-		auxMsg = fmt::format((*StringTable)[STR_AUXTXT], "PCS");
+		auxMsg = fmt::format((*StringTable)[STR_AUXTXT], L"PCS");
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
 	}
 	[[gsl::suppress(type .3)]] {
-		filinfo.dwTypeData = const_cast<LPSTR>(auxMsg.c_str());
+		filinfo.dwTypeData = const_cast<LPWSTR>(auxMsg.c_str());
 		SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
 	}
 	StateMap.set(StateFlag::DUMEN);
 }
 
 void savAs() {
-	char* pchr = nullptr;
+	wchar_t* pchr = nullptr;
 
 	if (PCSHeader.stitchCount || FormIndex || *PCSBMPFileName) {
 		OpenFileName.nFilterIndex = 0;
 		if (GetSaveFileName(&OpenFileName)) {
-			_strlwr_s(WorkingFileName);
-			pchr = strrchr(WorkingFileName, '.');
+			_wcslwr_s(WorkingFileName);
+			pchr = StrRChrW(WorkingFileName, 0, L'.');
 			if (!pchr)
-				pchr = &WorkingFileName[strlen(WorkingFileName)];
+				pchr = &WorkingFileName[wcslen(WorkingFileName)];
 			switch (OpenFileName.nFilterIndex) {
 			case 1:
-				strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), ".thr");
+				wcscpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), L".thr");
 				break;
 			case 2:
-				strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), ".pcs");
+				wcscpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), L".pcs");
 				IniFile.auxFileType = AUXPCS;
 				auxmen();
 				break;
 			case 3:
 #if PESACT
-				strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), ".pes");
+				strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), L".pes");
 				IniFile.auxFileType = AUXPES;
 				auxmen();
 				break;
 			case 4:
 #endif
-				strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), ".dst");
+				wcscpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), L".dst");
 				IniFile.auxFileType = AUXDST;
 				auxmen();
 				break;
@@ -4866,15 +4882,15 @@ void savAs() {
 }
 
 void save() {
-	char* pchr = nullptr;
+	wchar_t* pchr = nullptr;
 
 	if (WorkingFileName[0]) {
-		pchr = strrchr(WorkingFileName, '.');
+		pchr = StrRChrW(WorkingFileName, 0, L'.');
 		if (pchr)
 			pchr++;
 		else {
-			strcat_s(WorkingFileName, ".thr");
-			pchr = strrchr(WorkingFileName, '.') + 1;
+			wcscat_s(WorkingFileName, L".thr");
+			pchr = StrRChrW(WorkingFileName, 0, L'.') + 1;
 		}
 		thrsav();
 		if (PCSHeader.stitchCount)
@@ -4904,7 +4920,7 @@ void dun() {
 			StateMap.set(StateFlag::SAVEX);
 		}
 		else {
-			std::string fmtStr;
+			std::wstring fmtStr;
 			loadString(fmtStr, IDS_SAVFIL);
 			if (MessageBox(ThrEdWindow, fmt::format(fmtStr, ThrName).c_str(), (*StringTable)[STR_CLOS].c_str(), MB_YESNO)
 			    == IDYES)
@@ -4915,7 +4931,7 @@ void dun() {
 }
 
 void dusid(unsigned entry) noexcept {
-	SideWindow[entry] = CreateWindow("STATIC",
+	SideWindow[entry] = CreateWindow(L"STATIC",
 	                                 SideWindowsStrings[entry].c_str(),
 	                                 SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                 3,
@@ -4929,7 +4945,7 @@ void dusid(unsigned entry) noexcept {
 	SideWindowLocation++;
 }
 
-void sidmsg(HWND window, std::string* const strings, unsigned entries) {
+void sidmsg(HWND window, std::wstring* const strings, unsigned entries) {
 	if (strings) {
 		RECT     childListRect  = {};
 		RECT     parentListRect = {};
@@ -4958,7 +4974,7 @@ void sidmsg(HWND window, std::string* const strings, unsigned entries) {
 						maxtsiz(strings[iEntry], SideWindowSize);
 				}
 			}
-			SideMessageWindow = CreateWindow("STATIC",
+			SideMessageWindow = CreateWindow(L"STATIC",
 			                                 0,
 			                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 			                                 parentListRect.right - ThredWindowOrigin.x + 3,
@@ -4983,7 +4999,7 @@ void sidmsg(HWND window, std::string* const strings, unsigned entries) {
 		}
 		else {
 			if (FormMenuChoice == LLAYR) {
-				std::string zero = "0";
+				std::wstring zero = L"0";
 				maxtsiz(zero, SideWindowSize);
 			}
 			else {
@@ -5009,7 +5025,7 @@ void sidmsg(HWND window, std::string* const strings, unsigned entries) {
 					}
 				}
 			}
-			SideMessageWindow = CreateWindow("STATIC",
+			SideMessageWindow = CreateWindow(L"STATIC",
 			                                 0,
 			                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 			                                 parentListRect.right - ThredWindowOrigin.x + 3,
@@ -5061,7 +5077,7 @@ void stchWnd() {
 	stchPars();
 
 	MainStitchWin = nullptr;
-	MainStitchWin = CreateWindow("STATIC",
+	MainStitchWin = CreateWindow(L"STATIC",
 	                             0,
 	                             SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                             ButtonWidthX3,
@@ -5076,7 +5092,7 @@ void stchWnd() {
 	if (MainStitchWin != nullptr) {
 		GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
 
-		VerticalScrollBar = CreateWindow("SCROLLBAR",
+		VerticalScrollBar = CreateWindow(L"SCROLLBAR",
 		                                 0,
 		                                 SBS_VERT | WS_CHILD | WS_VISIBLE,
 		                                 StitchWindowSize.x + ButtonWidthX3,
@@ -5088,7 +5104,7 @@ void stchWnd() {
 		                                 ThrEdInstance,
 		                                 NULL);
 
-		HorizontalScrollBar = CreateWindow("SCROLLBAR",
+		HorizontalScrollBar = CreateWindow(L"SCROLLBAR",
 		                                   0,
 		                                   SBS_HORZ | WS_CHILD | WS_VISIBLE,
 		                                   ButtonWidthX3,
@@ -5400,7 +5416,7 @@ void bfil() {
 	InverseBackgroundColor = fswap(BackgroundColor);
 	BitmapFileHandle       = CreateFile(UserBMPFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 	if (BitmapFileHandle == INVALID_HANDLE_VALUE) {
-		std::string fmtStr;
+		std::wstring fmtStr;
 		loadString(fmtStr, IDS_UNOPEN);
 		shoMsg(fmt::format(fmtStr, UserBMPFileName));
 		CloseHandle(BitmapFileHandle);
@@ -5674,7 +5690,7 @@ void unthum() {
 			butxt(HUPTO, (*StringTable)[STR_UPON]);
 		else
 			butxt(HUPTO, (*StringTable)[STR_UPOF]);
-		std::string blank("");
+		const std::wstring blank(L"");
 		butxt(HNUM, blank);
 		redraw((*ButtonWin)[HHID]);
 		butxt(HBOXSEL, (*StringTable)[STR_BOXSEL]);
@@ -5697,10 +5713,10 @@ void nuFil() {
 	unsigned      textureHistoryFlag = 0, pcsStitchCount = 0;
 	unsigned      iPCSstitch = 0, color = 0, iColor = 0;
 	unsigned      iColorChange   = 0;
-	char*         fileExtention  = nullptr;
+	wchar_t*      fileExtention  = nullptr;
 	char          firstCharacter = 0;
 	STRHED        thredHeader    = {};
-	char          buffer[3]      = { 0 };
+	wchar_t       buffer[3]      = { 0 };
 	char*         tnam           = nullptr;
 	DSTHED        dstHeader      = {};
 	long          totalBytesRead = 0;
@@ -5755,7 +5771,7 @@ void nuFil() {
 			TextureIndex = 0;
 			EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
 			deldu();
-			strcpy_s(DesignerName, IniFile.designerName);
+			wcscpy_s(DesignerName, IniFile.designerName);
 			unbsho();
 			StateMap.reset(StateFlag::MOVSET);
 			frmon();
@@ -5788,12 +5804,12 @@ void nuFil() {
 			if (textureHistoryFlag)
 				StateMap.set(StateFlag::WASTXBAK);
 			fileSize      = GetFileSize(FileHandle, &fileSizeHigh);
-			fileExtention = strrchr(WorkingFileName, '.');
+			fileExtention = StrRChrW(WorkingFileName, 0, L'.');
 			if (fileExtention)
 				fileExtention++;
 			else {
-				strcat_s(WorkingFileName, ".thr");
-				fileExtention = strrchr(WorkingFileName, '.') + 1;
+				wcscat_s(WorkingFileName, L".thr");
+				fileExtention = StrRChrW(WorkingFileName, 0, L'.') + 1;
 			}
 			firstCharacter = tolower(fileExtention[0]);
 			if (firstCharacter == 't') {
@@ -5803,7 +5819,8 @@ void nuFil() {
 						tabmsg(IDS_SHRTF);
 						return;
 					}
-					version = (thredHeader.headerType & 0xff000000) >> 24;
+					version       = (thredHeader.headerType & 0xff000000) >> 24;
+					auto designer = win32::Utf16ToUtf8(IniFile.designerName);
 					switch (version) {
 					case 0:
 						if (PCSHeader.hoopType == SMALHUP) {
@@ -5816,8 +5833,8 @@ void nuFil() {
 							PCSHeader.hoopType                 = LARGHUP;
 						}
 						ritfnam(IniFile.designerName);
-						strcpy_s(DesignerName, IniFile.designerName);
-						strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
+						wcscpy_s(DesignerName, IniFile.designerName);
+						strcpy_s(ExtendedHeader.modifierName, designer.data());
 						break;
 					case 1:
 					case 2:
@@ -5871,7 +5888,7 @@ void nuFil() {
 						prtred();
 						return;
 					}
-					const auto threadLength = sizeof(ThreadSize) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
+					const auto threadLength = (sizeof(ThreadSize)/sizeof(wchar_t)) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
 					ReadFile(FileHandle, (char*)MsgBuffer, threadLength, &BytesRead, 0);
 					totalBytesRead += BytesRead;
 					if (BytesRead != threadLength) {
@@ -5991,7 +6008,7 @@ void nuFil() {
 							// Grab the bitmap filename
 							tnam = convert_ptr<char*>(&PCSDataBuffer[iPCSstitch]);
 							strcpy_s(PCSBMPFileName, tnam);
-							strcpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), "thr");
+							wcscpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), L"thr");
 							IniFile.auxFileType = AUXPCS;
 							if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP)
 								PCSHeader.hoopType = LARGHUP;
@@ -6120,7 +6137,8 @@ void nuFil() {
 			}
 			if (PCSBMPFileName[0]) {
 				SetCurrentDirectory(DefaultDirectory);
-				strcpy_s(UserBMPFileName, PCSBMPFileName);
+				auto BMPfileName = win32::Utf8ToUtf16(PCSBMPFileName);
+				wcscpy_s(UserBMPFileName, BMPfileName.data());
 				bfil();
 			}
 			ritot(PCSHeader.stitchCount);
@@ -6136,7 +6154,7 @@ void nuFil() {
 			for (iColor = 0; iColor < 16; iColor++) {
 				UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 				UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
-				strncpy_s(buffer, ThreadSize[iColor], 2);
+				wcsncpy_s(buffer, ThreadSize[iColor], 2);
 				SetWindowText(ThreadSizeWin[iColor], buffer);
 			}
 			for (iColor = 0; iColor < 16; iColor++)
@@ -6148,7 +6166,7 @@ void nuFil() {
 			StateMap.set(StateFlag::RESTCH);
 			nunams();
 			ritini();
-			std::string blank("");
+			const std::wstring blank(L"");
 			butxt(HNUM, blank);
 			if (PCSHeader.stitchCount)
 				nuAct(StitchBuffer[0].attribute & COLMSK);
@@ -6628,7 +6646,7 @@ void unlin() {
 void movbox() {
 	if (stch2px(ClosestPointIndex)) {
 		unbox();
-		OutputDebugString(fmt::format("Stitch:{} form:{} type:{}\n",
+		OutputDebugString(fmt::format(L"Stitch:{} form:{} type:{}\n",
 		                              ClosestPointIndex,
 		                              ((StitchBuffer[ClosestPointIndex].attribute & FRMSK) >> FRMSHFT),
 		                              ((StitchBuffer[ClosestPointIndex].attribute & TYPMSK) >> TYPSHFT))
@@ -6936,7 +6954,7 @@ void clrhbut(unsigned startButton) {
 	unsigned iButton;
 
 	for (iButton = startButton; iButton < 9; iButton++)
-		SetWindowText((*ButtonWin)[iButton], "");
+		SetWindowText((*ButtonWin)[iButton], L"");
 }
 
 void newFil() {
@@ -6950,9 +6968,10 @@ void newFil() {
 	}
 	deldu();
 	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], IniFile.designerName).c_str());
-	strcpy_s(ThrName, (*StringTable)[STR_NUFIL].c_str());
+	wcscpy_s(ThrName, (*StringTable)[STR_NUFIL].c_str());
 	ritfnam(IniFile.designerName);
-	strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
+	auto designer = win32::Utf16ToUtf8(IniFile.designerName);
+	strcpy_s(ExtendedHeader.modifierName, designer.data());
 	rstdu();
 	rstAll();
 	clrhbut(3);
@@ -7008,7 +7027,7 @@ void rebox() {
 		nuAct(ClosestPointIndex);
 		if (stch2px(ClosestPointIndex)) {
 			dubox();
-			OutputDebugString(fmt::format("Stitch:{} form:{} type:{}\n",
+			OutputDebugString(fmt::format(L"Stitch:{} form:{} type:{}\n",
 			                              ClosestPointIndex,
 			                              ((StitchBuffer[ClosestPointIndex].attribute & FRMSK) >> FRMSHFT),
 			                              ((StitchBuffer[ClosestPointIndex].attribute & TYPMSK) >> TYPSHFT))
@@ -7933,7 +7952,7 @@ void numWnd() noexcept {
 	RECT messageRect;
 
 	GetClientRect(MsgWindow, &messageRect);
-	GeneralNumberInputBox = CreateWindow("STATIC",
+	GeneralNumberInputBox = CreateWindow(L"STATIC",
 	                                     0,
 	                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                     5,
@@ -8150,15 +8169,14 @@ void setknots() {
 }
 
 void lodbmp() {
-	char* filename = nullptr;
-
 	if (PCSBMPFileName[0]) {
 		DeleteObject(BitmapFileHandle);
 		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
 	if (GetOpenFileName(&OpenBitmapName)) {
 		untrace();
-		filename = strrchr(UserBMPFileName, '\\') + 1;
+		auto BMPfileName = win32::Utf16ToUtf8(UserBMPFileName);
+		auto filename    = strrchr(BMPfileName.data(), '\\') + 1;
 		// PCS file can only store a 16 character filename?
 		// ToDo - give the user a little more info that the bitmap has not been loaded
 		if (filename && strlen(filename) < 16) {
@@ -8278,13 +8296,13 @@ void setsped() {
 }
 
 void deltot() {
-	strcpy_s(DesignerName, IniFile.designerName);
+	wcscpy_s(DesignerName, IniFile.designerName);
 	FormIndex = PCSHeader.stitchCount = FormVertexIndex = ClipPointIndex = SatinGuideIndex = TextureIndex = 0;
 	StateMap.reset(StateFlag::GMRK);
 	rstAll();
 	coltab();
 	zumhom();
-	strcpy_s(DesignerName, IniFile.designerName);
+	wcscpy_s(DesignerName, IniFile.designerName);
 	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRDBY], ThrName, DesignerName).c_str());
 }
 
@@ -8509,7 +8527,7 @@ void movi() {
 			RunPoint = 0;
 		movStch();
 		if (!StateMap.test(StateFlag::WASPAT)) {
-			SpeedScrollBar = CreateWindow("SCROLLBAR",
+			SpeedScrollBar = CreateWindow(L"SCROLLBAR",
 			                              0,
 			                              SBS_HORZ | WS_CHILD | WS_VISIBLE,
 			                              ButtonWidthX3,
@@ -8637,8 +8655,8 @@ void vubak() {
 				verticalLocation = dy;
 			else
 				verticalLocation = 0;
-			BackupViewer[iVersion] = CreateWindow("STATIC",
-			                                      "",
+			BackupViewer[iVersion] = CreateWindow(L"STATIC",
+			                                      L"",
 			                                      SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 			                                      dx * (iVersion & 1) + ButtonWidthX3,
 			                                      verticalLocation,
@@ -8665,13 +8683,13 @@ void insflin(POINT insertPoint) noexcept {
 	FormLines[2].y = FormLines[3].y = insertPoint.y + offset.y;
 }
 
-bool isthr(char* filename) {
-	char* lastCharacter;
+bool isthr(const wchar_t* const filename) noexcept {
+	wchar_t* lastCharacter;
 
-	lastCharacter = strrchr(filename, '.');
+	lastCharacter = StrRChrW(filename, 0, L'.');
 	if (lastCharacter) {
 		lastCharacter++;
-		if (!_strnicmp(lastCharacter, "th", 2))
+		if (!_wcsnicmp(lastCharacter, L"th", 2))
 			return 1;
 		else
 			return 0;
@@ -8696,7 +8714,7 @@ void insfil() {
 		sizeof(OPENFILENAME),               // lStructsize
 		ThrEdWindow,                        // hwndOwner
 		ThrEdInstance,                      // hInstance
-		"THR files\0*.thr\0\0",             // lpstrFilter
+		L"THR files\0*.thr\0\0",            // lpstrFilter
 		CustomFilter,                       // lpstrCustomFilter
 		_MAX_PATH,                          // nMaxCustFilter
 		0,                                  // nFilterIndex
@@ -8709,7 +8727,7 @@ void insfil() {
 		OFN_EXPLORER | OFN_OVERWRITEPROMPT, // Flags
 		0,                                  // nFileOffset
 		0,                                  // nFileExtension
-		"thr",                              // lpstrDefExt
+		L"thr",                             // lpstrDefExt
 		0,                                  // lCustData
 		0,                                  // lpfnHook
 		0,                                  // lpTemplateName
@@ -8966,7 +8984,7 @@ void getbak() {
 	if (StateMap.test(StateFlag::THUMSHO)) {
 		if (ThumbnailsSelected[FileVersionIndex]) {
 			if (StateMap.test(StateFlag::RBUT)) {
-				strcpy_s(InsertedFileName, (*Thumbnails)[ThumbnailsSelected[FileVersionIndex]].data());
+				wcscpy_s(InsertedFileName, (*Thumbnails)[ThumbnailsSelected[FileVersionIndex]].data());
 				StateMap.set(StateFlag::IGNORINS);
 				unthum();
 				StateMap.set(StateFlag::FRMOF);
@@ -8980,15 +8998,15 @@ void getbak() {
 				}
 			}
 			else {
-				strcpy_s(WorkingFileName, DefaultDirectory);
-				char* pchr = &WorkingFileName[strlen(WorkingFileName) - 1];
+				wcscpy_s(WorkingFileName, DefaultDirectory);
+				wchar_t* pchr = &WorkingFileName[wcslen(WorkingFileName) - 1];
 				if (pchr) {
 					if (pchr[0] != '\\') {
 						pchr[1] = '\\';
 						pchr[2] = 0;
 					}
 				}
-				strcat_s(WorkingFileName, (*Thumbnails)[ThumbnailsSelected[FileVersionIndex]].data());
+				wcscat_s(WorkingFileName, (*Thumbnails)[ThumbnailsSelected[FileVersionIndex]].data());
 				StateMap.set(StateFlag::REDOLD);
 				nuFil();
 			}
@@ -9000,20 +9018,20 @@ void getbak() {
 
 void rebak() {
 	unsigned iVersion                  = 0;
-	char     newFileName[_MAX_PATH]    = { 0 };
-	char     safetyFileName[_MAX_PATH] = { 0 };
+	wchar_t  newFileName[_MAX_PATH]    = { 0 };
+	wchar_t  safetyFileName[_MAX_PATH] = { 0 };
 
 	for (iVersion = 0; iVersion < OLDVER; iVersion++)
 		DestroyWindow(BackupViewer[iVersion]);
-	strcpy_s(newFileName, ThrName);
-	strcpy_s(safetyFileName, ThrName);
+	wcscpy_s(newFileName, ThrName);
+	wcscpy_s(safetyFileName, ThrName);
 	iVersion                 = duth(newFileName);
 	newFileName[iVersion]    = FileVersionIndex + 's';
 	safetyFileName[iVersion] = 'x';
 	MoveFile(ThrName, safetyFileName);
 	MoveFile(newFileName, ThrName);
 	MoveFile(safetyFileName, newFileName);
-	strcpy_s(WorkingFileName, ThrName);
+	wcscpy_s(WorkingFileName, ThrName);
 	StateMap.set(StateFlag::REDOLD);
 	nuFil();
 	DeleteFile(safetyFileName);
@@ -9028,12 +9046,12 @@ void thumbak() {
 }
 
 void movbak(char source, char destination) noexcept {
-	char     sourceFileName[_MAX_PATH]      = { 0 };
-	char     destinationFileName[_MAX_PATH] = { 0 };
+	wchar_t  sourceFileName[_MAX_PATH]      = { 0 };
+	wchar_t  destinationFileName[_MAX_PATH] = { 0 };
 	unsigned lastChar                       = duth(ThrName);
 
-	strcpy_s(sourceFileName, ThrName);
-	strcpy_s(destinationFileName, ThrName);
+	wcscpy_s(sourceFileName, ThrName);
+	wcscpy_s(destinationFileName, ThrName);
 	sourceFileName[lastChar]      = source;
 	destinationFileName[lastChar] = destination;
 	DeleteFile(destinationFileName);
@@ -9041,11 +9059,11 @@ void movbak(char source, char destination) noexcept {
 }
 
 void purg() {
-	char     fileName[_MAX_PATH] = { 0 };
+	wchar_t  fileName[_MAX_PATH] = { 0 };
 	unsigned lastChar = 0, iLast = 0;
 
 	if (FileHandle) {
-		strcpy_s(fileName, ThrName);
+		wcscpy_s(fileName, ThrName);
 		lastChar = duth(fileName);
 		for (iLast = 1; iLast < 6; iLast++) {
 			fileName[lastChar] = gsl::narrow<char>(iLast) + 'r';
@@ -9056,7 +9074,7 @@ void purg() {
 
 void purgdir() {
 	StateMap.set(StateFlag::PRGMSG);
-	std::string fmtStr;
+	std::wstring fmtStr;
 	loadString(fmtStr, IDS_DELBAK);
 	shoMsg(fmt::format(fmtStr, DefaultDirectory));
 	okcan();
@@ -9064,16 +9082,16 @@ void purgdir() {
 
 void deldir() {
 	unsigned        iLastChar           = 0;
-	char            fileName[_MAX_PATH] = { 0 };
+	wchar_t         fileName[_MAX_PATH] = { 0 };
 	WIN32_FIND_DATA findFileData        = {};
 	HANDLE          file                = {};
 
 	unmsg();
 	tabmsg(IDS_BAKDEL);
-	strcpy_s(fileName, DefaultDirectory);
-	char* fileSpec = &fileName[strlen(fileName)];
+	wcscpy_s(fileName, DefaultDirectory);
+	wchar_t* fileSpec = &fileName[wcslen(fileName)];
 	if (fileSpec) {
-		strcpy_s(fileSpec, sizeof(fileName) - (fileSpec - fileName), "\\*.th0");
+		wcscpy_s(fileSpec, sizeof(fileName) - (fileSpec - fileName), L"\\*.th0");
 		for (iLastChar = 1; iLastChar < 6; iLastChar++) {
 			fileSpec[5] = gsl::narrow<char>(iLastChar) + 'r';
 			file        = FindFirstFile(fileName, &findFileData);
@@ -9920,7 +9938,7 @@ void shorter() {
 		}
 		const float minLength
 		    = hypot(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y - StitchBuffer[iStitch].y);
-		butxt(HMINLEN, fmt::format("{:.2f}", minLength));
+		butxt(HMINLEN, fmt::format(L"{:.2f}", minLength));
 	}
 	CurrentStitchIndex = currentStitch;
 	lensadj();
@@ -10031,18 +10049,18 @@ int strcomp(const void* arg1, const void* arg2) noexcept {
 }
 
 void barnam(HWND window, unsigned iThumbnail) {
-	char  buffer[_MAX_PATH] = { 0 };
-	char* lastCharacter     = nullptr;
+	wchar_t  buffer[_MAX_PATH] = { 0 };
+	wchar_t* lastCharacter     = nullptr;
 
 	if (iThumbnail < ThumbnailDisplayCount) {
-		strcpy_s(buffer, (*Thumbnails)[ThumbnailsSelected[iThumbnail]].data());
-		lastCharacter = strrchr(buffer, '.');
+		wcscpy_s(buffer, (*Thumbnails)[ThumbnailsSelected[iThumbnail]].data());
+		lastCharacter = StrRChrW(buffer, 0, L'.');
 		if (lastCharacter)
 			lastCharacter[0] = 0;
 		SetWindowText(window, buffer);
 	}
 	else
-		SetWindowText(window, "");
+		SetWindowText(window, L"");
 }
 
 void rthumnam(unsigned iThumbnail) {
@@ -10075,19 +10093,19 @@ void thumnail() {
 	untrace();
 
 	SetCurrentDirectory(DefaultDirectory);
-	strcpy_s(SearchName, DefaultDirectory);
-	char* lastCharacter = &SearchName[strlen(SearchName) - 1];
+	wcscpy_s(SearchName, DefaultDirectory);
+	wchar_t* lastCharacter = &SearchName[wcslen(SearchName) - 1];
 	if (lastCharacter) {
 		if (lastCharacter[0] != '\\') {
 			lastCharacter[1] = '\\';
 			lastCharacter[2] = 0;
 		}
 	}
-	strcat_s(SearchName, "*.thr");
+	wcscat_s(SearchName, L"*.thr");
 	file = FindFirstFile(SearchName, &fileData);
 	if (file == INVALID_HANDLE_VALUE) {
-		const DWORD dwError = GetLastError();
-		std::string fmtStr;
+		const DWORD  dwError = GetLastError();
+		std::wstring fmtStr;
 		loadString(fmtStr, IDS_FFINDERR);
 		shoMsg(fmt::format(fmtStr, SearchName, dwError));
 		unthum();
@@ -10110,8 +10128,8 @@ void thumnail() {
 			rthumnam(iThumbnail++);
 		StateMap.set(StateFlag::THUMSHO);
 		ThumbnailSearchString[0] = 0;
-		SetWindowText((*ButtonWin)[HBOXSEL], "");
-		std::string blank("");
+		SetWindowText((*ButtonWin)[HBOXSEL], L"");
+		const std::wstring blank(L"");
 		butxt(HBOXSEL, blank);
 		vubak();
 		StateMap.set(StateFlag::RESTCH);
@@ -10125,11 +10143,11 @@ void nuthsel() {
 	if (ThumbnailIndex < Thumbnails->size()) {
 		savedIndex = ThumbnailIndex;
 		iThumbnail = 0;
-		length     = strlen(ThumbnailSearchString);
+		length     = wcslen(ThumbnailSearchString);
 		StateMap.set(StateFlag::RESTCH);
 		if (length) {
 			while (iThumbnail < 4 && ThumbnailIndex < Thumbnails->size()) {
-				if (!strncmp(ThumbnailSearchString, (*Thumbnails)[ThumbnailIndex].data(), length)) {
+				if (!wcsncmp(ThumbnailSearchString, (*Thumbnails)[ThumbnailIndex].data(), length)) {
 					ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
 					redraw(BackupViewer[iThumbnail++]);
 				}
@@ -10157,12 +10175,12 @@ void nuthbak(unsigned count) {
 	unsigned length = 0;
 
 	if (ThumbnailIndex) {
-		length = strlen(ThumbnailSearchString);
+		length = wcslen(ThumbnailSearchString);
 		if (length) {
 			while (count && ThumbnailIndex < MAXFORMS) {
 				if (ThumbnailIndex) {
 					ThumbnailIndex--;
-					if (!strncmp(ThumbnailSearchString, (*Thumbnails)[ThumbnailIndex].data(), length))
+					if (!wcsncmp(ThumbnailSearchString, (*Thumbnails)[ThumbnailIndex].data(), length))
 						count--;
 				}
 				else
@@ -10180,12 +10198,12 @@ void nuthbak(unsigned count) {
 void nuthum(char character) {
 	unsigned iString;
 
-	iString = strlen(ThumbnailSearchString);
+	iString = wcslen(ThumbnailSearchString);
 	if (iString < 16) {
 		StateMap.set(StateFlag::RESTCH);
 		ThumbnailSearchString[iString++] = character;
 		ThumbnailSearchString[iString]   = 0;
-		std::string txt(ThumbnailSearchString);
+		std::wstring txt(ThumbnailSearchString);
 		butxt(HBOXSEL, txt);
 		ThumbnailIndex = 0;
 		nuthsel();
@@ -10195,12 +10213,12 @@ void nuthum(char character) {
 void bakthum() {
 	unsigned searchStringLength;
 
-	searchStringLength = strlen(ThumbnailSearchString);
+	searchStringLength = wcslen(ThumbnailSearchString);
 	if (searchStringLength) {
 		StateMap.set(StateFlag::RESTCH);
 		ThumbnailSearchString[--searchStringLength] = 0;
 		ThumbnailIndex                              = 0;
-		std::string txt(ThumbnailSearchString);
+		std::wstring txt(ThumbnailSearchString);
 		butxt(HBOXSEL, txt);
 		nuthsel();
 	}
@@ -10381,10 +10399,10 @@ void frmrct(fRECTANGLE& rectangle) noexcept {
 }
 
 void desiz() {
-	fRECTANGLE  rectangle = {};
-	FLOAT       xSize = 0.0, ySize = 0.0;
-	std::string info;
-	auto        stringTable = *StringTable;
+	fRECTANGLE   rectangle = {};
+	FLOAT        xSize = 0.0, ySize = 0.0;
+	std::wstring info;
+	auto         stringTable = *StringTable;
 
 	if (PCSHeader.stitchCount) {
 		stchrct(rectangle);
@@ -10404,7 +10422,8 @@ void desiz() {
 	}
 	info += fmt::format(stringTable[STR_HUPWID], (IniFile.hoopSizeX / PFGRAN), (IniFile.hoopSizeY / PFGRAN));
 	if (PCSHeader.stitchCount) {
-		info += fmt::format(stringTable[STR_CREATBY], DesignerName, ExtendedHeader.modifierName);
+		auto modifier = win32::Utf8ToUtf16(ExtendedHeader.modifierName);
+		info += fmt::format(stringTable[STR_CREATBY], DesignerName, modifier);
 	}
 	shoMsg(info);
 }
@@ -10417,7 +10436,7 @@ void sidhup() {
 	StateMap.set(StateFlag::HUPMSG);
 	GetWindowRect((*ValueWindow)[PHUP], &hoopRectangle);
 	GetWindowRect(PreferencesWindow, &preferencesRectangle);
-	SideMessageWindow = CreateWindow("STATIC",
+	SideMessageWindow = CreateWindow(L"STATIC",
 	                                 0,
 	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                 preferencesRectangle.right + 3 - ThredWindowOrigin.x,
@@ -10429,7 +10448,7 @@ void sidhup() {
 	                                 ThrEdInstance,
 	                                 NULL);
 	for (iHoop = 0; iHoop < HUPS; iHoop++) {
-		SideWindow[iHoop] = CreateWindow("STATIC",
+		SideWindow[iHoop] = CreateWindow(L"STATIC",
 		                                 (*StringTable)[iHoop + STR_HUP0].c_str(),
 		                                 SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                                 3,
@@ -10678,7 +10697,7 @@ void rotmrk() {
 		tang                  = HighestAngle - LowestAngle;
 		segments              = 2 * PI / tang;
 		IniFile.rotationAngle = 2 * PI / segments;
-		std::string fmtStr;
+		std::wstring fmtStr;
 		loadString(fmtStr, IDS_ROTMARK);
 		// ToDo - should this be IniFile.rotationAngle?
 		shoMsg(fmt::format(fmtStr, IniFile.fillAngle * 180 / PI, segments));
@@ -11063,8 +11082,8 @@ void ritlock(const WIN32_FIND_DATA* fileData, unsigned fileIndex, HWND hwndlg) n
 BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	FINDINFO* fileInfo              = nullptr;
 	HANDLE    searchResult          = {};
-	char      searchName[_MAX_PATH] = { 0 };
-	char      fileName[_MAX_PATH]   = { 0 };
+	wchar_t   searchName[_MAX_PATH] = { 0 };
+	wchar_t   fileName[_MAX_PATH]   = { 0 };
 	unsigned  iFile = 0, fileError = 0;
 	HWND      lockHandle = {}, unlockHandle = {};
 
@@ -11074,11 +11093,11 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 		SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
 		[[gsl::suppress(type .1)]] fileInfo = reinterpret_cast<FINDINFO*>(lparam);
 		if (fileInfo) {
-			strcpy_s(searchName, DefaultDirectory);
-			strcat_s(searchName, "\\*.thr");
+			wcscpy_s(searchName, DefaultDirectory);
+			wcscat_s(searchName, L"\\*.thr");
 			searchResult = FindFirstFile(searchName, &(fileInfo->data[0]));
 			if (searchResult == INVALID_HANDLE_VALUE) {
-				std::string fmtStr;
+				std::wstring fmtStr;
 				loadString(fmtStr, IDS_NOTHRFIL);
 				shoMsg(fmt::format(fmtStr, DefaultDirectory));
 				EndDialog(hwndlg, wparam);
@@ -11133,17 +11152,17 @@ BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 				ritlock(fileInfo->data, fileInfo->count, hwndlg);
 				break;
 			case IDOK:
-				strcpy_s(searchName, DefaultDirectory);
-				strcat_s(searchName, "\\");
+				wcscpy_s(searchName, DefaultDirectory);
+				wcscat_s(searchName, L"\\");
 				fileError = 0;
 				for (iFile = 0; iFile < fileInfo->count; iFile++) {
-					strcpy_s(fileName, searchName);
-					strcat_s(fileName, fileInfo->data[iFile].cFileName);
+					wcscpy_s(fileName, searchName);
+					wcscat_s(fileName, fileInfo->data[iFile].cFileName);
 					if (!SetFileAttributes(fileName, fileInfo->data[iFile].dwFileAttributes))
 						fileError++;
 				}
 				if (fileError) {
-					std::string fmtStr;
+					std::wstring fmtStr;
 					loadString(fmtStr, IDS_LOCKNOT);
 					shoMsg(fmt::format(fmtStr, fileError));
 				}
@@ -11201,13 +11220,13 @@ unsigned icolsum(COLORREF color) {
 }
 
 void trcstpnum() {
-	std::string fmtStr;
+	std::wstring fmtStr;
 	loadString(fmtStr, IDS_TRCSTP);
 	SetWindowText(TraceStepWin, fmt::format(fmtStr, (IniFile.traceLength / PFGRAN)).c_str());
 }
 
 void trcratnum() {
-	std::string fmtStr;
+	std::wstring fmtStr;
 	loadString(fmtStr, IDS_TRCRAT);
 	butxt(HLIN, fmt::format(fmtStr, -log10(IniFile.traceRatio - 1)));
 }
@@ -11782,7 +11801,7 @@ void chkref() noexcept {
 }
 
 void trnumwnd0(int position) noexcept {
-	TraceNumberInput = CreateWindow("STATIC",
+	TraceNumberInput = CreateWindow(L"STATIC",
 	                                0,
 	                                SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                ButtonWidthX3,
@@ -11796,7 +11815,7 @@ void trnumwnd0(int position) noexcept {
 }
 
 void trnumwnd1(int position) noexcept {
-	GeneralNumberInputBox = CreateWindow("STATIC",
+	GeneralNumberInputBox = CreateWindow(L"STATIC",
 	                                     0,
 	                                     WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                     ButtonWidthX3,
@@ -11842,7 +11861,7 @@ void dutrnum1() {
 	DestroyWindow(GeneralNumberInputBox);
 	StateMap.reset(StateFlag::NUMIN);
 	StateMap.reset(StateFlag::TRNIN1);
-	traceLength = atof(MsgBuffer);
+	traceLength = std::stof(MsgBuffer);
 	if (traceLength > 9)
 		traceLength = 9;
 	if (StateMap.test(StateFlag::TRNUP)) {
@@ -12056,7 +12075,7 @@ void tracpar() {
 	COLORREF tracePosition = {};
 
 	if (StateMap.test(StateFlag::TRNIN0))
-		dutrnum0(atoi(TraceInputBuffer));
+		dutrnum0(std::stoi(TraceInputBuffer));
 	if (StateMap.test(StateFlag::TRNIN1))
 		dutrnum1();
 	TraceMsgPoint.x = Msg.pt.x - ThredWindowOrigin.x;
@@ -12169,7 +12188,7 @@ void delstch() {
 	rstAll();
 	clrfills();
 	ColorChanges = 0;
-	std::string blank("");
+	const std::wstring blank(L"");
 	butxt(HNUM, blank);
 	butxt(HTOT, blank);
 	StateMap.set(StateFlag::RESTCH);
@@ -12186,15 +12205,15 @@ void chkbit() {
 void trcnum(unsigned shift, COLORREF color, unsigned iRGB) noexcept {
 	unsigned bufferLength = 0;
 	unsigned xPosition    = 0;
-	char     buffer[11]   = { 0 };
+	wchar_t  buffer[11]   = { 0 };
 
 	color >>= shift;
 	color &= 0xff;
-	_itoa_s(color, buffer, 10);
-	bufferLength = strlen(buffer);
+	_itow_s(color, buffer, 10);
+	bufferLength = wcslen(buffer);
 	xPosition    = NumeralWidth * (3 - bufferLength) + 1;
 	SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
-	TextOut(DrawItem->hDC, xPosition, 1, buffer, strlen(buffer));
+	TextOut(DrawItem->hDC, xPosition, 1, buffer, wcslen(buffer));
 }
 
 void upnum(unsigned iRGB) noexcept {
@@ -12801,7 +12820,7 @@ void qcode() {
 		ClosestPointIndex    = 0;
 		movbox();
 	}
-	std::string blank("");
+	const std::wstring blank(L"");
 	butxt(HNUM, blank);
 	return;
 }
@@ -12854,20 +12873,20 @@ void drwLin(std::vector<POINT>& linePoints, unsigned currentStitch, unsigned len
 BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	char        buf[HBUFSIZ]  = { 0 };
-	char        buf1[HBUFSIZ] = { 0 };
-	unsigned    iFeatherStyle = 0, state = 0, featherType = 0;
-	std::string featherStyle;
+	wchar_t      buf[HBUFSIZ]  = { 0 };
+	wchar_t      buf1[HBUFSIZ] = { 0 };
+	unsigned     iFeatherStyle = 0, state = 0, featherType = 0;
+	std::wstring featherStyle;
 
 	switch (umsg) {
 	case WM_INITDIALOG:
 		featherType = IniFile.featherType;
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-		SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), fmt::format("{:.2f}", IniFile.featherRatio).c_str());
-		SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), fmt::format("{}", IniFile.featherUpCount).c_str());
-		SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), fmt::format("{}", IniFile.featherDownCount).c_str());
-		SetWindowText(GetDlgItem(hwndlg, IDC_DFLR), fmt::format("{:.2f}", (IniFile.featherMinStitchSize / PFGRAN)).c_str());
-		SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), fmt::format("{}", IniFile.featherCount).c_str());
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), fmt::format(L"{:.2f}", IniFile.featherRatio).c_str());
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), fmt::format(L"{}", IniFile.featherUpCount).c_str());
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), fmt::format(L"{}", IniFile.featherDownCount).c_str());
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFLR), fmt::format(L"{:.2f}", (IniFile.featherMinStitchSize / PFGRAN)).c_str());
+		SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), fmt::format(L"{}", IniFile.featherCount).c_str());
 		for (iFeatherStyle = 0; iFeatherStyle < 6; iFeatherStyle++) {
 			loadString(featherStyle, (IDS_FTH0 + iFeatherStyle));
 			[[gsl::suppress(type .1)]] SendMessage(
@@ -12907,21 +12926,21 @@ BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			IniFile.featherFillType = FDEFTYP;
 			for (iFeatherStyle = 0; iFeatherStyle < 6; iFeatherStyle++) {
 				LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, buf1, HBUFSIZ);
-				if (!strcmp(buf, buf1)) {
+				if (!wcscmp(buf, buf1)) {
 					IniFile.featherFillType = iFeatherStyle + 1;
 					break;
 				}
 			}
 			GetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf, HBUFSIZ);
-			IniFile.featherRatio = atof(buf);
+			IniFile.featherRatio = std::stof(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf, HBUFSIZ);
-			IniFile.featherUpCount = atoi(buf);
+			IniFile.featherUpCount = std::stoi(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf, HBUFSIZ);
-			IniFile.featherDownCount = atoi(buf);
+			IniFile.featherDownCount = std::stoi(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf, HBUFSIZ);
-			IniFile.featherMinStitchSize = atof(buf) * PFGRAN;
+			IniFile.featherMinStitchSize = std::stof(buf) * PFGRAN;
 			GetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf, HBUFSIZ);
-			IniFile.featherCount = atoi(buf);
+			IniFile.featherCount = std::stoi(buf);
 			if (IniFile.featherCount < 1)
 				IniFile.featherCount = 1;
 			EndDialog(hwndlg, 1);
@@ -12946,7 +12965,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 	POINT      point           = {};
 	RECT       windowRect      = {};
 	SATCON*    guides          = nullptr;
-	char       buffer[20]      = { 0 };
+	wchar_t    buffer[20]      = { 0 };
 	char       threadSizeMap[] = { '3', '4', '6' };
 	TXPNT*     textureSource   = nullptr;
 	unsigned   byteCount = 0, clipCount = 0, code = 0, currentClip = 0, currentGuide = 0, currentVertex = 0;
@@ -13602,7 +13621,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		}
 		if (StateMap.test(StateFlag::WASTRAC)) {
 			if (StateMap.test(StateFlag::TRNIN0))
-				dutrnum0(atoi(TraceInputBuffer));
+				dutrnum0(std::stoi(TraceInputBuffer));
 			if (StateMap.test(StateFlag::TRNIN1))
 				dutrnum1();
 			if (!StateMap.test(StateFlag::WASEDG))
@@ -13691,7 +13710,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 					if (closfrm())
 						nufsel();
 					if (SelectedFormList->size() > 1) {
-						std::string blank("");
+						const std::wstring blank(L"");
 						butxt(HNUM, blank);
 					}
 					return 1;
@@ -14204,7 +14223,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				VerticalIndex -= 13;
 				ThreadSize[ThreadSizeSelected][0]   = threadSizeMap[VerticalIndex];
 				ThreadSizeIndex[ThreadSizeSelected] = VerticalIndex;
-				strncpy_s(buffer, ThreadSize[ThreadSizeSelected], 2);
+				wcsncpy_s(buffer, ThreadSize[ThreadSizeSelected], 2);
 				buffer[2] = 0;
 				SetWindowText(ThreadSizeWin[ThreadSizeSelected], buffer);
 				StateMap.set(StateFlag::RESTCH);
@@ -14257,7 +14276,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		}
 		if (PreferenceIndex == PAP + 1 && chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
 			AppliqueColor = VerticalIndex;
-			SetWindowText((*ValueWindow)[PAP], fmt::format("{}", VerticalIndex).c_str());
+			SetWindowText((*ValueWindow)[PAP], fmt::format(L"{}", VerticalIndex).c_str());
 			unsid();
 			return 1;
 		}
@@ -14763,8 +14782,8 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LLAYR]) {
-					std::string LayerText[] = { "0", "1", "2", "3", "4" };
-					FormMenuChoice          = LLAYR;
+					std::wstring LayerText[] = { L"0", L"1", L"2", L"3", L"4" };
+					FormMenuChoice           = LLAYR;
 					StateMap.reset(StateFlag::FILTYP);
 					sidmsg((*ValueWindow)[LLAYR], LayerText, 5);
 					break;
@@ -15334,12 +15353,12 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		}
 		if (chkMsgs(Msg.pt, ThreadSizeWin[0], ThreadSizeWin[15])) {
 			if (Msg.message == WM_LBUTTONDOWN) {
-				const char* const str[] = { "30", "40", "60" };
+				const wchar_t* const str[] = { L"30", L"40", L"60" };
 
 				savdo();
 				ThreadSizeSelected = VerticalIndex;
 				for (iThreadSize = 0; iThreadSize < 3; iThreadSize++) {
-					ChangeThreadSizeWin[iThreadSize] = CreateWindow("STATIC",
+					ChangeThreadSizeWin[iThreadSize] = CreateWindow(L"STATIC",
 					                                                str[iThreadSize],
 					                                                WS_CHILD | WS_VISIBLE | WS_BORDER,
 					                                                ButtonWidthX3,
@@ -15605,7 +15624,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				if (StateMap.test(StateFlag::TRNIN0)) {
 					TraceInputBuffer[MsgIndex++] = NumericCode;
 					TraceInputBuffer[MsgIndex]   = 0;
-					traceColor                   = atoi(TraceInputBuffer);
+					traceColor                   = std::stoi(TraceInputBuffer);
 					switch (MsgIndex) {
 					case 2:
 						if (traceColor > 25)
@@ -15648,7 +15667,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				return 1;
 			case VK_RETURN:
 				if (StateMap.test(StateFlag::TRNIN0))
-					dutrnum0(atoi(TraceInputBuffer));
+					dutrnum0(std::stoi(TraceInputBuffer));
 				else {
 					if (StateMap.test(StateFlag::TRNIN1))
 						dutrnum1();
@@ -15658,9 +15677,9 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		}
 		if (code == 8 && BufferIndex) {
 			StitchEntryBuffer[--BufferIndex] = 0;
-			std::string txt(StitchEntryBuffer);
+			std::wstring txt(StitchEntryBuffer);
 			butxt(HNUM, txt);
-			ClosestPointIndex = atoi(StitchEntryBuffer);
+			ClosestPointIndex = std::stoi(StitchEntryBuffer);
 			movbox();
 			return 1;
 		}
@@ -15671,12 +15690,12 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				BufferIndex--;
 			StitchEntryBuffer[BufferIndex++] = NumericCode;
 			StitchEntryBuffer[BufferIndex]   = 0;
-			ClosestPointIndex                = atoi(StitchEntryBuffer);
+			ClosestPointIndex                = std::stoi(StitchEntryBuffer);
 			if (ClosestPointIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
-				sprintf_s(StitchEntryBuffer, sizeof(StitchEntryBuffer), "%d", PCSHeader.stitchCount - 1);
+				swprintf_s(StitchEntryBuffer, sizeof(StitchEntryBuffer), L"%d", PCSHeader.stitchCount - 1);
 				ClosestPointIndex = PCSHeader.stitchCount - 1;
 			}
-			std::string txt(StitchEntryBuffer);
+			std::wstring txt(StitchEntryBuffer);
 			butxt(HNUM, txt);
 			movbox();
 			StateMap.reset(StateFlag::NUMIN);
@@ -15684,7 +15703,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		}
 		BufferIndex = 0;
 		if (StateMap.testAndReset(StateFlag::ENTRDUP)) {
-			const double value    = atof(MsgBuffer);
+			const double value    = std::stof(MsgBuffer);
 			double       newAngle = 0;
 			if (value) {
 				rotationAngle         = value * PI / 180;
@@ -15695,7 +15714,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			duprot(newAngle, rotationCenter);
 		}
 		if (StateMap.testAndReset(StateFlag::ENTROT)) {
-			const double value    = atof(MsgBuffer);
+			const double value    = std::stof(MsgBuffer);
 			double       newAngle = 0;
 			if (value) {
 				newAngle              = value * PI / 180;
@@ -16644,7 +16663,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			fvars(ClosestFormToCursor);
 		for (iVersion = 0; iVersion < OLDNUM; iVersion++) {
 			if (Msg.wParam == LRUMenuId[iVersion]) {
-				strcpy_s(WorkingFileName, IniFile.prevNames[iVersion]);
+				wcscpy_s(WorkingFileName, IniFile.prevNames[iVersion]);
 				StateMap.set(StateFlag::REDOLD);
 				nuFil();
 			}
@@ -17331,15 +17350,15 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			ThreadSize60 = TSIZ60;
 			break;
 		case ID_SIZ30: // view / Thread Size / 30
-			tsizmsg("30", ThreadSize30);
+			tsizmsg(L"30", ThreadSize30);
 			StateMap.set(StateFlag::ENTR30);
 			break;
 		case ID_SIZ40: // view / Thread Size / 40
-			tsizmsg("40", ThreadSize40);
+			tsizmsg(L"40", ThreadSize40);
 			StateMap.set(StateFlag::ENTR40);
 			break;
 		case ID_SIZ60: // view / Thread Size / 60
-			tsizmsg("60", ThreadSize60);
+			tsizmsg(L"60", ThreadSize60);
 			StateMap.set(StateFlag::ENTR60);
 			break;
 		case ID_HIDBITF: // file / Hide Bitmap
@@ -17445,19 +17464,19 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 }
 
 // return the width of a text item
-int txtWid(const char* string) noexcept {
-	GetTextExtentPoint32(ThredDC, string, strlen(string), &TextSize);
+int txtWid(const wchar_t* string) noexcept {
+	GetTextExtentPoint32(ThredDC, string, wcslen(string), &TextSize);
 	return TextSize.cx;
 }
 
 void makCol() noexcept {
 	unsigned iColor    = 0;
-	char     buffer[3] = { 0 };
+	wchar_t     buffer[3] = { 0 };
 
-	buffer[1] = '0';
+	buffer[1] = L'0';
 	buffer[2] = 0;
 	for (iColor = 0; iColor < 16; iColor++) {
-		DefaultColorWin[iColor] = CreateWindow("STATIC",
+		DefaultColorWin[iColor] = CreateWindow(L"STATIC",
 		                                       0,
 		                                       SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                                       0,
@@ -17469,7 +17488,7 @@ void makCol() noexcept {
 		                                       ThrEdInstance,
 		                                       NULL);
 
-		UserColorWin[iColor] = CreateWindow("STATIC",
+		UserColorWin[iColor] = CreateWindow(L"STATIC",
 		                                    0,
 		                                    SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                                    ButtonWidth,
@@ -17482,7 +17501,7 @@ void makCol() noexcept {
 		                                    NULL);
 
 		buffer[0]             = ThreadSize[iColor][0];
-		ThreadSizeWin[iColor] = CreateWindow("STATIC",
+		ThreadSizeWin[iColor] = CreateWindow(L"STATIC",
 		                                     buffer,
 		                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                                     ButtonWidth << 1,
@@ -17497,14 +17516,14 @@ void makCol() noexcept {
 }
 
 void ritloc() {
-	char*   environment             = nullptr;
-	char    lockFileName[_MAX_PATH] = { 0 };
-	HANDLE  lockFile                = {};
-	DWORD   bytesWritten            = 0;
-	size_t  length                  = 0;
-	errno_t error                   = 0;
+	wchar_t* environment             = nullptr;
+	wchar_t  lockFileName[_MAX_PATH] = { 0 };
+	HANDLE   lockFile                = {};
+	DWORD    bytesWritten            = 0;
+	size_t   length                  = 0;
+	errno_t  error                   = 0;
 
-	error = _dupenv_s(&environment, &length, "COMSPEC");
+	error = _wdupenv_s(&environment, &length, L"COMSPEC");
 
 	// We have to use free here because of _dupenv_s, so suppress the warning
 	[[gsl::suppress(26408)]] {
@@ -17516,16 +17535,17 @@ void ritloc() {
 		}
 		else {
 			if (environment) {
-				strcpy_s(lockFileName, environment);
+				wcscpy_s(lockFileName, environment);
 				free(environment);
 			}
 		}
 	}
-	environment = strrchr(lockFileName, '\\') + 1;
-	strcpy_s(environment, sizeof(lockFileName) - (environment - lockFileName), "thredloc.txt");
+	environment = StrRChrW(lockFileName, 0, L'\\') + 1;
+	wcscpy_s(environment, sizeof(lockFileName) - (environment - lockFileName), L"thredloc.txt");
 	lockFile = CreateFile(lockFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (lockFile != INVALID_HANDLE_VALUE) {
-		WriteFile(lockFile, (char*)HomeDirectory, strlen(HomeDirectory) + 1, &bytesWritten, 0);
+		auto value = win32::Utf16ToUtf8(HomeDirectory);
+		WriteFile(lockFile, value.data(), value.size() + 1, &bytesWritten, 0);
 		CloseHandle(lockFile);
 	}
 }
@@ -17540,12 +17560,12 @@ void crtcurs() noexcept {
 	NeedleLeftUpCursor    = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftUp));
 }
 
-void duhom() {
+void duhom() noexcept {
 	unsigned pathLength    = 0;
-	char*    lastCharacter = nullptr;
+	wchar_t* lastCharacter = nullptr;
 
-	strcpy_s(HomeDirectory, __argv[0]);
-	lastCharacter = strrchr(HomeDirectory, '\\');
+	wcscpy_s(HomeDirectory, __wargv[0]);
+	lastCharacter = StrRChrW(HomeDirectory, 0, L'\\');
 	if (lastCharacter)
 		lastCharacter++;
 	else {
@@ -17563,25 +17583,25 @@ void duhom() {
 void ducmd() {
 	unsigned long bytesRead       = 0;
 	int           iArgument       = 0;
-	char*         balaradFileName = nullptr;
+	wchar_t*      balaradFileName = nullptr;
 
 	if (__argc > 1) {
-		strcpy_s(WorkingFileName, __argv[1]);
-		if (!strncmp(WorkingFileName, "/F1:", 4)) {
+		wcscpy_s(WorkingFileName, __wargv[1]);
+		if (!wcsncmp(WorkingFileName, L"/F1:", 4)) {
 			balaradFileName = &WorkingFileName[4];
 			BalaradFile     = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 			if (BalaradFile != INVALID_HANDLE_VALUE) {
 				CloseHandle(BalaradFile);
-				strcpy_s(BalaradName0, balaradFileName);
+				wcscpy_s(BalaradName0, balaradFileName);
 				if (__argc > 2) {
-					strcpy_s(WorkingFileName, __argv[2]);
-					if (!strncmp(WorkingFileName, "/F2:", 4)) {
+					wcscpy_s(WorkingFileName, __wargv[2]);
+					if (!wcsncmp(WorkingFileName, L"/F2:", 4)) {
 						balaradFileName = &WorkingFileName[4];
 						BalaradFile     = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 						if (BalaradFile != INVALID_HANDLE_VALUE) {
-							strcpy_s(BalaradName1, balaradFileName);
+							wcscpy_s(BalaradName1, balaradFileName);
 							ReadFile(BalaradFile, &BalaradName2, (_MAX_PATH + 1), &bytesRead, 0);
-							strcat_s(BalaradName2, "");
+							wcscat_s(BalaradName2, L"");
 							if (bytesRead)
 								redbal();
 							CloseHandle(BalaradFile);
@@ -17595,8 +17615,8 @@ void ducmd() {
 		}
 		else {
 			for (iArgument = 2; iArgument < __argc; iArgument++) {
-				strcat_s(WorkingFileName, " ");
-				strcat_s(WorkingFileName, __argv[iArgument]);
+				wcscat_s(WorkingFileName, L" ");
+				wcscat_s(WorkingFileName, __wargv[iArgument]);
 			}
 			StateMap.set(StateFlag::REDOLD);
 			nuFil();
@@ -17612,8 +17632,8 @@ void redini() {
 	for (iVersion = 0; iVersion < OLDNUM; iVersion++)
 		IniFile.prevNames[iVersion][0] = 0;
 	duhom();
-	strcpy_s(IniFileName, HomeDirectory);
-	strcat_s(IniFileName, "thred.ini");
+	wcscpy_s(IniFileName, HomeDirectory);
+	wcscat_s(IniFileName, L"thred.ini");
 	IniFileHandle = CreateFile(IniFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (IniFileHandle == INVALID_HANDLE_VALUE)
 		defpref();
@@ -17621,8 +17641,8 @@ void redini() {
 		ReadFile(IniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, 0);
 		if (bytesRead < 2061)
 			IniFile.formBoxSizePixels = DEFBPIX;
-		strcpy_s(DefaultDirectory, IniFile.defaultDirectory);
-		strcpy_s(DefaultBMPDirectory, IniFile.defaultDirectory);
+		wcscpy_s(DefaultDirectory, IniFile.defaultDirectory);
+		wcscpy_s(DefaultBMPDirectory, IniFile.defaultDirectory);
 		for (iColor = 0; iColor < 16; iColor++) {
 			UserColor[iColor]              = IniFile.stitchColors[iColor];
 			CustomColor[iColor]            = IniFile.stitchPreferredColors[iColor];
@@ -17756,8 +17776,8 @@ void redini() {
 
 void trcsub(HWND* window, unsigned xCoordinate, unsigned yCoordinate, unsigned buttonHeight) noexcept {
 	if (window) {
-		*window = CreateWindow("STATIC",
-		                       "",
+		*window = CreateWindow(L"STATIC",
+		                       L"",
 		                       SS_OWNERDRAW | WS_CHILD | WS_BORDER,
 		                       xCoordinate,
 		                       yCoordinate,
@@ -17809,8 +17829,8 @@ void init() {
 	RECT                wrct            = {};
 	HDC                 deviceContext   = GetDC(NULL);
 	const unsigned long screenHalfWidth = (GetDeviceCaps(deviceContext, HORZRES)) >> 1;
-	std::string         blank("");
-	std::string*        buttonTxt = &blank;
+	std::wstring        blank(L"");
+	std::wstring*       buttonTxt = &blank;
 
 	ReleaseDC(NULL, deviceContext);
 	TextureIndex = 0;
@@ -17855,11 +17875,11 @@ void init() {
 		           IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left,
 		           IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top,
 		           0);
-	ButtonWidth    = txtWid("MM") + TXTSIDS;
+	ButtonWidth    = txtWid(L"MM") + TXTSIDS;
 	ButtonWidthX3  = ButtonWidth * 3;
 	ButtonHeight   = TextSize.cy + 4;
-	NumeralWidth   = txtWid("0");
-	offsetStepSize = txtWid("0");
+	NumeralWidth   = txtWid(L"0");
+	offsetStepSize = txtWid(L"0");
 	for (iOffset = 0; iOffset < NERCNT; iOffset++)
 		BoxOffset[iOffset] = offsetStepSize * (iOffset + 1);
 	GetClientRect(ThrEdWindow, &ThredWindowRect);
@@ -17923,7 +17943,7 @@ void init() {
 			flag      = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
 		}
 		if (buttonTxt) {
-			(*ButtonWin)[iButton] = CreateWindow("STATIC",
+			(*ButtonWin)[iButton] = CreateWindow(L"STATIC",
 			                                     buttonTxt->c_str(),
 			                                     flag,
 			                                     0,
@@ -17936,22 +17956,20 @@ void init() {
 			                                     NULL);
 		}
 	}
-	TraceStepWin = CreateWindow(
+	TraceStepWin = CreateWindow(L"STATIC",
+	                            L"",
+	                            SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER,
+	                            0,
+	                            ButtonHeight * 18,
+	                            ButtonWidthX3,
+	                            ButtonHeight,
+	                            ThrEdWindow,
+	                            NULL,
+	                            ThrEdInstance,
+	                            NULL);
 
-	    "STATIC",
-	    "",
-	    SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER,
-	    0,
-	    ButtonHeight * 18,
-	    ButtonWidthX3,
-	    ButtonHeight,
-	    ThrEdWindow,
-	    NULL,
-	    ThrEdInstance,
-	    NULL);
-
-	ColorBar = CreateWindow("STATIC",
-	                        "",
+	ColorBar = CreateWindow(L"STATIC",
+	                        L"",
 	                        SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                        ThredWindowRect.right - COLSIZ,
 	                        0,
@@ -18016,7 +18034,8 @@ void init() {
 	auxmen();
 	fnamtabs();
 	ritfnam(IniFile.designerName);
-	strcpy_s(ExtendedHeader.modifierName, IniFile.designerName);
+	auto designer = win32::Utf16ToUtf8(IniFile.designerName);
+	strcpy_s(ExtendedHeader.modifierName, designer.data());
 	ExtendedHeader.stgran = 0;
 	for (iByte = 0; iByte < RES_SIZE; iByte++)
 		ExtendedHeader.res[iByte] = 0;
@@ -18491,7 +18510,7 @@ void drwStch() {
 		if (StateMap.test(StateFlag::FRMPSEL))
 			ritfcor(FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor]);
 		if (!StateMap.test(StateFlag::SELBOX) && !StateMap.test(StateFlag::FRMPSEL)) {
-			std::string blank("");
+			const std::wstring blank(L"");
 			butxt(HCOR, blank);
 		}
 		if (StateMap.test(StateFlag::WASLIN))
@@ -18601,7 +18620,7 @@ void dubar() {
 	}
 }
 
-void ritbak(const char* const fileName, DRAWITEMSTRUCT* drawItem) {
+void ritbak(const wchar_t* const fileName, DRAWITEMSTRUCT* drawItem) {
 	unsigned iStitch = 0, iVertexInForm = 0, iVertex = 0, iColor = 0, iLine = 0, bytesToRead = 0;
 	POINT    drawingDestinationSize
 	    = { (drawItem->rcItem.right - drawItem->rcItem.left), (drawItem->rcItem.bottom - drawItem->rcItem.top) };
@@ -18787,13 +18806,13 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 	unsigned position = 0, iRGB = 0, iColor = 0, iThumb = 0, iVersion = 0, lastCharacter = 0;
 	unsigned screenCenterOffset  = 0;
 	SIZE     maxWindowDimension  = {};
-	char     buffer[10]          = { 0 }; // for integer to string conversion
+	wchar_t  buffer[10]          = { 0 }; // for integer to string conversion
 	SIZE     textSize            = {};    // for measuring text items
 	POINT    scrollPoint         = {};    // for scroll bar functions
 	POINT    line[2]             = {};
 	long     adjustedWidth       = 0;
 	double   tdub                = 0.0;
-	char     fileName[_MAX_PATH] = { 0 };
+	wchar_t  fileName[_MAX_PATH] = { 0 };
 	RECT     traceHighMaskRect   = {}; // high trace mask rectangle
 	RECT     traceMiddleMaskRect = {}; // middle trace mask rectangle
 	RECT     traceLowMaskRect    = {}; // low trace mask rectangle
@@ -19022,9 +19041,9 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			else
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_BTNFACE));
 			if (StateMap.test(StateFlag::TXTRED)) {
-				std::string fmtStr;
+				std::wstring fmtStr;
 				loadString(fmtStr, IDS_TXWID);
-				std::string scrWidth(fmt::format(fmtStr, (TextureScreen.width / PFGRAN)));
+				std::wstring scrWidth(fmt::format(fmtStr, (TextureScreen.width / PFGRAN)));
 				TextOut(DrawItem->hDC, position, 1, scrWidth.c_str(), scrWidth.size());
 				;
 			}
@@ -19052,23 +19071,23 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				}
 				if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
 					TempBrush = BlackBrush;
-					strcpy_s(buffer, (*StringTable)[STR_OFF].c_str());
+					wcscpy_s(buffer, (*StringTable)[STR_OFF].c_str());
 					SetBkColor(DrawItem->hDC, 0);
 					SetTextColor(DrawItem->hDC, TraceRGB[iRGB]);
 					if (StateMap.test(TraceRGBFlag[iRGB])) {
 						TempBrush = TraceBrush[iRGB];
-						strcpy_s(buffer, (*StringTable)[STR_ON].c_str());
+						wcscpy_s(buffer, (*StringTable)[STR_ON].c_str());
 						SetTextColor(DrawItem->hDC, 0);
 						SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 					}
 					FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
-					TextOut(DrawItem->hDC, 1, 1, buffer, strlen(buffer));
+					TextOut(DrawItem->hDC, 1, 1, buffer, wcslen(buffer));
 					return 1;
 				}
 				if (DrawItem->hwndItem == TraceNumberInput) {
 					FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[ColumnColor]);
 					SetBkColor(DrawItem->hDC, TraceRGB[ColumnColor]);
-					TextOut(DrawItem->hDC, 1, 1, TraceInputBuffer, strlen(TraceInputBuffer));
+					TextOut(DrawItem->hDC, 1, 1, TraceInputBuffer, wcslen(TraceInputBuffer));
 					return 1;
 				}
 			}
@@ -19080,7 +19099,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 					if (DisplayedColorBitmap.test(iColor)) {
 						SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
 						SetTextColor(DrawItem->hDC, defTxt(iColor));
-						std::string colorNum(fmt::format("{}", iColor + 1));
+						std::wstring colorNum(fmt::format(L"{}", iColor + 1));
 						GetTextExtentPoint32(DrawItem->hDC, colorNum.c_str(), colorNum.size(), &textSize);
 						TextOut(DrawItem->hDC, (ButtonWidth - textSize.cx) >> 1, 0, colorNum.c_str(), colorNum.size());
 					}
@@ -19118,7 +19137,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			else {
 				for (iVersion = 0; iVersion < OLDVER; iVersion++) {
 					if (DrawItem->hwndItem == BackupViewer[iVersion]) {
-						strcpy_s(fileName, ThrName);
+						wcscpy_s(fileName, ThrName);
 						lastCharacter           = duth(fileName);
 						fileName[lastCharacter] = gsl::narrow<char>(iVersion) + 's';
 						ritbak(fileName, DrawItem);
@@ -19299,7 +19318,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
 	wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1);
-	wc.lpszClassName = "thred";
+	wc.lpszClassName = L"thred";
 	wc.hIconSm       = NULL;
 
 #if HIGHDPI
@@ -19315,7 +19334,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 		TracedMap = &private_TracedMap;
 		boost::dynamic_bitset<> private_TracedEdges(0);
 		TracedEdges = &private_TracedEdges;
-		std::vector<std::string> private_Thumbnails;
+		std::vector<std::wstring> private_Thumbnails;
 		Thumbnails = &private_Thumbnails;
 		std::vector<std::unique_ptr<unsigned[]>> private_UndoBuffer(16);
 		UndoBuffer = &private_UndoBuffer;
@@ -19323,14 +19342,14 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 		TempTexturePoints = &private_TempTexturePoints;
 		std::vector<unsigned> private_SelectedTexturePointsList;
 		SelectedTexturePointsList = &private_SelectedTexturePointsList;
-		std::vector<std::string> private_StringTable(STR_LEN);
+		std::vector<std::wstring> private_StringTable(STR_LEN);
 		StringTable = &private_StringTable;
 		std::vector<HWND> private_ButtonWin;
 		ButtonWin = &private_ButtonWin;
-		std::string private_FormOnOff;
+		std::wstring private_FormOnOff;
 		FormOnOff = &private_FormOnOff;
 		[[gsl::suppress(type .3)]] {
-			LPSTR formOnOff = const_cast<LPSTR>(private_FormOnOff.data());
+			LPWSTR formOnOff = const_cast<LPWSTR>(private_FormOnOff.data());
 
 			MENUITEMINFO private_MenuInfo
 			    = { sizeof(MENUITEMINFO), // Size
@@ -19372,7 +19391,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 		SelectedPointsLine = &private_SelectedPointsLine;
 		std::vector<double> private_FormAngles;
 		FormAngles = &private_FormAngles;
-		std::string private_textureInputBuffer;
+		std::wstring private_textureInputBuffer;
 		TextureInputBuffer = &private_textureInputBuffer;
 		std::vector<TXPNT> private_TexturePointsBuffer;
 		TexturePointsBuffer = &private_TexturePointsBuffer;
@@ -19383,8 +19402,8 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 		createParams.bEnableNonClientDpiScaling = true;
 
 		if (IniFile.initialWindowCoords.right) {
-			ThrEdWindow = CreateWindow("thred",
-			                           "",
+			ThrEdWindow = CreateWindow(L"thred",
+			                           L"",
 			                           WS_OVERLAPPEDWINDOW,
 			                           IniFile.initialWindowCoords.left,
 			                           IniFile.initialWindowCoords.right,
@@ -19396,8 +19415,8 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 			                           &createParams);
 		}
 		else {
-			ThrEdWindow = CreateWindow("thred",
-			                           "",
+			ThrEdWindow = CreateWindow(L"thred",
+			                           L"",
 			                           WS_OVERLAPPEDWINDOW,
 			                           CW_USEDEFAULT,
 			                           CW_USEDEFAULT,

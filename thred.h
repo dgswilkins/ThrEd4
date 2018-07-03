@@ -32,13 +32,12 @@
 #pragma warning(disable : 26499) //			Could not find any lifetime tracking information
 
 #include <vector>
-
 #include "EnumMap.h"
 
 // compile switches
 #define HIGHDPI 0 // allow for high DPI scaling
-#define PESACT 0 // compile pes code
-#define BUGBAK 0 // turn bakseq off
+#define PESACT 0  // compile pes code
+#define BUGBAK 0  // turn bakseq off
 
 #define TRCMTH 1 // 0=brightness compare,1=color compare
 
@@ -707,7 +706,7 @@ typedef struct _pcsheader {
 
 // ini file structure
 typedef struct _iniFil {
-	char           defaultDirectory[180];         // default directory
+	wchar_t        defaultDirectory[180];         // default directory
 	COLORREF       stitchColors[16];              // colors
 	COLORREF       stitchPreferredColors[16];     // stitch preference colors
 	COLORREF       backgroundPreferredColors[16]; // background preference colors
@@ -727,7 +726,7 @@ typedef struct _iniFil {
 	unsigned       userFlagMap;                   // bitmap for user variables
 	double         borderWidth;                   // border width
 	unsigned       appliqueColor;                 // applique color
-	char           prevNames[OLDNUM][_MAX_PATH];  // last file names
+	wchar_t        prevNames[OLDNUM][_MAX_PATH];  // last file names
 	double         snapLength;                    // snap together length
 	double         starRatio;                     // star ratio
 	double         spiralWrap;                    // spiral wrap
@@ -770,7 +769,7 @@ typedef struct _iniFil {
 	float          featherRatio;                  // feather ratio
 	float          featherMinStitchSize;          // feather floor
 	unsigned short featherCount;                  // feather fill psg granularity
-	char           p2cName[_MAX_PATH];            // pes2card file
+	wchar_t        p2cName[_MAX_PATH];            // pes2card file
 	float          underlayIndent;                // edge walk/underlay indent
 	float          underlayAngle;                 // underlay angle
 	float          underlaySpacing;               // underlay spacing
@@ -790,7 +789,7 @@ typedef struct _iniFil {
 	unsigned short daisyHeartCount;               // daisy heart count
 	unsigned short textureEditorSize;             // texture editor pixels
 	float          clpspc;                        // clipboard fill spacing
-	char           designerName[50];              // designer name
+	wchar_t        designerName[50];              // designer name
 } INIFILE;
 
 enum
@@ -950,7 +949,7 @@ public:
 	float    globalRatio;
 };
 
-#define COLMSK 0x0000000f   // 0000 0000 0000 0000 0000 0000 0000 1111
+#define COLMSK 0x0000000f    // 0000 0000 0000 0000 0000 0000 0000 1111
 #define APCOLMSK 0x000000f0  // 0000 0000 0000 0000 0000 0000 1111 0000
 #define NCOLMSK 0xfffffff0   // 1111 1111 1111 1111 1111 1111 1111 0000
 #define COLSMSK 0x0000ffff   // 0000 0000 0000 0000 1111 1111 1111 1111
@@ -1140,7 +1139,7 @@ public:
 	float          edgeSpacing;     // edge spacing
 	float          edgeStitchLen;   // edge stitch length
 	unsigned short res;             // pico length
-} ;
+};
 
 class FRMHED
 {
@@ -1231,7 +1230,7 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 #define NSBLNT 0xbf
 #define NOBLNT 0x9f
 
-// frmhed extended attribute bits
+	// frmhed extended attribute bits
 
 #define AT_SQR 1     // square ends
 #define AT_FTHUP 2   // feather up or down flag

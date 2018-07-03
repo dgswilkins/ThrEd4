@@ -41,6 +41,12 @@
     <ClInclude Include="ExtendedBitSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utf8conv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utf8except.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\dlin.cur">

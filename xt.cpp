@@ -2,6 +2,7 @@
 #define NOMINMAX
 #endif
 
+#include <Shlwapi.h>
 #include <CppCoreCheck\warnings.h>
 #include <math.h>
 #include <stdio.h>
@@ -17,83 +18,83 @@
 #include "resource.h"
 #include "thred.h"
 
-extern unsigned                  ActiveColor;
-extern unsigned                  ActiveLayer;
-extern fPOINT                    AngledFormVertices[MAXFRMLINS];
-extern FRMHED                    AngledForm;
-extern char                      AuxName[_MAX_PATH];
-extern HBRUSH                    BackgroundBrush;
-extern BSEQPNT                   BSequence[BSEQLEN];
-extern unsigned                  ButtonHeight;
-extern unsigned                  ButtonWidthX3;
-extern std::vector<HWND>*        ButtonWin;
-extern FORMCLIP*                 ClipFormHeader;
-extern HGLOBAL                   ClipMemory;
-extern fPOINT                    ClipPoints[MAXITEMS];
-extern fRECTANGLE                ClipRect;
-extern FLSIZ                     ClipRectSize;
-extern unsigned                  ClipStitchCount;
-extern fPOINTATTR                ClipBuffer[MAXFRMLINS];
-extern unsigned                  ClosestFormToCursor;
-extern unsigned                  ClosestPointIndex;
-extern unsigned                  ClosestVertexToCursor;
-extern unsigned                  ClipPointIndex;
-extern fPOINT*                   CurrentFormVertices;
-extern unsigned                  FormVertexIndex;
-extern fPOINT                    FormMoveDelta;
-extern unsigned                  FormIndex;
-extern POINT                     FormLines[MAXFRMLINS];
-extern FRMHED                    FormList[MAXFORMS];
-extern fPOINT                    FormVertices[MAXITEMS];
-extern HPEN                      GridPen;
-extern HWND                      HorizontalScrollBar;
-extern INIFILE                   IniFile;
-extern std::vector<fPOINT>*      InsidePoints;
-extern double                    LineSpacing;
-extern HWND                      MainStitchWin;
-extern MSG                       Msg;
-extern char                      MsgBuffer[MSGSIZ];
-extern unsigned                  NewFormVertexCount;
-extern unsigned                  OutputIndex;
-extern std::vector<fPOINT>*      OutsidePoints;
-extern fPOINT                    OSequence[OSEQLEN];
-extern PCSHEADER                 PCSHeader;
-extern unsigned                  PseudoRandomValue;
-extern FRMHED*                   SelectedForm;
-extern unsigned                  SatinGuideIndex;
-extern SATCON                    SatinGuides[MAXSAC];
-extern EnumMap<StateFlag>        StateMap;
-extern std::vector<unsigned>*    SelectedFormList;
-extern fPOINT                    SelectedPoint;
-extern unsigned                  SequenceIndex;
-extern std::vector<std::string>* StringTable;
-extern fPOINTATTR                StitchBuffer[MAXITEMS * 2];
-extern RECT                      StitchWindowClientRect;
-extern HDC                       StitchWindowDC;
-extern HDC                       StitchWindowMemDC;
-extern POINT                     StitchWindowOrigin;
-extern unsigned                  ThrEdClip;
-extern char*                     ThrEdClipFormat;
-extern HINSTANCE                 ThrEdInstance;
-extern HWND                      ThrEdWindow;
-extern char                      ThrName[_MAX_PATH];
-extern unsigned                  AppliqueColor;
-extern POINT                     UnzoomedRect;
-extern COLORREF                  UserColor[16];
-extern EnumMap<UserFlag>         UserFlagMap;
-extern double                    UserStitchLength;
-extern unsigned                  VertexCount;
-extern HWND                      VerticalScrollBar;
-extern char                      WorkingFileName[_MAX_PATH];
-extern POINT                     ZoomBoxLine[5];
-extern fPOINT                    ZoomBoxOrigin;
-extern dRECTANGLE                ZoomRect;
+extern unsigned                   ActiveColor;
+extern unsigned                   ActiveLayer;
+extern fPOINT                     AngledFormVertices[MAXFRMLINS];
+extern FRMHED                     AngledForm;
+extern wchar_t                    AuxName[_MAX_PATH];
+extern HBRUSH                     BackgroundBrush;
+extern BSEQPNT                    BSequence[BSEQLEN];
+extern unsigned                   ButtonHeight;
+extern unsigned                   ButtonWidthX3;
+extern std::vector<HWND>*         ButtonWin;
+extern FORMCLIP*                  ClipFormHeader;
+extern HGLOBAL                    ClipMemory;
+extern fPOINT                     ClipPoints[MAXITEMS];
+extern fRECTANGLE                 ClipRect;
+extern FLSIZ                      ClipRectSize;
+extern unsigned                   ClipStitchCount;
+extern fPOINTATTR                 ClipBuffer[MAXFRMLINS];
+extern unsigned                   ClosestFormToCursor;
+extern unsigned                   ClosestPointIndex;
+extern unsigned                   ClosestVertexToCursor;
+extern unsigned                   ClipPointIndex;
+extern fPOINT*                    CurrentFormVertices;
+extern unsigned                   FormVertexIndex;
+extern fPOINT                     FormMoveDelta;
+extern unsigned                   FormIndex;
+extern POINT                      FormLines[MAXFRMLINS];
+extern FRMHED                     FormList[MAXFORMS];
+extern fPOINT                     FormVertices[MAXITEMS];
+extern HPEN                       GridPen;
+extern HWND                       HorizontalScrollBar;
+extern INIFILE                    IniFile;
+extern std::vector<fPOINT>*       InsidePoints;
+extern double                     LineSpacing;
+extern HWND                       MainStitchWin;
+extern MSG                        Msg;
+extern wchar_t                    MsgBuffer[MSGSIZ];
+extern unsigned                   NewFormVertexCount;
+extern unsigned                   OutputIndex;
+extern std::vector<fPOINT>*       OutsidePoints;
+extern fPOINT                     OSequence[OSEQLEN];
+extern PCSHEADER                  PCSHeader;
+extern unsigned                   PseudoRandomValue;
+extern FRMHED*                    SelectedForm;
+extern unsigned                   SatinGuideIndex;
+extern SATCON                     SatinGuides[MAXSAC];
+extern EnumMap<StateFlag>         StateMap;
+extern std::vector<unsigned>*     SelectedFormList;
+extern fPOINT                     SelectedPoint;
+extern unsigned                   SequenceIndex;
+extern std::vector<std::wstring>* StringTable;
+extern fPOINTATTR                 StitchBuffer[MAXITEMS * 2];
+extern RECT                       StitchWindowClientRect;
+extern HDC                        StitchWindowDC;
+extern HDC                        StitchWindowMemDC;
+extern POINT                      StitchWindowOrigin;
+extern unsigned                   ThrEdClip;
+extern wchar_t*                   ThrEdClipFormat;
+extern HINSTANCE                  ThrEdInstance;
+extern HWND                       ThrEdWindow;
+extern wchar_t                    ThrName[_MAX_PATH];
+extern unsigned                   AppliqueColor;
+extern POINT                      UnzoomedRect;
+extern COLORREF                   UserColor[16];
+extern EnumMap<UserFlag>          UserFlagMap;
+extern double                     UserStitchLength;
+extern unsigned                   VertexCount;
+extern HWND                       VerticalScrollBar;
+extern wchar_t                    WorkingFileName[_MAX_PATH];
+extern POINT                      ZoomBoxLine[5];
+extern fPOINT                     ZoomBoxOrigin;
+extern dRECTANGLE                 ZoomRect;
 
-extern void               adbad(std::string& repairMessage, unsigned code, unsigned count);
+extern void               adbad(std::wstring& repairMessage, unsigned code, unsigned count);
 extern SATCON*            adsatk(unsigned count);
 extern void               angclpfn(const std::vector<RNGCNT>& textureSegments);
 extern void               bBox();
-extern void               butxt(unsigned iButton, const std::string& buttonText);
+extern void               butxt(unsigned iButton, const std::wstring& buttonText);
 extern void               centir();
 extern void               chkmen();
 extern void               chkseq(bool border);
@@ -114,7 +115,7 @@ extern void               fvars(unsigned iForm);
 extern void               hsizmsg();
 extern bool               isclp(unsigned iForm);
 extern bool               iseclp(unsigned iForm);
-extern inline void        loadString(std::string& sDest, unsigned stringID);
+extern inline void        loadString(std::wstring& sDest, unsigned stringID);
 extern void               mdufrm();
 extern float              midl(float high, float low);
 extern void               movStch();
@@ -135,7 +136,7 @@ extern void               satout(double satinWidth);
 extern void               savdo();
 extern void               save();
 extern void               setmfrm();
-extern void               shoMsg(const std::string& message);
+extern void               shoMsg(const std::wstring& message);
 extern void               shoseln(unsigned code0, unsigned code1);
 extern void               stchrct(fRECTANGLE& rectangle);
 extern void               tabmsg(unsigned code);
@@ -152,7 +153,7 @@ fPOINT                 DesignSize;                    // design size
 std::vector<TXPNT>*    TexturePointsBuffer;           // buffer for textured fill points
 int                    TextureIndex;                  // next textured fill point index
 unsigned               TextureWindowId;               // id of the window being updated
-std::string*           TextureInputBuffer;            // texture fill number buffer
+std::wstring*          TextureInputBuffer;            // texture fill number buffer
 HWND                   SideWindowButton;              // button side window
 RECT                   TexturePixelRect;              // screen selected texture points rectangle
 TXTRCT                 TextureRect;                   // selected texture points rectangle
@@ -710,17 +711,17 @@ constexpr ULARGE_INTEGER tim2int(FILETIME time) noexcept {
 	return op;
 }
 
-int fil2crd(const char* fileName) noexcept {
+int fil2crd(const wchar_t* fileName) noexcept {
 	STARTUPINFO         startupInfo = {};
 	PROCESS_INFORMATION processInfo = {};
 	int                 errorCode   = 0;
-	char                command[_MAX_PATH * 2 + 1 + 4];
+	wchar_t             command[_MAX_PATH * 2 + 1 + 4];
 
-	strcpy_s(command, "\"");
-	strcat_s(command, IniFile.p2cName);
-	strcat_s(command, "\" \"");
-	strcat_s(command, fileName);
-	strcat_s(command, "\"");
+	wcscpy_s(command, L"\"");
+	wcscpy_s(command, IniFile.p2cName);
+	wcscpy_s(command, L"\" \"");
+	wcscpy_s(command, fileName);
+	wcscpy_s(command, L"\"");
 	startupInfo    = {};
 	startupInfo.cb = sizeof(STARTUPINFO);
 	if (!CreateProcess(0, command, 0, 0, 0, NORMAL_PRIORITY_CLASS, 0, 0, &startupInfo, &processInfo)) {
@@ -735,7 +736,7 @@ int fil2crd(const char* fileName) noexcept {
 	return errorCode;
 }
 
-bool chkp2cnam(const char* fileName) noexcept {
+bool chkp2cnam(const wchar_t* fileName) noexcept {
 	HANDLE handleP2C;
 
 	handleP2C = CreateFile(fileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
@@ -753,10 +754,10 @@ void pes2crd() {
 
 	HKEY          registryKey = {};
 	unsigned long keyType = 0, size = 0;
-	char          programName[_MAX_PATH] = { 0 };
-	const char    filter[]               = "ComputerService (Lind2PC.exe)\0LinkP2C.exe\0\0";
-	char          message[P2CBUFSIZ]     = { 0 };
-	char          caption[P2CBUFSIZ]     = { 0 };
+	wchar_t       programName[_MAX_PATH] = { 0 };
+	const wchar_t filter[]               = L"ComputerService (Lind2PC.exe)\0LinkP2C.exe\0\0";
+	wchar_t       message[P2CBUFSIZ]     = { 0 };
+	wchar_t       caption[P2CBUFSIZ]     = { 0 };
 	OPENFILENAME  openFileName           = {
         sizeof(OPENFILENAME), // lStructsize
         ThrEdWindow,          // hwndOwner
@@ -769,12 +770,12 @@ void pes2crd() {
         _MAX_PATH,            // nMaxFile
         0,                    // lpstrFileTitle
         0,                    // nMaxFileTitle
-        "C:\\",               // lpstr	ialDir
+        L"C:\\",              // lpstr	ialDir
         0,                    // lpstrTitle
         0,                    // Flags
         0,                    // nFileOffset
         0,                    // nFileExtension
-        "exe",                // lpstrDefExt
+        L"exe",               // lpstrDefExt
         0,                    // lCustData
         0,                    // lpfnHook
         0,                    // lpTemplateName
@@ -791,12 +792,12 @@ void pes2crd() {
 		return;
 	}
 	*IniFile.p2cName = 0;
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion", 0, KEY_READ, &registryKey)
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion", 0, KEY_READ, &registryKey)
 	    == ERROR_SUCCESS) {
 		size    = _MAX_PATH;
 		keyType = REG_SZ;
-		if (RegQueryValueEx(registryKey, "ProgramFilesDir", 0, &keyType, (unsigned char*)programName, &size) == ERROR_SUCCESS) {
-			strcat_s(programName, "\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
+		if (RegQueryValueEx(registryKey, L"ProgramFilesDir", 0, &keyType, (unsigned char*)programName, &size) == ERROR_SUCCESS) {
+			wcscat_s(programName, L"\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
 			if (!chkp2cnam(programName))
 				*programName = 0;
 		}
@@ -815,7 +816,7 @@ void pes2crd() {
 		else
 			return;
 	}
-	strcpy_s(IniFile.p2cName, programName);
+	wcscpy_s(IniFile.p2cName, programName);
 	fil2crd(AuxName);
 }
 
@@ -1233,16 +1234,16 @@ void initdaz(HWND hWinDialog) {
 	unsigned iType = 0;
 
 	chkdaz();
-	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS), fmt::format("{}", IniFile.daisyPetalPoints).c_str());
-	SetWindowText(GetDlgItem(hWinDialog, IDC_DAZPCNT), fmt::format("{}", IniFile.daisyHeartCount).c_str());
-	SetWindowText(GetDlgItem(hWinDialog, IDC_CNTLEN), fmt::format("{:.2f}", IniFile.daisyDiameter).c_str());
-	SetWindowText(GetDlgItem(hWinDialog, IDC_HOLSIZ), fmt::format("{:.2f}", IniFile.daisyHoleDiameter).c_str());
-	SetWindowText(GetDlgItem(hWinDialog, IDC_INPNTS), fmt::format("{}", IniFile.daisyInnerCount).c_str());
-	SetWindowText(GetDlgItem(hWinDialog, IDC_PETALS), fmt::format("{}", IniFile.daisyPetalCount).c_str());
-	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLEN), fmt::format("{:.2f}", IniFile.daisyPetalLen).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS), fmt::format(L"{}", IniFile.daisyPetalPoints).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_DAZPCNT), fmt::format(L"{}", IniFile.daisyHeartCount).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_CNTLEN), fmt::format(L"{:.2f}", IniFile.daisyDiameter).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_HOLSIZ), fmt::format(L"{:.2f}", IniFile.daisyHoleDiameter).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_INPNTS), fmt::format(L"{}", IniFile.daisyInnerCount).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_PETALS), fmt::format(L"{}", IniFile.daisyPetalCount).c_str());
+	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLEN), fmt::format(L"{:.2f}", IniFile.daisyPetalLen).c_str());
 	CheckDlgButton(hWinDialog, IDC_HOLE, UserFlagMap.test(UserFlag::DAZHOL));
 	CheckDlgButton(hWinDialog, IDC_DLIN, UserFlagMap.test(UserFlag::DAZD));
-	std::string daisyType;
+	std::wstring daisyType;
 	for (iType = 0; iType < 6; iType++) {
 		// ToDo - move DaisyTypeStrings into resource file. See fthdefprc for example
 		loadString(daisyType, DaisyTypeStrings[iType]);
@@ -1255,8 +1256,8 @@ void initdaz(HWND hWinDialog) {
 BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	char     buffer[HBUFSIZ]        = { 0 };
-	char     compareBuffer[HBUFSIZ] = { 0 };
+	wchar_t  buffer[HBUFSIZ]        = { 0 };
+	wchar_t  compareBuffer[HBUFSIZ] = { 0 };
 	unsigned iType                  = 0;
 
 	switch (umsg) {
@@ -1271,19 +1272,19 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			return TRUE;
 		case IDOK:
 			GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer, HBUFSIZ);
-			IniFile.daisyPetalPoints = atoi(buffer);
+			IniFile.daisyPetalPoints = std::stoi(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer, HBUFSIZ);
-			IniFile.daisyHeartCount = atoi(buffer);
+			IniFile.daisyHeartCount = std::stoi(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer, HBUFSIZ);
-			IniFile.daisyDiameter = atof(buffer);
+			IniFile.daisyDiameter = std::stof(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer, HBUFSIZ);
-			IniFile.daisyHoleDiameter = atof(buffer);
+			IniFile.daisyHoleDiameter = std::stof(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer, HBUFSIZ);
-			IniFile.daisyInnerCount = atoi(buffer);
+			IniFile.daisyInnerCount = std::stoi(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer, HBUFSIZ);
-			IniFile.daisyPetalCount = atoi(buffer);
+			IniFile.daisyPetalCount = std::stoi(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer, HBUFSIZ);
-			IniFile.daisyPetalLen = atof(buffer);
+			IniFile.daisyPetalLen = std::stof(buffer);
 			if (IsDlgButtonChecked(hwndlg, IDC_HOLE))
 				UserFlagMap.set(UserFlag::DAZHOL);
 			else
@@ -1295,7 +1296,7 @@ BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer, HBUFSIZ);
 			for (iType = 0; iType < 6; iType++) {
 				LoadString(ThrEdInstance, DaisyTypeStrings[iType], compareBuffer, HBUFSIZ);
-				if (!strcmp(buffer, compareBuffer)) {
+				if (!StrCmpW(buffer, compareBuffer)) {
 					IniFile.daisyBorderType = iType;
 					break;
 				}
@@ -1608,7 +1609,7 @@ void dmprec(const std::vector<OREC*>& stitchRegion, unsigned count) {
 	unsigned iRegion;
 
 	for (iRegion = 0; iRegion < count; iRegion++) {
-		OutputDebugString(fmt::format("{:4d} attrb: 0x{:08x} form: {:4d} type: {} color: {:2d} start: {:5d} finish: {:5d}\n",
+		OutputDebugString(fmt::format(L"{:4d} attrb: 0x{:08x} form: {:4d} type: {} color: {:2d} start: {:5d} finish: {:5d}\n",
 		                              iRegion,
 		                              StitchBuffer[stitchRegion[iRegion]->start].attribute,
 		                              stitchRegion[iRegion]->form,
@@ -1763,7 +1764,7 @@ void fsort() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-		std::string str;
+		std::wstring str;
 		loadString(str, IDS_SRTER);
 		shoMsg(fmt::format(str, pFRecs[badForm]->form));
 	}
@@ -1791,7 +1792,7 @@ void duatf(unsigned ind) {
 		attributeFields.user = 1;
 	else
 		attributeFields.user = 0;
-	OutputDebugString(fmt::format("{:5d}: color: {:2d} form: {:5d} type: {:2d}, layer: {:1d}: user: {:1d} attrib: 0x{:08x}\n",
+	OutputDebugString(fmt::format(L"{:5d}: color: {:2d} form: {:5d} type: {:2d}, layer: {:1d}: user: {:1d} attrib: 0x{:08x}\n",
 	                              ind,
 	                              attributeFields.color,
 	                              attributeFields.form,
@@ -2819,11 +2820,11 @@ void duauxnam() {
 		workingFileName.replace_extension("pcs");
 	}
 
-	strcpy(AuxName, workingFileName.string().c_str());
+	wcscpy_s(AuxName, workingFileName.wstring().c_str());
 }
 
 void redtbak() {
-	OutputDebugString(fmt::format("retrieving texture history {}\n", TextureHistoryIndex).c_str());
+	OutputDebugString(fmt::format(L"retrieving texture history {}\n", TextureHistoryIndex).c_str());
 	const TXHST* textureHistoryItem = &TextureHistory[TextureHistoryIndex];
 	if (textureHistoryItem) {
 		TextureScreen.areaHeight = textureHistoryItem->height;
@@ -2935,13 +2936,13 @@ void px2ed(const POINT& point, fPOINT& editPoint) noexcept {
 }
 
 void bxtxt(unsigned iButton, unsigned iMessage) {
-	std::string message;
+	std::wstring message;
 	loadString(message, iMessage);
 	SetWindowText((*ButtonWin)[iButton], message.c_str());
 }
 
 void hlpflt(unsigned iButton, unsigned iMessage, float data) {
-	std::string fmtStr;
+	std::wstring fmtStr;
 	loadString(fmtStr, iMessage);
 	SetWindowText((*ButtonWin)[iButton], fmt::format(fmtStr, data).c_str());
 }
@@ -2955,7 +2956,7 @@ void drwtxbut() {
 	bxtxt(HTXHOR, IDS_TXHOR);
 	bxtxt(HTXANG, IDS_TXANG);
 	bxtxt(HTXMIR, IDS_TXMIR);
-	SetWindowText((*ButtonWin)[HTXMIR + 1], "");
+	SetWindowText((*ButtonWin)[HTXMIR + 1], L"");
 }
 
 void chktx() {
@@ -3519,7 +3520,7 @@ void butsid(unsigned windowId) {
 	chktxnum();
 	TextureWindowId = windowId;
 	GetWindowRect((*ButtonWin)[windowId], &buttonRect);
-	SideWindowButton = CreateWindow("STATIC",
+	SideWindowButton = CreateWindow(L"STATIC",
 	                                0,
 	                                SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                buttonRect.left + ButtonWidthX3 - StitchWindowOrigin.x,
@@ -3652,7 +3653,7 @@ void txof() {
 		butxt(HUPTO, (*StringTable)[STR_UPON]);
 	else
 		butxt(HUPTO, (*StringTable)[STR_UPOF]);
-	SetWindowText((*ButtonWin)[HTXSPAC], "");
+	SetWindowText((*ButtonWin)[HTXSPAC], L"");
 	savtxt();
 	zumhom();
 	SelectedTexturePointsList->clear();
@@ -3996,8 +3997,8 @@ void txsnap() {
 }
 
 void tst() {
-	strcpy_s(IniFile.designerName, "Mr");
-	strcpy_s(ThrName, IniFile.designerName);
+	wcscpy_s(IniFile.designerName, L"Mr");
+	wcscpy_s(ThrName, IniFile.designerName);
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -4168,17 +4169,17 @@ void rtrclp() {
 }
 
 void setstxt(unsigned stringIndex, float value, HWND dialog) {
-	SetWindowText(GetDlgItem(dialog, stringIndex), fmt::format("{:.2f}", (value / PFGRAN)).c_str());
+	SetWindowText(GetDlgItem(dialog, stringIndex), fmt::format(L"{:.2f}", (value / PFGRAN)).c_str());
 }
 
-float getstxt(unsigned stringIndex, HWND dialog) noexcept {
+float getstxt(unsigned stringIndex, HWND dialog) {
 	// ToDo - This is not great code.
-	char buffer[16] = {};
-	GetWindowText(GetDlgItem(dialog, stringIndex), buffer, sizeof(buffer));
-	return atof(buffer) * PFGRAN;
+	wchar_t buffer[16] = {};
+	GetWindowText(GetDlgItem(dialog, stringIndex), buffer, sizeof(buffer)/sizeof(wchar_t));
+	return std::stof(buffer) * PFGRAN;
 }
 
-bool chkasp(fPOINT& point, float aspectRatio, HWND dialog) noexcept {
+bool chkasp(fPOINT& point, float aspectRatio, HWND dialog) {
 	point.x = getstxt(IDC_DESWID, dialog);
 	point.y = getstxt(IDC_DESHI, dialog);
 	if ((point.y / point.x) == aspectRatio)
@@ -4402,14 +4403,14 @@ void clrstch() noexcept {
 		;
 }
 
-bool txnam(char* name, int sizeName) {
-	char* lastCharacter;
+bool txnam(wchar_t* name, int sizeName) noexcept {
+	wchar_t* lastCharacter;
 
-	strcpy_s(name, sizeName, __argv[0]);
-	lastCharacter = strrchr(name, '\\');
+	wcscpy_s(name, sizeName, __wargv[0]);
+	lastCharacter = StrRChrW(name, 0, L'\\');
 	if (lastCharacter) {
 		lastCharacter++;
-		strcpy_s(lastCharacter, sizeName - (lastCharacter - name), "thred.txr");
+		wcscpy_s(lastCharacter, sizeName - (lastCharacter - name), L"thred.txr");
 		return 1;
 	}
 	else
@@ -4417,7 +4418,7 @@ bool txnam(char* name, int sizeName) {
 }
 
 void txdun() {
-	char                  name[_MAX_PATH] = { 0 };
+	wchar_t               name[_MAX_PATH] = { 0 };
 	HANDLE                handle          = {};
 	unsigned long         bytesWritten    = 0;
 	int                   iHistory        = 0;
@@ -4455,7 +4456,7 @@ void txdun() {
 }
 
 void redtx() {
-	char                  name[_MAX_PATH] = { 0 };
+	wchar_t               name[_MAX_PATH] = { 0 };
 	HANDLE                handle          = {};
 	DWORD                 bytesRead = 0, historyBytesRead = 0;
 	unsigned int          ind    = 0;
@@ -4656,7 +4657,7 @@ void chkfstch() noexcept {
 	}
 }
 
-void repflt(std::string& repairMessage) {
+void repflt(std::wstring& repairMessage) {
 	unsigned iForm = 0, iDestination = 0, iVertex = 0, vertexDifference = 0, vertexCount = 0;
 	BADCNTS  badData = {};
 
@@ -4713,7 +4714,7 @@ void repflt(std::string& repairMessage) {
 	std::copy(vertexPoint.cbegin(), vertexPoint.cend(), FormVertices);
 }
 
-void repclp(std::string& repairMessage) {
+void repclp(std::wstring& repairMessage) {
 	FRMHED*             formHeader = nullptr;
 	unsigned            iForm = 0, clipCount = 0, clipDifference = 0, badClipCount = 0;
 	std::vector<fPOINT> clipPoint;
@@ -4861,7 +4862,7 @@ void reptx() {
 }
 
 void repar() {
-	std::string    repairMessage;
+	std::wstring   repairMessage;
 	const unsigned repairType = frmchkfn();
 
 	savdo();

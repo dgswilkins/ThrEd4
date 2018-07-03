@@ -1,3 +1,7 @@
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include <windows.h>
 #include <CppCoreCheck\warnings.h>
 #include <htmlhelp.h>
@@ -16,7 +20,7 @@ extern void movStch();
 extern void numWnd();
 extern void okcan();
 extern void rstAll();
-extern void shoMsg(const std::string& message);
+extern void shoMsg(const std::wstring& message);
 
 extern unsigned               ButtonHeight;
 extern unsigned               ButtonWidthX3;
@@ -25,11 +29,11 @@ extern unsigned               ClosestFormToCursor;
 extern DRAWITEMSTRUCT*        DrawItem;
 extern unsigned               FormIndex;
 extern FRMHED                 FormList[MAXFORMS];
-extern char                   HomeDirectory[_MAX_PATH];
+extern wchar_t                HomeDirectory[_MAX_PATH];
 extern INIFILE                IniFile;
 extern HWND                   MainStitchWin;
 extern MSG                    Msg;
-extern char                   MsgBuffer[MSGSIZ];
+extern wchar_t                MsgBuffer[MSGSIZ];
 extern fPOINT                 OSequence[OSEQLEN];
 extern PCSHEADER              PCSHeader;
 extern long                   PreferenceWindowWidth;
@@ -40,9 +44,9 @@ extern EnumMap<StateFlag>     StateMap;
 extern HDC                    StitchWindowMemDC;
 extern HINSTANCE              ThrEdInstance;
 extern HWND                   ThrEdWindow;
-extern char                   ThrName[_MAX_PATH];
+extern wchar_t                ThrName[_MAX_PATH];
 extern POINT                  UnzoomedRect;
-extern char                   WorkingFileName[_MAX_PATH];
+extern wchar_t                WorkingFileName[_MAX_PATH];
 
 HWND HelpWindow;    // help window
 HWND MsgWindow = 0; // message window
@@ -69,36 +73,36 @@ unsigned short LoadStringList[] = {
 	IDS_UND,      IDS_ULEN,      IDS_FUANG,  IDS_FUSPAC,  IDS_CWLK,    IDS_UNDCOL,  IDS_FRMBOX,  IDS_TXOF,
 };
 
-std::vector<std::string>* StringTable;
+std::vector<std::wstring>* StringTable;
 
-inline void loadString(std::string& sDest, unsigned stringID) {
+inline void loadString(std::wstring& sDest, unsigned stringID) {
 	WCHAR  sBuf[HBUFSIZ] = { 0 };
 	LPWSTR psBuf         = sBuf;
 	sDest.clear();
-	if (auto len = ::LoadStringW(ThrEdInstance, stringID, psBuf, 0) * sizeof(WCHAR)) {
-		sDest.resize(++len);
-		sDest.resize(::LoadStringA(ThrEdInstance, stringID, &*sDest.begin(), len));
+	if (auto len = ::LoadStringW(ThrEdInstance, stringID, psBuf, 0)) {
+		sDest.resize(len);
+		auto _ = std::copy(sBuf, sBuf + len, sDest.begin());
 	}
 }
 
-void adbad(std::string& repairMessage, unsigned code, unsigned count) {
-	std::string fmtStr;
+void adbad(std::wstring& repairMessage, unsigned code, unsigned count) {
+	std::wstring fmtStr;
 
 	loadString(fmtStr, code);
 	repairMessage += fmtStr;
 	loadString(fmtStr, IDS_NOTREP);
-	repairMessage += fmt::format(fmtStr, count);
+	//repairMessage += fmt::format(fmtStr, count);
 }
 
 void hsizmsg() {
-	std::string fmtStr;
+	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_HSIZ);
 	shoMsg(fmt::format(fmtStr, (UnzoomedRect.x / PFGRAN), (UnzoomedRect.y / PFGRAN)));
 }
 
 void msgflt(unsigned messageId, float value) {
-	std::string fmtStr;
+	std::wstring fmtStr;
 
 	loadString(fmtStr, messageId);
 	shoMsg(fmt::format(fmtStr, value));
@@ -106,37 +110,37 @@ void msgflt(unsigned messageId, float value) {
 	numWnd();
 }
 
-void tsizmsg(char* threadSizeText, double threadSize) {
-	std::string fmtStr;
+void tsizmsg(wchar_t* threadSizeText, double threadSize) {
+	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_SIZ);
-	shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
+	//shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
 	StateMap.set(StateFlag::NUMIN);
 	numWnd();
 }
 
 void bfilmsg() {
-	std::string fmtStr;
+	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_BADFIL);
-	shoMsg(fmt::format(fmtStr, WorkingFileName));
+	//shoMsg(fmt::format(fmtStr, WorkingFileName));
 }
 
-void filnopn(unsigned code, const char* fileName) {
-	std::string fmtStr;
+void filnopn(unsigned code, const wchar_t* fileName) {
+	std::wstring fmtStr;
 
 	loadString(fmtStr, code);
-	shoMsg(fmt::format(fmtStr, fileName));
+	//shoMsg(fmt::format(fmtStr, fileName));
 }
 
-void crmsg(const char* fileName) {
-	std::string fmtStr;
+void crmsg(const wchar_t* fileName) {
+	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_CREAT);
-	shoMsg(fmt::format(fmtStr, fileName));
+	//shoMsg(fmt::format(fmtStr, fileName));
 }
 
-void butxt(unsigned iButton, const std::string& buttonText) {
+void butxt(unsigned iButton, const std::wstring& buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
 		if (iButton == 5) {
 			if (StateMap.test(StateFlag::HIDMAP))
@@ -165,12 +169,12 @@ void lodstr() {
 	}
 }
 
-void shoMsg(const std::string& message) {
+void shoMsg(const std::wstring& message) {
 	if (message.size()) {
-		SIZE                     textSize = {}, messageSize = {};
-		unsigned                 iString = 0, index = 0, previousStringLength = 0;
-		long                     offset = 0;
-		std::vector<std::string> strings;
+		SIZE                      textSize = {}, messageSize = {};
+		unsigned                  iString = 0, index = 0, previousStringLength = 0;
+		long                      offset = 0;
+		std::vector<std::wstring> strings;
 
 		iString            = 0;
 		const auto sizeLim = message.size();
@@ -196,7 +200,7 @@ void shoMsg(const std::string& message) {
 			offset = PreferenceWindowWidth + 6;
 		else
 			offset = 3;
-		MsgWindow = CreateWindow("STATIC",
+		MsgWindow = CreateWindow(L"STATIC",
 		                         message.c_str(),
 		                         SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                         offset,
@@ -211,7 +215,7 @@ void shoMsg(const std::string& message) {
 }
 
 void tabmsg(unsigned code) {
-	std::string message;
+	std::wstring message;
 	loadString(message, code);
 	shoMsg(message);
 }
@@ -221,7 +225,7 @@ void riter() {
 }
 
 void pntmsg(unsigned msgID) {
-	std::string fmtStr, message;
+	std::wstring fmtStr, message;
 
 	loadString(fmtStr, IDS_PNT);
 	loadString(message, msgID);
@@ -229,7 +233,7 @@ void pntmsg(unsigned msgID) {
 }
 
 void shoseln(unsigned code0, unsigned code1) {
-	std::string fmtStr, msg0, msg1;
+	std::wstring fmtStr, msg0, msg1;
 
 	loadString(fmtStr, IDS_SHOSEL);
 	loadString(msg0, code0);
@@ -294,16 +298,16 @@ void grpmsg1() {
 }
 
 void help() {
-	std::string helpFileName;
+	std::wstring helpFileName;
 
 	loadString(helpFileName, IDS_HELPFN);
-	HelpWindow = HtmlHelp(ThrEdWindow, fmt::format("{}{}", HomeDirectory, helpFileName).c_str(), HH_DISPLAY_TOPIC, 0);
+	HelpWindow = HtmlHelp(ThrEdWindow, fmt::format(L"{}{}", HomeDirectory, helpFileName).c_str(), HH_DISPLAY_TOPIC, 0);
 	if (!HelpWindow)
 		tabmsg(IDS_NOHLP);
 }
 
 void sdmsg() {
-	std::string fmtStr;
+	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_SAVDISC);
 	shoMsg(fmt::format(fmtStr, ThrName));
@@ -322,8 +326,8 @@ void spltmsg() {
 }
 
 void datmsg(unsigned code) {
-	unsigned    dataErrorID = 0;
-	std::string dataError;
+	unsigned     dataErrorID = 0;
+	std::wstring dataError;
 
 	switch (code) {
 	case BADFLT:

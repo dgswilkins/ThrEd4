@@ -47,7 +47,7 @@ extern bool        isclp(unsigned find);
 extern bool        isclpx(unsigned find);
 extern bool        isfclp();
 extern bool        istx(unsigned find);
-extern inline void loadString(std::string& sDest, unsigned stringID);
+extern inline void loadString(std::wstring& sDest, unsigned stringID);
 extern void        movStch();
 extern void        mvstch(unsigned destination, unsigned source);
 extern void        mvstchs(unsigned destination, unsigned source, unsigned count);
@@ -77,7 +77,7 @@ extern void setfchk();
 extern void setpsel();
 extern void setxt(std::vector<RNGCNT>& textureSegments);
 extern void shft(const fPOINT& delta);
-extern void shoMsg(const std::string& message);
+extern void shoMsg(const std::wstring& message);
 extern void shord();
 extern void shoseln(unsigned code0, unsigned code1);
 extern void spltmsg();
@@ -94,99 +94,99 @@ extern void unsel();
 extern void unsid();
 extern void zumhom();
 
-extern unsigned                  ActiveColor;
-extern unsigned                  ActiveLayer;
-extern unsigned                  AppliqueColor;
-extern HCURSOR                   ArrowCursor;
-extern unsigned                  BitmapHeight;
-extern unsigned                  BitmapWidth;
-extern unsigned                  ButtonHeight;
-extern unsigned                  ButtonWidth;
-extern unsigned                  ButtonWidthX3;
-extern HWND                      CancelButton;
-extern unsigned                  Clip;
-extern fPOINTATTR                ClipBuffer[MAXFRMLINS];
-extern HGLOBAL                   ClipMemory;
-extern void*                     ClipPointer;
-extern fRECTANGLE                ClipRect;
-extern FLSIZ                     ClipRectSize;
-extern unsigned                  ClipStitchCount;
-extern CLPSTCH*                  ClipStitchData;
-extern unsigned                  ClosestPointIndex;
-extern HCURSOR                   CrossCursor;
-extern HWND                      DeleteStitchesDialog;
-extern HWND                      DiscardButton;
-extern POINT                     EndPointCross;
-extern HMENU                     FillMenu;
-extern HWND                      FormDataSheet;
-extern unsigned                  FormMenuChoice;
-extern HPEN                      FormPen;
-extern HPEN                      FormPen3px;
-extern HPEN                      FormSelectedPen;
-extern unsigned                  GroupEndStitch;
-extern unsigned                  GroupStartStitch;
-extern unsigned                  GroupStitchIndex;
-extern INIFILE                   IniFile;
-extern POINT                     InsertLine[3];
-extern fPOINT                    InterleaveSequence[MAXITEMS];
-extern unsigned                  InterleaveSequenceIndex;
-extern INSREC                    InterleaveSequenceIndices[10];
-extern bool                      iseclp(unsigned find);
-extern HPEN                      LayerPen[5];
-extern HMENU                     MainMenu;
-extern HWND                      MainStitchWin;
-extern double                    MinStitchLength;
-extern MSG                       Msg;
-extern char                      MsgBuffer[MSGSIZ];
-extern unsigned                  MsgIndex;
-extern RECT                      MsgRect;
-extern HWND                      MsgWindow;
-extern HPEN                      MultiFormPen;
-extern unsigned                  NearestCount;
-extern HWND                      OKButton;
-extern char*                     PcdClipFormat;
-extern PCSHEADER                 PCSHeader;
-extern unsigned                  PreferenceIndex;
-extern HWND                      PreferencesWindow;
-extern fRECTANGLE                RotationRect;
-extern unsigned                  SearchLineIndex;
-extern HPEN                      SelectAllPen;
-extern FRMHED*                   SelectedForm;
-extern FORMVERTICES              SelectedFormVertices;
-extern fPOINT                    SelectedFormsSize;
-extern RECT                      SelectedPixelsRect;
-extern fPOINT                    SelectedPoint;
-extern fRECTANGLE                SelectedVerticesRect;
-extern double                    ShowStitchThreshold;
-extern HWND                      SideMessageWindow;
-extern HWND                      SideWindow[11];
-extern char                      SideWindowEntryBuffer[11];
-extern double                    SmallStitchLength;
-extern EnumMap<StateFlag>        StateMap;
-extern double                    StitchBoxesThreshold;
-extern fPOINTATTR                StitchBuffer[MAXITEMS * 2];
-extern fRECTANGLE                StitchRangeRect;
-extern POINT                     StitchCoordinatesPixels;
-extern RECT                      StitchWindowClientRect;
-extern HDC                       StitchWindowDC;
-extern HDC                       StitchWindowMemDC;
-extern POINT                     StitchWindowOrigin;
-extern POINT                     StitchWindowSize;
-extern std::vector<std::string>* StringTable;
-extern int                       TextureIndex;
-extern std::vector<TXPNT>*       TexturePointsBuffer;
-extern HINSTANCE                 ThrEdInstance;
-extern HWND                      ThrEdWindow;
-extern POINT                     ThredWindowOrigin;
-extern char                      ThrName[_MAX_PATH];
-extern POINT                     UnzoomedRect;
-extern EnumMap<UserFlag>         UserFlagMap;
-extern HPEN                      UserPen[16];
-extern double                    UserStitchLength;
-extern double                    ZoomFactor;
-extern dPOINT                    ZoomMarkPoint;
-extern dPOINT                    ZoomRatio;
-extern dRECTANGLE                ZoomRect;
+extern unsigned                   ActiveColor;
+extern unsigned                   ActiveLayer;
+extern unsigned                   AppliqueColor;
+extern HCURSOR                    ArrowCursor;
+extern unsigned                   BitmapHeight;
+extern unsigned                   BitmapWidth;
+extern unsigned                   ButtonHeight;
+extern unsigned                   ButtonWidth;
+extern unsigned                   ButtonWidthX3;
+extern HWND                       CancelButton;
+extern unsigned                   Clip;
+extern fPOINTATTR                 ClipBuffer[MAXFRMLINS];
+extern HGLOBAL                    ClipMemory;
+extern void*                      ClipPointer;
+extern fRECTANGLE                 ClipRect;
+extern FLSIZ                      ClipRectSize;
+extern unsigned                   ClipStitchCount;
+extern CLPSTCH*                   ClipStitchData;
+extern unsigned                   ClosestPointIndex;
+extern HCURSOR                    CrossCursor;
+extern HWND                       DeleteStitchesDialog;
+extern HWND                       DiscardButton;
+extern POINT                      EndPointCross;
+extern HMENU                      FillMenu;
+extern HWND                       FormDataSheet;
+extern unsigned                   FormMenuChoice;
+extern HPEN                       FormPen;
+extern HPEN                       FormPen3px;
+extern HPEN                       FormSelectedPen;
+extern unsigned                   GroupEndStitch;
+extern unsigned                   GroupStartStitch;
+extern unsigned                   GroupStitchIndex;
+extern INIFILE                    IniFile;
+extern POINT                      InsertLine[3];
+extern fPOINT                     InterleaveSequence[MAXITEMS];
+extern unsigned                   InterleaveSequenceIndex;
+extern INSREC                     InterleaveSequenceIndices[10];
+extern bool                       iseclp(unsigned find);
+extern HPEN                       LayerPen[5];
+extern HMENU                      MainMenu;
+extern HWND                       MainStitchWin;
+extern double                     MinStitchLength;
+extern MSG                        Msg;
+extern wchar_t                    MsgBuffer[MSGSIZ];
+extern unsigned                   MsgIndex;
+extern RECT                       MsgRect;
+extern HWND                       MsgWindow;
+extern HPEN                       MultiFormPen;
+extern unsigned                   NearestCount;
+extern HWND                       OKButton;
+extern wchar_t*                   PcdClipFormat;
+extern PCSHEADER                  PCSHeader;
+extern unsigned                   PreferenceIndex;
+extern HWND                       PreferencesWindow;
+extern fRECTANGLE                 RotationRect;
+extern unsigned                   SearchLineIndex;
+extern HPEN                       SelectAllPen;
+extern FRMHED*                    SelectedForm;
+extern FORMVERTICES               SelectedFormVertices;
+extern fPOINT                     SelectedFormsSize;
+extern RECT                       SelectedPixelsRect;
+extern fPOINT                     SelectedPoint;
+extern fRECTANGLE                 SelectedVerticesRect;
+extern double                     ShowStitchThreshold;
+extern HWND                       SideMessageWindow;
+extern HWND                       SideWindow[11];
+extern wchar_t                    SideWindowEntryBuffer[11];
+extern double                     SmallStitchLength;
+extern EnumMap<StateFlag>         StateMap;
+extern double                     StitchBoxesThreshold;
+extern fPOINTATTR                 StitchBuffer[MAXITEMS * 2];
+extern fRECTANGLE                 StitchRangeRect;
+extern POINT                      StitchCoordinatesPixels;
+extern RECT                       StitchWindowClientRect;
+extern HDC                        StitchWindowDC;
+extern HDC                        StitchWindowMemDC;
+extern POINT                      StitchWindowOrigin;
+extern POINT                      StitchWindowSize;
+extern std::vector<std::wstring>* StringTable;
+extern int                        TextureIndex;
+extern std::vector<TXPNT>*        TexturePointsBuffer;
+extern HINSTANCE                  ThrEdInstance;
+extern HWND                       ThrEdWindow;
+extern POINT                      ThredWindowOrigin;
+extern wchar_t                    ThrName[_MAX_PATH];
+extern POINT                      UnzoomedRect;
+extern EnumMap<UserFlag>          UserFlagMap;
+extern HPEN                       UserPen[16];
+extern double                     UserStitchLength;
+extern double                     ZoomFactor;
+extern dPOINT                     ZoomMarkPoint;
+extern dPOINT                     ZoomRatio;
+extern dRECTANGLE                 ZoomRect;
 
 unsigned               ActivePointIndex;                 // pointer to the active form in the sequencing algorithm
 double                 AdjustedSpace;                    // adjusted space
@@ -225,7 +225,7 @@ FRMHED                 FormList[MAXFORMS];               // a list of form heade
 unsigned               FormMenuEntryCount;               // lines in the form-form
 fPOINT                 FormMoveDelta;                    // offset for moving forms
 FLOAT                  FormOffset;                       // form offset for clipboard fills
-std::string*           FormOnOff;
+std::wstring*          FormOnOff;
 unsigned               FormRelocationIndex;             // form relocator pointer
 unsigned               FormVertexIndex;                 // next index to append form points
 unsigned               FormVertexNext;                  // form vertex storage for form vertex insert
@@ -1262,16 +1262,16 @@ void setzig() {
 }
 
 inline void initTearDlg(HWND hwndlg) {
-	SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), fmt::format("{:d}", IniFile.formSides).c_str());
-	SetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), fmt::format("{:.3f}", IniFile.tearTailLength).c_str());
-	SetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), fmt::format("{:.3f}", IniFile.tearTwistStep / PFGRAN).c_str());
-	SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), fmt::format("{:.3f}", IniFile.tearTwistRatio).c_str());
+	SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), fmt::format(L"{:d}", IniFile.formSides).c_str());
+	SetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), fmt::format(L"{:.3f}", IniFile.tearTailLength).c_str());
+	SetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), fmt::format(L"{:.3f}", IniFile.tearTwistStep / PFGRAN).c_str());
+	SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), fmt::format(L"{:.3f}", IniFile.tearTwistRatio).c_str());
 }
 
 BOOL CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	char buffer[HBUFSIZ] = { 0 };
+	wchar_t buffer[HBUFSIZ] = { 0 };
 
 	switch (umsg) {
 	case WM_INITDIALOG:
@@ -1285,13 +1285,13 @@ BOOL CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			return TRUE;
 		case IDOK:
 			GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer, HBUFSIZ);
-			IniFile.formSides = atoi(buffer);
+			IniFile.formSides = std::stoi(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer, HBUFSIZ);
-			IniFile.tearTailLength = atof(buffer);
+			IniFile.tearTailLength = std::stof(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), buffer, HBUFSIZ);
-			IniFile.tearTwistStep = atof(buffer) * PFGRAN;
+			IniFile.tearTwistStep = std::stof(buffer) * PFGRAN;
 			GetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), buffer, HBUFSIZ);
-			IniFile.tearTwistRatio = atof(buffer);
+			IniFile.tearTwistRatio = std::stof(buffer);
 			EndDialog(hwndlg, 1);
 			break;
 		case IDC_DEFTEAR:
@@ -1564,16 +1564,16 @@ void setear() {
 }
 
 inline void wavinit(HWND hwndlg) {
-	SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), fmt::format("{}", IniFile.wavePoints).c_str());
-	SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), fmt::format("{}", IniFile.waveStart).c_str());
-	SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), fmt::format("{}", IniFile.waveEnd).c_str());
-	SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), fmt::format("{}", IniFile.waveLobes).c_str());
+	SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), fmt::format(L"{}", IniFile.wavePoints).c_str());
+	SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), fmt::format(L"{}", IniFile.waveStart).c_str());
+	SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), fmt::format(L"{}", IniFile.waveEnd).c_str());
+	SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), fmt::format(L"{}", IniFile.waveLobes).c_str());
 }
 
 bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	char buffer[HBUFSIZ] = { 0 };
+	wchar_t buffer[HBUFSIZ] = { 0 };
 
 	switch (umsg) {
 	case WM_INITDIALOG:
@@ -1587,13 +1587,13 @@ bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			return TRUE;
 		case IDOK:
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer, HBUFSIZ);
-			IniFile.wavePoints = atoi(buffer);
+			IniFile.wavePoints = std::stoi(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer, HBUFSIZ);
-			IniFile.waveStart = atoi(buffer);
+			IniFile.waveStart = std::stoi(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), buffer, HBUFSIZ);
-			IniFile.waveEnd = atoi(buffer);
+			IniFile.waveEnd = std::stoi(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer, HBUFSIZ);
-			IniFile.waveLobes = atoi(buffer);
+			IniFile.waveLobes = std::stoi(buffer);
 			if (IniFile.wavePoints > 100)
 				IniFile.wavePoints = 100;
 			if (IniFile.wavePoints < 3)
@@ -2024,7 +2024,7 @@ void ritfil(unsigned& interleaveSequenceIndex2) {
 void okcan() {
 	GetClientRect(MsgWindow, &MsgRect);
 
-	OKButton = CreateWindow("STATIC",
+	OKButton = CreateWindow(L"STATIC",
 	                        (*StringTable)[STR_OKENT].c_str(),
 	                        SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                        5,
@@ -2036,7 +2036,7 @@ void okcan() {
 	                        ThrEdInstance,
 	                        NULL);
 
-	CancelButton = CreateWindow("STATIC",
+	CancelButton = CreateWindow(L"STATIC",
 	                            (*StringTable)[STR_CANCEL].c_str(),
 	                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                            ButtonWidth * 5,
@@ -2050,7 +2050,7 @@ void okcan() {
 }
 
 void savdisc() {
-	char buffer[HBUFSIZ];
+	wchar_t buffer[HBUFSIZ];
 
 	sdmsg();
 	StateMap.reset(StateFlag::BIGBOX);
@@ -2058,7 +2058,7 @@ void savdisc() {
 	GetClientRect(MsgWindow, &MsgRect);
 
 	LoadString(ThrEdInstance, IDS_SAV, buffer, HBUFSIZ);
-	OKButton = CreateWindow("STATIC",
+	OKButton = CreateWindow(L"STATIC",
 	                        buffer,
 	                        SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                        5,
@@ -2071,7 +2071,7 @@ void savdisc() {
 	                        NULL);
 
 	LoadString(ThrEdInstance, IDS_DISC, buffer, HBUFSIZ);
-	DiscardButton = CreateWindow("STATIC",
+	DiscardButton = CreateWindow(L"STATIC",
 	                             buffer,
 	                             SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                             ButtonWidthX3 + 15,
@@ -2083,7 +2083,7 @@ void savdisc() {
 	                             ThrEdInstance,
 	                             NULL);
 
-	CancelButton = CreateWindow("STATIC",
+	CancelButton = CreateWindow(L"STATIC",
 	                            (*StringTable)[STR_CANCEL].c_str(),
 	                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                            2 * ButtonWidthX3 + 25,
@@ -6127,7 +6127,7 @@ void lcon(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& line
 			LastGroup = 0;
 			for (iPath = 0; iPath < PathIndex; iPath++) {
 				OutputDebugString(
-				    fmt::format("iterator {},vrt {},grpn {}\n", iPath, pathMap[iPath].node, pathMap[iPath].nextGroup).c_str());
+				    fmt::format(L"iterator {},vrt {},grpn {}\n", iPath, pathMap[iPath].node, pathMap[iPath].nextGroup).c_str());
 				if (!unvis(visitedRegions))
 					break;
 				durgn(sequencePath, visitedRegions, sortedLines, iPath, lineCount, RegionsList);
@@ -6316,7 +6316,7 @@ void satadj() {
 		}
 	}
 	if (CurrentFormGuidesCount != iDestination) {
-		OutputDebugString(fmt::format("Removed {} zero distance guides\n", (CurrentFormGuidesCount - iDestination)).c_str());
+		OutputDebugString(fmt::format(L"Removed {} zero distance guides\n", (CurrentFormGuidesCount - iDestination)).c_str());
 		CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
 		satcpy(CurrentFormGuides, interiorGuides, iDestination);
 	}
@@ -6339,7 +6339,7 @@ void satadj() {
 			}
 		}
 		if (CurrentFormGuidesCount != iDestination) {
-			OutputDebugString(fmt::format("Removed {} end guides\n", (CurrentFormGuidesCount - iDestination)).c_str());
+			OutputDebugString(fmt::format(L"Removed {} end guides\n", (CurrentFormGuidesCount - iDestination)).c_str());
 			CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
 			satcpy(CurrentFormGuides, interiorGuides, iDestination);
 		}
@@ -6352,7 +6352,7 @@ void satadj() {
 				}
 			}
 			if (CurrentFormGuidesCount != iDestination) {
-				OutputDebugString(fmt::format("Removed {} reversed guides\n", (CurrentFormGuidesCount - iDestination)).c_str());
+				OutputDebugString(fmt::format(L"Removed {} reversed guides\n", (CurrentFormGuidesCount - iDestination)).c_str());
 				CurrentFormGuidesCount = SelectedForm->satinGuideCount = iDestination;
 				satcpy(CurrentFormGuides, interiorGuides, iDestination);
 			}
@@ -8325,14 +8325,14 @@ void apliq() {
 }
 
 void setap() {
-	std::string fmtStr;
+	std::wstring fmtStr;
 	loadString(fmtStr, IDS_APCOL);
 
 	AppliqueColor = ActiveColor;
 	shoMsg(fmt::format(fmtStr, (AppliqueColor + 1)));
 }
 
-void maxtsiz(const std::string& label, POINT& textSize) noexcept {
+void maxtsiz(const std::wstring& label, POINT& textSize) noexcept {
 	SIZE labelSize;
 
 	GetTextExtentPoint32(StitchWindowMemDC, label.data(), label.size(), &labelSize);
@@ -8350,12 +8350,12 @@ void maxwid(unsigned start, unsigned finish) {
 	PreferenceWindowTextWidth = textSize.x + 6;
 }
 
-HWND txtwin(const std::string& windowName, const RECT& location) {
+HWND txtwin(const std::wstring& windowName, const RECT& location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		maxtsiz(windowName, LabelWindowSize);
 		return 0;
 	}
-	return CreateWindow("STATIC",
+	return CreateWindow(L"STATIC",
 	                    windowName.c_str(),
 	                    WS_CHILD | WS_VISIBLE,
 	                    location.left,
@@ -8368,12 +8368,12 @@ HWND txtwin(const std::string& windowName, const RECT& location) {
 	                    NULL);
 }
 
-HWND txtrwin(const std::string& winName, const RECT& location) {
+HWND txtrwin(const std::wstring& winName, const RECT& location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		maxtsiz(winName, ValueWindowSize);
 		return 0;
 	}
-	return CreateWindow("STATIC",
+	return CreateWindow(L"STATIC",
 	                    winName.c_str(),
 	                    SS_NOTIFY | WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                    location.left,
@@ -8386,12 +8386,12 @@ HWND txtrwin(const std::string& winName, const RECT& location) {
 	                    NULL);
 }
 
-HWND numwin(const std::string& winName, const RECT& location) {
+HWND numwin(const std::wstring& winName, const RECT& location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		maxtsiz(winName, ValueWindowSize);
 		return 0;
 	}
-	return CreateWindow("STATIC",
+	return CreateWindow(L"STATIC",
 	                    winName.c_str(),
 	                    SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                    location.left,
@@ -8420,11 +8420,11 @@ BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam) noexcept {
 }
 
 void refrmfn() {
-	std::string choice;
-	unsigned    edgeFillType = 0, iEdge = 0;
-	auto&       stringTable = *StringTable;
-	auto&       labelWindow = *LabelWindow;
-	auto&       valueWindow = *ValueWindow;
+	std::wstring choice;
+	unsigned     edgeFillType = 0, iEdge = 0;
+	auto&        stringTable = *StringTable;
+	auto&        labelWindow = *LabelWindow;
+	auto&        valueWindow = *ValueWindow;
 
 	edgeFillType = SelectedForm->edgeType & NEGUND;
 	if (edgeFillType >= EDGELAST) {
@@ -8447,7 +8447,7 @@ void refrmfn() {
 	valueWindow[LFRM] = txtrwin(choice, ValueWindowCoords);
 	nxtlin();
 	labelWindow[LLAYR] = txtwin(stringTable[STR_TXT1], LabelWindowCoords);
-	valueWindow[LLAYR] = txtrwin(fmt::format("{}", ((SelectedForm->attribute & FRMLMSK) >> 1)), ValueWindowCoords);
+	valueWindow[LLAYR] = txtrwin(fmt::format(L"{}", ((SelectedForm->attribute & FRMLMSK) >> 1)), ValueWindowCoords);
 	nxtlin();
 	if (SelectedForm->type != FRMLINE) {
 		labelWindow[LCWLK] = txtwin(stringTable[STR_CWLK], LabelWindowCoords);
@@ -8473,22 +8473,22 @@ void refrmfn() {
 		nxtlin();
 		if (SelectedForm->extendedAttribute & (AT_WALK | AT_UND | AT_CWLK)) {
 			labelWindow[LUNDCOL] = txtwin(stringTable[STR_UNDCOL], LabelWindowCoords);
-			valueWindow[LUNDCOL] = txtrwin(fmt::format("{}", (SelectedForm->underlayColor + 1)), ValueWindowCoords);
+			valueWindow[LUNDCOL] = txtrwin(fmt::format(L"{}", (SelectedForm->underlayColor + 1)), ValueWindowCoords);
 			nxtlin();
 			labelWindow[LULEN] = txtwin(stringTable[STR_ULEN], LabelWindowCoords);
-			valueWindow[LULEN] = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayStitchLen / PFGRAN)), ValueWindowCoords);
+			valueWindow[LULEN] = txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlayStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		labelWindow[LWLKIND] = txtwin(stringTable[STR_UWLKIND], LabelWindowCoords);
-		valueWindow[LWLKIND] = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayIndent / PFGRAN)), ValueWindowCoords);
+		valueWindow[LWLKIND] = txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlayIndent / PFGRAN)), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->extendedAttribute & AT_UND) {
 			labelWindow[LUSPAC] = txtwin(stringTable[STR_FUSPAC], LabelWindowCoords);
-			valueWindow[LUSPAC] = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlaySpacing / PFGRAN)), ValueWindowCoords);
+			valueWindow[LUSPAC] = txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlaySpacing / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 			labelWindow[LUANG] = txtwin(stringTable[STR_FUANG], LabelWindowCoords);
 			valueWindow[LUANG]
-			    = txtrwin(fmt::format("{:.2f}", (SelectedForm->underlayStitchAngle * 180 / PI)), ValueWindowCoords);
+			    = txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlayStitchAngle * 180 / PI)), ValueWindowCoords);
 			nxtlin();
 		}
 	}
@@ -8497,11 +8497,11 @@ void refrmfn() {
 	nxtlin();
 	if (SelectedForm->fillType) {
 		labelWindow[LFRMCOL] = txtwin(stringTable[STR_TXT3], LabelWindowCoords);
-		valueWindow[LFRMCOL] = numwin(fmt::format("{}", (SelectedForm->fillColor + 1)), ValueWindowCoords);
+		valueWindow[LFRMCOL] = numwin(fmt::format(L"{}", (SelectedForm->fillColor + 1)), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == FTHF) {
 			labelWindow[LFTHCOL] = txtwin(stringTable[STR_FTHCOL], LabelWindowCoords);
-			valueWindow[LFTHCOL] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.color + 1)), ValueWindowCoords);
+			valueWindow[LFTHCOL] = numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.color + 1)), ValueWindowCoords);
 			nxtlin();
 			labelWindow[LFTHTYP] = txtwin(stringTable[STR_FTHTYP], LabelWindowCoords);
 			valueWindow[LFTHTYP] = numwin(stringTable[STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1], ValueWindowCoords);
@@ -8532,61 +8532,61 @@ void refrmfn() {
 				}
 			}
 			labelWindow[LFTHUPCNT] = txtwin(stringTable[STR_FTHUPCNT], LabelWindowCoords);
-			valueWindow[LFTHUPCNT] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.upCount)), ValueWindowCoords);
+			valueWindow[LFTHUPCNT] = numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.upCount)), ValueWindowCoords);
 			nxtlin();
 			labelWindow[LFTHDWNCNT] = txtwin(stringTable[STR_FTHDWNCNT], LabelWindowCoords);
-			valueWindow[LFTHDWNCNT] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.downCount)), ValueWindowCoords);
+			valueWindow[LFTHDWNCNT] = numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.downCount)), ValueWindowCoords);
 			nxtlin();
 			labelWindow[LFTHSIZ] = txtwin(stringTable[STR_FTHSIZ], LabelWindowCoords);
-			valueWindow[LFTHSIZ] = numwin(fmt::format("{:.2f}", (SelectedForm->fillInfo.feather.ratio)), ValueWindowCoords);
+			valueWindow[LFTHSIZ] = numwin(fmt::format(L"{:.2f}", (SelectedForm->fillInfo.feather.ratio)), ValueWindowCoords);
 			nxtlin();
 			if (SelectedForm->fillInfo.feather.fillType == FTHPSG) {
 				labelWindow[LFTHNUM] = txtwin(stringTable[STR_FTHNUM], LabelWindowCoords);
-				valueWindow[LFTHNUM] = numwin(fmt::format("{}", (SelectedForm->fillInfo.feather.count)), ValueWindowCoords);
+				valueWindow[LFTHNUM] = numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.count)), ValueWindowCoords);
 				nxtlin();
 			}
 			labelWindow[LFTHFLR] = txtwin(stringTable[STR_FTHFLR], LabelWindowCoords);
 			valueWindow[LFTHFLR]
-			    = numwin(fmt::format("{:.2f}", (SelectedForm->fillInfo.feather.minStitchSize / PFGRAN)), ValueWindowCoords);
+			    = numwin(fmt::format(L"{:.2f}", (SelectedForm->fillInfo.feather.minStitchSize / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType != CLPF) {
 			labelWindow[LFRMSPAC] = txtwin(stringTable[STR_TXT4], LabelWindowCoords);
-			valueWindow[LFRMSPAC] = numwin(fmt::format("{:.2f}", (SelectedForm->fillSpacing / PFGRAN)), ValueWindowCoords);
+			valueWindow[LFRMSPAC] = numwin(fmt::format(L"{:.2f}", (SelectedForm->fillSpacing / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (istx(ClosestFormToCursor)) {
 			labelWindow[LTXOF] = txtwin(stringTable[STR_TXOF], LabelWindowCoords);
-			valueWindow[LTXOF] = numwin(fmt::format("{:.2f}", (SelectedForm->txof / PFGRAN)), ValueWindowCoords);
+			valueWindow[LTXOF] = numwin(fmt::format(L"{:.2f}", (SelectedForm->txof / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		labelWindow[LMAXFIL] = txtwin(stringTable[STR_TXT20], LabelWindowCoords);
-		valueWindow[LMAXFIL] = numwin(fmt::format("{:.2f}", (SelectedForm->maxFillStitchLen / PFGRAN)), ValueWindowCoords);
+		valueWindow[LMAXFIL] = numwin(fmt::format(L"{:.2f}", (SelectedForm->maxFillStitchLen / PFGRAN)), ValueWindowCoords);
 		nxtlin();
 		if (!isclp(ClosestFormToCursor) && !istx(ClosestFormToCursor)) {
 			labelWindow[LFRMLEN] = txtwin(stringTable[STR_TXT5], LabelWindowCoords);
 			valueWindow[LFRMLEN]
-			    = numwin(fmt::format("{:.2f}", (SelectedForm->lengthOrCount.stitchLength / PFGRAN)), ValueWindowCoords);
+			    = numwin(fmt::format(L"{:.2f}", (SelectedForm->lengthOrCount.stitchLength / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		labelWindow[LMINFIL] = txtwin(stringTable[STR_TXT21], LabelWindowCoords);
-		valueWindow[LMINFIL] = numwin(fmt::format("{:.2f}", (SelectedForm->minFillStitchLen / PFGRAN)), ValueWindowCoords);
+		valueWindow[LMINFIL] = numwin(fmt::format(L"{:.2f}", (SelectedForm->minFillStitchLen / PFGRAN)), ValueWindowCoords);
 		nxtlin();
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
 			labelWindow[LFRMANG] = txtwin(stringTable[STR_TXT6], LabelWindowCoords);
 			valueWindow[LFRMANG]
-			    = numwin(fmt::format("{:.2f}", (SelectedForm->angleOrClipData.angle * 180 / PI)), ValueWindowCoords);
+			    = numwin(fmt::format(L"{:.2f}", (SelectedForm->angleOrClipData.angle * 180 / PI)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == ANGCLPF) {
 			labelWindow[LSACANG] = txtwin(stringTable[STR_TXT6], LabelWindowCoords);
 			valueWindow[LSACANG]
-			    = numwin(fmt::format("{:.2f}", (SelectedForm->satinOrAngle.angle * 180 / PI)), ValueWindowCoords);
+			    = numwin(fmt::format(L"{:.2f}", (SelectedForm->satinOrAngle.angle * 180 / PI)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VCLPF || SelectedForm->fillType == HCLPF || SelectedForm->fillType == ANGCLPF) {
 			labelWindow[LFRMFAZ] = txtwin(stringTable[STR_TXT18], LabelWindowCoords);
-			valueWindow[LFRMFAZ] = numwin(fmt::format("{}", (SelectedForm->wordParam)), ValueWindowCoords);
+			valueWindow[LFRMFAZ] = numwin(fmt::format(L"{}", (SelectedForm->wordParam)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (SelectedForm->fillType == VRTF || SelectedForm->fillType == HORF || SelectedForm->fillType == ANGF
@@ -8609,7 +8609,7 @@ void refrmfn() {
 	nxtlin();
 	if (SelectedForm->extendedAttribute & AT_STRT) {
 		labelWindow[LDSTRT] = txtwin(stringTable[STR_FSTRT], LabelWindowCoords);
-		valueWindow[LDSTRT] = numwin(fmt::format("{}", (SelectedForm->fillStart)), ValueWindowCoords);
+		valueWindow[LDSTRT] = numwin(fmt::format(L"{}", (SelectedForm->fillStart)), ValueWindowCoords);
 		nxtlin();
 	}
 	labelWindow[LFEND] = txtwin(stringTable[STR_FEND], LabelWindowCoords);
@@ -8621,7 +8621,7 @@ void refrmfn() {
 	nxtlin();
 	if (SelectedForm->extendedAttribute & AT_END) {
 		labelWindow[LDEND] = txtwin(stringTable[STR_FEND], LabelWindowCoords);
-		valueWindow[LDEND] = numwin(fmt::format("{}", (SelectedForm->fillEnd)), ValueWindowCoords);
+		valueWindow[LDEND] = numwin(fmt::format(L"{}", (SelectedForm->fillEnd)), ValueWindowCoords);
 		nxtlin();
 	}
 	labelWindow[LBRD] = txtwin(stringTable[STR_TXT7], LabelWindowCoords);
@@ -8629,55 +8629,55 @@ void refrmfn() {
 	nxtlin();
 	if (edgeFillType) {
 		labelWindow[LBRDCOL] = txtwin(stringTable[STR_TXT8], LabelWindowCoords);
-		valueWindow[LBRDCOL] = numwin(fmt::format("{}", ((SelectedForm->borderColor & COLMSK) + 1)), ValueWindowCoords);
+		valueWindow[LBRDCOL] = numwin(fmt::format(L"{}", ((SelectedForm->borderColor & COLMSK) + 1)), ValueWindowCoords);
 		nxtlin();
 		if (EdgeArray[iEdge] & BESPAC) {
 			labelWindow[LBRDSPAC] = txtwin(stringTable[STR_TXT9], LabelWindowCoords);
 			if (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN)
-				choice = fmt::format("{:.2f}", (SelectedForm->edgeSpacing / PFGRAN));
+				choice = fmt::format(L"{:.2f}", (SelectedForm->edgeSpacing / PFGRAN));
 			else
-				choice = fmt::format("{:.2f}", (SelectedForm->edgeSpacing / PFGRAN * 2));
+				choice = fmt::format(L"{:.2f}", (SelectedForm->edgeSpacing / PFGRAN * 2));
 			valueWindow[LBRDSPAC] = numwin(choice, ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BPICSPAC) {
 			labelWindow[LBRDPIC] = txtwin(stringTable[STR_TXT16], LabelWindowCoords);
-			valueWindow[LBRDPIC] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeSpacing / PFGRAN)), ValueWindowCoords);
+			valueWindow[LBRDPIC] = numwin(fmt::format(L"{:.2f}", (SelectedForm->edgeSpacing / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BEMAX) {
 			labelWindow[LMAXBRD] = txtwin(stringTable[STR_TXT22], LabelWindowCoords);
-			valueWindow[LMAXBRD] = numwin(fmt::format("{:.2f}", (SelectedForm->maxBorderStitchLen / PFGRAN)), ValueWindowCoords);
+			valueWindow[LMAXBRD] = numwin(fmt::format(L"{:.2f}", (SelectedForm->maxBorderStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BELEN) {
 			labelWindow[LBRDLEN] = txtwin(stringTable[STR_TXT10], LabelWindowCoords);
-			valueWindow[LBRDLEN] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen / PFGRAN)), ValueWindowCoords);
+			valueWindow[LBRDLEN] = numwin(fmt::format(L"{:.2f}", (SelectedForm->edgeStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BEMIN) {
 			labelWindow[LMINBRD] = txtwin(stringTable[STR_TXT23], LabelWindowCoords);
-			valueWindow[LMINBRD] = numwin(fmt::format("{:.2f}", (SelectedForm->minBorderStitchLen / PFGRAN)), ValueWindowCoords);
+			valueWindow[LMINBRD] = numwin(fmt::format(L"{:.2f}", (SelectedForm->minBorderStitchLen / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BESIZ) {
 			labelWindow[LBRDSIZ] = txtwin(stringTable[STR_TXT11], LabelWindowCoords);
-			valueWindow[LBRDSIZ] = numwin(fmt::format("{:.2f}", (SelectedForm->borderSize / PFGRAN)), ValueWindowCoords);
+			valueWindow[LBRDSIZ] = numwin(fmt::format(L"{:.2f}", (SelectedForm->borderSize / PFGRAN)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & BRDPOS) {
 			labelWindow[LBRDPOS] = txtwin(stringTable[STR_TXT18], LabelWindowCoords);
-			valueWindow[LBRDPOS] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
+			valueWindow[LBRDPOS] = numwin(fmt::format(L"{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (EdgeArray[iEdge] & CHNPOS) {
 			labelWindow[LBRDPOS] = txtwin(stringTable[STR_TXT19], LabelWindowCoords);
-			valueWindow[LBRDPOS] = numwin(fmt::format("{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
+			valueWindow[LBRDPOS] = numwin(fmt::format(L"{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (edgeFillType == EDGEAPPL) {
 			labelWindow[LAPCOL] = txtwin(stringTable[STR_TXT12], LabelWindowCoords);
-			valueWindow[LAPCOL] = numwin(fmt::format("{}", ((SelectedForm->borderColor >> 4) + 1)), ValueWindowCoords);
+			valueWindow[LAPCOL] = numwin(fmt::format(L"{}", ((SelectedForm->borderColor >> 4) + 1)), ValueWindowCoords);
 			nxtlin();
 		}
 		if (edgeFillType == EDGEANGSAT || edgeFillType == EDGEAPPL || edgeFillType == EDGEPROPSAT) {
@@ -8691,9 +8691,9 @@ void refrmfn() {
 		}
 		if (EdgeArray[iEdge] & BCNRSIZ) {
 			if (SelectedForm->edgeType == EDGEBHOL)
-				choice = fmt::format("{:.2f}", (getblen() / PFGRAN));
+				choice = fmt::format(L"{:.2f}", (getblen() / PFGRAN));
 			else
-				choice = fmt::format("{:.2f}", (getplen() / PFGRAN));
+				choice = fmt::format(L"{:.2f}", (getplen() / PFGRAN));
 			labelWindow[LBCSIZ] = txtwin(stringTable[STR_TXT13], LabelWindowCoords);
 			valueWindow[LBCSIZ] = numwin(choice, ValueWindowCoords);
 			nxtlin();
@@ -8739,7 +8739,7 @@ void refrm() {
 		redraw(FormDataSheet);
 	}
 	else {
-		FormDataSheet = CreateWindow("STATIC",
+		FormDataSheet = CreateWindow(L"STATIC",
 		                             0,
 		                             WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                             ButtonWidthX3 + 3,
@@ -9263,7 +9263,7 @@ void sidwnd(HWND wnd) {
 	FormMenuChoice = savedChoice;
 	GetWindowRect(wnd, &windowRect);
 	GetWindowRect(FormDataSheet, &MsgRect);
-	SideMessageWindow = CreateWindow("STATIC",
+	SideMessageWindow = CreateWindow(L"STATIC",
 	                                 0,
 	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                 MsgRect.right - ThredWindowOrigin.x + 3,
@@ -9284,7 +9284,7 @@ void prfsid(HWND wnd) {
 	unsid();
 	GetWindowRect(wnd, &windowRect);
 	GetClientRect(PreferencesWindow, &MsgRect);
-	SideMessageWindow = CreateWindow("STATIC",
+	SideMessageWindow = CreateWindow(L"STATIC",
 	                                 0,
 	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                 windowRect.right - ThredWindowOrigin.x + 6,
@@ -9329,8 +9329,8 @@ void dubold() {
 	}
 }
 
-void prftwin(const std::string& text) noexcept {
-	CreateWindow("STATIC",
+void prftwin(const std::wstring& text) noexcept {
+	CreateWindow(L"STATIC",
 	             text.c_str(),
 	             WS_CHILD | WS_VISIBLE,
 	             LabelWindowCoords.left,
@@ -9343,8 +9343,8 @@ void prftwin(const std::string& text) noexcept {
 	             NULL);
 }
 
-HWND prfnwin(const std::string& text) noexcept {
-	return CreateWindow("STATIC",
+HWND prfnwin(const std::wstring& text) noexcept {
+	return CreateWindow(L"STATIC",
 	                    text.c_str(),
 	                    SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                    ValueWindowCoords.left,
@@ -9357,7 +9357,7 @@ HWND prfnwin(const std::string& text) noexcept {
 	                    NULL);
 }
 
-void prflin(const std::string& msg, unsigned row) {
+void prflin(const std::wstring& msg, unsigned row) {
 	prftwin((*StringTable)[row]);
 	(*ValueWindow)[row - STR_PRF0] = prfnwin(msg);
 	nxtlin();
@@ -9380,9 +9380,9 @@ void sethup() noexcept {
 }
 
 void prfmsg() {
-	std::string choice;
-	HDC         preferenceDC   = {};
-	RECT        preferenceRect = {};
+	std::wstring choice;
+	HDC          preferenceDC   = {};
+	RECT         preferenceRect = {};
 
 	if (StateMap.testAndReset(StateFlag::INSRT))
 		StateMap.set(StateFlag::WASRT);
@@ -9401,7 +9401,7 @@ void prfmsg() {
 	LabelWindowSize.x += 4;
 	DestroyWindow(PreferencesWindow);
 	PreferenceWindowWidth = LabelWindowSize.x + ValueWindowSize.x + 18;
-	PreferencesWindow     = CreateWindow("STATIC",
+	PreferencesWindow     = CreateWindow(L"STATIC",
                                      0,
                                      WS_CHILD | WS_VISIBLE | WS_BORDER,
                                      ButtonWidthX3 + 3,
@@ -9421,29 +9421,29 @@ void prfmsg() {
 	LabelWindowCoords.right                             = 3 + LabelWindowSize.x;
 	ValueWindowCoords.left                              = 6 + LabelWindowSize.x;
 	ValueWindowCoords.right                             = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
-	prflin(fmt::format("{}", (AppliqueColor + 1)), STR_PRF10);
-	prflin(fmt::format("{:.2f}", (BorderWidth / PFGRAN)), STR_PRF3);
-	prflin(fmt::format("{:.2f}", (ButtonholeCornerLength / PFGRAN)), STR_PRF14);
-	prflin(fmt::format("{:.2f}", (IniFile.chainSpace / PFGRAN)), STR_PRF23);
-	prflin(fmt::format("{:.2f}", (IniFile.chainRatio)), STR_PRF24);
-	prflin(fmt::format("{:.2f} mm", (IniFile.clipOffset / PFGRAN)), STR_PRF21);
-	prflin(fmt::format("{}", (IniFile.fillPhase)), STR_PRF22);
-	prflin(fmt::format("{:.2f}", (IniFile.eggRatio)), STR_PRF26);
-	prflin(fmt::format("{:.2f}", (IniFile.fillAngle / PI * 180)), STR_PRF1);
+	prflin(fmt::format(L"{}", (AppliqueColor + 1)), STR_PRF10);
+	prflin(fmt::format(L"{:.2f}", (BorderWidth / PFGRAN)), STR_PRF3);
+	prflin(fmt::format(L"{:.2f}", (ButtonholeCornerLength / PFGRAN)), STR_PRF14);
+	prflin(fmt::format(L"{:.2f}", (IniFile.chainSpace / PFGRAN)), STR_PRF23);
+	prflin(fmt::format(L"{:.2f}", (IniFile.chainRatio)), STR_PRF24);
+	prflin(fmt::format(L"{:.2f} mm", (IniFile.clipOffset / PFGRAN)), STR_PRF21);
+	prflin(fmt::format(L"{}", (IniFile.fillPhase)), STR_PRF22);
+	prflin(fmt::format(L"{:.2f}", (IniFile.eggRatio)), STR_PRF26);
+	prflin(fmt::format(L"{:.2f}", (IniFile.fillAngle / PI * 180)), STR_PRF1);
 	if (UserFlagMap.test(UserFlag::SQRFIL))
 		choice = (*StringTable)[STR_SQR];
 	else
 		choice = (*StringTable)[STR_PNTD];
 	prflin(choice, STR_PRF2);
-	prflin(fmt::format("{:.2f}", (LineSpacing / PFGRAN)), STR_PRF0);
-	prflin(fmt::format("{}", (duthrsh(ShowStitchThreshold))), STR_PRF7);
-	prflin(fmt::format("{:.2f} mm", (IniFile.gridSize / PFGRAN)), STR_PRF20);
+	prflin(fmt::format(L"{:.2f}", (LineSpacing / PFGRAN)), STR_PRF0);
+	prflin(fmt::format(L"{}", (duthrsh(ShowStitchThreshold))), STR_PRF7);
+	prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize / PFGRAN)), STR_PRF20);
 	sethup();
-	prflin(fmt::format("{}", (*StringTable)[STR_HUP0 + IniFile.hoopType - 1]), STR_PRF17);
-	prflin(fmt::format("{:.0f} mm", (IniFile.hoopSizeY / PFGRAN)), STR_PRF27);
-	prflin(fmt::format("{:.0f} mm", (IniFile.hoopSizeX / PFGRAN)), STR_PRF18);
-	prflin(fmt::format("{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);
-	prflin(fmt::format("{:.2f}", (PicotSpacing / PFGRAN)), STR_PRF16);
+	prflin(fmt::format(L"{}", (*StringTable)[STR_HUP0 + IniFile.hoopType - 1]), STR_PRF17);
+	prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY / PFGRAN)), STR_PRF27);
+	prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX / PFGRAN)), STR_PRF18);
+	prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);
+	prflin(fmt::format(L"{:.2f}", (PicotSpacing / PFGRAN)), STR_PRF16);
 	if (UserFlagMap.test(UserFlag::BLUNT))
 		choice = (*StringTable)[STR_BLUNT];
 	else
@@ -9454,14 +9454,14 @@ void prfmsg() {
 	else
 		choice = (*StringTable)[STR_OFF];
 	prflin(choice, STR_PRF19);
-	prflin(fmt::format("{:.2f}", (SmallStitchLength / PFGRAN)), STR_PRF9);
-	prflin(fmt::format("{:.2f}", (SnapLength / PFGRAN)), STR_PRF11);
-	prflin(fmt::format("{:.2f}", (SpiralWrap)), STR_PRF13);
-	prflin(fmt::format("{:.2f}", (StarRatio)), STR_PRF12);
-	prflin(fmt::format("{}", (duthrsh(StitchBoxesThreshold))), STR_PRF8);
-	prflin(fmt::format("{:.2f}", (IniFile.maxStitchLength / PFGRAN)), STR_PRF4);
-	prflin(fmt::format("{:.2f}", (UserStitchLength / PFGRAN)), STR_PRF5);
-	prflin(fmt::format("{:.2f}", (MinStitchLength / PFGRAN)), STR_PRF6);
+	prflin(fmt::format(L"{:.2f}", (SmallStitchLength / PFGRAN)), STR_PRF9);
+	prflin(fmt::format(L"{:.2f}", (SnapLength / PFGRAN)), STR_PRF11);
+	prflin(fmt::format(L"{:.2f}", (SpiralWrap)), STR_PRF13);
+	prflin(fmt::format(L"{:.2f}", (StarRatio)), STR_PRF12);
+	prflin(fmt::format(L"{}", (duthrsh(StitchBoxesThreshold))), STR_PRF8);
+	prflin(fmt::format(L"{:.2f}", (IniFile.maxStitchLength / PFGRAN)), STR_PRF4);
+	prflin(fmt::format(L"{:.2f}", (UserStitchLength / PFGRAN)), STR_PRF5);
+	prflin(fmt::format(L"{:.2f}", (MinStitchLength / PFGRAN)), STR_PRF6);
 	StateMap.set(StateFlag::PRFACT);
 	ReleaseDC(ThrEdWindow, preferenceDC);
 }
@@ -9842,7 +9842,7 @@ void tomsg() {
 
 	GetWindowRect(OKButton, &OKrect);
 	GetTextExtentPoint32(StitchWindowMemDC, (*StringTable)[STR_DELST2].c_str(), (*StringTable)[STR_DELST2].size(), &textSize);
-	DeleteStitchesDialog = CreateWindow("STATIC",
+	DeleteStitchesDialog = CreateWindow(L"STATIC",
 	                                    (*StringTable)[STR_DELST2].c_str(),
 	                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                    3,
@@ -10079,7 +10079,7 @@ void snpfn(const std::vector<unsigned>& xPoints, unsigned start, unsigned end, u
 }
 
 void nutim(double size) noexcept {
-	TimeWindow     = CreateWindow("STATIC",
+	TimeWindow     = CreateWindow(L"STATIC",
                               0,
                               WS_CHILD | WS_VISIBLE | WS_BORDER,
                               ButtonWidthX3,
@@ -10244,7 +10244,7 @@ void rotpar(dPOINT& rotationCenter) {
 }
 
 void rotentr(double rotationAngle) {
-	std::string fmtStr;
+	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_ROTA);
 	shoMsg(fmt::format(fmtStr, (rotationAngle / PI * 180)));
@@ -11149,7 +11149,7 @@ void frmnumfn(unsigned newFormIndex) {
 }
 
 void frmnum() {
-	std::string fmtStr;
+	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_FRML);
 	if (FormIndex && StateMap.test(StateFlag::FORMSEL)) {
@@ -11984,7 +11984,7 @@ void col2frm() {
 			endColorOffset += 16;
 		}
 	}
-	std::string fmtStr;
+	std::wstring fmtStr;
 	loadString(fmtStr, IDS_NCOLCHG);
 	shoMsg(fmt::format(fmtStr, colorChangedCount));
 }
@@ -12104,7 +12104,7 @@ void filclpx() {
 				tabmsg(IDS_CLP);
 		}
 		else {
-			std::string str("no clipboard data");
+			std::wstring str(L"no clipboard data");
 			shoMsg(str);
 			CloseClipboard();
 		}
