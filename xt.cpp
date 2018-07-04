@@ -22,6 +22,7 @@ extern unsigned                   ActiveColor;
 extern unsigned                   ActiveLayer;
 extern fPOINT                     AngledFormVertices[MAXFRMLINS];
 extern FRMHED                     AngledForm;
+extern LPWSTR*                    ArgList; // command line argument array
 extern wchar_t                    AuxName[_MAX_PATH];
 extern HBRUSH                     BackgroundBrush;
 extern BSEQPNT                    BSequence[BSEQLEN];
@@ -1942,7 +1943,7 @@ void fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
 		}
 	}
 	if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX)) {
-		for (ind = 0; ind<sizeof(fillStartsData)>> 2; ind++)
+		for (ind = 0; ind < (sizeof(fillStartsData) >> 2); ind++)
 			fillStartsData.fillArray[ind] = ClosestPointIndex;
 	}
 }
@@ -4175,7 +4176,7 @@ void setstxt(unsigned stringIndex, float value, HWND dialog) {
 float getstxt(unsigned stringIndex, HWND dialog) {
 	// ToDo - This is not great code.
 	wchar_t buffer[16] = {};
-	GetWindowText(GetDlgItem(dialog, stringIndex), buffer, sizeof(buffer)/sizeof(wchar_t));
+	GetWindowText(GetDlgItem(dialog, stringIndex), buffer, sizeof(buffer) / sizeof(wchar_t));
 	return std::stof(buffer) * PFGRAN;
 }
 
@@ -4406,7 +4407,7 @@ void clrstch() noexcept {
 bool txnam(wchar_t* name, int sizeName) noexcept {
 	wchar_t* lastCharacter;
 
-	wcscpy_s(name, sizeName, __wargv[0]);
+	wcscpy_s(name, sizeName, ArgList[0]);
 	lastCharacter = StrRChrW(name, 0, L'\\');
 	if (lastCharacter) {
 		lastCharacter++;
@@ -4426,7 +4427,7 @@ void txdun() {
 	std::vector<TXHSTBUF> textureHistoryBuffer(ITXBUFLEN);
 
 	if (TextureHistory[0].texturePoint.size()) {
-		if (txnam(name, sizeof(name))) {
+		if (txnam(name, sizeof(name) / sizeof(wchar_t))) {
 			handle = CreateFile(name, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 			if (handle != INVALID_HANDLE_VALUE) {
 				WriteFile(handle, &signature, sizeof(signature), &bytesWritten, 0);
@@ -4464,7 +4465,7 @@ void redtx() {
 	std::vector<TXHSTBUF> textureHistoryBuffer(ITXBUFLEN);
 
 	TextureHistoryIndex = ITXBUFLEN - 1;
-	if (txnam(name, sizeof(name))) {
+	if (txnam(name, sizeof(name) / sizeof(wchar_t))) {
 		handle = CreateFile(name, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 		if (handle != INVALID_HANDLE_VALUE) {
 			if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, 0)) {

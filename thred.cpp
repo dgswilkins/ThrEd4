@@ -380,6 +380,8 @@ extern unsigned short             SatinEndGuide;
 #define NERCNT 4 // number of entries in the near array
 
 // main variables
+LPWSTR*         ArgList;                                // command line argument array
+int             ArgCount;                               // command line argument count
 HINSTANCE       ThrEdInstance;                          // main instance handle
 HWND            ThrEdWindow;                            // main window handle
 MSG             Msg;                                    // main message loop message
@@ -1946,27 +1948,27 @@ void nunams() {
 	iFileExtention = AuxName + nameLength;
 	switch (IniFile.auxFileType) {
 	case AUXDST:
-		wcscpy_s(iFileExtention, sizeof(AuxName) - nameLength, L"dst");
+		wcscpy_s(iFileExtention, sizeof(AuxName) / sizeof(wchar_t) - nameLength, L"dst");
 		break;
 #if PESACT
 	case AUXPES:
-		strcpy_s(iFileExtention, sizeof(AuxName) - nameLength, "pes");
+		strcpy_s(iFileExtention, sizeof(AuxName) / sizeof(wchar_t) - nameLength, "pes");
 		break;
 #endif
 	default:
-		wcscpy_s(iFileExtention, sizeof(AuxName) - nameLength, L"pcs");
+		wcscpy_s(iFileExtention, sizeof(AuxName) / sizeof(wchar_t) - nameLength, L"pcs");
 	}
 	iFileExtention = ThrName + nameLength;
-	wcscpy_s(iFileExtention, sizeof(ThrName) - nameLength, L"thr");
+	wcscpy_s(iFileExtention, sizeof(ThrName) / sizeof(wchar_t) - nameLength, L"thr");
 	iFileExtention = GeName + nameLength;
-	wcscpy_s(iFileExtention, sizeof(GeName) - nameLength, L"th*");
+	wcscpy_s(iFileExtention, sizeof(GeName) / sizeof(wchar_t) - nameLength, L"th*");
 	bool flag = true;
 	for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
 		if (!StrCmpW(IniFile.prevNames[iPrevious], ThrName)) {
 			if (iPrevious) {
-				wcscpy_s(swapName, sizeof(swapName), IniFile.prevNames[0]);
-				wcscpy_s(IniFile.prevNames[0], sizeof(IniFile.prevNames[0]), IniFile.prevNames[iPrevious]);
-				wcscpy_s(IniFile.prevNames[iPrevious], sizeof(IniFile.prevNames[iPrevious]), swapName);
+				wcscpy_s(swapName, sizeof(swapName) / sizeof(wchar_t), IniFile.prevNames[0]);
+				wcscpy_s(IniFile.prevNames[0], sizeof(IniFile.prevNames[0]) / sizeof(wchar_t), IniFile.prevNames[iPrevious]);
+				wcscpy_s(IniFile.prevNames[iPrevious], sizeof(IniFile.prevNames[iPrevious]) / sizeof(wchar_t), swapName);
 				flag = false;
 				break;
 			}
@@ -2481,7 +2483,10 @@ void chkhup() {
 }
 
 void chknum() {
-	double   value    = std::stof(MsgBuffer);
+	double value = 0.0;
+	if (wcslen(MsgBuffer)) {
+		value = std::stod(MsgBuffer);
+	}
 	unsigned edgeType = 0, borderColor = 0;
 
 	clrstch();
@@ -2828,7 +2833,9 @@ void chknum() {
 				PreferenceIndex = 0;
 			}
 			else {
-				value = std::stof(MsgBuffer);
+				if (wcslen(MsgBuffer)) {
+					value = std::stof(MsgBuffer);
+				}
 				if (StateMap.testAndReset(StateFlag::SCLPSPAC))
 					IniFile.clipOffset = value * PFGRAN;
 				if (StateMap.testAndReset(StateFlag::FSETFIND))
@@ -3886,9 +3893,9 @@ void ritbal() {
 		wcscpy_s(outputName, WorkingFileName);
 		lastNameCharacter = StrRChrW(outputName, 0, L'.');
 		if (lastNameCharacter)
-			wcscpy_s(lastNameCharacter, sizeof(outputName) - (lastNameCharacter - outputName), L".thv");
+			wcscpy_s(lastNameCharacter, sizeof(outputName) / sizeof(wchar_t) - (lastNameCharacter - outputName), L".thv");
 		else
-			wcscat_s(outputName, sizeof(outputName)/sizeof(wchar_t) - wcslen(outputName), L".thv");
+			wcscat_s(outputName, sizeof(outputName) / sizeof(wchar_t) - wcslen(outputName), L".thv");
 		balaradFile = CreateFile(outputName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		if (balaradFile == INVALID_HANDLE_VALUE)
 			return;
@@ -4050,7 +4057,7 @@ void dubuf(char* const buffer, unsigned& count) {
 	stitchHeader.vertexCount   = vertexCount;
 	stitchHeader.dlineCount    = guideCount;
 	stitchHeader.clipDataCount = clipDataCount;
-	const auto threadLength    = (sizeof(ThreadSize)/sizeof(wchar_t)) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
+	const auto threadLength = (sizeof(ThreadSize) / sizeof(wchar_t)) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
 	const auto formDataOffset
 	    = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor) + sizeof(CustomColor) + threadLength;
 	stitchHeader.vertexLen   = sizeof(STRHED) + PCSHeader.stitchCount * sizeof(fPOINTATTR) + formDataOffset;
@@ -4071,9 +4078,13 @@ void dubuf(char* const buffer, unsigned& count) {
 	durit(&output, &BackgroundColor, sizeof(COLORREF));
 	durit(&output, UserColor, sizeof(UserColor));
 	durit(&output, CustomColor, sizeof(CustomColor));
-	for (auto iThread = 0; iThread < threadLength; iThread++)
+	for (auto iThread = 0; iThread < threadLength; iThread++) {
 		MsgBuffer[iThread] = ThreadSize[iThread][0];
-	durit(&output, MsgBuffer, threadLength * sizeof(char));
+	}
+	MsgBuffer[threadLength] = 0;
+	std::wstring threadSizeBufW(MsgBuffer);
+	auto         threadSizeBuf = win32::Utf16ToUtf8(threadSizeBufW);
+	durit(&output, threadSizeBuf.c_str(), threadLength * sizeof(char));
 	if (FormIndex) {
 		std::vector<FRMHED> forms;
 		forms.reserve(FormIndex);
@@ -4220,10 +4231,10 @@ bool colfil() noexcept {
 	extentionLocation = StrRChrW(ColorFileName, 0, L'.');
 	if (extentionLocation) {
 		extentionLocation++;
-		wcscpy_s(extentionLocation, sizeof(ColorFileName) - (extentionLocation - ColorFileName), L"thw");
+		wcscpy_s(extentionLocation, sizeof(ColorFileName) / sizeof(wchar_t) - (extentionLocation - ColorFileName), L"thw");
 		extentionLocation = StrRChrW(RGBFileName, 0, L'.');
 		extentionLocation++;
-		wcscpy_s(extentionLocation, sizeof(RGBFileName) - (extentionLocation - RGBFileName), L"rgb");
+		wcscpy_s(extentionLocation, sizeof(RGBFileName) / sizeof(wchar_t) - (extentionLocation - RGBFileName), L"rgb");
 		return 1;
 	}
 	else
@@ -4849,22 +4860,22 @@ void savAs() {
 				pchr = &WorkingFileName[wcslen(WorkingFileName)];
 			switch (OpenFileName.nFilterIndex) {
 			case 1:
-				wcscpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), L".thr");
+				wcscpy_s(pchr, sizeof(WorkingFileName) / sizeof(wchar_t) - (pchr - WorkingFileName), L".thr");
 				break;
 			case 2:
-				wcscpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), L".pcs");
+				wcscpy_s(pchr, sizeof(WorkingFileName) / sizeof(wchar_t) - (pchr - WorkingFileName), L".pcs");
 				IniFile.auxFileType = AUXPCS;
 				auxmen();
 				break;
 			case 3:
 #if PESACT
-				strcpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), L".pes");
+				strcpy_s(pchr, sizeof(WorkingFileName) / sizeof(wchar_t) - (pchr - WorkingFileName), L".pes");
 				IniFile.auxFileType = AUXPES;
 				auxmen();
 				break;
 			case 4:
 #endif
-				wcscpy_s(pchr, sizeof(WorkingFileName) - (pchr - WorkingFileName), L".dst");
+				wcscpy_s(pchr, sizeof(WorkingFileName) / sizeof(wchar_t) - (pchr - WorkingFileName), L".dst");
 				IniFile.auxFileType = AUXDST;
 				auxmen();
 				break;
@@ -5888,15 +5899,19 @@ void nuFil() {
 						prtred();
 						return;
 					}
-					const auto threadLength = (sizeof(ThreadSize)/sizeof(wchar_t)) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
-					ReadFile(FileHandle, (char*)MsgBuffer, threadLength, &BytesRead, 0);
+					const auto threadLength
+					    = (sizeof(ThreadSize) / sizeof(wchar_t)) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
+					char msgBuffer[threadLength];
+					ReadFile(FileHandle, msgBuffer, threadLength, &BytesRead, 0);
 					totalBytesRead += BytesRead;
 					if (BytesRead != threadLength) {
 						prtred();
 						return;
 					}
+					std::string threadSizebuf(msgBuffer, sizeof(msgBuffer));
+					auto        threadSizeBufW = win32::Utf8ToUtf16(threadSizebuf);
 					for (int iThread = 0; iThread < threadLength; iThread++)
-						ThreadSize[iThread][0] = MsgBuffer[iThread];
+						ThreadSize[iThread][0] = threadSizeBufW[iThread];
 					FormIndex = thredHeader.formCount;
 					if (FormIndex > MAXFORMS)
 						FormIndex = MAXFORMS;
@@ -9091,7 +9106,7 @@ void deldir() {
 	wcscpy_s(fileName, DefaultDirectory);
 	wchar_t* fileSpec = &fileName[wcslen(fileName)];
 	if (fileSpec) {
-		wcscpy_s(fileSpec, sizeof(fileName) - (fileSpec - fileName), L"\\*.th0");
+		wcscpy_s(fileSpec, sizeof(fileName) / sizeof(wchar_t) - (fileSpec - fileName), L"\\*.th0");
 		for (iLastChar = 1; iLastChar < 6; iLastChar++) {
 			fileSpec[5] = gsl::narrow<char>(iLastChar) + 'r';
 			file        = FindFirstFile(fileName, &findFileData);
@@ -11079,7 +11094,7 @@ void ritlock(const WIN32_FIND_DATA* fileData, unsigned fileIndex, HWND hwndlg) n
 	}
 }
 
-BOOL CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
+INT_PTR CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	FINDINFO* fileInfo              = nullptr;
 	HANDLE    searchResult          = {};
 	wchar_t   searchName[_MAX_PATH] = { 0 };
@@ -15692,7 +15707,8 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			StitchEntryBuffer[BufferIndex]   = 0;
 			ClosestPointIndex                = std::stoi(StitchEntryBuffer);
 			if (ClosestPointIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
-				swprintf_s(StitchEntryBuffer, sizeof(StitchEntryBuffer), L"%d", PCSHeader.stitchCount - 1);
+				// ToDo - replace use of swprintf_s
+				swprintf_s(StitchEntryBuffer, sizeof(StitchEntryBuffer) / sizeof(wchar_t), L"%d", PCSHeader.stitchCount - 1);
 				ClosestPointIndex = PCSHeader.stitchCount - 1;
 			}
 			std::wstring txt(StitchEntryBuffer);
@@ -17471,7 +17487,7 @@ int txtWid(const wchar_t* string) noexcept {
 
 void makCol() noexcept {
 	unsigned iColor    = 0;
-	wchar_t     buffer[3] = { 0 };
+	wchar_t  buffer[3] = { 0 };
 
 	buffer[1] = L'0';
 	buffer[2] = 0;
@@ -17541,7 +17557,7 @@ void ritloc() {
 		}
 	}
 	environment = StrRChrW(lockFileName, 0, L'\\') + 1;
-	wcscpy_s(environment, sizeof(lockFileName) - (environment - lockFileName), L"thredloc.txt");
+	wcscpy_s(environment, sizeof(lockFileName) / sizeof(wchar_t) - (environment - lockFileName), L"thredloc.txt");
 	lockFile = CreateFile(lockFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (lockFile != INVALID_HANDLE_VALUE) {
 		auto value = win32::Utf16ToUtf8(HomeDirectory);
@@ -17564,7 +17580,7 @@ void duhom() noexcept {
 	unsigned pathLength    = 0;
 	wchar_t* lastCharacter = nullptr;
 
-	wcscpy_s(HomeDirectory, __wargv[0]);
+	wcscpy_s(HomeDirectory, ArgList[0]);
 	lastCharacter = StrRChrW(HomeDirectory, 0, L'\\');
 	if (lastCharacter)
 		lastCharacter++;
@@ -17585,16 +17601,16 @@ void ducmd() {
 	int           iArgument       = 0;
 	wchar_t*      balaradFileName = nullptr;
 
-	if (__argc > 1) {
-		wcscpy_s(WorkingFileName, __wargv[1]);
+	if (ArgCount > 1) {
+		wcscpy_s(WorkingFileName, ArgList[1]);
 		if (!wcsncmp(WorkingFileName, L"/F1:", 4)) {
 			balaradFileName = &WorkingFileName[4];
 			BalaradFile     = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 			if (BalaradFile != INVALID_HANDLE_VALUE) {
 				CloseHandle(BalaradFile);
 				wcscpy_s(BalaradName0, balaradFileName);
-				if (__argc > 2) {
-					wcscpy_s(WorkingFileName, __wargv[2]);
+				if (ArgCount > 2) {
+					wcscpy_s(WorkingFileName, ArgList[2]);
 					if (!wcsncmp(WorkingFileName, L"/F2:", 4)) {
 						balaradFileName = &WorkingFileName[4];
 						BalaradFile     = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
@@ -17614,9 +17630,9 @@ void ducmd() {
 			DeleteFile(BalaradName1);
 		}
 		else {
-			for (iArgument = 2; iArgument < __argc; iArgument++) {
+			for (iArgument = 2; iArgument < ArgCount; iArgument++) {
 				wcscat_s(WorkingFileName, L" ");
-				wcscat_s(WorkingFileName, __wargv[iArgument]);
+				wcscat_s(WorkingFileName, ArgList[iArgument]);
 			}
 			StateMap.set(StateFlag::REDOLD);
 			nuFil();
@@ -19290,8 +19306,10 @@ int handle_program_memory_depletion(size_t) {
 }
 #endif
 
-int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PWSTR lpCmdLine, _In_ int nCmdShow) {
 	UNREFERENCED_PARAMETER(nCmdShow);
+
+	ArgList = CommandLineToArgvW(GetCommandLine(), &ArgCount);
 
 	WNDCLASSEX wc = {};
 	LOGBRUSH   br = { BS_SOLID, (COLOR_BACKGROUND + 1), 0 };
@@ -19469,6 +19487,8 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	// Restore the current thread's DPI awareness context
 	SetThreadDpiAwarenessContext(previousDpiContext);
 #endif
+
+	LocalFree(ArgList);
 
 	return -1;
 }
