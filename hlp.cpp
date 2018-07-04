@@ -76,12 +76,11 @@ unsigned short LoadStringList[] = {
 std::vector<std::wstring>* StringTable;
 
 inline void loadString(std::wstring& sDest, unsigned stringID) {
-	WCHAR  sBuf[HBUFSIZ] = { 0 };
-	LPWSTR psBuf         = sBuf;
+	WCHAR* pBuf          = NULL;
 	sDest.clear();
-	if (auto len = ::LoadStringW(ThrEdInstance, stringID, psBuf, 0)) {
+	if (auto len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPWSTR>(&pBuf), 0)) {
 		sDest.resize(len);
-		auto _ = std::copy(sBuf, sBuf + len, sDest.begin());
+		auto _ = std::copy(pBuf, pBuf + len, sDest.begin());
 	}
 }
 
@@ -91,7 +90,7 @@ void adbad(std::wstring& repairMessage, unsigned code, unsigned count) {
 	loadString(fmtStr, code);
 	repairMessage += fmtStr;
 	loadString(fmtStr, IDS_NOTREP);
-	//repairMessage += fmt::format(fmtStr, count);
+	repairMessage += fmt::format(fmtStr, count);
 }
 
 void hsizmsg() {
@@ -114,7 +113,7 @@ void tsizmsg(wchar_t* threadSizeText, double threadSize) {
 	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_SIZ);
-	//shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
+	shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
 	StateMap.set(StateFlag::NUMIN);
 	numWnd();
 }
@@ -123,21 +122,21 @@ void bfilmsg() {
 	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_BADFIL);
-	//shoMsg(fmt::format(fmtStr, WorkingFileName));
+	shoMsg(fmt::format(fmtStr, WorkingFileName));
 }
 
 void filnopn(unsigned code, const wchar_t* fileName) {
 	std::wstring fmtStr;
 
 	loadString(fmtStr, code);
-	//shoMsg(fmt::format(fmtStr, fileName));
+	shoMsg(fmt::format(fmtStr, fileName));
 }
 
 void crmsg(const wchar_t* fileName) {
 	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_CREAT);
-	//shoMsg(fmt::format(fmtStr, fileName));
+	shoMsg(fmt::format(fmtStr, fileName));
 }
 
 void butxt(unsigned iButton, const std::wstring& buttonText) {
