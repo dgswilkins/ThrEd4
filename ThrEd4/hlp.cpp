@@ -65,9 +65,9 @@ unsigned short LoadStringList[] = {
 std::vector<std::wstring>* StringTable;
 
 inline void loadString(std::wstring& sDest, unsigned stringID) {
-	WCHAR* pBuf = NULL;
+	LPWSTR pBuf = NULL;
 	sDest.clear();
-	if (auto len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPWSTR>(&pBuf), 0)) {
+	if (auto len = LoadString(ThrEdInstance, stringID, pBuf, 0)) {
 		sDest.resize(len);
 		auto _ = std::copy(pBuf, pBuf + len, sDest.begin());
 	}
