@@ -1,17 +1,6 @@
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
+#include "stdafx.h"
 
-#include <CppCoreCheck\warnings.h>
-#include <math.h>
-#include <stdio.h>
-#include <windows.h>
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include <fmt/core.h>
-#include <gsl/gsl>
-#pragma warning(pop)
-
+#include "EnumMap.h"
 #include "ExtendedBitSet.h"
 #include "Resources/resource.h"
 #include "thred.h"

@@ -1,28 +1,14 @@
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-#include <exception> // For std::exception
-#include <stdexcept> // For std::overflow_error
-#include <Shlwapi.h>
-#include <CppCoreCheck\warnings.h>
-#include <bitset>
-#include <float.h>
-#include <math.h>
-#include <stdio.h>
-#include <windows.h>
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include <boost/dynamic_bitset.hpp>
-#include <boost/endian/conversion.hpp>
-#include <fmt/core.h>
-#include <gsl/gsl>
-#pragma warning(pop)
+#include "stdafx.h"
 
 #ifdef ALLOCFAILURE
 #include <new.h>
 #endif
-#include "utf8conv.h" // UTF-8 conversion functions
+
+#include "EnumMap.h"
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "utf8conv.h"
+#pragma warning(pop)
 #include "Resources/resource.h"
 #include "thred.h"
 

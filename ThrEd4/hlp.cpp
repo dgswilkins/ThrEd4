@@ -1,17 +1,6 @@
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
+#include "stdafx.h"
 
-#include <windows.h>
-#include <CppCoreCheck\warnings.h>
-#include <htmlhelp.h>
-#include <locale.h>
-#include <stdio.h>
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include <fmt/format.h>
-#pragma warning(pop)
-
+#include "EnumMap.h"
 #include "Resources/resource.h"
 #include "thred.h"
 
@@ -76,7 +65,7 @@ unsigned short LoadStringList[] = {
 std::vector<std::wstring>* StringTable;
 
 inline void loadString(std::wstring& sDest, unsigned stringID) {
-	WCHAR* pBuf          = NULL;
+	WCHAR* pBuf = NULL;
 	sDest.clear();
 	if (auto len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPWSTR>(&pBuf), 0)) {
 		sDest.resize(len);
