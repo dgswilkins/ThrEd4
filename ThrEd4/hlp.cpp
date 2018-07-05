@@ -98,7 +98,7 @@ void msgflt(unsigned messageId, float value) {
 	numWnd();
 }
 
-void tsizmsg(wchar_t* threadSizeText, double threadSize) {
+void tsizmsg(const wchar_t* threadSizeText, double threadSize) {
 	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_SIZ);

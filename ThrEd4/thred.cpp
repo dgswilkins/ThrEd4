@@ -276,7 +276,7 @@ extern void               stchs2frm();
 extern void               tabmsg(unsigned code);
 extern void               tglfrm();
 extern void               tomsg();
-extern void               tsizmsg(wchar_t* threadSizeText, double threadSize);
+extern void               tsizmsg(const wchar_t* threadSizeText, double threadSize);
 extern void               tst();
 extern void               txdun();
 extern void               txof();
@@ -415,8 +415,8 @@ double          StitchWindowAspectRatio;                // aspect ratio of the s
 double          MinStitchLength   = MINSIZ * PFAFGRAN;  // minimum stitch size
 double          UserStitchLength  = USESIZ * PFAFGRAN;  // user selected stitch size
 double          SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
-wchar_t*        PcdClipFormat     = L"PMust_Format";
-wchar_t*        ThrEdClipFormat   = L"threditor";
+const wchar_t*  PcdClipFormat     = L"PMust_Format";
+const wchar_t*  ThrEdClipFormat   = L"threditor";
 CLPSTCH*        ClipStitchData;                 // for pcs clipboard data
 FORMCLIP*       ClipFormHeader;                 // for thred form clipboard data
 FORMSCLIP*      ClipFormsHeader;                // multiple form clipboard header

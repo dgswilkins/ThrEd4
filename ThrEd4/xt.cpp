@@ -61,7 +61,7 @@ extern HDC                        StitchWindowDC;
 extern HDC                        StitchWindowMemDC;
 extern POINT                      StitchWindowOrigin;
 extern unsigned                   ThrEdClip;
-extern wchar_t*                   ThrEdClipFormat;
+extern const wchar_t*             ThrEdClipFormat;
 extern HINSTANCE                  ThrEdInstance;
 extern HWND                       ThrEdWindow;
 extern wchar_t                    ThrName[_MAX_PATH];

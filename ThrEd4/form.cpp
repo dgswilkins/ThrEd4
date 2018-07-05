@@ -133,7 +133,7 @@ extern HWND                       MsgWindow;
 extern HPEN                       MultiFormPen;
 extern unsigned                   NearestCount;
 extern HWND                       OKButton;
-extern wchar_t*                   PcdClipFormat;
+extern const wchar_t*             PcdClipFormat;
 extern PCSHEADER                  PCSHeader;
 extern unsigned                   PreferenceIndex;
 extern HWND                       PreferencesWindow;
