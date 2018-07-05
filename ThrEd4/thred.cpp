@@ -23,7 +23,7 @@
 #include <new.h>
 #endif
 #include "utf8conv.h" // UTF-8 conversion functions
-#include "resource.h"
+#include "Resources/resource.h"
 #include "thred.h"
 
 extern void               angclp();

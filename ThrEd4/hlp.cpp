@@ -12,7 +12,7 @@
 #include <fmt/format.h>
 #pragma warning(pop)
 
-#include "resource.h"
+#include "Resources/resource.h"
 #include "thred.h"
 
 extern void ispcdclp();

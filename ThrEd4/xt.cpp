@@ -15,7 +15,7 @@
 #include <gsl/gsl>
 #pragma warning(pop)
 
-#include "resource.h"
+#include "Resources/resource.h"
 #include "thred.h"
 
 extern unsigned                   ActiveColor;

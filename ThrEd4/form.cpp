@@ -13,7 +13,7 @@
 #pragma warning(pop)
 
 #include "ExtendedBitSet.h"
-#include "resource.h"
+#include "Resources/resource.h"
 #include "thred.h"
 
 extern fPOINT*              adclp(unsigned count);
