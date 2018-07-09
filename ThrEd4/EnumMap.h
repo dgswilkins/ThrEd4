@@ -1,5 +1,4 @@
-#ifndef _ENUM_MASK
-#define _ENUM_MASK
+#pragma once
 
 #include <bitset>
 #include <cstddef>
@@ -127,5 +126,3 @@ public:
 private:
 	std::bitset<static_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> mask_;
 };
-
-#endif //_ENUM_MASK
