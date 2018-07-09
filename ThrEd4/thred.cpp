@@ -3695,7 +3695,8 @@ void ritini() {
 	unsigned iColor     = 0;
 	RECT     windowRect = {};
 
-	wcscpy_s(IniFile.defaultDirectory, DefaultDirectory);
+	auto directory = win32::Utf16ToUtf8(DefaultDirectory);
+	std::copy(directory.begin(), directory.end(), IniFile.defaultDirectory);
 	for (iColor = 0; iColor < 16; iColor++) {
 		IniFile.stitchColors[iColor]              = UserColor[iColor];
 		IniFile.backgroundPreferredColors[iColor] = CustomBackgroundColor[iColor];
@@ -17643,8 +17644,9 @@ void redini() {
 		ReadFile(IniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, 0);
 		if (bytesRead < 2061)
 			IniFile.formBoxSizePixels = DEFBPIX;
-		wcscpy_s(DefaultDirectory, IniFile.defaultDirectory);
-		wcscpy_s(DefaultBMPDirectory, IniFile.defaultDirectory);
+		auto directory = win32::Utf8ToUtf16(IniFile.defaultDirectory);
+		std::copy(directory.begin(), directory.end(), DefaultDirectory);
+		std::copy(directory.begin(), directory.end(), DefaultBMPDirectory);
 		for (iColor = 0; iColor < 16; iColor++) {
 			UserColor[iColor]              = IniFile.stitchColors[iColor];
 			CustomColor[iColor]            = IniFile.stitchPreferredColors[iColor];

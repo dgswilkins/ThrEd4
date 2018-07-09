@@ -706,7 +706,7 @@ typedef struct _pcsheader {
 
 // ini file structure
 typedef struct _iniFil {
-	wchar_t        defaultDirectory[180];         // default directory
+	char           defaultDirectory[180];         // default directory
 	COLORREF       stitchColors[16];              // colors
 	COLORREF       stitchPreferredColors[16];     // stitch preference colors
 	COLORREF       backgroundPreferredColors[16]; // background preference colors
