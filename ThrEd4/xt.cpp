@@ -3,12 +3,14 @@
 #include "Resources/resource.h"
 #include "thred.h"
 
+namespace fs = std::experimental::filesystem;
+
 extern unsigned                   ActiveColor;
 extern unsigned                   ActiveLayer;
 extern fPOINT                     AngledFormVertices[MAXFRMLINS];
 extern FRMHED                     AngledForm;
 extern LPWSTR*                    ArgList; // command line argument array
-extern wchar_t                    AuxName[_MAX_PATH];
+extern fs::path                   AuxName;
 extern HBRUSH                     BackgroundBrush;
 extern BSEQPNT                    BSequence[BSEQLEN];
 extern unsigned                   ButtonHeight;
@@ -26,7 +28,7 @@ extern unsigned                   ClosestPointIndex;
 extern unsigned                   ClosestVertexToCursor;
 extern unsigned                   ClipPointIndex;
 extern fPOINT*                    CurrentFormVertices;
-extern std::wstring* DesignerName;
+extern std::wstring*              DesignerName;
 extern unsigned                   FormVertexIndex;
 extern fPOINT                     FormMoveDelta;
 extern unsigned                   FormIndex;
@@ -698,7 +700,7 @@ constexpr ULARGE_INTEGER tim2int(FILETIME time) noexcept {
 	return op;
 }
 
-int fil2crd(const wchar_t* fileName) {
+int fil2crd(const fs::path& fileName) {
 	STARTUPINFO         startupInfo = {};
 	PROCESS_INFORMATION processInfo = {};
 	int                 errorCode   = 0;
@@ -707,7 +709,7 @@ int fil2crd(const wchar_t* fileName) {
 	wcscpy_s(command, L"\"");
 	wcscpy_s(command, win32::Utf8ToUtf16(std::string(IniFile.p2cName)).c_str());
 	wcscpy_s(command, L"\" \"");
-	wcscpy_s(command, fileName);
+	wcscpy_s(command, fileName.wstring().c_str());
 	wcscpy_s(command, L"\"");
 	startupInfo    = {};
 	startupInfo.cb = sizeof(STARTUPINFO);
@@ -2808,7 +2810,7 @@ void duauxnam() {
 		workingFileName.replace_extension("pcs");
 	}
 
-	wcscpy_s(AuxName, workingFileName.wstring().c_str());
+	AuxName = workingFileName;
 }
 
 void redtbak() {

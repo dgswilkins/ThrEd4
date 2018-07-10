@@ -3,6 +3,8 @@
 #include "Resources/resource.h"
 #include "thred.h"
 
+namespace fs = std::experimental::filesystem;
+
 extern void ispcdclp();
 extern void movStch();
 extern void numWnd();
@@ -115,18 +117,18 @@ void bfilmsg() {
 	shoMsg(fmt::format(fmtStr, WorkingFileName));
 }
 
-void filnopn(unsigned code, const wchar_t* fileName) {
+void filnopn(unsigned code, const fs::path& fileName) {
 	std::wstring fmtStr;
 
 	loadString(fmtStr, code);
-	shoMsg(fmt::format(fmtStr, fileName));
+	shoMsg(fmt::format(fmtStr, fileName.wstring()));
 }
 
-void crmsg(const wchar_t* fileName) {
+void crmsg(const fs::path& fileName) {
 	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_CREAT);
-	shoMsg(fmt::format(fmtStr, fileName));
+	shoMsg(fmt::format(fmtStr, fileName.wstring()));
 }
 
 void butxt(unsigned iButton, const std::wstring& buttonText) {

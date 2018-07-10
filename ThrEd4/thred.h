@@ -31,9 +31,6 @@
 // desired
 #pragma warning(disable : 26499) //			Could not find any lifetime tracking information
 
-#include <vector>
-#include "EnumMap.h"
-
 // compile switches
 #define HIGHDPI 0 // allow for high DPI scaling
 #define PESACT 0  // compile pes code

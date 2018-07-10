@@ -7,6 +7,8 @@
 #include "Resources/resource.h"
 #include "thred.h"
 
+namespace fs = std::experimental::filesystem;
+
 extern void               angclp();
 extern void               angsclp();
 extern void               apliq();
@@ -34,7 +36,7 @@ extern void               cntrx();
 extern void               col2frm();
 extern void               contfil();
 extern void               cpylayr(unsigned codedLayer);
-extern void               crmsg(const wchar_t* fileName);
+extern void               crmsg(const fs::path& fileName);
 extern void               crop();
 extern void               dazdef();
 extern void               debean();
@@ -99,7 +101,7 @@ extern void               fethrf();
 extern void               filangl();
 extern void               filclpx();
 extern void               filhor();
-extern void               filnopn(unsigned code, const wchar_t* fileName);
+extern void               filnopn(unsigned code, const fs::path& fileName);
 extern void               filsat();
 extern void               filvrt();
 extern unsigned           find1st();
@@ -681,11 +683,12 @@ const TCHAR AllFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.
 const wchar_t AllFilter[_MAX_PATH + 1] = L"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
 #endif
 
+fs::path AuxName;
+
 const wchar_t BmpFilter[_MAX_PATH + 1]       = L"Microsoft (BMP)\0*.bmp\0";
 wchar_t       CustomFilter[_MAX_PATH + 1]    = L"Thredworks (THR)\0*.thr\0";
 wchar_t       WorkingFileName[_MAX_PATH + 1] = { 0 };
 wchar_t       ThrName[_MAX_PATH + 1];
-wchar_t       AuxName[_MAX_PATH + 1];
 wchar_t       GeName[_MAX_PATH + 1];
 wchar_t       DefaultDirectory[_MAX_PATH + 1]    = L"c:\\";
 wchar_t       DefaultBMPDirectory[_MAX_PATH + 1] = L"c:\\";
@@ -1910,48 +1913,37 @@ void redfils() {
 }
 
 void nunams() {
-	wchar_t* iFileExtention = nullptr;
-	unsigned iPrevious      = 0;
-	unsigned nameLength     = 0;
-	// wchar_t  swapName[_MAX_PATH] = { 0 };
+	unsigned iPrevious = 0;
 
-	_wcslwr_s(WorkingFileName);
-	iFileExtention = StrRChrW(WorkingFileName, 0, L'.');
-	if (iFileExtention)
-		iFileExtention++;
-	else
-		iFileExtention = &WorkingFileName[wcslen(WorkingFileName)];
-	nameLength = iFileExtention - WorkingFileName;
-	wcsncpy_s(AuxName, WorkingFileName, nameLength);
-	wcsncpy_s(ThrName, WorkingFileName, nameLength);
-	wcsncpy_s(GeName, WorkingFileName, nameLength);
-	iFileExtention = AuxName + nameLength;
+	fs::path workingFileName = { WorkingFileName };
+
+	AuxName = workingFileName;
 	switch (IniFile.auxFileType) {
 	case AUXDST:
-		wcscpy_s(iFileExtention, sizeof(AuxName) / sizeof(wchar_t) - nameLength, L"dst");
+		AuxName.replace_extension(L".dst");
 		break;
 #if PESACT
 	case AUXPES:
-		strcpy_s(iFileExtention, sizeof(AuxName) / sizeof(wchar_t) - nameLength, "pes");
+		AuxName.replace_extension(L".pes");
 		break;
 #endif
 	default:
-		wcscpy_s(iFileExtention, sizeof(AuxName) / sizeof(wchar_t) - nameLength, L"pcs");
+		AuxName.replace_extension(L".pcs");
 	}
-	iFileExtention = ThrName + nameLength;
-	wcscpy_s(iFileExtention, sizeof(ThrName) / sizeof(wchar_t) - nameLength, L"thr");
-	iFileExtention = GeName + nameLength;
-	wcscpy_s(iFileExtention, sizeof(GeName) / sizeof(wchar_t) - nameLength, L"th*");
+	auto thrName = workingFileName;
+	thrName.replace_extension(L".thr");
+	auto strThr = thrName.wstring();
+	std::copy(strThr.begin(), strThr.end(), ThrName);
+	auto geName = workingFileName;
+	geName.replace_extension(L".th*");
+	auto strGe = geName.wstring();
+	std::copy(strGe.begin(), strGe.end(), GeName);
 	bool  flag          = true;
 	auto& previousNames = *PreviousNames;
 	for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
 		if (previousNames[iPrevious] == ThrName) {
 			if (iPrevious) {
 				std::swap(previousNames[0], previousNames[iPrevious]);
-				// wcscpy_s(swapName, sizeof(swapName) / sizeof(wchar_t), IniFile.prevNames[0]); //swapname = previousNames[0[
-				// wcscpy_s(IniFile.prevNames[0], sizeof(IniFile.prevNames[0]) / sizeof(wchar_t), IniFile.prevNames[iPrevious]);
-				// //previousNames[0] = previousNames[iPrevious]  wcscpy_s(IniFile.prevNames[iPrevious],
-				// sizeof(IniFile.prevNames[iPrevious]) / sizeof(wchar_t), swapName); // previousNames[iPrevious] = swapName
 				flag = false;
 				break;
 			}
@@ -3961,31 +3953,26 @@ void reldun() {
 	PostQuitMessage(0);
 }
 
-bool chkattr(const wchar_t* const filename) {
-	const unsigned attributes            = GetFileAttributes(filename);
-	unsigned       buttonPressed         = 0;
-	wchar_t        drive[_MAX_PATH]      = { 0 };
-	DWORD          SectorsPerCluster     = 0;
-	DWORD          BytesPerSector        = 0;
-	DWORD          NumberOfFreeClusters  = 0;
-	DWORD          TotalNumberOfClusters = 0;
+bool chkattr(const fs::path& filename) {
+	constexpr auto writeBits = (fs::perms::owner_write | fs::perms::others_write | fs::perms::group_write);
 
-	if (StateMap.testAndReset(StateFlag::NOTFREE))
-		return 1;
-	if (attributes & FILE_ATTRIBUTE_READONLY && attributes != 0xffffffff) {
-		buttonPressed = MessageBox(
-		    ThrEdWindow, fmt::format((*StringTable)[STR_OVRLOK], filename).c_str(), (*StringTable)[STR_OVRIT].c_str(), MB_YESNO);
-		if (buttonPressed == IDYES)
-			SetFileAttributes(filename, attributes & (0xffffffff ^ FILE_ATTRIBUTE_READONLY));
-		else
-			return 1;
-	}
-	wcscpy_s(drive, HomeDirectory);
-	drive[3] = 0;
-	// ToDo - does a return value of 0 mean no free space?
-	if (!GetDiskFreeSpace(drive, &SectorsPerCluster, &BytesPerSector, &NumberOfFreeClusters, &TotalNumberOfClusters)) {
+	if (!fs::space(filename.parent_path()).available) {
 		StateMap.set(StateFlag::NOTFREE);
 		return 1;
+	}
+	else {
+		StateMap.reset(StateFlag::NOTFREE);
+		auto writePerms = fs::status(filename).permissions() & writeBits;
+		if (writePerms == fs::perms::none) {
+			auto buttonPressed = MessageBox(ThrEdWindow,
+			                           fmt::format((*StringTable)[STR_OVRLOK], filename.wstring()).c_str(),
+			                           (*StringTable)[STR_OVRIT].c_str(),
+			                           MB_YESNO);
+			if (buttonPressed == IDYES)
+				fs::permissions(filename, fs::perms::add_perms | writeBits);
+			else
+				return 1;
+		}
 	}
 	return 0;
 }
@@ -4578,7 +4565,7 @@ void sav() {
 			saveStitches[iStitch] = StitchBuffer[iStitch];
 		}
 	}
-	PCSFileHandle = CreateFile(AuxName, (GENERIC_WRITE | GENERIC_READ), 0, NULL, CREATE_ALWAYS, 0, NULL);
+	PCSFileHandle = CreateFile(AuxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (PCSFileHandle == INVALID_HANDLE_VALUE) {
 		crmsg(AuxName);
 		PCSFileHandle = 0;
@@ -6980,6 +6967,7 @@ void newFil() {
 		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
 	deldu();
+	DesignerName->assign(win32::Utf8ToUtf16(std::string(IniFile.designerName)));
 	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], *DesignerName).c_str());
 	wcscpy_s(ThrName, (*StringTable)[STR_NUFIL].c_str());
 	ritfnam(*DesignerName);
