@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "EnumMap.h"
 #include "Resources/resource.h"
 #include "thred.h"
 
@@ -27,6 +26,7 @@ extern unsigned                   ClosestPointIndex;
 extern unsigned                   ClosestVertexToCursor;
 extern unsigned                   ClipPointIndex;
 extern fPOINT*                    CurrentFormVertices;
+extern std::wstring* DesignerName;
 extern unsigned                   FormVertexIndex;
 extern fPOINT                     FormMoveDelta;
 extern unsigned                   FormIndex;
@@ -3985,8 +3985,8 @@ void txsnap() {
 }
 
 void tst() {
-	wcscpy_s(IniFile.designerName, L"Mr");
-	wcscpy_s(ThrName, IniFile.designerName);
+	DesignerName->assign(L"Coder");
+	std::copy(DesignerName->begin(), DesignerName->end(), ThrName);
 	StateMap.set(StateFlag::RESTCH);
 }
 

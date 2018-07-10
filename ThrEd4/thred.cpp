@@ -1,14 +1,9 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #ifdef ALLOCFAILURE
 #include <new.h>
 #endif
 
-#include "EnumMap.h"
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include "utf8conv.h"
-#pragma warning(pop)
 #include "Resources/resource.h"
 #include "thred.h"
 
@@ -476,7 +471,7 @@ RANGE         SelectedRange;                   // first and last stitch for min/
 unsigned      NameOrder[50];                   // designer name order table
 unsigned char NameEncoder[128];                // designer name encoding
 unsigned char NameDecoder[256];                // designer name decode
-wchar_t       DesignerName[50];                // designer name in clear
+std::wstring* DesignerName;                    // designer name in clear
 HWND          FirstWin;                        // first window not destroyed for exiting enumerate loop
 RANGE         SelectedFormsRange;              // range of selected forms
 unsigned      TmpFormIndex;                    // saved form index
@@ -685,6 +680,7 @@ const TCHAR AllFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.
 #else
 const wchar_t AllFilter[_MAX_PATH + 1] = L"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
 #endif
+
 const wchar_t BmpFilter[_MAX_PATH + 1]       = L"Microsoft (BMP)\0*.bmp\0";
 wchar_t       CustomFilter[_MAX_PATH + 1]    = L"Thredworks (THR)\0*.thr\0";
 wchar_t       WorkingFileName[_MAX_PATH + 1] = { 0 };
@@ -1396,7 +1392,7 @@ BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	switch (umsg) {
 	case WM_INITDIALOG:
 		hwnd = GetDlgItem(hwndlg, IDC_DESED);
-		SetWindowText(hwnd, IniFile.designerName);
+		SetWindowText(hwnd, DesignerName->c_str());
 		SetFocus(hwnd);
 		SendMessage(hwnd, EM_SETSEL, 0, -1);
 		break;
@@ -1407,9 +1403,11 @@ BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			return TRUE;
 		case IDOK:
 			hwnd = GetDlgItem(hwndlg, IDC_DESED);
-			GetWindowText(hwnd, IniFile.designerName, 50);
+			wchar_t designerBuffer[50];
+			GetWindowText(hwnd, designerBuffer, sizeof(designerBuffer) / sizeof(wchar_t));
+			DesignerName->assign(designerBuffer);
 			EndDialog(hwndlg, 0);
-			SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], IniFile.designerName).c_str());
+			SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], *DesignerName).c_str());
 			return TRUE;
 		}
 	}
@@ -1553,28 +1551,23 @@ unsigned rsed() noexcept {
 }
 
 void fnamtabs() {
-	unsigned      iName = 0, swapInteger = 0, source = 0, destination = 0;
-	unsigned char swapCharacter = 0;
+	unsigned iName = 0, source = 0, destination = 0;
 
 	for (iName = 0; iName < 50; iName++)
 		NameOrder[iName] = iName;
 	PseudoRandomValue = NORDSED;
 	for (iName = 0; iName < 100; iName++) {
-		source                 = psg() % 50;
-		destination            = psg() % 50;
-		swapInteger            = NameOrder[destination];
-		NameOrder[destination] = NameOrder[source];
-		NameOrder[source]      = swapInteger;
+		source      = psg() % 50;
+		destination = psg() % 50;
+		std::swap(NameOrder[destination], NameOrder[source]);
 	}
 	for (iName = 0; iName < 128; iName++)
 		NameEncoder[iName] = gsl::narrow<unsigned char>(iName) + NCODOF;
 	PseudoRandomValue = NCODSED;
 	for (iName = 0; iName < 256; iName++) {
-		source                   = psg() & 0x7f;
-		destination              = psg() & 0x7f;
-		swapCharacter            = NameEncoder[destination];
-		NameEncoder[destination] = NameEncoder[source];
-		NameEncoder[source]      = swapCharacter;
+		source      = psg() & 0x7f;
+		destination = psg() & 0x7f;
+		std::swap(NameEncoder[destination], NameEncoder[source]);
 	}
 	const unsigned char fillval = {};
 	std::fill_n(NameDecoder, sizeof(NameDecoder), fillval);
@@ -1582,60 +1575,59 @@ void fnamtabs() {
 		NameDecoder[NameEncoder[iName]] = gsl::narrow<unsigned char>(iName);
 }
 
-void ritfnam(const wchar_t* designerName) {
-	if (designerName) {
-		auto          designer    = win32::Utf16ToUtf8(designerName);
-		unsigned      iName       = 0;
-		unsigned char tmpName[50] = { 0 };
+void ritfnam(const std::wstring& designerName) {
+	auto          designer    = win32::Utf16ToUtf8(designerName);
+	unsigned      iName       = 0;
+	unsigned char tmpName[50] = { 0 };
 
-		if (NameOrder[0] > 50)
-			fnamtabs();
-		PseudoRandomValue = rsed();
-		for (iName = 0; iName < 50; iName++)
-			tmpName[iName] = psg() & 0xff;
-		for (iName = 0; iName < 50; iName++) {
-			if (designer[iName]) {
-				tmpName[iName] = NameEncoder[designer[iName]];
-			}
-			else {
-				while (NameDecoder[tmpName[iName]])
-					tmpName[iName] = psg() & 0xff;
-				break;
-			}
+	if (NameOrder[0] > 50)
+		fnamtabs();
+	PseudoRandomValue = rsed();
+	for (iName = 0; iName < 50; iName++)
+		tmpName[iName] = psg() & 0xff;
+	for (iName = 0; iName < 50; iName++) {
+		if (designer[iName]) {
+			tmpName[iName] = NameEncoder[designer[iName]];
 		}
-		if (iName == 50) {
-			while (NameDecoder[tmpName[49]])
-				tmpName[49] = psg() & 0xff;
+		else {
+			while (NameDecoder[tmpName[iName]])
+				tmpName[iName] = psg() & 0xff;
+			break;
 		}
-		for (iName = 0; iName < 50; iName++) {
-			if (NameOrder[iName] < 50) {
-				ExtendedHeader.creatorName[NameOrder[iName]] = tmpName[iName];
-			}
+	}
+	if (iName == 50) {
+		while (NameDecoder[tmpName[49]])
+			tmpName[49] = psg() & 0xff;
+	}
+	for (iName = 0; iName < 50; iName++) {
+		if (NameOrder[iName] < 50) {
+			ExtendedHeader.creatorName[NameOrder[iName]] = tmpName[iName];
 		}
 	}
 }
 
-void redfnam(wchar_t* designerName) {
-	if (designerName) {
-		unsigned      iName       = 0;
-		unsigned char tmpName[50] = { 0 };
-		std::string   designer;
+void redfnam(std::wstring& designerName) {
+	unsigned      iName       = 0;
+	unsigned char tmpName[50] = { 0 };
+	std::string   designer;
 
-		for (iName = 0; iName < 50; iName++) {
-			if (NameOrder[iName] < 50)
-				tmpName[iName] = ExtendedHeader.creatorName[NameOrder[iName]];
-			else
-				tmpName[iName] = 111;
-		}
-		designer.resize(50);
-		for (iName = 0; iName < 50; iName++) {
-			designer[iName] = NameDecoder[tmpName[iName]];
-			if (!designer[iName])
-				break;
-		}
-		auto decoded = win32::Utf8ToUtf16(designer);
-		wcscpy_s(designerName, decoded.size(), decoded.data());
+	for (iName = 0; iName < 50; iName++) {
+		if (NameOrder[iName] < 50)
+			tmpName[iName] = ExtendedHeader.creatorName[NameOrder[iName]];
+		else
+			tmpName[iName] = 111;
 	}
+	designer.reserve(50);
+	for (iName = 0; iName < 50; iName++) {
+		if (NameDecoder[tmpName[iName]]) {
+			designer.push_back(NameDecoder[tmpName[iName]]);
+		}
+		else {
+			break;
+		}
+	}
+	auto decoded = win32::Utf8ToUtf16(designer);
+	designerName.assign(decoded);
 }
 
 void dstin(unsigned number, POINT& pout) noexcept {
@@ -1918,9 +1910,10 @@ void redfils() {
 }
 
 void nunams() {
-	wchar_t* iFileExtention      = nullptr;
-	unsigned iPrevious           = 0;
-	unsigned nameLength          = 0;
+	wchar_t* iFileExtention = nullptr;
+	unsigned iPrevious      = 0;
+	unsigned nameLength     = 0;
+	// wchar_t  swapName[_MAX_PATH] = { 0 };
 
 	_wcslwr_s(WorkingFileName);
 	iFileExtention = StrRChrW(WorkingFileName, 0, L'.');
@@ -1949,12 +1942,16 @@ void nunams() {
 	wcscpy_s(iFileExtention, sizeof(ThrName) / sizeof(wchar_t) - nameLength, L"thr");
 	iFileExtention = GeName + nameLength;
 	wcscpy_s(iFileExtention, sizeof(GeName) / sizeof(wchar_t) - nameLength, L"th*");
-	bool flag = true;
+	bool  flag          = true;
 	auto& previousNames = *PreviousNames;
 	for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
 		if (previousNames[iPrevious] == ThrName) {
 			if (iPrevious) {
 				std::swap(previousNames[0], previousNames[iPrevious]);
+				// wcscpy_s(swapName, sizeof(swapName) / sizeof(wchar_t), IniFile.prevNames[0]); //swapname = previousNames[0[
+				// wcscpy_s(IniFile.prevNames[0], sizeof(IniFile.prevNames[0]) / sizeof(wchar_t), IniFile.prevNames[iPrevious]);
+				// //previousNames[0] = previousNames[iPrevious]  wcscpy_s(IniFile.prevNames[iPrevious],
+				// sizeof(IniFile.prevNames[iPrevious]) / sizeof(wchar_t), swapName); // previousNames[iPrevious] = swapName
 				flag = false;
 				break;
 			}
@@ -3692,8 +3689,8 @@ void defbNam() noexcept {
 }
 
 void ritini() {
-	unsigned iColor     = 0;
-	RECT     windowRect = {};
+	unsigned    iColor     = 0;
+	RECT        windowRect = {};
 	std::string previous;
 
 	auto directory = win32::Utf16ToUtf8(DefaultDirectory);
@@ -3708,6 +3705,8 @@ void ritini() {
 		}
 		std::copy(previous.begin(), previous.end(), IniFile.prevNames[iVersion]);
 	}
+	auto designer = win32::Utf16ToUtf8(*DesignerName);
+	std::copy(designer.begin(), designer.end(), IniFile.designerName);
 	for (iColor = 0; iColor < 16; iColor++) {
 		IniFile.stitchColors[iColor]              = UserColor[iColor];
 		IniFile.backgroundPreferredColors[iColor] = CustomBackgroundColor[iColor];
@@ -4038,8 +4037,8 @@ void dubuf(char* const buffer, unsigned& count) {
 	stitchHeader.fileLength  = PCSHeader.stitchCount * sizeof(fPOINTATTR) + sizeof(STRHED) + sizeof(PCSBMPFileName);
 	stitchHeader.stitchCount = PCSHeader.stitchCount;
 	stitchHeader.hoopType    = IniFile.hoopType;
-	auto designer            = win32::Utf16ToUtf8(IniFile.designerName);
-	strcpy_s(ExtendedHeader.modifierName, designer.data());
+	auto designer            = win32::Utf16ToUtf8(*DesignerName);
+	std::copy(designer.begin(), designer.end(), ExtendedHeader.modifierName);
 	if (FormIndex) {
 		for (iForm = 0; iForm < FormIndex; iForm++) {
 			vertexCount += FormList[iForm].vertexCount;
@@ -5780,7 +5779,7 @@ void nuFil() {
 			TextureIndex = 0;
 			EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
 			deldu();
-			wcscpy_s(DesignerName, IniFile.designerName);
+			DesignerName->assign(win32::Utf8ToUtf16(std::string(IniFile.designerName)));
 			unbsho();
 			StateMap.reset(StateFlag::MOVSET);
 			frmon();
@@ -5828,8 +5827,8 @@ void nuFil() {
 						tabmsg(IDS_SHRTF);
 						return;
 					}
-					version       = (thredHeader.headerType & 0xff000000) >> 24;
-					auto designer = win32::Utf16ToUtf8(IniFile.designerName);
+					version = (thredHeader.headerType & 0xff000000) >> 24;
+					DesignerName->assign(win32::Utf8ToUtf16(std::string(IniFile.designerName)));
 					switch (version) {
 					case 0:
 						if (PCSHeader.hoopType == SMALHUP) {
@@ -5841,9 +5840,10 @@ void nuFil() {
 							UnzoomedRect.y = IniFile.hoopSizeY = LHUPY;
 							PCSHeader.hoopType                 = LARGHUP;
 						}
-						ritfnam(IniFile.designerName);
-						wcscpy_s(DesignerName, IniFile.designerName);
-						strcpy_s(ExtendedHeader.modifierName, designer.data());
+						ritfnam(*DesignerName);
+						std::copy(IniFile.designerName,
+						          IniFile.designerName + strlen(IniFile.designerName),
+						          ExtendedHeader.modifierName);
 						break;
 					case 1:
 					case 2:
@@ -5854,7 +5854,7 @@ void nuFil() {
 						}
 						IniFile.hoopSizeX = UnzoomedRect.x = ExtendedHeader.hoopSizeX;
 						IniFile.hoopSizeY = UnzoomedRect.y = ExtendedHeader.hoopSizeY;
-						redfnam(DesignerName);
+						redfnam(*DesignerName);
 						break;
 					default:
 						tabmsg(IDS_NOTVER);
@@ -6188,7 +6188,7 @@ void nuFil() {
 			auxmen();
 		}
 		lenCalc();
-		SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRDBY], WorkingFileName, DesignerName).c_str());
+		SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRDBY], WorkingFileName, *DesignerName).c_str());
 		CloseHandle(FileHandle);
 		StateMap.set(StateFlag::INIT);
 		StateMap.reset(StateFlag::TRSET);
@@ -6980,11 +6980,11 @@ void newFil() {
 		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
 	deldu();
-	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], IniFile.designerName).c_str());
+	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], *DesignerName).c_str());
 	wcscpy_s(ThrName, (*StringTable)[STR_NUFIL].c_str());
-	ritfnam(IniFile.designerName);
-	auto designer = win32::Utf16ToUtf8(IniFile.designerName);
-	strcpy_s(ExtendedHeader.modifierName, designer.data());
+	ritfnam(*DesignerName);
+	auto designer = win32::Utf16ToUtf8(*DesignerName);
+	std::copy(designer.begin(), designer.end(), ExtendedHeader.modifierName);
 	rstdu();
 	rstAll();
 	clrhbut(3);
@@ -8309,14 +8309,14 @@ void setsped() {
 }
 
 void deltot() {
-	wcscpy_s(DesignerName, IniFile.designerName);
+	DesignerName->assign(win32::Utf8ToUtf16(std::string(IniFile.designerName)));
 	FormIndex = PCSHeader.stitchCount = FormVertexIndex = ClipPointIndex = SatinGuideIndex = TextureIndex = 0;
 	StateMap.reset(StateFlag::GMRK);
 	rstAll();
 	coltab();
 	zumhom();
-	wcscpy_s(DesignerName, IniFile.designerName);
-	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRDBY], ThrName, DesignerName).c_str());
+	// wcscpy_s(DesignerName, IniFile.designerName);
+	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRDBY], ThrName, *DesignerName).c_str());
 }
 
 bool wastch() noexcept {
@@ -8908,8 +8908,8 @@ void insfil() {
 							for (iName = 0; iName < 50; iName++) {
 								ExtendedHeader.creatorName[iName] = thredHeader.creatorName[iName];
 							}
-							redfnam(DesignerName);
-							SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRDBY], ThrName, DesignerName).c_str());
+							redfnam(*DesignerName);
+							SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRDBY], ThrName, *DesignerName).c_str());
 						}
 					}
 					InsertCenter.x = (insertedRectangle.right - insertedRectangle.left) / 2 + insertedRectangle.left;
@@ -10436,7 +10436,7 @@ void desiz() {
 	info += fmt::format(stringTable[STR_HUPWID], (IniFile.hoopSizeX / PFGRAN), (IniFile.hoopSizeY / PFGRAN));
 	if (PCSHeader.stitchCount) {
 		auto modifier = win32::Utf8ToUtf16(ExtendedHeader.modifierName);
-		info += fmt::format(stringTable[STR_CREATBY], DesignerName, modifier);
+		info += fmt::format(stringTable[STR_CREATBY], *DesignerName, modifier);
 	}
 	shoMsg(info);
 }
@@ -12320,7 +12320,7 @@ void closfn() {
 	PCSBMPFileName[0] = 0;
 	deldu();
 	clrhbut(3);
-	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], IniFile.designerName).c_str());
+	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], *DesignerName).c_str());
 }
 
 void filclos() {
@@ -17646,17 +17646,22 @@ void redini() {
 	unsigned long bytesRead     = 0;
 	HDC           deviceContext = {};
 
-	for (auto iVersion = 0; iVersion < OLDNUM; iVersion++)
-		IniFile.prevNames[iVersion][0] = 0;
 	duhom();
 	wcscpy_s(IniFileName, HomeDirectory);
 	wcscat_s(IniFileName, L"thred.ini");
 	IniFileHandle = CreateFile(IniFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
-	if (IniFileHandle == INVALID_HANDLE_VALUE)
+	if (IniFileHandle == INVALID_HANDLE_VALUE) {
 		defpref();
+		if (!DesignerName->size()) {
+			wchar_t designerBuffer[50];
+			LoadString(ThrEdInstance, IDS_UNAM, designerBuffer, sizeof(designerBuffer) / sizeof(wchar_t));
+			DesignerName->assign(designerBuffer);
+			getdes();
+		}
+	}
 	else {
 		ReadFile(IniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, 0);
-		if (bytesRead < 2061)
+		if (bytesRead < sizeof(IniFile))
 			IniFile.formBoxSizePixels = DEFBPIX;
 		auto directory = win32::Utf8ToUtf16(IniFile.defaultDirectory);
 		std::copy(directory.begin(), directory.end(), DefaultDirectory);
@@ -17670,6 +17675,7 @@ void redini() {
 				previousNames[iVersion].assign(L"");
 			}
 		}
+		DesignerName->assign(win32::Utf8ToUtf16(std::string(IniFile.designerName)));
 		for (iColor = 0; iColor < 16; iColor++) {
 			UserColor[iColor]              = IniFile.stitchColors[iColor];
 			CustomColor[iColor]            = IniFile.stitchPreferredColors[iColor];
@@ -18060,9 +18066,9 @@ void init() {
 	GetTextExtentPoint(StitchWindowMemDC, (*StringTable)[STR_PIKOL].c_str(), (*StringTable)[STR_PIKOL].size(), &PickColorMsgSize);
 	auxmen();
 	fnamtabs();
-	ritfnam(IniFile.designerName);
-	auto designer = win32::Utf16ToUtf8(IniFile.designerName);
-	strcpy_s(ExtendedHeader.modifierName, designer.data());
+	ritfnam(*DesignerName);
+	auto designer = win32::Utf16ToUtf8(*DesignerName);
+	std::copy(designer.begin(), designer.end(), ExtendedHeader.modifierName);
 	ExtendedHeader.stgran = 0;
 	for (iByte = 0; iByte < RES_SIZE; iByte++)
 		ExtendedHeader.res[iByte] = 0;
@@ -18082,7 +18088,7 @@ void init() {
 	chkmen();
 	// check command line-should be last item in init
 	ducmd();
-	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], IniFile.designerName).c_str());
+	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], *DesignerName).c_str());
 }
 
 COLORREF defTxt(unsigned iColor) {
@@ -19429,6 +19435,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			private_PreviousNames.push_back(L"");
 		}
 		PreviousNames = &private_PreviousNames;
+		std::wstring private_DesignerName;
+		DesignerName = &private_DesignerName;
 
 		redini();
 
@@ -19471,8 +19479,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);
 		else
 			ShowWindow(ThrEdWindow, SW_SHOW);
-		if (!*IniFile.designerName) {
-			LoadString(ThrEdInstance, IDS_UNAM, IniFile.designerName, 50);
+		if (!DesignerName->size()) {
+			wchar_t designerBuffer[50];
+			LoadString(ThrEdInstance, IDS_UNAM, designerBuffer, sizeof(designerBuffer) / sizeof(wchar_t));
+			DesignerName->assign(designerBuffer);
 			getdes();
 		}
 		while (GetMessage(&Msg, NULL, 0, 0)) {

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "EnumMap.h"
 #include "Resources/resource.h"
 #include "thred.h"
 

@@ -789,7 +789,7 @@ typedef struct _iniFil {
 	unsigned short daisyHeartCount;               // daisy heart count
 	unsigned short textureEditorSize;             // texture editor pixels
 	float          clpspc;                        // clipboard fill spacing
-	wchar_t        designerName[50];              // designer name
+	char           designerName[50];              // designer name
 } INIFILE;
 
 enum

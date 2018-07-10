@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#include "EnumMap.h"
-#include "ExtendedBitSet.h"
 #include "Resources/resource.h"
 #include "thred.h"
 
