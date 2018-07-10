@@ -705,7 +705,7 @@ int fil2crd(const wchar_t* fileName) noexcept {
 	wchar_t             command[_MAX_PATH * 2 + 1 + 4];
 
 	wcscpy_s(command, L"\"");
-	wcscpy_s(command, IniFile.p2cName);
+	wcscpy_s(command, win32::Utf8ToUtf16(std::string(IniFile.p2cName)).c_str());
 	wcscpy_s(command, L"\" \"");
 	wcscpy_s(command, fileName);
 	wcscpy_s(command, L"\"");
@@ -774,7 +774,7 @@ void pes2crd() {
 		tabmsg(IDS_P2CNODAT);
 		return;
 	}
-	if (chkp2cnam(IniFile.p2cName)) {
+	if (chkp2cnam(win32::Utf8ToUtf16(std::string(IniFile.p2cName)).c_str())) {
 		fil2crd(ThrName);
 		return;
 	}
@@ -803,7 +803,8 @@ void pes2crd() {
 		else
 			return;
 	}
-	wcscpy_s(IniFile.p2cName, programName);
+	auto p2cName = win32::Utf16ToUtf8(std::wstring(programName));
+	std::copy(p2cName.begin(), p2cName.end(), IniFile.p2cName);
 	fil2crd(AuxName);
 }
 

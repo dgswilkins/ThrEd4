@@ -769,7 +769,7 @@ typedef struct _iniFil {
 	float          featherRatio;                  // feather ratio
 	float          featherMinStitchSize;          // feather floor
 	unsigned short featherCount;                  // feather fill psg granularity
-	wchar_t        p2cName[_MAX_PATH];            // pes2card file
+	char           p2cName[_MAX_PATH];            // pes2card file
 	float          underlayIndent;                // edge walk/underlay indent
 	float          underlayAngle;                 // underlay angle
 	float          underlaySpacing;               // underlay spacing
