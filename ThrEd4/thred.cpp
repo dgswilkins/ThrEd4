@@ -4022,7 +4022,7 @@ void duver(wchar_t* const name) noexcept {
 
 void durit(char** destination, const void* const source, unsigned count) noexcept {
 	if (destination && source) {
-		memcpy(static_cast<void*>(*destination), source, count);
+		[[gsl::suppress(26474)]] memcpy(static_cast<void*>(*destination), source, count);
 		*destination += count;
 	}
 }

@@ -698,7 +698,7 @@ constexpr ULARGE_INTEGER tim2int(FILETIME time) noexcept {
 	return op;
 }
 
-int fil2crd(const wchar_t* fileName) noexcept {
+int fil2crd(const wchar_t* fileName) {
 	STARTUPINFO         startupInfo = {};
 	PROCESS_INFORMATION processInfo = {};
 	int                 errorCode   = 0;
