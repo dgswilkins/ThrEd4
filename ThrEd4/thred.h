@@ -726,7 +726,7 @@ typedef struct _iniFil {
 	unsigned       userFlagMap;                   // bitmap for user variables
 	double         borderWidth;                   // border width
 	unsigned       appliqueColor;                 // applique color
-	wchar_t        prevNames[OLDNUM][_MAX_PATH];  // last file names
+	char           prevNames[OLDNUM][_MAX_PATH];  // last file names
 	double         snapLength;                    // snap together length
 	double         starRatio;                     // star ratio
 	double         spiralWrap;                    // spiral wrap

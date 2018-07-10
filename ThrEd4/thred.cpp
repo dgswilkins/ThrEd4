@@ -731,6 +731,8 @@ OPENFILENAME  OpenFileName = {
     0,                    // lpfnHook
     0,                    // lpTemplateName
 };
+
+std::vector<std::wstring>* PreviousNames;
 std::vector<std::wstring>* Thumbnails;                          // vector of thumbnail names
 int                        ThumbnailsSelected[4];               // indexes of thumbnails selected for display
 unsigned                   ThumbnailDisplayCount;               // number of thumbnail file names selected for display
@@ -1889,24 +1891,24 @@ void savdo() {
 }
 
 void redfils() {
-	unsigned        iLRU       = 0;
 	WIN32_FIND_DATA findData   = {};
 	HANDLE          fileHandle = nullptr;
 
-	for (iLRU = 0; iLRU < OLDNUM; iLRU++) {
+	for (auto iLRU = 0; iLRU < OLDNUM; iLRU++) {
 		if (GetMenuState(FileMenu, LRUMenuId[iLRU], MF_BYCOMMAND) != -1)
 			DeleteMenu(FileMenu, LRUMenuId[iLRU], MF_BYCOMMAND);
 	}
-	for (iLRU = 0; iLRU < OLDNUM; iLRU++) {
-		if (IniFile.prevNames[iLRU][0]) {
+	auto previousNames = *PreviousNames;
+	for (auto iLRU = 0; iLRU < OLDNUM; iLRU++) {
+		if (previousNames[iLRU].size()) {
 			if (StateMap.test(StateFlag::SAVAS))
-				AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], IniFile.prevNames[iLRU]);
+				AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].c_str());
 			else {
-				fileHandle = FindFirstFile(IniFile.prevNames[iLRU], &findData);
+				fileHandle = FindFirstFile(previousNames[iLRU].c_str(), &findData);
 				if (fileHandle == INVALID_HANDLE_VALUE)
-					IniFile.prevNames[iLRU][0] = 0;
+					previousNames[iLRU].clear();
 				else {
-					AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], IniFile.prevNames[iLRU]);
+					AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].c_str());
 					FindClose(fileHandle);
 				}
 			}
@@ -1919,7 +1921,6 @@ void nunams() {
 	wchar_t* iFileExtention      = nullptr;
 	unsigned iPrevious           = 0;
 	unsigned nameLength          = 0;
-	wchar_t  swapName[_MAX_PATH] = { 0 };
 
 	_wcslwr_s(WorkingFileName);
 	iFileExtention = StrRChrW(WorkingFileName, 0, L'.');
@@ -1949,12 +1950,11 @@ void nunams() {
 	iFileExtention = GeName + nameLength;
 	wcscpy_s(iFileExtention, sizeof(GeName) / sizeof(wchar_t) - nameLength, L"th*");
 	bool flag = true;
+	auto& previousNames = *PreviousNames;
 	for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
-		if (!StrCmpW(IniFile.prevNames[iPrevious], ThrName)) {
+		if (previousNames[iPrevious] == ThrName) {
 			if (iPrevious) {
-				wcscpy_s(swapName, sizeof(swapName) / sizeof(wchar_t), IniFile.prevNames[0]);
-				wcscpy_s(IniFile.prevNames[0], sizeof(IniFile.prevNames[0]) / sizeof(wchar_t), IniFile.prevNames[iPrevious]);
-				wcscpy_s(IniFile.prevNames[iPrevious], sizeof(IniFile.prevNames[iPrevious]) / sizeof(wchar_t), swapName);
+				std::swap(previousNames[0], previousNames[iPrevious]);
 				flag = false;
 				break;
 			}
@@ -1965,18 +1965,18 @@ void nunams() {
 	}
 	if (flag) {
 		for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
-			if (!IniFile.prevNames[iPrevious][0]) {
-				wcscpy_s(IniFile.prevNames[iPrevious], ThrName);
+			if (!previousNames[iPrevious].size()) {
+				previousNames[iPrevious].assign(ThrName);
 				flag = false;
 				break;
 			}
 		}
 	}
 	if (flag) {
-		wcscpy_s(IniFile.prevNames[3], IniFile.prevNames[2]);
-		wcscpy_s(IniFile.prevNames[2], IniFile.prevNames[1]);
-		wcscpy_s(IniFile.prevNames[1], IniFile.prevNames[0]);
-		wcscpy_s(IniFile.prevNames[0], ThrName);
+		previousNames[3] = previousNames[2];
+		previousNames[2] = previousNames[1];
+		previousNames[1] = previousNames[0];
+		previousNames[0].assign(ThrName);
 	}
 	redfils();
 }
@@ -3694,9 +3694,20 @@ void defbNam() noexcept {
 void ritini() {
 	unsigned iColor     = 0;
 	RECT     windowRect = {};
+	std::string previous;
 
 	auto directory = win32::Utf16ToUtf8(DefaultDirectory);
 	std::copy(directory.begin(), directory.end(), IniFile.defaultDirectory);
+	auto previousNames = *PreviousNames;
+	for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
+		if (previousNames[iVersion].size()) {
+			previous.assign(win32::Utf16ToUtf8(previousNames[iVersion]));
+		}
+		else {
+			previous.clear();
+		}
+		std::copy(previous.begin(), previous.end(), IniFile.prevNames[iVersion]);
+	}
 	for (iColor = 0; iColor < 16; iColor++) {
 		IniFile.stitchColors[iColor]              = UserColor[iColor];
 		IniFile.backgroundPreferredColors[iColor] = CustomBackgroundColor[iColor];
@@ -16664,11 +16675,14 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		unmsg();
 		if (StateMap.test(StateFlag::FORMSEL))
 			fvars(ClosestFormToCursor);
-		for (iVersion = 0; iVersion < OLDNUM; iVersion++) {
-			if (Msg.wParam == LRUMenuId[iVersion]) {
-				wcscpy_s(WorkingFileName, IniFile.prevNames[iVersion]);
-				StateMap.set(StateFlag::REDOLD);
-				nuFil();
+		{
+			auto previousNames = *PreviousNames;
+			for (iVersion = 0; iVersion < OLDNUM; iVersion++) {
+				if (Msg.wParam == LRUMenuId[iVersion]) {
+					std::copy(previousNames[iVersion].begin(), previousNames[iVersion].end(), WorkingFileName);
+					StateMap.set(StateFlag::REDOLD);
+					nuFil();
+				}
 			}
 		}
 		wParameter = LOWORD(Msg.wParam);
@@ -17628,11 +17642,11 @@ void ducmd() {
 }
 
 void redini() {
-	unsigned      iVersion = 0, iColor = 0, adjustedWidth = 0;
+	unsigned      iColor = 0, adjustedWidth = 0;
 	unsigned long bytesRead     = 0;
 	HDC           deviceContext = {};
 
-	for (iVersion = 0; iVersion < OLDNUM; iVersion++)
+	for (auto iVersion = 0; iVersion < OLDNUM; iVersion++)
 		IniFile.prevNames[iVersion][0] = 0;
 	duhom();
 	wcscpy_s(IniFileName, HomeDirectory);
@@ -17647,6 +17661,15 @@ void redini() {
 		auto directory = win32::Utf8ToUtf16(IniFile.defaultDirectory);
 		std::copy(directory.begin(), directory.end(), DefaultDirectory);
 		std::copy(directory.begin(), directory.end(), DefaultBMPDirectory);
+		auto& previousNames = *PreviousNames;
+		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
+			if (strlen(IniFile.prevNames[iVersion])) {
+				previousNames[iVersion] = win32::Utf8ToUtf16(std::string(IniFile.prevNames[iVersion]));
+			}
+			else {
+				previousNames[iVersion].assign(L"");
+			}
+		}
 		for (iColor = 0; iColor < 16; iColor++) {
 			UserColor[iColor]              = IniFile.stitchColors[iColor];
 			CustomColor[iColor]            = IniFile.stitchPreferredColors[iColor];
@@ -19401,6 +19424,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		TextureInputBuffer = &private_textureInputBuffer;
 		std::vector<TXPNT> private_TexturePointsBuffer;
 		TexturePointsBuffer = &private_TexturePointsBuffer;
+		std::vector<std::wstring> private_PreviousNames;
+		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
+			private_PreviousNames.push_back(L"");
+		}
+		PreviousNames = &private_PreviousNames;
 
 		redini();
 
