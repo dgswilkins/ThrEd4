@@ -2928,7 +2928,7 @@ void duxclp() {
 	clpxadj(tempClipPoints, chainEndPoints);
 	SequenceIndex         = 0;
 	dPOINT rotationCenter = {};
-	for (unsigned iPoint = 0; iPoint < chainEndPoints.size(); iPoint++) {
+	for (unsigned iPoint = 1; iPoint < chainEndPoints.size(); iPoint++) {
 		xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
 	}
 	if (SelectedForm->type != FRMLINE) {
