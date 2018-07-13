@@ -165,7 +165,6 @@ extern std::vector<TXPNT>*        TexturePointsBuffer;
 extern HINSTANCE                  ThrEdInstance;
 extern HWND                       ThrEdWindow;
 extern POINT                      ThredWindowOrigin;
-extern wchar_t                    ThrName[_MAX_PATH];
 extern POINT                      UnzoomedRect;
 extern EnumMap<UserFlag>          UserFlagMap;
 extern HPEN                       UserPen[16];

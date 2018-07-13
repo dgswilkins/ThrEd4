@@ -19,7 +19,7 @@ extern unsigned               ClosestFormToCursor;
 extern DRAWITEMSTRUCT*        DrawItem;
 extern unsigned               FormIndex;
 extern FRMHED                 FormList[MAXFORMS];
-extern wchar_t                HomeDirectory[_MAX_PATH];
+extern fs::path*              HomeDirectory;
 extern INIFILE                IniFile;
 extern HWND                   MainStitchWin;
 extern MSG                    Msg;
@@ -34,9 +34,9 @@ extern EnumMap<StateFlag>     StateMap;
 extern HDC                    StitchWindowMemDC;
 extern HINSTANCE              ThrEdInstance;
 extern HWND                   ThrEdWindow;
-extern wchar_t                ThrName[_MAX_PATH];
+extern fs::path*              ThrName;
 extern POINT                  UnzoomedRect;
-extern wchar_t                WorkingFileName[_MAX_PATH];
+extern fs::path*              WorkingFileName;
 
 HWND HelpWindow;    // help window
 HWND MsgWindow = 0; // message window
@@ -114,7 +114,7 @@ void bfilmsg() {
 	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_BADFIL);
-	shoMsg(fmt::format(fmtStr, WorkingFileName));
+	shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
 }
 
 void filnopn(unsigned code, const fs::path& fileName) {
@@ -131,6 +131,7 @@ void crmsg(const fs::path& fileName) {
 	shoMsg(fmt::format(fmtStr, fileName.wstring()));
 }
 
+// ToDo - this should probably be butxt(unsigned iButton, const wchar_t* buttonText)
 void butxt(unsigned iButton, const std::wstring& buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
 		if (iButton == 5) {
@@ -292,7 +293,7 @@ void help() {
 	std::wstring helpFileName;
 
 	loadString(helpFileName, IDS_HELPFN);
-	HelpWindow = HtmlHelp(ThrEdWindow, fmt::format(L"{}{}", HomeDirectory, helpFileName).c_str(), HH_DISPLAY_TOPIC, 0);
+	HelpWindow = HtmlHelp(ThrEdWindow, fmt::format(L"{}{}", HomeDirectory->wstring(), helpFileName).c_str(), HH_DISPLAY_TOPIC, 0);
 	if (!HelpWindow)
 		tabmsg(IDS_NOHLP);
 }
@@ -301,7 +302,7 @@ void sdmsg() {
 	std::wstring fmtStr;
 
 	loadString(fmtStr, IDS_SAVDISC);
-	shoMsg(fmt::format(fmtStr, ThrName));
+	shoMsg(fmt::format(fmtStr, ThrName->wstring()));
 }
 
 void alrotmsg() {

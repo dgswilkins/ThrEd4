@@ -10,7 +10,7 @@ extern unsigned                   ActiveLayer;
 extern fPOINT                     AngledFormVertices[MAXFRMLINS];
 extern FRMHED                     AngledForm;
 extern LPWSTR*                    ArgList; // command line argument array
-extern fs::path                   AuxName;
+extern fs::path*                  AuxName;
 extern HBRUSH                     BackgroundBrush;
 extern BSEQPNT                    BSequence[BSEQLEN];
 extern unsigned                   ButtonHeight;
@@ -66,7 +66,7 @@ extern unsigned                   ThrEdClip;
 extern const wchar_t*             ThrEdClipFormat;
 extern HINSTANCE                  ThrEdInstance;
 extern HWND                       ThrEdWindow;
-extern wchar_t                    ThrName[_MAX_PATH];
+extern fs::path*                  ThrName;
 extern unsigned                   AppliqueColor;
 extern POINT                      UnzoomedRect;
 extern COLORREF                   UserColor[16];
@@ -74,7 +74,7 @@ extern EnumMap<UserFlag>          UserFlagMap;
 extern double                     UserStitchLength;
 extern unsigned                   VertexCount;
 extern HWND                       VerticalScrollBar;
-extern wchar_t                    WorkingFileName[_MAX_PATH];
+extern fs::path*                  WorkingFileName;
 extern POINT                      ZoomBoxLine[5];
 extern fPOINT                     ZoomBoxOrigin;
 extern dRECTANGLE                 ZoomRect;
@@ -777,7 +777,7 @@ void pes2crd() {
 		return;
 	}
 	if (chkp2cnam(win32::Utf8ToUtf16(std::string(IniFile.p2cName)).c_str())) {
-		fil2crd(ThrName);
+		fil2crd(*ThrName);
 		return;
 	}
 	*IniFile.p2cName = 0;
@@ -807,7 +807,7 @@ void pes2crd() {
 	}
 	auto p2cName = win32::Utf16ToUtf8(std::wstring(programName));
 	std::copy(p2cName.begin(), p2cName.end(), IniFile.p2cName);
-	fil2crd(AuxName);
+	fil2crd(*AuxName);
 }
 
 std::vector<fPOINT>& insid() {
@@ -2796,21 +2796,19 @@ void setfilend() {
 }
 
 void duauxnam() {
-	std::experimental::filesystem::path workingFileName = { WorkingFileName };
+	*AuxName = *WorkingFileName;
 	switch (IniFile.auxFileType) {
 	case AUXDST:
-		workingFileName.replace_extension(".dst");
+		AuxName->replace_extension(".dst");
 		break;
 #if PESACT
 	case AUXPES:
-		workingFileName.replace_extension(".pes");
+		AuxName->replace_extension(".pes");
 		break;
 #endif
 	default:
-		workingFileName.replace_extension("pcs");
+		AuxName->replace_extension("pcs");
 	}
-
-	AuxName = workingFileName;
 }
 
 void redtbak() {
@@ -3988,7 +3986,7 @@ void txsnap() {
 
 void tst() {
 	DesignerName->assign(L"Coder");
-	std::copy(DesignerName->begin(), DesignerName->end(), ThrName);
+	ThrName->assign(*DesignerName);
 	StateMap.set(StateFlag::RESTCH);
 }
 

@@ -4,6 +4,8 @@
 #include <new.h>
 #endif
 
+#include <shlobj.h>
+
 #include "Resources/resource.h"
 #include "thred.h"
 
@@ -128,7 +130,6 @@ extern void               fsclpx();
 extern void               fselrct(unsigned iForm);
 extern void               fsizpar();
 extern void               fsort();
-extern void               fthrfn();
 extern void               fvars(unsigned iForm);
 extern void               getfinfo(unsigned iForm);
 extern unsigned           getlast();
@@ -192,7 +193,6 @@ extern void               refrm();
 extern void               repar();
 extern void               ribon();
 extern void               rinfrm();
-extern void               ritbrd();
 extern void               riter();
 extern void               ritfrct(unsigned iForm, HDC dc);
 extern void               ritnum(unsigned code, unsigned value);
@@ -455,43 +455,41 @@ POINT MovieLine[100]; // line for movie stitch draw
 unsigned LRUMenuId[] = { FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3 }; // recently used file menu ID's
 unsigned ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF;         // for checking if a fill is a clipboard fill
 
-RECT          MsgRect;                         // rectangle containing the text message
-unsigned      UndoBufferWriteIndex = 0;        // undo storage pointer
-unsigned      UndoBufferReadIndex  = 0;        // undo retrieval pointers
-unsigned      AppliqueColor        = 15;       // underlay color
-unsigned      LastKeyCode          = 0xffff;   // last key code
-unsigned      FormMenuChoice       = 0;        // data type for form data form numerical entry
-dPOINT        ZoomMarkPoint;                   // stitch coordinates of the zoom mark
-unsigned      PreferenceIndex = 0;             // index to the active preference window
-wchar_t       VersionNames[OLDVER][_MAX_PATH]; // temporary storage for old file version names
-unsigned      FileVersionIndex;                // points to old version to be read
-unsigned      ActiveLayer = 0;                 // active layer
-unsigned      LayerIndex;                      // active layer code
-unsigned      ClipFormsCount;                  // number of forms the on the clipboard
-POINT         StitchArrow[3];                  // arrow for selected stitch
-RANGE         SelectedRange;                   // first and last stitch for min/max stitch select
-unsigned      NameOrder[50];                   // designer name order table
-unsigned char NameEncoder[128];                // designer name encoding
-unsigned char NameDecoder[256];                // designer name decode
-std::wstring* DesignerName;                    // designer name in clear
-HWND          FirstWin;                        // first window not destroyed for exiting enumerate loop
-RANGE         SelectedFormsRange;              // range of selected forms
-unsigned      TmpFormIndex;                    // saved form index
-double        ZoomMin;                         // minimum allowed zoom value
-fRECTANGLE    CheckHoopRect;                   // for checking the hoop size
-fPOINT        BalaradOffset;                   // balarad offset
-unsigned      SideWindowLocation;              // side message window location
-POINT         SideWindowSize;                  // size of the side message window
-std::wstring* SideWindowsStrings;              // string array displayed in sidmsg
-wchar_t       ColorFileName[_MAX_PATH];        //.thw file name
-wchar_t       RGBFileName[_MAX_PATH];          //.rgb file name
-dPOINT        CellSize;                        // size of an stitchMap cell for drawing stitch boxes
-unsigned      DraggedColor;                    // color being dragged
-FORMVERTICES  SelectedFormVertices;            // selected form vertices
-fRECTANGLE    SelectedVerticesRect;            // rectangle enclosing selected form verticess
-RECT          SelectedPixelsRect;              // display form vertex select rectangle
-POINT*        FormVerticesAsLine;              // form vertex clipboard paste into form line
-unsigned      LastFormSelected;                // end point of selected range of forms
+RECT          MsgRect;                       // rectangle containing the text message
+unsigned      UndoBufferWriteIndex = 0;      // undo storage pointer
+unsigned      UndoBufferReadIndex  = 0;      // undo retrieval pointers
+unsigned      AppliqueColor        = 15;     // underlay color
+unsigned      LastKeyCode          = 0xffff; // last key code
+unsigned      FormMenuChoice       = 0;      // data type for form data form numerical entry
+dPOINT        ZoomMarkPoint;                 // stitch coordinates of the zoom mark
+unsigned      PreferenceIndex = 0;           // index to the active preference window
+fs::path      VersionNames[OLDVER];          // temporary storage for old file version names
+char          FileVersionIndex;              // points to old version to be read
+unsigned      ActiveLayer = 0;               // active layer
+unsigned      LayerIndex;                    // active layer code
+unsigned      ClipFormsCount;                // number of forms the on the clipboard
+POINT         StitchArrow[3];                // arrow for selected stitch
+RANGE         SelectedRange;                 // first and last stitch for min/max stitch select
+unsigned      NameOrder[50];                 // designer name order table
+unsigned char NameEncoder[128];              // designer name encoding
+unsigned char NameDecoder[256];              // designer name decode
+std::wstring* DesignerName;                  // designer name in clear
+HWND          FirstWin;                      // first window not destroyed for exiting enumerate loop
+RANGE         SelectedFormsRange;            // range of selected forms
+unsigned      TmpFormIndex;                  // saved form index
+double        ZoomMin;                       // minimum allowed zoom value
+fRECTANGLE    CheckHoopRect;                 // for checking the hoop size
+fPOINT        BalaradOffset;                 // balarad offset
+unsigned      SideWindowLocation;            // side message window location
+POINT         SideWindowSize;                // size of the side message window
+std::wstring* SideWindowsStrings;            // string array displayed in sidmsg
+dPOINT        CellSize;                      // size of an stitchMap cell for drawing stitch boxes
+unsigned      DraggedColor;                  // color being dragged
+FORMVERTICES  SelectedFormVertices;          // selected form vertices
+fRECTANGLE    SelectedVerticesRect;          // rectangle enclosing selected form verticess
+RECT          SelectedPixelsRect;            // display form vertex select rectangle
+POINT*        FormVerticesAsLine;            // form vertex clipboard paste into form line
+unsigned      LastFormSelected;              // end point of selected range of forms
 
 std::vector<std::unique_ptr<unsigned[]>>* UndoBuffer; // backup data
 
@@ -683,55 +681,58 @@ const TCHAR AllFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.
 const wchar_t AllFilter[_MAX_PATH + 1] = L"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
 #endif
 
-fs::path AuxName;
+fs::path* AuxName;
+fs::path* WorkingFileName;
+fs::path* ThrName;
+fs::path* GeName;
+fs::path* ColorFileName; //.thw file name
+fs::path* RGBFileName;   //.rgb file name
+fs::path* DefaultDirectory;
+fs::path* SearchName;
+fs::path* DefaultBMPDirectory;
+fs::path* BalaradName0; // balarad semaphore file
+fs::path* BalaradName1; // balarad data file
+fs::path* BalaradName2;
+fs::path* HomeDirectory;   // directory from which thred was executed
+fs::path* UserBMPFileName; // bitmap file name from user load
+fs::path* IniFileName;     //.ini file name
 
-const wchar_t BmpFilter[_MAX_PATH + 1]       = L"Microsoft (BMP)\0*.bmp\0";
-wchar_t       CustomFilter[_MAX_PATH + 1]    = L"Thredworks (THR)\0*.thr\0";
-wchar_t       WorkingFileName[_MAX_PATH + 1] = { 0 };
-wchar_t       ThrName[_MAX_PATH + 1];
-wchar_t       GeName[_MAX_PATH + 1];
-wchar_t       DefaultDirectory[_MAX_PATH + 1]    = L"c:\\";
-wchar_t       DefaultBMPDirectory[_MAX_PATH + 1] = L"c:\\";
-wchar_t       BalaradName0[_MAX_PATH + 1]        = { 0 }; // balarad semaphore file
-wchar_t       BalaradName1[_MAX_PATH + 1]        = { 0 }; // balarad data file
-wchar_t       BalaradName2[_MAX_PATH + 1];
-wchar_t       SearchName[_MAX_PATH + 1];
-wchar_t       HomeDirectory[_MAX_PATH + 1]; // directory from which thred was executed
-HANDLE        FileHandle    = 0;
-HANDLE        PCSFileHandle = 0;
-HANDLE        IniFileHandle = 0;
-HANDLE        InsertedFileHandle;         // insert file handle
-HANDLE        BitmapFileHandle;           // bitmap handle
-unsigned      FileSize;                   // size of file
-unsigned long BytesRead;                  // bytes actually read from file
-unsigned      ColorChanges;               // number of color changes
-wchar_t       IniFileName[_MAX_PATH];     //.ini file name
-char          PCSBMPFileName[16];         // bitmap file name from pcs file
-wchar_t       UserBMPFileName[_MAX_PATH]; // bitmap file name from user load
-OPENFILENAME  OpenFileName = {
-    sizeof(OPENFILENAME), // lStructsize
-    ThrEdWindow,          // hwndOwner
-    ThrEdInstance,        // hInstance
-    AllFilter,            // lpstrFilter
-    CustomFilter,         // lpstrCustomFilter
-    _MAX_PATH,            // nMaxCustFilter
-    0,                    // nFilterIndex
-    WorkingFileName,      // lpstrFile
-    _MAX_PATH,            // nMaxFile
-    0,                    // lpstrFileTitle
-    0,                    // nMaxFileTitle
-    DefaultDirectory,     // lpstrInitialDir
-    0,                    // lpstrTitle
-    OFN_OVERWRITEPROMPT,  // Flags
-    0,                    // nFileOffset
-    0,                    // nFileExtension
-    L"thr",               // lpstrDefExt
-    0,                    // lCustData
-    0,                    // lpfnHook
-    0,                    // lpTemplateName
+const wchar_t BmpFilter[_MAX_PATH + 1]    = L"Microsoft (BMP)\0*.bmp\0";
+wchar_t       CustomFilter[_MAX_PATH + 1] = L"Thredworks (THR)\0*.thr\0";
+HANDLE        FileHandle                  = 0;
+HANDLE        PCSFileHandle               = 0;
+HANDLE        IniFileHandle               = 0;
+HANDLE        InsertedFileHandle; // insert file handle
+HANDLE        BitmapFileHandle;   // bitmap handle
+unsigned      FileSize;           // size of file
+unsigned long BytesRead;          // bytes actually read from file
+unsigned      ColorChanges;       // number of color changes
+char          PCSBMPFileName[16]; // bitmap file name from pcs file
+
+OPENFILENAME OpenFileName = {
+	sizeof(OPENFILENAME), // lStructsize
+	ThrEdWindow,          // hwndOwner
+	ThrEdInstance,        // hInstance
+	AllFilter,            // lpstrFilter
+	CustomFilter,         // lpstrCustomFilter
+	_MAX_PATH,            // nMaxCustFilter
+	0,                    // nFilterIndex
+	0,                    // lpstrFile
+	_MAX_PATH,            // nMaxFile
+	0,                    // lpstrFileTitle
+	0,                    // nMaxFileTitle
+	0,                    // lpstrInitialDir
+	0,                    // lpstrTitle
+	OFN_OVERWRITEPROMPT,  // Flags
+	0,                    // nFileOffset
+	0,                    // nFileExtension
+	L"thr",               // lpstrDefExt
+	0,                    // lCustData
+	0,                    // lpfnHook
+	0,                    // lpTemplateName
 };
 
-std::vector<std::wstring>* PreviousNames;
+std::vector<fs::path>*     PreviousNames;
 std::vector<std::wstring>* Thumbnails;                          // vector of thumbnail names
 int                        ThumbnailsSelected[4];               // indexes of thumbnails selected for display
 unsigned                   ThumbnailDisplayCount;               // number of thumbnail file names selected for display
@@ -750,11 +751,11 @@ OPENFILENAME OpenBitmapName = {
 	CustomFilter,         // lpstrCustomFilter
 	_MAX_PATH,            // nMaxCustFilter
 	0,                    // nFilterIndex
-	UserBMPFileName,      // lpstrFile
+	0,                    // lpstrFile
 	_MAX_PATH,            // nMaxFile
 	0,                    // lpstrFileTitle
 	0,                    // nMaxFileTitle
-	DefaultBMPDirectory,  // lpstrInitialDir
+	0,                    // lpstrInitialDir
 	0,                    // lpstrTitle
 	OFN_OVERWRITEPROMPT,  // Flags
 	0,                    // nFileOffset
@@ -1797,10 +1798,8 @@ void ladj() {
 }
 
 void deldu() {
-	unsigned iBuffer = 0;
-
-	for (iBuffer = 0; iBuffer < 16; iBuffer++) {
-		(*UndoBuffer)[iBuffer].reset(nullptr);
+	for (auto& undo : *UndoBuffer) {
+		undo.reset(nullptr);
 	}
 	UndoBufferWriteIndex = 0;
 	StateMap.reset(StateFlag::BAKWRAP);
@@ -1893,17 +1892,17 @@ void redfils() {
 		if (GetMenuState(FileMenu, LRUMenuId[iLRU], MF_BYCOMMAND) != -1)
 			DeleteMenu(FileMenu, LRUMenuId[iLRU], MF_BYCOMMAND);
 	}
-	auto previousNames = *PreviousNames;
+	auto& previousNames = *PreviousNames;
 	for (auto iLRU = 0; iLRU < OLDNUM; iLRU++) {
-		if (previousNames[iLRU].size()) {
+		if (!previousNames[iLRU].empty()) {
 			if (StateMap.test(StateFlag::SAVAS))
-				AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].c_str());
+				AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].wstring().c_str());
 			else {
 				fileHandle = FindFirstFile(previousNames[iLRU].c_str(), &findData);
 				if (fileHandle == INVALID_HANDLE_VALUE)
 					previousNames[iLRU].clear();
 				else {
-					AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].c_str());
+					AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].wstring().c_str());
 					FindClose(fileHandle);
 				}
 			}
@@ -1915,12 +1914,10 @@ void redfils() {
 void nunams() {
 	unsigned iPrevious = 0;
 
-	fs::path workingFileName = { WorkingFileName };
-
-	AuxName = workingFileName;
+	*AuxName = *WorkingFileName;
 	switch (IniFile.auxFileType) {
 	case AUXDST:
-		AuxName.replace_extension(L".dst");
+		AuxName->replace_extension(L".dst");
 		break;
 #if PESACT
 	case AUXPES:
@@ -1928,20 +1925,16 @@ void nunams() {
 		break;
 #endif
 	default:
-		AuxName.replace_extension(L".pcs");
+		AuxName->replace_extension(L".pcs");
 	}
-	auto thrName = workingFileName;
-	thrName.replace_extension(L".thr");
-	auto strThr = thrName.wstring();
-	std::copy(strThr.begin(), strThr.end(), ThrName);
-	auto geName = workingFileName;
-	geName.replace_extension(L".th*");
-	auto strGe = geName.wstring();
-	std::copy(strGe.begin(), strGe.end(), GeName);
+	*ThrName = *WorkingFileName;
+	ThrName->replace_extension(L".thr");
+	*GeName = *WorkingFileName;
+	GeName->replace_extension(L".th*");
 	bool  flag          = true;
 	auto& previousNames = *PreviousNames;
 	for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
-		if (previousNames[iPrevious] == ThrName) {
+		if (previousNames[iPrevious] == *ThrName) {
 			if (iPrevious) {
 				std::swap(previousNames[0], previousNames[iPrevious]);
 				flag = false;
@@ -1954,8 +1947,8 @@ void nunams() {
 	}
 	if (flag) {
 		for (iPrevious = 0; iPrevious < OLDNUM; iPrevious++) {
-			if (!previousNames[iPrevious].size()) {
-				previousNames[iPrevious].assign(ThrName);
+			if (previousNames[iPrevious].empty()) {
+				previousNames[iPrevious].assign(*ThrName);
 				flag = false;
 				break;
 			}
@@ -1965,7 +1958,7 @@ void nunams() {
 		previousNames[3] = previousNames[2];
 		previousNames[2] = previousNames[1];
 		previousNames[1] = previousNames[0];
-		previousNames[0].assign(ThrName);
+		previousNames[0].assign(*ThrName);
 	}
 	redfils();
 }
@@ -3652,31 +3645,25 @@ void stch2pxr(const fPOINT& stitchCoordinate) noexcept {
 	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
 }
 
-void defNam(const wchar_t* fileName) noexcept {
-	if (fileName) {
-		if (fileName[0]) {
-			wcscpy_s(DefaultDirectory, fileName);
-			wchar_t* iLast = StrRChrW(DefaultDirectory, 0, L'\\');
-			if (iLast) {
-				if (iLast - DefaultDirectory == 2)
-					iLast[1] = 0;
-				else
-					iLast[0] = 0;
-			}
+void defNam(const fs::path& fileName) {
+	PWSTR ppszPath = nullptr; // variable to receive the path memory block pointer.
+	if (fileName.empty()) {
+		const HRESULT hr = SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &ppszPath);
+
+		if (SUCCEEDED(hr)) {
+			DefaultDirectory->assign(ppszPath); // make a local copy of the path
 		}
+
+		CoTaskMemFree(ppszPath); // free up the path memory block
+	}
+	else {
+		*DefaultDirectory = fileName.parent_path();
 	}
 }
 
-void defbNam() noexcept {
-	if (UserBMPFileName[0]) {
-		wcscpy_s(DefaultBMPDirectory, UserBMPFileName);
-		wchar_t* iLast = StrRChrW(DefaultBMPDirectory, 0, '\\');
-		if (iLast) {
-			if (iLast - DefaultBMPDirectory == 2)
-				iLast[1] = 0;
-			else
-				iLast[0] = 0;
-		}
+void defbNam() {
+	if (!UserBMPFileName->empty()) {
+		*DefaultBMPDirectory = UserBMPFileName->parent_path();
 	}
 }
 
@@ -3685,19 +3672,23 @@ void ritini() {
 	RECT        windowRect = {};
 	std::string previous;
 
-	auto directory = win32::Utf16ToUtf8(DefaultDirectory);
+	auto directory = win32::Utf16ToUtf8(DefaultDirectory->wstring());
 	std::copy(directory.begin(), directory.end(), IniFile.defaultDirectory);
-	auto previousNames = *PreviousNames;
+	const auto&    previousNames = *PreviousNames;
+	constexpr char fillchar      = '\0';
 	for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
-		if (previousNames[iVersion].size()) {
+		auto& prevNam = IniFile.prevNames[iVersion];
+		std::fill(prevNam, prevNam + sizeof(prevNam), fillchar);
+		if (!previousNames[iVersion].empty()) {
 			previous.assign(win32::Utf16ToUtf8(previousNames[iVersion]));
+			std::copy(previous.begin(), previous.end(), IniFile.prevNames[iVersion]);
 		}
 		else {
 			previous.clear();
 		}
-		std::copy(previous.begin(), previous.end(), IniFile.prevNames[iVersion]);
 	}
 	auto designer = win32::Utf16ToUtf8(*DesignerName);
+	std::fill(IniFile.designerName, IniFile.designerName + sizeof(IniFile.designerName), fillchar);
 	std::copy(designer.begin(), designer.end(), IniFile.designerName);
 	for (iColor = 0; iColor < 16; iColor++) {
 		IniFile.stitchColors[iColor]              = UserColor[iColor];
@@ -3737,7 +3728,7 @@ void ritini() {
 		IniFile.initialWindowCoords.bottom = windowRect.bottom;
 		IniFile.initialWindowCoords.top    = windowRect.top;
 	}
-	IniFileHandle = CreateFile(IniFileName, (GENERIC_WRITE | GENERIC_READ), 0, NULL, CREATE_ALWAYS, 0, NULL);
+	IniFileHandle = CreateFile(IniFileName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (IniFileHandle != INVALID_HANDLE_VALUE)
 		WriteFile(IniFileHandle, &IniFile, sizeof(INIFILE), &BytesRead, NULL);
 	CloseHandle(IniFileHandle);
@@ -3820,7 +3811,7 @@ void redbal() {
 
 	PCSHeader.stitchCount = 0;
 	FormIndex             = 0;
-	balaradFile           = CreateFile(BalaradName2, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+	balaradFile           = CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 	if (balaradFile != INVALID_HANDLE_VALUE) {
 		ReadFile(balaradFile, &balaradHeader, sizeof(BALHED), &bytesRead, 0);
 		if (bytesRead == sizeof(BALHED)) {
@@ -3869,23 +3860,19 @@ void redbal() {
 void ritbal() {
 	BALHED        balaradHeader = {};
 	unsigned      iStitch = 0, iColor = 0, iOutput = 0, color = 0;
-	HANDLE        balaradFile           = {};
-	wchar_t*      lastNameCharacter     = nullptr;
-	wchar_t       outputName[_MAX_PATH] = { 0 };
-	unsigned long bytesWritten          = 0;
+	HANDLE        balaradFile = {};
+	fs::path      outputName;
+	unsigned long bytesWritten = 0;
 
-	if (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount) {
-		if (!*WorkingFileName) {
-			wcscpy_s(WorkingFileName, DefaultDirectory);
-			wcscat_s(WorkingFileName, L"\\balfil.thr");
+	if (!BalaradName0->empty() && !BalaradName1->empty() && PCSHeader.stitchCount) {
+		if (WorkingFileName->empty()) {
+			outputName = *DefaultDirectory / L"balfil.thr";
 		}
-		wcscpy_s(outputName, WorkingFileName);
-		lastNameCharacter = StrRChrW(outputName, 0, L'.');
-		if (lastNameCharacter)
-			wcscpy_s(lastNameCharacter, sizeof(outputName) / sizeof(wchar_t) - (lastNameCharacter - outputName), L".thv");
-		else
-			wcscat_s(outputName, sizeof(outputName) / sizeof(wchar_t) - wcslen(outputName), L".thv");
-		balaradFile = CreateFile(outputName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		else {
+			outputName = *WorkingFileName;
+		}
+		outputName.replace_extension(L".thv");
+		balaradFile = CreateFile(outputName.wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		if (balaradFile == INVALID_HANDLE_VALUE)
 			return;
 		color                  = StitchBuffer[0].attribute & COLMSK;
@@ -3921,18 +3908,19 @@ void ritbal() {
 		}
 		WriteFile(balaradFile, balaradStitch.data(), iOutput * sizeof(BALSTCH), &bytesWritten, 0);
 		CloseHandle(balaradFile);
-		balaradFile = CreateFile(BalaradName1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
-		WriteFile(balaradFile, (char*)outputName, wcslen(outputName) + 1, &bytesWritten, 0);
+		balaradFile = CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		WriteFile(balaradFile, outputName.wstring().c_str(), outputName.wstring().size() + 1, &bytesWritten, 0);
 		CloseHandle(balaradFile);
 	}
 	else {
-		if (*BalaradName1) {
-			balaradFile = CreateFile(BalaradName1, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		if (!BalaradName1->empty()) {
+			balaradFile = CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 			CloseHandle(balaradFile);
 		}
 	}
-	if (*BalaradName0)
-		DeleteFile(BalaradName0);
+	if (!BalaradName0->empty()) {
+		fs::remove(*BalaradName0);
+	}
 }
 
 void dstcurs() noexcept {
@@ -3962,12 +3950,12 @@ bool chkattr(const fs::path& filename) {
 	}
 	else {
 		StateMap.reset(StateFlag::NOTFREE);
-		auto writePerms = fs::status(filename).permissions() & writeBits;
+		const auto writePerms = fs::status(filename).permissions() & writeBits;
 		if (writePerms == fs::perms::none) {
 			auto buttonPressed = MessageBox(ThrEdWindow,
-			                           fmt::format((*StringTable)[STR_OVRLOK], filename.wstring()).c_str(),
-			                           (*StringTable)[STR_OVRIT].c_str(),
-			                           MB_YESNO);
+			                                fmt::format((*StringTable)[STR_OVRLOK], filename.wstring()).c_str(),
+			                                (*StringTable)[STR_OVRIT].c_str(),
+			                                MB_YESNO);
 			if (buttonPressed == IDYES)
 				fs::permissions(filename, fs::perms::add_perms | writeBits);
 			else
@@ -3977,33 +3965,10 @@ bool chkattr(const fs::path& filename) {
 	return 0;
 }
 
-unsigned duth(const wchar_t* const name) noexcept {
-	// ToDo - Can I use strrchr here?
-	if (name) {
-		unsigned iLast = wcslen(name);
-
-		do
-			iLast--;
-		while (tolower(name[iLast]) != 'h' && iLast);
-		if (name[iLast - 1] == 't')
-			return iLast + 1;
-		else
-			return 0;
-	}
-	return 0;
-}
-
-void duver(wchar_t* const name) noexcept {
-	if (name) {
-		const unsigned lastChar = duth(name);
-		int            version  = 0;
-
-		if (lastChar) {
-			version             = tolower(name[lastChar]) - 'r';
-			name[_MAX_PATH - 1] = 0;
-			if (version >= 0 && version <= 3)
-				wcscpy_s(VersionNames[version], name);
-		}
+void duver(const fs::path& name) {
+	auto version = tolower(name.extension().wstring().back()) - 'r';
+	if (version >= 0 && version <= (OLDVER - 1)) {
+		VersionNames[version] = name;
 	}
 }
 
@@ -4124,43 +4089,43 @@ void dubuf(char* const buffer, unsigned& count) {
 }
 
 void thrsav() {
-	unsigned        iVersion = 0, lastCharacter = 0;
-	int             iBackup                = 0;
-	unsigned long   bytesWritten           = 0;
-	WIN32_FIND_DATA fileData               = {};
-	HANDLE          file                   = {};
-	wchar_t         newFileName[_MAX_PATH] = { 0 };
-	unsigned        count                  = 0;
+	unsigned        iVersion     = 0;
+	int             iBackup      = 0;
+	unsigned long   bytesWritten = 0;
+	WIN32_FIND_DATA fileData     = {};
+	HANDLE          file         = {};
+	fs::path        newFileName;
+	unsigned        count = 0;
 
-	if (chkattr(WorkingFileName))
+	if (chkattr(*WorkingFileName))
 		return;
 	if (!StateMap.testAndReset(StateFlag::IGNAM)) {
-		file     = FindFirstFile(GeName, &fileData);
+		file     = FindFirstFile(GeName->wstring().c_str(), &fileData);
 		iVersion = 0;
 		if (file != INVALID_HANDLE_VALUE) {
 			StateMap.reset(StateFlag::CMPDO);
-			for (iVersion = 0; iVersion < OLDVER; iVersion++)
-				VersionNames[iVersion][0] = 0;
-			duver(fileData.cFileName);
+			for (auto& version : VersionNames) {
+				version.clear();
+			}
+			duver(*DefaultDirectory / fileData.cFileName);
 			while (FindNextFile(file, &fileData))
-				duver(fileData.cFileName);
+				duver(*DefaultDirectory / fileData.cFileName);
 			FindClose(file);
-			DeleteFile(VersionNames[OLDVER - 1]);
-			// ToDo - Does this loop have to decrement or could it increment?
+			fs::remove(VersionNames[OLDVER - 1]);
 			for (iBackup = OLDVER - 2; iBackup >= 0; iBackup--) {
-				if (VersionNames[iBackup][0]) {
-					VersionNames[iBackup][_MAX_PATH - 1] = 0;
-					wcscpy_s(newFileName, VersionNames[iBackup]);
-					lastCharacter              = duth(newFileName);
-					newFileName[lastCharacter] = iBackup + 's';
-					MoveFile(VersionNames[iBackup], newFileName);
+				if (!VersionNames[iBackup].empty()) {
+					newFileName = VersionNames[iBackup];
+					auto ext    = newFileName.extension().wstring();
+					ext.back()  = iBackup + 's';
+					newFileName.replace_extension(ext);
+					fs::rename(VersionNames[iBackup], newFileName);
 				}
 			}
 		}
 	}
-	FileHandle = CreateFile(ThrName, (GENERIC_WRITE), 0, NULL, CREATE_ALWAYS, 0, NULL);
+	FileHandle = CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE), 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (FileHandle == INVALID_HANDLE_VALUE) {
-		crmsg(ThrName);
+		crmsg(*ThrName);
 		FileHandle = 0;
 	}
 	else {
@@ -4171,7 +4136,7 @@ void thrsav() {
 		if (bytesWritten != count) {
 			std::wstring fmtStr;
 			loadString(fmtStr, IDS_FWERR);
-			shoMsg(fmt::format(fmtStr, ThrName));
+			shoMsg(fmt::format(fmtStr, ThrName->wstring()));
 		}
 		CloseHandle(FileHandle);
 	}
@@ -4207,18 +4172,12 @@ constexpr unsigned dudbits(const POINT& dif) {
 	return Xdst[dif.x + 121] | Ydst[dif.y + 121];
 }
 
-bool colfil() noexcept {
-	wchar_t* extentionLocation = nullptr;
-
-	wcscpy_s(ColorFileName, WorkingFileName);
-	wcscpy_s(RGBFileName, WorkingFileName);
-	extentionLocation = StrRChrW(ColorFileName, 0, L'.');
-	if (extentionLocation) {
-		extentionLocation++;
-		wcscpy_s(extentionLocation, sizeof(ColorFileName) / sizeof(wchar_t) - (extentionLocation - ColorFileName), L"thw");
-		extentionLocation = StrRChrW(RGBFileName, 0, L'.');
-		extentionLocation++;
-		wcscpy_s(extentionLocation, sizeof(RGBFileName) / sizeof(wchar_t) - (extentionLocation - RGBFileName), L"rgb");
+bool colfil() {
+	*ColorFileName = *WorkingFileName;
+	*RGBFileName   = *WorkingFileName;
+	if (WorkingFileName->has_extension()) {
+		ColorFileName->replace_extension(L"thw");
+		RGBFileName->replace_extension(L"rgb");
 		return 1;
 	}
 	else
@@ -4311,11 +4270,11 @@ void ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, const st
 	DSTRecords.push_back({ 0, 0, gsl::narrow<TBYTE>(0xf3) });
 
 	if (colfil()) {
-		colorFile = CreateFile(ColorFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		colorFile = CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		if (colorFile != INVALID_HANDLE_VALUE)
 			WriteFile(colorFile, &colorData[0], colorData.size() * sizeof(colorData[0]), &bytesWritten, 0);
 		CloseHandle(colorFile);
-		colorFile = CreateFile(RGBFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		colorFile = CreateFile(RGBFileName->wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		if (colorFile != INVALID_HANDLE_VALUE)
 			WriteFile(colorFile, &colorData[2], (colorData.size() - 2) * sizeof(colorData[0]), &bytesWritten, 0);
 		CloseHandle(colorFile);
@@ -4548,7 +4507,7 @@ void sav() {
 #endif
 
 	duauxnam();
-	if (chkattr(AuxName))
+	if (chkattr(*AuxName))
 		return;
 	if (!PCSHeader.stitchCount)
 		return;
@@ -4565,9 +4524,9 @@ void sav() {
 			saveStitches[iStitch] = StitchBuffer[iStitch];
 		}
 	}
-	PCSFileHandle = CreateFile(AuxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, NULL, CREATE_ALWAYS, 0, NULL);
+	PCSFileHandle = CreateFile(AuxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (PCSFileHandle == INVALID_HANDLE_VALUE) {
-		crmsg(AuxName);
+		crmsg(*AuxName);
 		PCSFileHandle = 0;
 	}
 	else {
@@ -4577,7 +4536,7 @@ void sav() {
 		DSTRecords.reserve(PCSHeader.stitchCount + 128);
 		DSTOffsets          DSTOffsetData = {};
 		std::vector<PCSTCH> PCSStitchBuffer;
-		auto                auxName = win32::Utf16ToUtf8(AuxName);
+		auto                auxName = win32::Utf16ToUtf8(*AuxName);
 		auto                desc    = strrchr(auxName.data(), '\\') + 1;
 		switch (IniFile.auxFileType) {
 		case AUXDST:
@@ -4775,10 +4734,10 @@ void sav() {
 			} while (false);
 		}
 		if (flag) {
-			defNam(WorkingFileName);
+			defNam(*WorkingFileName);
 			CloseHandle(PCSFileHandle);
 			if (UserFlagMap.test(UserFlag::ROTAUX)) {
-				filnopn(IDS_FILROT, AuxName);
+				filnopn(IDS_FILROT, *AuxName);
 			}
 		}
 	}
@@ -4833,33 +4792,36 @@ void auxmen() {
 }
 
 void savAs() {
-	wchar_t* pchr = nullptr;
-
 	if (PCSHeader.stitchCount || FormIndex || *PCSBMPFileName) {
-		OpenFileName.nFilterIndex = 0;
+		wchar_t szFileName[_MAX_PATH] = { 0 };
+		wchar_t lpszBuffer[_MAX_PATH] = { 0 };
+		auto    workingFileStr        = WorkingFileName->wstring();
+		auto    dirStr                = DefaultDirectory->wstring();
+		std::copy(workingFileStr.begin(), workingFileStr.end(), szFileName);
+		std::copy(dirStr.begin(), dirStr.end(), lpszBuffer);
+		OpenFileName.lpstrFile       = szFileName;
+		OpenFileName.lpstrInitialDir = lpszBuffer;
+		OpenFileName.nFilterIndex    = 0;
 		if (GetSaveFileName(&OpenFileName)) {
-			_wcslwr_s(WorkingFileName);
-			pchr = StrRChrW(WorkingFileName, 0, L'.');
-			if (!pchr)
-				pchr = &WorkingFileName[wcslen(WorkingFileName)];
+			WorkingFileName->assign(szFileName);
 			switch (OpenFileName.nFilterIndex) {
 			case 1:
-				wcscpy_s(pchr, sizeof(WorkingFileName) / sizeof(wchar_t) - (pchr - WorkingFileName), L".thr");
+				WorkingFileName->replace_extension(L".thr");
 				break;
 			case 2:
-				wcscpy_s(pchr, sizeof(WorkingFileName) / sizeof(wchar_t) - (pchr - WorkingFileName), L".pcs");
+				WorkingFileName->replace_extension(L".pcs");
 				IniFile.auxFileType = AUXPCS;
 				auxmen();
 				break;
 			case 3:
 #if PESACT
-				strcpy_s(pchr, sizeof(WorkingFileName) / sizeof(wchar_t) - (pchr - WorkingFileName), L".pes");
+				WorkingFileName->replace_extension(L".pes");
 				IniFile.auxFileType = AUXPES;
 				auxmen();
 				break;
 			case 4:
 #endif
-				wcscpy_s(pchr, sizeof(WorkingFileName) / sizeof(wchar_t) - (pchr - WorkingFileName), L".dst");
+				WorkingFileName->replace_extension(L".dst");
 				IniFile.auxFileType = AUXDST;
 				auxmen();
 				break;
@@ -4871,28 +4833,23 @@ void savAs() {
 			StateMap.reset(StateFlag::CMPDO);
 			thrsav();
 			sav();
-			SetWindowText(ThrEdWindow, ThrName);
+			SetWindowText(ThrEdWindow, ThrName->wstring().c_str());
 		}
 	}
 }
 
 void save() {
-	wchar_t* pchr = nullptr;
-
-	if (WorkingFileName[0]) {
-		pchr = StrRChrW(WorkingFileName, 0, L'.');
-		if (pchr)
-			pchr++;
-		else {
-			wcscat_s(WorkingFileName, L".thr");
-			pchr = StrRChrW(WorkingFileName, 0, L'.') + 1;
+	if (WorkingFileName->empty()) {
+		savAs();
+	}
+	else {
+		if (WorkingFileName->extension().empty()) {
+			*WorkingFileName /= L".thr";
 		}
 		thrsav();
 		if (PCSHeader.stitchCount)
 			sav();
 	}
-	else
-		savAs();
 }
 
 void dun() {
@@ -4907,7 +4864,7 @@ void dun() {
 	unbsho();
 	rstAll();
 	//	if(savcmp() || (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount && !FormIndex))
-	if (savcmp() || (*BalaradName0))
+	if (savcmp() || (!BalaradName0->empty()))
 		reldun();
 	else {
 		if (StitchWindowClientRect.right) {
@@ -4917,7 +4874,8 @@ void dun() {
 		else {
 			std::wstring fmtStr;
 			loadString(fmtStr, IDS_SAVFIL);
-			if (MessageBox(ThrEdWindow, fmt::format(fmtStr, ThrName).c_str(), (*StringTable)[STR_CLOS].c_str(), MB_YESNO)
+			if (MessageBox(
+			        ThrEdWindow, fmt::format(fmtStr, ThrName->wstring()).c_str(), (*StringTable)[STR_CLOS].c_str(), MB_YESNO)
 			    == IDYES)
 				save();
 			reldun();
@@ -5365,9 +5323,9 @@ void savmap() {
 			return;
 		}
 		if (GetSaveFileName(&OpenBitmapName)) {
-			BitmapFileHandle = CreateFile(UserBMPFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+			BitmapFileHandle = CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 			if (IniFileHandle == INVALID_HANDLE_VALUE) {
-				crmsg(UserBMPFileName);
+				crmsg(*UserBMPFileName);
 				return;
 			}
 			WriteFile(BitmapFileHandle, &BitmapFileHeader, 14, &bytesWritten, NULL);
@@ -5409,11 +5367,11 @@ void bfil() {
 	COLORREF      InverseBackgroundColor = {};
 
 	InverseBackgroundColor = fswap(BackgroundColor);
-	BitmapFileHandle       = CreateFile(UserBMPFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+	BitmapFileHandle       = CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 	if (BitmapFileHandle == INVALID_HANDLE_VALUE) {
 		std::wstring fmtStr;
 		loadString(fmtStr, IDS_UNOPEN);
-		shoMsg(fmt::format(fmtStr, UserBMPFileName));
+		shoMsg(fmt::format(fmtStr, UserBMPFileName->wstring()));
 		CloseHandle(BitmapFileHandle);
 		BitmapFileHandle  = 0;
 		PCSBMPFileName[0] = 0;
@@ -5491,8 +5449,8 @@ void bfil() {
 		else {
 			CloseHandle(BitmapFileHandle);
 			StateMap.reset(StateFlag::MONOMAP);
-			BitmapFileHandle
-			    = LoadImage(ThrEdInstance, UserBMPFileName, IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
+			BitmapFileHandle = LoadImage(
+			    ThrEdInstance, UserBMPFileName->wstring().c_str(), IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
 			SelectObject(BitmapDC, BitmapFileHandle);
 			StateMap.set(StateFlag::RESTCH);
 		}
@@ -5540,7 +5498,7 @@ void dstran(std::vector<DSTREC>& DSTData) {
 	bool                  retval        = false;
 
 	if (colfil()) {
-		colorFile = CreateFile(ColorFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+		colorFile = CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 		if (colorFile != INVALID_HANDLE_VALUE) {
 			retval = GetFileSizeEx(colorFile, &colorFileSize);
 			// There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
@@ -5708,8 +5666,6 @@ void nuFil() {
 	unsigned      textureHistoryFlag = 0, pcsStitchCount = 0;
 	unsigned      iPCSstitch = 0, color = 0, iColor = 0;
 	unsigned      iColorChange   = 0;
-	wchar_t*      fileExtention  = nullptr;
-	char          firstCharacter = 0;
 	STRHED        thredHeader    = {};
 	wchar_t       buffer[3]      = { 0 };
 	char*         tnam           = nullptr;
@@ -5732,7 +5688,16 @@ void nuFil() {
 	double         locof         = 0.0;
 #endif
 
+	wchar_t szFileName[_MAX_PATH] = { 0 };
+	wchar_t lpszBuffer[_MAX_PATH] = { 0 };
+	auto    workingFileStr        = WorkingFileName->wstring();
+	auto    dirStr                = DefaultDirectory->wstring();
+	std::copy(workingFileStr.begin(), workingFileStr.end(), szFileName);
+	std::copy(dirStr.begin(), dirStr.end(), lpszBuffer);
+	OpenFileName.lpstrFile       = szFileName;
+	OpenFileName.lpstrInitialDir = lpszBuffer;
 	if (StateMap.testAndReset(StateFlag::REDOLD) || GetOpenFileName(&OpenFileName)) {
+		WorkingFileName->assign(szFileName);
 		fnamtabs();
 		untrace();
 		if (FormIndex)
@@ -5750,12 +5715,12 @@ void nuFil() {
 		}
 		// ToDo - use ifstream?
 		// ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
-		FileHandle = CreateFile(WorkingFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+		FileHandle = CreateFile(WorkingFileName->wstring().c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 		if (FileHandle == INVALID_HANDLE_VALUE) {
 			if (GetLastError() == 32)
-				filnopn(IDS_FNOPNA, WorkingFileName);
+				filnopn(IDS_FNOPNA, *WorkingFileName);
 			else
-				filnopn(IDS_FNOPN, WorkingFileName);
+				filnopn(IDS_FNOPN, *WorkingFileName);
 			FileHandle = 0;
 		}
 		else {
@@ -5788,7 +5753,7 @@ void nuFil() {
 			StateMap.reset(StateFlag::BAKWRAP);
 			ZoomFactor = 1;
 			StateMap.set(StateFlag::RESTCH);
-			defNam(WorkingFileName);
+			defNam(*WorkingFileName);
 			NearestCount = 0;
 			if (StateMap.testAndReset(StateFlag::WASPAT))
 				DestroyWindow(SpeedScrollBar);
@@ -5798,15 +5763,9 @@ void nuFil() {
 			StateMap.reset();
 			if (textureHistoryFlag)
 				StateMap.set(StateFlag::WASTXBAK);
-			fileSize      = GetFileSize(FileHandle, &fileSizeHigh);
-			fileExtention = StrRChrW(WorkingFileName, 0, L'.');
-			if (fileExtention)
-				fileExtention++;
-			else {
-				wcscat_s(WorkingFileName, L".thr");
-				fileExtention = StrRChrW(WorkingFileName, 0, L'.') + 1;
-			}
-			firstCharacter = tolower(fileExtention[0]);
+			fileSize            = GetFileSize(FileHandle, &fileSizeHigh);
+			auto fileExt        = WorkingFileName->extension().wstring();
+			auto firstCharacter = fileExt[1];
 			if (firstCharacter == 't') {
 				ReadFile(FileHandle, &thredHeader, sizeof(STRHED), &BytesRead, NULL);
 				if ((thredHeader.headerType & 0xffffff) == 0x746872) {
@@ -5972,10 +5931,10 @@ void nuFil() {
 			else {
 				StateMap.set(StateFlag::NOTHRFIL);
 				if (firstCharacter == 'p') {
-					if (tolower(fileExtention[01]) == 'c') {
+					if (tolower(fileExt[2]) == 'c') {
 						ReadFile(FileHandle, &PCSHeader, sizeof(PCSHeader), &BytesRead, NULL);
 						if (!fileSize) {
-							filnopn(IDS_ZEROL, WorkingFileName);
+							filnopn(IDS_ZEROL, *WorkingFileName);
 							return;
 						}
 						if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == 16) {
@@ -6008,7 +5967,7 @@ void nuFil() {
 							// Grab the bitmap filename
 							tnam = convert_ptr<char*>(&PCSDataBuffer[iPCSstitch]);
 							strcpy_s(PCSBMPFileName, tnam);
-							wcscpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), L"thr");
+							// wcscpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), L"thr");
 							IniFile.auxFileType = AUXPCS;
 							if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP)
 								PCSHeader.hoopType = LARGHUP;
@@ -6136,9 +6095,9 @@ void nuFil() {
 				}
 			}
 			if (PCSBMPFileName[0]) {
-				SetCurrentDirectory(DefaultDirectory);
+				fs::current_path(*DefaultDirectory);
 				auto BMPfileName = win32::Utf8ToUtf16(PCSBMPFileName);
-				wcscpy_s(UserBMPFileName, BMPfileName.data());
+				UserBMPFileName->assign(BMPfileName);
 				bfil();
 			}
 			ritot(PCSHeader.stitchCount);
@@ -6175,7 +6134,7 @@ void nuFil() {
 			auxmen();
 		}
 		lenCalc();
-		SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRDBY], WorkingFileName, *DesignerName).c_str());
+		SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRDBY], WorkingFileName->wstring(), *DesignerName).c_str());
 		CloseHandle(FileHandle);
 		StateMap.set(StateFlag::INIT);
 		StateMap.reset(StateFlag::TRSET);
@@ -6969,7 +6928,7 @@ void newFil() {
 	deldu();
 	DesignerName->assign(win32::Utf8ToUtf16(std::string(IniFile.designerName)));
 	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], *DesignerName).c_str());
-	wcscpy_s(ThrName, (*StringTable)[STR_NUFIL].c_str());
+	*ThrName = *DefaultDirectory / ((*StringTable)[STR_NUFIL].c_str());
 	ritfnam(*DesignerName);
 	auto designer = win32::Utf16ToUtf8(*DesignerName);
 	std::copy(designer.begin(), designer.end(), ExtendedHeader.modifierName);
@@ -6997,9 +6956,9 @@ void newFil() {
 	TextureIndex          = 0;
 	SatinGuideIndex       = 0;
 	FormIndex             = 0;
-	WorkingFileName[0]    = 0;
 	ColorChanges          = 0;
 	KnotCount             = 0;
+	WorkingFileName->clear();
 	for (iColor = 0; iColor < 16; iColor++) {
 		redraw(DefaultColorWin[iColor]);
 		redraw(UserColorWin[iColor]);
@@ -8174,16 +8133,26 @@ void lodbmp() {
 		DeleteObject(BitmapFileHandle);
 		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
+	wchar_t szFileName[_MAX_PATH] = { 0 };
+	wchar_t lpszBuffer[_MAX_PATH] = { 0 };
+	auto    workingFileStr        = UserBMPFileName->wstring();
+	auto    dirStr                = DefaultBMPDirectory->wstring();
+	std::copy(workingFileStr.begin(), workingFileStr.end(), szFileName);
+	std::copy(dirStr.begin(), dirStr.end(), lpszBuffer);
+	OpenBitmapName.lpstrFile       = szFileName;
+	OpenBitmapName.lpstrInitialDir = lpszBuffer;
 	if (GetOpenFileName(&OpenBitmapName)) {
+		UserBMPFileName->assign(szFileName);
 		untrace();
-		auto BMPfileName = win32::Utf16ToUtf8(UserBMPFileName);
-		auto filename    = strrchr(BMPfileName.data(), '\\') + 1;
+		auto filename = win32::Utf16ToUtf8(UserBMPFileName->filename().wstring());
 		// PCS file can only store a 16 character filename?
 		// ToDo - give the user a little more info that the bitmap has not been loaded
-		if (filename && strlen(filename) < 16) {
-			strncpy_s(PCSBMPFileName, filename, sizeof(PCSBMPFileName));
+		if (filename.size() && filename.size() < 16) {
+			std::copy(filename.begin(), filename.end(), PCSBMPFileName);
 			defbNam();
 			bfil();
+		}
+		else {
 		}
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -8304,7 +8273,7 @@ void deltot() {
 	coltab();
 	zumhom();
 	// wcscpy_s(DesignerName, IniFile.designerName);
-	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRDBY], ThrName, *DesignerName).c_str());
+	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRDBY], ThrName->wstring(), *DesignerName).c_str());
 }
 
 bool wastch() noexcept {
@@ -8651,7 +8620,7 @@ void vubak() {
 		FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 		dx = (StitchWindowClientRect.right >> 1);
 		dy = (StitchWindowClientRect.bottom >> 1);
-		for (iVersion = 0; iVersion < OLDVER; iVersion++) {
+		for (iVersion = 0; iVersion < 4; iVersion++) { // there are 4 quadrants
 			if (iVersion & 2)
 				verticalLocation = dy;
 			else
@@ -8712,26 +8681,26 @@ unsigned gethand(const fPOINTATTR* stitch, unsigned stitchCount) noexcept {
 
 void insfil() {
 	OPENFILENAME file = {
-		sizeof(OPENFILENAME),               // lStructsize
-		ThrEdWindow,                        // hwndOwner
-		ThrEdInstance,                      // hInstance
-		L"THR files\0*.thr\0\0",            // lpstrFilter
-		CustomFilter,                       // lpstrCustomFilter
-		_MAX_PATH,                          // nMaxCustFilter
-		0,                                  // nFilterIndex
-		InsertedFileName,                   // lpstrFile
-		_MAX_PATH,                          // nMaxFile
-		0,                                  // lpstrFileTitle
-		0,                                  // nMaxFileTitle
-		DefaultDirectory,                   // lpstr	ialDir
-		0,                                  // lpstrTitle
-		OFN_EXPLORER | OFN_OVERWRITEPROMPT, // Flags
-		0,                                  // nFileOffset
-		0,                                  // nFileExtension
-		L"thr",                             // lpstrDefExt
-		0,                                  // lCustData
-		0,                                  // lpfnHook
-		0,                                  // lpTemplateName
+		sizeof(OPENFILENAME),                // lStructsize
+		ThrEdWindow,                         // hwndOwner
+		ThrEdInstance,                       // hInstance
+		L"THR files\0*.thr\0\0",             // lpstrFilter
+		CustomFilter,                        // lpstrCustomFilter
+		_MAX_PATH,                           // nMaxCustFilter
+		0,                                   // nFilterIndex
+		InsertedFileName,                    // lpstrFile
+		_MAX_PATH,                           // nMaxFile
+		0,                                   // lpstrFileTitle
+		0,                                   // nMaxFileTitle
+		DefaultDirectory->wstring().c_str(), // lpstr	ialDir
+		0,                                   // lpstrTitle
+		OFN_EXPLORER | OFN_OVERWRITEPROMPT,  // Flags
+		0,                                   // nFileOffset
+		0,                                   // nFileExtension
+		L"thr",                              // lpstrDefExt
+		0,                                   // lCustData
+		0,                                   // lpfnHook
+		0,                                   // lpTemplateName
 	};
 	STRHED     fileHeader    = {};
 	STREX      thredHeader   = {};
@@ -8897,7 +8866,8 @@ void insfil() {
 								ExtendedHeader.creatorName[iName] = thredHeader.creatorName[iName];
 							}
 							redfnam(*DesignerName);
-							SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRDBY], ThrName, *DesignerName).c_str());
+							SetWindowText(ThrEdWindow,
+							              fmt::format((*StringTable)[STR_THRDBY], ThrName->wstring(), *DesignerName).c_str());
 						}
 					}
 					InsertCenter.x = (insertedRectangle.right - insertedRectangle.left) / 2 + insertedRectangle.left;
@@ -8999,15 +8969,7 @@ void getbak() {
 				}
 			}
 			else {
-				wcscpy_s(WorkingFileName, DefaultDirectory);
-				wchar_t* pchr = &WorkingFileName[wcslen(WorkingFileName) - 1];
-				if (pchr) {
-					if (pchr[0] != '\\') {
-						pchr[1] = '\\';
-						pchr[2] = 0;
-					}
-				}
-				wcscat_s(WorkingFileName, (*Thumbnails)[ThumbnailsSelected[FileVersionIndex]].data());
+				*WorkingFileName = *DefaultDirectory / (*Thumbnails)[ThumbnailsSelected[FileVersionIndex]];
 				StateMap.set(StateFlag::REDOLD);
 				nuFil();
 			}
@@ -9018,24 +8980,28 @@ void getbak() {
 }
 
 void rebak() {
-	unsigned iVersion                  = 0;
-	wchar_t  newFileName[_MAX_PATH]    = { 0 };
-	wchar_t  safetyFileName[_MAX_PATH] = { 0 };
+	unsigned iVersion = 0;
+	fs::path newFileName;
+	fs::path safetyFileName;
 
 	for (iVersion = 0; iVersion < OLDVER; iVersion++)
 		DestroyWindow(BackupViewer[iVersion]);
-	wcscpy_s(newFileName, ThrName);
-	wcscpy_s(safetyFileName, ThrName);
-	iVersion                 = duth(newFileName);
-	newFileName[iVersion]    = FileVersionIndex + 's';
-	safetyFileName[iVersion] = 'x';
-	MoveFile(ThrName, safetyFileName);
-	MoveFile(newFileName, ThrName);
-	MoveFile(safetyFileName, newFileName);
-	wcscpy_s(WorkingFileName, ThrName);
+	newFileName    = *ThrName;
+	safetyFileName = *ThrName;
+	auto ext       = newFileName.extension().wstring();
+	ext.back()     = FileVersionIndex + 's';
+	newFileName.replace_extension(ext);
+	ext.back() = 'x';
+	safetyFileName.replace_extension(ext);
+	fs::rename(*ThrName, safetyFileName);
+	if (fs::exists(newFileName)) {
+		fs::rename(newFileName, *ThrName);
+	}
+	fs::rename(safetyFileName, newFileName);
+	*WorkingFileName = *ThrName;
 	StateMap.set(StateFlag::REDOLD);
 	nuFil();
-	DeleteFile(safetyFileName);
+	fs::remove(safetyFileName);
 }
 
 void thumbak() {
@@ -9046,29 +9012,31 @@ void thumbak() {
 	getbak();
 }
 
-void movbak(char source, char destination) noexcept {
-	wchar_t  sourceFileName[_MAX_PATH]      = { 0 };
-	wchar_t  destinationFileName[_MAX_PATH] = { 0 };
-	unsigned lastChar                       = duth(ThrName);
+void movbak(char source, char destination) {
+	auto sourceFileName      = *ThrName;
+	auto destinationFileName = *ThrName;
 
-	wcscpy_s(sourceFileName, ThrName);
-	wcscpy_s(destinationFileName, ThrName);
-	sourceFileName[lastChar]      = source;
-	destinationFileName[lastChar] = destination;
-	DeleteFile(destinationFileName);
-	MoveFile(sourceFileName, destinationFileName);
+	auto ext   = ThrName->extension().wstring();
+	ext.back() = source;
+	sourceFileName.replace_extension(ext);
+	ext.back() = destination;
+	destinationFileName.replace_extension(ext);
+
+	fs::remove(destinationFileName);
+	fs::rename(sourceFileName, destinationFileName);
 }
 
 void purg() {
-	wchar_t  fileName[_MAX_PATH] = { 0 };
-	unsigned lastChar = 0, iLast = 0;
+	fs::path fileName;
+	char     iLast = 0;
 
 	if (FileHandle) {
-		wcscpy_s(fileName, ThrName);
-		lastChar = duth(fileName);
-		for (iLast = 1; iLast < 6; iLast++) {
-			fileName[lastChar] = gsl::narrow<char>(iLast) + 'r';
-			DeleteFile(fileName);
+		fileName = *ThrName;
+		auto ext = ThrName->extension().wstring();
+		for (iLast = 0; iLast < OLDVER; iLast++) {
+			ext.back() = iLast + 's';
+			fileName.replace_extension(ext);
+			fs::remove(fileName);
 		}
 	}
 }
@@ -9077,31 +9045,22 @@ void purgdir() {
 	StateMap.set(StateFlag::PRGMSG);
 	std::wstring fmtStr;
 	loadString(fmtStr, IDS_DELBAK);
-	shoMsg(fmt::format(fmtStr, DefaultDirectory));
+	shoMsg(fmt::format(fmtStr, DefaultDirectory->wstring()));
 	okcan();
 }
 
 void deldir() {
-	unsigned        iLastChar           = 0;
-	wchar_t         fileName[_MAX_PATH] = { 0 };
-	WIN32_FIND_DATA findFileData        = {};
-	HANDLE          file                = {};
-
 	unmsg();
 	tabmsg(IDS_BAKDEL);
-	wcscpy_s(fileName, DefaultDirectory);
-	wchar_t* fileSpec = &fileName[wcslen(fileName)];
-	if (fileSpec) {
-		wcscpy_s(fileSpec, sizeof(fileName) / sizeof(wchar_t) - (fileSpec - fileName), L"\\*.th0");
-		for (iLastChar = 1; iLastChar < 6; iLastChar++) {
-			fileSpec[5] = gsl::narrow<char>(iLastChar) + 'r';
-			file        = FindFirstFile(fileName, &findFileData);
-			if (file != INVALID_HANDLE_VALUE) {
-				DeleteFile(findFileData.cFileName);
-				while (FindNextFile(file, &findFileData))
-					DeleteFile(findFileData.cFileName);
+	std::wstring backSpec = { L".th0" };
+
+	auto& backChar = backSpec.back();
+	for (char iLastChar = 0; iLastChar < OLDVER; iLastChar++) {
+		backChar = iLastChar + 's';
+		for (auto& p : fs::directory_iterator(*DefaultDirectory)) {
+			if (!fs::is_directory(p) && (p.path().extension() == backSpec)) {
+				fs::remove(p.path());
 			}
-			FindClose(file);
 		}
 	}
 	unmsg();
@@ -10058,6 +10017,7 @@ void barnam(HWND window, unsigned iThumbnail) {
 		lastCharacter = StrRChrW(buffer, 0, L'.');
 		if (lastCharacter)
 			lastCharacter[0] = 0;
+		buffer[12] = 0;
 		SetWindowText(window, buffer);
 	}
 	else
@@ -10081,9 +10041,6 @@ void rthumnam(unsigned iThumbnail) {
 	}
 }
 
-// Suppress warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead
-#pragma warning(push)
-#pragma warning(disable : 4996)
 void thumnail() {
 	WIN32_FIND_DATA fileData   = {};
 	unsigned        iThumbnail = 0;
@@ -10093,22 +10050,14 @@ void thumnail() {
 	undat();
 	untrace();
 
-	SetCurrentDirectory(DefaultDirectory);
-	wcscpy_s(SearchName, DefaultDirectory);
-	wchar_t* lastCharacter = &SearchName[wcslen(SearchName) - 1];
-	if (lastCharacter) {
-		if (lastCharacter[0] != '\\') {
-			lastCharacter[1] = '\\';
-			lastCharacter[2] = 0;
-		}
-	}
-	wcscat_s(SearchName, L"*.thr");
-	file = FindFirstFile(SearchName, &fileData);
+	fs::current_path(*DefaultDirectory);
+	*SearchName = *DefaultDirectory / L"*.thr";
+	file        = FindFirstFile(SearchName->wstring().c_str(), &fileData);
 	if (file == INVALID_HANDLE_VALUE) {
 		const DWORD  dwError = GetLastError();
 		std::wstring fmtStr;
 		loadString(fmtStr, IDS_FFINDERR);
-		shoMsg(fmt::format(fmtStr, SearchName, dwError));
+		shoMsg(fmt::format(fmtStr, SearchName->wstring(), dwError));
 		unthum();
 	}
 	else {
@@ -10119,13 +10068,14 @@ void thumnail() {
 		}
 		FindClose(file);
 		std::sort(Thumbnails->begin(), Thumbnails->end());
-		iThumbnail = ThumbnailIndex = 0;
-		while (iThumbnail < 4 && iThumbnail < Thumbnails->size()) {
+		iThumbnail           = 0;
+		const auto thumbSize = Thumbnails->size();
+		while (iThumbnail < 4 && iThumbnail < thumbSize) {
 			ThumbnailsSelected[iThumbnail] = iThumbnail;
 			iThumbnail++;
 		}
 		ThumbnailIndex = ThumbnailDisplayCount = iThumbnail;
-		while (iThumbnail < 4 && iThumbnail < Thumbnails->size())
+		while (iThumbnail < 4 && iThumbnail < thumbSize)
 			rthumnam(iThumbnail++);
 		StateMap.set(StateFlag::THUMSHO);
 		ThumbnailSearchString[0] = 0;
@@ -10136,7 +10086,6 @@ void thumnail() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 }
-#pragma warning(pop)
 
 void nuthsel() {
 	unsigned iThumbnail = 0, length = 0, savedIndex = 0;
@@ -11081,10 +11030,10 @@ void ritlock(const WIN32_FIND_DATA* fileData, unsigned fileIndex, HWND hwndlg) n
 }
 
 INT_PTR CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
-	FINDINFO* fileInfo              = nullptr;
-	HANDLE    searchResult          = {};
-	wchar_t   searchName[_MAX_PATH] = { 0 };
-	wchar_t   fileName[_MAX_PATH]   = { 0 };
+	FINDINFO* fileInfo     = nullptr;
+	HANDLE    searchResult = {};
+	fs::path  searchName;
+	fs::path  fileName;
 	unsigned  iFile = 0, fileError = 0;
 	HWND      lockHandle = {}, unlockHandle = {};
 
@@ -11094,13 +11043,12 @@ INT_PTR CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 		SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
 		[[gsl::suppress(type .1)]] fileInfo = reinterpret_cast<FINDINFO*>(lparam);
 		if (fileInfo) {
-			wcscpy_s(searchName, DefaultDirectory);
-			wcscat_s(searchName, L"\\*.thr");
-			searchResult = FindFirstFile(searchName, &(fileInfo->data[0]));
+			searchName   = *DefaultDirectory / L"*.thr";
+			searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
 			if (searchResult == INVALID_HANDLE_VALUE) {
 				std::wstring fmtStr;
 				loadString(fmtStr, IDS_NOTHRFIL);
-				shoMsg(fmt::format(fmtStr, DefaultDirectory));
+				shoMsg(fmt::format(fmtStr, DefaultDirectory->wstring()));
 				EndDialog(hwndlg, wparam);
 				return TRUE;
 			}
@@ -11153,13 +11101,10 @@ INT_PTR CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 				ritlock(fileInfo->data, fileInfo->count, hwndlg);
 				break;
 			case IDOK:
-				wcscpy_s(searchName, DefaultDirectory);
-				wcscat_s(searchName, L"\\");
 				fileError = 0;
 				for (iFile = 0; iFile < fileInfo->count; iFile++) {
-					wcscpy_s(fileName, searchName);
-					wcscat_s(fileName, fileInfo->data[iFile].cFileName);
-					if (!SetFileAttributes(fileName, fileInfo->data[iFile].dwFileAttributes))
+					fileName = *DefaultDirectory / fileInfo->data[iFile].cFileName;
+					if (!SetFileAttributes(fileName.wstring().c_str(), fileInfo->data[iFile].dwFileAttributes))
 						fileError++;
 				}
 				if (fileError) {
@@ -12303,8 +12248,8 @@ void delmap() {
 
 void closfn() {
 	deltot();
-	KnotCount         = 0;
-	*WorkingFileName  = 0;
+	KnotCount = 0;
+	WorkingFileName->clear();
 	PCSBMPFileName[0] = 0;
 	deldu();
 	clrhbut(3);
@@ -12971,7 +12916,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 	TXPNT*     textureSource   = nullptr;
 	unsigned   byteCount = 0, clipCount = 0, code = 0, currentClip = 0, currentGuide = 0, currentVertex = 0;
 	unsigned   dst = 0, iClip = 0, iColor = 0, iFillType = 0, iForm = 0, iGuide = 0, iHoop = 0;
-	unsigned   iLayer = 0, iName = 0, iPreference = 0, iSelectedVertex = 0, iSide = 0, iStitch = 0;
+	unsigned   iLayer = 0, iPreference = 0, iSelectedVertex = 0, iSide = 0, iStitch = 0;
 	unsigned   iThreadSize = 0, iVersion = 0, iVertex = 0, iWindow = 0, nextVertex = 0, selectedVertexCount = 0;
 	unsigned   stitchAttribute = 0, textureCount = 0, traceColor = 0;
 	WPARAM     wParameter = {};
@@ -14150,16 +14095,17 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			}
 			else {
 				if (chkok()) {
-					iName          = duth(ThrName);
-					ThrName[iName] = 't';
+					auto& ThrNameLastChar         = ThrName->extension().wstring().back();
+					auto& WorkingFileNameLastChar = WorkingFileName->extension().wstring().back();
+					ThrNameLastChar               = 't';
 					StateMap.set(StateFlag::IGNAM);
 					thrsav();
-					ThrName[iName] = 'r';
+					ThrNameLastChar = 'r';
 					if (FileVersionIndex)
-						WorkingFileName[iName] = FileVersionIndex + 0x2f;
+						WorkingFileNameLastChar = FileVersionIndex + 0x2f;
 					StateMap.set(StateFlag::REDOLD);
 					nuFil();
-					WorkingFileName[iName] = 'r';
+					WorkingFileNameLastChar = 'r';
 					switch (FileVersionIndex) {
 					case 3:
 						movbak('1', '2');
@@ -14169,10 +14115,11 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 						movbak('r', '0');
 					}
 					movbak('t', 'r');
-					ThrName[iName] = 't';
-					DeleteFile(ThrName);
-					ThrName[iName] = 'r';
-					FileHandle     = CreateFile(ThrName, (GENERIC_WRITE | GENERIC_READ), 0, NULL, OPEN_EXISTING, 0, NULL);
+					ThrNameLastChar = 't';
+					fs::remove(*ThrName);
+					ThrNameLastChar = 'r';
+					FileHandle
+					    = CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, NULL, OPEN_EXISTING, 0, NULL);
 					if (FileHandle == INVALID_HANDLE_VALUE)
 						FileHandle = 0;
 					return 1;
@@ -16664,10 +16611,10 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		if (StateMap.test(StateFlag::FORMSEL))
 			fvars(ClosestFormToCursor);
 		{
-			auto previousNames = *PreviousNames;
+			const auto& previousNames = *PreviousNames;
 			for (iVersion = 0; iVersion < OLDNUM; iVersion++) {
 				if (Msg.wParam == LRUMenuId[iVersion]) {
-					std::copy(previousNames[iVersion].begin(), previousNames[iVersion].end(), WorkingFileName);
+					*WorkingFileName = previousNames[iVersion];
 					StateMap.set(StateFlag::REDOLD);
 					nuFil();
 				}
@@ -17549,7 +17496,7 @@ void ritloc() {
 	wcscpy_s(environment, sizeof(lockFileName) / sizeof(wchar_t) - (environment - lockFileName), L"thredloc.txt");
 	lockFile = CreateFile(lockFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (lockFile != INVALID_HANDLE_VALUE) {
-		auto value = win32::Utf16ToUtf8(HomeDirectory);
+		auto value = win32::Utf16ToUtf8(*HomeDirectory);
 		WriteFile(lockFile, value.data(), value.size() + 1, &bytesWritten, 0);
 		CloseHandle(lockFile);
 	}
@@ -17565,64 +17512,47 @@ void crtcurs() noexcept {
 	NeedleLeftUpCursor    = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftUp));
 }
 
-void duhom() noexcept {
-	unsigned pathLength    = 0;
-	wchar_t* lastCharacter = nullptr;
+void duhom() {
+	fs::path arg0 = { ArgList[0] };
 
-	wcscpy_s(HomeDirectory, ArgList[0]);
-	lastCharacter = StrRChrW(HomeDirectory, 0, L'\\');
-	if (lastCharacter)
-		lastCharacter++;
-	else {
-		pathLength = GetCurrentDirectory(_MAX_PATH, HomeDirectory);
-		if (pathLength) {
-			HomeDirectory[pathLength++] = '\\';
-			lastCharacter               = &HomeDirectory[pathLength];
-		}
-	}
-	if (lastCharacter) {
-		*lastCharacter = 0;
-	}
+	*HomeDirectory = arg0.parent_path();
 }
 
 void ducmd() {
-	unsigned long bytesRead       = 0;
-	int           iArgument       = 0;
-	wchar_t*      balaradFileName = nullptr;
+	unsigned long bytesRead = 0;
+	fs::path      balaradFileName;
 
 	if (ArgCount > 1) {
-		wcscpy_s(WorkingFileName, ArgList[1]);
-		if (!wcsncmp(WorkingFileName, L"/F1:", 4)) {
-			balaradFileName = &WorkingFileName[4];
-			BalaradFile     = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+		std::wstring arg1 = { ArgList[1] };
+		if (!arg1.compare(0, 4, L"/F1:")) {
+			balaradFileName = *HomeDirectory / arg1.substr(4);
+			BalaradFile     = CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 			if (BalaradFile != INVALID_HANDLE_VALUE) {
 				CloseHandle(BalaradFile);
-				wcscpy_s(BalaradName0, balaradFileName);
+				*BalaradName0 = balaradFileName;
 				if (ArgCount > 2) {
-					wcscpy_s(WorkingFileName, ArgList[2]);
-					if (!wcsncmp(WorkingFileName, L"/F2:", 4)) {
-						balaradFileName = &WorkingFileName[4];
-						BalaradFile     = CreateFile(balaradFileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+					std::wstring arg2 = { ArgList[2] };
+					if (!arg2.compare(0, 4, L"/F2:")) {
+						balaradFileName = *HomeDirectory / arg2.substr(4);
+						BalaradFile     = CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 						if (BalaradFile != INVALID_HANDLE_VALUE) {
-							wcscpy_s(BalaradName1, balaradFileName);
-							ReadFile(BalaradFile, &BalaradName2, (_MAX_PATH + 1), &bytesRead, 0);
-							wcscat_s(BalaradName2, L"");
-							if (bytesRead)
+							*BalaradName1                     = balaradFileName;
+							wchar_t readBuffer[_MAX_PATH + 1] = { 0 };
+							ReadFile(BalaradFile, &readBuffer, (_MAX_PATH + 1), &bytesRead, 0);
+							if (bytesRead) {
+								BalaradName2->assign(readBuffer);
 								redbal();
+							}
 							CloseHandle(BalaradFile);
 						}
 					}
 				}
 				SetWindowText(ThrEdWindow, (*StringTable)[STR_EMB].c_str());
 			}
-			*WorkingFileName = 0;
-			DeleteFile(BalaradName1);
+			fs::remove(*BalaradName1);
 		}
 		else {
-			for (iArgument = 2; iArgument < ArgCount; iArgument++) {
-				wcscat_s(WorkingFileName, L" ");
-				wcscat_s(WorkingFileName, ArgList[iArgument]);
-			}
+			WorkingFileName->assign(arg1);
 			StateMap.set(StateFlag::REDOLD);
 			nuFil();
 		}
@@ -17635,9 +17565,9 @@ void redini() {
 	HDC           deviceContext = {};
 
 	duhom();
-	wcscpy_s(IniFileName, HomeDirectory);
-	wcscat_s(IniFileName, L"thred.ini");
-	IniFileHandle = CreateFile(IniFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+	*IniFileName = *HomeDirectory;
+	*IniFileName /= L"thred.ini";
+	IniFileHandle = CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (IniFileHandle == INVALID_HANDLE_VALUE) {
 		defpref();
 		if (!DesignerName->size()) {
@@ -17652,15 +17582,15 @@ void redini() {
 		if (bytesRead < sizeof(IniFile))
 			IniFile.formBoxSizePixels = DEFBPIX;
 		auto directory = win32::Utf8ToUtf16(IniFile.defaultDirectory);
-		std::copy(directory.begin(), directory.end(), DefaultDirectory);
-		std::copy(directory.begin(), directory.end(), DefaultBMPDirectory);
+		DefaultDirectory->assign(directory);
+		DefaultBMPDirectory->assign(directory);
 		auto& previousNames = *PreviousNames;
 		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
 			if (strlen(IniFile.prevNames[iVersion])) {
-				previousNames[iVersion] = win32::Utf8ToUtf16(std::string(IniFile.prevNames[iVersion]));
+				previousNames[iVersion].assign(win32::Utf8ToUtf16(std::string(IniFile.prevNames[iVersion])));
 			}
 			else {
-				previousNames[iVersion].assign(L"");
+				previousNames[iVersion].clear();
 			}
 		}
 		DesignerName->assign(win32::Utf8ToUtf16(std::string(IniFile.designerName)));
@@ -18641,7 +18571,7 @@ void dubar() {
 	}
 }
 
-void ritbak(const wchar_t* const fileName, DRAWITEMSTRUCT* drawItem) {
+void ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem) {
 	unsigned iStitch = 0, iVertexInForm = 0, iVertex = 0, iColor = 0, iLine = 0, bytesToRead = 0;
 	POINT    drawingDestinationSize
 	    = { (drawItem->rcItem.right - drawItem->rcItem.left), (drawItem->rcItem.bottom - drawItem->rcItem.top) };
@@ -18656,7 +18586,7 @@ void ritbak(const wchar_t* const fileName, DRAWITEMSTRUCT* drawItem) {
 	STREX                 extendedHeader  = {};
 	unsigned              fileTypeVersion = 0;
 
-	HANDLE thrEdFile = CreateFile(fileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+	HANDLE thrEdFile = CreateFile(fileName.wstring().c_str(), GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 
 	if (thrEdFile != INVALID_HANDLE_VALUE) {
 		ReadFile(thrEdFile, &stitchHeader, sizeof(STRHED), &BytesRead, NULL);
@@ -18824,16 +18754,16 @@ struct CreateParams {
 };
 
 LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-	unsigned position = 0, iRGB = 0, iColor = 0, iThumb = 0, iVersion = 0, lastCharacter = 0;
-	unsigned screenCenterOffset  = 0;
-	SIZE     maxWindowDimension  = {};
-	wchar_t  buffer[10]          = { 0 }; // for integer to string conversion
-	SIZE     textSize            = {};    // for measuring text items
-	POINT    scrollPoint         = {};    // for scroll bar functions
-	POINT    line[2]             = {};
-	long     adjustedWidth       = 0;
-	double   tdub                = 0.0;
-	wchar_t  fileName[_MAX_PATH] = { 0 };
+	unsigned position = 0, iRGB = 0, iColor = 0, iThumb = 0;
+	unsigned screenCenterOffset = 0;
+	SIZE     maxWindowDimension = {};
+	wchar_t  buffer[10]         = { 0 }; // for integer to string conversion
+	SIZE     textSize           = {};    // for measuring text items
+	POINT    scrollPoint        = {};    // for scroll bar functions
+	POINT    line[2]            = {};
+	long     adjustedWidth      = 0;
+	double   tdub               = 0.0;
+	fs::path fileName;
 	RECT     traceHighMaskRect   = {}; // high trace mask rectangle
 	RECT     traceMiddleMaskRect = {}; // middle trace mask rectangle
 	RECT     traceLowMaskRect    = {}; // low trace mask rectangle
@@ -19156,11 +19086,12 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				}
 			}
 			else {
-				for (iVersion = 0; iVersion < OLDVER; iVersion++) {
+				for (char iVersion = 0; iVersion < OLDVER; iVersion++) {
 					if (DrawItem->hwndItem == BackupViewer[iVersion]) {
-						wcscpy_s(fileName, ThrName);
-						lastCharacter           = duth(fileName);
-						fileName[lastCharacter] = gsl::narrow<char>(iVersion) + 's';
+						fileName   = *ThrName;
+						auto ext   = fileName.extension().wstring();
+						ext.back() = iVersion + 's';
+						fileName.replace_extension(ext);
 						ritbak(fileName, DrawItem);
 						return 1;
 					}
@@ -19418,13 +19349,44 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		TextureInputBuffer = &private_textureInputBuffer;
 		std::vector<TXPNT> private_TexturePointsBuffer;
 		TexturePointsBuffer = &private_TexturePointsBuffer;
-		std::vector<std::wstring> private_PreviousNames;
+		std::vector<fs::path> private_PreviousNames;
 		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
 			private_PreviousNames.push_back(L"");
 		}
 		PreviousNames = &private_PreviousNames;
 		std::wstring private_DesignerName;
 		DesignerName = &private_DesignerName;
+		fs::path private_AuxName;
+		fs::path private_WorkingFileName;
+		fs::path private_ThrName;
+		fs::path private_GeName;
+		fs::path private_ColorFileName;
+		fs::path private_RGBFileName;
+		fs::path private_DefaultDirectory;
+		fs::path private_SearchName;
+		fs::path private_DefaultBMPDirectory;
+		fs::path private_BalaradName0;
+		fs::path private_BalaradName1;
+		fs::path private_BalaradName2;
+		fs::path private_HomeDirectory;
+		fs::path private_UserBMPFileName;
+		fs::path private_IniFileName;
+
+		AuxName             = &private_AuxName;
+		WorkingFileName     = &private_WorkingFileName;
+		ThrName             = &private_ThrName;
+		GeName              = &private_GeName;
+		ColorFileName       = &private_ColorFileName;
+		RGBFileName         = &private_RGBFileName;
+		DefaultDirectory    = &private_DefaultDirectory;
+		SearchName          = &private_SearchName;
+		DefaultBMPDirectory = &private_DefaultBMPDirectory;
+		BalaradName0        = &private_BalaradName0;
+		BalaradName1        = &private_BalaradName1;
+		BalaradName2        = &private_BalaradName2;
+		HomeDirectory       = &private_HomeDirectory;
+		UserBMPFileName     = &private_UserBMPFileName;
+		IniFileName = &private_IniFileName;
 
 		redini();
 
