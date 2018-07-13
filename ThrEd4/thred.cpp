@@ -5282,6 +5282,7 @@ void bitlin(const unsigned char* source, unsigned* destination, COLORREF foregro
 }
 
 COLORREF fswap(COLORREF color) noexcept {
+	// ToDo - find a better option than _byteswap
 	return _byteswap_ulong(color) >> 8;
 }
 
@@ -9055,11 +9056,15 @@ void deldir() {
 	std::wstring backSpec = { L".th0" };
 
 	auto& backChar = backSpec.back();
-	for (char iLastChar = 0; iLastChar < OLDVER; iLastChar++) {
-		backChar = iLastChar + 's';
-		for (auto& p : fs::directory_iterator(*DefaultDirectory)) {
-			if (!fs::is_directory(p) && (p.path().extension() == backSpec)) {
-				fs::remove(p.path());
+	for (auto& p : fs::directory_iterator(*DefaultDirectory)) {
+		if (!fs::is_directory(p)) {
+			auto fileExt = p.path().extension().wstring();
+			backChar     = 's';
+			for (char iLastChar = 0; iLastChar < OLDVER; iLastChar++) {
+				if (fileExt == backSpec) {
+					fs::remove(p.path());
+					backChar++;
+				}
 			}
 		}
 	}
@@ -13864,8 +13869,9 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			duinsfil();
 			return 1;
 		}
-		if (StateMap.test(StateFlag::BIGBOX) && chkbig(stretchBoxLine, xyRatio))
+		if (StateMap.test(StateFlag::BIGBOX) && chkbig(stretchBoxLine, xyRatio)) {
 			return 1;
+		}
 		if (StateMap.testAndReset(StateFlag::DELSFRMS)) {
 			code = 0;
 			if (chkok()) {
@@ -13917,8 +13923,9 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			StateMap.set(StateFlag::RESTCH);
 			return 1;
 		}
-		if (SelectedFormList->size() && !StateMap.test(StateFlag::ROTAT) && chkbig(stretchBoxLine, xyRatio))
+		if (SelectedFormList->size() && !StateMap.test(StateFlag::ROTAT) && chkbig(stretchBoxLine, xyRatio)) {
 			return 1;
+		}
 		if (StateMap.test(StateFlag::SIDCOL) && chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
 			do {
 				savdo();
@@ -14095,17 +14102,24 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			}
 			else {
 				if (chkok()) {
-					auto& ThrNameLastChar         = ThrName->extension().wstring().back();
-					auto& WorkingFileNameLastChar = WorkingFileName->extension().wstring().back();
-					ThrNameLastChar               = 't';
+					auto  thrExt   = ThrName->extension().wstring();
+					auto& thrBack  = thrExt.back();
+					auto  workExt  = WorkingFileName->extension().wstring();
+					auto& workBack = workExt.back();
+					thrBack        = 't';
+					ThrName->replace_extension(thrExt);
 					StateMap.set(StateFlag::IGNAM);
 					thrsav();
-					ThrNameLastChar = 'r';
-					if (FileVersionIndex)
-						WorkingFileNameLastChar = FileVersionIndex + 0x2f;
+					thrBack = 'r';
+					ThrName->replace_extension(thrExt);
+					if (FileVersionIndex > 0) {
+						workBack = (FileVersionIndex - 1) + '0';
+						WorkingFileName->replace_extension(workExt);
+					}
 					StateMap.set(StateFlag::REDOLD);
 					nuFil();
-					WorkingFileNameLastChar = 'r';
+					workBack = 'r';
+					WorkingFileName->replace_extension(workExt);
 					switch (FileVersionIndex) {
 					case 3:
 						movbak('1', '2');
@@ -14115,9 +14129,11 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 						movbak('r', '0');
 					}
 					movbak('t', 'r');
-					ThrNameLastChar = 't';
+					thrBack = 't';
+					ThrName->replace_extension(thrExt);
 					fs::remove(*ThrName);
-					ThrNameLastChar = 'r';
+					thrBack = 'r';
+					ThrName->replace_extension(thrExt);
 					FileHandle
 					    = CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, NULL, OPEN_EXISTING, 0, NULL);
 					if (FileHandle == INVALID_HANDLE_VALUE)
@@ -19386,7 +19402,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		BalaradName2        = &private_BalaradName2;
 		HomeDirectory       = &private_HomeDirectory;
 		UserBMPFileName     = &private_UserBMPFileName;
-		IniFileName = &private_IniFileName;
+		IniFileName         = &private_IniFileName;
 
 		redini();
 

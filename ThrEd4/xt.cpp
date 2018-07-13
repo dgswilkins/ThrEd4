@@ -1235,7 +1235,6 @@ void initdaz(HWND hWinDialog) {
 	CheckDlgButton(hWinDialog, IDC_DLIN, UserFlagMap.test(UserFlag::DAZD));
 	std::wstring daisyType;
 	for (iType = 0; iType < 6; iType++) {
-		// ToDo - move DaisyTypeStrings into resource file. See fthdefprc for example
 		loadString(daisyType, DaisyTypeStrings[iType]);
 		[[gsl::suppress(type .1)]] SendMessage(
 		    GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str()));
