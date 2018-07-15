@@ -1,3 +1,4 @@
+#pragma once
 // Suppress C4244: conversion from 'type1' to 'type2', possible loss of data
 #pragma warning(disable : 4244)
 // Suppress C6031: return value ignored
@@ -798,10 +799,10 @@ enum
 };
 
 typedef struct _formVertices {
-	unsigned start;
-	unsigned vertexCount;
-	unsigned finish;
-	unsigned form;
+	size_t start;
+	size_t vertexCount;
+	size_t finish;
+	size_t form;
 } FORMVERTICES;
 
 class fPOINT;
@@ -934,7 +935,7 @@ public:
 	unsigned upCount;           // feather up count
 	unsigned downCount;         // feather down count
 	unsigned totalCount;        // up count plus down count
-	unsigned phaseIndex;
+	size_t   phaseIndex;
 	unsigned phase;
 	unsigned countUp;
 	unsigned countDown;
@@ -1017,29 +1018,162 @@ typedef struct _floatRectangle {
 typedef struct _forminfo {
 	unsigned type;
 	unsigned attribute;
-	unsigned sideCount;
+	size_t   sideCount;
 } FORMINFO;
 
-typedef struct _satcon {
+class SATCONOUT;
+
+class SATCON
+{
+public:
+	size_t start;
+	size_t finish;
+
+	inline SATCON& operator=(const SATCONOUT& rhs) noexcept;
+};
+
+class SATCONOUT
+{
+public:
 	unsigned short start;
 	unsigned short finish;
-} SATCON;
 
-typedef union _fangclp {
+	SATCONOUT() noexcept;
+	SATCONOUT(const SATCON& rhs);
+	~SATCONOUT(){};
+	inline SATCONOUT& operator=(const SATCON& rhs) noexcept;
+};
+
+inline SATCONOUT::SATCONOUT() noexcept {
+	start  = 0u;
+	finish = 0u;
+}
+
+inline SATCONOUT::SATCONOUT(const SATCON& rhs) {
+	start  = gsl::narrow<unsigned short>(rhs.start);
+	finish = gsl::narrow<unsigned short>(rhs.finish);
+}
+
+inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) noexcept {
+	start  = gsl::narrow<unsigned short>(rhs.start);
+	finish = gsl::narrow<unsigned short>(rhs.finish);
+
+	return *this;
+}
+
+inline SATCON& SATCON::operator=(const SATCONOUT& rhs) noexcept {
+	start = rhs.start;
+	finish = rhs.finish;
+
+	return *this;
+}
+
+class FANGCLPOUT;
+
+class FANGCLP
+{
+public:
 	float   angle;
 	fPOINT* clip;
 	SATCON  guide;
-} FANGCLP;
 
-typedef union _flencnt {
+	inline FANGCLP& operator=(const FANGCLPOUT& rhs) noexcept;
+};
+
+class FANGCLPOUT
+{
+public:
+	float     angle;
+	fPOINT*   clip;
+	SATCONOUT guide;
+
+	FANGCLPOUT() noexcept;
+	FANGCLPOUT(const FANGCLP& rhs);
+	~FANGCLPOUT(){};
+	inline FANGCLPOUT& operator=(const FANGCLP& rhs) noexcept;
+};
+
+inline FANGCLPOUT::FANGCLPOUT() noexcept {
+	angle = 0.0;
+	clip  = nullptr;
+	guide = { 0, 0 };
+}
+
+inline FANGCLPOUT::FANGCLPOUT(const FANGCLP& rhs) {
+	angle = rhs.angle;
+	clip  = rhs.clip;
+	guide = rhs.guide;
+}
+
+inline FANGCLPOUT& FANGCLPOUT::operator=(const FANGCLP& rhs) noexcept {
+	angle = rhs.angle;
+	clip  = rhs.clip;
+	guide = rhs.guide;
+
+	return *this;
+}
+
+inline FANGCLP& FANGCLP::operator=(const FANGCLPOUT& rhs) noexcept {
+	angle = rhs.angle;
+	clip  = rhs.clip;
+	guide = rhs.guide;
+
+	return *this;
+}
+
+class FLENCNTOUT;
+
+class FLENCNT
+{
+public:
+	float  stitchLength;
+	size_t clipCount;
+
+	inline FLENCNT& operator=(const FLENCNTOUT& rhs);
+};
+
+class FLENCNTOUT
+{
+public:
 	float    stitchLength;
 	unsigned clipCount;
-} FLENCNT;
 
-typedef union _satinOrAngle {
+	FLENCNTOUT() noexcept;
+	FLENCNTOUT(const FLENCNT& rhs);
+	~FLENCNTOUT(){};
+	inline FLENCNTOUT& operator=(const FLENCNT& rhs);
+};
+
+inline FLENCNTOUT::FLENCNTOUT() noexcept {
+	stitchLength = 0.0;
+	clipCount    = 0u;
+}
+
+inline FLENCNTOUT::FLENCNTOUT(const FLENCNT& rhs) {
+	stitchLength = rhs.stitchLength;
+	clipCount    = gsl::narrow<unsigned>(rhs.clipCount);
+}
+
+inline FLENCNTOUT& FLENCNTOUT::operator=(const FLENCNT& rhs) {
+	stitchLength = rhs.stitchLength;
+	clipCount    = gsl::narrow<unsigned>(rhs.clipCount);
+
+	return *this;
+}
+
+inline FLENCNT& FLENCNT::operator=(const FLENCNTOUT& rhs) {
+	stitchLength = rhs.stitchLength;
+	clipCount    = rhs.clipCount;
+
+	return *this;
+}
+
+class SATINANGLE
+{
+public:
 	SATCON* guide;
 	float   angle;
-} SATINANGLE;
+};
 
 /*
     fill	edgeStitchLen	edgeSpacing	borderSize	clipCount	picspac		crnrsiz		brdend
@@ -1138,20 +1272,22 @@ public:
 	unsigned short res;             // pico length
 };
 
+class FRMHEDOUT;
+
 class FRMHED
 {
 public:
 	unsigned char  attribute;       // attribute
-	unsigned short vertexCount;     // number of sides
+	size_t         vertexCount;     // number of sides
 	unsigned char  type;            // type
 	unsigned char  fillColor;       // fill color
 	unsigned char  borderColor;     // border color
-	unsigned short clipEntries;     // number of border clipboard entries
+	size_t         clipEntries;     // number of border clipboard entries
 	fPOINT*        vertices;        // points
 	SATINANGLE     satinOrAngle;    // satin guidlines or angle clipboard fill angle
 	fPOINT*        borderClipData;  // border clipboard data
-	unsigned short satinGuideCount; // number of satin guidlines
-	unsigned short wordParam;       // clipboard/textured fill phase or satin end guide
+	size_t         satinGuideCount; // number of satin guidlines
+	size_t         wordParam;       // clipboard/textured fill phase or satin end guide
 	fRECTANGLE     rectangle;       // rectangle
 	unsigned char  fillType;        // fill type
 	unsigned char  edgeType;        // edge type
@@ -1163,23 +1299,24 @@ public:
 	float          edgeStitchLen;   // edge stitch length
 	unsigned short picoLength;      // pico length
 
-	unsigned       extendedAttribute;   // attribute extension
-	float          maxFillStitchLen;    // maximum fill stitch length
-	float          minFillStitchLen;    // minimum fill stitch length
-	float          maxBorderStitchLen;  // maximum border stitch length
-	float          minBorderStitchLen;  // minimum border stitch length
-	TFINFO         fillInfo;            // feather/texture info
-	unsigned short fillStart;           // fill start point
-	unsigned short fillEnd;             // fill end point
-	float          underlaySpacing;     // underlay spacing
-	float          underlayStitchLen;   // underlay stitch length
-	float          underlayStitchAngle; // underlay stitch angle
-	float          underlayIndent;      // underlay/edge walk indent
-	float          txof;                // gradient end density
-	unsigned char  underlayColor;       // underlay color
-	unsigned char  cres;                // reserved
+	unsigned      extendedAttribute;   // attribute extension
+	float         maxFillStitchLen;    // maximum fill stitch length
+	float         minFillStitchLen;    // minimum fill stitch length
+	float         maxBorderStitchLen;  // maximum border stitch length
+	float         minBorderStitchLen;  // minimum border stitch length
+	TFINFO        fillInfo;            // feather/texture info
+	size_t        fillStart;           // fill start point
+	size_t        fillEnd;             // fill end point
+	float         underlaySpacing;     // underlay spacing
+	float         underlayStitchLen;   // underlay stitch length
+	float         underlayStitchAngle; // underlay stitch angle
+	float         underlayIndent;      // underlay/edge walk indent
+	float         txof;                // gradient end density
+	unsigned char underlayColor;       // underlay color
+	unsigned char cres;                // reserved
 
 	inline FRMHED& operator=(const FRMHEDO& rhs) noexcept;
+	inline FRMHED& operator=(const FRMHEDOUT& rhs) noexcept;
 };
 
 inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
@@ -1204,6 +1341,181 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 	edgeSpacing     = rhs.edgeSpacing;
 	edgeStitchLen   = rhs.edgeStitchLen;
 	picoLength      = rhs.res;
+	return *this;
+}
+
+class FRMHEDOUT
+{
+public:
+	unsigned char  attribute;       // attribute
+	unsigned short vertexCount;     // number of sides
+	unsigned char  type;            // type
+	unsigned char  fillColor;       // fill color
+	unsigned char  borderColor;     // border color
+	unsigned short clipEntries;     // number of border clipboard entries
+	fPOINT*        vertices;        // points
+	SATINANGLE     satinOrAngle;    // satin guidlines or angle clipboard fill angle
+	fPOINT*        borderClipData;  // border clipboard data
+	unsigned short satinGuideCount; // number of satin guidlines
+	unsigned short wordParam;       // clipboard/textured fill phase or satin end guide
+	fRECTANGLE     rectangle;       // rectangle
+	unsigned char  fillType;        // fill type
+	unsigned char  edgeType;        // edge type
+	float          fillSpacing;     // fill spacing
+	FLENCNTOUT     lengthOrCount;   // fill stitch length or clipboard count
+	FANGCLPOUT     angleOrClipData; // fill angle or clipboard data pointer
+	float          borderSize;      // border size
+	float          edgeSpacing;     // edge spacing
+	float          edgeStitchLen;   // edge stitch length
+	unsigned short picoLength;      // pico length
+
+	unsigned       extendedAttribute;   // attribute extension
+	float          maxFillStitchLen;    // maximum fill stitch length
+	float          minFillStitchLen;    // minimum fill stitch length
+	float          maxBorderStitchLen;  // maximum border stitch length
+	float          minBorderStitchLen;  // minimum border stitch length
+	TFINFO         fillInfo;            // feather/texture info
+	unsigned short fillStart;           // fill start point
+	unsigned short fillEnd;             // fill end point
+	float          underlaySpacing;     // underlay spacing
+	float          underlayStitchLen;   // underlay stitch length
+	float          underlayStitchAngle; // underlay stitch angle
+	float          underlayIndent;      // underlay/edge walk indent
+	float          txof;                // gradient end density
+	unsigned char  underlayColor;       // underlay color
+	unsigned char  cres;                // reserved
+
+	FRMHEDOUT();
+	inline FRMHEDOUT(const FRMHED& rhs);
+	~FRMHEDOUT(){};
+
+	inline FRMHEDOUT& operator=(const FRMHED& rhs) noexcept;
+};
+
+inline FRMHEDOUT::FRMHEDOUT() {
+}
+
+inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
+	attribute       = rhs.attribute;
+	vertexCount     = gsl::narrow<unsigned short>(rhs.vertexCount);
+	type            = rhs.type;
+	fillColor       = rhs.fillColor;
+	borderColor     = rhs.borderColor;
+	clipEntries     = gsl::narrow<unsigned short>(rhs.clipEntries);
+	vertices        = rhs.vertices;
+	satinOrAngle    = rhs.satinOrAngle;
+	borderClipData  = rhs.borderClipData;
+	satinGuideCount = gsl::narrow<unsigned short>(rhs.satinGuideCount);
+	wordParam       = gsl::narrow<unsigned short>(rhs.wordParam);
+	rectangle       = rhs.rectangle;
+	fillType        = rhs.fillType;
+	edgeType        = rhs.edgeType;
+	fillSpacing     = rhs.fillSpacing;
+	lengthOrCount   = rhs.lengthOrCount;
+	angleOrClipData = rhs.angleOrClipData;
+	borderSize      = rhs.borderSize;
+	edgeSpacing     = rhs.edgeSpacing;
+	edgeStitchLen   = rhs.edgeStitchLen;
+	picoLength      = rhs.picoLength;
+
+	extendedAttribute   = rhs.extendedAttribute;
+	maxFillStitchLen    = rhs.maxFillStitchLen;
+	minFillStitchLen    = rhs.minFillStitchLen;
+	maxBorderStitchLen  = rhs.maxBorderStitchLen;
+	minBorderStitchLen  = rhs.minBorderStitchLen;
+	fillInfo            = rhs.fillInfo;
+	fillStart           = gsl::narrow<unsigned short>(rhs.fillStart);
+	fillEnd             = gsl::narrow<unsigned short>(rhs.fillEnd);
+	underlaySpacing     = rhs.underlaySpacing;
+	underlayStitchLen   = rhs.underlayStitchLen;
+	underlayStitchAngle = rhs.underlayStitchAngle;
+	underlayIndent      = rhs.underlayIndent;
+	txof                = rhs.txof;
+	underlayColor       = rhs.underlayColor;
+	cres                = rhs.cres;
+}
+
+inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) noexcept {
+	attribute       = rhs.attribute;
+	vertexCount     = gsl::narrow<unsigned short>(rhs.vertexCount);
+	type            = rhs.type;
+	fillColor       = rhs.fillColor;
+	borderColor     = rhs.borderColor;
+	clipEntries     = gsl::narrow<unsigned short>(rhs.clipEntries);
+	vertices        = rhs.vertices;
+	satinOrAngle    = rhs.satinOrAngle;
+	borderClipData  = rhs.borderClipData;
+	satinGuideCount = gsl::narrow<unsigned short>(rhs.satinGuideCount);
+	wordParam       = gsl::narrow<unsigned short>(rhs.wordParam);
+	rectangle       = rhs.rectangle;
+	fillType        = rhs.fillType;
+	edgeType        = rhs.edgeType;
+	fillSpacing     = rhs.fillSpacing;
+	lengthOrCount   = rhs.lengthOrCount;
+	angleOrClipData = rhs.angleOrClipData;
+	borderSize      = rhs.borderSize;
+	edgeSpacing     = rhs.edgeSpacing;
+	edgeStitchLen   = rhs.edgeStitchLen;
+	picoLength      = rhs.picoLength;
+
+	extendedAttribute   = rhs.extendedAttribute;
+	maxFillStitchLen    = rhs.maxFillStitchLen;
+	minFillStitchLen    = rhs.minFillStitchLen;
+	maxBorderStitchLen  = rhs.maxBorderStitchLen;
+	minBorderStitchLen  = rhs.minBorderStitchLen;
+	fillInfo            = rhs.fillInfo;
+	fillStart           = gsl::narrow<unsigned short>(rhs.fillStart);
+	fillEnd             = gsl::narrow<unsigned short>(rhs.fillEnd);
+	underlaySpacing     = rhs.underlaySpacing;
+	underlayStitchLen   = rhs.underlayStitchLen;
+	underlayStitchAngle = rhs.underlayStitchAngle;
+	underlayIndent      = rhs.underlayIndent;
+	txof                = rhs.txof;
+	underlayColor       = rhs.underlayColor;
+	cres                = rhs.cres;
+
+	return *this;
+}
+
+inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
+	attribute       = rhs.attribute;
+	vertexCount     = rhs.vertexCount;
+	type            = rhs.type;
+	fillColor       = rhs.fillColor;
+	borderColor     = rhs.borderColor;
+	clipEntries     = rhs.clipEntries;
+	vertices        = rhs.vertices;
+	satinOrAngle    = rhs.satinOrAngle;
+	borderClipData  = rhs.borderClipData;
+	satinGuideCount = rhs.satinGuideCount;
+	wordParam       = rhs.wordParam;
+	rectangle       = rhs.rectangle;
+	fillType        = rhs.fillType;
+	edgeType        = rhs.edgeType;
+	fillSpacing     = rhs.fillSpacing;
+	lengthOrCount   = rhs.lengthOrCount;
+	angleOrClipData = rhs.angleOrClipData;
+	borderSize      = rhs.borderSize;
+	edgeSpacing     = rhs.edgeSpacing;
+	edgeStitchLen   = rhs.edgeStitchLen;
+	picoLength      = rhs.picoLength;
+
+	extendedAttribute   = rhs.extendedAttribute;
+	maxFillStitchLen    = rhs.maxFillStitchLen;
+	minFillStitchLen    = rhs.minFillStitchLen;
+	maxBorderStitchLen  = rhs.maxBorderStitchLen;
+	minBorderStitchLen  = rhs.minBorderStitchLen;
+	fillInfo            = rhs.fillInfo;
+	fillStart           = rhs.fillStart;
+	fillEnd             = rhs.fillEnd;
+	underlaySpacing     = rhs.underlaySpacing;
+	underlayStitchLen   = rhs.underlayStitchLen;
+	underlayStitchAngle = rhs.underlayStitchAngle;
+	underlayIndent      = rhs.underlayIndent;
+	txof                = rhs.txof;
+	underlayColor       = rhs.underlayColor;
+	cres                = rhs.cres;
+
 	return *this;
 }
 
@@ -1256,9 +1568,9 @@ typedef struct _frmsclp {
 } FORMSCLIP; // multiple forms clipboard header
 
 typedef struct _fvclip {
-	unsigned       clipType;
-	unsigned short vertexCount;
-	bool           direction;
+	unsigned clipType;
+	size_t   vertexCount;
+	bool     direction;
 } FORMVERTEXCLIP; // form points clipboard header
 
 typedef struct _strhed { // thred file header
@@ -1351,7 +1663,7 @@ typedef struct _pcstch {
 } PCSTCH;
 
 typedef struct _clpstch {
-	unsigned short led;  // ????
+	size_t         led;  // ????
 	unsigned char  fx;   // fractional part of x coord
 	unsigned short x;    // integer part of x coord
 	unsigned char  spcx; // ToDo - Is this structure member needed?
@@ -1363,19 +1675,19 @@ typedef struct _clpstch {
 } CLPSTCH;
 
 typedef struct _bakhed {
-	unsigned    formCount;
+	size_t      formCount;
 	FRMHED*     forms;
 	unsigned    stitchCount;
 	fPOINTATTR* stitches;
-	unsigned    vertexCount;
+	size_t      vertexCount;
 	fPOINT*     vertices;
-	unsigned    guideCount;
+	size_t      guideCount;
 	SATCON*     guide;
-	unsigned    clipPointCount;
+	size_t      clipPointCount;
 	fPOINT*     clipPoints;
 	COLORREF*   colors;
 	TXPNT*      texturePoints;
-	unsigned    texturePointCount;
+	size_t      texturePointCount;
 	POINT       zoomRect;
 } BAKHED;
 
@@ -1383,6 +1695,11 @@ typedef struct _flsiz {
 	float cx;
 	float cy;
 } FLSIZ;
+
+typedef struct _frmrange {
+	size_t start;
+	size_t finish;
+} FRMRANGE;
 
 typedef struct _range {
 	unsigned start;
@@ -1463,28 +1780,28 @@ typedef struct _balstch {
 } BALSTCH;
 
 typedef struct _clpseg {
-	unsigned       start;
-	float          beginLength;
-	unsigned       beginIndex;
-	unsigned short asid;
-	unsigned       finish;
-	float          endLength;
-	unsigned       endIndex;
-	unsigned short zsid;
-	char           dun;
+	unsigned start;
+	float    beginLength;
+	unsigned beginIndex;
+	size_t   asid;
+	unsigned finish;
+	float    endLength;
+	unsigned endIndex;
+	size_t   zsid;
+	char     dun;
 } CLPSEG;
 
 typedef struct _clipsort {
-	float    segmentLength;
-	float    sideLength;
-	unsigned vertexIndex;
-	fPOINT   point;
+	float  segmentLength;
+	float  sideLength;
+	size_t vertexIndex;
+	fPOINT point;
 } CLIPSORT;
 
 typedef struct _clipnt {
 	float    x;
 	float    y;
-	unsigned vertexIndex;
+	size_t   vertexIndex;
 	unsigned flag;
 } CLIPNT;
 
@@ -1893,7 +2210,7 @@ enum
 typedef struct _intinf {
 	unsigned    pins;
 	unsigned    coloc;
-	unsigned    layerIndex;
+	size_t      layerIndex;
 	unsigned    start;
 	unsigned    output;
 	fPOINTATTR* highStitchBuffer;
@@ -1931,7 +2248,7 @@ typedef struct _txhst {
 
 typedef struct _txhstbuff {
 	unsigned* placeholder;
-	unsigned  count;
+	size_t    count;
 	float     height;
 	float     width;
 	float     spacing;
@@ -1949,10 +2266,10 @@ typedef struct _rngcnt {
 
 typedef struct _badcnts {
 	unsigned attribute;
-	int      flt;
-	int      clip;
-	int      guideCount; // ToDo - is this an accurate description?
-	int      tx;
+	size_t   flt;
+	size_t   clip;
+	size_t   guideCount; // ToDo - is this an accurate description?
+	size_t   tx;
 } BADCNTS;
 
 typedef struct _findInfo {

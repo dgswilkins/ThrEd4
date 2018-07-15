@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "wrappers.h"
 #include "Resources/resource.h"
 #include "thred.h"
 
@@ -15,9 +16,9 @@ extern void shoMsg(const std::wstring& message);
 extern unsigned               ButtonHeight;
 extern unsigned               ButtonWidthX3;
 extern std::vector<HWND>*     ButtonWin;
-extern unsigned               ClosestFormToCursor;
+extern size_t               ClosestFormToCursor;
 extern DRAWITEMSTRUCT*        DrawItem;
-extern unsigned               FormIndex;
+extern size_t               FormIndex;
 extern FRMHED                 FormList[MAXFORMS];
 extern fs::path*              HomeDirectory;
 extern INIFILE                IniFile;
@@ -29,7 +30,7 @@ extern PCSHEADER              PCSHeader;
 extern long                   PreferenceWindowWidth;
 extern RECT                   scRct;
 extern FRMHED*                SelectedForm;
-extern std::vector<unsigned>* SelectedFormList;
+extern std::vector<size_t>* SelectedFormList;
 extern EnumMap<StateFlag>     StateMap;
 extern HDC                    StitchWindowMemDC;
 extern HINSTANCE              ThrEdInstance;
@@ -76,7 +77,7 @@ inline void loadString(std::wstring& sDest, unsigned stringID) {
 	}
 }
 
-void adbad(std::wstring& repairMessage, unsigned code, unsigned count) {
+void adbad(std::wstring& repairMessage, unsigned code, size_t count) {
 	std::wstring fmtStr;
 
 	loadString(fmtStr, code);
@@ -147,7 +148,7 @@ void butxt(unsigned iButton, const std::wstring& buttonText) {
 		SetWindowText((*ButtonWin)[iButton], buttonText.c_str());
 }
 
-void ritnum(unsigned code, unsigned value) {
+void ritnum(unsigned code, size_t value) {
 	butxt(HNUM, fmt::format((*StringTable)[code], value));
 }
 
@@ -181,13 +182,13 @@ void shoMsg(const std::wstring& message) {
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
 		textSize.cx = textSize.cy = messageSize.cy = messageSize.cx = 0;
 		for (index = 0; index < strings.size(); index++) {
-			GetTextExtentPoint32(StitchWindowMemDC, strings[index].c_str(), strings[index].size(), &textSize);
+			GetTextExtentPoint32Int(StitchWindowMemDC, strings[index].c_str(), strings[index].size(), &textSize);
 			if (textSize.cx > messageSize.cx)
 				messageSize.cx = textSize.cx;
 			if (textSize.cy > messageSize.cy)
 				messageSize.cy = textSize.cy;
 		}
-		messageSize.cy *= strings.size();
+		messageSize.cy *= gsl::narrow<LONG>(strings.size());
 		if (StateMap.testAndReset(StateFlag::MSGOF))
 			offset = PreferenceWindowWidth + 6;
 		else

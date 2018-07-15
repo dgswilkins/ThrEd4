@@ -1,11 +1,13 @@
 #include "stdafx.h"
 
+#include "wrappers.h"
+
 #include "Resources/resource.h"
 #include "thred.h"
 
-extern fPOINT*              adclp(unsigned count);
-extern fPOINT*              adflt(unsigned count);
-extern SATCON*              adsatk(unsigned count);
+extern fPOINT*              adclp(size_t count);
+extern fPOINT*              adflt(size_t count);
+extern SATCON*              adsatk(size_t count);
 extern void                 alrotmsg();
 extern void                 angrct(fRECTANGLE& rectangle);
 extern void                 centr();
@@ -30,13 +32,13 @@ extern void                 grpAdj();
 extern void                 insadj();
 extern std::vector<fPOINT>& insid();
 extern void        intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsigned interleaveSequenceIndex2);
-extern bool        isclp(unsigned find);
-extern bool        isclpx(unsigned find);
+extern bool        isclp(size_t find);
+extern bool        isclpx(size_t find);
 extern bool        isfclp();
-extern bool        istx(unsigned find);
+extern bool        istx(size_t find);
 extern inline void loadString(std::wstring& sDest, unsigned stringID);
 extern void        movStch();
-extern void        mvstch(unsigned destination, unsigned source);
+extern void        mvstch(size_t destination, size_t source);
 extern void        mvstchs(unsigned destination, unsigned source, unsigned count);
 extern void        numWnd();
 extern void        nuRct();
@@ -47,7 +49,7 @@ extern void        redclp();
 extern void        redraw(HWND window);
 extern void        ritfcor(const fPOINT& point);
 extern void        ritmov();
-extern void        ritnum(unsigned code, unsigned value);
+extern void        ritnum(unsigned code, size_t value);
 extern void        ritot(unsigned number);
 extern void        rngadj();
 extern void
@@ -97,7 +99,7 @@ extern HGLOBAL                    ClipMemory;
 extern void*                      ClipPointer;
 extern fRECTANGLE                 ClipRect;
 extern FLSIZ                      ClipRectSize;
-extern unsigned                   ClipStitchCount;
+extern size_t                     ClipStitchCount;
 extern CLPSTCH*                   ClipStitchData;
 extern unsigned                   ClosestPointIndex;
 extern HCURSOR                    CrossCursor;
@@ -118,7 +120,7 @@ extern POINT                      InsertLine[3];
 extern fPOINT                     InterleaveSequence[MAXITEMS];
 extern unsigned                   InterleaveSequenceIndex;
 extern INSREC                     InterleaveSequenceIndices[10];
-extern bool                       iseclp(unsigned find);
+extern bool                       iseclp(size_t find);
 extern HPEN                       LayerPen[5];
 extern HMENU                      MainMenu;
 extern HWND                       MainStitchWin;
@@ -160,7 +162,7 @@ extern HDC                        StitchWindowMemDC;
 extern POINT                      StitchWindowOrigin;
 extern POINT                      StitchWindowSize;
 extern std::vector<std::wstring>* StringTable;
-extern int                        TextureIndex;
+extern size_t                     TextureIndex;
 extern std::vector<TXPNT>*        TexturePointsBuffer;
 extern HINSTANCE                  ThrEdInstance;
 extern HWND                       ThrEdWindow;
@@ -174,119 +176,119 @@ extern dPOINT                     ZoomMarkPoint;
 extern dPOINT                     ZoomRatio;
 extern dRECTANGLE                 ZoomRect;
 
-unsigned               ActivePointIndex;                 // pointer to the active form in the sequencing algorithm
-double                 AdjustedSpace;                    // adjusted space
-fRECTANGLE             AllItemsRect;                     // rectangle enclosing all forms and stitches
-FRMHED                 AngledForm;                       // a temporary rotated form for angle fills
-fPOINT                 AngledFormVertices[MAXFRMLINS];   // form formOrigin data for angle fills
-BSEQPNT                BSequence[BSEQLEN];               // reverse sequence for polygon fills
-unsigned               BeanCount;                        // number of stitches added by convert to bean
-fPOINT                 BorderClipReference;              // reference for clipboard line border
-double                 BorderWidth = BRDWID;             // border width for satin borders
-fRECTANGLE             BoundingRect;                     // isin rectangle
-float                  ButtonholeCornerLength = IBFCLEN; // buttonhole corner length
-unsigned short         ClipIntersectSide;                // clipboard intersect side;
-unsigned               ClipPointIndex;                   // next index to append main clipboard points
-fPOINT                 ClipPoints[MAXITEMS];             // main clipboard fill points for forms
-fPOINT                 ClipReference;                    // clipboard reference formOrigin
-float                  ClipWidth;                        // horizontal spacing for vertical clipboard fill
-unsigned               ClosestFormToCursor;              // closest form to the cursor
-unsigned               ClosestVertexToCursor;            // formOrigin closest to the cursor
-fPOINT*                CurrentFillVertices;              // pointer to the line of the polygon being filled
-SATCON*                CurrentFormGuides;                // connections in the currently selecteed form
-unsigned short         CurrentFormGuidesCount;           // number of connections in the currently selected form
-fPOINT*                CurrentFormVertices;              // points in the currently selected form
-REGION*                CurrentRegion;                    // region currently being sequenced
-unsigned               CurrentSide;                      // active form formOrigin for line clipboard fill
-double                 Div4;                             // chain space divided by four
-unsigned               DoneRegion;                       // last region sequenced
-double                 EggRatio;                         // ratio for shrinking eggs
-std::vector<double>*   FormAngles;                       // angles of a form for satin border fills
-std::vector<POINT>*    FormControlPoints;                // form control rectangle in pixel coordinates
-FRMHED*                FormForInsert;                    // insert form vertex in this form
-unsigned               FormIndex = 0;                    // index into the list of forms
-FORMINFO               FormInfo;                         // form info used in drawing forms
-POINT                  FormLines[MAXFRMLINS];            // used in the form drawing routines
-FRMHED                 FormList[MAXFORMS];               // a list of form headers
-unsigned               FormMenuEntryCount;               // lines in the form-form
-fPOINT                 FormMoveDelta;                    // offset for moving forms
-FLOAT                  FormOffset;                       // form offset for clipboard fills
-std::wstring*          FormOnOff;
-unsigned               FormRelocationIndex;             // form relocator pointer
-unsigned               FormVertexIndex;                 // next index to append form points
-unsigned               FormVertexNext;                  // form vertex storage for form vertex insert
-unsigned               FormVertexPrev;                  // form vertex storage for form vertex insert
-fPOINT                 FormVertices[MAXITEMS];          // form points
-double                 GapToClosestRegion;              // region close enough threshold for sequencing
-unsigned               GroupIndexCount;                 // number of group indices
-double                 HorizontalLength2;               // horizontal length of a clipboard fill/2
-double                 HorizontalLength;                // horizontal length of a clipboard fill
-double                 HorizontalRatio;                 // horizontal ratio between the zoom window and the entire stitch space
-unsigned               InOutFlag;                       // is intersection of line and cursor before, in or after the line
-std::vector<fPOINT>*   InsidePointList;                 // list of inside outline points for satin or clipboard fills
-std::vector<fPOINT>*   InsidePoints;                    // pointer to the list of inside outline points
-std::vector<HWND>*     LabelWindow;                     // text handles for the form data sheet
-RECT                   LabelWindowCoords;               // location of left windows in the form data sheet
-POINT                  LabelWindowSize;                 // size of the left windows in the form data sheet
-unsigned               LastGroup;                       // group of the last line written in the previous region;
-fPOINT                 LastPoint;                       // last formOrigin written by line connect routine
-double*                Lengths;                         // array of cumulative lengths used in satin fills
-unsigned               LineGroupIndex;                  // pointer for groups of fill line segments
-fPOINT                 LineSegmentEnd;                  // vertical clipboard line segment end
-fPOINT                 LineSegmentStart;                // vertical clipboard line segment start
-double                 LineSpacing = DEFSPACE * PFGRAN; // stitch spacing in stitch units
-fPOINT                 LowerLeftStitch;                 // lower left formOrigin in a form
-float                  MaxStitchLen;                    // maximum stitch length
-MENUITEMINFO*          MenuInfo;
-unsigned               NewFormVertexCount;           // points in the new form
-unsigned               NextGroup;                    // group that connects to the next region
-unsigned               NextStart;                    // index of the endpoint of the line segment being processed
-fPOINT                 OSequence[OSEQLEN];           // temporary storage for sequencing
-unsigned               OutputIndex;                  // output pointer for sequencing
-std::vector<fPOINT>*   OutsidePointList;             // list of outside outline points for satin or clipboard fills
-std::vector<fPOINT>*   OutsidePoints;                // pointer to the list of outside outline points
-unsigned               PathIndex;                    // formOrigin to the next path element for vertical fill sequencing
-unsigned               PathMapIndex;                 // number of entries in the path map
-float                  PicotSpacing = IPICSPAC;      // space between border picots
-unsigned               PreferenceWindowTextWidth;    // size of the text part of the preference window
-long                   PreferenceWindowWidth;        // width of the preference window
-unsigned               PreviousFormIndex;            // previously selected form
-unsigned               PseudoRandomValue;            // pseudo-random sequence register
-unsigned               RegionCount;                  // number of regions to be sequenced
-RGSEQ*                 RegionPath;                   // path to a region
-std::vector<POINT>*    RubberBandLine;               // points to form points to be moved
-unsigned               SatinBackupIndex;             // pointer for backup stitches in satin fills
-unsigned short         SatinEndGuide;                // satin end guide for the currently selected form
-unsigned               SatinGuideIndex;              // next index to append satin connect points
-SATCON                 SatinGuides[MAXSAC];          // satin form connects
-unsigned               SatinIndex;                   // pointer to next satin formOrigin to enter
-unsigned               SelectedFormControlVertex;    // user selected form control formOrigin
-std::vector<unsigned>* SelectedFormList;             // a list of selected forms
-std::vector<POINT>*    SelectedFormsLine;            // line derived from the big rectangle
-RECT                   SelectedFormsRect;            // for multiple selections;
-std::vector<POINT>*    SelectedPointsLine;           // line derived from the formOrigin select rectangle
-unsigned               SequenceIndex;                // sequencing pointer
-SMALPNTL*              SequenceLines;                // line for vertical/horizontal/angle fills
-unsigned               SequencePathIndex;            // index to path of sequenced regions
-double                 Slope;                        // slope of line in angle fills
-double                 SnapLength = SNPLEN * PFGRAN; // snap together length
-double                 SpiralWrap = SPIRWRAP;        // number of revolutions in a spiral
-double                 StarRatio  = STARAT;          // star formOrigin to body ratio
-unsigned short         StartPoint;                   // starting formOrigin for a satin stitch guide-line
-unsigned               StitchLineCount;              // count of stitch lines
-std::vector<fPOINT>*   TempPolygon;                  // temporary storage when user is entering a polygon;
-HDC                    TimeDC;                       // progress bar device context
-double                 TimePosition;                 // progress bar postiion
-double                 TimeStep;                     // progress bar step
-HWND                   TimeWindow;                   // progress bar
-float                  UserStitchLen;                // user stitch length
-std::vector<HWND>*     ValueWindow;                  // data handles for the form data sheet
-RECT                   ValueWindowCoords;            // location of right windows in the form data sheet
-POINT                  ValueWindowSize;              // size of the right windows in the form data sheet
-unsigned               VertexCount;                  // sides of the selected form to fill
-double                 VerticalRatio;                // vertical ratio between the zoom window and the entire stitch space
-unsigned               VisitedIndex;                 // next unvisited region for sequencing
-fPOINT*                WorkingFormVertices;          // form points for angle fills
+unsigned             ActivePointIndex;                 // pointer to the active form in the sequencing algorithm
+double               AdjustedSpace;                    // adjusted space
+fRECTANGLE           AllItemsRect;                     // rectangle enclosing all forms and stitches
+FRMHED               AngledForm;                       // a temporary rotated form for angle fills
+fPOINT               AngledFormVertices[MAXFRMLINS];   // form formOrigin data for angle fills
+BSEQPNT              BSequence[BSEQLEN];               // reverse sequence for polygon fills
+unsigned             BeanCount;                        // number of stitches added by convert to bean
+fPOINT               BorderClipReference;              // reference for clipboard line border
+double               BorderWidth = BRDWID;             // border width for satin borders
+fRECTANGLE           BoundingRect;                     // isin rectangle
+float                ButtonholeCornerLength = IBFCLEN; // buttonhole corner length
+size_t               ClipIntersectSide;                // clipboard intersect side;
+size_t               ClipPointIndex;                   // next index to append main clipboard points
+fPOINT               ClipPoints[MAXITEMS];             // main clipboard fill points for forms
+fPOINT               ClipReference;                    // clipboard reference formOrigin
+float                ClipWidth;                        // horizontal spacing for vertical clipboard fill
+size_t               ClosestFormToCursor;              // closest form to the cursor
+size_t               ClosestVertexToCursor;            // formOrigin closest to the cursor
+fPOINT*              CurrentFillVertices;              // pointer to the line of the polygon being filled
+SATCON*              CurrentFormGuides;                // connections in the currently selecteed form
+size_t       CurrentFormGuidesCount;           // number of connections in the currently selected form
+fPOINT*              CurrentFormVertices;              // points in the currently selected form
+REGION*              CurrentRegion;                    // region currently being sequenced
+unsigned             CurrentSide;                      // active form formOrigin for line clipboard fill
+double               Div4;                             // chain space divided by four
+unsigned             DoneRegion;                       // last region sequenced
+double               EggRatio;                         // ratio for shrinking eggs
+std::vector<double>* FormAngles;                       // angles of a form for satin border fills
+std::vector<POINT>*  FormControlPoints;                // form control rectangle in pixel coordinates
+FRMHED*              FormForInsert;                    // insert form vertex in this form
+size_t               FormIndex = 0;                    // index into the list of forms
+FORMINFO             FormInfo;                         // form info used in drawing forms
+POINT                FormLines[MAXFRMLINS];            // used in the form drawing routines
+FRMHED               FormList[MAXFORMS];               // a list of form headers
+unsigned             FormMenuEntryCount;               // lines in the form-form
+fPOINT               FormMoveDelta;                    // offset for moving forms
+FLOAT                FormOffset;                       // form offset for clipboard fills
+std::wstring*        FormOnOff;
+unsigned             FormRelocationIndex;             // form relocator pointer
+size_t               FormVertexIndex;                 // next index to append form points
+size_t               FormVertexNext;                  // form vertex storage for form vertex insert
+size_t               FormVertexPrev;                  // form vertex storage for form vertex insert
+fPOINT               FormVertices[MAXITEMS];          // form points
+double               GapToClosestRegion;              // region close enough threshold for sequencing
+size_t               GroupIndexCount;                 // number of group indices
+double               HorizontalLength2;               // horizontal length of a clipboard fill/2
+double               HorizontalLength;                // horizontal length of a clipboard fill
+double               HorizontalRatio;                 // horizontal ratio between the zoom window and the entire stitch space
+unsigned             InOutFlag;                       // is intersection of line and cursor before, in or after the line
+std::vector<fPOINT>* InsidePointList;                 // list of inside outline points for satin or clipboard fills
+std::vector<fPOINT>* InsidePoints;                    // pointer to the list of inside outline points
+std::vector<HWND>*   LabelWindow;                     // text handles for the form data sheet
+RECT                 LabelWindowCoords;               // location of left windows in the form data sheet
+POINT                LabelWindowSize;                 // size of the left windows in the form data sheet
+unsigned             LastGroup;                       // group of the last line written in the previous region;
+fPOINT               LastPoint;                       // last formOrigin written by line connect routine
+double*              Lengths;                         // array of cumulative lengths used in satin fills
+unsigned             LineGroupIndex;                  // pointer for groups of fill line segments
+fPOINT               LineSegmentEnd;                  // vertical clipboard line segment end
+fPOINT               LineSegmentStart;                // vertical clipboard line segment start
+double               LineSpacing = DEFSPACE * PFGRAN; // stitch spacing in stitch units
+fPOINT               LowerLeftStitch;                 // lower left formOrigin in a form
+float                MaxStitchLen;                    // maximum stitch length
+MENUITEMINFO*        MenuInfo;
+size_t               NewFormVertexCount;           // points in the new form
+unsigned             NextGroup;                    // group that connects to the next region
+size_t               NextStart;                    // index of the endpoint of the line segment being processed
+fPOINT               OSequence[OSEQLEN];           // temporary storage for sequencing
+size_t               OutputIndex;                  // output pointer for sequencing
+std::vector<fPOINT>* OutsidePointList;             // list of outside outline points for satin or clipboard fills
+std::vector<fPOINT>* OutsidePoints;                // pointer to the list of outside outline points
+unsigned             PathIndex;                    // formOrigin to the next path element for vertical fill sequencing
+unsigned             PathMapIndex;                 // number of entries in the path map
+float                PicotSpacing = IPICSPAC;      // space between border picots
+unsigned             PreferenceWindowTextWidth;    // size of the text part of the preference window
+long                 PreferenceWindowWidth;        // width of the preference window
+size_t               PreviousFormIndex;            // previously selected form
+unsigned             PseudoRandomValue;            // pseudo-random sequence register
+unsigned             RegionCount;                  // number of regions to be sequenced
+RGSEQ*               RegionPath;                   // path to a region
+std::vector<POINT>*  RubberBandLine;               // points to form points to be moved
+unsigned             SatinBackupIndex;             // pointer for backup stitches in satin fills
+size_t               SatinEndGuide;                // satin end guide for the currently selected form
+size_t               SatinGuideIndex;              // next index to append satin connect points
+SATCON               SatinGuides[MAXSAC];          // satin form connects
+unsigned             SatinIndex;                   // pointer to next satin formOrigin to enter
+unsigned             SelectedFormControlVertex;    // user selected form control formOrigin
+std::vector<size_t>* SelectedFormList;             // a list of selected forms
+std::vector<POINT>*  SelectedFormsLine;            // line derived from the big rectangle
+RECT                 SelectedFormsRect;            // for multiple selections;
+std::vector<POINT>*  SelectedPointsLine;           // line derived from the formOrigin select rectangle
+size_t               SequenceIndex;                // sequencing pointer
+SMALPNTL*            SequenceLines;                // line for vertical/horizontal/angle fills
+unsigned             SequencePathIndex;            // index to path of sequenced regions
+double               Slope;                        // slope of line in angle fills
+double               SnapLength = SNPLEN * PFGRAN; // snap together length
+double               SpiralWrap = SPIRWRAP;        // number of revolutions in a spiral
+double               StarRatio  = STARAT;          // star formOrigin to body ratio
+size_t               StartPoint;                   // starting formOrigin for a satin stitch guide-line
+unsigned             StitchLineCount;              // count of stitch lines
+std::vector<fPOINT>* TempPolygon;                  // temporary storage when user is entering a polygon;
+HDC                  TimeDC;                       // progress bar device context
+double               TimePosition;                 // progress bar postiion
+double               TimeStep;                     // progress bar step
+HWND                 TimeWindow;                   // progress bar
+float                UserStitchLen;                // user stitch length
+std::vector<HWND>*   ValueWindow;                  // data handles for the form data sheet
+RECT                 ValueWindowCoords;            // location of right windows in the form data sheet
+POINT                ValueWindowSize;              // size of the right windows in the form data sheet
+size_t               VertexCount;                  // sides of the selected form to fill
+double               VerticalRatio;                // vertical ratio between the zoom window and the entire stitch space
+unsigned             VisitedIndex;                 // next unvisited region for sequencing
+fPOINT*              WorkingFormVertices;          // form points for angle fills
 
 unsigned short EdgeArray[]
     = { MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0 };
@@ -319,7 +321,7 @@ void frmclr(FRMHED* const destination) noexcept {
 void duinf(const FRMHED& formHeader) noexcept {
 	// Correct
 	FormInfo.type      = formHeader.attribute & 0xf;
-	FormInfo.attribute = (formHeader.attribute >> 4) & 0xf;
+	FormInfo.attribute = (formHeader.attribute >> FRMSHFT) & 0xf;
 	FormInfo.sideCount = formHeader.vertexCount;
 }
 
@@ -331,7 +333,7 @@ bool comp(const dPOINTLINE& point1, const dPOINTLINE& point2) noexcept {
 	return false;
 }
 
-void getfinfo(unsigned iForm) noexcept {
+void getfinfo(size_t iForm) noexcept {
 	duinf(FormList[iForm]);
 }
 
@@ -347,9 +349,8 @@ void dusqr() {
 }
 
 void sacspac(const SATCON* const startGuide, unsigned guideCount) noexcept {
-	int      iStartGuide = 0;
-	int      source = 0, destination = 0;
-	unsigned iForm = 0;
+	size_t   iStartGuide = 0;
+	size_t source = 0, destination = 0;
 
 	iStartGuide = satind(startGuide);
 	source      = SatinGuideIndex - 1;
@@ -357,17 +358,17 @@ void sacspac(const SATCON* const startGuide, unsigned guideCount) noexcept {
 	while (source >= iStartGuide) {
 		SatinGuides[destination--] = SatinGuides[source--];
 	}
-	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 		if (FormList[iForm].type == SAT)
 			FormList[iForm].satinOrAngle.guide += guideCount;
 	}
 	SatinGuideIndex += guideCount;
 }
 
-SATCON* nusac(unsigned formIndex, unsigned guideCount) noexcept {
-	unsigned iForm = 0, guideIndex = 0;
+SATCON* nusac(size_t formIndex, unsigned guideCount) noexcept {
+	size_t guideIndex = 0;
 
-	for (iForm = 0; iForm < formIndex; iForm++) {
+	for (size_t iForm = 0u; iForm < formIndex; iForm++) {
 		if (FormList[iForm].type == SAT)
 			guideIndex += FormList[iForm].satinGuideCount;
 	}
@@ -376,14 +377,14 @@ SATCON* nusac(unsigned formIndex, unsigned guideCount) noexcept {
 	return FormList[formIndex].satinOrAngle.guide;
 }
 
-bool iseclpx(unsigned iForm) {
+bool iseclpx(size_t iForm) {
 	if (iseclp(iForm) && FormList[iForm].clipEntries)
 		return 1;
 	return 0;
 }
 
-unsigned findclp(unsigned formIndex) {
-	unsigned iForm;
+size_t findclp(size_t formIndex) {
+	size_t iForm;
 
 	for (iForm = formIndex; iForm != 0; iForm--) {
 		if (iseclp(iForm - 1))
@@ -394,8 +395,8 @@ unsigned findclp(unsigned formIndex) {
 	return 0;
 }
 
-void clpsub(unsigned fpnt, unsigned cnt) {
-	unsigned iForm;
+void clpsub(size_t fpnt, size_t cnt) {
+	size_t iForm;
 
 	for (iForm = fpnt + 1; iForm < FormIndex; iForm++) {
 		if (isclpx(iForm))
@@ -405,8 +406,8 @@ void clpsub(unsigned fpnt, unsigned cnt) {
 	}
 }
 
-void delmclp(unsigned iForm) {
-	unsigned source = 0, destination = 0;
+void delmclp(size_t iForm) {
+	size_t source = 0, destination = 0;
 
 	if (ClipPointIndex) {
 		if (isclp(iForm)) {
@@ -427,8 +428,8 @@ void delmclp(unsigned iForm) {
 	}
 }
 
-void deleclp(unsigned iForm) {
-	unsigned source = 0, destination = 0;
+void deleclp(size_t iForm) {
+	size_t source = 0, destination = 0;
 
 	if (ClipPointIndex) {
 		if (iseclpx(iForm)) {
@@ -447,12 +448,12 @@ void deleclp(unsigned iForm) {
 	}
 }
 
-void delclps(unsigned iForm) {
+void delclps(size_t iForm) {
 	deleclp(iForm);
 	delmclp(iForm);
 }
 
-bool chkmax(unsigned arg0, unsigned arg1) noexcept {
+bool chkmax(size_t arg0, size_t arg1) noexcept {
 	if (arg0 & MAXMSK)
 		return 1;
 	if (arg1 & MAXMSK)
@@ -462,22 +463,21 @@ bool chkmax(unsigned arg0, unsigned arg1) noexcept {
 	return 0;
 }
 
-fPOINT* nueclp(unsigned currentForm, unsigned count) {
-	int      find        = findclp(ClosestFormToCursor);
-	int      source      = ClipPointIndex - 1;
-	int      destination = ClipPointIndex + count - 1;
-	unsigned iform       = currentForm;
+fPOINT* nueclp(size_t currentForm, size_t count) {
+	size_t find        = findclp(ClosestFormToCursor);
+	size_t source      = ClipPointIndex - 1;
+	size_t destination = ClipPointIndex + count - 1;
 
 	if (isclp(ClosestFormToCursor))
 		find += FormList[ClosestFormToCursor].lengthOrCount.clipCount;
 	while (source >= find) {
 		ClipPoints[destination--] = ClipPoints[source--];
 	}
-	for (iform = currentForm; iform < FormIndex; iform++) {
+	for (auto iform = currentForm; iform < FormIndex; iform++) {
 		if (iseclpx(iform))
 			FormList[iform].borderClipData += count;
 	}
-	for (iform = currentForm + 1; iform < FormIndex; iform++) {
+	for (auto iform = currentForm + 1; iform < FormIndex; iform++) {
 		if (isclp(iform))
 			FormList[iform].angleOrClipData.clip += count;
 	}
@@ -486,10 +486,10 @@ fPOINT* nueclp(unsigned currentForm, unsigned count) {
 }
 
 fPOINT* numclp() {
-	int      find        = findclp(ClosestFormToCursor);
-	int      source      = ClipPointIndex - 1;
-	int      destination = ClipPointIndex + ClipStitchCount - 1;
-	unsigned iForm       = ClosestFormToCursor + 1;
+	size_t find        = findclp(ClosestFormToCursor);
+	size_t source      = ClipPointIndex - 1;
+	size_t destination = ClipPointIndex + ClipStitchCount - 1;
+	size_t iForm       = ClosestFormToCursor + 1;
 
 	while (source >= find) {
 		ClipPoints[destination--] = ClipPoints[source--];
@@ -515,11 +515,11 @@ unsigned clpind(const fPOINT* const point) noexcept {
 	return point - ClipPoints;
 }
 
-void fltspac(const fPOINT* const start, unsigned count) noexcept {
-	const int startIndex  = fltind(start);
-	int       source      = FormVertexIndex - 1;
-	int       destination = FormVertexIndex + count - 1;
-	unsigned  iForm       = ClosestFormToCursor + 1;
+void fltspac(const fPOINT* const start, size_t count) noexcept {
+	const unsigned int startIndex  = fltind(start);
+	size_t    source      = FormVertexIndex - 1;
+	size_t    destination = FormVertexIndex + count - 1;
+	size_t    iForm       = ClosestFormToCursor + 1;
 
 	while (source >= startIndex) {
 		FormVertices[destination--] = FormVertices[source--];
@@ -529,9 +529,9 @@ void fltspac(const fPOINT* const start, unsigned count) noexcept {
 	FormVertexIndex += count;
 }
 
-void delsac(unsigned formIndex) noexcept {
-	unsigned iForm  = 0;
-	unsigned source = 0, destination = 0;
+void delsac(size_t formIndex) noexcept {
+	size_t   iForm  = 0;
+	size_t source = 0, destination = 0;
 
 	if (SatinGuideIndex) {
 		if (FormList[formIndex].type == SAT && FormList[formIndex].satinGuideCount) {
@@ -550,9 +550,8 @@ void delsac(unsigned formIndex) noexcept {
 	FormList[formIndex].satinGuideCount = 0;
 }
 
-void delflt(unsigned formIndex) noexcept {
-	unsigned iForm  = 0;
-	unsigned source = 0, destination = 0;
+void delflt(size_t formIndex) noexcept {
+	size_t source = 0, destination = 0;
 
 	if (FormList[formIndex].vertexCount) {
 		destination = fltind(FormList[formIndex].vertices);
@@ -560,7 +559,7 @@ void delflt(unsigned formIndex) noexcept {
 		while (source < FormVertexIndex) {
 			FormVertices[destination++] = FormVertices[source++];
 		}
-		for (iForm = formIndex + 1; iForm < FormIndex; iForm++)
+		for (auto iForm = formIndex + 1; iForm < FormIndex; iForm++)
 			FormList[iForm].vertices -= FormList[formIndex].vertexCount;
 		FormVertexIndex -= FormList[formIndex].vertexCount;
 		if (FormVertexIndex & 0x8000000)
@@ -604,9 +603,9 @@ void delfil(unsigned attribute) {
 }
 
 void delmfil() {
-	const unsigned attribute       = ClosestFormToCursor << FRMSHFT;
-	unsigned       stitchAttribute = 0;
-	unsigned       iSource = 0, iDestination = 0;
+	const size_t attribute       = ClosestFormToCursor << FRMSHFT;
+	unsigned     stitchAttribute = 0;
+	unsigned     iSource = 0, iDestination = 0;
 
 	if (istx(ClosestFormToCursor))
 		deltx();
@@ -630,14 +629,15 @@ void fsizpar() noexcept {
 }
 
 void chkcont() {
-	unsigned iGuide = 0, shortestGuideIndex = 0, length = 0, minimumLength = 10000;
+	unsigned shortestGuideIndex = 0;
+	size_t   length = 0, minimumLength = 10000;
 
 	delmclp(ClosestFormToCursor);
 	deleclp(ClosestFormToCursor);
 	fsizpar();
 	if (SelectedForm->fillType != CONTF) {
 		if (CurrentFormGuidesCount) {
-			for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+			for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 				length = SelectedForm->satinOrAngle.guide[iGuide].finish - SelectedForm->satinOrAngle.guide[iGuide].start;
 				if (length < minimumLength) {
 					minimumLength      = length;
@@ -659,7 +659,8 @@ void chkcont() {
 }
 
 unsigned find1st() {
-	unsigned iStitch = 0, attribute = 0;
+	unsigned iStitch   = 0;
+	size_t   attribute = 0;
 
 	if (chk2of())
 		return ClosestPointIndex;
@@ -687,7 +688,7 @@ void ispcdclp() {
 	CloseClipboard();
 }
 
-void frmout(unsigned formIndex) noexcept {
+void frmout(size_t formIndex) noexcept {
 	fRECTANGLE* rectangle = nullptr;
 	unsigned    iVertex   = 0;
 	float       offset    = 0.0;
@@ -734,7 +735,7 @@ void px2stchf(const POINT& screen, fPOINT& stitchPoint) noexcept {
 	stitchPoint.y = factorY * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
 }
 
-void frmlin(const fPOINT* const vertices, unsigned vertexCount) noexcept {
+void frmlin(const fPOINT* const vertices, size_t vertexCount) noexcept {
 	if (vertices) {
 		unsigned iVertex = 0;
 
@@ -750,8 +751,8 @@ void frmlin(const fPOINT* const vertices, unsigned vertexCount) noexcept {
 }
 
 void frmlin(const std::vector<fPOINT>& vertices) {
-	unsigned       iVertex   = 0;
-	const unsigned vertexMax = vertices.size();
+	unsigned     iVertex   = 0;
+	const size_t vertexMax = vertices.size();
 
 	if (vertexMax) {
 		for (iVertex = 0; iVertex < vertexMax; iVertex++) {
@@ -766,7 +767,7 @@ void frmlin(const std::vector<fPOINT>& vertices) {
 void dufrm() noexcept {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
-	Polyline(StitchWindowDC, FormLines, NewFormVertexCount);
+	PolylineInt(StitchWindowDC, FormLines, NewFormVertexCount);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -779,9 +780,9 @@ void mdufrm() noexcept {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
 	if (FormList[ClosestFormToCursor].type == FRMLINE)
-		Polyline(StitchWindowDC, FormLines, NewFormVertexCount - 1);
+		PolylineInt(StitchWindowDC, FormLines, NewFormVertexCount - 1);
 	else
-		Polyline(StitchWindowDC, FormLines, NewFormVertexCount);
+		PolylineInt(StitchWindowDC, FormLines, NewFormVertexCount);
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
 }
 
@@ -801,7 +802,7 @@ void rats() {
 	}
 }
 
-void fvars(unsigned iForm) noexcept {
+void fvars(size_t iForm) noexcept {
 	SelectedForm           = &FormList[iForm];
 	CurrentFormVertices    = FormList[iForm].vertices;
 	VertexCount            = FormList[iForm].vertexCount;
@@ -939,7 +940,7 @@ constexpr float midl(float high, float low) {
 	return (high - low) / 2 + low;
 }
 
-void ritfrct(unsigned iForm, HDC dc) {
+void ritfrct(size_t iForm, HDC dc) {
 	unsigned    controlPoint     = 0;
 	POINT       pixelOutline[10] = {};
 	fRECTANGLE* rectangle        = nullptr;
@@ -982,7 +983,7 @@ void delfrms() {
 	}
 }
 
-void fselrct(unsigned iForm) noexcept {
+void fselrct(size_t iForm) noexcept {
 	const FRMHED& formHeader     = FormList[iForm];
 	fPOINT        formOutline[5] = {};
 	POINT         line[6]        = {};
@@ -1036,7 +1037,7 @@ void dubig() {
 		selsqr((*SelectedFormsLine)[iPoint], StitchWindowMemDC);
 }
 
-void frmpoly(const POINT* const line, unsigned count) noexcept {
+void frmpoly(const POINT* const line, size_t count) noexcept {
 	if (line) {
 		unsigned iPoint = 0;
 
@@ -1048,7 +1049,7 @@ void frmpoly(const POINT* const line, unsigned count) noexcept {
 }
 
 void dupsel(HDC dc) {
-	unsigned iPoint;
+	size_t iPoint;
 
 	SelectObject(dc, FormPen);
 	SetROP2(dc, R2_XORPEN);
@@ -1072,9 +1073,10 @@ void sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect) noexcept {
 }
 
 void drwfrm() {
-	unsigned iForm = 0, iGuide = 0, iVertex = 0, lastPoint = 0, layer = 0;
-	POINT    line[2] = {};
-	dPOINT   point   = {};
+	unsigned iForm = 0, iGuide = 0, iVertex = 0, layer = 0;
+	size_t   lastPoint = 0;
+	POINT    line[2]   = {};
+	dPOINT   point     = {};
 
 	StateMap.reset(StateFlag::SHOMOV);
 	StateMap.reset(StateFlag::SHOPSEL);
@@ -1357,14 +1359,14 @@ void durpoli(unsigned vertexCount) {
 	mdufrm();
 }
 
-constexpr unsigned nxt(unsigned int iVertex) {
+constexpr size_t nxt(size_t iVertex) {
 	iVertex++;
 	if (iVertex > VertexCount - 1)
 		iVertex = 0;
 	return iVertex;
 }
 
-constexpr unsigned prv(unsigned iVertex) {
+constexpr size_t prv(size_t iVertex) {
 	if (iVertex)
 		iVertex--;
 	else
@@ -1372,7 +1374,7 @@ constexpr unsigned prv(unsigned iVertex) {
 	return iVertex;
 }
 
-unsigned pdir(unsigned vertex) {
+size_t pdir(size_t vertex) {
 	if (StateMap.test(StateFlag::PSELDIR))
 		return nxt(vertex);
 	else
@@ -1395,9 +1397,10 @@ void pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) {
 }
 
 void flipv() {
-	unsigned   iForm = 0, iStitch = 0, iVertex = 0, currentVertex = 0, decodedForm = 0;
-	float      midpoint  = 0;
-	fRECTANGLE rectangle = {};
+	unsigned   iForm = 0, iStitch = 0, iVertex = 0, decodedForm = 0;
+	size_t     currentVertex = 0;
+	float      midpoint      = 0;
+	fRECTANGLE rectangle     = {};
 
 	fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
@@ -1474,15 +1477,16 @@ void flipv() {
 }
 
 void setear() {
-	unsigned nResult = 0, iStep = 0, iVertex = 0, count = 0, iRightVertices = 0, iLeftVertices = 0;
-	double   middle           = 0.0;
-	double   verticalPosition = 0.0;
-	double   length           = 0.0;
-	double   step             = 0.0;
-	double   horizontalRatio  = 0.0;
-	double   verticalRatio    = 0.0;
-	float    twistStep        = 0.0;
-	fPOINT   size             = {};
+	INT_PTR nResult = 0;
+	size_t  count = 0, iRightVertices = 0, iLeftVertices = 0;
+	double  middle           = 0.0;
+	double  verticalPosition = 0.0;
+	double  length           = 0.0;
+	double  step             = 0.0;
+	double  horizontalRatio  = 0.0;
+	double  verticalRatio    = 0.0;
+	float   twistStep        = 0.0;
+	fPOINT  size             = {};
 
 	unmsg();
 	nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, (DLGPROC)tearprc);
@@ -1497,7 +1501,7 @@ void setear() {
 		verticalPosition = CurrentFormVertices[count + 1].y;
 		iLeftVertices    = VertexCount - count;
 		iRightVertices   = count + 1;
-		for (iStep = 0; iStep < count; iStep++) {
+		for (size_t iStep = 0; iStep < count; iStep++) {
 			CurrentFormVertices[iRightVertices].y = CurrentFormVertices[iLeftVertices].y = verticalPosition;
 			CurrentFormVertices[iRightVertices].x += twistStep;
 			CurrentFormVertices[iLeftVertices].x += twistStep;
@@ -1534,7 +1538,7 @@ void setear() {
 		if (verticalRatio < horizontalRatio)
 			horizontalRatio = verticalRatio;
 		if (horizontalRatio < 1) {
-			for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+			for (size_t iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				CurrentFormVertices[iVertex].x
 				    = (CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x) * horizontalRatio + CurrentFormVertices[0].x;
 				CurrentFormVertices[iVertex].y
@@ -1542,7 +1546,7 @@ void setear() {
 			}
 		}
 		frmout(FormIndex);
-		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+		for (size_t iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			CurrentFormVertices[iVertex].x -= SelectedForm->rectangle.left;
 			CurrentFormVertices[iVertex].y -= SelectedForm->rectangle.bottom;
 		}
@@ -1603,7 +1607,8 @@ bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 }
 
 void wavfrm() {
-	unsigned iVertex = 0, iPoint = 0, vertexCount = 0, iNextVertex = 0, iLobe = 0;
+	unsigned iPoint = 0, iNextVertex = 0, iLobe = 0;
+	size_t   iVertex = 0, vertexCount = 0;
 	unsigned end             = 0;
 	unsigned count           = 0;
 	fPOINT   currentPosition = {};
@@ -1656,7 +1661,7 @@ void wavfrm() {
 		for (iVertex = 0; iVertex < vertexCount; iVertex++)
 			rotflt(CurrentFormVertices[iVertex], rotationAngle, { 0.0, 0.0 });
 		SelectedForm->type        = FRMLINE;
-		SelectedForm->vertexCount = vertexCount;
+		SelectedForm->vertexCount = gsl::narrow<unsigned short>(vertexCount);
 		FormVertexIndex += vertexCount;
 		frmout(FormIndex);
 		StateMap.reset(StateFlag::FORMSEL);
@@ -1772,7 +1777,8 @@ float findDistanceToSide(const fPOINT& lineStart, const fPOINT& lineEnd, const f
 }
 
 unsigned closfrm() {
-	unsigned iForm = 0, iVertex = 0, closestForm = 0, closestVertex = 0, layerCoded = 0, formLayer = 0;
+	unsigned iForm = 0, iVertex = 0, layerCoded = 0, formLayer = 0;
+	size_t   closestVertex = 0, closestForm = 0;
 	fPOINT   point            = {};
 	POINT    screenCoordinate = {};
 	double   length           = 0;
@@ -1831,7 +1837,7 @@ unsigned closfrm() {
 }
 
 void frmovlin() {
-	unsigned iPoint = 0, previousPoint = 0;
+	size_t previousPoint = 0;
 
 	fvars(ClosestFormToCursor);
 	ratsr();
@@ -1841,7 +1847,7 @@ void frmovlin() {
 		NewFormVertexCount = SelectedForm->vertexCount + 1;
 	frmlin(SelectedForm->vertices, SelectedForm->vertexCount);
 	previousPoint = prv(ClosestVertexToCursor);
-	for (iPoint = 0; iPoint < 3; iPoint++) {
+	for (auto iPoint = 0; iPoint < 3; iPoint++) {
 		(*RubberBandLine)[iPoint] = FormLines[previousPoint];
 		previousPoint++;
 	}
@@ -1896,12 +1902,12 @@ bool ritlin(const fPOINT& start, const fPOINT& finish) noexcept {
 	return 1;
 }
 
-unsigned closflt(float xCoordinate, float yCoordinate) noexcept {
-	double   length = 0.0, minimumLength = 0.0;
-	unsigned iVertex = 0, closestVertex = 0;
+size_t closflt(float xCoordinate, float yCoordinate) noexcept {
+	double length = 0.0, minimumLength = 0.0;
+	size_t closestVertex = 0;
 
 	minimumLength = 1e99;
-	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+	for (size_t iVertex = 0; iVertex < VertexCount; iVertex++) {
 		length = hypot(xCoordinate - CurrentFormVertices[iVertex].x, yCoordinate - CurrentFormVertices[iVertex].y);
 		if (length < minimumLength) {
 			closestVertex = iVertex;
@@ -2091,14 +2097,13 @@ bool lastch() noexcept {
 		return 0;
 }
 
-unsigned getlast() noexcept {
-	unsigned iVertex       = 0;
-	unsigned closestVertex = 0;
-	double   length = 0.0, dx = 0.0, dy = 0.0, minimumLength = 1e99;
+size_t getlast() noexcept {
+	size_t closestVertex = 0;
+	double length = 0.0, dx = 0.0, dy = 0.0, minimumLength = 1e99;
 
 	if (SelectedForm->fillType) {
 		lastch();
-		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+		for (size_t iVertex = 0; iVertex < VertexCount; iVertex++) {
 			dx     = LastPoint.x - CurrentFormVertices[iVertex].x;
 			dy     = LastPoint.y - CurrentFormVertices[iVertex].y;
 			length = hypot(dx, dy);
@@ -2152,7 +2157,7 @@ void linrutb(unsigned start) noexcept {
 	LineSpacing = spacing;
 }
 
-void oclp(const fPOINT* const clip, unsigned clipEntries) {
+void oclp(const fPOINT* const clip, size_t clipEntries) {
 	if (clip) {
 		unsigned iClip = 1;
 
@@ -2181,7 +2186,7 @@ void oclp(const fPOINT* const clip, unsigned clipEntries) {
 }
 
 constexpr float getblen() {
-	unsigned iLength = 0;
+	size_t iLength = 0;
 
 	iLength = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
 	return static_cast<float>(iLength);
@@ -2213,7 +2218,7 @@ void savplen(float length) {
 	FormList[ClosestFormToCursor].picoLength = gsl::narrow<unsigned short>(num << 8) | fr;
 }
 
-void bdrlin(unsigned start, unsigned finish, double stitchSize) {
+void bdrlin(size_t start, size_t finish, double stitchSize) {
 	dPOINT       delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
                      (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
 	dPOINT       step = {}, point = {};
@@ -2251,7 +2256,7 @@ void bdrlin(unsigned start, unsigned finish, double stitchSize) {
 
 void brdfil(double pd_Size) {
 	unsigned iVertex    = 0;
-	unsigned nextVertex = 0, currentVertex = 0;
+	size_t   nextVertex = 0, currentVertex = 0;
 
 	if (SelectedForm->extendedAttribute & AT_STRT)
 		currentVertex = SelectedForm->fillStart;
@@ -2270,7 +2275,7 @@ void brdfil(double pd_Size) {
 	}
 }
 
-void boldlin(unsigned start, unsigned finish, double size) noexcept {
+void boldlin(size_t start, size_t finish, double size) noexcept {
 	dPOINT       delta  = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
                      (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
 	fPOINT       step   = {};
@@ -2305,8 +2310,8 @@ void boldlin(unsigned start, unsigned finish, double size) noexcept {
 
 void bold(double size) noexcept {
 	unsigned iVertex = 0, iSequence = 0, iOutput = 0;
-	unsigned iNextLine = getlast();
-	unsigned iLine     = iNextLine;
+	size_t   iNextLine = getlast();
+	size_t   iLine     = iNextLine;
 	double   length    = 0.0;
 
 	SequenceIndex              = 0;
@@ -2498,8 +2503,8 @@ bool projv(double xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoin
 }
 
 bool cisin(float xCoordinate, float yCoordinate) noexcept {
-	unsigned          iVertex = 0, count = 0;
-	unsigned          nextVertex   = 0;
+	unsigned          count        = 0;
+	size_t            nextVertex   = 0;
 	dPOINT            intersection = {};
 	const fRECTANGLE* rectangle    = &SelectedForm->rectangle;
 
@@ -2512,7 +2517,7 @@ bool cisin(float xCoordinate, float yCoordinate) noexcept {
 	if (yCoordinate <= rectangle->bottom)
 		return 0;
 	count = 0;
-	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+	for (size_t iVertex = 0; iVertex < VertexCount; iVertex++) {
 		nextVertex = nxt(iVertex);
 		if (projv(xCoordinate, CurrentFormVertices[iVertex], CurrentFormVertices[nextVertex], intersection)) {
 			if (intersection.y >= yCoordinate) {
@@ -2580,8 +2585,8 @@ void clpout() {
 
 bool clpsid(const std::vector<fPOINT>& clipReversedData,
             std::vector<fPOINT>&       clipFillData,
-            unsigned                   start,
-            unsigned                   finish,
+            size_t                     start,
+            size_t                     finish,
             const dPOINT&              rotationCenter) {
 	unsigned     ind = 0, clipCount = 0;
 	fPOINT       delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
@@ -2616,13 +2621,13 @@ bool clpsid(const std::vector<fPOINT>& clipReversedData,
 	return 0;
 }
 
-void clpbrd(unsigned short startVertex) {
-	unsigned iVertex = 0, reference = 0;
-	unsigned currentVertex = 0, nextVertex = 0;
-	double   clipAngle      = 0;  // for clipboard border fill
-	dPOINT   vector0        = {}; // x size of the clipboard fill at the fill angle
-	dPOINT   moveToCoords   = {}; // moving formOrigin for clipboard fill
-	dPOINT   rotationCenter = {};
+void clpbrd(size_t startVertex) {
+	size_t reference     = 0;
+	size_t currentVertex = 0, nextVertex = 0;
+	double clipAngle      = 0;  // for clipboard border fill
+	dPOINT vector0        = {}; // x size of the clipboard fill at the fill angle
+	dPOINT moveToCoords   = {}; // moving formOrigin for clipboard fill
+	dPOINT rotationCenter = {};
 
 	SequenceIndex = 0;
 	StateMap.reset(StateFlag::CLPBAK);
@@ -2653,7 +2658,7 @@ void clpbrd(unsigned short startVertex) {
 	else {
 		clpout();
 		reference = currentVertex = startVertex;
-		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+		for (size_t iVertex = 0; iVertex < VertexCount; iVertex++) {
 			nextVertex = prv(currentVertex);
 			if (clpsid(clipReversedData, clipFillData, reference, nextVertex, rotationCenter))
 				reference = nextVertex;
@@ -2982,7 +2987,7 @@ bool proj(const dPOINT& point, double slope, const fPOINT& point0, const fPOINT&
 	}
 }
 
-bool linx(const std::vector<fPOINT>& points, unsigned start, unsigned finish, dPOINT& intersection) {
+bool linx(const std::vector<fPOINT>& points, size_t start, size_t finish, dPOINT& intersection) {
 	if (OutsidePoints) {
 		dPOINT delta = { ((*OutsidePoints)[start].x - points[start].x), ((*OutsidePoints)[start].y - points[start].y) };
 		dPOINT point = { (points[start].x), (points[start].y) };
@@ -3025,7 +3030,7 @@ void filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point) {
 	filinsb(point);
 }
 
-void sbfn(const std::vector<fPOINT>& insidePoints, unsigned start, unsigned finish) {
+void sbfn(const std::vector<fPOINT>& insidePoints, size_t start, size_t finish) {
 	std::vector<dPOINT> satinBackup(8); // backup stitches in satin fills
 	dPOINT innerDelta  = { (insidePoints[finish].x - insidePoints[start].x), (insidePoints[finish].y - insidePoints[start].y) };
 	double innerLength = hypot(innerDelta.x, innerDelta.y);
@@ -3120,11 +3125,10 @@ void sbfn(const std::vector<fPOINT>& insidePoints, unsigned start, unsigned fini
 	}
 }
 
-void sfn(unsigned startVertex) {
-	unsigned iVertex    = 0;
-	unsigned nextVertex = 0;
+void sfn(size_t startVertex) {
+	size_t nextVertex = 0;
 
-	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+	for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
 		nextVertex = nxt(startVertex);
 		sbfn(*InsidePoints, startVertex, nextVertex);
 		startVertex = nextVertex;
@@ -3135,8 +3139,8 @@ void sfn(unsigned startVertex) {
 }
 
 void sbrd() {
-	const double   spacing = LineSpacing;
-	const unsigned start   = getlast();
+	const double spacing = LineSpacing;
+	const size_t start   = getlast();
 
 	StateMap.reset(StateFlag::SAT1);
 	StateMap.reset(StateFlag::FILDIR);
@@ -3359,7 +3363,7 @@ unsigned psg() noexcept {
 	return PseudoRandomValue;
 }
 
-void spend(const std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish) {
+void spend(const std::vector<VRCT2>& fillVerticalRect, size_t start, size_t finish) {
 	dPOINT       innerDelta  = { (fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
                           (fillVerticalRect[finish].cipnt.y - fillVerticalRect[start].bipnt.y) };
 	const double innerLength = hypot(innerDelta.x, innerDelta.y);
@@ -3422,8 +3426,8 @@ void spend(const std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned 
 
 void duspnd(const std::vector<VRCT2>& underlayVerticalRect,
             const std::vector<VRCT2>& fillVerticalRect,
-            unsigned                  start,
-            unsigned                  finish) {
+            size_t                    start,
+            size_t                    finish) {
 	double length = 0.0, angle = 0.0;
 	dPOINT point = {}, delta = {};
 
@@ -3467,11 +3471,11 @@ void duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 
 void pfn(const std::vector<VRCT2>& underlayVerticalRect,
          const std::vector<VRCT2>& fillVerticalRect,
-         unsigned                  startVertex,
+         size_t                    startVertex,
          const std::vector<VRCT2>& vrct) {
 	unsigned iVertex       = 0;
-	unsigned currentVertex = startVertex;
-	unsigned nextVertex    = nxt(currentVertex);
+	size_t   currentVertex = startVertex;
+	size_t   nextVertex    = nxt(currentVertex);
 
 	SelectedPoint = CurrentFormVertices[startVertex];
 	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
@@ -3503,9 +3507,9 @@ void prsmal() noexcept {
 }
 
 void pbrd(double edgeSpacing) {
-	const double   spacing = LineSpacing;
-	unsigned       iVertex = 0;
-	const unsigned start   = getlast();
+	const double spacing = LineSpacing;
+	unsigned     iVertex = 0;
+	const size_t start   = getlast();
 
 	LineSpacing   = SelectedForm->edgeSpacing;
 	SequenceIndex = 0;
@@ -3540,8 +3544,8 @@ void pbrd(double edgeSpacing) {
 }
 
 void apbrd() {
-	unsigned       iVertex    = 0;
-	unsigned short nextVertex = 0, currentVertex = 0;
+	unsigned iVertex    = 0;
+	size_t   nextVertex = 0, currentVertex = 0;
 
 	SequenceIndex              = 0;
 	OSequence[SequenceIndex++] = CurrentFormVertices[currentVertex];
@@ -3552,7 +3556,7 @@ void apbrd() {
 	}
 }
 
-void bhfn(unsigned start, unsigned finish, double spacing) noexcept {
+void bhfn(size_t start, size_t finish, double spacing) noexcept {
 	dPOINT         delta      = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
                      (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
 	const double   length     = hypot(delta.x, delta.y);
@@ -3597,10 +3601,10 @@ void bhfn(unsigned start, unsigned finish, double spacing) noexcept {
 	}
 }
 
-void bhcrnr(unsigned vertex) {
-	const unsigned nextVertex = nxt(vertex);
-	dPOINT         delta = {}, point = {};
-	double         length = 0.0, ratio = 0.0;
+void bhcrnr(size_t vertex) {
+	const size_t nextVertex = nxt(vertex);
+	dPOINT       delta = {}, point = {};
+	double       length = 0.0, ratio = 0.0;
 
 	if (StateMap.test(StateFlag::INDIR)) {
 		delta.x = (*OutsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x;
@@ -3626,12 +3630,12 @@ void bhcrnr(unsigned vertex) {
 }
 
 void bhbrd(double spacing) {
-	unsigned vertex     = getlast();
-	unsigned nextVertex = 0, iVertex = 0;
+	size_t vertex     = getlast();
+	size_t nextVertex = 0;
 
 	SequenceIndex              = 0;
 	OSequence[SequenceIndex++] = CurrentFormVertices[vertex];
-	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+	for (size_t iVertex = 0; iVertex < VertexCount; iVertex++) {
 		nextVertex = nxt(vertex);
 		bhfn(vertex, nextVertex, spacing);
 		bhcrnr(vertex);
@@ -3639,13 +3643,13 @@ void bhbrd(double spacing) {
 	}
 }
 
-void clpcrnr(std::vector<fPOINT>& clipFillData, unsigned vertex, const dPOINT& rotationCenter) {
-	const unsigned nextVertex = nxt(vertex);
-	unsigned       iStitch    = 0;
-	dPOINT         delta = {}, point = {};
-	fPOINT         tpnt   = {};
-	double         length = 0.0, ratio = 0.0;
-	fPOINTATTR     referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
+void clpcrnr(std::vector<fPOINT>& clipFillData, size_t vertex, const dPOINT& rotationCenter) {
+	const size_t nextVertex = nxt(vertex);
+	unsigned     iStitch    = 0;
+	dPOINT       delta = {}, point = {};
+	fPOINT       tpnt   = {};
+	double       length = 0.0, ratio = 0.0;
+	fPOINTATTR   referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
 
 	if (StateMap.test(StateFlag::INDIR)) {
 		delta.x = (*OutsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x;
@@ -3680,7 +3684,7 @@ void clpcrnr(std::vector<fPOINT>& clipFillData, unsigned vertex, const dPOINT& r
 	}
 }
 
-void picfn(std::vector<fPOINT>& clipFillData, unsigned start, unsigned finish, double spacing, const dPOINT& rotationCenter) {
+void picfn(std::vector<fPOINT>& clipFillData, size_t start, size_t finish, double spacing, const dPOINT& rotationCenter) {
 	dPOINT       delta          = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
                      (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
 	const double length         = hypot(delta.x, delta.y);
@@ -3750,7 +3754,7 @@ void picfn(std::vector<fPOINT>& clipFillData, unsigned start, unsigned finish, d
 void clpic() {
 	const unsigned short start         = 0;
 	unsigned             iVertex       = 0;
-	unsigned             currentVertex = start, nextVertex = 0;
+	size_t               currentVertex = start, nextVertex = 0;
 	std::vector<fPOINT>  clipFillData(ClipStitchCount);
 
 	dPOINT rotationCenter
@@ -3786,7 +3790,7 @@ void clpic() {
 }
 
 void dubfn() {
-	unsigned iBackward = 0, iForward = 0;
+	size_t iBackward = 0, iForward = 0;
 
 	brdfil(SelectedForm->edgeStitchLen);
 	iForward = SequenceIndex;
@@ -3823,9 +3827,9 @@ void duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned start, unsigned 
 		delta.x = chainEndPoints[finish].x - chainEndPoints[finish - 1].x;
 		delta.y = chainEndPoints[finish].y - chainEndPoints[finish - 1].y;
 	}
-	chainPoint[2].x     = chainEndPoints[finish].x + delta.x / 4;
-	chainPoint[2].y     = chainEndPoints[finish].y + delta.y / 4;
-	unsigned chainCount = chainSequence.size();
+	chainPoint[2].x   = chainEndPoints[finish].x + delta.x / 4;
+	chainPoint[2].y   = chainEndPoints[finish].y + delta.y / 4;
+	size_t chainCount = chainSequence.size();
 	if (StateMap.test(StateFlag::LINCHN))
 		chainCount--;
 	for (iChain = 0; iChain < chainCount; iChain++) {
@@ -4097,7 +4101,6 @@ void satends(unsigned isBlunt) {
 }
 
 void slbrd() {
-	unsigned     iVertex = 0;
 	const double spacing = LineSpacing;
 
 	SequenceIndex = 0;
@@ -4108,10 +4111,10 @@ void slbrd() {
 		StateMap.reset(StateFlag::SAT1);
 		StateMap.reset(StateFlag::FILDIR);
 		LineSpacing = USPAC;
-		for (iVertex = 0; iVertex < gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
+		for (size_t iVertex = 0u; iVertex < SelectedForm->vertexCount - 1; iVertex++)
 			sbfn(*InsidePoints, iVertex, iVertex + 1);
 		StateMap.flip(StateFlag::FILDIR);
-		for (iVertex = SelectedForm->vertexCount - 1; iVertex != 0; iVertex--)
+		for (size_t iVertex = SelectedForm->vertexCount - 1; iVertex != 0; iVertex--)
 			sbfn(*InsidePoints, iVertex, iVertex - 1);
 	}
 	HorizontalLength2 = SelectedForm->borderSize;
@@ -4119,7 +4122,7 @@ void slbrd() {
 	satends(SelectedForm->attribute);
 	LineSpacing = SelectedForm->edgeSpacing;
 	StateMap.reset(StateFlag::SAT1);
-	for (iVertex = 0; iVertex < gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1; iVertex++)
+	for (size_t iVertex = 0; iVertex < SelectedForm->vertexCount - 1; iVertex++)
 		sbfn(*InsidePoints, iVertex, iVertex + 1);
 	LineSpacing = spacing;
 }
@@ -4168,9 +4171,9 @@ void plfn(const std::vector<VRCT2>& underlayVerticalRect,
 	duromb(prct[VertexCount - 4].bipnt, prct[VertexCount - 4].dipnt, prct[VertexCount - 4].bopnt, prct[VertexCount - 4].dopnt);
 }
 
-void plbak(unsigned backPoint) noexcept {
-	unsigned iSequence = SequenceIndex - 1;
-	fPOINT   tflt      = {};
+void plbak(size_t backPoint) noexcept {
+	size_t iSequence = SequenceIndex - 1;
+	fPOINT tflt      = {};
 
 	while (iSequence > backPoint) {
 		tflt                 = OSequence[iSequence];
@@ -4182,7 +4185,7 @@ void plbak(unsigned backPoint) noexcept {
 }
 
 void plbrd(double edgeSpacing) {
-	unsigned savedIndex = 0;
+	size_t   savedIndex = 0;
 	unsigned iVertex    = 0;
 
 	// Ensure that we have at least 4 array members
@@ -4241,14 +4244,13 @@ void plbrd(double edgeSpacing) {
 
 void lapbrd() {
 	const double savedStitchLength = UserStitchLength;
-	unsigned     iVertex           = 0;
 
 	SequenceIndex = 0;
 	// ToDo - Should APSPAC be a configurable variable instead?
 	UserStitchLength = APSPAC;
-	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++)
+	for (size_t iVertex = 0; iVertex < VertexCount - 1; iVertex++)
 		bdrlin(iVertex, iVertex + 1, APSPAC);
-	for (iVertex = VertexCount - 1; iVertex != 0; iVertex--)
+	for (auto iVertex = VertexCount - 1; iVertex != 0; iVertex--)
 		bdrlin(iVertex, iVertex - 1, APSPAC);
 	UserStitchLength = savedStitchLength;
 }
@@ -4267,13 +4269,13 @@ void blbrd(double spacing) {
 }
 
 void contf() {
-	const unsigned start          = SelectedForm->angleOrClipData.guide.start;
-	const fPOINT*  selectionStart = &CurrentFormVertices[start];
+	const size_t  start          = SelectedForm->angleOrClipData.guide.start;
+	const fPOINT* selectionStart = &CurrentFormVertices[start];
 	if (selectionStart) {
-		const unsigned        finish              = SelectedForm->angleOrClipData.guide.finish;
-		const unsigned        lowVertexIndex      = start;
-		const unsigned        highVertexIndex     = VertexCount - start - 1;
-		const unsigned        selectedVertexCount = finish - start;
+		const size_t          finish              = SelectedForm->angleOrClipData.guide.finish;
+		const size_t          lowVertexIndex      = start;
+		const size_t          highVertexIndex     = VertexCount - start - 1;
+		const size_t          selectedVertexCount = finish - start;
 		std::vector<unsigned> lowCounts(lowVertexIndex);
 		std::vector<unsigned> highCounts(highVertexIndex);
 		std::vector<double>   lowLengths(lowVertexIndex);
@@ -4284,7 +4286,8 @@ void contf() {
 		std::vector<dPOINT>   highSteps(highVertexIndex);
 		std::vector<fPOINT>   lowVertices(lowVertexIndex);
 		std::vector<dPOINT>   highVertices(highVertexIndex);
-		unsigned              iVertex = 0, lowIndex = 0, highIndex = 0, selind = 0;
+		size_t                lowIndex = 0, highIndex = 0;
+		unsigned              selind    = 0;
 		double                lowLength = 0.0, highLength = 0.0, length = 0.0;
 		double                lowSpacing = 0.0, highSpacing = 0.0;
 		unsigned              highCount = 0, lowCount = 0, count = 0;
@@ -4296,7 +4299,7 @@ void contf() {
 		PVEC              polref = {}, polin = {}, poldif = {};
 
 		SequenceIndex = 0;
-		for (iVertex = lowVertexIndex; iVertex != 0; iVertex--) {
+		for (auto iVertex = lowVertexIndex; iVertex != 0; iVertex--) {
 			lowVertices[lowIndex] = CurrentFormVertices[iVertex];
 			lowDeltas[lowIndex].x = CurrentFormVertices[iVertex - 1].x - CurrentFormVertices[iVertex].x;
 			lowDeltas[lowIndex].y = CurrentFormVertices[iVertex - 1].y - CurrentFormVertices[iVertex].y;
@@ -4305,7 +4308,7 @@ void contf() {
 			lowIndex++;
 		}
 		selind = 0;
-		for (iVertex = start + 1; iVertex <= finish; iVertex++) {
+		for (auto iVertex = start + 1; iVertex <= finish; iVertex++) {
 			delta.x             = CurrentFormVertices[iVertex].x - selectionStart[0].x;
 			delta.y             = CurrentFormVertices[iVertex].y - selectionStart[0].y;
 			pols[selind].length = hypot(delta.x, delta.y);
@@ -4314,7 +4317,7 @@ void contf() {
 		}
 		highIndex  = 0;
 		highLength = 0;
-		for (iVertex = finish; iVertex < VertexCount - 1; iVertex++) {
+		for (auto iVertex = finish; iVertex < VertexCount - 1; iVertex++) {
 			highVertices[highIndex].x = CurrentFormVertices[iVertex].x;
 			highVertices[highIndex].y = CurrentFormVertices[iVertex].y;
 			highDeltas[highIndex].x   = CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x;
@@ -4336,12 +4339,12 @@ void contf() {
 			highSpacing = SelectedForm->fillSpacing;
 			lowSpacing  = SelectedForm->fillSpacing * lowLength / highLength;
 		}
-		for (iVertex = 0; iVertex < lowVertexIndex; iVertex++) {
+		for (size_t iVertex = 0u; iVertex < lowVertexIndex; iVertex++) {
 			lowCounts[iVertex]  = lowLengths[iVertex] / lowSpacing;
 			lowSteps[iVertex].x = lowDeltas[iVertex].x / lowCounts[iVertex];
 			lowSteps[iVertex].y = lowDeltas[iVertex].y / lowCounts[iVertex];
 		}
-		for (iVertex = 0; iVertex < highVertexIndex; iVertex++) {
+		for (size_t iVertex = 0u; iVertex < highVertexIndex; iVertex++) {
 			highCounts[iVertex]  = highLengths[iVertex] / highSpacing;
 			highSteps[iVertex].x = highDeltas[iVertex].x / highCounts[iVertex];
 			highSteps[iVertex].y = highDeltas[iVertex].y / highCounts[iVertex];
@@ -4386,7 +4389,7 @@ void contf() {
 					OSequence[SequenceIndex].x = lowPoint.x;
 					OSequence[SequenceIndex].y = lowPoint.y;
 					SequenceIndex++;
-					for (iVertex = 0; iVertex < (selectedVertexCount - 1); iVertex++) {
+					for (size_t iVertex = 0; iVertex < (selectedVertexCount - 1); iVertex++) {
 						length                     = pols[iVertex].length * poldif.length;
 						const auto angle           = pols[iVertex].angle + poldif.angle;
 						OSequence[SequenceIndex].x = lowPoint.x + cos(angle) * length;
@@ -4398,7 +4401,7 @@ void contf() {
 					OSequence[SequenceIndex].x = highPoint.x;
 					OSequence[SequenceIndex].y = highPoint.y;
 					SequenceIndex++;
-					for (iVertex = selectedVertexCount - 1; iVertex != 0; iVertex--) {
+					for (size_t iVertex = selectedVertexCount - 1; iVertex != 0; iVertex--) {
 						length                     = pols[iVertex - 1].length * poldif.length;
 						const auto angle           = pols[iVertex - 1].angle + poldif.angle;
 						OSequence[SequenceIndex].x = lowPoint.x + cos(angle) * length;
@@ -4468,7 +4471,7 @@ bool isin(const std::vector<VCLPX> regionCrossingData,
 	// ToDo - rename local variables
 
 	unsigned iRegion = 0, acnt = 0;
-	unsigned svrt = 0, nvrt = 0;
+	size_t   svrt = 0, nvrt = 0;
 	dPOINT   ipnt = {};
 
 	if (xCoordinate < BoundingRect.left)
@@ -4510,7 +4513,7 @@ void inspnt(std::vector<CLIPNT>& clipStitchPoints) {
 	clipStitchPoints.push_back(clipStitchPoint);
 }
 
-bool isect(unsigned vertex0, unsigned vertex1, fPOINT& intersection, float& length) noexcept {
+bool isect(size_t vertex0, size_t vertex1, fPOINT& intersection, float& length) noexcept {
 	dPOINT delta            = { (LineSegmentEnd.x - LineSegmentStart.x), (LineSegmentEnd.y - LineSegmentStart.y) };
 	dPOINT point            = { (LineSegmentStart.x), (LineSegmentStart.y) };
 	dPOINT tempIntersection = {};
@@ -4578,7 +4581,7 @@ unsigned insect(std::vector<CLIPSORT>&    clipIntersectData,
                 unsigned                  regionCrossingStart,
                 unsigned                  regionCrossingEnd) {
 	unsigned   iRegions = 0, iDestination = 0, iIntersection = 0, count = 0;
-	unsigned   currentVertex = 0, nextVertex = 0;
+	size_t     currentVertex = 0, nextVertex = 0;
 	fRECTANGLE lineSegmentRect = {};
 	fPOINT*    intersection    = nullptr;
 
@@ -4661,8 +4664,9 @@ bool lencmp(const LENINFO& arg1, const LENINFO& arg2) noexcept {
 	return (arg1.length < arg2.length);
 }
 
-void chksid(unsigned vertexIndex) noexcept {
-	unsigned iVertex = 0, limit = 0;
+void chksid(size_t vertexIndex) noexcept {
+	size_t iVertex = 0;
+	size_t limit   = 0;
 
 	if (ClipIntersectSide != vertexIndex) {
 		if ((vertexIndex - ClipIntersectSide + VertexCount) % VertexCount < (VertexCount >> 1)) {
@@ -4725,8 +4729,8 @@ void ritseg(const std::vector<CLIPNT>& clipStitchPoints, std::vector<CLPSEG>& cl
 bool clpnxt(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned sind) {
 	// ToDo - rename local variables
 
-	unsigned       ind          = 1;
-	const unsigned indexDoubled = clipSegments.size() << 1;
+	unsigned     ind          = 1;
+	const size_t indexDoubled = clipSegments.size() << 1;
 
 	StateMap.reset(StateFlag::FILDIR);
 	while (ind < clipSegments.size()) {
@@ -4771,8 +4775,9 @@ bool vscmp(unsigned index1, unsigned index2) noexcept {
 
 void clpcon(const std::vector<RNGCNT>& textureSegments) {
 	RECT     clipGrid = {};
-	unsigned iSegment = 0, iStitchPoint = 0, iVertex = 0, iPoint = 0, iSorted = 0, iSequence = 0, vertex = 0;
-	unsigned iRegion = 0, ine = 0, nextVertex = 0, regionSegment = 0, iStitch = 0;
+	unsigned iSegment = 0, iStitchPoint = 0, iVertex = 0, iPoint = 0, iSorted = 0, iSequence = 0;
+	size_t   vertex = 0, nextVertex = 0;
+	unsigned iRegion = 0, ine = 0, regionSegment = 0, iStitch = 0;
 	unsigned lineOffset = 0, negativeOffset = 0, clipNegative = 0;
 	unsigned start = 0, finish = 0, segmentCount = 0, previousPoint = 0;
 	// ToDo - rename variables
@@ -4781,10 +4786,10 @@ void clpcon(const std::vector<RNGCNT>& textureSegments) {
 	fPOINT   pasteLocation = {};
 	double   totalLength = 0.0, minx = 0.0;
 	float    formNegativeOffset  = 0.0;
-	unsigned clipGridOffset      = 0;
+	size_t   clipGridOffset      = 0;
 	double   clipVerticalOffset  = 0.0;
 	TXPNT*   texture             = nullptr;
-	unsigned clplim              = 0; // vertical clipboard search limit
+	size_t   clplim              = 0; // vertical clipboard search limit
 	unsigned regionCrossingStart = 0; // start of region crossing data for a particular region
 	unsigned regionCrossingEnd   = 0; // end of region crossing data for a particular region
 
@@ -4799,7 +4804,9 @@ void clpcon(const std::vector<RNGCNT>& textureSegments) {
 	if (ClipWidth < CLPMINAUT)
 		ClipWidth = CLPMINAUT;
 	if (StateMap.test(StateFlag::TXFIL)) {
-		if (TextureIndex && SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count <= TextureIndex)
+		if (TextureIndex
+		    && SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count
+		           <= gsl::narrow<unsigned short>(TextureIndex))
 			ClipWidth = SelectedForm->fillSpacing;
 		else {
 			return;
@@ -5531,7 +5538,7 @@ void rspnt(float xCoordinate, float yCoordinate) noexcept {
 	BSequence[OutputIndex++].attribute = 0;
 }
 
-void brkdun(const std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish) {
+void brkdun(const std::vector<SMALPNTL*>& sortedLines, size_t start, size_t finish) {
 	rspnt(sortedLines[start]->x, sortedLines[start]->y);
 	rspnt(sortedLines[finish]->x, sortedLines[finish]->y);
 	rspnt(WorkingFormVertices[sortedLines[start]->line].x, WorkingFormVertices[sortedLines[start]->line].y);
@@ -5543,7 +5550,7 @@ void duseq1() noexcept {
 	      (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
 }
 
-void movseq(const std::vector<SMALPNTL*>& sortedLines, unsigned ind) {
+void movseq(const std::vector<SMALPNTL*>& sortedLines, size_t ind) {
 	SMALPNTL* lineEndPoint = sortedLines[ind];
 
 	BSequence[OutputIndex].attribute = SEQBOT;
@@ -5559,16 +5566,16 @@ void movseq(const std::vector<SMALPNTL*>& sortedLines, unsigned ind) {
 	OutputIndex++;
 }
 
-void brkseq(const std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish, boost::dynamic_bitset<>& sequenceMap) {
-	unsigned iLine = 0, iLineDec = 0, savedGroup = 0;
+void brkseq(const std::vector<SMALPNTL*>& sortedLines, size_t start, size_t finish, boost::dynamic_bitset<>& sequenceMap) {
+	unsigned savedGroup = 0;
 
 	StateMap.reset(StateFlag::SEQDUN);
 	if (start > finish) {
 		savedGroup = sortedLines[start]->group + 1;
 		// This odd construction for iLine is used to ensure
 		// loop terminates when finish = 0
-		for (iLine = start + 1; iLine != finish; iLine--) {
-			iLineDec = iLine - 1;
+		for (auto iLine = start + 1; iLine != finish; iLine--) {
+			auto iLineDec = iLine - 1;
 			savedGroup--;
 			if (sortedLines[iLineDec]->group != savedGroup) {
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
@@ -5591,7 +5598,7 @@ void brkseq(const std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned 
 	}
 	else {
 		savedGroup = sortedLines[start]->group - 1;
-		for (iLine = start; iLine <= finish; iLine++) {
+		for (auto iLine = start; iLine <= finish; iLine++) {
 			savedGroup++;
 			if (sortedLines[iLine]->group != savedGroup) {
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
@@ -5617,10 +5624,10 @@ void brkseq(const std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned 
 	}
 }
 
-void dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish) {
+void dunseq(const std::vector<SMALPNTL*>& sortedLines, size_t start, size_t finish) {
 	double minimumY = 1e30;
 
-	for (unsigned iLine = start; iLine <= finish; iLine++) {
+	for (auto iLine = start; iLine <= finish; iLine++) {
 		const double deltaY = sortedLines[start][1].y - sortedLines[start][0].y;
 		if (deltaY < minimumY)
 			minimumY = deltaY;
@@ -5636,23 +5643,23 @@ void dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned 
 	LastGroup = sortedLines[finish][0].group;
 }
 
-void duseq2(const std::vector<SMALPNTL*>& sortedLines, unsigned iLine) {
+void duseq2(const std::vector<SMALPNTL*>& sortedLines, size_t iLine) {
 	SequenceLines = sortedLines[iLine];
 	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x,
 	      (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
 }
 
-void duseq(const std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned finish, boost::dynamic_bitset<>& sequenceMap) {
-	unsigned iLine = 0, iLineDec = 0;
+void duseq(const std::vector<SMALPNTL*>& sortedLines, size_t start, size_t finish, boost::dynamic_bitset<>& sequenceMap) {
 	unsigned savedTopLine = sortedLines[start][1].line;
 	bool     flag         = false;
 
 	SequenceLines = sortedLines[start];
 	StateMap.reset(StateFlag::SEQDUN);
 	if (start > finish) {
+		auto iLine = start + 1;
 		// This odd construction for iLine is used to ensure loop terminates when finish = 0
 		for (iLine = start + 1; iLine != finish; iLine--) {
-			iLineDec = iLine - 1;
+			auto iLineDec = iLine - 1;
 			if (sequenceMap.test_set(iLineDec)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
 					flag = true;
@@ -5687,6 +5694,7 @@ void duseq(const std::vector<SMALPNTL*>& sortedLines, unsigned start, unsigned f
 		}
 	}
 	else {
+		auto iLine = start;
 		for (iLine = start; iLine <= finish; iLine++) {
 			if (sequenceMap.test_set(iLine)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
@@ -5731,12 +5739,14 @@ void durgn(const std::vector<FSEQ>&      sequencePath,
            boost::dynamic_bitset<>&      visitedRegions,
            const std::vector<SMALPNTL*>& sortedLines,
            unsigned                      pthi,
-           unsigned                      lineCount,
+           size_t                        lineCount,
            std::vector<REGION>&          regionsList) {
-	unsigned       dun = 0, gdif = 0, mindif = 0, iVertex = 0, ind = 0, fdif = 0, bdif = 0;
-	unsigned       seql = 0, seqn = 0;
-	unsigned       sequenceStart = 0;
-	unsigned       sequenceEnd   = 0;
+	unsigned dun = 0, gdif = 0, iVertex = 0;
+	size_t   ind = 0;
+
+	size_t         mindif = 0, fdif = 0, bdif = 0, seql = 0, seqn = 0;
+	size_t         sequenceStart = 0;
+	size_t         sequenceEnd   = 0;
 	unsigned       groupStart = 0, groupEnd = 0;
 	double         length = 0.0, minimumLength = 0.0;
 	BSEQPNT*       bpnt      = nullptr;
@@ -5938,7 +5948,7 @@ void lcon(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& line
 	bool      isConnected    = false;
 	SMALPNTL* lineGroupPoint = nullptr;
 	unsigned  iStartLine     = 0;
-	unsigned  lineCount      = 0;
+	size_t    lineCount      = 0;
 
 #if BUGSEQ
 
@@ -6153,7 +6163,7 @@ void bakseq() {
 
 	// ToDo - More renaming required
 	int          count = 0, rcnt = 0;
-	int          iSequence = OutputIndex - 1;
+	size_t       iSequence = OutputIndex - 1;
 	int          rit       = 0;
 	dPOINT       delta = {}, point = {}, step = {};
 	double       length = 0.0, slope = 0.0;
@@ -6278,25 +6288,27 @@ void satcpy(SATCON* const destination, const std::vector<SATCON> source, unsigne
 void satadj() {
 	fvars(ClosestFormToCursor);
 
-	unsigned            iGuide = 0, iSource = 0, iForm = 0, iForward = 0, iVertex = 0, iReverse = 0, iDestination = 0;
+	unsigned            iDestination = 0;
+	size_t              iVertex = 0, iReverse = 0, iForward = 0, iGuide = 0;
 	std::vector<SATCON> interiorGuides(CurrentFormGuidesCount);
 	SATCON*             sourceGuide      = nullptr;
 	SATCON*             destinationGuide = nullptr;
-	unsigned short      savedGuideCount  = SelectedForm->satinGuideCount;
+	size_t      savedGuideCount  = SelectedForm->satinGuideCount;
 	FRMHED*             formHeader       = nullptr;
 	ExtendedBitSet<>    satinMap(VertexCount);
 
 	// ensure all guide endpoints are on valid vertices
-	for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-		if (CurrentFormGuides[iGuide].finish > VertexCount - 1)
-			CurrentFormGuides[iGuide].finish = VertexCount - 1;
-		if (CurrentFormGuides[iGuide].start > VertexCount - 1)
-			CurrentFormGuides[iGuide].start = VertexCount - 1;
+	for (iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+		auto endCount = gsl::narrow<unsigned short>(VertexCount - 1);
+		if (CurrentFormGuides[iGuide].finish > endCount)
+			CurrentFormGuides[iGuide].finish = endCount;
+		if (CurrentFormGuides[iGuide].start > endCount)
+			CurrentFormGuides[iGuide].start = endCount;
 	}
 
 	// remove any guides of 0 length
 	iDestination = 0;
-	for (iSource = 0; iSource < CurrentFormGuidesCount; iSource++) {
+	for (auto iSource = 0u; iSource < CurrentFormGuidesCount; iSource++) {
 		if (CurrentFormGuides[iSource].start != CurrentFormGuides[iSource].finish) {
 			interiorGuides[iDestination++] = CurrentFormGuides[iSource];
 		}
@@ -6319,7 +6331,7 @@ void satadj() {
 		}
 		// check to see if any of the current guides are end guides and add to interiorGuides if not
 		iDestination = 0;
-		for (iSource = 0; iSource < CurrentFormGuidesCount; iSource++) {
+		for (auto iSource = 0u; iSource < CurrentFormGuidesCount; iSource++) {
 			if (!satinMap.test(CurrentFormGuides[iSource].start) && !satinMap.test(CurrentFormGuides[iSource].finish)) {
 				interiorGuides[iDestination++] = CurrentFormGuides[iSource];
 			}
@@ -6332,7 +6344,7 @@ void satadj() {
 		// remove any guides that start after the end guide
 		if (SatinEndGuide) {
 			iDestination = 0;
-			for (iSource = 0; iSource < CurrentFormGuidesCount; iSource++) {
+			for (auto iSource = 0u; iSource < CurrentFormGuidesCount; iSource++) {
 				if (CurrentFormGuides[iSource].start < SatinEndGuide) {
 					interiorGuides[iDestination++] = CurrentFormGuides[iSource];
 				}
@@ -6347,7 +6359,7 @@ void satadj() {
 
 	if (CurrentFormGuidesCount) {
 		satinMap.reset();
-		for (iGuide = 0; iGuide < CurrentFormGuidesCount; iGuide++) {
+		for (iGuide = 0u; iGuide < CurrentFormGuidesCount; iGuide++) {
 			iForward = CurrentFormGuides[iGuide].start;
 			if (iForward > gsl::narrow<unsigned>(SatinEndGuide) - 1)
 				iForward = SatinEndGuide - 1;
@@ -6375,17 +6387,17 @@ void satadj() {
 				}
 			}
 		}
-		iGuide = 0;
+		iGuide = 0u;
 		do {
 			iVertex = satinMap.getFirst();
 			if (iVertex < VertexCount)
-				CurrentFormGuides[iGuide++].start = iVertex;
+				CurrentFormGuides[iGuide++].start = gsl::narrow<unsigned short>(iVertex);
 		} while (iVertex < VertexCount);
 
-		CurrentFormGuidesCount = SelectedForm->satinGuideCount = iGuide;
+		CurrentFormGuidesCount = SelectedForm->satinGuideCount = gsl::narrow<unsigned short>(iGuide);
 		satinMap.reset();
 		// Todo - are iForward and iReverse appropriate variable names below?
-		for (iGuide = 0; iGuide < CurrentFormGuidesCount; iGuide++) {
+		for (iGuide = 0u; iGuide < CurrentFormGuidesCount; iGuide++) {
 			iForward = iReverse = CurrentFormGuides[iGuide].finish;
 			if (iForward > VertexCount - 1)
 				iForward = VertexCount - 1;
@@ -6414,20 +6426,22 @@ void satadj() {
 				}
 			}
 		}
-		iGuide = 0;
+		iGuide = 0u;
 		do {
 			iReverse = satinMap.getLast();
 			if (iReverse < VertexCount)
-				CurrentFormGuides[iGuide++].finish = iReverse;
+				CurrentFormGuides[iGuide++].finish = gsl::narrow<unsigned short>(iReverse);
 		} while (iReverse < VertexCount);
 		if (iGuide < CurrentFormGuidesCount)
 			iGuide = CurrentFormGuidesCount;
-		CurrentFormGuidesCount = SelectedForm->satinGuideCount = iGuide;
+		CurrentFormGuidesCount = SelectedForm->satinGuideCount = gsl::narrow<unsigned short>(iGuide);
 		if (SatinEndGuide) {
-			if (CurrentFormGuidesCount > VertexCount - SatinEndGuide - 2)
-				CurrentFormGuidesCount = VertexCount - SatinEndGuide - 2;
-			if (CurrentFormGuidesCount > SatinEndGuide - 2)
-				CurrentFormGuidesCount = SatinEndGuide - 2;
+			auto end0 = gsl::narrow<unsigned short>(VertexCount - SatinEndGuide - 2);
+			auto end1 = gsl::narrow<unsigned short>(SatinEndGuide - 2);
+			if (CurrentFormGuidesCount > end0)
+				CurrentFormGuidesCount = end0;
+			if (CurrentFormGuidesCount > end1)
+				CurrentFormGuidesCount = end1;
 			SelectedForm->satinGuideCount = CurrentFormGuidesCount;
 		}
 	}
@@ -6439,7 +6453,7 @@ void satadj() {
 		std::copy(sourceGuide,
 		          (&SatinGuides[SatinGuideIndex] + 1),
 		          stdext::make_checked_array_iterator(destinationGuide, 10000 - SatinGuideIndex));
-		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			formHeader = &FormList[iForm];
 			if (formHeader->type == SAT)
 				formHeader->satinOrAngle.guide -= iGuide;
@@ -6448,7 +6462,7 @@ void satadj() {
 	}
 }
 
-void ritseq1(unsigned ind) noexcept {
+void ritseq1(size_t ind) noexcept {
 	BSequence[SequenceIndex].x = CurrentFormVertices[ind].x;
 	BSequence[SequenceIndex].y = CurrentFormVertices[ind].y;
 	SequenceIndex++;
@@ -6512,12 +6526,15 @@ void filin(dPOINT currentPoint) {
 	SelectedPoint = currentPoint;
 }
 
-void satfn(const std::vector<double>& lengths, unsigned line1Start, unsigned line1End, unsigned line2Start, unsigned line2End) {
-	unsigned line1Next = 0, line2Previous = 0, stitchCount = 0;
-	unsigned iSegment = 0, line1Count = 0, line2Count = 0, iVertex = 0;
-	unsigned iNextVertex = 0, segmentStitchCount = 0, iLine1Vertex = 0;
-	unsigned iLine2Vertex = 0, iLine1Count = 0, iLine2Count = 0;
-	unsigned line1Segments = 0, line2Segments = 0;
+void satfn(const std::vector<double>& lengths, size_t line1Start, size_t line1End, size_t line2Start, size_t line2End) {
+	size_t   line1Next = 0, line2Previous = 0;
+	unsigned stitchCount = 0;
+	unsigned iSegment = 0, line1Count = 0, line2Count = 0;
+	unsigned segmentStitchCount = 0;
+	size_t   iLine1Vertex       = 0;
+	size_t   iNextVertex = 0, iVertex = 0, iLine2Vertex = 0;
+	unsigned iLine1Count = 0, iLine2Count = 0;
+	size_t   line1Segments = 0, line2Segments = 0;
 	double   line1Length = 0.0, line2Length = 0.0;
 	dPOINT   line1Point = {}, line2Point = {}, line1Delta = {}, line2Delta = {};
 	dPOINT   line1Step = {}, line2Step = {};
@@ -6707,7 +6724,8 @@ void satfn(const std::vector<double>& lengths, unsigned line1Start, unsigned lin
 }
 
 void satmf(const std::vector<double>& lengths) {
-	unsigned iGuide = 0, iVertex = 0;
+	unsigned iGuide  = 0;
+	size_t   iVertex = 0;
 	double   length = 0.0, deltaX = 0.0, deltaY = 0.0;
 
 	if (SelectedForm->attribute & FRMEND)
@@ -7143,11 +7161,11 @@ void refilfn() {
 }
 
 void refil() {
-	unsigned codedForm = 0, iStitch = 0, attribute = 0;
+	unsigned codedForm = 0, attribute = 0;
 
 	if (!UserFlagMap.test(UserFlag::WRNOF)) {
-		codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
-		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+		codedForm = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT) | USMSK;
+		for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			attribute = StitchBuffer[iStitch].attribute;
 			if (!(attribute & NOTFRM) && (attribute & (USMSK | FRMSK)) == codedForm) {
 				if (FormDataSheet)
@@ -7334,8 +7352,8 @@ unsigned chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio) {
 		}
 		if (minimumLength < CLOSENUF) {
 			ritfrct(ClosestFormToCursor, StitchWindowDC);
-			for (iControl = 0; iControl < 4; iControl++) {
-				stretchBoxLine[iControl] = formControls[iControl << 1];
+			for (size_t iCorner = 0u; iCorner < 4; iCorner++) {
+				stretchBoxLine[iCorner] = formControls[iCorner << 1];
 			}
 			stretchBoxLine[4] = stretchBoxLine[0];
 			strtchbox(stretchBoxLine);
@@ -7367,7 +7385,7 @@ void rstfrm() {
 	unsigned iVertex = 0, iStitch = 0;
 	POINT    point
 	    = { (Msg.pt.x + gsl::narrow<long>(round(FormMoveDelta.x))), (Msg.pt.y + gsl::narrow<long>(round(FormMoveDelta.y))) };
-	const unsigned attribute = (ClosestFormToCursor << 4);
+	const unsigned attribute = gsl::narrow<unsigned int>(ClosestFormToCursor << 4);
 
 	setmfrm();
 	StateMap.reset(StateFlag::FRMOV);
@@ -7468,7 +7486,6 @@ void satfix() {
 }
 
 void delcon(unsigned GuideIndex) {
-	unsigned iForm = ClosestFormToCursor + 1;
 	// ToDo - Find a better way to calculate the offset into the SatinGuides array
 	const unsigned iGuide = &SelectedForm->satinOrAngle.guide[GuideIndex] - SatinGuides;
 	SATCON*        guide  = &SelectedForm->satinOrAngle.guide[GuideIndex];
@@ -7479,7 +7496,7 @@ void delcon(unsigned GuideIndex) {
 			std::copy(
 			    guide + 1, guide + (SatinGuideIndex - iGuide + 1), stdext::make_checked_array_iterator(guide, SatinGuideIndex));
 		}
-		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			FRMHED* formHeader = &FormList[iForm];
 			if (formHeader->type == SAT && formHeader->satinGuideCount)
 				formHeader->satinOrAngle.guide--;
@@ -7572,14 +7589,15 @@ void uninsf() {
 		duinsf();
 }
 
-void rotfrm(unsigned newStartVertex) {
+void rotfrm(size_t newStartVertex) {
 	fvars(ClosestFormToCursor);
 
 	fPOINT* selectedVertices = CurrentFormVertices;
 	if (selectedVertices) {
 		std::vector<fPOINT> rotatedVertices(VertexCount);
-		unsigned            iVertex = 0, iGuide = 0, iRotatedGuide = 0, iRotated = newStartVertex;
-		unsigned short      tlin = 0;
+		unsigned            iVertex = 0, iGuide = 0, iRotatedGuide = 0;
+		size_t              iRotated = newStartVertex;
+		size_t              tlin     = 0;
 
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 			rotatedVertices[iVertex] = selectedVertices[iVertex];
@@ -7628,8 +7646,9 @@ void rotfrm(unsigned newStartVertex) {
 }
 
 void satclos() {
-	unsigned iVertex = 0, closestVertex = StartPoint, swap = 0;
-	unsigned initialGuideCount = SelectedForm->satinGuideCount;
+	unsigned iVertex = 0;
+	size_t   closestVertex     = StartPoint;
+	size_t  initialGuideCount = SelectedForm->satinGuideCount;
 	double   deltaX = 0.0, deltaY = 0.0, length = 0.0, minimumLength = 1e99;
 
 	uninsf();
@@ -7648,10 +7667,7 @@ void satclos() {
 		SelectedForm->fillType = CONTF;
 		closestVertex          = ClosestVertexToCursor;
 		if (StartPoint > closestVertex) {
-			// std::swap(closestVertex, StartPoint);
-			swap          = closestVertex;
-			closestVertex = StartPoint;
-			StartPoint    = gsl::narrow<unsigned short>(swap);
+			std::swap(closestVertex, StartPoint);
 		}
 		if (!StartPoint)
 			StartPoint++;
@@ -7763,11 +7779,12 @@ void filsat() {
 }
 
 unsigned closat() {
-	unsigned     iForm = 0, iVertex = 0, lastVertex = 0;
-	double       minimumLength = 1e99;
-	double       length        = 0;
-	unsigned int savedVertex   = 0;
-	float        param         = 0.0;
+	unsigned iForm         = 0;
+	size_t   lastVertex    = 0;
+	double   minimumLength = 1e99;
+	double   length        = 0;
+	size_t   savedVertex   = 0;
+	float    param         = 0.0;
 
 	px2stch();
 	for (iForm = 0; iForm < FormIndex; iForm++) {
@@ -7783,7 +7800,7 @@ unsigned closat() {
 				lastVertex = VertexCount;
 			}
 			// Loop through for all line segments
-			for (iVertex = 0; iVertex < lastVertex; iVertex++) {
+			for (size_t iVertex = 0; iVertex < lastVertex; iVertex++) {
 				param
 				    = findDistanceToSide(CurrentFormVertices[iVertex], CurrentFormVertices[nxt(iVertex)], SelectedPoint, length);
 				if ((length < minimumLength)) {
@@ -7820,9 +7837,9 @@ unsigned closat() {
 		return 1;
 }
 
-void nufpnt(unsigned vertex) noexcept {
+void nufpnt(size_t vertex) noexcept {
 	unsigned ind       = 0;
-	unsigned newVertex = vertex + 1;
+	size_t   newVertex = vertex + 1;
 
 	fltspac(&FormForInsert->vertices[newVertex], 1);
 	FormForInsert->vertices[newVertex] = SelectedPoint;
@@ -7851,7 +7868,7 @@ double p2p(const fPOINT& point0, const fPOINT& point1) noexcept {
 }
 
 void insat() {
-	unsigned int lastVertex = 0;
+	size_t lastVertex = 0;
 
 	if (closat()) {
 		savdo();
@@ -7901,7 +7918,7 @@ bool chkdel() noexcept {
 }
 
 void delspnt() {
-	unsigned iGuide = 0, iForm = 0;
+	unsigned iGuide     = 0;
 	SATCON*  guide      = nullptr;
 	fPOINT   vertex     = {};
 	FRMHED*  formHeader = nullptr;
@@ -7933,7 +7950,7 @@ void delspnt() {
 					}
 					SelectedForm->satinGuideCount--;
 					SatinGuideIndex--;
-					for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+					for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 						formHeader = &FormList[iForm];
 						if (formHeader->type == SAT && formHeader->satinGuideCount)
 							formHeader->satinOrAngle.guide++;
@@ -7959,7 +7976,7 @@ void delspnt() {
 	if (ClosestVertexToCursor > gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1)
 		ClosestVertexToCursor = SelectedForm->vertexCount - 1;
 	StateMap.set(StateFlag::FRMPSEL);
-	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
+	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 		FormList[iForm].vertices--;
 	ritfcor(CurrentFormVertices[ClosestVertexToCursor]);
 	ritnum(STR_NUMPNT, ClosestVertexToCursor);
@@ -8003,7 +8020,7 @@ void unfil() {
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			if (!StateMap.testAndReset(StateFlag::IGNOR) && !UserFlagMap.test(UserFlag::WRNOF)) {
-				codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
+				codedForm = gsl::narrow<unsigned int>((ClosestFormToCursor << FRMSHFT) | USMSK);
 				mapLength = StitchBuffer[0].attribute & (FRMSK | USMSK);
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 					attribute = StitchBuffer[iStitch].attribute;
@@ -8016,7 +8033,7 @@ void unfil() {
 					}
 				}
 			}
-			codedForm    = ClosestFormToCursor << FRMSHFT;
+			codedForm    = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 			iDestination = 0;
 			for (iSource = 0; iSource < PCSHeader.stitchCount; iSource++) {
 				if ((StitchBuffer[iSource].attribute & FRMSK) != codedForm || (StitchBuffer[iSource].attribute & NOTFRM)) {
@@ -8041,7 +8058,7 @@ void satzum() {
 	frmlin(*TempPolygon);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	SelectObject(StitchWindowMemDC, FormPen);
-	Polyline(StitchWindowMemDC, FormLines, SatinIndex);
+	PolylineInt(StitchWindowMemDC, FormLines, SatinIndex);
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	drwsat();
 }
@@ -8321,7 +8338,7 @@ void setap() {
 void maxtsiz(const std::wstring& label, POINT& textSize) noexcept {
 	SIZE labelSize;
 
-	GetTextExtentPoint32(StitchWindowMemDC, label.data(), label.size(), &labelSize);
+	GetTextExtentPoint32Int(StitchWindowMemDC, label.data(), label.size(), &labelSize);
 	textSize.y = labelSize.cy;
 	if (labelSize.cx > textSize.x)
 		textSize.x = labelSize.cx;
@@ -8808,8 +8825,9 @@ void selal() {
 void setstrtch() {
 	FLOAT      reference = 0.0;
 	double     ratio     = 1.0;
-	unsigned   iForm = 0, iVertex = 0, iStitch = 0, currentVertex = 0;
-	fRECTANGLE stitchRect = {};
+	unsigned   iForm = 0, iVertex = 0, iStitch = 0;
+	size_t     currentVertex = 0;
+	fRECTANGLE stitchRect    = {};
 	long       offsetY = 0, offsetX = 0;
 
 	savdo();
@@ -9004,14 +9022,15 @@ void setstrtch() {
 }
 
 void setexpand(double xyRatio) {
-	dPOINT     reference        = {};
-	POINT      integerReference = {};
-	fPOINT     stitchReference  = {};
-	dPOINT     size0            = {};
-	dPOINT     size1            = {};
-	dPOINT     ratio            = {};
-	double     aspect           = 0.0;
-	unsigned   iVertex = 0, iForm = 0, iStitch = 0, iCurrent = 0;
+	dPOINT reference        = {};
+	POINT  integerReference = {};
+	fPOINT stitchReference  = {};
+	dPOINT size0            = {};
+	dPOINT size1            = {};
+	dPOINT ratio            = {};
+	double aspect           = 0.0;
+	// unsigned iVertex = 0, iForm = 0, iStitch = 0;
+	size_t     iCurrent  = 0;
 	fRECTANGLE rectangle = {};
 
 	savdo();
@@ -9116,7 +9135,7 @@ void setexpand(double xyRatio) {
 	if (StateMap.test(StateFlag::FPSEL)) {
 		fvars(ClosestFormToCursor);
 		iCurrent = SelectedFormVertices.start;
-		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
+		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 			CurrentFormVertices[iCurrent].x = (CurrentFormVertices[iCurrent].x - stitchReference.x) * ratio.x + stitchReference.x;
 			CurrentFormVertices[iCurrent].y = (CurrentFormVertices[iCurrent].y - stitchReference.y) * ratio.y + stitchReference.y;
 			iCurrent                        = pdir(iCurrent);
@@ -9128,9 +9147,9 @@ void setexpand(double xyRatio) {
 		return;
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-		for (iForm = 0; iForm < FormIndex; iForm++) {
+		for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 			fvars(iForm);
-			for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+			for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
 				CurrentFormVertices[iVertex].x
 				    = (CurrentFormVertices[iVertex].x - stitchReference.x) * ratio.x + stitchReference.x;
 				CurrentFormVertices[iVertex].y
@@ -9138,7 +9157,7 @@ void setexpand(double xyRatio) {
 			}
 			frmout(iForm);
 		}
-		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			StitchBuffer[iStitch].x = (StitchBuffer[iStitch].x - stitchReference.x) * ratio.x + stitchReference.x;
 			StitchBuffer[iStitch].y = (StitchBuffer[iStitch].y - stitchReference.y) * ratio.y + stitchReference.y;
 		}
@@ -9149,7 +9168,7 @@ void setexpand(double xyRatio) {
 		if (SelectedFormList->size()) {
 			for (auto selectedForm : (*SelectedFormList)) {
 				fvars(selectedForm);
-				for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+				for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
 					CurrentFormVertices[iVertex].x
 					    = (CurrentFormVertices[iVertex].x - stitchReference.x) * ratio.x + stitchReference.x;
 					CurrentFormVertices[iVertex].y
@@ -9162,14 +9181,14 @@ void setexpand(double xyRatio) {
 		}
 		else {
 			if (StateMap.test(StateFlag::FORMSEL)) {
-				for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+				for (size_t iVertex = 0u; iVertex < VertexCount; iVertex++) {
 					CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - reference.x) * ratio.x + reference.x;
 					CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - reference.y) * ratio.y + reference.y;
 				}
 				refil();
 			}
 			else {
-				for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
+				for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
 					StitchBuffer[iStitch].x = (StitchBuffer[iStitch].x - reference.x) * ratio.x + reference.x;
 					StitchBuffer[iStitch].y = (StitchBuffer[iStitch].y - reference.y) * ratio.y + reference.y;
 				}
@@ -9184,7 +9203,7 @@ void nufilcol(unsigned color) noexcept {
 
 	if (SelectedForm->fillColor != color) {
 		SelectedForm->fillColor = color;
-		attribute               = (ClosestFormToCursor << 4) | FRMFIL;
+		attribute               = gsl::narrow<unsigned int>((ClosestFormToCursor << 4) | FRMFIL);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if ((StitchBuffer[iStitch].attribute & (FRMSK | TYPMSK | FTHMSK)) == attribute) {
 				StitchBuffer[iStitch].attribute &= 0xfffffff0;
@@ -9199,7 +9218,7 @@ void nufthcol(unsigned color) noexcept {
 
 	if (SelectedForm->fillInfo.feather.color != color) {
 		SelectedForm->fillInfo.feather.color = color;
-		attribute                            = (ClosestFormToCursor << 4) | FTHMSK;
+		attribute                            = gsl::narrow<unsigned int>((ClosestFormToCursor << 4) | FTHMSK);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if ((StitchBuffer[iStitch].attribute & (FRMSK | FTHMSK)) == attribute) {
 				StitchBuffer[iStitch].attribute &= 0xfffffff0;
@@ -9213,7 +9232,7 @@ void nubrdcol(unsigned color) noexcept {
 	unsigned attribute = 0, iStitch = 0;
 
 	SelectedForm->borderColor = color;
-	attribute                 = (ClosestFormToCursor << 4) | FRMBFIL;
+	attribute                 = gsl::narrow<unsigned int>((ClosestFormToCursor << 4) | FRMBFIL);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute & (FRMSK | TYPMSK)) == attribute) {
 			StitchBuffer[iStitch].attribute &= 0xfffffff0;
@@ -9228,7 +9247,7 @@ void nulapcol(unsigned color) {
 	if (gsl::narrow<unsigned>(SelectedForm->borderColor >> 4) != color) {
 		SelectedForm->borderColor &= COLMSK;
 		SelectedForm->borderColor |= color << 4;
-		attribute = (ClosestFormToCursor << 4) | TYPMSK;
+		attribute = gsl::narrow<unsigned int>((ClosestFormToCursor << 4) | TYPMSK);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if ((StitchBuffer[iStitch].attribute & (TYPMSK | FRMSK)) == attribute) {
 				StitchBuffer[iStitch].attribute &= 0xfffffff0;
@@ -9745,9 +9764,10 @@ void duzig(unsigned vertices) {
 }
 
 void fliph() {
-	unsigned   iForm = 0, iVertex = 0, iStitch = 0, currentVertex = 0, decodedForm = 0;
-	float      midpoint  = 0;
-	fRECTANGLE rectangle = {};
+	unsigned   iForm = 0, iVertex = 0, iStitch = 0, decodedForm = 0;
+	size_t     currentVertex = 0;
+	float      midpoint      = 0;
+	fRECTANGLE rectangle     = {};
 
 	fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
@@ -9827,7 +9847,7 @@ void tomsg() {
 	SIZE textSize;
 
 	GetWindowRect(OKButton, &OKrect);
-	GetTextExtentPoint32(StitchWindowMemDC, (*StringTable)[STR_DELST2].c_str(), (*StringTable)[STR_DELST2].size(), &textSize);
+	GetTextExtentPoint32Int(StitchWindowMemDC, (*StringTable)[STR_DELST2].c_str(), (*StringTable)[STR_DELST2].size(), &textSize);
 	DeleteStitchesDialog = CreateWindow(L"STATIC",
 	                                    (*StringTable)[STR_DELST2].c_str(),
 	                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -9929,7 +9949,7 @@ void frmon() {
 }
 
 void fnord() {
-	int iVertex = 0;
+	size_t iVertex = 0;
 
 	fvars(ClosestFormToCursor);
 	SelectedForm = &FormList[ClosestFormToCursor];
@@ -9941,7 +9961,8 @@ void fnord() {
 
 void flpord() {
 	int      iStitch = 0;
-	unsigned iVertex = 0, iForward = 0, start = 0, finish = 0;
+	unsigned iVertex = 0, iForward = 0;
+	size_t   start = 0, finish = 0;
 
 	fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
@@ -10284,7 +10305,7 @@ void rotdup() {
 		shord();
 }
 
-void adfrm(unsigned iForm) {
+void adfrm(size_t iForm) {
 	FRMHED* formHeader = &FormList[FormIndex];
 
 	SelectedForm         = &FormList[iForm];
@@ -10324,8 +10345,8 @@ void duprot(double rotationAngle, const dPOINT& rotationCenter) {
 }
 
 void duprotfs(double rotationAngle) {
-	const unsigned savedFormIndex = FormIndex;
-	dPOINT         rotationCenter = {};
+	const auto savedFormIndex = FormIndex;
+	dPOINT     rotationCenter = {};
 
 	rotpar(rotationCenter);
 	for (auto selectedForm : (*SelectedFormList)) {
@@ -10358,7 +10379,7 @@ void duprots(double rotationAngle, const dPOINT& rotationCenter) {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void cplayfn(unsigned iForm, unsigned play) {
+void cplayfn(size_t iForm, unsigned play) {
 	const FRMHED* formHeader = &FormList[iForm];
 
 	fvars(FormIndex);
@@ -10468,14 +10489,14 @@ void movlayr(unsigned codedLayer) {
 }
 
 void join() {
-	const unsigned savedFormIndex = ClosestFormToCursor;
-	unsigned       iVertex = 0, vertexCount = 0;
+	const auto savedFormIndex = ClosestFormToCursor;
+	size_t vertexCount               = 0;
 
 	StateMap.set(StateFlag::FRMSAM);
 	if (FormIndex > 1 && StateMap.test(StateFlag::FORMSEL) && closfrm()) {
 		vertexCount = FormList[ClosestFormToCursor].vertexCount;
 		std::vector<fPOINT> vertexList(vertexCount);
-		for (iVertex = 0; iVertex < vertexCount; iVertex++) {
+		for (size_t iVertex = 0u; iVertex < vertexCount; iVertex++) {
 			vertexList[iVertex]   = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor];
 			ClosestVertexToCursor = nxt(ClosestVertexToCursor);
 		}
@@ -10488,7 +10509,7 @@ void join() {
 		fPOINT* insertedVertex = &FormList[ClosestFormToCursor].vertices[FormList[ClosestFormToCursor].vertexCount];
 		if (insertedVertex) {
 			fltspac(insertedVertex, vertexCount);
-			for (iVertex = 0; iVertex < vertexCount; iVertex++) {
+			for (size_t iVertex = 0u; iVertex < vertexCount; iVertex++) {
 				insertedVertex[iVertex] = vertexList[iVertex];
 			}
 		}
@@ -10496,7 +10517,7 @@ void join() {
 		SelectedForm->vertexCount += vertexCount;
 		SelectedForm->rectangle.left = SelectedForm->rectangle.right = SelectedForm->vertices[0].x;
 		SelectedForm->rectangle.top = SelectedForm->rectangle.bottom = SelectedForm->vertices[0].y;
-		for (iVertex = 1; iVertex < SelectedForm->vertexCount; iVertex++) {
+		for (size_t iVertex = 1u; iVertex < SelectedForm->vertexCount; iVertex++) {
 			if (SelectedForm->vertices[iVertex].x < SelectedForm->rectangle.left)
 				SelectedForm->rectangle.left = SelectedForm->vertices[iVertex].x;
 			if (SelectedForm->vertices[iVertex].x > SelectedForm->rectangle.right)
@@ -10514,7 +10535,7 @@ void join() {
 }
 
 void refilal() {
-	const unsigned savedFormIndex = ClosestFormToCursor;
+	const auto savedFormIndex = ClosestFormToCursor;
 
 	savdo();
 	for (ClosestFormToCursor = 0; ClosestFormToCursor < FormIndex; ClosestFormToCursor++)
@@ -10546,7 +10567,7 @@ void nufsel() {
 	}
 }
 
-void frmadj(unsigned formIndex) noexcept {
+void frmadj(size_t formIndex) noexcept {
 	unsigned iVertex = 0;
 
 	fvars(formIndex);
@@ -10573,8 +10594,8 @@ void frmsadj() {
 }
 
 void frmpnts(unsigned type) noexcept {
-	unsigned       iStitch = 0;
-	const unsigned trg     = (ClosestFormToCursor << 4) | type;
+	unsigned   iStitch = 0;
+	const auto trg     = gsl::narrow<unsigned int>((ClosestFormToCursor << 4) | type);
 
 	while (iStitch < PCSHeader.stitchCount && (StitchBuffer[iStitch].attribute & (ALTYPMSK | FRMSK)) != trg)
 		iStitch++;
@@ -10647,7 +10668,7 @@ void selalfil() {
 		tabmsg(IDS_SEL1FRM);
 }
 
-bool frmrng(unsigned iForm, RANGE& range) noexcept {
+bool frmrng(size_t iForm, RANGE& range) noexcept {
 	range.start  = 0;
 	range.finish = PCSHeader.stitchCount;
 	if (FormList[iForm].fillType || FormList[iForm].edgeType) {
@@ -10733,7 +10754,7 @@ void fcntr() {
 				SelectedForm->vertices[iVertex].y += delta.y;
 			}
 			frmout(selectedForm);
-			codedForm = (selectedForm << 4);
+			codedForm = gsl::narrow<unsigned int>(selectedForm << FRMSHFT);
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 				if ((StitchBuffer[iStitch].attribute & FRMSK) == codedForm && !(StitchBuffer[iStitch].attribute & NOTFRM)) {
 					StitchBuffer[iStitch].x += delta.x;
@@ -10817,7 +10838,7 @@ void picot() {
 	}
 }
 
-bool contsf(unsigned formIndex) {
+bool contsf(size_t formIndex) {
 	ClosestFormToCursor = formIndex;
 	fvars(formIndex);
 	if (SelectedForm->vertexCount > 4) {
@@ -10860,7 +10881,8 @@ void contfil() {
 }
 
 void ribon() {
-	unsigned iVertex = 0, iGuide = 0, isBlunt = 0, iNewVertex = 0, savedFormIndex = 0;
+	unsigned iNewVertex = 0, isBlunt = 0;
+	size_t   savedFormIndex = 0;
 
 	frm1pnt();
 	if (StateMap.test(StateFlag::FORMSEL)) {
@@ -10888,10 +10910,10 @@ void ribon() {
 					formHeader->vertices                 = adflt(VertexCount << 1);
 					formHeader->vertices[0].x            = (*OutsidePoints)[0].x;
 					formHeader->vertices[iNewVertex++].y = (*OutsidePoints)[0].y;
-					for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+					for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 						formHeader->vertices[iNewVertex++] = (*InsidePoints)[iVertex];
 					}
-					for (iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
+					for (auto iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
 						formHeader->vertices[iNewVertex++] = (*OutsidePoints)[iVertex];
 					}
 				}
@@ -10900,12 +10922,12 @@ void ribon() {
 					formHeader->vertices[0].x            = (*OutsidePoints)[0].x;
 					formHeader->vertices[iNewVertex++].y = (*OutsidePoints)[0].y;
 					formHeader->underlayIndent           = IniFile.underlayIndent;
-					for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+					for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 						formHeader->vertices[iNewVertex++] = (*InsidePoints)[iVertex];
 					}
 					formHeader->vertices[iNewVertex++] = (*InsidePoints)[0];
 					formHeader->vertices[iNewVertex++] = (*OutsidePoints)[0];
-					for (iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
+					for (auto iVertex = VertexCount - 1; iVertex != 0; iVertex--) {
 						formHeader->vertices[iNewVertex++] = (*OutsidePoints)[iVertex];
 					}
 				}
@@ -10932,7 +10954,7 @@ void ribon() {
 				}
 				else
 					formHeader->fillType = SATF;
-				for (iGuide = 0; iGuide < formHeader->satinGuideCount; iGuide++) {
+				for (auto iGuide = 0u; iGuide < formHeader->satinGuideCount; iGuide++) {
 					formHeader->satinOrAngle.guide[iGuide].start  = iGuide + 2;
 					formHeader->satinOrAngle.guide[iGuide].finish = formHeader->vertexCount - iGuide - 1;
 				}
@@ -11041,7 +11063,7 @@ void dufdat(std::vector<fPOINT>& tempClipPoints,
             std::vector<SATCON>& tempGuides,
             std::vector<fPOINT>& destinationFormVertices,
             std::vector<FRMHED>& destinationFormList,
-            unsigned             formIndex) {
+            size_t               formIndex) {
 	FRMHED& destination = destinationFormList[FormRelocationIndex];
 
 	destinationFormList[FormRelocationIndex++] = FormList[formIndex];
@@ -11080,7 +11102,8 @@ void stchfrm(unsigned formIndex, unsigned* attribute) noexcept {
 }
 
 void frmnumfn(unsigned newFormIndex) {
-	unsigned iForm = 0, iStitch = 0, sourceForm = 0, start = 0, finish = 0, decodedFormIndex = 0;
+	unsigned iStitch = 0, sourceForm = 0, decodedFormIndex = 0;
+	size_t   start = 0, finish = 0;
 
 	savdo();
 	if (newFormIndex != ClosestFormToCursor) {
@@ -11100,7 +11123,7 @@ void frmnumfn(unsigned newFormIndex) {
 		std::vector<fPOINT> tempClipPoints(ClipPointIndex);
 
 		FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
-		for (iForm = 0; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 			if (iForm == newFormIndex)
 				dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, ClosestFormToCursor);
 			else {
@@ -11439,15 +11462,15 @@ void debean() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void mvfrmsb(FRMHED* const destination, const FRMHED* const source, unsigned count) noexcept {
+void mvfrmsb(FRMHED* const destination, const FRMHED* const source, size_t count) noexcept {
 	memmove(destination, source, count * sizeof(FRMHED));
 }
 
-void mvfltsb(fPOINT* const destination, const fPOINT* const source, unsigned count) noexcept {
+void mvfltsb(fPOINT* const destination, const fPOINT* const source, size_t count) noexcept {
 	memmove(destination, source, count * sizeof(fPOINT));
 }
 
-void clpspac(const fPOINT* const insertPoint, unsigned count) noexcept {
+void clpspac(const fPOINT* const insertPoint, size_t count) noexcept {
 	mvfltsb(&ClipPoints[ClipPointIndex + count - 1], &ClipPoints[ClipPointIndex - 1], ClipPointIndex - clpind(insertPoint));
 }
 
@@ -11464,7 +11487,7 @@ void stchadj() {
 		}
 	}
 	refilfn();
-	low = ClosestFormToCursor << FRMSHFT;
+	low = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 	for (iStitch = PCSHeader.stitchCount; iStitch != 0; iStitch--) {
 		high = StitchBuffer[iStitch - 1].attribute & FRMSK;
 		if ((StitchBuffer[iStitch - 1].attribute & FRMSK) == low) {
@@ -11479,7 +11502,8 @@ void stchadj() {
 void spltsat(const SATCON& currentGuide) {
 	// We are adding two additional vertices when splitting the form
 	std::vector<fPOINT> vertexBuffer(VertexCount + 2);
-	unsigned            iForm = 0, iGuide = 0, iVertex = 0, iOldVertex = 0, iNewVertex = 0, oldLastVertex = 0;
+	unsigned            iGuide = 0, iVertex = 0;
+	size_t              oldLastVertex = 0, iNewVertex = 0, iOldVertex = 0;
 
 	mvfrmsb(&FormList[FormIndex], &FormList[FormIndex - 1], FormIndex - ClosestFormToCursor);
 	FormIndex++;
@@ -11488,7 +11512,7 @@ void spltsat(const SATCON& currentGuide) {
 		        &FormVertices[FormVertexIndex - 1],
 		        FormVertexIndex - fltind(FormList[ClosestFormToCursor + 2].vertices));
 	FormVertexIndex += 2;
-	for (iForm = ClosestFormToCursor + 2; iForm < FormIndex; iForm++)
+	for (auto iForm = ClosestFormToCursor + 2; iForm < FormIndex; iForm++)
 		FormList[iForm].vertices += 2;
 	iOldVertex    = 0;
 	oldLastVertex = currentGuide.start + (VertexCount - currentGuide.finish) + 1;
@@ -11547,19 +11571,17 @@ void spltsat(const SATCON& currentGuide) {
 	FormList[ClosestFormToCursor + 1].satinOrAngle.guide = &SelectedForm->satinOrAngle.guide[ActivePointIndex];
 	FormList[ClosestFormToCursor + 1].satinGuideCount    = SelectedForm->satinGuideCount - ActivePointIndex - 1;
 	SelectedForm->satinGuideCount                        = ActivePointIndex;
-	for (iForm = ClosestFormToCursor + 2; iForm < FormIndex; iForm++)
+	for (auto iForm = ClosestFormToCursor + 2; iForm < FormIndex; iForm++)
 		FormList[iForm].satinOrAngle.guide--;
 	if (iseclp(ClosestFormToCursor)) {
 		clpspac(SelectedForm->borderClipData, SelectedForm->clipEntries);
-		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
+		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 			FormList[iForm].borderClipData += SelectedForm->clipEntries;
 	}
 	stchadj();
 }
 
 bool spltlin() {
-	unsigned iForm = 0;
-
 	if (ClosestVertexToCursor < 2 || SelectedForm->vertexCount - ClosestVertexToCursor < 2)
 		return 0;
 	mvfrmsb(&FormList[FormIndex], &FormList[FormIndex - 1], FormIndex - ClosestFormToCursor);
@@ -11571,7 +11593,7 @@ bool spltlin() {
 	frmout(ClosestFormToCursor + 1);
 	if (iseclp(ClosestFormToCursor)) {
 		clpspac(SelectedForm->borderClipData, SelectedForm->clipEntries);
-		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
+		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 			FormList[iForm].borderClipData += SelectedForm->clipEntries;
 	}
 	stchadj();
@@ -11879,16 +11901,16 @@ void dubfil() {
 }
 
 void col2frm() {
-	unsigned       iStitch = 0, iForm = 0, iColor = 0, formColorCode = 0, count = 0, majorityColor = 0;
-	unsigned       startColorOffset = 0, endColorOffset = 0, colorChangedCount = 0;
-	const unsigned formColorPermutations = FormIndex << 4; // total number of form and color combinations
+	unsigned     iColor = 0, formColorCode = 0, count = 0, majorityColor = 0;
+	unsigned     startColorOffset = 0, endColorOffset = 0, colorChangedCount = 0;
+	const size_t formColorPermutations = FormIndex << 4; // total number of form and color combinations
 
 	if (FormIndex) {
 		std::vector<unsigned> fillColorHistogram(formColorPermutations);
 		std::vector<unsigned> borderColorHistogram(formColorPermutations);
 		std::vector<unsigned> featherColorHistogram(formColorPermutations);
 		std::vector<unsigned> underlayColorHistogram(formColorPermutations);
-		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+		for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			formColorCode = StitchBuffer[iStitch].attribute & 0x3fff;
 			if (StitchBuffer[iStitch].attribute & (WLKMSK | CWLKMSK | UNDMSK))
 				underlayColorHistogram[formColorCode]++;
@@ -11909,7 +11931,7 @@ void col2frm() {
 		}
 		startColorOffset = 0;
 		endColorOffset   = 16;
-		for (iForm = 0; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0ul; iForm < FormIndex; iForm++) {
 			if (FormList[iForm].fillType) {
 				count = majorityColor = 0;
 				for (iColor = startColorOffset; iColor < endColorOffset; iColor++) {

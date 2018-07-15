@@ -6,295 +6,297 @@
 
 #include <shlobj.h>
 
+#include "wrappers.h"
+
 #include "Resources/resource.h"
 #include "thred.h"
 
 namespace fs = std::experimental::filesystem;
 
-extern void               angclp();
-extern void               angsclp();
-extern void               apliq();
-extern void               bakagain();
-extern void               bakdup();
-extern void               bfilmsg();
-extern void               bhol();
-extern void               bholbrd();
-extern void               bord();
-extern void               boxsel();
-extern void               bsizpar();
-extern void               butxt(unsigned iButton, const std::wstring& buttonText);
-extern void               centir();
-extern void               chain();
-extern void               chan();
-extern void               chgchk(int code);
-extern void               chgwrn();
-extern void               chkcont();
-extern unsigned           chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
-extern unsigned           closfrm();
-extern void               clpfil();
-extern void               clrfills();
-extern void               clrstch();
-extern void               cntrx();
-extern void               col2frm();
-extern void               contfil();
-extern void               cpylayr(unsigned codedLayer);
-extern void               crmsg(const fs::path& fileName);
-extern void               crop();
-extern void               dazdef();
-extern void               debean();
-extern void               delcon(unsigned GuideIndex);
-extern void               deleclp(unsigned iForm);
-extern void               delflt(unsigned formIndex);
-extern void               delfrms();
-extern void               delmclp(unsigned iForm);
-extern void               delmfil();
-extern void               delsac(unsigned formIndex);
-extern void               delspnt();
-extern void               deltx();
-extern void               drwcon();
-extern void               drwfrm();
-extern void               drwsat();
-extern void               drwtxtr();
-extern void               duauxnam();
-extern void               dubcol(unsigned color);
-extern void               dubean();
-extern void               dubfil();
-extern void               dubig();
-extern void               dubit(unsigned bit);
-extern void               dublen(float length);
-extern void               dubmax(float length);
-extern void               dubmin(float length);
-extern void               dubold();
-extern void               dubsfil();
-extern void               dubspac(float length);
-extern void               dueg(unsigned nsids);
-extern void               dufang(float angle);
-extern void               dufcol(unsigned color);
-extern void               dufhi(float length);
-extern void               dufind(float indent);
-extern void               duflen(float length);
-extern void               dufmax(float length);
-extern void               dufmin(float length);
-extern void               duform(unsigned ind);
-extern void               dufrm();
-extern void               dufspac(float spacing);
-extern void               dufwid(float length);
-extern void               dufxang(float angle);
-extern void               duhart(unsigned sideCount);
-extern void               duinsf();
-extern void               dulens(unsigned sides);
-extern void               dundcol(unsigned color);
-extern void               duprot(double rotationAngle, const dPOINT& rotationCenter);
-extern void               dupsel(HDC dc);
-extern void               durpoli(unsigned vertexCount);
-extern void               dusat();
-extern void               dushft();
-extern void               duspac(float spacing);
-extern void               duspir(unsigned stepCount);
-extern void               dustar(unsigned starCount, double length);
-extern void               dusulen(float length);
-extern void               dutxtfil();
-extern void               duxclp();
-extern void               duzig(unsigned vertices);
-extern void               fclp();
-extern void               fcntr();
-extern void               fethr();
-extern void               fethrf();
-extern void               filangl();
-extern void               filclpx();
-extern void               filhor();
-extern void               filnopn(unsigned code, const fs::path& fileName);
-extern void               filsat();
-extern void               filvrt();
-extern unsigned           find1st();
-extern void               fliph();
-extern void               flipv();
-extern void               flpord();
-extern unsigned           fltind(const fPOINT* const point);
-extern void               fltspac(const fPOINT* const start, unsigned count);
-extern void               form();
-extern void               frm0();
-extern void               frmadj(unsigned formIndex);
-extern void               frmchkx();
-extern void               frmclr(FRMHED* const destination);
-extern void               frmlin(fPOINT* vertices, unsigned vertexCount);
-extern void               frmnum();
-extern void               frmnumfn(unsigned newFormIndex);
-extern void               frmon();
-extern void               frmout(unsigned formIndex);
-extern void               frmovlin();
-extern bool               frmrng(unsigned iForm, RANGE& range);
-extern void               frmsadj();
-extern void               frmsqr(unsigned iVertex);
-extern void               fsclpx();
-extern void               fselrct(unsigned iForm);
-extern void               fsizpar();
-extern void               fsort();
-extern void               fvars(unsigned iForm);
-extern void               getfinfo(unsigned iForm);
-extern unsigned           getlast();
-extern void               grpmsg();
-extern void               grpmsg1();
-extern void               help();
-extern void               horclp();
-extern void               horsclp();
-extern void               hsizmsg();
-extern void               infrm();
-extern void               insat();
-extern bool               iseclpx(unsigned iForm) noexcept;
-extern void               ispcdclp();
-extern bool               istx(unsigned iForm);
-extern void               join();
-extern void               lodchk();
-extern void               lodstr();
-extern inline void        loadString(std::wstring& sDest, unsigned stringID);
-extern void               makspac(unsigned start, unsigned count);
-extern void               maxtsiz(const std::wstring& label, POINT& textSize);
-extern void               maxwid(unsigned start, unsigned finish);
-extern float              midl(float high, float low);
-extern void               mdufrm();
-extern void               movlayr(unsigned codedLayer);
-extern void               msgstr(unsigned code);
-extern void               munfrm();
-extern void               mvshft();
-extern void               notcwlk();
-extern bool               notfstch(unsigned attribute);
-extern bool               notsel();
-extern void               notund();
-extern void               notwlk();
-extern void               nubrdcol(unsigned color);
-extern void               nudsiz();
-extern void               nufilcol(unsigned color);
-extern void               nufsel();
-extern void               nufthcol(unsigned color);
-extern void               nulapcol(unsigned color);
-extern constexpr unsigned nxt(unsigned int iVertex);
-extern void               oclp(const fPOINT* const clip, unsigned clipEntries);
-extern void               okcan();
-extern unsigned           pdir(unsigned vertex);
-extern void               pes2crd();
-extern void               picot();
-extern void               prbug();
-extern void               prfmsg();
-extern void               prfsid(HWND wnd);
-extern void               prpbrd(double borderStitchSpacing);
-extern constexpr unsigned prv(unsigned iVertex);
-extern unsigned           psg();
-extern void               pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect);
-extern void               rats();
-extern void               ratsr();
-extern void               rct2sel(const RECT& rectangle, std::vector<POINT>& line);
-extern void               redtx();
-extern void               redup();
-extern void               refil();
-extern void               refilal();
-extern void               refilfn();
-extern void               refrm();
-extern void               repar();
-extern void               ribon();
-extern void               rinfrm();
-extern void               riter();
-extern void               ritfrct(unsigned iForm, HDC dc);
-extern void               ritnum(unsigned code, unsigned value);
-extern void               rotagain();
-extern void               rotcmd(dPOINT& rotationCenter);
-extern void               rotdup();
-extern void               rstfrm();
-extern void               rstxt();
-extern void               rstxt();
-extern void               rtrclp();
-extern void               sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect) noexcept;
-extern void               satadj();
-extern void               satbrd();
-extern void               satfix();
-extern void               satknkt();
-extern void               satpnt0();
-extern void               satpnt1();
-extern void               satsel();
-extern void               satzum();
-extern void               savblen(float fLength);
-extern void               savdisc();
-extern void               savplen(float length);
-extern void               savtxt();
-extern void               selal();
-extern void               selalfil();
-extern void               selalfrm();
-extern void               selfil(unsigned type);
-extern void               selsqr(const POINT& controlPoint, HDC dc);
-extern void               setap();
-extern void               setbcol();
-extern void               setblen();
-extern void               setbmax();
-extern void               setbmin();
-extern void               setbspac();
-extern void               setclpspac();
-extern void               setcwlk();
-extern void               setear();
-extern void               setexpand(double xyRatio);
-extern void               setfang();
-extern void               setfchk();
-extern void               setfcol();
-extern void               setfhi();
-extern void               setfilend();
-extern void               setfilstrt();
-extern void               setfind();
-extern void               setflen();
-extern void               setfmax();
-extern void               setfmin();
-extern void               setfpnt();
-extern void               setfrm();
-extern void               setfspac();
-extern void               setfwid();
-extern void               sethup();
-extern void               setins();
-extern void               setmfrm();
-extern void               setrang();
-extern void               setshft();
-extern void               setstrtch();
-extern void               setuang();
-extern void               setucol();
-extern void               setulen();
-extern void               setund();
-extern void               setuspac();
-extern void               setwlk();
-extern void               setwlkind();
-extern void               sfCor2px(const fPOINT& stitchPoint, POINT& screen);
-extern void               sfuang();
-extern void               shoMsg(const std::wstring& message);
-extern void               shoseln(unsigned code0, unsigned code1);
-extern void               shrnk();
-extern void               sidwnd(HWND wnd);
-extern void               snap();
-extern void               spltfrm();
-extern void               srtbyfrm();
-extern void               srtfrm();
-extern void               stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect);
-extern void               stchs2frm();
-extern void               tabmsg(unsigned code);
-extern void               tglfrm();
-extern void               tomsg();
-extern void               tsizmsg(const wchar_t* threadSizeText, double threadSize);
-extern void               tst();
-extern void               txdun();
-extern void               txof();
-extern void               txsnap();
-extern void               txtclp();
-extern void               txtkey(unsigned keyCode);
-extern void               txtlbut();
-extern void               txtlin();
-extern void               txtrbut();
-extern void               txtrmov();
-extern void               txtrup();
-extern void               undlen();
-extern void               unfil();
-extern void               unfrm();
-extern void               uninsf();
-extern void               unpsel();
-extern void               unstrtch(std::vector<POINT>& stretchBoxLine);
-extern void               uspac();
-extern void               vrtclp();
-extern void               vrtsclp();
-extern void               wavfrm();
+extern void             angclp();
+extern void             angsclp();
+extern void             apliq();
+extern void             bakagain();
+extern void             bakdup();
+extern void             bfilmsg();
+extern void             bhol();
+extern void             bholbrd();
+extern void             bord();
+extern void             boxsel();
+extern void             bsizpar();
+extern void             butxt(unsigned iButton, const std::wstring& buttonText);
+extern void             centir();
+extern void             chain();
+extern void             chan();
+extern void             chgchk(int code);
+extern void             chgwrn();
+extern void             chkcont();
+extern unsigned         chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
+extern unsigned         closfrm();
+extern void             clpfil();
+extern void             clrfills();
+extern void             clrstch();
+extern void             cntrx();
+extern void             col2frm();
+extern void             contfil();
+extern void             cpylayr(unsigned codedLayer);
+extern void             crmsg(const fs::path& fileName);
+extern void             crop();
+extern void             dazdef();
+extern void             debean();
+extern void             delcon(unsigned GuideIndex);
+extern void             deleclp(size_t iForm);
+extern void             delflt(size_t formIndex);
+extern void             delfrms();
+extern void             delmclp(size_t iForm);
+extern void             delmfil();
+extern void             delsac(size_t formIndex);
+extern void             delspnt();
+extern void             deltx();
+extern void             drwcon();
+extern void             drwfrm();
+extern void             drwsat();
+extern void             drwtxtr();
+extern void             duauxnam();
+extern void             dubcol(unsigned color);
+extern void             dubean();
+extern void             dubfil();
+extern void             dubig();
+extern void             dubit(unsigned bit);
+extern void             dublen(float length);
+extern void             dubmax(float length);
+extern void             dubmin(float length);
+extern void             dubold();
+extern void             dubsfil();
+extern void             dubspac(float length);
+extern void             dueg(unsigned nsids);
+extern void             dufang(float angle);
+extern void             dufcol(unsigned color);
+extern void             dufhi(float length);
+extern void             dufind(float indent);
+extern void             duflen(float length);
+extern void             dufmax(float length);
+extern void             dufmin(float length);
+extern void             duform(unsigned ind);
+extern void             dufrm();
+extern void             dufspac(float spacing);
+extern void             dufwid(float length);
+extern void             dufxang(float angle);
+extern void             duhart(unsigned sideCount);
+extern void             duinsf();
+extern void             dulens(unsigned sides);
+extern void             dundcol(unsigned color);
+extern void             duprot(double rotationAngle, const dPOINT& rotationCenter);
+extern void             dupsel(HDC dc);
+extern void             durpoli(unsigned vertexCount);
+extern void             dusat();
+extern void             dushft();
+extern void             duspac(float spacing);
+extern void             duspir(unsigned stepCount);
+extern void             dustar(unsigned starCount, double length);
+extern void             dusulen(float length);
+extern void             dutxtfil();
+extern void             duxclp();
+extern void             duzig(unsigned vertices);
+extern void             fclp();
+extern void             fcntr();
+extern void             fethr();
+extern void             fethrf();
+extern void             filangl();
+extern void             filclpx();
+extern void             filhor();
+extern void             filnopn(unsigned code, const fs::path& fileName);
+extern void             filsat();
+extern void             filvrt();
+extern unsigned         find1st();
+extern void             fliph();
+extern void             flipv();
+extern void             flpord();
+extern unsigned         fltind(const fPOINT* const point);
+extern void             fltspac(const fPOINT* const start, size_t count);
+extern void             form();
+extern void             frm0();
+extern void             frmadj(size_t formIndex);
+extern void             frmchkx();
+extern void             frmclr(FRMHED* const destination);
+extern void             frmlin(fPOINT* vertices, unsigned vertexCount);
+extern void             frmnum();
+extern void             frmnumfn(unsigned newFormIndex);
+extern void             frmon();
+extern void             frmout(size_t formIndex);
+extern void             frmovlin();
+extern bool             frmrng(size_t iForm, RANGE& range);
+extern void             frmsadj();
+extern void             frmsqr(unsigned iVertex);
+extern void             fsclpx();
+extern void             fselrct(size_t iForm);
+extern void             fsizpar();
+extern void             fsort();
+extern void             fvars(size_t iForm);
+extern void             getfinfo(size_t iForm);
+extern unsigned         getlast();
+extern void             grpmsg();
+extern void             grpmsg1();
+extern void             help();
+extern void             horclp();
+extern void             horsclp();
+extern void             hsizmsg();
+extern void             infrm();
+extern void             insat();
+extern bool             iseclpx(size_t iForm) noexcept;
+extern void             ispcdclp();
+extern bool             istx(size_t iForm);
+extern void             join();
+extern void             lodchk();
+extern void             lodstr();
+extern inline void      loadString(std::wstring& sDest, unsigned stringID);
+extern void             makspac(unsigned start, unsigned count);
+extern void             maxtsiz(const std::wstring& label, POINT& textSize);
+extern void             maxwid(unsigned start, unsigned finish);
+extern float            midl(float high, float low);
+extern void             mdufrm();
+extern void             movlayr(unsigned codedLayer);
+extern void             msgstr(unsigned code);
+extern void             munfrm();
+extern void             mvshft();
+extern void             notcwlk();
+extern bool             notfstch(unsigned attribute);
+extern bool             notsel();
+extern void             notund();
+extern void             notwlk();
+extern void             nubrdcol(unsigned color);
+extern void             nudsiz();
+extern void             nufilcol(unsigned color);
+extern void             nufsel();
+extern void             nufthcol(unsigned color);
+extern void             nulapcol(unsigned color);
+extern constexpr size_t nxt(size_t iVertex);
+extern void             oclp(const fPOINT* const clip, size_t clipEntries);
+extern void             okcan();
+extern size_t           pdir(size_t vertex);
+extern void             pes2crd();
+extern void             picot();
+extern void             prbug();
+extern void             prfmsg();
+extern void             prfsid(HWND wnd);
+extern void             prpbrd(double borderStitchSpacing);
+extern constexpr size_t prv(size_t iVertex);
+extern unsigned         psg();
+extern void             pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect);
+extern void             rats();
+extern void             ratsr();
+extern void             rct2sel(const RECT& rectangle, std::vector<POINT>& line);
+extern void             redtx();
+extern void             redup();
+extern void             refil();
+extern void             refilal();
+extern void             refilfn();
+extern void             refrm();
+extern void             repar();
+extern void             ribon();
+extern void             rinfrm();
+extern void             riter();
+extern void             ritfrct(size_t iForm, HDC dc);
+extern void             ritnum(unsigned code, size_t value);
+extern void             rotagain();
+extern void             rotcmd(dPOINT& rotationCenter);
+extern void             rotdup();
+extern void             rstfrm();
+extern void             rstxt();
+extern void             rstxt();
+extern void             rtrclp();
+extern void             sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect) noexcept;
+extern void             satadj();
+extern void             satbrd();
+extern void             satfix();
+extern void             satknkt();
+extern void             satpnt0();
+extern void             satpnt1();
+extern void             satsel();
+extern void             satzum();
+extern void             savblen(float fLength);
+extern void             savdisc();
+extern void             savplen(float length);
+extern void             savtxt();
+extern void             selal();
+extern void             selalfil();
+extern void             selalfrm();
+extern void             selfil(unsigned type);
+extern void             selsqr(const POINT& controlPoint, HDC dc);
+extern void             setap();
+extern void             setbcol();
+extern void             setblen();
+extern void             setbmax();
+extern void             setbmin();
+extern void             setbspac();
+extern void             setclpspac();
+extern void             setcwlk();
+extern void             setear();
+extern void             setexpand(double xyRatio);
+extern void             setfang();
+extern void             setfchk();
+extern void             setfcol();
+extern void             setfhi();
+extern void             setfilend();
+extern void             setfilstrt();
+extern void             setfind();
+extern void             setflen();
+extern void             setfmax();
+extern void             setfmin();
+extern void             setfpnt();
+extern void             setfrm();
+extern void             setfspac();
+extern void             setfwid();
+extern void             sethup();
+extern void             setins();
+extern void             setmfrm();
+extern void             setrang();
+extern void             setshft();
+extern void             setstrtch();
+extern void             setuang();
+extern void             setucol();
+extern void             setulen();
+extern void             setund();
+extern void             setuspac();
+extern void             setwlk();
+extern void             setwlkind();
+extern void             sfCor2px(const fPOINT& stitchPoint, POINT& screen);
+extern void             sfuang();
+extern void             shoMsg(const std::wstring& message);
+extern void             shoseln(unsigned code0, unsigned code1);
+extern void             shrnk();
+extern void             sidwnd(HWND wnd);
+extern void             snap();
+extern void             spltfrm();
+extern void             srtbyfrm();
+extern void             srtfrm();
+extern void             stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect);
+extern void             stchs2frm();
+extern void             tabmsg(unsigned code);
+extern void             tglfrm();
+extern void             tomsg();
+extern void             tsizmsg(const wchar_t* threadSizeText, double threadSize);
+extern void             tst();
+extern void             txdun();
+extern void             txof();
+extern void             txsnap();
+extern void             txtclp();
+extern void             txtkey(unsigned keyCode);
+extern void             txtlbut();
+extern void             txtlin();
+extern void             txtrbut();
+extern void             txtrmov();
+extern void             txtrup();
+extern void             undlen();
+extern void             unfil();
+extern void             unfrm();
+extern void             uninsf();
+extern void             unpsel();
+extern void             unstrtch(std::vector<POINT>& stretchBoxLine);
+extern void             uspac();
+extern void             vrtclp();
+extern void             vrtsclp();
+extern void             wavfrm();
 #ifdef _DEBUG
 extern void dmpat();
 #endif
@@ -305,17 +307,17 @@ extern double                     BorderWidth;
 extern BSEQPNT                    BSequence[BSEQLEN];
 extern float                      ButtonholeCornerLength;
 extern fPOINT                     ClipPoints[MAXITEMS];
-extern unsigned                   ClosestFormToCursor;
-extern unsigned                   ClosestVertexToCursor;
-extern unsigned                   ClipPointIndex;
+extern size_t                     ClosestFormToCursor;
+extern size_t                     ClosestVertexToCursor;
+extern size_t                     ClipPointIndex;
 extern SATCON*                    CurrentFormGuides;
 extern fPOINT*                    CurrentFormVertices;
 extern std::vector<HWND>*         ValueWindow;
 extern std::vector<double>*       FormAngles;
 extern POINT                      FormLines[MAXFRMLINS];
-extern unsigned                   FormVertexIndex;
+extern size_t                     FormVertexIndex;
 extern fPOINT                     FormMoveDelta;
-extern unsigned                   FormIndex;
+extern size_t                     FormIndex;
 extern FRMHED                     FormList[MAXFORMS];
 extern std::vector<POINT>*        FormControlPoints;
 extern std::wstring*              FormOnOff;
@@ -327,20 +329,20 @@ extern double                     LineSpacing;
 extern fPOINT                     LowerLeftStitch;
 extern MENUITEMINFO*              MenuInfo;
 extern HWND                       MsgWindow;
-extern unsigned                   NewFormVertexCount;
-extern unsigned                   OutputIndex;
+extern size_t                     NewFormVertexCount;
+extern size_t                     OutputIndex;
 extern fPOINT                     OSequence[OSEQLEN];
 extern std::vector<fPOINT>*       OutsidePointList;
 extern std::vector<fPOINT>*       InsidePointList;
 extern float                      PicotSpacing;
 extern long                       PreferenceWindowWidth;
-extern unsigned                   PreviousFormIndex;
+extern size_t                     PreviousFormIndex;
 extern unsigned                   PseudoRandomValue;
 extern std::vector<POINT>*        RubberBandLine;
-extern unsigned                   SatinGuideIndex;
+extern size_t                     SatinGuideIndex;
 extern SATCON                     SatinGuides[MAXSAC];
 extern unsigned                   SelectedFormControlVertex;
-extern std::vector<unsigned>*     SelectedFormList;
+extern std::vector<size_t>*       SelectedFormList;
 extern std::vector<POINT>*        SelectedFormsLine;
 extern RECT                       SelectedFormsRect;
 extern std::vector<POINT>*        SelectedPointsLine;
@@ -352,12 +354,12 @@ extern double                     StarRatio;
 extern std::vector<fPOINT>*       TempPolygon;
 extern std::vector<TXPNT>*        TempTexturePoints;
 extern TXTSCR                     TextureScreen;
-extern int                        TextureIndex;
+extern size_t                     TextureIndex;
 extern std::wstring*              TextureInputBuffer; // texture editor number buffer
 extern std::vector<TXPNT>*        TexturePointsBuffer;
-extern unsigned                   VertexCount;
+extern size_t                     VertexCount;
 extern double                     VerticalRatio;
-extern unsigned short             SatinEndGuide;
+extern size_t                     SatinEndGuide;
 
 // select box
 #define NERCNT 4 // number of entries in the near array
@@ -406,7 +408,7 @@ unsigned        PrevGroupEndStitch;                     // higher end of previou
 wchar_t         StitchEntryBuffer[5];                   // stitch number entered by user
 wchar_t         SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
 unsigned        BufferIndex = 0;                        // pointer to the next number to be entered
-unsigned        BufferDigitCount;                       // number of decimal digits in the number of stitches
+size_t          BufferDigitCount;                       // number of decimal digits in the number of stitches
 unsigned        LineIndex;                              // line index for display routine
 double          StitchWindowAspectRatio;                // aspect ratio of the stitch window
 double          MinStitchLength   = MINSIZ * PFAFGRAN;  // minimum stitch size
@@ -422,7 +424,7 @@ void*           ClipPointer;                    // for memory allocation for cli
 void*           ThrEdClipPointer;               // for memory allocation for thred format clipboard data
 FLSIZ           ClipRectSize;                   // clipboard rectangle size
 fRECTANGLE      ClipRect;                       // clipboard rectangle
-unsigned        ClipStitchCount;                // number of stitchs extracted from clipboard
+size_t          ClipStitchCount;                // number of stitchs extracted from clipboard
 POINT           ClipOrigin;                     // origin of clipboard box in stitch coordinates
 HGLOBAL         ClipMemory;                     // handle to the clipboard memory
 SIZE            SelectBoxSize;                  // size of the select box
@@ -475,8 +477,8 @@ unsigned char NameEncoder[128];              // designer name encoding
 unsigned char NameDecoder[256];              // designer name decode
 std::wstring* DesignerName;                  // designer name in clear
 HWND          FirstWin;                      // first window not destroyed for exiting enumerate loop
-RANGE         SelectedFormsRange;            // range of selected forms
-unsigned      TmpFormIndex;                  // saved form index
+FRMRANGE      SelectedFormsRange;            // range of selected forms
+size_t        TmpFormIndex;                  // saved form index
 double        ZoomMin;                       // minimum allowed zoom value
 fRECTANGLE    CheckHoopRect;                 // for checking the hoop size
 fPOINT        BalaradOffset;                 // balarad offset
@@ -489,7 +491,7 @@ FORMVERTICES  SelectedFormVertices;          // selected form vertices
 fRECTANGLE    SelectedVerticesRect;          // rectangle enclosing selected form verticess
 RECT          SelectedPixelsRect;            // display form vertex select rectangle
 POINT*        FormVerticesAsLine;            // form vertex clipboard paste into form line
-unsigned      LastFormSelected;              // end point of selected range of forms
+size_t        LastFormSelected;              // end point of selected range of forms
 
 std::vector<std::unique_ptr<unsigned[]>>* UndoBuffer; // backup data
 
@@ -704,7 +706,7 @@ HANDLE        PCSFileHandle               = 0;
 HANDLE        IniFileHandle               = 0;
 HANDLE        InsertedFileHandle; // insert file handle
 HANDLE        BitmapFileHandle;   // bitmap handle
-unsigned      FileSize;           // size of file
+size_t        FileSize;           // size of file
 unsigned long BytesRead;          // bytes actually read from file
 unsigned      ColorChanges;       // number of color changes
 char          PCSBMPFileName[16]; // bitmap file name from pcs file
@@ -734,13 +736,13 @@ OPENFILENAME OpenFileName = {
 
 std::vector<fs::path>*     PreviousNames;
 std::vector<std::wstring>* Thumbnails;                          // vector of thumbnail names
-int                        ThumbnailsSelected[4];               // indexes of thumbnails selected for display
+size_t                     ThumbnailsSelected[4];               // indexes of thumbnails selected for display
 unsigned                   ThumbnailDisplayCount;               // number of thumbnail file names selected for display
-unsigned                   ThumbnailIndex;                      // index into the thumbnail filname table
+size_t                     ThumbnailIndex;                      // index into the thumbnail filname table
 wchar_t                    ThumbnailSearchString[32];           // storage for the thumnail search string
 wchar_t                    InsertedFileName[_MAX_PATH] = { 0 }; // insert file name
-unsigned                   InsertedVertexIndex;                 // saved float pointer for inserting files
-unsigned                   InsertedFormIndex;                   // saved form pointer for inserting files
+size_t                     InsertedVertexIndex;                 // saved float pointer for inserting files
+size_t                     InsertedFormIndex;                   // saved form pointer for inserting files
 unsigned                   InsertedStitchCount;                 // saved stitch pointer for inserting files
 
 OPENFILENAME OpenBitmapName = {
@@ -1422,13 +1424,13 @@ void getdes() noexcept {
 	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, (DLGPROC)dnamproc);
 }
 
-bool isclp(unsigned iForm) noexcept {
+bool isclp(size_t iForm) noexcept {
 	if ((1 << FormList[iForm].fillType) & ClipTypeMap)
 		return 1;
 	return 0;
 }
 
-bool isclpx(unsigned iForm) noexcept {
+bool isclpx(size_t iForm) noexcept {
 	if (isclp(iForm) && FormList[iForm].lengthOrCount.clipCount)
 		return 1;
 	return 0;
@@ -1440,7 +1442,7 @@ bool isfclp() noexcept {
 	return 0;
 }
 
-bool iseclp(unsigned iForm) noexcept {
+bool iseclp(size_t iForm) noexcept {
 	if (FormList[iForm].edgeType == EDGECLIP || FormList[iForm].edgeType == EDGEPICOT || FormList[iForm].edgeType == EDGECLIPX)
 		return 1;
 	return 0;
@@ -1649,8 +1651,8 @@ void dstin(unsigned number, POINT& pout) noexcept {
 	}
 }
 
-fPOINT* adflt(unsigned count) {
-	unsigned iFormVertex = FormVertexIndex;
+fPOINT* adflt(size_t count) {
+	size_t iFormVertex = FormVertexIndex;
 
 	if (FormVertexIndex + count > MAXITEMS)
 		tabmsg(IDS_FRMOVR);
@@ -1658,15 +1660,15 @@ fPOINT* adflt(unsigned count) {
 	return &FormVertices[iFormVertex];
 }
 
-SATCON* adsatk(unsigned count) noexcept {
-	unsigned iSatinConnect = SatinGuideIndex;
+SATCON* adsatk(size_t count) noexcept {
+	auto iSatinConnect = SatinGuideIndex;
 
 	SatinGuideIndex += count;
 	return &SatinGuides[iSatinConnect];
 }
 
-fPOINT* adclp(unsigned count) noexcept {
-	unsigned iClipPoint = ClipPointIndex;
+fPOINT* adclp(size_t count) noexcept {
+	size_t iClipPoint = ClipPointIndex;
 
 	ClipPointIndex += count;
 	return &ClipPoints[iClipPoint];
@@ -1807,9 +1809,9 @@ void deldu() {
 }
 
 void dudat() {
-	unsigned size       = 0;
-	BAKHED*  backupData = nullptr;
-	auto&    undoBuffer = *UndoBuffer;
+	size_t  size       = 0;
+	BAKHED* backupData = nullptr;
+	auto&   undoBuffer = *UndoBuffer;
 
 	undoBuffer[UndoBufferWriteIndex].reset(nullptr);
 	size = sizeof(BAKHED) + sizeof(FRMHED) * FormIndex + sizeof(fPOINTATTR) * PCSHeader.stitchCount
@@ -1978,7 +1980,7 @@ void rngadj() {
 	}
 }
 
-void inline mvstch(unsigned destination, unsigned source) noexcept {
+void inline mvstch(size_t destination, size_t source) noexcept {
 	StitchBuffer[destination] = StitchBuffer[source];
 }
 
@@ -3065,7 +3067,8 @@ void ritot(unsigned number) {
 }
 
 void frmcalc() {
-	unsigned iStitch = 0, code = 0;
+	unsigned iStitch   = 0;
+	size_t   code      = 0;
 	double   maxLength = 0;
 	double   minLength = 1e99;
 	double   length    = 0.0;
@@ -3168,11 +3171,11 @@ void delsmal(unsigned startStitch, unsigned endStitch) {
 	// ToDo - does this function work correctly?
 	// ToDo - rename inf
 
-	unsigned       iStitch = 0, iNextStitch = 0;
-	const unsigned codedAttribute = ClosestFormToCursor << 4;
-	unsigned       inf            = 0;
-	long           dx = 0, dy = 0;
-	double         stitchSize = 1e99;
+	unsigned     iStitch = 0, iNextStitch = 0;
+	const size_t codedAttribute = ClosestFormToCursor << 4;
+	unsigned     inf            = 0;
+	long         dx = 0, dy = 0;
+	double       stitchSize = 1e99;
 
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
@@ -3345,7 +3348,7 @@ void selin(unsigned start, unsigned end, HDC dc) {
 	SelectObject(dc, GroupSelectPen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	if (SearchLineIndex)
-		Polyline(dc, SearchLine, SearchLineIndex);
+		PolylineInt(dc, SearchLine, SearchLineIndex);
 	if (start > end) {
 		swap  = start;
 		start = end;
@@ -3358,7 +3361,7 @@ void selin(unsigned start, unsigned end, HDC dc) {
 		coordinate                      = (hi - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5);
 		SearchLine[SearchLineIndex++].y = gsl::narrow<long>(round(coordinate));
 	}
-	Polyline(dc, SearchLine, SearchLineIndex);
+	PolylineInt(dc, SearchLine, SearchLineIndex);
 	SetROP2(dc, R2_COPYPEN);
 }
 
@@ -3439,7 +3442,7 @@ void dusel(HDC dc) {
 
 	SetROP2(dc, R2_NOTXORPEN);
 	SelectObject(dc, LinePen);
-	Polyline(dc, FormControlPoints->data(), (FormControlPoints->size() - 1));
+	PolylineInt(dc, FormControlPoints->data(), (FormControlPoints->size() - 1));
 	for (ind = 0; ind < 8; ind++)
 		selsqr((*FormControlPoints)[ind], dc);
 	SetROP2(dc, R2_COPYPEN);
@@ -3909,7 +3912,7 @@ void ritbal() {
 		WriteFile(balaradFile, balaradStitch.data(), iOutput * sizeof(BALSTCH), &bytesWritten, 0);
 		CloseHandle(balaradFile);
 		balaradFile = CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
-		WriteFile(balaradFile, outputName.wstring().c_str(), outputName.wstring().size() + 1, &bytesWritten, 0);
+		WriteFileInt(balaradFile, outputName.wstring().c_str(), outputName.wstring().size() + 1, &bytesWritten, 0);
 		CloseHandle(balaradFile);
 	}
 	else {
@@ -3972,7 +3975,7 @@ void duver(const fs::path& name) {
 	}
 }
 
-void durit(char** destination, const void* const source, unsigned count) noexcept {
+void durit(char** destination, const void* const source, size_t count) noexcept {
 	if (destination && source) {
 		[[gsl::suppress(26474)]] memcpy(static_cast<void*>(*destination), source, count);
 		*destination += count;
@@ -3981,8 +3984,9 @@ void durit(char** destination, const void* const source, unsigned count) noexcep
 
 void dubuf(char* const buffer, unsigned& count) {
 	STRHED   stitchHeader = {};
-	unsigned iForm = 0, iVertex = 0, iGuide = 0, iClip = 0;
-	unsigned vertexCount = 0, guideCount = 0, clipDataCount = 0;
+	unsigned iVertex = 0, iGuide = 0, iClip = 0;
+	size_t   vertexCount = 0;
+	size_t   guideCount = 0, clipDataCount = 0;
 	char*    output = buffer;
 
 	stitchHeader.headerType  = 0x2746872;
@@ -3992,7 +3996,7 @@ void dubuf(char* const buffer, unsigned& count) {
 	auto designer            = win32::Utf16ToUtf8(*DesignerName);
 	std::copy(designer.begin(), designer.end(), ExtendedHeader.modifierName);
 	if (FormIndex) {
-		for (iForm = 0; iForm < FormIndex; iForm++) {
+		for (size_t iForm = 0; iForm < FormIndex; iForm++) {
 			vertexCount += FormList[iForm].vertexCount;
 			if (FormList[iForm].type == SAT)
 				guideCount += FormList[iForm].satinGuideCount;
@@ -4002,21 +4006,22 @@ void dubuf(char* const buffer, unsigned& count) {
 				clipDataCount += FormList[iForm].clipEntries;
 		}
 	}
-	stitchHeader.formCount     = FormIndex;
-	stitchHeader.vertexCount   = vertexCount;
-	stitchHeader.dlineCount    = guideCount;
-	stitchHeader.clipDataCount = clipDataCount;
+	stitchHeader.formCount     = gsl::narrow<unsigned short>(FormIndex);
+	stitchHeader.vertexCount   = gsl::narrow<unsigned short>(vertexCount);
+	stitchHeader.dlineCount    = gsl::narrow<unsigned short>(guideCount);
+	stitchHeader.clipDataCount = gsl::narrow<unsigned short>(clipDataCount);
 	const auto threadLength = (sizeof(ThreadSize) / sizeof(wchar_t)) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
 	const auto formDataOffset
 	    = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor) + sizeof(CustomColor) + threadLength;
-	stitchHeader.vertexLen   = sizeof(STRHED) + PCSHeader.stitchCount * sizeof(fPOINTATTR) + formDataOffset;
-	stitchHeader.dlineLen    = sizeof(fPOINT) * vertexCount;
-	stitchHeader.clipDataLen = sizeof(fPOINT) * clipDataCount;
+	stitchHeader.vertexLen
+	    = gsl::narrow<unsigned short>(sizeof(STRHED) + PCSHeader.stitchCount * sizeof(fPOINTATTR) + formDataOffset);
+	stitchHeader.dlineLen    = gsl::narrow<unsigned short>(sizeof(fPOINT) * vertexCount);
+	stitchHeader.clipDataLen = gsl::narrow<unsigned short>(sizeof(fPOINT) * clipDataCount);
 	durit(&output, &stitchHeader, sizeof(STRHED));
 	ExtendedHeader.auxFormat         = IniFile.auxFileType;
 	ExtendedHeader.hoopSizeX         = IniFile.hoopSizeX;
 	ExtendedHeader.hoopSizeY         = IniFile.hoopSizeY;
-	ExtendedHeader.texturePointCount = TextureIndex;
+	ExtendedHeader.texturePointCount = gsl::narrow<unsigned int>(TextureIndex);
 	durit(&output, &ExtendedHeader, sizeof(STREX));
 	durit(&output, StitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR));
 	if (!PCSBMPFileName[0]) {
@@ -4035,15 +4040,15 @@ void dubuf(char* const buffer, unsigned& count) {
 	auto         threadSizeBuf = win32::Utf16ToUtf8(threadSizeBufW);
 	durit(&output, threadSizeBuf.c_str(), threadLength * sizeof(char));
 	if (FormIndex) {
-		std::vector<FRMHED> forms;
+		std::vector<FRMHEDOUT> forms;
 		forms.reserve(FormIndex);
 		std::vector<fPOINT> vertices;
 		vertices.reserve(vertexCount);
-		std::vector<SATCON> guides;
+		std::vector<SATCONOUT> guides;
 		guides.reserve(guideCount);
 		std::vector<fPOINT> points;
 		points.reserve(clipDataCount);
-		for (iForm = 0; iForm < FormIndex; iForm++) {
+		for (size_t iForm = 0; iForm < FormIndex; iForm++) {
 			forms.push_back(FormList[iForm]);
 			forms[iForm].vertices = nullptr;
 			for (iVertex = 0; iVertex < FormList[iForm].vertexCount; iVertex++) {
@@ -4051,7 +4056,7 @@ void dubuf(char* const buffer, unsigned& count) {
 			}
 			if (FormList[iForm].type == SAT) {
 				forms[iForm].satinOrAngle.guide = nullptr;
-				forms[iForm].satinGuideCount    = FormList[iForm].satinGuideCount;
+				forms[iForm].satinGuideCount    = gsl::narrow<unsigned short>(FormList[iForm].satinGuideCount);
 				for (iGuide = 0; iGuide < FormList[iForm].satinGuideCount; iGuide++) {
 					guides.push_back(FormList[iForm].satinOrAngle.guide[iGuide]);
 				}
@@ -4272,11 +4277,11 @@ void ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, const st
 	if (colfil()) {
 		colorFile = CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		if (colorFile != INVALID_HANDLE_VALUE)
-			WriteFile(colorFile, &colorData[0], colorData.size() * sizeof(colorData[0]), &bytesWritten, 0);
+			WriteFileInt(colorFile, &colorData[0], colorData.size() * sizeof(colorData[0]), &bytesWritten, 0);
 		CloseHandle(colorFile);
 		colorFile = CreateFile(RGBFileName->wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 		if (colorFile != INVALID_HANDLE_VALUE)
-			WriteFile(colorFile, &colorData[2], (colorData.size() - 2) * sizeof(colorData[0]), &bytesWritten, 0);
+			WriteFileInt(colorFile, &colorData[2], (colorData.size() - 2) * sizeof(colorData[0]), &bytesWritten, 0);
 		CloseHandle(colorFile);
 	}
 }
@@ -4537,7 +4542,7 @@ void sav() {
 		DSTOffsets          DSTOffsetData = {};
 		std::vector<PCSTCH> PCSStitchBuffer;
 		auto                auxName = win32::Utf16ToUtf8(*AuxName);
-		auto                desc    = strrchr(auxName.data(), '\\') + 1;
+		const char*         desc    = strrchr(auxName.data(), '\\') + 1;
 		switch (IniFile.auxFileType) {
 		case AUXDST:
 			ritdst(DSTOffsetData, DSTRecords, saveStitches);
@@ -4579,7 +4584,7 @@ void sav() {
 			strncpy(dstHeader.eof, "\x1a", sizeof(dstHeader.eof));
 			std::fill_n(dstHeader.res, sizeof(dstHeader.res), ' ');
 			WriteFile(PCSFileHandle, &dstHeader, sizeof(DSTHED), &bytesWritten, 0);
-			WriteFile(PCSFileHandle, DSTRecords.data(), sizeof(DSTREC) * DSTRecords.size(), &bytesWritten, 0);
+			WriteFileInt(PCSFileHandle, DSTRecords.data(), sizeof(DSTREC) * DSTRecords.size(), &bytesWritten, 0);
 			break;
 #if PESACT
 		case AUXPES:
@@ -5813,7 +5818,7 @@ void nuFil() {
 					PCSHeader.stitchCount         = thredHeader.stitchCount;
 					ReadFile(FileHandle, StitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR), &stitchesRead, NULL);
 					if (stitchesRead != PCSHeader.stitchCount * sizeof(fPOINTATTR)) {
-						PCSHeader.stitchCount = stitchesRead / sizeof(fPOINTATTR);
+						PCSHeader.stitchCount = gsl::narrow<unsigned short>(stitchesRead / sizeof(fPOINTATTR));
 						prtred();
 						return;
 					}
@@ -5864,9 +5869,10 @@ void nuFil() {
 					if (FormIndex) {
 						FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
 						MsgBuffer[0]                                       = 0;
+						DWORD bytesToRead                                  = 0u;
 						if (version < 2) {
 							std::vector<FRMHEDO> formListOriginal(FormIndex);
-							ReadFile(FileHandle, formListOriginal.data(), FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
+							ReadFileInt(FileHandle, formListOriginal.data(), FormIndex * sizeof(FRMHEDO), &BytesRead, 0);
 							if (BytesRead != FormIndex * sizeof(FRMHEDO)) {
 								FormIndex = BytesRead / sizeof(FRMHEDO);
 								StateMap.set(StateFlag::BADFIL);
@@ -5874,27 +5880,39 @@ void nuFil() {
 							std::copy(formListOriginal.cbegin(), formListOriginal.cend(), FormList);
 						}
 						else {
-							ReadFile(FileHandle, (FRMHED*)FormList, FormIndex * sizeof(FRMHED), &BytesRead, 0);
+							FRMHEDOUT inFormList[1024];
+							bytesToRead = gsl::narrow<DWORD>(FormIndex * sizeof(FRMHEDOUT));
+							ReadFileInt(FileHandle, (FRMHEDOUT*)inFormList, bytesToRead, &BytesRead, 0);
 							StateMap.reset(StateFlag::BADFIL);
-							if (BytesRead != FormIndex * sizeof(FRMHED)) {
-								FormIndex = BytesRead / sizeof(FRMHED);
+							if (BytesRead != bytesToRead) {
+								FormIndex = BytesRead / sizeof(FRMHEDOUT);
 								StateMap.set(StateFlag::BADFIL);
 							}
+							for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+								FormList[iForm] = inFormList[iForm];
+							}
 						}
-						ReadFile(FileHandle, (fPOINT*)FormVertices, thredHeader.vertexCount * sizeof(fPOINT), &BytesRead, 0);
-						if (BytesRead != sizeof(fPOINT) * thredHeader.vertexCount) {
+						bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(fPOINT));
+						ReadFile(FileHandle, (fPOINT*)FormVertices, bytesToRead, &BytesRead, 0);
+						if (BytesRead != bytesToRead) {
 							FormVertexIndex = BytesRead / sizeof(fPOINT);
-							for (unsigned iVertex = FormVertexIndex; iVertex < thredHeader.vertexCount; iVertex++)
+							for (size_t iVertex = FormVertexIndex; iVertex < thredHeader.vertexCount; iVertex++)
 								FormVertices[iVertex].x = FormVertices[iVertex].y = 0;
 							StateMap.set(StateFlag::BADFIL);
 						}
-						ReadFile(FileHandle, (SATCON*)SatinGuides, thredHeader.dlineCount * sizeof(SATCON), &BytesRead, 0);
-						if (BytesRead != thredHeader.dlineCount * sizeof(SATCON)) {
-							SatinGuideIndex = BytesRead / sizeof(SATCON);
+						SATCONOUT inSatinGuides[MAXSAC];
+						bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(SATCONOUT));
+						ReadFile(FileHandle, (SATCONOUT*)inSatinGuides, bytesToRead, &BytesRead, 0);
+						if (BytesRead != bytesToRead) {
+							SatinGuideIndex = BytesRead / sizeof(SATCONOUT);
 							StateMap.set(StateFlag::BADFIL);
 						}
-						ReadFile(FileHandle, (fPOINT*)ClipPoints, thredHeader.clipDataCount * sizeof(fPOINT), &BytesRead, 0);
-						if (BytesRead != thredHeader.clipDataCount * sizeof(fPOINT)) {
+						for (size_t iGuide = 0u; iGuide < SatinGuideIndex; iGuide++) {
+							SatinGuides[iGuide] = inSatinGuides[iGuide];
+						}
+						bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(fPOINT));
+						ReadFile(FileHandle, (fPOINT*)ClipPoints, bytesToRead, &BytesRead, 0);
+						if (BytesRead != bytesToRead) {
 							ClipPointIndex = BytesRead / sizeof(fPOINT);
 							StateMap.set(StateFlag::BADFIL);
 						}
@@ -6083,7 +6101,7 @@ void nuFil() {
 							PCSBMPFileName[0] = 0;
 							fileSize          = GetFileSize(FileHandle, &BytesRead) - sizeof(DSTHED);
 							std::vector<DSTREC> DSTData(fileSize / sizeof(DSTREC));
-							ReadFile(FileHandle, DSTData.data(), sizeof(DSTREC) * DSTData.size(), &BytesRead, 0);
+							ReadFileInt(FileHandle, DSTData.data(), sizeof(DSTREC) * DSTData.size(), &BytesRead, 0);
 							dstran(DSTData);
 							IniFile.auxFileType = AUXDST;
 						}
@@ -7056,7 +7074,7 @@ void clpbox() {
 void lodclp(unsigned iStitch) {
 	fPOINT   adjustment  = { (ClipOrigin.x - ClipRect.left), (ClipOrigin.y - ClipRect.bottom) };
 	unsigned source      = PCSHeader.stitchCount - 1;
-	unsigned destination = PCSHeader.stitchCount + ClipStitchCount - 1;
+	size_t   destination = PCSHeader.stitchCount + ClipStitchCount - 1;
 
 	if (iStitch != PCSHeader.stitchCount)
 		iStitch++;
@@ -7075,7 +7093,7 @@ void lodclp(unsigned iStitch) {
 	}
 	GroupStitchIndex = iStitch - 1;
 	StateMap.set(StateFlag::GRPSEL);
-	PCSHeader.stitchCount += ClipStitchCount;
+	PCSHeader.stitchCount += gsl::narrow<unsigned short>(ClipStitchCount);
 	if (PCSHeader.stitchCount)
 		StateMap.set(StateFlag::INIT);
 }
@@ -7369,7 +7387,7 @@ void rot(dPOINT& rotationCenter) {
 	ritrot(0, rotationCenter);
 }
 
-void savclp(unsigned destination, unsigned source) noexcept {
+void savclp(size_t destination, size_t source) noexcept {
 	double frct = 0.0, intg = 0.0;
 
 	ClipStitchData[destination].led  = StitchBuffer[source].attribute & COLMSK;
@@ -7386,7 +7404,7 @@ void savclp(unsigned destination, unsigned source) noexcept {
 	ClipStitchData[destination].tag  = 0x14;
 }
 
-void rtclpfn(unsigned destination, unsigned source) noexcept {
+void rtclpfn(size_t destination, size_t source) noexcept {
 	double fractional = 0.0, integer = 0.0;
 
 	ClipStitchData[destination].led  = 0;
@@ -7403,8 +7421,8 @@ void rtclpfn(unsigned destination, unsigned source) noexcept {
 	ClipStitchData[destination].tag  = 0x14;
 }
 
-unsigned sizfclp() {
-	unsigned clipSize;
+size_t sizfclp() {
+	size_t clipSize;
 
 	clipSize = sizeof(FORMCLIP) + VertexCount * sizeof(fPOINT);
 	if (SelectedForm->type == SAT)
@@ -7418,9 +7436,9 @@ unsigned sizfclp() {
 	return clipSize;
 }
 
-unsigned frmcnt(unsigned iForm, unsigned formFirstStitchIndex) noexcept {
-	const unsigned codedAttribute = iForm << FRMSHFT;
-	unsigned       stitchCount = 0, iStitch = 0;
+unsigned frmcnt(size_t iForm, unsigned formFirstStitchIndex) noexcept {
+	const size_t codedAttribute = iForm << FRMSHFT;
+	unsigned     stitchCount = 0, iStitch = 0;
 
 	LowerLeftStitch.x = LowerLeftStitch.y = 1e20f;
 	bool flag                             = true;
@@ -7449,8 +7467,8 @@ unsigned frmcnt(unsigned iForm, unsigned formFirstStitchIndex) noexcept {
 	}
 }
 
-unsigned sizclp(unsigned formFirstStitchIndex) {
-	unsigned length = 0;
+size_t sizclp(unsigned formFirstStitchIndex) {
+	size_t length = 0;
 
 	length = FileSize = sizeof(FORMCLIP) + VertexCount * sizeof(fPOINT);
 	if (SelectedForm->type == SAT)
@@ -7469,11 +7487,11 @@ unsigned sizclp(unsigned formFirstStitchIndex) {
 	return length;
 }
 
-constexpr unsigned lenclp() {
+unsigned lenclp() {
 	unsigned codedAttribute = 0, iStitch = 0, stitchCount = 0;
 
 	stitchCount    = 0;
-	codedAttribute = ClosestFormToCursor << FRMSHFT;
+	codedAttribute = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute & (FRMSK | NOTFRM)) == codedAttribute)
 			stitchCount++;
@@ -7483,10 +7501,13 @@ constexpr unsigned lenclp() {
 
 void duclip() {
 	unsigned       iClip = 0, iDestination = 0, iForm = 0, iGuide = 0;
-	unsigned       iSide = 0, iStitch = 0, iSource = 0, iTexture = 0, iVertex = 0;
+	unsigned       iSide = 0, iStitch = 0, iTexture = 0, iVertex = 0;
+	size_t         iSource    = 0;
 	unsigned       guideCount = 0, pointCount = 0, textureCount = 0, stitchCount = 0;
-	unsigned       length = 0, codedAttribute = 0, msiz = 0;
-	const unsigned firstStitch = 0; // points to the first stitch in a form
+	unsigned       codedAttribute = 0;
+	size_t         msiz           = 0;
+	size_t         length         = 0;
+	const unsigned firstStitch    = 0; // points to the first stitch in a form
 
 	if (StateMap.test(StateFlag::FPSEL)) {
 		if (OpenClipboard(ThrEdWindow)) {
@@ -7644,7 +7665,7 @@ void duclip() {
 				if (StateMap.test(StateFlag::FORMSEL)) {
 					length = sizclp(firstStitch);
 					fvars(ClosestFormToCursor);
-					codedAttribute = ClosestFormToCursor << FRMSHFT;
+					codedAttribute = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 					FileSize += sizeof(FORMCLIP);
 					ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize);
 					[[gsl::suppress(26429)]] {
@@ -7698,7 +7719,7 @@ void duclip() {
 								ClipStitchData[0].led = length;
 								iTexture++;
 								iDestination   = 1;
-								codedAttribute = ClosestFormToCursor << FRMSHFT;
+								codedAttribute = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 								while (iTexture < PCSHeader.stitchCount) {
 									if ((StitchBuffer[iTexture].attribute & FRMSK) == codedAttribute
 									    && !(StitchBuffer[iTexture].attribute & NOTFRM))
@@ -7764,7 +7785,7 @@ void f1del() {
 	unsigned cod = 0, iStitch = 0, stitchCount = 0;
 
 	if (StateMap.test(StateFlag::DELTO)) {
-		cod         = ClosestFormToCursor << FRMSHFT;
+		cod         = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 		stitchCount = 0;
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if ((StitchBuffer[iStitch].attribute & (FRMSK | NOTFRM)) != cod) {
@@ -7782,16 +7803,15 @@ void f1del() {
 }
 
 void frmdel() {
-	unsigned iForm = 0, iStitch = 0;
 	unsigned stitchForm = 0, stitchAttributeFormBits = 0;
 
 	fvars(ClosestFormToCursor);
 	f1del();
-	for (iForm = ClosestFormToCursor; iForm < FormIndex; iForm++) {
+	for (auto iForm = ClosestFormToCursor; iForm < FormIndex; iForm++) {
 		FormList[iForm] = FormList[iForm + 1];
 	}
 	if (StateMap.testAndReset(StateFlag::DELTO)) {
-		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+		for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (!(StitchBuffer[iStitch].attribute & NOTFRM)) {
 				stitchAttributeFormBits = (StitchBuffer[iStitch].attribute & FRMSK);
 				stitchForm              = stitchAttributeFormBits >> 4;
@@ -7803,7 +7823,7 @@ void frmdel() {
 		}
 	}
 	else {
-		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (!(StitchBuffer[iStitch].attribute & NOTFRM)) {
 				stitchAttributeFormBits = (StitchBuffer[iStitch].attribute & FRMSK);
 				stitchForm              = stitchAttributeFormBits >> FRMSHFT;
@@ -8066,7 +8086,7 @@ void setknt() {
 	StateMap.set(StateFlag::FILDIR);
 	endknt(iStitch);
 	StitchBuffer[OutputIndex - 1].attribute &= (~KNOTMSK);
-	PCSHeader.stitchCount = OutputIndex - MAXITEMS;
+	PCSHeader.stitchCount = gsl::narrow<unsigned short>(OutputIndex - MAXITEMS);
 	mvstchs(0, MAXITEMS, PCSHeader.stitchCount);
 }
 
@@ -8112,7 +8132,7 @@ void chkncol() {
 				strtknt(iStitch);
 		}
 	}
-	PCSHeader.stitchCount = OutputIndex - MAXITEMS;
+	PCSHeader.stitchCount = gsl::narrow<unsigned short>(OutputIndex - MAXITEMS);
 	mvstchs(0, MAXITEMS, PCSHeader.stitchCount);
 }
 
@@ -8214,7 +8234,7 @@ void drwlstch(unsigned finish) {
 			}
 		}
 		SelectObject(StitchWindowDC, UserPen[color]);
-		Polyline(StitchWindowDC, MovieLine, iMovieFrame);
+		PolylineInt(StitchWindowDC, MovieLine, iMovieFrame);
 		if (!flag)
 			RunPoint--;
 	}
@@ -8228,7 +8248,7 @@ void drwlstch(unsigned finish) {
 			MovieLine[iMovieFrame++] = StitchCoordinatesPixels;
 		}
 		RunPoint--;
-		Polyline(StitchWindowDC, MovieLine, iMovieFrame);
+		PolylineInt(StitchWindowDC, MovieLine, iMovieFrame);
 	}
 	if ((StitchBuffer[RunPoint + 1].attribute & 0xf) != color)
 		RunPoint++;
@@ -8268,7 +8288,7 @@ void setsped() {
 
 void deltot() {
 	DesignerName->assign(win32::Utf8ToUtf16(std::string(IniFile.designerName)));
-	FormIndex = PCSHeader.stitchCount = FormVertexIndex = ClipPointIndex = SatinGuideIndex = TextureIndex = 0;
+	TextureIndex = FormIndex = FormVertexIndex = SatinGuideIndex = ClipPointIndex = PCSHeader.stitchCount = 0;
 	StateMap.reset(StateFlag::GMRK);
 	rstAll();
 	coltab();
@@ -8278,9 +8298,7 @@ void deltot() {
 }
 
 bool wastch() noexcept {
-	unsigned iStitch;
-
-	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor)
 			return 1;
 	}
@@ -8303,7 +8321,8 @@ bool frmstch() {
 }
 
 void delet() {
-	unsigned iVertex = 0, iForm = 0, iGuide = 0, currentFormVertex = 0;
+	unsigned iVertex = 0, iGuide = 0;
+	size_t   currentFormVertex = 0;
 	// ToDo - check satinFlag
 	bool satinFlag = false;
 
@@ -8328,7 +8347,7 @@ void delet() {
 		while (iVertex < FormVertexIndex) {
 			FormVertices[currentFormVertex++] = FormVertices[iVertex++];
 		}
-		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
+		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 			FormList[iForm].vertices -= (SelectedFormVertices.vertexCount + 1);
 		FormVertexIndex -= (SelectedFormVertices.vertexCount + 1);
 		SelectedForm->vertexCount -= (SelectedFormVertices.vertexCount + 1);
@@ -8706,7 +8725,7 @@ void insfil() {
 	STRHED     fileHeader    = {};
 	STREX      thredHeader   = {};
 	PCSHEADER  pcsFileHeader = {};
-	unsigned   iFormList = 0, iVertex = 0, iStitch = 0, iName = 0, iPCSStitch = 0;
+	unsigned   iStitch = 0, iName = 0, iPCSStitch = 0;
 	unsigned   newStitchCount = 0, newAttribute = 0, encodedFormIndex = 0;
 	fRECTANGLE insertedRectangle  = {};
 	fPOINT     insertedSize       = {};
@@ -8714,7 +8733,7 @@ void insfil() {
 	double     homscor            = 0.0;
 	double     filscor            = 0.0;
 	unsigned   version            = 0;
-	int        newTextureIndex    = TextureIndex;
+	size_t     newTextureIndex    = TextureIndex;
 
 	if (StateMap.test(StateFlag::IGNORINS) || GetOpenFileName(&file)) {
 		InsertedFileHandle = CreateFile(InsertedFileName, (GENERIC_READ), 0, NULL, OPEN_EXISTING, 0, NULL);
@@ -8752,11 +8771,13 @@ void insfil() {
 					const auto formDataOffset = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor)
 					                            + sizeof(CustomColor) + threadLength;
 					SetFilePointer(InsertedFileHandle, formDataOffset, 0, FILE_CURRENT);
-					insertedRectangle.left = insertedRectangle.bottom = 1e9f;
-					insertedRectangle.top = insertedRectangle.right = 1e-9f;
-					encodedFormIndex                                = FormIndex << FRMSHFT;
-					InsertedVertexIndex                             = FormVertexIndex;
-					InsertedFormIndex                               = FormIndex;
+					insertedRectangle.left   = 1e9f;
+					insertedRectangle.bottom = 1e9f;
+					insertedRectangle.top    = 1e-9f;
+					insertedRectangle.right  = 1e-9f;
+					encodedFormIndex         = gsl::narrow<unsigned int>(FormIndex << FRMSHFT);
+					InsertedVertexIndex      = FormVertexIndex;
+					InsertedFormIndex        = FormIndex;
 					if (fileHeader.formCount) {
 						if (version < 2) {
 							std::vector<FRMHEDO> formHeader(fileHeader.formCount);
@@ -8804,7 +8825,7 @@ void insfil() {
 						         0);
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = 0;
-						for (iFormList = FormIndex; iFormList < FormIndex + fileHeader.formCount; iFormList++) {
+						for (auto iFormList = FormIndex; iFormList < FormIndex + fileHeader.formCount; iFormList++) {
 							FormList[iFormList].vertices = adflt(FormList[iFormList].vertexCount);
 							if (FormList[iFormList].type == SAT) {
 								if (FormList[iFormList].satinGuideCount)
@@ -8817,7 +8838,7 @@ void insfil() {
 							if (iseclpx(iFormList))
 								FormList[iFormList].borderClipData = adclp(FormList[iFormList].clipEntries);
 							if (istx(iFormList)) {
-								FormList[iFormList].fillInfo.texture.index += TextureIndex;
+								FormList[iFormList].fillInfo.texture.index += gsl::narrow<unsigned short>(TextureIndex);
 								newTextureIndex += FormList[iFormList].fillInfo.texture.count;
 							}
 						}
@@ -8826,7 +8847,7 @@ void insfil() {
 						if (fileHeader.formCount) {
 							insertedRectangle.left = insertedRectangle.right = FormVertices[InsertedVertexIndex].x;
 							insertedRectangle.bottom = insertedRectangle.top = FormVertices[InsertedVertexIndex].y;
-							for (iVertex = InsertedVertexIndex + 1; iVertex < FormVertexIndex; iVertex++) {
+							for (auto iVertex = InsertedVertexIndex + 1; iVertex < FormVertexIndex; iVertex++) {
 								if (FormVertices[iVertex].x < insertedRectangle.left)
 									insertedRectangle.left = FormVertices[iVertex].x;
 								if (FormVertices[iVertex].x > insertedRectangle.right)
@@ -9095,7 +9116,7 @@ void mv2f() {
 		savdo();
 		iLowBuffer  = 0;
 		iHighBuffer = MAXITEMS;
-		attribute   = ClosestFormToCursor << 4;
+		attribute   = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (!(StitchBuffer[iStitch].attribute & NOTFRM) && (StitchBuffer[iStitch].attribute & FRMSK) == attribute) {
 				StitchBuffer[iLowBuffer++] = StitchBuffer[iStitch];
@@ -9143,7 +9164,7 @@ void mv2b() {
 		savdo();
 		iLowBuffer  = 0;
 		iHighBuffer = MAXITEMS;
-		attribute   = ClosestFormToCursor << 4;
+		attribute   = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (!(StitchBuffer[iStitch].attribute & NOTFRM) && (StitchBuffer[iStitch].attribute & FRMSK) == attribute) {
 				StitchBuffer[iHighBuffer++] = StitchBuffer[iStitch];
@@ -9274,7 +9295,8 @@ void unmov() {
 }
 
 void duprct() {
-	unsigned iVertex = 0, currentVertex = SelectedFormVertices.start;
+	unsigned iVertex       = 0;
+	size_t   currentVertex = SelectedFormVertices.start;
 
 	SelectedVerticesRect.left = SelectedVerticesRect.right = CurrentFormVertices[currentVertex].x;
 	SelectedVerticesRect.top = SelectedVerticesRect.bottom = CurrentFormVertices[currentVertex].y;
@@ -9304,9 +9326,10 @@ void setpsel() {
 }
 
 void rotfn(double rotationAngle, const dPOINT& rotationCenter) {
-	unsigned iVertex = 0, iStitch = 0, iForm = 0, currentVertex = 0;
-	double   length = 0.0;
-	dPOINT   center = {};
+	unsigned iVertex = 0, iStitch = 0, iForm = 0;
+	size_t   currentVertex = 0;
+	double   length        = 0.0;
+	dPOINT   center        = {};
 
 	savdo();
 	if (StateMap.test(StateFlag::FPSEL)) {
@@ -9408,7 +9431,7 @@ bool iselpnt() {
 }
 
 void rtrclpfn() {
-	unsigned iStitch = 0, count = 0;
+	size_t count = 0;
 
 	if (OpenClipboard(ThrEdWindow)) {
 		fvars(ClosestFormToCursor);
@@ -9431,7 +9454,7 @@ void rtrclpfn() {
 				ClipStitchData = *(static_cast<CLPSTCH**>(ClipPointer));
 				rtclpfn(0, 0);
 				ClipStitchData[0].led = count;
-				for (iStitch = 1; iStitch < count; iStitch++)
+				for (size_t iStitch = 1; iStitch < count; iStitch++)
 					rtclpfn(iStitch, iStitch);
 				SetClipboardData(Clip, ClipPointer);
 			}
@@ -9454,7 +9477,7 @@ void unstrtch(std::vector<POINT>& stretchBoxLine) {
 }
 
 bool chkbig(std::vector<POINT>& stretchBoxLine, double& xyRatio) {
-	unsigned iControlPoint = 0, iCorner = 0;
+	unsigned iControlPoint = 0;
 	double   length = 0.0, minimumLength = 1e99;
 	POINT    pointToTest = { (Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y) };
 
@@ -9466,12 +9489,12 @@ bool chkbig(std::vector<POINT>& stretchBoxLine, double& xyRatio) {
 			SelectedFormControlVertex = iControlPoint;
 		}
 	}
-	for (iCorner = 0; iCorner < 4; iCorner++) {
+	for (size_t iCorner = 0; iCorner < 4; iCorner++) {
 		FormLines[iCorner] = (*SelectedFormsLine)[iCorner << 1];
 	}
 	FormLines[4] = FormLines[0];
 	if (minimumLength < CLOSENUF) {
-		for (iCorner = 0; iCorner < 4; iCorner++) {
+		for (size_t iCorner = 0; iCorner < 4; iCorner++) {
 			stretchBoxLine[iCorner] = (*SelectedFormsLine)[iCorner << 1];
 		}
 		stretchBoxLine[4] = stretchBoxLine[0];
@@ -9524,7 +9547,7 @@ void setmov() {
 }
 
 void dufsel() {
-	unsigned start = 0, finish = 0;
+	size_t start = 0, finish = 0;
 
 	if (LastFormSelected > ClosestFormToCursor) {
 		start  = ClosestFormToCursor;
@@ -9925,7 +9948,7 @@ bool inrng(unsigned stitch) noexcept {
 		return 0;
 }
 
-bool finrng(unsigned find) noexcept {
+bool finrng(size_t find) noexcept {
 	unsigned cod = 0;
 
 	if (FormList[find].rectangle.left >= StitchRangeRect.left && FormList[find].rectangle.right <= StitchRangeRect.right
@@ -10093,7 +10116,8 @@ void thumnail() {
 }
 
 void nuthsel() {
-	unsigned iThumbnail = 0, length = 0, savedIndex = 0;
+	unsigned iThumbnail = 0;
+	size_t   length = 0, savedIndex = 0;
 
 	if (ThumbnailIndex < Thumbnails->size()) {
 		savedIndex = ThumbnailIndex;
@@ -10127,7 +10151,7 @@ void nuthsel() {
 }
 
 void nuthbak(unsigned count) {
-	unsigned length = 0;
+	size_t length = 0;
 
 	if (ThumbnailIndex) {
 		length = wcslen(ThumbnailSearchString);
@@ -10151,7 +10175,7 @@ void nuthbak(unsigned count) {
 }
 
 void nuthum(char character) {
-	unsigned iString;
+	size_t iString;
 
 	iString = wcslen(ThumbnailSearchString);
 	if (iString < 16) {
@@ -10166,7 +10190,7 @@ void nuthum(char character) {
 }
 
 void bakthum() {
-	unsigned searchStringLength;
+	size_t searchStringLength;
 
 	searchStringLength = wcslen(ThumbnailSearchString);
 	if (searchStringLength) {
@@ -10194,25 +10218,24 @@ void selalstch() {
 }
 
 void duinsfil() {
-	fPOINT      offset = {};
-	unsigned    iForm = 0, iVertex = 0, iStitch = 0;
+	fPOINT      offset        = {};
 	fRECTANGLE* formRectangle = nullptr;
 
 	px2stch();
 	offset.x = SelectedPoint.x - InsertCenter.x;
 	offset.y = SelectedPoint.y - InsertCenter.y;
-	for (iForm = InsertedFormIndex; iForm < FormIndex; iForm++) {
+	for (auto iForm = InsertedFormIndex; iForm < FormIndex; iForm++) {
 		formRectangle = &FormList[iForm].rectangle;
 		formRectangle->bottom += offset.y;
 		formRectangle->top += offset.y;
 		formRectangle->left += offset.x;
 		formRectangle->right += offset.x;
 	}
-	for (iVertex = InsertedVertexIndex; iVertex < FormVertexIndex; iVertex++) {
+	for (auto iVertex = InsertedVertexIndex; iVertex < FormVertexIndex; iVertex++) {
 		FormVertices[iVertex].x += offset.x;
 		FormVertices[iVertex].y += offset.y;
 	}
-	for (iStitch = InsertedStitchCount; iStitch < PCSHeader.stitchCount; iStitch++) {
+	for (auto iStitch = InsertedStitchCount; iStitch < PCSHeader.stitchCount; iStitch++) {
 		StitchBuffer[iStitch].x += offset.x;
 		StitchBuffer[iStitch].y += offset.y;
 	}
@@ -10630,7 +10653,7 @@ void rotmrk() {
 
 	if (StateMap.test(StateFlag::GMRK) && (StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::GRPSEL))) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			codedFormIndex = ClosestFormToCursor << FRMSHFT;
+			codedFormIndex = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 			fvars(ClosestFormToCursor);
 			LowestAngle = HighestAngle = 0;
 			OriginalAngle = atan2(CurrentFormVertices[0].y - ZoomMarkPoint.y, CurrentFormVertices[0].x - ZoomMarkPoint.x);
@@ -10707,25 +10730,23 @@ void filfrms() {
 	}
 }
 
-void nuslst(unsigned find) {
-	unsigned form = 0;
-
+void nuslst(size_t find) {
 	gselrng();
 	// ToDo - Check this code. Does it do what is intended?
 	do {
 		if (find < SelectedFormsRange.start) {
-			for (form = find; form < SelectedFormsRange.finish; form++) {
+			for (auto form = find; form < SelectedFormsRange.finish; form++) {
 				SelectedFormList->push_back(form);
 			}
 			break;
 		}
 		if (find > SelectedFormsRange.finish) {
-			for (form = SelectedFormsRange.start; form <= find; form++) {
+			for (auto form = SelectedFormsRange.start; form <= find; form++) {
 				SelectedFormList->push_back(form);
 			}
 			break;
 		}
-		for (form = SelectedFormsRange.start; form <= find; form++) {
+		for (auto form = SelectedFormsRange.start; form <= find; form++) {
 			SelectedFormList->push_back(form);
 		}
 	} while (false);
@@ -10972,7 +10993,7 @@ void stchsnap(unsigned start, unsigned finish) noexcept {
 	}
 }
 
-void frmsnap(fPOINT* start, unsigned count) noexcept {
+void frmsnap(fPOINT* start, size_t count) noexcept {
 	for (unsigned i = 0; i < count; i++) {
 		start->x = rintf(start->x / IniFile.gridSize) * IniFile.gridSize;
 		start->y = rintf(start->y / IniFile.gridSize) * IniFile.gridSize;
@@ -11688,7 +11709,7 @@ void dutrac() {
 			return;
 		}
 		SelectedForm->vertices    = adflt(OutputIndex);
-		SelectedForm->vertexCount = OutputIndex;
+		SelectedForm->vertexCount = gsl::narrow<unsigned short>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = ActiveLayer << 1;
 		frmout(FormIndex);
@@ -12153,8 +12174,8 @@ void chkbit() {
 	}
 }
 
-void trcnum(unsigned shift, COLORREF color, unsigned iRGB) noexcept {
-	unsigned bufferLength = 0;
+void trcnum(unsigned shift, COLORREF color, unsigned iRGB) {
+	size_t   bufferLength = 0;
 	unsigned xPosition    = 0;
 	wchar_t  buffer[11]   = { 0 };
 
@@ -12162,16 +12183,16 @@ void trcnum(unsigned shift, COLORREF color, unsigned iRGB) noexcept {
 	color &= 0xff;
 	_itow_s(color, buffer, 10);
 	bufferLength = wcslen(buffer);
-	xPosition    = NumeralWidth * (3 - bufferLength) + 1;
+	xPosition    = gsl::narrow<unsigned int>(NumeralWidth * (3 - bufferLength) + 1);
 	SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
-	TextOut(DrawItem->hDC, xPosition, 1, buffer, wcslen(buffer));
+	TextOutInt(DrawItem->hDC, xPosition, 1, buffer, wcslen(buffer));
 }
 
-void upnum(unsigned iRGB) noexcept {
+void upnum(unsigned iRGB) {
 	trcnum(TraceShift[iRGB], InvertUpColor, iRGB);
 }
 
-void dwnum(unsigned iRGB) noexcept {
+void dwnum(unsigned iRGB) {
 	trcnum(TraceShift[iRGB], InvertDownColor, iRGB);
 }
 
@@ -12663,7 +12684,7 @@ void setpclp() {
 void dupclp() noexcept {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
-	Polyline(StitchWindowDC, FormVerticesAsLine, OutputIndex);
+	PolylineInt(StitchWindowDC, FormVerticesAsLine, OutputIndex);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -12673,9 +12694,10 @@ void unpclp() {
 }
 
 void fixpclp() {
-	POINT    point   = { (Msg.pt.x + static_cast<LONG>(FormMoveDelta.x)), (Msg.pt.y + static_cast<LONG>(FormMoveDelta.y)) };
-	fPOINT   offset  = {};
-	unsigned iOutput = 0, iNext = 0, count = 0;
+	POINT  point  = { (Msg.pt.x + static_cast<LONG>(FormMoveDelta.x)), (Msg.pt.y + static_cast<LONG>(FormMoveDelta.y)) };
+	fPOINT offset = {};
+	size_t iNext  = 0;
+	size_t count  = 0;
 
 	pxCor2stch(point);
 	offset.x = SelectedPoint.x - InterleaveSequence[1].x;
@@ -12683,12 +12705,12 @@ void fixpclp() {
 	iNext    = nxt(ClosestVertexToCursor);
 	count    = OutputIndex - 2;
 	fltspac(&CurrentFormVertices[iNext], count);
-	for (iOutput = 1; iOutput < OutputIndex - 1; iOutput++) {
+	for (size_t iOutput = 1; iOutput < OutputIndex - 1; iOutput++) {
 		CurrentFormVertices[iNext].x = InterleaveSequence[iOutput].x + offset.x;
 		CurrentFormVertices[iNext].y = InterleaveSequence[iOutput].y + offset.y;
 		iNext++;
 	}
-	SelectedForm->vertexCount += count;
+	SelectedForm->vertexCount += gsl::narrow<unsigned short>(count);
 	refil();
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
@@ -12794,7 +12816,7 @@ void drwLin(std::vector<POINT>& linePoints, unsigned currentStitch, unsigned len
 		SelectObject(StitchWindowMemDC, hPen);
 		// ToDo - where did 16000 come from?
 		if (LineIndex < 16000)
-			Polyline(StitchWindowMemDC, linePoints.data(), LineIndex);
+			PolylineInt(StitchWindowMemDC, linePoints.data(), LineIndex);
 		else {
 			iOffset = 0;
 			while (LineIndex) {
@@ -12804,7 +12826,7 @@ void drwLin(std::vector<POINT>& linePoints, unsigned currentStitch, unsigned len
 					LineIndex -= 15999;
 				}
 				else {
-					Polyline(StitchWindowMemDC, &linePoints[iOffset], LineIndex);
+					PolylineInt(StitchWindowMemDC, &linePoints[iOffset], LineIndex);
 					break;
 				}
 			}
@@ -12919,10 +12941,12 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 	wchar_t    buffer[20]      = { 0 };
 	char       threadSizeMap[] = { '3', '4', '6' };
 	TXPNT*     textureSource   = nullptr;
-	unsigned   byteCount = 0, clipCount = 0, code = 0, currentClip = 0, currentGuide = 0, currentVertex = 0;
-	unsigned   dst = 0, iClip = 0, iColor = 0, iFillType = 0, iForm = 0, iGuide = 0, iHoop = 0;
-	unsigned   iLayer = 0, iPreference = 0, iSelectedVertex = 0, iSide = 0, iStitch = 0;
-	unsigned   iThreadSize = 0, iVersion = 0, iVertex = 0, iWindow = 0, nextVertex = 0, selectedVertexCount = 0;
+	unsigned   code = 0, currentClip = 0, currentGuide = 0, currentVertex = 0;
+	size_t     byteCount = 0, clipCount = 0;
+	unsigned   dst = 0, iClip = 0, iColor = 0, iFillType = 0, iGuide = 0, iHoop = 0;
+	unsigned   iLayer = 0, iPreference = 0, iStitch = 0;
+	size_t     iSelectedVertex = 0, selectedVertexCount = 0, nextVertex = 0;
+	unsigned   iThreadSize = 0, iVersion = 0, iWindow = 0;
 	unsigned   stitchAttribute = 0, textureCount = 0, traceColor = 0;
 	WPARAM     wParameter = {};
 
@@ -13032,9 +13056,9 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			}
 			if (StateMap.test(StateFlag::EXPAND)) {
 				unstrtch(stretchBoxLine);
-				newSize.x = Msg.pt.x - StitchWindowOrigin.x;
-				newSize.y = Msg.pt.y - StitchWindowOrigin.y;
-				iSide     = (SelectedFormControlVertex + 2) % 4;
+				newSize.x  = Msg.pt.x - StitchWindowOrigin.x;
+				newSize.y  = Msg.pt.y - StitchWindowOrigin.y;
+				auto iSide = (SelectedFormControlVertex + 2) % 4;
 				ratio = fabs(static_cast<double>(newSize.x - stretchBoxLine[iSide].x) / (newSize.y - stretchBoxLine[iSide].y));
 				if (iSide & 1) {
 					if (ratio < xyRatio)
@@ -13075,7 +13099,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 					lineLength = Msg.pt.y - StitchWindowOrigin.y;
 				dst  = (SelectedFormControlVertex + 2) % 4;
 				code = nxtcrnr(dst);
-				for (iSide = 0; iSide < 4; iSide++) {
+				for (size_t iSide = 0u; iSide < 4; iSide++) {
 					if (iSide != dst && iSide != code) {
 						if (SelectedFormControlVertex & 1)
 							stretchBoxLine[iSide].x = lineLength;
@@ -13240,7 +13264,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			if (StateMap.test(StateFlag::FPSEL)) {
 				fvars(ClosestFormToCursor);
 				iSelectedVertex = SelectedFormVertices.start;
-				for (iVertex = 0; gsl::narrow<unsigned>(iVertex) <= SelectedFormVertices.vertexCount; iVertex++) {
+				for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 					CurrentFormVertices[iSelectedVertex].x += FormMoveDelta.x;
 					CurrentFormVertices[iSelectedVertex].y -= FormMoveDelta.y;
 					iSelectedVertex = pdir(iSelectedVertex);
@@ -13253,7 +13277,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			else {
 				if (StateMap.test(StateFlag::BIGBOX)) {
 					savdo();
-					for (iForm = 0; iForm < FormIndex; iForm++)
+					for (size_t iForm = 0; iForm < FormIndex; iForm++)
 						frmadj(iForm);
 					for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 						StitchBuffer[iStitch].x += FormMoveDelta.x;
@@ -13368,7 +13392,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 					// amount overallocated
 					SelectedFormList->reserve(FormIndex);
 					StateMap.reset(StateFlag::FORMSEL);
-					for (iForm = 0; iForm < FormIndex; iForm++) {
+					for (size_t iForm = 0; iForm < FormIndex; iForm++) {
 						if (finrng(iForm)) {
 							SelectedFormList->push_back(iForm);
 						}
@@ -13641,7 +13665,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 								if (TmpFormIndex > ClosestFormToCursor) {
 									std::swap(ClosestFormToCursor, TmpFormIndex);
 								}
-								for (iForm = TmpFormIndex; iForm <= ClosestFormToCursor; iForm++) {
+								for (auto iForm = TmpFormIndex; iForm <= ClosestFormToCursor; iForm++) {
 									SelectedFormList->push_back(iForm);
 								}
 								StateMap.set(StateFlag::RESTCH);
@@ -13909,10 +13933,10 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			px2stch();
 			FormMoveDelta.x = SelectedPoint.x - ((formsRect.right - formsRect.left) / 2 + formsRect.left);
 			FormMoveDelta.y = SelectedPoint.y - ((formsRect.top - formsRect.bottom) / 2 + formsRect.bottom);
-			for (iForm = 0; iForm < ClipFormsCount; iForm++) {
+			for (size_t iForm = 0; iForm < ClipFormsCount; iForm++) {
 				ClosestFormToCursor = FormIndex + iForm;
 				fvars(ClosestFormToCursor);
-				for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+				for (size_t iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
 					SelectedForm->vertices[iVertex].x += FormMoveDelta.x;
 					SelectedForm->vertices[iVertex].y += FormMoveDelta.y;
 				}
@@ -14041,7 +14065,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		if (!StateMap.test(StateFlag::ROTAT) && StateMap.test(StateFlag::GRPSEL)) {
 			auto controlPoint = *FormControlPoints;
 			if (iselpnt()) {
-				for (iSide = 0; iSide < 4; iSide++) {
+				for (size_t iSide = 0; iSide < 4; iSide++) {
 					stretchBoxLine[iSide] = controlPoint[iSide << 1];
 				}
 				stretchBoxLine[4] = stretchBoxLine[0];
@@ -15271,7 +15295,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 								}
 								if (SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK))
 									FormList[ClosestFormToCursor].underlayColor = ActiveColor;
-								code = ClosestFormToCursor << FRMSHFT;
+								code = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 								for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 									stitchAttribute = StitchBuffer[iStitch].attribute;
 									if (stitchAttribute & ALTYPMSK && (stitchAttribute & FRMSK) == code
@@ -16085,6 +16109,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 								fvars(ClosestFormToCursor);
 								InterleaveSequence[0] = CurrentFormVertices[ClosestVertexToCursor];
 								clipData              = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
+								size_t iVertex        = 0u;
 								for (iVertex = 0; iVertex <= ClipFormVerticesData->vertexCount; iVertex++) {
 									InterleaveSequence[iVertex + 1] = clipData[iVertex];
 								}
@@ -16124,6 +16149,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 						// ToDo - Add more information to the clipboard so that memory can be allocated
 						ClipFormsHeader = static_cast<FORMSCLIP*>(ClipPointer);
 						if (ClipFormsHeader->clipType == CLP_FRMS) {
+							size_t iForm   = 0;
 							ClipFormsCount = ClipFormsHeader->formCount;
 							forms          = convert_ptr<FRMHED*>(&ClipFormsHeader[1]);
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
@@ -16137,7 +16163,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 								SelectedForm           = &FormList[FormIndex + iForm];
 								SelectedForm->vertices = adflt(SelectedForm->vertexCount);
-								for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
+								for (size_t iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
 									SelectedForm->vertices[iVertex] = CurrentFormVertices[currentVertex++];
 								}
 							}
@@ -16175,7 +16201,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 								if (istx(FormIndex + iForm)) {
 									SelectedForm = &FormList[FormIndex + iForm];
 									textureCount += SelectedForm->fillInfo.texture.count;
-									SelectedForm->fillInfo.texture.index += TextureIndex;
+									SelectedForm->fillInfo.texture.index += gsl::narrow<unsigned short>(TextureIndex);
 								}
 							}
 							TexturePointsBuffer->resize(TexturePointsBuffer->size() + textureCount);
@@ -16248,7 +16274,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 								}
 								textureSource = convert_ptr<TXPNT*>(&clipData[clipCount]);
 								if (istx(FormIndex)) {
-									SelectedForm->fillInfo.texture.index = TextureIndex;
+									SelectedForm->fillInfo.texture.index = gsl::narrow<unsigned short>(TextureIndex);
 
 									auto currentCount = SelectedForm->fillInfo.texture.count;
 									TexturePointsBuffer->resize(TexturePointsBuffer->size() + currentCount);
@@ -17433,7 +17459,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 
 // return the width of a text item
 int txtWid(const wchar_t* string) noexcept {
-	GetTextExtentPoint32(ThredDC, string, wcslen(string), &TextSize);
+	GetTextExtentPoint32Int(ThredDC, string, wcslen(string), &TextSize);
 	return TextSize.cx;
 }
 
@@ -17513,7 +17539,7 @@ void ritloc() {
 	lockFile = CreateFile(lockFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (lockFile != INVALID_HANDLE_VALUE) {
 		auto value = win32::Utf16ToUtf8(*HomeDirectory);
-		WriteFile(lockFile, value.data(), value.size() + 1, &bytesWritten, 0);
+		WriteFileInt(lockFile, value.data(), value.size() + 1, &bytesWritten, 0);
 		CloseHandle(lockFile);
 	}
 }
@@ -17997,7 +18023,8 @@ void init() {
 	PCSHeader.stitchCount = 0;
 	GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
 	ladj();
-	GetTextExtentPoint(StitchWindowMemDC, (*StringTable)[STR_PIKOL].c_str(), (*StringTable)[STR_PIKOL].size(), &PickColorMsgSize);
+	GetTextExtentPointInt(
+	    StitchWindowMemDC, (*StringTable)[STR_PIKOL].c_str(), (*StringTable)[STR_PIKOL].size(), &PickColorMsgSize);
 	auxmen();
 	fnamtabs();
 	ritfnam(*DesignerName);
@@ -18375,7 +18402,7 @@ void drwStch() {
 									linePoints[LineIndex].x = (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5;
 									linePoints[LineIndex++].y
 									    = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
-									Polyline(StitchWindowMemDC, linePoints.data(), LineIndex);
+									PolylineInt(StitchWindowMemDC, linePoints.data(), LineIndex);
 									LineIndex = 0;
 								}
 								else {
@@ -18447,7 +18474,7 @@ void drwStch() {
 					throw;
 				}
 				if (LineIndex) {
-					Polyline(StitchWindowMemDC, linePoints.data(), LineIndex);
+					PolylineInt(StitchWindowMemDC, linePoints.data(), LineIndex);
 					linePoints[0] = linePoints[LineIndex - 1];
 					LineIndex     = 1;
 				}
@@ -18646,7 +18673,7 @@ void ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem) {
 				if (bytesToRead == BytesRead) {
 					SetFilePointer(thrEdFile, 16, 0, FILE_CURRENT);
 					ReadFile(thrEdFile, &brushColor, sizeof(COLORREF), &BytesRead, 0);
-					ReadFile(thrEdFile, colors.data(), colors.size() * sizeof(COLORREF), &BytesRead, 0);
+					ReadFileInt(thrEdFile, colors.data(), colors.size() * sizeof(COLORREF), &BytesRead, 0);
 					brush = CreateSolidBrush(brushColor);
 					SelectObject(drawItem->hDC, brush);
 					FillRect(drawItem->hDC, &drawItem->rcItem, brush);
@@ -18661,7 +18688,7 @@ void ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem) {
 						else {
 							pen = nuPen(pen, 1, colors[iColor]);
 							SelectObject(drawItem->hDC, pen);
-							Polyline(drawItem->hDC, lines.data(), iLine);
+							PolylineInt(drawItem->hDC, lines.data(), iLine);
 							iLine  = 0;
 							iColor = stitchesToDraw[iStitch].attribute & 0xf;
 						}
@@ -18669,7 +18696,7 @@ void ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem) {
 					if (iLine) {
 						pen = nuPen(pen, 1, colors[iColor]);
 						SelectObject(drawItem->hDC, pen);
-						Polyline(drawItem->hDC, lines.data(), iLine);
+						PolylineInt(drawItem->hDC, lines.data(), iLine);
 					}
 					DeleteObject(brush);
 					DeleteObject(pen);
@@ -18719,9 +18746,9 @@ void ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem) {
 						SelectObject(drawItem->hDC, FormPen);
 						SetROP2(drawItem->hDC, R2_XORPEN);
 						if (FormList[iStitch].type == FRMLINE)
-							Polyline(drawItem->hDC, lines.data(), formList[iStitch].vertexCount);
+							PolylineInt(drawItem->hDC, lines.data(), formList[iStitch].vertexCount);
 						else
-							Polyline(drawItem->hDC, lines.data(), formList[iStitch].vertexCount + 1);
+							PolylineInt(drawItem->hDC, lines.data(), formList[iStitch].vertexCount + 1);
 						SetROP2(StitchWindowMemDC, R2_COPYPEN);
 					}
 				} while (false);
@@ -19011,12 +19038,10 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				std::wstring fmtStr;
 				loadString(fmtStr, IDS_TXWID);
 				std::wstring scrWidth(fmt::format(fmtStr, (TextureScreen.width / PFGRAN)));
-				TextOut(DrawItem->hDC, position, 1, scrWidth.c_str(), scrWidth.size());
-				;
+				TextOutInt(DrawItem->hDC, position, 1, scrWidth.c_str(), scrWidth.size());
 			}
 			else
-				TextOut(DrawItem->hDC, position, 1, (*StringTable)[STR_PIKOL].c_str(), (*StringTable)[STR_PIKOL].size());
-			;
+				TextOutInt(DrawItem->hDC, position, 1, (*StringTable)[STR_PIKOL].c_str(), (*StringTable)[STR_PIKOL].size());
 			return 1;
 		}
 		if (StateMap.test(StateFlag::WASTRAC)) {
@@ -19048,13 +19073,13 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 						SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 					}
 					FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
-					TextOut(DrawItem->hDC, 1, 1, buffer, wcslen(buffer));
+					TextOutInt(DrawItem->hDC, 1, 1, buffer, wcslen(buffer));
 					return 1;
 				}
 				if (DrawItem->hwndItem == TraceNumberInput) {
 					FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[ColumnColor]);
 					SetBkColor(DrawItem->hDC, TraceRGB[ColumnColor]);
-					TextOut(DrawItem->hDC, 1, 1, TraceInputBuffer, wcslen(TraceInputBuffer));
+					TextOutInt(DrawItem->hDC, 1, 1, TraceInputBuffer, wcslen(TraceInputBuffer));
 					return 1;
 				}
 			}
@@ -19067,8 +19092,8 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 						SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
 						SetTextColor(DrawItem->hDC, defTxt(iColor));
 						std::wstring colorNum(fmt::format(L"{}", iColor + 1));
-						GetTextExtentPoint32(DrawItem->hDC, colorNum.c_str(), colorNum.size(), &textSize);
-						TextOut(DrawItem->hDC, (ButtonWidth - textSize.cx) >> 1, 0, colorNum.c_str(), colorNum.size());
+						GetTextExtentPoint32Int(DrawItem->hDC, colorNum.c_str(), colorNum.size(), &textSize);
+						TextOutInt(DrawItem->hDC, (ButtonWidth - textSize.cx) >> 1, 0, colorNum.c_str(), colorNum.size());
 					}
 					return 1;
 				}
@@ -19216,16 +19241,14 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 }
 
 void sachk() {
-	unsigned iForm = 0, iGuide = 0, bakclo = 0;
-
-	for (iForm = 0; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0ul; iForm < FormIndex; iForm++) {
 		const FRMHED* form = &FormList[iForm];
 		if (form && form->type == SAT && form->satinGuideCount) {
 			const SATCON* guide = form->satinOrAngle.guide;
 			if (guide) {
-				for (iGuide = 0; iGuide < form->satinGuideCount; iGuide++) {
+				for (size_t iGuide = 0; iGuide < form->satinGuideCount; iGuide++) {
 					if (guide[iGuide].start > form->vertexCount || guide[iGuide].finish > form->vertexCount) {
-						bakclo              = ClosestFormToCursor;
+						auto bakclo         = ClosestFormToCursor;
 						ClosestFormToCursor = iForm;
 						delsac(iForm);
 						ClosestFormToCursor = bakclo;
@@ -19349,7 +19372,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		ValueWindow = &private_ValueWindow;
 		std::vector<HWND> private_LabelWindow(LASTLIN);
 		LabelWindow = &private_LabelWindow;
-		std::vector<unsigned> private_SelectedFormList;
+		std::vector<size_t> private_SelectedFormList;
 		SelectedFormList = &private_SelectedFormList;
 		std::vector<POINT> private_FormControlPoints(10);
 		FormControlPoints = &private_FormControlPoints;

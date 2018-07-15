@@ -24,8 +24,8 @@ public:
 	}
 	*/
 
-	unsigned getFirst() {
-		const unsigned foundBit = super::find_first();
+	size_t getFirst() {
+		const size_t foundBit = super::find_first();
 		if (foundBit != super::npos) {
 			super::reset(foundBit);
 		}
@@ -35,8 +35,8 @@ public:
 		return foundBit;
 	}
 
-	unsigned getLast() {
-		unsigned foundBit = super::find_first();
+	size_t getLast() {
+		size_t foundBit = super::find_first();
 		if (foundBit != super::npos) {
 			do {
 				if (super::find_next(foundBit) != super::npos) {

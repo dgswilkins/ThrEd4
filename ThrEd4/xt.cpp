@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "wrappers.h"
 #include "Resources/resource.h"
 #include "thred.h"
 
@@ -21,17 +22,17 @@ extern HGLOBAL                    ClipMemory;
 extern fPOINT                     ClipPoints[MAXITEMS];
 extern fRECTANGLE                 ClipRect;
 extern FLSIZ                      ClipRectSize;
-extern unsigned                   ClipStitchCount;
+extern size_t                     ClipStitchCount;
 extern fPOINTATTR                 ClipBuffer[MAXFRMLINS];
-extern unsigned                   ClosestFormToCursor;
+extern size_t                     ClosestFormToCursor;
 extern unsigned                   ClosestPointIndex;
-extern unsigned                   ClosestVertexToCursor;
-extern unsigned                   ClipPointIndex;
+extern size_t                     ClosestVertexToCursor;
+extern size_t                   ClipPointIndex;
 extern fPOINT*                    CurrentFormVertices;
 extern std::wstring*              DesignerName;
-extern unsigned                   FormVertexIndex;
+extern size_t                     FormVertexIndex;
 extern fPOINT                     FormMoveDelta;
-extern unsigned                   FormIndex;
+extern size_t                     FormIndex;
 extern POINT                      FormLines[MAXFRMLINS];
 extern FRMHED                     FormList[MAXFORMS];
 extern fPOINT                     FormVertices[MAXITEMS];
@@ -43,19 +44,19 @@ extern double                     LineSpacing;
 extern HWND                       MainStitchWin;
 extern MSG                        Msg;
 extern wchar_t                    MsgBuffer[MSGSIZ];
-extern unsigned                   NewFormVertexCount;
-extern unsigned                   OutputIndex;
+extern size_t                     NewFormVertexCount;
+extern size_t                     OutputIndex;
 extern std::vector<fPOINT>*       OutsidePoints;
 extern fPOINT                     OSequence[OSEQLEN];
 extern PCSHEADER                  PCSHeader;
 extern unsigned                   PseudoRandomValue;
 extern FRMHED*                    SelectedForm;
-extern unsigned                   SatinGuideIndex;
+extern size_t                     SatinGuideIndex;
 extern SATCON                     SatinGuides[MAXSAC];
 extern EnumMap<StateFlag>         StateMap;
-extern std::vector<unsigned>*     SelectedFormList;
+extern std::vector<size_t>*       SelectedFormList;
 extern fPOINT                     SelectedPoint;
-extern unsigned                   SequenceIndex;
+extern size_t                     SequenceIndex;
 extern std::vector<std::wstring>* StringTable;
 extern fPOINTATTR                 StitchBuffer[MAXITEMS * 2];
 extern RECT                       StitchWindowClientRect;
@@ -72,67 +73,67 @@ extern POINT                      UnzoomedRect;
 extern COLORREF                   UserColor[16];
 extern EnumMap<UserFlag>          UserFlagMap;
 extern double                     UserStitchLength;
-extern unsigned                   VertexCount;
+extern size_t                     VertexCount;
 extern HWND                       VerticalScrollBar;
 extern fs::path*                  WorkingFileName;
 extern POINT                      ZoomBoxLine[5];
 extern fPOINT                     ZoomBoxOrigin;
 extern dRECTANGLE                 ZoomRect;
 
-extern void               adbad(std::wstring& repairMessage, unsigned code, unsigned count);
-extern SATCON*            adsatk(unsigned count);
-extern void               angclpfn(const std::vector<RNGCNT>& textureSegments);
-extern void               bBox();
-extern void               butxt(unsigned iButton, const std::wstring& buttonText);
-extern void               centir();
-extern void               chkmen();
-extern void               chkseq(bool border);
-extern bool               cisin(float xCoordinate, float yCoordinate);
-extern unsigned           closflt(float xCoordinate, float yCoordinate);
-extern void               coltab();
-extern void               datmsg(unsigned code);
-extern void               delclps(unsigned iForm);
-extern void               delinf();
-extern void               delmclp(unsigned iForm);
-extern void               delsac(unsigned formIndex);
-extern void               dusqr();
-extern bool               filmsgs(unsigned code);
-extern void               frmclr(FRMHED* const destination);
-extern void               frmout(unsigned formIndex);
-extern void               frmrct(fRECTANGLE& rectangle);
-extern void               fvars(unsigned iForm);
-extern void               hsizmsg();
-extern bool               isclp(unsigned iForm);
-extern bool               iseclp(unsigned iForm);
-extern inline void        loadString(std::wstring& sDest, unsigned stringID);
-extern void               mdufrm();
-extern float              midl(float high, float low);
-extern void               movStch();
-extern void               msgflt(unsigned messageId, float value);
-extern void               numWnd();
-extern constexpr unsigned nxt(unsigned int iVertex);
-extern constexpr unsigned prv(unsigned iVertex);
-extern unsigned           psg();
-extern unsigned           px2stch();
-extern void               pxCor2stch(const POINT& pnt);
-extern void               redraw(HWND window);
-extern void               refil();
-extern void               refilal();
-extern void               refilfn();
-extern void               rtrclpfn();
-extern void               satfil();
-extern void               satout(double satinWidth);
-extern void               savdo();
-extern void               save();
-extern void               setmfrm();
-extern void               shoMsg(const std::wstring& message);
-extern void               shoseln(unsigned code0, unsigned code1);
-extern void               stchrct(fRECTANGLE& rectangle);
-extern void               tabmsg(unsigned code);
-extern void               unbBox();
-extern void               unmsg();
-extern void               wrnmen();
-extern void               zumhom();
+extern void             adbad(std::wstring& repairMessage, unsigned code, size_t count);
+extern SATCON*          adsatk(size_t count);
+extern void             angclpfn(const std::vector<RNGCNT>& textureSegments);
+extern void             bBox();
+extern void             butxt(unsigned iButton, const std::wstring& buttonText);
+extern void             centir();
+extern void             chkmen();
+extern void             chkseq(bool border);
+extern bool             cisin(float xCoordinate, float yCoordinate);
+extern size_t           closflt(float xCoordinate, float yCoordinate);
+extern void             coltab();
+extern void             datmsg(unsigned code);
+extern void             delclps(size_t iForm);
+extern void             delinf();
+extern void             delmclp(size_t iForm);
+extern void             delsac(size_t formIndex);
+extern void             dusqr();
+extern bool             filmsgs(unsigned code);
+extern void             frmclr(FRMHED* const destination);
+extern void             frmout(size_t formIndex);
+extern void             frmrct(fRECTANGLE& rectangle);
+extern void             fvars(size_t iForm);
+extern void             hsizmsg();
+extern bool             isclp(size_t iForm);
+extern bool             iseclp(size_t iForm);
+extern inline void      loadString(std::wstring& sDest, unsigned stringID);
+extern void             mdufrm();
+extern float            midl(float high, float low);
+extern void             movStch();
+extern void             msgflt(unsigned messageId, float value);
+extern void             numWnd();
+extern constexpr size_t nxt(size_t iVertex);
+extern constexpr size_t prv(size_t iVertex);
+extern unsigned         psg();
+extern unsigned         px2stch();
+extern void             pxCor2stch(const POINT& pnt);
+extern void             redraw(HWND window);
+extern void             refil();
+extern void             refilal();
+extern void             refilfn();
+extern void             rtrclpfn();
+extern void             satfil();
+extern void             satout(double satinWidth);
+extern void             savdo();
+extern void             save();
+extern void             setmfrm();
+extern void             shoMsg(const std::wstring& message);
+extern void             shoseln(unsigned code0, unsigned code1);
+extern void             stchrct(fRECTANGLE& rectangle);
+extern void             tabmsg(unsigned code);
+extern void             unbBox();
+extern void             unmsg();
+extern void             wrnmen();
+extern void             zumhom();
 
 unsigned short DaisyTypeStrings[] = {
 	IDS_DAZCRV, IDS_DAZSAW, IDS_DAZRMP, IDS_DAZRAG, IDS_DAZCOG, IDS_DAZHART,
@@ -140,7 +141,7 @@ unsigned short DaisyTypeStrings[] = {
 
 fPOINT                 DesignSize;                    // design size
 std::vector<TXPNT>*    TexturePointsBuffer;           // buffer for textured fill points
-int                    TextureIndex;                  // next textured fill point index
+size_t                 TextureIndex;                  // next textured fill point index
 unsigned               TextureWindowId;               // id of the window being updated
 std::wstring*          TextureInputBuffer;            // texture fill number buffer
 HWND                   SideWindowButton;              // button side window
@@ -199,7 +200,7 @@ void prbug() noexcept {
 }
 #endif
 
-bool istx(unsigned iForm) noexcept {
+bool istx(size_t iForm) noexcept {
 	FRMHED* pfrm;
 
 	pfrm = &FormList[iForm];
@@ -320,12 +321,12 @@ constexpr float duxrat(float strt, float fin, float featherRatioLocal) {
 	return (fin - strt) * featherRatioLocal + strt;
 }
 
-void duxrats(unsigned start, unsigned finish, fPOINT& point, float featherRatioLocal) noexcept {
+void duxrats(size_t start, size_t finish, fPOINT& point, float featherRatioLocal) noexcept {
 	point.x = duxrat(BSequence[finish].x, BSequence[start].x, featherRatioLocal);
 	point.y = duxrat(BSequence[finish].y, BSequence[start].y, featherRatioLocal);
 }
 
-void durats(unsigned iSequence, fPOINT& point, FEATHER& feather) noexcept {
+void durats(size_t iSequence, fPOINT& point, FEATHER& feather) noexcept {
 	const double stitchLength
 	    = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x, BSequence[iSequence + 1].y - BSequence[iSequence].y);
 	fPOINT adjustedPoint = {};
@@ -416,12 +417,12 @@ void nurat(FEATHER& feather) {
 	feather.globalPosition += feather.globalStep;
 }
 
-void fthfn(unsigned iSequence, FEATHER& feather) {
+void fthfn(size_t iSequence, FEATHER& feather) {
 	nurat(feather);
 	durats(iSequence, OSequence[iSequence], feather);
 }
 
-void ratpnt(unsigned iPoint, unsigned iNextPoint, fPOINT& point, float featherRatio) noexcept {
+void ratpnt(size_t iPoint, size_t iNextPoint, fPOINT& point, float featherRatio) noexcept {
 	point.x = (BSequence[iNextPoint].x - BSequence[iPoint].x) * featherRatio + BSequence[iPoint].x;
 	point.y = (BSequence[iNextPoint].y - BSequence[iPoint].y) * featherRatio + BSequence[iPoint].y;
 }
@@ -435,7 +436,7 @@ void xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point, floa
 	point.y = (endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y;
 }
 
-void fthrbfn(unsigned iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence) {
+void fthrbfn(size_t iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence) {
 	fPOINT currentPoint     = {};
 	fPOINT nextPoint        = {};
 	fPOINT currentHighPoint = {};
@@ -471,7 +472,7 @@ void fthrbfn(unsigned iSequence, FEATHER& feather, std::vector<fPOINT>& featherS
 	featherSequence.push_back(midPoint);
 }
 
-void fthdfn(unsigned iSequence, FEATHER& feather) {
+void fthdfn(size_t iSequence, FEATHER& feather) {
 	const double length
 	    = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 	fPOINT adjustedPoint = {};
@@ -494,7 +495,8 @@ void fthdfn(unsigned iSequence, FEATHER& feather) {
 }
 
 void fritfil(std::vector<fPOINT>& featherSequence, unsigned& interleaveSequenceIndex2) {
-	unsigned iSequence = 0, iReverseSequence = 0;
+	unsigned iSequence        = 0;
+	size_t   iReverseSequence = 0;
 
 	if (SequenceIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = TYPFRM;
@@ -524,7 +526,7 @@ void fritfil(std::vector<fPOINT>& featherSequence, unsigned& interleaveSequenceI
 }
 
 void fthrfn(unsigned& interleaveSequenceIndex2) {
-	unsigned            ind = 0, res = 0;
+	size_t              ind = 0, res = 0;
 	const double        savedSpacing = LineSpacing;
 	FEATHER             feather      = {};
 	std::vector<fPOINT> featherSequence;
@@ -596,7 +598,7 @@ void fthrfn(unsigned& interleaveSequenceIndex2) {
 
 void deltx() {
 	unsigned iBuffer = 0;
-	unsigned iForm   = 0;
+	size_t   iForm   = 0;
 	bool     flag    = false;
 
 	const unsigned short currentIndex = FormList[ClosestFormToCursor].fillInfo.texture.index;
@@ -826,7 +828,7 @@ std::vector<fPOINT>& insid() {
 		return *OutsidePoints;
 }
 
-void delwlk(unsigned code) {
+void delwlk(size_t code) {
 	unsigned iStitch = 0, stitchCount = 0;
 
 	if (PCSHeader.stitchCount) {
@@ -920,12 +922,14 @@ void ritcwlk(unsigned& interleaveSequenceIndex2) noexcept {
 }
 
 unsigned gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, unsigned code) {
-	double         length      = hypot(finish.x - start.x, finish.y - start.y);
-	unsigned       startVertex = closflt(start.x, start.y);
-	const unsigned endVertex   = closflt(finish.x, finish.y);
-	unsigned       stitchCount = 0, intermediateVertex = 0;
-	unsigned       up = 0, down = 0, iStitch = 0, iStep = 0;
-	fPOINT         localPoint = {}, step = {}, delta = {};
+	double       length             = hypot(finish.x - start.x, finish.y - start.y);
+	size_t       startVertex        = closflt(start.x, start.y);
+	const size_t endVertex          = closflt(finish.x, finish.y);
+	unsigned     stitchCount        = 0;
+	size_t       intermediateVertex = 0;
+	unsigned     iStitch = 0, iStep = 0;
+	size_t       up = 0, down = 0;
+	fPOINT       localPoint = {}, step = {}, delta = {};
 
 	if (length < 5)
 		return 0;
@@ -990,8 +994,9 @@ unsigned gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, 
 	return iStitch - destination;
 }
 
-void fnwlk(unsigned find, unsigned& interleaveSequenceIndex2) {
-	unsigned start = 0, count = 0;
+void fnwlk(size_t find, unsigned& interleaveSequenceIndex2) {
+	size_t start = 0;
+	size_t count = 0;
 
 	fvars(find);
 	if (SelectedForm->type == FRMLINE)
@@ -1031,7 +1036,8 @@ void undclp() noexcept {
 }
 
 void fncwlk(unsigned& interleaveSequenceIndex2) {
-	unsigned iGuide = 0, iVertex = 0, start = 0, finish = 0;
+	size_t iVertex = 0;
+	size_t start = 0, finish = 0;
 
 	OutputIndex = 0;
 	SelectedForm->extendedAttribute |= AT_CWLK;
@@ -1044,7 +1050,7 @@ void fncwlk(unsigned& interleaveSequenceIndex2) {
 		}
 		const SATCON* guide = SelectedForm->satinOrAngle.guide;
 		if (guide) {
-			for (iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--) {
+			for (auto iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--) {
 				OSequence[OutputIndex].x
 				    = midl(CurrentFormVertices[guide[iGuide - 1].finish].x, CurrentFormVertices[guide[iGuide - 1].start].x);
 				OSequence[OutputIndex].y
@@ -1067,7 +1073,7 @@ void fncwlk(unsigned& interleaveSequenceIndex2) {
 		OutputIndex++;
 		finish = prv(start);
 		start  = nxt(start);
-		for (iGuide = 1; iGuide<VertexCount>> 1; iGuide++) {
+		for (size_t iGuide = 1; iGuide<VertexCount>> 1; iGuide++) {
 			OSequence[OutputIndex].x = midl(CurrentFormVertices[finish].x, CurrentFormVertices[start].x);
 			OSequence[OutputIndex].y = midl(CurrentFormVertices[finish].y, CurrentFormVertices[start].y);
 			if (cisin(OSequence[OutputIndex].x, OSequence[OutputIndex].y))
@@ -1165,7 +1171,7 @@ void chkwlk(unsigned& interleaveSequenceIndex2) {
 		delwlk((ClosestFormToCursor << FRMSHFT) | WLKMSK);
 }
 
-void fnund(const std::vector<RNGCNT>& textureSegments, unsigned find, unsigned& interleaveSequenceIndex2) {
+void fnund(const std::vector<RNGCNT>& textureSegments, size_t find, unsigned& interleaveSequenceIndex2) {
 	const float savedStitchSize = UserStitchLength;
 
 	UserStitchLength = 1e99;
@@ -1748,7 +1754,7 @@ void fsort() {
 			precjmps(tempStitchBuffer, pRecs, sortRecord);
 		}
 		std::copy(tempStitchBuffer.cbegin(), tempStitchBuffer.cbegin() + OutputIndex, StitchBuffer);
-		PCSHeader.stitchCount = OutputIndex;
+		PCSHeader.stitchCount = gsl::narrow<unsigned short>(OutputIndex);
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -1806,8 +1812,9 @@ void dmpat() {
 #endif
 
 void fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
-	unsigned iSourceStitch = 0, ind = 0, iDestinationStitch = 0, codedFormIndex = 0, attribute = 0, type = 0, tmap = 0, color = 0,
-	         bordercolor = 0, tapcol = 0;
+	unsigned iSourceStitch = 0, ind = 0, iDestinationStitch = 0, attribute = 0, type = 0, tmap = 0, color = 0, bordercolor = 0,
+	         tapcol       = 0;
+	size_t codedFormIndex = 0;
 	// ToDo - Still not sure what this function does?
 	//        I suspect the fillStartsData members are not correctly named
 	codedFormIndex = (ClosestFormToCursor << FRMSHFT);
@@ -2008,20 +2015,20 @@ void chkend(unsigned offset, unsigned code, INTINF& ilData) {
 }
 
 void intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsigned interleaveSequenceIndex2) {
-	unsigned iSequence = 0, ine = 0, code = 0, offset = 0;
+	unsigned ine = 0, code = 0, offset = 0;
 	fPOINT   colpnt = {};
 	INTINF   ilData = {};
 
 	StateMap.reset(StateFlag::ISEND);
 	fvars(ClosestFormToCursor);
 	InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
-	ilData.layerIndex = ((SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
+	ilData.layerIndex = (gsl::narrow<size_t>(SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
 	StateMap.reset(StateFlag::DIDSTRT);
 	if (PCSHeader.stitchCount) {
 		offset = MAXITEMS;
 		// Todo - Allocate memory locally for ilData.highStitchBuffer
 		ilData.highStitchBuffer = &StitchBuffer[MAXITEMS];
-		for (iSequence = 0; iSequence < interleaveSequenceIndex2; iSequence++) {
+		for (auto iSequence = 0u; iSequence < interleaveSequenceIndex2; iSequence++) {
 			ilData.pins = iSequence;
 			switch (InterleaveSequenceIndices[iSequence].seq) {
 			case I_AP:
@@ -2052,7 +2059,8 @@ void intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsig
 					ilData.coloc = fillStartsData.fillNamed.borderColor;
 				break;
 			}
-			code = ilData.layerIndex | InterleaveSequenceIndices[ilData.pins].code | InterleaveSequenceIndices[ilData.pins].color;
+			code = gsl::narrow<unsigned int>(ilData.layerIndex | InterleaveSequenceIndices[ilData.pins].code
+			                                 | InterleaveSequenceIndices[ilData.pins].color);
 			duint(offset, code, ilData);
 		}
 		chkend(MAXITEMS, code, ilData);
@@ -2072,8 +2080,9 @@ void intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsig
 	}
 	else {
 		offset = 0;
-		for (iSequence = 0; iSequence < interleaveSequenceIndex2; iSequence++) {
-			code = ilData.layerIndex | InterleaveSequenceIndices[iSequence].code | InterleaveSequenceIndices[iSequence].color;
+		for (auto iSequence = 0u; iSequence < interleaveSequenceIndex2; iSequence++) {
+			code = gsl::narrow<unsigned int>(ilData.layerIndex | InterleaveSequenceIndices[iSequence].code
+			                                 | InterleaveSequenceIndices[iSequence].color);
 			if (SelectedForm->extendedAttribute & AT_STRT) {
 				if (!StateMap.testAndSet(StateFlag::DIDSTRT))
 					ilData.output += gucon(CurrentFormVertices[SelectedForm->fillStart],
@@ -2189,7 +2198,7 @@ void notcwlk() {
 	notundfn(AT_CWLK);
 }
 
-void ulenfn(unsigned find, float length) {
+void ulenfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) {
@@ -2219,7 +2228,7 @@ void undlen() {
 	numWnd();
 }
 
-void uspacfn(unsigned find, float spacing) {
+void uspacfn(size_t find, float spacing) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & AT_UND) {
@@ -2249,7 +2258,7 @@ void uspac() {
 	numWnd();
 }
 
-void uangfn(unsigned find, float angle) {
+void uangfn(size_t find, float angle) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & AT_UND) {
@@ -2280,7 +2289,7 @@ void sfuang() {
 	numWnd();
 }
 
-void flenfn(unsigned find, float length) {
+void flenfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType && !isclp(find)) {
@@ -2310,7 +2319,7 @@ void setflen() {
 	numWnd();
 }
 
-void fspacfn(unsigned find, float spacing) {
+void fspacfn(size_t find, float spacing) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
@@ -2344,7 +2353,7 @@ void setfspac() {
 	numWnd();
 }
 
-void findfn(unsigned find, float indent) {
+void findfn(size_t find, float indent) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	SelectedForm->underlayIndent = indent;
@@ -2367,7 +2376,7 @@ void dufind(float indent) {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void fangfn(unsigned find, float angle) {
+void fangfn(size_t find, float angle) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	// ToDo - also do angle updates for texture filled forms
@@ -2412,7 +2421,7 @@ void setfang() {
 	numWnd();
 }
 
-void ucolfn(unsigned find, unsigned color) {
+void ucolfn(size_t find, unsigned color) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) {
@@ -2445,7 +2454,7 @@ void setucol() {
 	numWnd();
 }
 
-void fcolfn(unsigned find, unsigned color) {
+void fcolfn(size_t find, unsigned color) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
@@ -2478,7 +2487,7 @@ void setfcol() {
 	numWnd();
 }
 
-void bcolfn(unsigned find, unsigned color) {
+void bcolfn(size_t find, unsigned color) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -2511,7 +2520,7 @@ void setbcol() {
 	numWnd();
 }
 
-void blenfn(unsigned find, float length) {
+void blenfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType && !iseclp(find)) {
@@ -2541,7 +2550,7 @@ void setblen() {
 	numWnd();
 }
 
-void bspacfn(unsigned find, float length) {
+void bspacfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -2571,7 +2580,7 @@ void setbspac() {
 	numWnd();
 }
 
-void bminfn(unsigned find, float length) {
+void bminfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -2601,7 +2610,7 @@ void setbmin() {
 	numWnd();
 }
 
-void bmaxfn(unsigned find, float length) {
+void bmaxfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -2631,7 +2640,7 @@ void setbmax() {
 	numWnd();
 }
 
-void fminfn(unsigned find, float length) {
+void fminfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
@@ -2661,7 +2670,7 @@ void setfmin() {
 	numWnd();
 }
 
-void fmaxfn(unsigned find, float length) {
+void fmaxfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
@@ -2691,7 +2700,7 @@ void setfmax() {
 	numWnd();
 }
 
-void fwidfn(unsigned find, float length) {
+void fwidfn(size_t find, float length) {
 	unsigned iVertex   = 0;
 	double   ratio     = 0.0;
 	float    reference = 0.0;
@@ -2734,7 +2743,7 @@ void setfind() {
 	numWnd();
 }
 
-void fhifn(unsigned find, float length) {
+void fhifn(size_t find, float length) {
 	unsigned iVertex   = 0;
 	double   ratio     = 0.0;
 	float    reference = 0.0;
@@ -2772,7 +2781,7 @@ void setfhi() {
 
 void setfilstrt() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
-		FormList[ClosestFormToCursor].fillStart = ClosestVertexToCursor;
+		FormList[ClosestFormToCursor].fillStart = gsl::narrow<unsigned short>(ClosestVertexToCursor);
 		FormList[ClosestFormToCursor].extendedAttribute |= AT_STRT;
 		refil();
 		coltab();
@@ -2784,7 +2793,7 @@ void setfilstrt() {
 
 void setfilend() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
-		FormList[ClosestFormToCursor].fillEnd = ClosestVertexToCursor;
+		FormList[ClosestFormToCursor].fillEnd = gsl::narrow<unsigned short>(ClosestVertexToCursor);
 		FormList[ClosestFormToCursor].extendedAttribute |= AT_END;
 		refil();
 		coltab();
@@ -3224,7 +3233,8 @@ void dutxlin(const fPOINT& point0in, const fPOINT& point1in) {
 void setxclp() {
 	POINT    screenOffset = {};
 	fPOINT   editorOffset = {};
-	unsigned iVertex = 0, iLine = 0, iNextVertex = 0, lineCount = 0;
+	size_t lineCount = 0;
+	size_t   iNextVertex = 0;
 
 	deorg(screenOffset);
 	px2ed(screenOffset, editorOffset);
@@ -3234,7 +3244,7 @@ void setxclp() {
 	else
 		editorOffset.x -= TextureScreen.formCenter.x;
 	editorOffset.y -= TextureScreen.formCenter.y;
-	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
+	for (size_t iVertex = 0u; iVertex < AngledForm.vertexCount; iVertex++) {
 		AngledFormVertices[iVertex].x += editorOffset.x;
 		AngledFormVertices[iVertex].y += editorOffset.y;
 	}
@@ -3242,7 +3252,7 @@ void setxclp() {
 	if (AngledForm.type != FRMLINE)
 		lineCount++;
 	VertexCount = AngledForm.vertexCount;
-	for (iLine = 0; iLine < lineCount; iLine++) {
+	for (size_t iLine = 0u; iLine < lineCount; iLine++) {
 		iNextVertex = nxt(iLine);
 		dutxlin(AngledFormVertices[iLine], AngledFormVertices[iNextVertex]);
 	}
@@ -3354,13 +3364,14 @@ void angrct(fRECTANGLE& rectangle) noexcept {
 }
 
 void ritxfrm() noexcept {
-	unsigned iVertex = 0, vertexCount = 0;
+	size_t   iVertex     = 0u;
+	size_t vertexCount = 0;
 	POINT    offset
 	    = { (TextureCursorLocation.x - SelectTexturePointsOrigin.x), (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
 
 	offset.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
 	offset.y = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
-	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
+	for (iVertex = 0u; iVertex < AngledForm.vertexCount; iVertex++) {
 		ed2px(AngledFormVertices[iVertex], FormLines[iVertex]);
 		FormLines[iVertex].x += offset.x;
 		FormLines[iVertex].y += offset.y;
@@ -3370,7 +3381,7 @@ void ritxfrm() noexcept {
 	if (AngledForm.type != FRMLINE)
 		vertexCount++;
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	Polyline(StitchWindowDC, FormLines, vertexCount);
+	PolylineInt(StitchWindowDC, FormLines, vertexCount);
 }
 
 void setxfrm() {
@@ -3573,7 +3584,7 @@ void txang() {
 }
 
 void nutx() {
-	unsigned iForm = 0, iPoint = 0;
+	unsigned iPoint     = 0;
 	FRMHED*  formHeader = nullptr;
 
 	std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txcmp);
@@ -3583,7 +3594,7 @@ void nutx() {
 			deltx();
 		}
 		else {
-			for (iForm = ClosestFormToCursor; iForm-- > 0;) {
+			for (auto iForm = ClosestFormToCursor; iForm-- > 0;) {
 				if (istx(iForm)) {
 					formHeader = &FormList[iForm];
 					iPoint     = formHeader->fillInfo.texture.index + formHeader->fillInfo.texture.count;
@@ -3603,7 +3614,7 @@ void nutx() {
 			auto destination = startSource + tempPointCount;
 			auto _           = std::copy(startSource, endSource, destination);
 		}
-		for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			if (istx(iForm))
 				FormList[iForm].fillInfo.texture.index += gsl::narrow<unsigned short>(tempPointCount);
 		}
@@ -3682,8 +3693,8 @@ void dutxfn(unsigned textureType) {
 
 void dutxmir() {
 	const int centerLine   = (TextureScreen.lines + 1) >> 1;
-	unsigned  iPoint       = TempTexturePoints->size() - 1;
-	unsigned  iMirrorPoint = 0;
+	size_t    iPoint       = TempTexturePoints->size() - 1;
+	size_t    iMirrorPoint = 0;
 
 	savtxt();
 	std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txcmp);
@@ -4427,14 +4438,14 @@ void txdun() {
 					bufferEntry.width        = historyEntry.width;
 					bufferEntry.spacing      = historyEntry.spacing;
 				}
-				WriteFile(handle, textureHistoryBuffer.data(), textureHistoryBuffer.size() * ITXBUFLEN, &bytesWritten, 0);
+				WriteFileInt(handle, textureHistoryBuffer.data(), textureHistoryBuffer.size() * ITXBUFLEN, &bytesWritten, 0);
 				for (iHistory = 0; iHistory < ITXBUFLEN; iHistory++) {
 					if (TextureHistory[iHistory].texturePoint.size())
-						WriteFile(handle,
-						          TextureHistory[iHistory].texturePoint.data(),
-						          TextureHistory[iHistory].texturePoint.size() * sizeof(TXPNT),
-						          &bytesWritten,
-						          0);
+						WriteFileInt(handle,
+						             TextureHistory[iHistory].texturePoint.data(),
+						             TextureHistory[iHistory].texturePoint.size() * sizeof(TXPNT),
+						             &bytesWritten,
+						             0);
 				}
 			}
 			CloseHandle(handle);
@@ -4457,22 +4468,22 @@ void redtx() {
 			if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, 0)) {
 				if (!strcmp(sig, "txh")) {
 					if (ReadFile(handle, &TextureHistoryIndex, sizeof(int), &bytesRead, 0)) {
-						if (ReadFile(handle,
-						             textureHistoryBuffer.data(),
-						             textureHistoryBuffer.size() * ITXBUFLEN,
-						             &historyBytesRead,
-						             0)) {
+						if (ReadFileInt(handle,
+						                textureHistoryBuffer.data(),
+						                textureHistoryBuffer.size() * ITXBUFLEN,
+						                &historyBytesRead,
+						                0)) {
 							for (ind = 0; ind < (historyBytesRead / sizeof(TXHSTBUF)); ind++) {
 								TextureHistory[ind].height  = textureHistoryBuffer[ind].height;
 								TextureHistory[ind].width   = textureHistoryBuffer[ind].width;
 								TextureHistory[ind].spacing = textureHistoryBuffer[ind].spacing;
 								if (textureHistoryBuffer[ind].count) {
 									TextureHistory[ind].texturePoint.resize(textureHistoryBuffer[ind].count);
-									if (!ReadFile(handle,
-									              TextureHistory[ind].texturePoint.data(),
-									              sizeof(TXPNT) * textureHistoryBuffer[ind].count,
-									              &bytesRead,
-									              0)) {
+									if (!ReadFileInt(handle,
+									                 TextureHistory[ind].texturePoint.data(),
+									                 sizeof(TXPNT) * textureHistoryBuffer[ind].count,
+									                 &bytesRead,
+									                 0)) {
 										TextureHistory[ind].texturePoint.clear();
 										TextureHistory[ind].texturePoint.shrink_to_fit();
 									}
@@ -4608,11 +4619,11 @@ unsigned frmchkfn() {
 			if (badData.attribute == (BADFLT | BADCLP | BADSAT | BADTX))
 				break;
 		}
-		if (badData.flt != gsl::narrow<int>(FormVertexIndex))
+		if (badData.flt != FormVertexIndex)
 			badData.attribute |= BADFLT;
-		if (badData.clip != gsl::narrow<int>(ClipPointIndex))
+		if (badData.clip != ClipPointIndex)
 			badData.attribute |= BADCLP;
-		if (badData.guideCount != gsl::narrow<int>(SatinGuideIndex))
+		if (badData.guideCount != SatinGuideIndex)
 			badData.attribute |= BADSAT;
 		if (badData.tx != TextureIndex)
 			badData.attribute |= BADTX;
@@ -4620,7 +4631,7 @@ unsigned frmchkfn() {
 	return badData.attribute;
 }
 
-void bcup(unsigned find, BADCNTS& badData) {
+void bcup(size_t find, BADCNTS& badData) {
 	FRMHED* formHeader;
 
 	formHeader = &FormList[find];
@@ -4635,20 +4646,20 @@ void bcup(unsigned find, BADCNTS& badData) {
 }
 
 void chkfstch() noexcept {
-	const unsigned codedFormIndex = FormIndex << FRMSHFT;
-	unsigned       iStitch        = 0;
+	const size_t codedFormIndex = FormIndex << FRMSHFT;
 
-	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+	for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute & FRMSK) >= codedFormIndex)
 			StitchBuffer[iStitch].attribute = NOTFRM;
 	}
 }
 
 void repflt(std::wstring& repairMessage) {
-	unsigned iForm = 0, iDestination = 0, iVertex = 0, vertexDifference = 0, vertexCount = 0;
-	BADCNTS  badData = {};
+	unsigned iDestination = 0;
+	size_t   vertexDifference = 0, vertexCount = 0;
+	BADCNTS  badData          = {};
 
-	for (iForm = 0; iForm < FormIndex; iForm++) {
+	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		if (FormList[iForm].vertexCount) {
 			FormList[iDestination++] = FormList[iForm];
 			vertexCount += FormList[iForm].vertexCount;
@@ -4656,9 +4667,9 @@ void repflt(std::wstring& repairMessage) {
 	}
 	FormIndex = iDestination;
 	std::vector<fPOINT> vertexPoint;
-	iVertex   = 0;
+	size_t iVertex   = 0;
 	bool flag = true;
-	for (iForm = 0; iForm < FormIndex; iForm++) {
+	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		FRMHED* formHeader = &FormList[iForm];
 		vertexDifference   = formHeader->vertices - FormVertices;
 		if (FormVertexIndex >= vertexDifference + formHeader->vertexCount) {
@@ -4673,7 +4684,7 @@ void repflt(std::wstring& repairMessage) {
 		}
 		else {
 			if (vertexDifference < FormVertexIndex) {
-				formHeader->vertexCount = FormVertexIndex - vertexDifference;
+				formHeader->vertexCount = gsl::narrow<unsigned short>(FormVertexIndex - vertexDifference);
 				delsac(iForm);
 				// ToDo - do we need to increase the size of vertexPoint?
 				// vertexPoint.resize(vertexPoint.size + formHeader->vertexCount);
@@ -4703,11 +4714,13 @@ void repflt(std::wstring& repairMessage) {
 
 void repclp(std::wstring& repairMessage) {
 	FRMHED*             formHeader = nullptr;
-	unsigned            iForm = 0, clipCount = 0, clipDifference = 0, badClipCount = 0;
+	unsigned            iForm = 0, badClipCount = 0;
+	size_t              clipCount = 0, clipDifference = 0;
 	std::vector<fPOINT> clipPoint;
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		formHeader = &FormList[iForm];
 		if (isclp(iForm)) {
+			// ToDo - pointer arithmetic to be fixed
 			clipDifference = formHeader->angleOrClipData.clip - ClipPoints;
 			if (clipDifference + formHeader->lengthOrCount.clipCount < ClipPointIndex) {
 				clipPoint.resize(clipPoint.size() + formHeader->lengthOrCount.clipCount);
@@ -4721,7 +4734,7 @@ void repclp(std::wstring& repairMessage) {
 			}
 			else {
 				if (clipDifference < ClipPointIndex) {
-					formHeader->lengthOrCount.clipCount = FormVertexIndex - clipDifference;
+					formHeader->lengthOrCount.clipCount = gsl::narrow<unsigned int>(FormVertexIndex - clipDifference);
 					clipPoint.resize(clipPoint.size() + formHeader->lengthOrCount.clipCount);
 					auto sourceStart = formHeader->angleOrClipData.clip;
 					auto sourceEnd   = sourceStart + formHeader->lengthOrCount.clipCount;
@@ -4738,6 +4751,7 @@ void repclp(std::wstring& repairMessage) {
 			}
 		}
 		if (iseclp(iForm)) {
+			// ToDo - pointer arithmetic to be fixed
 			clipDifference = formHeader->borderClipData - ClipPoints;
 			if (clipDifference + formHeader->clipEntries < ClipPointIndex) {
 				clipPoint.resize(clipPoint.size() + formHeader->clipEntries);
@@ -4751,7 +4765,7 @@ void repclp(std::wstring& repairMessage) {
 			}
 			else {
 				if (clipDifference < ClipPointIndex) {
-					formHeader->clipEntries = FormVertexIndex - clipDifference;
+					formHeader->clipEntries = gsl::narrow<unsigned short>(FormVertexIndex - clipDifference);
 					clipPoint.resize(clipPoint.size() + formHeader->clipEntries);
 					auto sourceStart = formHeader->borderClipData;
 					auto sourceEnd   = sourceStart + formHeader->clipEntries;
@@ -4775,13 +4789,15 @@ void repclp(std::wstring& repairMessage) {
 }
 
 void repsat() {
-	unsigned iForm = 0, guideCount = 0, guideDifference = 0;
+	unsigned iForm = 0, guideDifference = 0;
+	size_t   guideCount = 0; 
 	FRMHED*  formHeader = nullptr;
 	BADCNTS  badData    = {};
 
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		formHeader = &FormList[iForm];
 		if (formHeader->type == SAT) {
+			// ToDo - pointer arithmetic to be fixed
 			guideDifference = formHeader->satinOrAngle.guide - SatinGuides;
 			if (FormVertexIndex > guideDifference + formHeader->vertexCount) {
 				auto       sourceStart = formHeader->satinOrAngle.guide;
@@ -4794,7 +4810,7 @@ void repsat() {
 			}
 			else {
 				if (guideDifference < SatinGuideIndex) {
-					formHeader->satinGuideCount = SatinGuideIndex - guideDifference;
+					formHeader->satinGuideCount = gsl::narrow<unsigned short>(SatinGuideIndex - guideDifference);
 					auto       sourceStart      = formHeader->satinOrAngle.guide;
 					auto       sourceEnd        = sourceStart + formHeader->satinGuideCount;
 					const auto destination = stdext::make_checked_array_iterator(&SatinGuides[guideCount], 10000 - guideCount);
@@ -4812,31 +4828,33 @@ void repsat() {
 }
 
 void reptx() {
-	unsigned iForm = 0, textureCount = 0;
-	FRMHED*  formHeader = nullptr;
-	BADCNTS  badData    = {};
+	size_t  textureCount = 0;
+	FRMHED* formHeader   = nullptr;
+	BADCNTS badData      = {};
 
-	for (iForm = 0; iForm < FormIndex; iForm++) {
+	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		if (istx(iForm)) {
 			formHeader = &FormList[iForm];
-			if (TextureIndex > formHeader->fillInfo.texture.index + formHeader->fillInfo.texture.count) {
+			if (gsl::narrow<unsigned short>(TextureIndex)
+			    > formHeader->fillInfo.texture.index + formHeader->fillInfo.texture.count) {
 				auto       sourceStart = &SatinGuides[formHeader->fillInfo.texture.index];
 				auto       sourceEnd   = sourceStart + formHeader->fillInfo.texture.count;
 				const auto destination = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
 				std::copy(sourceStart, sourceEnd, destination);
-				formHeader->fillInfo.texture.index = textureCount;
+				formHeader->fillInfo.texture.index = gsl::narrow<unsigned short>(textureCount);
 				textureCount += formHeader->fillInfo.texture.count;
 				bcup(iForm, badData);
 			}
 			else {
 				if (TextureIndex > formHeader->fillInfo.texture.index) {
-					formHeader->fillInfo.texture.count = TextureIndex - formHeader->fillInfo.texture.index;
-					auto       sourceStart             = &SatinGuides[formHeader->fillInfo.texture.index];
-					auto       sourceEnd               = sourceStart + formHeader->fillInfo.texture.count;
+					formHeader->fillInfo.texture.count
+					    = gsl::narrow<unsigned short>(TextureIndex) - formHeader->fillInfo.texture.index;
+					auto       sourceStart = &SatinGuides[formHeader->fillInfo.texture.index];
+					auto       sourceEnd   = sourceStart + formHeader->fillInfo.texture.count;
 					const auto destination
 					    = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
 					std::copy(sourceStart, sourceEnd, destination);
-					formHeader->fillInfo.texture.index = textureCount;
+					formHeader->fillInfo.texture.index = gsl::narrow<unsigned short>(textureCount);
 					bcup(iForm, badData);
 					textureCount = badData.tx;
 				}
