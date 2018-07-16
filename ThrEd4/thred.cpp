@@ -747,25 +747,25 @@ unsigned                   InsertedStitchCount;                 // saved stitch 
 
 OPENFILENAME OpenBitmapName = {
 	sizeof(OpenBitmapName), // lStructsize
-	ThrEdWindow,          // hwndOwner
-	ThrEdInstance,        // hInstance
-	BmpFilter,            // lpstrFilter
-	CustomFilter,         // lpstrCustomFilter
-	_MAX_PATH,            // nMaxCustFilter
-	0,                    // nFilterIndex
-	0,                    // lpstrFile
-	_MAX_PATH,            // nMaxFile
-	0,                    // lpstrFileTitle
-	0,                    // nMaxFileTitle
-	0,                    // lpstrInitialDir
-	0,                    // lpstrTitle
-	OFN_OVERWRITEPROMPT,  // Flags
-	0,                    // nFileOffset
-	0,                    // nFileExtension
-	L"bmp",               // lpstrDefExt
-	0,                    // lCustData
-	0,                    // lpfnHook
-	0,                    // lpTemplateName
+	ThrEdWindow,            // hwndOwner
+	ThrEdInstance,          // hInstance
+	BmpFilter,              // lpstrFilter
+	CustomFilter,           // lpstrCustomFilter
+	_MAX_PATH,              // nMaxCustFilter
+	0,                      // nFilterIndex
+	0,                      // lpstrFile
+	_MAX_PATH,              // nMaxFile
+	0,                      // lpstrFileTitle
+	0,                      // nMaxFileTitle
+	0,                      // lpstrInitialDir
+	0,                      // lpstrTitle
+	OFN_OVERWRITEPROMPT,    // Flags
+	0,                      // nFileOffset
+	0,                      // nFileExtension
+	L"bmp",                 // lpstrDefExt
+	0,                      // lCustData
+	0,                      // lpfnHook
+	0,                      // lpTemplateName
 };
 
 BITMAPFILEHEADER BitmapFileHeader;   // bitmap file header
@@ -1816,7 +1816,6 @@ void dudat() {
 	auto size = sizeof(*backupData) + sizeof(FormList[0]) * FormIndex + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
 	            + sizeof(FormVertices[0]) * FormVertexIndex + sizeof(ClipPoints[0]) * ClipPointIndex
 	            + sizeof(SatinGuides[0]) * SatinGuideIndex + sizeof(UserColor) + sizeof((*TexturePointsBuffer)[0]) * TextureIndex;
-
 	undoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);
 	backupData                       = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
 	if (backupData) {
@@ -4011,7 +4010,7 @@ void dubuf(char* const buffer, unsigned& count) {
 	stitchHeader.dlineCount    = gsl::narrow<unsigned short>(guideCount);
 	stitchHeader.clipDataCount = gsl::narrow<unsigned short>(clipDataCount);
 	constexpr auto threadLength
-	    = (sizeof(ThreadSize) / sizeof(ThreadSize[0])) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
+	    = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0])) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
 	constexpr auto formDataOffset
 	    = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor) + sizeof(CustomColor) + threadLength;
 	// ToDo - vertexLength overflows if there are more than 5446 stitches, so clamp it until version 3
@@ -4720,7 +4719,8 @@ void sav() {
 					PCSStitchBuffer[iPCSstitch].fy  = fractionalPart * 256;
 					PCSStitchBuffer[iPCSstitch++].y = integerPart;
 				}
-				if (!WriteFile(PCSFileHandle, PCSStitchBuffer.data(), iPCSstitch * sizeof(PCSStitchBuffer[0]), &bytesWritten, 0)) {
+				if (!WriteFile(
+				        PCSFileHandle, PCSStitchBuffer.data(), iPCSstitch * sizeof(PCSStitchBuffer[0]), &bytesWritten, 0)) {
 					riter();
 					flag = false;
 					break;
@@ -5853,8 +5853,8 @@ void nuFil() {
 						prtred();
 						return;
 					}
-					const auto threadLength
-					    = (sizeof(ThreadSize) / sizeof(ThreadSize[0])) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
+					constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0]))
+					                              / 2; // ThreadSize is defined as a 16 entry array of 2 characters
 					char msgBuffer[threadLength];
 					ReadFile(FileHandle, msgBuffer, threadLength, &BytesRead, 0);
 					totalBytesRead += BytesRead;
@@ -5876,7 +5876,8 @@ void nuFil() {
 						DWORD bytesToRead                                  = 0u;
 						if (version < 2) {
 							std::vector<FRMHEDO> formListOriginal(FormIndex);
-							ReadFileInt(FileHandle, formListOriginal.data(), FormIndex * sizeof(formListOriginal[0]), &BytesRead, 0);
+							ReadFileInt(
+							    FileHandle, formListOriginal.data(), FormIndex * sizeof(formListOriginal[0]), &BytesRead, 0);
 							if (BytesRead != FormIndex * sizeof(formListOriginal[0])) {
 								FormIndex = BytesRead / sizeof(formListOriginal[0]);
 								StateMap.set(StateFlag::BADFIL);
@@ -7522,7 +7523,7 @@ void duclip() {
 			EmptyClipboard();
 			ThrEdClip        = RegisterClipboardFormat(ThrEdClipFormat);
 			ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
-			                               (SelectedFormVertices.vertexCount + 1) * sizeof(FormVertices[0]) + sizeof(FORMVERTEXCLIP));
+			                               (SelectedFormVertices.vertexCount + 1) * sizeof(fPOINT) + sizeof(FORMVERTEXCLIP));
 			[[gsl::suppress(26429)]] {
 				if (ThrEdClipPointer) {
 					FORMVERTEXCLIP* clipHeader = *(static_cast<FORMVERTEXCLIP**>(ThrEdClipPointer));
@@ -8709,7 +8710,7 @@ unsigned gethand(const fPOINTATTR* stitch, unsigned stitchCount) noexcept {
 
 void insfil() {
 	OPENFILENAME file = {
-		sizeof(file),                // lStructsize
+		sizeof(file),                        // lStructsize
 		ThrEdWindow,                         // hwndOwner
 		ThrEdInstance,                       // hInstance
 		L"THR files\0*.thr\0\0",             // lpstrFilter
@@ -8807,14 +8808,16 @@ void insfil() {
 							}
 						}
 						else {
+							// ToDo - Use FRMHEDOUT here
 							ReadFile(
-							    InsertedFileHandle, &FormList[FormIndex], fileHeader.formCount * sizeof(FormList[0]), &BytesRead, 0);
+							    InsertedFileHandle, &FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), &BytesRead, 0);
 						}
 						ReadFile(InsertedFileHandle,
 						         &FormVertices[FormVertexIndex],
 						         fileHeader.vertexCount * sizeof(FormVertices[0]),
 						         &BytesRead,
 						         0);
+						// ToDo - Use SATCONOUT here
 						ReadFile(InsertedFileHandle,
 						         &SatinGuides[SatinGuideIndex],
 						         fileHeader.dlineCount * sizeof(SatinGuides[0]),
@@ -15689,7 +15692,10 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			ClosestPointIndex                = std::stoi(StitchEntryBuffer);
 			if (ClosestPointIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 				// ToDo - replace use of swprintf_s
-				swprintf_s(StitchEntryBuffer, sizeof(StitchEntryBuffer) / sizeof(StitchEntryBuffer[0]), L"%d", PCSHeader.stitchCount - 1);
+				swprintf_s(StitchEntryBuffer,
+				           sizeof(StitchEntryBuffer) / sizeof(StitchEntryBuffer[0]),
+				           L"%d",
+				           PCSHeader.stitchCount - 1);
 				ClosestPointIndex = PCSHeader.stitchCount - 1;
 			}
 			std::wstring txt(StitchEntryBuffer);
@@ -16106,7 +16112,8 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 						ClipFormVerticesData = static_cast<FORMVERTEXCLIP*>(ClipPointer);
 						if (ClipFormVerticesData->clipType == CLP_FRMPS) {
 							duzrat();
-							byteCount = sizeof(*ClipFormVerticesData) + (ClipFormVerticesData->vertexCount + 1) * sizeof(FormVertices[0]);
+							byteCount = sizeof(*ClipFormVerticesData)
+							            + (ClipFormVerticesData->vertexCount + 1) * sizeof(FormVertices[0]);
 							auto clipCopyBuffer = std::vector<unsigned char>(byteCount);
 							auto clipPointer    = static_cast<unsigned char*>(ClipPointer);
 							auto _              = std::copy(clipPointer, clipPointer + byteCount, clipCopyBuffer.begin());
@@ -16136,8 +16143,8 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 								StateMap.set(StateFlag::FUNCLP);
 								ClosestFormToCursor = FormIndex;
 								SelectedForm        = &FormList[FormIndex];
-								// ToDo - define clear in FRMHED
-								FillMemory(SelectedForm, sizeof(FormList[0]), 0);
+								// ToDo - This is now dangerous. Need to define clear in FRMHED
+								FillMemory(SelectedForm, sizeof((*SelectedForm)), 0);
 								SelectedForm->type        = FRMLINE;
 								SelectedForm->vertexCount = ClipFormVerticesData->vertexCount + 1;
 								SelectedForm->vertices    = adflt(SelectedForm->vertexCount);
@@ -19355,16 +19362,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 			MENUITEMINFO private_MenuInfo
 			    = { sizeof(private_MenuInfo), // Size
-				    MIIM_TYPE,            // Mask
-				    MFT_STRING,           // Type
-				    0,                    // State
-				    0,                    // ID
-				    0,                    // SubMenu
-				    0,                    // bmpChecked
-				    0,                    // bmpUnchecked
-				    0,                    // ItemData
-				    formOnOff,            // TypeData
-				    16,                   // cch
+				    MIIM_TYPE,                // Mask
+				    MFT_STRING,               // Type
+				    0,                        // State
+				    0,                        // ID
+				    0,                        // SubMenu
+				    0,                        // bmpChecked
+				    0,                        // bmpUnchecked
+				    0,                        // ItemData
+				    formOnOff,                // TypeData
+				    16,                       // cch
 #if (WINVER >= 0x0500)
 				    0 // bmpItem
 #endif                /* WINVER >= 0x0500 */

@@ -27,7 +27,7 @@ extern fPOINTATTR                 ClipBuffer[MAXFRMLINS];
 extern size_t                     ClosestFormToCursor;
 extern unsigned                   ClosestPointIndex;
 extern size_t                     ClosestVertexToCursor;
-extern size_t                   ClipPointIndex;
+extern size_t                     ClipPointIndex;
 extern fPOINT*                    CurrentFormVertices;
 extern std::wstring*              DesignerName;
 extern size_t                     FormVertexIndex;
@@ -2022,7 +2022,8 @@ void intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsig
 	StateMap.reset(StateFlag::ISEND);
 	fvars(ClosestFormToCursor);
 	InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
-	ilData.layerIndex = (gsl::narrow<size_t>(SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
+	ilData.layerIndex
+	    = (gsl::narrow<size_t>(SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
 	StateMap.reset(StateFlag::DIDSTRT);
 	if (PCSHeader.stitchCount) {
 		offset = MAXITEMS;
@@ -2956,7 +2957,6 @@ void drwtxbut() {
 }
 
 void chktx() {
-	// ToDo - this should be allocated in the calling function
 	std::vector<TXPNT> tmpTexture;
 	for (auto& p : *TempTexturePoints) {
 		if (p.line <= TextureScreen.lines && p.y <= TextureScreen.areaHeight) {
@@ -3231,10 +3231,10 @@ void dutxlin(const fPOINT& point0in, const fPOINT& point1in) {
 }
 
 void setxclp() {
-	POINT    screenOffset = {};
-	fPOINT   editorOffset = {};
-	size_t lineCount = 0;
-	size_t   iNextVertex = 0;
+	POINT  screenOffset = {};
+	fPOINT editorOffset = {};
+	size_t lineCount    = 0;
+	size_t iNextVertex  = 0;
 
 	deorg(screenOffset);
 	px2ed(screenOffset, editorOffset);
@@ -3364,9 +3364,9 @@ void angrct(fRECTANGLE& rectangle) noexcept {
 }
 
 void ritxfrm() {
-	size_t   iVertex     = 0u;
+	size_t iVertex     = 0u;
 	size_t vertexCount = 0;
-	POINT    offset
+	POINT  offset
 	    = { (TextureCursorLocation.x - SelectTexturePointsOrigin.x), (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
 
 	offset.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
@@ -4443,7 +4443,7 @@ void txdun() {
 					if (TextureHistory[iHistory].texturePoint.size())
 						WriteFileInt(handle,
 						             TextureHistory[iHistory].texturePoint.data(),
-						             TextureHistory[iHistory].texturePoint.size() * sizeof(TexturePointsBuffer[0]),
+						             TextureHistory[iHistory].texturePoint.size() * sizeof(TextureHistory[0].texturePoint[0]),
 						             &bytesWritten,
 						             0);
 				}
@@ -4481,7 +4481,8 @@ void redtx() {
 									TextureHistory[ind].texturePoint.resize(textureHistoryBuffer[ind].count);
 									if (!ReadFileInt(handle,
 									                 TextureHistory[ind].texturePoint.data(),
-									                 sizeof(TextureHistory[0].texturePoint[0]) * textureHistoryBuffer[ind].count,
+									                 sizeof(TextureHistory[0].texturePoint[0])
+									                     * textureHistoryBuffer[ind].count,
 									                 &bytesRead,
 									                 0)) {
 										TextureHistory[ind].texturePoint.clear();
@@ -4655,9 +4656,9 @@ void chkfstch() noexcept {
 }
 
 void repflt(std::wstring& repairMessage) {
-	unsigned iDestination = 0;
+	unsigned iDestination     = 0;
 	size_t   vertexDifference = 0, vertexCount = 0;
-	BADCNTS  badData          = {};
+	BADCNTS  badData = {};
 
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		if (FormList[iForm].vertexCount) {
@@ -4667,8 +4668,8 @@ void repflt(std::wstring& repairMessage) {
 	}
 	FormIndex = iDestination;
 	std::vector<fPOINT> vertexPoint;
-	size_t iVertex   = 0;
-	bool flag = true;
+	size_t              iVertex = 0;
+	bool                flag    = true;
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		FRMHED* formHeader = &FormList[iForm];
 		vertexDifference   = formHeader->vertices - FormVertices;
@@ -4790,7 +4791,7 @@ void repclp(std::wstring& repairMessage) {
 
 void repsat() {
 	unsigned iForm = 0, guideDifference = 0;
-	size_t   guideCount = 0; 
+	size_t   guideCount = 0;
 	FRMHED*  formHeader = nullptr;
 	BADCNTS  badData    = {};
 

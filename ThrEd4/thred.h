@@ -1394,30 +1394,30 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
     : satinOrAngle()
     , lengthOrCount()
     , angleOrClipData() {
-	attribute   = 0;
-	vertexCount = 0;
-	type        = 0;
-	fillColor   = 0;
-	borderColor = 0;
-	clipEntries = 0;
-	vertices    = 0;
+	attribute       = 0;
+	vertexCount     = 0;
+	type            = 0;
+	fillColor       = 0;
+	borderColor     = 0;
+	clipEntries     = 0;
+	vertices        = 0;
 	borderClipData  = 0;
 	satinGuideCount = 0;
 	wordParam       = 0;
 	rectangle       = {};
-	fillType    = 0;
-	edgeType    = 0;
-	fillSpacing = 0;
-	borderSize    = 0;
-	edgeSpacing   = 0;
-	edgeStitchLen = 0;
-	picoLength    = 0;
+	fillType        = 0;
+	edgeType        = 0;
+	fillSpacing     = 0;
+	borderSize      = 0;
+	edgeSpacing     = 0;
+	edgeStitchLen   = 0;
+	picoLength      = 0;
 
-	maxFillStitchLen   = 0;
-	minFillStitchLen   = 0;
-	extendedAttribute  = 0;
-	maxBorderStitchLen = 0;
-	minBorderStitchLen = 0;
+	maxFillStitchLen    = 0;
+	minFillStitchLen    = 0;
+	extendedAttribute   = 0;
+	maxBorderStitchLen  = 0;
+	minBorderStitchLen  = 0;
 	fillInfo            = {};
 	fillStart           = 0;
 	fillEnd             = 0;

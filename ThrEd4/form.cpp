@@ -196,7 +196,7 @@ size_t               ClosestFormToCursor;              // closest form to the cu
 size_t               ClosestVertexToCursor;            // formOrigin closest to the cursor
 fPOINT*              CurrentFillVertices;              // pointer to the line of the polygon being filled
 SATCON*              CurrentFormGuides;                // connections in the currently selecteed form
-size_t       CurrentFormGuidesCount;           // number of connections in the currently selected form
+size_t               CurrentFormGuidesCount;           // number of connections in the currently selected form
 fPOINT*              CurrentFormVertices;              // points in the currently selected form
 REGION*              CurrentRegion;                    // region currently being sequenced
 unsigned             CurrentSide;                      // active form formOrigin for line clipboard fill
@@ -349,7 +349,7 @@ void dusqr() {
 }
 
 void sacspac(const SATCON* const startGuide, unsigned guideCount) noexcept {
-	size_t   iStartGuide = 0;
+	size_t iStartGuide = 0;
 	size_t source = 0, destination = 0;
 
 	iStartGuide = satind(startGuide);
@@ -491,7 +491,7 @@ fPOINT* numclp() {
 	size_t destination = ClipPointIndex + ClipStitchCount - 1;
 	size_t iForm       = ClosestFormToCursor + 1;
 
-	while (source >= find) {
+	while ((source + 1) > find) {
 		ClipPoints[destination--] = ClipPoints[source--];
 	}
 	FormList[ClosestFormToCursor].angleOrClipData.clip = &ClipPoints[find];
@@ -517,9 +517,9 @@ unsigned clpind(const fPOINT* const point) noexcept {
 
 void fltspac(const fPOINT* const start, size_t count) noexcept {
 	const unsigned int startIndex  = fltind(start);
-	size_t    source      = FormVertexIndex - 1;
-	size_t    destination = FormVertexIndex + count - 1;
-	size_t    iForm       = ClosestFormToCursor + 1;
+	size_t             source      = FormVertexIndex - 1;
+	size_t             destination = FormVertexIndex + count - 1;
+	size_t             iForm       = ClosestFormToCursor + 1;
 
 	while (source >= startIndex) {
 		FormVertices[destination--] = FormVertices[source--];
@@ -530,7 +530,7 @@ void fltspac(const fPOINT* const start, size_t count) noexcept {
 }
 
 void delsac(size_t formIndex) noexcept {
-	size_t   iForm  = 0;
+	size_t iForm  = 0;
 	size_t source = 0, destination = 0;
 
 	if (SatinGuideIndex) {
@@ -6293,7 +6293,7 @@ void satadj() {
 	std::vector<SATCON> interiorGuides(CurrentFormGuidesCount);
 	SATCON*             sourceGuide      = nullptr;
 	SATCON*             destinationGuide = nullptr;
-	size_t      savedGuideCount  = SelectedForm->satinGuideCount;
+	size_t              savedGuideCount  = SelectedForm->satinGuideCount;
 	FRMHED*             formHeader       = nullptr;
 	ExtendedBitSet<>    satinMap(VertexCount);
 
@@ -7646,9 +7646,9 @@ void rotfrm(size_t newStartVertex) {
 }
 
 void satclos() {
-	unsigned iVertex = 0;
+	unsigned iVertex           = 0;
 	size_t   closestVertex     = StartPoint;
-	size_t  initialGuideCount = SelectedForm->satinGuideCount;
+	size_t   initialGuideCount = SelectedForm->satinGuideCount;
 	double   deltaX = 0.0, deltaY = 0.0, length = 0.0, minimumLength = 1e99;
 
 	uninsf();
@@ -10490,7 +10490,7 @@ void movlayr(unsigned codedLayer) {
 
 void join() {
 	const auto savedFormIndex = ClosestFormToCursor;
-	size_t vertexCount               = 0;
+	size_t     vertexCount    = 0;
 
 	StateMap.set(StateFlag::FRMSAM);
 	if (FormIndex > 1 && StateMap.test(StateFlag::FORMSEL) && closfrm()) {

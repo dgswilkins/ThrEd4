@@ -12,97 +12,77 @@
 
 #pragma once
 
-
 //
 // Includes
 //
 
-#include <stdint.h>   // for uint32_t
-#include <stdexcept>  // for std::runtime_error
-#include <string>     // for std::string
+#include <stdint.h>  // for uint32_t
+#include <stdexcept> // for std::runtime_error
+#include <string>    // for std::string
 
-
-namespace win32 
-{
-
+namespace win32 {
 
 //------------------------------------------------------------------------------
 // Error occurred during UTF-8 encoding conversions
 //------------------------------------------------------------------------------
-class Utf8ConversionException
-    : public std::runtime_error
+class Utf8ConversionException : public std::runtime_error
 {
 public:
+	// Possible conversion "directions"
+	enum class ConversionType
+	{
+		FromUtf8ToUtf16 = 0,
+		FromUtf16ToUtf8
+	};
 
-    // Possible conversion "directions"
-    enum class ConversionType
-    {
-        FromUtf8ToUtf16 = 0,
-        FromUtf16ToUtf8
-    };
+	// Initialize with error message raw C-string, last Win32 error code and conversion direction
+	Utf8ConversionException(const char* message, uint32_t errorCode, ConversionType type);
 
+	// Initialize with error message string, last Win32 error code and conversion direction
+	Utf8ConversionException(const std::string& message, uint32_t errorCode, ConversionType type);
 
-    // Initialize with error message raw C-string, last Win32 error code and conversion direction
-    Utf8ConversionException(const char* message, uint32_t errorCode, ConversionType type);
+	// Retrieve error code associated to the failed conversion
+	uint32_t ErrorCode() const noexcept;
 
-    // Initialize with error message string, last Win32 error code and conversion direction
-    Utf8ConversionException(const std::string& message, uint32_t errorCode, ConversionType type);
-
-    // Retrieve error code associated to the failed conversion
-    uint32_t ErrorCode() const noexcept;
-
-    // Direction of the conversion (e.g. from UTF-8 to UTF-16)
-    ConversionType Direction() const noexcept;
-
+	// Direction of the conversion (e.g. from UTF-8 to UTF-16)
+	ConversionType Direction() const noexcept;
 
 private:
-    // Error code from GetLastError()
-    uint32_t _errorCode;
+	// Error code from GetLastError()
+	uint32_t _errorCode;
 
-    // Direction of the conversion
-    ConversionType _conversionType;
+	// Direction of the conversion
+	ConversionType _conversionType;
 };
-
 
 //
 // Inline Method Implementations
 //
 
-inline Utf8ConversionException::Utf8ConversionException(
-    const char* const message, 
-    const uint32_t errorCode,
-    const ConversionType type)
+inline Utf8ConversionException::Utf8ConversionException(const char* const    message,
+                                                        const uint32_t       errorCode,
+                                                        const ConversionType type)
 
     : std::runtime_error(message)
     , _errorCode(errorCode)
-    , _conversionType(type)
-{
+    , _conversionType(type) {
 }
 
-
-inline Utf8ConversionException::Utf8ConversionException(
-    const std::string& message,
-    const uint32_t errorCode,
-    const ConversionType type)
+inline Utf8ConversionException::Utf8ConversionException(const std::string&   message,
+                                                        const uint32_t       errorCode,
+                                                        const ConversionType type)
 
     : std::runtime_error(message)
     , _errorCode(errorCode)
-    , _conversionType(type)
-{
+    , _conversionType(type) {
 }
 
-
-inline uint32_t Utf8ConversionException::ErrorCode() const noexcept
-{
-    return _errorCode;
+inline uint32_t Utf8ConversionException::ErrorCode() const noexcept {
+	return _errorCode;
 }
 
-
-inline Utf8ConversionException::ConversionType Utf8ConversionException::Direction() const noexcept
-{
-    return _conversionType;
+inline Utf8ConversionException::ConversionType Utf8ConversionException::Direction() const noexcept {
+	return _conversionType;
 }
-
 
 } // namespace win32
-
