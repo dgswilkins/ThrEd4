@@ -11463,11 +11463,11 @@ void debean() {
 }
 
 void mvfrmsb(FRMHED* const destination, const FRMHED* const source, size_t count) noexcept {
-	memmove(destination, source, count * sizeof(FRMHED));
+	memmove(destination, source, count * sizeof(*source));
 }
 
 void mvfltsb(fPOINT* const destination, const fPOINT* const source, size_t count) noexcept {
-	memmove(destination, source, count * sizeof(fPOINT));
+	memmove(destination, source, count * sizeof(*source));
 }
 
 void clpspac(const fPOINT* const insertPoint, size_t count) noexcept {

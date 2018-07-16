@@ -714,7 +714,7 @@ int fil2crd(const fs::path& fileName) {
 	wcscpy_s(command, fileName.wstring().c_str());
 	wcscpy_s(command, L"\"");
 	startupInfo    = {};
-	startupInfo.cb = sizeof(STARTUPINFO);
+	startupInfo.cb = sizeof(startupInfo);
 	if (!CreateProcess(0, command, 0, 0, 0, NORMAL_PRIORITY_CLASS, 0, 0, &startupInfo, &processInfo)) {
 		errorCode = GetLastError();
 	}
@@ -750,7 +750,7 @@ void pes2crd() {
 	wchar_t       message[P2CBUFSIZ]     = { 0 };
 	wchar_t       caption[P2CBUFSIZ]     = { 0 };
 	OPENFILENAME  openFileName           = {
-        sizeof(OPENFILENAME), // lStructsize
+        sizeof(openFileName), // lStructsize
         ThrEdWindow,          // hwndOwner
         ThrEdInstance,        // hInstance
         filter,               // lpstrFilter
@@ -4173,7 +4173,7 @@ void setstxt(unsigned stringIndex, float value, HWND dialog) {
 float getstxt(unsigned stringIndex, HWND dialog) {
 	// ToDo - This is not great code.
 	wchar_t buffer[16] = {};
-	GetWindowText(GetDlgItem(dialog, stringIndex), buffer, sizeof(buffer) / sizeof(wchar_t));
+	GetWindowText(GetDlgItem(dialog, stringIndex), buffer, sizeof(buffer) / sizeof(buffer[0]));
 	return std::stof(buffer) * PFGRAN;
 }
 
@@ -4424,11 +4424,11 @@ void txdun() {
 	std::vector<TXHSTBUF> textureHistoryBuffer(ITXBUFLEN);
 
 	if (TextureHistory[0].texturePoint.size()) {
-		if (txnam(name, sizeof(name) / sizeof(wchar_t))) {
+		if (txnam(name, sizeof(name) / sizeof(name[0]))) {
 			handle = CreateFile(name, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 			if (handle != INVALID_HANDLE_VALUE) {
 				WriteFile(handle, &signature, sizeof(signature), &bytesWritten, 0);
-				WriteFile(handle, &TextureHistoryIndex, sizeof(int), &bytesWritten, 0);
+				WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, 0);
 				for (auto i = 0; i < ITXBUFLEN; i++) {
 					auto&       bufferEntry  = textureHistoryBuffer[i];
 					const auto& historyEntry = TextureHistory[i];
@@ -4443,7 +4443,7 @@ void txdun() {
 					if (TextureHistory[iHistory].texturePoint.size())
 						WriteFileInt(handle,
 						             TextureHistory[iHistory].texturePoint.data(),
-						             TextureHistory[iHistory].texturePoint.size() * sizeof(TXPNT),
+						             TextureHistory[iHistory].texturePoint.size() * sizeof(TexturePointsBuffer[0]),
 						             &bytesWritten,
 						             0);
 				}
@@ -4462,18 +4462,18 @@ void redtx() {
 	std::vector<TXHSTBUF> textureHistoryBuffer(ITXBUFLEN);
 
 	TextureHistoryIndex = ITXBUFLEN - 1;
-	if (txnam(name, sizeof(name) / sizeof(wchar_t))) {
+	if (txnam(name, sizeof(name) / sizeof(name[0]))) {
 		handle = CreateFile(name, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
 		if (handle != INVALID_HANDLE_VALUE) {
 			if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, 0)) {
 				if (!strcmp(sig, "txh")) {
-					if (ReadFile(handle, &TextureHistoryIndex, sizeof(int), &bytesRead, 0)) {
+					if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, 0)) {
 						if (ReadFileInt(handle,
 						                textureHistoryBuffer.data(),
 						                textureHistoryBuffer.size() * ITXBUFLEN,
 						                &historyBytesRead,
 						                0)) {
-							for (ind = 0; ind < (historyBytesRead / sizeof(TXHSTBUF)); ind++) {
+							for (ind = 0; ind < (historyBytesRead / sizeof(textureHistoryBuffer[0])); ind++) {
 								TextureHistory[ind].height  = textureHistoryBuffer[ind].height;
 								TextureHistory[ind].width   = textureHistoryBuffer[ind].width;
 								TextureHistory[ind].spacing = textureHistoryBuffer[ind].spacing;
@@ -4481,7 +4481,7 @@ void redtx() {
 									TextureHistory[ind].texturePoint.resize(textureHistoryBuffer[ind].count);
 									if (!ReadFileInt(handle,
 									                 TextureHistory[ind].texturePoint.data(),
-									                 sizeof(TXPNT) * textureHistoryBuffer[ind].count,
+									                 sizeof(TextureHistory[0].texturePoint[0]) * textureHistoryBuffer[ind].count,
 									                 &bytesRead,
 									                 0)) {
 										TextureHistory[ind].texturePoint.clear();

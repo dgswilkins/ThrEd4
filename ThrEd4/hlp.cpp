@@ -132,7 +132,6 @@ void crmsg(const fs::path& fileName) {
 	shoMsg(fmt::format(fmtStr, fileName.wstring()));
 }
 
-// ToDo - this should probably be butxt(unsigned iButton, const wchar_t* buttonText)
 void butxt(unsigned iButton, const std::wstring& buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
 		if (iButton == 5) {
