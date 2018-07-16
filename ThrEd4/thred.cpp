@@ -5837,13 +5837,13 @@ void nuFil() {
 						return;
 					}
 					BackgroundBrush = CreateSolidBrush(BackgroundColor);
-					ReadFile(FileHandle, (COLORREF*)UserColor, sizeof(UserColor), &BytesRead, 0);
+					ReadFile(FileHandle, UserColor, sizeof(UserColor), &BytesRead, 0);
 					totalBytesRead += BytesRead;
 					if (BytesRead != sizeof(UserColor)) {
 						prtred();
 						return;
 					}
-					ReadFile(FileHandle, (COLORREF*)CustomColor, sizeof(CustomColor), &BytesRead, 0);
+					ReadFile(FileHandle, CustomColor, sizeof(CustomColor), &BytesRead, 0);
 					totalBytesRead += BytesRead;
 					if (BytesRead != sizeof(CustomColor)) {
 						prtred();
@@ -5880,9 +5880,11 @@ void nuFil() {
 							std::copy(formListOriginal.cbegin(), formListOriginal.cend(), FormList);
 						}
 						else {
-							FRMHEDOUT inFormList[1024];
+							auto ptrFormList = std::make_unique<FRMHEDOUT[]>(FormIndex);
+							auto inFormList  = ptrFormList.get();
+
 							bytesToRead = gsl::narrow<DWORD>(FormIndex * sizeof(FRMHEDOUT));
-							ReadFileInt(FileHandle, (FRMHEDOUT*)inFormList, bytesToRead, &BytesRead, 0);
+							ReadFileInt(FileHandle, inFormList, bytesToRead, &BytesRead, 0);
 							StateMap.reset(StateFlag::BADFIL);
 							if (BytesRead != bytesToRead) {
 								FormIndex = BytesRead / sizeof(FRMHEDOUT);
@@ -5893,16 +5895,18 @@ void nuFil() {
 							}
 						}
 						bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(fPOINT));
-						ReadFile(FileHandle, (fPOINT*)FormVertices, bytesToRead, &BytesRead, 0);
+						ReadFile(FileHandle, FormVertices, bytesToRead, &BytesRead, 0);
 						if (BytesRead != bytesToRead) {
 							FormVertexIndex = BytesRead / sizeof(fPOINT);
 							for (size_t iVertex = FormVertexIndex; iVertex < thredHeader.vertexCount; iVertex++)
 								FormVertices[iVertex].x = FormVertices[iVertex].y = 0;
 							StateMap.set(StateFlag::BADFIL);
 						}
-						SATCONOUT inSatinGuides[MAXSAC];
-						bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(SATCONOUT));
-						ReadFile(FileHandle, (SATCONOUT*)inSatinGuides, bytesToRead, &BytesRead, 0);
+						SatinGuideIndex = thredHeader.dlineCount;
+						auto ptrSatinGuides = std::make_unique<SATCONOUT[]>(SatinGuideIndex);
+						auto inSatinGuides  = ptrSatinGuides.get();
+						bytesToRead         = gsl::narrow<DWORD>(SatinGuideIndex * sizeof(SATCONOUT));
+						ReadFile(FileHandle, inSatinGuides, bytesToRead, &BytesRead, 0);
 						if (BytesRead != bytesToRead) {
 							SatinGuideIndex = BytesRead / sizeof(SATCONOUT);
 							StateMap.set(StateFlag::BADFIL);
@@ -5911,7 +5915,7 @@ void nuFil() {
 							SatinGuides[iGuide] = inSatinGuides[iGuide];
 						}
 						bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(fPOINT));
-						ReadFile(FileHandle, (fPOINT*)ClipPoints, bytesToRead, &BytesRead, 0);
+						ReadFile(FileHandle, ClipPoints, bytesToRead, &BytesRead, 0);
 						if (BytesRead != bytesToRead) {
 							ClipPointIndex = BytesRead / sizeof(fPOINT);
 							StateMap.set(StateFlag::BADFIL);
@@ -12681,7 +12685,7 @@ void setpclp() {
 	FormVerticesAsLine[ind] = point;
 }
 
-void dupclp() noexcept {
+void dupclp() {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
 	PolylineInt(StitchWindowDC, FormVerticesAsLine, OutputIndex);
@@ -17458,7 +17462,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 }
 
 // return the width of a text item
-int txtWid(const wchar_t* string) noexcept {
+int txtWid(const wchar_t* string) {
 	GetTextExtentPoint32Int(ThredDC, string, wcslen(string), &TextSize);
 	return TextSize.cx;
 }
@@ -19248,7 +19252,7 @@ void sachk() {
 			if (guide) {
 				for (size_t iGuide = 0; iGuide < form->satinGuideCount; iGuide++) {
 					if (guide[iGuide].start > form->vertexCount || guide[iGuide].finish > form->vertexCount) {
-						auto bakclo         = ClosestFormToCursor;
+						const auto bakclo         = ClosestFormToCursor;
 						ClosestFormToCursor = iForm;
 						delsac(iForm);
 						ClosestFormToCursor = bakclo;

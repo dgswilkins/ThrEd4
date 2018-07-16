@@ -1035,13 +1035,17 @@ public:
 class SATCONOUT
 {
 public:
+	SATCONOUT() noexcept;
+	// SATCONOUT(SATCONOUT&&) = default;
+	// SATCONOUT& operator=(const SATCONOUT& rhs) = default;
+	// SATCONOUT& operator=(SATCONOUT&&) = default;
+	//~SATCONOUT() = default;
+
+	SATCONOUT(const SATCON& rhs);
+	inline SATCONOUT& operator=(const SATCON& rhs);
+
 	unsigned short start;
 	unsigned short finish;
-
-	SATCONOUT() noexcept;
-	SATCONOUT(const SATCON& rhs);
-	~SATCONOUT(){};
-	inline SATCONOUT& operator=(const SATCON& rhs) noexcept;
 };
 
 inline SATCONOUT::SATCONOUT() noexcept {
@@ -1054,7 +1058,7 @@ inline SATCONOUT::SATCONOUT(const SATCON& rhs) {
 	finish = gsl::narrow<unsigned short>(rhs.finish);
 }
 
-inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) noexcept {
+inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) {
 	start  = gsl::narrow<unsigned short>(rhs.start);
 	finish = gsl::narrow<unsigned short>(rhs.finish);
 
@@ -1062,16 +1066,15 @@ inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) noexcept {
 }
 
 inline SATCON& SATCON::operator=(const SATCONOUT& rhs) noexcept {
-	start = rhs.start;
+	start  = rhs.start;
 	finish = rhs.finish;
 
 	return *this;
 }
 
-class FANGCLPOUT;
+union FANGCLPOUT;
 
-class FANGCLP
-{
+union FANGCLP {
 public:
 	float   angle;
 	fPOINT* clip;
@@ -1080,96 +1083,88 @@ public:
 	inline FANGCLP& operator=(const FANGCLPOUT& rhs) noexcept;
 };
 
-class FANGCLPOUT
-{
+union FANGCLPOUT {
 public:
+	FANGCLPOUT() noexcept;
+	// FANGCLPOUT(FANGCLPOUT&&) = default;
+	// FANGCLPOUT& operator=(const FANGCLPOUT& rhs) = default;
+	// FANGCLPOUT& operator=(FANGCLPOUT&&) = default;
+	//~FANGCLPOUT() = default;
+
+	FANGCLPOUT(const FANGCLP& rhs) noexcept;
+	inline FANGCLPOUT& operator=(const FANGCLP& rhs) noexcept;
+
 	float     angle;
 	fPOINT*   clip;
 	SATCONOUT guide;
-
-	FANGCLPOUT() noexcept;
-	FANGCLPOUT(const FANGCLP& rhs);
-	~FANGCLPOUT(){};
-	inline FANGCLPOUT& operator=(const FANGCLP& rhs) noexcept;
 };
 
 inline FANGCLPOUT::FANGCLPOUT() noexcept {
-	angle = 0.0;
-	clip  = nullptr;
-	guide = { 0, 0 };
+	clip = nullptr;
 }
 
-inline FANGCLPOUT::FANGCLPOUT(const FANGCLP& rhs) {
-	angle = rhs.angle;
-	clip  = rhs.clip;
-	guide = rhs.guide;
+inline FANGCLPOUT::FANGCLPOUT(const FANGCLP& rhs) noexcept {
+	clip = rhs.clip;
 }
 
 inline FANGCLPOUT& FANGCLPOUT::operator=(const FANGCLP& rhs) noexcept {
-	angle = rhs.angle;
-	clip  = rhs.clip;
-	guide = rhs.guide;
+	clip = rhs.clip;
 
 	return *this;
 }
 
 inline FANGCLP& FANGCLP::operator=(const FANGCLPOUT& rhs) noexcept {
-	angle = rhs.angle;
-	clip  = rhs.clip;
-	guide = rhs.guide;
+	clip = rhs.clip;
 
 	return *this;
 }
 
-class FLENCNTOUT;
+union FLENCNTOUT;
 
-class FLENCNT
-{
+union FLENCNT {
 public:
 	float  stitchLength;
 	size_t clipCount;
 
-	inline FLENCNT& operator=(const FLENCNTOUT& rhs);
+	inline FLENCNT& operator=(const FLENCNTOUT& rhs) noexcept;
 };
 
-class FLENCNTOUT
-{
+union FLENCNTOUT {
 public:
+	FLENCNTOUT() noexcept;
+	// FLENCNTOUT(FLENCNTOUT&&) = default;
+	// FLENCNTOUT& operator=(const FLENCNTOUT& rhs) = default;
+	// FLENCNTOUT& operator=(FLENCNTOUT&&) = default;
+	//~FLENCNTOUT() = default;
+
+	FLENCNTOUT(const FLENCNT& rhs);
+	inline FLENCNTOUT& operator=(const FLENCNT& rhs);
+
 	float    stitchLength;
 	unsigned clipCount;
-
-	FLENCNTOUT() noexcept;
-	FLENCNTOUT(const FLENCNT& rhs);
-	~FLENCNTOUT(){};
-	inline FLENCNTOUT& operator=(const FLENCNT& rhs);
 };
 
 inline FLENCNTOUT::FLENCNTOUT() noexcept {
-	stitchLength = 0.0;
-	clipCount    = 0u;
+	clipCount = 0u;
 }
 
 inline FLENCNTOUT::FLENCNTOUT(const FLENCNT& rhs) {
-	stitchLength = rhs.stitchLength;
-	clipCount    = gsl::narrow<unsigned>(rhs.clipCount);
+	clipCount = gsl::narrow<unsigned>(rhs.clipCount);
 }
 
 inline FLENCNTOUT& FLENCNTOUT::operator=(const FLENCNT& rhs) {
-	stitchLength = rhs.stitchLength;
-	clipCount    = gsl::narrow<unsigned>(rhs.clipCount);
+	clipCount = gsl::narrow<unsigned>(rhs.clipCount);
 
 	return *this;
 }
 
-inline FLENCNT& FLENCNT::operator=(const FLENCNTOUT& rhs) {
-	stitchLength = rhs.stitchLength;
-	clipCount    = rhs.clipCount;
+inline FLENCNT& FLENCNT::operator=(const FLENCNTOUT& rhs) noexcept {
+	clipCount = rhs.clipCount;
 
 	return *this;
 }
 
-class SATINANGLE
-{
+union SATINANGLE {
 public:
 	SATCON* guide;
 	float   angle;
@@ -1347,6 +1342,15 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 class FRMHEDOUT
 {
 public:
+	FRMHEDOUT() noexcept;
+	// FRMHEDOUT(FRMHEDOUT&&) = default;
+	// FRMHEDOUT& operator=(const FRMHEDOUT& rhs) = default;
+	// FRMHEDOUT& operator=(FRMHEDOUT&&) = default;
+	//~FRMHEDOUT() = default;
+
+	inline FRMHEDOUT(const FRMHED& rhs);
+	inline FRMHEDOUT& operator=(const FRMHED& rhs);
+
 	unsigned char  attribute;       // attribute
 	unsigned short vertexCount;     // number of sides
 	unsigned char  type;            // type
@@ -1384,15 +1388,46 @@ public:
 	float          txof;                // gradient end density
 	unsigned char  underlayColor;       // underlay color
 	unsigned char  cres;                // reserved
-
-	FRMHEDOUT();
-	inline FRMHEDOUT(const FRMHED& rhs);
-	~FRMHEDOUT(){};
-
-	inline FRMHEDOUT& operator=(const FRMHED& rhs) noexcept;
 };
 
-inline FRMHEDOUT::FRMHEDOUT() {
+inline FRMHEDOUT::FRMHEDOUT() noexcept
+    : satinOrAngle()
+    , lengthOrCount()
+    , angleOrClipData() {
+	attribute   = 0;
+	vertexCount = 0;
+	type        = 0;
+	fillColor   = 0;
+	borderColor = 0;
+	clipEntries = 0;
+	vertices    = 0;
+	borderClipData  = 0;
+	satinGuideCount = 0;
+	wordParam       = 0;
+	rectangle       = {};
+	fillType    = 0;
+	edgeType    = 0;
+	fillSpacing = 0;
+	borderSize    = 0;
+	edgeSpacing   = 0;
+	edgeStitchLen = 0;
+	picoLength    = 0;
+
+	maxFillStitchLen   = 0;
+	minFillStitchLen   = 0;
+	extendedAttribute  = 0;
+	maxBorderStitchLen = 0;
+	minBorderStitchLen = 0;
+	fillInfo            = {};
+	fillStart           = 0;
+	fillEnd             = 0;
+	underlaySpacing     = 0;
+	underlayStitchLen   = 0;
+	underlayStitchAngle = 0;
+	underlayIndent      = 0;
+	txof                = 0;
+	underlayColor       = 0;
+	cres                = 0;
 }
 
 inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
@@ -1435,7 +1470,7 @@ inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
 	cres                = rhs.cres;
 }
 
-inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) noexcept {
+inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
 	attribute       = rhs.attribute;
 	vertexCount     = gsl::narrow<unsigned short>(rhs.vertexCount);
 	type            = rhs.type;

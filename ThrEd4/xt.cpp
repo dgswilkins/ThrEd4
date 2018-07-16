@@ -3363,7 +3363,7 @@ void angrct(fRECTANGLE& rectangle) noexcept {
 	}
 }
 
-void ritxfrm() noexcept {
+void ritxfrm() {
 	size_t   iVertex     = 0u;
 	size_t vertexCount = 0;
 	POINT    offset
@@ -4564,15 +4564,15 @@ void lodchk() {
 	}
 }
 
-void chkclp(const FRMHED* const formHeader, BADCNTS& badData) noexcept {
-	if (badData.clip == formHeader->angleOrClipData.clip - ClipPoints)
+void chkclp(const FRMHED* const formHeader, BADCNTS& badData) {
+	if (badData.clip == gsl::narrow<size_t>(formHeader->angleOrClipData.clip - ClipPoints))
 		badData.clip += formHeader->lengthOrCount.clipCount;
 	else
 		badData.attribute |= BADCLP;
 }
 
-void chkeclp(const FRMHED* const formHeader, BADCNTS& badData) noexcept {
-	if (badData.clip == formHeader->borderClipData - ClipPoints)
+void chkeclp(const FRMHED* const formHeader, BADCNTS& badData) {
+	if (badData.clip == gsl::narrow<size_t>(formHeader->borderClipData - ClipPoints))
 		badData.clip += formHeader->clipEntries;
 	else
 		badData.attribute |= BADCLP;
@@ -4589,7 +4589,7 @@ unsigned frmchkfn() {
 			if (!(badData.attribute & BADFLT)) {
 				if (!formHeader->vertexCount)
 					badData.attribute |= BADFLT;
-				if (badData.flt == formHeader->vertices - FormVertices)
+				if (badData.flt == gsl::narrow<size_t>(formHeader->vertices - FormVertices))
 					badData.flt += formHeader->vertexCount;
 				else
 					badData.attribute |= BADFLT;
@@ -4602,7 +4602,7 @@ unsigned frmchkfn() {
 			}
 			if (formHeader->type == SAT && formHeader->satinGuideCount) {
 				if (!(badData.attribute & BADSAT)) {
-					if (badData.guideCount == formHeader->satinOrAngle.guide - SatinGuides)
+					if (badData.guideCount == gsl::narrow<size_t>(formHeader->satinOrAngle.guide - SatinGuides))
 						badData.guideCount += formHeader->satinGuideCount;
 					else
 						badData.attribute |= BADSAT;

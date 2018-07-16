@@ -764,7 +764,7 @@ void frmlin(const std::vector<fPOINT>& vertices) {
 	}
 }
 
-void dufrm() noexcept {
+void dufrm() {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
 	PolylineInt(StitchWindowDC, FormLines, NewFormVertexCount);
@@ -776,7 +776,7 @@ void unfrm() {
 		dufrm();
 }
 
-void mdufrm() noexcept {
+void mdufrm() {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
 	if (FormList[ClosestFormToCursor].type == FRMLINE)
@@ -5575,7 +5575,7 @@ void brkseq(const std::vector<SMALPNTL*>& sortedLines, size_t start, size_t fini
 		// This odd construction for iLine is used to ensure
 		// loop terminates when finish = 0
 		for (auto iLine = start + 1; iLine != finish; iLine--) {
-			auto iLineDec = iLine - 1;
+			const auto iLineDec = iLine - 1;
 			savedGroup--;
 			if (sortedLines[iLineDec]->group != savedGroup) {
 				rspnt(SequenceLines[0].x, SequenceLines[0].y);
@@ -5659,7 +5659,7 @@ void duseq(const std::vector<SMALPNTL*>& sortedLines, size_t start, size_t finis
 		auto iLine = start + 1;
 		// This odd construction for iLine is used to ensure loop terminates when finish = 0
 		for (iLine = start + 1; iLine != finish; iLine--) {
-			auto iLineDec = iLine - 1;
+			const auto iLineDec = iLine - 1;
 			if (sequenceMap.test_set(iLineDec)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
 					flag = true;
@@ -8335,7 +8335,7 @@ void setap() {
 	shoMsg(fmt::format(fmtStr, (AppliqueColor + 1)));
 }
 
-void maxtsiz(const std::wstring& label, POINT& textSize) noexcept {
+void maxtsiz(const std::wstring& label, POINT& textSize) {
 	SIZE labelSize;
 
 	GetTextExtentPoint32Int(StitchWindowMemDC, label.data(), label.size(), &labelSize);
@@ -9198,7 +9198,7 @@ void setexpand(double xyRatio) {
 	}
 }
 
-void nufilcol(unsigned color) noexcept {
+void nufilcol(unsigned color) {
 	unsigned attribute = 0, iStitch = 0;
 
 	if (SelectedForm->fillColor != color) {
@@ -9213,7 +9213,7 @@ void nufilcol(unsigned color) noexcept {
 	}
 }
 
-void nufthcol(unsigned color) noexcept {
+void nufthcol(unsigned color) {
 	unsigned attribute = 0, iStitch = 0;
 
 	if (SelectedForm->fillInfo.feather.color != color) {
@@ -9228,7 +9228,7 @@ void nufthcol(unsigned color) noexcept {
 	}
 }
 
-void nubrdcol(unsigned color) noexcept {
+void nubrdcol(unsigned color) {
 	unsigned attribute = 0, iStitch = 0;
 
 	SelectedForm->borderColor = color;
@@ -10593,7 +10593,7 @@ void frmsadj() {
 	}
 }
 
-void frmpnts(unsigned type) noexcept {
+void frmpnts(unsigned type) {
 	unsigned   iStitch = 0;
 	const auto trg     = gsl::narrow<unsigned int>((ClosestFormToCursor << 4) | type);
 
