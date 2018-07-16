@@ -4010,11 +4010,16 @@ void dubuf(char* const buffer, unsigned& count) {
 	stitchHeader.vertexCount   = gsl::narrow<unsigned short>(vertexCount);
 	stitchHeader.dlineCount    = gsl::narrow<unsigned short>(guideCount);
 	stitchHeader.clipDataCount = gsl::narrow<unsigned short>(clipDataCount);
-	const auto threadLength = (sizeof(ThreadSize) / sizeof(wchar_t)) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
-	const auto formDataOffset
+	constexpr auto threadLength
+	    = (sizeof(ThreadSize) / sizeof(wchar_t)) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
+	constexpr auto formDataOffset
 	    = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor) + sizeof(CustomColor) + threadLength;
-	stitchHeader.vertexLen
-	    = gsl::narrow<unsigned short>(sizeof(STRHED) + PCSHeader.stitchCount * sizeof(fPOINTATTR) + formDataOffset);
+	// ToDo - vertexLength overflows if there are more than 5446 stitches, so clamp it until version 3
+	auto vtxLen = sizeof(STRHED) + PCSHeader.stitchCount * sizeof(fPOINTATTR) + formDataOffset;
+	if (vtxLen > USHRT_MAX) {
+		vtxLen = USHRT_MAX;
+	}
+	stitchHeader.vertexLen   = gsl::narrow<unsigned short>(vtxLen);
 	stitchHeader.dlineLen    = gsl::narrow<unsigned short>(sizeof(fPOINT) * vertexCount);
 	stitchHeader.clipDataLen = gsl::narrow<unsigned short>(sizeof(fPOINT) * clipDataCount);
 	durit(&output, &stitchHeader, sizeof(STRHED));
@@ -4025,8 +4030,7 @@ void dubuf(char* const buffer, unsigned& count) {
 	durit(&output, &ExtendedHeader, sizeof(STREX));
 	durit(&output, StitchBuffer, PCSHeader.stitchCount * sizeof(fPOINTATTR));
 	if (!PCSBMPFileName[0]) {
-		for (auto iName = 0; iName < sizeof(PCSBMPFileName); iName++)
-			PCSBMPFileName[iName] = 0;
+		std::fill_n(PCSBMPFileName, sizeof(PCSBMPFileName), '\0');
 	}
 	durit(&output, PCSBMPFileName, sizeof(PCSBMPFileName));
 	durit(&output, &BackgroundColor, sizeof(COLORREF));
@@ -5902,7 +5906,7 @@ void nuFil() {
 								FormVertices[iVertex].x = FormVertices[iVertex].y = 0;
 							StateMap.set(StateFlag::BADFIL);
 						}
-						SatinGuideIndex = thredHeader.dlineCount;
+						SatinGuideIndex     = thredHeader.dlineCount;
 						auto ptrSatinGuides = std::make_unique<SATCONOUT[]>(SatinGuideIndex);
 						auto inSatinGuides  = ptrSatinGuides.get();
 						bytesToRead         = gsl::narrow<DWORD>(SatinGuideIndex * sizeof(SATCONOUT));
@@ -19252,7 +19256,7 @@ void sachk() {
 			if (guide) {
 				for (size_t iGuide = 0; iGuide < form->satinGuideCount; iGuide++) {
 					if (guide[iGuide].start > form->vertexCount || guide[iGuide].finish > form->vertexCount) {
-						const auto bakclo         = ClosestFormToCursor;
+						const auto bakclo   = ClosestFormToCursor;
 						ClosestFormToCursor = iForm;
 						delsac(iForm);
 						ClosestFormToCursor = bakclo;
