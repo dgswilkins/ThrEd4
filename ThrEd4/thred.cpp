@@ -1813,7 +1813,7 @@ void dudat() {
 	auto&   undoBuffer = *UndoBuffer;
 
 	undoBuffer[UndoBufferWriteIndex].reset(nullptr);
-	auto size = sizeof(*backupData) + sizeof(FormList[0]) * FormIndex + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
+	const auto size = sizeof(BAKHED) + sizeof(FormList[0]) * FormIndex + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
 	            + sizeof(FormVertices[0]) * FormVertexIndex + sizeof(ClipPoints[0]) * ClipPointIndex
 	            + sizeof(SatinGuides[0]) * SatinGuideIndex + sizeof(UserColor) + sizeof((*TexturePointsBuffer)[0]) * TextureIndex;
 	undoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);

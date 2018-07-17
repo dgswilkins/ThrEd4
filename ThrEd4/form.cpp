@@ -11463,11 +11463,15 @@ void debean() {
 }
 
 void mvfrmsb(FRMHED* const destination, const FRMHED* const source, size_t count) noexcept {
-	memmove(destination, source, count * sizeof(*source));
+	if (source && destination) {
+		memmove(destination, source, count * sizeof(*source));
+	}
 }
 
 void mvfltsb(fPOINT* const destination, const fPOINT* const source, size_t count) noexcept {
-	memmove(destination, source, count * sizeof(*source));
+	if (source && destination) {
+		memmove(destination, source, count * sizeof(*source));
+	}
 }
 
 void clpspac(const fPOINT* const insertPoint, size_t count) noexcept {
@@ -11507,10 +11511,11 @@ void spltsat(const SATCON& currentGuide) {
 
 	mvfrmsb(&FormList[FormIndex], &FormList[FormIndex - 1], FormIndex - ClosestFormToCursor);
 	FormIndex++;
-	if (ClosestFormToCursor < FormIndex - 2)
+	if (ClosestFormToCursor < FormIndex - 2) {
 		mvfltsb(&FormVertices[FormVertexIndex + 1],
 		        &FormVertices[FormVertexIndex - 1],
 		        FormVertexIndex - fltind(FormList[ClosestFormToCursor + 2].vertices));
+	}
 	FormVertexIndex += 2;
 	for (auto iForm = ClosestFormToCursor + 2; iForm < FormIndex; iForm++)
 		FormList[iForm].vertices += 2;
@@ -11582,8 +11587,9 @@ void spltsat(const SATCON& currentGuide) {
 }
 
 bool spltlin() {
-	if (ClosestVertexToCursor < 2 || SelectedForm->vertexCount - ClosestVertexToCursor < 2)
+	if (ClosestVertexToCursor < 2 || SelectedForm->vertexCount - ClosestVertexToCursor < 2) {
 		return 0;
+	}
 	mvfrmsb(&FormList[FormIndex], &FormList[FormIndex - 1], FormIndex - ClosestFormToCursor);
 	FormIndex++;
 	SelectedForm->vertexCount = ClosestVertexToCursor;
