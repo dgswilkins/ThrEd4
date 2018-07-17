@@ -405,9 +405,9 @@ unsigned        GroupStartStitch;                       // lower end of selected
 unsigned        GroupEndStitch;                         // higher end of selected stitches
 unsigned        PrevGroupStartStitch;                   // lower end of previous selection
 unsigned        PrevGroupEndStitch;                     // higher end of previous selection
-wchar_t         StitchEntryBuffer[5];                   // stitch number entered by user
+//wchar_t         StitchEntryBuffer[5];                   // stitch number entered by user
 wchar_t         SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
-unsigned        BufferIndex = 0;                        // pointer to the next number to be entered
+//unsigned        BufferIndex = 0;                        // pointer to the next number to be entered
 size_t          BufferDigitCount;                       // number of decimal digits in the number of stitches
 unsigned        LineIndex;                              // line index for display routine
 double          StitchWindowAspectRatio;                // aspect ratio of the stitch window
@@ -3627,7 +3627,7 @@ void dubox() {
 	StateMap.set(StateFlag::SELBOX);
 	StateMap.reset(StateFlag::FRMPSEL);
 	redraw(ColorBar);
-	if (!BufferIndex)
+	//if (!BufferIndex)
 		ritnum(STR_NUMSEL, ClosestPointIndex);
 }
 
@@ -6129,7 +6129,7 @@ void nuFil() {
 				bfil();
 			}
 			ritot(PCSHeader.stitchCount);
-			BufferIndex     = 0;
+			//BufferIndex     = 0;
 			ZoomRect.left   = 0;
 			ZoomRect.bottom = 0;
 			ZoomRect.right = UnzoomedRect.x = IniFile.hoopSizeX;
@@ -12798,12 +12798,14 @@ void qcode() {
 	else
 		rstAll();
 	StateMap.set(StateFlag::RESTCH);
-	if (BufferIndex) {
+/*
+if (BufferIndex) {
 		BufferIndex          = 0;
 		StitchEntryBuffer[0] = 0;
 		ClosestPointIndex    = 0;
 		movbox();
 	}
+*/
 	const std::wstring blank(L"");
 	butxt(HNUM, blank);
 	return;
@@ -13617,7 +13619,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		unmsg();
 		unboxs();
 		unpat();
-		BufferIndex = 0;
+		//BufferIndex = 0;
 		StateMap.reset(StateFlag::SATIN);
 		if (StateMap.testAndReset(StateFlag::SATPNT))
 			satfix();
@@ -15674,6 +15676,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				break;
 			}
 		}
+		/*
 		if (code == 8 && BufferIndex) {
 			StitchEntryBuffer[--BufferIndex] = 0;
 			std::wstring txt(StitchEntryBuffer);
@@ -15704,7 +15707,8 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			StateMap.reset(StateFlag::NUMIN);
 			return 1;
 		}
-		BufferIndex = 0;
+		*/
+		//BufferIndex = 0;
 		if (StateMap.testAndReset(StateFlag::ENTRDUP)) {
 			const double value    = std::stof(MsgBuffer);
 			double       newAngle = 0;
