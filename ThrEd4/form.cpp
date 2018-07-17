@@ -10180,7 +10180,7 @@ void dufcntr(dPOINT& center) {
 	fRECTANGLE* formRect = nullptr;
 	fRECTANGLE  bigRect  = {};
 
-	formRect       = &FormList[(*SelectedFormList)[0]].rectangle;
+	formRect       = &FormList[SelectedFormList->front()].rectangle;
 	bigRect.left   = formRect->left;
 	bigRect.right  = formRect->right;
 	bigRect.top    = formRect->top;
@@ -10736,7 +10736,7 @@ void fcntr() {
 
 	if (SelectedFormList->size()) {
 		savdo();
-		auto firstForm = (*SelectedFormList)[0];
+		auto firstForm = SelectedFormList->front();
 		initialCenter.x
 		    = (FormList[firstForm].rectangle.right - FormList[firstForm].rectangle.left) / 2 + FormList[firstForm].rectangle.left;
 		initialCenter.y = (FormList[firstForm].rectangle.top - FormList[firstForm].rectangle.bottom) / 2

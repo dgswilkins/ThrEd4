@@ -6293,7 +6293,7 @@ void zumin() {
 				break;
 			}
 			if (SelectedFormList->size()) {
-				auto firstForm           = (*SelectedFormList)[0];
+				auto firstForm           = SelectedFormList->front();
 				SelectedFormsRect.bottom = FormList[firstForm].rectangle.bottom;
 				SelectedFormsRect.top    = FormList[firstForm].rectangle.top;
 				SelectedFormsRect.left   = FormList[firstForm].rectangle.left;
@@ -8318,7 +8318,7 @@ bool frmstch() {
 	unsigned                iStitch = 0, formCode = 0;
 	boost::dynamic_bitset<> formMap(FormIndex);
 
-	for (auto form : *SelectedFormList) {
+	for (auto form : (*SelectedFormList)) {
 		formMap.set(form);
 	}
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -9583,9 +9583,9 @@ void selup() {
 		StateMap.reset(StateFlag::SELBOX);
 		if (StateMap.testAndReset(StateFlag::FORMSEL)) {
 			if (ClosestFormToCursor < FormIndex - 1) {
-				(*SelectedFormList)[0] = ClosestFormToCursor;
+				SelectedFormList->push_back(ClosestFormToCursor);
 				LastFormSelected       = ClosestFormToCursor + 1;
-				(*SelectedFormList)[1] = LastFormSelected;
+				SelectedFormList->push_back(LastFormSelected);
 			}
 			else
 				return;
@@ -13411,7 +13411,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 					if (SelectedFormList->size() == 1) {
 						ReleaseCapture();
 						gotbox();
-						ClosestFormToCursor   = (*SelectedFormList)[0];
+						ClosestFormToCursor   = SelectedFormList->front();
 						ClosestVertexToCursor = 0;
 						SelectedFormList->clear();
 						ritnum(STR_NUMFORM, ClosestFormToCursor);
