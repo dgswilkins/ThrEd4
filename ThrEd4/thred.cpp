@@ -365,49 +365,49 @@ extern size_t                     SatinEndGuide;
 #define NERCNT 4 // number of entries in the near array
 
 // main variables
-LPWSTR*         ArgList;                                // command line argument array
-int             ArgCount;                               // command line argument count
-HINSTANCE       ThrEdInstance;                          // main instance handle
-HWND            ThrEdWindow;                            // main window handle
-MSG             Msg;                                    // main message loop message
-RECT            ThredWindowRect;                        // main window size
-RECT            ColorBarRect;                           // color bar rectangle
-RECT            MinLenRect;                             // minimum length rectangle
-RECT            MaxLenRect;                             // maximum length rectangle
-unsigned        SmallestStitchIndex;                    // pointer to the smallest stitch in the selected range
-unsigned        LargestStitchIndex;                     // pointer to the largest stitch in the selected range
-unsigned        CurrentStitchIndex;                     // pointer to the current selection for length search
-HDC             ThredDC;                                // main device context handle
-HDC             StitchWindowMemDC;                      // stitch window memory device context
-HDC             StitchWindowDC;                         // stitch window device context
-HDC             BitmapDC;                               // bitmap device context
-HDC             ColorBarDC;                             // color bar device context
-HBITMAP         StitchWindowBmp;                        // bitmap for the memory stitch device context
-POINT           ThredWindowOrigin;                      // offset origin of the main window
-POINT           StitchWindowOrigin;                     // offset origin of the stitch window
-SIZE            TextSize;                               // used for measuring sizes of text items
-SIZE            ScreenSizePixels;                       // screen size in pixels
-SIZE            ScreenSizeMM;                           // screen size in millimeters
-dRECTANGLE      ZoomRect;                               // zoom rectangle
-RECT            StitchWindowAbsRect;                    // stitch window size,absolute
-RECT            StitchWindowClientRect;                 // stitch window size,client
-DRAWITEMSTRUCT* DrawItem;                               // for owner-draw windows
-double          ZoomFactor = 1;                         // zoom factor
-POINT           UnzoomedRect;                           // size of the unzoomed stitch window
-POINT           StitchCoordinatesPixels;                // converted from stitch to pixel
-POINT           NearestPixel[NERCNT];                   // selected points
-POINT           BoxCoordinate = { 0, 0 };               // single select box point
-double          DistanceToClick;                        // distance of closest point to a mouse click
-unsigned        ClosestPointIndex;                      // index of closest point
-unsigned        ClosestPointIndexClone;                 // copy of index of closest point
-unsigned        GroupStitchIndex;                       // last point selected in group
-unsigned        GroupStartStitch;                       // lower end of selected stitches
-unsigned        GroupEndStitch;                         // higher end of selected stitches
-unsigned        PrevGroupStartStitch;                   // lower end of previous selection
-unsigned        PrevGroupEndStitch;                     // higher end of previous selection
-//wchar_t         StitchEntryBuffer[5];                   // stitch number entered by user
-wchar_t         SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
-//unsigned        BufferIndex = 0;                        // pointer to the next number to be entered
+LPWSTR*         ArgList;                  // command line argument array
+int             ArgCount;                 // command line argument count
+HINSTANCE       ThrEdInstance;            // main instance handle
+HWND            ThrEdWindow;              // main window handle
+MSG             Msg;                      // main message loop message
+RECT            ThredWindowRect;          // main window size
+RECT            ColorBarRect;             // color bar rectangle
+RECT            MinLenRect;               // minimum length rectangle
+RECT            MaxLenRect;               // maximum length rectangle
+unsigned        SmallestStitchIndex;      // pointer to the smallest stitch in the selected range
+unsigned        LargestStitchIndex;       // pointer to the largest stitch in the selected range
+unsigned        CurrentStitchIndex;       // pointer to the current selection for length search
+HDC             ThredDC;                  // main device context handle
+HDC             StitchWindowMemDC;        // stitch window memory device context
+HDC             StitchWindowDC;           // stitch window device context
+HDC             BitmapDC;                 // bitmap device context
+HDC             ColorBarDC;               // color bar device context
+HBITMAP         StitchWindowBmp;          // bitmap for the memory stitch device context
+POINT           ThredWindowOrigin;        // offset origin of the main window
+POINT           StitchWindowOrigin;       // offset origin of the stitch window
+SIZE            TextSize;                 // used for measuring sizes of text items
+SIZE            ScreenSizePixels;         // screen size in pixels
+SIZE            ScreenSizeMM;             // screen size in millimeters
+dRECTANGLE      ZoomRect;                 // zoom rectangle
+RECT            StitchWindowAbsRect;      // stitch window size,absolute
+RECT            StitchWindowClientRect;   // stitch window size,client
+DRAWITEMSTRUCT* DrawItem;                 // for owner-draw windows
+double          ZoomFactor = 1;           // zoom factor
+POINT           UnzoomedRect;             // size of the unzoomed stitch window
+POINT           StitchCoordinatesPixels;  // converted from stitch to pixel
+POINT           NearestPixel[NERCNT];     // selected points
+POINT           BoxCoordinate = { 0, 0 }; // single select box point
+double          DistanceToClick;          // distance of closest point to a mouse click
+unsigned        ClosestPointIndex;        // index of closest point
+unsigned        ClosestPointIndexClone;   // copy of index of closest point
+unsigned        GroupStitchIndex;         // last point selected in group
+unsigned        GroupStartStitch;         // lower end of selected stitches
+unsigned        GroupEndStitch;           // higher end of selected stitches
+unsigned        PrevGroupStartStitch;     // lower end of previous selection
+unsigned        PrevGroupEndStitch;       // higher end of previous selection
+// wchar_t         StitchEntryBuffer[5];                   // stitch number entered by user
+wchar_t SideWindowEntryBuffer[11]; // side window number for entering form data sheet numbers
+// unsigned        BufferIndex = 0;                        // pointer to the next number to be entered
 size_t          BufferDigitCount;                       // number of decimal digits in the number of stitches
 unsigned        LineIndex;                              // line index for display routine
 double          StitchWindowAspectRatio;                // aspect ratio of the stitch window
@@ -1814,8 +1814,9 @@ void dudat() {
 
 	undoBuffer[UndoBufferWriteIndex].reset(nullptr);
 	const auto size = sizeof(BAKHED) + sizeof(FormList[0]) * FormIndex + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
-	            + sizeof(FormVertices[0]) * FormVertexIndex + sizeof(ClipPoints[0]) * ClipPointIndex
-	            + sizeof(SatinGuides[0]) * SatinGuideIndex + sizeof(UserColor) + sizeof((*TexturePointsBuffer)[0]) * TextureIndex;
+	                  + sizeof(FormVertices[0]) * FormVertexIndex + sizeof(ClipPoints[0]) * ClipPointIndex
+	                  + sizeof(SatinGuides[0]) * SatinGuideIndex + sizeof(UserColor)
+	                  + sizeof((*TexturePointsBuffer)[0]) * TextureIndex;
 	undoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);
 	backupData                       = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
 	if (backupData) {
@@ -2515,7 +2516,7 @@ void chknum() {
 			case LFTHCOL:
 				if (value) {
 					savdo();
-					nufthcol((std::stoi(SideWindowEntryBuffer) - 1) & 0xf);
+					nufthcol((std::stoull(SideWindowEntryBuffer) - 1) & 0xf);
 					SetWindowText((*ValueWindow)[LFRMCOL], SideWindowEntryBuffer);
 					coltab();
 				}
@@ -2525,7 +2526,7 @@ void chknum() {
 			case LFRMCOL:
 				if (value) {
 					savdo();
-					nufilcol((std::stoi(SideWindowEntryBuffer) - 1) & 0xf);
+					nufilcol((std::stoull(SideWindowEntryBuffer) - 1) & 0xf);
 					SetWindowText((*ValueWindow)[LFRMCOL], SideWindowEntryBuffer);
 					coltab();
 				}
@@ -2535,7 +2536,7 @@ void chknum() {
 			case LUNDCOL:
 				if (value) {
 					savdo();
-					SelectedForm->underlayColor = (std::stoi(SideWindowEntryBuffer) - 1) & 0xf;
+					SelectedForm->underlayColor = (std::stoull(SideWindowEntryBuffer) - 1) & 0xf;
 					SetWindowText((*ValueWindow)[LUNDCOL], SideWindowEntryBuffer);
 					refilfn();
 					coltab();
@@ -2546,7 +2547,7 @@ void chknum() {
 			case LBRDCOL:
 				if (value) {
 					savdo();
-					nubrdcol((std::stoi(SideWindowEntryBuffer) - 1) & 0xf);
+					nubrdcol((std::stoull(SideWindowEntryBuffer) - 1) & 0xf);
 					SetWindowText((*ValueWindow)[LFRMCOL], SideWindowEntryBuffer);
 					coltab();
 				}
@@ -3627,8 +3628,8 @@ void dubox() {
 	StateMap.set(StateFlag::SELBOX);
 	StateMap.reset(StateFlag::FRMPSEL);
 	redraw(ColorBar);
-	//if (!BufferIndex)
-		ritnum(STR_NUMSEL, ClosestPointIndex);
+	// if (!BufferIndex)
+	ritnum(STR_NUMSEL, ClosestPointIndex);
 }
 
 unsigned stch2px(unsigned iStitch) noexcept {
@@ -6129,7 +6130,7 @@ void nuFil() {
 				bfil();
 			}
 			ritot(PCSHeader.stitchCount);
-			//BufferIndex     = 0;
+			// BufferIndex     = 0;
 			ZoomRect.left   = 0;
 			ZoomRect.bottom = 0;
 			ZoomRect.right = UnzoomedRect.x = IniFile.hoopSizeX;
@@ -9584,7 +9585,7 @@ void selup() {
 		if (StateMap.testAndReset(StateFlag::FORMSEL)) {
 			if (ClosestFormToCursor < FormIndex - 1) {
 				SelectedFormList->push_back(ClosestFormToCursor);
-				LastFormSelected       = ClosestFormToCursor + 1;
+				LastFormSelected = ClosestFormToCursor + 1;
 				SelectedFormList->push_back(LastFormSelected);
 			}
 			else
@@ -10888,12 +10889,12 @@ void respac() {
 }
 
 bool chkminus(unsigned code) noexcept {
-	if (code == 189 || code == 109) {
-		if (PreferenceIndex == PCLPOF + 1)
+	if (code == 189 || code == 109) { // '-' key pressed
+		if (PreferenceIndex == PFAZ)  // Clipboard Offset in preferences
 			return 1;
-		if (FormMenuChoice == LFRMSPAC && isfclp())
+		if (FormMenuChoice == LFRMSPAC && isfclp()) // Fill Spacing for fan clip fill
 			return 1;
-		if (FormMenuChoice == LWLKIND)
+		if (FormMenuChoice == LWLKIND) // Indent
 			return 1;
 	}
 	return 0;
@@ -12798,14 +12799,14 @@ void qcode() {
 	else
 		rstAll();
 	StateMap.set(StateFlag::RESTCH);
-/*
-if (BufferIndex) {
-		BufferIndex          = 0;
-		StitchEntryBuffer[0] = 0;
-		ClosestPointIndex    = 0;
-		movbox();
-	}
-*/
+	/*
+	if (BufferIndex) {
+	        BufferIndex          = 0;
+	        StitchEntryBuffer[0] = 0;
+	        ClosestPointIndex    = 0;
+	        movbox();
+	    }
+	*/
 	const std::wstring blank(L"");
 	butxt(HNUM, blank);
 	return;
@@ -13619,7 +13620,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		unmsg();
 		unboxs();
 		unpat();
-		//BufferIndex = 0;
+		// BufferIndex = 0;
 		StateMap.reset(StateFlag::SATIN);
 		if (StateMap.testAndReset(StateFlag::SATPNT))
 			satfix();
@@ -15579,9 +15580,11 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 					unsid();
 				}
 				else {
-					SideWindowEntryBuffer[MsgIndex++] = NumericCode;
-					SideWindowEntryBuffer[MsgIndex]   = 0;
-					SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
+					if (MsgIndex < ((sizeof(SideWindowEntryBuffer) - 1) / sizeof(SideWindowEntryBuffer[0]))) {
+						SideWindowEntryBuffer[MsgIndex++] = NumericCode;
+						SideWindowEntryBuffer[MsgIndex]   = 0;
+						SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
+					}
 				}
 				return 1;
 			}
@@ -15678,37 +15681,37 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		}
 		/*
 		if (code == 8 && BufferIndex) {
-			StitchEntryBuffer[--BufferIndex] = 0;
-			std::wstring txt(StitchEntryBuffer);
-			butxt(HNUM, txt);
-			ClosestPointIndex = std::stoi(StitchEntryBuffer);
-			movbox();
-			return 1;
+		    StitchEntryBuffer[--BufferIndex] = 0;
+		    std::wstring txt(StitchEntryBuffer);
+		    butxt(HNUM, txt);
+		    ClosestPointIndex = std::stoi(StitchEntryBuffer);
+		    movbox();
+		    return 1;
 		}
 		if (!StateMap.test(StateFlag::WASTRAC) && dunum(code)) {
-			if (BufferIndex > BufferDigitCount - 1)
-				BufferIndex = 0;
-			if (StitchEntryBuffer[0] == '0' && BufferIndex)
-				BufferIndex--;
-			StitchEntryBuffer[BufferIndex++] = NumericCode;
-			StitchEntryBuffer[BufferIndex]   = 0;
-			ClosestPointIndex                = std::stoi(StitchEntryBuffer);
-			if (ClosestPointIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
-				// ToDo - replace use of swprintf_s
-				swprintf_s(StitchEntryBuffer,
-				           sizeof(StitchEntryBuffer) / sizeof(StitchEntryBuffer[0]),
-				           L"%d",
-				           PCSHeader.stitchCount - 1);
-				ClosestPointIndex = PCSHeader.stitchCount - 1;
-			}
-			std::wstring txt(StitchEntryBuffer);
-			butxt(HNUM, txt);
-			movbox();
-			StateMap.reset(StateFlag::NUMIN);
-			return 1;
+		    if (BufferIndex > BufferDigitCount - 1)
+		        BufferIndex = 0;
+		    if (StitchEntryBuffer[0] == '0' && BufferIndex)
+		        BufferIndex--;
+		    StitchEntryBuffer[BufferIndex++] = NumericCode;
+		    StitchEntryBuffer[BufferIndex]   = 0;
+		    ClosestPointIndex                = std::stoi(StitchEntryBuffer);
+		    if (ClosestPointIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
+		        // ToDo - replace use of swprintf_s
+		        swprintf_s(StitchEntryBuffer,
+		                   sizeof(StitchEntryBuffer) / sizeof(StitchEntryBuffer[0]),
+		                   L"%d",
+		                   PCSHeader.stitchCount - 1);
+		        ClosestPointIndex = PCSHeader.stitchCount - 1;
+		    }
+		    std::wstring txt(StitchEntryBuffer);
+		    butxt(HNUM, txt);
+		    movbox();
+		    StateMap.reset(StateFlag::NUMIN);
+		    return 1;
 		}
 		*/
-		//BufferIndex = 0;
+		// BufferIndex = 0;
 		if (StateMap.testAndReset(StateFlag::ENTRDUP)) {
 			const double value    = std::stof(MsgBuffer);
 			double       newAngle = 0;
