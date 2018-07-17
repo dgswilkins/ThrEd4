@@ -2452,10 +2452,36 @@ void chkhup() {
 	setfchk();
 }
 
+float bufToDouble(wchar_t *buffer) {
+	float value;
+
+	try {
+		value = std::stod(buffer);
+	}
+	catch (...) {
+		OutputDebugString(fmt::format(L"stod failed trying to convert '{}'\n", buffer).c_str());
+		value = 0.0;
+	}
+	return value;
+}
+
+unsigned long long bufTou64(wchar_t* buffer) {
+	unsigned long long value;
+
+	try {
+		value = std::stoull(buffer);
+	}
+	catch (...) {
+		OutputDebugString(fmt::format(L"stoull failed trying to convert '{}'\n", buffer).c_str());
+		value = 0;
+	}
+	return value;
+}
+
 void chknum() {
 	double value = 0.0;
 	if (wcslen(MsgBuffer)) {
-		value = std::stod(MsgBuffer);
+		value = bufToDouble(MsgBuffer);
 	}
 	unsigned edgeType = 0, borderColor = 0;
 
@@ -2474,7 +2500,7 @@ void chknum() {
 	}
 	if (MsgIndex) {
 		if (FormMenuChoice) {
-			value = std::stof(SideWindowEntryBuffer) * PFGRAN;
+			value = bufToDouble(SideWindowEntryBuffer) * PFGRAN;
 			switch (FormMenuChoice) {
 			case LTXOF:
 				savdo();
@@ -2516,7 +2542,7 @@ void chknum() {
 			case LFTHCOL:
 				if (value) {
 					savdo();
-					nufthcol((std::stoull(SideWindowEntryBuffer) - 1) & 0xf);
+					nufthcol((bufTou64(SideWindowEntryBuffer) - 1) & 0xf);
 					SetWindowText((*ValueWindow)[LFRMCOL], SideWindowEntryBuffer);
 					coltab();
 				}
@@ -2526,7 +2552,7 @@ void chknum() {
 			case LFRMCOL:
 				if (value) {
 					savdo();
-					nufilcol((std::stoull(SideWindowEntryBuffer) - 1) & 0xf);
+					nufilcol((bufTou64(SideWindowEntryBuffer) - 1) & 0xf);
 					SetWindowText((*ValueWindow)[LFRMCOL], SideWindowEntryBuffer);
 					coltab();
 				}
@@ -2536,7 +2562,7 @@ void chknum() {
 			case LUNDCOL:
 				if (value) {
 					savdo();
-					SelectedForm->underlayColor = (std::stoull(SideWindowEntryBuffer) - 1) & 0xf;
+					SelectedForm->underlayColor = (bufTou64(SideWindowEntryBuffer) - 1) & 0xf;
 					SetWindowText((*ValueWindow)[LUNDCOL], SideWindowEntryBuffer);
 					refilfn();
 					coltab();
@@ -2547,7 +2573,7 @@ void chknum() {
 			case LBRDCOL:
 				if (value) {
 					savdo();
-					nubrdcol((std::stoull(SideWindowEntryBuffer) - 1) & 0xf);
+					nubrdcol((bufTou64(SideWindowEntryBuffer) - 1) & 0xf);
 					SetWindowText((*ValueWindow)[LFRMCOL], SideWindowEntryBuffer);
 					coltab();
 				}
@@ -2686,7 +2712,7 @@ void chknum() {
 		}
 		else {
 			if (PreferenceIndex) {
-				value = std::stof(SideWindowEntryBuffer);
+				value = bufToDouble(SideWindowEntryBuffer);
 				switch (PreferenceIndex - 1) {
 				case PEG:
 					IniFile.eggRatio = value;
@@ -2804,7 +2830,7 @@ void chknum() {
 			}
 			else {
 				if (wcslen(MsgBuffer)) {
-					value = std::stof(MsgBuffer);
+					value = bufToDouble(MsgBuffer);
 				}
 				if (StateMap.testAndReset(StateFlag::SCLPSPAC))
 					IniFile.clipOffset = value * PFGRAN;
