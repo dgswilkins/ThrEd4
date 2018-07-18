@@ -16,7 +16,6 @@
 #include <gsl/gsl>
 #pragma warning(pop)
 
-
 // Suppress C4244: conversion from 'type1' to 'type2', possible loss of data
 #pragma warning(disable : 4244)
 // Suppress C6031: return value ignored
@@ -1113,27 +1112,25 @@ public:
 	inline FANGCLPOUT& operator=(const FANGCLP& rhs) noexcept;
 
 	float     angle;
-	fPOINT*   clip;
+	DWORD     clip; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
 	SATCONOUT guide;
 };
 
 inline FANGCLPOUT::FANGCLPOUT() noexcept {
-	clip = nullptr;
+	clip = 0;
 }
 
 inline FANGCLPOUT::FANGCLPOUT(const FANGCLP& rhs) noexcept {
-	clip = rhs.clip;
+	angle = rhs.angle;
 }
 
 inline FANGCLPOUT& FANGCLPOUT::operator=(const FANGCLP& rhs) noexcept {
-	clip = rhs.clip;
-
+	angle = rhs.angle;
 	return *this;
 }
 
 inline FANGCLP& FANGCLP::operator=(const FANGCLPOUT& rhs) noexcept {
-	clip = rhs.clip;
-
+	angle = rhs.angle;
 	return *this;
 }
 
@@ -1369,15 +1366,15 @@ public:
 	inline FRMHEDOUT(const FRMHED& rhs);
 	inline FRMHEDOUT& operator=(const FRMHED& rhs);
 
-	unsigned char  attribute;       // attribute
-	unsigned short vertexCount;     // number of sides
-	unsigned char  type;            // type
-	unsigned char  fillColor;       // fill color
-	unsigned char  borderColor;     // border color
-	unsigned short clipEntries;     // number of border clipboard entries
-	fPOINT*        vertices;        // points
-	SATINANGLE     satinOrAngle;    // satin guidlines or angle clipboard fill angle
-	fPOINT*        borderClipData;  // border clipboard data
+	unsigned char  attribute;    // attribute
+	unsigned short vertexCount;  // number of sides
+	unsigned char  type;         // type
+	unsigned char  fillColor;    // fill color
+	unsigned char  borderColor;  // border color
+	unsigned short clipEntries;  // number of border clipboard entries
+	DWORD          vertices;     // vertices pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+	SATINANGLE     satinOrAngle; // satin guidlines or angle clipboard fill angle
+	DWORD borderClipData; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
 	unsigned short satinGuideCount; // number of satin guidlines
 	unsigned short wordParam;       // clipboard/textured fill phase or satin end guide
 	fRECTANGLE     rectangle;       // rectangle
@@ -1455,9 +1452,9 @@ inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = gsl::narrow<unsigned short>(rhs.clipEntries);
-	vertices        = rhs.vertices;
+	vertices        = 0; // do not write the pointer value to file
 	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = rhs.borderClipData;
+	borderClipData  = 0; // do not write the pointer value to file
 	satinGuideCount = gsl::narrow<unsigned short>(rhs.satinGuideCount);
 	wordParam       = gsl::narrow<unsigned short>(rhs.wordParam);
 	rectangle       = rhs.rectangle;
@@ -1495,9 +1492,9 @@ inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = gsl::narrow<unsigned short>(rhs.clipEntries);
-	vertices        = rhs.vertices;
+	vertices        = 0; // do not write the pointer value to file
 	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = rhs.borderClipData;
+	borderClipData  = 0; // do not write the pointer value to file
 	satinGuideCount = gsl::narrow<unsigned short>(rhs.satinGuideCount);
 	wordParam       = gsl::narrow<unsigned short>(rhs.wordParam);
 	rectangle       = rhs.rectangle;
@@ -1537,9 +1534,9 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertices        = rhs.vertices;
+	vertices        = 0; //do not read the pointer from file
 	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = rhs.borderClipData;
+	borderClipData  = 0; //do not read the pointer from file
 	satinGuideCount = rhs.satinGuideCount;
 	wordParam       = rhs.wordParam;
 	rectangle       = rhs.rectangle;

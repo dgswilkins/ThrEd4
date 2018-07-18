@@ -4110,7 +4110,7 @@ void dubuf(char* const buffer, unsigned& count) {
 		points.reserve(clipDataCount);
 		for (size_t iForm = 0; iForm < FormIndex; iForm++) {
 			forms.push_back(FormList[iForm]);
-			forms[iForm].vertices = nullptr;
+			forms[iForm].vertices = 0;
 			for (iVertex = 0; iVertex < FormList[iForm].vertexCount; iVertex++) {
 				vertices.push_back(FormList[iForm].vertices[iVertex]);
 			}
@@ -4122,13 +4122,11 @@ void dubuf(char* const buffer, unsigned& count) {
 				}
 			}
 			if (isclp(iForm)) {
-				forms[iForm].angleOrClipData.clip = nullptr;
 				for (iClip = 0; iClip < FormList[iForm].lengthOrCount.clipCount; iClip++) {
 					points.push_back(FormList[iForm].angleOrClipData.clip[iClip]);
 				}
 			}
 			if (iseclpx(iForm)) {
-				forms[iForm].borderClipData = nullptr;
 				for (iClip = 0; iClip < FormList[iForm].clipEntries; iClip++) {
 					points.push_back(FormList[iForm].borderClipData[iClip]);
 				}
@@ -5924,17 +5922,19 @@ void nuFil() {
 					for (int iThread = 0; iThread < threadLength; iThread++)
 						ThreadSize[iThread][0] = threadSizeBufW[iThread];
 					FormIndex = thredHeader.formCount;
-					if (FormIndex > MAXFORMS)
+					if (FormIndex > MAXFORMS) {
 						FormIndex = MAXFORMS;
+					}
 					pcsStitchCount = 0;
 					if (FormIndex) {
+						StateMap.reset(StateFlag::BADFIL);
 						FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
 						MsgBuffer[0]                                       = 0;
 						DWORD bytesToRead                                  = 0u;
 						if (version < 2) {
 							std::vector<FRMHEDO> formListOriginal(FormIndex);
-							ReadFileInt(
-							    FileHandle, formListOriginal.data(), FormIndex * sizeof(formListOriginal[0]), &BytesRead, 0);
+							bytesToRead = gsl::narrow<DWORD>(FormIndex * sizeof(formListOriginal[0]));
+							ReadFileInt(FileHandle, formListOriginal.data(), bytesToRead, &BytesRead, 0);
 							if (BytesRead != FormIndex * sizeof(formListOriginal[0])) {
 								FormIndex = BytesRead / sizeof(formListOriginal[0]);
 								StateMap.set(StateFlag::BADFIL);
@@ -5942,60 +5942,70 @@ void nuFil() {
 							std::copy(formListOriginal.cbegin(), formListOriginal.cend(), FormList);
 						}
 						else {
-							auto ptrFormList = std::make_unique<FRMHEDOUT[]>(FormIndex);
-							auto inFormList  = ptrFormList.get();
-
-							bytesToRead = gsl::narrow<DWORD>(FormIndex * sizeof(ptrFormList[0]));
-							ReadFileInt(FileHandle, inFormList, bytesToRead, &BytesRead, 0);
-							StateMap.reset(StateFlag::BADFIL);
+							std::vector<FRMHEDOUT> inFormList(FormIndex);
+							bytesToRead = gsl::narrow<DWORD>(FormIndex * sizeof(inFormList[0]));
+							ReadFileInt(FileHandle, inFormList.data(), bytesToRead, &BytesRead, 0);
 							if (BytesRead != bytesToRead) {
-								FormIndex = BytesRead / sizeof(ptrFormList[0]);
+								FormIndex = BytesRead / sizeof(inFormList[0]);
 								StateMap.set(StateFlag::BADFIL);
 							}
-							for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
-								FormList[iForm] = inFormList[iForm];
+							std::copy(inFormList.cbegin(), inFormList.cend(), FormList);
+						}
+						if (thredHeader.vertexCount) {
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(FormVertices[0]));
+							ReadFile(FileHandle, FormVertices, bytesToRead, &BytesRead, 0);
+							if (BytesRead != bytesToRead) {
+								FormVertexIndex = BytesRead / sizeof(FormVertices[0]);
+								for (size_t iVertex = FormVertexIndex; iVertex < thredHeader.vertexCount; iVertex++)
+									FormVertices[iVertex].x = FormVertices[iVertex].y = 0;
+								StateMap.set(StateFlag::BADFIL);
 							}
 						}
-						bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(FormVertices[0]));
-						ReadFile(FileHandle, FormVertices, bytesToRead, &BytesRead, 0);
-						if (BytesRead != bytesToRead) {
-							FormVertexIndex = BytesRead / sizeof(FormVertices[0]);
-							for (size_t iVertex = FormVertexIndex; iVertex < thredHeader.vertexCount; iVertex++)
-								FormVertices[iVertex].x = FormVertices[iVertex].y = 0;
-							StateMap.set(StateFlag::BADFIL);
+						else {
+							// We have forms but no vertices - blow up the read
+							prtred();
+							return;
 						}
-						SatinGuideIndex     = thredHeader.dlineCount;
-						auto ptrSatinGuides = std::make_unique<SATCONOUT[]>(SatinGuideIndex);
-						auto inSatinGuides  = ptrSatinGuides.get();
-						bytesToRead         = gsl::narrow<DWORD>(SatinGuideIndex * sizeof(ptrSatinGuides[0]));
-						ReadFile(FileHandle, inSatinGuides, bytesToRead, &BytesRead, 0);
-						if (BytesRead != bytesToRead) {
-							SatinGuideIndex = BytesRead / sizeof(ptrSatinGuides[0]);
-							StateMap.set(StateFlag::BADFIL);
+						if (thredHeader.dlineCount) {
+							SatinGuideIndex = thredHeader.dlineCount;
+							std::vector<SATCONOUT> inSatinGuides(SatinGuideIndex);
+							bytesToRead = gsl::narrow<DWORD>(SatinGuideIndex * sizeof(inSatinGuides[0]));
+							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, 0);
+							if (BytesRead != bytesToRead) {
+								SatinGuideIndex = BytesRead / sizeof(inSatinGuides[0]);
+								StateMap.set(StateFlag::BADFIL);
+							}
+							std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), SatinGuides);
 						}
-						for (size_t iGuide = 0u; iGuide < SatinGuideIndex; iGuide++) {
-							SatinGuides[iGuide] = inSatinGuides[iGuide];
+						else {
+							SatinGuideIndex = 0;
 						}
-						bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(ClipPoints[0]));
-						ReadFile(FileHandle, ClipPoints, bytesToRead, &BytesRead, 0);
-						if (BytesRead != bytesToRead) {
-							ClipPointIndex = BytesRead / sizeof(ClipPoints[0]);
-							StateMap.set(StateFlag::BADFIL);
+						if (thredHeader.clipDataCount) {
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(ClipPoints[0]));
+							ReadFile(FileHandle, ClipPoints, bytesToRead, &BytesRead, 0);
+							if (BytesRead != bytesToRead) {
+								ClipPointIndex = BytesRead / sizeof(ClipPoints[0]);
+								StateMap.set(StateFlag::BADFIL);
+							}
 						}
 						if (ExtendedHeader.texturePointCount) {
 							TexturePointsBuffer->resize(ExtendedHeader.texturePointCount);
-							ReadFile(FileHandle,
-							         TexturePointsBuffer->data(),
-							         ExtendedHeader.texturePointCount * sizeof((*TexturePointsBuffer)[0]),
-							         &BytesRead,
-							         0);
-							TextureIndex = BytesRead / sizeof((*TexturePointsBuffer)[0]);
+							bytesToRead
+							    = gsl::narrow<DWORD>(ExtendedHeader.texturePointCount * sizeof((*TexturePointsBuffer)[0]));
+							ReadFile(FileHandle, TexturePointsBuffer->data(), bytesToRead, &BytesRead, 0);
+							if (BytesRead != bytesToRead) {
+								TexturePointsBuffer->resize(BytesRead / sizeof((*TexturePointsBuffer)[0]));
+								StateMap.set(StateFlag::BADFIL);
+							}
+							TextureIndex = TexturePointsBuffer->size();
 						}
 						else {
 							TextureIndex = 0;
 						}
-						if (StateMap.testAndReset(StateFlag::BADFIL))
+						if (StateMap.testAndReset(StateFlag::BADFIL)) {
 							bfilmsg();
+						}
+						// now re-create all the pointers in the form data
 						for (unsigned iForm = 0; iForm < FormIndex; iForm++) {
 							FormList[iForm].vertices = adflt(FormList[iForm].vertexCount);
 							if (FormList[iForm].type == SAT) {
@@ -8792,13 +8802,16 @@ void insfil() {
 	STREX      thredHeader   = {};
 	PCSHEADER  pcsFileHeader = {};
 	unsigned   iStitch = 0, iName = 0, iPCSStitch = 0;
-	unsigned   newStitchCount = 0, newAttribute = 0, encodedFormIndex = 0;
+	unsigned   newStitchCount = 0, newAttribute = 0;
 	fRECTANGLE insertedRectangle  = {};
 	fPOINT     insertedSize       = {};
 	POINT      initialInsertPoint = {};
 	double     homscor            = 0.0;
 	double     filscor            = 0.0;
 	unsigned   version            = 0;
+	size_t     newFormVertexIndex = FormVertexIndex;
+	size_t     newSatinGuideIndex = SatinGuideIndex;
+	size_t     newClipPointIndex  = ClipPointIndex;
 	size_t     newTextureIndex    = TextureIndex;
 
 	if (StateMap.test(StateFlag::IGNORINS) || GetOpenFileName(&file)) {
@@ -8828,11 +8841,13 @@ void insfil() {
 						ReadFile(InsertedFileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, 0);
 					}
 					savdo();
-					ReadFile(InsertedFileHandle,
-					         &StitchBuffer[PCSHeader.stitchCount],
-					         fileHeader.stitchCount * sizeof(StitchBuffer[0]),
-					         &BytesRead,
-					         NULL);
+					if (fileHeader.stitchCount) {
+						ReadFile(InsertedFileHandle,
+						         &StitchBuffer[PCSHeader.stitchCount],
+						         fileHeader.stitchCount * sizeof(StitchBuffer[0]),
+						         &BytesRead,
+						         NULL);
+					}
 					const auto threadLength   = sizeof(ThreadSize) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
 					const auto formDataOffset = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor)
 					                            + sizeof(CustomColor) + threadLength;
@@ -8841,7 +8856,6 @@ void insfil() {
 					insertedRectangle.bottom = 1e9f;
 					insertedRectangle.top    = 1e-9f;
 					insertedRectangle.right  = 1e-9f;
-					encodedFormIndex         = gsl::narrow<unsigned int>(FormIndex << FRMSHFT);
 					InsertedVertexIndex      = FormVertexIndex;
 					InsertedFormIndex        = FormIndex;
 					if (fileHeader.formCount) {
@@ -8853,7 +8867,7 @@ void insfil() {
 							         &BytesRead,
 							         0);
 							if (BytesRead != fileHeader.formCount * sizeof(formHeader[0])) {
-								FormIndex = BytesRead / sizeof(formHeader[0]);
+								formHeader.resize(BytesRead / sizeof(formHeader[0]));
 								StateMap.set(StateFlag::BADFIL);
 							}
 							if (FormIndex + fileHeader.formCount < MAXFORMS) {
@@ -8863,37 +8877,81 @@ void insfil() {
 								          formHeader.cend(),
 								          stdext::make_checked_array_iterator(FormList + FormIndex, MAXITEMS - FormIndex));
 							}
+							FormIndex += formHeader.size();
 						}
 						else {
 							// ToDo - Use FRMHEDOUT here
-							ReadFile(
-							    InsertedFileHandle, &FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), &BytesRead, 0);
+							// ReadFile(
+							//    InsertedFileHandle, &FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), &BytesRead, 0);
+							std::vector<FRMHEDOUT> inFormList(fileHeader.formCount);
+							auto                   bytesToRead = gsl::narrow<DWORD>(fileHeader.formCount * sizeof(inFormList[0]));
+							ReadFileInt(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, 0);
+							if (BytesRead != bytesToRead) {
+								inFormList.resize(BytesRead / sizeof(inFormList[0]));
+								StateMap.set(StateFlag::BADFIL);
+							}
+							const auto destination = stdext::make_checked_array_iterator(
+							    FormList + FormIndex, (sizeof(FormList) / sizeof(FormList[0])) - FormIndex);
+							std::copy(inFormList.cbegin(), inFormList.cend(), destination);
+							FormIndex += inFormList.size();
 						}
-						ReadFile(InsertedFileHandle,
-						         &FormVertices[FormVertexIndex],
-						         fileHeader.vertexCount * sizeof(FormVertices[0]),
-						         &BytesRead,
-						         0);
-						// ToDo - Use SATCONOUT here
-						ReadFile(InsertedFileHandle,
-						         &SatinGuides[SatinGuideIndex],
-						         fileHeader.dlineCount * sizeof(SatinGuides[0]),
-						         &BytesRead,
-						         0);
-						ReadFile(InsertedFileHandle,
-						         &ClipPoints[ClipPointIndex],
-							         fileHeader.clipDataCount * sizeof(ClipPoints[0]),
+						if (fileHeader.vertexCount) {
+							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.vertexCount * sizeof(FormVertices[0]));
+							ReadFile(InsertedFileHandle, &FormVertices[FormVertexIndex], bytesToRead, &BytesRead, 0);
+							if (BytesRead != bytesToRead) {
+								newFormVertexIndex += BytesRead / sizeof(FormVertices[0]);
+								StateMap.set(StateFlag::BADFIL);
+							}
+							else {
+								newFormVertexIndex += fileHeader.vertexCount;
+							}
+						}
+						else {
+							StateMap.set(StateFlag::BADFIL);
+						}
+						if (fileHeader.dlineCount) {
+							// ToDo - Use SATCONOUT here
+							// ReadFile(InsertedFileHandle,
+							//         &SatinGuides[SatinGuideIndex],
+							//         fileHeader.dlineCount * sizeof(SatinGuides[0]),
+							//         &BytesRead,
+							//         0);
+							std::vector<SATCONOUT> inSatinGuides(fileHeader.dlineCount);
+							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.dlineCount * sizeof(inSatinGuides[0]));
+							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, 0);
+							if (BytesRead != bytesToRead) {
+								inSatinGuides.resize(BytesRead / sizeof(inSatinGuides[0]));
+								StateMap.set(StateFlag::BADFIL);
+							}
+							const auto destination = stdext::make_checked_array_iterator(
+							    SatinGuides + SatinGuideIndex, (sizeof(SatinGuides) / sizeof(SatinGuides[0])) - SatinGuideIndex);
+							std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), destination);
+							newSatinGuideIndex += inSatinGuides.size();
+						}
+						if (fileHeader.clipDataCount) {
+							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.clipDataCount * sizeof(ClipPoints[0]));
+							ReadFile(InsertedFileHandle,
+							         &ClipPoints[ClipPointIndex],
+							         bytesToRead,
 							         &BytesRead,
 							         0);
+							if (BytesRead != bytesToRead) {
+								StateMap.set(StateFlag::BADFIL);
+							}
+							newClipPointIndex += BytesRead / sizeof(ClipPoints[0]);
+						}
+						if (ExtendedHeader.texturePointCount) {
 							TexturePointsBuffer->resize(TexturePointsBuffer->size() + ExtendedHeader.texturePointCount);
 							ReadFile(InsertedFileHandle,
 							         &TexturePointsBuffer[TextureIndex],
 							         ExtendedHeader.texturePointCount * sizeof(TexturePointsBuffer[0]),
 							         &BytesRead,
 							         0);
+						}
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = 0;
-						for (auto iFormList = FormIndex; iFormList < FormIndex + fileHeader.formCount; iFormList++) {
+						// update the form pointer variables
+						for (auto iFormList = InsertedFormIndex; iFormList < FormIndex; iFormList++) {
 							FormList[iFormList].vertices = adflt(FormList[iFormList].vertexCount);
 							if (FormList[iFormList].type == SAT) {
 								if (FormList[iFormList].satinGuideCount)
@@ -8910,8 +8968,17 @@ void insfil() {
 								newTextureIndex += FormList[iFormList].fillInfo.texture.count;
 							}
 						}
+						if (newFormVertexIndex != FormVertexIndex) {
+							StateMap.set(StateFlag::BADFIL);
+						}
+						if (newSatinGuideIndex != SatinGuideIndex) {
+							StateMap.set(StateFlag::BADFIL);
+						}
+						if (newClipPointIndex != ClipPointIndex) {
+							StateMap.set(StateFlag::BADFIL);
+						}
+
 						TextureIndex = newTextureIndex;
-						FormIndex += fileHeader.formCount;
 						if (fileHeader.formCount) {
 							insertedRectangle.left = insertedRectangle.right = FormVertices[InsertedVertexIndex].x;
 							insertedRectangle.bottom = insertedRectangle.top = FormVertices[InsertedVertexIndex].y;
@@ -8928,6 +8995,7 @@ void insfil() {
 						}
 					}
 					if (fileHeader.stitchCount) {
+						auto encodedFormIndex = gsl::narrow<unsigned int>(InsertedFormIndex << FRMSHFT);
 						for (iStitch = PCSHeader.stitchCount;
 						     iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) + fileHeader.stitchCount;
 						     iStitch++) {
@@ -10286,18 +10354,17 @@ void selalstch() {
 }
 
 void duinsfil() {
-	fPOINT      offset        = {};
-	fRECTANGLE* formRectangle = nullptr;
+	fPOINT offset = {};
 
 	px2stch();
 	offset.x = SelectedPoint.x - InsertCenter.x;
 	offset.y = SelectedPoint.y - InsertCenter.y;
 	for (auto iForm = InsertedFormIndex; iForm < FormIndex; iForm++) {
-		formRectangle = &FormList[iForm].rectangle;
-		formRectangle->bottom += offset.y;
-		formRectangle->top += offset.y;
-		formRectangle->left += offset.x;
-		formRectangle->right += offset.x;
+		auto& formRectangle = FormList[iForm].rectangle;
+		formRectangle.bottom += offset.y;
+		formRectangle.top += offset.y;
+		formRectangle.left += offset.x;
+		formRectangle.right += offset.x;
 	}
 	for (auto iVertex = InsertedVertexIndex; iVertex < FormVertexIndex; iVertex++) {
 		FormVertices[iVertex].x += offset.x;
