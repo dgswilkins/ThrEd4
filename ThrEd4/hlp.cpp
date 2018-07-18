@@ -1,6 +1,31 @@
 #include "stdafx.h"
 
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+#include <Windows.h>
+
+#include <filesystem>
+#include <HtmlHelp.h>
+#include <limits>
+#include <string>
+#include <vector>
+
+#include <CppCoreCheck\warnings.h>
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include <fmt/format.h>
+#include <gsl/gsl>
+#pragma warning(pop)
+
+#include "EnumMap.h"
 #include "wrappers.h"
+
 #include "Resources/resource.h"
 #include "thred.h"
 

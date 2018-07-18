@@ -1,12 +1,42 @@
 ﻿#include "stdafx.h"
 
+#include "targetver.h"
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <Windows.h> // Win32 Platform SDK main header
+
+// C RunTime Header Files
+#include <bitset>
+#include <commdlg.h>
+#include <filesystem>
+
+#include <shellapi.h>
+#include <shlobj.h>
+#include <Shlwapi.h>
+
+// TODO: reference additional headers your program requires here
+#include <CppCoreCheck\warnings.h>
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include <boost/dynamic_bitset.hpp>
+#include <fmt/format.h>
+#pragma warning(pop)
+
+#include "EnumMap.h"
+#include "utf8conv.h"
+#include "wrappers.h"
+
 #ifdef ALLOCFAILURE
 #include <new.h>
 #endif
-
-#include <shlobj.h>
-
-#include "wrappers.h"
 
 #include "Resources/resource.h"
 #include "thred.h"
@@ -2452,7 +2482,7 @@ void chkhup() {
 	setfchk();
 }
 
-float bufToDouble(wchar_t *buffer) {
+float bufToDouble(wchar_t* buffer) {
 	float value;
 
 	try {
@@ -8852,15 +8882,15 @@ void insfil() {
 						         0);
 						ReadFile(InsertedFileHandle,
 						         &ClipPoints[ClipPointIndex],
-						         fileHeader.clipDataCount * sizeof(ClipPoints[0]),
-						         &BytesRead,
-						         0);
-						TexturePointsBuffer->resize(TexturePointsBuffer->size() + ExtendedHeader.texturePointCount);
-						ReadFile(InsertedFileHandle,
-						         &TexturePointsBuffer[TextureIndex],
-						         ExtendedHeader.texturePointCount * sizeof(TexturePointsBuffer[0]),
-						         &BytesRead,
-						         0);
+							         fileHeader.clipDataCount * sizeof(ClipPoints[0]),
+							         &BytesRead,
+							         0);
+							TexturePointsBuffer->resize(TexturePointsBuffer->size() + ExtendedHeader.texturePointCount);
+							ReadFile(InsertedFileHandle,
+							         &TexturePointsBuffer[TextureIndex],
+							         ExtendedHeader.texturePointCount * sizeof(TexturePointsBuffer[0]),
+							         &BytesRead,
+							         0);
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = 0;
 						for (auto iFormList = FormIndex; iFormList < FormIndex + fileHeader.formCount; iFormList++) {

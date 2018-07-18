@@ -1,6 +1,33 @@
 #include "stdafx.h"
 
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <Windows.h> // Win32 Platform SDK main header
+
+// C RunTime Header Files
+#include <commdlg.h>
+#include <filesystem>
+#include <Shlwapi.h>
+
+// Open Source headers
+#include <CppCoreCheck\warnings.h>
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include <boost/dynamic_bitset.hpp>
+#include <fmt/format.h>
+#pragma warning(pop)
+
+#include "EnumMap.h"
+#include "utf8conv.h"
 #include "wrappers.h"
+
 #include "Resources/resource.h"
 #include "thred.h"
 

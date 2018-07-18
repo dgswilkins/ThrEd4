@@ -1,5 +1,17 @@
 #include "stdafx.h"
 
+#include <limits> // For std::numeric_limits
+
+#include <CppCoreCheck\warnings.h>
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include <boost/dynamic_bitset.hpp>
+#include <fmt/format.h>
+#include <gsl/gsl>
+#pragma warning(pop)
+
+#include "EnumMap.h"
+#include "ExtendedBitSet.h"
 #include "wrappers.h"
 
 #include "Resources/resource.h"
