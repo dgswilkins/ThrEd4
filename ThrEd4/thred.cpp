@@ -8848,7 +8848,8 @@ void insfil() {
 						         &BytesRead,
 						         NULL);
 					}
-					const auto threadLength   = sizeof(ThreadSize) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
+					const auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0]))
+					                          / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
 					const auto formDataOffset = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor)
 					                            + sizeof(CustomColor) + threadLength;
 					SetFilePointer(InsertedFileHandle, formDataOffset, 0, FILE_CURRENT);
@@ -8930,11 +8931,7 @@ void insfil() {
 						}
 						if (fileHeader.clipDataCount) {
 							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.clipDataCount * sizeof(ClipPoints[0]));
-							ReadFile(InsertedFileHandle,
-							         &ClipPoints[ClipPointIndex],
-							         bytesToRead,
-							         &BytesRead,
-							         0);
+							ReadFile(InsertedFileHandle, &ClipPoints[ClipPointIndex], bytesToRead, &BytesRead, 0);
 							if (BytesRead != bytesToRead) {
 								StateMap.set(StateFlag::BADFIL);
 							}
