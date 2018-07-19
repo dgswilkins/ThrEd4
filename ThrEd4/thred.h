@@ -1052,6 +1052,9 @@ public:
 class SATCONOUT
 {
 public:
+	unsigned short start;
+	unsigned short finish;
+
 	SATCONOUT() noexcept;
 	// SATCONOUT(SATCONOUT&&) = default;
 	// SATCONOUT& operator=(const SATCONOUT& rhs) = default;
@@ -1060,9 +1063,6 @@ public:
 
 	SATCONOUT(const SATCON& rhs);
 	inline SATCONOUT& operator=(const SATCON& rhs);
-
-	unsigned short start;
-	unsigned short finish;
 };
 
 inline SATCONOUT::SATCONOUT() noexcept {
@@ -1102,6 +1102,10 @@ public:
 
 union FANGCLPOUT {
 public:
+	float     angle;
+	DWORD     clip; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+	SATCONOUT guide;
+
 	FANGCLPOUT() noexcept;
 	// FANGCLPOUT(FANGCLPOUT&&) = default;
 	// FANGCLPOUT& operator=(const FANGCLPOUT& rhs) = default;
@@ -1110,10 +1114,6 @@ public:
 
 	FANGCLPOUT(const FANGCLP& rhs) noexcept;
 	inline FANGCLPOUT& operator=(const FANGCLP& rhs) noexcept;
-
-	float     angle;
-	DWORD     clip; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
-	SATCONOUT guide;
 };
 
 inline FANGCLPOUT::FANGCLPOUT() noexcept {
@@ -1146,6 +1146,9 @@ public:
 
 union FLENCNTOUT {
 public:
+	float    stitchLength;
+	unsigned clipCount;
+
 	FLENCNTOUT() noexcept;
 	// FLENCNTOUT(FLENCNTOUT&&) = default;
 	// FLENCNTOUT& operator=(const FLENCNTOUT& rhs) = default;
@@ -1154,9 +1157,6 @@ public:
 
 	FLENCNTOUT(const FLENCNT& rhs);
 	inline FLENCNTOUT& operator=(const FLENCNT& rhs);
-
-	float    stitchLength;
-	unsigned clipCount;
 };
 
 inline FLENCNTOUT::FLENCNTOUT() noexcept {
@@ -1179,24 +1179,63 @@ inline FLENCNT& FLENCNT::operator=(const FLENCNTOUT& rhs) noexcept {
 	return *this;
 }
 
+union SATINANGLEOUT;
+
 union SATINANGLE {
 public:
 	SATCON* guide;
 	float   angle;
+
+	inline SATINANGLE& operator=(const SATINANGLEOUT& rhs) noexcept;
 };
 
-/*
-    fill	edgeStitchLen	edgeSpacing	borderSize	clipCount	picspac		crnrsiz		brdend
+union SATINANGLEOUT {
+public:
+	DWORD guide;
+	float angle;
 
-    EDGELINE	edgeStitchLen
-    EDGEBEAN	edgeStitchLen
-    EDGECLIP											clipCount
-    EDGEANGSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
-    EDGEAPPL	edgeStitchLen	edgeSpacing	borderSize									attribute
-    EDGEPROPSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
-    EDGEBHOL	edgeStitchLen	edgeSpacing	borderSize	clipCount,res
-    EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
-*/
+	SATINANGLEOUT() noexcept;
+	// SATINANGLEOUT(SATINANGLEOUT&&) = default;
+	// SATINANGLEOUT& operator=(const SATINANGLEOUT& rhs) = default;
+	// SATINANGLEOUT& operator=(SATINANGLEOUT&&) = default;
+	//~SATINANGLEOUT() = default;
+
+	SATINANGLEOUT(const SATINANGLE& rhs);
+	inline SATINANGLEOUT& operator=(const SATINANGLE& rhs);
+};
+
+inline SATINANGLEOUT::SATINANGLEOUT() noexcept {
+	angle = 0.0;
+}
+
+inline SATINANGLEOUT::SATINANGLEOUT(const SATINANGLE& rhs) {
+	angle = rhs.angle;
+}
+
+inline SATINANGLEOUT& SATINANGLEOUT::operator=(const SATINANGLE& rhs) {
+	angle = rhs.angle;
+
+	return *this;
+}
+
+inline SATINANGLE& SATINANGLE::operator=(const SATINANGLEOUT& rhs) noexcept {
+	angle = rhs.angle;
+
+	return *this;
+}
+
+	/*
+	    fill	edgeStitchLen	edgeSpacing	borderSize	clipCount	picspac		crnrsiz		brdend
+
+	    EDGELINE	edgeStitchLen
+	    EDGEBEAN	edgeStitchLen
+	    EDGECLIP											clipCount
+	    EDGEANGSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
+	    EDGEAPPL	edgeStitchLen	edgeSpacing	borderSize									attribute
+	    EDGEPROPSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
+	    EDGEBHOL	edgeStitchLen	edgeSpacing	borderSize	clipCount,res
+	    EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
+	*/
 
 #define BELEN 1
 #define BESPAC 2
@@ -1357,15 +1396,6 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 class FRMHEDOUT
 {
 public:
-	FRMHEDOUT() noexcept;
-	// FRMHEDOUT(FRMHEDOUT&&) = default;
-	// FRMHEDOUT& operator=(const FRMHEDOUT& rhs) = default;
-	// FRMHEDOUT& operator=(FRMHEDOUT&&) = default;
-	//~FRMHEDOUT() = default;
-
-	inline FRMHEDOUT(const FRMHED& rhs);
-	inline FRMHEDOUT& operator=(const FRMHED& rhs);
-
 	unsigned char  attribute;    // attribute
 	unsigned short vertexCount;  // number of sides
 	unsigned char  type;         // type
@@ -1373,7 +1403,7 @@ public:
 	unsigned char  borderColor;  // border color
 	unsigned short clipEntries;  // number of border clipboard entries
 	DWORD          vertices;     // vertices pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
-	SATINANGLE     satinOrAngle; // satin guidlines or angle clipboard fill angle
+	SATINANGLEOUT  satinOrAngle; // satin guidlines or angle clipboard fill angle
 	DWORD borderClipData; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
 	unsigned short satinGuideCount; // number of satin guidlines
 	unsigned short wordParam;       // clipboard/textured fill phase or satin end guide
@@ -1388,7 +1418,7 @@ public:
 	float          edgeStitchLen;   // edge stitch length
 	unsigned short picoLength;      // pico length
 
-	unsigned       extendedAttribute;   // attribute extension
+	unsigned int   extendedAttribute;   // attribute extension
 	float          maxFillStitchLen;    // maximum fill stitch length
 	float          minFillStitchLen;    // minimum fill stitch length
 	float          maxBorderStitchLen;  // maximum border stitch length
@@ -1403,6 +1433,15 @@ public:
 	float          txof;                // gradient end density
 	unsigned char  underlayColor;       // underlay color
 	unsigned char  cres;                // reserved
+
+	FRMHEDOUT() noexcept;
+	// FRMHEDOUT(FRMHEDOUT&&) = default;
+	// FRMHEDOUT& operator=(const FRMHEDOUT& rhs) = default;
+	// FRMHEDOUT& operator=(FRMHEDOUT&&) = default;
+	//~FRMHEDOUT() = default;
+
+	inline FRMHEDOUT(const FRMHED& rhs);
+	inline FRMHEDOUT& operator=(const FRMHED& rhs);
 };
 
 inline FRMHEDOUT::FRMHEDOUT() noexcept
@@ -1534,9 +1573,9 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertices        = 0; //do not read the pointer from file
+	vertices        = 0; // do not read the pointer from file
 	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = 0; //do not read the pointer from file
+	borderClipData  = 0; // do not read the pointer from file
 	satinGuideCount = rhs.satinGuideCount;
 	wordParam       = rhs.wordParam;
 	rectangle       = rhs.rectangle;

@@ -149,7 +149,7 @@ extern void             frm0();
 extern void             frmadj(size_t formIndex);
 extern void             frmchkx();
 extern void             frmclr(FRMHED* const destination);
-extern void             frmlin(fPOINT* vertices, unsigned vertexCount);
+extern void             frmlin(fPOINT* vertices, size_t vertexCount);
 extern void             frmnum();
 extern void             frmnumfn(unsigned newFormIndex);
 extern void             frmon();
@@ -4115,7 +4115,6 @@ void dubuf(char* const buffer, unsigned& count) {
 				vertices.push_back(FormList[iForm].vertices[iVertex]);
 			}
 			if (FormList[iForm].type == SAT) {
-				forms[iForm].satinOrAngle.guide = nullptr;
 				forms[iForm].satinGuideCount    = gsl::narrow<unsigned short>(FormList[iForm].satinGuideCount);
 				for (iGuide = 0; iGuide < FormList[iForm].satinGuideCount; iGuide++) {
 					guides.push_back(FormList[iForm].satinOrAngle.guide[iGuide]);
@@ -18511,18 +18510,26 @@ void drwStch() {
 										    = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
 									}
 									else {
-										linePoints[LineIndex].x
-										    = (currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x + 0.5;
-										linePoints[LineIndex++].y
-										    = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
-										linePoints[LineIndex].x
-										    = (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5;
-										linePoints[LineIndex++].y
-										    = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
+										if (iStitch == 0) {
+											linePoints[LineIndex].x
+												= (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5;
+											linePoints[LineIndex++].y
+												= maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
+										}
+										else {
+											linePoints[LineIndex].x
+												= (currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x + 0.5;
+											linePoints[LineIndex++].y
+												= maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
+											linePoints[LineIndex].x
+												= (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5;
+											linePoints[LineIndex++].y
+												= maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
+										}
 									}
 								}
 								else {
-									if (iStitch == 0 && iColor == 0) {
+									if (iStitch == 0) {
 										linePoints[0].x = (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5;
 										linePoints[0].y
 										    = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
