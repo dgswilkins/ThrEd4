@@ -5966,18 +5966,13 @@ void nuFil() {
 							return;
 						}
 						if (thredHeader.dlineCount) {
-							SatinGuideIndex = thredHeader.dlineCount;
-							std::vector<SATCONOUT> inSatinGuides(SatinGuideIndex);
-							bytesToRead = gsl::narrow<DWORD>(SatinGuideIndex * sizeof(inSatinGuides[0]));
+							std::vector<SATCONOUT> inSatinGuides(thredHeader.dlineCount);
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(inSatinGuides[0]));
 							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, 0);
 							if (BytesRead != bytesToRead) {
-								SatinGuideIndex = BytesRead / sizeof(inSatinGuides[0]);
 								StateMap.set(StateFlag::BADFIL);
 							}
 							std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), SatinGuides);
-						}
-						else {
-							SatinGuideIndex = 0;
 						}
 						if (thredHeader.clipDataCount) {
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(ClipPoints[0]));
@@ -6005,6 +6000,9 @@ void nuFil() {
 							bfilmsg();
 						}
 						// now re-create all the pointers in the form data
+						SatinGuideIndex = 0;
+						ClipPointIndex = 0;
+						FormVertexIndex = 0;
 						for (unsigned iForm = 0; iForm < FormIndex; iForm++) {
 							FormList[iForm].vertices = adflt(FormList[iForm].vertexCount);
 							if (FormList[iForm].type == SAT) {
