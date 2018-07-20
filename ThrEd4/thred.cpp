@@ -4115,7 +4115,7 @@ void dubuf(char* const buffer, unsigned& count) {
 				vertices.push_back(FormList[iForm].vertices[iVertex]);
 			}
 			if (FormList[iForm].type == SAT) {
-				forms[iForm].satinGuideCount    = gsl::narrow<unsigned short>(FormList[iForm].satinGuideCount);
+				forms[iForm].satinGuideCount = gsl::narrow<unsigned short>(FormList[iForm].satinGuideCount);
 				for (iGuide = 0; iGuide < FormList[iForm].satinGuideCount; iGuide++) {
 					guides.push_back(FormList[iForm].satinOrAngle.guide[iGuide]);
 				}
@@ -4212,7 +4212,12 @@ void chk1col() {
 	for (iColorChange = 0; iColorChange < ColorChanges; iColorChange++) {
 		if (ColorChangeTable[iColorChange + 1].stitchIndex - ColorChangeTable[iColorChange].stitchIndex == 1) {
 			iStitch = ColorChangeTable[iColorChange].stitchIndex;
-			color   = StitchBuffer[iStitch - 1].attribute & COLMSK;
+			if (iStitch) {
+				color = StitchBuffer[iStitch - 1].attribute & COLMSK;
+			}
+			else {
+				color = StitchBuffer[iStitch].attribute & COLMSK;
+			}
 			StitchBuffer[iStitch].attribute &= NCOLMSK;
 			StitchBuffer[iStitch].attribute |= color;
 		}
@@ -6001,7 +6006,7 @@ void nuFil() {
 						}
 						// now re-create all the pointers in the form data
 						SatinGuideIndex = 0;
-						ClipPointIndex = 0;
+						ClipPointIndex  = 0;
 						FormVertexIndex = 0;
 						for (unsigned iForm = 0; iForm < FormIndex; iForm++) {
 							FormList[iForm].vertices = adflt(FormList[iForm].vertexCount);
@@ -12684,7 +12689,9 @@ void inscol() {
 				}
 			}
 			for (iColor = nextColor; iColor > VerticalIndex; iColor--) {
-				UserColor[iColor] = UserColor[iColor - 1];
+				if (iColor) {
+					UserColor[iColor] = UserColor[iColor - 1];
+				}
 				nuscol(iColor);
 			}
 			coltab();
@@ -12965,8 +12972,14 @@ void drwLin(std::vector<POINT>& linePoints, unsigned currentStitch, unsigned len
 		LineIndex = 1;
 		layer     = (activeStitch[iOffset].attribute & LAYMSK) >> LAYSHFT;
 		if (!ActiveLayer || !layer || layer == ActiveLayer) {
-			linePoints[0].x = (activeStitch[iOffset - 1].x - ZoomRect.left) * ZoomRatio.x;
-			linePoints[0].y = StitchWindowClientRect.bottom - (activeStitch[iOffset - 1].y - ZoomRect.bottom) * ZoomRatio.y;
+			if (iOffset) {
+				linePoints[0].x = (activeStitch[iOffset - 1].x - ZoomRect.left) * ZoomRatio.x;
+				linePoints[0].y = StitchWindowClientRect.bottom - (activeStitch[iOffset - 1].y - ZoomRect.bottom) * ZoomRatio.y;
+			}
+			else {
+				linePoints[0].x = (activeStitch[0].x - ZoomRect.left) * ZoomRatio.x;
+				linePoints[0].y = StitchWindowClientRect.bottom - (activeStitch[0].y - ZoomRect.bottom) * ZoomRatio.y;
+			}
 		}
 	}
 	else {
@@ -18510,19 +18523,20 @@ void drwStch() {
 									else {
 										if (iStitch == 0) {
 											linePoints[LineIndex].x
-												= (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5;
+											    = (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5;
 											linePoints[LineIndex++].y
-												= maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
+											    = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
 										}
 										else {
 											linePoints[LineIndex].x
-												= (currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x + 0.5;
+											    = (currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x + 0.5;
 											linePoints[LineIndex++].y
-												= maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
+											    = maxYcoord - (currentStitches[iStitch - 1].y - ZoomRect.bottom) * ZoomRatio.y
+											      + 0.5;
 											linePoints[LineIndex].x
-												= (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5;
+											    = (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5;
 											linePoints[LineIndex++].y
-												= maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
+											    = maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
 										}
 									}
 								}
