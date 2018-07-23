@@ -4334,7 +4334,7 @@ void ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, const st
 			lengths.y -= difference.y;
 		}
 	}
-	DSTRecords.push_back({ 0, 0, gsl::narrow<TBYTE>(0xf3) });
+	DSTRecords.push_back({ 0, 0, gsl::narrow<unsigned char>(0xf3) });
 
 	if (colfil()) {
 		colorFile = CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);

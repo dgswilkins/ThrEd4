@@ -1731,9 +1731,9 @@ typedef struct _dsthed { // dst file header
 #define REGTYP 0x030000
 
 typedef struct _dstrec { // dst stitch record
-	TBYTE led;
-	TBYTE mid;
-	TBYTE nd;
+	unsigned char led;
+	unsigned char mid;
+	unsigned char nd;
 } DSTREC;
 
 typedef struct _dstoffsets {
