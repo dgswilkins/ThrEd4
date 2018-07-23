@@ -1200,19 +1200,19 @@ public:
 	// SATINANGLEOUT& operator=(SATINANGLEOUT&&) = default;
 	//~SATINANGLEOUT() = default;
 
-	SATINANGLEOUT(const SATINANGLE& rhs);
-	inline SATINANGLEOUT& operator=(const SATINANGLE& rhs);
+	SATINANGLEOUT(const SATINANGLE& rhs) noexcept;
+	inline SATINANGLEOUT& operator=(const SATINANGLE& rhs) noexcept;
 };
 
 inline SATINANGLEOUT::SATINANGLEOUT() noexcept {
 	angle = 0.0;
 }
 
-inline SATINANGLEOUT::SATINANGLEOUT(const SATINANGLE& rhs) {
+inline SATINANGLEOUT::SATINANGLEOUT(const SATINANGLE& rhs) noexcept {
 	angle = rhs.angle;
 }
 
-inline SATINANGLEOUT& SATINANGLEOUT::operator=(const SATINANGLE& rhs) {
+inline SATINANGLEOUT& SATINANGLEOUT::operator=(const SATINANGLE& rhs) noexcept {
 	angle = rhs.angle;
 
 	return *this;

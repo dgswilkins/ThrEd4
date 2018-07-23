@@ -67,10 +67,10 @@ inline std::wstring Utf8ToUtf16(const std::string& utf8) {
 	// If the size_t value is too big to be stored into an int,
 	// throw an exception to prevent conversion errors like huge size_t values
 	// converted to *negative* integers.
-	if (utf8.length() > static_cast<size_t>((std::numeric_limits<int>::max)())) {
+	if (utf8.length() > gsl::narrow<size_t>((std::numeric_limits<int>::max)())) {
 		throw std::overflow_error("Input string too long: size_t-length doesn't fit into int.");
 	}
-	const int utf8Length = static_cast<int>(utf8.length());
+	const int utf8Length = gsl::narrow<int>(utf8.length());
 
 	// Get the size of the destination UTF-16 string
 	const int utf16Length = ::MultiByteToWideChar(CP_UTF8,     // source string is in UTF-8
@@ -95,12 +95,12 @@ inline std::wstring Utf8ToUtf16(const std::string& utf8) {
 	utf16.resize(utf16Length);
 
 	// Do the actual conversion from UTF-8 to UTF-16
-	const int result = ::MultiByteToWideChar(CP_UTF8,     // source string is in UTF-8
-	                                         kFlags,      // conversion flags
-	                                         utf8.data(), // source UTF-8 string pointer
-	                                         utf8Length,  // length of source UTF-8 string, in chars
-	                                         &utf16[0],   // pointer to destination buffer
-	                                         utf16Length  // size of destination buffer, in wchar_ts
+	const int result = ::MultiByteToWideChar(CP_UTF8,      // source string is in UTF-8
+	                                         kFlags,       // conversion flags
+	                                         utf8.data(),  // source UTF-8 string pointer
+	                                         utf8Length,   // length of source UTF-8 string, in chars
+	                                         utf16.data(), // pointer to destination buffer
+	                                         utf16Length   // size of destination buffer, in wchar_ts
 	);
 	if (result == 0) {
 		// Conversion error: capture error code and throw
@@ -139,10 +139,10 @@ inline std::string Utf16ToUtf8(const std::wstring& utf16) {
 	// If the size_t value is too big to be stored into an int,
 	// throw an exception to prevent conversion errors like huge size_t values
 	// converted to *negative* integers.
-	if (utf16.length() > static_cast<size_t>((std::numeric_limits<int>::max)())) {
+	if (utf16.length() > gsl::narrow<size_t>((std::numeric_limits<int>::max)())) {
 		throw std::overflow_error("Input string too long: size_t-length doesn't fit into int.");
 	}
-	const int utf16Length = static_cast<int>(utf16.length());
+	const int utf16Length = gsl::narrow<int>(utf16.length());
 
 	// Get the length, in chars, of the resulting UTF-8 string
 	const int utf8Length = ::WideCharToMultiByte(CP_UTF8,      // convert to UTF-8
@@ -173,7 +173,7 @@ inline std::string Utf16ToUtf8(const std::wstring& utf16) {
 	                                         kFlags,       // conversion flags
 	                                         utf16.data(), // source UTF-16 string
 	                                         utf16Length,  // length of source UTF-16 string, in wchar_ts
-	                                         &utf8[0],     // pointer to destination buffer
+	                                         utf8.data(),  // pointer to destination buffer
 	                                         utf8Length,   // size of destination buffer, in chars
 	                                         nullptr,
 	                                         nullptr // unused
