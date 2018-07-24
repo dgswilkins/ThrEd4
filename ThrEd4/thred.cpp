@@ -1612,7 +1612,7 @@ void fnamtabs() {
 }
 
 void ritfnam(const std::wstring& designerName) {
-	auto          designer    = win32::Utf16ToUtf8(designerName);
+	auto          designer    = utf::Utf16ToUtf8(designerName);
 	unsigned      iName       = 0;
 	unsigned char tmpName[50] = { 0 };
 
@@ -1662,7 +1662,7 @@ void redfnam(std::wstring& designerName) {
 			break;
 		}
 	}
-	auto decoded = win32::Utf8ToUtf16(designer);
+	auto decoded = utf::Utf8ToUtf16(designer);
 	designerName.assign(decoded);
 }
 
@@ -3731,22 +3731,23 @@ void ritini() {
 	RECT        windowRect = {};
 	std::string previous;
 
-	auto directory = win32::Utf16ToUtf8(DefaultDirectory->wstring());
+	auto directory = utf::Utf16ToUtf8(DefaultDirectory->wstring());
+	constexpr char fillchar = '\0';
+	std::fill(IniFile.defaultDirectory, IniFile.defaultDirectory + sizeof(IniFile.defaultDirectory), fillchar);
 	std::copy(directory.begin(), directory.end(), IniFile.defaultDirectory);
 	const auto&    previousNames = *PreviousNames;
-	constexpr char fillchar      = '\0';
 	for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
 		auto& prevNam = IniFile.prevNames[iVersion];
 		std::fill(prevNam, prevNam + sizeof(prevNam), fillchar);
 		if (!previousNames[iVersion].empty()) {
-			previous.assign(win32::Utf16ToUtf8(previousNames[iVersion]));
+			previous.assign(utf::Utf16ToUtf8(previousNames[iVersion]));
 			std::copy(previous.begin(), previous.end(), IniFile.prevNames[iVersion]);
 		}
 		else {
 			previous.clear();
 		}
 	}
-	auto designer = win32::Utf16ToUtf8(*DesignerName);
+	auto designer = utf::Utf16ToUtf8(*DesignerName);
 	std::fill(IniFile.designerName, IniFile.designerName + sizeof(IniFile.designerName), fillchar);
 	std::copy(designer.begin(), designer.end(), IniFile.designerName);
 	for (iColor = 0; iColor < 16; iColor++) {
@@ -4049,7 +4050,7 @@ void dubuf(char* const buffer, unsigned& count) {
 	stitchHeader.fileLength  = PCSHeader.stitchCount * sizeof(StitchBuffer[0]) + sizeof(stitchHeader) + sizeof(PCSBMPFileName);
 	stitchHeader.stitchCount = PCSHeader.stitchCount;
 	stitchHeader.hoopType    = IniFile.hoopType;
-	auto designer            = win32::Utf16ToUtf8(*DesignerName);
+	auto designer            = utf::Utf16ToUtf8(*DesignerName);
 	std::copy(designer.begin(), designer.end(), ExtendedHeader.modifierName);
 	if (FormIndex) {
 		for (size_t iForm = 0; iForm < FormIndex; iForm++) {
@@ -4097,7 +4098,7 @@ void dubuf(char* const buffer, unsigned& count) {
 	}
 	MsgBuffer[threadLength] = 0;
 	std::wstring threadSizeBufW(MsgBuffer);
-	auto         threadSizeBuf = win32::Utf16ToUtf8(threadSizeBufW);
+	auto         threadSizeBuf = utf::Utf16ToUtf8(threadSizeBufW);
 	durit(&output, threadSizeBuf.c_str(), threadSizeBuf.size() * sizeof(threadSizeBuf[0]));
 	if (FormIndex) {
 		std::vector<FRMHEDOUT> forms;
@@ -4603,7 +4604,7 @@ void sav() {
 		DSTRecords.reserve(PCSHeader.stitchCount + 128);
 		DSTOffsets          DSTOffsetData = {};
 		std::vector<PCSTCH> PCSStitchBuffer;
-		auto                auxName = win32::Utf16ToUtf8(*AuxName);
+		auto                auxName = utf::Utf16ToUtf8(*AuxName);
 		const char*         desc    = strrchr(auxName.data(), '\\') + 1;
 		switch (IniFile.auxFileType) {
 		case AUXDST:
@@ -5800,7 +5801,7 @@ void nuFil() {
 			TextureIndex = 0;
 			EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
 			deldu();
-			DesignerName->assign(win32::Utf8ToUtf16(std::string(IniFile.designerName)));
+			DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
 			unbsho();
 			StateMap.reset(StateFlag::MOVSET);
 			frmon();
@@ -5834,7 +5835,7 @@ void nuFil() {
 				StateMap.set(StateFlag::WASTXBAK);
 			fileSize            = GetFileSize(FileHandle, &fileSizeHigh);
 			auto fileExt        = WorkingFileName->extension().wstring();
-			auto firstCharacter = fileExt[1];
+			auto firstCharacter = tolower(fileExt[1]);
 			if (firstCharacter == 't') {
 				ReadFile(FileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, NULL);
 				if ((thredHeader.headerType & 0xffffff) == 0x746872) {
@@ -5843,7 +5844,7 @@ void nuFil() {
 						return;
 					}
 					version = (thredHeader.headerType & 0xff000000) >> 24;
-					DesignerName->assign(win32::Utf8ToUtf16(std::string(IniFile.designerName)));
+					DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
 					switch (version) {
 					case 0:
 						if (PCSHeader.hoopType == SMALHUP) {
@@ -5922,7 +5923,7 @@ void nuFil() {
 						return;
 					}
 					std::string threadSizebuf(msgBuffer, sizeof(msgBuffer));
-					auto        threadSizeBufW = win32::Utf8ToUtf16(threadSizebuf);
+					auto        threadSizeBufW = utf::Utf8ToUtf16(threadSizebuf);
 					for (int iThread = 0; iThread < threadLength; iThread++)
 						ThreadSize[iThread][0] = threadSizeBufW[iThread];
 					FormIndex = thredHeader.formCount;
@@ -6193,7 +6194,7 @@ void nuFil() {
 			}
 			if (PCSBMPFileName[0]) {
 				fs::current_path(*DefaultDirectory);
-				auto BMPfileName = win32::Utf8ToUtf16(PCSBMPFileName);
+				auto BMPfileName = utf::Utf8ToUtf16(PCSBMPFileName);
 				UserBMPFileName->assign(BMPfileName);
 				bfil();
 			}
@@ -7023,11 +7024,11 @@ void newFil() {
 		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
 	deldu();
-	DesignerName->assign(win32::Utf8ToUtf16(std::string(IniFile.designerName)));
+	DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
 	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], *DesignerName).c_str());
 	*ThrName = *DefaultDirectory / ((*StringTable)[STR_NUFIL].c_str());
 	ritfnam(*DesignerName);
-	auto designer = win32::Utf16ToUtf8(*DesignerName);
+	auto designer = utf::Utf16ToUtf8(*DesignerName);
 	std::copy(designer.begin(), designer.end(), ExtendedHeader.modifierName);
 	rstdu();
 	rstAll();
@@ -8243,7 +8244,7 @@ void lodbmp() {
 	if (GetOpenFileName(&OpenBitmapName)) {
 		UserBMPFileName->assign(szFileName);
 		untrace();
-		auto filename = win32::Utf16ToUtf8(UserBMPFileName->filename().wstring());
+		auto filename = utf::Utf16ToUtf8(UserBMPFileName->filename().wstring());
 		// PCS file can only store a 16 character filename?
 		// ToDo - give the user a little more info that the bitmap has not been loaded
 		if (filename.size() && filename.size() < 16) {
@@ -8365,7 +8366,7 @@ void setsped() {
 }
 
 void deltot() {
-	DesignerName->assign(win32::Utf8ToUtf16(std::string(IniFile.designerName)));
+	DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
 	TextureIndex = FormIndex = FormVertexIndex = SatinGuideIndex = ClipPointIndex = PCSHeader.stitchCount = 0;
 	StateMap.reset(StateFlag::GMRK);
 	rstAll();
@@ -10534,7 +10535,7 @@ void desiz() {
 	}
 	info += fmt::format(stringTable[STR_HUPWID], (IniFile.hoopSizeX / PFGRAN), (IniFile.hoopSizeY / PFGRAN));
 	if (PCSHeader.stitchCount) {
-		auto modifier = win32::Utf8ToUtf16(ExtendedHeader.modifierName);
+		auto modifier = utf::Utf8ToUtf16(ExtendedHeader.modifierName);
 		info += fmt::format(stringTable[STR_CREATBY], *DesignerName, modifier);
 	}
 	shoMsg(info);
@@ -17691,7 +17692,7 @@ void ritloc() {
 	wcscpy_s(environment, sizeof(lockFileName) / sizeof(lockFileName[0]) - (environment - lockFileName), L"thredloc.txt");
 	lockFile = CreateFile(lockFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (lockFile != INVALID_HANDLE_VALUE) {
-		auto value = win32::Utf16ToUtf8(*HomeDirectory);
+		auto value = utf::Utf16ToUtf8(*HomeDirectory);
 		WriteFileInt(lockFile, value.data(), value.size() + 1, &bytesWritten, 0);
 		CloseHandle(lockFile);
 	}
@@ -17776,19 +17777,19 @@ void redini() {
 		ReadFile(IniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, 0);
 		if (bytesRead < sizeof(IniFile))
 			IniFile.formBoxSizePixels = DEFBPIX;
-		auto directory = win32::Utf8ToUtf16(IniFile.defaultDirectory);
+		auto directory = utf::Utf8ToUtf16(IniFile.defaultDirectory);
 		DefaultDirectory->assign(directory);
 		DefaultBMPDirectory->assign(directory);
 		auto& previousNames = *PreviousNames;
 		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
 			if (strlen(IniFile.prevNames[iVersion])) {
-				previousNames[iVersion].assign(win32::Utf8ToUtf16(std::string(IniFile.prevNames[iVersion])));
+				previousNames[iVersion].assign(utf::Utf8ToUtf16(std::string(IniFile.prevNames[iVersion])));
 			}
 			else {
 				previousNames[iVersion].clear();
 			}
 		}
-		DesignerName->assign(win32::Utf8ToUtf16(std::string(IniFile.designerName)));
+		DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
 		for (iColor = 0; iColor < 16; iColor++) {
 			UserColor[iColor]              = IniFile.stitchColors[iColor];
 			CustomColor[iColor]            = IniFile.stitchPreferredColors[iColor];
@@ -18181,7 +18182,7 @@ void init() {
 	auxmen();
 	fnamtabs();
 	ritfnam(*DesignerName);
-	auto designer = win32::Utf16ToUtf8(*DesignerName);
+	auto designer = utf::Utf16ToUtf8(*DesignerName);
 	std::copy(designer.begin(), designer.end(), ExtendedHeader.modifierName);
 	ExtendedHeader.stgran = 0;
 	for (iByte = 0; iByte < RES_SIZE; iByte++)

@@ -47,9 +47,6 @@
     <ClInclude Include="utf8conv.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utf8except.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Resources\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
