@@ -5835,7 +5835,7 @@ void nuFil() {
 				StateMap.set(StateFlag::WASTXBAK);
 			fileSize            = GetFileSize(FileHandle, &fileSizeHigh);
 			auto fileExt        = WorkingFileName->extension().wstring();
-			auto firstCharacter = tolower(fileExt[1]);
+			const auto firstCharacter = tolower(fileExt[1]);
 			if (firstCharacter == 't') {
 				ReadFile(FileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, NULL);
 				if ((thredHeader.headerType & 0xffffff) == 0x746872) {
