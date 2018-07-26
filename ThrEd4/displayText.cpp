@@ -25,7 +25,7 @@
 
 #include "Resources/resource.h"
 #include "globals.h"
-#include "displayText.h"
+#include "form.h"
 
 unsigned short LoadStringList[] = {
 	// strings to load into memory at init time
@@ -58,12 +58,6 @@ inline void loadString(std::wstring& sDest, unsigned stringID) {
 			auto _ = std::copy(pBuf, pBuf + len, sDest.begin());
 		}
 	}
-}
-
-void tabmsg(unsigned code) {
-	std::wstring message;
-	loadString(message, code);
-	shoMsg(message);
 }
 
 void shoMsg(const std::wstring& message) {
@@ -111,6 +105,12 @@ void shoMsg(const std::wstring& message) {
 	}
 }
 
+void tabmsg(unsigned code) {
+	std::wstring message;
+	loadString(message, code);
+	shoMsg(message);
+}
+
 void lodstr() {
 	for (auto iString = 0; iString < STR_LEN; iString++) {
 		loadString((*StringTable)[iString], LoadStringList[iString]);
@@ -122,24 +122,6 @@ void hsizmsg() {
 
 	loadString(fmtStr, IDS_HSIZ);
 	shoMsg(fmt::format(fmtStr, (UnzoomedRect.x / PFGRAN), (UnzoomedRect.y / PFGRAN)));
-}
-
-void msgflt(unsigned messageId, float value) {
-	std::wstring fmtStr;
-
-	loadString(fmtStr, messageId);
-	shoMsg(fmt::format(fmtStr, value));
-	StateMap.set(StateFlag::NUMIN);
-	numWnd();
-}
-
-void tsizmsg(const wchar_t* threadSizeText, double threadSize) {
-	std::wstring fmtStr;
-
-	loadString(fmtStr, IDS_SIZ);
-	shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
-	StateMap.set(StateFlag::NUMIN);
-	numWnd();
 }
 
 void numWnd() noexcept {
@@ -159,6 +141,24 @@ void numWnd() noexcept {
 		NULL);
 	MsgIndex = 0;
 	*MsgBuffer = 0;
+}
+
+void msgflt(unsigned messageId, float value) {
+	std::wstring fmtStr;
+
+	loadString(fmtStr, messageId);
+	shoMsg(fmt::format(fmtStr, value));
+	StateMap.set(StateFlag::NUMIN);
+	numWnd();
+}
+
+void tsizmsg(const wchar_t* threadSizeText, double threadSize) {
+	std::wstring fmtStr;
+
+	loadString(fmtStr, IDS_SIZ);
+	shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
+	StateMap.set(StateFlag::NUMIN);
+	numWnd();
 }
 
 void bfilmsg() {
@@ -226,3 +226,107 @@ void shoseln(unsigned code0, unsigned code1) {
 	shoMsg(fmt::format(fmtStr, msg0, msg1));
 }
 
+void adbad(std::wstring& repairMessage, unsigned code, size_t count) {
+	std::wstring fmtStr;
+
+	loadString(fmtStr, code);
+	repairMessage += fmtStr;
+	loadString(fmtStr, IDS_NOTREP);
+	repairMessage += fmt::format(fmtStr, count);
+}
+
+
+bool clpmsgs(unsigned code) {
+	ispcdclp();
+	if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap.test(StateFlag::WASPCDCLP)) {
+		tabmsg(IDS_CLPS);
+		return 1;
+	}
+	return 0;
+}
+
+void frm1pnt() {
+	if (FormIndex == 1) {
+		StateMap.set(StateFlag::FORMSEL);
+		ClosestFormToCursor = 0;
+	}
+}
+
+bool filmsgs(unsigned code) {
+	if (SelectedFormList->size())
+		return clpmsgs(code);
+	if (FormIndex) {
+		frm1pnt();
+		if (StateMap.test(StateFlag::FORMSEL)) {
+			SelectedForm = &FormList[ClosestFormToCursor];
+			if (SelectedForm->vertexCount == 2) {
+				if (code < FML_LIN) {
+					tabmsg(IDS_FRM3X);
+					return 1;
+				}
+				else {
+					if (code == FML_PRPS) {
+						tabmsg(IDS_ANGS);
+						return 1;
+					}
+				}
+			}
+			return clpmsgs(code);
+		}
+		else {
+			tabmsg(IDS_FILSEL);
+			return 1;
+		}
+	}
+	else {
+		tabmsg(IDS_FILCR);
+		return 1;
+	}
+}
+
+void grpmsg() {
+	shoseln(IDS_FGRPS, IDS_UNGRP);
+}
+
+void grpmsg1() {
+	tabmsg(IDS_NOGRP);
+}
+
+void sdmsg() {
+	std::wstring fmtStr;
+
+	loadString(fmtStr, IDS_SAVDISC);
+	shoMsg(fmt::format(fmtStr, ThrName->wstring()));
+}
+
+void alrotmsg() {
+	shoseln(IDS_ALLX, IDS_ROTAGIN);
+}
+
+void shord() {
+	shoseln(IDS_FGRPF, IDS_ROTDUP);
+}
+
+void spltmsg() {
+	shoseln(IDS_FRMGUID, IDS_SPLT);
+}
+
+void datmsg(unsigned code) {
+	unsigned     dataErrorID = 0;
+	std::wstring dataError;
+
+	switch (code) {
+	case BADFLT:
+		dataErrorID = IDS_BADFLT;
+	case BADCLP:
+		dataErrorID = IDS_BADCLP;
+	case BADSAT:
+		dataErrorID = IDS_BADSAT;
+	case BADTX:
+		dataErrorID = IDS_BADTX;
+	default:
+		dataErrorID = IDS_BADUKN;
+	}
+	loadString(dataError, dataErrorID);
+	shoMsg(dataError);
+}

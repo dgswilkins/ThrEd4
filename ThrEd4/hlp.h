@@ -10,14 +10,4 @@
 #include <Windows.h>
 #include <string>
 
-bool clpmsgs(unsigned code);
-bool filmsgs(unsigned code);
-void adbad(std::wstring& repairMessage, unsigned code, size_t count);
-void alrotmsg();
-void datmsg(unsigned code);
-void frm1pnt();
-void grpmsg();
-void grpmsg1();
-void sdmsg();
-void shord();
-void spltmsg();
+void help();
