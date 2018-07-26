@@ -1,7 +1,5 @@
 ﻿#include "stdafx.h"
 
-#include "targetver.h"
-
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #endif
@@ -14,15 +12,19 @@
 #include <Windows.h> // Win32 Platform SDK main header
 
 // C RunTime Header Files
-#include <bitset>
 #include <commdlg.h>
-#include <filesystem>
-
 #include <shellapi.h>
-#include <shlobj.h>
 #include <Shlwapi.h>
+#include <shlobj.h>
 
-// TODO: reference additional headers your program requires here
+#ifdef ALLOCFAILURE
+#include <new.h>
+#endif
+
+// Standard Libraries
+#include <bitset>
+
+// Open Source headers
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
@@ -30,376 +32,25 @@
 #include <fmt/format.h>
 #pragma warning(pop)
 
+// Local Headers
 #include "EnumMap.h"
 #include "utf8conv.h"
 #include "wrappers.h"
 
-#ifdef ALLOCFAILURE
-#include <new.h>
-#endif
-
 #include "Resources/resource.h"
-#include "thred.h"
+#include "globals.h"
+#include "displayText.h"
+#include "form.h"
+#include "hlp.h"
+#include "xt.h"
 
 namespace fs = std::experimental::filesystem;
-
-extern void             angclp();
-extern void             angsclp();
-extern void             apliq();
-extern void             bakagain();
-extern void             bakdup();
-extern void             bfilmsg();
-extern void             bhol();
-extern void             bholbrd();
-extern void             bord();
-extern void             boxsel();
-extern void             bsizpar();
-extern void             butxt(unsigned iButton, const std::wstring& buttonText);
-extern void             centir();
-extern void             chain();
-extern void             chan();
-extern void             chgchk(int code);
-extern void             chgwrn();
-extern void             chkcont();
-extern unsigned         chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
-extern unsigned         closfrm();
-extern void             clpfil();
-extern void             clrfills();
-extern void             clrstch();
-extern void             cntrx();
-extern void             col2frm();
-extern void             contfil();
-extern void             cpylayr(unsigned codedLayer);
-extern void             crmsg(const fs::path& fileName);
-extern void             crop();
-extern void             dazdef();
-extern void             debean();
-extern void             delcon(unsigned GuideIndex);
-extern void             deleclp(size_t iForm);
-extern void             delflt(size_t formIndex);
-extern void             delfrms();
-extern void             delmclp(size_t iForm);
-extern void             delmfil();
-extern void             delsac(size_t formIndex);
-extern void             delspnt();
-extern void             deltx();
-extern void             drwcon();
-extern void             drwfrm();
-extern void             drwsat();
-extern void             drwtxtr();
-extern void             duauxnam();
-extern void             dubcol(unsigned color);
-extern void             dubean();
-extern void             dubfil();
-extern void             dubig();
-extern void             dubit(unsigned bit);
-extern void             dublen(float length);
-extern void             dubmax(float length);
-extern void             dubmin(float length);
-extern void             dubold();
-extern void             dubsfil();
-extern void             dubspac(float length);
-extern void             dueg(unsigned nsids);
-extern void             dufang(float angle);
-extern void             dufcol(unsigned color);
-extern void             dufhi(float length);
-extern void             dufind(float indent);
-extern void             duflen(float length);
-extern void             dufmax(float length);
-extern void             dufmin(float length);
-extern void             duform(unsigned ind);
-extern void             dufrm();
-extern void             dufspac(float spacing);
-extern void             dufwid(float length);
-extern void             dufxang(float angle);
-extern void             duhart(unsigned sideCount);
-extern void             duinsf();
-extern void             dulens(unsigned sides);
-extern void             dundcol(unsigned color);
-extern void             duprot(double rotationAngle, const dPOINT& rotationCenter);
-extern void             dupsel(HDC dc);
-extern void             durpoli(unsigned vertexCount);
-extern void             dusat();
-extern void             dushft();
-extern void             duspac(float spacing);
-extern void             duspir(unsigned stepCount);
-extern void             dustar(unsigned starCount, double length);
-extern void             dusulen(float length);
-extern void             dutxtfil();
-extern void             duxclp();
-extern void             duzig(unsigned vertices);
-extern void             fclp();
-extern void             fcntr();
-extern void             fethr();
-extern void             fethrf();
-extern void             filangl();
-extern void             filclpx();
-extern void             filhor();
-extern void             filnopn(unsigned code, const fs::path& fileName);
-extern void             filsat();
-extern void             filvrt();
-extern unsigned         find1st();
-extern void             fliph();
-extern void             flipv();
-extern void             flpord();
-extern unsigned         fltind(const fPOINT* const point);
-extern void             fltspac(const fPOINT* const start, size_t count);
-extern void             form();
-extern void             frm0();
-extern void             frmadj(size_t formIndex);
-extern void             frmchkx();
-extern void             frmclr(FRMHED* const destination);
-extern void             frmlin(fPOINT* vertices, size_t vertexCount);
-extern void             frmnum();
-extern void             frmnumfn(unsigned newFormIndex);
-extern void             frmon();
-extern void             frmout(size_t formIndex);
-extern void             frmovlin();
-extern bool             frmrng(size_t iForm, RANGE& range);
-extern void             frmsadj();
-extern void             frmsqr(unsigned iVertex);
-extern void             fsclpx();
-extern void             fselrct(size_t iForm);
-extern void             fsizpar();
-extern void             fsort();
-extern void             fvars(size_t iForm);
-extern void             getfinfo(size_t iForm);
-extern unsigned         getlast();
-extern void             grpmsg();
-extern void             grpmsg1();
-extern void             help();
-extern void             horclp();
-extern void             horsclp();
-extern void             hsizmsg();
-extern void             infrm();
-extern void             insat();
-extern bool             iseclpx(size_t iForm) noexcept;
-extern void             ispcdclp();
-extern bool             istx(size_t iForm);
-extern void             join();
-extern void             lodchk();
-extern void             lodstr();
-extern inline void      loadString(std::wstring& sDest, unsigned stringID);
-extern void             makspac(unsigned start, unsigned count);
-extern void             maxtsiz(const std::wstring& label, POINT& textSize);
-extern void             maxwid(unsigned start, unsigned finish);
-extern float            midl(float high, float low);
-extern void             mdufrm();
-extern void             movlayr(unsigned codedLayer);
-extern void             msgstr(unsigned code);
-extern void             munfrm();
-extern void             mvshft();
-extern void             notcwlk();
-extern bool             notfstch(unsigned attribute);
-extern bool             notsel();
-extern void             notund();
-extern void             notwlk();
-extern void             nubrdcol(unsigned color);
-extern void             nudsiz();
-extern void             nufilcol(unsigned color);
-extern void             nufsel();
-extern void             nufthcol(unsigned color);
-extern void             nulapcol(unsigned color);
-extern constexpr size_t nxt(size_t iVertex);
-extern void             oclp(const fPOINT* const clip, size_t clipEntries);
-extern void             okcan();
-extern size_t           pdir(size_t vertex);
-extern void             pes2crd();
-extern void             picot();
-extern void             prbug();
-extern void             prfmsg();
-extern void             prfsid(HWND wnd);
-extern void             prpbrd(double borderStitchSpacing);
-extern constexpr size_t prv(size_t iVertex);
-extern unsigned         psg();
-extern void             pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect);
-extern void             rats();
-extern void             ratsr();
-extern void             rct2sel(const RECT& rectangle, std::vector<POINT>& line);
-extern void             redtx();
-extern void             redup();
-extern void             refil();
-extern void             refilal();
-extern void             refilfn();
-extern void             refrm();
-extern void             repar();
-extern void             ribon();
-extern void             rinfrm();
-extern void             riter();
-extern void             ritfrct(size_t iForm, HDC dc);
-extern void             ritnum(unsigned code, size_t value);
-extern void             rotagain();
-extern void             rotcmd(dPOINT& rotationCenter);
-extern void             rotdup();
-extern void             rstfrm();
-extern void             rstxt();
-extern void             rstxt();
-extern void             rtrclp();
-extern void             sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect) noexcept;
-extern void             satadj();
-extern void             satbrd();
-extern void             satfix();
-extern void             satknkt();
-extern void             satpnt0();
-extern void             satpnt1();
-extern void             satsel();
-extern void             satzum();
-extern void             savblen(float fLength);
-extern void             savdisc();
-extern void             savplen(float length);
-extern void             savtxt();
-extern void             selal();
-extern void             selalfil();
-extern void             selalfrm();
-extern void             selfil(unsigned type);
-extern void             selsqr(const POINT& controlPoint, HDC dc);
-extern void             setap();
-extern void             setbcol();
-extern void             setblen();
-extern void             setbmax();
-extern void             setbmin();
-extern void             setbspac();
-extern void             setclpspac();
-extern void             setcwlk();
-extern void             setear();
-extern void             setexpand(double xyRatio);
-extern void             setfang();
-extern void             setfchk();
-extern void             setfcol();
-extern void             setfhi();
-extern void             setfilend();
-extern void             setfilstrt();
-extern void             setfind();
-extern void             setflen();
-extern void             setfmax();
-extern void             setfmin();
-extern void             setfpnt();
-extern void             setfrm();
-extern void             setfspac();
-extern void             setfwid();
-extern void             sethup();
-extern void             setins();
-extern void             setmfrm();
-extern void             setrang();
-extern void             setshft();
-extern void             setstrtch();
-extern void             setuang();
-extern void             setucol();
-extern void             setulen();
-extern void             setund();
-extern void             setuspac();
-extern void             setwlk();
-extern void             setwlkind();
-extern void             sfCor2px(const fPOINT& stitchPoint, POINT& screen);
-extern void             sfuang();
-extern void             shoMsg(const std::wstring& message);
-extern void             shoseln(unsigned code0, unsigned code1);
-extern void             shrnk();
-extern void             sidwnd(HWND wnd);
-extern void             snap();
-extern void             spltfrm();
-extern void             srtbyfrm();
-extern void             srtfrm();
-extern void             stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect);
-extern void             stchs2frm();
-extern void             tabmsg(unsigned code);
-extern void             tglfrm();
-extern void             tomsg();
-extern void             tsizmsg(const wchar_t* threadSizeText, double threadSize);
-extern void             tst();
-extern void             txdun();
-extern void             txof();
-extern void             txsnap();
-extern void             txtclp();
-extern void             txtkey(unsigned keyCode);
-extern void             txtlbut();
-extern void             txtlin();
-extern void             txtrbut();
-extern void             txtrmov();
-extern void             txtrup();
-extern void             undlen();
-extern void             unfil();
-extern void             unfrm();
-extern void             uninsf();
-extern void             unpsel();
-extern void             unstrtch(std::vector<POINT>& stretchBoxLine);
-extern void             uspac();
-extern void             vrtclp();
-extern void             vrtsclp();
-extern void             wavfrm();
-#ifdef _DEBUG
-extern void dmpat();
-#endif
-
-extern unsigned                   ActivePointIndex;
-extern fRECTANGLE                 AllItemsRect;
-extern double                     BorderWidth;
-extern BSEQPNT                    BSequence[BSEQLEN];
-extern float                      ButtonholeCornerLength;
-extern fPOINT                     ClipPoints[MAXITEMS];
-extern size_t                     ClosestFormToCursor;
-extern size_t                     ClosestVertexToCursor;
-extern size_t                     ClipPointIndex;
-extern SATCON*                    CurrentFormGuides;
-extern fPOINT*                    CurrentFormVertices;
-extern std::vector<HWND>*         ValueWindow;
-extern std::vector<double>*       FormAngles;
-extern POINT                      FormLines[MAXFRMLINS];
-extern size_t                     FormVertexIndex;
-extern fPOINT                     FormMoveDelta;
-extern size_t                     FormIndex;
-extern FRMHED                     FormList[MAXFORMS];
-extern std::vector<POINT>*        FormControlPoints;
-extern std::wstring*              FormOnOff;
-extern fPOINT                     FormVertices[MAXITEMS];
-extern double                     HorizontalRatio;
-extern fPOINT                     InterleaveSequence[MAXITEMS];
-extern std::vector<HWND>*         LabelWindow;
-extern double                     LineSpacing;
-extern fPOINT                     LowerLeftStitch;
-extern MENUITEMINFO*              MenuInfo;
-extern HWND                       MsgWindow;
-extern size_t                     NewFormVertexCount;
-extern size_t                     OutputIndex;
-extern fPOINT                     OSequence[OSEQLEN];
-extern std::vector<fPOINT>*       OutsidePointList;
-extern std::vector<fPOINT>*       InsidePointList;
-extern float                      PicotSpacing;
-extern long                       PreferenceWindowWidth;
-extern size_t                     PreviousFormIndex;
-extern unsigned                   PseudoRandomValue;
-extern std::vector<POINT>*        RubberBandLine;
-extern size_t                     SatinGuideIndex;
-extern SATCON                     SatinGuides[MAXSAC];
-extern unsigned                   SelectedFormControlVertex;
-extern std::vector<size_t>*       SelectedFormList;
-extern std::vector<POINT>*        SelectedFormsLine;
-extern RECT                       SelectedFormsRect;
-extern std::vector<POINT>*        SelectedPointsLine;
-extern std::vector<unsigned>*     SelectedTexturePointsList;
-extern double                     SnapLength;
-extern double                     SpiralWrap;
-extern std::vector<std::wstring>* StringTable;
-extern double                     StarRatio;
-extern std::vector<fPOINT>*       TempPolygon;
-extern std::vector<TXPNT>*        TempTexturePoints;
-extern TXTSCR                     TextureScreen;
-extern size_t                     TextureIndex;
-extern std::wstring*              TextureInputBuffer; // texture editor number buffer
-extern std::vector<TXPNT>*        TexturePointsBuffer;
-extern size_t                     VertexCount;
-extern double                     VerticalRatio;
-extern size_t                     SatinEndGuide;
 
 // select box
 #define NERCNT 4 // number of entries in the near array
 
 // main variables
-LPWSTR*         ArgList;                  // command line argument array
 int             ArgCount;                 // command line argument count
-HINSTANCE       ThrEdInstance;            // main instance handle
-HWND            ThrEdWindow;              // main window handle
-MSG             Msg;                      // main message loop message
 RECT            ThredWindowRect;          // main window size
 RECT            ColorBarRect;             // color bar rectangle
 RECT            MinLenRect;               // minimum length rectangle
@@ -408,78 +59,41 @@ unsigned        SmallestStitchIndex;      // pointer to the smallest stitch in t
 unsigned        LargestStitchIndex;       // pointer to the largest stitch in the selected range
 unsigned        CurrentStitchIndex;       // pointer to the current selection for length search
 HDC             ThredDC;                  // main device context handle
-HDC             StitchWindowMemDC;        // stitch window memory device context
-HDC             StitchWindowDC;           // stitch window device context
 HDC             BitmapDC;                 // bitmap device context
 HDC             ColorBarDC;               // color bar device context
 HBITMAP         StitchWindowBmp;          // bitmap for the memory stitch device context
-POINT           ThredWindowOrigin;        // offset origin of the main window
-POINT           StitchWindowOrigin;       // offset origin of the stitch window
 SIZE            TextSize;                 // used for measuring sizes of text items
 SIZE            ScreenSizePixels;         // screen size in pixels
 SIZE            ScreenSizeMM;             // screen size in millimeters
-dRECTANGLE      ZoomRect;                 // zoom rectangle
 RECT            StitchWindowAbsRect;      // stitch window size,absolute
-RECT            StitchWindowClientRect;   // stitch window size,client
-DRAWITEMSTRUCT* DrawItem;                 // for owner-draw windows
-double          ZoomFactor = 1;           // zoom factor
-POINT           UnzoomedRect;             // size of the unzoomed stitch window
-POINT           StitchCoordinatesPixels;  // converted from stitch to pixel
 POINT           NearestPixel[NERCNT];     // selected points
 POINT           BoxCoordinate = { 0, 0 }; // single select box point
 double          DistanceToClick;          // distance of closest point to a mouse click
-unsigned        ClosestPointIndex;        // index of closest point
 unsigned        ClosestPointIndexClone;   // copy of index of closest point
-unsigned        GroupStitchIndex;         // last point selected in group
-unsigned        GroupStartStitch;         // lower end of selected stitches
-unsigned        GroupEndStitch;           // higher end of selected stitches
 unsigned        PrevGroupStartStitch;     // lower end of previous selection
 unsigned        PrevGroupEndStitch;       // higher end of previous selection
-// wchar_t         StitchEntryBuffer[5];                   // stitch number entered by user
-wchar_t SideWindowEntryBuffer[11]; // side window number for entering form data sheet numbers
-// unsigned        BufferIndex = 0;                        // pointer to the next number to be entered
-size_t          BufferDigitCount;                       // number of decimal digits in the number of stitches
-unsigned        LineIndex;                              // line index for display routine
-double          StitchWindowAspectRatio;                // aspect ratio of the stitch window
-double          MinStitchLength   = MINSIZ * PFAFGRAN;  // minimum stitch size
-double          UserStitchLength  = USESIZ * PFAFGRAN;  // user selected stitch size
-double          SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
-const wchar_t*  PcdClipFormat     = L"PMust_Format";
-const wchar_t*  ThrEdClipFormat   = L"threditor";
-CLPSTCH*        ClipStitchData;                 // for pcs clipboard data
-FORMCLIP*       ClipFormHeader;                 // for thred form clipboard data
-FORMSCLIP*      ClipFormsHeader;                // multiple form clipboard header
-FORMVERTEXCLIP* ClipFormVerticesData;           // form points clipboard header
-void*           ClipPointer;                    // for memory allocation for clipboard data
-void*           ThrEdClipPointer;               // for memory allocation for thred format clipboard data
-FLSIZ           ClipRectSize;                   // clipboard rectangle size
-fRECTANGLE      ClipRect;                       // clipboard rectangle
-size_t          ClipStitchCount;                // number of stitchs extracted from clipboard
-POINT           ClipOrigin;                     // origin of clipboard box in stitch coordinates
-HGLOBAL         ClipMemory;                     // handle to the clipboard memory
-SIZE            SelectBoxSize;                  // size of the select box
-POINT           SelectBoxOffset;                // offset of the spot the user selected from the lower left of the select box
-dPOINT          ZoomRatio;                      // zoom ratio used to draw stitch window
-double          RotationHandleAngle;            // angle of the rotation handle
-fRECTANGLE      RotationRect;                   // rotation rectangle
-dPOINT          BmpStitchRatio;                 // bitmap to stitch hoop ratios
-dPOINT          StitchBmpRatio;                 // stitch hoop to bitmap ratios
-RECT            BitmapSrcRect;                  // bitmap source rectangle for zoomed view
-RECT            BitmapDstRect;                  // stitch window destination rectangle for zooomed view
-unsigned        BitmapWidth;                    // bitmap width
-unsigned        BitmapHeight;                   // bitmap height
-dPOINT          BitmapSizeinStitches;           // bitmap end points in stitch points
-unsigned        BitmapColor = BITCOL;           // bitmap color
-wchar_t         MsgBuffer[MSGSIZ];              // for user messages
-unsigned        MsgIndex;                       // pointer to the message buffer
-double          ShowStitchThreshold = SHOPNTS;  // show stitch grid below this zoom level
-double          ThreadSize30        = TSIZ30;   //#30 thread size
-double          ThreadSize40        = TSIZ40;   //#40 thread size
-double          ThreadSize60        = TSIZ60;   //#40 thread size
-unsigned        RunPoint;                       // point for animating stitchout
-unsigned        StitchesPerFrame;               // number of stitches to draw in each frame
-int             MovieTimeStep;                  // time delay for stitchout
-double          StitchBoxesThreshold = STCHBOX; // threshold for drawing stitch boxes
+size_t          BufferDigitCount;         // number of decimal digits in the number of stitches
+unsigned        LineIndex;                // line index for display routine
+double          StitchWindowAspectRatio;  // aspect ratio of the stitch window
+FORMSCLIP*      ClipFormsHeader;          // multiple form clipboard header
+FORMVERTEXCLIP* ClipFormVerticesData;     // form points clipboard header
+void*           ThrEdClipPointer;         // for memory allocation for thred format clipboard data
+POINT           ClipOrigin;               // origin of clipboard box in stitch coordinates
+SIZE            SelectBoxSize;            // size of the select box
+POINT           SelectBoxOffset;          // offset of the spot the user selected from the lower left of the select box
+double          RotationHandleAngle;      // angle of the rotation handle
+dPOINT          BmpStitchRatio;           // bitmap to stitch hoop ratios
+dPOINT          StitchBmpRatio;           // stitch hoop to bitmap ratios
+RECT            BitmapSrcRect;            // bitmap source rectangle for zoomed view
+RECT            BitmapDstRect;            // stitch window destination rectangle for zooomed view
+dPOINT          BitmapSizeinStitches;     // bitmap end points in stitch points
+unsigned        BitmapColor  = BITCOL;    // bitmap color
+double          ThreadSize30 = TSIZ30;    //#30 thread size
+double          ThreadSize40 = TSIZ40;    //#40 thread size
+double          ThreadSize60 = TSIZ60;    //#40 thread size
+unsigned        RunPoint;                 // point for animating stitchout
+unsigned        StitchesPerFrame;         // number of stitches to draw in each frame
+int             MovieTimeStep;            // time delay for stitchout
 
 // WARNING the size of the following array must be changed if the maximum movie speed is changed
 POINT MovieLine[100]; // line for movie stitch draw
@@ -487,17 +101,11 @@ POINT MovieLine[100]; // line for movie stitch draw
 unsigned LRUMenuId[] = { FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3 }; // recently used file menu ID's
 unsigned ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF;         // for checking if a fill is a clipboard fill
 
-RECT          MsgRect;                       // rectangle containing the text message
 unsigned      UndoBufferWriteIndex = 0;      // undo storage pointer
 unsigned      UndoBufferReadIndex  = 0;      // undo retrieval pointers
-unsigned      AppliqueColor        = 15;     // underlay color
 unsigned      LastKeyCode          = 0xffff; // last key code
-unsigned      FormMenuChoice       = 0;      // data type for form data form numerical entry
-dPOINT        ZoomMarkPoint;                 // stitch coordinates of the zoom mark
-unsigned      PreferenceIndex = 0;           // index to the active preference window
 fs::path      VersionNames[OLDVER];          // temporary storage for old file version names
 char          FileVersionIndex;              // points to old version to be read
-unsigned      ActiveLayer = 0;               // active layer
 unsigned      LayerIndex;                    // active layer code
 unsigned      ClipFormsCount;                // number of forms the on the clipboard
 POINT         StitchArrow[3];                // arrow for selected stitch
@@ -505,7 +113,6 @@ RANGE         SelectedRange;                 // first and last stitch for min/ma
 unsigned      NameOrder[50];                 // designer name order table
 unsigned char NameEncoder[128];              // designer name encoding
 unsigned char NameDecoder[256];              // designer name decode
-std::wstring* DesignerName;                  // designer name in clear
 HWND          FirstWin;                      // first window not destroyed for exiting enumerate loop
 FRMRANGE      SelectedFormsRange;            // range of selected forms
 size_t        TmpFormIndex;                  // saved form index
@@ -517,9 +124,6 @@ POINT         SideWindowSize;                // size of the side message window
 std::wstring* SideWindowsStrings;            // string array displayed in sidmsg
 dPOINT        CellSize;                      // size of an stitchMap cell for drawing stitch boxes
 unsigned      DraggedColor;                  // color being dragged
-FORMVERTICES  SelectedFormVertices;          // selected form vertices
-fRECTANGLE    SelectedVerticesRect;          // rectangle enclosing selected form verticess
-RECT          SelectedPixelsRect;            // display form vertex select rectangle
 POINT*        FormVerticesAsLine;            // form vertex clipboard paste into form line
 size_t        LastFormSelected;              // end point of selected range of forms
 
@@ -535,7 +139,6 @@ unsigned char* PESstitch;             // pes stitches
 unsigned       PEScolorIndex;         // pes color index
 #endif
 
-POINT                    EndPointCross;     // point to draw at the end cross for form select points
 HDC                      TraceDC;           // trace device context
 HBITMAP                  TraceBitmap;       // trace bitmap
 unsigned*                TraceBitmapData;   // trace bitmap data
@@ -561,8 +164,6 @@ unsigned                 ColumnColor;            // trace color column
 POINT                    BitmapPoint;            // a point on the bitmap
 
 // cursors
-HCURSOR ArrowCursor;           // arrow
-HCURSOR CrossCursor;           // cross
 HCURSOR FormCursor;            // form
 HCURSOR DLineCursor;           // dline
 HCURSOR NeedleUpCursor;        // upright needle
@@ -571,34 +172,21 @@ HCURSOR NeedleLeftDownCursor;  // left down needle
 HCURSOR NeedleRightUpCursor;   // right up needle
 HCURSOR NeedleRightDownCursor; // right down needle
 
-HPEN LinePen;         // line pen for stitch move lines
-HPEN BoxPen[4];       // box pens
-HPEN UserPen[16];     // user color pens
-HPEN CrossPen;        // pen for crosses in color windows
-HPEN GroupSelectPen;  // pen for group select
-HPEN GridPen;         // pen for stitch grid
-HPEN BackgroundPen;   // background color pen
-HPEN BitmapPen;       // bitmap pen
-HPEN FormPen;         // form pen
-HPEN LayerPen[6];     // layer pens
-HPEN FormPen3px;      // three-pixel form pen
-HPEN FormSelectedPen; // form select pen
-HPEN ZoomMarkPen;     // zoom mark pen
-HPEN MultiFormPen;    // multiple selected forms pen
-HPEN SelectAllPen;    // pen for drawing large boxes
-HPEN KnotPen;         // knot pen
-HPEN BlackPen;        // black pen
+HPEN LinePen;        // line pen for stitch move lines
+HPEN BoxPen[4];      // box pens
+HPEN CrossPen;       // pen for crosses in color windows
+HPEN GroupSelectPen; // pen for group select
+HPEN BackgroundPen;  // background color pen
+HPEN BitmapPen;      // bitmap pen
+HPEN ZoomMarkPen;    // zoom mark pen
+HPEN KnotPen;        // knot pen
+HPEN BlackPen;       // black pen
 
 unsigned BackgroundPenWidth; // width of the background pen
 
 // brushes
-HBRUSH BackgroundBrush;       // background color brush
 HBRUSH DefaultColorBrush[16]; // default color brushes
 HBRUSH UserColorBrush[16];    // user color brushes
-
-// clipboard handle
-unsigned Clip      = 0; // pcs format
-unsigned ThrEdClip = 0; // thred format
 
 // for the choose color dialog box
 CHOOSECOLOR ColorStruct;
@@ -614,36 +202,21 @@ wchar_t  ThreadSize[16][2];    // user selected thread sizes
 unsigned ThreadSizePixels[16]; // thread sizes in pixels
 unsigned ThreadSizeIndex[16];  // thread size indices
 
-HMENU              MainMenu;               // main menu
-HMENU              FillMenu;               // fill submenu
-HMENU              FileMenu;               // file submenu
-HMENU              BorderFillMenu;         // border fill submenu
-HMENU              ViewMenu;               // view submenu
-HMENU              ViewSetMenu;            // view/set
-HMENU              EditMenu;               // edit submenu
-HWND               DefaultColorWin[16];    // default color windows
-HWND               UserColorWin[16];       // user color windows
-HWND               ThreadSizeWin[16];      // thread size windows
-HWND               ChangeThreadSizeWin[3]; // thread size change windows
-HWND               MainStitchWin;          // stitch window
-HWND               VerticalScrollBar;      // vertical scroll bar
-HWND               HorizontalScrollBar;    // horizontal scroll bar
-std::vector<HWND>* ButtonWin;              // button windows
-HWND               TraceStepWin;           // trace stepSize window
-HWND               ColorBar;               // color bar
-HWND               OKButton;               // ok button
-HWND               DiscardButton;          // discard button
-HWND               CancelButton;           // cancel button
-HWND               GeneralNumberInputBox;  // general number input box
-HWND               SpeedScrollBar;         // speed scroll bar for movie
-HWND               SideMessageWindow = 0;  // main side message window
-HWND               SideWindow[16];         // side message windows
-HWND               PreferencesWindow;      // preferences window
-HWND               FormDataSheet = 0;      // form data sheet
-HWND               DeleteStitchesDialog;   // asking user if they want to delete the sitches associated with a form
-HWND               BackupViewer[OLDVER];   // handles of multiple file viewing windows
-HWND               TraceUpWindow[3];       // trace up number windows
-HWND               TraceDownWindow[3];     // trace down number windows
+HMENU FileMenu;               // file submenu
+HMENU BorderFillMenu;         // border fill submenu
+HMENU ViewMenu;               // view submenu
+HMENU ViewSetMenu;            // view/set
+HMENU EditMenu;               // edit submenu
+HWND  DefaultColorWin[16];    // default color windows
+HWND  UserColorWin[16];       // user color windows
+HWND  ThreadSizeWin[16];      // thread size windows
+HWND  ChangeThreadSizeWin[3]; // thread size change windows
+HWND  TraceStepWin;           // trace stepSize window
+HWND  ColorBar;               // color bar
+HWND  SpeedScrollBar;         // speed scroll bar for movie
+HWND  BackupViewer[OLDVER];   // handles of multiple file viewing windows
+HWND  TraceUpWindow[3];       // trace up number windows
+HWND  TraceDownWindow[3];     // trace down number windows
 
 HWND     TraceControlWindow[3];       // trace control windows
 HWND     TraceSelectWindow[3];        // trace select windows
@@ -653,25 +226,16 @@ HWND     TraceNumberInput;            // trace number input window
 HBRUSH   BlackBrush;                  // black brush
 HBRUSH   TempBrush;                   // temporary brush
 
-COLORREF        UserColor[16];   // user colors
 COLORREF        BackgroundColor; // stitch window background
-COLORREF        BoxColor[]  = { 0x404040, 0x408040, 0x804040, 0x404080 };
-unsigned        ActiveColor = 0;                       // active color selector
-unsigned        ButtonHeight;                          // button height
-unsigned        ButtonWidth;                           // button width
-unsigned        ButtonWidthX3;                         // button width times 3
+COLORREF        BoxColor[] = { 0x404040, 0x408040, 0x804040, 0x404080 };
 unsigned        NumeralWidth;                          // width of 0
 int             ThreadWidthPixels[3];                  // thread sizes in pixels
 std::bitset<32> DisplayedColorBitmap(0);               // Map of color numbers in design that are actually displayed
 double          GapToNearest[NERCNT];                  // distances of the closest points
                                                        // to a mouse click
 long       NearestPoint[NERCNT];                       // indices of the closest points
-unsigned   NearestCount;                               // number of boxes selected
 POINT      SearchLine[MAXITEMS];                       // stitch select line
-unsigned   SearchLineIndex = 0;                        // pointer for drawing stitch select lines
-fRECTANGLE StitchRangeRect;                            // stitch range rectangle
 fPOINT     StitchRangeSize;                            // form check ranges
-fPOINT     SelectedFormsSize;                          // size of multiple select rectangle
 unsigned   MoveAnchor;                                 // for resequencing stitches
 double     RotateAngle;                                // angle for pixel rotate
 SIZE       PickColorMsgSize;                           // size of the pick color message
@@ -694,10 +258,6 @@ HANDLE     BalaradFile;                                // balarad file handle
 // graphics variables
 double     AspectRatio = (LHUPX / LHUPY); // aspect ratio of the stitch window
 SCROLLINFO ScrollInfo;                    // scroll bar i/o structure
-POINT      StitchWindowSize;              // size of the stitch window in pixels
-fPOINT     SelectedPoint;                 // for converting stitch coordinates
-                                          // to metric cordinates (mm)
-fPOINT ZoomBoxOrigin;                     // zoom box origin
 
 COLORREF DefaultColors[] = { 0x000000, 0x800000, 0xFF0000, 0x808000, 0xFFFF00, 0x800080, 0xFF00FF, 0x000080,
 	                         0x0000FF, 0x008000, 0x00FF00, 0x008080, 0x00FFFF, 0x808080, 0xC0C0C0, 0xFFFFFF };
@@ -713,9 +273,6 @@ const TCHAR AllFilter[_MAX_PATH + 1] = "Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.
 const wchar_t AllFilter[_MAX_PATH + 1] = L"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
 #endif
 
-fs::path* AuxName;
-fs::path* WorkingFileName;
-fs::path* ThrName;
 fs::path* GeName;
 fs::path* ColorFileName; //.thw file name
 fs::path* RGBFileName;   //.rgb file name
@@ -725,7 +282,6 @@ fs::path* DefaultBMPDirectory;
 fs::path* BalaradName0; // balarad semaphore file
 fs::path* BalaradName1; // balarad data file
 fs::path* BalaradName2;
-fs::path* HomeDirectory;   // directory from which thred was executed
 fs::path* UserBMPFileName; // bitmap file name from user load
 fs::path* IniFileName;     //.ini file name
 
@@ -743,8 +299,8 @@ char          PCSBMPFileName[16]; // bitmap file name from pcs file
 
 OPENFILENAME OpenFileName = {
 	sizeof(OpenFileName), // lStructsize
-	ThrEdWindow,          // hwndOwner
-	ThrEdInstance,        // hInstance
+	0,                    // hwndOwner
+	0,                    // hInstance
 	AllFilter,            // lpstrFilter
 	CustomFilter,         // lpstrCustomFilter
 	_MAX_PATH,            // nMaxCustFilter
@@ -777,8 +333,8 @@ unsigned                   InsertedStitchCount;                 // saved stitch 
 
 OPENFILENAME OpenBitmapName = {
 	sizeof(OpenBitmapName), // lStructsize
-	ThrEdWindow,            // hwndOwner
-	ThrEdInstance,          // hInstance
+	0,                      // hwndOwner
+	0,                      // hInstance
 	BmpFilter,              // lpstrFilter
 	CustomFilter,           // lpstrCustomFilter
 	_MAX_PATH,              // nMaxCustFilter
@@ -819,18 +375,14 @@ COLORREF DefaultBitmapBackgroundColors[] = { 0xc0d5bf, 0xc8dfee, 0x708189, 0xa5a
 
 POINT MoveLine0[2];              // move point line
 POINT MoveLine1[2];              // move point line
-POINT InsertLine[3];             // the insert line
-POINT ZoomBoxLine[5];            // the zoom box
 POINT ClipInsertBoxLine[5];      // for displaying clipboard insert rectangle
 POINT RotateBoxOutline[5];       // for drawing the rotate rectangle
 POINT RotateBoxCrossVertLine[2]; // vertical part of the rotate cross
 POINT RotateBoxCrossHorzLine[2]; // horizontal part of the rotate cross
 POINT RotateBoxToCursorLine[2];  // line from the cursor to the center of the rotate cross
 
-COLCHNG   ColorChangeTable[MAXCHNG];
-PCSHEADER PCSHeader;      // pcs file header
-STREX     ExtendedHeader; // thred file header extension
-INIFILE   IniFile;        // initialization file
+COLCHNG ColorChangeTable[MAXCHNG];
+STREX   ExtendedHeader; // thred file header extension
 
 typedef struct _dstdat {
 	char cor;
@@ -1408,12 +960,7 @@ unsigned PESColorTranslate[] = {
 };
 #endif
 
-EnumMap<StateFlag> StateMap(0);                // Flags indicating current run state
-EnumMap<UserFlag>  UserFlagMap(0);             // for storage of persistent binary variables set by the user
-fPOINTATTR         StitchBuffer[MAXITEMS * 2]; // main stitch buffer
-fPOINTATTR         ClipBuffer[MAXITEMS];       // for temporary copy of imported clipboard data
-FRMHED*            SelectedForm;               // pointer to selected form
-unsigned           FillTypes[] =               // fill type array for side window display
+unsigned FillTypes[] = // fill type array for side window display
     { 0, VRTF, HORF, ANGF, SATF, CLPF, CONTF, VCLPF, HCLPF, ANGCLPF, FTHF, TXVRTF, TXHORF, TXANGF };
 unsigned EdgeFillTypes[] = // edge fill type array for side window display
     { 0,        EDGELINE,  EDGEBEAN,   EDGECLIP,   EDGEANGSAT, EDGEAPPL, EDGEPROPSAT,
@@ -3731,11 +3278,11 @@ void ritini() {
 	RECT        windowRect = {};
 	std::string previous;
 
-	auto directory = utf::Utf16ToUtf8(DefaultDirectory->wstring());
-	constexpr char fillchar = '\0';
+	auto           directory = utf::Utf16ToUtf8(DefaultDirectory->wstring());
+	constexpr char fillchar  = '\0';
 	std::fill(IniFile.defaultDirectory, IniFile.defaultDirectory + sizeof(IniFile.defaultDirectory), fillchar);
 	std::copy(directory.begin(), directory.end(), IniFile.defaultDirectory);
-	const auto&    previousNames = *PreviousNames;
+	const auto& previousNames = *PreviousNames;
 	for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
 		auto& prevNam = IniFile.prevNames[iVersion];
 		std::fill(prevNam, prevNam + sizeof(prevNam), fillchar);
@@ -4868,6 +4415,8 @@ void savAs() {
 		auto    dirStr                = DefaultDirectory->wstring();
 		std::copy(workingFileStr.begin(), workingFileStr.end(), szFileName);
 		std::copy(dirStr.begin(), dirStr.end(), lpszBuffer);
+		OpenFileName.hwndOwner       = ThrEdWindow;
+		OpenFileName.hInstance       = ThrEdInstance;
 		OpenFileName.lpstrFile       = szFileName;
 		OpenFileName.lpstrInitialDir = lpszBuffer;
 		OpenFileName.nFilterIndex    = 0;
@@ -5764,6 +5313,8 @@ void nuFil() {
 	auto    dirStr                = DefaultDirectory->wstring();
 	std::copy(workingFileStr.begin(), workingFileStr.end(), szFileName);
 	std::copy(dirStr.begin(), dirStr.end(), lpszBuffer);
+	OpenFileName.hwndOwner       = ThrEdWindow;
+	OpenFileName.hInstance       = ThrEdInstance;
 	OpenFileName.lpstrFile       = szFileName;
 	OpenFileName.lpstrInitialDir = lpszBuffer;
 	if (StateMap.testAndReset(StateFlag::REDOLD) || GetOpenFileName(&OpenFileName)) {
@@ -5833,8 +5384,8 @@ void nuFil() {
 			StateMap.reset();
 			if (textureHistoryFlag)
 				StateMap.set(StateFlag::WASTXBAK);
-			fileSize            = GetFileSize(FileHandle, &fileSizeHigh);
-			auto fileExt        = WorkingFileName->extension().wstring();
+			fileSize                  = GetFileSize(FileHandle, &fileSizeHigh);
+			auto       fileExt        = WorkingFileName->extension().wstring();
 			const auto firstCharacter = tolower(fileExt[1]);
 			if (firstCharacter == 't') {
 				ReadFile(FileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, NULL);
@@ -6243,10 +5794,6 @@ void nuFil() {
 		lodchk();
 	}
 }
-
-#if PESACT
-
-#endif
 
 COLORREF nuCol(COLORREF init) noexcept {
 	ColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
@@ -7427,7 +6974,7 @@ void ritrot(double rotationAngle, const dPOINT& rotationCenter) {
 	durot();
 }
 
-void durcntr(dPOINT& rotationCenter) {
+void durcntr(dPOINT& rotationCenter) noexcept {
 	rotationCenter.x = midl(RotationRect.right, RotationRect.left);
 	rotationCenter.y = midl(RotationRect.top, RotationRect.bottom);
 }
@@ -8006,25 +7553,6 @@ void cut() {
 	coltab();
 	rstAll();
 	StateMap.set(StateFlag::RESTCH);
-}
-
-void numWnd() noexcept {
-	RECT messageRect;
-
-	GetClientRect(MsgWindow, &messageRect);
-	GeneralNumberInputBox = CreateWindow(L"STATIC",
-	                                     0,
-	                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                                     5,
-	                                     messageRect.bottom + 15,
-	                                     ButtonWidthX3,
-	                                     ButtonHeight,
-	                                     MainStitchWin,
-	                                     NULL,
-	                                     ThrEdInstance,
-	                                     NULL);
-	MsgIndex              = 0;
-	*MsgBuffer            = 0;
 }
 
 void unpat() {

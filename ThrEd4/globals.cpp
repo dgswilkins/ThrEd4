@@ -1,0 +1,192 @@
+#include "stdafx.h"
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <Windows.h> // Win32 Platform SDK main header
+
+// Standard Libraries
+#include <filesystem>
+
+// Local Headers
+#include "ThrEdTypes.h"
+#include "EnumMap.h"
+
+namespace fs = std::experimental::filesystem;
+
+unsigned                   ActiveColor = 0;                // active color selector
+unsigned                   ActiveLayer = 0;                // active layer
+unsigned                   ActivePointIndex;               // pointer to the active form in the sequencing algorithm
+fRECTANGLE                 AllItemsRect;                   // rectangle enclosing all forms and stitches
+FRMHED                     AngledForm;                     // a temporary rotated form for angle fills
+fPOINT                     AngledFormVertices[MAXFRMLINS]; // form formOrigin data for angle fills
+unsigned                   AppliqueColor = 15;             // underlay color
+LPWSTR*                    ArgList;                        // command line argument array
+HCURSOR                    ArrowCursor;                    // arrow
+fs::path*                  AuxName;
+BSEQPNT                    BSequence[BSEQLEN];
+HBRUSH                     BackgroundBrush;                  // background color brush
+unsigned                   BitmapHeight;                     // bitmap height
+unsigned                   BitmapWidth;                      // bitmap width
+double                     BorderWidth = BRDWID;             // border width for satin borders
+unsigned                   ButtonHeight;                     // button height
+unsigned                   ButtonWidth;                      // button width
+unsigned                   ButtonWidthX3;                    // button width times 3
+std::vector<HWND>*         ButtonWin;                        // button windows
+float                      ButtonholeCornerLength = IBFCLEN; // buttonhole corner length
+HWND                       CancelButton;                     // cancel button
+unsigned                   Clip = 0;                         // pcs format clipboard handle
+fPOINTATTR                 ClipBuffer[MAXITEMS];
+FORMCLIP*                  ClipFormHeader;        // for thred form clipboard data
+HGLOBAL                    ClipMemory;            // handle to the clipboard memory
+size_t                     ClipPointIndex;        // next index to append main clipboard points
+void*                      ClipPointer;           // for memory allocation for clipboard data
+fPOINT                     ClipPoints[MAXITEMS];  // main clipboard fill points for forms
+fRECTANGLE                 ClipRect;              // clipboard rectangle
+FLSIZ                      ClipRectSize;          // clipboard rectangle size
+size_t                     ClipStitchCount;       // number of stitchs extracted from clipboard
+CLPSTCH*                   ClipStitchData;        // for pcs clipboard data
+size_t                     ClosestFormToCursor;   // closest form to the cursor
+unsigned                   ClosestPointIndex;     // index of closest point
+size_t                     ClosestVertexToCursor; // formOrigin closest to the cursor
+HCURSOR                    CrossCursor;           // cross
+SATCON*                    CurrentFormGuides;     // connections in the currently selecteed form
+fPOINT*                    CurrentFormVertices;   // points in the currently selected form
+HWND                       DeleteStitchesDialog;  // asking user if they want to delete the sitches associated with a form
+std::wstring*              DesignerName;          // designer name in clear
+HWND                       DiscardButton;         // discard button
+DRAWITEMSTRUCT*            DrawItem;              // for owner-draw windows
+POINT                      EndPointCross;         // point to draw at the end cross for form select points
+HMENU                      FillMenu;              // fill submenu
+std::vector<double>*       FormAngles;            // angles of a form for satin border fills
+std::vector<POINT>*        FormControlPoints;     // form control rectangle in pixel coordinates
+HWND                       FormDataSheet = 0;     // form data sheet
+size_t                     FormIndex     = 0;     // index into the list of forms
+POINT                      FormLines[MAXFRMLINS]; // used in the form drawing routines
+FRMHED                     FormList[MAXFORMS];    // a list of form headers
+unsigned                   FormMenuChoice = 0;    // data type for form data form numerical entry
+fPOINT                     FormMoveDelta;         // offset for moving forms
+std::wstring*              FormOnOff;
+HPEN                       FormPen;                       // form pen
+HPEN                       FormPen3px;                    // three-pixel form pen
+HPEN                       FormSelectedPen;               // form select pen
+size_t                     FormVertexIndex;               // next index to append form points
+fPOINT                     FormVertices[MAXITEMS];        // form points
+HWND                       GeneralNumberInputBox;         // general number input box
+HPEN                       GridPen;                       // pen for stitch grid
+unsigned                   GroupEndStitch;                // higher end of selected stitches
+unsigned                   GroupStartStitch;              // lower end of selected stitches
+unsigned                   GroupStitchIndex;              // last point selected in group
+fs::path*                  HomeDirectory;                 // directory from which thred was executed
+double                     HorizontalRatio;               // horizontal ratio between the zoom window and the entire stitch space
+HWND                       HorizontalScrollBar;           // horizontal scroll bar
+INIFILE                    IniFile;                       // initialization file
+POINT                      InsertLine[3];                 // the insert line
+std::vector<fPOINT>*       InsidePointList;               // list of inside outline points for satin or clipboard fills
+std::vector<fPOINT>*       InsidePoints;                  // pointer to the list of inside outline points
+unsigned                   InterleaveSequenceIndex;       // index into the interleave sequence
+INSREC                     InterleaveSequenceIndices[10]; // indices into interleave points
+fPOINT                     InterleaveSequence[MAXITEMS];  // storage for interleave points
+std::vector<HWND>*         LabelWindow;                   // text handles for the form data sheet
+HPEN                       LayerPen[6];
+double                     LineSpacing = DEFSPACE * PFGRAN; // stitch spacing in stitch units
+fPOINT                     LowerLeftStitch;                 // lower left formOrigin in a form
+HMENU                      MainMenu;                        // main menu
+HWND                       MainStitchWin;                   // stitch window
+MENUITEMINFO*              MenuInfo;
+double                     MinStitchLength = MINSIZ * PFAFGRAN; // minimum stitch size
+MSG                        Msg;                                 // main message loop message
+wchar_t                    MsgBuffer[MSGSIZ];                   // for user messages
+unsigned                   MsgIndex;                            // pointer to the message buffer
+RECT                       MsgRect;                             // rectangle containing the text message
+HWND                       MsgWindow = 0;                       // message window
+HPEN                       MultiFormPen;                        // multiple selected forms pen
+unsigned                   NearestCount;                        // number of boxes selected
+size_t                     NewFormVertexCount;                  // points in the new form
+HWND                       OKButton;                            // ok button
+fPOINT                     OSequence[OSEQLEN];                  // temporary storage for sequencing
+size_t                     OutputIndex;                         // output pointer for sequencing
+std::vector<fPOINT>*       OutsidePointList;                    // list of outside outline points for satin or clipboard fills
+std::vector<fPOINT>*       OutsidePoints;                       // pointer to the list of outside outline points
+PCSHEADER                  PCSHeader;                           // pcs file header
+const wchar_t*             PcdClipFormat   = L"PMust_Format";
+float                      PicotSpacing    = IPICSPAC;             // space between border picots
+unsigned                   PreferenceIndex = 0;                    // index to the active preference window
+long                       PreferenceWindowWidth;                  // width of the preference window
+HWND                       PreferencesWindow;                      // preferences window
+size_t                     PreviousFormIndex;                      // previously selected form
+unsigned                   PseudoRandomValue;                      // pseudo-random sequence register
+fRECTANGLE                 RotationRect;                           // rotation rectangle
+std::vector<POINT>*        RubberBandLine;                         // points to form points to be moved
+size_t                     SatinEndGuide;                          // satin end guide for the currently selected form
+size_t                     SatinGuideIndex;                        // next index to append satin connect points
+SATCON                     SatinGuides[MAXSAC];                    // satin form connects
+unsigned                   SearchLineIndex = 0;                    // pointer for drawing stitch select lines
+HPEN                       SelectAllPen;                           // pen for drawing large boxes
+FRMHED*                    SelectedForm;                           // pointer to selected form
+unsigned                   SelectedFormControlVertex;              // user selected form control formOrigin
+std::vector<size_t>*       SelectedFormList;                       // a list of selected forms
+FORMVERTICES               SelectedFormVertices;                   // selected form vertices
+std::vector<POINT>*        SelectedFormsLine;                      // line derived from the big rectangle
+RECT                       SelectedFormsRect;                      // for multiple selections;
+fPOINT                     SelectedFormsSize;                      // size of multiple select rectangle
+RECT                       SelectedPixelsRect;                     // display form vertex select rectangle
+fPOINT                     SelectedPoint;                          // for converting stitch coordinates to metric cordinates (mm)
+std::vector<POINT>*        SelectedPointsLine;                     // line derived from the formOrigin select rectangle
+std::vector<unsigned>*     SelectedTexturePointsList;              // list of selected points
+fRECTANGLE                 SelectedVerticesRect;                   // rectangle enclosing selected form verticess
+size_t                     SequenceIndex;                          // sequencing pointer
+double                     ShowStitchThreshold = SHOPNTS;          // show stitch grid below this zoom level
+HWND                       SideMessageWindow   = 0;                // main side message window
+wchar_t                    SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
+HWND                       SideWindow[16];                         // side message windows
+double                     SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
+double                     SnapLength        = SNPLEN * PFGRAN;    // snap together length
+double                     SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
+double                     StarRatio         = STARAT;             // star formOrigin to body ratio
+EnumMap<StateFlag>         StateMap(0);                            // Flags indicating current run state
+double                     StitchBoxesThreshold = STCHBOX;         // threshold for drawing stitch boxes
+fPOINTATTR                 StitchBuffer[MAXITEMS * 2];             // main stitch buffer
+POINT                      StitchCoordinatesPixels;                // converted from stitch to pixel
+fRECTANGLE                 StitchRangeRect;                        // stitch range rectangle
+RECT                       StitchWindowClientRect;                 // stitch window size,client
+HDC                        StitchWindowDC;                         // stitch window device context
+HDC                        StitchWindowMemDC;                      // stitch window memory device context
+POINT                      StitchWindowOrigin;                     // offset origin of the stitch window
+POINT                      StitchWindowSize;                       // size of the stitch window in pixels
+std::vector<std::wstring>* StringTable;                            //
+std::vector<fPOINT>*       TempPolygon;                            // temporary storage when user is entering a polygon;
+std::vector<TXPNT>*        TempTexturePoints;                      // temporary storage for textured fill data
+size_t                     TextureIndex;                           // next textured fill point index
+std::wstring*              TextureInputBuffer;                     // texture fill number buffer
+std::vector<TXPNT>*        TexturePointsBuffer;                    // buffer for textured fill points
+TXTSCR                     TextureScreen;                          // texture editor layout parameters
+unsigned                   ThrEdClip       = 0;                    // thred format
+const wchar_t*             ThrEdClipFormat = L"threditor";         //
+HINSTANCE                  ThrEdInstance;                          // main instance handle
+HWND                       ThrEdWindow;                            // main window handle
+fs::path*                  ThrName;                                //
+POINT                      ThredWindowOrigin;                      // offset origin of the main window
+POINT                      UnzoomedRect;                           // size of the unzoomed stitch window
+COLORREF                   UserColor[16];                          // user colors
+EnumMap<UserFlag>          UserFlagMap(0);                         // for storage of persistent binary variables set by the user
+HPEN                       UserPen[16];                            // user color pens
+double                     UserStitchLength = USESIZ * PFAFGRAN;   // user selected stitch size
+std::vector<HWND>*         ValueWindow;                            // data handles for the form data sheet
+size_t                     VertexCount;                            // sides of the selected form to fill
+double                     VerticalRatio;     // vertical ratio between the zoom window and the entire stitch space
+HWND                       VerticalScrollBar; // vertical scroll bar
+fs::path*                  WorkingFileName;   //
+POINT                      ZoomBoxLine[5];    // the zoom box
+fPOINT                     ZoomBoxOrigin;     // zoom box origin
+double                     ZoomFactor = 1;    // zoom factor
+dPOINT                     ZoomMarkPoint;     // stitch coordinates of the zoom mark
+dPOINT                     ZoomRatio;         // zoom ratio used to draw stitch window
+dRECTANGLE                 ZoomRect;          // zoom rectangle
+RECT                       scRct;

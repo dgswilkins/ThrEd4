@@ -1,306 +1,94 @@
 #include "stdafx.h"
 
-#include <limits> // For std::numeric_limits
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <Windows.h> // Win32 Platform SDK main header
+
+// C RunTime Header Files
+
+// Open Source headers
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include <boost/dynamic_bitset.hpp>
 #include <fmt/format.h>
-#include <gsl/gsl>
 #pragma warning(pop)
 
-#include "EnumMap.h"
+// Local Headers
 #include "ExtendedBitSet.h"
 #include "wrappers.h"
 
 #include "Resources/resource.h"
+#include "globals.h"
+#include "displayText.h"
+#include "hlp.h"
 #include "thred.h"
+#include "xt.h"
 
-extern fPOINT*              adclp(size_t count);
-extern fPOINT*              adflt(size_t count);
-extern SATCON*              adsatk(size_t count);
-extern void                 alrotmsg();
-extern void                 angrct(fRECTANGLE& rectangle);
-extern void                 centr();
-extern void                 chkcwlk(unsigned& interleaveSequenceIndex2);
-extern void                 chkrng(fPOINT& range);
-extern void                 chkund(const std::vector<RNGCNT>& textureSegments, unsigned& interleaveSequenceIndex2);
-extern void                 chkwlk(unsigned& interleaveSequenceIndex2);
-extern void                 coltab();
-extern void                 dasyfrm();
-extern void                 delfstchs();
-extern void                 delinf();
-extern void                 delstchm();
-extern void                 deltx();
-extern unsigned             duthrsh(double threshold);
-extern void                 duzrat();
-extern void                 fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap);
-extern bool                 filmsgs(unsigned code);
-extern void                 frm1pnt();
-extern void                 frmdel();
-extern void                 fthrfn(unsigned& interleaveSequenceIndex2);
-extern void                 grpAdj();
-extern void                 insadj();
-extern std::vector<fPOINT>& insid();
-extern void        intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsigned interleaveSequenceIndex2);
-extern bool        isclp(size_t find);
-extern bool        isclpx(size_t find);
-extern bool        isfclp();
-extern bool        istx(size_t find);
-extern inline void loadString(std::wstring& sDest, unsigned stringID);
-extern void        movStch();
-extern void        mvstch(size_t destination, size_t source);
-extern void        mvstchs(unsigned destination, unsigned source, unsigned count);
-extern void        numWnd();
-extern void        nuRct();
-extern void        pntmsg(unsigned count);
-extern unsigned    px2stch();
-extern void        pxCor2stch(const POINT& point);
-extern void        redclp();
-extern void        redraw(HWND window);
-extern void        ritfcor(const fPOINT& point);
-extern void        ritmov();
-extern void        ritnum(unsigned code, size_t value);
-extern void        ritot(unsigned number);
-extern void        rngadj();
-extern void
-            rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, const double& rotationAngle, const dPOINT& rotationCenter);
-extern void rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, const double rotationAngle, const dPOINT& rotationCenter);
-extern void rotflt(fPOINT& point, const double rotationAngle, const dPOINT& rotationCenter);
-extern void rotfn(double rotationAngle, const dPOINT& rotationCenter);
-extern void rstAll();
-extern void savdo();
-extern void sCor2px(const dPOINT& stitchCoordinate, POINT& pixelCoordinate);
-extern void sdmsg();
-extern void selRct(fRECTANGLE& sourceRect);
-extern void setfchk();
-extern void setpsel();
-extern void setxt(std::vector<RNGCNT>& textureSegments);
-extern void shft(const fPOINT& delta);
-extern void shoMsg(const std::wstring& message);
-extern void shord();
-extern void shoseln(unsigned code0, unsigned code1);
-extern void spltmsg();
-extern void srtcol();
-extern void stch2pxr(const fPOINT& stitchCoordinate);
-extern void strtchbox(std::vector<POINT>& stretchBoxLine);
-extern void tabmsg(unsigned code);
-extern void unbsho();
-extern void uncros();
-extern void undat();
-extern void unlin();
-extern void unmsg();
-extern void unsel();
-extern void unsid();
-extern void zumhom();
-
-extern unsigned                   ActiveColor;
-extern unsigned                   ActiveLayer;
-extern unsigned                   AppliqueColor;
-extern HCURSOR                    ArrowCursor;
-extern unsigned                   BitmapHeight;
-extern unsigned                   BitmapWidth;
-extern unsigned                   ButtonHeight;
-extern unsigned                   ButtonWidth;
-extern unsigned                   ButtonWidthX3;
-extern HWND                       CancelButton;
-extern unsigned                   Clip;
-extern fPOINTATTR                 ClipBuffer[MAXFRMLINS];
-extern HGLOBAL                    ClipMemory;
-extern void*                      ClipPointer;
-extern fRECTANGLE                 ClipRect;
-extern FLSIZ                      ClipRectSize;
-extern size_t                     ClipStitchCount;
-extern CLPSTCH*                   ClipStitchData;
-extern unsigned                   ClosestPointIndex;
-extern HCURSOR                    CrossCursor;
-extern HWND                       DeleteStitchesDialog;
-extern HWND                       DiscardButton;
-extern POINT                      EndPointCross;
-extern HMENU                      FillMenu;
-extern HWND                       FormDataSheet;
-extern unsigned                   FormMenuChoice;
-extern HPEN                       FormPen;
-extern HPEN                       FormPen3px;
-extern HPEN                       FormSelectedPen;
-extern unsigned                   GroupEndStitch;
-extern unsigned                   GroupStartStitch;
-extern unsigned                   GroupStitchIndex;
-extern INIFILE                    IniFile;
-extern POINT                      InsertLine[3];
-extern fPOINT                     InterleaveSequence[MAXITEMS];
-extern unsigned                   InterleaveSequenceIndex;
-extern INSREC                     InterleaveSequenceIndices[10];
-extern bool                       iseclp(size_t find);
-extern HPEN                       LayerPen[5];
-extern HMENU                      MainMenu;
-extern HWND                       MainStitchWin;
-extern double                     MinStitchLength;
-extern MSG                        Msg;
-extern wchar_t                    MsgBuffer[MSGSIZ];
-extern unsigned                   MsgIndex;
-extern RECT                       MsgRect;
-extern HWND                       MsgWindow;
-extern HPEN                       MultiFormPen;
-extern unsigned                   NearestCount;
-extern HWND                       OKButton;
-extern const wchar_t*             PcdClipFormat;
-extern PCSHEADER                  PCSHeader;
-extern unsigned                   PreferenceIndex;
-extern HWND                       PreferencesWindow;
-extern fRECTANGLE                 RotationRect;
-extern unsigned                   SearchLineIndex;
-extern HPEN                       SelectAllPen;
-extern FRMHED*                    SelectedForm;
-extern FORMVERTICES               SelectedFormVertices;
-extern fPOINT                     SelectedFormsSize;
-extern RECT                       SelectedPixelsRect;
-extern fPOINT                     SelectedPoint;
-extern fRECTANGLE                 SelectedVerticesRect;
-extern double                     ShowStitchThreshold;
-extern HWND                       SideMessageWindow;
-extern HWND                       SideWindow[11];
-extern wchar_t                    SideWindowEntryBuffer[11];
-extern double                     SmallStitchLength;
-extern EnumMap<StateFlag>         StateMap;
-extern double                     StitchBoxesThreshold;
-extern fPOINTATTR                 StitchBuffer[MAXITEMS * 2];
-extern fRECTANGLE                 StitchRangeRect;
-extern POINT                      StitchCoordinatesPixels;
-extern RECT                       StitchWindowClientRect;
-extern HDC                        StitchWindowDC;
-extern HDC                        StitchWindowMemDC;
-extern POINT                      StitchWindowOrigin;
-extern POINT                      StitchWindowSize;
-extern std::vector<std::wstring>* StringTable;
-extern size_t                     TextureIndex;
-extern std::vector<TXPNT>*        TexturePointsBuffer;
-extern HINSTANCE                  ThrEdInstance;
-extern HWND                       ThrEdWindow;
-extern POINT                      ThredWindowOrigin;
-extern POINT                      UnzoomedRect;
-extern EnumMap<UserFlag>          UserFlagMap;
-extern HPEN                       UserPen[16];
-extern double                     UserStitchLength;
-extern double                     ZoomFactor;
-extern dPOINT                     ZoomMarkPoint;
-extern dPOINT                     ZoomRatio;
-extern dRECTANGLE                 ZoomRect;
-
-unsigned             ActivePointIndex;                 // pointer to the active form in the sequencing algorithm
-double               AdjustedSpace;                    // adjusted space
-fRECTANGLE           AllItemsRect;                     // rectangle enclosing all forms and stitches
-FRMHED               AngledForm;                       // a temporary rotated form for angle fills
-fPOINT               AngledFormVertices[MAXFRMLINS];   // form formOrigin data for angle fills
-BSEQPNT              BSequence[BSEQLEN];               // reverse sequence for polygon fills
-unsigned             BeanCount;                        // number of stitches added by convert to bean
-fPOINT               BorderClipReference;              // reference for clipboard line border
-double               BorderWidth = BRDWID;             // border width for satin borders
-fRECTANGLE           BoundingRect;                     // isin rectangle
-float                ButtonholeCornerLength = IBFCLEN; // buttonhole corner length
-size_t               ClipIntersectSide;                // clipboard intersect side;
-size_t               ClipPointIndex;                   // next index to append main clipboard points
-fPOINT               ClipPoints[MAXITEMS];             // main clipboard fill points for forms
-fPOINT               ClipReference;                    // clipboard reference formOrigin
-float                ClipWidth;                        // horizontal spacing for vertical clipboard fill
-size_t               ClosestFormToCursor;              // closest form to the cursor
-size_t               ClosestVertexToCursor;            // formOrigin closest to the cursor
-fPOINT*              CurrentFillVertices;              // pointer to the line of the polygon being filled
-SATCON*              CurrentFormGuides;                // connections in the currently selecteed form
-size_t               CurrentFormGuidesCount;           // number of connections in the currently selected form
-fPOINT*              CurrentFormVertices;              // points in the currently selected form
-REGION*              CurrentRegion;                    // region currently being sequenced
-unsigned             CurrentSide;                      // active form formOrigin for line clipboard fill
-double               Div4;                             // chain space divided by four
-unsigned             DoneRegion;                       // last region sequenced
-double               EggRatio;                         // ratio for shrinking eggs
-std::vector<double>* FormAngles;                       // angles of a form for satin border fills
-std::vector<POINT>*  FormControlPoints;                // form control rectangle in pixel coordinates
-FRMHED*              FormForInsert;                    // insert form vertex in this form
-size_t               FormIndex = 0;                    // index into the list of forms
-FORMINFO             FormInfo;                         // form info used in drawing forms
-POINT                FormLines[MAXFRMLINS];            // used in the form drawing routines
-FRMHED               FormList[MAXFORMS];               // a list of form headers
-unsigned             FormMenuEntryCount;               // lines in the form-form
-fPOINT               FormMoveDelta;                    // offset for moving forms
-FLOAT                FormOffset;                       // form offset for clipboard fills
-std::wstring*        FormOnOff;
-unsigned             FormRelocationIndex;             // form relocator pointer
-size_t               FormVertexIndex;                 // next index to append form points
-size_t               FormVertexNext;                  // form vertex storage for form vertex insert
-size_t               FormVertexPrev;                  // form vertex storage for form vertex insert
-fPOINT               FormVertices[MAXITEMS];          // form points
-double               GapToClosestRegion;              // region close enough threshold for sequencing
-size_t               GroupIndexCount;                 // number of group indices
-double               HorizontalLength2;               // horizontal length of a clipboard fill/2
-double               HorizontalLength;                // horizontal length of a clipboard fill
-double               HorizontalRatio;                 // horizontal ratio between the zoom window and the entire stitch space
-unsigned             InOutFlag;                       // is intersection of line and cursor before, in or after the line
-std::vector<fPOINT>* InsidePointList;                 // list of inside outline points for satin or clipboard fills
-std::vector<fPOINT>* InsidePoints;                    // pointer to the list of inside outline points
-std::vector<HWND>*   LabelWindow;                     // text handles for the form data sheet
-RECT                 LabelWindowCoords;               // location of left windows in the form data sheet
-POINT                LabelWindowSize;                 // size of the left windows in the form data sheet
-unsigned             LastGroup;                       // group of the last line written in the previous region;
-fPOINT               LastPoint;                       // last formOrigin written by line connect routine
-double*              Lengths;                         // array of cumulative lengths used in satin fills
-unsigned             LineGroupIndex;                  // pointer for groups of fill line segments
-fPOINT               LineSegmentEnd;                  // vertical clipboard line segment end
-fPOINT               LineSegmentStart;                // vertical clipboard line segment start
-double               LineSpacing = DEFSPACE * PFGRAN; // stitch spacing in stitch units
-fPOINT               LowerLeftStitch;                 // lower left formOrigin in a form
-float                MaxStitchLen;                    // maximum stitch length
-MENUITEMINFO*        MenuInfo;
-size_t               NewFormVertexCount;           // points in the new form
-unsigned             NextGroup;                    // group that connects to the next region
-size_t               NextStart;                    // index of the endpoint of the line segment being processed
-fPOINT               OSequence[OSEQLEN];           // temporary storage for sequencing
-size_t               OutputIndex;                  // output pointer for sequencing
-std::vector<fPOINT>* OutsidePointList;             // list of outside outline points for satin or clipboard fills
-std::vector<fPOINT>* OutsidePoints;                // pointer to the list of outside outline points
-unsigned             PathIndex;                    // formOrigin to the next path element for vertical fill sequencing
-unsigned             PathMapIndex;                 // number of entries in the path map
-float                PicotSpacing = IPICSPAC;      // space between border picots
-unsigned             PreferenceWindowTextWidth;    // size of the text part of the preference window
-long                 PreferenceWindowWidth;        // width of the preference window
-size_t               PreviousFormIndex;            // previously selected form
-unsigned             PseudoRandomValue;            // pseudo-random sequence register
-unsigned             RegionCount;                  // number of regions to be sequenced
-RGSEQ*               RegionPath;                   // path to a region
-std::vector<POINT>*  RubberBandLine;               // points to form points to be moved
-unsigned             SatinBackupIndex;             // pointer for backup stitches in satin fills
-size_t               SatinEndGuide;                // satin end guide for the currently selected form
-size_t               SatinGuideIndex;              // next index to append satin connect points
-SATCON               SatinGuides[MAXSAC];          // satin form connects
-unsigned             SatinIndex;                   // pointer to next satin formOrigin to enter
-unsigned             SelectedFormControlVertex;    // user selected form control formOrigin
-std::vector<size_t>* SelectedFormList;             // a list of selected forms
-std::vector<POINT>*  SelectedFormsLine;            // line derived from the big rectangle
-RECT                 SelectedFormsRect;            // for multiple selections;
-std::vector<POINT>*  SelectedPointsLine;           // line derived from the formOrigin select rectangle
-size_t               SequenceIndex;                // sequencing pointer
-SMALPNTL*            SequenceLines;                // line for vertical/horizontal/angle fills
-unsigned             SequencePathIndex;            // index to path of sequenced regions
-double               Slope;                        // slope of line in angle fills
-double               SnapLength = SNPLEN * PFGRAN; // snap together length
-double               SpiralWrap = SPIRWRAP;        // number of revolutions in a spiral
-double               StarRatio  = STARAT;          // star formOrigin to body ratio
-size_t               StartPoint;                   // starting formOrigin for a satin stitch guide-line
-unsigned             StitchLineCount;              // count of stitch lines
-std::vector<fPOINT>* TempPolygon;                  // temporary storage when user is entering a polygon;
-HDC                  TimeDC;                       // progress bar device context
-double               TimePosition;                 // progress bar postiion
-double               TimeStep;                     // progress bar step
-HWND                 TimeWindow;                   // progress bar
-float                UserStitchLen;                // user stitch length
-std::vector<HWND>*   ValueWindow;                  // data handles for the form data sheet
-RECT                 ValueWindowCoords;            // location of right windows in the form data sheet
-POINT                ValueWindowSize;              // size of the right windows in the form data sheet
-size_t               VertexCount;                  // sides of the selected form to fill
-double               VerticalRatio;                // vertical ratio between the zoom window and the entire stitch space
-unsigned             VisitedIndex;                 // next unvisited region for sequencing
-fPOINT*              WorkingFormVertices;          // form points for angle fills
+double     AdjustedSpace;             // adjusted space
+unsigned   BeanCount;                 // number of stitches added by convert to bean
+fPOINT     BorderClipReference;       // reference for clipboard line border
+fRECTANGLE BoundingRect;              // isin rectangle
+size_t     ClipIntersectSide;         // clipboard intersect side;
+fPOINT     ClipReference;             // clipboard reference formOrigin
+float      ClipWidth;                 // horizontal spacing for vertical clipboard fill
+fPOINT*    CurrentFillVertices;       // pointer to the line of the polygon being filled
+size_t     CurrentFormGuidesCount;    // number of connections in the currently selected form
+REGION*    CurrentRegion;             // region currently being sequenced
+unsigned   CurrentSide;               // active form formOrigin for line clipboard fill
+double     Div4;                      // chain space divided by four
+unsigned   DoneRegion;                // last region sequenced
+double     EggRatio;                  // ratio for shrinking eggs
+FRMHED*    FormForInsert;             // insert form vertex in this form
+FORMINFO   FormInfo;                  // form info used in drawing forms
+unsigned   FormMenuEntryCount;        // lines in the form-form
+FLOAT      FormOffset;                // form offset for clipboard fills
+unsigned   FormRelocationIndex;       // form relocator pointer
+size_t     FormVertexNext;            // form vertex storage for form vertex insert
+size_t     FormVertexPrev;            // form vertex storage for form vertex insert
+double     GapToClosestRegion;        // region close enough threshold for sequencing
+size_t     GroupIndexCount;           // number of group indices
+double     HorizontalLength2;         // horizontal length of a clipboard fill/2
+double     HorizontalLength;          // horizontal length of a clipboard fill
+unsigned   InOutFlag;                 // is intersection of line and cursor before, in or after the line
+RECT       LabelWindowCoords;         // location of left windows in the form data sheet
+POINT      LabelWindowSize;           // size of the left windows in the form data sheet
+unsigned   LastGroup;                 // group of the last line written in the previous region;
+fPOINT     LastPoint;                 // last formOrigin written by line connect routine
+double*    Lengths;                   // array of cumulative lengths used in satin fills
+unsigned   LineGroupIndex;            // pointer for groups of fill line segments
+fPOINT     LineSegmentEnd;            // vertical clipboard line segment end
+fPOINT     LineSegmentStart;          // vertical clipboard line segment start
+float      MaxStitchLen;              // maximum stitch length
+unsigned   NextGroup;                 // group that connects to the next region
+size_t     NextStart;                 // index of the endpoint of the line segment being processed
+unsigned   PathIndex;                 // formOrigin to the next path element for vertical fill sequencing
+unsigned   PathMapIndex;              // number of entries in the path map
+unsigned   PreferenceWindowTextWidth; // size of the text part of the preference window
+unsigned   RegionCount;               // number of regions to be sequenced
+RGSEQ*     RegionPath;                // path to a region
+unsigned   SatinBackupIndex;          // pointer for backup stitches in satin fills
+unsigned   SatinIndex;                // pointer to next satin formOrigin to enter
+SMALPNTL*  SequenceLines;             // line for vertical/horizontal/angle fills
+unsigned   SequencePathIndex;         // index to path of sequenced regions
+double     Slope;                     // slope of line in angle fills
+size_t     StartPoint;                // starting formOrigin for a satin stitch guide-line
+unsigned   StitchLineCount;           // count of stitch lines
+HDC        TimeDC;                    // progress bar device context
+double     TimePosition;              // progress bar postiion
+double     TimeStep;                  // progress bar step
+HWND       TimeWindow;                // progress bar
+float      UserStitchLen;             // user stitch length
+RECT       ValueWindowCoords;         // location of right windows in the form data sheet
+POINT      ValueWindowSize;           // size of the right windows in the form data sheet
+unsigned   VisitedIndex;              // next unvisited region for sequencing
+fPOINT*    WorkingFormVertices;       // form points for angle fills
 
 unsigned short EdgeArray[]
     = { MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0 };
@@ -10681,21 +10469,26 @@ void selalfil() {
 }
 
 bool frmrng(size_t iForm, RANGE& range) noexcept {
-	range.start  = 0;
-	range.finish = PCSHeader.stitchCount;
-	if (FormList[iForm].fillType || FormList[iForm].edgeType) {
-		while (range.start < PCSHeader.stitchCount && notfstch(StitchBuffer[range.start].attribute))
-			range.start++;
-		range.finish = PCSHeader.stitchCount - 1;
-		while (range.finish > range.start && notfstch(StitchBuffer[range.finish].attribute))
-			range.finish--;
-		if (range.finish > range.start)
-			return 1;
+	if (PCSHeader.stitchCount) {
+		range.start  = 0;
+		range.finish = PCSHeader.stitchCount;
+		if (FormList[iForm].fillType || FormList[iForm].edgeType) {
+			while (range.start < PCSHeader.stitchCount && notfstch(StitchBuffer[range.start].attribute))
+				range.start++;
+			range.finish = PCSHeader.stitchCount - 1;
+			while (range.finish > range.start && notfstch(StitchBuffer[range.finish].attribute))
+				range.finish--;
+			if (range.finish > range.start)
+				return 1;
+			else
+				return 0;
+		}
 		else
 			return 0;
 	}
-	else
+	else {
 		return 0;
+	}
 }
 
 void bholbrd() {
@@ -11079,28 +10872,32 @@ void dufdat(std::vector<fPOINT>& tempClipPoints,
 	FRMHED& destination = destinationFormList[FormRelocationIndex];
 
 	destinationFormList[FormRelocationIndex++] = FormList[formIndex];
-	const auto res                             = std::copy(
-        destination.vertices, destination.vertices + destination.vertexCount, destinationFormVertices.begin() + FormVertexIndex);
+
+	const auto res = std::copy(
+	    destination.vertices, destination.vertices + destination.vertexCount, destinationFormVertices.begin() + FormVertexIndex);
 	destination.vertices = &FormVertices[FormVertexIndex];
 	FormVertexIndex += destination.vertexCount;
 	if (destination.satinGuideCount) {
-		const auto _                   = std::copy(destination.satinOrAngle.guide,
-                                 destination.satinOrAngle.guide + destination.satinGuideCount,
-                                 tempGuides.begin() + SatinGuideIndex);
+		const auto _ = std::copy(destination.satinOrAngle.guide,
+		                         destination.satinOrAngle.guide + destination.satinGuideCount,
+		                         tempGuides.begin() + SatinGuideIndex);
+
 		destination.satinOrAngle.guide = &SatinGuides[SatinGuideIndex];
 		SatinGuideIndex += destination.satinGuideCount;
 	}
 	if (iseclpx(formIndex)) {
-		const auto _               = std::copy(destination.borderClipData,
-                                 destination.borderClipData + destination.clipEntries,
-                                 tempClipPoints.begin() + ClipPointIndex);
+		const auto _ = std::copy(destination.borderClipData,
+		                         destination.borderClipData + destination.clipEntries,
+		                         tempClipPoints.begin() + ClipPointIndex);
+
 		destination.borderClipData = &ClipPoints[ClipPointIndex];
 		ClipPointIndex += destination.clipEntries;
 	}
 	if (isclpx(formIndex)) {
-		const auto _                     = std::copy(destination.angleOrClipData.clip,
-                                 destination.angleOrClipData.clip + destination.lengthOrCount.clipCount,
-                                 tempClipPoints.begin() + ClipPointIndex);
+		const auto _ = std::copy(destination.angleOrClipData.clip,
+		                         destination.angleOrClipData.clip + destination.lengthOrCount.clipCount,
+		                         tempClipPoints.begin() + ClipPointIndex);
+
 		destination.angleOrClipData.clip = &ClipPoints[ClipPointIndex];
 		ClipPointIndex += destination.lengthOrCount.clipCount;
 	}

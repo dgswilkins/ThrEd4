@@ -33,6 +33,12 @@
     <ClCompile Include="wrappers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="displayText.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EnumMap.h">
@@ -54,6 +60,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="wrappers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="displayText.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ThrEdTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="form.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hlp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

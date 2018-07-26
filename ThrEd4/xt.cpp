@@ -13,8 +13,10 @@
 
 // C RunTime Header Files
 #include <commdlg.h>
-#include <filesystem>
 #include <Shlwapi.h>
+
+// Standard Libraries
+#include <filesystem>
 
 // Open Source headers
 #include <CppCoreCheck\warnings.h>
@@ -24,166 +26,34 @@
 #include <fmt/format.h>
 #pragma warning(pop)
 
+// Local Headers
 #include "EnumMap.h"
 #include "utf8conv.h"
 #include "wrappers.h"
 
 #include "Resources/resource.h"
+#include "globals.h"
+#include "displayText.h"
+#include "form.h"
+#include "hlp.h"
 #include "thred.h"
 
 namespace fs = std::experimental::filesystem;
 
-extern unsigned                   ActiveColor;
-extern unsigned                   ActiveLayer;
-extern fPOINT                     AngledFormVertices[MAXFRMLINS];
-extern FRMHED                     AngledForm;
-extern LPWSTR*                    ArgList; // command line argument array
-extern fs::path*                  AuxName;
-extern HBRUSH                     BackgroundBrush;
-extern BSEQPNT                    BSequence[BSEQLEN];
-extern unsigned                   ButtonHeight;
-extern unsigned                   ButtonWidthX3;
-extern std::vector<HWND>*         ButtonWin;
-extern FORMCLIP*                  ClipFormHeader;
-extern HGLOBAL                    ClipMemory;
-extern fPOINT                     ClipPoints[MAXITEMS];
-extern fRECTANGLE                 ClipRect;
-extern FLSIZ                      ClipRectSize;
-extern size_t                     ClipStitchCount;
-extern fPOINTATTR                 ClipBuffer[MAXFRMLINS];
-extern size_t                     ClosestFormToCursor;
-extern unsigned                   ClosestPointIndex;
-extern size_t                     ClosestVertexToCursor;
-extern size_t                     ClipPointIndex;
-extern fPOINT*                    CurrentFormVertices;
-extern std::wstring*              DesignerName;
-extern size_t                     FormVertexIndex;
-extern fPOINT                     FormMoveDelta;
-extern size_t                     FormIndex;
-extern POINT                      FormLines[MAXFRMLINS];
-extern FRMHED                     FormList[MAXFORMS];
-extern fPOINT                     FormVertices[MAXITEMS];
-extern HPEN                       GridPen;
-extern HWND                       HorizontalScrollBar;
-extern INIFILE                    IniFile;
-extern std::vector<fPOINT>*       InsidePoints;
-extern double                     LineSpacing;
-extern HWND                       MainStitchWin;
-extern MSG                        Msg;
-extern wchar_t                    MsgBuffer[MSGSIZ];
-extern size_t                     NewFormVertexCount;
-extern size_t                     OutputIndex;
-extern std::vector<fPOINT>*       OutsidePoints;
-extern fPOINT                     OSequence[OSEQLEN];
-extern PCSHEADER                  PCSHeader;
-extern unsigned                   PseudoRandomValue;
-extern FRMHED*                    SelectedForm;
-extern size_t                     SatinGuideIndex;
-extern SATCON                     SatinGuides[MAXSAC];
-extern EnumMap<StateFlag>         StateMap;
-extern std::vector<size_t>*       SelectedFormList;
-extern fPOINT                     SelectedPoint;
-extern size_t                     SequenceIndex;
-extern std::vector<std::wstring>* StringTable;
-extern fPOINTATTR                 StitchBuffer[MAXITEMS * 2];
-extern RECT                       StitchWindowClientRect;
-extern HDC                        StitchWindowDC;
-extern HDC                        StitchWindowMemDC;
-extern POINT                      StitchWindowOrigin;
-extern unsigned                   ThrEdClip;
-extern const wchar_t*             ThrEdClipFormat;
-extern HINSTANCE                  ThrEdInstance;
-extern HWND                       ThrEdWindow;
-extern fs::path*                  ThrName;
-extern unsigned                   AppliqueColor;
-extern POINT                      UnzoomedRect;
-extern COLORREF                   UserColor[16];
-extern EnumMap<UserFlag>          UserFlagMap;
-extern double                     UserStitchLength;
-extern size_t                     VertexCount;
-extern HWND                       VerticalScrollBar;
-extern fs::path*                  WorkingFileName;
-extern POINT                      ZoomBoxLine[5];
-extern fPOINT                     ZoomBoxOrigin;
-extern dRECTANGLE                 ZoomRect;
-
-extern void             adbad(std::wstring& repairMessage, unsigned code, size_t count);
-extern SATCON*          adsatk(size_t count);
-extern void             angclpfn(const std::vector<RNGCNT>& textureSegments);
-extern void             bBox();
-extern void             butxt(unsigned iButton, const std::wstring& buttonText);
-extern void             centir();
-extern void             chkmen();
-extern void             chkseq(bool border);
-extern bool             cisin(float xCoordinate, float yCoordinate);
-extern size_t           closflt(float xCoordinate, float yCoordinate);
-extern void             coltab();
-extern void             datmsg(unsigned code);
-extern void             delclps(size_t iForm);
-extern void             delinf();
-extern void             delmclp(size_t iForm);
-extern void             delsac(size_t formIndex);
-extern void             dusqr();
-extern bool             filmsgs(unsigned code);
-extern void             frmclr(FRMHED* const destination);
-extern void             frmout(size_t formIndex);
-extern void             frmrct(fRECTANGLE& rectangle);
-extern void             fvars(size_t iForm);
-extern void             hsizmsg();
-extern bool             isclp(size_t iForm);
-extern bool             iseclp(size_t iForm);
-extern inline void      loadString(std::wstring& sDest, unsigned stringID);
-extern void             mdufrm();
-extern float            midl(float high, float low);
-extern void             movStch();
-extern void             msgflt(unsigned messageId, float value);
-extern void             numWnd();
-extern constexpr size_t nxt(size_t iVertex);
-extern constexpr size_t prv(size_t iVertex);
-extern unsigned         psg();
-extern unsigned         px2stch();
-extern void             pxCor2stch(const POINT& pnt);
-extern void             redraw(HWND window);
-extern void             refil();
-extern void             refilal();
-extern void             refilfn();
-extern void             rtrclpfn();
-extern void             satfil();
-extern void             satout(double satinWidth);
-extern void             savdo();
-extern void             save();
-extern void             setmfrm();
-extern void             shoMsg(const std::wstring& message);
-extern void             shoseln(unsigned code0, unsigned code1);
-extern void             stchrct(fRECTANGLE& rectangle);
-extern void             tabmsg(unsigned code);
-extern void             unbBox();
-extern void             unmsg();
-extern void             wrnmen();
-extern void             zumhom();
 
 unsigned short DaisyTypeStrings[] = {
 	IDS_DAZCRV, IDS_DAZSAW, IDS_DAZRMP, IDS_DAZRAG, IDS_DAZCOG, IDS_DAZHART,
 };
 
 fPOINT                 DesignSize;                    // design size
-std::vector<TXPNT>*    TexturePointsBuffer;           // buffer for textured fill points
-size_t                 TextureIndex;                  // next textured fill point index
 unsigned               TextureWindowId;               // id of the window being updated
-std::wstring*          TextureInputBuffer;            // texture fill number buffer
 HWND                   SideWindowButton;              // button side window
 RECT                   TexturePixelRect;              // screen selected texture points rectangle
 TXTRCT                 TextureRect;                   // selected texture points rectangle
 POINT                  SelectTexturePointsOrigin;     // original location of selected texture points
-std::vector<unsigned>* SelectedTexturePointsList;     // list of selected points
 POINT                  TextureCursorLocation;         // texture editor move cursor location
 HPEN                   TextureCrossPen;               // texture editor cross pen
-TXTSCR                 TextureScreen;                 // texture editor layout parameters
-std::vector<TXPNT>*    TempTexturePoints;             // temporary storage for textured fill data
 unsigned               ColorOrder[16];                // color order adjusted for applique
-fPOINT                 InterleaveSequence[MAXITEMS];  // storage for interleave points
-unsigned               InterleaveSequenceIndex;       // index into the interleave sequence
-INSREC                 InterleaveSequenceIndices[10]; // indices into interleave points
 
 enum
 {
@@ -3411,7 +3281,7 @@ void ritxfrm() {
 	PolylineInt(StitchWindowDC, FormLines, vertexCount);
 }
 
-void setxfrm() {
+void setxfrm() noexcept {
 	unsigned   iVertex   = 0;
 	fRECTANGLE angleRect = {};
 	float      height    = 0.0;

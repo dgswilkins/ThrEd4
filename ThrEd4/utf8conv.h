@@ -17,10 +17,23 @@
 
 #pragma once
 
-#include <crtdbg.h>  // For _ASSERTE()
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
 #include <Windows.h> // Win32 Platform SDK main header
 
+// C RunTime Header Files
+#include <crtdbg.h>  // For _ASSERTE()
+
+// Standard Libraries
 #include <string> // For std::string and std::wstring
+#include <codecvt>
 
 namespace utf {
 
