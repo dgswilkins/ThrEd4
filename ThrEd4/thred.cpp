@@ -42,6 +42,7 @@
 #include "displayText.h"
 #include "form.h"
 #include "hlp.h"
+#include "repair.h"
 #include "xt.h"
 
 namespace fs = std::experimental::filesystem;

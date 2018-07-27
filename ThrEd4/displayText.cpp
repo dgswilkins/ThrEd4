@@ -226,16 +226,6 @@ void shoseln(unsigned code0, unsigned code1) {
 	shoMsg(fmt::format(fmtStr, msg0, msg1));
 }
 
-void adbad(std::wstring& repairMessage, unsigned code, size_t count) {
-	std::wstring fmtStr;
-
-	loadString(fmtStr, code);
-	repairMessage += fmtStr;
-	loadString(fmtStr, IDS_NOTREP);
-	repairMessage += fmt::format(fmtStr, count);
-}
-
-
 bool clpmsgs(unsigned code) {
 	ispcdclp();
 	if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap.test(StateFlag::WASPCDCLP)) {

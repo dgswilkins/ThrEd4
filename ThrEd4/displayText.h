@@ -1,6 +1,5 @@
 #pragma once
 
-void        adbad(std::wstring& repairMessage, unsigned code, size_t count);
 void        alrotmsg();
 void        bfilmsg();
 void        butxt(unsigned iButton, const std::wstring& buttonText);

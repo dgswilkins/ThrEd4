@@ -39,6 +39,9 @@
     <ClCompile Include="globals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="repair.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EnumMap.h">
@@ -78,6 +81,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hlp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="repair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

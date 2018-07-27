@@ -23,6 +23,7 @@
     <ClCompile Include="form.cpp" />
     <ClCompile Include="globals.cpp" />
     <ClCompile Include="hlp.cpp" />
+    <ClCompile Include="repair.cpp" />
     <ClCompile Include="wrappers.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -39,6 +40,7 @@
     <ClInclude Include="ExtendedBitSet.h" />
     <ClInclude Include="form.h" />
     <ClInclude Include="globals.h" />
+    <ClInclude Include="repair.h" />
     <ClInclude Include="hlp.h" />
     <ClInclude Include="Resources\resource.h" />
     <ClInclude Include="stdafx.h" />
