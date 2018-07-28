@@ -1,5 +1,6 @@
 #pragma once
 
+// Open Source headers
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)

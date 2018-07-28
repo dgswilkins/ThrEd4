@@ -32,7 +32,13 @@ HCURSOR                    ArrowCursor;                    // arrow
 fs::path*                  AuxName;
 BSEQPNT                    BSequence[BSEQLEN];
 HBRUSH                     BackgroundBrush;                  // background color brush
+HDC                        BitmapDC;                         // bitmap device context
+RECT                       BitmapDstRect;                    // stitch window destination rectangle for zooomed view
 unsigned                   BitmapHeight;                     // bitmap height
+POINT                      BitmapPoint;                      // a point on the bitmap
+dPOINT                     BitmapSizeinStitches;             // bitmap end points in stitch points
+RECT                       BitmapSrcRect;                    // bitmap source rectangle for zoomed view
+dPOINT                     BmpStitchRatio;                   // bitmap to stitch hoop ratios
 unsigned                   BitmapWidth;                      // bitmap width
 double                     BorderWidth = BRDWID;             // border width for satin borders
 unsigned                   ButtonHeight;                     // button height
@@ -58,6 +64,7 @@ size_t                     ClosestVertexToCursor; // formOrigin closest to the c
 HCURSOR                    CrossCursor;           // cross
 SATCON*                    CurrentFormGuides;     // connections in the currently selecteed form
 fPOINT*                    CurrentFormVertices;   // points in the currently selected form
+HWND                       DefaultColorWin[16];   // default color windows
 HWND                       DeleteStitchesDialog;  // asking user if they want to delete the sitches associated with a form
 std::wstring*              DesignerName;          // designer name in clear
 HWND                       DiscardButton;         // discard button
@@ -114,6 +121,7 @@ fPOINT                     OSequence[OSEQLEN];                  // temporary sto
 size_t                     OutputIndex;                         // output pointer for sequencing
 std::vector<fPOINT>*       OutsidePointList;                    // list of outside outline points for satin or clipboard fills
 std::vector<fPOINT>*       OutsidePoints;                       // pointer to the list of outside outline points
+char                       PCSBMPFileName[16];                  // bitmap file name from pcs file
 PCSHEADER                  PCSHeader;                           // pcs file header
 const wchar_t*             PcdClipFormat   = L"PMust_Format";
 float                      PicotSpacing    = IPICSPAC;             // space between border picots
@@ -151,6 +159,7 @@ double                     SnapLength        = SNPLEN * PFGRAN;    // snap toget
 double                     SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
 double                     StarRatio         = STARAT;             // star formOrigin to body ratio
 EnumMap<StateFlag>         StateMap(0);                            // Flags indicating current run state
+dPOINT                     StitchBmpRatio;                         // stitch hoop to bitmap ratios
 double                     StitchBoxesThreshold = STCHBOX;         // threshold for drawing stitch boxes
 fPOINTATTR                 StitchBuffer[MAXITEMS * 2];             // main stitch buffer
 POINT                      StitchCoordinatesPixels;                // converted from stitch to pixel
@@ -167,14 +176,20 @@ size_t                     TextureIndex;                           // next textu
 std::wstring*              TextureInputBuffer;                     // texture fill number buffer
 std::vector<TXPNT>*        TexturePointsBuffer;                    // buffer for textured fill points
 TXTSCR                     TextureScreen;                          // texture editor layout parameters
+HWND                       ThreadSizeWin[16];                      // thread size windows
 unsigned                   ThrEdClip       = 0;                    // thred format
 const wchar_t*             ThrEdClipFormat = L"threditor";         //
 HINSTANCE                  ThrEdInstance;                          // main instance handle
 HWND                       ThrEdWindow;                            // main window handle
 fs::path*                  ThrName;                                //
 POINT                      ThredWindowOrigin;                      // offset origin of the main window
+unsigned*                  TraceBitmapData;                        // trace bitmap data
+HDC                        TraceDC;                                // trace device context
+boost::dynamic_bitset<>*   TracedEdges;                            // detected edges of trace areas
+boost::dynamic_bitset<>*   TracedMap;                              // in/out state of trace areas
 POINT                      UnzoomedRect;                           // size of the unzoomed stitch window
 COLORREF                   UserColor[16];                          // user colors
+HWND                       UserColorWin[16];                       // user color windows
 EnumMap<UserFlag>          UserFlagMap(0);                         // for storage of persistent binary variables set by the user
 HPEN                       UserPen[16];                            // user color pens
 double                     UserStitchLength = USESIZ * PFAFGRAN;   // user selected stitch size

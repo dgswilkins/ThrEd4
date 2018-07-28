@@ -1,9 +1,10 @@
 #pragma once
 
-void        alrotmsg();
-void        bfilmsg();
-void        butxt(unsigned iButton, const std::wstring& buttonText);
-bool        clpmsgs(unsigned code);
+void alrotmsg();
+void bfilmsg();
+void butxt(unsigned iButton, const std::wstring& buttonText);
+// bool        clpmsgs(unsigned code);
+void        clrhbut(unsigned startButton);
 void        crmsg(const fs::path& fileName);
 void        datmsg(unsigned code);
 bool        filmsgs(unsigned code);
@@ -11,7 +12,6 @@ void        filnopn(unsigned code, const fs::path& fileName);
 void        frm1pnt();
 void        grpmsg();
 void        grpmsg1();
-void        help();
 void        hsizmsg();
 inline void loadString(std::wstring& sDest, unsigned stringID);
 void        lodstr();

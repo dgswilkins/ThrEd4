@@ -24,6 +24,7 @@
     <ClCompile Include="globals.cpp" />
     <ClCompile Include="hlp.cpp" />
     <ClCompile Include="repair.cpp" />
+    <ClCompile Include="trace.cpp" />
     <ClCompile Include="wrappers.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -46,6 +47,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="thred.h" />
     <ClInclude Include="ThrEdTypes.h" />
+    <ClInclude Include="trace.h" />
     <ClInclude Include="utf8conv.h" />
     <ClInclude Include="wrappers.h" />
     <ClInclude Include="xt.h" />

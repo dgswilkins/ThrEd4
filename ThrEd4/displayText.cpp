@@ -197,6 +197,13 @@ void butxt(unsigned iButton, const std::wstring& buttonText) {
 		SetWindowText((*ButtonWin)[iButton], buttonText.c_str());
 }
 
+void clrhbut(unsigned startButton) {
+	unsigned iButton;
+
+	for (iButton = startButton; iButton < 9; iButton++)
+		SetWindowText((*ButtonWin)[iButton], L"");
+}
+
 void ritnum(unsigned code, size_t value) {
 	butxt(HNUM, fmt::format((*StringTable)[code], value));
 }

@@ -1,6 +1,9 @@
 #pragma once
 
+// Standard Libraries
 #include <string>
+
+// Local Headers
 #include "ThrEdTypes.h"
 
 //void     adbad(std::wstring& repairMessage, unsigned code, size_t count);

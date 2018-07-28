@@ -51,11 +51,9 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-//#include <gsl/gsl>
 #pragma warning(pop)
 
-
-
+// Local Headers
 #include "ThrEdTypes.h"
 #include "EnumMap.h"
 
@@ -73,7 +71,13 @@ extern HCURSOR                    ArrowCursor;
 extern fs::path*                  AuxName;
 extern BSEQPNT                    BSequence[BSEQLEN];
 extern HBRUSH                     BackgroundBrush;
+extern HDC                        BitmapDC;
+extern RECT                       BitmapDstRect;
 extern unsigned                   BitmapHeight;
+extern POINT                      BitmapPoint;
+extern dPOINT                     BitmapSizeinStitches;
+extern RECT                       BitmapSrcRect;
+extern dPOINT                     BmpStitchRatio;
 extern unsigned                   BitmapWidth;
 extern double                     BorderWidth;
 extern unsigned                   ButtonHeight;
@@ -99,6 +103,7 @@ extern size_t                     ClosestVertexToCursor;
 extern HCURSOR                    CrossCursor;
 extern SATCON*                    CurrentFormGuides;
 extern fPOINT*                    CurrentFormVertices;
+extern HWND                       DefaultColorWin[16];
 extern HWND                       DeleteStitchesDialog;
 extern std::wstring*              DesignerName;
 extern HWND                       DiscardButton;
@@ -155,6 +160,7 @@ extern fPOINT                     OSequence[OSEQLEN];
 extern size_t                     OutputIndex;
 extern std::vector<fPOINT>*       OutsidePointList;
 extern std::vector<fPOINT>*       OutsidePoints;
+extern char                       PCSBMPFileName[16];
 extern PCSHEADER                  PCSHeader;
 extern const wchar_t*             PcdClipFormat;
 extern float                      PicotSpacing;
@@ -192,6 +198,7 @@ extern double                     SnapLength;
 extern double                     SpiralWrap;
 extern double                     StarRatio;
 extern EnumMap<StateFlag>         StateMap;
+extern dPOINT                     StitchBmpRatio;
 extern double                     StitchBoxesThreshold;
 extern fPOINTATTR                 StitchBuffer[MAXITEMS * 2];
 extern POINT                      StitchCoordinatesPixels;
@@ -205,17 +212,23 @@ extern std::vector<std::wstring>* StringTable;
 extern std::vector<fPOINT>*       TempPolygon;
 extern std::vector<TXPNT>*        TempTexturePoints;
 extern size_t                     TextureIndex;
-extern std::wstring*              TextureInputBuffer; // texture editor number buffer
+extern std::wstring*              TextureInputBuffer;
 extern std::vector<TXPNT>*        TexturePointsBuffer;
 extern TXTSCR                     TextureScreen;
+extern HWND                       ThreadSizeWin[16];
 extern unsigned                   ThrEdClip;
 extern const wchar_t*             ThrEdClipFormat;
 extern HINSTANCE                  ThrEdInstance;
 extern HWND                       ThrEdWindow;
 extern fs::path*                  ThrName;
 extern POINT                      ThredWindowOrigin;
+extern unsigned*                  TraceBitmapData;
+extern HDC                        TraceDC;
+extern boost::dynamic_bitset<>*   TracedEdges;  
+extern boost::dynamic_bitset<>*   TracedMap;           
 extern POINT                      UnzoomedRect;
 extern COLORREF                   UserColor[16];
+extern HWND                       UserColorWin[16];
 extern EnumMap<UserFlag>          UserFlagMap;
 extern HPEN                       UserPen[16];
 extern double                     UserStitchLength;
