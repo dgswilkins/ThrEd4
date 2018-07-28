@@ -43,6 +43,7 @@
 #include "form.h"
 #include "hlp.h"
 #include "repair.h"
+#include "texture.h"
 #include "trace.h"
 #include "xt.h"
 
@@ -17447,10 +17448,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			else
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_BTNFACE));
 			if (StateMap.test(StateFlag::TXTRED)) {
-				std::wstring fmtStr;
-				loadString(fmtStr, IDS_TXWID);
-				std::wstring scrWidth(fmt::format(fmtStr, (TextureScreen.width / PFGRAN)));
-				TextOutInt(DrawItem->hDC, position, 1, scrWidth.c_str(), scrWidth.size());
+				writeScreenWidth(position);
 			}
 			else
 				TextOutInt(DrawItem->hDC, position, 1, (*StringTable)[STR_PIKOL].c_str(), (*StringTable)[STR_PIKOL].size());
@@ -17708,9 +17706,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		std::vector<std::unique_ptr<unsigned[]>> private_UndoBuffer(16);
 		UndoBuffer = &private_UndoBuffer;
 		std::vector<TXPNT> private_TempTexturePoints;
-		TempTexturePoints = &private_TempTexturePoints;
 		std::vector<unsigned> private_SelectedTexturePointsList;
-		SelectedTexturePointsList = &private_SelectedTexturePointsList;
+		initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
 		std::vector<std::wstring> private_StringTable(STR_LEN);
 		StringTable = &private_StringTable;
 		std::vector<HWND> private_ButtonWin;

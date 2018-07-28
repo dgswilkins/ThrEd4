@@ -28,6 +28,7 @@
 #include "globals.h"
 #include "displayText.h"
 #include "hlp.h"
+#include "texture.h"
 #include "thred.h"
 #include "xt.h"
 

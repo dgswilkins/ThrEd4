@@ -15,6 +15,7 @@
 #include "globals.h"
 #include "displayText.h"
 #include "form.h"
+#include "texture.h"
 #include "thred.h"
 #include "xt.h"
 

@@ -19,8 +19,9 @@ void blak();
 // static inline void difsub(const unsigned source, unsigned shift, unsigned& destination);
 // void               dublk(HDC dc, const RECT& traceHighMask, const RECT& traceLowMask, HBRUSH brush);
 // unsigned           ducolm();
-// void               durct(unsigned shift, const RECT& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT&
-// traceLowMask);  void               dutdif(TRCPNT& traceDiff, const TRCPNT* point);  void               dutrac();
+// void               durct(unsigned shift, const RECT& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);  
+// void               dutdif(TRCPNT& traceDiff, const TRCPNT* point);  
+// void               dutrac();
 void dutrnum0(unsigned color);
 void dutrnum1();
 void dutrnum2();

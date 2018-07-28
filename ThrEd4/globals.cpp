@@ -147,7 +147,6 @@ fPOINT                     SelectedFormsSize;                      // size of mu
 RECT                       SelectedPixelsRect;                     // display form vertex select rectangle
 fPOINT                     SelectedPoint;                          // for converting stitch coordinates to metric cordinates (mm)
 std::vector<POINT>*        SelectedPointsLine;                     // line derived from the formOrigin select rectangle
-std::vector<unsigned>*     SelectedTexturePointsList;              // list of selected points
 fRECTANGLE                 SelectedVerticesRect;                   // rectangle enclosing selected form verticess
 size_t                     SequenceIndex;                          // sequencing pointer
 double                     ShowStitchThreshold = SHOPNTS;          // show stitch grid below this zoom level
@@ -171,11 +170,9 @@ POINT                      StitchWindowOrigin;                     // offset ori
 POINT                      StitchWindowSize;                       // size of the stitch window in pixels
 std::vector<std::wstring>* StringTable;                            //
 std::vector<fPOINT>*       TempPolygon;                            // temporary storage when user is entering a polygon;
-std::vector<TXPNT>*        TempTexturePoints;                      // temporary storage for textured fill data
 size_t                     TextureIndex;                           // next textured fill point index
 std::wstring*              TextureInputBuffer;                     // texture fill number buffer
 std::vector<TXPNT>*        TexturePointsBuffer;                    // buffer for textured fill points
-TXTSCR                     TextureScreen;                          // texture editor layout parameters
 HWND                       ThreadSizeWin[16];                      // thread size windows
 unsigned                   ThrEdClip       = 0;                    // thred format
 const wchar_t*             ThrEdClipFormat = L"threditor";         //
