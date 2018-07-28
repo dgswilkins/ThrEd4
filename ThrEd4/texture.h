@@ -40,7 +40,7 @@ void   dutxtfil();
 //fPOINT ed2stch(const fPOINT& point);
 //void   ed2txp(const POINT& offset, TXPNT& textureRecord);
 //void   hlpflt(unsigned iButton, unsigned iMessage, float data);
-void   initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<unsigned>* ptrTexturePointsList);
+void   initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<unsigned>* ptrTexturePointsList) noexcept;
 //bool   inrct(const fRECTANGLE& rectangle, const fPOINTATTR& stitch);
 bool   istx(size_t iForm);
 //bool   istxclp();

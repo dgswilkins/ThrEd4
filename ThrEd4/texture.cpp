@@ -41,7 +41,7 @@ std::vector<TXPNT>*    TempTexturePoints;         // temporary storage for textu
 std::vector<unsigned>* SelectedTexturePointsList; // list of selected points
 TXTSCR                     TextureScreen;                          // texture editor layout parameters
 
-void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<unsigned>* ptrTexturePointsList) {
+void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<unsigned>* ptrTexturePointsList) noexcept {
 	TempTexturePoints         = ptrTexturePoints;
 	SelectedTexturePointsList = ptrTexturePointsList;
 }

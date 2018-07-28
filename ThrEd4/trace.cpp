@@ -18,69 +18,69 @@
 #include "form.h"
 #include "thred.h"
 
-unsigned                 PixelColors[3];        // separated pixel reference colors
-HBITMAP                  TraceBitmap;           // trace bitmap
-HWND                     TraceControlWindow[3]; // trace control windows
-HWND                     TraceDownWindow[3];    // trace down number windows
-HWND                     TraceSelectWindow[3];  // trace select windows
-HWND                     TraceUpWindow[3];      // trace up number windows
-POINT                    CurrentTracePoint;     // current point being traced
-unsigned                 TraceDataSize;         // size of the trace bitmap in double words
-unsigned*                TracedPixels;          // bitmap of selected trace pixels
-HWND                     TraceStepWin;          // trace stepSize window
-StateFlag                TraceRGBFlag[] = { StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU }; // trace bits
-unsigned                 TraceRGBMask[] = { REDMSK, GRNMSK, BLUMSK };                                  // trace masks
-unsigned                 TraceRGB[]     = { BLUCOL, GRNCOL, REDCOL };                                  // trace colors
-unsigned                 TraceAdjacentColors[9];      // separated colors for adjacent pixels
-wchar_t                  TraceInputBuffer[4];         // for user input color numbers
-COLORREF                 UpPixelColor;                // color of the up reference pixel
-COLORREF                 DownPixelColor;              // color of the down reference pixel
-COLORREF                 InvertUpColor;               // complement color of the up reference pixel
-COLORREF                 InvertDownColor;             // complement color of the down reference pixel
-POINT                    TraceMsgPoint;               // message point for trace parsing
-unsigned                 HighColors[3];               // separated upper reference colors
-unsigned                 LowColors[3];                // separated lower reference colors
-unsigned                 ColumnColor;                 // trace color column
-unsigned                 TraceShift[] = { 0, 8, 16 }; // trace shift values
-HBRUSH                   TraceBrush[3];               // red,green,and blue brushes
-HWND                     TraceNumberInput;            // trace number input window
-HPEN                     BlackPen;                    // black pen
+unsigned  PixelColors[3];        // separated pixel reference colors
+HBITMAP   TraceBitmap;           // trace bitmap
+HWND      TraceControlWindow[3]; // trace control windows
+HWND      TraceDownWindow[3];    // trace down number windows
+HWND      TraceSelectWindow[3];  // trace select windows
+HWND      TraceUpWindow[3];      // trace up number windows
+POINT     CurrentTracePoint;     // current point being traced
+unsigned  TraceDataSize;         // size of the trace bitmap in double words
+unsigned* TracedPixels;          // bitmap of selected trace pixels
+HWND      TraceStepWin;          // trace stepSize window
+StateFlag TraceRGBFlag[] = { StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU }; // trace bits
+unsigned  TraceRGBMask[] = { REDMSK, GRNMSK, BLUMSK };                                  // trace masks
+unsigned  TraceRGB[]     = { BLUCOL, GRNCOL, REDCOL };                                  // trace colors
+unsigned  TraceAdjacentColors[9];                                                       // separated colors for adjacent pixels
+wchar_t   TraceInputBuffer[4];                                                          // for user input color numbers
+COLORREF  UpPixelColor;                                                                 // color of the up reference pixel
+COLORREF  DownPixelColor;                                                               // color of the down reference pixel
+COLORREF  InvertUpColor;               // complement color of the up reference pixel
+COLORREF  InvertDownColor;             // complement color of the down reference pixel
+POINT     TraceMsgPoint;               // message point for trace parsing
+unsigned  HighColors[3];               // separated upper reference colors
+unsigned  LowColors[3];                // separated lower reference colors
+unsigned  ColumnColor;                 // trace color column
+unsigned  TraceShift[] = { 0, 8, 16 }; // trace shift values
+HBRUSH    TraceBrush[3];               // red,green,and blue brushes
+HWND      TraceNumberInput;            // trace number input window
+HPEN      BlackPen;                    // black pen
 
-void initColorRef(){
-	UpPixelColor = 0;
-	DownPixelColor = 0x7f7f7f;
-	InvertUpColor = 0xffffff;
+void initColorRef() noexcept {
+	UpPixelColor    = 0;
+	DownPixelColor  = 0x7f7f7f;
+	InvertUpColor   = 0xffffff;
 	InvertDownColor = 0x808080;
 }
 
 void trcsub(HWND* window, unsigned xCoordinate, unsigned yCoordinate, unsigned buttonHeight) noexcept {
 	if (window) {
 		*window = CreateWindow(L"STATIC",
-			L"",
-			SS_OWNERDRAW | WS_CHILD | WS_BORDER,
-			xCoordinate,
-			yCoordinate,
-			ButtonWidth,
-			buttonHeight,
-			ThrEdWindow,
-			NULL,
-			ThrEdInstance,
-			NULL);
+		                       L"",
+		                       SS_OWNERDRAW | WS_CHILD | WS_BORDER,
+		                       xCoordinate,
+		                       yCoordinate,
+		                       ButtonWidth,
+		                       buttonHeight,
+		                       ThrEdWindow,
+		                       NULL,
+		                       ThrEdInstance,
+		                       NULL);
 	}
 }
 
-void initTraceWindows() {
+void initTraceWindows() noexcept {
 	TraceStepWin = CreateWindow(L"STATIC",
-		L"",
-		SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER,
-		0,
-		ButtonHeight * 18,
-		ButtonWidthX3,
-		ButtonHeight,
-		ThrEdWindow,
-		NULL,
-		ThrEdInstance,
-		NULL);
+	                            L"",
+	                            SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER,
+	                            0,
+	                            ButtonHeight * 18,
+	                            ButtonWidthX3,
+	                            ButtonHeight,
+	                            ThrEdWindow,
+	                            NULL,
+	                            ThrEdInstance,
+	                            NULL);
 	for (auto iRGB = 0; iRGB < 3; iRGB++) {
 		trcsub(&TraceControlWindow[iRGB], ButtonWidth * iRGB, 0, ButtonHeight * 15);
 		trcsub(&TraceSelectWindow[iRGB], ButtonWidth * iRGB, ButtonHeight * 15, ButtonHeight);
@@ -931,7 +931,7 @@ void dutrnum0(unsigned color) {
 	trace();
 }
 
-void dutrnum2(){
+void dutrnum2() {
 	dutrnum0(std::stoi(TraceInputBuffer));
 }
 
@@ -1047,7 +1047,6 @@ void blak() {
 }
 
 void tracpar() {
-
 	unsigned position      = 0;
 	double   ratio         = 0.0;
 	COLORREF traceColor    = {};
@@ -1163,14 +1162,14 @@ void trcnum(unsigned shift, COLORREF color, unsigned iRGB) {
 	const unsigned NumeralWidth = txtWid(L"0");
 
 	size_t   bufferLength = 0;
-	unsigned xPosition = 0;
-	wchar_t  buffer[11] = { 0 };
+	unsigned xPosition    = 0;
+	wchar_t  buffer[11]   = { 0 };
 
 	color >>= shift;
 	color &= 0xff;
 	_itow_s(color, buffer, 10);
 	bufferLength = wcslen(buffer);
-	xPosition = gsl::narrow<unsigned int>(NumeralWidth * (3 - bufferLength) + 1);
+	xPosition    = gsl::narrow<unsigned int>(NumeralWidth * (3 - bufferLength) + 1);
 	SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 	TextOutInt(DrawItem->hDC, xPosition, 1, buffer, wcslen(buffer));
 }
@@ -1184,44 +1183,44 @@ void dwnum(unsigned iRGB) {
 }
 
 void durct(unsigned shift, const RECT& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask) {
-	const unsigned lowerColor = (UpPixelColor >> shift) & 0xff;
-	const unsigned upperColor = (DownPixelColor >> shift) & 0xff;
+	const unsigned lowerColor    = (UpPixelColor >> shift) & 0xff;
+	const unsigned upperColor    = (DownPixelColor >> shift) & 0xff;
 	const unsigned controlHeight = traceControlRect.bottom - traceControlRect.top;
-	double         ratio = 0.0;
+	double         ratio         = 0.0;
 
 	traceHighMask.left = traceLowMask.left = traceMiddleMask.left = traceControlRect.left;
 	traceHighMask.right = traceLowMask.right = traceMiddleMask.right = traceControlRect.right;
 
-	ratio = static_cast<double>(lowerColor) / 255;
-	traceMiddleMask.top = controlHeight * ratio + traceControlRect.top;
-	ratio = static_cast<double>(upperColor) / 255;
+	ratio                  = static_cast<double>(lowerColor) / 255;
+	traceMiddleMask.top    = controlHeight * ratio + traceControlRect.top;
+	ratio                  = static_cast<double>(upperColor) / 255;
 	traceMiddleMask.bottom = controlHeight * ratio + traceControlRect.top;
 	StateMap.reset(StateFlag::DUHI);
 	StateMap.reset(StateFlag::DULO);
 	if (lowerColor) {
 		StateMap.set(StateFlag::DULO);
 		traceLowMask.bottom = traceMiddleMask.top;
-		traceLowMask.top = 0;
+		traceLowMask.top    = 0;
 	}
 	if (upperColor != 255) {
 		StateMap.set(StateFlag::DUHI);
-		traceHighMask.top = traceMiddleMask.bottom;
+		traceHighMask.top    = traceMiddleMask.bottom;
 		traceHighMask.bottom = traceControlRect.bottom;
 	}
 }
 
-void dublk(HDC dc, const RECT& traceHighMask, const RECT& traceLowMask, HBRUSH   brush) {
+void dublk(HDC dc, const RECT& traceHighMask, const RECT& traceLowMask, HBRUSH brush) {
 	if (StateMap.test(StateFlag::DUHI))
 		FillRect(dc, &traceHighMask, brush);
 	if (StateMap.test(StateFlag::DULO))
 		FillRect(dc, &traceLowMask, brush);
 }
 
-void wasTrace () {
-	RECT     traceHighMaskRect = {}; // high trace mask rectangle
-	RECT     traceMiddleMaskRect = {}; // middle trace mask rectangle
-	RECT     traceLowMaskRect = {}; // low trace mask rectangle
-	HBRUSH   BlackBrush = CreateSolidBrush(0);                  // black brush
+void wasTrace() {
+	RECT   traceHighMaskRect   = {};                  // high trace mask rectangle
+	RECT   traceMiddleMaskRect = {};                  // middle trace mask rectangle
+	RECT   traceLowMaskRect    = {};                  // low trace mask rectangle
+	HBRUSH BlackBrush          = CreateSolidBrush(0); // black brush
 
 	for (auto iRGB = 0; iRGB < 3; iRGB++) {
 		if (DrawItem->hwndItem == TraceUpWindow[iRGB]) {
@@ -1240,8 +1239,8 @@ void wasTrace () {
 			break;
 		}
 		if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
-			auto TempBrush = BlackBrush;
-			wchar_t  buffer[10] = { 0 }; // for integer to string conversion
+			auto    TempBrush  = BlackBrush;
+			wchar_t buffer[10] = { 0 }; // for integer to string conversion
 			wcscpy_s(buffer, (*StringTable)[STR_OFF].c_str());
 			SetBkColor(DrawItem->hDC, 0);
 			SetTextColor(DrawItem->hDC, TraceRGB[iRGB]);
@@ -1275,8 +1274,8 @@ void wasTrace1() {
 
 void traceNumberInput(unsigned NumericCode) {
 	TraceInputBuffer[MsgIndex++] = NumericCode;
-	TraceInputBuffer[MsgIndex] = 0;
-	auto traceColor = std::stoi(TraceInputBuffer);
+	TraceInputBuffer[MsgIndex]   = 0;
+	auto traceColor              = std::stoi(TraceInputBuffer);
 	switch (MsgIndex) {
 	case 2:
 		if (traceColor > 25)
@@ -1291,7 +1290,7 @@ void traceNumberInput(unsigned NumericCode) {
 	redraw(TraceNumberInput);
 }
 
-void traceNumberReset () {
+void traceNumberReset() {
 	TraceInputBuffer[MsgIndex] = 0;
 	redraw(TraceNumberInput);
 }
