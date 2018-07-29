@@ -1,6 +1,25 @@
 #include "stdafx.h"
 
-#include "wrappers.h"
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <Windows.h> // Win32 Platform SDK main header
+
+// Open Source headers
+#include <CppCoreCheck\warnings.h>
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include <gsl/gsl>
+#pragma warning(pop)
+
+// Local Headers
+#include "switches.h"
 
 void PolylineInt(HDC hdc, CONST POINT* apt, size_t cpt) {
 	Polyline(hdc, apt, gsl::narrow<int>(cpt));

@@ -46,6 +46,7 @@
     <ClInclude Include="hlp.h" />
     <ClInclude Include="Resources\resource.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="switches.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="thred.h" />
     <ClInclude Include="ThrEdTypes.h" />

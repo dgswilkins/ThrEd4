@@ -51,6 +51,7 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include <boost/dynamic_bitset.hpp>
 #pragma warning(pop)
 
 // Local Headers

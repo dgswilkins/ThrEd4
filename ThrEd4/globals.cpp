@@ -14,7 +14,15 @@
 // Standard Libraries
 #include <filesystem>
 
+// Open Source headers
+#include <CppCoreCheck\warnings.h>
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include <boost/dynamic_bitset.hpp>
+#pragma warning(pop)
+
 // Local Headers
+#include "switches.h"
 #include "ThrEdTypes.h"
 #include "EnumMap.h"
 

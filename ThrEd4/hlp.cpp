@@ -18,9 +18,12 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#pragma warning(disable : 4127) // supress warning for fmt library header
 #include <fmt/format.h>
 #pragma warning(pop)
 
+// Local Headers
+#include "switches.h"
 #include "Resources/resource.h"
 #include "globals.h"
 #include "displayText.h"

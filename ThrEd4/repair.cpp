@@ -11,13 +11,26 @@
 // Windows Header Files:
 //#include <Windows.h> // Win32 Platform SDK main header
 
+// Standard Libraries
+//#include <string>
+
+// Open Source headers
+#include <CppCoreCheck\warnings.h>
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#pragma warning(disable : 4127) // supress warning for fmt library header
+#include <fmt/format.h>
+#pragma warning(pop)
+
+// Local Headers
+#include "switches.h"
 #include "Resources/resource.h"
 #include "globals.h"
 #include "displayText.h"
 #include "form.h"
 #include "texture.h"
 #include "thred.h"
-#include "xt.h"
+//#include "xt.h"
 
 void adbad(std::wstring& repairMessage, unsigned code, size_t count) {
 	std::wstring fmtStr;

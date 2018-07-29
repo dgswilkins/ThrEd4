@@ -23,10 +23,12 @@
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include <boost/dynamic_bitset.hpp>
+#pragma warning(disable : 4127) // supress warning for fmt library header 
 #include <fmt/format.h>
 #pragma warning(pop)
 
 // Local Headers
+#include "switches.h"
 #include "EnumMap.h"
 #include "utf8conv.h"
 #include "wrappers.h"
