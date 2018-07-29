@@ -46,7 +46,7 @@ void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<unsigned>* p
 	SelectedTexturePointsList = ptrTexturePointsList;
 }
 
-bool txnam(wchar_t* name, int sizeName) noexcept {
+bool txnam(wchar_t* name, int sizeName) {
 	fs::path texturePath(ArgList[0]);
 
 	texturePath.replace_filename(L"thred.txr");

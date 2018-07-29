@@ -8182,19 +8182,17 @@ void insflin(POINT insertPoint) noexcept {
 	FormLines[2].y = FormLines[3].y = insertPoint.y + offset.y;
 }
 
-bool isthr(const wchar_t* const filename) noexcept {
-	wchar_t* lastCharacter;
+bool isthr(const wchar_t* const filename) {
+	fs::path thredPath(filename);
 
-	lastCharacter = StrRChrW(filename, 0, L'.');
-	if (lastCharacter) {
-		lastCharacter++;
-		if (!_wcsnicmp(lastCharacter, L"th", 2))
-			return 1;
-		else
-			return 0;
+	auto extention = thredPath.extension().wstring();
+
+	if ((extention.compare(0, 3, L".th")) == 0) {
+		return true;
 	}
-	else
-		return 1;
+	else {
+		return false;
+	}
 }
 
 unsigned gethand(const fPOINTATTR* stitch, unsigned stitchCount) noexcept {
@@ -9603,16 +9601,10 @@ int strcomp(const void* arg1, const void* arg2) noexcept {
 }
 
 void barnam(HWND window, unsigned iThumbnail) {
-	wchar_t  buffer[_MAX_PATH] = { 0 };
-	wchar_t* lastCharacter     = nullptr;
-
 	if (iThumbnail < ThumbnailDisplayCount) {
-		wcscpy_s(buffer, (*Thumbnails)[ThumbnailsSelected[iThumbnail]].data());
-		lastCharacter = StrRChrW(buffer, 0, L'.');
-		if (lastCharacter)
-			lastCharacter[0] = 0;
-		buffer[12] = 0;
-		SetWindowText(window, buffer);
+		fs::path thumbPath((*Thumbnails)[ThumbnailsSelected[iThumbnail]].data());
+		auto     name = thumbPath.stem().wstring().substr(0, 12);
+		SetWindowText(window, name.c_str());
 	}
 	else
 		SetWindowText(window, L"");
@@ -15990,38 +15982,24 @@ void makCol() noexcept {
 }
 
 void ritloc() {
-	wchar_t* environment             = nullptr;
-	wchar_t  lockFileName[_MAX_PATH] = { 0 };
-	HANDLE   lockFile                = {};
-	DWORD    bytesWritten            = 0;
-	size_t   length                  = 0;
-	errno_t  error                   = 0;
+	fs::path   lockFilePath;
+	PWSTR      ppszPath = nullptr; // variable to receive the path memory block pointer.
+	const auto hr       = SHGetKnownFolderPath(FOLDERID_LocalAppDataLow, 0, NULL, &ppszPath);
 
-	error = _wdupenv_s(&environment, &length, L"COMSPEC");
-
-	// We have to use free here because of _dupenv_s, so suppress the warning
-	[[gsl::suppress(26408)]] {
-		if (error) {
-			if (environment) {
-				free(environment);
-			}
-			return;
-		}
-		else {
-			if (environment) {
-				wcscpy_s(lockFileName, environment);
-				free(environment);
-			}
+	if (SUCCEEDED(hr)) {
+		lockFilePath.assign(ppszPath); // make a local copy of the path
+		lockFilePath /= L"ThrEd";
+		fs::create_directory(lockFilePath);
+		lockFilePath /= L"thredloc.txt";
+		auto lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+		if (lockFile != INVALID_HANDLE_VALUE) {
+			DWORD bytesWritten = 0;
+			auto  value        = utf::Utf16ToUtf8(*HomeDirectory);
+			WriteFileInt(lockFile, value.data(), value.size() + 1, &bytesWritten, 0);
+			CloseHandle(lockFile);
 		}
 	}
-	environment = StrRChrW(lockFileName, 0, L'\\') + 1;
-	wcscpy_s(environment, sizeof(lockFileName) / sizeof(lockFileName[0]) - (environment - lockFileName), L"thredloc.txt");
-	lockFile = CreateFile(lockFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
-	if (lockFile != INVALID_HANDLE_VALUE) {
-		auto value = utf::Utf16ToUtf8(*HomeDirectory);
-		WriteFileInt(lockFile, value.data(), value.size() + 1, &bytesWritten, 0);
-		CloseHandle(lockFile);
-	}
+	CoTaskMemFree(ppszPath); // free up the path memory block
 }
 
 void crtcurs() noexcept {
@@ -17705,7 +17683,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		Thumbnails = &private_Thumbnails;
 		std::vector<std::unique_ptr<unsigned[]>> private_UndoBuffer(16);
 		UndoBuffer = &private_UndoBuffer;
-		std::vector<TXPNT> private_TempTexturePoints;
+		std::vector<TXPNT>    private_TempTexturePoints;
 		std::vector<unsigned> private_SelectedTexturePointsList;
 		initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
 		std::vector<std::wstring> private_StringTable(STR_LEN);
