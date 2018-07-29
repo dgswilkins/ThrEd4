@@ -47,17 +47,15 @@ void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<unsigned>* p
 }
 
 bool txnam(wchar_t* name, int sizeName) noexcept {
-	wchar_t* lastCharacter;
+	fs::path texturePath(ArgList[0]);
 
-	wcscpy_s(name, sizeName, ArgList[0]);
-	lastCharacter = StrRChrW(name, 0, L'\\');
-	if (lastCharacter) {
-		lastCharacter++;
-		wcscpy_s(lastCharacter, sizeName - (lastCharacter - name), L"thred.txr");
-		return 1;
+	texturePath.replace_filename(L"thred.txr");
+	if (wcscpy_s(name, sizeName, texturePath.c_str())) {
+		return false;
 	}
-	else
-		return 0;
+	else {
+		return true;
+	}
 }
 
 void txdun() {
