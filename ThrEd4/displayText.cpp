@@ -329,3 +329,98 @@ void datmsg(unsigned code) {
 	loadString(dataError, dataErrorID);
 	shoMsg(dataError);
 }
+
+void okcan() {
+	GetClientRect(MsgWindow, &MsgRect);
+
+	OKButton = CreateWindow(L"STATIC",
+		(*StringTable)[STR_OKENT].c_str(),
+		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+		5,
+		MsgRect.bottom + 15,
+		ButtonWidth << 2,
+		ButtonHeight,
+		MainStitchWin,
+		NULL,
+		ThrEdInstance,
+		NULL);
+
+	CancelButton = CreateWindow(L"STATIC",
+		(*StringTable)[STR_CANCEL].c_str(),
+		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+		ButtonWidth * 5,
+		MsgRect.bottom + 15,
+		ButtonWidthX3,
+		ButtonHeight,
+		MainStitchWin,
+		NULL,
+		ThrEdInstance,
+		NULL);
+}
+
+void savdisc() {
+	wchar_t buffer[HBUFSIZ];
+
+	sdmsg();
+	StateMap.reset(StateFlag::BIGBOX);
+
+	GetClientRect(MsgWindow, &MsgRect);
+
+	LoadString(ThrEdInstance, IDS_SAV, buffer, HBUFSIZ);
+	OKButton = CreateWindow(L"STATIC",
+		buffer,
+		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+		5,
+		MsgRect.bottom + 15,
+		ButtonWidthX3,
+		ButtonHeight,
+		MainStitchWin,
+		NULL,
+		ThrEdInstance,
+		NULL);
+
+	LoadString(ThrEdInstance, IDS_DISC, buffer, HBUFSIZ);
+	DiscardButton = CreateWindow(L"STATIC",
+		buffer,
+		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+		ButtonWidthX3 + 15,
+		MsgRect.bottom + 15,
+		ButtonWidthX3,
+		ButtonHeight,
+		MainStitchWin,
+		NULL,
+		ThrEdInstance,
+		NULL);
+
+	CancelButton = CreateWindow(L"STATIC",
+		(*StringTable)[STR_CANCEL].c_str(),
+		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+		2 * ButtonWidthX3 + 25,
+		MsgRect.bottom + 15,
+		ButtonWidthX3,
+		ButtonHeight,
+		MainStitchWin,
+		NULL,
+		ThrEdInstance,
+		NULL);
+}
+
+void tomsg() {
+	RECT OKrect;
+	SIZE textSize;
+
+	GetWindowRect(OKButton, &OKrect);
+	GetTextExtentPoint32Int(StitchWindowMemDC, (*StringTable)[STR_DELST2].c_str(), (*StringTable)[STR_DELST2].size(), &textSize);
+	DeleteStitchesDialog = CreateWindow(L"STATIC",
+		(*StringTable)[STR_DELST2].c_str(),
+		SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
+		3,
+		OKrect.bottom - StitchWindowOrigin.y + 6 + textSize.cy,
+		textSize.cx + 6,
+		textSize.cy + 6,
+		MainStitchWin,
+		NULL,
+		ThrEdInstance,
+		NULL);
+}
+

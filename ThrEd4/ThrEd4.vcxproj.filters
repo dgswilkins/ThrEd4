@@ -48,6 +48,9 @@
     <ClCompile Include="texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="formForms.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EnumMap.h">
@@ -99,6 +102,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="switches.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="formForms.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

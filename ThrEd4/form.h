@@ -52,8 +52,6 @@ void centir();
 void chain();
 void chan();
 
-//BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam);
-
 //bool               chk2of();
 //bool               chkbak(const std::vector<dPOINT>& satinBackup, const dPOINT& pnt);
 //void               chkbrd(unsigned& interleaveSequenceIndex2);
@@ -212,7 +210,6 @@ void     frmadj(size_t formIndex);
 void     frmclr(FRMHED* const destination) noexcept;
 //void     frmlin(const fPOINT* const vertices, size_t vertexCount);
 //void     frmlin(const std::vector<fPOINT>& vertices);
-void     frmnum();
 void     frmnumfn(unsigned newFormIndex);
 void     frmon();
 void     frmout(size_t formIndex);
@@ -242,19 +239,18 @@ void     fvars(size_t iForm);
 //bool     fxpnt(const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs, dPOINT& moveToCoords);
 //void     getbig();
 
-//constexpr float getblen();
+constexpr float getblen();
 
 //void   getfinfo(size_t iForm);
 //size_t getlast();
 //float  getlen(std::vector<CLIPNT>& clipStitchPoints, const std::vector<double>& lengths, unsigned iPoint);
 
-//constexpr float getplen();
+constexpr float getplen();
 
 void            horclp();
 //void            horclpfn(const std::vector<RNGCNT>& textureSegments);
 void            horsclp();
 void            infrm();
-//inline void     initTearDlg(HWND hwndlg);
 void            insat();
 //unsigned        insect(std::vector<CLIPSORT>&    clipIntersectData,
 //                       const std::vector<VCLPX>& regionCrossingData,
@@ -297,8 +293,6 @@ void            join();
 //                       unsigned               line1);
 //void            makpoli();
 void            makspac(unsigned start, unsigned count);
-void            maxtsiz(const std::wstring& label, POINT& textSize);
-void            maxwid(unsigned start, unsigned finish);
 void            mdufrm();
 constexpr float midl(float high, float low);
 void            movlayr(unsigned codedLayer);
@@ -325,13 +319,11 @@ void             nufsel();
 void             nufthcol(unsigned color);
 void             nulapcol(unsigned color);
 //fPOINT*          numclp();
-//HWND             numwin(const std::wstring& winName, const RECT& location);
 //bool             nupnt(double clipAngle, dPOINT& moveToCoords);
 //SATCON*          nusac(size_t formIndex, unsigned guideCount);
 //void             nutim(double size);
 constexpr size_t nxt(size_t iVertex);
 //void             nxtim();
-//void             nxtlin();
 //void             nxtrgn(std::vector<RGSEQ>&           tempPath,
 //                        const std::vector<RCON>&      pathMap,
 //                        const std::vector<unsigned>&  mapIndexSequence,
@@ -343,7 +335,6 @@ constexpr size_t nxt(size_t iVertex);
 //                        const std::vector<unsigned>& mapIndexSequence,
 //                        unsigned                     pathIndex);
 void             oclp(const fPOINT* const clip, size_t clipEntries);
-void             okcan();
 //void             outfn(unsigned start, unsigned finish, double satinWidth);
 //double           p2p(const fPOINT& point0, const fPOINT& point1);
 //void             pbrd(double edgeSpacing);
@@ -362,11 +353,6 @@ void             picot();
 //                      const std::vector<VRCT2>& fillVerticalRect,
 //                      const std::vector<VRCT2>& prct);
 //void             prebrd();
-//void             prflin(const std::wstring& msg, unsigned row);
-void             prfmsg();
-//HWND             prfnwin(const std::wstring& text);
-void             prfsid(HWND wnd);
-//void             prftwin(const std::wstring& text);
 //bool             proj(const dPOINT& point, double slope, const fPOINT& point0, const fPOINT& point1, dPOINT& intersectionPoint);
 //bool             projh(double yCoordinate, const fPOINT& point0, const fPOINT& point1, dPOINT& intersection);
 //bool             projv(double xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, dPOINT& intersection);
@@ -384,8 +370,6 @@ void             redup();
 void             refil();
 void             refilal();
 void             refilfn();
-void             refrm();
-//void             refrmfn();
 //bool             regclos(std::vector<unsigned>&        groupIndexSequence,
 //                         std::vector<SMALPNTL>&        lineEndpoints,
 //                         const std::vector<SMALPNTL*>& sortedLines,
@@ -439,7 +423,6 @@ void            satsel();
 //bool            satselfn();
 void            satzum();
 void            savblen(float fLength);
-void            savdisc();
 void            savplen(float length);
 //void            sbfn(const std::vector<fPOINT>& insidePoints, size_t start, size_t finish);
 //void            sbold();
@@ -451,7 +434,6 @@ void            selalfil();
 void            selfil(unsigned type);
 void            selsqr(const POINT& controlPoint, HDC dc);
 void            setap();
-//void            setear();
 //void            seteg();
 void            setexpand(double xyRatio);
 void            setfpnt();
@@ -475,7 +457,6 @@ void            sfCor2px(const fPOINT& stitchPoint, POINT& screen);
 //constexpr float shreg(float highValue, float reference);
 void            shrnk();
 //void            shrnks();
-void            sidwnd(HWND wnd);
 //void            slbrd();
 void            snap();
 //void            snp(unsigned start, unsigned finish);
@@ -498,16 +479,12 @@ void srtfrm();
 void stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect);
 void stchs2frm();
 
-//bool CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
 void               tglfrm();
-void               tomsg();
 //void               trfrm(const dPOINT& bottomLeftPoint,
 //                         const dPOINT& topLeftPoint,
 //                         const dPOINT& bottomRightPoint,
 //                         const dPOINT& topRightPoint);
-//HWND               txtrwin(const std::wstring& winName, const RECT& location);
-//HWND               txtwin(const std::wstring& windowName, const RECT& location);
 //void               unbean(unsigned start, unsigned finish);
 //void               uncon();
 void               unfil();
@@ -520,11 +497,6 @@ void               unpsel();
 void               vrtclp();
 void               vrtsclp();
 //bool               vscmp(unsigned index1, unsigned index2);
-//void               wavfrm();
-//inline void        wavinit(HWND hwndlg);
-
-//bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
-
 //void xclpfn(const std::vector<fPOINT>& tempClipPoints,
 //            const std::vector<fPOINT>& chainEndPoints,
 //            unsigned                   start,

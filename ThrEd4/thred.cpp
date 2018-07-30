@@ -43,6 +43,7 @@
 #include "globals.h"
 #include "displayText.h"
 #include "form.h"
+#include "formForms.h"
 #include "hlp.h"
 #include "repair.h"
 #include "texture.h"

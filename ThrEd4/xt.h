@@ -35,7 +35,6 @@ void     chgchk(int code);
 void     chgwrn();
 //bool     chkasp(fPOINT& point, float aspectRatio, HWND dialog);
 void     chkcwlk(unsigned& interleaveSequenceIndex2);
-//void     chkdaz();
 //void     chkend(unsigned offset, unsigned code, INTINF& ilData);
 //bool     chkp2cnam(const wchar_t* fileName);
 //bool     chkrdun(const std::vector<unsigned>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord);
@@ -43,11 +42,6 @@ void     chkund(const std::vector<RNGCNT>& textureSegments, unsigned& interleave
 //void     chkuseq(const unsigned interleaveSequenceIndex2);
 void     chkwlk(unsigned& interleaveSequenceIndex2);
 void     clrstch();
-void     dasyfrm();
-
-//BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
-
-void dazdef();
 //void delwlk(size_t code);
 
 #ifdef _DEBUG
@@ -120,7 +114,6 @@ void     fthrfn(unsigned& interleaveSequenceIndex2);
 //void     fwidfn(size_t find, float length);
 //float    getstxt(unsigned stringIndex, HWND dialog);
 //unsigned gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, unsigned code);
-//void     initdaz(HWND hWinDialog);
 
 std::vector<fPOINT>& insid();
 

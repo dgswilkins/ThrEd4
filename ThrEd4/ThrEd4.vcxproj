@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="displayText.cpp" />
     <ClCompile Include="form.cpp" />
+    <ClCompile Include="formForms.cpp" />
     <ClCompile Include="globals.cpp" />
     <ClCompile Include="hlp.cpp" />
     <ClCompile Include="repair.cpp" />
@@ -41,6 +42,7 @@
     <ClInclude Include="EnumMap.h" />
     <ClInclude Include="ExtendedBitSet.h" />
     <ClInclude Include="form.h" />
+    <ClInclude Include="formForms.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="repair.h" />
     <ClInclude Include="hlp.h" />
