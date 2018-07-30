@@ -58,21 +58,17 @@ void chan();
 void               chkcont();
 //bool               chkdel();
 unsigned           chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
-//bool               chkmax(size_t arg0, size_t arg1);
+bool               chkmax(size_t arg0, size_t arg1);
 void               chkseq(bool border);
 //void               chksid(size_t vertexIndex);
-//void               chnfn();
 bool               cisin(float xCoordinate, float yCoordinate);
 //unsigned           closat();
 size_t             closflt(float xCoordinate, float yCoordinate);
 unsigned           closfrm();
-//void               clpbrd(size_t startVertex);
 //bool               clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2);
 //void               clpcon(const std::vector<RNGCNT>& textureSegments);
-//void               clpcrnr(std::vector<fPOINT>& clipFillData, size_t vertex, const dPOINT& rotationCenter);
 void               clpfil();
 //void               clpfm();
-//void               clpic();
 //unsigned           clpind(const fPOINT* const point);
 //unsigned           clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
 //                           std::vector<CLPSEG>&       clipSegments,
@@ -80,15 +76,7 @@ void               clpfil();
 //                           unsigned                   start,
 //                           unsigned                   finish);
 //bool               clpnxt(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned sind);
-//void               clpout();
-//bool               clpsid(const std::vector<fPOINT>& clipReversedData,
-//                          std::vector<fPOINT>&       clipFillData,
-//                          size_t                     start,
-//                          size_t                     finish,
-//                          const dPOINT&              rotationCenter);
 //void               clpspac(const fPOINT* const insertPoint, size_t count);
-//void               clpsub(size_t fpnt, size_t cnt);
-//void               clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints);
 void               clrfills();
 void               cntrx();
 void               col2frm();
@@ -100,20 +88,17 @@ void               contfil();
 void               cpylayr(unsigned codedLayer);
 void               crop();
 void               debean();
-void               delclps(size_t iForm);
 void               delcon(unsigned GuideIndex);
-void               deleclp(size_t iForm);
 //void               delfil(unsigned attribute);
 void               delflt(size_t formIndex);
 void               delfrms();
-void               delmclp(size_t iForm);
 void               delmfil();
 void               delsac(size_t formIndex);
 void               delspnt();
 void               drwcon();
 void               drwfrm();
 void               drwsat();
-//void               duangs();
+void               duangs();
 //constexpr unsigned duat(unsigned attribute);
 void               dubean();
 void               dubfil();
@@ -121,8 +106,6 @@ void               dubfil();
 void               dubig();
 void               dubold();
 void               dubsfil();
-//void               duch(std::vector<fPOINT>& chainEndPoints);
-//void               duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned start, unsigned finish);
 //void               ducon();
 //void               dudif(const dPOINT& start, const dPOINT& finish, dPOINT* const delta);
 void               dueg(unsigned sides);
@@ -135,11 +118,9 @@ void               dueg(unsigned sides);
 //void               duflt();
 void               duform(unsigned formType);
 void               dufrm();
-//void               dufxlen(std::vector<fPOINT>& chainEndPoints);
 void               duhart(unsigned sideCount);
 //void               duinf(const FRMHED& formHeader) noexcept;
 void               duinsf();
-//void               dulast(std::vector<fPOINT>& chainEndPoints);
 void               dulens(unsigned sides);
 //void               dunseq(const std::vector<SMALPNTL*>& sortedLines, size_t start, size_t finish);
 //void               dupfn(double rotationAngle);
@@ -147,7 +128,6 @@ void               duprot(double rotationAngle, const dPOINT& rotationCenter);
 //void               duprotfs(double rotationAngle);
 //void               duprots(double rotationAngle, const dPOINT& rotationCenter);
 void               dupsel(HDC dc);
-//void               durev(std::vector<fPOINT>& clipReversedData);
 //void               durgn(const std::vector<FSEQ>&      sequencePath,
 //                         boost::dynamic_bitset<>&      visitedRegions,
 //                         const std::vector<SMALPNTL*>& sortedLines,
@@ -169,7 +149,6 @@ void     duspir(unsigned stepCount);
 //                size_t                    finish);
 void     dusqr();
 void     dustar(unsigned starCount, double length);
-//void     duxclp();
 void     duzig(unsigned vertices);
 void     fclp();
 void     fcntr();
@@ -186,7 +165,6 @@ void     filsat();
 void     filvrt();
 unsigned find1st();
 //float    findDistanceToSide(const fPOINT& lineStart, const fPOINT& lineEnd, const fPOINT& point, double& distance);
-//size_t   findclp(size_t formIndex);
 void     fliph();
 void     flipv();
 void     flpord();
@@ -230,13 +208,6 @@ void     fsizpar();
 //void     fspic();
 //void     fsvrt();
 void     fvars(size_t iForm);
-//void     fxlen(std::vector<fPOINT>& chainEndPoints, const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs);
-//void     fxlin(std::vector<fPOINT>&       chainEndPoints,
-//               const std::vector<double>& ListSINEs,
-//               const std::vector<double>& ListCOSINEs,
-//               dPOINT&                    moveToCoords);
-//void     fxlit(const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs, dPOINT& moveToCoords);
-//bool     fxpnt(const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs, dPOINT& moveToCoords);
 //void     getbig();
 
 constexpr float getblen();
@@ -259,7 +230,6 @@ void            insat();
 //                       unsigned                  regionCrossingEnd);
 //void            inspnt(std::vector<CLIPNT>& clipStitchPoints);
 //unsigned short  isclos(const SMALPNTL* const lineEndPoint0, const SMALPNTL* const lineEndPoint1);
-bool            iseclpx(size_t iForm);
 //bool            isect(size_t vertex0, size_t vertex1, fPOINT& intersection, float& length);
 //bool            isin(const std::vector<VCLPX> regionCrossingData,
 //                     float                    xCoordinate,
@@ -269,21 +239,11 @@ bool            iseclpx(size_t iForm);
 void            ispcdclp();
 void            join();
 //void            lapbrd();
-//bool            lastch();
+bool            lastch();
 //void            lcon(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
 //bool            lencmp(const LENINFO& arg1, const LENINFO& arg2);
 //bool            lencmpa(const CLIPSORT* const arg1, const CLIPSORT* const arg2);
-//void            lincrnr(const std::vector<fPOINT>& clipReversedData,
-//                        std::vector<fPOINT>&       clipFillData,
-//                        double                     clipAngle,
-//                        dPOINT&                    moveToCoords,
-//                        const dPOINT&              rotationCenter);
 //void            linrutb(unsigned start);
-//void            linsid(const std::vector<fPOINT>& clipReversedData,
-//                       std::vector<fPOINT>&       clipFillData,
-//                       double                     clipAngle,
-//                       const dPOINT&              vector0,
-//                       const dPOINT&              rotationCenter);
 //bool            linx(const std::vector<fPOINT>& points, size_t start, size_t finish, dPOINT& intersection);
 //bool            lnclos(std::vector<unsigned>& groupIndexSequence,
 //                       std::vector<SMALPNTL>& lineEndpoints,
@@ -312,14 +272,11 @@ void            nubrdcol(unsigned color);
 
 //bool nucseg(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned& currentSegmentIndex);
 
-//fPOINT*          nueclp(size_t currentForm, size_t count);
 void             nufilcol(unsigned color);
 //void             nufpnt(size_t vertex);
 void             nufsel();
 void             nufthcol(unsigned color);
 void             nulapcol(unsigned color);
-//fPOINT*          numclp();
-//bool             nupnt(double clipAngle, dPOINT& moveToCoords);
 //SATCON*          nusac(size_t formIndex, unsigned guideCount);
 //void             nutim(double size);
 constexpr size_t nxt(size_t iVertex);
@@ -334,7 +291,6 @@ constexpr size_t nxt(size_t iVertex);
 //                        const std::vector<RCON>&     pathMap,
 //                        const std::vector<unsigned>& mapIndexSequence,
 //                        unsigned                     pathIndex);
-void             oclp(const fPOINT* const clip, size_t clipEntries);
 //void             outfn(unsigned start, unsigned finish, double satinWidth);
 //double           p2p(const fPOINT& point0, const fPOINT& point1);
 //void             pbrd(double edgeSpacing);
@@ -343,8 +299,6 @@ size_t           pdir(size_t vertex);
 //                     const std::vector<VRCT2>& fillVerticalRect,
 //                     size_t                    startVertex,
 //                     const std::vector<VRCT2>& vrct);
-
-//void picfn(std::vector<fPOINT>& clipFillData, size_t start, size_t finish, double spacing, const dPOINT& rotationCenter);
 
 void             picot();
 //void             plbak(size_t backPoint);
@@ -384,7 +338,6 @@ void             ribon();
 void             rinfrm();
 //void             ritapbrd(unsigned& interleaveSequenceIndex2);
 //void             ritbrd(unsigned& interleaveSequenceIndex2);
-//bool             ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point);
 //void             ritfil(unsigned& interleaveSequenceIndex2);
 void             ritfrct(size_t iForm, HDC dc);
 //bool             ritlin(const fPOINT& start, const fPOINT& finish);
@@ -450,7 +403,6 @@ void            setrang();
 //void            setspir();
 //void            setstar();
 void            setstrtch();
-//void            setvct(unsigned start, unsigned finish, double& ClipAngle, dPOINT& vector0);
 //void            setzig();
 void            sfCor2px(const fPOINT& stitchPoint, POINT& screen);
 //void            sfn(size_t startVertex);
@@ -497,8 +449,5 @@ void               unpsel();
 void               vrtclp();
 void               vrtsclp();
 //bool               vscmp(unsigned index1, unsigned index2);
-//void xclpfn(const std::vector<fPOINT>& tempClipPoints,
-//            const std::vector<fPOINT>& chainEndPoints,
-//            unsigned                   start,
-//            unsigned                   finish,
-//            const dPOINT&              rotationCenter);
+
+extern unsigned   BeanCount;

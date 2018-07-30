@@ -28,44 +28,47 @@
 
 namespace fs = std::experimental::filesystem;
 
-unsigned                   ActiveColor = 0;                // active color selector
-unsigned                   ActiveLayer = 0;                // active layer
-unsigned                   ActivePointIndex;               // pointer to the active form in the sequencing algorithm
-fRECTANGLE                 AllItemsRect;                   // rectangle enclosing all forms and stitches
-FRMHED                     AngledForm;                     // a temporary rotated form for angle fills
-fPOINT                     AngledFormVertices[MAXFRMLINS]; // form formOrigin data for angle fills
-unsigned                   AppliqueColor = 15;             // underlay color
-LPWSTR*                    ArgList;                        // command line argument array
-HCURSOR                    ArrowCursor;                    // arrow
-fs::path*                  AuxName;
-BSEQPNT                    BSequence[BSEQLEN];
-HBRUSH                     BackgroundBrush;                  // background color brush
-HDC                        BitmapDC;                         // bitmap device context
-RECT                       BitmapDstRect;                    // stitch window destination rectangle for zooomed view
-unsigned                   BitmapHeight;                     // bitmap height
-POINT                      BitmapPoint;                      // a point on the bitmap
-dPOINT                     BitmapSizeinStitches;             // bitmap end points in stitch points
-RECT                       BitmapSrcRect;                    // bitmap source rectangle for zoomed view
-dPOINT                     BmpStitchRatio;                   // bitmap to stitch hoop ratios
-unsigned                   BitmapWidth;                      // bitmap width
-double                     BorderWidth = BRDWID;             // border width for satin borders
-unsigned                   ButtonHeight;                     // button height
-unsigned                   ButtonWidth;                      // button width
-unsigned                   ButtonWidthX3;                    // button width times 3
-std::vector<HWND>*         ButtonWin;                        // button windows
-float                      ButtonholeCornerLength = IBFCLEN; // buttonhole corner length
-HWND                       CancelButton;                     // cancel button
-unsigned                   Clip = 0;                         // pcs format clipboard handle
-fPOINTATTR                 ClipBuffer[MAXITEMS];
-FORMCLIP*                  ClipFormHeader;        // for thred form clipboard data
-HGLOBAL                    ClipMemory;            // handle to the clipboard memory
-size_t                     ClipPointIndex;        // next index to append main clipboard points
-void*                      ClipPointer;           // for memory allocation for clipboard data
-fPOINT                     ClipPoints[MAXITEMS];  // main clipboard fill points for forms
-fRECTANGLE                 ClipRect;              // clipboard rectangle
-FLSIZ                      ClipRectSize;          // clipboard rectangle size
-size_t                     ClipStitchCount;       // number of stitchs extracted from clipboard
-CLPSTCH*                   ClipStitchData;        // for pcs clipboard data
+unsigned           ActiveColor = 0;                // active color selector
+unsigned           ActiveLayer = 0;                // active layer
+unsigned           ActivePointIndex;               // pointer to the active form in the sequencing algorithm
+fRECTANGLE         AllItemsRect;                   // rectangle enclosing all forms and stitches
+FRMHED             AngledForm;                     // a temporary rotated form for angle fills
+fPOINT             AngledFormVertices[MAXFRMLINS]; // form formOrigin data for angle fills
+unsigned           AppliqueColor = 15;             // underlay color
+LPWSTR*            ArgList;                        // command line argument array
+HCURSOR            ArrowCursor;                    // arrow
+fs::path*          AuxName;
+BSEQPNT            BSequence[BSEQLEN];
+HBRUSH             BackgroundBrush;                  // background color brush
+HDC                BitmapDC;                         // bitmap device context
+RECT               BitmapDstRect;                    // stitch window destination rectangle for zooomed view
+unsigned           BitmapHeight;                     // bitmap height
+POINT              BitmapPoint;                      // a point on the bitmap
+dPOINT             BitmapSizeinStitches;             // bitmap end points in stitch points
+RECT               BitmapSrcRect;                    // bitmap source rectangle for zoomed view
+dPOINT             BmpStitchRatio;                   // bitmap to stitch hoop ratios
+unsigned           BitmapWidth;                      // bitmap width
+double             BorderWidth = BRDWID;             // border width for satin borders
+unsigned           ButtonHeight;                     // button height
+unsigned           ButtonWidth;                      // button width
+unsigned           ButtonWidthX3;                    // button width times 3
+std::vector<HWND>* ButtonWin;                        // button windows
+float              ButtonholeCornerLength = IBFCLEN; // buttonhole corner length
+HWND               CancelButton;                     // cancel button
+unsigned           Clip = 0;                         // pcs format clipboard handle
+fPOINTATTR         ClipBuffer[MAXITEMS];
+FORMCLIP*          ClipFormHeader;       // for thred form clipboard data
+HGLOBAL            ClipMemory;           // handle to the clipboard memory
+size_t             ClipPointIndex;       // next index to append main clipboard points
+void*              ClipPointer;          // for memory allocation for clipboard data
+fPOINT             ClipPoints[MAXITEMS]; // main clipboard fill points for forms
+fRECTANGLE         ClipRect;             // clipboard rectangle
+FLSIZ              ClipRectSize;         // clipboard rectangle size
+size_t             ClipStitchCount;      // number of stitchs extracted from clipboard
+CLPSTCH*           ClipStitchData;       // for pcs clipboard data
+
+unsigned ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
+
 size_t                     ClosestFormToCursor;   // closest form to the cursor
 unsigned                   ClosestPointIndex;     // index of closest point
 size_t                     ClosestVertexToCursor; // formOrigin closest to the cursor
@@ -99,6 +102,8 @@ unsigned                   GroupEndStitch;                // higher end of selec
 unsigned                   GroupStartStitch;              // lower end of selected stitches
 unsigned                   GroupStitchIndex;              // last point selected in group
 fs::path*                  HomeDirectory;                 // directory from which thred was executed
+double                     HorizontalLength;              // horizontal length of a clipboard fill
+double                     HorizontalLength2;             // horizontal length of a clipboard fill/2
 double                     HorizontalRatio;               // horizontal ratio between the zoom window and the entire stitch space
 HWND                       HorizontalScrollBar;           // horizontal scroll bar
 INIFILE                    IniFile;                       // initialization file
@@ -109,6 +114,7 @@ unsigned                   InterleaveSequenceIndex;       // index into the inte
 INSREC                     InterleaveSequenceIndices[10]; // indices into interleave points
 fPOINT                     InterleaveSequence[MAXITEMS];  // storage for interleave points
 std::vector<HWND>*         LabelWindow;                   // text handles for the form data sheet
+fPOINT                     LastPoint;                     // last formOrigin written by line connect routine
 HPEN                       LayerPen[6];
 double                     LineSpacing = DEFSPACE * PFGRAN; // stitch spacing in stitch units
 fPOINT                     LowerLeftStitch;                 // lower left formOrigin in a form

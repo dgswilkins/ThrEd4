@@ -26,6 +26,7 @@
 #include "switches.h"
 #include "Resources/resource.h"
 #include "globals.h"
+#include "clip.h"
 #include "displayText.h"
 #include "form.h"
 #include "texture.h"

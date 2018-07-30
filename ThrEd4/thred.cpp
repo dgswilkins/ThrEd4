@@ -41,6 +41,7 @@
 
 #include "Resources/resource.h"
 #include "globals.h"
+#include "clip.h"
 #include "displayText.h"
 #include "form.h"
 #include "formForms.h"
@@ -99,7 +100,6 @@ int             MovieTimeStep;            // time delay for stitchout
 POINT MovieLine[100]; // line for movie stitch draw
 
 unsigned LRUMenuId[] = { FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3 }; // recently used file menu ID's
-unsigned ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF;         // for checking if a fill is a clipboard fill
 
 unsigned      UndoBufferWriteIndex = 0;      // undo storage pointer
 unsigned      UndoBufferReadIndex  = 0;      // undo retrieval pointers
@@ -960,26 +960,8 @@ void getdes() noexcept {
 	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, (DLGPROC)dnamproc);
 }
 
-bool isclp(size_t iForm) noexcept {
-	if ((1 << FormList[iForm].fillType) & ClipTypeMap)
-		return 1;
-	return 0;
-}
-
-bool isclpx(size_t iForm) noexcept {
-	if (isclp(iForm) && FormList[iForm].lengthOrCount.clipCount)
-		return 1;
-	return 0;
-}
-
 bool isfclp() noexcept {
 	if (isclp(ClosestFormToCursor) && FormList[ClosestFormToCursor].fillType != CLPF)
-		return 1;
-	return 0;
-}
-
-bool iseclp(size_t iForm) noexcept {
-	if (FormList[iForm].edgeType == EDGECLIP || FormList[iForm].edgeType == EDGEPICOT || FormList[iForm].edgeType == EDGECLIPX)
 		return 1;
 	return 0;
 }

@@ -51,6 +51,9 @@
     <ClCompile Include="formForms.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="clip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EnumMap.h">
@@ -105,6 +108,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="formForms.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clip.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
