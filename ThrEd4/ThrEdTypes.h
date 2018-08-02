@@ -799,9 +799,9 @@ public:
 	float y;
 
 	inline bool    operator==(const fPOINT& rhs) const noexcept;
-	inline fPOINT& operator=(const dPOINT& rhs);
+	inline fPOINT& operator=(const dPOINT& rhs) noexcept;
 	inline fPOINT& operator=(const fPOINTATTR& rhs) noexcept;
-	inline fPOINT& operator=(const SMALPNTL& rhs);
+	inline fPOINT& operator=(const SMALPNTL& rhs) noexcept;
 	inline fPOINT& operator=(const BSEQPNT& rhs) noexcept;
 };
 
@@ -834,9 +834,9 @@ inline bool fPOINT::operator==(const fPOINT& rhs) const noexcept {
 	return (x == rhs.x) && (y == rhs.y);
 }
 
-inline fPOINT& fPOINT::operator=(const dPOINT& rhs) {
-	x = gsl::narrow<float>(rhs.x);
-	y = gsl::narrow<float>(rhs.y);
+inline fPOINT& fPOINT::operator=(const dPOINT& rhs) noexcept {
+	x = rhs.x;
+	y = rhs.y;
 	return *this;
 }
 
@@ -846,9 +846,9 @@ inline fPOINT& fPOINT::operator=(const fPOINTATTR& rhs) noexcept {
 	return *this;
 }
 
-inline fPOINT& fPOINT::operator=(const SMALPNTL& rhs) {
-	x = gsl::narrow<float>(rhs.x);
-	y = gsl::narrow<float>(rhs.y);
+inline fPOINT& fPOINT::operator=(const SMALPNTL& rhs) noexcept {
+	x = rhs.x;
+	y = rhs.y;
 	return *this;
 }
 
