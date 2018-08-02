@@ -1315,7 +1315,7 @@ size_t closflt(float xCoordinate, float yCoordinate) noexcept {
 	return closestVertex;
 }
 
-void chkseq(bool border) {
+void chkseq(bool border) noexcept {
 #if BUGBAK
 
 	unsigned index;
@@ -3064,11 +3064,9 @@ bool isin(const std::vector<VCLPX> regionCrossingData,
           float                    yCoordinate,
           unsigned                 regionCrossingStart,
           unsigned                 regionCrossingEnd) {
-	// ToDo - rename local variables
 
-	unsigned iRegion = 0, acnt = 0;
-	size_t   svrt = 0, nvrt = 0;
-	dPOINT   ipnt = {};
+	unsigned count = 0;
+	dPOINT   point = {};
 
 	if (xCoordinate < BoundingRect.left)
 		return 0;
@@ -3078,27 +3076,27 @@ bool isin(const std::vector<VCLPX> regionCrossingData,
 		return 0;
 	if (yCoordinate > BoundingRect.top)
 		return 0;
-	for (iRegion = regionCrossingStart; iRegion < regionCrossingEnd; iRegion++) {
-		svrt = regionCrossingData[iRegion].vertex;
-		nvrt = nxt(svrt);
-		if (projv(xCoordinate, CurrentFormVertices[svrt], CurrentFormVertices[nvrt], ipnt)) {
-			if (ipnt.y > yCoordinate) {
-				if (CurrentFormVertices[svrt].x != xCoordinate && CurrentFormVertices[nvrt].x != xCoordinate)
-					acnt++;
+	for (auto iRegion = regionCrossingStart; iRegion < regionCrossingEnd; iRegion++) {
+		const auto startVertex = regionCrossingData[iRegion].vertex;
+		const auto endVertex = nxt(startVertex);
+		if (projv(xCoordinate, CurrentFormVertices[startVertex], CurrentFormVertices[endVertex], point)) {
+			if (point.y > yCoordinate) {
+				if (CurrentFormVertices[startVertex].x != xCoordinate && CurrentFormVertices[endVertex].x != xCoordinate)
+					count++;
 				else {
-					if (CurrentFormVertices[svrt].x < CurrentFormVertices[nvrt].x) {
-						if (CurrentFormVertices[nvrt].x != xCoordinate)
-							acnt++;
+					if (CurrentFormVertices[startVertex].x < CurrentFormVertices[endVertex].x) {
+						if (CurrentFormVertices[endVertex].x != xCoordinate)
+							count++;
 					}
 					else {
-						if (CurrentFormVertices[svrt].x != xCoordinate)
-							acnt++;
+						if (CurrentFormVertices[startVertex].x != xCoordinate)
+							count++;
 					}
 				}
 			}
 		}
 	}
-	return acnt & 1;
+	return count & 1;
 }
 
 void inspnt(std::vector<CLIPNT>& clipStitchPoints) {

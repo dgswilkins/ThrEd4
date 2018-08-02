@@ -219,7 +219,7 @@ void     hidbit();
 //void     insfil();
 //void     insflin(POINT insertPoint);
 //bool     iselpnt();
-//bool     isfclp();
+//bool     isfclp() noexcept;
 //bool     isknots();
 //void     istch();
 //bool     isthr(const wchar_t* const filename);

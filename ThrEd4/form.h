@@ -59,7 +59,7 @@ void               chkcont();
 //bool               chkdel();
 unsigned           chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
 bool               chkmax(size_t arg0, size_t arg1);
-void               chkseq(bool border);
+void               chkseq(bool border) noexcept;
 //void               chksid(size_t vertexIndex);
 bool               cisin(float xCoordinate, float yCoordinate);
 //unsigned           closat();
