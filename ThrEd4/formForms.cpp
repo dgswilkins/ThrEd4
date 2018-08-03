@@ -337,7 +337,7 @@ void refrmfn() {
 	if (edgeFillType >= EDGELAST) {
 		edgeFillType = EDGELAST - 1;
 	}
-	unsigned int iEdge = edgeFillType - 1;
+	const unsigned int iEdge = edgeFillType - 1;
 
 	valueWindow[LBRD] = txtrwin(stringTable[STR_EDG0 + edgeFillType], ValueWindowCoords);
 	nxtlin();
@@ -478,9 +478,9 @@ void refrm() {
 void sidwnd(HWND wnd) {
 	RECT windowRect = {};
 
-	MsgIndex                 = 0;
-	SideWindowEntryBuffer[0] = 0;
-	unsigned int savedChoice = FormMenuChoice;
+	MsgIndex                       = 0;
+	SideWindowEntryBuffer[0]       = 0;
+	const unsigned int savedChoice = FormMenuChoice;
 	unsid();
 	FormMenuChoice = savedChoice;
 	GetWindowRect(wnd, &windowRect);
@@ -773,22 +773,22 @@ void dasyfrm() {
 		StateMap.reset(StateFlag::FORMIN);
 		return;
 	}
-	fPOINT referencePoint = { midl(ZoomRect.right, ZoomRect.left), midl(ZoomRect.top, ZoomRect.bottom) };
-	SelectedForm          = &FormList[FormIndex];
-	ClosestFormToCursor   = FormIndex;
+	const fPOINT referencePoint = { midl(ZoomRect.right, ZoomRect.left), midl(ZoomRect.top, ZoomRect.bottom) };
+	SelectedForm                = &FormList[FormIndex];
+	ClosestFormToCursor         = FormIndex;
 	frmclr(SelectedForm);
 	SelectedForm->vertices  = &FormVertices[FormVertexIndex];
 	SelectedForm->attribute = ActiveLayer << 1;
 	fvars(FormIndex);
-	auto maximumXsize = ZoomRect.right - ZoomRect.left;
-	auto maximumYsize = ZoomRect.top - ZoomRect.bottom;
+	auto       maximumXsize = ZoomRect.right - ZoomRect.left;
+	const auto maximumYsize = ZoomRect.top - ZoomRect.bottom;
 	if (maximumYsize > maximumXsize)
 		maximumXsize = maximumYsize;
 	maximumXsize /= 6;
-	auto diameter     = IniFile.daisyDiameter;
-	auto petalLength  = IniFile.daisyPetalLen;
-	auto holeDiameter = IniFile.daisyHoleDiameter;
-	auto ratio        = maximumXsize / (diameter + petalLength);
+	auto       diameter     = IniFile.daisyDiameter;
+	auto       petalLength  = IniFile.daisyPetalLen;
+	auto       holeDiameter = IniFile.daisyHoleDiameter;
+	const auto ratio        = maximumXsize / (diameter + petalLength);
 	diameter *= ratio;
 	petalLength *= ratio;
 	holeDiameter *= ratio;
@@ -797,8 +797,8 @@ void dasyfrm() {
 	size_t fref        = 0;
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
 		angle                          = PI2;
-		auto holeVertexCount           = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
-		auto holeSegmentAngle          = PI2 / holeVertexCount;
+		const auto holeVertexCount     = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
+		const auto holeSegmentAngle    = PI2 / holeVertexCount;
 		CurrentFormVertices[iVertex].x = referencePoint.x + diameter * cos(angle);
 		CurrentFormVertices[iVertex].y = referencePoint.y + diameter * sin(angle);
 		iVertex++;
@@ -825,7 +825,7 @@ void dasyfrm() {
 		SelectedForm->wordParam          = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1;
 		SelectedForm->satinOrAngle.guide = adsatk(IniFile.daisyPetalCount - 1);
 	}
-	auto halfPetalPointCount = IniFile.daisyPetalPoints >> 1;
+	const auto halfPetalPointCount = IniFile.daisyPetalPoints >> 1;
 	for (unsigned int iMacroPetal = 0; iMacroPetal < IniFile.daisyPetalCount; iMacroPetal++) {
 		auto petalPointAngle         = 0.0;
 		PseudoRandomValue            = SEED;
@@ -953,17 +953,17 @@ BOOL CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 void setear() {
 	unmsg();
-	INT_PTR nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, (DLGPROC)tearprc);
+	const INT_PTR nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, (DLGPROC)tearprc);
 	if (nResult > 0) {
 		auto twistStep = IniFile.tearTwistStep;
 		durpoli(IniFile.formSides);
 		fvars(FormIndex);
-		auto count            = VertexCount / 4;
-		auto middle           = (CurrentFormVertices[1].x - CurrentFormVertices[0].x) / 2.0 + CurrentFormVertices[0].x;
-		auto step             = CurrentFormVertices[count + 1].y - CurrentFormVertices[count].y;
-		auto verticalPosition = CurrentFormVertices[count + 1].y;
-		auto iLeftVertices    = VertexCount - count;
-		auto iRightVertices   = count + 1;
+		const auto count            = VertexCount / 4;
+		const auto middle           = (CurrentFormVertices[1].x - CurrentFormVertices[0].x) / 2.0 + CurrentFormVertices[0].x;
+		auto       step             = CurrentFormVertices[count + 1].y - CurrentFormVertices[count].y;
+		auto       verticalPosition = CurrentFormVertices[count + 1].y;
+		auto       iLeftVertices    = VertexCount - count;
+		auto       iRightVertices   = count + 1;
 		for (size_t iStep = 0; iStep < count; iStep++) {
 			CurrentFormVertices[iRightVertices].y = CurrentFormVertices[iLeftVertices].y = verticalPosition;
 			CurrentFormVertices[iRightVertices].x += twistStep;
@@ -997,7 +997,7 @@ void setear() {
 		auto         horizontalRatio = UnzoomedRect.x / 4.0 / size.x;
 		if (horizontalRatio > 1.0)
 			horizontalRatio = 1.0;
-		auto verticalRatio = UnzoomedRect.y / 4.0 / size.y;
+		const auto verticalRatio = UnzoomedRect.y / 4.0 / size.y;
 		if (verticalRatio < horizontalRatio)
 			horizontalRatio = verticalRatio;
 		if (horizontalRatio < 1.0) {
@@ -1073,16 +1073,16 @@ void wavfrm() {
 	unmsg();
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, (DLGPROC)wavprc)) {
 		std::vector<fPOINT> points(IniFile.wavePoints);
-		auto                saveIndex = FormVertexIndex;
+		const auto          saveIndex = FormVertexIndex;
 		durpoli(IniFile.wavePoints);
 		mdufrm();
 		FormVertexIndex = saveIndex;
 		auto iPoint     = 0u;
-		auto waveIndex      = IniFile.waveStart;
+		auto waveIndex  = IniFile.waveStart;
 		while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
-			auto iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
-			points[iPoint].x = -CurrentFormVertices[iNextVertex].x + CurrentFormVertices[waveIndex].x;
-			points[iPoint].y = -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[waveIndex].y;
+			const auto iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
+			points[iPoint].x       = -CurrentFormVertices[iNextVertex].x + CurrentFormVertices[waveIndex].x;
+			points[iPoint].y       = -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[waveIndex].y;
 			iPoint++;
 			waveIndex = iNextVertex;
 		}
@@ -1108,7 +1108,7 @@ void wavfrm() {
 			}
 		}
 		CurrentFormVertices[iVertex] = currentPosition;
-		auto         vertexCount     = iVertex + 1;
+		const auto   vertexCount     = iVertex + 1;
 		const double rotationAngle   = -atan2(CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y,
                                             CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x);
 		for (size_t index = 0u; index < vertexCount; index++) {
@@ -1124,7 +1124,7 @@ void wavfrm() {
 		auto         horizontalRatio = UnzoomedRect.x / 4.0 / selectedSize.x;
 		if (horizontalRatio > 1)
 			horizontalRatio = 1.0;
-		auto verticalRatio = UnzoomedRect.y / 4.0 / selectedSize.y;
+		const auto verticalRatio = UnzoomedRect.y / 4.0 / selectedSize.y;
 		if (verticalRatio < horizontalRatio)
 			horizontalRatio = verticalRatio;
 		if (horizontalRatio < 1.0) {
