@@ -1378,7 +1378,7 @@ void chkseq(bool border) noexcept {
 #endif
 }
 
-void ritbrd(unsigned& interleaveSequenceIndex2) {
+void ritbrd(unsigned& interleaveSequenceIndex2) noexcept {
 	if (SequenceIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].seq   = I_BRD;
@@ -1389,7 +1389,7 @@ void ritbrd(unsigned& interleaveSequenceIndex2) {
 	}
 }
 
-void ritapbrd(unsigned& interleaveSequenceIndex2) {
+void ritapbrd(unsigned& interleaveSequenceIndex2) noexcept {
 	if (SequenceIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].seq   = I_AP;
@@ -1400,7 +1400,7 @@ void ritapbrd(unsigned& interleaveSequenceIndex2) {
 	}
 }
 
-void ritfil(unsigned& interleaveSequenceIndex2) {
+void ritfil(unsigned& interleaveSequenceIndex2) noexcept {
 	if (SequenceIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].seq   = I_FIL;

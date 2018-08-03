@@ -336,9 +336,9 @@ void             refilfn();
 //                        const std::vector<REGION>&    regionsList);
 void             ribon();
 void             rinfrm();
-//void             ritapbrd(unsigned& interleaveSequenceIndex2);
-//void             ritbrd(unsigned& interleaveSequenceIndex2);
-//void             ritfil(unsigned& interleaveSequenceIndex2);
+//void             ritapbrd(unsigned& interleaveSequenceIndex2) noexcept;
+//void             ritbrd(unsigned& interleaveSequenceIndex2) noexcept;
+//void             ritfil(unsigned& interleaveSequenceIndex2) noexcept;
 void             ritfrct(size_t iForm, HDC dc);
 //bool             ritlin(const fPOINT& start, const fPOINT& finish);
 
