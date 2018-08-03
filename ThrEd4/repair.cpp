@@ -43,17 +43,17 @@ void adbad(std::wstring& repairMessage, unsigned code, size_t count) {
 }
 
 void lodchk() {
-	unsigned iForm = 0, iStitch = 0, attribute = 0;
+	unsigned attribute = 0;
 
 	delinf();
-	for (iForm = 0; iForm < FormIndex; iForm++) {
+	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		SelectedForm = &FormList[iForm];
 		if (!SelectedForm->type)
 			SelectedForm->type = FRMFPOLY;
 		else {
 			if (SelectedForm->type == FRMLINE) {
 				if (SelectedForm->fillType != CONTF) {
-					SelectedForm->fillType = 0;
+					SelectedForm->fillType                = 0;
 					SelectedForm->lengthOrCount.clipCount = 0;
 				}
 			}
@@ -65,7 +65,7 @@ void lodchk() {
 			SelectedForm->maxBorderStitchLen = IniFile.maxStitchLength;
 	}
 	boost::dynamic_bitset<> formMap(FormIndex);
-	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		attribute = StitchBuffer[iStitch].attribute;
 		if ((attribute & TYPMSK) == TYPFRM) {
 			const unsigned tform = (attribute & FRMSK) >> FRMSHFT;
@@ -78,17 +78,17 @@ void lodchk() {
 			}
 		}
 	}
-	for (iForm = 0; iForm < FormIndex; iForm++) {
+	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		if (!formMap.test(iForm))
 			FormList[iForm].fillType = 0;
 	}
 	formMap.reset();
-	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
+	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		attribute = StitchBuffer[iStitch].attribute;
 		if (attribute & TYPBRD)
 			formMap.set((attribute & FRMSK) >> FRMSHFT);
 	}
-	for (iForm = 0; iForm < FormIndex; iForm++) {
+	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		if (!formMap.test(iForm))
 			FormList[iForm].edgeType = 0;
 	}
@@ -109,13 +109,11 @@ void chkeclp(const FRMHED* const formHeader, BADCNTS& badData) {
 }
 
 unsigned frmchkfn() {
-	unsigned iForm = 0;
-	FRMHED*  formHeader = nullptr;
-	BADCNTS  badData = {};
+	BADCNTS badData = {};
 
 	if (FormIndex) {
-		for (iForm = 0; iForm < FormIndex; iForm++) {
-			formHeader = &FormList[iForm];
+		for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+			FRMHED const* formHeader = &FormList[iForm];
 			if (!(badData.attribute & BADFLT)) {
 				if (!formHeader->vertexCount)
 					badData.attribute |= BADFLT;
@@ -162,9 +160,7 @@ unsigned frmchkfn() {
 }
 
 void bcup(size_t find, BADCNTS& badData) {
-	FRMHED* formHeader;
-
-	formHeader = &FormList[find];
+	FRMHED const* formHeader = &FormList[find];
 	if (isclp(find))
 		badData.clip += formHeader->lengthOrCount.clipCount;
 	if (iseclp(find))
@@ -185,9 +181,9 @@ void chkfstch() noexcept {
 }
 
 void repflt(std::wstring& repairMessage) {
-	unsigned iDestination = 0;
-	size_t   vertexDifference = 0, vertexCount = 0;
-	BADCNTS  badData = {};
+	size_t  iDestination = 0;
+	size_t  vertexCount  = 0;
+	BADCNTS badData      = {};
 
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		if (FormList[iForm].vertexCount) {
@@ -198,17 +194,17 @@ void repflt(std::wstring& repairMessage) {
 	FormIndex = iDestination;
 	std::vector<fPOINT> vertexPoint;
 	size_t              iVertex = 0;
-	bool                flag = true;
+	bool                flag    = true;
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
-		FRMHED* formHeader = &FormList[iForm];
-		vertexDifference = formHeader->vertices - FormVertices;
+		auto   formHeader       = &FormList[iForm];
+		const size_t vertexDifference = formHeader->vertices - FormVertices;
 		if (FormVertexIndex >= vertexDifference + formHeader->vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + formHeader->vertexCount);
 			auto       sourceStart = formHeader->vertices;
-			auto       sourceEnd = sourceStart + formHeader->vertexCount;
+			auto       sourceEnd   = sourceStart + formHeader->vertexCount;
 			auto       destination = vertexPoint.begin() + iVertex;
-			const auto _ = std::copy(sourceStart, sourceEnd, destination);
-			formHeader->vertices = &FormVertices[iVertex];
+			const auto _           = std::copy(sourceStart, sourceEnd, destination);
+			formHeader->vertices   = &FormVertices[iVertex];
 			iVertex += formHeader->vertexCount;
 			bcup(iForm, badData);
 		}
@@ -219,16 +215,16 @@ void repflt(std::wstring& repairMessage) {
 				// ToDo - do we need to increase the size of vertexPoint?
 				// vertexPoint.resize(vertexPoint.size + formHeader->vertexCount);
 				auto sourceStart = formHeader->vertices;
-				auto sourceEnd = sourceStart + formHeader->vertexCount;
+				auto sourceEnd   = sourceStart + formHeader->vertexCount;
 				auto destination = vertexPoint.begin() + iVertex;
-				auto _ = std::copy(sourceStart, sourceEnd, destination);
+				auto _           = std::copy(sourceStart, sourceEnd, destination);
 				bcup(iForm, badData);
 			}
 			else {
-				FormIndex = iForm;
-				ClipPointIndex = badData.clip;
+				FormIndex       = iForm;
+				ClipPointIndex  = badData.clip;
 				SatinGuideIndex = badData.guideCount;
-				TextureIndex = badData.tx;
+				TextureIndex    = badData.tx;
 				chkfstch();
 				adbad(repairMessage, IDS_FRMDAT, FormIndex - iForm + 1);
 				flag = false;
@@ -243,21 +239,21 @@ void repflt(std::wstring& repairMessage) {
 }
 
 void repclp(std::wstring& repairMessage) {
-	FRMHED*             formHeader = nullptr;
-	unsigned            iForm = 0, badClipCount = 0;
-	size_t              clipCount = 0, clipDifference = 0;
+	unsigned            badClipCount = 0;
+	size_t              clipCount = 0;
 	std::vector<fPOINT> clipPoint;
-	for (iForm = 0; iForm < FormIndex; iForm++) {
-		formHeader = &FormList[iForm];
+	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+		auto formHeader = &FormList[iForm];
+		size_t clipDifference = 0u;
 		if (isclp(iForm)) {
 			// ToDo - pointer arithmetic to be fixed
 			clipDifference = formHeader->angleOrClipData.clip - ClipPoints;
 			if (clipDifference + formHeader->lengthOrCount.clipCount < ClipPointIndex) {
 				clipPoint.resize(clipPoint.size() + formHeader->lengthOrCount.clipCount);
 				auto sourceStart = formHeader->angleOrClipData.clip;
-				auto sourceEnd = sourceStart + formHeader->lengthOrCount.clipCount;
+				auto sourceEnd   = sourceStart + formHeader->lengthOrCount.clipCount;
 				auto destination = clipPoint.begin() + clipCount;
-				auto _ = std::copy(sourceStart, sourceEnd, destination);
+				auto _           = std::copy(sourceStart, sourceEnd, destination);
 
 				formHeader->angleOrClipData.clip = &ClipPoints[clipCount];
 				clipCount += formHeader->lengthOrCount.clipCount;
@@ -267,9 +263,9 @@ void repclp(std::wstring& repairMessage) {
 					formHeader->lengthOrCount.clipCount = gsl::narrow<unsigned int>(FormVertexIndex - clipDifference);
 					clipPoint.resize(clipPoint.size() + formHeader->lengthOrCount.clipCount);
 					auto sourceStart = formHeader->angleOrClipData.clip;
-					auto sourceEnd = sourceStart + formHeader->lengthOrCount.clipCount;
+					auto sourceEnd   = sourceStart + formHeader->lengthOrCount.clipCount;
 					auto destination = clipPoint.begin() + clipCount;
-					auto _ = std::copy(sourceStart, sourceEnd, destination);
+					auto _           = std::copy(sourceStart, sourceEnd, destination);
 
 					formHeader->angleOrClipData.clip = &ClipPoints[clipCount];
 					clipCount += formHeader->lengthOrCount.clipCount;
@@ -286,9 +282,9 @@ void repclp(std::wstring& repairMessage) {
 			if (clipDifference + formHeader->clipEntries < ClipPointIndex) {
 				clipPoint.resize(clipPoint.size() + formHeader->clipEntries);
 				auto sourceStart = formHeader->borderClipData;
-				auto sourceEnd = sourceStart + formHeader->clipEntries;
+				auto sourceEnd   = sourceStart + formHeader->clipEntries;
 				auto destination = clipPoint.begin() + clipCount;
-				auto _ = std::copy(sourceStart, sourceEnd, destination);
+				auto _           = std::copy(sourceStart, sourceEnd, destination);
 
 				formHeader->borderClipData = &ClipPoints[clipCount];
 				clipCount += formHeader->clipEntries;
@@ -298,9 +294,9 @@ void repclp(std::wstring& repairMessage) {
 					formHeader->clipEntries = gsl::narrow<unsigned short>(FormVertexIndex - clipDifference);
 					clipPoint.resize(clipPoint.size() + formHeader->clipEntries);
 					auto sourceStart = formHeader->borderClipData;
-					auto sourceEnd = sourceStart + formHeader->clipEntries;
+					auto sourceEnd   = sourceStart + formHeader->clipEntries;
 					auto destination = clipPoint.begin() + clipCount;
-					auto _ = std::copy(sourceStart, sourceEnd, destination);
+					auto _           = std::copy(sourceStart, sourceEnd, destination);
 
 					formHeader->borderClipData = &ClipPoints[clipCount];
 					clipCount += formHeader->clipEntries;
@@ -319,19 +315,17 @@ void repclp(std::wstring& repairMessage) {
 }
 
 void repsat() {
-	unsigned iForm = 0, guideDifference = 0;
 	size_t   guideCount = 0;
-	FRMHED*  formHeader = nullptr;
-	BADCNTS  badData = {};
+	BADCNTS  badData    = {};
 
-	for (iForm = 0; iForm < FormIndex; iForm++) {
-		formHeader = &FormList[iForm];
+	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+		auto formHeader = &FormList[iForm];
 		if (formHeader->type == SAT) {
 			// ToDo - pointer arithmetic to be fixed
-			guideDifference = formHeader->satinOrAngle.guide - SatinGuides;
+			const size_t guideDifference = formHeader->satinOrAngle.guide - SatinGuides;
 			if (FormVertexIndex > guideDifference + formHeader->vertexCount) {
 				auto       sourceStart = formHeader->satinOrAngle.guide;
-				auto       sourceEnd = sourceStart + formHeader->satinGuideCount;
+				auto       sourceEnd   = sourceStart + formHeader->satinGuideCount;
 				const auto destination = stdext::make_checked_array_iterator(&SatinGuides[guideCount], 10000 - guideCount);
 				std::copy(sourceStart, sourceEnd, destination);
 				formHeader->satinOrAngle.guide = &SatinGuides[guideCount];
@@ -341,14 +335,14 @@ void repsat() {
 			else {
 				if (guideDifference < SatinGuideIndex) {
 					formHeader->satinGuideCount = gsl::narrow<unsigned short>(SatinGuideIndex - guideDifference);
-					auto       sourceStart = formHeader->satinOrAngle.guide;
-					auto       sourceEnd = sourceStart + formHeader->satinGuideCount;
+					auto       sourceStart      = formHeader->satinOrAngle.guide;
+					auto       sourceEnd        = sourceStart + formHeader->satinGuideCount;
 					const auto destination = stdext::make_checked_array_iterator(&SatinGuides[guideCount], 10000 - guideCount);
 					std::copy(sourceStart, sourceEnd, destination);
 					bcup(iForm, badData);
 				}
 				else {
-					guideCount = badData.guideCount;
+					guideCount                  = badData.guideCount;
 					formHeader->satinGuideCount = 0;
 				}
 			}
@@ -359,16 +353,15 @@ void repsat() {
 
 void reptx() {
 	size_t  textureCount = 0;
-	FRMHED* formHeader = nullptr;
-	BADCNTS badData = {};
+	BADCNTS badData      = {};
 
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		if (istx(iForm)) {
-			formHeader = &FormList[iForm];
+			auto formHeader = &FormList[iForm];
 			if (gsl::narrow<unsigned short>(TextureIndex)
-	> formHeader->fillInfo.texture.index + formHeader->fillInfo.texture.count) {
+			    > formHeader->fillInfo.texture.index + formHeader->fillInfo.texture.count) {
 				auto       sourceStart = &SatinGuides[formHeader->fillInfo.texture.index];
-				auto       sourceEnd = sourceStart + formHeader->fillInfo.texture.count;
+				auto       sourceEnd   = sourceStart + formHeader->fillInfo.texture.count;
 				const auto destination = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
 				std::copy(sourceStart, sourceEnd, destination);
 				formHeader->fillInfo.texture.index = gsl::narrow<unsigned short>(textureCount);
@@ -378,11 +371,11 @@ void reptx() {
 			else {
 				if (TextureIndex > formHeader->fillInfo.texture.index) {
 					formHeader->fillInfo.texture.count
-						= gsl::narrow<unsigned short>(TextureIndex) - formHeader->fillInfo.texture.index;
+					    = gsl::narrow<unsigned short>(TextureIndex) - formHeader->fillInfo.texture.index;
 					auto       sourceStart = &SatinGuides[formHeader->fillInfo.texture.index];
-					auto       sourceEnd = sourceStart + formHeader->fillInfo.texture.count;
+					auto       sourceEnd   = sourceStart + formHeader->fillInfo.texture.count;
 					const auto destination
-						= stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
+					    = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
 					std::copy(sourceStart, sourceEnd, destination);
 					formHeader->fillInfo.texture.index = gsl::narrow<unsigned short>(textureCount);
 					bcup(iForm, badData);
@@ -416,10 +409,8 @@ void repar() {
 }
 
 void frmchkx() {
-	unsigned code = 0;
-
 	if (IniFile.dataCheck) {
-		code = frmchkfn();
+		const auto code = frmchkfn();
 		switch (IniFile.dataCheck) {
 		case 1:
 			if (code)
