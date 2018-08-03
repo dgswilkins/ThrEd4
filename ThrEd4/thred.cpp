@@ -1226,7 +1226,7 @@ void ritfcor(const fPOINT& point) {
 }
 
 void ritcor(const fPOINTATTR& pointAttribute) {
-	fPOINT point = { pointAttribute.x, pointAttribute.y };
+	const fPOINT point = { pointAttribute.x, pointAttribute.y };
 
 	ritfcor(point);
 }
@@ -6585,7 +6585,7 @@ void clpbox() {
 }
 
 void lodclp(unsigned iStitch) {
-	fPOINT   adjustment  = { (ClipOrigin.x - ClipRect.left), (ClipOrigin.y - ClipRect.bottom) };
+	const fPOINT   adjustment  = { (ClipOrigin.x - ClipRect.left), (ClipOrigin.y - ClipRect.bottom) };
 	unsigned source      = PCSHeader.stitchCount - 1;
 	size_t   destination = PCSHeader.stitchCount + ClipStitchCount - 1;
 

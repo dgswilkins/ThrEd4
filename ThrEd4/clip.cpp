@@ -328,7 +328,7 @@ bool clpsid(const std::vector<fPOINT>& clipReversedData,
 			remainder = ((length - clipCount * ClipRectSize.cx) / (clipCount - 1) + ClipRectSize.cx) / length;
 		else
 			remainder = (length - ClipRectSize.cx) / 2;
-		fPOINT step        = { delta.x * remainder, delta.y * remainder };
+		const fPOINT step        = { delta.x * remainder, delta.y * remainder };
 		auto   insertPoint = begin;
 		for (size_t index = 0; index < ClipStitchCount; index++)
 			rotangf(clipReversedData[index], clipFillData[index], rotationAngle, rotationCenter);
@@ -661,7 +661,7 @@ void clpcrnr(std::vector<fPOINT>& clipFillData, size_t vertex, const dPOINT& rot
 	const auto ratio  = getplen() / length;
 	delta.x *= ratio;
 	delta.y *= ratio;
-	fPOINT point               = { CurrentFormVertices[nextVertex].x + delta.x, CurrentFormVertices[nextVertex].y + delta.y };
+	const fPOINT point               = { CurrentFormVertices[nextVertex].x + delta.x, CurrentFormVertices[nextVertex].y + delta.y };
 	OSequence[SequenceIndex++] = CurrentFormVertices[nextVertex];
 	OSequence[SequenceIndex++] = point;
 	OSequence[SequenceIndex++] = CurrentFormVertices[nextVertex];
