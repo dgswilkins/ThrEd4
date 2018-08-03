@@ -834,19 +834,22 @@ inline bool fPOINT::operator==(const fPOINT& rhs) const noexcept {
 	return (x == rhs.x) && (y == rhs.y);
 }
 
+#pragma warning(push)
+#pragma warning(disable : 4244)
 inline fPOINT& fPOINT::operator=(const dPOINT& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
 }
 
-inline fPOINT& fPOINT::operator=(const fPOINTATTR& rhs) noexcept {
+inline fPOINT& fPOINT::operator=(const SMALPNTL& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
 }
+#pragma warning(pop)
 
-inline fPOINT& fPOINT::operator=(const SMALPNTL& rhs) noexcept {
+inline fPOINT& fPOINT::operator=(const fPOINTATTR& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
