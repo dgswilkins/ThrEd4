@@ -798,6 +798,11 @@ public:
 	float x;
 	float y;
 
+	fPOINT()
+		: x(0.0)
+		, y(0.0) {
+	}
+	inline fPOINT(double rhsX, double rhsY);
 	inline bool    operator==(const fPOINT& rhs) const noexcept;
 	inline fPOINT& operator=(const dPOINT& rhs) noexcept;
 	inline fPOINT& operator=(const fPOINTATTR& rhs) noexcept;
@@ -836,6 +841,11 @@ inline bool fPOINT::operator==(const fPOINT& rhs) const noexcept {
 
 #pragma warning(push)
 #pragma warning(disable : 4244)
+inline fPOINT::fPOINT(double rhsX, double rhsY)
+    : x(rhsX)
+    , y(rhsY) {
+}
+
 inline fPOINT& fPOINT::operator=(const dPOINT& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
