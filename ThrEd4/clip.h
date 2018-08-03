@@ -33,10 +33,10 @@ void               clpic();
 //                          size_t                     start,
 //                          size_t                     finish,
 //                          const dPOINT&              rotationCenter);
-//void               clpsub(size_t fpnt, size_t cnt);
+//void               clpsub(size_t fpnt, size_t cnt) noexcept;
 //void               clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints);
 void               delclps(size_t iForm);
-void               deleclp(size_t iForm);
+void               deleclp(size_t iForm) noexcept;
 void               delmclp(size_t iForm);
 //void               duch(std::vector<fPOINT>& chainEndPoints);
 //void               duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned start, unsigned finish);
@@ -45,7 +45,7 @@ void               duxclp();
 //void               dulast(std::vector<fPOINT>& chainEndPoints);
 //void               durev(std::vector<fPOINT>& clipReversedData);
 
-// size_t            findclp(size_t formIndex);
+// size_t            findclp(size_t formIndex) noexcept;
 //void               fxlen(std::vector<fPOINT>& chainEndPoints, const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs, unsigned currentSide);
 //void fxlin(std::vector<fPOINT>&       chainEndPoints,
 //	const std::vector<double>& ListSINEs,
@@ -54,10 +54,10 @@ void               duxclp();
 //	unsigned                   currentSide);
 //void               fxlit(const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs, dPOINT& moveToCoords);
 //bool     fxpnt(const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs, dPOINT& moveToCoords);
-bool isclp(size_t iForm);
+bool isclp(size_t iForm) noexcept;
 bool isclpx(size_t iForm);
 bool iseclp(size_t iForm);
-bool iseclpx(size_t iForm);
+bool iseclpx(size_t iForm) noexcept;
 //void lincrnr(const std::vector<fPOINT>& clipReversedData,
 //	std::vector<fPOINT>&       clipFillData,
 //	double                     clipAngle,
@@ -69,9 +69,9 @@ bool iseclpx(size_t iForm);
 //	double                     clipAngle,
 //	const dPOINT&              vector0,
 //	const dPOINT&              rotationCenter,
-//	unsigned int               currentSide);
-fPOINT*          nueclp(size_t currentForm, size_t count);
-fPOINT*          numclp();
+//	size_t                     currentSide);
+fPOINT*          nueclp(size_t currentForm, size_t count) noexcept;
+fPOINT*          numclp() noexcept;
 bool nupnt(double clipAngle, dPOINT& moveToCoords, unsigned currentSide);
 void             oclp(const fPOINT* const clip, size_t clipEntries);
 //void picfn(std::vector<fPOINT>& clipFillData, size_t start, size_t finish, double spacing, const dPOINT& rotationCenter);
