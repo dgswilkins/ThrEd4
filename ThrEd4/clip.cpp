@@ -43,32 +43,30 @@ size_t NextStart;           // index of the endpoint of the line segment being p
 
 bool iseclp(size_t iForm) noexcept {
 	if (FormList[iForm].edgeType == EDGECLIP || FormList[iForm].edgeType == EDGEPICOT || FormList[iForm].edgeType == EDGECLIPX)
-		return 1;
-	return 0;
+		return true;
+	return false;
 }
 
 bool isclp(size_t iForm) noexcept {
 	if ((1 << FormList[iForm].fillType) & ClipTypeMap)
-		return 1;
-	return 0;
+		return true;
+	return false;
 }
 
 bool isclpx(size_t iForm) noexcept {
 	if (isclp(iForm) && FormList[iForm].lengthOrCount.clipCount)
-		return 1;
-	return 0;
+		return true;
+	return false;
 }
 
-bool iseclpx(size_t iForm) {
+bool iseclpx(size_t iForm) noexcept {
 	if (iseclp(iForm) && FormList[iForm].clipEntries)
-		return 1;
-	return 0;
+		return true;
+	return false;
 }
 
-size_t findclp(size_t formIndex) {
-	size_t iForm;
-
-	for (iForm = formIndex; iForm != 0; iForm--) {
+size_t findclp(size_t formIndex) noexcept {
+	for (auto iForm = formIndex; iForm != 0; iForm--) {
 		if (iseclp(iForm - 1))
 			return FormList[iForm - 1].borderClipData - ClipPoints + FormList[iForm - 1].clipEntries;
 		if (isclp(iForm - 1))
@@ -77,10 +75,8 @@ size_t findclp(size_t formIndex) {
 	return 0;
 }
 
-void clpsub(size_t fpnt, size_t cnt) {
-	size_t iForm;
-
-	for (iForm = fpnt + 1; iForm < FormIndex; iForm++) {
+void clpsub(size_t fpnt, size_t cnt) noexcept {
+	for (auto iForm = fpnt + 1; iForm < FormIndex; iForm++) {
 		if (isclpx(iForm))
 			FormList[iForm].angleOrClipData.clip -= cnt;
 		if (iseclpx(fpnt))
@@ -89,12 +85,10 @@ void clpsub(size_t fpnt, size_t cnt) {
 }
 
 void delmclp(size_t iForm) {
-	size_t source = 0, destination = 0;
-
 	if (ClipPointIndex) {
 		if (isclp(iForm)) {
-			destination = findclp(iForm);
-			source      = destination + FormList[iForm].lengthOrCount.clipCount;
+			auto destination = findclp(iForm);
+			auto source      = destination + FormList[iForm].lengthOrCount.clipCount;
 			std::copy(ClipPoints + source,
 			          ClipPoints + ClipPointIndex,
 			          stdext::make_checked_array_iterator((ClipPoints + destination), (MAXITEMS - destination)));
@@ -110,13 +104,11 @@ void delmclp(size_t iForm) {
 	}
 }
 
-void deleclp(size_t iForm) {
-	size_t source = 0, destination = 0;
-
+void deleclp(size_t iForm) noexcept {
 	if (ClipPointIndex) {
 		if (iseclpx(iForm)) {
-			destination = findclp(iForm);
-			source      = destination + FormList[iForm].clipEntries;
+			auto destination = findclp(iForm);
+			auto source      = destination + FormList[iForm].clipEntries;
 			while (source < ClipPointIndex) {
 				ClipPoints[destination++] = ClipPoints[source++];
 			}
@@ -135,10 +127,10 @@ void delclps(size_t iForm) {
 	delmclp(iForm);
 }
 
-fPOINT* nueclp(size_t currentForm, size_t count) {
-	size_t find        = findclp(ClosestFormToCursor);
-	size_t source      = ClipPointIndex - 1;
-	size_t destination = ClipPointIndex + count - 1;
+fPOINT* nueclp(size_t currentForm, size_t count) noexcept {
+	auto find        = findclp(ClosestFormToCursor);
+	auto source      = ClipPointIndex - 1;
+	auto destination = ClipPointIndex + count - 1;
 
 	if (isclp(ClosestFormToCursor))
 		find += FormList[ClosestFormToCursor].lengthOrCount.clipCount;
@@ -157,11 +149,10 @@ fPOINT* nueclp(size_t currentForm, size_t count) {
 	return &ClipPoints[find];
 }
 
-fPOINT* numclp() {
-	size_t find        = findclp(ClosestFormToCursor);
-	size_t source      = ClipPointIndex - 1;
-	size_t destination = ClipPointIndex + ClipStitchCount - 1;
-	size_t iForm       = ClosestFormToCursor + 1;
+fPOINT* numclp() noexcept {
+	auto find        = findclp(ClosestFormToCursor);
+	auto source      = ClipPointIndex - 1;
+	auto destination = ClipPointIndex + ClipStitchCount - 1;
 
 	while ((source + 1) > find) {
 		ClipPoints[destination--] = ClipPoints[source--];
@@ -169,7 +160,7 @@ fPOINT* numclp() {
 	FormList[ClosestFormToCursor].angleOrClipData.clip = &ClipPoints[find];
 	if (iseclpx(ClosestFormToCursor))
 		FormList[ClosestFormToCursor].borderClipData += ClipStitchCount;
-	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 		if (isclpx(iForm))
 			FormList[iForm].angleOrClipData.clip += ClipStitchCount;
 		if (iseclpx(iForm))
@@ -181,16 +172,14 @@ fPOINT* numclp() {
 
 void oclp(const fPOINT* const clip, size_t clipEntries) {
 	if (clip) {
-		unsigned iClip = 1;
-
 		if (!StateMap.test(StateFlag::NOCLP)) {
-			for (iClip = 0; iClip < clipEntries; iClip++) {
+			for (size_t iClip = 0u; iClip < clipEntries; iClip++) {
 				ClipBuffer[iClip].x = clip[iClip].x;
 				ClipBuffer[iClip].y = clip[iClip].y;
 			}
 			ClipRect.left = ClipRect.right = ClipBuffer[0].x;
 			ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
-			for (iClip = 1; iClip < clipEntries; iClip++) {
+			for (size_t iClip = 1u; iClip < clipEntries; iClip++) {
 				if (ClipBuffer[iClip].x < ClipRect.left)
 					ClipRect.left = ClipBuffer[iClip].x;
 				if (ClipBuffer[iClip].x > ClipRect.right)
@@ -208,63 +197,58 @@ void oclp(const fPOINT* const clip, size_t clipEntries) {
 }
 
 void durev(std::vector<fPOINT>& clipReversedData) {
-	unsigned     iStitch  = 0;
 	const double midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
 
 	if (ClipBuffer[0].x > midpoint) {
-		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
+		for (size_t iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
 			clipReversedData[iStitch].x = ClipRect.right - ClipBuffer[iStitch].x;
 			clipReversedData[iStitch].y = ClipBuffer[iStitch].y;
 		}
 	}
 	else {
-		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
+		for (size_t iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
 			clipReversedData[iStitch] = ClipBuffer[iStitch];
 		}
 	}
 }
 
-void setvct(unsigned start, unsigned finish, double& ClipAngle, dPOINT& vector0) noexcept {
-	ClipAngle = atan2(CurrentFormVertices[finish].y - CurrentFormVertices[start].y,
+void setvct(unsigned start, unsigned finish, double& clipAngle, dPOINT& vector0) noexcept {
+	clipAngle = atan2(CurrentFormVertices[finish].y - CurrentFormVertices[start].y,
 	                  CurrentFormVertices[finish].x - CurrentFormVertices[start].x);
-	vector0.x = ClipRectSize.cx * cos(ClipAngle);
-	vector0.y = ClipRectSize.cx * sin(ClipAngle);
+	vector0.x = ClipRectSize.cx * cos(clipAngle);
+	vector0.y = ClipRectSize.cx * sin(clipAngle);
 }
 
 bool nupnt(double clipAngle, dPOINT& moveToCoords, unsigned currentSide) noexcept {
-	double       length = 0.0, delta = 0.0;
-	unsigned     step     = 0;
 	const double sinAngle = sin(clipAngle);
 	const double cosAngle = cos(clipAngle);
 
-	// ToDo - should we use a temp variable and assign to moveToCoords before return?
 	moveToCoords = CurrentFormVertices[currentSide + 2];
-	length       = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
+	auto length  = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > ClipRectSize.cx) {
-		for (step = 0; step < 10; step++) {
-			length = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
-			delta  = ClipRectSize.cx - length;
+		for (auto step = 0u; step < 10; step++) {
+			length           = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
+			const auto delta = ClipRectSize.cx - length;
 			moveToCoords.x += delta * cosAngle;
 			moveToCoords.y += delta * sinAngle;
 			if (fabs(delta) < 0.01)
 				break;
 		}
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 bool ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) {
-	fPOINT   adjustedPoint = { (point.x - ClipReference.x), (point.y - ClipReference.y) };
-	unsigned iStitch       = 0;
+	const fPOINT adjustedPoint = { (point.x - ClipReference.x), (point.y - ClipReference.y) };
 
 	if (chkmax(ClipStitchCount, SequenceIndex))
-		return 1;
-	for (iStitch = 0; iStitch < ClipStitchCount; iStitch++) {
+		return true;
+	for (size_t iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 		OSequence[SequenceIndex].x   = clipFillData[iStitch].x + adjustedPoint.x;
 		OSequence[SequenceIndex++].y = clipFillData[iStitch].y + adjustedPoint.y;
 	}
-	return 0;
+	return false;
 }
 
 void lincrnr(const std::vector<fPOINT>& clipReversedData,
@@ -273,15 +257,14 @@ void lincrnr(const std::vector<fPOINT>& clipReversedData,
              dPOINT&                    moveToCoords,
              const dPOINT&              rotationCenter,
              unsigned                   currentSide) {
-	dPOINT   delta   = {};
-	unsigned iStitch = 0;
+	dPOINT delta = {};
 
 	if (nupnt(clipAngle, moveToCoords, currentSide)) {
 		delta.x                    = moveToCoords.x - SelectedPoint.x;
 		delta.y                    = moveToCoords.y - SelectedPoint.y;
 		const double rotationAngle = atan2(delta.y, delta.x);
 		rotangf(BorderClipReference, ClipReference, rotationAngle, rotationCenter);
-		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
+		for (size_t iStitch = 0; iStitch < ClipStitchCount; iStitch++)
 			rotangf(clipReversedData[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
 		ritclp(clipFillData, SelectedPoint);
 		SelectedPoint = moveToCoords;
@@ -293,18 +276,17 @@ void linsid(const std::vector<fPOINT>& clipReversedData,
             double                     clipAngle,
             const dPOINT&              vector0,
             const dPOINT&              rotationCenter,
-            unsigned int               currentSide) {
-	fPOINT         delta     = { (CurrentFormVertices[currentSide + 1].x - SelectedPoint.x),
-                     (CurrentFormVertices[currentSide + 1].y - SelectedPoint.y) };
-	const double   length    = hypot(delta.x, delta.y);
-	const unsigned clipCount = length / ClipRectSize.cx;
-	unsigned       iStitch = 0, iClip = 0;
+            size_t                     currentSide) {
+	const auto&    point     = CurrentFormVertices[currentSide + 1];
+	const fPOINT   delta     = { (point.x - SelectedPoint.x), (point.y - SelectedPoint.y) };
+	const auto     length    = hypot(delta.x, delta.y);
+	const unsigned clipCount = floor(length / ClipRectSize.cx);
 
 	if (clipCount) {
 		rotangf(BorderClipReference, ClipReference, clipAngle, rotationCenter);
-		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
+		for (size_t iStitch = 0; iStitch < ClipStitchCount; iStitch++)
 			rotangf(clipReversedData[iStitch], clipFillData[iStitch], clipAngle, rotationCenter);
-		for (iClip = 0; iClip < clipCount; iClip++) {
+		for (auto iClip = 0u; iClip < clipCount; iClip++) {
 			ritclp(clipFillData, SelectedPoint);
 			SelectedPoint.x += vector0.x;
 			SelectedPoint.y += vector0.y;
@@ -331,46 +313,38 @@ bool clpsid(const std::vector<fPOINT>& clipReversedData,
             size_t                     start,
             size_t                     finish,
             const dPOINT&              rotationCenter) {
-	unsigned     ind = 0, clipCount = 0;
-	fPOINT       delta = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
-                     (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
-	fPOINT       step = {}, insertPoint = {};
-	const double length             = hypot(delta.x, delta.y);
-	double       tdub               = 0.0;
-	fPOINTATTR   clipReferencePoint = { ClipRect.left, ClipRect.bottom };
-	double       rotationAngle      = atan2(delta.y, delta.x);
+	const auto&      end                = CurrentFormVertices[finish];
+	const auto&      begin              = CurrentFormVertices[start];
+	const fPOINT     delta              = { (end.x - begin.x), (end.y - begin.y) };
+	const auto       length             = hypot(delta.x, delta.y);
+	const fPOINTATTR clipReferencePoint = { ClipRect.left, ClipRect.bottom };
+	const double     rotationAngle      = atan2(delta.y, delta.x);
 
 	rotang1(clipReferencePoint, ClipReference, rotationAngle, rotationCenter);
-	clipCount = length / ClipRectSize.cx;
+	const unsigned int clipCount = floor(length / ClipRectSize.cx);
 	if (clipCount) {
+		float remainder = 0.0;
 		if (clipCount > 1)
-			tdub = ((length - clipCount * ClipRectSize.cx) / (clipCount - 1) + ClipRectSize.cx) / length;
+			remainder = ((length - clipCount * ClipRectSize.cx) / (clipCount - 1) + ClipRectSize.cx) / length;
 		else
-			tdub = (length - ClipRectSize.cx) / 2;
-		step.x        = delta.x * tdub;
-		step.y        = delta.y * tdub;
-		insertPoint   = CurrentFormVertices[start];
-		rotationAngle = atan2(delta.y, delta.x);
-		for (ind = 0; ind < ClipStitchCount; ind++)
-			rotangf(clipReversedData[ind], clipFillData[ind], rotationAngle, rotationCenter);
-		for (ind = 0; ind < clipCount; ind++) {
+			remainder = (length - ClipRectSize.cx) / 2;
+		fPOINT step        = { delta.x * remainder, delta.y * remainder };
+		auto   insertPoint = begin;
+		for (size_t index = 0; index < ClipStitchCount; index++)
+			rotangf(clipReversedData[index], clipFillData[index], rotationAngle, rotationCenter);
+		for (auto stepCount = 0u; stepCount < clipCount; stepCount++) {
 			if (ritclp(clipFillData, insertPoint))
 				break;
 			insertPoint.x += step.x;
 			insertPoint.y += step.y;
 		}
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 void clpbrd(size_t startVertex) {
-	size_t reference     = 0;
-	size_t currentVertex = 0, nextVertex = 0;
-	double clipAngle      = 0;  // for clipboard border fill
-	dPOINT vector0        = {}; // x size of the clipboard fill at the fill angle
-	dPOINT moveToCoords   = {}; // moving formOrigin for clipboard fill
-	dPOINT rotationCenter = {};
+	dPOINT moveToCoords = {}; // moving formOrigin for clipboard fill
 
 	SequenceIndex = 0;
 	StateMap.reset(StateFlag::CLPBAK);
@@ -378,12 +352,15 @@ void clpbrd(size_t startVertex) {
 	HorizontalLength  = ClipRectSize.cx;
 	std::vector<fPOINT> clipFillData(ClipStitchCount);
 	std::vector<fPOINT> clipReversedData(ClipStitchCount);
-	rotationCenter.x = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
-	ClipReference.y = rotationCenter.y = (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom;
-	ClipReference.x                    = ClipRect.left;
+	const dPOINT        rotationCenter
+	    = { (ClipRect.right - ClipRect.left) / 2 + ClipRect.left, (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom };
+	ClipReference.x = ClipRect.left;
+	ClipReference.y = rotationCenter.y;
 	durev(clipReversedData);
 	if (SelectedForm->type == FRMLINE) {
-		SelectedPoint = CurrentFormVertices[0];
+		SelectedPoint    = CurrentFormVertices[0];
+		double clipAngle = 0.0; // for clipboard border fill
+		dPOINT vector0   = {};  // x size of the clipboard fill at the fill angle
 		setvct(0, 1, clipAngle, vector0);
 		// Since ClipRect.bottom is always 0
 		BorderClipReference.y = ClipRect.top / 2;
@@ -391,7 +368,7 @@ void clpbrd(size_t startVertex) {
 		// the center of the clip with the beginning of the line
 		BorderClipReference.x = 0;
 		// BorderClipReference.x = ClipRect.right / 2;
-		unsigned currentSide;
+		size_t currentSide;
 		for (currentSide = 0; currentSide < VertexCount - 2; currentSide++) {
 			linsid(clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, currentSide);
 			setvct(currentSide + 1, currentSide + 2, clipAngle, vector0);
@@ -401,30 +378,28 @@ void clpbrd(size_t startVertex) {
 	}
 	else {
 		clpout();
-		reference = currentVertex = startVertex;
+		auto reference     = startVertex;
+		auto currentVertex = startVertex;
 		for (size_t iVertex = 0; iVertex < VertexCount; iVertex++) {
-			nextVertex = prv(currentVertex);
-			if (clpsid(clipReversedData, clipFillData, reference, nextVertex, rotationCenter))
+			const auto nextVertex = prv(currentVertex);
+			if (clpsid(clipReversedData, clipFillData, reference, nextVertex, rotationCenter)) {
 				reference = nextVertex;
+			}
 			currentVertex = nextVertex;
 		}
 	}
 }
 
 bool fxpnt(const std::vector<double>& listSINEs,
-	const std::vector<double>& listCOSINEs,
-	dPOINT&                    moveToCoords,
-	unsigned                   currentSide) {
-	double   length = 0.0, delta = 0.0;
-	unsigned iGuess = 0;
-
-	moveToCoords.x = CurrentFormVertices[NextStart].x;
-	moveToCoords.y = CurrentFormVertices[NextStart].y;
-	length = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
+           const std::vector<double>& listCOSINEs,
+           dPOINT&                    moveToCoords,
+           unsigned                   currentSide) {
+	moveToCoords = CurrentFormVertices[NextStart];
+	auto length  = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > AdjustedSpace) {
-		for (iGuess = 0; iGuess < 10; iGuess++) {
-			length = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
-			delta = AdjustedSpace - length;
+		for (auto iGuess = 0u; iGuess < 10; iGuess++) {
+			length           = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
+			const auto delta = AdjustedSpace - length;
 			moveToCoords.x += delta * listCOSINEs[currentSide];
 			moveToCoords.y += delta * listSINEs[currentSide];
 			if (fabs(delta) < 0.2)
@@ -439,18 +414,13 @@ void fxlit(const std::vector<double>& listSINEs,
            const std::vector<double>& listCOSINEs,
            dPOINT&                    moveToCoords,
            unsigned                   currentSide) {
-	double   length = 0.0;
-	unsigned count  = 0;
-	dPOINT   delta  = {};
-
 	if (fxpnt(listSINEs, listCOSINEs, moveToCoords, currentSide)) {
-		SelectedPoint.x = moveToCoords.x;
-		SelectedPoint.y = moveToCoords.y;
+		SelectedPoint = moveToCoords;
 		BeanCount++;
-		length  = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
-		count   = floor(length / AdjustedSpace);
-		delta.x = AdjustedSpace * listCOSINEs[currentSide];
-		delta.y = AdjustedSpace * listSINEs[currentSide];
+		const auto length
+		    = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
+		const unsigned int count = floor(length / AdjustedSpace);
+		dPOINT             delta = { AdjustedSpace * listCOSINEs[currentSide], AdjustedSpace * listSINEs[currentSide] };
 		SelectedPoint.x += delta.x * count;
 		SelectedPoint.y += delta.y * count;
 		BeanCount += count;
@@ -462,20 +432,14 @@ void fxlin(std::vector<fPOINT>&       chainEndPoints,
            const std::vector<double>& ListCOSINEs,
            dPOINT&                    moveToCoords,
            unsigned                   currentSide) {
-	double   length = 0.0;
-	unsigned count  = 0;
-	unsigned iChain = 0;
-	dPOINT   delta  = {};
-
 	if (fxpnt(ListSINEs, ListCOSINEs, moveToCoords, currentSide)) {
-		SelectedPoint.x = moveToCoords.x;
-		SelectedPoint.y = moveToCoords.y;
+		SelectedPoint = moveToCoords;
 		chainEndPoints.push_back(SelectedPoint);
-		length  = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
-		count   = floor(length / AdjustedSpace);
-		delta.x = AdjustedSpace * ListCOSINEs[currentSide];
-		delta.y = AdjustedSpace * ListSINEs[currentSide];
-		for (iChain = 0; iChain < count; iChain++) {
+		const auto length
+		    = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
+		const size_t count = floor(length / AdjustedSpace);
+		const dPOINT delta = { AdjustedSpace * ListCOSINEs[currentSide], AdjustedSpace * ListSINEs[currentSide] };
+		for (size_t iChain = 0; iChain < count; iChain++) {
 			SelectedPoint.x += delta.x;
 			SelectedPoint.y += delta.y;
 			chainEndPoints.push_back(SelectedPoint);
@@ -483,26 +447,14 @@ void fxlin(std::vector<fPOINT>&       chainEndPoints,
 	}
 }
 
-void fxlen(std::vector<fPOINT>&       chainEndPoints,
-           const std::vector<double>& listSINEs,
-           const std::vector<double>& listCOSINEs) {
-	double   interval        = 0.0;
-	double   minimumInterval = 0.0;
-	double   minimumSpacing  = 0.0;
-	double   largestSpacing  = 0.0;
-	double   smallestSpacing = 0.0;
-	double   halfSpacing     = 0.0;
-	unsigned initialCount    = 0;
-	unsigned loopCount       = 0;
-	unsigned iVertex         = 0;
-	double   length          = 0.0;
-	dPOINT   moveToCoords    = {}; // moving formOrigin for clipboard fill
+void fxlen(std::vector<fPOINT>& chainEndPoints, const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs) {
+	dPOINT moveToCoords = {}; // moving formOrigin for clipboard fill
 
 	AdjustedSpace = 0;
 	bool flag     = true;
-	for (iVertex = 1; iVertex < VertexCount; iVertex++) {
-		length = hypot(CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x,
-		               CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y);
+	for (size_t iVertex = 1; iVertex < VertexCount; iVertex++) {
+		const auto length = hypot(CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x,
+		                          CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y);
 		if (length > SelectedForm->edgeSpacing) {
 			flag = false;
 			break;
@@ -518,12 +470,15 @@ void fxlen(std::vector<fPOINT>&       chainEndPoints,
 		chainEndPoints.push_back(CurrentFormVertices[1]);
 		return;
 	}
-	AdjustedSpace = minimumSpacing = SelectedForm->edgeSpacing;
-	halfSpacing                    = AdjustedSpace / 2;
-	interval = minimumInterval = 1e9;
-	loopCount = initialCount = 0;
-	smallestSpacing          = 0;
-	largestSpacing           = 1;
+	AdjustedSpace              = SelectedForm->edgeSpacing;
+	auto       minimumSpacing  = SelectedForm->edgeSpacing;
+	const auto halfSpacing     = AdjustedSpace / 2;
+	auto       interval        = 1e9;
+	auto       minimumInterval = 1e9;
+	size_t     loopCount       = 0;
+	size_t     initialCount    = 0;
+	auto       smallestSpacing = 0.0;
+	auto       largestSpacing  = 1.0;
 	// loop at least 50 times to guarantee convergence
 	while (loopCount < 50 && (largestSpacing - smallestSpacing) > TINY) {
 		BeanCount     = 0;
@@ -542,8 +497,9 @@ void fxlen(std::vector<fPOINT>&       chainEndPoints,
 		if (!initialCount) {
 			initialCount    = BeanCount;
 			smallestSpacing = AdjustedSpace;
-			minimumInterval = interval = static_cast<double>(
-			    hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y));
+			minimumInterval
+			    = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
+			interval       = minimumInterval;
 			minimumSpacing = AdjustedSpace;
 			interval /= initialCount;
 			AdjustedSpace += interval / 2;
@@ -593,14 +549,12 @@ void fxlen(std::vector<fPOINT>&       chainEndPoints,
 }
 
 void dufxlen(std::vector<fPOINT>& chainEndPoints) {
-	unsigned iVertex = 0;
-
 	duangs();
 	std::vector<double> listSINEs;
 	listSINEs.reserve(VertexCount + 1);
 	std::vector<double> listCOSINEs;
 	listCOSINEs.reserve(VertexCount);
-	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+	for (size_t iVertex = 0; iVertex < VertexCount; iVertex++) {
 		listSINEs.push_back(sin((*FormAngles)[iVertex]));
 		listCOSINEs.push_back(cos((*FormAngles)[iVertex]));
 	}
@@ -611,28 +565,23 @@ void dufxlen(std::vector<fPOINT>& chainEndPoints) {
 }
 
 void dulast(std::vector<fPOINT>& chainEndPoints) {
-	unsigned iPoint = 0, iDestination = 0, minimumIndex = 0;
-	double   minimumLength = 0.0;
-	double   length        = 0.0;
-
 	std::vector<fPOINT> tempClipPoints;
 	tempClipPoints.reserve(chainEndPoints.size());
 	if (lastch()) {
-		minimumLength = 1e99;
-		minimumIndex  = 0;
-		for (iPoint = 0; iPoint < chainEndPoints.size() - 1; iPoint++) {
-			length = hypot(LastPoint.x - chainEndPoints[iPoint].x, LastPoint.y - chainEndPoints[iPoint].y);
+		auto   minimumLength = 1e99;
+		size_t minimumIndex  = 0;
+		for (size_t iPoint = 0; iPoint < chainEndPoints.size() - 1; iPoint++) {
+			const auto length = hypot(LastPoint.x - chainEndPoints[iPoint].x, LastPoint.y - chainEndPoints[iPoint].y);
 			if (length < minimumLength) {
 				minimumLength = length;
 				minimumIndex  = iPoint;
 			}
 		}
 		if (minimumIndex) {
-			iDestination = 0;
-			for (iPoint = minimumIndex; iPoint < chainEndPoints.size() - 2; iPoint++) {
+			for (size_t iPoint = minimumIndex; iPoint < chainEndPoints.size() - 2; iPoint++) {
 				tempClipPoints.push_back(chainEndPoints[iPoint]);
 			}
-			for (iPoint = 0; iPoint <= minimumIndex; iPoint++) {
+			for (size_t iPoint = 0; iPoint <= minimumIndex; iPoint++) {
 				tempClipPoints.push_back(chainEndPoints[iPoint]);
 			}
 			chainEndPoints = tempClipPoints;
@@ -641,18 +590,15 @@ void dulast(std::vector<fPOINT>& chainEndPoints) {
 }
 
 void clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints) {
-	unsigned iPoint = 0;
-	float    pivot  = 0.0;
-
 	dulast(chainEndPoints);
 	if (SelectedForm->type == FRMLINE) {
-		pivot = ClipRectSize.cy / 2;
-		for (iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
+		const auto pivot = ClipRectSize.cy / 2;
+		for (size_t iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
 			tempClipPoints.push_back({ ClipBuffer[iPoint].x, (-ClipBuffer[iPoint].y + pivot) });
 		}
 	}
 	else {
-		for (iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
+		for (size_t iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
 			tempClipPoints.push_back({ ClipBuffer[iPoint].x, (-ClipBuffer[iPoint].y) });
 		}
 	}
@@ -663,14 +609,12 @@ void xclpfn(const std::vector<fPOINT>& tempClipPoints,
             unsigned                   start,
             unsigned                   finish,
             const dPOINT&              rotationCenter) {
-	dPOINT delta = { (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
-	unsigned            iPoint = 0;
-	const double        length = hypot(delta.x, delta.y);
-	const double        ratio  = length / ClipRectSize.cx;
 	std::vector<fPOINT> points(ClipStitchCount);
 
+	const dPOINT delta
+	    = { (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
 	const double rotationAngle = atan2(delta.y, delta.x);
-	for (iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
+	for (size_t iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
 		points[iPoint] = tempClipPoints[iPoint];
 		rotflt(points[iPoint], rotationAngle, rotationCenter);
 		OSequence[SequenceIndex].x   = chainEndPoints[start].x + points[iPoint].x;
@@ -698,119 +642,87 @@ void duxclp() {
 
 void clpcrnr(std::vector<fPOINT>& clipFillData, size_t vertex, const dPOINT& rotationCenter) {
 	const size_t nextVertex = nxt(vertex);
-	unsigned     iStitch    = 0;
-	dPOINT       delta = {}, point = {};
-	fPOINT       tpnt   = {};
-	double       length = 0.0, ratio = 0.0;
-	fPOINTATTR   referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
+	dPOINT       delta      = {};
 
 	if (StateMap.test(StateFlag::INDIR)) {
-		delta.x = (*OutsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x;
-		delta.y = (*OutsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y;
+		delta = { (*OutsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
+			      (*OutsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y };
 	}
 	else {
-		delta.x = (*InsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x;
-		delta.y = (*InsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y;
+		delta = { (*InsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
+			      (*InsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y };
 	}
-	const double rotationAngle = atan2(delta.y, delta.x) + PI / 2;
+	const double     rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
+	const fPOINTATTR referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
 	rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
-	for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
+	for (size_t iStitch = 0; iStitch < ClipStitchCount; iStitch++)
 		rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
-	length = hypot(delta.x, delta.y);
-	ratio  = getplen() / length;
+	const auto length = hypot(delta.x, delta.y);
+	const auto ratio  = getplen() / length;
 	delta.x *= ratio;
 	delta.y *= ratio;
-	point.x                      = CurrentFormVertices[nextVertex].x + delta.x;
-	point.y                      = CurrentFormVertices[nextVertex].y + delta.y;
-	OSequence[SequenceIndex++]   = CurrentFormVertices[nextVertex];
-	OSequence[SequenceIndex].x   = point.x;
-	OSequence[SequenceIndex++].y = point.y;
-	OSequence[SequenceIndex++]   = CurrentFormVertices[nextVertex];
-	OSequence[SequenceIndex].x   = point.x;
-	OSequence[SequenceIndex++].y = point.y;
-	tpnt.x                       = point.x;
-	tpnt.y                       = point.y;
-	if (!ritclp(clipFillData, tpnt)) {
-		OSequence[SequenceIndex].x   = point.x;
-		OSequence[SequenceIndex++].y = point.y;
-		OSequence[SequenceIndex++]   = CurrentFormVertices[nextVertex];
+	fPOINT point               = { CurrentFormVertices[nextVertex].x + delta.x, CurrentFormVertices[nextVertex].y + delta.y };
+	OSequence[SequenceIndex++] = CurrentFormVertices[nextVertex];
+	OSequence[SequenceIndex++] = point;
+	OSequence[SequenceIndex++] = CurrentFormVertices[nextVertex];
+	OSequence[SequenceIndex++] = point;
+	if (!ritclp(clipFillData, point)) {
+		OSequence[SequenceIndex++] = point;
+		OSequence[SequenceIndex++] = CurrentFormVertices[nextVertex];
 	}
 }
 
 void picfn(std::vector<fPOINT>& clipFillData, size_t start, size_t finish, double spacing, const dPOINT& rotationCenter) {
-	dPOINT       delta          = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
-                     (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
-	const double length         = hypot(delta.x, delta.y);
-	dPOINT       innerPoint     = { CurrentFormVertices[start].x, CurrentFormVertices[start].y };
-	fPOINTATTR   referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
-	double       tdub           = 0.0;
-	dPOINT       step = {}, outerStep = {}, firstPoint = {}, outerPoint = {};
-	fPOINT       tpnt  = {};
-	unsigned     count = 0, iStitch = 0, iStep = 0;
+	const dPOINT     delta          = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
+                           (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
+	const double     length         = hypot(delta.x, delta.y);
+	const fPOINTATTR referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
 
-	double rotationAngle = atan2(-delta.x, delta.y);
-	outerStep.x          = SelectedForm->borderSize * cos(rotationAngle);
-	outerStep.y          = SelectedForm->borderSize * sin(rotationAngle);
+	double       rotationAngle = atan2(-delta.x, delta.y);
+	const dPOINT outerStep     = { SelectedForm->borderSize * cos(rotationAngle), SelectedForm->borderSize * sin(rotationAngle) };
 	spacing += ClipRectSize.cx;
-	count         = length / spacing;
-	rotationAngle = atan2(delta.y, delta.x);
+	const unsigned int count = length / spacing;
+	rotationAngle            = atan2(delta.y, delta.x);
 	rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	if (count) {
-		step.x = 0;
-		step.y = 0;
+		dPOINT step = {};
 		if (count > 1) {
-			tdub   = ((length - count * spacing) / (count - 1) + spacing) / length;
-			step.x = delta.x * tdub;
-			step.y = delta.y * tdub;
+			const auto tdub = ((length - count * spacing) / (count - 1) + spacing) / length;
+			step            = { delta.x * tdub, delta.y * tdub };
 		}
-		for (iStitch = 0; iStitch < ClipStitchCount; iStitch++)
+		for (size_t iStitch = 0; iStitch < ClipStitchCount; iStitch++)
 			rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
-		bool flag = true;
-		for (iStep = 0; iStep < count - 1; iStep++) {
-			firstPoint.x                 = innerPoint.x + step.x;
-			firstPoint.y                 = innerPoint.y + step.y;
-			outerPoint.x                 = firstPoint.x + outerStep.x;
-			outerPoint.y                 = firstPoint.y + outerStep.y;
-			OSequence[SequenceIndex].x   = firstPoint.x;
-			OSequence[SequenceIndex++].y = firstPoint.y;
-			OSequence[SequenceIndex].x   = innerPoint.x;
-			OSequence[SequenceIndex++].y = innerPoint.y;
-			OSequence[SequenceIndex].x   = firstPoint.x;
-			OSequence[SequenceIndex++].y = firstPoint.y;
-			OSequence[SequenceIndex].x   = outerPoint.x;
-			OSequence[SequenceIndex++].y = outerPoint.y;
-			OSequence[SequenceIndex].x   = firstPoint.x;
-			OSequence[SequenceIndex++].y = firstPoint.y;
-			OSequence[SequenceIndex].x   = outerPoint.x;
-			OSequence[SequenceIndex++].y = outerPoint.y;
-			tpnt.x                       = outerPoint.x;
-			tpnt.y                       = outerPoint.y;
-			if (ritclp(clipFillData, tpnt)) {
+		bool   flag       = true;
+		fPOINT innerPoint = { CurrentFormVertices[start].x, CurrentFormVertices[start].y };
+		for (size_t iStep = 0; iStep < count - 1; iStep++) {
+			const fPOINT firstPoint    = { innerPoint.x + step.x, innerPoint.y + step.y };
+			const fPOINT outerPoint    = { firstPoint.x + outerStep.x, firstPoint.y + outerStep.y };
+			OSequence[SequenceIndex++] = firstPoint;
+			OSequence[SequenceIndex++] = innerPoint;
+			OSequence[SequenceIndex++] = firstPoint;
+			OSequence[SequenceIndex++] = outerPoint;
+			OSequence[SequenceIndex++] = firstPoint;
+			OSequence[SequenceIndex++] = outerPoint;
+			if (ritclp(clipFillData, outerPoint)) {
 				flag = false;
 				break;
 			}
-			OSequence[SequenceIndex].x   = outerPoint.x;
-			OSequence[SequenceIndex++].y = outerPoint.y;
-			OSequence[SequenceIndex].x   = firstPoint.x;
-			OSequence[SequenceIndex++].y = firstPoint.y;
+			OSequence[SequenceIndex++] = outerPoint;
+			OSequence[SequenceIndex++] = firstPoint;
 			innerPoint.x += step.x;
 			innerPoint.y += step.y;
 		}
 		if (flag) {
-			OSequence[SequenceIndex++]   = CurrentFormVertices[finish];
-			OSequence[SequenceIndex].x   = innerPoint.x;
-			OSequence[SequenceIndex++].y = innerPoint.y;
+			OSequence[SequenceIndex++] = CurrentFormVertices[finish];
+			OSequence[SequenceIndex++] = innerPoint;
 		}
 	}
 }
 
 void clpic() {
-	const unsigned short start         = 0;
-	unsigned             iVertex       = 0;
-	size_t               currentVertex = start, nextVertex = 0;
-	std::vector<fPOINT>  clipFillData(ClipStitchCount);
+	std::vector<fPOINT> clipFillData(ClipStitchCount);
 
-	dPOINT rotationCenter
+	const dPOINT rotationCenter
 	    = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ((ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom) };
 
 	SequenceIndex = 0;
@@ -821,19 +733,19 @@ void clpic() {
 	ClipReference.x   = ClipRect.left;
 	satout(20);
 	if (SelectedForm->type == FRMLINE) {
-		for (iVertex = 0; iVertex < VertexCount - 2; iVertex++) {
+		for (size_t iVertex = 0; iVertex < VertexCount - 2; iVertex++) {
 			picfn(clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing, rotationCenter);
 			clpcrnr(clipFillData, iVertex, rotationCenter);
 		}
-		picfn(clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing, rotationCenter);
+		picfn(clipFillData, VertexCount - 1, VertexCount, SelectedForm->edgeSpacing, rotationCenter);
 	}
 	else {
 		if (!SelectedForm->fillType) {
-			OSequence[SequenceIndex++] = CurrentFormVertices[start];
+			OSequence[SequenceIndex++] = CurrentFormVertices[0];
 		}
-		currentVertex = start;
-		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-			nextVertex = nxt(currentVertex);
+		size_t currentVertex = 0;
+		for (size_t iVertex = 0; iVertex < VertexCount; iVertex++) {
+			const auto nextVertex = nxt(currentVertex);
 			picfn(clipFillData, currentVertex, nextVertex, SelectedForm->edgeSpacing, rotationCenter);
 			clpcrnr(clipFillData, currentVertex, rotationCenter);
 			currentVertex = nextVertex;
@@ -843,8 +755,7 @@ void clpic() {
 }
 
 void duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned start, unsigned finish) {
-	unsigned              iChain        = 0;
-	std::vector<unsigned> chainSequence = { 0, 1, 2, 3, 0, 1, 4, 3, 0, 3 }; // chain stitch sequence
+	const std::vector<unsigned> chainSequence = { 0, 1, 2, 3, 0, 1, 4, 3, 0, 3 }; // chain stitch sequence
 
 	std::vector<fPOINT> chainPoint(5);
 	dPOINT delta = { (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
@@ -860,7 +771,6 @@ void duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned start, unsigned 
 	chainPoint[1].y = middleYcoord + offset.y;
 	chainPoint[3].x = middleXcoord - offset.x;
 	chainPoint[3].y = middleYcoord - offset.y;
-	// ToDo - This may not be correct
 	if (finish < chainEndPoints.size() - 1) {
 		delta.x = chainEndPoints[finish + 1].x - chainEndPoints[finish].x;
 		delta.y = chainEndPoints[finish + 1].y - chainEndPoints[finish].y;
@@ -874,33 +784,32 @@ void duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned start, unsigned 
 	size_t chainCount = chainSequence.size();
 	if (StateMap.test(StateFlag::LINCHN))
 		chainCount--;
-	for (iChain = 0; iChain < chainCount; iChain++) {
+	for (size_t iChain = 0; iChain < chainCount; iChain++) {
 		OSequence[SequenceIndex] = chainPoint[chainSequence[iChain]];
 		SequenceIndex++;
 	}
 }
 
 void duch(std::vector<fPOINT>& chainEndPoints) {
-	unsigned iPoint = 0, backupAt = 0;
-
-	SequenceIndex = 0;
-	if (chainEndPoints.size()) {
-		for (iPoint = 0; iPoint < chainEndPoints.size() - 2; iPoint++) {
+	SequenceIndex          = 0;
+	const auto chainLength = chainEndPoints.size() - 1;
+	if (chainLength) {
+		for (size_t iPoint = 0; iPoint < chainLength - 1; iPoint++) {
 			duchfn(chainEndPoints, iPoint, iPoint + 1);
 		}
 		if (SelectedForm->type == FRMLINE) {
-			duchfn(chainEndPoints, iPoint, iPoint + 1);
-			backupAt = 8;
+			duchfn(chainEndPoints, chainLength - 1, chainLength);
+			size_t backupAt = 8;
 			if (StateMap.test(StateFlag::LINCHN))
 				backupAt--;
 			if ((SequenceIndex >= backupAt)) {
-				OSequence[SequenceIndex - backupAt] = chainEndPoints[iPoint + 1];
+				OSequence[SequenceIndex - backupAt] = chainEndPoints[chainLength];
 			}
-			OSequence[SequenceIndex++] = chainEndPoints[iPoint + 1];
+			OSequence[SequenceIndex++] = chainEndPoints[chainLength];
 		}
 		else {
-			duchfn(chainEndPoints, iPoint, 0);
-			OSequence[SequenceIndex++] = chainEndPoints[chainEndPoints.size() - 1];
+			duchfn(chainEndPoints, chainLength - 1, 0);
+			OSequence[SequenceIndex++] = chainEndPoints[chainLength];
 		}
 	}
 	else
