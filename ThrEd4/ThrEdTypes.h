@@ -390,244 +390,244 @@ enum class StateFlag
 	WASLIN,    // a move stitch line has been drawn
 	CAPT,      // screen capture in effect
 	VCAPT,     // keep screen capture as long as the mouse cursor
-			   // is in the edit window
-			   SELBOX,    // the select box is showing
-			   ILIN,      // insert line is showing on the screen
-			   INIT,      // set when a stitch is entered in the stitch buffer,a form is entered, or the mark is set
-			   LIN1,      // drawing only one line in stitch insert mode
-			   ILIN1,     // one insert line showing on screen
-			   GRPSEL,    // group select mode
-			   SCROS,     // start group cross has been drawn
-			   ECROS,     // end group cross has been drawn
-			   ELIN,      // group select line has been drawn
-			   BAKEND,    // insert data should be appended to the end of the file
-			   CLPSHO,    // display the clipboard insert rectangle
-			   SELSHO,    // display the select rectangle
-			   ROTAT,     // rotate state
-			   ROTSHO,    // rotate rectangle is showing
-			   ROTUSHO,   // rotate indicator line is showing
-			   ROTCAPT,   // rotate capture mode
-			   MOVCNTR,   // user is moving the rotate center
-			   GETMIN,    // user is entering a minimum stitch length
-			   NUMIN,     // user in entering a number
-			   MOVFRM,    // user is moving a form vertex
-			   MOVMSG,    // user tried to move an edited form
-			   SHOFRM,    // form is currently written to the screen
-			   STHR,      // user is entering a new stitch box threshold
-			   ENTAR,     // user is adjusting a number with the up and down arrow keys
-			   ENTR30,    // user is entering a new thread size for #30 thread
-			   ENTR40,    // user is entering a new thread size for #40 thread
-			   ENTR60,    // user is entering a new thread size for #60 thread
-			   FORMSEL,   // a form is selected
-			   FRMPMOV,   // user is moving a point on a form
-			   IGNOR,     // user may elect to ignore a message about losing edits when resizing a form
-			   FRMOV,     // user is moving a form
-			   RUNPAT,    // user is runing a pattern
-			   WASPAT,    // user ran a pattern, but hasn't done anything else yet
-			   FILDIR,    // direction lines in angle fill
-			   SHOSAT,    // the satin stitch form is on the screen
-			   SHOCON,    // connect point line is visible
-			   FENDIN,    // user is selecting fill ends
-			   DELFRM,    // user wants to delete a form
-			   BAKACT,    // there are entries in the undo buffer
-			   BAKWRAP,   // undo buffer pointer has wrapped
-			   BAKING,    // user has called the undo function
-			   REDUSHO,   // redo menu item is active
-			   UNDUSHO,   // undo menu item is active
-			   FUNCLP,    // user is loading a form from the clipboard
-			   FRMPSEL,   // user has selected a point in a form
-			   SHOINSF,   // the form insert line has been drawn
-			   SAT1,      // set when the first stitch is entered in a satin fill
-			   FILMSG,    // set when user tries to unfil a form with edited stitches
-			   CLPBAK,    // set when the first clipboard fill item has been entered
-			   STRTCH,    // user is stretching a form horizontally or vertically
-			   SHOSTRTCH, // stretch box is written to the screen
-			   EXPAND,    // user is expanding a form horizontally and vertically
-			   SIDACT,    // side message window is active
-			   BRDACT,    // border data in side message window
-			   FILTYP,    // 0=main fill, 1=border fill, used in side message display
-			   GMRK,      // draw the mark on the screen
-			   SIDCOL,    // user is selecting a fill color for a form
-			   BRDSID,    // user is selecting a border fill color for a form
-			   ENTRPOL,   // user is entering sides for a regular polygon
-			   FRMROT,    // user is rotating a form
-			   DELTO,     // user is deleting a form and the associated stitches
-			   REDOLD,    // user is opening a file from the old file list
-			   BAKSHO,    // user is looking at bakup files
-			   DUBAK,     // user has chosen a backup file to load, but may want to save changes
-			   IGNAM,     // save the thred file without making backups
-			   PRGMSG,    // delete all backups message is displayed
-			   NEWBAK,    // user is starting a new file, but may want to save changes
-			   SAVEX,     // user is exiting, may want to save changes
-			   OSAV,      // user wants to load a new file, may want to save changes
-			   FRMOF,     // forms are not displayed and can't be selected
-			   SHOMOV,    // user moving form line shown on screen
-			   BARSAT,    // doing a bare satin fill to be filled in with clipboard data
-			   ENTRSTAR,  // user in entering the number of points for a star
-			   ENTROT,    // user is entering a rotate number for command rotate;
-			   ENTRDUP,   // user is entering a rotate angle for rotate and duplicate
-			   ENTRSPIR,  // user is entering the number of points for a spiral
-			   ENTRHART,  // user is entering the number of points for a heart
-			   ENTRLENS,  // user is entering the number of points for a lens
-			   SEQDUN,    // last stitch seqenced was already done
-			   WASEL,     // a form was selected when the user hit control-right-click
-			   MOVFRMS,   // user is moving a group of forms
-			   FRMSROT,   // user is rotating group of forms
-			   FUNSCLP,   // user is pasting a group of forms
-			   DELSFRMS,  // user is deleting a group of forms
-			   BIGBOX,    // user has selected all forms and stitches
-			   MOVSET,    // the move point has been selected
-			   UPTO,      // show points upto the selected point
-			   LENSRCH,   // user has hit the max or min button
-			   BOXSLCT,   // user is making a select box
-			   THUMSHO,   // thumbnail mode
-			   INSFIL,    // user is inserting a file
-			   IGNORINS,  // don't use the open file dialog box to get the insert file name
-			   RBUT,      // user pressed the right mouse button selecting a thumbnail
-			   UND,       // stitching a perp satin underlay
-			   UNDPHAS,   // perp satin underlay phase
-			   SAVAS,     // user is saving a file under a new name
-			   SHOSIZ,    // design size box is displayed
-			   HUPMSG,    // user is selecting a hoop size
-			   IGNTHR,    // ignore the close enough threshold for 'C' hotkey
-			   MONOMAP,   // set if a color bitmap is loaded
-			   THUMON,    // user is loading a thumnail
-			   CLPOVR,    // can't fit another clipboard fill on the current line
-			   CONTIG,    // contiguous point flag
-			   NUROT,     // user is entering a rotate angle
-			   APSID,     // user is enter a new applique color
-			   FRMSAM,    // don't find an already selected form
-			   ENTRSEG,   // user is entering rotation segments
-			   ENTRFNUM,  // user is entering a form number
-			   WASFRMFRM, // need to restore the form-form
-			   SAVACT,    // activate the undo save
-			   CNTRH,     // for centering horizontally
-			   CNTRV,     // for centering vertically
-			   RESTCH,    // redraw the stitch window
-			   WASGRP,    // group of stitches selecter when entering length search
-			   REFILMSG,  // refill all message is up
-			   PRELIN,    // user is inserting form points before the 0 point in a line form
-			   WASRT,     // insert was active when preferences activated
-			   WASDIR,    // last minimum direction for sequencing
-			   BRKFIX,    // last line sequenced was from the end of a break of an already done region
-			   RELAYR,    // need to write the layer in the layer button
-			   HIDSTCH,   // don't display the stitches
-			   WASIN,     // placing stitches inside the form for vertical clipboard fill
-			   LTRACE,    // line trace funtion active
-			   HUPEX,     // set when points are outside the hoop
-			   HUPCHNG,   // hoop size has been changed
-			   SIZED,     // window has been resized
-			   ROTAL,     // user is rotating all stitches
-			   ZUMACT,    // zoom to actual size
-			   WASREFIL,  // last fill was a refil
-			   DUMEN,     // menu needs to be refilled
-			   WASNEG,    // form had a point less than the size of the clipboard fill
-			   FCLOS,     // user is closing a file
-			   NOTFREE,   // no free space on the drive
-			   PIXIN,     // user in inputting nudge pixels
-			   STPXIN,    // user is inputting stitch point pixels
-			   FRMPXIN,   // user is inputting form vertex pixels
-			   WASMRK,    // user has set a mark
-			   RESIZ,     // need to change the size of the main window
-			   MSGOF,     // offset the message box
-			   WASMOV,    // mouse move capture flag
-			   WASCOL,    // mouse move started in a color box
-			   ENTREG,    // user is entering an egg form
-			   BADFIL,    // loaded file is corrupted
-			   WASTRAC,   // trace bitmap loaded
-			   LANDSCAP,  // trace bitmap is landscape position
-			   WASEDG,    // trace edge map was created
-			   TRCUP,     // trace the up limit
-			   TRCRED,    // red trace on
-			   TRCGRN,    // green trace on
-			   TRCBLU,    // blue trace on
-			   DUHI,      // paint the high trace rectangle
-			   DULO,      // paint the low trace rectangle
-			   WASDIF,    // found edges on bitmap
-			   WASDSEL,   // color selected bitmap
-			   TRNIN0,    // trace color number input
-			   TRNUP,     // trace up number input
-			   WASTRCOL,  // trace color entered from keyboard
-			   TRNIN1,    // trace parameter number input
-			   TRSET,     // trace numbers have been set
-			   WASESC,    // user hit escape
-			   HIDMAP,    // hide the bitmap
-			   WASBLAK,   // bitmap form pixels set to black
-			   LINCHN,    // chain stitch has line in middle
-			   ENTRZIG,   // user is creating a zig-zag form
-			   FOLFRM,    // form-form is displaying a follower form
-			   DUREFRM,   // display the form-form
-			   SIDX,      // display the extra fills
-			   WASLED,    // lead form found in frmchk
-			   FPSEL,     // form points selected
-			   SHOPSEL,   // form points selected rectangle is showing
-			   PSELDIR,   // direction of form vertex select
-			   FPUNCLP,   // user is retrieving cliped form points into a form
-			   SHOP,      // clipboard from points are showing
-			   WASPCDCLP, // there is pcd data on the clipboard
-			   FTHR,      // feather fill flag
-			   FBOTH,     // do both sides of a feather fill
-			   ENTRFTHUP, // user is entering the feather up number
-			   FTHSID,    // user is entering a feather color
-			   CNV2FTH,   // converting a form to feather ribbon
-			   WASFPNT,   // user is moving a form vertex
-			   WASDO,     // backup has been made before refil
-			   NOSEL,     // left button down didn't select anything
-			   WASDEL,    // stitches were deleted
-			   FLPBLND,   // flip the feather blend bit before refilling
-			   GTWLKIND,  // get the edge walk/underlay offset
-			   GTWLKLEN,  // get the edge walk/underlay stitch length
-			   GTUANG,    // get the underlay angle
-			   GTUSPAC,   // get the underaly spacing
-			   BADVER,    // key version does not match
-			   DUSRT,     // write sort info
-			   WLKDIR,    // edge walk direction, 0=forward
-			   INDIR,     // inner border switched with outer
-			   DIDSTRT,   // start stitches have been written
-			   REFCNT,    // counting the form-form lines
-			   UNDCOL,    // user is entrering an underlay color
-			   FSETULEN,  // user is setting the underlay stitch length for a group of forms
-			   ISEND,     // writing the end stitches
-			   FSETUSPAC, // user is setting the underlay spacing for a group of forms
-			   FSETUANG,  // user is setting the underlay angle for a group of forms
-			   FSETFLEN,  // user is setting the fill stitch length for a group of forms
-			   FSETFSPAC, // user is setting the fill spacing for a group of forms
-			   FSETFANG,  // user is setting the fill angle for a group of forms
-			   FSETUCOL,  // user is setting the underlay color for a group of forms
-			   FSETFCOL,  // user is setting the fill color for a group of forms
-			   FSETBCOL,  // user is setting the border color for a group of forms
-			   FSETBLEN,  // user is setting the border color for a group of forms
-			   FSETBSPAC, // user is setting the border spacing for a group of forms
-			   FSETBMIN,  // user is setting the minimum border stitch length for a group of forms
-			   FSETBMAX,  // user is setting the maximum border stitch length for a group of forms
-			   FSETFMIN,  // user is setting the minimum fill stitch length for a group of forms
-			   FSETFMAX,  // user is setting the maximum fill stitch length for a group of forms
-			   FSETFWID,  // user is setting the width for a group of forms
-			   FSETFHI,   // user is setting the height for a group of forms
-			   TXTRED,    // displaying the texture fill editor
-			   FRMBOXIN,  // user is setting the form box pixels
-			   TXTMOV,    // user is moving a texture editor point
-			   TXTCLP,    // user is setting texture points with a clipboard form
-			   TXTLIN,    // user is setting texture points in a line
-			   WASTXBAK,  // texture fill editor history active
-			   LASTXBAK,  // last key was a texture back key
-			   TXBDIR,    // texture backup direction
-			   TXHCNTR,   // texture center on
-			   TXFIL,     // texture fill in progress
-			   WASWROT,   // texture clipboard form was written
-			   DESCHG,    // design size change 0=x, 1=y
-			   CMPDO,     // design has been changed
-			   ISUND,     // doing underlay fill
-			   CHKTX,     // user has changed the texture fill window size, check the points
-			   FSETFIND,  // user is setting the indent for a group of forms
-			   TXBOX,     // user is importing stitches for textured fill
-			   TXIN,      // last stitch point was in stitch select box
-			   SCLPSPAC,  // user is setting the clipbard fill spacing
-			   FCHK,      // check the forms
-			   NOCLP,     // don't load clipboard data from forms
-			   NOTHRFIL,  // loaded file wasn't a Thred file
+	           // is in the edit window
+	SELBOX,    // the select box is showing
+	ILIN,      // insert line is showing on the screen
+	INIT,      // set when a stitch is entered in the stitch buffer,a form is entered, or the mark is set
+	LIN1,      // drawing only one line in stitch insert mode
+	ILIN1,     // one insert line showing on screen
+	GRPSEL,    // group select mode
+	SCROS,     // start group cross has been drawn
+	ECROS,     // end group cross has been drawn
+	ELIN,      // group select line has been drawn
+	BAKEND,    // insert data should be appended to the end of the file
+	CLPSHO,    // display the clipboard insert rectangle
+	SELSHO,    // display the select rectangle
+	ROTAT,     // rotate state
+	ROTSHO,    // rotate rectangle is showing
+	ROTUSHO,   // rotate indicator line is showing
+	ROTCAPT,   // rotate capture mode
+	MOVCNTR,   // user is moving the rotate center
+	GETMIN,    // user is entering a minimum stitch length
+	NUMIN,     // user in entering a number
+	MOVFRM,    // user is moving a form vertex
+	MOVMSG,    // user tried to move an edited form
+	SHOFRM,    // form is currently written to the screen
+	STHR,      // user is entering a new stitch box threshold
+	ENTAR,     // user is adjusting a number with the up and down arrow keys
+	ENTR30,    // user is entering a new thread size for #30 thread
+	ENTR40,    // user is entering a new thread size for #40 thread
+	ENTR60,    // user is entering a new thread size for #60 thread
+	FORMSEL,   // a form is selected
+	FRMPMOV,   // user is moving a point on a form
+	IGNOR,     // user may elect to ignore a message about losing edits when resizing a form
+	FRMOV,     // user is moving a form
+	RUNPAT,    // user is runing a pattern
+	WASPAT,    // user ran a pattern, but hasn't done anything else yet
+	FILDIR,    // direction lines in angle fill
+	SHOSAT,    // the satin stitch form is on the screen
+	SHOCON,    // connect point line is visible
+	FENDIN,    // user is selecting fill ends
+	DELFRM,    // user wants to delete a form
+	BAKACT,    // there are entries in the undo buffer
+	BAKWRAP,   // undo buffer pointer has wrapped
+	BAKING,    // user has called the undo function
+	REDUSHO,   // redo menu item is active
+	UNDUSHO,   // undo menu item is active
+	FUNCLP,    // user is loading a form from the clipboard
+	FRMPSEL,   // user has selected a point in a form
+	SHOINSF,   // the form insert line has been drawn
+	SAT1,      // set when the first stitch is entered in a satin fill
+	FILMSG,    // set when user tries to unfil a form with edited stitches
+	CLPBAK,    // set when the first clipboard fill item has been entered
+	STRTCH,    // user is stretching a form horizontally or vertically
+	SHOSTRTCH, // stretch box is written to the screen
+	EXPAND,    // user is expanding a form horizontally and vertically
+	SIDACT,    // side message window is active
+	BRDACT,    // border data in side message window
+	FILTYP,    // 0=main fill, 1=border fill, used in side message display
+	GMRK,      // draw the mark on the screen
+	SIDCOL,    // user is selecting a fill color for a form
+	BRDSID,    // user is selecting a border fill color for a form
+	ENTRPOL,   // user is entering sides for a regular polygon
+	FRMROT,    // user is rotating a form
+	DELTO,     // user is deleting a form and the associated stitches
+	REDOLD,    // user is opening a file from the old file list
+	BAKSHO,    // user is looking at bakup files
+	DUBAK,     // user has chosen a backup file to load, but may want to save changes
+	IGNAM,     // save the thred file without making backups
+	PRGMSG,    // delete all backups message is displayed
+	NEWBAK,    // user is starting a new file, but may want to save changes
+	SAVEX,     // user is exiting, may want to save changes
+	OSAV,      // user wants to load a new file, may want to save changes
+	FRMOF,     // forms are not displayed and can't be selected
+	SHOMOV,    // user moving form line shown on screen
+	BARSAT,    // doing a bare satin fill to be filled in with clipboard data
+	ENTRSTAR,  // user in entering the number of points for a star
+	ENTROT,    // user is entering a rotate number for command rotate;
+	ENTRDUP,   // user is entering a rotate angle for rotate and duplicate
+	ENTRSPIR,  // user is entering the number of points for a spiral
+	ENTRHART,  // user is entering the number of points for a heart
+	ENTRLENS,  // user is entering the number of points for a lens
+	SEQDUN,    // last stitch seqenced was already done
+	WASEL,     // a form was selected when the user hit control-right-click
+	MOVFRMS,   // user is moving a group of forms
+	FRMSROT,   // user is rotating group of forms
+	FUNSCLP,   // user is pasting a group of forms
+	DELSFRMS,  // user is deleting a group of forms
+	BIGBOX,    // user has selected all forms and stitches
+	MOVSET,    // the move point has been selected
+	UPTO,      // show points upto the selected point
+	LENSRCH,   // user has hit the max or min button
+	BOXSLCT,   // user is making a select box
+	THUMSHO,   // thumbnail mode
+	INSFIL,    // user is inserting a file
+	IGNORINS,  // don't use the open file dialog box to get the insert file name
+	RBUT,      // user pressed the right mouse button selecting a thumbnail
+	UND,       // stitching a perp satin underlay
+	UNDPHAS,   // perp satin underlay phase
+	SAVAS,     // user is saving a file under a new name
+	SHOSIZ,    // design size box is displayed
+	HUPMSG,    // user is selecting a hoop size
+	IGNTHR,    // ignore the close enough threshold for 'C' hotkey
+	MONOMAP,   // set if a color bitmap is loaded
+	THUMON,    // user is loading a thumnail
+	CLPOVR,    // can't fit another clipboard fill on the current line
+	CONTIG,    // contiguous point flag
+	NUROT,     // user is entering a rotate angle
+	APSID,     // user is enter a new applique color
+	FRMSAM,    // don't find an already selected form
+	ENTRSEG,   // user is entering rotation segments
+	ENTRFNUM,  // user is entering a form number
+	WASFRMFRM, // need to restore the form-form
+	SAVACT,    // activate the undo save
+	CNTRH,     // for centering horizontally
+	CNTRV,     // for centering vertically
+	RESTCH,    // redraw the stitch window
+	WASGRP,    // group of stitches selecter when entering length search
+	REFILMSG,  // refill all message is up
+	PRELIN,    // user is inserting form points before the 0 point in a line form
+	WASRT,     // insert was active when preferences activated
+	WASDIR,    // last minimum direction for sequencing
+	BRKFIX,    // last line sequenced was from the end of a break of an already done region
+	RELAYR,    // need to write the layer in the layer button
+	HIDSTCH,   // don't display the stitches
+	WASIN,     // placing stitches inside the form for vertical clipboard fill
+	LTRACE,    // line trace funtion active
+	HUPEX,     // set when points are outside the hoop
+	HUPCHNG,   // hoop size has been changed
+	SIZED,     // window has been resized
+	ROTAL,     // user is rotating all stitches
+	ZUMACT,    // zoom to actual size
+	WASREFIL,  // last fill was a refil
+	DUMEN,     // menu needs to be refilled
+	WASNEG,    // form had a point less than the size of the clipboard fill
+	FCLOS,     // user is closing a file
+	NOTFREE,   // no free space on the drive
+	PIXIN,     // user in inputting nudge pixels
+	STPXIN,    // user is inputting stitch point pixels
+	FRMPXIN,   // user is inputting form vertex pixels
+	WASMRK,    // user has set a mark
+	RESIZ,     // need to change the size of the main window
+	MSGOF,     // offset the message box
+	WASMOV,    // mouse move capture flag
+	WASCOL,    // mouse move started in a color box
+	ENTREG,    // user is entering an egg form
+	BADFIL,    // loaded file is corrupted
+	WASTRAC,   // trace bitmap loaded
+	LANDSCAP,  // trace bitmap is landscape position
+	WASEDG,    // trace edge map was created
+	TRCUP,     // trace the up limit
+	TRCRED,    // red trace on
+	TRCGRN,    // green trace on
+	TRCBLU,    // blue trace on
+	DUHI,      // paint the high trace rectangle
+	DULO,      // paint the low trace rectangle
+	WASDIF,    // found edges on bitmap
+	WASDSEL,   // color selected bitmap
+	TRNIN0,    // trace color number input
+	TRNUP,     // trace up number input
+	WASTRCOL,  // trace color entered from keyboard
+	TRNIN1,    // trace parameter number input
+	TRSET,     // trace numbers have been set
+	WASESC,    // user hit escape
+	HIDMAP,    // hide the bitmap
+	WASBLAK,   // bitmap form pixels set to black
+	LINCHN,    // chain stitch has line in middle
+	ENTRZIG,   // user is creating a zig-zag form
+	FOLFRM,    // form-form is displaying a follower form
+	DUREFRM,   // display the form-form
+	SIDX,      // display the extra fills
+	WASLED,    // lead form found in frmchk
+	FPSEL,     // form points selected
+	SHOPSEL,   // form points selected rectangle is showing
+	PSELDIR,   // direction of form vertex select
+	FPUNCLP,   // user is retrieving cliped form points into a form
+	SHOP,      // clipboard from points are showing
+	WASPCDCLP, // there is pcd data on the clipboard
+	FTHR,      // feather fill flag
+	FBOTH,     // do both sides of a feather fill
+	ENTRFTHUP, // user is entering the feather up number
+	FTHSID,    // user is entering a feather color
+	CNV2FTH,   // converting a form to feather ribbon
+	WASFPNT,   // user is moving a form vertex
+	WASDO,     // backup has been made before refil
+	NOSEL,     // left button down didn't select anything
+	WASDEL,    // stitches were deleted
+	FLPBLND,   // flip the feather blend bit before refilling
+	GTWLKIND,  // get the edge walk/underlay offset
+	GTWLKLEN,  // get the edge walk/underlay stitch length
+	GTUANG,    // get the underlay angle
+	GTUSPAC,   // get the underaly spacing
+	BADVER,    // key version does not match
+	DUSRT,     // write sort info
+	WLKDIR,    // edge walk direction, 0=forward
+	INDIR,     // inner border switched with outer
+	DIDSTRT,   // start stitches have been written
+	REFCNT,    // counting the form-form lines
+	UNDCOL,    // user is entrering an underlay color
+	FSETULEN,  // user is setting the underlay stitch length for a group of forms
+	ISEND,     // writing the end stitches
+	FSETUSPAC, // user is setting the underlay spacing for a group of forms
+	FSETUANG,  // user is setting the underlay angle for a group of forms
+	FSETFLEN,  // user is setting the fill stitch length for a group of forms
+	FSETFSPAC, // user is setting the fill spacing for a group of forms
+	FSETFANG,  // user is setting the fill angle for a group of forms
+	FSETUCOL,  // user is setting the underlay color for a group of forms
+	FSETFCOL,  // user is setting the fill color for a group of forms
+	FSETBCOL,  // user is setting the border color for a group of forms
+	FSETBLEN,  // user is setting the border color for a group of forms
+	FSETBSPAC, // user is setting the border spacing for a group of forms
+	FSETBMIN,  // user is setting the minimum border stitch length for a group of forms
+	FSETBMAX,  // user is setting the maximum border stitch length for a group of forms
+	FSETFMIN,  // user is setting the minimum fill stitch length for a group of forms
+	FSETFMAX,  // user is setting the maximum fill stitch length for a group of forms
+	FSETFWID,  // user is setting the width for a group of forms
+	FSETFHI,   // user is setting the height for a group of forms
+	TXTRED,    // displaying the texture fill editor
+	FRMBOXIN,  // user is setting the form box pixels
+	TXTMOV,    // user is moving a texture editor point
+	TXTCLP,    // user is setting texture points with a clipboard form
+	TXTLIN,    // user is setting texture points in a line
+	WASTXBAK,  // texture fill editor history active
+	LASTXBAK,  // last key was a texture back key
+	TXBDIR,    // texture backup direction
+	TXHCNTR,   // texture center on
+	TXFIL,     // texture fill in progress
+	WASWROT,   // texture clipboard form was written
+	DESCHG,    // design size change 0=x, 1=y
+	CMPDO,     // design has been changed
+	ISUND,     // doing underlay fill
+	CHKTX,     // user has changed the texture fill window size, check the points
+	FSETFIND,  // user is setting the indent for a group of forms
+	TXBOX,     // user is importing stitches for textured fill
+	TXIN,      // last stitch point was in stitch select box
+	SCLPSPAC,  // user is setting the clipbard fill spacing
+	FCHK,      // check the forms
+	NOCLP,     // don't load clipboard data from forms
+	NOTHRFIL,  // loaded file wasn't a Thred file
 
-			   EnumCount // must be the last entry in the enum
+	EnumCount // must be the last entry in the enum
 };
 
 // user bitmap
@@ -798,11 +798,11 @@ public:
 	float x;
 	float y;
 
-	fPOINT()
-		: x(0.0)
-		, y(0.0) {
+	constexpr fPOINT() noexcept
+	    : x(0.0f)
+	    , y(0.0f) {
 	}
-	inline fPOINT(double rhsX, double rhsY);
+	inline fPOINT(double rhsX, double rhsY) noexcept;
 	inline bool    operator==(const fPOINT& rhs) const noexcept;
 	inline fPOINT& operator=(const dPOINT& rhs) noexcept;
 	inline fPOINT& operator=(const fPOINTATTR& rhs) noexcept;
@@ -841,7 +841,7 @@ inline bool fPOINT::operator==(const fPOINT& rhs) const noexcept {
 
 #pragma warning(push)
 #pragma warning(disable : 4244)
-inline fPOINT::fPOINT(double rhsX, double rhsY)
+inline fPOINT::fPOINT(double rhsX, double rhsY) noexcept
     : x(rhsX)
     , y(rhsY) {
 }
@@ -1191,18 +1191,18 @@ inline SATINANGLE& SATINANGLE::operator=(const SATINANGLEOUT& rhs) noexcept {
 	return *this;
 }
 
-/*
-fill	edgeStitchLen	edgeSpacing	borderSize	clipCount	picspac		crnrsiz		brdend
+	/*
+	fill	edgeStitchLen	edgeSpacing	borderSize	clipCount	picspac		crnrsiz		brdend
 
-EDGELINE	edgeStitchLen
-EDGEBEAN	edgeStitchLen
-EDGECLIP											clipCount
-EDGEANGSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
-EDGEAPPL	edgeStitchLen	edgeSpacing	borderSize									attribute
-EDGEPROPSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
-EDGEBHOL	edgeStitchLen	edgeSpacing	borderSize	clipCount,res
-EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
-*/
+	EDGELINE	edgeStitchLen
+	EDGEBEAN	edgeStitchLen
+	EDGECLIP											clipCount
+	EDGEANGSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
+	EDGEAPPL	edgeStitchLen	edgeSpacing	borderSize									attribute
+	EDGEPROPSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
+	EDGEBHOL	edgeStitchLen	edgeSpacing	borderSize	clipCount,res
+	EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
+	*/
 
 #define BELEN 1
 #define BESPAC 2
@@ -1595,7 +1595,7 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 #define NSBLNT 0xbf
 #define NOBLNT 0x9f
 
-// frmhed extended attribute bits
+	// frmhed extended attribute bits
 
 #define AT_SQR 1     // square ends
 #define AT_FTHUP 2   // feather up or down flag
@@ -1847,12 +1847,21 @@ typedef struct _clpseg {
 	char     dun;
 } CLPSEG;
 
-typedef struct _clipsort {
+class CLIPSORT
+{
+public:
 	float  segmentLength;
 	float  sideLength;
 	size_t vertexIndex;
 	fPOINT point;
-} CLIPSORT;
+
+	constexpr CLIPSORT() noexcept
+	    : segmentLength(0.0f)
+	    , sideLength(0.0f)
+	    , vertexIndex(0)
+		, point() {
+	}
+};
 
 typedef struct _clipnt {
 	float    x;
@@ -2272,7 +2281,9 @@ typedef struct _intinf {
 	fPOINTATTR* highStitchBuffer;
 } INTINF;
 
-typedef struct _txtscr {
+class TXTSCR
+{
+public:
 	int            top;              // pixel top line
 	int            bottom;           // pixel bottom line
 	int            height;           // pixel height of area
@@ -2286,7 +2297,23 @@ typedef struct _txtscr {
 	unsigned short lines;            // number of lines
 	double         editToPixelRatio; // edit to pixel ratio
 	fPOINT         formCenter;       // middle of the form
-} TXTSCR;
+
+	constexpr TXTSCR() noexcept
+	    : top()
+	    , bottom()
+	    , height()
+	    , halfHeight()
+	    , xOffset(0.0f)
+	    , yOffset(0.0f)
+	    , areaHeight(0.0f)
+	    , screenHeight(0.0f)
+	    , width(0.0f)
+	    , spacing(0.0f)
+	    , lines(0)
+	    , editToPixelRatio(0.0)
+	    , formCenter() {
+	}
+};
 
 typedef struct _txtrct {
 	unsigned short left;
