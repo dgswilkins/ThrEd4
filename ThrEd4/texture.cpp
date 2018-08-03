@@ -43,7 +43,7 @@ TXHST                  TextureHistory[ITXBUFLEN]; // texture editor history head
 int                    TextureHistoryIndex;       // pointer to the next texture history buffer
 std::vector<TXPNT>*    TempTexturePoints;         // temporary storage for textured fill data
 std::vector<unsigned>* SelectedTexturePointsList; // list of selected points
-TXTSCR                     TextureScreen;                          // texture editor layout parameters
+TXTSCR                 TextureScreen;             // texture editor layout parameters
 
 void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<unsigned>* ptrTexturePointsList) noexcept {
 	TempTexturePoints         = ptrTexturePoints;
@@ -64,10 +64,10 @@ bool txnam(wchar_t* name, int sizeName) {
 
 void txdun() {
 	wchar_t               name[_MAX_PATH] = { 0 };
-	HANDLE                handle = {};
-	unsigned long         bytesWritten = 0;
-	int                   iHistory = 0;
-	const char            signature[4] = "txh";
+	HANDLE                handle          = {};
+	unsigned long         bytesWritten    = 0;
+	int                   iHistory        = 0;
+	const char            signature[4]    = "txh";
 	std::vector<TXHSTBUF> textureHistoryBuffer(ITXBUFLEN);
 
 	if (TextureHistory[0].texturePoint.size()) {
@@ -77,22 +77,22 @@ void txdun() {
 				WriteFile(handle, &signature, sizeof(signature), &bytesWritten, 0);
 				WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, 0);
 				for (auto i = 0; i < ITXBUFLEN; i++) {
-					auto&       bufferEntry = textureHistoryBuffer[i];
+					auto&       bufferEntry  = textureHistoryBuffer[i];
 					const auto& historyEntry = TextureHistory[i];
-					bufferEntry.placeholder = nullptr;
-					bufferEntry.count = historyEntry.texturePoint.size();
-					bufferEntry.height = historyEntry.height;
-					bufferEntry.width = historyEntry.width;
-					bufferEntry.spacing = historyEntry.spacing;
+					bufferEntry.placeholder  = nullptr;
+					bufferEntry.count        = historyEntry.texturePoint.size();
+					bufferEntry.height       = historyEntry.height;
+					bufferEntry.width        = historyEntry.width;
+					bufferEntry.spacing      = historyEntry.spacing;
 				}
 				WriteFileInt(handle, textureHistoryBuffer.data(), textureHistoryBuffer.size() * ITXBUFLEN, &bytesWritten, 0);
 				for (iHistory = 0; iHistory < ITXBUFLEN; iHistory++) {
 					if (TextureHistory[iHistory].texturePoint.size())
 						WriteFileInt(handle,
-							TextureHistory[iHistory].texturePoint.data(),
-							TextureHistory[iHistory].texturePoint.size() * sizeof(TextureHistory[0].texturePoint[0]),
-							&bytesWritten,
-							0);
+						             TextureHistory[iHistory].texturePoint.data(),
+						             TextureHistory[iHistory].texturePoint.size() * sizeof(TextureHistory[0].texturePoint[0]),
+						             &bytesWritten,
+						             0);
 				}
 			}
 			CloseHandle(handle);
@@ -105,8 +105,8 @@ void redtbak() {
 	const TXHST* textureHistoryItem = &TextureHistory[TextureHistoryIndex];
 	if (textureHistoryItem) {
 		TextureScreen.areaHeight = textureHistoryItem->height;
-		TextureScreen.width = textureHistoryItem->width;
-		TextureScreen.spacing = textureHistoryItem->spacing;
+		TextureScreen.width      = textureHistoryItem->width;
+		TextureScreen.spacing    = textureHistoryItem->spacing;
 		if (textureHistoryItem->texturePoint.size()) {
 			TempTexturePoints->clear();
 			TempTexturePoints->reserve(textureHistoryItem->texturePoint.size());
@@ -120,9 +120,9 @@ void redtbak() {
 
 void redtx() {
 	wchar_t               name[_MAX_PATH] = { 0 };
-	HANDLE                handle = {};
+	HANDLE                handle          = {};
 	DWORD                 bytesRead = 0, historyBytesRead = 0;
-	unsigned int          ind = 0;
+	unsigned int          ind    = 0;
 	char                  sig[4] = { 0 };
 	std::vector<TXHSTBUF> textureHistoryBuffer(ITXBUFLEN);
 
@@ -134,22 +134,21 @@ void redtx() {
 				if (!strcmp(sig, "txh")) {
 					if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, 0)) {
 						if (ReadFileInt(handle,
-							textureHistoryBuffer.data(),
-							textureHistoryBuffer.size() * ITXBUFLEN,
-							&historyBytesRead,
-							0)) {
+						                textureHistoryBuffer.data(),
+						                textureHistoryBuffer.size() * ITXBUFLEN,
+						                &historyBytesRead,
+						                0)) {
 							for (ind = 0; ind < (historyBytesRead / sizeof(textureHistoryBuffer[0])); ind++) {
-								TextureHistory[ind].height = textureHistoryBuffer[ind].height;
-								TextureHistory[ind].width = textureHistoryBuffer[ind].width;
+								TextureHistory[ind].height  = textureHistoryBuffer[ind].height;
+								TextureHistory[ind].width   = textureHistoryBuffer[ind].width;
 								TextureHistory[ind].spacing = textureHistoryBuffer[ind].spacing;
 								if (textureHistoryBuffer[ind].count) {
 									TextureHistory[ind].texturePoint.resize(textureHistoryBuffer[ind].count);
 									if (!ReadFileInt(handle,
-										TextureHistory[ind].texturePoint.data(),
-										sizeof(TextureHistory[0].texturePoint[0])
-										* textureHistoryBuffer[ind].count,
-										&bytesRead,
-										0)) {
+									                 TextureHistory[ind].texturePoint.data(),
+									                 sizeof(TextureHistory[0].texturePoint[0]) * textureHistoryBuffer[ind].count,
+									                 &bytesRead,
+									                 0)) {
 										TextureHistory[ind].texturePoint.clear();
 										TextureHistory[ind].texturePoint.shrink_to_fit();
 									}
@@ -1681,7 +1680,7 @@ void setshft() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void writeScreenWidth(unsigned position){
+void writeScreenWidth(unsigned position) {
 	std::wstring fmtStr;
 	loadString(fmtStr, IDS_TXWID);
 	std::wstring scrWidth(fmt::format(fmtStr, (TextureScreen.width / PFGRAN)));
