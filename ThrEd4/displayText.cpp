@@ -17,7 +17,7 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127) // supress warning for fmt library header 
+#pragma warning(disable : 4127) // supress warning for fmt library header
 #include <fmt/format.h>
 #pragma warning(pop)
 
@@ -54,7 +54,7 @@ unsigned short LoadStringList[] = {
 inline void loadString(std::wstring& sDest, unsigned stringID) {
 	wchar_t* pBuf = nullptr;
 	sDest.clear();
-	[[gsl::suppress(26490)]]{
+	[[gsl::suppress(26490)]] {
 		if (auto len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPWSTR>(&pBuf), 0)) {
 			sDest.resize(len);
 			auto _ = std::copy(pBuf, pBuf + len, sDest.begin());
@@ -64,13 +64,11 @@ inline void loadString(std::wstring& sDest, unsigned stringID) {
 
 void shoMsg(const std::wstring& message) {
 	if (message.size()) {
-		SIZE                      textSize = {}, messageSize = {};
-		unsigned                  iString = 0, index = 0, previousStringLength = 0;
-		long                      offset = 0;
 		std::vector<std::wstring> strings;
 
-		iString = 0;
-		const auto sizeLim = message.size();
+		size_t     iString              = 0;
+		size_t     previousStringLength = 0;
+		const auto sizeLim              = message.size();
 		while (iString < sizeLim) {
 			if (message[iString] == 10) {
 				strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
@@ -80,8 +78,8 @@ void shoMsg(const std::wstring& message) {
 				iString++;
 		}
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
-		textSize.cx = textSize.cy = messageSize.cy = messageSize.cx = 0;
-		for (index = 0; index < strings.size(); index++) {
+		SIZE textSize = {}, messageSize = {};
+		for (size_t index = 0; index < strings.size(); index++) {
 			GetTextExtentPoint32Int(StitchWindowMemDC, strings[index].c_str(), strings[index].size(), &textSize);
 			if (textSize.cx > messageSize.cx)
 				messageSize.cx = textSize.cx;
@@ -89,21 +87,22 @@ void shoMsg(const std::wstring& message) {
 				messageSize.cy = textSize.cy;
 		}
 		messageSize.cy *= gsl::narrow<LONG>(strings.size());
+		int xOffset = 0;
 		if (StateMap.testAndReset(StateFlag::MSGOF))
-			offset = PreferenceWindowWidth + 6;
+			xOffset = PreferenceWindowWidth + 6;
 		else
-			offset = 3;
+			xOffset = 3;
 		MsgWindow = CreateWindow(L"STATIC",
-			message.c_str(),
-			SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-			offset,
-			3,
-			messageSize.cx + 20,
-			messageSize.cy + 6,
-			MainStitchWin,
-			NULL,
-			ThrEdInstance,
-			NULL);
+		                         message.c_str(),
+		                         SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+		                         xOffset,
+		                         3,
+		                         messageSize.cx + 20,
+		                         messageSize.cy + 6,
+		                         MainStitchWin,
+		                         NULL,
+		                         ThrEdInstance,
+		                         NULL);
 	}
 }
 
@@ -131,18 +130,18 @@ void numWnd() noexcept {
 
 	GetClientRect(MsgWindow, &messageRect);
 	GeneralNumberInputBox = CreateWindow(L"STATIC",
-		0,
-		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		5,
-		messageRect.bottom + 15,
-		ButtonWidthX3,
-		ButtonHeight,
-		MainStitchWin,
-		NULL,
-		ThrEdInstance,
-		NULL);
-	MsgIndex = 0;
-	*MsgBuffer = 0;
+	                                     0,
+	                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                                     5,
+	                                     messageRect.bottom + 15,
+	                                     ButtonWidthX3,
+	                                     ButtonHeight,
+	                                     MainStitchWin,
+	                                     NULL,
+	                                     ThrEdInstance,
+	                                     NULL);
+	MsgIndex              = 0;
+	*MsgBuffer            = 0;
 }
 
 void msgflt(unsigned messageId, float value) {
@@ -334,28 +333,28 @@ void okcan() {
 	GetClientRect(MsgWindow, &MsgRect);
 
 	OKButton = CreateWindow(L"STATIC",
-		(*StringTable)[STR_OKENT].c_str(),
-		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		5,
-		MsgRect.bottom + 15,
-		ButtonWidth << 2,
-		ButtonHeight,
-		MainStitchWin,
-		NULL,
-		ThrEdInstance,
-		NULL);
+	                        (*StringTable)[STR_OKENT].c_str(),
+	                        SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                        5,
+	                        MsgRect.bottom + 15,
+	                        ButtonWidth << 2,
+	                        ButtonHeight,
+	                        MainStitchWin,
+	                        NULL,
+	                        ThrEdInstance,
+	                        NULL);
 
 	CancelButton = CreateWindow(L"STATIC",
-		(*StringTable)[STR_CANCEL].c_str(),
-		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		ButtonWidth * 5,
-		MsgRect.bottom + 15,
-		ButtonWidthX3,
-		ButtonHeight,
-		MainStitchWin,
-		NULL,
-		ThrEdInstance,
-		NULL);
+	                            (*StringTable)[STR_CANCEL].c_str(),
+	                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                            ButtonWidth * 5,
+	                            MsgRect.bottom + 15,
+	                            ButtonWidthX3,
+	                            ButtonHeight,
+	                            MainStitchWin,
+	                            NULL,
+	                            ThrEdInstance,
+	                            NULL);
 }
 
 void savdisc() {
@@ -368,41 +367,41 @@ void savdisc() {
 
 	LoadString(ThrEdInstance, IDS_SAV, buffer, HBUFSIZ);
 	OKButton = CreateWindow(L"STATIC",
-		buffer,
-		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		5,
-		MsgRect.bottom + 15,
-		ButtonWidthX3,
-		ButtonHeight,
-		MainStitchWin,
-		NULL,
-		ThrEdInstance,
-		NULL);
+	                        buffer,
+	                        SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                        5,
+	                        MsgRect.bottom + 15,
+	                        ButtonWidthX3,
+	                        ButtonHeight,
+	                        MainStitchWin,
+	                        NULL,
+	                        ThrEdInstance,
+	                        NULL);
 
 	LoadString(ThrEdInstance, IDS_DISC, buffer, HBUFSIZ);
 	DiscardButton = CreateWindow(L"STATIC",
-		buffer,
-		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		ButtonWidthX3 + 15,
-		MsgRect.bottom + 15,
-		ButtonWidthX3,
-		ButtonHeight,
-		MainStitchWin,
-		NULL,
-		ThrEdInstance,
-		NULL);
+	                             buffer,
+	                             SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                             ButtonWidthX3 + 15,
+	                             MsgRect.bottom + 15,
+	                             ButtonWidthX3,
+	                             ButtonHeight,
+	                             MainStitchWin,
+	                             NULL,
+	                             ThrEdInstance,
+	                             NULL);
 
 	CancelButton = CreateWindow(L"STATIC",
-		(*StringTable)[STR_CANCEL].c_str(),
-		SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		2 * ButtonWidthX3 + 25,
-		MsgRect.bottom + 15,
-		ButtonWidthX3,
-		ButtonHeight,
-		MainStitchWin,
-		NULL,
-		ThrEdInstance,
-		NULL);
+	                            (*StringTable)[STR_CANCEL].c_str(),
+	                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                            2 * ButtonWidthX3 + 25,
+	                            MsgRect.bottom + 15,
+	                            ButtonWidthX3,
+	                            ButtonHeight,
+	                            MainStitchWin,
+	                            NULL,
+	                            ThrEdInstance,
+	                            NULL);
 }
 
 void tomsg() {
@@ -412,15 +411,14 @@ void tomsg() {
 	GetWindowRect(OKButton, &OKrect);
 	GetTextExtentPoint32Int(StitchWindowMemDC, (*StringTable)[STR_DELST2].c_str(), (*StringTable)[STR_DELST2].size(), &textSize);
 	DeleteStitchesDialog = CreateWindow(L"STATIC",
-		(*StringTable)[STR_DELST2].c_str(),
-		SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		3,
-		OKrect.bottom - StitchWindowOrigin.y + 6 + textSize.cy,
-		textSize.cx + 6,
-		textSize.cy + 6,
-		MainStitchWin,
-		NULL,
-		ThrEdInstance,
-		NULL);
+	                                    (*StringTable)[STR_DELST2].c_str(),
+	                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                                    3,
+	                                    OKrect.bottom - StitchWindowOrigin.y + 6 + textSize.cy,
+	                                    textSize.cx + 6,
+	                                    textSize.cy + 6,
+	                                    MainStitchWin,
+	                                    NULL,
+	                                    ThrEdInstance,
+	                                    NULL);
 }
-
