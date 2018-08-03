@@ -7,7 +7,6 @@
 #include <gsl/gsl>
 #pragma warning(pop)
 
-
 #define TRCMTH 1 // 0=brightness compare,1=color compare
 
 #define RUTVALID 1
@@ -1033,24 +1032,24 @@ public:
 };
 
 inline SATCONOUT::SATCONOUT() noexcept {
-	start = 0u;
+	start  = 0u;
 	finish = 0u;
 }
 
 inline SATCONOUT::SATCONOUT(const SATCON& rhs) {
-	start = gsl::narrow<unsigned short>(rhs.start);
+	start  = gsl::narrow<unsigned short>(rhs.start);
 	finish = gsl::narrow<unsigned short>(rhs.finish);
 }
 
 inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) {
-	start = gsl::narrow<unsigned short>(rhs.start);
+	start  = gsl::narrow<unsigned short>(rhs.start);
 	finish = gsl::narrow<unsigned short>(rhs.finish);
 
 	return *this;
 }
 
 inline SATCON& SATCON::operator=(const SATCONOUT& rhs) noexcept {
-	start = rhs.start;
+	start  = rhs.start;
 	finish = rhs.finish;
 
 	return *this;
@@ -1150,7 +1149,7 @@ union SATINANGLEOUT;
 
 union SATINANGLE {
 public:
-	SATCON * guide;
+	SATCON* guide;
 	float   angle;
 
 	inline SATINANGLE& operator=(const SATINANGLEOUT& rhs) noexcept;
@@ -1336,27 +1335,27 @@ public:
 };
 
 inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
-	attribute = rhs.attribute;
-	vertexCount = rhs.vertexCount;
-	type = rhs.type;
-	fillColor = rhs.fillColor;
-	borderColor = rhs.borderColor;
-	clipEntries = rhs.clipEntries;
-	vertices = rhs.vertices;
-	satinOrAngle = rhs.satinOrAngle;
-	borderClipData = rhs.borderClipData;
+	attribute       = rhs.attribute;
+	vertexCount     = rhs.vertexCount;
+	type            = rhs.type;
+	fillColor       = rhs.fillColor;
+	borderColor     = rhs.borderColor;
+	clipEntries     = rhs.clipEntries;
+	vertices        = rhs.vertices;
+	satinOrAngle    = rhs.satinOrAngle;
+	borderClipData  = rhs.borderClipData;
 	satinGuideCount = rhs.satinGuideCount;
-	wordParam = rhs.wordParam;
-	rectangle = rhs.rectangle;
-	fillType = rhs.fillType;
-	edgeType = rhs.edgeType;
-	fillSpacing = rhs.fillSpacing;
-	lengthOrCount = rhs.lengthOrCount;
+	wordParam       = rhs.wordParam;
+	rectangle       = rhs.rectangle;
+	fillType        = rhs.fillType;
+	edgeType        = rhs.edgeType;
+	fillSpacing     = rhs.fillSpacing;
+	lengthOrCount   = rhs.lengthOrCount;
 	angleOrClipData = rhs.angleOrClipData;
-	borderSize = rhs.borderSize;
-	edgeSpacing = rhs.edgeSpacing;
-	edgeStitchLen = rhs.edgeStitchLen;
-	picoLength = rhs.res;
+	borderSize      = rhs.borderSize;
+	edgeSpacing     = rhs.edgeSpacing;
+	edgeStitchLen   = rhs.edgeStitchLen;
+	picoLength      = rhs.res;
 	return *this;
 }
 
@@ -1412,165 +1411,165 @@ public:
 };
 
 inline FRMHEDOUT::FRMHEDOUT() noexcept
-	: satinOrAngle()
-	, lengthOrCount()
-	, angleOrClipData() {
-	attribute = 0;
-	vertexCount = 0;
-	type = 0;
-	fillColor = 0;
-	borderColor = 0;
-	clipEntries = 0;
-	vertices = 0;
-	borderClipData = 0;
+    : satinOrAngle()
+    , lengthOrCount()
+    , angleOrClipData() {
+	attribute       = 0;
+	vertexCount     = 0;
+	type            = 0;
+	fillColor       = 0;
+	borderColor     = 0;
+	clipEntries     = 0;
+	vertices        = 0;
+	borderClipData  = 0;
 	satinGuideCount = 0;
-	wordParam = 0;
-	rectangle = {};
-	fillType = 0;
-	edgeType = 0;
-	fillSpacing = 0;
-	borderSize = 0;
-	edgeSpacing = 0;
-	edgeStitchLen = 0;
-	picoLength = 0;
+	wordParam       = 0;
+	rectangle       = {};
+	fillType        = 0;
+	edgeType        = 0;
+	fillSpacing     = 0;
+	borderSize      = 0;
+	edgeSpacing     = 0;
+	edgeStitchLen   = 0;
+	picoLength      = 0;
 
-	maxFillStitchLen = 0;
-	minFillStitchLen = 0;
-	extendedAttribute = 0;
-	maxBorderStitchLen = 0;
-	minBorderStitchLen = 0;
-	fillInfo = {};
-	fillStart = 0;
-	fillEnd = 0;
-	underlaySpacing = 0;
-	underlayStitchLen = 0;
+	maxFillStitchLen    = 0;
+	minFillStitchLen    = 0;
+	extendedAttribute   = 0;
+	maxBorderStitchLen  = 0;
+	minBorderStitchLen  = 0;
+	fillInfo            = {};
+	fillStart           = 0;
+	fillEnd             = 0;
+	underlaySpacing     = 0;
+	underlayStitchLen   = 0;
 	underlayStitchAngle = 0;
-	underlayIndent = 0;
-	txof = 0;
-	underlayColor = 0;
-	cres = 0;
+	underlayIndent      = 0;
+	txof                = 0;
+	underlayColor       = 0;
+	cres                = 0;
 }
 
 inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
-	attribute = rhs.attribute;
-	vertexCount = gsl::narrow<unsigned short>(rhs.vertexCount);
-	type = rhs.type;
-	fillColor = rhs.fillColor;
-	borderColor = rhs.borderColor;
-	clipEntries = gsl::narrow<unsigned short>(rhs.clipEntries);
-	vertices = 0; // do not write the pointer value to file
-	satinOrAngle = rhs.satinOrAngle;
-	borderClipData = 0; // do not write the pointer value to file
+	attribute       = rhs.attribute;
+	vertexCount     = gsl::narrow<unsigned short>(rhs.vertexCount);
+	type            = rhs.type;
+	fillColor       = rhs.fillColor;
+	borderColor     = rhs.borderColor;
+	clipEntries     = gsl::narrow<unsigned short>(rhs.clipEntries);
+	vertices        = 0; // do not write the pointer value to file
+	satinOrAngle    = rhs.satinOrAngle;
+	borderClipData  = 0; // do not write the pointer value to file
 	satinGuideCount = gsl::narrow<unsigned short>(rhs.satinGuideCount);
-	wordParam = gsl::narrow<unsigned short>(rhs.wordParam);
-	rectangle = rhs.rectangle;
-	fillType = rhs.fillType;
-	edgeType = rhs.edgeType;
-	fillSpacing = rhs.fillSpacing;
-	lengthOrCount = rhs.lengthOrCount;
+	wordParam       = gsl::narrow<unsigned short>(rhs.wordParam);
+	rectangle       = rhs.rectangle;
+	fillType        = rhs.fillType;
+	edgeType        = rhs.edgeType;
+	fillSpacing     = rhs.fillSpacing;
+	lengthOrCount   = rhs.lengthOrCount;
 	angleOrClipData = rhs.angleOrClipData;
-	borderSize = rhs.borderSize;
-	edgeSpacing = rhs.edgeSpacing;
-	edgeStitchLen = rhs.edgeStitchLen;
-	picoLength = rhs.picoLength;
+	borderSize      = rhs.borderSize;
+	edgeSpacing     = rhs.edgeSpacing;
+	edgeStitchLen   = rhs.edgeStitchLen;
+	picoLength      = rhs.picoLength;
 
-	extendedAttribute = rhs.extendedAttribute;
-	maxFillStitchLen = rhs.maxFillStitchLen;
-	minFillStitchLen = rhs.minFillStitchLen;
-	maxBorderStitchLen = rhs.maxBorderStitchLen;
-	minBorderStitchLen = rhs.minBorderStitchLen;
-	fillInfo = rhs.fillInfo;
-	fillStart = gsl::narrow<unsigned short>(rhs.fillStart);
-	fillEnd = gsl::narrow<unsigned short>(rhs.fillEnd);
-	underlaySpacing = rhs.underlaySpacing;
-	underlayStitchLen = rhs.underlayStitchLen;
+	extendedAttribute   = rhs.extendedAttribute;
+	maxFillStitchLen    = rhs.maxFillStitchLen;
+	minFillStitchLen    = rhs.minFillStitchLen;
+	maxBorderStitchLen  = rhs.maxBorderStitchLen;
+	minBorderStitchLen  = rhs.minBorderStitchLen;
+	fillInfo            = rhs.fillInfo;
+	fillStart           = gsl::narrow<unsigned short>(rhs.fillStart);
+	fillEnd             = gsl::narrow<unsigned short>(rhs.fillEnd);
+	underlaySpacing     = rhs.underlaySpacing;
+	underlayStitchLen   = rhs.underlayStitchLen;
 	underlayStitchAngle = rhs.underlayStitchAngle;
-	underlayIndent = rhs.underlayIndent;
-	txof = rhs.txof;
-	underlayColor = rhs.underlayColor;
-	cres = rhs.cres;
+	underlayIndent      = rhs.underlayIndent;
+	txof                = rhs.txof;
+	underlayColor       = rhs.underlayColor;
+	cres                = rhs.cres;
 }
 
 inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
-	attribute = rhs.attribute;
-	vertexCount = gsl::narrow<unsigned short>(rhs.vertexCount);
-	type = rhs.type;
-	fillColor = rhs.fillColor;
-	borderColor = rhs.borderColor;
-	clipEntries = gsl::narrow<unsigned short>(rhs.clipEntries);
-	vertices = 0; // do not write the pointer value to file
-	satinOrAngle = rhs.satinOrAngle;
-	borderClipData = 0; // do not write the pointer value to file
+	attribute       = rhs.attribute;
+	vertexCount     = gsl::narrow<unsigned short>(rhs.vertexCount);
+	type            = rhs.type;
+	fillColor       = rhs.fillColor;
+	borderColor     = rhs.borderColor;
+	clipEntries     = gsl::narrow<unsigned short>(rhs.clipEntries);
+	vertices        = 0; // do not write the pointer value to file
+	satinOrAngle    = rhs.satinOrAngle;
+	borderClipData  = 0; // do not write the pointer value to file
 	satinGuideCount = gsl::narrow<unsigned short>(rhs.satinGuideCount);
-	wordParam = gsl::narrow<unsigned short>(rhs.wordParam);
-	rectangle = rhs.rectangle;
-	fillType = rhs.fillType;
-	edgeType = rhs.edgeType;
-	fillSpacing = rhs.fillSpacing;
-	lengthOrCount = rhs.lengthOrCount;
+	wordParam       = gsl::narrow<unsigned short>(rhs.wordParam);
+	rectangle       = rhs.rectangle;
+	fillType        = rhs.fillType;
+	edgeType        = rhs.edgeType;
+	fillSpacing     = rhs.fillSpacing;
+	lengthOrCount   = rhs.lengthOrCount;
 	angleOrClipData = rhs.angleOrClipData;
-	borderSize = rhs.borderSize;
-	edgeSpacing = rhs.edgeSpacing;
-	edgeStitchLen = rhs.edgeStitchLen;
-	picoLength = rhs.picoLength;
+	borderSize      = rhs.borderSize;
+	edgeSpacing     = rhs.edgeSpacing;
+	edgeStitchLen   = rhs.edgeStitchLen;
+	picoLength      = rhs.picoLength;
 
-	extendedAttribute = rhs.extendedAttribute;
-	maxFillStitchLen = rhs.maxFillStitchLen;
-	minFillStitchLen = rhs.minFillStitchLen;
-	maxBorderStitchLen = rhs.maxBorderStitchLen;
-	minBorderStitchLen = rhs.minBorderStitchLen;
-	fillInfo = rhs.fillInfo;
-	fillStart = gsl::narrow<unsigned short>(rhs.fillStart);
-	fillEnd = gsl::narrow<unsigned short>(rhs.fillEnd);
-	underlaySpacing = rhs.underlaySpacing;
-	underlayStitchLen = rhs.underlayStitchLen;
+	extendedAttribute   = rhs.extendedAttribute;
+	maxFillStitchLen    = rhs.maxFillStitchLen;
+	minFillStitchLen    = rhs.minFillStitchLen;
+	maxBorderStitchLen  = rhs.maxBorderStitchLen;
+	minBorderStitchLen  = rhs.minBorderStitchLen;
+	fillInfo            = rhs.fillInfo;
+	fillStart           = gsl::narrow<unsigned short>(rhs.fillStart);
+	fillEnd             = gsl::narrow<unsigned short>(rhs.fillEnd);
+	underlaySpacing     = rhs.underlaySpacing;
+	underlayStitchLen   = rhs.underlayStitchLen;
 	underlayStitchAngle = rhs.underlayStitchAngle;
-	underlayIndent = rhs.underlayIndent;
-	txof = rhs.txof;
-	underlayColor = rhs.underlayColor;
-	cres = rhs.cres;
+	underlayIndent      = rhs.underlayIndent;
+	txof                = rhs.txof;
+	underlayColor       = rhs.underlayColor;
+	cres                = rhs.cres;
 
 	return *this;
 }
 
 inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
-	attribute = rhs.attribute;
-	vertexCount = rhs.vertexCount;
-	type = rhs.type;
-	fillColor = rhs.fillColor;
-	borderColor = rhs.borderColor;
-	clipEntries = rhs.clipEntries;
-	vertices = 0; // do not read the pointer from file
-	satinOrAngle = rhs.satinOrAngle;
-	borderClipData = 0; // do not read the pointer from file
+	attribute       = rhs.attribute;
+	vertexCount     = rhs.vertexCount;
+	type            = rhs.type;
+	fillColor       = rhs.fillColor;
+	borderColor     = rhs.borderColor;
+	clipEntries     = rhs.clipEntries;
+	vertices        = 0; // do not read the pointer from file
+	satinOrAngle    = rhs.satinOrAngle;
+	borderClipData  = 0; // do not read the pointer from file
 	satinGuideCount = rhs.satinGuideCount;
-	wordParam = rhs.wordParam;
-	rectangle = rhs.rectangle;
-	fillType = rhs.fillType;
-	edgeType = rhs.edgeType;
-	fillSpacing = rhs.fillSpacing;
-	lengthOrCount = rhs.lengthOrCount;
+	wordParam       = rhs.wordParam;
+	rectangle       = rhs.rectangle;
+	fillType        = rhs.fillType;
+	edgeType        = rhs.edgeType;
+	fillSpacing     = rhs.fillSpacing;
+	lengthOrCount   = rhs.lengthOrCount;
 	angleOrClipData = rhs.angleOrClipData;
-	borderSize = rhs.borderSize;
-	edgeSpacing = rhs.edgeSpacing;
-	edgeStitchLen = rhs.edgeStitchLen;
-	picoLength = rhs.picoLength;
+	borderSize      = rhs.borderSize;
+	edgeSpacing     = rhs.edgeSpacing;
+	edgeStitchLen   = rhs.edgeStitchLen;
+	picoLength      = rhs.picoLength;
 
-	extendedAttribute = rhs.extendedAttribute;
-	maxFillStitchLen = rhs.maxFillStitchLen;
-	minFillStitchLen = rhs.minFillStitchLen;
-	maxBorderStitchLen = rhs.maxBorderStitchLen;
-	minBorderStitchLen = rhs.minBorderStitchLen;
-	fillInfo = rhs.fillInfo;
-	fillStart = rhs.fillStart;
-	fillEnd = rhs.fillEnd;
-	underlaySpacing = rhs.underlaySpacing;
-	underlayStitchLen = rhs.underlayStitchLen;
+	extendedAttribute   = rhs.extendedAttribute;
+	maxFillStitchLen    = rhs.maxFillStitchLen;
+	minFillStitchLen    = rhs.minFillStitchLen;
+	maxBorderStitchLen  = rhs.maxBorderStitchLen;
+	minBorderStitchLen  = rhs.minBorderStitchLen;
+	fillInfo            = rhs.fillInfo;
+	fillStart           = rhs.fillStart;
+	fillEnd             = rhs.fillEnd;
+	underlaySpacing     = rhs.underlaySpacing;
+	underlayStitchLen   = rhs.underlayStitchLen;
 	underlayStitchAngle = rhs.underlayStitchAngle;
-	underlayIndent = rhs.underlayIndent;
-	txof = rhs.txof;
-	underlayColor = rhs.underlayColor;
-	cres = rhs.cres;
+	underlayIndent      = rhs.underlayIndent;
+	txof                = rhs.txof;
+	underlayColor       = rhs.underlayColor;
+	cres                = rhs.cres;
 
 	return *this;
 }
@@ -1859,7 +1858,7 @@ public:
 	    : segmentLength(0.0f)
 	    , sideLength(0.0f)
 	    , vertexIndex(0)
-		, point() {
+	    , point() {
 	}
 };
 
@@ -2324,8 +2323,8 @@ typedef struct _txtrct {
 
 typedef struct _txhst {
 	std::vector<TXPNT> texturePoint;
-	float              height = 0.0;
-	float              width = 0.0;
+	float              height  = 0.0;
+	float              width   = 0.0;
 	float              spacing = 0.0;
 } TXHST;
 
@@ -2379,7 +2378,7 @@ typedef struct _lengthInfo {
 // use the encapsulation recommended in I.30
 // (https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#i30-encapsulate-rule-violations)
 template <class T2, class T1> inline _Ret_notnull_ T2 convert_ptr(T1* pointer) {
-	[[gsl::suppress(26474)]]{
+	[[gsl::suppress(26474)]] {
 		if (pointer) {
 			return static_cast<T2>(static_cast<void*>(pointer));
 		}
