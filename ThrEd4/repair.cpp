@@ -113,7 +113,7 @@ unsigned frmchkfn() {
 
 	if (FormIndex) {
 		for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
-			FRMHED const* formHeader = &FormList[iForm];
+			const auto* formHeader = &FormList[iForm];
 			if (!(badData.attribute & BADFLT)) {
 				if (!formHeader->vertexCount)
 					badData.attribute |= BADFLT;
@@ -160,15 +160,15 @@ unsigned frmchkfn() {
 }
 
 void bcup(size_t find, BADCNTS& badData) {
-	FRMHED const* formHeader = &FormList[find];
+	const auto& formHeader = FormList[find];
 	if (isclp(find))
-		badData.clip += formHeader->lengthOrCount.clipCount;
+		badData.clip += formHeader.lengthOrCount.clipCount;
 	if (iseclp(find))
-		badData.clip += formHeader->clipEntries;
-	if (formHeader->type == SAT)
-		badData.guideCount += formHeader->satinGuideCount;
+		badData.clip += formHeader.clipEntries;
+	if (formHeader.type == SAT)
+		badData.guideCount += formHeader.satinGuideCount;
 	if (istx(find))
-		badData.tx += formHeader->fillInfo.texture.count;
+		badData.tx += formHeader.fillInfo.texture.count;
 }
 
 void chkfstch() noexcept {
@@ -196,7 +196,7 @@ void repflt(std::wstring& repairMessage) {
 	size_t              iVertex = 0;
 	bool                flag    = true;
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
-		auto   formHeader       = &FormList[iForm];
+		const auto formHeader       = &FormList[iForm];
 		const size_t vertexDifference = formHeader->vertices - FormVertices;
 		if (FormVertexIndex >= vertexDifference + formHeader->vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + formHeader->vertexCount);
@@ -243,7 +243,7 @@ void repclp(std::wstring& repairMessage) {
 	size_t              clipCount = 0;
 	std::vector<fPOINT> clipPoint;
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
-		auto formHeader = &FormList[iForm];
+		const auto formHeader = &FormList[iForm];
 		size_t clipDifference = 0u;
 		if (isclp(iForm)) {
 			// ToDo - pointer arithmetic to be fixed
@@ -319,7 +319,7 @@ void repsat() {
 	BADCNTS  badData    = {};
 
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
-		auto formHeader = &FormList[iForm];
+		const auto formHeader = &FormList[iForm];
 		if (formHeader->type == SAT) {
 			// ToDo - pointer arithmetic to be fixed
 			const size_t guideDifference = formHeader->satinOrAngle.guide - SatinGuides;
@@ -357,7 +357,7 @@ void reptx() {
 
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		if (istx(iForm)) {
-			auto formHeader = &FormList[iForm];
+			const auto formHeader = &FormList[iForm];
 			if (gsl::narrow<unsigned short>(TextureIndex)
 			    > formHeader->fillInfo.texture.index + formHeader->fillInfo.texture.count) {
 				auto       sourceStart = &SatinGuides[formHeader->fillInfo.texture.index];

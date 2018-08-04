@@ -1099,14 +1099,13 @@ bool srtchk(const std::vector<OREC*>& stitchRegion, unsigned count, unsigned& ba
 	unsigned iRegion    = 1;
 	unsigned form       = stitchRegion[0]->form;
 	unsigned color      = stitchRegion[0]->color;
-	FRMHED*  formHeader = nullptr;
 
 	for (iRegion = 1; iRegion < count; iRegion++) {
 		if (stitchRegion[iRegion]->form == form) {
 			if (ColorOrder[stitchRegion[iRegion]->color] < ColorOrder[color]) {
-				formHeader = &FormList[form];
-				if (formHeader->fillType == FTHF && formHeader->extendedAttribute & AT_FTHBLND
-				    && stitchRegion[iRegion]->color == formHeader->fillColor)
+				const auto& formHeader = FormList[form];
+				if (formHeader.fillType == FTHF && formHeader.extendedAttribute & AT_FTHBLND
+				    && stitchRegion[iRegion]->color == formHeader.fillColor)
 					continue;
 				badForm = iRegion;
 				return false;

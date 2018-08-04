@@ -5752,7 +5752,6 @@ unsigned px2stch() noexcept {
 void zumin() {
 	dPOINT      newSize           = {};
 	fRECTANGLE  groupBoundingRect = {};
-	fRECTANGLE* boundingRect      = nullptr;
 
 	if (!StateMap.testAndReset(StateFlag::ZUMACT))
 		ZoomFactor *= ZUMFCT;
@@ -5767,9 +5766,9 @@ void zumin() {
 				break;
 			}
 			if (StateMap.test(StateFlag::FORMSEL)) {
-				boundingRect    = &FormList[ClosestFormToCursor].rectangle;
-				SelectedPoint.x = ((boundingRect->right - boundingRect->left) / 2) + boundingRect->left;
-				SelectedPoint.y = ((boundingRect->top - boundingRect->bottom) / 2) + boundingRect->bottom;
+				const auto& boundingRect    = FormList[ClosestFormToCursor].rectangle;
+				SelectedPoint.x = ((boundingRect.right - boundingRect.left) / 2) + boundingRect.left;
+				SelectedPoint.y = ((boundingRect.top - boundingRect.bottom) / 2) + boundingRect.bottom;
 				break;
 			}
 			if (StateMap.test(StateFlag::FRMPSEL)) {
@@ -5865,7 +5864,6 @@ void zumshft() {
 void zumout() {
 	POINT       newSize           = {};
 	fRECTANGLE  groupBoundingRect = {};
-	fRECTANGLE* boundingRect      = nullptr;
 
 	unboxs();
 	if (StateMap.test(StateFlag::ZUMED)) {
@@ -5875,9 +5873,9 @@ void zumout() {
 				break;
 			}
 			if (StateMap.test(StateFlag::FORMSEL)) {
-				boundingRect    = &FormList[ClosestFormToCursor].rectangle;
-				SelectedPoint.x = ((boundingRect->right - boundingRect->left) / 2) + boundingRect->left;
-				SelectedPoint.y = ((boundingRect->top - boundingRect->bottom) / 2) + boundingRect->bottom;
+				const auto& boundingRect    = FormList[ClosestFormToCursor].rectangle;
+				SelectedPoint.x = ((boundingRect.right - boundingRect.left) / 2) + boundingRect.left;
+				SelectedPoint.y = ((boundingRect.top - boundingRect.bottom) / 2) + boundingRect.bottom;
 				break;
 			}
 			if (StateMap.test(StateFlag::FRMPSEL)) {
@@ -10908,7 +10906,6 @@ void nuscol(unsigned iColor) noexcept {
 
 void movchk() {
 	unsigned iStitch = 0, iForm = 0, color = 0, key = 0, swapColor = 0, switchColors = 0;
-	FRMHED*  pfrm = nullptr;
 
 	if (Msg.wParam & MK_LBUTTON) {
 		if (!StateMap.testAndSet(StateFlag::WASMOV)) {
@@ -10937,7 +10934,7 @@ void movchk() {
 					}
 				}
 				for (iForm = 0; iForm < FormIndex; iForm++) {
-					pfrm = &FormList[iForm];
+					const auto pfrm = &FormList[iForm];
 					if (pfrm->fillType) {
 						if (pfrm->fillColor == VerticalIndex)
 							pfrm->fillColor = DraggedColor;
@@ -10979,7 +10976,6 @@ void movchk() {
 
 void inscol() {
 	unsigned iStitch = 0, iForm = 0, iColor = 0, nextColor = 0, color = 0;
-	FRMHED*  form = nullptr;
 
 	boost::dynamic_bitset<> colorMap(16);
 	if (chkMsgs(Msg.pt, DefaultColorWin[0], UserColorWin[15])) {
@@ -11000,7 +10996,7 @@ void inscol() {
 				}
 			}
 			for (iForm = 0; iForm < FormIndex; iForm++) {
-				form = &FormList[iForm];
+				const auto form = &FormList[iForm];
 				if (form->fillType) {
 					if (form->fillColor >= VerticalIndex && form->fillColor < nextColor)
 						form->fillColor++;
@@ -11036,7 +11032,6 @@ bool usedcol() noexcept {
 
 void delcol() {
 	unsigned iStitch = 0, iForm = 0, iColor = 0, color = 0;
-	FRMHED*  form = nullptr;
 
 	if (chkMsgs(Msg.pt, DefaultColorWin[0], UserColorWin[15])) {
 		VerticalIndex &= 0xf;
@@ -11051,7 +11046,7 @@ void delcol() {
 				}
 			}
 			for (iForm = 0; iForm < FormIndex; iForm++) {
-				form = &FormList[iForm];
+				const auto form = &FormList[iForm];
 				if (form->fillType) {
 					if (form->fillColor > VerticalIndex)
 						form->fillColor--;
@@ -17579,12 +17574,12 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 void sachk() {
 	for (auto iForm = 0ul; iForm < FormIndex; iForm++) {
-		const FRMHED* form = &FormList[iForm];
-		if (form && form->type == SAT && form->satinGuideCount) {
-			const SATCON* guide = form->satinOrAngle.guide;
+		const auto& form = FormList[iForm];
+		if (form.type == SAT && form.satinGuideCount) {
+			const SATCON* guide = form.satinOrAngle.guide;
 			if (guide) {
-				for (size_t iGuide = 0; iGuide < form->satinGuideCount; iGuide++) {
-					if (guide[iGuide].start > form->vertexCount || guide[iGuide].finish > form->vertexCount) {
+				for (size_t iGuide = 0; iGuide < form.satinGuideCount; iGuide++) {
+					if (guide[iGuide].start > form.vertexCount || guide[iGuide].finish > form.vertexCount) {
 						const auto bakclo   = ClosestFormToCursor;
 						ClosestFormToCursor = iForm;
 						delsac(iForm);

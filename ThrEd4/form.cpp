@@ -36,49 +36,49 @@
 #include "thred.h"
 #include "xt.h"
 
-unsigned   BeanCount;                 // number of stitches added by convert to bean
-fRECTANGLE BoundingRect;              // isin rectangle
-size_t     ClipIntersectSide;         // clipboard intersect side;
-float      ClipWidth;                 // horizontal spacing for vertical clipboard fill
-fPOINT*    CurrentFillVertices;       // pointer to the line of the polygon being filled
-size_t     CurrentFormGuidesCount;    // number of connections in the currently selected form
-REGION*    CurrentRegion;             // region currently being sequenced
-unsigned   DoneRegion;                // last region sequenced
-double     EggRatio;                  // ratio for shrinking eggs
-FRMHED*    FormForInsert;             // insert form vertex in this form
-FORMINFO   FormInfo;                  // form info used in drawing forms
-FLOAT      FormOffset;                // form offset for clipboard fills
-unsigned   FormRelocationIndex;       // form relocator pointer
-size_t     FormVertexNext;            // form vertex storage for form vertex insert
-size_t     FormVertexPrev;            // form vertex storage for form vertex insert
-double     GapToClosestRegion;        // region close enough threshold for sequencing
-size_t     GroupIndexCount;           // number of group indices
-unsigned   InOutFlag;                 // is intersection of line and cursor before, in or after the line
-unsigned   LastGroup;                 // group of the last line written in the previous region;
-double*    Lengths;                   // array of cumulative lengths used in satin fills
-unsigned   LineGroupIndex;            // pointer for groups of fill line segments
-fPOINT     LineSegmentEnd;            // vertical clipboard line segment end
-fPOINT     LineSegmentStart;          // vertical clipboard line segment start
-float      MaxStitchLen;              // maximum stitch length
-unsigned   NextGroup;                 // group that connects to the next region
-unsigned   PathIndex;                 // formOrigin to the next path element for vertical fill sequencing
-unsigned   PathMapIndex;              // number of entries in the path map
-unsigned   RegionCount;               // number of regions to be sequenced
-RGSEQ*     RegionPath;                // path to a region
-unsigned   SatinBackupIndex;          // pointer for backup stitches in satin fills
-unsigned   SatinIndex;                // pointer to next satin formOrigin to enter
-SMALPNTL*  SequenceLines;             // line for vertical/horizontal/angle fills
-unsigned   SequencePathIndex;         // index to path of sequenced regions
-double     Slope;                     // slope of line in angle fills
-size_t     StartPoint;                // starting formOrigin for a satin stitch guide-line
-unsigned   StitchLineCount;           // count of stitch lines
-HDC        TimeDC;                    // progress bar device context
-double     TimePosition;              // progress bar postiion
-double     TimeStep;                  // progress bar step
-HWND       TimeWindow;                // progress bar
-float      UserStitchLen;             // user stitch length
-unsigned   VisitedIndex;              // next unvisited region for sequencing
-fPOINT*    WorkingFormVertices;       // form points for angle fills
+unsigned   BeanCount;              // number of stitches added by convert to bean
+fRECTANGLE BoundingRect;           // isin rectangle
+size_t     ClipIntersectSide;      // clipboard intersect side;
+float      ClipWidth;              // horizontal spacing for vertical clipboard fill
+fPOINT*    CurrentFillVertices;    // pointer to the line of the polygon being filled
+size_t     CurrentFormGuidesCount; // number of connections in the currently selected form
+REGION*    CurrentRegion;          // region currently being sequenced
+unsigned   DoneRegion;             // last region sequenced
+double     EggRatio;               // ratio for shrinking eggs
+FRMHED*    FormForInsert;          // insert form vertex in this form
+FORMINFO   FormInfo;               // form info used in drawing forms
+FLOAT      FormOffset;             // form offset for clipboard fills
+unsigned   FormRelocationIndex;    // form relocator pointer
+size_t     FormVertexNext;         // form vertex storage for form vertex insert
+size_t     FormVertexPrev;         // form vertex storage for form vertex insert
+double     GapToClosestRegion;     // region close enough threshold for sequencing
+size_t     GroupIndexCount;        // number of group indices
+unsigned   InOutFlag;              // is intersection of line and cursor before, in or after the line
+unsigned   LastGroup;              // group of the last line written in the previous region;
+double*    Lengths;                // array of cumulative lengths used in satin fills
+unsigned   LineGroupIndex;         // pointer for groups of fill line segments
+fPOINT     LineSegmentEnd;         // vertical clipboard line segment end
+fPOINT     LineSegmentStart;       // vertical clipboard line segment start
+float      MaxStitchLen;           // maximum stitch length
+unsigned   NextGroup;              // group that connects to the next region
+unsigned   PathIndex;              // formOrigin to the next path element for vertical fill sequencing
+unsigned   PathMapIndex;           // number of entries in the path map
+unsigned   RegionCount;            // number of regions to be sequenced
+RGSEQ*     RegionPath;             // path to a region
+unsigned   SatinBackupIndex;       // pointer for backup stitches in satin fills
+unsigned   SatinIndex;             // pointer to next satin formOrigin to enter
+SMALPNTL*  SequenceLines;          // line for vertical/horizontal/angle fills
+unsigned   SequencePathIndex;      // index to path of sequenced regions
+double     Slope;                  // slope of line in angle fills
+size_t     StartPoint;             // starting formOrigin for a satin stitch guide-line
+unsigned   StitchLineCount;        // count of stitch lines
+HDC        TimeDC;                 // progress bar device context
+double     TimePosition;           // progress bar postiion
+double     TimeStep;               // progress bar step
+HWND       TimeWindow;             // progress bar
+float      UserStitchLen;          // user stitch length
+unsigned   VisitedIndex;           // next unvisited region for sequencing
+fPOINT*    WorkingFormVertices;    // form points for angle fills
 
 unsigned char Level00   = 0;
 unsigned char Level01   = 1;
@@ -356,13 +356,12 @@ void ispcdclp() {
 }
 
 void frmout(size_t formIndex) noexcept {
-	fRECTANGLE* rectangle = nullptr;
-	unsigned    iVertex   = 0;
-	float       offset    = 0.0;
+	unsigned iVertex = 0;
+	float    offset  = 0.0;
 
 	if (FormList[formIndex].vertexCount) {
-		rectangle           = &FormList[formIndex].rectangle;
-		CurrentFormVertices = FormList[formIndex].vertices;
+		const auto rectangle = &FormList[formIndex].rectangle;
+		CurrentFormVertices  = FormList[formIndex].vertices;
 		rectangle->left = rectangle->right = CurrentFormVertices[0].x;
 		rectangle->bottom = rectangle->top = CurrentFormVertices[0].y;
 		for (iVertex = 1; iVertex < FormList[formIndex].vertexCount; iVertex++) {
@@ -608,23 +607,22 @@ constexpr float midl(float high, float low) {
 }
 
 void ritfrct(size_t iForm, HDC dc) {
-	unsigned    controlPoint     = 0;
-	POINT       pixelOutline[10] = {};
-	fRECTANGLE* rectangle        = nullptr;
-	fPOINT      formOutline[10]  = {};
+	unsigned controlPoint     = 0;
+	POINT    pixelOutline[10] = {};
+	fPOINT   formOutline[10]  = {};
 
 	ratsr();
 	SelectObject(StitchWindowDC, FormPen);
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	getfinfo(iForm);
-	rectangle = &FormList[iForm].rectangle;
+	const auto& rectangle = FormList[iForm].rectangle;
 	SelectObject(dc, FormSelectedPen);
-	formOutline[0].x = formOutline[6].x = formOutline[7].x = formOutline[8].x = rectangle->left;
-	formOutline[1].x = formOutline[5].x = midl(rectangle->right, rectangle->left);
-	formOutline[0].y = formOutline[1].y = formOutline[2].y = formOutline[8].y = rectangle->top;
-	formOutline[3].y = formOutline[7].y = midl(rectangle->top, rectangle->bottom);
-	formOutline[4].y = formOutline[5].y = formOutline[6].y = rectangle->bottom;
-	formOutline[2].x = formOutline[3].x = formOutline[4].x = rectangle->right;
+	formOutline[0].x = formOutline[6].x = formOutline[7].x = formOutline[8].x = rectangle.left;
+	formOutline[1].x = formOutline[5].x = midl(rectangle.right, rectangle.left);
+	formOutline[0].y = formOutline[1].y = formOutline[2].y = formOutline[8].y = rectangle.top;
+	formOutline[3].y = formOutline[7].y = midl(rectangle.top, rectangle.bottom);
+	formOutline[4].y = formOutline[5].y = formOutline[6].y = rectangle.bottom;
+	formOutline[2].x = formOutline[3].x = formOutline[4].x = rectangle.right;
 	for (controlPoint = 0; controlPoint < 8; controlPoint++)
 		sfCor2px(formOutline[controlPoint], pixelOutline[controlPoint]);
 	sfCor2px(formOutline[0], pixelOutline[controlPoint]);
@@ -651,7 +649,7 @@ void delfrms() {
 }
 
 void fselrct(size_t iForm) noexcept {
-	const FRMHED& formHeader     = FormList[iForm];
+	const auto& formHeader     = FormList[iForm];
 	fPOINT        formOutline[5] = {};
 	POINT         line[6]        = {};
 	unsigned      iPoint         = 0;
@@ -3064,7 +3062,6 @@ bool isin(const std::vector<VCLPX> regionCrossingData,
           float                    yCoordinate,
           unsigned                 regionCrossingStart,
           unsigned                 regionCrossingEnd) {
-
 	unsigned count = 0;
 	dPOINT   point = {};
 
@@ -3078,7 +3075,7 @@ bool isin(const std::vector<VCLPX> regionCrossingData,
 		return 0;
 	for (auto iRegion = regionCrossingStart; iRegion < regionCrossingEnd; iRegion++) {
 		const auto startVertex = regionCrossingData[iRegion].vertex;
-		const auto endVertex = nxt(startVertex);
+		const auto endVertex   = nxt(startVertex);
 		if (projv(xCoordinate, CurrentFormVertices[startVertex], CurrentFormVertices[endVertex], point)) {
 			if (point.y > yCoordinate) {
 				if (CurrentFormVertices[startVertex].x != xCoordinate && CurrentFormVertices[endVertex].x != xCoordinate)
@@ -4888,7 +4885,6 @@ void satadj() {
 	SATCON*             sourceGuide      = nullptr;
 	SATCON*             destinationGuide = nullptr;
 	size_t              savedGuideCount  = SelectedForm->satinGuideCount;
-	FRMHED*             formHeader       = nullptr;
 	ExtendedBitSet<>    satinMap(VertexCount);
 
 	// ensure all guide endpoints are on valid vertices
@@ -5048,7 +5044,7 @@ void satadj() {
 		          (&SatinGuides[SatinGuideIndex] + 1),
 		          stdext::make_checked_array_iterator(destinationGuide, 10000 - SatinGuideIndex));
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-			formHeader = &FormList[iForm];
+			const auto formHeader = &FormList[iForm];
 			if (formHeader->type == SAT)
 				formHeader->satinOrAngle.guide -= iGuide;
 		}
@@ -6091,7 +6087,7 @@ void delcon(unsigned GuideIndex) {
 			    guide + 1, guide + (SatinGuideIndex - iGuide + 1), stdext::make_checked_array_iterator(guide, SatinGuideIndex));
 		}
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-			FRMHED* formHeader = &FormList[iForm];
+			const auto formHeader = &FormList[iForm];
 			if (formHeader->type == SAT && formHeader->satinGuideCount)
 				formHeader->satinOrAngle.guide--;
 		}
@@ -6512,10 +6508,9 @@ bool chkdel() noexcept {
 }
 
 void delspnt() {
-	unsigned iGuide     = 0;
-	SATCON*  guide      = nullptr;
-	fPOINT   vertex     = {};
-	FRMHED*  formHeader = nullptr;
+	unsigned iGuide = 0;
+	SATCON*  guide  = nullptr;
+	fPOINT   vertex = {};
 
 	fvars(ClosestFormToCursor);
 	if (chkdel()) {
@@ -6545,7 +6540,7 @@ void delspnt() {
 					SelectedForm->satinGuideCount--;
 					SatinGuideIndex--;
 					for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-						formHeader = &FormList[iForm];
+						const auto formHeader = &FormList[iForm];
 						if (formHeader->type == SAT && formHeader->satinGuideCount)
 							formHeader->satinOrAngle.guide++;
 					}
@@ -6931,20 +6926,19 @@ void setap() {
 
 void getbig() noexcept {
 	unsigned    iForm = 0, iStitch = 0;
-	fRECTANGLE* trct = nullptr;
 
 	AllItemsRect.bottom = AllItemsRect.left = 1e9;
 	AllItemsRect.top = AllItemsRect.right = 0;
 	for (iForm = 0; iForm < FormIndex; iForm++) {
-		trct = &FormList[iForm].rectangle;
-		if (trct->bottom < AllItemsRect.bottom)
-			AllItemsRect.bottom = trct->bottom;
-		if (trct->left < AllItemsRect.left)
-			AllItemsRect.left = trct->left;
-		if (trct->right > AllItemsRect.right)
-			AllItemsRect.right = trct->right;
-		if (trct->top > AllItemsRect.top)
-			AllItemsRect.top = trct->top;
+		const auto& trct = FormList[iForm].rectangle;
+		if (trct.bottom < AllItemsRect.bottom)
+			AllItemsRect.bottom = trct.bottom;
+		if (trct.left < AllItemsRect.left)
+			AllItemsRect.left = trct.left;
+		if (trct.right > AllItemsRect.right)
+			AllItemsRect.right = trct.right;
+		if (trct.top > AllItemsRect.top)
+			AllItemsRect.top = trct.top;
 	}
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (StitchBuffer[iStitch].x < AllItemsRect.left)
@@ -8163,24 +8157,23 @@ void snap() {
 }
 
 void dufcntr(dPOINT& center) {
-	fRECTANGLE* formRect = nullptr;
-	fRECTANGLE  bigRect  = {};
+	fRECTANGLE bigRect = {};
 
-	formRect       = &FormList[SelectedFormList->front()].rectangle;
-	bigRect.left   = formRect->left;
-	bigRect.right  = formRect->right;
-	bigRect.top    = formRect->top;
-	bigRect.bottom = formRect->bottom;
+	const auto initRect = FormList[SelectedFormList->front()].rectangle;
+	bigRect.left        = initRect.left;
+	bigRect.right       = initRect.right;
+	bigRect.top         = initRect.top;
+	bigRect.bottom      = initRect.bottom;
 	for (auto selectedForm : (*SelectedFormList)) {
-		formRect = &FormList[selectedForm].rectangle;
-		if (formRect->left < bigRect.left)
-			bigRect.left = formRect->left;
-		if (formRect->right > bigRect.right)
-			bigRect.right = formRect->right;
-		if (formRect->bottom < bigRect.bottom)
-			bigRect.bottom = formRect->bottom;
-		if (formRect->top > bigRect.top)
-			bigRect.top = formRect->top;
+		const auto formRect = FormList[selectedForm].rectangle;
+		if (formRect.left < bigRect.left)
+			bigRect.left = formRect.left;
+		if (formRect.right > bigRect.right)
+			bigRect.right = formRect.right;
+		if (formRect.bottom < bigRect.bottom)
+			bigRect.bottom = formRect.bottom;
+		if (formRect.top > bigRect.top)
+			bigRect.top = formRect.top;
 	}
 	center.x = (bigRect.right - bigRect.left) / 2 + bigRect.left;
 	center.y = (bigRect.top - bigRect.bottom) / 2 + bigRect.bottom;
@@ -8292,7 +8285,7 @@ void rotdup() {
 }
 
 void adfrm(size_t iForm) {
-	FRMHED* formHeader = &FormList[FormIndex];
+	auto formHeader = &FormList[FormIndex];
 
 	SelectedForm         = &FormList[iForm];
 	*formHeader          = *SelectedForm;
@@ -8366,7 +8359,7 @@ void duprots(double rotationAngle, const dPOINT& rotationCenter) {
 }
 
 void cplayfn(size_t iForm, unsigned play) {
-	const FRMHED* formHeader = &FormList[iForm];
+	const auto* formHeader = &FormList[iForm];
 
 	fvars(FormIndex);
 	*SelectedForm = *formHeader;
@@ -8385,7 +8378,6 @@ void cplayfn(size_t iForm, unsigned play) {
 	SelectedForm->clipEntries             = 0;
 	SelectedForm->fillType                = 0;
 	SelectedForm->lengthOrCount.clipCount = 0;
-	;
 	SelectedForm->edgeType               = 0;
 	SelectedForm->fillInfo.texture.index = 0;
 	SelectedForm->attribute              = FormList[FormIndex].attribute & NFRMLMSK;
@@ -8492,7 +8484,7 @@ void join() {
 			ClosestFormToCursor = savedFormIndex - 1;
 		else
 			ClosestFormToCursor = savedFormIndex;
-		fPOINT* insertedVertex = &FormList[ClosestFormToCursor].vertices[FormList[ClosestFormToCursor].vertexCount];
+		const auto insertedVertex = &FormList[ClosestFormToCursor].vertices[FormList[ClosestFormToCursor].vertexCount];
 		if (insertedVertex) {
 			fltspac(insertedVertex, vertexCount);
 			for (size_t iVertex = 0u; iVertex < vertexCount; iVertex++) {
@@ -8884,7 +8876,7 @@ void ribon() {
 			satout(BorderWidth);
 
 			HorizontalLength2  = BorderWidth / 2;
-			FRMHED* formHeader = &FormList[FormIndex];
+			const auto formHeader = &FormList[FormIndex];
 			if (formHeader) {
 				frmclr(formHeader);
 				iNewVertex                   = 0;
@@ -9218,7 +9210,6 @@ void cntrx() {
 	dPOINT      selectedCenter = {};
 	unsigned    iStitch        = 0;
 	bool        flag           = false;
-	fRECTANGLE* formRect       = nullptr;
 	fRECTANGLE  groupRect      = {};
 
 	if (StateMap.test(StateFlag::GMRK)) {
@@ -9248,9 +9239,9 @@ void cntrx() {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			flag = true;
 			savdo();
-			formRect         = &FormList[ClosestFormToCursor].rectangle;
-			selectedCenter.x = (formRect->right - formRect->left) / 2 + formRect->left;
-			selectedCenter.y = (formRect->top - formRect->bottom) / 2 + formRect->bottom;
+			const auto& formRect         = FormList[ClosestFormToCursor].rectangle;
+			selectedCenter.x = (formRect.right - formRect.left) / 2 + formRect.left;
+			selectedCenter.y = (formRect.top - formRect.bottom) / 2 + formRect.bottom;
 			FormMoveDelta.x  = markCenter.x - selectedCenter.x;
 			FormMoveDelta.y  = -markCenter.y + selectedCenter.y;
 			if (StateMap.test(StateFlag::CNTRV))
