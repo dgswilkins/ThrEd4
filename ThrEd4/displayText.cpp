@@ -28,6 +28,7 @@
 #include "Resources/resource.h"
 #include "globals.h"
 #include "form.h"
+#include "thred.h"
 
 unsigned short LoadStringList[] = {
 	// strings to load into memory at init time
@@ -421,4 +422,28 @@ void tomsg() {
 	                                    NULL,
 	                                    ThrEdInstance,
 	                                    NULL);
+}
+
+void bxtxt(unsigned iButton, unsigned iMessage) {
+	std::wstring message;
+	loadString(message, iMessage);
+	SetWindowText((*ButtonWin)[iButton], message.c_str());
+}
+
+void hlpflt(unsigned iButton, unsigned iMessage, float data) {
+	std::wstring fmtStr;
+	loadString(fmtStr, iMessage);
+	SetWindowText((*ButtonWin)[iButton], fmt::format(fmtStr, data).c_str());
+}
+
+void drwtxbut(const TXTSCR& textureScreen) {
+	bxtxt(HTXCLR, IDS_CLEAR);
+	hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight / PFGRAN);
+	redraw((*ButtonWin)[HTXWID]);
+	hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing / PFGRAN);
+	bxtxt(HTXVRT, IDS_TXVRT);
+	bxtxt(HTXHOR, IDS_TXHOR);
+	bxtxt(HTXANG, IDS_TXANG);
+	bxtxt(HTXMIR, IDS_TXMIR);
+	SetWindowText((*ButtonWin)[HTXMIR + 1], L"");
 }
