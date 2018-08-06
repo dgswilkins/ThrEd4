@@ -212,14 +212,14 @@ void durev(std::vector<fPOINT>& clipReversedData) {
 	}
 }
 
-void setvct(unsigned start, unsigned finish, double& clipAngle, dPOINT& vector0) noexcept {
+void setvct(size_t start, size_t finish, double& clipAngle, dPOINT& vector0) noexcept {
 	clipAngle = atan2(CurrentFormVertices[finish].y - CurrentFormVertices[start].y,
 	                  CurrentFormVertices[finish].x - CurrentFormVertices[start].x);
 	vector0.x = ClipRectSize.cx * cos(clipAngle);
 	vector0.y = ClipRectSize.cx * sin(clipAngle);
 }
 
-bool nupnt(double clipAngle, dPOINT& moveToCoords, unsigned currentSide) noexcept {
+bool nupnt(double clipAngle, dPOINT& moveToCoords, size_t currentSide) noexcept {
 	const double sinAngle = sin(clipAngle);
 	const double cosAngle = cos(clipAngle);
 
@@ -256,7 +256,7 @@ void lincrnr(const std::vector<fPOINT>& clipReversedData,
              double                     clipAngle,
              dPOINT&                    moveToCoords,
              const dPOINT&              rotationCenter,
-             unsigned                   currentSide) {
+             size_t                     currentSide) {
 	dPOINT delta = {};
 
 	if (nupnt(clipAngle, moveToCoords, currentSide)) {
@@ -329,7 +329,7 @@ bool clpsid(const std::vector<fPOINT>& clipReversedData,
 		else
 			remainder = (length - ClipRectSize.cx) / 2;
 		const fPOINT step        = { delta.x * remainder, delta.y * remainder };
-		auto   insertPoint = begin;
+		auto         insertPoint = begin;
 		for (size_t index = 0; index < ClipStitchCount; index++)
 			rotangf(clipReversedData[index], clipFillData[index], rotationAngle, rotationCenter);
 		for (auto stepCount = 0u; stepCount < clipCount; stepCount++) {
@@ -661,7 +661,7 @@ void clpcrnr(std::vector<fPOINT>& clipFillData, size_t vertex, const dPOINT& rot
 	const auto ratio  = getplen() / length;
 	delta.x *= ratio;
 	delta.y *= ratio;
-	const fPOINT point               = { CurrentFormVertices[nextVertex].x + delta.x, CurrentFormVertices[nextVertex].y + delta.y };
+	const fPOINT point         = { CurrentFormVertices[nextVertex].x + delta.x, CurrentFormVertices[nextVertex].y + delta.y };
 	OSequence[SequenceIndex++] = CurrentFormVertices[nextVertex];
 	OSequence[SequenceIndex++] = point;
 	OSequence[SequenceIndex++] = CurrentFormVertices[nextVertex];
@@ -754,7 +754,7 @@ void clpic() {
 	}
 }
 
-void duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned start, unsigned finish) {
+void duchfn(const std::vector<fPOINT>& chainEndPoints, size_t start, size_t finish) {
 	const std::vector<unsigned> chainSequence = { 0, 1, 2, 3, 0, 1, 4, 3, 0, 3 }; // chain stitch sequence
 
 	std::vector<fPOINT> chainPoint(5);

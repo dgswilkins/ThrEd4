@@ -32,20 +32,20 @@
 #include "form.h"
 #include "thred.h"
 
-unsigned               TextureWindowId;           // id of the window being updated
-HWND                   SideWindowButton;          // button side window
-RECT                   TexturePixelRect;          // screen selected texture points rectangle
-TXTRCT                 TextureRect;               // selected texture points rectangle
-POINT                  SelectTexturePointsOrigin; // original location of selected texture points
-POINT                  TextureCursorLocation;     // texture editor move cursor location
-HPEN                   TextureCrossPen;           // texture editor cross pen
-TXHST                  TextureHistory[ITXBUFLEN]; // texture editor history headers
-int                    TextureHistoryIndex;       // pointer to the next texture history buffer
-std::vector<TXPNT>*    TempTexturePoints;         // temporary storage for textured fill data
-std::vector<unsigned>* SelectedTexturePointsList; // list of selected points
-TXTSCR                 TextureScreen;             // texture editor layout parameters
+unsigned             TextureWindowId;           // id of the window being updated
+HWND                 SideWindowButton;          // button side window
+RECT                 TexturePixelRect;          // screen selected texture points rectangle
+TXTRCT               TextureRect;               // selected texture points rectangle
+POINT                SelectTexturePointsOrigin; // original location of selected texture points
+POINT                TextureCursorLocation;     // texture editor move cursor location
+HPEN                 TextureCrossPen;           // texture editor cross pen
+TXHST                TextureHistory[ITXBUFLEN]; // texture editor history headers
+int                  TextureHistoryIndex;       // pointer to the next texture history buffer
+std::vector<TXPNT>*  TempTexturePoints;         // temporary storage for textured fill data
+std::vector<size_t>* SelectedTexturePointsList; // list of selected points
+TXTSCR               TextureScreen;             // texture editor layout parameters
 
-void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<unsigned>* ptrTexturePointsList) noexcept {
+void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<size_t>* ptrTexturePointsList) noexcept {
 	TempTexturePoints         = ptrTexturePoints;
 	SelectedTexturePointsList = ptrTexturePointsList;
 }
@@ -278,7 +278,7 @@ void txt2pix(const TXPNT& texturePoint, POINT& screenPoint) noexcept {
 	screenPoint.x = (texturePoint.line * TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio;
 }
 
-void txtxfn(const POINT& reference, int offsetPixels) noexcept {
+void txtxfn(const POINT& reference, unsigned short offsetPixels) noexcept {
 	POINT line[2];
 
 	line[0].x = line[1].x = reference.x;
@@ -291,7 +291,7 @@ void txtxfn(const POINT& reference, int offsetPixels) noexcept {
 	Polyline(StitchWindowMemDC, line, 2);
 }
 
-void dutxtx(int index, int offsetPixels) {
+void dutxtx(size_t index, unsigned short offsetPixels) {
 	POINT ref;
 
 	txt2pix((*TempTexturePoints)[index], ref);
@@ -343,9 +343,9 @@ void drwtxtr() {
 	const auto editSpace = TextureScreen.areaHeight * 2.0 / (TextureScreen.spacing * (TextureScreen.lines + 2.0));
 
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-	const auto pixelSpace     = (StitchWindowClientRect.bottom * 1.0) / StitchWindowClientRect.right;
-	TextureScreen.lines = floor(TextureScreen.width / TextureScreen.spacing);
-const	auto extraWidth     = TextureScreen.spacing * (TextureScreen.lines + 2);
+	const auto pixelSpace = (StitchWindowClientRect.bottom * 1.0) / StitchWindowClientRect.right;
+	TextureScreen.lines   = floor(TextureScreen.width / TextureScreen.spacing);
+	const auto extraWidth = TextureScreen.spacing * (TextureScreen.lines + 2);
 	if (StateMap.testAndReset(StateFlag::CHKTX))
 		chktx();
 	int yOffset = 0;
@@ -484,7 +484,7 @@ void txtrbut() {
 		rstxt();
 }
 
-bool txtclos(unsigned& closestTexturePoint) {
+bool txtclos(size_t& closestTexturePoint) {
 	if (closestTexturePoint) {
 		auto  minimumLength = 1e99;
 		POINT reference = {}, point = {};
@@ -493,7 +493,7 @@ bool txtclos(unsigned& closestTexturePoint) {
 		closestTexturePoint = 0;
 		for (size_t iPoint = 0; iPoint < TempTexturePoints->size(); iPoint++) {
 			txt2pix((*TempTexturePoints)[iPoint], point);
-const			auto length = hypot(point.x - reference.x, point.y - reference.y);
+			const auto length = hypot(point.x - reference.x, point.y - reference.y);
 			if (length < minimumLength) {
 				minimumLength       = length;
 				closestTexturePoint = iPoint;
@@ -571,12 +571,12 @@ void dutxlin(const fPOINT& point0in, const fPOINT& point1in) {
 	const auto point0 = ed2stch(point0in);
 	const auto point1 = ed2stch(point1in);
 
-const	auto deltaX = point1.x - point0.x;
+	const auto deltaX = point1.x - point0.x;
 	if (fabs(deltaX) < TINY)
 		return;
-const	auto slope  = (point1.y - point0.y) / deltaX;
-	auto start  = point0.x;
-	auto finish = point1.x;
+	const auto slope  = (point1.y - point0.y) / deltaX;
+	auto       start  = point0.x;
+	auto       finish = point1.x;
 	if (start > finish) {
 		std::swap(start, finish);
 	}
@@ -592,7 +592,7 @@ const	auto slope  = (point1.y - point0.y) / deltaX;
 	if (lineRange >= 0) {
 		TempTexturePoints->reserve(TempTexturePoints->size() + lineRange);
 		while (integerStart <= integerFinish) {
-const			auto yOffset = slope * (-point0.x + integerStart * TextureScreen.spacing) + point0.y;
+			const auto yOffset = slope * (-point0.x + integerStart * TextureScreen.spacing) + point0.y;
 			if (yOffset > 0 && yOffset < TextureScreen.areaHeight) {
 				TempTexturePoints->push_back({ yOffset, gsl::narrow<unsigned short>(integerStart) });
 			}
@@ -658,8 +658,8 @@ void txtrup() {
 		deorg(offset);
 		offset.x -= SelectTexturePointsOrigin.x;
 		offset.y -= SelectTexturePointsOrigin.y;
-const		auto Xmagnitude    = abs(offset.x);
-		textureOffset.line = std::round(Xmagnitude * TextureScreen.editToPixelRatio / TextureScreen.spacing);
+		const auto Xmagnitude = abs(offset.x);
+		textureOffset.line    = std::round(Xmagnitude * TextureScreen.editToPixelRatio / TextureScreen.spacing);
 		if (offset.x < 0)
 			textureOffset.line = -textureOffset.line;
 		textureOffset.y = (-offset.y) / TextureScreen.height * TextureScreen.areaHeight;
@@ -753,9 +753,9 @@ void setxfrm() noexcept {
 		AngledFormVertices[iVertex].y -= angleRect.bottom;
 	}
 	angrct(angleRect);
-const	auto height = angleRect.top - angleRect.bottom;
+	const auto height = angleRect.top - angleRect.bottom;
 	if (height > TextureScreen.areaHeight) {
-const		auto ratio = TextureScreen.areaHeight / height * 0.95;
+		const auto ratio = TextureScreen.areaHeight / height * 0.95;
 		for (size_t iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 			AngledFormVertices[iVertex].x *= ratio;
 			AngledFormVertices[iVertex].y *= ratio;
@@ -996,7 +996,7 @@ void deltx() {
 }
 
 void nutx() {
-	unsigned index      = 0;
+	unsigned index = 0;
 
 	std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txcmp);
 	if (FormIndex) {
@@ -1008,7 +1008,7 @@ void nutx() {
 			for (auto iForm = ClosestFormToCursor; iForm-- > 0;) {
 				if (istx(iForm)) {
 					const auto& formHeader = FormList[iForm];
-					index      = formHeader.fillInfo.texture.index + formHeader.fillInfo.texture.count;
+					index                  = formHeader.fillInfo.texture.index + formHeader.fillInfo.texture.count;
 					break;
 				}
 			}
@@ -1040,7 +1040,7 @@ void nutx() {
 void altx() {
 	boost::dynamic_bitset<> txtLines(TextureScreen.lines + 1);
 	if (StateMap.test(StateFlag::FORMSEL)) {
-const		auto halfHeight = TextureScreen.areaHeight / 2.0f;
+		const auto halfHeight = TextureScreen.areaHeight / 2.0f;
 		for (size_t iPoint = 0; iPoint < TempTexturePoints->size(); iPoint++) {
 			txtLines.set((*TempTexturePoints)[iPoint].line);
 		}
@@ -1108,7 +1108,7 @@ void dutxmir() {
 	auto iPoint = TempTexturePoints->size() - 1;
 	while ((*TempTexturePoints)[iPoint].line > centerLine && iPoint >= 0)
 		iPoint--;
-const	auto iMirrorPoint = iPoint + 1;
+	const auto iMirrorPoint = iPoint + 1;
 	// ToDo - What does this do? iPoint is not used beyond here
 	if (TextureScreen.lines & 1) {
 		while (iPoint >= 0) {
@@ -1268,7 +1268,7 @@ void txtdel() {
 		StateMap.set(StateFlag::RESTCH);
 		return;
 	}
-	unsigned iClosestPoint = 0;
+	size_t iClosestPoint = 0;
 	if (TempTexturePoints->size() && txtclos(iClosestPoint)) {
 		auto it = TempTexturePoints->begin();
 		std::advance(it, iClosestPoint);
@@ -1334,9 +1334,9 @@ bool txdig(unsigned keyCode, char& character) {
 void txnudg(int deltaX, float deltaY) {
 	if (SelectedTexturePointsList->size()) {
 		if (deltaY) {
-const			auto screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
+			const auto screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
 			for (size_t iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-const				auto yCoord = (*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]].y + screenDeltaY;
+				const auto yCoord = (*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]].y + screenDeltaY;
 				if (yCoord < 0.0)
 					return;
 				if (yCoord > TextureScreen.areaHeight)
@@ -1347,7 +1347,7 @@ const				auto yCoord = (*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]
 		}
 		else {
 			for (size_t iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-const				auto textureLine = (*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]].line + deltaX;
+				const auto textureLine = (*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]].line + deltaX;
 				if (textureLine < 1)
 					return;
 				if (textureLine > TextureScreen.lines)
@@ -1369,16 +1369,16 @@ void txsnap() {
 		const auto halfGrid = IniFile.gridSize / 2;
 		if (SelectedTexturePointsList->size()) {
 			for (size_t iPoint = 0; iPoint < txpntSize; iPoint++) {
-				auto texturePoint = &(*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]];
-const				auto yStep        = (texturePoint->y + halfGrid) / IniFile.gridSize;
-				texturePoint->y   = yStep * IniFile.gridSize;
+				auto       texturePoint = &(*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]];
+				const auto yStep        = (texturePoint->y + halfGrid) / IniFile.gridSize;
+				texturePoint->y         = yStep * IniFile.gridSize;
 			}
 		}
 		else {
 			for (size_t iPoint = 0; iPoint < txpntSize; iPoint++) {
-				auto texturePoint = &(*TempTexturePoints)[iPoint];
-const				auto yStep        = (texturePoint->y + halfGrid) / IniFile.gridSize;
-				texturePoint->y   = yStep * IniFile.gridSize;
+				auto       texturePoint = &(*TempTexturePoints)[iPoint];
+				const auto yStep        = (texturePoint->y + halfGrid) / IniFile.gridSize;
+				texturePoint->y         = yStep * IniFile.gridSize;
 			}
 		}
 		StateMap.set(StateFlag::RESTCH);
@@ -1516,7 +1516,7 @@ void setxt(std::vector<RNGCNT>& textureSegments) {
 		for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; iTexturePoint--) {
 			const auto currentPoint = TexturePointsBuffer->at(currentIndex + iTexturePoint);
 			if (currentPoint.line) {
-const				auto iSegment = currentPoint.line - 1;
+				const auto iSegment = currentPoint.line - 1;
 
 				textureSegments[iSegment].line = iTexturePoint;
 				textureSegments[iSegment].stitchCount++;

@@ -17664,7 +17664,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		std::vector<std::unique_ptr<unsigned[]>> private_UndoBuffer(16);
 		UndoBuffer = &private_UndoBuffer;
 		std::vector<TXPNT>    private_TempTexturePoints;
-		std::vector<unsigned> private_SelectedTexturePointsList;
+		std::vector<size_t> private_SelectedTexturePointsList;
 		initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
 		std::vector<std::wstring> private_StringTable(STR_LEN);
 		StringTable = &private_StringTable;

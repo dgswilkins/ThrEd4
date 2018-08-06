@@ -39,7 +39,7 @@ void               delclps(size_t iForm);
 void               deleclp(size_t iForm) noexcept;
 void               delmclp(size_t iForm);
 //void               duch(std::vector<fPOINT>& chainEndPoints);
-//void               duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned start, unsigned finish);
+//void               duchfn(const std::vector<fPOINT>& chainEndPoints, size_t start, size_t finish);
 void               duxclp();
 //void               dufxlen(std::vector<fPOINT>& chainEndPoints);
 //void               dulast(std::vector<fPOINT>& chainEndPoints);
@@ -63,7 +63,7 @@ bool iseclpx(size_t iForm) noexcept;
 //	double                     clipAngle,
 //	dPOINT&                    moveToCoords,
 //	const dPOINT&              rotationCenter,
-//	unsigned int               currentSide);
+//	size_t                     currentSide);
 //void linsid(const std::vector<fPOINT>& clipReversedData,
 //	std::vector<fPOINT>&       clipFillData,
 //	double                     clipAngle,
@@ -72,11 +72,11 @@ bool iseclpx(size_t iForm) noexcept;
 //	size_t                     currentSide);
 fPOINT*          nueclp(size_t currentForm, size_t count) noexcept;
 fPOINT*          numclp() noexcept;
-bool nupnt(double clipAngle, dPOINT& moveToCoords, unsigned currentSide);
+bool nupnt(double clipAngle, dPOINT& moveToCoords, size_t currentSide);
 void             oclp(const fPOINT* const clip, size_t clipEntries);
 //void picfn(std::vector<fPOINT>& clipFillData, size_t start, size_t finish, double spacing, const dPOINT& rotationCenter);
 //bool             ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point);
-//void            setvct(unsigned start, unsigned finish, double& ClipAngle, dPOINT& vector0);
+//void            setvct(size_t start, size_t finish, double& ClipAngle, dPOINT& vector0);
 //void xclpfn(const std::vector<fPOINT>& tempClipPoints,
 //            const std::vector<fPOINT>& chainEndPoints,
 //            unsigned                   start,
