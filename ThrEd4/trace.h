@@ -31,7 +31,7 @@ void dutrnum2();
 // unsigned           icolsum(COLORREF color);
 void initColorRef() noexcept;
 void initTraceWindows() noexcept;
-// void               pxlin(unsigned start, unsigned finish);
+// void               pxlin(size_t start, size_t finish);
 // void               ritrcol(COLORREF* color, unsigned number);
 // void               shownd(HWND hwnd);
 // void               stch2bit(fPOINT& point);
