@@ -3148,16 +3148,21 @@ void stch2pxr(const fPOINT& stitchCoordinate) noexcept {
 	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
 }
 
-void defNam(const fs::path& fileName) {
+void getDocsFolder(fs::path* directory)
+{
 	PWSTR ppszPath = nullptr; // variable to receive the path memory block pointer.
+	const HRESULT hr = SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &ppszPath);
+
+	if (SUCCEEDED(hr)) {
+		directory->assign(ppszPath); // make a local copy of the path
+	}
+
+	CoTaskMemFree(ppszPath); // free up the path memory block
+}
+
+void defNam(const fs::path& fileName) {
 	if (fileName.empty()) {
-		const HRESULT hr = SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &ppszPath);
-
-		if (SUCCEEDED(hr)) {
-			DefaultDirectory->assign(ppszPath); // make a local copy of the path
-		}
-
-		CoTaskMemFree(ppszPath); // free up the path memory block
+		getDocsFolder(DefaultDirectory);
 	}
 	else {
 		*DefaultDirectory = fileName.parent_path();
@@ -16050,6 +16055,7 @@ void redini() {
 	IniFileHandle = CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (IniFileHandle == INVALID_HANDLE_VALUE) {
 		defpref();
+		getDocsFolder(DefaultDirectory);
 		if (!DesignerName->size()) {
 			wchar_t designerBuffer[50];
 			LoadString(ThrEdInstance, IDS_UNAM, designerBuffer, sizeof(designerBuffer) / sizeof(designerBuffer[0]));
