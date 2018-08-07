@@ -3,11 +3,11 @@
 // Local Headers
 #include "ThrEdTypes.h"
 
-void alrotmsg();
-void bfilmsg();
-void butxt(unsigned iButton, const std::wstring& buttonText);
-void bxtxt(unsigned iButton, unsigned iMessage);
-// bool        clpmsgs(unsigned code);
+void        alrotmsg();
+void        bfilmsg();
+void        butxt(unsigned iButton, const std::wstring& buttonText);
+void        bxtxt(unsigned iButton, unsigned iMessage);
+bool        clpmsgs(unsigned code);
 void        clrhbut(unsigned startButton);
 void        crmsg(const fs::path& fileName);
 void        datmsg(unsigned code);
