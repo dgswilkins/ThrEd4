@@ -906,7 +906,7 @@ inline void initTearDlg(HWND hwndlg) {
 	SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), fmt::format(L"{:.3f}", IniFile.tearTwistRatio).c_str());
 }
 
-BOOL CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
+bool CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
 	wchar_t buffer[HBUFSIZ] = { 0 };

@@ -23,39 +23,39 @@
 // Local Headers
 #include "ThrEdTypes.h"
 
-//BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam);
+BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam) noexcept;
 
-//void     chkdaz() noexcept;
-void     dasyfrm();
+void chkdaz() noexcept;
+void dasyfrm();
 
-//BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
 void dazdef();
-void     frmnum();
-//void     initdaz(HWND hWinDialog);
-//inline void     initTearDlg(HWND hwndlg);
-void            maxtsiz(const std::wstring& label, POINT& textSize);
-void            maxwid(unsigned start, unsigned finish);
-//HWND             numwin(const std::wstring& winName, const RECT& location);
-//void             nxtlin();
-//void             prflin(const std::wstring& msg, unsigned row);
-void             prfmsg();
-//HWND             prfnwin(const std::wstring& text);
-void             prfsid(HWND wnd);
-//void             prftwin(const std::wstring& text);
-void             refrm();
-//void             refrmfn();
-void            setear();
-void            sidwnd(HWND wnd);
+void frmnum();
+void initdaz(HWND hWinDialog);
 
-//bool CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+inline void initTearDlg(HWND hwndlg);
 
-//HWND               txtrwin(const std::wstring& winName, const RECT& location);
-//HWND               txtwin(const std::wstring& windowName, const RECT& location);
-void               wavfrm();
+void maxtsiz(const std::wstring& label, POINT& textSize);
+void maxwid(unsigned start, unsigned finish);
+HWND numwin(const std::wstring& winName, const RECT& location);
+void nxtlin() noexcept;
+void prflin(const std::wstring& msg, unsigned row);
+void prfmsg();
+HWND prfnwin(const std::wstring& text) noexcept;
+void prfsid(HWND wnd) noexcept;
+void prftwin(const std::wstring& text) noexcept;
+void refrm();
+void refrmfn();
+void setear();
+void sidwnd(HWND wnd) noexcept;
 
-//inline void        wavinit(HWND hwndlg);
+bool CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
-//bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+HWND txtrwin(const std::wstring& winName, const RECT& location);
+HWND txtwin(const std::wstring& windowName, const RECT& location);
+void wavfrm();
 
+inline void wavinit(HWND hwndlg);
 
+bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
