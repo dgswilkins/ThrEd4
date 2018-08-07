@@ -3150,14 +3150,16 @@ void stch2pxr(const fPOINT& stitchCoordinate) noexcept {
 
 void getDocsFolder(fs::path* directory)
 {
-	PWSTR ppszPath = nullptr; // variable to receive the path memory block pointer.
-	const HRESULT hr = SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &ppszPath);
+	if (directory) {
+		PWSTR ppszPath = nullptr; // variable to receive the path memory block pointer.
+		const HRESULT hr = SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &ppszPath);
 
-	if (SUCCEEDED(hr)) {
-		directory->assign(ppszPath); // make a local copy of the path
+		if (SUCCEEDED(hr)) {
+			directory->assign(ppszPath); // make a local copy of the path
+		}
+
+		CoTaskMemFree(ppszPath); // free up the path memory block
 	}
-
-	CoTaskMemFree(ppszPath); // free up the path memory block
 }
 
 void defNam(const fs::path& fileName) {
@@ -10414,7 +10416,7 @@ void tglhid() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void respac() {
+void respac() noexcept {
 	if (isclp(ClosestFormToCursor)) {
 		SelectedForm->fillSpacing = LineSpacing;
 		fsizpar();
@@ -11119,7 +11121,7 @@ void selfrmx() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setpclp() {
+void setpclp() noexcept {
 	POINT    offset = {};
 	POINT    point  = {};
 	unsigned ind = 0, ine = 0;
@@ -17578,7 +17580,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 	return DefWindowProc(p_hWnd, message, wParam, lParam);
 }
 
-void sachk() {
+void sachk() noexcept {
 	for (auto iForm = 0ul; iForm < FormIndex; iForm++) {
 		const auto& form = FormList[iForm];
 		if (form.type == SAT && form.satinGuideCount) {
