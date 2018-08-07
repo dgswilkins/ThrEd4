@@ -36,7 +36,6 @@
 #include "thred.h"
 #include "xt.h"
 
-unsigned   BeanCount;              // number of stitches added by convert to bean
 fRECTANGLE BoundingRect;           // isin rectangle
 size_t     ClipIntersectSide;      // clipboard intersect side;
 float      ClipWidth;              // horizontal spacing for vertical clipboard fill
@@ -242,7 +241,7 @@ bool chk2of() {
 	return 1;
 }
 
-void rotbak(double rotationAngle, const dPOINT& rotationCenter) {
+void rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept {
 	unsigned iSequence;
 
 	for (iSequence = 0; iSequence < SequenceIndex; iSequence++)
@@ -515,7 +514,7 @@ void form() {
 	duzrat();
 }
 
-void frmsqr(unsigned iVertex) {
+void frmsqr(unsigned iVertex) noexcept {
 	double angle         = 0.0;
 	double ratio         = 0.0;
 	float  length        = 0.0;
@@ -994,7 +993,7 @@ size_t pdir(size_t vertex) {
 		return prv(vertex);
 }
 
-void pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) {
+void pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) noexcept {
 	POINT corner;
 
 	corner.x = screenRect.left + StitchWindowOrigin.x;
@@ -6103,7 +6102,7 @@ void delcon(unsigned GuideIndex) {
 	}
 }
 
-bool satselfn() {
+bool satselfn() noexcept {
 	unsigned iForm = 0, iVertex = 0, layerCode = 0;
 	double   length = 0, minimumLength = 1e99;
 	double   deltaX = 0.0, deltaY = 0.0;
@@ -6952,7 +6951,7 @@ void getbig() noexcept {
 	}
 }
 
-void stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect) {
+void stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect) noexcept {
 	dPOINT stitchCoord = { stitchRect.left, stitchRect.top };
 	POINT  screenCoord = {};
 
@@ -9323,7 +9322,7 @@ void centir() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void bean(unsigned start, unsigned finish) {
+void bean(unsigned start, unsigned finish) noexcept {
 	unsigned iOutputStitch = start;
 	unsigned iSourceStitch = start;
 	unsigned iCopyStitch   = MAXITEMS;

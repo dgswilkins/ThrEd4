@@ -475,7 +475,7 @@ void refrm() {
 	refrmfn();
 }
 
-void sidwnd(HWND wnd) {
+void sidwnd(HWND wnd) noexcept {
 	RECT windowRect = {};
 
 	MsgIndex                       = 0;
@@ -498,7 +498,7 @@ void sidwnd(HWND wnd) {
 	                                 NULL);
 }
 
-void prfsid(HWND wnd) {
+void prfsid(HWND wnd) noexcept {
 	RECT windowRect = {};
 
 	MsgIndex                 = 0;

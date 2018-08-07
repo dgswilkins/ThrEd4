@@ -772,7 +772,7 @@ void undclp() noexcept {
 	ClipStitchCount                                  = 2;
 }
 
-void fncwlk(unsigned& interleaveSequenceIndex2) {
+void fncwlk(unsigned& interleaveSequenceIndex2) noexcept {
 	size_t iVertex = 0;
 	size_t start = 0, finish = 0;
 
@@ -2388,7 +2388,7 @@ void sadj(fPOINT& point, const dPOINT& designSizeRatio, const fRECTANGLE& design
 	point.y = (point.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
 }
 
-void nudfn(const fRECTANGLE& designSizeRect) {
+void nudfn(const fRECTANGLE& designSizeRect) noexcept {
 	unsigned iStitch = 0, iVertex = 0;
 	fPOINT   newSize = { (designSizeRect.right - designSizeRect.left), (designSizeRect.top - designSizeRect.bottom) };
 

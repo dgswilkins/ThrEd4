@@ -1251,7 +1251,7 @@ void traceNumberInput(unsigned NumericCode) {
 	redraw(TraceNumberInput);
 }
 
-void traceNumberReset() {
+void traceNumberReset() noexcept {
 	TraceInputBuffer[MsgIndex] = 0;
 	redraw(TraceNumberInput);
 }
