@@ -29,8 +29,10 @@
 #include "clip.h"
 #include "displayText.h"
 #include "form.h"
+#include "satin.h"
 #include "texture.h"
 #include "thred.h"
+#include "repair.h"
 
 void adbad(std::wstring& repairMessage, unsigned code, size_t count) {
 	std::wstring fmtStr;

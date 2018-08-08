@@ -52,7 +52,6 @@ void     centir();
 void     chain();
 void     chan();
 bool     chk2of();
-bool     chkbak(const std::vector<dPOINT>& satinBackup, const dPOINT& pnt);
 void     chkbrd(unsigned& interleaveSequenceIndex2);
 void     chkcont();
 bool     chkdel() noexcept;
@@ -87,16 +86,12 @@ void     cplayfn(size_t iForm, unsigned play);
 void     cpylayr(unsigned codedLayer);
 void     crop();
 void     debean();
-void     delcon(unsigned GuideIndex);
 void     delfil(unsigned attribute);
 void     delflt(size_t formIndex) noexcept;
 void     delfrms();
 void     delmfil();
-void     delsac(size_t formIndex) noexcept;
-void     delspnt();
 void     drwcon();
 void     drwfrm();
-void     drwsat();
 void     duangs();
 
 constexpr unsigned duat(unsigned attribute);
@@ -137,7 +132,6 @@ void     durgn(const std::vector<FSEQ>&      sequencePath,
                std::vector<REGION>&          regionsList);
 void     duromb(const dPOINT& start0, const dPOINT& finish0, const dPOINT& start1, const dPOINT& finish1);
 void     durpoli(unsigned vertexCount);
-void     dusat() noexcept;
 void     duseq(const std::vector<SMALPNTL*>& sortedLines, size_t start, size_t finish, boost::dynamic_bitset<>& sequenceMap);
 void     duseq1() noexcept;
 void     duseq2(const std::vector<SMALPNTL*>& sortedLines, size_t iLine);
@@ -278,7 +272,6 @@ void    nufpnt(size_t vertex) noexcept;
 void    nufsel();
 void    nufthcol(unsigned color);
 void    nulapcol(unsigned color);
-SATCON* nusac(size_t formIndex, unsigned guideCount) noexcept;
 void    nutim(double size) noexcept;
 
 constexpr size_t nxt(size_t iVertex);
@@ -294,7 +287,6 @@ void   nxtseq(std::vector<FSEQ>&           sequencePath,
               const std::vector<RCON>&     pathMap,
               const std::vector<unsigned>& mapIndexSequence,
               unsigned                     pathIndex);
-void   outfn(unsigned start, unsigned finish, double satinWidth);
 double p2p(const fPOINT& point0, const fPOINT& point1) noexcept;
 void   pbrd(double edgeSpacing);
 size_t pdir(size_t vertex);
@@ -338,7 +330,6 @@ double   reglen(const std::vector<SMALPNTL*>& sortedLines,
                 unsigned                      iRegion,
                 const std::vector<fPOINT>&    lastRegionCorners,
                 const std::vector<REGION>&    regionsList);
-void     ribon();
 void     rinfrm();
 void     ritapbrd(unsigned& interleaveSequenceIndex2) noexcept;
 void     ritbrd(unsigned& interleaveSequenceIndex2) noexcept;
@@ -357,33 +348,12 @@ void rotpar(dPOINT& rotationCenter);
 void rspnt(float xCoordinate, float yCoordinate) noexcept;
 void rstfrm();
 void sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect) noexcept;
-void sacspac(const SATCON* const startGuide, unsigned guideCount) noexcept;
 void sapliq();
-void satadj();
-void satbrd();
-void satclos();
-void satcpy(SATCON* const destination, const std::vector<SATCON> source, unsigned int size);
-void satends(unsigned isBlunt);
-void satfil();
-void satfix();
-void satfn(const std::vector<double>& lengths, size_t line1Start, size_t line1End, size_t line2Start, size_t line2End);
 
-unsigned satind(const SATCON* const guide) noexcept;
-void     satknkt();
-void     satmf(const std::vector<double>& lengths);
-void     satout(double satinWidth);
-void     satpnt0();
-void     satpnt1();
-void     satsbrd();
-void     satsel();
-bool     satselfn() noexcept;
-void     satzum();
 void     savblen(float fLength);
 void     savplen(float length);
-void     sbfn(const std::vector<fPOINT>& insidePoints, size_t start, size_t finish);
 void     sbold();
 void     sbord();
-void     sbrd();
 bool     scomp(const SATCON& arg1, const SATCON& arg2) noexcept;
 void     selal();
 void     selalfil();
@@ -408,20 +378,17 @@ void     setstar();
 void     setstrtch();
 void     setzig();
 void     sfCor2px(const fPOINT& stitchPoint, POINT& screen) noexcept;
-void     sfn(size_t startVertex);
 
 constexpr float shreg(float highValue, float reference);
 
 void shrnk();
 void shrnks();
-void slbrd();
 void snap();
 void snp(unsigned start, unsigned finish);
 void snpfn(const std::vector<unsigned>& xPoints, unsigned start, unsigned end, unsigned finish);
 void spend(const std::vector<VRCT2>& fillVerticalRect, size_t start, size_t finish);
 void spltfrm();
 bool spltlin();
-void spltsat(const SATCON& currentGuide);
 void sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish);
 void spurct(std::vector<VRCT2>& underlayVerticalRect, const std::vector<VRCT2>& fillVerticalRect, unsigned iRect);
 void spurfn(const dPOINT& innerPoint, const dPOINT& outerPoint, dPOINT& underlayInnerPoint, dPOINT& underlayOuterPoint) noexcept;
@@ -444,7 +411,6 @@ void unfil();
 void unfrm();
 void uninsf();
 void unpsel();
-void unsat();
 
 constexpr unsigned leftsid();
 

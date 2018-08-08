@@ -72,19 +72,20 @@ CLPSTCH*   ClipStitchData;                   // for pcs clipboard data
 
 unsigned ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
 
-size_t          ClosestFormToCursor;   // closest form to the cursor
-unsigned        ClosestPointIndex;     // index of closest point
-size_t          ClosestVertexToCursor; // formOrigin closest to the cursor
-HCURSOR         CrossCursor;           // cross
-SATCON*         CurrentFormGuides;     // connections in the currently selecteed form
-fPOINT*         CurrentFormVertices;   // points in the currently selected form
-HWND            DefaultColorWin[16];   // default color windows
-HWND            DeleteStitchesDialog;  // asking user if they want to delete the sitches associated with a form
-std::wstring*   DesignerName;          // designer name in clear
-HWND            DiscardButton;         // discard button
-DRAWITEMSTRUCT* DrawItem;              // for owner-draw windows
-POINT           EndPointCross;         // point to draw at the end cross for form select points
-HMENU           FillMenu;              // fill submenu
+size_t          ClosestFormToCursor;    // closest form to the cursor
+unsigned        ClosestPointIndex;      // index of closest point
+size_t          ClosestVertexToCursor;  // formOrigin closest to the cursor
+HCURSOR         CrossCursor;            // cross
+SATCON*         CurrentFormGuides;      // connections in the currently selecteed form
+size_t          CurrentFormGuidesCount; // number of connections in the currently selected form
+fPOINT*         CurrentFormVertices;    // points in the currently selected form
+HWND            DefaultColorWin[16];    // default color windows
+HWND            DeleteStitchesDialog;   // asking user if they want to delete the sitches associated with a form
+std::wstring*   DesignerName;           // designer name in clear
+HWND            DiscardButton;          // discard button
+DRAWITEMSTRUCT* DrawItem;               // for owner-draw windows
+POINT           EndPointCross;          // point to draw at the end cross for form select points
+HMENU           FillMenu;               // fill submenu
 
 std::vector<double>* FormAngles;        // angles of a form for satin border fills
 std::vector<POINT>*  FormControlPoints; // form control rectangle in pixel coordinates
@@ -131,6 +132,7 @@ double LineSpacing = DEFSPACE * PFGRAN; // stitch spacing in stitch units
 fPOINT LowerLeftStitch;                 // lower left formOrigin in a form
 HMENU  MainMenu;                        // main menu
 HWND   MainStitchWin;                   // stitch window
+float  MaxStitchLen;                    // maximum stitch length
 
 MENUITEMINFO* MenuInfo;
 

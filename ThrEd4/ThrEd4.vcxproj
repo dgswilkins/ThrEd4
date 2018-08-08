@@ -26,6 +26,7 @@
     <ClCompile Include="globals.cpp" />
     <ClCompile Include="hlp.cpp" />
     <ClCompile Include="repair.cpp" />
+    <ClCompile Include="satin.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="trace.cpp" />
     <ClCompile Include="wrappers.cpp" />
@@ -49,6 +50,7 @@
     <ClInclude Include="repair.h" />
     <ClInclude Include="hlp.h" />
     <ClInclude Include="Resources\resource.h" />
+    <ClInclude Include="satin.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="switches.h" />
     <ClInclude Include="texture.h" />

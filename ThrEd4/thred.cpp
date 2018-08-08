@@ -47,9 +47,11 @@
 #include "formForms.h"
 #include "hlp.h"
 #include "repair.h"
+#include "satin.h"
 #include "texture.h"
 #include "trace.h"
 #include "xt.h"
+#include "thred.h"
 
 namespace fs = std::experimental::filesystem;
 

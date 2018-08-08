@@ -39,8 +39,10 @@
 #include "displayText.h"
 #include "form.h"
 #include "hlp.h"
+#include "satin.h"
 #include "texture.h"
 #include "thred.h"
+#include "xt.h"
 
 namespace fs = std::experimental::filesystem;
 

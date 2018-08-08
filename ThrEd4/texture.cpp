@@ -30,7 +30,9 @@
 #include "clip.h"
 #include "displayText.h"
 #include "form.h"
+#include "satin.h"
 #include "thred.h"
+#include "texture.h"
 
 unsigned             TextureWindowId;           // id of the window being updated
 HWND                 SideWindowButton;          // button side window

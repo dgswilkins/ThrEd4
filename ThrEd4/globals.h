@@ -107,6 +107,7 @@ extern unsigned   ClosestPointIndex;
 extern size_t     ClosestVertexToCursor;
 extern HCURSOR    CrossCursor;
 extern SATCON*    CurrentFormGuides;
+extern size_t     CurrentFormGuidesCount;
 extern fPOINT*    CurrentFormVertices;
 extern HWND       DefaultColorWin[16];
 extern HWND       DeleteStitchesDialog;
@@ -162,6 +163,7 @@ extern double LineSpacing;
 extern fPOINT LowerLeftStitch;
 extern HMENU  MainMenu;
 extern HWND   MainStitchWin;
+extern float  MaxStitchLen;
 
 extern MENUITEMINFO* MenuInfo;
 
