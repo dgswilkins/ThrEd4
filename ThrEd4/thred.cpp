@@ -6939,7 +6939,7 @@ void rtclpfn(size_t destination, size_t source) noexcept {
 	ClipStitchData[destination].tag  = 0x14;
 }
 
-size_t sizfclp() {
+size_t sizfclp() noexcept {
 	size_t clipSize;
 
 	clipSize = sizeof(*ClipFormHeader) + VertexCount * sizeof(FormVertices[0]);
@@ -6985,7 +6985,7 @@ unsigned frmcnt(size_t iForm, unsigned formFirstStitchIndex) noexcept {
 	}
 }
 
-size_t sizclp(unsigned formFirstStitchIndex) {
+size_t sizclp(unsigned formFirstStitchIndex) noexcept {
 	size_t length = 0;
 
 	length = FileSize = sizeof(*ClipFormHeader) + VertexCount * sizeof(FormVertices[0]);

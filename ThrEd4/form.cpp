@@ -6327,8 +6327,6 @@ void satknkt() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-extern void prbug();
-
 void filsfn() {
 	delmclp(ClosestFormToCursor);
 	deltx();

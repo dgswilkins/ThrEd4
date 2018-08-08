@@ -7,7 +7,7 @@
 #include "ThrEdTypes.h"
 
 void     adbad(std::wstring& repairMessage, unsigned code, size_t count);
-void     bcup(size_t find, BADCNTS& badData);
+void     bcup(size_t find, BADCNTS& badData) noexcept;
 void     chkclp(const FRMHED* const formHeader, BADCNTS& badData);
 void     chkeclp(const FRMHED* const formHeader, BADCNTS& badData);
 void     chkfstch() noexcept;

@@ -158,7 +158,7 @@ unsigned frmchkfn() {
 	return badData.attribute;
 }
 
-void bcup(size_t find, BADCNTS& badData) {
+void bcup(size_t find, BADCNTS& badData) noexcept {
 	const auto& formHeader = FormList[find];
 	if (isclp(find))
 		badData.clip += formHeader.lengthOrCount.clipCount;
