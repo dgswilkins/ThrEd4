@@ -31,7 +31,6 @@
 #include "form.h"
 #include "texture.h"
 #include "thred.h"
-//#include "xt.h"
 
 void adbad(std::wstring& repairMessage, unsigned code, size_t count) {
 	std::wstring fmtStr;
