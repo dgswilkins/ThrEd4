@@ -40,7 +40,6 @@ bool    iseclpx(size_t iForm) noexcept;
 fPOINT* nueclp(size_t currentForm, size_t count) noexcept;
 fPOINT* numclp() noexcept;
 void    oclp(const fPOINT* const clip, size_t clipEntries);
-
 }
 
 namespace clipPriv {

@@ -253,11 +253,11 @@ bool clipPriv::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& poi
 }
 
 void clipPriv::lincrnr(const std::vector<fPOINT>& clipReversedData,
-             std::vector<fPOINT>&       clipFillData,
-             double                     clipAngle,
-             dPOINT&                    moveToCoords,
-             const dPOINT&              rotationCenter,
-             size_t                     currentSide) {
+                       std::vector<fPOINT>&       clipFillData,
+                       double                     clipAngle,
+                       dPOINT&                    moveToCoords,
+                       const dPOINT&              rotationCenter,
+                       size_t                     currentSide) {
 	dPOINT delta = {};
 
 	if (clipPriv::nupnt(clipAngle, moveToCoords, currentSide)) {
@@ -273,11 +273,11 @@ void clipPriv::lincrnr(const std::vector<fPOINT>& clipReversedData,
 }
 
 void clipPriv::linsid(const std::vector<fPOINT>& clipReversedData,
-            std::vector<fPOINT>&       clipFillData,
-            double                     clipAngle,
-            const dPOINT&              vector0,
-            const dPOINT&              rotationCenter,
-            size_t                     currentSide) {
+                      std::vector<fPOINT>&       clipFillData,
+                      double                     clipAngle,
+                      const dPOINT&              vector0,
+                      const dPOINT&              rotationCenter,
+                      size_t                     currentSide) {
 	const auto&    point     = CurrentFormVertices[currentSide + 1];
 	const fPOINT   delta     = { (point.x - SelectedPoint.x), (point.y - SelectedPoint.y) };
 	const auto     length    = hypot(delta.x, delta.y);
@@ -310,10 +310,10 @@ void clip::clpout() {
 }
 
 bool clipPriv::clpsid(const std::vector<fPOINT>& clipReversedData,
-            std::vector<fPOINT>&       clipFillData,
-            size_t                     start,
-            size_t                     finish,
-            const dPOINT&              rotationCenter) {
+                      std::vector<fPOINT>&       clipFillData,
+                      size_t                     start,
+                      size_t                     finish,
+                      const dPOINT&              rotationCenter) {
 	const auto&      end                = CurrentFormVertices[finish];
 	const auto&      begin              = CurrentFormVertices[start];
 	const fPOINT     delta              = { (end.x - begin.x), (end.y - begin.y) };
@@ -392,9 +392,9 @@ void clip::clpbrd(size_t startVertex) {
 }
 
 bool clipPriv::fxpnt(const std::vector<double>& listSINEs,
-           const std::vector<double>& listCOSINEs,
-           dPOINT&                    moveToCoords,
-           unsigned                   currentSide) {
+                     const std::vector<double>& listCOSINEs,
+                     dPOINT&                    moveToCoords,
+                     unsigned                   currentSide) {
 	moveToCoords = CurrentFormVertices[NextStart];
 	auto length  = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > AdjustedSpace) {
@@ -412,9 +412,9 @@ bool clipPriv::fxpnt(const std::vector<double>& listSINEs,
 }
 
 void clipPriv::fxlit(const std::vector<double>& listSINEs,
-           const std::vector<double>& listCOSINEs,
-           dPOINT&                    moveToCoords,
-           unsigned                   currentSide) {
+                     const std::vector<double>& listCOSINEs,
+                     dPOINT&                    moveToCoords,
+                     unsigned                   currentSide) {
 	if (clipPriv::fxpnt(listSINEs, listCOSINEs, moveToCoords, currentSide)) {
 		SelectedPoint = moveToCoords;
 		BeanCount++;
@@ -429,10 +429,10 @@ void clipPriv::fxlit(const std::vector<double>& listSINEs,
 }
 
 void clipPriv::fxlin(std::vector<fPOINT>&       chainEndPoints,
-           const std::vector<double>& ListSINEs,
-           const std::vector<double>& ListCOSINEs,
-           dPOINT&                    moveToCoords,
-           unsigned                   currentSide) {
+                     const std::vector<double>& ListSINEs,
+                     const std::vector<double>& ListCOSINEs,
+                     dPOINT&                    moveToCoords,
+                     unsigned                   currentSide) {
 	if (clipPriv::fxpnt(ListSINEs, ListCOSINEs, moveToCoords, currentSide)) {
 		SelectedPoint = moveToCoords;
 		chainEndPoints.push_back(SelectedPoint);
@@ -448,7 +448,9 @@ void clipPriv::fxlin(std::vector<fPOINT>&       chainEndPoints,
 	}
 }
 
-void clipPriv::fxlen(std::vector<fPOINT>& chainEndPoints, const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs) {
+void clipPriv::fxlen(std::vector<fPOINT>&       chainEndPoints,
+                     const std::vector<double>& listSINEs,
+                     const std::vector<double>& listCOSINEs) {
 	dPOINT moveToCoords = {}; // moving formOrigin for clipboard fill
 
 	AdjustedSpace = 0;
@@ -606,10 +608,10 @@ void clipPriv::clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>&
 }
 
 void clipPriv::xclpfn(const std::vector<fPOINT>& tempClipPoints,
-            const std::vector<fPOINT>& chainEndPoints,
-            unsigned                   start,
-            unsigned                   finish,
-            const dPOINT&              rotationCenter) {
+                      const std::vector<fPOINT>& chainEndPoints,
+                      unsigned                   start,
+                      unsigned                   finish,
+                      const dPOINT&              rotationCenter) {
 	std::vector<fPOINT> points(ClipStitchCount);
 
 	const dPOINT delta
@@ -673,7 +675,11 @@ void clipPriv::clpcrnr(std::vector<fPOINT>& clipFillData, size_t vertex, const d
 	}
 }
 
-void clipPriv::picfn(std::vector<fPOINT>& clipFillData, size_t start, size_t finish, double spacing, const dPOINT& rotationCenter) {
+void clipPriv::picfn(std::vector<fPOINT>& clipFillData,
+                     size_t               start,
+                     size_t               finish,
+                     double               spacing,
+                     const dPOINT&        rotationCenter) {
 	const dPOINT     delta          = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
                            (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
 	const double     length         = hypot(delta.x, delta.y);

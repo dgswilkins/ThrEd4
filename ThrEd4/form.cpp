@@ -38,43 +38,43 @@
 #include "xt.h"
 #include "form.h"
 
-fRECTANGLE BoundingRect;           // isin rectangle
-size_t     ClipIntersectSide;      // clipboard intersect side;
-float      ClipWidth;              // horizontal spacing for vertical clipboard fill
-fPOINT*    CurrentFillVertices;    // pointer to the line of the polygon being filled
-REGION*    CurrentRegion;          // region currently being sequenced
-unsigned   DoneRegion;             // last region sequenced
-double     EggRatio;               // ratio for shrinking eggs
-FRMHED*    FormForInsert;          // insert form vertex in this form
-FORMINFO   FormInfo;               // form info used in drawing forms
-FLOAT      FormOffset;             // form offset for clipboard fills
-unsigned   FormRelocationIndex;    // form relocator pointer
-size_t     FormVertexNext;         // form vertex storage for form vertex insert
-size_t     FormVertexPrev;         // form vertex storage for form vertex insert
-double     GapToClosestRegion;     // region close enough threshold for sequencing
-size_t     GroupIndexCount;        // number of group indices
-unsigned   InOutFlag;              // is intersection of line and cursor before, in or after the line
-unsigned   LastGroup;              // group of the last line written in the previous region;
-double*    Lengths;                // array of cumulative lengths used in satin fills
-unsigned   LineGroupIndex;         // pointer for groups of fill line segments
-fPOINT     LineSegmentEnd;         // vertical clipboard line segment end
-fPOINT     LineSegmentStart;       // vertical clipboard line segment start
-unsigned   NextGroup;              // group that connects to the next region
-unsigned   PathIndex;              // formOrigin to the next path element for vertical fill sequencing
-unsigned   PathMapIndex;           // number of entries in the path map
-unsigned   RegionCount;            // number of regions to be sequenced
-RGSEQ*     RegionPath;             // path to a region
-SMALPNTL*  SequenceLines;          // line for vertical/horizontal/angle fills
-unsigned   SequencePathIndex;      // index to path of sequenced regions
-double     Slope;                  // slope of line in angle fills
-unsigned   StitchLineCount;        // count of stitch lines
-HDC        TimeDC;                 // progress bar device context
-double     TimePosition;           // progress bar postiion
-double     TimeStep;               // progress bar step
-HWND       TimeWindow;             // progress bar
-float      UserStitchLen;          // user stitch length
-unsigned   VisitedIndex;           // next unvisited region for sequencing
-fPOINT*    WorkingFormVertices;    // form points for angle fills
+fRECTANGLE BoundingRect;        // isin rectangle
+size_t     ClipIntersectSide;   // clipboard intersect side;
+float      ClipWidth;           // horizontal spacing for vertical clipboard fill
+fPOINT*    CurrentFillVertices; // pointer to the line of the polygon being filled
+REGION*    CurrentRegion;       // region currently being sequenced
+unsigned   DoneRegion;          // last region sequenced
+double     EggRatio;            // ratio for shrinking eggs
+FRMHED*    FormForInsert;       // insert form vertex in this form
+FORMINFO   FormInfo;            // form info used in drawing forms
+FLOAT      FormOffset;          // form offset for clipboard fills
+unsigned   FormRelocationIndex; // form relocator pointer
+size_t     FormVertexNext;      // form vertex storage for form vertex insert
+size_t     FormVertexPrev;      // form vertex storage for form vertex insert
+double     GapToClosestRegion;  // region close enough threshold for sequencing
+size_t     GroupIndexCount;     // number of group indices
+unsigned   InOutFlag;           // is intersection of line and cursor before, in or after the line
+unsigned   LastGroup;           // group of the last line written in the previous region;
+double*    Lengths;             // array of cumulative lengths used in satin fills
+unsigned   LineGroupIndex;      // pointer for groups of fill line segments
+fPOINT     LineSegmentEnd;      // vertical clipboard line segment end
+fPOINT     LineSegmentStart;    // vertical clipboard line segment start
+unsigned   NextGroup;           // group that connects to the next region
+unsigned   PathIndex;           // formOrigin to the next path element for vertical fill sequencing
+unsigned   PathMapIndex;        // number of entries in the path map
+unsigned   RegionCount;         // number of regions to be sequenced
+RGSEQ*     RegionPath;          // path to a region
+SMALPNTL*  SequenceLines;       // line for vertical/horizontal/angle fills
+unsigned   SequencePathIndex;   // index to path of sequenced regions
+double     Slope;               // slope of line in angle fills
+unsigned   StitchLineCount;     // count of stitch lines
+HDC        TimeDC;              // progress bar device context
+double     TimePosition;        // progress bar postiion
+double     TimeStep;            // progress bar step
+HWND       TimeWindow;          // progress bar
+float      UserStitchLen;       // user stitch length
+unsigned   VisitedIndex;        // next unvisited region for sequencing
+fPOINT*    WorkingFormVertices; // form points for angle fills
 
 unsigned char Level00   = 0;
 unsigned char Level01   = 1;
@@ -592,9 +592,9 @@ void delfrms() {
 
 void fselrct(size_t iForm) noexcept {
 	const auto& formHeader     = FormList[iForm];
-	fPOINT        formOutline[5] = {};
-	POINT         line[6]        = {};
-	unsigned      iPoint         = 0;
+	fPOINT      formOutline[5] = {};
+	POINT       line[6]        = {};
+	unsigned    iPoint         = 0;
 
 	formOutline[0].x = formOutline[3].x = formOutline[4].x = formHeader.rectangle.left;
 	formOutline[1].x = formOutline[2].x = formHeader.rectangle.right;
@@ -5739,7 +5739,7 @@ void setap() {
 }
 
 void getbig() noexcept {
-	unsigned    iForm = 0, iStitch = 0;
+	unsigned iForm = 0, iStitch = 0;
 
 	AllItemsRect.bottom = AllItemsRect.left = 1e9;
 	AllItemsRect.top = AllItemsRect.right = 0;
@@ -7192,9 +7192,9 @@ void cplayfn(size_t iForm, unsigned play) {
 	SelectedForm->clipEntries             = 0;
 	SelectedForm->fillType                = 0;
 	SelectedForm->lengthOrCount.clipCount = 0;
-	SelectedForm->edgeType               = 0;
-	SelectedForm->fillInfo.texture.index = 0;
-	SelectedForm->attribute              = FormList[FormIndex].attribute & NFRMLMSK;
+	SelectedForm->edgeType                = 0;
+	SelectedForm->fillInfo.texture.index  = 0;
+	SelectedForm->attribute               = FormList[FormIndex].attribute & NFRMLMSK;
 	SelectedForm->attribute |= play;
 	SelectedForm->extendedAttribute = 0;
 	dusqr();
@@ -7919,11 +7919,11 @@ void srtbyfrm() {
 }
 
 void cntrx() {
-	dPOINT      markCenter     = {};
-	dPOINT      selectedCenter = {};
-	unsigned    iStitch        = 0;
-	bool        flag           = false;
-	fRECTANGLE  groupRect      = {};
+	dPOINT     markCenter     = {};
+	dPOINT     selectedCenter = {};
+	unsigned   iStitch        = 0;
+	bool       flag           = false;
+	fRECTANGLE groupRect      = {};
 
 	if (StateMap.test(StateFlag::GMRK)) {
 		markCenter.x = ZoomMarkPoint.x;
@@ -7952,11 +7952,11 @@ void cntrx() {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			flag = true;
 			savdo();
-			const auto& formRect         = FormList[ClosestFormToCursor].rectangle;
-			selectedCenter.x = (formRect.right - formRect.left) / 2 + formRect.left;
-			selectedCenter.y = (formRect.top - formRect.bottom) / 2 + formRect.bottom;
-			FormMoveDelta.x  = markCenter.x - selectedCenter.x;
-			FormMoveDelta.y  = -markCenter.y + selectedCenter.y;
+			const auto& formRect = FormList[ClosestFormToCursor].rectangle;
+			selectedCenter.x     = (formRect.right - formRect.left) / 2 + formRect.left;
+			selectedCenter.y     = (formRect.top - formRect.bottom) / 2 + formRect.bottom;
+			FormMoveDelta.x      = markCenter.x - selectedCenter.x;
+			FormMoveDelta.y      = -markCenter.y + selectedCenter.y;
 			if (StateMap.test(StateFlag::CNTRV))
 				FormMoveDelta.y = 0;
 			if (StateMap.test(StateFlag::CNTRH))

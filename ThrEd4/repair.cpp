@@ -197,7 +197,7 @@ void repflt(std::wstring& repairMessage) {
 	size_t              iVertex = 0;
 	bool                flag    = true;
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
-		const auto formHeader       = &FormList[iForm];
+		const auto   formHeader       = &FormList[iForm];
 		const size_t vertexDifference = formHeader->vertices - FormVertices;
 		if (FormVertexIndex >= vertexDifference + formHeader->vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + formHeader->vertexCount);
@@ -241,11 +241,11 @@ void repflt(std::wstring& repairMessage) {
 
 void repclp(std::wstring& repairMessage) {
 	unsigned            badClipCount = 0;
-	size_t              clipCount = 0;
+	size_t              clipCount    = 0;
 	std::vector<fPOINT> clipPoint;
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
-		const auto formHeader = &FormList[iForm];
-		size_t clipDifference = 0u;
+		const auto formHeader     = &FormList[iForm];
+		size_t     clipDifference = 0u;
 		if (clip::isclp(iForm)) {
 			// ToDo - pointer arithmetic to be fixed
 			clipDifference = formHeader->angleOrClipData.clip - ClipPoints;
@@ -316,8 +316,8 @@ void repclp(std::wstring& repairMessage) {
 }
 
 void repsat() {
-	size_t   guideCount = 0;
-	BADCNTS  badData    = {};
+	size_t  guideCount = 0;
+	BADCNTS badData    = {};
 
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		const auto formHeader = &FormList[iForm];
