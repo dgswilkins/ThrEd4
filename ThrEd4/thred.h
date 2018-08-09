@@ -96,7 +96,7 @@ void     deldir();
 void     deldu();
 void     delet();
 void     delfre();
-void     delfstchs()  noexcept;
+void     delfstchs() noexcept;
 void     delinf() noexcept;
 void     delknot();
 void     delknt() noexcept;
@@ -121,35 +121,35 @@ void dstran(std::vector<DSTREC>& DSTData);
 
 inline unsigned dtrn(DSTREC* dpnt);
 
-void     duClos(unsigned startStitch, unsigned stitchCount);
-void     duIns();
-void     duSelbox() noexcept;
-void     duar();
-void     dubar();
-void     dubox();
-void     dubuf(char* const buffer, unsigned& count);
-void     duclip();
-void     duclp() noexcept;
-void     ducmd();
-void     ducros(HDC dc);
-void     dudat();
+void duClos(unsigned startStitch, unsigned stitchCount);
+void duIns();
+void duSelbox() noexcept;
+void duar();
+void dubar();
+void dubox();
+void dubuf(char* const buffer, unsigned& count);
+void duclip();
+void duclp() noexcept;
+void ducmd();
+void ducros(HDC dc);
+void dudat();
 
 constexpr unsigned dudbits(const POINT& dif);
 
-void dufdef() noexcept;
-void dufsel();
-void dugrid();
-void duhbit(unsigned cod) noexcept;
-void duhom();
-void duinsfil();
-void dulin();
-void dumov();
-void dumrk(double xCoord, double yCoord);
-void dun();
-bool dunum(unsigned code) noexcept;
-void dupclp();
-void duprct();
-void durcntr(dPOINT& rotationCenter) noexcept;
+void     dufdef() noexcept;
+void     dufsel();
+void     dugrid();
+void     duhbit(unsigned cod) noexcept;
+void     duhom();
+void     duinsfil();
+void     dulin();
+void     dumov();
+void     dumrk(double xCoord, double yCoord);
+void     dun();
+bool     dunum(unsigned code) noexcept;
+void     dupclp();
+void     duprct();
+void     durcntr(dPOINT& rotationCenter) noexcept;
 void     durit(char** destination, const void* const source, size_t count) noexcept;
 void     durot() noexcept;
 void     durotu() noexcept;
@@ -345,8 +345,14 @@ void     rngal();
 void     rot(dPOINT& rotationCenter);
 void     rotang(dPOINT unrotatedPoint, POINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter);
 
-void rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, const double& rotationAngle, const dPOINT& rotationCenter) noexcept;
-void rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, const double rotationAngle, const dPOINT& rotationCenter) noexcept;
+void rotang1(const fPOINTATTR& unrotatedPoint,
+             fPOINT&           rotatedPoint,
+             const double&     rotationAngle,
+             const dPOINT&     rotationCenter) noexcept;
+void rotangf(const fPOINT& unrotatedPoint,
+             fPOINT&       rotatedPoint,
+             const double  rotationAngle,
+             const dPOINT& rotationCenter) noexcept;
 
 void        rotauxmen();
 void        rotauxsel(unsigned stat);

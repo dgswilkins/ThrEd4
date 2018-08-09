@@ -12321,7 +12321,8 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 						IniFile.customHoopX = IniFile.hoopSizeX;
 						IniFile.customHoopY = IniFile.hoopSizeY;
 						StateMap.set(StateFlag::MSGOF);
-						displayText::shoMsg(fmt::format((*StringTable)[STR_CUSTHUP], IniFile.hoopSizeX / PFGRAN, IniFile.hoopSizeY / PFGRAN));
+						displayText::shoMsg(
+						    fmt::format((*StringTable)[STR_CUSTHUP], IniFile.hoopSizeX / PFGRAN, IniFile.hoopSizeY / PFGRAN));
 						break;
 					case SMALHUP:
 						IniFile.hoopSizeX = SHUPX;

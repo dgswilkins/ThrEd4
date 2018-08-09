@@ -29,7 +29,7 @@
 #include "displayText.h"
 #include "hlp.h"
 
-HWND HelpWindow;    // help window
+HWND HelpWindow; // help window
 
 void help() {
 	std::wstring helpFileName;
@@ -39,4 +39,3 @@ void help() {
 	if (!HelpWindow)
 		displayText::tabmsg(IDS_NOHLP);
 }
-
