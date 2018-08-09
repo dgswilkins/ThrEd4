@@ -29,6 +29,7 @@
 #include "globals.h"
 #include "form.h"
 #include "thred.h"
+#include "displayText.h"
 
 unsigned short LoadStringList[] = {
 	// strings to load into memory at init time

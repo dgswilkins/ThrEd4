@@ -36,6 +36,7 @@
 #include "texture.h"
 #include "thred.h"
 #include "xt.h"
+#include "formForms.h"
 
 unsigned FormMenuEntryCount;        // lines in the form-form
 RECT     LabelWindowCoords;         // location of left windows in the form data sheet

@@ -20,6 +20,7 @@
 
 // Local Headers
 #include "switches.h"
+#include "wrappers.h"
 
 void PolylineInt(HDC hdc, CONST POINT* apt, size_t cpt) {
 	Polyline(hdc, apt, gsl::narrow<int>(cpt));

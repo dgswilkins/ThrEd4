@@ -35,6 +35,7 @@
 #include "texture.h"
 #include "thred.h"
 #include "xt.h"
+#include "clip.h"
 
 fPOINT ClipReference;       // clipboard reference formOrigin
 fPOINT BorderClipReference; // reference for clipboard line border

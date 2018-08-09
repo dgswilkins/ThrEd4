@@ -27,6 +27,7 @@
 #include "Resources/resource.h"
 #include "globals.h"
 #include "displayText.h"
+#include "hlp.h"
 
 HWND HelpWindow;    // help window
 

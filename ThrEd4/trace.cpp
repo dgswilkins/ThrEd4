@@ -28,6 +28,7 @@
 #include "displayText.h"
 #include "form.h"
 #include "thred.h"
+#include "trace.h"
 
 unsigned  PixelColors[3];        // separated pixel reference colors
 HBITMAP   TraceBitmap;           // trace bitmap
