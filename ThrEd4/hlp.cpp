@@ -34,9 +34,9 @@ HWND HelpWindow;    // help window
 void help() {
 	std::wstring helpFileName;
 
-	loadString(helpFileName, IDS_HELPFN);
+	displayText::loadString(helpFileName, IDS_HELPFN);
 	HelpWindow = HtmlHelp(ThrEdWindow, fmt::format(L"{}{}", HomeDirectory->wstring(), helpFileName).c_str(), HH_DISPLAY_TOPIC, 0);
 	if (!HelpWindow)
-		tabmsg(IDS_NOHLP);
+		displayText::tabmsg(IDS_NOHLP);
 }
 

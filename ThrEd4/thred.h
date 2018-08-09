@@ -76,7 +76,6 @@ unsigned closlin();
 void     clpadj();
 void     clpbox();
 void     clpradj(fPOINTATTR stitch) noexcept;
-void     clrhbut(unsigned startButton);
 bool     cmpstch(unsigned iStitchA, unsigned iStitchB) noexcept;
 void     colchk() noexcept;
 

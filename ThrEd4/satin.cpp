@@ -585,7 +585,7 @@ void delspnt() {
 	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 		FormList[iForm].vertices--;
 	ritfcor(CurrentFormVertices[ClosestVertexToCursor]);
-	ritnum(STR_NUMPNT, ClosestVertexToCursor);
+	displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
 	frmout(ClosestFormToCursor);
 	vertex = SelectedForm->vertices[ClosestVertexToCursor];
 	if (vertex.x < ZoomRect.left || vertex.x > ZoomRect.right || vertex.y < ZoomRect.bottom || vertex.y > ZoomRect.top)
@@ -606,7 +606,7 @@ void satsbrd() {
 }
 
 void satbrd() {
-	if (filmsgs(FML_ANGS))
+	if (displayText::filmsgs(FML_ANGS))
 		return;
 	if (SelectedFormList->size()) {
 		for (auto selectedForm : (*SelectedFormList)) {
@@ -677,7 +677,7 @@ void ribon() {
 	unsigned iNewVertex = 0, isBlunt = 0;
 	size_t   savedFormIndex = 0;
 
-	frm1pnt();
+	displayText::frm1pnt();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		fvars(ClosestFormToCursor);
 		if (VertexCount > 2) {
@@ -768,10 +768,10 @@ void ribon() {
 			}
 		}
 		else
-			tabmsg(IDS_FRM2);
+			displayText::tabmsg(IDS_FRM2);
 	}
 	else
-		shoseln(IDS_FRM1MSG, IDS_CONVRIB);
+		displayText::shoseln(IDS_FRM1MSG, IDS_CONVRIB);
 }
 
 void slbrd() {

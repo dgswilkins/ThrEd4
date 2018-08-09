@@ -37,9 +37,9 @@
 void adbad(std::wstring& repairMessage, unsigned code, size_t count) {
 	std::wstring fmtStr;
 
-	loadString(fmtStr, code);
+	displayText::loadString(fmtStr, code);
 	repairMessage += fmtStr;
-	loadString(fmtStr, IDS_NOTREP);
+	displayText::loadString(fmtStr, IDS_NOTREP);
 	repairMessage += fmt::format(fmtStr, count);
 }
 
@@ -406,7 +406,7 @@ void repar() {
 		reptx();
 	lodchk();
 	StateMap.set(StateFlag::RESTCH);
-	shoMsg(repairMessage);
+	displayText::shoMsg(repairMessage);
 }
 
 void frmchkx() {
@@ -415,7 +415,7 @@ void frmchkx() {
 		switch (IniFile.dataCheck) {
 		case 1:
 			if (code)
-				datmsg(code);
+				displayText::datmsg(code);
 			break;
 		case 2:
 			if (code)
@@ -424,7 +424,7 @@ void frmchkx() {
 		case 3:
 			if (code) {
 				repar();
-				tabmsg(IDS_DATREP);
+				displayText::tabmsg(IDS_DATREP);
 			}
 		}
 	}

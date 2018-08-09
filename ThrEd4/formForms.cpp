@@ -644,15 +644,15 @@ void prfmsg() {
 void frmnum() {
 	std::wstring fmtStr;
 
-	loadString(fmtStr, IDS_FRML);
+	displayText::loadString(fmtStr, IDS_FRML);
 	if (FormIndex && StateMap.test(StateFlag::FORMSEL)) {
-		shoMsg(fmt::format(fmtStr, FormIndex));
+		displayText::shoMsg(fmt::format(fmtStr, FormIndex));
 		StateMap.set(StateFlag::NUMIN);
 		StateMap.set(StateFlag::ENTRFNUM);
-		numWnd();
+		displayText::numWnd();
 	}
 	else
-		shoseln(IDS_FRM1MSG, IDS_SETFRM);
+		displayText::shoseln(IDS_FRM1MSG, IDS_SETFRM);
 }
 
 void chkdaz() noexcept {
@@ -692,7 +692,7 @@ void initdaz(HWND hWinDialog) {
 	CheckDlgButton(hWinDialog, IDC_DLIN, UserFlagMap.test(UserFlag::DAZD));
 	std::wstring daisyType;
 	for (size_t iType = 0; iType < 6; iType++) {
-		loadString(daisyType, DaisyTypeStrings[iType]);
+		displayText::loadString(daisyType, DaisyTypeStrings[iType]);
 		[[gsl::suppress(type .1)]] SendMessage(
 		    GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str()));
 	}

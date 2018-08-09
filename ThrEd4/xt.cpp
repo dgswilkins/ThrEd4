@@ -415,7 +415,7 @@ void fethrf() {
 }
 
 void fethr() {
-	if (filmsgs(FMM_FTH))
+	if (displayText::filmsgs(FMM_FTH))
 		return;
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
@@ -513,7 +513,7 @@ void pes2crd() {
 	if (PCSHeader.stitchCount)
 		save();
 	else {
-		tabmsg(IDS_P2CNODAT);
+		displayText::tabmsg(IDS_P2CNODAT);
 		return;
 	}
 	if (chkp2cnam(utf::Utf8ToUtf16(std::string(IniFile.p2cName)).c_str())) {
@@ -877,22 +877,22 @@ void dubit(unsigned bit) {
 
 void setuang() {
 	StateMap.set(StateFlag::GTUANG);
-	msgflt(IDS_UANG, IniFile.underlayAngle / PI * 180);
+	displayText::msgflt(IDS_UANG, IniFile.underlayAngle / PI * 180);
 }
 
 void setuspac() {
 	StateMap.set(StateFlag::GTUSPAC);
-	msgflt(IDS_USPAC, IniFile.underlaySpacing / PFGRAN);
+	displayText::msgflt(IDS_USPAC, IniFile.underlaySpacing / PFGRAN);
 }
 
 void setwlkind() {
 	StateMap.set(StateFlag::GTWLKIND);
-	msgflt(IDS_WLKIND, IniFile.underlayIndent / PFGRAN);
+	displayText::msgflt(IDS_WLKIND, IniFile.underlayIndent / PFGRAN);
 }
 
 void setulen() {
 	StateMap.set(StateFlag::GTWLKLEN);
-	msgflt(IDS_WLKLEN, IniFile.underlayStitchLen / PFGRAN);
+	displayText::msgflt(IDS_WLKLEN, IniFile.underlayStitchLen / PFGRAN);
 }
 
 void chkcwlk(unsigned& interleaveSequenceIndex2) {
@@ -1238,8 +1238,8 @@ void fsort() {
 	}
 	else {
 		std::wstring str;
-		loadString(str, IDS_SRTER);
-		shoMsg(fmt::format(str, pFRecs[badForm]->form));
+		displayText::loadString(str, IDS_SRTER);
+		displayText::shoMsg(fmt::format(str, pFRecs[badForm]->form));
 	}
 }
 
@@ -1701,10 +1701,10 @@ void dusulen(float length) {
 }
 
 void undlen() {
-	tabmsg(IDS_SETULEN);
+	displayText::tabmsg(IDS_SETULEN);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETULEN);
-	numWnd();
+	displayText::numWnd();
 }
 
 void uspacfn(size_t find, float spacing) {
@@ -1731,10 +1731,10 @@ void duspac(float spacing) {
 }
 
 void uspac() {
-	tabmsg(IDS_SETUSPAC);
+	displayText::tabmsg(IDS_SETUSPAC);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETUSPAC);
-	numWnd();
+	displayText::numWnd();
 }
 
 void uangfn(size_t find, float angle) {
@@ -1762,10 +1762,10 @@ void dufang(float angle) {
 }
 
 void sfuang() {
-	tabmsg(IDS_SETUANG);
+	displayText::tabmsg(IDS_SETUANG);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETUANG);
-	numWnd();
+	displayText::numWnd();
 }
 
 void flenfn(size_t find, float length) {
@@ -1792,10 +1792,10 @@ void duflen(float length) {
 }
 
 void setflen() {
-	tabmsg(IDS_SETFLEN);
+	displayText::tabmsg(IDS_SETFLEN);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFLEN);
-	numWnd();
+	displayText::numWnd();
 }
 
 void fspacfn(size_t find, float spacing) {
@@ -1826,10 +1826,10 @@ void dufspac(float spacing) {
 }
 
 void setfspac() {
-	tabmsg(IDS_SETFSPAC);
+	displayText::tabmsg(IDS_SETFSPAC);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFSPAC);
-	numWnd();
+	displayText::numWnd();
 }
 
 void findfn(size_t find, float indent) {
@@ -1894,10 +1894,10 @@ void dufxang(float angle) {
 }
 
 void setfang() {
-	tabmsg(IDS_SETFANG);
+	displayText::tabmsg(IDS_SETFANG);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFANG);
-	numWnd();
+	displayText::numWnd();
 }
 
 void ucolfn(size_t find, unsigned color) {
@@ -1927,10 +1927,10 @@ void dundcol(unsigned color) {
 }
 
 void setucol() {
-	tabmsg(IDS_COL);
+	displayText::tabmsg(IDS_COL);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETUCOL);
-	numWnd();
+	displayText::numWnd();
 }
 
 void fcolfn(size_t find, unsigned color) {
@@ -1960,10 +1960,10 @@ void dufcol(unsigned color) {
 }
 
 void setfcol() {
-	tabmsg(IDS_COL);
+	displayText::tabmsg(IDS_COL);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFCOL);
-	numWnd();
+	displayText::numWnd();
 }
 
 void bcolfn(size_t find, unsigned color) {
@@ -1993,10 +1993,10 @@ void dubcol(unsigned color) {
 }
 
 void setbcol() {
-	tabmsg(IDS_COL);
+	displayText::tabmsg(IDS_COL);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETBCOL);
-	numWnd();
+	displayText::numWnd();
 }
 
 void blenfn(size_t find, float length) {
@@ -2023,10 +2023,10 @@ void dublen(float length) {
 }
 
 void setblen() {
-	tabmsg(IDS_SETFLEN);
+	displayText::tabmsg(IDS_SETFLEN);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETBLEN);
-	numWnd();
+	displayText::numWnd();
 }
 
 void bspacfn(size_t find, float length) {
@@ -2053,10 +2053,10 @@ void dubspac(float length) {
 }
 
 void setbspac() {
-	tabmsg(IDS_SETFSPAC);
+	displayText::tabmsg(IDS_SETFSPAC);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETBSPAC);
-	numWnd();
+	displayText::numWnd();
 }
 
 void bminfn(size_t find, float length) {
@@ -2083,10 +2083,10 @@ void dubmin(float length) {
 }
 
 void setbmin() {
-	tabmsg(IDS_TXT23);
+	displayText::tabmsg(IDS_TXT23);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETBMIN);
-	numWnd();
+	displayText::numWnd();
 }
 
 void bmaxfn(size_t find, float length) {
@@ -2113,10 +2113,10 @@ void dubmax(float length) {
 }
 
 void setbmax() {
-	tabmsg(IDS_TXT22);
+	displayText::tabmsg(IDS_TXT22);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETBMAX);
-	numWnd();
+	displayText::numWnd();
 }
 
 void fminfn(size_t find, float length) {
@@ -2143,10 +2143,10 @@ void dufmin(float length) {
 }
 
 void setfmin() {
-	tabmsg(IDS_TXT21);
+	displayText::tabmsg(IDS_TXT21);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFMIN);
-	numWnd();
+	displayText::numWnd();
 }
 
 void fmaxfn(size_t find, float length) {
@@ -2173,10 +2173,10 @@ void dufmax(float length) {
 }
 
 void setfmax() {
-	tabmsg(IDS_TXT20);
+	displayText::tabmsg(IDS_TXT20);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFMAX);
-	numWnd();
+	displayText::numWnd();
 }
 
 void fwidfn(size_t find, float length) {
@@ -2209,17 +2209,17 @@ void dufwid(float length) {
 }
 
 void setfwid() {
-	tabmsg(IDS_WID);
+	displayText::tabmsg(IDS_WID);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFWID);
-	numWnd();
+	displayText::numWnd();
 }
 
 void setfind() {
-	tabmsg(IDS_UWLKIND);
+	displayText::tabmsg(IDS_UWLKIND);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFIND);
-	numWnd();
+	displayText::numWnd();
 }
 
 void fhifn(size_t find, float length) {
@@ -2252,10 +2252,10 @@ void dufhi(float length) {
 }
 
 void setfhi() {
-	tabmsg(IDS_HI);
+	displayText::tabmsg(IDS_HI);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFHI);
-	numWnd();
+	displayText::numWnd();
 }
 
 void setfilstrt() {
@@ -2267,7 +2267,7 @@ void setfilstrt() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
-		shoseln(IDS_FORMP, IDS_FSTRT);
+		displayText::shoseln(IDS_FORMP, IDS_FSTRT);
 }
 
 void setfilend() {
@@ -2279,7 +2279,7 @@ void setfilend() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
-		shoseln(IDS_FORMP, IDS_FEND);
+		displayText::shoseln(IDS_FORMP, IDS_FEND);
 }
 
 void duauxnam() {
@@ -2441,7 +2441,7 @@ void nudsiz() {
 			if (flag) {
 				movStch();
 				zumhom();
-				hsizmsg();
+				displayText::hsizmsg();
 			}
 			centir();
 			for (iForm = 0; iForm < FormIndex; iForm++)
@@ -2478,10 +2478,10 @@ void mvshft() {
 }
 
 void setclpspac() {
-	msgflt(IDS_CLPSPAC, IniFile.clipOffset / PFGRAN);
+	displayText::msgflt(IDS_CLPSPAC, IniFile.clipOffset / PFGRAN);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::SCLPSPAC);
-	numWnd();
+	displayText::numWnd();
 }
 
 BOOL CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept {

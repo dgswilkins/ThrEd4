@@ -426,7 +426,7 @@ void drwtxtr() {
 		dutxtx((*SelectedTexturePointsList)[iPoint], IniFile.textureEditorSize << 1);
 	}
 	BitBlt(StitchWindowDC, 0, 0, StitchWindowClientRect.right, StitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
-	drwtxbut(TextureScreen);
+	displayText::drwtxbut(TextureScreen);
 }
 
 bool px2txt(const POINT& offset) {
@@ -1055,12 +1055,12 @@ void altx() {
 }
 
 void txof() {
-	butxt(HBOXSEL, (*StringTable)[STR_BOXSEL]);
+	displayText::butxt(HBOXSEL, (*StringTable)[STR_BOXSEL]);
 	redraw((*ButtonWin)[HHID]);
 	if (StateMap.test(StateFlag::UPTO))
-		butxt(HUPTO, (*StringTable)[STR_UPON]);
+		displayText::butxt(HUPTO, (*StringTable)[STR_UPON]);
 	else
-		butxt(HUPTO, (*StringTable)[STR_UPOF]);
+		displayText::butxt(HUPTO, (*StringTable)[STR_UPOF]);
 	SetWindowText((*ButtonWin)[HTXSPAC], L"");
 	savtxt();
 	zumhom();
@@ -1597,7 +1597,7 @@ void setshft() {
 
 void writeScreenWidth(unsigned position) {
 	std::wstring fmtStr;
-	loadString(fmtStr, IDS_TXWID);
+	displayText::loadString(fmtStr, IDS_TXWID);
 	std::wstring scrWidth(fmt::format(fmtStr, (TextureScreen.width / PFGRAN)));
 	TextOutInt(DrawItem->hDC, position, 1, scrWidth.c_str(), scrWidth.size());
 }

@@ -451,7 +451,7 @@ void setfrm() {
 }
 
 void form() {
-	shoMsg((*StringTable)[STR_FMEN]);
+	displayText::shoMsg((*StringTable)[STR_FMEN]);
 	StateMap.set(StateFlag::FORMIN);
 	StateMap.reset(StateFlag::INSRT);
 	duzrat();
@@ -741,7 +741,7 @@ void drwfrm() {
 					frmsqr0(FormLines[0]);
 				else
 					frmx(FormLines[0], StitchWindowMemDC);
-				ritnum(STR_NUMPNT, ClosestVertexToCursor);
+				displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
 			}
 			else {
 				for (iVertex = 1; iVertex < VertexCount; iVertex++)
@@ -802,58 +802,58 @@ void setlin() {
 
 void setrpoli() {
 	unmsg();
-	pntmsg(IDS_REGP);
+	displayText::pntmsg(IDS_REGP);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTRPOL);
-	numWnd();
+	displayText::numWnd();
 }
 
 void setstar() {
 	unmsg();
-	pntmsg(IDS_STAR);
+	displayText::pntmsg(IDS_STAR);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTRSTAR);
-	numWnd();
+	displayText::numWnd();
 }
 
 void setspir() {
 	unmsg();
-	pntmsg(IDS_SPIR);
+	displayText::pntmsg(IDS_SPIR);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTRSPIR);
-	numWnd();
+	displayText::numWnd();
 }
 
 void sethart() {
 	unmsg();
-	pntmsg(IDS_HEART);
+	displayText::pntmsg(IDS_HEART);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTRHART);
-	numWnd();
+	displayText::numWnd();
 }
 
 void setlens() {
 	unmsg();
-	pntmsg(IDS_LENS);
+	displayText::pntmsg(IDS_LENS);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTRLENS);
-	numWnd();
+	displayText::numWnd();
 }
 
 void seteg() {
 	unmsg();
-	pntmsg(IDS_EGG);
+	displayText::pntmsg(IDS_EGG);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTREG);
-	numWnd();
+	displayText::numWnd();
 }
 
 void setzig() {
 	unmsg();
-	pntmsg(IDS_ZIG);
+	displayText::pntmsg(IDS_ZIG);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTRZIG);
-	numWnd();
+	displayText::numWnd();
 }
 
 void setmfrm() noexcept {
@@ -4926,9 +4926,9 @@ void refil() {
 				if (FormDataSheet)
 					StateMap.set(StateFlag::WASFRMFRM);
 				undat();
-				tabmsg(IDS_REFIL);
+				displayText::tabmsg(IDS_REFIL);
 				StateMap.set(StateFlag::MOVMSG);
-				okcan();
+				displayText::okcan();
 				return;
 			}
 		}
@@ -4977,7 +4977,7 @@ void fsvrt() {
 }
 
 void filvrt() {
-	if (filmsgs(FMM_VRT))
+	if (displayText::filmsgs(FMM_VRT))
 		return;
 	if (SelectedFormList->size()) {
 		savdo();
@@ -5017,7 +5017,7 @@ void fshor() {
 }
 
 void filhor() {
-	if (filmsgs(FMM_HOR))
+	if (displayText::filmsgs(FMM_HOR))
 		return;
 	if (SelectedFormList->size()) {
 		for (auto selectedForm : (*SelectedFormList)) {
@@ -5055,7 +5055,7 @@ void fsangl() {
 }
 
 void filangl() {
-	if (filmsgs(FMM_ANG))
+	if (displayText::filmsgs(FMM_ANG))
 		return;
 	if (SelectedFormList->size()) {
 		savdo();
@@ -5283,7 +5283,7 @@ void filsfn() {
 }
 
 void filsat() {
-	if (filmsgs(FMM_FAN))
+	if (displayText::filmsgs(FMM_FAN))
 		return;
 	if (SelectedFormList->size()) {
 		savdo();
@@ -5452,7 +5452,7 @@ void unfil() {
 	unsigned codedForm = 0, attribute = 0;
 	unsigned mapLength = 0;
 
-	if (filmsgs(FMX_UNF))
+	if (displayText::filmsgs(FMX_UNF))
 		return;
 	if (SelectedFormList->size()) {
 		boost::dynamic_bitset<> formMap(FormIndex);
@@ -5485,9 +5485,9 @@ void unfil() {
 				for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 					attribute = StitchBuffer[iStitch].attribute;
 					if (!(attribute & NOTFRM) && (attribute & (USMSK | FRMSK)) == codedForm) {
-						tabmsg(IDS_UNFIL);
+						displayText::tabmsg(IDS_UNFIL);
 						StateMap.set(StateFlag::FILMSG);
-						okcan();
+						displayText::okcan();
 						StateMap.set(StateFlag::IGNOR);
 						return;
 					}
@@ -5598,7 +5598,7 @@ void sbord() {
 }
 
 void bord() {
-	if (filmsgs(FML_LIN))
+	if (displayText::filmsgs(FML_LIN))
 		return;
 	if (SelectedFormList->size()) {
 		for (auto selectedForm : (*SelectedFormList)) {
@@ -5642,7 +5642,7 @@ void fsclp() {
 }
 
 void fclp() {
-	if (filmsgs(FML_CLP))
+	if (displayText::filmsgs(FML_CLP))
 		return;
 	if (OpenClipboard(ThrEdWindow)) {
 		fvars(ClosestFormToCursor);
@@ -5673,7 +5673,7 @@ void fclp() {
 				}
 			}
 			else
-				tabmsg(IDS_CLP);
+				displayText::tabmsg(IDS_CLP);
 		}
 		else
 			CloseClipboard();
@@ -5700,7 +5700,7 @@ void sapliq() {
 }
 
 void apliq() {
-	if (filmsgs(FML_APLQ))
+	if (displayText::filmsgs(FML_APLQ))
 		return;
 	if (SelectedFormList->size()) {
 		for (auto selectedForm : (*SelectedFormList)) {
@@ -5732,10 +5732,10 @@ void apliq() {
 
 void setap() {
 	std::wstring fmtStr;
-	loadString(fmtStr, IDS_APCOL);
+	displayText::loadString(fmtStr, IDS_APCOL);
 
 	AppliqueColor = ActiveColor;
-	shoMsg(fmt::format(fmtStr, (AppliqueColor + 1)));
+	displayText::shoMsg(fmt::format(fmtStr, (AppliqueColor + 1)));
 }
 
 void getbig() noexcept {
@@ -6245,7 +6245,7 @@ void sbold() {
 }
 
 void dubold() {
-	if (filmsgs(FML_BLD))
+	if (displayText::filmsgs(FML_BLD))
 		return;
 	if (SelectedFormList->size()) {
 		for (auto selectedForm : (*SelectedFormList)) {
@@ -6672,7 +6672,7 @@ void prpsbrd() {
 void prpbrd(double borderStitchSpacing) {
 	const double savedSpacing = LineSpacing;
 
-	if (filmsgs(FML_PRPS))
+	if (displayText::filmsgs(FML_PRPS))
 		return;
 	LineSpacing = borderStitchSpacing;
 	if (SelectedFormList->size()) {
@@ -6823,7 +6823,7 @@ void filsclp() {
 }
 
 void clpfil() {
-	if (filmsgs(FMM_CLP))
+	if (displayText::filmsgs(FMM_CLP))
 		return;
 	if (OpenClipboard(ThrEdWindow)) {
 		Clip       = RegisterClipboardFormat(PcdClipFormat);
@@ -6853,7 +6853,7 @@ void clpfil() {
 				}
 			}
 			else
-				tabmsg(IDS_CLP);
+				displayText::tabmsg(IDS_CLP);
 		}
 		else
 			CloseClipboard();
@@ -6995,7 +6995,7 @@ void dufcntr(dPOINT& center) {
 
 void rotpar(dPOINT& rotationCenter) {
 	if (IniFile.rotationAngle < (PI / 180))
-		tabmsg(IDS_ROTIN);
+		displayText::tabmsg(IDS_ROTIN);
 	if (StateMap.test(StateFlag::FPSEL)) {
 		rotationCenter.x = midl(SelectedVerticesRect.right, SelectedVerticesRect.left);
 		rotationCenter.y = midl(SelectedVerticesRect.top, SelectedVerticesRect.bottom);
@@ -7046,10 +7046,10 @@ void rotpar(dPOINT& rotationCenter) {
 void rotentr(double rotationAngle) {
 	std::wstring fmtStr;
 
-	loadString(fmtStr, IDS_ROTA);
-	shoMsg(fmt::format(fmtStr, (rotationAngle / PI * 180)));
+	displayText::loadString(fmtStr, IDS_ROTA);
+	displayText::shoMsg(fmt::format(fmtStr, (rotationAngle / PI * 180)));
 	StateMap.set(StateFlag::NUMIN);
-	numWnd();
+	displayText::numWnd();
 }
 
 void setrang() {
@@ -7065,7 +7065,7 @@ void rotcmd(dPOINT& rotationCenter) {
 		StateMap.set(StateFlag::ENTROT);
 	}
 	else
-		shoseln(IDS_ALLX, IDS_ROTCMD);
+		displayText::shoseln(IDS_ALLX, IDS_ROTCMD);
 }
 
 void fnagain(double rotationAngle) {
@@ -7076,7 +7076,7 @@ void fnagain(double rotationAngle) {
 		rotfn(rotationAngle, rotationCenter);
 	}
 	else
-		alrotmsg();
+		displayText::alrotmsg();
 }
 
 void rotagain() {
@@ -7095,7 +7095,7 @@ void rotdup() {
 		StateMap.set(StateFlag::ENTRDUP);
 	}
 	else
-		shord();
+		displayText::shord();
 }
 
 void adfrm(size_t iForm) {
@@ -7404,18 +7404,18 @@ void frmpnts(unsigned type) {
 }
 
 void selfil(unsigned type) {
-	frm1pnt();
+	displayText::frm1pnt();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		if (type == FRMFIL && !FormList[ClosestFormToCursor].fillType) {
-			tabmsg(IDS_FSELF);
+			displayText::tabmsg(IDS_FSELF);
 			return;
 		}
 		if (type == FRMBFIL && !FormList[ClosestFormToCursor].edgeType) {
-			tabmsg(IDS_FSELB);
+			displayText::tabmsg(IDS_FSELB);
 			return;
 		}
 		if (type == FRMAPFIL && (FormList[ClosestFormToCursor].edgeType & NEGUND) != EDGEAPPL) {
-			tabmsg(IDS_FSELA);
+			displayText::tabmsg(IDS_FSELA);
 			return;
 		}
 		frmpnts(type);
@@ -7425,7 +7425,7 @@ void selfil(unsigned type) {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
-		tabmsg(IDS_SEL1FRM);
+		displayText::tabmsg(IDS_SEL1FRM);
 }
 
 bool notfstch(unsigned attribute) noexcept {
@@ -7437,7 +7437,7 @@ bool notfstch(unsigned attribute) noexcept {
 }
 
 void selalfil() {
-	frm1pnt();
+	displayText::frm1pnt();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		ClosestPointIndex = 0;
 		while (ClosestPointIndex < PCSHeader.stitchCount && notfstch(StitchBuffer[ClosestPointIndex].attribute))
@@ -7454,10 +7454,10 @@ void selalfil() {
 			StateMap.set(StateFlag::RESTCH);
 		}
 		else
-			tabmsg(IDS_FSELM);
+			displayText::tabmsg(IDS_FSELM);
 	}
 	else
-		tabmsg(IDS_SEL1FRM);
+		displayText::tabmsg(IDS_SEL1FRM);
 }
 
 bool frmrng(size_t iForm, RANGE& range) noexcept {
@@ -7497,7 +7497,7 @@ void bholbrd() {
 void bhol() {
 	const double savedSpacing = LineSpacing;
 
-	if (filmsgs(FML_BHOL))
+	if (displayText::filmsgs(FML_BHOL))
 		return;
 	LineSpacing = savedSpacing;
 	if (SelectedFormList->size()) {
@@ -7562,7 +7562,7 @@ void fcntr() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
-		tabmsg(IDS_SELC);
+		displayText::tabmsg(IDS_SELC);
 }
 
 void boxsel() {
@@ -7597,7 +7597,7 @@ void fspic() {
 }
 
 void picot() {
-	if (filmsgs(FML_PIC))
+	if (displayText::filmsgs(FML_PIC))
 		return;
 	if (OpenClipboard(ThrEdWindow)) {
 		savdo();
@@ -7628,7 +7628,7 @@ void picot() {
 				}
 			}
 			else
-				tabmsg(IDS_CLP);
+				displayText::tabmsg(IDS_CLP);
 		}
 		else
 			CloseClipboard();
@@ -7653,7 +7653,7 @@ bool contsf(size_t formIndex) {
 }
 
 void contfil() {
-	if (filmsgs(FML_CONT))
+	if (displayText::filmsgs(FML_CONT))
 		return;
 	if (SelectedFormList->size()) {
 		savdo();
@@ -7673,7 +7673,7 @@ void contfil() {
 			StateMap.set(StateFlag::RESTCH);
 		}
 		else
-			tabmsg(IDS_CONT);
+			displayText::tabmsg(IDS_CONT);
 	}
 }
 
@@ -7691,7 +7691,7 @@ void dupfn(double rotationAngle) {
 				if (SelectedFormList->size())
 					duprotfs(rotationAngle);
 				else
-					shord();
+					displayText::shord();
 			}
 		}
 	}
@@ -7752,7 +7752,7 @@ void shrnk() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
-		shoseln(IDS_FRMCLP, IDS_SHRNK);
+		displayText::shoseln(IDS_FRMCLP, IDS_SHRNK);
 }
 
 void dufdat(std::vector<fPOINT>& tempClipPoints,
@@ -7853,7 +7853,7 @@ void frmnumfn(unsigned newFormIndex) {
 			}
 		}
 		ClosestFormToCursor = newFormIndex;
-		ritnum(STR_NUMFRM, ClosestFormToCursor);
+		displayText::ritnum(STR_NUMFRM, ClosestFormToCursor);
 	}
 }
 
@@ -8001,7 +8001,7 @@ void cntrx() {
 				}
 			}
 			else
-				shoseln(IDS_FGRPF, IDS_CENT);
+				displayText::shoseln(IDS_FGRPF, IDS_CENT);
 		}
 	}
 	if (flag)
@@ -8224,10 +8224,10 @@ void spltfrm() {
 						return;
 					}
 				}
-				spltmsg();
+				displayText::spltmsg();
 			}
 			else
-				spltmsg();
+				displayText::spltmsg();
 		}
 		else {
 			if (SelectedForm->type == FRMLINE) {
@@ -8236,14 +8236,14 @@ void spltfrm() {
 					StateMap.set(StateFlag::RESTCH);
 				}
 				else
-					tabmsg(IDS_FRM3);
+					displayText::tabmsg(IDS_FRM3);
 				return;
 			}
 			else
-				spltmsg();
+				displayText::spltmsg();
 		}
 	}
-	spltmsg();
+	displayText::spltmsg();
 }
 
 void stchs2frm() {
@@ -8252,7 +8252,7 @@ void stchs2frm() {
 	if (StateMap.test(StateFlag::GRPSEL)) {
 		rngadj();
 		if ((GroupEndStitch - GroupStartStitch) > 12000) {
-			tabmsg(IDS_STMAX);
+			displayText::tabmsg(IDS_STMAX);
 			return;
 		}
 		vertexCount  = GroupEndStitch - GroupStartStitch + 1;
@@ -8282,7 +8282,7 @@ void stchs2frm() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
-		shoseln(IDS_GRPMSG, IDS_STCH2FRM);
+		displayText::shoseln(IDS_GRPMSG, IDS_STCH2FRM);
 }
 
 void vrtsclp() {
@@ -8307,7 +8307,7 @@ void vrtsclp() {
 }
 
 void vrtclp() {
-	if (filmsgs(FMM_CLP))
+	if (displayText::filmsgs(FMM_CLP))
 		return;
 	if (OpenClipboard(ThrEdWindow)) {
 		Clip       = RegisterClipboardFormat(PcdClipFormat);
@@ -8340,7 +8340,7 @@ void vrtclp() {
 				}
 			}
 			else
-				tabmsg(IDS_CLP);
+				displayText::tabmsg(IDS_CLP);
 		}
 		else
 			CloseClipboard();
@@ -8371,7 +8371,7 @@ void horsclp() {
 }
 
 void horclp() {
-	if (filmsgs(FMM_CLP))
+	if (displayText::filmsgs(FMM_CLP))
 		return;
 	if (OpenClipboard(ThrEdWindow)) {
 		Clip       = RegisterClipboardFormat(PcdClipFormat);
@@ -8404,7 +8404,7 @@ void horclp() {
 				}
 			}
 			else
-				tabmsg(IDS_CLP);
+				displayText::tabmsg(IDS_CLP);
 		}
 		else
 			CloseClipboard();
@@ -8434,7 +8434,7 @@ void angsclp() {
 }
 
 void angclp() {
-	if (filmsgs(FMM_CLP))
+	if (displayText::filmsgs(FMM_CLP))
 		return;
 	if (OpenClipboard(ThrEdWindow)) {
 		Clip       = RegisterClipboardFormat(PcdClipFormat);
@@ -8467,7 +8467,7 @@ void angclp() {
 				}
 			}
 			else
-				tabmsg(IDS_CLP);
+				displayText::tabmsg(IDS_CLP);
 		}
 		else
 			CloseClipboard();
@@ -8486,7 +8486,7 @@ void dubsfil() {
 }
 
 void dubfil() {
-	if (filmsgs(FML_LIN))
+	if (displayText::filmsgs(FML_LIN))
 		return;
 	if (SelectedFormList->size()) {
 		for (auto selectedForm : (*SelectedFormList)) {
@@ -8601,8 +8601,8 @@ void col2frm() {
 		}
 	}
 	std::wstring fmtStr;
-	loadString(fmtStr, IDS_NCOLCHG);
-	shoMsg(fmt::format(fmtStr, colorChangedCount));
+	displayText::loadString(fmtStr, IDS_NCOLCHG);
+	displayText::shoMsg(fmt::format(fmtStr, colorChangedCount));
 }
 
 void chan() {
@@ -8620,7 +8620,7 @@ void chan() {
 }
 
 void chain() {
-	if (filmsgs(FML_CHAIN))
+	if (displayText::filmsgs(FML_CHAIN))
 		return;
 	savdo();
 	if (SelectedFormList->size()) {
@@ -8648,7 +8648,7 @@ void chain() {
 void crop() {
 	unsigned iSource = 0, iDestination = 0;
 
-	frm1pnt();
+	displayText::frm1pnt();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		savdo();
 		fvars(ClosestFormToCursor);
@@ -8663,7 +8663,7 @@ void crop() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
-		shoseln(IDS_FRM1MSG, IDS_CROP);
+		displayText::shoseln(IDS_FRM1MSG, IDS_CROP);
 }
 
 void fsclpx() {
@@ -8686,7 +8686,7 @@ void fsclpx() {
 }
 
 void filclpx() {
-	if (filmsgs(FML_CLP))
+	if (displayText::filmsgs(FML_CLP))
 		return;
 	if (OpenClipboard(ThrEdWindow)) {
 		fvars(ClosestFormToCursor);
@@ -8717,11 +8717,11 @@ void filclpx() {
 				}
 			}
 			else
-				tabmsg(IDS_CLP);
+				displayText::tabmsg(IDS_CLP);
 		}
 		else {
 			std::wstring str(L"no clipboard data");
-			shoMsg(str);
+			displayText::shoMsg(str);
 			CloseClipboard();
 		}
 	}

@@ -132,14 +132,14 @@ unsigned icolsum(COLORREF color) {
 
 void trcstpnum() {
 	std::wstring fmtStr;
-	loadString(fmtStr, IDS_TRCSTP);
+	displayText::loadString(fmtStr, IDS_TRCSTP);
 	SetWindowText(TraceStepWin, fmt::format(fmtStr, (IniFile.traceLength / PFGRAN)).c_str());
 }
 
 void trcratnum() {
 	std::wstring fmtStr;
-	loadString(fmtStr, IDS_TRCRAT);
-	butxt(HLIN, fmt::format(fmtStr, -log10(IniFile.traceRatio - 1)));
+	displayText::loadString(fmtStr, IDS_TRCRAT);
+	displayText::butxt(HLIN, fmt::format(fmtStr, -log10(IniFile.traceRatio - 1)));
 }
 
 bool trcin(COLORREF color) {
@@ -227,7 +227,7 @@ void tracwnd() {
 	shownd(TraceStepWin);
 	trcstpnum();
 	trcratnum();
-	clrhbut(4);
+	displayText::clrhbut(4);
 }
 
 void blanklin(std::vector<unsigned>& differenceBitmap, unsigned lineStart) {
@@ -318,7 +318,7 @@ void untrace() {
 
 void trdif() {
 	if (!PCSBMPFileName[0]) {
-		tabmsg(IDS_MAPLOD);
+		displayText::tabmsg(IDS_MAPLOD);
 		return;
 	}
 	StateMap.reset(StateFlag::TRSET);
@@ -441,7 +441,7 @@ void trace() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
-		tabmsg(IDS_MAPLOD);
+		displayText::tabmsg(IDS_MAPLOD);
 }
 
 void tracedg() {
@@ -706,7 +706,7 @@ void dutrac() {
 		while (trcbit(initialDirection, traceDirection, tracedPoints))
 			;
 		if (tracedPoints.size() >= 500000) {
-			tabmsg(IDS_FRM2L);
+			displayText::tabmsg(IDS_FRM2L);
 			return;
 		}
 		std::vector<TRCPNT> decimatedLine;
@@ -762,7 +762,7 @@ void dutrac() {
 			}
 		}
 		if (FormVertexIndex + OutputIndex > MAXITEMS) {
-			tabmsg(IDS_FRMOVR);
+			displayText::tabmsg(IDS_FRMOVR);
 			return;
 		}
 		SelectedForm->vertices    = adflt(OutputIndex);
@@ -845,7 +845,7 @@ void trinit() {
 		trace();
 	}
 	else
-		tabmsg(IDS_MAPLOD);
+		displayText::tabmsg(IDS_MAPLOD);
 }
 
 void trcsel() {
@@ -877,7 +877,7 @@ void trcsel() {
 		tracwnd();
 	}
 	else
-		tabmsg(IDS_MAPLOD);
+		displayText::tabmsg(IDS_MAPLOD);
 }
 
 void ritrcol(COLORREF* color, unsigned number) noexcept {
@@ -994,7 +994,7 @@ void bfrm() {
 
 void blak() {
 	if (!PCSBMPFileName[0]) {
-		tabmsg(IDS_MAPLOD);
+		displayText::tabmsg(IDS_MAPLOD);
 		return;
 	}
 	tracwnd();
@@ -1013,7 +1013,7 @@ void blak() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
-		tabmsg(IDS_FRMNO);
+		displayText::tabmsg(IDS_FRMNO);
 }
 
 void tracpar() {

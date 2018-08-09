@@ -820,7 +820,7 @@ void clipPriv::duch(std::vector<fPOINT>& chainEndPoints) {
 		}
 	}
 	else
-		tabmsg(IDS_CHANSMAL);
+		displayText::tabmsg(IDS_CHANSMAL);
 }
 
 void clip::chnfn() {

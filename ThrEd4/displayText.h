@@ -3,12 +3,13 @@
 // Local Headers
 #include "ThrEdTypes.h"
 
+namespace displayText {
+
 void        alrotmsg();
 void        bfilmsg();
 void        butxt(unsigned iButton, const std::wstring& buttonText);
-void        bxtxt(unsigned iButton, unsigned iMessage);
-bool        clpmsgs(unsigned code);
 void        clrhbut(unsigned startButton);
+bool        clpmsgs(unsigned code);
 void        crmsg(const fs::path& fileName);
 void        datmsg(unsigned code);
 void        drwtxbut(const TXTSCR& textureScreen);
@@ -17,7 +18,6 @@ void        filnopn(unsigned code, const fs::path& fileName);
 void        frm1pnt();
 void        grpmsg();
 void        grpmsg1();
-void        hlpflt(unsigned iButton, unsigned iMessage, float data);
 void        hsizmsg();
 inline void loadString(std::wstring& sDest, unsigned stringID);
 void        lodstr();
@@ -28,12 +28,19 @@ void        okcan();
 void        pntmsg(unsigned msgID);
 void        riter();
 void        ritnum(unsigned code, size_t value);
+void        tabmsg(unsigned code);
 void        savdisc();
-void        sdmsg();
 void        shoMsg(const std::wstring& message);
 void        shord();
 void        shoseln(unsigned code0, unsigned code1);
 void        spltmsg();
-void        tabmsg(unsigned code);
 void        tomsg();
 void        tsizmsg(const wchar_t* threadSizeText, double threadSize);
+}
+
+namespace displayTextPriv {
+
+void bxtxt(unsigned iButton, unsigned iMessage);
+void hlpflt(unsigned iButton, unsigned iMessage, float data);
+void sdmsg();
+}

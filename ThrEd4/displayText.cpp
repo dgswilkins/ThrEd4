@@ -53,7 +53,7 @@ unsigned short LoadStringList[] = {
 	IDS_UND,      IDS_ULEN,      IDS_FUANG,  IDS_FUSPAC,  IDS_CWLK,    IDS_UNDCOL,  IDS_FRMBOX,  IDS_TXOF,
 };
 
-inline void loadString(std::wstring& sDest, unsigned stringID) {
+inline void displayText::loadString(std::wstring& sDest, unsigned stringID) {
 	wchar_t* pBuf = nullptr;
 	sDest.clear();
 	[[gsl::suppress(26490)]] {
@@ -64,7 +64,7 @@ inline void loadString(std::wstring& sDest, unsigned stringID) {
 	}
 }
 
-void shoMsg(const std::wstring& message) {
+void displayText::shoMsg(const std::wstring& message) {
 	if (message.size()) {
 		std::vector<std::wstring> strings;
 
@@ -108,26 +108,26 @@ void shoMsg(const std::wstring& message) {
 	}
 }
 
-void tabmsg(unsigned code) {
+void displayText::tabmsg(unsigned code) {
 	std::wstring message;
-	loadString(message, code);
-	shoMsg(message);
+	displayText::loadString(message, code);
+	displayText::shoMsg(message);
 }
 
-void lodstr() {
+void displayText::lodstr() {
 	for (auto iString = 0; iString < STR_LEN; iString++) {
-		loadString((*StringTable)[iString], LoadStringList[iString]);
+		displayText::loadString((*StringTable)[iString], LoadStringList[iString]);
 	}
 }
 
-void hsizmsg() {
+void displayText::hsizmsg() {
 	std::wstring fmtStr;
 
-	loadString(fmtStr, IDS_HSIZ);
-	shoMsg(fmt::format(fmtStr, (UnzoomedRect.x / PFGRAN), (UnzoomedRect.y / PFGRAN)));
+	displayText::loadString(fmtStr, IDS_HSIZ);
+	displayText::shoMsg(fmt::format(fmtStr, (UnzoomedRect.x / PFGRAN), (UnzoomedRect.y / PFGRAN)));
 }
 
-void numWnd() noexcept {
+void displayText::numWnd() noexcept {
 	RECT messageRect;
 
 	GetClientRect(MsgWindow, &messageRect);
@@ -146,46 +146,46 @@ void numWnd() noexcept {
 	*MsgBuffer            = 0;
 }
 
-void msgflt(unsigned messageId, float value) {
+void displayText::msgflt(unsigned messageId, float value) {
 	std::wstring fmtStr;
 
-	loadString(fmtStr, messageId);
-	shoMsg(fmt::format(fmtStr, value));
+	displayText::loadString(fmtStr, messageId);
+	displayText::shoMsg(fmt::format(fmtStr, value));
 	StateMap.set(StateFlag::NUMIN);
-	numWnd();
+	displayText::numWnd();
 }
 
-void tsizmsg(const wchar_t* threadSizeText, double threadSize) {
+void displayText::tsizmsg(const wchar_t* threadSizeText, double threadSize) {
 	std::wstring fmtStr;
 
-	loadString(fmtStr, IDS_SIZ);
-	shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
+	displayText::loadString(fmtStr, IDS_SIZ);
+	displayText::shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
 	StateMap.set(StateFlag::NUMIN);
-	numWnd();
+	displayText::numWnd();
 }
 
-void bfilmsg() {
+void displayText::bfilmsg() {
 	std::wstring fmtStr;
 
-	loadString(fmtStr, IDS_BADFIL);
-	shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
+	displayText::loadString(fmtStr, IDS_BADFIL);
+	displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
 }
 
-void filnopn(unsigned code, const fs::path& fileName) {
+void displayText::filnopn(unsigned code, const fs::path& fileName) {
 	std::wstring fmtStr;
 
-	loadString(fmtStr, code);
-	shoMsg(fmt::format(fmtStr, fileName.wstring()));
+	displayText::loadString(fmtStr, code);
+	displayText::shoMsg(fmt::format(fmtStr, fileName.wstring()));
 }
 
-void crmsg(const fs::path& fileName) {
+void displayText::crmsg(const fs::path& fileName) {
 	std::wstring fmtStr;
 
-	loadString(fmtStr, IDS_CREAT);
-	shoMsg(fmt::format(fmtStr, fileName.wstring()));
+	displayText::loadString(fmtStr, IDS_CREAT);
+	displayText::shoMsg(fmt::format(fmtStr, fileName.wstring()));
 }
 
-void butxt(unsigned iButton, const std::wstring& buttonText) {
+void displayText::butxt(unsigned iButton, const std::wstring& buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
 		if (iButton == 5) {
 			if (StateMap.test(StateFlag::HIDMAP))
@@ -200,118 +200,118 @@ void butxt(unsigned iButton, const std::wstring& buttonText) {
 		SetWindowText((*ButtonWin)[iButton], buttonText.c_str());
 }
 
-void clrhbut(unsigned startButton) {
+void displayText::clrhbut(unsigned startButton) {
 	unsigned iButton;
 
 	for (iButton = startButton; iButton < 9; iButton++)
 		SetWindowText((*ButtonWin)[iButton], L"");
 }
 
-void ritnum(unsigned code, size_t value) {
-	butxt(HNUM, fmt::format((*StringTable)[code], value));
+void displayText::ritnum(unsigned code, size_t value) {
+	displayText::butxt(HNUM, fmt::format((*StringTable)[code], value));
 }
 
-void msgstr(unsigned code) noexcept {
+void displayText::msgstr(unsigned code) noexcept {
 	LoadString(ThrEdInstance, code, MsgBuffer, MSGSIZ);
 }
 
-void riter() {
-	tabmsg(IDS_RITER);
+void displayText::riter() {
+	displayText::tabmsg(IDS_RITER);
 }
 
-void pntmsg(unsigned msgID) {
+void displayText::pntmsg(unsigned msgID) {
 	std::wstring fmtStr, message;
 
-	loadString(fmtStr, IDS_PNT);
-	loadString(message, msgID);
-	shoMsg(fmt::format(fmtStr, message));
+	displayText::loadString(fmtStr, IDS_PNT);
+	displayText::loadString(message, msgID);
+	displayText::shoMsg(fmt::format(fmtStr, message));
 }
 
-void shoseln(unsigned code0, unsigned code1) {
+void displayText::shoseln(unsigned code0, unsigned code1) {
 	std::wstring fmtStr, msg0, msg1;
 
-	loadString(fmtStr, IDS_SHOSEL);
-	loadString(msg0, code0);
-	loadString(msg1, code1);
-	shoMsg(fmt::format(fmtStr, msg0, msg1));
+	displayText::loadString(fmtStr, IDS_SHOSEL);
+	displayText::loadString(msg0, code0);
+	displayText::loadString(msg1, code1);
+	displayText::shoMsg(fmt::format(fmtStr, msg0, msg1));
 }
 
-bool clpmsgs(unsigned code) {
+bool displayText::clpmsgs(unsigned code) {
 	ispcdclp();
 	if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap.test(StateFlag::WASPCDCLP)) {
-		tabmsg(IDS_CLPS);
+		displayText::tabmsg(IDS_CLPS);
 		return 1;
 	}
 	return 0;
 }
 
-void frm1pnt() {
+void displayText::frm1pnt() {
 	if (FormIndex == 1) {
 		StateMap.set(StateFlag::FORMSEL);
 		ClosestFormToCursor = 0;
 	}
 }
 
-bool filmsgs(unsigned code) {
+bool displayText::filmsgs(unsigned code) {
 	if (SelectedFormList->size())
-		return clpmsgs(code);
+		return displayText::clpmsgs(code);
 	if (FormIndex) {
-		frm1pnt();
+		displayText::frm1pnt();
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			SelectedForm = &FormList[ClosestFormToCursor];
 			if (SelectedForm->vertexCount == 2) {
 				if (code < FML_LIN) {
-					tabmsg(IDS_FRM3X);
+					displayText::tabmsg(IDS_FRM3X);
 					return 1;
 				}
 				else {
 					if (code == FML_PRPS) {
-						tabmsg(IDS_ANGS);
+						displayText::tabmsg(IDS_ANGS);
 						return 1;
 					}
 				}
 			}
-			return clpmsgs(code);
+			return displayText::clpmsgs(code);
 		}
 		else {
-			tabmsg(IDS_FILSEL);
+			displayText::tabmsg(IDS_FILSEL);
 			return 1;
 		}
 	}
 	else {
-		tabmsg(IDS_FILCR);
+		displayText::tabmsg(IDS_FILCR);
 		return 1;
 	}
 }
 
-void grpmsg() {
-	shoseln(IDS_FGRPS, IDS_UNGRP);
+void displayText::grpmsg() {
+	displayText::shoseln(IDS_FGRPS, IDS_UNGRP);
 }
 
-void grpmsg1() {
-	tabmsg(IDS_NOGRP);
+void displayText::grpmsg1() {
+	displayText::tabmsg(IDS_NOGRP);
 }
 
-void sdmsg() {
+void displayTextPriv::sdmsg() {
 	std::wstring fmtStr;
 
-	loadString(fmtStr, IDS_SAVDISC);
-	shoMsg(fmt::format(fmtStr, ThrName->wstring()));
+	displayText::loadString(fmtStr, IDS_SAVDISC);
+	displayText::shoMsg(fmt::format(fmtStr, ThrName->wstring()));
 }
 
-void alrotmsg() {
-	shoseln(IDS_ALLX, IDS_ROTAGIN);
+void displayText::alrotmsg() {
+	displayText::shoseln(IDS_ALLX, IDS_ROTAGIN);
 }
 
-void shord() {
-	shoseln(IDS_FGRPF, IDS_ROTDUP);
+void displayText::shord() {
+	displayText::shoseln(IDS_FGRPF, IDS_ROTDUP);
 }
 
-void spltmsg() {
-	shoseln(IDS_FRMGUID, IDS_SPLT);
+void displayText::spltmsg() {
+	displayText::shoseln(IDS_FRMGUID, IDS_SPLT);
 }
 
-void datmsg(unsigned code) {
+void displayText::datmsg(unsigned code) {
 	unsigned     dataErrorID = 0;
 	std::wstring dataError;
 
@@ -327,11 +327,11 @@ void datmsg(unsigned code) {
 	default:
 		dataErrorID = IDS_BADUKN;
 	}
-	loadString(dataError, dataErrorID);
-	shoMsg(dataError);
+	displayText::loadString(dataError, dataErrorID);
+	displayText::shoMsg(dataError);
 }
 
-void okcan() {
+void displayText::okcan() {
 	GetClientRect(MsgWindow, &MsgRect);
 
 	OKButton = CreateWindow(L"STATIC",
@@ -359,10 +359,10 @@ void okcan() {
 	                            NULL);
 }
 
-void savdisc() {
+void displayText::savdisc() {
 	wchar_t buffer[HBUFSIZ];
 
-	sdmsg();
+	displayTextPriv::sdmsg();
 	StateMap.reset(StateFlag::BIGBOX);
 
 	GetClientRect(MsgWindow, &MsgRect);
@@ -406,7 +406,7 @@ void savdisc() {
 	                            NULL);
 }
 
-void tomsg() {
+void displayText::tomsg() {
 	RECT OKrect;
 	SIZE textSize;
 
@@ -425,26 +425,26 @@ void tomsg() {
 	                                    NULL);
 }
 
-void bxtxt(unsigned iButton, unsigned iMessage) {
+void displayTextPriv::bxtxt(unsigned iButton, unsigned iMessage) {
 	std::wstring message;
-	loadString(message, iMessage);
+	displayText::loadString(message, iMessage);
 	SetWindowText((*ButtonWin)[iButton], message.c_str());
 }
 
-void hlpflt(unsigned iButton, unsigned iMessage, float data) {
+void displayTextPriv::hlpflt(unsigned iButton, unsigned iMessage, float data) {
 	std::wstring fmtStr;
-	loadString(fmtStr, iMessage);
+	displayText::loadString(fmtStr, iMessage);
 	SetWindowText((*ButtonWin)[iButton], fmt::format(fmtStr, data).c_str());
 }
 
-void drwtxbut(const TXTSCR& textureScreen) {
-	bxtxt(HTXCLR, IDS_CLEAR);
-	hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight / PFGRAN);
+void displayText::drwtxbut(const TXTSCR& textureScreen) {
+	displayTextPriv::bxtxt(HTXCLR, IDS_CLEAR);
+	displayTextPriv::hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight / PFGRAN);
 	redraw((*ButtonWin)[HTXWID]);
-	hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing / PFGRAN);
-	bxtxt(HTXVRT, IDS_TXVRT);
-	bxtxt(HTXHOR, IDS_TXHOR);
-	bxtxt(HTXANG, IDS_TXANG);
-	bxtxt(HTXMIR, IDS_TXMIR);
+	displayTextPriv::hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing / PFGRAN);
+	displayTextPriv::bxtxt(HTXVRT, IDS_TXVRT);
+	displayTextPriv::bxtxt(HTXHOR, IDS_TXHOR);
+	displayTextPriv::bxtxt(HTXANG, IDS_TXANG);
+	displayTextPriv::bxtxt(HTXMIR, IDS_TXMIR);
 	SetWindowText((*ButtonWin)[HTXMIR + 1], L"");
 }
