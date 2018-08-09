@@ -271,7 +271,7 @@ void refrmfn() {
 		labelWindow[LMAXFIL] = txtwin(stringTable[STR_TXT20], LabelWindowCoords);
 		valueWindow[LMAXFIL] = numwin(fmt::format(L"{:.2f}", (SelectedForm->maxFillStitchLen / PFGRAN)), ValueWindowCoords);
 		nxtlin();
-		if (!isclp(ClosestFormToCursor) && !istx(ClosestFormToCursor)) {
+		if (!clip::isclp(ClosestFormToCursor) && !istx(ClosestFormToCursor)) {
 			labelWindow[LFRMLEN] = txtwin(stringTable[STR_TXT5], LabelWindowCoords);
 			valueWindow[LFRMLEN]
 			    = numwin(fmt::format(L"{:.2f}", (SelectedForm->lengthOrCount.stitchLength / PFGRAN)), ValueWindowCoords);

@@ -218,7 +218,7 @@ void delmfil() {
 
 	if (istx(ClosestFormToCursor))
 		deltx();
-	delmclp(ClosestFormToCursor);
+	clip::delmclp(ClosestFormToCursor);
 	for (iSource = 0; iSource < PCSHeader.stitchCount; iSource++) {
 		stitchAttribute = StitchBuffer[iSource].attribute;
 		if (!(stitchAttribute & NOTFRM)) {
@@ -241,8 +241,8 @@ void chkcont() {
 	unsigned shortestGuideIndex = 0;
 	size_t   length = 0, minimumLength = 10000;
 
-	delmclp(ClosestFormToCursor);
-	deleclp(ClosestFormToCursor);
+	clip::delmclp(ClosestFormToCursor);
+	clip::deleclp(ClosestFormToCursor);
 	fsizpar();
 	if (SelectedForm->fillType != CONTF) {
 		if (CurrentFormGuidesCount) {
@@ -1285,7 +1285,7 @@ void chkseq(bool border) noexcept {
 		if (!SelectedForm->maxFillStitchLen)
 			SelectedForm->maxFillStitchLen = IniFile.maxStitchLength;
 		MaxStitchLen = SelectedForm->maxFillStitchLen;
-		if (isclp(ClosestFormToCursor))
+		if (clip::isclp(ClosestFormToCursor))
 			UserStitchLen = MaxStitchLen;
 		else
 			UserStitchLen = SelectedForm->lengthOrCount.stitchLength;
@@ -2222,12 +2222,12 @@ void chkbrd(unsigned& interleaveSequenceIndex2) {
 			bold(SelectedForm->edgeStitchLen);
 			break;
 		case EDGECLIP: // Clipboard
-			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
-			clpbrd(getlast());
+			clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
+			clip::clpbrd(getlast());
 			break;
 		case EDGECLIPX: // Even Clipboard
-			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
-			duxclp();
+			clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
+			clip::duxclp();
 			break;
 		case EDGEANGSAT: // Angle Satin
 			HorizontalLength2 = SelectedForm->borderSize;
@@ -2253,19 +2253,19 @@ void chkbrd(unsigned& interleaveSequenceIndex2) {
 			ButtonholeCornerLength = length;
 			break;
 		case EDGEPICOT: // Picot
-			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
-			clpic();
+			clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
+			clip::clpic();
 			break;
 		case EDGEDOUBLE: // Double
 			dubfn();
 			break;
 		case EDGELCHAIN: // Lin Chain
 			StateMap.set(StateFlag::LINCHN);
-			chnfn();
+			clip::chnfn();
 			break;
 		case EDGEOCHAIN: // Open Chain
 			StateMap.reset(StateFlag::LINCHN);
-			chnfn();
+			clip::chnfn();
 			break;
 		}
 		ritbrd(interleaveSequenceIndex2);
@@ -4714,7 +4714,7 @@ void refilfn() {
 	savdo();
 	fdelstch(fillStartsData, fillStartsMap);
 	StateMap.set(StateFlag::WASREFIL);
-	if (SelectedForm->fillSpacing < 0.5 && !isclp(ClosestFormToCursor))
+	if (SelectedForm->fillSpacing < 0.5 && !clip::isclp(ClosestFormToCursor))
 		SelectedForm->fillSpacing = 0.5;
 	if (SelectedForm->edgeSpacing < 0.5)
 		SelectedForm->edgeSpacing = 0.5;
@@ -4740,10 +4740,10 @@ void refilfn() {
 			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGECLIP:
-			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
-			clpout();
+			clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
+			clip::clpout();
 			SequenceIndex = 0;
-			clpbrd(0);
+			clip::clpbrd(0);
 			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGEANGSAT:
@@ -4775,11 +4775,11 @@ void refilfn() {
 			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGEPICOT:
-			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
+			clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
 			SequenceIndex          = 0;
 			length                 = ButtonholeCornerLength;
 			ButtonholeCornerLength = getplen();
-			clpic();
+			clip::clpic();
 			ButtonholeCornerLength = length;
 			ritbrd(interleaveSequenceIndex2);
 			break;
@@ -4789,17 +4789,17 @@ void refilfn() {
 			break;
 		case EDGELCHAIN:
 			StateMap.set(StateFlag::LINCHN);
-			chnfn();
+			clip::chnfn();
 			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGEOCHAIN:
 			StateMap.reset(StateFlag::LINCHN);
-			chnfn();
+			clip::chnfn();
 			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGECLIPX:
-			oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
-			duxclp();
+			clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
+			clip::duxclp();
 			ritbrd(interleaveSequenceIndex2);
 			break;
 		}
@@ -4835,18 +4835,18 @@ void refilfn() {
 				WorkingFormVertices = AngledForm.vertices;
 				break;
 			case VCLPF:
-				oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
+				clip::oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 				fvars(ClosestFormToCursor);
 				clpcon(textureSegments);
 				doFill = false;
 				break;
 			case HCLPF:
-				oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
+				clip::oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 				horclpfn(textureSegments);
 				doFill = false;
 				break;
 			case ANGCLPF:
-				oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
+				clip::oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 				StateMap.reset(StateFlag::ISUND);
 				angclpfn(textureSegments);
 				doFill = false;
@@ -4896,7 +4896,7 @@ void refilfn() {
 			ritfil(interleaveSequenceIndex2);
 			break;
 		case CLPF:
-			oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
+			clip::oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 			fmclp();
 			ritfil(interleaveSequenceIndex2);
 			break;
@@ -4963,7 +4963,7 @@ void makpoli() noexcept {
 }
 
 void fsvrt() {
-	delmclp(ClosestFormToCursor);
+	clip::delmclp(ClosestFormToCursor);
 	deltx();
 	makpoli();
 	SelectedForm->fillType  = VRTF;
@@ -5003,7 +5003,7 @@ void filvrt() {
 }
 
 void fshor() {
-	delmclp(ClosestFormToCursor);
+	clip::delmclp(ClosestFormToCursor);
 	deltx();
 	makpoli();
 	SelectedForm->fillType  = HORF;
@@ -5041,7 +5041,7 @@ void filhor() {
 }
 
 void fsangl() {
-	delmclp(ClosestFormToCursor);
+	clip::delmclp(ClosestFormToCursor);
 	deltx();
 	makpoli();
 	SelectedForm->fillType              = ANGF;
@@ -5271,7 +5271,7 @@ void rotfrm(size_t newStartVertex) {
 }
 
 void filsfn() {
-	delmclp(ClosestFormToCursor);
+	clip::delmclp(ClosestFormToCursor);
 	deltx();
 	SelectedForm->type = SAT;
 	fsizpar();
@@ -5459,7 +5459,7 @@ void unfil() {
 		for (auto selectedForm : (*SelectedFormList)) {
 			SelectedForm = &FormList[selectedForm];
 			if (SelectedForm->fillType || SelectedForm->edgeType) {
-				delclps(selectedForm);
+				clip::delclps(selectedForm);
 				deltx();
 				formMap.set(selectedForm);
 				SelectedForm->fillType = 0;
@@ -5500,7 +5500,7 @@ void unfil() {
 					StitchBuffer[iDestination++] = StitchBuffer[iSource];
 				}
 			}
-			delclps(ClosestFormToCursor);
+			clip::delclps(ClosestFormToCursor);
 			deltx();
 			SelectedForm->fillType = 0;
 			SelectedForm->edgeType = 0;
@@ -5591,7 +5591,7 @@ void bsizpar() noexcept {
 
 void sbord() {
 	fvars(ClosestFormToCursor);
-	deleclp(ClosestFormToCursor);
+	clip::deleclp(ClosestFormToCursor);
 	SelectedForm->edgeType = EDGELINE;
 	bsizpar();
 	refilfn();
@@ -5625,10 +5625,10 @@ void bord() {
 void fsclp() {
 	unsigned iStitch = 0;
 
-	deleclp(ClosestFormToCursor);
+	clip::deleclp(ClosestFormToCursor);
 	SelectedForm->edgeType       = EDGECLIP;
 	SelectedForm->clipEntries    = ClipStitchCount;
-	SelectedForm->borderClipData = nueclp(ClosestFormToCursor, ClipStitchCount);
+	SelectedForm->borderClipData = clip::nueclp(ClosestFormToCursor, ClipStitchCount);
 	SelectedForm->borderSize     = ClipRectSize.cy;
 	SelectedForm->edgeSpacing    = ClipRectSize.cx;
 	SelectedForm->borderColor    = ActiveColor;
@@ -5637,7 +5637,7 @@ void fsclp() {
 		SelectedForm->borderClipData[iStitch] = ClipBuffer[iStitch];
 	}
 	HorizontalLength2 = ClipRectSize.cy / 2;
-	clpout();
+	clip::clpout();
 	refilfn();
 }
 
@@ -5682,7 +5682,7 @@ void fclp() {
 
 void sapliq() {
 	fvars(ClosestFormToCursor);
-	deleclp(ClosestFormToCursor);
+	clip::deleclp(ClosestFormToCursor);
 	SelectedForm->edgeType = EDGEAPPL;
 	if (UserFlagMap.test(UserFlag::DUND))
 		SelectedForm->edgeType |= EGUND;
@@ -6238,7 +6238,7 @@ void nulapcol(unsigned color) {
 
 void sbold() {
 	fvars(ClosestFormToCursor);
-	deleclp(ClosestFormToCursor);
+	clip::deleclp(ClosestFormToCursor);
 	SelectedForm->edgeType    = EDGEBEAN;
 	SelectedForm->borderColor = ActiveColor;
 	refilfn();
@@ -6657,7 +6657,7 @@ void fliph() {
 
 void prpsbrd() {
 	if (SelectedForm->vertexCount > 2) {
-		deleclp(ClosestFormToCursor);
+		clip::deleclp(ClosestFormToCursor);
 		SelectedForm->edgeType = EDGEPROPSAT;
 		if (UserFlagMap.test(UserFlag::DUND))
 			SelectedForm->edgeType |= EGUND;
@@ -6814,7 +6814,7 @@ void filsclp() {
 		SelectedForm->wordParam = 0;
 	SelectedForm->type                    = SAT;
 	SelectedForm->fillType                = CLPF;
-	SelectedForm->angleOrClipData.clip    = numclp();
+	SelectedForm->angleOrClipData.clip    = clip::numclp();
 	SelectedForm->lengthOrCount.clipCount = ClipStitchCount;
 	for (iClip = 0; iClip < ClipStitchCount; iClip++) {
 		SelectedForm->angleOrClipData.clip[iClip] = ClipBuffer[iClip];
@@ -7114,13 +7114,13 @@ void adfrm(size_t iForm) {
 		          SelectedForm->satinOrAngle.guide + SelectedForm->satinGuideCount,
 		          stdext::make_checked_array_iterator(formHeader->satinOrAngle.guide, SelectedForm->satinGuideCount));
 	}
-	if (iseclpx(FormIndex)) {
+	if (clip::iseclpx(FormIndex)) {
 		formHeader->borderClipData = adclp(formHeader->clipEntries);
 		std::copy(SelectedForm->borderClipData,
 		          SelectedForm->borderClipData + SelectedForm->clipEntries,
 		          stdext::make_checked_array_iterator(formHeader->borderClipData, formHeader->clipEntries));
 	}
-	if (isclpx(FormIndex)) {
+	if (clip::isclpx(FormIndex)) {
 		formHeader->angleOrClipData.clip = adclp(formHeader->lengthOrCount.clipCount);
 		std::copy(SelectedForm->angleOrClipData.clip,
 		          SelectedForm->angleOrClipData.clip + SelectedForm->lengthOrCount.clipCount,
@@ -7484,7 +7484,7 @@ bool frmrng(size_t iForm, RANGE& range) noexcept {
 }
 
 void bholbrd() {
-	deleclp(ClosestFormToCursor);
+	clip::deleclp(ClosestFormToCursor);
 	SelectedForm->borderSize = BorderWidth;
 	bsizpar();
 	SelectedForm->edgeType    = EDGEBHOL;
@@ -7579,10 +7579,10 @@ void boxsel() {
 void fspic() {
 	unsigned iStitch = 0;
 
-	deleclp(ClosestFormToCursor);
+	clip::deleclp(ClosestFormToCursor);
 	SelectedForm->edgeType       = EDGEPICOT;
 	SelectedForm->clipEntries    = ClipStitchCount;
-	SelectedForm->borderClipData = nueclp(ClosestFormToCursor, ClipStitchCount);
+	SelectedForm->borderClipData = clip::nueclp(ClosestFormToCursor, ClipStitchCount);
 	SelectedForm->borderSize     = ClipRectSize.cy;
 	SelectedForm->edgeSpacing    = PicotSpacing;
 	SelectedForm->borderColor    = ActiveColor;
@@ -7639,7 +7639,7 @@ bool contsf(size_t formIndex) {
 	ClosestFormToCursor = formIndex;
 	fvars(formIndex);
 	if (SelectedForm->vertexCount > 4) {
-		delclps(ClosestFormToCursor);
+		clip::delclps(ClosestFormToCursor);
 		deltx();
 		chkcont();
 		SelectedForm->fillSpacing = LineSpacing;
@@ -7714,7 +7714,7 @@ void shrnks() {
 	dPOINT   delta  = {};
 	double   length = 0.0, ratio = 0.0, deltaLength = 0.0, truncationDelta = 0.0;
 
-	oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
+	clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		delta.x                            = CurrentFormVertices[iVertex + 1].x - CurrentFormVertices[iVertex].x;
 		delta.y                            = CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y;
@@ -7776,7 +7776,7 @@ void dufdat(std::vector<fPOINT>& tempClipPoints,
 		destination.satinOrAngle.guide = &SatinGuides[SatinGuideIndex];
 		SatinGuideIndex += destination.satinGuideCount;
 	}
-	if (iseclpx(formIndex)) {
+	if (clip::iseclpx(formIndex)) {
 		const auto _ = std::copy(destination.borderClipData,
 		                         destination.borderClipData + destination.clipEntries,
 		                         tempClipPoints.begin() + ClipPointIndex);
@@ -7784,7 +7784,7 @@ void dufdat(std::vector<fPOINT>& tempClipPoints,
 		destination.borderClipData = &ClipPoints[ClipPointIndex];
 		ClipPointIndex += destination.clipEntries;
 	}
-	if (isclpx(formIndex)) {
+	if (clip::isclpx(formIndex)) {
 		const auto _ = std::copy(destination.angleOrClipData.clip,
 		                         destination.angleOrClipData.clip + destination.lengthOrCount.clipCount,
 		                         tempClipPoints.begin() + ClipPointIndex);
@@ -8199,7 +8199,7 @@ bool spltlin() {
 	FormList[ClosestFormToCursor + 1].vertices = &SelectedForm->vertices[ClosestVertexToCursor];
 	frmout(ClosestFormToCursor);
 	frmout(ClosestFormToCursor + 1);
-	if (iseclp(ClosestFormToCursor)) {
+	if (clip::iseclp(ClosestFormToCursor)) {
 		clpspac(SelectedForm->borderClipData, SelectedForm->clipEntries);
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 			FormList[iForm].borderClipData += SelectedForm->clipEntries;
@@ -8289,10 +8289,10 @@ void vrtsclp() {
 	unsigned iStitch = 0;
 
 	fvars(ClosestFormToCursor);
-	delmclp(ClosestFormToCursor);
+	clip::delmclp(ClosestFormToCursor);
 	deltx();
 	SelectedForm->lengthOrCount.clipCount = ClipStitchCount;
-	SelectedForm->angleOrClipData.clip    = numclp();
+	SelectedForm->angleOrClipData.clip    = clip::numclp();
 	SelectedForm->wordParam               = IniFile.fillPhase;
 	makpoli();
 	SelectedForm->fillSpacing = IniFile.clipOffset;
@@ -8351,10 +8351,10 @@ void horsclp() {
 	unsigned iStitch = 0;
 
 	fvars(ClosestFormToCursor);
-	delmclp(ClosestFormToCursor);
+	clip::delmclp(ClosestFormToCursor);
 	deltx();
 	SelectedForm->lengthOrCount.clipCount = ClipStitchCount;
-	SelectedForm->angleOrClipData.clip    = numclp();
+	SelectedForm->angleOrClipData.clip    = clip::numclp();
 	SelectedForm->lengthOrCount.clipCount = ClipStitchCount;
 	SelectedForm->wordParam               = IniFile.fillPhase;
 	makpoli();
@@ -8415,9 +8415,9 @@ void angsclp() {
 	unsigned iStitch = 0;
 
 	fvars(ClosestFormToCursor);
-	delmclp(ClosestFormToCursor);
+	clip::delmclp(ClosestFormToCursor);
 	deltx();
-	SelectedForm->angleOrClipData.clip    = numclp();
+	SelectedForm->angleOrClipData.clip    = clip::numclp();
 	SelectedForm->lengthOrCount.clipCount = ClipStitchCount;
 	SelectedForm->wordParam               = IniFile.fillPhase;
 	makpoli();
@@ -8476,7 +8476,7 @@ void angclp() {
 
 void dubsfil() {
 	fvars(ClosestFormToCursor);
-	deleclp(ClosestFormToCursor);
+	clip::deleclp(ClosestFormToCursor);
 	SelectedForm->edgeType    = EDGEDOUBLE;
 	SequenceIndex             = 0;
 	SelectedForm->borderColor = ActiveColor;
@@ -8669,10 +8669,10 @@ void crop() {
 void fsclpx() {
 	unsigned iPoint = 0;
 
-	deleclp(ClosestFormToCursor);
+	clip::deleclp(ClosestFormToCursor);
 	SelectedForm->edgeType       = EDGECLIPX;
 	SelectedForm->clipEntries    = ClipStitchCount;
-	SelectedForm->borderClipData = nueclp(ClosestFormToCursor, ClipStitchCount);
+	SelectedForm->borderClipData = clip::nueclp(ClosestFormToCursor, ClipStitchCount);
 	SelectedForm->borderSize     = ClipRectSize.cy;
 	SelectedForm->edgeSpacing    = ClipRectSize.cx;
 	SelectedForm->borderColor    = ActiveColor;
@@ -8681,7 +8681,7 @@ void fsclpx() {
 		SelectedForm->borderClipData[iPoint].x = ClipBuffer[iPoint].x;
 		SelectedForm->borderClipData[iPoint].y = ClipBuffer[iPoint].y;
 	}
-	duxclp();
+	clip::duxclp();
 	refilfn();
 }
 

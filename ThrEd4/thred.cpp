@@ -963,7 +963,7 @@ void getdes() noexcept {
 }
 
 bool isfclp() noexcept {
-	if (isclp(ClosestFormToCursor) && FormList[ClosestFormToCursor].fillType != CLPF)
+	if (clip::isclp(ClosestFormToCursor) && FormList[ClosestFormToCursor].fillType != CLPF)
 		return 1;
 	return 0;
 }
@@ -3150,11 +3150,10 @@ void stch2pxr(const fPOINT& stitchCoordinate) noexcept {
 	StitchCoordinatesPixels.y = StitchWindowClientRect.bottom - (stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y + 0.5;
 }
 
-void getDocsFolder(fs::path* directory)
-{
+void getDocsFolder(fs::path* directory) {
 	if (directory) {
-		PWSTR ppszPath = nullptr; // variable to receive the path memory block pointer.
-		const HRESULT hr = SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &ppszPath);
+		PWSTR         ppszPath = nullptr; // variable to receive the path memory block pointer.
+		const HRESULT hr       = SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &ppszPath);
 
 		if (SUCCEEDED(hr)) {
 			directory->assign(ppszPath); // make a local copy of the path
@@ -3510,9 +3509,9 @@ void dubuf(char* const buffer, unsigned& count) {
 			vertexCount += FormList[iForm].vertexCount;
 			if (FormList[iForm].type == SAT)
 				guideCount += FormList[iForm].satinGuideCount;
-			if (isclp(iForm))
+			if (clip::isclp(iForm))
 				clipDataCount += FormList[iForm].lengthOrCount.clipCount;
-			if (iseclp(iForm))
+			if (clip::iseclp(iForm))
 				clipDataCount += FormList[iForm].clipEntries;
 		}
 	}
@@ -3574,12 +3573,12 @@ void dubuf(char* const buffer, unsigned& count) {
 					guides.push_back(FormList[iForm].satinOrAngle.guide[iGuide]);
 				}
 			}
-			if (isclp(iForm)) {
+			if (clip::isclp(iForm)) {
 				for (iClip = 0; iClip < FormList[iForm].lengthOrCount.clipCount; iClip++) {
 					points.push_back(FormList[iForm].angleOrClipData.clip[iClip]);
 				}
 			}
-			if (iseclpx(iForm)) {
+			if (clip::iseclpx(iForm)) {
 				for (iClip = 0; iClip < FormList[iForm].clipEntries; iClip++) {
 					points.push_back(FormList[iForm].borderClipData[iClip]);
 				}
@@ -5469,9 +5468,9 @@ void nuFil() {
 								if (FormList[iForm].satinGuideCount)
 									FormList[iForm].satinOrAngle.guide = adsatk(FormList[iForm].satinGuideCount);
 							}
-							if (isclp(iForm))
+							if (clip::isclp(iForm))
 								FormList[iForm].angleOrClipData.clip = adclp(FormList[iForm].lengthOrCount.clipCount);
-							if (iseclpx(iForm))
+							if (clip::iseclpx(iForm))
 								FormList[iForm].borderClipData = adclp(FormList[iForm].clipEntries);
 						}
 						setfchk();
@@ -5759,8 +5758,8 @@ unsigned px2stch() noexcept {
 }
 
 void zumin() {
-	dPOINT      newSize           = {};
-	fRECTANGLE  groupBoundingRect = {};
+	dPOINT     newSize           = {};
+	fRECTANGLE groupBoundingRect = {};
 
 	if (!StateMap.testAndReset(StateFlag::ZUMACT))
 		ZoomFactor *= ZUMFCT;
@@ -5775,9 +5774,9 @@ void zumin() {
 				break;
 			}
 			if (StateMap.test(StateFlag::FORMSEL)) {
-				const auto& boundingRect    = FormList[ClosestFormToCursor].rectangle;
-				SelectedPoint.x = ((boundingRect.right - boundingRect.left) / 2) + boundingRect.left;
-				SelectedPoint.y = ((boundingRect.top - boundingRect.bottom) / 2) + boundingRect.bottom;
+				const auto& boundingRect = FormList[ClosestFormToCursor].rectangle;
+				SelectedPoint.x          = ((boundingRect.right - boundingRect.left) / 2) + boundingRect.left;
+				SelectedPoint.y          = ((boundingRect.top - boundingRect.bottom) / 2) + boundingRect.bottom;
 				break;
 			}
 			if (StateMap.test(StateFlag::FRMPSEL)) {
@@ -5871,8 +5870,8 @@ void zumshft() {
 }
 
 void zumout() {
-	POINT       newSize           = {};
-	fRECTANGLE  groupBoundingRect = {};
+	POINT      newSize           = {};
+	fRECTANGLE groupBoundingRect = {};
 
 	unboxs();
 	if (StateMap.test(StateFlag::ZUMED)) {
@@ -5882,9 +5881,9 @@ void zumout() {
 				break;
 			}
 			if (StateMap.test(StateFlag::FORMSEL)) {
-				const auto& boundingRect    = FormList[ClosestFormToCursor].rectangle;
-				SelectedPoint.x = ((boundingRect.right - boundingRect.left) / 2) + boundingRect.left;
-				SelectedPoint.y = ((boundingRect.top - boundingRect.bottom) / 2) + boundingRect.bottom;
+				const auto& boundingRect = FormList[ClosestFormToCursor].rectangle;
+				SelectedPoint.x          = ((boundingRect.right - boundingRect.left) / 2) + boundingRect.left;
+				SelectedPoint.y          = ((boundingRect.top - boundingRect.bottom) / 2) + boundingRect.bottom;
 				break;
 			}
 			if (StateMap.test(StateFlag::FRMPSEL)) {
@@ -6592,9 +6591,9 @@ void clpbox() {
 }
 
 void lodclp(unsigned iStitch) {
-	const fPOINT   adjustment  = { (ClipOrigin.x - ClipRect.left), (ClipOrigin.y - ClipRect.bottom) };
-	unsigned source      = PCSHeader.stitchCount - 1;
-	size_t   destination = PCSHeader.stitchCount + ClipStitchCount - 1;
+	const fPOINT adjustment  = { (ClipOrigin.x - ClipRect.left), (ClipOrigin.y - ClipRect.bottom) };
+	unsigned     source      = PCSHeader.stitchCount - 1;
+	size_t       destination = PCSHeader.stitchCount + ClipStitchCount - 1;
 
 	if (iStitch != PCSHeader.stitchCount)
 		iStitch++;
@@ -6947,9 +6946,9 @@ size_t sizfclp() noexcept {
 	clipSize = sizeof(*ClipFormHeader) + VertexCount * sizeof(FormVertices[0]);
 	if (SelectedForm->type == SAT)
 		clipSize += SelectedForm->satinGuideCount * sizeof(SatinGuides[0]);
-	if (iseclp(ClosestFormToCursor))
+	if (clip::iseclp(ClosestFormToCursor))
 		clipSize += SelectedForm->clipEntries * sizeof(ClipPoints[0]);
-	if (isclpx(ClosestFormToCursor))
+	if (clip::isclpx(ClosestFormToCursor))
 		clipSize += SelectedForm->lengthOrCount.clipCount * sizeof(ClipPoints[0]);
 	if (istx(ClosestFormToCursor))
 		clipSize += SelectedForm->fillInfo.texture.count * sizeof(TexturePointsBuffer[0]);
@@ -6997,9 +6996,9 @@ size_t sizclp(unsigned formFirstStitchIndex) noexcept {
 		length += frmcnt(ClosestFormToCursor, formFirstStitchIndex);
 		FileSize += length * sizeof(StitchBuffer[0]);
 	}
-	if (iseclp(ClosestFormToCursor))
+	if (clip::iseclp(ClosestFormToCursor))
 		FileSize += SelectedForm->clipEntries * sizeof(ClipPoints[0]);
-	if (isclpx(ClosestFormToCursor))
+	if (clip::isclpx(ClosestFormToCursor))
 		FileSize += SelectedForm->lengthOrCount.clipCount * sizeof(ClipPoints[0]);
 	if (istx(ClosestFormToCursor))
 		FileSize += SelectedForm->fillInfo.texture.count * sizeof(TexturePointsBuffer[0]);
@@ -7113,12 +7112,12 @@ void duclip() {
 						pointCount     = 0;
 						for (auto selectedForm : (*SelectedFormList)) {
 							SelectedForm = &FormList[selectedForm];
-							if (isclpx(selectedForm)) {
+							if (clip::isclpx(selectedForm)) {
 								for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
 									points[pointCount++] = SelectedForm->angleOrClipData.clip[iClip];
 								}
 							}
-							if (iseclp(selectedForm)) {
+							if (clip::iseclp(selectedForm)) {
 								for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
 									points[pointCount++] = SelectedForm->borderClipData[iClip];
 								}
@@ -7206,13 +7205,13 @@ void duclip() {
 							}
 							fPOINT* mclp = convert_ptr<fPOINT*>(&guides[iGuide]);
 							iClip        = 0;
-							if (isclpx(ClosestFormToCursor)) {
+							if (clip::isclpx(ClosestFormToCursor)) {
 								for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
 									mclp[iClip] = SelectedForm->angleOrClipData.clip[iClip];
 								}
 							}
 							fPOINT* points = convert_ptr<fPOINT*>(&mclp[iClip]);
-							if (iseclpx(ClosestFormToCursor)) {
+							if (clip::iseclpx(ClosestFormToCursor)) {
 								for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
 									points[iClip] = SelectedForm->borderClipData[iClip];
 								}
@@ -7315,8 +7314,8 @@ void f1del() {
 		}
 		PCSHeader.stitchCount = stitchCount;
 	}
-	deleclp(ClosestFormToCursor);
-	delmclp(ClosestFormToCursor);
+	clip::deleclp(ClosestFormToCursor);
+	clip::delmclp(ClosestFormToCursor);
 	delsac(ClosestFormToCursor);
 	delflt(ClosestFormToCursor);
 	deltx();
@@ -8376,12 +8375,12 @@ void insfil() {
 							if (FormList[iFormList].type == SAT) {
 								if (FormList[iFormList].satinGuideCount)
 									FormList[iFormList].satinOrAngle.guide = adsatk(FormList[iFormList].satinGuideCount);
-								if (isclpx(iFormList))
+								if (clip::isclpx(iFormList))
 									FormList[iFormList].angleOrClipData.clip = adclp(FormList[iFormList].lengthOrCount.clipCount);
 							}
-							if (isclp(iFormList))
+							if (clip::isclp(iFormList))
 								FormList[iFormList].angleOrClipData.clip = adclp(FormList[iFormList].lengthOrCount.clipCount);
-							if (iseclpx(iFormList))
+							if (clip::iseclpx(iFormList))
 								FormList[iFormList].borderClipData = adclp(FormList[iFormList].clipEntries);
 							if (istx(iFormList)) {
 								FormList[iFormList].fillInfo.texture.index += gsl::narrow<unsigned short>(TextureIndex);
@@ -8991,14 +8990,14 @@ void rtrclpfn() {
 
 	if (OpenClipboard(ThrEdWindow)) {
 		fvars(ClosestFormToCursor);
-		if (iseclp(ClosestFormToCursor)) {
+		if (clip::iseclp(ClosestFormToCursor)) {
 			count = SelectedForm->clipEntries;
-			oclp(SelectedForm->borderClipData, count);
+			clip::oclp(SelectedForm->borderClipData, count);
 		}
 		else {
-			if (isclp(ClosestFormToCursor)) {
+			if (clip::isclp(ClosestFormToCursor)) {
 				count = SelectedForm->lengthOrCount.clipCount;
-				oclp(SelectedForm->angleOrClipData.clip, count);
+				clip::oclp(SelectedForm->angleOrClipData.clip, count);
 			}
 		}
 		if (count) {
@@ -10419,7 +10418,7 @@ void tglhid() {
 }
 
 void respac() noexcept {
-	if (isclp(ClosestFormToCursor)) {
+	if (clip::isclp(ClosestFormToCursor)) {
 		SelectedForm->fillSpacing = LineSpacing;
 		fsizpar();
 	}
@@ -12761,8 +12760,8 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			}
 			SelectedForm->borderColor &= COLMSK;
 			if (StateMap.testAndReset(StateFlag::BRDACT)) {
-				if (iseclp(ClosestFormToCursor))
-					deleclp(ClosestFormToCursor);
+				if (clip::iseclp(ClosestFormToCursor))
+					clip::deleclp(ClosestFormToCursor);
 				do {
 					if (Msg.hwnd == SideWindow[0]) {
 						SelectedForm->edgeType = 0;
@@ -14643,13 +14642,13 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 							currentClip = 0;
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 								SelectedForm = &FormList[FormIndex + iForm];
-								if (isclpx(FormIndex + iForm)) {
+								if (clip::isclpx(FormIndex + iForm)) {
 									SelectedForm->angleOrClipData.clip = adclp(SelectedForm->lengthOrCount.clipCount);
 									for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
 										SelectedForm->angleOrClipData.clip[iClip] = clipData[currentClip++];
 									}
 								}
-								if (iseclpx(FormIndex + iForm)) {
+								if (clip::iseclpx(FormIndex + iForm)) {
 									SelectedForm->borderClipData = adclp(SelectedForm->clipEntries);
 									for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
 										SelectedForm->borderClipData[iClip] = clipData[currentClip++];
@@ -14716,7 +14715,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 								}
 								clipData  = convert_ptr<fPOINT*>(&guides[0]);
 								clipCount = 0;
-								if (isclpx(FormIndex)) {
+								if (clip::isclpx(FormIndex)) {
 									SelectedForm->angleOrClipData.clip = adclp(SelectedForm->lengthOrCount.clipCount);
 									std::copy(clipData,
 									          clipData + SelectedForm->lengthOrCount.clipCount,
@@ -14724,7 +14723,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 									                                              SelectedForm->lengthOrCount.clipCount));
 									clipCount += SelectedForm->lengthOrCount.clipCount;
 								}
-								if (iseclpx(FormIndex)) {
+								if (clip::iseclpx(FormIndex)) {
 									clipData                     = convert_ptr<fPOINT*>(&clipData[clipCount]);
 									SelectedForm->borderClipData = adclp(SelectedForm->clipEntries);
 									std::copy(clipData,
@@ -17673,7 +17672,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		Thumbnails = &private_Thumbnails;
 		std::vector<std::unique_ptr<unsigned[]>> private_UndoBuffer(16);
 		UndoBuffer = &private_UndoBuffer;
-		std::vector<TXPNT>    private_TempTexturePoints;
+		std::vector<TXPNT>  private_TempTexturePoints;
 		std::vector<size_t> private_SelectedTexturePointsList;
 		initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
 		std::vector<std::wstring> private_StringTable(STR_LEN);

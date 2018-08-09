@@ -124,9 +124,9 @@ unsigned frmchkfn() {
 					badData.attribute |= BADFLT;
 			}
 			if (!(badData.attribute & BADCLP)) {
-				if (isclp(iForm))
+				if (clip::isclp(iForm))
 					chkclp(formHeader, badData);
-				if (iseclp(iForm))
+				if (clip::iseclp(iForm))
 					chkeclp(formHeader, badData);
 			}
 			if (formHeader->type == SAT && formHeader->satinGuideCount) {
@@ -162,9 +162,9 @@ unsigned frmchkfn() {
 
 void bcup(size_t find, BADCNTS& badData) noexcept {
 	const auto& formHeader = FormList[find];
-	if (isclp(find))
+	if (clip::isclp(find))
 		badData.clip += formHeader.lengthOrCount.clipCount;
-	if (iseclp(find))
+	if (clip::iseclp(find))
 		badData.clip += formHeader.clipEntries;
 	if (formHeader.type == SAT)
 		badData.guideCount += formHeader.satinGuideCount;
@@ -246,7 +246,7 @@ void repclp(std::wstring& repairMessage) {
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		const auto formHeader = &FormList[iForm];
 		size_t clipDifference = 0u;
-		if (isclp(iForm)) {
+		if (clip::isclp(iForm)) {
 			// ToDo - pointer arithmetic to be fixed
 			clipDifference = formHeader->angleOrClipData.clip - ClipPoints;
 			if (clipDifference + formHeader->lengthOrCount.clipCount < ClipPointIndex) {
@@ -277,7 +277,7 @@ void repclp(std::wstring& repairMessage) {
 				}
 			}
 		}
-		if (iseclp(iForm)) {
+		if (clip::iseclp(iForm)) {
 			// ToDo - pointer arithmetic to be fixed
 			clipDifference = formHeader->borderClipData - ClipPoints;
 			if (clipDifference + formHeader->clipEntries < ClipPointIndex) {

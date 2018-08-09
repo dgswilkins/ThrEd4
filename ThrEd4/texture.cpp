@@ -1079,7 +1079,7 @@ enum
 void dutxfn(unsigned textureType) {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		altx();
-		delmclp(ClosestFormToCursor);
+		clip::delmclp(ClosestFormToCursor);
 		delsac(ClosestFormToCursor);
 		deltx();
 		savtxt();

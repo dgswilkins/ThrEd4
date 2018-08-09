@@ -171,7 +171,7 @@ void spltsat(const SATCON& currentGuide) {
 	SelectedForm->satinGuideCount = ActivePointIndex;
 	for (auto iForm = ClosestFormToCursor + 2; iForm < FormIndex; iForm++)
 		FormList[iForm].satinOrAngle.guide--;
-	if (iseclp(ClosestFormToCursor)) {
+	if (clip::iseclp(ClosestFormToCursor)) {
 		clpspac(SelectedForm->borderClipData, SelectedForm->clipEntries);
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 			FormList[iForm].borderClipData += SelectedForm->clipEntries;
@@ -594,7 +594,7 @@ void delspnt() {
 }
 
 void satsbrd() {
-	deleclp(ClosestFormToCursor);
+	clip::deleclp(ClosestFormToCursor);
 	SelectedForm->edgeType = EDGEANGSAT;
 	if (UserFlagMap.test(UserFlag::DUND))
 		SelectedForm->edgeType |= EGUND;

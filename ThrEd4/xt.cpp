@@ -23,7 +23,7 @@
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include <boost/dynamic_bitset.hpp>
-#pragma warning(disable : 4127) // supress warning for fmt library header 
+#pragma warning(disable : 4127) // supress warning for fmt library header
 #include <fmt/format.h>
 #pragma warning(pop)
 
@@ -46,9 +46,8 @@
 
 namespace fs = std::experimental::filesystem;
 
-
-fPOINT                 DesignSize;                    // design size
-unsigned               ColorOrder[16];                // color order adjusted for applique
+fPOINT   DesignSize;     // design size
+unsigned ColorOrder[16]; // color order adjusted for applique
 
 enum
 {
@@ -395,7 +394,7 @@ void fthrfn(unsigned& interleaveSequenceIndex2) {
 void fethrf() {
 	if (FormIndex) {
 		fvars(ClosestFormToCursor);
-		delclps(ClosestFormToCursor);
+		clip::delclps(ClosestFormToCursor);
 		deltx();
 		SelectedForm->type                           = SAT;
 		SelectedForm->fillInfo.feather.ratio         = IniFile.featherRatio;
@@ -1098,9 +1097,9 @@ void dmprec(const std::vector<OREC*>& stitchRegion, unsigned count) {
 #endif
 
 bool srtchk(const std::vector<OREC*>& stitchRegion, unsigned count, unsigned& badForm) {
-	unsigned iRegion    = 1;
-	unsigned form       = stitchRegion[0]->form;
-	unsigned color      = stitchRegion[0]->color;
+	unsigned iRegion = 1;
+	unsigned form    = stitchRegion[0]->form;
+	unsigned color   = stitchRegion[0]->color;
 
 	for (iRegion = 1; iRegion < count; iRegion++) {
 		if (stitchRegion[iRegion]->form == form) {
@@ -1772,7 +1771,7 @@ void sfuang() {
 void flenfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
-	if (SelectedForm->fillType && !isclp(find)) {
+	if (SelectedForm->fillType && !clip::isclp(find)) {
 		SelectedForm->lengthOrCount.stitchLength = length;
 		refilfn();
 	}
@@ -1804,7 +1803,7 @@ void fspacfn(size_t find, float spacing) {
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
 		if (spacing < 0) {
-			if (!isclp(find))
+			if (!clip::isclp(find))
 				return;
 		}
 		SelectedForm->fillSpacing = spacing;
@@ -2003,7 +2002,7 @@ void setbcol() {
 void blenfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
-	if (SelectedForm->edgeType && !iseclp(find)) {
+	if (SelectedForm->edgeType && !clip::iseclp(find)) {
 		SelectedForm->lengthOrCount.stitchLength = length;
 		refilfn();
 	}
@@ -2508,4 +2507,3 @@ void chgchk(int code) {
 	chkmen();
 	StateMap.set(StateFlag::DUMEN);
 }
-
