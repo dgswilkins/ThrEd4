@@ -38,7 +38,6 @@ void    bakthum();
 void    bal2thr(std::vector<BALSTCH>& balaradStitch, unsigned destination, unsigned source, unsigned code);
 void    barnam(HWND window, unsigned iThumbnail);
 void    bfil();
-void    bfrm();
 bool    binv(const std::vector<unsigned char>& monoBitmapData, unsigned bitmapWidthInBytes);
 bool    bitar();
 void    bitlin(const unsigned char* source, unsigned* destination, COLORREF foreground, COLORREF background);

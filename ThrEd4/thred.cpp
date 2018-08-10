@@ -2525,7 +2525,7 @@ void rstAll() {
 	StateMap.reset(StateFlag::GTUSPAC);
 	StateMap.reset(StateFlag::GTWLKIND);
 	StateMap.reset(StateFlag::GTWLKLEN);
-	untrace();
+	trace::untrace();
 	StateMap.reset(StateFlag::WASEDG);
 	displayText::butxt(HUPTO, (*StringTable)[STR_UPOF]);
 	if (ZoomFactor == 1)
@@ -4973,7 +4973,7 @@ void bfil() {
 			StateMap.set(StateFlag::RESTCH);
 		}
 		bitsiz();
-		initColorRef();
+		trace::initColorRef();
 		StateMap.reset(StateFlag::HIDMAP);
 	}
 	else {
@@ -5216,7 +5216,7 @@ void nuFil() {
 	if (StateMap.testAndReset(StateFlag::REDOLD) || GetOpenFileName(&OpenFileName)) {
 		WorkingFileName->assign(szFileName);
 		fnamtabs();
-		untrace();
+		trace::untrace();
 		if (FormIndex)
 			delfrms();
 		StateMap.reset(StateFlag::ZUMED);
@@ -7658,7 +7658,7 @@ void lodbmp() {
 	OpenBitmapName.lpstrInitialDir = lpszBuffer;
 	if (GetOpenFileName(&OpenBitmapName)) {
 		UserBMPFileName->assign(szFileName);
-		untrace();
+		trace::untrace();
 		auto filename = utf::Utf16ToUtf8(UserBMPFileName->filename().wstring());
 		// PCS file can only store a 16 character filename?
 		// ToDo - give the user a little more info that the bitmap has not been loaded
@@ -9619,7 +9619,7 @@ void thumnail() {
 
 	unbsho();
 	undat();
-	untrace();
+	trace::untrace();
 
 	fs::current_path(*DefaultDirectory);
 	*SearchName = *DefaultDirectory / L"*.thr";
@@ -10000,7 +10000,7 @@ void setdst() {
 }
 
 void fop() {
-	untrace();
+	trace::untrace();
 	if (FormIndex || PCSHeader.stitchCount) {
 		if (savcmp()) {
 			nuFil();
@@ -11224,7 +11224,7 @@ void esccode() {
 }
 
 void qcode() {
-	untrace();
+	trace::untrace();
 	StateMap.reset(StateFlag::HIDMAP);
 	StateMap.reset(StateFlag::FILDIR);
 	ReleaseCapture();
@@ -12060,7 +12060,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			}
 		}
 		if (StateMap.test(StateFlag::WASTRAC)) {
-			wasTrace1();
+			trace::wasTrace1();
 			return 1;
 		}
 		unmsg();
@@ -12304,7 +12304,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				return 1;
 		}
 		if (StateMap.test(StateFlag::WASTRAC)) {
-			tracpar();
+			trace::tracpar();
 			return 1;
 		}
 		if (StateMap.testAndReset(StateFlag::HUPMSG)) {
@@ -14073,7 +14073,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			}
 			if (dunum(code)) {
 				if (StateMap.test(StateFlag::TRNIN0)) {
-					traceNumberInput(NumericCode);
+					trace::traceNumberInput(NumericCode);
 				}
 				else {
 					MsgBuffer[MsgIndex++] = NumericCode;
@@ -14093,7 +14093,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				if (MsgIndex) {
 					MsgIndex--;
 					if (StateMap.test(StateFlag::TRNIN0)) {
-						traceNumberReset();
+						trace::traceNumberReset();
 					}
 					else {
 						MsgBuffer[MsgIndex] = 0;
@@ -14103,10 +14103,10 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				return 1;
 			case VK_RETURN:
 				if (StateMap.test(StateFlag::TRNIN0))
-					dutrnum2();
+					trace::dutrnum2();
 				else {
 					if (StateMap.test(StateFlag::TRNIN1))
-						dutrnum1();
+						trace::dutrnum1();
 				}
 				break;
 			}
@@ -14380,7 +14380,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 					pgdwn();
 				else {
 					StateMap.set(StateFlag::TRCUP);
-					trace();
+					trace::trace();
 				}
 			}
 			break;
@@ -14389,10 +14389,10 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				pgup();
 			else {
 				if (GetKeyState(VK_CONTROL) & 0X8000)
-					trdif();
+					trace::trdif();
 				else {
 					StateMap.reset(StateFlag::TRCUP);
-					trace();
+					trace::trace();
 				}
 			}
 			break;
@@ -14401,9 +14401,9 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				pglft();
 			else {
 				if (GetKeyState(VK_CONTROL) & 0X8000)
-					trcsel();
+					trace::trcsel();
 				else
-					blak();
+					trace::blak();
 			}
 			break;
 		case 'J':
@@ -14480,7 +14480,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				retrac();
 			else {
 				if (GetKeyState(VK_CONTROL) & 0x8000)
-					trinit();
+					trace::trinit();
 				else
 					thumnail();
 			}
@@ -15317,22 +15317,22 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			delmap();
 			break;
 		case ID_BLAK: // edit / Trace / Reset Form Pixels
-			blak();
+			trace::blak();
 			break;
 		case ID_SAVMAP: // file / Save Bitmap
 			savmap();
 			break;
 		case ID_TRDIF: // edit / Trace / Find Edges
-			trdif();
+			trace::trdif();
 			break;
 		case ID_TRACEDG: // edit / Trace / Show Traced Edges
-			tracedg();
+			trace::tracedg();
 			break;
 		case ID_TRCSEL: // edit / Trace / Select Colors
-			trcsel();
+			trace::trcsel();
 			break;
 		case ID_TRACE: // edit / Trace / Trace Mode
-			trinit();
+			trace::trinit();
 			break;
 		case ID_FLOK: // file / Locking
 			lock();
@@ -16374,7 +16374,7 @@ void init() {
 			                                     NULL);
 		}
 	}
-	initTraceWindows();
+	trace::initTraceWindows();
 	ColorBar = CreateWindow(L"STATIC",
 	                        L"",
 	                        SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -17417,7 +17417,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			return 1;
 		}
 		if (StateMap.test(StateFlag::WASTRAC)) {
-			wasTrace();
+			trace::wasTrace();
 			return 1;
 		}
 		else {
