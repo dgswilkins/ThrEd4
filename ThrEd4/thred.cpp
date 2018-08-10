@@ -2549,7 +2549,7 @@ void rstAll() {
 		insadj();
 	StateMap.reset(StateFlag::FUNCLP);
 	if (StateMap.testAndReset(StateFlag::SATPNT))
-		satfix();
+		satin::satfix();
 	if (StateMap.testAndReset(StateFlag::RUNPAT))
 		patdun();
 	StateMap.reset(StateFlag::FORMSEL);
@@ -7316,7 +7316,7 @@ void f1del() {
 	}
 	clip::deleclp(ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
-	delsac(ClosestFormToCursor);
+	satin::delsac(ClosestFormToCursor);
 	delflt(ClosestFormToCursor);
 	deltx();
 }
@@ -7853,7 +7853,7 @@ void delet() {
 		SelectedForm->vertexCount -= (SelectedFormVertices.vertexCount + 1);
 		frmout(ClosestFormToCursor);
 		if (SelectedForm->type == SAT)
-			satadj();
+			satin::satadj();
 		refil();
 		fndknt();
 		StateMap.set(StateFlag::RESTCH);
@@ -7959,7 +7959,7 @@ void delet() {
 					for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 						if (SelectedForm->satinOrAngle.guide[iGuide].start == ClosestVertexToCursor
 						    || SelectedForm->satinOrAngle.guide[iGuide].finish == ClosestVertexToCursor) {
-							delcon(iGuide);
+							satin::delcon(iGuide);
 							satinFlag = true;
 							break;
 						}
@@ -7967,7 +7967,7 @@ void delet() {
 				} while (false);
 			}
 			if (!satinFlag) {
-				delspnt();
+				satin::delspnt();
 			}
 			if (ClosestFormToCursor > FormIndex - 1)
 				ClosestFormToCursor = FormIndex - 1;
@@ -11603,7 +11603,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				return 1;
 			}
 			if (StateMap.test(StateFlag::SATPNT)) {
-				drwsat();
+				satin::drwsat();
 				return 1;
 			}
 			if (StateMap.test(StateFlag::FRMOV)) {
@@ -12075,7 +12075,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		// BufferIndex = 0;
 		StateMap.reset(StateFlag::SATIN);
 		if (StateMap.testAndReset(StateFlag::SATPNT))
-			satfix();
+			satin::satfix();
 		if (StateMap.test(StateFlag::BAKSHO)) {
 			unbsho();
 			return 1;
@@ -12830,7 +12830,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 						else {
 							unmsg();
 							unsid();
-							satbrd();
+							satin::satbrd();
 							return 1;
 						}
 					}
@@ -12971,7 +12971,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			}
 			else {
 				if (SelectedForm->fillType == SAT && SelectedForm->satinGuideCount)
-					delsac(ClosestFormToCursor);
+					satin::delsac(ClosestFormToCursor);
 				if ((SelectedForm->edgeType & NEGUND) == EDGEAPPL) {
 					SelectedForm->edgeType = EDGEANGSAT;
 					if (UserFlagMap.test(UserFlag::DUND))
@@ -13232,7 +13232,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 					else
 						SelectedForm->type = FRMLINE;
 					coltab();
-					delsac(ClosestFormToCursor);
+					satin::delsac(ClosestFormToCursor);
 					StateMap.set(StateFlag::RESTCH);
 					break;
 				}
@@ -13448,15 +13448,15 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		}
 		if (StateMap.test(StateFlag::SATCNKT)) {
 			savdo();
-			satknkt();
+			satin::satknkt();
 			return 1;
 		}
 		if (StateMap.test(StateFlag::SATPNT)) {
-			satpnt1();
+			satin::satpnt1();
 			return 1;
 		}
 		if (StateMap.testAndReset(StateFlag::SATIN)) {
-			satpnt0();
+			satin::satpnt0();
 			return 1;
 		}
 		if (StateMap.test(StateFlag::FORMSEL)) {
@@ -14444,7 +14444,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				}
 			}
 			else
-				satsel();
+				satin::satpnt1();
 			break;
 		case 'K':
 			if (GetKeyState(VK_MENU) & GetKeyState(VK_CONTROL) & 0X8000)
@@ -14536,7 +14536,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			else {
 				if (GetKeyState(VK_SHIFT) & 0X8000) {
 					StateMap.set(StateFlag::CNV2FTH);
-					ribon();
+					satin::ribon();
 				}
 				else {
 					frmon();
@@ -14778,7 +14778,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			else {
 				if (GetKeyState(VK_SHIFT) & 0X8000) {
 					StateMap.reset(StateFlag::CNV2FTH);
-					ribon();
+					satin::ribon();
 				}
 				else {
 					StateMap.reset(StateFlag::HIDSTCH);
@@ -15258,7 +15258,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			break;
 		case ID_2FTHR: // edit / Convert / to Feather Ribbon
 			StateMap.set(StateFlag::CNV2FTH);
-			ribon();
+			satin::ribon();
 			break;
 		case ID_FETHR: // fill / Feather
 			fethr();
@@ -15518,7 +15518,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			break;
 		case ID_RIBON: // edit / Convert / to Satin Ribbon
 			StateMap.reset(StateFlag::CNV2FTH);
-			ribon();
+			satin::ribon();
 			break;
 		case ID_DESIZ: // view / Design Information
 			desiz();
@@ -15733,7 +15733,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		case ID_SATBRD: // fill / Border / Angle Satin
 			if (StateMap.test(StateFlag::FORMSEL))
 				savdo();
-			satbrd();
+			satin::satbrd();
 			break;
 		case ID_FILCLP: // fill / Border / Clipboard
 			fclp();
@@ -16985,7 +16985,7 @@ void drwStch() {
 		dufrm();
 	}
 	if (StateMap.test(StateFlag::SATPNT))
-		satzum();
+		satin::satzum();
 	if (FormDataSheet)
 		formForms::refrm();
 	if (StateMap.test(StateFlag::GMRK))
@@ -17365,7 +17365,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 					if (StateMap.test(StateFlag::HIDSTCH)) {
 						drwfrm();
 						if (StateMap.test(StateFlag::SATPNT))
-							satzum();
+							satin::satzum();
 					}
 					if (StateMap.test(StateFlag::PRFACT))
 						redraw(PreferencesWindow);
@@ -17394,7 +17394,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				if (StateMap.test(StateFlag::ROTSHO))
 					durot();
 				if (StateMap.test(StateFlag::SHOSAT))
-					dusat();
+					satin::dusat();
 				if (StateMap.test(StateFlag::SHOINSF))
 					duinsf();
 			}
@@ -17592,7 +17592,7 @@ void sachk() noexcept {
 					if (guide[iGuide].start > form.vertexCount || guide[iGuide].finish > form.vertexCount) {
 						const auto bakclo   = ClosestFormToCursor;
 						ClosestFormToCursor = iForm;
-						delsac(iForm);
+						satin::delsac(iForm);
 						ClosestFormToCursor = bakclo;
 					}
 				}

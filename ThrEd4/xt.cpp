@@ -330,7 +330,7 @@ void fthrfn(unsigned& interleaveSequenceIndex2) {
 	PseudoRandomValue = FSED;
 	fthvars(feather);
 	LineSpacing = SelectedForm->fillSpacing;
-	satfil();
+	satin::satfil();
 	BSequence[0].attribute = 0;
 	BSequence[1].attribute = 1;
 	if (!feather.phaseIndex)
@@ -553,7 +553,7 @@ void pes2crd() {
 std::vector<fPOINT>& insid() {
 	unsigned iVertex = 0;
 
-	satout(fabs(SelectedForm->underlayIndent));
+	satin::satout(fabs(SelectedForm->underlayIndent));
 	if (SelectedForm->underlayIndent > 0) {
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 			if (!cisin((*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y)) {

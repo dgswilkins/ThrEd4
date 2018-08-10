@@ -255,7 +255,7 @@ void chkcont() {
 			}
 			SelectedForm->angleOrClipData.guide.start  = SelectedForm->satinOrAngle.guide[shortestGuideIndex].start;
 			SelectedForm->angleOrClipData.guide.finish = SelectedForm->satinOrAngle.guide[shortestGuideIndex].finish;
-			delsac(ClosestFormToCursor);
+			satin::delsac(ClosestFormToCursor);
 		}
 		else {
 			SelectedForm->angleOrClipData.guide.start  = 1;
@@ -2070,7 +2070,7 @@ void pbrd(double edgeSpacing) {
 	SequenceIndex = 0;
 	std::vector<VRCT2> fillVerticalRect(VertexCount);
 	std::vector<VRCT2> underlayVerticalRect(VertexCount);
-	satout(SelectedForm->borderSize);
+	satin::satout(SelectedForm->borderSize);
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
 		sprct(fillVerticalRect, iVertex, iVertex + 1);
 		spurct(underlayVerticalRect, fillVerticalRect, iVertex);
@@ -2082,7 +2082,7 @@ void pbrd(double edgeSpacing) {
 		LineSpacing = USPAC;
 		StateMap.set(StateFlag::UND);
 		HorizontalLength2 = SelectedForm->borderSize * URAT;
-		satout(HorizontalLength2);
+		satin::satout(HorizontalLength2);
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.set(StateFlag::FILDIR);
 		pfn(underlayVerticalRect, fillVerticalRect, start, underlayVerticalRect);
@@ -2231,7 +2231,7 @@ void chkbrd(unsigned& interleaveSequenceIndex2) {
 			break;
 		case EDGEANGSAT: // Angle Satin
 			HorizontalLength2 = SelectedForm->borderSize;
-			sbrd();
+			satin::sbrd();
 			break;
 		case EDGEPROPSAT: // Proportional Satin
 			HorizontalLength2 = SelectedForm->borderSize;
@@ -2242,13 +2242,13 @@ void chkbrd(unsigned& interleaveSequenceIndex2) {
 			apbrd();
 			ritapbrd(interleaveSequenceIndex2);
 			HorizontalLength2 = SelectedForm->borderSize;
-			sbrd();
+			satin::sbrd();
 			break;
 		case EDGEBHOL: // BH Buttonhole
 			HorizontalLength2      = SelectedForm->borderSize * 2.0;
 			length                 = ButtonholeCornerLength;
 			ButtonholeCornerLength = getblen();
-			satout(20);
+			satin::satout(20);
 			bhbrd(SelectedForm->edgeSpacing);
 			ButtonholeCornerLength = length;
 			break;
@@ -2461,7 +2461,7 @@ void plbrd(double edgeSpacing) {
 	std::vector<VRCT2> fillVerticalRect(VertexCount + 3);
 	std::vector<VRCT2> underlayVerticalRect(VertexCount + 3);
 	prebrd();
-	satout(SelectedForm->borderSize);
+	satin::satout(SelectedForm->borderSize);
 	InsidePoints->push_back((*InsidePoints)[0]);
 	OutsidePoints->push_back((*OutsidePoints)[0]);
 	for (iVertex = 0; iVertex < VertexCount - 1; iVertex++) {
@@ -4689,7 +4689,7 @@ void fmclp() {
 
 	LineSpacing = ClipRectSize.cx;
 	StateMap.set(StateFlag::BARSAT);
-	satfil();
+	satin::satfil();
 	StateMap.reset(StateFlag::BARSAT);
 	clpfm();
 	SelectedForm->fillType = CLPF;
@@ -4748,7 +4748,7 @@ void refilfn() {
 			break;
 		case EDGEANGSAT:
 			StateMap.reset(StateFlag::SAT1);
-			slbrd();
+			satin::slbrd();
 			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGEPROPSAT:
@@ -4762,14 +4762,14 @@ void refilfn() {
 			lapbrd();
 			ritapbrd(interleaveSequenceIndex2);
 			StateMap.reset(StateFlag::SAT1);
-			slbrd();
+			satin::slbrd();
 			ritbrd(interleaveSequenceIndex2);
 			break;
 		case EDGEBHOL:
 			HorizontalLength2      = SelectedForm->borderSize * 2;
 			length                 = ButtonholeCornerLength;
 			ButtonholeCornerLength = getblen();
-			satout(20);
+			satin::satout(20);
 			blbrd(SelectedForm->edgeSpacing);
 			ButtonholeCornerLength = length;
 			ritbrd(interleaveSequenceIndex2);
@@ -4891,7 +4891,7 @@ void refilfn() {
 			spacing          = LineSpacing;
 			LineSpacing      = SelectedForm->fillSpacing;
 			UserStitchLength = SelectedForm->lengthOrCount.stitchLength;
-			satfil();
+			satin::satfil();
 			LineSpacing = spacing;
 			ritfil(interleaveSequenceIndex2);
 			break;
@@ -4957,7 +4957,7 @@ void setfpnt() {
 void makpoli() noexcept {
 	if (SelectedForm->type == SAT) {
 		if (SelectedForm->satinGuideCount)
-			delsac(ClosestFormToCursor);
+			satin::delsac(ClosestFormToCursor);
 	}
 	SelectedForm->type = FRMFPOLY;
 }
@@ -5516,7 +5516,7 @@ void frm0() {
 		savdo();
 		rotfrm(ClosestVertexToCursor);
 		ClosestVertexToCursor = 0;
-		satadj();
+		satin::satadj();
 		refil();
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
@@ -5692,7 +5692,7 @@ void sapliq() {
 	SelectedForm->borderColor = ActiveColor | (AppliqueColor << 4);
 	if (SelectedForm->type != FRMLINE) {
 		if (SelectedForm->fillType == SAT && SelectedForm->satinGuideCount)
-			delsac(ClosestFormToCursor);
+			satin::delsac(ClosestFormToCursor);
 	}
 	SelectedForm->fillType = 0;
 	SelectedForm->type     = FRMFPOLY;
@@ -6709,7 +6709,7 @@ void prpbrd(double borderStitchSpacing) {
 
 void tglfrm() {
 	if (StateMap.testAndReset(StateFlag::SATPNT))
-		satfix();
+		satin::satfix();
 	StateMap.reset(StateFlag::HIDSTCH);
 	if (StateMap.testAndFlip(StateFlag::FRMOF)) {
 		FormOnOff->assign((*StringTable)[STR_FRMPLUS]);
@@ -8220,7 +8220,7 @@ void spltfrm() {
 				for (ActivePointIndex = 0; ActivePointIndex < SelectedForm->satinGuideCount; ActivePointIndex++) {
 					if (SelectedForm->satinOrAngle.guide[ActivePointIndex].start == ClosestVertexToCursor
 					    || SelectedForm->satinOrAngle.guide[ActivePointIndex].finish == ClosestVertexToCursor) {
-						spltsat(SelectedForm->satinOrAngle.guide[ActivePointIndex]);
+						satin::spltsat(SelectedForm->satinOrAngle.guide[ActivePointIndex]);
 						return;
 					}
 				}

@@ -212,7 +212,7 @@ void repairPriv::repflt(std::wstring& repairMessage) {
 		else {
 			if (vertexDifference < FormVertexIndex) {
 				formHeader->vertexCount = gsl::narrow<unsigned short>(FormVertexIndex - vertexDifference);
-				delsac(iForm);
+				satin::delsac(iForm);
 				// ToDo - do we need to increase the size of vertexPoint?
 				// vertexPoint.resize(vertexPoint.size + formHeader->vertexCount);
 				auto sourceStart = formHeader->vertices;

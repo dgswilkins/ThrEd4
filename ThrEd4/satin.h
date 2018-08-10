@@ -23,37 +23,44 @@
 // Local Headers
 #include "ThrEdTypes.h"
 
+namespace satin {
+
+void delcon(unsigned GuideIndex);
+void delsac(size_t formIndex) noexcept;
+void delspnt();
+void drwsat();
+void dusat() noexcept;
+void ribon();
+void satadj();
+void satbrd();
+void satfil();
+void satfix();
+void satknkt();
+void satout(double satinWidth);
+void satpnt0();
+void satpnt1();
+void satsel();
+void satzum();
+void sbrd();
+void slbrd();
+void spltsat(const SATCON& currentGuide);
+}
+
+namespace satinPriv {
+
 bool     chkbak(const std::vector<dPOINT>& satinBackup, const dPOINT& pnt);
-void     delcon(unsigned GuideIndex);
-void     delsac(size_t formIndex) noexcept;
-void     delspnt();
-void     drwsat();
-void     dusat() noexcept;
 SATCON*  nusac(size_t formIndex, unsigned guideCount) noexcept;
 void     outfn(unsigned start, unsigned finish, double satinWidth);
-void     ribon();
 void     sacspac(const SATCON* const startGuide, unsigned guideCount) noexcept;
-void     satadj();
-void     satbrd();
 void     satclos();
 void     satcpy(SATCON* const destination, const std::vector<SATCON> source, unsigned int size);
 void     satends(unsigned isBlunt);
-void     satfil();
-void     satfix();
 void     satfn(const std::vector<double>& lengths, size_t line1Start, size_t line1End, size_t line2Start, size_t line2End);
 unsigned satind(const SATCON* const guide) noexcept;
-void     satknkt();
 void     satmf(const std::vector<double>& lengths);
-void     satout(double satinWidth);
-void     satpnt0();
-void     satpnt1();
 void     satsbrd();
-void     satsel();
 bool     satselfn() noexcept;
-void     satzum();
 void     sbfn(const std::vector<fPOINT>& insidePoints, size_t start, size_t finish);
-void     sbrd();
 void     sfn(size_t startVertex);
-void     slbrd();
-void     spltsat(const SATCON& currentGuide);
 void     unsat();
+}

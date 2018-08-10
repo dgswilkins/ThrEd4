@@ -297,9 +297,9 @@ void clipPriv::linsid(const std::vector<fPOINT>& clipReversedData,
 
 void clip::clpout() {
 	if (SelectedForm->type == FRMLINE)
-		satout(HorizontalLength2);
+		satin::satout(HorizontalLength2);
 	else {
-		satout(ClipRectSize.cy);
+		satin::satout(ClipRectSize.cy);
 		InsidePointList->clear();
 		// ToDo - insert should be replaced with this line once vertices is a std::vector * as a copy will not be
 		// required  InsidePoints = SelectedForm->vertices;
@@ -738,7 +738,7 @@ void clip::clpic() {
 	HorizontalLength  = ClipRectSize.cx;
 	ClipReference.y   = rotationCenter.y;
 	ClipReference.x   = ClipRect.left;
-	satout(20);
+	satin::satout(20);
 	if (SelectedForm->type == FRMLINE) {
 		for (size_t iVertex = 0; iVertex < VertexCount - 2; iVertex++) {
 			clipPriv::picfn(clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing, rotationCenter);

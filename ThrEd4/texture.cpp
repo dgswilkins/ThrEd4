@@ -1080,7 +1080,7 @@ void dutxfn(unsigned textureType) {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		altx();
 		clip::delmclp(ClosestFormToCursor);
-		delsac(ClosestFormToCursor);
+		satin::delsac(ClosestFormToCursor);
 		deltx();
 		savtxt();
 		nutx();
