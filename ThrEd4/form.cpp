@@ -581,7 +581,8 @@ void delfrms() {
 	unsigned iStitch = 0;
 
 	savdo();
-	FormIndex = FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
+	FormIndex = FormVertexIndex = ClipPointIndex = 0;
+	satin::clearGuideSize();
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		StitchBuffer[iStitch].attribute &= NFRM_NTYP;
 		StitchBuffer[iStitch].attribute |= NOTFRM;
@@ -7107,7 +7108,7 @@ void adfrm(size_t iForm) {
 	          SelectedForm->vertices + SelectedForm->vertexCount,
 	          stdext::make_checked_array_iterator(formHeader->vertices, SelectedForm->vertexCount));
 	if (formHeader->type == SAT && formHeader->satinGuideCount) {
-		formHeader->satinOrAngle.guide = adsatk(formHeader->satinGuideCount);
+		formHeader->satinOrAngle.guide = satin::adsatk(formHeader->satinGuideCount);
 		std::copy(SelectedForm->satinOrAngle.guide,
 		          SelectedForm->satinOrAngle.guide + SelectedForm->satinGuideCount,
 		          stdext::make_checked_array_iterator(formHeader->satinOrAngle.guide, SelectedForm->satinGuideCount));
@@ -7180,13 +7181,7 @@ void cplayfn(size_t iForm, unsigned play) {
 	std::copy(formHeader->vertices,
 	          formHeader->vertices + VertexCount,
 	          stdext::make_checked_array_iterator(SelectedForm->vertices, MAXITEMS - FormVertexIndex));
-	if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
-		SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
-		auto       sourceStart           = formHeader->satinOrAngle.guide;
-		auto       sourceEnd             = sourceStart + SelectedForm->satinGuideCount;
-		const auto destination = stdext::make_checked_array_iterator(SelectedForm->satinOrAngle.guide, 10000 - SatinGuideIndex);
-		std::copy(sourceStart, sourceEnd, destination);
-	}
+	satin::cpySat(*formHeader);
 	SelectedForm->clipEntries             = 0;
 	SelectedForm->fillType                = 0;
 	SelectedForm->lengthOrCount.clipCount = 0;
@@ -7768,11 +7763,11 @@ void dufdat(std::vector<fPOINT>& tempClipPoints,
 	FormVertexIndex += destination.vertexCount;
 	if (destination.satinGuideCount) {
 		const auto _ = std::copy(destination.satinOrAngle.guide,
-		                         destination.satinOrAngle.guide + destination.satinGuideCount,
-		                         tempGuides.begin() + SatinGuideIndex);
+			destination.satinOrAngle.guide + destination.satinGuideCount,
+			tempGuides.begin() + satin::getGuideSize());
 
-		destination.satinOrAngle.guide = &SatinGuides[SatinGuideIndex];
-		SatinGuideIndex += destination.satinGuideCount;
+		destination.satinOrAngle.guide = &SatinGuides[satin::getGuideSize()];
+		satin::setGuideSize(satin::getGuideSize() + destination.satinGuideCount);
 	}
 	if (clip::iseclpx(formIndex)) {
 		const auto _ = std::copy(destination.borderClipData,
@@ -7817,10 +7812,11 @@ void frmnumfn(unsigned newFormIndex) {
 
 		std::vector<FRMHED> tempFormList(FormIndex);
 		std::vector<fPOINT> tempFormVertices(FormVertexIndex);
-		std::vector<SATCON> tempGuides(SatinGuideIndex);
+		std::vector<SATCON> tempGuides(satin::getGuideSize());
 		std::vector<fPOINT> tempClipPoints(ClipPointIndex);
 
-		FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
+		FormVertexIndex = ClipPointIndex = 0;
+		satin::clearGuideSize();
 		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 			if (iForm == newFormIndex)
 				dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, ClosestFormToCursor);

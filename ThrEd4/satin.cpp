@@ -1408,3 +1408,49 @@ bool satinPriv::chkbak(const std::vector<dPOINT>& satinBackup, const dPOINT& pnt
 	}
 	return 0;
 }
+
+SATCON* satin::adsatk(size_t count) noexcept {
+	auto iSatinConnect = SatinGuideIndex;
+
+	SatinGuideIndex += count;
+	return &SatinGuides[iSatinConnect];
+}
+
+void satin::cpySat(const FRMHED& formHeader) {
+	if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
+		SelectedForm->satinOrAngle.guide = satin::adsatk(SelectedForm->satinGuideCount);
+		auto       sourceStart           = formHeader.satinOrAngle.guide;
+		auto       sourceEnd             = sourceStart + SelectedForm->satinGuideCount;
+		const auto destination = stdext::make_checked_array_iterator(SelectedForm->satinOrAngle.guide, 10000 - SatinGuideIndex);
+		std::copy(sourceStart, sourceEnd, destination);
+	}
+}
+
+size_t satin::getGuideSize() {
+	return SatinGuideIndex;
+}
+
+void satin::clearGuideSize() {
+	SatinGuideIndex = 0;
+}
+
+void satin::setGuideSize(size_t newGuideSize) {
+	SatinGuideIndex = newGuideSize;
+}
+
+void satin::cpyTmpGuides(std::vector<SATCONOUT> &inSatinGuides)
+{
+	const auto destination = stdext::make_checked_array_iterator(
+		SatinGuides + SatinGuideIndex, (sizeof(SatinGuides) / sizeof(SatinGuides[0])) - SatinGuideIndex);
+	std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), destination);
+}
+
+void satin::cpyUndoGuides(const BAKHED& undoData)
+{
+	if (undoData.guideCount) {
+		std::copy(undoData.guide, undoData.guide + undoData.guideCount, SatinGuides);
+	}
+	SatinGuideIndex = undoData.guideCount;
+}
+
+

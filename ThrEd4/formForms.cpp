@@ -30,6 +30,7 @@
 #include "displayText.h"
 #include "form.h"
 #include "hlp.h"
+#include "satin.h"
 #include "texture.h"
 #include "thred.h"
 #include "xt.h"
@@ -844,7 +845,7 @@ void formForms::dasyfrm() {
 	if (UserFlagMap.test(UserFlag::DAZD)) {
 		SelectedForm->satinGuideCount    = IniFile.daisyPetalCount - 1;
 		SelectedForm->wordParam          = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1;
-		SelectedForm->satinOrAngle.guide = adsatk(IniFile.daisyPetalCount - 1);
+		SelectedForm->satinOrAngle.guide = satin::adsatk(IniFile.daisyPetalCount - 1);
 	}
 	const auto halfPetalPointCount = IniFile.daisyPetalPoints >> 1;
 	for (unsigned int iMacroPetal = 0; iMacroPetal < IniFile.daisyPetalCount; iMacroPetal++) {

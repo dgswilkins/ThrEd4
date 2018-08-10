@@ -152,7 +152,7 @@ unsigned repairPriv::frmchkfn() {
 			badData.attribute |= BADFLT;
 		if (badData.clip != ClipPointIndex)
 			badData.attribute |= BADCLP;
-		if (badData.guideCount != SatinGuideIndex)
+		if (badData.guideCount != satin::getGuideSize())
 			badData.attribute |= BADSAT;
 		if (badData.tx != TextureIndex)
 			badData.attribute |= BADTX;
@@ -224,7 +224,7 @@ void repairPriv::repflt(std::wstring& repairMessage) {
 			else {
 				FormIndex       = iForm;
 				ClipPointIndex  = badData.clip;
-				SatinGuideIndex = badData.guideCount;
+				satin::setGuideSize(badData.guideCount);
 				TextureIndex    = badData.tx;
 				repairPriv::chkfstch();
 				repairPriv::adbad(repairMessage, IDS_FRMDAT, FormIndex - iForm + 1);
@@ -334,8 +334,8 @@ void repairPriv::repsat() {
 				repairPriv::bcup(iForm, badData);
 			}
 			else {
-				if (guideDifference < SatinGuideIndex) {
-					formHeader->satinGuideCount = gsl::narrow<unsigned short>(SatinGuideIndex - guideDifference);
+				if (guideDifference < satin::getGuideSize()) {
+					formHeader->satinGuideCount = gsl::narrow<unsigned short>(satin::getGuideSize() - guideDifference);
 					auto       sourceStart      = formHeader->satinOrAngle.guide;
 					auto       sourceEnd        = sourceStart + formHeader->satinGuideCount;
 					const auto destination = stdext::make_checked_array_iterator(&SatinGuides[guideCount], 10000 - guideCount);
@@ -349,7 +349,7 @@ void repairPriv::repsat() {
 			}
 		}
 	}
-	SatinGuideIndex = guideCount;
+	satin::setGuideSize(guideCount);
 }
 
 void repairPriv::reptx() {

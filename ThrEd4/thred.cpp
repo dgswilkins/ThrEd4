@@ -1174,13 +1174,6 @@ fPOINT* adflt(size_t count) {
 	return &FormVertices[iFormVertex];
 }
 
-SATCON* adsatk(size_t count) noexcept {
-	auto iSatinConnect = SatinGuideIndex;
-
-	SatinGuideIndex += count;
-	return &SatinGuides[iSatinConnect];
-}
-
 fPOINT* adclp(size_t count) noexcept {
 	size_t iClipPoint = ClipPointIndex;
 
@@ -1329,7 +1322,7 @@ void dudat() {
 	undoBuffer[UndoBufferWriteIndex].reset(nullptr);
 	const auto size = sizeof(BAKHED) + sizeof(FormList[0]) * FormIndex + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
 	                  + sizeof(FormVertices[0]) * FormVertexIndex + sizeof(ClipPoints[0]) * ClipPointIndex
-	                  + sizeof(SatinGuides[0]) * SatinGuideIndex + sizeof(UserColor)
+	                  + sizeof(SatinGuides[0]) * satin::getGuideSize() + sizeof(UserColor)
 	                  + sizeof((*TexturePointsBuffer)[0]) * TextureIndex;
 	undoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);
 	backupData                       = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
@@ -1352,15 +1345,15 @@ void dudat() {
 			          FormVertices + FormVertexIndex,
 			          stdext::make_checked_array_iterator(backupData->vertices, backupData->vertexCount));
 		}
-		backupData->guideCount = SatinGuideIndex;
+		backupData->guideCount = satin::getGuideSize();
 		backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertexIndex]);
-		if (SatinGuideIndex) {
+		if (satin::getGuideSize()) {
 			std::copy(SatinGuides,
-			          SatinGuides + SatinGuideIndex,
+			          SatinGuides + satin::getGuideSize(),
 			          stdext::make_checked_array_iterator(backupData->guide, backupData->guideCount));
 		}
 		backupData->clipPointCount = ClipPointIndex;
-		backupData->clipPoints     = convert_ptr<fPOINT*>(&backupData->guide[SatinGuideIndex]);
+		backupData->clipPoints     = convert_ptr<fPOINT*>(&backupData->guide[satin::getGuideSize()]);
 		if (ClipPointIndex) {
 			if (ClipPointIndex > MAXITEMS)
 				ClipPointIndex = MAXITEMS;
@@ -4638,10 +4631,7 @@ void redbak() {
 			std::copy(undoData->vertices, undoData->vertices + undoData->vertexCount, FormVertices);
 		}
 		FormVertexIndex = undoData->vertexCount;
-		if (undoData->guideCount) {
-			std::copy(undoData->guide, undoData->guide + undoData->guideCount, SatinGuides);
-		}
-		SatinGuideIndex = undoData->guideCount;
+		satin::cpyUndoGuides(*undoData);
 		if (undoData->clipPointCount) {
 			std::copy(undoData->clipPoints, undoData->clipPoints + undoData->clipPointCount, ClipPoints);
 		}
@@ -5380,9 +5370,10 @@ void nuFil() {
 					pcsStitchCount = 0;
 					if (FormIndex) {
 						StateMap.reset(StateFlag::BADFIL);
-						FormVertexIndex = SatinGuideIndex = ClipPointIndex = 0;
-						MsgBuffer[0]                                       = 0;
-						DWORD bytesToRead                                  = 0u;
+						FormVertexIndex = ClipPointIndex = 0;
+						satin::clearGuideSize();
+						MsgBuffer[0]      = 0;
+						DWORD bytesToRead = 0u;
 						if (version < 2) {
 							std::vector<FRMHEDO> formListOriginal(FormIndex);
 							bytesToRead = gsl::narrow<DWORD>(FormIndex * sizeof(formListOriginal[0]));
@@ -5453,14 +5444,14 @@ void nuFil() {
 							displayText::bfilmsg();
 						}
 						// now re-create all the pointers in the form data
-						SatinGuideIndex = 0;
+						satin::clearGuideSize();
 						ClipPointIndex  = 0;
 						FormVertexIndex = 0;
 						for (unsigned iForm = 0; iForm < FormIndex; iForm++) {
 							FormList[iForm].vertices = adflt(FormList[iForm].vertexCount);
 							if (FormList[iForm].type == SAT) {
 								if (FormList[iForm].satinGuideCount)
-									FormList[iForm].satinOrAngle.guide = adsatk(FormList[iForm].satinGuideCount);
+									FormList[iForm].satinOrAngle.guide = satin::adsatk(FormList[iForm].satinGuideCount);
 							}
 							if (clip::isclp(iForm))
 								FormList[iForm].angleOrClipData.clip = adclp(FormList[iForm].lengthOrCount.clipCount);
@@ -6486,7 +6477,7 @@ void newFil() {
 	FormVertexIndex       = 0;
 	ClipPointIndex        = 0;
 	TextureIndex          = 0;
-	SatinGuideIndex       = 0;
+	satin::clearGuideSize();
 	FormIndex             = 0;
 	ColorChanges          = 0;
 	KnotCount             = 0;
@@ -7782,7 +7773,8 @@ void setsped() {
 
 void deltot() {
 	DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
-	TextureIndex = FormIndex = FormVertexIndex = SatinGuideIndex = ClipPointIndex = PCSHeader.stitchCount = 0;
+	TextureIndex = FormIndex = FormVertexIndex = ClipPointIndex = PCSHeader.stitchCount = 0;
+	satin::clearGuideSize();
 	StateMap.reset(StateFlag::GMRK);
 	rstAll();
 	coltab();
@@ -8226,7 +8218,7 @@ void insfil() {
 	double     filscor            = 0.0;
 	unsigned   version            = 0;
 	size_t     newFormVertexIndex = FormVertexIndex;
-	size_t     newSatinGuideIndex = SatinGuideIndex;
+	size_t     newSatinGuideIndex = satin::getGuideSize();
 	size_t     newClipPointIndex  = ClipPointIndex;
 	size_t     newTextureIndex    = TextureIndex;
 
@@ -8340,9 +8332,7 @@ void insfil() {
 								inSatinGuides.resize(BytesRead / sizeof(inSatinGuides[0]));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							const auto destination = stdext::make_checked_array_iterator(
-							    SatinGuides + SatinGuideIndex, (sizeof(SatinGuides) / sizeof(SatinGuides[0])) - SatinGuideIndex);
-							std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), destination);
+							satin::cpyTmpGuides(inSatinGuides);
 							newSatinGuideIndex += inSatinGuides.size();
 						}
 						if (fileHeader.clipDataCount) {
@@ -8368,7 +8358,7 @@ void insfil() {
 							FormList[iFormList].vertices = adflt(FormList[iFormList].vertexCount);
 							if (FormList[iFormList].type == SAT) {
 								if (FormList[iFormList].satinGuideCount)
-									FormList[iFormList].satinOrAngle.guide = adsatk(FormList[iFormList].satinGuideCount);
+									FormList[iFormList].satinOrAngle.guide = satin::adsatk(FormList[iFormList].satinGuideCount);
 								if (clip::isclpx(iFormList))
 									FormList[iFormList].angleOrClipData.clip = adclp(FormList[iFormList].lengthOrCount.clipCount);
 							}
@@ -8384,7 +8374,7 @@ void insfil() {
 						if (newFormVertexIndex != FormVertexIndex) {
 							StateMap.set(StateFlag::BADFIL);
 						}
-						if (newSatinGuideIndex != SatinGuideIndex) {
+						if (newSatinGuideIndex != satin::getGuideSize()) {
 							StateMap.set(StateFlag::BADFIL);
 						}
 						if (newClipPointIndex != ClipPointIndex) {
@@ -14627,7 +14617,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 								SelectedForm = &FormList[FormIndex + iForm];
 								if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
-									SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
+									SelectedForm->satinOrAngle.guide = satin::adsatk(SelectedForm->satinGuideCount);
 									for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 										SelectedForm->satinOrAngle.guide[iGuide] = guides[currentGuide++];
 									}
@@ -14702,7 +14692,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 								          stdext::make_checked_array_iterator(SelectedForm->vertices, SelectedForm->vertexCount));
 								guides = convert_ptr<SATCON*>(&CurrentFormVertices[SelectedForm->vertexCount]);
 								if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
-									SelectedForm->satinOrAngle.guide = adsatk(SelectedForm->satinGuideCount);
+									SelectedForm->satinOrAngle.guide = satin::adsatk(SelectedForm->satinGuideCount);
 									std::copy(guides,
 									          guides + SelectedForm->satinGuideCount,
 									          stdext::make_checked_array_iterator(SelectedForm->satinOrAngle.guide,

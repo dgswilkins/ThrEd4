@@ -178,7 +178,6 @@ void setwlkind();
 void sfuang();
 bool srtchk(const std::vector<OREC*>& stitchRegion, unsigned count, unsigned& badForm);
 void srtcol();
-void stxlin();
 
 constexpr ULARGE_INTEGER tim2int(FILETIME time) noexcept;
 
