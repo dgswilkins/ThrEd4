@@ -801,7 +801,11 @@ void satin::slbrd() {
 	LineSpacing = spacing;
 }
 
-void satinPriv::satfn(const std::vector<double>& lengths, size_t line1Start, size_t line1End, size_t line2Start, size_t line2End) {
+void satinPriv::satfn(const std::vector<double>& lengths,
+                      size_t                     line1Start,
+                      size_t                     line1End,
+                      size_t                     line2Start,
+                      size_t                     line2End) {
 	size_t   line1Next = 0, line2Previous = 0;
 	unsigned stitchCount = 0;
 	unsigned iSegment = 0, line1Count = 0, line2Count = 0;
@@ -1008,12 +1012,13 @@ void satinPriv::satmf(const std::vector<double>& lengths) {
 	satinPriv::satfn(lengths, iGuide, CurrentFormGuides[0].start, VertexCount, CurrentFormGuides[0].finish);
 	for (iGuide = 0; iGuide < gsl::narrow<unsigned>(CurrentFormGuidesCount) - 1; iGuide++)
 		satinPriv::satfn(lengths,
-		      CurrentFormGuides[iGuide].start,
-		      CurrentFormGuides[iGuide + 1].start,
-		      CurrentFormGuides[iGuide].finish,
-		      CurrentFormGuides[iGuide + 1].finish);
+		                 CurrentFormGuides[iGuide].start,
+		                 CurrentFormGuides[iGuide + 1].start,
+		                 CurrentFormGuides[iGuide].finish,
+		                 CurrentFormGuides[iGuide + 1].finish);
 	if (SatinEndGuide)
-		satinPriv::satfn(lengths, CurrentFormGuides[iGuide].start, SatinEndGuide, CurrentFormGuides[iGuide].finish, SatinEndGuide + 1);
+		satinPriv::satfn(
+		    lengths, CurrentFormGuides[iGuide].start, SatinEndGuide, CurrentFormGuides[iGuide].finish, SatinEndGuide + 1);
 	else {
 		if (CurrentFormGuides[iGuide].finish - CurrentFormGuides[iGuide].start > 2) {
 			length = (lengths[CurrentFormGuides[iGuide].finish] - lengths[CurrentFormGuides[iGuide].start]) / 2
@@ -1029,10 +1034,10 @@ void satinPriv::satmf(const std::vector<double>& lengths) {
 		}
 		else
 			satinPriv::satfn(lengths,
-			      CurrentFormGuides[iGuide].start,
-			      CurrentFormGuides[iGuide].start + 1,
-			      CurrentFormGuides[iGuide].finish,
-			      CurrentFormGuides[iGuide].start + 1);
+			                 CurrentFormGuides[iGuide].start,
+			                 CurrentFormGuides[iGuide].start + 1,
+			                 CurrentFormGuides[iGuide].finish,
+			                 CurrentFormGuides[iGuide].start + 1);
 	}
 }
 
