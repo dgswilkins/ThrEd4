@@ -15140,7 +15140,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			chgchk(3);
 			break;
 		case ID_REPAIR: // edit / Repair Data
-			repar();
+			repair::repar();
 			break;
 		case ID_WARNOF: // set / Warn if edited
 			chgwrn();
@@ -17820,7 +17820,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			if (!chkMsg(stretchBoxLine, xyRatio, rotationAngle, rotationCenter))
 				DispatchMessage(&Msg);
 			if (StateMap.testAndReset(StateFlag::FCHK))
-				frmchkx();
+				repair::frmchkx();
 			if (StateMap.testAndReset(StateFlag::RESTCH))
 				redraw(MainStitchWin);
 			if (StateMap.testAndReset(StateFlag::RELAYR))
