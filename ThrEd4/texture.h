@@ -19,26 +19,26 @@
 
 namespace texture {
 
-	void   deltx();
-	void   drwtxtr();
-	void   dutxtfil();
-	void   initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<size_t>* ptrTexturePointsList) noexcept;
-	bool   istx(size_t iForm) noexcept;
-	void   redtx();
-	void   rstxt();
-	void   rtrtx();
-	void   savtxt();
-	void   setshft();
-	void   setxt(std::vector<RNGCNT>& textureSegments);
-	void   txdun();
-	void   txof();
-	void   txsnap();
-	void   txtkey(unsigned keyCode);
-	void   txtlbut();
-	void   txtrbut();
-	void   txtrmov();
-	void   txtrup();
-	void   writeScreenWidth(unsigned position);
+void deltx();
+void drwtxtr();
+void dutxtfil();
+void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<size_t>* ptrTexturePointsList) noexcept;
+bool istx(size_t iForm) noexcept;
+void redtx();
+void rstxt();
+void rtrtx();
+void savtxt();
+void setshft();
+void setxt(std::vector<RNGCNT>& textureSegments);
+void txdun();
+void txof();
+void txsnap();
+void txtkey(unsigned keyCode);
+void txtlbut();
+void txtrbut();
+void txtrmov();
+void txtrup();
+void writeScreenWidth(unsigned position);
 }
 
 namespace texturePriv {

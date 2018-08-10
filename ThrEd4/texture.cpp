@@ -1274,7 +1274,6 @@ void texturePriv::txcntrv() {
 	}
 }
 
- 
 void texturePriv::txsiz(double ratio) {
 	texturePriv::ritxfrm();
 	for (size_t iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
