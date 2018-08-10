@@ -1059,16 +1059,16 @@ void duform(unsigned formType) {
 		seteg();
 		break;
 	case FRMTEAR - 1:
-		setear();
+		formForms::setear();
 		break;
 	case FRMZIGZAG - 1:
 		setzig();
 		break;
 	case FRMWAVE - 1:
-		wavfrm();
+		formForms::wavfrm();
 		break;
 	case FRMDAISY - 1:
-		dasyfrm();
+		formForms::dasyfrm();
 		break;
 	}
 }

@@ -1924,7 +1924,7 @@ void chkhup() {
 	StateMap.set(StateFlag::HUPEX);
 	hupfn();
 	if (StateMap.test(StateFlag::INIT))
-		prfmsg();
+		formForms::prfmsg();
 	setfchk();
 }
 
@@ -2280,14 +2280,14 @@ void chknum() {
 							IniFile.hoopSizeX = value * PFGRAN;
 							SetWindowText((*ValueWindow)[PHUPX], fmt::format(L"{:.0f} mm", value).c_str());
 							sethup();
-							prfmsg();
+							formForms::prfmsg();
 							chkhup();
 							break;
 						case PHUPY:
 							IniFile.hoopSizeY = value * PFGRAN;
 							SetWindowText((*ValueWindow)[PHUPY], fmt::format(L"{:.0f} mm", value).c_str());
 							sethup();
-							prfmsg();
+							formForms::prfmsg();
 							chkhup();
 							break;
 						case PGRD:
@@ -4442,12 +4442,12 @@ void sidmsg(HWND window, std::wstring* const strings, unsigned entries) {
 					if (EdgeFillTypes[iEntry] == EDGECLIP || EdgeFillTypes[iEntry] == EDGEPICOT
 					    || EdgeFillTypes[iEntry] == EDGECLIPX) {
 						if (StateMap.test(StateFlag::WASPCDCLP))
-							maxtsiz(strings[iEntry], SideWindowSize);
+							formForms::maxtsiz(strings[iEntry], SideWindowSize);
 						else
 							entryCount--;
 					}
 					else
-						maxtsiz(strings[iEntry], SideWindowSize);
+						formForms::maxtsiz(strings[iEntry], SideWindowSize);
 				}
 			}
 			SideMessageWindow = CreateWindow(L"STATIC",
@@ -4476,7 +4476,7 @@ void sidmsg(HWND window, std::wstring* const strings, unsigned entries) {
 		else {
 			if (FormMenuChoice == LLAYR) {
 				std::wstring zero = L"0";
-				maxtsiz(zero, SideWindowSize);
+				formForms::maxtsiz(zero, SideWindowSize);
 			}
 			else {
 				if (FormMenuChoice == LFTHTYP) {
@@ -4488,7 +4488,7 @@ void sidmsg(HWND window, std::wstring* const strings, unsigned entries) {
 					for (iEntry = 0; iEntry < entries; iEntry++) {
 						if ((1 << FillTypes[iEntry]) & ClipTypeMap) {
 							if (StateMap.test(StateFlag::WASPCDCLP))
-								maxtsiz(strings[iEntry], SideWindowSize);
+								formForms::maxtsiz(strings[iEntry], SideWindowSize);
 							else
 								entryCount--;
 						}
@@ -4496,7 +4496,7 @@ void sidmsg(HWND window, std::wstring* const strings, unsigned entries) {
 							if (FillTypes[iEntry] == SelectedForm->fillType)
 								entryCount--;
 							else
-								maxtsiz(strings[iEntry], SideWindowSize);
+								formForms::maxtsiz(strings[iEntry], SideWindowSize);
 						}
 					}
 				}
@@ -10094,7 +10094,7 @@ void defpref() {
 		CustomBackgroundColor[iColor]  = DefaultCustomBackgroundColors[iColor];
 		BitmapBackgroundColors[iColor] = DefaultBitmapBackgroundColors[iColor];
 	}
-	dazdef();
+	formForms::dazdef();
 	AppliqueColor          = 15;
 	BorderWidth            = BRDWID;
 	ButtonholeCornerLength = IBFCLEN;
@@ -12353,7 +12353,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				}
 			}
 			unsid();
-			prfmsg();
+			formForms::prfmsg();
 			return 1;
 		}
 		if (StateMap.testAndReset(StateFlag::INSFIL)) {
@@ -12390,7 +12390,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			}
 			unmsg();
 			if (StateMap.testAndReset(StateFlag::WASFRMFRM))
-				refrm();
+				formForms::refrm();
 			return 1;
 		}
 		if (StateMap.testAndReset(StateFlag::FUNSCLP)) {
@@ -12523,7 +12523,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			for (iPreference = 0; iPreference < PRFLINS; iPreference++) {
 				if (Msg.hwnd == (*ValueWindow)[iPreference]) {
 					PreferenceIndex = iPreference + 1;
-					prfsid((*ValueWindow)[iPreference]);
+					formForms::prfsid((*ValueWindow)[iPreference]);
 					break;
 				}
 			}
@@ -12742,7 +12742,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 					if (Msg.hwnd == SideWindow[iFillType]) {
 						SelectedForm->fillInfo.feather.fillType = iFillType + 1;
 						refil();
-						refrm();
+						formForms::refrm();
 						break;
 					}
 				}
@@ -12963,7 +12963,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 						return 1;
 					}
 				} while (false);
-				refrm();
+				formForms::refrm();
 				refil();
 				unsid();
 				StateMap.set(StateFlag::RESTCH);
@@ -13134,7 +13134,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 						dutxtfil();
 					}
 				} while (false);
-				refrm();
+				formForms::refrm();
 				refil();
 				unsid();
 				StateMap.set(StateFlag::RESTCH);
@@ -13147,57 +13147,57 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			do {
 				if (Msg.hwnd == (*ValueWindow)[LTXOF]) {
 					FormMenuChoice = LTXOF;
-					sidwnd((*ValueWindow)[LTXOF]);
+					formForms::sidwnd((*ValueWindow)[LTXOF]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LUSPAC]) {
 					FormMenuChoice = LUSPAC;
-					sidwnd((*ValueWindow)[LUSPAC]);
+					formForms::sidwnd((*ValueWindow)[LUSPAC]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LUANG]) {
 					FormMenuChoice = LUANG;
-					sidwnd((*ValueWindow)[LUANG]);
+					formForms::sidwnd((*ValueWindow)[LUANG]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LULEN]) {
 					FormMenuChoice = LULEN;
-					sidwnd((*ValueWindow)[LULEN]);
+					formForms::sidwnd((*ValueWindow)[LULEN]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LWLKIND]) {
 					FormMenuChoice = LWLKIND;
-					sidwnd((*ValueWindow)[LWLKIND]);
+					formForms::sidwnd((*ValueWindow)[LWLKIND]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFTHSIZ]) {
 					FormMenuChoice = LFTHSIZ;
-					sidwnd((*ValueWindow)[LFTHSIZ]);
+					formForms::sidwnd((*ValueWindow)[LFTHSIZ]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFTHNUM]) {
 					FormMenuChoice = LFTHNUM;
-					sidwnd((*ValueWindow)[LFTHNUM]);
+					formForms::sidwnd((*ValueWindow)[LFTHNUM]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFTHFLR]) {
 					FormMenuChoice = LFTHFLR;
-					sidwnd((*ValueWindow)[LFTHFLR]);
+					formForms::sidwnd((*ValueWindow)[LFTHFLR]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFTHUPCNT]) {
 					FormMenuChoice = LFTHUPCNT;
-					sidwnd((*ValueWindow)[LFTHUPCNT]);
+					formForms::sidwnd((*ValueWindow)[LFTHUPCNT]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFTHDWNCNT]) {
 					FormMenuChoice = LFTHDWNCNT;
-					sidwnd((*ValueWindow)[LFTHDWNCNT]);
+					formForms::sidwnd((*ValueWindow)[LFTHDWNCNT]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFTHBLND]) {
 					StateMap.set(StateFlag::FLPBLND);
-					refrm();
+					formForms::refrm();
 					refil();
 					unsid();
 					StateMap.set(StateFlag::RESTCH);
@@ -13205,7 +13205,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFTHUP]) {
 					SelectedForm->extendedAttribute ^= AT_FTHUP;
-					refrm();
+					formForms::refrm();
 					refil();
 					unsid();
 					StateMap.set(StateFlag::RESTCH);
@@ -13213,7 +13213,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFTHBTH]) {
 					SelectedForm->extendedAttribute ^= AT_FTHBTH;
-					refrm();
+					formForms::refrm();
 					refil();
 					unsid();
 					StateMap.set(StateFlag::RESTCH);
@@ -13251,32 +13251,32 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFRMCOL]) {
 					FormMenuChoice = LFRMCOL;
-					sidwnd((*ValueWindow)[LFRMCOL]);
+					formForms::sidwnd((*ValueWindow)[LFRMCOL]);
 					StateMap.set(StateFlag::SIDCOL);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LUNDCOL]) {
 					FormMenuChoice = LUNDCOL;
-					sidwnd((*ValueWindow)[LUNDCOL]);
+					formForms::sidwnd((*ValueWindow)[LUNDCOL]);
 					StateMap.set(StateFlag::SIDCOL);
 					StateMap.set(StateFlag::UNDCOL);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFTHCOL]) {
 					FormMenuChoice = LFTHCOL;
-					sidwnd((*ValueWindow)[LFTHCOL]);
+					formForms::sidwnd((*ValueWindow)[LFTHCOL]);
 					StateMap.set(StateFlag::SIDCOL);
 					StateMap.set(StateFlag::FTHSID);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFRMSPAC]) {
 					FormMenuChoice = LFRMSPAC;
-					sidwnd((*ValueWindow)[LFRMSPAC]);
+					formForms::sidwnd((*ValueWindow)[LFRMSPAC]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFRMLEN]) {
 					FormMenuChoice = LFRMLEN;
-					sidwnd((*ValueWindow)[LFRMLEN]);
+					formForms::sidwnd((*ValueWindow)[LFRMLEN]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LBRD]) {
@@ -13287,36 +13287,36 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				}
 				if (Msg.hwnd == (*ValueWindow)[LBRDCOL]) {
 					FormMenuChoice = LBRDCOL;
-					sidwnd((*ValueWindow)[LBRDCOL]);
+					formForms::sidwnd((*ValueWindow)[LBRDCOL]);
 					StateMap.set(StateFlag::SIDCOL);
 					StateMap.set(StateFlag::BRDSID);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LBRDSPAC]) {
 					FormMenuChoice = LBRDSPAC;
-					sidwnd((*ValueWindow)[LBRDSPAC]);
+					formForms::sidwnd((*ValueWindow)[LBRDSPAC]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LBRDLEN]) {
 					FormMenuChoice = LBRDLEN;
-					sidwnd((*ValueWindow)[LBRDLEN]);
+					formForms::sidwnd((*ValueWindow)[LBRDLEN]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LBRDSIZ]) {
 					FormMenuChoice = LBRDSIZ;
-					sidwnd((*ValueWindow)[LBRDSIZ]);
+					formForms::sidwnd((*ValueWindow)[LBRDSIZ]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LAPCOL]) {
 					FormMenuChoice = LAPCOL;
 					StateMap.set(StateFlag::SIDCOL);
 					StateMap.set(StateFlag::APSID);
-					sidwnd((*ValueWindow)[LAPCOL]);
+					formForms::sidwnd((*ValueWindow)[LAPCOL]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LBCSIZ]) {
 					FormMenuChoice = LBCSIZ;
-					sidwnd((*ValueWindow)[LBCSIZ]);
+					formForms::sidwnd((*ValueWindow)[LBCSIZ]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LBSTRT]) {
@@ -13343,12 +13343,12 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFRMANG]) {
 					FormMenuChoice = LFRMANG;
-					sidwnd((*ValueWindow)[LFRMANG]);
+					formForms::sidwnd((*ValueWindow)[LFRMANG]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LBRDPIC]) {
 					FormMenuChoice = LBRDPIC;
-					sidwnd((*ValueWindow)[LBRDPIC]);
+					formForms::sidwnd((*ValueWindow)[LBRDPIC]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LBRDUND]) {
@@ -13358,17 +13358,17 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				}
 				if (Msg.hwnd == (*ValueWindow)[LSACANG]) {
 					FormMenuChoice = LSACANG;
-					sidwnd((*ValueWindow)[LSACANG]);
+					formForms::sidwnd((*ValueWindow)[LSACANG]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFRMFAZ]) {
 					FormMenuChoice = LFRMFAZ;
-					sidwnd((*ValueWindow)[LFRMFAZ]);
+					formForms::sidwnd((*ValueWindow)[LFRMFAZ]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LBRDPOS]) {
 					FormMenuChoice = LBRDPOS;
-					sidwnd((*ValueWindow)[LBRDPOS]);
+					formForms::sidwnd((*ValueWindow)[LBRDPOS]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LBFILSQR]) {
@@ -13381,7 +13381,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				}
 				if (Msg.hwnd == (*ValueWindow)[LDSTRT]) {
 					FormMenuChoice = LDSTRT;
-					sidwnd((*ValueWindow)[LDSTRT]);
+					formForms::sidwnd((*ValueWindow)[LDSTRT]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFEND]) {
@@ -13390,7 +13390,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				}
 				if (Msg.hwnd == (*ValueWindow)[LDEND]) {
 					FormMenuChoice = LDEND;
-					sidwnd((*ValueWindow)[LDEND]);
+					formForms::sidwnd((*ValueWindow)[LDEND]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LWALK]) {
@@ -13407,22 +13407,22 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				}
 				if (Msg.hwnd == (*ValueWindow)[LMAXFIL]) {
 					FormMenuChoice = LMAXFIL;
-					sidwnd((*ValueWindow)[LMAXFIL]);
+					formForms::sidwnd((*ValueWindow)[LMAXFIL]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LMINFIL]) {
 					FormMenuChoice = LMINFIL;
-					sidwnd((*ValueWindow)[LMINFIL]);
+					formForms::sidwnd((*ValueWindow)[LMINFIL]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LMAXBRD]) {
 					FormMenuChoice = LMAXBRD;
-					sidwnd((*ValueWindow)[LMAXBRD]);
+					formForms::sidwnd((*ValueWindow)[LMAXBRD]);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LMINBRD]) {
 					FormMenuChoice = LMINBRD;
-					sidwnd((*ValueWindow)[LMINBRD]);
+					formForms::sidwnd((*ValueWindow)[LMINBRD]);
 					break;
 				}
 			} while (false);
@@ -13929,7 +13929,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			else
 				unmsg();
 			if (StateMap.testAndReset(StateFlag::WASFRMFRM))
-				refrm();
+				formForms::refrm();
 			return 1;
 		}
 		if (StateMap.testAndReset(StateFlag::PRGMSG)) {
@@ -14225,7 +14225,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			cntrx();
 			break;
 		case 0xbf: /// forward slash /
-			frmnum();
+			formForms::frmnum();
 			break;
 		case 0xbb: //=
 			shrnk();
@@ -14376,7 +14376,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			}
 			break;
 		case 'P':
-			prfmsg();
+			formForms::prfmsg();
 			break;
 		case 'N':
 			if (GetKeyState(VK_CONTROL) & 0X8000)
@@ -14541,7 +14541,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 				else {
 					frmon();
 					if (StateMap.test(StateFlag::FORMSEL))
-						refrm();
+						formForms::refrm();
 					else
 						form();
 				}
@@ -15466,7 +15466,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			cntrx();
 			break;
 		case ID_FRMNUM: // edit / Set / Form Number
-			frmnum();
+			formForms::frmnum();
 			break;
 		case ID_REFILF: // fill / Refill
 			filfrms();
@@ -15709,7 +15709,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			filangl();
 			break;
 		case ID_PREF: // pref
-			prfmsg();
+			formForms::prfmsg();
 			break;
 		case ID_BOLD: // fill / Border / Bean
 			if (StateMap.test(StateFlag::FORMSEL) || SelectedFormList->size())
@@ -15758,7 +15758,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 		case ID_FORM: // Form
 			frmon();
 			if (StateMap.test(StateFlag::FORMSEL))
-				refrm();
+				formForms::refrm();
 			else
 				form();
 			break;
@@ -16309,7 +16309,7 @@ void init() {
 	GetClientRect(ThrEdWindow, &ThredWindowRect);
 	stchWnd();
 	displayText::lodstr();
-	maxwid(STR_PRF0, STR_PRF27);
+	formForms::maxwid(STR_PRF0, STR_PRF27);
 	if (!IniFileHandle) {
 		// initialize the user color and thread size arrays
 		for (iColor = 0; iColor < 16; iColor++)
@@ -16987,7 +16987,7 @@ void drwStch() {
 	if (StateMap.test(StateFlag::SATPNT))
 		satzum();
 	if (FormDataSheet)
-		refrm();
+		formForms::refrm();
 	if (StateMap.test(StateFlag::GMRK))
 		drwmrk(StitchWindowMemDC);
 	if (StateMap.test(StateFlag::PRFACT))

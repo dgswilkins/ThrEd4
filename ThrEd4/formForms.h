@@ -23,39 +23,46 @@
 // Local Headers
 #include "ThrEdTypes.h"
 
+namespace formForms {
+
+void dazdef();
+void dasyfrm();
+void frmnum();
+void maxtsiz(const std::wstring& label, POINT& textSize);
+void maxwid(unsigned start, unsigned finish);
+void prfmsg();
+void prfsid(HWND wnd) noexcept;
+void refrm();
+void setear();
+void sidwnd(HWND wnd) noexcept;
+void wavfrm();
+}
+
+namespace formFormsPriv {
+
 BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam) noexcept;
 
 void chkdaz() noexcept;
-void dasyfrm();
 
 BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
-void dazdef();
-void frmnum();
 void initdaz(HWND hWinDialog);
 
 inline void initTearDlg(HWND hwndlg);
 
-void maxtsiz(const std::wstring& label, POINT& textSize);
-void maxwid(unsigned start, unsigned finish);
 HWND numwin(const std::wstring& winName, const RECT& location);
 void nxtlin() noexcept;
 void prflin(const std::wstring& msg, unsigned row);
-void prfmsg();
 HWND prfnwin(const std::wstring& text) noexcept;
-void prfsid(HWND wnd) noexcept;
 void prftwin(const std::wstring& text) noexcept;
-void refrm();
 void refrmfn();
-void setear();
-void sidwnd(HWND wnd) noexcept;
 
 bool CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
 HWND txtrwin(const std::wstring& winName, const RECT& location);
 HWND txtwin(const std::wstring& windowName, const RECT& location);
-void wavfrm();
 
 inline void wavinit(HWND hwndlg);
 
 bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+}
