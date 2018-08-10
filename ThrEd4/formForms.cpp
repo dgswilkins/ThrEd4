@@ -11,9 +11,6 @@
 // Windows Header Files:
 #include <Windows.h> // Win32 Platform SDK main header
 
-// C RunTime Header Files
-#include <Shlwapi.h>
-
 // Open Source headers
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
@@ -764,7 +761,7 @@ BOOL CALLBACK formFormsPriv::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPA
 			GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer, HBUFSIZ);
 			for (unsigned char iType = 0; iType < 6; iType++) {
 				LoadString(ThrEdInstance, DaisyTypeStrings[iType], compareBuffer, HBUFSIZ);
-				if (!StrCmpW(buffer, compareBuffer)) {
+				if (!wcscmp(buffer, compareBuffer)) {
 					IniFile.daisyBorderType = iType;
 					break;
 				}

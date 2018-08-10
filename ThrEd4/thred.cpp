@@ -11,12 +11,6 @@
 // Windows Header Files:
 #include <Windows.h> // Win32 Platform SDK main header
 
-// C RunTime Header Files
-#include <commdlg.h>
-#include <shellapi.h>
-#include <Shlwapi.h>
-#include <shlobj.h>
-
 #ifdef ALLOCFAILURE
 #include <new.h>
 #endif

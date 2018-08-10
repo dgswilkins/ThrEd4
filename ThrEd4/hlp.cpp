@@ -12,8 +12,6 @@
 #include <Windows.h> // Win32 Platform SDK main header
 #include <HtmlHelp.h>
 
-// C RunTime Header Files
-
 // Open Source headers
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
