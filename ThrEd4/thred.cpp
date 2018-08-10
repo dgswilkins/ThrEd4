@@ -17642,15 +17642,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	// testalloc[0] = 1;
 #endif
 
-	ThrEdInstance    = hInstance;
-	wc.cbSize        = sizeof(wc);
-	wc.style         = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-	wc.lpfnWndProc   = (WNDPROC)WndProc;
-	wc.cbClsExtra    = 0;
-	wc.cbWndExtra    = 0;
-	wc.hInstance     = ThrEdInstance;
-	wc.hIcon         = static_cast<HICON>(LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_SHARED));
-	wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	ThrEdInstance  = hInstance;
+	wc.cbSize      = sizeof(wc);
+	wc.style       = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	wc.lpfnWndProc = (WNDPROC)WndProc;
+	wc.cbClsExtra  = 0;
+	wc.cbWndExtra  = 0;
+	wc.hInstance   = ThrEdInstance;
+	wc.hIcon       = static_cast<HICON>(LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_SHARED));
+	wc.hCursor     = 0; //  set the cursor to null as the cursor changes in the window:
+	                    //  https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setcursor
 	wc.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
 	wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1);
 	wc.lpszClassName = L"thred";
