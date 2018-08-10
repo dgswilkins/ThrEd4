@@ -31,7 +31,7 @@
 
 HWND HelpWindow; // help window
 
-void help() {
+void hlp::help() {
 	std::wstring helpFileName;
 
 	displayText::loadString(helpFileName, IDS_HELPFN);

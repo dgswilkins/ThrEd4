@@ -14298,7 +14298,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			snap();
 			break;
 		case VK_F1:
-			help();
+			hlp::help();
 			break;
 		case VK_F3:
 			if (GetKeyState(VK_CONTROL) & 0X8000)
@@ -15524,7 +15524,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			desiz();
 			break;
 		case ID_HLP: // help
-			help();
+			hlp::help();
 			break;
 		case ID_CNTR: // edit / Center / Forms
 			fcntr();
