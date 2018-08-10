@@ -275,7 +275,7 @@ void formFormsPriv::refrmfn() {
 			    = formFormsPriv::numwin(fmt::format(L"{:.2f}", (SelectedForm->fillSpacing / PFGRAN)), ValueWindowCoords);
 			formFormsPriv::nxtlin();
 		}
-		if (istx(ClosestFormToCursor)) {
+		if (texture::istx(ClosestFormToCursor)) {
 			labelWindow[LTXOF] = formFormsPriv::txtwin(stringTable[STR_TXOF], LabelWindowCoords);
 			valueWindow[LTXOF] = formFormsPriv::numwin(fmt::format(L"{:.2f}", (SelectedForm->txof / PFGRAN)), ValueWindowCoords);
 			formFormsPriv::nxtlin();
@@ -284,7 +284,7 @@ void formFormsPriv::refrmfn() {
 		valueWindow[LMAXFIL]
 		    = formFormsPriv::numwin(fmt::format(L"{:.2f}", (SelectedForm->maxFillStitchLen / PFGRAN)), ValueWindowCoords);
 		formFormsPriv::nxtlin();
-		if (!clip::isclp(ClosestFormToCursor) && !istx(ClosestFormToCursor)) {
+		if (!clip::isclp(ClosestFormToCursor) && !texture::istx(ClosestFormToCursor)) {
 			labelWindow[LFRMLEN] = formFormsPriv::txtwin(stringTable[STR_TXT5], LabelWindowCoords);
 			valueWindow[LFRMLEN] = formFormsPriv::numwin(
 			    fmt::format(L"{:.2f}", (SelectedForm->lengthOrCount.stitchLength / PFGRAN)), ValueWindowCoords);
@@ -312,7 +312,7 @@ void formFormsPriv::refrmfn() {
 			formFormsPriv::nxtlin();
 		}
 		if (SelectedForm->fillType == VRTF || SelectedForm->fillType == HORF || SelectedForm->fillType == ANGF
-		    || istx(ClosestFormToCursor)) {
+		    || texture::istx(ClosestFormToCursor)) {
 			labelWindow[LBFILSQR] = formFormsPriv::txtwin(stringTable[STR_PRF2], LabelWindowCoords);
 			if (SelectedForm->extendedAttribute & AT_SQR)
 				choice = stringTable[STR_SQR];

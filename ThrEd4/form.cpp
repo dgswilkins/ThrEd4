@@ -216,8 +216,8 @@ void delmfil() {
 	unsigned     stitchAttribute = 0;
 	unsigned     iSource = 0, iDestination = 0;
 
-	if (istx(ClosestFormToCursor))
-		deltx();
+	if (texture::istx(ClosestFormToCursor))
+		texture::deltx();
 	clip::delmclp(ClosestFormToCursor);
 	for (iSource = 0; iSource < PCSHeader.stitchCount; iSource++) {
 		stitchAttribute = StitchBuffer[iSource].attribute;
@@ -4852,17 +4852,17 @@ void refilfn() {
 				doFill = false;
 				break;
 			case TXVRTF:
-				setxt(textureSegments);
+				texture::setxt(textureSegments);
 				clpcon(textureSegments);
 				doFill = false;
 				break;
 			case TXHORF:
-				setxt(textureSegments);
+				texture::setxt(textureSegments);
 				horclpfn(textureSegments);
 				doFill = false;
 				break;
 			case TXANGF:
-				setxt(textureSegments);
+				texture::setxt(textureSegments);
 				StateMap.reset(StateFlag::ISUND);
 				angclpfn(textureSegments);
 				doFill = false;
@@ -4964,7 +4964,7 @@ void makpoli() noexcept {
 
 void fsvrt() {
 	clip::delmclp(ClosestFormToCursor);
-	deltx();
+	texture::deltx();
 	makpoli();
 	SelectedForm->fillType  = VRTF;
 	SelectedForm->type      = FRMFPOLY;
@@ -5004,7 +5004,7 @@ void filvrt() {
 
 void fshor() {
 	clip::delmclp(ClosestFormToCursor);
-	deltx();
+	texture::deltx();
 	makpoli();
 	SelectedForm->fillType  = HORF;
 	SelectedForm->fillColor = ActiveColor;
@@ -5042,7 +5042,7 @@ void filhor() {
 
 void fsangl() {
 	clip::delmclp(ClosestFormToCursor);
-	deltx();
+	texture::deltx();
 	makpoli();
 	SelectedForm->fillType              = ANGF;
 	SelectedForm->angleOrClipData.angle = static_cast<float>(IniFile.fillAngle);
@@ -5272,7 +5272,7 @@ void rotfrm(size_t newStartVertex) {
 
 void filsfn() {
 	clip::delmclp(ClosestFormToCursor);
-	deltx();
+	texture::deltx();
 	SelectedForm->type = SAT;
 	fsizpar();
 	SelectedForm->fillType    = SATF;
@@ -5460,7 +5460,7 @@ void unfil() {
 			SelectedForm = &FormList[selectedForm];
 			if (SelectedForm->fillType || SelectedForm->edgeType) {
 				clip::delclps(selectedForm);
-				deltx();
+				texture::deltx();
 				formMap.set(selectedForm);
 				SelectedForm->fillType = 0;
 				SelectedForm->edgeType = 0;
@@ -5501,7 +5501,7 @@ void unfil() {
 				}
 			}
 			clip::delclps(ClosestFormToCursor);
-			deltx();
+			texture::deltx();
 			SelectedForm->fillType = 0;
 			SelectedForm->edgeType = 0;
 			SelectedForm->extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
@@ -6808,7 +6808,7 @@ void flpord() {
 void filsclp() {
 	unsigned iClip = 0;
 
-	deltx();
+	texture::deltx();
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->type != SAT)
 		SelectedForm->wordParam = 0;
@@ -7640,7 +7640,7 @@ bool contsf(size_t formIndex) {
 	fvars(formIndex);
 	if (SelectedForm->vertexCount > 4) {
 		clip::delclps(ClosestFormToCursor);
-		deltx();
+		texture::deltx();
 		chkcont();
 		SelectedForm->fillSpacing = LineSpacing;
 		SelectedForm->fillColor   = ActiveColor;
@@ -8290,7 +8290,7 @@ void vrtsclp() {
 
 	fvars(ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
-	deltx();
+	texture::deltx();
 	SelectedForm->lengthOrCount.clipCount = ClipStitchCount;
 	SelectedForm->angleOrClipData.clip    = clip::numclp();
 	SelectedForm->wordParam               = IniFile.fillPhase;
@@ -8352,7 +8352,7 @@ void horsclp() {
 
 	fvars(ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
-	deltx();
+	texture::deltx();
 	SelectedForm->lengthOrCount.clipCount = ClipStitchCount;
 	SelectedForm->angleOrClipData.clip    = clip::numclp();
 	SelectedForm->lengthOrCount.clipCount = ClipStitchCount;
@@ -8416,7 +8416,7 @@ void angsclp() {
 
 	fvars(ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
-	deltx();
+	texture::deltx();
 	SelectedForm->angleOrClipData.clip    = clip::numclp();
 	SelectedForm->lengthOrCount.clipCount = ClipStitchCount;
 	SelectedForm->wordParam               = IniFile.fillPhase;

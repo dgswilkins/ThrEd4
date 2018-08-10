@@ -137,7 +137,7 @@ unsigned repairPriv::frmchkfn() {
 						badData.attribute |= BADSAT;
 				}
 			}
-			if (istx(iForm)) {
+			if (texture::istx(iForm)) {
 				if (!(badData.attribute & BADTX)) {
 					if (badData.tx == formHeader->fillInfo.texture.index)
 						badData.tx += formHeader->fillInfo.texture.count;
@@ -168,7 +168,7 @@ void repairPriv::bcup(size_t find, BADCNTS& badData) noexcept {
 		badData.clip += formHeader.clipEntries;
 	if (formHeader.type == SAT)
 		badData.guideCount += formHeader.satinGuideCount;
-	if (istx(find))
+	if (texture::istx(find))
 		badData.tx += formHeader.fillInfo.texture.count;
 }
 
@@ -357,7 +357,7 @@ void repairPriv::reptx() {
 	BADCNTS badData      = {};
 
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
-		if (istx(iForm)) {
+		if (texture::istx(iForm)) {
 			const auto formHeader = &FormList[iForm];
 			if (gsl::narrow<unsigned short>(TextureIndex)
 			    > formHeader->fillInfo.texture.index + formHeader->fillInfo.texture.count) {

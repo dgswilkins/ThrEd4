@@ -3446,7 +3446,7 @@ void dstcurs() noexcept {
 }
 
 void reldun() {
-	txdun();
+	texture::txdun();
 	ritbal();
 	ritini();
 	dstcurs();
@@ -4376,9 +4376,9 @@ void save() {
 }
 
 void dun() {
-	savtxt();
-	txof();
-	rstxt();
+	texture::savtxt();
+	texture::txof();
+	texture::rstxt();
 	if (StateMap.testAndReset(StateFlag::PRFACT)) {
 		DestroyWindow(PreferencesWindow);
 		StateMap.reset(StateFlag::WASRT);
@@ -6950,7 +6950,7 @@ size_t sizfclp() noexcept {
 		clipSize += SelectedForm->clipEntries * sizeof(ClipPoints[0]);
 	if (clip::isclpx(ClosestFormToCursor))
 		clipSize += SelectedForm->lengthOrCount.clipCount * sizeof(ClipPoints[0]);
-	if (istx(ClosestFormToCursor))
+	if (texture::istx(ClosestFormToCursor))
 		clipSize += SelectedForm->fillInfo.texture.count * sizeof(TexturePointsBuffer[0]);
 	return clipSize;
 }
@@ -7000,7 +7000,7 @@ size_t sizclp(unsigned formFirstStitchIndex) noexcept {
 		FileSize += SelectedForm->clipEntries * sizeof(ClipPoints[0]);
 	if (clip::isclpx(ClosestFormToCursor))
 		FileSize += SelectedForm->lengthOrCount.clipCount * sizeof(ClipPoints[0]);
-	if (istx(ClosestFormToCursor))
+	if (texture::istx(ClosestFormToCursor))
 		FileSize += SelectedForm->fillInfo.texture.count * sizeof(TexturePointsBuffer[0]);
 
 	return length;
@@ -7129,7 +7129,7 @@ void duclip() {
 						iForm           = 0;
 						for (auto selectedForm : (*SelectedFormList)) {
 							SelectedForm = &FormList[selectedForm];
-							if (istx(selectedForm)) {
+							if (texture::istx(selectedForm)) {
 								auto startPoint = TexturePointsBuffer->cbegin() + SelectedForm->fillInfo.texture.index;
 								auto endPoint   = startPoint + SelectedForm->fillInfo.texture.count;
 								std::copy(startPoint,
@@ -7217,7 +7217,7 @@ void duclip() {
 								}
 							}
 							TXPNT* textures = convert_ptr<TXPNT*>(&points[iClip]);
-							if (istx(ClosestFormToCursor)) {
+							if (texture::istx(ClosestFormToCursor)) {
 								auto startPoint = TexturePointsBuffer->cbegin() + SelectedForm->fillInfo.texture.index;
 								auto endPoint   = startPoint + SelectedForm->fillInfo.texture.count;
 								std::copy(startPoint,
@@ -7318,7 +7318,7 @@ void f1del() {
 	clip::delmclp(ClosestFormToCursor);
 	satin::delsac(ClosestFormToCursor);
 	delflt(ClosestFormToCursor);
-	deltx();
+	texture::deltx();
 }
 
 void frmdel() {
@@ -8382,7 +8382,7 @@ void insfil() {
 								FormList[iFormList].angleOrClipData.clip = adclp(FormList[iFormList].lengthOrCount.clipCount);
 							if (clip::iseclpx(iFormList))
 								FormList[iFormList].borderClipData = adclp(FormList[iFormList].clipEntries);
-							if (istx(iFormList)) {
+							if (texture::istx(iFormList)) {
 								FormList[iFormList].fillInfo.texture.index += gsl::narrow<unsigned short>(TextureIndex);
 								newTextureIndex += FormList[iFormList].fillInfo.texture.count;
 							}
@@ -10552,7 +10552,7 @@ void frmsnap(fPOINT* start, size_t count) noexcept {
 
 void gsnap() {
 	if (StateMap.test(StateFlag::TXTRED)) {
-		txsnap();
+		texture::txsnap();
 		return;
 	}
 	if (SelectedFormList->size()) {
@@ -11423,7 +11423,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 
 	if (Msg.message == WM_MOUSEMOVE) {
 		if (StateMap.test(StateFlag::TXTMOV)) {
-			txtrmov();
+			texture::txtrmov();
 			return 1;
 		}
 		movchk();
@@ -11716,11 +11716,11 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 	}
 	if (Msg.message == WM_LBUTTONUP) {
 		if (GetKeyState(VK_SHIFT) & 0X8000 && px2stch()) {
-			setshft();
+			texture::setshft();
 			return 1;
 		}
 		if (StateMap.test(StateFlag::TXTRED)) {
-			txtrup();
+			texture::txtrup();
 			return 1;
 		}
 		ReleaseCapture();
@@ -12035,7 +12035,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 	}
 	if (Msg.message == WM_RBUTTONDOWN) {
 		if (StateMap.test(StateFlag::TXTRED) && !MsgWindow) {
-			txtrbut();
+			texture::txtrbut();
 			return 1;
 		}
 		if (GetKeyState(VK_SHIFT) & 0X8000) {
@@ -12278,7 +12278,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			return 1;
 		}
 		if (StateMap.test(StateFlag::TXTRED) && !StateMap.test(StateFlag::FORMIN)) {
-			txtlbut();
+			texture::txtlbut();
 			return 1;
 		}
 		if (StateMap.testAndReset(StateFlag::FSETFCOL)) {
@@ -13110,28 +13110,28 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 					}
 					if (Msg.hwnd == SideWindow[11]) // vertical texture
 					{
-						if (istx(ClosestFormToCursor)) {
+						if (texture::istx(ClosestFormToCursor)) {
 							SelectedForm->fillType = TXVRTF;
 							break;
 						}
-						dutxtfil();
+						texture::dutxtfil();
 					}
 					if (Msg.hwnd == SideWindow[12]) // horizontal texture
 					{
-						if (istx(ClosestFormToCursor)) {
+						if (texture::istx(ClosestFormToCursor)) {
 							SelectedForm->fillType = TXHORF;
 							break;
 						}
-						dutxtfil();
+						texture::dutxtfil();
 					}
 					if (Msg.hwnd == SideWindow[13]) // angle texture
 					{
-						if (istx(ClosestFormToCursor)) {
+						if (texture::istx(ClosestFormToCursor)) {
 							SelectedForm->fillType              = TXANGF;
 							SelectedForm->angleOrClipData.angle = IniFile.fillAngle;
 							break;
 						}
-						dutxtfil();
+						texture::dutxtfil();
 					}
 				} while (false);
 				formForms::refrm();
@@ -13842,7 +13842,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 	case WM_KEYDOWN:
 		code = Msg.wParam & 0xffff;
 		if (StateMap.test(StateFlag::TXTRED)) {
-			txtkey(code);
+			texture::txtkey(code);
 			return 1;
 		}
 		fvars(ClosestFormToCursor);
@@ -14290,7 +14290,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			break;
 		case 'E':
 			if (GetKeyState(VK_SHIFT) & 0X8000)
-				dutxtfil();
+				texture::dutxtfil();
 			else
 				infrm();
 			break;
@@ -14659,7 +14659,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 							textureSource = convert_ptr<TXPNT*>(&clipData[currentClip]);
 							textureCount  = 0;
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-								if (istx(FormIndex + iForm)) {
+								if (texture::istx(FormIndex + iForm)) {
 									SelectedForm = &FormList[FormIndex + iForm];
 									textureCount += SelectedForm->fillInfo.texture.count;
 									SelectedForm->fillInfo.texture.index += gsl::narrow<unsigned short>(TextureIndex);
@@ -14734,7 +14734,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 									clipCount += SelectedForm->clipEntries;
 								}
 								textureSource = convert_ptr<TXPNT*>(&clipData[clipCount]);
-								if (istx(FormIndex)) {
+								if (texture::istx(FormIndex)) {
 									SelectedForm->fillInfo.texture.index = gsl::narrow<unsigned short>(TextureIndex);
 
 									auto currentCount = SelectedForm->fillInfo.texture.count;
@@ -15155,7 +15155,7 @@ unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rot
 			nudsiz();
 			break;
 		case ID_TXFIL: // Fill / Texture Editor
-			dutxtfil();
+			texture::dutxtfil();
 			break;
 		case ID_FRMHI: // edit / Form Update / Height
 			setfhi();
@@ -16453,7 +16453,7 @@ void init() {
 	wrnmen();
 	ritloc();
 	frmcurmen();
-	redtx();
+	texture::redtx();
 	StateMap.set(StateFlag::HIDMAP);
 	hidbit();
 	chkmen();
@@ -17350,7 +17350,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		[[gsl::suppress(type .1)]] DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
 		if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
 			if (StateMap.test(StateFlag::TXTRED)) {
-				drwtxtr();
+				texture::drwtxtr();
 				return 1;
 			}
 			if (!StateMap.test(StateFlag::RUNPAT)) {
@@ -17416,7 +17416,7 @@ LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			else
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_BTNFACE));
 			if (StateMap.test(StateFlag::TXTRED)) {
-				writeScreenWidth(position);
+				texture::writeScreenWidth(position);
 			}
 			else
 				TextOutInt(DrawItem->hDC, position, 1, (*StringTable)[STR_PIKOL].c_str(), (*StringTable)[STR_PIKOL].size());
@@ -17675,7 +17675,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		UndoBuffer = &private_UndoBuffer;
 		std::vector<TXPNT>  private_TempTexturePoints;
 		std::vector<size_t> private_SelectedTexturePointsList;
-		initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
+		texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
 		std::vector<std::wstring> private_StringTable(STR_LEN);
 		StringTable = &private_StringTable;
 		std::vector<HWND> private_ButtonWin;

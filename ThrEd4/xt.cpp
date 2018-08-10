@@ -49,7 +49,7 @@ namespace fs = std::experimental::filesystem;
 fPOINT   DesignSize;     // design size
 unsigned ColorOrder[16]; // color order adjusted for applique
 
-enum
+enum stitchStyles
 {
 	TYPE_APPLIQUE = 1, // applique
 	TYPE_CWALK,        // center walk
@@ -395,7 +395,7 @@ void fethrf() {
 	if (FormIndex) {
 		fvars(ClosestFormToCursor);
 		clip::delclps(ClosestFormToCursor);
-		deltx();
+		texture::deltx();
 		SelectedForm->type                           = SAT;
 		SelectedForm->fillInfo.feather.ratio         = IniFile.featherRatio;
 		SelectedForm->fillInfo.feather.upCount       = IniFile.featherUpCount;
@@ -2301,8 +2301,8 @@ void duauxnam() {
 void rtrclp() {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		fvars(ClosestFormToCursor);
-		if (istx(ClosestFormToCursor))
-			rtrtx();
+		if (texture::istx(ClosestFormToCursor))
+			texture::rtrtx();
 		else
 			rtrclpfn();
 	}

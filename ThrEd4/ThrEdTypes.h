@@ -168,7 +168,7 @@
 #define ITXPIX 5                  // default texture editor cross pixels
 #define ITXBUFLEN 16              // texture buffer depth
 
-enum
+enum stringLabel
 {
 	STR_PIKOL,
 	STR_UPON,
@@ -335,7 +335,7 @@ enum
 };
 
 // edge tracing directions
-enum
+enum traceDirection
 {
 	TRCU, // top edge
 	TRCR, // right edge
@@ -343,7 +343,7 @@ enum
 	TRCL  // left edge
 };
 
-enum
+enum hoopSize
 {
 	SETCUST = 1, // set the custom hoop
 	SMALHUP = 2, // pfaf code for small hoop
@@ -352,7 +352,7 @@ enum
 	CUSTHUP      // user defined hoop size
 };
 
-enum
+enum daisyStyles
 {          // daisy form types
 	DSIN,  // SINE shape
 	DRAMP, // Ramp shape
@@ -651,7 +651,7 @@ enum class UserFlag
 	EnumCount // must be the last entry in the enum
 };
 
-enum
+enum featherStyles
 {               // feather fill types
 	FTHSIN = 1, // sine
 	FTHSIN2,    // half sine
@@ -760,9 +760,8 @@ typedef struct _iniFil {
 	char           designerName[50];              // designer name
 } INIFILE;
 
-enum
+enum machineType
 {
-
 	AUXPCS,
 	AUXDST,
 	AUXPES
@@ -1922,7 +1921,7 @@ typedef struct _grdcod {
 #pragma pack()
 
 // form types
-enum
+enum formStyles
 {
 	FRMLINE = 1u, // Line form
 	FRMFPOLY,     // Freehand polygon form
@@ -1940,7 +1939,7 @@ enum
 };
 
 // main menu items
-enum
+enum mainMenuItems
 {
 	M_FILE,
 	M_VIEW,
@@ -1964,7 +1963,7 @@ enum
 };
 
 // view menu items
-enum
+enum viewMenuItems
 {
 	MVW_MOVIE,
 	MVW_SET,
@@ -1980,7 +1979,7 @@ enum
 };
 
 // fill menu items
-enum
+enum fillMenuItems
 {
 	MFIL_SAT,
 	MFIL_FTH,
@@ -1995,7 +1994,7 @@ enum
 };
 
 // clipboard data types
-enum
+enum clipDataType
 {
 	CLP_STCH = 1,
 	CLP_FRM,
@@ -2004,7 +2003,7 @@ enum
 };
 
 // edge fill types
-enum
+enum edgeFillStyles
 {
 	EDGELINE = 1, // Line
 	EDGEBEAN,     // Bean
@@ -2026,7 +2025,7 @@ enum
 #define NEGUND 0x7f
 
 // form data lines
-enum
+enum formData
 {
 	LFRM,       // form 0
 	LLAYR,      // layer 1
@@ -2081,7 +2080,7 @@ enum
 };
 
 // fill types
-enum
+enum fillStyles
 {
 	VRTF = 1, // Vertical fill
 	HORF,     // Horizontal fill
@@ -2103,7 +2102,7 @@ enum
 #define MANGCLPF 1 << ANGCLPF
 
 // preference window
-enum
+enum preferenceItems
 {
 	PSPAC,  // 0
 	PANGL,  // 1
@@ -2136,7 +2135,7 @@ enum
 };
 
 // file menu items
-enum
+enum fileMenuItems
 {
 	FM_NEW,
 	FM_OPEN,
@@ -2160,7 +2159,7 @@ enum
 };
 
 // fill message codes
-enum
+enum fillMessageCodes
 {
 	FMM_FAN,
 	FMM_VRT,
@@ -2182,7 +2181,7 @@ enum
 };
 
 // button windows
-enum
+enum stitchButtons
 {
 	HBOXSEL,
 	HUPTO,
@@ -2195,7 +2194,7 @@ enum
 	HLAYR
 };
 
-enum
+enum textureButtons
 { // text button windows
 	HTXCLR,
 	HTXHI,
@@ -2263,7 +2262,7 @@ typedef struct _insrec {
 	unsigned seq;
 } INSREC;
 
-enum
+enum interleaveTypes
 { // interleave sequence identifiers
 	I_AP,
 	I_FIL,
@@ -2360,7 +2359,7 @@ typedef struct _findInfo {
 } FINDINFO;
 
 // Line point intersection
-enum
+enum intersectionStyles
 {
 	POINT_IN_LINE = 0,
 	POINT_BEFORE_LINE,
