@@ -26,48 +26,48 @@
 namespace satin {
 
 SATCON* adsatk(size_t count) noexcept;
-void clearGuideSize();
-void cpySat(const FRMHED& formHeader);
-void cpyTmpGuides(std::vector<SATCONOUT> &inSatinGuides);
-void cpyUndoGuides(const BAKHED& undoData);
-void delcon(unsigned GuideIndex);
-void delsac(size_t formIndex) noexcept;
-void delspnt();
-void drwsat();
-void dusat() noexcept;
-size_t getGuideSize();
-void ribon();
-void satadj();
-void satbrd();
-void satfil();
-void satfix();
-void satknkt();
-void satout(double satinWidth);
-void satpnt0();
-void satpnt1();
-void satsel();
-void satzum();
-void sbrd();
-void setGuideSize(size_t newGuideSize);
-void slbrd();
-void spltsat(const SATCON& currentGuide);
-}
+void    clearGuideSize();
+void    cpySat(const FRMHED& formHeader);
+void    cpyTmpGuides(std::vector<SATCONOUT>& inSatinGuides);
+void    cpyUndoGuides(const BAKHED& undoData);
+void    delcon(unsigned GuideIndex);
+void    delsac(size_t formIndex) noexcept;
+void    delspnt();
+void    drwsat();
+void    dusat() noexcept;
+size_t  getGuideSize();
+void    ribon();
+void    satadj();
+void    satbrd();
+void    satfil();
+void    satfix();
+void    satknkt();
+void    satout(double satinWidth);
+void    satpnt0();
+void    satpnt1();
+void    satsel();
+void    satzum();
+void    sbrd();
+void    setGuideSize(size_t newGuideSize);
+void    slbrd();
+void    spltsat(const SATCON& currentGuide);
 
-namespace satinPriv {
+namespace internal {
 
-bool     chkbak(const std::vector<dPOINT>& satinBackup, const dPOINT& pnt);
-SATCON*  nusac(size_t formIndex, unsigned guideCount) noexcept;
-void     outfn(unsigned start, unsigned finish, double satinWidth);
-void     sacspac(const SATCON* const startGuide, unsigned guideCount) noexcept;
-void     satclos();
-void     satcpy(SATCON* const destination, const std::vector<SATCON> source, unsigned int size);
-void     satends(unsigned isBlunt);
-void     satfn(const std::vector<double>& lengths, size_t line1Start, size_t line1End, size_t line2Start, size_t line2End);
-unsigned satind(const SATCON* const guide) noexcept;
-void     satmf(const std::vector<double>& lengths);
-void     satsbrd();
-bool     satselfn() noexcept;
-void     sbfn(const std::vector<fPOINT>& insidePoints, size_t start, size_t finish);
-void     sfn(size_t startVertex);
-void     unsat();
-}
+	bool     chkbak(const std::vector<dPOINT>& satinBackup, const dPOINT& pnt);
+	SATCON*  nusac(size_t formIndex, unsigned guideCount) noexcept;
+	void     outfn(unsigned start, unsigned finish, double satinWidth);
+	void     sacspac(const SATCON* const startGuide, unsigned guideCount) noexcept;
+	void     satclos();
+	void     satcpy(SATCON* const destination, const std::vector<SATCON> source, unsigned int size);
+	void     satends(unsigned isBlunt);
+	void     satfn(const std::vector<double>& lengths, size_t line1Start, size_t line1End, size_t line2Start, size_t line2End);
+	unsigned satind(const SATCON* const guide) noexcept;
+	void     satmf(const std::vector<double>& lengths);
+	void     satsbrd();
+	bool     satselfn() noexcept;
+	void     sbfn(const std::vector<fPOINT>& insidePoints, size_t start, size_t finish);
+	void     sfn(size_t startVertex);
+	void     unsat();
+} // namespace internal
+} // namespace satin

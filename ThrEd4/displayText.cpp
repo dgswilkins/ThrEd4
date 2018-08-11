@@ -290,7 +290,7 @@ void displayText::grpmsg1() {
 	displayText::tabmsg(IDS_NOGRP);
 }
 
-void displayTextPriv::sdmsg() {
+void displayText::internal::sdmsg() {
 	std::wstring fmtStr;
 
 	displayText::loadString(fmtStr, IDS_SAVDISC);
@@ -360,7 +360,7 @@ void displayText::okcan() {
 void displayText::savdisc() {
 	wchar_t buffer[HBUFSIZ];
 
-	displayTextPriv::sdmsg();
+	displayText::internal::sdmsg();
 	StateMap.reset(StateFlag::BIGBOX);
 
 	GetClientRect(MsgWindow, &MsgRect);
@@ -423,26 +423,26 @@ void displayText::tomsg() {
 	                                    NULL);
 }
 
-void displayTextPriv::bxtxt(unsigned iButton, unsigned iMessage) {
+void displayText::internal::bxtxt(unsigned iButton, unsigned iMessage) {
 	std::wstring message;
 	displayText::loadString(message, iMessage);
 	SetWindowText((*ButtonWin)[iButton], message.c_str());
 }
 
-void displayTextPriv::hlpflt(unsigned iButton, unsigned iMessage, float data) {
+void displayText::internal::hlpflt(unsigned iButton, unsigned iMessage, float data) {
 	std::wstring fmtStr;
 	displayText::loadString(fmtStr, iMessage);
 	SetWindowText((*ButtonWin)[iButton], fmt::format(fmtStr, data).c_str());
 }
 
 void displayText::drwtxbut(const TXTSCR& textureScreen) {
-	displayTextPriv::bxtxt(HTXCLR, IDS_CLEAR);
-	displayTextPriv::hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight / PFGRAN);
+	displayText::internal::bxtxt(HTXCLR, IDS_CLEAR);
+	displayText::internal::hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight / PFGRAN);
 	redraw((*ButtonWin)[HTXWID]);
-	displayTextPriv::hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing / PFGRAN);
-	displayTextPriv::bxtxt(HTXVRT, IDS_TXVRT);
-	displayTextPriv::bxtxt(HTXHOR, IDS_TXHOR);
-	displayTextPriv::bxtxt(HTXANG, IDS_TXANG);
-	displayTextPriv::bxtxt(HTXMIR, IDS_TXMIR);
+	displayText::internal::hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing / PFGRAN);
+	displayText::internal::bxtxt(HTXVRT, IDS_TXVRT);
+	displayText::internal::bxtxt(HTXHOR, IDS_TXHOR);
+	displayText::internal::bxtxt(HTXANG, IDS_TXANG);
+	displayText::internal::bxtxt(HTXMIR, IDS_TXMIR);
 	SetWindowText((*ButtonWin)[HTXMIR + 1], L"");
 }

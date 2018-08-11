@@ -369,7 +369,6 @@ void        rstAll();
 void        rstdu();
 void        rtclpfn(size_t destination, size_t source) noexcept;
 void        rthumnam(unsigned iThumbnail);
-void        rtrclpfn();
 void        sCor2px(const dPOINT& stitchCoordinate, POINT& pixelCoordinate) noexcept;
 void        sachk() noexcept;
 void        sav();

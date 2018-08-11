@@ -72,19 +72,19 @@ char StitchTypes[] = {
 	TYPE_BORDER,   // 12 border
 };
 
-void setfchk() {
+void xt::setfchk() {
 	if (IniFile.dataCheck)
 		StateMap.set(StateFlag::FCHK);
 }
 
 #ifdef _DEBUG
 
-void prbug() noexcept {
+void xt::internal::prbug() noexcept {
 	OutputDebugString(MsgBuffer);
 }
 #endif
 
-void fthvars(FEATHER& feather) {
+void xt::internal::fthvars(FEATHER& feather) {
 	StateMap.reset(StateFlag::BARSAT);
 	StateMap.reset(StateFlag::FTHR);
 
@@ -104,20 +104,20 @@ void fthvars(FEATHER& feather) {
 		StateMap.set(StateFlag::FTHR);
 }
 
-constexpr float durat(float start, float finish, float featherRatio) {
+constexpr float xt::internal::durat(float start, float finish, float featherRatio) {
 	return (finish - start) * featherRatio + start;
 }
 
-constexpr float duxrat(float strt, float fin, float featherRatioLocal) {
+constexpr float xt::internal::duxrat(float strt, float fin, float featherRatioLocal) {
 	return (fin - strt) * featherRatioLocal + strt;
 }
 
-void duxrats(size_t start, size_t finish, fPOINT& point, float featherRatioLocal) noexcept {
+void xt::internal::duxrats(size_t start, size_t finish, fPOINT& point, float featherRatioLocal) noexcept {
 	point.x = duxrat(BSequence[finish].x, BSequence[start].x, featherRatioLocal);
 	point.y = duxrat(BSequence[finish].y, BSequence[start].y, featherRatioLocal);
 }
 
-void durats(size_t iSequence, fPOINT& point, FEATHER& feather) noexcept {
+void xt::internal::durats(size_t iSequence, fPOINT& point, FEATHER& feather) noexcept {
 	const double stitchLength
 	    = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x, BSequence[iSequence + 1].y - BSequence[iSequence].y);
 	fPOINT adjustedPoint = {};
@@ -135,7 +135,7 @@ void durats(size_t iSequence, fPOINT& point, FEATHER& feather) noexcept {
 	}
 }
 
-unsigned bpsg() noexcept {
+unsigned xt::internal::bpsg() noexcept {
 	unsigned testValue = 0;
 
 	if (!PseudoRandomValue)
@@ -147,7 +147,7 @@ unsigned bpsg() noexcept {
 	return PseudoRandomValue;
 }
 
-void nurat(FEATHER& feather) {
+void xt::internal::nurat(FEATHER& feather) {
 	float remainder;
 
 	remainder = fmod(feather.globalPosition, 1);
@@ -208,26 +208,26 @@ void nurat(FEATHER& feather) {
 	feather.globalPosition += feather.globalStep;
 }
 
-void fthfn(size_t iSequence, FEATHER& feather) {
+void xt::internal::fthfn(size_t iSequence, FEATHER& feather) {
 	nurat(feather);
 	durats(iSequence, OSequence[iSequence], feather);
 }
 
-void ratpnt(size_t iPoint, size_t iNextPoint, fPOINT& point, float featherRatio) noexcept {
+void xt::internal::ratpnt(size_t iPoint, size_t iNextPoint, fPOINT& point, float featherRatio) noexcept {
 	point.x = (BSequence[iNextPoint].x - BSequence[iPoint].x) * featherRatio + BSequence[iPoint].x;
 	point.y = (BSequence[iNextPoint].y - BSequence[iPoint].y) * featherRatio + BSequence[iPoint].y;
 }
 
-fPOINT midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept {
+fPOINT xt::internal::midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept {
 	return { (endPoint.x - startPoint.x) * 0.5f + startPoint.x, (endPoint.y - startPoint.y) * 0.5f + startPoint.y };
 }
 
-void xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point, float featherRatioLocal) noexcept {
+void xt::internal::xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point, float featherRatioLocal) noexcept {
 	point.x = (endPoint.x - startPoint.x) * featherRatioLocal + startPoint.x;
 	point.y = (endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y;
 }
 
-void fthrbfn(size_t iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence) {
+void xt::internal::fthrbfn(size_t iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence) {
 	fPOINT currentPoint     = {};
 	fPOINT nextPoint        = {};
 	fPOINT currentHighPoint = {};
@@ -263,7 +263,7 @@ void fthrbfn(size_t iSequence, FEATHER& feather, std::vector<fPOINT>& featherSeq
 	featherSequence.push_back(midPoint);
 }
 
-void fthdfn(size_t iSequence, FEATHER& feather) {
+void xt::internal::fthdfn(size_t iSequence, FEATHER& feather) {
 	const double length
 	    = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 	fPOINT adjustedPoint = {};
@@ -285,7 +285,7 @@ void fthdfn(size_t iSequence, FEATHER& feather) {
 	}
 }
 
-void fritfil(std::vector<fPOINT>& featherSequence, unsigned& interleaveSequenceIndex2) {
+void xt::internal::fritfil(std::vector<fPOINT>& featherSequence, unsigned& interleaveSequenceIndex2) {
 	unsigned iSequence        = 0;
 	size_t   iReverseSequence = 0;
 
@@ -316,7 +316,7 @@ void fritfil(std::vector<fPOINT>& featherSequence, unsigned& interleaveSequenceI
 	}
 }
 
-void fthrfn(unsigned& interleaveSequenceIndex2) {
+void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 	size_t              ind = 0, res = 0;
 	const double        savedSpacing = LineSpacing;
 	FEATHER             feather      = {};
@@ -324,7 +324,7 @@ void fthrfn(unsigned& interleaveSequenceIndex2) {
 
 	// ToDo - what does this function do
 	PseudoRandomValue = FSED;
-	fthvars(feather);
+	xt::internal::fthvars(feather);
 	LineSpacing = SelectedForm->fillSpacing;
 	satin::satfil();
 	BSequence[0].attribute = 0;
@@ -349,14 +349,14 @@ void fthrfn(unsigned& interleaveSequenceIndex2) {
 		OutputIndex = 0;
 		for (ind = 0; ind < SequenceIndex; ind++) {
 			if (!BSequence[ind].attribute)
-				fthrbfn(ind, feather, featherSequence);
+				xt::internal::fthrbfn(ind, feather, featherSequence);
 		}
 	}
 	else {
 		if (SelectedForm->extendedAttribute & AT_FTHBTH) {
 			for (ind = 0; ind <= SequenceIndex; ind++) {
 				if (!BSequence[ind].attribute)
-					fthdfn(ind, feather);
+					xt::internal::fthdfn(ind, feather);
 			}
 			ind--;
 		}
@@ -364,7 +364,7 @@ void fthrfn(unsigned& interleaveSequenceIndex2) {
 			for (ind = 0; ind <= SequenceIndex; ind++) {
 				if (BSequence[ind].attribute) {
 					if (feather.extendedAttribute & AT_FTHUP)
-						fthfn(ind, feather);
+						xt::internal::fthfn(ind, feather);
 					else
 						OSequence[ind] = BSequence[ind];
 					;
@@ -373,7 +373,7 @@ void fthrfn(unsigned& interleaveSequenceIndex2) {
 					if (feather.extendedAttribute & AT_FTHUP)
 						OSequence[ind] = BSequence[ind];
 					else
-						fthfn(ind, feather);
+						xt::internal::fthfn(ind, feather);
 				}
 			}
 			ind--;
@@ -384,10 +384,10 @@ void fthrfn(unsigned& interleaveSequenceIndex2) {
 	StateMap.reset(StateFlag::BARSAT);
 	LineSpacing   = savedSpacing;
 	SequenceIndex = OutputIndex;
-	fritfil(featherSequence, interleaveSequenceIndex2);
+	xt::internal::fritfil(featherSequence, interleaveSequenceIndex2);
 }
 
-void fethrf() {
+void xt::fethrf() {
 	if (FormIndex) {
 		fvars(ClosestFormToCursor);
 		clip::delclps(ClosestFormToCursor);
@@ -410,17 +410,17 @@ void fethrf() {
 	}
 }
 
-void fethr() {
+void xt::fethr() {
 	if (displayText::filmsgs(FMM_FTH))
 		return;
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		fethrf();
+		xt::fethrf();
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
-			fethrf();
+			xt::fethrf();
 		}
 	}
 	StateMap.set(StateFlag::INIT);
@@ -428,7 +428,7 @@ void fethr() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-constexpr ULARGE_INTEGER tim2int(FILETIME time) noexcept {
+constexpr ULARGE_INTEGER xt::internal::tim2int(FILETIME time) noexcept {
 	ULARGE_INTEGER op = { { 0, 0 } };
 
 	op.LowPart  = time.dwLowDateTime;
@@ -436,7 +436,7 @@ constexpr ULARGE_INTEGER tim2int(FILETIME time) noexcept {
 	return op;
 }
 
-int fil2crd(const fs::path& fileName) {
+int xt::internal::fil2crd(const fs::path& fileName) {
 	STARTUPINFO         startupInfo = {};
 	PROCESS_INFORMATION processInfo = {};
 	int                 errorCode   = 0;
@@ -461,7 +461,7 @@ int fil2crd(const fs::path& fileName) {
 	return errorCode;
 }
 
-bool chkp2cnam(const wchar_t* fileName) noexcept {
+bool xt::internal::chkp2cnam(const wchar_t* fileName) noexcept {
 	HANDLE handleP2C;
 
 	handleP2C = CreateFile(fileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
@@ -474,7 +474,7 @@ bool chkp2cnam(const wchar_t* fileName) noexcept {
 	}
 }
 
-void pes2crd() {
+void xt::pes2crd() {
 #define P2CBUFSIZ 256
 
 	HKEY          registryKey = {};
@@ -512,8 +512,8 @@ void pes2crd() {
 		displayText::tabmsg(IDS_P2CNODAT);
 		return;
 	}
-	if (chkp2cnam(utf::Utf8ToUtf16(std::string(IniFile.p2cName)).c_str())) {
-		fil2crd(*ThrName);
+	if (xt::internal::chkp2cnam(utf::Utf8ToUtf16(std::string(IniFile.p2cName)).c_str())) {
+		xt::internal::fil2crd(*ThrName);
 		return;
 	}
 	*IniFile.p2cName = 0;
@@ -523,7 +523,7 @@ void pes2crd() {
 		keyType = REG_SZ;
 		if (RegQueryValueEx(registryKey, L"ProgramFilesDir", 0, &keyType, (unsigned char*)programName, &size) == ERROR_SUCCESS) {
 			wcscat_s(programName, L"\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
-			if (!chkp2cnam(programName))
+			if (!xt::internal::chkp2cnam(programName))
 				*programName = 0;
 		}
 	}
@@ -532,7 +532,7 @@ void pes2crd() {
 		LoadString(ThrEdInstance, IDS_P2CTITL, caption, P2CBUFSIZ);
 		if (IDOK == MessageBox(ThrEdWindow, message, caption, MB_OKCANCEL)) {
 			if (GetOpenFileName(&openFileName)) {
-				if (!chkp2cnam(programName))
+				if (!xt::internal::chkp2cnam(programName))
 					return;
 			}
 			else
@@ -543,10 +543,10 @@ void pes2crd() {
 	}
 	auto p2cName = utf::Utf16ToUtf8(std::wstring(programName));
 	std::copy(p2cName.begin(), p2cName.end(), IniFile.p2cName);
-	fil2crd(*AuxName);
+	xt::internal::fil2crd(*AuxName);
 }
 
-std::vector<fPOINT>& insid() {
+std::vector<fPOINT>& xt::insid() {
 	unsigned iVertex = 0;
 
 	satin::satout(fabs(SelectedForm->underlayIndent));
@@ -562,7 +562,7 @@ std::vector<fPOINT>& insid() {
 		return *OutsidePoints;
 }
 
-void delwlk(size_t code) {
+void xt::internal::delwlk(size_t code) {
 	unsigned iStitch = 0, stitchCount = 0;
 
 	if (PCSHeader.stitchCount) {
@@ -583,7 +583,7 @@ void delwlk(size_t code) {
 	}
 }
 
-void chkuseq(const unsigned interleaveSequenceIndex2) noexcept {
+void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) noexcept {
 #if BUGBAK
 	unsigned index;
 
@@ -635,7 +635,7 @@ void chkuseq(const unsigned interleaveSequenceIndex2) noexcept {
 #endif
 }
 
-void ritwlk(unsigned& interleaveSequenceIndex2) noexcept {
+void xt::internal::ritwlk(unsigned& interleaveSequenceIndex2) noexcept {
 	if (OutputIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = WLKMSK;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
@@ -645,7 +645,7 @@ void ritwlk(unsigned& interleaveSequenceIndex2) noexcept {
 	}
 }
 
-void ritcwlk(unsigned& interleaveSequenceIndex2) noexcept {
+void xt::internal::ritcwlk(unsigned& interleaveSequenceIndex2) noexcept {
 	if (OutputIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = CWLKMSK;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
@@ -655,7 +655,7 @@ void ritcwlk(unsigned& interleaveSequenceIndex2) noexcept {
 	}
 }
 
-unsigned gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, unsigned code) {
+unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, unsigned code) {
 	double       length             = hypot(finish.x - start.x, finish.y - start.y);
 	size_t       startVertex        = closflt(start.x, start.y);
 	const size_t endVertex          = closflt(finish.x, finish.y);
@@ -669,7 +669,7 @@ unsigned gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, 
 		return 0;
 	if (startVertex == endVertex)
 		return 0;
-	const std::vector<fPOINT>& indentedPoint = insid();
+	const std::vector<fPOINT>& indentedPoint = xt::insid();
 	up = down = startVertex;
 	do {
 		if (up == endVertex) {
@@ -728,7 +728,7 @@ unsigned gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, 
 	return iStitch - destination;
 }
 
-void fnwlk(size_t find, unsigned& interleaveSequenceIndex2) {
+void xt::internal::fnwlk(size_t find, unsigned& interleaveSequenceIndex2) {
 	size_t start = 0;
 	size_t count = 0;
 
@@ -742,7 +742,7 @@ void fnwlk(size_t find, unsigned& interleaveSequenceIndex2) {
 	count = VertexCount;
 	if (SelectedForm->type != FRMLINE)
 		count++;
-	const std::vector<fPOINT>& walkPoints = insid();
+	const std::vector<fPOINT>& walkPoints = xt::insid();
 	OutputIndex                           = 0;
 	while (count) {
 		OSequence[OutputIndex] = walkPoints[start];
@@ -753,7 +753,7 @@ void fnwlk(size_t find, unsigned& interleaveSequenceIndex2) {
 	ritwlk(interleaveSequenceIndex2);
 }
 
-void ritund(unsigned& interleaveSequenceIndex2) noexcept {
+void xt::internal::ritund(unsigned& interleaveSequenceIndex2) noexcept {
 	if (SequenceIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = UNDMSK;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
@@ -763,13 +763,13 @@ void ritund(unsigned& interleaveSequenceIndex2) noexcept {
 	}
 }
 
-void undclp() noexcept {
+void xt::internal::undclp() noexcept {
 	ClipRectSize.cx = ClipRect.bottom = ClipRect.left = ClipRect.right = ClipBuffer[0].x = ClipBuffer[1].x = ClipBuffer[0].y = 0;
 	ClipRectSize.cy = ClipRect.top = ClipBuffer[1].y = SelectedForm->underlayStitchLen;
 	ClipStitchCount                                  = 2;
 }
 
-void fncwlk(unsigned& interleaveSequenceIndex2) noexcept {
+void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) noexcept {
 	size_t iVertex = 0;
 	size_t start = 0, finish = 0;
 
@@ -821,7 +821,7 @@ void fncwlk(unsigned& interleaveSequenceIndex2) noexcept {
 	ritcwlk(interleaveSequenceIndex2);
 }
 
-void srtcol() {
+void xt::srtcol() {
 	const int             colorSize = 16;
 	std::vector<unsigned> histogram(colorSize);
 	std::vector<unsigned> colorStartStitch(colorSize);
@@ -843,7 +843,7 @@ void srtcol() {
 	std::copy(highStitchBuffer.cbegin(), highStitchBuffer.cend(), StitchBuffer);
 }
 
-void dubit(unsigned bit) {
+void xt::dubit(unsigned bit) {
 	unsigned code = 0;
 
 	savdo();
@@ -871,41 +871,41 @@ void dubit(unsigned bit) {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setuang() {
+void xt::setuang() {
 	StateMap.set(StateFlag::GTUANG);
 	displayText::msgflt(IDS_UANG, IniFile.underlayAngle / PI * 180);
 }
 
-void setuspac() {
+void xt::setuspac() {
 	StateMap.set(StateFlag::GTUSPAC);
 	displayText::msgflt(IDS_USPAC, IniFile.underlaySpacing / PFGRAN);
 }
 
-void setwlkind() {
+void xt::setwlkind() {
 	StateMap.set(StateFlag::GTWLKIND);
 	displayText::msgflt(IDS_WLKIND, IniFile.underlayIndent / PFGRAN);
 }
 
-void setulen() {
+void xt::setulen() {
 	StateMap.set(StateFlag::GTWLKLEN);
 	displayText::msgflt(IDS_WLKLEN, IniFile.underlayStitchLen / PFGRAN);
 }
 
-void chkcwlk(unsigned& interleaveSequenceIndex2) {
+void xt::chkcwlk(unsigned& interleaveSequenceIndex2) {
 	if (SelectedForm->extendedAttribute & AT_CWLK)
-		fncwlk(interleaveSequenceIndex2);
+		xt::internal::fncwlk(interleaveSequenceIndex2);
 	else
-		delwlk((ClosestFormToCursor << FRMSHFT) | CWLKMSK);
+		xt::internal::delwlk((ClosestFormToCursor << FRMSHFT) | CWLKMSK);
 }
 
-void chkwlk(unsigned& interleaveSequenceIndex2) {
+void xt::chkwlk(unsigned& interleaveSequenceIndex2) {
 	if (SelectedForm->extendedAttribute & AT_WALK)
-		fnwlk(ClosestFormToCursor, interleaveSequenceIndex2);
+		xt::internal::fnwlk(ClosestFormToCursor, interleaveSequenceIndex2);
 	else
-		delwlk((ClosestFormToCursor << FRMSHFT) | WLKMSK);
+		xt::internal::delwlk((ClosestFormToCursor << FRMSHFT) | WLKMSK);
 }
 
-void fnund(const std::vector<RNGCNT>& textureSegments, size_t find, unsigned& interleaveSequenceIndex2) {
+void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, size_t find, unsigned& interleaveSequenceIndex2) {
 	const float savedStitchSize = UserStitchLength;
 
 	UserStitchLength = 1e99;
@@ -922,21 +922,21 @@ void fnund(const std::vector<RNGCNT>& textureSegments, size_t find, unsigned& in
 	UserStitchLength = savedStitchSize;
 }
 
-void chkund(const std::vector<RNGCNT>& textureSegments, unsigned& interleaveSequenceIndex2) {
+void xt::chkund(const std::vector<RNGCNT>& textureSegments, unsigned& interleaveSequenceIndex2) {
 	if (SelectedForm->extendedAttribute & AT_UND)
-		fnund(textureSegments, ClosestFormToCursor, interleaveSequenceIndex2);
+		xt::internal::fnund(textureSegments, ClosestFormToCursor, interleaveSequenceIndex2);
 	else
-		delwlk((ClosestFormToCursor << FRMSHFT) | UNDMSK);
+		xt::internal::delwlk((ClosestFormToCursor << FRMSHFT) | UNDMSK);
 }
 
-void selalfrm() {
+void xt::selalfrm() {
 	SelectedFormList->reserve(FormIndex);
 	for (auto formIndex = 0u; formIndex < FormIndex; formIndex++)
 		SelectedFormList->push_back(formIndex);
 	StateMap.set(StateFlag::RESTCH);
 }
 
-unsigned dutyp(unsigned attribute) noexcept {
+unsigned xt::internal::dutyp(unsigned attribute) noexcept {
 	char           result          = 0;
 	DWORD          bit             = 0;
 	const unsigned maskedAttribute = attribute & SRTYPMSK;
@@ -954,7 +954,7 @@ unsigned dutyp(unsigned attribute) noexcept {
 	return 1;
 }
 
-void durec(OREC& record) noexcept {
+void xt::internal::durec(OREC& record) noexcept {
 	unsigned          attribute = 0;
 	const fPOINTATTR* stitch    = &StitchBuffer[record.start];
 
@@ -964,7 +964,7 @@ void durec(OREC& record) noexcept {
 	record.form  = (attribute & FRMSK) >> FRMSHFT;
 }
 
-bool recmp(const OREC* record1, const OREC* record2) noexcept {
+bool xt::internal::recmp(const OREC* record1, const OREC* record2) noexcept {
 	if (ColorOrder[record1->color] == ColorOrder[record2->color]) {
 		if (record1->form == record2->form) {
 			if (record1->type == record2->type)
@@ -981,7 +981,7 @@ bool recmp(const OREC* record1, const OREC* record2) noexcept {
 	}
 }
 
-bool refcmp(const OREC* record1, const OREC* record2) noexcept {
+bool xt::internal::refcmp(const OREC* record1, const OREC* record2) noexcept {
 	if (record1->form == record2->form) {
 		return (record1->type < record2->type);
 	}
@@ -990,7 +990,7 @@ bool refcmp(const OREC* record1, const OREC* record2) noexcept {
 	}
 }
 
-bool chkrdun(const std::vector<unsigned>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord) {
+bool xt::internal::chkrdun(const std::vector<unsigned>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord) {
 	unsigned iStitch;
 
 	for (iStitch = stitchRecord.start; iStitch < stitchRecord.finish; iStitch++) {
@@ -1000,7 +1000,7 @@ bool chkrdun(const std::vector<unsigned>& formFillCounter, const std::vector<ORE
 	return 0;
 }
 
-double precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord) {
+double xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord) {
 	unsigned    iRegion       = 0;
 	unsigned    currentRegion = sortRecord.currentRegion;
 	fPOINTATTR* currentStitch = nullptr;
@@ -1058,7 +1058,7 @@ double precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<ORE
 	return totalJumps;
 }
 
-unsigned duprecs(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, SRTREC& sortRecord) {
+unsigned xt::internal::duprecs(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, SRTREC& sortRecord) {
 	sortRecord.direction  = 0;
 	const unsigned jumps0 = precjmps(tempStitchBuffer, pRecs, sortRecord);
 
@@ -1075,7 +1075,7 @@ unsigned duprecs(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OR
 
 #ifdef _DEBUG
 
-void dmprec(const std::vector<OREC*>& stitchRegion, unsigned count) {
+void xt::internal::dmprec(const std::vector<OREC*>& stitchRegion, unsigned count) {
 	unsigned iRegion;
 
 	for (iRegion = 0; iRegion < count; iRegion++) {
@@ -1092,7 +1092,7 @@ void dmprec(const std::vector<OREC*>& stitchRegion, unsigned count) {
 }
 #endif
 
-bool srtchk(const std::vector<OREC*>& stitchRegion, unsigned count, unsigned& badForm) {
+bool xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, unsigned count, unsigned& badForm) {
 	unsigned iRegion = 1;
 	unsigned form    = stitchRegion[0]->form;
 	unsigned color   = stitchRegion[0]->color;
@@ -1118,7 +1118,7 @@ bool srtchk(const std::vector<OREC*>& stitchRegion, unsigned count, unsigned& ba
 	return true;
 }
 
-void fsort() {
+void xt::fsort() {
 	unsigned attribute = StitchBuffer->attribute & SRTMSK;
 	unsigned iColor = 0, iStitch = 0, badForm = 0, iRange = 0, lastRange = 0;
 	unsigned currentForm = 0, iRegion = 0, lastRegion = 0;
@@ -1158,16 +1158,16 @@ void fsort() {
 	std::vector<OREC*> pRecs(lastRegion);
 	std::vector<OREC*> pFRecs(lastRegion);
 	for (iRegion = 0; iRegion < lastRegion; iRegion++) {
-		durec(stitchRegion[iRegion]);
+		xt::internal::durec(stitchRegion[iRegion]);
 		pRecs[iRegion]  = &stitchRegion[iRegion];
 		pFRecs[iRegion] = &stitchRegion[iRegion];
 	}
-	std::sort(pRecs.begin(), pRecs.end(), recmp);
-	std::sort(pFRecs.begin(), pFRecs.end(), refcmp);
+	std::sort(pRecs.begin(), pRecs.end(), xt::internal::recmp);
+	std::sort(pFRecs.begin(), pFRecs.end(), xt::internal::refcmp);
 #ifdef _DEBUG
-	dmprec(pRecs, lastRegion);
+	xt::internal::dmprec(pRecs, lastRegion);
 #endif
-	if (srtchk(pFRecs, lastRegion, badForm)) {
+	if (xt::internal::srtchk(pFRecs, lastRegion, badForm)) {
 		std::vector<RANGE> stitchRange(lastRegion);
 		stitchRange[0].start = 0;
 		attribute            = pRecs[0]->color;
@@ -1206,11 +1206,11 @@ void fsort() {
 			minimumJumps      = 0xffffffff;
 			// timeout used to put an upper bound on the number of sorting permutations checked
 			GetSystemTimeAsFileTime(&fileTime);
-			startTime = tim2int(fileTime);
+			startTime = xt::internal::tim2int(fileTime);
 			for (iRegion = sortRecord.start; iRegion < sortRecord.finish; iRegion++) {
 				sortRecord.currentRegion = iRegion;
 				if (!pRecs[iRegion]->otyp) {
-					jumps = duprecs(tempStitchBuffer, pRecs, sortRecord);
+					jumps = xt::internal::duprecs(tempStitchBuffer, pRecs, sortRecord);
 					if (jumps < minimumJumps) {
 						minimumJumps     = jumps;
 						minimumIndex     = iRegion;
@@ -1218,14 +1218,14 @@ void fsort() {
 					}
 				}
 				GetSystemTimeAsFileTime(&fileTime);
-				nextTime = tim2int(fileTime);
+				nextTime = xt::internal::tim2int(fileTime);
 				if (nextTime.QuadPart - startTime.QuadPart > SRTIM)
 					break;
 			}
 			StateMap.set(StateFlag::DUSRT);
 			sortRecord.currentRegion = minimumIndex;
 			sortRecord.direction     = minimumDirection;
-			precjmps(tempStitchBuffer, pRecs, sortRecord);
+			xt::internal::precjmps(tempStitchBuffer, pRecs, sortRecord);
 		}
 		std::copy(tempStitchBuffer.cbegin(), tempStitchBuffer.cbegin() + OutputIndex, StitchBuffer);
 		PCSHeader.stitchCount = gsl::narrow<unsigned short>(OutputIndex);
@@ -1249,7 +1249,7 @@ typedef struct _atfld {
 	unsigned user;
 } ATFLD;
 
-void duatf(unsigned ind) {
+void xt::internal::duatf(unsigned ind) {
 	const unsigned attribute       = StitchBuffer[ind].attribute;
 	ATFLD          attributeFields = { (attribute & COLMSK),
                               ((attribute & FRMSK) >> FRMSHFT),
@@ -1272,20 +1272,20 @@ void duatf(unsigned ind) {
 	                      .c_str());
 }
 
-void dmpat() {
+void xt::dmpat() {
 	unsigned iStitch = 0, attribute = StitchBuffer[0].attribute;
 
-	duatf(0);
+	xt::internal::duatf(0);
 	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (attribute != StitchBuffer[iStitch].attribute) {
-			duatf(iStitch);
+			xt::internal::duatf(iStitch);
 			attribute = StitchBuffer[iStitch].attribute;
 		}
 	}
 }
 #endif
 
-void fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
+void xt::fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
 	unsigned iSourceStitch = 0, ind = 0, iDestinationStitch = 0, attribute = 0, type = 0, tmap = 0, color = 0, bordercolor = 0,
 	         tapcol       = 0;
 	size_t codedFormIndex = 0;
@@ -1299,7 +1299,7 @@ void fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
 			ClosestPointIndex = iDestinationStitch;
 		attribute = StitchBuffer[iSourceStitch].attribute;
 		if (codedFormIndex == (attribute & (FRMSK | NOTFRM))) {
-			type = StitchTypes[dutyp(attribute)];
+			type = StitchTypes[xt::internal::dutyp(attribute)];
 			switch (type) {
 			case TYPE_APPLIQUE:
 				if (!(tmap & M_AP)) {
@@ -1417,7 +1417,7 @@ void fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
 	}
 }
 
-bool lastcol(unsigned index, fPOINT& point) noexcept {
+bool xt::internal::lastcol(unsigned index, fPOINT& point) noexcept {
 	unsigned color;
 
 	color = InterleaveSequenceIndices[index].color;
@@ -1431,7 +1431,7 @@ bool lastcol(unsigned index, fPOINT& point) noexcept {
 	return 0;
 }
 
-void duint(unsigned offset, unsigned code, INTINF& ilData) {
+void xt::internal::duint(unsigned offset, unsigned code, INTINF& ilData) {
 	unsigned count = 0, iSequence = 0;
 	fPOINT   point = {};
 
@@ -1467,7 +1467,7 @@ void duint(unsigned offset, unsigned code, INTINF& ilData) {
 	}
 }
 
-bool isfil() noexcept {
+bool xt::internal::isfil() noexcept {
 	if (SelectedForm->fillType)
 		return 1;
 	if (SelectedForm->edgeType)
@@ -1477,7 +1477,7 @@ bool isfil() noexcept {
 	return 0;
 }
 
-void chkend(unsigned offset, unsigned code, INTINF& ilData) {
+void xt::internal::chkend(unsigned offset, unsigned code, INTINF& ilData) {
 	if (isfil()) {
 		StateMap.set(StateFlag::ISEND);
 		if (SelectedForm->extendedAttribute & AT_END)
@@ -1488,7 +1488,7 @@ void chkend(unsigned offset, unsigned code, INTINF& ilData) {
 	}
 }
 
-void intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsigned interleaveSequenceIndex2) {
+void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsigned interleaveSequenceIndex2) {
 	unsigned ine = 0, code = 0, offset = 0;
 	fPOINT   colpnt = {};
 	INTINF   ilData = {};
@@ -1536,9 +1536,9 @@ void intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsig
 			}
 			code = gsl::narrow<unsigned int>(ilData.layerIndex | InterleaveSequenceIndices[ilData.pins].code
 			                                 | InterleaveSequenceIndices[ilData.pins].color);
-			duint(offset, code, ilData);
+			xt::internal::duint(offset, code, ilData);
 		}
-		chkend(MAXITEMS, code, ilData);
+		xt::internal::chkend(MAXITEMS, code, ilData);
 		if (PCSHeader.stitchCount && ilData.start < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 			ine              = PCSHeader.stitchCount - ilData.start;
 			auto sourceStart = &StitchBuffer[ilData.start];
@@ -1560,14 +1560,14 @@ void intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsig
 			                                 | InterleaveSequenceIndices[iSequence].color);
 			if (SelectedForm->extendedAttribute & AT_STRT) {
 				if (!StateMap.testAndSet(StateFlag::DIDSTRT))
-					ilData.output += gucon(CurrentFormVertices[SelectedForm->fillStart],
+					ilData.output += xt::internal::gucon(CurrentFormVertices[SelectedForm->fillStart],
 					                       InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index],
 					                       ilData.output + offset,
 					                       code);
 			}
-			if (lastcol(iSequence, colpnt))
+			if (xt::internal::lastcol(iSequence, colpnt))
 				ilData.output
-				    += gucon(colpnt, InterleaveSequence[InterleaveSequenceIndices[iSequence].index], ilData.output, code);
+				    += xt::internal::gucon(colpnt, InterleaveSequence[InterleaveSequenceIndices[iSequence].index], ilData.output, code);
 			for (ine = InterleaveSequenceIndices[iSequence].index; ine < InterleaveSequenceIndices[iSequence + 1].index; ine++) {
 				StitchBuffer[ilData.output].x         = InterleaveSequence[ine].x;
 				StitchBuffer[ilData.output].y         = InterleaveSequence[ine].y;
@@ -1582,13 +1582,13 @@ void intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsig
 				}
 			}
 		}
-		chkend(0, code, ilData);
+		xt::internal::chkend(0, code, ilData);
 	}
 	PCSHeader.stitchCount = ilData.output;
 	coltab();
 }
 
-void setundfn(unsigned code) {
+void xt::internal::setundfn(unsigned code) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		fvars(ClosestFormToCursor);
@@ -1618,19 +1618,19 @@ void setundfn(unsigned code) {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setund() {
-	setundfn(AT_UND);
+void xt::setund() {
+	xt::internal::setundfn(AT_UND);
 }
 
-void setwlk() {
-	setundfn(AT_WALK);
+void xt::setwlk() {
+	xt::internal::setundfn(AT_WALK);
 }
 
-void setcwlk() {
-	setundfn(AT_CWLK);
+void xt::setcwlk() {
+	xt::internal::setundfn(AT_CWLK);
 }
 
-void notundfn(unsigned code) {
+void xt::internal::notundfn(unsigned code) {
 	savdo();
 	code = ~code;
 	if (StateMap.test(StateFlag::FORMSEL)) {
@@ -1661,19 +1661,19 @@ void notundfn(unsigned code) {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void notund() {
-	notundfn(AT_UND);
+void xt::notund() {
+	xt::internal::notundfn(AT_UND);
 }
 
-void notwlk() {
-	notundfn(AT_WALK);
+void xt::notwlk() {
+	xt::internal::notundfn(AT_WALK);
 }
 
-void notcwlk() {
-	notundfn(AT_CWLK);
+void xt::notcwlk() {
+	xt::internal::notundfn(AT_CWLK);
 }
 
-void ulenfn(size_t find, float length) {
+void xt::internal::ulenfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) {
@@ -1682,28 +1682,28 @@ void ulenfn(size_t find, float length) {
 	}
 }
 
-void dusulen(float length) {
+void xt::dusulen(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		ulenfn(ClosestFormToCursor, length);
+		xt::internal::ulenfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			ulenfn(selectedForm, length);
+			xt::internal::ulenfn(selectedForm, length);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void undlen() {
+void xt::undlen() {
 	displayText::tabmsg(IDS_SETULEN);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETULEN);
 	displayText::numWnd();
 }
 
-void uspacfn(size_t find, float spacing) {
+void xt::internal::uspacfn(size_t find, float spacing) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & AT_UND) {
@@ -1712,28 +1712,28 @@ void uspacfn(size_t find, float spacing) {
 	}
 }
 
-void duspac(float spacing) {
+void xt::duspac(float spacing) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		uspacfn(ClosestFormToCursor, spacing);
+		xt::internal::uspacfn(ClosestFormToCursor, spacing);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			uspacfn(selectedForm, spacing);
+			xt::internal::uspacfn(selectedForm, spacing);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void uspac() {
+void xt::uspac() {
 	displayText::tabmsg(IDS_SETUSPAC);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETUSPAC);
 	displayText::numWnd();
 }
 
-void uangfn(size_t find, float angle) {
+void xt::internal::uangfn(size_t find, float angle) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & AT_UND) {
@@ -1742,29 +1742,29 @@ void uangfn(size_t find, float angle) {
 	}
 }
 
-void dufang(float angle) {
+void xt::dufang(float angle) {
 	savdo();
 	angle *= (float)PI / 180;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		uangfn(ClosestFormToCursor, angle);
+		xt::internal::uangfn(ClosestFormToCursor, angle);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			uangfn(selectedForm, angle);
+			xt::internal::uangfn(selectedForm, angle);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void sfuang() {
+void xt::sfuang() {
 	displayText::tabmsg(IDS_SETUANG);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETUANG);
 	displayText::numWnd();
 }
 
-void flenfn(size_t find, float length) {
+void xt::internal::flenfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType && !clip::isclp(find)) {
@@ -1773,28 +1773,28 @@ void flenfn(size_t find, float length) {
 	}
 }
 
-void duflen(float length) {
+void xt::duflen(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		flenfn(ClosestFormToCursor, length);
+		xt::internal::flenfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			flenfn(selectedForm, length);
+			xt::internal::flenfn(selectedForm, length);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setflen() {
+void xt::setflen() {
 	displayText::tabmsg(IDS_SETFLEN);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFLEN);
 	displayText::numWnd();
 }
 
-void fspacfn(size_t find, float spacing) {
+void xt::internal::fspacfn(size_t find, float spacing) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
@@ -1807,28 +1807,28 @@ void fspacfn(size_t find, float spacing) {
 	}
 }
 
-void dufspac(float spacing) {
+void xt::dufspac(float spacing) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		fspacfn(ClosestFormToCursor, spacing);
+		xt::internal::fspacfn(ClosestFormToCursor, spacing);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			fspacfn(selectedForm, spacing);
+			xt::internal::fspacfn(selectedForm, spacing);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setfspac() {
+void xt::setfspac() {
 	displayText::tabmsg(IDS_SETFSPAC);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFSPAC);
 	displayText::numWnd();
 }
 
-void findfn(size_t find, float indent) {
+void xt::internal::findfn(size_t find, float indent) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	SelectedForm->underlayIndent = indent;
@@ -1836,22 +1836,22 @@ void findfn(size_t find, float indent) {
 		refilfn();
 }
 
-void dufind(float indent) {
+void xt::dufind(float indent) {
 	savdo();
 	indent *= PFGRAN;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		findfn(ClosestFormToCursor, indent);
+		xt::internal::findfn(ClosestFormToCursor, indent);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			findfn(selectedForm, indent);
+			xt::internal::findfn(selectedForm, indent);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void fangfn(size_t find, float angle) {
+void xt::internal::fangfn(size_t find, float angle) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	// ToDo - also do angle updates for texture filled forms
@@ -1874,29 +1874,29 @@ void fangfn(size_t find, float angle) {
 	}
 }
 
-void dufxang(float angle) {
+void xt::dufxang(float angle) {
 	savdo();
 	angle *= (float)PI / 180;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		fangfn(ClosestFormToCursor, angle);
+		xt::internal::fangfn(ClosestFormToCursor, angle);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			fangfn(selectedForm, angle);
+			xt::internal::fangfn(selectedForm, angle);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setfang() {
+void xt::setfang() {
 	displayText::tabmsg(IDS_SETFANG);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFANG);
 	displayText::numWnd();
 }
 
-void ucolfn(size_t find, unsigned color) {
+void xt::internal::ucolfn(size_t find, unsigned color) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) {
@@ -1905,31 +1905,31 @@ void ucolfn(size_t find, unsigned color) {
 	}
 }
 
-void dundcol(unsigned color) {
+void xt::dundcol(unsigned color) {
 	savdo();
 	if (color)
 		color--;
 	color &= COLMSK;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		ucolfn(ClosestFormToCursor, color);
+		xt::internal::ucolfn(ClosestFormToCursor, color);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			ucolfn(selectedForm, color);
+			xt::internal::ucolfn(selectedForm, color);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setucol() {
+void xt::setucol() {
 	displayText::tabmsg(IDS_COL);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETUCOL);
 	displayText::numWnd();
 }
 
-void fcolfn(size_t find, unsigned color) {
+void xt::internal::fcolfn(size_t find, unsigned color) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
@@ -1938,31 +1938,31 @@ void fcolfn(size_t find, unsigned color) {
 	}
 }
 
-void dufcol(unsigned color) {
+void xt::dufcol(unsigned color) {
 	savdo();
 	if (color)
 		color--;
 	color &= COLMSK;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		fcolfn(ClosestFormToCursor, color);
+		xt::internal::fcolfn(ClosestFormToCursor, color);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			fcolfn(selectedForm, color);
+			xt::internal::fcolfn(selectedForm, color);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setfcol() {
+void xt::setfcol() {
 	displayText::tabmsg(IDS_COL);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFCOL);
 	displayText::numWnd();
 }
 
-void bcolfn(size_t find, unsigned color) {
+void xt::internal::bcolfn(size_t find, unsigned color) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -1971,31 +1971,31 @@ void bcolfn(size_t find, unsigned color) {
 	}
 }
 
-void dubcol(unsigned color) {
+void xt::dubcol(unsigned color) {
 	savdo();
 	if (color)
 		color--;
 	color &= COLMSK;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		bcolfn(ClosestFormToCursor, color);
+		xt::internal::bcolfn(ClosestFormToCursor, color);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			bcolfn(selectedForm, color);
+			xt::internal::bcolfn(selectedForm, color);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setbcol() {
+void xt::setbcol() {
 	displayText::tabmsg(IDS_COL);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETBCOL);
 	displayText::numWnd();
 }
 
-void blenfn(size_t find, float length) {
+void xt::internal::blenfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType && !clip::iseclp(find)) {
@@ -2004,28 +2004,28 @@ void blenfn(size_t find, float length) {
 	}
 }
 
-void dublen(float length) {
+void xt::dublen(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		blenfn(ClosestFormToCursor, length);
+		xt::internal::blenfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			blenfn(selectedForm, length);
+			xt::internal::blenfn(selectedForm, length);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setblen() {
+void xt::setblen() {
 	displayText::tabmsg(IDS_SETFLEN);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETBLEN);
 	displayText::numWnd();
 }
 
-void bspacfn(size_t find, float length) {
+void xt::internal::bspacfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -2034,28 +2034,28 @@ void bspacfn(size_t find, float length) {
 	}
 }
 
-void dubspac(float length) {
+void xt::dubspac(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		bspacfn(ClosestFormToCursor, length);
+		xt::internal::bspacfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			bspacfn(selectedForm, length);
+			xt::internal::bspacfn(selectedForm, length);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setbspac() {
+void xt::setbspac() {
 	displayText::tabmsg(IDS_SETFSPAC);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETBSPAC);
 	displayText::numWnd();
 }
 
-void bminfn(size_t find, float length) {
+void xt::internal::bminfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -2064,28 +2064,28 @@ void bminfn(size_t find, float length) {
 	}
 }
 
-void dubmin(float length) {
+void xt::dubmin(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		bminfn(ClosestFormToCursor, length);
+		xt::internal::bminfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			bminfn(selectedForm, length);
+			xt::internal::bminfn(selectedForm, length);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setbmin() {
+void xt::setbmin() {
 	displayText::tabmsg(IDS_TXT23);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETBMIN);
 	displayText::numWnd();
 }
 
-void bmaxfn(size_t find, float length) {
+void xt::internal::bmaxfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -2094,28 +2094,28 @@ void bmaxfn(size_t find, float length) {
 	}
 }
 
-void dubmax(float length) {
+void xt::dubmax(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		bmaxfn(ClosestFormToCursor, length);
+		xt::internal::bmaxfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			bmaxfn(selectedForm, length);
+			xt::internal::bmaxfn(selectedForm, length);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setbmax() {
+void xt::setbmax() {
 	displayText::tabmsg(IDS_TXT22);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETBMAX);
 	displayText::numWnd();
 }
 
-void fminfn(size_t find, float length) {
+void xt::internal::fminfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
@@ -2124,28 +2124,28 @@ void fminfn(size_t find, float length) {
 	}
 }
 
-void dufmin(float length) {
+void xt::dufmin(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		fminfn(ClosestFormToCursor, length);
+		xt::internal::fminfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			fminfn(selectedForm, length);
+			xt::internal::fminfn(selectedForm, length);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setfmin() {
+void xt::setfmin() {
 	displayText::tabmsg(IDS_TXT21);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFMIN);
 	displayText::numWnd();
 }
 
-void fmaxfn(size_t find, float length) {
+void xt::internal::fmaxfn(size_t find, float length) {
 	ClosestFormToCursor = find;
 	fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
@@ -2154,28 +2154,28 @@ void fmaxfn(size_t find, float length) {
 	}
 }
 
-void dufmax(float length) {
+void xt::dufmax(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		fmaxfn(ClosestFormToCursor, length);
+		xt::internal::fmaxfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			fmaxfn(selectedForm, length);
+			xt::internal::fmaxfn(selectedForm, length);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setfmax() {
+void xt::setfmax() {
 	displayText::tabmsg(IDS_TXT20);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFMAX);
 	displayText::numWnd();
 }
 
-void fwidfn(size_t find, float length) {
+void xt::internal::fwidfn(size_t find, float length) {
 	unsigned iVertex   = 0;
 	double   ratio     = 0.0;
 	float    reference = 0.0;
@@ -2190,35 +2190,35 @@ void fwidfn(size_t find, float length) {
 	refilfn();
 }
 
-void dufwid(float length) {
+void xt::dufwid(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		fwidfn(ClosestFormToCursor, length);
+		xt::internal::fwidfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			fwidfn(selectedForm, length);
+			xt::internal::fwidfn(selectedForm, length);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setfwid() {
+void xt::setfwid() {
 	displayText::tabmsg(IDS_WID);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFWID);
 	displayText::numWnd();
 }
 
-void setfind() {
+void xt::setfind() {
 	displayText::tabmsg(IDS_UWLKIND);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFIND);
 	displayText::numWnd();
 }
 
-void fhifn(size_t find, float length) {
+void xt::internal::fhifn(size_t find, float length) {
 	unsigned iVertex   = 0;
 	double   ratio     = 0.0;
 	float    reference = 0.0;
@@ -2233,28 +2233,28 @@ void fhifn(size_t find, float length) {
 	refilfn();
 }
 
-void dufhi(float length) {
+void xt::dufhi(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		fhifn(ClosestFormToCursor, length);
+		xt::internal::fhifn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			fhifn(selectedForm, length);
+			xt::internal::fhifn(selectedForm, length);
 		}
 	}
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void setfhi() {
+void xt::setfhi() {
 	displayText::tabmsg(IDS_HI);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::FSETFHI);
 	displayText::numWnd();
 }
 
-void setfilstrt() {
+void xt::setfilstrt() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
 		FormList[ClosestFormToCursor].fillStart = gsl::narrow<unsigned short>(ClosestVertexToCursor);
 		FormList[ClosestFormToCursor].extendedAttribute |= AT_STRT;
@@ -2266,7 +2266,7 @@ void setfilstrt() {
 		displayText::shoseln(IDS_FORMP, IDS_FSTRT);
 }
 
-void setfilend() {
+void xt::setfilend() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
 		FormList[ClosestFormToCursor].fillEnd = gsl::narrow<unsigned short>(ClosestVertexToCursor);
 		FormList[ClosestFormToCursor].extendedAttribute |= AT_END;
@@ -2278,7 +2278,7 @@ void setfilend() {
 		displayText::shoseln(IDS_FORMP, IDS_FEND);
 }
 
-void duauxnam() {
+void xt::duauxnam() {
 	*AuxName = *WorkingFileName;
 	switch (IniFile.auxFileType) {
 	case AUXDST:
@@ -2294,28 +2294,61 @@ void duauxnam() {
 	}
 }
 
-void rtrclp() {
+void xt::internal::rtrclpfn() {
+	size_t count = 0;
+
+	if (OpenClipboard(ThrEdWindow)) {
+		fvars(ClosestFormToCursor);
+		if (clip::iseclp(ClosestFormToCursor)) {
+			count = SelectedForm->clipEntries;
+			clip::oclp(SelectedForm->borderClipData, count);
+		}
+		else {
+			if (clip::isclp(ClosestFormToCursor)) {
+				count = SelectedForm->lengthOrCount.clipCount;
+				clip::oclp(SelectedForm->angleOrClipData.clip, count);
+			}
+		}
+		if (count) {
+			LowerLeftStitch = {};
+			EmptyClipboard();
+			Clip = RegisterClipboardFormat(PcdClipFormat);
+			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, count * sizeof(CLPSTCH) + 2);
+			if (ClipPointer) {
+				ClipStitchData = *(static_cast<CLPSTCH**>(ClipPointer));
+				rtclpfn(0, 0);
+				ClipStitchData[0].led = count;
+				for (size_t iStitch = 1; iStitch < count; iStitch++)
+					rtclpfn(iStitch, iStitch);
+				SetClipboardData(Clip, ClipPointer);
+			}
+			CloseClipboard();
+		}
+	}
+}
+
+void xt::rtrclp() {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		fvars(ClosestFormToCursor);
 		if (texture::istx(ClosestFormToCursor))
 			texture::rtrtx();
 		else
-			rtrclpfn();
+			xt::internal::rtrclpfn();
 	}
 }
 
-void setstxt(unsigned stringIndex, float value, HWND dialog) {
+void xt::internal::setstxt(unsigned stringIndex, float value, HWND dialog) {
 	SetWindowText(GetDlgItem(dialog, stringIndex), fmt::format(L"{:.2f}", (value / PFGRAN)).c_str());
 }
 
-float getstxt(unsigned stringIndex, HWND dialog) {
+float xt::internal::getstxt(unsigned stringIndex, HWND dialog) {
 	// ToDo - This is not great code.
 	wchar_t buffer[16] = {};
 	GetWindowText(GetDlgItem(dialog, stringIndex), buffer, sizeof(buffer) / sizeof(buffer[0]));
 	return std::stof(buffer) * PFGRAN;
 }
 
-bool chkasp(fPOINT& point, float aspectRatio, HWND dialog) {
+bool xt::internal::chkasp(fPOINT& point, float aspectRatio, HWND dialog) {
 	point.x = getstxt(IDC_DESWID, dialog);
 	point.y = getstxt(IDC_DESHI, dialog);
 	if ((point.y / point.x) == aspectRatio)
@@ -2324,7 +2357,7 @@ bool chkasp(fPOINT& point, float aspectRatio, HWND dialog) {
 		return 0;
 }
 
-BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
+BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
 	fPOINT designSize        = {};
@@ -2375,17 +2408,17 @@ BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 }
 
 // ToDo - Find a better name
-void sadj(fPOINTATTR& stitch, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept {
+void xt::internal::sadj(fPOINTATTR& stitch, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept {
 	stitch.x = (stitch.x - designSizeRect.left) * designSizeRatio.x + designSizeRect.left;
 	stitch.y = (stitch.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
 }
 
-void sadj(fPOINT& point, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept {
+void xt::internal::sadj(fPOINT& point, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept {
 	point.x = (point.x - designSizeRect.left) * designSizeRatio.x + designSizeRect.left;
 	point.y = (point.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
 }
 
-void nudfn(const fRECTANGLE& designSizeRect) noexcept {
+void xt::internal::nudfn(const fRECTANGLE& designSizeRect) noexcept {
 	unsigned iStitch = 0, iVertex = 0;
 	fPOINT   newSize = { (designSizeRect.right - designSizeRect.left), (designSizeRect.top - designSizeRect.bottom) };
 
@@ -2399,7 +2432,7 @@ void nudfn(const fRECTANGLE& designSizeRect) noexcept {
 	frmout(ClosestFormToCursor);
 }
 
-void nudsiz() {
+void xt::nudsiz() {
 	int        flag           = 0;
 	unsigned   iForm          = 0;
 	fRECTANGLE designSizeRect = {}; // design size rectangle
@@ -2419,7 +2452,7 @@ void nudsiz() {
 	if (flag) {
 		DesignSize.x = designSizeRect.right - designSizeRect.left;
 		DesignSize.y = designSizeRect.top - designSizeRect.bottom;
-		if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, (DLGPROC)setsprc)) {
+		if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, (DLGPROC)xt::internal::setsprc)) {
 			flag = 0;
 			if (DesignSize.x > IniFile.hoopSizeX) {
 				IniFile.hoopSizeX = DesignSize.x * 1.05;
@@ -2431,7 +2464,7 @@ void nudsiz() {
 				UnzoomedRect.y    = IniFile.hoopSizeY;
 				flag              = 1;
 			}
-			nudfn(designSizeRect);
+			xt::internal::nudfn(designSizeRect);
 			if (UserFlagMap.test(UserFlag::CHREF))
 				refilal();
 			if (flag) {
@@ -2446,7 +2479,7 @@ void nudsiz() {
 	}
 }
 
-void dushft() {
+void xt::dushft() {
 	//	StateMap.set(StateFlag::BOXSLCT);
 	StateMap.set(StateFlag::BZUMIN);
 	//	StateMap.set(StateFlag::NOSEL);
@@ -2457,7 +2490,7 @@ void dushft() {
 	ZoomBoxOrigin = SelectedPoint;
 }
 
-void mvshft() {
+void xt::mvshft() {
 	if (StateMap.test(StateFlag::BOXZUM) && StateMap.testAndSet(StateFlag::VCAPT))
 		SetCapture(ThrEdWindow);
 	if (StateMap.test(StateFlag::BZUMIN)) {
@@ -2473,33 +2506,40 @@ void mvshft() {
 	}
 }
 
-void setclpspac() {
+void xt::setclpspac() {
 	displayText::msgflt(IDS_CLPSPAC, IniFile.clipOffset / PFGRAN);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::SCLPSPAC);
 	displayText::numWnd();
 }
 
-BOOL CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept {
+BOOL CALLBACK xt::internal::enumch(HWND hwnd, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	DestroyWindow(hwnd);
 	return 1;
 }
 
-void clrstch() noexcept {
-	while (EnumChildWindows(MainStitchWin, enumch, 0))
+void xt::clrstch() noexcept {
+	while (EnumChildWindows(MainStitchWin, xt::internal::enumch, 0))
 		;
 }
 
-void chgwrn() {
+void xt::chgwrn() {
 	UserFlagMap.flip(UserFlag::WRNOF);
 	wrnmen();
 	StateMap.set(StateFlag::DUMEN);
 }
 
-void chgchk(int code) {
+void xt::chgchk(int code) {
 	IniFile.dataCheck = code;
 	chkmen();
 	StateMap.set(StateFlag::DUMEN);
 }
+
+void xt::tst() {
+	DesignerName->assign(L"Coder");
+	ThrName->assign(*DesignerName);
+	StateMap.set(StateFlag::RESTCH);
+}
+

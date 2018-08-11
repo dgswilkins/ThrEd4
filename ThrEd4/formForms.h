@@ -36,33 +36,33 @@ void refrm();
 void setear();
 void sidwnd(HWND wnd) noexcept;
 void wavfrm();
-}
 
-namespace formFormsPriv {
+namespace internal {
 
-BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam) noexcept;
+	BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam) noexcept;
 
-void chkdaz() noexcept;
+	void chkdaz() noexcept;
 
-BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+	BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
-void initdaz(HWND hWinDialog);
+	void initdaz(HWND hWinDialog);
 
-inline void initTearDlg(HWND hwndlg);
+	inline void initTearDlg(HWND hwndlg);
 
-HWND numwin(const std::wstring& winName, const RECT& location);
-void nxtlin() noexcept;
-void prflin(const std::wstring& msg, unsigned row);
-HWND prfnwin(const std::wstring& text) noexcept;
-void prftwin(const std::wstring& text) noexcept;
-void refrmfn();
+	HWND numwin(const std::wstring& winName, const RECT& location);
+	void nxtlin() noexcept;
+	void prflin(const std::wstring& msg, unsigned row);
+	HWND prfnwin(const std::wstring& text) noexcept;
+	void prftwin(const std::wstring& text) noexcept;
+	void refrmfn();
 
-bool CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+	bool CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
-HWND txtrwin(const std::wstring& winName, const RECT& location);
-HWND txtwin(const std::wstring& windowName, const RECT& location);
+	HWND txtrwin(const std::wstring& winName, const RECT& location);
+	HWND txtwin(const std::wstring& windowName, const RECT& location);
 
-inline void wavinit(HWND hwndlg);
+	inline void wavinit(HWND hwndlg);
 
-bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
-}
+	bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+} // namespace internal
+} // namespace formForms

@@ -64,7 +64,7 @@ bool clip::iseclpx(size_t iForm) noexcept {
 	return false;
 }
 
-size_t clipPriv::findclp(size_t formIndex) noexcept {
+size_t clip::internal::findclp(size_t formIndex) noexcept {
 	for (auto iForm = formIndex; iForm != 0; iForm--) {
 		if (clip::iseclp(iForm - 1))
 			return FormList[iForm - 1].borderClipData - ClipPoints + FormList[iForm - 1].clipEntries;
@@ -74,7 +74,7 @@ size_t clipPriv::findclp(size_t formIndex) noexcept {
 	return 0;
 }
 
-void clipPriv::clpsub(size_t fpnt, size_t cnt) noexcept {
+void clip::internal::clpsub(size_t fpnt, size_t cnt) noexcept {
 	for (auto iForm = fpnt + 1; iForm < FormIndex; iForm++) {
 		if (clip::isclpx(iForm))
 			FormList[iForm].angleOrClipData.clip -= cnt;
@@ -86,14 +86,14 @@ void clipPriv::clpsub(size_t fpnt, size_t cnt) noexcept {
 void clip::delmclp(size_t iForm) {
 	if (ClipPointIndex) {
 		if (clip::isclp(iForm)) {
-			auto destination = clipPriv::findclp(iForm);
+			auto destination = clip::internal::findclp(iForm);
 			auto source      = destination + FormList[iForm].lengthOrCount.clipCount;
 			std::copy(ClipPoints + source,
 			          ClipPoints + ClipPointIndex,
 			          stdext::make_checked_array_iterator((ClipPoints + destination), (MAXITEMS - destination)));
 			if (clip::iseclp(iForm))
 				FormList[iForm].borderClipData -= FormList[iForm].lengthOrCount.clipCount;
-			clipPriv::clpsub(iForm, FormList[iForm].lengthOrCount.clipCount);
+			clip::internal::clpsub(iForm, FormList[iForm].lengthOrCount.clipCount);
 			if (ClipPointIndex > FormList[iForm].lengthOrCount.clipCount)
 				ClipPointIndex -= FormList[iForm].lengthOrCount.clipCount;
 			else
@@ -106,12 +106,12 @@ void clip::delmclp(size_t iForm) {
 void clip::deleclp(size_t iForm) noexcept {
 	if (ClipPointIndex) {
 		if (clip::iseclpx(iForm)) {
-			auto destination = clipPriv::findclp(iForm);
+			auto destination = clip::internal::findclp(iForm);
 			auto source      = destination + FormList[iForm].clipEntries;
 			while (source < ClipPointIndex) {
 				ClipPoints[destination++] = ClipPoints[source++];
 			}
-			clipPriv::clpsub(iForm, FormList[iForm].clipEntries);
+			clip::internal::clpsub(iForm, FormList[iForm].clipEntries);
 			if (ClipPointIndex > FormList[iForm].clipEntries)
 				ClipPointIndex -= FormList[iForm].clipEntries;
 			else
@@ -127,7 +127,7 @@ void clip::delclps(size_t iForm) {
 }
 
 fPOINT* clip::nueclp(size_t currentForm, size_t count) noexcept {
-	auto find        = clipPriv::findclp(ClosestFormToCursor);
+	auto find        = clip::internal::findclp(ClosestFormToCursor);
 	auto source      = ClipPointIndex - 1;
 	auto destination = ClipPointIndex + count - 1;
 
@@ -149,7 +149,7 @@ fPOINT* clip::nueclp(size_t currentForm, size_t count) noexcept {
 }
 
 fPOINT* clip::numclp() noexcept {
-	auto find        = clipPriv::findclp(ClosestFormToCursor);
+	auto find        = clip::internal::findclp(ClosestFormToCursor);
 	auto source      = ClipPointIndex - 1;
 	auto destination = ClipPointIndex + ClipStitchCount - 1;
 
@@ -195,7 +195,7 @@ void clip::oclp(const fPOINT* const clip, size_t clipEntries) {
 	}
 }
 
-void clipPriv::durev(std::vector<fPOINT>& clipReversedData) {
+void clip::internal::durev(std::vector<fPOINT>& clipReversedData) {
 	const double midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
 
 	if (ClipBuffer[0].x > midpoint) {
@@ -211,14 +211,14 @@ void clipPriv::durev(std::vector<fPOINT>& clipReversedData) {
 	}
 }
 
-void clipPriv::setvct(size_t start, size_t finish, double& clipAngle, dPOINT& vector0) noexcept {
+void clip::internal::setvct(size_t start, size_t finish, double& clipAngle, dPOINT& vector0) noexcept {
 	clipAngle = atan2(CurrentFormVertices[finish].y - CurrentFormVertices[start].y,
 	                  CurrentFormVertices[finish].x - CurrentFormVertices[start].x);
 	vector0.x = ClipRectSize.cx * cos(clipAngle);
 	vector0.y = ClipRectSize.cx * sin(clipAngle);
 }
 
-bool clipPriv::nupnt(double clipAngle, dPOINT& moveToCoords, size_t currentSide) noexcept {
+bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, size_t currentSide) noexcept {
 	const double sinAngle = sin(clipAngle);
 	const double cosAngle = cos(clipAngle);
 
@@ -238,7 +238,7 @@ bool clipPriv::nupnt(double clipAngle, dPOINT& moveToCoords, size_t currentSide)
 	return false;
 }
 
-bool clipPriv::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) {
+bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) {
 	const fPOINT adjustedPoint = { (point.x - ClipReference.x), (point.y - ClipReference.y) };
 
 	if (chkmax(ClipStitchCount, SequenceIndex))
@@ -250,7 +250,7 @@ bool clipPriv::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& poi
 	return false;
 }
 
-void clipPriv::lincrnr(const std::vector<fPOINT>& clipReversedData,
+void clip::internal::lincrnr(const std::vector<fPOINT>& clipReversedData,
                        std::vector<fPOINT>&       clipFillData,
                        double                     clipAngle,
                        dPOINT&                    moveToCoords,
@@ -258,19 +258,19 @@ void clipPriv::lincrnr(const std::vector<fPOINT>& clipReversedData,
                        size_t                     currentSide) {
 	dPOINT delta = {};
 
-	if (clipPriv::nupnt(clipAngle, moveToCoords, currentSide)) {
+	if (clip::internal::nupnt(clipAngle, moveToCoords, currentSide)) {
 		delta.x                    = moveToCoords.x - SelectedPoint.x;
 		delta.y                    = moveToCoords.y - SelectedPoint.y;
 		const double rotationAngle = atan2(delta.y, delta.x);
 		rotangf(BorderClipReference, ClipReference, rotationAngle, rotationCenter);
 		for (size_t iStitch = 0; iStitch < ClipStitchCount; iStitch++)
 			rotangf(clipReversedData[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
-		clipPriv::ritclp(clipFillData, SelectedPoint);
+		clip::internal::ritclp(clipFillData, SelectedPoint);
 		SelectedPoint = moveToCoords;
 	}
 }
 
-void clipPriv::linsid(const std::vector<fPOINT>& clipReversedData,
+void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
                       std::vector<fPOINT>&       clipFillData,
                       double                     clipAngle,
                       const dPOINT&              vector0,
@@ -286,7 +286,7 @@ void clipPriv::linsid(const std::vector<fPOINT>& clipReversedData,
 		for (size_t iStitch = 0; iStitch < ClipStitchCount; iStitch++)
 			rotangf(clipReversedData[iStitch], clipFillData[iStitch], clipAngle, rotationCenter);
 		for (auto iClip = 0u; iClip < clipCount; iClip++) {
-			clipPriv::ritclp(clipFillData, SelectedPoint);
+			clip::internal::ritclp(clipFillData, SelectedPoint);
 			SelectedPoint.x += vector0.x;
 			SelectedPoint.y += vector0.y;
 		}
@@ -307,7 +307,7 @@ void clip::clpout() {
 	}
 }
 
-bool clipPriv::clpsid(const std::vector<fPOINT>& clipReversedData,
+bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
                       std::vector<fPOINT>&       clipFillData,
                       size_t                     start,
                       size_t                     finish,
@@ -332,7 +332,7 @@ bool clipPriv::clpsid(const std::vector<fPOINT>& clipReversedData,
 		for (size_t index = 0; index < ClipStitchCount; index++)
 			rotangf(clipReversedData[index], clipFillData[index], rotationAngle, rotationCenter);
 		for (auto stepCount = 0u; stepCount < clipCount; stepCount++) {
-			if (clipPriv::ritclp(clipFillData, insertPoint))
+			if (clip::internal::ritclp(clipFillData, insertPoint))
 				break;
 			insertPoint.x += step.x;
 			insertPoint.y += step.y;
@@ -355,12 +355,12 @@ void clip::clpbrd(size_t startVertex) {
 	    = { (ClipRect.right - ClipRect.left) / 2 + ClipRect.left, (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom };
 	ClipReference.x = ClipRect.left;
 	ClipReference.y = rotationCenter.y;
-	clipPriv::durev(clipReversedData);
+	clip::internal::durev(clipReversedData);
 	if (SelectedForm->type == FRMLINE) {
 		SelectedPoint    = CurrentFormVertices[0];
 		double clipAngle = 0.0; // for clipboard border fill
 		dPOINT vector0   = {};  // x size of the clipboard fill at the fill angle
-		clipPriv::setvct(0, 1, clipAngle, vector0);
+		clip::internal::setvct(0, 1, clipAngle, vector0);
 		// Since ClipRect.bottom is always 0
 		BorderClipReference.y = ClipRect.top / 2;
 		// Use 0 to align left edge of clip with beginning of line, ClipRect.right / 2 if you want to align
@@ -369,11 +369,11 @@ void clip::clpbrd(size_t startVertex) {
 		// BorderClipReference.x = ClipRect.right / 2;
 		size_t currentSide;
 		for (currentSide = 0; currentSide < VertexCount - 2; currentSide++) {
-			clipPriv::linsid(clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, currentSide);
-			clipPriv::setvct(currentSide + 1, currentSide + 2, clipAngle, vector0);
-			clipPriv::lincrnr(clipReversedData, clipFillData, clipAngle, moveToCoords, rotationCenter, currentSide);
+			clip::internal::linsid(clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, currentSide);
+			clip::internal::setvct(currentSide + 1, currentSide + 2, clipAngle, vector0);
+			clip::internal::lincrnr(clipReversedData, clipFillData, clipAngle, moveToCoords, rotationCenter, currentSide);
 		}
-		clipPriv::linsid(clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, currentSide);
+		clip::internal::linsid(clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, currentSide);
 	}
 	else {
 		clpout();
@@ -381,7 +381,7 @@ void clip::clpbrd(size_t startVertex) {
 		auto currentVertex = startVertex;
 		for (size_t iVertex = 0; iVertex < VertexCount; iVertex++) {
 			const auto nextVertex = prv(currentVertex);
-			if (clipPriv::clpsid(clipReversedData, clipFillData, reference, nextVertex, rotationCenter)) {
+			if (clip::internal::clpsid(clipReversedData, clipFillData, reference, nextVertex, rotationCenter)) {
 				reference = nextVertex;
 			}
 			currentVertex = nextVertex;
@@ -389,7 +389,7 @@ void clip::clpbrd(size_t startVertex) {
 	}
 }
 
-bool clipPriv::fxpnt(const std::vector<double>& listSINEs,
+bool clip::internal::fxpnt(const std::vector<double>& listSINEs,
                      const std::vector<double>& listCOSINEs,
                      dPOINT&                    moveToCoords,
                      unsigned                   currentSide) {
@@ -409,11 +409,11 @@ bool clipPriv::fxpnt(const std::vector<double>& listSINEs,
 	return 0;
 }
 
-void clipPriv::fxlit(const std::vector<double>& listSINEs,
+void clip::internal::fxlit(const std::vector<double>& listSINEs,
                      const std::vector<double>& listCOSINEs,
                      dPOINT&                    moveToCoords,
                      unsigned                   currentSide) {
-	if (clipPriv::fxpnt(listSINEs, listCOSINEs, moveToCoords, currentSide)) {
+	if (clip::internal::fxpnt(listSINEs, listCOSINEs, moveToCoords, currentSide)) {
 		SelectedPoint = moveToCoords;
 		BeanCount++;
 		const auto length
@@ -426,12 +426,12 @@ void clipPriv::fxlit(const std::vector<double>& listSINEs,
 	}
 }
 
-void clipPriv::fxlin(std::vector<fPOINT>&       chainEndPoints,
+void clip::internal::fxlin(std::vector<fPOINT>&       chainEndPoints,
                      const std::vector<double>& ListSINEs,
                      const std::vector<double>& ListCOSINEs,
                      dPOINT&                    moveToCoords,
                      unsigned                   currentSide) {
-	if (clipPriv::fxpnt(ListSINEs, ListCOSINEs, moveToCoords, currentSide)) {
+	if (clip::internal::fxpnt(ListSINEs, ListCOSINEs, moveToCoords, currentSide)) {
 		SelectedPoint = moveToCoords;
 		chainEndPoints.push_back(SelectedPoint);
 		const auto length
@@ -446,7 +446,7 @@ void clipPriv::fxlin(std::vector<fPOINT>&       chainEndPoints,
 	}
 }
 
-void clipPriv::fxlen(std::vector<fPOINT>&       chainEndPoints,
+void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
                      const std::vector<double>& listSINEs,
                      const std::vector<double>& listCOSINEs) {
 	dPOINT moveToCoords = {}; // moving formOrigin for clipboard fill
@@ -487,11 +487,11 @@ void clipPriv::fxlen(std::vector<fPOINT>&       chainEndPoints,
 		unsigned currentSide;
 		for (currentSide = 0; currentSide < VertexCount - 1; currentSide++) {
 			NextStart = currentSide + 1;
-			clipPriv::fxlit(listSINEs, listCOSINEs, moveToCoords, currentSide);
+			clip::internal::fxlit(listSINEs, listCOSINEs, moveToCoords, currentSide);
 		}
 		if (SelectedForm->type != FRMLINE) {
 			NextStart = 0;
-			clipPriv::fxlit(listSINEs, listCOSINEs, moveToCoords, currentSide);
+			clip::internal::fxlit(listSINEs, listCOSINEs, moveToCoords, currentSide);
 		}
 		else
 			NextStart = VertexCount - 1;
@@ -534,11 +534,11 @@ void clipPriv::fxlen(std::vector<fPOINT>&       chainEndPoints,
 	unsigned currentSide;
 	for (currentSide = 0; currentSide < VertexCount - 1; currentSide++) {
 		NextStart = currentSide + 1;
-		clipPriv::fxlin(chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide);
+		clip::internal::fxlin(chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide);
 	}
 	if (SelectedForm->type != FRMLINE) {
 		NextStart = 0;
-		clipPriv::fxlin(chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide);
+		clip::internal::fxlin(chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide);
 	}
 	interval = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
 	if (interval > halfSpacing) {
@@ -549,7 +549,7 @@ void clipPriv::fxlen(std::vector<fPOINT>&       chainEndPoints,
 	}
 }
 
-void clipPriv::dufxlen(std::vector<fPOINT>& chainEndPoints) {
+void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 	duangs();
 	std::vector<double> listSINEs;
 	listSINEs.reserve(VertexCount + 1);
@@ -562,10 +562,10 @@ void clipPriv::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 	listSINEs.push_back(sin(((*FormAngles)[0] > (*FormAngles)[VertexCount - 1])
 	                            ? ((*FormAngles)[0] - (*FormAngles)[VertexCount - 1])
 	                            : ((*FormAngles)[VertexCount - 1] - (*FormAngles)[0])));
-	clipPriv::fxlen(chainEndPoints, listSINEs, listCOSINEs);
+	clip::internal::fxlen(chainEndPoints, listSINEs, listCOSINEs);
 }
 
-void clipPriv::dulast(std::vector<fPOINT>& chainEndPoints) {
+void clip::internal::dulast(std::vector<fPOINT>& chainEndPoints) {
 	std::vector<fPOINT> tempClipPoints;
 	tempClipPoints.reserve(chainEndPoints.size());
 	if (lastch()) {
@@ -590,8 +590,8 @@ void clipPriv::dulast(std::vector<fPOINT>& chainEndPoints) {
 	}
 }
 
-void clipPriv::clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints) {
-	clipPriv::dulast(chainEndPoints);
+void clip::internal::clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints) {
+	clip::internal::dulast(chainEndPoints);
 	if (SelectedForm->type == FRMLINE) {
 		const auto pivot = ClipRectSize.cy / 2;
 		for (size_t iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
@@ -605,7 +605,7 @@ void clipPriv::clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>&
 	}
 }
 
-void clipPriv::xclpfn(const std::vector<fPOINT>& tempClipPoints,
+void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
                       const std::vector<fPOINT>& chainEndPoints,
                       unsigned                   start,
                       unsigned                   finish,
@@ -627,21 +627,21 @@ void clip::duxclp() {
 	std::vector<fPOINT> chainEndPoints;
 	// reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
 	chainEndPoints.reserve(50);
-	clipPriv::dufxlen(chainEndPoints);
+	clip::internal::dufxlen(chainEndPoints);
 	std::vector<fPOINT> tempClipPoints;
 	tempClipPoints.reserve(ClipStitchCount);
-	clipPriv::clpxadj(tempClipPoints, chainEndPoints);
+	clip::internal::clpxadj(tempClipPoints, chainEndPoints);
 	SequenceIndex         = 0;
 	dPOINT rotationCenter = {};
 	for (unsigned iPoint = 1; iPoint < chainEndPoints.size(); iPoint++) {
-		clipPriv::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
+		clip::internal::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
 	}
 	if (SelectedForm->type != FRMLINE) {
 		OSequence[SequenceIndex++] = chainEndPoints[0];
 	}
 }
 
-void clipPriv::clpcrnr(std::vector<fPOINT>& clipFillData, size_t vertex, const dPOINT& rotationCenter) {
+void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, size_t vertex, const dPOINT& rotationCenter) {
 	const size_t nextVertex = nxt(vertex);
 	dPOINT       delta      = {};
 
@@ -667,13 +667,13 @@ void clipPriv::clpcrnr(std::vector<fPOINT>& clipFillData, size_t vertex, const d
 	OSequence[SequenceIndex++] = point;
 	OSequence[SequenceIndex++] = CurrentFormVertices[nextVertex];
 	OSequence[SequenceIndex++] = point;
-	if (!clipPriv::ritclp(clipFillData, point)) {
+	if (!clip::internal::ritclp(clipFillData, point)) {
 		OSequence[SequenceIndex++] = point;
 		OSequence[SequenceIndex++] = CurrentFormVertices[nextVertex];
 	}
 }
 
-void clipPriv::picfn(std::vector<fPOINT>& clipFillData,
+void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
                      size_t               start,
                      size_t               finish,
                      double               spacing,
@@ -708,7 +708,7 @@ void clipPriv::picfn(std::vector<fPOINT>& clipFillData,
 			OSequence[SequenceIndex++] = outerPoint;
 			OSequence[SequenceIndex++] = firstPoint;
 			OSequence[SequenceIndex++] = outerPoint;
-			if (clipPriv::ritclp(clipFillData, outerPoint)) {
+			if (clip::internal::ritclp(clipFillData, outerPoint)) {
 				flag = false;
 				break;
 			}
@@ -739,10 +739,10 @@ void clip::clpic() {
 	satin::satout(20);
 	if (SelectedForm->type == FRMLINE) {
 		for (size_t iVertex = 0; iVertex < VertexCount - 2; iVertex++) {
-			clipPriv::picfn(clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing, rotationCenter);
-			clipPriv::clpcrnr(clipFillData, iVertex, rotationCenter);
+			clip::internal::picfn(clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing, rotationCenter);
+			clip::internal::clpcrnr(clipFillData, iVertex, rotationCenter);
 		}
-		clipPriv::picfn(clipFillData, VertexCount - 1, VertexCount, SelectedForm->edgeSpacing, rotationCenter);
+		clip::internal::picfn(clipFillData, VertexCount - 1, VertexCount, SelectedForm->edgeSpacing, rotationCenter);
 	}
 	else {
 		if (!SelectedForm->fillType) {
@@ -751,15 +751,15 @@ void clip::clpic() {
 		size_t currentVertex = 0;
 		for (size_t iVertex = 0; iVertex < VertexCount; iVertex++) {
 			const auto nextVertex = nxt(currentVertex);
-			clipPriv::picfn(clipFillData, currentVertex, nextVertex, SelectedForm->edgeSpacing, rotationCenter);
-			clipPriv::clpcrnr(clipFillData, currentVertex, rotationCenter);
+			clip::internal::picfn(clipFillData, currentVertex, nextVertex, SelectedForm->edgeSpacing, rotationCenter);
+			clip::internal::clpcrnr(clipFillData, currentVertex, rotationCenter);
 			currentVertex = nextVertex;
 		}
 		OSequence[SequenceIndex++] = CurrentFormVertices[currentVertex];
 	}
 }
 
-void clipPriv::duchfn(const std::vector<fPOINT>& chainEndPoints, size_t start, size_t finish) {
+void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, size_t start, size_t finish) {
 	const std::vector<unsigned> chainSequence = { 0, 1, 2, 3, 0, 1, 4, 3, 0, 3 }; // chain stitch sequence
 
 	std::vector<fPOINT> chainPoint(5);
@@ -795,15 +795,15 @@ void clipPriv::duchfn(const std::vector<fPOINT>& chainEndPoints, size_t start, s
 	}
 }
 
-void clipPriv::duch(std::vector<fPOINT>& chainEndPoints) {
+void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 	SequenceIndex          = 0;
 	const auto chainLength = chainEndPoints.size() - 1;
 	if (chainLength) {
 		for (size_t iPoint = 0; iPoint < chainLength - 1; iPoint++) {
-			clipPriv::duchfn(chainEndPoints, iPoint, iPoint + 1);
+			clip::internal::duchfn(chainEndPoints, iPoint, iPoint + 1);
 		}
 		if (SelectedForm->type == FRMLINE) {
-			clipPriv::duchfn(chainEndPoints, chainLength - 1, chainLength);
+			clip::internal::duchfn(chainEndPoints, chainLength - 1, chainLength);
 			size_t backupAt = 8;
 			if (StateMap.test(StateFlag::LINCHN))
 				backupAt--;
@@ -813,7 +813,7 @@ void clipPriv::duch(std::vector<fPOINT>& chainEndPoints) {
 			OSequence[SequenceIndex++] = chainEndPoints[chainLength];
 		}
 		else {
-			clipPriv::duchfn(chainEndPoints, chainLength - 1, 0);
+			clip::internal::duchfn(chainEndPoints, chainLength - 1, 0);
 			OSequence[SequenceIndex++] = chainEndPoints[chainLength];
 		}
 	}
@@ -827,8 +827,8 @@ void clip::chnfn() {
 	chainEndPoints.reserve(50);
 	fvars(ClosestFormToCursor);
 	clip::deleclp(ClosestFormToCursor);
-	clipPriv::dufxlen(chainEndPoints);
-	clipPriv::dulast(chainEndPoints);
+	clip::internal::dufxlen(chainEndPoints);
+	clip::internal::dulast(chainEndPoints);
 	SequenceIndex = 0;
-	clipPriv::duch(chainEndPoints);
+	clip::internal::duch(chainEndPoints);
 }

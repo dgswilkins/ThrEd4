@@ -3447,7 +3447,7 @@ void angclpfn(const std::vector<RNGCNT>& textureSegments) {
 	AngledForm.vertices = AngledFormVertices;
 	if (StateMap.test(StateFlag::ISUND)) {
 		rotationAngle                         = PI / 2 - SelectedForm->underlayStitchAngle;
-		const std::vector<fPOINT>& vertexList = insid();
+		const std::vector<fPOINT>& vertexList = xt::insid();
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 			AngledFormVertices[iVertex] = vertexList[iVertex];
 			rotflt(AngledFormVertices[iVertex], rotationAngle, rotationCenter);
@@ -4711,7 +4711,7 @@ void refilfn() {
 	if (SelectedForm->type == FRMLINE)
 		SelectedForm->underlayIndent = 0;
 	savdo();
-	fdelstch(fillStartsData, fillStartsMap);
+	xt::fdelstch(fillStartsData, fillStartsMap);
 	StateMap.set(StateFlag::WASREFIL);
 	if (SelectedForm->fillSpacing < 0.5 && !clip::isclp(ClosestFormToCursor))
 		SelectedForm->fillSpacing = 0.5;
@@ -4808,9 +4808,9 @@ void refilfn() {
 		}
 		break;
 	case FRMFPOLY:
-		chkcwlk(interleaveSequenceIndex2);
-		chkwlk(interleaveSequenceIndex2);
-		chkund(textureSegments, interleaveSequenceIndex2);
+		xt::chkcwlk(interleaveSequenceIndex2);
+		xt::chkwlk(interleaveSequenceIndex2);
+		xt::chkund(textureSegments, interleaveSequenceIndex2);
 		StateMap.reset(StateFlag::ISUND);
 		if (SelectedForm->fillType) {
 			spacing     = LineSpacing;
@@ -4881,9 +4881,9 @@ void refilfn() {
 		chkbrd(interleaveSequenceIndex2);
 		break;
 	case SAT:
-		chkcwlk(interleaveSequenceIndex2);
-		chkwlk(interleaveSequenceIndex2);
-		chkund(textureSegments, interleaveSequenceIndex2);
+		xt::chkcwlk(interleaveSequenceIndex2);
+		xt::chkwlk(interleaveSequenceIndex2);
+		xt::chkund(textureSegments, interleaveSequenceIndex2);
 		StateMap.reset(StateFlag::ISUND);
 		switch (SelectedForm->fillType) {
 		case SATF:
@@ -4903,15 +4903,15 @@ void refilfn() {
 			if (StateMap.testAndReset(StateFlag::FLPBLND))
 				SelectedForm->extendedAttribute ^= AT_FTHBLND;
 			StateMap.set(StateFlag::CNV2FTH);
-			fthrfn(interleaveSequenceIndex2);
+			xt::fthrfn(interleaveSequenceIndex2);
 			break;
 		}
 		chkbrd(interleaveSequenceIndex2);
 	}
 	UserStitchLength = stitchLength;
-	intlv(fillStartsData, fillStartsMap, interleaveSequenceIndex2);
+	xt::intlv(fillStartsData, fillStartsMap, interleaveSequenceIndex2);
 	ritot(PCSHeader.stitchCount);
-	setfchk();
+	xt::setfchk();
 }
 
 void refil() {
@@ -7907,7 +7907,7 @@ void srtbyfrm() {
 		}
 	}
 	else
-		srtcol();
+		xt::srtcol();
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -8026,7 +8026,7 @@ void centir() {
 	}
 	for (iForm = 0; iForm < FormIndex; iForm++)
 		frmout(iForm);
-	setfchk();
+	xt::setfchk();
 	StateMap.set(StateFlag::RESTCH);
 }
 
