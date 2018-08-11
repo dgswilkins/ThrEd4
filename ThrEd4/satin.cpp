@@ -106,8 +106,8 @@ void satin::spltsat(const SATCON& currentGuide) {
 	FormIndex++;
 	if (ClosestFormToCursor < FormIndex - 2) {
 		form::mvfltsb(&FormVertices[FormVertexIndex + 1],
-		        &FormVertices[FormVertexIndex - 1],
-		        FormVertexIndex - form::fltind(FormList[ClosestFormToCursor + 2].vertices));
+		              &FormVertices[FormVertexIndex - 1],
+		              FormVertexIndex - form::fltind(FormList[ClosestFormToCursor + 2].vertices));
 	}
 	FormVertexIndex += 2;
 	for (auto iForm = ClosestFormToCursor + 2; iForm < FormIndex; iForm++)

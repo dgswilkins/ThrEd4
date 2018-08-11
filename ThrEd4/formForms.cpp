@@ -857,7 +857,8 @@ void formForms::dasyfrm() {
 			} break;
 			case DRAG:
 				distanceFromDaisyCenter
-				    = diameter + (static_cast<double>(form::psg() % IniFile.daisyPetalPoints) / IniFile.daisyPetalPoints * petalLength);
+				    = diameter
+				      + (static_cast<double>(form::psg() % IniFile.daisyPetalPoints) / IniFile.daisyPetalPoints * petalLength);
 				break;
 			case DCOG:
 				distanceFromDaisyCenter = diameter;

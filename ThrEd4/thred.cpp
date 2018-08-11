@@ -6478,9 +6478,9 @@ void newFil() {
 	ClipPointIndex        = 0;
 	TextureIndex          = 0;
 	satin::clearGuideSize();
-	FormIndex             = 0;
-	ColorChanges          = 0;
-	KnotCount             = 0;
+	FormIndex    = 0;
+	ColorChanges = 0;
+	KnotCount    = 0;
 	WorkingFileName->clear();
 	for (iColor = 0; iColor < 16; iColor++) {
 		redraw(DefaultColorWin[iColor]);

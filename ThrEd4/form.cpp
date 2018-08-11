@@ -1074,7 +1074,10 @@ void form::duform(unsigned formType) {
 	}
 }
 
-float form::internal::findDistanceToSide(const fPOINT& lineStart, const fPOINT& lineEnd, const fPOINT& point, double& distance) noexcept {
+float form::internal::findDistanceToSide(const fPOINT& lineStart,
+                                         const fPOINT& lineEnd,
+                                         const fPOINT& point,
+                                         double&       distance) noexcept {
 	const double A     = point.x - lineStart.x;
 	const double B     = point.y - lineStart.y;
 	const double C     = lineEnd.x - lineStart.x;
@@ -1584,7 +1587,10 @@ void form::duangs() {
 }
 
 // find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
-bool form::internal::projv(double xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, dPOINT& intersection) noexcept {
+bool form::internal::projv(double        xCoordinate,
+                           const fPOINT& lowerPoint,
+                           const fPOINT& upperPoint,
+                           dPOINT&       intersection) noexcept {
 	double       slope  = 0.0;
 	const double deltaX = upperPoint.x - lowerPoint.x;
 
@@ -1646,7 +1652,11 @@ bool form::cisin(float xCoordinate, float yCoordinate) noexcept {
 
 /* find the intersection of two lines, one defined by point and slope, the other by the coordinates
    of the endpoints. */
-bool form::internal::proj(const dPOINT& point, double slope, const fPOINT& point0, const fPOINT& point1, dPOINT& intersectionPoint) noexcept {
+bool form::internal::proj(const dPOINT& point,
+                          double        slope,
+                          const fPOINT& point0,
+                          const fPOINT& point1,
+                          dPOINT&       intersectionPoint) noexcept {
 	dPOINT delta     = {};
 	double sideSlope = 0.0, pointConstant = 0.0, sideConstant = 0.0, xMinimum = 0.0;
 	double xMaximum = 0.0, yMinimum = 0.0, yMaximum = 0.0;
@@ -1833,7 +1843,10 @@ void form::internal::sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start,
 	}
 }
 
-void form::internal::spurfn(const dPOINT& innerPoint, const dPOINT& outerPoint, dPOINT& underlayInnerPoint, dPOINT& underlayOuterPoint) noexcept {
+void form::internal::spurfn(const dPOINT& innerPoint,
+                            const dPOINT& outerPoint,
+                            dPOINT&       underlayInnerPoint,
+                            dPOINT&       underlayOuterPoint) noexcept {
 	dPOINT delta;
 
 	delta.x              = outerPoint.x - innerPoint.x;
@@ -1844,7 +1857,9 @@ void form::internal::spurfn(const dPOINT& innerPoint, const dPOINT& outerPoint, 
 	underlayOuterPoint.y = delta.y * DOURAT + innerPoint.y;
 }
 
-void form::internal::spurct(std::vector<VRCT2>& underlayVerticalRect, const std::vector<VRCT2>& fillVerticalRect, unsigned iRect) {
+void form::internal::spurct(std::vector<VRCT2>&       underlayVerticalRect,
+                            const std::vector<VRCT2>& fillVerticalRect,
+                            unsigned                  iRect) {
 	spurfn(fillVerticalRect[iRect].aipnt,
 	       fillVerticalRect[iRect].aopnt,
 	       underlayVerticalRect[iRect].aipnt,
@@ -1981,9 +1996,9 @@ void form::internal::spend(const std::vector<VRCT2>& fillVerticalRect, size_t st
 }
 
 void form::internal::duspnd(const std::vector<VRCT2>& underlayVerticalRect,
-            const std::vector<VRCT2>& fillVerticalRect,
-            size_t                    start,
-            size_t                    finish) {
+                            const std::vector<VRCT2>& fillVerticalRect,
+                            size_t                    start,
+                            size_t                    finish) {
 	double length = 0.0, angle = 0.0;
 	dPOINT point = {}, delta = {};
 
@@ -2026,9 +2041,9 @@ void form::internal::duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 }
 
 void form::internal::pfn(const std::vector<VRCT2>& underlayVerticalRect,
-         const std::vector<VRCT2>& fillVerticalRect,
-         size_t                    startVertex,
-         const std::vector<VRCT2>& vrct) {
+                         const std::vector<VRCT2>& fillVerticalRect,
+                         size_t                    startVertex,
+                         const std::vector<VRCT2>& vrct) {
 	unsigned iVertex       = 0;
 	size_t   currentVertex = startVertex;
 	size_t   nextVertex    = form::nxt(currentVertex);
@@ -2358,9 +2373,9 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 }
 
 void form::internal::fnang(std::vector<unsigned>& groupIndexSequence,
-           std::vector<SMALPNTL>& lineEndpoints,
-           double                 rotationAngle,
-           dPOINT&                rotationCenter) {
+                           std::vector<SMALPNTL>& lineEndpoints,
+                           double                 rotationAngle,
+                           dPOINT&                rotationCenter) {
 	unsigned iVertex = 0;
 
 	AngledForm = FormList[ClosestFormToCursor];
@@ -2378,9 +2393,9 @@ void form::internal::fnang(std::vector<unsigned>& groupIndexSequence,
 }
 
 void form::internal::fnhor(std::vector<unsigned>& groupIndexSequence,
-           std::vector<SMALPNTL>& lineEndpoints,
-           const double           rotationAngle,
-           dPOINT&                rotationCenter) {
+                           std::vector<SMALPNTL>& lineEndpoints,
+                           const double           rotationAngle,
+                           dPOINT&                rotationCenter) {
 	unsigned iVertex = 0;
 
 	AngledForm = FormList[ClosestFormToCursor];
@@ -2428,8 +2443,8 @@ void form::internal::prebrd() {
 }
 
 void form::internal::plfn(const std::vector<VRCT2>& underlayVerticalRect,
-          const std::vector<VRCT2>& fillVerticalRect,
-          const std::vector<VRCT2>& prct) {
+                          const std::vector<VRCT2>& fillVerticalRect,
+                          const std::vector<VRCT2>& prct) {
 	unsigned iVertex;
 
 	duromb(prct[1].aipnt, prct[1].cipnt, prct[1].aopnt, prct[1].copnt);
@@ -2734,10 +2749,10 @@ bool form::internal::clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept {
 }
 
 bool form::internal::isin(const std::vector<VCLPX> regionCrossingData,
-          float                    xCoordinate,
-          float                    yCoordinate,
-          unsigned                 regionCrossingStart,
-          unsigned                 regionCrossingEnd) {
+                          float                    xCoordinate,
+                          float                    yCoordinate,
+                          unsigned                 regionCrossingStart,
+                          unsigned                 regionCrossingEnd) {
 	unsigned count = 0;
 	dPOINT   point = {};
 
@@ -2843,10 +2858,10 @@ void form::internal::mvpclp(std::vector<CLIPSORT*>& arrayOfClipIntersectData, un
 }
 
 unsigned form::internal::insect(std::vector<CLIPSORT>&    clipIntersectData,
-                const std::vector<VCLPX>& regionCrossingData,
-                std::vector<CLIPSORT*>&   arrayOfClipIntersectData,
-                unsigned                  regionCrossingStart,
-                unsigned                  regionCrossingEnd) {
+                                const std::vector<VCLPX>& regionCrossingData,
+                                std::vector<CLIPSORT*>&   arrayOfClipIntersectData,
+                                unsigned                  regionCrossingStart,
+                                unsigned                  regionCrossingEnd) {
 	unsigned   iRegions = 0, iDestination = 0, iIntersection = 0, count = 0;
 	size_t     currentVertex = 0, nextVertex = 0;
 	fRECTANGLE lineSegmentRect = {};
@@ -2910,10 +2925,10 @@ float form::internal::getlen(std::vector<CLIPNT>& clipStitchPoints, const std::v
 }
 
 unsigned form::internal::clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
-                 std::vector<CLPSEG>&       clipSegments,
-                 const std::vector<double>& lengths,
-                 unsigned                   start,
-                 unsigned                   finish) {
+                                 std::vector<CLPSEG>&       clipSegments,
+                                 const std::vector<double>& lengths,
+                                 unsigned                   start,
+                                 unsigned                   finish) {
 	CLPSEG clipSegment;
 
 	clipSegment.start       = start;
@@ -2954,7 +2969,9 @@ void form::internal::chksid(size_t vertexIndex) noexcept {
 	}
 }
 
-void form::internal::ritseg(const std::vector<CLIPNT>& clipStitchPoints, std::vector<CLPSEG>& clipSegments, const unsigned currentSegmentIndex) {
+void form::internal::ritseg(const std::vector<CLIPNT>& clipStitchPoints,
+                            std::vector<CLPSEG>&       clipSegments,
+                            const unsigned             currentSegmentIndex) {
 	unsigned iPoint       = 0;
 	bool     isPointedEnd = true;
 
@@ -3016,7 +3033,9 @@ bool form::internal::clpnxt(const std::vector<CLPSEG>& clipSegments, const std::
 	return 1;
 }
 
-bool form::internal::nucseg(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned& currentSegmentIndex) {
+bool form::internal::nucseg(const std::vector<CLPSEG>&  clipSegments,
+                            const std::vector<LENINFO>& sortedLengths,
+                            unsigned&                   currentSegmentIndex) {
 	unsigned ind = 0;
 
 	if (StateMap.test(StateFlag::FILDIR))
@@ -3514,11 +3533,11 @@ unsigned short form::internal::isclos(const SMALPNTL* const lineEndPoint0, const
 }
 
 bool form::internal::lnclos(std::vector<unsigned>& groupIndexSequence,
-            std::vector<SMALPNTL>& lineEndpoints,
-            unsigned               group0,
-            unsigned               line0,
-            unsigned               group1,
-            unsigned               line1) {
+                            std::vector<SMALPNTL>& lineEndpoints,
+                            unsigned               group0,
+                            unsigned               line0,
+                            unsigned               group1,
+                            unsigned               line1) {
 	unsigned        index0 = 0, index1 = 0;
 	unsigned        count0        = (groupIndexSequence[group0 + 1] - groupIndexSequence[group0]) >> 1;
 	unsigned        count1        = 0;
@@ -3554,11 +3573,11 @@ bool form::internal::lnclos(std::vector<unsigned>& groupIndexSequence,
 }
 
 bool form::internal::regclos(std::vector<unsigned>&        groupIndexSequence,
-             std::vector<SMALPNTL>&        lineEndpoints,
-             const std::vector<SMALPNTL*>& sortedLines,
-             unsigned                      iRegion0,
-             unsigned                      iRegion1,
-             const std::vector<REGION>&    regionsList) {
+                             std::vector<SMALPNTL>&        lineEndpoints,
+                             const std::vector<SMALPNTL*>& sortedLines,
+                             unsigned                      iRegion0,
+                             unsigned                      iRegion1,
+                             const std::vector<REGION>&    regionsList) {
 	// ToDo - More renaming required
 
 	const SMALPNTL* lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
@@ -3644,10 +3663,10 @@ bool form::internal::unvis(const boost::dynamic_bitset<>& visitedRegions) {
 }
 
 unsigned form::internal::notdun(std::vector<RGSEQ>&            tempPath,
-                const std::vector<RCON>&       pathMap,
-                const std::vector<unsigned>&   mapIndexSequence,
-                const boost::dynamic_bitset<>& VisitedRegions,
-                unsigned                       level) {
+                                const std::vector<RCON>&       pathMap,
+                                const std::vector<unsigned>&   mapIndexSequence,
+                                const boost::dynamic_bitset<>& VisitedRegions,
+                                unsigned                       level) {
 	unsigned iPath         = 1;
 	int      pivot         = 0;
 	int      previousLevel = level - 1;
@@ -3699,9 +3718,9 @@ unsigned form::internal::notdun(std::vector<RGSEQ>&            tempPath,
 }
 
 double form::internal::reglen(const std::vector<SMALPNTL*>& sortedLines,
-              unsigned                      iRegion,
-              const std::vector<fPOINT>&    lastRegionCorners,
-              const std::vector<REGION>&    regionsList) {
+                              unsigned                      iRegion,
+                              const std::vector<fPOINT>&    lastRegionCorners,
+                              const std::vector<REGION>&    regionsList) {
 	double                 length = 0.0, minimumLength = 1e99;
 	unsigned               iCorner = 0, iPoint = 0;
 	std::vector<SMALPNTL*> lineEndPoints(4);
@@ -3723,11 +3742,11 @@ double form::internal::reglen(const std::vector<SMALPNTL*>& sortedLines,
 }
 
 void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
-            const std::vector<RCON>&      pathMap,
-            const std::vector<unsigned>&  mapIndexSequence,
-            boost::dynamic_bitset<>&      visitedRegions,
-            const std::vector<SMALPNTL*>& sortedLines,
-            const std::vector<REGION>&    regionsList) {
+                            const std::vector<RCON>&      pathMap,
+                            const std::vector<unsigned>&  mapIndexSequence,
+                            boost::dynamic_bitset<>&      visitedRegions,
+                            const std::vector<SMALPNTL*>& sortedLines,
+                            const std::vector<REGION>&    regionsList) {
 	unsigned iRegion = 0, iPath = 0, newRegion = 0;
 	double   length = 0, minimumLength = 1e99;
 	unsigned pathLength = 1; // length of the path to the region
@@ -3782,9 +3801,9 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 }
 
 void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
-            const std::vector<RCON>&     pathMap,
-            const std::vector<unsigned>& mapIndexSequence,
-            unsigned                     pathIndex) {
+                            const std::vector<RCON>&     pathMap,
+                            const std::vector<unsigned>& mapIndexSequence,
+                            unsigned                     pathIndex) {
 	unsigned iPath    = mapIndexSequence[sequencePath[pathIndex].node];
 	unsigned nextNode = 0;
 	if ((pathIndex + 1) < sequencePath.size()) {
@@ -3833,7 +3852,10 @@ void form::internal::movseq(const std::vector<SMALPNTL*>& sortedLines, size_t in
 	OutputIndex++;
 }
 
-void form::internal::brkseq(const std::vector<SMALPNTL*>& sortedLines, size_t start, size_t finish, boost::dynamic_bitset<>& sequenceMap) {
+void form::internal::brkseq(const std::vector<SMALPNTL*>& sortedLines,
+                            size_t                        start,
+                            size_t                        finish,
+                            boost::dynamic_bitset<>&      sequenceMap) {
 	unsigned savedGroup = 0;
 
 	StateMap.reset(StateFlag::SEQDUN);
@@ -3916,7 +3938,10 @@ void form::internal::duseq2(const std::vector<SMALPNTL*>& sortedLines, size_t iL
 	      (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
 }
 
-void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines, size_t start, size_t finish, boost::dynamic_bitset<>& sequenceMap) {
+void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
+                           size_t                        start,
+                           size_t                        finish,
+                           boost::dynamic_bitset<>&      sequenceMap) {
 	unsigned savedTopLine = sortedLines[start][1].line;
 	bool     flag         = false;
 
@@ -4003,11 +4028,11 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines, size_t sta
 }
 
 void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
-           boost::dynamic_bitset<>&      visitedRegions,
-           const std::vector<SMALPNTL*>& sortedLines,
-           unsigned                      pthi,
-           size_t                        lineCount,
-           std::vector<REGION>&          regionsList) {
+                           boost::dynamic_bitset<>&      visitedRegions,
+                           const std::vector<SMALPNTL*>& sortedLines,
+                           unsigned                      pthi,
+                           size_t                        lineCount,
+                           std::vector<REGION>&          regionsList) {
 	unsigned dun = 0, gdif = 0, iVertex = 0;
 	size_t   ind = 0;
 
@@ -4614,9 +4639,9 @@ void form::internal::dudif(const dPOINT& start, const dPOINT& finish, dPOINT* co
 }
 
 void form::internal::trfrm(const dPOINT& bottomLeftPoint,
-           const dPOINT& topLeftPoint,
-           const dPOINT& bottomRightPoint,
-           const dPOINT& topRightPoint) noexcept {
+                           const dPOINT& topLeftPoint,
+                           const dPOINT& bottomRightPoint,
+                           const dPOINT& topRightPoint) noexcept {
 	unsigned iStitch  = 0;
 	dPOINT   topDelta = {}, bottomDelta = {}, leftDelta = {}, rightDelta = {};
 	dPOINT   clipRatio = {}, topMidpoint = {}, bottomMidpoint = {}, middleDelta = {};
@@ -5332,8 +5357,8 @@ unsigned form::internal::closat() {
 			}
 			// Loop through for all line segments
 			for (size_t iVertex = 0; iVertex < lastVertex; iVertex++) {
-				param
-				    = findDistanceToSide(CurrentFormVertices[iVertex], CurrentFormVertices[form::nxt(iVertex)], SelectedPoint, length);
+				param = findDistanceToSide(
+				    CurrentFormVertices[iVertex], CurrentFormVertices[form::nxt(iVertex)], SelectedPoint, length);
 				if ((length < minimumLength)) {
 					if ((param < 0.0) && (iVertex == 0)) {
 						// this should only happen if the Closest vertex is the start of a line (vertex 0)
@@ -7751,10 +7776,10 @@ void form::shrnk() {
 }
 
 void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
-            std::vector<SATCON>& tempGuides,
-            std::vector<fPOINT>& destinationFormVertices,
-            std::vector<FRMHED>& destinationFormList,
-            size_t               formIndex) {
+                            std::vector<SATCON>& tempGuides,
+                            std::vector<fPOINT>& destinationFormVertices,
+                            std::vector<FRMHED>& destinationFormList,
+                            size_t               formIndex) {
 	FRMHED& destination = destinationFormList[FormRelocationIndex];
 
 	destinationFormList[FormRelocationIndex++] = FormList[formIndex];
@@ -7765,8 +7790,8 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
 	FormVertexIndex += destination.vertexCount;
 	if (destination.satinGuideCount) {
 		const auto _ = std::copy(destination.satinOrAngle.guide,
-			destination.satinOrAngle.guide + destination.satinGuideCount,
-			tempGuides.begin() + satin::getGuideSize());
+		                         destination.satinOrAngle.guide + destination.satinGuideCount,
+		                         tempGuides.begin() + satin::getGuideSize());
 
 		destination.satinOrAngle.guide = &SatinGuides[satin::getGuideSize()];
 		satin::setGuideSize(satin::getGuideSize() + destination.satinGuideCount);
@@ -8156,7 +8181,8 @@ void form::mvfltsb(fPOINT* const destination, const fPOINT* const source, size_t
 }
 
 void form::clpspac(const fPOINT* const insertPoint, size_t count) noexcept {
-	form::mvfltsb(&ClipPoints[ClipPointIndex + count - 1], &ClipPoints[ClipPointIndex - 1], ClipPointIndex - fi::clpind(insertPoint));
+	form::mvfltsb(
+	    &ClipPoints[ClipPointIndex + count - 1], &ClipPoints[ClipPointIndex - 1], ClipPointIndex - fi::clpind(insertPoint));
 }
 
 void form::stchadj() {
