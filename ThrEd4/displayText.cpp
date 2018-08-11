@@ -237,7 +237,7 @@ void displayText::shoseln(unsigned code0, unsigned code1) {
 }
 
 bool displayText::clpmsgs(unsigned code) {
-	ispcdclp();
+	form::ispcdclp();
 	if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap.test(StateFlag::WASPCDCLP)) {
 		displayText::tabmsg(IDS_CLPS);
 		return 1;

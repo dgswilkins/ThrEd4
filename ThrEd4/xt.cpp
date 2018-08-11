@@ -156,7 +156,7 @@ void xt::internal::nurat(FEATHER& feather) {
 	case FTHPSG:
 		if (feather.upCount) {
 			if (feather.countUp) {
-				feather.ratio = static_cast<float>(feather.totalCount - (psg() % feather.totalCount)) / feather.totalCount;
+				feather.ratio = static_cast<float>(feather.totalCount - (form::psg() % feather.totalCount)) / feather.totalCount;
 				feather.countUp--;
 			}
 			else {
@@ -171,7 +171,7 @@ void xt::internal::nurat(FEATHER& feather) {
 			}
 		}
 		else
-			feather.ratio = static_cast<float>(feather.totalCount - (psg() % feather.totalCount)) / feather.totalCount;
+			feather.ratio = static_cast<float>(feather.totalCount - (form::psg() % feather.totalCount)) / feather.totalCount;
 		feather.ratio *= feather.formRatio;
 		break;
 	case FTHFAZ:
@@ -295,7 +295,7 @@ void xt::internal::fritfil(std::vector<fPOINT>& featherSequence, unsigned& inter
 		InterleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->fillColor;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].seq   = I_FIL;
-		chkseq(false);
+		form::chkseq(false);
 		interleaveSequenceIndex2++;
 		if (SelectedForm->extendedAttribute & AT_FTHBLND
 		    && ~(SelectedForm->extendedAttribute & (AT_FTHUP | AT_FTHBTH)) != (AT_FTHUP | AT_FTHBTH)) {
@@ -311,7 +311,7 @@ void xt::internal::fritfil(std::vector<fPOINT>& featherSequence, unsigned& inter
 				iReverseSequence--;
 			}
 			SequenceIndex = sequenceMax;
-			chkseq(false);
+			form::chkseq(false);
 			interleaveSequenceIndex2++;
 		}
 	}
@@ -390,7 +390,7 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 
 void xt::fethrf() {
 	if (FormIndex) {
-		fvars(ClosestFormToCursor);
+		form::fvars(ClosestFormToCursor);
 		clip::delclps(ClosestFormToCursor);
 		texture::deltx();
 		SelectedForm->type                           = SAT;
@@ -407,7 +407,7 @@ void xt::fethrf() {
 		SelectedForm->fillColor                  = ActiveColor;
 		SelectedForm->fillInfo.feather.color     = (ActiveColor + 1) & COLMSK;
 		SelectedForm->fillType                   = FTHF;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -553,7 +553,7 @@ std::vector<fPOINT>& xt::insid() {
 	satin::satout(fabs(SelectedForm->underlayIndent));
 	if (SelectedForm->underlayIndent > 0) {
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-			if (!cisin((*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y)) {
+			if (!form::cisin((*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y)) {
 				(*InsidePoints)[iVertex] = CurrentFormVertices[iVertex];
 			}
 		}
@@ -658,8 +658,8 @@ void xt::internal::ritcwlk(unsigned& interleaveSequenceIndex2) noexcept {
 
 unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, unsigned code) {
 	double       length             = hypot(finish.x - start.x, finish.y - start.y);
-	size_t       startVertex        = closflt(start.x, start.y);
-	const size_t endVertex          = closflt(finish.x, finish.y);
+	size_t       startVertex        = form::closflt(start.x, start.y);
+	const size_t endVertex          = form::closflt(finish.x, finish.y);
 	unsigned     stitchCount        = 0;
 	size_t       intermediateVertex = 0;
 	unsigned     iStitch = 0, iStep = 0;
@@ -681,8 +681,8 @@ unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned
 			StateMap.set(StateFlag::WLKDIR);
 			break;
 		}
-		up   = nxt(up);
-		down = prv(down);
+		up   = form::nxt(up);
+		down = form::prv(down);
 	} while (true);
 	iStitch = destination;
 	while (startVertex != endVertex) {
@@ -696,9 +696,9 @@ unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned
 		else
 			iStitch++;
 		if (StateMap.test(StateFlag::WLKDIR))
-			intermediateVertex = prv(startVertex);
+			intermediateVertex = form::prv(startVertex);
 		else
-			intermediateVertex = nxt(startVertex);
+			intermediateVertex = form::nxt(startVertex);
 		delta.x     = indentedPoint[intermediateVertex].x - indentedPoint[startVertex].x;
 		delta.y     = indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y;
 		length      = hypot(delta.x, delta.y);
@@ -718,9 +718,9 @@ unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned
 			}
 		}
 		if (StateMap.test(StateFlag::WLKDIR))
-			startVertex = prv(startVertex);
+			startVertex = form::prv(startVertex);
 		else
-			startVertex = nxt(startVertex);
+			startVertex = form::nxt(startVertex);
 	}
 	StitchBuffer[iStitch].x         = indentedPoint[startVertex].x;
 	StitchBuffer[iStitch].y         = indentedPoint[startVertex].y;
@@ -733,7 +733,7 @@ void xt::internal::fnwlk(size_t find, unsigned& interleaveSequenceIndex2) {
 	size_t start = 0;
 	size_t count = 0;
 
-	fvars(find);
+	form::fvars(find);
 	if (SelectedForm->type == FRMLINE)
 		SelectedForm->type = FRMFPOLY;
 	if (SelectedForm->extendedAttribute & AT_STRT && SelectedForm->type != FRMLINE)
@@ -747,7 +747,7 @@ void xt::internal::fnwlk(size_t find, unsigned& interleaveSequenceIndex2) {
 	OutputIndex                           = 0;
 	while (count) {
 		OSequence[OutputIndex] = walkPoints[start];
-		start                  = nxt(start);
+		start                  = form::nxt(start);
 		OutputIndex++;
 		count--;
 	}
@@ -779,23 +779,23 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) noexcept {
 	if (SelectedForm->satinGuideCount) {
 		if (SelectedForm->wordParam) {
 			iVertex                  = SelectedForm->wordParam;
-			OSequence[OutputIndex].x = midl(CurrentFormVertices[iVertex].x, CurrentFormVertices[iVertex + 1].x);
-			OSequence[OutputIndex].y = midl(CurrentFormVertices[iVertex].y, CurrentFormVertices[iVertex + 1].y);
+			OSequence[OutputIndex].x = form::midl(CurrentFormVertices[iVertex].x, CurrentFormVertices[iVertex + 1].x);
+			OSequence[OutputIndex].y = form::midl(CurrentFormVertices[iVertex].y, CurrentFormVertices[iVertex + 1].y);
 			OutputIndex++;
 		}
 		const SATCON* guide = SelectedForm->satinOrAngle.guide;
 		if (guide) {
 			for (auto iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--) {
 				OSequence[OutputIndex].x
-				    = midl(CurrentFormVertices[guide[iGuide - 1].finish].x, CurrentFormVertices[guide[iGuide - 1].start].x);
+				    = form::midl(CurrentFormVertices[guide[iGuide - 1].finish].x, CurrentFormVertices[guide[iGuide - 1].start].x);
 				OSequence[OutputIndex].y
-				    = midl(CurrentFormVertices[guide[iGuide - 1].finish].y, CurrentFormVertices[guide[iGuide - 1].start].y);
+				    = form::midl(CurrentFormVertices[guide[iGuide - 1].finish].y, CurrentFormVertices[guide[iGuide - 1].start].y);
 				OutputIndex++;
 			}
 		}
 		if (SelectedForm->attribute & FRMEND) {
-			OSequence[OutputIndex].x = midl(CurrentFormVertices[0].x, CurrentFormVertices[1].x);
-			OSequence[OutputIndex].y = midl(CurrentFormVertices[0].y, CurrentFormVertices[1].y);
+			OSequence[OutputIndex].x = form::midl(CurrentFormVertices[0].x, CurrentFormVertices[1].x);
+			OSequence[OutputIndex].y = form::midl(CurrentFormVertices[0].y, CurrentFormVertices[1].y);
 			OutputIndex++;
 		}
 	}
@@ -806,15 +806,15 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) noexcept {
 			start = 0;
 		OSequence[OutputIndex] = CurrentFormVertices[start];
 		OutputIndex++;
-		finish = prv(start);
-		start  = nxt(start);
+		finish = form::prv(start);
+		start  = form::nxt(start);
 		for (size_t iGuide = 1; iGuide<VertexCount>> 1; iGuide++) {
-			OSequence[OutputIndex].x = midl(CurrentFormVertices[finish].x, CurrentFormVertices[start].x);
-			OSequence[OutputIndex].y = midl(CurrentFormVertices[finish].y, CurrentFormVertices[start].y);
-			if (cisin(OSequence[OutputIndex].x, OSequence[OutputIndex].y))
+			OSequence[OutputIndex].x = form::midl(CurrentFormVertices[finish].x, CurrentFormVertices[start].x);
+			OSequence[OutputIndex].y = form::midl(CurrentFormVertices[finish].y, CurrentFormVertices[start].y);
+			if (form::cisin(OSequence[OutputIndex].x, OSequence[OutputIndex].y))
 				OutputIndex++;
-			start  = nxt(start);
-			finish = prv(finish);
+			start  = form::nxt(start);
+			finish = form::prv(finish);
 		}
 		OSequence[OutputIndex] = CurrentFormVertices[start];
 		OutputIndex++;
@@ -867,7 +867,7 @@ void xt::dubit(unsigned bit) {
 		SelectedForm->extendedAttribute &= ~(bit);
 	else
 		SelectedForm->extendedAttribute |= bit;
-	refil();
+	form::refil();
 	coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -916,10 +916,10 @@ void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, size_t find
 		SelectedForm->underlayStitchLen = IniFile.underlayStitchLen;
 	undclp();
 	StateMap.set(StateFlag::ISUND);
-	angclpfn(textureSegments);
+	form::angclpfn(textureSegments);
 	OutputIndex = SequenceIndex;
 	ritund(interleaveSequenceIndex2);
-	fvars(find);
+	form::fvars(find);
 	UserStitchLength = savedStitchSize;
 }
 
@@ -1498,7 +1498,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 	INTINF   ilData = {};
 
 	StateMap.reset(StateFlag::ISEND);
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
 	ilData.layerIndex
 	    = (gsl::narrow<size_t>(SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
@@ -1595,26 +1595,26 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 void xt::internal::setundfn(unsigned code) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		fvars(ClosestFormToCursor);
+		form::fvars(ClosestFormToCursor);
 		if (SelectedForm->type != FRMLINE) {
 			const auto savedAttribute = SelectedForm->extendedAttribute;
 			SelectedForm->extendedAttribute |= code;
 			if (savedAttribute != SelectedForm->extendedAttribute) {
-				refilfn();
+				form::refilfn();
 			}
 		}
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
-			fvars(ClosestFormToCursor);
+			form::fvars(ClosestFormToCursor);
 			if (SelectedForm->type == FRMLINE) {
 				continue;
 			}
 			const auto savedAttribute = SelectedForm->extendedAttribute;
 			SelectedForm->extendedAttribute |= code;
 			if (savedAttribute != SelectedForm->extendedAttribute) {
-				refilfn();
+				form::refilfn();
 			}
 		}
 	}
@@ -1638,26 +1638,26 @@ void xt::internal::notundfn(unsigned code) {
 	savdo();
 	code = ~code;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		fvars(ClosestFormToCursor);
+		form::fvars(ClosestFormToCursor);
 		if (SelectedForm->type != FRMLINE) {
 			const auto savedAttribute = SelectedForm->extendedAttribute;
 			SelectedForm->extendedAttribute &= code;
 			if (savedAttribute != SelectedForm->extendedAttribute) {
-				refilfn();
+				form::refilfn();
 			}
 		}
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
-			fvars(ClosestFormToCursor);
+			form::fvars(ClosestFormToCursor);
 			if (SelectedForm->type == FRMLINE) {
 				continue;
 			}
 			const auto savedAttribute = SelectedForm->extendedAttribute;
 			SelectedForm->extendedAttribute &= code;
 			if (savedAttribute != SelectedForm->extendedAttribute) {
-				refilfn();
+				form::refilfn();
 			}
 		}
 	}
@@ -1679,10 +1679,10 @@ void xt::notcwlk() {
 
 void xt::internal::ulenfn(size_t find, float length) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) {
 		SelectedForm->underlayStitchLen = length;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -1709,10 +1709,10 @@ void xt::undlen() {
 
 void xt::internal::uspacfn(size_t find, float spacing) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & AT_UND) {
 		SelectedForm->underlaySpacing = spacing;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -1739,10 +1739,10 @@ void xt::uspac() {
 
 void xt::internal::uangfn(size_t find, float angle) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & AT_UND) {
 		SelectedForm->underlayStitchAngle = angle;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -1770,10 +1770,10 @@ void xt::sfuang() {
 
 void xt::internal::flenfn(size_t find, float length) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType && !clip::isclp(find)) {
 		SelectedForm->lengthOrCount.stitchLength = length;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -1800,14 +1800,14 @@ void xt::setflen() {
 
 void xt::internal::fspacfn(size_t find, float spacing) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
 		if (spacing < 0) {
 			if (!clip::isclp(find))
 				return;
 		}
 		SelectedForm->fillSpacing = spacing;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -1834,10 +1834,10 @@ void xt::setfspac() {
 
 void xt::internal::findfn(size_t find, float indent) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	SelectedForm->underlayIndent = indent;
 	if (SelectedForm->extendedAttribute & (AT_UND | AT_WALK))
-		refilfn();
+		form::refilfn();
 }
 
 void xt::dufind(float indent) {
@@ -1857,7 +1857,7 @@ void xt::dufind(float indent) {
 
 void xt::internal::fangfn(size_t find, float angle) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	// ToDo - also do angle updates for texture filled forms
 	if (SelectedForm->type == FRMFPOLY && SelectedForm->fillType) {
 		switch (SelectedForm->fillType) {
@@ -1874,7 +1874,7 @@ void xt::internal::fangfn(size_t find, float angle) {
 			SelectedForm->satinOrAngle.angle = angle;
 			break;
 		}
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -1902,10 +1902,10 @@ void xt::setfang() {
 
 void xt::internal::ucolfn(size_t find, unsigned color) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) {
 		SelectedForm->underlayColor = color;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -1935,10 +1935,10 @@ void xt::setucol() {
 
 void xt::internal::fcolfn(size_t find, unsigned color) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
 		SelectedForm->fillColor = color;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -1968,10 +1968,10 @@ void xt::setfcol() {
 
 void xt::internal::bcolfn(size_t find, unsigned color) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
 		SelectedForm->borderColor = color;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -2001,10 +2001,10 @@ void xt::setbcol() {
 
 void xt::internal::blenfn(size_t find, float length) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType && !clip::iseclp(find)) {
 		SelectedForm->lengthOrCount.stitchLength = length;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -2031,10 +2031,10 @@ void xt::setblen() {
 
 void xt::internal::bspacfn(size_t find, float length) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
 		SelectedForm->edgeSpacing = length;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -2061,10 +2061,10 @@ void xt::setbspac() {
 
 void xt::internal::bminfn(size_t find, float length) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
 		SelectedForm->minBorderStitchLen = length;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -2091,10 +2091,10 @@ void xt::setbmin() {
 
 void xt::internal::bmaxfn(size_t find, float length) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
 		SelectedForm->maxBorderStitchLen = length;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -2121,10 +2121,10 @@ void xt::setbmax() {
 
 void xt::internal::fminfn(size_t find, float length) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
 		SelectedForm->minFillStitchLen = length;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -2151,10 +2151,10 @@ void xt::setfmin() {
 
 void xt::internal::fmaxfn(size_t find, float length) {
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
 		SelectedForm->maxFillStitchLen = length;
-		refilfn();
+		form::refilfn();
 	}
 }
 
@@ -2185,13 +2185,13 @@ void xt::internal::fwidfn(size_t find, float length) {
 	float    reference = 0.0;
 
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	reference = SelectedForm->rectangle.left;
 	ratio     = length / (SelectedForm->rectangle.right - reference);
 	for (iVertex = 0; iVertex < VertexCount; iVertex++)
 		CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - reference) * ratio + reference;
-	frmout(ClosestFormToCursor);
-	refilfn();
+	form::frmout(ClosestFormToCursor);
+	form::refilfn();
 }
 
 void xt::dufwid(float length) {
@@ -2228,13 +2228,13 @@ void xt::internal::fhifn(size_t find, float length) {
 	float    reference = 0.0;
 
 	ClosestFormToCursor = find;
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	reference = SelectedForm->rectangle.bottom;
 	ratio     = length / (SelectedForm->rectangle.top - reference);
 	for (iVertex = 0; iVertex < VertexCount; iVertex++)
 		CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - reference) * ratio + reference;
-	frmout(ClosestFormToCursor);
-	refilfn();
+	form::frmout(ClosestFormToCursor);
+	form::refilfn();
 }
 
 void xt::dufhi(float length) {
@@ -2262,7 +2262,7 @@ void xt::setfilstrt() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
 		FormList[ClosestFormToCursor].fillStart = gsl::narrow<unsigned short>(ClosestVertexToCursor);
 		FormList[ClosestFormToCursor].extendedAttribute |= AT_STRT;
-		refil();
+		form::refil();
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -2274,7 +2274,7 @@ void xt::setfilend() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
 		FormList[ClosestFormToCursor].fillEnd = gsl::narrow<unsigned short>(ClosestVertexToCursor);
 		FormList[ClosestFormToCursor].extendedAttribute |= AT_END;
-		refil();
+		form::refil();
 		coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -2302,7 +2302,7 @@ void xt::internal::rtrclpfn() {
 	size_t count = 0;
 
 	if (OpenClipboard(ThrEdWindow)) {
-		fvars(ClosestFormToCursor);
+		form::fvars(ClosestFormToCursor);
 		if (clip::iseclp(ClosestFormToCursor)) {
 			count = SelectedForm->clipEntries;
 			clip::oclp(SelectedForm->borderClipData, count);
@@ -2333,7 +2333,7 @@ void xt::internal::rtrclpfn() {
 
 void xt::rtrclp() {
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		fvars(ClosestFormToCursor);
+		form::fvars(ClosestFormToCursor);
 		if (texture::istx(ClosestFormToCursor))
 			texture::rtrtx();
 		else
@@ -2433,7 +2433,7 @@ void xt::internal::nudfn(const fRECTANGLE& designSizeRect) noexcept {
 		sadj(StitchBuffer[iStitch], designSizeRatio, designSizeRect);
 	for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
 		sadj(FormVertices[iVertex], designSizeRatio, designSizeRect);
-	frmout(ClosestFormToCursor);
+	form::frmout(ClosestFormToCursor);
 }
 
 void xt::nudsiz() {
@@ -2470,15 +2470,15 @@ void xt::nudsiz() {
 			}
 			xi::nudfn(designSizeRect);
 			if (UserFlagMap.test(UserFlag::CHREF))
-				refilal();
+				form::refilal();
 			if (flag) {
 				movStch();
 				zumhom();
 				displayText::hsizmsg();
 			}
-			centir();
+			form::centir();
 			for (iForm = 0; iForm < FormIndex; iForm++)
-				frmout(iForm);
+				form::frmout(iForm);
 		}
 	}
 }

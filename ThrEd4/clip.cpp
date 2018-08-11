@@ -243,7 +243,7 @@ bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, size_t curren
 bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) {
 	const fPOINT adjustedPoint = { (point.x - ClipReference.x), (point.y - ClipReference.y) };
 
-	if (chkmax(ClipStitchCount, SequenceIndex))
+	if (form::chkmax(ClipStitchCount, SequenceIndex))
 		return true;
 	for (size_t iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 		OSequence[SequenceIndex].x   = clipFillData[iStitch].x + adjustedPoint.x;
@@ -382,7 +382,7 @@ void clip::clpbrd(size_t startVertex) {
 		auto reference     = startVertex;
 		auto currentVertex = startVertex;
 		for (size_t iVertex = 0; iVertex < VertexCount; iVertex++) {
-			const auto nextVertex = prv(currentVertex);
+			const auto nextVertex = form::prv(currentVertex);
 			if (ci::clpsid(clipReversedData, clipFillData, reference, nextVertex, rotationCenter)) {
 				reference = nextVertex;
 			}
@@ -552,7 +552,7 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 }
 
 void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
-	duangs();
+	form::duangs();
 	std::vector<double> listSINEs;
 	listSINEs.reserve(VertexCount + 1);
 	std::vector<double> listCOSINEs;
@@ -570,7 +570,7 @@ void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 void clip::internal::dulast(std::vector<fPOINT>& chainEndPoints) {
 	std::vector<fPOINT> tempClipPoints;
 	tempClipPoints.reserve(chainEndPoints.size());
-	if (lastch()) {
+	if (form::lastch()) {
 		auto   minimumLength = 1e99;
 		size_t minimumIndex  = 0;
 		for (size_t iPoint = 0; iPoint < chainEndPoints.size() - 1; iPoint++) {
@@ -644,7 +644,7 @@ void clip::duxclp() {
 }
 
 void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, size_t vertex, const dPOINT& rotationCenter) {
-	const size_t nextVertex = nxt(vertex);
+	const size_t nextVertex = form::nxt(vertex);
 	dPOINT       delta      = {};
 
 	if (StateMap.test(StateFlag::INDIR)) {
@@ -661,7 +661,7 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, size_t vertex, c
 	for (size_t iStitch = 0; iStitch < ClipStitchCount; iStitch++)
 		rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
 	const auto length = hypot(delta.x, delta.y);
-	const auto ratio  = getplen() / length;
+	const auto ratio  = form::getplen() / length;
 	delta.x *= ratio;
 	delta.y *= ratio;
 	const fPOINT point         = { CurrentFormVertices[nextVertex].x + delta.x, CurrentFormVertices[nextVertex].y + delta.y };
@@ -752,7 +752,7 @@ void clip::clpic() {
 		}
 		size_t currentVertex = 0;
 		for (size_t iVertex = 0; iVertex < VertexCount; iVertex++) {
-			const auto nextVertex = nxt(currentVertex);
+			const auto nextVertex = form::nxt(currentVertex);
 			ci::picfn(clipFillData, currentVertex, nextVertex, SelectedForm->edgeSpacing, rotationCenter);
 			ci::clpcrnr(clipFillData, currentVertex, rotationCenter);
 			currentVertex = nextVertex;
@@ -827,7 +827,7 @@ void clip::chnfn() {
 	std::vector<fPOINT> chainEndPoints;
 	// reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
 	chainEndPoints.reserve(50);
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	clip::deleclp(ClosestFormToCursor);
 	ci::dufxlen(chainEndPoints);
 	ci::dulast(chainEndPoints);

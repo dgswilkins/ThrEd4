@@ -739,7 +739,7 @@ void trace::internal::dutrac() {
 			tracedPoints.push_back(decimatedLine[iCurrent]);
 		}
 		SelectedForm = &FormList[FormIndex];
-		frmclr(SelectedForm);
+		form::frmclr(SelectedForm);
 		CurrentFormVertices      = &FormVertices[FormVertexIndex];
 		CurrentFormVertices[0].x = tracedPoints[0].x * StitchBmpRatio.x;
 		CurrentFormVertices[0].y = tracedPoints[0].y * StitchBmpRatio.y;
@@ -771,12 +771,12 @@ void trace::internal::dutrac() {
 		SelectedForm->vertexCount = gsl::narrow<unsigned short>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = ActiveLayer << 1;
-		frmout(FormIndex);
+		form::frmout(FormIndex);
 		FormList[FormIndex].satinGuideCount = 0;
 		FormIndex++;
 		StateMap.set(StateFlag::RESTCH);
 		StateMap.set(StateFlag::FRMOF);
-		tglfrm();
+		form::tglfrm();
 	}
 }
 
@@ -1007,7 +1007,7 @@ void trace::blak() {
 		if (!StateMap.test(StateFlag::WASTRAC))
 			ti::getrmap();
 		for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
-			fvars(iForm);
+			form::fvars(iForm);
 			ti::bfrm();
 		}
 		DeleteObject(BlackPen);

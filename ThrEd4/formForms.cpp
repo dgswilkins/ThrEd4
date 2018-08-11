@@ -412,9 +412,9 @@ void formForms::internal::refrmfn() {
 		}
 		if (edgeArray[iEdge] & BCNRSIZ) {
 			if (SelectedForm->edgeType == EDGEBHOL)
-				choice = fmt::format(L"{:.2f}", (getblen() / PFGRAN));
+				choice = fmt::format(L"{:.2f}", (form::getblen() / PFGRAN));
 			else
-				choice = fmt::format(L"{:.2f}", (getplen() / PFGRAN));
+				choice = fmt::format(L"{:.2f}", (form::getplen() / PFGRAN));
 			labelWindow[LBCSIZ] = ffi::txtwin(stringTable[STR_TXT13], LabelWindowCoords);
 			valueWindow[LBCSIZ] = ffi::numwin(choice, ValueWindowCoords);
 			ffi::nxtlin();
@@ -619,7 +619,7 @@ void formForms::prfmsg() {
 	ffi::prflin(fmt::format(L"{:.2f}", (LineSpacing / PFGRAN)), STR_PRF0);
 	ffi::prflin(fmt::format(L"{}", (duthrsh(ShowStitchThreshold))), STR_PRF7);
 	ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize / PFGRAN)), STR_PRF20);
-	sethup();
+	form::sethup();
 	ffi::prflin(fmt::format(L"{}", (*StringTable)[STR_HUP0 + IniFile.hoopType - 1]), STR_PRF17);
 	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY / PFGRAN)), STR_PRF27);
 	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX / PFGRAN)), STR_PRF18);
@@ -780,13 +780,13 @@ void formForms::dasyfrm() {
 		StateMap.reset(StateFlag::FORMIN);
 		return;
 	}
-	const fPOINT referencePoint = { midl(ZoomRect.right, ZoomRect.left), midl(ZoomRect.top, ZoomRect.bottom) };
+	const fPOINT referencePoint = { form::midl(ZoomRect.right, ZoomRect.left), form::midl(ZoomRect.top, ZoomRect.bottom) };
 	SelectedForm                = &FormList[FormIndex];
 	ClosestFormToCursor         = FormIndex;
-	frmclr(SelectedForm);
+	form::frmclr(SelectedForm);
 	SelectedForm->vertices  = &FormVertices[FormVertexIndex];
 	SelectedForm->attribute = ActiveLayer << 1;
-	fvars(FormIndex);
+	form::fvars(FormIndex);
 	auto       maximumXsize = ZoomRect.right - ZoomRect.left;
 	const auto maximumYsize = ZoomRect.top - ZoomRect.bottom;
 	if (maximumYsize > maximumXsize)
@@ -857,7 +857,7 @@ void formForms::dasyfrm() {
 			} break;
 			case DRAG:
 				distanceFromDaisyCenter
-				    = diameter + (static_cast<double>(psg() % IniFile.daisyPetalPoints) / IniFile.daisyPetalPoints * petalLength);
+				    = diameter + (static_cast<double>(form::psg() % IniFile.daisyPetalPoints) / IniFile.daisyPetalPoints * petalLength);
 				break;
 			case DCOG:
 				distanceFromDaisyCenter = diameter;
@@ -894,7 +894,7 @@ void formForms::dasyfrm() {
 	}
 	FormVertexIndex += iVertex;
 	StateMap.set(StateFlag::INIT);
-	frmout(FormIndex);
+	form::frmout(FormIndex);
 	for (size_t iMacroPetal = 0; iMacroPetal < iVertex; iMacroPetal++) {
 		CurrentFormVertices[iMacroPetal].x -= SelectedForm->rectangle.left;
 		CurrentFormVertices[iMacroPetal].y -= SelectedForm->rectangle.bottom;
@@ -902,8 +902,8 @@ void formForms::dasyfrm() {
 	FormMoveDelta.x = FormMoveDelta.y = 0;
 	NewFormVertexCount                = iVertex + 1;
 	StateMap.set(StateFlag::POLIMOV);
-	setmfrm();
-	mdufrm();
+	form::setmfrm();
+	form::mdufrm();
 }
 
 inline void formForms::internal::initTearDlg(HWND hwndlg) {
@@ -963,8 +963,8 @@ void formForms::setear() {
 	const INT_PTR nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, (DLGPROC)ffi::tearprc);
 	if (nResult > 0) {
 		auto twistStep = IniFile.tearTwistStep;
-		durpoli(IniFile.formSides);
-		fvars(FormIndex);
+		form::durpoli(IniFile.formSides);
+		form::fvars(FormIndex);
 		const auto count            = VertexCount / 4;
 		const auto middle           = (CurrentFormVertices[1].x - CurrentFormVertices[0].x) / 2.0 + CurrentFormVertices[0].x;
 		auto       step             = CurrentFormVertices[count + 1].y - CurrentFormVertices[count].y;
@@ -995,9 +995,9 @@ void formForms::setear() {
 		NewFormVertexCount++;
 		FormVertexIndex++;
 		StateMap.set(StateFlag::FORMSEL);
-		fvars(FormIndex);
-		frmout(FormIndex);
-		flipv();
+		form::fvars(FormIndex);
+		form::frmout(FormIndex);
+		form::flipv();
 		StateMap.reset(StateFlag::FORMSEL);
 		const fPOINT size            = { SelectedForm->rectangle.right - SelectedForm->rectangle.left,
                               SelectedForm->rectangle.top - SelectedForm->rectangle.bottom };
@@ -1015,7 +1015,7 @@ void formForms::setear() {
 				    = (CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y) * horizontalRatio + CurrentFormVertices[0].y;
 			}
 		}
-		frmout(FormIndex);
+		form::frmout(FormIndex);
 		for (size_t iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			CurrentFormVertices[iVertex].x -= SelectedForm->rectangle.left;
 			CurrentFormVertices[iVertex].y -= SelectedForm->rectangle.bottom;
@@ -1081,8 +1081,8 @@ void formForms::wavfrm() {
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, (DLGPROC)ffi::wavprc)) {
 		std::vector<fPOINT> points(IniFile.wavePoints);
 		const auto          saveIndex = FormVertexIndex;
-		durpoli(IniFile.wavePoints);
-		mdufrm();
+		form::durpoli(IniFile.wavePoints);
+		form::mdufrm();
 		FormVertexIndex = saveIndex;
 		auto iPoint     = 0u;
 		auto waveIndex  = IniFile.waveStart;
@@ -1124,7 +1124,7 @@ void formForms::wavfrm() {
 		SelectedForm->type        = FRMLINE;
 		SelectedForm->vertexCount = vertexCount;
 		FormVertexIndex += vertexCount;
-		frmout(FormIndex);
+		form::frmout(FormIndex);
 		StateMap.reset(StateFlag::FORMSEL);
 		const fPOINT selectedSize    = { SelectedForm->rectangle.right - SelectedForm->rectangle.left,
                                       SelectedForm->rectangle.top - SelectedForm->rectangle.bottom };
@@ -1142,14 +1142,14 @@ void formForms::wavfrm() {
 				    = (CurrentFormVertices[index].y - CurrentFormVertices[0].y) * horizontalRatio + CurrentFormVertices[0].y;
 			}
 		}
-		frmout(FormIndex);
+		form::frmout(FormIndex);
 		for (size_t index = 0u; index < vertexCount; index++) {
 			CurrentFormVertices[index].x -= SelectedForm->rectangle.left;
 			CurrentFormVertices[index].y -= SelectedForm->rectangle.bottom;
 		}
 		FormMoveDelta.x = FormMoveDelta.y = 0;
 		NewFormVertexCount                = vertexCount + 1;
-		setmfrm();
-		mdufrm();
+		form::setmfrm();
+		form::mdufrm();
 	}
 }

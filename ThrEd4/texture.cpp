@@ -612,7 +612,7 @@ void texture::internal::setxclp() {
 	VertexCount        = AngledForm.vertexCount;
 	size_t iNextVertex = 0;
 	for (size_t iLine = 0u; iLine < lineCount; iLine++) {
-		iNextVertex = nxt(iLine);
+		iNextVertex = form::nxt(iLine);
 		txi::dutxlin(AngledFormVertices[iLine], AngledFormVertices[iNextVertex]);
 	}
 }
@@ -751,8 +751,8 @@ void texture::internal::setxfrm() noexcept {
 		}
 		txi::angrct(angleRect);
 	}
-	TextureScreen.formCenter.x = midl(angleRect.right, angleRect.left);
-	TextureScreen.formCenter.y = midl(angleRect.top, angleRect.bottom);
+	TextureScreen.formCenter.x = form::midl(angleRect.right, angleRect.left);
+	TextureScreen.formCenter.y = form::midl(angleRect.top, angleRect.bottom);
 	txi::ed2px(TextureScreen.formCenter, SelectTexturePointsOrigin);
 }
 
@@ -895,13 +895,13 @@ void texture::internal::txpar() {
 	SelectedForm->maxFillStitchLen           = IniFile.maxStitchLength;
 	SelectedForm->minFillStitchLen           = IniFile.minStitchLength;
 	SelectedForm->fillColor                  = ActiveColor;
-	refilfn();
+	form::refilfn();
 }
 
 void texture::internal::txvrt() {
 	if (TempTexturePoints->size()) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			fvars(ClosestFormToCursor);
+			form::fvars(ClosestFormToCursor);
 			SelectedForm->fillType = TXVRTF;
 			txi::txpar();
 		}
@@ -911,7 +911,7 @@ void texture::internal::txvrt() {
 void texture::internal::txhor() {
 	if (TempTexturePoints->size()) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			fvars(ClosestFormToCursor);
+			form::fvars(ClosestFormToCursor);
 			SelectedForm->fillType = TXHORF;
 			txi::txpar();
 		}
@@ -921,7 +921,7 @@ void texture::internal::txhor() {
 void texture::internal::txang() {
 	if (TempTexturePoints->size()) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			fvars(ClosestFormToCursor);
+			form::fvars(ClosestFormToCursor);
 			SelectedForm->fillType              = TXANGF;
 			SelectedForm->angleOrClipData.angle = static_cast<float>(IniFile.fillAngle);
 			txi::txpar();
@@ -1071,7 +1071,7 @@ void texture::internal::dutxfn(unsigned textureType) {
 		texture::deltx();
 		texture::savtxt();
 		txi::nutx();
-		dusqr();
+		form::dusqr();
 		switch (textureType) {
 		case VRTYP:
 			txi::txvrt();
@@ -1162,7 +1162,7 @@ bool texture::internal::chkbut() {
 }
 
 void texture::txtlbut() {
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	if (txi::chkbut())
 		return;
 	if (StateMap.testAndReset(StateFlag::TXTCLP)) {
@@ -1283,8 +1283,8 @@ void texture::internal::txsiz(double ratio) {
 	}
 	fRECTANGLE angleRect = {};
 	txi::angrct(angleRect);
-	TextureScreen.formCenter.x = midl(angleRect.right, angleRect.left);
-	TextureScreen.formCenter.y = midl(angleRect.top, angleRect.bottom);
+	TextureScreen.formCenter.x = form::midl(angleRect.right, angleRect.left);
+	TextureScreen.formCenter.y = form::midl(angleRect.top, angleRect.bottom);
 	txi::ed2px(TextureScreen.formCenter, SelectTexturePointsOrigin);
 	txi::ritxfrm();
 }
@@ -1502,7 +1502,7 @@ void texture::setxt(std::vector<RNGCNT>& textureSegments) {
 }
 
 void texture::rtrtx() {
-	fvars(ClosestFormToCursor);
+	form::fvars(ClosestFormToCursor);
 	TempTexturePoints->clear();
 
 	const auto currentIndex = SelectedForm->fillInfo.texture.index;

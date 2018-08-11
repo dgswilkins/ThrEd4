@@ -61,7 +61,7 @@ void repair::lodchk() {
 				}
 			}
 		}
-		frmout(iForm);
+		form::frmout(iForm);
 		if (!SelectedForm->maxFillStitchLen)
 			SelectedForm->maxFillStitchLen = IniFile.maxStitchLength;
 		if (!SelectedForm->maxBorderStitchLen)
