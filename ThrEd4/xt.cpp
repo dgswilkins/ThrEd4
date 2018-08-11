@@ -41,6 +41,7 @@
 #include "xt.h"
 
 namespace fs = std::experimental::filesystem;
+namespace xi = xt::internal;
 
 fPOINT   DesignSize;     // design size
 unsigned ColorOrder[16]; // color order adjusted for applique
@@ -324,7 +325,7 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 
 	// ToDo - what does this function do
 	PseudoRandomValue = FSED;
-	xt::internal::fthvars(feather);
+	xi::fthvars(feather);
 	LineSpacing = SelectedForm->fillSpacing;
 	satin::satfil();
 	BSequence[0].attribute = 0;
@@ -349,14 +350,14 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 		OutputIndex = 0;
 		for (ind = 0; ind < SequenceIndex; ind++) {
 			if (!BSequence[ind].attribute)
-				xt::internal::fthrbfn(ind, feather, featherSequence);
+				xi::fthrbfn(ind, feather, featherSequence);
 		}
 	}
 	else {
 		if (SelectedForm->extendedAttribute & AT_FTHBTH) {
 			for (ind = 0; ind <= SequenceIndex; ind++) {
 				if (!BSequence[ind].attribute)
-					xt::internal::fthdfn(ind, feather);
+					xi::fthdfn(ind, feather);
 			}
 			ind--;
 		}
@@ -364,7 +365,7 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 			for (ind = 0; ind <= SequenceIndex; ind++) {
 				if (BSequence[ind].attribute) {
 					if (feather.extendedAttribute & AT_FTHUP)
-						xt::internal::fthfn(ind, feather);
+						xi::fthfn(ind, feather);
 					else
 						OSequence[ind] = BSequence[ind];
 					;
@@ -373,7 +374,7 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 					if (feather.extendedAttribute & AT_FTHUP)
 						OSequence[ind] = BSequence[ind];
 					else
-						xt::internal::fthfn(ind, feather);
+						xi::fthfn(ind, feather);
 				}
 			}
 			ind--;
@@ -384,7 +385,7 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 	StateMap.reset(StateFlag::BARSAT);
 	LineSpacing   = savedSpacing;
 	SequenceIndex = OutputIndex;
-	xt::internal::fritfil(featherSequence, interleaveSequenceIndex2);
+	xi::fritfil(featherSequence, interleaveSequenceIndex2);
 }
 
 void xt::fethrf() {
@@ -512,8 +513,8 @@ void xt::pes2crd() {
 		displayText::tabmsg(IDS_P2CNODAT);
 		return;
 	}
-	if (xt::internal::chkp2cnam(utf::Utf8ToUtf16(std::string(IniFile.p2cName)).c_str())) {
-		xt::internal::fil2crd(*ThrName);
+	if (xi::chkp2cnam(utf::Utf8ToUtf16(std::string(IniFile.p2cName)).c_str())) {
+		xi::fil2crd(*ThrName);
 		return;
 	}
 	*IniFile.p2cName = 0;
@@ -523,7 +524,7 @@ void xt::pes2crd() {
 		keyType = REG_SZ;
 		if (RegQueryValueEx(registryKey, L"ProgramFilesDir", 0, &keyType, (unsigned char*)programName, &size) == ERROR_SUCCESS) {
 			wcscat_s(programName, L"\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
-			if (!xt::internal::chkp2cnam(programName))
+			if (!xi::chkp2cnam(programName))
 				*programName = 0;
 		}
 	}
@@ -532,7 +533,7 @@ void xt::pes2crd() {
 		LoadString(ThrEdInstance, IDS_P2CTITL, caption, P2CBUFSIZ);
 		if (IDOK == MessageBox(ThrEdWindow, message, caption, MB_OKCANCEL)) {
 			if (GetOpenFileName(&openFileName)) {
-				if (!xt::internal::chkp2cnam(programName))
+				if (!xi::chkp2cnam(programName))
 					return;
 			}
 			else
@@ -543,7 +544,7 @@ void xt::pes2crd() {
 	}
 	auto p2cName = utf::Utf16ToUtf8(std::wstring(programName));
 	std::copy(p2cName.begin(), p2cName.end(), IniFile.p2cName);
-	xt::internal::fil2crd(*AuxName);
+	xi::fil2crd(*AuxName);
 }
 
 std::vector<fPOINT>& xt::insid() {
@@ -893,16 +894,16 @@ void xt::setulen() {
 
 void xt::chkcwlk(unsigned& interleaveSequenceIndex2) {
 	if (SelectedForm->extendedAttribute & AT_CWLK)
-		xt::internal::fncwlk(interleaveSequenceIndex2);
+		xi::fncwlk(interleaveSequenceIndex2);
 	else
-		xt::internal::delwlk((ClosestFormToCursor << FRMSHFT) | CWLKMSK);
+		xi::delwlk((ClosestFormToCursor << FRMSHFT) | CWLKMSK);
 }
 
 void xt::chkwlk(unsigned& interleaveSequenceIndex2) {
 	if (SelectedForm->extendedAttribute & AT_WALK)
-		xt::internal::fnwlk(ClosestFormToCursor, interleaveSequenceIndex2);
+		xi::fnwlk(ClosestFormToCursor, interleaveSequenceIndex2);
 	else
-		xt::internal::delwlk((ClosestFormToCursor << FRMSHFT) | WLKMSK);
+		xi::delwlk((ClosestFormToCursor << FRMSHFT) | WLKMSK);
 }
 
 void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, size_t find, unsigned& interleaveSequenceIndex2) {
@@ -924,9 +925,9 @@ void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, size_t find
 
 void xt::chkund(const std::vector<RNGCNT>& textureSegments, unsigned& interleaveSequenceIndex2) {
 	if (SelectedForm->extendedAttribute & AT_UND)
-		xt::internal::fnund(textureSegments, ClosestFormToCursor, interleaveSequenceIndex2);
+		xi::fnund(textureSegments, ClosestFormToCursor, interleaveSequenceIndex2);
 	else
-		xt::internal::delwlk((ClosestFormToCursor << FRMSHFT) | UNDMSK);
+		xi::delwlk((ClosestFormToCursor << FRMSHFT) | UNDMSK);
 }
 
 void xt::selalfrm() {
@@ -990,7 +991,9 @@ bool xt::internal::refcmp(const OREC* record1, const OREC* record2) noexcept {
 	}
 }
 
-bool xt::internal::chkrdun(const std::vector<unsigned>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord) {
+bool xt::internal::chkrdun(const std::vector<unsigned>& formFillCounter,
+                           const std::vector<OREC*>&    pRecs,
+                           const SRTREC&                stitchRecord) {
 	unsigned iStitch;
 
 	for (iStitch = stitchRecord.start; iStitch < stitchRecord.finish; iStitch++) {
@@ -1000,7 +1003,8 @@ bool xt::internal::chkrdun(const std::vector<unsigned>& formFillCounter, const s
 	return 0;
 }
 
-double xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord) {
+double
+xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord) {
 	unsigned    iRegion       = 0;
 	unsigned    currentRegion = sortRecord.currentRegion;
 	fPOINTATTR* currentStitch = nullptr;
@@ -1158,16 +1162,16 @@ void xt::fsort() {
 	std::vector<OREC*> pRecs(lastRegion);
 	std::vector<OREC*> pFRecs(lastRegion);
 	for (iRegion = 0; iRegion < lastRegion; iRegion++) {
-		xt::internal::durec(stitchRegion[iRegion]);
+		xi::durec(stitchRegion[iRegion]);
 		pRecs[iRegion]  = &stitchRegion[iRegion];
 		pFRecs[iRegion] = &stitchRegion[iRegion];
 	}
-	std::sort(pRecs.begin(), pRecs.end(), xt::internal::recmp);
-	std::sort(pFRecs.begin(), pFRecs.end(), xt::internal::refcmp);
+	std::sort(pRecs.begin(), pRecs.end(), xi::recmp);
+	std::sort(pFRecs.begin(), pFRecs.end(), xi::refcmp);
 #ifdef _DEBUG
-	xt::internal::dmprec(pRecs, lastRegion);
+	xi::dmprec(pRecs, lastRegion);
 #endif
-	if (xt::internal::srtchk(pFRecs, lastRegion, badForm)) {
+	if (xi::srtchk(pFRecs, lastRegion, badForm)) {
 		std::vector<RANGE> stitchRange(lastRegion);
 		stitchRange[0].start = 0;
 		attribute            = pRecs[0]->color;
@@ -1206,11 +1210,11 @@ void xt::fsort() {
 			minimumJumps      = 0xffffffff;
 			// timeout used to put an upper bound on the number of sorting permutations checked
 			GetSystemTimeAsFileTime(&fileTime);
-			startTime = xt::internal::tim2int(fileTime);
+			startTime = xi::tim2int(fileTime);
 			for (iRegion = sortRecord.start; iRegion < sortRecord.finish; iRegion++) {
 				sortRecord.currentRegion = iRegion;
 				if (!pRecs[iRegion]->otyp) {
-					jumps = xt::internal::duprecs(tempStitchBuffer, pRecs, sortRecord);
+					jumps = xi::duprecs(tempStitchBuffer, pRecs, sortRecord);
 					if (jumps < minimumJumps) {
 						minimumJumps     = jumps;
 						minimumIndex     = iRegion;
@@ -1218,14 +1222,14 @@ void xt::fsort() {
 					}
 				}
 				GetSystemTimeAsFileTime(&fileTime);
-				nextTime = xt::internal::tim2int(fileTime);
+				nextTime = xi::tim2int(fileTime);
 				if (nextTime.QuadPart - startTime.QuadPart > SRTIM)
 					break;
 			}
 			StateMap.set(StateFlag::DUSRT);
 			sortRecord.currentRegion = minimumIndex;
 			sortRecord.direction     = minimumDirection;
-			xt::internal::precjmps(tempStitchBuffer, pRecs, sortRecord);
+			xi::precjmps(tempStitchBuffer, pRecs, sortRecord);
 		}
 		std::copy(tempStitchBuffer.cbegin(), tempStitchBuffer.cbegin() + OutputIndex, StitchBuffer);
 		PCSHeader.stitchCount = gsl::narrow<unsigned short>(OutputIndex);
@@ -1275,10 +1279,10 @@ void xt::internal::duatf(unsigned ind) {
 void xt::dmpat() {
 	unsigned iStitch = 0, attribute = StitchBuffer[0].attribute;
 
-	xt::internal::duatf(0);
+	xi::duatf(0);
 	for (iStitch = 1; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (attribute != StitchBuffer[iStitch].attribute) {
-			xt::internal::duatf(iStitch);
+			xi::duatf(iStitch);
 			attribute = StitchBuffer[iStitch].attribute;
 		}
 	}
@@ -1299,7 +1303,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
 			ClosestPointIndex = iDestinationStitch;
 		attribute = StitchBuffer[iSourceStitch].attribute;
 		if (codedFormIndex == (attribute & (FRMSK | NOTFRM))) {
-			type = StitchTypes[xt::internal::dutyp(attribute)];
+			type = StitchTypes[xi::dutyp(attribute)];
 			switch (type) {
 			case TYPE_APPLIQUE:
 				if (!(tmap & M_AP)) {
@@ -1536,9 +1540,9 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 			}
 			code = gsl::narrow<unsigned int>(ilData.layerIndex | InterleaveSequenceIndices[ilData.pins].code
 			                                 | InterleaveSequenceIndices[ilData.pins].color);
-			xt::internal::duint(offset, code, ilData);
+			xi::duint(offset, code, ilData);
 		}
-		xt::internal::chkend(MAXITEMS, code, ilData);
+		xi::chkend(MAXITEMS, code, ilData);
 		if (PCSHeader.stitchCount && ilData.start < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 			ine              = PCSHeader.stitchCount - ilData.start;
 			auto sourceStart = &StitchBuffer[ilData.start];
@@ -1560,14 +1564,14 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 			                                 | InterleaveSequenceIndices[iSequence].color);
 			if (SelectedForm->extendedAttribute & AT_STRT) {
 				if (!StateMap.testAndSet(StateFlag::DIDSTRT))
-					ilData.output += xt::internal::gucon(CurrentFormVertices[SelectedForm->fillStart],
-					                       InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index],
-					                       ilData.output + offset,
-					                       code);
+					ilData.output += xi::gucon(CurrentFormVertices[SelectedForm->fillStart],
+					                           InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index],
+					                           ilData.output + offset,
+					                           code);
 			}
-			if (xt::internal::lastcol(iSequence, colpnt))
+			if (xi::lastcol(iSequence, colpnt))
 				ilData.output
-				    += xt::internal::gucon(colpnt, InterleaveSequence[InterleaveSequenceIndices[iSequence].index], ilData.output, code);
+				    += xi::gucon(colpnt, InterleaveSequence[InterleaveSequenceIndices[iSequence].index], ilData.output, code);
 			for (ine = InterleaveSequenceIndices[iSequence].index; ine < InterleaveSequenceIndices[iSequence + 1].index; ine++) {
 				StitchBuffer[ilData.output].x         = InterleaveSequence[ine].x;
 				StitchBuffer[ilData.output].y         = InterleaveSequence[ine].y;
@@ -1582,7 +1586,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 				}
 			}
 		}
-		xt::internal::chkend(0, code, ilData);
+		xi::chkend(0, code, ilData);
 	}
 	PCSHeader.stitchCount = ilData.output;
 	coltab();
@@ -1619,15 +1623,15 @@ void xt::internal::setundfn(unsigned code) {
 }
 
 void xt::setund() {
-	xt::internal::setundfn(AT_UND);
+	xi::setundfn(AT_UND);
 }
 
 void xt::setwlk() {
-	xt::internal::setundfn(AT_WALK);
+	xi::setundfn(AT_WALK);
 }
 
 void xt::setcwlk() {
-	xt::internal::setundfn(AT_CWLK);
+	xi::setundfn(AT_CWLK);
 }
 
 void xt::internal::notundfn(unsigned code) {
@@ -1662,15 +1666,15 @@ void xt::internal::notundfn(unsigned code) {
 }
 
 void xt::notund() {
-	xt::internal::notundfn(AT_UND);
+	xi::notundfn(AT_UND);
 }
 
 void xt::notwlk() {
-	xt::internal::notundfn(AT_WALK);
+	xi::notundfn(AT_WALK);
 }
 
 void xt::notcwlk() {
-	xt::internal::notundfn(AT_CWLK);
+	xi::notundfn(AT_CWLK);
 }
 
 void xt::internal::ulenfn(size_t find, float length) {
@@ -1685,11 +1689,11 @@ void xt::internal::ulenfn(size_t find, float length) {
 void xt::dusulen(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::ulenfn(ClosestFormToCursor, length);
+		xi::ulenfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::ulenfn(selectedForm, length);
+			xi::ulenfn(selectedForm, length);
 		}
 	}
 	coltab();
@@ -1715,11 +1719,11 @@ void xt::internal::uspacfn(size_t find, float spacing) {
 void xt::duspac(float spacing) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::uspacfn(ClosestFormToCursor, spacing);
+		xi::uspacfn(ClosestFormToCursor, spacing);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::uspacfn(selectedForm, spacing);
+			xi::uspacfn(selectedForm, spacing);
 		}
 	}
 	coltab();
@@ -1746,11 +1750,11 @@ void xt::dufang(float angle) {
 	savdo();
 	angle *= (float)PI / 180;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::uangfn(ClosestFormToCursor, angle);
+		xi::uangfn(ClosestFormToCursor, angle);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::uangfn(selectedForm, angle);
+			xi::uangfn(selectedForm, angle);
 		}
 	}
 	coltab();
@@ -1776,11 +1780,11 @@ void xt::internal::flenfn(size_t find, float length) {
 void xt::duflen(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::flenfn(ClosestFormToCursor, length);
+		xi::flenfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::flenfn(selectedForm, length);
+			xi::flenfn(selectedForm, length);
 		}
 	}
 	coltab();
@@ -1810,11 +1814,11 @@ void xt::internal::fspacfn(size_t find, float spacing) {
 void xt::dufspac(float spacing) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::fspacfn(ClosestFormToCursor, spacing);
+		xi::fspacfn(ClosestFormToCursor, spacing);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::fspacfn(selectedForm, spacing);
+			xi::fspacfn(selectedForm, spacing);
 		}
 	}
 	coltab();
@@ -1840,11 +1844,11 @@ void xt::dufind(float indent) {
 	savdo();
 	indent *= PFGRAN;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::findfn(ClosestFormToCursor, indent);
+		xi::findfn(ClosestFormToCursor, indent);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::findfn(selectedForm, indent);
+			xi::findfn(selectedForm, indent);
 		}
 	}
 	coltab();
@@ -1878,11 +1882,11 @@ void xt::dufxang(float angle) {
 	savdo();
 	angle *= (float)PI / 180;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::fangfn(ClosestFormToCursor, angle);
+		xi::fangfn(ClosestFormToCursor, angle);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::fangfn(selectedForm, angle);
+			xi::fangfn(selectedForm, angle);
 		}
 	}
 	coltab();
@@ -1911,11 +1915,11 @@ void xt::dundcol(unsigned color) {
 		color--;
 	color &= COLMSK;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::ucolfn(ClosestFormToCursor, color);
+		xi::ucolfn(ClosestFormToCursor, color);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::ucolfn(selectedForm, color);
+			xi::ucolfn(selectedForm, color);
 		}
 	}
 	coltab();
@@ -1944,11 +1948,11 @@ void xt::dufcol(unsigned color) {
 		color--;
 	color &= COLMSK;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::fcolfn(ClosestFormToCursor, color);
+		xi::fcolfn(ClosestFormToCursor, color);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::fcolfn(selectedForm, color);
+			xi::fcolfn(selectedForm, color);
 		}
 	}
 	coltab();
@@ -1977,11 +1981,11 @@ void xt::dubcol(unsigned color) {
 		color--;
 	color &= COLMSK;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::bcolfn(ClosestFormToCursor, color);
+		xi::bcolfn(ClosestFormToCursor, color);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::bcolfn(selectedForm, color);
+			xi::bcolfn(selectedForm, color);
 		}
 	}
 	coltab();
@@ -2007,11 +2011,11 @@ void xt::internal::blenfn(size_t find, float length) {
 void xt::dublen(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::blenfn(ClosestFormToCursor, length);
+		xi::blenfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::blenfn(selectedForm, length);
+			xi::blenfn(selectedForm, length);
 		}
 	}
 	coltab();
@@ -2037,11 +2041,11 @@ void xt::internal::bspacfn(size_t find, float length) {
 void xt::dubspac(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::bspacfn(ClosestFormToCursor, length);
+		xi::bspacfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::bspacfn(selectedForm, length);
+			xi::bspacfn(selectedForm, length);
 		}
 	}
 	coltab();
@@ -2067,11 +2071,11 @@ void xt::internal::bminfn(size_t find, float length) {
 void xt::dubmin(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::bminfn(ClosestFormToCursor, length);
+		xi::bminfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::bminfn(selectedForm, length);
+			xi::bminfn(selectedForm, length);
 		}
 	}
 	coltab();
@@ -2097,11 +2101,11 @@ void xt::internal::bmaxfn(size_t find, float length) {
 void xt::dubmax(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::bmaxfn(ClosestFormToCursor, length);
+		xi::bmaxfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::bmaxfn(selectedForm, length);
+			xi::bmaxfn(selectedForm, length);
 		}
 	}
 	coltab();
@@ -2127,11 +2131,11 @@ void xt::internal::fminfn(size_t find, float length) {
 void xt::dufmin(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::fminfn(ClosestFormToCursor, length);
+		xi::fminfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::fminfn(selectedForm, length);
+			xi::fminfn(selectedForm, length);
 		}
 	}
 	coltab();
@@ -2157,11 +2161,11 @@ void xt::internal::fmaxfn(size_t find, float length) {
 void xt::dufmax(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::fmaxfn(ClosestFormToCursor, length);
+		xi::fmaxfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::fmaxfn(selectedForm, length);
+			xi::fmaxfn(selectedForm, length);
 		}
 	}
 	coltab();
@@ -2193,11 +2197,11 @@ void xt::internal::fwidfn(size_t find, float length) {
 void xt::dufwid(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::fwidfn(ClosestFormToCursor, length);
+		xi::fwidfn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::fwidfn(selectedForm, length);
+			xi::fwidfn(selectedForm, length);
 		}
 	}
 	coltab();
@@ -2236,11 +2240,11 @@ void xt::internal::fhifn(size_t find, float length) {
 void xt::dufhi(float length) {
 	savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		xt::internal::fhifn(ClosestFormToCursor, length);
+		xi::fhifn(ClosestFormToCursor, length);
 	}
 	else {
 		for (auto selectedForm : (*SelectedFormList)) {
-			xt::internal::fhifn(selectedForm, length);
+			xi::fhifn(selectedForm, length);
 		}
 	}
 	coltab();
@@ -2312,7 +2316,7 @@ void xt::internal::rtrclpfn() {
 		if (count) {
 			LowerLeftStitch = {};
 			EmptyClipboard();
-			Clip = RegisterClipboardFormat(PcdClipFormat);
+			Clip        = RegisterClipboardFormat(PcdClipFormat);
 			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, count * sizeof(CLPSTCH) + 2);
 			if (ClipPointer) {
 				ClipStitchData = *(static_cast<CLPSTCH**>(ClipPointer));
@@ -2333,7 +2337,7 @@ void xt::rtrclp() {
 		if (texture::istx(ClosestFormToCursor))
 			texture::rtrtx();
 		else
-			xt::internal::rtrclpfn();
+			xi::rtrclpfn();
 	}
 }
 
@@ -2452,7 +2456,7 @@ void xt::nudsiz() {
 	if (flag) {
 		DesignSize.x = designSizeRect.right - designSizeRect.left;
 		DesignSize.y = designSizeRect.top - designSizeRect.bottom;
-		if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, (DLGPROC)xt::internal::setsprc)) {
+		if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, (DLGPROC)xi::setsprc)) {
 			flag = 0;
 			if (DesignSize.x > IniFile.hoopSizeX) {
 				IniFile.hoopSizeX = DesignSize.x * 1.05;
@@ -2464,7 +2468,7 @@ void xt::nudsiz() {
 				UnzoomedRect.y    = IniFile.hoopSizeY;
 				flag              = 1;
 			}
-			xt::internal::nudfn(designSizeRect);
+			xi::nudfn(designSizeRect);
 			if (UserFlagMap.test(UserFlag::CHREF))
 				refilal();
 			if (flag) {
@@ -2521,7 +2525,7 @@ BOOL CALLBACK xt::internal::enumch(HWND hwnd, LPARAM lParam) noexcept {
 }
 
 void xt::clrstch() noexcept {
-	while (EnumChildWindows(MainStitchWin, xt::internal::enumch, 0))
+	while (EnumChildWindows(MainStitchWin, xi::enumch, 0))
 		;
 }
 
@@ -2542,4 +2546,3 @@ void xt::tst() {
 	ThrName->assign(*DesignerName);
 	StateMap.set(StateFlag::RESTCH);
 }
-

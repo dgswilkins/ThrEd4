@@ -34,6 +34,8 @@
 #include "thred.h"
 #include "repair.h"
 
+namespace ri = repair::internal;
+
 void repair::internal::adbad(std::wstring& repairMessage, unsigned code, size_t count) {
 	std::wstring fmtStr;
 
@@ -125,9 +127,9 @@ unsigned repair::internal::frmchkfn() {
 			}
 			if (!(badData.attribute & BADCLP)) {
 				if (clip::isclp(iForm))
-					repair::internal::chkclp(formHeader, badData);
+					ri::chkclp(formHeader, badData);
 				if (clip::iseclp(iForm))
-					repair::internal::chkeclp(formHeader, badData);
+					ri::chkeclp(formHeader, badData);
 			}
 			if (formHeader->type == SAT && formHeader->satinGuideCount) {
 				if (!(badData.attribute & BADSAT)) {
@@ -207,7 +209,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			const auto _           = std::copy(sourceStart, sourceEnd, destination);
 			formHeader->vertices   = &FormVertices[iVertex];
 			iVertex += formHeader->vertexCount;
-			repair::internal::bcup(iForm, badData);
+			ri::bcup(iForm, badData);
 		}
 		else {
 			if (vertexDifference < FormVertexIndex) {
@@ -219,15 +221,15 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 				auto sourceEnd   = sourceStart + formHeader->vertexCount;
 				auto destination = vertexPoint.begin() + iVertex;
 				auto _           = std::copy(sourceStart, sourceEnd, destination);
-				repair::internal::bcup(iForm, badData);
+				ri::bcup(iForm, badData);
 			}
 			else {
-				FormIndex       = iForm;
-				ClipPointIndex  = badData.clip;
+				FormIndex      = iForm;
+				ClipPointIndex = badData.clip;
 				satin::setGuideSize(badData.guideCount);
-				TextureIndex    = badData.tx;
-				repair::internal::chkfstch();
-				repair::internal::adbad(repairMessage, IDS_FRMDAT, FormIndex - iForm + 1);
+				TextureIndex = badData.tx;
+				ri::chkfstch();
+				ri::adbad(repairMessage, IDS_FRMDAT, FormIndex - iForm + 1);
 				flag = false;
 				break;
 			}
@@ -312,7 +314,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 	std::copy(clipPoint.cbegin(), clipPoint.cend(), ClipPoints);
 	ClipPointIndex = clipCount;
 	if (badClipCount)
-		repair::internal::adbad(repairMessage, IDS_CLPDAT, badClipCount);
+		ri::adbad(repairMessage, IDS_CLPDAT, badClipCount);
 }
 
 void repair::internal::repsat() {
@@ -331,7 +333,7 @@ void repair::internal::repsat() {
 				std::copy(sourceStart, sourceEnd, destination);
 				formHeader->satinOrAngle.guide = &SatinGuides[guideCount];
 				guideCount += formHeader->satinGuideCount;
-				repair::internal::bcup(iForm, badData);
+				ri::bcup(iForm, badData);
 			}
 			else {
 				if (guideDifference < satin::getGuideSize()) {
@@ -340,7 +342,7 @@ void repair::internal::repsat() {
 					auto       sourceEnd        = sourceStart + formHeader->satinGuideCount;
 					const auto destination = stdext::make_checked_array_iterator(&SatinGuides[guideCount], 10000 - guideCount);
 					std::copy(sourceStart, sourceEnd, destination);
-					repair::internal::bcup(iForm, badData);
+					ri::bcup(iForm, badData);
 				}
 				else {
 					guideCount                  = badData.guideCount;
@@ -367,7 +369,7 @@ void repair::internal::reptx() {
 				std::copy(sourceStart, sourceEnd, destination);
 				formHeader->fillInfo.texture.index = gsl::narrow<unsigned short>(textureCount);
 				textureCount += formHeader->fillInfo.texture.count;
-				repair::internal::bcup(iForm, badData);
+				ri::bcup(iForm, badData);
 			}
 			else {
 				if (TextureIndex > formHeader->fillInfo.texture.index) {
@@ -379,7 +381,7 @@ void repair::internal::reptx() {
 					    = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
 					std::copy(sourceStart, sourceEnd, destination);
 					formHeader->fillInfo.texture.index = gsl::narrow<unsigned short>(textureCount);
-					repair::internal::bcup(iForm, badData);
+					ri::bcup(iForm, badData);
 					textureCount = badData.tx;
 				}
 				else
@@ -392,18 +394,18 @@ void repair::internal::reptx() {
 
 void repair::repar() {
 	std::wstring   repairMessage;
-	const unsigned repairType = repair::internal::frmchkfn();
+	const unsigned repairType = ri::frmchkfn();
 
 	savdo();
 	// RepairString = MsgBuffer;
 	if (repairType & BADFLT)
-		repair::internal::repflt(repairMessage);
+		ri::repflt(repairMessage);
 	if (repairType & BADCLP)
-		repair::internal::repclp(repairMessage);
+		ri::repclp(repairMessage);
 	if (repairType & BADSAT)
-		repair::internal::repsat();
+		ri::repsat();
 	if (repairType & BADTX)
-		repair::internal::reptx();
+		ri::reptx();
 	repair::lodchk();
 	StateMap.set(StateFlag::RESTCH);
 	displayText::shoMsg(repairMessage);
@@ -411,7 +413,7 @@ void repair::repar() {
 
 void repair::frmchkx() {
 	if (IniFile.dataCheck) {
-		const auto code = repair::internal::frmchkfn();
+		const auto code = ri::frmchkfn();
 		switch (IniFile.dataCheck) {
 		case 1:
 			if (code)

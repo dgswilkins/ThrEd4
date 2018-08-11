@@ -36,6 +36,8 @@
 #include "xt.h"
 #include "formForms.h"
 
+namespace ffi = formForms::internal;
+
 unsigned FormMenuEntryCount;        // lines in the form-form
 RECT     LabelWindowCoords;         // location of left windows in the form data sheet
 POINT    LabelWindowSize;           // size of the left windows in the form data sheet
@@ -145,206 +147,196 @@ void formForms::internal::refrmfn() {
 	LabelWindowCoords.right  = 3 + LabelWindowSize.x;
 	ValueWindowCoords.left   = 6 + LabelWindowSize.x;
 	ValueWindowCoords.right  = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
-	labelWindow[LFRM]        = formForms::internal::txtwin(stringTable[STR_TXT0], LabelWindowCoords);
+	labelWindow[LFRM]        = ffi::txtwin(stringTable[STR_TXT0], LabelWindowCoords);
 	if (SelectedForm->type == FRMLINE)
 		choice = stringTable[STR_EDG1];
 	else
 		choice = stringTable[STR_FREH];
-	valueWindow[LFRM] = formForms::internal::txtrwin(choice, ValueWindowCoords);
-	formForms::internal::nxtlin();
-	labelWindow[LLAYR] = formForms::internal::txtwin(stringTable[STR_TXT1], LabelWindowCoords);
-	valueWindow[LLAYR]
-	    = formForms::internal::txtrwin(fmt::format(L"{}", ((SelectedForm->attribute & FRMLMSK) >> 1)), ValueWindowCoords);
-	formForms::internal::nxtlin();
+	valueWindow[LFRM] = ffi::txtrwin(choice, ValueWindowCoords);
+	ffi::nxtlin();
+	labelWindow[LLAYR] = ffi::txtwin(stringTable[STR_TXT1], LabelWindowCoords);
+	valueWindow[LLAYR] = ffi::txtrwin(fmt::format(L"{}", ((SelectedForm->attribute & FRMLMSK) >> 1)), ValueWindowCoords);
+	ffi::nxtlin();
 	if (SelectedForm->type != FRMLINE) {
-		labelWindow[LCWLK] = formForms::internal::txtwin(stringTable[STR_CWLK], LabelWindowCoords);
+		labelWindow[LCWLK] = ffi::txtwin(stringTable[STR_CWLK], LabelWindowCoords);
 		if (SelectedForm->extendedAttribute & AT_CWLK)
 			choice = stringTable[STR_ON];
 		else
 			choice = stringTable[STR_OFF];
-		valueWindow[LCWLK] = formForms::internal::txtrwin(choice, ValueWindowCoords);
-		formForms::internal::nxtlin();
-		labelWindow[LWALK] = formForms::internal::txtwin(stringTable[STR_WALK], LabelWindowCoords);
+		valueWindow[LCWLK] = ffi::txtrwin(choice, ValueWindowCoords);
+		ffi::nxtlin();
+		labelWindow[LWALK] = ffi::txtwin(stringTable[STR_WALK], LabelWindowCoords);
 		if (SelectedForm->extendedAttribute & AT_WALK)
 			choice = stringTable[STR_ON];
 		else
 			choice = stringTable[STR_OFF];
-		valueWindow[LWALK] = formForms::internal::txtrwin(choice, ValueWindowCoords);
-		formForms::internal::nxtlin();
-		labelWindow[LUND] = formForms::internal::txtwin(stringTable[STR_UND], LabelWindowCoords);
+		valueWindow[LWALK] = ffi::txtrwin(choice, ValueWindowCoords);
+		ffi::nxtlin();
+		labelWindow[LUND] = ffi::txtwin(stringTable[STR_UND], LabelWindowCoords);
 		if (SelectedForm->extendedAttribute & AT_UND)
 			choice = stringTable[STR_ON];
 		else
 			choice = stringTable[STR_OFF];
-		valueWindow[LUND] = formForms::internal::txtrwin(choice, ValueWindowCoords);
-		formForms::internal::nxtlin();
+		valueWindow[LUND] = ffi::txtrwin(choice, ValueWindowCoords);
+		ffi::nxtlin();
 		if (SelectedForm->extendedAttribute & (AT_WALK | AT_UND | AT_CWLK)) {
-			labelWindow[LUNDCOL] = formForms::internal::txtwin(stringTable[STR_UNDCOL], LabelWindowCoords);
-			valueWindow[LUNDCOL]
-			    = formForms::internal::txtrwin(fmt::format(L"{}", (SelectedForm->underlayColor + 1)), ValueWindowCoords);
-			formForms::internal::nxtlin();
-			labelWindow[LULEN] = formForms::internal::txtwin(stringTable[STR_ULEN], LabelWindowCoords);
+			labelWindow[LUNDCOL] = ffi::txtwin(stringTable[STR_UNDCOL], LabelWindowCoords);
+			valueWindow[LUNDCOL] = ffi::txtrwin(fmt::format(L"{}", (SelectedForm->underlayColor + 1)), ValueWindowCoords);
+			ffi::nxtlin();
+			labelWindow[LULEN] = ffi::txtwin(stringTable[STR_ULEN], LabelWindowCoords);
 			valueWindow[LULEN]
-			    = formForms::internal::txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlayStitchLen / PFGRAN)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			    = ffi::txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlayStitchLen / PFGRAN)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
-		labelWindow[LWLKIND] = formForms::internal::txtwin(stringTable[STR_UWLKIND], LabelWindowCoords);
-		valueWindow[LWLKIND]
-		    = formForms::internal::txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlayIndent / PFGRAN)), ValueWindowCoords);
-		formForms::internal::nxtlin();
+		labelWindow[LWLKIND] = ffi::txtwin(stringTable[STR_UWLKIND], LabelWindowCoords);
+		valueWindow[LWLKIND] = ffi::txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlayIndent / PFGRAN)), ValueWindowCoords);
+		ffi::nxtlin();
 		if (SelectedForm->extendedAttribute & AT_UND) {
-			labelWindow[LUSPAC] = formForms::internal::txtwin(stringTable[STR_FUSPAC], LabelWindowCoords);
+			labelWindow[LUSPAC] = ffi::txtwin(stringTable[STR_FUSPAC], LabelWindowCoords);
 			valueWindow[LUSPAC]
-			    = formForms::internal::txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlaySpacing / PFGRAN)), ValueWindowCoords);
-			formForms::internal::nxtlin();
-			labelWindow[LUANG] = formForms::internal::txtwin(stringTable[STR_FUANG], LabelWindowCoords);
-			valueWindow[LUANG] = formForms::internal::txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlayStitchAngle * 180 / PI)),
-			                                            ValueWindowCoords);
-			formForms::internal::nxtlin();
+			    = ffi::txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlaySpacing / PFGRAN)), ValueWindowCoords);
+			ffi::nxtlin();
+			labelWindow[LUANG] = ffi::txtwin(stringTable[STR_FUANG], LabelWindowCoords);
+			valueWindow[LUANG]
+			    = ffi::txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlayStitchAngle * 180 / PI)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 	}
-	labelWindow[LFRMFIL] = formForms::internal::txtwin(stringTable[STR_TXT2], LabelWindowCoords);
-	valueWindow[LFRMFIL] = formForms::internal::txtrwin(stringTable[STR_FIL0 + SelectedForm->fillType], ValueWindowCoords);
-	formForms::internal::nxtlin();
+	labelWindow[LFRMFIL] = ffi::txtwin(stringTable[STR_TXT2], LabelWindowCoords);
+	valueWindow[LFRMFIL] = ffi::txtrwin(stringTable[STR_FIL0 + SelectedForm->fillType], ValueWindowCoords);
+	ffi::nxtlin();
 	if (SelectedForm->fillType) {
-		labelWindow[LFRMCOL] = formForms::internal::txtwin(stringTable[STR_TXT3], LabelWindowCoords);
-		valueWindow[LFRMCOL] = formForms::internal::numwin(fmt::format(L"{}", (SelectedForm->fillColor + 1)), ValueWindowCoords);
-		formForms::internal::nxtlin();
+		labelWindow[LFRMCOL] = ffi::txtwin(stringTable[STR_TXT3], LabelWindowCoords);
+		valueWindow[LFRMCOL] = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillColor + 1)), ValueWindowCoords);
+		ffi::nxtlin();
 		if (SelectedForm->fillType == FTHF) {
-			labelWindow[LFTHCOL] = formForms::internal::txtwin(stringTable[STR_FTHCOL], LabelWindowCoords);
-			valueWindow[LFTHCOL]
-			    = formForms::internal::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.color + 1)), ValueWindowCoords);
-			formForms::internal::nxtlin();
-			labelWindow[LFTHTYP] = formForms::internal::txtwin(stringTable[STR_FTHTYP], LabelWindowCoords);
+			labelWindow[LFTHCOL] = ffi::txtwin(stringTable[STR_FTHCOL], LabelWindowCoords);
+			valueWindow[LFTHCOL] = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.color + 1)), ValueWindowCoords);
+			ffi::nxtlin();
+			labelWindow[LFTHTYP] = ffi::txtwin(stringTable[STR_FTHTYP], LabelWindowCoords);
 			valueWindow[LFTHTYP]
-			    = formForms::internal::numwin(stringTable[STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1], ValueWindowCoords);
-			formForms::internal::nxtlin();
-			labelWindow[LFTHBLND] = formForms::internal::txtwin(stringTable[STR_FTHBLND], LabelWindowCoords);
+			    = ffi::numwin(stringTable[STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1], ValueWindowCoords);
+			ffi::nxtlin();
+			labelWindow[LFTHBLND] = ffi::txtwin(stringTable[STR_FTHBLND], LabelWindowCoords);
 			if (SelectedForm->extendedAttribute & AT_FTHBLND)
 				choice = stringTable[STR_ON];
 			else
 				choice = stringTable[STR_OFF];
-			valueWindow[LFTHBLND] = formForms::internal::txtrwin(choice, ValueWindowCoords);
-			formForms::internal::nxtlin();
+			valueWindow[LFTHBLND] = ffi::txtrwin(choice, ValueWindowCoords);
+			ffi::nxtlin();
 			if (!(SelectedForm->extendedAttribute & AT_FTHBLND)) {
-				labelWindow[LFTHBTH] = formForms::internal::txtwin(stringTable[STR_FTHBOTH], LabelWindowCoords);
+				labelWindow[LFTHBTH] = ffi::txtwin(stringTable[STR_FTHBOTH], LabelWindowCoords);
 				if (SelectedForm->extendedAttribute & (AT_FTHBTH))
 					choice = stringTable[STR_ON];
 				else
 					choice = stringTable[STR_OFF];
-				valueWindow[LFTHBTH] = formForms::internal::txtrwin(choice, ValueWindowCoords);
-				formForms::internal::nxtlin();
+				valueWindow[LFTHBTH] = ffi::txtrwin(choice, ValueWindowCoords);
+				ffi::nxtlin();
 				if (!(SelectedForm->extendedAttribute & AT_FTHBTH)) {
-					labelWindow[LFTHUP] = formForms::internal::txtwin(stringTable[STR_FTHUP], LabelWindowCoords);
+					labelWindow[LFTHUP] = ffi::txtwin(stringTable[STR_FTHUP], LabelWindowCoords);
 					if (SelectedForm->extendedAttribute & AT_FTHUP)
 						choice = stringTable[STR_ON];
 					else
 						choice = stringTable[STR_OFF];
-					valueWindow[LFTHUP] = formForms::internal::txtrwin(choice, ValueWindowCoords);
-					formForms::internal::nxtlin();
+					valueWindow[LFTHUP] = ffi::txtrwin(choice, ValueWindowCoords);
+					ffi::nxtlin();
 				}
 			}
-			labelWindow[LFTHUPCNT] = formForms::internal::txtwin(stringTable[STR_FTHUPCNT], LabelWindowCoords);
-			valueWindow[LFTHUPCNT]
-			    = formForms::internal::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.upCount)), ValueWindowCoords);
-			formForms::internal::nxtlin();
-			labelWindow[LFTHDWNCNT] = formForms::internal::txtwin(stringTable[STR_FTHDWNCNT], LabelWindowCoords);
+			labelWindow[LFTHUPCNT] = ffi::txtwin(stringTable[STR_FTHUPCNT], LabelWindowCoords);
+			valueWindow[LFTHUPCNT] = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.upCount)), ValueWindowCoords);
+			ffi::nxtlin();
+			labelWindow[LFTHDWNCNT] = ffi::txtwin(stringTable[STR_FTHDWNCNT], LabelWindowCoords);
 			valueWindow[LFTHDWNCNT]
-			    = formForms::internal::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.downCount)), ValueWindowCoords);
-			formForms::internal::nxtlin();
-			labelWindow[LFTHSIZ] = formForms::internal::txtwin(stringTable[STR_FTHSIZ], LabelWindowCoords);
-			valueWindow[LFTHSIZ]
-			    = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->fillInfo.feather.ratio)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			    = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.downCount)), ValueWindowCoords);
+			ffi::nxtlin();
+			labelWindow[LFTHSIZ] = ffi::txtwin(stringTable[STR_FTHSIZ], LabelWindowCoords);
+			valueWindow[LFTHSIZ] = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->fillInfo.feather.ratio)), ValueWindowCoords);
+			ffi::nxtlin();
 			if (SelectedForm->fillInfo.feather.fillType == FTHPSG) {
-				labelWindow[LFTHNUM] = formForms::internal::txtwin(stringTable[STR_FTHNUM], LabelWindowCoords);
-				valueWindow[LFTHNUM]
-				    = formForms::internal::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.count)), ValueWindowCoords);
-				formForms::internal::nxtlin();
+				labelWindow[LFTHNUM] = ffi::txtwin(stringTable[STR_FTHNUM], LabelWindowCoords);
+				valueWindow[LFTHNUM] = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.count)), ValueWindowCoords);
+				ffi::nxtlin();
 			}
-			labelWindow[LFTHFLR] = formForms::internal::txtwin(stringTable[STR_FTHFLR], LabelWindowCoords);
-			valueWindow[LFTHFLR] = formForms::internal::numwin(
-			    fmt::format(L"{:.2f}", (SelectedForm->fillInfo.feather.minStitchSize / PFGRAN)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			labelWindow[LFTHFLR] = ffi::txtwin(stringTable[STR_FTHFLR], LabelWindowCoords);
+			valueWindow[LFTHFLR]
+			    = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->fillInfo.feather.minStitchSize / PFGRAN)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (SelectedForm->fillType != CLPF) {
-			labelWindow[LFRMSPAC] = formForms::internal::txtwin(stringTable[STR_TXT4], LabelWindowCoords);
-			valueWindow[LFRMSPAC]
-			    = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->fillSpacing / PFGRAN)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			labelWindow[LFRMSPAC] = ffi::txtwin(stringTable[STR_TXT4], LabelWindowCoords);
+			valueWindow[LFRMSPAC] = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->fillSpacing / PFGRAN)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (texture::istx(ClosestFormToCursor)) {
-			labelWindow[LTXOF] = formForms::internal::txtwin(stringTable[STR_TXOF], LabelWindowCoords);
-			valueWindow[LTXOF] = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->txof / PFGRAN)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			labelWindow[LTXOF] = ffi::txtwin(stringTable[STR_TXOF], LabelWindowCoords);
+			valueWindow[LTXOF] = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->txof / PFGRAN)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
-		labelWindow[LMAXFIL] = formForms::internal::txtwin(stringTable[STR_TXT20], LabelWindowCoords);
-		valueWindow[LMAXFIL]
-		    = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->maxFillStitchLen / PFGRAN)), ValueWindowCoords);
-		formForms::internal::nxtlin();
+		labelWindow[LMAXFIL] = ffi::txtwin(stringTable[STR_TXT20], LabelWindowCoords);
+		valueWindow[LMAXFIL] = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->maxFillStitchLen / PFGRAN)), ValueWindowCoords);
+		ffi::nxtlin();
 		if (!clip::isclp(ClosestFormToCursor) && !texture::istx(ClosestFormToCursor)) {
-			labelWindow[LFRMLEN] = formForms::internal::txtwin(stringTable[STR_TXT5], LabelWindowCoords);
-			valueWindow[LFRMLEN] = formForms::internal::numwin(
-			    fmt::format(L"{:.2f}", (SelectedForm->lengthOrCount.stitchLength / PFGRAN)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			labelWindow[LFRMLEN] = ffi::txtwin(stringTable[STR_TXT5], LabelWindowCoords);
+			valueWindow[LFRMLEN]
+			    = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->lengthOrCount.stitchLength / PFGRAN)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
-		labelWindow[LMINFIL] = formForms::internal::txtwin(stringTable[STR_TXT21], LabelWindowCoords);
-		valueWindow[LMINFIL]
-		    = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->minFillStitchLen / PFGRAN)), ValueWindowCoords);
-		formForms::internal::nxtlin();
+		labelWindow[LMINFIL] = ffi::txtwin(stringTable[STR_TXT21], LabelWindowCoords);
+		valueWindow[LMINFIL] = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->minFillStitchLen / PFGRAN)), ValueWindowCoords);
+		ffi::nxtlin();
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
-			labelWindow[LFRMANG] = formForms::internal::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
-			valueWindow[LFRMANG] = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->angleOrClipData.angle * 180 / PI)),
-			                                             ValueWindowCoords);
-			formForms::internal::nxtlin();
+			labelWindow[LFRMANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
+			valueWindow[LFRMANG]
+			    = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->angleOrClipData.angle * 180 / PI)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (SelectedForm->fillType == ANGCLPF) {
-			labelWindow[LSACANG] = formForms::internal::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
+			labelWindow[LSACANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
 			valueWindow[LSACANG]
-			    = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->satinOrAngle.angle * 180 / PI)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			    = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->satinOrAngle.angle * 180 / PI)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (SelectedForm->fillType == VCLPF || SelectedForm->fillType == HCLPF || SelectedForm->fillType == ANGCLPF) {
-			labelWindow[LFRMFAZ] = formForms::internal::txtwin(stringTable[STR_TXT18], LabelWindowCoords);
-			valueWindow[LFRMFAZ] = formForms::internal::numwin(fmt::format(L"{}", (SelectedForm->wordParam)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			labelWindow[LFRMFAZ] = ffi::txtwin(stringTable[STR_TXT18], LabelWindowCoords);
+			valueWindow[LFRMFAZ] = ffi::numwin(fmt::format(L"{}", (SelectedForm->wordParam)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (SelectedForm->fillType == VRTF || SelectedForm->fillType == HORF || SelectedForm->fillType == ANGF
 		    || texture::istx(ClosestFormToCursor)) {
-			labelWindow[LBFILSQR] = formForms::internal::txtwin(stringTable[STR_PRF2], LabelWindowCoords);
+			labelWindow[LBFILSQR] = ffi::txtwin(stringTable[STR_PRF2], LabelWindowCoords);
 			if (SelectedForm->extendedAttribute & AT_SQR)
 				choice = stringTable[STR_SQR];
 			else
 				choice = stringTable[STR_PNTD];
-			valueWindow[LBFILSQR] = formForms::internal::txtrwin(choice, ValueWindowCoords);
-			formForms::internal::nxtlin();
+			valueWindow[LBFILSQR] = ffi::txtrwin(choice, ValueWindowCoords);
+			ffi::nxtlin();
 		}
 	}
-	labelWindow[LFSTRT] = formForms::internal::txtwin(stringTable[STR_FSTRT], LabelWindowCoords);
+	labelWindow[LFSTRT] = ffi::txtwin(stringTable[STR_FSTRT], LabelWindowCoords);
 	if (SelectedForm->extendedAttribute & AT_STRT)
 		choice = stringTable[STR_ON];
 	else
 		choice = stringTable[STR_OFF];
-	valueWindow[LFSTRT] = formForms::internal::txtrwin(choice, ValueWindowCoords);
-	formForms::internal::nxtlin();
+	valueWindow[LFSTRT] = ffi::txtrwin(choice, ValueWindowCoords);
+	ffi::nxtlin();
 	if (SelectedForm->extendedAttribute & AT_STRT) {
-		labelWindow[LDSTRT] = formForms::internal::txtwin(stringTable[STR_FSTRT], LabelWindowCoords);
-		valueWindow[LDSTRT] = formForms::internal::numwin(fmt::format(L"{}", (SelectedForm->fillStart)), ValueWindowCoords);
-		formForms::internal::nxtlin();
+		labelWindow[LDSTRT] = ffi::txtwin(stringTable[STR_FSTRT], LabelWindowCoords);
+		valueWindow[LDSTRT] = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillStart)), ValueWindowCoords);
+		ffi::nxtlin();
 	}
-	labelWindow[LFEND] = formForms::internal::txtwin(stringTable[STR_FEND], LabelWindowCoords);
+	labelWindow[LFEND] = ffi::txtwin(stringTable[STR_FEND], LabelWindowCoords);
 	if (SelectedForm->extendedAttribute & AT_END)
 		choice = stringTable[STR_ON];
 	else
 		choice = stringTable[STR_OFF];
-	valueWindow[LFEND] = formForms::internal::txtrwin(choice, ValueWindowCoords);
-	formForms::internal::nxtlin();
+	valueWindow[LFEND] = ffi::txtrwin(choice, ValueWindowCoords);
+	ffi::nxtlin();
 	if (SelectedForm->extendedAttribute & AT_END) {
-		labelWindow[LDEND] = formForms::internal::txtwin(stringTable[STR_FEND], LabelWindowCoords);
-		valueWindow[LDEND] = formForms::internal::numwin(fmt::format(L"{}", (SelectedForm->fillEnd)), ValueWindowCoords);
-		formForms::internal::nxtlin();
+		labelWindow[LDEND] = ffi::txtwin(stringTable[STR_FEND], LabelWindowCoords);
+		valueWindow[LDEND] = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillEnd)), ValueWindowCoords);
+		ffi::nxtlin();
 	}
-	labelWindow[LBRD] = formForms::internal::txtwin(stringTable[STR_TXT7], LabelWindowCoords);
+	labelWindow[LBRD] = ffi::txtwin(stringTable[STR_TXT7], LabelWindowCoords);
 
 	unsigned int edgeFillType = SelectedForm->edgeType & NEGUND;
 	if (edgeFillType >= EDGELAST) {
@@ -352,103 +344,96 @@ void formForms::internal::refrmfn() {
 	}
 	const unsigned int iEdge = edgeFillType - 1;
 
-	valueWindow[LBRD] = formForms::internal::txtrwin(stringTable[STR_EDG0 + edgeFillType], ValueWindowCoords);
-	formForms::internal::nxtlin();
+	valueWindow[LBRD] = ffi::txtrwin(stringTable[STR_EDG0 + edgeFillType], ValueWindowCoords);
+	ffi::nxtlin();
 	if (edgeFillType) {
-		labelWindow[LBRDCOL] = formForms::internal::txtwin(stringTable[STR_TXT8], LabelWindowCoords);
-		valueWindow[LBRDCOL]
-		    = formForms::internal::numwin(fmt::format(L"{}", ((SelectedForm->borderColor & COLMSK) + 1)), ValueWindowCoords);
-		formForms::internal::nxtlin();
+		labelWindow[LBRDCOL] = ffi::txtwin(stringTable[STR_TXT8], LabelWindowCoords);
+		valueWindow[LBRDCOL] = ffi::numwin(fmt::format(L"{}", ((SelectedForm->borderColor & COLMSK) + 1)), ValueWindowCoords);
+		ffi::nxtlin();
 		if (edgeArray[iEdge] & BESPAC) {
-			labelWindow[LBRDSPAC] = formForms::internal::txtwin(stringTable[STR_TXT9], LabelWindowCoords);
+			labelWindow[LBRDSPAC] = ffi::txtwin(stringTable[STR_TXT9], LabelWindowCoords);
 			if (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN)
 				choice = fmt::format(L"{:.2f}", (SelectedForm->edgeSpacing / PFGRAN));
 			else
 				choice = fmt::format(L"{:.2f}", (SelectedForm->edgeSpacing / PFGRAN * 2));
-			valueWindow[LBRDSPAC] = formForms::internal::numwin(choice, ValueWindowCoords);
-			formForms::internal::nxtlin();
+			valueWindow[LBRDSPAC] = ffi::numwin(choice, ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (edgeArray[iEdge] & BPICSPAC) {
-			labelWindow[LBRDPIC] = formForms::internal::txtwin(stringTable[STR_TXT16], LabelWindowCoords);
-			valueWindow[LBRDPIC]
-			    = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->edgeSpacing / PFGRAN)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			labelWindow[LBRDPIC] = ffi::txtwin(stringTable[STR_TXT16], LabelWindowCoords);
+			valueWindow[LBRDPIC] = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->edgeSpacing / PFGRAN)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (edgeArray[iEdge] & BEMAX) {
-			labelWindow[LMAXBRD] = formForms::internal::txtwin(stringTable[STR_TXT22], LabelWindowCoords);
+			labelWindow[LMAXBRD] = ffi::txtwin(stringTable[STR_TXT22], LabelWindowCoords);
 			valueWindow[LMAXBRD]
-			    = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->maxBorderStitchLen / PFGRAN)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			    = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->maxBorderStitchLen / PFGRAN)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (edgeArray[iEdge] & BELEN) {
-			labelWindow[LBRDLEN] = formForms::internal::txtwin(stringTable[STR_TXT10], LabelWindowCoords);
-			valueWindow[LBRDLEN]
-			    = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->edgeStitchLen / PFGRAN)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			labelWindow[LBRDLEN] = ffi::txtwin(stringTable[STR_TXT10], LabelWindowCoords);
+			valueWindow[LBRDLEN] = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->edgeStitchLen / PFGRAN)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (edgeArray[iEdge] & BEMIN) {
-			labelWindow[LMINBRD] = formForms::internal::txtwin(stringTable[STR_TXT23], LabelWindowCoords);
+			labelWindow[LMINBRD] = ffi::txtwin(stringTable[STR_TXT23], LabelWindowCoords);
 			valueWindow[LMINBRD]
-			    = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->minBorderStitchLen / PFGRAN)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			    = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->minBorderStitchLen / PFGRAN)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (edgeArray[iEdge] & BESIZ) {
-			labelWindow[LBRDSIZ] = formForms::internal::txtwin(stringTable[STR_TXT11], LabelWindowCoords);
-			valueWindow[LBRDSIZ]
-			    = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->borderSize / PFGRAN)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			labelWindow[LBRDSIZ] = ffi::txtwin(stringTable[STR_TXT11], LabelWindowCoords);
+			valueWindow[LBRDSIZ] = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->borderSize / PFGRAN)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (edgeArray[iEdge] & BRDPOS) {
-			labelWindow[LBRDPOS] = formForms::internal::txtwin(stringTable[STR_TXT18], LabelWindowCoords);
-			valueWindow[LBRDPOS]
-			    = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			labelWindow[LBRDPOS] = ffi::txtwin(stringTable[STR_TXT18], LabelWindowCoords);
+			valueWindow[LBRDPOS] = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (edgeArray[iEdge] & CHNPOS) {
-			labelWindow[LBRDPOS] = formForms::internal::txtwin(stringTable[STR_TXT19], LabelWindowCoords);
-			valueWindow[LBRDPOS]
-			    = formForms::internal::numwin(fmt::format(L"{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			labelWindow[LBRDPOS] = ffi::txtwin(stringTable[STR_TXT19], LabelWindowCoords);
+			valueWindow[LBRDPOS] = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->edgeStitchLen)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (edgeFillType == EDGEAPPL) {
-			labelWindow[LAPCOL] = formForms::internal::txtwin(stringTable[STR_TXT12], LabelWindowCoords);
-			valueWindow[LAPCOL]
-			    = formForms::internal::numwin(fmt::format(L"{}", ((SelectedForm->borderColor >> 4) + 1)), ValueWindowCoords);
-			formForms::internal::nxtlin();
+			labelWindow[LAPCOL] = ffi::txtwin(stringTable[STR_TXT12], LabelWindowCoords);
+			valueWindow[LAPCOL] = ffi::numwin(fmt::format(L"{}", ((SelectedForm->borderColor >> 4) + 1)), ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (edgeFillType == EDGEANGSAT || edgeFillType == EDGEAPPL || edgeFillType == EDGEPROPSAT) {
-			labelWindow[LBRDUND] = formForms::internal::txtwin(stringTable[STR_TXT17], LabelWindowCoords);
+			labelWindow[LBRDUND] = ffi::txtwin(stringTable[STR_TXT17], LabelWindowCoords);
 			if (SelectedForm->edgeType & EGUND)
 				choice = stringTable[STR_ON];
 			else
 				choice = stringTable[STR_OFF];
-			valueWindow[LBRDUND] = formForms::internal::numwin(choice, ValueWindowCoords);
-			formForms::internal::nxtlin();
+			valueWindow[LBRDUND] = ffi::numwin(choice, ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (edgeArray[iEdge] & BCNRSIZ) {
 			if (SelectedForm->edgeType == EDGEBHOL)
 				choice = fmt::format(L"{:.2f}", (getblen() / PFGRAN));
 			else
 				choice = fmt::format(L"{:.2f}", (getplen() / PFGRAN));
-			labelWindow[LBCSIZ] = formForms::internal::txtwin(stringTable[STR_TXT13], LabelWindowCoords);
-			valueWindow[LBCSIZ] = formForms::internal::numwin(choice, ValueWindowCoords);
-			formForms::internal::nxtlin();
+			labelWindow[LBCSIZ] = ffi::txtwin(stringTable[STR_TXT13], LabelWindowCoords);
+			valueWindow[LBCSIZ] = ffi::numwin(choice, ValueWindowCoords);
+			ffi::nxtlin();
 		}
 		if (SelectedForm->type == FRMLINE && edgeArray[iEdge] & BRDEND) {
-			labelWindow[LBSTRT] = formForms::internal::txtwin(stringTable[STR_TXT14], LabelWindowCoords);
+			labelWindow[LBSTRT] = ffi::txtwin(stringTable[STR_TXT14], LabelWindowCoords);
 			if (SelectedForm->attribute & SBLNT)
 				choice = stringTable[STR_BLUNT];
 			else
 				choice = stringTable[STR_TAPR];
-			valueWindow[LBSTRT] = formForms::internal::numwin(choice, ValueWindowCoords);
-			formForms::internal::nxtlin();
-			labelWindow[LBFIN] = formForms::internal::txtwin(stringTable[STR_TXT15], LabelWindowCoords);
+			valueWindow[LBSTRT] = ffi::numwin(choice, ValueWindowCoords);
+			ffi::nxtlin();
+			labelWindow[LBFIN] = ffi::txtwin(stringTable[STR_TXT15], LabelWindowCoords);
 			if (SelectedForm->attribute & FBLNT)
 				choice = stringTable[STR_BLUNT];
 			else
 				choice = stringTable[STR_TAPR];
-			valueWindow[LBFIN] = formForms::internal::numwin(choice, ValueWindowCoords);
-			formForms::internal::nxtlin();
+			valueWindow[LBFIN] = ffi::numwin(choice, ValueWindowCoords);
+			ffi::nxtlin();
 		}
 	}
 }
@@ -468,9 +453,9 @@ void formForms::refrm() {
 	LabelWindowSize = ValueWindowSize = {};
 	StateMap.set(StateFlag::REFCNT);
 	FormMenuEntryCount = 0;
-	formForms::internal::refrmfn();
+	ffi::refrmfn();
 	if (FormDataSheet) {
-		while (EnumChildWindows(FormDataSheet, formForms::internal::chenum, 0))
+		while (EnumChildWindows(FormDataSheet, ffi::chenum, 0))
 			;
 		MoveWindow(FormDataSheet,
 		           ButtonWidthX3 + 3,
@@ -494,7 +479,7 @@ void formForms::refrm() {
 		                             NULL);
 	}
 	StateMap.reset(StateFlag::REFCNT);
-	formForms::internal::refrmfn();
+	ffi::refrmfn();
 }
 
 void formForms::sidwnd(HWND wnd) noexcept {
@@ -570,9 +555,9 @@ HWND formForms::internal::prfnwin(const std::wstring& text) noexcept {
 }
 
 void formForms::internal::prflin(const std::wstring& msg, unsigned row) {
-	formForms::internal::prftwin((*StringTable)[row]);
-	(*ValueWindow)[row - STR_PRF0] = formForms::internal::prfnwin(msg);
-	formForms::internal::nxtlin();
+	ffi::prftwin((*StringTable)[row]);
+	(*ValueWindow)[row - STR_PRF0] = ffi::prfnwin(msg);
+	ffi::nxtlin();
 }
 
 void formForms::prfmsg() {
@@ -617,47 +602,47 @@ void formForms::prfmsg() {
 	LabelWindowCoords.right                             = 3 + LabelWindowSize.x;
 	ValueWindowCoords.left                              = 6 + LabelWindowSize.x;
 	ValueWindowCoords.right                             = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
-	formForms::internal::prflin(fmt::format(L"{}", (AppliqueColor + 1)), STR_PRF10);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (BorderWidth / PFGRAN)), STR_PRF3);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (ButtonholeCornerLength / PFGRAN)), STR_PRF14);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (IniFile.chainSpace / PFGRAN)), STR_PRF23);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (IniFile.chainRatio)), STR_PRF24);
-	formForms::internal::prflin(fmt::format(L"{:.2f} mm", (IniFile.clipOffset / PFGRAN)), STR_PRF21);
-	formForms::internal::prflin(fmt::format(L"{}", (IniFile.fillPhase)), STR_PRF22);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (IniFile.eggRatio)), STR_PRF26);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (IniFile.fillAngle / PI * 180)), STR_PRF1);
+	ffi::prflin(fmt::format(L"{}", (AppliqueColor + 1)), STR_PRF10);
+	ffi::prflin(fmt::format(L"{:.2f}", (BorderWidth / PFGRAN)), STR_PRF3);
+	ffi::prflin(fmt::format(L"{:.2f}", (ButtonholeCornerLength / PFGRAN)), STR_PRF14);
+	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.chainSpace / PFGRAN)), STR_PRF23);
+	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.chainRatio)), STR_PRF24);
+	ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.clipOffset / PFGRAN)), STR_PRF21);
+	ffi::prflin(fmt::format(L"{}", (IniFile.fillPhase)), STR_PRF22);
+	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.eggRatio)), STR_PRF26);
+	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.fillAngle / PI * 180)), STR_PRF1);
 	if (UserFlagMap.test(UserFlag::SQRFIL))
 		choice = (*StringTable)[STR_SQR];
 	else
 		choice = (*StringTable)[STR_PNTD];
-	formForms::internal::prflin(choice, STR_PRF2);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (LineSpacing / PFGRAN)), STR_PRF0);
-	formForms::internal::prflin(fmt::format(L"{}", (duthrsh(ShowStitchThreshold))), STR_PRF7);
-	formForms::internal::prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize / PFGRAN)), STR_PRF20);
+	ffi::prflin(choice, STR_PRF2);
+	ffi::prflin(fmt::format(L"{:.2f}", (LineSpacing / PFGRAN)), STR_PRF0);
+	ffi::prflin(fmt::format(L"{}", (duthrsh(ShowStitchThreshold))), STR_PRF7);
+	ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize / PFGRAN)), STR_PRF20);
 	sethup();
-	formForms::internal::prflin(fmt::format(L"{}", (*StringTable)[STR_HUP0 + IniFile.hoopType - 1]), STR_PRF17);
-	formForms::internal::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY / PFGRAN)), STR_PRF27);
-	formForms::internal::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX / PFGRAN)), STR_PRF18);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (PicotSpacing / PFGRAN)), STR_PRF16);
+	ffi::prflin(fmt::format(L"{}", (*StringTable)[STR_HUP0 + IniFile.hoopType - 1]), STR_PRF17);
+	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY / PFGRAN)), STR_PRF27);
+	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX / PFGRAN)), STR_PRF18);
+	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);
+	ffi::prflin(fmt::format(L"{:.2f}", (PicotSpacing / PFGRAN)), STR_PRF16);
 	if (UserFlagMap.test(UserFlag::BLUNT))
 		choice = (*StringTable)[STR_BLUNT];
 	else
 		choice = (*StringTable)[STR_TAPR];
-	formForms::internal::prflin(choice, STR_PRF15);
+	ffi::prflin(choice, STR_PRF15);
 	if (UserFlagMap.test(UserFlag::DUND))
 		choice = (*StringTable)[STR_ON];
 	else
 		choice = (*StringTable)[STR_OFF];
-	formForms::internal::prflin(choice, STR_PRF19);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (SmallStitchLength / PFGRAN)), STR_PRF9);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (SnapLength / PFGRAN)), STR_PRF11);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (SpiralWrap)), STR_PRF13);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (StarRatio)), STR_PRF12);
-	formForms::internal::prflin(fmt::format(L"{}", (duthrsh(StitchBoxesThreshold))), STR_PRF8);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (IniFile.maxStitchLength / PFGRAN)), STR_PRF4);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (UserStitchLength / PFGRAN)), STR_PRF5);
-	formForms::internal::prflin(fmt::format(L"{:.2f}", (MinStitchLength / PFGRAN)), STR_PRF6);
+	ffi::prflin(choice, STR_PRF19);
+	ffi::prflin(fmt::format(L"{:.2f}", (SmallStitchLength / PFGRAN)), STR_PRF9);
+	ffi::prflin(fmt::format(L"{:.2f}", (SnapLength / PFGRAN)), STR_PRF11);
+	ffi::prflin(fmt::format(L"{:.2f}", (SpiralWrap)), STR_PRF13);
+	ffi::prflin(fmt::format(L"{:.2f}", (StarRatio)), STR_PRF12);
+	ffi::prflin(fmt::format(L"{}", (duthrsh(StitchBoxesThreshold))), STR_PRF8);
+	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.maxStitchLength / PFGRAN)), STR_PRF4);
+	ffi::prflin(fmt::format(L"{:.2f}", (UserStitchLength / PFGRAN)), STR_PRF5);
+	ffi::prflin(fmt::format(L"{:.2f}", (MinStitchLength / PFGRAN)), STR_PRF6);
 	StateMap.set(StateFlag::PRFACT);
 	ReleaseDC(ThrEdWindow, preferenceDC);
 }
@@ -701,7 +686,7 @@ void formForms::dazdef() {
 }
 
 void formForms::internal::initdaz(HWND hWinDialog) {
-	formForms::internal::chkdaz();
+	ffi::chkdaz();
 	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS), fmt::format(L"{}", IniFile.daisyPetalPoints).c_str());
 	SetWindowText(GetDlgItem(hWinDialog, IDC_DAZPCNT), fmt::format(L"{}", IniFile.daisyHeartCount).c_str());
 	SetWindowText(GetDlgItem(hWinDialog, IDC_CNTLEN), fmt::format(L"{:.2f}", IniFile.daisyDiameter).c_str());
@@ -720,7 +705,7 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 }
 
-BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
+BOOL CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
 	wchar_t buffer[HBUFSIZ]        = { 0 };
@@ -729,7 +714,7 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 	switch (umsg) {
 	case WM_INITDIALOG:
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-		formForms::internal::initdaz(hwndlg);
+		ffi::initdaz(hwndlg);
 		break;
 	case WM_COMMAND:
 		switch (LOWORD(wparam)) {
@@ -767,12 +752,12 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 					break;
 				}
 			}
-			formForms::internal::chkdaz();
+			ffi::chkdaz();
 			EndDialog(hwndlg, 1);
 			break;
 		case IDC_DAZRST:
 			formForms::dazdef();
-			formForms::internal::initdaz(hwndlg);
+			ffi::initdaz(hwndlg);
 			break;
 		case IDC_DLIN:
 			if (IsDlgButtonChecked(hwndlg, IDC_DLIN))
@@ -791,7 +776,7 @@ void formForms::dasyfrm() {
 	double angle = 0.0;
 
 	unmsg();
-	if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, (DLGPROC)formForms::internal::dasyproc)) {
+	if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, (DLGPROC)ffi::dasyproc)) {
 		StateMap.reset(StateFlag::FORMIN);
 		return;
 	}
@@ -936,7 +921,7 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 	switch (umsg) {
 	case WM_INITDIALOG:
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-		formForms::internal::initTearDlg(hwndlg);
+		ffi::initTearDlg(hwndlg);
 		break;
 	case WM_COMMAND:
 		switch (LOWORD(wparam)) {
@@ -959,14 +944,14 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 			IniFile.tearTailLength = 1.1f;
 			IniFile.tearTwistStep  = 0.0f;
 			IniFile.tearTwistRatio = 1.6f;
-			formForms::internal::initTearDlg(hwndlg);
+			ffi::initTearDlg(hwndlg);
 			break;
 		case IDC_DEFPAIS:
 			IniFile.formSides      = 24;
 			IniFile.tearTailLength = 1.15f;
 			IniFile.tearTwistStep  = 0.3f * PFGRAN;
 			IniFile.tearTwistRatio = 1.8f;
-			formForms::internal::initTearDlg(hwndlg);
+			ffi::initTearDlg(hwndlg);
 			break;
 		}
 	}
@@ -975,7 +960,7 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 
 void formForms::setear() {
 	unmsg();
-	const INT_PTR nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, (DLGPROC)formForms::internal::tearprc);
+	const INT_PTR nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, (DLGPROC)ffi::tearprc);
 	if (nResult > 0) {
 		auto twistStep = IniFile.tearTwistStep;
 		durpoli(IniFile.formSides);
@@ -1045,7 +1030,7 @@ inline void formForms::internal::wavinit(HWND hwndlg) {
 	SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), fmt::format(L"{}", IniFile.waveLobes).c_str());
 }
 
-bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
+bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
 	wchar_t buffer[HBUFSIZ] = { 0 };
@@ -1053,7 +1038,7 @@ bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	switch (umsg) {
 	case WM_INITDIALOG:
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-		formForms::internal::wavinit(hwndlg);
+		ffi::wavinit(hwndlg);
 		break;
 	case WM_COMMAND:
 		switch (LOWORD(wparam)) {
@@ -1084,7 +1069,7 @@ bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 			IniFile.waveStart  = IWAVSTRT;
 			IniFile.waveEnd    = IWAVEND;
 			IniFile.waveLobes  = IWAVS;
-			formForms::internal::wavinit(hwndlg);
+			ffi::wavinit(hwndlg);
 			break;
 		}
 	}
@@ -1093,7 +1078,7 @@ bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 
 void formForms::wavfrm() {
 	unmsg();
-	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, (DLGPROC)wavprc)) {
+	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, (DLGPROC)ffi::wavprc)) {
 		std::vector<fPOINT> points(IniFile.wavePoints);
 		const auto          saveIndex = FormVertexIndex;
 		durpoli(IniFile.wavePoints);

@@ -29,6 +29,8 @@
 #include "thred.h"
 #include "displayText.h"
 
+namespace di = displayText::internal;
+
 unsigned short LoadStringList[] = {
 	// strings to load into memory at init time
 	IDS_PIKOL,    IDS_UPON,      IDS_UPOF,   IDS_AUXTXT,  IDS_HUP0,    IDS_HUP1,    IDS_HUP2,    IDS_HUP3,   IDS_HUP4,
@@ -360,7 +362,7 @@ void displayText::okcan() {
 void displayText::savdisc() {
 	wchar_t buffer[HBUFSIZ];
 
-	displayText::internal::sdmsg();
+	di::sdmsg();
 	StateMap.reset(StateFlag::BIGBOX);
 
 	GetClientRect(MsgWindow, &MsgRect);
@@ -436,13 +438,13 @@ void displayText::internal::hlpflt(unsigned iButton, unsigned iMessage, float da
 }
 
 void displayText::drwtxbut(const TXTSCR& textureScreen) {
-	displayText::internal::bxtxt(HTXCLR, IDS_CLEAR);
-	displayText::internal::hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight / PFGRAN);
+	di::bxtxt(HTXCLR, IDS_CLEAR);
+	di::hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight / PFGRAN);
 	redraw((*ButtonWin)[HTXWID]);
-	displayText::internal::hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing / PFGRAN);
-	displayText::internal::bxtxt(HTXVRT, IDS_TXVRT);
-	displayText::internal::bxtxt(HTXHOR, IDS_TXHOR);
-	displayText::internal::bxtxt(HTXANG, IDS_TXANG);
-	displayText::internal::bxtxt(HTXMIR, IDS_TXMIR);
+	di::hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing / PFGRAN);
+	di::bxtxt(HTXVRT, IDS_TXVRT);
+	di::bxtxt(HTXHOR, IDS_TXHOR);
+	di::bxtxt(HTXANG, IDS_TXANG);
+	di::bxtxt(HTXMIR, IDS_TXMIR);
 	SetWindowText((*ButtonWin)[HTXMIR + 1], L"");
 }
