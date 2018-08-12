@@ -26,16 +26,16 @@
 namespace satin {
 
 SATCON* adsatk(size_t count) noexcept;
-void    clearGuideSize();
+void    clearGuideSize() noexcept;
 void    cpySat(const FRMHED& formHeader);
-void    cpyTmpGuides(std::vector<SATCONOUT>& inSatinGuides);
+void    cpyTmpGuides(const std::vector<SATCONOUT>& inSatinGuides);
 void    cpyUndoGuides(const BAKHED& undoData);
 void    delcon(unsigned GuideIndex);
 void    delsac(size_t formIndex) noexcept;
 void    delspnt();
 void    drwsat();
 void    dusat() noexcept;
-size_t  getGuideSize();
+size_t  getGuideSize() noexcept;
 void    ribon();
 void    satadj();
 void    satbrd();
@@ -48,7 +48,7 @@ void    satpnt1();
 void    satsel();
 void    satzum();
 void    sbrd();
-void    setGuideSize(size_t newGuideSize);
+void    setGuideSize(size_t newGuideSize) noexcept;
 void    slbrd();
 void    spltsat(const SATCON& currentGuide);
 

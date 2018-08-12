@@ -1427,19 +1427,19 @@ void satin::cpySat(const FRMHED& formHeader) {
 	}
 }
 
-size_t satin::getGuideSize() {
+size_t satin::getGuideSize() noexcept {
 	return SatinGuideIndex;
 }
 
-void satin::clearGuideSize() {
+void satin::clearGuideSize() noexcept {
 	SatinGuideIndex = 0;
 }
 
-void satin::setGuideSize(size_t newGuideSize) {
+void satin::setGuideSize(size_t newGuideSize) noexcept {
 	SatinGuideIndex = newGuideSize;
 }
 
-void satin::cpyTmpGuides(std::vector<SATCONOUT>& inSatinGuides) {
+void satin::cpyTmpGuides(const std::vector<SATCONOUT>& inSatinGuides) {
 	const auto destination = stdext::make_checked_array_iterator(
 	    SatinGuides + SatinGuideIndex, (sizeof(SatinGuides) / sizeof(SatinGuides[0])) - SatinGuideIndex);
 	std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), destination);

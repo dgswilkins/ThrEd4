@@ -24,6 +24,8 @@
 // Local Headers
 #include "ThrEdTypes.h"
 
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PWSTR lpCmdLine, _In_ int nCmdShow);
+
 namespace fs = std::experimental::filesystem;
 
 namespace thred {
@@ -225,7 +227,6 @@ namespace internal {
 	void     filfrms();
 	bool     finrng(size_t find) noexcept;
 	void     fixpclp();
-	int      fltex(int code) noexcept;
 	void     fnamtabs();
 	void     fndknt();
 	void     fop();
@@ -261,7 +262,6 @@ namespace internal {
 	bool     inrng(unsigned stitch) noexcept;
 	void     insadj();
 	void     inscol();
-	void     cpyTmpGuides(std::vector<SATCONOUT>& inSatinGuides);
 	void     insfil();
 	void     insflin(POINT insertPoint) noexcept;
 	bool     iselpnt();
@@ -354,7 +354,6 @@ namespace internal {
 	void   rebak();
 	void   rebox();
 	void   redbak();
-	void   cpyUndoGuides(const BAKHED* undoData);
 	void   redbal();
 	void   redfils();
 	void   redfnam(std::wstring& designerName);
@@ -443,7 +442,6 @@ namespace internal {
 	void        stchout();
 	void        stchsnap(unsigned start, unsigned finish) noexcept;
 	double      stlen(unsigned iStitch) noexcept;
-	int         strcomp(const void* arg1, const void* arg2) noexcept;
 	void        strtknt(unsigned start) noexcept;
 	void        tglhid();
 	void        thr2bal(std::vector<BALSTCH>& balaradStitch, unsigned destination, unsigned source, unsigned code);
@@ -476,14 +474,13 @@ namespace internal {
 
 	LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PWSTR lpCmdLine, _In_ int nCmdShow);
-	bool         wastch() noexcept;
-	void         xlin();
-	void         xlin1();
-	void         zRctAdj() noexcept;
-	void         zumin();
-	void         zumout();
-	void         zumshft();
+	bool wastch() noexcept;
+	void xlin();
+	void xlin1();
+	void zRctAdj() noexcept;
+	void zumin();
+	void zumout();
+	void zumshft();
 
 #if PESACT
 	double   dubl(unsigned char* pnt) noexcept;

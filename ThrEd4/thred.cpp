@@ -9537,13 +9537,6 @@ void thred::internal::ungrphi() {
 	}
 }
 
-int strcomp(const void* arg1, const void* arg2) noexcept {
-	if (arg1 && arg2) {
-		return _stricmp(*static_cast<char* const*>(arg1), *static_cast<char* const*>(arg2));
-	}
-	return 0;
-}
-
 void thred::internal::barnam(HWND window, unsigned iThumbnail) {
 	if (iThumbnail < ThumbnailDisplayCount) {
 		fs::path thumbPath((*Thumbnails)[ThumbnailsSelected[iThumbnail]].data());
