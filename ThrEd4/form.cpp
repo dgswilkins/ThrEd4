@@ -188,7 +188,7 @@ void form::internal::rotbak(double rotationAngle, const dPOINT& rotationCenter) 
 	unsigned iSequence;
 
 	for (iSequence = 0; iSequence < SequenceIndex; iSequence++)
-		rotflt(OSequence[iSequence], rotationAngle, rotationCenter);
+		thred::rotflt(OSequence[iSequence], rotationAngle, rotationCenter);
 }
 
 void form::internal::delfil(unsigned attribute) {
@@ -223,10 +223,10 @@ void form::delmfil() {
 		stitchAttribute = StitchBuffer[iSource].attribute;
 		if (!(stitchAttribute & NOTFRM)) {
 			if (!((stitchAttribute & FRMSK) == attribute && (stitchAttribute & (TYPFRM | FTHMSK))))
-				mvstch(iDestination++, iSource);
+				thred::mvstch(iDestination++, iSource);
 		}
 		else
-			mvstch(iDestination++, iSource);
+			thred::mvstch(iDestination++, iSource);
 	}
 	PCSHeader.stitchCount = iDestination;
 }
@@ -454,7 +454,7 @@ void form::form() {
 	displayText::shoMsg((*StringTable)[STR_FMEN]);
 	StateMap.set(StateFlag::FORMIN);
 	StateMap.reset(StateFlag::INSRT);
-	duzrat();
+	thred::duzrat();
 }
 
 void form::internal::frmsqr(unsigned iVertex) noexcept {
@@ -467,7 +467,7 @@ void form::internal::frmsqr(unsigned iVertex) noexcept {
 	dPOINT delta         = {};
 	POINT  line[4]       = {};
 
-	stch2pxr(CurrentFormVertices[iVertex]);
+	thred::stch2pxr(CurrentFormVertices[iVertex]);
 	line[1]  = StitchCoordinatesPixels;
 	ratio    = static_cast<double>(IniFile.formVertexSizePixels) / StitchWindowClientRect.right;
 	length   = (ZoomRect.right - ZoomRect.left) * ratio * 2;
@@ -484,11 +484,11 @@ void form::internal::frmsqr(unsigned iVertex) noexcept {
 	offset.y        = length * sin(angle);
 	adjustedPoint.x = point.x + offset.x;
 	adjustedPoint.y = point.y + offset.y;
-	stch2pxr(adjustedPoint);
+	thred::stch2pxr(adjustedPoint);
 	line[0] = line[3] = StitchCoordinatesPixels;
 	adjustedPoint.x   = point.x - offset.x;
 	adjustedPoint.y   = point.y - offset.y;
-	stch2pxr(adjustedPoint);
+	thred::stch2pxr(adjustedPoint);
 	line[2] = StitchCoordinatesPixels;
 	Polyline(StitchWindowMemDC, line, 4);
 }
@@ -582,7 +582,7 @@ void form::ritfrct(size_t iForm, HDC dc) {
 void form::delfrms() {
 	unsigned iStitch = 0;
 
-	savdo();
+	thred::savdo();
 	FormIndex = FormVertexIndex = ClipPointIndex = 0;
 	satin::clearGuideSize();
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -690,7 +690,7 @@ void form::drwfrm() {
 	StateMap.reset(StateFlag::SHOPSEL);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	ratsr();
-	duzrat();
+	thred::duzrat();
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		form::fvars(iForm);
 		form::frmlin(SelectedForm->vertices, VertexCount);
@@ -723,9 +723,9 @@ void form::drwfrm() {
 				fi::frmpoly(FormLines, VertexCount);
 				if (SelectedForm->fillType == CONTF) {
 					point = CurrentFormVertices[SelectedForm->angleOrClipData.guide.start];
-					sCor2px(point, line[0]);
+					thred::sCor2px(point, line[0]);
 					point = CurrentFormVertices[SelectedForm->angleOrClipData.guide.finish];
-					sCor2px(point, line[1]);
+					thred::sCor2px(point, line[1]);
 					Polyline(StitchWindowMemDC, line, 2);
 				}
 			}
@@ -774,11 +774,11 @@ void form::drwfrm() {
 		if (StateMap.test(StateFlag::FORMSEL))
 			form::ritfrct(ClosestFormToCursor, StitchWindowMemDC);
 		if (StateMap.test(StateFlag::FRMPMOV)) {
-			ritmov();
+			thred::ritmov();
 			(*RubberBandLine)[1].x = Msg.pt.x - StitchWindowOrigin.x;
 			(*RubberBandLine)[1].y = Msg.pt.y - StitchWindowOrigin.y;
 			StateMap.set(StateFlag::SHOMOV);
-			ritmov();
+			thred::ritmov();
 		}
 	}
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
@@ -802,7 +802,7 @@ void form::internal::setlin() {
 }
 
 void form::internal::setrpoli() {
-	unmsg();
+	thred::unmsg();
 	displayText::pntmsg(IDS_REGP);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTRPOL);
@@ -810,7 +810,7 @@ void form::internal::setrpoli() {
 }
 
 void form::internal::setstar() {
-	unmsg();
+	thred::unmsg();
 	displayText::pntmsg(IDS_STAR);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTRSTAR);
@@ -818,7 +818,7 @@ void form::internal::setstar() {
 }
 
 void form::internal::setspir() {
-	unmsg();
+	thred::unmsg();
 	displayText::pntmsg(IDS_SPIR);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTRSPIR);
@@ -826,7 +826,7 @@ void form::internal::setspir() {
 }
 
 void form::internal::sethart() {
-	unmsg();
+	thred::unmsg();
 	displayText::pntmsg(IDS_HEART);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTRHART);
@@ -834,7 +834,7 @@ void form::internal::sethart() {
 }
 
 void form::internal::setlens() {
-	unmsg();
+	thred::unmsg();
 	displayText::pntmsg(IDS_LENS);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTRLENS);
@@ -842,7 +842,7 @@ void form::internal::setlens() {
 }
 
 void form::internal::seteg() {
-	unmsg();
+	thred::unmsg();
 	displayText::pntmsg(IDS_EGG);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTREG);
@@ -850,7 +850,7 @@ void form::internal::seteg() {
 }
 
 void form::internal::setzig() {
-	unmsg();
+	thred::unmsg();
 	displayText::pntmsg(IDS_ZIG);
 	StateMap.set(StateFlag::NUMIN);
 	StateMap.set(StateFlag::ENTRZIG);
@@ -890,11 +890,11 @@ void form::durpoli(unsigned vertexCount) {
 	SelectedForm        = &FormList[FormIndex];
 	ClosestFormToCursor = FormIndex;
 	frmclr(SelectedForm);
-	SelectedForm->vertices    = adflt(vertexCount);
+	SelectedForm->vertices    = thred::adflt(vertexCount);
 	SelectedForm->vertexCount = vertexCount;
 	SelectedForm->attribute   = ActiveLayer << 1;
 	form::fvars(FormIndex);
-	px2stch();
+	thred::px2stch();
 	point.x = SelectedPoint.x;
 	point.y = SelectedPoint.y;
 	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
@@ -942,12 +942,12 @@ void form::pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) noexcept {
 
 	corner.x = screenRect.left + StitchWindowOrigin.x;
 	corner.y = screenRect.top + StitchWindowOrigin.y;
-	pxCor2stch(corner);
+	thred::pxCor2stch(corner);
 	stitchRect.left = SelectedPoint.x;
 	stitchRect.top  = SelectedPoint.y;
 	corner.x        = screenRect.right + StitchWindowOrigin.x;
 	corner.y        = screenRect.bottom + StitchWindowOrigin.y;
-	pxCor2stch(corner);
+	thred::pxCor2stch(corner);
 	stitchRect.right  = SelectedPoint.x;
 	stitchRect.bottom = SelectedPoint.y;
 }
@@ -960,7 +960,7 @@ void form::flipv() {
 
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
-		savdo();
+		thred::savdo();
 		midpoint      = (SelectedVerticesRect.top - SelectedVerticesRect.bottom) * 0.5 + SelectedVerticesRect.bottom;
 		currentVertex = SelectedFormVertices.start;
 		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
@@ -971,7 +971,7 @@ void form::flipv() {
 		return;
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-		savdo();
+		thred::savdo();
 		midpoint = (AllItemsRect.top - AllItemsRect.bottom) / 2 + AllItemsRect.bottom;
 		for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
 			FormVertices[iVertex].y = midpoint + midpoint - FormVertices[iVertex].y;
@@ -985,7 +985,7 @@ void form::flipv() {
 		return;
 	}
 	if (SelectedFormList->size()) {
-		savdo();
+		thred::savdo();
 		boost::dynamic_bitset<> formMap(FormIndex);
 		form::pxrct2stch(SelectedFormsRect, rectangle);
 		midpoint = (rectangle.top - rectangle.bottom) / 2 + rectangle.bottom;
@@ -1006,7 +1006,7 @@ void form::flipv() {
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			savdo();
+			thred::savdo();
 			midpoint = (SelectedForm->rectangle.top - SelectedForm->rectangle.bottom) / 2 + SelectedForm->rectangle.bottom;
 			for (iVertex = 0; iVertex < VertexCount; iVertex++)
 				CurrentFormVertices[iVertex].y = midpoint + midpoint - CurrentFormVertices[iVertex].y;
@@ -1020,9 +1020,9 @@ void form::flipv() {
 		}
 		else {
 			if (StateMap.test(StateFlag::GRPSEL)) {
-				savdo();
-				rngadj();
-				selRct(rectangle);
+				thred::savdo();
+				thred::rngadj();
+				thred::selRct(rectangle);
 				midpoint = (rectangle.top - rectangle.bottom) / 2 + rectangle.bottom;
 				for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++)
 					StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
@@ -1161,7 +1161,7 @@ unsigned form::closfrm() {
 			}
 		}
 		if (FormList[closestForm].vertices) {
-			stch2pxr(FormList[closestForm].vertices[closestVertex]);
+			thred::stch2pxr(FormList[closestForm].vertices[closestVertex]);
 		}
 		minimumLength = hypot(StitchCoordinatesPixels.x - screenCoordinate.x, StitchCoordinatesPixels.y - screenCoordinate.y);
 		if (minimumLength < CLOSENUF) {
@@ -1193,7 +1193,7 @@ void form::frmovlin() {
 		(*RubberBandLine)[iPoint] = FormLines[previousPoint];
 		previousPoint++;
 	}
-	ritmov();
+	thred::ritmov();
 }
 
 void form::makspac(unsigned start, unsigned count) {
@@ -2385,7 +2385,7 @@ void form::internal::fnang(std::vector<unsigned>& groupIndexSequence,
 	AngledForm.vertices = AngledFormVertices;
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 		AngledForm.vertices[iVertex] = SelectedForm->vertices[iVertex];
-		rotflt(AngledForm.vertices[iVertex], rotationAngle, rotationCenter);
+		thred::rotflt(AngledForm.vertices[iVertex], rotationAngle, rotationCenter);
 	}
 	SelectedForm = &AngledForm;
 	fnvrt(groupIndexSequence, lineEndpoints);
@@ -2405,7 +2405,7 @@ void form::internal::fnhor(std::vector<unsigned>& groupIndexSequence,
 	AngledForm.vertices = AngledFormVertices;
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 		AngledForm.vertices[iVertex] = SelectedForm->vertices[iVertex];
-		rotflt(AngledForm.vertices[iVertex], rotationAngle, rotationCenter);
+		thred::rotflt(AngledForm.vertices[iVertex], rotationAngle, rotationCenter);
 	}
 	SelectedForm = &AngledForm;
 	fnvrt(groupIndexSequence, lineEndpoints);
@@ -3447,7 +3447,7 @@ void form::internal::horclpfn(const std::vector<RNGCNT>& textureSegments) {
 	AngledForm.vertices = AngledFormVertices;
 	for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 		AngledForm.vertices[iVertex] = SelectedForm->vertices[iVertex];
-		rotflt(AngledForm.vertices[iVertex], (PI / 2), rotationCenter);
+		thred::rotflt(AngledForm.vertices[iVertex], (PI / 2), rotationCenter);
 	}
 	angout();
 	SelectedForm        = &AngledForm;
@@ -3471,7 +3471,7 @@ void form::angclpfn(const std::vector<RNGCNT>& textureSegments) {
 		const std::vector<fPOINT>& vertexList = xt::insid();
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 			AngledFormVertices[iVertex] = vertexList[iVertex];
-			rotflt(AngledFormVertices[iVertex], rotationAngle, rotationCenter);
+			thred::rotflt(AngledFormVertices[iVertex], rotationAngle, rotationCenter);
 		}
 	}
 	else {
@@ -3481,7 +3481,7 @@ void form::angclpfn(const std::vector<RNGCNT>& textureSegments) {
 			rotationAngle = PI / 2 - SelectedForm->satinOrAngle.angle;
 		for (iVertex = 0; iVertex < AngledForm.vertexCount; iVertex++) {
 			AngledFormVertices[iVertex] = SelectedForm->vertices[iVertex];
-			rotflt(AngledFormVertices[iVertex], rotationAngle, rotationCenter);
+			thred::rotflt(AngledFormVertices[iVertex], rotationAngle, rotationCenter);
 		}
 	}
 	fi::angout();
@@ -4737,7 +4737,7 @@ void form::refilfn() {
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->type == FRMLINE)
 		SelectedForm->underlayIndent = 0;
-	savdo();
+	thred::savdo();
 	xt::fdelstch(fillStartsData, fillStartsMap);
 	StateMap.set(StateFlag::WASREFIL);
 	if (SelectedForm->fillSpacing < 0.5 && !clip::isclp(ClosestFormToCursor))
@@ -4746,7 +4746,7 @@ void form::refilfn() {
 		SelectedForm->edgeSpacing = 0.5;
 	UserStitchLength = SelectedForm->lengthOrCount.stitchLength;
 	if (!StateMap.test(StateFlag::WASDO))
-		savdo();
+		thred::savdo();
 	StateMap.reset(StateFlag::WASDO);
 	if (SelectedForm->extendedAttribute & (AT_UND | AT_WALK) && SelectedForm->type == FRMLINE && SelectedForm->fillType != CONTF)
 		SelectedForm->type = FRMFPOLY;
@@ -4937,7 +4937,7 @@ void form::refilfn() {
 	}
 	UserStitchLength = stitchLength;
 	xt::intlv(fillStartsData, fillStartsMap, interleaveSequenceIndex2);
-	ritot(PCSHeader.stitchCount);
+	thred::ritot(PCSHeader.stitchCount);
 	xt::setfchk();
 }
 
@@ -4951,7 +4951,7 @@ void form::refil() {
 			if (!(attribute & NOTFRM) && (attribute & (USMSK | FRMSK)) == codedForm) {
 				if (FormDataSheet)
 					StateMap.set(StateFlag::WASFRMFRM);
-				undat();
+				thred::undat();
 				displayText::tabmsg(IDS_REFIL);
 				StateMap.set(StateFlag::MOVMSG);
 				displayText::okcan();
@@ -4975,7 +4975,7 @@ void form::setfpnt() {
 		StateMap.set(StateFlag::WASFPNT);
 		StateMap.reset(StateFlag::SELBOX);
 		StateMap.set(StateFlag::FRMPSEL);
-		ritfcor(CurrentFormVertices[ClosestVertexToCursor]);
+		thred::ritfcor(CurrentFormVertices[ClosestVertexToCursor]);
 		StateMap.set(StateFlag::RESTCH);
 	}
 }
@@ -5006,7 +5006,7 @@ void form::filvrt() {
 	if (displayText::filmsgs(FMM_VRT))
 		return;
 	if (SelectedFormList->size()) {
-		savdo();
+		thred::savdo();
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
@@ -5014,15 +5014,15 @@ void form::filvrt() {
 				fi::fsvrt();
 		}
 		StateMap.set(StateFlag::INIT);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			savdo();
+			thred::savdo();
 			fi::fsvrt();
 			StateMap.set(StateFlag::INIT);
-			coltab();
+			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -5053,14 +5053,14 @@ void form::filhor() {
 				fi::fshor();
 		}
 		StateMap.set(StateFlag::INIT);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			fi::fshor();
 			StateMap.set(StateFlag::INIT);
-			coltab();
+			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -5084,7 +5084,7 @@ void form::filangl() {
 	if (displayText::filmsgs(FMM_ANG))
 		return;
 	if (SelectedFormList->size()) {
-		savdo();
+		thred::savdo();
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
@@ -5092,15 +5092,15 @@ void form::filangl() {
 				fi::fsangl();
 		}
 		StateMap.set(StateFlag::INIT);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			savdo();
+			thred::savdo();
 			fi::fsangl();
 			StateMap.set(StateFlag::INIT);
-			coltab();
+			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -5116,7 +5116,7 @@ unsigned form::chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio) {
 	double   length = 0.0, minimumLength = 1e99;
 
 	NewFormVertexCount = SelectedForm->vertexCount + 1;
-	duzrat();
+	thred::duzrat();
 	form::sRct2px(SelectedForm->rectangle, rectangle);
 	auto& formControls = *FormControlPoints;
 	formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x = rectangle.left;
@@ -5137,7 +5137,7 @@ unsigned form::chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio) {
 				stretchBoxLine[iCorner] = formControls[iCorner << 1];
 			}
 			stretchBoxLine[4] = stretchBoxLine[0];
-			strtchbox(stretchBoxLine);
+			thred::strtchbox(stretchBoxLine);
 			if (SelectedFormControlVertex & 1)
 				StateMap.set(StateFlag::STRTCH);
 			else {
@@ -5170,7 +5170,7 @@ void form::rstfrm() {
 
 	form::setmfrm();
 	StateMap.reset(StateFlag::FRMOV);
-	pxCor2stch(point);
+	thred::pxCor2stch(point);
 	offset.x = SelectedPoint.x - SelectedForm->vertices[0].x;
 	offset.y = SelectedPoint.y - SelectedForm->vertices[0].y;
 	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
@@ -5312,7 +5312,7 @@ void form::filsat() {
 	if (displayText::filmsgs(FMM_FAN))
 		return;
 	if (SelectedFormList->size()) {
-		savdo();
+		thred::savdo();
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
@@ -5320,15 +5320,15 @@ void form::filsat() {
 				fi::filsfn();
 		}
 		StateMap.set(StateFlag::INIT);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			savdo();
+			thred::savdo();
 			fi::filsfn();
 			StateMap.set(StateFlag::INIT);
-			coltab();
+			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -5342,7 +5342,7 @@ unsigned form::internal::closat() {
 	size_t   savedVertex   = 0;
 	float    param         = 0.0;
 
-	px2stch();
+	thred::px2stch();
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		if (!ActiveLayer || gsl::narrow<unsigned>((FormList[iForm].attribute & FRMLMSK) >> 1) == ActiveLayer
 		    || !(FormList[iForm].attribute & FRMLMSK)) {
@@ -5427,7 +5427,7 @@ void form::insat() {
 	size_t lastVertex = 0;
 
 	if (fi::closat()) {
-		savdo();
+		thred::savdo();
 		SelectedForm  = &FormList[ClosestFormToCursor];
 		FormForInsert = SelectedForm;
 		lastVertex    = FormForInsert->vertexCount - 1;
@@ -5500,7 +5500,7 @@ void form::unfil() {
 			}
 		}
 		PCSHeader.stitchCount = iDestination;
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
@@ -5532,19 +5532,19 @@ void form::unfil() {
 			SelectedForm->edgeType = 0;
 			SelectedForm->extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
 			PCSHeader.stitchCount = iDestination;
-			ritot(PCSHeader.stitchCount);
+			thred::ritot(PCSHeader.stitchCount);
 		}
 	}
 }
 
 void form::frm0() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
-		savdo();
+		thred::savdo();
 		form::rotfrm(ClosestVertexToCursor);
 		ClosestVertexToCursor = 0;
 		satin::satadj();
 		form::refil();
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 }
@@ -5587,7 +5587,7 @@ void form::infrm() {
 }
 
 void form::setins() {
-	px2stch();
+	thred::px2stch();
 	fi::nufpnt(FormVertexPrev);
 	if (StateMap.test(StateFlag::PRELIN)) {
 		SelectedPoint.x            = FormForInsert->vertices[0].x;
@@ -5634,14 +5634,14 @@ void form::bord() {
 			fi::sbord();
 		}
 		StateMap.set(StateFlag::INIT);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			SelectedForm->borderColor = ActiveColor;
 			fi::sbord();
-			coltab();
+			thred::coltab();
 			StateMap.set(StateFlag::INIT);
 			StateMap.set(StateFlag::RESTCH);
 		}
@@ -5675,8 +5675,8 @@ void form::fclp() {
 		Clip       = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory) {
-			savdo();
-			redclp();
+			thred::savdo();
+			thred::redclp();
 			CloseClipboard();
 			if (ClipRectSize.cx > CLPMIN) {
 				if (SelectedFormList->size()) {
@@ -5686,14 +5686,14 @@ void form::fclp() {
 						fi::fsclp();
 					}
 					StateMap.set(StateFlag::INIT);
-					coltab();
+					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
 				}
 				else {
 					if (StateMap.test(StateFlag::FORMSEL)) {
 						fi::fsclp();
 						StateMap.set(StateFlag::INIT);
-						coltab();
+						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
 					}
 				}
@@ -5739,7 +5739,7 @@ void form::apliq() {
 			fi::sapliq();
 		}
 		StateMap.set(StateFlag::INIT);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
@@ -5750,7 +5750,7 @@ void form::apliq() {
 				SelectedForm->attribute &= NOBLNT;
 			fi::sapliq();
 			StateMap.set(StateFlag::INIT);
-			coltab();
+			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -5796,12 +5796,12 @@ void form::stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect) noexcept {
 	dPOINT stitchCoord = { stitchRect.left, stitchRect.top };
 	POINT  screenCoord = {};
 
-	sCor2px(stitchCoord, screenCoord);
+	thred::sCor2px(stitchCoord, screenCoord);
 	screenRect.left = screenCoord.x;
 	screenRect.top  = screenCoord.y;
 	stitchCoord.x   = stitchRect.right;
 	stitchCoord.y   = stitchRect.bottom;
-	sCor2px(stitchCoord, screenCoord);
+	thred::sCor2px(stitchCoord, screenCoord);
 	screenRect.right  = screenCoord.x;
 	screenRect.bottom = screenCoord.y;
 }
@@ -5818,10 +5818,10 @@ void form::selal() {
 	ZoomRect.top    = UnzoomedRect.y;
 	ZoomFactor      = 1;
 	StateMap.reset(StateFlag::ZUMED);
-	movStch();
+	thred::movStch();
 	NearestCount = 0;
 	StateMap.reset(StateFlag::RUNPAT);
-	duzrat();
+	thred::duzrat();
 	form::stchrct2px(AllItemsRect, SelectedFormsRect);
 	StateMap.set(StateFlag::BIGBOX);
 	StateMap.set(StateFlag::RESTCH);
@@ -5835,7 +5835,7 @@ void form::setstrtch() {
 	fRECTANGLE stitchRect    = {};
 	long       offsetY = 0, offsetX = 0;
 
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FPSEL)) {
 		stitchRect = SelectedVerticesRect;
 	}
@@ -5844,7 +5844,7 @@ void form::setstrtch() {
 			form::pxrct2stch(SelectedFormsRect, stitchRect);
 		else {
 			form::fvars(ClosestFormToCursor);
-			px2stch();
+			thred::px2stch();
 			stitchRect.bottom = stitchRect.left = stitchRect.right = stitchRect.top = 0;
 		}
 	}
@@ -5931,7 +5931,7 @@ void form::setstrtch() {
 				currentVertex                        = pdir(currentVertex);
 			}
 			form::frmout(ClosestFormToCursor);
-			setpsel();
+			thred::setpsel();
 			refil();
 			StateMap.set(StateFlag::RESTCH);
 			return;
@@ -5977,7 +5977,7 @@ void form::setstrtch() {
 				currentVertex                        = pdir(currentVertex);
 			}
 			form::frmout(ClosestFormToCursor);
-			setpsel();
+			thred::setpsel();
 			refil();
 			StateMap.set(StateFlag::RESTCH);
 			return;
@@ -6038,7 +6038,7 @@ void form::setexpand(double xyRatio) {
 	size_t     iCurrent  = 0;
 	fRECTANGLE rectangle = {};
 
-	savdo();
+	thred::savdo();
 	if (SelectedFormList->size() || StateMap.test(StateFlag::BIGBOX) || StateMap.test(StateFlag::FPSEL)) {
 		rectangle.bottom = SelectedFormsRect.bottom;
 		rectangle.left   = SelectedFormsRect.left;
@@ -6049,7 +6049,7 @@ void form::setexpand(double xyRatio) {
 		size0.y          = rectangle.bottom - rectangle.top;
 	}
 	else {
-		px2stch();
+		thred::px2stch();
 		form::fvars(ClosestFormToCursor);
 		if (StateMap.test(StateFlag::FORMSEL))
 			rectangle = SelectedForm->rectangle;
@@ -6145,7 +6145,7 @@ void form::setexpand(double xyRatio) {
 			CurrentFormVertices[iCurrent].y = (CurrentFormVertices[iCurrent].y - stitchReference.y) * ratio.y + stitchReference.y;
 			iCurrent                        = form::pdir(iCurrent);
 		}
-		setpsel();
+		thred::setpsel();
 		form::frmout(ClosestFormToCursor);
 		form::refil();
 		StateMap.set(StateFlag::RESTCH);
@@ -6280,16 +6280,16 @@ void form::dubold() {
 			fi::sbold();
 		}
 		StateMap.set(StateFlag::INIT);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			fi::sbold();
-			coltab();
+			thred::coltab();
 			StateMap.set(StateFlag::INIT);
 			StateMap.set(StateFlag::RESTCH);
-			ritot(PCSHeader.stitchCount);
+			thred::ritot(PCSHeader.stitchCount);
 		}
 	}
 }
@@ -6326,11 +6326,11 @@ void form::dustar(unsigned starCount, double length) {
 	SelectedForm        = &FormList[FormIndex];
 	ClosestFormToCursor = FormIndex;
 	form::frmclr(SelectedForm);
-	SelectedForm->vertices    = adflt(vertexCount);
+	SelectedForm->vertices    = thred::adflt(vertexCount);
 	SelectedForm->vertexCount = vertexCount;
 	SelectedForm->attribute   = (ActiveLayer << 1);
 	form::fvars(FormIndex);
-	px2stch();
+	thred::px2stch();
 	point.x = SelectedPoint.x;
 	point.y = SelectedPoint.y;
 	StateMap.set(StateFlag::FILDIR);
@@ -6376,13 +6376,13 @@ void form::duspir(unsigned stepCount) {
 	ClosestFormToCursor = FormIndex;
 	form::frmclr(SelectedForm);
 	vertexCount            = stepCount * SpiralWrap;
-	SelectedForm->vertices = adflt(vertexCount);
+	SelectedForm->vertices = thred::adflt(vertexCount);
 	std::vector<fPOINT> firstSpiral(stepCount);
 	std::vector<fPOINT> centeredSpiral(stepCount);
 	SelectedForm->vertexCount = vertexCount;
 	SelectedForm->attribute   = (ActiveLayer << 1);
 	form::fvars(FormIndex);
-	px2stch();
+	thred::px2stch();
 	point.x = SelectedPoint.x;
 	point.y = SelectedPoint.y;
 	for (iStep = 0; iStep < stepCount; iStep++) {
@@ -6432,7 +6432,7 @@ void form::duhart(unsigned sideCount) {
 	form::frmclr(SelectedForm);
 	SelectedForm->attribute = ActiveLayer << 1;
 	CurrentFormVertices     = &FormVertices[FormVertexIndex];
-	px2stch();
+	thred::px2stch();
 	point.x   = SelectedPoint.x;
 	point.y   = SelectedPoint.y;
 	stepAngle = PI * 2 / sideCount;
@@ -6472,7 +6472,7 @@ void form::duhart(unsigned sideCount) {
 		iDestination++;
 	}
 	NewFormVertexCount        = iDestination + 1;
-	SelectedForm->vertices    = adflt(iDestination);
+	SelectedForm->vertices    = thred::adflt(iDestination);
 	SelectedForm->vertexCount = iDestination;
 	SelectedForm->type        = FRMFPOLY;
 	ClosestFormToCursor       = FormIndex;
@@ -6509,7 +6509,7 @@ void form::dulens(unsigned sides) {
 	SelectedForm->vertices  = &FormVertices[FormVertexIndex];
 	SelectedForm->attribute = ActiveLayer << 1;
 	form::fvars(FormIndex);
-	px2stch();
+	thred::px2stch();
 	point   = SelectedPoint;
 	iVertex = 0;
 	SelectedPoint.x -= 0.0001f;
@@ -6528,7 +6528,7 @@ void form::dulens(unsigned sides) {
 		iDestination++;
 	}
 	NewFormVertexCount        = iDestination;
-	SelectedForm->vertices    = adflt(iDestination - 1);
+	SelectedForm->vertices    = thred::adflt(iDestination - 1);
 	SelectedForm->vertexCount = iDestination - 1;
 	SelectedForm->type        = FRMFPOLY;
 	ClosestFormToCursor       = FormIndex;
@@ -6576,11 +6576,11 @@ void form::duzig(unsigned vertices) {
 	SelectedForm        = &FormList[FormIndex];
 	ClosestFormToCursor = FormIndex;
 	form::frmclr(SelectedForm);
-	SelectedForm->vertices    = adflt(vertices);
+	SelectedForm->vertices    = thred::adflt(vertices);
 	SelectedForm->vertexCount = vertices;
 	SelectedForm->attribute   = ActiveLayer << 1;
 	form::fvars(FormIndex);
-	px2stch();
+	thred::px2stch();
 	offset.x = UnzoomedRect.x / 6;
 	offset.y = UnzoomedRect.y / (6 * vertices);
 	for (iVertex = 0; iVertex < vertices; iVertex++) {
@@ -6610,7 +6610,7 @@ void form::fliph() {
 
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
-		savdo();
+		thred::savdo();
 		midpoint      = (SelectedVerticesRect.right - SelectedVerticesRect.left) * 0.5 + SelectedVerticesRect.left;
 		currentVertex = SelectedFormVertices.start;
 		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
@@ -6634,7 +6634,7 @@ void form::fliph() {
 		return;
 	}
 	if (SelectedFormList->size()) {
-		savdo();
+		thred::savdo();
 		boost::dynamic_bitset<> formMap(FormIndex);
 		form::pxrct2stch(SelectedFormsRect, rectangle);
 		midpoint = (rectangle.right - rectangle.left) / 2 + rectangle.left;
@@ -6655,7 +6655,7 @@ void form::fliph() {
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			savdo();
+			thred::savdo();
 			midpoint = (SelectedForm->rectangle.right - SelectedForm->rectangle.left) / 2 + SelectedForm->rectangle.left;
 			for (iVertex = 0; iVertex < VertexCount; iVertex++)
 				CurrentFormVertices[iVertex].x = midpoint + midpoint - CurrentFormVertices[iVertex].x;
@@ -6669,9 +6669,9 @@ void form::fliph() {
 		}
 		else {
 			if (StateMap.test(StateFlag::GRPSEL)) {
-				savdo();
-				rngadj();
-				selRct(rectangle);
+				thred::savdo();
+				thred::rngadj();
+				thred::selRct(rectangle);
 				midpoint = (rectangle.right - rectangle.left) / 2 + rectangle.left;
 				for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++)
 					StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
@@ -6713,7 +6713,7 @@ void form::prpbrd(double borderStitchSpacing) {
 			fi::prpsbrd();
 		}
 		StateMap.set(StateFlag::INIT);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
@@ -6725,8 +6725,8 @@ void form::prpbrd(double borderStitchSpacing) {
 				SelectedForm->attribute &= NOBLNT;
 			fi::prpsbrd();
 			StateMap.set(StateFlag::INIT);
-			coltab();
-			ritot(PCSHeader.stitchCount);
+			thred::coltab();
+			thred::ritot(PCSHeader.stitchCount);
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -6761,7 +6761,7 @@ void form::tglfrm() {
 }
 
 void form::frmon() {
-	unbsho();
+	thred::unbsho();
 	StateMap.reset(StateFlag::FRMOF);
 	FormOnOff->assign((*StringTable)[STR_FRMPLUS]);
 	SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, MenuInfo);
@@ -6786,7 +6786,7 @@ void form::flpord() {
 
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
-		savdo();
+		thred::savdo();
 		start  = SelectedFormVertices.start;
 		finish = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % VertexCount;
 		for (iVertex = 0; iVertex <= SelectedFormVertices.vertexCount >> 1; iVertex++) {
@@ -6800,31 +6800,31 @@ void form::flpord() {
 		return;
 	}
 	if (SelectedFormList->size()) {
-		savdo();
+		thred::savdo();
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			fi::fnord();
 		}
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			savdo();
+			thred::savdo();
 			fi::fnord();
-			coltab();
+			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 		}
 		else {
 			if (StateMap.test(StateFlag::GRPSEL)) {
-				savdo();
-				rngadj();
+				thred::savdo();
+				thred::rngadj();
 				iForward = GroupStartStitch;
 				for (iStitch = 0; iStitch < (gsl::narrow<signed>(GroupEndStitch - GroupStartStitch) >> 1) + 1; iStitch++) {
 					std::swap(StitchBuffer[iForward], StitchBuffer[GroupEndStitch - iStitch]);
 					iForward++;
 				}
-				coltab();
+				thred::coltab();
 				StateMap.set(StateFlag::RESTCH);
 			}
 		}
@@ -6855,7 +6855,7 @@ void form::clpfil() {
 		Clip       = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory) {
-			redclp();
+			thred::redclp();
 			CloseClipboard();
 			if (ClipRectSize.cx > CLPMIN && ClipRectSize.cy > CLPMIN) {
 				if (SelectedFormList->size()) {
@@ -6866,14 +6866,14 @@ void form::clpfil() {
 							fi::filsclp();
 					}
 					StateMap.set(StateFlag::INIT);
-					coltab();
+					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
 				}
 				else {
 					if (StateMap.test(StateFlag::FORMSEL)) {
 						fi::filsclp();
 						StateMap.set(StateFlag::INIT);
-						coltab();
+						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
 					}
 				}
@@ -6936,7 +6936,7 @@ void form::internal::snp(unsigned start, unsigned finish) {
 	unsigned iColumn = 0, iStitch = 0, value = 0, accumulator = 0, checkLength = 0, attribute = 0;
 	fPOINT   range = {};
 
-	chkrng(range);
+	thred::chkrng(range);
 	std::vector<unsigned> xPoints(PCSHeader.stitchCount);
 	std::vector<unsigned> xHistogram((round(range.x)) + 1);
 	if (StateMap.test(StateFlag::FORMSEL)) {
@@ -6985,14 +6985,14 @@ void form::internal::snp(unsigned start, unsigned finish) {
 }
 
 void form::snap() {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::GRPSEL)) {
-		rngadj();
+		thred::rngadj();
 		fi::snp(GroupStartStitch, GroupEndStitch);
 	}
 	else
 		fi::snp(0, PCSHeader.stitchCount);
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -7055,8 +7055,8 @@ void form::internal::rotpar(dPOINT& rotationCenter) {
 	}
 	else {
 		if (StateMap.test(StateFlag::GRPSEL)) {
-			rngadj();
-			selRct(RotationRect);
+			thred::rngadj();
+			thred::selRct(RotationRect);
 		}
 	}
 	if (StateMap.test(StateFlag::GMRK)) {
@@ -7099,7 +7099,7 @@ void form::internal::fnagain(double rotationAngle) {
 	    || StateMap.test(StateFlag::BIGBOX) || StateMap.test(StateFlag::FPSEL)) {
 		dPOINT rotationCenter;
 		rotpar(rotationCenter);
-		rotfn(rotationAngle, rotationCenter);
+		thred::rotfn(rotationAngle, rotationCenter);
 	}
 	else
 		displayText::alrotmsg();
@@ -7130,7 +7130,7 @@ void form::internal::adfrm(size_t iForm) {
 	SelectedForm         = &FormList[iForm];
 	*formHeader          = *SelectedForm;
 	ClosestFormToCursor  = FormIndex;
-	formHeader->vertices = adflt(SelectedForm->vertexCount);
+	formHeader->vertices = thred::adflt(SelectedForm->vertexCount);
 	std::copy(SelectedForm->vertices,
 	          SelectedForm->vertices + SelectedForm->vertexCount,
 	          stdext::make_checked_array_iterator(formHeader->vertices, SelectedForm->vertexCount));
@@ -7141,13 +7141,13 @@ void form::internal::adfrm(size_t iForm) {
 		          stdext::make_checked_array_iterator(formHeader->satinOrAngle.guide, SelectedForm->satinGuideCount));
 	}
 	if (clip::iseclpx(FormIndex)) {
-		formHeader->borderClipData = adclp(formHeader->clipEntries);
+		formHeader->borderClipData = thred::adclp(formHeader->clipEntries);
 		std::copy(SelectedForm->borderClipData,
 		          SelectedForm->borderClipData + SelectedForm->clipEntries,
 		          stdext::make_checked_array_iterator(formHeader->borderClipData, formHeader->clipEntries));
 	}
 	if (clip::isclpx(FormIndex)) {
-		formHeader->angleOrClipData.clip = adclp(formHeader->lengthOrCount.clipCount);
+		formHeader->angleOrClipData.clip = thred::adclp(formHeader->lengthOrCount.clipCount);
 		std::copy(SelectedForm->angleOrClipData.clip,
 		          SelectedForm->angleOrClipData.clip + SelectedForm->lengthOrCount.clipCount,
 		          stdext::make_checked_array_iterator(formHeader->angleOrClipData.clip, formHeader->lengthOrCount.clipCount));
@@ -7157,7 +7157,7 @@ void form::internal::adfrm(size_t iForm) {
 
 void form::duprot(double rotationAngle, const dPOINT& rotationCenter) {
 	fi::adfrm(ClosestFormToCursor);
-	rotfn(rotationAngle, rotationCenter);
+	thred::rotfn(rotationAngle, rotationCenter);
 	form::refil();
 	StateMap.set(StateFlag::FORMSEL);
 	StateMap.set(StateFlag::RESTCH);
@@ -7181,7 +7181,7 @@ void form::internal::duprotfs(double rotationAngle) {
 void form::internal::duprots(double rotationAngle, const dPOINT& rotationCenter) {
 	unsigned source = 0, destination = PCSHeader.stitchCount;
 
-	rngadj();
+	thred::rngadj();
 
 	for (source = GroupStartStitch; source <= GroupEndStitch; source++) {
 		StitchBuffer[destination].x           = StitchBuffer[source].x;
@@ -7192,9 +7192,9 @@ void form::internal::duprots(double rotationAngle, const dPOINT& rotationCenter)
 	PCSHeader.stitchCount += (GroupEndStitch - GroupStartStitch);
 	GroupStitchIndex = PCSHeader.stitchCount;
 	PCSHeader.stitchCount++;
-	rngadj();
-	rotfn(rotationAngle, rotationCenter);
-	coltab();
+	thred::rngadj();
+	thred::rotfn(rotationAngle, rotationCenter);
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -7204,7 +7204,7 @@ void form::internal::cplayfn(size_t iForm, unsigned play) {
 	form::fvars(FormIndex);
 	*SelectedForm = *formHeader;
 	form::fvars(FormIndex);
-	SelectedForm->vertices = adflt(SelectedForm->vertexCount);
+	SelectedForm->vertices = thred::adflt(SelectedForm->vertexCount);
 	std::copy(formHeader->vertices,
 	          formHeader->vertices + VertexCount,
 	          stdext::make_checked_array_iterator(SelectedForm->vertices, MAXITEMS - FormVertexIndex));
@@ -7226,20 +7226,20 @@ void form::cpylayr(unsigned codedLayer) {
 	const unsigned codedStitchLayer = codedLayer << (LAYSHFT - 1);
 
 	if (SelectedFormList->size()) {
-		savdo();
+		thred::savdo();
 		for (auto selectedForm : (*SelectedFormList)) {
 			fi::cplayfn(selectedForm, codedLayer);
 		}
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			savdo();
+			thred::savdo();
 			fi::cplayfn(ClosestFormToCursor, codedLayer);
 		}
 		else {
 			if (StateMap.test(StateFlag::GRPSEL)) {
-				savdo();
-				rngadj();
+				thred::savdo();
+				thred::rngadj();
 				iCurrentStitch = PCSHeader.stitchCount;
 				for (iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
 					StitchBuffer[iCurrentStitch].x           = StitchBuffer[iStitch].x;
@@ -7247,7 +7247,7 @@ void form::cpylayr(unsigned codedLayer) {
 					StitchBuffer[iCurrentStitch++].attribute = StitchBuffer[iStitch].attribute & NLAYMSK | codedStitchLayer;
 				}
 				PCSHeader.stitchCount = iCurrentStitch;
-				coltab();
+				thred::coltab();
 				StateMap.set(StateFlag::RESTCH);
 			}
 		}
@@ -7259,7 +7259,7 @@ void form::movlayr(unsigned codedLayer) {
 	const unsigned codedStitchLayer = codedLayer << (LAYSHFT - 1);
 
 	if (SelectedFormList->size()) {
-		savdo();
+		thred::savdo();
 		boost::dynamic_bitset<> formMap(FormIndex);
 		for (auto selectedForm : (*SelectedFormList)) {
 			FormList[selectedForm].attribute = (FormList[selectedForm].attribute & NFRMLMSK) | codedLayer;
@@ -7278,7 +7278,7 @@ void form::movlayr(unsigned codedLayer) {
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			savdo();
+			thred::savdo();
 			FormList[ClosestFormToCursor].attribute = (FormList[ClosestFormToCursor].attribute & NFRMLMSK) | codedLayer;
 			StateMap.reset(StateFlag::FORMSEL);
 			for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -7290,8 +7290,8 @@ void form::movlayr(unsigned codedLayer) {
 		}
 		else {
 			if (StateMap.test(StateFlag::GRPSEL)) {
-				savdo();
-				rngadj();
+				thred::savdo();
+				thred::rngadj();
 				for (iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++)
 					StitchBuffer[iStitch].attribute = StitchBuffer[iStitch].attribute & NLAYMSK | codedStitchLayer;
 				StateMap.set(StateFlag::RESTCH);
@@ -7313,7 +7313,7 @@ void form::join() {
 			ClosestVertexToCursor = form::nxt(ClosestVertexToCursor);
 		}
 		StateMap.set(StateFlag::DELTO);
-		frmdel();
+		thred::frmdel();
 		if (savedFormIndex > ClosestFormToCursor)
 			ClosestFormToCursor = savedFormIndex - 1;
 		else
@@ -7340,7 +7340,7 @@ void form::join() {
 				SelectedForm->rectangle.bottom = SelectedForm->vertices[iVertex].y;
 		}
 		form::refil();
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	StateMap.reset(StateFlag::FRMSAM);
@@ -7349,12 +7349,12 @@ void form::join() {
 void form::refilal() {
 	const auto savedFormIndex = ClosestFormToCursor;
 
-	savdo();
+	thred::savdo();
 	for (ClosestFormToCursor = 0; ClosestFormToCursor < FormIndex; ClosestFormToCursor++)
 		form::refilfn();
 	ClosestFormToCursor = savedFormIndex;
 	form::fvars(ClosestFormToCursor);
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -7441,7 +7441,7 @@ void form::selfil(unsigned type) {
 		fi::frmpnts(type);
 		StateMap.set(StateFlag::GRPSEL);
 		StateMap.reset(StateFlag::FORMSEL);
-		rngadj();
+		thred::rngadj();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
@@ -7470,7 +7470,7 @@ void form::selalfil() {
 				GroupStitchIndex--;
 			StateMap.set(StateFlag::GRPSEL);
 			StateMap.reset(StateFlag::FORMSEL);
-			rngadj();
+			thred::rngadj();
 			StateMap.set(StateFlag::RESTCH);
 		}
 		else
@@ -7527,7 +7527,7 @@ void form::bhol() {
 			fi::bholbrd();
 		}
 		StateMap.set(StateFlag::INIT);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
@@ -7535,8 +7535,8 @@ void form::bhol() {
 			form::fvars(ClosestFormToCursor);
 			fi::bholbrd();
 			StateMap.set(StateFlag::INIT);
-			coltab();
-			ritot(PCSHeader.stitchCount);
+			thred::coltab();
+			thred::ritot(PCSHeader.stitchCount);
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -7552,7 +7552,7 @@ void form::fcntr() {
 	dPOINT   delta         = {};
 
 	if (SelectedFormList->size()) {
-		savdo();
+		thred::savdo();
 		auto firstForm = SelectedFormList->front();
 		initialCenter.x
 		    = (FormList[firstForm].rectangle.right - FormList[firstForm].rectangle.left) / 2 + FormList[firstForm].rectangle.left;
@@ -7620,12 +7620,12 @@ void form::picot() {
 	if (displayText::filmsgs(FML_PIC))
 		return;
 	if (OpenClipboard(ThrEdWindow)) {
-		savdo();
+		thred::savdo();
 		form::fvars(ClosestFormToCursor);
 		Clip       = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory) {
-			redclp();
+			thred::redclp();
 			CloseClipboard();
 			if (ClipRectSize.cx > CLPMIN) {
 				if (SelectedFormList->size()) {
@@ -7635,14 +7635,14 @@ void form::picot() {
 						fi::fspic();
 					}
 					StateMap.set(StateFlag::INIT);
-					coltab();
+					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
 				}
 				else {
 					if (StateMap.test(StateFlag::FORMSEL)) {
 						fi::fspic();
 						StateMap.set(StateFlag::INIT);
-						coltab();
+						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
 					}
 				}
@@ -7676,20 +7676,20 @@ void form::contfil() {
 	if (displayText::filmsgs(FML_CONT))
 		return;
 	if (SelectedFormList->size()) {
-		savdo();
+		thred::savdo();
 		for (auto selectedForm : (*SelectedFormList)) {
 			fi::contsf(selectedForm);
 		}
 		StateMap.set(StateFlag::INIT);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
 		form::fvars(ClosestFormToCursor);
-		savdo();
+		thred::savdo();
 		if (fi::contsf(ClosestFormToCursor)) {
 			StateMap.set(StateFlag::INIT);
-			coltab();
+			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 		}
 		else
@@ -7699,7 +7699,7 @@ void form::contfil() {
 
 void form::internal::dupfn(double rotationAngle) {
 	dPOINT rotationCenter;
-	savdo();
+	thred::savdo();
 	rotpar(rotationCenter);
 	if (IniFile.rotationAngle) {
 		if (StateMap.test(StateFlag::FORMSEL))
@@ -7768,7 +7768,7 @@ void form::shrnk() {
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FORMSEL) && SelectedForm->edgeType == EDGECLIP) {
 		fi::shrnks();
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
@@ -7825,7 +7825,7 @@ void form::frmnumfn(unsigned newFormIndex) {
 	unsigned iStitch = 0, sourceForm = 0, decodedFormIndex = 0;
 	size_t   start = 0, finish = 0;
 
-	savdo();
+	thred::savdo();
 	if (newFormIndex != ClosestFormToCursor) {
 		if (ClosestFormToCursor > newFormIndex) {
 			start  = newFormIndex;
@@ -7910,7 +7910,7 @@ void form::srtbyfrm() {
 	std::vector<unsigned> color(16);
 
 	if (FormIndex) {
-		savdo();
+		thred::savdo();
 		color[AppliqueColor] = 0;
 		for (iColor = 0; iColor < 16; iColor++) {
 			if (iColor != AppliqueColor)
@@ -7935,7 +7935,7 @@ void form::srtbyfrm() {
 	}
 	else
 		xt::srtcol();
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -7956,7 +7956,7 @@ void form::cntrx() {
 	}
 	if (SelectedFormList->size()) {
 		flag = true;
-		savdo();
+		thred::savdo();
 		fi::dufcntr(selectedCenter);
 		FormMoveDelta.x = markCenter.x - selectedCenter.x;
 		FormMoveDelta.y = -markCenter.y + selectedCenter.y;
@@ -7972,7 +7972,7 @@ void form::cntrx() {
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			flag = true;
-			savdo();
+			thred::savdo();
 			const auto& formRect = FormList[ClosestFormToCursor].rectangle;
 			selectedCenter.x     = (formRect.right - formRect.left) / 2 + formRect.left;
 			selectedCenter.y     = (formRect.top - formRect.bottom) / 2 + formRect.bottom;
@@ -7994,8 +7994,8 @@ void form::cntrx() {
 		else {
 			if (StateMap.test(StateFlag::GRPSEL)) {
 				flag = true;
-				savdo();
-				rngadj();
+				thred::savdo();
+				thred::rngadj();
 				groupRect.right = groupRect.left = StitchBuffer[GroupStartStitch].x;
 				groupRect.top = groupRect.bottom = StitchBuffer[GroupStartStitch].y;
 				for (iStitch = GroupStartStitch + 1; iStitch <= GroupEndStitch; iStitch++) {
@@ -8063,64 +8063,64 @@ void form::internal::bean(unsigned start, unsigned finish) noexcept {
 	unsigned iCopyStitch   = MAXITEMS;
 
 	BeanCount = 0;
-	mvstch(iCopyStitch++, iSourceStitch);
+	thred::mvstch(iCopyStitch++, iSourceStitch);
 	if (StitchBuffer[iSourceStitch + 2].x != StitchBuffer[iSourceStitch].x
 	    || StitchBuffer[iSourceStitch + 2].y != StitchBuffer[iSourceStitch].y) {
-		mvstch(iCopyStitch++, iSourceStitch + 1);
-		mvstch(iCopyStitch++, iSourceStitch);
+		thred::mvstch(iCopyStitch++, iSourceStitch + 1);
+		thred::mvstch(iCopyStitch++, iSourceStitch);
 		BeanCount += 2;
 	}
 	iSourceStitch++;
-	mvstch(iCopyStitch++, iSourceStitch);
+	thred::mvstch(iCopyStitch++, iSourceStitch);
 	if (StitchBuffer[iSourceStitch + 2].x != StitchBuffer[iSourceStitch].x
 	    || StitchBuffer[iSourceStitch + 2].y != StitchBuffer[iSourceStitch].y) {
-		mvstch(iCopyStitch++, iSourceStitch + 1);
-		mvstch(iCopyStitch++, iSourceStitch);
+		thred::mvstch(iCopyStitch++, iSourceStitch + 1);
+		thred::mvstch(iCopyStitch++, iSourceStitch);
 		BeanCount += 2;
 	}
 	iSourceStitch++;
 	while (iSourceStitch < finish - 2) {
-		mvstch(iCopyStitch++, iSourceStitch);
+		thred::mvstch(iCopyStitch++, iSourceStitch);
 		if ((StitchBuffer[iSourceStitch + 2].x != StitchBuffer[iSourceStitch].x
 		     || StitchBuffer[iSourceStitch + 2].y != StitchBuffer[iSourceStitch].y)
 		    && (StitchBuffer[iSourceStitch - 2].x != StitchBuffer[iSourceStitch].x
 		        || StitchBuffer[iSourceStitch - 2].y != StitchBuffer[iSourceStitch].y)) {
-			mvstch(iCopyStitch++, iSourceStitch + 1);
-			mvstch(iCopyStitch++, iSourceStitch);
+			thred::mvstch(iCopyStitch++, iSourceStitch + 1);
+			thred::mvstch(iCopyStitch++, iSourceStitch);
 			BeanCount += 2;
 		}
 		iSourceStitch++;
 	}
-	mvstch(iCopyStitch++, iSourceStitch);
+	thred::mvstch(iCopyStitch++, iSourceStitch);
 	if ((StitchBuffer[iSourceStitch - 2].x != StitchBuffer[iSourceStitch].x
 	     || StitchBuffer[iSourceStitch - 2].y != StitchBuffer[iSourceStitch].y)) {
-		mvstch(iCopyStitch++, iSourceStitch + 1);
-		mvstch(iCopyStitch++, iSourceStitch);
+		thred::mvstch(iCopyStitch++, iSourceStitch + 1);
+		thred::mvstch(iCopyStitch++, iSourceStitch);
 		BeanCount += 2;
 	}
 	iSourceStitch++;
 	while (iSourceStitch < PCSHeader.stitchCount)
-		mvstch(iCopyStitch++, iSourceStitch++);
+		thred::mvstch(iCopyStitch++, iSourceStitch++);
 	for (iSourceStitch = MAXITEMS; iSourceStitch < iCopyStitch; iSourceStitch++)
-		mvstch(iOutputStitch++, iSourceStitch);
+		thred::mvstch(iOutputStitch++, iSourceStitch);
 	PCSHeader.stitchCount = iOutputStitch;
 }
 
 void form::dubean() {
 	if (PCSHeader.stitchCount) {
-		savdo();
+		thred::savdo();
 		if (StateMap.test(StateFlag::GRPSEL)) {
-			rngadj();
+			thred::rngadj();
 			fi::bean(GroupStartStitch, GroupEndStitch);
 			if (ClosestPointIndex > GroupStitchIndex)
 				ClosestPointIndex += BeanCount;
 			else
 				GroupStitchIndex += BeanCount;
-			grpAdj();
+			thred::grpAdj();
 		}
 		else
 			fi::bean(0, PCSHeader.stitchCount - 1);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 }
@@ -8130,7 +8130,7 @@ void form::internal::unbean(unsigned start, unsigned finish) {
 
 	BeanCount = 0;
 	for (iSource = start; iSource <= finish; iSource++) {
-		mvstch(iCopy++, iSource);
+		thred::mvstch(iCopy++, iSource);
 		if (StitchBuffer[iSource].x == StitchBuffer[iSource + 2].x && StitchBuffer[iSource].y == StitchBuffer[iSource + 2].y) {
 			iSource += 2;
 			BeanCount += 2;
@@ -8142,15 +8142,15 @@ void form::internal::unbean(unsigned start, unsigned finish) {
 	if (iSource > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 		iSource = PCSHeader.stitchCount - 1;
 	while (iSource < PCSHeader.stitchCount)
-		mvstch(iCopy++, iSource++);
-	mvstchs(start, MAXITEMS, iCopy);
+		thred::mvstch(iCopy++, iSource++);
+	thred::mvstchs(start, MAXITEMS, iCopy);
 	PCSHeader.stitchCount = start + iCopy;
 }
 
 void form::debean() {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::GRPSEL)) {
-		rngadj();
+		thred::rngadj();
 		fi::unbean(GroupStartStitch, GroupEndStitch);
 		if (ClosestPointIndex > GroupStitchIndex)
 			ClosestPointIndex -= BeanCount;
@@ -8160,11 +8160,11 @@ void form::debean() {
 			ClosestPointIndex = PCSHeader.stitchCount - 1;
 		if (GroupStitchIndex > gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 			GroupStitchIndex = PCSHeader.stitchCount - 1;
-		grpAdj();
+		thred::grpAdj();
 	}
 	else
 		fi::unbean(0, PCSHeader.stitchCount - 1);
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -8232,11 +8232,11 @@ bool form::internal::spltlin() {
 
 void form::spltfrm() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
-		savdo();
+		thred::savdo();
 		form::fvars(ClosestFormToCursor);
 		if (SelectedForm->type == SAT) {
 			if (SelectedForm->satinGuideCount) {
-				delfstchs();
+				thred::delfstchs();
 				SelectedForm->fillType = 0;
 				SelectedForm->edgeType = 0;
 				for (ActivePointIndex = 0; ActivePointIndex < SelectedForm->satinGuideCount; ActivePointIndex++) {
@@ -8254,7 +8254,7 @@ void form::spltfrm() {
 		else {
 			if (SelectedForm->type == FRMLINE) {
 				if (fi::spltlin()) {
-					coltab();
+					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
 				}
 				else
@@ -8272,7 +8272,7 @@ void form::stchs2frm() {
 	unsigned iStitch = 0, iVertex = 0, vertexCount = 0;
 
 	if (StateMap.test(StateFlag::GRPSEL)) {
-		rngadj();
+		thred::rngadj();
 		if ((GroupEndStitch - GroupStartStitch) > 12000) {
 			displayText::tabmsg(IDS_STMAX);
 			return;
@@ -8282,7 +8282,7 @@ void form::stchs2frm() {
 		form::frmclr(SelectedForm);
 		SelectedForm->type        = FRMLINE;
 		SelectedForm->vertexCount = vertexCount;
-		SelectedForm->vertices    = adflt(vertexCount);
+		SelectedForm->vertices    = thred::adflt(vertexCount);
 		iVertex                   = 0;
 		for (iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
 			SelectedForm->vertices[iVertex].x   = StitchBuffer[iStitch].x;
@@ -8298,9 +8298,9 @@ void form::stchs2frm() {
 			if (GroupStitchIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1)
 				GroupStitchIndex++;
 		}
-		delstchm();
+		thred::delstchm();
 		StateMap.reset(StateFlag::GRPSEL);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
@@ -8335,7 +8335,7 @@ void form::vrtclp() {
 		Clip       = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory) {
-			redclp();
+			thred::redclp();
 			CloseClipboard();
 			if (ClipRectSize.cy > CLPMIN) {
 				if (SelectedFormList->size()) {
@@ -8348,7 +8348,7 @@ void form::vrtclp() {
 					}
 					StateMap.reset(StateFlag::NOCLP);
 					StateMap.set(StateFlag::INIT);
-					coltab();
+					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
 				}
 				else {
@@ -8356,7 +8356,7 @@ void form::vrtclp() {
 						form::fvars(ClosestFormToCursor);
 						vrtsclp();
 						StateMap.set(StateFlag::INIT);
-						coltab();
+						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
 					}
 				}
@@ -8399,7 +8399,7 @@ void form::horclp() {
 		Clip       = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory) {
-			redclp();
+			thred::redclp();
 			CloseClipboard();
 			if (ClipRectSize.cy > CLPMIN) {
 				if (SelectedFormList->size()) {
@@ -8412,7 +8412,7 @@ void form::horclp() {
 					}
 					StateMap.set(StateFlag::NOCLP);
 					StateMap.set(StateFlag::INIT);
-					coltab();
+					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
 				}
 				else {
@@ -8420,7 +8420,7 @@ void form::horclp() {
 						form::fvars(ClosestFormToCursor);
 						horsclp();
 						StateMap.set(StateFlag::INIT);
-						coltab();
+						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
 					}
 				}
@@ -8462,7 +8462,7 @@ void form::angclp() {
 		Clip       = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory) {
-			redclp();
+			thred::redclp();
 			CloseClipboard();
 			if (ClipRectSize.cy > CLPMIN) {
 				if (SelectedFormList->size()) {
@@ -8475,7 +8475,7 @@ void form::angclp() {
 					}
 					StateMap.reset(StateFlag::NOCLP);
 					StateMap.set(StateFlag::INIT);
-					coltab();
+					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
 				}
 				else {
@@ -8483,7 +8483,7 @@ void form::angclp() {
 						SelectedForm = &FormList[ClosestFormToCursor];
 						angsclp();
 						StateMap.set(StateFlag::INIT);
-						coltab();
+						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
 					}
 				}
@@ -8517,13 +8517,13 @@ void form::dubfil() {
 			dubsfil();
 		}
 		StateMap.set(StateFlag::INIT);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			dubsfil();
-			coltab();
+			thred::coltab();
 			StateMap.set(StateFlag::INIT);
 			StateMap.set(StateFlag::RESTCH);
 		}
@@ -8644,7 +8644,7 @@ void form::chan() {
 void form::chain() {
 	if (displayText::filmsgs(FML_CHAIN))
 		return;
-	savdo();
+	thred::savdo();
 	if (SelectedFormList->size()) {
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
@@ -8652,7 +8652,7 @@ void form::chain() {
 			chan();
 		}
 		StateMap.set(StateFlag::INIT);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
@@ -8660,8 +8660,8 @@ void form::chain() {
 			form::fvars(ClosestFormToCursor);
 			chan();
 			StateMap.set(StateFlag::INIT);
-			coltab();
-			ritot(PCSHeader.stitchCount);
+			thred::coltab();
+			thred::ritot(PCSHeader.stitchCount);
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -8672,7 +8672,7 @@ void form::crop() {
 
 	displayText::frm1pnt();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		savdo();
+		thred::savdo();
 		form::fvars(ClosestFormToCursor);
 		iDestination = 0;
 		for (iSource = 0; iSource < PCSHeader.stitchCount; iSource++) {
@@ -8681,7 +8681,7 @@ void form::crop() {
 			}
 		}
 		PCSHeader.stitchCount = iDestination;
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
@@ -8715,8 +8715,8 @@ void form::filclpx() {
 		Clip       = RegisterClipboardFormat(PcdClipFormat);
 		ClipMemory = GetClipboardData(Clip);
 		if (ClipMemory) {
-			savdo();
-			redclp();
+			thred::savdo();
+			thred::redclp();
 			CloseClipboard();
 			if (ClipRectSize.cx > CLPMIN) {
 				if (SelectedFormList->size()) {
@@ -8726,14 +8726,14 @@ void form::filclpx() {
 						fi::fsclpx();
 					}
 					StateMap.set(StateFlag::INIT);
-					coltab();
+					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
 				}
 				else {
 					if (StateMap.test(StateFlag::FORMSEL)) {
 						fi::fsclpx();
 						StateMap.set(StateFlag::INIT);
-						coltab();
+						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
 					}
 				}
@@ -8754,7 +8754,7 @@ void form::srtfrm() {
 	std::vector<unsigned> histogram(FormIndex);
 
 	if (PCSHeader.stitchCount) {
-		savdo();
+		thred::savdo();
 		for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			iForm = (StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT;
 			histogram[iForm]++;
@@ -8773,7 +8773,7 @@ void form::srtfrm() {
 		}
 		std::copy(
 		    highStitchBuffer.cbegin(), highStitchBuffer.cend(), stdext::make_checked_array_iterator(StitchBuffer, MAXITEMS));
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 }

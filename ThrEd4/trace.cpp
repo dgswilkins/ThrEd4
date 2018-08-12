@@ -181,7 +181,7 @@ void trace::internal::getrmap() {
 	header.biBitCount    = 32;
 	header.biCompression = BI_RGB;
 	info.bmiHeader       = header;
-	TraceBitmap          = getBitmap(BitmapDC, &info, &TraceBitmapData);
+	TraceBitmap          = thred::getBitmap(BitmapDC, &info, &TraceBitmapData);
 	TraceDC              = CreateCompatibleDC(StitchWindowDC);
 	if (TraceBitmap && TraceDC) {
 		SelectObject(TraceDC, TraceBitmap);
@@ -373,7 +373,7 @@ void trace::trace() {
 		trace::untrace();
 		ti::tracwnd();
 		ti::getrmap();
-		if (px2stch() && !StateMap.testAndReset(StateFlag::WASTRCOL)) {
+		if (thred::px2stch() && !StateMap.testAndReset(StateFlag::WASTRCOL)) {
 			if (StateMap.test(StateFlag::LANDSCAP))
 				SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 			BitmapPoint.x    = BmpStitchRatio.x * SelectedPoint.x;
@@ -604,12 +604,12 @@ void trace::internal::dutdif(TRCPNT& traceDiff, const TRCPNT* point) noexcept {
 }
 
 void trace::internal::dutrac() {
-	if (px2stch()) {
+	if (thred::px2stch()) {
 		if (!StateMap.test(StateFlag::WASEDG)) {
 			trace::tracedg();
 			return;
 		}
-		savdo();
+		thred::savdo();
 		if (StateMap.test(StateFlag::LANDSCAP))
 			SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 		CurrentTracePoint.x = BmpStitchRatio.x * SelectedPoint.x;
@@ -767,7 +767,7 @@ void trace::internal::dutrac() {
 			displayText::tabmsg(IDS_FRMOVR);
 			return;
 		}
-		SelectedForm->vertices    = adflt(OutputIndex);
+		SelectedForm->vertices    = thred::adflt(OutputIndex);
 		SelectedForm->vertexCount = gsl::narrow<unsigned short>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = ActiveLayer << 1;
@@ -896,14 +896,14 @@ void trace::internal::dutrnum0(unsigned color) {
 	if (StateMap.test(StateFlag::TRNUP)) {
 		ti::ritrcol(&InvertUpColor, color);
 		UpPixelColor = InvertUpColor ^ 0xffffff;
-		redraw(TraceUpWindow[ColumnColor]);
+		thred::redraw(TraceUpWindow[ColumnColor]);
 	}
 	else {
 		ti::ritrcol(&InvertDownColor, color);
 		DownPixelColor = InvertDownColor ^ 0xffffff;
-		redraw(TraceDownWindow[ColumnColor]);
+		thred::redraw(TraceDownWindow[ColumnColor]);
 	}
-	redraw(TraceControlWindow[ColumnColor]);
+	thred::redraw(TraceControlWindow[ColumnColor]);
 	DestroyWindow(TraceNumberInput);
 	StateMap.set(StateFlag::WASTRCOL);
 	trace::trace();
@@ -1060,14 +1060,14 @@ void trace::tracpar() {
 					DownPixelColor |= position << TraceShift[ColumnColor];
 				}
 			} while (false);
-			redraw(TraceControlWindow[ColumnColor]);
+			thred::redraw(TraceControlWindow[ColumnColor]);
 			trace::trace();
 		}
 		else {
 			const unsigned int position = floor(TraceMsgPoint.y / ButtonHeight);
 			if (position < 16) {
 				StateMap.flip(TraceRGBFlag[ColumnColor]);
-				redraw(TraceSelectWindow[ColumnColor]);
+				thred::redraw(TraceSelectWindow[ColumnColor]);
 				trace::trace();
 			}
 			else {
@@ -1106,7 +1106,7 @@ void trace::tracpar() {
 							trace::trdif();
 							break;
 						case 21:
-							hidbit();
+							thred::hidbit();
 							break;
 						case 22:
 							trace::blak();
@@ -1126,7 +1126,7 @@ void trace::tracpar() {
 }
 
 void trace::internal::trcnum(unsigned shift, COLORREF color, unsigned iRGB) {
-	const unsigned NumeralWidth = txtWid(L"0");
+	const unsigned NumeralWidth = thred::txtWid(L"0");
 
 	wchar_t buffer[11] = { 0 };
 
@@ -1255,10 +1255,10 @@ void trace::traceNumberInput(unsigned NumericCode) {
 		ti::dutrnum0(traceColor);
 		break;
 	}
-	redraw(TraceNumberInput);
+	thred::redraw(TraceNumberInput);
 }
 
 void trace::traceNumberReset() noexcept {
 	TraceInputBuffer[MsgIndex] = 0;
-	redraw(TraceNumberInput);
+	thred::redraw(TraceNumberInput);
 }

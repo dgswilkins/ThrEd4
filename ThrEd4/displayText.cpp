@@ -440,7 +440,7 @@ void displayText::internal::hlpflt(unsigned iButton, unsigned iMessage, float da
 void displayText::drwtxbut(const TXTSCR& textureScreen) {
 	di::bxtxt(HTXCLR, IDS_CLEAR);
 	di::hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight / PFGRAN);
-	redraw((*ButtonWin)[HTXWID]);
+	thred::redraw((*ButtonWin)[HTXWID]);
 	di::hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing / PFGRAN);
 	di::bxtxt(HTXVRT, IDS_TXVRT);
 	di::bxtxt(HTXHOR, IDS_TXHOR);

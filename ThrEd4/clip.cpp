@@ -264,9 +264,9 @@ void clip::internal::lincrnr(const std::vector<fPOINT>& clipReversedData,
 		delta.x                    = moveToCoords.x - SelectedPoint.x;
 		delta.y                    = moveToCoords.y - SelectedPoint.y;
 		const double rotationAngle = atan2(delta.y, delta.x);
-		rotangf(BorderClipReference, ClipReference, rotationAngle, rotationCenter);
+		thred::rotangf(BorderClipReference, ClipReference, rotationAngle, rotationCenter);
 		for (size_t iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotangf(clipReversedData[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
+			thred::rotangf(clipReversedData[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
 		ci::ritclp(clipFillData, SelectedPoint);
 		SelectedPoint = moveToCoords;
 	}
@@ -284,9 +284,9 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
 	const unsigned clipCount = floor(length / ClipRectSize.cx);
 
 	if (clipCount) {
-		rotangf(BorderClipReference, ClipReference, clipAngle, rotationCenter);
+		thred::rotangf(BorderClipReference, ClipReference, clipAngle, rotationCenter);
 		for (size_t iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotangf(clipReversedData[iStitch], clipFillData[iStitch], clipAngle, rotationCenter);
+			thred::rotangf(clipReversedData[iStitch], clipFillData[iStitch], clipAngle, rotationCenter);
 		for (auto iClip = 0u; iClip < clipCount; iClip++) {
 			ci::ritclp(clipFillData, SelectedPoint);
 			SelectedPoint.x += vector0.x;
@@ -321,7 +321,7 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 	const fPOINTATTR clipReferencePoint = { ClipRect.left, ClipRect.bottom };
 	const double     rotationAngle      = atan2(delta.y, delta.x);
 
-	rotang1(clipReferencePoint, ClipReference, rotationAngle, rotationCenter);
+	thred::rotang1(clipReferencePoint, ClipReference, rotationAngle, rotationCenter);
 	const unsigned int clipCount = floor(length / ClipRectSize.cx);
 	if (clipCount) {
 		float remainder = 0.0;
@@ -332,7 +332,7 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 		const fPOINT step        = { delta.x * remainder, delta.y * remainder };
 		auto         insertPoint = begin;
 		for (size_t index = 0; index < ClipStitchCount; index++)
-			rotangf(clipReversedData[index], clipFillData[index], rotationAngle, rotationCenter);
+			thred::rotangf(clipReversedData[index], clipFillData[index], rotationAngle, rotationCenter);
 		for (auto stepCount = 0u; stepCount < clipCount; stepCount++) {
 			if (ci::ritclp(clipFillData, insertPoint))
 				break;
@@ -619,7 +619,7 @@ void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
 	const double rotationAngle = atan2(delta.y, delta.x);
 	for (size_t iPoint = 0; iPoint < ClipStitchCount; iPoint++) {
 		points[iPoint] = tempClipPoints[iPoint];
-		rotflt(points[iPoint], rotationAngle, rotationCenter);
+		thred::rotflt(points[iPoint], rotationAngle, rotationCenter);
 		OSequence[SequenceIndex].x   = chainEndPoints[start].x + points[iPoint].x;
 		OSequence[SequenceIndex++].y = chainEndPoints[start].y + points[iPoint].y;
 	}
@@ -657,9 +657,9 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, size_t vertex, c
 	}
 	const double     rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
 	const fPOINTATTR referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
-	rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
+	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	for (size_t iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-		rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
+		thred::rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
 	const auto length = hypot(delta.x, delta.y);
 	const auto ratio  = form::getplen() / length;
 	delta.x *= ratio;
@@ -690,7 +690,7 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 	spacing += ClipRectSize.cx;
 	const unsigned int count = length / spacing;
 	rotationAngle            = atan2(delta.y, delta.x);
-	rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
+	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	if (count) {
 		dPOINT step = {};
 		if (count > 1) {
@@ -698,7 +698,7 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 			step            = { delta.x * tdub, delta.y * tdub };
 		}
 		for (size_t iStitch = 0; iStitch < ClipStitchCount; iStitch++)
-			rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
+			thred::rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
 		bool   flag       = true;
 		fPOINT innerPoint = { CurrentFormVertices[start].x, CurrentFormVertices[start].y };
 		for (size_t iStep = 0; iStep < count - 1; iStep++) {

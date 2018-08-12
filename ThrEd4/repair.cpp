@@ -48,7 +48,7 @@ void repair::internal::adbad(std::wstring& repairMessage, unsigned code, size_t 
 void repair::lodchk() {
 	unsigned attribute = 0;
 
-	delinf();
+	thred::delinf();
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		SelectedForm = &FormList[iForm];
 		if (!SelectedForm->type)
@@ -396,7 +396,7 @@ void repair::repar() {
 	std::wstring   repairMessage;
 	const unsigned repairType = ri::frmchkfn();
 
-	savdo();
+	thred::savdo();
 	// RepairString = MsgBuffer;
 	if (repairType & BADFLT)
 		ri::repflt(repairMessage);

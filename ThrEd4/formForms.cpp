@@ -463,7 +463,7 @@ void formForms::refrm() {
 		           LabelWindowSize.x + ValueWindowSize.x + 18,
 		           LabelWindowSize.y * FormMenuEntryCount + 12,
 		           TRUE);
-		redraw(FormDataSheet);
+		thred::redraw(FormDataSheet);
 	}
 	else {
 		FormDataSheet = CreateWindow(L"STATIC",
@@ -488,7 +488,7 @@ void formForms::sidwnd(HWND wnd) noexcept {
 	MsgIndex                       = 0;
 	SideWindowEntryBuffer[0]       = 0;
 	const unsigned int savedChoice = FormMenuChoice;
-	unsid();
+	thred::unsid();
 	FormMenuChoice = savedChoice;
 	GetWindowRect(wnd, &windowRect);
 	GetWindowRect(FormDataSheet, &MsgRect);
@@ -510,7 +510,7 @@ void formForms::prfsid(HWND wnd) noexcept {
 
 	MsgIndex                 = 0;
 	SideWindowEntryBuffer[0] = 0;
-	unsid();
+	thred::unsid();
 	GetWindowRect(wnd, &windowRect);
 	GetClientRect(PreferencesWindow, &MsgRect);
 	SideMessageWindow = CreateWindow(L"STATIC",
@@ -570,8 +570,8 @@ void formForms::prfmsg() {
 	StateMap.reset(StateFlag::BIGBOX);
 	SelectedFormList->clear();
 	if (FormDataSheet) {
-		undat();
-		unsid();
+		thred::undat();
+		thred::unsid();
 		FormMenuChoice = 0;
 	}
 	LabelWindowSize.x = LabelWindowSize.y = 0;
@@ -617,7 +617,7 @@ void formForms::prfmsg() {
 		choice = (*StringTable)[STR_PNTD];
 	ffi::prflin(choice, STR_PRF2);
 	ffi::prflin(fmt::format(L"{:.2f}", (LineSpacing / PFGRAN)), STR_PRF0);
-	ffi::prflin(fmt::format(L"{}", (duthrsh(ShowStitchThreshold))), STR_PRF7);
+	ffi::prflin(fmt::format(L"{}", (thred::duthrsh(ShowStitchThreshold))), STR_PRF7);
 	ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize / PFGRAN)), STR_PRF20);
 	form::sethup();
 	ffi::prflin(fmt::format(L"{}", (*StringTable)[STR_HUP0 + IniFile.hoopType - 1]), STR_PRF17);
@@ -639,7 +639,7 @@ void formForms::prfmsg() {
 	ffi::prflin(fmt::format(L"{:.2f}", (SnapLength / PFGRAN)), STR_PRF11);
 	ffi::prflin(fmt::format(L"{:.2f}", (SpiralWrap)), STR_PRF13);
 	ffi::prflin(fmt::format(L"{:.2f}", (StarRatio)), STR_PRF12);
-	ffi::prflin(fmt::format(L"{}", (duthrsh(StitchBoxesThreshold))), STR_PRF8);
+	ffi::prflin(fmt::format(L"{}", (thred::duthrsh(StitchBoxesThreshold))), STR_PRF8);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.maxStitchLength / PFGRAN)), STR_PRF4);
 	ffi::prflin(fmt::format(L"{:.2f}", (UserStitchLength / PFGRAN)), STR_PRF5);
 	ffi::prflin(fmt::format(L"{:.2f}", (MinStitchLength / PFGRAN)), STR_PRF6);
@@ -775,7 +775,7 @@ BOOL CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 void formForms::dasyfrm() {
 	double angle = 0.0;
 
-	unmsg();
+	thred::unmsg();
 	if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, (DLGPROC)ffi::dasyproc)) {
 		StateMap.reset(StateFlag::FORMIN);
 		return;
@@ -960,7 +960,7 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 }
 
 void formForms::setear() {
-	unmsg();
+	thred::unmsg();
 	const INT_PTR nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, (DLGPROC)ffi::tearprc);
 	if (nResult > 0) {
 		auto twistStep = IniFile.tearTwistStep;
@@ -1078,7 +1078,7 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 }
 
 void formForms::wavfrm() {
-	unmsg();
+	thred::unmsg();
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, (DLGPROC)ffi::wavprc)) {
 		std::vector<fPOINT> points(IniFile.wavePoints);
 		const auto          saveIndex = FormVertexIndex;
@@ -1120,7 +1120,7 @@ void formForms::wavfrm() {
 		const double rotationAngle   = -atan2(CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y,
                                             CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x);
 		for (size_t index = 0u; index < vertexCount; index++) {
-			rotflt(CurrentFormVertices[index], rotationAngle, { 0.0, 0.0 });
+			thred::rotflt(CurrentFormVertices[index], rotationAngle, { 0.0, 0.0 });
 		}
 		SelectedForm->type        = FRMLINE;
 		SelectedForm->vertexCount = vertexCount;

@@ -414,7 +414,7 @@ void xt::fethrf() {
 void xt::fethr() {
 	if (displayText::filmsgs(FMM_FTH))
 		return;
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xt::fethrf();
 	}
@@ -425,7 +425,7 @@ void xt::fethr() {
 		}
 	}
 	StateMap.set(StateFlag::INIT);
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -508,7 +508,7 @@ void xt::pes2crd() {
 	};
 
 	if (PCSHeader.stitchCount)
-		save();
+		thred::save();
 	else {
 		displayText::tabmsg(IDS_P2CNODAT);
 		return;
@@ -847,7 +847,7 @@ void xt::srtcol() {
 void xt::dubit(unsigned bit) {
 	unsigned code = 0;
 
-	savdo();
+	thred::savdo();
 	StateMap.set(StateFlag::WASDO);
 	if (SelectedForm->type == FRMLINE)
 		SelectedForm->type = FRMFPOLY;
@@ -868,7 +868,7 @@ void xt::dubit(unsigned bit) {
 	else
 		SelectedForm->extendedAttribute |= bit;
 	form::refil();
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1137,7 +1137,7 @@ void xt::fsort() {
 
 	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors
 	//        in a single form are not in ascending order already.
-	savdo();
+	thred::savdo();
 	stitchRegion[0].start       = 0;
 	stitchRegion[0].startStitch = StitchBuffer;
 	ColorOrder[AppliqueColor]   = 0;
@@ -1233,7 +1233,7 @@ void xt::fsort() {
 		}
 		std::copy(tempStitchBuffer.cbegin(), tempStitchBuffer.cbegin() + OutputIndex, StitchBuffer);
 		PCSHeader.stitchCount = gsl::narrow<unsigned short>(OutputIndex);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
@@ -1589,11 +1589,11 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 		xi::chkend(0, code, ilData);
 	}
 	PCSHeader.stitchCount = ilData.output;
-	coltab();
+	thred::coltab();
 }
 
 void xt::internal::setundfn(unsigned code) {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		form::fvars(ClosestFormToCursor);
 		if (SelectedForm->type != FRMLINE) {
@@ -1618,7 +1618,7 @@ void xt::internal::setundfn(unsigned code) {
 			}
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1635,7 +1635,7 @@ void xt::setcwlk() {
 }
 
 void xt::internal::notundfn(unsigned code) {
-	savdo();
+	thred::savdo();
 	code = ~code;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		form::fvars(ClosestFormToCursor);
@@ -1661,7 +1661,7 @@ void xt::internal::notundfn(unsigned code) {
 			}
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1687,7 +1687,7 @@ void xt::internal::ulenfn(size_t find, float length) {
 }
 
 void xt::dusulen(float length) {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::ulenfn(ClosestFormToCursor, length);
 	}
@@ -1696,7 +1696,7 @@ void xt::dusulen(float length) {
 			xi::ulenfn(selectedForm, length);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1717,7 +1717,7 @@ void xt::internal::uspacfn(size_t find, float spacing) {
 }
 
 void xt::duspac(float spacing) {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::uspacfn(ClosestFormToCursor, spacing);
 	}
@@ -1726,7 +1726,7 @@ void xt::duspac(float spacing) {
 			xi::uspacfn(selectedForm, spacing);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1747,7 +1747,7 @@ void xt::internal::uangfn(size_t find, float angle) {
 }
 
 void xt::dufang(float angle) {
-	savdo();
+	thred::savdo();
 	angle *= (float)PI / 180;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::uangfn(ClosestFormToCursor, angle);
@@ -1757,7 +1757,7 @@ void xt::dufang(float angle) {
 			xi::uangfn(selectedForm, angle);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1778,7 +1778,7 @@ void xt::internal::flenfn(size_t find, float length) {
 }
 
 void xt::duflen(float length) {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::flenfn(ClosestFormToCursor, length);
 	}
@@ -1787,7 +1787,7 @@ void xt::duflen(float length) {
 			xi::flenfn(selectedForm, length);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1812,7 +1812,7 @@ void xt::internal::fspacfn(size_t find, float spacing) {
 }
 
 void xt::dufspac(float spacing) {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::fspacfn(ClosestFormToCursor, spacing);
 	}
@@ -1821,7 +1821,7 @@ void xt::dufspac(float spacing) {
 			xi::fspacfn(selectedForm, spacing);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1841,7 +1841,7 @@ void xt::internal::findfn(size_t find, float indent) {
 }
 
 void xt::dufind(float indent) {
-	savdo();
+	thred::savdo();
 	indent *= PFGRAN;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::findfn(ClosestFormToCursor, indent);
@@ -1851,7 +1851,7 @@ void xt::dufind(float indent) {
 			xi::findfn(selectedForm, indent);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1879,7 +1879,7 @@ void xt::internal::fangfn(size_t find, float angle) {
 }
 
 void xt::dufxang(float angle) {
-	savdo();
+	thred::savdo();
 	angle *= (float)PI / 180;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::fangfn(ClosestFormToCursor, angle);
@@ -1889,7 +1889,7 @@ void xt::dufxang(float angle) {
 			xi::fangfn(selectedForm, angle);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1910,7 +1910,7 @@ void xt::internal::ucolfn(size_t find, unsigned color) {
 }
 
 void xt::dundcol(unsigned color) {
-	savdo();
+	thred::savdo();
 	if (color)
 		color--;
 	color &= COLMSK;
@@ -1922,7 +1922,7 @@ void xt::dundcol(unsigned color) {
 			xi::ucolfn(selectedForm, color);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1943,7 +1943,7 @@ void xt::internal::fcolfn(size_t find, unsigned color) {
 }
 
 void xt::dufcol(unsigned color) {
-	savdo();
+	thred::savdo();
 	if (color)
 		color--;
 	color &= COLMSK;
@@ -1955,7 +1955,7 @@ void xt::dufcol(unsigned color) {
 			xi::fcolfn(selectedForm, color);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1976,7 +1976,7 @@ void xt::internal::bcolfn(size_t find, unsigned color) {
 }
 
 void xt::dubcol(unsigned color) {
-	savdo();
+	thred::savdo();
 	if (color)
 		color--;
 	color &= COLMSK;
@@ -1988,7 +1988,7 @@ void xt::dubcol(unsigned color) {
 			xi::bcolfn(selectedForm, color);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -2009,7 +2009,7 @@ void xt::internal::blenfn(size_t find, float length) {
 }
 
 void xt::dublen(float length) {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::blenfn(ClosestFormToCursor, length);
 	}
@@ -2018,7 +2018,7 @@ void xt::dublen(float length) {
 			xi::blenfn(selectedForm, length);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -2039,7 +2039,7 @@ void xt::internal::bspacfn(size_t find, float length) {
 }
 
 void xt::dubspac(float length) {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::bspacfn(ClosestFormToCursor, length);
 	}
@@ -2048,7 +2048,7 @@ void xt::dubspac(float length) {
 			xi::bspacfn(selectedForm, length);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -2069,7 +2069,7 @@ void xt::internal::bminfn(size_t find, float length) {
 }
 
 void xt::dubmin(float length) {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::bminfn(ClosestFormToCursor, length);
 	}
@@ -2078,7 +2078,7 @@ void xt::dubmin(float length) {
 			xi::bminfn(selectedForm, length);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -2099,7 +2099,7 @@ void xt::internal::bmaxfn(size_t find, float length) {
 }
 
 void xt::dubmax(float length) {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::bmaxfn(ClosestFormToCursor, length);
 	}
@@ -2108,7 +2108,7 @@ void xt::dubmax(float length) {
 			xi::bmaxfn(selectedForm, length);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -2129,7 +2129,7 @@ void xt::internal::fminfn(size_t find, float length) {
 }
 
 void xt::dufmin(float length) {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::fminfn(ClosestFormToCursor, length);
 	}
@@ -2138,7 +2138,7 @@ void xt::dufmin(float length) {
 			xi::fminfn(selectedForm, length);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -2159,7 +2159,7 @@ void xt::internal::fmaxfn(size_t find, float length) {
 }
 
 void xt::dufmax(float length) {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::fmaxfn(ClosestFormToCursor, length);
 	}
@@ -2168,7 +2168,7 @@ void xt::dufmax(float length) {
 			xi::fmaxfn(selectedForm, length);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -2195,7 +2195,7 @@ void xt::internal::fwidfn(size_t find, float length) {
 }
 
 void xt::dufwid(float length) {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::fwidfn(ClosestFormToCursor, length);
 	}
@@ -2204,7 +2204,7 @@ void xt::dufwid(float length) {
 			xi::fwidfn(selectedForm, length);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -2238,7 +2238,7 @@ void xt::internal::fhifn(size_t find, float length) {
 }
 
 void xt::dufhi(float length) {
-	savdo();
+	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::fhifn(ClosestFormToCursor, length);
 	}
@@ -2247,7 +2247,7 @@ void xt::dufhi(float length) {
 			xi::fhifn(selectedForm, length);
 		}
 	}
-	coltab();
+	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -2263,7 +2263,7 @@ void xt::setfilstrt() {
 		FormList[ClosestFormToCursor].fillStart = gsl::narrow<unsigned short>(ClosestVertexToCursor);
 		FormList[ClosestFormToCursor].extendedAttribute |= AT_STRT;
 		form::refil();
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
@@ -2275,7 +2275,7 @@ void xt::setfilend() {
 		FormList[ClosestFormToCursor].fillEnd = gsl::narrow<unsigned short>(ClosestVertexToCursor);
 		FormList[ClosestFormToCursor].extendedAttribute |= AT_END;
 		form::refil();
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else
@@ -2320,10 +2320,10 @@ void xt::internal::rtrclpfn() {
 			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, count * sizeof(CLPSTCH) + 2);
 			if (ClipPointer) {
 				ClipStitchData = *(static_cast<CLPSTCH**>(ClipPointer));
-				rtclpfn(0, 0);
+				thred::rtclpfn(0, 0);
 				ClipStitchData[0].led = count;
 				for (size_t iStitch = 1; iStitch < count; iStitch++)
-					rtclpfn(iStitch, iStitch);
+					thred::rtclpfn(iStitch, iStitch);
 				SetClipboardData(Clip, ClipPointer);
 			}
 			CloseClipboard();
@@ -2441,15 +2441,15 @@ void xt::nudsiz() {
 	unsigned   iForm          = 0;
 	fRECTANGLE designSizeRect = {}; // design size rectangle
 
-	savdo();
+	thred::savdo();
 	flag = 0;
 	if (PCSHeader.stitchCount) {
-		stchrct(designSizeRect);
+		thred::stchrct(designSizeRect);
 		flag = 1;
 	}
 	else {
 		if (FormIndex) {
-			frmrct(designSizeRect);
+			thred::frmrct(designSizeRect);
 			flag = 2;
 		}
 	}
@@ -2472,8 +2472,8 @@ void xt::nudsiz() {
 			if (UserFlagMap.test(UserFlag::CHREF))
 				form::refilal();
 			if (flag) {
-				movStch();
-				zumhom();
+				thred::movStch();
+				thred::zumhom();
 				displayText::hsizmsg();
 			}
 			form::centir();
@@ -2490,7 +2490,7 @@ void xt::dushft() {
 	ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
 	ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 	ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
-	px2stch();
+	thred::px2stch();
 	ZoomBoxOrigin = SelectedPoint;
 }
 
@@ -2501,11 +2501,11 @@ void xt::mvshft() {
 		if (Msg.wParam & MK_LBUTTON) {
 			if (StateMap.testAndSet(StateFlag::VCAPT))
 				SetCapture(ThrEdWindow);
-			unbBox();
+			thred::unbBox();
 			ZoomBoxLine[1].x = ZoomBoxLine[2].x = Msg.pt.x - StitchWindowOrigin.x;
 			ZoomBoxLine[2].y = ZoomBoxLine[3].y = Msg.pt.y - StitchWindowOrigin.y;
 			StateMap.set(StateFlag::BZUM);
-			bBox();
+			thred::bBox();
 		}
 	}
 }
@@ -2531,13 +2531,13 @@ void xt::clrstch() noexcept {
 
 void xt::chgwrn() {
 	UserFlagMap.flip(UserFlag::WRNOF);
-	wrnmen();
+	thred::wrnmen();
 	StateMap.set(StateFlag::DUMEN);
 }
 
 void xt::chgchk(int code) {
 	IniFile.dataCheck = code;
-	chkmen();
+	thred::chkmen();
 	StateMap.set(StateFlag::DUMEN);
 }
 

@@ -250,7 +250,7 @@ void texture::dutxtfil() {
 	StateMap.set(StateFlag::ZUMED);
 	StateMap.reset(StateFlag::WASPAT);
 	StateMap.reset(StateFlag::RUNPAT);
-	movStch();
+	thred::movStch();
 	ShowWindow(VerticalScrollBar, FALSE);
 	ShowWindow(HorizontalScrollBar, FALSE);
 	SelectedTexturePointsList->clear();
@@ -1043,14 +1043,14 @@ void texture::internal::altx() {
 
 void texture::txof() {
 	displayText::butxt(HBOXSEL, (*StringTable)[STR_BOXSEL]);
-	redraw((*ButtonWin)[HHID]);
+	thred::redraw((*ButtonWin)[HHID]);
 	if (StateMap.test(StateFlag::UPTO))
 		displayText::butxt(HUPTO, (*StringTable)[STR_UPON]);
 	else
 		displayText::butxt(HUPTO, (*StringTable)[STR_UPOF]);
 	SetWindowText((*ButtonWin)[HTXSPAC], L"");
 	texture::savtxt();
-	zumhom();
+	thred::zumhom();
 	SelectedTexturePointsList->clear();
 	SelectedTexturePointsList->shrink_to_fit();
 	StateMap.reset(StateFlag::TXTRED);
@@ -1539,12 +1539,12 @@ void texture::setshft() {
 	fRECTANGLE selectionRect = {};
 
 	texture::savtxt();
-	unbBox();
+	thred::unbBox();
 	StateMap.reset(StateFlag::BZUMIN);
-	pxCor2stch(ZoomBoxLine[0]);
+	thred::pxCor2stch(ZoomBoxLine[0]);
 	selectionRect.top  = SelectedPoint.y;
 	selectionRect.left = SelectedPoint.x;
-	pxCor2stch(ZoomBoxLine[2]);
+	thred::pxCor2stch(ZoomBoxLine[2]);
 	selectionRect.bottom = SelectedPoint.y;
 	selectionRect.right  = SelectedPoint.x;
 	StateMap.reset(StateFlag::TXIN);

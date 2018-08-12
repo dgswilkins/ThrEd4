@@ -186,7 +186,7 @@ void satin::internal::satclos() {
 	double   deltaX = 0.0, deltaY = 0.0, length = 0.0, minimumLength = 1e99;
 
 	form::uninsf();
-	px2stch();
+	thred::px2stch();
 	for (iVertex = 0; iVertex < SelectedForm->vertexCount; iVertex++) {
 		deltaX = SelectedPoint.x - SelectedForm->vertices[iVertex].x;
 		deltaY = SelectedPoint.y - SelectedForm->vertices[iVertex].y;
@@ -277,7 +277,7 @@ bool satin::internal::satselfn() noexcept {
 	double   length = 0, minimumLength = 1e99;
 	double   deltaX = 0.0, deltaY = 0.0;
 
-	px2stch();
+	thred::px2stch();
 	for (iForm = 0; iForm < FormIndex; iForm++) {
 		layerCode = (FormList[iForm].attribute & FRMLMSK) >> 1;
 		if (!ActiveLayer || !layerCode || layerCode == ActiveLayer) {
@@ -302,7 +302,7 @@ bool satin::internal::satselfn() noexcept {
 void satin::satsel() {
 	if (si::satselfn()) {
 		form::fvars(ClosestFormToCursor);
-		duzrat();
+		thred::duzrat();
 		StartPoint = ClosestVertexToCursor;
 		form::sfCor2px(SelectedForm->vertices[ClosestVertexToCursor], FormLines[0]);
 		StateMap.reset(StateFlag::SHOCON);
@@ -519,7 +519,7 @@ void satin::delcon(unsigned GuideIndex) {
 		CurrentFormGuidesCount = SelectedForm->satinGuideCount;
 		if (SelectedForm->fillType == SATF)
 			form::refil();
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 }
@@ -532,9 +532,9 @@ void satin::delspnt() {
 	form::fvars(ClosestFormToCursor);
 	if (form::chkdel()) {
 		StateMap.set(StateFlag::DELTO);
-		frmdel();
+		thred::frmdel();
 		StateMap.reset(StateFlag::FRMPSEL);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 		return;
 	}
@@ -584,12 +584,12 @@ void satin::delspnt() {
 	StateMap.set(StateFlag::FRMPSEL);
 	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 		FormList[iForm].vertices--;
-	ritfcor(CurrentFormVertices[ClosestVertexToCursor]);
+	thred::ritfcor(CurrentFormVertices[ClosestVertexToCursor]);
 	displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
 	form::frmout(ClosestFormToCursor);
 	vertex = SelectedForm->vertices[ClosestVertexToCursor];
 	if (vertex.x < ZoomRect.left || vertex.x > ZoomRect.right || vertex.y < ZoomRect.bottom || vertex.y > ZoomRect.top)
-		shft(vertex);
+		thred::shft(vertex);
 	form::refil();
 }
 
@@ -619,7 +619,7 @@ void satin::satbrd() {
 			si::satsbrd();
 		}
 		StateMap.set(StateFlag::INIT);
-		coltab();
+		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
@@ -631,8 +631,8 @@ void satin::satbrd() {
 				SelectedForm->attribute &= NOBLNT;
 			si::satsbrd();
 			StateMap.set(StateFlag::INIT);
-			coltab();
-			ritot(PCSHeader.stitchCount);
+			thred::coltab();
+			thred::ritot(PCSHeader.stitchCount);
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -681,7 +681,7 @@ void satin::ribon() {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		form::fvars(ClosestFormToCursor);
 		if (VertexCount > 2) {
-			savdo();
+			thred::savdo();
 			savedFormIndex = ClosestFormToCursor;
 			satin::satout(BorderWidth);
 
@@ -700,7 +700,7 @@ void satin::ribon() {
 					else
 						isBlunt = 0;
 					si::satends(isBlunt);
-					formHeader->vertices                 = adflt(VertexCount << 1);
+					formHeader->vertices                 = thred::adflt(VertexCount << 1);
 					formHeader->vertices[0].x            = (*OutsidePoints)[0].x;
 					formHeader->vertices[iNewVertex++].y = (*OutsidePoints)[0].y;
 					for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
@@ -711,7 +711,7 @@ void satin::ribon() {
 					}
 				}
 				else {
-					formHeader->vertices                 = adflt((VertexCount << 1) + 2);
+					formHeader->vertices                 = thred::adflt((VertexCount << 1) + 2);
 					formHeader->vertices[0].x            = (*OutsidePoints)[0].x;
 					formHeader->vertices[iNewVertex++].y = (*OutsidePoints)[0].y;
 					formHeader->underlayIndent           = IniFile.underlayIndent;
@@ -757,7 +757,7 @@ void satin::ribon() {
 				form::refilfn();
 				ClosestFormToCursor = savedFormIndex;
 				StateMap.set(StateFlag::DELTO);
-				frmdel();
+				thred::frmdel();
 				ClosestFormToCursor = FormIndex - 1;
 				StateMap.set(StateFlag::FORMSEL);
 				StateMap.set(StateFlag::INIT);
@@ -1135,7 +1135,7 @@ void satin::satfix() {
 	unsigned iVertex = 0;
 
 	if (SatinIndex > 1) {
-		FormList[FormIndex].vertices = adflt(SatinIndex);
+		FormList[FormIndex].vertices = thred::adflt(SatinIndex);
 		for (iVertex = 0; iVertex < SatinIndex; iVertex++) {
 			FormList[FormIndex].vertices[iVertex] = (*TempPolygon)[iVertex];
 		}
@@ -1166,7 +1166,7 @@ void satin::internal::unsat() {
 
 void satin::drwsat() {
 	si::unsat();
-	px2stch();
+	thred::px2stch();
 	FormLines[SatinIndex].x = Msg.pt.x - StitchWindowOrigin.x;
 	FormLines[SatinIndex].y = Msg.pt.y - StitchWindowOrigin.y;
 	StateMap.set(StateFlag::SHOSAT);
@@ -1174,7 +1174,7 @@ void satin::drwsat() {
 }
 
 void satin::satpnt0() {
-	px2stch();
+	thred::px2stch();
 	FormLines[0].x = Msg.pt.x - StitchWindowOrigin.x;
 	FormLines[0].y = Msg.pt.y - StitchWindowOrigin.y;
 	TempPolygon->push_back(SelectedPoint);
@@ -1184,7 +1184,7 @@ void satin::satpnt0() {
 
 void satin::satpnt1() {
 	si::unsat();
-	px2stch();
+	thred::px2stch();
 	FormLines[SatinIndex].x = Msg.pt.x - StitchWindowOrigin.x;
 	FormLines[SatinIndex].y = Msg.pt.y - StitchWindowOrigin.y;
 	satin::dusat();
@@ -1309,7 +1309,7 @@ void satin::internal::sfn(size_t startVertex) {
 
 void satin::satzum() {
 	StateMap.reset(StateFlag::SHOSAT);
-	duzrat();
+	thred::duzrat();
 	VertexCount = SatinIndex;
 	form::frmlin(*TempPolygon);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
