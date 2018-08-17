@@ -18,8 +18,10 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#pragma warning(disable : 4127)  // supress warning for fmt library header
+#pragma warning(disable : 6387)  // supress warning for fmt library header
+#pragma warning(disable : 26455) // supress warning for library headers
 #include <boost/dynamic_bitset.hpp>
-#pragma warning(disable : 4127) // supress warning for fmt library header
 #include <fmt/format.h>
 #pragma warning(pop)
 
@@ -450,7 +452,8 @@ int xt::internal::fil2crd(const fs::path& fileName) {
 	wcscpy_s(command, L"\"");
 	startupInfo    = {};
 	startupInfo.cb = sizeof(startupInfo);
-	if (!CreateProcess(0, command, 0, 0, 0, NORMAL_PRIORITY_CLASS, 0, 0, &startupInfo, &processInfo)) {
+	if (!CreateProcess(
+	        nullptr, command, nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS, nullptr, nullptr, &startupInfo, &processInfo)) {
 		errorCode = GetLastError();
 	}
 	else {
@@ -465,7 +468,7 @@ int xt::internal::fil2crd(const fs::path& fileName) {
 bool xt::internal::chkp2cnam(const wchar_t* fileName) noexcept {
 	HANDLE handleP2C;
 
-	handleP2C = CreateFile(fileName, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+	handleP2C = CreateFile(fileName, GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (handleP2C == INVALID_HANDLE_VALUE) {
 		return 0;
 	}
@@ -489,22 +492,22 @@ void xt::pes2crd() {
         ThrEdWindow,          // hwndOwner
         ThrEdInstance,        // hInstance
         filter,               // lpstrFilter
-        0,                    // lpstrCustomFilter
+        nullptr,              // lpstrCustomFilter
         0,                    // nMaxCustFilter
         0,                    // nFilterIndex
         programName,          // lpstrFile
         _MAX_PATH,            // nMaxFile
-        0,                    // lpstrFileTitle
+        nullptr,              // lpstrFileTitle
         0,                    // nMaxFileTitle
         L"C:\\",              // lpstr	ialDir
-        0,                    // lpstrTitle
+        nullptr,              // lpstrTitle
         0,                    // Flags
         0,                    // nFileOffset
         0,                    // nFileExtension
         L"exe",               // lpstrDefExt
         0,                    // lCustData
-        0,                    // lpfnHook
-        0,                    // lpTemplateName
+        nullptr,              // lpfnHook
+        nullptr,              // lpTemplateName
 	};
 
 	if (PCSHeader.stitchCount)
@@ -522,7 +525,7 @@ void xt::pes2crd() {
 	    == ERROR_SUCCESS) {
 		size    = _MAX_PATH;
 		keyType = REG_SZ;
-		if (RegQueryValueEx(registryKey, L"ProgramFilesDir", 0, &keyType, (unsigned char*)programName, &size) == ERROR_SUCCESS) {
+		if (RegQueryValueEx(registryKey, L"ProgramFilesDir", nullptr, &keyType, (unsigned char*)programName, &size) == ERROR_SUCCESS) {
 			wcscat_s(programName, L"\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
 			if (!xi::chkp2cnam(programName))
 				*programName = 0;

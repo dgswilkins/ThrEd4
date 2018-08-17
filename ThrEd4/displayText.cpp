@@ -15,7 +15,9 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127) // supress warning for fmt library header
+#pragma warning(disable : 4127)  // supress warning for fmt library header
+#pragma warning(disable : 6387)  // supress warning for fmt library header
+#pragma warning(disable : 26455) // supress warning for library headers
 #include <fmt/format.h>
 #pragma warning(pop)
 
@@ -102,9 +104,9 @@ void displayText::shoMsg(const std::wstring& message) {
 		                         messageSize.cx + 20,
 		                         messageSize.cy + 6,
 		                         MainStitchWin,
-		                         NULL,
+		                         nullptr,
 		                         ThrEdInstance,
-		                         NULL);
+		                         nullptr);
 	}
 }
 
@@ -132,16 +134,16 @@ void displayText::numWnd() noexcept {
 
 	GetClientRect(MsgWindow, &messageRect);
 	GeneralNumberInputBox = CreateWindow(L"STATIC",
-	                                     0,
+	                                     nullptr,
 	                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                     5,
 	                                     messageRect.bottom + 15,
 	                                     ButtonWidthX3,
 	                                     ButtonHeight,
 	                                     MainStitchWin,
-	                                     NULL,
+	                                     nullptr,
 	                                     ThrEdInstance,
-	                                     NULL);
+	                                     nullptr);
 	MsgIndex              = 0;
 	*MsgBuffer            = 0;
 }
@@ -342,9 +344,9 @@ void displayText::okcan() {
 	                        ButtonWidth << 2,
 	                        ButtonHeight,
 	                        MainStitchWin,
-	                        NULL,
+	                        nullptr,
 	                        ThrEdInstance,
-	                        NULL);
+	                        nullptr);
 
 	CancelButton = CreateWindow(L"STATIC",
 	                            (*StringTable)[STR_CANCEL].c_str(),
@@ -354,9 +356,9 @@ void displayText::okcan() {
 	                            ButtonWidthX3,
 	                            ButtonHeight,
 	                            MainStitchWin,
-	                            NULL,
+	                            nullptr,
 	                            ThrEdInstance,
-	                            NULL);
+	                            nullptr);
 }
 
 void displayText::savdisc() {
@@ -376,9 +378,9 @@ void displayText::savdisc() {
 	                        ButtonWidthX3,
 	                        ButtonHeight,
 	                        MainStitchWin,
-	                        NULL,
+	                        nullptr,
 	                        ThrEdInstance,
-	                        NULL);
+	                        nullptr);
 
 	LoadString(ThrEdInstance, IDS_DISC, buffer, HBUFSIZ);
 	DiscardButton = CreateWindow(L"STATIC",
@@ -389,9 +391,9 @@ void displayText::savdisc() {
 	                             ButtonWidthX3,
 	                             ButtonHeight,
 	                             MainStitchWin,
-	                             NULL,
+	                             nullptr,
 	                             ThrEdInstance,
-	                             NULL);
+	                             nullptr);
 
 	CancelButton = CreateWindow(L"STATIC",
 	                            (*StringTable)[STR_CANCEL].c_str(),
@@ -401,9 +403,9 @@ void displayText::savdisc() {
 	                            ButtonWidthX3,
 	                            ButtonHeight,
 	                            MainStitchWin,
-	                            NULL,
+	                            nullptr,
 	                            ThrEdInstance,
-	                            NULL);
+	                            nullptr);
 }
 
 void displayText::tomsg() {
@@ -420,9 +422,9 @@ void displayText::tomsg() {
 	                                    textSize.cx + 6,
 	                                    textSize.cy + 6,
 	                                    MainStitchWin,
-	                                    NULL,
+	                                    nullptr,
 	                                    ThrEdInstance,
-	                                    NULL);
+	                                    nullptr);
 }
 
 void displayText::internal::bxtxt(unsigned iButton, unsigned iMessage) {

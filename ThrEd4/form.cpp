@@ -15,7 +15,10 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127) // supress warning for fmt library header
+#pragma warning(disable : 4127)  // supress warning for fmt library header
+#pragma warning(disable : 6387)  // supress warning for fmt library header
+#pragma warning(disable : 26455) // supress warning for library headers
+#include <boost/dynamic_bitset.hpp>
 #include <fmt/format.h>
 #pragma warning(pop)
 
@@ -6907,16 +6910,16 @@ void form::internal::snpfn(const std::vector<unsigned>& xPoints, unsigned start,
 
 void form::internal::nutim(double size) noexcept {
 	TimeWindow     = CreateWindow(L"STATIC",
-                              0,
+                              nullptr,
                               WS_CHILD | WS_VISIBLE | WS_BORDER,
                               ButtonWidthX3,
                               0,
                               StitchWindowSize.x,
                               ButtonHeight,
                               ThrEdWindow,
-                              NULL,
+                              nullptr,
                               ThrEdInstance,
-                              NULL);
+                              nullptr);
 	TimeDC         = GetDC(TimeWindow);
 	TimeStep       = static_cast<double>(StitchWindowSize.x) / size;
 	TimePosition   = 0;

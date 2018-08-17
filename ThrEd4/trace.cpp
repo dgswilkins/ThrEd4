@@ -15,7 +15,9 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127) // supress warning for fmt library header
+#pragma warning(disable : 4127)  // supress warning for fmt library header
+#pragma warning(disable : 6387)  // supress warning for fmt library header
+#pragma warning(disable : 26455) // supress warning for library headers
 #include <fmt/format.h>
 #pragma warning(pop)
 
@@ -77,9 +79,9 @@ void trcsub(HWND* window, unsigned xCoordinate, unsigned yCoordinate, unsigned b
 		                       ButtonWidth,
 		                       buttonHeight,
 		                       ThrEdWindow,
-		                       NULL,
+		                       nullptr,
 		                       ThrEdInstance,
-		                       NULL);
+		                       nullptr);
 	}
 }
 
@@ -92,9 +94,9 @@ void trace::initTraceWindows() noexcept {
 	                            ButtonWidthX3,
 	                            ButtonHeight,
 	                            ThrEdWindow,
-	                            NULL,
+	                            nullptr,
 	                            ThrEdInstance,
-	                            NULL);
+	                            nullptr);
 	for (auto iRGB = 0; iRGB < 3; iRGB++) {
 		trcsub(&TraceControlWindow[iRGB], ButtonWidth * iRGB, 0, ButtonHeight * 15);
 		trcsub(&TraceSelectWindow[iRGB], ButtonWidth * iRGB, ButtonHeight * 15, ButtonHeight);
@@ -941,30 +943,30 @@ unsigned trace::internal::ducolm() {
 
 void trace::internal::trnumwnd0(int position) noexcept {
 	TraceNumberInput = CreateWindow(L"STATIC",
-	                                0,
+	                                nullptr,
 	                                SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                ButtonWidthX3,
 	                                position,
 	                                ButtonWidth,
 	                                ButtonHeight,
 	                                ThrEdWindow,
-	                                NULL,
+	                                nullptr,
 	                                ThrEdInstance,
-	                                NULL);
+	                                nullptr);
 }
 
 void trace::internal::trnumwnd1(int position) noexcept {
 	GeneralNumberInputBox = CreateWindow(L"STATIC",
-	                                     0,
+	                                     nullptr,
 	                                     WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                     ButtonWidthX3,
 	                                     position,
 	                                     ButtonWidthX3,
 	                                     ButtonHeight,
 	                                     ThrEdWindow,
-	                                     NULL,
+	                                     nullptr,
 	                                     ThrEdInstance,
-	                                     NULL);
+	                                     nullptr);
 }
 
 void trace::internal::stch2bit(fPOINT& point) {

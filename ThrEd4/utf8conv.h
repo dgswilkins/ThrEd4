@@ -35,7 +35,10 @@
 #include <string> // For std::string and std::wstring
 #include <codecvt>
 
+
 namespace utf {
+#pragma warning(push)
+#pragma warning(disable : 26477) // supress warning for _ASSERTE
 
 inline std::wstring Utf8ToUtf16(const std::string& utf8) {
 	std::wstring utf16;
@@ -63,5 +66,6 @@ inline std::string Utf16ToUtf8(const std::wstring& utf16) {
 
 	return utf8;
 }
+#pragma warning(pop)
 
 } // namespace utf

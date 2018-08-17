@@ -18,6 +18,7 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#pragma warning(disable : 26455) // supress warning for library headers
 #include <boost/dynamic_bitset.hpp>
 #pragma warning(pop)
 
@@ -90,7 +91,7 @@ HMENU           FillMenu;               // fill submenu
 std::vector<double>* FormAngles;        // angles of a form for satin border fills
 std::vector<POINT>*  FormControlPoints; // form control rectangle in pixel coordinates
 
-HWND     FormDataSheet = 0;     // form data sheet
+HWND     FormDataSheet = nullptr;     // form data sheet
 size_t   FormIndex     = 0;     // index into the list of forms
 POINT    FormLines[MAXFRMLINS]; // used in the form drawing routines
 FRMHED   FormList[MAXFORMS];    // a list of form headers
@@ -141,7 +142,7 @@ MSG      Msg;                                 // main message loop message
 wchar_t  MsgBuffer[MSGSIZ];                   // for user messages
 unsigned MsgIndex;                            // pointer to the message buffer
 RECT     MsgRect;                             // rectangle containing the text message
-HWND     MsgWindow = 0;                       // message window
+HWND     MsgWindow = nullptr;                       // message window
 HPEN     MultiFormPen;                        // multiple selected forms pen
 unsigned NearestCount;                        // number of boxes selected
 size_t   NewFormVertexCount;                  // points in the new form
@@ -188,7 +189,7 @@ std::vector<POINT>* SelectedPointsLine; // line derived from the formOrigin sele
 fRECTANGLE SelectedVerticesRect;                   // rectangle enclosing selected form verticess
 size_t     SequenceIndex;                          // sequencing pointer
 double     ShowStitchThreshold = SHOPNTS;          // show stitch grid below this zoom level
-HWND       SideMessageWindow   = 0;                // main side message window
+HWND       SideMessageWindow   = nullptr;                // main side message window
 wchar_t    SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
 HWND       SideWindow[16];                         // side message windows
 double     SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this

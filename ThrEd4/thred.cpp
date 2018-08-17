@@ -22,8 +22,10 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#pragma warning(disable : 4127)  // supress warning for fmt library header
+#pragma warning(disable : 6387)  // supress warning for fmt library header
+#pragma warning(disable : 26455) // supress warning for library headers
 #include <boost/dynamic_bitset.hpp>
-#pragma warning(disable : 4127) // supress warning for fmt library header
 #include <fmt/format.h>
 #pragma warning(pop)
 
@@ -245,9 +247,9 @@ fs::path* IniFileName;     //.ini file name
 
 const wchar_t BmpFilter[_MAX_PATH + 1]    = L"Microsoft (BMP)\0*.bmp\0";
 wchar_t       CustomFilter[_MAX_PATH + 1] = L"Thredworks (THR)\0*.thr\0";
-HANDLE        FileHandle                  = 0;
-HANDLE        PCSFileHandle               = 0;
-HANDLE        IniFileHandle               = 0;
+HANDLE        FileHandle                  = nullptr;
+HANDLE        PCSFileHandle               = nullptr;
+HANDLE        IniFileHandle               = nullptr;
 HANDLE        InsertedFileHandle; // insert file handle
 HANDLE        BitmapFileHandle;   // bitmap handle
 size_t        FileSize;           // size of file
@@ -256,25 +258,25 @@ unsigned      ColorChanges;       // number of color changes
 
 OPENFILENAME OpenFileName = {
 	sizeof(OpenFileName), // lStructsize
-	0,                    // hwndOwner
-	0,                    // hInstance
+	nullptr,              // hwndOwner
+	nullptr,              // hInstance
 	AllFilter,            // lpstrFilter
 	CustomFilter,         // lpstrCustomFilter
 	_MAX_PATH,            // nMaxCustFilter
 	0,                    // nFilterIndex
-	0,                    // lpstrFile
+	nullptr,              // lpstrFile
 	_MAX_PATH,            // nMaxFile
-	0,                    // lpstrFileTitle
+	nullptr,              // lpstrFileTitle
 	0,                    // nMaxFileTitle
-	0,                    // lpstrInitialDir
-	0,                    // lpstrTitle
+	nullptr,              // lpstrInitialDir
+	nullptr,              // lpstrTitle
 	OFN_OVERWRITEPROMPT,  // Flags
 	0,                    // nFileOffset
 	0,                    // nFileExtension
 	L"thr",               // lpstrDefExt
 	0,                    // lCustData
-	0,                    // lpfnHook
-	0,                    // lpTemplateName
+	nullptr,              // lpfnHook
+	nullptr               // lpTemplateName
 };
 
 std::vector<fs::path>*     PreviousNames;
@@ -290,25 +292,25 @@ unsigned                   InsertedStitchCount;                 // saved stitch 
 
 OPENFILENAME OpenBitmapName = {
 	sizeof(OpenBitmapName), // lStructsize
-	0,                      // hwndOwner
-	0,                      // hInstance
+	nullptr,                // hwndOwner
+	nullptr,                // hInstance
 	BmpFilter,              // lpstrFilter
 	CustomFilter,           // lpstrCustomFilter
 	_MAX_PATH,              // nMaxCustFilter
 	0,                      // nFilterIndex
-	0,                      // lpstrFile
+	nullptr,                // lpstrFile
 	_MAX_PATH,              // nMaxFile
-	0,                      // lpstrFileTitle
+	nullptr,                // lpstrFileTitle
 	0,                      // nMaxFileTitle
-	0,                      // lpstrInitialDir
-	0,                      // lpstrTitle
+	nullptr,                // lpstrInitialDir
+	nullptr,                // lpstrTitle
 	OFN_OVERWRITEPROMPT,    // Flags
 	0,                      // nFileOffset
 	0,                      // nFileExtension
 	L"bmp",                 // lpstrDefExt
 	0,                      // lCustData
-	0,                      // lpfnHook
-	0,                      // lpTemplateName
+	nullptr,                // lpfnHook
+	nullptr,                // lpTemplateName
 };
 
 BITMAPFILEHEADER BitmapFileHeader;   // bitmap file header
@@ -971,7 +973,7 @@ double thred::internal::stlen(unsigned iStitch) noexcept {
 void thred::undat() noexcept {
 	if (FormDataSheet) {
 		DestroyWindow(FormDataSheet);
-		FormDataSheet = 0;
+		FormDataSheet = nullptr;
 	}
 }
 
@@ -1554,13 +1556,13 @@ void thred::internal::stchPars() {
 void thred::redraw(HWND window) noexcept {
 	unsigned iWindow = 0;
 
-	RedrawWindow(window, NULL, NULL, RDW_INVALIDATE);
+	RedrawWindow(window, nullptr, nullptr, RDW_INVALIDATE);
 	if (window == MainStitchWin) {
 		for (iWindow = 0; iWindow < 16; iWindow++) {
 			if (DefaultColorWin[iWindow])
-				RedrawWindow(DefaultColorWin[iWindow], NULL, NULL, RDW_INVALIDATE);
+				RedrawWindow(DefaultColorWin[iWindow], nullptr, nullptr, RDW_INVALIDATE);
 		}
-		RedrawWindow(ColorBar, NULL, NULL, RDW_INVALIDATE);
+		RedrawWindow(ColorBar, nullptr, nullptr, RDW_INVALIDATE);
 	}
 }
 
@@ -1577,7 +1579,7 @@ void thred::internal::nuRct() {
 	ReleaseDC(MainStitchWin, StitchWindowDC);
 	DeleteObject(StitchWindowBmp);
 	ReleaseDC(MainStitchWin, StitchWindowDC);
-	StitchWindowDC = GetDCEx(MainStitchWin, 0, DCX_PARENTCLIP | DCX_CLIPSIBLINGS);
+	StitchWindowDC = GetDCEx(MainStitchWin, nullptr, DCX_PARENTCLIP | DCX_CLIPSIBLINGS);
 	DeleteDC(StitchWindowMemDC);
 	StitchWindowMemDC = CreateCompatibleDC(StitchWindowDC);
 	GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
@@ -1641,7 +1643,7 @@ void thred::unsid() noexcept {
 	FormMenuChoice = 0;
 	if (SideMessageWindow) {
 		DestroyWindow(SideMessageWindow);
-		SideMessageWindow = 0;
+		SideMessageWindow = nullptr;
 	}
 }
 
@@ -2413,7 +2415,7 @@ void thred::internal::chknum() {
 
 void thred::internal::noMsg() {
 	if (DestroyWindow(MsgWindow))
-		MsgWindow = 0;
+		MsgWindow = nullptr;
 	DestroyWindow(OKButton);
 	DestroyWindow(DiscardButton);
 	DestroyWindow(CancelButton);
@@ -2545,7 +2547,7 @@ void thred::internal::rstAll() {
 	StateMap.reset(StateFlag::FRMPSEL);
 	thred::unmsg();
 	SearchLineIndex = 0;
-	FirstWin        = 0;
+	FirstWin        = nullptr;
 	while (EnumChildWindows(MainStitchWin, EnumChildProc, 0)) {
 	}
 }
@@ -3142,7 +3144,7 @@ void thred::stch2pxr(const fPOINT& stitchCoordinate) noexcept {
 void thred::internal::getDocsFolder(fs::path* directory) {
 	if (directory) {
 		PWSTR         ppszPath = nullptr; // variable to receive the path memory block pointer.
-		const HRESULT hr       = SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &ppszPath);
+		const HRESULT hr       = SHGetKnownFolderPath(FOLDERID_Documents, 0, nullptr, &ppszPath);
 
 		if (SUCCEEDED(hr)) {
 			directory->assign(ppszPath); // make a local copy of the path
@@ -3229,9 +3231,10 @@ void thred::internal::ritini() {
 		IniFile.initialWindowCoords.bottom = windowRect.bottom;
 		IniFile.initialWindowCoords.top    = windowRect.top;
 	}
-	IniFileHandle = CreateFile(IniFileName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, NULL, CREATE_ALWAYS, 0, NULL);
+	IniFileHandle
+	    = CreateFile(IniFileName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	if (IniFileHandle != INVALID_HANDLE_VALUE)
-		WriteFile(IniFileHandle, &IniFile, sizeof(IniFile), &BytesRead, NULL);
+		WriteFile(IniFileHandle, &IniFile, sizeof(IniFile), &BytesRead, nullptr);
 	CloseHandle(IniFileHandle);
 }
 
@@ -3312,12 +3315,12 @@ void thred::internal::redbal() {
 
 	PCSHeader.stitchCount = 0;
 	FormIndex             = 0;
-	balaradFile           = CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+	balaradFile           = CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (balaradFile != INVALID_HANDLE_VALUE) {
-		ReadFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, 0);
+		ReadFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, nullptr);
 		if (bytesRead == sizeof(balaradHeader)) {
 			std::vector<BALSTCH> balaradStitch(MAXITEMS);
-			ReadFile(balaradFile, balaradStitch.data(), MAXITEMS * sizeof(balaradStitch[0]), &bytesRead, 0);
+			ReadFile(balaradFile, balaradStitch.data(), MAXITEMS * sizeof(balaradStitch[0]), &bytesRead, nullptr);
 			stitchCount             = bytesRead / sizeof(balaradStitch[0]);
 			IniFile.backgroundColor = BackgroundColor = balaradHeader.backgroundColor;
 			BackgroundPen                             = nuPen(BackgroundPen, 1, BackgroundColor);
@@ -3373,7 +3376,7 @@ void thred::internal::ritbal() {
 			outputName = *WorkingFileName;
 		}
 		outputName.replace_extension(L".thv");
-		balaradFile = CreateFile(outputName.wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		balaradFile = CreateFile(outputName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 		if (balaradFile == INVALID_HANDLE_VALUE)
 			return;
 		color                  = StitchBuffer[0].attribute & COLMSK;
@@ -3391,7 +3394,7 @@ void thred::internal::ritbal() {
 		balaradHeader.backgroundColor = BackgroundColor;
 		balaradHeader.hoopSizeX       = IniFile.hoopSizeX * BALRAT;
 		balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BALRAT;
-		WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, 0);
+		WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
 		BalaradOffset.x = IniFile.hoopSizeX / 2;
 		BalaradOffset.y = IniFile.hoopSizeY / 2;
 		std::vector<BALSTCH> balaradStitch(PCSHeader.stitchCount + 2);
@@ -3407,15 +3410,15 @@ void thred::internal::ritbal() {
 				balaradStitch[iOutput++].flag = gsl::narrow<unsigned char>(color);
 			}
 		}
-		WriteFile(balaradFile, balaradStitch.data(), iOutput * sizeof(balaradStitch[0]), &bytesWritten, 0);
+		WriteFile(balaradFile, balaradStitch.data(), iOutput * sizeof(balaradStitch[0]), &bytesWritten, nullptr);
 		CloseHandle(balaradFile);
-		balaradFile = CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
-		WriteFileInt(balaradFile, outputName.wstring().c_str(), outputName.wstring().size() + 1, &bytesWritten, 0);
+		balaradFile = CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+		WriteFileInt(balaradFile, outputName.wstring().c_str(), outputName.wstring().size() + 1, &bytesWritten, nullptr);
 		CloseHandle(balaradFile);
 	}
 	else {
 		if (!BalaradName1->empty()) {
-			balaradFile = CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+			balaradFile = CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 			CloseHandle(balaradFile);
 		}
 	}
@@ -3627,16 +3630,16 @@ void thred::internal::thrsav() {
 			}
 		}
 	}
-	FileHandle = CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE), 0, NULL, CREATE_ALWAYS, 0, NULL);
+	FileHandle = CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	if (FileHandle == INVALID_HANDLE_VALUE) {
 		displayText::crmsg(*ThrName);
-		FileHandle = 0;
+		FileHandle = nullptr;
 	}
 	else {
 		// ToDo - MAXITEMS * 8 is not the best option here. Need something better
 		auto output = std::vector<char>(MAXITEMS * 8);
 		dubuf(output.data(), count);
-		WriteFile(FileHandle, output.data(), count, &bytesWritten, 0);
+		WriteFile(FileHandle, output.data(), count, &bytesWritten, nullptr);
 		if (bytesWritten != count) {
 			std::wstring fmtStr;
 			displayText::loadString(fmtStr, IDS_FWERR);
@@ -3693,7 +3696,9 @@ bool thred::internal::colfil() {
 		return 0;
 }
 
-void thred::internal::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, const std::vector<fPOINTATTR>& stitches) {
+void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
+                             std::vector<DSTREC>&           DSTRecords,
+                             const std::vector<fPOINTATTR>& stitches) {
 #define DSTMAX 121
 	unsigned                iStitch = 0, dstType = 0, color = 0, count = 0;
 	POINT                   centerCoordinate = {}, lengths = {}, absoluteLengths = {}, difference = {}, stepSize = {};
@@ -3779,13 +3784,13 @@ void thred::internal::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DST
 	DSTRecords.push_back({ 0, 0, gsl::narrow<unsigned char>(0xf3) });
 
 	if (colfil()) {
-		colorFile = CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		colorFile = CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 		if (colorFile != INVALID_HANDLE_VALUE)
-			WriteFileInt(colorFile, &colorData[0], colorData.size() * sizeof(colorData[0]), &bytesWritten, 0);
+			WriteFileInt(colorFile, &colorData[0], colorData.size() * sizeof(colorData[0]), &bytesWritten, nullptr);
 		CloseHandle(colorFile);
-		colorFile = CreateFile(RGBFileName->wstring().c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+		colorFile = CreateFile(RGBFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 		if (colorFile != INVALID_HANDLE_VALUE)
-			WriteFileInt(colorFile, &colorData[2], (colorData.size() - 2) * sizeof(colorData[0]), &bytesWritten, 0);
+			WriteFileInt(colorFile, &colorData[2], (colorData.size() - 2) * sizeof(colorData[0]), &bytesWritten, nullptr);
 		CloseHandle(colorFile);
 	}
 }
@@ -4033,10 +4038,10 @@ void thred::internal::sav() {
 			saveStitches[iStitch] = StitchBuffer[iStitch];
 		}
 	}
-	PCSFileHandle = CreateFile(AuxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, NULL, CREATE_ALWAYS, 0, NULL);
+	PCSFileHandle = CreateFile(AuxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	if (PCSFileHandle == INVALID_HANDLE_VALUE) {
 		displayText::crmsg(*AuxName);
-		PCSFileHandle = 0;
+		PCSFileHandle = nullptr;
 	}
 	else {
 		bool                flag = true;
@@ -4087,8 +4092,8 @@ void thred::internal::sav() {
 			strncpy(dstHeader.pd, "******\r", sizeof(dstHeader.pd));
 			strncpy(dstHeader.eof, "\x1a", sizeof(dstHeader.eof));
 			std::fill_n(dstHeader.res, sizeof(dstHeader.res), ' ');
-			WriteFile(PCSFileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, 0);
-			WriteFileInt(PCSFileHandle, DSTRecords.data(), sizeof(DSTRecords[0]) * DSTRecords.size(), &bytesWritten, 0);
+			WriteFile(PCSFileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr);
+			WriteFileInt(PCSFileHandle, DSTRecords.data(), sizeof(DSTRecords[0]) * DSTRecords.size(), &bytesWritten, nullptr);
 			break;
 #if PESACT
 		case AUXPES:
@@ -4152,8 +4157,8 @@ void thred::internal::sav() {
 			GroupEndStitch               = PCSHeader.stitchCount - 1;
 			pesHeader.xsiz               = 10000;
 			pesHeader.ysiz               = 10000;
-			WriteFile(PCSFileHandle, convert_ptr<PESHED*>(&pesHeader), sizeof(pesHeader), &bytesWritten, 0);
-			WriteFile(PCSFileHandle, PESstitches, OutputIndex * sizeof(PESstitches[0]), &bytesWritten, 0);
+			WriteFile(PCSFileHandle, convert_ptr<PESHED*>(&pesHeader), sizeof(pesHeader), &bytesWritten, nullptr);
+			WriteFile(PCSFileHandle, PESstitches, OutputIndex * sizeof(PESstitches[0]), &bytesWritten, nullptr);
 			delete[] PESstitches;
 			// ToDo - (PES) is there a better estimate for data size?
 			pchr = new unsigned char[MAXITEMS * 4];
@@ -4186,7 +4191,7 @@ void thred::internal::sav() {
 			pchr[529] = 0x80; // hor lsb
 			pchr[530] = 0x82; // vert msb
 			pchr[531] = 0xff; // vert lsb
-			WriteFile(PCSFileHandle, pchr, OutputIndex, &bytesWritten, 0);
+			WriteFile(PCSFileHandle, pchr, OutputIndex, &bytesWritten, nullptr);
 			delete[] pchr;
 			break;
 #endif
@@ -4199,7 +4204,7 @@ void thred::internal::sav() {
 					flag = false;
 					break;
 				}
-				if (!WriteFile(PCSFileHandle, &PCSHeader, 0x46, &bytesWritten, 0)) {
+				if (!WriteFile(PCSFileHandle, &PCSHeader, 0x46, &bytesWritten, nullptr)) {
 					displayText::riter();
 					flag = false;
 					break;
@@ -4221,21 +4226,21 @@ void thred::internal::sav() {
 					PCSStitchBuffer[iPCSstitch++].y = integerPart;
 				}
 				if (!WriteFile(
-				        PCSFileHandle, PCSStitchBuffer.data(), iPCSstitch * sizeof(PCSStitchBuffer[0]), &bytesWritten, 0)) {
+				        PCSFileHandle, PCSStitchBuffer.data(), iPCSstitch * sizeof(PCSStitchBuffer[0]), &bytesWritten, nullptr)) {
 					displayText::riter();
 					flag = false;
 					break;
 				}
 				if (UserFlagMap.test(UserFlag::BSAVOF)) {
 					*MsgBuffer = 0;
-					if (!WriteFile(PCSFileHandle, MsgBuffer, 15, &bytesWritten, 0)) {
+					if (!WriteFile(PCSFileHandle, MsgBuffer, 15, &bytesWritten, nullptr)) {
 						displayText::riter();
 						flag = false;
 						break;
 					}
 				}
 				else {
-					if (!WriteFile(PCSFileHandle, PCSBMPFileName, 15, &bytesWritten, 0)) {
+					if (!WriteFile(PCSFileHandle, PCSBMPFileName, 15, &bytesWritten, nullptr)) {
 						displayText::riter();
 						flag = false;
 						break;
@@ -4260,13 +4265,13 @@ void thred::internal::auxmen() {
 		                     MFT_STRING,
 		                     0,
 		                     0,
-		                     0,
-		                     0,
-		                     0,
+		                     nullptr,
+		                     nullptr,
+		                     nullptr,
 		                     0,
 		                     nullptr, // dwTypeData
 		                     13,
-		                     0 };
+		                     nullptr };
 
 	std::wstring auxMsg;
 
@@ -4297,8 +4302,7 @@ void thred::internal::auxmen() {
 	[[gsl::suppress(type .3)]] {
 		filinfo.dwTypeData = const_cast<LPWSTR>(auxMsg.c_str());
 		SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
-	}
-	StateMap.set(StateFlag::DUMEN);
+	} StateMap.set(StateFlag::DUMEN);
 }
 
 void thred::internal::savAs() {
@@ -4404,9 +4408,9 @@ void thred::internal::dusid(unsigned entry) noexcept {
 	                                 SideWindowSize.x + 3,
 	                                 SideWindowSize.y,
 	                                 SideMessageWindow,
-	                                 NULL,
+	                                 nullptr,
 	                                 ThrEdInstance,
-	                                 NULL);
+	                                 nullptr);
 	SideWindowLocation++;
 }
 
@@ -4440,16 +4444,16 @@ void thred::internal::sidmsg(HWND window, std::wstring* const strings, unsigned 
 				}
 			}
 			SideMessageWindow = CreateWindow(L"STATIC",
-			                                 0,
+			                                 nullptr,
 			                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 			                                 parentListRect.right - ThredWindowOrigin.x + 3,
 			                                 childListRect.top - ThredWindowOrigin.y - 3,
 			                                 SideWindowSize.x + 12,
 			                                 SideWindowSize.y * entryCount + 12,
 			                                 ThrEdWindow,
-			                                 NULL,
+			                                 nullptr,
 			                                 ThrEdInstance,
-			                                 NULL);
+			                                 nullptr);
 			for (iEntry = 0; iEntry < entries; iEntry++) {
 				if (gsl::narrow<unsigned>(SelectedForm->edgeType & NEGUND) != EdgeFillTypes[iEntry]) {
 					if (EdgeFillTypes[iEntry] == EDGECLIP || EdgeFillTypes[iEntry] == EDGEPICOT
@@ -4491,16 +4495,16 @@ void thred::internal::sidmsg(HWND window, std::wstring* const strings, unsigned 
 				}
 			}
 			SideMessageWindow = CreateWindow(L"STATIC",
-			                                 0,
+			                                 nullptr,
 			                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 			                                 parentListRect.right - ThredWindowOrigin.x + 3,
 			                                 childListRect.top - ThredWindowOrigin.y - 3,
 			                                 SideWindowSize.x + 12,
 			                                 SideWindowSize.y * entryCount + 12,
 			                                 ThrEdWindow,
-			                                 NULL,
+			                                 nullptr,
 			                                 ThrEdInstance,
-			                                 NULL);
+			                                 nullptr);
 			if (FormMenuChoice == LLAYR) {
 				for (iEntry = 0; iEntry < entries; iEntry++)
 					dusid(iEntry);
@@ -4543,43 +4547,43 @@ void thred::internal::stchWnd() {
 
 	MainStitchWin = nullptr;
 	MainStitchWin = CreateWindow(L"STATIC",
-	                             0,
+	                             nullptr,
 	                             SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                             ButtonWidthX3,
 	                             0,
 	                             StitchWindowSize.x,
 	                             StitchWindowSize.y,
 	                             ThrEdWindow,
-	                             NULL,
+	                             nullptr,
 	                             ThrEdInstance,
-	                             NULL);
+	                             nullptr);
 
 	if (MainStitchWin != nullptr) {
 		GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
 
 		VerticalScrollBar = CreateWindow(L"SCROLLBAR",
-		                                 0,
+		                                 nullptr,
 		                                 SBS_VERT | WS_CHILD | WS_VISIBLE,
 		                                 StitchWindowSize.x + ButtonWidthX3,
 		                                 0,
 		                                 SCROLSIZ,
 		                                 StitchWindowSize.y,
 		                                 ThrEdWindow,
-		                                 NULL,
+		                                 nullptr,
 		                                 ThrEdInstance,
-		                                 NULL);
+		                                 nullptr);
 
 		HorizontalScrollBar = CreateWindow(L"SCROLLBAR",
-		                                   0,
+		                                   nullptr,
 		                                   SBS_HORZ | WS_CHILD | WS_VISIBLE,
 		                                   ButtonWidthX3,
 		                                   StitchWindowSize.y,
 		                                   StitchWindowSize.x,
 		                                   SCROLSIZ,
 		                                   ThrEdWindow,
-		                                   NULL,
+		                                   nullptr,
 		                                   ThrEdInstance,
-		                                   NULL);
+		                                   nullptr);
 		ShowWindow(VerticalScrollBar, FALSE);
 		ShowWindow(HorizontalScrollBar, FALSE);
 	}
@@ -4833,16 +4837,17 @@ void thred::internal::savmap() {
 			return;
 		}
 		if (GetSaveFileName(&OpenBitmapName)) {
-			BitmapFileHandle = CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+			BitmapFileHandle
+			    = CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 			if (IniFileHandle == INVALID_HANDLE_VALUE) {
 				displayText::crmsg(*UserBMPFileName);
 				return;
 			}
-			WriteFile(BitmapFileHandle, &BitmapFileHeader, 14, &bytesWritten, NULL);
-			WriteFile(BitmapFileHandle, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14, &bytesWritten, NULL);
+			WriteFile(BitmapFileHandle, &BitmapFileHeader, 14, &bytesWritten, nullptr);
+			WriteFile(BitmapFileHandle, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14, &bytesWritten, nullptr);
 			auto buffer = std::vector<unsigned char>((BitmapWidth * BitmapHeight * 3) + 1);
 			movmap(BitmapWidth * BitmapHeight, buffer.data());
-			WriteFile(BitmapFileHandle, buffer.data(), BitmapWidth * BitmapHeight * 3, &bytesWritten, NULL);
+			WriteFile(BitmapFileHandle, buffer.data(), BitmapWidth * BitmapHeight * 3, &bytesWritten, nullptr);
 			CloseHandle(BitmapFileHandle);
 		}
 	}
@@ -4853,7 +4858,7 @@ void thred::internal::savmap() {
 HBITMAP thred::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ unsigned int** ppvBits) {
 	[[gsl::suppress(26490)]] {
 		if (ppvBits) {
-			HBITMAP bitmap = CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), 0, 0);
+			HBITMAP bitmap = CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0);
 			if (*ppvBits != nullptr) {
 				return bitmap;
 			}
@@ -4877,26 +4882,26 @@ void thred::internal::bfil() {
 	COLORREF      InverseBackgroundColor = {};
 
 	InverseBackgroundColor = fswap(BackgroundColor);
-	BitmapFileHandle       = CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+	BitmapFileHandle       = CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (BitmapFileHandle == INVALID_HANDLE_VALUE) {
 		std::wstring fmtStr;
 		displayText::loadString(fmtStr, IDS_UNOPEN);
 		displayText::shoMsg(fmt::format(fmtStr, UserBMPFileName->wstring()));
 		CloseHandle(BitmapFileHandle);
-		BitmapFileHandle  = 0;
+		BitmapFileHandle  = nullptr;
 		PCSBMPFileName[0] = 0;
 		return;
 	}
-	ReadFile(BitmapFileHandle, &BitmapFileHeader, 14, &BytesRead, NULL);
+	ReadFile(BitmapFileHandle, &BitmapFileHeader, 14, &BytesRead, nullptr);
 	if (BitmapFileHeader.bfType == 'MB') {
 		fileHeaderSize = BitmapFileHeader.bfOffBits - 14;
 		if (fileHeaderSize > sizeof(BITMAPV4HEADER))
 			fileHeaderSize = sizeof(BITMAPV4HEADER);
-		ReadFile(BitmapFileHandle, &BitmapFileHeaderV4, fileHeaderSize, &BytesRead, NULL);
+		ReadFile(BitmapFileHandle, &BitmapFileHeaderV4, fileHeaderSize, &BytesRead, nullptr);
 	}
 	else {
 		CloseHandle(BitmapFileHandle);
-		BitmapFileHandle  = 0;
+		BitmapFileHandle  = nullptr;
 		PCSBMPFileName[0] = 0;
 		return;
 	}
@@ -4918,7 +4923,7 @@ void thred::internal::bfil() {
 				bitmapWidthBytes += 4;
 			bitmapSizeBytes = bitmapWidthBytes * BitmapHeight;
 			std::vector<unsigned char> monoBitmapData(bitmapSizeBytes);
-			ReadFile(BitmapFileHandle, monoBitmapData.data(), bitmapSizeBytes, &BytesRead, NULL);
+			ReadFile(BitmapFileHandle, monoBitmapData.data(), bitmapSizeBytes, &BytesRead, nullptr);
 			CloseHandle(BitmapFileHandle);
 			if (binv(monoBitmapData, bitmapWidthBytes)) {
 				background = BitmapColor;
@@ -4945,8 +4950,8 @@ void thred::internal::bfil() {
 						bitlin(&monoBitmapData[iHeight * bitmapWidthBytes], &bits[iHeight * BitmapWidth], background, foreground);
 					}
 				}
-			}
-			deviceContext = CreateCompatibleDC(StitchWindowDC);
+			} deviceContext
+			    = CreateCompatibleDC(StitchWindowDC);
 			if (bitmap && deviceContext) {
 				SelectObject(deviceContext, bitmap);
 				BitmapFileHandle = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
@@ -4970,7 +4975,7 @@ void thred::internal::bfil() {
 	}
 	else {
 		CloseHandle(BitmapFileHandle);
-		BitmapFileHandle  = 0;
+		BitmapFileHandle  = nullptr;
 		PCSBMPFileName[0] = 0;
 		displayText::tabmsg(IDS_BMAP);
 	}
@@ -5005,12 +5010,12 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 	bool                  retval        = false;
 
 	if (colfil()) {
-		colorFile = CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+		colorFile = CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 		if (colorFile != INVALID_HANDLE_VALUE) {
 			retval = GetFileSizeEx(colorFile, &colorFileSize);
 			// There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
 			colors.resize(colorFileSize.u.LowPart / sizeof(colors[0]));
-			ReadFile(colorFile, colors.data(), colorFileSize.u.LowPart, &bytesRead, 0);
+			ReadFile(colorFile, colors.data(), colorFileSize.u.LowPart, &bytesRead, nullptr);
 			CloseHandle(colorFile);
 			if (bytesRead > (sizeof(colors[0]) * 2)) {
 				if (colors[0] == COLVER) {
@@ -5224,13 +5229,13 @@ void thred::internal::nuFil() {
 		}
 		// ToDo - use ifstream?
 		// ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
-		FileHandle = CreateFile(WorkingFileName->wstring().c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+		FileHandle = CreateFile(WorkingFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 		if (FileHandle == INVALID_HANDLE_VALUE) {
 			if (GetLastError() == 32)
 				displayText::filnopn(IDS_FNOPNA, *WorkingFileName);
 			else
 				displayText::filnopn(IDS_FNOPN, *WorkingFileName);
-			FileHandle = 0;
+			FileHandle = nullptr;
 		}
 		else {
 			StateMap.reset(StateFlag::CMPDO);
@@ -5276,7 +5281,7 @@ void thred::internal::nuFil() {
 			auto       fileExt        = WorkingFileName->extension().wstring();
 			const auto firstCharacter = tolower(fileExt[1]);
 			if (firstCharacter == 't') {
-				ReadFile(FileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, NULL);
+				ReadFile(FileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, nullptr);
 				if ((thredHeader.headerType & 0xffffff) == 0x746872) {
 					if (BytesRead != sizeof(thredHeader)) {
 						displayText::tabmsg(IDS_SHRTF);
@@ -5302,7 +5307,7 @@ void thred::internal::nuFil() {
 						break;
 					case 1:
 					case 2:
-						ReadFile(FileHandle, &ExtendedHeader, sizeof(ExtendedHeader), &BytesRead, NULL);
+						ReadFile(FileHandle, &ExtendedHeader, sizeof(ExtendedHeader), &BytesRead, nullptr);
 						if (BytesRead != sizeof(ExtendedHeader)) {
 							displayText::tabmsg(IDS_SHRTF);
 							return;
@@ -5319,20 +5324,20 @@ void thred::internal::nuFil() {
 					ZoomRect.right = UnzoomedRect.x = IniFile.hoopSizeX;
 					ZoomRect.top = UnzoomedRect.y = IniFile.hoopSizeY;
 					PCSHeader.stitchCount         = thredHeader.stitchCount;
-					ReadFile(FileHandle, StitchBuffer, PCSHeader.stitchCount * sizeof(StitchBuffer[0]), &stitchesRead, NULL);
+					ReadFile(FileHandle, StitchBuffer, PCSHeader.stitchCount * sizeof(StitchBuffer[0]), &stitchesRead, nullptr);
 					if (stitchesRead != PCSHeader.stitchCount * sizeof(StitchBuffer[0])) {
 						PCSHeader.stitchCount = gsl::narrow<unsigned short>(stitchesRead / sizeof(StitchBuffer[0]));
 						prtred();
 						return;
 					}
-					ReadFile(FileHandle, PCSBMPFileName, sizeof(PCSBMPFileName), &BytesRead, 0);
+					ReadFile(FileHandle, PCSBMPFileName, sizeof(PCSBMPFileName), &BytesRead, nullptr);
 					totalBytesRead = BytesRead;
 					if (BytesRead != sizeof(PCSBMPFileName)) {
 						PCSBMPFileName[0] = 0;
 						prtred();
 						return;
 					}
-					ReadFile(FileHandle, &BackgroundColor, sizeof(BackgroundColor), &BytesRead, 0);
+					ReadFile(FileHandle, &BackgroundColor, sizeof(BackgroundColor), &BytesRead, nullptr);
 					totalBytesRead += BytesRead;
 					if (BytesRead != sizeof(BackgroundColor)) {
 						BackgroundColor = IniFile.backgroundColor;
@@ -5340,13 +5345,13 @@ void thred::internal::nuFil() {
 						return;
 					}
 					BackgroundBrush = CreateSolidBrush(BackgroundColor);
-					ReadFile(FileHandle, UserColor, sizeof(UserColor), &BytesRead, 0);
+					ReadFile(FileHandle, UserColor, sizeof(UserColor), &BytesRead, nullptr);
 					totalBytesRead += BytesRead;
 					if (BytesRead != sizeof(UserColor)) {
 						prtred();
 						return;
 					}
-					ReadFile(FileHandle, CustomColor, sizeof(CustomColor), &BytesRead, 0);
+					ReadFile(FileHandle, CustomColor, sizeof(CustomColor), &BytesRead, nullptr);
 					totalBytesRead += BytesRead;
 					if (BytesRead != sizeof(CustomColor)) {
 						prtred();
@@ -5355,7 +5360,7 @@ void thred::internal::nuFil() {
 					constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0]))
 					                              / 2; // ThreadSize is defined as a 16 entry array of 2 characters
 					char msgBuffer[threadLength];
-					ReadFile(FileHandle, msgBuffer, threadLength, &BytesRead, 0);
+					ReadFile(FileHandle, msgBuffer, threadLength, &BytesRead, nullptr);
 					totalBytesRead += BytesRead;
 					if (BytesRead != threadLength) {
 						prtred();
@@ -5379,7 +5384,7 @@ void thred::internal::nuFil() {
 						if (version < 2) {
 							std::vector<FRMHEDO> formListOriginal(FormIndex);
 							bytesToRead = gsl::narrow<DWORD>(FormIndex * sizeof(formListOriginal[0]));
-							ReadFileInt(FileHandle, formListOriginal.data(), bytesToRead, &BytesRead, 0);
+							ReadFileInt(FileHandle, formListOriginal.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != FormIndex * sizeof(formListOriginal[0])) {
 								FormIndex = BytesRead / sizeof(formListOriginal[0]);
 								StateMap.set(StateFlag::BADFIL);
@@ -5389,7 +5394,7 @@ void thred::internal::nuFil() {
 						else {
 							std::vector<FRMHEDOUT> inFormList(FormIndex);
 							bytesToRead = gsl::narrow<DWORD>(FormIndex * sizeof(inFormList[0]));
-							ReadFileInt(FileHandle, inFormList.data(), bytesToRead, &BytesRead, 0);
+							ReadFileInt(FileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								FormIndex = BytesRead / sizeof(inFormList[0]);
 								StateMap.set(StateFlag::BADFIL);
@@ -5398,7 +5403,7 @@ void thred::internal::nuFil() {
 						}
 						if (thredHeader.vertexCount) {
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(FormVertices[0]));
-							ReadFile(FileHandle, FormVertices, bytesToRead, &BytesRead, 0);
+							ReadFile(FileHandle, FormVertices, bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								FormVertexIndex = BytesRead / sizeof(FormVertices[0]);
 								for (size_t iVertex = FormVertexIndex; iVertex < thredHeader.vertexCount; iVertex++)
@@ -5414,7 +5419,7 @@ void thred::internal::nuFil() {
 						if (thredHeader.dlineCount) {
 							std::vector<SATCONOUT> inSatinGuides(thredHeader.dlineCount);
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(inSatinGuides[0]));
-							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, 0);
+							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								StateMap.set(StateFlag::BADFIL);
 							}
@@ -5422,7 +5427,7 @@ void thred::internal::nuFil() {
 						}
 						if (thredHeader.clipDataCount) {
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(ClipPoints[0]));
-							ReadFile(FileHandle, ClipPoints, bytesToRead, &BytesRead, 0);
+							ReadFile(FileHandle, ClipPoints, bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								ClipPointIndex = BytesRead / sizeof(ClipPoints[0]);
 								StateMap.set(StateFlag::BADFIL);
@@ -5432,7 +5437,7 @@ void thred::internal::nuFil() {
 							TexturePointsBuffer->resize(ExtendedHeader.texturePointCount);
 							bytesToRead
 							    = gsl::narrow<DWORD>(ExtendedHeader.texturePointCount * sizeof((*TexturePointsBuffer)[0]));
-							ReadFile(FileHandle, TexturePointsBuffer->data(), bytesToRead, &BytesRead, 0);
+							ReadFile(FileHandle, TexturePointsBuffer->data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								TexturePointsBuffer->resize(BytesRead / sizeof((*TexturePointsBuffer)[0]));
 								StateMap.set(StateFlag::BADFIL);
@@ -5470,7 +5475,7 @@ void thred::internal::nuFil() {
 				StateMap.set(StateFlag::NOTHRFIL);
 				if (firstCharacter == 'p') {
 					if (tolower(fileExt[2]) == 'c') {
-						ReadFile(FileHandle, &PCSHeader, sizeof(PCSHeader), &BytesRead, NULL);
+						ReadFile(FileHandle, &PCSHeader, sizeof(PCSHeader), &BytesRead, nullptr);
 						if (!fileSize) {
 							displayText::filnopn(IDS_ZEROL, *WorkingFileName);
 							return;
@@ -5481,7 +5486,7 @@ void thred::internal::nuFil() {
 							fileSize -= sizeof(PCSHeader);
 							pcsStitchCount = fileSize / sizeof(PCSTCH) + 2;
 							std::vector<PCSTCH> PCSDataBuffer(pcsStitchCount);
-							ReadFile(FileHandle, PCSDataBuffer.data(), fileSize, &BytesRead, NULL);
+							ReadFile(FileHandle, PCSDataBuffer.data(), fileSize, &BytesRead, nullptr);
 							iStitch      = 0;
 							iColorChange = 0;
 							color        = 0;
@@ -5541,7 +5546,7 @@ void thred::internal::nuFil() {
 					else {
 						// ToDo - (PES) is there a better estimate for data size?
 						fileBuffer = new unsigned char[MAXITEMS * 8];
-						ReadFile(FileHandle, fileBuffer, MAXITEMS * 8, &BytesRead, 0);
+						ReadFile(FileHandle, fileBuffer, MAXITEMS * 8, &BytesRead, nullptr);
 						pesHeader = convert_ptr<PESHED*>(fileBuffer);
 						l_peschr  = convert_ptr<char*>(pesHeader);
 						if (strncmp(pesHeader->led, "#PES00", 6)) {
@@ -5614,13 +5619,13 @@ void thred::internal::nuFil() {
 #endif
 				}
 				else {
-					ReadFile(FileHandle, &dstHeader, sizeof(dstHeader), &BytesRead, 0);
+					ReadFile(FileHandle, &dstHeader, sizeof(dstHeader), &BytesRead, nullptr);
 					if (BytesRead == sizeof(dstHeader)) {
 						if (chkdst(&dstHeader)) {
 							PCSBMPFileName[0] = 0;
 							fileSize          = GetFileSize(FileHandle, &BytesRead) - sizeof(dstHeader);
 							std::vector<DSTREC> DSTData(fileSize / sizeof(DSTREC));
-							ReadFileInt(FileHandle, DSTData.data(), fileSize, &BytesRead, 0);
+							ReadFileInt(FileHandle, DSTData.data(), fileSize, &BytesRead, nullptr);
 							dstran(DSTData);
 							IniFile.auxFileType = AUXDST;
 						}
@@ -5689,8 +5694,8 @@ COLORREF thred::internal::nuCol(COLORREF init) noexcept {
 	ColorStruct.hwndOwner      = ThrEdWindow;
 	ColorStruct.lCustData      = 0;
 	ColorStruct.lpCustColors   = CustomColor;
-	ColorStruct.lpfnHook       = 0;
-	ColorStruct.lpTemplateName = 0;
+	ColorStruct.lpfnHook       = nullptr;
+	ColorStruct.lpTemplateName = nullptr;
 	ColorStruct.rgbResult      = init;
 	ColorStruct.lStructSize    = sizeof(ColorStruct);
 	return ChooseColor(&ColorStruct);
@@ -5701,8 +5706,8 @@ COLORREF thred::internal::nuBak() noexcept {
 	BackgroundColorStruct.hwndOwner      = ThrEdWindow;
 	BackgroundColorStruct.lCustData      = 0;
 	BackgroundColorStruct.lpCustColors   = CustomBackgroundColor;
-	BackgroundColorStruct.lpfnHook       = 0;
-	BackgroundColorStruct.lpTemplateName = 0;
+	BackgroundColorStruct.lpfnHook       = nullptr;
+	BackgroundColorStruct.lpTemplateName = nullptr;
 	BackgroundColorStruct.rgbResult      = BackgroundColor;
 	BackgroundColorStruct.lStructSize    = sizeof(BackgroundColorStruct);
 	return ChooseColor(&BackgroundColorStruct);
@@ -5713,8 +5718,8 @@ COLORREF thred::internal::nuBit() noexcept {
 	BitMapColorStruct.hwndOwner      = ThrEdWindow;
 	BitMapColorStruct.lCustData      = 0;
 	BitMapColorStruct.lpCustColors   = BitmapBackgroundColors;
-	BitMapColorStruct.lpfnHook       = 0;
-	BitMapColorStruct.lpTemplateName = 0;
+	BitMapColorStruct.lpfnHook       = nullptr;
+	BitMapColorStruct.lpTemplateName = nullptr;
 	BitMapColorStruct.rgbResult      = BitmapColor;
 	BitMapColorStruct.lStructSize    = sizeof(BackgroundColorStruct);
 	return ChooseColor(&BitMapColorStruct);
@@ -6721,9 +6726,9 @@ void thred::internal::rotang(dPOINT unrotatedPoint, POINT& rotatedPoint, double 
 }
 
 void thred::rotang1(const fPOINTATTR& unrotatedPoint,
-             fPOINT&           rotatedPoint,
-             const double&     rotationAngle,
-             const dPOINT&     rotationCenter) noexcept {
+                    fPOINT&           rotatedPoint,
+                    const double&     rotationAngle,
+                    const dPOINT&     rotationCenter) noexcept {
 	double       distanceToCenter = 0.0, newAngle = 0.0;
 	const double dx = unrotatedPoint.x - rotationCenter.x;
 	const double dy = unrotatedPoint.y - rotationCenter.y;
@@ -6748,9 +6753,9 @@ void thred::rotang1(const fPOINTATTR& unrotatedPoint,
 }
 
 void thred::rotangf(const fPOINT& unrotatedPoint,
-             fPOINT&       rotatedPoint,
-             const double  rotationAngle,
-             const dPOINT& rotationCenter) noexcept {
+                    fPOINT&       rotatedPoint,
+                    const double  rotationAngle,
+                    const dPOINT& rotationCenter) noexcept {
 	double       distanceToCenter = 0.0, newAngle = 0.0;
 	const double dx = unrotatedPoint.x - rotationCenter.x;
 	const double dy = unrotatedPoint.y - rotationCenter.y;
@@ -7043,8 +7048,7 @@ void thred::internal::duclip() {
 				else {
 					throw;
 				}
-			}
-			CloseClipboard();
+			} CloseClipboard();
 		}
 		return;
 	}
@@ -7129,8 +7133,7 @@ void thred::internal::duclip() {
 						}
 						SetClipboardData(ThrEdClip, ThrEdClipPointer);
 					}
-				}
-				CloseClipboard();
+				} CloseClipboard();
 				boost::dynamic_bitset<> formMap(FormIndex);
 				for (auto selectedForm : (*SelectedFormList)) {
 					formMap.set(selectedForm);
@@ -7236,8 +7239,7 @@ void thred::internal::duclip() {
 							}
 							form::ispcdclp();
 						}
-					}
-					CloseClipboard();
+					} CloseClipboard();
 				}
 				else {
 					if (PCSHeader.stitchCount && StateMap.test(StateFlag::GRPSEL)) {
@@ -7770,7 +7772,7 @@ void thred::internal::setsped() {
 	}
 	if (StitchesPerFrame < 2)
 		StitchesPerFrame = 2;
-	SetTimer(ThrEdWindow, 0, elapsedTimePerFrame, 0);
+	SetTimer(ThrEdWindow, 0, elapsedTimePerFrame, nullptr);
 }
 
 void thred::internal::deltot() {
@@ -7994,7 +7996,7 @@ void thred::internal::movi() {
 	if (PCSHeader.stitchCount) {
 		if (MsgWindow) {
 			DestroyWindow(MsgWindow);
-			MsgWindow = 0;
+			MsgWindow = nullptr;
 		}
 		StateMap.set(StateFlag::RUNPAT);
 		if (StateMap.test(StateFlag::GRPSEL)) {
@@ -8006,16 +8008,16 @@ void thred::internal::movi() {
 		thred::movStch();
 		if (!StateMap.test(StateFlag::WASPAT)) {
 			SpeedScrollBar = CreateWindow(L"SCROLLBAR",
-			                              0,
+			                              nullptr,
 			                              SBS_HORZ | WS_CHILD | WS_VISIBLE,
 			                              ButtonWidthX3,
 			                              0,
 			                              StitchWindowSize.x,
 			                              SCROLSIZ,
 			                              ThrEdWindow,
-			                              NULL,
+			                              nullptr,
 			                              ThrEdInstance,
-			                              NULL);
+			                              nullptr);
 		}
 		if (StateMap.test(StateFlag::ZUMED))
 			stepCount = PCSHeader.stitchCount * ZoomFactor * ZoomFactor;
@@ -8141,9 +8143,9 @@ void thred::internal::vubak() {
 			                                      dx,
 			                                      dy,
 			                                      ThrEdWindow,
-			                                      NULL,
+			                                      nullptr,
 			                                      ThrEdInstance,
-			                                      NULL);
+			                                      nullptr);
 		}
 		StateMap.set(StateFlag::BAKSHO);
 	}
@@ -8196,17 +8198,17 @@ void thred::internal::insfil() {
 		0,                                   // nFilterIndex
 		InsertedFileName,                    // lpstrFile
 		_MAX_PATH,                           // nMaxFile
-		0,                                   // lpstrFileTitle
+		nullptr,                             // lpstrFileTitle
 		0,                                   // nMaxFileTitle
 		DefaultDirectory->wstring().c_str(), // lpstr	ialDir
-		0,                                   // lpstrTitle
+		nullptr,                             // lpstrTitle
 		OFN_EXPLORER | OFN_OVERWRITEPROMPT,  // Flags
 		0,                                   // nFileOffset
 		0,                                   // nFileExtension
 		L"thr",                              // lpstrDefExt
 		0,                                   // lCustData
-		0,                                   // lpfnHook
-		0,                                   // lpTemplateName
+		nullptr,                             // lpfnHook
+		nullptr,                             // lpTemplateName
 	};
 	STRHED     fileHeader    = {};
 	STREX      thredHeader   = {};
@@ -8225,16 +8227,16 @@ void thred::internal::insfil() {
 	size_t     newTextureIndex    = TextureIndex;
 
 	if (StateMap.test(StateFlag::IGNORINS) || GetOpenFileName(&file)) {
-		InsertedFileHandle = CreateFile(InsertedFileName, (GENERIC_READ), 0, NULL, OPEN_EXISTING, 0, NULL);
+		InsertedFileHandle = CreateFile(InsertedFileName, (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
 		if (InsertedFileHandle == INVALID_HANDLE_VALUE) {
 			displayText::filnopn(IDS_FNOPN, InsertedFileName);
-			FileHandle = 0;
+			FileHandle = nullptr;
 			CloseHandle(InsertedFileHandle);
 		}
 		else {
 			InsertedStitchCount = PCSHeader.stitchCount;
 			if (isthr(InsertedFileName)) {
-				ReadFile(InsertedFileHandle, &fileHeader, sizeof(fileHeader), &BytesRead, NULL);
+				ReadFile(InsertedFileHandle, &fileHeader, sizeof(fileHeader), &BytesRead, nullptr);
 				if ((fileHeader.headerType & 0xffffff) != 0x746872)
 					displayText::tabmsg(IDS_NOTHR);
 				else {
@@ -8248,7 +8250,7 @@ void thred::internal::insfil() {
 						// ToDo - replace constants with sizes of data structures?
 						homscor = static_cast<double>(FormIndex) * FRMW + gethand(StitchBuffer, PCSHeader.stitchCount) * HANDW
 						          + FormVertexIndex * FRMPW + PCSHeader.stitchCount * STCHW;
-						ReadFile(InsertedFileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, 0);
+						ReadFile(InsertedFileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, nullptr);
 					}
 					thred::savdo();
 					if (fileHeader.stitchCount) {
@@ -8256,13 +8258,13 @@ void thred::internal::insfil() {
 						         &StitchBuffer[PCSHeader.stitchCount],
 						         fileHeader.stitchCount * sizeof(StitchBuffer[0]),
 						         &BytesRead,
-						         NULL);
+						         nullptr);
 					}
 					const auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0]))
 					                          / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
 					const auto formDataOffset = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor)
 					                            + sizeof(CustomColor) + threadLength;
-					SetFilePointer(InsertedFileHandle, formDataOffset, 0, FILE_CURRENT);
+					SetFilePointer(InsertedFileHandle, formDataOffset, nullptr, FILE_CURRENT);
 					insertedRectangle.left   = 1e9f;
 					insertedRectangle.bottom = 1e9f;
 					insertedRectangle.top    = 1e-9f;
@@ -8276,7 +8278,7 @@ void thred::internal::insfil() {
 							         formHeader.data(),
 							         fileHeader.formCount * sizeof(formHeader[0]),
 							         &BytesRead,
-							         0);
+							         nullptr);
 							if (BytesRead != fileHeader.formCount * sizeof(formHeader[0])) {
 								formHeader.resize(BytesRead / sizeof(formHeader[0]));
 								StateMap.set(StateFlag::BADFIL);
@@ -8293,10 +8295,11 @@ void thred::internal::insfil() {
 						else {
 							// ToDo - Use FRMHEDOUT here
 							// ReadFile(
-							//    InsertedFileHandle, &FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), &BytesRead, 0);
+							//    InsertedFileHandle, &FormList[FormIndex], fileHeader.formCount * sizeof(FRMHED), &BytesRead,
+							//    nullptr);
 							std::vector<FRMHEDOUT> inFormList(fileHeader.formCount);
 							auto                   bytesToRead = gsl::narrow<DWORD>(fileHeader.formCount * sizeof(inFormList[0]));
-							ReadFileInt(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, 0);
+							ReadFileInt(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								inFormList.resize(BytesRead / sizeof(inFormList[0]));
 								StateMap.set(StateFlag::BADFIL);
@@ -8308,7 +8311,7 @@ void thred::internal::insfil() {
 						}
 						if (fileHeader.vertexCount) {
 							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.vertexCount * sizeof(FormVertices[0]));
-							ReadFile(InsertedFileHandle, &FormVertices[FormVertexIndex], bytesToRead, &BytesRead, 0);
+							ReadFile(InsertedFileHandle, &FormVertices[FormVertexIndex], bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								newFormVertexIndex += BytesRead / sizeof(FormVertices[0]);
 								StateMap.set(StateFlag::BADFIL);
@@ -8329,7 +8332,7 @@ void thred::internal::insfil() {
 							//         0);
 							std::vector<SATCONOUT> inSatinGuides(fileHeader.dlineCount);
 							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.dlineCount * sizeof(inSatinGuides[0]));
-							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, 0);
+							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								inSatinGuides.resize(BytesRead / sizeof(inSatinGuides[0]));
 								StateMap.set(StateFlag::BADFIL);
@@ -8339,7 +8342,7 @@ void thred::internal::insfil() {
 						}
 						if (fileHeader.clipDataCount) {
 							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.clipDataCount * sizeof(ClipPoints[0]));
-							ReadFile(InsertedFileHandle, &ClipPoints[ClipPointIndex], bytesToRead, &BytesRead, 0);
+							ReadFile(InsertedFileHandle, &ClipPoints[ClipPointIndex], bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								StateMap.set(StateFlag::BADFIL);
 							}
@@ -8351,10 +8354,10 @@ void thred::internal::insfil() {
 							         &TexturePointsBuffer[TextureIndex],
 							         ExtendedHeader.texturePointCount * sizeof(TexturePointsBuffer[0]),
 							         &BytesRead,
-							         0);
+							         nullptr);
 						}
 						CloseHandle(InsertedFileHandle);
-						InsertedFileHandle = 0;
+						InsertedFileHandle = nullptr;
 						// update the form pointer variables
 						for (auto iFormList = InsertedFormIndex; iFormList < FormIndex; iFormList++) {
 							FormList[iFormList].vertices = thred::adflt(FormList[iFormList].vertexCount);
@@ -8362,10 +8365,12 @@ void thred::internal::insfil() {
 								if (FormList[iFormList].satinGuideCount)
 									FormList[iFormList].satinOrAngle.guide = satin::adsatk(FormList[iFormList].satinGuideCount);
 								if (clip::isclpx(iFormList))
-									FormList[iFormList].angleOrClipData.clip = thred::adclp(FormList[iFormList].lengthOrCount.clipCount);
+									FormList[iFormList].angleOrClipData.clip
+									    = thred::adclp(FormList[iFormList].lengthOrCount.clipCount);
 							}
 							if (clip::isclp(iFormList))
-								FormList[iFormList].angleOrClipData.clip = thred::adclp(FormList[iFormList].lengthOrCount.clipCount);
+								FormList[iFormList].angleOrClipData.clip
+								    = thred::adclp(FormList[iFormList].lengthOrCount.clipCount);
 							if (clip::iseclpx(iFormList))
 								FormList[iFormList].borderClipData = thred::adclp(FormList[iFormList].clipEntries);
 							if (texture::istx(iFormList)) {
@@ -8453,7 +8458,7 @@ void thred::internal::insfil() {
 			}
 			else {
 				// ToDo - inserting PCS files is broken and needs to be fixed
-				ReadFile(InsertedFileHandle, &pcsFileHeader, 0x46, &BytesRead, NULL);
+				ReadFile(InsertedFileHandle, &pcsFileHeader, 0x46, &BytesRead, nullptr);
 				if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16) {
 					thred::savdo();
 					std::vector<PCSTCH> pcsStitchBuffer(pcsFileHeader.stitchCount);
@@ -8461,7 +8466,7 @@ void thred::internal::insfil() {
 					         pcsStitchBuffer.data(),
 					         pcsFileHeader.stitchCount * sizeof(pcsStitchBuffer[0]),
 					         &BytesRead,
-					         NULL);
+					         nullptr);
 					iStitch      = PCSHeader.stitchCount;
 					newAttribute = 0;
 					for (iPCSStitch = 0; iPCSStitch < pcsFileHeader.stitchCount; iPCSStitch++) {
@@ -9909,16 +9914,16 @@ void thred::internal::sidhup() {
 	GetWindowRect((*ValueWindow)[PHUP], &hoopRectangle);
 	GetWindowRect(PreferencesWindow, &preferencesRectangle);
 	SideMessageWindow = CreateWindow(L"STATIC",
-	                                 0,
+	                                 nullptr,
 	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                 preferencesRectangle.right + 3 - ThredWindowOrigin.x,
 	                                 hoopRectangle.top - ThredWindowOrigin.y,
 	                                 ButtonWidthX3 + ButtonWidth * 2 + 6,
 	                                 ButtonHeight * HUPS + 6,
 	                                 ThrEdWindow,
-	                                 NULL,
+	                                 nullptr,
 	                                 ThrEdInstance,
-	                                 NULL);
+	                                 nullptr);
 	for (iHoop = 0; iHoop < HUPS; iHoop++) {
 		SideWindow[iHoop] = CreateWindow(L"STATIC",
 		                                 (*StringTable)[iHoop + STR_HUP0].c_str(),
@@ -9928,9 +9933,9 @@ void thred::internal::sidhup() {
 		                                 ButtonWidthX3 + ButtonWidth * 2,
 		                                 ButtonHeight,
 		                                 SideMessageWindow,
-		                                 NULL,
+		                                 nullptr,
 		                                 ThrEdInstance,
-		                                 NULL);
+		                                 nullptr);
 	}
 }
 
@@ -11344,7 +11349,8 @@ void thred::internal::dufdef() noexcept {
 	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, (DLGPROC)fthdefprc);
 }
 
-unsigned thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rotationAngle, dPOINT& rotationCenter) {
+unsigned
+thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rotationAngle, dPOINT& rotationCenter) {
 	double     colorBarPosition = 0.0, ratio = 0.0, swapCoordinate = 0.0, swapFactor = 0.0;
 	FRMHED*    forms           = nullptr;
 	fPOINT     adjustedPoint   = {};
@@ -12061,7 +12067,8 @@ unsigned thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyR
 			StateMap.set(StateFlag::RESTCH);
 			return 1;
 		}
-		if (thred::px2stch() && !(StateMap.test(StateFlag::SIZSEL) && thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2]))) {
+		if (thred::px2stch()
+		    && !(StateMap.test(StateFlag::SIZSEL) && thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2]))) {
 			if (FormIndex && !StateMap.test(StateFlag::FRMOF)) {
 				if (Msg.wParam & MK_SHIFT) {
 					TmpFormIndex = ClosestFormToCursor;
@@ -12571,10 +12578,10 @@ unsigned thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyR
 					fs::remove(*ThrName);
 					thrBack = 'r';
 					ThrName->replace_extension(thrExt);
-					FileHandle
-					    = CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, NULL, OPEN_EXISTING, 0, NULL);
+					FileHandle = CreateFile(
+					    ThrName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
 					if (FileHandle == INVALID_HANDLE_VALUE)
-						FileHandle = 0;
+						FileHandle = nullptr;
 					return 1;
 				}
 				GetWindowRect(CancelButton, &windowRect);
@@ -13415,7 +13422,8 @@ unsigned thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyR
 			return 1;
 		}
 		thred::unmsg();
-		if (thred::px2stch() && !(StateMap.test(StateFlag::SIZSEL) && thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2]))) {
+		if (thred::px2stch()
+		    && !(StateMap.test(StateFlag::SIZSEL) && thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2]))) {
 			unpat();
 			if (StateMap.testAndReset(StateFlag::ROTAT)) {
 				RotateBoxToCursorLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
@@ -13767,9 +13775,9 @@ unsigned thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyR
 					                                                ButtonWidth,
 					                                                ButtonHeight,
 					                                                ThrEdWindow,
-					                                                NULL,
+					                                                nullptr,
 					                                                ThrEdInstance,
-					                                                NULL);
+					                                                nullptr);
 				}
 				StateMap.set(StateFlag::SIZSEL);
 			}
@@ -14143,12 +14151,12 @@ unsigned thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyR
 			}
 			else {
 #if PESACT
-			//				IniFile.auxFileType=AUXPES;
-			//				strcpy_s(WorkingFileName,"u:\\mrd\\t.thr");
-			//				StateMap.set(StateFlag::REDOLD);
-			//				nuFil();
-			//				lodpes();
-			//				savpes();
+				//				IniFile.auxFileType=AUXPES;
+				//				strcpy_s(WorkingFileName,"u:\\mrd\\t.thr");
+				//				StateMap.set(StateFlag::REDOLD);
+				//				nuFil();
+				//				lodpes();
+				//				savpes();
 #endif
 				xt::tst();
 			}
@@ -15878,28 +15886,28 @@ void thred::internal::makCol() noexcept {
 	buffer[2] = 0;
 	for (iColor = 0; iColor < 16; iColor++) {
 		DefaultColorWin[iColor] = CreateWindow(L"STATIC",
-		                                       0,
+		                                       nullptr,
 		                                       SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                                       0,
 		                                       ButtonHeight * iColor,
 		                                       ButtonWidth,
 		                                       ButtonHeight,
 		                                       ThrEdWindow,
-		                                       NULL,
+		                                       nullptr,
 		                                       ThrEdInstance,
-		                                       NULL);
+		                                       nullptr);
 
 		UserColorWin[iColor] = CreateWindow(L"STATIC",
-		                                    0,
+		                                    nullptr,
 		                                    SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                                    ButtonWidth,
 		                                    ButtonHeight * iColor,
 		                                    ButtonWidth,
 		                                    ButtonHeight,
 		                                    ThrEdWindow,
-		                                    NULL,
+		                                    nullptr,
 		                                    ThrEdInstance,
-		                                    NULL);
+		                                    nullptr);
 
 		buffer[0]             = ThreadSize[iColor][0];
 		ThreadSizeWin[iColor] = CreateWindow(L"STATIC",
@@ -15910,27 +15918,27 @@ void thred::internal::makCol() noexcept {
 		                                     ButtonWidth,
 		                                     ButtonHeight,
 		                                     ThrEdWindow,
-		                                     NULL,
+		                                     nullptr,
 		                                     ThrEdInstance,
-		                                     NULL);
+		                                     nullptr);
 	}
 }
 
 void thred::internal::ritloc() {
 	fs::path   lockFilePath;
 	PWSTR      ppszPath = nullptr; // variable to receive the path memory block pointer.
-	const auto hr       = SHGetKnownFolderPath(FOLDERID_LocalAppDataLow, 0, NULL, &ppszPath);
+	const auto hr       = SHGetKnownFolderPath(FOLDERID_LocalAppDataLow, 0, nullptr, &ppszPath);
 
 	if (SUCCEEDED(hr)) {
 		lockFilePath.assign(ppszPath); // make a local copy of the path
 		lockFilePath /= L"ThrEd";
 		fs::create_directory(lockFilePath);
 		lockFilePath /= L"thredloc.txt";
-		auto lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+		auto lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 		if (lockFile != INVALID_HANDLE_VALUE) {
 			DWORD bytesWritten = 0;
 			auto  value        = utf::Utf16ToUtf8(*HomeDirectory);
-			WriteFileInt(lockFile, value.data(), value.size() + 1, &bytesWritten, 0);
+			WriteFileInt(lockFile, value.data(), value.size() + 1, &bytesWritten, nullptr);
 			CloseHandle(lockFile);
 		}
 	}
@@ -15961,7 +15969,7 @@ void thred::internal::ducmd() {
 		std::wstring arg1 = { ArgList[1] };
 		if (!arg1.compare(0, 4, L"/F1:")) {
 			balaradFileName = *HomeDirectory / arg1.substr(4);
-			BalaradFile     = CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+			BalaradFile     = CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 			if (BalaradFile != INVALID_HANDLE_VALUE) {
 				CloseHandle(BalaradFile);
 				*BalaradName0 = balaradFileName;
@@ -15969,11 +15977,12 @@ void thred::internal::ducmd() {
 					std::wstring arg2 = { ArgList[2] };
 					if (!arg2.compare(0, 4, L"/F2:")) {
 						balaradFileName = *HomeDirectory / arg2.substr(4);
-						BalaradFile     = CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+						BalaradFile
+						    = CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 						if (BalaradFile != INVALID_HANDLE_VALUE) {
 							*BalaradName1                     = balaradFileName;
 							wchar_t readBuffer[_MAX_PATH + 1] = { 0 };
-							ReadFile(BalaradFile, &readBuffer, (_MAX_PATH + 1), &bytesRead, 0);
+							ReadFile(BalaradFile, &readBuffer, (_MAX_PATH + 1), &bytesRead, nullptr);
 							if (bytesRead) {
 								BalaradName2->assign(readBuffer);
 								redbal();
@@ -16002,7 +16011,7 @@ void thred::internal::redini() {
 	duhom();
 	*IniFileName = *HomeDirectory;
 	*IniFileName /= L"thred.ini";
-	IniFileHandle = CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+	IniFileHandle = CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (IniFileHandle == INVALID_HANDLE_VALUE) {
 		defpref();
 		getDocsFolder(DefaultDirectory);
@@ -16014,7 +16023,7 @@ void thred::internal::redini() {
 		}
 	}
 	else {
-		ReadFile(IniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, 0);
+		ReadFile(IniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr);
 		if (bytesRead < sizeof(IniFile))
 			IniFile.formBoxSizePixels = DEFBPIX;
 		auto directory = utf::Utf8ToUtf16(IniFile.defaultDirectory);
@@ -16147,7 +16156,7 @@ void thred::internal::redini() {
 	CloseHandle(IniFileHandle);
 	if (!IniFile.fillAngle)
 		IniFile.fillAngle = PI / 6;
-	deviceContext       = GetDC(0);
+	deviceContext       = GetDC(nullptr);
 	ScreenSizePixels.cx = GetDeviceCaps(deviceContext, HORZRES);
 	ScreenSizePixels.cy = GetDeviceCaps(deviceContext, VERTRES);
 	if (IniFile.initialWindowCoords.left < 0)
@@ -16198,12 +16207,12 @@ void thred::internal::init() {
 	long                offsetStepSize  = 0;
 	RECT                tRct            = {};
 	RECT                wrct            = {};
-	HDC                 deviceContext   = GetDC(NULL);
+	HDC                 deviceContext   = GetDC(nullptr);
 	const unsigned long screenHalfWidth = (GetDeviceCaps(deviceContext, HORZRES)) >> 1;
 	std::wstring        blank(L"");
 	std::wstring*       buttonTxt = &blank;
 
-	ReleaseDC(NULL, deviceContext);
+	ReleaseDC(nullptr, deviceContext);
 	TextureIndex = 0;
 	LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1));
 	MainMenu = GetMenu(ThrEdWindow);
@@ -16226,15 +16235,15 @@ void thred::internal::init() {
 	ViewMenu       = GetSubMenu(MainMenu, M_VIEW);
 	ViewSetMenu    = GetSubMenu(ViewMenu, MVW_SET);
 	qchk();
-	ArrowCursor = LoadCursor(0, IDC_ARROW);
-	CrossCursor = LoadCursor(0, IDC_CROSS);
+	ArrowCursor = LoadCursor(nullptr, IDC_ARROW);
+	CrossCursor = LoadCursor(nullptr, IDC_CROSS);
 	crtcurs();
 	redfils();
 	StateMap.reset(); // clear the bitmap
 	// set up the size variables
 	ThredDC = GetDC(ThrEdWindow);
 	SetStretchBltMode(ThredDC, COLORONCOLOR);
-	StitchWindowDC    = GetDCEx(MainStitchWin, 0, DCX_PARENTCLIP | DCX_CLIPSIBLINGS);
+	StitchWindowDC    = GetDCEx(MainStitchWin, nullptr, DCX_PARENTCLIP | DCX_CLIPSIBLINGS);
 	StitchWindowMemDC = CreateCompatibleDC(StitchWindowDC);
 	ScreenSizeMM.cx   = GetDeviceCaps(ThredDC, HORZSIZE);
 	ScreenSizeMM.cy   = GetDeviceCaps(ThredDC, VERTSIZE);
@@ -16321,9 +16330,9 @@ void thred::internal::init() {
 			                                     ButtonWidthX3,
 			                                     ButtonHeight,
 			                                     ThrEdWindow,
-			                                     NULL,
+			                                     nullptr,
 			                                     ThrEdInstance,
-			                                     NULL);
+			                                     nullptr);
 		}
 	}
 	trace::initTraceWindows();
@@ -16335,9 +16344,9 @@ void thred::internal::init() {
 	                        COLSIZ,
 	                        ThredWindowRect.bottom,
 	                        ThrEdWindow,
-	                        NULL,
+	                        nullptr,
 	                        ThrEdInstance,
-	                        NULL);
+	                        nullptr);
 	nuRct();
 	// create pens
 	for (iRGBK = 0; iRGBK < 4; iRGBK++)
@@ -16994,10 +17003,10 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 	STREX                 extendedHeader  = {};
 	unsigned              fileTypeVersion = 0;
 
-	HANDLE thrEdFile = CreateFile(fileName.wstring().c_str(), GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+	HANDLE thrEdFile = CreateFile(fileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 
 	if (thrEdFile != INVALID_HANDLE_VALUE) {
-		ReadFile(thrEdFile, &stitchHeader, sizeof(stitchHeader), &BytesRead, NULL);
+		ReadFile(thrEdFile, &stitchHeader, sizeof(stitchHeader), &BytesRead, nullptr);
 		if (BytesRead == sizeof(stitchHeader)) {
 			if ((stitchHeader.headerType & 0xffffff) == 0x746872) {
 				fileTypeVersion = (stitchHeader.headerType & 0xff000000) >> 24;
@@ -17014,7 +17023,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					break;
 				case 1:
 				case 2:
-					ReadFile(thrEdFile, &extendedHeader, sizeof(extendedHeader), &BytesRead, NULL);
+					ReadFile(thrEdFile, &extendedHeader, sizeof(extendedHeader), &BytesRead, nullptr);
 					if (BytesRead != sizeof(extendedHeader))
 						return;
 					stitchSourceSize.x = extendedHeader.hoopSizeX;
@@ -17034,11 +17043,11 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 				std::vector<fPOINTATTR> stitchesToDraw(stitchHeader.stitchCount);
 				std::vector<POINT>      lines(stitchHeader.stitchCount);
 				bytesToRead = stitchHeader.stitchCount * sizeof(StitchBuffer[0]);
-				ReadFile(thrEdFile, stitchesToDraw.data(), bytesToRead, &BytesRead, 0);
+				ReadFile(thrEdFile, stitchesToDraw.data(), bytesToRead, &BytesRead, nullptr);
 				if (bytesToRead == BytesRead) {
-					SetFilePointer(thrEdFile, 16, 0, FILE_CURRENT);
-					ReadFile(thrEdFile, &brushColor, sizeof(brushColor), &BytesRead, 0);
-					ReadFileInt(thrEdFile, colors.data(), colors.size() * sizeof(colors[0]), &BytesRead, 0);
+					SetFilePointer(thrEdFile, 16, nullptr, FILE_CURRENT);
+					ReadFile(thrEdFile, &brushColor, sizeof(brushColor), &BytesRead, nullptr);
+					ReadFileInt(thrEdFile, colors.data(), colors.size() * sizeof(colors[0]), &BytesRead, nullptr);
 					brush = CreateSolidBrush(brushColor);
 					SelectObject(drawItem->hDC, brush);
 					FillRect(drawItem->hDC, &drawItem->rcItem, brush);
@@ -17072,29 +17081,29 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 				}
 			}
 			else
-				SetFilePointer(thrEdFile, 84, 0, FILE_CURRENT);
+				SetFilePointer(thrEdFile, 84, nullptr, FILE_CURRENT);
 			if (stitchHeader.formCount) {
 				do {
 					std::vector<POINT> lines(MAXFRMLINS);
-					SetFilePointer(thrEdFile, 80, 0, FILE_CURRENT);
+					SetFilePointer(thrEdFile, 80, nullptr, FILE_CURRENT);
 					std::vector<FRMHED> formList(stitchHeader.formCount);
 					std::vector<fPOINT> vertexList(stitchHeader.vertexCount);
 					if (fileTypeVersion < 2) {
 						std::vector<FRMHEDO> formListOriginal(stitchHeader.formCount);
 						bytesToRead = stitchHeader.formCount * sizeof(formListOriginal[0]);
-						ReadFile(thrEdFile, formListOriginal.data(), bytesToRead, &BytesRead, 0);
+						ReadFile(thrEdFile, formListOriginal.data(), bytesToRead, &BytesRead, nullptr);
 						if (BytesRead != bytesToRead)
 							break;
 						const auto _ = std::copy(formListOriginal.cbegin(), formListOriginal.cend(), formList.begin());
 					}
 					else {
 						bytesToRead = stitchHeader.formCount * sizeof(formList[0]);
-						ReadFile(thrEdFile, formList.data(), bytesToRead, &BytesRead, 0);
+						ReadFile(thrEdFile, formList.data(), bytesToRead, &BytesRead, nullptr);
 						if (BytesRead != bytesToRead)
 							break;
 					}
 					bytesToRead = stitchHeader.vertexCount * sizeof(vertexList[0]);
-					ReadFile(thrEdFile, vertexList.data(), bytesToRead, &BytesRead, 0);
+					ReadFile(thrEdFile, vertexList.data(), bytesToRead, &BytesRead, nullptr);
 					if (BytesRead != bytesToRead)
 						break;
 					iVertex = 0;
@@ -17553,13 +17562,13 @@ void thred::internal::sachk() noexcept {
 
 /*
 int fltex(int code) noexcept {
-	if (code != 0x10)
-		return 0;
-	unsigned int current_word = 0;
-	_controlfp_s(&current_word, ALL_FPU_EX, _MCW_EM);
-	_controlfp_s(&current_word, _RC_NEAR, _MCW_RC);
+    if (code != 0x10)
+        return 0;
+    unsigned int current_word = 0;
+    _controlfp_s(&current_word, ALL_FPU_EX, _MCW_EM);
+    _controlfp_s(&current_word, _RC_NEAR, _MCW_RC);
 
-	return -1;
+    return -1;
 }
 */
 
@@ -17571,7 +17580,9 @@ int handle_program_memory_depletion(size_t) {
 }
 #endif
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PWSTR lpCmdLine, _In_ int nCmdShow) {
+#pragma warning(push)
+#pragma warning(disable : 26461) //disable warning for hPrevInstance not being marked as a pointer to const
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,  _In_opt_ HINSTANCE hPrevInstance, _In_ PWSTR lpCmdLine, _In_ int nCmdShow) {
 	UNREFERENCED_PARAMETER(nCmdShow);
 
 	ArgList = CommandLineToArgvW(GetCommandLine(), &ArgCount);
@@ -17598,12 +17609,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	wc.cbWndExtra  = 0;
 	wc.hInstance   = ThrEdInstance;
 	wc.hIcon       = static_cast<HICON>(LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_SHARED));
-	wc.hCursor     = 0; //  set the cursor to null as the cursor changes in the window:
-	                    //  https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setcursor
+	wc.hCursor     = nullptr; //  set the cursor to null as the cursor changes in the window:
+	                          //  https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setcursor
 	wc.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
 	wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1);
 	wc.lpszClassName = L"thred";
-	wc.hIconSm       = NULL;
+	wc.hIconSm       = nullptr;
 
 #if HIGHDPI
 	DPI_AWARENESS_CONTEXT previousDpiContext = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
@@ -17640,19 +17651,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 				    MFT_STRING,               // Type
 				    0,                        // State
 				    0,                        // ID
-				    0,                        // SubMenu
-				    0,                        // bmpChecked
-				    0,                        // bmpUnchecked
+				    nullptr,                  // SubMenu
+				    nullptr,                  // bmpChecked
+				    nullptr,                  // bmpUnchecked
 				    0,                        // ItemData
 				    formOnOff,                // TypeData
 				    16,                       // cch
 #if (WINVER >= 0x0500)
-				    0 // bmpItem
-#endif                /* WINVER >= 0x0500 */
+				    nullptr // bmpItem
+#endif                      /* WINVER >= 0x0500 */
 			      };
 			MenuInfo = &private_MenuInfo;
-		}
-		std::vector<fPOINT> private_TempPolygon;
+		} std::vector<fPOINT>
+		    private_TempPolygon;
 		TempPolygon = &private_TempPolygon;
 		std::vector<fPOINT> private_OutsidePointList;
 		OutsidePointList = &private_OutsidePointList;
@@ -17730,8 +17741,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			                           IniFile.initialWindowCoords.right,
 			                           IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left,
 			                           IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top,
-			                           0,
-			                           0,
+			                           nullptr,
+			                           nullptr,
 			                           hInstance,
 			                           &createParams);
 		}
@@ -17743,8 +17754,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			                           CW_USEDEFAULT,
 			                           CW_USEDEFAULT,
 			                           CW_USEDEFAULT,
-			                           0,
-			                           0,
+			                           nullptr,
+			                           nullptr,
 			                           hInstance,
 			                           &createParams);
 			GetClientRect(ThrEdWindow, &ThredWindowRect);
@@ -17764,7 +17775,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			DesignerName->assign(designerBuffer);
 			thi::getdes();
 		}
-		while (GetMessage(&Msg, NULL, 0, 0)) {
+		while (GetMessage(&Msg, nullptr, 0, 0)) {
 			StateMap.set(StateFlag::SAVACT);
 			if (!thi::chkMsg(stretchBoxLine, xyRatio, rotationAngle, rotationCenter))
 				DispatchMessage(&Msg);
@@ -17797,3 +17808,4 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	return -1;
 }
+#pragma warning(pop)

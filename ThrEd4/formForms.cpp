@@ -15,7 +15,9 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127) // supress warning for fmt library header
+#pragma warning(disable : 4127)  // supress warning for fmt library header
+#pragma warning(disable : 6387)  // supress warning for fmt library header
+#pragma warning(disable : 26455) // supress warning for library headers
 #include <fmt/format.h>
 #pragma warning(pop)
 
@@ -70,7 +72,7 @@ void formForms::maxwid(unsigned start, unsigned finish) {
 HWND formForms::internal::txtwin(const std::wstring& windowName, const RECT& location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		formForms::maxtsiz(windowName, LabelWindowSize);
-		return 0;
+		return nullptr;
 	}
 	return CreateWindow(L"STATIC",
 	                    windowName.c_str(),
@@ -80,15 +82,15 @@ HWND formForms::internal::txtwin(const std::wstring& windowName, const RECT& loc
 	                    location.right - location.left,
 	                    location.bottom - location.top,
 	                    FormDataSheet,
-	                    NULL,
+	                    nullptr,
 	                    ThrEdInstance,
-	                    NULL);
+	                    nullptr);
 }
 
 HWND formForms::internal::txtrwin(const std::wstring& winName, const RECT& location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		formForms::maxtsiz(winName, ValueWindowSize);
-		return 0;
+		return nullptr;
 	}
 	return CreateWindow(L"STATIC",
 	                    winName.c_str(),
@@ -98,15 +100,15 @@ HWND formForms::internal::txtrwin(const std::wstring& winName, const RECT& locat
 	                    location.right - location.left,
 	                    location.bottom - location.top,
 	                    FormDataSheet,
-	                    NULL,
+	                    nullptr,
 	                    ThrEdInstance,
-	                    NULL);
+	                    nullptr);
 }
 
 HWND formForms::internal::numwin(const std::wstring& winName, const RECT& location) {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		formForms::maxtsiz(winName, ValueWindowSize);
-		return 0;
+		return nullptr;
 	}
 	return CreateWindow(L"STATIC",
 	                    winName.c_str(),
@@ -116,9 +118,9 @@ HWND formForms::internal::numwin(const std::wstring& winName, const RECT& locati
 	                    location.right - location.left,
 	                    location.bottom - location.top,
 	                    FormDataSheet,
-	                    NULL,
+	                    nullptr,
 	                    ThrEdInstance,
-	                    NULL);
+	                    nullptr);
 }
 
 void formForms::internal::nxtlin() noexcept {
@@ -467,16 +469,16 @@ void formForms::refrm() {
 	}
 	else {
 		FormDataSheet = CreateWindow(L"STATIC",
-		                             0,
+		                             nullptr,
 		                             WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                             ButtonWidthX3 + 3,
 		                             3,
 		                             LabelWindowSize.x + ValueWindowSize.x + 18,
 		                             LabelWindowSize.y * FormMenuEntryCount + 12,
 		                             ThrEdWindow,
-		                             NULL,
+		                             nullptr,
 		                             ThrEdInstance,
-		                             NULL);
+		                             nullptr);
 	}
 	StateMap.reset(StateFlag::REFCNT);
 	ffi::refrmfn();
@@ -493,16 +495,16 @@ void formForms::sidwnd(HWND wnd) noexcept {
 	GetWindowRect(wnd, &windowRect);
 	GetWindowRect(FormDataSheet, &MsgRect);
 	SideMessageWindow = CreateWindow(L"STATIC",
-	                                 0,
+	                                 nullptr,
 	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                 MsgRect.right - ThredWindowOrigin.x + 3,
 	                                 windowRect.top - ThredWindowOrigin.y - 3,
 	                                 ButtonWidthX3,
 	                                 windowRect.bottom - windowRect.top + 3,
 	                                 ThrEdWindow,
-	                                 NULL,
+	                                 nullptr,
 	                                 ThrEdInstance,
-	                                 NULL);
+	                                 nullptr);
 }
 
 void formForms::prfsid(HWND wnd) noexcept {
@@ -514,16 +516,16 @@ void formForms::prfsid(HWND wnd) noexcept {
 	GetWindowRect(wnd, &windowRect);
 	GetClientRect(PreferencesWindow, &MsgRect);
 	SideMessageWindow = CreateWindow(L"STATIC",
-	                                 0,
+	                                 nullptr,
 	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                 windowRect.right - ThredWindowOrigin.x + 6,
 	                                 windowRect.top - ThredWindowOrigin.y - 3,
 	                                 ValueWindowSize.x,
 	                                 windowRect.bottom - windowRect.top + 3,
 	                                 ThrEdWindow,
-	                                 NULL,
+	                                 nullptr,
 	                                 ThrEdInstance,
-	                                 NULL);
+	                                 nullptr);
 }
 
 void formForms::internal::prftwin(const std::wstring& text) noexcept {
@@ -535,9 +537,9 @@ void formForms::internal::prftwin(const std::wstring& text) noexcept {
 	             LabelWindowCoords.right - LabelWindowCoords.left,
 	             LabelWindowCoords.bottom - LabelWindowCoords.top,
 	             PreferencesWindow,
-	             NULL,
+	             nullptr,
 	             ThrEdInstance,
-	             NULL);
+	             nullptr);
 }
 
 HWND formForms::internal::prfnwin(const std::wstring& text) noexcept {
@@ -549,9 +551,9 @@ HWND formForms::internal::prfnwin(const std::wstring& text) noexcept {
 	                    ValueWindowCoords.right - ValueWindowCoords.left,
 	                    ValueWindowCoords.bottom - ValueWindowCoords.top,
 	                    PreferencesWindow,
-	                    NULL,
+	                    nullptr,
 	                    ThrEdInstance,
-	                    NULL);
+	                    nullptr);
 }
 
 void formForms::internal::prflin(const std::wstring& msg, unsigned row) {
@@ -583,16 +585,16 @@ void formForms::prfmsg() {
 	DestroyWindow(PreferencesWindow);
 	PreferenceWindowWidth = LabelWindowSize.x + ValueWindowSize.x + 18;
 	PreferencesWindow     = CreateWindow(L"STATIC",
-                                     0,
+                                     nullptr,
                                      WS_CHILD | WS_VISIBLE | WS_BORDER,
                                      ButtonWidthX3 + 3,
                                      3,
                                      PreferenceWindowWidth,
                                      LabelWindowSize.y * PRFLINS + 12,
                                      ThrEdWindow,
-                                     NULL,
+                                     nullptr,
                                      ThrEdInstance,
-                                     NULL);
+                                     nullptr);
 	preferenceDC          = GetDC(PreferencesWindow);
 	GetClientRect(PreferencesWindow, &preferenceRect);
 	FillRect(preferenceDC, &preferenceRect, GetSysColorBrush(COLOR_WINDOW));

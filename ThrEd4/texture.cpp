@@ -15,7 +15,10 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127) // supress warning for fmt library header
+#pragma warning(disable : 4127)  // supress warning for fmt library header
+#pragma warning(disable : 6387)  // supress warning for fmt library header
+#pragma warning(disable : 26455) // supress warning for library headers
+#include <boost/dynamic_bitset.hpp>
 #include <fmt/format.h>
 #pragma warning(pop)
 
@@ -73,10 +76,10 @@ void texture::txdun() {
 	if (TextureHistory[0].texturePoint.size()) {
 		if (txi::txnam(name, sizeof(name) / sizeof(name[0]))) {
 			DWORD bytesWritten = 0;
-			auto  handle       = CreateFile(name, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+			auto  handle       = CreateFile(name, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 			if (handle != INVALID_HANDLE_VALUE) {
-				WriteFile(handle, &signature, sizeof(signature), &bytesWritten, 0);
-				WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, 0);
+				WriteFile(handle, &signature, sizeof(signature), &bytesWritten, nullptr);
+				WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
 				for (auto i = 0; i < ITXBUFLEN; i++) {
 					auto&       bufferEntry  = textureHistoryBuffer[i];
 					const auto& historyEntry = TextureHistory[i];
@@ -86,14 +89,15 @@ void texture::txdun() {
 					bufferEntry.width        = historyEntry.width;
 					bufferEntry.spacing      = historyEntry.spacing;
 				}
-				WriteFileInt(handle, textureHistoryBuffer.data(), textureHistoryBuffer.size() * ITXBUFLEN, &bytesWritten, 0);
+				WriteFileInt(
+				    handle, textureHistoryBuffer.data(), textureHistoryBuffer.size() * ITXBUFLEN, &bytesWritten, nullptr);
 				for (size_t iHistory = 0; iHistory < ITXBUFLEN; iHistory++) {
 					if (TextureHistory[iHistory].texturePoint.size())
 						WriteFileInt(handle,
 						             TextureHistory[iHistory].texturePoint.data(),
 						             TextureHistory[iHistory].texturePoint.size() * sizeof(TextureHistory[0].texturePoint[0]),
 						             &bytesWritten,
-						             0);
+						             nullptr);
 				}
 			}
 			CloseHandle(handle);
@@ -125,19 +129,19 @@ void texture::redtx() {
 
 	TextureHistoryIndex = ITXBUFLEN - 1;
 	if (txi::txnam(name, sizeof(name) / sizeof(name[0]))) {
-		auto handle = CreateFile(name, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0);
+		auto handle = CreateFile(name, GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 		if (handle != INVALID_HANDLE_VALUE) {
 			DWORD bytesRead = 0;
 			char  sig[4]    = { 0 };
-			if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, 0)) {
+			if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, nullptr)) {
 				if (!strcmp(sig, "txh")) {
-					if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, 0)) {
+					if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr)) {
 						DWORD historyBytesRead = 0;
 						if (ReadFileInt(handle,
 						                textureHistoryBuffer.data(),
 						                textureHistoryBuffer.size() * ITXBUFLEN,
 						                &historyBytesRead,
-						                0)) {
+						                nullptr)) {
 							for (size_t index = 0; index < (historyBytesRead / sizeof(textureHistoryBuffer[0])); index++) {
 								TextureHistory[index].height  = textureHistoryBuffer[index].height;
 								TextureHistory[index].width   = textureHistoryBuffer[index].width;
@@ -149,7 +153,7 @@ void texture::redtx() {
 									                 sizeof(TextureHistory[0].texturePoint[0])
 									                     * textureHistoryBuffer[index].count,
 									                 &bytesRead,
-									                 0)) {
+									                 nullptr)) {
 										TextureHistory[index].texturePoint.clear();
 										TextureHistory[index].texturePoint.shrink_to_fit();
 									}
@@ -255,7 +259,7 @@ void texture::dutxtfil() {
 	ShowWindow(HorizontalScrollBar, FALSE);
 	SelectedTexturePointsList->clear();
 	StateMap.set(StateFlag::INIT);
-	SideWindowButton = 0;
+	SideWindowButton = nullptr;
 	if (StateMap.test(StateFlag::WASTXBAK)) {
 		txi::redtbak();
 		if (!TextureScreen.areaHeight)
@@ -474,7 +478,7 @@ void texture::rstxt() {
 	StateMap.set(StateFlag::RESTCH);
 	StateMap.reset(StateFlag::POLIMOV);
 	DestroyWindow(SideWindowButton);
-	SideWindowButton = 0;
+	SideWindowButton = nullptr;
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -854,7 +858,7 @@ void texture::internal::chktxnum() {
 		}
 	}
 	DestroyWindow(SideWindowButton);
-	SideWindowButton = 0;
+	SideWindowButton = nullptr;
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -865,16 +869,16 @@ void texture::internal::butsid(unsigned windowId) {
 	TextureWindowId = windowId;
 	GetWindowRect((*ButtonWin)[windowId], &buttonRect);
 	SideWindowButton = CreateWindow(L"STATIC",
-	                                0,
+	                                nullptr,
 	                                SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                buttonRect.left + ButtonWidthX3 - StitchWindowOrigin.x,
 	                                buttonRect.top - StitchWindowOrigin.y,
 	                                ButtonWidthX3,
 	                                ButtonHeight,
 	                                MainStitchWin,
-	                                NULL,
+	                                nullptr,
 	                                ThrEdInstance,
-	                                NULL);
+	                                nullptr);
 }
 
 bool texture::internal::txcmp(const TXPNT& texturePoint0, const TXPNT& texturePoint1) noexcept {
