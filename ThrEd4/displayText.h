@@ -16,6 +16,7 @@ void        drwtxbut(const TXTSCR& textureScreen);
 bool        filmsgs(unsigned code);
 void        filnopn(unsigned code, const fs::path& fileName);
 void        frm1pnt();
+HFONT       getThrEdFont();
 void        grpmsg();
 void        grpmsg1();
 void        hsizmsg();
