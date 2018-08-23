@@ -922,10 +922,37 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 	wchar_t buffer[HBUFSIZ] = { 0 };
 
 	switch (umsg) {
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+#ifdef TESTCODE
+		const auto uDpi = GetDpiForWindow(hwndlg);
+		RECT rcClient = {};
+		GetWindowRect(hwndlg, &rcClient);
+		auto uWidth = MulDiv((rcClient.right - rcClient.left), uDpi, 96);
+		auto uHeight = MulDiv((rcClient.bottom - rcClient.top), uDpi, 96);
+		SetWindowPos(
+			hwndlg,
+			nullptr,
+			rcClient.left,
+			rcClient.top,
+			uWidth,
+			uHeight,
+			SWP_NOZORDER | SWP_NOACTIVATE);
+
+		LOGFONT lfText;
+		SystemParametersInfoForDpi(SPI_GETICONTITLELOGFONT, sizeof(lfText), &lfText, FALSE, uDpi);
+		auto hFontNew = CreateFontIndirectW(&lfText);
+		//SendMessage(hwndlg, WM_SETFONT, (WPARAM)hFontNew, MAKELPARAM(TRUE, 0));
+		EnumChildWindows(hwndlg,
+			[](HWND p_hWnd, LPARAM lParam) -> BOOL {
+			SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
+			return TRUE;
+		},
+			(LPARAM)hFontNew);
+#endif // !TESTCODE
 		ffi::initTearDlg(hwndlg);
 		break;
+	}
 	case WM_COMMAND:
 		switch (LOWORD(wparam)) {
 		case IDCANCEL:
