@@ -939,16 +939,14 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 			uHeight,
 			SWP_NOZORDER | SWP_NOACTIVATE);
 
-		LOGFONT lfText;
-		SystemParametersInfoForDpi(SPI_GETICONTITLELOGFONT, sizeof(lfText), &lfText, FALSE, uDpi);
-		auto hFontNew = CreateFontIndirectW(&lfText);
-		//SendMessage(hwndlg, WM_SETFONT, (WPARAM)hFontNew, MAKELPARAM(TRUE, 0));
+		auto hFont = displayText::getThrEdFont(400);
+		//SendMessage(hwndlg, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
 		EnumChildWindows(hwndlg,
 			[](HWND p_hWnd, LPARAM lParam) -> BOOL {
 			SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
 			return TRUE;
 		},
-			(LPARAM)hFontNew);
+			(LPARAM)hFont);
 #endif // !TESTCODE
 		ffi::initTearDlg(hwndlg);
 		break;
