@@ -15899,18 +15899,18 @@ void thred::internal::makCol() noexcept {
 		                                       nullptr,
 		                                       ThrEdInstance,
 		                                       nullptr);
-		SendMessage(DefaultColorWin[iColor], WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
-		UserColorWin[iColor] = CreateWindow(L"STATIC",
-		                                    nullptr,
-		                                    SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		                                    ButtonWidth,
-		                                    ButtonHeight * iColor,
-		                                    ButtonWidth,
-		                                    ButtonHeight,
-		                                    ThrEdWindow,
-		                                    nullptr,
-		                                    ThrEdInstance,
-		                                    nullptr);
+		displayText::setWindowFont(DefaultColorWin[iColor], hFont);
+		UserColorWin[iColor]  = CreateWindow(L"STATIC",
+                                            nullptr,
+                                            SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                            ButtonWidth,
+                                            ButtonHeight * iColor,
+                                            ButtonWidth,
+                                            ButtonHeight,
+                                            ThrEdWindow,
+                                            nullptr,
+                                            ThrEdInstance,
+                                            nullptr);
 		buffer[0]             = ThreadSize[iColor][0];
 		ThreadSizeWin[iColor] = CreateWindow(L"STATIC",
 		                                     buffer,
@@ -15923,8 +15923,7 @@ void thred::internal::makCol() noexcept {
 		                                     nullptr,
 		                                     ThrEdInstance,
 		                                     nullptr);
-		SendMessage(ThreadSizeWin[iColor], WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
-
+		displayText::setWindowFont(ThreadSizeWin[iColor], hFont);
 	}
 }
 
@@ -17166,14 +17165,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 		// supports this automatically when the DPI_AWARENESS_CONTEXT is
 		// DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2.
 		//
-		// Here we are detecting if a BOOL was set to enable non-client DPI scaling
-		// via the call to CreateWindow that resulted in this window. Doing this
-		// detection is only necessary in the context of this sample.
-		auto createStruct = reinterpret_cast<const CREATESTRUCT*>(lParam);
-		auto createParams = static_cast<const CreateParams*>(createStruct->lpCreateParams);
-		if (createParams->bEnableNonClientDpiScaling) {
-			EnableNonClientDpiScaling(p_hWnd);
-		}
+		EnableNonClientDpiScaling(p_hWnd);
 
 		return DefWindowProc(p_hWnd, message, wParam, lParam);
 	}
@@ -17588,8 +17580,8 @@ int handle_program_memory_depletion(size_t) {
 #endif
 
 #pragma warning(push)
-#pragma warning(disable : 26461) //disable warning for hPrevInstance not being marked as a pointer to const
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,  _In_opt_ HINSTANCE hPrevInstance, _In_ PWSTR lpCmdLine, _In_ int nCmdShow) {
+#pragma warning(disable : 26461) // disable warning for hPrevInstance not being marked as a pointer to const
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PWSTR lpCmdLine, _In_ int nCmdShow) {
 	UNREFERENCED_PARAMETER(nCmdShow);
 
 	ArgList = CommandLineToArgvW(GetCommandLine(), &ArgCount);

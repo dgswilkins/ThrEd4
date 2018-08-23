@@ -451,8 +451,8 @@ void displayText::drwtxbut(const TXTSCR& textureScreen) {
 	SetWindowText((*ButtonWin)[HTXMIR + 1], L"");
 }
 
-HFONT displayText::getThrEdFont(LONG weight) {
-	LOGFONT lfText;
+HFONT displayText::getThrEdFont(LONG weight) noexcept {
+	LOGFONT lfText = {};
 #if HIGHDPI
 	const auto uDpi = GetDpiForWindow(ThrEdWindow);
 	SystemParametersInfoForDpi(SPI_GETICONTITLELOGFONT, sizeof(lfText), &lfText, FALSE, uDpi);
@@ -464,4 +464,10 @@ HFONT displayText::getThrEdFont(LONG weight) {
 	return CreateFontIndirectW(&lfText);
 
 #endif
+}
+
+[[gsl::suppress(26490)]]
+[[gsl::suppress(26461)]]
+void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
+	SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0));
 }
