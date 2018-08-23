@@ -15884,6 +15884,9 @@ void thred::internal::makCol() noexcept {
 
 	buffer[1] = L'0';
 	buffer[2] = 0;
+
+	auto hFont = displayText::getThrEdFont(700);
+
 	for (iColor = 0; iColor < 16; iColor++) {
 		DefaultColorWin[iColor] = CreateWindow(L"STATIC",
 		                                       nullptr,
@@ -15896,7 +15899,7 @@ void thred::internal::makCol() noexcept {
 		                                       nullptr,
 		                                       ThrEdInstance,
 		                                       nullptr);
-
+		SendMessage(DefaultColorWin[iColor], WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
 		UserColorWin[iColor] = CreateWindow(L"STATIC",
 		                                    nullptr,
 		                                    SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -15908,7 +15911,6 @@ void thred::internal::makCol() noexcept {
 		                                    nullptr,
 		                                    ThrEdInstance,
 		                                    nullptr);
-
 		buffer[0]             = ThreadSize[iColor][0];
 		ThreadSizeWin[iColor] = CreateWindow(L"STATIC",
 		                                     buffer,
@@ -15921,6 +15923,8 @@ void thred::internal::makCol() noexcept {
 		                                     nullptr,
 		                                     ThrEdInstance,
 		                                     nullptr);
+		SendMessage(ThreadSizeWin[iColor], WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
+
 	}
 }
 
@@ -16255,6 +16259,9 @@ void thred::internal::init() {
 		           IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left,
 		           IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top,
 		           0);
+	auto hFontNew = displayText::getThrEdFont(700);
+	SelectObject(ThredDC, hFontNew);
+	SelectObject(StitchWindowDC, hFontNew);
 	ButtonWidth    = thred::txtWid(L"MM") + TXTSIDS;
 	ButtonWidthX3  = ButtonWidth * 3;
 	ButtonHeight   = TextSize.cy + 4;
@@ -16388,7 +16395,7 @@ void thred::internal::init() {
 	PCSHeader.stitchCount = 0;
 	GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
 	ladj();
-	GetTextExtentPointInt(
+	GetTextExtentPoint32Int(
 	    StitchWindowMemDC, (*StringTable)[STR_PIKOL].c_str(), (*StringTable)[STR_PIKOL].size(), &PickColorMsgSize);
 	auxmen();
 	fnamtabs();
@@ -17362,7 +17369,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_WINDOW));
 			return 1;
 		}
-		if (DrawItem->hwndItem == (*ButtonWin)[HHID] && DrawItem->itemAction == ODA_DRAWENTIRE) {
+		if (ButtonWin->size() && DrawItem->hwndItem == (*ButtonWin)[HHID] && DrawItem->itemAction == ODA_DRAWENTIRE) {
 			position = (ButtonWidthX3 - PickColorMsgSize.cx) >> 1;
 			if (StateMap.test(StateFlag::HID)) {
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[ActiveColor]);
