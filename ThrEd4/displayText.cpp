@@ -451,16 +451,16 @@ void displayText::drwtxbut(const TXTSCR& textureScreen) {
 	SetWindowText((*ButtonWin)[HTXMIR + 1], L"");
 }
 
-HFONT displayText::getThrEdFont() {
+HFONT displayText::getThrEdFont(LONG weight) {
 	LOGFONT lfText;
 #if HIGHDPI
 	const auto uDpi = GetDpiForWindow(ThrEdWindow);
 	SystemParametersInfoForDpi(SPI_GETICONTITLELOGFONT, sizeof(lfText), &lfText, FALSE, uDpi);
-	lfText.lfWeight = 700; // Bold
+	lfText.lfWeight = weight;
 	return CreateFontIndirectW(&lfText);
 #else
 	SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(lfText), &lfText, FALSE);
-	lfText.lfWeight = 700; // Bold
+	lfText.lfWeight = weight; 
 	return CreateFontIndirectW(&lfText);
 
 #endif
