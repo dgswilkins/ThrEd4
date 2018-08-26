@@ -74,10 +74,12 @@ void satin::internal::sacspac(const SATCON* const startGuide, unsigned guideCoun
 	size_t source = 0, destination = 0;
 
 	iStartGuide = si::satind(startGuide);
-	source      = SatinGuideIndex - 1;
-	destination = SatinGuideIndex + guideCount - 1;
-	while (source >= iStartGuide) {
-		SatinGuides[destination--] = SatinGuides[source--];
+	if (SatinGuideIndex) {
+		source = SatinGuideIndex - 1;
+		destination = SatinGuideIndex + guideCount - 1;
+		while (source >= iStartGuide) {
+			SatinGuides[destination--] = SatinGuides[source--];
+		}
 	}
 	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 		if (FormList[iForm].type == SAT)

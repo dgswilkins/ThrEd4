@@ -132,13 +132,15 @@ void clip::delclps(size_t iForm) {
 
 fPOINT* clip::nueclp(size_t currentForm, size_t count) noexcept {
 	auto find        = ci::findclp(ClosestFormToCursor);
-	auto source      = ClipPointIndex - 1;
 	auto destination = ClipPointIndex + count - 1;
 
 	if (clip::isclp(ClosestFormToCursor))
 		find += FormList[ClosestFormToCursor].lengthOrCount.clipCount;
-	while (source >= find) {
-		ClipPoints[destination--] = ClipPoints[source--];
+	if (ClipPointIndex) {
+		auto source = ClipPointIndex - 1;
+		while (source >= find) {
+			ClipPoints[destination--] = ClipPoints[source--];
+		}
 	}
 	for (auto iform = currentForm; iform < FormIndex; iform++) {
 		if (clip::iseclpx(iform))
