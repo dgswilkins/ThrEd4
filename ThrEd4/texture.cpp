@@ -31,6 +31,7 @@
 #include "clip.h"
 #include "displayText.h"
 #include "form.h"
+#include "formForms.h"
 #include "satin.h"
 #include "thred.h"
 #include "xt.h"
@@ -1090,35 +1091,40 @@ void texture::internal::dutxfn(unsigned textureType) {
 	}
 	texture::txof();
 	texture::rstxt();
+	if (StateMap.testAndReset(StateFlag::WASFRMFRM)) {
+		formForms::refrm();
+	}
 }
 
 void texture::internal::dutxmir() {
-	const auto centerLine = (TextureScreen.lines + 1u) >> 1;
+	if (TempTexturePoints->size()) {
+		const auto centerLine = (TextureScreen.lines + 1u) >> 1;
 
-	texture::savtxt();
-	std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::txcmp);
+		texture::savtxt();
+		std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::txcmp);
 
-	auto iPoint = TempTexturePoints->size() - 1;
-	while ((*TempTexturePoints)[iPoint].line > centerLine && iPoint >= 0)
-		iPoint--;
-	const auto iMirrorPoint = iPoint + 1;
-	// ToDo - What does this do? iPoint is not used beyond here
-	if (TextureScreen.lines & 1) {
-		while (iPoint >= 0) {
-			if ((*TempTexturePoints)[iPoint].line == centerLine) {
-				iPoint--;
-			}
-			else {
-				break;
+		auto iPoint = TempTexturePoints->size() - 1;
+		while ((*TempTexturePoints)[iPoint].line > centerLine && iPoint >= 0)
+			iPoint--;
+		const auto iMirrorPoint = iPoint + 1;
+		// ToDo - What does this do? iPoint is not used beyond here
+		if (TextureScreen.lines & 1) {
+			while (iPoint >= 0) {
+				if ((*TempTexturePoints)[iPoint].line == centerLine) {
+					iPoint--;
+				}
+				else {
+					break;
+				}
 			}
 		}
+		TempTexturePoints->resize(iMirrorPoint);
+		for (size_t index = 0; index < iMirrorPoint; index++) {
+			TempTexturePoints->push_back({ (*TempTexturePoints)[index].y,
+										   gsl::narrow<unsigned short>(TextureScreen.lines - (*TempTexturePoints)[index].line + 1) });
+		}
+		StateMap.set(StateFlag::RESTCH);
 	}
-	TempTexturePoints->resize(iMirrorPoint);
-	for (size_t index = 0; index < iMirrorPoint; index++) {
-		TempTexturePoints->push_back({ (*TempTexturePoints)[index].y,
-		                               gsl::narrow<unsigned short>(TextureScreen.lines - (*TempTexturePoints)[index].line + 1) });
-	}
-	StateMap.set(StateFlag::RESTCH);
 }
 
 void texture::internal::txdelal() {
