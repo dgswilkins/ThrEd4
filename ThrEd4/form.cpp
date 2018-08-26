@@ -150,12 +150,14 @@ unsigned form::internal::clpind(const fPOINT* const point) noexcept {
 
 void form::fltspac(const fPOINT* const start, size_t count) noexcept {
 	const unsigned int startIndex  = form::fltind(start);
-	size_t             source      = FormVertexIndex - 1;
 	size_t             destination = FormVertexIndex + count - 1;
 	size_t             iForm       = ClosestFormToCursor + 1;
 
-	while (source >= startIndex) {
-		FormVertices[destination--] = FormVertices[source--];
+	if (FormVertexIndex) {
+		size_t source = FormVertexIndex - 1;
+		while (source >= startIndex) {
+			FormVertices[destination--] = FormVertices[source--];
+		}
 	}
 	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
 		FormList[iForm].vertices += count;
@@ -785,6 +787,7 @@ void form::drwfrm() {
 		}
 	}
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
+	form::fvars(ClosestFormToCursor);
 }
 
 void form::internal::setpoli() {
