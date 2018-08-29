@@ -414,14 +414,14 @@ void displayText::savdisc() {
 	                            nullptr);
 }
 
-void displayText::updateWinFont(HWND hWnd) {
-	auto hFont = displayText::getThrEdFont(400);
+void displayText::updateWinFont(HWND hWnd) noexcept {
+	auto const* hFont = displayText::getThrEdFont(400);
 	EnumChildWindows(hWnd,
 		[](HWND p_hWnd, LPARAM lParam) -> BOOL {
-		SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
+		SendMessage(p_hWnd, WM_SETFONT, gsl::narrow<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
 		return TRUE;
 	},
-		(LPARAM)hFont);
+		reinterpret_cast<LPARAM>(hFont));
 }
 
 void displayText::tomsg() {

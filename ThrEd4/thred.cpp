@@ -1604,7 +1604,7 @@ void thred::internal::nuRct() {
 	if (StitchWindowDC) {
 		StitchWindowBmp = CreateCompatibleBitmap(StitchWindowDC, StitchWindowClientRect.right, StitchWindowClientRect.bottom);
 	}
-	if (StitchWindowMemDC) {
+	if (StitchWindowMemDC && StitchWindowBmp) {
 		SelectObject(StitchWindowMemDC, StitchWindowBmp);
 	}
 }
