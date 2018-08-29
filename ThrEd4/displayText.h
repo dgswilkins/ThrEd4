@@ -38,9 +38,9 @@ void        shoseln(unsigned code0, unsigned code1);
 void        spltmsg();
 void        tomsg();
 void        tsizmsg(const wchar_t* threadSizeText, double threadSize);
+void        updateWinFont(HWND hWnd);
 
 namespace internal {
-
 	void bxtxt(unsigned iButton, unsigned iMessage);
 	void hlpflt(unsigned iButton, unsigned iMessage, float data);
 	void sdmsg();

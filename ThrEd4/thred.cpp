@@ -1573,24 +1573,40 @@ void thred::internal::nuRct() {
 		GetWindowRect((*ButtonWin)[HMINLEN], &MinLenRect);
 		GetWindowRect((*ButtonWin)[HMAXLEN], &MaxLenRect);
 	}
-	ReleaseDC(ColorBar, ColorBarDC);
-	ColorBarDC = GetDC(ColorBar);
-	DeleteDC(StitchWindowMemDC);
-	ReleaseDC(MainStitchWin, StitchWindowDC);
-	DeleteObject(StitchWindowBmp);
-	ReleaseDC(MainStitchWin, StitchWindowDC);
-	StitchWindowDC = GetDCEx(MainStitchWin, nullptr, DCX_PARENTCLIP | DCX_CLIPSIBLINGS);
-	DeleteDC(StitchWindowMemDC);
-	StitchWindowMemDC = CreateCompatibleDC(StitchWindowDC);
-	GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
-	ReleaseDC(ThrEdWindow, ThredDC);
-	ThredDC = GetDC(ThrEdWindow);
-	SetStretchBltMode(ThredDC, COLORONCOLOR);
-	GetDCOrgEx(ThredDC, &ThredWindowOrigin);
-	GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
-	GetClientRect(MainStitchWin, &StitchWindowClientRect);
-	StitchWindowBmp = CreateCompatibleBitmap(StitchWindowDC, StitchWindowClientRect.right, StitchWindowClientRect.bottom);
-	SelectObject(StitchWindowMemDC, StitchWindowBmp);
+	if (ColorBarDC) {
+		ReleaseDC(ColorBar, ColorBarDC);
+		ColorBarDC = GetDC(ColorBar);
+	}
+	if (StitchWindowMemDC) {
+		DeleteDC(StitchWindowMemDC);
+	}
+	if (StitchWindowDC) {
+		ReleaseDC(MainStitchWin, StitchWindowDC);
+		StitchWindowDC    = GetDCEx(MainStitchWin, nullptr, DCX_PARENTCLIP | DCX_CLIPSIBLINGS);
+		StitchWindowMemDC = CreateCompatibleDC(StitchWindowDC);
+		if (StitchWindowBmp) {
+			DeleteObject(StitchWindowBmp);
+		}
+		GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
+	}
+	if (ThredDC) {
+		ReleaseDC(ThrEdWindow, ThredDC);
+	}
+	if (ThrEdWindow) {
+		ThredDC = GetDC(ThrEdWindow);
+		SetStretchBltMode(ThredDC, COLORONCOLOR);
+		GetDCOrgEx(ThredDC, &ThredWindowOrigin);
+	}
+	if (MainStitchWin) {
+		GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
+		GetClientRect(MainStitchWin, &StitchWindowClientRect);
+	}
+	if (StitchWindowDC) {
+		StitchWindowBmp = CreateCompatibleBitmap(StitchWindowDC, StitchWindowClientRect.right, StitchWindowClientRect.bottom);
+	}
+	if (StitchWindowMemDC) {
+		SelectObject(StitchWindowMemDC, StitchWindowBmp);
+	}
 }
 
 void thred::movStch() {
@@ -1631,10 +1647,8 @@ void thred::movStch() {
 }
 
 void thred::unbsho() {
-	unsigned iBackup = 0;
-
 	if (StateMap.testAndReset(StateFlag::BAKSHO)) {
-		for (iBackup = 0; iBackup < OLDVER; iBackup++)
+		for (auto iBackup = 0u; iBackup < OLDVER; iBackup++)
 			DestroyWindow(BackupViewer[iBackup]);
 	}
 }
@@ -2176,6 +2190,7 @@ void thred::internal::chknum() {
 			}
 			thred::unsid();
 			form::refil();
+			formForms::refrm();
 		}
 		else {
 			if (PreferenceIndex) {
@@ -2420,11 +2435,17 @@ void thred::internal::noMsg() {
 	DestroyWindow(DiscardButton);
 	DestroyWindow(CancelButton);
 	DestroyWindow(DeleteStitchesDialog);
+	if (GeneralNumberInputBox) {
+		if (DestroyWindow(GeneralNumberInputBox)) {
+			GeneralNumberInputBox = nullptr;
+		}
+	}
 	if (StateMap.testAndReset(StateFlag::NUMIN) || FormMenuChoice || PreferenceIndex)
 		chknum();
 	StateMap.reset(StateFlag::MOVMSG);
 	StateMap.reset(StateFlag::DELFRM);
 	StateMap.reset(StateFlag::FILMSG);
+	StateMap.reset(StateFlag::FORMIN);
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -2548,7 +2569,7 @@ void thred::internal::rstAll() {
 	thred::unmsg();
 	SearchLineIndex = 0;
 	FirstWin        = nullptr;
-	while (EnumChildWindows(MainStitchWin, EnumChildProc, 0)) {
+	while (EnumChildWindows(MainStitchWin, thi::EnumChildProc, 0)) {
 	}
 }
 
@@ -4557,6 +4578,8 @@ void thred::internal::stchWnd() {
 	                             nullptr,
 	                             ThrEdInstance,
 	                             nullptr);
+	auto hFont    = displayText::getThrEdFont(400);
+	SelectObject(GetDC(MainStitchWin), hFont);
 
 	if (MainStitchWin != nullptr) {
 		GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
@@ -6590,7 +6613,7 @@ void thred::internal::lodclp(unsigned iStitch) {
 	if (iStitch != PCSHeader.stitchCount)
 		iStitch++;
 	if (iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) && StateMap.test(StateFlag::INIT)) {
-		while (source >= iStitch) {
+		while (source && (source >= iStitch)) {
 			StitchBuffer[destination].x           = StitchBuffer[source].x;
 			StitchBuffer[destination].y           = StitchBuffer[source--].y;
 			StitchBuffer[destination--].attribute = StitchBuffer[source].attribute;
@@ -10398,7 +10421,7 @@ void thred::internal::retrac() {
 		form::makspac(GroupEndStitch + 1, GroupEndStitch - GroupStartStitch);
 		source      = GroupEndStitch - 1;
 		destination = GroupEndStitch + 1;
-		while (source >= GroupStartStitch) {
+		while (source && (source >= GroupStartStitch)) {
 			StitchBuffer[destination++] = StitchBuffer[source--];
 		}
 		thred::coltab();
@@ -11903,6 +11926,10 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 		}
 	}
 	if (Msg.message == WM_RBUTTONDOWN || Msg.message == WM_LBUTTONDOWN) {
+		if (FormDataSheet) {
+			RECT formDataRect = {};
+			GetWindowRect(FormDataSheet, &formDataRect);
+		}
 		if (StateMap.testAndReset(StateFlag::THUMON)) {
 			if (chkok()) {
 				thred::save();
@@ -12270,33 +12297,35 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 			for (iHoop = 0; iHoop < HUPS; iHoop++) {
 				if (Msg.hwnd == SideWindow[iHoop]) {
 					switch (iHoop + 1) {
-					case SETCUST:
+					case SETCUST: {
 						IniFile.customHoopX = IniFile.hoopSizeX;
 						IniFile.customHoopY = IniFile.hoopSizeY;
-						StateMap.set(StateFlag::MSGOF);
-						displayText::shoMsg(
-						    fmt::format((*StringTable)[STR_CUSTHUP], IniFile.hoopSizeX / PFGRAN, IniFile.hoopSizeY / PFGRAN));
 						break;
-					case SMALHUP:
+					}
+					case SMALHUP: {
 						IniFile.hoopSizeX = SHUPX;
 						IniFile.hoopSizeY = SHUPY;
 						IniFile.hoopType  = SMALHUP;
 						break;
-					case LARGHUP:
+					}
+					case LARGHUP: {
 						IniFile.hoopSizeX = LHUPX;
 						IniFile.hoopSizeY = LHUPY;
 						IniFile.hoopType  = LARGHUP;
 						break;
-					case HUP100:
+					}
+					case HUP100: {
 						IniFile.hoopSizeX = HUP100XY;
 						IniFile.hoopSizeY = HUP100XY;
 						IniFile.hoopType  = HUP100;
 						break;
-					case CUSTHUP:
+					}
+					case CUSTHUP: {
 						IniFile.hoopSizeX = IniFile.customHoopX;
 						IniFile.hoopSizeY = IniFile.customHoopY;
 						IniFile.hoopType  = CUSTHUP;
 						break;
+					}
 					}
 					UnzoomedRect.x = IniFile.hoopSizeX;
 					UnzoomedRect.y = IniFile.hoopSizeY;
@@ -12565,12 +12594,15 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					workBack = 'r';
 					WorkingFileName->replace_extension(workExt);
 					switch (FileVersionIndex) {
-					case 3:
+					case 3: {
 						movbak('1', '2');
-					case 2:
+					}
+					case 2: {
 						movbak('0', '1');
-					case 1:
+					}
+					case 1: {
 						movbak('r', '0');
+					}
 					}
 					movbak('t', 'r');
 					thrBack = 't';
@@ -12719,11 +12751,9 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				do {
 					if (Msg.hwnd == SideWindow[0]) {
 						SelectedForm->edgeType = 0;
-						form::refilfn();
 						thred::coltab();
-						thred::unsid();
 						StateMap.set(StateFlag::RESTCH);
-						return 1;
+						break;
 					}
 					if (Msg.hwnd == SideWindow[1]) {
 						if (SelectedForm->edgeType) {
@@ -12734,10 +12764,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						else {
-							thred::unmsg();
-							thred::unsid();
 							form::bord();
-							return 1;
+							break;
 						}
 					}
 					if (Msg.hwnd == SideWindow[2]) {
@@ -12749,31 +12777,30 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						else {
-							thred::unmsg();
-							thred::unsid();
 							form::dubold();
-							return 1;
+							break;
 						}
 					}
 					if (Msg.hwnd == SideWindow[3]) {
-						thred::unmsg();
-						thred::unsid();
 						form::fclp();
-						return 1;
+						break;
 					}
 					if (Msg.hwnd == SideWindow[4]) {
 						if (SelectedForm->edgeType) {
 							switch (SelectedForm->edgeType) {
-							case EDGECLIP:
+							case EDGECLIP: {
 								form::bsizpar();
+							}
 							case EDGELINE:
-							case EDGEBEAN:
+							case EDGEBEAN: {
 								SelectedForm->borderSize  = BorderWidth;
 								SelectedForm->edgeSpacing = LineSpacing;
 								break;
-							case EDGEPROPSAT:
+							}
+							case EDGEPROPSAT: {
 								SelectedForm->edgeSpacing /= 2;
 								break;
+							}
 							}
 							SelectedForm->edgeType = EDGEANGSAT;
 							if (UserFlagMap.test(UserFlag::DUND))
@@ -12781,10 +12808,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						else {
-							thred::unmsg();
-							thred::unsid();
 							satin::satbrd();
-							return 1;
+							break;
 						}
 					}
 					if (Msg.hwnd == SideWindow[5]) {
@@ -12807,24 +12832,25 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						else {
-							thred::unmsg();
-							thred::unsid();
 							form::apliq();
-							return 1;
+							break;
 						}
 					}
 					if (Msg.hwnd == SideWindow[6]) {
 						if (SelectedForm->edgeType) {
 							switch (SelectedForm->edgeType) {
-							case EDGECLIP:
+							case EDGECLIP: {
 								form::bsizpar();
+							}
 							case EDGELINE:
-							case EDGEBEAN:
+							case EDGEBEAN: {
 								SelectedForm->borderSize  = BorderWidth;
 								SelectedForm->edgeSpacing = LineSpacing;
 								break;
-							case EDGEANGSAT:
+							}
+							case EDGEANGSAT: {
 								SelectedForm->edgeSpacing *= 2;
+							}
 							}
 							SelectedForm->edgeType = EDGEPROPSAT;
 							if (UserFlagMap.test(UserFlag::DUND))
@@ -12832,10 +12858,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						else {
-							thred::unmsg();
-							thred::unsid();
 							form::prpbrd(LineSpacing);
-							return 1;
+							break;
 						}
 					}
 					if (Msg.hwnd == SideWindow[7]) {
@@ -12851,10 +12875,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						else {
-							thred::unmsg();
-							thred::unsid();
 							form::bhol();
-							return 1;
+							break;
 						}
 					}
 					if (Msg.hwnd == SideWindow[8]) {
@@ -12870,10 +12892,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						else {
-							thred::unmsg();
-							thred::unsid();
 							form::picot();
-							return 1;
+							break;
 						}
 					}
 					if (Msg.hwnd == SideWindow[9]) {
@@ -12885,39 +12905,30 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						else {
-							thred::unmsg();
-							thred::unsid();
 							form::dubsfil();
-							return 1;
+							break;
 						}
 					}
 					if (Msg.hwnd == SideWindow[10]) {
 						StateMap.set(StateFlag::LINCHN);
-						thred::unmsg();
-						thred::unsid();
 						form::chan();
 						thred::coltab();
-						StateMap.set(StateFlag::RESTCH);
-						return 1;
+						break;
 					}
 					if (Msg.hwnd == SideWindow[11]) {
 						StateMap.reset(StateFlag::LINCHN);
-						thred::unmsg();
-						thred::unsid();
 						form::chan();
 						thred::coltab();
-						StateMap.set(StateFlag::RESTCH);
-						return 1;
+						break;
 					}
 					if (Msg.hwnd == SideWindow[12]) {
-						thred::unmsg();
-						thred::unsid();
 						form::filclpx();
-						return 1;
+						break;
 					}
 				} while (false);
 				formForms::refrm();
 				form::refil();
+				thred::unmsg();
 				thred::unsid();
 				StateMap.set(StateFlag::RESTCH);
 				return 1;
@@ -12930,15 +12941,15 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					if (UserFlagMap.test(UserFlag::DUND))
 						SelectedForm->edgeType |= EGUND;
 				}
+				auto textureFlag = false;
 				do {
 					if (Msg.hwnd == SideWindow[0]) { // none
 						SelectedForm->type = FRMFPOLY;
 						form::delmfil();
 						SelectedForm->fillType = 0;
 						thred::coltab();
-						thred::unsid();
 						StateMap.set(StateFlag::RESTCH);
-						return 1;
+						break;
 					}
 					if (Msg.hwnd == SideWindow[1]) { // vertical fill
 						thred::savdo();
@@ -12950,10 +12961,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						else {
-							thred::unmsg();
-							thred::unsid();
 							form::filvrt();
-							return 1;
+							break;
 						}
 					}
 					if (Msg.hwnd == SideWindow[2]) { // horizontal fill
@@ -12964,10 +12973,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						else {
-							thred::unmsg();
-							thred::unsid();
 							form::filhor();
-							return 1;
+							break;
 						}
 					}
 					if (Msg.hwnd == SideWindow[3]) { // angle fill
@@ -12980,10 +12987,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						else {
-							thred::unmsg();
-							thred::unsid();
 							form::filangl();
-							return 1;
+							break;
 						}
 					}
 					if (Msg.hwnd == SideWindow[4]) { // fan fill
@@ -12994,19 +12999,15 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						else {
-							thred::unmsg();
-							thred::unsid();
 							StateMap.reset(StateFlag::FTHR);
 							form::filsat();
-							return 1;
+							break;
 						}
 					}
 					if (Msg.hwnd == SideWindow[5]) { // fan clip
 						SelectedForm->type = SAT;
-						thred::unmsg();
-						thred::unsid();
 						form::clpfil();
-						return 1;
+						break;
 					}
 					if (Msg.hwnd == SideWindow[6]) { // contour fill
 						if (SelectedForm->fillType) {
@@ -13016,50 +13017,40 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						else {
-							thred::unmsg();
-							thred::unsid();
 							form::contfil();
-							return 1;
+							break;
 						}
 					}
 					if (Msg.hwnd == SideWindow[7]) { // vertical clip
-						thred::unmsg();
-						thred::unsid();
 						if (sidclp())
 							form::vrtsclp();
 						StateMap.reset(StateFlag::CLPSHO);
 						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
-						return 1;
+						break;
 					}
 					if (Msg.hwnd == SideWindow[8]) { // horizontal clip
-						thred::unmsg();
-						thred::unsid();
 						if (sidclp())
 							form::horsclp();
 						StateMap.reset(StateFlag::CLPSHO);
 						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
-						return 1;
+						break;
 					}
 					if (Msg.hwnd == SideWindow[9]) { // angle clip
-						thred::unmsg();
-						thred::unsid();
 						if (sidclp())
 							form::angsclp();
 						StateMap.reset(StateFlag::CLPSHO);
 						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
-						return 1;
+						break;
 					}
 					if (Msg.hwnd == SideWindow[10]) { // feather fill
-						thred::unmsg();
-						thred::unsid();
 						xt::fethrf();
 						StateMap.set(StateFlag::INIT);
 						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
-						return 1;
+						break;
 					}
 					if (Msg.hwnd == SideWindow[11]) // vertical texture
 					{
@@ -13068,6 +13059,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						texture::dutxtfil();
+						textureFlag = true;
+						break;
 					}
 					if (Msg.hwnd == SideWindow[12]) // horizontal texture
 					{
@@ -13076,6 +13069,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						texture::dutxtfil();
+						textureFlag = true;
+						break;
 					}
 					if (Msg.hwnd == SideWindow[13]) // angle texture
 					{
@@ -13085,12 +13080,23 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 							break;
 						}
 						texture::dutxtfil();
+						textureFlag = true;
+						break;
 					}
 				} while (false);
-				formForms::refrm();
-				form::refil();
-				thred::unsid();
-				StateMap.set(StateFlag::RESTCH);
+				if (textureFlag) {
+					thred::unsid();
+					DestroyWindow(FormDataSheet);
+					FormDataSheet = nullptr;
+					StateMap.set(StateFlag::WASFRMFRM);
+				}
+				else {
+					formForms::refrm();
+					form::refil();
+					thred::unmsg();
+					thred::unsid();
+					StateMap.set(StateFlag::RESTCH);
+				}
 				return 1;
 			}
 		}
@@ -13098,57 +13104,57 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 			chknum();
 			thred::unsid();
 			do {
-				if (Msg.hwnd == (*ValueWindow)[LTXOF]) {
+				if (Msg.hwnd == (*ValueWindow)[LTXOF] || Msg.hwnd == (*LabelWindow)[LTXOF]) {
 					FormMenuChoice = LTXOF;
 					formForms::sidwnd((*ValueWindow)[LTXOF]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LUSPAC]) {
+				if (Msg.hwnd == (*ValueWindow)[LUSPAC] || Msg.hwnd == (*LabelWindow)[LUSPAC]) {
 					FormMenuChoice = LUSPAC;
 					formForms::sidwnd((*ValueWindow)[LUSPAC]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LUANG]) {
+				if (Msg.hwnd == (*ValueWindow)[LUANG] || Msg.hwnd == (*LabelWindow)[LUANG]) {
 					FormMenuChoice = LUANG;
 					formForms::sidwnd((*ValueWindow)[LUANG]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LULEN]) {
+				if (Msg.hwnd == (*ValueWindow)[LULEN] || Msg.hwnd == (*LabelWindow)[LULEN]) {
 					FormMenuChoice = LULEN;
 					formForms::sidwnd((*ValueWindow)[LULEN]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LWLKIND]) {
+				if (Msg.hwnd == (*ValueWindow)[LWLKIND] || Msg.hwnd == (*LabelWindow)[LWLKIND]) {
 					FormMenuChoice = LWLKIND;
 					formForms::sidwnd((*ValueWindow)[LWLKIND]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFTHSIZ]) {
+				if (Msg.hwnd == (*ValueWindow)[LFTHSIZ] || Msg.hwnd == (*LabelWindow)[LFTHSIZ]) {
 					FormMenuChoice = LFTHSIZ;
 					formForms::sidwnd((*ValueWindow)[LFTHSIZ]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFTHNUM]) {
+				if (Msg.hwnd == (*ValueWindow)[LFTHNUM] || Msg.hwnd == (*LabelWindow)[LFTHNUM]) {
 					FormMenuChoice = LFTHNUM;
 					formForms::sidwnd((*ValueWindow)[LFTHNUM]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFTHFLR]) {
+				if (Msg.hwnd == (*ValueWindow)[LFTHFLR] || Msg.hwnd == (*LabelWindow)[LFTHFLR]) {
 					FormMenuChoice = LFTHFLR;
 					formForms::sidwnd((*ValueWindow)[LFTHFLR]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFTHUPCNT]) {
+				if (Msg.hwnd == (*ValueWindow)[LFTHUPCNT] || Msg.hwnd == (*LabelWindow)[LFTHUPCNT]) {
 					FormMenuChoice = LFTHUPCNT;
 					formForms::sidwnd((*ValueWindow)[LFTHUPCNT]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFTHDWNCNT]) {
+				if (Msg.hwnd == (*ValueWindow)[LFTHDWNCNT] || Msg.hwnd == (*LabelWindow)[LFTHDWNCNT]) {
 					FormMenuChoice = LFTHDWNCNT;
 					formForms::sidwnd((*ValueWindow)[LFTHDWNCNT]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFTHBLND]) {
+				if (Msg.hwnd == (*ValueWindow)[LFTHBLND] || Msg.hwnd == (*LabelWindow)[LFTHBLND]) {
 					StateMap.set(StateFlag::FLPBLND);
 					formForms::refrm();
 					form::refil();
@@ -13156,7 +13162,7 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					StateMap.set(StateFlag::RESTCH);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFTHUP]) {
+				if (Msg.hwnd == (*ValueWindow)[LFTHUP] || Msg.hwnd == (*LabelWindow)[LFTHUP]) {
 					SelectedForm->extendedAttribute ^= AT_FTHUP;
 					formForms::refrm();
 					form::refil();
@@ -13164,7 +13170,7 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					StateMap.set(StateFlag::RESTCH);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFTHBTH]) {
+				if (Msg.hwnd == (*ValueWindow)[LFTHBTH] || Msg.hwnd == (*LabelWindow)[LFTHBTH]) {
 					SelectedForm->extendedAttribute ^= AT_FTHBTH;
 					formForms::refrm();
 					form::refil();
@@ -13172,12 +13178,12 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					StateMap.set(StateFlag::RESTCH);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFTHTYP]) {
+				if (Msg.hwnd == (*ValueWindow)[LFTHTYP] || Msg.hwnd == (*LabelWindow)[LFTHTYP]) {
 					FormMenuChoice = LFTHTYP;
 					sidmsg((*ValueWindow)[LFTHTYP], &(*StringTable)[STR_FTH0], 6);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFRM]) {
+				if (Msg.hwnd == (*ValueWindow)[LFRM] || Msg.hwnd == (*LabelWindow)[LFRM]) {
 					thred::savdo();
 					form::unfil();
 					if (SelectedForm->type == FRMLINE)
@@ -13187,92 +13193,93 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					thred::coltab();
 					satin::delsac(ClosestFormToCursor);
 					StateMap.set(StateFlag::RESTCH);
+					formForms::refrm();
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LLAYR]) {
+				if (Msg.hwnd == (*ValueWindow)[LLAYR] || Msg.hwnd == (*LabelWindow)[LLAYR]) {
 					std::wstring LayerText[] = { L"0", L"1", L"2", L"3", L"4" };
 					FormMenuChoice           = LLAYR;
 					StateMap.reset(StateFlag::FILTYP);
 					sidmsg((*ValueWindow)[LLAYR], LayerText, 5);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFRMFIL]) {
+				if (Msg.hwnd == (*ValueWindow)[LFRMFIL] || Msg.hwnd == (*LabelWindow)[LFRMFIL]) {
 					StateMap.reset(StateFlag::FILTYP);
 					FormMenuChoice = LFRMFIL;
 					sidmsg((*ValueWindow)[LFRMFIL], &(*StringTable)[STR_FIL0], 14);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFRMCOL]) {
+				if (Msg.hwnd == (*ValueWindow)[LFRMCOL] || Msg.hwnd == (*LabelWindow)[LFRMCOL]) {
 					FormMenuChoice = LFRMCOL;
 					formForms::sidwnd((*ValueWindow)[LFRMCOL]);
 					StateMap.set(StateFlag::SIDCOL);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LUNDCOL]) {
+				if (Msg.hwnd == (*ValueWindow)[LUNDCOL] || Msg.hwnd == (*LabelWindow)[LUNDCOL]) {
 					FormMenuChoice = LUNDCOL;
 					formForms::sidwnd((*ValueWindow)[LUNDCOL]);
 					StateMap.set(StateFlag::SIDCOL);
 					StateMap.set(StateFlag::UNDCOL);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFTHCOL]) {
+				if (Msg.hwnd == (*ValueWindow)[LFTHCOL] || Msg.hwnd == (*LabelWindow)[LFTHCOL]) {
 					FormMenuChoice = LFTHCOL;
 					formForms::sidwnd((*ValueWindow)[LFTHCOL]);
 					StateMap.set(StateFlag::SIDCOL);
 					StateMap.set(StateFlag::FTHSID);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFRMSPAC]) {
+				if (Msg.hwnd == (*ValueWindow)[LFRMSPAC] || Msg.hwnd == (*LabelWindow)[LFRMSPAC]) {
 					FormMenuChoice = LFRMSPAC;
 					formForms::sidwnd((*ValueWindow)[LFRMSPAC]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFRMLEN]) {
+				if (Msg.hwnd == (*ValueWindow)[LFRMLEN] || Msg.hwnd == (*LabelWindow)[LFRMLEN]) {
 					FormMenuChoice = LFRMLEN;
 					formForms::sidwnd((*ValueWindow)[LFRMLEN]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LBRD]) {
+				if (Msg.hwnd == (*ValueWindow)[LBRD] || Msg.hwnd == (*LabelWindow)[LBRD]) {
 					StateMap.set(StateFlag::FILTYP);
 					sidmsg((*ValueWindow)[LBRD], &(*StringTable)[STR_EDG0], EDGETYPS + 1);
 					StateMap.set(StateFlag::BRDACT);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LBRDCOL]) {
+				if (Msg.hwnd == (*ValueWindow)[LBRDCOL] || Msg.hwnd == (*LabelWindow)[LBRDCOL]) {
 					FormMenuChoice = LBRDCOL;
 					formForms::sidwnd((*ValueWindow)[LBRDCOL]);
 					StateMap.set(StateFlag::SIDCOL);
 					StateMap.set(StateFlag::BRDSID);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LBRDSPAC]) {
+				if (Msg.hwnd == (*ValueWindow)[LBRDSPAC] || Msg.hwnd == (*LabelWindow)[LBRDSPAC]) {
 					FormMenuChoice = LBRDSPAC;
 					formForms::sidwnd((*ValueWindow)[LBRDSPAC]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LBRDLEN]) {
+				if (Msg.hwnd == (*ValueWindow)[LBRDLEN] || Msg.hwnd == (*LabelWindow)[LBRDLEN]) {
 					FormMenuChoice = LBRDLEN;
 					formForms::sidwnd((*ValueWindow)[LBRDLEN]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LBRDSIZ]) {
+				if (Msg.hwnd == (*ValueWindow)[LBRDSIZ] || Msg.hwnd == (*LabelWindow)[LBRDSIZ]) {
 					FormMenuChoice = LBRDSIZ;
 					formForms::sidwnd((*ValueWindow)[LBRDSIZ]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LAPCOL]) {
+				if (Msg.hwnd == (*ValueWindow)[LAPCOL] || Msg.hwnd == (*LabelWindow)[LAPCOL]) {
 					FormMenuChoice = LAPCOL;
 					StateMap.set(StateFlag::SIDCOL);
 					StateMap.set(StateFlag::APSID);
 					formForms::sidwnd((*ValueWindow)[LAPCOL]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LBCSIZ]) {
+				if (Msg.hwnd == (*ValueWindow)[LBCSIZ] || Msg.hwnd == (*LabelWindow)[LBCSIZ]) {
 					FormMenuChoice = LBCSIZ;
 					formForms::sidwnd((*ValueWindow)[LBCSIZ]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LBSTRT]) {
+				if (Msg.hwnd == (*ValueWindow)[LBSTRT] || Msg.hwnd == (*LabelWindow)[LBSTRT]) {
 					code = SelectedForm->attribute & SBLNT;
 					if (code)
 						SelectedForm->attribute &= NSBLNT;
@@ -13283,7 +13290,7 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					StateMap.set(StateFlag::RESTCH);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LBFIN]) {
+				if (Msg.hwnd == (*ValueWindow)[LBFIN] || Msg.hwnd == (*LabelWindow)[LBFIN]) {
 					code = SelectedForm->attribute & FBLNT;
 					if (code)
 						SelectedForm->attribute &= NFBLNT;
@@ -13294,86 +13301,92 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					StateMap.set(StateFlag::RESTCH);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFRMANG]) {
+				if (Msg.hwnd == (*ValueWindow)[LFRMANG] || Msg.hwnd == (*LabelWindow)[LFRMANG]) {
 					FormMenuChoice = LFRMANG;
 					formForms::sidwnd((*ValueWindow)[LFRMANG]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LBRDPIC]) {
+				if (Msg.hwnd == (*ValueWindow)[LBRDPIC] || Msg.hwnd == (*LabelWindow)[LBRDPIC]) {
 					FormMenuChoice = LBRDPIC;
 					formForms::sidwnd((*ValueWindow)[LBRDPIC]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LBRDUND]) {
+				if (Msg.hwnd == (*ValueWindow)[LBRDUND] || Msg.hwnd == (*LabelWindow)[LBRDUND]) {
 					SelectedForm->edgeType ^= EGUND;
 					form::refil();
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LSACANG]) {
+				if (Msg.hwnd == (*ValueWindow)[LSACANG] || Msg.hwnd == (*LabelWindow)[LSACANG]) {
 					FormMenuChoice = LSACANG;
 					formForms::sidwnd((*ValueWindow)[LSACANG]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFRMFAZ]) {
+				if (Msg.hwnd == (*ValueWindow)[LFRMFAZ] || Msg.hwnd == (*LabelWindow)[LFRMFAZ]) {
 					FormMenuChoice = LFRMFAZ;
 					formForms::sidwnd((*ValueWindow)[LFRMFAZ]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LBRDPOS]) {
+				if (Msg.hwnd == (*ValueWindow)[LBRDPOS] || Msg.hwnd == (*LabelWindow)[LBRDPOS]) {
 					FormMenuChoice = LBRDPOS;
 					formForms::sidwnd((*ValueWindow)[LBRDPOS]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LBFILSQR]) {
+				if (Msg.hwnd == (*ValueWindow)[LBFILSQR] || Msg.hwnd == (*LabelWindow)[LBFILSQR]) {
 					xt::dubit(AT_SQR);
+					formForms::refrm();
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFSTRT]) {
+				if (Msg.hwnd == (*ValueWindow)[LFSTRT] || Msg.hwnd == (*LabelWindow)[LFSTRT]) {
 					xt::dubit(AT_STRT);
+					formForms::refrm();
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LDSTRT]) {
+				if (Msg.hwnd == (*ValueWindow)[LDSTRT] || Msg.hwnd == (*LabelWindow)[LDSTRT]) {
 					FormMenuChoice = LDSTRT;
 					formForms::sidwnd((*ValueWindow)[LDSTRT]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LFEND]) {
+				if (Msg.hwnd == (*ValueWindow)[LFEND] || Msg.hwnd == (*LabelWindow)[LFEND]) {
 					xt::dubit(AT_END);
+					formForms::refrm();
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LDEND]) {
+				if (Msg.hwnd == (*ValueWindow)[LDEND] || Msg.hwnd == (*LabelWindow)[LDEND]) {
 					FormMenuChoice = LDEND;
 					formForms::sidwnd((*ValueWindow)[LDEND]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LWALK]) {
+				if (Msg.hwnd == (*ValueWindow)[LWALK] || Msg.hwnd == (*LabelWindow)[LWALK]) {
 					xt::dubit(AT_WALK);
+					formForms::refrm();
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LCWLK]) {
+				if (Msg.hwnd == (*ValueWindow)[LCWLK] || Msg.hwnd == (*LabelWindow)[LCWLK]) {
 					xt::dubit(AT_CWLK);
+					formForms::refrm();
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LUND]) {
+				if (Msg.hwnd == (*ValueWindow)[LUND] || Msg.hwnd == (*LabelWindow)[LUND]) {
 					xt::dubit(AT_UND);
+					formForms::refrm();
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LMAXFIL]) {
+				if (Msg.hwnd == (*ValueWindow)[LMAXFIL] || Msg.hwnd == (*LabelWindow)[LMAXFIL]) {
 					FormMenuChoice = LMAXFIL;
 					formForms::sidwnd((*ValueWindow)[LMAXFIL]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LMINFIL]) {
+				if (Msg.hwnd == (*ValueWindow)[LMINFIL] || Msg.hwnd == (*LabelWindow)[LMINFIL]) {
 					FormMenuChoice = LMINFIL;
 					formForms::sidwnd((*ValueWindow)[LMINFIL]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LMAXBRD]) {
+				if (Msg.hwnd == (*ValueWindow)[LMAXBRD] || Msg.hwnd == (*LabelWindow)[LMAXBRD]) {
 					FormMenuChoice = LMAXBRD;
 					formForms::sidwnd((*ValueWindow)[LMAXBRD]);
 					break;
 				}
-				if (Msg.hwnd == (*ValueWindow)[LMINBRD]) {
+				if (Msg.hwnd == (*ValueWindow)[LMINBRD] || Msg.hwnd == (*LabelWindow)[LMINBRD]) {
 					FormMenuChoice = LMINBRD;
 					formForms::sidwnd((*ValueWindow)[LMINBRD]);
 					break;
@@ -13785,15 +13798,17 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 		}
 	}
 	switch (Msg.message) {
-	case WM_TIMER:
+	case WM_TIMER: {
 		if (StateMap.test(StateFlag::RUNPAT) && !Msg.wParam)
 			stchout();
 		break;
-	case WM_CHAR:
+	}
+	case WM_CHAR: {
 		if (isgraph(Msg.wParam))
 			nuthum(tolower(Msg.wParam));
 		break;
-	case WM_KEYDOWN:
+	}
+	case WM_KEYDOWN: {
 		code = Msg.wParam & 0xffff;
 		if (StateMap.test(StateFlag::TXTRED)) {
 			texture::txtkey(code);
@@ -13801,20 +13816,6 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 		}
 		form::fvars(ClosestFormToCursor);
 
-#if LANG == GRM
-		if (code >= 0x30 && code <= 0x39) {
-			if (GetKeyState(VK_SHIFT) & 0X8000) {
-				switch (code) {
-				case 0x38:
-					selfrm0();
-					break;
-				case 0x39:
-					selfrmx();
-					break;
-				}
-			}
-		}
-#endif
 		// ToDo - value passed to duform is wierd because it is dependant on order of enumeration of the form types.
 		//        and value 'SAT' throws it off
 		if (StateMap.test(StateFlag::FORMIN)) {
@@ -13822,46 +13823,58 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				return 1;
 
 			switch (code) {
-			case 'E':
+			case 'E': {
 				StateMap.reset(StateFlag::FORMIN);
 				thred::unmsg();
 				form::duform(FRMLINE - 1);
 				return 1;
-			case 'F':
+			}
+			case 'F': {
 				StateMap.reset(StateFlag::FORMIN);
 				thred::unmsg();
 				form::duform(FRMFPOLY - 1);
 				return 1;
-			case 'R':
+			}
+			case 'R': {
 				form::duform(FRMRPOLY - 1);
 				return 1;
-			case 'S':
+			}
+			case 'S': {
 				form::duform(FRMSTAR - 1);
 				return 1;
-			case 'A':
+			}
+			case 'A': {
 				form::duform(FRMSPIRAL - 1);
 				return 1;
-			case 'H':
+			}
+			case 'H': {
 				form::duform(FRMHEART - 2);
 				return 1;
-			case 'L':
+			}
+			case 'L': {
 				form::duform(FRMLENS - 2);
 				return 1;
-			case 'G':
+			}
+			case 'G': {
 				form::duform(FRMEGG - 2);
 				return 1;
-			case 'T':
+			}
+			case 'T': {
 				form::duform(FRMTEAR - 2);
 				return 1;
-			case 'Z':
+			}
+			case 'Z': {
 				form::duform(FRMZIGZAG - 2);
 				return 1;
-			case 'W':
+			}
+			case 'W': {
 				form::duform(FRMWAVE - 2);
 				return 1;
-			case 'D':
+			}
+			case 'D': {
 				form::duform(FRMDAISY - 2);
 				return 1;
+			}
 			}
 		}
 		if (StateMap.test(StateFlag::FILMSG)) {
@@ -13924,34 +13937,39 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 		if (StateMap.test(StateFlag::THUMSHO)) {
 			switch (code) {
 			case VK_ESCAPE:
-			case 'Q':
+			case 'Q': {
 				unthum();
 				StateMap.reset(StateFlag::BAKSHO);
 				esccode();
 				qcode();
 				break;
+			}
 			case VK_DOWN:
-			case 0x22: // page down
+			case 0x22: { // page down
 				nuthsel();
 				break;
+			}
 			case VK_UP:
-			case 0x21: // page up
+			case 0x21: { // page up
 				nuthbak(8);
 				break;
-			case VK_HOME:
+			}
+			case VK_HOME: {
 				ThumbnailIndex = 0;
 				nuthsel();
 				break;
-			case VK_END:
+			}
+			case VK_END: {
 				ThumbnailIndex = Thumbnails->size();
 				nuthbak(4);
 				break;
+			}
 			case 8: // backspace
-			case VK_LEFT:
+			case VK_LEFT: {
 				bakthum();
 				break;
-			default:
-				TranslateMessage(&Msg);
+			}
+			default: { TranslateMessage(&Msg); }
 			}
 			return 1;
 		}
@@ -13996,23 +14014,26 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				return 1;
 			}
 			switch (code) {
-			case 0x6e: // numpad period
-			case 0xbe: // period
+			case 0x6e:   // numpad period
+			case 0xbe: { // period
 				SideWindowEntryBuffer[MsgIndex++] = '.';
 				SideWindowEntryBuffer[MsgIndex]   = 0;
 				SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
 				return 1;
-			case 8: // backspace
+			}
+			case 8: { // backspace
 				if (MsgIndex) {
 					SideWindowEntryBuffer[--MsgIndex] = 0;
 					SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
 				}
 				return 1;
-			case VK_RETURN:
+			}
+			case VK_RETURN: {
 				chknum();
 				FormMenuChoice  = 0;
 				PreferenceIndex = 0;
 				return 1;
+			}
 			}
 		}
 		if (code == 'I') {
@@ -14043,13 +14064,14 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				return 1;
 			}
 			switch (code) {
-			case 0x6e: // numpad period
-			case 0xbe: // period
+			case 0x6e:   // numpad period
+			case 0xbe: { // period
 				MsgBuffer[MsgIndex++] = '.';
 				MsgBuffer[MsgIndex]   = 0;
 				SetWindowText(GeneralNumberInputBox, MsgBuffer);
 				return 1;
-			case 8: // backspace
+			}
+			case 8: { // backspace
 				if (MsgIndex) {
 					MsgIndex--;
 					if (StateMap.test(StateFlag::TRNIN0)) {
@@ -14061,7 +14083,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					}
 				}
 				return 1;
-			case VK_RETURN:
+			}
+			case VK_RETURN: {
 				if (StateMap.test(StateFlag::TRNIN0))
 					trace::dutrnum2();
 				else {
@@ -14069,6 +14092,7 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 						trace::dutrnum1();
 				}
 				break;
+			}
 			}
 		}
 		/*
@@ -14128,17 +14152,18 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 		}
 		thred::unmsg();
 		switch (code) {
-		case VK_ESCAPE:
+		case VK_ESCAPE: {
 			esccode();
-		case 'Q':
-
+		}
+		case 'Q': {
 			if (GetKeyState(VK_SHIFT) & 0x8000) {
 				ritcur();
 				return 1;
 			}
 			qcode();
 			return 1;
-		case 0xc0: //`
+		}
+		case 0xc0: { //`
 			if (GetKeyState(VK_CONTROL) & 0x8000 && GetKeyState(VK_MENU) & 0x8000) {
 				BackgroundColor    = 0x505050;
 				BackgroundPen      = nuPen(BackgroundPen, 1, BackgroundColor);
@@ -14161,13 +14186,16 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				xt::tst();
 			}
 			break;
-		case VK_INSERT:
+		}
+		case VK_INSERT: {
 			inscol();
 			break;
-		case 0x6d: // keypad -
+		}
+		case 0x6d: { // keypad -
 			toglup();
 			break;
-		case 0xbd: //-
+		}
+		case 0xbd: { //-
 			StateMap.reset(StateFlag::CNTRH);
 			StateMap.reset(StateFlag::CNTRV);
 			if (GetKeyState(VK_SHIFT) & 0X8000)
@@ -14178,61 +14206,73 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 			}
 			form::cntrx();
 			break;
-		case 0xbf: /// forward slash /
+		}
+		case 0xbf: { /// forward slash /
 			formForms::frmnum();
 			break;
-		case 0xbb: //=
+		}
+		case 0xbb: { //=
 			form::shrnk();
 			break;
-		case 0x21: // page up
+		}
+		case 0x21: { // page up
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				form::redup();
 			else
 				form::rotagain();
 			break;
-		case 0x22: // page down
+		}
+		case 0x22: { // page down
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				form::bakdup();
 			else
 				form::bakagain();
 			break;
-		case 0xde: //'
+		}
+		case 0xde: { //'
 			desiz();
 			break;
-		case 0xdb: //[
+		}
+		case 0xdb: { //[
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				selfrm0();
 			else
 				ungrplo();
 			break;
-		case 0xdd: //]
+		}
+		case 0xdd: { //]
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				selfrmx();
 			else
 				ungrphi();
 			break;
-		case 0xba: // semicolon
+		}
+		case 0xba: { // semicolon
 			movmrk();
 			break;
-		case VK_DOWN:
+		}
+		case VK_DOWN: {
 			if (GetKeyState(VK_CONTROL) & 0X8000)
 				nudgfn(0, -IniFile.cursorNudgeStep);
 			else
 				seldwn();
 			break;
-		case VK_UP:
+		}
+		case VK_UP: {
 			if (GetKeyState(VK_CONTROL) & 0X8000)
 				nudgfn(0, IniFile.cursorNudgeStep);
 			else
 				selup();
 			break;
-		case 0xbe: // period
+		}
+		case 0xbe: { // period
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				xt::setfilend();
 			else
 				setmov();
 			break;
-		case 'W':
+		}
+		case 'W': {
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				form::crop();
 			else {
@@ -14242,19 +14282,23 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					form::insat();
 			}
 			break;
-		case 'E':
+		}
+		case 'E': {
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				texture::dutxtfil();
 			else
 				form::infrm();
 			break;
-		case VK_F2:
+		}
+		case VK_F2: {
 			form::snap();
 			break;
-		case VK_F1:
+		}
+		case VK_F1: {
 			hlp::help();
 			break;
-		case VK_F3:
+		}
+		case VK_F3: {
 			if (GetKeyState(VK_CONTROL) & 0X8000)
 				form::srtfrm();
 			else {
@@ -14264,31 +14308,39 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					xt::fsort();
 			}
 			break;
-		case VK_F4:
+		}
+		case VK_F4: {
 			xt::rtrclp();
 			break;
-		case VK_F5:
+		}
+		case VK_F5: {
 			filfrms();
 			break;
-		case VK_F6:
+		}
+		case VK_F6: {
 			vuthrds();
 			break;
-		case VK_F7:
+		}
+		case VK_F7: {
 			thred::save();
 			break;
-		case VK_F8:
+		}
+		case VK_F8: {
 			savAs();
 			break;
-		case VK_F9:
+		}
+		case VK_F9: {
 			selCol();
 			break;
-		case VK_F11:
+		}
+		case VK_F11: {
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				rembig();
 			else
 				duzero();
 			break;
-		case VK_F12:
+		}
+		case VK_F12: {
 			if (GetKeyState(VK_CONTROL) & GetKeyState(VK_MENU) & 0X8000)
 				reldun();
 			else {
@@ -14300,14 +14352,17 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					dun();
 			}
 			break;
-		case 'Y':
+		}
+		case 'Y': {
 			if (form::closfrm())
 				selfpnt();
 			break;
-		case 'O':
+		}
+		case 'O': {
 			fop();
 			break;
-		case 'Z':
+		}
+		case 'Z': {
 			if (GetKeyState(VK_SHIFT) & 0X8000) {
 				ZoomFactor = ZoomMin;
 				zumin();
@@ -14319,7 +14374,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					zumin();
 			}
 			break;
-		case 'X':
+		}
+		case 'X': {
 			if (GetKeyState(VK_CONTROL) & 0X8000)
 				cut();
 			else {
@@ -14329,10 +14385,12 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					thred::zumhom();
 			}
 			break;
-		case 'P':
+		}
+		case 'P': {
 			formForms::prfmsg();
 			break;
-		case 'N':
+		}
+		case 'N': {
 			if (GetKeyState(VK_CONTROL) & 0X8000)
 				xt::nudsiz();
 			else {
@@ -14344,7 +14402,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				}
 			}
 			break;
-		case 'U':
+		}
+		case 'U': {
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				pgup();
 			else {
@@ -14356,7 +14415,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				}
 			}
 			break;
-		case 'H':
+		}
+		case 'H': {
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				pglft();
 			else {
@@ -14366,13 +14426,15 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					trace::blak();
 			}
 			break;
-		case 'J':
+		}
+		case 'J': {
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				pgrit();
 			else
 				form::refilal();
 			break;
-		case 0xbc: // comma
+		}
+		case 0xbc: { // comma
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				xt::setfilstrt();
 			else {
@@ -14380,7 +14442,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				form::join();
 			}
 			break;
-		case 'B':
+		}
+		case 'B': {
 			if (GetKeyState(VK_CONTROL) & 0X8000)
 				redo();
 			else {
@@ -14390,7 +14453,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					bak();
 			}
 			break;
-		case 'D':
+		}
+		case 'D': {
 			if (GetKeyState(VK_SHIFT) & 0X8000) {
 				if (StateMap.test(StateFlag::FORMSEL)) {
 					PostMessage(ThrEdWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
@@ -14400,7 +14464,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 			else
 				satin::satpnt1();
 			break;
-		case 'K':
+		}
+		case 'K': {
 			if (GetKeyState(VK_MENU) & GetKeyState(VK_CONTROL) & 0X8000)
 				setknots();
 			else {
@@ -14414,7 +14479,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				}
 			}
 			break;
-		case 'A':
+		}
+		case 'A': {
 			if (GetKeyState(VK_CONTROL) & 0X8000)
 				selalstch();
 			else {
@@ -14424,7 +14490,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					zumout();
 			}
 			break;
-		case VK_SPACE:
+		}
+		case VK_SPACE: {
 			if (StateMap.testAndFlip(StateFlag::INSRT)) {
 				ReleaseCapture();
 				StateMap.set(StateFlag::RESTCH);
@@ -14435,7 +14502,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 			if (StateMap.testAndReset(StateFlag::GRPSEL) || StateMap.testAndReset(StateFlag::FORMSEL))
 				StateMap.set(StateFlag::RESTCH);
 			break;
-		case 'T':
+		}
+		case 'T': {
 			if (GetKeyState(VK_SHIFT) & 0x8000)
 				retrac();
 			else {
@@ -14445,7 +14513,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					thumnail();
 			}
 			break;
-		case 'R':
+		}
+		case 'R': {
 			if (GetKeyState(VK_CONTROL) & GetKeyState(VK_SHIFT) & 0x8000) {
 				thred::movStch();
 				unbox();
@@ -14467,10 +14536,12 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				}
 			}
 			break;
-		case VK_TAB:
+		}
+		case VK_TAB: {
 			rot(rotationCenter);
 			break;
-		case 'S':
+		}
+		case 'S': {
 			if (GetKeyState(VK_CONTROL) & 0X8000) {
 				colchk();
 				thred::save();
@@ -14482,7 +14553,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					zumshft();
 			}
 			break;
-		case 'F':
+		}
+		case 'F': {
 			if (SelectedFormList->size()) {
 				PostMessage(ThrEdWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
 				keybd_event('F', 0, 0, 0);
@@ -14501,7 +14573,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				}
 			}
 			break;
-		case 'V':
+		}
+		case 'V': {
 			if (GetKeyState(VK_CONTROL) & 0X8000 && OpenClipboard(ThrEdWindow)) {
 				ThrEdClip  = RegisterClipboardFormat(ThrEdClipFormat);
 				ClipMemory = GetClipboardData(ThrEdClip);
@@ -14726,7 +14799,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 			else
 				closPnt();
 			break;
-		case 'C':
+		}
+		case 'C': {
 			if (GetKeyState(VK_CONTROL) & 0X8000)
 				duclip();
 			else {
@@ -14743,7 +14817,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				}
 			}
 			break;
-		case VK_HOME:
+		}
+		case VK_HOME: {
 			if (GetKeyState(VK_SHIFT) & 0X8000 && GetKeyState(VK_CONTROL) & 0X8000) {
 				if (StateMap.testAndReset(StateFlag::SELBOX)) {
 					GroupStitchIndex = 0;
@@ -14803,7 +14878,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				}
 			}
 			break;
-		case VK_END:
+		}
+		case VK_END: {
 			if (GetKeyState(VK_SHIFT) & 0X8000 && GetKeyState(VK_CONTROL) & 0X8000) {
 				if (StateMap.testAndReset(StateFlag::SELBOX)) {
 					GroupStitchIndex = PCSHeader.stitchCount - 1;
@@ -14862,7 +14938,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				}
 			}
 			break;
-		case VK_RIGHT:
+		}
+		case VK_RIGHT: {
 			form::fvars(ClosestFormToCursor);
 			if (GetKeyState(VK_SHIFT) & 0X8000) {
 				if (StateMap.test(StateFlag::FPSEL)) {
@@ -14951,7 +15028,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				}
 			}
 			break;
-		case VK_LEFT:
+		}
+		case VK_LEFT: {
 			if (GetKeyState(VK_SHIFT) & 0X8000) {
 				if (StateMap.test(StateFlag::FPSEL)) {
 					if (!StateMap.test(StateFlag::PSELDIR)) {
@@ -15033,10 +15111,12 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				}
 			}
 			break;
-		case 'G':
+		}
+		case 'G': {
 			mark();
 			break;
-		case 'M':
+		}
+		case 'M': {
 			if (GetKeyState(VK_CONTROL) & 0x8000)
 				pntmrk();
 			else {
@@ -15049,21 +15129,24 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				StateMap.set(StateFlag::RESTCH);
 			}
 			break;
-		case 'L':
+		}
+		case 'L': {
 			if (GetKeyState(VK_SHIFT) & 0x8000)
 				delstch();
 			else
 				form::fcntr();
 			break;
-		case VK_DELETE:
+		}
+		case VK_DELETE: {
 			if (thi::chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15]))
 				delcol();
 			else
 				delet();
 			break;
+		} break;
 		}
-		break;
-	case WM_COMMAND:
+	}
+	case WM_COMMAND: {
 		thred::unmsg();
 		if (StateMap.test(StateFlag::FORMSEL))
 			form::fvars(ClosestFormToCursor);
@@ -15081,712 +15164,919 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 		if (wParameter > 40000 && wParameter < 40400)
 			thred::undat();
 		switch (wParameter) {
-		case ID_CHKOF: // view / Set / Data check / Off
+		case ID_CHKOF: { // view / Set / Data check / Off
 			xt::chgchk(0);
 			break;
-		case ID_CHKON: // view / Set / Data check / On
+		}
+		case ID_CHKON: { // view / Set / Data check / On
 			xt::chgchk(1);
 			break;
-		case ID_CHKREP: // view / Set / Data Check / Auto Repair on
+		}
+		case ID_CHKREP: { // view / Set / Data Check / Auto Repair on
 			xt::chgchk(2);
 			break;
-		case ID_CHKREPMSG: // view / Set / Data Check / Auto Repair with Message
+		}
+		case ID_CHKREPMSG: { // view / Set / Data Check / Auto Repair with Message
 			xt::chgchk(3);
 			break;
-		case ID_REPAIR: // edit / Repair Data
+		}
+		case ID_REPAIR: { // edit / Repair Data
 			repair::repar();
 			break;
+		}
 		case ID_WARNOF: // set / Warn if edited
 			xt::chgwrn();
 			break;
-		case ID_CLPSPAC: // set / Clipboard Fill  Spacing
+		case ID_CLPSPAC: { // set / Clipboard Fill  Spacing
 			xt::setclpspac();
 			break;
-		case ID_FRMIND: // edit / Form Update / Indent
+		}
+		case ID_FRMIND: { // edit / Form Update / Indent
 			xt::setfind();
 			break;
-		case ID_SETSIZ: // edit / Set / Design Size
+		}
+		case ID_SETSIZ: { // edit / Set / Design Size
 			xt::nudsiz();
 			break;
-		case ID_TXFIL: // Fill / Texture Editor
+		}
+		case ID_TXFIL: { // Fill / Texture Editor
 			texture::dutxtfil();
 			break;
-		case ID_FRMHI: // edit / Form Update / Height
+		}
+		case ID_FRMHI: { // edit / Form Update / Height
 			xt::setfhi();
 			break;
-		case ID_FRMWID: // edit / Form Update / Width
+		}
+		case ID_FRMWID: { // edit / Form Update / Width
 			xt::setfwid();
 			break;
-		case ID_MAXFLEN: // edit / Form Update / Fill /  Maximum Stitch Length
+		}
+		case ID_MAXFLEN: { // edit / Form Update / Fill /  Maximum Stitch Length
 			xt::setfmax();
 			break;
-		case ID_MINFLEN: // edit / Form Update / Fill /  Minimum Stitch Length
+		}
+		case ID_MINFLEN: { // edit / Form Update / Fill /  Minimum Stitch Length
 			xt::setfmin();
 			break;
-		case ID_MAXBLEN: // edit / Form Update / Border /  Maximum Stitch Length
+		}
+		case ID_MAXBLEN: { // edit / Form Update / Border /  Maximum Stitch Length
 			xt::setbmax();
 			break;
-		case ID_MINBLEN: // edit / Form Update / Border /  Minimum Stitch Length
+		}
+		case ID_MINBLEN: { // edit / Form Update / Border /  Minimum Stitch Length
 			xt::setbmin();
 			break;
-		case ID_SETBSPAC: // edit / Form Update / Border /  Spacing
+		}
+		case ID_SETBSPAC: { // edit / Form Update / Border /  Spacing
 			xt::setbspac();
 			break;
-		case ID_SETBLEN: // edit / Form Update / Border /  Stitch Length
+		}
+		case ID_SETBLEN: { // edit / Form Update / Border /  Stitch Length
 			xt::setblen();
 			break;
-		case ID_SETBCOL: // edit / Form Update / Border /  Color
+		}
+		case ID_SETBCOL: { // edit / Form Update / Border /  Color
 			xt::setbcol();
 			break;
-		case ID_SETFCOL: // edit / Form Update / Fill /  Color
+		}
+		case ID_SETFCOL: { // edit / Form Update / Fill /  Color
 			xt::setfcol();
 			break;
-		case ID_SETUCOL: // edit / Form Update / Underlay /  Color
+		}
+		case ID_SETUCOL: { // edit / Form Update / Underlay /  Color
 			xt::setucol();
 			break;
-		case ID_SETFANG: // edit / Form Update / Fill /  Angle
+		}
+		case ID_SETFANG: { // edit / Form Update / Fill /  Angle
 			xt::setfang();
 			break;
-		case ID_SETFSPAC: // edit / Form Update / Fill /  Spacing
+		}
+		case ID_SETFSPAC: { // edit / Form Update / Fill /  Spacing
 			xt::setfspac();
 			break;
-		case ID_SETFLEN: // edit / Form Update / Fill /  Stitch Length
+		}
+		case ID_SETFLEN: { // edit / Form Update / Fill /  Stitch Length
 			xt::setflen();
 			break;
-		case ID_SETUANG: // edit / Form Update / Underlay /  Angle
+		}
+		case ID_SETUANG: { // edit / Form Update / Underlay /  Angle
 			xt::sfuang();
 			break;
-		case ID_SETUSPAC: // edit / Form Update / Underlay /  Spacing
+		}
+		case ID_SETUSPAC: { // edit / Form Update / Underlay /  Spacing
 			xt::uspac();
 			break;
-		case ID_UNDLEN: // edit / Form Update / Underlay / Stitch Length
+		}
+		case ID_UNDLEN: { // edit / Form Update / Underlay / Stitch Length
 			xt::undlen();
 			break;
-		case ID_SETCWLK: // edit / Form Update / Center Walk / On
+		}
+		case ID_SETCWLK: { // edit / Form Update / Center Walk / On
 			xt::setcwlk();
 			break;
-		case ID_SETWLK: // edit / Form Update / Edge Walk /  On
+		}
+		case ID_SETWLK: { // edit / Form Update / Edge Walk /  On
 			xt::setwlk();
 			break;
-		case ID_SETUND: // edit / Form Update / Underlay / On
+		}
+		case ID_SETUND: { // edit / Form Update / Underlay / On
 			xt::setund();
 			break;
-		case ID_NOTCWLK: // edit / Form Update / Center Walk / Off
+		}
+		case ID_NOTCWLK: { // edit / Form Update / Center Walk / Off
 			xt::notcwlk();
 			break;
-		case ID_NOTWLK: // edit / Form Update / Edge Walk / Off
+		}
+		case ID_NOTWLK: { // edit / Form Update / Edge Walk / Off
 			xt::notwlk();
 			break;
-		case ID_NOTUND: // edit / Form Update / Underlay / Off
+		}
+		case ID_NOTUND: { // edit / Form Update / Underlay / Off
 			xt::notund();
 			break;
-		case ID_SELUND: // edit / Select / Form Underlay Stitches
+		}
+		case ID_SELUND: { // edit / Select / Form Underlay Stitches
 			form::selfil(UNDMSK);
 			break;
-		case ID_SELWLK: // edit / Select / Form Edge Walk Stitches
+		}
+		case ID_SELWLK: { // edit / Select / Form Edge Walk Stitches
 			form::selfil(WLKMSK);
 			break;
-		case ID_ALFRM: // edit / Select / All Forms
+		}
+		case ID_ALFRM: { // edit / Select / All Forms
 			xt::selalfrm();
 			break;
-		case ID_USPAC: // view / Set / Underlay / Spacing
+		}
+		case ID_USPAC: { // view / Set / Underlay / Spacing
 			xt::setuspac();
 			break;
-		case ID_UANG: // view / Set / Underlay / Angle
+		}
+		case ID_UANG: { // view / Set / Underlay / Angle
 			xt::setuang();
 			break;
-		case ID_USTCH: // view / Set / Underlay / Stitch Length
+		}
+		case ID_USTCH: { // view / Set / Underlay / Stitch Length
 			xt::setulen();
 			break;
-		case ID_WIND: // view / Set / Underlay / Indent
+		}
+		case ID_WIND: { // view / Set / Underlay / Indent
 			xt::setwlkind();
 			break;
-		case ID_FILSTRT: // Edit / Set / Fill Start Point
+		}
+		case ID_FILSTRT: { // Edit / Set / Fill Start Point
 			xt::setfilstrt();
 			break;
-		case ID_FILEND: // Edit / Set / Fill End Point
+		}
+		case ID_FILEND: { // Edit / Set / Fill End Point
 			xt::setfilend();
 			break;
-		case ID_PES2CRD: // file / PES2Card
+		}
+		case ID_PES2CRD: { // file / PES2Card
 			xt::pes2crd();
 			break;
-		case ID_2FTHR: // edit / Convert / to Feather Ribbon
+		}
+		case ID_2FTHR: { // edit / Convert / to Feather Ribbon
 			StateMap.set(StateFlag::CNV2FTH);
 			satin::ribon();
 			break;
-		case ID_FETHR: // fill / Feather
+		}
+		case ID_FETHR: { // fill / Feather
 			xt::fethr();
 			break;
-		case ID_FTHDEF: // edit / Set / Feather Defaults
+		}
+		case ID_FTHDEF: { // edit / Set / Feather Defaults
 			dufdef();
 			break;
-		case ID_SRTF: // edit / Sort / by Form
+		}
+		case ID_SRTF: { // edit / Sort / by Form
 			form::srtfrm();
 			break;
-		case ID_FILCLPX: // fill / Border / Clipboard, Even
+		}
+		case ID_FILCLPX: { // fill / Border / Clipboard, Even
 			form::filclpx();
 			break;
-		case ID_FRMX: // view / Set / Form Cursor / Cross
+		}
+		case ID_FRMX: { // view / Set / Form Cursor / Cross
 			frmcursel(1);
 			break;
-		case ID_FRMBOX: // view / Set / Form Cursor / Box
+		}
+		case ID_FRMBOX: { // view / Set / Form Cursor / Box
 			frmcursel(0);
 			break;
-		case ID_KNOTAT: // edit / Set / Knot at Selected Stitch
+		}
+		case ID_KNOTAT: { // edit / Set / Knot at Selected Stitch
 			set1knot();
 			break;
-		case ID_STCHPIX: // view / Set / Point Size / Stitch Point Boxes
+		}
+		case ID_STCHPIX: { // view / Set / Point Size / Stitch Point Boxes
 			getstpix();
-			;
 			break;
-		case ID_FRMPIX: // view / Set / Point Size / Form Point Triangles
+		}
+		case ID_FRMPIX: { // view / Set / Point Size / Form Point Triangles
 			getfrmpix();
 			break;
-		case ID_FRMPBOX: // view / Set / Point Size / Form Box
+		}
+		case ID_FRMPBOX: { // view / Set / Point Size / Form Box
 			getfrmbox();
 			break;
-		case ID_CROP: // edit / Crop to Form
+		}
+		case ID_CROP: { // edit / Crop to Form
 			form::crop();
 			break;
-		case ID_BAKMRK: // view / Retrieve Mark
+		}
+		case ID_BAKMRK: { // view / Retrieve Mark
 			bakmrk();
 			break;
-		case ID_MARKESC: // view / Set / Retrieve Mark / Escape
+		}
+		case ID_MARKESC: { // view / Set / Retrieve Mark / Escape
 			UserFlagMap.set(UserFlag::MARQ);
 			qchk();
 			break;
-		case ID_MARKQ: // view / Set / Retrieve Mark / Q
+		}
+		case ID_MARKQ: { // view / Set / Retrieve Mark / Q
 			UserFlagMap.reset(UserFlag::MARQ);
 			qchk();
 			break;
-		case ID_NUDGPIX: // view / Set / Nudge Pixels
+		}
+		case ID_NUDGPIX: { // view / Set / Nudge Pixels
 			getnpix();
 			break;
-		case ID_LINCHN: // fill / Border / Line chain
+		}
+		case ID_LINCHN: { // fill / Border / Line chain
 			StateMap.set(StateFlag::LINCHN);
 			form::chain();
 			break;
-		case ID_OPNCHN: // fill / Border / Open chain
+		}
+		case ID_OPNCHN: { // fill / Border / Open chain
 			StateMap.reset(StateFlag::LINCHN);
 			form::chain();
 			break;
-		case ID_CLOSE: // file / Close
+		}
+		case ID_CLOSE: { // file / Close
 			filclos();
 			break;
-		case ID_DELMAP: // file / Remove Bitmap
+		}
+		case ID_DELMAP: { // file / Remove Bitmap
 			delmap();
 			break;
-		case ID_BLAK: // edit / Trace / Reset Form Pixels
+		}
+		case ID_BLAK: { // edit / Trace / Reset Form Pixels
 			trace::blak();
 			break;
-		case ID_SAVMAP: // file / Save Bitmap
+		}
+		case ID_SAVMAP: { // file / Save Bitmap
 			savmap();
 			break;
-		case ID_TRDIF: // edit / Trace / Find Edges
+		}
+		case ID_TRDIF: { // edit / Trace / Find Edges
 			trace::trdif();
 			break;
-		case ID_TRACEDG: // edit / Trace / Show Traced Edges
+		}
+		case ID_TRACEDG: { // edit / Trace / Show Traced Edges
 			trace::tracedg();
 			break;
-		case ID_TRCSEL: // edit / Trace / Select Colors
+		}
+		case ID_TRCSEL: { // edit / Trace / Select Colors
 			trace::trcsel();
 			break;
-		case ID_TRACE: // edit / Trace / Trace Mode
+		}
+		case ID_TRACE: { // edit / Trace / Trace Mode
 			trace::trinit();
 			break;
-		case ID_FLOK: // file / Locking
+		}
+		case ID_FLOK: { // file / Locking
 			lock();
 			break;
-		case ID_ROTAUXON: // view / Set / Rotate Machine File / On
+		}
+		case ID_ROTAUXON: { // view / Set / Rotate Machine File / On
 			rotauxsel(1);
 			break;
-		case ID_ROTAUXOFF: // view / Set / Rotate Machine File / Off
+		}
+		case ID_ROTAUXOFF: { // view / Set / Rotate Machine File / Off
 			rotauxsel(0);
 			break;
-		case ID_FRM2COL: // edit / Set / Form Color to  stitch Color
+		}
+		case ID_FRM2COL: { // edit / Set / Form Color to  stitch Color
 			form::col2frm();
 			break;
-		case ID_SNAP2GRD: // edit / Snap / to Grid
+		}
+		case ID_SNAP2GRD: { // edit / Snap / to Grid
 			gsnap();
 			break;
-		case ID_FIL2SEL_ON: // view / Set / Fill at Select / On
+		}
+		case ID_FIL2SEL_ON: { // view / Set / Fill at Select / On
 			fil2sel(1);
 			break;
-		case ID_FIL2SEL_OFF: // view / Set / Fill at Select / Off
+		}
+		case ID_FIL2SEL_OFF: { // view / Set / Fill at Select / Off
 			fil2sel(0);
 			break;
-		case ID_OVRLAY: // file / Overlay
+		}
+		case ID_OVRLAY: { // file / Overlay
 			ovrlay();
 			break;
-		case ID_GRDHI: // view / Set / Grid Mask / High
+		}
+		case ID_GRDHI: { // view / Set / Grid Mask / High
 			setgrd(HIGRD);
 			break;
-		case ID_GRDMED: // view / Set / Grid Mask / Medium
+		}
+		case ID_GRDMED: { // view / Set / Grid Mask / Medium
 			setgrd(MEDGRD);
 			break;
-		case ID_GRDEF: // view / Set / Grid Mask / Default
+		}
+		case ID_GRDEF: { // view / Set / Grid Mask / Default
 			setgrd(DEFGRD);
 			break;
-		case ID_GRDRED: // view / Set / Grid Mask / UnRed
+		}
+		case ID_GRDRED: { // view / Set / Grid Mask / UnRed
 			setgrd(REDGRD);
 			break;
-		case ID_GRDBLU: // view / Set / Grid Mask / UnBlue
+		}
+		case ID_GRDBLU: { // view / Set / Grid Mask / UnBlue
 			setgrd(BLUGRD);
 			break;
-		case ID_GRDGRN: // view / Set / Grid Mask / UnGreen
+		}
+		case ID_GRDGRN: { // view / Set / Grid Mask / UnGreen
 			setgrd(GRNGRD);
 			break;
-		case ID_RETRACE: // edit / Retrace
+		}
+		case ID_RETRACE: { // edit / Retrace
 			retrac();
 			break;
-		case ID_DUBFIL: // fill / Border / Double
+		}
+		case ID_DUBFIL: { // fill / Border / Double
 			form::dubfil();
 			break;
-		case ID_HORCLP: // fill / Clipboard / Horizontal
+		}
+		case ID_HORCLP: { // fill / Clipboard / Horizontal
 			if (StateMap.test(StateFlag::FORMSEL) || SelectedFormList->size())
 				thred::savdo();
 			form::horclp();
 			break;
-		case ID_ANGCLP: // fill / Clipboard / Angle
+		}
+		case ID_ANGCLP: { // fill / Clipboard / Angle
 			if (StateMap.test(StateFlag::FORMSEL) || SelectedFormList->size())
 				thred::savdo();
 			form::angclp();
 			break;
-		case ID_VRTCLP: // fill / Clipboard / Vertical
+		}
+		case ID_VRTCLP: { // fill / Clipboard / Vertical
 			if (StateMap.test(StateFlag::FORMSEL) || SelectedFormList->size())
 				thred::savdo();
 			form::vrtclp();
 			break;
-		case ID_LINBEXACT: // view / Set / Line Border Spacing / Exact
+		}
+		case ID_LINBEXACT: { // view / Set / Line Border Spacing / Exact
 			UserFlagMap.reset(UserFlag::LINSPAC);
 			linbmen();
 			break;
-		case ID_LINBEVEN: // view / Set / Line Border Spacing / Even
+		}
+		case ID_LINBEVEN: { // view / Set / Line Border Spacing / Even
 			UserFlagMap.set(UserFlag::LINSPAC);
 			linbmen();
 			break;
-		case ID_BSAVON: // view / Set / PCS Bitmap Save / On
+		}
+		case ID_BSAVON: { // view / Set / PCS Bitmap Save / On
 			pcsbsavon();
 			break;
-		case ID_BSAVOF: // view / Set / PCS Bitmap Save / Off
+		}
+		case ID_BSAVOF: { // view / Set / PCS Bitmap Save / Off
 			pcsbsavof();
 			break;
-		case ID_KNOTON: // view / Knots / On
+		}
+		case ID_KNOTON: { // view / Knots / On
 			shoknot();
 			break;
-		case ID_KNOTOF: // view / Knots / Off
+		}
+		case ID_KNOTOF: { // view / Knots / Off
 			hidknot();
 			break;
-		case ID_DELKNOT: // edit / Delete / Knots
+		}
+		case ID_DELKNOT: { // edit / Delete / Knots
 			delknot();
 			break;
-		case ID_RSTNEDL: // view / Set / Needle Cursor / Off
+		}
+		case ID_RSTNEDL: { // view / Set / Needle Cursor / Off
 			nedof();
 			break;
-		case ID_SETNEDL: // view / Set / Needle Cursor / On
+		}
+		case ID_SETNEDL: { // view / Set / Needle Cursor / On
 			nedon();
 			break;
-		case ID_STCHS2FRM: // edit / Convert / Stitches to Form
+		}
+		case ID_STCHS2FRM: { // edit / Convert / Stitches to Form
 			form::stchs2frm();
 			break;
-		case ID_SPLTFRM: // edit / Split Form
+		}
+		case ID_SPLTFRM: { // edit / Split Form
 			form::spltfrm();
 			break;
-		case ID_UNBEAN: // edit / Convert / from Bean to Line
+		}
+		case ID_UNBEAN: { // edit / Convert / from Bean to Line
 			form::debean();
 			break;
-		case ID_DUBEAN: // edit / Convert / to Bean
+		}
+		case ID_DUBEAN: { // edit / Convert / to Bean
 			form::dubean();
 			break;
-		case ID_SRTBF: // edit / Sort / by Color then Form
+		}
+		case ID_SRTBF: { // edit / Sort / by Color then Form
 			form::srtbyfrm();
 			break;
-		case ID_CENTIRE: // edit / Center / Entire Design
+		}
+		case ID_CENTIRE: { // edit / Center / Entire Design
 			form::centir();
 			break;
-		case ID_CNTRX: // edit / Center / Both
+		}
+		case ID_CNTRX: { // edit / Center / Both
 			StateMap.reset(StateFlag::CNTRH);
 			StateMap.reset(StateFlag::CNTRV);
 			form::cntrx();
 			break;
-		case ID_CNTRH: // edit / Center / Horizontal
+		}
+		case ID_CNTRH: { // edit / Center / Horizontal
 			StateMap.reset(StateFlag::CNTRH);
 			StateMap.set(StateFlag::CNTRV);
 			form::cntrx();
 			break;
-		case ID_CNTRV: // edit / Center / Vertical
+		}
+		case ID_CNTRV: { // edit / Center / Vertical
 			StateMap.set(StateFlag::CNTRH);
 			StateMap.reset(StateFlag::CNTRV);
 			form::cntrx();
 			break;
-		case ID_FRMNUM: // edit / Set / Form Number
+		}
+		case ID_FRMNUM: { // edit / Set / Form Number
 			formForms::frmnum();
 			break;
-		case ID_REFILF: // fill / Refill
+		}
+		case ID_REFILF: { // fill / Refill
 			filfrms();
 			break;
-		case ID_MRKPNT: // edit / Set / Zoom Mark at Selected Point
+		}
+		case ID_MRKPNT: { // edit / Set / Zoom Mark at Selected Point
 			pntmrk();
 			break;
-		case ID_ROTSEG: // edit / Set / Rotation / Segments
+		}
+		case ID_ROTSEG: { // edit / Set / Rotation / Segments
 			rotseg();
 			break;
-		case ID_ROTMRK: // edit / Set / Rotation / Angle from Mark
+		}
+		case ID_ROTMRK: { // edit / Set / Rotation / Angle from Mark
 			rotmrk();
 			break;
-		case ID_MRKCNTR: // edit / Set / Zoom Mark at Center
+		}
+		case ID_MRKCNTR: { // edit / Set / Zoom Mark at Center
 			dumrk(UnzoomedRect.x / 2, UnzoomedRect.y / 2);
 			StateMap.set(StateFlag::RESTCH);
 			break;
-		case ID_SETROT: // edit / Set / Rotation / Angle
+		}
+		case ID_SETROT: { // edit / Set / Rotation / Angle
 			form::setrang();
 			break;
-		case ID_SETPREF: // view / Set / Default Preferences
+		}
+		case ID_SETPREF: { // view / Set / Default Preferences
 			defpref();
 			break;
-		case ID_SHRINK: // edit / Shrink Clipboard Border
+		}
+		case ID_SHRINK: { // edit / Shrink Clipboard Border
 			form::shrnk();
 			break;
-		case ID_DUPAGAIN: // edit / Rotate / and Duplicate again
+		}
+		case ID_DUPAGAIN: { // edit / Rotate / and Duplicate again
 			form::redup();
 			break;
-		case ID_CLPADJ: // edit / Set / Range Ends for Clipboard Fills
+		}
+		case ID_CLPADJ: { // edit / Set / Range Ends for Clipboard Fills
 			clpadj();
 			break;
-		case ID_DELTOT: // edit / Delete / All Forms and Stitches
+		}
+		case ID_DELTOT: { // edit / Delete / All Forms and Stitches
 			deltot();
 			break;
-		case ID_AUXPCS: // view / Set / Machine File Type / Pfaff PCS
+		}
+		case ID_AUXPCS: { // view / Set / Machine File Type / Pfaff PCS
 			setpcs();
 			break;
+		}
 #if PESACT
-		case ID_AUXPES: // view / Set / Machine File Type / Brother PES
+		case ID_AUXPES: { // view / Set / Machine File Type / Brother PES
 			setpes();
 			break;
+		}
 #endif
-		case ID_AUXDST: // view / Set / Machine File Type / Tajima DST
+		case ID_AUXDST: { // view / Set / Machine File Type / Tajima DST
 			setdst();
 			break;
-		case ID_ABOUT: // view / About ThrEd4
+		}
+		case ID_ABOUT: { // view / About ThrEd4
 			displayText::tabmsg(IDS_CPYRIT);
 			break;
-		case ID_RIBON: // edit / Convert / to Satin Ribbon
+		}
+		case ID_RIBON: { // edit / Convert / to Satin Ribbon
 			StateMap.reset(StateFlag::CNV2FTH);
 			satin::ribon();
 			break;
-		case ID_DESIZ: // view / Design Information
+		}
+		case ID_DESIZ: { // view / Design Information
 			desiz();
 			break;
-		case ID_HLP: // help
+		}
+		case ID_HLP: { // help
 			hlp::help();
 			break;
-		case ID_CNTR: // edit / Center / Forms
+		}
+		case ID_CNTR: { // edit / Center / Forms
 			form::fcntr();
 			break;
-		case ID_INSFIL: // file / Insert
+		}
+		case ID_INSFIL: { // file / Insert
 			StateMap.reset(StateFlag::IGNORINS);
 			insfil();
 			break;
-		case ID_SELALSTCH: // edit / Select / All Stitches
+		}
+		case ID_SELALSTCH: { // edit / Select / All Stitches
 			selalstch();
 			break;
-		case ID_UNGRPLO: // edit / Ungroup / First
+		}
+		case ID_UNGRPLO: { // edit / Ungroup / First
 			ungrplo();
 			break;
-		case ID_UNGRPHI: // edit / Ungroup / Last
+		}
+		case ID_UNGRPHI: { // edit / Ungroup / Last
 			ungrphi();
 			break;
-		case ID_CONTF: // fill / Contour
+		}
+		case ID_CONTF: { // fill / Contour
 			form::contfil();
 			break;
-		case ID_THUM: // file / Thumbnails
+		}
+		case ID_THUM: { // file / Thumbnails
 			thumnail();
 			break;
-		case ID_PICOT: // fill / Border / Picot
+		}
+		case ID_PICOT: { // fill / Border / Picot
 			form::picot();
 			break;
-		case ID_FILBUT: // fill / Border / Buttonhole
+		}
+		case ID_FILBUT: { // fill / Border / Buttonhole
 			form::bhol();
 			break;
-		case ID_REMBIG: // edit / Delete / Large Stitches
+		}
+		case ID_REMBIG: { // edit / Delete / Large Stitches
 			rembig();
 			break;
-		case ID_VUSELTHRDS: // view / Show Threads for Selected Color
+		}
+		case ID_VUSELTHRDS: { // view / Show Threads for Selected Color
 			vuselthr();
 			break;
-		case ID_VUTHRDS: // view / Show Threads
+		}
+		case ID_VUTHRDS: { // view / Show Threads
 			vuthrds();
 			break;
-		case ID_MOVMRK: // edit / Move / to Mark
+		}
+		case ID_MOVMRK: { // edit / Move / to Mark
 			movmrk();
 			break;
-		case ID_SELFIL: // edit / Select / Form Fill Stitches
+		}
+		case ID_SELFIL: { // edit / Select / Form Fill Stitches
 			form::selfil(FRMFIL);
 			break;
-		case ID_SELBRD: // edit / Select / Form Border Stitches
+		}
+		case ID_SELBRD: { // edit / Select / Form Border Stitches
 			form::selfil(FRMBFIL);
 			break;
-		case ID_SELAP: // edit / Select / Form Applique Stitches
+		}
+		case ID_SELAP: { // edit / Select / Form Applique Stitches
 			form::selfil(FRMAPFIL);
 			break;
-		case ID_SELFSTCHS: // edit / Select / Form Stitches
+		}
+		case ID_SELFSTCHS: { // edit / Select / Form Stitches
 			form::selalfil();
 			break;
-		case ID_SETMRK: // edit / Set / Order Mark
+		}
+		case ID_SETMRK: { // edit / Set / Order Mark
 			setmov();
 			break;
-		case ID_DELFRE: // edit / Delete / Free Stitches
+		}
+		case ID_DELFRE: { // edit / Delete / Free Stitches
 			delfre();
 			break;
-		case ID_SELAL: // edit / Select / All Forms and Stitches
+		}
+		case ID_SELAL: { // edit / Select / All Forms and Stitches
 			form::selal();
 			break;
-		case ID_REFILAL: // edit / Refill All
+		}
+		case ID_REFILAL: { // edit / Refill All
 			form::refilal();
 			break;
-		case ID_CHK: // edit / Check Range
+		}
+		case ID_CHK: { // edit / Check Range
 			thred::chkrng(StitchRangeSize);
 			StateMap.set(StateFlag::RESTCH);
 			break;
-		case ID_RTRVCLP: // edit / Retrieve Clipboard Stitches
+		}
+		case ID_RTRVCLP: { // edit / Retrieve Clipboard Stitches
 			xt::rtrclp();
 			break;
-		case ID_SORT: // edit / Sort / Auto
+		}
+		case ID_SORT: { // edit / Sort / Auto
 			xt::fsort();
 			break;
-		case ID_LAYMOV0: // edit / Move to Layer / 0
+		}
+		case ID_LAYMOV0: { // edit / Move to Layer / 0
 			form::movlayr(0);
 			break;
-		case ID_LAYMOV1: // edit / Move to Layer / 1
+		}
+		case ID_LAYMOV1: { // edit / Move to Layer / 1
 			form::movlayr(2);
 			break;
-		case ID_LAYMOV2: // edit / Move to Layer / 2
+		}
+		case ID_LAYMOV2: { // edit / Move to Layer / 2
 			form::movlayr(4);
 			break;
-		case ID_LAYMOV3: // edit / Move to Layer / 3
+		}
+		case ID_LAYMOV3: { // edit / Move to Layer / 3
 			form::movlayr(6);
 			break;
-		case ID_LAYMOV4: // edit / Move to Layer / 4
+		}
+		case ID_LAYMOV4: { // edit / Move to Layer / 4
 			form::movlayr(8);
 			break;
-		case ID_LAYCPY0: // edit / Copy to Layer / 0
+		}
+		case ID_LAYCPY0: { // edit / Copy to Layer / 0
 			form::cpylayr(0);
 			break;
-		case ID_LAYCPY1: // edit / Copy to Layer / 1
+		}
+		case ID_LAYCPY1: { // edit / Copy to Layer / 1
 			form::cpylayr(2);
 			break;
-		case ID_LAYCPY2: // edit / Copy to Layer / 2
+		}
+		case ID_LAYCPY2: { // edit / Copy to Layer / 2
 			form::cpylayr(4);
 			break;
-		case ID_LAYCPY3: // edit / Copy to Layer / 3
+		}
+		case ID_LAYCPY3: { // edit / Copy to Layer / 3
 			form::cpylayr(6);
 			break;
-		case ID_LAYCPY4: // edit / Copy to Layer / 4
+		}
+		case ID_LAYCPY4: { // edit / Copy to Layer / 4
 			form::cpylayr(8);
 			break;
-		case ID_LA: // all (Show all layers)
+		}
+		case ID_LA: { // all (Show all layers)
 			nulayr(0);
 			break;
-		case ID_L1: // 1 (Show layer 1 only)
+		}
+		case ID_L1: { // 1 (Show layer 1 only)
 			nulayr(1);
 			break;
-		case ID_L2: // 2 (Show layer 2 only)
+		}
+		case ID_L2: { // 2 (Show layer 2 only)
 			nulayr(2);
 			break;
-		case ID_L3: // 3 (Show layer 3 only)
+		}
+		case ID_L3: { // 3 (Show layer 3 only)
 			nulayr(3);
 			break;
-		case ID_L4: // 4 (Show layer 4 only)
+		}
+		case ID_L4: { // 4 (Show layer 4 only)
 			nulayr(4);
 			break;
-		case ID_ROTDUP: // edit / Rotate / and Duplicate
+		}
+		case ID_ROTDUP: { // edit / Rotate / and Duplicate
 			form::rotdup();
 			break;
-		case ID_ROTAGAIN: // edit / Rotate / Again
+		}
+		case ID_ROTAGAIN: { // edit / Rotate / Again
 			form::rotagain();
 			break;
-		case ID_ROTCMD: // edit / Rotate / Command
+		}
+		case ID_ROTCMD: { // edit / Rotate / Command
 			form::rotcmd(rotationCenter);
 			break;
-		case ID_DELFRMS: // edit / Delete / All Forms
+		}
+		case ID_DELFRMS: { // edit / Delete / All Forms
 			form::delfrms();
 			rstAll();
 			StateMap.set(StateFlag::RESTCH);
 			break;
-		case ID_SNAP2: // edit / Snap / Together
+		}
+		case ID_SNAP2: { // edit / Snap / Together
 			form::snap();
 			break;
-		case ID_CLPFIL: // fill / Clipboard / Fan
+		}
+		case ID_CLPFIL: { // fill / Clipboard / Fan
 			form::clpfil();
 			break;
-		case ID_FLPORD: // edit / Flip / Order
+		}
+		case ID_FLPORD: { // edit / Flip / Order
 			form::flpord();
 			break;
-		case ID_FRMOF: // frm+
+		}
+		case ID_FRMOF: { // frm+
 			if (GetKeyState(VK_SHIFT) & 0X8000)
 				tglhid();
 			else
 				form::tglfrm();
 			break;
-		case ID_MV2BAK: // edit / move / to End
+		}
+		case ID_MV2BAK: { // edit / move / to End
 			mv2b();
 			break;
-		case ID_MV2FRNT: // edit / move / to Start
+		}
+		case ID_MV2FRNT: { // edit / move / to Start
 			mv2f();
 			break;
-		case ID_PERP: // fill / Border / Perpendicular Satin
+		}
+		case ID_PERP: { // fill / Border / Perpendicular Satin
 			if (StateMap.test(StateFlag::FORMSEL) || SelectedFormList->size())
 				thred::savdo();
 			form::prpbrd(LineSpacing);
 			break;
-		case ID_PURGDIR: // file / Delete Backups / All backups in the selected directory
+		}
+		case ID_PURGDIR: { // file / Delete Backups / All backups in the selected directory
 			purgdir();
 			break;
-		case ID_PURG: // file / Delete Backups / Backups for the selected file
+		}
+		case ID_PURG: { // file / Delete Backups / Backups for the selected file
 			purg();
 			break;
-		case ID_VUBAK: // view / Backups
+		}
+		case ID_VUBAK: { // view / Backups
 			vubak();
 			break;
-		case ID_DELETE: // edit / Delete / Selected
+		}
+		case ID_DELETE: { // edit / Delete / Selected
 			delet();
 			break;
-		case ID_FLIPH: // edit / Flip / Horizontal
+		}
+		case ID_FLIPH: { // edit / Flip / Horizontal
 			form::fliph();
 			break;
-		case ID_FLIPV: // edit / Flip / Vertical
+		}
+		case ID_FLIPV: { // edit / Flip / Vertical
 			form::flipv();
 			break;
-		case ID_FILANG: // fill / Angle
+		}
+		case ID_FILANG: { // fill / Angle
 			if (StateMap.test(StateFlag::FORMSEL))
 				thred::savdo();
 			form::filangl();
 			break;
-		case ID_PREF: // pref
+		}
+		case ID_PREF: { // pref
 			formForms::prfmsg();
 			break;
-		case ID_BOLD: // fill / Border / Bean
+		}
+		case ID_BOLD: { // fill / Border / Bean
 			if (StateMap.test(StateFlag::FORMSEL) || SelectedFormList->size())
 				thred::savdo();
 			form::dubold();
 			break;
-		case ID_ADEND: // add
+		}
+		case ID_ADEND: { // add
 			stch2px1(PCSHeader.stitchCount - 1);
 			endpnt();
 			StateMap.set(StateFlag::BAKEND);
 			StateMap.set(StateFlag::RESTCH);
 			break;
-		case ID_SETAP: // view / Set / Applique Color
+		}
+		case ID_SETAP: { // view / Set / Applique Color
 			form::setap();
 			break;
-		case ID_APLIQ: // fill / Border / Applique
+		}
+		case ID_APLIQ: { // fill / Border / Applique
 			if (StateMap.test(StateFlag::FORMSEL))
 				thred::savdo();
 			form::apliq();
 			break;
-		case ID_SATBRD: // fill / Border / Angle Satin
+		}
+		case ID_SATBRD: { // fill / Border / Angle Satin
 			if (StateMap.test(StateFlag::FORMSEL))
 				thred::savdo();
 			satin::satbrd();
 			break;
-		case ID_FILCLP: // fill / Border / Clipboard
+		}
+		case ID_FILCLP: { // fill / Border / Clipboard
 			form::fclp();
 			break;
-		case ID_FILIN: // fill / Border / Line
+		}
+		case ID_FILIN: { // fill / Border / Line
 			if (StateMap.test(StateFlag::FORMSEL))
 				thred::savdo();
 			form::bord();
 			break;
-		case ID_FRM0: // edit / Set / Form Zero Point
+		}
+		case ID_FRM0: { // edit / Set / Form Zero Point
 			form::frm0();
 			break;
-		case ID_REDO: // redo
+		}
+		case ID_REDO: { // redo
 			redo();
 			break;
-		case ID_UNFIL: // fill / Unfill
+		}
+		case ID_UNFIL: { // fill / Unfill
 			thred::savdo();
 			form::unfil();
 			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 			break;
-		case ID_FORM: // Form
+		}
+		case ID_FORM: { // Form
 			form::frmon();
 			if (StateMap.test(StateFlag::FORMSEL))
 				formForms::refrm();
 			else
 				form::form();
 			break;
-		case ID_FILSAT: // fill / Fan
+		}
+		case ID_FILSAT: { // fill / Fan
 			StateMap.reset(StateFlag::FTHR);
 			form::filsat();
 			break;
-
-		case ID_OPNPCD: // file / Open Auxiliary file
+		}
+		case ID_OPNPCD: { // file / Open Auxiliary file
 			switch (IniFile.auxFileType) {
-			case AUXDST:
+			case AUXDST: {
 				OpenFileName.nFilterIndex = 3;
 				break;
-			default:
-				OpenFileName.nFilterIndex = 2;
+			}
+			default: { OpenFileName.nFilterIndex = 2; }
 			}
 			nuFil();
 			nulayr(0);
 			break;
-		case ID_DELSTCH: // edit / Delete / All Stitches
+		}
+		case ID_DELSTCH: { // edit / Delete / All Stitches
 			delstch();
 			break;
-		case ID_FILL_VERT: // fill / Vertical
+		}
+		case ID_FILL_VERT: { // fill / Vertical
 			if (StateMap.test(StateFlag::FORMSEL) || SelectedFormList->size())
 				thred::savdo();
 			form::filvrt();
 			break;
-		case ID_FILL_HOR: // fill / Horizontal
+		}
+		case ID_FILL_HOR: { // fill / Horizontal
 			if (StateMap.test(StateFlag::FORMSEL))
 				thred::savdo();
 			form::filhor();
 			break;
-		case ID_RUNPAT: // view / Movie
+		}
+		case ID_RUNPAT: { // view / Movie
 			movi();
 			break;
-		case ID_LENDEF: // Todo - No menu item in thred.rc for this option
+		}
+		case ID_LENDEF: { // Todo - No menu item in thred.rc for this option
 			IniFile.maxStitchLength = MAXSIZ * PFGRAN;
 			UserStitchLength        = USESIZ * PFGRAN;
 			MinStitchLength         = MINSIZ * PFGRAN;
 			break;
-		case ID_TSIZDEF: // view / Thread Size / Set Defaults
+		}
+		case ID_TSIZDEF: { // view / Thread Size / Set Defaults
 			ThreadSize30 = TSIZ30;
 			ThreadSize40 = TSIZ40;
 			ThreadSize60 = TSIZ60;
 			break;
-		case ID_SIZ30: // view / Thread Size / 30
+		}
+		case ID_SIZ30: { // view / Thread Size / 30
 			displayText::tsizmsg(L"30", ThreadSize30);
 			StateMap.set(StateFlag::ENTR30);
 			break;
-		case ID_SIZ40: // view / Thread Size / 40
+		}
+		case ID_SIZ40: { // view / Thread Size / 40
 			displayText::tsizmsg(L"40", ThreadSize40);
 			StateMap.set(StateFlag::ENTR40);
 			break;
-		case ID_SIZ60: // view / Thread Size / 60
+		}
+		case ID_SIZ60: { // view / Thread Size / 60
 			displayText::tsizmsg(L"60", ThreadSize60);
 			StateMap.set(StateFlag::ENTR60);
 			break;
-		case ID_HIDBITF: // file / Hide Bitmap
-		case ID_HIDBIT:  // edit / Trace / Hide Bitmap
+		}
+		case ID_HIDBITF:  // file / Hide Bitmap
+		case ID_HIDBIT: { // edit / Trace / Hide Bitmap
 			thred::hidbit();
 			break;
-		case ID_LODBIT: // file / Load Bitmap
+		}
+		case ID_LODBIT: { // file / Load Bitmap
 			lodbmp();
 			break;
-		case ID_KNOTS: // edit / Set / Knots
+		}
+		case ID_KNOTS: { // edit / Set / Knots
 			setknots();
 			break;
-		case ID_REMZERO: // edit / Delete / Small Stitches
+		}
+		case ID_REMZERO: { // edit / Delete / Small Stitches
 			duzero();
 			break;
-		case ID_ROT: // rot
+		}
+		case ID_ROT: { // rot
 			rot(rotationCenter);
 			break;
-		case ZUMIN: // in
+		}
+		case ZUMIN: { // in
 			if (StateMap.test(StateFlag::GMRK) || StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::INSRT)
 			    || StateMap.test(StateFlag::GRPSEL) || StateMap.test(StateFlag::FORMSEL))
 				zumin();
@@ -15798,13 +16088,16 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				SetCapture(ThrEdWindow);
 			}
 			break;
-		case ID_ZUMOUT: // out
+		}
+		case ID_ZUMOUT: { // out
 			zumout();
 			break;
-		case ID_FILE_OPEN1: // file / Open
+		}
+		case ID_FILE_OPEN1: { // file / Open
 			fop();
 			break;
-		case ID_VIEW_STCHBAK: // view / Set / Background Color
+		}
+		case ID_VIEW_STCHBAK: { // view / Set / Background Color
 			if (nuBak()) {
 				BackgroundColor    = BackgroundColorStruct.rgbResult;
 				BackgroundPen      = nuPen(BackgroundPen, 1, BackgroundColor);
@@ -15816,7 +16109,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				thred::zumhom();
 			}
 			break;
-		case ID_BITCOL: // view / Set / Bitmap Color
+		}
+		case ID_BITCOL: { // view / Set / Bitmap Color
 			if (nuBit()) {
 				BitmapColor = fswap(BitMapColorStruct.rgbResult);
 				if (PCSBMPFileName[0])
@@ -15825,11 +16119,13 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				thred::zumhom();
 			}
 			break;
-		case ID_FILE_SAVE3: // file / Save As
+		}
+		case ID_FILE_SAVE3: { // file / Save As
 			colchk();
 			savAs();
 			break;
-		case ID_EDIT_RESET_COL: // edit / Reset Colors
+		}
+		case ID_EDIT_RESET_COL: { // edit / Reset Colors
 			for (iColor = 0; iColor < 16; iColor++) {
 				UserColor[iColor]      = DefaultColors[iColor];
 				UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
@@ -15838,17 +16134,21 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 			}
 			StateMap.set(StateFlag::RESTCH);
 			break;
-		case ID_FILE_SAVE2: // file / Save
+		}
+		case ID_FILE_SAVE2: { // file / Save
 			colchk();
 			thred::save();
 			break;
-		case VU_ZUMFUL: // view / Zoom Full
+		}
+		case VU_ZUMFUL: { // view / Zoom Full
 			thred::zumhom();
 			break;
-		case ID_EDIT_SELECTCOLOR: // edit / Select / Color
+		}
+		case ID_EDIT_SELECTCOLOR: { // edit / Select / Color
 			selCol();
 			break;
-		case ID_FILE_NEW1: // file / New
+		}
+		case ID_FILE_NEW1: { // file / New
 			if (!savcmp()) {
 				displayText::savdisc();
 				StateMap.set(StateFlag::NEWBAK);
@@ -15860,14 +16160,18 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 				nulayr(0);
 			}
 			break;
-		case ID_BACK: // undo
+		}
+		case ID_BACK: { // undo
 			bak();
 			break;
-		case ID_DESNAM: // edit / Set / Designer Name
+		}
+		case ID_DESNAM: { // edit / Set / Designer Name
 			getdes();
 			break;
 		}
+		}
 		break;
+	}
 	}
 	return 0;
 }
@@ -15885,7 +16189,7 @@ void thred::internal::makCol() noexcept {
 	buffer[1] = L'0';
 	buffer[2] = 0;
 
-	auto hFont = displayText::getThrEdFont(700);
+	auto hFont = displayText::getThrEdFont(400);
 
 	for (iColor = 0; iColor < 16; iColor++) {
 		DefaultColorWin[iColor] = CreateWindow(L"STATIC",
@@ -16258,9 +16562,9 @@ void thred::internal::init() {
 		           IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left,
 		           IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top,
 		           0);
-	auto hFontNew = displayText::getThrEdFont(700);
-	SelectObject(ThredDC, hFontNew);
-	SelectObject(StitchWindowDC, hFontNew);
+	auto hFont = displayText::getThrEdFont(400);
+	SelectObject(ThredDC, hFont);
+	SelectObject(StitchWindowDC, hFont);
 	ButtonWidth    = thred::txtWid(L"MM") + TXTSIDS;
 	ButtonWidthX3  = ButtonWidth * 3;
 	ButtonHeight   = TextSize.cy + 4;
@@ -16394,8 +16698,7 @@ void thred::internal::init() {
 	PCSHeader.stitchCount = 0;
 	GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
 	ladj();
-	GetTextExtentPoint32Int(
-	    StitchWindowMemDC, (*StringTable)[STR_PIKOL].c_str(), (*StringTable)[STR_PIKOL].size(), &PickColorMsgSize);
+	GetTextExtentPoint32Int(ThredDC, (*StringTable)[STR_PIKOL].c_str(), (*StringTable)[STR_PIKOL].size(), &PickColorMsgSize);
 	auxmen();
 	fnamtabs();
 	ritfnam(*DesignerName);
@@ -16947,8 +17250,6 @@ void thred::internal::drwStch() {
 	}
 	if (StateMap.test(StateFlag::SATPNT))
 		satin::satzum();
-	if (FormDataSheet)
-		formForms::refrm();
 	if (StateMap.test(StateFlag::GMRK))
 		drwmrk(StitchWindowMemDC);
 	if (StateMap.test(StateFlag::PRFACT))
@@ -17166,11 +17467,14 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 		// DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2.
 		//
 		EnableNonClientDpiScaling(p_hWnd);
-
-		return DefWindowProc(p_hWnd, message, wParam, lParam);
+		break;
 	}
 #endif
-	case WM_INITMENU:
+	case WM_PAINT: {
+		displayText::updateWinFont(p_hWnd);
+		break;
+	}
+	case WM_INITMENU: {
 		if (StateMap.testAndReset(StateFlag::PRFACT)) {
 			DestroyWindow(PreferencesWindow);
 			StateMap.reset(StateFlag::WASRT);
@@ -17180,7 +17484,8 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 		StateMap.reset(StateFlag::FORMIN);
 		StateMap.set(StateFlag::RESTCH);
 		break;
-	case WM_HSCROLL:
+	}
+	case WM_HSCROLL: {
 		switch (gsl::narrow<long>(LOWORD(wParam))) {
 		case SB_LINELEFT:
 			if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
@@ -17264,9 +17569,9 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			return 1;
 		}
 		break;
-	case WM_VSCROLL:
+	}
+	case WM_VSCROLL: {
 		switch (LOWORD(wParam)) {
-			//		unpat();
 		case SB_LINEDOWN:
 			scrollPoint.y = (ZoomRect.top - ZoomRect.bottom) * LINSCROL;
 			if (!scrollPoint.y)
@@ -17299,7 +17604,8 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			return 1;
 		}
 		break;
-	case WM_DRAWITEM:
+	}
+	case WM_DRAWITEM: {
 		// owner draw windows
 		[[gsl::suppress(type .1)]] DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
 		if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
@@ -17436,7 +17742,8 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			}
 		}
 		break;
-	case WM_SIZE:
+	}
+	case WM_SIZE: {
 		GetClientRect(p_hWnd, &ThredWindowRect);
 		switch (wParam) {
 		case SIZE_MAXIMIZED:
@@ -17510,7 +17817,8 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 				RunPoint = 0;
 		}
 		return 1;
-	case WM_MOVE:
+	}
+	case WM_MOVE: {
 		GetClientRect(p_hWnd, &ThredWindowRect);
 		if ((ThredWindowRect.right - ThredWindowRect.left) < 20) {
 			ThredWindowRect.left  = 0;
@@ -17527,11 +17835,13 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			FillRect(StitchWindowDC, &StitchWindowClientRect, BackgroundBrush);
 		}
 		return 1;
-	case WM_CLOSE:
+	}
+	case WM_CLOSE: {
 		dun();
 		if (StateMap.test(StateFlag::SAVEX))
 			return 1;
 		break;
+	}
 	}
 	return DefWindowProc(p_hWnd, message, wParam, lParam);
 }

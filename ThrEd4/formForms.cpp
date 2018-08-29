@@ -54,7 +54,7 @@ unsigned short DaisyTypeStrings[] = {
 void formForms::maxtsiz(const std::wstring& label, POINT& textSize) {
 	SIZE labelSize;
 
-	GetTextExtentPoint32Int(StitchWindowMemDC, label.data(), label.size(), &labelSize);
+	GetTextExtentPoint32Int(GetDC(ThrEdWindow), label.data(), label.size(), &labelSize);
 	textSize.y = labelSize.cy;
 	if (labelSize.cx > textSize.x)
 		textSize.x = labelSize.cx;
@@ -76,7 +76,7 @@ HWND formForms::internal::txtwin(const std::wstring& windowName, const RECT& loc
 	}
 	return CreateWindow(L"STATIC",
 	                    windowName.c_str(),
-	                    WS_CHILD | WS_VISIBLE,
+	                    SS_NOTIFY | WS_CHILD | WS_VISIBLE,
 	                    location.left,
 	                    location.top,
 	                    location.right - location.left,
@@ -453,34 +453,24 @@ void formForms::refrm() {
 		StateMap.reset(StateFlag::WASRT);
 	}
 	LabelWindowSize = ValueWindowSize = {};
-	StateMap.set(StateFlag::REFCNT);
+	StateMap.set(StateFlag::REFCNT); // don't create windows - just size them
 	FormMenuEntryCount = 0;
 	ffi::refrmfn();
 	if (FormDataSheet) {
-		while (EnumChildWindows(FormDataSheet, ffi::chenum, 0))
-			;
-		MoveWindow(FormDataSheet,
-		           ButtonWidthX3 + 3,
-		           3,
-		           LabelWindowSize.x + ValueWindowSize.x + 18,
-		           LabelWindowSize.y * FormMenuEntryCount + 12,
-		           TRUE);
-		thred::redraw(FormDataSheet);
+		DestroyWindow(FormDataSheet);
 	}
-	else {
-		FormDataSheet = CreateWindow(L"STATIC",
-		                             nullptr,
-		                             WS_CHILD | WS_VISIBLE | WS_BORDER,
-		                             ButtonWidthX3 + 3,
-		                             3,
-		                             LabelWindowSize.x + ValueWindowSize.x + 18,
-		                             LabelWindowSize.y * FormMenuEntryCount + 12,
-		                             ThrEdWindow,
-		                             nullptr,
-		                             ThrEdInstance,
-		                             nullptr);
-	}
-	StateMap.reset(StateFlag::REFCNT);
+	FormDataSheet = CreateWindow(L"STATIC",
+	                             nullptr,
+	                             WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                             ButtonWidthX3 + 3,
+	                             3,
+	                             LabelWindowSize.x + ValueWindowSize.x + 18,
+	                             LabelWindowSize.y * FormMenuEntryCount + 12,
+	                             ThrEdWindow,
+	                             nullptr,
+	                             ThrEdInstance,
+	                             nullptr);
+	StateMap.reset(StateFlag::REFCNT); // this time create the windows
 	ffi::refrmfn();
 }
 
@@ -925,28 +915,21 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 #ifdef TESTCODE
-		const auto uDpi = GetDpiForWindow(hwndlg);
-		RECT rcClient = {};
+		const auto uDpi     = GetDpiForWindow(hwndlg);
+		RECT       rcClient = {};
 		GetWindowRect(hwndlg, &rcClient);
-		auto uWidth = MulDiv((rcClient.right - rcClient.left), uDpi, 96);
+		auto uWidth  = MulDiv((rcClient.right - rcClient.left), uDpi, 96);
 		auto uHeight = MulDiv((rcClient.bottom - rcClient.top), uDpi, 96);
-		SetWindowPos(
-			hwndlg,
-			nullptr,
-			rcClient.left,
-			rcClient.top,
-			uWidth,
-			uHeight,
-			SWP_NOZORDER | SWP_NOACTIVATE);
+		SetWindowPos(hwndlg, nullptr, rcClient.left, rcClient.top, uWidth, uHeight, SWP_NOZORDER | SWP_NOACTIVATE);
 
 		auto hFont = displayText::getThrEdFont(400);
-		//SendMessage(hwndlg, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
+		// SendMessage(hwndlg, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
 		EnumChildWindows(hwndlg,
-			[](HWND p_hWnd, LPARAM lParam) -> BOOL {
-			SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
-			return TRUE;
-		},
-			(LPARAM)hFont);
+		                 [](HWND p_hWnd, LPARAM lParam) -> BOOL {
+			                 SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
+			                 return TRUE;
+		                 },
+		                 (LPARAM)hFont);
 #endif // !TESTCODE
 		ffi::initTearDlg(hwndlg);
 		break;

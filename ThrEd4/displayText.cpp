@@ -84,18 +84,18 @@ void displayText::shoMsg(const std::wstring& message) {
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
 		SIZE textSize = {}, messageSize = {};
 		for (size_t index = 0; index < strings.size(); index++) {
-			GetTextExtentPoint32Int(StitchWindowMemDC, strings[index].c_str(), strings[index].size(), &textSize);
+			GetTextExtentPoint32Int(GetDC(ThrEdWindow), strings[index].c_str(), strings[index].size(), &textSize);
 			if (textSize.cx > messageSize.cx)
 				messageSize.cx = textSize.cx;
 			if (textSize.cy > messageSize.cy)
 				messageSize.cy = textSize.cy;
 		}
 		messageSize.cy *= gsl::narrow<LONG>(strings.size());
-		int xOffset = 0;
-		if (StateMap.testAndReset(StateFlag::MSGOF))
-			xOffset = PreferenceWindowWidth + 6;
-		else
-			xOffset = 3;
+		RECT mainRect = {};
+		GetWindowRect(MainStitchWin, &mainRect);
+		auto xOffset = mainRect.left;
+		GetWindowRect(ThrEdWindow, &mainRect);
+		xOffset -= mainRect.left;
 		MsgWindow = CreateWindow(L"STATIC",
 		                         message.c_str(),
 		                         SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -103,10 +103,11 @@ void displayText::shoMsg(const std::wstring& message) {
 		                         3,
 		                         messageSize.cx + 20,
 		                         messageSize.cy + 6,
-		                         MainStitchWin,
+		                         ThrEdWindow,
 		                         nullptr,
 		                         ThrEdInstance,
 		                         nullptr);
+//		displayText::updateWinFont(MainStitchWin);
 	}
 }
 
@@ -130,17 +131,22 @@ void displayText::hsizmsg() {
 }
 
 void displayText::numWnd() noexcept {
-	RECT messageRect;
+	RECT messageRect = {};
 
 	GetClientRect(MsgWindow, &messageRect);
+	RECT wRect = {};
+	GetWindowRect(MainStitchWin, &wRect);
+	auto xOffset = wRect.left;
+	GetWindowRect(ThrEdWindow, &wRect);
+	xOffset -= wRect.left;
 	GeneralNumberInputBox = CreateWindow(L"STATIC",
 	                                     nullptr,
 	                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                                     5,
+	                                     xOffset + 5,
 	                                     messageRect.bottom + 15,
 	                                     ButtonWidthX3,
 	                                     ButtonHeight,
-	                                     MainStitchWin,
+	                                     ThrEdWindow,
 	                                     nullptr,
 	                                     ThrEdInstance,
 	                                     nullptr);
@@ -408,12 +414,22 @@ void displayText::savdisc() {
 	                            nullptr);
 }
 
+void displayText::updateWinFont(HWND hWnd) {
+	auto hFont = displayText::getThrEdFont(400);
+	EnumChildWindows(hWnd,
+		[](HWND p_hWnd, LPARAM lParam) -> BOOL {
+		SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
+		return TRUE;
+	},
+		(LPARAM)hFont);
+}
+
 void displayText::tomsg() {
 	RECT OKrect;
 	SIZE textSize;
 
 	GetWindowRect(OKButton, &OKrect);
-	GetTextExtentPoint32Int(StitchWindowMemDC, (*StringTable)[STR_DELST2].c_str(), (*StringTable)[STR_DELST2].size(), &textSize);
+	GetTextExtentPoint32Int(GetDC(ThrEdWindow), (*StringTable)[STR_DELST2].c_str(), (*StringTable)[STR_DELST2].size(), &textSize);
 	DeleteStitchesDialog = CreateWindow(L"STATIC",
 	                                    (*StringTable)[STR_DELST2].c_str(),
 	                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -425,6 +441,7 @@ void displayText::tomsg() {
 	                                    nullptr,
 	                                    ThrEdInstance,
 	                                    nullptr);
+	displayText::updateWinFont(MainStitchWin);
 }
 
 void displayText::internal::bxtxt(unsigned iButton, unsigned iMessage) {
@@ -460,14 +477,12 @@ HFONT displayText::getThrEdFont(LONG weight) noexcept {
 	return CreateFontIndirectW(&lfText);
 #else
 	SystemParametersInfo(SPI_GETICONTITLELOGFONT, sizeof(lfText), &lfText, FALSE);
-	lfText.lfWeight = weight; 
+	lfText.lfWeight = weight;
 	return CreateFontIndirectW(&lfText);
 
 #endif
 }
 
-[[gsl::suppress(26490)]]
-[[gsl::suppress(26461)]]
-void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
+[[gsl::suppress(26490)]][[gsl::suppress(26461)]] void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
 	SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0));
 }
