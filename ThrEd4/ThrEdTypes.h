@@ -7,6 +7,9 @@
 #include <gsl/gsl>
 #pragma warning(pop)
 
+// Local Headers
+#include "switches.h"
+
 #define TRCMTH 1 // 0=brightness compare,1=color compare
 
 #define RUTVALID 1
