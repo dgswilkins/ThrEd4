@@ -107,7 +107,7 @@ void displayText::shoMsg(const std::wstring& message) {
 		                         nullptr,
 		                         ThrEdInstance,
 		                         nullptr);
-//		displayText::updateWinFont(MainStitchWin);
+		//		displayText::updateWinFont(MainStitchWin);
 	}
 }
 
@@ -414,15 +414,18 @@ void displayText::savdisc() {
 	                            nullptr);
 }
 
+#pragma warning(push)
+#pragma warning(disable : 26493)  // we use c style casts as this is a C API
 void displayText::updateWinFont(HWND hWnd) noexcept {
 	auto const* hFont = displayText::getThrEdFont(400);
 	EnumChildWindows(hWnd,
-		[](HWND p_hWnd, LPARAM lParam) -> BOOL {
-		SendMessage(p_hWnd, WM_SETFONT, gsl::narrow<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
-		return TRUE;
-	},
-		reinterpret_cast<LPARAM>(hFont));
+	                 [](HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
+		                 SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
+		                 return TRUE;
+	                 },
+	                 (LPARAM)hFont);
 }
+#pragma warning(pop)
 
 void displayText::tomsg() {
 	RECT OKrect;
