@@ -17406,7 +17406,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					else {
 						std::vector<FRMHEDOUT> inFormList(stitchHeader.formCount);
 						bytesToRead = gsl::narrow<DWORD>(stitchHeader.formCount * sizeof(inFormList[0]));
-						ReadFileInt(FileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
+						ReadFileInt(thrEdFile, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 						if (BytesRead != bytesToRead) {
 							break;
 						}
