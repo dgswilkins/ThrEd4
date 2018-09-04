@@ -17404,10 +17404,13 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 						const auto _ = std::copy(formListOriginal.cbegin(), formListOriginal.cend(), formList.begin());
 					}
 					else {
-						bytesToRead = stitchHeader.formCount * sizeof(formList[0]);
-						ReadFile(thrEdFile, formList.data(), bytesToRead, &BytesRead, nullptr);
-						if (BytesRead != bytesToRead)
+						std::vector<FRMHEDOUT> inFormList(stitchHeader.formCount);
+						bytesToRead = gsl::narrow<DWORD>(stitchHeader.formCount * sizeof(inFormList[0]));
+						ReadFileInt(FileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
+						if (BytesRead != bytesToRead) {
 							break;
+						}
+						std::copy(inFormList.cbegin(), inFormList.cend(), formList.begin());
 					}
 					bytesToRead = stitchHeader.vertexCount * sizeof(vertexList[0]);
 					ReadFile(thrEdFile, vertexList.data(), bytesToRead, &BytesRead, nullptr);
