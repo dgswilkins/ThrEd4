@@ -788,6 +788,13 @@ public:
 	double x;
 	double y;
 
+	constexpr dPOINT() noexcept
+		: x(0.0)
+		, y(0.0) {
+	}
+	inline dPOINT(const fPOINT& rhs);
+	inline dPOINT(float rhsX, float rhsY) noexcept;
+	inline dPOINT(double rhsX, double rhsY) noexcept;
 	inline bool    operator==(const dPOINT& rhs) const noexcept;
 	inline dPOINT& operator=(const fPOINT& rhs) noexcept;
 	inline dPOINT& operator=(const BSEQPNT& rhs) noexcept;
@@ -872,6 +879,20 @@ inline fPOINT& fPOINT::operator=(const BSEQPNT& rhs) noexcept {
 	return *this;
 }
 
+inline dPOINT::dPOINT(const fPOINT& rhs) {
+	x = gsl::narrow<double>(rhs.x);
+	y = gsl::narrow<double>(rhs.y);
+}
+
+inline dPOINT::dPOINT(float rhsX, float rhsY) noexcept
+	: x(rhsX)
+	, y(rhsY) {
+}
+
+inline dPOINT::dPOINT(double rhsX, double rhsY) noexcept
+	: x(rhsX)
+	, y(rhsY) {
+}
 inline bool dPOINT::operator==(const dPOINT& rhs) const noexcept {
 	return (x == rhs.x) && (y == rhs.y);
 }
