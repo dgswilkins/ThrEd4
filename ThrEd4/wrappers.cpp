@@ -45,3 +45,11 @@ void TextOutInt(HDC hdc, int nXStart, int nYStart, LPCTSTR lpString, size_t cchS
 void GetTextExtentPointInt(HDC hdc, LPCTSTR lpString, size_t cbString, LPSIZE lpSize) {
 	GetTextExtentPoint(hdc, lpString, gsl::narrow<int>(cbString), lpSize);
 }
+
+void setCursorInt(HCURSOR hCursor) {
+	static HCURSOR saveCursor = 0;
+	if (saveCursor != hCursor) {
+		SetCursor(hCursor);
+		saveCursor = hCursor;
+	}
+}

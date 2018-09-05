@@ -11190,55 +11190,55 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					thred::ritfcor(SelectedPoint);
 				if ((StateMap.test(StateFlag::PRFACT) || StateMap.test(StateFlag::FORMIN) || StateMap.test(StateFlag::POLIMOV))
 				    || FormDataSheet) {
-					SetCursor(ArrowCursor);
+					setCursorInt(ArrowCursor);
 					break;
 				}
 				if (!StateMap.test(StateFlag::INIT)) {
 					if (UserFlagMap.test(UserFlag::NEDOF))
-						SetCursor(CrossCursor);
+						setCursorInt(CrossCursor);
 					else
-						SetCursor(NeedleUpCursor);
+						setCursorInt(NeedleUpCursor);
 					break;
 				}
 				if (StateMap.test(StateFlag::INSRT)) {
 					if (UserFlagMap.test(UserFlag::NEDOF))
-						SetCursor(CrossCursor);
+						setCursorInt(CrossCursor);
 					else {
 						if (StateMap.test(StateFlag::LIN1))
-							SetCursor(NeedleUpCursor);
+							setCursorInt(NeedleUpCursor);
 						else {
 							if (StitchBuffer[ClosestPointIndex + 1].x > StitchBuffer[ClosestPointIndex].x) {
 								if (StitchBuffer[ClosestPointIndex + 1].y > StitchBuffer[ClosestPointIndex].y)
-									SetCursor(NeedleLeftUpCursor);
+									setCursorInt(NeedleLeftUpCursor);
 								else
-									SetCursor(NeedleLeftDownCursor);
+									setCursorInt(NeedleLeftDownCursor);
 							}
 							else {
 								if (StitchBuffer[ClosestPointIndex + 1].y > StitchBuffer[ClosestPointIndex].y)
-									SetCursor(NeedleRightUpCursor);
+									setCursorInt(NeedleRightUpCursor);
 								else
-									SetCursor(NeedleRightDownCursor);
+									setCursorInt(NeedleRightDownCursor);
 							}
 						}
 					}
 					break;
 				}
 				if (StateMap.test(StateFlag::BZUMIN) || StateMap.test(StateFlag::BOXZUM) || StateMap.test(StateFlag::SELPNT)) {
-					SetCursor(CrossCursor);
+					setCursorInt(CrossCursor);
 					break;
 				}
 				if (StateMap.test(StateFlag::SATIN) || StateMap.test(StateFlag::SATPNT) || StateMap.test(StateFlag::INSFRM)) {
 					if (UserFlagMap.test(UserFlag::FRMX))
-						SetCursor(CrossCursor);
+						setCursorInt(CrossCursor);
 					else
-						SetCursor(FormCursor);
+						setCursorInt(FormCursor);
 					break;
 				}
 				if (StateMap.test(StateFlag::SATCNKT)) {
-					SetCursor(DLineCursor);
+					setCursorInt(DLineCursor);
 				}
 				else {
-					SetCursor(ArrowCursor);
+					setCursorInt(ArrowCursor);
 				}
 			} while (false);
 			if (StateMap.test(StateFlag::FPUNCLP)) {
