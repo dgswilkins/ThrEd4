@@ -57,7 +57,7 @@
 #define PAGSCROL 0.9      // page scroll factor
 #define LINSCROL 0.05     // line scroll factor
 #define TXTSIDS 6         // extra pixels in a text box
-#define MAXITEMS 0x10000  // maximum number of stitches, vertices, texture points, sequence items & clipboard points
+#define MAXITEMS 0x10000u  // maximum number of stitches, vertices, texture points, sequence items & clipboard points
 #define MAXCHNG 10000     // maximum number of color changes
 #define SHUPX 480         // small hoop x size
 #define SHUPY 480         // small hoop y size
@@ -123,7 +123,7 @@
 #define FSED 1340007303           // feather seqence seed
 #define NAMSED 2222222222         // trial version psg seed
 #define DSTRAT 0.8333333333333333 // ratio of dst stitch points to PFAFF stitch points
-#define HUPS 5                    // number of hoops the user can select
+#define HUPS 5u                    // number of hoops the user can select
 #define NORDSED 0x5a5a5a5a        // name order seed
 #define NCODSED 0x73ef5a7e        // name encoding seed
 #define NCODOF 80                 // name encoding offset
@@ -1576,9 +1576,9 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 	return *this;
 }
 
-#define FRMEND 1
-#define FRMLMSK 0x0e
-#define NFRMLMSK 0xf1
+#define FRMEND 1u
+#define FRMLMSK 0x0eu
+#define NFRMLMSK 0xf1u
 
 /*form attribute bits
 
@@ -1590,11 +1590,11 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 */
 
 // blunt bits
-#define FBLNT 0x20
-#define SBLNT 0x40
-#define NFBLNT 0xdf
-#define NSBLNT 0xbf
-#define NOBLNT 0x9f
+#define FBLNT 0x20u
+#define SBLNT 0x40u
+#define NFBLNT 0xdfu
+#define NSBLNT 0xbfu
+#define NOBLNT 0x9fu
 
 	// frmhed extended attribute bits
 

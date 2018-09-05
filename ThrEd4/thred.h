@@ -56,20 +56,14 @@ void mvstchs(unsigned destination, unsigned source, unsigned count);
 unsigned px2stch() noexcept;
 
 void pxCor2stch(const POINT& point) noexcept;
-void redclp();
+void redclp() noexcept;
 void redraw(HWND window) noexcept;
 void ritfcor(const fPOINT& point);
 void ritmov();
 void ritot(unsigned number);
 void rngadj();
-void rotang1(const fPOINTATTR& unrotatedPoint,
-             fPOINT&           rotatedPoint,
-             const double&     rotationAngle,
-             const dPOINT&     rotationCenter) noexcept;
-void rotangf(const fPOINT& unrotatedPoint,
-             fPOINT&       rotatedPoint,
-             const double  rotationAngle,
-             const dPOINT& rotationCenter) noexcept;
+void rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter) noexcept;
+void rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter) noexcept;
 
 void rotflt(fPOINT& point, const double rotationAngle, const dPOINT& rotationCenter) noexcept;
 void rotfn(double rotationAngle, const dPOINT& rotationCenter);
@@ -83,7 +77,7 @@ void shft(const fPOINT& delta) noexcept;
 void stch2pxr(const fPOINT& stitchCoordinate) noexcept;
 void stchrct(fRECTANGLE& rectangle) noexcept;
 void strtchbox(std::vector<POINT>& stretchBoxLine) noexcept;
-int  txtWid(const wchar_t* string);
+long  txtWid(const wchar_t* string);
 void unbBox();
 void unbsho();
 void undat() noexcept;
@@ -112,7 +106,7 @@ namespace internal {
 
 	unsigned long long bufTou64(wchar_t* buffer);
 
-	void     centr() noexcept;
+	void     centr();
 	void     chk1col();
 	unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rotationAngle, dPOINT& rotationCenter);
 	unsigned chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept;
@@ -139,7 +133,7 @@ namespace internal {
 	bool     cmpstch(unsigned iStitchA, unsigned iStitchB) noexcept;
 	void     colchk() noexcept;
 
-	constexpr unsigned coldis(COLORREF colorA, COLORREF colorB);
+	constexpr DWORD coldis(COLORREF colorA, COLORREF colorB);
 
 	bool     colfil();
 	unsigned colmatch(COLORREF color) noexcept;
@@ -177,7 +171,7 @@ namespace internal {
 
 	inline unsigned dtrn(DSTREC* dpnt);
 
-	void duClos(unsigned startStitch, unsigned stitchCount);
+	void duClos(unsigned startStitch, unsigned stitchCount) noexcept;
 	void duIns();
 	void duSelbox() noexcept;
 	void duar();
@@ -192,31 +186,33 @@ namespace internal {
 
 	constexpr unsigned dudbits(const POINT& dif);
 
-	void     dufdef() noexcept;
-	void     dufsel();
-	void     dugrid();
-	void     duhbit(unsigned cod) noexcept;
-	void     duhom();
-	void     duinsfil();
-	void     dulin();
-	void     dumov();
-	void     dumrk(double xCoord, double yCoord);
-	void     dun();
-	bool     dunum(unsigned code) noexcept;
-	void     dupclp();
-	void     duprct();
-	void     durcntr(dPOINT& rotationCenter) noexcept;
-	void     durit(char** destination, const void* const source, size_t count) noexcept;
-	void     durot() noexcept;
-	void     durotu() noexcept;
-	void     dusel(HDC dc);
-	void     duselrng();
-	void     dusid(unsigned entry) noexcept;
-	unsigned duswap(unsigned data) noexcept;
-	void     duver(const fs::path& name);
-	void     duzero();
-	void     endknt(unsigned finish);
-	void     endpnt();
+	void dufdef() noexcept;
+	void dufsel();
+	void dugrid();
+	void duhbit(unsigned cod) noexcept;
+	void duhom();
+	void duinsfil();
+	void dulin();
+	void dumov();
+	void dumrk(double xCoord, double yCoord);
+	void dun();
+	bool dunum(unsigned code) noexcept;
+	void dupclp();
+	void duprct();
+	void durcntr(dPOINT& rotationCenter) noexcept;
+	void durit(char** destination, const void* const source, size_t count) noexcept;
+	void durot() noexcept;
+	void durotu() noexcept;
+	void dusel(HDC dc);
+	void duselrng();
+	void dusid(unsigned entry) noexcept;
+
+	constexpr unsigned byteSwap(unsigned data) noexcept;
+
+	void duver(const fs::path& name);
+	void duzero();
+	void endknt(unsigned finish);
+	void endpnt();
 
 	BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam);
 
@@ -286,7 +282,7 @@ namespace internal {
 	void     lodclp(unsigned iStitch);
 	void     longer();
 	void     makCol() noexcept;
-	unsigned makbig(unsigned start, unsigned finish);
+	unsigned makbig(unsigned start, unsigned finish) noexcept;
 	void     mark();
 	void     movbak(char source, char destination);
 	void     movbox();
@@ -426,7 +422,7 @@ namespace internal {
 	void        shftflt(fPOINT point) noexcept;
 	void        shoknot();
 	void        shorter();
-	bool        sidclp();
+	bool        sidclp() noexcept;
 	void        sidhup();
 	void        sidmsg(HWND window, std::wstring* const strings, unsigned entries);
 	size_t      sizclp(unsigned formFirstStitchIndex) noexcept;
@@ -491,7 +487,7 @@ namespace internal {
 	unsigned pesnam() noexcept;
 	void     ritpcol(unsigned char colorIndex) noexcept;
 	void     ritpes(unsigned iStitch, const std::vector<fPOINTATTR>& stitches);
-	void     rpcrd(float stitchDelta) noexcept;
+	void     rpcrd(float stitchDelta);
 	void     setpes();
 	unsigned tripl(char* dat);
 #endif
