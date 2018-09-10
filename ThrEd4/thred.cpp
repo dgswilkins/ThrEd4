@@ -1707,9 +1707,9 @@ void thred::internal::zRctAdj() noexcept {
 }
 
 void thred::shft(const fPOINT& delta) noexcept {
-	dPOINT halfZoomRect = { ((ZoomRect.right - ZoomRect.left) / 2), ((ZoomRect.top - ZoomRect.bottom) / 2) };
-	dPOINT center       = { (ZoomRect.left + halfZoomRect.x), (ZoomRect.bottom + halfZoomRect.y) };
-	dPOINT shift        = { (center.x - delta.x), (center.y - delta.y) };
+	const	dPOINT halfZoomRect = { ((ZoomRect.right - ZoomRect.left) / 2), ((ZoomRect.top - ZoomRect.bottom) / 2) };
+	const	dPOINT center       = { (ZoomRect.left + halfZoomRect.x), (ZoomRect.bottom + halfZoomRect.y) };
+	const	dPOINT shift        = { (center.x - delta.x), (center.y - delta.y) };
 
 	ZoomRect.bottom -= shift.y;
 	ZoomRect.top -= shift.y;
@@ -6666,7 +6666,7 @@ void thred::internal::rotang(dPOINT unrotatedPoint, POINT& rotatedPoint, double 
 		else
 			newAngle = rotationAngle - PI / 2;
 	}
-	dPOINT point = { rotationCenter.x + distanceToCenter * cos(newAngle), rotationCenter.y + distanceToCenter * sin(newAngle) };
+	const	dPOINT point = { rotationCenter.x + distanceToCenter * cos(newAngle), rotationCenter.y + distanceToCenter * sin(newAngle) };
 	thred::sCor2px(point, rotatedPoint);
 }
 
@@ -9161,12 +9161,12 @@ unsigned thred::internal::makbig(unsigned start, unsigned finish) noexcept {
 	finish--;
 	// ToDo - Use a temp buffer rather than the high buffer
 	for (auto source = start; source < finish; source++) {
-		dPOINT delta{ StitchBuffer[source + 1].x - StitchBuffer[source].x, StitchBuffer[source + 1].y - StitchBuffer[source].y };
+		const		dPOINT delta{ StitchBuffer[source + 1].x - StitchBuffer[source].x, StitchBuffer[source + 1].y - StitchBuffer[source].y };
 		const auto length = hypot(delta.x, delta.y);
 		thred::mvstch(destination++, source);
 		if (length > IniFile.maxStitchLength) {
 			const auto stitchCount = ceil(length / UserStitchLength);
-			dPOINT     step{ delta.x / stitchCount, delta.y / stitchCount };
+			const			dPOINT     step{ delta.x / stitchCount, delta.y / stitchCount };
 			dPOINT     point{ StitchBuffer[source].x + step.x, StitchBuffer[source].y + step.y };
 			auto       attribute = StitchBuffer[source].attribute;
 			if (attribute != StitchBuffer[source + 1].attribute) {
@@ -16606,7 +16606,7 @@ bool thred::internal::bitar() {
 			                          backingRect.left - zoomedInRect.left,
 			                          zoomedInRect.right - backingRect.right };
 
-		dPOINT bitmapStitchRatio = { static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
+		const		dPOINT bitmapStitchRatio = { static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
 			                         static_cast<double>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom) };
 
 		BitmapDstRect = { gsl::narrow<LONG>(differenceRect.top * bitmapStitchRatio.y),

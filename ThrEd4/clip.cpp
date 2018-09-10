@@ -15,7 +15,7 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127) // supress warning for fmt library header
+#pragma warning(disable : 4127)  // supress warning for fmt library header
 #pragma warning(disable : 6387)  // supress warning for fmt library header
 #pragma warning(disable : 26455) // supress warning for library headers
 #include <fmt/format.h>
@@ -425,7 +425,7 @@ void clip::internal::fxlit(const std::vector<double>& listSINEs,
 		const auto length
 		    = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
 		const unsigned int count = floor(length / AdjustedSpace);
-		dPOINT             delta = { AdjustedSpace * listCOSINEs[currentSide], AdjustedSpace * listSINEs[currentSide] };
+		const dPOINT       delta = { AdjustedSpace * listCOSINEs[currentSide], AdjustedSpace * listSINEs[currentSide] };
 		SelectedPoint.x += delta.x * count;
 		SelectedPoint.y += delta.y * count;
 		BeanCount += count;
@@ -637,8 +637,9 @@ void clip::duxclp() {
 	std::vector<fPOINT> tempClipPoints;
 	tempClipPoints.reserve(ClipStitchCount);
 	ci::clpxadj(tempClipPoints, chainEndPoints);
-	SequenceIndex         = 0;
-	dPOINT rotationCenter = {};
+	SequenceIndex = 0;
+	// ToDo - does this make sense?
+	const dPOINT rotationCenter = {};
 	for (unsigned iPoint = 1; iPoint < chainEndPoints.size(); iPoint++) {
 		ci::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
 	}

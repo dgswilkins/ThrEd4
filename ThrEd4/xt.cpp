@@ -2431,7 +2431,7 @@ void xt::internal::nudfn(const fRECTANGLE& designSizeRect) noexcept {
 
 	newSize.x              = designSizeRect.right - designSizeRect.left;
 	newSize.y              = designSizeRect.top - designSizeRect.bottom;
-	dPOINT designSizeRatio = { (DesignSize.x / newSize.x), (DesignSize.y / newSize.y) };
+	const dPOINT designSizeRatio = { (DesignSize.x / newSize.x), (DesignSize.y / newSize.y) };
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 		sadj(StitchBuffer[iStitch], designSizeRatio, designSizeRect);
 	for (iVertex = 0; iVertex < FormVertexIndex; iVertex++)
