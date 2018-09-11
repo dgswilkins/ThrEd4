@@ -158,11 +158,11 @@ void xt::internal::nurat(FEATHER& feather) {
 	case FTHPSG:
 		if (feather.upCount) {
 			if (feather.countUp) {
-				feather.ratio = static_cast<float>(feather.totalCount - (form::psg() % feather.totalCount)) / feather.totalCount;
+				feather.ratio = (static_cast<float>(feather.totalCount) - (form::psg() % feather.totalCount)) / feather.totalCount;
 				feather.countUp--;
 			}
 			else {
-				feather.ratio = static_cast<float>(feather.totalCount - (bpsg() % feather.totalCount)) / feather.totalCount;
+				feather.ratio = (static_cast<float>(feather.totalCount) - (bpsg() % feather.totalCount)) / feather.totalCount;
 				if (feather.countDown)
 					feather.countDown--;
 				else {
@@ -173,7 +173,7 @@ void xt::internal::nurat(FEATHER& feather) {
 			}
 		}
 		else
-			feather.ratio = static_cast<float>(feather.totalCount - (form::psg() % feather.totalCount)) / feather.totalCount;
+			feather.ratio = (static_cast<float>(feather.totalCount) - (form::psg() % feather.totalCount)) / feather.totalCount;
 		feather.ratio *= feather.formRatio;
 		break;
 	case FTHFAZ:

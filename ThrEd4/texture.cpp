@@ -449,7 +449,7 @@ bool texture::internal::px2txt(const POINT& offset) {
 			return false;
 		else {
 			tmp.y = TextureScreen.areaHeight
-			        - (static_cast<float>(offset.y - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
+			        - ((static_cast<float>(offset.y) - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
 			TempTexturePoints->push_back(tmp);
 			return true;
 		}
@@ -641,7 +641,7 @@ void texture::internal::ed2txp(const POINT& offset, TXPNT& textureRecord) noexce
 	txi::px2ed(offset, point);
 	textureRecord.line = (point.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5;
 	textureRecord.y    = TextureScreen.areaHeight
-	                  - (static_cast<float>(offset.y - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
+	                  - ((static_cast<float>(offset.y) - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
 }
 
 void texture::txtrup() {

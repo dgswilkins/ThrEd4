@@ -5691,18 +5691,18 @@ COLORREF thred::internal::nuBit() noexcept {
 }
 
 void thred::pxCor2stch(const POINT& point) noexcept {
-	auto ratio      = static_cast<double>(point.x - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
+	auto ratio      = (static_cast<double>(point.x) - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
 	SelectedPoint.x = ratio * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-	ratio           = static_cast<double>(StitchWindowAbsRect.bottom - point.y) / StitchWindowClientRect.bottom;
+	ratio           = (static_cast<double>(StitchWindowAbsRect.bottom) - point.y) / StitchWindowClientRect.bottom;
 	SelectedPoint.y = ratio * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
 }
 
 unsigned thred::px2stch() noexcept {
 	if (Msg.pt.x >= StitchWindowAbsRect.left && Msg.pt.x <= StitchWindowAbsRect.right && Msg.pt.y >= StitchWindowAbsRect.top
 	    && Msg.pt.y <= StitchWindowAbsRect.bottom) {
-		auto tdub       = static_cast<double>(Msg.pt.x - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
+		auto tdub       = (static_cast<double>(Msg.pt.x) - StitchWindowAbsRect.left) / StitchWindowClientRect.right;
 		SelectedPoint.x = tdub * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-		tdub            = static_cast<double>(StitchWindowAbsRect.bottom - Msg.pt.y) / StitchWindowClientRect.bottom;
+		tdub            = (static_cast<double>(StitchWindowAbsRect.bottom) - Msg.pt.y) / StitchWindowClientRect.bottom;
 		SelectedPoint.y = tdub * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
 		return 1;
 	}
@@ -6192,11 +6192,11 @@ unsigned thred::internal::closlin() {
 #define TOL 20
 	thi::unboxs();
 	auto offset
-	    = static_cast<float>(Msg.pt.x - StitchWindowAbsRect.left) / (StitchWindowAbsRect.right - StitchWindowAbsRect.left);
+	    = (static_cast<float>(Msg.pt.x) - StitchWindowAbsRect.left) / (static_cast<float>(StitchWindowAbsRect.right) - StitchWindowAbsRect.left);
 	checkedPoint.x = offset * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-	offset = static_cast<float>(StitchWindowAbsRect.bottom - Msg.pt.y) / (StitchWindowAbsRect.bottom - StitchWindowAbsRect.top);
+	offset = (static_cast<float>(StitchWindowAbsRect.bottom) - Msg.pt.y) / (static_cast<float>(StitchWindowAbsRect.bottom) - StitchWindowAbsRect.top);
 	checkedPoint.y       = (offset * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom);
-	offset               = static_cast<double>(ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
+	offset               = (ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
 	const auto tolerance = offset * TOL;
 	for (auto iChange = 0u; iChange < ColorChanges; iChange++) {
 		auto stitchCount = gsl::narrow<unsigned short>(
@@ -8903,8 +8903,8 @@ bool thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, double& xyRatio
 			StateMap.set(StateFlag::STRTCH);
 		else {
 			StateMap.set(StateFlag::EXPAND);
-			xyRatio = static_cast<double>(SelectedFormsRect.right - SelectedFormsRect.left)
-			          / (SelectedFormsRect.bottom - SelectedFormsRect.top);
+			xyRatio = (static_cast<double>(SelectedFormsRect.right) - SelectedFormsRect.left)
+			          / (static_cast<double>(SelectedFormsRect.bottom) - SelectedFormsRect.top);
 		}
 		SelectedFormControlVertex >>= 1;
 		StateMap.set(StateFlag::SHOSTRTCH);
@@ -11282,7 +11282,7 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
                                    gsl::narrow<float>(Msg.pt.y - StitchWindowOrigin.y) };
 				auto       iSide   = (SelectedFormControlVertex + 2) % 4;
 				const auto ratio
-				    = fabs(static_cast<double>(newSize.x - stretchBoxLine[iSide].x) / (newSize.y - stretchBoxLine[iSide].y));
+				    = fabs((static_cast<double>(newSize.x) - stretchBoxLine[iSide].x) / (newSize.y - stretchBoxLine[iSide].y));
 				if (iSide & 1) {
 					if (ratio < xyRatio)
 						newSize.x = (stretchBoxLine[iSide].y - newSize.y) * xyRatio + stretchBoxLine[iSide].x;
@@ -11755,7 +11755,7 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 		    && Msg.pt.y <= ColorBarRect.bottom) {
 			unpat();
 			const auto colorBarPosition
-			    = static_cast<double>(Msg.pt.y - ColorBarRect.top) / (ColorBarRect.bottom - ColorBarRect.top);
+			    = (static_cast<double>(Msg.pt.y) - ColorBarRect.top) / (static_cast<double>(ColorBarRect.bottom) - ColorBarRect.top);
 			if (Msg.message == WM_RBUTTONDOWN) {
 				if (Msg.wParam & MK_SHIFT && (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::GRPSEL))) {
 					unbox();
@@ -12300,8 +12300,8 @@ thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, dou
 					StateMap.set(StateFlag::STRTCH);
 				else {
 					StateMap.set(StateFlag::EXPAND);
-					xyRatio = static_cast<double>(StitchRangeRect.right - StitchRangeRect.left)
-					          / (StitchRangeRect.top - StitchRangeRect.bottom);
+					xyRatio = (static_cast<double>(StitchRangeRect.right) - StitchRangeRect.left)
+					          / (static_cast<double>(StitchRangeRect.top) - StitchRangeRect.bottom);
 				}
 				SelectedFormControlVertex >>= 1;
 				StateMap.set(StateFlag::SHOSTRTCH);
