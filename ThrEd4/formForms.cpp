@@ -554,7 +554,6 @@ void formForms::internal::prflin(const std::wstring& msg, unsigned row) {
 
 void formForms::prfmsg() {
 	std::wstring choice;
-	HDC          preferenceDC   = {};
 	RECT         preferenceRect = {};
 
 	if (StateMap.testAndReset(StateFlag::INSRT))
@@ -585,7 +584,7 @@ void formForms::prfmsg() {
                                      nullptr,
                                      ThrEdInstance,
                                      nullptr);
-	preferenceDC          = GetDC(PreferencesWindow);
+	auto preferenceDC     = GetDC(PreferencesWindow);
 	GetClientRect(PreferencesWindow, &preferenceRect);
 	FillRect(preferenceDC, &preferenceRect, GetSysColorBrush(COLOR_WINDOW));
 	LabelWindowCoords.top = ValueWindowCoords.top = 3;
@@ -765,8 +764,6 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 }
 
 void formForms::dasyfrm() {
-	double angle = 0.0;
-
 	thred::unmsg();
 	if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, (DLGPROC)ffi::dasyproc)) {
 		StateMap.reset(StateFlag::FORMIN);
@@ -795,7 +792,7 @@ void formForms::dasyfrm() {
 	size_t iVertex     = 0;
 	size_t fref        = 0;
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
-		angle                          = PI2;
+		auto       angle               = PI2;
 		const auto holeVertexCount     = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
 		const auto holeSegmentAngle    = PI2 / holeVertexCount;
 		CurrentFormVertices[iVertex].x = referencePoint.x + diameter * cos(angle);
@@ -809,7 +806,6 @@ void formForms::dasyfrm() {
 		}
 		fref = iVertex;
 	}
-	angle                               = 0.0;
 	auto               petalVertexCount = IniFile.daisyPetalCount * IniFile.daisyPetalPoints;
 	auto               petalPointCount  = IniFile.daisyPetalPoints;
 	const unsigned int borderType       = IniFile.daisyBorderType;
@@ -825,19 +821,22 @@ void formForms::dasyfrm() {
 		SelectedForm->satinOrAngle.guide = satin::adsatk(IniFile.daisyPetalCount - 1);
 	}
 	const auto halfPetalPointCount = IniFile.daisyPetalPoints >> 1;
+	auto       angle               = 0.0;
 	for (unsigned int iMacroPetal = 0; iMacroPetal < IniFile.daisyPetalCount; iMacroPetal++) {
 		auto petalPointAngle         = 0.0;
 		PseudoRandomValue            = SEED;
 		auto distanceFromDaisyCenter = 0.0;
 		for (unsigned int iPoint = 0; iPoint < petalPointCount; iPoint++) {
 			switch (borderType) {
-			case DSIN:
+			case DSIN: {
 				distanceFromDaisyCenter = diameter + sin(petalPointAngle) * petalLength;
 				petalPointAngle += deltaPetalAngle;
 				break;
-			case DRAMP:
+			}
+			case DRAMP: {
 				distanceFromDaisyCenter = diameter + (static_cast<double>(iPoint) / IniFile.daisyPetalPoints * petalLength);
 				break;
+			}
 			case DSAW: {
 				auto sawPointCount = 0u;
 				if (iPoint > halfPetalPointCount)
@@ -846,24 +845,28 @@ void formForms::dasyfrm() {
 					sawPointCount = iPoint;
 				distanceFromDaisyCenter
 				    = diameter + (static_cast<double>(sawPointCount) / IniFile.daisyPetalPoints * petalLength);
-			} break;
-			case DRAG:
+				break;
+			}
+			case DRAG: {
 				distanceFromDaisyCenter
 				    = diameter
 				      + (static_cast<double>(form::psg() % IniFile.daisyPetalPoints) / IniFile.daisyPetalPoints * petalLength);
 				break;
-			case DCOG:
+			}
+			case DCOG: {
 				distanceFromDaisyCenter = diameter;
 				if (iPoint > halfPetalPointCount)
 					distanceFromDaisyCenter += petalLength;
 				break;
-			case DHART:
+			}
+			case DHART: {
 				distanceFromDaisyCenter = diameter + sin(petalPointAngle) * petalLength;
 				if (iPoint > IniFile.daisyHeartCount)
 					petalPointAngle -= deltaPetalAngle;
 				else
 					petalPointAngle += deltaPetalAngle;
 				break;
+			}
 			}
 			CurrentFormVertices[iVertex].x = referencePoint.x + cos(angle) * distanceFromDaisyCenter;
 			CurrentFormVertices[iVertex].y = referencePoint.y + sin(angle) * distanceFromDaisyCenter;
