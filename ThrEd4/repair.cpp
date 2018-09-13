@@ -18,7 +18,7 @@
 #include <CppCoreCheck\warnings.h>
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127) // supress warning for fmt library header
+#pragma warning(disable : 4127)  // supress warning for fmt library header
 #pragma warning(disable : 6387)  // supress warning for fmt library header
 #pragma warning(disable : 26455) // supress warning for library headers
 #include <boost/dynamic_bitset.hpp>
@@ -49,8 +49,6 @@ void repair::internal::adbad(std::wstring& repairMessage, unsigned code, size_t 
 }
 
 void repair::lodchk() {
-	unsigned attribute = 0;
-
 	thred::delinf();
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		SelectedForm = &FormList[iForm];
@@ -72,7 +70,7 @@ void repair::lodchk() {
 	}
 	boost::dynamic_bitset<> formMap(FormIndex);
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		attribute = StitchBuffer[iStitch].attribute;
+		const auto attribute = StitchBuffer[iStitch].attribute;
 		if ((attribute & TYPMSK) == TYPFRM) {
 			const unsigned tform = (attribute & FRMSK) >> FRMSHFT;
 			if (tform < formMap.size()) {
@@ -90,7 +88,7 @@ void repair::lodchk() {
 	}
 	formMap.reset();
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		attribute = StitchBuffer[iStitch].attribute;
+		const auto attribute = StitchBuffer[iStitch].attribute;
 		if (attribute & TYPBRD)
 			formMap.set((attribute & FRMSK) >> FRMSHFT);
 	}
@@ -178,7 +176,7 @@ void repair::internal::bcup(size_t find, BADCNTS& badData) noexcept {
 }
 
 void repair::internal::chkfstch() noexcept {
-	const size_t codedFormIndex = FormIndex << FRMSHFT;
+	const auto codedFormIndex = FormIndex << FRMSHFT;
 
 	for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute & FRMSK) >= codedFormIndex)
@@ -187,8 +185,8 @@ void repair::internal::chkfstch() noexcept {
 }
 
 void repair::internal::repflt(std::wstring& repairMessage) {
-	size_t  iDestination = 0;
-	size_t  vertexCount  = 0;
+	auto    iDestination = 0u;
+	auto    vertexCount  = 0u;
 	BADCNTS badData      = {};
 
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
@@ -245,8 +243,9 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 }
 
 void repair::internal::repclp(std::wstring& repairMessage) {
-	unsigned            badClipCount = 0;
-	size_t              clipCount    = 0;
+	auto badClipCount = 0u;
+	auto clipCount    = 0u;
+
 	std::vector<fPOINT> clipPoint;
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
 		const auto formHeader     = &FormList[iForm];
@@ -321,7 +320,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 }
 
 void repair::internal::repsat() {
-	size_t  guideCount = 0;
+	auto    guideCount = 0u;
 	BADCNTS badData    = {};
 
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
@@ -358,7 +357,7 @@ void repair::internal::repsat() {
 }
 
 void repair::internal::reptx() {
-	size_t  textureCount = 0;
+	auto    textureCount = 0u;
 	BADCNTS badData      = {};
 
 	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
