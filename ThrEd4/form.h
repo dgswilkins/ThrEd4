@@ -86,7 +86,7 @@ void     filangl();
 void     filclpx();
 void     filhor();
 void     filin(dPOINT currentPoint);
-void     filinsb(const dPOINT& point) noexcept;
+void     filinsb(const dPOINT& point);
 void     filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point);
 void     filinu(const dPOINT& inPoint);
 void     filsat();
@@ -137,10 +137,10 @@ void munfrm();
 void mvfltsb(fPOINT* const destination, const fPOINT* const source, size_t count) noexcept;
 void mvfrmsb(FRMHED* const destination, const FRMHED* const source, size_t count) noexcept;
 bool notfstch(unsigned attribute) noexcept;
-void nubrdcol(unsigned color);
-void nufilcol(unsigned color);
+void nubrdcol(unsigned color) noexcept;
+void nufilcol(unsigned color) noexcept;
 void nufsel();
-void nufthcol(unsigned color);
+void nufthcol(unsigned color) noexcept;
 void nulapcol(unsigned color);
 
 constexpr size_t nxt(size_t iVertex);
@@ -181,7 +181,7 @@ void     setfpnt();
 void     setfrm();
 void     sethup() noexcept;
 void     setins();
-void     setmfrm() noexcept;
+void     setmfrm();
 void     setrang();
 void     setstrtch();
 void     sfCor2px(const fPOINT& stitchPoint, POINT& screen) noexcept;
@@ -211,18 +211,18 @@ namespace internal {
 	void     bean(unsigned start, unsigned finish) noexcept;
 	void     bhbrd(double spacing);
 	void     bhcrnr(size_t vertex);
-	void     bhfn(size_t start, size_t finish, double spacing) noexcept;
+	void     bhfn(size_t start, size_t finish, double spacing);
 	void     bholbrd();
 	void     blbrd(double spacing);
-	void     bold(double size) noexcept;
-	void     boldlin(size_t start, size_t finish, double size) noexcept;
+	void     bold(double size);
+	void     boldlin(size_t start, size_t finish, double size);
 	void     brdfil(double pd_Size);
 	void     brkdun(const std::vector<SMALPNTL*>& sortedLines, size_t start, size_t finish);
 	void     brkseq(const std::vector<SMALPNTL*>& sortedLines, size_t start, size_t finish, boost::dynamic_bitset<>& sequenceMap);
 	bool     chk2of();
 	void     chkbrd(unsigned& interleaveSequenceIndex2);
 	void     chksid(size_t vertexIndex) noexcept;
-	unsigned closat();
+	bool     closat();
 	bool     clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept;
 	void     clpcon(const std::vector<RNGCNT>& textureSegments);
 	void     clpfm() noexcept;
@@ -243,7 +243,7 @@ namespace internal {
 
 	void  dubfn();
 	void  ducon() noexcept;
-	void  dudif(const dPOINT& start, const dPOINT& finish, dPOINT* const delta) noexcept;
+	void  dudif(const dPOINT& start, const dPOINT& finish, dPOINT& delta) noexcept;
 	void  dufcntr(dPOINT& center);
 	void  dufdat(std::vector<fPOINT>& tempClipPoints,
 	             std::vector<SATCON>& tempGuides,
@@ -308,34 +308,34 @@ namespace internal {
 	                unsigned                  regionCrossingEnd);
 	void     inspnt(std::vector<CLIPNT>& clipStitchPoints);
 
-	unsigned short isclos(const SMALPNTL* const lineEndPoint0, const SMALPNTL* const lineEndPoint1) noexcept;
+	bool isclos(const SMALPNTL* const lineEndPoint0, const SMALPNTL* const lineEndPoint1) noexcept;
 
-	bool     isect(size_t vertex0, size_t vertex1, fPOINT& intersection, float& length) noexcept;
-	bool     isin(const std::vector<VCLPX> regionCrossingData,
-	              float                    xCoordinate,
-	              float                    yCoordinate,
-	              unsigned                 regionCrossingStart,
-	              unsigned                 regionCrossingEnd);
-	void     lapbrd();
-	void     lcon(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
-	bool     lencmp(const LENINFO& arg1, const LENINFO& arg2) noexcept;
-	bool     lencmpa(const CLIPSORT* const arg1, const CLIPSORT* const arg2) noexcept;
-	void     linrutb(unsigned start) noexcept;
-	bool     lnclos(std::vector<unsigned>& groupIndexSequence,
-	                std::vector<SMALPNTL>& lineEndpoints,
-	                unsigned               group0,
-	                unsigned               line0,
-	                unsigned               group1,
-	                unsigned               line1);
-	void     makpoli() noexcept;
-	void     movseq(const std::vector<SMALPNTL*>& sortedLines, size_t ind);
-	void     mvpclp(std::vector<CLIPSORT*>& arrayOfClipIntersectData, unsigned destination, unsigned source);
-	unsigned notdun(std::vector<RGSEQ>&            tempPath,
-	                const std::vector<RCON>&       pathMap,
-	                const std::vector<unsigned>&   mapIndexSequence,
-	                const boost::dynamic_bitset<>& VisitedRegions,
-	                unsigned                       level);
-	bool     notsel() noexcept;
+	bool isect(size_t vertex0, size_t vertex1, fPOINT& intersection, float& length) noexcept;
+	bool isin(const std::vector<VCLPX> regionCrossingData,
+	          float                    xCoordinate,
+	          float                    yCoordinate,
+	          unsigned                 regionCrossingStart,
+	          unsigned                 regionCrossingEnd);
+	void lapbrd();
+	void lcon(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
+	bool lencmp(const LENINFO& arg1, const LENINFO& arg2) noexcept;
+	bool lencmpa(const CLIPSORT* const arg1, const CLIPSORT* const arg2) noexcept;
+	void linrutb(unsigned start);
+	bool lnclos(std::vector<unsigned>& groupIndexSequence,
+	            std::vector<SMALPNTL>& lineEndpoints,
+	            unsigned               group0,
+	            unsigned               line0,
+	            unsigned               group1,
+	            unsigned               line1);
+	void makpoli() noexcept;
+	void movseq(const std::vector<SMALPNTL*>& sortedLines, size_t ind);
+	void mvpclp(std::vector<CLIPSORT*>& arrayOfClipIntersectData, unsigned destination, unsigned source);
+	bool notdun(std::vector<RGSEQ>&            tempPath,
+	            const std::vector<RCON>&       pathMap,
+	            const std::vector<unsigned>&   mapIndexSequence,
+	            const boost::dynamic_bitset<>& VisitedRegions,
+	            unsigned                       level);
+	bool notsel() noexcept;
 	bool
 	       nucseg(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned& currentSegmentIndex);
 	void   nufpnt(size_t vertex) noexcept;
