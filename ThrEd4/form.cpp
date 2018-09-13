@@ -7016,7 +7016,7 @@ void form::join() {
 
 	StateMap.set(StateFlag::FRMSAM);
 	if (FormIndex > 1 && StateMap.test(StateFlag::FORMSEL) && form::closfrm()) {
-		const const auto    vertexCount = FormList[ClosestFormToCursor].vertexCount;
+		const auto    vertexCount = FormList[ClosestFormToCursor].vertexCount;
 		std::vector<fPOINT> vertexList(vertexCount);
 		for (size_t iVertex = 0u; iVertex < vertexCount; iVertex++) {
 			vertexList[iVertex]   = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor];
