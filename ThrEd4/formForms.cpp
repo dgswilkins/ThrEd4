@@ -760,7 +760,7 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			break;
 		}
 	}
-	return 0;
+	return false;
 }
 
 void formForms::dasyfrm() {
@@ -969,7 +969,7 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 			break;
 		}
 	}
-	return 0;
+	return false;
 }
 
 void formForms::setear() {

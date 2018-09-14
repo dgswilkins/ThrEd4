@@ -1526,14 +1526,14 @@ void texture::rtrtx() {
 
 bool texture::internal::inrct(const fRECTANGLE& rectangle, const fPOINTATTR& stitch) noexcept {
 	if (stitch.x < rectangle.left)
-		return 0;
+		return false;
 	if (stitch.x > rectangle.right)
-		return 0;
+		return false;
 	if (stitch.y < rectangle.bottom)
-		return 0;
+		return false;
 	if (stitch.y > rectangle.top)
-		return 0;
-	return 1;
+		return false;
+	return true;
 }
 
 void texture::setshft() {

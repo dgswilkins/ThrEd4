@@ -132,12 +132,12 @@ void form::dusqr() {
 
 bool form::chkmax(size_t arg0, size_t arg1) noexcept {
 	if (arg0 & MAXMSK)
-		return 1;
+		return true;
 	if (arg1 & MAXMSK)
-		return 1;
+		return true;
 	if ((arg1 + arg0) & MAXMSK)
-		return 1;
-	return 0;
+		return true;
+	return false;
 }
 
 unsigned form::fltind(const fPOINT* const point) noexcept {
@@ -181,10 +181,10 @@ void form::delflt(size_t formIndex) noexcept {
 
 bool form::internal::chk2of() {
 	if (!StateMap.test(StateFlag::SELBOX))
-		return 0;
+		return false;
 	if (UserFlagMap.test(UserFlag::FIL2OF))
-		return 0;
-	return 1;
+		return false;
+	return true;
 }
 
 void form::internal::rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept {
@@ -1068,7 +1068,7 @@ float form::internal::findDistanceToSide(const fPOINT& lineStart,
 	return param;
 }
 
-unsigned form::closfrm() {
+bool form::closfrm() {
 	if (FormIndex) {
 		POINT screenCoordinate = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 		fi::rats();
@@ -1114,13 +1114,13 @@ unsigned form::closfrm() {
 			ClosestVertexToCursor = closestVertex;
 			form::fvars(ClosestFormToCursor);
 			StateMap.set(StateFlag::RELAYR);
-			return 1;
+			return true;
 		}
 		else
-			return 0;
+			return false;
 	}
 	else
-		return 0;
+		return false;
 }
 
 void form::frmovlin() {
@@ -1165,7 +1165,7 @@ bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish) noexcept 
 			for (auto iStep = 0u; iStep < count - 1; iStep++) {
 				if (InterleaveSequenceIndex & MAXMSK) {
 					InterleaveSequenceIndex = MAXITEMS - 2;
-					return 0;
+					return false;
 				}
 				InterleaveSequence[InterleaveSequenceIndex++] = point;
 				point.x += step.x;
@@ -1174,10 +1174,10 @@ bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish) noexcept 
 		}
 		else {
 			SequenceIndex = MAXITEMS - 2;
-			return 0;
+			return false;
 		}
 	}
-	return 1;
+	return true;
 }
 
 size_t form::closflt(float xCoordinate, float yCoordinate) noexcept {
@@ -1289,10 +1289,10 @@ void form::internal::ritfil(unsigned& interleaveSequenceIndex2) noexcept {
 bool form::lastch() noexcept {
 	if (InterleaveSequenceIndex) {
 		LastPoint = InterleaveSequence[InterleaveSequenceIndex - 1];
-		return 1;
+		return true;
 	}
 	else
-		return 0;
+		return false;
 }
 
 size_t form::getlast() noexcept {
@@ -1528,13 +1528,13 @@ bool form::cisin(float xCoordinate, float yCoordinate) noexcept {
 	const auto* rectangle = &SelectedForm->rectangle;
 
 	if (xCoordinate >= rectangle->right)
-		return 0;
+		return false;
 	if (xCoordinate <= rectangle->left)
-		return 0;
+		return false;
 	if (yCoordinate >= rectangle->top)
-		return 0;
+		return false;
 	if (yCoordinate <= rectangle->bottom)
-		return 0;
+		return false;
 	auto   count        = 0u;
 	auto   nextVertex   = 0u;
 	dPOINT intersection = {};
@@ -1611,22 +1611,22 @@ bool form::linx(const std::vector<fPOINT>& points, size_t start, size_t finish, 
 		const dPOINT point = { (points[start].x), (points[start].y) };
 
 		if (!delta.x && !delta.y)
-			return 0;
+			return false;
 		if (delta.x) {
 			if (fi::proj(point, delta.y / delta.x, (*OutsidePoints)[finish], points[finish], intersection))
-				return 1;
+				return true;
 			else
-				return 0;
+				return false;
 		}
 		else {
 			if (fi::projv(point.x, points[finish], (*OutsidePoints)[finish], intersection))
-				return 1;
+				return true;
 			else
-				return 0;
+				return false;
 		}
 	}
 	else {
-		return 0;
+		return false;
 	}
 }
 
@@ -2592,13 +2592,13 @@ bool form::internal::isin(const std::vector<VCLPX> regionCrossingData,
 	dPOINT   point = {};
 
 	if (xCoordinate < BoundingRect.left)
-		return 0;
+		return false;
 	if (xCoordinate > BoundingRect.right)
-		return 0;
+		return false;
 	if (yCoordinate < BoundingRect.bottom)
-		return 0;
+		return false;
 	if (yCoordinate > BoundingRect.top)
-		return 0;
+		return false;
 	for (auto iRegion = regionCrossingStart; iRegion < regionCrossingEnd; iRegion++) {
 		const auto startVertex = regionCrossingData[iRegion].vertex;
 		const auto endVertex   = form::nxt(startVertex);
@@ -3347,9 +3347,9 @@ bool form::internal::lnclos(std::vector<unsigned>& groupIndexSequence,
 	const auto lineEndPoint0 = &lineEndpoints[groupIndexSequence[group0]];
 
 	if (group1 > GroupIndexCount - 2)
-		return 0;
+		return false;
 	if (group0 == 0)
-		return 0;
+		return false;
 	if (lineEndPoint0) {
 		auto count0 = (groupIndexSequence[group0 + 1] - groupIndexSequence[group0]) >> 1;
 		auto index0 = 0u;
@@ -3367,14 +3367,14 @@ bool form::internal::lnclos(std::vector<unsigned>& groupIndexSequence,
 				}
 				if (count1) {
 					if (isclos(&lineEndPoint0[index0], &lineEndPoint1[index1]))
-						return 1;
+						return true;
 					else
-						return 0;
+						return false;
 				}
 			}
 		}
 	}
-	return 0;
+	return false;
 }
 
 bool form::internal::regclos(std::vector<unsigned>&        groupIndexSequence,
@@ -4940,7 +4940,7 @@ unsigned form::chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio) {
 			}
 			SelectedFormControlVertex >>= 1;
 			StateMap.set(StateFlag::SHOSTRTCH);
-			return 1;
+			return true;
 		}
 	}
 	if (point.x >= rectangle.left && point.x <= rectangle.right && point.y >= rectangle.top && point.y <= rectangle.bottom) {
@@ -4949,10 +4949,10 @@ unsigned form::chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio) {
 		FormMoveDelta.x = formOrigin.x - point.x;
 		FormMoveDelta.y = formOrigin.y - point.y;
 		StateMap.set(StateFlag::FRMOV);
-		return 1;
+		return true;
 	}
 	else
-		return 0;
+		return false;
 }
 
 void form::rstfrm() {
@@ -7071,7 +7071,7 @@ void form::refilal() {
 bool form::internal::notsel() noexcept {
 	for (auto selectedForm : (*SelectedFormList)) {
 		if (selectedForm == ClosestFormToCursor)
-			return 0;
+			return false;
 	}
 	return true;
 }
@@ -7197,15 +7197,15 @@ bool form::frmrng(size_t iForm, RANGE& range) noexcept {
 			while (range.finish > range.start && notfstch(StitchBuffer[range.finish].attribute))
 				range.finish--;
 			if (range.finish > range.start)
-				return 1;
+				return true;
 			else
-				return 0;
+				return false;
 		}
 		else
-			return 0;
+			return false;
 	}
 	else {
-		return 0;
+		return false;
 	}
 }
 
@@ -7363,9 +7363,9 @@ bool form::internal::contsf(size_t formIndex) {
 		form::fsizpar();
 		SelectedForm->attribute |= (ActiveLayer << 1);
 		form::refilfn();
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 void form::contfil() {
@@ -7890,7 +7890,7 @@ void form::stchadj() {
 
 bool form::internal::spltlin() {
 	if (ClosestVertexToCursor < 2 || SelectedForm->vertexCount - ClosestVertexToCursor < 2) {
-		return 0;
+		return false;
 	}
 	form::mvfrmsb(&FormList[FormIndex], &FormList[FormIndex - 1], FormIndex - ClosestFormToCursor);
 	FormIndex++;
@@ -7905,7 +7905,7 @@ bool form::internal::spltlin() {
 			FormList[iForm].borderClipData += SelectedForm->clipEntries;
 	}
 	form::stchadj();
-	return 1;
+	return true;
 }
 
 void form::spltfrm() {

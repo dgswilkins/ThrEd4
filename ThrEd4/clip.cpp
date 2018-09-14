@@ -410,9 +410,9 @@ bool clip::internal::fxpnt(const std::vector<double>& listSINEs,
 			if (fabs(delta) < 0.2)
 				break;
 		}
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 void clip::internal::fxlit(const std::vector<double>& listSINEs,

@@ -46,7 +46,7 @@ bool     chkmax(size_t arg0, size_t arg1) noexcept;
 void     chkseq(bool border) noexcept;
 bool     cisin(float xCoordinate, float yCoordinate) noexcept;
 size_t   closflt(float xCoordinate, float yCoordinate) noexcept;
-unsigned closfrm();
+bool     closfrm();
 void     clpfil();
 void     clpspac(const fPOINT* const insertPoint, size_t count) noexcept;
 void     clrfills() noexcept;

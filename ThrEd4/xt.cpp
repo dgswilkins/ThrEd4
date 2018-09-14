@@ -470,11 +470,11 @@ bool xt::internal::chkp2cnam(const wchar_t* fileName) noexcept {
 
 	handleP2C = CreateFile(fileName, GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (handleP2C == INVALID_HANDLE_VALUE) {
-		return 0;
+		return false;
 	}
 	else {
 		CloseHandle(handleP2C);
-		return 1;
+		return true;
 	}
 }
 
@@ -945,6 +945,7 @@ unsigned xt::internal::dutyp(unsigned attribute) noexcept {
 	DWORD          bit             = 0;
 	const unsigned maskedAttribute = attribute & SRTYPMSK;
 
+	// ToDo - replace
 	_BitScanReverse(&bit, maskedAttribute);
 
 	if (bit == 0)
@@ -1001,9 +1002,9 @@ bool xt::internal::chkrdun(const std::vector<unsigned>& formFillCounter,
 
 	for (iStitch = stitchRecord.start; iStitch < stitchRecord.finish; iStitch++) {
 		if (pRecs[iStitch]->otyp == formFillCounter[pRecs[iStitch]->form])
-			return 1;
+			return true;
 	}
-	return 0;
+	return false;
 }
 
 double
@@ -1432,10 +1433,10 @@ bool xt::internal::lastcol(unsigned index, fPOINT& point) noexcept {
 		index--;
 		if (InterleaveSequenceIndices[index].color == color) {
 			point = InterleaveSequence[InterleaveSequenceIndices[index + 1].index - 1];
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
 void xt::internal::duint(unsigned offset, unsigned code, INTINF& ilData) {
@@ -1476,12 +1477,12 @@ void xt::internal::duint(unsigned offset, unsigned code, INTINF& ilData) {
 
 bool xt::internal::isfil() noexcept {
 	if (SelectedForm->fillType)
-		return 1;
+		return true;
 	if (SelectedForm->edgeType)
-		return 1;
+		return true;
 	if (SelectedForm->extendedAttribute & (AT_CWLK | AT_WALK | AT_UND))
-		return 1;
-	return 0;
+		return true;
+	return false;
 }
 
 void xt::internal::chkend(unsigned offset, unsigned code, INTINF& ilData) {
@@ -2359,9 +2360,9 @@ bool xt::internal::chkasp(fPOINT& point, float aspectRatio, HWND dialog) {
 	point.x = getstxt(IDC_DESWID, dialog);
 	point.y = getstxt(IDC_DESHI, dialog);
 	if ((point.y / point.x) == aspectRatio)
-		return 1;
+		return true;
 	else
-		return 0;
+		return false;
 }
 
 BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
@@ -2411,7 +2412,7 @@ BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 			break;
 		}
 	}
-	return 0;
+	return false;
 }
 
 // ToDo - Find a better name
@@ -2524,7 +2525,7 @@ BOOL CALLBACK xt::internal::enumch(HWND hwnd, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	DestroyWindow(hwnd);
-	return 1;
+	return true;
 }
 
 void xt::clrstch() noexcept {

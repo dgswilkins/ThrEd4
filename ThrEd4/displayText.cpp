@@ -248,9 +248,9 @@ bool displayText::clpmsgs(unsigned code) {
 	form::ispcdclp();
 	if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap.test(StateFlag::WASPCDCLP)) {
 		displayText::tabmsg(IDS_CLPS);
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 void displayText::frm1pnt() {
@@ -270,12 +270,12 @@ bool displayText::filmsgs(unsigned code) {
 			if (SelectedForm->vertexCount == 2) {
 				if (code < FML_LIN) {
 					displayText::tabmsg(IDS_FRM3X);
-					return 1;
+					return true;
 				}
 				else {
 					if (code == FML_PRPS) {
 						displayText::tabmsg(IDS_ANGS);
-						return 1;
+						return true;
 					}
 				}
 			}
@@ -283,12 +283,12 @@ bool displayText::filmsgs(unsigned code) {
 		}
 		else {
 			displayText::tabmsg(IDS_FILSEL);
-			return 1;
+			return true;
 		}
 	}
 	else {
 		displayText::tabmsg(IDS_FILCR);
-		return 1;
+		return true;
 	}
 }
 

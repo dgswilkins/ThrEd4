@@ -151,25 +151,25 @@ bool trace::internal::trcin(COLORREF color) {
 		ti::trcols(color);
 		if (StateMap.test(StateFlag::TRCRED)) {
 			if (PixelColors[0] > HighColors[0])
-				return 0;
+				return false;
 			if (PixelColors[0] < LowColors[0])
-				return 0;
+				return false;
 		}
 		if (StateMap.test(StateFlag::TRCGRN)) {
 			if (PixelColors[1] > HighColors[1])
-				return 0;
+				return false;
 			if (PixelColors[1] < LowColors[1])
-				return 0;
+				return false;
 		}
 		if (StateMap.test(StateFlag::TRCBLU)) {
 			if (PixelColors[2] > HighColors[2])
-				return 0;
+				return false;
 			if (PixelColors[2] < LowColors[2])
-				return 0;
+				return false;
 		}
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 void trace::internal::getrmap() {
@@ -588,13 +588,13 @@ bool trace::internal::trcbit(const unsigned initialDirection, unsigned& traceDir
 	if (tracedPoints.back().x != CurrentTracePoint.x || tracedPoints.back().y != CurrentTracePoint.y) {
 		tracedPoints.push_back({ gsl::narrow<short>(CurrentTracePoint.x), gsl::narrow<short>(CurrentTracePoint.y) });
 		if (tracedPoints.size() >= 500000)
-			return 0;
+			return false;
 	}
 	if (traceDirection == initialDirection && CurrentTracePoint.x == tracedPoints[0].x
 	    && CurrentTracePoint.y == tracedPoints[0].y)
-		return 0;
+		return false;
 	else
-		return 1;
+		return true;
 }
 
 void trace::internal::dutdif(TRCPNT& traceDiff, const TRCPNT* point) noexcept {

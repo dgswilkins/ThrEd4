@@ -289,9 +289,9 @@ bool satin::internal::satselfn() noexcept {
 		}
 	}
 	if (minimumLength < CLOSENUF)
-		return 1;
+		return true;
 	else
-		return 0;
+		return false;
 }
 
 void satin::satsel() {

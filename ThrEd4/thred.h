@@ -53,7 +53,7 @@ void inline mvstch(size_t destination, size_t source) noexcept;
 
 void mvstchs(unsigned destination, unsigned source, unsigned count);
 
-unsigned px2stch() noexcept;
+bool px2stch() noexcept;
 
 void pxCor2stch(const POINT& point) noexcept;
 void redclp() noexcept;
@@ -77,7 +77,7 @@ void shft(const fPOINT& delta) noexcept;
 void stch2pxr(const fPOINT& stitchCoordinate) noexcept;
 void stchrct(fRECTANGLE& rectangle) noexcept;
 void strtchbox(std::vector<POINT>& stretchBoxLine) noexcept;
-long  txtWid(const wchar_t* string);
+long txtWid(const wchar_t* string);
 void unbBox();
 void unbsho();
 void undat() noexcept;
@@ -108,8 +108,8 @@ namespace internal {
 
 	void     centr();
 	void     chk1col();
-	unsigned chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rotationAngle, dPOINT& rotationCenter);
-	unsigned chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept;
+	bool     chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rotationAngle, dPOINT& rotationCenter);
+	bool     chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept;
 	bool     chkattr(const fs::path& filename);
 	bool     chkbig(std::vector<POINT>& stretchBoxLine, double& xyRatio);
 	void     chkbit();
@@ -431,7 +431,7 @@ namespace internal {
 	void        srchk();
 	unsigned    srchknot(unsigned source) noexcept;
 	inline void stCor2px(const fPOINTATTR& stitch, POINT& point) noexcept;
-	unsigned    stch2px(unsigned iStitch) noexcept;
+	bool        stch2px(unsigned iStitch) noexcept;
 	void        stch2px1(unsigned iStitch) noexcept;
 	void        stchPars();
 	void        stchWnd();
