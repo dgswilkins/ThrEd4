@@ -174,12 +174,12 @@ void texture::redtx() {
 bool texture::istx(size_t iForm) noexcept {
 	const auto& pfrm = FormList[iForm];
 	if (pfrm.fillType == TXVRTF)
-		return 1;
+		return true;
 	if (pfrm.fillType == TXHORF)
-		return 1;
+		return true;
 	if (pfrm.fillType == TXANGF)
-		return 1;
-	return 0;
+		return true;
+	return false;
 }
 
 void texture::internal::txrfor() noexcept {
@@ -287,15 +287,13 @@ void texture::internal::txt2pix(const TXPNT& texturePoint, POINT& screenPoint) n
 }
 
 void texture::internal::txtxfn(const POINT& reference, unsigned short offsetPixels) noexcept {
-	POINT line[2];
+	POINT line[2] = {};
 
-	line[0].x = line[1].x = reference.x;
-	line[0].y             = reference.y - offsetPixels;
-	line[1].y             = reference.y + offsetPixels;
+	line[0] = { reference.x, reference.y - offsetPixels };
+	line[1] = { reference.x, reference.y + offsetPixels };
 	Polyline(StitchWindowMemDC, line, 2);
-	line[0].y = line[1].y = reference.y;
-	line[0].x             = reference.x - offsetPixels;
-	line[1].x             = reference.x + offsetPixels;
+	line[0] = { reference.x - offsetPixels, reference.y };
+	line[1] = { reference.x + offsetPixels, reference.y };
 	Polyline(StitchWindowMemDC, line, 2);
 }
 
@@ -413,18 +411,14 @@ void texture::drwtxtr() {
 	}
 	if (SelectedTexturePointsList->size()) {
 		txi::txrct2rct(TextureRect, TexturePixelRect);
-		line[0].y = line[1].y = TexturePixelRect.top;
-		line[0].x             = TexturePixelRect.left;
-		line[1].x             = TexturePixelRect.right;
+		line[0] = { TexturePixelRect.left, TexturePixelRect.top };
+		line[1] = { TexturePixelRect.right, TexturePixelRect.top };
 		Polyline(StitchWindowMemDC, line, 2);
-		line[1].y = TexturePixelRect.bottom;
-		line[1].x = TexturePixelRect.left;
+		line[1] = { TexturePixelRect.left, TexturePixelRect.bottom };
 		Polyline(StitchWindowMemDC, line, 2);
-		line[0].x = TexturePixelRect.right;
-		line[0].y = TexturePixelRect.bottom;
+		line[0] = { TexturePixelRect.right, TexturePixelRect.bottom };
 		Polyline(StitchWindowMemDC, line, 2);
-		line[1].x = TexturePixelRect.right;
-		line[1].y = TexturePixelRect.top;
+		line[1] = { TexturePixelRect.right, TexturePixelRect.top };
 		Polyline(StitchWindowMemDC, line, 2);
 	}
 	for (size_t iPoint = 0; iPoint < SelectedTexturePointsList->size(); iPoint++) {
@@ -460,8 +454,7 @@ bool texture::internal::px2txt(const POINT& offset) {
 }
 
 void texture::internal::deorg(POINT& point) noexcept {
-	point.x = Msg.pt.x - StitchWindowOrigin.x;
-	point.y = Msg.pt.y - StitchWindowOrigin.y;
+	point = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 }
 
 bool texture::internal::txbutfn() {
@@ -779,8 +772,7 @@ void texture::internal::txtclp() {
 				StateMap.set(StateFlag::TXTCLP);
 				StateMap.set(StateFlag::TXTMOV);
 				txi::setxfrm();
-				TextureCursorLocation.x = Msg.pt.x - StitchWindowOrigin.x;
-				TextureCursorLocation.y = Msg.pt.y - StitchWindowOrigin.y;
+				TextureCursorLocation = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 			}
 			GlobalUnlock(ClipMemory);
 		}
@@ -804,15 +796,13 @@ void texture::txtrmov() {
 	if (StateMap.test(StateFlag::TXTCLP)) {
 		if (StateMap.testAndSet(StateFlag::WASWROT))
 			txi::ritxfrm();
-		TextureCursorLocation.x = Msg.pt.x - StitchWindowOrigin.x;
-		TextureCursorLocation.y = Msg.pt.y - StitchWindowOrigin.y;
+		TextureCursorLocation = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 		txi::ritxfrm();
 	}
 	else {
 		if (SelectedTexturePointsList->size()) {
 			txi::ritxrct();
-			TextureCursorLocation.x = Msg.pt.x - StitchWindowOrigin.x;
-			TextureCursorLocation.y = Msg.pt.y - StitchWindowOrigin.y;
+			TextureCursorLocation = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 			txi::ritxrct();
 		}
 	}
@@ -827,8 +817,8 @@ void texture::internal::txtlin() {
 }
 
 void texture::internal::chktxnum() {
-	float  value    = 0.0f;
-	size_t lastChar = 0;
+	auto value    = 0.0f;
+	auto lastChar = 0u;
 
 	if (TextureInputBuffer->size()) {
 		value = stof(*TextureInputBuffer, &lastChar);
@@ -935,7 +925,7 @@ void texture::internal::txang() {
 }
 
 void texture::deltx() {
-	bool flag = false;
+	auto flag = false;
 
 	const auto currentIndex = FormList[ClosestFormToCursor].fillInfo.texture.index;
 
@@ -990,7 +980,7 @@ void texture::deltx() {
 }
 
 void texture::internal::nutx() {
-	unsigned index = 0;
+	auto index = 0u;
 
 	std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::txcmp);
 	if (FormIndex) {
@@ -1120,8 +1110,9 @@ void texture::internal::dutxmir() {
 		}
 		TempTexturePoints->resize(iMirrorPoint);
 		for (size_t index = 0; index < iMirrorPoint; index++) {
-			TempTexturePoints->push_back({ (*TempTexturePoints)[index].y,
-										   gsl::narrow<unsigned short>(TextureScreen.lines - (*TempTexturePoints)[index].line + 1) });
+			TempTexturePoints->push_back(
+			    { (*TempTexturePoints)[index].y,
+			      gsl::narrow<unsigned short>(TextureScreen.lines - (*TempTexturePoints)[index].line + 1) });
 		}
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -1138,37 +1129,37 @@ void texture::internal::txdelal() {
 bool texture::internal::chkbut() {
 	if (Msg.hwnd == (*ButtonWin)[HTXCLR]) {
 		txi::txdelal();
-		return 1;
+		return true;
 	}
 	if (Msg.hwnd == (*ButtonWin)[HTXHI]) {
 		txi::butsid(HTXHI);
-		return 1;
+		return true;
 	}
 	if (Msg.hwnd == (*ButtonWin)[HTXWID]) {
 		txi::butsid(HTXWID);
-		return 1;
+		return true;
 	}
 	if (Msg.hwnd == (*ButtonWin)[HTXSPAC]) {
 		txi::butsid(HTXSPAC);
-		return 1;
+		return true;
 	}
 	if (Msg.hwnd == (*ButtonWin)[HTXVRT]) {
 		txi::dutxfn(VRTYP);
-		return 1;
+		return true;
 	}
 	if (Msg.hwnd == (*ButtonWin)[HTXHOR]) {
 		txi::dutxfn(HORTYP);
-		return 1;
+		return true;
 	}
 	if (Msg.hwnd == (*ButtonWin)[HTXANG]) {
 		txi::dutxfn(ANGTYP);
-		return 1;
+		return true;
 	}
 	if (Msg.hwnd == (*ButtonWin)[HTXMIR]) {
 		txi::dutxmir();
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 void texture::txtlbut() {
@@ -1310,17 +1301,17 @@ void texture::internal::txgro() {
 bool texture::internal::txdig(unsigned keyCode, char& character) {
 	if (isdigit(keyCode)) {
 		character = gsl::narrow<char>(keyCode);
-		return 1;
+		return true;
 	}
 	if (keyCode >= VK_NUMPAD0 && keyCode <= VK_NUMPAD9) {
 		character = gsl::narrow<char>(keyCode) - VK_NUMPAD0 + 0x30;
-		return 1;
+		return true;
 	}
 	if (keyCode == 0xbe || keyCode == 0x6e) {
 		character = '.';
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 void texture::internal::txnudg(int deltaX, float deltaY) {
