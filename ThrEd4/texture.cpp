@@ -827,25 +827,28 @@ void texture::internal::chktxnum() {
 		TextureInputBuffer->clear();
 		value *= PFGRAN;
 		switch (TextureWindowId) {
-		case HTXHI:
+		case HTXHI: {
 			texture::savtxt();
 			TextureScreen.areaHeight = value;
 			IniFile.textureHeight    = value;
 			StateMap.set(StateFlag::CHKTX);
 			break;
-		case HTXWID:
+		}
+		case HTXWID: {
 			texture::savtxt();
 			TextureScreen.width  = value;
 			IniFile.textureWidth = value;
 			StateMap.set(StateFlag::CHKTX);
 			break;
-		case HTXSPAC:
+		}
+		case HTXSPAC: {
 			texture::savtxt();
 			TextureScreen.spacing  = value;
 			IniFile.textureSpacing = value;
 			TextureScreen.width    = value * TextureScreen.lines + value / 2;
 			StateMap.set(StateFlag::CHKTX);
 			break;
+		}
 		}
 	}
 	DestroyWindow(SideWindowButton);
@@ -1068,15 +1071,18 @@ void texture::internal::dutxfn(unsigned textureType) {
 		txi::nutx();
 		form::dusqr();
 		switch (textureType) {
-		case VRTYP:
+		case VRTYP: {
 			txi::txvrt();
 			break;
-		case HORTYP:
+		}
+		case HORTYP: {
 			txi::txhor();
 			break;
-		case ANGTYP:
+		}
+		case ANGTYP: {
 			txi::txang();
 			break;
+		}
 		}
 	}
 	texture::txof();
@@ -1374,22 +1380,27 @@ void texture::txtkey(unsigned keyCode) {
 
 	if (SideWindowButton) {
 		switch (keyCode) {
-		case VK_RETURN:
+		case VK_RETURN: {
 			txi::chktxnum();
 			return;
-		case VK_ESCAPE:
+		}
+		case VK_ESCAPE: {
 			texture::rstxt();
 			StateMap.set(StateFlag::RESTCH);
 			break;
-		case 'Q':
+		}
+		case 'Q': {
 			texture::rstxt();
 			StateMap.set(StateFlag::RESTCH);
 			break;
+		}
 		case 8: // backspace
+		{
 			if (TextureInputBuffer->size())
 				TextureInputBuffer->pop_back();
 			flag = false;
 			break;
+		}
 		}
 		if (flag) {
 			if (TextureInputBuffer->size() < 8) { // floating point 7 digits of precision + '.'
@@ -1402,35 +1413,44 @@ void texture::txtkey(unsigned keyCode) {
 		return;
 	}
 	switch (keyCode) {
-	case VK_ESCAPE:
+	case VK_ESCAPE: {
 		texture::txof();
-	case 'Q':
+	}
+	case 'Q': {
 		texture::rstxt();
 		StateMap.set(StateFlag::RESTCH);
 		break;
-	case 0xdb: //[
+	}
+	case 0xdb: { //[
 		txi::txshrnk();
 		break;
-	case 0xdd: //]
+	}
+	case 0xdd: { //]
 		txi::txgro();
 		break;
-	case 192: //`
+	}
+	case 192: { //`
 		xt::tst();
 		break;
-	case 'R':
+	}
+	case 'R': {
 		txi::dutxfn(VRTYP);
 		break;
-	case 'A':
+	}
+	case 'A': {
 		txi::dutxfn(ANGTYP);
 		break;
-	case 'H':
+	}
+	case 'H': {
 		txi::dutxfn(HORTYP);
 		break;
-	case 'E':
+	}
+	case 'E': {
 		txi::txtlin();
 		break;
+	}
 	case 'Z':
-	case 'B':
+	case 'B': {
 		if (!StateMap.testAndSet(StateFlag::LASTXBAK)) {
 			texture::savtxt();
 			txi::txrbak();
@@ -1441,41 +1461,51 @@ void texture::txtkey(unsigned keyCode) {
 		}
 		txi::txbak();
 		return;
-	case 'V':
+	}
+	case 'V': {
 		if (OpenClipboard(ThrEdWindow))
 			txi::txtclp();
 		break;
-	case 'N':
+	}
+	case 'N': {
 		StateMap.set(StateFlag::LASTXBAK);
 		if (!StateMap.testAndSet(StateFlag::TXBDIR))
 			txi::txrfor();
 		txi::nxbak();
 		return;
+	}
 	case 'D':
-	case VK_DELETE:
+	case VK_DELETE: {
 		if (GetKeyState(VK_SHIFT) & GetKeyState(VK_CONTROL) & 0X8000)
 			txi::txdelal();
 		else
 			txi::txtdel();
 		break;
-	case 0xbd: //-
+	}
+	case 0xbd: { //-
 		txi::txcntrv();
 		break;
-	case VK_LEFT:
+	}
+	case VK_LEFT: {
 		txi::txnudg(-1, 0);
 		break;
-	case VK_RIGHT:
+	}
+	case VK_RIGHT: {
 		txi::txnudg(1, 0);
 		break;
-	case VK_UP:
+	}
+	case VK_UP: {
 		txi::txnudg(0, IniFile.cursorNudgeStep);
 		break;
-	case VK_DOWN:
+	}
+	case VK_DOWN: {
 		txi::txnudg(0, -IniFile.cursorNudgeStep);
 		break;
-	case 'S':
+	}
+	case 'S': {
 		texture::txsnap();
 		break;
+	}
 	}
 	StateMap.reset(StateFlag::LASTXBAK);
 }

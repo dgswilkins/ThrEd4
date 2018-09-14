@@ -703,16 +703,18 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 	wchar_t compareBuffer[HBUFSIZ] = { 0 };
 
 	switch (umsg) {
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 		ffi::initdaz(hwndlg);
 		break;
-	case WM_COMMAND:
+	}
+	case WM_COMMAND: {
 		switch (LOWORD(wparam)) {
-		case IDCANCEL:
+		case IDCANCEL: {
 			EndDialog(hwndlg, 0);
 			return TRUE;
-		case IDOK:
+		}
+		case IDOK: {
 			GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer, HBUFSIZ);
 			IniFile.daisyPetalPoints = std::stoi(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer, HBUFSIZ);
@@ -746,19 +748,24 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			ffi::chkdaz();
 			EndDialog(hwndlg, 1);
 			break;
-		case IDC_DAZRST:
+		}
+		case IDC_DAZRST: {
 			formForms::dazdef();
 			ffi::initdaz(hwndlg);
 			break;
-		case IDC_DLIN:
+		}
+		case IDC_DLIN: {
 			if (IsDlgButtonChecked(hwndlg, IDC_DLIN))
 				CheckDlgButton(hwndlg, IDC_HOLE, BST_CHECKED);
 			break;
-		case IDC_HOLE:
+		}
+		case IDC_HOLE: {
 			if (!IsDlgButtonChecked(hwndlg, IDC_HOLE))
 				CheckDlgButton(hwndlg, IDC_DLIN, BST_UNCHECKED);
 			break;
 		}
+		}
+	}
 	}
 	return false;
 }
@@ -937,12 +944,13 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 		ffi::initTearDlg(hwndlg);
 		break;
 	}
-	case WM_COMMAND:
+	case WM_COMMAND: {
 		switch (LOWORD(wparam)) {
-		case IDCANCEL:
+		case IDCANCEL: {
 			EndDialog(hwndlg, 0);
 			return TRUE;
-		case IDOK:
+		}
+		case IDOK: {
 			GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer, HBUFSIZ);
 			IniFile.formSides = std::stoi(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer, HBUFSIZ);
@@ -953,14 +961,16 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 			IniFile.tearTwistRatio = std::stof(buffer);
 			EndDialog(hwndlg, 1);
 			break;
-		case IDC_DEFTEAR:
+		}
+		case IDC_DEFTEAR: {
 			IniFile.formSides      = 20;
 			IniFile.tearTailLength = 1.1f;
 			IniFile.tearTwistStep  = 0.0f;
 			IniFile.tearTwistRatio = 1.6f;
 			ffi::initTearDlg(hwndlg);
 			break;
-		case IDC_DEFPAIS:
+		}
+		case IDC_DEFPAIS: {
 			IniFile.formSides      = 24;
 			IniFile.tearTailLength = 1.15f;
 			IniFile.tearTwistStep  = 0.3f * PFGRAN;
@@ -968,6 +978,8 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 			ffi::initTearDlg(hwndlg);
 			break;
 		}
+		}
+	}
 	}
 	return false;
 }
@@ -1050,16 +1062,18 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 	wchar_t buffer[HBUFSIZ] = { 0 };
 
 	switch (umsg) {
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 		ffi::wavinit(hwndlg);
 		break;
-	case WM_COMMAND:
+	}
+	case WM_COMMAND: {
 		switch (LOWORD(wparam)) {
-		case IDCANCEL:
+		case IDCANCEL: {
 			EndDialog(hwndlg, 0);
 			return TRUE;
-		case IDOK:
+		}
+		case IDOK: {
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer, HBUFSIZ);
 			IniFile.wavePoints = std::stoi(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer, HBUFSIZ);
@@ -1078,7 +1092,8 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 			IniFile.waveEnd %= IniFile.wavePoints;
 			EndDialog(hwndlg, 1);
 			break;
-		case IDC_DEFWAV:
+		}
+		case IDC_DEFWAV: {
 			IniFile.wavePoints = IWAVPNTS;
 			IniFile.waveStart  = IWAVSTRT;
 			IniFile.waveEnd    = IWAVEND;
@@ -1086,6 +1101,8 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 			ffi::wavinit(hwndlg);
 			break;
 		}
+		}
+	}
 	}
 	return false;
 }

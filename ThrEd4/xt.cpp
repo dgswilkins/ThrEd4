@@ -155,10 +155,11 @@ void xt::internal::nurat(FEATHER& feather) {
 
 	remainder = fmod(feather.globalPosition, 1);
 	switch (feather.fillType) {
-	case FTHPSG:
+	case FTHPSG: {
 		if (feather.upCount) {
 			if (feather.countUp) {
-				feather.ratio = (static_cast<float>(feather.totalCount) - (form::psg() % feather.totalCount)) / feather.totalCount;
+				feather.ratio
+				    = (static_cast<float>(feather.totalCount) - (form::psg() % feather.totalCount)) / feather.totalCount;
 				feather.countUp--;
 			}
 			else {
@@ -176,36 +177,43 @@ void xt::internal::nurat(FEATHER& feather) {
 			feather.ratio = (static_cast<float>(feather.totalCount) - (form::psg() % feather.totalCount)) / feather.totalCount;
 		feather.ratio *= feather.formRatio;
 		break;
-	case FTHFAZ:
+	}
+	case FTHFAZ: {
 		if (feather.phase >= feather.upCount)
 			feather.ratio = 1;
 		else
 			feather.ratio = feather.formRatio;
 		break;
-	case FTHSIN:
+	}
+	case FTHSIN: {
 		if (remainder > feather.globalRatio)
 			feather.ratio = sin((1 - remainder) / (1 - feather.globalRatio) * PI + PI) * 0.5 + 0.5;
 		else
 			feather.ratio = sin(remainder / feather.globalRatio * PI) * 0.5 + 0.5;
 		feather.ratio *= feather.formRatio;
 		break;
-	case FTHSIN2:
+	}
+	case FTHSIN2: {
 		if (remainder > feather.globalRatio)
 			feather.ratio = sin((1 - remainder) / (1 - feather.globalRatio) * PI);
 		else
 			feather.ratio = sin(remainder / feather.globalRatio * PI);
 		feather.ratio *= feather.formRatio;
 		break;
-	case FTHRMP:
+	}
+	case FTHRMP: {
 		if (remainder > feather.globalRatio)
 			feather.ratio = (1 - remainder) / (1 - feather.globalRatio);
 		else
 			feather.ratio = remainder / feather.globalRatio;
 		feather.ratio *= feather.formRatio;
 		break;
+	}
 	case FTHLIN:
-	default:
+	default: {
 		feather.ratio = feather.formRatio;
+		break;
+	}
 	}
 	++feather.phase %= feather.phaseIndex;
 	feather.globalPosition += feather.globalStep;
@@ -525,7 +533,8 @@ void xt::pes2crd() {
 	    == ERROR_SUCCESS) {
 		size    = _MAX_PATH;
 		keyType = REG_SZ;
-		if (RegQueryValueEx(registryKey, L"ProgramFilesDir", nullptr, &keyType, (unsigned char*)programName, &size) == ERROR_SUCCESS) {
+		if (RegQueryValueEx(registryKey, L"ProgramFilesDir", nullptr, &keyType, (unsigned char*)programName, &size)
+		    == ERROR_SUCCESS) {
 			wcscat_s(programName, L"\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
 			if (!xi::chkp2cnam(programName))
 				*programName = 0;
@@ -1309,36 +1318,41 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
 		if (codedFormIndex == (attribute & (FRMSK | NOTFRM))) {
 			type = StitchTypes[xi::dutyp(attribute)];
 			switch (type) {
-			case TYPE_APPLIQUE:
+			case TYPE_APPLIQUE: {
 				if (!(tmap & M_AP)) {
 					tmap |= M_AP;
 					fillStartsData.fillNamed.applique = iDestinationStitch;
 				}
 				break;
-			case TYPE_FTHR:
+			}
+			case TYPE_FTHR: {
 				if (!(tmap & M_FTH)) {
 					tmap |= M_FTH;
 					fillStartsData.fillNamed.feather = iDestinationStitch;
 				}
 				break;
-			case TYPE_FILL:
+			}
+			case TYPE_FILL: {
 				if (!(tmap & M_FIL)) {
 					tmap |= M_FIL;
 					fillStartsData.fillNamed.fill = iDestinationStitch;
 				}
 				break;
-			case TYPE_BORDER:
+			}
+			case TYPE_BORDER: {
 				if (!(tmap & M_BRD)) {
 					tmap |= M_BRD;
 					fillStartsData.fillNamed.border = iDestinationStitch;
 				}
 				break;
-			default:
+			}
+			default: {
 				if (SelectedForm->fillType && !(tmap & M_FIL)) {
 					tmap |= M_FIL;
 					fillStartsData.fillNamed.fill = iDestinationStitch;
 				}
 				break;
+			}
 			}
 		}
 		else {
@@ -1514,7 +1528,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 		for (auto iSequence = 0u; iSequence < interleaveSequenceIndex2; iSequence++) {
 			ilData.pins = iSequence;
 			switch (InterleaveSequenceIndices[iSequence].seq) {
-			case I_AP:
+			case I_AP: {
 				if (fillStartsMap & M_FIL && fillStartsData.fillNamed.applique >= ilData.coloc)
 					ilData.coloc = fillStartsData.fillNamed.applique;
 				else {
@@ -1523,24 +1537,28 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 						ilData.coloc = 0;
 				}
 				break;
-			case I_FIL:
+			}
+			case I_FIL: {
 				if (fillStartsMap & M_FIL && fillStartsData.fillNamed.fill >= ilData.coloc)
 					ilData.coloc = fillStartsData.fillNamed.fill;
 				else
 					ilData.coloc = fillStartsData.fillNamed.fillColor;
 				break;
-			case I_FTH:
+			}
+			case I_FTH: {
 				if (fillStartsMap & M_FIL && fillStartsData.fillNamed.feather >= ilData.coloc)
 					ilData.coloc = fillStartsData.fillNamed.feather;
 				else
 					ilData.coloc = fillStartsData.fillNamed.featherColor;
 				break;
-			case I_BRD:
+			}
+			case I_BRD: {
 				if (fillStartsMap & M_BRD && fillStartsData.fillNamed.border >= ilData.coloc)
 					ilData.coloc = fillStartsData.fillNamed.border;
 				else
 					ilData.coloc = fillStartsData.fillNamed.borderColor;
 				break;
+			}
 			}
 			code = gsl::narrow<unsigned int>(ilData.layerIndex | InterleaveSequenceIndices[ilData.pins].code
 			                                 | InterleaveSequenceIndices[ilData.pins].color);
@@ -1867,16 +1885,18 @@ void xt::internal::fangfn(size_t find, float angle) {
 		switch (SelectedForm->fillType) {
 		case VRTF:
 		case HORF:
-		case ANGF:
+		case ANGF: {
 			SelectedForm->fillType              = ANGF;
 			SelectedForm->angleOrClipData.angle = angle;
 			break;
+		}
 		case VCLPF:
 		case HCLPF:
-		case ANGCLPF:
+		case ANGCLPF: {
 			SelectedForm->fillType           = ANGCLPF;
 			SelectedForm->satinOrAngle.angle = angle;
 			break;
+		}
 		}
 		form::refilfn();
 	}
@@ -2289,16 +2309,20 @@ void xt::setfilend() {
 void xt::duauxnam() {
 	*AuxName = *WorkingFileName;
 	switch (IniFile.auxFileType) {
-	case AUXDST:
+	case AUXDST: {
 		AuxName->replace_extension(".dst");
 		break;
+	}
 #if PESACT
-	case AUXPES:
+	case AUXPES: {
 		AuxName->replace_extension(".pes");
 		break;
+	}
 #endif
-	default:
+	default: {
 		AuxName->replace_extension("pcs");
+		break;
+	}
 	}
 }
 
@@ -2373,18 +2397,20 @@ BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 	HWND   designSizeDialog  = hwndlg; // change design size dialog window
 
 	switch (umsg) {
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 		setstxt(IDC_DESWID, DesignSize.x, designSizeDialog);
 		setstxt(IDC_DESHI, DesignSize.y, designSizeDialog);
 		CheckDlgButton(hwndlg, IDC_REFILF, UserFlagMap.test(UserFlag::CHREF));
 		break;
-	case WM_COMMAND:
+	}
+	case WM_COMMAND: {
 		switch (LOWORD(wparam)) {
-		case IDCANCEL:
+		case IDCANCEL: {
 			EndDialog(hwndlg, 0);
 			return TRUE;
-		case IDOK:
+		}
+		case IDOK: {
 			DesignSize.x = getstxt(IDC_DESWID, designSizeDialog);
 			DesignSize.y = getstxt(IDC_DESHI, designSizeDialog);
 			if (IsDlgButtonChecked(hwndlg, IDC_REFILF))
@@ -2393,15 +2419,18 @@ BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 				UserFlagMap.reset(UserFlag::CHREF);
 			EndDialog(hwndlg, 1);
 			return TRUE;
-		case IDC_DESWID:
+		}
+		case IDC_DESWID: {
 			if ((wparam >> 16) == EN_CHANGE)
 				StateMap.reset(StateFlag::DESCHG);
 			break;
-		case IDC_DESHI:
+		}
+		case IDC_DESHI: {
 			if ((wparam >> 16) == EN_CHANGE)
 				StateMap.set(StateFlag::DESCHG);
 			break;
-		case IDC_DUASP:
+		}
+		case IDC_DUASP: {
 			designAspectRatio = DesignSize.y / DesignSize.x;
 			if (!chkasp(designSize, designAspectRatio, designSizeDialog)) {
 				if (StateMap.test(StateFlag::DESCHG))
@@ -2411,6 +2440,8 @@ BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 			}
 			break;
 		}
+		}
+	}
 	}
 	return false;
 }
@@ -2430,8 +2461,8 @@ void xt::internal::nudfn(const fRECTANGLE& designSizeRect) noexcept {
 	unsigned iStitch = 0, iVertex = 0;
 	fPOINT   newSize = { (designSizeRect.right - designSizeRect.left), (designSizeRect.top - designSizeRect.bottom) };
 
-	newSize.x              = designSizeRect.right - designSizeRect.left;
-	newSize.y              = designSizeRect.top - designSizeRect.bottom;
+	newSize.x                    = designSizeRect.right - designSizeRect.left;
+	newSize.y                    = designSizeRect.top - designSizeRect.bottom;
 	const dPOINT designSizeRatio = { (DesignSize.x / newSize.x), (DesignSize.y / newSize.y) };
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++)
 		sadj(StitchBuffer[iStitch], designSizeRatio, designSizeRect);

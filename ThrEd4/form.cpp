@@ -3120,18 +3120,21 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 
 		for (auto iPoint = 0u; iPoint < clipStitchPoints.size() - 1; iPoint++) {
 			switch (clipStitchPoints[iPoint].flag) {
-			case 0: // inside
+			case 0: { // inside
 				StateMap.set(StateFlag::FILDIR);
 				break;
-			case 1: // line
+			}
+			case 1: { // line
 				if (StateMap.testAndFlip(StateFlag::FILDIR))
 					clpnseg(clipStitchPoints, clipSegments, lengths, previousPoint, iPoint);
 				else
 					previousPoint = iPoint;
 				break;
-			case 2: // outside
+			}
+			case 2: { // outside
 				StateMap.reset(StateFlag::FILDIR);
 				break;
+			}
 			}
 		}
 	}
@@ -4629,7 +4632,7 @@ void form::refilfn() {
 			dPOINT rotationCenter = {};
 			auto   doFill         = true;
 			auto   rotationAngle  = 0.0;
-			switch (gsl::narrow<unsigned>(SelectedForm->fillType)) {
+			switch (SelectedForm->fillType) {
 			case VRTF: {
 				fi::fnvrt(groupIndexSequence, lineEndpoints);
 				WorkingFormVertices = SelectedForm->vertices;
@@ -7016,7 +7019,7 @@ void form::join() {
 
 	StateMap.set(StateFlag::FRMSAM);
 	if (FormIndex > 1 && StateMap.test(StateFlag::FORMSEL) && form::closfrm()) {
-		const auto    vertexCount = FormList[ClosestFormToCursor].vertexCount;
+		const auto          vertexCount = FormList[ClosestFormToCursor].vertexCount;
 		std::vector<fPOINT> vertexList(vertexCount);
 		for (size_t iVertex = 0u; iVertex < vertexCount; iVertex++) {
 			vertexList[iVertex]   = FormList[ClosestFormToCursor].vertices[ClosestVertexToCursor];
@@ -8215,12 +8218,14 @@ void form::col2frm() {
 					featherColorHistogram[formColorCode]++;
 				else {
 					switch (StitchBuffer[iStitch].attribute & TYPMSK) {
-					case FRMFIL:
+					case FRMFIL: {
 						fillColorHistogram[formColorCode]++;
 						break;
-					case FRMBFIL:
+					}
+					case FRMBFIL: {
 						borderColorHistogram[formColorCode]++;
 						break;
+					}
 					}
 				}
 			}

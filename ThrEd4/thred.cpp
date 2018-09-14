@@ -1413,16 +1413,20 @@ void thred::internal::redfils() {
 void thred::internal::nunams() {
 	*AuxName = *WorkingFileName;
 	switch (IniFile.auxFileType) {
-	case AUXDST:
+	case AUXDST: {
 		AuxName->replace_extension(L".dst");
 		break;
+	}
 #if PESACT
-	case AUXPES:
+	case AUXPES: {
 		AuxName->replace_extension(L".pes");
 		break;
+	}
 #endif
-	default:
+	default: {
 		AuxName->replace_extension(L".pcs");
+		break;
+	}
 	}
 	*ThrName = *WorkingFileName;
 	ThrName->replace_extension(L".thr");
@@ -3363,12 +3367,14 @@ void thred::internal::redbal() {
 			ColorChanges        = 1;
 			for (auto iStitch = 0u; iStitch < stitchCount; iStitch++) {
 				switch (balaradStitch[iStitch].code) {
-				case BALNORM:
+				case BALNORM: {
 					bal2thr(balaradStitch, iBalaradStitch++, iStitch, color);
 					break;
-				case BALSTOP:
+				}
+				case BALSTOP: {
 					color = colmatch(balaradHeader.color[bColor++]);
 					break;
+				}
 				}
 			}
 			for (auto iColor = 0u; iColor < ColorChanges; iColor++) {
@@ -4291,21 +4297,27 @@ void thred::internal::auxmen() {
 #endif
 	CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
 	switch (IniFile.auxFileType) {
-	case AUXDST:
+	case AUXDST: {
 		auxMsg = fmt::format((*StringTable)[STR_AUXTXT], L"DST");
 		CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
 		break;
+	}
 	case AUXPES:
 #if PESACT
+	{
 		auxMsg = fmt::format((*StringTable)[STR_AUXTXT], L"PES");
 		CheckMenuItem(MainMenu, ID_AUXPES, MF_CHECKED);
 		break;
+	}
 #else
+	{
 		IniFile.auxFileType = AUXPCS;
+	}
 #endif
-	default:
+	default: {
 		auxMsg = fmt::format((*StringTable)[STR_AUXTXT], L"PCS");
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
+	}
 	}
 	[[gsl::suppress(type .3)]] {
 		filinfo.dwTypeData = const_cast<LPWSTR>(auxMsg.c_str());
@@ -4329,26 +4341,32 @@ void thred::internal::savAs() {
 		if (GetSaveFileName(&OpenFileName)) {
 			WorkingFileName->assign(szFileName);
 			switch (OpenFileName.nFilterIndex) {
-			case 1:
+			case 1: {
 				WorkingFileName->replace_extension(L".thr");
 				break;
-			case 2:
+			}
+			case 2: {
 				WorkingFileName->replace_extension(L".pcs");
 				IniFile.auxFileType = AUXPCS;
 				auxmen();
 				break;
+			}
 			case 3:
 #if PESACT
+			{
 				WorkingFileName->replace_extension(L".pes");
 				IniFile.auxFileType = AUXPES;
 				auxmen();
 				break;
+			}
 			case 4:
 #endif
+			{
 				WorkingFileName->replace_extension(L".dst");
 				IniFile.auxFileType = AUXDST;
 				auxmen();
 				break;
+			}
 			}
 			StateMap.set(StateFlag::SAVAS);
 			nunams();
@@ -5255,7 +5273,7 @@ void thred::internal::nuFil() {
 					const auto version = (thredHeader.headerType & 0xff000000) >> 24;
 					DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
 					switch (version) {
-					case 0:
+					case 0: {
 						if (PCSHeader.hoopType == SMALHUP) {
 							UnzoomedRect.x = IniFile.hoopSizeX = SHUPX;
 							UnzoomedRect.y = IniFile.hoopSizeY = SHUPY;
@@ -5270,8 +5288,9 @@ void thred::internal::nuFil() {
 						          IniFile.designerName + strlen(IniFile.designerName),
 						          ExtendedHeader.modifierName);
 						break;
+					}
 					case 1:
-					case 2:
+					case 2: {
 						ReadFile(FileHandle, &ExtendedHeader, sizeof(ExtendedHeader), &BytesRead, nullptr);
 						if (BytesRead != sizeof(ExtendedHeader)) {
 							displayText::tabmsg(IDS_SHRTF);
@@ -5281,9 +5300,11 @@ void thred::internal::nuFil() {
 						IniFile.hoopSizeY = UnzoomedRect.y = ExtendedHeader.hoopSizeY;
 						redfnam(*DesignerName);
 						break;
-					default:
+					}
+					default: {
 						displayText::tabmsg(IDS_NOTVER);
 						return;
+					}
 					}
 					ZoomRect.bottom = ZoomRect.left = 0;
 					ZoomRect.right = UnzoomedRect.x = IniFile.hoopSizeX;
@@ -7836,7 +7857,7 @@ void thred::internal::delet() {
 		if (StateMap.test(StateFlag::FRMPSEL) || form::closfrm()) {
 			SelectedForm = &FormList[ClosestFormToCursor];
 			switch (SelectedForm->type) {
-			case FRMLINE:
+			case FRMLINE: {
 				if (SelectedForm->fillType == CONTF) {
 					if (ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.start
 					    || ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.finish) {
@@ -7852,7 +7873,8 @@ void thred::internal::delet() {
 						SelectedForm->angleOrClipData.guide.finish--;
 				}
 				break;
-			case SAT:
+			}
+			case SAT: {
 				do {
 					if (ClosestVertexToCursor <= 1) {
 						if (SelectedForm->attribute & FRMEND) {
@@ -7881,6 +7903,7 @@ void thred::internal::delet() {
 						}
 					}
 				} while (false);
+			}
 			}
 			if (!satinFlag) {
 				satin::delspnt();
@@ -9429,18 +9452,22 @@ void thred::internal::barnam(HWND window, unsigned iThumbnail) {
 
 void thred::internal::rthumnam(unsigned iThumbnail) {
 	switch (iThumbnail) {
-	case 0:
+	case 0: {
 		barnam((*ButtonWin)[HNUM], iThumbnail);
 		break;
-	case 1:
+	}
+	case 1: {
 		barnam((*ButtonWin)[HTOT], iThumbnail);
 		break;
-	case 2:
+	}
+	case 2: {
 		barnam((*ButtonWin)[HMINLEN], iThumbnail);
 		break;
-	case 3:
+	}
+	case 3: {
 		barnam((*ButtonWin)[HMAXLEN], iThumbnail);
 		break;
+	}
 	}
 }
 
@@ -10396,7 +10423,7 @@ INT_PTR CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam,
 	FINDINFO* fileInfo = nullptr;
 
 	switch (umsg) {
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 		SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
 		[[gsl::suppress(type .1)]] fileInfo = reinterpret_cast<FINDINFO*>(lparam);
@@ -10417,7 +10444,8 @@ INT_PTR CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam,
 			ritlock(fileInfo->data, fileInfo->count, hwndlg);
 		}
 		break;
-	case WM_COMMAND:
+	}
+	case WM_COMMAND: {
 		[[gsl::suppress(type .1)]] fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER));
 		if (fileInfo) {
 			switch (LOWORD(wparam)) {
@@ -10481,6 +10509,7 @@ INT_PTR CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam,
 			}
 			}
 		}
+	}
 	}
 	return false;
 }
@@ -11174,8 +11203,7 @@ void thred::internal::dufdef() noexcept {
 	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, (DLGPROC)fthdefprc);
 }
 
-bool
-thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rotationAngle, dPOINT& rotationCenter) {
+bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rotationAngle, dPOINT& rotationCenter) {
 	if (Msg.message == WM_MOUSEMOVE) {
 		if (StateMap.test(StateFlag::TXTMOV)) {
 			texture::txtrmov();

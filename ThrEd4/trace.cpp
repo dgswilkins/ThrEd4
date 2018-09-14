@@ -508,7 +508,7 @@ void trace::tracedg() {
 bool trace::internal::trcbit(const unsigned initialDirection, unsigned& traceDirection, std::vector<TRCPNT>& tracedPoints) {
 	auto pixelIndex = CurrentTracePoint.y * BitmapWidth + CurrentTracePoint.x;
 	switch (traceDirection) {
-	case TRCR:
+	case TRCR: {
 		pixelIndex += (1 - BitmapWidth);
 		if (CurrentTracePoint.x == gsl::narrow<int>(BitmapWidth) - 1)
 			traceDirection = TRCU;
@@ -527,7 +527,8 @@ bool trace::internal::trcbit(const unsigned initialDirection, unsigned& traceDir
 			}
 		}
 		break;
-	case TRCD:
+	}
+	case TRCD: {
 		pixelIndex -= (BitmapWidth + 1);
 		if (!CurrentTracePoint.y)
 			traceDirection = TRCR;
@@ -546,7 +547,8 @@ bool trace::internal::trcbit(const unsigned initialDirection, unsigned& traceDir
 			}
 		}
 		break;
-	case TRCL:
+	}
+	case TRCL: {
 		pixelIndex += (BitmapWidth - 1);
 		if (!CurrentTracePoint.x)
 			traceDirection = TRCD;
@@ -565,7 +567,8 @@ bool trace::internal::trcbit(const unsigned initialDirection, unsigned& traceDir
 			}
 		}
 		break;
-	case TRCU:
+	}
+	case TRCU: {
 		pixelIndex += (1 + BitmapWidth);
 		if (CurrentTracePoint.y == gsl::narrow<int>(BitmapHeight) - 1)
 			traceDirection = TRCL;
@@ -584,6 +587,7 @@ bool trace::internal::trcbit(const unsigned initialDirection, unsigned& traceDir
 			}
 		}
 		break;
+	}
 	}
 	if (tracedPoints.back().x != CurrentTracePoint.x || tracedPoints.back().y != CurrentTracePoint.y) {
 		tracedPoints.push_back({ gsl::narrow<short>(CurrentTracePoint.x), gsl::narrow<short>(CurrentTracePoint.y) });
@@ -683,23 +687,26 @@ void trace::internal::dutrac() {
 				}
 			}
 			switch (flag) {
-			case TRCU:
+			case TRCU: {
 				CurrentTracePoint.y = findRectangle.top;
 				traceDirection      = TRCR;
 				break;
-			case TRCR:
+			}
+			case TRCR: {
 				CurrentTracePoint.x = findRectangle.right;
 				traceDirection      = TRCD;
 				break;
-			case TRCD:
+			}
+			case TRCD: {
 				CurrentTracePoint.y = findRectangle.bottom;
 				traceDirection      = TRCL;
 				break;
-			case TRCL:
+			}
+			case TRCL: {
 				CurrentTracePoint.x = findRectangle.left;
 				traceDirection      = TRCU;
 				break;
-
+			}
 			default:
 				return;
 			}
@@ -1104,21 +1111,26 @@ void trace::tracpar() {
 					}
 					else {
 						switch (position) {
-						case 20:
+						case 20: {
 							trace::trdif();
 							break;
-						case 21:
+						}
+						case 21: {
 							thred::hidbit();
 							break;
-						case 22:
+						}
+						case 22: {
 							trace::blak();
 							break;
-						case 23:
+						}
+						case 23: {
 							trace::trcsel();
 							break;
-						case 24:
+						}
+						case 24: {
 							trace::tracedg();
 							break;
+						}
 						}
 					}
 				}
@@ -1247,15 +1259,17 @@ void trace::traceNumberInput(unsigned NumericCode) {
 	TraceInputBuffer[MsgIndex]   = 0;
 	auto traceColor              = std::stoi(TraceInputBuffer);
 	switch (MsgIndex) {
-	case 2:
+	case 2: {
 		if (traceColor > 25)
 			ti::dutrnum0(traceColor);
 		break;
-	case 3:
+	}
+	case 3: {
 		if (traceColor > 255)
 			traceColor = 255;
 		ti::dutrnum0(traceColor);
 		break;
+	}
 	}
 	thred::redraw(TraceNumberInput);
 }

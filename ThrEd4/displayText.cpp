@@ -326,14 +326,19 @@ void displayText::datmsg(unsigned code) {
 	switch (code) {
 	case BADFLT:
 		dataErrorID = IDS_BADFLT;
+		break;
 	case BADCLP:
 		dataErrorID = IDS_BADCLP;
+		break;
 	case BADSAT:
 		dataErrorID = IDS_BADSAT;
+		break;
 	case BADTX:
 		dataErrorID = IDS_BADTX;
+		break;
 	default:
 		dataErrorID = IDS_BADUKN;
+		break;
 	}
 	displayText::loadString(dataError, dataErrorID);
 	displayText::shoMsg(dataError);

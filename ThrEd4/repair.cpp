@@ -417,19 +417,22 @@ void repair::frmchkx() {
 	if (IniFile.dataCheck) {
 		const auto code = ri::frmchkfn();
 		switch (IniFile.dataCheck) {
-		case 1:
+		case 1: {
 			if (code)
 				displayText::datmsg(code);
 			break;
-		case 2:
+		}
+		case 2: {
 			if (code)
 				repair::repar();
 			break;
-		case 3:
+		}
+		case 3: {
 			if (code) {
 				repair::repar();
 				displayText::tabmsg(IDS_DATREP);
 			}
+		}
 		}
 	}
 }
