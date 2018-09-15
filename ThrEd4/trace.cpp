@@ -357,8 +357,7 @@ void trace::trdif() {
 			for (auto iPixel = 0u; iPixel < BitmapWidth * BitmapHeight; iPixel++) {
 				TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
 				if (differenceBitmap[iPixel]) {
-					auto adjustedColorSum
-					    = gsl::narrow<unsigned int>(std::round(differenceBitmap[iPixel] - colorSumMinimum) * ratio);
+					const auto adjustedColorSum = dToUI((differenceBitmap[iPixel] - colorSumMinimum) * ratio);
 					TraceBitmapData[iPixel] |= adjustedColorSum << TraceShift[iRGB];
 				}
 			}
@@ -378,8 +377,8 @@ void trace::trace() {
 		if (thred::px2stch() && !StateMap.testAndReset(StateFlag::WASTRCOL)) {
 			if (StateMap.test(StateFlag::LANDSCAP))
 				SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
-			BitmapPoint.x    = BmpStitchRatio.x * SelectedPoint.x;
-			BitmapPoint.y    = BmpStitchRatio.y * SelectedPoint.y - 1;
+			BitmapPoint.x    = dToL(BmpStitchRatio.x * SelectedPoint.x);
+			BitmapPoint.y    = dToL(BmpStitchRatio.y * SelectedPoint.y - 1.0);
 			const auto color = TraceBitmapData[BitmapPoint.y * BitmapWidth + BitmapPoint.x] ^ 0xffffff;
 			if (StateMap.test(StateFlag::TRCUP)) {
 				UpPixelColor   = color;
@@ -618,8 +617,8 @@ void trace::internal::dutrac() {
 		thred::savdo();
 		if (StateMap.test(StateFlag::LANDSCAP))
 			SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
-		CurrentTracePoint.x = BmpStitchRatio.x * SelectedPoint.x;
-		CurrentTracePoint.y = BmpStitchRatio.y * SelectedPoint.y;
+		CurrentTracePoint.x = dToL(BmpStitchRatio.x * SelectedPoint.x);
+		CurrentTracePoint.y = dToL(BmpStitchRatio.y * SelectedPoint.y);
 		if (CurrentTracePoint.x > gsl::narrow<long>(BitmapWidth))
 			CurrentTracePoint.x = BitmapWidth;
 		if (CurrentTracePoint.y > gsl::narrow<long>(BitmapHeight))
@@ -779,7 +778,7 @@ void trace::internal::dutrac() {
 		SelectedForm->vertices    = thred::adflt(OutputIndex);
 		SelectedForm->vertexCount = gsl::narrow<unsigned short>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
-		SelectedForm->attribute   = ActiveLayer << 1;
+		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
 		form::frmout(FormIndex);
 		FormList[FormIndex].satinGuideCount = 0;
 		FormIndex++;
@@ -979,8 +978,8 @@ void trace::internal::trnumwnd1(int position) noexcept {
 void trace::internal::stch2bit(fPOINT& point) {
 	if (StateMap.test(StateFlag::LANDSCAP))
 		point.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
-	BitmapPoint.x = BmpStitchRatio.x * point.x;
-	BitmapPoint.y = (BitmapHeight - BmpStitchRatio.y * point.y);
+	BitmapPoint.x = dToL(BmpStitchRatio.x * point.x);
+	BitmapPoint.y = dToL(BitmapHeight - BmpStitchRatio.y * point.y);
 }
 
 void trace::internal::pxlin(size_t start, size_t finish) {
@@ -1045,10 +1044,10 @@ void trace::tracpar() {
 					DownPixelColor |= TraceRGB[2 - ColumnColor];
 					break;
 				}
-				const auto         ratio         = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
-				const unsigned int position      = floor(ratio * 255);
-				COLORREF           traceColor    = UpPixelColor & TraceRGB[2 - ColumnColor];
-				const COLORREF     tracePosition = position << TraceShift[ColumnColor];
+				const auto     ratio         = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
+				const auto     position      = dToUI(std::floor(ratio * 255.0));
+				COLORREF       traceColor    = UpPixelColor & TraceRGB[2 - ColumnColor];
+				const COLORREF tracePosition = position << TraceShift[ColumnColor];
 				if (tracePosition < traceColor) {
 					UpPixelColor &= TraceRGBMask[ColumnColor];
 					UpPixelColor |= tracePosition;
@@ -1073,7 +1072,7 @@ void trace::tracpar() {
 			trace::trace();
 		}
 		else {
-			const unsigned int position = floor(TraceMsgPoint.y / ButtonHeight);
+			const auto position = dToUI(std::floor(TraceMsgPoint.y / ButtonHeight));
 			if (position < 16) {
 				StateMap.flip(TraceRGBFlag[ColumnColor]);
 				thred::redraw(TraceSelectWindow[ColumnColor]);
@@ -1174,9 +1173,9 @@ void trace::internal::durct(unsigned    shift,
 	traceHighMask.right = traceLowMask.right = traceMiddleMask.right = traceControlRect.right;
 
 	auto ratio             = static_cast<double>(lowerColor) / 255;
-	traceMiddleMask.top    = controlHeight * ratio + traceControlRect.top;
+	traceMiddleMask.top    = dToL(controlHeight * ratio + traceControlRect.top);
 	ratio                  = static_cast<double>(upperColor) / 255;
-	traceMiddleMask.bottom = controlHeight * ratio + traceControlRect.top;
+	traceMiddleMask.bottom = dToL(controlHeight * ratio + traceControlRect.top);
 	StateMap.reset(StateFlag::DUHI);
 	StateMap.reset(StateFlag::DULO);
 	if (lowerColor) {

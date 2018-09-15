@@ -56,9 +56,9 @@ namespace internal {
 	void   dutxrct(TXTRCT& textureRect);
 	void   dutxtlin() noexcept;
 	void   dutxtx(size_t index, unsigned short offsetPixels);
-	void   ed2px(const fPOINT& editPoint, POINT& point) noexcept;
+	void   ed2px(const fPOINT& editPoint, POINT& point);
 	fPOINT ed2stch(const fPOINT& point) noexcept;
-	void   ed2txp(const POINT& offset, TXPNT& textureRecord) noexcept;
+	void   ed2txp(const POINT& offset, TXPNT& textureRecord);
 	bool   inrct(const fRECTANGLE& rectangle, const fPOINTATTR& stitch) noexcept;
 	void   nutx();
 	void   nxbak();
@@ -68,7 +68,7 @@ namespace internal {
 	void   ritxfrm();
 	void   ritxrct() noexcept;
 	void   setxclp();
-	void   setxfrm() noexcept;
+	void   setxfrm();
 	void   setxmov();
 	void   stxlin();
 	void   txang();
@@ -84,11 +84,11 @@ namespace internal {
 	void   txnudg(int deltaX, float deltaY);
 	void   txpar();
 	void   txrbak() noexcept;
-	void   txrct2rct(const TXTRCT& textureRect, RECT& rectangle) noexcept;
+	void   txrct2rct(const TXTRCT& textureRect, RECT& rectangle);
 	void   txrfor() noexcept;
 	void   txshrnk();
 	void   txsiz(double ratio);
-	void   txt2pix(const TXPNT& texturePoint, POINT& screenPoint) noexcept;
+	void   txt2pix(const TXPNT& texturePoint, POINT& screenPoint);
 	bool   txtclos(size_t& closestTexturePoint);
 	void   txtclp();
 	void   txtdel();

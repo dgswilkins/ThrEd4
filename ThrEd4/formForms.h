@@ -42,7 +42,7 @@ namespace internal {
 
 	BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam) noexcept;
 
-	void chkdaz() noexcept;
+	void chkdaz();
 
 	BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 

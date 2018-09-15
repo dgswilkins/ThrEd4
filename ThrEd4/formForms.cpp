@@ -652,15 +652,15 @@ void formForms::frmnum() {
 		displayText::shoseln(IDS_FRM1MSG, IDS_SETFRM);
 }
 
-void formForms::internal::chkdaz() noexcept {
+void formForms::internal::chkdaz() {
 	if (!IniFile.daisyPetalPoints)
 		IniFile.daisyPetalPoints = 1;
 	if (!IniFile.daisyInnerCount)
 		IniFile.daisyInnerCount = 1;
 	if (!IniFile.daisyPetalCount)
 		IniFile.daisyPetalCount = 1;
-	if (IniFile.daisyHeartCount > IniFile.daisyPetalPoints)
-		IniFile.daisyHeartCount = IniFile.daisyPetalPoints;
+	if (IniFile.daisyHeartCount > gsl::narrow<unsigned char>(IniFile.daisyPetalPoints))
+		IniFile.daisyHeartCount = gsl::narrow<unsigned char>(IniFile.daisyPetalPoints);
 }
 
 void formForms::dazdef() {
@@ -718,7 +718,7 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer, HBUFSIZ);
 			IniFile.daisyPetalPoints = std::stoi(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer, HBUFSIZ);
-			IniFile.daisyHeartCount = std::stoi(buffer);
+			IniFile.daisyHeartCount = gsl::narrow<unsigned short>(std::stoi(buffer));
 			GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer, HBUFSIZ);
 			IniFile.daisyDiameter = std::stof(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer, HBUFSIZ);
@@ -781,7 +781,7 @@ void formForms::dasyfrm() {
 	ClosestFormToCursor         = FormIndex;
 	form::frmclr(SelectedForm);
 	SelectedForm->vertices  = &FormVertices[FormVertexIndex];
-	SelectedForm->attribute = ActiveLayer << 1;
+	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	form::fvars(FormIndex);
 	auto       maximumXsize = ZoomRect.right - ZoomRect.left;
 	const auto maximumYsize = ZoomRect.top - ZoomRect.bottom;
@@ -952,7 +952,7 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 		}
 		case IDOK: {
 			GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer, HBUFSIZ);
-			IniFile.formSides = std::stoi(buffer);
+			IniFile.formSides = gsl::narrow<unsigned short>(std::stoi(buffer));
 			GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer, HBUFSIZ);
 			IniFile.tearTailLength = std::stof(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), buffer, HBUFSIZ);
@@ -1075,13 +1075,13 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 		}
 		case IDOK: {
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer, HBUFSIZ);
-			IniFile.wavePoints = std::stoi(buffer);
+			IniFile.wavePoints = gsl::narrow<unsigned short>(std::stoi(buffer));
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer, HBUFSIZ);
-			IniFile.waveStart = std::stoi(buffer);
+			IniFile.waveStart = gsl::narrow<unsigned short>(std::stoi(buffer));
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), buffer, HBUFSIZ);
-			IniFile.waveEnd = std::stoi(buffer);
+			IniFile.waveEnd = gsl::narrow<unsigned char>(std::stoi(buffer));
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer, HBUFSIZ);
-			IniFile.waveLobes = std::stoi(buffer);
+			IniFile.waveLobes = gsl::narrow<unsigned char>(std::stoi(buffer));
 			if (IniFile.wavePoints > 100)
 				IniFile.wavePoints = 100;
 			if (IniFile.wavePoints < 3)
@@ -1118,7 +1118,7 @@ void formForms::wavfrm() {
 		auto iPoint     = 0u;
 		auto waveIndex  = IniFile.waveStart;
 		while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
-			const auto iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
+			const unsigned short iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
 			points[iPoint].x       = -CurrentFormVertices[iNextVertex].x + CurrentFormVertices[waveIndex].x;
 			points[iPoint].y       = -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[waveIndex].y;
 			iPoint++;

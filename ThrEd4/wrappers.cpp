@@ -46,6 +46,17 @@ void GetTextExtentPointInt(HDC hdc, LPCTSTR lpString, size_t cbString, LPSIZE lp
 	GetTextExtentPoint(hdc, lpString, gsl::narrow<int>(cbString), lpSize);
 }
 
+long dToL(double invar) {
+	return gsl::narrow<long>(std::round(invar));
+}
+unsigned int dToUI(double invar){
+	return gsl::narrow<unsigned int>(std::round(invar));
+}
+
+long fToL(float invar) {
+	return gsl::narrow<long>(std::round(invar));
+}
+
 void setCursorInt(HCURSOR hCursor) noexcept {
 	static HCURSOR saveCursor = nullptr;
 	if (saveCursor != hCursor) {

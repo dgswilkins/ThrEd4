@@ -414,7 +414,7 @@ void xt::fethrf() {
 		SelectedForm->fillInfo.feather.count     = IniFile.featherCount;
 		SelectedForm->lengthOrCount.stitchLength = UserStitchLength;
 		SelectedForm->fillSpacing                = LineSpacing;
-		SelectedForm->fillColor                  = ActiveColor;
+		SelectedForm->fillColor                  = gsl::narrow<unsigned char>(ActiveColor);
 		SelectedForm->fillInfo.feather.color     = (ActiveColor + 1) & COLMSK;
 		SelectedForm->fillType                   = FTHF;
 		form::refilfn();
@@ -596,7 +596,7 @@ void xt::internal::delwlk(size_t code) {
 	}
 }
 
-void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) noexcept {
+void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) {
 #if BUGBAK
 	unsigned index;
 
@@ -624,7 +624,7 @@ void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) noexcept {
 			delta.x     = OSequence[iSequence + 1].x - OSequence[iSequence].x;
 			delta.y     = OSequence[iSequence + 1].y - OSequence[iSequence].y;
 			length      = hypot(delta.x, delta.y);
-			stitchCount = floor(length / underlayStitchLength);
+			stitchCount = dToUI(length / underlayStitchLength);
 			if (stitchCount) {
 				step.x = delta.x / stitchCount;
 				step.y = delta.y / stitchCount;
@@ -648,7 +648,7 @@ void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) noexcept {
 #endif
 }
 
-void xt::internal::ritwlk(unsigned& interleaveSequenceIndex2) noexcept {
+void xt::internal::ritwlk(unsigned& interleaveSequenceIndex2) {
 	if (OutputIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = WLKMSK;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
@@ -658,7 +658,7 @@ void xt::internal::ritwlk(unsigned& interleaveSequenceIndex2) noexcept {
 	}
 }
 
-void xt::internal::ritcwlk(unsigned& interleaveSequenceIndex2) noexcept {
+void xt::internal::ritcwlk(unsigned& interleaveSequenceIndex2) {
 	if (OutputIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = CWLKMSK;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
@@ -714,7 +714,7 @@ unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned
 		delta.x     = indentedPoint[intermediateVertex].x - indentedPoint[startVertex].x;
 		delta.y     = indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y;
 		length      = hypot(delta.x, delta.y);
-		stitchCount = length / SelectedForm->lengthOrCount.stitchLength;
+		stitchCount = dToUI(length / SelectedForm->lengthOrCount.stitchLength);
 		if (stitchCount > 1) {
 			step.x       = delta.x / stitchCount;
 			step.y       = delta.y / stitchCount;
@@ -766,7 +766,7 @@ void xt::internal::fnwlk(size_t find, unsigned& interleaveSequenceIndex2) {
 	ritwlk(interleaveSequenceIndex2);
 }
 
-void xt::internal::ritund(unsigned& interleaveSequenceIndex2) noexcept {
+void xt::internal::ritund(unsigned& interleaveSequenceIndex2) {
 	if (SequenceIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = UNDMSK;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
@@ -782,7 +782,7 @@ void xt::internal::undclp() noexcept {
 	ClipStitchCount                                  = 2;
 }
 
-void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) noexcept {
+void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 	size_t iVertex = 0;
 	size_t start = 0, finish = 0;
 
@@ -867,7 +867,7 @@ void xt::dubit(unsigned bit) {
 		if (SelectedForm->fillType)
 			SelectedForm->underlayColor = SelectedForm->fillColor;
 		else
-			SelectedForm->underlayColor = ActiveColor;
+			SelectedForm->underlayColor = gsl::narrow<unsigned char>(ActiveColor);
 		SelectedForm->underlayStitchLen = IniFile.underlayStitchLen;
 	}
 	if (!(SelectedForm->extendedAttribute & AT_UND) && bit & AT_UND) {
@@ -1077,10 +1077,10 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 
 unsigned xt::internal::duprecs(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, SRTREC& sortRecord) {
 	sortRecord.direction  = 0;
-	const unsigned jumps0 = precjmps(tempStitchBuffer, pRecs, sortRecord);
+	const auto jumps0 = dToUI(precjmps(tempStitchBuffer, pRecs, sortRecord));
 
 	sortRecord.direction  = 1;
-	const unsigned jumps1 = precjmps(tempStitchBuffer, pRecs, sortRecord);
+	const auto jumps1 = dToUI(precjmps(tempStitchBuffer, pRecs, sortRecord));
 
 	if (jumps0 < jumps1) {
 		sortRecord.direction = 0;
@@ -1385,7 +1385,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
 	fillStartsData.fillNamed.borderColor++;
 	fillStartsData.fillNamed.appliqueColor++;
 	fillStartsMap         = tmap;
-	PCSHeader.stitchCount = iDestinationStitch;
+	PCSHeader.stitchCount = gsl::narrow<unsigned short>(iDestinationStitch);
 	iDestinationStitch    = 0;
 	if (!(tmap & M_ECOL))
 		fillStartsData.fillNamed.borderColor = PCSHeader.stitchCount;
@@ -1610,7 +1610,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 		}
 		xi::chkend(0, code, ilData);
 	}
-	PCSHeader.stitchCount = ilData.output;
+	PCSHeader.stitchCount = gsl::narrow<unsigned short>(ilData.output);
 	thred::coltab();
 }
 
@@ -1928,7 +1928,7 @@ void xt::internal::ucolfn(size_t find, unsigned color) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) {
-		SelectedForm->underlayColor = color;
+		SelectedForm->underlayColor = gsl::narrow<unsigned char>(color);
 		form::refilfn();
 	}
 }
@@ -1961,7 +1961,7 @@ void xt::internal::fcolfn(size_t find, unsigned color) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
-		SelectedForm->fillColor = color;
+		SelectedForm->fillColor = gsl::narrow<unsigned char>(color);
 		form::refilfn();
 	}
 }
@@ -1994,7 +1994,7 @@ void xt::internal::bcolfn(size_t find, unsigned color) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
-		SelectedForm->borderColor = color;
+		SelectedForm->borderColor = gsl::narrow<unsigned char>(color);
 		form::refilfn();
 	}
 }
@@ -2495,12 +2495,12 @@ void xt::nudsiz() {
 			flag = 0;
 			if (DesignSize.x > IniFile.hoopSizeX) {
 				IniFile.hoopSizeX = DesignSize.x * 1.05;
-				UnzoomedRect.x    = IniFile.hoopSizeX;
+				UnzoomedRect.x    = fToL(IniFile.hoopSizeX);
 				flag              = 1;
 			}
 			if (DesignSize.y > IniFile.hoopSizeY) {
 				IniFile.hoopSizeY = DesignSize.y * 1.05;
-				UnzoomedRect.y    = IniFile.hoopSizeY;
+				UnzoomedRect.y    = fToL(IniFile.hoopSizeY);
 				flag              = 1;
 			}
 			xi::nudfn(designSizeRect);
@@ -2570,7 +2570,7 @@ void xt::chgwrn() {
 	StateMap.set(StateFlag::DUMEN);
 }
 
-void xt::chgchk(int code) {
+void xt::chgchk(unsigned char code) {
 	IniFile.dataCheck = code;
 	thred::chkmen();
 	StateMap.set(StateFlag::DUMEN);

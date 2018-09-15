@@ -285,7 +285,7 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
 	const auto&    point     = CurrentFormVertices[currentSide + 1];
 	const fPOINT   delta     = { (point.x - SelectedPoint.x), (point.y - SelectedPoint.y) };
 	const auto     length    = hypot(delta.x, delta.y);
-	const unsigned clipCount = floor(length / ClipRectSize.cx);
+	const auto clipCount = gsl::narrow<size_t>(std::floor(length / ClipRectSize.cx));
 
 	if (clipCount) {
 		thred::rotangf(BorderClipReference, ClipReference, clipAngle, rotationCenter);
@@ -326,7 +326,7 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 	const double     rotationAngle      = atan2(delta.y, delta.x);
 
 	thred::rotang1(clipReferencePoint, ClipReference, rotationAngle, rotationCenter);
-	const unsigned int clipCount = floor(length / ClipRectSize.cx);
+	const auto  clipCount = gsl::narrow<size_t>(std::floor(length / ClipRectSize.cx));
 	if (clipCount) {
 		float remainder = 0.0;
 		if (clipCount > 1)
@@ -424,7 +424,7 @@ void clip::internal::fxlit(const std::vector<double>& listSINEs,
 		BeanCount++;
 		const auto length
 		    = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
-		const unsigned int count = floor(length / AdjustedSpace);
+		const auto count = gsl::narrow<size_t>(std::floor(length / AdjustedSpace));
 		const dPOINT       delta = { AdjustedSpace * listCOSINEs[currentSide], AdjustedSpace * listSINEs[currentSide] };
 		SelectedPoint.x += delta.x * count;
 		SelectedPoint.y += delta.y * count;
@@ -442,7 +442,7 @@ void clip::internal::fxlin(std::vector<fPOINT>&       chainEndPoints,
 		chainEndPoints.push_back(SelectedPoint);
 		const auto length
 		    = hypot(CurrentFormVertices[NextStart].x - SelectedPoint.x, CurrentFormVertices[NextStart].y - SelectedPoint.y);
-		const size_t count = floor(length / AdjustedSpace);
+		const auto count = gsl::narrow<size_t>(std::floor(length / AdjustedSpace));
 		const dPOINT delta = { AdjustedSpace * ListCOSINEs[currentSide], AdjustedSpace * ListSINEs[currentSide] };
 		for (size_t iChain = 0; iChain < count; iChain++) {
 			SelectedPoint.x += delta.x;
@@ -693,7 +693,7 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 	double       rotationAngle = atan2(-delta.x, delta.y);
 	const dPOINT outerStep     = { SelectedForm->borderSize * cos(rotationAngle), SelectedForm->borderSize * sin(rotationAngle) };
 	spacing += ClipRectSize.cx;
-	const unsigned int count = length / spacing;
+	const auto count = gsl::narrow<size_t>(std::round(length / spacing));
 	rotationAngle            = atan2(delta.y, delta.x);
 	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	if (count) {

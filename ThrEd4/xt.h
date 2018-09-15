@@ -22,7 +22,7 @@ namespace fs = std::experimental::filesystem;
 
 namespace xt {
 
-void chgchk(int code);
+void chgchk(unsigned char code);
 void chgwrn();
 void chkcwlk(unsigned& interleaveSequenceIndex2);
 void chkund(const std::vector<RNGCNT>& textureSegments, unsigned& interleaveSequenceIndex2);
@@ -119,7 +119,7 @@ namespace internal {
 	void     chkend(unsigned offset, unsigned code, INTINF& ilData);
 	bool     chkp2cnam(const wchar_t* fileName) noexcept;
 	bool     chkrdun(const std::vector<unsigned>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord);
-	void     chkuseq(const unsigned interleaveSequenceIndex2) noexcept;
+	void     chkuseq(const unsigned interleaveSequenceIndex2);
 	void     delwlk(size_t code);
 
 #ifdef _DEBUG
@@ -150,7 +150,7 @@ namespace internal {
 	void  flenfn(size_t find, float length);
 	void  fmaxfn(size_t find, float length);
 	void  fminfn(size_t find, float length);
-	void  fncwlk(unsigned& interleaveSequenceIndex2) noexcept;
+	void  fncwlk(unsigned& interleaveSequenceIndex2);
 	void  fnund(const std::vector<RNGCNT>& textureSegments, size_t find, unsigned& interleaveSequenceIndex2);
 	void  fnwlk(size_t find, unsigned& interleaveSequenceIndex2);
 	void  fritfil(std::vector<fPOINT>& featherSequence, unsigned& interleaveSequenceIndex2);
@@ -177,9 +177,9 @@ namespace internal {
 	bool recmp(const OREC* record1, const OREC* record2) noexcept;
 	bool refcmp(const OREC* record1, const OREC* record2) noexcept;
 	void rtrclpfn();
-	void ritcwlk(unsigned& interleaveSequenceIndex2) noexcept;
-	void ritund(unsigned& interleaveSequenceIndex2) noexcept;
-	void ritwlk(unsigned& interleaveSequenceIndex2) noexcept;
+	void ritcwlk(unsigned& interleaveSequenceIndex2);
+	void ritund(unsigned& interleaveSequenceIndex2);
+	void ritwlk(unsigned& interleaveSequenceIndex2);
 	void sadj(fPOINT& point, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
 	void sadj(fPOINTATTR& stitch, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
 

@@ -43,7 +43,7 @@ void     chkcont();
 bool     chkdel() noexcept;
 unsigned chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
 bool     chkmax(size_t arg0, size_t arg1) noexcept;
-void     chkseq(bool border) noexcept;
+void     chkseq(bool border);
 bool     cisin(float xCoordinate, float yCoordinate) noexcept;
 size_t   closflt(float xCoordinate, float yCoordinate) noexcept;
 bool     closfrm();
@@ -101,7 +101,7 @@ void     form();
 void     frm0();
 void     frmadj(size_t formIndex) noexcept;
 void     frmclr(FRMHED* const destination) noexcept;
-void     frmlin(const fPOINT* const vertices, size_t vertexCount) noexcept;
+void     frmlin(const fPOINT* const vertices, size_t vertexCount);
 void     frmlin(const std::vector<fPOINT>& vertices);
 void     frmnumfn(unsigned newFormIndex);
 void     frmon();
@@ -109,7 +109,7 @@ void     frmout(size_t formIndex) noexcept;
 void     frmovlin();
 bool     frmrng(size_t iForm, RANGE& range) noexcept;
 void     frmsadj();
-void     fselrct(size_t iForm) noexcept;
+void     fselrct(size_t iForm);
 void     fsizpar() noexcept;
 void     fvars(size_t iForm) noexcept;
 
@@ -137,10 +137,10 @@ void munfrm();
 void mvfltsb(fPOINT* const destination, const fPOINT* const source, size_t count) noexcept;
 void mvfrmsb(FRMHED* const destination, const FRMHED* const source, size_t count) noexcept;
 bool notfstch(unsigned attribute) noexcept;
-void nubrdcol(unsigned color) noexcept;
-void nufilcol(unsigned color) noexcept;
+void nubrdcol(unsigned color);
+void nufilcol(unsigned color);
 void nufsel();
-void nufthcol(unsigned color) noexcept;
+void nufthcol(unsigned color);
 void nulapcol(unsigned color);
 
 constexpr size_t nxt(size_t iVertex);
@@ -168,7 +168,7 @@ void     rotcmd(dPOINT& rotationCenter);
 void     rotdup();
 void     rotfrm(size_t newStartVertex);
 void     rstfrm();
-void     sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect) noexcept;
+void     sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect);
 void     savblen(float fLength);
 void     savplen(float length);
 void     selal();
@@ -184,14 +184,14 @@ void     setins();
 void     setmfrm();
 void     setrang();
 void     setstrtch();
-void     sfCor2px(const fPOINT& stitchPoint, POINT& screen) noexcept;
+void     sfCor2px(const fPOINT& stitchPoint, POINT& screen);
 void     shrnk();
 void     snap();
 void     spltfrm();
 void     srtbyfrm();
 void     srtfrm();
 void     stchadj();
-void     stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect) noexcept;
+void     stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect);
 void     stchs2frm();
 void     tglfrm();
 void     unfil();
@@ -208,7 +208,7 @@ namespace internal {
 	void     apbrd();
 	void     bakseq();
 	void     bdrlin(size_t start, size_t finish, double stitchSize);
-	void     bean(unsigned start, unsigned finish) noexcept;
+	void     bean(unsigned start, unsigned finish);
 	void     bhbrd(double spacing);
 	void     bhcrnr(size_t vertex);
 	void     bhfn(size_t start, size_t finish, double spacing);
@@ -222,10 +222,10 @@ namespace internal {
 	bool     chk2of();
 	void     chkbrd(unsigned& interleaveSequenceIndex2);
 	void     chksid(size_t vertexIndex) noexcept;
-	bool     closat();
+	bool     closat() noexcept;
 	bool     clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept;
 	void     clpcon(const std::vector<RNGCNT>& textureSegments);
-	void     clpfm() noexcept;
+	void     clpfm();
 	unsigned clpind(const fPOINT* const point) noexcept;
 	unsigned clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
 	                 std::vector<CLPSEG>&       clipSegments,
@@ -285,9 +285,9 @@ namespace internal {
 	            dPOINT&                rotationCenter);
 	void  fnord();
 	void  fnvrt(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
-	void  frmpnts(unsigned type);
+	void  frmpnts(unsigned type) noexcept;
 	void  frmpoly(const POINT* const line, size_t count) noexcept;
-	void  frmsqr(unsigned iVertex) noexcept;
+	void  frmsqr(unsigned iVertex);
 	void  frmsqr0(const POINT& controlPoint) noexcept;
 	void  frmx(const POINT& controlPoint, HDC dc) noexcept;
 	void  fsangl();
@@ -338,9 +338,9 @@ namespace internal {
 	bool notsel() noexcept;
 	bool
 	       nucseg(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned& currentSegmentIndex);
-	void   nufpnt(size_t vertex) noexcept;
+	void   nufpnt(size_t vertex);
 	void   nutim(double size) noexcept;
-	void   nxtim() noexcept;
+	void   nxtim();
 	void   nxtrgn(std::vector<RGSEQ>&           tempPath,
 	              const std::vector<RCON>&      pathMap,
 	              const std::vector<unsigned>&  mapIndexSequence,
@@ -380,10 +380,10 @@ namespace internal {
 	              unsigned                      iRegion,
 	              const std::vector<fPOINT>&    lastRegionCorners,
 	              const std::vector<REGION>&    regionsList);
-	void   ritapbrd(unsigned& interleaveSequenceIndex2) noexcept;
-	void   ritbrd(unsigned& interleaveSequenceIndex2) noexcept;
-	void   ritfil(unsigned& interleaveSequenceIndex2) noexcept;
-	bool   ritlin(const fPOINT& start, const fPOINT& finish) noexcept;
+	void   ritapbrd(unsigned& interleaveSequenceIndex2);
+	void   ritbrd(unsigned& interleaveSequenceIndex2);
+	void   ritfil(unsigned& interleaveSequenceIndex2);
+	bool   ritlin(const fPOINT& start, const fPOINT& finish);
 	void
 	     ritseg(const std::vector<CLIPNT>& clipStitchPoints, std::vector<CLPSEG>& clipSegments, const unsigned currentSegmentIndex);
 	void rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept;

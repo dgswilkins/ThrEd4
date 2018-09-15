@@ -150,7 +150,7 @@ void satin::spltsat(const SATCON& currentGuide) {
 	if (SelectedForm->wordParam)
 		SelectedForm->wordParam = currentGuide.start;
 	iOldVertex = iGuide + 1;
-	while (iGuide < gsl::narrow<unsigned>(SelectedForm->satinGuideCount)) {
+	while (iGuide < (SelectedForm->satinGuideCount)) {
 		SelectedForm->satinOrAngle.guide[iGuide].start -= (currentGuide.start - 1);
 		SelectedForm->satinOrAngle.guide[iGuide].finish -= (currentGuide.start - 1);
 		iGuide++;
@@ -200,19 +200,18 @@ void satin::internal::satclos() {
 		}
 		if (!StartPoint)
 			StartPoint++;
-		if (StartPoint == SelectedForm->vertexCount - 2
-		    && closestVertex == gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1) {
+		if (StartPoint == SelectedForm->vertexCount - 2 && closestVertex == (SelectedForm->vertexCount) - 1) {
 			StartPoint    = 1;
 			closestVertex = SelectedForm->vertexCount - 2;
 		}
-		if (closestVertex >= gsl::narrow<unsigned>(SelectedForm->vertexCount) - 2) {
+		if (closestVertex >= (SelectedForm->vertexCount) - 2) {
 			closestVertex = SelectedForm->vertexCount - 2;
-			if (StartPoint >= gsl::narrow<unsigned>(SelectedForm->vertexCount) - 2)
+			if (StartPoint >= (SelectedForm->vertexCount) - 2)
 				StartPoint = SelectedForm->vertexCount - 2;
 		}
 		if (closestVertex - StartPoint < 2) {
 			closestVertex = StartPoint + 2;
-			if (closestVertex > gsl::narrow<unsigned>(SelectedForm->vertexCount) - 2) {
+			if (closestVertex > (SelectedForm->vertexCount) - 2) {
 				closestVertex = closestVertex - SelectedForm->vertexCount - 2;
 				closestVertex -= closestVertex;
 				StartPoint -= closestVertex;
@@ -324,7 +323,7 @@ void satin::satadj() {
 
 	// ensure all guide endpoints are on valid vertices
 	for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-		auto endCount = gsl::narrow<unsigned short>(VertexCount - 1);
+		const auto endCount = (VertexCount - 1);
 		if (CurrentFormGuides[iGuide].finish > endCount)
 			CurrentFormGuides[iGuide].finish = endCount;
 		if (CurrentFormGuides[iGuide].start > endCount)
@@ -386,13 +385,13 @@ void satin::satadj() {
 		satinMap.reset();
 		for (auto iGuide = 0u; iGuide < CurrentFormGuidesCount; iGuide++) {
 			auto iForward = CurrentFormGuides[iGuide].start;
-			if (iForward > gsl::narrow<unsigned>(SatinEndGuide) - 1)
+			if (iForward > (SatinEndGuide)-1)
 				iForward = SatinEndGuide - 1;
 			if (satinMap.test_set(iForward)) {
 				auto iReverse = iForward;
 				if (iReverse)
 					iReverse--;
-				while (satinMap.test(iForward) && (iForward < (gsl::narrow<unsigned>(SatinEndGuide) - 1)))
+				while (satinMap.test(iForward) && (iForward < ((SatinEndGuide)-1)))
 					iForward++;
 				while (iReverse && (satinMap.test(iReverse)))
 					iReverse--;
@@ -420,7 +419,7 @@ void satin::satadj() {
 				CurrentFormGuides[iGuide++].start = iVertex;
 		} while (iVertex < VertexCount);
 
-		CurrentFormGuidesCount = SelectedForm->satinGuideCount = gsl::narrow<unsigned short>(iGuide);
+		CurrentFormGuidesCount = SelectedForm->satinGuideCount = (iGuide);
 		satinMap.reset();
 		// Todo - are iForward and iReverse appropriate variable names below?
 		for (iGuide = 0u; iGuide < CurrentFormGuidesCount; iGuide++) {
@@ -431,11 +430,11 @@ void satin::satadj() {
 			if (satinMap.test_set(iForward)) {
 				if (iForward < VertexCount - 1)
 					iForward++;
-				if (iReverse > gsl::narrow<unsigned>(SatinEndGuide) + 1)
+				if (iReverse > (SatinEndGuide) + 1)
 					iReverse--;
 				while (satinMap.test(iForward) && iForward < VertexCount - 1)
 					iForward++;
-				while (iReverse > gsl::narrow<unsigned>(SatinEndGuide) - 1 && (satinMap.test(iReverse)))
+				while (iReverse > (SatinEndGuide)-1 && (satinMap.test(iReverse)))
 					iReverse--;
 				if (satinMap.test(iForward) && satinMap.test(iReverse))
 					break;
@@ -462,10 +461,10 @@ void satin::satadj() {
 		} while (iReverse < VertexCount);
 		if (iGuide < CurrentFormGuidesCount)
 			iGuide = CurrentFormGuidesCount;
-		CurrentFormGuidesCount = SelectedForm->satinGuideCount = gsl::narrow<unsigned short>(iGuide);
+		CurrentFormGuidesCount = SelectedForm->satinGuideCount = (iGuide);
 		if (SatinEndGuide) {
-			auto end0 = gsl::narrow<unsigned short>(VertexCount - SatinEndGuide - 2);
-			auto end1 = gsl::narrow<unsigned short>(SatinEndGuide - 2);
+			const auto end0 = (VertexCount - SatinEndGuide - 2);
+			const auto end1 = (SatinEndGuide - 2);
 			if (CurrentFormGuidesCount > end0)
 				CurrentFormGuidesCount = end0;
 			if (CurrentFormGuidesCount > end1)
@@ -570,7 +569,7 @@ void satin::delspnt() {
 	SelectedForm->vertexCount--;
 	FormVertexIndex--;
 	form::fvars(ClosestFormToCursor);
-	if (ClosestVertexToCursor > gsl::narrow<unsigned>(SelectedForm->vertexCount) - 1)
+	if (ClosestVertexToCursor > (SelectedForm->vertexCount) - 1)
 		ClosestVertexToCursor = SelectedForm->vertexCount - 1;
 	StateMap.set(StateFlag::FRMPSEL);
 	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++)
@@ -592,7 +591,7 @@ void satin::internal::satsbrd() {
 	form::bsizpar();
 	SelectedForm->borderSize  = BorderWidth;
 	SelectedForm->edgeSpacing = LineSpacing / 2;
-	SelectedForm->borderColor = ActiveColor;
+	SelectedForm->borderColor = gsl::narrow<unsigned char>(ActiveColor);
 	form::refilfn();
 }
 
@@ -711,7 +710,7 @@ void satin::ribon() {
 					}
 				}
 				formHeader->type                       = SAT;
-				formHeader->fillColor                  = ActiveColor;
+				formHeader->fillColor                  = gsl::narrow<unsigned char>(ActiveColor);
 				formHeader->fillSpacing                = LineSpacing;
 				formHeader->lengthOrCount.stitchLength = IniFile.maxStitchLength;
 				formHeader->vertexCount                = iNewVertex;
@@ -813,9 +812,9 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		auto line2Length = lengths[line2Start] - lengths[line2End];
 		auto stitchCount = 0u;
 		if (fabs(line1Length) > fabs(line2Length))
-			stitchCount = fabs(line2Length) / LineSpacing;
+			stitchCount = dToUI(fabs(line2Length) / LineSpacing);
 		else
-			stitchCount = fabs(line1Length) / LineSpacing;
+			stitchCount = dToUI(fabs(line1Length) / LineSpacing);
 		const auto            line1Segments = ((line1End > line1Start) ? (line1End - line1Start) : (line1Start - line1End));
 		const auto            line2Segments = ((line2Start > line2End) ? (line2Start - line2End) : (line2End - line2Start));
 		std::vector<unsigned> line1StitchCounts;
@@ -825,8 +824,9 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		auto iVertex            = line1Start;
 		auto segmentStitchCount = 0u;
 		for (auto iSegment = 0u; iSegment < line1Segments - 1; iSegment++) {
-			const auto     nextVertex = form::nxt(iVertex);
-			const unsigned val        = ((lengths[nextVertex] - lengths[iVertex]) / line1Length) * stitchCount + 0.5;
+			const auto nextVertex = form::nxt(iVertex);
+			const auto val        = gsl::narrow<unsigned int>(
+                std::round(((lengths[nextVertex] - lengths[iVertex]) / line1Length) * stitchCount + 0.5));
 			line1StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iVertex = form::nxt(iVertex);
@@ -837,7 +837,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		// auto iSegment           = 0;
 		segmentStitchCount = 0;
 		while (iVertex > line2End) {
-			const unsigned val = ((lengths[iNextVertex] - lengths[iVertex]) / line2Length) * stitchCount + 0.5;
+			const auto  val = gsl::narrow<size_t>(std::round(((lengths[iNextVertex] - lengths[iVertex]) / line2Length) * stitchCount + 0.5));
 			line2StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iNextVertex = form::prv(iNextVertex);

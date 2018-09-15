@@ -18,6 +18,10 @@
 #include <gsl/gsl>
 #pragma warning(pop)
 
+long dToL(double invar);
+unsigned int dToUI(double invar);
+long fToL(float invar);
+
 void GetTextExtentPoint32Int(HDC hdc, LPCTSTR lpString, size_t c, LPSIZE lpSize);
 void GetTextExtentPointInt(HDC hdc, LPCTSTR lpString, size_t cbString, LPSIZE lpSize);
 void PolylineInt(HDC hdc, const POINT* apt, size_t cpt);

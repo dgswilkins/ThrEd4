@@ -1144,20 +1144,20 @@ public:
 	// FLENCNTOUT& operator=(FLENCNTOUT&&) = default;
 	//~FLENCNTOUT() = default;
 
-	FLENCNTOUT(const FLENCNT& rhs);
-	inline FLENCNTOUT& operator=(const FLENCNT& rhs);
+	FLENCNTOUT(const FLENCNT& rhs) noexcept;
+	inline FLENCNTOUT& operator=(const FLENCNT& rhs) noexcept;
 };
 
 inline FLENCNTOUT::FLENCNTOUT() noexcept {
 	clipCount = 0u;
 }
 
-inline FLENCNTOUT::FLENCNTOUT(const FLENCNT& rhs) {
-	clipCount = gsl::narrow<unsigned>(rhs.clipCount);
+inline FLENCNTOUT::FLENCNTOUT(const FLENCNT& rhs) noexcept {
+	clipCount = rhs.clipCount;
 }
 
-inline FLENCNTOUT& FLENCNTOUT::operator=(const FLENCNT& rhs) {
-	clipCount = gsl::narrow<unsigned>(rhs.clipCount);
+inline FLENCNTOUT& FLENCNTOUT::operator=(const FLENCNT& rhs) noexcept {
+	clipCount = rhs.clipCount;
 
 	return *this;
 }
