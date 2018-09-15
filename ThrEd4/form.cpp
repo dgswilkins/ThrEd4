@@ -2758,7 +2758,7 @@ float form::internal::getlen(std::vector<CLIPNT>& clipStitchPoints, const std::v
 	auto retval = lengths[clipStitchPoints[iPoint].vertexIndex]
 	              + hypot(CurrentFormVertices[clipStitchPoints[iPoint].vertexIndex].x - clipStitchPoints[iPoint].x,
 	                      CurrentFormVertices[clipStitchPoints[iPoint].vertexIndex].y - clipStitchPoints[iPoint].y);
-	return gsl::narrow<float>(retval);
+	return gsl::narrow_cast<float>(retval);
 }
 
 unsigned form::internal::clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
