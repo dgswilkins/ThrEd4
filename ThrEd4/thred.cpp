@@ -6921,11 +6921,11 @@ void thred::rtclpfn(size_t destination, size_t source) {
 	// ToDo - Does this makes sense?
 	ClipStitchData[destination].led  = 0;
 	auto fractional                  = modf(ClipBuffer[source].x - LowerLeftStitch.x, &integer);
-	ClipStitchData[destination].fx   = fractional;
+	ClipStitchData[destination].fx   = gsl::narrow<unsigned char>(std::round(fractional * 256.0));
 	ClipStitchData[destination].x    = gsl::narrow<unsigned short>(integer);
 	ClipStitchData[destination].spcx = 0;
 	fractional                       = modf(ClipBuffer[source].y - LowerLeftStitch.y, &integer);
-	ClipStitchData[destination].fy   = fractional;
+	ClipStitchData[destination].fy   = gsl::narrow<unsigned char>(std::round(fractional * 256.0));
 	ClipStitchData[destination].y    = gsl::narrow<unsigned short>(integer);
 	ClipStitchData[destination].spcy = 0;
 	// ToDo - Are these structure members needed?
@@ -13381,15 +13381,14 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio
 						}
 						else {
 							xlin1();
-							auto iStitch = 0u;
-							for (iStitch = PCSHeader.stitchCount; iStitch; iStitch--) {
+							for (auto iStitch = PCSHeader.stitchCount; iStitch; iStitch--) {
 								StitchBuffer[iStitch] = StitchBuffer[iStitch - 1];
 							}
 							StitchBuffer[0].attribute = code;
-							StitchBuffer[iStitch].attribute &= (~KNOTMSK);
+							StitchBuffer[0].attribute &= (~KNOTMSK);
 							StitchBuffer[0].x = SelectedPoint.x;
 							StitchBuffer[0].y = SelectedPoint.y;
-							stch2px1(iStitch);
+							stch2px1(0);
 							InsertLine[0]   = StitchCoordinatesPixels;
 							InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 							InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
@@ -14319,7 +14318,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio
 				}
 			}
 			else
-				satin::satpnt1();
+				satin::satsel();
 			break;
 		}
 		case 'K': {
