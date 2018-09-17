@@ -340,7 +340,8 @@ void form::frmlin(const fPOINT* const vertices, size_t vertexCount) {
 		if (VertexCount) {
 			for (auto iVertex = 0u; iVertex < vertexCount; iVertex++) {
 				FormLines[iVertex].x = dToL((vertices[iVertex].x - ZoomRect.left) * ZoomRatio.x);
-				FormLines[iVertex].y = dToL(StitchWindowClientRect.bottom - (vertices[iVertex].y - ZoomRect.bottom) * ZoomRatio.y);
+				FormLines[iVertex].y
+				    = dToL(StitchWindowClientRect.bottom - (vertices[iVertex].y - ZoomRect.bottom) * ZoomRatio.y);
 			}
 			FormLines[vertexCount].x = dToL((vertices[0].x - ZoomRect.left) * ZoomRatio.x);
 			FormLines[vertexCount].y = dToL(StitchWindowClientRect.bottom - (vertices[0].y - ZoomRect.bottom) * ZoomRatio.y);
@@ -2183,7 +2184,6 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 		if (iLineCounter > maximumLines)
 			maximumLines = iLineCounter;
 	}
-	// ToDo - why do we modify maximumlines?
 	maximumLines = (maximumLines >> 1);
 	lineEndpoints.reserve(fillLineCount + 1);
 	StitchLineCount = 0;
@@ -2677,7 +2677,7 @@ bool form::internal::isect(size_t vertex0, size_t vertex1, fPOINT& intersection,
 	intersection.y = static_cast<float>(tempIntersection.y);
 	length         = hypot(tempIntersection.x - LineSegmentStart.x, tempIntersection.y - LineSegmentStart.y);
 	// ToDo - should length be determined from start or end?
-	//	 hypot(tipnt.x-LineSegmentEnd.x,tipnt.y-LineSegmentEnd.y);
+	//	 hypot(tempIntersection.x-LineSegmentEnd.x,tempIntersection.y-LineSegmentEnd.y);
 	return flag;
 }
 
@@ -2996,8 +2996,8 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 	}
 	ActivePointIndex = 0;
 	std::vector<CLIPNT> clipStitchPoints;
-	// ToDo - find a better number than MAXITEMS
-	clipStitchPoints.reserve(MAXITEMS);
+	// Reserve some memory, but probably not enough
+	clipStitchPoints.reserve(1000);
 	bool   breakFlag     = false;
 	fPOINT pasteLocation = {};
 	TXPNT* texture       = nullptr;
@@ -3106,22 +3106,19 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++)
 			CurrentFormVertices[iVertex].y -= formNegativeOffset;
 	}
+
 #define CLPVU 0
 
-#if CLPVU == 1
-
-	goto clp1skp;
-
-#endif
-
+#if CLPVU == 0
 	StateMap.reset(StateFlag::FILDIR);
 	auto                previousPoint = 0u;
 	std::vector<CLPSEG> clipSegments;
-	if (clipStitchPoints.size()) {
+	auto                endPoint = clipStitchPoints.size();
+	if (endPoint) {
+		endPoint--;
 		// reserve a reasonable amount but not the full amount potentially required
-		clipSegments.reserve(clipStitchPoints.size() / 10);
-
-		for (auto iPoint = 0u; iPoint < clipStitchPoints.size() - 1; iPoint++) {
+		clipSegments.reserve(endPoint / 10);
+		for (auto iPoint = 0u; iPoint < endPoint; iPoint++) {
 			switch (clipStitchPoints[iPoint].flag) {
 			case 0: { // inside
 				StateMap.set(StateFlag::FILDIR);
@@ -3141,10 +3138,6 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 			}
 		}
 	}
-
-#if CLPVU == 1
-
-clp1skp:;
 
 #endif
 

@@ -6900,7 +6900,7 @@ void thred::internal::rot(dPOINT& rotationCenter) {
 }
 
 void thred::internal::savclp(size_t destination, size_t source) {
-	double integer = 0.0;
+	auto integer = 0.0;
 
 	ClipStitchData[destination].led  = StitchBuffer[source].attribute & COLMSK;
 	auto fractional                  = modf(static_cast<double>(StitchBuffer[source].x) - LowerLeftStitch.x, &integer);
@@ -6917,8 +6917,8 @@ void thred::internal::savclp(size_t destination, size_t source) {
 }
 
 void thred::rtclpfn(size_t destination, size_t source) {
-	double integer = 0.0;
-	// ToDo - Does this makes sense?
+	auto integer = 0.0;
+
 	ClipStitchData[destination].led  = 0;
 	auto fractional                  = modf(ClipBuffer[source].x - LowerLeftStitch.x, &integer);
 	ClipStitchData[destination].fx   = gsl::narrow<unsigned char>(std::round(fractional * 256.0));
