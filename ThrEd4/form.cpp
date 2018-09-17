@@ -3201,15 +3201,11 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 		if (SequenceIndex > MAXITEMS - 100)
 			SequenceIndex = MAXITEMS - 100;
 		auto index = 0u;
-		// Todo - unused inf?
-		auto inf = 0;
 		for (auto iSequence = 0u; iSequence < SequenceIndex; iSequence++) {
 			if (vscmp(iSequence, index)) {
 				index++;
 				OSequence[index] = OSequence[iSequence];
 			}
-			else
-				inf++;
 		}
 		SequenceIndex = index;
 		if (StateMap.test(StateFlag::WASNEG)) {
@@ -3380,8 +3376,6 @@ bool form::internal::regclos(std::vector<unsigned>&        groupIndexSequence,
                              unsigned                      iRegion0,
                              unsigned                      iRegion1,
                              const std::vector<REGION>&    regionsList) {
-	// ToDo - More renaming required
-
 	const auto lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
 	SMALPNTL*  lineEndPoint0End   = nullptr;
 	const auto lineEndPoint1Start = sortedLines[regionsList[iRegion1].start];
@@ -4076,8 +4070,8 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			RegionsList[iRegion].breakCount = count;
 		}
 
-#if BUGSEQ
-		// ToDo - this debug code is currently broken
+#if BUGSEQ 
+		// Note - this debug code only works for vertical fill on a single form
 		auto bugColor = 0u;
 		auto index    = 0u;
 		for (auto iRegion = 0u; iRegion < RegionCount; iRegion++) {
