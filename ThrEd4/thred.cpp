@@ -4254,10 +4254,10 @@ void thred::internal::sav() {
 						PCSStitchBuffer[iPCSstitch++].fx = gsl::narrow<unsigned char>(savcol);
 					}
 					fractionalPart                  = std::modf(saveStitches[iStitch].x, &integerPart);
-					PCSStitchBuffer[iPCSstitch].fx  = gsl::narrow<unsigned char>(std::round(fractionalPart * 256.0));
+					PCSStitchBuffer[iPCSstitch].fx  = gsl::narrow<unsigned char>(std::floor(fractionalPart * 256.0));
 					PCSStitchBuffer[iPCSstitch].x   = gsl::narrow<short>(integerPart);
 					fractionalPart                  = std::modf(saveStitches[iStitch].y, &integerPart);
-					PCSStitchBuffer[iPCSstitch].fy  = gsl::narrow<unsigned char>(std::round(fractionalPart * 256.0));
+					PCSStitchBuffer[iPCSstitch].fy  = gsl::narrow<unsigned char>(std::floor(fractionalPart * 256.0));
 					PCSStitchBuffer[iPCSstitch++].y = gsl::narrow<short>(integerPart);
 				}
 				if (!WriteFile(
@@ -5515,9 +5515,9 @@ void thred::internal::nuFil() {
 								}
 								else {
 									StitchBuffer[iStitch].x
-									    = PCSDataBuffer[iPCSstitch].x + static_cast<float>(PCSDataBuffer[iPCSstitch].fx) / 256;
+									    = PCSDataBuffer[iPCSstitch].x + static_cast<float>(PCSDataBuffer[iPCSstitch].fx) / 256.0;
 									StitchBuffer[iStitch].y
-									    = PCSDataBuffer[iPCSstitch].y + static_cast<float>(PCSDataBuffer[iPCSstitch].fy) / 256;
+									    = PCSDataBuffer[iPCSstitch].y + static_cast<float>(PCSDataBuffer[iPCSstitch].fy) / 256.0;
 									StitchBuffer[iStitch++].attribute = color;
 									iPCSstitch++;
 								}
@@ -6904,11 +6904,11 @@ void thred::internal::savclp(size_t destination, size_t source) {
 
 	ClipStitchData[destination].led  = StitchBuffer[source].attribute & COLMSK;
 	auto fractional                  = modf(static_cast<double>(StitchBuffer[source].x) - LowerLeftStitch.x, &integer);
-	ClipStitchData[destination].fx   = gsl::narrow<unsigned char>(std::round(fractional * 256.0));
+	ClipStitchData[destination].fx   = gsl::narrow<unsigned char>(std::floor(fractional * 256.0));
 	ClipStitchData[destination].x    = gsl::narrow<unsigned short>(integer);
 	ClipStitchData[destination].spcx = 0;
 	fractional                       = modf(static_cast<double>(StitchBuffer[source].y) - LowerLeftStitch.y, &integer);
-	ClipStitchData[destination].fy   = gsl::narrow<unsigned char>(std::round(fractional * 256.0));
+	ClipStitchData[destination].fy   = gsl::narrow<unsigned char>(std::floor(fractional * 256.0));
 	ClipStitchData[destination].y    = gsl::narrow<unsigned short>(integer);
 	ClipStitchData[destination].spcy = 0;
 	// ToDo - Are these structure members needed?
@@ -6921,11 +6921,11 @@ void thred::rtclpfn(size_t destination, size_t source) {
 
 	ClipStitchData[destination].led  = 0;
 	auto fractional                  = modf(ClipBuffer[source].x - LowerLeftStitch.x, &integer);
-	ClipStitchData[destination].fx   = gsl::narrow<unsigned char>(std::round(fractional * 256.0));
+	ClipStitchData[destination].fx   = gsl::narrow<unsigned char>(std::floor(fractional * 256.0));
 	ClipStitchData[destination].x    = gsl::narrow<unsigned short>(integer);
 	ClipStitchData[destination].spcx = 0;
 	fractional                       = modf(ClipBuffer[source].y - LowerLeftStitch.y, &integer);
-	ClipStitchData[destination].fy   = gsl::narrow<unsigned char>(std::round(fractional * 256.0));
+	ClipStitchData[destination].fy   = gsl::narrow<unsigned char>(std::floor(fractional * 256.0));
 	ClipStitchData[destination].y    = gsl::narrow<unsigned short>(integer);
 	ClipStitchData[destination].spcy = 0;
 	// ToDo - Are these structure members needed?
@@ -8031,8 +8031,8 @@ void thred::redclp() noexcept {
 	if (ClipPointer) {
 		ClipStitchData          = static_cast<CLPSTCH*>(ClipPointer);
 		ClipStitchCount         = ClipStitchData[0].led;
-		ClipBuffer[0].x         = ClipStitchData[0].x + static_cast<float>(ClipStitchData[0].fx) / 256;
-		ClipBuffer[0].y         = ClipStitchData[0].y + static_cast<float>(ClipStitchData[0].fy) / 256;
+		ClipBuffer[0].x         = ClipStitchData[0].x + static_cast<float>(ClipStitchData[0].fx) / 256.0;
+		ClipBuffer[0].y         = ClipStitchData[0].y + static_cast<float>(ClipStitchData[0].fy) / 256.0;
 		ClipBuffer[0].attribute = 0;
 
 #if CLPBUG
@@ -8041,8 +8041,8 @@ void thred::redclp() noexcept {
 		ClipRect.left = ClipRect.right = ClipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
 		for (auto iStitch = 1u; iStitch < ClipStitchCount; iStitch++) {
-			ClipBuffer[iStitch].x         = ClipStitchData[iStitch].x + static_cast<float>(ClipStitchData[iStitch].fx) / 256;
-			ClipBuffer[iStitch].y         = ClipStitchData[iStitch].y + static_cast<float>(ClipStitchData[iStitch].fy) / 256;
+			ClipBuffer[iStitch].x         = ClipStitchData[iStitch].x + static_cast<float>(ClipStitchData[iStitch].fx) / 256.0;
+			ClipBuffer[iStitch].y         = ClipStitchData[iStitch].y + static_cast<float>(ClipStitchData[iStitch].fy) / 256.0;
 			ClipBuffer[iStitch].attribute = (ClipStitchData[iStitch].led & 0xf) | codedLayer;
 
 #if CLPBUG
@@ -8442,9 +8442,9 @@ void thred::internal::insfil() {
 							newAttribute = pcsStitchBuffer[iPCSStitch++].fx;
 						else {
 							StitchBuffer[iStitch].x
-							    = pcsStitchBuffer[iPCSStitch].x + static_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256;
+							    = pcsStitchBuffer[iPCSStitch].x + static_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0;
 							StitchBuffer[iStitch].y
-							    = pcsStitchBuffer[iPCSStitch].y + static_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256;
+							    = pcsStitchBuffer[iPCSStitch].y + static_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0;
 							StitchBuffer[iStitch++].attribute = newAttribute;
 						}
 					}
