@@ -3142,9 +3142,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 #endif
 
 	if (clipSegments.size()) {
-		// Todo - which of these is correct? check with original code
-		auto clplim = clipSegments.size() >> 3;
-		clplim      = clipSegments.size() >> 1;
+		auto clplim = clipSegments.size() >> 1;
 		if (!clplim)
 			clplim = 1;
 		if (clplim > 12)
