@@ -7424,7 +7424,7 @@ void form::internal::shrnks() {
 			                    CurrentFormVertices[iVertex + 1].y - CurrentFormVertices[iVertex].y };
 
 		const auto length = hypot(vDelta.x, vDelta.y);
-		const auto count  = length / ClipRectSize.cx + 0.5;
+		const auto count  = std::round(length / ClipRectSize.cx);
 		const auto ratio  = (ClipRectSize.cx * count + 0.004) / length;
 
 		CurrentFormVertices[iVertex + 1].x = CurrentFormVertices[iVertex].x + vDelta.x * ratio;
