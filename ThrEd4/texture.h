@@ -22,8 +22,8 @@ namespace texture {
 void deltx();
 void drwtxtr();
 void dutxtfil();
-void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<size_t>* ptrTexturePointsList) noexcept;
-bool istx(size_t iForm) noexcept;
+void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<unsigned int>* ptrTexturePointsList) noexcept;
+bool istx(unsigned int iForm) noexcept;
 void redtx();
 void rstxt();
 void rtrtx();
@@ -55,7 +55,7 @@ namespace internal {
 	void   dutxmir();
 	void   dutxrct(TXTRCT& textureRect);
 	void   dutxtlin() noexcept;
-	void   dutxtx(size_t index, unsigned short offsetPixels);
+	void   dutxtx(unsigned int index, unsigned short offsetPixels);
 	void   ed2px(const fPOINT& editPoint, POINT& point);
 	fPOINT ed2stch(const fPOINT& point) noexcept;
 	void   ed2txp(const POINT& offset, TXPNT& textureRecord);
@@ -89,7 +89,7 @@ namespace internal {
 	void   txshrnk();
 	void   txsiz(double ratio);
 	void   txt2pix(const TXPNT& texturePoint, POINT& screenPoint);
-	bool   txtclos(size_t& closestTexturePoint);
+	bool   txtclos(unsigned int& closestTexturePoint);
 	void   txtclp();
 	void   txtdel();
 	void   txtlin();

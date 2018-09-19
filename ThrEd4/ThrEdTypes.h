@@ -57,7 +57,7 @@
 #define PAGSCROL 0.9      // page scroll factor
 #define LINSCROL 0.05     // line scroll factor
 #define TXTSIDS 6         // extra pixels in a text box
-#define MAXITEMS 0x10000u  // maximum number of stitches, vertices, texture points, sequence items & clipboard points
+#define MAXITEMS 0x10000u // maximum number of stitches, vertices, texture points, sequence items & clipboard points
 #define MAXCHNG 10000     // maximum number of color changes
 #define SHUPX 480         // small hoop x size
 #define SHUPY 480         // small hoop y size
@@ -115,7 +115,7 @@
 #define KNOTLEN 54                // set knots for stitches longer than this
 #define MAXSAC 10000              // maximum number of satin guidlines
 #define MAXKNOTS 16384            // maximum nuber of knots
-#define IBFCLEN 4 * PFGRAN        //initial buttonhole fill corner length
+#define IBFCLEN 4 * PFGRAN        // initial buttonhole fill corner length
 #define IPICSPAC 6                // initial picot border space
 #define PRFLINS 28                // number of lines on the preference menu
 #define EDGETYPS 12               // number of border fill types
@@ -123,7 +123,7 @@
 #define FSED 1340007303           // feather seqence seed
 #define NAMSED 2222222222         // trial version psg seed
 #define DSTRAT 0.8333333333333333 // ratio of dst stitch points to PFAFF stitch points
-#define HUPS 5u                    // number of hoops the user can select
+#define HUPS 5u                   // number of hoops the user can select
 #define NORDSED 0x5a5a5a5a        // name order seed
 #define NCODSED 0x73ef5a7e        // name encoding seed
 #define NCODOF 80                 // name encoding offset
@@ -165,9 +165,9 @@
 #define FDEFFLR 9                 // default feather floor
 #define FDEFNUM 10                // default feather number
 #define FDEFTYP FTHPSG            // default feather type
-#define ITXHI 9 * PFGRAN          //default texture editor height
-#define ITXWID 9 * PFGRAN         //default texture editor width
-#define ITXSPAC 0.40 * PFGRAN     //default texture editor spacing
+#define ITXHI 9 * PFGRAN          // default texture editor height
+#define ITXWID 9 * PFGRAN         // default texture editor width
+#define ITXSPAC 0.40 * PFGRAN     // default texture editor spacing
 #define ITXPIX 5                  // default texture editor cross pixels
 #define ITXBUFLEN 16              // texture buffer depth
 
@@ -771,10 +771,10 @@ enum machineType
 };
 
 typedef struct _formVertices {
-	size_t start;
-	size_t vertexCount;
-	size_t finish;
-	size_t form;
+	unsigned int start;
+	unsigned int vertexCount;
+	unsigned int finish;
+	unsigned int form;
 } FORMVERTICES;
 
 class fPOINT;
@@ -789,8 +789,8 @@ public:
 	double y;
 
 	constexpr dPOINT() noexcept
-		: x(0.0)
-		, y(0.0) {
+	    : x(0.0)
+	    , y(0.0) {
 	}
 	inline dPOINT(const fPOINT& rhs);
 	inline dPOINT(float rhsX, float rhsY) noexcept;
@@ -885,13 +885,13 @@ inline dPOINT::dPOINT(const fPOINT& rhs) {
 }
 
 inline dPOINT::dPOINT(float rhsX, float rhsY) noexcept
-	: x(rhsX)
-	, y(rhsY) {
+    : x(rhsX)
+    , y(rhsY) {
 }
 
 inline dPOINT::dPOINT(double rhsX, double rhsY) noexcept
-	: x(rhsX)
-	, y(rhsY) {
+    : x(rhsX)
+    , y(rhsY) {
 }
 inline bool dPOINT::operator==(const dPOINT& rhs) const noexcept {
 	return (x == rhs.x) && (y == rhs.y);
@@ -932,25 +932,25 @@ typedef struct _colChng {
 class FEATHER
 {
 public:
-	unsigned fillType;          // type of feather fill
-	float    ratio;             // feather ratio
-	float    minStitch;         // smallest stitch allowed
-	float    ratioLocal;        // local feather ratio
-	float    formRatio;         // feather ratio from form
-	unsigned extendedAttribute; // extended form attribute
-	unsigned upCount;           // feather up count
-	unsigned downCount;         // feather down count
-	unsigned totalCount;        // up count plus down count
-	size_t   phaseIndex;
-	unsigned phase;
-	unsigned countUp;
-	unsigned countDown;
-	float    globalStep;
-	float    globalPosition;
-	float    globalPhase;
-	float    globalUp;
-	float    globalDown;
-	float    globalRatio;
+	unsigned     fillType;          // type of feather fill
+	float        ratio;             // feather ratio
+	float        minStitch;         // smallest stitch allowed
+	float        ratioLocal;        // local feather ratio
+	float        formRatio;         // feather ratio from form
+	unsigned     extendedAttribute; // extended form attribute
+	unsigned     upCount;           // feather up count
+	unsigned     downCount;         // feather down count
+	unsigned     totalCount;        // up count plus down count
+	unsigned int phaseIndex;
+	unsigned     phase;
+	unsigned     countUp;
+	unsigned     countDown;
+	float        globalStep;
+	float        globalPosition;
+	float        globalPhase;
+	float        globalUp;
+	float        globalDown;
+	float        globalRatio;
 };
 
 #define COLMSK 0x0000000f    // 0000 0000 0000 0000 0000 0000 0000 1111
@@ -969,7 +969,7 @@ public:
 #define TYPFRM 0x20000000    // 0010 0000 0000 0000 0000 0000 0000 0000
 #define TYPBRD 0x40000000    // 0100 0000 0000 0000 0000 0000 0000 0000
 #define NTYPMSK 0x9fffffff   // 1001 1111 1111 1111 1111 1111 1111 1111
-#define USMSK 0x80000000u     // 1000 0000 0000 0000 0000 0000 0000 0000
+#define USMSK 0x80000000u    // 1000 0000 0000 0000 0000 0000 0000 0000
 #define ATMSK 0x7fffffff     // 0111 1111 1111 1111 1111 1111 1111 1111
 #define NFRM_NTYP 0x9fffc00f // 1001 1111 1111 1111 1100 0000 0000 1111
 #define TYPATMSK 0x20000000  // 0010 0000 0000 0000 0000 0000 0000 0000
@@ -1022,9 +1022,9 @@ typedef struct _floatRectangle {
 } fRECTANGLE;
 
 typedef struct _forminfo {
-	unsigned type;
-	unsigned attribute;
-	size_t   sideCount;
+	unsigned     type;
+	unsigned     attribute;
+	unsigned int sideCount;
 } FORMINFO;
 
 class SATCONOUT;
@@ -1032,8 +1032,8 @@ class SATCONOUT;
 class SATCON
 {
 public:
-	size_t start;
-	size_t finish;
+	unsigned int start;
+	unsigned int finish;
 
 	inline SATCON& operator=(const SATCONOUT& rhs) noexcept;
 };
@@ -1127,8 +1127,8 @@ union FLENCNTOUT;
 
 union FLENCNT {
 public:
-	float  stitchLength;
-	size_t clipCount;
+	float        stitchLength;
+	unsigned int clipCount;
 
 	inline FLENCNT& operator=(const FLENCNTOUT& rhs) noexcept;
 };
@@ -1213,18 +1213,18 @@ inline SATINANGLE& SATINANGLE::operator=(const SATINANGLEOUT& rhs) noexcept {
 	return *this;
 }
 
-	/*
-	fill	edgeStitchLen	edgeSpacing	borderSize	clipCount	picspac		crnrsiz		brdend
+/*
+fill	edgeStitchLen	edgeSpacing	borderSize	clipCount	picspac		crnrsiz		brdend
 
-	EDGELINE	edgeStitchLen
-	EDGEBEAN	edgeStitchLen
-	EDGECLIP											clipCount
-	EDGEANGSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
-	EDGEAPPL	edgeStitchLen	edgeSpacing	borderSize									attribute
-	EDGEPROPSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
-	EDGEBHOL	edgeStitchLen	edgeSpacing	borderSize	clipCount,res
-	EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
-	*/
+EDGELINE	edgeStitchLen
+EDGEBEAN	edgeStitchLen
+EDGECLIP											clipCount
+EDGEANGSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
+EDGEAPPL	edgeStitchLen	edgeSpacing	borderSize									attribute
+EDGEPROPSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
+EDGEBHOL	edgeStitchLen	edgeSpacing	borderSize	clipCount,res
+EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
+*/
 
 #define BELEN 1
 #define BESPAC 2
@@ -1316,16 +1316,16 @@ class FRMHED
 {
 public:
 	unsigned char  attribute;       // attribute
-	size_t         vertexCount;     // number of sides
+	unsigned int   vertexCount;     // number of sides
 	unsigned char  type;            // type
 	unsigned char  fillColor;       // fill color
 	unsigned char  borderColor;     // border color
-	size_t         clipEntries;     // number of border clipboard entries
+	unsigned int   clipEntries;     // number of border clipboard entries
 	fPOINT*        vertices;        // points
 	SATINANGLE     satinOrAngle;    // satin guidlines or angle clipboard fill angle
 	fPOINT*        borderClipData;  // border clipboard data
-	size_t         satinGuideCount; // number of satin guidlines
-	size_t         wordParam;       // clipboard/textured fill phase or satin end guide
+	unsigned int   satinGuideCount; // number of satin guidlines
+	unsigned int   wordParam;       // clipboard/textured fill phase or satin end guide
 	fRECTANGLE     rectangle;       // rectangle
 	unsigned char  fillType;        // fill type
 	unsigned char  edgeType;        // edge type
@@ -1343,8 +1343,8 @@ public:
 	float         maxBorderStitchLen;  // maximum border stitch length
 	float         minBorderStitchLen;  // minimum border stitch length
 	TFINFO        fillInfo;            // feather/texture info
-	size_t        fillStart;           // fill start point
-	size_t        fillEnd;             // fill end point
+	unsigned int  fillStart;           // fill start point
+	unsigned int  fillEnd;             // fill end point
 	float         underlaySpacing;     // underlay spacing
 	float         underlayStitchLen;   // underlay stitch length
 	float         underlayStitchAngle; // underlay stitch angle
@@ -1617,7 +1617,7 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 #define NSBLNT 0xbfu
 #define NOBLNT 0x9fu
 
-	// frmhed extended attribute bits
+// frmhed extended attribute bits
 
 #define AT_SQR 1     // square ends
 #define AT_FTHUP 2   // feather up or down flag
@@ -1646,9 +1646,9 @@ typedef struct _frmsclp {
 } FORMSCLIP; // multiple forms clipboard header
 
 typedef struct _fvclip {
-	unsigned clipType;
-	size_t   vertexCount;
-	bool     direction;
+	unsigned     clipType;
+	unsigned int vertexCount;
+	bool         direction;
 } FORMVERTEXCLIP; // form points clipboard header
 
 typedef struct _strhed { // thred file header
@@ -1741,7 +1741,7 @@ typedef struct _pcstch {
 } PCSTCH;
 
 typedef struct _clpstch {
-	size_t         led;  // ????
+	unsigned int   led;  // ????
 	unsigned char  fx;   // fractional part of x coord
 	unsigned short x;    // integer part of x coord
 	unsigned char  spcx; // ToDo - Is this structure member needed?
@@ -1753,20 +1753,20 @@ typedef struct _clpstch {
 } CLPSTCH;
 
 typedef struct _bakhed {
-	size_t      formCount;
-	FRMHED*     forms;
-	unsigned    stitchCount;
-	fPOINTATTR* stitches;
-	size_t      vertexCount;
-	fPOINT*     vertices;
-	size_t      guideCount;
-	SATCON*     guide;
-	size_t      clipPointCount;
-	fPOINT*     clipPoints;
-	COLORREF*   colors;
-	TXPNT*      texturePoints;
-	size_t      texturePointCount;
-	POINT       zoomRect;
+	unsigned int formCount;
+	FRMHED*      forms;
+	unsigned     stitchCount;
+	fPOINTATTR*  stitches;
+	unsigned int vertexCount;
+	fPOINT*      vertices;
+	unsigned int guideCount;
+	SATCON*      guide;
+	unsigned int clipPointCount;
+	fPOINT*      clipPoints;
+	COLORREF*    colors;
+	TXPNT*       texturePoints;
+	unsigned int texturePointCount;
+	POINT        zoomRect;
 } BAKHED;
 
 typedef struct _flsiz {
@@ -1775,8 +1775,8 @@ typedef struct _flsiz {
 } FLSIZ;
 
 typedef struct _frmrange {
-	size_t start;
-	size_t finish;
+	unsigned int start;
+	unsigned int finish;
 } FRMRANGE;
 
 typedef struct _range {
@@ -1858,24 +1858,24 @@ typedef struct _balstch {
 } BALSTCH;
 
 typedef struct _clpseg {
-	unsigned start;
-	float    beginLength;
-	unsigned beginIndex;
-	size_t   asid;
-	unsigned finish;
-	float    endLength;
-	unsigned endIndex;
-	size_t   zsid;
-	char     dun;
+	unsigned     start;
+	float        beginLength;
+	unsigned     beginIndex;
+	unsigned int asid;
+	unsigned     finish;
+	float        endLength;
+	unsigned     endIndex;
+	unsigned int zsid;
+	char         dun;
 } CLPSEG;
 
 class CLIPSORT
 {
 public:
-	float  segmentLength;
-	float  sideLength;
-	size_t vertexIndex;
-	fPOINT point;
+	float        segmentLength;
+	float        sideLength;
+	unsigned int vertexIndex;
+	fPOINT       point;
 
 	constexpr CLIPSORT() noexcept
 	    : segmentLength(0.0f)
@@ -1886,10 +1886,10 @@ public:
 };
 
 typedef struct _clipnt {
-	float    x;
-	float    y;
-	size_t   vertexIndex;
-	unsigned flag;
+	float        x;
+	float        y;
+	unsigned int vertexIndex;
+	unsigned     flag;
 } CLIPNT;
 
 typedef struct _vclpx {
@@ -2295,12 +2295,12 @@ enum interleaveTypes
 };
 
 typedef struct _intinf {
-	unsigned    pins;
-	unsigned    coloc;
-	size_t      layerIndex;
-	unsigned    start;
-	unsigned    output;
-	fPOINTATTR* highStitchBuffer;
+	unsigned     pins;
+	unsigned     coloc;
+	unsigned int layerIndex;
+	unsigned     start;
+	unsigned     output;
+	fPOINTATTR*  highStitchBuffer;
 } INTINF;
 
 class TXTSCR
@@ -2352,11 +2352,11 @@ typedef struct _txhst {
 } TXHST;
 
 typedef struct _txhstbuff {
-	unsigned* placeholder;
-	size_t    count;
-	float     height;
-	float     width;
-	float     spacing;
+	unsigned*    placeholder;
+	unsigned int count;
+	float        height;
+	float        width;
+	float        spacing;
 } TXHSTBUF;
 
 typedef struct _rngcnt {
@@ -2370,11 +2370,11 @@ typedef struct _rngcnt {
 #define BADTX 8
 
 typedef struct _badcnts {
-	unsigned attribute;
-	size_t   flt;
-	size_t   clip;
-	size_t   guideCount; // ToDo - is this an accurate description?
-	size_t   tx;
+	unsigned     attribute;
+	unsigned int flt;
+	unsigned int clip;
+	unsigned int guideCount; // ToDo - is this an accurate description?
+	unsigned int tx;
 } BADCNTS;
 
 typedef struct _findInfo {

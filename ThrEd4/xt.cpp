@@ -115,12 +115,12 @@ constexpr float xt::internal::duxrat(float strt, float fin, float featherRatioLo
 	return (fin - strt) * featherRatioLocal + strt;
 }
 
-void xt::internal::duxrats(size_t start, size_t finish, fPOINT& point, float featherRatioLocal) noexcept {
+void xt::internal::duxrats(unsigned int start, unsigned int finish, fPOINT& point, float featherRatioLocal) noexcept {
 	point.x = duxrat(BSequence[finish].x, BSequence[start].x, featherRatioLocal);
 	point.y = duxrat(BSequence[finish].y, BSequence[start].y, featherRatioLocal);
 }
 
-void xt::internal::durats(size_t iSequence, fPOINT& point, FEATHER& feather) noexcept {
+void xt::internal::durats(unsigned int iSequence, fPOINT& point, FEATHER& feather) noexcept {
 	const double stitchLength
 	    = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x, BSequence[iSequence + 1].y - BSequence[iSequence].y);
 	fPOINT adjustedPoint = {};
@@ -219,12 +219,12 @@ void xt::internal::nurat(FEATHER& feather) {
 	feather.globalPosition += feather.globalStep;
 }
 
-void xt::internal::fthfn(size_t iSequence, FEATHER& feather) {
+void xt::internal::fthfn(unsigned int iSequence, FEATHER& feather) {
 	nurat(feather);
 	durats(iSequence, OSequence[iSequence], feather);
 }
 
-void xt::internal::ratpnt(size_t iPoint, size_t iNextPoint, fPOINT& point, float featherRatio) noexcept {
+void xt::internal::ratpnt(unsigned int iPoint, unsigned int iNextPoint, fPOINT& point, float featherRatio) noexcept {
 	point.x = (BSequence[iNextPoint].x - BSequence[iPoint].x) * featherRatio + BSequence[iPoint].x;
 	point.y = (BSequence[iNextPoint].y - BSequence[iPoint].y) * featherRatio + BSequence[iPoint].y;
 }
@@ -238,7 +238,7 @@ void xt::internal::xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOIN
 	point.y = (endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y;
 }
 
-void xt::internal::fthrbfn(size_t iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence) {
+void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence) {
 	fPOINT currentPoint     = {};
 	fPOINT nextPoint        = {};
 	fPOINT currentHighPoint = {};
@@ -274,7 +274,7 @@ void xt::internal::fthrbfn(size_t iSequence, FEATHER& feather, std::vector<fPOIN
 	featherSequence.push_back(midPoint);
 }
 
-void xt::internal::fthdfn(size_t iSequence, FEATHER& feather) {
+void xt::internal::fthdfn(unsigned int iSequence, FEATHER& feather) {
 	const double length
 	    = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 	fPOINT adjustedPoint = {};
@@ -297,8 +297,8 @@ void xt::internal::fthdfn(size_t iSequence, FEATHER& feather) {
 }
 
 void xt::internal::fritfil(std::vector<fPOINT>& featherSequence, unsigned& interleaveSequenceIndex2) {
-	unsigned iSequence        = 0;
-	size_t   iReverseSequence = 0;
+	auto iSequence        = 0u;
+	auto   iReverseSequence = 0u;
 
 	if (SequenceIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = TYPFRM;
@@ -314,7 +314,7 @@ void xt::internal::fritfil(std::vector<fPOINT>& featherSequence, unsigned& inter
 			InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
 			InterleaveSequenceIndices[interleaveSequenceIndex2].seq   = I_FTH;
 
-			const auto sequenceMax = featherSequence.size();
+			const auto sequenceMax = gsl::narrow<unsigned int>(featherSequence.size());
 			iReverseSequence       = sequenceMax - 1;
 			for (iSequence = 0; iSequence < sequenceMax; iSequence++) {
 				OSequence[iSequence] = featherSequence[iReverseSequence];
@@ -328,7 +328,7 @@ void xt::internal::fritfil(std::vector<fPOINT>& featherSequence, unsigned& inter
 }
 
 void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
-	size_t              ind = 0, res = 0;
+	auto              ind = 0u, res = 0u;
 	const double        savedSpacing = LineSpacing;
 	FEATHER             feather      = {};
 	std::vector<fPOINT> featherSequence;
@@ -575,7 +575,7 @@ std::vector<fPOINT>& xt::insid() {
 		return *OutsidePoints;
 }
 
-void xt::internal::delwlk(size_t code) {
+void xt::internal::delwlk(unsigned int code) {
 	unsigned iStitch = 0, stitchCount = 0;
 
 	if (PCSHeader.stitchCount) {
@@ -670,12 +670,12 @@ void xt::internal::ritcwlk(unsigned& interleaveSequenceIndex2) {
 
 unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, unsigned code) {
 	double       length             = hypot(finish.x - start.x, finish.y - start.y);
-	size_t       startVertex        = form::closflt(start.x, start.y);
-	const size_t endVertex          = form::closflt(finish.x, finish.y);
+	auto       startVertex        = form::closflt(start.x, start.y);
+	const auto endVertex          = form::closflt(finish.x, finish.y);
 	unsigned     stitchCount        = 0;
-	size_t       intermediateVertex = 0;
+	auto       intermediateVertex = 0u;
 	unsigned     iStitch = 0, iStep = 0;
-	size_t       up = 0, down = 0;
+	auto       up = 0u, down = 0u;
 	fPOINT       localPoint = {}, step = {}, delta = {};
 
 	if (length < 5)
@@ -741,9 +741,9 @@ unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned
 	return iStitch - destination;
 }
 
-void xt::internal::fnwlk(size_t find, unsigned& interleaveSequenceIndex2) {
-	size_t start = 0;
-	size_t count = 0;
+void xt::internal::fnwlk(unsigned int find, unsigned& interleaveSequenceIndex2) {
+	auto  start = 0u;
+	auto count = 0u;
 
 	form::fvars(find);
 	if (SelectedForm->type == FRMLINE)
@@ -783,8 +783,8 @@ void xt::internal::undclp() noexcept {
 }
 
 void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
-	size_t iVertex = 0;
-	size_t start = 0, finish = 0;
+	auto iVertex = 0u;
+	auto start = 0u, finish = 0u;
 
 	OutputIndex = 0;
 	SelectedForm->extendedAttribute |= AT_CWLK;
@@ -820,7 +820,7 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 		OutputIndex++;
 		finish = form::prv(start);
 		start  = form::nxt(start);
-		for (size_t iGuide = 1; iGuide<VertexCount>> 1; iGuide++) {
+		for (auto iGuide = 1u; iGuide<VertexCount>> 1; iGuide++) {
 			OSequence[OutputIndex].x = form::midl(CurrentFormVertices[finish].x, CurrentFormVertices[start].x);
 			OSequence[OutputIndex].y = form::midl(CurrentFormVertices[finish].y, CurrentFormVertices[start].y);
 			if (form::cisin(OSequence[OutputIndex].x, OSequence[OutputIndex].y))
@@ -918,7 +918,7 @@ void xt::chkwlk(unsigned& interleaveSequenceIndex2) {
 		xi::delwlk((ClosestFormToCursor << FRMSHFT) | WLKMSK);
 }
 
-void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, size_t find, unsigned& interleaveSequenceIndex2) {
+void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, unsigned int find, unsigned& interleaveSequenceIndex2) {
 	const float savedStitchSize = UserStitchLength;
 
 	UserStitchLength = 1e99;
@@ -1023,7 +1023,7 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 	fPOINTATTR* currentStitch = nullptr;
 	bool        direction     = sortRecord.direction;
 
-	std::vector<unsigned> formFillCounter((FormIndex + 2) << 2);
+	std::vector<unsigned> formFillCounter((gsl::narrow<size_t>(FormIndex) + 2) << 2);
 	unsigned              totalJumps = 0;
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
 		double minimumLength = 1e9;
@@ -1305,7 +1305,7 @@ void xt::dmpat() {
 void xt::fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
 	unsigned iSourceStitch = 0, ind = 0, iDestinationStitch = 0, attribute = 0, type = 0, tmap = 0, color = 0, bordercolor = 0,
 	         tapcol       = 0;
-	size_t codedFormIndex = 0;
+	auto codedFormIndex = 0u;
 	// ToDo - Still not sure what this function does?
 	//        I suspect the fillStartsData members are not correctly named
 	codedFormIndex = (ClosestFormToCursor << FRMSHFT);
@@ -1519,7 +1519,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 	form::fvars(ClosestFormToCursor);
 	InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
 	ilData.layerIndex
-	    = (gsl::narrow<size_t>(SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
+	    = (gsl::narrow<unsigned int>(SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
 	StateMap.reset(StateFlag::DIDSTRT);
 	if (PCSHeader.stitchCount) {
 		offset = MAXITEMS;
@@ -1699,7 +1699,7 @@ void xt::notcwlk() {
 	xi::notundfn(AT_CWLK);
 }
 
-void xt::internal::ulenfn(size_t find, float length) {
+void xt::internal::ulenfn(unsigned int find, float length) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) {
@@ -1729,7 +1729,7 @@ void xt::undlen() {
 	displayText::numWnd();
 }
 
-void xt::internal::uspacfn(size_t find, float spacing) {
+void xt::internal::uspacfn(unsigned int find, float spacing) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & AT_UND) {
@@ -1759,7 +1759,7 @@ void xt::uspac() {
 	displayText::numWnd();
 }
 
-void xt::internal::uangfn(size_t find, float angle) {
+void xt::internal::uangfn(unsigned int find, float angle) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & AT_UND) {
@@ -1790,7 +1790,7 @@ void xt::sfuang() {
 	displayText::numWnd();
 }
 
-void xt::internal::flenfn(size_t find, float length) {
+void xt::internal::flenfn(unsigned int find, float length) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType && !clip::isclp(find)) {
@@ -1820,7 +1820,7 @@ void xt::setflen() {
 	displayText::numWnd();
 }
 
-void xt::internal::fspacfn(size_t find, float spacing) {
+void xt::internal::fspacfn(unsigned int find, float spacing) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
@@ -1854,7 +1854,7 @@ void xt::setfspac() {
 	displayText::numWnd();
 }
 
-void xt::internal::findfn(size_t find, float indent) {
+void xt::internal::findfn(unsigned int find, float indent) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	SelectedForm->underlayIndent = indent;
@@ -1877,7 +1877,7 @@ void xt::dufind(float indent) {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void xt::internal::fangfn(size_t find, float angle) {
+void xt::internal::fangfn(unsigned int find, float angle) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	// ToDo - also do angle updates for texture filled forms
@@ -1924,7 +1924,7 @@ void xt::setfang() {
 	displayText::numWnd();
 }
 
-void xt::internal::ucolfn(size_t find, unsigned color) {
+void xt::internal::ucolfn(unsigned int find, unsigned color) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) {
@@ -1957,7 +1957,7 @@ void xt::setucol() {
 	displayText::numWnd();
 }
 
-void xt::internal::fcolfn(size_t find, unsigned color) {
+void xt::internal::fcolfn(unsigned int find, unsigned color) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
@@ -1990,7 +1990,7 @@ void xt::setfcol() {
 	displayText::numWnd();
 }
 
-void xt::internal::bcolfn(size_t find, unsigned color) {
+void xt::internal::bcolfn(unsigned int find, unsigned color) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -2023,7 +2023,7 @@ void xt::setbcol() {
 	displayText::numWnd();
 }
 
-void xt::internal::blenfn(size_t find, float length) {
+void xt::internal::blenfn(unsigned int find, float length) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType && !clip::iseclp(find)) {
@@ -2053,7 +2053,7 @@ void xt::setblen() {
 	displayText::numWnd();
 }
 
-void xt::internal::bspacfn(size_t find, float length) {
+void xt::internal::bspacfn(unsigned int find, float length) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -2083,7 +2083,7 @@ void xt::setbspac() {
 	displayText::numWnd();
 }
 
-void xt::internal::bminfn(size_t find, float length) {
+void xt::internal::bminfn(unsigned int find, float length) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -2113,7 +2113,7 @@ void xt::setbmin() {
 	displayText::numWnd();
 }
 
-void xt::internal::bmaxfn(size_t find, float length) {
+void xt::internal::bmaxfn(unsigned int find, float length) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->edgeType) {
@@ -2143,7 +2143,7 @@ void xt::setbmax() {
 	displayText::numWnd();
 }
 
-void xt::internal::fminfn(size_t find, float length) {
+void xt::internal::fminfn(unsigned int find, float length) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
@@ -2173,7 +2173,7 @@ void xt::setfmin() {
 	displayText::numWnd();
 }
 
-void xt::internal::fmaxfn(size_t find, float length) {
+void xt::internal::fmaxfn(unsigned int find, float length) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->fillType) {
@@ -2203,7 +2203,7 @@ void xt::setfmax() {
 	displayText::numWnd();
 }
 
-void xt::internal::fwidfn(size_t find, float length) {
+void xt::internal::fwidfn(unsigned int find, float length) {
 	unsigned iVertex   = 0;
 	double   ratio     = 0.0;
 	float    reference = 0.0;
@@ -2246,7 +2246,7 @@ void xt::setfind() {
 	displayText::numWnd();
 }
 
-void xt::internal::fhifn(size_t find, float length) {
+void xt::internal::fhifn(unsigned int find, float length) {
 	unsigned iVertex   = 0;
 	double   ratio     = 0.0;
 	float    reference = 0.0;
@@ -2327,7 +2327,7 @@ void xt::duauxnam() {
 }
 
 void xt::internal::rtrclpfn() {
-	size_t count = 0;
+	auto count = 0u;
 
 	if (OpenClipboard(ThrEdWindow)) {
 		form::fvars(ClosestFormToCursor);
@@ -2350,7 +2350,7 @@ void xt::internal::rtrclpfn() {
 				ClipStitchData = *(static_cast<CLPSTCH**>(ClipPointer));
 				thred::rtclpfn(0, 0);
 				ClipStitchData[0].led = count;
-				for (size_t iStitch = 1; iStitch < count; iStitch++)
+				for (auto iStitch = 1u; iStitch < count; iStitch++)
 					thred::rtclpfn(iStitch, iStitch);
 				SetClipboardData(Clip, ClipPointer);
 			}

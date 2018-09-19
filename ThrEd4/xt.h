@@ -109,18 +109,18 @@ namespace internal {
 	void prbug() noexcept;
 #endif
 
-	void     bcolfn(size_t find, unsigned color);
-	void     blenfn(size_t find, float length);
-	void     bmaxfn(size_t find, float length);
-	void     bminfn(size_t find, float length);
+	void     bcolfn(unsigned int find, unsigned color);
+	void     blenfn(unsigned int find, float length);
+	void     bmaxfn(unsigned int find, float length);
+	void     bminfn(unsigned int find, float length);
 	unsigned bpsg() noexcept;
-	void     bspacfn(size_t find, float length);
+	void     bspacfn(unsigned int find, float length);
 	bool     chkasp(fPOINT& point, float aspectRatio, HWND dialog);
 	void     chkend(unsigned offset, unsigned code, INTINF& ilData);
 	bool     chkp2cnam(const wchar_t* fileName) noexcept;
 	bool     chkrdun(const std::vector<unsigned>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord);
 	void     chkuseq(const unsigned interleaveSequenceIndex2);
-	void     delwlk(size_t code);
+	void     delwlk(unsigned int code);
 
 #ifdef _DEBUG
 	void dmprec(const std::vector<OREC*>& stitchRegion, unsigned count);
@@ -132,34 +132,34 @@ namespace internal {
 
 	constexpr float durat(float start, float finish, float featherRatio);
 
-	void     durats(size_t iSequence, fPOINT& point, FEATHER& feather) noexcept;
+	void     durats(unsigned int iSequence, fPOINT& point, FEATHER& feather) noexcept;
 	void     durec(OREC& record) noexcept;
 	unsigned dutyp(unsigned attribute) noexcept;
 
 	constexpr float duxrat(float strt, float fin, float featherRatioLocal);
 
-	void duxrats(size_t start, size_t finish, fPOINT& point, float featherRatioLocal) noexcept;
+	void duxrats(unsigned int start, unsigned int finish, fPOINT& point, float featherRatioLocal) noexcept;
 
 	BOOL CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept;
 
-	void  fangfn(size_t find, float angle);
-	void  fcolfn(size_t find, unsigned color);
-	void  fhifn(size_t find, float length);
+	void  fangfn(unsigned int find, float angle);
+	void  fcolfn(unsigned int find, unsigned color);
+	void  fhifn(unsigned int find, float length);
 	int   fil2crd(const fs::path& fileName);
-	void  findfn(size_t find, float indent);
-	void  flenfn(size_t find, float length);
-	void  fmaxfn(size_t find, float length);
-	void  fminfn(size_t find, float length);
+	void  findfn(unsigned int find, float indent);
+	void  flenfn(unsigned int find, float length);
+	void  fmaxfn(unsigned int find, float length);
+	void  fminfn(unsigned int find, float length);
 	void  fncwlk(unsigned& interleaveSequenceIndex2);
-	void  fnund(const std::vector<RNGCNT>& textureSegments, size_t find, unsigned& interleaveSequenceIndex2);
-	void  fnwlk(size_t find, unsigned& interleaveSequenceIndex2);
+	void  fnund(const std::vector<RNGCNT>& textureSegments, unsigned int find, unsigned& interleaveSequenceIndex2);
+	void  fnwlk(unsigned int find, unsigned& interleaveSequenceIndex2);
 	void  fritfil(std::vector<fPOINT>& featherSequence, unsigned& interleaveSequenceIndex2);
-	void  fspacfn(size_t find, float spacing);
-	void  fthdfn(size_t iSequence, FEATHER& feather);
-	void  fthfn(size_t iSequence, FEATHER& feather);
-	void  fthrbfn(size_t iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence);
+	void  fspacfn(unsigned int find, float spacing);
+	void  fthdfn(unsigned int iSequence, FEATHER& feather);
+	void  fthfn(unsigned int iSequence, FEATHER& feather);
+	void  fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence);
 	void  fthvars(FEATHER& feather);
-	void  fwidfn(size_t find, float length);
+	void  fwidfn(unsigned int find, float length);
 	float getstxt(unsigned stringIndex, HWND dialog);
 
 	unsigned gucon(const fPOINT& start, const fPOINT& finish, unsigned destination, unsigned code);
@@ -173,7 +173,7 @@ namespace internal {
 
 	double precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord);
 
-	void ratpnt(size_t iPoint, size_t iNextPoint, fPOINT& point, float featherRatio) noexcept;
+	void ratpnt(unsigned int iPoint, unsigned int iNextPoint, fPOINT& point, float featherRatio) noexcept;
 	bool recmp(const OREC* record1, const OREC* record2) noexcept;
 	bool refcmp(const OREC* record1, const OREC* record2) noexcept;
 	void rtrclpfn();
@@ -191,11 +191,11 @@ namespace internal {
 
 	constexpr ULARGE_INTEGER tim2int(FILETIME time) noexcept;
 
-	void uangfn(size_t find, float angle);
-	void ucolfn(size_t find, unsigned color);
-	void ulenfn(size_t find, float length);
+	void uangfn(unsigned int find, float angle);
+	void ucolfn(unsigned int find, unsigned color);
+	void ulenfn(unsigned int find, float length);
 	void undclp() noexcept;
-	void uspacfn(size_t find, float spacing);
+	void uspacfn(unsigned int find, float spacing);
 	void xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point, float featherRatioLocal) noexcept;
 }
 }

@@ -52,7 +52,7 @@ namespace internal {
 
 	unsigned icolsum(COLORREF color);
 
-	void pxlin(size_t start, size_t finish);
+	void pxlin(unsigned int start, unsigned int finish);
 	void ritrcol(COLORREF* color, unsigned number) noexcept;
 	void shownd(HWND hwnd) noexcept;
 	void stch2bit(fPOINT& point);

@@ -22,10 +22,10 @@ long dToL(double invar);
 unsigned int dToUI(double invar);
 long fToL(float invar);
 
-void GetTextExtentPoint32Int(HDC hdc, LPCTSTR lpString, size_t c, LPSIZE lpSize);
-void GetTextExtentPointInt(HDC hdc, LPCTSTR lpString, size_t cbString, LPSIZE lpSize);
-void PolylineInt(HDC hdc, const POINT* apt, size_t cpt);
-bool ReadFileInt(HANDLE file, LPVOID buffer, size_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped);
+void GetTextExtentPoint32Int(HDC hdc, LPCTSTR lpString, unsigned int c, LPSIZE lpSize);
+void GetTextExtentPointInt(HDC hdc, LPCTSTR lpString, unsigned int cbString, LPSIZE lpSize);
+void PolylineInt(HDC hdc, const POINT* apt, unsigned int cpt);
+bool ReadFileInt(HANDLE file, LPVOID buffer, unsigned int bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped);
 void setCursorInt(HCURSOR hCursor) noexcept;
-void TextOutInt(HDC hdc, int nXStart, int nYStart, LPCTSTR lpString, size_t cchString);
-void WriteFileInt(HANDLE file, LPCVOID buffer, size_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped);
+void TextOutInt(HDC hdc, int nXStart, int nYStart, LPCTSTR lpString, unsigned int cchString);
+void WriteFileInt(HANDLE file, LPCVOID buffer, unsigned int bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped);

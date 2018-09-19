@@ -39,7 +39,7 @@
 
 namespace ri = repair::internal;
 
-void repair::internal::adbad(std::wstring& repairMessage, unsigned code, size_t count) {
+void repair::internal::adbad(std::wstring& repairMessage, unsigned code, unsigned int count) {
 	std::wstring fmtStr;
 
 	displayText::loadString(fmtStr, code);
@@ -50,7 +50,7 @@ void repair::internal::adbad(std::wstring& repairMessage, unsigned code, size_t 
 
 void repair::lodchk() {
 	thred::delinf();
-	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		SelectedForm = &FormList[iForm];
 		if (!SelectedForm->type)
 			SelectedForm->type = FRMFPOLY;
@@ -82,7 +82,7 @@ void repair::lodchk() {
 			}
 		}
 	}
-	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		if (!formMap.test(iForm))
 			FormList[iForm].fillType = 0;
 	}
@@ -92,21 +92,21 @@ void repair::lodchk() {
 		if (attribute & TYPBRD)
 			formMap.set((attribute & FRMSK) >> FRMSHFT);
 	}
-	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		if (!formMap.test(iForm))
 			FormList[iForm].edgeType = 0;
 	}
 }
 
 void repair::internal::chkclp(const FRMHED* const formHeader, BADCNTS& badData) {
-	if (badData.clip == gsl::narrow<size_t>(formHeader->angleOrClipData.clip - ClipPoints))
+	if (badData.clip == gsl::narrow<unsigned int>(formHeader->angleOrClipData.clip - ClipPoints))
 		badData.clip += formHeader->lengthOrCount.clipCount;
 	else
 		badData.attribute |= BADCLP;
 }
 
 void repair::internal::chkeclp(const FRMHED* const formHeader, BADCNTS& badData) {
-	if (badData.clip == gsl::narrow<size_t>(formHeader->borderClipData - ClipPoints))
+	if (badData.clip == gsl::narrow<unsigned int>(formHeader->borderClipData - ClipPoints))
 		badData.clip += formHeader->clipEntries;
 	else
 		badData.attribute |= BADCLP;
@@ -116,12 +116,12 @@ unsigned repair::internal::frmchkfn() {
 	BADCNTS badData = {};
 
 	if (FormIndex) {
-		for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 			const auto* formHeader = &FormList[iForm];
 			if (!(badData.attribute & BADFLT)) {
 				if (!formHeader->vertexCount)
 					badData.attribute |= BADFLT;
-				if (badData.flt == gsl::narrow<size_t>(formHeader->vertices - FormVertices))
+				if (badData.flt == gsl::narrow<unsigned int>(formHeader->vertices - FormVertices))
 					badData.flt += formHeader->vertexCount;
 				else
 					badData.attribute |= BADFLT;
@@ -134,7 +134,7 @@ unsigned repair::internal::frmchkfn() {
 			}
 			if (formHeader->type == SAT && formHeader->satinGuideCount) {
 				if (!(badData.attribute & BADSAT)) {
-					if (badData.guideCount == gsl::narrow<size_t>(formHeader->satinOrAngle.guide - SatinGuides))
+					if (badData.guideCount == gsl::narrow<unsigned int>(formHeader->satinOrAngle.guide - SatinGuides))
 						badData.guideCount += formHeader->satinGuideCount;
 					else
 						badData.attribute |= BADSAT;
@@ -163,7 +163,7 @@ unsigned repair::internal::frmchkfn() {
 	return badData.attribute;
 }
 
-void repair::internal::bcup(size_t find, BADCNTS& badData) noexcept {
+void repair::internal::bcup(unsigned int find, BADCNTS& badData) noexcept {
 	const auto& formHeader = FormList[find];
 	if (clip::isclp(find))
 		badData.clip += formHeader.lengthOrCount.clipCount;
@@ -189,7 +189,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	auto    vertexCount  = 0u;
 	BADCNTS badData      = {};
 
-	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		if (FormList[iForm].vertexCount) {
 			FormList[iDestination++] = FormList[iForm];
 			vertexCount += FormList[iForm].vertexCount;
@@ -197,11 +197,12 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	}
 	FormIndex = iDestination;
 	std::vector<fPOINT> vertexPoint;
-	size_t              iVertex = 0;
+	auto              iVertex = 0u;
 	bool                flag    = true;
-	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		const auto   formHeader       = &FormList[iForm];
-		const size_t vertexDifference = formHeader->vertices - FormVertices;
+		// ToDo - find a better way than pointer arithmetic
+		const auto vertexDifference = gsl::narrow<unsigned int>(formHeader->vertices - FormVertices);
 		if (FormVertexIndex >= vertexDifference + formHeader->vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + formHeader->vertexCount);
 			auto       sourceStart = formHeader->vertices;
@@ -247,9 +248,9 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 	auto clipCount    = 0u;
 
 	std::vector<fPOINT> clipPoint;
-	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		const auto formHeader     = &FormList[iForm];
-		size_t     clipDifference = 0u;
+		auto     clipDifference = 0u;
 		if (clip::isclp(iForm)) {
 			// ToDo - pointer arithmetic to be fixed
 			clipDifference = formHeader->angleOrClipData.clip - ClipPoints;
@@ -323,11 +324,11 @@ void repair::internal::repsat() {
 	auto    guideCount = 0u;
 	BADCNTS badData    = {};
 
-	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		const auto formHeader = &FormList[iForm];
 		if (formHeader->type == SAT) {
 			// ToDo - pointer arithmetic to be fixed
-			const size_t guideDifference = formHeader->satinOrAngle.guide - SatinGuides;
+			const auto guideDifference = gsl::narrow<unsigned int>(formHeader->satinOrAngle.guide - SatinGuides);
 			if (FormVertexIndex > guideDifference + formHeader->vertexCount) {
 				auto       sourceStart = formHeader->satinOrAngle.guide;
 				auto       sourceEnd   = sourceStart + formHeader->satinGuideCount;
@@ -360,7 +361,7 @@ void repair::internal::reptx() {
 	auto    textureCount = 0u;
 	BADCNTS badData      = {};
 
-	for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		if (texture::istx(iForm)) {
 			const auto formHeader = &FormList[iForm];
 			if (gsl::narrow<unsigned short>(TextureIndex)

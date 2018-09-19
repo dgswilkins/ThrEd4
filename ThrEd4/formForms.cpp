@@ -54,7 +54,7 @@ unsigned short DaisyTypeStrings[] = {
 void formForms::maxtsiz(const std::wstring& label, POINT& textSize) {
 	SIZE labelSize;
 
-	GetTextExtentPoint32Int(GetDC(ThrEdWindow), label.data(), label.size(), &labelSize);
+	GetTextExtentPoint32Int(GetDC(ThrEdWindow), label.data(), gsl::narrow<unsigned int>(label.size()), &labelSize);
 	textSize.y = labelSize.cy;
 	if (labelSize.cx > textSize.x)
 		textSize.x = labelSize.cx;
@@ -688,7 +688,7 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 	CheckDlgButton(hWinDialog, IDC_HOLE, UserFlagMap.test(UserFlag::DAZHOL));
 	CheckDlgButton(hWinDialog, IDC_DLIN, UserFlagMap.test(UserFlag::DAZD));
 	std::wstring daisyType;
-	for (size_t iType = 0; iType < 6; iType++) {
+	for (auto iType = 0u; iType < 6; iType++) {
 		displayText::loadString(daisyType, DaisyTypeStrings[iType]);
 		[[gsl::suppress(type .1)]] SendMessage(
 		    GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str()));
@@ -796,8 +796,8 @@ void formForms::dasyfrm() {
 	petalLength *= ratio;
 	holeDiameter *= ratio;
 	SelectedForm->type = FRMFPOLY;
-	size_t iVertex     = 0;
-	size_t fref        = 0;
+	auto iVertex     = 0u;
+	auto fref        = 0u;
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
 		auto       angle               = PI2;
 		const auto holeVertexCount     = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
@@ -805,7 +805,7 @@ void formForms::dasyfrm() {
 		CurrentFormVertices[iVertex].x = referencePoint.x + diameter * cos(angle);
 		CurrentFormVertices[iVertex].y = referencePoint.y + diameter * sin(angle);
 		iVertex++;
-		for (size_t iSegment = 0; iSegment < holeVertexCount + 1; iSegment++) {
+		for (auto iSegment = 0u; iSegment < holeVertexCount + 1; iSegment++) {
 			CurrentFormVertices[iVertex].x = referencePoint.x + holeDiameter * cos(angle);
 			CurrentFormVertices[iVertex].y = referencePoint.y + holeDiameter * sin(angle);
 			iVertex++;
@@ -898,7 +898,7 @@ void formForms::dasyfrm() {
 	FormVertexIndex += iVertex;
 	StateMap.set(StateFlag::INIT);
 	form::frmout(FormIndex);
-	for (size_t iMacroPetal = 0; iMacroPetal < iVertex; iMacroPetal++) {
+	for (auto iMacroPetal = 0u; iMacroPetal < iVertex; iMacroPetal++) {
 		CurrentFormVertices[iMacroPetal].x -= SelectedForm->rectangle.left;
 		CurrentFormVertices[iMacroPetal].y -= SelectedForm->rectangle.bottom;
 	}
@@ -997,7 +997,7 @@ void formForms::setear() {
 		auto       verticalPosition = CurrentFormVertices[count + 1].y;
 		auto       iLeftVertices    = VertexCount - count;
 		auto       iRightVertices   = count + 1;
-		for (size_t iStep = 0; iStep < count; iStep++) {
+		for (auto iStep = 0u; iStep < count; iStep++) {
 			CurrentFormVertices[iRightVertices].y = CurrentFormVertices[iLeftVertices].y = verticalPosition;
 			CurrentFormVertices[iRightVertices].x += twistStep;
 			CurrentFormVertices[iLeftVertices].x += twistStep;
@@ -1034,7 +1034,7 @@ void formForms::setear() {
 		if (verticalRatio < horizontalRatio)
 			horizontalRatio = verticalRatio;
 		if (horizontalRatio < 1.0) {
-			for (size_t iVertex = 0u; iVertex < VertexCount; iVertex++) {
+			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				CurrentFormVertices[iVertex].x
 				    = (CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x) * horizontalRatio + CurrentFormVertices[0].x;
 				CurrentFormVertices[iVertex].y
@@ -1042,7 +1042,7 @@ void formForms::setear() {
 			}
 		}
 		form::frmout(FormIndex);
-		for (size_t iVertex = 0u; iVertex < VertexCount; iVertex++) {
+		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			CurrentFormVertices[iVertex].x -= SelectedForm->rectangle.left;
 			CurrentFormVertices[iVertex].y -= SelectedForm->rectangle.bottom;
 		}
@@ -1125,11 +1125,11 @@ void formForms::wavfrm() {
 			waveIndex = iNextVertex;
 		}
 		const auto count           = iPoint;
-		size_t     iVertex         = 0;
+		auto     iVertex         = 0u;
 		fPOINT     currentPosition = {};
 		for (auto iLobe = 0u; iLobe < IniFile.waveLobes; iLobe++) {
 			if (iLobe & 1) {
-				for (size_t index = 0; index < count; index++) {
+				for (auto index = 0u; index < count; index++) {
 					CurrentFormVertices[iVertex] = currentPosition;
 					iVertex++;
 					currentPosition.x += points[index].x;
@@ -1137,7 +1137,7 @@ void formForms::wavfrm() {
 				}
 			}
 			else {
-				for (size_t index = count; index != 0; index--) {
+				for (auto index = count; index != 0; index--) {
 					CurrentFormVertices[iVertex] = currentPosition;
 					iVertex++;
 					currentPosition.x += points[index - 1].x;
@@ -1149,7 +1149,7 @@ void formForms::wavfrm() {
 		const auto   vertexCount     = iVertex + 1;
 		const double rotationAngle   = -atan2(CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y,
                                             CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x);
-		for (size_t index = 0u; index < vertexCount; index++) {
+		for (auto index = 0u; index < vertexCount; index++) {
 			thred::rotflt(CurrentFormVertices[index], rotationAngle, { 0.0, 0.0 });
 		}
 		SelectedForm->type        = FRMLINE;
@@ -1166,7 +1166,7 @@ void formForms::wavfrm() {
 		if (verticalRatio < horizontalRatio)
 			horizontalRatio = verticalRatio;
 		if (horizontalRatio < 1.0) {
-			for (size_t index = 0u; index < vertexCount; index++) {
+			for (auto index = 0u; index < vertexCount; index++) {
 				CurrentFormVertices[index].x
 				    = (CurrentFormVertices[index].x - CurrentFormVertices[0].x) * horizontalRatio + CurrentFormVertices[0].x;
 				CurrentFormVertices[index].y
@@ -1174,7 +1174,7 @@ void formForms::wavfrm() {
 			}
 		}
 		form::frmout(FormIndex);
-		for (size_t index = 0u; index < vertexCount; index++) {
+		for (auto index = 0u; index < vertexCount; index++) {
 			CurrentFormVertices[index].x -= SelectedForm->rectangle.left;
 			CurrentFormVertices[index].y -= SelectedForm->rectangle.bottom;
 		}

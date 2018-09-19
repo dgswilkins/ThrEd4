@@ -725,7 +725,7 @@ void trace::internal::dutrac() {
 		decimatedLine.push_back(tracedPoints[0]);
 		ti::dutdif(traceDiff[0], tracedPoints.data());
 		OutputIndex = 1;
-		for (size_t iPoint = 1; iPoint < tracedPoints.size(); iPoint++) {
+		for (auto iPoint = 1u; iPoint < tracedPoints.size(); iPoint++) {
 			traceDiff[1] = traceDiff[0];
 			ti::dutdif(traceDiff[0], &tracedPoints[iPoint]);
 			if (traceDiff[1].x != traceDiff[0].x || traceDiff[1].y != traceDiff[0].y) {
@@ -734,8 +734,8 @@ void trace::internal::dutrac() {
 		}
 		tracedPoints.clear();
 		tracedPoints.push_back(decimatedLine[0]);
-		size_t iNext = 0u;
-		for (size_t iCurrent = 1; iCurrent < decimatedLine.size(); iCurrent++) {
+		auto iNext = 0u;
+		for (auto iCurrent = 1u; iCurrent < decimatedLine.size(); iCurrent++) {
 			const auto traceLength
 			    = hypot(decimatedLine[iCurrent].x - decimatedLine[iNext].x, decimatedLine[iCurrent].y - decimatedLine[iNext].y);
 			if (traceLength > IniFile.traceLength) {
@@ -743,7 +743,7 @@ void trace::internal::dutrac() {
 				iNext = iCurrent;
 			}
 		}
-		for (size_t iCurrent = iNext + 1; iCurrent < decimatedLine.size(); iCurrent++) {
+		for (auto iCurrent = iNext + 1; iCurrent < decimatedLine.size(); iCurrent++) {
 			tracedPoints.push_back(decimatedLine[iCurrent]);
 		}
 		SelectedForm = &FormList[FormIndex];
@@ -757,7 +757,7 @@ void trace::internal::dutrac() {
 		auto landscapeOffset     = 0.0;
 		if (StateMap.test(StateFlag::LANDSCAP))
 			landscapeOffset = UnzoomedRect.y - BitmapSizeinStitches.y;
-		for (size_t iCurrent = 1; iCurrent < tracedPoints.size(); iCurrent++) {
+		for (auto iCurrent = 1u; iCurrent < tracedPoints.size(); iCurrent++) {
 			traceLengthSum += hypot(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1].x,
 			                        tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1].y);
 			const auto traceLength
@@ -825,7 +825,7 @@ void trace::trinit() {
 				}
 			}
 			else {
-				for (size_t iPixel = 0u; iPixel < BitmapWidth * BitmapHeight; iPixel++) {
+				for (auto iPixel = 0u; iPixel < BitmapWidth * BitmapHeight; iPixel++) {
 					ti::trcols(TraceBitmapData[iPixel]);
 					for (auto iRGB = 0u; iRGB < 3; iRGB++)
 						histogramData[iRGB][PixelColors[iRGB]]++;
@@ -869,7 +869,7 @@ void trace::trcsel() {
 		trace::trace();
 		StateMap.reset(StateFlag::HIDMAP);
 		StateMap.reset(StateFlag::TRSET);
-		for (size_t iPixel = 0; iPixel < BitmapWidth * BitmapHeight; iPixel++) {
+		for (auto iPixel = 0u; iPixel < BitmapWidth * BitmapHeight; iPixel++) {
 			ti::trcols(TraceBitmapData[iPixel]);
 			auto maximumColorComponent = PixelColors[0];
 			auto iRGB                  = 2u;
@@ -982,7 +982,7 @@ void trace::internal::stch2bit(fPOINT& point) {
 	BitmapPoint.y = dToL(BitmapHeight - BmpStitchRatio.y * point.y);
 }
 
-void trace::internal::pxlin(size_t start, size_t finish) {
+void trace::internal::pxlin(unsigned int start, unsigned int finish) {
 	POINT line[2];
 
 	ti::stch2bit(CurrentFormVertices[start]);
@@ -995,7 +995,7 @@ void trace::internal::pxlin(size_t start, size_t finish) {
 
 void trace::internal::bfrm() {
 	if (VertexCount) {
-		for (size_t iVertex = 0u; iVertex < VertexCount - 1; iVertex++)
+		for (auto iVertex = 0u; iVertex < VertexCount - 1; iVertex++)
 			ti::pxlin(iVertex, iVertex + 1);
 		if (SelectedForm->type != FRMLINE)
 			ti::pxlin(VertexCount - 1, 0);
@@ -1014,7 +1014,7 @@ void trace::blak() {
 		SelectObject(TraceDC, BlackPen);
 		if (!StateMap.test(StateFlag::WASTRAC))
 			ti::getrmap();
-		for (size_t iForm = 0u; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 			form::fvars(iForm);
 			ti::bfrm();
 		}
@@ -1146,10 +1146,10 @@ void trace::internal::trcnum(unsigned shift, COLORREF color, unsigned iRGB) {
 	color >>= shift;
 	color &= 0xff;
 	_itow_s(color, buffer, 10);
-	const auto bufferLength = wcslen(buffer);
-	auto       xPosition    = gsl::narrow<unsigned int>(NumeralWidth * (3 - bufferLength) + 1);
+	const auto bufferLength = gsl::narrow<unsigned int>(wcslen(buffer));
+	const auto       xPosition    = NumeralWidth * (3 - bufferLength) + 1;
 	SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
-	TextOutInt(DrawItem->hDC, xPosition, 1, buffer, wcslen(buffer));
+	TextOutInt(DrawItem->hDC, xPosition, 1, buffer, bufferLength);
 }
 
 void trace::internal::upnum(unsigned iRGB) {
@@ -1232,13 +1232,13 @@ void trace::wasTrace() {
 				SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 			}
 			FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
-			TextOutInt(DrawItem->hDC, 1, 1, buffer, wcslen(buffer));
+			TextOutInt(DrawItem->hDC, 1, 1, buffer, gsl::narrow<unsigned int>(wcslen(buffer)));
 			break;
 		}
 		if (DrawItem->hwndItem == TraceNumberInput) {
 			FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[ColumnColor]);
 			SetBkColor(DrawItem->hDC, TraceRGB[ColumnColor]);
-			TextOutInt(DrawItem->hDC, 1, 1, TraceInputBuffer, wcslen(TraceInputBuffer));
+			TextOutInt(DrawItem->hDC, 1, 1, TraceInputBuffer, gsl::narrow<unsigned int>(wcslen(TraceInputBuffer)));
 			break;
 		}
 	}

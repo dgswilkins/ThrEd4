@@ -70,8 +70,8 @@ void displayText::shoMsg(const std::wstring& message) {
 	if (message.size()) {
 		std::vector<std::wstring> strings;
 
-		size_t     iString              = 0;
-		size_t     previousStringLength = 0;
+		auto     iString              = 0u;
+		auto     previousStringLength = 0u;
 		const auto sizeLim              = message.size();
 		while (iString < sizeLim) {
 			if (message[iString] == 10) {
@@ -83,8 +83,8 @@ void displayText::shoMsg(const std::wstring& message) {
 		}
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
 		SIZE textSize = {}, messageSize = {};
-		for (size_t index = 0; index < strings.size(); index++) {
-			GetTextExtentPoint32Int(GetDC(ThrEdWindow), strings[index].c_str(), strings[index].size(), &textSize);
+		for (auto index = 0u; index < strings.size(); index++) {
+			GetTextExtentPoint32Int(GetDC(ThrEdWindow), strings[index].c_str(), gsl::narrow<unsigned int>(strings[index].size()), &textSize);
 			if (textSize.cx > messageSize.cx)
 				messageSize.cx = textSize.cx;
 			if (textSize.cy > messageSize.cy)
@@ -215,7 +215,7 @@ void displayText::clrhbut(unsigned startButton) {
 		SetWindowText((*ButtonWin)[iButton], L"");
 }
 
-void displayText::ritnum(unsigned code, size_t value) {
+void displayText::ritnum(unsigned code, unsigned int value) {
 	displayText::butxt(HNUM, fmt::format((*StringTable)[code], value));
 }
 
@@ -437,7 +437,7 @@ void displayText::tomsg() {
 	SIZE textSize;
 
 	GetWindowRect(OKButton, &OKrect);
-	GetTextExtentPoint32Int(GetDC(ThrEdWindow), (*StringTable)[STR_DELST2].c_str(), (*StringTable)[STR_DELST2].size(), &textSize);
+	GetTextExtentPoint32Int(GetDC(ThrEdWindow), (*StringTable)[STR_DELST2].c_str(), gsl::narrow<unsigned int>((*StringTable)[STR_DELST2].size()), &textSize);
 	DeleteStitchesDialog = CreateWindow(L"STATIC",
 	                                    (*StringTable)[STR_DELST2].c_str(),
 	                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,

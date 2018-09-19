@@ -28,7 +28,7 @@ void        numWnd() noexcept;
 void        okcan();
 void        pntmsg(unsigned msgID);
 void        riter();
-void        ritnum(unsigned code, size_t value);
+void        ritnum(unsigned code, unsigned int value);
 void        tabmsg(unsigned code);
 void        savdisc();
 void        setWindowFont(HWND hWnd, HFONT hFont) noexcept;

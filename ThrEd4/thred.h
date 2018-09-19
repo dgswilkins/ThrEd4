@@ -31,8 +31,8 @@ namespace fs = std::experimental::filesystem;
 
 namespace thred {
 
-fPOINT*  adclp(size_t count) noexcept;
-fPOINT*  adflt(size_t count);
+fPOINT*  adclp(unsigned int count) noexcept;
+fPOINT*  adflt(unsigned int count);
 void     bBox() noexcept;
 void     chkmen() noexcept;
 void     chkrng(fPOINT& range);
@@ -49,7 +49,7 @@ void     grpAdj();
 void     hidbit();
 void     movStch();
 
-void inline mvstch(size_t destination, size_t source) noexcept;
+void inline mvstch(unsigned int destination, unsigned int source) noexcept;
 
 void mvstchs(unsigned destination, unsigned source, unsigned count);
 
@@ -67,7 +67,7 @@ void rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, double rotation
 
 void rotflt(fPOINT& point, const double rotationAngle, const dPOINT& rotationCenter) noexcept;
 void rotfn(double rotationAngle, const dPOINT& rotationCenter);
-void rtclpfn(size_t destination, size_t source);
+void rtclpfn(unsigned int destination, unsigned int source);
 void sCor2px(const dPOINT& stitchCoordinate, POINT& pixelCoordinate);
 void savdo();
 void save();
@@ -200,7 +200,7 @@ namespace internal {
 	void dupclp();
 	void duprct();
 	void durcntr(dPOINT& rotationCenter) noexcept;
-	void durit(char** destination, const void* const source, size_t count) noexcept;
+	void durit(char** destination, const void* const source, unsigned int count) noexcept;
 	void durot() noexcept;
 	void durotu() noexcept;
 	void dusel(HDC dc);
@@ -222,17 +222,17 @@ namespace internal {
 	void     fil2sel(unsigned stat);
 	void     filclos();
 	void     filfrms();
-	bool     finrng(size_t find) noexcept;
+	bool     finrng(unsigned int find) noexcept;
 	void     fixpclp();
 	void     fnamtabs();
 	void     fndknt() noexcept;
 	void     fop();
 	void     frmcalc();
-	unsigned frmcnt(size_t iForm, unsigned formFirstStitchIndex) noexcept;
+	unsigned frmcnt(unsigned int iForm, unsigned formFirstStitchIndex) noexcept;
 	void     frmcurmen();
 	void     frmcursel(unsigned cursorType);
 	void     frmpos(float deltaX, float deltaY) noexcept;
-	void     frmsnap(fPOINT* start, size_t count) noexcept;
+	void     frmsnap(fPOINT* start, unsigned int count) noexcept;
 	bool     frmstch();
 	COLORREF fswap(COLORREF color) noexcept;
 
@@ -316,7 +316,7 @@ namespace internal {
 	void     nunams();
 	void     nuscol(unsigned iColor) noexcept;
 	void     nuselrct();
-	void     nuslst(size_t find);
+	void     nuslst(unsigned int find);
 	void     nuthbak(unsigned count);
 	void     nuthsel();
 	void     nuthum(char character);
@@ -392,7 +392,7 @@ namespace internal {
 	void        sachk() noexcept;
 	void        sav();
 	void        savAs();
-	void        savclp(size_t destination, size_t source);
+	void        savclp(unsigned int destination, unsigned int source);
 	bool        savcmp() noexcept;
 	void        savdst(std::vector<DSTREC>& DSTRecords, unsigned data);
 	void        savmap();
@@ -425,8 +425,8 @@ namespace internal {
 	bool        sidclp() noexcept;
 	void        sidhup();
 	void        sidmsg(HWND window, std::wstring* const strings, unsigned entries);
-	size_t      sizclp(unsigned formFirstStitchIndex) noexcept;
-	size_t      sizfclp() noexcept;
+	unsigned int      sizclp(unsigned formFirstStitchIndex) noexcept;
+	unsigned int      sizfclp();
 	void        sizstch(fRECTANGLE& rectangle, const fPOINTATTR* const stitches) noexcept;
 	void        srchk();
 	unsigned    srchknot(unsigned source) noexcept;
@@ -493,7 +493,7 @@ namespace internal {
 #endif
 
 #ifdef ALLOCFAILURE
-	int handle_program_memory_depletion(size_t);
+	int handle_program_memory_depletion(unsigned int);
 #endif
 } // namespace internal
 } // namespace ThrEd

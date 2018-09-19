@@ -89,29 +89,29 @@ extern unsigned   ButtonWidthX3;
 
 extern std::vector<HWND>* ButtonWin;
 
-extern float      ButtonholeCornerLength;
-extern HWND       CancelButton;
-extern unsigned   Clip;
-extern fPOINTATTR ClipBuffer[MAXITEMS];
-extern FORMCLIP*  ClipFormHeader;
-extern HGLOBAL    ClipMemory;
-extern size_t     ClipPointIndex;
-extern void*      ClipPointer;
-extern fPOINT     ClipPoints[MAXITEMS];
-extern fRECTANGLE ClipRect;
-extern FLSIZ      ClipRectSize;
-extern size_t     ClipStitchCount;
-extern CLPSTCH*   ClipStitchData;
-extern unsigned   ClipTypeMap;
-extern size_t     ClosestFormToCursor;
-extern unsigned   ClosestPointIndex;
-extern size_t     ClosestVertexToCursor;
-extern HCURSOR    CrossCursor;
-extern SATCON*    CurrentFormGuides;
-extern size_t     CurrentFormGuidesCount;
-extern fPOINT*    CurrentFormVertices;
-extern HWND       DefaultColorWin[16];
-extern HWND       DeleteStitchesDialog;
+extern float        ButtonholeCornerLength;
+extern HWND         CancelButton;
+extern unsigned     Clip;
+extern fPOINTATTR   ClipBuffer[MAXITEMS];
+extern FORMCLIP*    ClipFormHeader;
+extern HGLOBAL      ClipMemory;
+extern unsigned int ClipPointIndex;
+extern void*        ClipPointer;
+extern fPOINT       ClipPoints[MAXITEMS];
+extern fRECTANGLE   ClipRect;
+extern FLSIZ        ClipRectSize;
+extern unsigned int ClipStitchCount;
+extern CLPSTCH*     ClipStitchData;
+extern unsigned     ClipTypeMap;
+extern unsigned int ClosestFormToCursor;
+extern unsigned     ClosestPointIndex;
+extern unsigned int ClosestVertexToCursor;
+extern HCURSOR      CrossCursor;
+extern SATCON*      CurrentFormGuides;
+extern unsigned int CurrentFormGuidesCount;
+extern fPOINT*      CurrentFormVertices;
+extern HWND         DefaultColorWin[16];
+extern HWND         DeleteStitchesDialog;
 
 extern std::wstring*   DesignerName;
 extern HWND            DiscardButton;
@@ -122,19 +122,19 @@ extern HMENU           FillMenu;
 extern std::vector<double>* FormAngles;
 extern std::vector<POINT>*  FormControlPoints;
 
-extern HWND     FormDataSheet;
-extern size_t   FormIndex;
-extern POINT    FormLines[MAXFRMLINS];
-extern FRMHED   FormList[MAXFORMS];
-extern unsigned FormMenuChoice;
-extern fPOINT   FormMoveDelta;
+extern HWND         FormDataSheet;
+extern unsigned int FormIndex;
+extern POINT        FormLines[MAXFRMLINS];
+extern FRMHED       FormList[MAXFORMS];
+extern unsigned int FormMenuChoice;
+extern fPOINT       FormMoveDelta;
 
 extern std::wstring* FormOnOff;
 
 extern HPEN      FormPen3px;
 extern HPEN      FormPen;
 extern HPEN      FormSelectedPen;
-extern size_t    FormVertexIndex;
+extern unsigned  FormVertexIndex;
 extern fPOINT    FormVertices[MAXITEMS];
 extern HWND      GeneralNumberInputBox;
 extern HPEN      GridPen;
@@ -168,18 +168,18 @@ extern float  MaxStitchLen;
 
 extern MENUITEMINFO* MenuInfo;
 
-extern double   MinStitchLength;
-extern MSG      Msg;
-extern wchar_t  MsgBuffer[MSGSIZ];
-extern unsigned MsgIndex;
-extern RECT     MsgRect;
-extern HWND     MsgWindow;
-extern HPEN     MultiFormPen;
-extern unsigned NearestCount;
-extern size_t   NewFormVertexCount;
-extern HWND     OKButton;
-extern fPOINT   OSequence[OSEQLEN];
-extern size_t   OutputIndex;
+extern double       MinStitchLength;
+extern MSG          Msg;
+extern wchar_t      MsgBuffer[MSGSIZ];
+extern unsigned     MsgIndex;
+extern RECT         MsgRect;
+extern HWND         MsgWindow;
+extern HPEN         MultiFormPen;
+extern unsigned     NearestCount;
+extern unsigned int NewFormVertexCount;
+extern HWND         OKButton;
+extern fPOINT       OSequence[OSEQLEN];
+extern unsigned int OutputIndex;
 
 extern std::vector<fPOINT>* OutsidePointList;
 extern std::vector<fPOINT>* OutsidePoints;
@@ -191,24 +191,24 @@ extern float          PicotSpacing;
 extern unsigned       PreferenceIndex;
 extern long           PreferenceWindowWidth;
 extern HWND           PreferencesWindow;
-extern size_t         PreviousFormIndex;
+extern unsigned int   PreviousFormIndex;
 extern unsigned       PseudoRandomValue;
 extern fRECTANGLE     RotationRect;
 
 extern std::vector<POINT>* RubberBandLine;
 
-extern size_t   SatinEndGuide;
-extern size_t   SatinGuideIndex;
-extern SATCON   SatinGuides[MAXSAC];
-extern RECT     scRct;
-extern unsigned SearchLineIndex;
-extern HPEN     SelectAllPen;
-extern FRMHED*  SelectedForm;
-extern unsigned SelectedFormControlVertex;
+extern unsigned int SatinEndGuide;
+extern unsigned int SatinGuideIndex;
+extern SATCON       SatinGuides[MAXSAC];
+extern RECT         scRct;
+extern unsigned     SearchLineIndex;
+extern HPEN         SelectAllPen;
+extern FRMHED*      SelectedForm;
+extern unsigned     SelectedFormControlVertex;
 
-extern std::vector<size_t>* SelectedFormList;
-extern FORMVERTICES         SelectedFormVertices;
-extern std::vector<POINT>*  SelectedFormsLine;
+extern std::vector<unsigned int>* SelectedFormList;
+extern FORMVERTICES               SelectedFormVertices;
+extern std::vector<POINT>*        SelectedFormsLine;
 
 extern RECT   SelectedFormsRect;
 extern fPOINT SelectedFormsSize;
@@ -217,16 +217,16 @@ extern fPOINT SelectedPoint;
 
 extern std::vector<POINT>* SelectedPointsLine;
 
-extern fRECTANGLE SelectedVerticesRect;
-extern size_t     SequenceIndex;
-extern double     ShowStitchThreshold;
-extern HWND       SideMessageWindow;
-extern wchar_t    SideWindowEntryBuffer[11];
-extern HWND       SideWindow[16];
-extern double     SmallStitchLength;
-extern double     SnapLength;
-extern double     SpiralWrap;
-extern double     StarRatio;
+extern fRECTANGLE   SelectedVerticesRect;
+extern unsigned int SequenceIndex;
+extern double       ShowStitchThreshold;
+extern HWND         SideMessageWindow;
+extern wchar_t      SideWindowEntryBuffer[11];
+extern HWND         SideWindow[16];
+extern double       SmallStitchLength;
+extern double       SnapLength;
+extern double       SpiralWrap;
+extern double       StarRatio;
 
 extern EnumMap<StateFlag> StateMap;
 
@@ -244,7 +244,7 @@ extern POINT      StitchWindowSize;
 extern std::vector<std::wstring>* StringTable;
 
 extern std::vector<fPOINT>* TempPolygon;
-extern size_t               TextureIndex;
+extern unsigned int         TextureIndex;
 extern std::wstring*        TextureInputBuffer;
 extern std::vector<TXPNT>*  TexturePointsBuffer;
 extern HWND                 ThreadSizeWin[16];
@@ -271,13 +271,13 @@ extern double UserStitchLength;
 
 extern std::vector<HWND>* ValueWindow;
 
-extern size_t     VertexCount;
-extern double     VerticalRatio;
-extern HWND       VerticalScrollBar;
-extern fs::path*  WorkingFileName;
-extern POINT      ZoomBoxLine[5];
-extern fPOINT     ZoomBoxOrigin;
-extern double     ZoomFactor;
-extern dPOINT     ZoomMarkPoint;
-extern dPOINT     ZoomRatio;
-extern dRECTANGLE ZoomRect;
+extern unsigned int VertexCount;
+extern double       VerticalRatio;
+extern HWND         VerticalScrollBar;
+extern fs::path*    WorkingFileName;
+extern POINT        ZoomBoxLine[5];
+extern fPOINT       ZoomBoxOrigin;
+extern double       ZoomFactor;
+extern dPOINT       ZoomMarkPoint;
+extern dPOINT       ZoomRatio;
+extern dRECTANGLE   ZoomRect;
