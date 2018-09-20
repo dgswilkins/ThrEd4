@@ -792,7 +792,7 @@ public:
 	    : x(0.0)
 	    , y(0.0) {
 	}
-	inline dPOINT(const fPOINT& rhs);
+	explicit inline dPOINT(const fPOINT& rhs);
 	inline dPOINT(float rhsX, float rhsY) noexcept;
 	inline dPOINT(double rhsX, double rhsY) noexcept;
 	inline bool    operator==(const dPOINT& rhs) const noexcept;
@@ -811,6 +811,7 @@ public:
 	    , y(0.0f) {
 	}
 	inline fPOINT(double rhsX, double rhsY) noexcept;
+	explicit inline fPOINT(const dPOINT& rhs) noexcept;
 	inline bool    operator==(const fPOINT& rhs) const noexcept;
 	inline fPOINT& operator=(const dPOINT& rhs) noexcept;
 	inline fPOINT& operator=(const fPOINTATTR& rhs) noexcept;
@@ -852,6 +853,11 @@ inline bool fPOINT::operator==(const fPOINT& rhs) const noexcept {
 inline fPOINT::fPOINT(double rhsX, double rhsY) noexcept
     : x(rhsX)
     , y(rhsY) {
+}
+
+inline fPOINT::fPOINT(const dPOINT& rhs) noexcept {
+	x = gsl::narrow_cast<float>(rhs.x);
+	y = gsl::narrow_cast<float>(rhs.y);
 }
 
 inline fPOINT& fPOINT::operator=(const dPOINT& rhs) noexcept {
@@ -1050,7 +1056,7 @@ public:
 	// SATCONOUT& operator=(SATCONOUT&&) = default;
 	//~SATCONOUT() = default;
 
-	SATCONOUT(const SATCON& rhs);
+	explicit SATCONOUT(const SATCON& rhs);
 	inline SATCONOUT& operator=(const SATCON& rhs);
 };
 
@@ -1429,7 +1435,7 @@ public:
 	// FRMHEDOUT& operator=(FRMHEDOUT&&) = default;
 	//~FRMHEDOUT() = default;
 
-	inline FRMHEDOUT(const FRMHED& rhs);
+	explicit inline FRMHEDOUT(const FRMHED& rhs);
 	inline FRMHEDOUT& operator=(const FRMHED& rhs);
 };
 

@@ -70,8 +70,8 @@ void displayText::shoMsg(const std::wstring& message) {
 	if (message.size()) {
 		std::vector<std::wstring> strings;
 
-		auto     iString              = 0u;
-		auto     previousStringLength = 0u;
+		auto       iString              = 0u;
+		auto       previousStringLength = 0u;
 		const auto sizeLim              = message.size();
 		while (iString < sizeLim) {
 			if (message[iString] == 10) {
@@ -84,7 +84,8 @@ void displayText::shoMsg(const std::wstring& message) {
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
 		SIZE textSize = {}, messageSize = {};
 		for (auto index = 0u; index < strings.size(); index++) {
-			GetTextExtentPoint32Int(GetDC(ThrEdWindow), strings[index].c_str(), gsl::narrow<unsigned int>(strings[index].size()), &textSize);
+			GetTextExtentPoint32Int(
+			    GetDC(ThrEdWindow), strings[index].c_str(), gsl::narrow<unsigned int>(strings[index].size()), &textSize);
 			if (textSize.cx > messageSize.cx)
 				messageSize.cx = textSize.cx;
 			if (textSize.cy > messageSize.cy)
@@ -151,7 +152,7 @@ void displayText::numWnd() noexcept {
 	                                     ThrEdInstance,
 	                                     nullptr);
 	MsgIndex              = 0;
-	*MsgBuffer            = 0;
+	MsgBuffer[0]          = 0;
 }
 
 void displayText::msgflt(unsigned messageId, float value) {
@@ -263,7 +264,7 @@ void displayText::frm1pnt() {
 bool displayText::filmsgs(unsigned code) {
 	if (SelectedFormList->size())
 		return displayText::clpmsgs(code);
-	if (FormIndex) {
+	if (FormIndex != 0) {
 		displayText::frm1pnt();
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			SelectedForm = &FormList[ClosestFormToCursor];
@@ -420,11 +421,11 @@ void displayText::savdisc() {
 }
 
 #pragma warning(push)
-#pragma warning(disable : 26493)  // we use c style casts as this is a C API
+#pragma warning(disable : 26493) // we use c style casts as this is a C API
 void displayText::updateWinFont(HWND hWnd) noexcept {
 	auto const* hFont = displayText::getThrEdFont(400);
 	EnumChildWindows(hWnd,
-	                 [](HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
+	                 [](HWND p_hWnd, LPARAM lParam) noexcept->BOOL {
 		                 SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
 		                 return TRUE;
 	                 },
@@ -437,7 +438,10 @@ void displayText::tomsg() {
 	SIZE textSize;
 
 	GetWindowRect(OKButton, &OKrect);
-	GetTextExtentPoint32Int(GetDC(ThrEdWindow), (*StringTable)[STR_DELST2].c_str(), gsl::narrow<unsigned int>((*StringTable)[STR_DELST2].size()), &textSize);
+	GetTextExtentPoint32Int(GetDC(ThrEdWindow),
+	                        (*StringTable)[STR_DELST2].c_str(),
+	                        gsl::narrow<unsigned int>((*StringTable)[STR_DELST2].size()),
+	                        &textSize);
 	DeleteStitchesDialog = CreateWindow(L"STATIC",
 	                                    (*StringTable)[STR_DELST2].c_str(),
 	                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,

@@ -14,7 +14,7 @@ class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator>
 	typedef boost::dynamic_bitset<Block, Allocator> super;
 
 public:
-	[[gsl::suppress(26434)]] ExtendedBitSet(std::size_t bits)
+	[[gsl::suppress(26434)]] explicit ExtendedBitSet(std::size_t bits)
 	    : super::dynamic_bitset(bits) {
 	}
 

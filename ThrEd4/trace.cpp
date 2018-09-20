@@ -112,6 +112,7 @@ void trace::internal::trcols(COLORREF color) noexcept {
 	PixelColors[2] = (color & 0xff0000) >> 16;
 }
 
+/*
 unsigned trace::internal::colsum(COLORREF color) {
 	auto colorSum = 0u;
 
@@ -122,7 +123,9 @@ unsigned trace::internal::colsum(COLORREF color) {
 	}
 	return colorSum;
 }
+*/
 
+/*
 unsigned trace::internal::icolsum(COLORREF color) {
 	auto colorSum = 0u;
 
@@ -133,6 +136,7 @@ unsigned trace::internal::icolsum(COLORREF color) {
 	}
 	return colorSum;
 }
+*/
 
 void trace::internal::trcstpnum() {
 	std::wstring fmtStr;
@@ -790,14 +794,13 @@ void trace::internal::dutrac() {
 
 void trace::trinit() {
 	unsigned histogramData[3][256] = { 0 };
-	unsigned componentPeakCount[3] = { 0 };
-	unsigned componentPeak[3]      = { 0 };
 
 	if (PCSBMPFileName[0]) {
 		if (!StateMap.test(StateFlag::TRSET)) {
 			StateMap.set(StateFlag::TRCRED);
 			StateMap.set(StateFlag::TRCGRN);
 			StateMap.set(StateFlag::TRCBLU);
+			unsigned componentPeak[3] = { 0 };
 			if (!StateMap.test(StateFlag::WASTRAC))
 				ti::getrmap();
 			if (StateMap.test(StateFlag::MONOMAP)) {
@@ -830,8 +833,7 @@ void trace::trinit() {
 					for (auto iRGB = 0u; iRGB < 3; iRGB++)
 						histogramData[iRGB][PixelColors[iRGB]]++;
 				}
-				for (auto iRGB = 0u; iRGB < 3; iRGB++)
-					componentPeakCount[iRGB] = 0;
+				unsigned componentPeakCount[3] = { 0 };
 				for (auto iLevel = 0u; iLevel < 256; iLevel++) {
 					for (auto iRGB = 0u; iRGB < 3; iRGB++) {
 						if (histogramData[iRGB][iLevel] > componentPeakCount[iRGB]) {

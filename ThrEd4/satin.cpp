@@ -845,7 +845,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 			iVertex     = form::prv(iNextVertex);
 		}
 		line2StitchCounts.push_back(stitchCount - segmentStitchCount);
-		dPOINT line1Point    = CurrentFormVertices[line1Start];
+		dPOINT line1Point(CurrentFormVertices[line1Start]);
 		auto   line1Next     = form::nxt(line1Start);
 		auto   line2Previous = form::prv(line2Start);
 		auto   line1Count    = line1StitchCounts[0];
@@ -1065,7 +1065,7 @@ void satin::satfil() {
 						OSequence[0] = SelectedPoint = CurrentFormVertices[1];
 						SequenceIndex                = 1;
 					}
-					while ((length > lengths[iVertex]) && (iVertex < (VertexCount + 1))) {
+					while ((iVertex < (VertexCount + 1)) && (length > lengths[iVertex])) {
 						iVertex++;
 					}
 					const auto deltaA = lengths[iVertex] - length;
@@ -1180,7 +1180,6 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 
 	auto innerFlag     = false;
 	auto outerFlag     = false;
-	bool intersectFlag = false;
 	auto count         = 0u;
 
 	if (!StateMap.testAndSet(StateFlag::SAT1)) {
@@ -1196,7 +1195,6 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 
 		dPOINT intersection = {};
 		if (form::linx(insidePoints, start, finish, intersection)) {
-			intersectFlag = true;
 			innerDelta    = {};
 			innerLength   = 0;
 			innerPoint    = intersection;
@@ -1208,7 +1206,6 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 
 		dPOINT intersection = {};
 		if (form::linx(insidePoints, start, finish, intersection)) {
-			intersectFlag = true;
 			outerDelta    = {};
 			outerLength   = 0;
 			outerPoint    = intersection;

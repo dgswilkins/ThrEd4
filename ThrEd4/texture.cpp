@@ -70,11 +70,11 @@ bool texture::internal::txnam(wchar_t* name, int sizeName) {
 }
 
 void texture::txdun() {
-	wchar_t               name[_MAX_PATH] = { 0 };
 	const char            signature[4]    = "txh";
 	std::vector<TXHSTBUF> textureHistoryBuffer(ITXBUFLEN);
 
 	if (TextureHistory[0].texturePoint.size()) {
+		wchar_t               name[_MAX_PATH] = { 0 };
 		if (txi::txnam(name, sizeof(name) / sizeof(name[0]))) {
 			DWORD bytesWritten = 0;
 			auto  handle       = CreateFile(name, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
@@ -618,9 +618,8 @@ void texture::internal::setxclp() {
 	if (AngledForm.type != FRMLINE)
 		lineCount++;
 	VertexCount      = AngledForm.vertexCount;
-	auto iNextVertex = 0;
 	for (auto iLine = 0u; iLine < lineCount; iLine++) {
-		iNextVertex = form::nxt(iLine);
+		const auto iNextVertex = form::nxt(iLine);
 		txi::dutxlin(AngledFormVertices[iLine], AngledFormVertices[iNextVertex]);
 	}
 }
@@ -1386,9 +1385,9 @@ void texture::txsnap() {
 
 void texture::txtkey(unsigned keyCode) {
 	char character = {};
-	bool flag      = true;
 
 	if (SideWindowButton) {
+		bool flag = true;
 		switch (keyCode) {
 		case VK_RETURN: {
 			txi::chktxnum();

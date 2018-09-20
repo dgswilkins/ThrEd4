@@ -440,11 +440,13 @@ void formForms::internal::refrmfn() {
 	}
 }
 
+/*
 BOOL CALLBACK formForms::internal::chenum(HWND hwnd, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	return DestroyWindow(hwnd);
 }
+*/
 
 void formForms::refrm() {
 	SelectedForm = &FormList[ClosestFormToCursor];
@@ -519,17 +521,17 @@ void formForms::prfsid(HWND wnd) noexcept {
 }
 
 void formForms::internal::prftwin(const std::wstring& text) noexcept {
-	auto _ = CreateWindow(L"STATIC",
-	                      text.c_str(),
-	                      WS_CHILD | WS_VISIBLE,
-	                      LabelWindowCoords.left,
-	                      LabelWindowCoords.top,
-	                      LabelWindowCoords.right - LabelWindowCoords.left,
-	                      LabelWindowCoords.bottom - LabelWindowCoords.top,
-	                      PreferencesWindow,
-	                      nullptr,
-	                      ThrEdInstance,
-	                      nullptr);
+	CreateWindow(L"STATIC",
+	             text.c_str(),
+	             WS_CHILD | WS_VISIBLE,
+	             LabelWindowCoords.left,
+	             LabelWindowCoords.top,
+	             LabelWindowCoords.right - LabelWindowCoords.left,
+	             LabelWindowCoords.bottom - LabelWindowCoords.top,
+	             PreferencesWindow,
+	             nullptr,
+	             ThrEdInstance,
+	             nullptr);
 }
 
 HWND formForms::internal::prfnwin(const std::wstring& text) noexcept {
@@ -699,8 +701,6 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	wchar_t buffer[HBUFSIZ]        = { 0 };
-	wchar_t compareBuffer[HBUFSIZ] = { 0 };
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
@@ -715,6 +715,7 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			return TRUE;
 		}
 		case IDOK: {
+			wchar_t buffer[HBUFSIZ] = { 0 };
 			GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer, HBUFSIZ);
 			IniFile.daisyPetalPoints = std::stoi(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer, HBUFSIZ);
@@ -738,6 +739,7 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			else
 				UserFlagMap.reset(UserFlag::DAZD);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer, HBUFSIZ);
+			wchar_t compareBuffer[HBUFSIZ] = { 0 };
 			for (unsigned char iType = 0; iType < 6; iType++) {
 				LoadString(ThrEdInstance, DaisyTypeStrings[iType], compareBuffer, HBUFSIZ);
 				if (!wcscmp(buffer, compareBuffer)) {
@@ -919,7 +921,6 @@ inline void formForms::internal::initTearDlg(HWND hwndlg) {
 bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	wchar_t buffer[HBUFSIZ] = { 0 };
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
@@ -951,6 +952,7 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 			return TRUE;
 		}
 		case IDOK: {
+			wchar_t buffer[HBUFSIZ] = { 0 };
 			GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer, HBUFSIZ);
 			IniFile.formSides = gsl::narrow<unsigned short>(std::stoi(buffer));
 			GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer, HBUFSIZ);
@@ -1059,7 +1061,6 @@ inline void formForms::internal::wavinit(HWND hwndlg) {
 bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	wchar_t buffer[HBUFSIZ] = { 0 };
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
@@ -1074,6 +1075,7 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 			return TRUE;
 		}
 		case IDOK: {
+			wchar_t buffer[HBUFSIZ] = { 0 };
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer, HBUFSIZ);
 			IniFile.wavePoints = gsl::narrow<unsigned short>(std::stoi(buffer));
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer, HBUFSIZ);

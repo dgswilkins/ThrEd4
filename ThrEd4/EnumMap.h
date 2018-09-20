@@ -24,7 +24,7 @@ template <typename EnumType> class EnumMap
 	              "Enum provided to EnumMap must have a \"EnumCount\" option as the last element in the enum.");
 
 public:
-	constexpr EnumMap(unsigned i_val)
+	explicit constexpr EnumMap(unsigned i_val)
 	    : mask_(i_val) {
 	}
 	inline bool test(const EnumType i_key) const {

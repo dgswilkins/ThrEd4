@@ -658,10 +658,10 @@ void form::drwfrm() {
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		form::fvars(iForm);
 		form::frmlin(SelectedForm->vertices, VertexCount);
-		auto lastPoint = 0u;
 		auto layer     = ((SelectedForm->attribute & FRMLMSK) >> 1);
 		if (!ActiveLayer || !layer || layer == ActiveLayer) {
 			POINT line[2] = {};
+			auto lastPoint = 0u;
 			if (SelectedForm->type == SAT) {
 				if (SelectedForm->attribute & FRMEND) {
 					SelectObject(StitchWindowMemDC, FormPen3px);
@@ -687,7 +687,7 @@ void form::drwfrm() {
 			if (SelectedForm->type == FRMLINE) {
 				fi::frmpoly(FormLines, VertexCount);
 				if (SelectedForm->fillType == CONTF) {
-					dPOINT point = CurrentFormVertices[SelectedForm->angleOrClipData.guide.start];
+					dPOINT point(CurrentFormVertices[SelectedForm->angleOrClipData.guide.start]);
 					thred::sCor2px(point, line[0]);
 					point = CurrentFormVertices[SelectedForm->angleOrClipData.guide.finish];
 					thred::sCor2px(point, line[1]);
@@ -1299,11 +1299,11 @@ bool form::lastch() noexcept {
 }
 
 unsigned int form::getlast() noexcept {
-	auto closestVertex = 0u;
 
 	if (SelectedForm->fillType) {
 		form::lastch();
 		auto minimumLength = 1e99;
+		auto closestVertex = 0u;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			const auto dx     = LastPoint.x - CurrentFormVertices[iVertex].x;
 			const auto dy     = LastPoint.y - CurrentFormVertices[iVertex].y;
@@ -1348,9 +1348,11 @@ void form::internal::linrutb(unsigned start) {
 	const auto spacing = LineSpacing;
 
 	for (auto iVertex = start + 1; iVertex < VertexCount; iVertex++) {
-		form::filinsb(CurrentFormVertices[iVertex]);
+		const dPOINT temp(CurrentFormVertices[iVertex]);
+		form::filinsb(temp);
 	}
-	form::filinsb(CurrentFormVertices[0]);
+	const dPOINT temp(CurrentFormVertices[0]);
+	form::filinsb(temp);
 	LineSpacing = spacing;
 }
 
@@ -1539,10 +1541,9 @@ bool form::cisin(float xCoordinate, float yCoordinate) noexcept {
 	if (yCoordinate <= rectangle->bottom)
 		return false;
 	auto   count        = 0u;
-	auto   nextVertex   = 0u;
 	dPOINT intersection = {};
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
-		nextVertex = nxt(iVertex);
+		const auto nextVertex = nxt(iVertex);
 		if (fi::projv(xCoordinate, CurrentFormVertices[iVertex], CurrentFormVertices[nextVertex], intersection)) {
 			if (intersection.y >= yCoordinate) {
 				if (CurrentFormVertices[iVertex].x != xCoordinate && CurrentFormVertices[nextVertex].x != xCoordinate)
@@ -2700,8 +2701,7 @@ unsigned form::internal::insect(std::vector<CLIPSORT>&    clipIntersectData,
                                 std::vector<CLIPSORT*>&   arrayOfClipIntersectData,
                                 unsigned                  regionCrossingStart,
                                 unsigned                  regionCrossingEnd) {
-	auto       iRegions = 0u, iDestination = 0u, iIntersection = 0u, count = 0u;
-	auto       currentVertex = 0u, nextVertex = 0u;
+	auto       iRegions = 0u, iIntersection = 0u, count = 0u;
 	fRECTANGLE lineSegmentRect = {};
 	fPOINT*    intersection    = nullptr;
 
@@ -2724,8 +2724,8 @@ unsigned form::internal::insect(std::vector<CLIPSORT>&    clipIntersectData,
 	iIntersection = count = 0;
 	arrayOfClipIntersectData.clear();
 	for (iRegions = regionCrossingStart; iRegions < regionCrossingEnd; iRegions++) {
-		currentVertex = regionCrossingData[iRegions].vertex;
-		nextVertex    = form::nxt(currentVertex);
+		const auto currentVertex = regionCrossingData[iRegions].vertex;
+		const auto nextVertex    = form::nxt(currentVertex);
 		if (isect(
 		        currentVertex, nextVertex, clipIntersectData[iIntersection].point, clipIntersectData[iIntersection].sideLength)) {
 			intersection = &clipIntersectData[iIntersection].point;
@@ -2743,7 +2743,7 @@ unsigned form::internal::insect(std::vector<CLIPSORT>&    clipIntersectData,
 	}
 	if (count > 1) {
 		std::sort(arrayOfClipIntersectData.begin(), arrayOfClipIntersectData.end(), lencmpa);
-		iDestination = 1;
+		auto iDestination = 1u;
 		for (iIntersection = 0; iIntersection < count - 1; iIntersection++) {
 			if (fabs(arrayOfClipIntersectData[iIntersection]->segmentLength
 			         - arrayOfClipIntersectData[iIntersection + 1]->segmentLength)
@@ -3002,12 +3002,12 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 	std::vector<CLIPNT> clipStitchPoints;
 	// Reserve some memory, but probably not enough
 	clipStitchPoints.reserve(1000);
-	bool   breakFlag     = false;
 	fPOINT pasteLocation = {};
 	TXPNT* texture       = nullptr;
 	auto   iclpxSize     = iclpx.size();
 	if (iclpxSize) {
 		iclpxSize--;
+		bool breakFlag = false;
 		for (auto iRegion = 0u; iRegion < iclpxSize; iRegion++) {
 			auto regionCrossingStart = iclpx[iRegion];
 			auto regionCrossingEnd   = iclpx[iRegion + 1];
@@ -6082,7 +6082,7 @@ void form::dustar(unsigned starCount, double length) {
 	SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	form::fvars(FormIndex);
 	thred::px2stch();
-	dPOINT point = SelectedPoint;
+	dPOINT point(SelectedPoint);
 	StateMap.set(StateFlag::FILDIR);
 	for (auto iVertex = 0u; iVertex < vertexCount; iVertex++) {
 		CurrentFormVertices[iVertex].x = point.x;
@@ -6126,7 +6126,7 @@ void form::duspir(unsigned stepCount) {
 	SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	form::fvars(FormIndex);
 	thred::px2stch();
-	dPOINT point = SelectedPoint;
+	dPOINT point(SelectedPoint);
 	auto   angle = 0.0;
 	for (auto iStep = 0u; iStep < stepCount; iStep++) {
 		firstSpiral[iStep].x = point.x;
@@ -6168,7 +6168,7 @@ void form::duhart(unsigned sideCount) {
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	CurrentFormVertices     = &FormVertices[FormVertexIndex];
 	thred::px2stch();
-	dPOINT     point     = SelectedPoint;
+	dPOINT     point(SelectedPoint);
 	auto       stepAngle = PI * 2.0 / sideCount;
 	const auto length    = 300 / sideCount * ZoomFactor * (UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
 	auto       angle     = PI * 0.28;
@@ -6238,7 +6238,7 @@ void form::dulens(unsigned sides) {
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	form::fvars(FormIndex);
 	thred::px2stch();
-	dPOINT point   = SelectedPoint;
+	dPOINT point(SelectedPoint);
 	auto   iVertex = 0u;
 	SelectedPoint.x -= 0.0001f;
 	while (point.x >= SelectedPoint.x) {
