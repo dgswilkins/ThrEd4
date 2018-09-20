@@ -41,43 +41,43 @@
 
 namespace fi = form::internal;
 
-fRECTANGLE BoundingRect;        // isin rectangle
-unsigned int     ClipIntersectSide;   // clipboard intersect side;
-float      ClipWidth;           // horizontal spacing for vertical clipboard fill
-fPOINT*    CurrentFillVertices; // pointer to the line of the polygon being filled
-REGION*    CurrentRegion;       // region currently being sequenced
-unsigned   DoneRegion;          // last region sequenced
-double     EggRatio;            // ratio for shrinking eggs
-FRMHED*    FormForInsert;       // insert form vertex in this form
-FORMINFO   FormInfo;            // form info used in drawing forms
-FLOAT      FormOffset;          // form offset for clipboard fills
-unsigned   FormRelocationIndex; // form relocator pointer
-unsigned int     FormVertexNext;      // form vertex storage for form vertex insert
-unsigned int     FormVertexPrev;      // form vertex storage for form vertex insert
-double     GapToClosestRegion;  // region close enough threshold for sequencing
-unsigned int     GroupIndexCount;     // number of group indices
-unsigned   InOutFlag;           // is intersection of line and cursor before, in or after the line
-unsigned   LastGroup;           // group of the last line written in the previous region;
-double*    Lengths;             // array of cumulative lengths used in satin fills
-unsigned   LineGroupIndex;      // pointer for groups of fill line segments
-fPOINT     LineSegmentEnd;      // vertical clipboard line segment end
-fPOINT     LineSegmentStart;    // vertical clipboard line segment start
-unsigned   NextGroup;           // group that connects to the next region
-unsigned   PathIndex;           // formOrigin to the next path element for vertical fill sequencing
-unsigned   PathMapIndex;        // number of entries in the path map
-unsigned   RegionCount;         // number of regions to be sequenced
-RGSEQ*     RegionPath;          // path to a region
-SMALPNTL*  SequenceLines;       // line for vertical/horizontal/angle fills
-unsigned   SequencePathIndex;   // index to path of sequenced regions
-double     Slope;               // slope of line in angle fills
-unsigned   StitchLineCount;     // count of stitch lines
-HDC        TimeDC;              // progress bar device context
-double     TimePosition;        // progress bar postiion
-double     TimeStep;            // progress bar step
-HWND       TimeWindow;          // progress bar
-float      UserStitchLen;       // user stitch length
-unsigned   VisitedIndex;        // next unvisited region for sequencing
-fPOINT*    WorkingFormVertices; // form points for angle fills
+fRECTANGLE   BoundingRect;        // isin rectangle
+unsigned int ClipIntersectSide;   // clipboard intersect side;
+float        ClipWidth;           // horizontal spacing for vertical clipboard fill
+fPOINT*      CurrentFillVertices; // pointer to the line of the polygon being filled
+REGION*      CurrentRegion;       // region currently being sequenced
+unsigned     DoneRegion;          // last region sequenced
+double       EggRatio;            // ratio for shrinking eggs
+FRMHED*      FormForInsert;       // insert form vertex in this form
+FORMINFO     FormInfo;            // form info used in drawing forms
+FLOAT        FormOffset;          // form offset for clipboard fills
+unsigned     FormRelocationIndex; // form relocator pointer
+unsigned int FormVertexNext;      // form vertex storage for form vertex insert
+unsigned int FormVertexPrev;      // form vertex storage for form vertex insert
+double       GapToClosestRegion;  // region close enough threshold for sequencing
+unsigned int GroupIndexCount;     // number of group indices
+unsigned     InOutFlag;           // is intersection of line and cursor before, in or after the line
+unsigned     LastGroup;           // group of the last line written in the previous region;
+double*      Lengths;             // array of cumulative lengths used in satin fills
+unsigned     LineGroupIndex;      // pointer for groups of fill line segments
+fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
+fPOINT       LineSegmentStart;    // vertical clipboard line segment start
+unsigned     NextGroup;           // group that connects to the next region
+unsigned     PathIndex;           // formOrigin to the next path element for vertical fill sequencing
+unsigned     PathMapIndex;        // number of entries in the path map
+unsigned     RegionCount;         // number of regions to be sequenced
+RGSEQ*       RegionPath;          // path to a region
+SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
+unsigned     SequencePathIndex;   // index to path of sequenced regions
+double       Slope;               // slope of line in angle fills
+unsigned     StitchLineCount;     // count of stitch lines
+HDC          TimeDC;              // progress bar device context
+double       TimePosition;        // progress bar postiion
+double       TimeStep;            // progress bar step
+HWND         TimeWindow;          // progress bar
+float        UserStitchLen;       // user stitch length
+unsigned     VisitedIndex;        // next unvisited region for sequencing
+fPOINT*      WorkingFormVertices; // form points for angle fills
 
 unsigned char Level00   = 0;
 unsigned char Level01   = 1;
@@ -1880,8 +1880,8 @@ void form::internal::spend(const std::vector<VRCT2>& fillVerticalRect, unsigned 
 
 void form::internal::duspnd(const std::vector<VRCT2>& underlayVerticalRect,
                             const std::vector<VRCT2>& fillVerticalRect,
-                            unsigned int                    start,
-                            unsigned int                    finish) {
+                            unsigned int              start,
+                            unsigned int              finish) {
 	if (StateMap.test(StateFlag::UND)) {
 		if (StateMap.test(StateFlag::UNDPHAS)) {
 			form::filinsb(underlayVerticalRect[start].copnt);
@@ -1922,7 +1922,7 @@ void form::internal::duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 
 void form::internal::pfn(const std::vector<VRCT2>& underlayVerticalRect,
                          const std::vector<VRCT2>& fillVerticalRect,
-                         unsigned int                    startVertex,
+                         unsigned int              startVertex,
                          const std::vector<VRCT2>& vrct) {
 	auto currentVertex = startVertex;
 	auto nextVertex    = form::nxt(currentVertex);
@@ -2700,8 +2700,8 @@ unsigned form::internal::insect(std::vector<CLIPSORT>&    clipIntersectData,
                                 std::vector<CLIPSORT*>&   arrayOfClipIntersectData,
                                 unsigned                  regionCrossingStart,
                                 unsigned                  regionCrossingEnd) {
-	auto   iRegions = 0u, iDestination = 0u, iIntersection = 0u, count = 0u;
-	auto     currentVertex = 0u, nextVertex = 0u;
+	auto       iRegions = 0u, iDestination = 0u, iIntersection = 0u, count = 0u;
+	auto       currentVertex = 0u, nextVertex = 0u;
 	fRECTANGLE lineSegmentRect = {};
 	fPOINT*    intersection    = nullptr;
 
@@ -2777,6 +2777,8 @@ unsigned form::internal::clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
 	clipSegment.zsid        = clipStitchPoints[finish].vertexIndex;
 	clipSegment.finish      = finish;
 	clipSegment.dun         = 0;
+	clipSegment.beginIndex  = 0u;
+	clipSegment.endIndex    = 0u;
 	clipSegments.push_back(clipSegment);
 	return finish + 1;
 }
@@ -3650,8 +3652,8 @@ void form::internal::movseq(const std::vector<SMALPNTL*>& sortedLines, unsigned 
 }
 
 void form::internal::brkseq(const std::vector<SMALPNTL*>& sortedLines,
-                            unsigned int                        start,
-                            unsigned int                        finish,
+                            unsigned int                  start,
+                            unsigned int                  finish,
                             boost::dynamic_bitset<>&      sequenceMap) {
 	StateMap.reset(StateFlag::SEQDUN);
 	if (start > finish) {
@@ -3734,8 +3736,8 @@ void form::internal::duseq2(const std::vector<SMALPNTL*>& sortedLines, unsigned 
 }
 
 void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
-                           unsigned int                        start,
-                           unsigned int                        finish,
+                           unsigned int                  start,
+                           unsigned int                  finish,
                            boost::dynamic_bitset<>&      sequenceMap) {
 	auto savedTopLine = sortedLines[start][1].line;
 	bool flag         = false;
@@ -3826,7 +3828,7 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
                            boost::dynamic_bitset<>&      visitedRegions,
                            const std::vector<SMALPNTL*>& sortedLines,
                            unsigned                      pthi,
-                           unsigned int                        lineCount,
+                           unsigned int                  lineCount,
                            std::vector<REGION>&          regionsList) {
 	boost::dynamic_bitset<> sequenceMap(lineCount);
 
@@ -4072,7 +4074,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			RegionsList[iRegion].breakCount = count;
 		}
 
-#if BUGSEQ 
+#if BUGSEQ
 		// Note - this debug code only works for vertical fill on a single form
 		auto bugColor = 0u;
 		auto index    = 0u;
@@ -5028,8 +5030,8 @@ void form::rotfrm(unsigned int newStartVertex) {
 	if (selectedVertices) {
 		std::vector<fPOINT> rotatedVertices(VertexCount);
 		unsigned            iVertex = 0, iGuide = 0, iRotatedGuide = 0;
-		auto              iRotated = newStartVertex;
-		auto              tlin     = 0u;
+		auto                iRotated = newStartVertex;
+		auto                tlin     = 0u;
 
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
 			rotatedVertices[iVertex] = selectedVertices[iVertex];
@@ -6503,7 +6505,7 @@ void form::internal::fnord() {
 void form::flpord() {
 	// int      iStitch = 0;
 	unsigned iVertex = 0, iForward = 0;
-	auto   start = 0u, finish = 0u;
+	auto     start = 0u, finish = 0u;
 
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
@@ -7468,7 +7470,7 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
                             std::vector<SATCON>& tempGuides,
                             std::vector<fPOINT>& destinationFormVertices,
                             std::vector<FRMHED>& destinationFormList,
-                            unsigned int               formIndex) {
+                            unsigned int         formIndex) {
 	FRMHED& destination = destinationFormList[FormRelocationIndex];
 
 	destinationFormList[FormRelocationIndex++] = FormList[formIndex];
