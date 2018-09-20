@@ -4927,6 +4927,7 @@ HBITMAP thred::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uns
 				return bitmap;
 			}
 			else {
+				DeleteObject(bitmap);
 				throw;
 			}
 		}
