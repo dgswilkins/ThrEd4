@@ -519,17 +519,17 @@ void formForms::prfsid(HWND wnd) noexcept {
 }
 
 void formForms::internal::prftwin(const std::wstring& text) noexcept {
-	CreateWindow(L"STATIC",
-	             text.c_str(),
-	             WS_CHILD | WS_VISIBLE,
-	             LabelWindowCoords.left,
-	             LabelWindowCoords.top,
-	             LabelWindowCoords.right - LabelWindowCoords.left,
-	             LabelWindowCoords.bottom - LabelWindowCoords.top,
-	             PreferencesWindow,
-	             nullptr,
-	             ThrEdInstance,
-	             nullptr);
+	auto _ = CreateWindow(L"STATIC",
+	                      text.c_str(),
+	                      WS_CHILD | WS_VISIBLE,
+	                      LabelWindowCoords.left,
+	                      LabelWindowCoords.top,
+	                      LabelWindowCoords.right - LabelWindowCoords.left,
+	                      LabelWindowCoords.bottom - LabelWindowCoords.top,
+	                      PreferencesWindow,
+	                      nullptr,
+	                      ThrEdInstance,
+	                      nullptr);
 }
 
 HWND formForms::internal::prfnwin(const std::wstring& text) noexcept {
@@ -796,8 +796,8 @@ void formForms::dasyfrm() {
 	petalLength *= ratio;
 	holeDiameter *= ratio;
 	SelectedForm->type = FRMFPOLY;
-	auto iVertex     = 0u;
-	auto fref        = 0u;
+	auto iVertex       = 0u;
+	auto fref          = 0u;
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
 		auto       angle               = PI2;
 		const auto holeVertexCount     = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
@@ -1119,13 +1119,13 @@ void formForms::wavfrm() {
 		auto waveIndex  = IniFile.waveStart;
 		while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 			const unsigned short iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
-			points[iPoint].x       = -CurrentFormVertices[iNextVertex].x + CurrentFormVertices[waveIndex].x;
-			points[iPoint].y       = -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[waveIndex].y;
+			points[iPoint].x                 = -CurrentFormVertices[iNextVertex].x + CurrentFormVertices[waveIndex].x;
+			points[iPoint].y                 = -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[waveIndex].y;
 			iPoint++;
 			waveIndex = iNextVertex;
 		}
 		const auto count           = iPoint;
-		auto     iVertex         = 0u;
+		auto       iVertex         = 0u;
 		fPOINT     currentPosition = {};
 		for (auto iLobe = 0u; iLobe < IniFile.waveLobes; iLobe++) {
 			if (iLobe & 1) {
