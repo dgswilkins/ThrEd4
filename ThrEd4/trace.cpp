@@ -112,32 +112,6 @@ void trace::internal::trcols(COLORREF color) noexcept {
 	PixelColors[2] = (color & 0xff0000) >> 16;
 }
 
-/*
-unsigned trace::internal::colsum(COLORREF color) {
-	auto colorSum = 0u;
-
-	ti::trcols(color);
-	for (auto iRGB = 0u; iRGB < 3; iRGB++) {
-		if (StateMap.test(TraceRGBFlag[iRGB]))
-			colorSum += PixelColors[iRGB];
-	}
-	return colorSum;
-}
-*/
-
-/*
-unsigned trace::internal::icolsum(COLORREF color) {
-	auto colorSum = 0u;
-
-	ti::trcols(color);
-	for (auto iRGB = 0u; iRGB < 3u; iRGB++) {
-		if (StateMap.test(TraceRGBFlag[iRGB]))
-			colorSum += 255 - PixelColors[iRGB];
-	}
-	return colorSum;
-}
-*/
-
 void trace::internal::trcstpnum() {
 	std::wstring fmtStr;
 	displayText::loadString(fmtStr, IDS_TRCSTP);
