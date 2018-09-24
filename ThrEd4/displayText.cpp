@@ -202,8 +202,9 @@ void displayText::butxt(unsigned iButton, const std::wstring& buttonText) {
 			else
 				SetWindowText((*ButtonWin)[iButton], (*StringTable)[STR_TRC1S].c_str());
 		}
-		else
+		else {
 			SetWindowText((*ButtonWin)[iButton], (*StringTable)[iButton - 4 + STR_TRC0].c_str());
+		}
 	}
 	else
 		SetWindowText((*ButtonWin)[iButton], buttonText.c_str());
@@ -273,19 +274,19 @@ bool displayText::filmsgs(unsigned code) {
 					displayText::tabmsg(IDS_FRM3X);
 					return true;
 				}
-				else {
+				
 					if (code == FML_PRPS) {
 						displayText::tabmsg(IDS_ANGS);
 						return true;
 					}
-				}
+				
 			}
 			return displayText::clpmsgs(code);
 		}
-		else {
+		
 			displayText::tabmsg(IDS_FILSEL);
 			return true;
-		}
+		
 	}
 	else {
 		displayText::tabmsg(IDS_FILCR);
@@ -426,7 +427,7 @@ void displayText::updateWinFont(HWND hWnd) noexcept {
 	auto const* hFont = displayText::getThrEdFont(400);
 	EnumChildWindows(hWnd,
 	                 [](HWND p_hWnd, LPARAM lParam) noexcept->BOOL {
-		                 SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
+		                 SendMessage(p_hWnd, WM_SETFONT, static_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
 		                 return TRUE;
 	                 },
 	                 (LPARAM)hFont);
