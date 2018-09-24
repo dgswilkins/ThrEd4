@@ -40,7 +40,7 @@ bool    iseclp(unsigned int iForm) noexcept;
 bool    iseclpx(unsigned int iForm) noexcept;
 fPOINT* nueclp(unsigned int currentForm, unsigned int count) noexcept;
 fPOINT* numclp() noexcept;
-void    oclp(const fPOINT* const clip, unsigned int clipEntries);
+void    oclp(const fPOINT* clip, unsigned int clipEntries);
 
 namespace internal {
 
@@ -92,7 +92,7 @@ namespace internal {
 	           double               spacing,
 	           const dPOINT&        rotationCenter);
 	bool ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point);
-	void setvct(unsigned int start, unsigned int finish, double& ClipAngle, dPOINT& vector0) noexcept;
+	void setvct(unsigned int start, unsigned int finish, double& clipAngle, dPOINT& vector0) noexcept;
 	void xclpfn(const std::vector<fPOINT>& tempClipPoints,
 	            const std::vector<fPOINT>& chainEndPoints,
 	            unsigned                   start,

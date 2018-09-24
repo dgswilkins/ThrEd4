@@ -58,16 +58,16 @@ namespace internal {
 	bool     chkbak(const std::vector<dPOINT>& satinBackup, const dPOINT& pnt);
 	SATCON*  nusac(unsigned int formIndex, unsigned guideCount) noexcept;
 	void     outfn(unsigned start, unsigned finish, double satinWidth);
-	void     sacspac(const SATCON* const startGuide, unsigned guideCount) noexcept;
+	void     sacspac(const SATCON* startGuide, unsigned guideCount) noexcept;
 	void     satclos();
-	void     satcpy(SATCON* const destination, const std::vector<SATCON> source, unsigned int size);
+	void     satcpy(SATCON* destination, std::vector<SATCON> source, unsigned int size);
 	void     satends(unsigned isBlunt);
 	void     satfn(const std::vector<double>& lengths,
 	               unsigned int               line1Start,
 	               unsigned int               line1End,
 	               unsigned int               line2Start,
 	               unsigned int               line2End);
-	unsigned satind(const SATCON* const guide) noexcept;
+	unsigned satind(const SATCON* guide) noexcept;
 	void     satmf(const std::vector<double>& lengths);
 	void     satsbrd();
 	bool     satselfn() noexcept;

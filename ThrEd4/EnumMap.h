@@ -7,8 +7,8 @@
 // struct for ensuring an enum has a count element.
 // this does NOT validate that the EnumCount element is the last element
 template <class T> struct has_enum_count {
-	typedef char yes;
-	typedef yes (&no)[2];
+	using yes = char;
+	using no = yes (&)[2];
 
 	template <class U> static yes test(decltype(U::EnumCount) *);
 	template <class U> static no  test(...);

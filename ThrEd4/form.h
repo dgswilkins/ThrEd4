@@ -48,7 +48,7 @@ bool     cisin(float xCoordinate, float yCoordinate) noexcept;
 unsigned int   closflt(float xCoordinate, float yCoordinate) noexcept;
 bool     closfrm();
 void     clpfil();
-void     clpspac(const fPOINT* const insertPoint, unsigned int count) noexcept;
+void     clpspac(const fPOINT* insertPoint, unsigned int count) noexcept;
 void     clrfills() noexcept;
 void     cntrx();
 void     col2frm();
@@ -95,13 +95,13 @@ unsigned find1st();
 void     fliph();
 void     flipv();
 void     flpord();
-unsigned fltind(const fPOINT* const point) noexcept;
-void     fltspac(const fPOINT* const start, unsigned int count) noexcept;
+unsigned fltind(const fPOINT* point) noexcept;
+void     fltspac(const fPOINT* start, unsigned int count) noexcept;
 void     form();
 void     frm0();
 void     frmadj(unsigned int formIndex) noexcept;
-void     frmclr(FRMHED* const destination) noexcept;
-void     frmlin(const fPOINT* const vertices, unsigned int vertexCount);
+void     frmclr(FRMHED* destination) noexcept;
+void     frmlin(const fPOINT* vertices, unsigned int vertexCount);
 void     frmlin(const std::vector<fPOINT>& vertices);
 void     frmnumfn(unsigned newFormIndex);
 void     frmon();
@@ -134,8 +134,8 @@ constexpr float midl(float high, float low);
 
 void movlayr(unsigned codedLayer);
 void munfrm();
-void mvfltsb(fPOINT* const destination, const fPOINT* const source, unsigned int count) noexcept;
-void mvfrmsb(FRMHED* const destination, const FRMHED* const source, unsigned int count) noexcept;
+void mvfltsb(fPOINT* destination, const fPOINT* source, unsigned int count) noexcept;
+void mvfrmsb(FRMHED* destination, const FRMHED* source, unsigned int count) noexcept;
 bool notfstch(unsigned attribute) noexcept;
 void nubrdcol(unsigned color);
 void nufilcol(unsigned color);
@@ -226,7 +226,7 @@ namespace internal {
 	bool     clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept;
 	void     clpcon(const std::vector<RNGCNT>& textureSegments);
 	void     clpfm();
-	unsigned clpind(const fPOINT* const point) noexcept;
+	unsigned clpind(const fPOINT* point) noexcept;
 	unsigned clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
 	                 std::vector<CLPSEG>&       clipSegments,
 	                 const std::vector<double>& lengths,
@@ -281,12 +281,12 @@ namespace internal {
 	            dPOINT&                rotationCenter);
 	void  fnhor(std::vector<unsigned>& groupIndexSequence,
 	            std::vector<SMALPNTL>& lineEndpoints,
-	            const double           rotationAngle,
+	            double           rotationAngle,
 	            dPOINT&                rotationCenter);
 	void  fnord();
 	void  fnvrt(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
 	void  frmpnts(unsigned type) noexcept;
-	void  frmpoly(const POINT* const line, unsigned int count) noexcept;
+	void  frmpoly(const POINT* line, unsigned int count) noexcept;
 	void  frmsqr(unsigned iVertex);
 	void  frmsqr0(const POINT& controlPoint) noexcept;
 	void  frmx(const POINT& controlPoint, HDC dc) noexcept;
@@ -308,10 +308,10 @@ namespace internal {
 	                unsigned                  regionCrossingEnd);
 	void     inspnt(std::vector<CLIPNT>& clipStitchPoints);
 
-	bool isclos(const SMALPNTL* const lineEndPoint0, const SMALPNTL* const lineEndPoint1) noexcept;
+	bool isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoint1) noexcept;
 
 	bool isect(unsigned int vertex0, unsigned int vertex1, fPOINT& intersection, float& length) noexcept;
-	bool isin(const std::vector<VCLPX> regionCrossingData,
+	bool isin(std::vector<VCLPX> regionCrossingData,
 	          float                    xCoordinate,
 	          float                    yCoordinate,
 	          unsigned                 regionCrossingStart,
@@ -319,7 +319,7 @@ namespace internal {
 	void lapbrd();
 	void lcon(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
 	bool lencmp(const LENINFO& arg1, const LENINFO& arg2) noexcept;
-	bool lencmpa(const CLIPSORT* const arg1, const CLIPSORT* const arg2) noexcept;
+	bool lencmpa(const CLIPSORT* arg1, const CLIPSORT* arg2) noexcept;
 	void linrutb(unsigned start);
 	bool lnclos(std::vector<unsigned>& groupIndexSequence,
 	            std::vector<SMALPNTL>& lineEndpoints,
@@ -385,7 +385,7 @@ namespace internal {
 	void   ritfil(unsigned& interleaveSequenceIndex2);
 	bool   ritlin(const fPOINT& start, const fPOINT& finish);
 	void
-	     ritseg(const std::vector<CLIPNT>& clipStitchPoints, std::vector<CLPSEG>& clipSegments, const unsigned currentSegmentIndex);
+	     ritseg(const std::vector<CLIPNT>& clipStitchPoints, std::vector<CLPSEG>& clipSegments, unsigned currentSegmentIndex);
 	void rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept;
 	void rotentr(double rotationAngle);
 	void rotpar(dPOINT& rotationCenter);

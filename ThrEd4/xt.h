@@ -62,7 +62,7 @@ void fthrfn(unsigned& interleaveSequenceIndex2);
 
 std::vector<fPOINT>& insid();
 
-void intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsigned interleaveSequenceIndex2);
+void intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, unsigned interleaveSequenceIndex2);
 void mvshft();
 void notcwlk();
 void notund();
@@ -119,7 +119,7 @@ namespace internal {
 	void     chkend(unsigned offset, unsigned code, INTINF& ilData);
 	bool     chkp2cnam(const wchar_t* fileName) noexcept;
 	bool     chkrdun(const std::vector<unsigned>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord);
-	void     chkuseq(const unsigned interleaveSequenceIndex2);
+	void     chkuseq(unsigned interleaveSequenceIndex2);
 	void     delwlk(unsigned int code);
 
 #ifdef _DEBUG
@@ -197,5 +197,5 @@ namespace internal {
 	void undclp() noexcept;
 	void uspacfn(unsigned int find, float spacing);
 	void xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point, float featherRatioLocal) noexcept;
-}
-}
+}  // namespace internal
+}  // namespace xt

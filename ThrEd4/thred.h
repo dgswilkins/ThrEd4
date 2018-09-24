@@ -65,7 +65,7 @@ void rngadj() noexcept;
 void rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter) noexcept;
 void rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter) noexcept;
 
-void rotflt(fPOINT& point, const double rotationAngle, const dPOINT& rotationCenter) noexcept;
+void rotflt(fPOINT& point, double rotationAngle, const dPOINT& rotationCenter) noexcept;
 void rotfn(double rotationAngle, const dPOINT& rotationCenter);
 void rtclpfn(unsigned int destination, unsigned int source);
 void sCor2px(const dPOINT& stitchCoordinate, POINT& pixelCoordinate);
@@ -177,7 +177,7 @@ namespace internal {
 	void duar();
 	void dubar();
 	void dubox();
-	void dubuf(char* const buffer, unsigned& count);
+	void dubuf(char* buffer, unsigned& count);
 	void duclip();
 	void duclp() noexcept;
 	void ducmd();
@@ -200,7 +200,7 @@ namespace internal {
 	void dupclp();
 	void duprct();
 	void durcntr(dPOINT& rotationCenter) noexcept;
-	void durit(char** destination, const void* const source, unsigned int count) noexcept;
+	void durit(char** destination, const void* source, unsigned int count) noexcept;
 	void durot() noexcept;
 	void durotu() noexcept;
 	void dusel(HDC dc);
@@ -265,7 +265,7 @@ namespace internal {
 	bool     isfclp() noexcept;
 	bool     isknots() noexcept;
 	void     istch();
-	bool     isthr(const wchar_t* const filename);
+	bool     isthr(const wchar_t* filename);
 	unsigned kjmp(unsigned start);
 	void     knotmen();
 	void     ladj();
@@ -383,7 +383,7 @@ namespace internal {
 	void        rotmrk();
 	void        rotpix(const POINT& unrotatedPoint, POINT& rotatedPoint, const POINT& rotationCenterPixels);
 	void        rotseg();
-	void        rotstch(fPOINTATTR* stitch, const double rotationAngle, const dPOINT& rotationCenter) noexcept;
+	void        rotstch(fPOINTATTR* stitch, double rotationAngle, const dPOINT& rotationCenter) noexcept;
 	unsigned    rsed() noexcept;
 	void        rshft(const POINT& shiftPoint);
 	void        rstAll();
@@ -396,7 +396,7 @@ namespace internal {
 	bool        savcmp() noexcept;
 	void        savdst(std::vector<DSTREC>& DSTRecords, unsigned data);
 	void        savmap();
-	void        sdCor2px(const fPOINTATTR stitchPoint, POINT& pixelCoordinate);
+	void        sdCor2px(fPOINTATTR stitchPoint, POINT& pixelCoordinate);
 	void        segentr(double rotationAngle);
 	void        selCol();
 	void        selalstch();
@@ -424,10 +424,10 @@ namespace internal {
 	void        shorter();
 	bool        sidclp() noexcept;
 	void        sidhup();
-	void        sidmsg(HWND window, std::wstring* const strings, unsigned entries);
+	void        sidmsg(HWND window, std::wstring* strings, unsigned entries);
 	unsigned int      sizclp(unsigned formFirstStitchIndex) noexcept;
 	unsigned int      sizfclp();
-	void        sizstch(fRECTANGLE& rectangle, const fPOINTATTR* const stitches) noexcept;
+	void        sizstch(fRECTANGLE& rectangle, const fPOINTATTR* stitches) noexcept;
 	void        srchk();
 	unsigned    srchknot(unsigned source) noexcept;
 	inline void stCor2px(const fPOINTATTR& stitch, POINT& point);
@@ -496,4 +496,4 @@ namespace internal {
 	int handle_program_memory_depletion(unsigned int);
 #endif
 } // namespace internal
-} // namespace ThrEd
+}  // namespace thred

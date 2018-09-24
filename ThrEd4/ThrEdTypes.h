@@ -785,12 +785,11 @@ class BSEQPNT;
 class dPOINT
 {
 public:
-	double x;
-	double y;
+	double x{0.0};
+	double y{0.0};
 
 	constexpr dPOINT() noexcept
-	    : x(0.0)
-	    , y(0.0) {
+	     {
 	}
 	explicit inline dPOINT(const fPOINT& rhs);
 	inline dPOINT(float rhsX, float rhsY) noexcept;
@@ -803,12 +802,11 @@ public:
 class fPOINT
 {
 public:
-	float x;
-	float y;
+	float x{0.0f};
+	float y{0.0f};
 
 	constexpr fPOINT() noexcept
-	    : x(0.0f)
-	    , y(0.0f) {
+	     {
 	}
 	inline fPOINT(double rhsX, double rhsY) noexcept;
 	explicit inline fPOINT(const dPOINT& rhs) noexcept;
@@ -1878,16 +1876,13 @@ typedef struct _clpseg {
 class CLIPSORT
 {
 public:
-	float        segmentLength;
-	float        sideLength;
-	unsigned int vertexIndex;
+	float        segmentLength{0.0f};
+	float        sideLength{0.0f};
+	unsigned int vertexIndex{0};
 	fPOINT       point;
 
 	constexpr CLIPSORT() noexcept
-	    : segmentLength(0.0f)
-	    , sideLength(0.0f)
-	    , vertexIndex(0)
-	    , point() {
+	     {
 	}
 };
 
@@ -2312,34 +2307,22 @@ typedef struct _intinf {
 class TXTSCR
 {
 public:
-	int            top;              // pixel top line
-	int            bottom;           // pixel bottom line
-	int            height;           // pixel height of area
-	int            halfHeight;       // pixel middle of area
-	float          xOffset;          // edit x offset of area
-	float          yOffset;          // edit y offset of area
-	float          areaHeight;       // edit height of area
-	float          screenHeight;     // edit height of screen
-	float          width;            // edit width of area
-	float          spacing;          // edit space between lines
-	unsigned short lines;            // number of lines
-	double         editToPixelRatio; // edit to pixel ratio
+	int            top{};              // pixel top line
+	int            bottom{};           // pixel bottom line
+	int            height{};           // pixel height of area
+	int            halfHeight{};       // pixel middle of area
+	float          xOffset{0.0f};          // edit x offset of area
+	float          yOffset{0.0f};          // edit y offset of area
+	float          areaHeight{0.0f};       // edit height of area
+	float          screenHeight{0.0f};     // edit height of screen
+	float          width{0.0f};            // edit width of area
+	float          spacing{0.0f};          // edit space between lines
+	unsigned short lines{0};            // number of lines
+	double         editToPixelRatio{0.0}; // edit to pixel ratio
 	fPOINT         formCenter;       // middle of the form
 
 	constexpr TXTSCR() noexcept
-	    : top()
-	    , bottom()
-	    , height()
-	    , halfHeight()
-	    , xOffset(0.0f)
-	    , yOffset(0.0f)
-	    , areaHeight(0.0f)
-	    , screenHeight(0.0f)
-	    , width(0.0f)
-	    , spacing(0.0f)
-	    , lines(0)
-	    , editToPixelRatio(0.0)
-	    , formCenter() {
+	     {
 	}
 };
 
