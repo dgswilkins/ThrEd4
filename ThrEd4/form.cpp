@@ -1581,12 +1581,7 @@ bool form::internal::projv(double        xCoordinate,
 		if (lower > upper) {
 			std::swap(lower, upper);
 		}
-		if (xCoordinate < lower || xCoordinate > upper) {
-			return false;
-		}
-		else {
-			return true;
-		}
+		return !(xCoordinate < lower || xCoordinate > upper);
 	}
 	else {
 		return false;
@@ -1666,21 +1661,11 @@ bool form::internal::proj(const dPOINT& point,
 		if (yMinimum > yMaximum) {
 			std::swap(yMinimum, yMaximum);
 		}
-		if (intersectionPoint.x <= xMinimum || intersectionPoint.x > xMaximum || intersectionPoint.y < yMinimum
-		    || intersectionPoint.y > yMaximum) {
-			return false;
-		}
-		else {
-			return true;
-		}
+		return !(intersectionPoint.x <= xMinimum || intersectionPoint.x > xMaximum || intersectionPoint.y < yMinimum
+		         || intersectionPoint.y > yMaximum);
 	}
 	else {
-		if (intersectionPoint.x <= xMinimum || intersectionPoint.x > xMaximum) {
-			return false;
-		}
-		else {
-			return true;
-		}
+		return !(intersectionPoint.x <= xMinimum || intersectionPoint.x > xMaximum);
 	}
 }
 
@@ -1735,12 +1720,7 @@ bool form::internal::projh(double yCoordinate, const fPOINT& point0, const fPOIN
 	if (leftY > rightY) {
 		std::swap(leftY, rightY);
 	}
-	if (yCoordinate < leftY || yCoordinate > rightY) {
-		return false;
-	}
-	else {
-		return true;
-	}
+	return !(yCoordinate < leftY || yCoordinate > rightY);
 }
 
 void form::internal::sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start, unsigned finish) {
@@ -3443,9 +3423,8 @@ bool form::internal::sqcomp(const SMALPNTL* arg1, const SMALPNTL* arg2) noexcept
 
 				return (lineEnd1.y < lineEnd2.y);
 			}
-			else {
-				return (lineEnd1.group < lineEnd2.group);
-			}
+
+			return (lineEnd1.group < lineEnd2.group);
 		}
 		else {
 			return (lineEnd1.line < lineEnd2.line);
@@ -5327,12 +5306,7 @@ bool form::internal::closat() noexcept {
 			VertexCount = savedVertex;
 		}
 	}
-	if (minimumLength == 1e99) {
-		return false;
-	}
-	else {
-		return true;
-	}
+	return minimumLength != 1e99;
 }
 
 void form::internal::nufpnt(unsigned int vertex) {
@@ -5401,20 +5375,10 @@ void form::insat() {
 
 bool form::chkdel() noexcept {
 	if (SelectedForm->type == FRMLINE) {
-		if (SelectedForm->vertexCount > 2) {
-			return false;
-		}
-		else {
-			return true;
-		}
+		return SelectedForm->vertexCount <= 2;
 	}
 	else {
-		if (SelectedForm->vertexCount > 3) {
-			return false;
-		}
-		else {
-			return true;
-		}
+		return SelectedForm->vertexCount <= 3;
 	}
 }
 
@@ -7392,10 +7356,7 @@ bool form::notfstch(unsigned attribute) noexcept {
 	if (attribute & NOTFRM) {
 		return true;
 	}
-	if (((attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
-		return false;
-	}
-	return true;
+	return ((attribute & FRMSK) >> FRMSHFT) != ClosestFormToCursor;
 }
 
 void form::selalfil() {
@@ -7438,12 +7399,7 @@ bool form::frmrng(unsigned int iForm, RANGE& range) noexcept {
 			while (range.finish > range.start && notfstch(StitchBuffer[range.finish].attribute)) {
 				range.finish--;
 			}
-			if (range.finish > range.start) {
-				return true;
-			}
-			else {
-				return false;
-			}
+			return range.finish > range.start;
 		}
 		else {
 			return false;
