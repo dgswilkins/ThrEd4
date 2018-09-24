@@ -1676,18 +1676,10 @@ bool form::linx(const std::vector<fPOINT>& points, unsigned int start, unsigned 
 			return false;
 		}
 		if (delta.x) {
-			if (fi::proj(point, delta.y / delta.x, (*OutsidePoints)[finish], points[finish], intersection)) {
-				return true;
-			}
-			else {
-				return false;
-			}
+			return fi::proj(point, delta.y / delta.x, (*OutsidePoints)[finish], points[finish], intersection);
 		}
 		else {
-			if (fi::projv(point.x, points[finish], (*OutsidePoints)[finish], intersection))
-				return true;
-			else
-				return false;
+			return fi::projv(point.x, points[finish], (*OutsidePoints)[finish], intersection);
 		}
 	}
 	else {
@@ -3477,12 +3469,7 @@ bool form::internal::lnclos(std::vector<unsigned>& groupIndexSequence,
 					index1 += 2;
 				}
 				if (count1) {
-					if (isclos(&lineEndPoint0[index0], &lineEndPoint1[index1])) {
-						return true;
-					}
-					else {
-						return false;
-					}
+					return isclos(&lineEndPoint0[index0], &lineEndPoint1[index1]);
 				}
 			}
 		}
