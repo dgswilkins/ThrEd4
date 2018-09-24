@@ -112,7 +112,7 @@ void clip::delmclp(unsigned int iForm) {
 }
 
 void clip::deleclp(unsigned int iForm) noexcept {
-	if (ClipPointIndex) {
+	if (ClipPointIndex != 0u) {
 		if (clip::iseclpx(iForm)) {
 			auto destination = ci::findclp(iForm);
 			auto source      = destination + FormList[iForm].clipEntries;
