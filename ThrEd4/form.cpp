@@ -1583,9 +1583,8 @@ bool form::internal::projv(double        xCoordinate,
 		}
 		return !(xCoordinate < lower || xCoordinate > upper);
 	}
-	
-		return false;
-	
+
+	return false;
 }
 
 bool form::cisin(float xCoordinate, float yCoordinate) noexcept {
@@ -1664,9 +1663,8 @@ bool form::internal::proj(const dPOINT& point,
 		return !(intersectionPoint.x <= xMinimum || intersectionPoint.x > xMaximum || intersectionPoint.y < yMinimum
 		         || intersectionPoint.y > yMaximum);
 	}
-	
-		return !(intersectionPoint.x <= xMinimum || intersectionPoint.x > xMaximum);
-	
+
+	return !(intersectionPoint.x <= xMinimum || intersectionPoint.x > xMaximum);
 }
 
 bool form::linx(const std::vector<fPOINT>& points, unsigned int start, unsigned int finish, dPOINT& intersection) {
@@ -3426,9 +3424,8 @@ bool form::internal::sqcomp(const SMALPNTL* arg1, const SMALPNTL* arg2) noexcept
 
 			return (lineEnd1.group < lineEnd2.group);
 		}
-		
-			return (lineEnd1.line < lineEnd2.line);
-		
+
+		return (lineEnd1.line < lineEnd2.line);
 	}
 	return false;
 }
@@ -5377,9 +5374,8 @@ bool form::chkdel() noexcept {
 	if (SelectedForm->type == FRMLINE) {
 		return SelectedForm->vertexCount <= 2;
 	}
-	
-		return SelectedForm->vertexCount <= 3;
-	
+
+	return SelectedForm->vertexCount <= 3;
 }
 
 void form::unfil() {
@@ -7401,13 +7397,11 @@ bool form::frmrng(unsigned int iForm, RANGE& range) noexcept {
 			}
 			return range.finish > range.start;
 		}
-		
-			return false;
-		
-	}
-	else {
+
 		return false;
 	}
+
+	return false;
 }
 
 void form::internal::bholbrd() {
