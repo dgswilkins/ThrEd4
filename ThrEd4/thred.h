@@ -98,7 +98,7 @@ namespace internal {
 	bool  binv(const std::vector<unsigned char>& monoBitmapData, unsigned bitmapWidthInBytes);
 	bool  bitar();
 	void  bitlin(const unsigned char* source, unsigned* destination, COLORREF foreground, COLORREF background);
-	void  bitsiz() noexcept;
+	void  bitsiz();
 	void  box(unsigned iNearest, HDC dc) noexcept;
 	void  boxs() noexcept;
 	void  bsavmen();
