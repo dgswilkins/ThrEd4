@@ -59,11 +59,11 @@
 #define TXTSIDS 6         // extra pixels in a text box
 #define MAXITEMS 0x10000u // maximum number of stitches, vertices, texture points, sequence items & clipboard points
 #define MAXCHNG 10000     // maximum number of color changes
-#define SHUPX 480         // small hoop x size
-#define SHUPY 480         // small hoop y size
-#define LHUPX 719         // large hoop x size
-#define LHUPY 690         // large hoop y size
-#define HUP100XY 600      // 100 millimeter hoop size
+#define SHUPX 480.0f      // small hoop x size
+#define SHUPY 480.0f      // small hoop y size
+#define LHUPX 719.0f      // large hoop x size
+#define LHUPY 690.0f      // large hoop y size
+#define HUP100XY 600.0f   // 100 millimeter hoop size
 #define PFGRAN 6          // pfaf "pixels" per millimeter
 #define TSIZ30 0.3        //#30 thread size in millimeters
 #define TSIZ40 0.2        //#40 thread size in millimeters
