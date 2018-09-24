@@ -14374,7 +14374,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio
 								SelectedFormList->push_back(OutputIndex + FormIndex);
 							}
 							SelectedFormsSize = { gsl::narrow<float>(SelectedFormsRect.right - SelectedFormsRect.left),
-												  gsl::narrow<float>(SelectedFormsRect.bottom - SelectedFormsRect.top) };
+								                  gsl::narrow<float>(SelectedFormsRect.bottom - SelectedFormsRect.top) };
 							StateMap.set(StateFlag::INIT);
 							FormLines[0].x = FormLines[3].x = FormLines[4].x = SelectedFormsRect.left;
 							FormLines[1].x = FormLines[2].x = SelectedFormsRect.right;
@@ -14383,7 +14383,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio
 							StateMap.set(StateFlag::SHOSTRTCH);
 							thred::strtchbox(stretchBoxLine);
 							FormMoveDelta = { gsl::narrow<float>((SelectedFormsRect.right - SelectedFormsRect.left) >> 1),
-											  gsl::narrow<float>((SelectedFormsRect.bottom - SelectedFormsRect.top) >> 1) };
+								              gsl::narrow<float>((SelectedFormsRect.bottom - SelectedFormsRect.top) >> 1) };
 							StateMap.set(StateFlag::MOVFRMS);
 							StateMap.set(StateFlag::FUNSCLP);
 						}
@@ -16474,8 +16474,8 @@ bool thred::internal::bitar() {
 	if (zoomedInRect.top > BitmapSizeinStitches.y || zoomedInRect.left > BitmapSizeinStitches.x)
 		return false;
 	else {
-		BitmapSrcRect = { gsl::narrow<LONG>(std::ceil(zoomedInRect.top * BmpStitchRatio.y)),
-			              gsl::narrow<LONG>(std::ceil(ZoomRect.left * BmpStitchRatio.x)),
+		BitmapSrcRect = { gsl::narrow<LONG>(std::ceil(ZoomRect.left * BmpStitchRatio.x)),
+			              gsl::narrow<LONG>(std::ceil(zoomedInRect.top * BmpStitchRatio.y)),
 			              gsl::narrow<LONG>(std::floor(ZoomRect.right * BmpStitchRatio.x)),
 			              gsl::narrow<LONG>(std::floor(zoomedInRect.bottom * BmpStitchRatio.y)) };
 		if (BitmapSrcRect.right > gsl::narrow<long>(BitmapWidth)) {
@@ -16500,10 +16500,10 @@ bool thred::internal::bitar() {
 		    = { static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
 			    static_cast<double>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom) };
 
-		BitmapDstRect = { dToL(differenceRect.top * bitmapStitchRatio.y),
-			              dToL(StitchWindowClientRect.bottom - differenceRect.bottom * bitmapStitchRatio.y),
-			              dToL(differenceRect.left * bitmapStitchRatio.x),
-			              dToL(StitchWindowClientRect.right - differenceRect.right * bitmapStitchRatio.x) };
+		BitmapDstRect = { dToL(differenceRect.left * bitmapStitchRatio.x),
+			              dToL(differenceRect.top * bitmapStitchRatio.y),
+			              dToL(StitchWindowClientRect.right - differenceRect.right * bitmapStitchRatio.x),
+			              dToL(StitchWindowClientRect.bottom - differenceRect.bottom * bitmapStitchRatio.y) };
 		return true;
 	}
 }
@@ -17033,7 +17033,8 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					auto iLine  = 0u;
 					for (auto iStitch = 0u; iStitch < stitchHeader.stitchCount; iStitch++) {
 						if ((stitchesToDraw[iStitch].attribute & 0xf) == iColor) {
-							lines[iLine++] = { dToL(stitchesToDraw[iStitch].x * ratio), dToL(drawingDestinationSize.y - stitchesToDraw[iStitch].y * ratio) };
+							lines[iLine++] = { dToL(stitchesToDraw[iStitch].x * ratio),
+								               dToL(drawingDestinationSize.y - stitchesToDraw[iStitch].y * ratio) };
 						}
 						else {
 							pen = nuPen(pen, 1, colors[iColor]);
@@ -17091,7 +17092,8 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 						for (auto iVertexInForm = 0u;
 						     (iVertexInForm < formList[iStitch].vertexCount) && (iVertex < stitchHeader.vertexCount);
 						     iVertexInForm++) {
-							lines[iVertexInForm] = { dToL(vertexList[iVertex].x * ratio), dToL(drawingDestinationSize.y - vertexList[iVertex++].y * ratio) };
+							lines[iVertexInForm] = { dToL(vertexList[iVertex].x * ratio),
+								                     dToL(drawingDestinationSize.y - vertexList[iVertex++].y * ratio) };
 						}
 						lines[formList[iStitch].vertexCount]
 						    = { dToL(vertexList[iLine].x * ratio), dToL(drawingDestinationSize.y - vertexList[iLine].y * ratio) };
