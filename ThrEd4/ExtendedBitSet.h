@@ -11,7 +11,7 @@
 template <typename Block = unsigned, typename Allocator = std::allocator<unsigned>>
 class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator>
 {
-	typedef boost::dynamic_bitset<Block, Allocator> super;
+	using super = boost::dynamic_bitset<Block, Allocator>;
 
 public:
 	[[gsl::suppress(26434)]] explicit ExtendedBitSet(std::size_t bits)

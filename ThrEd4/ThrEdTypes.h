@@ -667,16 +667,18 @@ enum featherStyles
 #pragma pack(1)
 
 // pcs file header structure
-typedef struct _pcsheader {
+struct _pcsheader {
 	char           leadIn;
 	char           hoopType;
 	unsigned short colorCount;
 	COLORREF       colors[16];
 	unsigned short stitchCount;
-} PCSHEADER;
+};
+
+using PCSHEADER = struct _pcsheader;
 
 // ini file structure
-typedef struct _iniFil {
+struct _iniFil {
 	char           defaultDirectory[180];         // default directory
 	COLORREF       stitchColors[16];              // colors
 	COLORREF       stitchPreferredColors[16];     // stitch preference colors
@@ -761,7 +763,9 @@ typedef struct _iniFil {
 	unsigned short textureEditorSize;             // texture editor pixels
 	float          clpspc;                        // clipboard fill spacing
 	char           designerName[50];              // designer name
-} INIFILE;
+};
+
+using INIFILE = struct _iniFil;
 
 enum machineType
 {
@@ -770,12 +774,14 @@ enum machineType
 	AUXPES
 };
 
-typedef struct _formVertices {
+struct _formVertices {
 	unsigned int start;
 	unsigned int vertexCount;
 	unsigned int finish;
 	unsigned int form;
-} FORMVERTICES;
+};
+
+using FORMVERTICES = struct _formVertices;
 
 class fPOINT;
 class fPOINTATTR;
@@ -915,25 +921,29 @@ inline dPOINT& dPOINT::operator=(const BSEQPNT& rhs) noexcept {
 	return *this;
 }
 
-typedef struct _doublePointLine {
+struct _doublePointLine {
 	double         x;
 	double         y;
 	unsigned short line;
+};
 
-} dPOINTLINE;
+using dPOINTLINE = struct _doublePointLine;
 
-typedef struct _doublerectangle {
+struct _doublerectangle {
 	double top;
 	double bottom;
 	double left;
 	double right;
+};
 
-} dRECTANGLE;
+using dRECTANGLE = struct _doublerectangle;
 
-typedef struct _colChng {
+struct _colChng {
 	unsigned short stitchIndex; // stitch index
 	unsigned short colorIndex;  // color index
-} COLCHNG;
+};
+
+using COLCHNG = struct _colChng;
 
 class FEATHER
 {
@@ -1020,18 +1030,22 @@ bit definitions for fPOINTATTR.attribute
 #define FRMBFIL 0x40000000
 #define FRMAPFIL 0x60000000
 
-typedef struct _floatRectangle {
+struct _floatRectangle {
 	float top;
 	float left;
 	float right;
 	float bottom;
-} fRECTANGLE;
+};
 
-typedef struct _forminfo {
+using fRECTANGLE = struct _floatRectangle;
+
+struct _forminfo {
 	unsigned     type;
 	unsigned     attribute;
 	unsigned int sideCount;
-} FORMINFO;
+};
+
+using FORMINFO = struct _forminfo;
 
 class SATCONOUT;
 
@@ -1267,7 +1281,7 @@ EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
 #define EGPIC_LINS 7
 #define EGCHN_LINS 6
 
-typedef struct _featherInfo {
+struct _featherInfo {
 	unsigned char  fillType;      // feather fill type
 	unsigned char  upCount;       // feather up count
 	unsigned char  downCount;     // feather down count
@@ -1275,19 +1289,25 @@ typedef struct _featherInfo {
 	float          ratio;         // feather ratio
 	float          minStitchSize; // feather floor
 	unsigned short count;         // feather fill psg granularity
-} FTHINFO;
+};
 
-typedef struct _textureInfo {
+using FTHINFO = struct _featherInfo;
+
+struct _textureInfo {
 	short          lines;
 	unsigned short index;
 	unsigned short count;
 	float          height;
-} TXTRINFO;
+};
 
-typedef union _tfhed {
+using TXTRINFO = struct _textureInfo;
+
+union _tfhed {
 	FTHINFO  feather;
 	TXTRINFO texture;
-} TFINFO;
+};
+
+using TFINFO = union _tfhed;
 
 // Original form header used prior to version 2
 class FRMHEDO
@@ -1639,25 +1659,31 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 #define FRECONT 0x80
 #define NFRECONT 0x7f
 
-typedef struct _frmclp {
+struct _frmclp {
 	unsigned clipType;
 	unsigned reserved;
 	FRMHED   form;
-} FORMCLIP; // form data clipboard header
+};
 
-typedef struct _frmsclp {
+using FORMCLIP = struct _frmclp; // form data clipboard header
+
+struct _frmsclp {
 	unsigned       clipType;
 	unsigned short formCount;
 	unsigned short reserved;
-} FORMSCLIP; // multiple forms clipboard header
+};
 
-typedef struct _fvclip {
+using FORMSCLIP = struct _frmsclp; // multiple forms clipboard header
+
+struct _fvclip {
 	unsigned     clipType;
 	unsigned int vertexCount;
 	bool         direction;
-} FORMVERTEXCLIP; // form points clipboard header
+};
 
-typedef struct _strhed { // thred file header
+using FORMVERTEXCLIP = struct _fvclip; // form points clipboard header
+
+struct _strhed { // thred file header
 	unsigned       headerType;
 	unsigned       fileLength;    // length of strhed + length of stitch data
 	unsigned short stitchCount;   // number of stitches
@@ -1669,16 +1695,20 @@ typedef struct _strhed { // thred file header
 	unsigned short dlineCount;    // dline data count
 	unsigned short clipDataLen;   // points to clipboard data
 	unsigned short clipDataCount; // clipboard data count
-} STRHED;
+};
 
-typedef struct _txpnt { // textured fill point
+using STRHED = _strhed;
+
+struct _txpnt { // textured fill point
 	float          y;
 	unsigned short line;
-} TXPNT;
+};
+
+using TXPNT = struct _txpnt;
 
 #define RES_SIZE 26
 
-typedef struct _strex {         // thred v1.0 file header extension
+struct _strex {         // thred v1.0 file header extension
 	float    hoopSizeX;         // hoop size x dimension
 	float    hoopSizeY;         // hoop size y dimension
 	float    stgran;            // stitches per millimeter
@@ -1688,9 +1718,11 @@ typedef struct _strex {         // thred v1.0 file header extension
 	char     stres;             // reserved
 	unsigned texturePointCount; // textured fill point count
 	char     res[RES_SIZE];     // reserved for expansion
-} STREX;
+};
 
-typedef struct _dsthed { // dst file header
+using STREX = struct _strex;
+
+struct _dsthed { // dst file header
 	char desched[3];     // 0 0		description
 	char desc[17];       // 3 3
 	char recshed[3];     // 20 14	record count
@@ -1717,7 +1749,9 @@ typedef struct _dsthed { // dst file header
 	char pd[7];          // 116 74
 	char eof[1];         // 123 7B
 	char res[388];       // 124 7C
-} DSTHED;
+};
+
+using DSTHED = struct _dsthed;
 
 // dst type masks
 
@@ -1725,18 +1759,22 @@ typedef struct _dsthed { // dst file header
 #define COLTYP 0x630000
 #define REGTYP 0x030000
 
-typedef struct _dstrec { // dst stitch record
+struct _dstrec { // dst stitch record
 	unsigned char led;
 	unsigned char mid;
 	unsigned char nd;
-} DSTREC;
+};
 
-typedef struct _dstoffsets {
+using DSTREC = struct _dstrec;
+
+struct _dstoffsets {
 	POINT Positive; // plus offset written into the destination file header
 	POINT Negative; // minus offset written into the destination file header
-} DSTOffsets;
+};
 
-typedef struct _pcstch {
+using DSTOffsets = struct _dstoffsets;
+
+struct _pcstch {
 	unsigned char fx; // fractional part of x coord or color if tag = 3
 	short         x;  // integer part of x coord
 	unsigned char nx;
@@ -1744,9 +1782,11 @@ typedef struct _pcstch {
 	short         y;  // integer part of y coord
 	unsigned char ny;
 	unsigned char tag;
-} PCSTCH;
+};
 
-typedef struct _clpstch {
+using PCSTCH = struct _pcstch;
+
+struct _clpstch {
 	unsigned int   led;  // ????
 	unsigned char  fx;   // fractional part of x coord
 	unsigned short x;    // integer part of x coord
@@ -1756,9 +1796,11 @@ typedef struct _clpstch {
 	unsigned char  spcy; // ToDo - Is this structure member needed?
 	unsigned char  myst; // ToDo - Is this structure member needed?
 	unsigned char  tag;  // ToDo - Is this structure member needed?
-} CLPSTCH;
+};
 
-typedef struct _bakhed {
+using CLPSTCH = struct _clpstch;
+
+struct _bakhed {
 	unsigned int formCount;
 	FRMHED*      forms;
 	unsigned     stitchCount;
@@ -1773,57 +1815,75 @@ typedef struct _bakhed {
 	TXPNT*       texturePoints;
 	unsigned int texturePointCount;
 	POINT        zoomRect;
-} BAKHED;
+};
 
-typedef struct _flsiz {
+using BAKHED = struct _bakhed;
+
+struct _flsiz {
 	float cx;
 	float cy;
-} FLSIZ;
+};
 
-typedef struct _frmrange {
+using FLSIZ = struct _flsiz;
+
+struct _frmrange {
 	unsigned int start;
 	unsigned int finish;
-} FRMRANGE;
+};
 
-typedef struct _range {
+using FRMRANGE = struct _frmrange;
+
+struct _range {
 	unsigned start;
 	unsigned finish;
-} RANGE;
+};
 
-typedef struct _region {  // region for sequencing vertical fills
+using RANGE = struct _range;
+
+struct _region {  // region for sequencing vertical fills
 	unsigned start;       // start line of region
 	unsigned end;         // end line of region
 	unsigned regionBreak; // ToDo - Is this member needed?
 	unsigned breakCount;
-} REGION;
+};
 
-typedef struct _rcon { // PathMap: path map for sequencing
+using REGION = struct _region;
+
+struct _rcon { // PathMap: path map for sequencing
 	unsigned node;
 	bool     isConnected;
 	unsigned nextGroup;
-} RCON;
+};
 
-typedef struct _rgseq { // TempPath: temporary path connections
+using RCON = struct _rcon;
+
+struct _rgseq { // TempPath: temporary path connections
 	unsigned pcon;      // pointer to PathMap entry
 	int      count;
 	bool     skp; // path not found
-} RGSEQ;
+};
 
-typedef struct _fseq { // SequencePath: path of sequenced regions
+using RGSEQ = struct _rgseq;
+
+struct _fseq { // SequencePath: path of sequenced regions
 	unsigned short node;
 	unsigned short nextGroup;
 	bool           skp; // path not found
-} FSEQ;
+};
+
+using FSEQ = struct _fseq;
 
 #define SEQTOP 2
 #define SEQBOT 3
 
-typedef struct _pvec {
+struct _pvec {
 	double angle;
 	double length;
-} PVEC;
+};
 
-typedef struct _vrct2 {
+using PVEC = struct _pvec;
+
+struct _vrct2 {
 	dPOINT aipnt;
 	dPOINT aopnt;
 	dPOINT bipnt;
@@ -1832,9 +1892,11 @@ typedef struct _vrct2 {
 	dPOINT copnt;
 	dPOINT dipnt;
 	dPOINT dopnt;
-} VRCT2;
+};
 
-typedef struct _cursorMask {
+using VRCT2 = struct _vrct2;
+
+struct _cursorMask {
 	unsigned char form[128];
 	unsigned char dline[128];
 	unsigned char uprightNeedle[128];
@@ -1842,10 +1904,12 @@ typedef struct _cursorMask {
 	unsigned char leftDownNeedle[128];
 	unsigned char rightUpNeedle[128];
 	unsigned char rightDownNeedle[128];
-} CURSORMASK;
+};
+
+using CURSORMASK = struct _cursorMask;
 
 // balarad file header
-typedef struct _balhed {
+struct _balhed {
 	COLORREF       color[256];
 	unsigned       signature;
 	unsigned short version;
@@ -1853,17 +1917,21 @@ typedef struct _balhed {
 	float          hoopSizeY;
 	COLORREF       backgroundColor;
 	unsigned char  res[1006];
-} BALHED;
+};
+
+using BALHED = struct _balhed;
 
 // balarad stitch
-typedef struct _balstch {
+struct _balstch {
 	unsigned char code;
 	unsigned char flag;
 	float         x;
 	float         y;
-} BALSTCH;
+};
 
-typedef struct _clpseg {
+using BALSTCH = struct _balstch;
+
+struct _clpseg {
 	unsigned     start;
 	float        beginLength;
 	unsigned     beginIndex;
@@ -1873,7 +1941,9 @@ typedef struct _clpseg {
 	unsigned     endIndex;
 	unsigned int zsid;
 	char         dun;
-} CLPSEG;
+};
+
+using CLPSEG = struct _clpseg;
 
 class CLIPSORT
 {
@@ -1886,26 +1956,32 @@ public:
 	constexpr CLIPSORT() noexcept = default;
 };
 
-typedef struct _clipnt {
+struct _clipnt {
 	float        x;
 	float        y;
 	unsigned int vertexIndex;
 	unsigned     flag;
-} CLIPNT;
+};
 
-typedef struct _vclpx {
+using CLIPNT = struct _clipnt;
+
+struct _vclpx {
 	unsigned segment;
 	unsigned vertex;
-} VCLPX;
+};
+
+using VCLPX = struct _vclpx;
 
 #if PESACT
 
-typedef struct _pesled {
+struct _pesled {
 	char     ver[8];
 	unsigned pec;
-} PESLED;
+};
 
-typedef struct _peshed {
+using PESLED = struct _pesled;
+
+struct _peshed {
 	char  led[8];
 	char  off[3];
 	char  m1[13];
@@ -1918,30 +1994,40 @@ typedef struct _peshed {
 	char  m4[3];
 	char  scol;
 	char  m5[3];
-} PESHED;
+};
 
-typedef struct _pestch {
+using PESHED = struct _peshed;
+
+struct _pestch {
 	short x;
 	short y;
-} PESTCH;
+};
+
+using PESTCH = struct _pestch;
 
 #endif
 
-typedef struct _trcpnt {
+struct _trcpnt {
 	SHORT x;
 	SHORT y;
-} TRCPNT;
+};
+
+using TRCPNT = struct _trcpnt;
 
 // ToDo - Is this struct needed?
-typedef struct _txtmsg {
+struct _txtmsg {
 	unsigned cod;
 	char*    str;
-} TXTMSG;
+};
 
-typedef struct _grdcod {
+using TXTMSG = struct _txtmsg;
+
+struct _grdcod {
 	unsigned id;
 	unsigned col;
-} GRDCOD;
+};
+
+using GRDCOD = struct _grdcod;
 
 #pragma pack()
 
@@ -2233,7 +2319,7 @@ enum textureButtons
 
 #define HLIN HNUM
 
-typedef struct _orec {
+struct _orec {
 	unsigned    start;
 	unsigned    finish;
 	fPOINTATTR* startStitch;
@@ -2242,17 +2328,21 @@ typedef struct _orec {
 	unsigned    type;
 	unsigned    form;
 	unsigned    otyp;
-} OREC;
+};
 
-typedef struct _srtrec {
+using OREC = struct _orec;
+
+struct _srtrec {
 	unsigned start;         // start region index
 	unsigned finish;        // finish region index
 	unsigned count;         // number of regions in range
 	unsigned currentRegion; // current region index
 	bool     direction;     // direction of sort
-} SRTREC;
+};
 
-typedef struct _fstrts {
+using SRTREC = struct _srtrec;
+
+struct _fstrts {
 	unsigned applique;
 	unsigned fill;
 	unsigned feather;
@@ -2261,12 +2351,16 @@ typedef struct _fstrts {
 	unsigned fillColor;
 	unsigned featherColor;
 	unsigned borderColor;
-} FSTRTS;
+};
 
-typedef union _fillStarts {
+using FSTRTS = struct _fstrts;
+
+union _fillStarts {
 	FSTRTS       fillNamed;
 	unsigned int fillArray[sizeof(FSTRTS) / sizeof(unsigned int)];
-} FILLSTARTS;
+};
+
+using FILLSTARTS = union _fillStarts;
 
 #define M_AP 2
 #define M_CWLK 4
@@ -2280,12 +2374,14 @@ typedef union _fillStarts {
 #define M_FTHCOL 1024
 #define M_ECOL 2048
 
-typedef struct _insrec {
+struct _insrec {
 	unsigned code;
 	unsigned color;
 	unsigned index;
 	unsigned seq;
-} INSREC;
+};
+
+using INSREC = struct _insrec;
 
 enum interleaveTypes
 { // interleave sequence identifiers
@@ -2295,14 +2391,16 @@ enum interleaveTypes
 	I_BRD,
 };
 
-typedef struct _intinf {
+struct _intinf {
 	unsigned     pins;
 	unsigned     coloc;
 	unsigned int layerIndex;
 	unsigned     start;
 	unsigned     output;
 	fPOINTATTR*  highStitchBuffer;
-} INTINF;
+};
+
+using INTINF = struct _intinf;
 
 class TXTSCR
 {
@@ -2324,50 +2422,62 @@ public:
 	constexpr TXTSCR() noexcept = default;
 };
 
-typedef struct _txtrct {
+struct _txtrct {
 	unsigned short left;
 	unsigned short right;
 	float          top;
 	float          bottom;
-} TXTRCT;
+};
 
-typedef struct _txhst {
+using TXTRCT = struct _txtrct;
+
+struct _txhst {
 	std::vector<TXPNT> texturePoint;
 	float              height  = 0.0;
 	float              width   = 0.0;
 	float              spacing = 0.0;
-} TXHST;
+};
 
-typedef struct _txhstbuff {
+using TXHST = struct _txhst;
+
+struct _txhstbuff {
 	unsigned*    placeholder;
 	unsigned int count;
 	float        height;
 	float        width;
 	float        spacing;
-} TXHSTBUF;
+};
 
-typedef struct _rngcnt {
+using TXHSTBUF = struct _txhstbuff;
+
+struct _rngcnt {
 	int line;
 	int stitchCount;
-} RNGCNT;
+};
+
+using RNGCNT = struct _rngcnt;
 
 #define BADFLT 1
 #define BADCLP 2
 #define BADSAT 4
 #define BADTX 8
 
-typedef struct _badcnts {
+struct _badcnts {
 	unsigned     attribute;
 	unsigned int flt;
 	unsigned int clip;
 	unsigned int guideCount; // ToDo - is this an accurate description?
 	unsigned int tx;
-} BADCNTS;
+};
 
-typedef struct _findInfo {
+using BADCNTS = struct _badcnts;
+
+struct _findInfo {
 	unsigned         count;
 	WIN32_FIND_DATA* data;
-} FINDINFO;
+};
+
+using FINDINFO = struct _findInfo;
 
 // Line point intersection
 enum intersectionStyles
@@ -2378,11 +2488,13 @@ enum intersectionStyles
 };
 
 // Sorted line length info
-typedef struct _lengthInfo {
+struct _lengthInfo {
 	unsigned index;
 	bool     isEnd;
 	float    length;
-} LENINFO;
+};
+
+using LENINFO = struct _lengthInfo;
 
 // Do the type punning while ensuring that the returned pointer is non_null
 // use the encapsulation recommended in I.30
