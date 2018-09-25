@@ -467,9 +467,8 @@ bool texture::internal::px2txt(const POINT& offset) {
 		TempTexturePoints->push_back(tmp);
 		return true;
 	}
-	else {
-		return false;
-	}
+
+	return false;
 }
 
 void texture::internal::deorg(POINT& point) noexcept {
