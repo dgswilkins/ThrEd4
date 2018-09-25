@@ -10978,7 +10978,7 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, unsigned currentSti
 		for (iOffset = 0; iOffset < length; iOffset++) {
 			const auto layer = (activeStitch[iOffset].attribute & LAYMSK) >> LAYSHFT;
 			if (!ActiveLayer || !layer || (layer == ActiveLayer)) {
-				linePoints[LineIndex]
+				linePoints[LineIndex++]
 				    = { dToL((activeStitch[iOffset].x - ZoomRect.left) * ZoomRatio.x),
 					    dToL(StitchWindowClientRect.bottom - (activeStitch[iOffset].y - ZoomRect.bottom) * ZoomRatio.y) };
 			}
