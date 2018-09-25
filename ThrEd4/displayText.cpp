@@ -288,10 +288,10 @@ bool displayText::filmsgs(unsigned code) {
 			return true;
 		
 	}
-	else {
+	
 		displayText::tabmsg(IDS_FILCR);
 		return true;
-	}
+	
 }
 
 void displayText::grpmsg() {
