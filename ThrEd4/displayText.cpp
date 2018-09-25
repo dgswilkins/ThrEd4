@@ -427,7 +427,7 @@ void displayText::updateWinFont(HWND hWnd) noexcept {
 	auto const* hFont = displayText::getThrEdFont(400);
 	EnumChildWindows(hWnd,
 	                 [](HWND p_hWnd, LPARAM lParam) noexcept->BOOL {
-		                 SendMessage(p_hWnd, WM_SETFONT, static_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
+		                 SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
 		                 return TRUE;
 	                 },
 	                 (LPARAM)hFont);
