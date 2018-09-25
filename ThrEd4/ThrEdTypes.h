@@ -789,7 +789,7 @@ public:
 	double y{ 0.0 };
 
 	constexpr dPOINT() noexcept = default;
-	explicit inline dPOINT(const fPOINT& rhs);
+	explicit inline dPOINT(const fPOINT& rhs) noexcept;
 	inline dPOINT(float rhsX, float rhsY) noexcept;
 	inline dPOINT(double rhsX, double rhsY) noexcept;
 	inline bool    operator==(const dPOINT& rhs) const noexcept;
@@ -805,6 +805,7 @@ public:
 
 	constexpr fPOINT() noexcept = default;
 	inline fPOINT(double rhsX, double rhsY) noexcept;
+	inline fPOINT(float rhsX, float rhsY) noexcept;
 	explicit inline fPOINT(const dPOINT& rhs) noexcept;
 	inline bool    operator==(const fPOINT& rhs) const noexcept;
 	inline fPOINT& operator=(const dPOINT& rhs) noexcept;
@@ -840,6 +841,11 @@ public:
 
 inline bool fPOINT::operator==(const fPOINT& rhs) const noexcept {
 	return (x == rhs.x) && (y == rhs.y);
+}
+
+inline fPOINT::fPOINT(float rhsX, float rhsY) noexcept
+    : x(rhsX)
+    , y(rhsY) {
 }
 
 #pragma warning(push)
@@ -879,9 +885,9 @@ inline fPOINT& fPOINT::operator=(const BSEQPNT& rhs) noexcept {
 	return *this;
 }
 
-inline dPOINT::dPOINT(const fPOINT& rhs) {
-	x = gsl::narrow<double>(rhs.x);
-	y = gsl::narrow<double>(rhs.y);
+inline dPOINT::dPOINT(const fPOINT& rhs) noexcept
+    : x(rhs.x)
+    , y(rhs.y) {
 }
 
 inline dPOINT::dPOINT(float rhsX, float rhsY) noexcept
