@@ -56,8 +56,9 @@ void formForms::maxtsiz(const std::wstring& label, POINT& textSize) {
 
 	GetTextExtentPoint32Int(GetDC(ThrEdWindow), label.data(), gsl::narrow<unsigned int>(label.size()), &labelSize);
 	textSize.y = labelSize.cy;
-	if (labelSize.cx > textSize.x)
+	if (labelSize.cx > textSize.x) {
 		textSize.x = labelSize.cx;
+	}
 }
 
 void formForms::maxwid(unsigned start, unsigned finish) {
@@ -442,9 +443,9 @@ void formForms::internal::refrmfn() {
 
 /*
 BOOL CALLBACK formForms::internal::chenum(HWND hwnd, LPARAM lParam) noexcept {
-	UNREFERENCED_PARAMETER(lParam);
+    UNREFERENCED_PARAMETER(lParam);
 
-	return DestroyWindow(hwnd);
+    return DestroyWindow(hwnd);
 }
 */
 
@@ -655,12 +656,15 @@ void formForms::frmnum() {
 }
 
 void formForms::internal::chkdaz() {
-	if (!IniFile.daisyPetalPoints)
+	if (!IniFile.daisyPetalPoints) {
 		IniFile.daisyPetalPoints = 1;
-	if (!IniFile.daisyInnerCount)
+	}
+	if (!IniFile.daisyInnerCount) {
 		IniFile.daisyInnerCount = 1;
-	if (!IniFile.daisyPetalCount)
+	}
+	if (!IniFile.daisyPetalCount) {
 		IniFile.daisyPetalCount = 1;
+	}
 	if (IniFile.daisyHeartCount > gsl::narrow<unsigned char>(IniFile.daisyPetalPoints))
 		IniFile.daisyHeartCount = gsl::narrow<unsigned char>(IniFile.daisyPetalPoints);
 }
@@ -700,7 +704,6 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 
 BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
-
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
@@ -757,13 +760,15 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			break;
 		}
 		case IDC_DLIN: {
-			if (IsDlgButtonChecked(hwndlg, IDC_DLIN))
+			if (IsDlgButtonChecked(hwndlg, IDC_DLIN)) {
 				CheckDlgButton(hwndlg, IDC_HOLE, BST_CHECKED);
+			}
 			break;
 		}
 		case IDC_HOLE: {
-			if (!IsDlgButtonChecked(hwndlg, IDC_HOLE))
+			if (!IsDlgButtonChecked(hwndlg, IDC_HOLE)) {
 				CheckDlgButton(hwndlg, IDC_DLIN, BST_UNCHECKED);
+			}
 			break;
 		}
 		}
@@ -787,8 +792,9 @@ void formForms::dasyfrm() {
 	form::fvars(FormIndex);
 	auto       maximumXsize = ZoomRect.right - ZoomRect.left;
 	const auto maximumYsize = ZoomRect.top - ZoomRect.bottom;
-	if (maximumYsize > maximumXsize)
+	if (maximumYsize > maximumXsize) {
 		maximumXsize = maximumYsize;
+	}
 	maximumXsize /= 6;
 	auto       diameter     = IniFile.daisyDiameter;
 	auto       petalLength  = IniFile.daisyPetalLen;
@@ -848,10 +854,12 @@ void formForms::dasyfrm() {
 			}
 			case DSAW: {
 				auto sawPointCount = 0u;
-				if (iPoint > halfPetalPointCount)
+				if (iPoint > halfPetalPointCount) {
 					sawPointCount = IniFile.daisyPetalPoints - iPoint;
-				else
+				}
+				else {
 					sawPointCount = iPoint;
+				}
 				distanceFromDaisyCenter
 				    = diameter + (static_cast<double>(sawPointCount) / IniFile.daisyPetalPoints * petalLength);
 				break;
@@ -864,16 +872,19 @@ void formForms::dasyfrm() {
 			}
 			case DCOG: {
 				distanceFromDaisyCenter = diameter;
-				if (iPoint > halfPetalPointCount)
+				if (iPoint > halfPetalPointCount) {
 					distanceFromDaisyCenter += petalLength;
+				}
 				break;
 			}
 			case DHART: {
 				distanceFromDaisyCenter = diameter + sin(petalPointAngle) * petalLength;
-				if (iPoint > IniFile.daisyHeartCount)
+				if (iPoint > IniFile.daisyHeartCount) {
 					petalPointAngle -= deltaPetalAngle;
-				else
+				}
+				else {
 					petalPointAngle += deltaPetalAngle;
+				}
 				break;
 			}
 			}
@@ -920,7 +931,6 @@ inline void formForms::internal::initTearDlg(HWND hwndlg) {
 
 bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
-
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
@@ -1014,10 +1024,12 @@ void formForms::setear() {
 		CurrentFormVertices[1].x += twistStep;
 		verticalPosition -= step / 2.0;
 		CurrentFormVertices[VertexCount] = CurrentFormVertices[0];
-		if (twistStep)
+		if (twistStep) {
 			CurrentFormVertices[0].x = CurrentFormVertices[1].x + twistStep / 4.0;
-		else
+		}
+		else {
 			CurrentFormVertices[0].x = middle;
+		}
 		CurrentFormVertices[0].y = verticalPosition;
 		SelectedForm->vertexCount++;
 		NewFormVertexCount++;
@@ -1030,11 +1042,13 @@ void formForms::setear() {
 		const fPOINT size            = { SelectedForm->rectangle.right - SelectedForm->rectangle.left,
                               SelectedForm->rectangle.top - SelectedForm->rectangle.bottom };
 		auto         horizontalRatio = UnzoomedRect.x / 4.0 / size.x;
-		if (horizontalRatio > 1.0)
+		if (horizontalRatio > 1.0) {
 			horizontalRatio = 1.0;
+		}
 		const auto verticalRatio = UnzoomedRect.y / 4.0 / size.y;
-		if (verticalRatio < horizontalRatio)
+		if (verticalRatio < horizontalRatio) {
 			horizontalRatio = verticalRatio;
+		}
 		if (horizontalRatio < 1.0) {
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				CurrentFormVertices[iVertex].x
@@ -1061,7 +1075,6 @@ inline void formForms::internal::wavinit(HWND hwndlg) {
 bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
@@ -1084,12 +1097,15 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 			IniFile.waveEnd = gsl::narrow<unsigned char>(std::stoi(buffer));
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer, HBUFSIZ);
 			IniFile.waveLobes = gsl::narrow<unsigned char>(std::stoi(buffer));
-			if (IniFile.wavePoints > 100)
+			if (IniFile.wavePoints > 100) {
 				IniFile.wavePoints = 100;
-			if (IniFile.wavePoints < 3)
+			}
+			if (IniFile.wavePoints < 3) {
 				IniFile.wavePoints = 3;
-			if (IniFile.waveStart == IniFile.waveEnd)
+			}
+			if (IniFile.waveStart == IniFile.waveEnd) {
 				IniFile.waveEnd += (IniFile.wavePoints >> 2);
+			}
 			IniFile.waveStart %= IniFile.wavePoints;
 			IniFile.waveEnd %= IniFile.wavePoints;
 			EndDialog(hwndlg, 1);
@@ -1162,11 +1178,13 @@ void formForms::wavfrm() {
 		const fPOINT selectedSize    = { SelectedForm->rectangle.right - SelectedForm->rectangle.left,
                                       SelectedForm->rectangle.top - SelectedForm->rectangle.bottom };
 		auto         horizontalRatio = UnzoomedRect.x / 4.0 / selectedSize.x;
-		if (horizontalRatio > 1)
+		if (horizontalRatio > 1) {
 			horizontalRatio = 1.0;
+		}
 		const auto verticalRatio = UnzoomedRect.y / 4.0 / selectedSize.y;
-		if (verticalRatio < horizontalRatio)
+		if (verticalRatio < horizontalRatio) {
 			horizontalRatio = verticalRatio;
+		}
 		if (horizontalRatio < 1.0) {
 			for (auto index = 0u; index < vertexCount; index++) {
 				CurrentFormVertices[index].x
