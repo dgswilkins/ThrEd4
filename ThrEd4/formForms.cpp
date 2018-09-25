@@ -694,7 +694,7 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 	CheckDlgButton(hWinDialog, IDC_HOLE, UserFlagMap.test(UserFlag::DAZHOL));
 	CheckDlgButton(hWinDialog, IDC_DLIN, UserFlagMap.test(UserFlag::DAZD));
 	std::wstring daisyType;
-	for (auto DaisyTypeString : DaisyTypeStrings) {
+	for (const auto DaisyTypeString : DaisyTypeStrings) {
 		displayText::loadString(daisyType, DaisyTypeString);
 		[[gsl::suppress(type .1)]] SendMessage(
 		    GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str()));
