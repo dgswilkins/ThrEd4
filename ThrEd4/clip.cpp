@@ -45,31 +45,19 @@ double       AdjustedSpace;       // adjusted space
 unsigned int NextStart;           // index of the endpoint of the line segment being processed
 
 bool clip::iseclp(unsigned int iForm) noexcept {
-	if (FormList[iForm].edgeType == EDGECLIP || FormList[iForm].edgeType == EDGEPICOT || FormList[iForm].edgeType == EDGECLIPX) {
-		return true;
-	}
-	return false;
+	return FormList[iForm].edgeType == EDGECLIP || FormList[iForm].edgeType == EDGEPICOT || FormList[iForm].edgeType == EDGECLIPX;
 }
 
 bool clip::isclp(unsigned int iForm) noexcept {
-	if ((1 << FormList[iForm].fillType) & ClipTypeMap) {
-		return true;
-	}
-	return false;
+	return ((1 << FormList[iForm].fillType) & ClipTypeMap) != 0;
 }
 
 bool clip::isclpx(unsigned int iForm) noexcept {
-	if (clip::isclp(iForm) && FormList[iForm].lengthOrCount.clipCount) {
-		return true;
-	}
-	return false;
+	return clip::isclp(iForm) && FormList[iForm].lengthOrCount.clipCount;
 }
 
 bool clip::iseclpx(unsigned int iForm) noexcept {
-	if (clip::iseclp(iForm) && FormList[iForm].clipEntries) {
-		return true;
-	}
-	return false;
+	return clip::iseclp(iForm) && FormList[iForm].clipEntries;
 }
 
 unsigned int clip::internal::findclp(unsigned int formIndex) noexcept {
