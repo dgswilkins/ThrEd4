@@ -52,8 +52,9 @@ void repair::lodchk() {
 	thred::delinf();
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		SelectedForm = &FormList[iForm];
-		if (!SelectedForm->type)
+		if (!SelectedForm->type) {
 			SelectedForm->type = FRMFPOLY;
+		}
 		else {
 			if (SelectedForm->type == FRMLINE) {
 				if (SelectedForm->fillType != CONTF) {
@@ -63,10 +64,12 @@ void repair::lodchk() {
 			}
 		}
 		form::frmout(iForm);
-		if (!SelectedForm->maxFillStitchLen)
+		if (!SelectedForm->maxFillStitchLen) {
 			SelectedForm->maxFillStitchLen = IniFile.maxStitchLength;
-		if (!SelectedForm->maxBorderStitchLen)
+		}
+		if (!SelectedForm->maxBorderStitchLen) {
 			SelectedForm->maxBorderStitchLen = IniFile.maxStitchLength;
+		}
 	}
 	boost::dynamic_bitset<> formMap(FormIndex);
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -119,18 +122,21 @@ unsigned repair::internal::frmchkfn() {
 		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 			const auto* formHeader = &FormList[iForm];
 			if (!(badData.attribute & BADFLT)) {
-				if (!formHeader->vertexCount)
+				if (!formHeader->vertexCount) {
 					badData.attribute |= BADFLT;
+				}
 				if (badData.flt == gsl::narrow<unsigned int>(formHeader->vertices - FormVertices))
 					badData.flt += formHeader->vertexCount;
 				else
 					badData.attribute |= BADFLT;
 			}
 			if (!(badData.attribute & BADCLP)) {
-				if (clip::isclp(iForm))
+				if (clip::isclp(iForm)) {
 					ri::chkclp(formHeader, badData);
-				if (clip::iseclp(iForm))
+				}
+				if (clip::iseclp(iForm)) {
 					ri::chkeclp(formHeader, badData);
+				}
 			}
 			if (formHeader->type == SAT && formHeader->satinGuideCount) {
 				if (!(badData.attribute & BADSAT)) {
@@ -142,45 +148,57 @@ unsigned repair::internal::frmchkfn() {
 			}
 			if (texture::istx(iForm)) {
 				if (!(badData.attribute & BADTX)) {
-					if (badData.tx == formHeader->fillInfo.texture.index)
+					if (badData.tx == formHeader->fillInfo.texture.index) {
 						badData.tx += formHeader->fillInfo.texture.count;
-					else
+					}
+					else {
 						badData.attribute |= BADTX;
+					}
 				}
 			}
-			if (badData.attribute == (BADFLT | BADCLP | BADSAT | BADTX))
+			if (badData.attribute == (BADFLT | BADCLP | BADSAT | BADTX)) {
 				break;
+			}
 		}
-		if (badData.flt != FormVertexIndex)
+		if (badData.flt != FormVertexIndex) {
 			badData.attribute |= BADFLT;
-		if (badData.clip != ClipPointIndex)
+		}
+		if (badData.clip != ClipPointIndex) {
 			badData.attribute |= BADCLP;
-		if (badData.guideCount != satin::getGuideSize())
+		}
+		if (badData.guideCount != satin::getGuideSize()) {
 			badData.attribute |= BADSAT;
-		if (badData.tx != TextureIndex)
+		}
+		if (badData.tx != TextureIndex) {
 			badData.attribute |= BADTX;
+		}
 	}
 	return badData.attribute;
 }
 
 void repair::internal::bcup(unsigned int find, BADCNTS& badData) noexcept {
 	const auto& formHeader = FormList[find];
-	if (clip::isclp(find))
+	if (clip::isclp(find)) {
 		badData.clip += formHeader.lengthOrCount.clipCount;
-	if (clip::iseclp(find))
+	}
+	if (clip::iseclp(find)) {
 		badData.clip += formHeader.clipEntries;
-	if (formHeader.type == SAT)
+	}
+	if (formHeader.type == SAT) {
 		badData.guideCount += formHeader.satinGuideCount;
-	if (texture::istx(find))
+	}
+	if (texture::istx(find)) {
 		badData.tx += formHeader.fillInfo.texture.count;
+	}
 }
 
 void repair::internal::chkfstch() noexcept {
 	const auto codedFormIndex = FormIndex << FRMSHFT;
 
 	for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if ((StitchBuffer[iStitch].attribute & FRMSK) >= codedFormIndex)
+		if ((StitchBuffer[iStitch].attribute & FRMSK) >= codedFormIndex) {
 			StitchBuffer[iStitch].attribute = NOTFRM;
+		}
 	}
 }
 
@@ -197,10 +215,10 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	}
 	FormIndex = iDestination;
 	std::vector<fPOINT> vertexPoint;
-	auto              iVertex = 0u;
+	auto                iVertex = 0u;
 	bool                flag    = true;
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-		const auto   formHeader       = &FormList[iForm];
+		const auto formHeader = &FormList[iForm];
 		// ToDo - find a better way than pointer arithmetic
 		const auto vertexDifference = gsl::narrow<unsigned int>(formHeader->vertices - FormVertices);
 		if (FormVertexIndex >= vertexDifference + formHeader->vertexCount) {
@@ -250,7 +268,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 	std::vector<fPOINT> clipPoint;
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		const auto formHeader     = &FormList[iForm];
-		auto     clipDifference = 0u;
+		auto       clipDifference = 0u;
 		if (clip::isclp(iForm)) {
 			// ToDo - pointer arithmetic to be fixed
 			clipDifference = formHeader->angleOrClipData.clip - ClipPoints;
@@ -316,8 +334,9 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 	}
 	std::copy(clipPoint.cbegin(), clipPoint.cend(), ClipPoints);
 	ClipPointIndex = clipCount;
-	if (badClipCount)
+	if (badClipCount) {
 		ri::adbad(repairMessage, IDS_CLPDAT, badClipCount);
+	}
 }
 
 void repair::internal::repsat() {
@@ -387,8 +406,9 @@ void repair::internal::reptx() {
 					ri::bcup(iForm, badData);
 					textureCount = badData.tx;
 				}
-				else
+				else {
 					formHeader->fillType = 0;
+				}
 			}
 		}
 	}
@@ -401,14 +421,18 @@ void repair::repar() {
 
 	thred::savdo();
 	// RepairString = MsgBuffer;
-	if (repairType & BADFLT)
+	if (repairType & BADFLT) {
 		ri::repflt(repairMessage);
-	if (repairType & BADCLP)
+	}
+	if (repairType & BADCLP) {
 		ri::repclp(repairMessage);
-	if (repairType & BADSAT)
+	}
+	if (repairType & BADSAT) {
 		ri::repsat();
-	if (repairType & BADTX)
+	}
+	if (repairType & BADTX) {
 		ri::reptx();
+	}
 	repair::lodchk();
 	StateMap.set(StateFlag::RESTCH);
 	displayText::shoMsg(repairMessage);
@@ -419,13 +443,15 @@ void repair::frmchkx() {
 		const auto code = ri::frmchkfn();
 		switch (IniFile.dataCheck) {
 		case 1: {
-			if (code)
+			if (code) {
 				displayText::datmsg(code);
+			}
 			break;
 		}
 		case 2: {
-			if (code)
+			if (code) {
 				repair::repar();
+			}
 			break;
 		}
 		case 3: {
