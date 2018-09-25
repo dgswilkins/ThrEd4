@@ -5720,8 +5720,8 @@ void thred::internal::zumin() {
 			if (StateMap.test(StateFlag::FORMSEL)) {
 				const auto& boundingRect = FormList[ClosestFormToCursor].rectangle;
 
-				SelectedPoint = { ((boundingRect.right - boundingRect.left) / 2) + boundingRect.left,
-					              ((boundingRect.top - boundingRect.bottom) / 2) + boundingRect.bottom };
+				SelectedPoint = { ((boundingRect.right - boundingRect.left) / 2.0f) + boundingRect.left,
+					              ((boundingRect.top - boundingRect.bottom) / 2.0f) + boundingRect.bottom };
 				break;
 			}
 			if (StateMap.test(StateFlag::FRMPSEL)) {
@@ -5735,8 +5735,8 @@ void thred::internal::zumin() {
 			if (StateMap.test(StateFlag::GRPSEL)) {
 				fRECTANGLE groupBoundingRect = {};
 				thred::selRct(groupBoundingRect);
-				SelectedPoint = { ((groupBoundingRect.right - groupBoundingRect.left) / 2) + groupBoundingRect.left,
-					              ((groupBoundingRect.top - groupBoundingRect.bottom) / 2) + groupBoundingRect.bottom };
+				SelectedPoint = { ((groupBoundingRect.right - groupBoundingRect.left) / 2.0f) + groupBoundingRect.left,
+					              ((groupBoundingRect.top - groupBoundingRect.bottom) / 2.0f) + groupBoundingRect.bottom };
 				break;
 			}
 			if (StateMap.test(StateFlag::INSRT)) {
@@ -5780,7 +5780,7 @@ void thred::internal::zumin() {
 				centr();
 		} while (false);
 	}
-	ZoomRect = { ZoomRect.right / StitchWindowAspectRatio, 0, 0, UnzoomedRect.x * ZoomFactor };
+	ZoomRect = { (UnzoomedRect.x * ZoomFactor) / StitchWindowAspectRatio, 0, 0, UnzoomedRect.x * ZoomFactor };
 	thred::shft(SelectedPoint);
 	NearestCount = 0;
 	if (!StateMap.test(StateFlag::GMRK) && StateMap.test(StateFlag::SELBOX))
@@ -16976,7 +16976,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 		STRHED stitchHeader = {};
 		ReadFile(thrEdFile, &stitchHeader, sizeof(stitchHeader), &BytesRead, nullptr);
 		if (BytesRead == sizeof(stitchHeader)) {
-			fPOINT     stitchSourceSize = { 1, 1 };
+			fPOINT     stitchSourceSize = { 1.0f, 1.0f };
 			const auto fileTypeVersion  = (stitchHeader.headerType & 0xff000000) >> 24;
 			if ((stitchHeader.headerType & 0xffffff) == 0x746872) {
 				switch (fileTypeVersion) {
