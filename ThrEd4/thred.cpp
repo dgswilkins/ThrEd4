@@ -344,10 +344,12 @@ POINT RotateBoxToCursorLine[2];  // line from the cursor to the center of the ro
 COLCHNG ColorChangeTable[MAXCHNG];
 STREX   ExtendedHeader; // thred file header extension
 
-typedef struct _dstdat {
+struct _dstdat {
 	char cor;
 	char val;
-} DSTDAT;
+};
+
+using DSTDAT = struct _dstdat;
 
 #define XCOR 0
 #define YCOR 1
