@@ -586,13 +586,8 @@ bool trace::internal::trcbit(const unsigned initialDirection, unsigned& traceDir
 		if (tracedPoints.size() >= 500000)
 			return false;
 	}
-	if (traceDirection == initialDirection && CurrentTracePoint.x == tracedPoints[0].x
-	    && CurrentTracePoint.y == tracedPoints[0].y) {
-		return false;
-	}
-	else {
-		return true;
-	}
+	return !(traceDirection == initialDirection && CurrentTracePoint.x == tracedPoints[0].x
+	         && CurrentTracePoint.y == tracedPoints[0].y);
 }
 
 void trace::internal::dutdif(TRCPNT& traceDiff, const TRCPNT* point) noexcept {
