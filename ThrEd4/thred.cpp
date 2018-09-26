@@ -3264,16 +3264,19 @@ void thred::internal::ritini() {
 	std::fill(IniFile.defaultDirectory, IniFile.defaultDirectory + sizeof(IniFile.defaultDirectory), fillchar);
 	std::copy(directory.begin(), directory.end(), IniFile.defaultDirectory);
 	const auto& previousNames = *PreviousNames;
-	std::string previous;
-	for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
-		auto& prevNam = IniFile.prevNames[iVersion];
-		std::fill(prevNam, prevNam + sizeof(prevNam), fillchar);
-		if (!previousNames[iVersion].empty()) {
-			previous.assign(utf::Utf16ToUtf8(previousNames[iVersion]));
-			std::copy(previous.begin(), previous.end(), IniFile.prevNames[iVersion]);
-		}
-		else {
-			previous.clear();
+	{
+		std::string previous;
+		auto        iVersion = 0u;
+		for (auto& prevName : IniFile.prevNames) {
+			std::fill(prevName, prevName + sizeof(prevName), fillchar);
+			if (!previousNames[iVersion].empty()) {
+				previous.assign(utf::Utf16ToUtf8(previousNames[iVersion]));
+				std::copy(previous.begin(), previous.end(), prevName);
+			}
+			else {
+				previous.clear();
+			}
+			iVersion++;
 		}
 	}
 	auto designer = utf::Utf16ToUtf8(*DesignerName);
@@ -11986,32 +11989,38 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio
 			return true;
 		}
 		if (StateMap.testAndReset(StateFlag::BAKSHO)) {
-			if (Msg.message == WM_RBUTTONDOWN)
+			if (Msg.message == WM_RBUTTONDOWN) {
 				StateMap.set(StateFlag::RBUT);
-			else
+			}
+			else {
 				StateMap.reset(StateFlag::RBUT);
-			for (auto iVersion = 0u; iVersion < OLDVER; iVersion++) {
-				if (Msg.hwnd == BackupViewer[iVersion]) {
-					FileVersionIndex = gsl::narrow<char>(iVersion);
-					if (StateMap.test(StateFlag::THUMSHO)) {
-						if (savcmp()) {
-							thumbak();
-						}
-						else {
-							if (StateMap.test(StateFlag::RBUT))
+			}
+			{
+				auto iVersion = 0u;
+				for (auto& iBackup : BackupViewer) {
+					if (Msg.hwnd == iBackup) {
+						FileVersionIndex = gsl::narrow<char>(iVersion);
+						if (StateMap.test(StateFlag::THUMSHO)) {
+							if (savcmp()) {
 								thumbak();
-							else {
-								StateMap.set(StateFlag::THUMON);
-								displayText::savdisc();
 							}
-							return true;
+							else {
+								if (StateMap.test(StateFlag::RBUT))
+									thumbak();
+								else {
+									StateMap.set(StateFlag::THUMON);
+									displayText::savdisc();
+								}
+								return true;
+							}
 						}
+						else
+							rebak();
+						rstAll();
+						StateMap.set(StateFlag::RESTCH);
+						return true;
 					}
-					else
-						rebak();
-					rstAll();
-					StateMap.set(StateFlag::RESTCH);
-					return true;
+					iVersion++;
 				}
 			}
 		}
@@ -15181,16 +15190,19 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio
 	}
 	case WM_COMMAND: {
 		thred::unmsg();
-		if (StateMap.test(StateFlag::FORMSEL))
+		if (StateMap.test(StateFlag::FORMSEL)) {
 			form::fvars(ClosestFormToCursor);
+		}
 		{
 			const auto& previousNames = *PreviousNames;
-			for (auto iVersion = 0u; iVersion < OLDNUM; iVersion++) {
-				if (Msg.wParam == LRUMenuId[iVersion]) {
+			auto        iVersion      = 0u;
+			for (auto iLRU : LRUMenuId) {
+				if (Msg.wParam == iLRU) {
 					*WorkingFileName = previousNames[iVersion];
 					StateMap.set(StateFlag::REDOLD);
 					nuFil();
 				}
+				iVersion++;
 			}
 		}
 		const auto wParameter = LOWORD(Msg.wParam);
@@ -16369,13 +16381,17 @@ void thred::internal::redini() {
 		auto directory = utf::Utf8ToUtf16(IniFile.defaultDirectory);
 		DefaultDirectory->assign(directory);
 		DefaultBMPDirectory->assign(directory);
-		auto& previousNames = *PreviousNames;
-		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
-			if (strlen(IniFile.prevNames[iVersion])) {
-				previousNames[iVersion].assign(utf::Utf8ToUtf16(std::string(IniFile.prevNames[iVersion])));
-			}
-			else {
-				previousNames[iVersion].clear();
+		{
+			auto& previousNames = *PreviousNames;
+			auto iVersion = 0u;
+			for (auto& prevName : IniFile.prevNames) {
+				if (strlen(prevName)) {
+					previousNames[iVersion].assign(utf::Utf8ToUtf16(std::string(prevName)));
+				}
+				else {
+					previousNames[iVersion].clear();
+				}
+				iVersion++;
 			}
 		}
 		DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
