@@ -34,10 +34,9 @@ namespace internal {
 
 	void     bfrm();
 	void     blanklin(std::vector<unsigned>& differenceBitmap, unsigned lineStart);
-	unsigned colsum(COLORREF color);
 	void     difbits(unsigned shift, unsigned* point) noexcept;
 
-	static inline void difsub(const unsigned source, unsigned shift, unsigned& destination) noexcept;
+	static inline void difsub(unsigned source, unsigned shift, unsigned& destination) noexcept;
 
 	void     dublk(HDC dc, const RECT& traceHighMask, const RECT& traceLowMask, HBRUSH brush);
 	unsigned ducolm();
@@ -50,14 +49,12 @@ namespace internal {
 	void getrmap();
 	void hidwnd(HWND hwnd) noexcept;
 
-	unsigned icolsum(COLORREF color);
-
 	void pxlin(unsigned int start, unsigned int finish);
 	void ritrcol(COLORREF* color, unsigned number) noexcept;
 	void shownd(HWND hwnd) noexcept;
 	void stch2bit(fPOINT& point);
 	void tracwnd();
-	bool trcbit(const unsigned initialDirection, unsigned& traceDirection, std::vector<TRCPNT>& tracedPoints);
+	bool trcbit(unsigned initialDirection, unsigned& traceDirection, std::vector<TRCPNT>& tracedPoints);
 	bool trcin(COLORREF color);
 	void trcnum(unsigned shift, COLORREF color, unsigned iRGB);
 	void trcols(COLORREF color) noexcept;
