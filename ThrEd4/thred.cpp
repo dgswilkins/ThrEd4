@@ -965,10 +965,7 @@ void thred::internal::getdes() noexcept {
 }
 
 bool thred::internal::isfclp() noexcept {
-	if (clip::isclp(ClosestFormToCursor) && FormList[ClosestFormToCursor].fillType != CLPF) {
-		return true;
-	}
-	return false;
+	return clip::isclp(ClosestFormToCursor) && FormList[ClosestFormToCursor].fillType != CLPF;
 }
 
 double thred::internal::stlen(unsigned iStitch) noexcept {
@@ -1154,9 +1151,9 @@ void thred::internal::redfnam(std::wstring& designerName) {
 		}
 	}
 	designer.reserve(50);
-	for (auto iName = 0; iName < 50; iName++) {
-		if (NameDecoder[tmpName[iName]]) {
-			designer.push_back(NameDecoder[tmpName[iName]]);
+	for (const auto character : tmpName) {
+		if (NameDecoder[character]) {
+			designer.push_back(NameDecoder[character]);
 		}
 		else {
 			break;
@@ -1170,12 +1167,14 @@ void thred::internal::dstin(unsigned number, POINT& pout) noexcept {
 	// ToDo - what is this code doing?
 	auto shift = 1u;
 	pout       = {};
-	for (auto index = 0; index < 22; index++) {
+	for (const auto& DSTValue : DSTValues) {
 		if (number & shift) {
-			if (DSTValues[index].cor)
-				pout.y += DSTValues[index].val;
-			else
-				pout.x += DSTValues[index].val;
+			if (DSTValue.cor) {
+				pout.y += DSTValue.val;
+			}
+			else {
+				pout.x += DSTValue.val;
+			}
 		}
 		shift <<= 1;
 	}
@@ -1416,9 +1415,10 @@ void thred::savdo() {
 void thred::internal::redfils() {
 	WIN32_FIND_DATA findData = {};
 
-	for (auto iLRU = 0; iLRU < OLDNUM; iLRU++) {
-		if (GetMenuState(FileMenu, LRUMenuId[iLRU], MF_BYCOMMAND) != -1)
-			DeleteMenu(FileMenu, LRUMenuId[iLRU], MF_BYCOMMAND);
+	for (const auto iLRU : LRUMenuId) {
+		if (GetMenuState(FileMenu, iLRU, MF_BYCOMMAND) != -1) {
+			DeleteMenu(FileMenu, iLRU, MF_BYCOMMAND);
+		}
 	}
 	auto& previousNames = *PreviousNames;
 	for (auto iLRU = 0; iLRU < OLDNUM; iLRU++) {
@@ -1573,9 +1573,10 @@ void thred::internal::stchPars() {
 void thred::redraw(HWND window) noexcept {
 	RedrawWindow(window, nullptr, nullptr, RDW_INVALIDATE);
 	if (window == MainStitchWin) {
-		for (auto iWindow = 0u; iWindow < 16; iWindow++) {
-			if (DefaultColorWin[iWindow])
-				RedrawWindow(DefaultColorWin[iWindow], nullptr, nullptr, RDW_INVALIDATE);
+		for (auto& iWindow : DefaultColorWin) {
+			if (iWindow) {
+				RedrawWindow(iWindow, nullptr, nullptr, RDW_INVALIDATE);
+			}
 		}
 		RedrawWindow(ColorBar, nullptr, nullptr, RDW_INVALIDATE);
 	}
@@ -1663,8 +1664,9 @@ void thred::movStch() {
 
 void thred::unbsho() {
 	if (StateMap.testAndReset(StateFlag::BAKSHO)) {
-		for (auto iBackup = 0u; iBackup < OLDVER; iBackup++)
-			DestroyWindow(BackupViewer[iBackup]);
+		for (auto& iBackup : BackupViewer) {
+			DestroyWindow(iBackup);
+		}
 	}
 }
 
@@ -2582,10 +2584,9 @@ BOOL CALLBACK thred::internal::EnumChildProc(HWND hwnd, LPARAM lParam) {
 		}
 		return true;
 	}
-	else {
-		FirstWin = hwnd;
-		return TRUE;
-	}
+
+	FirstWin = hwnd;
+	return TRUE;
 }
 
 void thred::internal::rstAll() {
@@ -3219,13 +3220,8 @@ bool thred::internal::stch2px(unsigned iStitch) {
 	StitchCoordinatesPixels
 	    = { dToL((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
 		    dToL(StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5) };
-	if (StitchCoordinatesPixels.x >= 0 && StitchCoordinatesPixels.x <= StitchWindowClientRect.right
-	    && StitchCoordinatesPixels.y >= 0 && StitchCoordinatesPixels.y <= StitchWindowClientRect.bottom) {
-		return true;
-	}
-	else {
-		return false;
-	}
+	return StitchCoordinatesPixels.x >= 0 && StitchCoordinatesPixels.x <= StitchWindowClientRect.right
+	       && StitchCoordinatesPixels.y >= 0 && StitchCoordinatesPixels.y <= StitchWindowClientRect.bottom;
 }
 
 void thred::stch2pxr(const fPOINT& stitchCoordinate) {
@@ -3787,14 +3783,13 @@ constexpr unsigned thred::internal::dudbits(const POINT& dif) {
 bool thred::internal::colfil() {
 	*ColorFileName = *WorkingFileName;
 	*RGBFileName   = *WorkingFileName;
+	auto flag      = false;
 	if (WorkingFileName->has_extension()) {
 		ColorFileName->replace_extension(L"thw");
 		RGBFileName->replace_extension(L"rgb");
-		return true;
+		flag = true;
 	}
-	else {
-		return false;
-	}
+	return flag;
 }
 
 void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
@@ -4887,24 +4882,23 @@ bool thred::internal::binv(const std::vector<unsigned char>& monoBitmapData, uns
 			}
 		}
 	}
-	if (whiteBits > blackBits) {
-		return true;
-	}
-	return false;
+	return whiteBits > blackBits;
 }
 
-void thred::internal::bitlin(const unsigned char* source, unsigned* destination, COLORREF foreground, COLORREF background) {
+void thred::internal::bitlin(const unsigned char* source, unsigned int* destination, COLORREF foreground, COLORREF background) {
 	if (source && destination) {
 		for (auto i = 0u; i < (BitmapWidth >> 3); i++) {
 			std::bitset<8> bits(source[i]);
 			for (unsigned bitOffset = 0; bitOffset < 8; bitOffset++) {
-				*destination++ = bits[bitOffset ^ 7] ? foreground : background;
+				*destination = bits[bitOffset ^ 7] ? foreground : background;
+				destination++;
 			}
 		}
 		if (const unsigned int final = (BitmapWidth % 8)) {
 			std::bitset<8> bits(source[(BitmapWidth >> 3)]);
 			for (auto bitOffset = final; bitOffset < 8; bitOffset++) {
-				*destination++ = bits[bitOffset ^ 7] ? foreground : background;
+				*destination = bits[bitOffset ^ 7] ? foreground : background;
+				destination++;
 			}
 		}
 	}
@@ -4982,9 +4976,8 @@ HBITMAP thred::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uns
 			DeleteObject(bitmap);
 			throw;
 		}
-		else {
-			throw;
-		}
+
+		throw;
 	}
 }
 
@@ -5250,8 +5243,8 @@ dubl2 :
 
 void thred::internal::unthum() {
 	if (StateMap.testAndReset(StateFlag::THUMSHO)) {
-		for (auto iBackup = 0u; iBackup < 4; iBackup++) {
-			DestroyWindow(BackupViewer[iBackup]);
+		for (auto& iBackup : BackupViewer) {
+			DestroyWindow(iBackup);
 		}
 		if (StateMap.test(StateFlag::UPTO))
 			displayText::butxt(HUPTO, (*StringTable)[STR_UPON]);
@@ -5753,8 +5746,8 @@ void thred::internal::nuFil() {
 				wcsncpy_s(buffer, ThreadSize[iColor], 2);
 				SetWindowText(ThreadSizeWin[iColor], buffer);
 			}
-			for (auto iColor = 0u; iColor < 16; iColor++) {
-				thred::redraw(UserColorWin[iColor]);
+			for (auto& iColor : UserColorWin) {
+				thred::redraw(iColor);
 			}
 			thred::redraw(ColorBar);
 			if (PCSHeader.stitchCount)
@@ -6052,9 +6045,9 @@ void thred::internal::closPnt() {
 			duClos(iStitch0, iStitch1 - iStitch0);
 	}
 	GetClientRect(MainStitchWin, &StitchWindowClientRect);
-	for (auto iNear = 0u; iNear < NERCNT; iNear++) {
-		if (stch2px(NearestPoint[iNear])) {
-			NearestPoint[NearestCount]   = NearestPoint[iNear];
+	for (const auto iNear : NearestPoint) {
+		if (stch2px(iNear)) {
+			NearestPoint[NearestCount]   = iNear;
 			NearestPixel[NearestCount++] = StitchCoordinatesPixels;
 		}
 	}
@@ -6241,15 +6234,10 @@ void thred::internal::movbox() {
 
 bool thred::internal::chkhid(unsigned colorToCheck) {
 	if (StateMap.test(StateFlag::HID)) {
-		if (ColorChangeTable[colorToCheck].colorIndex == ActiveColor) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		return ColorChangeTable[colorToCheck].colorIndex == ActiveColor;
 	}
-	else
-		return true;
+
+	return true;
 }
 
 /*
@@ -6608,8 +6596,9 @@ void thred::internal::rebox() {
 			StateMap.reset(StateFlag::ECROS);
 			SearchLineIndex = 0;
 			StateMap.set(StateFlag::RESTCH);
-			for (auto iColor = 0u; iColor < 16; iColor++)
-				thred::redraw(UserColorWin[iColor]);
+			for (auto& window : UserColorWin) {
+				thred::redraw(window);
+			}
 		}
 		ritcor(StitchBuffer[ClosestPointIndex]);
 	}
@@ -7584,8 +7573,9 @@ void thred::internal::strtknt(unsigned start) noexcept {
 	if (finish < PCSHeader.stitchCount) {
 		KnotAttribute = StitchBuffer[start].attribute | KNOTMSK;
 		KnotStep      = { 2.0 / length * delta.x, 2.0 / length * delta.y };
-		for (auto iKnot = 0u; iKnot < 5; iKnot++)
-			ofstch(start, KnotAtStartOrder[iKnot]);
+		for (const char iKnot : KnotAtStartOrder) {
+			ofstch(start, iKnot);
+		}
 	}
 }
 
@@ -7674,13 +7664,12 @@ unsigned thred::internal::srchknot(unsigned source) noexcept {
 		}
 		return 2;
 	}
-	else {
-		ActivePointIndex++;
-		if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5) {
-			return 1;
-		}
-		return 3;
+
+	ActivePointIndex++;
+	if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5) {
+		return 1;
 	}
+	return 3;
 }
 
 void thred::internal::chkncol() {
@@ -8641,8 +8630,9 @@ void thred::internal::getbak() {
 }
 
 void thred::internal::rebak() {
-	for (auto iVersion = 0u; iVersion < OLDVER; iVersion++)
-		DestroyWindow(BackupViewer[iVersion]);
+	for (auto& iVersion : BackupViewer) {
+		DestroyWindow(iVersion);
+	}
 	auto newFileName    = *ThrName;
 	auto safetyFileName = *ThrName;
 	auto ext            = newFileName.extension().wstring();
@@ -8662,8 +8652,9 @@ void thred::internal::rebak() {
 }
 
 void thred::internal::thumbak() {
-	for (auto iVersion = 0u; iVersion < OLDVER; iVersion++)
-		DestroyWindow(BackupViewer[iVersion]);
+	for (auto& iVersion : BackupViewer) {
+		DestroyWindow(iVersion);
+	}
 	getbak();
 }
 
@@ -8726,13 +8717,8 @@ bool thred::internal::chkwnd(HWND window) noexcept {
 	RECT windowRect;
 
 	GetWindowRect(window, &windowRect);
-	if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right && Msg.pt.y >= windowRect.top
-	    && Msg.pt.y <= windowRect.bottom) {
-		return true;
-	}
-	else {
-		return false;
-	}
+	return Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right && Msg.pt.y >= windowRect.top
+	       && Msg.pt.y <= windowRect.bottom;
 }
 
 bool thred::internal::chkok() noexcept {
@@ -9552,13 +9538,8 @@ void thred::internal::setsrch(unsigned stitch) {
 }
 
 bool thred::internal::inrng(unsigned stitch) noexcept {
-	if (StitchBuffer[stitch].x >= StitchRangeRect.left && StitchBuffer[stitch].x <= StitchRangeRect.right
-	    && StitchBuffer[stitch].y >= StitchRangeRect.bottom && StitchBuffer[stitch].y <= StitchRangeRect.top) {
-		return true;
-	}
-	else {
-		return false;
-	}
+	return StitchBuffer[stitch].x >= StitchRangeRect.left && StitchBuffer[stitch].x <= StitchRangeRect.right
+	       && StitchBuffer[stitch].y >= StitchRangeRect.bottom && StitchBuffer[stitch].y <= StitchRangeRect.top;
 }
 
 bool thred::internal::finrng(unsigned int find) noexcept {
@@ -9568,16 +9549,10 @@ bool thred::internal::finrng(unsigned int find) noexcept {
 			return true;
 		}
 		const auto cod = (FormList[find].attribute & FRMLMSK) >> 1;
-		if (!cod || ActiveLayer == cod) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		return !cod || ActiveLayer == cod;
 	}
-	else {
-		return false;
-	}
+
+	return false;
 }
 
 void thred::internal::ungrplo() {
@@ -10518,11 +10493,13 @@ void thred::internal::setgrd(COLORREF color) {
 		ID_GRDHI, HIGRD, ID_GRDMED, MEDGRD, ID_GRDEF, DEFGRD, ID_GRDRED, REDGRD, ID_GRDBLU, BLUGRD, ID_GRDGRN, GRNGRD,
 	};
 
-	for (auto iCode = 0u; iCode < 6; iCode++) {
-		if (color == gridCodes[iCode].col)
-			CheckMenuItem(MainMenu, gridCodes[iCode].id, MF_CHECKED);
-		else
-			CheckMenuItem(MainMenu, gridCodes[iCode].id, MF_UNCHECKED);
+	for (const auto gridCode : gridCodes) {
+		if (color == gridCode.col) {
+			CheckMenuItem(MainMenu, gridCode.id, MF_CHECKED);
+		}
+		else {
+			CheckMenuItem(MainMenu, gridCode.id, MF_UNCHECKED);
+		}
 	}
 	GridPen           = nuPen(GridPen, 1, color);
 	IniFile.gridColor = color;
@@ -12746,16 +12723,16 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio
 				buffer[2] = 0;
 				SetWindowText(ThreadSizeWin[ThreadSizeSelected], buffer);
 				StateMap.set(StateFlag::RESTCH);
-				for (auto iWindow = 0u; iWindow < 3; iWindow++) {
-					if (ChangeThreadSizeWin[iWindow]) {
-						DestroyWindow(ChangeThreadSizeWin[iWindow]);
+				for (auto& iWindow : ChangeThreadSizeWin) {
+					if (iWindow) {
+						DestroyWindow(iWindow);
 					}
 				}
 				return true;
 			}
-			for (auto iWindow = 0u; iWindow < 3; iWindow++) {
-				if (ChangeThreadSizeWin[iWindow]) {
-					DestroyWindow(ChangeThreadSizeWin[iWindow]);
+			for (auto& iWindow : ChangeThreadSizeWin) {
+				if (iWindow) {
+					DestroyWindow(iWindow);
 				}
 			}
 		}
@@ -13629,34 +13606,33 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio
 						StateMap.set(StateFlag::RESTCH);
 						return true;
 					}
-					else {
-						xlin();
-						if (StitchBuffer[ClosestPointIndex].attribute & ALTYPMSK
-						    && StitchBuffer[ClosestPointIndex + 1].attribute & ALTYPMSK) {
-							if ((StitchBuffer[ClosestPointIndex].attribute & FRMSK)
-							    == (StitchBuffer[ClosestPointIndex + 1].attribute & FRMSK)) {
-								code = StitchBuffer[ClosestPointIndex].attribute | USMSK;
-							}
+
+					xlin();
+					if (StitchBuffer[ClosestPointIndex].attribute & ALTYPMSK
+					    && StitchBuffer[ClosestPointIndex + 1].attribute & ALTYPMSK) {
+						if ((StitchBuffer[ClosestPointIndex].attribute & FRMSK)
+						    == (StitchBuffer[ClosestPointIndex + 1].attribute & FRMSK)) {
+							code = StitchBuffer[ClosestPointIndex].attribute | USMSK;
 						}
-						auto iStitch = PCSHeader.stitchCount;
-						do {
-							StitchBuffer[iStitch] = StitchBuffer[iStitch - 1];
-							iStitch--;
-						} while (iStitch > ClosestPointIndex);
-						PCSHeader.stitchCount++;
-						ClosestPointIndex++;
-						StitchBuffer[ClosestPointIndex] = { SelectedPoint.x, SelectedPoint.y, code };
-						xlin();
-						InsertLine[1] = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
-						stch2px1(ClosestPointIndex);
-						InsertLine[0] = StitchCoordinatesPixels;
-						stch2px1(ClosestPointIndex + 1);
-						InsertLine[2] = StitchCoordinatesPixels;
-						thred::coltab();
-						StateMap.set(StateFlag::RESTCH);
-						displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
-						return true;
 					}
+					auto iStitch = PCSHeader.stitchCount;
+					do {
+						StitchBuffer[iStitch] = StitchBuffer[iStitch - 1];
+						iStitch--;
+					} while (iStitch > ClosestPointIndex);
+					PCSHeader.stitchCount++;
+					ClosestPointIndex++;
+					StitchBuffer[ClosestPointIndex] = { SelectedPoint.x, SelectedPoint.y, code };
+					xlin();
+					InsertLine[1] = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
+					stch2px1(ClosestPointIndex);
+					InsertLine[0] = StitchCoordinatesPixels;
+					stch2px1(ClosestPointIndex + 1);
+					InsertLine[2] = StitchCoordinatesPixels;
+					thred::coltab();
+					StateMap.set(StateFlag::RESTCH);
+					displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
+					return true;
 				}
 				if ((!StateMap.test(StateFlag::HIDSTCH)) && closPnt1(&ClosestPointIndexClone)) {
 					ClosestPointIndex = ClosestPointIndexClone;
@@ -16693,9 +16669,9 @@ void thred::internal::init() {
 			UserColor[iColor] = DefaultColors[iColor];
 		}
 	}
-	for (auto iColor = 0u; iColor < 16; iColor++) {
-		ThreadSize[iColor][0] = '4';
-		ThreadSize[iColor][1] = '0';
+	for (auto& iSize : ThreadSize) {
+		iSize[0] = '4';
+		iSize[1] = '0';
 	}
 	if (!IniFile.traceLength) {
 		IniFile.traceLength = TRACLEN;
@@ -16838,8 +16814,9 @@ void thred::internal::init() {
 	auto designer = utf::Utf16ToUtf8(*DesignerName);
 	std::copy(designer.begin(), designer.end(), ExtendedHeader.modifierName);
 	ExtendedHeader.stgran = 0;
-	for (auto iByte = 0u; iByte < RES_SIZE; iByte++)
-		ExtendedHeader.res[iByte] = 0;
+	for (auto& reservedChar : ExtendedHeader.res) {
+		reservedChar = 0;
+	}
 	chkhup();
 	nedmen();
 	fil2men();
@@ -16914,12 +16891,11 @@ unsigned thred::internal::chkup(unsigned count, unsigned iStitch) {
 			}
 			return ClosestPointIndex - ColorChangeTable[iStitch].stitchIndex + 1;
 		}
-		else {
-			return 0;
-		}
+
+		return 0;
 	}
-	else
-		return count;
+
+	return count;
 }
 
 bool thred::internal::bitar() {
@@ -17140,9 +17116,8 @@ void thred::internal::drwStch() {
 
 						throw;
 					}
-					else {
-						wascol = 0;
-					}
+
+					wascol = 0;
 				}
 				else {
 					wascol = 0;
