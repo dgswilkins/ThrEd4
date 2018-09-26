@@ -142,7 +142,7 @@ fPOINT* clip::nueclp(unsigned int currentForm, unsigned int count) noexcept {
 	}
 	if (ClipPointIndex) {
 		auto source = ClipPointIndex - 1;
-		while (source >= find) {
+		while (source + 1 >= find + 1) {
 			ClipPoints[destination--] = ClipPoints[source--];
 		}
 	}
