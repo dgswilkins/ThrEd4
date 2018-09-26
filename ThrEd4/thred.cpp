@@ -15198,7 +15198,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio
 		{
 			const auto& previousNames = *PreviousNames;
 			auto        iVersion      = 0u;
-			for (auto iLRU : LRUMenuId) {
+			for (const auto iLRU : LRUMenuId) {
 				if (Msg.wParam == iLRU) {
 					*WorkingFileName = previousNames[iVersion];
 					StateMap.set(StateFlag::REDOLD);
@@ -16386,7 +16386,7 @@ void thred::internal::redini() {
 		{
 			auto& previousNames = *PreviousNames;
 			auto iVersion = 0u;
-			for (auto& prevName : IniFile.prevNames) {
+			for (const auto& prevName : IniFile.prevNames) {
 				if (strlen(prevName)) {
 					previousNames[iVersion].assign(utf::Utf8ToUtf16(std::string(prevName)));
 				}
