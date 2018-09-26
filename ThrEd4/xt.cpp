@@ -978,7 +978,7 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 	fPOINTATTR* currentStitch = nullptr;
 	bool        direction     = sortRecord.direction;
 
-	std::vector<unsigned> formFillCounter((FormIndex + 2u) << 2u);
+	std::vector<unsigned> formFillCounter(gsl::narrow<unsigned int>((gsl::narrow_cast<unsigned long>(FormIndex) + 2u) << 2u));
 	unsigned              totalJumps = 0;
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
 		double minimumLength = 1e9;
