@@ -5181,10 +5181,7 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 }
 
 bool thred::internal::chkdst(const DSTHED* dstHeader) noexcept {
-	if (strncmp(dstHeader->desched, "LA:", 3)) {
-		return false;
-	}
-	return true;
+	return strncmp(dstHeader->desched, "LA:", 3) == 0;
 }
 
 #if PESACT
@@ -8249,12 +8246,7 @@ bool thred::internal::isthr(const wchar_t* const filename) {
 
 	auto extention = thredPath.extension().wstring();
 
-	if ((extention.compare(0, 3, L".th")) == 0) {
-		return true;
-	}
-	else {
-		return false;
-	}
+	return (extention.compare(0, 3, L".th") == 0);
 }
 
 unsigned thred::internal::gethand(const fPOINTATTR* stitch, unsigned stitchCount) noexcept {
@@ -18005,8 +17997,8 @@ int handle_program_memory_depletion(unsigned int) {
 
 #pragma warning(push)
 #pragma warning(disable : 26461) // disable warning for hPrevInstance not being marked as a pointer to const
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PWSTR lpCmdLine, _In_ int nCmdShow) {
-	UNREFERENCED_PARAMETER(nCmdShow);
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd) {
+	UNREFERENCED_PARAMETER(nShowCmd);
 
 	ArgList = CommandLineToArgvW(GetCommandLine(), &ArgCount);
 
