@@ -11730,6 +11730,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio
 			}
 		}
 		else {
+			SetCursor(ArrowCursor);
+			setCursorInt(ArrowCursor);
 			if (StateMap.testAndReset(StateFlag::VCAPT))
 				ReleaseCapture();
 		}
@@ -16385,7 +16387,7 @@ void thred::internal::redini() {
 		DefaultBMPDirectory->assign(directory);
 		{
 			auto& previousNames = *PreviousNames;
-			auto iVersion = 0u;
+			auto  iVersion      = 0u;
 			for (const auto& prevName : IniFile.prevNames) {
 				if (strlen(prevName)) {
 					previousNames[iVersion].assign(utf::Utf8ToUtf16(std::string(prevName)));
