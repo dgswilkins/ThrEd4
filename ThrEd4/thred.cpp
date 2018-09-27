@@ -5915,7 +5915,8 @@ void thred::internal::zumin() {
 			}
 		} while (false);
 	}
-	ZoomRect = { (UnzoomedRect.x * ZoomFactor) / StitchWindowAspectRatio, 0, 0, UnzoomedRect.x * ZoomFactor };
+	auto zoomRight = UnzoomedRect.x * ZoomFactor;
+	ZoomRect = { zoomRight / StitchWindowAspectRatio, 0, 0, zoomRight };
 	thred::shft(SelectedPoint);
 	NearestCount = 0;
 	if (!StateMap.test(StateFlag::GMRK) && StateMap.test(StateFlag::SELBOX))
@@ -5993,7 +5994,8 @@ void thred::internal::zumout() {
 			NearestCount = 0;
 		}
 		else {
-			ZoomRect = { ZoomRect.right / StitchWindowAspectRatio, 0, 0, UnzoomedRect.x * ZoomFactor };
+			auto zoomRight = UnzoomedRect.x * ZoomFactor;
+			ZoomRect = { zoomRight / StitchWindowAspectRatio, 0, 0, zoomRight };
 			thred::shft(SelectedPoint);
 		}
 		if (StateMap.test(StateFlag::RUNPAT)) {
