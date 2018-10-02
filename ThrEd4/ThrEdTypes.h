@@ -68,9 +68,8 @@
 #define TSIZ30 0.3        //#30 thread size in millimeters
 #define TSIZ40 0.2        //#40 thread size in millimeters
 #define TSIZ60 0.05       //#60 thread size in millimeters
-#define SCROLSIZ 12       // width of a scroll bar
-#define COLSIZ 12         // width of the color bar
-#define RIGHTSIZ 24       // SCROLSIZ+COLSIZ
+#define SCROLSIZ 12       // logical pixel width of a scroll bar
+#define COLSIZ 12         // logical pixel width of the color bar
 // ToDo - Should this be a configurable parameter?
 #define CLOSENUF 15              // mouse click region for select
 #define ZMARGIN 1.25             // zoom margin for select zooms

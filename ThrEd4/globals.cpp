@@ -76,6 +76,7 @@ unsigned ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a 
 unsigned int    ClosestFormToCursor;    // closest form to the cursor
 unsigned        ClosestPointIndex;      // index of closest point
 unsigned int    ClosestVertexToCursor;  // formOrigin closest to the cursor
+int*            ColorBarSize;           // Color bar width scaled for DPI
 HCURSOR         CrossCursor;            // cross
 SATCON*         CurrentFormGuides;      // connections in the currently selecteed form
 unsigned int    CurrentFormGuidesCount; // number of connections in the currently selected form
@@ -170,6 +171,7 @@ unsigned int SatinEndGuide;             // satin end guide for the currently sel
 unsigned int SatinGuideIndex;           // next index to append satin connect points
 SATCON       SatinGuides[MAXSAC];       // satin form connects
 RECT         scRct;                     //
+int*         ScrollSize;                // Scroll bar width scaled for DPI
 unsigned     SearchLineIndex = 0;       // pointer for drawing stitch select lines
 HPEN         SelectAllPen;              // pen for drawing large boxes
 FRMHED*      SelectedForm;              // pointer to selected form
