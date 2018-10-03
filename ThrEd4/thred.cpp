@@ -3162,7 +3162,7 @@ void thred::internal::ritlayr() {
 
 HPEN thred::internal::nuPen(HPEN pen, unsigned width, COLORREF color) noexcept {
 	DeleteObject(pen);
-	return CreatePen(PS_SOLID, width, color);
+	return CreatePenInt(PS_SOLID, width, color);
 }
 
 void thred::internal::nuStchSiz(unsigned iColor, unsigned width) noexcept {
@@ -3443,7 +3443,7 @@ void thred::internal::redbal() {
 				}
 			}
 			for (auto iColor = 0u; iColor < ColorChanges; iColor++) {
-				UserPen[iColor]        = CreatePen(PS_SOLID, 1, UserColor[iColor]);
+				UserPen[iColor]        = CreatePenInt(PS_SOLID, 1, UserColor[iColor]);
 				UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 			}
 			PCSHeader.stitchCount = gsl::narrow<unsigned short>(iBalaradStitch);
@@ -16779,32 +16779,32 @@ void thred::internal::init() {
 	nuRct();
 	// create pens
 	for (auto iRGBK = 0u; iRGBK < 4; iRGBK++) {
-		BoxPen[iRGBK] = CreatePen(PS_SOLID, 1, BoxColor[iRGBK]);
+		BoxPen[iRGBK] = CreatePenInt(PS_SOLID, 1, BoxColor[iRGBK]);
 	}
-	LinePen            = CreatePen(PS_SOLID, 1, 0x404040);
-	CrossPen           = CreatePen(PS_SOLID, 5, 0x804080);
-	GroupSelectPen     = CreatePen(PS_SOLID, 1, 0x804080);
-	GridPen            = CreatePen(PS_SOLID, 1, IniFile.gridColor);
-	BackgroundPen      = CreatePen(PS_SOLID, 3, BackgroundColor);
-	BitmapPen          = CreatePen(PS_SOLID, 1, BitmapColor);
-	FormPen            = CreatePen(PS_SOLID, 1, 0xc0c0c0);
-	MultiFormPen       = CreatePen(PS_SOLID, 1, 0xc0c080);
-	FormPen3px         = CreatePen(PS_SOLID, 3, 0xc0c0c0);
-	FormSelectedPen    = CreatePen(PS_SOLID, 1, 0x80c080);
-	ZoomMarkPen        = CreatePen(PS_SOLID, 3, 0x40c040);
-	SelectAllPen       = CreatePen(PS_SOLID, 1, 0xc08080);
-	KnotPen            = CreatePen(PS_SOLID, 1, 0xffffff);
-	LayerPen[0]        = CreatePen(PS_SOLID, 1, 0xc0c0c0);
-	LayerPen[1]        = CreatePen(PS_SOLID, 1, 0x80c0c0);
-	LayerPen[2]        = CreatePen(PS_SOLID, 1, 0xc080c0);
-	LayerPen[3]        = CreatePen(PS_SOLID, 1, 0xc0c080);
-	LayerPen[4]        = CreatePen(PS_SOLID, 1, 0x40c0c0);
-	LayerPen[5]        = CreatePen(PS_SOLID, 1, 0xc0c040);
+	LinePen            = CreatePenInt(PS_SOLID, 1, 0x404040);
+	CrossPen           = CreatePenInt(PS_SOLID, 5, 0x804080);
+	GroupSelectPen     = CreatePenInt(PS_SOLID, 1, 0x804080);
+	GridPen            = CreatePenInt(PS_SOLID, 1, IniFile.gridColor);
+	BackgroundPen      = CreatePenInt(PS_SOLID, 3, BackgroundColor);
+	BitmapPen          = CreatePenInt(PS_SOLID, 1, BitmapColor);
+	FormPen            = CreatePenInt(PS_SOLID, 1, 0xc0c0c0);
+	MultiFormPen       = CreatePenInt(PS_SOLID, 1, 0xc0c080);
+	FormPen3px         = CreatePenInt(PS_SOLID, 3, 0xc0c0c0);
+	FormSelectedPen    = CreatePenInt(PS_SOLID, 1, 0x80c080);
+	ZoomMarkPen        = CreatePenInt(PS_SOLID, 3, 0x40c040);
+	SelectAllPen       = CreatePenInt(PS_SOLID, 1, 0xc08080);
+	KnotPen            = CreatePenInt(PS_SOLID, 1, 0xffffff);
+	LayerPen[0]        = CreatePenInt(PS_SOLID, 1, 0xc0c0c0);
+	LayerPen[1]        = CreatePenInt(PS_SOLID, 1, 0x80c0c0);
+	LayerPen[2]        = CreatePenInt(PS_SOLID, 1, 0xc080c0);
+	LayerPen[3]        = CreatePenInt(PS_SOLID, 1, 0xc0c080);
+	LayerPen[4]        = CreatePenInt(PS_SOLID, 1, 0x40c0c0);
+	LayerPen[5]        = CreatePenInt(PS_SOLID, 1, 0xc0c040);
 	BackgroundPenWidth = 1;
 	for (auto iColor = 0u; iColor < 16; iColor++) {
 		ThreadSizePixels[iColor] = 1;
 		ThreadSizeIndex[iColor]  = 1;
-		UserPen[iColor]          = CreatePen(PS_SOLID, 1, UserColor[iColor]);
+		UserPen[iColor]          = CreatePenInt(PS_SOLID, 1, UserColor[iColor]);
 	}
 	BackgroundBrush = CreateSolidBrush(BackgroundColor);
 	// create brushes
@@ -17478,7 +17478,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					SelectObject(drawItem->hDC, brush);
 					FillRect(drawItem->hDC, &drawItem->rcItem, brush);
 					auto iColor = stitchesToDraw[0].attribute & 0xf;
-					auto pen    = CreatePen(PS_SOLID, 1, colors[iColor]);
+					auto pen    = CreatePenInt(PS_SOLID, 1, colors[iColor]);
 					auto iLine  = 0u;
 					for (auto iStitch = 0u; iStitch < stitchHeader.stitchCount; iStitch++) {
 						if ((stitchesToDraw[iStitch].attribute & 0xf) == iColor) {
@@ -18201,9 +18201,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		}
 
 		// Adjust the scroll width for the screen DPI now that we have a window handle
-		const auto uDpi = GetDpiForWindow(ThrEdWindow);
-		private_ScrollSize = MulDiv(private_ScrollSize, uDpi, 96);
-		private_ColorBarSize = MulDiv(private_ColorBarSize, uDpi, 96);
+		auto private_DPI = GetDpiForWindow(ThrEdWindow);
+		screenDPI = &private_DPI;
+		private_ScrollSize = MulDiv(private_ScrollSize, *screenDPI, 96);
+		private_ColorBarSize = MulDiv(private_ColorBarSize, *screenDPI, 96);
 		thi::init();
 		if (UserFlagMap.test(UserFlag::SAVMAX))
 			ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);

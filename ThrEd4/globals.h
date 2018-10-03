@@ -202,6 +202,7 @@ extern unsigned int SatinEndGuide;
 extern unsigned int SatinGuideIndex;
 extern SATCON       SatinGuides[MAXSAC];
 extern RECT         scRct;
+extern unsigned*    screenDPI;
 extern int*         ScrollSize;
 extern unsigned     SearchLineIndex;
 extern HPEN         SelectAllPen;

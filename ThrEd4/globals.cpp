@@ -171,6 +171,7 @@ unsigned int SatinEndGuide;             // satin end guide for the currently sel
 unsigned int SatinGuideIndex;           // next index to append satin connect points
 SATCON       SatinGuides[MAXSAC];       // satin form connects
 RECT         scRct;                     //
+unsigned*    screenDPI;                 // screen DPI
 int*         ScrollSize;                // Scroll bar width scaled for DPI
 unsigned     SearchLineIndex = 0;       // pointer for drawing stitch select lines
 HPEN         SelectAllPen;              // pen for drawing large boxes

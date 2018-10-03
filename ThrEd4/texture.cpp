@@ -403,7 +403,7 @@ void texture::drwtxtr() {
 		textureRecord.y += IniFile.gridSize;
 	}
 	DeleteObject(TextureCrossPen);
-	TextureCrossPen = CreatePen(PS_SOLID, 1, UserColor[ActiveColor]);
+	TextureCrossPen = CreatePenInt(PS_SOLID, 1, UserColor[ActiveColor]);
 	SelectObject(StitchWindowMemDC, TextureCrossPen);
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	line[0].y = 0;
@@ -420,7 +420,7 @@ void texture::drwtxtr() {
 	line[0].y = line[1].y = TextureScreen.bottom;
 	Polyline(StitchWindowMemDC, line, 2);
 	DeleteObject(TextureCrossPen);
-	TextureCrossPen = CreatePen(PS_SOLID, 1, 0xffffff);
+	TextureCrossPen = CreatePenInt(PS_SOLID, 1, 0xffffff);
 	SelectObject(StitchWindowMemDC, TextureCrossPen);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	for (auto index = 0u; index < TempTexturePoints->size(); index++) {

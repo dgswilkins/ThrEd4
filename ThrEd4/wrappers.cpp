@@ -19,6 +19,7 @@
 #pragma warning(pop)
 
 // Local Headers
+#include "globals.h"
 #include "switches.h"
 #include "wrappers.h"
 
@@ -49,7 +50,7 @@ void GetTextExtentPointInt(HDC hdc, LPCTSTR lpString, unsigned int cbString, LPS
 long dToL(double invar) {
 	return gsl::narrow<long>(std::round(invar));
 }
-unsigned int dToUI(double invar){
+unsigned int dToUI(double invar) {
 	return gsl::narrow<unsigned int>(std::round(invar));
 }
 
@@ -63,4 +64,9 @@ void setCursorInt(HCURSOR hCursor) noexcept {
 		SetCursor(hCursor);
 		saveCursor = hCursor;
 	}
+}
+
+HPEN CreatePenInt(int iStyle, unsigned width, COLORREF color) noexcept {
+	auto scaledWidth = MulDiv(width, *screenDPI, 96);
+	return CreatePen(iStyle, scaledWidth, color);
 }
