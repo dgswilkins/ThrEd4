@@ -474,7 +474,7 @@ void form::internal::frmsqr(unsigned iVertex) {
 
 	thred::stch2pxr(CurrentFormVertices[iVertex]);
 	line[1]             = StitchCoordinatesPixels;
-	const auto   ratio  = static_cast<double>(IniFile.formVertexSizePixels) / StitchWindowClientRect.right;
+	const auto   ratio  = static_cast<double>(MulDiv(IniFile.formVertexSizePixels, *screenDPI, 96)) / StitchWindowClientRect.right;
 	auto         length = (ZoomRect.right - ZoomRect.left) * ratio * 2;
 	const dPOINT delta  = { CurrentFormVertices[iVertex - 1].x - CurrentFormVertices[iVertex].x,
                            CurrentFormVertices[iVertex - 1].y - CurrentFormVertices[iVertex].y };
@@ -483,13 +483,11 @@ void form::internal::frmsqr(unsigned iVertex) {
 	const fPOINT point  = { CurrentFormVertices[iVertex].x + offset.x, CurrentFormVertices[iVertex].y + offset.y };
 	angle               = atan2(-delta.x, delta.y);
 	length /= 2.0;
-	offset.x             = length * cos(angle);
-	offset.y             = length * sin(angle);
+	offset = { length * cos(angle), length * sin(angle) };
 	fPOINT adjustedPoint = { point.x + offset.x, point.y + offset.y };
 	thred::stch2pxr(adjustedPoint);
 	line[0] = line[3] = StitchCoordinatesPixels;
-	adjustedPoint.x   = point.x - offset.x;
-	adjustedPoint.y   = point.y - offset.y;
+	adjustedPoint = { point.x - offset.x, point.y - offset.y };
 	thred::stch2pxr(adjustedPoint);
 	line[2] = StitchCoordinatesPixels;
 	Polyline(StitchWindowMemDC, line, 4);
@@ -497,18 +495,19 @@ void form::internal::frmsqr(unsigned iVertex) {
 
 void form::selsqr(const POINT& controlPoint, HDC dc) noexcept {
 	POINT line[5];
+	const auto offset = gsl::narrow<LONG>(MulDiv(IniFile.formVertexSizePixels, *screenDPI, 96));
 
-	line[0].x = line[3].x = line[4].x = controlPoint.x - IniFile.formVertexSizePixels;
-	line[0].y = line[1].y = controlPoint.y - IniFile.formVertexSizePixels;
-	line[1].x = line[2].x = controlPoint.x + IniFile.formVertexSizePixels;
-	line[2].y = line[3].y = controlPoint.y + IniFile.formVertexSizePixels;
-	line[4].y             = controlPoint.y - IniFile.formVertexSizePixels;
+	line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
+	line[0].y = line[1].y = controlPoint.y - offset;
+	line[1].x = line[2].x = controlPoint.x + offset;
+	line[2].y = line[3].y = controlPoint.y + offset;
+	line[4].y             = controlPoint.y - offset;
 	Polyline(dc, line, 5);
 }
 
 void form::internal::frmsqr0(const POINT& controlPoint) noexcept {
 	POINT          line[5] = {};
-	const unsigned offset  = IniFile.formBoxSizePixels;
+	const auto offset  = gsl::narrow<LONG>(MulDiv(IniFile.formBoxSizePixels, *screenDPI, 96));
 
 	if (offset) {
 		line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
@@ -522,15 +521,16 @@ void form::internal::frmsqr0(const POINT& controlPoint) noexcept {
 
 void form::internal::frmx(const POINT& controlPoint, HDC dc) noexcept {
 	POINT line[2];
+	const auto offset = gsl::narrow<LONG>(MulDiv(8, *screenDPI, 96));
 
 	SelectObject(dc, FormSelectedPen);
 	line[0].x = line[1].x = controlPoint.x;
-	line[0].y             = controlPoint.y + 8;
-	line[1].y             = controlPoint.y - 8;
+	line[0].y             = controlPoint.y + offset;
+	line[1].y             = controlPoint.y - offset;
 	Polyline(dc, line, 2);
 	line[0].y = line[1].y = controlPoint.y;
-	line[0].x             = controlPoint.x - 8;
-	line[1].x             = controlPoint.x + 8;
+	line[0].x             = controlPoint.x - offset;
+	line[1].x             = controlPoint.x + offset;
 	Polyline(dc, line, 2);
 	SelectObject(dc, FormPen);
 }

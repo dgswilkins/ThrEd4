@@ -6736,14 +6736,15 @@ void thred::internal::setbak(unsigned penWidth) noexcept {
 void thred::internal::stchbox(unsigned iStitch, HDC dc) {
 	POINT      line[5] = {};
 	const auto layer   = (StitchBuffer[iStitch].attribute & LAYMSK) >> LAYSHFT;
+	const unsigned offset = MulDiv(IniFile.stitchSizePixels, *screenDPI, 96);
 
 	if (!ActiveLayer || !layer || layer == ActiveLayer) {
 		stch2px1(iStitch);
-		line[0].x = line[3].x = line[4].x = StitchCoordinatesPixels.x - IniFile.stitchSizePixels;
-		line[0].y = line[1].y = StitchCoordinatesPixels.y - IniFile.stitchSizePixels;
-		line[1].x = line[2].x = StitchCoordinatesPixels.x + IniFile.stitchSizePixels;
-		line[2].y = line[3].y = StitchCoordinatesPixels.y + IniFile.stitchSizePixels;
-		line[4].y             = StitchCoordinatesPixels.y - IniFile.stitchSizePixels;
+		line[0].x = line[3].x = line[4].x = StitchCoordinatesPixels.x - offset;
+		line[0].y = line[1].y = StitchCoordinatesPixels.y - offset;
+		line[1].x = line[2].x = StitchCoordinatesPixels.x + offset;
+		line[2].y = line[3].y = StitchCoordinatesPixels.y + offset;
+		line[4].y             = StitchCoordinatesPixels.y - offset;
 		Polyline(dc, line, 5);
 	}
 }
@@ -8197,7 +8198,7 @@ constexpr unsigned thred::internal::nxtcrnr(unsigned corner) {
 void thred::internal::drwmrk(HDC dc) {
 	POINT      markCoordinates = {};
 	POINT      markLine[2]     = {};
-	const long markOffset      = 6;
+	const auto markOffset      = gsl::narrow<long>(MulDiv(6, *screenDPI, 96));
 
 	thred::sCor2px(ZoomMarkPoint, markCoordinates);
 	SelectObject(dc, ZoomMarkPen);
