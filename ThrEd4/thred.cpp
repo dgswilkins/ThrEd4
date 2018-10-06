@@ -1561,8 +1561,8 @@ void thred::internal::stchPars() {
 			StitchWindowSize.y = ThredWindowRect.bottom - *ScrollSize;
 	}
 	else {
-		StitchWindowSize
-		    = { gsl::narrow<LONG>(ThredWindowRect.right - ButtonWidthX3 - *ColorBarSize), ThredWindowRect.bottom - ThredWindowRect.top };
+		StitchWindowSize = { gsl::narrow<LONG>(ThredWindowRect.right - ButtonWidthX3 - *ColorBarSize),
+			                 ThredWindowRect.bottom - ThredWindowRect.top };
 		if (static_cast<double>(StitchWindowSize.x) / static_cast<double>(StitchWindowSize.y) > AspectRatio) {
 			StitchWindowSize.x = dToL(StitchWindowSize.y * AspectRatio);
 		}
@@ -1628,8 +1628,9 @@ void thred::internal::nuRct() {
 }
 
 void thred::movStch() {
-	POINT clientSize     = { (ThredWindowRect.right - gsl::narrow<LONG>(ButtonWidthX3) - (*ScrollSize + *ColorBarSize)), (ThredWindowRect.bottom) };
-	auto  verticalOffset = 0;
+	POINT clientSize         = { (ThredWindowRect.right - gsl::narrow<LONG>(ButtonWidthX3) - (*ScrollSize + *ColorBarSize)),
+                         (ThredWindowRect.bottom) };
+	auto  verticalOffset     = 0;
 	auto  actualWindowHeight = StitchWindowSize.y;
 
 	thi::unboxs();
@@ -3190,11 +3191,13 @@ void thred::internal::rotpix(const POINT& unrotatedPoint, POINT& rotatedPoint, c
 }
 
 void thred::internal::duar() {
-	POINT arrowCenter = { (StitchCoordinatesPixels.x - 10), (StitchCoordinatesPixels.y + 10) };
+	const auto offset = gsl::narrow<LONG>(MulDiv(10, *screenDPI, 96));
+
+	POINT arrowCenter = { (StitchCoordinatesPixels.x - offset), (StitchCoordinatesPixels.y + offset) };
 
 	StitchArrow[1] = StitchCoordinatesPixels;
 	rotpix(arrowCenter, StitchArrow[0], StitchCoordinatesPixels);
-	arrowCenter.y = StitchCoordinatesPixels.y - 10;
+	arrowCenter.y = StitchCoordinatesPixels.y - offset;
 	rotpix(arrowCenter, StitchArrow[2], StitchCoordinatesPixels);
 	SelectObject(StitchWindowMemDC, BoxPen[0]);
 	SelectObject(StitchWindowDC, BoxPen[0]);
@@ -5916,7 +5919,7 @@ void thred::internal::zumin() {
 		} while (false);
 	}
 	const auto zoomRight = UnzoomedRect.x * ZoomFactor;
-	ZoomRect = { zoomRight / StitchWindowAspectRatio, 0, 0, zoomRight };
+	ZoomRect             = { zoomRight / StitchWindowAspectRatio, 0, 0, zoomRight };
 	thred::shft(SelectedPoint);
 	NearestCount = 0;
 	if (!StateMap.test(StateFlag::GMRK) && StateMap.test(StateFlag::SELBOX))
@@ -5995,7 +5998,7 @@ void thred::internal::zumout() {
 		}
 		else {
 			const auto zoomRight = UnzoomedRect.x * ZoomFactor;
-			ZoomRect = { zoomRight / StitchWindowAspectRatio, 0, 0, zoomRight };
+			ZoomRect             = { zoomRight / StitchWindowAspectRatio, 0, 0, zoomRight };
 			thred::shft(SelectedPoint);
 		}
 		if (StateMap.test(StateFlag::RUNPAT)) {
@@ -6734,9 +6737,9 @@ void thred::internal::setbak(unsigned penWidth) noexcept {
 }
 
 void thred::internal::stchbox(unsigned iStitch, HDC dc) {
-	POINT      line[5] = {};
-	const auto layer   = (StitchBuffer[iStitch].attribute & LAYMSK) >> LAYSHFT;
-	const unsigned offset = MulDiv(IniFile.stitchSizePixels, *screenDPI, 96);
+	POINT          line[5] = {};
+	const auto     layer   = (StitchBuffer[iStitch].attribute & LAYMSK) >> LAYSHFT;
+	const unsigned offset  = MulDiv(IniFile.stitchSizePixels, *screenDPI, 96);
 
 	if (!ActiveLayer || !layer || layer == ActiveLayer) {
 		stch2px1(iStitch);
@@ -16779,6 +16782,7 @@ void thred::internal::init() {
 	                        nullptr);
 	nuRct();
 	// create pens
+
 	for (auto iRGBK = 0u; iRGBK < 4; iRGBK++) {
 		BoxPen[iRGBK] = CreatePenInt(PS_SOLID, 1, BoxColor[iRGBK]);
 	}
@@ -16959,24 +16963,27 @@ inline void thred::internal::stCor2px(const fPOINTATTR& stitch, POINT& point) {
 }
 
 void thred::internal::drwknot() {
-#define KSIZ 5
-#define KLSIZ 10
-
-	POINT point   = {};
-	POINT tlin[5] = {};
+#define KSIZ 5   // offset of the knot box sides
+#define KLSIZ 10 // length of the knot line
 
 	if (!UserFlagMap.test(UserFlag::KNOTOF) && KnotCount && PCSHeader.stitchCount) {
+		const auto kOffset = gsl::narrow<LONG>(MulDiv(KSIZ, *screenDPI, 96));
+		const auto kLine   = gsl::narrow<LONG>(MulDiv(KLSIZ, *screenDPI, 96));
+
+		POINT point   = {};
+		POINT tlin[5] = {};
+
 		for (auto ind = 0u; ind < KnotCount; ind++) {
 			stCor2px(StitchBuffer[Knots[ind]], point);
 			SelectObject(StitchWindowMemDC, KnotPen);
 			SetROP2(StitchWindowMemDC, R2_XORPEN);
-			tlin[0].x = tlin[3].x = tlin[4].x = point.x - KSIZ;
-			tlin[1].x = tlin[2].x = point.x + KSIZ;
-			tlin[0].y = tlin[1].y = tlin[4].y = point.y + KSIZ;
-			tlin[2].y = tlin[3].y = point.y - KSIZ;
+			tlin[0].x = tlin[3].x = tlin[4].x = point.x - kOffset;
+			tlin[1].x = tlin[2].x = point.x + kOffset;
+			tlin[0].y = tlin[1].y = tlin[4].y = point.y + kOffset;
+			tlin[2].y = tlin[3].y = point.y - kOffset;
 			Polyline(StitchWindowMemDC, tlin, 5);
-			tlin[0].x = point.x - KLSIZ;
-			tlin[1].x = point.x + KLSIZ;
+			tlin[0].x = point.x - kLine;
+			tlin[1].x = point.x + kLine;
 			tlin[0].y = tlin[1].y = point.y;
 			Polyline(StitchWindowMemDC, tlin, 2);
 			SetROP2(StitchWindowMemDC, R2_COPYPEN);
@@ -18166,11 +18173,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		CreateParams createParams;
 		createParams.bEnableNonClientDpiScaling = true;
 
-		auto private_ScrollSize = SCROLSIZ;
-		ScrollSize = &private_ScrollSize;
+		auto private_ScrollSize   = SCROLSIZ;
+		ScrollSize                = &private_ScrollSize;
 		auto private_ColorBarSize = COLSIZ;
-		ColorBarSize = &private_ColorBarSize;
-
+		ColorBarSize              = &private_ColorBarSize;
 
 		if (IniFile.initialWindowCoords.right) {
 			ThrEdWindow = CreateWindow(L"thred",
@@ -18202,9 +18208,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		}
 
 		// Adjust the scroll width for the screen DPI now that we have a window handle
-		auto private_DPI = GetDpiForWindow(ThrEdWindow);
-		screenDPI = &private_DPI;
-		private_ScrollSize = MulDiv(private_ScrollSize, *screenDPI, 96);
+		auto private_DPI     = GetDpiForWindow(ThrEdWindow);
+		screenDPI            = &private_DPI;
+		private_ScrollSize   = MulDiv(private_ScrollSize, *screenDPI, 96);
 		private_ColorBarSize = MulDiv(private_ColorBarSize, *screenDPI, 96);
 		thi::init();
 		if (UserFlagMap.test(UserFlag::SAVMAX))
