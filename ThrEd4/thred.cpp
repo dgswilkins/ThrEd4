@@ -2389,130 +2389,198 @@ void thred::internal::chknum() {
 			}
 			else {
 				if (wcslen(MsgBuffer)) {
-					value = bufToDouble(MsgBuffer);
+					value        = bufToDouble(MsgBuffer);
+					MsgBuffer[0] = 0;
+					do {
+						if (StateMap.testAndReset(StateFlag::ENTRFNUM)) {
+							if (value < FormIndex) {
+								form::frmnumfn(dToUI(value));
+							}
+							else {
+								displayText::tabmsg(IDS_FRMN1);
+							}
+							return;
+						}
+						auto uintValue = gsl::narrow<unsigned int>(std::floor(value));
+						if (StateMap.testAndReset(StateFlag::ENTRPOL)) {
+							form::durpoli(uintValue);
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::ENTRSTAR)) {
+							form::dustar(uintValue,
+							             250 / value * ZoomFactor * (UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY));
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::ENTRSPIR)) {
+							form::duspir(uintValue);
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::ENTRHART)) {
+							form::duhart(uintValue);
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::ENTRLENS)) {
+							form::dulens(uintValue);
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::ENTREG)) {
+							form::dueg(uintValue);
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::ENTRZIG)){
+							form::duzig(uintValue);
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::PIXIN)) {
+							IniFile.nudgePixels = gsl::narrow<unsigned short>(std::round(pxchk(value)));
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::STPXIN)) {
+							IniFile.stitchSizePixels = gsl::narrow<unsigned short>(std::round(pxchk(value)));
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FRMPXIN)) {
+							IniFile.formVertexSizePixels = gsl::narrow<unsigned short>(std::round(value));
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FRMBOXIN)) {
+							IniFile.formBoxSizePixels = gsl::narrow<unsigned short>(std::round(value));
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::GETMIN)) {
+							SmallStitchLength = value * PFGRAN;
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::ENTR30)) {
+							ThreadSize30 = value;
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::ENTR40)) {
+							ThreadSize40 = value;
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::ENTR60)) {
+							ThreadSize60 = value;
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::SCLPSPAC)) {
+							IniFile.clipOffset = value * PFGRAN;
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETFIND)) {
+							xt::dufind(value);
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETFHI)) {
+							if (value) {
+								xt::dufhi(value * PFGRAN);
+							}
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETFWID)) {
+							if (value) {
+								xt::dufwid(value * PFGRAN);
+							}
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETFMAX)) {
+							if (value) {
+								xt::dufmax(value * PFGRAN);
+							}
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETFMIN)) {
+							xt::dufmin(value * PFGRAN);
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETBMAX)) {
+							if (value) {
+								xt::dubmax(value * PFGRAN);
+							}
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETBMIN)) {
+							xt::dubmin(value * PFGRAN);
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETBSPAC)) {
+							if (value) {
+								xt::dubspac(value * PFGRAN);
+							}
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETFLEN)) {
+							if (value) {
+								xt::dublen(value * PFGRAN);
+							}
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETBCOL)) {
+							xt::dubcol(dToUI(value));
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETFCOL)) {
+							xt::dufcol(dToUI(value));
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETUCOL)) {
+							xt::dundcol(dToUI(value));
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETFANG)) {
+							xt::dufxang(value);
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETFSPAC)) {
+							if (value) {
+								xt::dufspac(value * PFGRAN);
+							}
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETUANG)) {
+							xt::dufang(value);
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETFLEN)) {
+							if (value) {
+								xt::duflen(value * PFGRAN);
+							}
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETUSPAC)) {
+							if (value) {
+								xt::duspac(value * PFGRAN);
+							}
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::FSETULEN)) {
+							if (value) {
+								xt::dusulen(value * PFGRAN);
+							}
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::GTUANG)) {
+							IniFile.underlayAngle = value / 180 * PI;
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::GTUSPAC)) {
+							if (value) {
+								IniFile.underlaySpacing = value * PFGRAN;
+							}
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::GTWLKIND)) {
+							IniFile.underlayIndent = value * PFGRAN;
+							break;
+						}
+						if (StateMap.testAndReset(StateFlag::GTWLKLEN)) {
+							if (value) {
+								IniFile.underlayStitchLen = value * PFGRAN;
+							}
+							break;
+						}
+					} while (false);
 				}
-				if (StateMap.testAndReset(StateFlag::SCLPSPAC))
-					IniFile.clipOffset = value * PFGRAN;
-				if (StateMap.testAndReset(StateFlag::FSETFIND))
-					xt::dufind(value);
-				if (StateMap.testAndReset(StateFlag::FSETFHI)) {
-					if (value) {
-						xt::dufhi(value * PFGRAN);
-					}
-				}
-				if (StateMap.testAndReset(StateFlag::FSETFWID)) {
-					if (value) {
-						xt::dufwid(value * PFGRAN);
-					}
-				}
-				if (StateMap.testAndReset(StateFlag::FSETFMAX)) {
-					if (value) {
-						xt::dufmax(value * PFGRAN);
-					}
-				}
-				if (StateMap.testAndReset(StateFlag::FSETFMIN))
-					xt::dufmin(value * PFGRAN);
-				if (StateMap.testAndReset(StateFlag::FSETBMAX)) {
-					if (value) {
-						xt::dubmax(value * PFGRAN);
-					}
-				}
-				if (StateMap.testAndReset(StateFlag::FSETBMIN))
-					xt::dubmin(value * PFGRAN);
-				if (StateMap.testAndReset(StateFlag::FSETBSPAC)) {
-					if (value) {
-						xt::dubspac(value * PFGRAN);
-					}
-				}
-				if (StateMap.testAndReset(StateFlag::FSETFLEN)) {
-					if (value) {
-						xt::dublen(value * PFGRAN);
-					}
-				}
-				if (StateMap.testAndReset(StateFlag::FSETBCOL))
-					xt::dubcol(dToUI(value));
-				if (StateMap.testAndReset(StateFlag::FSETFCOL))
-					xt::dufcol(dToUI(value));
-				if (StateMap.testAndReset(StateFlag::FSETUCOL))
-					xt::dundcol(dToUI(value));
-				if (StateMap.testAndReset(StateFlag::FSETFANG))
-					xt::dufxang(value);
-				if (StateMap.testAndReset(StateFlag::FSETFSPAC)) {
-					if (value) {
-						xt::dufspac(value * PFGRAN);
-					}
-				}
-				if (StateMap.testAndReset(StateFlag::FSETUANG))
-					xt::dufang(value);
-				if (StateMap.testAndReset(StateFlag::FSETFLEN)) {
-					if (value) {
-						xt::duflen(value * PFGRAN);
-					}
-				}
-				if (StateMap.testAndReset(StateFlag::FSETUSPAC)) {
-					if (value) {
-						xt::duspac(value * PFGRAN);
-					}
-				}
-				if (StateMap.testAndReset(StateFlag::FSETULEN)) {
-					if (value) {
-						xt::dusulen(value * PFGRAN);
-					}
-				}
-				if (StateMap.testAndReset(StateFlag::GTUANG))
-					IniFile.underlayAngle = value / 180 * PI;
-				if (StateMap.testAndReset(StateFlag::GTUSPAC)) {
-					if (value) {
-						IniFile.underlaySpacing = value * PFGRAN;
-					}
-				}
-				if (StateMap.testAndReset(StateFlag::GTWLKIND))
-					IniFile.underlayIndent = value * PFGRAN;
-				if (StateMap.testAndReset(StateFlag::GTWLKLEN)) {
-					if (value) {
-						IniFile.underlayStitchLen = value * PFGRAN;
-					}
-				}
-				if (StateMap.testAndReset(StateFlag::PIXIN))
-					IniFile.nudgePixels = gsl::narrow<unsigned short>(std::round(pxchk(value)));
-				if (StateMap.testAndReset(StateFlag::STPXIN))
-					IniFile.stitchSizePixels = gsl::narrow<unsigned short>(std::round(pxchk(value)));
-				if (StateMap.testAndReset(StateFlag::FRMPXIN))
-					IniFile.formVertexSizePixels = gsl::narrow<unsigned short>(std::round(value));
-				if (StateMap.testAndReset(StateFlag::FRMBOXIN))
-					IniFile.formBoxSizePixels = gsl::narrow<unsigned short>(std::round(value));
-				if (StateMap.testAndReset(StateFlag::GETMIN))
-					SmallStitchLength = value * PFGRAN;
-				if (StateMap.testAndReset(StateFlag::ENTR30))
-					ThreadSize30 = value;
-				if (StateMap.testAndReset(StateFlag::ENTR40))
-					ThreadSize40 = value;
-				if (StateMap.testAndReset(StateFlag::ENTR60))
-					ThreadSize60 = value;
-				if (StateMap.testAndReset(StateFlag::ENTRFNUM)) {
-					if (value < FormIndex) {
-						form::frmnumfn(dToUI(value));
-					}
-					else {
-						displayText::tabmsg(IDS_FRMN1);
-					}
-					return;
-				}
-				auto uintValue = gsl::narrow<unsigned int>(std::floor(value));
-				if (StateMap.testAndReset(StateFlag::ENTRPOL))
-					form::durpoli(uintValue);
-				if (StateMap.testAndReset(StateFlag::ENTRSTAR))
-					form::dustar(uintValue, 250 / value * ZoomFactor * (UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY));
-				if (StateMap.testAndReset(StateFlag::ENTRSPIR))
-					form::duspir(uintValue);
-				if (StateMap.testAndReset(StateFlag::ENTRHART))
-					form::duhart(uintValue);
-				if (StateMap.testAndReset(StateFlag::ENTRLENS))
-					form::dulens(uintValue);
-				if (StateMap.testAndReset(StateFlag::ENTREG))
-					form::dueg(uintValue);
-				if (StateMap.testAndReset(StateFlag::ENTRZIG))
-					form::duzig(uintValue);
 			}
 		}
 	}
