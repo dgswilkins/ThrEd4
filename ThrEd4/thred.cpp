@@ -6835,7 +6835,7 @@ void thred::rotang1(const fPOINTATTR& unrotatedPoint,
 			newAngle         = rotationAngle - PI / 2;
 		}
 	}
-	rotatedPoint = { rotationCenter.y + distanceToCenter * sin(newAngle), rotationCenter.x + distanceToCenter * cos(newAngle) };
+	rotatedPoint = { rotationCenter.x + distanceToCenter * cos(newAngle), rotationCenter.y + distanceToCenter * sin(newAngle) };
 }
 
 void thred::rotangf(const fPOINT& unrotatedPoint,
