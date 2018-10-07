@@ -6169,6 +6169,7 @@ void form::internal::sbold() {
 	clip::deleclp(ClosestFormToCursor);
 	SelectedForm->edgeType    = EDGEBEAN;
 	SelectedForm->borderColor = gsl::narrow<unsigned char>(ActiveColor);
+	form::bsizpar();
 	form::refilfn();
 }
 
@@ -8385,8 +8386,8 @@ void form::dubsfil() {
 	SelectedForm->edgeType    = EDGEDOUBLE;
 	SequenceIndex             = 0;
 	SelectedForm->borderColor = gsl::narrow<unsigned char>(ActiveColor);
-	fi::dubfn();
 	form::bsizpar();
+	fi::dubfn();
 	form::refilfn();
 }
 
