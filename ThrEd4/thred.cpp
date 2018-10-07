@@ -2427,7 +2427,7 @@ void thred::internal::chknum() {
 							form::dueg(uintValue);
 							break;
 						}
-						if (StateMap.testAndReset(StateFlag::ENTRZIG)){
+						if (StateMap.testAndReset(StateFlag::ENTRZIG)) {
 							form::duzig(uintValue);
 							break;
 						}
