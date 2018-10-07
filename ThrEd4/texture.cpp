@@ -450,8 +450,11 @@ bool texture::internal::px2txt(const POINT& offset) {
 	fPOINT editPoint;
 
 	txi::px2ed(offset, editPoint);
-	TXPNT tmp
-	    = { 0.0f, gsl::narrow<unsigned short>(std::floor((editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5)) };
+	auto val = (editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing;
+	if (val < -0.5f) {
+		val = 0.0f;
+	}
+	TXPNT tmp = { 0.0f, gsl::narrow<unsigned short>(std::round(val)) };
 	if (tmp.line > TextureScreen.lines) {
 		return false;
 	}
@@ -655,7 +658,11 @@ void texture::internal::ed2txp(const POINT& offset, TXPNT& textureRecord) {
 	fPOINT point;
 
 	txi::px2ed(offset, point);
-	textureRecord.line = gsl::narrow<unsigned short>(std::round((point.x - TextureScreen.xOffset) / TextureScreen.spacing + 0.5));
+	auto val = (point.x - TextureScreen.xOffset) / TextureScreen.spacing;
+	if (val < -0.5f) {
+		val = 0.0f;
+	}
+	textureRecord.line = gsl::narrow<unsigned short>(std::round(val));
 	textureRecord.y    = TextureScreen.areaHeight
 	                  - ((static_cast<float>(offset.y) - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
 }
@@ -904,6 +911,7 @@ void texture::internal::butsid(unsigned windowId) {
 	                                nullptr,
 	                                ThrEdInstance,
 	                                nullptr);
+	displayText::updateWinFont(MainStitchWin);
 }
 
 bool texture::internal::txcmp(const TXPNT& texturePoint0, const TXPNT& texturePoint1) noexcept {
