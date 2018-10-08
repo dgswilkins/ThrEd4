@@ -1013,7 +1013,7 @@ void trace::blak() {
 	}
 	ti::tracwnd();
 	if (FormIndex) {
-		BlackPen = CreatePen(PS_SOLID, 1, 0);
+		BlackPen = CreatePenInt(PS_SOLID, 1, 0);
 		SelectObject(BitmapDC, BlackPen);
 		SelectObject(TraceDC, BlackPen);
 		if (!StateMap.test(StateFlag::WASTRAC))

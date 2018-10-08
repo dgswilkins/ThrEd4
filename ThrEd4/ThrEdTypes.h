@@ -579,7 +579,7 @@ enum class StateFlag
 	GTWLKIND,  // get the edge walk/underlay offset
 	GTWLKLEN,  // get the edge walk/underlay stitch length
 	GTUANG,    // get the underlay angle
-	GTUSPAC,   // get the underaly spacing
+	GTUSPAC,   // get the underlay spacing
 	BADVER,    // key version does not match
 	DUSRT,     // write sort info
 	WLKDIR,    // edge walk direction, 0=forward
