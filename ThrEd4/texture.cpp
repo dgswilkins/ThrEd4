@@ -68,7 +68,7 @@ void texture::txdun() {
 	const char            signature[4] = "txh";
 	std::vector<TXHSTBUF> textureHistoryBuffer(ITXBUFLEN);
 
-	if (TextureHistory[0].texturePoint.size()) {
+	if (!TextureHistory[0].texturePoints.empty()) {
 		wchar_t name[_MAX_PATH] = { 0 };
 		if (txi::txnam(name, sizeof(name) / sizeof(name[0]))) {
 			DWORD bytesWritten = 0;
@@ -76,28 +76,30 @@ void texture::txdun() {
 			if (handle != INVALID_HANDLE_VALUE) {
 				WriteFile(handle, &signature, sizeof(signature), &bytesWritten, nullptr);
 				WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
-				for (auto i = 0; i < ITXBUFLEN; i++) {
-					auto&       bufferEntry  = textureHistoryBuffer[i];
-					const auto& historyEntry = TextureHistory[i];
-					bufferEntry.placeholder  = nullptr;
-					bufferEntry.count        = gsl::narrow<unsigned>(historyEntry.texturePoint.size());
-					bufferEntry.height       = historyEntry.height;
-					bufferEntry.width        = historyEntry.width;
-					bufferEntry.spacing      = historyEntry.spacing;
+				auto bufferIter = textureHistoryBuffer.begin();
+				for (const auto& historyEntry : TextureHistory) {
+					auto& bufferEntry       = *bufferIter;
+					bufferEntry.placeholder = nullptr;
+					bufferEntry.count       = gsl::narrow<unsigned>(historyEntry.texturePoints.size());
+					bufferEntry.height      = historyEntry.height;
+					bufferEntry.width       = historyEntry.width;
+					bufferEntry.spacing     = historyEntry.spacing;
+					bufferIter++;
 				}
 				WriteFileInt(handle,
 				             textureHistoryBuffer.data(),
 				             gsl::narrow<unsigned int>(textureHistoryBuffer.size() * ITXBUFLEN),
 				             &bytesWritten,
 				             nullptr);
-				for (auto iHistory = 0u; iHistory < ITXBUFLEN; iHistory++) {
-					if (TextureHistory[iHistory].texturePoint.size())
-						WriteFileInt(handle,
-						             TextureHistory[iHistory].texturePoint.data(),
-						             gsl::narrow<unsigned int>(TextureHistory[iHistory].texturePoint.size()
-						                                       * sizeof(TextureHistory[0].texturePoint[0])),
-						             &bytesWritten,
-						             nullptr);
+				for (auto& item : TextureHistory) {
+					if (!item.texturePoints.empty()) {
+						WriteFileInt(
+						    handle,
+						    item.texturePoints.data(),
+						    gsl::narrow<unsigned int>(item.texturePoints.size() * sizeof(TextureHistory[0].texturePoints[0])),
+						    &bytesWritten,
+						    nullptr);
+					}
 				}
 			}
 			CloseHandle(handle);
@@ -112,11 +114,11 @@ void texture::internal::redtbak() {
 		TextureScreen.areaHeight = textureHistoryItem->height;
 		TextureScreen.width      = textureHistoryItem->width;
 		TextureScreen.spacing    = textureHistoryItem->spacing;
-		if (textureHistoryItem->texturePoint.size()) {
+		if (!textureHistoryItem->texturePoints.empty()) {
 			TempTexturePoints->clear();
-			TempTexturePoints->reserve(textureHistoryItem->texturePoint.size());
-			for (auto i = 0u; i < textureHistoryItem->texturePoint.size(); i++) {
-				TempTexturePoints->push_back(textureHistoryItem->texturePoint[i]);
+			TempTexturePoints->reserve(textureHistoryItem->texturePoints.size());
+			for (auto texturePoint : textureHistoryItem->texturePoints) {
+				TempTexturePoints->push_back(texturePoint);
 			}
 		}
 		StateMap.set(StateFlag::RESTCH);
@@ -147,15 +149,15 @@ void texture::redtx() {
 								TextureHistory[index].width   = textureHistoryBuffer[index].width;
 								TextureHistory[index].spacing = textureHistoryBuffer[index].spacing;
 								if (textureHistoryBuffer[index].count) {
-									TextureHistory[index].texturePoint.resize(textureHistoryBuffer[index].count);
+									TextureHistory[index].texturePoints.resize(textureHistoryBuffer[index].count);
 									if (!ReadFileInt(handle,
-									                 TextureHistory[index].texturePoint.data(),
-									                 sizeof(TextureHistory[0].texturePoint[0])
+									                 TextureHistory[index].texturePoints.data(),
+									                 sizeof(TextureHistory[0].texturePoints[0])
 									                     * textureHistoryBuffer[index].count,
 									                 &bytesRead,
 									                 nullptr)) {
-										TextureHistory[index].texturePoint.clear();
-										TextureHistory[index].texturePoint.shrink_to_fit();
+										TextureHistory[index].texturePoints.clear();
+										TextureHistory[index].texturePoints.shrink_to_fit();
 									}
 								}
 							}
@@ -195,8 +197,9 @@ void texture::internal::txrfor() noexcept {
 
 bool texture::internal::chktxh(_In_ const TXHST* historyItem) {
 	if (historyItem) {
-		if (historyItem->texturePoint.size() != TempTexturePoints->size())
+		if (historyItem->texturePoints.size() != TempTexturePoints->size()) {
 			return true;
+		}
 		if (historyItem->height != TextureScreen.areaHeight) {
 			return true;
 		}
@@ -207,17 +210,19 @@ bool texture::internal::chktxh(_In_ const TXHST* historyItem) {
 			return true;
 		}
 		for (auto iPoint = 0u; iPoint < TempTexturePoints->size(); iPoint++) {
-			if ((*TempTexturePoints)[iPoint].line != historyItem->texturePoint[iPoint].line)
+			if ((*TempTexturePoints)[iPoint].line != historyItem->texturePoints[iPoint].line) {
 				return true;
-			if ((*TempTexturePoints)[iPoint].y != historyItem->texturePoint[iPoint].y)
+			}
+			if ((*TempTexturePoints)[iPoint].y != historyItem->texturePoints[iPoint].y) {
 				return true;
+			}
 		}
 	}
 	return false;
 }
 
 void texture::savtxt() {
-	if (TempTexturePoints->size()) {
+	if (!TempTexturePoints->empty()) {
 		auto currentHistoryItem = &TextureHistory[TextureHistoryIndex];
 		if (txi::chktxh(currentHistoryItem)) {
 			StateMap.set(StateFlag::WASTXBAK);
@@ -228,10 +233,10 @@ void texture::savtxt() {
 			currentHistoryItem->height  = TextureScreen.areaHeight;
 			currentHistoryItem->width   = TextureScreen.width;
 			currentHistoryItem->spacing = TextureScreen.spacing;
-			currentHistoryItem->texturePoint.clear();
-			currentHistoryItem->texturePoint.reserve(TempTexturePoints->size());
-			for (auto i = 0u; i < TempTexturePoints->size(); i++) {
-				currentHistoryItem->texturePoint.push_back((*TempTexturePoints)[i]);
+			currentHistoryItem->texturePoints.clear();
+			currentHistoryItem->texturePoints.reserve(TempTexturePoints->size());
+			for (auto texturePoint : *TempTexturePoints) {
+				currentHistoryItem->texturePoints.push_back(texturePoint);
 			}
 		}
 	}
@@ -367,8 +372,9 @@ void texture::drwtxtr() {
 	const auto pixelSpace = (StitchWindowClientRect.bottom * 1.0) / StitchWindowClientRect.right;
 	TextureScreen.lines   = gsl::narrow<unsigned short>(std::floor(TextureScreen.width / TextureScreen.spacing));
 	const auto extraWidth = TextureScreen.spacing * (TextureScreen.lines + 2);
-	if (StateMap.testAndReset(StateFlag::CHKTX))
+	if (StateMap.testAndReset(StateFlag::CHKTX)) {
 		txi::chktx();
+	}
 	int yOffset = 0;
 	if (pixelSpace > editSpace) {
 		TextureScreen.xOffset          = 0;
@@ -426,7 +432,7 @@ void texture::drwtxtr() {
 	for (auto index = 0u; index < TempTexturePoints->size(); index++) {
 		txi::dutxtx(index, IniFile.textureEditorSize);
 	}
-	if (SelectedTexturePointsList->size()) {
+	if (!SelectedTexturePointsList->empty()) {
 		txi::txrct2rct(TextureRect, TexturePixelRect);
 		line[0] = { TexturePixelRect.left, TexturePixelRect.top };
 		line[1] = { TexturePixelRect.right, TexturePixelRect.top };
@@ -438,9 +444,9 @@ void texture::drwtxtr() {
 		line[1] = { TexturePixelRect.right, TexturePixelRect.top };
 		Polyline(StitchWindowMemDC, line, 2);
 	}
-	for (auto iPoint = 0u; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-		txi::dutxtx((*SelectedTexturePointsList)[iPoint], IniFile.textureEditorSize);
-		txi::dutxtx((*SelectedTexturePointsList)[iPoint], IniFile.textureEditorSize << 1);
+	for (auto point : *SelectedTexturePointsList) {
+		txi::dutxtx(point, IniFile.textureEditorSize);
+		txi::dutxtx(point, IniFile.textureEditorSize << 1);
 	}
 	BitBlt(StitchWindowDC, 0, 0, StitchWindowClientRect.right, StitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
 	displayText::drwtxbut(TextureScreen);
@@ -550,20 +556,24 @@ void texture::internal::ritxrct() noexcept {
 }
 
 void texture::internal::dutxrct(TXTRCT& textureRect) {
-	if (SelectedTexturePointsList->size()) {
+	if (!SelectedTexturePointsList->empty()) {
 		auto texturePoint = &(*TempTexturePoints)[(*SelectedTexturePointsList)[0]];
 		textureRect.left = textureRect.right = texturePoint->line;
 		textureRect.top = textureRect.bottom = texturePoint->y;
 		for (auto iPoint = 1u; iPoint < SelectedTexturePointsList->size(); iPoint++) {
 			texturePoint = &(*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]];
-			if (texturePoint->y > textureRect.top)
+			if (texturePoint->y > textureRect.top) {
 				textureRect.top = texturePoint->y;
-			if (texturePoint->y < textureRect.bottom)
+			}
+			if (texturePoint->y < textureRect.bottom) {
 				textureRect.bottom = texturePoint->y;
-			if (texturePoint->line < textureRect.left)
+			}
+			if (texturePoint->line < textureRect.left) {
 				textureRect.left = texturePoint->line;
-			if (texturePoint->line > textureRect.right)
+			}
+			if (texturePoint->line > textureRect.right) {
 				textureRect.right = texturePoint->line;
+			}
 		}
 	}
 	else {
@@ -617,11 +627,13 @@ void texture::internal::setxclp() {
 
 	txi::deorg(screenOffset);
 	txi::px2ed(screenOffset, editorOffset);
-	if (StateMap.testAndReset(StateFlag::TXHCNTR))
+	if (StateMap.testAndReset(StateFlag::TXHCNTR)) {
 		editorOffset.x = (TextureScreen.lines * TextureScreen.spacing) / 2 + TextureScreen.xOffset - TextureScreen.formCenter.x
 		                 + TextureScreen.spacing / 2;
-	else
+	}
+	else {
 		editorOffset.x -= TextureScreen.formCenter.x;
+	}
 	editorOffset.y -= TextureScreen.formCenter.y;
 	for (auto iVertex = 0u; iVertex < AngledForm.vertexCount; iVertex++) {
 		AngledFormVertices[iVertex].x += editorOffset.x;
@@ -684,13 +696,15 @@ void texture::txtrup() {
 			textureOffset.y -= yOffset;
 		}
 		auto xCoord = TextureRect.left + textureOffset.line - 1;
-		if (xCoord < 0)
+		if (xCoord < 0) {
 			textureOffset.line -= gsl::narrow<unsigned short>(xCoord);
+		}
 		xCoord = TextureRect.right + textureOffset.line - TextureScreen.lines;
-		if (xCoord > 0)
+		if (xCoord > 0) {
 			textureOffset.line -= gsl::narrow<unsigned short>(xCoord);
-		for (auto iPoint = 0u; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-			auto texturePoint = &(*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]];
+		}
+		for (auto point : *SelectedTexturePointsList) {
+			auto texturePoint = &(*TempTexturePoints)[point];
 			texturePoint->line += textureOffset.line;
 			texturePoint->y += textureOffset.y;
 		}
@@ -826,13 +840,14 @@ void texture::txtrmov() {
 		return;
 	}
 	if (StateMap.test(StateFlag::TXTCLP)) {
-		if (StateMap.testAndSet(StateFlag::WASWROT))
+		if (StateMap.testAndSet(StateFlag::WASWROT)) {
 			txi::ritxfrm();
+		}
 		TextureCursorLocation = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 		txi::ritxfrm();
 	}
 	else {
-		if (SelectedTexturePointsList->size()) {
+		if (!SelectedTexturePointsList->empty()) {
 			txi::ritxrct();
 			TextureCursorLocation = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 			txi::ritxrct();
@@ -927,7 +942,7 @@ void texture::internal::txpar() {
 }
 
 void texture::internal::txvrt() {
-	if (TempTexturePoints->size()) {
+	if (!TempTexturePoints->empty()) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			form::fvars(ClosestFormToCursor);
 			SelectedForm->fillType = TXVRTF;
@@ -937,7 +952,7 @@ void texture::internal::txvrt() {
 }
 
 void texture::internal::txhor() {
-	if (TempTexturePoints->size()) {
+	if (!TempTexturePoints->empty()) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			form::fvars(ClosestFormToCursor);
 			SelectedForm->fillType = TXHORF;
@@ -947,7 +962,7 @@ void texture::internal::txhor() {
 }
 
 void texture::internal::txang() {
-	if (TempTexturePoints->size()) {
+	if (!TempTexturePoints->empty()) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			form::fvars(ClosestFormToCursor);
 			SelectedForm->fillType              = TXANGF;
@@ -1031,7 +1046,7 @@ void texture::internal::nutx() {
 			}
 		}
 	}
-	if (TempTexturePoints->size()) {
+	if (!TempTexturePoints->empty()) {
 		const auto tempPointCount = gsl::narrow<unsigned int>(TempTexturePoints->size());
 		const auto pointCount     = TextureIndex - index;
 		TexturePointsBuffer->resize(TexturePointsBuffer->size() + tempPointCount);
@@ -1043,8 +1058,9 @@ void texture::internal::nutx() {
 			auto _           = std::copy(startSource, endSource, destination);
 		}
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-			if (texture::istx(iForm))
+			if (texture::istx(iForm)) {
 				FormList[iForm].fillInfo.texture.index += gsl::narrow<unsigned short>(tempPointCount);
+			}
 		}
 		auto _ = std::copy(TempTexturePoints->cbegin(), TempTexturePoints->cend(), startSource);
 
@@ -1058,8 +1074,8 @@ void texture::internal::altx() {
 	boost::dynamic_bitset<> txtLines(TextureScreen.lines + 1);
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		const auto halfHeight = TextureScreen.areaHeight / 2.0f;
-		for (auto iPoint = 0u; iPoint < TempTexturePoints->size(); iPoint++) {
-			txtLines.set((*TempTexturePoints)[iPoint].line);
+		for (auto& texturePoint : *TempTexturePoints) {
+			txtLines.set(texturePoint.line);
 		}
 		for (unsigned short iLine = 1; iLine <= TextureScreen.lines; iLine++) {
 			if (!txtLines.test(iLine)) {
@@ -1072,10 +1088,12 @@ void texture::internal::altx() {
 void texture::txof() {
 	displayText::butxt(HBOXSEL, (*StringTable)[STR_BOXSEL]);
 	thred::redraw((*ButtonWin)[HHID]);
-	if (StateMap.test(StateFlag::UPTO))
+	if (StateMap.test(StateFlag::UPTO)) {
 		displayText::butxt(HUPTO, (*StringTable)[STR_UPON]);
-	else
+	}
+	else {
 		displayText::butxt(HUPTO, (*StringTable)[STR_UPOF]);
+	}
 	SetWindowText((*ButtonWin)[HTXSPAC], L"");
 	texture::savtxt();
 	thred::zumhom();
@@ -1123,15 +1141,16 @@ void texture::internal::dutxfn(unsigned textureType) {
 }
 
 void texture::internal::dutxmir() {
-	if (TempTexturePoints->size()) {
+	if (!TempTexturePoints->empty()) {
 		const auto centerLine = (TextureScreen.lines + 1u) >> 1;
 
 		texture::savtxt();
 		std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::txcmp);
 
 		auto iPoint = TempTexturePoints->size() - 1;
-		while ((*TempTexturePoints)[iPoint].line > centerLine && iPoint >= 0)
+		while ((*TempTexturePoints)[iPoint].line > centerLine && iPoint >= 0) {
 			iPoint--;
+		}
 		const auto iMirrorPoint = iPoint + 1;
 		// ToDo - What does this do? iPoint is not used beyond here
 		if (TextureScreen.lines & 1) {
@@ -1213,7 +1232,7 @@ void texture::txtlbut() {
 		txi::stxlin();
 		return;
 	}
-	if (SelectedTexturePointsList->size()) {
+	if (!SelectedTexturePointsList->empty()) {
 		POINT point = {};
 		txi::deorg(point);
 		if (point.x > TexturePixelRect.left && point.x < TexturePixelRect.right && point.y > TexturePixelRect.top
@@ -1223,7 +1242,7 @@ void texture::txtlbut() {
 			return;
 		}
 	}
-	if (SelectedTexturePointsList->size()) {
+	if (!SelectedTexturePointsList->empty()) {
 		if (txi::txtclos((*SelectedTexturePointsList)[0])) {
 			SelectedTexturePointsList->resize(1);
 			txi::setxmov();
@@ -1275,7 +1294,7 @@ void texture::internal::nxbak() {
 }
 
 void texture::internal::txtdel() {
-	if (SelectedTexturePointsList->size()) {
+	if (!SelectedTexturePointsList->empty()) {
 		texture::savtxt();
 		boost::dynamic_bitset<> texturePointsMap(TempTexturePoints->size());
 		for (auto& p : *SelectedTexturePointsList) {
@@ -1296,7 +1315,7 @@ void texture::internal::txtdel() {
 		return;
 	}
 	auto iClosestPoint = 0u;
-	if (TempTexturePoints->size() && txi::txtclos(iClosestPoint)) {
+	if (!TempTexturePoints->empty() && txi::txtclos(iClosestPoint)) {
 		auto it = TempTexturePoints->begin();
 		std::advance(it, iClosestPoint);
 		it = TempTexturePoints->erase(it);
@@ -1352,29 +1371,35 @@ bool texture::internal::txdig(unsigned keyCode, char& character) {
 }
 
 void texture::internal::txnudg(int deltaX, float deltaY) {
-	if (SelectedTexturePointsList->size()) {
+	if (!SelectedTexturePointsList->empty()) {
 		if (deltaY) {
 			const auto screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
-			for (auto iPoint = 0u; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-				const auto yCoord = (*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]].y + screenDeltaY;
-				if (yCoord < 0.0)
+			for (auto point : *SelectedTexturePointsList) {
+				const auto yCoord = (*TempTexturePoints)[point].y + screenDeltaY;
+				if (yCoord < 0.0) {
 					return;
-				if (yCoord > TextureScreen.areaHeight)
+				}
+				if (yCoord > TextureScreen.areaHeight) {
 					return;
+				}
 			}
-			for (auto iPoint = 0u; iPoint < SelectedTexturePointsList->size(); iPoint++)
-				(*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]].y += screenDeltaY;
+			for (auto point : *SelectedTexturePointsList) {
+				(*TempTexturePoints)[point].y += screenDeltaY;
+			}
 		}
 		else {
-			for (auto iPoint = 0u; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-				const auto textureLine = (*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]].line + deltaX;
-				if (textureLine < 1)
+			for (auto point : *SelectedTexturePointsList) {
+				const auto textureLine = (*TempTexturePoints)[point].line + deltaX;
+				if (textureLine < 1) {
 					return;
-				if (textureLine > TextureScreen.lines)
+				}
+				if (textureLine > TextureScreen.lines) {
 					return;
+				}
 			}
-			for (auto iPoint = 0u; iPoint < SelectedTexturePointsList->size(); iPoint++)
-				(*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]].line += gsl::narrow<unsigned short>(deltaX);
+			for (unsigned int point : *SelectedTexturePointsList) {
+				(*TempTexturePoints)[point].line += gsl::narrow<unsigned short>(deltaX);
+			}
 		}
 	}
 	txi::dutxrct(TextureRect);
@@ -1387,7 +1412,7 @@ void texture::txsnap() {
 	if (txpntSize) {
 		texture::savtxt();
 		const auto halfGrid = IniFile.gridSize / 2;
-		if (SelectedTexturePointsList->size()) {
+		if (!SelectedTexturePointsList->empty()) {
 			for (auto iPoint = 0u; iPoint < txpntSize; iPoint++) {
 				auto       texturePoint = &(*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]];
 				const auto yStep        = (texturePoint->y + halfGrid) / IniFile.gridSize;
@@ -1488,8 +1513,9 @@ void texture::txtkey(unsigned keyCode) {
 			txi::txrbak();
 		}
 		else {
-			if (StateMap.testAndReset(StateFlag::TXBDIR))
+			if (StateMap.testAndReset(StateFlag::TXBDIR)) {
 				txi::txrbak();
+			}
 		}
 		txi::txbak();
 		return;
@@ -1502,8 +1528,9 @@ void texture::txtkey(unsigned keyCode) {
 	}
 	case 'N': {
 		StateMap.set(StateFlag::LASTXBAK);
-		if (!StateMap.testAndSet(StateFlag::TXBDIR))
+		if (!StateMap.testAndSet(StateFlag::TXBDIR)) {
 			txi::txrfor();
+		}
 		txi::nxbak();
 		return;
 	}
@@ -1625,11 +1652,12 @@ void texture::setshft() {
 			TempTexturePoints->push_back({ (StitchBuffer[iStitch].y - selectionRect.bottom), gsl::narrow<unsigned short>(line) });
 		}
 		else {
-			if (StateMap.testAndReset(StateFlag::TXIN))
+			if (StateMap.testAndReset(StateFlag::TXIN)) {
 				line++;
+			}
 		}
 	}
-	if (TempTexturePoints->size()) {
+	if (!TempTexturePoints->empty()) {
 		line = TempTexturePoints->back().line;
 	}
 	TextureScreen.spacing    = (selectionRect.right - selectionRect.left) / line;
