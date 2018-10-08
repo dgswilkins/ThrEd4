@@ -380,7 +380,7 @@ void texture::drwtxtr() {
 		TextureScreen.xOffset          = 0;
 		TextureScreen.editToPixelRatio = extraWidth / StitchWindowClientRect.bottom;
 		yOffset                        = gsl::narrow<decltype(yOffset)>(
-            std::round(StitchWindowClientRect.bottom - TextureScreen.areaHeight / TextureScreen.editToPixelRatio) / 2.0);
+            std::round((StitchWindowClientRect.bottom - TextureScreen.areaHeight / TextureScreen.editToPixelRatio) / 2.0));
 	}
 	else {
 		TextureScreen.editToPixelRatio = TextureScreen.areaHeight * 2 / StitchWindowClientRect.bottom;
