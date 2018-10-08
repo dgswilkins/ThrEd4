@@ -67,6 +67,6 @@ void setCursorInt(HCURSOR hCursor) noexcept {
 }
 
 HPEN CreatePenInt(int iStyle, unsigned width, COLORREF color) noexcept {
-	auto scaledWidth = MulDiv(width, *screenDPI, 96);
+	const auto scaledWidth = MulDiv(width, *screenDPI, 96);
 	return CreatePen(iStyle, scaledWidth, color);
 }

@@ -26,92 +26,92 @@
 
 namespace form {
 
-void     angclp();
-void     angclpfn(const std::vector<RNGCNT>& textureSegments);
-void     angsclp();
-void     apliq();
-void     bakagain();
-void     bakdup();
-void     bhol();
-void     boxsel();
-void     bord();
-void     bsizpar() noexcept;
-void     centir();
-void     chain();
-void     chan();
-void     chkcont();
-bool     chkdel() noexcept;
-unsigned chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
-bool     chkmax(unsigned int arg0, unsigned int arg1) noexcept;
-void     chkseq(bool border);
-bool     cisin(float xCoordinate, float yCoordinate) noexcept;
-unsigned int   closflt(float xCoordinate, float yCoordinate) noexcept;
-bool     closfrm();
-void     clpfil();
-void     clpspac(const fPOINT* insertPoint, unsigned int count) noexcept;
-void     clrfills() noexcept;
-void     cntrx();
-void     col2frm();
-void     contfil();
-void     cpylayr(unsigned codedLayer);
-void     crop();
-void     debean();
-void     delflt(unsigned int formIndex) noexcept;
-void     delfrms();
-void     delmfil();
-void     drwcon();
-void     drwfrm();
-void     duangs();
-void     dubean();
-void     dubfil();
-void     dubig();
-void     dubold();
-void     dubsfil();
-void     dueg(unsigned sides);
-void     duform(unsigned formType);
-void     dufrm();
-void     duhart(unsigned sideCount);
-void     dulens(unsigned sides);
-void     duinsf() noexcept;
-void     duprot(double rotationAngle, const dPOINT& rotationCenter);
-void     dupsel(HDC dc);
-void     durpoli(unsigned vertexCount);
-void     duspir(unsigned stepCount);
-void     dusqr();
-void     dustar(unsigned starCount, double length);
-void     duzig(unsigned vertices);
-void     fclp();
-void     fcntr();
-void     filangl();
-void     filclpx();
-void     filhor();
-void     filin(dPOINT currentPoint);
-void     filinsb(const dPOINT& point);
-void     filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point);
-void     filinu(const dPOINT& inPoint);
-void     filsat();
-void     filvrt();
-unsigned find1st();
-void     fliph();
-void     flipv();
-void     flpord();
-unsigned fltind(const fPOINT* point) noexcept;
-void     fltspac(const fPOINT* start, unsigned int count) noexcept;
-void     form();
-void     frm0();
-void     frmadj(unsigned int formIndex) noexcept;
-void     frmclr(FRMHED* destination) noexcept;
-void     frmlin(const fPOINT* vertices, unsigned int vertexCount);
-void     frmlin(const std::vector<fPOINT>& vertices);
-void     frmnumfn(unsigned newFormIndex);
-void     frmon();
-void     frmout(unsigned int formIndex) noexcept;
-void     frmovlin();
-bool     frmrng(unsigned int iForm, RANGE& range) noexcept;
-void     frmsadj();
-void     fselrct(unsigned int iForm);
-void     fsizpar() noexcept;
-void     fvars(unsigned int iForm) noexcept;
+void         angclp();
+void         angclpfn(const std::vector<RNGCNT>& textureSegments);
+void         angsclp();
+void         apliq();
+void         bakagain();
+void         bakdup();
+void         bhol();
+void         boxsel();
+void         bord();
+void         bsizpar() noexcept;
+void         centir();
+void         chain();
+void         chan();
+void         chkcont();
+bool         chkdel() noexcept;
+unsigned     chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
+bool         chkmax(unsigned int arg0, unsigned int arg1) noexcept;
+void         chkseq(bool border);
+bool         cisin(float xCoordinate, float yCoordinate) noexcept;
+unsigned int closflt(float xCoordinate, float yCoordinate) noexcept;
+bool         closfrm();
+void         clpfil();
+void         clpspac(const fPOINT* insertPoint, unsigned int count) noexcept;
+void         clrfills() noexcept;
+void         cntrx();
+void         col2frm();
+void         contfil();
+void         cpylayr(unsigned codedLayer);
+void         crop();
+void         debean();
+void         delflt(unsigned int formIndex) noexcept;
+void         delfrms();
+void         delmfil();
+void         drwcon();
+void         drwfrm();
+void         duangs();
+void         dubean();
+void         dubfil();
+void         dubig();
+void         dubold();
+void         dubsfil();
+void         dueg(unsigned sides);
+void         duform(unsigned formType);
+void         dufrm();
+void         duhart(unsigned sideCount);
+void         dulens(unsigned sides);
+void         duinsf() noexcept;
+void         duprot(double rotationAngle, const dPOINT& rotationCenter);
+void         dupsel(HDC dc);
+void         durpoli(unsigned vertexCount);
+void         duspir(unsigned stepCount);
+void         dusqr();
+void         dustar(unsigned starCount, double length);
+void         duzig(unsigned vertices);
+void         fclp();
+void         fcntr();
+void         filangl();
+void         filclpx();
+void         filhor();
+void         filin(dPOINT currentPoint);
+void         filinsb(const dPOINT& point);
+void         filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point);
+void         filinu(const dPOINT& inPoint);
+void         filsat();
+void         filvrt();
+unsigned     find1st();
+void         fliph();
+void         flipv();
+void         flpord();
+unsigned     fltind(const fPOINT* point) noexcept;
+void         fltspac(const fPOINT* start, unsigned int count) noexcept;
+void         form();
+void         frm0();
+void         frmadj(unsigned int formIndex) noexcept;
+void         frmclr(FRMHED* destination) noexcept;
+void         frmlin(const fPOINT* vertices, unsigned int vertexCount);
+void         frmlin(const std::vector<fPOINT>& vertices);
+void         frmnumfn(unsigned newFormIndex);
+void         frmon();
+void         frmout(unsigned int formIndex) noexcept;
+void         frmovlin();
+bool         frmrng(unsigned int iForm, RANGE& range) noexcept;
+void         frmsadj();
+void         fselrct(unsigned int iForm);
+void         fsizpar() noexcept;
+void         fvars(unsigned int iForm) noexcept;
 
 constexpr float getblen();
 
@@ -174,7 +174,7 @@ void     savplen(float length);
 void     selal();
 void     selalfil();
 void     selfil(unsigned type);
-void     selsqr(const POINT& controlPoint, HDC dc) noexcept;
+void     selsqr(const POINT& controlPoint, HDC dc);
 void     setap();
 void     setexpand(double xyRatio);
 void     setfpnt();
@@ -218,7 +218,10 @@ namespace internal {
 	void     boldlin(unsigned int start, unsigned int finish, double size);
 	void     brdfil(double pd_Size);
 	void     brkdun(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish);
-	void     brkseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish, boost::dynamic_bitset<>& sequenceMap);
+	void     brkseq(const std::vector<SMALPNTL*>& sortedLines,
+	                unsigned int                  start,
+	                unsigned int                  finish,
+	                boost::dynamic_bitset<>&      sequenceMap);
 	bool     chk2of();
 	void     chkbrd(unsigned& interleaveSequenceIndex2);
 	void     chksid(unsigned int vertexIndex) noexcept;
@@ -249,7 +252,7 @@ namespace internal {
 	             std::vector<SATCON>& tempGuides,
 	             std::vector<fPOINT>& destinationFormVertices,
 	             std::vector<FRMHED>& destinationFormList,
-	             unsigned int               formIndex);
+	             unsigned int         formIndex);
 	void  duflt();
 	void  duinf(const FRMHED& formHeader) noexcept;
 	void  dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish);
@@ -260,16 +263,19 @@ namespace internal {
 	            boost::dynamic_bitset<>&      visitedRegions,
 	            const std::vector<SMALPNTL*>& sortedLines,
 	            unsigned                      pthi,
-	            unsigned int                        lineCount,
+	            unsigned int                  lineCount,
 	            std::vector<REGION>&          regionsList);
 	void  duromb(const dPOINT& start0, const dPOINT& finish0, const dPOINT& start1, const dPOINT& finish1);
-	void  duseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish, boost::dynamic_bitset<>& sequenceMap);
+	void  duseq(const std::vector<SMALPNTL*>& sortedLines,
+	            unsigned int                  start,
+	            unsigned int                  finish,
+	            boost::dynamic_bitset<>&      sequenceMap);
 	void  duseq1() noexcept;
 	void  duseq2(const std::vector<SMALPNTL*>& sortedLines, unsigned int iLine);
 	void  duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 	             const std::vector<VRCT2>& fillVerticalRect,
-	             unsigned int                    start,
-	             unsigned int                    finish);
+	             unsigned int              start,
+	             unsigned int              finish);
 	void  filsclp();
 	void  filsfn();
 	float findDistanceToSide(const fPOINT& lineStart, const fPOINT& lineEnd, const fPOINT& point, double& distance) noexcept;
@@ -281,15 +287,15 @@ namespace internal {
 	            dPOINT&                rotationCenter);
 	void  fnhor(std::vector<unsigned>& groupIndexSequence,
 	            std::vector<SMALPNTL>& lineEndpoints,
-	            double           rotationAngle,
+	            double                 rotationAngle,
 	            dPOINT&                rotationCenter);
 	void  fnord();
 	void  fnvrt(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
 	void  frmpnts(unsigned type) noexcept;
 	void  frmpoly(const POINT* line, unsigned int count) noexcept;
 	void  frmsqr(unsigned iVertex);
-	void  frmsqr0(const POINT& controlPoint) noexcept;
-	void  frmx(const POINT& controlPoint, HDC dc) noexcept;
+	void  frmsqr0(const POINT& controlPoint);
+	void  frmx(const POINT& controlPoint, HDC dc);
 	void  fsangl();
 	void  fsclp();
 	void  fsclpx();
@@ -312,10 +318,10 @@ namespace internal {
 
 	bool isect(unsigned int vertex0, unsigned int vertex1, fPOINT& intersection, float& length) noexcept;
 	bool isin(std::vector<VCLPX> regionCrossingData,
-	          float                    xCoordinate,
-	          float                    yCoordinate,
-	          unsigned                 regionCrossingStart,
-	          unsigned                 regionCrossingEnd);
+	          float              xCoordinate,
+	          float              yCoordinate,
+	          unsigned           regionCrossingStart,
+	          unsigned           regionCrossingEnd);
 	void lapbrd();
 	void lcon(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
 	bool lencmp(const LENINFO& arg1, const LENINFO& arg2) noexcept;
@@ -355,7 +361,7 @@ namespace internal {
 	void   pbrd(double edgeSpacing);
 	void   pfn(const std::vector<VRCT2>& underlayVerticalRect,
 	           const std::vector<VRCT2>& fillVerticalRect,
-	           unsigned int                    startVertex,
+	           unsigned int              startVertex,
 	           const std::vector<VRCT2>& vrct);
 	void   plbak(unsigned int backPoint) noexcept;
 	void   plbrd(double edgeSpacing);
@@ -384,13 +390,12 @@ namespace internal {
 	void   ritbrd(unsigned& interleaveSequenceIndex2);
 	void   ritfil(unsigned& interleaveSequenceIndex2);
 	bool   ritlin(const fPOINT& start, const fPOINT& finish);
-	void
-	     ritseg(const std::vector<CLIPNT>& clipStitchPoints, std::vector<CLPSEG>& clipSegments, unsigned currentSegmentIndex);
-	void rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept;
-	void rotentr(double rotationAngle);
-	void rotpar(dPOINT& rotationCenter);
-	void rspnt(float xCoordinate, float yCoordinate) noexcept;
-	void sapliq();
+	void   ritseg(const std::vector<CLIPNT>& clipStitchPoints, std::vector<CLPSEG>& clipSegments, unsigned currentSegmentIndex);
+	void   rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept;
+	void   rotentr(double rotationAngle);
+	void   rotpar(dPOINT& rotationCenter);
+	void   rspnt(float xCoordinate, float yCoordinate) noexcept;
+	void   sapliq();
 
 	void sbold();
 	void sbord();
