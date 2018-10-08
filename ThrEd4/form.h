@@ -113,11 +113,11 @@ void     fselrct(unsigned int iForm);
 void     fsizpar() noexcept;
 void     fvars(unsigned int iForm) noexcept;
 
-constexpr float getblen();
+float getblen();
 
 unsigned int getlast() noexcept;
 
-constexpr float getplen();
+float getplen();
 
 void horclp();
 void horsclp();
@@ -143,7 +143,7 @@ void nufsel();
 void nufthcol(unsigned color);
 void nulapcol(unsigned color);
 
-constexpr unsigned int nxt(unsigned int iVertex);
+unsigned int nxt(unsigned int iVertex);
 
 unsigned int pdir(unsigned int vertex);
 
@@ -405,7 +405,7 @@ namespace internal {
 	void setstar();
 	void setzig();
 
-	constexpr float shreg(float highValue, float reference);
+	float shreg(float highValue, float reference);
 
 	void shrnks();
 	void snp(unsigned start, unsigned finish);
@@ -426,7 +426,7 @@ namespace internal {
 	void unbean(unsigned start, unsigned finish);
 	void uncon();
 
-	constexpr unsigned leftsid();
+	unsigned leftsid();
 
 	bool unvis(const boost::dynamic_bitset<>& visitedRegions);
 	bool vscmp(unsigned index1, unsigned index2) noexcept;
