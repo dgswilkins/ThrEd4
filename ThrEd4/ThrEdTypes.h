@@ -1707,7 +1707,7 @@ using TXPNT = struct _txpnt;
 
 #define RES_SIZE 26
 
-struct _strex {         // thred v1.0 file header extension
+struct _strex {                 // thred v1.0 file header extension
 	float    hoopSizeX;         // hoop size x dimension
 	float    hoopSizeY;         // hoop size y dimension
 	float    stgran;            // stitches per millimeter
@@ -1721,33 +1721,33 @@ struct _strex {         // thred v1.0 file header extension
 
 using STREX = struct _strex;
 
-struct _dsthed { // dst file header
-	char desched[3];     // 0 0		description
-	char desc[17];       // 3 3
-	char recshed[3];     // 20 14	record count
-	char recs[8];        // 23 17
-	char cohed[3];       // 31 1F
-	char co[4];          // 34 22
-	char xplushed[3];    // 38 26	x+ size
-	char xplus[6];       // 41 29
-	char xminhed[3];     // 47 2F	x- size
-	char xmin[6];        // 50 32
-	char yplushed[3];    // 56 38
-	char yplus[6];       // 59 3B	y+ size
-	char yminhed[3];     // 65 41
-	char ymin[6];        // 68 44	y- size
-	char axhed[3];       // 74 4A
-	char ax[7];          // 77 4D
-	char ayhed[3];       // 84 54
-	char ay[7];          // 87 57
-	char mxhed[3];       // 94 5E
-	char mx[7];          // 97 61
-	char myhed[3];       // 104 68
-	char my[7];          // 107 6B
-	char pdhed[2];       // 114 72
-	char pd[7];          // 116 74
-	char eof[1];         // 123 7B
-	char res[388];       // 124 7C
+struct _dsthed {      // dst file header
+	char desched[3];  // 0 0		description
+	char desc[17];    // 3 3
+	char recshed[3];  // 20 14	record count
+	char recs[8];     // 23 17
+	char cohed[3];    // 31 1F
+	char co[4];       // 34 22
+	char xplushed[3]; // 38 26	x+ size
+	char xplus[6];    // 41 29
+	char xminhed[3];  // 47 2F	x- size
+	char xmin[6];     // 50 32
+	char yplushed[3]; // 56 38
+	char yplus[6];    // 59 3B	y+ size
+	char yminhed[3];  // 65 41
+	char ymin[6];     // 68 44	y- size
+	char axhed[3];    // 74 4A
+	char ax[7];       // 77 4D
+	char ayhed[3];    // 84 54
+	char ay[7];       // 87 57
+	char mxhed[3];    // 94 5E
+	char mx[7];       // 97 61
+	char myhed[3];    // 104 68
+	char my[7];       // 107 6B
+	char pdhed[2];    // 114 72
+	char pd[7];       // 116 74
+	char eof[1];      // 123 7B
+	char res[388];    // 124 7C
 };
 
 using DSTHED = struct _dsthed;
@@ -1839,7 +1839,7 @@ struct _range {
 
 using RANGE = struct _range;
 
-struct _region {  // region for sequencing vertical fills
+struct _region {          // region for sequencing vertical fills
 	unsigned start;       // start line of region
 	unsigned end;         // end line of region
 	unsigned regionBreak; // ToDo - Is this member needed?
@@ -1856,8 +1856,8 @@ struct _rcon { // PathMap: path map for sequencing
 
 using RCON = struct _rcon;
 
-struct _rgseq { // TempPath: temporary path connections
-	unsigned pcon;      // pointer to PathMap entry
+struct _rgseq {    // TempPath: temporary path connections
+	unsigned pcon; // pointer to PathMap entry
 	int      count;
 	bool     skp; // path not found
 };
@@ -2503,8 +2503,7 @@ template <class T2, class T1> inline _Ret_notnull_ T2 convert_ptr(T1* pointer) {
 		if (pointer) {
 			return static_cast<T2>(static_cast<void*>(pointer));
 		}
-		
-			throw;
-		
+
+		throw;
 	}
 }
