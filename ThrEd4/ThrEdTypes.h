@@ -2503,8 +2503,8 @@ template <class T2, class T1> inline _Ret_notnull_ T2 convert_ptr(T1* pointer) {
 		if (pointer) {
 			return static_cast<T2>(static_cast<void*>(pointer));
 		}
-		else {
+		
 			throw;
-		}
+		
 	}
 }
