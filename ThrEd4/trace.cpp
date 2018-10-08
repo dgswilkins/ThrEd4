@@ -671,7 +671,12 @@ void trace::internal::dutrac() {
 			}
 			point = savedPoint;
 			while (point > 0 && !TracedEdges->test(point)) {
-				point -= BitmapWidth;
+				if (point > BitmapWidth) {
+					point -= BitmapWidth;
+				}
+				else {
+					point = 0;
+				}
 			}
 			if (point > 0) {
 				findRectangle.bottom = point / BitmapWidth;
