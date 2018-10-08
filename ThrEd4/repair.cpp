@@ -86,33 +86,40 @@ void repair::lodchk() {
 		}
 	}
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-		if (!formMap.test(iForm))
+		if (!formMap.test(iForm)) {
 			FormList[iForm].fillType = 0;
+		}
 	}
 	formMap.reset();
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		const auto attribute = StitchBuffer[iStitch].attribute;
-		if (attribute & TYPBRD)
+		if (attribute & TYPBRD) {
 			formMap.set((attribute & FRMSK) >> FRMSHFT);
+		}
 	}
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-		if (!formMap.test(iForm))
+		if (!formMap.test(iForm)) {
 			FormList[iForm].edgeType = 0;
+		}
 	}
 }
 
 void repair::internal::chkclp(const FRMHED* const formHeader, BADCNTS& badData) {
-	if (badData.clip == gsl::narrow<unsigned int>(formHeader->angleOrClipData.clip - ClipPoints))
+	if (badData.clip == gsl::narrow<unsigned int>(formHeader->angleOrClipData.clip - ClipPoints)) {
 		badData.clip += formHeader->lengthOrCount.clipCount;
-	else
+	}
+	else {
 		badData.attribute |= BADCLP;
+	}
 }
 
 void repair::internal::chkeclp(const FRMHED* const formHeader, BADCNTS& badData) {
-	if (badData.clip == gsl::narrow<unsigned int>(formHeader->borderClipData - ClipPoints))
+	if (badData.clip == gsl::narrow<unsigned int>(formHeader->borderClipData - ClipPoints)) {
 		badData.clip += formHeader->clipEntries;
-	else
+	}
+	else {
 		badData.attribute |= BADCLP;
+	}
 }
 
 unsigned repair::internal::frmchkfn() {
@@ -125,10 +132,12 @@ unsigned repair::internal::frmchkfn() {
 				if (!formHeader->vertexCount) {
 					badData.attribute |= BADFLT;
 				}
-				if (badData.flt == gsl::narrow<unsigned int>(formHeader->vertices - FormVertices))
+				if (badData.flt == gsl::narrow<unsigned int>(formHeader->vertices - FormVertices)) {
 					badData.flt += formHeader->vertexCount;
-				else
+				}
+				else {
 					badData.attribute |= BADFLT;
+				}
 			}
 			if (!(badData.attribute & BADCLP)) {
 				if (clip::isclp(iForm)) {
@@ -140,10 +149,12 @@ unsigned repair::internal::frmchkfn() {
 			}
 			if (formHeader->type == SAT && formHeader->satinGuideCount) {
 				if (!(badData.attribute & BADSAT)) {
-					if (badData.guideCount == gsl::narrow<unsigned int>(formHeader->satinOrAngle.guide - SatinGuides))
+					if (badData.guideCount == gsl::narrow<unsigned int>(formHeader->satinOrAngle.guide - SatinGuides)) {
 						badData.guideCount += formHeader->satinGuideCount;
-					else
+					}
+					else {
 						badData.attribute |= BADSAT;
+					}
 				}
 			}
 			if (texture::istx(iForm)) {
