@@ -116,8 +116,8 @@ constexpr float xt::internal::duxrat(float strt, float fin, float featherRatioLo
 }
 
 void xt::internal::duxrats(unsigned int start, unsigned int finish, fPOINT& point, float featherRatioLocal) noexcept {
-	point = { duxrat(BSequence[finish].x, BSequence[start].x, featherRatioLocal),
-		      duxrat(BSequence[finish].y, BSequence[start].y, featherRatioLocal) };
+	point.x = duxrat(BSequence[finish].x, BSequence[start].x, featherRatioLocal);
+	point.y = duxrat(BSequence[finish].y, BSequence[start].y, featherRatioLocal);
 }
 
 void xt::internal::durats(unsigned int iSequence, fPOINT& point, FEATHER& feather) noexcept {
@@ -125,15 +125,16 @@ void xt::internal::durats(unsigned int iSequence, fPOINT& point, FEATHER& feathe
 	    = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x, BSequence[iSequence + 1].y - BSequence[iSequence].y);
 
 	if (stitchLength < feather.minStitch) {
-		point = { BSequence[iSequence].x, BSequence[iSequence].y };
+		point.x = BSequence[iSequence].x; 
+		point.y = BSequence[iSequence].y;
 	}
 	else {
 		feather.ratioLocal         = feather.minStitch / stitchLength;
 		const fPOINT adjustedPoint = { duxrat(BSequence[iSequence + 1].x, BSequence[iSequence].x, feather.ratioLocal),
 			                           duxrat(BSequence[iSequence + 1].y, BSequence[iSequence].y, feather.ratioLocal) };
 
-		point = { durat(adjustedPoint.x, BSequence[iSequence].x, feather.ratio),
-			      durat(adjustedPoint.y, BSequence[iSequence].y, feather.ratio) };
+		point.x = durat(adjustedPoint.x, BSequence[iSequence].x, feather.ratio);
+		point.y = durat(adjustedPoint.y, BSequence[iSequence].y, feather.ratio);
 	}
 }
 
@@ -234,8 +235,8 @@ void xt::internal::fthfn(unsigned int iSequence, FEATHER& feather) {
 }
 
 void xt::internal::ratpnt(unsigned int iPoint, unsigned int iNextPoint, fPOINT& point, float featherRatio) noexcept {
-	point = { (BSequence[iNextPoint].x - BSequence[iPoint].x) * featherRatio + BSequence[iPoint].x,
-		      (BSequence[iNextPoint].y - BSequence[iPoint].y) * featherRatio + BSequence[iPoint].y };
+	point.x = (BSequence[iNextPoint].x - BSequence[iPoint].x) * featherRatio + BSequence[iPoint].x;
+	point.y = (BSequence[iNextPoint].y - BSequence[iPoint].y) * featherRatio + BSequence[iPoint].y;
 }
 
 fPOINT xt::internal::midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept {
@@ -243,8 +244,8 @@ fPOINT xt::internal::midpnt(const fPOINT& startPoint, const fPOINT& endPoint) no
 }
 
 void xt::internal::xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point, float featherRatioLocal) noexcept {
-	point = { (endPoint.x - startPoint.x) * featherRatioLocal + startPoint.x,
-		      (endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y };
+	point.x = (endPoint.x - startPoint.x) * featherRatioLocal + startPoint.x;
+	point.y = (endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y;
 }
 
 void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence) {
@@ -788,24 +789,24 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 	SelectedForm->extendedAttribute |= AT_CWLK;
 	if (SelectedForm->satinGuideCount) {
 		if (SelectedForm->wordParam) {
-			const auto iVertex     = SelectedForm->wordParam;
-			OSequence[OutputIndex] = { form::midl(CurrentFormVertices[iVertex].x, CurrentFormVertices[iVertex + 1].x),
-				                       form::midl(CurrentFormVertices[iVertex].y, CurrentFormVertices[iVertex + 1].y) };
+			const auto iVertex       = SelectedForm->wordParam;
+			OSequence[OutputIndex].x = form::midl(CurrentFormVertices[iVertex].x, CurrentFormVertices[iVertex + 1].x);
+			OSequence[OutputIndex].y = form::midl(CurrentFormVertices[iVertex].y, CurrentFormVertices[iVertex + 1].y);
 			OutputIndex++;
 		}
 		const SATCON* guide = SelectedForm->satinOrAngle.guide;
 		if (guide) {
 			for (auto iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--) {
-				OSequence[OutputIndex] = {
-					form::midl(CurrentFormVertices[guide[iGuide - 1].finish].x, CurrentFormVertices[guide[iGuide - 1].start].x),
-					form::midl(CurrentFormVertices[guide[iGuide - 1].finish].y, CurrentFormVertices[guide[iGuide - 1].start].y)
-				};
+				OSequence[OutputIndex].x
+				    = form::midl(CurrentFormVertices[guide[iGuide - 1].finish].x, CurrentFormVertices[guide[iGuide - 1].start].x);
+				OSequence[OutputIndex].y
+				    = form::midl(CurrentFormVertices[guide[iGuide - 1].finish].y, CurrentFormVertices[guide[iGuide - 1].start].y);
 				OutputIndex++;
 			}
 		}
 		if (SelectedForm->attribute & FRMEND) {
-			OSequence[OutputIndex] = { form::midl(CurrentFormVertices[0].x, CurrentFormVertices[1].x),
-				                       form::midl(CurrentFormVertices[0].y, CurrentFormVertices[1].y) };
+			OSequence[OutputIndex].x = form::midl(CurrentFormVertices[0].x, CurrentFormVertices[1].x);
+			OSequence[OutputIndex].y = form::midl(CurrentFormVertices[0].y, CurrentFormVertices[1].y);
 			OutputIndex++;
 		}
 	}
@@ -819,8 +820,8 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 		auto finish = form::prv(start);
 		start       = form::nxt(start);
 		for (auto iGuide = 1u; iGuide<VertexCount>> 1; iGuide++) {
-			OSequence[OutputIndex] = { form::midl(CurrentFormVertices[finish].x, CurrentFormVertices[start].x),
-				                       form::midl(CurrentFormVertices[finish].y, CurrentFormVertices[start].y) };
+			OSequence[OutputIndex].x = form::midl(CurrentFormVertices[finish].x, CurrentFormVertices[start].x);
+			OSequence[OutputIndex].y = form::midl(CurrentFormVertices[finish].y, CurrentFormVertices[start].y);
 			if (form::cisin(OSequence[OutputIndex].x, OSequence[OutputIndex].y)) {
 				OutputIndex++;
 			}
@@ -2374,7 +2375,8 @@ void xt::internal::rtrclpfn() {
 			}
 		}
 		if (count) {
-			LowerLeftStitch = {};
+			LowerLeftStitch.x = 0.0f;
+			LowerLeftStitch.y = 0.0f;
 			EmptyClipboard();
 			Clip        = RegisterClipboardFormat(PcdClipFormat);
 			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, count * sizeof(CLPSTCH) + 2);
@@ -2416,7 +2418,8 @@ float xt::internal::getstxt(unsigned stringIndex, HWND dialog) {
 }
 
 bool xt::internal::chkasp(fPOINT& point, float aspectRatio, HWND dialog) {
-	point = { getstxt(IDC_DESWID, dialog), getstxt(IDC_DESHI, dialog) };
+	point.x = getstxt(IDC_DESWID, dialog);
+	point.y = getstxt(IDC_DESHI, dialog);
 	// ToDo - should this have a range? aspectRatio +/- %
 	if ((point.y / point.x) == aspectRatio) {
 		return true;
@@ -2488,8 +2491,8 @@ void xt::internal::sadj(fPOINTATTR& stitch, const dPOINT& designSizeRatio, const
 }
 
 void xt::internal::sadj(fPOINT& point, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept {
-	point = { (point.x - designSizeRect.left) * designSizeRatio.x + designSizeRect.left,
-		      (point.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom };
+	point.x = (point.x - designSizeRect.left) * designSizeRatio.x + designSizeRect.left;
+	point.y = (point.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
 }
 
 void xt::internal::nudfn(const fRECTANGLE& designSizeRect) noexcept {
