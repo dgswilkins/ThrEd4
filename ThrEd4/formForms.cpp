@@ -735,7 +735,7 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 	std::wstring daisyType;
 	for (const auto DaisyTypeString : DaisyTypeStrings) {
 		displayText::loadString(daisyType, DaisyTypeString);
-		SendMessage(
+		GSL_SUPPRESS(type.1) SendMessage(
 		    GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str()));
 	}
 	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);

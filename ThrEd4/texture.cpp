@@ -444,9 +444,9 @@ void texture::drwtxtr() {
 		line[1] = { TexturePixelRect.right, TexturePixelRect.top };
 		Polyline(StitchWindowMemDC, line, 2);
 	}
-	for (auto point : *SelectedTexturePointsList) {
-		txi::dutxtx(point, IniFile.textureEditorSize);
-		txi::dutxtx(point, IniFile.textureEditorSize << 1);
+	for (auto selectedPoint : *SelectedTexturePointsList) {
+		txi::dutxtx(selectedPoint, IniFile.textureEditorSize);
+		txi::dutxtx(selectedPoint, IniFile.textureEditorSize << 1);
 	}
 	BitBlt(StitchWindowDC, 0, 0, StitchWindowClientRect.right, StitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
 	displayText::drwtxbut(TextureScreen);
@@ -1405,7 +1405,7 @@ void texture::internal::txnudg(int deltaX, float deltaY) {
 					return;
 				}
 			}
-			for (unsigned int point : *SelectedTexturePointsList) {
+			for (const auto point : *SelectedTexturePointsList) {
 				(*TempTexturePoints)[point].line += gsl::narrow<unsigned short>(deltaX);
 			}
 		}

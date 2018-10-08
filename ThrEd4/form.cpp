@@ -927,7 +927,7 @@ void form::durpoli(unsigned vertexCount) {
 	mdufrm();
 }
 
-unsigned int form::nxt(unsigned int iVertex) {
+unsigned int form::nxt(unsigned int iVertex) noexcept {
 	iVertex++;
 	if (iVertex > VertexCount - 1) {
 		iVertex = 0;
@@ -1432,7 +1432,7 @@ void form::internal::linrutb(unsigned start) {
 	LineSpacing = spacing;
 }
 
-float form::getblen() {
+float form::getblen() noexcept {
 	const auto iLength = (FormList[ClosestFormToCursor].clipEntries << 16) | FormList[ClosestFormToCursor].picoLength;
 	return static_cast<float>(iLength);
 }
@@ -1444,7 +1444,7 @@ void form::savblen(float fLength) {
 	FormList[ClosestFormToCursor].picoLength  = iLength & 0xFFFF;
 }
 
-float form::getplen() {
+float form::getplen() noexcept {
 	const auto value = SelectedForm->picoLength;
 
 	return (static_cast<float>(value >> 8) + (value & 0xff) / 256);
@@ -2331,7 +2331,7 @@ void form::internal::fnang(std::vector<unsigned>& groupIndexSequence,
                            double                 rotationAngle,
                            dPOINT&                rotationCenter) {
 	AngledForm          = FormList[ClosestFormToCursor];
-	auto& angRect       = AngledForm.rectangle;
+	const auto& angRect       = AngledForm.rectangle;
 	rotationCenter.x    = ((static_cast<double>(angRect.right) - angRect.left) / 2.0 + angRect.left);
 	rotationCenter.y    = ((static_cast<double>(angRect.top) - angRect.bottom) / 2.0 + angRect.bottom);
 	AngledForm.vertices = AngledFormVertices;
@@ -2349,7 +2349,7 @@ void form::internal::fnhor(std::vector<unsigned>& groupIndexSequence,
                            const double           rotationAngle,
                            dPOINT&                rotationCenter) {
 	AngledForm          = FormList[ClosestFormToCursor];
-	auto& angRect       = AngledForm.rectangle;
+	const auto& angRect       = AngledForm.rectangle;
 	rotationCenter.x    = ((static_cast<double>(angRect.right) - angRect.left) / 2.0 + angRect.left);
 	rotationCenter.y    = ((static_cast<double>(angRect.top) - angRect.bottom) / 2.0 + angRect.bottom);
 	AngledForm.vertices = AngledFormVertices;
@@ -2676,7 +2676,7 @@ void form::internal::duflt() {
 	}
 }
 
-unsigned form::internal::leftsid() {
+unsigned form::internal::leftsid() noexcept {
 	unsigned iVertex = 0, leftVertex = 0;
 	float    minimumX = 1e9;
 
@@ -6525,7 +6525,7 @@ void form::dulens(unsigned sides) {
 	form::mdufrm();
 }
 
-float form::internal::shreg(float highValue, float reference) {
+float form::internal::shreg(float highValue, float reference) noexcept {
 	return (highValue - reference) * EggRatio + reference;
 }
 

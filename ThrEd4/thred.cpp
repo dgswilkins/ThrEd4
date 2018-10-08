@@ -6297,7 +6297,7 @@ bool thred::internal::closPnt1(unsigned* closestStitch) {
 	return false;
 }
 
-unsigned thred::internal::pt2colInd(unsigned iStitch) {
+unsigned thred::internal::pt2colInd(unsigned iStitch) noexcept {
 	auto iColor = 0u;
 
 	for (iColor = 0; iColor < ColorChanges; iColor++) {

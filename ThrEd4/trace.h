@@ -63,7 +63,7 @@ namespace internal {
 	void trnumwnd0(int position) noexcept;
 	void trnumwnd1(int position) noexcept;
 
-	unsigned trsum();
+	unsigned trsum() noexcept;
 
 	void upnum(unsigned iRGB);
 } // namespace internal

@@ -261,7 +261,7 @@ void trace::internal::difbits(unsigned shift, unsigned* point) noexcept {
 	}
 }
 
-unsigned trace::internal::trsum() {
+unsigned trace::internal::trsum() noexcept {
 	auto sumAdjacent = 0u;
 
 	for (auto iAdjacent = 1u; iAdjacent < 9; iAdjacent++) {

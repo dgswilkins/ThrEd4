@@ -680,12 +680,12 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 	dPOINT     delta      = {};
 
 	if (StateMap.test(StateFlag::INDIR)) {
-		dPOINT val((*OutsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
+		const dPOINT val((*OutsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
 		           (*OutsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y);
 		delta = val;
 	}
 	else {
-		dPOINT val((*InsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
+		const dPOINT val((*InsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
 		           (*InsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y);
 		delta = val;
 	}
@@ -730,7 +730,7 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 		dPOINT step = {};
 		if (count > 1) {
 			const auto tdub = ((length - count * spacing) / (count - 1) + spacing) / length;
-			dPOINT     val(delta.x * tdub, delta.y * tdub);
+			const dPOINT     val(delta.x * tdub, delta.y * tdub);
 			step = val;
 		}
 		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
