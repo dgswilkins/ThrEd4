@@ -76,8 +76,9 @@ char StitchTypes[] = {
 };
 
 void xt::setfchk() {
-	if (IniFile.dataCheck)
+	if (IniFile.dataCheck) {
 		StateMap.set(StateFlag::FCHK);
+	}
 }
 
 #ifdef _DEBUG
@@ -101,10 +102,12 @@ void xt::internal::fthvars(FEATHER& feather) {
 	feather.countDown         = SelectedForm->fillInfo.feather.downCount;
 	feather.downCount         = feather.countDown;
 	feather.phaseIndex        = feather.upCount + feather.downCount;
-	if (feather.extendedAttribute & AT_FTHBLND)
+	if (feather.extendedAttribute & AT_FTHBLND) {
 		StateMap.set(StateFlag::BARSAT);
-	else
+	}
+	else {
 		StateMap.set(StateFlag::FTHR);
+	}
 }
 
 constexpr float xt::internal::durat(float start, float finish, float featherRatio) {
@@ -125,7 +128,7 @@ void xt::internal::durats(unsigned int iSequence, fPOINT& point, FEATHER& feathe
 	    = hypot(BSequence[iSequence + 1].x - BSequence[iSequence].x, BSequence[iSequence + 1].y - BSequence[iSequence].y);
 
 	if (stitchLength < feather.minStitch) {
-		point.x = BSequence[iSequence].x; 
+		point.x = BSequence[iSequence].x;
 		point.y = BSequence[iSequence].y;
 	}
 	else {
@@ -280,7 +283,7 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 	midPoint                 = midpnt(currentPoint, nextPoint);
 	OSequence[OutputIndex++] = BSequence[iSequence];
 	OSequence[OutputIndex++] = midPoint;
-	featherSequence.push_back({ BSequence[iSequence + 1].x, BSequence[iSequence + 1].y });
+	featherSequence.emplace_back(BSequence[iSequence + 1].x, BSequence[iSequence + 1].y);
 	featherSequence.push_back(midPoint);
 }
 
@@ -368,8 +371,9 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 	if (feather.extendedAttribute & AT_FTHBLND) {
 		OutputIndex = 0;
 		for (ind = 0; ind < SequenceIndex; ind++) {
-			if (!BSequence[ind].attribute)
+			if (!BSequence[ind].attribute) {
 				xi::fthrbfn(ind, feather, featherSequence);
+			}
 		}
 	}
 	else {
@@ -585,9 +589,8 @@ std::vector<fPOINT>& xt::insid() {
 		}
 		return *InsidePoints;
 	}
-	else {
-		return *OutsidePoints;
-	}
+
+	return *OutsidePoints;
 }
 
 void xt::internal::delwlk(unsigned int code) {
@@ -715,10 +718,12 @@ unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned
 			iStitch++;
 		}
 		auto intermediateVertex = 0u;
-		if (StateMap.test(StateFlag::WLKDIR))
+		if (StateMap.test(StateFlag::WLKDIR)) {
 			intermediateVertex = form::prv(startVertex);
-		else
+		}
+		else {
 			intermediateVertex = form::nxt(startVertex);
+		}
 		const fPOINT delta = { indentedPoint[intermediateVertex].x - indentedPoint[startVertex].x,
 			                   indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y };
 		length             = hypot(delta.x, delta.y);
@@ -734,10 +739,12 @@ unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned
 				localPoint.y += step.y;
 			}
 		}
-		if (StateMap.test(StateFlag::WLKDIR))
+		if (StateMap.test(StateFlag::WLKDIR)) {
 			startVertex = form::prv(startVertex);
-		else
+		}
+		else {
 			startVertex = form::nxt(startVertex);
+		}
 	}
 	StitchBuffer[iStitch] = { indentedPoint[startVertex].x, indentedPoint[startVertex].y, code };
 	iStitch++;
@@ -839,8 +846,9 @@ void xt::srtcol() {
 	std::vector<unsigned> histogram(colorSize);
 	std::vector<unsigned> colorStartStitch(colorSize);
 
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++)
+	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		histogram[StitchBuffer[iStitch].attribute & COLMSK]++;
+	}
 	auto startStitch = 0u;
 	auto it          = histogram.begin();
 	for (auto& stitchColor : colorStartStitch) {
@@ -954,8 +962,9 @@ void xt::chkund(const std::vector<RNGCNT>& textureSegments, unsigned& interleave
 
 void xt::selalfrm() {
 	SelectedFormList->reserve(FormIndex);
-	for (auto formIndex = 0u; formIndex < FormIndex; formIndex++)
+	for (auto formIndex = 0u; formIndex < FormIndex; formIndex++) {
 		SelectedFormList->push_back(formIndex);
+	}
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -997,9 +1006,8 @@ bool xt::internal::recmp(const OREC* record1, const OREC* record2) noexcept {
 			}
 			return (record1->type < record2->type);
 		}
-		else {
-			return (record1->form < record2->form);
-		}
+
+		return (record1->form < record2->form);
 	}
 	else {
 		return (ColorOrder[record1->color] < ColorOrder[record2->color]);
@@ -1018,8 +1026,9 @@ bool xt::internal::chkrdun(const std::vector<unsigned>& formFillCounter,
                            const std::vector<OREC*>&    pRecs,
                            const SRTREC&                stitchRecord) {
 	for (auto iStitch = stitchRecord.start; iStitch < stitchRecord.finish; iStitch++) {
-		if (pRecs[iStitch]->otyp == formFillCounter[pRecs[iStitch]->form])
+		if (pRecs[iStitch]->otyp == formFillCounter[pRecs[iStitch]->form]) {
 			return true;
+		}
 	}
 	return false;
 }
@@ -1034,29 +1043,32 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 	unsigned              totalJumps = 0;
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
 		double minimumLength = 1e9;
-		if (direction)
+		if (direction) {
 			currentStitch = &StitchBuffer[pRecs[currentRegion]->finish];
-		else
+		}
+		else {
 			currentStitch = &StitchBuffer[pRecs[currentRegion]->start];
+		}
 		for (auto iRegion = sortRecord.start; iRegion < sortRecord.finish; iRegion++) {
 			if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
 				double length
 				    = hypot(pRecs[iRegion]->startStitch->x - currentStitch->x, pRecs[iRegion]->startStitch->y - currentStitch->y);
 				if (length < minimumLength) {
 					minimumLength = length;
-					direction     = 0;
+					direction     = false;
 					currentRegion = iRegion;
 				}
 				length = hypot(pRecs[iRegion]->endStitch->x - currentStitch->x, pRecs[iRegion]->endStitch->y - currentStitch->y);
 				if (length < minimumLength) {
 					minimumLength = length;
-					direction     = 1;
+					direction     = true;
 					currentRegion = iRegion;
 				}
 			}
 		}
-		if (minimumLength > 9 * PFGRAN)
+		if (minimumLength > 9 * PFGRAN) {
 			totalJumps++;
+		}
 		formFillCounter[pRecs[currentRegion]->form]++;
 		if (StateMap.test(StateFlag::DUSRT)) {
 			if (direction) {
@@ -1123,8 +1135,9 @@ bool xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, unsigned count
 			if (ColorOrder[stitchRegion[iRegion]->color] < ColorOrder[color]) {
 				const auto& formHeader = FormList[form];
 				if (formHeader.fillType == FTHF && formHeader.extendedAttribute & AT_FTHBLND
-				    && stitchRegion[iRegion]->color == formHeader.fillColor)
+				    && stitchRegion[iRegion]->color == formHeader.fillColor) {
 					continue;
+				}
 				badForm = iRegion;
 				return false;
 			}
@@ -1203,8 +1216,9 @@ void xt::fsort() {
 				srtskp                       = false;
 			}
 			if (srtskp) {
-				if (pRecs[iRegion]->form == currentForm)
+				if (pRecs[iRegion]->form == currentForm) {
 					typeCount++;
+				}
 				else {
 					typeCount   = 0;
 					currentForm = pRecs[iRegion]->form;
@@ -1320,8 +1334,9 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
 
 	auto tapcol = gsl::narrow<unsigned int>(SelectedForm->borderColor >> 4);
 	for (auto iSourceStitch = 0u; iSourceStitch < PCSHeader.stitchCount; iSourceStitch++) {
-		if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX) && iSourceStitch == ClosestPointIndex)
+		if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX) && iSourceStitch == ClosestPointIndex) {
 			ClosestPointIndex = iDestinationStitch;
+		}
 		const auto attribute = StitchBuffer[iSourceStitch].attribute;
 		if (codedFormIndex == (attribute & (FRMSK | NOTFRM))) {
 			const auto type = StitchTypes[xi::dutyp(attribute)];
@@ -1485,11 +1500,12 @@ void xt::internal::duint(unsigned offset, unsigned code, INTINF& ilData) {
 		ilData.output += count;
 	}
 	if (SelectedForm->extendedAttribute & AT_STRT) {
-		if (!StateMap.testAndSet(StateFlag::DIDSTRT))
+		if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
 			ilData.output += gucon(CurrentFormVertices[SelectedForm->fillStart],
 			                       InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index],
 			                       ilData.output + offset,
 			                       code);
+		}
 	}
 	fPOINT point = {};
 	if (lastcol(ilData.pins, point)) {
@@ -1617,11 +1633,12 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 			code = gsl::narrow<unsigned int>(ilData.layerIndex | InterleaveSequenceIndices[iSequence].code
 			                                 | InterleaveSequenceIndices[iSequence].color);
 			if (SelectedForm->extendedAttribute & AT_STRT) {
-				if (!StateMap.testAndSet(StateFlag::DIDSTRT))
+				if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
 					ilData.output += xi::gucon(CurrentFormVertices[SelectedForm->fillStart],
 					                           InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index],
 					                           ilData.output + offset,
 					                           code);
+				}
 			}
 			fPOINT colpnt = {};
 			if (xi::lastcol(iSequence, colpnt)) {
@@ -2323,8 +2340,9 @@ void xt::setfilstrt() {
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
-	else
+	else {
 		displayText::shoseln(IDS_FORMP, IDS_FSTRT);
+	}
 }
 
 void xt::setfilend() {
@@ -2335,8 +2353,9 @@ void xt::setfilend() {
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
-	else
+	else {
 		displayText::shoseln(IDS_FORMP, IDS_FEND);
+	}
 }
 
 void xt::duauxnam() {
@@ -2421,12 +2440,7 @@ bool xt::internal::chkasp(fPOINT& point, float aspectRatio, HWND dialog) {
 	point.x = getstxt(IDC_DESWID, dialog);
 	point.y = getstxt(IDC_DESHI, dialog);
 	// ToDo - should this have a range? aspectRatio +/- %
-	if ((point.y / point.x) == aspectRatio) {
-		return true;
-	}
-	else {
-		return false;
-	}
+	return (point.y / point.x) == aspectRatio;
 }
 
 BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
@@ -2451,31 +2465,37 @@ BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 		case IDOK: {
 			DesignSize.x = getstxt(IDC_DESWID, designSizeDialog);
 			DesignSize.y = getstxt(IDC_DESHI, designSizeDialog);
-			if (IsDlgButtonChecked(hwndlg, IDC_REFILF))
+			if (IsDlgButtonChecked(hwndlg, IDC_REFILF)) {
 				UserFlagMap.set(UserFlag::CHREF);
-			else
+			}
+			else {
 				UserFlagMap.reset(UserFlag::CHREF);
+			}
 			EndDialog(hwndlg, 1);
 			return TRUE;
 		}
 		case IDC_DESWID: {
-			if ((wparam >> 16) == EN_CHANGE)
+			if ((wparam >> 16) == EN_CHANGE) {
 				StateMap.reset(StateFlag::DESCHG);
+			}
 			break;
 		}
 		case IDC_DESHI: {
-			if ((wparam >> 16) == EN_CHANGE)
+			if ((wparam >> 16) == EN_CHANGE) {
 				StateMap.set(StateFlag::DESCHG);
+			}
 			break;
 		}
 		case IDC_DUASP: {
 			const auto designAspectRatio = DesignSize.y / DesignSize.x;
 			fPOINT     designSize        = {};
 			if (!chkasp(designSize, designAspectRatio, designSizeDialog)) {
-				if (StateMap.test(StateFlag::DESCHG))
+				if (StateMap.test(StateFlag::DESCHG)) {
 					setstxt(IDC_DESWID, designSize.y / designAspectRatio, designSizeDialog);
-				else
+				}
+				else {
 					setstxt(IDC_DESHI, designSize.x * designAspectRatio, designSizeDialog);
+				}
 			}
 			break;
 		}
@@ -2539,8 +2559,9 @@ void xt::nudsiz() {
 				flag              = 1;
 			}
 			xi::nudfn(designSizeRect);
-			if (UserFlagMap.test(UserFlag::CHREF))
+			if (UserFlagMap.test(UserFlag::CHREF)) {
 				form::refilal();
+			}
 			if (flag != 0) {
 				thred::movStch();
 				thred::zumhom();
@@ -2566,12 +2587,14 @@ void xt::dushft() {
 }
 
 void xt::mvshft() {
-	if (StateMap.test(StateFlag::BOXZUM) && StateMap.testAndSet(StateFlag::VCAPT))
+	if (StateMap.test(StateFlag::BOXZUM) && StateMap.testAndSet(StateFlag::VCAPT)) {
 		SetCapture(ThrEdWindow);
+	}
 	if (StateMap.test(StateFlag::BZUMIN)) {
 		if (Msg.wParam & MK_LBUTTON) {
-			if (StateMap.testAndSet(StateFlag::VCAPT))
+			if (StateMap.testAndSet(StateFlag::VCAPT)) {
 				SetCapture(ThrEdWindow);
+			}
 			thred::unbBox();
 			ZoomBoxLine[1].x = ZoomBoxLine[2].x = Msg.pt.x - StitchWindowOrigin.x;
 			ZoomBoxLine[2].y = ZoomBoxLine[3].y = Msg.pt.y - StitchWindowOrigin.y;
