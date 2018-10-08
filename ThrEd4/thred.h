@@ -338,7 +338,7 @@ namespace internal {
 	void pntmrk();
 	void prtred();
 
-	constexpr unsigned pt2colInd(unsigned iStitch);
+	unsigned pt2colInd(unsigned iStitch);
 
 	void   purg();
 	void   purgdir();
