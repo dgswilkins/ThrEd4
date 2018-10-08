@@ -67,7 +67,7 @@ inline void displayText::loadString(std::wstring& sDest, unsigned stringID) {
 }
 
 void displayText::shoMsg(const std::wstring& message) {
-	if (message.size()) {
+	if (!message.empty()) {
 		std::vector<std::wstring> strings;
 
 		auto       iString              = 0u;
@@ -78,18 +78,20 @@ void displayText::shoMsg(const std::wstring& message) {
 				strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
 				previousStringLength = iString;
 			}
-			else
+			else {
 				iString++;
+			}
 		}
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
 		SIZE textSize = {}, messageSize = {};
-		for (auto index = 0u; index < strings.size(); index++) {
-			GetTextExtentPoint32Int(
-			    GetDC(ThrEdWindow), strings[index].c_str(), gsl::narrow<unsigned int>(strings[index].size()), &textSize);
-			if (textSize.cx > messageSize.cx)
+		for (auto& string : strings) {
+			GetTextExtentPoint32Int(GetDC(ThrEdWindow), string.c_str(), gsl::narrow<unsigned int>(string.size()), &textSize);
+			if (textSize.cx > messageSize.cx) {
 				messageSize.cx = textSize.cx;
-			if (textSize.cy > messageSize.cy)
+			}
+			if (textSize.cy > messageSize.cy) {
 				messageSize.cy = textSize.cy;
+			}
 		}
 		messageSize.cy *= gsl::narrow<LONG>(strings.size());
 		RECT mainRect = {};
@@ -197,24 +199,28 @@ void displayText::crmsg(const fs::path& fileName) {
 void displayText::butxt(unsigned iButton, const std::wstring& buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
 		if (iButton == 5) {
-			if (StateMap.test(StateFlag::HIDMAP))
+			if (StateMap.test(StateFlag::HIDMAP)) {
 				SetWindowText((*ButtonWin)[iButton], (*StringTable)[STR_TRC1H].c_str());
-			else
+			}
+			else {
 				SetWindowText((*ButtonWin)[iButton], (*StringTable)[STR_TRC1S].c_str());
+			}
 		}
 		else {
 			SetWindowText((*ButtonWin)[iButton], (*StringTable)[iButton - 4 + STR_TRC0].c_str());
 		}
 	}
-	else
+	else {
 		SetWindowText((*ButtonWin)[iButton], buttonText.c_str());
+	}
 }
 
 void displayText::clrhbut(unsigned startButton) {
 	unsigned iButton;
 
-	for (iButton = startButton; iButton < 9; iButton++)
+	for (iButton = startButton; iButton < 9; iButton++) {
 		SetWindowText((*ButtonWin)[iButton], L"");
+	}
 }
 
 void displayText::ritnum(unsigned code, unsigned int value) {
@@ -263,8 +269,9 @@ void displayText::frm1pnt() {
 }
 
 bool displayText::filmsgs(unsigned code) {
-	if (SelectedFormList->size())
+	if (!SelectedFormList->empty()) {
 		return displayText::clpmsgs(code);
+	}
 	if (FormIndex != 0) {
 		displayText::frm1pnt();
 		if (StateMap.test(StateFlag::FORMSEL)) {
@@ -274,24 +281,21 @@ bool displayText::filmsgs(unsigned code) {
 					displayText::tabmsg(IDS_FRM3X);
 					return true;
 				}
-				
-					if (code == FML_PRPS) {
-						displayText::tabmsg(IDS_ANGS);
-						return true;
-					}
-				
+
+				if (code == FML_PRPS) {
+					displayText::tabmsg(IDS_ANGS);
+					return true;
+				}
 			}
 			return displayText::clpmsgs(code);
 		}
-		
-			displayText::tabmsg(IDS_FILSEL);
-			return true;
-		
-	}
-	
-		displayText::tabmsg(IDS_FILCR);
+
+		displayText::tabmsg(IDS_FILSEL);
 		return true;
-	
+	}
+
+	displayText::tabmsg(IDS_FILCR);
+	return true;
 }
 
 void displayText::grpmsg() {
