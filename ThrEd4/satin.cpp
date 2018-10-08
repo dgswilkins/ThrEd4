@@ -407,23 +407,30 @@ void satin::satadj() {
 				if (iReverse) {
 					iReverse--;
 				}
-				while (satinMap.test(iForward) && (iForward < ((SatinEndGuide)-1)))
+				while (satinMap.test(iForward) && (iForward < ((SatinEndGuide)-1))) {
 					iForward++;
-				while (iReverse && (satinMap.test(iReverse)))
+				}
+				while (iReverse && (satinMap.test(iReverse))) {
 					iReverse--;
-				if (satinMap.test(iForward) && satinMap.test(iReverse))
+				}
+				if (satinMap.test(iForward) && satinMap.test(iReverse)) {
 					break;
+				}
 				if (!satinMap.test(iForward) && !satinMap.test(iReverse)) {
-					if (iForward - CurrentFormGuides[iGuide].start > CurrentFormGuides[iGuide].start - iReverse)
+					if (iForward - CurrentFormGuides[iGuide].start > CurrentFormGuides[iGuide].start - iReverse) {
 						satinMap.set(iReverse);
-					else
+					}
+					else {
 						satinMap.set(iForward);
+					}
 				}
 				else {
-					if (!satinMap.test(iForward))
+					if (!satinMap.test(iForward)) {
 						satinMap.set(iReverse);
-					else
+					}
+					else {
 						satinMap.set(iForward);
+					}
 				}
 			}
 		}
@@ -452,23 +459,30 @@ void satin::satadj() {
 				if (iReverse > (SatinEndGuide) + 1) {
 					iReverse--;
 				}
-				while (satinMap.test(iForward) && iForward < VertexCount - 1)
+				while (satinMap.test(iForward) && iForward < VertexCount - 1) {
 					iForward++;
-				while (iReverse > (SatinEndGuide)-1 && (satinMap.test(iReverse)))
+				}
+				while (iReverse > (SatinEndGuide)-1 && (satinMap.test(iReverse))) {
 					iReverse--;
-				if (satinMap.test(iForward) && satinMap.test(iReverse))
+				}
+				if (satinMap.test(iForward) && satinMap.test(iReverse)) {
 					break;
+				}
 				if (!satinMap.test(iForward) && !satinMap.test(iReverse)) {
-					if (iForward - CurrentFormGuides[iGuide].finish > CurrentFormGuides[iGuide].finish - iReverse)
+					if (iForward - CurrentFormGuides[iGuide].finish > CurrentFormGuides[iGuide].finish - iReverse) {
 						satinMap.set(iReverse);
-					else
+					}
+					else {
 						satinMap.set(iForward);
+					}
 				}
 				else {
-					if (!satinMap.test(iForward))
+					if (!satinMap.test(iForward)) {
 						satinMap.set(iForward);
-					else
+					}
+					else {
 						satinMap.set(iReverse);
+					}
 				}
 			}
 		}
@@ -622,8 +636,9 @@ void satin::delspnt() {
 void satin::internal::satsbrd() {
 	clip::deleclp(ClosestFormToCursor);
 	SelectedForm->edgeType = EDGEANGSAT;
-	if (UserFlagMap.test(UserFlag::DUND))
+	if (UserFlagMap.test(UserFlag::DUND)) {
 		SelectedForm->edgeType |= EGUND;
+	}
 	form::bsizpar();
 	SelectedForm->borderSize  = BorderWidth;
 	SelectedForm->edgeSpacing = LineSpacing / 2;
@@ -635,14 +650,16 @@ void satin::satbrd() {
 	if (displayText::filmsgs(FML_ANGS)) {
 		return;
 	}
-	if (SelectedFormList->size()) {
+	if (!SelectedFormList->empty()) {
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
-			if (UserFlagMap.test(UserFlag::BLUNT))
+			if (UserFlagMap.test(UserFlag::BLUNT)) {
 				SelectedForm->attribute |= (SBLNT | FBLNT);
-			else
+			}
+			else {
 				SelectedForm->attribute &= NOBLNT;
+			}
 			si::satsbrd();
 		}
 		StateMap.set(StateFlag::INIT);
@@ -652,10 +669,12 @@ void satin::satbrd() {
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			form::fvars(ClosestFormToCursor);
-			if (UserFlagMap.test(UserFlag::BLUNT))
+			if (UserFlagMap.test(UserFlag::BLUNT)) {
 				SelectedForm->attribute |= (SBLNT | FBLNT);
-			else
+			}
+			else {
 				SelectedForm->attribute &= NOBLNT;
+			}
 			si::satsbrd();
 			StateMap.set(StateFlag::INIT);
 			thred::coltab();
@@ -717,10 +736,12 @@ void satin::ribon() {
 				if (SelectedForm->type == FRMLINE) {
 					// Set blunt flags
 					auto isBlunt = 0u;
-					if (UserFlagMap.test(UserFlag::BLUNT))
+					if (UserFlagMap.test(UserFlag::BLUNT)) {
 						isBlunt = SBLNT | FBLNT;
-					else
+					}
+					else {
 						isBlunt = 0;
+					}
 					si::satends(isBlunt);
 					formHeader->vertices                 = thred::adflt(VertexCount << 1);
 					formHeader->vertices[0].x            = (*OutsidePoints)[0].x;
@@ -767,8 +788,9 @@ void satin::ribon() {
 					formHeader->fillInfo.feather.count = IniFile.featherCount;
 					formHeader->fillInfo.feather.color = (ActiveColor + 1) & COLMSK;
 				}
-				else
+				else {
 					formHeader->fillType = SATF;
+				}
 				for (auto iGuide = 0u; iGuide < formHeader->satinGuideCount; iGuide++) {
 					formHeader->satinOrAngle.guide[iGuide].start  = iGuide + 2;
 					formHeader->satinOrAngle.guide[iGuide].finish = formHeader->vertexCount - iGuide - 1;
@@ -793,8 +815,9 @@ void satin::ribon() {
 			displayText::tabmsg(IDS_FRM2);
 		}
 	}
-	else
+	else {
 		displayText::shoseln(IDS_FRM1MSG, IDS_CONVRIB);
+	}
 }
 
 void satin::slbrd() {
@@ -808,19 +831,22 @@ void satin::slbrd() {
 		StateMap.reset(StateFlag::SAT1);
 		StateMap.reset(StateFlag::FILDIR);
 		LineSpacing = USPAC;
-		for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount - 1; iVertex++)
+		for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount - 1; iVertex++) {
 			si::sbfn(*InsidePoints, iVertex, iVertex + 1);
+		}
 		StateMap.flip(StateFlag::FILDIR);
-		for (auto iVertex = SelectedForm->vertexCount - 1; iVertex != 0; iVertex--)
+		for (auto iVertex = SelectedForm->vertexCount - 1; iVertex != 0; iVertex--) {
 			si::sbfn(*InsidePoints, iVertex, iVertex - 1);
+		}
 	}
 	HorizontalLength2 = SelectedForm->borderSize;
 	satin::satout(HorizontalLength2);
 	si::satends(SelectedForm->attribute);
 	LineSpacing = SelectedForm->edgeSpacing;
 	StateMap.reset(StateFlag::SAT1);
-	for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount - 1; iVertex++)
+	for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount - 1; iVertex++) {
 		si::sbfn(*InsidePoints, iVertex, iVertex + 1);
+	}
 	LineSpacing = savedSpacing;
 }
 
@@ -849,10 +875,12 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		auto line1Length = lengths[line1End] - lengths[line1Start];
 		auto line2Length = lengths[line2Start] - lengths[line2End];
 		auto stitchCount = 0u;
-		if (fabs(line1Length) > fabs(line2Length))
+		if (fabs(line1Length) > fabs(line2Length)) {
 			stitchCount = dToUI(fabs(line2Length) / LineSpacing);
-		else
+		}
+		else {
 			stitchCount = dToUI(fabs(line1Length) / LineSpacing);
+		}
 		const auto            line1Segments = ((line1End > line1Start) ? (line1End - line1Start) : (line1Start - line1End));
 		const auto            line2Segments = ((line2Start > line2End) ? (line2Start - line2End) : (line2End - line2Start));
 		std::vector<unsigned> line1StitchCounts;
@@ -895,14 +923,14 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		dPOINT line2Delta    = {};
 		dPOINT line2Point    = {};
 		if (iLine2Vertex == VertexCount) {
-			line2Delta = { CurrentFormVertices[line2Previous].x - CurrentFormVertices[0].x,
-				           CurrentFormVertices[line2Previous].y - CurrentFormVertices[0].y };
-			line2Point = CurrentFormVertices[0];
+			line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[0].x;
+			line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[0].y;
+			line2Point   = CurrentFormVertices[0];
 		}
 		else {
-			line2Delta = { CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x,
-				           CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y };
-			line2Point = CurrentFormVertices[iLine2Vertex];
+			line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x;
+			line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y;
+			line2Point   = CurrentFormVertices[iLine2Vertex];
 		}
 		iLine1Vertex       = form::nxt(iLine1Vertex);
 		iLine2Vertex       = form::prv(iLine2Vertex);
@@ -967,13 +995,15 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 						line2Point.x += line2Step.x;
 						line2Point.y += line2Step.y;
 						if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-							if (UserFlagMap.test(UserFlag::SQRFIL))
+							if (UserFlagMap.test(UserFlag::SQRFIL)) {
 								form::filinu(line2Point);
+							}
 							form::filin(line1Point);
 						}
 						else {
-							if (UserFlagMap.test(UserFlag::SQRFIL))
+							if (UserFlagMap.test(UserFlag::SQRFIL)) {
 								form::filinu(line1Point);
+							}
 							form::filin(line2Point);
 						}
 						line1Count--;
@@ -985,19 +1015,21 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 				if (!line1Count && iLine1Count < line1StitchCounts.size()) {
 					line1Count   = line1StitchCounts[iLine1Count++];
 					line1Next    = form::nxt(iLine1Vertex);
-					line1Delta   = { CurrentFormVertices[line1Next].x - CurrentFormVertices[iLine1Vertex].x,
-                                   CurrentFormVertices[line1Next].y - CurrentFormVertices[iLine1Vertex].y };
+					line1Delta.x = CurrentFormVertices[line1Next].x - CurrentFormVertices[iLine1Vertex].x;
+					line1Delta.y = CurrentFormVertices[line1Next].y - CurrentFormVertices[iLine1Vertex].y;
 					iLine1Vertex = form::nxt(iLine1Vertex);
-					line1Step    = { line1Delta.x / line1Count, line1Delta.y / line1Count };
+					line1Step.x  = line1Delta.x / line1Count;
+					line1Step.y  = line1Delta.y / line1Count;
 				}
 
 				if (!line2Count && iLine2Count < line2StitchCounts.size()) {
 					line2Count    = line2StitchCounts[iLine2Count++];
 					line2Previous = form::prv(iLine2Vertex);
-					line2Delta    = { CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x,
-                                   CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y };
+					line2Delta.x  = CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x;
+					line2Delta.y  = CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y;
 					iLine2Vertex  = form::prv(iLine2Vertex);
-					line2Step     = { line2Delta.x / line2Count, line2Delta.y / line2Count };
+					line2Step.x   = line2Delta.x / line2Count;
+					line2Step.y   = line2Delta.y / line2Count;
 				}
 				if ((line1Count || line2Count) && line1Count < MAXITEMS && line2Count < MAXITEMS) {
 					flag = true;
@@ -1018,12 +1050,13 @@ void satin::internal::satmf(const std::vector<double>& lengths) {
 	if (endGuide) {
 		endGuide--;
 	}
-	for (auto iGuide = 0u; iGuide < endGuide; iGuide++)
+	for (auto iGuide = 0u; iGuide < endGuide; iGuide++) {
 		si::satfn(lengths,
 		          CurrentFormGuides[iGuide].start,
 		          CurrentFormGuides[iGuide + 1].start,
 		          CurrentFormGuides[iGuide].finish,
 		          CurrentFormGuides[iGuide + 1].finish);
+	}
 	if (SatinEndGuide) {
 		si::satfn(
 		    lengths, CurrentFormGuides[endGuide].start, SatinEndGuide, CurrentFormGuides[endGuide].finish, SatinEndGuide + 1);
@@ -1033,12 +1066,14 @@ void satin::internal::satmf(const std::vector<double>& lengths) {
 			auto length = (lengths[CurrentFormGuides[endGuide].finish] - lengths[CurrentFormGuides[endGuide].start]) / 2
 			              + lengths[CurrentFormGuides[endGuide].start];
 			auto iVertex = CurrentFormGuides[endGuide].start;
-			while (length > lengths[iVertex])
+			while (length > lengths[iVertex]) {
 				iVertex++;
+			}
 			auto deltaX = lengths[iVertex] - length;
 			auto deltaY = length - lengths[iVertex - 1];
-			if (deltaY > deltaX)
+			if (deltaY > deltaX) {
 				iVertex--;
+			}
 			si::satfn(lengths, CurrentFormGuides[endGuide].start, iVertex, CurrentFormGuides[endGuide].finish, iVertex);
 		}
 		else {
@@ -1131,8 +1166,9 @@ void satin::satfil() {
 		}
 		const auto deltaA = lengths[iVertex] - length;
 		const auto deltaB = length - lengths[iVertex - 1];
-		if (deltaB > deltaA)
+		if (deltaB > deltaA) {
 			iVertex--;
+		}
 		si::satfn(lengths, 0, iVertex, VertexCount, iVertex);
 	} while (false);
 
@@ -1166,8 +1202,9 @@ void satin::dusat() noexcept {
 }
 
 void satin::internal::unsat() {
-	if (StateMap.testAndReset(StateFlag::SHOSAT))
+	if (StateMap.testAndReset(StateFlag::SHOSAT)) {
 		satin::dusat();
+	}
 }
 
 void satin::drwsat() {
@@ -1225,7 +1262,8 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 	}
 	SatinBackupIndex = 0;
 	for (auto& sb : satinBackup) {
-		sb = { 1e12f, 1e12f };
+		sb.x = 1e12;
+		sb.y = 1e12;
 	}
 	if (outerLength > innerLength) {
 		count     = gsl::narrow<unsigned int>(std::round(outerLength / LineSpacing));
@@ -1233,9 +1271,10 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 
 		dPOINT intersection = {};
 		if (form::linx(insidePoints, start, finish, intersection)) {
-			innerDelta  = {};
-			innerLength = 0;
-			innerPoint  = intersection;
+			innerDelta.x = 0.0;
+			innerDelta.y = 0.0;
+			innerLength  = 0;
+			innerPoint   = intersection;
 		}
 	}
 	else {
@@ -1244,9 +1283,10 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 
 		dPOINT intersection = {};
 		if (form::linx(insidePoints, start, finish, intersection)) {
-			outerDelta  = {};
-			outerLength = 0;
-			outerPoint  = intersection;
+			outerDelta.x = 0.0;
+			outerDelta.y = 0.0;
+			outerLength  = 0;
+			outerPoint   = intersection;
 		}
 	}
 	if (!count) {
@@ -1335,8 +1375,9 @@ void satin::satout(double satinWidth) {
 		}
 		auto count = 0u;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
-			if (form::cisin((*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y))
+			if (form::cisin((*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y)) {
 				count++;
+			}
 		}
 		satinWidth /= 2;
 		for (auto iVertex = 0u; iVertex < VertexCount - 1; iVertex++) {
@@ -1385,10 +1426,12 @@ void satin::internal::outfn(unsigned start, unsigned finish, double satinWidth) 
 
 		auto angle  = ((*FormAngles)[finish] - (*FormAngles)[start]) / 2.0;
 		auto length = satinWidth / cos(angle);
-		if (length < -satinWidth * SATHRESH)
+		if (length < -satinWidth * SATHRESH) {
 			length = -satinWidth * SATHRESH;
-		if (length > satinWidth * SATHRESH)
+		}
+		if (length > satinWidth * SATHRESH) {
 			length = satinWidth * SATHRESH;
+		}
 		angle += (*FormAngles)[start] + PI / 2;
 		xOffset = length * cos(angle);
 		yOffset = length * sin(angle);
@@ -1403,8 +1446,9 @@ bool satin::internal::chkbak(const std::vector<dPOINT>& satinBackup, const dPOIN
 	const auto maxSB = satinBackup.size();
 	for (auto iBackup = 0u; iBackup < maxSB; iBackup++) {
 		const auto length = hypot(satinBackup[iBackup].x - pnt.x, satinBackup[iBackup].y - pnt.y);
-		if (length < LineSpacing)
+		if (length < LineSpacing) {
 			return true;
+		}
 	}
 	return false;
 }
