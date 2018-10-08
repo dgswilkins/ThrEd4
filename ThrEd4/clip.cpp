@@ -284,8 +284,9 @@ void clip::internal::lincrnr(const std::vector<fPOINT>& clipReversedData,
 		delta.y                    = moveToCoords.y - SelectedPoint.y;
 		const double rotationAngle = atan2(delta.y, delta.x);
 		thred::rotangf(BorderClipReference, ClipReference, rotationAngle, rotationCenter);
-		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++)
+		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 			thred::rotangf(clipReversedData[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
+		}
 		ci::ritclp(clipFillData, SelectedPoint);
 		SelectedPoint = moveToCoords;
 	}
@@ -304,8 +305,9 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
 
 	if (clipCount) {
 		thred::rotangf(BorderClipReference, ClipReference, clipAngle, rotationCenter);
-		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++)
+		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 			thred::rotangf(clipReversedData[iStitch], clipFillData[iStitch], clipAngle, rotationCenter);
+		}
 		for (auto iClip = 0u; iClip < clipCount; iClip++) {
 			ci::ritclp(clipFillData, SelectedPoint);
 			SelectedPoint.x += vector0.x;
@@ -345,17 +347,21 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 	const auto clipCount = gsl::narrow<unsigned int>(std::floor(length / ClipRectSize.cx));
 	if (clipCount) {
 		float remainder = 0.0;
-		if (clipCount > 1)
+		if (clipCount > 1) {
 			remainder = ((length - clipCount * ClipRectSize.cx) / (clipCount - 1) + ClipRectSize.cx) / length;
-		else
+		}
+		else {
 			remainder = (length - ClipRectSize.cx) / 2;
+		}
 		const fPOINT step        = { delta.x * remainder, delta.y * remainder };
 		auto         insertPoint = begin;
-		for (auto index = 0u; index < ClipStitchCount; index++)
+		for (auto index = 0u; index < ClipStitchCount; index++) {
 			thred::rotangf(clipReversedData[index], clipFillData[index], rotationAngle, rotationCenter);
+		}
 		for (auto stepCount = 0u; stepCount < clipCount; stepCount++) {
-			if (ci::ritclp(clipFillData, insertPoint))
+			if (ci::ritclp(clipFillData, insertPoint)) {
 				break;
+			}
 			insertPoint.x += step.x;
 			insertPoint.y += step.y;
 		}
@@ -622,12 +628,12 @@ void clip::internal::clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fP
 	if (SelectedForm->type == FRMLINE) {
 		const auto pivot = ClipRectSize.cy / 2;
 		for (auto iPoint = 0u; iPoint < ClipStitchCount; iPoint++) {
-			tempClipPoints.push_back({ ClipBuffer[iPoint].x, (-ClipBuffer[iPoint].y + pivot) });
+			tempClipPoints.emplace_back(ClipBuffer[iPoint].x, (-ClipBuffer[iPoint].y + pivot));
 		}
 	}
 	else {
 		for (auto iPoint = 0u; iPoint < ClipStitchCount; iPoint++) {
-			tempClipPoints.push_back({ ClipBuffer[iPoint].x, (-ClipBuffer[iPoint].y) });
+			tempClipPoints.emplace_back(ClipBuffer[iPoint].x, (-ClipBuffer[iPoint].y));
 		}
 	}
 }
@@ -674,18 +680,21 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 	dPOINT     delta      = {};
 
 	if (StateMap.test(StateFlag::INDIR)) {
-		delta = { (*OutsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
-			      (*OutsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y };
+		dPOINT val((*OutsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
+		           (*OutsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y);
+		delta = val;
 	}
 	else {
-		delta = { (*InsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
-			      (*InsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y };
+		dPOINT val((*InsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
+		           (*InsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y);
+		delta = val;
 	}
 	const double     rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
 	const fPOINTATTR referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
 	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
-	for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++)
+	for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 		thred::rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
+	}
 	const auto length = hypot(delta.x, delta.y);
 	const auto ratio  = form::getplen() / length;
 	delta.x *= ratio;
@@ -721,10 +730,12 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 		dPOINT step = {};
 		if (count > 1) {
 			const auto tdub = ((length - count * spacing) / (count - 1) + spacing) / length;
-			step            = { delta.x * tdub, delta.y * tdub };
+			dPOINT     val(delta.x * tdub, delta.y * tdub);
+			step = val;
 		}
-		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++)
+		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 			thred::rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
+		}
 		bool   flag       = true;
 		fPOINT innerPoint = { CurrentFormVertices[start].x, CurrentFormVertices[start].y };
 		for (auto iStep = 0u; iStep < count - 1; iStep++) {
@@ -815,8 +826,9 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 	chainPoint[2].x = chainEndPoints[finish].x + delta.x / 4;
 	chainPoint[2].y = chainEndPoints[finish].y + delta.y / 4;
 	auto chainCount = gsl::narrow<unsigned int>(chainSequence.size());
-	if (StateMap.test(StateFlag::LINCHN))
+	if (StateMap.test(StateFlag::LINCHN)) {
 		chainCount--;
+	}
 	for (auto iChain = 0u; iChain < chainCount; iChain++) {
 		OSequence[SequenceIndex] = chainPoint[chainSequence[iChain]];
 		SequenceIndex++;
@@ -834,8 +846,9 @@ void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 		if (SelectedForm->type == FRMLINE) {
 			ci::duchfn(chainEndPoints, chainLength - 1, chainLength);
 			auto backupAt = 8u;
-			if (StateMap.test(StateFlag::LINCHN))
+			if (StateMap.test(StateFlag::LINCHN)) {
 				backupAt--;
+			}
 			if ((SequenceIndex >= backupAt)) {
 				OSequence[SequenceIndex - backupAt] = chainEndPoints[chainLength];
 			}
@@ -846,8 +859,9 @@ void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 			OSequence[SequenceIndex++] = chainEndPoints[chainLength];
 		}
 	}
-	else
+	else {
 		displayText::tabmsg(IDS_CHANSMAL);
+	}
 }
 
 void clip::chnfn() {
