@@ -12,7 +12,7 @@
 #include <Windows.h> // Win32 Platform SDK main header
 
 // Open Source headers
-#include <CppCoreCheck\warnings.h>
+#include "warnings.h"
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #pragma warning(disable : 4127)  // supress warning for fmt library header
@@ -58,7 +58,7 @@ unsigned short LoadStringList[] = {
 inline void displayText::loadString(std::wstring& sDest, unsigned stringID) {
 	wchar_t* pBuf = nullptr;
 	sDest.clear();
-	[[gsl::suppress(26490)]] {
+	GSL_SUPPRESS(26490) {
 		if (auto len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPWSTR>(&pBuf), 0)) {
 			sDest.resize(len);
 			auto _ = std::copy(pBuf, pBuf + len, sDest.begin());
@@ -500,6 +500,6 @@ HFONT displayText::getThrEdFont(LONG weight) noexcept {
 #endif
 }
 
-[[gsl::suppress(26490)]][[gsl::suppress(26461)]] void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
+GSL_SUPPRESS(26490)GSL_SUPPRESS(26461) void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
 	SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0));
 }

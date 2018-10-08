@@ -1,7 +1,7 @@
 #pragma once
 
 // Open Source headers
-#include <CppCoreCheck\warnings.h>
+#include "warnings.h"
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include <gsl/gsl>
@@ -2431,7 +2431,7 @@ struct _txtrct {
 using TXTRCT = struct _txtrct;
 
 struct _txhst {
-	std::vector<TXPNT> texturePoint;
+	std::vector<TXPNT> texturePoints;
 	float              height  = 0.0;
 	float              width   = 0.0;
 	float              spacing = 0.0;
@@ -2499,7 +2499,7 @@ using LENINFO = struct _lengthInfo;
 // use the encapsulation recommended in I.30
 // (https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#i30-encapsulate-rule-violations)
 template <class T2, class T1> inline _Ret_notnull_ T2 convert_ptr(T1* pointer) {
-	[[gsl::suppress(26474)]] {
+	GSL_SUPPRESS(26474) {
 		if (pointer) {
 			return static_cast<T2>(static_cast<void*>(pointer));
 		}

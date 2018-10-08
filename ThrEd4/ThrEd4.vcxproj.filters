@@ -119,6 +119,9 @@
     <ClInclude Include="satin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="warnings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\dlin.cur">

@@ -1,7 +1,7 @@
 #pragma once
 
 // Open Source headers
-#include <CppCoreCheck\warnings.h>
+#include "warnings.h"
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #pragma warning(disable : 26455) // supress warning for library headers
@@ -14,7 +14,7 @@ class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator>
 	using super = boost::dynamic_bitset<Block, Allocator>;
 
 public:
-	[[gsl::suppress(26434)]] explicit ExtendedBitSet(std::size_t bits)
+	GSL_SUPPRESS(26434) explicit ExtendedBitSet(std::size_t bits)
 	    : super::dynamic_bitset(bits) {
 	}
 

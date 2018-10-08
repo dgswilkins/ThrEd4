@@ -58,6 +58,7 @@
     <ClInclude Include="ThrEdTypes.h" />
     <ClInclude Include="trace.h" />
     <ClInclude Include="utf8conv.h" />
+    <ClInclude Include="warnings.h" />
     <ClInclude Include="wrappers.h" />
     <ClInclude Include="xt.h" />
   </ItemGroup>

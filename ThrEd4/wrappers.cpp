@@ -12,7 +12,7 @@
 #include <Windows.h> // Win32 Platform SDK main header
 
 // Open Source headers
-#include <CppCoreCheck\warnings.h>
+#include "warnings.h"
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include <gsl/gsl>
