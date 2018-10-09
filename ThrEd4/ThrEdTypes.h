@@ -410,7 +410,7 @@ enum class StateFlag
 	ROTCAPT,   // rotate capture mode
 	MOVCNTR,   // user is moving the rotate center
 	GETMIN,    // user is entering a minimum stitch length
-	NUMIN,     // user in entering a number
+	NUMIN,     // user is entering a number
 	MOVFRM,    // user is moving a form vertex
 	MOVMSG,    // user tried to move an edited form
 	SHOFRM,    // form is currently written to the screen

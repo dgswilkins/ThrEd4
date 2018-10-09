@@ -2065,7 +2065,7 @@ void thred::internal::chknum() {
 				if (value) {
 					thred::savdo();
 					form::nufthcol((bufTou64(SideWindowEntryBuffer) - 1) & 0xf);
-					SetWindowText((*ValueWindow)[LFRMCOL], SideWindowEntryBuffer);
+					SetWindowText((*ValueWindow)[LFTHCOL], SideWindowEntryBuffer);
 					thred::coltab();
 				}
 				thred::unsid();
@@ -13770,6 +13770,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					break;
 				}
 			} while (false);
+			OutputDebugString(fmt::format(L"chkmsg:FormMenuChoice '{}'\n", FormMenuChoice).c_str());
+
 			return true;
 		}
 		if (StateMap.test(StateFlag::INSFRM)) {
