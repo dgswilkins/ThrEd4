@@ -512,7 +512,7 @@ void formForms::sidwnd(HWND wnd) noexcept {
 
 	MsgIndex                       = 0;
 	SideWindowEntryBuffer[0]       = 0;
-	const unsigned int savedChoice = FormMenuChoice;
+	const auto savedChoice = FormMenuChoice;
 	thred::unsid();
 	FormMenuChoice = savedChoice;
 	GetWindowRect(wnd, &windowRect);
@@ -597,7 +597,7 @@ void formForms::prfmsg() {
 	if (FormDataSheet) {
 		thred::undat();
 		thred::unsid();
-		FormMenuChoice = 0;
+		FormMenuChoice = 0u;
 	}
 	LabelWindowSize.x = LabelWindowSize.y = 0;
 	ValueWindowSize.x = ValueWindowSize.y = 0;
