@@ -471,14 +471,6 @@ void formForms::internal::refrmfn() {
 	}
 }
 
-/*
-BOOL CALLBACK formForms::internal::chenum(HWND hwnd, LPARAM lParam) noexcept {
-    UNREFERENCED_PARAMETER(lParam);
-
-    return DestroyWindow(hwnd);
-}
-*/
-
 void formForms::refrm() {
 	SelectedForm = &FormList[ClosestFormToCursor];
 	if (StateMap.testAndReset(StateFlag::PRFACT)) {
