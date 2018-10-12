@@ -2109,6 +2109,8 @@ void thred::internal::chknum() {
 			case LBRDPIC: {
 				thred::savdo();
 				SelectedForm->edgeSpacing = value;
+				thred::unsid();
+				SetWindowText((*ValueWindow)[LBRDPIC], SideWindowEntryBuffer);
 				form::refil();
 				return;
 			}
@@ -2116,6 +2118,7 @@ void thred::internal::chknum() {
 				thred::savdo();
 				SelectedForm->wordParam = gsl::narrow<unsigned int>(std::floor(value / PFGRAN));
 				thred::unsid();
+				SetWindowText((*ValueWindow)[LFRMFAZ], SideWindowEntryBuffer);
 				form::refil();
 				return;
 			}
@@ -2123,6 +2126,7 @@ void thred::internal::chknum() {
 				thred::savdo();
 				SelectedForm->edgeStitchLen = value / PFGRAN;
 				thred::unsid();
+				SetWindowText((*ValueWindow)[LBRDPOS], SideWindowEntryBuffer);
 				form::refil();
 				return;
 			}
@@ -2130,6 +2134,7 @@ void thred::internal::chknum() {
 				thred::savdo();
 				SelectedForm->maxFillStitchLen = value;
 				thred::unsid();
+				SetWindowText((*ValueWindow)[LMAXFIL], SideWindowEntryBuffer);
 				form::refil();
 				return;
 			}
@@ -2137,6 +2142,7 @@ void thred::internal::chknum() {
 				thred::savdo();
 				SelectedForm->minFillStitchLen = value;
 				thred::unsid();
+				SetWindowText((*ValueWindow)[LMINFIL], SideWindowEntryBuffer);
 				form::refil();
 				return;
 			}
@@ -2144,6 +2150,7 @@ void thred::internal::chknum() {
 				thred::savdo();
 				SelectedForm->maxBorderStitchLen = value;
 				thred::unsid();
+				SetWindowText((*ValueWindow)[LMAXBRD], SideWindowEntryBuffer);
 				form::refil();
 				return;
 			}
@@ -2151,6 +2158,7 @@ void thred::internal::chknum() {
 				thred::savdo();
 				SelectedForm->minBorderStitchLen = value;
 				thred::unsid();
+				SetWindowText((*ValueWindow)[LMINBRD], SideWindowEntryBuffer);
 				form::refil();
 				return;
 			}
@@ -10870,7 +10878,7 @@ void thred::internal::ritlock(const WIN32_FIND_DATA* fileData, unsigned fileInde
 		SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
 		for (auto iFile = 0u; iFile < fileIndex; iFile++) {
 			if (fileData[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) {
-				GSL_SUPPRESS(type.1)
+ 				GSL_SUPPRESS(type.1)
 				SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(fileData[iFile].cFileName));
 			}
 			else {
@@ -12866,6 +12874,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			for (auto iPreference = 0u; iPreference < PRFLINS; iPreference++) {
 				if (Msg.hwnd == (*ValueWindow)[iPreference]) {
 					PreferenceIndex = iPreference + 1;
+					OutputDebugString(fmt::format(L"chkmsg:PreferenceIndex '{}'\n", PreferenceIndex).c_str());
 					formForms::prfsid((*ValueWindow)[iPreference]);
 					break;
 				}
@@ -13094,6 +13103,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				for (auto iFillType = 0u; iFillType < 6; iFillType++) {
 					if (Msg.hwnd == SideWindow[iFillType]) {
 						SelectedForm->fillInfo.feather.fillType = gsl::narrow<unsigned char>(iFillType + 1);
+						thred::unsid();
 						form::refil();
 						formForms::refrm();
 						break;
@@ -13112,6 +13122,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					form::movlayr(iLayer << 1);
 					StateMap.set(StateFlag::FORMSEL);
 				}
+				thred::unsid();
+				auto layerStr = fmt::format(L"{}", ((SelectedForm->attribute & FRMLMSK) >> 1));
+				SetWindowText((*ValueWindow)[LLAYR], layerStr.c_str());
 				return true;
 			}
 			SelectedForm->borderColor &= COLMSK;
@@ -13527,7 +13540,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFTHBLND] || Msg.hwnd == (*LabelWindow)[LFTHBLND]) {
-					StateMap.set(StateFlag::FLPBLND);
+					SelectedForm->extendedAttribute ^= AT_FTHBLND;
 					formForms::refrm();
 					form::refil();
 					thred::unsid();
@@ -13536,9 +13549,12 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFTHUP] || Msg.hwnd == (*LabelWindow)[LFTHUP]) {
 					SelectedForm->extendedAttribute ^= AT_FTHUP;
-					formForms::refrm();
 					form::refil();
-					thred::unsid();
+					auto choice = (*StringTable)[STR_OFF];
+					if (SelectedForm->extendedAttribute & AT_FTHUP) {
+						choice = (*StringTable)[STR_ON];
+					}
+					SetWindowText((*ValueWindow)[LFTHUP], choice.c_str());
 					StateMap.set(StateFlag::RESTCH);
 					break;
 				}
@@ -13571,10 +13587,10 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LLAYR] || Msg.hwnd == (*LabelWindow)[LLAYR]) {
-					std::wstring LayerText[] = { L"0", L"1", L"2", L"3", L"4" };
+					std::wstring layerText[] = { L"0", L"1", L"2", L"3", L"4" };
 					FormMenuChoice           = LLAYR;
 					StateMap.reset(StateFlag::FILTYP);
-					sidmsg((*ValueWindow)[LLAYR], LayerText, 5);
+					sidmsg((*ValueWindow)[LLAYR], layerText, 5);
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFRMFIL] || Msg.hwnd == (*LabelWindow)[LFRMFIL]) {
@@ -13711,7 +13727,11 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				}
 				if (Msg.hwnd == (*ValueWindow)[LBFILSQR] || Msg.hwnd == (*LabelWindow)[LBFILSQR]) {
 					xt::dubit(AT_SQR);
-					formForms::refrm();
+					auto choice = (*StringTable)[STR_PNTD];
+					if (SelectedForm->extendedAttribute & AT_SQR) {
+						choice = (*StringTable)[STR_SQR];
+					}
+					SetWindowText((*ValueWindow)[LBFILSQR], choice.c_str());
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LFSTRT] || Msg.hwnd == (*LabelWindow)[LFSTRT]) {
@@ -18248,6 +18268,9 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 				       0,                             // y-coordinate of source upper-left corner
 				       SRCCOPY                        // raster operation code
 				);
+				if (FormDataSheet) {
+					thred::redraw(FormDataSheet);
+				}
 				if (StateMap.test(StateFlag::ROTSHO)) {
 					durot();
 				}

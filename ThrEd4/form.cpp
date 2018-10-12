@@ -4904,9 +4904,6 @@ void form::refilfn() {
 			break;
 		}
 		case FTHF: {
-			if (StateMap.testAndReset(StateFlag::FLPBLND)) {
-				SelectedForm->extendedAttribute ^= AT_FTHBLND;
-			}
 			StateMap.set(StateFlag::CNV2FTH);
 			xt::fthrfn(interleaveSequenceIndex2);
 			break;
