@@ -11,12 +11,12 @@
 #pragma warning(disable : 26409) //			Avoid calling new and delete explicitly, use std::make_unique<T> instead
 #pragma warning(disable : 26423) //			The allocation was not directly assigned to an owner
 #pragma warning(disable : 26424) //			Failing to delete or assign ownership of allocation
-#pragma warning(disable : 26425) //			Assigning 'return of new[]' to a static variable
+//#pragma warning(disable : 26425) //			Assigning 'return of new[]' to a static variable
 //#pragma warning(disable:26429)	// f.23		Symbol is never tested for nullness, it can be marked as not_null
 //#pragma warning(disable:26438)	// es.76	Avoid 'goto'
 // We disable 26446 as operator[] is bounds checked for vectors in the debug version
 #pragma warning(disable : 26446) // bounds.4 Prefer to use gsl::at() instead of unchecked subscript operator
-#pragma warning(disable : 26451) // io.2		Arithmetic overflow
+//#pragma warning(disable : 26451) // io.2		Arithmetic overflow
 //#pragma warning(disable:26461)	// con.3	The pointer argument can be marked as a pointer to const
 //#pragma warning(disable:26472)	// type.1	Don't use a static_cast for arithmetic conversions
 //#pragma warning(disable:26474)	// type.1	Don't cast between pointer types when the conversion could be implicit
