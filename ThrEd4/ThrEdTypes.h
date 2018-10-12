@@ -575,7 +575,6 @@ enum class StateFlag
 	WASDO,     // backup has been made before refil
 	NOSEL,     // left button down didn't select anything
 	WASDEL,    // stitches were deleted
-	FLPBLND,   // flip the feather blend bit before refilling
 	GTWLKIND,  // get the edge walk/underlay offset
 	GTWLKLEN,  // get the edge walk/underlay stitch length
 	GTUANG,    // get the underlay angle
