@@ -209,7 +209,7 @@ void formForms::internal::refrmfn() {
 			ffi::nxtlin();
 			labelWindow[LUANG] = ffi::txtwin(stringTable[STR_FUANG], LabelWindowCoords);
 			valueWindow[LUANG]
-			    = ffi::txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlayStitchAngle * 180 / PI)), ValueWindowCoords);
+			    = ffi::txtrwin(fmt::format(L"{:.2f}", (static_cast<double>(SelectedForm->underlayStitchAngle) * 180 / PI)), ValueWindowCoords);
 			ffi::nxtlin();
 		}
 	}
@@ -304,13 +304,13 @@ void formForms::internal::refrmfn() {
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
 			labelWindow[LFRMANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
 			valueWindow[LFRMANG]
-			    = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->angleOrClipData.angle * 180 / PI)), ValueWindowCoords);
+			    = ffi::numwin(fmt::format(L"{:.2f}", (static_cast<double>(SelectedForm->angleOrClipData.angle) * 180 / PI)), ValueWindowCoords);
 			ffi::nxtlin();
 		}
 		if (SelectedForm->fillType == ANGCLPF) {
 			labelWindow[LSACANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
 			valueWindow[LSACANG]
-			    = ffi::numwin(fmt::format(L"{:.2f}", (SelectedForm->satinOrAngle.angle * 180 / PI)), ValueWindowCoords);
+			    = ffi::numwin(fmt::format(L"{:.2f}", (static_cast<double>(SelectedForm->satinOrAngle.angle) * 180 / PI)), ValueWindowCoords);
 			ffi::nxtlin();
 		}
 		if (SelectedForm->fillType == VCLPF || SelectedForm->fillType == HCLPF || SelectedForm->fillType == ANGCLPF) {
@@ -834,7 +834,7 @@ void formForms::dasyfrm() {
 	auto       diameter     = IniFile.daisyDiameter;
 	auto       petalLength  = IniFile.daisyPetalLen;
 	auto       holeDiameter = IniFile.daisyHoleDiameter;
-	const auto ratio        = maximumXsize / (diameter + petalLength);
+	const auto ratio        = maximumXsize / (static_cast<double>(diameter) + petalLength);
 	diameter *= ratio;
 	petalLength *= ratio;
 	holeDiameter *= ratio;
@@ -1039,7 +1039,7 @@ void formForms::setear() {
 		form::durpoli(IniFile.formSides);
 		form::fvars(FormIndex);
 		const auto count            = VertexCount / 4;
-		const auto middle           = (CurrentFormVertices[1].x - CurrentFormVertices[0].x) / 2.0 + CurrentFormVertices[0].x;
+		const auto middle           = (CurrentFormVertices[1].x - CurrentFormVertices[0].x) / 2.0f + CurrentFormVertices[0].x;
 		auto       step             = CurrentFormVertices[count + 1].y - CurrentFormVertices[count].y;
 		auto       verticalPosition = CurrentFormVertices[count + 1].y;
 		auto       iLeftVertices    = VertexCount - count;
