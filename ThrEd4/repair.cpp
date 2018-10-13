@@ -75,7 +75,7 @@ void repair::lodchk() {
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		const auto attribute = StitchBuffer[iStitch].attribute;
 		if ((attribute & TYPMSK) == TYPFRM) {
-			const unsigned tform = (attribute & FRMSK) >> FRMSHFT;
+			const auto tform = (attribute & FRMSK) >> FRMSHFT;
 			if (tform < formMap.size()) {
 				formMap.set(tform);
 			}
@@ -226,8 +226,9 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	}
 	FormIndex = iDestination;
 	std::vector<fPOINT> vertexPoint;
-	auto                iVertex = 0u;
-	bool                flag    = true;
+
+	auto iVertex = 0u;
+	auto flag    = true;
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		const auto formHeader = &FormList[iForm];
 		// ToDo - find a better way than pointer arithmetic
