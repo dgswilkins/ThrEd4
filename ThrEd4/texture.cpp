@@ -299,9 +299,11 @@ void texture::dutxtfil() {
 }
 
 void texture::internal::txt2pix(const TXPNT& texturePoint, POINT& screenPoint) {
-	screenPoint.x = dToL((texturePoint.line * TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio);
+	screenPoint.x = dToL((static_cast<double>(TextureScreen.spacing) * texturePoint.line + TextureScreen.xOffset)
+	                     / TextureScreen.editToPixelRatio);
 	screenPoint.y
-	    = dToL(TextureScreen.height - texturePoint.y / TextureScreen.areaHeight * TextureScreen.height + TextureScreen.top);
+	    = dToL(static_cast<double>(TextureScreen.height)
+	           - texturePoint.y / static_cast<double>(TextureScreen.areaHeight) * TextureScreen.height + TextureScreen.top);
 }
 
 void texture::internal::txtxfn(const POINT& reference, unsigned short offsetPixels) noexcept {
@@ -385,9 +387,9 @@ void texture::drwtxtr() {
 	else {
 		TextureScreen.editToPixelRatio = TextureScreen.areaHeight * 2 / StitchWindowClientRect.bottom;
 		yOffset                        = StitchWindowClientRect.bottom >> 2;
-		TextureScreen.xOffset
-		    = (StitchWindowClientRect.right * TextureScreen.editToPixelRatio - (TextureScreen.lines + 2) * TextureScreen.spacing)
-		      / 2;
+		TextureScreen.xOffset          = (TextureScreen.editToPixelRatio * StitchWindowClientRect.right
+                                 - static_cast<double>(TextureScreen.spacing) * (static_cast<double>(TextureScreen.lines) + 2.0))
+		                        / 2.0;
 	}
 	TextureScreen.top          = yOffset;
 	TextureScreen.bottom       = StitchWindowClientRect.bottom - yOffset;
@@ -415,8 +417,8 @@ void texture::drwtxtr() {
 	line[0].y = 0;
 	line[1].y = StitchWindowClientRect.bottom;
 	for (auto iVertical = 1u; iVertical < TextureScreen.lines + 1u; iVertical++) {
-		line[0].x = line[1].x
-		    = dToL((iVertical * TextureScreen.spacing + TextureScreen.xOffset) / TextureScreen.editToPixelRatio);
+		line[0].x = line[1].x = dToL((static_cast<double>(TextureScreen.spacing) * iVertical + TextureScreen.xOffset)
+		                             / TextureScreen.editToPixelRatio);
 		Polyline(StitchWindowMemDC, line, 2);
 	}
 	line[0].x = 0;
@@ -1079,7 +1081,7 @@ void texture::internal::nutx() {
 
 // Ensure all lines in the texture have at least 1 point
 void texture::internal::altx() {
-	boost::dynamic_bitset<> txtLines(TextureScreen.lines + 1);
+	boost::dynamic_bitset<> txtLines(static_cast<size_t>(TextureScreen.lines) + 1);
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		const auto halfHeight = TextureScreen.areaHeight / 2.0f;
 		for (auto& texturePoint : *TempTexturePoints) {
@@ -1591,7 +1593,7 @@ void texture::setxt(std::vector<RNGCNT>& textureSegments) {
 	ClipRectSize.cy = SelectedForm->fillInfo.texture.height;
 	if (currentCount) {
 		for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; iTexturePoint--) {
-			const auto currentPoint = TexturePointsBuffer->at(currentIndex + iTexturePoint);
+			const auto currentPoint = TexturePointsBuffer->at(static_cast<size_t>(currentIndex) + iTexturePoint);
 			if (currentPoint.line) {
 				const auto iSegment = currentPoint.line - 1;
 
