@@ -2130,8 +2130,8 @@ enum edgeFillStyles
 };
 
 // edge underlay bit
-#define EGUND 0x80
-#define NEGUND 0x7f
+#define EGUND 0x80u
+#define NEGUND 0x7fu
 
 // form data lines
 enum formData
