@@ -194,7 +194,7 @@ void xt::internal::nurat(FEATHER& feather) {
 	}
 	case FTHSIN: {
 		if (remainder > feather.globalRatio) {
-			feather.ratio = sin((1 - remainder) / (1 - feather.globalRatio) * PI + PI) * 0.5 + 0.5;
+			feather.ratio = sin((1.0 - remainder) / (1.0 - feather.globalRatio) * PI + PI) * 0.5 + 0.5;
 		}
 		else {
 			feather.ratio = sin(remainder / feather.globalRatio * PI) * 0.5 + 0.5;
@@ -204,7 +204,7 @@ void xt::internal::nurat(FEATHER& feather) {
 	}
 	case FTHSIN2: {
 		if (remainder > feather.globalRatio) {
-			feather.ratio = sin((1 - remainder) / (1 - feather.globalRatio) * PI);
+			feather.ratio = sin((1.0 - remainder) / (1.0 - feather.globalRatio) * PI);
 		}
 		else {
 			feather.ratio = sin(remainder / feather.globalRatio * PI);
@@ -214,7 +214,7 @@ void xt::internal::nurat(FEATHER& feather) {
 	}
 	case FTHRMP: {
 		if (remainder > feather.globalRatio) {
-			feather.ratio = (1 - remainder) / (1 - feather.globalRatio);
+			feather.ratio = (1.0 - remainder) / (1.0 - feather.globalRatio);
 		}
 		else {
 			feather.ratio = remainder / feather.globalRatio;
@@ -260,7 +260,7 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 	    = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 
 	nurat(feather);
-	if (length < (feather.minStitch * 2)) {
+	if (length < (2.0 * feather.minStitch)) {
 		feather.ratio = 0.5;
 		ratpnt(iSequence, iSequence + 1, currentPoint, feather.ratio);
 		ratpnt(iSequence + 3, iSequence + 2, nextPoint, feather.ratio);
@@ -1066,7 +1066,7 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 				}
 			}
 		}
-		if (minimumLength > 9 * PFGRAN) {
+		if (minimumLength > 9.0 * PFGRAN) {
 			totalJumps++;
 		}
 		formFillCounter[pRecs[currentRegion]->form]++;
