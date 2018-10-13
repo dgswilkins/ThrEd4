@@ -216,9 +216,7 @@ void displayText::butxt(unsigned iButton, const std::wstring& buttonText) {
 }
 
 void displayText::clrhbut(unsigned startButton) {
-	unsigned iButton;
-
-	for (iButton = startButton; iButton < 9; iButton++) {
+	for (auto iButton = startButton; iButton < 9u; iButton++) {
 		SetWindowText((*ButtonWin)[iButton], L"");
 	}
 }
