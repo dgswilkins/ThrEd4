@@ -135,7 +135,7 @@ void clip::delclps(unsigned int iForm) {
 
 fPOINT* clip::nueclp(unsigned int currentForm, unsigned int count) noexcept {
 	auto find        = ci::findclp(ClosestFormToCursor);
-	auto destination = ClipPointIndex + count - 1;
+	auto destination = ClipPointIndex + count - 1u;
 
 	if (clip::isclp(ClosestFormToCursor)) {
 		find += FormList[ClosestFormToCursor].lengthOrCount.clipCount;
@@ -238,8 +238,8 @@ void clip::internal::setvct(unsigned int start, unsigned int finish, double& cli
 }
 
 bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int currentSide) noexcept {
-	const double sinAngle = sin(clipAngle);
-	const double cosAngle = cos(clipAngle);
+	const auto sinAngle = sin(clipAngle);
+	const auto cosAngle = cos(clipAngle);
 
 	moveToCoords = CurrentFormVertices[currentSide + 2];
 	auto length  = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
@@ -282,7 +282,7 @@ void clip::internal::lincrnr(const std::vector<fPOINT>& clipReversedData,
 	if (ci::nupnt(clipAngle, moveToCoords, currentSide)) {
 		delta.x                    = moveToCoords.x - SelectedPoint.x;
 		delta.y                    = moveToCoords.y - SelectedPoint.y;
-		const double rotationAngle = atan2(delta.y, delta.x);
+		const auto rotationAngle = atan2(delta.y, delta.x);
 		thred::rotangf(BorderClipReference, ClipReference, rotationAngle, rotationCenter);
 		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 			thred::rotangf(clipReversedData[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
@@ -341,12 +341,12 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 	const fPOINT     delta              = { (end.x - begin.x), (end.y - begin.y) };
 	const auto       length             = hypot(delta.x, delta.y);
 	const fPOINTATTR clipReferencePoint = { ClipRect.left, ClipRect.bottom };
-	const double     rotationAngle      = atan2(delta.y, delta.x);
+	const auto     rotationAngle      = atan2(delta.y, delta.x);
 
 	thred::rotang1(clipReferencePoint, ClipReference, rotationAngle, rotationCenter);
 	const auto clipCount = gsl::narrow<unsigned int>(std::floor(length / ClipRectSize.cx));
 	if (clipCount) {
-		float remainder = 0.0;
+		auto remainder = 0.0f;
 		if (clipCount > 1) {
 			remainder = ((length - clipCount * ClipRectSize.cx) / (clipCount - 1) + ClipRectSize.cx) / length;
 		}
@@ -386,7 +386,7 @@ void clip::clpbrd(unsigned int startVertex) {
 	ci::durev(clipReversedData);
 	if (SelectedForm->type == FRMLINE) {
 		SelectedPoint    = CurrentFormVertices[0];
-		double clipAngle = 0.0; // for clipboard border fill
+		auto clipAngle = 0.0; // for clipboard border fill
 		dPOINT vector0   = {};  // x size of the clipboard fill at the fill angle
 		ci::setvct(0, 1, clipAngle, vector0);
 		// Since ClipRect.bottom is always 0
@@ -481,7 +481,7 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 	dPOINT moveToCoords = {}; // moving formOrigin for clipboard fill
 
 	AdjustedSpace = 0;
-	bool flag     = true;
+	auto flag     = true;
 	for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
 		const auto length = hypot(CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x,
 		                          CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y);
@@ -512,7 +512,7 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 	while (loopCount < 50 && (largestSpacing - smallestSpacing) > TINY) {
 		BeanCount     = 0;
 		SelectedPoint = CurrentFormVertices[0];
-		unsigned currentSide;
+		auto currentSide = 0u;
 		for (currentSide = 0; currentSide < VertexCount - 1; currentSide++) {
 			NextStart = currentSide + 1;
 			ci::fxlit(listSINEs, listCOSINEs, moveToCoords, currentSide);
@@ -564,7 +564,7 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 	OutputIndex   = 1;
 	AdjustedSpace = minimumSpacing;
 	chainEndPoints.push_back(SelectedPoint);
-	unsigned currentSide;
+	auto currentSide = 0u;
 	for (currentSide = 0; currentSide < VertexCount - 1; currentSide++) {
 		NextStart = currentSide + 1;
 		ci::fxlin(chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide);
@@ -647,7 +647,7 @@ void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
 
 	const dPOINT delta
 	    = { (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
-	const double rotationAngle = atan2(delta.y, delta.x);
+	const auto rotationAngle = atan2(delta.y, delta.x);
 	for (auto iPoint = 0u; iPoint < ClipStitchCount; iPoint++) {
 		points[iPoint] = tempClipPoints[iPoint];
 		thred::rotflt(points[iPoint], rotationAngle, rotationCenter);
@@ -667,7 +667,7 @@ void clip::duxclp() {
 	SequenceIndex = 0;
 	// ToDo - does this make sense?
 	const dPOINT rotationCenter = {};
-	for (unsigned iPoint = 1; iPoint < chainEndPoints.size(); iPoint++) {
+	for (auto iPoint = 1u; iPoint < chainEndPoints.size(); iPoint++) {
 		ci::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
 	}
 	if (SelectedForm->type != FRMLINE) {
@@ -689,7 +689,7 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 		           (*InsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y);
 		delta = val;
 	}
-	const double     rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
+	const auto     rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
 	const fPOINTATTR referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
 	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
@@ -717,10 +717,10 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
                            const dPOINT&        rotationCenter) {
 	const dPOINT     delta          = { (CurrentFormVertices[finish].x - CurrentFormVertices[start].x),
                            (CurrentFormVertices[finish].y - CurrentFormVertices[start].y) };
-	const double     length         = hypot(delta.x, delta.y);
+	const auto     length         = hypot(delta.x, delta.y);
 	const fPOINTATTR referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
 
-	double       rotationAngle = atan2(-delta.x, delta.y);
+	auto       rotationAngle = atan2(-delta.x, delta.y);
 	const dPOINT outerStep     = { SelectedForm->borderSize * cos(rotationAngle), SelectedForm->borderSize * sin(rotationAngle) };
 	spacing += ClipRectSize.cx;
 	const auto count = gsl::narrow<unsigned int>(std::round(length / spacing));
@@ -736,7 +736,7 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 			thred::rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
 		}
-		bool   flag       = true;
+		auto   flag       = true;
 		fPOINT innerPoint = { CurrentFormVertices[start].x, CurrentFormVertices[start].y };
 		for (auto iStep = 0u; iStep < count - 1; iStep++) {
 			const fPOINT firstPoint    = { innerPoint.x + step.x, innerPoint.y + step.y };
@@ -804,10 +804,10 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 	std::vector<fPOINT> chainPoint(5);
 	dPOINT delta = { (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
 	const dPOINT lengthDelta  = { (delta.x * SelectedForm->edgeStitchLen), (delta.y * SelectedForm->edgeStitchLen) };
-	const double angle        = atan2(delta.y, delta.x) + PI / 2;
+	const auto angle        = atan2(delta.y, delta.x) + PI / 2;
 	const dPOINT offset       = { (cos(angle) * SelectedForm->borderSize), (sin(angle) * SelectedForm->borderSize) };
-	const float  middleXcoord = chainEndPoints[start].x + lengthDelta.x;
-	const float  middleYcoord = chainEndPoints[start].y + lengthDelta.y;
+	const auto  middleXcoord = chainEndPoints[start].x + lengthDelta.x;
+	const auto  middleYcoord = chainEndPoints[start].y + lengthDelta.y;
 
 	chainPoint[0]   = chainEndPoints[start];
 	chainPoint[4]   = chainEndPoints[finish];
