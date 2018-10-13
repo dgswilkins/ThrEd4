@@ -498,6 +498,6 @@ HFONT displayText::getThrEdFont(LONG weight) noexcept {
 #endif
 }
 
-GSL_SUPPRESS(26490)GSL_SUPPRESS(26461) void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
+GSL_SUPPRESS(26490) GSL_SUPPRESS(26461) void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
 	SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0));
 }
