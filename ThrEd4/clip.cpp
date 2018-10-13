@@ -215,7 +215,7 @@ void clip::oclp(const fPOINT* const clip, unsigned int clipEntries) {
 }
 
 void clip::internal::durev(std::vector<fPOINT>& clipReversedData) {
-	const double midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
+	const auto midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
 
 	if (ClipBuffer[0].x > midpoint) {
 		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
@@ -816,15 +816,15 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 	chainPoint[3].x = middleXcoord - offset.x;
 	chainPoint[3].y = middleYcoord - offset.y;
 	if (finish < chainEndPoints.size() - 1) {
-		delta.x = chainEndPoints[finish + 1].x - chainEndPoints[finish].x;
-		delta.y = chainEndPoints[finish + 1].y - chainEndPoints[finish].y;
+		delta.x = static_cast<double>(chainEndPoints[finish + 1].x) - chainEndPoints[finish].x;
+		delta.y = static_cast<double>(chainEndPoints[finish + 1].y) - chainEndPoints[finish].y;
 	}
 	else {
-		delta.x = chainEndPoints[finish].x - chainEndPoints[finish - 1].x;
-		delta.y = chainEndPoints[finish].y - chainEndPoints[finish - 1].y;
+		delta.x = static_cast<double>(chainEndPoints[finish].x) - chainEndPoints[finish - 1].x;
+		delta.y = static_cast<double>(chainEndPoints[finish].y) - chainEndPoints[finish - 1].y;
 	}
-	chainPoint[2].x = chainEndPoints[finish].x + delta.x / 4;
-	chainPoint[2].y = chainEndPoints[finish].y + delta.y / 4;
+	chainPoint[2].x = chainEndPoints[finish].x + delta.x / 4.0;
+	chainPoint[2].y = chainEndPoints[finish].y + delta.y / 4.0;
 	auto chainCount = gsl::narrow<unsigned int>(chainSequence.size());
 	if (StateMap.test(StateFlag::LINCHN)) {
 		chainCount--;
