@@ -1272,7 +1272,7 @@ void texture::txtlbut() {
 void texture::internal::txbak() {
 	if (StateMap.test(StateFlag::WASTXBAK)) {
 		SelectedTexturePointsList->clear();
-		bool flag = false;
+		auto flag = false;
 		for (auto iHistory = 0u; iHistory < ITXBUFLEN; iHistory++) {
 			if (TextureHistory[TextureHistoryIndex].width) {
 				flag = true;
@@ -1289,7 +1289,7 @@ void texture::internal::txbak() {
 
 void texture::internal::nxbak() {
 	if (StateMap.test(StateFlag::WASTXBAK)) {
-		bool flag = false;
+		auto flag = false;
 		for (auto iHistory = 0u; iHistory < ITXBUFLEN; iHistory++) {
 			txi::txrfor();
 			if (TextureHistory[TextureHistoryIndex].width) {
@@ -1444,7 +1444,7 @@ void texture::txtkey(unsigned keyCode) {
 	char character = {};
 
 	if (SideWindowButton) {
-		bool flag = true;
+		auto flag = true;
 		switch (keyCode) {
 		case VK_RETURN: {
 			txi::chktxnum();
