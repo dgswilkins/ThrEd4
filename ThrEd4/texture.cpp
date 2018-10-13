@@ -1081,7 +1081,7 @@ void texture::internal::nutx() {
 
 // Ensure all lines in the texture have at least 1 point
 void texture::internal::altx() {
-	boost::dynamic_bitset<> txtLines(static_cast<size_t>(TextureScreen.lines) + 1);
+	boost::dynamic_bitset<> txtLines(gsl::narrow<size_t>(TextureScreen.lines) + 1);
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		const auto halfHeight = TextureScreen.areaHeight / 2.0f;
 		for (auto& texturePoint : *TempTexturePoints) {
@@ -1593,7 +1593,7 @@ void texture::setxt(std::vector<RNGCNT>& textureSegments) {
 	ClipRectSize.cy = SelectedForm->fillInfo.texture.height;
 	if (currentCount) {
 		for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; iTexturePoint--) {
-			const auto currentPoint = TexturePointsBuffer->at(static_cast<size_t>(currentIndex) + iTexturePoint);
+			const auto currentPoint = TexturePointsBuffer->at(gsl::narrow<size_t>(currentIndex) + iTexturePoint);
 			if (currentPoint.line) {
 				const auto iSegment = currentPoint.line - 1;
 
