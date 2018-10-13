@@ -100,7 +100,7 @@ SATCON* satin::internal::nusac(unsigned int formIndex, unsigned guideCount) noex
 
 void satin::spltsat(const SATCON& currentGuide) {
 	// We are adding two additional vertices when splitting the form
-	std::vector<fPOINT> vertexBuffer(VertexCount + 2);
+	std::vector<fPOINT> vertexBuffer(static_cast<size_t>(VertexCount) + 2);
 
 	form::mvfrmsb(&FormList[FormIndex], &FormList[FormIndex - 1], FormIndex - ClosestFormToCursor);
 	FormIndex++;
@@ -365,7 +365,7 @@ void satin::satadj() {
 		}
 		if (SatinEndGuide) {
 			satinMap.set(SatinEndGuide);
-			satinMap.set(SatinEndGuide + 1);
+			satinMap.set(static_cast<size_t>(SatinEndGuide) + 1);
 		}
 		// check to see if any of the current guides are end guides and add to interiorGuides if not
 		iDestination = 0;
@@ -538,7 +538,7 @@ void satin::delcon(unsigned GuideIndex) {
 		if (SatinGuideIndex > iGuide) {
 			// Todo - use std::vector & member erase() ?
 			std::copy(
-			    guide + 1, guide + (SatinGuideIndex - iGuide + 1), stdext::make_checked_array_iterator(guide, SatinGuideIndex));
+			    guide + 1, guide + (SatinGuideIndex - iGuide + 1u), stdext::make_checked_array_iterator(guide, SatinGuideIndex));
 		}
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			const auto formHeader = &FormList[iForm];
@@ -923,13 +923,13 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		dPOINT line2Delta    = {};
 		dPOINT line2Point    = {};
 		if (iLine2Vertex == VertexCount) {
-			line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[0].x;
-			line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[0].y;
+			line2Delta.x = static_cast<double>(CurrentFormVertices[line2Previous].x) - CurrentFormVertices[0].x;
+			line2Delta.y = static_cast<double>(CurrentFormVertices[line2Previous].y) - CurrentFormVertices[0].y;
 			line2Point   = CurrentFormVertices[0];
 		}
 		else {
-			line2Delta.x = CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x;
-			line2Delta.y = CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y;
+			line2Delta.x = static_cast<double>(CurrentFormVertices[line2Previous].x) - CurrentFormVertices[iLine2Vertex].x;
+			line2Delta.y = static_cast<double>(CurrentFormVertices[line2Previous].y) - CurrentFormVertices[iLine2Vertex].y;
 			line2Point   = CurrentFormVertices[iLine2Vertex];
 		}
 		iLine1Vertex       = form::nxt(iLine1Vertex);
@@ -1015,8 +1015,8 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 				if (!line1Count && iLine1Count < line1StitchCounts.size()) {
 					line1Count   = line1StitchCounts[iLine1Count++];
 					line1Next    = form::nxt(iLine1Vertex);
-					line1Delta.x = CurrentFormVertices[line1Next].x - CurrentFormVertices[iLine1Vertex].x;
-					line1Delta.y = CurrentFormVertices[line1Next].y - CurrentFormVertices[iLine1Vertex].y;
+					line1Delta.x = static_cast<double>(CurrentFormVertices[line1Next].x) - CurrentFormVertices[iLine1Vertex].x;
+					line1Delta.y = static_cast<double>(CurrentFormVertices[line1Next].y) - CurrentFormVertices[iLine1Vertex].y;
 					iLine1Vertex = form::nxt(iLine1Vertex);
 					line1Step.x  = line1Delta.x / line1Count;
 					line1Step.y  = line1Delta.y / line1Count;
@@ -1025,8 +1025,8 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 				if (!line2Count && iLine2Count < line2StitchCounts.size()) {
 					line2Count    = line2StitchCounts[iLine2Count++];
 					line2Previous = form::prv(iLine2Vertex);
-					line2Delta.x  = CurrentFormVertices[line2Previous].x - CurrentFormVertices[iLine2Vertex].x;
-					line2Delta.y  = CurrentFormVertices[line2Previous].y - CurrentFormVertices[iLine2Vertex].y;
+					line2Delta.x  = static_cast<double>(CurrentFormVertices[line2Previous].x) - CurrentFormVertices[iLine2Vertex].x;
+					line2Delta.y  = static_cast<double>(CurrentFormVertices[line2Previous].y) - CurrentFormVertices[iLine2Vertex].y;
 					iLine2Vertex  = form::prv(iLine2Vertex);
 					line2Step.x   = line2Delta.x / line2Count;
 					line2Step.y   = line2Delta.y / line2Count;
@@ -1099,7 +1099,7 @@ void satin::satfil() {
 	StateMap.reset(StateFlag::FILDIR);
 	SelectedForm->fillType = SATF;
 	std::vector<double> lengths;
-	lengths.reserve(VertexCount + 1);
+	lengths.reserve(static_cast<size_t>(VertexCount) + 1);
 	auto length = 0.0;
 	lengths.push_back(length);
 	for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
@@ -1165,7 +1165,7 @@ void satin::satfil() {
 			iVertex++;
 		}
 		const auto deltaA = lengths[iVertex] - length;
-		const auto deltaB = length - lengths[iVertex - 1];
+		const auto deltaB = length - lengths[static_cast<size_t>(iVertex) - 1u];
 		if (deltaB > deltaA) {
 			iVertex--;
 		}
