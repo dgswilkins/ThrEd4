@@ -538,7 +538,7 @@ void satin::delcon(unsigned GuideIndex) {
 		if (SatinGuideIndex > iGuide) {
 			// Todo - use std::vector & member erase() ?
 			std::copy(
-			    guide + 1, guide + (SatinGuideIndex - iGuide + 1u), stdext::make_checked_array_iterator(guide, SatinGuideIndex));
+			    guide + 1, guide + gsl::narrow<size_t>(SatinGuideIndex - iGuide + 1u), stdext::make_checked_array_iterator(guide, SatinGuideIndex));
 		}
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			const auto formHeader = &FormList[iForm];

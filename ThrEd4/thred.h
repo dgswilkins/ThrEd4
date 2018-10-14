@@ -100,7 +100,7 @@ namespace internal {
 	void  box(unsigned iNearest, HDC dc) noexcept;
 	void  boxs() noexcept;
 	void  bsavmen();
-	float bufToDouble(wchar_t* buffer);
+	double bufToDouble(wchar_t* buffer);
 
 	unsigned long long bufTou64(wchar_t* buffer);
 

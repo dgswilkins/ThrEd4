@@ -214,7 +214,7 @@ void formForms::internal::refrmfn() {
 		}
 	}
 	labelWindow[LFRMFIL] = ffi::txtwin(stringTable[STR_TXT2], LabelWindowCoords);
-	valueWindow[LFRMFIL] = ffi::txtrwin(stringTable[STR_FIL0 + SelectedForm->fillType], ValueWindowCoords);
+	valueWindow[LFRMFIL] = ffi::txtrwin(stringTable[gsl::narrow<size_t>(SelectedForm->fillType) + STR_FIL0], ValueWindowCoords);
 	ffi::nxtlin();
 	if (SelectedForm->fillType) {
 		labelWindow[LFRMCOL] = ffi::txtwin(stringTable[STR_TXT3], LabelWindowCoords);
@@ -226,7 +226,7 @@ void formForms::internal::refrmfn() {
 			ffi::nxtlin();
 			labelWindow[LFTHTYP] = ffi::txtwin(stringTable[STR_FTHTYP], LabelWindowCoords);
 			valueWindow[LFTHTYP]
-			    = ffi::numwin(stringTable[STR_FTH0 + SelectedForm->fillInfo.feather.fillType - 1], ValueWindowCoords);
+			    = ffi::numwin(stringTable[gsl::narrow<size_t>(SelectedForm->fillInfo.feather.fillType) - 1 + STR_FTH0], ValueWindowCoords);
 			ffi::nxtlin();
 			labelWindow[LFTHBLND] = ffi::txtwin(stringTable[STR_FTHBLND], LabelWindowCoords);
 			if (SelectedForm->extendedAttribute & AT_FTHBLND) {
@@ -367,7 +367,7 @@ void formForms::internal::refrmfn() {
 	}
 	const auto iEdge = edgeFillType - 1u;
 
-	valueWindow[LBRD] = ffi::txtrwin(stringTable[STR_EDG0 + edgeFillType], ValueWindowCoords);
+	valueWindow[LBRD] = ffi::txtrwin(stringTable[gsl::narrow<size_t>(edgeFillType) + STR_EDG0], ValueWindowCoords);
 	ffi::nxtlin();
 	if (edgeFillType) {
 		labelWindow[LBRDCOL] = ffi::txtwin(stringTable[STR_TXT8], LabelWindowCoords);
@@ -639,7 +639,7 @@ void formForms::prfmsg() {
 	ffi::prflin(fmt::format(L"{}", (thred::duthrsh(ShowStitchThreshold))), STR_PRF7);
 	ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize / PFGRAN)), STR_PRF20);
 	form::sethup();
-	ffi::prflin(fmt::format(L"{}", (*StringTable)[STR_HUP0 + IniFile.hoopType - 1]), STR_PRF17);
+	ffi::prflin(fmt::format(L"{}", (*StringTable)[gsl::narrow<size_t>(IniFile.hoopType) - 1 + STR_HUP0]), STR_PRF17);
 	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY / PFGRAN)), STR_PRF27);
 	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX / PFGRAN)), STR_PRF18);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);

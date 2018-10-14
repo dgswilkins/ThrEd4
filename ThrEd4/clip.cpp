@@ -585,7 +585,7 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 	form::duangs();
 	std::vector<double> listSINEs;
-	listSINEs.reserve(VertexCount + 1);
+	listSINEs.reserve(gsl::narrow<size_t>(VertexCount) + 1);
 	std::vector<double> listCOSINEs;
 	listCOSINEs.reserve(VertexCount);
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
@@ -816,8 +816,8 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 	chainPoint[3].x = middleXcoord - offset.x;
 	chainPoint[3].y = middleYcoord - offset.y;
 	if (finish < chainEndPoints.size() - 1) {
-		delta.x = static_cast<double>(chainEndPoints[finish + 1].x) - chainEndPoints[finish].x;
-		delta.y = static_cast<double>(chainEndPoints[finish + 1].y) - chainEndPoints[finish].y;
+		delta.x = static_cast<double>(chainEndPoints[gsl::narrow<size_t>(finish) + 1].x) - chainEndPoints[finish].x;
+		delta.y = static_cast<double>(chainEndPoints[gsl::narrow<size_t>(finish) + 1].y) - chainEndPoints[finish].y;
 	}
 	else {
 		delta.x = static_cast<double>(chainEndPoints[finish].x) - chainEndPoints[finish - 1].x;

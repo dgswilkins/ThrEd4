@@ -207,7 +207,7 @@ void displayText::butxt(unsigned iButton, const std::wstring& buttonText) {
 			}
 		}
 		else {
-			SetWindowText((*ButtonWin)[iButton], (*StringTable)[iButton - 4 + STR_TRC0].c_str());
+			SetWindowText((*ButtonWin)[iButton], (*StringTable)[gsl::narrow<size_t>(iButton) - 4u + STR_TRC0].c_str());
 		}
 	}
 	else {
