@@ -2646,7 +2646,7 @@ void thred::unmsg() {
 	}
 }
 
-GSL_SUPPRESS(con .3) bool thred::internal::oldwnd(HWND window) {
+GSL_SUPPRESS(26461) bool thred::internal::oldwnd(HWND window) {
 	for (auto iColor = 0u; iColor < 16; iColor++) {
 		if (DefaultColorWin[iColor] == window || UserColorWin[iColor] == window || ThreadSizeWin[iColor] == window) {
 			return false;
@@ -4537,7 +4537,7 @@ void thred::internal::auxmen() {
 		CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
 	}
 	}
-	GSL_SUPPRESS(type .3) {
+	GSL_SUPPRESS(26465) {
 		filinfo.dwTypeData = const_cast<LPWSTR>(auxMsg.c_str());
 		SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
 	}
@@ -7299,7 +7299,8 @@ void thred::internal::duclip() {
 			EmptyClipboard();
 			ThrEdClip        = RegisterClipboardFormat(ThrEdClipFormat);
 			ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
-			                               (gsl::narrow<size_t>(SelectedFormVertices.vertexCount) + 1) * sizeof(fPOINT) + sizeof(FORMVERTEXCLIP));
+			                               (gsl::narrow<size_t>(SelectedFormVertices.vertexCount) + 1) * sizeof(fPOINT)
+			                                   + sizeof(FORMVERTEXCLIP));
 			GSL_SUPPRESS(26429) {
 				if (ThrEdClipPointer) {
 					FORMVERTEXCLIP* clipHeader = *(static_cast<FORMVERTEXCLIP**>(ThrEdClipPointer));
@@ -10887,11 +10888,11 @@ void thred::internal::ritlock(const WIN32_FIND_DATA* fileData, unsigned fileInde
 		SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
 		for (auto iFile = 0u; iFile < fileIndex; iFile++) {
 			if (fileData[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) {
-				GSL_SUPPRESS(type .1)
+				GSL_SUPPRESS(26490)
 				SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(fileData[iFile].cFileName));
 			}
 			else {
-				GSL_SUPPRESS(type .1)
+				GSL_SUPPRESS(26490)
 				SendMessage(
 				    GetDlgItem(hwndlg, IDC_UNLOCKED), LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(fileData[iFile].cFileName));
 			}
@@ -10906,7 +10907,7 @@ INT_PTR CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam,
 	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 		SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
-		GSL_SUPPRESS(type .1) fileInfo = reinterpret_cast<FINDINFO*>(lparam);
+		GSL_SUPPRESS(26490) fileInfo = reinterpret_cast<FINDINFO*>(lparam);
 		if (fileInfo) {
 			auto searchName   = *DefaultDirectory / L"*.thr";
 			auto searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
@@ -10927,7 +10928,7 @@ INT_PTR CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam,
 		break;
 	}
 	case WM_COMMAND: {
-		GSL_SUPPRESS(type .1) fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER));
+		GSL_SUPPRESS(26490) fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER));
 		if (fileInfo) {
 			switch (LOWORD(wparam)) {
 			case IDCANCEL: {
@@ -11007,7 +11008,7 @@ void thred::internal::lock() {
 	// ToDo - Replace 512 with maximum files in subdirectory
 	lockInfo.data = new WIN32_FIND_DATA[512];
 
-	GSL_SUPPRESS(type .1)
+	GSL_SUPPRESS(26490)
 	DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, LockPrc, reinterpret_cast<LPARAM>(&lockInfo));
 
 	delete[] lockInfo.data;
@@ -11633,7 +11634,7 @@ BOOL CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		std::wstring featherStyle;
 		for (auto iFeatherStyle = 0u; iFeatherStyle < 6; iFeatherStyle++) {
 			displayText::loadString(featherStyle, (IDS_FTH0 + iFeatherStyle));
-			GSL_SUPPRESS(type .1)
+			GSL_SUPPRESS(26490)
 			SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(featherStyle.c_str()));
 		}
 		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
@@ -15045,8 +15046,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 						ClipFormVerticesData = static_cast<FORMVERTEXCLIP*>(ClipPointer);
 						if (ClipFormVerticesData->clipType == CLP_FRMPS) {
 							thred::duzrat();
-							auto byteCount = sizeof(*ClipFormVerticesData)
-							                 + (gsl::narrow<size_t>(ClipFormVerticesData->vertexCount) + 1) * sizeof(FormVertices[0]);
+							auto byteCount
+							    = sizeof(*ClipFormVerticesData)
+							      + (gsl::narrow<size_t>(ClipFormVerticesData->vertexCount) + 1) * sizeof(FormVertices[0]);
 							auto clipCopyBuffer = std::vector<unsigned char>(byteCount);
 							auto clipPointer    = static_cast<unsigned char*>(ClipPointer);
 							auto _              = std::copy(clipPointer, clipPointer + byteCount, clipCopyBuffer.begin());
@@ -18162,7 +18164,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 		}
 		case SB_THUMBPOSITION: {
 			if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
-				GSL_SUPPRESS(type .1) {
+				GSL_SUPPRESS(26490) {
 					if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) {
 						const auto position = HIWORD(wParam);
 						MovieTimeStep       = MAXDELAY - position;
@@ -18172,7 +18174,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 				}
 			}
 			else {
-				GSL_SUPPRESS(type .1) {
+				GSL_SUPPRESS(26490) {
 					if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) {
 						const auto zoomWidth = ZoomRect.right - ZoomRect.left;
 						ZoomRect.left        = gsl::narrow<long>(HIWORD(wParam));
@@ -18234,7 +18236,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 	}
 	case WM_DRAWITEM: {
 		// owner draw windows
-		GSL_SUPPRESS(type .1) DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
+		GSL_SUPPRESS(26490) DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
 		if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
 			if (StateMap.test(StateFlag::TXTRED)) {
 				texture::drwtxtr();

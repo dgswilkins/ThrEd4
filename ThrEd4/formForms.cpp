@@ -225,8 +225,8 @@ void formForms::internal::refrmfn() {
 			valueWindow[LFTHCOL] = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.color + 1)), ValueWindowCoords);
 			ffi::nxtlin();
 			labelWindow[LFTHTYP] = ffi::txtwin(stringTable[STR_FTHTYP], LabelWindowCoords);
-			valueWindow[LFTHTYP]
-			    = ffi::numwin(stringTable[gsl::narrow<size_t>(SelectedForm->fillInfo.feather.fillType) - 1 + STR_FTH0], ValueWindowCoords);
+			valueWindow[LFTHTYP] = ffi::numwin(
+			    stringTable[gsl::narrow<size_t>(SelectedForm->fillInfo.feather.fillType) - 1 + STR_FTH0], ValueWindowCoords);
 			ffi::nxtlin();
 			labelWindow[LFTHBLND] = ffi::txtwin(stringTable[STR_FTHBLND], LabelWindowCoords);
 			if (SelectedForm->extendedAttribute & AT_FTHBLND) {
@@ -727,7 +727,7 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 	std::wstring daisyType;
 	for (const auto DaisyTypeString : DaisyTypeStrings) {
 		displayText::loadString(daisyType, DaisyTypeString);
-		GSL_SUPPRESS(type.1)
+		GSL_SUPPRESS(26490)
 		SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str()));
 	}
 	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
