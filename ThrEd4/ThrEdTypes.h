@@ -102,7 +102,7 @@
 #define BSEQLEN OSEQLEN << 1      // reverse sequence length
 #define MAXRAT 3                  // maximum number of stitches in one place in satin border
 #define URAT 0.75                 // ratio of underlay stitch to satin border size
-#define PURAT 0.6                 // for perp satin corners
+#define PURAT 0.6                 // for proportional satin corners
 #define DIURAT 0.125              //(1-URAT)/2
 #define DOURAT 0.8125             //(1-URAT)/2+URAT
 #define MINRCT 12                 // minimum dimension of a form select rectangle
@@ -112,14 +112,14 @@
 #define SPEDLIN 30                // speed change for line message on speed scroll bar
 #define SPEDPAG 120               // speed change for page message on speed scroll bar
 #define KNOTLEN 54                // set knots for stitches longer than this
-#define MAXSAC 10000              // maximum number of satin guidlines
+#define MAXSAC 10000              // maximum number of satin guidelines
 #define MAXKNOTS 16384            // maximum nuber of knots
 #define IBFCLEN 4 * PFGRAN        // initial buttonhole fill corner length
 #define IPICSPAC 6                // initial picot border space
 #define PRFLINS 28                // number of lines on the preference menu
 #define EDGETYPS 12               // number of border fill types
 #define SEED 3037000499           // pseudo-random-sequence seed
-#define FSED 1340007303           // feather seqence seed
+#define FSED 1340007303           // feather sequence seed
 #define NAMSED 2222222222         // trial version psg seed
 #define DSTRAT 0.8333333333333333 // ratio of dst stitch points to PFAFF stitch points
 #define HUPS 5u                   // number of hoops the user can select
@@ -356,7 +356,7 @@ enum hoopSize
 
 enum daisyStyles
 {          // daisy form types
-	DSIN,  // SINE shape
+	DSIN,  // Sine shape
 	DRAMP, // Ramp shape
 	DSAW,  // Sawtooth shape
 	DRAG,  // Ragged shape
@@ -423,7 +423,7 @@ enum class StateFlag
 	FRMPMOV,   // user is moving a point on a form
 	IGNOR,     // user may elect to ignore a message about losing edits when resizing a form
 	FRMOV,     // user is moving a form
-	RUNPAT,    // user is runing a pattern
+	RUNPAT,    // user is running a pattern
 	WASPAT,    // user ran a pattern, but hasn't done anything else yet
 	FILDIR,    // direction lines in angle fill
 	SHOSAT,    // the satin stitch form is on the screen
@@ -439,7 +439,7 @@ enum class StateFlag
 	FRMPSEL,   // user has selected a point in a form
 	SHOINSF,   // the form insert line has been drawn
 	SAT1,      // set when the first stitch is entered in a satin fill
-	FILMSG,    // set when user tries to unfil a form with edited stitches
+	FILMSG,    // set when user tries to unfill a form with edited stitches
 	CLPBAK,    // set when the first clipboard fill item has been entered
 	STRTCH,    // user is stretching a form horizontally or vertically
 	SHOSTRTCH, // stretch box is written to the screen
@@ -454,13 +454,13 @@ enum class StateFlag
 	FRMROT,    // user is rotating a form
 	DELTO,     // user is deleting a form and the associated stitches
 	REDOLD,    // user is opening a file from the old file list
-	BAKSHO,    // user is looking at bakup files
+	BAKSHO,    // user is looking at backup files
 	DUBAK,     // user has chosen a backup file to load, but may want to save changes
 	IGNAM,     // save the thred file without making backups
 	PRGMSG,    // delete all backups message is displayed
 	NEWBAK,    // user is starting a new file, but may want to save changes
 	SAVEX,     // user is exiting, may want to save changes
-	OSAV,      // user wants to load a new file, may want to save changes
+	OSAV,      // user wants to load a new file, but may want to save changes
 	FRMOF,     // forms are not displayed and can't be selected
 	SHOMOV,    // user moving form line shown on screen
 	BARSAT,    // doing a bare satin fill to be filled in with clipboard data
@@ -470,7 +470,7 @@ enum class StateFlag
 	ENTRSPIR,  // user is entering the number of points for a spiral
 	ENTRHART,  // user is entering the number of points for a heart
 	ENTRLENS,  // user is entering the number of points for a lens
-	SEQDUN,    // last stitch seqenced was already done
+	SEQDUN,    // last stitch sequenced was already done
 	WASEL,     // a form was selected when the user hit control-right-click
 	MOVFRMS,   // user is moving a group of forms
 	FRMSROT,   // user is rotating group of forms
@@ -478,15 +478,15 @@ enum class StateFlag
 	DELSFRMS,  // user is deleting a group of forms
 	BIGBOX,    // user has selected all forms and stitches
 	MOVSET,    // the move point has been selected
-	UPTO,      // show points upto the selected point
+	UPTO,      // show points up to the selected point
 	LENSRCH,   // user has hit the max or min button
 	BOXSLCT,   // user is making a select box
 	THUMSHO,   // thumbnail mode
 	INSFIL,    // user is inserting a file
 	IGNORINS,  // don't use the open file dialog box to get the insert file name
 	RBUT,      // user pressed the right mouse button selecting a thumbnail
-	UND,       // stitching a perp satin underlay
-	UNDPHAS,   // perp satin underlay phase
+	UND,       // stitching a proportional satin underlay
+	UNDPHAS,   // proportional satin underlay phase
 	SAVAS,     // user is saving a file under a new name
 	SHOSIZ,    // design size box is displayed
 	HUPMSG,    // user is selecting a hoop size
@@ -496,7 +496,7 @@ enum class StateFlag
 	CLPOVR,    // can't fit another clipboard fill on the current line
 	CONTIG,    // contiguous point flag
 	NUROT,     // user is entering a rotate angle
-	APSID,     // user is enter a new applique color
+	APSID,     // user is entering a new applique color
 	FRMSAM,    // don't find an already selected form
 	ENTRSEG,   // user is entering rotation segments
 	ENTRFNUM,  // user is entering a form number
@@ -505,7 +505,7 @@ enum class StateFlag
 	CNTRH,     // for centering horizontally
 	CNTRV,     // for centering vertically
 	RESTCH,    // redraw the stitch window
-	WASGRP,    // group of stitches selecter when entering length search
+	WASGRP,    // group of stitches selected when entering length search
 	REFILMSG,  // refill all message is up
 	PRELIN,    // user is inserting form points before the 0 point in a line form
 	WASRT,     // insert was active when preferences activated
@@ -563,7 +563,7 @@ enum class StateFlag
 	FPSEL,     // form points selected
 	SHOPSEL,   // form points selected rectangle is showing
 	PSELDIR,   // direction of form vertex select
-	FPUNCLP,   // user is retrieving cliped form points into a form
+	FPUNCLP,   // user is retrieving clipped form points into a form
 	SHOP,      // clipboard from points are showing
 	WASPCDCLP, // there is pcd data on the clipboard
 	FTHR,      // feather fill flag
@@ -572,7 +572,7 @@ enum class StateFlag
 	FTHSID,    // user is entering a feather color
 	CNV2FTH,   // converting a form to feather ribbon
 	WASFPNT,   // user is moving a form vertex
-	WASDO,     // backup has been made before refil
+	WASDO,     // backup has been made before refill
 	NOSEL,     // left button down didn't select anything
 	WASDEL,    // stitches were deleted
 	GTWLKIND,  // get the edge walk/underlay offset
@@ -1318,9 +1318,9 @@ public:
 	unsigned char  borderColor;     // border color
 	unsigned short clipEntries;     // number of border clipboard entries
 	fPOINT*        vertices;        // points
-	SATINANGLE     satinOrAngle;    // satin guidlines or angle clipboard fill angle
+	SATINANGLE     satinOrAngle;    // satin guidelines or angle clipboard fill angle
 	fPOINT*        borderClipData;  // border clipboard data
-	unsigned short satinGuideCount; // number of satin guidlines
+	unsigned short satinGuideCount; // number of satin guidelines
 	unsigned short wordParam;       // word parameter
 	fRECTANGLE     rectangle;       // rectangle
 	unsigned char  fillType;        // fill type
@@ -1346,9 +1346,9 @@ public:
 	unsigned char  borderColor;     // border color
 	unsigned int   clipEntries;     // number of border clipboard entries
 	fPOINT*        vertices;        // points
-	SATINANGLE     satinOrAngle;    // satin guidlines or angle clipboard fill angle
+	SATINANGLE     satinOrAngle;    // satin guidelines or angle clipboard fill angle
 	fPOINT*        borderClipData;  // border clipboard data
-	unsigned int   satinGuideCount; // number of satin guidlines
+	unsigned int   satinGuideCount; // number of satin guidelines
 	unsigned int   wordParam;       // clipboard/textured fill phase or satin end guide
 	fRECTANGLE     rectangle;       // rectangle
 	unsigned char  fillType;        // fill type
@@ -1416,9 +1416,9 @@ public:
 	unsigned char  borderColor;  // border color
 	unsigned short clipEntries;  // number of border clipboard entries
 	DWORD          vertices;     // vertices pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
-	SATINANGLEOUT  satinOrAngle; // satin guidlines or angle clipboard fill angle
+	SATINANGLEOUT  satinOrAngle; // satin guidelines or angle clipboard fill angle
 	DWORD borderClipData; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
-	unsigned short satinGuideCount; // number of satin guidlines
+	unsigned short satinGuideCount; // number of satin guidelines
 	unsigned short wordParam;       // clipboard/textured fill phase or satin end guide
 	fRECTANGLE     rectangle;       // rectangle
 	unsigned char  fillType;        // fill type
@@ -1685,7 +1685,7 @@ struct _strhed { // thred file header
 	unsigned       headerType;
 	unsigned       fileLength;    // length of strhed + length of stitch data
 	unsigned short stitchCount;   // number of stitches
-	unsigned short hoopType;      // size of hup
+	unsigned short hoopType;      // size of hoop
 	unsigned short formCount;     // number of forms
 	unsigned short vertexLen;     // points to form points
 	unsigned short vertexCount;   // number of form points
