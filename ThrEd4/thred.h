@@ -29,7 +29,8 @@ namespace fs = std::experimental::filesystem;
 
 namespace thred {
 
-fPOINT*  adclp(unsigned int count) noexcept;
+unsigned int adclp(unsigned int count) noexcept;
+
 fPOINT*  adflt(unsigned int count);
 void     bBox() noexcept;
 void     chkmen() noexcept;
@@ -85,21 +86,21 @@ void wrnmen();
 void zumhom();
 
 namespace internal {
-	void  angdif(double angle) noexcept;
-	void  auxmen();
-	void  bak();
-	void  bakmrk();
-	void  bakthum();
-	void  bal2thr(std::vector<BALSTCH>& balaradStitch, unsigned destination, unsigned source, unsigned code);
-	void  barnam(HWND window, unsigned iThumbnail);
-	void  bfil();
-	bool  binv(const std::vector<unsigned char>& monoBitmapData, unsigned bitmapWidthInBytes);
-	bool  bitar();
-	void  bitlin(const unsigned char* source, unsigned int* destination, COLORREF foreground, COLORREF background);
-	void  bitsiz();
-	void  box(unsigned iNearest, HDC dc) noexcept;
-	void  boxs() noexcept;
-	void  bsavmen();
+	void   angdif(double angle) noexcept;
+	void   auxmen();
+	void   bak();
+	void   bakmrk();
+	void   bakthum();
+	void   bal2thr(std::vector<BALSTCH>& balaradStitch, unsigned destination, unsigned source, unsigned code);
+	void   barnam(HWND window, unsigned iThumbnail);
+	void   bfil();
+	bool   binv(const std::vector<unsigned char>& monoBitmapData, unsigned bitmapWidthInBytes);
+	bool   bitar();
+	void   bitlin(const unsigned char* source, unsigned int* destination, COLORREF foreground, COLORREF background);
+	void   bitsiz();
+	void   box(unsigned iNearest, HDC dc) noexcept;
+	void   boxs() noexcept;
+	void   bsavmen();
 	double bufToDouble(wchar_t* buffer);
 
 	unsigned long long bufTou64(wchar_t* buffer);

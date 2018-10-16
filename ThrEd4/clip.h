@@ -38,9 +38,9 @@ bool    isclp(unsigned int iForm) noexcept;
 bool    isclpx(unsigned int iForm) noexcept;
 bool    iseclp(unsigned int iForm) noexcept;
 bool    iseclpx(unsigned int iForm) noexcept;
-fPOINT* nueclp(unsigned int currentForm, unsigned int count) noexcept;
-fPOINT* numclp() noexcept;
-void    oclp(const fPOINT* clip, unsigned int clipEntries);
+unsigned int nueclp(unsigned int currentForm, unsigned int count) noexcept;
+unsigned int numclp() noexcept;
+void    oclp(unsigned int clipIndex, unsigned int clipEntries);
 
 namespace internal {
 

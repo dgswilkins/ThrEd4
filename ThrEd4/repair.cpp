@@ -104,8 +104,8 @@ void repair::lodchk() {
 	}
 }
 
-void repair::internal::chkclp(const FRMHED* const formHeader, BADCNTS& badData) {
-	if (badData.clip == gsl::narrow<unsigned int>(formHeader->angleOrClipData.clip - ClipPoints)) {
+void repair::internal::chkclp(const FRMHED* const formHeader, BADCNTS& badData) noexcept {
+	if (badData.clip == formHeader->angleOrClipData.clip) {
 		badData.clip += formHeader->lengthOrCount.clipCount;
 	}
 	else {
@@ -113,8 +113,8 @@ void repair::internal::chkclp(const FRMHED* const formHeader, BADCNTS& badData) 
 	}
 }
 
-void repair::internal::chkeclp(const FRMHED* const formHeader, BADCNTS& badData) {
-	if (badData.clip == gsl::narrow<unsigned int>(formHeader->borderClipData - ClipPoints)) {
+void repair::internal::chkeclp(const FRMHED* const formHeader, BADCNTS& badData) noexcept {
+	if (badData.clip == formHeader->borderClipData) {
 		badData.clip += formHeader->clipEntries;
 	}
 	else {
@@ -283,27 +283,27 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		auto       clipDifference = 0u;
 		if (clip::isclp(iForm)) {
 			// ToDo - pointer arithmetic to be fixed
-			clipDifference = formHeader->angleOrClipData.clip - ClipPoints;
+			clipDifference = formHeader->angleOrClipData.clip;
 			if (clipDifference + formHeader->lengthOrCount.clipCount < ClipPointIndex) {
 				clipPoint.resize(clipPoint.size() + formHeader->lengthOrCount.clipCount);
-				auto sourceStart = formHeader->angleOrClipData.clip;
+				auto sourceStart = &ClipPoints[formHeader->angleOrClipData.clip];
 				auto sourceEnd   = sourceStart + formHeader->lengthOrCount.clipCount;
 				auto destination = clipPoint.begin() + clipCount;
 				auto _           = std::copy(sourceStart, sourceEnd, destination);
 
-				formHeader->angleOrClipData.clip = &ClipPoints[clipCount];
+				formHeader->angleOrClipData.clip = clipCount;
 				clipCount += formHeader->lengthOrCount.clipCount;
 			}
 			else {
 				if (clipDifference < ClipPointIndex) {
 					formHeader->lengthOrCount.clipCount = gsl::narrow<unsigned int>(FormVertexIndex - clipDifference);
 					clipPoint.resize(clipPoint.size() + formHeader->lengthOrCount.clipCount);
-					auto sourceStart = formHeader->angleOrClipData.clip;
+					auto sourceStart = &ClipPoints[formHeader->angleOrClipData.clip];
 					auto sourceEnd   = sourceStart + formHeader->lengthOrCount.clipCount;
 					auto destination = clipPoint.begin() + clipCount;
 					auto _           = std::copy(sourceStart, sourceEnd, destination);
 
-					formHeader->angleOrClipData.clip = &ClipPoints[clipCount];
+					formHeader->angleOrClipData.clip = clipCount;
 					clipCount += formHeader->lengthOrCount.clipCount;
 				}
 				else {
@@ -313,28 +313,27 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 			}
 		}
 		if (clip::iseclp(iForm)) {
-			// ToDo - pointer arithmetic to be fixed
-			clipDifference = formHeader->borderClipData - ClipPoints;
+			clipDifference = formHeader->borderClipData;
 			if (clipDifference + formHeader->clipEntries < ClipPointIndex) {
 				clipPoint.resize(clipPoint.size() + formHeader->clipEntries);
-				auto sourceStart = formHeader->borderClipData;
+				auto sourceStart = &ClipPoints[formHeader->borderClipData];
 				auto sourceEnd   = sourceStart + formHeader->clipEntries;
 				auto destination = clipPoint.begin() + clipCount;
 				auto _           = std::copy(sourceStart, sourceEnd, destination);
 
-				formHeader->borderClipData = &ClipPoints[clipCount];
+				formHeader->borderClipData = clipCount;
 				clipCount += formHeader->clipEntries;
 			}
 			else {
 				if (clipDifference < ClipPointIndex) {
 					formHeader->clipEntries = gsl::narrow<unsigned short>(FormVertexIndex - clipDifference);
 					clipPoint.resize(clipPoint.size() + formHeader->clipEntries);
-					auto sourceStart = formHeader->borderClipData;
+					auto sourceStart = &ClipPoints[formHeader->borderClipData];
 					auto sourceEnd   = sourceStart + formHeader->clipEntries;
 					auto destination = clipPoint.begin() + clipCount;
 					auto _           = std::copy(sourceStart, sourceEnd, destination);
 
-					formHeader->borderClipData = &ClipPoints[clipCount];
+					formHeader->borderClipData = clipCount;
 					clipCount += formHeader->clipEntries;
 				}
 				else {

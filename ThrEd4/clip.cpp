@@ -63,12 +63,10 @@ bool clip::iseclpx(unsigned int iForm) noexcept {
 unsigned int clip::internal::findclp(unsigned int formIndex) noexcept {
 	for (auto iForm = formIndex; iForm != 0; iForm--) {
 		if (clip::iseclp(iForm - 1)) {
-			// ToDo - find a better way than pointer arithmetic
-			return FormList[iForm - 1].borderClipData - ClipPoints + FormList[iForm - 1].clipEntries;
+			return FormList[iForm - 1].borderClipData + FormList[iForm - 1].clipEntries;
 		}
 		if (clip::isclp(iForm - 1)) {
-			// ToDo - find a better way than pointer arithmetic
-			return FormList[iForm - 1].angleOrClipData.clip - ClipPoints + FormList[iForm - 1].lengthOrCount.clipCount;
+			return FormList[iForm - 1].angleOrClipData.clip + FormList[iForm - 1].lengthOrCount.clipCount;
 		}
 	}
 	return 0;
@@ -133,7 +131,7 @@ void clip::delclps(unsigned int iForm) {
 	clip::delmclp(iForm);
 }
 
-fPOINT* clip::nueclp(unsigned int currentForm, unsigned int count) noexcept {
+unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) noexcept {
 	auto find        = ci::findclp(ClosestFormToCursor);
 	auto destination = ClipPointIndex + count - 1u;
 
@@ -157,18 +155,18 @@ fPOINT* clip::nueclp(unsigned int currentForm, unsigned int count) noexcept {
 		}
 	}
 	ClipPointIndex += count;
-	return &ClipPoints[find];
+	return find;
 }
 
-fPOINT* clip::numclp() noexcept {
-	auto find        = ci::findclp(ClosestFormToCursor);
+unsigned int clip::numclp() noexcept {
+	const auto find        = ci::findclp(ClosestFormToCursor);
 	auto source      = ClipPointIndex - 1;
 	auto destination = ClipPointIndex + ClipStitchCount - 1;
 
 	while ((source + 1) > find) {
 		ClipPoints[destination--] = ClipPoints[source--];
 	}
-	FormList[ClosestFormToCursor].angleOrClipData.clip = &ClipPoints[find];
+	FormList[ClosestFormToCursor].angleOrClipData.clip = find;
 	if (clip::iseclpx(ClosestFormToCursor)) {
 		FormList[ClosestFormToCursor].borderClipData += ClipStitchCount;
 	}
@@ -181,36 +179,36 @@ fPOINT* clip::numclp() noexcept {
 		}
 	}
 	ClipPointIndex += ClipStitchCount;
-	return &ClipPoints[find];
+	return find;
 }
 
-void clip::oclp(const fPOINT* const clip, unsigned int clipEntries) {
-	if (clip) {
-		if (!StateMap.test(StateFlag::NOCLP)) {
-			for (auto iClip = 0u; iClip < clipEntries; iClip++) {
-				ClipBuffer[iClip].x = clip[iClip].x;
-				ClipBuffer[iClip].y = clip[iClip].y;
-			}
-			ClipRect.left = ClipRect.right = ClipBuffer[0].x;
-			ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
-			for (auto iClip = 1u; iClip < clipEntries; iClip++) {
-				if (ClipBuffer[iClip].x < ClipRect.left) {
-					ClipRect.left = ClipBuffer[iClip].x;
-				}
-				if (ClipBuffer[iClip].x > ClipRect.right) {
-					ClipRect.right = ClipBuffer[iClip].x;
-				}
-				if (ClipBuffer[iClip].y < ClipRect.bottom) {
-					ClipRect.bottom = ClipBuffer[iClip].y;
-				}
-				if (ClipBuffer[iClip].y > ClipRect.top) {
-					ClipRect.top = ClipBuffer[iClip].y;
-				}
-			}
-			ClipRectSize.cx = ClipRect.right - ClipRect.left;
-			ClipRectSize.cy = ClipRect.top - ClipRect.bottom;
-			ClipStitchCount = clipEntries;
+void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
+	const auto* clip = &ClipPoints[clipIndex];
+	if (!StateMap.test(StateFlag::NOCLP)) {
+		// ToDo - use local vector for buffer
+		for (auto iClip = 0u; iClip < clipEntries; iClip++) {
+			ClipBuffer[iClip].x = clip[iClip].x;
+			ClipBuffer[iClip].y = clip[iClip].y;
 		}
+		ClipRect.left = ClipRect.right = ClipBuffer[0].x;
+		ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
+		for (auto iClip = 1u; iClip < clipEntries; iClip++) {
+			if (ClipBuffer[iClip].x < ClipRect.left) {
+				ClipRect.left = ClipBuffer[iClip].x;
+			}
+			if (ClipBuffer[iClip].x > ClipRect.right) {
+				ClipRect.right = ClipBuffer[iClip].x;
+			}
+			if (ClipBuffer[iClip].y < ClipRect.bottom) {
+				ClipRect.bottom = ClipBuffer[iClip].y;
+			}
+			if (ClipBuffer[iClip].y > ClipRect.top) {
+				ClipRect.top = ClipBuffer[iClip].y;
+			}
+		}
+		ClipRectSize.cx = ClipRect.right - ClipRect.left;
+		ClipRectSize.cy = ClipRect.top - ClipRect.bottom;
+		ClipStitchCount = clipEntries;
 	}
 }
 

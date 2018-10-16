@@ -1100,9 +1100,9 @@ union FANGCLPOUT;
 
 union FANGCLP {
 public:
-	float   angle;
-	fPOINT* clip;
-	SATCON  guide;
+	float        angle;
+	unsigned int clip;
+	SATCON       guide;
 
 	inline FANGCLP& operator=(const FANGCLPOUT& rhs) noexcept;
 };
@@ -1319,7 +1319,7 @@ public:
 	unsigned short clipEntries;     // number of border clipboard entries
 	fPOINT*        vertices;        // points
 	SATINANGLE     satinOrAngle;    // satin guidelines or angle clipboard fill angle
-	fPOINT*        borderClipData;  // border clipboard data
+	unsigned int   borderClipData;  // border clipboard data
 	unsigned short satinGuideCount; // number of satin guidelines
 	unsigned short wordParam;       // word parameter
 	fRECTANGLE     rectangle;       // rectangle
@@ -1347,7 +1347,7 @@ public:
 	unsigned int   clipEntries;     // number of border clipboard entries
 	fPOINT*        vertices;        // points
 	SATINANGLE     satinOrAngle;    // satin guidelines or angle clipboard fill angle
-	fPOINT*        borderClipData;  // border clipboard data
+	unsigned int   borderClipData;  // border clipboard data
 	unsigned int   satinGuideCount; // number of satin guidelines
 	unsigned int   wordParam;       // clipboard/textured fill phase or satin end guide
 	fRECTANGLE     rectangle;       // rectangle
@@ -1388,9 +1388,9 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertices        = rhs.vertices;
+	vertices        = rhs.vertices; // Todo - Should we be copying this value?
 	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = rhs.borderClipData;
+	borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
 	satinGuideCount = rhs.satinGuideCount;
 	wordParam       = rhs.wordParam;
 	rectangle       = rhs.rectangle;
@@ -1588,7 +1588,7 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 	clipEntries     = rhs.clipEntries;
 	vertices        = nullptr; // do not read the pointer from file
 	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = nullptr; // do not read the pointer from file
+	borderClipData  = 0u; // do not read the index from file
 	satinGuideCount = rhs.satinGuideCount;
 	wordParam       = rhs.wordParam;
 	rectangle       = rhs.rectangle;

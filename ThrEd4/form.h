@@ -48,7 +48,7 @@ bool         cisin(float xCoordinate, float yCoordinate) noexcept;
 unsigned int closflt(float xCoordinate, float yCoordinate) noexcept;
 bool         closfrm();
 void         clpfil();
-void         clpspac(const fPOINT* insertPoint, unsigned int count) noexcept;
+void         clpspac(unsigned int insertPoint, unsigned int count) noexcept;
 void         clrfills() noexcept;
 void         cntrx();
 void         col2frm();
@@ -229,7 +229,6 @@ namespace internal {
 	bool     clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept;
 	void     clpcon(const std::vector<RNGCNT>& textureSegments);
 	void     clpfm();
-	unsigned clpind(const fPOINT* point) noexcept;
 	unsigned clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
 	                 std::vector<CLPSEG>&       clipSegments,
 	                 const std::vector<double>& lengths,

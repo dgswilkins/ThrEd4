@@ -1195,11 +1195,11 @@ fPOINT* thred::adflt(unsigned int count) {
 	return &FormVertices[iFormVertex];
 }
 
-fPOINT* thred::adclp(unsigned int count) noexcept {
-	auto iClipPoint = ClipPointIndex;
+unsigned int thred::adclp(unsigned int count) noexcept {
+	const auto iClipPoint = ClipPointIndex;
 
 	ClipPointIndex += count;
-	return &ClipPoints[iClipPoint];
+	return iClipPoint;
 }
 
 unsigned thred::duthrsh(double threshold) noexcept {
@@ -3791,13 +3791,16 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 				}
 			}
 			if (clip::isclp(iForm)) {
+				const auto* offsetStart = &ClipPoints[FormList[iForm].angleOrClipData.clip];
 				for (auto iClip = 0u; iClip < FormList[iForm].lengthOrCount.clipCount; iClip++) {
-					points.push_back(FormList[iForm].angleOrClipData.clip[iClip]);
+					points.push_back(offsetStart[iClip]);
 				}
 			}
 			if (clip::iseclpx(iForm)) {
-				for (auto iClip = 0u; iClip < FormList[iForm].clipEntries; iClip++) {
-					points.push_back(FormList[iForm].borderClipData[iClip]);
+				const auto* offsetStart = &ClipPoints[FormList[iForm].borderClipData];
+				const auto  clipCount   = FormList[iForm].clipEntries;
+				for (auto iClip = 0u; iClip < clipCount; iClip++) {
+					points.push_back(offsetStart[iClip]);
 				}
 			}
 		}
@@ -7385,13 +7388,15 @@ void thred::internal::duclip() {
 						for (auto selectedForm : (*SelectedFormList)) {
 							SelectedForm = &FormList[selectedForm];
 							if (clip::isclpx(selectedForm)) {
+								const auto* offsetStart = &ClipPoints[SelectedForm->angleOrClipData.clip];
 								for (auto iClip = 0u; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
-									points[pointCount++] = SelectedForm->angleOrClipData.clip[iClip];
+									points[pointCount++] = offsetStart[iClip];
 								}
 							}
 							if (clip::iseclp(selectedForm)) {
+								const auto* offsetStart = &ClipPoints[SelectedForm->borderClipData];
 								for (auto iClip = 0u; iClip < SelectedForm->clipEntries; iClip++) {
-									points[pointCount++] = SelectedForm->borderClipData[iClip];
+									points[pointCount++] = offsetStart[iClip];
 								}
 							}
 						}
@@ -7482,14 +7487,16 @@ void thred::internal::duclip() {
 							auto mclp  = convert_ptr<fPOINT*>(&guides[iGuide]);
 							auto iClip = 0u;
 							if (clip::isclpx(ClosestFormToCursor)) {
+								const auto* offsetStart = &ClipPoints[SelectedForm->angleOrClipData.clip];
 								for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
-									mclp[iClip] = SelectedForm->angleOrClipData.clip[iClip];
+									mclp[iClip] = offsetStart[iClip];
 								}
 							}
 							auto points = convert_ptr<fPOINT*>(&mclp[iClip]);
 							if (clip::iseclpx(ClosestFormToCursor)) {
+								const auto* offsetStart = &ClipPoints[SelectedForm->borderClipData];
 								for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
-									points[iClip] = SelectedForm->borderClipData[iClip];
+									points[iClip] = offsetStart[iClip];
 								}
 							}
 							auto textures = convert_ptr<TXPNT*>(&points[iClip]);
@@ -15136,14 +15143,16 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								SelectedForm = &FormList[FormIndex + iForm];
 								if (clip::isclpx(FormIndex + iForm)) {
 									SelectedForm->angleOrClipData.clip = thred::adclp(SelectedForm->lengthOrCount.clipCount);
+									auto* offsetStart                  = &ClipPoints[SelectedForm->angleOrClipData.clip];
 									for (auto iClip = 0u; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
-										SelectedForm->angleOrClipData.clip[iClip] = clipData[currentClip++];
+										offsetStart[iClip] = clipData[currentClip++];
 									}
 								}
 								if (clip::iseclpx(FormIndex + iForm)) {
 									SelectedForm->borderClipData = thred::adclp(SelectedForm->clipEntries);
+									auto* offsetStart      = &ClipPoints[SelectedForm->borderClipData];
 									for (auto iClip = 0u; iClip < SelectedForm->clipEntries; iClip++) {
-										SelectedForm->borderClipData[iClip] = clipData[currentClip++];
+										offsetStart[iClip] = clipData[currentClip++];
 									}
 								}
 							}
@@ -15213,7 +15222,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 									SelectedForm->angleOrClipData.clip = thred::adclp(SelectedForm->lengthOrCount.clipCount);
 									std::copy(clipData,
 									          clipData + SelectedForm->lengthOrCount.clipCount,
-									          stdext::make_checked_array_iterator(SelectedForm->angleOrClipData.clip,
+									          stdext::make_checked_array_iterator(&ClipPoints[SelectedForm->angleOrClipData.clip],
 									                                              SelectedForm->lengthOrCount.clipCount));
 									clipCount += SelectedForm->lengthOrCount.clipCount;
 								}
@@ -15222,7 +15231,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 									SelectedForm->borderClipData = thred::adclp(SelectedForm->clipEntries);
 									std::copy(clipData,
 									          clipData + SelectedForm->clipEntries,
-									          stdext::make_checked_array_iterator(SelectedForm->borderClipData,
+									          stdext::make_checked_array_iterator(&ClipPoints[SelectedForm->borderClipData],
 									                                              SelectedForm->clipEntries));
 									clipCount += SelectedForm->clipEntries;
 								}
