@@ -728,7 +728,7 @@ unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned
 			                   indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y };
 		length             = hypot(delta.x, delta.y);
 
-		const auto stitchCount = dToUI(length / SelectedForm->lengthOrCount.stitchLength);
+		const auto stitchCount = dToUI(length / UserStitchLength);
 		if (stitchCount > 1) {
 			const fPOINT step       = { delta.x / stitchCount, delta.y / stitchCount };
 			fPOINT       localPoint = { indentedPoint[startVertex].x + step.x, indentedPoint[startVertex].y + step.y };
