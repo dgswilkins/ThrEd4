@@ -1838,14 +1838,28 @@ struct _range {
 
 using RANGE = struct _range;
 
-struct _region {          // region for sequencing vertical fills
-	unsigned start;       // start line of region
-	unsigned end;         // end line of region
-	unsigned regionBreak; // ToDo - Is this member needed?
-	unsigned breakCount;
+class REGION // region for sequencing vertical fills
+{ 
+public:
+	unsigned start{ 0u };       // start line of region
+	unsigned end{ 0u };         // end line of region
+	unsigned regionBreak{ 0u }; // ToDo - Is this member needed?
+	unsigned breakCount{ 0u };
+
+	constexpr REGION() noexcept = default;
+	inline REGION(unsigned rhsStart, unsigned rhsEnd, unsigned rhsBreak, unsigned rhsCount) noexcept;
+	// REGION(REGION&&) = default;
+	// REGION& operator=(const REGION& rhs) = default;
+	// REGION& operator=(REGION&&) = default;
+	//~REGION() = default;
 };
 
-using REGION = struct _region;
+inline REGION::REGION(unsigned rhsStart, unsigned rhsEnd, unsigned rhsBreak, unsigned rhsCount) noexcept
+    : start(rhsStart)
+    , end(rhsEnd)
+    , regionBreak(rhsBreak)
+    , breakCount(rhsCount) {
+}
 
 struct _rcon { // PathMap: path map for sequencing
 	unsigned node;
