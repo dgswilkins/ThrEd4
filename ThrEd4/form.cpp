@@ -70,7 +70,6 @@ RGSEQ*       RegionPath;          // path to a region
 SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
 unsigned     SequencePathIndex;   // index to path of sequenced regions
 double       Slope;               // slope of line in angle fills
-unsigned     StitchLineCount;     // count of stitch lines
 HDC          TimeDC;              // progress bar device context
 double       TimePosition;        // progress bar postiion
 double       TimeStep;            // progress bar step
@@ -2276,7 +2275,6 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 	}
 	maximumLines = (maximumLines >> 1);
 	lineEndpoints.reserve(gsl::narrow_cast<size_t>(fillLineCount) + 1);
-	StitchLineCount = 0;
 	LineGroupIndex  = 0;
 	// groupIndex cannot be more than fillLineCount so reserve that amount of memory to reduce re-allocations
 	groupIndexSequence.reserve(fillLineCount);
@@ -2297,27 +2295,26 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 		}
 		if (iPoint > 1) {
 			const auto evenPointCount = iPoint &= 0xfffffffe;
-			groupIndexSequence.push_back(StitchLineCount);
+			groupIndexSequence.push_back(lineEndpoints.size());
 			std::sort(projectedPoints.begin(), projectedPoints.end(), comp);
 			iPoint                    = 0;
-			const auto savedLineCount = StitchLineCount;
+			const auto savedLineCount = lineEndpoints.size();
 			while (iPoint < evenPointCount) {
-				if (StitchLineCount < fillLineCount) {
+				if (lineEndpoints.size() < fillLineCount) {
 					lineEndpoints.push_back(
 					    { projectedPoints[iPoint].line, LineGroupIndex, projectedPoints[iPoint].x, projectedPoints[iPoint].y });
 					iPoint++;
 					lineEndpoints.push_back(
 					    { projectedPoints[iPoint].line, LineGroupIndex, projectedPoints[iPoint].x, projectedPoints[iPoint].y });
 					iPoint++;
-					StitchLineCount += 2;
 				}
 			}
-			if (StitchLineCount != savedLineCount) {
+			if (lineEndpoints.size() != savedLineCount) {
 				LineGroupIndex++;
 			}
 		}
 	}
-	groupIndexSequence.push_back(StitchLineCount);
+	groupIndexSequence.push_back(lineEndpoints.size());
 	GroupIndexCount = gsl::narrow<unsigned int>(groupIndexSequence.size());
 	LineGroupIndex--;
 }
@@ -4194,10 +4191,11 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 	UNREFERENCED_PARAMETER(groupIndexSequence);
 #endif
 
-	if (StitchLineCount) {
+	if (!lineEndpoints.empty()) {
 		std::vector<SMALPNTL*> sortedLines;
-		sortedLines.reserve(StitchLineCount >> 1);
-		for (auto iLine = 0u; iLine < StitchLineCount; iLine += 2) {
+		const auto stitchLineCount = lineEndpoints.size();
+		sortedLines.reserve(stitchLineCount >> 1);
+		for (auto iLine = 0u; iLine < stitchLineCount; iLine += 2) {
 			sortedLines.push_back(&lineEndpoints[iLine]);
 		}
 		std::sort(sortedLines.begin(), sortedLines.end(), sqcomp);
