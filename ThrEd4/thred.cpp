@@ -4952,6 +4952,7 @@ void thred::internal::bak() {
 	StateMap.reset(StateFlag::FPSEL);
 	StateMap.reset(StateFlag::FRMPSEL);
 	StateMap.reset(StateFlag::BIGBOX);
+	thred::undat();
 	if (StateMap.testAndReset(StateFlag::PRFACT)) {
 		StateMap.reset(StateFlag::WASRT);
 		DestroyWindow(PreferencesWindow);
