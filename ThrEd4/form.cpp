@@ -58,7 +58,6 @@ double       GapToClosestRegion;  // region close enough threshold for sequencin
 unsigned     InOutFlag;           // is intersection of line and cursor before, in or after the line
 unsigned     LastGroup;           // group of the last line written in the previous region;
 double*      Lengths;             // array of cumulative lengths used in satin fills
-unsigned     LineGroupIndex;      // pointer for groups of fill line segments
 fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
 fPOINT       LineSegmentStart;    // vertical clipboard line segment start
 unsigned     NextGroup;           // group that connects to the next region
@@ -2274,7 +2273,7 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 	}
 	maximumLines = (maximumLines >> 1);
 	lineEndpoints.reserve(gsl::narrow_cast<size_t>(fillLineCount) + 1);
-	LineGroupIndex  = 0;
+	auto lineGroupIndex  = 0u;
 	// groupIndex cannot be more than fillLineCount so reserve that amount of memory to reduce re-allocations
 	groupIndexSequence.reserve(fillLineCount);
 	currentX        = lowX;
@@ -2300,20 +2299,19 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 			while (iPoint < evenPointCount) {
 				if (lineEndpoints.size() < fillLineCount) {
 					lineEndpoints.push_back(
-					    { projectedPoints[iPoint].line, LineGroupIndex, projectedPoints[iPoint].x, projectedPoints[iPoint].y });
+					    { projectedPoints[iPoint].line, lineGroupIndex, projectedPoints[iPoint].x, projectedPoints[iPoint].y });
 					iPoint++;
 					lineEndpoints.push_back(
-					    { projectedPoints[iPoint].line, LineGroupIndex, projectedPoints[iPoint].x, projectedPoints[iPoint].y });
+					    { projectedPoints[iPoint].line, lineGroupIndex, projectedPoints[iPoint].x, projectedPoints[iPoint].y });
 					iPoint++;
 				}
 			}
 			if (lineEndpoints.size() != savedLineCount) {
-				LineGroupIndex++;
+				lineGroupIndex++;
 			}
 		}
 	}
 	groupIndexSequence.push_back(lineEndpoints.size());
-	LineGroupIndex--;
 }
 
 void form::internal::fnang(std::vector<unsigned>& groupIndexSequence,
