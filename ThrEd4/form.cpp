@@ -63,7 +63,6 @@ fPOINT       LineSegmentStart;    // vertical clipboard line segment start
 unsigned     NextGroup;           // group that connects to the next region
 unsigned     PathIndex;           // formOrigin to the next path element for vertical fill sequencing
 unsigned     PathMapIndex;        // number of entries in the path map
-unsigned     RegionCount;         // number of regions to be sequenced
 RGSEQ*       RegionPath;          // path to a region
 SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
 unsigned     SequencePathIndex;   // index to path of sequenced regions
@@ -3607,7 +3606,8 @@ bool form::internal::regclos(std::vector<unsigned>&        groupIndexSequence,
 }
 
 bool form::internal::unvis(const boost::dynamic_bitset<>& visitedRegions) {
-	for (VisitedIndex = 0; VisitedIndex < RegionCount; VisitedIndex++) {
+	const auto regionCount = visitedRegions.size();
+	for (VisitedIndex = 0; VisitedIndex < regionCount; VisitedIndex++) {
 		if (!visitedRegions[VisitedIndex]) {
 			return true;
 		}
@@ -3720,7 +3720,8 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 			}
 			auto newRegion     = 0u;
 			auto minimumLength = 1e99;
-			for (auto iRegion = 0u; iRegion < RegionCount; iRegion++) {
+			const auto regionCount = visitedRegions.size();
+			for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
 				if (!visitedRegions[iRegion]) {
 					const auto length = reglen(sortedLines, iRegion, lastRegionCorners, regionsList);
 					if (length < minimumLength) {
@@ -4195,28 +4196,27 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 		}
 		std::sort(sortedLines.begin(), sortedLines.end(), sqcomp);
 		const auto lineCount = gsl::narrow<unsigned int>(sortedLines.size());
-		RegionCount          = 0;
-		// Count the regions. There cannot be more regions than lines
-		std::vector<REGION> regions(lineCount);
-		regions[0].start = 0;
+		std::vector<REGION> regions;
+		regions.emplace_back(0u, 0u, 0u, 0u);
 		auto breakLine   = sortedLines[0]->line;
 		for (auto iLine = 0u; iLine < lineCount; iLine++) {
 			if (breakLine != sortedLines[iLine]->line) {
-				regions[RegionCount++].end = iLine - 1;
-				regions[RegionCount].start = iLine;
+				regions.back().end = iLine - 1;
+				regions.emplace_back(iLine, 0u, 0u, 0u);
 				breakLine                  = sortedLines[iLine]->line;
 			}
 		}
-		regions[RegionCount++].end = lineCount - 1;
-		std::vector<REGION>     RegionsList(RegionCount);
-		boost::dynamic_bitset<> visitedRegions(RegionCount);
-		for (auto iRegion = 0u; iRegion < RegionCount; iRegion++) {
+		regions.back().end = lineCount - 1;
+		auto regionCount = regions.size();
+		std::vector<REGION>     RegionsList(regionCount);
+		boost::dynamic_bitset<> visitedRegions(regionCount);
+		for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
 			RegionsList[iRegion].start      = regions[iRegion].start;
 			RegionsList[iRegion].end        = regions[iRegion].end;
 			RegionsList[iRegion].breakCount = 0;
 		}
 		const auto iStartLine = 0u;
-		for (auto iRegion = 0u; iRegion < RegionCount; iRegion++) {
+		for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
 			auto count = 0u;
 			if ((RegionsList[iRegion].end - RegionsList[iRegion].start) > 1) {
 				auto startGroup = sortedLines[RegionsList[iRegion].start]->group;
@@ -4256,19 +4256,19 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 		OutputIndex = 0;
 
 		std::vector<unsigned> mapIndexSequence;
-		mapIndexSequence.reserve(gsl::narrow_cast<size_t>(RegionCount) + 1);
+		mapIndexSequence.reserve(gsl::narrow_cast<size_t>(regionCount) + 1);
 		std::vector<RCON> pathMap;
 		std::vector<FSEQ> sequencePath;
 
-		if (RegionCount > 1) {
+		if (regionCount > 1) {
 			PathMapIndex = 0;
 			// use the number of possible pairs of nodes n(n - 1)/2 and account for RegionCount possibly being odd
-			pathMap.reserve(gsl::narrow_cast<size_t>((RegionCount * (RegionCount - 1)) / 2) + 2);
-			for (auto iSequence = 0u; iSequence < RegionCount; iSequence++) {
+			pathMap.reserve(gsl::narrow_cast<size_t>((regionCount * (regionCount - 1)) / 2) + 2);
+			for (auto iSequence = 0u; iSequence < regionCount; iSequence++) {
 				mapIndexSequence.push_back(PathMapIndex);
 				auto count         = 0;
 				GapToClosestRegion = 0;
-				for (auto iNode = 0u; iNode < RegionCount; iNode++) {
+				for (auto iNode = 0u; iNode < regionCount; iNode++) {
 					if (iSequence != iNode) {
 						const auto isConnected
 						    = regclos(groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, RegionsList);
@@ -4282,7 +4282,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				while (!count) {
 					GapToClosestRegion += LineSpacing;
 					count = 0;
-					for (auto iNode = 0u; iNode < RegionCount; iNode++) {
+					for (auto iNode = 0u; iNode < regionCount; iNode++) {
 						if (iSequence != iNode) {
 							const auto isConnected
 							    = regclos(groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, RegionsList);
@@ -4299,7 +4299,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			// find the leftmost region
 			auto startGroup = 0xffffffffu;
 			auto leftRegion = 0u;
-			for (auto iRegion = 0u; iRegion < RegionCount; iRegion++) {
+			for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
 				auto lineGroupPoint = sortedLines[RegionsList[iRegion].start];
 				if (lineGroupPoint->group < startGroup) {
 					startGroup = lineGroupPoint->group;
@@ -4307,7 +4307,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				}
 			}
 			OutputIndex = 0;
-			std::vector<RGSEQ> tempPath(gsl::narrow_cast<size_t>((RegionCount * (RegionCount - 1)) / 2) + 1);
+			std::vector<RGSEQ> tempPath(gsl::narrow_cast<size_t>((regionCount * (regionCount - 1)) / 2) + 1);
 
 			// find the leftmost region in pathMap
 			SequencePathIndex = 1;
