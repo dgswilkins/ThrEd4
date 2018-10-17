@@ -55,7 +55,6 @@ unsigned     FormRelocationIndex; // form relocator pointer
 unsigned int FormVertexNext;      // form vertex storage for form vertex insert
 unsigned int FormVertexPrev;      // form vertex storage for form vertex insert
 double       GapToClosestRegion;  // region close enough threshold for sequencing
-unsigned int GroupIndexCount;     // number of group indices
 unsigned     InOutFlag;           // is intersection of line and cursor before, in or after the line
 unsigned     LastGroup;           // group of the last line written in the previous region;
 double*      Lengths;             // array of cumulative lengths used in satin fills
@@ -2278,7 +2277,6 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 	LineGroupIndex  = 0;
 	// groupIndex cannot be more than fillLineCount so reserve that amount of memory to reduce re-allocations
 	groupIndexSequence.reserve(fillLineCount);
-	GroupIndexCount = 0;
 	currentX        = lowX;
 	for (auto iLine = 0u; iLine < fillLineCount; iLine++) {
 		projectedPoints.clear();
@@ -2315,7 +2313,6 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 		}
 	}
 	groupIndexSequence.push_back(lineEndpoints.size());
-	GroupIndexCount = gsl::narrow<unsigned int>(groupIndexSequence.size());
 	LineGroupIndex--;
 }
 
@@ -3499,7 +3496,7 @@ bool form::internal::lnclos(std::vector<unsigned>& groupIndexSequence,
                             unsigned               line1) {
 	const auto lineEndPoint0 = &lineEndpoints[groupIndexSequence[group0]];
 
-	if (group1 > GroupIndexCount - 2) {
+	if (group1 > groupIndexSequence.size() - 2) {
 		return false;
 	}
 	if (group0 == 0) {
