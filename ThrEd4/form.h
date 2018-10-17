@@ -251,7 +251,7 @@ namespace internal {
 	             std::vector<SATCON>& tempGuides,
 	             std::vector<fPOINT>& destinationFormVertices,
 	             std::vector<FRMHED>& destinationFormList,
-	             unsigned int         formIndex);
+	             unsigned int         formIndex, unsigned int& FormRelocationIndex);
 	void  duflt();
 	void  duinf(const FRMHED& formHeader) noexcept;
 	void  dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish);

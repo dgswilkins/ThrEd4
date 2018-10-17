@@ -51,7 +51,6 @@ double       EggRatio;            // ratio for shrinking eggs
 FRMHED*      FormForInsert;       // insert form vertex in this form
 FORMINFO     FormInfo;            // form info used in drawing forms
 FLOAT        FormOffset;          // form offset for clipboard fills
-unsigned     FormRelocationIndex; // form relocator pointer
 unsigned int FormVertexNext;      // form vertex storage for form vertex insert
 unsigned int FormVertexPrev;      // form vertex storage for form vertex insert
 double       GapToClosestRegion;  // region close enough threshold for sequencing
@@ -7798,10 +7797,10 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
                             std::vector<SATCON>& tempGuides,
                             std::vector<fPOINT>& destinationFormVertices,
                             std::vector<FRMHED>& destinationFormList,
-                            unsigned int         formIndex) {
-	FRMHED& destination = destinationFormList[FormRelocationIndex];
+                            unsigned int         formIndex, unsigned int& formRelocationIndex) {
+	FRMHED& destination = destinationFormList[formRelocationIndex];
 
-	destinationFormList[FormRelocationIndex++] = FormList[formIndex];
+	destinationFormList[formRelocationIndex++] = FormList[formIndex];
 
 	const auto res = std::copy(
 	    destination.vertices, destination.vertices + destination.vertexCount, destinationFormVertices.begin() + FormVertexIndex);
@@ -7852,7 +7851,7 @@ void form::frmnumfn(unsigned newFormIndex) {
 			start  = ClosestFormToCursor;
 			finish = newFormIndex;
 		}
-		FormRelocationIndex = 0;
+		auto formRelocationIndex = 0u;
 		auto sourceForm     = 0u;
 
 		std::vector<FRMHED> tempFormList(FormIndex);
@@ -7864,13 +7863,13 @@ void form::frmnumfn(unsigned newFormIndex) {
 		satin::clearGuideSize();
 		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 			if (iForm == newFormIndex) {
-				fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, ClosestFormToCursor);
+				fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, ClosestFormToCursor, formRelocationIndex);
 			}
 			else {
 				if (sourceForm == ClosestFormToCursor) {
 					sourceForm++;
 				}
-				fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, sourceForm++);
+				fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, sourceForm++, formRelocationIndex);
 			}
 		}
 		std::copy(tempFormList.cbegin(), tempFormList.cend(), FormList);
