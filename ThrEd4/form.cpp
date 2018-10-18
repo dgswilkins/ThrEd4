@@ -42,7 +42,6 @@
 namespace fi = form::internal;
 
 fRECTANGLE   BoundingRect;        // isin rectangle
-float        ClipWidth;           // horizontal spacing for vertical clipboard fill
 fPOINT*      CurrentFillVertices; // pointer to the line of the polygon being filled
 REGION*      CurrentRegion;       // region currently being sequenced
 unsigned     DoneRegion;          // last region sequenced
@@ -3013,22 +3012,22 @@ bool form::internal::vscmp(unsigned index1, unsigned index2) noexcept {
 
 void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 	duflt();
-	ClipWidth = ClipRectSize.cx + SelectedForm->fillSpacing;
+	auto clipWidth = ClipRectSize.cx + SelectedForm->fillSpacing;
 	if (StateMap.test(StateFlag::ISUND)) {
-		ClipWidth = SelectedForm->underlaySpacing;
+		clipWidth = SelectedForm->underlaySpacing;
 	}
 	auto clipNegative = false;
 	if (SelectedForm->fillSpacing < 0) {
 		clipNegative = true;
 	}
-	if (ClipWidth < CLPMINAUT) {
-		ClipWidth = CLPMINAUT;
+	if (clipWidth < CLPMINAUT) {
+		clipWidth = CLPMINAUT;
 	}
 	if (StateMap.test(StateFlag::TXFIL)) {
 		if (TextureIndex
 		    && SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count
 		           <= gsl::narrow<unsigned short>(TextureIndex)) {
-			ClipWidth = SelectedForm->fillSpacing;
+			clipWidth = SelectedForm->fillSpacing;
 		}
 		else {
 			return;
@@ -3050,9 +3049,9 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 		totalLength += clipSideLengths[vertex];
 		vertex = nextVertex;
 	}
-	RECT clipGrid = { gsl::narrow<LONG>(std::floor(SelectedForm->rectangle.left / ClipWidth)),
+	RECT clipGrid = { gsl::narrow<LONG>(std::floor(SelectedForm->rectangle.left / clipWidth)),
 		              gsl::narrow<LONG>(std::ceil(SelectedForm->rectangle.top / ClipRectSize.cy + 1) + 2),
-		              gsl::narrow<LONG>(std::ceil(SelectedForm->rectangle.right / ClipWidth)),
+		              gsl::narrow<LONG>(std::ceil(SelectedForm->rectangle.right / clipWidth)),
 		              gsl::narrow<LONG>(std::floor(SelectedForm->rectangle.bottom / ClipRectSize.cy - 1)) };
 
 	auto negativeOffset = 0l;
@@ -3064,12 +3063,12 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 		clipGrid.top++;
 		if (SelectedForm->fillSpacing < 0) {
 			clipGrid.bottom--;
-			clipGrid.left -= dToL(ClipRectSize.cx / ClipWidth);
-			clipGrid.right += dToL(ClipRectSize.cx / ClipWidth);
+			clipGrid.left -= dToL(ClipRectSize.cx / clipWidth);
+			clipGrid.right += dToL(ClipRectSize.cx / clipWidth);
 		}
 	}
 	if (clipNegative && !clipGridOffset) {
-		clipGrid.left -= dToL(ClipRectSize.cx / ClipWidth);
+		clipGrid.left -= dToL(ClipRectSize.cx / clipWidth);
 	}
 	if (clipGrid.bottom < 0) {
 		negativeOffset = 1 - clipGrid.bottom;
@@ -3083,19 +3082,19 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 	std::vector<VCLPX> regionCrossingData; // region crossing data for vertical clipboard fills
 	regionCrossingData.reserve(MAXFRMLINS);
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
-		auto start  = gsl::narrow<unsigned int>(std::floor(CurrentFormVertices[iVertex].x / ClipWidth));
-		auto finish = gsl::narrow<unsigned int>(std::floor((CurrentFormVertices[form::nxt(iVertex)].x) / ClipWidth));
+		auto start  = gsl::narrow<unsigned int>(std::floor(CurrentFormVertices[iVertex].x / clipWidth));
+		auto finish = gsl::narrow<unsigned int>(std::floor((CurrentFormVertices[form::nxt(iVertex)].x) / clipWidth));
 		if (start > finish) {
 			std::swap(start, finish);
 		}
 		if (SelectedForm->fillSpacing < 0) {
-			finish += gsl::narrow<decltype(finish)>(std::round(ClipRectSize.cx / ClipWidth));
+			finish += gsl::narrow<decltype(finish)>(std::round(ClipRectSize.cx / clipWidth));
 		}
 		if (finish > gsl::narrow<unsigned int>(clipGrid.right)) {
 			finish = gsl::narrow<unsigned int>(clipGrid.right);
 		}
 		if (clipNegative) {
-			start -= dToUI(ClipRectSize.cx / ClipWidth);
+			start -= dToUI(ClipRectSize.cx / clipWidth);
 		}
 		for (auto iSegment = start; iSegment <= finish; iSegment++) {
 			regionCrossingData.push_back({ iSegment, iVertex });
@@ -3142,7 +3141,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 		for (auto iRegion = 0u; iRegion < iclpxSize; iRegion++) {
 			auto regionCrossingStart = iclpx[iRegion];
 			auto regionCrossingEnd   = iclpx[static_cast<size_t>(iRegion) + 1];
-			pasteLocation.x          = ClipWidth * (iRegion + clipGrid.left);
+			pasteLocation.x          = clipWidth * (iRegion + clipGrid.left);
 			auto clipVerticalOffset  = 0.0f;
 			if (StateMap.test(StateFlag::TXFIL)) {
 				const auto textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
