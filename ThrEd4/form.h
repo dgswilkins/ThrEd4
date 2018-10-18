@@ -340,7 +340,8 @@ namespace internal {
 	            const std::vector<RCON>&       pathMap,
 	            const std::vector<unsigned>&   mapIndexSequence,
 	            const boost::dynamic_bitset<>& VisitedRegions,
-	            unsigned                       level);
+	            unsigned                       level,
+	            unsigned                       doneRegion);
 	bool notsel() noexcept;
 	bool
 	       nucseg(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned& currentSegmentIndex);
@@ -352,7 +353,8 @@ namespace internal {
 	              const std::vector<unsigned>&  mapIndexSequence,
 	              boost::dynamic_bitset<>&      visitedRegions,
 	              const std::vector<SMALPNTL*>& sortedLines,
-	              const std::vector<REGION>&    regionsList);
+	              const std::vector<REGION>&    regionsList,
+	              unsigned&                      doneRegion);
 	void   nxtseq(std::vector<FSEQ>&           sequencePath,
 	              const std::vector<RCON>&     pathMap,
 	              const std::vector<unsigned>& mapIndexSequence,

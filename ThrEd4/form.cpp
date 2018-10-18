@@ -44,7 +44,6 @@ namespace fi = form::internal;
 fRECTANGLE   BoundingRect;        // isin rectangle
 fPOINT*      CurrentFillVertices; // pointer to the line of the polygon being filled
 REGION*      CurrentRegion;       // region currently being sequenced
-unsigned     DoneRegion;          // last region sequenced
 double       EggRatio;            // ratio for shrinking eggs
 FRMHED*      FormForInsert;       // insert form vertex in this form
 FORMINFO     FormInfo;            // form info used in drawing forms
@@ -2914,7 +2913,7 @@ void form::internal::chksid(unsigned int vertexIndex, unsigned clipIntersectSide
 void form::internal::ritseg(const std::vector<CLIPNT>& clipStitchPoints,
                             std::vector<CLPSEG>&       clipSegments,
                             const unsigned             currentSegmentIndex,
-                            unsigned&                   clipIntersectSide) {
+                            unsigned&                  clipIntersectSide) {
 	auto isPointedEnd = true;
 
 	if (SelectedForm->extendedAttribute & AT_SQR) {
@@ -3332,7 +3331,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 
 		unsigned currentSegmentIndex = 0;
 		StateMap.set(StateFlag::FILDIR);
-		SequenceIndex     = 0;
+		SequenceIndex          = 0;
 		auto clipIntersectSide = clipSegments[0].asid;
 		ritseg(clipStitchPoints, clipSegments, currentSegmentIndex, clipIntersectSide);
 		while (nucseg(clipSegments, sortedLengths, currentSegmentIndex)) {
@@ -3617,15 +3616,16 @@ bool form::internal::notdun(std::vector<RGSEQ>&            tempPath,
                             const std::vector<RCON>&       pathMap,
                             const std::vector<unsigned>&   mapIndexSequence,
                             const boost::dynamic_bitset<>& VisitedRegions,
-                            unsigned                       level) {
+                            unsigned                       level,
+                            unsigned                       doneRegion) {
 	auto previousLevel = level;
 	if (previousLevel) {
 		previousLevel--;
 	}
 
 	RegionPath          = &tempPath[SequencePathIndex];
-	RegionPath[0].pcon  = mapIndexSequence[DoneRegion];
-	RegionPath[0].count = mapIndexSequence[static_cast<size_t>(DoneRegion) + 1] - RegionPath[0].pcon;
+	RegionPath[0].pcon  = mapIndexSequence[doneRegion];
+	RegionPath[0].count = mapIndexSequence[static_cast<size_t>(doneRegion) + 1] - RegionPath[0].pcon;
 	for (auto iPath = 1u; iPath < level; iPath++) {
 		RegionPath[iPath].pcon = mapIndexSequence[pathMap[RegionPath[iPath - 1].pcon].node];
 		RegionPath[iPath].count
@@ -3699,19 +3699,20 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
                             const std::vector<unsigned>&  mapIndexSequence,
                             boost::dynamic_bitset<>&      visitedRegions,
                             const std::vector<SMALPNTL*>& sortedLines,
-                            const std::vector<REGION>&    regionsList) {
+                            const std::vector<REGION>&    regionsList,
+                            unsigned&                     doneRegion) {
 	std::vector<fPOINT> lastRegionCorners(4); // corners of last region sequenced
 
 	auto pathLength = 1u; // length of the path to the region
-	while (notdun(tempPath, pathMap, mapIndexSequence, visitedRegions, pathLength)) {
+	while (notdun(tempPath, pathMap, mapIndexSequence, visitedRegions, pathLength, doneRegion)) {
 		pathLength++;
 		if (pathLength > 8) {
-			SMALPNTL* lineEndPoint = sortedLines[regionsList[DoneRegion].start];
+			SMALPNTL* lineEndPoint = sortedLines[regionsList[doneRegion].start];
 			if (lineEndPoint) {
 				lastRegionCorners[0] = lineEndPoint[0];
 				lastRegionCorners[1] = lineEndPoint[1];
 			}
-			lineEndPoint = sortedLines[regionsList[DoneRegion].end];
+			lineEndPoint = sortedLines[regionsList[doneRegion].end];
 			if (lineEndPoint) {
 				lastRegionCorners[2] = lineEndPoint[0];
 				lastRegionCorners[3] = lineEndPoint[1];
@@ -3733,14 +3734,14 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 				if (pathMap[iPath].node == newRegion) {
 					tempPath[SequencePathIndex++].pcon = iPath;
 					visitedRegions.set(newRegion);
-					DoneRegion = newRegion;
+					doneRegion = newRegion;
 					return;
 				}
 			}
 			tempPath[SequencePathIndex].count  = VisitedIndex;
 			tempPath[SequencePathIndex++].pcon = 0xffffffff;
 			visitedRegions.set(VisitedIndex);
-			DoneRegion = VisitedIndex;
+			doneRegion = VisitedIndex;
 			return;
 		}
 	}
@@ -3749,7 +3750,7 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 		tempPath[SequencePathIndex++].pcon = RegionPath[iPath].pcon;
 		visitedRegions.set(pathMap[RegionPath[iPath].pcon].node);
 	}
-	DoneRegion = pathMap[RegionPath[pathLength - 1].pcon].node;
+	doneRegion = pathMap[RegionPath[pathLength - 1].pcon].node;
 }
 
 void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
@@ -4327,9 +4328,9 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			tempPath[0].count = 1;
 			tempPath[0].skp   = false;
 			visitedRegions.set(leftRegion);
-			DoneRegion = leftRegion;
+			auto doneRegion = leftRegion; // last region sequenced
 			while (unvis(visitedRegions)) {
-				nxtrgn(tempPath, pathMap, mapIndexSequence, visitedRegions, sortedLines, RegionsList);
+				nxtrgn(tempPath, pathMap, mapIndexSequence, visitedRegions, sortedLines, RegionsList, doneRegion);
 			}
 			auto count = 0xffffffffu;
 			sequencePath.reserve(SequencePathIndex);
