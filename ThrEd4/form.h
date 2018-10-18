@@ -224,7 +224,7 @@ namespace internal {
 	                boost::dynamic_bitset<>&      sequenceMap);
 	bool     chk2of();
 	void     chkbrd(unsigned& interleaveSequenceIndex2);
-	void     chksid(unsigned int vertexIndex) noexcept;
+	void     chksid(unsigned int vertexIndex, unsigned clipIntersectSide) noexcept;
 	bool     closat() noexcept;
 	bool     clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept;
 	void     clpcon(const std::vector<RNGCNT>& textureSegments);
@@ -251,7 +251,8 @@ namespace internal {
 	             std::vector<SATCON>& tempGuides,
 	             std::vector<fPOINT>& destinationFormVertices,
 	             std::vector<FRMHED>& destinationFormList,
-	             unsigned int         formIndex, unsigned int& FormRelocationIndex);
+	             unsigned int         formIndex,
+	             unsigned int&        FormRelocationIndex);
 	void  duflt();
 	void  duinf(const FRMHED& formHeader) noexcept;
 	void  dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish);
@@ -389,7 +390,10 @@ namespace internal {
 	void   ritbrd(unsigned& interleaveSequenceIndex2);
 	void   ritfil(unsigned& interleaveSequenceIndex2);
 	bool   ritlin(const fPOINT& start, const fPOINT& finish);
-	void   ritseg(const std::vector<CLIPNT>& clipStitchPoints, std::vector<CLPSEG>& clipSegments, unsigned currentSegmentIndex);
+	void   ritseg(const std::vector<CLIPNT>& clipStitchPoints,
+	              std::vector<CLPSEG>&       clipSegments,
+	              unsigned                   currentSegmentIndex,
+	              unsigned&                  clipIntersectSide);
 	void   rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept;
 	void   rotentr(double rotationAngle);
 	void   rotpar(dPOINT& rotationCenter);
