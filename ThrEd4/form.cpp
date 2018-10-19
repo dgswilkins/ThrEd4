@@ -52,7 +52,6 @@ unsigned int FormVertexPrev;      // form vertex storage for form vertex insert
 unsigned     LastGroup;           // group of the last line written in the previous region;
 fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
 fPOINT       LineSegmentStart;    // vertical clipboard line segment start
-unsigned     NextGroup;           // group that connects to the next region
 RGSEQ*       RegionPath;          // path to a region
 SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
 unsigned     SequencePathIndex;   // index to path of sequenced regions
@@ -3523,7 +3522,8 @@ bool form::internal::regclos(std::vector<unsigned>&        groupIndexSequence,
                              unsigned                      iRegion0,
                              unsigned                      iRegion1,
                              const std::vector<REGION>&    regionsList,
-                             double                        gapToClosestRegion) {
+                             double                        gapToClosestRegion,
+                             unsigned&                     nextGroup) {
 	const auto lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
 	SMALPNTL*  lineEndPoint0End   = nullptr;
 	const auto lineEndPoint1Start = sortedLines[regionsList[iRegion1].start];
@@ -3548,7 +3548,7 @@ bool form::internal::regclos(std::vector<unsigned>&        groupIndexSequence,
 	}
 	if (groupStart
 	    && lnclos(groupIndexSequence, lineEndpoints, groupStart - 1, prevLine, groupStart, lineStart, gapToClosestRegion)) {
-		NextGroup = groupStart;
+		nextGroup = groupStart;
 		return true;
 	}
 
@@ -3570,31 +3570,31 @@ bool form::internal::regclos(std::vector<unsigned>&        groupIndexSequence,
 		lastLine = lineEndPoint0End->line;
 	}
 	if (lnclos(groupIndexSequence, lineEndpoints, groupEnd, lineEnd, groupEnd + 1, lastLine, gapToClosestRegion)) {
-		NextGroup = groupEnd;
+		nextGroup = groupEnd;
 		return true;
 	}
 
 	if (((group0Start > group1Start) ? (group0Start - group1Start) : (group1Start - group0Start)) < 2) {
 		if (isclos(lineEndPoint0Start, lineEndPoint1Start, gapToClosestRegion)) {
-			NextGroup = group0Start;
+			nextGroup = group0Start;
 			return true;
 		}
 	}
 	if (((group0Start > group1End) ? (group0Start - group1End) : (group1End - group0Start)) < 2) {
 		if (isclos(lineEndPoint0Start, lineEndPoint1End, gapToClosestRegion)) {
-			NextGroup = group0Start;
+			nextGroup = group0Start;
 			return true;
 		}
 	}
 	if (((group0End > group1Start) ? (group0End - group1Start) : (group1Start - group0End)) < 2) {
 		if (isclos(lineEndPoint0End, lineEndPoint1Start, gapToClosestRegion)) {
-			NextGroup = group0End;
+			nextGroup = group0End;
 			return true;
 		}
 	}
 	if (((group0End > group1End) ? (group0End - group1End) : (group1End - group0End)) < 2) {
 		if (isclos(lineEndPoint0End, lineEndPoint1End, gapToClosestRegion)) {
-			NextGroup = group0End;
+			nextGroup = group0End;
 			return true;
 		}
 	}
@@ -4270,10 +4270,11 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				auto gapToClosestRegion = 0.0;
 				for (auto iNode = 0u; iNode < regionCount; iNode++) {
 					if (iSequence != iNode) {
+						auto nextGroup = 0u;
 						const auto isConnected = regclos(
-						    groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, RegionsList, gapToClosestRegion);
+						    groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, RegionsList, gapToClosestRegion, nextGroup);
 						if (isConnected) {
-							pathMap.push_back({ iNode, isConnected, NextGroup });
+							pathMap.push_back({ iNode, isConnected, nextGroup });
 							pathMapIndex++;
 							count++;
 						}
@@ -4284,15 +4285,16 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 					count = 0;
 					for (auto iNode = 0u; iNode < regionCount; iNode++) {
 						if (iSequence != iNode) {
+							auto nextGroup = 0u;
 							const auto isConnected = regclos(groupIndexSequence,
 							                                 lineEndpoints,
 							                                 sortedLines,
 							                                 iSequence,
 							                                 iNode,
 							                                 RegionsList,
-							                                 gapToClosestRegion);
+							                                 gapToClosestRegion, nextGroup);
 							if (isConnected) {
-								pathMap.push_back({ iNode, isConnected, NextGroup });
+								pathMap.push_back({ iNode, isConnected, nextGroup });
 								pathMapIndex++;
 								count++;
 							}

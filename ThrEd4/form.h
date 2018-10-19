@@ -387,7 +387,8 @@ namespace internal {
 	             unsigned                      iRegion0,
 	             unsigned                      iRegion1,
 	             const std::vector<REGION>&    regionsList,
-	             double                        gapToClosestRegion);
+	             double                        gapToClosestRegion,
+	             unsigned&                     NextGroup);
 	double reglen(const std::vector<SMALPNTL*>& sortedLines,
 	              unsigned                      iRegion,
 	              const std::vector<fPOINT>&    lastRegionCorners,
