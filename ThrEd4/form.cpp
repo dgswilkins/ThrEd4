@@ -53,7 +53,6 @@ unsigned     LastGroup;           // group of the last line written in the previ
 fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
 fPOINT       LineSegmentStart;    // vertical clipboard line segment start
 unsigned     NextGroup;           // group that connects to the next region
-unsigned     PathMapIndex;        // number of entries in the path map
 RGSEQ*       RegionPath;          // path to a region
 SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
 unsigned     SequencePathIndex;   // index to path of sequenced regions
@@ -3700,7 +3699,8 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
                             boost::dynamic_bitset<>&      visitedRegions,
                             const std::vector<SMALPNTL*>& sortedLines,
                             const std::vector<REGION>&    regionsList,
-                            unsigned&                     doneRegion) {
+                            unsigned&                     doneRegion,
+                            unsigned                      pathMapIndex) {
 	std::vector<fPOINT> lastRegionCorners(4); // corners of last region sequenced
 
 	auto pathLength = 1u; // length of the path to the region
@@ -3730,7 +3730,7 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 				}
 			}
 			tempPath[SequencePathIndex].skp = true;
-			for (auto iPath = 0u; iPath < PathMapIndex; iPath++) {
+			for (auto iPath = 0u; iPath < pathMapIndex; iPath++) {
 				if (pathMap[iPath].node == newRegion) {
 					tempPath[SequencePathIndex++].pcon = iPath;
 					visitedRegions.set(newRegion);
@@ -4261,11 +4261,11 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 		std::vector<FSEQ> sequencePath;
 
 		if (regionCount > 1) {
-			PathMapIndex = 0;
+			auto pathMapIndex = 0u;
 			// use the number of possible pairs of nodes n(n - 1)/2 and account for RegionCount possibly being odd
 			pathMap.reserve(gsl::narrow_cast<size_t>((regionCount * (regionCount - 1)) / 2) + 2);
 			for (auto iSequence = 0u; iSequence < regionCount; iSequence++) {
-				mapIndexSequence.push_back(PathMapIndex);
+				mapIndexSequence.push_back(pathMapIndex);
 				auto count              = 0;
 				auto gapToClosestRegion = 0.0;
 				for (auto iNode = 0u; iNode < regionCount; iNode++) {
@@ -4274,7 +4274,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 						    groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, RegionsList, gapToClosestRegion);
 						if (isConnected) {
 							pathMap.push_back({ iNode, isConnected, NextGroup });
-							PathMapIndex++;
+							pathMapIndex++;
 							count++;
 						}
 					}
@@ -4293,14 +4293,14 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 							                                 gapToClosestRegion);
 							if (isConnected) {
 								pathMap.push_back({ iNode, isConnected, NextGroup });
-								PathMapIndex++;
+								pathMapIndex++;
 								count++;
 							}
 						}
 					}
 				}
 			}
-			mapIndexSequence.push_back(PathMapIndex);
+			mapIndexSequence.push_back(pathMapIndex);
 			// find the leftmost region
 			auto startGroup = 0xffffffffu;
 			auto leftRegion = 0u;
@@ -4318,16 +4318,16 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			SequencePathIndex = 1;
 			auto dontSkip     = true;
 			auto inPath       = 0u;
-			for (inPath = 0u; inPath < PathMapIndex; inPath++) {
+			for (inPath = 0u; inPath < pathMapIndex; inPath++) {
 				if (pathMap[inPath].node == leftRegion) {
 					dontSkip = false;
 					break;
 				}
 			}
 			if (dontSkip) {
-				pathMap[PathMapIndex].node      = leftRegion;
-				pathMap[PathMapIndex].nextGroup = 0;
-				inPath                          = PathMapIndex;
+				pathMap[pathMapIndex].node      = leftRegion;
+				pathMap[pathMapIndex].nextGroup = 0;
+				inPath                          = pathMapIndex;
 			}
 			// set the first entry in the temporary path to the leftmost region
 			tempPath[0].pcon  = inPath;
@@ -4336,7 +4336,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			visitedRegions.set(leftRegion);
 			auto doneRegion = leftRegion; // last region sequenced
 			while (unvis(visitedRegions)) {
-				nxtrgn(tempPath, pathMap, mapIndexSequence, visitedRegions, sortedLines, RegionsList, doneRegion);
+				nxtrgn(tempPath, pathMap, mapIndexSequence, visitedRegions, sortedLines, RegionsList, doneRegion, pathMapIndex);
 			}
 			auto count = 0xffffffffu;
 			sequencePath.reserve(SequencePathIndex);

@@ -355,7 +355,8 @@ namespace internal {
 	              boost::dynamic_bitset<>&      visitedRegions,
 	              const std::vector<SMALPNTL*>& sortedLines,
 	              const std::vector<REGION>&    regionsList,
-	              unsigned&                     doneRegion);
+	              unsigned&                     doneRegion,
+	              unsigned                      pathMapIndex);
 	void   nxtseq(std::vector<FSEQ>&           sequencePath,
 	              const std::vector<RCON>&     pathMap,
 	              const std::vector<unsigned>& mapIndexSequence,
