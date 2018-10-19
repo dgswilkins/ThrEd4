@@ -53,10 +53,6 @@ fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
 fPOINT       LineSegmentStart;    // vertical clipboard line segment start
 RGSEQ*       RegionPath;          // path to a region
 SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
-HDC          TimeDC;              // progress bar device context
-double       TimePosition;        // progress bar postiion
-double       TimeStep;            // progress bar step
-HWND         TimeWindow;          // progress bar
 float        UserStitchLen;       // user stitch length
 unsigned     VisitedIndex;        // next unvisited region for sequencing
 fPOINT*      WorkingFormVertices; // form points for angle fills
@@ -1716,8 +1712,8 @@ void form::internal::sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start,
 	VRCT2* verticalRect = &fillVerticalRect[start];
 
 	if (delta.x && delta.y) {
-		auto slope = -delta.x / delta.y;
-		point = CurrentFormVertices[finish];
+		const auto slope = -delta.x / delta.y;
+		point            = CurrentFormVertices[finish];
 		proj(point, slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->dopnt);
 		proj(point, slope, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->dipnt);
 		point = CurrentFormVertices[start];
@@ -3994,7 +3990,7 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
                            unsigned int                  lineCount,
                            std::vector<REGION>&          regionsList,
                            unsigned&                     lastGroup,
-                           unsigned&                     sequencePathIndex) {
+                           unsigned                      sequencePathIndex) {
 	boost::dynamic_bitset<> sequenceMap(lineCount);
 
 	const auto nextGroup     = sequencePath[pthi].nextGroup;
@@ -4394,7 +4390,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			}
 		}
 		else {
-			auto sequencePathIndex = 1u;
+			const auto sequencePathIndex = 1u;
 			sequencePath.resize(sequencePathIndex);
 			auto lastGroup            = 0u;
 			sequencePath[0].node      = 0;
@@ -6932,31 +6928,38 @@ void form::internal::snpfn(const std::vector<unsigned>& xPoints, unsigned start,
 	}
 }
 
-void form::internal::nutim(double size) noexcept {
-	TimeWindow     = CreateWindow(L"STATIC",
-                              nullptr,
-                              WS_CHILD | WS_VISIBLE | WS_BORDER,
-                              ButtonWidthX3,
-                              0,
-                              StitchWindowSize.x,
-                              ButtonHeight,
-                              ThrEdWindow,
-                              nullptr,
-                              ThrEdInstance,
-                              nullptr);
-	TimeDC         = GetDC(TimeWindow);
-	TimeStep       = static_cast<double>(StitchWindowSize.x) / size;
-	TimePosition   = 0;
-	FormLines[0].y = 0;
-	FormLines[1].y = ButtonHeight;
-	FormLines[0].x = FormLines[1].x = 0;
-	SelectObject(TimeDC, UserPen[0]);
-}
+void form::internal::doTimeWindow(float rangeX, const std::vector<unsigned>& xPoints, const std::vector<unsigned>& xHistogram) {
+	auto checkLength = gsl::narrow<unsigned int>(std::round(SnapLength * 2.0 + 1.0));
 
-void form::internal::nxtim() {
-	Polyline(TimeDC, FormLines, 2);
-	TimePosition += TimeStep;
-	FormLines[0].x = FormLines[1].x = dToL(TimePosition);
+	auto timeWindow = CreateWindow(L"STATIC",
+	                               nullptr,
+	                               WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                               ButtonWidthX3,
+	                               0,
+	                               StitchWindowSize.x,
+	                               ButtonHeight,
+	                               ThrEdWindow,
+	                               nullptr,
+	                               ThrEdInstance,
+	                               nullptr);
+
+	auto       timeDC       = GetDC(timeWindow);
+	const auto timeStep     = static_cast<double>(StitchWindowSize.x) / rangeX;
+	auto       timePosition = 0.0;
+	FormLines[0].y          = 0;
+	FormLines[1].y          = ButtonHeight;
+	FormLines[0].x = FormLines[1].x = 0;
+	SelectObject(timeDC, UserPen[0]);
+	for (auto iColumn = 1u; iColumn < rangeX - checkLength - 1; iColumn++) {
+		snpfn(xPoints,
+		      xHistogram[iColumn],
+		      xHistogram[static_cast<size_t>(iColumn) + 1],
+		      xHistogram[static_cast<size_t>(iColumn) + checkLength]);
+		Polyline(timeDC, FormLines, 2);
+		timePosition += timeStep;
+		FormLines[0].x = FormLines[1].x = dToL(timePosition);
+	}
+	DestroyWindow(timeWindow);
 }
 
 void form::internal::snp(unsigned start, unsigned finish) {
@@ -7004,16 +7007,7 @@ void form::internal::snp(unsigned start, unsigned finish) {
 			xPoints[xHistogram[iColumn]++] = iStitch;
 		}
 	}
-	auto checkLength = gsl::narrow<unsigned int>(std::round(SnapLength * 2.0 + 1.0));
-	nutim(range.x);
-	for (auto iColumn = 1u; iColumn < range.x - checkLength - 1; iColumn++) {
-		snpfn(xPoints,
-		      xHistogram[iColumn],
-		      xHistogram[static_cast<size_t>(iColumn) + 1],
-		      xHistogram[static_cast<size_t>(iColumn) + checkLength]);
-		nxtim();
-	}
-	DestroyWindow(TimeWindow);
+	doTimeWindow(range.x, xPoints, xHistogram);
 }
 
 void form::snap() {

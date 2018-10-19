@@ -267,7 +267,7 @@ namespace internal {
 	            unsigned int                  lineCount,
 	            std::vector<REGION>&          regionsList,
 	            unsigned&                     LastGroup,
-	            unsigned&                     sequencePathIndex);
+	            unsigned                      sequencePathIndex);
 	void  duromb(const dPOINT& start0, const dPOINT& finish0, const dPOINT& start1, const dPOINT& finish1);
 	void  duseq(const std::vector<SMALPNTL*>& sortedLines,
 	            unsigned int                  start,
@@ -352,8 +352,7 @@ namespace internal {
 	bool
 	       nucseg(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned& currentSegmentIndex);
 	void   nufpnt(unsigned int vertex);
-	void   nutim(double size) noexcept;
-	void   nxtim();
+	void   doTimeWindow(float rangeX, const std::vector<unsigned>& xPoints, const std::vector<unsigned>& xHistogram);
 	void   nxtrgn(std::vector<RGSEQ>&           tempPath,
 	              const std::vector<RCON>&      pathMap,
 	              const std::vector<unsigned>&  mapIndexSequence,
