@@ -53,7 +53,6 @@ fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
 fPOINT       LineSegmentStart;    // vertical clipboard line segment start
 RGSEQ*       RegionPath;          // path to a region
 SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
-double       Slope;               // slope of line in angle fills
 HDC          TimeDC;              // progress bar device context
 double       TimePosition;        // progress bar postiion
 double       TimeStep;            // progress bar step
@@ -1717,30 +1716,30 @@ void form::internal::sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start,
 	VRCT2* verticalRect = &fillVerticalRect[start];
 
 	if (delta.x && delta.y) {
-		Slope = -delta.x / delta.y;
+		auto slope = -delta.x / delta.y;
 		point = CurrentFormVertices[finish];
-		proj(point, Slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->dopnt);
-		proj(point, Slope, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->dipnt);
+		proj(point, slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->dopnt);
+		proj(point, slope, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->dipnt);
 		point = CurrentFormVertices[start];
-		proj(point, Slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->aopnt);
-		proj(point, Slope, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->aipnt);
+		proj(point, slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->aopnt);
+		proj(point, slope, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->aipnt);
 		point = (*InsidePoints)[start];
-		if (proj(point, Slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->bopnt)) {
+		if (proj(point, slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->bopnt)) {
 			verticalRect->bipnt = (*InsidePoints)[start];
 		}
 		else {
 			verticalRect->bopnt = (*OutsidePoints)[start];
 			point               = (*OutsidePoints)[start];
-			proj(point, Slope, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->bipnt);
+			proj(point, slope, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->bipnt);
 		}
 		point = (*InsidePoints)[finish];
-		if (proj(point, Slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->copnt)) {
+		if (proj(point, slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->copnt)) {
 			verticalRect->cipnt = (*InsidePoints)[finish];
 		}
 		else {
 			verticalRect->copnt = (*OutsidePoints)[finish];
 			point               = (*OutsidePoints)[finish];
-			proj(point, Slope, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->cipnt);
+			proj(point, slope, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->cipnt);
 		}
 	}
 	else {
