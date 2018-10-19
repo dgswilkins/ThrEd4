@@ -314,7 +314,7 @@ namespace internal {
 	                unsigned                  regionCrossingEnd);
 	void     inspnt(std::vector<CLIPNT>& clipStitchPoints);
 
-	bool isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoint1) noexcept;
+	bool isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoint1, double gapToClosestRegion) noexcept;
 
 	bool isect(unsigned int vertex0, unsigned int vertex1, fPOINT& intersection, float& length) noexcept;
 	bool isin(std::vector<VCLPX> regionCrossingData,
@@ -332,7 +332,8 @@ namespace internal {
 	            unsigned               group0,
 	            unsigned               line0,
 	            unsigned               group1,
-	            unsigned               line1);
+	            unsigned               line1,
+	            double                 gapToClosestRegion);
 	void makpoli() noexcept;
 	void movseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int ind);
 	void mvpclp(std::vector<CLIPSORT*>& arrayOfClipIntersectData, unsigned destination, unsigned source);
@@ -354,7 +355,7 @@ namespace internal {
 	              boost::dynamic_bitset<>&      visitedRegions,
 	              const std::vector<SMALPNTL*>& sortedLines,
 	              const std::vector<REGION>&    regionsList,
-	              unsigned&                      doneRegion);
+	              unsigned&                     doneRegion);
 	void   nxtseq(std::vector<FSEQ>&           sequencePath,
 	              const std::vector<RCON>&     pathMap,
 	              const std::vector<unsigned>& mapIndexSequence,
@@ -383,7 +384,8 @@ namespace internal {
 	             const std::vector<SMALPNTL*>& sortedLines,
 	             unsigned                      iRegion0,
 	             unsigned                      iRegion1,
-	             const std::vector<REGION>&    regionsList);
+	             const std::vector<REGION>&    regionsList,
+	             double                        gapToClosestRegion);
 	double reglen(const std::vector<SMALPNTL*>& sortedLines,
 	              unsigned                      iRegion,
 	              const std::vector<fPOINT>&    lastRegionCorners,
@@ -415,7 +417,7 @@ namespace internal {
 	void setstar();
 	void setzig();
 
-	float shreg(float highValue, float reference) noexcept;
+	constexpr float shreg(float highValue, float reference, double EggRatio) noexcept;
 
 	void shrnks();
 	void snp(unsigned start, unsigned finish);

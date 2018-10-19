@@ -44,13 +44,11 @@ namespace fi = form::internal;
 fRECTANGLE   BoundingRect;        // isin rectangle
 fPOINT*      CurrentFillVertices; // pointer to the line of the polygon being filled
 REGION*      CurrentRegion;       // region currently being sequenced
-double       EggRatio;            // ratio for shrinking eggs
 FRMHED*      FormForInsert;       // insert form vertex in this form
 FORMINFO     FormInfo;            // form info used in drawing forms
 FLOAT        FormOffset;          // form offset for clipboard fills
 unsigned int FormVertexNext;      // form vertex storage for form vertex insert
 unsigned int FormVertexPrev;      // form vertex storage for form vertex insert
-double       GapToClosestRegion;  // region close enough threshold for sequencing
 unsigned     InOutFlag;           // is intersection of line and cursor before, in or after the line
 unsigned     LastGroup;           // group of the last line written in the previous region;
 double*      Lengths;             // array of cumulative lengths used in satin fills
@@ -3465,12 +3463,14 @@ bool form::internal::sqcomp(const SMALPNTL* arg1, const SMALPNTL* arg2) noexcept
 	return false;
 }
 
-bool form::internal::isclos(const SMALPNTL* const lineEndPoint0, const SMALPNTL* const lineEndPoint1) noexcept {
+bool form::internal::isclos(const SMALPNTL* const lineEndPoint0,
+                            const SMALPNTL* const lineEndPoint1,
+                            double                gapToClosestRegion) noexcept {
 	if (lineEndPoint0 && lineEndPoint1) {
-		const auto low0  = lineEndPoint0[0].y - GapToClosestRegion;
-		const auto high0 = lineEndPoint0[1].y + GapToClosestRegion;
-		const auto low1  = lineEndPoint1[0].y - GapToClosestRegion;
-		const auto high1 = lineEndPoint1[1].y + GapToClosestRegion;
+		const auto low0  = lineEndPoint0[0].y - gapToClosestRegion;
+		const auto high0 = lineEndPoint0[1].y + gapToClosestRegion;
+		const auto low1  = lineEndPoint1[0].y - gapToClosestRegion;
+		const auto high1 = lineEndPoint1[1].y + gapToClosestRegion;
 
 		if (high0 < low1) {
 			return false;
@@ -3487,7 +3487,8 @@ bool form::internal::lnclos(std::vector<unsigned>& groupIndexSequence,
                             unsigned               group0,
                             unsigned               line0,
                             unsigned               group1,
-                            unsigned               line1) {
+                            unsigned               line1,
+                            double                 gapToClosestRegion) {
 	const auto lineEndPoint0 = &lineEndpoints[groupIndexSequence[group0]];
 
 	if (group1 > groupIndexSequence.size() - 2) {
@@ -3512,7 +3513,7 @@ bool form::internal::lnclos(std::vector<unsigned>& groupIndexSequence,
 					index1 += 2;
 				}
 				if (count1) {
-					return isclos(&lineEndPoint0[index0], &lineEndPoint1[index1]);
+					return isclos(&lineEndPoint0[index0], &lineEndPoint1[index1], gapToClosestRegion);
 				}
 			}
 		}
@@ -3525,7 +3526,8 @@ bool form::internal::regclos(std::vector<unsigned>&        groupIndexSequence,
                              const std::vector<SMALPNTL*>& sortedLines,
                              unsigned                      iRegion0,
                              unsigned                      iRegion1,
-                             const std::vector<REGION>&    regionsList) {
+                             const std::vector<REGION>&    regionsList,
+                             double                        gapToClosestRegion) {
 	const auto lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
 	SMALPNTL*  lineEndPoint0End   = nullptr;
 	const auto lineEndPoint1Start = sortedLines[regionsList[iRegion1].start];
@@ -3548,7 +3550,8 @@ bool form::internal::regclos(std::vector<unsigned>&        groupIndexSequence,
 		lineStart  = lineEndPoint1Start->line;
 		prevLine   = lineEndPoint0Start->line;
 	}
-	if (groupStart && lnclos(groupIndexSequence, lineEndpoints, groupStart - 1, prevLine, groupStart, lineStart)) {
+	if (groupStart
+	    && lnclos(groupIndexSequence, lineEndpoints, groupStart - 1, prevLine, groupStart, lineStart, gapToClosestRegion)) {
 		NextGroup = groupStart;
 		return true;
 	}
@@ -3570,31 +3573,31 @@ bool form::internal::regclos(std::vector<unsigned>&        groupIndexSequence,
 		lineEnd  = lineEndPoint1End->line;
 		lastLine = lineEndPoint0End->line;
 	}
-	if (lnclos(groupIndexSequence, lineEndpoints, groupEnd, lineEnd, groupEnd + 1, lastLine)) {
+	if (lnclos(groupIndexSequence, lineEndpoints, groupEnd, lineEnd, groupEnd + 1, lastLine, gapToClosestRegion)) {
 		NextGroup = groupEnd;
 		return true;
 	}
 
 	if (((group0Start > group1Start) ? (group0Start - group1Start) : (group1Start - group0Start)) < 2) {
-		if (isclos(lineEndPoint0Start, lineEndPoint1Start)) {
+		if (isclos(lineEndPoint0Start, lineEndPoint1Start, gapToClosestRegion)) {
 			NextGroup = group0Start;
 			return true;
 		}
 	}
 	if (((group0Start > group1End) ? (group0Start - group1End) : (group1End - group0Start)) < 2) {
-		if (isclos(lineEndPoint0Start, lineEndPoint1End)) {
+		if (isclos(lineEndPoint0Start, lineEndPoint1End, gapToClosestRegion)) {
 			NextGroup = group0Start;
 			return true;
 		}
 	}
 	if (((group0End > group1Start) ? (group0End - group1Start) : (group1Start - group0End)) < 2) {
-		if (isclos(lineEndPoint0End, lineEndPoint1Start)) {
+		if (isclos(lineEndPoint0End, lineEndPoint1Start, gapToClosestRegion)) {
 			NextGroup = group0End;
 			return true;
 		}
 	}
 	if (((group0End > group1End) ? (group0End - group1End) : (group1End - group0End)) < 2) {
-		if (isclos(lineEndPoint0End, lineEndPoint1End)) {
+		if (isclos(lineEndPoint0End, lineEndPoint1End, gapToClosestRegion)) {
 			NextGroup = group0End;
 			return true;
 		}
@@ -4265,12 +4268,12 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			pathMap.reserve(gsl::narrow_cast<size_t>((regionCount * (regionCount - 1)) / 2) + 2);
 			for (auto iSequence = 0u; iSequence < regionCount; iSequence++) {
 				mapIndexSequence.push_back(PathMapIndex);
-				auto count         = 0;
-				GapToClosestRegion = 0;
+				auto count              = 0;
+				auto gapToClosestRegion = 0.0;
 				for (auto iNode = 0u; iNode < regionCount; iNode++) {
 					if (iSequence != iNode) {
-						const auto isConnected
-						    = regclos(groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, RegionsList);
+						const auto isConnected = regclos(
+						    groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, RegionsList, gapToClosestRegion);
 						if (isConnected) {
 							pathMap.push_back({ iNode, isConnected, NextGroup });
 							PathMapIndex++;
@@ -4279,12 +4282,17 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 					}
 				}
 				while (!count) {
-					GapToClosestRegion += LineSpacing;
+					gapToClosestRegion += LineSpacing;
 					count = 0;
 					for (auto iNode = 0u; iNode < regionCount; iNode++) {
 						if (iSequence != iNode) {
-							const auto isConnected
-							    = regclos(groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, RegionsList);
+							const auto isConnected = regclos(groupIndexSequence,
+							                                 lineEndpoints,
+							                                 sortedLines,
+							                                 iSequence,
+							                                 iNode,
+							                                 RegionsList,
+							                                 gapToClosestRegion);
 							if (isConnected) {
 								pathMap.push_back({ iNode, isConnected, NextGroup });
 								PathMapIndex++;
@@ -6520,8 +6528,8 @@ void form::dulens(unsigned sides) {
 	form::mdufrm();
 }
 
-float form::internal::shreg(float highValue, float reference) noexcept {
-	return (highValue - reference) * EggRatio + reference;
+constexpr float form::internal::shreg(float highValue, float reference, double eggRatio) noexcept {
+	return (highValue - reference) * eggRatio + reference;
 }
 
 void form::dueg(unsigned sides) {
@@ -6540,10 +6548,10 @@ void form::dueg(unsigned sides) {
 			CurrentFormVertices[iVertex].y = reference - (reference - CurrentFormVertices[iVertex].y) * IniFile.eggRatio;
 		}
 	}
-	EggRatio = maximumY / (static_cast<double>(CurrentFormVertices[sides >> 2].y) - CurrentFormVertices[0].y);
+	const auto eggRatio = maximumY / (static_cast<double>(CurrentFormVertices[sides >> 2].y) - CurrentFormVertices[0].y);
 	for (unsigned iVertex = 1; iVertex < VertexCount; iVertex++) {
-		CurrentFormVertices[iVertex].x = fi::shreg(CurrentFormVertices[iVertex].x, CurrentFormVertices[0].x);
-		CurrentFormVertices[iVertex].y = fi::shreg(CurrentFormVertices[iVertex].y, CurrentFormVertices[0].y);
+		CurrentFormVertices[iVertex].x = fi::shreg(CurrentFormVertices[iVertex].x, CurrentFormVertices[0].x, eggRatio);
+		CurrentFormVertices[iVertex].y = fi::shreg(CurrentFormVertices[iVertex].y, CurrentFormVertices[0].y, eggRatio);
 	}
 }
 
