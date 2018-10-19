@@ -53,7 +53,6 @@ fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
 fPOINT       LineSegmentStart;    // vertical clipboard line segment start
 RGSEQ*       RegionPath;          // path to a region
 SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
-unsigned     SequencePathIndex;   // index to path of sequenced regions
 double       Slope;               // slope of line in angle fills
 HDC          TimeDC;              // progress bar device context
 double       TimePosition;        // progress bar postiion
@@ -3613,15 +3612,16 @@ bool form::internal::unvis(const boost::dynamic_bitset<>& visitedRegions) {
 bool form::internal::notdun(std::vector<RGSEQ>&            tempPath,
                             const std::vector<RCON>&       pathMap,
                             const std::vector<unsigned>&   mapIndexSequence,
-                            const boost::dynamic_bitset<>& VisitedRegions,
+                            const boost::dynamic_bitset<>& visitedRegions,
                             unsigned                       level,
-                            unsigned                       doneRegion) {
+                            unsigned                       doneRegion,
+                            unsigned                       sequencePathIndex) {
 	auto previousLevel = level;
 	if (previousLevel) {
 		previousLevel--;
 	}
 
-	RegionPath          = &tempPath[SequencePathIndex];
+	RegionPath          = &tempPath[sequencePathIndex];
 	RegionPath[0].pcon  = mapIndexSequence[doneRegion];
 	RegionPath[0].count = mapIndexSequence[static_cast<size_t>(doneRegion) + 1] - RegionPath[0].pcon;
 	for (auto iPath = 1u; iPath < level; iPath++) {
@@ -3630,7 +3630,7 @@ bool form::internal::notdun(std::vector<RGSEQ>&            tempPath,
 		    = mapIndexSequence[static_cast<size_t>(pathMap[RegionPath[static_cast<size_t>(iPath) - 1].pcon].node) + 1]
 		      - RegionPath[iPath].pcon;
 	}
-	while (VisitedRegions[pathMap[RegionPath[previousLevel].pcon].node] && previousLevel >= 0) {
+	while (visitedRegions[pathMap[RegionPath[previousLevel].pcon].node] && previousLevel >= 0) {
 		if (--RegionPath[previousLevel].count > 0) {
 			RegionPath[previousLevel].pcon++;
 		}
@@ -3699,11 +3699,12 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
                             const std::vector<SMALPNTL*>& sortedLines,
                             const std::vector<REGION>&    regionsList,
                             unsigned&                     doneRegion,
-                            unsigned                      pathMapIndex) {
+                            unsigned                      pathMapIndex,
+                            unsigned&                     sequencePathIndex) {
 	std::vector<fPOINT> lastRegionCorners(4); // corners of last region sequenced
 
 	auto pathLength = 1u; // length of the path to the region
-	while (notdun(tempPath, pathMap, mapIndexSequence, visitedRegions, pathLength, doneRegion)) {
+	while (notdun(tempPath, pathMap, mapIndexSequence, visitedRegions, pathLength, doneRegion, sequencePathIndex)) {
 		pathLength++;
 		if (pathLength > 8) {
 			SMALPNTL* lineEndPoint = sortedLines[regionsList[doneRegion].start];
@@ -3728,25 +3729,25 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 					}
 				}
 			}
-			tempPath[SequencePathIndex].skp = true;
+			tempPath[sequencePathIndex].skp = true;
 			for (auto iPath = 0u; iPath < pathMapIndex; iPath++) {
 				if (pathMap[iPath].node == newRegion) {
-					tempPath[SequencePathIndex++].pcon = iPath;
+					tempPath[sequencePathIndex++].pcon = iPath;
 					visitedRegions.set(newRegion);
 					doneRegion = newRegion;
 					return;
 				}
 			}
-			tempPath[SequencePathIndex].count  = VisitedIndex;
-			tempPath[SequencePathIndex++].pcon = 0xffffffff;
+			tempPath[sequencePathIndex].count  = VisitedIndex;
+			tempPath[sequencePathIndex++].pcon = 0xffffffff;
 			visitedRegions.set(VisitedIndex);
 			doneRegion = VisitedIndex;
 			return;
 		}
 	}
 	for (auto iPath = 0u; iPath < pathLength; iPath++) {
-		tempPath[SequencePathIndex].skp    = false;
-		tempPath[SequencePathIndex++].pcon = RegionPath[iPath].pcon;
+		tempPath[sequencePathIndex].skp    = false;
+		tempPath[sequencePathIndex++].pcon = RegionPath[iPath].pcon;
 		visitedRegions.set(pathMap[RegionPath[iPath].pcon].node);
 	}
 	doneRegion = pathMap[RegionPath[pathLength - 1].pcon].node;
@@ -3993,7 +3994,8 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
                            unsigned                      pthi,
                            unsigned int                  lineCount,
                            std::vector<REGION>&          regionsList,
-                           unsigned&                     lastGroup) {
+                           unsigned&                     lastGroup,
+                           unsigned&                     sequencePathIndex) {
 	boost::dynamic_bitset<> sequenceMap(lineCount);
 
 	const auto nextGroup     = sequencePath[pthi].nextGroup;
@@ -4126,7 +4128,7 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 		else {
 			if (lastGroup >= groupEnd) {
 				brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup);
-				if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn) {
+				if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
 					brkseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup);
 				}
 			}
@@ -4136,7 +4138,7 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 						brkseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup);
 					}
 					brkseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap, lastGroup);
-					if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn) {
+					if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
 						brkseq(sortedLines, sequenceEnd, seqn, sequenceMap, lastGroup);
 					}
 				}
@@ -4145,7 +4147,7 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 						brkseq(sortedLines, seql, sequenceEnd, sequenceMap, lastGroup);
 					}
 					brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup);
-					if (pthi < SequencePathIndex - 1 && sequenceStart != seqn) {
+					if (pthi < sequencePathIndex - 1 && sequenceStart != seqn) {
 						brkseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup);
 					}
 				}
@@ -4167,7 +4169,7 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 						duseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup);
 					}
 					duseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap, lastGroup);
-					if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn) {
+					if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
 						duseq(sortedLines, sequenceEnd, seqn, sequenceMap, lastGroup);
 					}
 				}
@@ -4176,7 +4178,7 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 						duseq(sortedLines, seql, sequenceEnd, sequenceMap, lastGroup);
 					}
 					duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup);
-					if (pthi < SequencePathIndex - 1 && sequenceStart != seqn) {
+					if (pthi < sequencePathIndex - 1 && sequenceStart != seqn) {
 						duseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup);
 					}
 				}
@@ -4329,9 +4331,9 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			std::vector<RGSEQ> tempPath(gsl::narrow_cast<size_t>((regionCount * (regionCount - 1)) / 2) + 1);
 
 			// find the leftmost region in pathMap
-			SequencePathIndex = 1;
-			auto dontSkip     = true;
-			auto inPath       = 0u;
+			auto sequencePathIndex = 1u;
+			auto dontSkip          = true;
+			auto inPath            = 0u;
 			for (inPath = 0u; inPath < pathMapIndex; inPath++) {
 				if (pathMap[inPath].node == leftRegion) {
 					dontSkip = false;
@@ -4350,11 +4352,19 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			visitedRegions.set(leftRegion);
 			auto doneRegion = leftRegion; // last region sequenced
 			while (unvis(visitedRegions)) {
-				nxtrgn(tempPath, pathMap, mapIndexSequence, visitedRegions, sortedLines, RegionsList, doneRegion, pathMapIndex);
+				nxtrgn(tempPath,
+				       pathMap,
+				       mapIndexSequence,
+				       visitedRegions,
+				       sortedLines,
+				       RegionsList,
+				       doneRegion,
+				       pathMapIndex,
+				       sequencePathIndex);
 			}
 			auto count = 0xffffffffu;
-			sequencePath.reserve(SequencePathIndex);
-			for (auto iPath = 0u; iPath < SequencePathIndex; iPath++) {
+			sequencePath.reserve(sequencePathIndex);
+			for (auto iPath = 0u; iPath < sequencePathIndex; iPath++) {
 				const bool     tmpSkip = tempPath[iPath].skp;
 				unsigned short tmpNode = 0u;
 				if (tempPath[iPath].pcon == 0xffffffff) {
@@ -4370,7 +4380,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				sequencePath.push_back({ tmpNode, 0, tmpSkip });
 			}
 			auto pathCount = 0u;
-			for (auto iPath = 0u; iPath < SequencePathIndex; iPath++) {
+			for (auto iPath = 0u; iPath < sequencePathIndex; iPath++) {
 				nxtseq(sequencePath, pathMap, mapIndexSequence, iPath, pathCount);
 			}
 			visitedRegions.reset();
@@ -4381,16 +4391,17 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				if (!unvis(visitedRegions)) {
 					break;
 				}
-				durgn(sequencePath, visitedRegions, sortedLines, iPath, lineCount, RegionsList, lastGroup);
+				durgn(sequencePath, visitedRegions, sortedLines, iPath, lineCount, RegionsList, lastGroup, sequencePathIndex);
 			}
 		}
 		else {
-			sequencePath.resize(1);
+			auto sequencePathIndex = 1u;
+			sequencePath.resize(sequencePathIndex);
 			auto lastGroup            = 0u;
 			sequencePath[0].node      = 0;
 			sequencePath[0].nextGroup = gsl::narrow<unsigned short>(sortedLines[RegionsList[0].end]->group);
 			sequencePath[0].skp       = false;
-			durgn(sequencePath, visitedRegions, sortedLines, 0, lineCount, RegionsList, lastGroup);
+			durgn(sequencePath, visitedRegions, sortedLines, 0, lineCount, RegionsList, lastGroup, sequencePathIndex);
 		}
 
 #endif

@@ -266,7 +266,8 @@ namespace internal {
 	            unsigned                      pthi,
 	            unsigned int                  lineCount,
 	            std::vector<REGION>&          regionsList,
-	            unsigned&                     LastGroup);
+	            unsigned&                     LastGroup,
+	            unsigned&                     sequencePathIndex);
 	void  duromb(const dPOINT& start0, const dPOINT& finish0, const dPOINT& start1, const dPOINT& finish1);
 	void  duseq(const std::vector<SMALPNTL*>& sortedLines,
 	            unsigned int                  start,
@@ -343,9 +344,10 @@ namespace internal {
 	bool notdun(std::vector<RGSEQ>&            tempPath,
 	            const std::vector<RCON>&       pathMap,
 	            const std::vector<unsigned>&   mapIndexSequence,
-	            const boost::dynamic_bitset<>& VisitedRegions,
+	            const boost::dynamic_bitset<>& visitedRegions,
 	            unsigned                       level,
-	            unsigned                       doneRegion);
+	            unsigned                       doneRegion,
+	            unsigned                       sequencePathIndex);
 	bool notsel() noexcept;
 	bool
 	       nucseg(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned& currentSegmentIndex);
@@ -359,7 +361,8 @@ namespace internal {
 	              const std::vector<SMALPNTL*>& sortedLines,
 	              const std::vector<REGION>&    regionsList,
 	              unsigned&                     doneRegion,
-	              unsigned                      pathMapIndex);
+	              unsigned                      pathMapIndex,
+	              unsigned&                     sequencePathIndex);
 	void   nxtseq(std::vector<FSEQ>&           sequencePath,
 	              const std::vector<RCON>&     pathMap,
 	              const std::vector<unsigned>& mapIndexSequence,
