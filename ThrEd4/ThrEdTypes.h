@@ -2491,7 +2491,7 @@ struct _findInfo {
 
 using FINDINFO = struct _findInfo;
 
-// Line point intersection
+// is intersection of line and cursor in, before or after the line
 enum intersectionStyles
 {
 	POINT_IN_LINE = 0,

@@ -225,7 +225,7 @@ namespace internal {
 	bool     chk2of();
 	void     chkbrd(unsigned& interleaveSequenceIndex2);
 	void     chksid(unsigned int vertexIndex, unsigned clipIntersectSide) noexcept;
-	bool     closat() noexcept;
+	bool     closat(intersectionStyles& inOutFlag) noexcept;
 	bool     clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept;
 	void     clpcon(const std::vector<RNGCNT>& textureSegments);
 	void     clpfm();

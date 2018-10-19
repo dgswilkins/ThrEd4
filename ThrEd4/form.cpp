@@ -49,7 +49,6 @@ FORMINFO     FormInfo;            // form info used in drawing forms
 FLOAT        FormOffset;          // form offset for clipboard fills
 unsigned int FormVertexNext;      // form vertex storage for form vertex insert
 unsigned int FormVertexPrev;      // form vertex storage for form vertex insert
-unsigned     InOutFlag;           // is intersection of line and cursor before, in or after the line
 unsigned     LastGroup;           // group of the last line written in the previous region;
 double*      Lengths;             // array of cumulative lengths used in satin fills
 fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
@@ -5317,7 +5316,7 @@ void form::filsat() {
 	}
 }
 
-bool form::internal::closat() noexcept {
+bool form::internal::closat(intersectionStyles& inOutFlag) noexcept {
 	auto minimumLength = 1e99;
 
 	thred::px2stch();
@@ -5345,7 +5344,7 @@ bool form::internal::closat() noexcept {
 						minimumLength         = length;
 						ClosestFormToCursor   = iForm;
 						ClosestVertexToCursor = iVertex;
-						InOutFlag             = POINT_BEFORE_LINE;
+						inOutFlag             = POINT_BEFORE_LINE;
 					}
 					else {
 						// return the vertex after the intersection
@@ -5353,13 +5352,13 @@ bool form::internal::closat() noexcept {
 							minimumLength         = length;
 							ClosestFormToCursor   = iForm;
 							ClosestVertexToCursor = form::nxt(iVertex);
-							InOutFlag             = POINT_AFTER_LINE;
+							inOutFlag             = POINT_AFTER_LINE;
 						}
 						else {
 							minimumLength         = length;
 							ClosestFormToCursor   = iForm;
 							ClosestVertexToCursor = form::nxt(iVertex);
-							InOutFlag             = POINT_IN_LINE;
+							inOutFlag             = POINT_IN_LINE;
 						}
 					}
 				}
@@ -5402,13 +5401,14 @@ double form::internal::p2p(const fPOINT& point0, const fPOINT& point1) noexcept 
 }
 
 void form::insat() {
-	if (fi::closat()) {
+	auto inOutFlag = POINT_IN_LINE;
+	if (fi::closat(inOutFlag)) {
 		thred::savdo();
 		SelectedForm          = &FormList[ClosestFormToCursor];
 		FormForInsert         = SelectedForm;
 		const auto lastVertex = FormForInsert->vertexCount - 1;
 		form::fvars(ClosestFormToCursor);
-		if (InOutFlag) {
+		if (inOutFlag != POINT_IN_LINE) {
 			if (ClosestVertexToCursor == 0 && FormForInsert->type == FRMLINE) {
 				StateMap.set(StateFlag::PRELIN);
 			}
@@ -5529,10 +5529,11 @@ void form::rinfrm() {
 }
 
 void form::infrm() {
-	if (fi::closat()) {
+	auto inOutFlag = POINT_IN_LINE;
+	if (fi::closat(inOutFlag)) {
 		FormForInsert = &FormList[ClosestFormToCursor];
 		form::fvars(ClosestFormToCursor);
-		if (InOutFlag) {
+		if (inOutFlag != POINT_IN_LINE) {
 			if (!ClosestVertexToCursor && FormForInsert->type == FRMLINE) {
 				FormVertexPrev = 0;
 				StateMap.set(StateFlag::PRELIN);
