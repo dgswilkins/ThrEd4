@@ -221,7 +221,8 @@ namespace internal {
 	void     brkseq(const std::vector<SMALPNTL*>& sortedLines,
 	                unsigned int                  start,
 	                unsigned int                  finish,
-	                boost::dynamic_bitset<>&      sequenceMap);
+	                boost::dynamic_bitset<>&      sequenceMap,
+	                unsigned&                     lastGroup);
 	bool     chk2of();
 	void     chkbrd(unsigned& interleaveSequenceIndex2);
 	void     chksid(unsigned int vertexIndex, unsigned clipIntersectSide) noexcept;
@@ -255,7 +256,7 @@ namespace internal {
 	             unsigned int&        FormRelocationIndex);
 	void  duflt();
 	void  duinf(const FRMHED& formHeader) noexcept;
-	void  dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish);
+	void  dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish, unsigned& lastGroup);
 	void  dupfn(double rotationAngle);
 	void  duprotfs(double rotationAngle);
 	void  duprots(double rotationAngle, const dPOINT& rotationCenter);
@@ -264,12 +265,14 @@ namespace internal {
 	            const std::vector<SMALPNTL*>& sortedLines,
 	            unsigned                      pthi,
 	            unsigned int                  lineCount,
-	            std::vector<REGION>&          regionsList);
+	            std::vector<REGION>&          regionsList,
+	            unsigned&                     LastGroup);
 	void  duromb(const dPOINT& start0, const dPOINT& finish0, const dPOINT& start1, const dPOINT& finish1);
 	void  duseq(const std::vector<SMALPNTL*>& sortedLines,
 	            unsigned int                  start,
 	            unsigned int                  finish,
-	            boost::dynamic_bitset<>&      sequenceMap);
+	            boost::dynamic_bitset<>&      sequenceMap,
+	            unsigned&                     LastGroup);
 	void  duseq1() noexcept;
 	void  duseq2(const std::vector<SMALPNTL*>& sortedLines, unsigned int iLine);
 	void  duspnd(const std::vector<VRCT2>& underlayVerticalRect,

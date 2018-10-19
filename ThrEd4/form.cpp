@@ -49,7 +49,6 @@ FORMINFO     FormInfo;            // form info used in drawing forms
 FLOAT        FormOffset;          // form offset for clipboard fills
 unsigned int FormVertexNext;      // form vertex storage for form vertex insert
 unsigned int FormVertexPrev;      // form vertex storage for form vertex insert
-unsigned     LastGroup;           // group of the last line written in the previous region;
 fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
 fPOINT       LineSegmentStart;    // vertical clipboard line segment start
 RGSEQ*       RegionPath;          // path to a region
@@ -3810,7 +3809,8 @@ void form::internal::movseq(const std::vector<SMALPNTL*>& sortedLines, unsigned 
 void form::internal::brkseq(const std::vector<SMALPNTL*>& sortedLines,
                             unsigned int                  start,
                             unsigned int                  finish,
-                            boost::dynamic_bitset<>&      sequenceMap) {
+                            boost::dynamic_bitset<>&      sequenceMap,
+                            unsigned&                     lastGroup) {
 	StateMap.reset(StateFlag::SEQDUN);
 	if (start > finish) {
 		auto savedGroup = sortedLines[start]->group + 1;
@@ -3837,7 +3837,7 @@ void form::internal::brkseq(const std::vector<SMALPNTL*>& sortedLines,
 				movseq(sortedLines, iLineDec);
 			}
 		}
-		LastGroup = SequenceLines->group;
+		lastGroup = SequenceLines->group;
 	}
 	else {
 		auto savedGroup = sortedLines[start]->group - 1;
@@ -3861,14 +3861,17 @@ void form::internal::brkseq(const std::vector<SMALPNTL*>& sortedLines,
 				movseq(sortedLines, iLine);
 			}
 		}
-		LastGroup = SequenceLines->group;
+		lastGroup = SequenceLines->group;
 	}
 	if (StateMap.testAndReset(StateFlag::SEQDUN)) {
 		duseq1();
 	}
 }
 
-void form::internal::dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish) {
+void form::internal::dunseq(const std::vector<SMALPNTL*>& sortedLines,
+                            unsigned int                  start,
+                            unsigned int                  finish,
+                            unsigned&                     lastGroup) {
 	auto minimumY = 1e30;
 
 	for (auto iLine = start; iLine <= finish; iLine++) {
@@ -3885,7 +3888,7 @@ void form::internal::dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned 
 	}
 	rspnt(sortedLines[start][0].x, sortedLines[start][0].y + minimumY);
 	rspnt(sortedLines[finish][0].x, sortedLines[finish][0].y + minimumY);
-	LastGroup = sortedLines[finish][0].group;
+	lastGroup = sortedLines[finish][0].group;
 }
 
 void form::internal::duseq2(const std::vector<SMALPNTL*>& sortedLines, unsigned int iLine) {
@@ -3897,7 +3900,8 @@ void form::internal::duseq2(const std::vector<SMALPNTL*>& sortedLines, unsigned 
 void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
                            unsigned int                  start,
                            unsigned int                  finish,
-                           boost::dynamic_bitset<>&      sequenceMap) {
+                           boost::dynamic_bitset<>&      sequenceMap,
+                           unsigned&                     lastGroup) {
 	auto savedTopLine = sortedLines[start][1].line;
 	bool flag         = false;
 
@@ -3938,7 +3942,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 			duseq2(sortedLines, iLine);
 		}
 		if (flag) {
-			LastGroup = SequenceLines->group;
+			lastGroup = SequenceLines->group;
 		}
 	}
 	else {
@@ -3978,7 +3982,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 			}
 		}
 		if (flag) {
-			LastGroup = SequenceLines->group;
+			lastGroup = SequenceLines->group;
 		}
 	}
 }
@@ -3988,7 +3992,8 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
                            const std::vector<SMALPNTL*>& sortedLines,
                            unsigned                      pthi,
                            unsigned int                  lineCount,
-                           std::vector<REGION>&          regionsList) {
+                           std::vector<REGION>&          regionsList,
+                           unsigned&                     lastGroup) {
 	boost::dynamic_bitset<> sequenceMap(lineCount);
 
 	const auto nextGroup     = sequencePath[pthi].nextGroup;
@@ -4043,7 +4048,7 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 	auto       seql       = 0u;
 	if (groupEnd != groupStart) {
 		const auto intermediate
-		    = std::round((static_cast<double>(LastGroup) - groupStart) / (static_cast<double>(groupEnd) - groupStart)
+		    = std::round((static_cast<double>(lastGroup) - groupStart) / (static_cast<double>(groupEnd) - groupStart)
 		                     * (static_cast<double>(sequenceEnd) - sequenceStart)
 		                 + sequenceStart);
 		// ToDo - is this guard still needed now that intermediate is calculated correctly?
@@ -4072,19 +4077,19 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 	if (seqn > sequenceEnd) {
 		seqn = sequenceEnd;
 	}
-	if (sortedLines[seql]->group != LastGroup) {
-		if (seql < sequenceEnd && sortedLines[static_cast<size_t>(seql) + 1]->group == LastGroup) {
+	if (sortedLines[seql]->group != lastGroup) {
+		if (seql < sequenceEnd && sortedLines[static_cast<size_t>(seql) + 1]->group == lastGroup) {
 			seql++;
 		}
 		else {
-			if (seql > sequenceStart && sortedLines[seql - 1]->group == LastGroup) {
+			if (seql > sequenceStart && sortedLines[seql - 1]->group == lastGroup) {
 				seql--;
 			}
 			else {
 				auto mindif = 0xffffffffu;
 				for (auto ind = sequenceStart; ind <= sequenceEnd; ind++) {
-					const auto gdif = ((sortedLines[ind]->group > LastGroup) ? (sortedLines[ind]->group - LastGroup)
-					                                                         : (LastGroup - sortedLines[ind]->group));
+					const auto gdif = ((sortedLines[ind]->group > lastGroup) ? (sortedLines[ind]->group - lastGroup)
+					                                                         : (lastGroup - sortedLines[ind]->group));
 					if (gdif < mindif) {
 						mindif = gdif;
 						seql   = ind;
@@ -4119,29 +4124,29 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 			brkdun(sortedLines, seql, seqn);
 		}
 		else {
-			if (LastGroup >= groupEnd) {
-				brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap);
+			if (lastGroup >= groupEnd) {
+				brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup);
 				if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn) {
-					brkseq(sortedLines, sequenceStart, seqn, sequenceMap);
+					brkseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup);
 				}
 			}
 			else {
 				if (groupStart <= nextGroup) {
 					if (seql != sequenceStart) {
-						brkseq(sortedLines, seql, sequenceStart, sequenceMap);
+						brkseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup);
 					}
-					brkseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap);
+					brkseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap, lastGroup);
 					if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn) {
-						brkseq(sortedLines, sequenceEnd, seqn, sequenceMap);
+						brkseq(sortedLines, sequenceEnd, seqn, sequenceMap, lastGroup);
 					}
 				}
 				else {
 					if (seql != sequenceEnd) {
-						brkseq(sortedLines, seql, sequenceEnd, sequenceMap);
+						brkseq(sortedLines, seql, sequenceEnd, sequenceMap, lastGroup);
 					}
-					brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap);
+					brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup);
 					if (pthi < SequencePathIndex - 1 && sequenceStart != seqn) {
-						brkseq(sortedLines, sequenceStart, seqn, sequenceMap);
+						brkseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup);
 					}
 				}
 			}
@@ -4149,30 +4154,30 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 	}
 	else {
 		if (dun) {
-			dunseq(sortedLines, seql, seqn);
+			dunseq(sortedLines, seql, seqn, lastGroup);
 		}
 		else {
-			if (LastGroup >= groupEnd) {
-				duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap);
-				duseq(sortedLines, sequenceStart, seqn, sequenceMap);
+			if (lastGroup >= groupEnd) {
+				duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup);
+				duseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup);
 			}
 			else {
 				if (groupStart <= nextGroup) {
 					if (seql != sequenceStart) {
-						duseq(sortedLines, seql, sequenceStart, sequenceMap);
+						duseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup);
 					}
-					duseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap);
+					duseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap, lastGroup);
 					if (pthi < SequencePathIndex - 1 && sequenceEnd != seqn) {
-						duseq(sortedLines, sequenceEnd, seqn, sequenceMap);
+						duseq(sortedLines, sequenceEnd, seqn, sequenceMap, lastGroup);
 					}
 				}
 				else {
 					if (seql != sequenceEnd) {
-						duseq(sortedLines, seql, sequenceEnd, sequenceMap);
+						duseq(sortedLines, seql, sequenceEnd, sequenceMap, lastGroup);
 					}
-					duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap);
+					duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup);
 					if (pthi < SequencePathIndex - 1 && sequenceStart != seqn) {
-						duseq(sortedLines, sequenceStart, seqn, sequenceMap);
+						duseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup);
 					}
 				}
 			}
@@ -4270,9 +4275,15 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				auto gapToClosestRegion = 0.0;
 				for (auto iNode = 0u; iNode < regionCount; iNode++) {
 					if (iSequence != iNode) {
-						auto nextGroup = 0u;
-						const auto isConnected = regclos(
-						    groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, RegionsList, gapToClosestRegion, nextGroup);
+						auto       nextGroup   = 0u;
+						const auto isConnected = regclos(groupIndexSequence,
+						                                 lineEndpoints,
+						                                 sortedLines,
+						                                 iSequence,
+						                                 iNode,
+						                                 RegionsList,
+						                                 gapToClosestRegion,
+						                                 nextGroup);
 						if (isConnected) {
 							pathMap.push_back({ iNode, isConnected, nextGroup });
 							pathMapIndex++;
@@ -4285,14 +4296,15 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 					count = 0;
 					for (auto iNode = 0u; iNode < regionCount; iNode++) {
 						if (iSequence != iNode) {
-							auto nextGroup = 0u;
+							auto       nextGroup   = 0u;
 							const auto isConnected = regclos(groupIndexSequence,
 							                                 lineEndpoints,
 							                                 sortedLines,
 							                                 iSequence,
 							                                 iNode,
 							                                 RegionsList,
-							                                 gapToClosestRegion, nextGroup);
+							                                 gapToClosestRegion,
+							                                 nextGroup);
 							if (isConnected) {
 								pathMap.push_back({ iNode, isConnected, nextGroup });
 								pathMapIndex++;
@@ -4362,23 +4374,23 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				nxtseq(sequencePath, pathMap, mapIndexSequence, iPath, pathCount);
 			}
 			visitedRegions.reset();
-			LastGroup = 0;
+			auto lastGroup = 0u;
 			for (auto iPath = 0u; iPath < pathCount; iPath++) {
 				OutputDebugString(
 				    fmt::format(L"iterator {},vrt {},grpn {}\n", iPath, pathMap[iPath].node, pathMap[iPath].nextGroup).c_str());
 				if (!unvis(visitedRegions)) {
 					break;
 				}
-				durgn(sequencePath, visitedRegions, sortedLines, iPath, lineCount, RegionsList);
+				durgn(sequencePath, visitedRegions, sortedLines, iPath, lineCount, RegionsList, lastGroup);
 			}
 		}
 		else {
 			sequencePath.resize(1);
-			LastGroup                 = 0;
+			auto lastGroup            = 0u;
 			sequencePath[0].node      = 0;
 			sequencePath[0].nextGroup = gsl::narrow<unsigned short>(sortedLines[RegionsList[0].end]->group);
 			sequencePath[0].skp       = false;
-			durgn(sequencePath, visitedRegions, sortedLines, 0, lineCount, RegionsList);
+			durgn(sequencePath, visitedRegions, sortedLines, 0, lineCount, RegionsList, lastGroup);
 		}
 
 #endif
