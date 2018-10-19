@@ -50,11 +50,9 @@ FLOAT        FormOffset;          // form offset for clipboard fills
 unsigned int FormVertexNext;      // form vertex storage for form vertex insert
 unsigned int FormVertexPrev;      // form vertex storage for form vertex insert
 unsigned     LastGroup;           // group of the last line written in the previous region;
-double*      Lengths;             // array of cumulative lengths used in satin fills
 fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
 fPOINT       LineSegmentStart;    // vertical clipboard line segment start
 unsigned     NextGroup;           // group that connects to the next region
-unsigned     PathIndex;           // formOrigin to the next path element for vertical fill sequencing
 unsigned     PathMapIndex;        // number of entries in the path map
 RGSEQ*       RegionPath;          // path to a region
 SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
@@ -3758,7 +3756,8 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
                             const std::vector<RCON>&     pathMap,
                             const std::vector<unsigned>& mapIndexSequence,
-                            unsigned                     pathIndex) {
+                            unsigned                     pathIndex,
+                            unsigned&                    pathCount) {
 	auto iPath = mapIndexSequence[sequencePath[pathIndex].node];
 
 	if ((gsl::narrow_cast<size_t>(pathIndex) + 1) < sequencePath.size()) {
@@ -3767,10 +3766,10 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
 		       && pathMap[iPath].node != nextNode) {
 			iPath++;
 		}
-		sequencePath[PathIndex++].nextGroup = gsl::narrow<unsigned short>(pathMap[iPath].nextGroup);
+		sequencePath[pathCount++].nextGroup = gsl::narrow<unsigned short>(pathMap[iPath].nextGroup);
 	}
 	else {
-		sequencePath[PathIndex++].nextGroup = 0;
+		sequencePath[pathCount++].nextGroup = 0;
 	}
 }
 
@@ -4356,13 +4355,13 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				}
 				sequencePath.push_back({ tmpNode, 0, tmpSkip });
 			}
-			PathIndex = 0;
+			auto pathCount = 0u;
 			for (auto iPath = 0u; iPath < SequencePathIndex; iPath++) {
-				nxtseq(sequencePath, pathMap, mapIndexSequence, iPath);
+				nxtseq(sequencePath, pathMap, mapIndexSequence, iPath, pathCount);
 			}
 			visitedRegions.reset();
 			LastGroup = 0;
-			for (auto iPath = 0u; iPath < PathIndex; iPath++) {
+			for (auto iPath = 0u; iPath < pathCount; iPath++) {
 				OutputDebugString(
 				    fmt::format(L"iterator {},vrt {},grpn {}\n", iPath, pathMap[iPath].node, pathMap[iPath].nextGroup).c_str());
 				if (!unvis(visitedRegions)) {

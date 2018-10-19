@@ -359,7 +359,8 @@ namespace internal {
 	void   nxtseq(std::vector<FSEQ>&           sequencePath,
 	              const std::vector<RCON>&     pathMap,
 	              const std::vector<unsigned>& mapIndexSequence,
-	              unsigned                     pathIndex);
+	              unsigned                     pathIndex,
+	              unsigned&                    pathCount);
 	double p2p(const fPOINT& point0, const fPOINT& point1) noexcept;
 	void   pbrd(double edgeSpacing);
 	void   pfn(const std::vector<VRCT2>& underlayVerticalRect,
