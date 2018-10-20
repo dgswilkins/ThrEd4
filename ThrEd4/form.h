@@ -321,11 +321,12 @@ namespace internal {
 	bool isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoint1, double gapToClosestRegion) noexcept;
 
 	bool isect(unsigned int vertex0, unsigned int vertex1, fPOINT& intersection, float& length) noexcept;
-	bool isin(std::vector<VCLPX> regionCrossingData,
-	          float              xCoordinate,
-	          float              yCoordinate,
-	          unsigned           regionCrossingStart,
-	          unsigned           regionCrossingEnd);
+	bool isin(std::vector<VCLPX>& regionCrossingData,
+	          float               xCoordinate,
+	          float               yCoordinate,
+	          unsigned            regionCrossingStart,
+	          unsigned            regionCrossingEnd,
+	          const fRECTANGLE&   boundingRect);
 	void lapbrd();
 	void lcon(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
 	bool lencmp(const LENINFO& arg1, const LENINFO& arg2) noexcept;

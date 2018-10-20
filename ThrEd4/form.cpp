@@ -41,7 +41,6 @@
 
 namespace fi = form::internal;
 
-fRECTANGLE   BoundingRect;        // isin rectangle
 fPOINT*      CurrentFillVertices; // pointer to the line of the polygon being filled
 REGION*      CurrentRegion;       // region currently being sequenced
 FRMHED*      FormForInsert;       // insert form vertex in this form
@@ -2661,24 +2660,25 @@ bool form::internal::clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept {
 	return (vclpx1.segment < vclpx2.segment);
 }
 
-bool form::internal::isin(const std::vector<VCLPX> regionCrossingData,
-                          float                    xCoordinate,
-                          float                    yCoordinate,
-                          unsigned                 regionCrossingStart,
-                          unsigned                 regionCrossingEnd) {
+bool form::internal::isin(std::vector<VCLPX>& regionCrossingData,
+                          float               xCoordinate,
+                          float               yCoordinate,
+                          unsigned            regionCrossingStart,
+                          unsigned            regionCrossingEnd,
+                          const fRECTANGLE&   boundingRect) {
 	unsigned count = 0;
 	dPOINT   point = {};
 
-	if (xCoordinate < BoundingRect.left) {
+	if (xCoordinate < boundingRect.left) {
 		return false;
 	}
-	if (xCoordinate > BoundingRect.right) {
+	if (xCoordinate > boundingRect.right) {
 		return false;
 	}
-	if (yCoordinate < BoundingRect.bottom) {
+	if (yCoordinate < boundingRect.bottom) {
 		return false;
 	}
-	if (yCoordinate > BoundingRect.top) {
+	if (yCoordinate > boundingRect.top) {
 		return false;
 	}
 	for (auto iRegion = regionCrossingStart; iRegion < regionCrossingEnd; iRegion++) {
@@ -3096,20 +3096,20 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 		}
 	}
 	iclpx.push_back(gsl::narrow<unsigned int>(regionCrossingData.size()));
-	BoundingRect.left = BoundingRect.right = CurrentFormVertices[0].x;
-	BoundingRect.top = BoundingRect.bottom = CurrentFormVertices[0].y;
+	fRECTANGLE boundingRect
+	    = { CurrentFormVertices[0].y, CurrentFormVertices[0].x, CurrentFormVertices[0].x, CurrentFormVertices[0].y };
 	for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
-		if (CurrentFormVertices[iVertex].x > BoundingRect.right) {
-			BoundingRect.right = CurrentFormVertices[iVertex].x;
+		if (CurrentFormVertices[iVertex].x > boundingRect.right) {
+			boundingRect.right = CurrentFormVertices[iVertex].x;
 		}
-		if (CurrentFormVertices[iVertex].x < BoundingRect.left) {
-			BoundingRect.left = CurrentFormVertices[iVertex].x;
+		if (CurrentFormVertices[iVertex].x < boundingRect.left) {
+			boundingRect.left = CurrentFormVertices[iVertex].x;
 		}
-		if (CurrentFormVertices[iVertex].y > BoundingRect.top) {
-			BoundingRect.top = CurrentFormVertices[iVertex].y;
+		if (CurrentFormVertices[iVertex].y > boundingRect.top) {
+			boundingRect.top = CurrentFormVertices[iVertex].y;
 		}
-		if (CurrentFormVertices[iVertex].y < BoundingRect.bottom) {
-			BoundingRect.bottom = CurrentFormVertices[iVertex].y;
+		if (CurrentFormVertices[iVertex].y < boundingRect.bottom) {
+			boundingRect.bottom = CurrentFormVertices[iVertex].y;
 		}
 	}
 	ActivePointIndex = 0;
@@ -3169,8 +3169,12 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 					}
 
 					clipStitchPoints.push_back({ LineSegmentStart.x, LineSegmentStart.y, 0, 0 });
-					if (isin(
-					        regionCrossingData, LineSegmentStart.x, LineSegmentStart.y, regionCrossingStart, regionCrossingEnd)) {
+					if (isin(regionCrossingData,
+					         LineSegmentStart.x,
+					         LineSegmentStart.y,
+					         regionCrossingStart,
+					         regionCrossingEnd,
+					         boundingRect)) {
 						if ((clipStitchPoints.size() > 1) && clipStitchPoints[clipStitchPoints.size() - 1].flag == 2) {
 							inspnt(clipStitchPoints);
 						}
@@ -4345,7 +4349,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			tempPath[0].count = 1;
 			tempPath[0].skp   = false;
 			visitedRegions.set(leftRegion);
-			auto doneRegion = leftRegion; // last region sequenced
+			auto doneRegion   = leftRegion; // last region sequenced
 			auto visitedIndex = 0u;
 			while (unvis(visitedRegions, visitedIndex)) {
 				nxtrgn(tempPath,
@@ -4356,7 +4360,8 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				       RegionsList,
 				       doneRegion,
 				       pathMapIndex,
-				       sequencePathIndex, visitedIndex);
+				       sequencePathIndex,
+				       visitedIndex);
 			}
 			auto count = 0xffffffffu;
 			sequencePath.reserve(sequencePathIndex);
