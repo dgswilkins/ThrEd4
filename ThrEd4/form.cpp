@@ -41,7 +41,6 @@
 
 namespace fi = form::internal;
 
-fPOINT*      CurrentFillVertices; // pointer to the line of the polygon being filled
 REGION*      CurrentRegion;       // region currently being sequenced
 FRMHED*      FormForInsert;       // insert form vertex in this form
 FORMINFO     FormInfo;            // form info used in drawing forms
@@ -2213,16 +2212,16 @@ void form::internal::chkbrd(unsigned& interleaveSequenceIndex2) {
 }
 
 void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints) {
-	CurrentFillVertices = SelectedForm->vertices;
-	auto highX          = CurrentFillVertices[0].x;
-	auto lowX           = CurrentFillVertices[0].x;
+	const auto* currentFillVertices = SelectedForm->vertices;
+	auto highX          = currentFillVertices[0].x;
+	auto lowX           = currentFillVertices[0].x;
 	VertexCount         = SelectedForm->vertexCount;
 	for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
-		if (CurrentFillVertices[iVertex].x > highX) {
-			highX = CurrentFillVertices[iVertex].x;
+		if (currentFillVertices[iVertex].x > highX) {
+			highX = currentFillVertices[iVertex].x;
 		}
-		if (CurrentFillVertices[iVertex].x < lowX) {
-			lowX = CurrentFillVertices[iVertex].x;
+		if (currentFillVertices[iVertex].x < lowX) {
+			lowX = currentFillVertices[iVertex].x;
 		}
 	}
 
@@ -2241,7 +2240,7 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			const auto iNextVertex = (iVertex + 1) % VertexCount;
 			dPOINT     point       = {};
-			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iNextVertex], point)) {
+			if (projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
 				iLineCounter++;
 			}
 		}
@@ -2263,7 +2262,7 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			const auto iNextVertex = (iVertex + 1) % VertexCount;
 			dPOINT     point       = {};
-			if (projv(currentX, CurrentFillVertices[iVertex], CurrentFillVertices[iNextVertex], point)) {
+			if (projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
 				dPOINTLINE a = { point.x, point.y, gsl::narrow<unsigned short>(iVertex) };
 				projectedPoints.push_back(a);
 				iPoint++;
