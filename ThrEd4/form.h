@@ -361,7 +361,8 @@ namespace internal {
 	              const std::vector<REGION>&    regionsList,
 	              unsigned&                     doneRegion,
 	              unsigned                      pathMapIndex,
-	              unsigned&                     sequencePathIndex);
+	              unsigned&                     sequencePathIndex,
+	              unsigned                      VisitedIndex);
 	void   nxtseq(std::vector<FSEQ>&           sequencePath,
 	              const std::vector<RCON>&     pathMap,
 	              const std::vector<unsigned>& mapIndexSequence,
@@ -448,7 +449,7 @@ namespace internal {
 
 	unsigned leftsid() noexcept;
 
-	bool unvis(const boost::dynamic_bitset<>& visitedRegions);
+	bool unvis(const boost::dynamic_bitset<>& visitedRegions, unsigned& VisitedIndex);
 	bool vscmp(unsigned index1, unsigned index2) noexcept;
 } // namespace internal
 } // namespace form

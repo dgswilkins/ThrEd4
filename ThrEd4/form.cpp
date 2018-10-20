@@ -53,7 +53,6 @@ fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
 fPOINT       LineSegmentStart;    // vertical clipboard line segment start
 RGSEQ*       RegionPath;          // path to a region
 SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
-unsigned     VisitedIndex;        // next unvisited region for sequencing
 fPOINT*      WorkingFormVertices; // form points for angle fills
 
 unsigned char Level00   = 0;
@@ -1249,7 +1248,7 @@ void form::chkseq(bool border) {
 #else
 
 	auto minimumStitchLength = 0.0f;
-	auto userStitchLen = 0.0f;
+	auto userStitchLen       = 0.0f;
 
 	const auto savedIndex = InterleaveSequenceIndex;
 	if (border) {
@@ -3594,10 +3593,10 @@ bool form::internal::regclos(std::vector<unsigned>&        groupIndexSequence,
 	return false;
 }
 
-bool form::internal::unvis(const boost::dynamic_bitset<>& visitedRegions) {
+bool form::internal::unvis(const boost::dynamic_bitset<>& visitedRegions, unsigned& visitedIndex) {
 	const auto regionCount = visitedRegions.size();
-	for (VisitedIndex = 0; VisitedIndex < regionCount; VisitedIndex++) {
-		if (!visitedRegions[VisitedIndex]) {
+	for (visitedIndex = 0; visitedIndex < regionCount; visitedIndex++) {
+		if (!visitedRegions[visitedIndex]) {
 			return true;
 		}
 	}
@@ -3695,7 +3694,8 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
                             const std::vector<REGION>&    regionsList,
                             unsigned&                     doneRegion,
                             unsigned                      pathMapIndex,
-                            unsigned&                     sequencePathIndex) {
+                            unsigned&                     sequencePathIndex,
+                            unsigned                      visitedIndex) {
 	std::vector<fPOINT> lastRegionCorners(4); // corners of last region sequenced
 
 	auto pathLength = 1u; // length of the path to the region
@@ -3733,10 +3733,10 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 					return;
 				}
 			}
-			tempPath[sequencePathIndex].count  = VisitedIndex;
+			tempPath[sequencePathIndex].count  = visitedIndex;
 			tempPath[sequencePathIndex++].pcon = 0xffffffff;
-			visitedRegions.set(VisitedIndex);
-			doneRegion = VisitedIndex;
+			visitedRegions.set(visitedIndex);
+			doneRegion = visitedIndex;
 			return;
 		}
 	}
@@ -4346,7 +4346,8 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			tempPath[0].skp   = false;
 			visitedRegions.set(leftRegion);
 			auto doneRegion = leftRegion; // last region sequenced
-			while (unvis(visitedRegions)) {
+			auto visitedIndex = 0u;
+			while (unvis(visitedRegions, visitedIndex)) {
 				nxtrgn(tempPath,
 				       pathMap,
 				       mapIndexSequence,
@@ -4355,7 +4356,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				       RegionsList,
 				       doneRegion,
 				       pathMapIndex,
-				       sequencePathIndex);
+				       sequencePathIndex, visitedIndex);
 			}
 			auto count = 0xffffffffu;
 			sequencePath.reserve(sequencePathIndex);
@@ -4383,7 +4384,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			for (auto iPath = 0u; iPath < pathCount; iPath++) {
 				OutputDebugString(
 				    fmt::format(L"iterator {},vrt {},grpn {}\n", iPath, pathMap[iPath].node, pathMap[iPath].nextGroup).c_str());
-				if (!unvis(visitedRegions)) {
+				if (!unvis(visitedRegions, visitedIndex)) {
 					break;
 				}
 				durgn(sequencePath, visitedRegions, sortedLines, iPath, lineCount, RegionsList, lastGroup, sequencePathIndex);
