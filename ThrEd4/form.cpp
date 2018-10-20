@@ -53,7 +53,6 @@ fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
 fPOINT       LineSegmentStart;    // vertical clipboard line segment start
 RGSEQ*       RegionPath;          // path to a region
 SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
-float        UserStitchLen;       // user stitch length
 unsigned     VisitedIndex;        // next unvisited region for sequencing
 fPOINT*      WorkingFormVertices; // form points for angle fills
 
@@ -1192,13 +1191,13 @@ void form::makspac(unsigned start, unsigned count) {
 	}
 }
 
-bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish) {
+bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float userStitchLen) {
 	const dPOINT delta  = { finish.x - start.x, finish.y - start.y };
 	const auto   length = hypot(delta.x, delta.y);
 
 	InterleaveSequence[InterleaveSequenceIndex++] = start;
 	if (length > MaxStitchLen) {
-		auto count = gsl::narrow<unsigned int>(std::ceil(length / UserStitchLen));
+		auto count = gsl::narrow<unsigned int>(std::ceil(length / userStitchLen));
 		if (!count) {
 			count = 1;
 		}
@@ -1250,6 +1249,7 @@ void form::chkseq(bool border) {
 #else
 
 	auto minimumStitchLength = 0.0f;
+	auto userStitchLen = 0.0f;
 
 	const auto savedIndex = InterleaveSequenceIndex;
 	if (border) {
@@ -1258,10 +1258,10 @@ void form::chkseq(bool border) {
 		}
 		MaxStitchLen = SelectedForm->maxBorderStitchLen;
 		if (SelectedForm->edgeType == EDGELCHAIN || SelectedForm->edgeType == EDGEOCHAIN) {
-			UserStitchLen = 9 * PFGRAN;
+			userStitchLen = 9.0f * PFGRAN;
 		}
 		else {
-			UserStitchLen = SelectedForm->edgeStitchLen;
+			userStitchLen = SelectedForm->edgeStitchLen;
 		}
 		minimumStitchLength = SelectedForm->minBorderStitchLen;
 	}
@@ -1271,19 +1271,19 @@ void form::chkseq(bool border) {
 		}
 		MaxStitchLen = SelectedForm->maxFillStitchLen;
 		if (clip::isclp(ClosestFormToCursor)) {
-			UserStitchLen = MaxStitchLen;
+			userStitchLen = MaxStitchLen;
 		}
 		else {
-			UserStitchLen = SelectedForm->lengthOrCount.stitchLength;
+			userStitchLen = SelectedForm->lengthOrCount.stitchLength;
 		}
 		minimumStitchLength = SelectedForm->minFillStitchLen;
 	}
-	if (UserStitchLen > MaxStitchLen) {
-		UserStitchLen = MaxStitchLen;
+	if (userStitchLen > MaxStitchLen) {
+		userStitchLen = MaxStitchLen;
 	}
 	bool flag = true;
 	for (auto iSequence = 0u; iSequence < SequenceIndex - 1; iSequence++) {
-		if (!fi::ritlin(OSequence[iSequence], OSequence[iSequence + 1])) {
+		if (!fi::ritlin(OSequence[iSequence], OSequence[iSequence + 1], userStitchLen)) {
 			flag = false;
 			break;
 		}

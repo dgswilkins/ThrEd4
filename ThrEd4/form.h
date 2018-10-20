@@ -48,7 +48,7 @@ bool         cisin(float xCoordinate, float yCoordinate) noexcept;
 unsigned int closflt(float xCoordinate, float yCoordinate) noexcept;
 bool         closfrm();
 void         clpfil();
-void         clpspac(unsigned int insertPoint, unsigned int count) noexcept;
+void         clpspac(const unsigned insertPoint, unsigned int count) noexcept;
 void         clrfills() noexcept;
 void         cntrx();
 void         col2frm();
@@ -401,7 +401,7 @@ namespace internal {
 	void   ritapbrd(unsigned& interleaveSequenceIndex2);
 	void   ritbrd(unsigned& interleaveSequenceIndex2);
 	void   ritfil(unsigned& interleaveSequenceIndex2);
-	bool   ritlin(const fPOINT& start, const fPOINT& finish);
+	bool   ritlin(const fPOINT& start, const fPOINT& finish, float UserStitchLen);
 	void   ritseg(const std::vector<CLIPNT>& clipStitchPoints,
 	              std::vector<CLPSEG>&       clipSegments,
 	              unsigned                   currentSegmentIndex,
