@@ -42,7 +42,6 @@
 namespace fi = form::internal;
 
 FRMHED*      FormForInsert;       // insert form vertex in this form
-FORMINFO     FormInfo;            // form info used in drawing forms
 FLOAT        FormOffset;          // form offset for clipboard fills
 unsigned int FormVertexNext;      // form vertex storage for form vertex insert
 unsigned int FormVertexPrev;      // form vertex storage for form vertex insert
@@ -78,13 +77,6 @@ void form::frmclr(FRMHED* const destination) noexcept {
 	*destination = head;
 }
 
-void form::internal::duinf(const FRMHED& formHeader) noexcept {
-	// Correct
-	FormInfo.type      = formHeader.attribute & 0xf;
-	FormInfo.attribute = (formHeader.attribute >> FRMSHFT) & 0xf;
-	FormInfo.sideCount = formHeader.vertexCount;
-}
-
 bool form::internal::comp(const dPOINTLINE& point1, const dPOINTLINE& point2) noexcept {
 	if (point1.y < point2.y) {
 		return true;
@@ -93,10 +85,6 @@ bool form::internal::comp(const dPOINTLINE& point1, const dPOINTLINE& point2) no
 		return true;
 	}
 	return false;
-}
-
-void form::internal::getfinfo(unsigned int iForm) noexcept {
-	duinf(FormList[iForm]);
 }
 
 void form::dusqr() {
@@ -533,7 +521,6 @@ void form::ritfrct(unsigned int iForm, HDC dc) {
 	ratsr();
 	SelectObject(StitchWindowDC, FormPen);
 	SetROP2(StitchWindowDC, R2_XORPEN);
-	fi::getfinfo(iForm);
 	const auto& rectangle = FormList[iForm].rectangle;
 	SelectObject(dc, FormSelectedPen);
 	formOutline[0].x = formOutline[6].x = formOutline[7].x = formOutline[8].x = rectangle.left;
@@ -1121,12 +1108,12 @@ bool form::closfrm() {
 			}
 			const auto formLayer = FormList[iForm].attribute & FRMLMSK;
 			if (!ActiveLayer || !formLayer || formLayer == layerCoded) {
-				fi::getfinfo(iForm);
 				const fPOINT* vertices = FormList[iForm].vertices;
 				if (vertices) {
 					// find the closest line first and then find the closest vertex on that line
 					auto length = 0.0;
-					for (auto iVertex = 0u; iVertex < FormInfo.sideCount; iVertex++) {
+					auto sideCount = FormList[iForm].vertexCount;
+					for (auto iVertex = 0u; iVertex < sideCount; iVertex++) {
 						const auto param = fi::findDistanceToSide(vertices[iVertex], vertices[form::nxt(iVertex)], point, length);
 						if ((length < minimumLength) & (length >= 0)) {
 							minimumLength = length;
