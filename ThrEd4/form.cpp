@@ -5392,65 +5392,64 @@ bool form::internal::closat(intersectionStyles& inOutFlag) noexcept {
 	return minimumLength != 1e99;
 }
 
-void form::internal::nufpnt(unsigned int vertex) {
-	form::fltspac(&FormForInsert->vertices[vertex + 1], 1);
-	FormForInsert->vertices[vertex + 1] = SelectedPoint;
-	FormForInsert->vertexCount++;
-	for (auto ind = 0u; ind < FormForInsert->satinGuideCount; ind++) {
-		if (FormForInsert->satinOrAngle.guide[ind].start > vertex) {
-			FormForInsert->satinOrAngle.guide[ind].start++;
+void form::internal::nufpnt(unsigned int vertex, FRMHED *formForInsert) {
+	form::fltspac(&formForInsert->vertices[vertex + 1], 1);
+	formForInsert->vertices[vertex + 1] = SelectedPoint;
+	formForInsert->vertexCount++;
+	for (auto ind = 0u; ind < formForInsert->satinGuideCount; ind++) {
+		if (formForInsert->satinOrAngle.guide[ind].start > vertex) {
+			formForInsert->satinOrAngle.guide[ind].start++;
 		}
-		if (FormForInsert->satinOrAngle.guide[ind].finish > vertex) {
-			FormForInsert->satinOrAngle.guide[ind].finish++;
-		}
-	}
-	if (FormForInsert->wordParam >= vertex + 1) {
-		FormForInsert->wordParam++;
-		FormForInsert->wordParam %= VertexCount;
-	}
-	if (FormForInsert->fillType == CONTF) {
-		if (FormForInsert->angleOrClipData.guide.start > vertex) {
-			FormForInsert->angleOrClipData.guide.start++;
-		}
-		if (FormForInsert->angleOrClipData.guide.finish > vertex) {
-			FormForInsert->angleOrClipData.guide.finish++;
+		if (formForInsert->satinOrAngle.guide[ind].finish > vertex) {
+			formForInsert->satinOrAngle.guide[ind].finish++;
 		}
 	}
-	form::frmlin(FormForInsert->vertices, FormForInsert->vertexCount);
+	if (formForInsert->wordParam >= vertex + 1) {
+		formForInsert->wordParam++;
+		formForInsert->wordParam %= VertexCount;
+	}
+	if (formForInsert->fillType == CONTF) {
+		if (formForInsert->angleOrClipData.guide.start > vertex) {
+			formForInsert->angleOrClipData.guide.start++;
+		}
+		if (formForInsert->angleOrClipData.guide.finish > vertex) {
+			formForInsert->angleOrClipData.guide.finish++;
+		}
+	}
+	form::frmlin(formForInsert->vertices, formForInsert->vertexCount);
 }
 
 double form::internal::p2p(const fPOINT& point0, const fPOINT& point1) noexcept {
 	return hypot(point0.x - point1.x, point0.y - point1.y);
 }
 
-void form::insat() {
+void form::insat() { // insert a point in a form
 	auto inOutFlag = POINT_IN_LINE;
 	if (fi::closat(inOutFlag)) {
 		thred::savdo();
-		SelectedForm          = &FormList[ClosestFormToCursor];
-		FormForInsert         = SelectedForm;
-		const auto lastVertex = FormForInsert->vertexCount - 1;
+		auto* selectedForm          = &FormList[ClosestFormToCursor];
+		const auto lastVertex = selectedForm->vertexCount - 1;
 		form::fvars(ClosestFormToCursor);
 		if (inOutFlag != POINT_IN_LINE) {
-			if (ClosestVertexToCursor == 0 && FormForInsert->type == FRMLINE) {
+			if (ClosestVertexToCursor == 0 && selectedForm->type == FRMLINE) {
 				StateMap.set(StateFlag::PRELIN);
 			}
 			else {
-				if (ClosestVertexToCursor != lastVertex && FormForInsert->type == FRMLINE) {
+				if (ClosestVertexToCursor != lastVertex && selectedForm->type == FRMLINE) {
 					ClosestVertexToCursor = form::prv(ClosestVertexToCursor);
 				}
 			}
-			fi::nufpnt(ClosestVertexToCursor);
+			fi::nufpnt(ClosestVertexToCursor, selectedForm);
 			if (StateMap.testAndReset(StateFlag::PRELIN)) {
-				SelectedPoint.x            = FormForInsert->vertices[0].x;
-				SelectedPoint.y            = FormForInsert->vertices[0].y;
-				FormForInsert->vertices[0] = FormForInsert->vertices[1];
-				FormForInsert->vertices[1] = SelectedPoint;
+				SelectedPoint.x            = selectedForm->vertices[0].x;
+				SelectedPoint.y            = selectedForm->vertices[0].y;
+				selectedForm->vertices[0] = selectedForm->vertices[1];
+				selectedForm->vertices[1] = SelectedPoint;
 			}
 		}
 		else {
 			ClosestVertexToCursor = form::prv(ClosestVertexToCursor);
-			fi::nufpnt(ClosestVertexToCursor);
+			fi::nufpnt(ClosestVertexToCursor, selectedForm);
 		}
 		form::refil();
 	}
@@ -5551,7 +5550,7 @@ void form::rinfrm() {
 	form::duinsf();
 }
 
-void form::infrm() {
+void form::infrm() { // insert multiple points into a form
 	auto inOutFlag = POINT_IN_LINE;
 	if (fi::closat(inOutFlag)) {
 		FormForInsert = &FormList[ClosestFormToCursor];
@@ -5578,7 +5577,7 @@ void form::infrm() {
 
 void form::setins() {
 	thred::px2stch();
-	fi::nufpnt(FormVertexPrev);
+	fi::nufpnt(FormVertexPrev, FormForInsert);
 	if (StateMap.test(StateFlag::PRELIN)) {
 		SelectedPoint.x            = FormForInsert->vertices[0].x;
 		SelectedPoint.y            = FormForInsert->vertices[0].y;

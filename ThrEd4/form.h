@@ -352,7 +352,7 @@ namespace internal {
 	bool notsel() noexcept;
 	bool
 	       nucseg(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned& currentSegmentIndex);
-	void   nufpnt(unsigned int vertex);
+	void   nufpnt(unsigned int vertex, FRMHED *formForInsert);
 	void   doTimeWindow(float rangeX, const std::vector<unsigned>& xPoints, const std::vector<unsigned>& xHistogram);
 	void   nxtrgn(std::vector<RGSEQ>&           tempPath,
 	              const std::vector<RCON>&      pathMap,
