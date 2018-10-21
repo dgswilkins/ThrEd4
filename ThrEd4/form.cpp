@@ -44,7 +44,6 @@ namespace fi = form::internal;
 FRMHED*      FormForInsert;       // insert form vertex in this form
 unsigned int FormVertexNext;      // form vertex storage for form vertex insert
 unsigned int FormVertexPrev;      // form vertex storage for form vertex insert
-SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
 fPOINT*      WorkingFormVertices; // form points for angle fills
 
 unsigned char Level00   = 0;
@@ -1107,7 +1106,7 @@ bool form::closfrm() {
 				const fPOINT* vertices = FormList[iForm].vertices;
 				if (vertices) {
 					// find the closest line first and then find the closest vertex on that line
-					auto length    = 0.0;
+					auto       length    = 0.0;
 					const auto sideCount = FormList[iForm].vertexCount;
 					for (auto iVertex = 0u; iVertex < sideCount; iVertex++) {
 						const auto param = fi::findDistanceToSide(vertices[iVertex], vertices[form::nxt(iVertex)], point, length);
@@ -2696,12 +2695,12 @@ void form::internal::inspnt(std::vector<CLIPNT>& clipStitchPoints) {
 	clipStitchPoints.push_back(clipStitchPoint);
 }
 
-bool form::internal::isect(unsigned int vertex0,
-                           unsigned int vertex1,
-                           fPOINT&      intersection,
-                           float&       length,
-                           const fPOINT&      lineSegmentStart,
-                           const fPOINT&      lineSegmentEnd) noexcept {
+bool form::internal::isect(unsigned int  vertex0,
+                           unsigned int  vertex1,
+                           fPOINT&       intersection,
+                           float&        length,
+                           const fPOINT& lineSegmentStart,
+                           const fPOINT& lineSegmentEnd) noexcept {
 	const dPOINT delta            = { (lineSegmentEnd.x - lineSegmentStart.x), (lineSegmentEnd.y - lineSegmentStart.y) };
 	const dPOINT point            = { (lineSegmentStart.x), (lineSegmentStart.y) };
 	dPOINT       tempIntersection = {};
@@ -2774,8 +2773,8 @@ unsigned form::internal::insect(std::vector<CLIPSORT>&    clipIntersectData,
                                 std::vector<CLIPSORT*>&   arrayOfClipIntersectData,
                                 unsigned                  regionCrossingStart,
                                 unsigned                  regionCrossingEnd,
-                                const fPOINT&                   lineSegmentStart,
-                                const fPOINT&                   lineSegmentEnd) {
+                                const fPOINT&             lineSegmentStart,
+                                const fPOINT&             lineSegmentEnd) {
 	auto       iRegions = 0u, iIntersection = 0u, count = 0u;
 	fRECTANGLE lineSegmentRect = {};
 	fPOINT*    intersection    = nullptr;
@@ -3116,12 +3115,12 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 		iclpxSize--;
 		bool breakFlag = false;
 		for (auto iRegion = 0u; iRegion < iclpxSize; iRegion++) {
-			auto regionCrossingStart = iclpx[iRegion];
-			auto regionCrossingEnd   = iclpx[static_cast<size_t>(iRegion) + 1];
-			pasteLocation.x          = clipWidth * (iRegion + clipGrid.left);
-			auto clipVerticalOffset  = 0.0f;
-			fPOINT       lineSegmentStart = {};    // vertical clipboard line segment start
-			fPOINT       lineSegmentEnd = {};      // vertical clipboard line segment end
+			auto regionCrossingStart  = iclpx[iRegion];
+			auto regionCrossingEnd    = iclpx[static_cast<size_t>(iRegion) + 1];
+			pasteLocation.x           = clipWidth * (iRegion + clipGrid.left);
+			auto   clipVerticalOffset = 0.0f;
+			fPOINT lineSegmentStart   = {}; // vertical clipboard line segment start
+			fPOINT lineSegmentEnd     = {}; // vertical clipboard line segment end
 			if (StateMap.test(StateFlag::TXFIL)) {
 				const auto textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
 				ClipStitchCount        = textureSegments[textureLine].stitchCount;
@@ -3181,8 +3180,13 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 						}
 						clipStitchPoints.back().flag = 2;
 					}
-					const auto count = insect(
-					    clipIntersectData, regionCrossingData, arrayOfClipIntersectData, regionCrossingStart, regionCrossingEnd, lineSegmentStart, lineSegmentEnd);
+					const auto count = insect(clipIntersectData,
+					                          regionCrossingData,
+					                          arrayOfClipIntersectData,
+					                          regionCrossingStart,
+					                          regionCrossingEnd,
+					                          lineSegmentStart,
+					                          lineSegmentEnd);
 					if (count) {
 						for (auto index = 0u; index < count; index++) {
 							clipStitchPoints.push_back({ arrayOfClipIntersectData[index]->point.x,
@@ -3614,9 +3618,9 @@ bool form::internal::notdun(std::vector<RGSEQ>&            tempPath,
 		previousLevel--;
 	}
 
-	const auto regionPath          = &tempPath[sequencePathIndex];
-	regionPath[0].pcon  = mapIndexSequence[doneRegion];
-	regionPath[0].count = mapIndexSequence[static_cast<size_t>(doneRegion) + 1] - regionPath[0].pcon;
+	const auto regionPath = &tempPath[sequencePathIndex];
+	regionPath[0].pcon    = mapIndexSequence[doneRegion];
+	regionPath[0].count   = mapIndexSequence[static_cast<size_t>(doneRegion) + 1] - regionPath[0].pcon;
 	for (auto iPath = 1u; iPath < level; iPath++) {
 		regionPath[iPath].pcon = mapIndexSequence[pathMap[regionPath[iPath - 1].pcon].node];
 		regionPath[iPath].count
@@ -3781,9 +3785,11 @@ void form::internal::brkdun(const std::vector<SMALPNTL*>& sortedLines, unsigned 
 	StateMap.set(StateFlag::BRKFIX);
 }
 
-void form::internal::duseq1() noexcept {
-	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x,
-	      (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
+void form::internal::duseq1(SMALPNTL* sequenceLines) noexcept {
+	if (sequenceLines != nullptr) {
+		rspnt((sequenceLines[1].x - sequenceLines[0].x) / 2 + sequenceLines[0].x,
+		      (sequenceLines[1].y - sequenceLines[0].y) / 2 + sequenceLines[0].y);
+	}
 }
 
 void form::internal::movseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int ind) {
@@ -3806,61 +3812,64 @@ void form::internal::brkseq(const std::vector<SMALPNTL*>& sortedLines,
                             unsigned int                  start,
                             unsigned int                  finish,
                             boost::dynamic_bitset<>&      sequenceMap,
-                            unsigned&                     lastGroup) {
-	StateMap.reset(StateFlag::SEQDUN);
-	if (start > finish) {
-		auto savedGroup = sortedLines[start]->group + 1;
-		// This odd construction for iLine is used to ensure
-		// loop terminates when finish = 0
-		for (auto iLine = start + 1; iLine != finish; iLine--) {
-			const auto iLineDec = iLine - 1;
-			savedGroup--;
-			if (sortedLines[iLineDec]->group != savedGroup) {
-				rspnt(SequenceLines[0].x, SequenceLines[0].y);
-				SequenceLines = sortedLines[iLineDec];
-				rspnt(SequenceLines[0].x, SequenceLines[0].y);
-				savedGroup = SequenceLines[0].group;
-			}
-			else {
-				SequenceLines = sortedLines[iLineDec];
-			}
-			if (sequenceMap.test_set(iLineDec)) {
-				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
-					duseq1();
+                            unsigned&                     lastGroup,
+                            SMALPNTL*                     sequenceLines) {
+	if (sequenceLines != nullptr) {
+		StateMap.reset(StateFlag::SEQDUN);
+		if (start > finish) {
+			auto savedGroup = sortedLines[start]->group + 1;
+			// This odd construction for iLine is used to ensure
+			// loop terminates when finish = 0
+			for (auto iLine = start + 1; iLine != finish; iLine--) {
+				const auto iLineDec = iLine - 1;
+				savedGroup--;
+				if (sortedLines[iLineDec]->group != savedGroup) {
+					rspnt(sequenceLines[0].x, sequenceLines[0].y);
+					sequenceLines = sortedLines[iLineDec];
+					rspnt(sequenceLines[0].x, sequenceLines[0].y);
+					savedGroup = sequenceLines[0].group;
+				}
+				else {
+					sequenceLines = sortedLines[iLineDec];
+				}
+				if (sequenceMap.test_set(iLineDec)) {
+					if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
+						duseq1(sequenceLines);
+					}
+				}
+				else {
+					movseq(sortedLines, iLineDec);
 				}
 			}
-			else {
-				movseq(sortedLines, iLineDec);
-			}
+			lastGroup = sequenceLines->group;
 		}
-		lastGroup = SequenceLines->group;
-	}
-	else {
-		auto savedGroup = sortedLines[start]->group - 1;
-		for (auto iLine = start; iLine <= finish; iLine++) {
-			savedGroup++;
-			if (sortedLines[iLine]->group != savedGroup) {
-				rspnt(SequenceLines[0].x, SequenceLines[0].y);
-				SequenceLines = sortedLines[iLine];
-				rspnt(SequenceLines[0].x, SequenceLines[0].y);
-				savedGroup = SequenceLines[0].group;
-			}
-			else {
-				SequenceLines = sortedLines[iLine];
-			}
-			if (sequenceMap.test_set(iLine)) {
-				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
-					duseq1();
+		else {
+			auto savedGroup = sortedLines[start]->group - 1;
+			for (auto iLine = start; iLine <= finish; iLine++) {
+				savedGroup++;
+				if (sortedLines[iLine]->group != savedGroup) {
+					rspnt(sequenceLines[0].x, sequenceLines[0].y);
+					sequenceLines = sortedLines[iLine];
+					rspnt(sequenceLines[0].x, sequenceLines[0].y);
+					savedGroup = sequenceLines[0].group;
+				}
+				else {
+					sequenceLines = sortedLines[iLine];
+				}
+				if (sequenceMap.test_set(iLine)) {
+					if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
+						duseq1(sequenceLines);
+					}
+				}
+				else {
+					movseq(sortedLines, iLine);
 				}
 			}
-			else {
-				movseq(sortedLines, iLine);
-			}
+			lastGroup = sequenceLines->group;
 		}
-		lastGroup = SequenceLines->group;
-	}
-	if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-		duseq1();
+		if (StateMap.testAndReset(StateFlag::SEQDUN)) {
+			duseq1(sequenceLines);
+		}
 	}
 }
 
@@ -3887,21 +3896,23 @@ void form::internal::dunseq(const std::vector<SMALPNTL*>& sortedLines,
 	lastGroup = sortedLines[finish][0].group;
 }
 
-void form::internal::duseq2(const std::vector<SMALPNTL*>& sortedLines, unsigned int iLine) {
-	SequenceLines = sortedLines[iLine];
-	rspnt((SequenceLines[1].x - SequenceLines[0].x) / 2 + SequenceLines[0].x,
-	      (SequenceLines[1].y - SequenceLines[0].y) / 2 + SequenceLines[0].y);
+void form::internal::duseq2(SMALPNTL* sequenceLines) {
+	if (sequenceLines != nullptr) {
+		rspnt((sequenceLines[1].x - sequenceLines[0].x) / 2 + sequenceLines[0].x,
+		      (sequenceLines[1].y - sequenceLines[0].y) / 2 + sequenceLines[0].y);
+	}
 }
 
 void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
                            unsigned int                  start,
                            unsigned int                  finish,
                            boost::dynamic_bitset<>&      sequenceMap,
-                           unsigned&                     lastGroup) {
+                           unsigned&                     lastGroup,
+                           SMALPNTL*                     sequenceLines) {
 	auto savedTopLine = sortedLines[start][1].line;
 	bool flag         = false;
 
-	SequenceLines = sortedLines[start];
+	sequenceLines = sortedLines[start];
 	StateMap.reset(StateFlag::SEQDUN);
 	if (start > finish) {
 		auto iLine = start + 1;
@@ -3911,34 +3922,34 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 			if (sequenceMap.test_set(iLineDec)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
 					flag = true;
-					duseq2(sortedLines, iLineDec);
+					duseq2(sortedLines[iLineDec]);
 				}
 				else {
 					if (savedTopLine != sortedLines[iLineDec][1].line) {
 						if (iLineDec) {
-							duseq2(sortedLines, iLineDec + 1);
+							duseq2(sortedLines[iLineDec + 1]);
 						}
 						flag = true;
-						duseq2(sortedLines, iLineDec);
-						savedTopLine = SequenceLines[1].line;
+						duseq2(sortedLines[iLineDec]);
+						savedTopLine = sequenceLines[1].line;
 					}
 				}
 			}
 			else {
 				if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-					duseq2(sortedLines, (iLineDec + 1));
+					duseq2(sortedLines[iLineDec + 1]);
 				}
 				flag          = true;
-				SequenceLines = sortedLines[iLineDec];
+				sequenceLines = sortedLines[iLineDec];
 				movseq(sortedLines, iLineDec);
 			}
 		}
 		if (StateMap.testAndReset(StateFlag::SEQDUN)) {
 			flag = true;
-			duseq2(sortedLines, iLine);
+			duseq2(sortedLines[iLine]);
 		}
 		if (flag) {
-			lastGroup = SequenceLines->group;
+			lastGroup = sequenceLines->group;
 		}
 	}
 	else {
@@ -3947,38 +3958,38 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 			if (sequenceMap.test_set(iLine)) {
 				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
 					flag = true;
-					duseq2(sortedLines, iLine);
+					duseq2(sortedLines[iLine]);
 				}
 				else {
 					if (savedTopLine != sortedLines[iLine][1].line) {
 						if (iLine) {
-							duseq2(sortedLines, (iLine - 1));
+							duseq2(sortedLines[iLine - 1]);
 						}
 						flag = true;
-						duseq2(sortedLines, iLine);
-						savedTopLine = SequenceLines[1].line;
+						duseq2(sortedLines[iLine]);
+						savedTopLine = sequenceLines[1].line;
 					}
 				}
 			}
 			else {
 				if (StateMap.testAndReset(StateFlag::SEQDUN)) {
 					if (iLine) {
-						duseq2(sortedLines, (iLine - 1));
+						duseq2(sortedLines[iLine - 1]);
 					}
 				}
 				flag          = true;
-				SequenceLines = sortedLines[iLine];
+				sequenceLines = sortedLines[iLine];
 				movseq(sortedLines, iLine);
 			}
 		}
 		if (StateMap.testAndReset(StateFlag::SEQDUN)) {
 			if (iLine) {
 				flag = true;
-				duseq2(sortedLines, (iLine - 1));
+				duseq2(sortedLines[iLine - 1]);
 			}
 		}
 		if (flag) {
-			lastGroup = SequenceLines->group;
+			lastGroup = sequenceLines->group;
 		}
 	}
 }
@@ -4116,34 +4127,35 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 			}
 		}
 	}
+	SMALPNTL* sequenceLines = nullptr;
 	if (currentRegion->breakCount) {
 		if (dun) {
 			brkdun(sortedLines, seql, seqn);
 		}
 		else {
 			if (lastGroup >= groupEnd) {
-				brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup);
+				brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines);
 				if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
-					brkseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup);
+					brkseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup, sequenceLines);
 				}
 			}
 			else {
 				if (groupStart <= nextGroup) {
 					if (seql != sequenceStart) {
-						brkseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup);
+						brkseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup, sequenceLines);
 					}
-					brkseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap, lastGroup);
+					brkseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap, lastGroup, sequenceLines);
 					if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
-						brkseq(sortedLines, sequenceEnd, seqn, sequenceMap, lastGroup);
+						brkseq(sortedLines, sequenceEnd, seqn, sequenceMap, lastGroup, sequenceLines);
 					}
 				}
 				else {
 					if (seql != sequenceEnd) {
-						brkseq(sortedLines, seql, sequenceEnd, sequenceMap, lastGroup);
+						brkseq(sortedLines, seql, sequenceEnd, sequenceMap, lastGroup, sequenceLines);
 					}
-					brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup);
+					brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines);
 					if (pthi < sequencePathIndex - 1 && sequenceStart != seqn) {
-						brkseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup);
+						brkseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup, sequenceLines);
 					}
 				}
 			}
@@ -4155,26 +4167,26 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 		}
 		else {
 			if (lastGroup >= groupEnd) {
-				duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup);
-				duseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup);
+				duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines);
+				duseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup, sequenceLines);
 			}
 			else {
 				if (groupStart <= nextGroup) {
 					if (seql != sequenceStart) {
-						duseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup);
+						duseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup, sequenceLines);
 					}
-					duseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap, lastGroup);
+					duseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap, lastGroup, sequenceLines);
 					if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
-						duseq(sortedLines, sequenceEnd, seqn, sequenceMap, lastGroup);
+						duseq(sortedLines, sequenceEnd, seqn, sequenceMap, lastGroup, sequenceLines);
 					}
 				}
 				else {
 					if (seql != sequenceEnd) {
-						duseq(sortedLines, seql, sequenceEnd, sequenceMap, lastGroup);
+						duseq(sortedLines, seql, sequenceEnd, sequenceMap, lastGroup, sequenceLines);
 					}
-					duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup);
+					duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines);
 					if (pthi < sequencePathIndex - 1 && sequenceStart != seqn) {
-						duseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup);
+						duseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup, sequenceLines);
 					}
 				}
 			}
@@ -5424,7 +5436,9 @@ double form::internal::p2p(const fPOINT& point0, const fPOINT& point1) noexcept 
 }
 
 void form::insat() { // insert a point in a form
+	// clang-format off
 	auto inOutFlag = POINT_IN_LINE;
+	// clang-format on
 	if (fi::closat(inOutFlag)) {
 		thred::savdo();
 		auto*      selectedForm = &FormList[ClosestFormToCursor];
@@ -5551,7 +5565,9 @@ void form::rinfrm() {
 }
 
 void form::infrm() { // insert multiple points into a form
+	// clang-format off
 	auto inOutFlag = POINT_IN_LINE;
+	// clang-format on
 	if (fi::closat(inOutFlag)) {
 		FormForInsert = &FormList[ClosestFormToCursor];
 		form::fvars(ClosestFormToCursor);

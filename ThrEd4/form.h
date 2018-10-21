@@ -222,7 +222,8 @@ namespace internal {
 	                unsigned int                  start,
 	                unsigned int                  finish,
 	                boost::dynamic_bitset<>&      sequenceMap,
-	                unsigned&                     lastGroup);
+	                unsigned&                     lastGroup,
+	                SMALPNTL*                     SequenceLines);
 	bool     chk2of();
 	void     chkbrd(unsigned& interleaveSequenceIndex2);
 	void     chksid(unsigned int vertexIndex, unsigned clipIntersectSide) noexcept;
@@ -272,9 +273,10 @@ namespace internal {
 	            unsigned int                  start,
 	            unsigned int                  finish,
 	            boost::dynamic_bitset<>&      sequenceMap,
-	            unsigned&                     LastGroup);
-	void  duseq1() noexcept;
-	void  duseq2(const std::vector<SMALPNTL*>& sortedLines, unsigned int iLine);
+	            unsigned&                     LastGroup,
+	            SMALPNTL*                     sequenceLines);
+	void  duseq1(SMALPNTL* SequenceLines) noexcept;
+	void  duseq2(SMALPNTL* SequenceLines);
 	void  duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 	             const std::vector<VRCT2>& fillVerticalRect,
 	             unsigned int              start,
@@ -314,18 +316,18 @@ namespace internal {
 	                std::vector<CLIPSORT*>&   arrayOfClipIntersectData,
 	                unsigned                  regionCrossingStart,
 	                unsigned                  regionCrossingEnd,
-	                const fPOINT&                   lineSegmentStart,
-	                const fPOINT&                   lineSegmentEnd);
+	                const fPOINT&             lineSegmentStart,
+	                const fPOINT&             lineSegmentEnd);
 	void     inspnt(std::vector<CLIPNT>& clipStitchPoints);
 
 	bool isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoint1, double gapToClosestRegion) noexcept;
 
-	bool isect(unsigned int vertex0,
-	           unsigned int vertex1,
-	           fPOINT&      intersection,
-	           float&       length,
-	           const fPOINT&      lineSegmentStart,
-	           const fPOINT&      lineSegmentEnd) noexcept;
+	bool isect(unsigned int  vertex0,
+	           unsigned int  vertex1,
+	           fPOINT&       intersection,
+	           float&        length,
+	           const fPOINT& lineSegmentStart,
+	           const fPOINT& lineSegmentEnd) noexcept;
 	bool isin(std::vector<VCLPX>& regionCrossingData,
 	          float               xCoordinate,
 	          float               yCoordinate,
