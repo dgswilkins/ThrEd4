@@ -42,7 +42,6 @@
 namespace fi = form::internal;
 
 FRMHED*      FormForInsert;       // insert form vertex in this form
-FLOAT        FormOffset;          // form offset for clipboard fills
 unsigned int FormVertexNext;      // form vertex storage for form vertex insert
 unsigned int FormVertexPrev;      // form vertex storage for form vertex insert
 fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
@@ -2605,7 +2604,7 @@ void form::internal::contf() {
 	}
 }
 
-void form::internal::duflt() {
+void form::internal::duflt(float& formOffset) {
 	unsigned iVertex  = 0;
 	float    leftEdge = 1e9;
 
@@ -2616,12 +2615,12 @@ void form::internal::duflt() {
 	}
 	if (leftEdge < ClipRectSize.cx) {
 		StateMap.set(StateFlag::WASNEG);
-		FormOffset = ClipRectSize.cx + fabs(leftEdge) + .05;
+		formOffset = ClipRectSize.cx + fabs(leftEdge) + .05;
 		for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-			CurrentFormVertices[iVertex].x += FormOffset;
+			CurrentFormVertices[iVertex].x += formOffset;
 		}
-		SelectedForm->rectangle.left += FormOffset;
-		SelectedForm->rectangle.right += FormOffset;
+		SelectedForm->rectangle.left += formOffset;
+		SelectedForm->rectangle.right += formOffset;
 	}
 	else {
 		StateMap.reset(StateFlag::WASNEG);
@@ -2980,7 +2979,8 @@ bool form::internal::vscmp(unsigned index1, unsigned index2) noexcept {
 }
 
 void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
-	duflt();
+	auto formOffset = 0.0f;
+	duflt(formOffset);
 	auto clipWidth = ClipRectSize.cx + SelectedForm->fillSpacing;
 	if (StateMap.test(StateFlag::ISUND)) {
 		clipWidth = SelectedForm->underlaySpacing;
@@ -3328,13 +3328,13 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 		SequenceIndex = index;
 		if (StateMap.test(StateFlag::WASNEG)) {
 			for (auto iSequence = 0u; iSequence < SequenceIndex; iSequence++) {
-				OSequence[iSequence].x -= FormOffset;
+				OSequence[iSequence].x -= formOffset;
 			}
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
-				CurrentFormVertices[iVertex].x -= FormOffset;
+				CurrentFormVertices[iVertex].x -= formOffset;
 			}
-			SelectedForm->rectangle.left -= FormOffset;
-			SelectedForm->rectangle.right -= FormOffset;
+			SelectedForm->rectangle.left -= formOffset;
+			SelectedForm->rectangle.right -= formOffset;
 		}
 #endif
 	}

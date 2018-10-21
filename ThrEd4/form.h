@@ -254,7 +254,7 @@ namespace internal {
 	             std::vector<FRMHED>& destinationFormList,
 	             unsigned int         formIndex,
 	             unsigned int&        FormRelocationIndex);
-	void  duflt();
+	void  duflt(float& FormOffset);
 	void  duinf(const FRMHED& formHeader) noexcept;
 	void  dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish, unsigned& lastGroup);
 	void  dupfn(double rotationAngle);
