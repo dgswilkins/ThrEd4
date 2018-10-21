@@ -255,7 +255,6 @@ namespace internal {
 	             unsigned int         formIndex,
 	             unsigned int&        FormRelocationIndex);
 	void  duflt(float& FormOffset);
-	void  duinf(const FRMHED& formHeader) noexcept;
 	void  dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish, unsigned& lastGroup);
 	void  dupfn(double rotationAngle);
 	void  duprotfs(double rotationAngle);
@@ -307,7 +306,6 @@ namespace internal {
 	void  fspic();
 	void  fsvrt();
 	void  getbig() noexcept;
-	void  getfinfo(unsigned int iForm) noexcept;
 	float getlen(std::vector<CLIPNT>& clipStitchPoints, const std::vector<double>& lengths, unsigned iPoint);
 	void  horclpfn(const std::vector<RNGCNT>& textureSegments);
 
@@ -315,12 +313,19 @@ namespace internal {
 	                const std::vector<VCLPX>& regionCrossingData,
 	                std::vector<CLIPSORT*>&   arrayOfClipIntersectData,
 	                unsigned                  regionCrossingStart,
-	                unsigned                  regionCrossingEnd);
+	                unsigned                  regionCrossingEnd,
+	                const fPOINT&                   lineSegmentStart,
+	                const fPOINT&                   lineSegmentEnd);
 	void     inspnt(std::vector<CLIPNT>& clipStitchPoints);
 
 	bool isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoint1, double gapToClosestRegion) noexcept;
 
-	bool isect(unsigned int vertex0, unsigned int vertex1, fPOINT& intersection, float& length) noexcept;
+	bool isect(unsigned int vertex0,
+	           unsigned int vertex1,
+	           fPOINT&      intersection,
+	           float&       length,
+	           const fPOINT&      lineSegmentStart,
+	           const fPOINT&      lineSegmentEnd) noexcept;
 	bool isin(std::vector<VCLPX>& regionCrossingData,
 	          float               xCoordinate,
 	          float               yCoordinate,
@@ -352,7 +357,7 @@ namespace internal {
 	bool notsel() noexcept;
 	bool
 	       nucseg(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned& currentSegmentIndex);
-	void   nufpnt(unsigned int vertex, FRMHED *formForInsert);
+	void   nufpnt(unsigned int vertex, FRMHED* formForInsert);
 	void   doTimeWindow(float rangeX, const std::vector<unsigned>& xPoints, const std::vector<unsigned>& xHistogram);
 	void   nxtrgn(std::vector<RGSEQ>&           tempPath,
 	              const std::vector<RCON>&      pathMap,

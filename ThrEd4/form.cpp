@@ -44,8 +44,6 @@ namespace fi = form::internal;
 FRMHED*      FormForInsert;       // insert form vertex in this form
 unsigned int FormVertexNext;      // form vertex storage for form vertex insert
 unsigned int FormVertexPrev;      // form vertex storage for form vertex insert
-fPOINT       LineSegmentEnd;      // vertical clipboard line segment end
-fPOINT       LineSegmentStart;    // vertical clipboard line segment start
 RGSEQ*       RegionPath;          // path to a region
 SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
 fPOINT*      WorkingFormVertices; // form points for angle fills
@@ -1110,8 +1108,8 @@ bool form::closfrm() {
 				const fPOINT* vertices = FormList[iForm].vertices;
 				if (vertices) {
 					// find the closest line first and then find the closest vertex on that line
-					auto length = 0.0;
-					auto sideCount = FormList[iForm].vertexCount;
+					auto length    = 0.0;
+					const auto sideCount = FormList[iForm].vertexCount;
 					for (auto iVertex = 0u; iVertex < sideCount; iVertex++) {
 						const auto param = fi::findDistanceToSide(vertices[iVertex], vertices[form::nxt(iVertex)], point, length);
 						if ((length < minimumLength) & (length >= 0)) {
@@ -2699,9 +2697,14 @@ void form::internal::inspnt(std::vector<CLIPNT>& clipStitchPoints) {
 	clipStitchPoints.push_back(clipStitchPoint);
 }
 
-bool form::internal::isect(unsigned int vertex0, unsigned int vertex1, fPOINT& intersection, float& length) noexcept {
-	const dPOINT delta            = { (LineSegmentEnd.x - LineSegmentStart.x), (LineSegmentEnd.y - LineSegmentStart.y) };
-	const dPOINT point            = { (LineSegmentStart.x), (LineSegmentStart.y) };
+bool form::internal::isect(unsigned int vertex0,
+                           unsigned int vertex1,
+                           fPOINT&      intersection,
+                           float&       length,
+                           const fPOINT&      lineSegmentStart,
+                           const fPOINT&      lineSegmentEnd) noexcept {
+	const dPOINT delta            = { (lineSegmentEnd.x - lineSegmentStart.x), (lineSegmentEnd.y - lineSegmentStart.y) };
+	const dPOINT point            = { (lineSegmentStart.x), (lineSegmentStart.y) };
 	dPOINT       tempIntersection = {};
 	bool         flag             = false;
 	float        left             = 0.0;
@@ -2718,8 +2721,8 @@ bool form::internal::isect(unsigned int vertex0, unsigned int vertex1, fPOINT& i
 			if (delta.x) {
 				flag = projh(point.y, CurrentFormVertices[vertex0], CurrentFormVertices[vertex1], tempIntersection);
 			}
-			else if (CurrentFormVertices[vertex0].y == LineSegmentStart.y
-			         && CurrentFormVertices[vertex1].y == LineSegmentStart.y) {
+			else if (CurrentFormVertices[vertex0].y == lineSegmentStart.y
+			         && CurrentFormVertices[vertex1].y == lineSegmentStart.y) {
 				if (CurrentFormVertices[vertex0].x < CurrentFormVertices[vertex1].x) {
 					left  = CurrentFormVertices[vertex0].x;
 					right = CurrentFormVertices[vertex1].x;
@@ -2728,9 +2731,9 @@ bool form::internal::isect(unsigned int vertex0, unsigned int vertex1, fPOINT& i
 					left  = CurrentFormVertices[vertex1].x;
 					right = CurrentFormVertices[vertex0].x;
 				}
-				if (LineSegmentStart.x > left && LineSegmentStart.x < right) {
-					intersection.x = LineSegmentStart.x;
-					intersection.y = LineSegmentStart.y;
+				if (lineSegmentStart.x > left && lineSegmentStart.x < right) {
+					intersection.x = lineSegmentStart.x;
+					intersection.y = lineSegmentStart.y;
 					length         = 0;
 					return true;
 				}
@@ -2749,9 +2752,9 @@ bool form::internal::isect(unsigned int vertex0, unsigned int vertex1, fPOINT& i
 	}
 	intersection.x = static_cast<float>(tempIntersection.x);
 	intersection.y = static_cast<float>(tempIntersection.y);
-	length         = hypot(tempIntersection.x - LineSegmentStart.x, tempIntersection.y - LineSegmentStart.y);
+	length         = hypot(tempIntersection.x - lineSegmentStart.x, tempIntersection.y - lineSegmentStart.y);
 	// ToDo - should length be determined from start or end?
-	//	 hypot(tempIntersection.x-LineSegmentEnd.x,tempIntersection.y-LineSegmentEnd.y);
+	//	 hypot(tempIntersection.x-lineSegmentEnd.x,tempIntersection.y-lineSegmentEnd.y);
 	return flag;
 }
 
@@ -2771,40 +2774,46 @@ unsigned form::internal::insect(std::vector<CLIPSORT>&    clipIntersectData,
                                 const std::vector<VCLPX>& regionCrossingData,
                                 std::vector<CLIPSORT*>&   arrayOfClipIntersectData,
                                 unsigned                  regionCrossingStart,
-                                unsigned                  regionCrossingEnd) {
+                                unsigned                  regionCrossingEnd,
+                                const fPOINT&                   lineSegmentStart,
+                                const fPOINT&                   lineSegmentEnd) {
 	auto       iRegions = 0u, iIntersection = 0u, count = 0u;
 	fRECTANGLE lineSegmentRect = {};
 	fPOINT*    intersection    = nullptr;
 
-	if (LineSegmentEnd.x > LineSegmentStart.x) {
-		lineSegmentRect.left  = LineSegmentStart.x;
-		lineSegmentRect.right = LineSegmentEnd.x;
+	if (lineSegmentEnd.x > lineSegmentStart.x) {
+		lineSegmentRect.left  = lineSegmentStart.x;
+		lineSegmentRect.right = lineSegmentEnd.x;
 	}
 	else {
-		lineSegmentRect.left  = LineSegmentEnd.x;
-		lineSegmentRect.right = LineSegmentStart.x;
+		lineSegmentRect.left  = lineSegmentEnd.x;
+		lineSegmentRect.right = lineSegmentStart.x;
 	}
-	if (LineSegmentEnd.y > LineSegmentStart.y) {
-		lineSegmentRect.top    = LineSegmentEnd.y;
-		lineSegmentRect.bottom = LineSegmentStart.y;
+	if (lineSegmentEnd.y > lineSegmentStart.y) {
+		lineSegmentRect.top    = lineSegmentEnd.y;
+		lineSegmentRect.bottom = lineSegmentStart.y;
 	}
 	else {
-		lineSegmentRect.top    = LineSegmentStart.y;
-		lineSegmentRect.bottom = LineSegmentEnd.y;
+		lineSegmentRect.top    = lineSegmentStart.y;
+		lineSegmentRect.bottom = lineSegmentEnd.y;
 	}
 	iIntersection = count = 0;
 	arrayOfClipIntersectData.clear();
 	for (iRegions = regionCrossingStart; iRegions < regionCrossingEnd; iRegions++) {
 		const auto currentVertex = regionCrossingData[iRegions].vertex;
 		const auto nextVertex    = form::nxt(currentVertex);
-		if (isect(
-		        currentVertex, nextVertex, clipIntersectData[iIntersection].point, clipIntersectData[iIntersection].sideLength)) {
+		if (isect(currentVertex,
+		          nextVertex,
+		          clipIntersectData[iIntersection].point,
+		          clipIntersectData[iIntersection].sideLength,
+		          lineSegmentStart,
+		          lineSegmentEnd)) {
 			intersection = &clipIntersectData[iIntersection].point;
 			if (intersection->x >= lineSegmentRect.left && intersection->x <= lineSegmentRect.right
 			    && intersection->y >= lineSegmentRect.bottom && intersection->y <= lineSegmentRect.top) {
 				clipIntersectData[iIntersection].segmentLength
-				    = hypot(clipIntersectData[iIntersection].point.x - LineSegmentStart.x,
-				            clipIntersectData[iIntersection].point.y - LineSegmentStart.y);
+				    = hypot(clipIntersectData[iIntersection].point.x - lineSegmentStart.x,
+				            clipIntersectData[iIntersection].point.y - lineSegmentStart.y);
 				clipIntersectData[iIntersection].vertexIndex = currentVertex;
 				arrayOfClipIntersectData.push_back(&clipIntersectData[iIntersection]);
 				iIntersection++;
@@ -3112,12 +3121,14 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 			auto regionCrossingEnd   = iclpx[static_cast<size_t>(iRegion) + 1];
 			pasteLocation.x          = clipWidth * (iRegion + clipGrid.left);
 			auto clipVerticalOffset  = 0.0f;
+			fPOINT       lineSegmentStart = {};    // vertical clipboard line segment start
+			fPOINT       lineSegmentEnd = {};      // vertical clipboard line segment end
 			if (StateMap.test(StateFlag::TXFIL)) {
 				const auto textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
 				ClipStitchCount        = textureSegments[textureLine].stitchCount;
 				texture                = &TexturePointsBuffer->at(gsl::narrow_cast<size_t>(SelectedForm->fillInfo.texture.index)
                                                    + textureSegments[textureLine].line);
-				LineSegmentStart.x     = pasteLocation.x;
+				lineSegmentStart.x     = pasteLocation.x;
 				if (SelectedForm->txof) {
 					const auto lineOffset = (iRegion + clipGrid.left) / SelectedForm->fillInfo.texture.lines;
 					clipVerticalOffset    = fmod(SelectedForm->txof * lineOffset, SelectedForm->fillInfo.texture.height);
@@ -3127,36 +3138,36 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 				if (clipGridOffset) {
 					clipVerticalOffset = static_cast<float>(iRegion % clipGridOffset) / (clipGridOffset * ClipRectSize.cy);
 				}
-				LineSegmentStart.x = pasteLocation.x + ClipBuffer[0].x;
+				lineSegmentStart.x = pasteLocation.x + ClipBuffer[0].x;
 			}
-			LineSegmentStart.y = clipGrid.bottom * ClipRectSize.cy;
+			lineSegmentStart.y = clipGrid.bottom * ClipRectSize.cy;
 			if (clipGridOffset) {
 				clipVerticalOffset = static_cast<float>(iRegion % clipGridOffset) / (clipGridOffset * ClipRectSize.cy);
 			}
 			for (auto iVerticalGrid = clipGrid.bottom; iVerticalGrid < clipGrid.top; iVerticalGrid++) {
 				pasteLocation.y  = iVerticalGrid * ClipRectSize.cy - clipVerticalOffset;
-				LineSegmentEnd.x = pasteLocation.x + ClipBuffer[0].x;
-				LineSegmentEnd.y = pasteLocation.y + ClipBuffer[0].y;
+				lineSegmentEnd.x = pasteLocation.x + ClipBuffer[0].x;
+				lineSegmentEnd.y = pasteLocation.y + ClipBuffer[0].y;
 				if (clipStitchPoints.empty()) {
-					LineSegmentStart.x = LineSegmentEnd.x;
-					LineSegmentStart.y = LineSegmentEnd.y;
+					lineSegmentStart.x = lineSegmentEnd.x;
+					lineSegmentStart.y = lineSegmentEnd.y;
 				}
 				for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 					if (StateMap.test(StateFlag::TXFIL)) {
 						if (texture != nullptr) {
-							LineSegmentEnd.x = pasteLocation.x;
-							LineSegmentEnd.y = pasteLocation.y + texture[iStitch].y;
+							lineSegmentEnd.x = pasteLocation.x;
+							lineSegmentEnd.y = pasteLocation.y + texture[iStitch].y;
 						}
 					}
 					else {
-						LineSegmentEnd.x = pasteLocation.x + ClipBuffer[iStitch].x;
-						LineSegmentEnd.y = pasteLocation.y + ClipBuffer[iStitch].y;
+						lineSegmentEnd.x = pasteLocation.x + ClipBuffer[iStitch].x;
+						lineSegmentEnd.y = pasteLocation.y + ClipBuffer[iStitch].y;
 					}
 
-					clipStitchPoints.push_back({ LineSegmentStart.x, LineSegmentStart.y, 0, 0 });
+					clipStitchPoints.push_back({ lineSegmentStart.x, lineSegmentStart.y, 0, 0 });
 					if (isin(regionCrossingData,
-					         LineSegmentStart.x,
-					         LineSegmentStart.y,
+					         lineSegmentStart.x,
+					         lineSegmentStart.y,
 					         regionCrossingStart,
 					         regionCrossingEnd,
 					         boundingRect)) {
@@ -3172,7 +3183,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 						clipStitchPoints.back().flag = 2;
 					}
 					const auto count = insect(
-					    clipIntersectData, regionCrossingData, arrayOfClipIntersectData, regionCrossingStart, regionCrossingEnd);
+					    clipIntersectData, regionCrossingData, arrayOfClipIntersectData, regionCrossingStart, regionCrossingEnd, lineSegmentStart, lineSegmentEnd);
 					if (count) {
 						for (auto index = 0u; index < count; index++) {
 							clipStitchPoints.push_back({ arrayOfClipIntersectData[index]->point.x,
@@ -3188,7 +3199,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 							break;
 						}
 					}
-					LineSegmentStart = LineSegmentEnd;
+					lineSegmentStart = lineSegmentEnd;
 				}
 				if (breakFlag) {
 					break;
@@ -5379,31 +5390,33 @@ bool form::internal::closat(intersectionStyles& inOutFlag) noexcept {
 	return minimumLength != 1e99;
 }
 
-void form::internal::nufpnt(unsigned int vertex, FRMHED *formForInsert) {
-	form::fltspac(&formForInsert->vertices[vertex + 1], 1);
-	formForInsert->vertices[vertex + 1] = SelectedPoint;
-	formForInsert->vertexCount++;
-	for (auto ind = 0u; ind < formForInsert->satinGuideCount; ind++) {
-		if (formForInsert->satinOrAngle.guide[ind].start > vertex) {
-			formForInsert->satinOrAngle.guide[ind].start++;
+void form::internal::nufpnt(unsigned int vertex, FRMHED* formForInsert) {
+	if (formForInsert != nullptr) {
+		form::fltspac(&formForInsert->vertices[vertex + 1], 1);
+		formForInsert->vertices[vertex + 1] = SelectedPoint;
+		formForInsert->vertexCount++;
+		for (auto ind = 0u; ind < formForInsert->satinGuideCount; ind++) {
+			if (formForInsert->satinOrAngle.guide[ind].start > vertex) {
+				formForInsert->satinOrAngle.guide[ind].start++;
+			}
+			if (formForInsert->satinOrAngle.guide[ind].finish > vertex) {
+				formForInsert->satinOrAngle.guide[ind].finish++;
+			}
 		}
-		if (formForInsert->satinOrAngle.guide[ind].finish > vertex) {
-			formForInsert->satinOrAngle.guide[ind].finish++;
+		if (formForInsert->wordParam >= vertex + 1) {
+			formForInsert->wordParam++;
+			formForInsert->wordParam %= VertexCount;
 		}
+		if (formForInsert->fillType == CONTF) {
+			if (formForInsert->angleOrClipData.guide.start > vertex) {
+				formForInsert->angleOrClipData.guide.start++;
+			}
+			if (formForInsert->angleOrClipData.guide.finish > vertex) {
+				formForInsert->angleOrClipData.guide.finish++;
+			}
+		}
+		form::frmlin(formForInsert->vertices, formForInsert->vertexCount);
 	}
-	if (formForInsert->wordParam >= vertex + 1) {
-		formForInsert->wordParam++;
-		formForInsert->wordParam %= VertexCount;
-	}
-	if (formForInsert->fillType == CONTF) {
-		if (formForInsert->angleOrClipData.guide.start > vertex) {
-			formForInsert->angleOrClipData.guide.start++;
-		}
-		if (formForInsert->angleOrClipData.guide.finish > vertex) {
-			formForInsert->angleOrClipData.guide.finish++;
-		}
-	}
-	form::frmlin(formForInsert->vertices, formForInsert->vertexCount);
 }
 
 double form::internal::p2p(const fPOINT& point0, const fPOINT& point1) noexcept {
@@ -5414,8 +5427,8 @@ void form::insat() { // insert a point in a form
 	auto inOutFlag = POINT_IN_LINE;
 	if (fi::closat(inOutFlag)) {
 		thred::savdo();
-		auto* selectedForm          = &FormList[ClosestFormToCursor];
-		const auto lastVertex = selectedForm->vertexCount - 1;
+		auto*      selectedForm = &FormList[ClosestFormToCursor];
+		const auto lastVertex   = selectedForm->vertexCount - 1;
 		form::fvars(ClosestFormToCursor);
 		if (inOutFlag != POINT_IN_LINE) {
 			if (ClosestVertexToCursor == 0 && selectedForm->type == FRMLINE) {
@@ -5428,8 +5441,8 @@ void form::insat() { // insert a point in a form
 			}
 			fi::nufpnt(ClosestVertexToCursor, selectedForm);
 			if (StateMap.testAndReset(StateFlag::PRELIN)) {
-				SelectedPoint.x            = selectedForm->vertices[0].x;
-				SelectedPoint.y            = selectedForm->vertices[0].y;
+				SelectedPoint.x           = selectedForm->vertices[0].x;
+				SelectedPoint.y           = selectedForm->vertices[0].y;
 				selectedForm->vertices[0] = selectedForm->vertices[1];
 				selectedForm->vertices[1] = SelectedPoint;
 			}
