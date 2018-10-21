@@ -44,7 +44,6 @@ namespace fi = form::internal;
 FRMHED*      FormForInsert;       // insert form vertex in this form
 unsigned int FormVertexNext;      // form vertex storage for form vertex insert
 unsigned int FormVertexPrev;      // form vertex storage for form vertex insert
-RGSEQ*       RegionPath;          // path to a region
 SMALPNTL*    SequenceLines;       // line for vertical/horizontal/angle fills
 fPOINT*      WorkingFormVertices; // form points for angle fills
 
@@ -3615,18 +3614,18 @@ bool form::internal::notdun(std::vector<RGSEQ>&            tempPath,
 		previousLevel--;
 	}
 
-	RegionPath          = &tempPath[sequencePathIndex];
-	RegionPath[0].pcon  = mapIndexSequence[doneRegion];
-	RegionPath[0].count = mapIndexSequence[static_cast<size_t>(doneRegion) + 1] - RegionPath[0].pcon;
+	const auto regionPath          = &tempPath[sequencePathIndex];
+	regionPath[0].pcon  = mapIndexSequence[doneRegion];
+	regionPath[0].count = mapIndexSequence[static_cast<size_t>(doneRegion) + 1] - regionPath[0].pcon;
 	for (auto iPath = 1u; iPath < level; iPath++) {
-		RegionPath[iPath].pcon = mapIndexSequence[pathMap[RegionPath[iPath - 1].pcon].node];
-		RegionPath[iPath].count
-		    = mapIndexSequence[static_cast<size_t>(pathMap[RegionPath[static_cast<size_t>(iPath) - 1].pcon].node) + 1]
-		      - RegionPath[iPath].pcon;
+		regionPath[iPath].pcon = mapIndexSequence[pathMap[regionPath[iPath - 1].pcon].node];
+		regionPath[iPath].count
+		    = mapIndexSequence[static_cast<size_t>(pathMap[regionPath[static_cast<size_t>(iPath) - 1].pcon].node) + 1]
+		      - regionPath[iPath].pcon;
 	}
-	while (visitedRegions[pathMap[RegionPath[previousLevel].pcon].node] && previousLevel >= 0) {
-		if (--RegionPath[previousLevel].count > 0) {
-			RegionPath[previousLevel].pcon++;
+	while (visitedRegions[pathMap[regionPath[previousLevel].pcon].node] && previousLevel >= 0) {
+		if (--regionPath[previousLevel].count > 0) {
+			regionPath[previousLevel].pcon++;
 		}
 		else {
 			auto pivot = previousLevel;
@@ -3637,20 +3636,20 @@ bool form::internal::notdun(std::vector<RGSEQ>&            tempPath,
 				else {
 					return true;
 				}
-				RegionPath[pivot].count--;
-				RegionPath[pivot].pcon++;
-			} while (!RegionPath[pivot].count);
+				regionPath[pivot].count--;
+				regionPath[pivot].pcon++;
+			} while (!regionPath[pivot].count);
 			pivot++;
 			while (pivot <= previousLevel) {
 				if (pivot) {
-					RegionPath[pivot].pcon = mapIndexSequence[pathMap[RegionPath[pivot - 1].pcon].node];
-					RegionPath[pivot].count
-					    = mapIndexSequence[static_cast<size_t>(pathMap[RegionPath[static_cast<size_t>(pivot) - 1].pcon].node) + 1]
-					      - RegionPath[pivot].pcon;
+					regionPath[pivot].pcon = mapIndexSequence[pathMap[regionPath[pivot - 1].pcon].node];
+					regionPath[pivot].count
+					    = mapIndexSequence[static_cast<size_t>(pathMap[regionPath[static_cast<size_t>(pivot) - 1].pcon].node) + 1]
+					      - regionPath[pivot].pcon;
 				}
 				else {
-					if (--RegionPath[0].count) {
-						RegionPath[0].pcon++;
+					if (--regionPath[0].count) {
+						regionPath[0].pcon++;
 					}
 					else {
 						return true;
@@ -3740,12 +3739,13 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 			return;
 		}
 	}
+	const auto regionPath = &tempPath[sequencePathIndex];
 	for (auto iPath = 0u; iPath < pathLength; iPath++) {
 		tempPath[sequencePathIndex].skp    = false;
-		tempPath[sequencePathIndex++].pcon = RegionPath[iPath].pcon;
-		visitedRegions.set(pathMap[RegionPath[iPath].pcon].node);
+		tempPath[sequencePathIndex++].pcon = regionPath[iPath].pcon;
+		visitedRegions.set(pathMap[regionPath[iPath].pcon].node);
 	}
-	doneRegion = pathMap[RegionPath[pathLength - 1].pcon].node;
+	doneRegion = pathMap[regionPath[pathLength - 1].pcon].node;
 }
 
 void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
