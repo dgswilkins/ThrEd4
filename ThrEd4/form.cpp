@@ -3785,7 +3785,7 @@ void form::internal::brkdun(const std::vector<SMALPNTL*>& sortedLines, unsigned 
 	StateMap.set(StateFlag::BRKFIX);
 }
 
-void form::internal::duseq1(SMALPNTL* sequenceLines) noexcept {
+void form::internal::duseq1(const SMALPNTL* sequenceLines) noexcept {
 	if (sequenceLines != nullptr) {
 		rspnt((sequenceLines[1].x - sequenceLines[0].x) / 2 + sequenceLines[0].x,
 		      (sequenceLines[1].y - sequenceLines[0].y) / 2 + sequenceLines[0].y);
@@ -3896,7 +3896,7 @@ void form::internal::dunseq(const std::vector<SMALPNTL*>& sortedLines,
 	lastGroup = sortedLines[finish][0].group;
 }
 
-void form::internal::duseq2(SMALPNTL* sequenceLines) {
+void form::internal::duseq2(const SMALPNTL* sequenceLines) noexcept {
 	if (sequenceLines != nullptr) {
 		rspnt((sequenceLines[1].x - sequenceLines[0].x) / 2 + sequenceLines[0].x,
 		      (sequenceLines[1].y - sequenceLines[0].y) / 2 + sequenceLines[0].y);
@@ -3913,83 +3913,85 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 	bool flag         = false;
 
 	sequenceLines = sortedLines[start];
-	StateMap.reset(StateFlag::SEQDUN);
-	if (start > finish) {
-		auto iLine = start + 1;
-		// This odd construction for iLine is used to ensure loop terminates when finish = 0
-		for (iLine = start + 1; iLine != finish; iLine--) {
-			const auto iLineDec = iLine - 1;
-			if (sequenceMap.test_set(iLineDec)) {
-				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
-					flag = true;
-					duseq2(sortedLines[iLineDec]);
-				}
-				else {
-					if (savedTopLine != sortedLines[iLineDec][1].line) {
-						if (iLineDec) {
-							duseq2(sortedLines[iLineDec + 1]);
-						}
+	if (sequenceLines != nullptr) {
+		StateMap.reset(StateFlag::SEQDUN);
+		if (start > finish) {
+			auto iLine = start + 1;
+			// This odd construction for iLine is used to ensure loop terminates when finish = 0
+			for (iLine = start + 1; iLine != finish; iLine--) {
+				const auto iLineDec = iLine - 1;
+				if (sequenceMap.test_set(iLineDec)) {
+					if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
 						flag = true;
 						duseq2(sortedLines[iLineDec]);
-						savedTopLine = sequenceLines[1].line;
+					}
+					else {
+						if (savedTopLine != sortedLines[iLineDec][1].line) {
+							if (iLineDec) {
+								duseq2(sortedLines[iLineDec + 1]);
+							}
+							flag = true;
+							duseq2(sortedLines[iLineDec]);
+							savedTopLine = sequenceLines[1].line;
+						}
 					}
 				}
-			}
-			else {
-				if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-					duseq2(sortedLines[iLineDec + 1]);
+				else {
+					if (StateMap.testAndReset(StateFlag::SEQDUN)) {
+						duseq2(sortedLines[iLineDec + 1]);
+					}
+					flag          = true;
+					sequenceLines = sortedLines[iLineDec];
+					movseq(sortedLines, iLineDec);
 				}
-				flag          = true;
-				sequenceLines = sortedLines[iLineDec];
-				movseq(sortedLines, iLineDec);
+			}
+			if (StateMap.testAndReset(StateFlag::SEQDUN)) {
+				flag = true;
+				duseq2(sortedLines[iLine]);
+			}
+			if (flag) {
+				lastGroup = sequenceLines->group;
 			}
 		}
-		if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-			flag = true;
-			duseq2(sortedLines[iLine]);
-		}
-		if (flag) {
-			lastGroup = sequenceLines->group;
-		}
-	}
-	else {
-		auto iLine = start;
-		for (iLine = start; iLine <= finish; iLine++) {
-			if (sequenceMap.test_set(iLine)) {
-				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
-					flag = true;
-					duseq2(sortedLines[iLine]);
+		else {
+			auto iLine = start;
+			for (iLine = start; iLine <= finish; iLine++) {
+				if (sequenceMap.test_set(iLine)) {
+					if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
+						flag = true;
+						duseq2(sortedLines[iLine]);
+					}
+					else {
+						if (savedTopLine != sortedLines[iLine][1].line) {
+							if (iLine) {
+								duseq2(sortedLines[iLine - 1]);
+							}
+							flag = true;
+							duseq2(sortedLines[iLine]);
+							savedTopLine = sequenceLines[1].line;
+						}
+					}
 				}
 				else {
-					if (savedTopLine != sortedLines[iLine][1].line) {
+					if (StateMap.testAndReset(StateFlag::SEQDUN)) {
 						if (iLine) {
 							duseq2(sortedLines[iLine - 1]);
 						}
-						flag = true;
-						duseq2(sortedLines[iLine]);
-						savedTopLine = sequenceLines[1].line;
 					}
+					flag          = true;
+					sequenceLines = sortedLines[iLine];
+					movseq(sortedLines, iLine);
 				}
 			}
-			else {
-				if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-					if (iLine) {
-						duseq2(sortedLines[iLine - 1]);
-					}
+			if (StateMap.testAndReset(StateFlag::SEQDUN)) {
+				if (iLine) {
+					flag = true;
+					duseq2(sortedLines[iLine - 1]);
 				}
-				flag          = true;
-				sequenceLines = sortedLines[iLine];
-				movseq(sortedLines, iLine);
 			}
-		}
-		if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-			if (iLine) {
-				flag = true;
-				duseq2(sortedLines[iLine - 1]);
+			if (flag) {
+				lastGroup = sequenceLines->group;
 			}
-		}
-		if (flag) {
-			lastGroup = sequenceLines->group;
 		}
 	}
 }

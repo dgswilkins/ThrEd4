@@ -17149,7 +17149,6 @@ void thred::internal::init() {
 	GetClientRect(ThrEdWindow, &ThredWindowRect);
 	stchWnd();
 	displayText::lodstr();
-	formForms::maxwid(STR_PRF0, STR_PRF27);
 	if (!IniFileHandle) {
 		// initialize the user color and thread size arrays
 		for (auto iColor = 0u; iColor < 16; iColor++) {

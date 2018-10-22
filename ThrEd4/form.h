@@ -275,8 +275,8 @@ namespace internal {
 	            boost::dynamic_bitset<>&      sequenceMap,
 	            unsigned&                     LastGroup,
 	            SMALPNTL*                     sequenceLines);
-	void  duseq1(SMALPNTL* SequenceLines) noexcept;
-	void  duseq2(SMALPNTL* SequenceLines);
+	void  duseq1(const SMALPNTL* SequenceLines) noexcept;
+	void  duseq2(const SMALPNTL* SequenceLines) noexcept;
 	void  duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 	             const std::vector<VRCT2>& fillVerticalRect,
 	             unsigned int              start,

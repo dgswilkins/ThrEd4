@@ -31,7 +31,7 @@ void dazdef();
 void dasyfrm();
 void frmnum();
 void maxtsiz(const std::wstring& label, POINT& textSize);
-void maxwid(unsigned start, unsigned finish);
+auto maxwid(unsigned start, unsigned finish);
 void prfmsg();
 void prfsid(HWND wnd) noexcept;
 void refrm();

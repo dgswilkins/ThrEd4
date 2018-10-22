@@ -42,7 +42,6 @@ namespace ffi = formForms::internal;
 
 RECT     LabelWindowCoords;         // location of left windows in the form data sheet
 POINT    LabelWindowSize;           // size of the left windows in the form data sheet
-unsigned PreferenceWindowTextWidth; // size of the text part of the preference window
 RECT     ValueWindowCoords;         // location of right windows in the form data sheet
 POINT    ValueWindowSize;           // size of the right windows in the form data sheet
 
@@ -60,13 +59,13 @@ void formForms::maxtsiz(const std::wstring& label, POINT& textSize) {
 	}
 }
 
-void formForms::maxwid(unsigned start, unsigned finish) {
+auto formForms::maxwid(unsigned start, unsigned finish) {
 	POINT textSize = {};
 
 	while (start <= finish) {
 		formForms::maxtsiz((*StringTable)[start++], textSize);
 	}
-	PreferenceWindowTextWidth = textSize.x + 6;
+	return textSize.x + 6;
 }
 
 HWND formForms::internal::txtwin(const std::wstring& windowName, const RECT& location) {
@@ -597,22 +596,22 @@ void formForms::prfmsg() {
 	ValueWindowSize.x = ValueWindowSize.y = 0;
 	formForms::maxtsiz((*StringTable)[STR_PRF0 + 4], LabelWindowSize);
 	formForms::maxtsiz((*StringTable)[STR_TAPR], ValueWindowSize);
-	LabelWindowSize.x = PreferenceWindowTextWidth;
+	LabelWindowSize.x = formForms::maxwid(STR_PRF0, STR_PRF27);
 	LabelWindowSize.x += 4;
 	DestroyWindow(PreferencesWindow);
-	PreferenceWindowWidth = LabelWindowSize.x + ValueWindowSize.x + 18;
-	PreferencesWindow     = CreateWindow(L"STATIC",
-                                     nullptr,
-                                     WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                     ButtonWidthX3 + 3,
-                                     3,
-                                     PreferenceWindowWidth,
-                                     LabelWindowSize.y * PRFLINS + 12,
-                                     ThrEdWindow,
-                                     nullptr,
-                                     ThrEdInstance,
-                                     nullptr);
-	auto preferenceDC     = GetDC(PreferencesWindow);
+	auto windowWidth  = LabelWindowSize.x + ValueWindowSize.x + 18;
+	PreferencesWindow = CreateWindow(L"STATIC",
+	                                 nullptr,
+	                                 WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                                 ButtonWidthX3 + 3,
+	                                 3,
+	                                 windowWidth,
+	                                 LabelWindowSize.y * PRFLINS + 12,
+	                                 ThrEdWindow,
+	                                 nullptr,
+	                                 ThrEdInstance,
+	                                 nullptr);
+	auto preferenceDC = GetDC(PreferencesWindow);
 	GetClientRect(PreferencesWindow, &preferenceRect);
 	FillRect(preferenceDC, &preferenceRect, GetSysColorBrush(COLOR_WINDOW));
 	LabelWindowCoords.top = ValueWindowCoords.top = 3;
