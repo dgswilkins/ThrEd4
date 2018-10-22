@@ -57,6 +57,7 @@ void         spltsat(const SATCON& currentGuide);
 namespace internal {
 
 	bool     chkbak(const std::vector<dPOINT>& satinBackup, const dPOINT& pnt);
+	void     filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point, unsigned& SatinBackupIndex);
 	SATCON*  nusac(unsigned int formIndex, unsigned guideCount) noexcept;
 	void     outfn(unsigned start, unsigned finish, double satinWidth);
 	void     sacspac(const SATCON* startGuide, unsigned guideCount) noexcept;

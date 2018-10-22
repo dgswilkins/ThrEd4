@@ -599,7 +599,7 @@ void formForms::prfmsg() {
 	LabelWindowSize.x = formForms::maxwid(STR_PRF0, STR_PRF27);
 	LabelWindowSize.x += 4;
 	DestroyWindow(PreferencesWindow);
-	auto windowWidth  = LabelWindowSize.x + ValueWindowSize.x + 18;
+	const auto windowWidth  = LabelWindowSize.x + ValueWindowSize.x + 18;
 	PreferencesWindow = CreateWindow(L"STATIC",
 	                                 nullptr,
 	                                 WS_CHILD | WS_VISIBLE | WS_BORDER,

@@ -41,7 +41,6 @@
 namespace si = satin::internal;
 
 unsigned int StartPoint;       // starting formOrigin for a satin stitch guide-line
-unsigned     SatinBackupIndex; // pointer for backup stitches in satin fills
 unsigned     SatinIndex;       // pointer to next satin form origin to enter
 
 unsigned satin::internal::satind(const SATCON* const guide) noexcept {
@@ -1236,9 +1235,9 @@ void satin::satpnt1() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void form::filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point) {
-	satinBackup[SatinBackupIndex++] = point;
-	SatinBackupIndex &= (satinBackup.size() - 1);
+void si::filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point, unsigned& satinBackupIndex) {
+	satinBackup[satinBackupIndex++] = point;
+	satinBackupIndex &= (satinBackup.size() - 1);
 	form::filinsb(point);
 }
 
@@ -1260,7 +1259,6 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 	if (!StateMap.testAndSet(StateFlag::SAT1)) {
 		SelectedPoint = insidePoints[start];
 	}
-	SatinBackupIndex = 0;
 	for (auto& sb : satinBackup) {
 		sb.x = 1e12;
 		sb.y = 1e12;
@@ -1297,6 +1295,7 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 	}
 	const dPOINT innerStep = { innerDelta.x / count, innerDelta.y / count };
 	const dPOINT outerStep = { outerDelta.x / count, outerDelta.y / count };
+	auto satinBackupIndex = 0u;
 	for (auto iStep = 0u; iStep < count; iStep++) {
 		innerPoint.x += innerStep.x;
 		innerPoint.y += innerStep.y;
@@ -1313,7 +1312,7 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 					offset.x -= offsetStep.x;
 					offset.y -= offsetStep.y;
 				}
-				form::filinsbw(satinBackup, offset);
+				si::filinsbw(satinBackup, offset, satinBackupIndex);
 			}
 			else {
 				form::filinsb(innerPoint);
@@ -1330,7 +1329,7 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 					offset.x -= offsetStep.x;
 					offset.y -= offsetStep.y;
 				}
-				form::filinsbw(satinBackup, offset);
+				si::filinsbw(satinBackup, offset, satinBackupIndex);
 			}
 			else {
 				form::filinsb(outerPoint);

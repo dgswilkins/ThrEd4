@@ -87,7 +87,6 @@ void         filclpx();
 void         filhor();
 void         filin(dPOINT currentPoint);
 void         filinsb(const dPOINT& point);
-void         filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point);
 void         filinu(const dPOINT& inPoint);
 void         filsat();
 void         filvrt();
