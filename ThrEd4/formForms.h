@@ -41,7 +41,7 @@ void wavfrm();
 
 namespace internal {
 
-	BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam) noexcept;
+	//BOOL CALLBACK chenum(HWND hwnd, LPARAM lParam) noexcept;
 
 	void chkdaz();
 
@@ -52,11 +52,12 @@ namespace internal {
 	inline void initTearDlg(HWND hwndlg);
 
 	HWND numwin(const std::wstring& winName, const RECT& location);
-	void nxtlin() noexcept;
+	void nxtlin(unsigned& formMenuEntryCount) noexcept;
+	void nxtlinprf() noexcept;
 	void prflin(const std::wstring& msg, unsigned row);
 	HWND prfnwin(const std::wstring& text) noexcept;
 	void prftwin(const std::wstring& text) noexcept;
-	void refrmfn();
+	void refrmfn(unsigned& formMenuEntryCount);
 
 	bool CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
