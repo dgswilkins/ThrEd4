@@ -40,8 +40,7 @@
 
 namespace si = satin::internal;
 
-unsigned int StartPoint;       // starting formOrigin for a satin stitch guide-line
-unsigned     SatinIndex;       // pointer to next satin form origin to enter
+unsigned int StartPoint; // starting formOrigin for a satin stitch guide-line
 
 unsigned satin::internal::satind(const SATCON* const guide) noexcept {
 	// ToDo - find a better way than pointer arithmetic
@@ -536,8 +535,9 @@ void satin::delcon(unsigned GuideIndex) {
 	if (guide) {
 		if (SatinGuideIndex > iGuide) {
 			// Todo - use std::vector & member erase() ?
-			std::copy(
-			    guide + 1, guide + gsl::narrow<size_t>(SatinGuideIndex - iGuide + 1u), stdext::make_checked_array_iterator(guide, SatinGuideIndex));
+			std::copy(guide + 1,
+			          guide + gsl::narrow<size_t>(SatinGuideIndex - iGuide + 1u),
+			          stdext::make_checked_array_iterator(guide, SatinGuideIndex));
 		}
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			const auto formHeader = &FormList[iForm];
@@ -1024,11 +1024,13 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 				if (!line2Count && iLine2Count < line2StitchCounts.size()) {
 					line2Count    = line2StitchCounts[iLine2Count++];
 					line2Previous = form::prv(iLine2Vertex);
-					line2Delta.x  = static_cast<double>(CurrentFormVertices[line2Previous].x) - CurrentFormVertices[iLine2Vertex].x;
-					line2Delta.y  = static_cast<double>(CurrentFormVertices[line2Previous].y) - CurrentFormVertices[iLine2Vertex].y;
-					iLine2Vertex  = form::prv(iLine2Vertex);
-					line2Step.x   = line2Delta.x / line2Count;
-					line2Step.y   = line2Delta.y / line2Count;
+					line2Delta.x
+					    = static_cast<double>(CurrentFormVertices[line2Previous].x) - CurrentFormVertices[iLine2Vertex].x;
+					line2Delta.y
+					    = static_cast<double>(CurrentFormVertices[line2Previous].y) - CurrentFormVertices[iLine2Vertex].y;
+					iLine2Vertex = form::prv(iLine2Vertex);
+					line2Step.x  = line2Delta.x / line2Count;
+					line2Step.y  = line2Delta.y / line2Count;
 				}
 				if ((line1Count || line2Count) && line1Count < MAXITEMS && line2Count < MAXITEMS) {
 					flag = true;
@@ -1175,13 +1177,14 @@ void satin::satfil() {
 }
 
 void satin::satfix() {
-	if (SatinIndex > 1) {
-		FormList[FormIndex].vertices = thred::adflt(SatinIndex);
-		for (auto iVertex = 0u; iVertex < SatinIndex; iVertex++) {
+	const auto vertexCount = TempPolygon->size();
+	if (!TempPolygon->empty()) {
+		FormList[FormIndex].vertices = thred::adflt(vertexCount);
+		for (auto iVertex = 0u; iVertex < vertexCount; iVertex++) {
 			FormList[FormIndex].vertices[iVertex] = (*TempPolygon)[iVertex];
 		}
 		TempPolygon->clear();
-		FormList[FormIndex].vertexCount = SatinIndex;
+		FormList[FormIndex].vertexCount = vertexCount;
 		form::frmout(FormIndex);
 		FormList[FormIndex].satinGuideCount = 0;
 		FormIndex++;
@@ -1192,7 +1195,8 @@ void satin::satfix() {
 }
 
 void satin::dusat() noexcept {
-	const auto* line = &FormLines[SatinIndex - 1];
+	const auto  vertexCount = TempPolygon->size();
+	const auto* line        = &FormLines[vertexCount - 1];
 
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
@@ -1209,8 +1213,9 @@ void satin::internal::unsat() {
 void satin::drwsat() {
 	si::unsat();
 	thred::px2stch();
-	FormLines[SatinIndex].x = Msg.pt.x - StitchWindowOrigin.x;
-	FormLines[SatinIndex].y = Msg.pt.y - StitchWindowOrigin.y;
+	auto vertexCount         = TempPolygon->size();
+	FormLines[vertexCount].x = Msg.pt.x - StitchWindowOrigin.x;
+	FormLines[vertexCount].y = Msg.pt.y - StitchWindowOrigin.y;
 	StateMap.set(StateFlag::SHOSAT);
 	satin::dusat();
 }
@@ -1220,18 +1225,17 @@ void satin::satpnt0() {
 	FormLines[0].x = Msg.pt.x - StitchWindowOrigin.x;
 	FormLines[0].y = Msg.pt.y - StitchWindowOrigin.y;
 	TempPolygon->push_back(SelectedPoint);
-	SatinIndex = 1;
 	StateMap.set(StateFlag::SATPNT);
 }
 
 void satin::satpnt1() {
 	si::unsat();
 	thred::px2stch();
-	FormLines[SatinIndex].x = Msg.pt.x - StitchWindowOrigin.x;
-	FormLines[SatinIndex].y = Msg.pt.y - StitchWindowOrigin.y;
+	auto vertexCount         = TempPolygon->size();
+	FormLines[vertexCount].x = Msg.pt.x - StitchWindowOrigin.x;
+	FormLines[vertexCount].y = Msg.pt.y - StitchWindowOrigin.y;
 	satin::dusat();
 	TempPolygon->push_back(SelectedPoint);
-	SatinIndex++;
 	StateMap.set(StateFlag::RESTCH);
 }
 
@@ -1293,9 +1297,9 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 	if (form::chkmax(count, SequenceIndex)) {
 		return;
 	}
-	const dPOINT innerStep = { innerDelta.x / count, innerDelta.y / count };
-	const dPOINT outerStep = { outerDelta.x / count, outerDelta.y / count };
-	auto satinBackupIndex = 0u;
+	const dPOINT innerStep        = { innerDelta.x / count, innerDelta.y / count };
+	const dPOINT outerStep        = { outerDelta.x / count, outerDelta.y / count };
+	auto         satinBackupIndex = 0u;
 	for (auto iStep = 0u; iStep < count; iStep++) {
 		innerPoint.x += innerStep.x;
 		innerPoint.y += innerStep.y;
@@ -1353,11 +1357,12 @@ void satin::internal::sfn(unsigned int startVertex) {
 void satin::satzum() {
 	StateMap.reset(StateFlag::SHOSAT);
 	thred::duzrat();
-	VertexCount = SatinIndex;
+	const auto vertexCount = TempPolygon->size();
+	VertexCount            = vertexCount;
 	form::frmlin(*TempPolygon);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	SelectObject(StitchWindowMemDC, FormPen);
-	PolylineInt(StitchWindowMemDC, FormLines, SatinIndex);
+	PolylineInt(StitchWindowMemDC, FormLines, vertexCount);
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	satin::drwsat();
 }
