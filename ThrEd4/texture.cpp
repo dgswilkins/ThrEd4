@@ -1184,7 +1184,10 @@ void texture::internal::dutxmir() {
 }
 
 void texture::internal::txdelal() {
-	txi::chktxnum();
+	TextureInputBuffer->clear();
+	DestroyWindow(SideWindowButton);
+	SideWindowButton = nullptr;
+	StateMap.set(StateFlag::RESTCH);
 	texture::savtxt();
 	TempTexturePoints->clear();
 	texture::rstxt();
