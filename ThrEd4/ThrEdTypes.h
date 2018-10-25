@@ -1704,8 +1704,14 @@ struct _txpnt { // textured fill point
 
 using TXPNT = struct _txpnt;
 
-#define RES_SIZE 26
+struct _txoff { // textured fill offset
+	float y;
+	int   line;
+};
 
+using TXOFF = struct _txoff;
+
+#define RES_SIZE 26
 struct _strex {                 // thred v1.0 file header extension
 	float    hoopSizeX;         // hoop size x dimension
 	float    hoopSizeY;         // hoop size y dimension
@@ -1839,7 +1845,7 @@ struct _range {
 using RANGE = struct _range;
 
 class REGION // region for sequencing vertical fills
-{ 
+{
 public:
 	unsigned start{ 0u };       // start line of region
 	unsigned end{ 0u };         // end line of region

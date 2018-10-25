@@ -682,21 +682,21 @@ void texture::internal::ed2txp(const POINT& offset, TXPNT& textureRecord) {
 }
 
 void texture::txtrup() {
-	POINT offset = {};
+	auto offset = POINT{};
+
 	if (StateMap.testAndReset(StateFlag::TXTMOV)) {
-		TXPNT textureOffset = {};
 		texture::savtxt();
 		txi::deorg(offset);
 		offset.x -= SelectTexturePointsOrigin.x;
 		offset.y -= SelectTexturePointsOrigin.y;
 		const auto Xmagnitude = abs(offset.x);
-		textureOffset.line
-		    = gsl::narrow<unsigned short>(std::round(Xmagnitude * TextureScreen.editToPixelRatio / TextureScreen.spacing));
+		auto       textureOffset
+		    = TXOFF{ static_cast<float>(-offset.y) / TextureScreen.height * TextureScreen.areaHeight,
+			         gsl::narrow<int>(std::ceil(Xmagnitude * TextureScreen.editToPixelRatio / TextureScreen.spacing)) };
 		if (offset.x < 0) {
 			textureOffset.line = -textureOffset.line;
 		}
-		textureOffset.y = (-offset.y) / TextureScreen.height * TextureScreen.areaHeight;
-		auto yOffset    = TextureRect.top + textureOffset.y - TextureScreen.areaHeight;
+		auto yOffset = TextureRect.top + textureOffset.y - TextureScreen.areaHeight;
 		if (yOffset > 0) {
 			textureOffset.y -= yOffset;
 		}
@@ -706,23 +706,23 @@ void texture::txtrup() {
 		}
 		auto xCoord = TextureRect.left + textureOffset.line - 1;
 		if (xCoord < 0) {
-			textureOffset.line -= gsl::narrow<unsigned short>(xCoord);
+			textureOffset.line -= xCoord;
 		}
 		xCoord = TextureRect.right + textureOffset.line - TextureScreen.lines;
 		if (xCoord > 0) {
-			textureOffset.line -= gsl::narrow<unsigned short>(xCoord);
+			textureOffset.line -= xCoord;
 		}
 		for (auto point : *SelectedTexturePointsList) {
-			auto texturePoint = &(*TempTexturePoints)[point];
-			texturePoint->line += textureOffset.line;
-			texturePoint->y += textureOffset.y;
+			auto& texturePoint = (*TempTexturePoints)[point];
+			texturePoint.line += textureOffset.line;
+			texturePoint.y += textureOffset.y;
 		}
 		txi::dutxrct(TextureRect);
 	}
 	else {
 		if (StateMap.testAndReset(StateFlag::BZUMIN)) {
-			TXPNT lowestTexturePoint  = {};
-			TXPNT highestTexturePoint = {};
+			auto highestTexturePoint = TXPNT{};
+			auto lowestTexturePoint  = TXPNT{};
 			txi::deorg(offset);
 			txi::ed2txp(ZoomBoxLine[0], highestTexturePoint);
 			txi::ed2txp(offset, lowestTexturePoint);
