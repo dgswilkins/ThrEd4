@@ -2251,7 +2251,7 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 		}
 		if (iPoint > 1) {
 			const auto evenPointCount = iPoint &= 0xfffffffe;
-			groupIndexSequence.push_back(lineEndpoints.size());
+			groupIndexSequence.push_back(gsl::narrow<unsigned int>(lineEndpoints.size()));
 			std::sort(projectedPoints.begin(), projectedPoints.end(), comp);
 			iPoint                    = 0;
 			const auto savedLineCount = lineEndpoints.size();
@@ -2270,7 +2270,7 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 			}
 		}
 	}
-	groupIndexSequence.push_back(lineEndpoints.size());
+	groupIndexSequence.push_back(gsl::narrow<unsigned int>(lineEndpoints.size()));
 }
 
 void form::internal::fnang(std::vector<unsigned>& groupIndexSequence,

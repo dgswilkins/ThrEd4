@@ -1177,7 +1177,7 @@ void satin::satfil() {
 }
 
 void satin::satfix() {
-	const auto vertexCount = TempPolygon->size();
+	const auto vertexCount = gsl::narrow<unsigned int>(TempPolygon->size());
 	if (!TempPolygon->empty()) {
 		FormList[FormIndex].vertices = thred::adflt(vertexCount);
 		for (auto iVertex = 0u; iVertex < vertexCount; iVertex++) {
@@ -1357,7 +1357,7 @@ void satin::internal::sfn(unsigned int startVertex) {
 void satin::satzum() {
 	StateMap.reset(StateFlag::SHOSAT);
 	thred::duzrat();
-	const auto vertexCount = TempPolygon->size();
+	const auto vertexCount = gsl::narrow<unsigned int>(TempPolygon->size());
 	VertexCount            = vertexCount;
 	form::frmlin(*TempPolygon);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
