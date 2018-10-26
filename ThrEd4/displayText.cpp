@@ -83,7 +83,8 @@ void displayText::shoMsg(const std::wstring& message) {
 			}
 		}
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
-		SIZE textSize = {}, messageSize = {};
+		auto textSize = SIZE{};
+		auto messageSize = SIZE{};
 		for (auto& string : strings) {
 			GetTextExtentPoint32Int(GetDC(ThrEdWindow), string.c_str(), gsl::narrow<unsigned int>(string.size()), &textSize);
 			if (textSize.cx > messageSize.cx) {
@@ -94,7 +95,7 @@ void displayText::shoMsg(const std::wstring& message) {
 			}
 		}
 		messageSize.cy *= gsl::narrow<LONG>(strings.size());
-		RECT mainRect = {};
+		auto mainRect = RECT{};
 		GetWindowRect(MainStitchWin, &mainRect);
 		auto xOffset = mainRect.left;
 		GetWindowRect(ThrEdWindow, &mainRect);
@@ -134,10 +135,10 @@ void displayText::hsizmsg() {
 }
 
 void displayText::numWnd() noexcept {
-	RECT messageRect = {};
+	auto messageRect = RECT{};
 
 	GetClientRect(MsgWindow, &messageRect);
-	RECT wRect = {};
+	auto wRect = RECT{};
 	GetWindowRect(MainStitchWin, &wRect);
 	auto xOffset = wRect.left;
 	GetWindowRect(ThrEdWindow, &wRect);
@@ -324,7 +325,7 @@ void displayText::spltmsg() {
 }
 
 void displayText::datmsg(unsigned code) {
-	unsigned     dataErrorID = 0;
+	auto     dataErrorID = 0u;
 	std::wstring dataError;
 
 	switch (code) {
@@ -437,8 +438,8 @@ void displayText::updateWinFont(HWND hWnd) noexcept {
 #pragma warning(pop)
 
 void displayText::tomsg() {
-	RECT OKrect;
-	SIZE textSize;
+	auto OKrect = RECT{};
+	auto textSize = SIZE{};
 
 	GetWindowRect(OKButton, &OKrect);
 	GetTextExtentPoint32Int(GetDC(ThrEdWindow),
@@ -484,7 +485,7 @@ void displayText::drwtxbut(const TXTSCR& textureScreen) {
 }
 
 HFONT displayText::getThrEdFont(LONG weight) noexcept {
-	LOGFONT lfText = {};
+	auto lfText = LOGFONT{};
 #if HIGHDPI
 	const auto uDpi = GetDpiForWindow(ThrEdWindow);
 	SystemParametersInfoForDpi(SPI_GETICONTITLELOGFONT, sizeof(lfText), &lfText, FALSE, uDpi);
