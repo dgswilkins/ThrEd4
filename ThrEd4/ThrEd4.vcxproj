@@ -63,6 +63,7 @@
     <ClInclude Include="xt.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="cpp.hint" />
     <None Include="Resources\dlin.cur" />
     <None Include="Resources\Form.cur" />
     <None Include="Resources\LeftDown.cur" />
