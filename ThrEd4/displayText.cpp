@@ -56,7 +56,7 @@ unsigned short LoadStringList[] = {
 };
 
 inline void displayText::loadString(std::wstring& sDest, unsigned stringID) {
-	wchar_t* pBuf = nullptr;
+	auto pBuf = static_cast<wchar_t*>(nullptr);
 	sDest.clear();
 	GSL_SUPPRESS(26490) {
 		if (auto len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPWSTR>(&pBuf), 0)) {
