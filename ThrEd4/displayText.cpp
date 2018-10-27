@@ -68,7 +68,7 @@ inline void displayText::loadString(std::wstring& sDest, unsigned stringID) {
 
 void displayText::shoMsg(const std::wstring& message) {
 	if (!message.empty()) {
-		std::vector<std::wstring> strings;
+		auto strings = std::vector<std::wstring>{};
 
 		auto       iString              = 0u;
 		auto       previousStringLength = 0u;
@@ -83,7 +83,7 @@ void displayText::shoMsg(const std::wstring& message) {
 			}
 		}
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
-		auto textSize = SIZE{};
+		auto textSize    = SIZE{};
 		auto messageSize = SIZE{};
 		for (auto& string : strings) {
 			GetTextExtentPoint32Int(GetDC(ThrEdWindow), string.c_str(), gsl::narrow<unsigned int>(string.size()), &textSize);
@@ -116,7 +116,7 @@ void displayText::shoMsg(const std::wstring& message) {
 }
 
 void displayText::tabmsg(unsigned code) {
-	std::wstring message;
+	auto message = std::wstring{};
 	displayText::loadString(message, code);
 	displayText::shoMsg(message);
 }
@@ -128,7 +128,7 @@ void displayText::lodstr() {
 }
 
 void displayText::hsizmsg() {
-	std::wstring fmtStr;
+	auto fmtStr = std::wstring{};
 
 	displayText::loadString(fmtStr, IDS_HSIZ);
 	displayText::shoMsg(fmt::format(fmtStr, (UnzoomedRect.x / PFGRAN), (UnzoomedRect.y / PFGRAN)));
@@ -159,7 +159,7 @@ void displayText::numWnd() noexcept {
 }
 
 void displayText::msgflt(unsigned messageId, float value) {
-	std::wstring fmtStr;
+	auto fmtStr = std::wstring{};
 
 	displayText::loadString(fmtStr, messageId);
 	displayText::shoMsg(fmt::format(fmtStr, value));
@@ -168,7 +168,7 @@ void displayText::msgflt(unsigned messageId, float value) {
 }
 
 void displayText::tsizmsg(const wchar_t* threadSizeText, double threadSize) {
-	std::wstring fmtStr;
+	auto fmtStr = std::wstring{};
 
 	displayText::loadString(fmtStr, IDS_SIZ);
 	displayText::shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
@@ -177,21 +177,21 @@ void displayText::tsizmsg(const wchar_t* threadSizeText, double threadSize) {
 }
 
 void displayText::bfilmsg() {
-	std::wstring fmtStr;
+	auto fmtStr = std::wstring{};
 
 	displayText::loadString(fmtStr, IDS_BADFIL);
 	displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
 }
 
 void displayText::filnopn(unsigned code, const fs::path& fileName) {
-	std::wstring fmtStr;
+	auto fmtStr = std::wstring{};
 
 	displayText::loadString(fmtStr, code);
 	displayText::shoMsg(fmt::format(fmtStr, fileName.wstring()));
 }
 
 void displayText::crmsg(const fs::path& fileName) {
-	std::wstring fmtStr;
+	auto fmtStr = std::wstring{};
 
 	displayText::loadString(fmtStr, IDS_CREAT);
 	displayText::shoMsg(fmt::format(fmtStr, fileName.wstring()));
@@ -235,7 +235,8 @@ void displayText::riter() {
 }
 
 void displayText::pntmsg(unsigned msgID) {
-	std::wstring fmtStr, message;
+	auto fmtStr  = std::wstring{};
+	auto message = std::wstring{};
 
 	displayText::loadString(fmtStr, IDS_PNT);
 	displayText::loadString(message, msgID);
@@ -243,7 +244,9 @@ void displayText::pntmsg(unsigned msgID) {
 }
 
 void displayText::shoseln(unsigned code0, unsigned code1) {
-	std::wstring fmtStr, msg0, msg1;
+	auto fmtStr = std::wstring{};
+	auto msg0   = std::wstring{};
+	auto msg1   = std::wstring{};
 
 	displayText::loadString(fmtStr, IDS_SHOSEL);
 	displayText::loadString(msg0, code0);
@@ -306,7 +309,7 @@ void displayText::grpmsg1() {
 }
 
 void displayText::internal::sdmsg() {
-	std::wstring fmtStr;
+	auto fmtStr = std::wstring{};
 
 	displayText::loadString(fmtStr, IDS_SAVDISC);
 	displayText::shoMsg(fmt::format(fmtStr, ThrName->wstring()));
@@ -325,8 +328,8 @@ void displayText::spltmsg() {
 }
 
 void displayText::datmsg(unsigned code) {
-	auto     dataErrorID = 0u;
-	std::wstring dataError;
+	auto dataErrorID = 0u;
+	auto dataError   = std::wstring{};
 
 	switch (code) {
 	case BADFLT:
@@ -427,7 +430,7 @@ void displayText::savdisc() {
 #pragma warning(push)
 #pragma warning(disable : 26493) // we use c style casts as this is a C API
 void displayText::updateWinFont(HWND hWnd) noexcept {
-	auto const* hFont = displayText::getThrEdFont(400);
+	const auto* hFont = displayText::getThrEdFont(400);
 	EnumChildWindows(hWnd,
 	                 [](HWND p_hWnd, LPARAM lParam) noexcept->BOOL {
 		                 SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
@@ -438,7 +441,7 @@ void displayText::updateWinFont(HWND hWnd) noexcept {
 #pragma warning(pop)
 
 void displayText::tomsg() {
-	auto OKrect = RECT{};
+	auto OKrect   = RECT{};
 	auto textSize = SIZE{};
 
 	GetWindowRect(OKButton, &OKrect);
@@ -461,13 +464,13 @@ void displayText::tomsg() {
 }
 
 void displayText::internal::bxtxt(unsigned iButton, unsigned iMessage) {
-	std::wstring message;
+	auto message = std::wstring{};
 	displayText::loadString(message, iMessage);
 	SetWindowText((*ButtonWin)[iButton], message.c_str());
 }
 
 void displayText::internal::hlpflt(unsigned iButton, unsigned iMessage, float data) {
-	std::wstring fmtStr;
+	auto fmtStr = std::wstring{};
 	displayText::loadString(fmtStr, iMessage);
 	SetWindowText((*ButtonWin)[iButton], fmt::format(fmtStr, data).c_str());
 }
