@@ -4424,13 +4424,13 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 	}
 }
 
-#define RITSIZ 6
-
-unsigned seqtab[] = {
-	12, 7, 15, 11, 13, 17,
-};
-
 void form::internal::bakseq() {
+constexpr auto RITSIZ = 6;
+
+	unsigned seqtab[] = {
+		12, 7, 15, 11, 13, 17,
+	};
+
 #if BUGBAK
 
 	for (SequenceIndex = 0; SequenceIndex < OutputIndex; SequenceIndex++) {
