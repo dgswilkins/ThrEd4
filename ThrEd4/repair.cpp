@@ -40,7 +40,7 @@
 namespace ri = repair::internal;
 
 void repair::internal::adbad(std::wstring& repairMessage, unsigned code, unsigned int count) {
-	std::wstring fmtStr;
+	auto fmtStr = std::wstring{};
 
 	displayText::loadString(fmtStr, code);
 	repairMessage += fmtStr;
@@ -71,7 +71,7 @@ void repair::lodchk() {
 			SelectedForm->maxBorderStitchLen = IniFile.maxStitchLength;
 		}
 	}
-	boost::dynamic_bitset<> formMap(FormIndex);
+	auto formMap = boost::dynamic_bitset<>(FormIndex);
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		const auto attribute = StitchBuffer[iStitch].attribute;
 		if ((attribute & TYPMSK) == TYPFRM) {
@@ -123,7 +123,7 @@ void repair::internal::chkeclp(const FRMHED* const formHeader, BADCNTS& badData)
 }
 
 unsigned repair::internal::frmchkfn() {
-	BADCNTS badData = {};
+	auto badData = BADCNTS{};
 
 	if (FormIndex) {
 		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
@@ -214,9 +214,9 @@ void repair::internal::chkfstch() noexcept {
 }
 
 void repair::internal::repflt(std::wstring& repairMessage) {
-	auto    iDestination = 0u;
-	auto    vertexCount  = 0u;
-	BADCNTS badData      = {};
+	auto iDestination = 0u;
+	auto vertexCount  = 0u;
+	auto badData      = BADCNTS{};
 
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		if (FormList[iForm].vertexCount) {
@@ -224,11 +224,10 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			vertexCount += FormList[iForm].vertexCount;
 		}
 	}
-	FormIndex = iDestination;
-	std::vector<fPOINT> vertexPoint;
-
-	auto iVertex = 0u;
-	auto flag    = true;
+	FormIndex        = iDestination;
+	auto vertexPoint = std::vector<fPOINT>{};
+	auto iVertex     = 0u;
+	auto flag        = true;
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		const auto formHeader = &FormList[iForm];
 		// ToDo - find a better way than pointer arithmetic
@@ -277,7 +276,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 	auto badClipCount = 0u;
 	auto clipCount    = 0u;
 
-	std::vector<fPOINT> clipPoint;
+	auto clipPoint = std::vector<fPOINT>();
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		const auto formHeader     = &FormList[iForm];
 		auto       clipDifference = 0u;
@@ -351,8 +350,8 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 }
 
 void repair::internal::repsat() {
-	auto    guideCount = 0u;
-	BADCNTS badData    = {};
+	auto guideCount = 0u;
+	auto badData    = BADCNTS{};
 
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		const auto formHeader = &FormList[iForm];
@@ -388,8 +387,8 @@ void repair::internal::repsat() {
 }
 
 void repair::internal::reptx() {
-	auto    textureCount = 0u;
-	BADCNTS badData      = {};
+	auto textureCount = 0u;
+	auto badData      = BADCNTS{};
 
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		if (texture::istx(iForm)) {
@@ -427,8 +426,8 @@ void repair::internal::reptx() {
 }
 
 void repair::repar() {
-	std::wstring   repairMessage;
-	const unsigned repairType = ri::frmchkfn();
+	auto       repairMessage = std::wstring{};
+	const auto repairType    = ri::frmchkfn();
 
 	thred::savdo();
 	// RepairString = MsgBuffer;
