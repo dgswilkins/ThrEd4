@@ -1165,7 +1165,7 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 void formForms::wavfrm() {
 	thred::unmsg();
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, (DLGPROC)ffi::wavprc)) {
-		auto       points    = std::vector<fPOINT>(IniFile.wavePoints);
+		auto       points = std::vector<fPOINT>{ IniFile.wavePoints };
 		const auto saveIndex = FormVertexIndex;
 		form::durpoli(IniFile.wavePoints);
 		form::mdufrm();
