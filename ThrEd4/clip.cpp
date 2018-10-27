@@ -373,11 +373,11 @@ void clip::clpbrd(unsigned int startVertex) {
 
 	SequenceIndex = 0;
 	StateMap.reset(StateFlag::CLPBAK);
-	HorizontalLength2 = ClipRectSize.cx / 2;
-	HorizontalLength  = ClipRectSize.cx;
-	std::vector<fPOINT> clipFillData(ClipStitchCount);
-	std::vector<fPOINT> clipReversedData(ClipStitchCount);
-	const auto          rotationCenter
+	HorizontalLength2           = ClipRectSize.cx / 2;
+	HorizontalLength            = ClipRectSize.cx;
+	auto       clipFillData     = std::vector<fPOINT>{ ClipStitchCount };
+	auto       clipReversedData = std::vector<fPOINT>{ ClipStitchCount };
+	const auto rotationCenter
 	    = dPOINT{ (ClipRect.right - ClipRect.left) / 2 + ClipRect.left, (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom };
 	ClipReference.x = ClipRect.left;
 	ClipReference.y = rotationCenter.y;
@@ -582,10 +582,11 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 
 void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 	form::duangs();
-	std::vector<double> listSINEs;
+	auto listSINEs = std::vector<double>{};
 	listSINEs.reserve(gsl::narrow<size_t>(VertexCount) + 1);
-	std::vector<double> listCOSINEs;
+	auto listCOSINEs = std::vector<double>{};
 	listCOSINEs.reserve(VertexCount);
+	// Todo - would emplace_back be better here?
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 		listSINEs.push_back(sin((*FormAngles)[iVertex]));
 		listCOSINEs.push_back(cos((*FormAngles)[iVertex]));
@@ -597,7 +598,7 @@ void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 }
 
 void clip::internal::dulast(std::vector<fPOINT>& chainEndPoints) {
-	std::vector<fPOINT> tempClipPoints;
+	auto tempClipPoints = std::vector<fPOINT>{};
 	tempClipPoints.reserve(chainEndPoints.size());
 	if (form::lastch()) {
 		auto minimumLength = 1e99;
@@ -610,6 +611,7 @@ void clip::internal::dulast(std::vector<fPOINT>& chainEndPoints) {
 			}
 		}
 		if (minimumIndex) {
+			// Todo - would emplace_back be better here?
 			for (auto iPoint = minimumIndex; iPoint < chainEndPoints.size() - 2; iPoint++) {
 				tempClipPoints.push_back(chainEndPoints[iPoint]);
 			}
@@ -641,7 +643,7 @@ void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
                             unsigned                   start,
                             unsigned                   finish,
                             const dPOINT&              rotationCenter) {
-	std::vector<fPOINT> points(ClipStitchCount);
+	auto points = std::vector<fPOINT>{ ClipStitchCount };
 
 	const auto delta
 	    = dPOINT{ (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
@@ -655,11 +657,11 @@ void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
 }
 
 void clip::duxclp() {
-	std::vector<fPOINT> chainEndPoints;
+	auto  chainEndPoints = std::vector<fPOINT>{};
 	// reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
 	chainEndPoints.reserve(50);
 	ci::dufxlen(chainEndPoints);
-	std::vector<fPOINT> tempClipPoints;
+	auto tempClipPoints = std::vector<fPOINT>{};
 	tempClipPoints.reserve(ClipStitchCount);
 	ci::clpxadj(tempClipPoints, chainEndPoints);
 	SequenceIndex = 0;
@@ -760,7 +762,7 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 }
 
 void clip::clpic() {
-	std::vector<fPOINT> clipFillData(ClipStitchCount);
+	auto  clipFillData = std::vector<fPOINT>{ ClipStitchCount };
 
 	const auto rotationCenter = dPOINT{ ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left),
 		                                ((ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom) };
@@ -795,9 +797,9 @@ void clip::clpic() {
 }
 
 void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned int start, unsigned int finish) {
-	const std::vector<unsigned> chainSequence = { 0, 1, 2, 3, 0, 1, 4, 3, 0, 3 }; // chain stitch sequence
+	const auto chainSequence = std::vector<unsigned>{ 0, 1, 2, 3, 0, 1, 4, 3, 0, 3 }; // chain stitch sequence
 
-	std::vector<fPOINT> chainPoint(5);
+	auto chainPoint = std::vector<fPOINT>{ 5 };
 	auto                delta
 	    = dPOINT{ (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
 	const auto lengthDelta  = dPOINT{ (delta.x * SelectedForm->edgeStitchLen), (delta.y * SelectedForm->edgeStitchLen) };
@@ -862,7 +864,7 @@ void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 }
 
 void clip::chnfn() {
-	std::vector<fPOINT> chainEndPoints;
+	auto chainEndPoints = std::vector<fPOINT>{};
 	// reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
 	chainEndPoints.reserve(50);
 	form::fvars(ClosestFormToCursor);
