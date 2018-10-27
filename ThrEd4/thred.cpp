@@ -54,47 +54,47 @@ namespace fs = std::experimental::filesystem;
 namespace thi = thred::internal;
 
 // select box
-#define NERCNT 4 // number of entries in the near array
+constexpr auto NearestCount = 4; // number of entries in the near array;
 
 // main variables
-int             ArgCount;                 // command line argument count
-RECT            ThredWindowRect;          // main window size
-RECT            ColorBarRect;             // color bar rectangle
-RECT            MinLenRect;               // minimum length rectangle
-RECT            MaxLenRect;               // maximum length rectangle
-unsigned        SmallestStitchIndex;      // pointer to the smallest stitch in the selected range
-unsigned        LargestStitchIndex;       // pointer to the largest stitch in the selected range
-unsigned        CurrentStitchIndex;       // pointer to the current selection for length search
-HDC             ThredDC;                  // main device context handle
-HDC             ColorBarDC;               // color bar device context
-HBITMAP         StitchWindowBmp;          // bitmap for the memory stitch device context
-SIZE            TextSize;                 // used for measuring sizes of text items
-SIZE            ScreenSizePixels;         // screen size in pixels
-SIZE            ScreenSizeMM;             // screen size in millimeters
-RECT            StitchWindowAbsRect;      // stitch window size,absolute
-POINT           NearestPixel[NERCNT];     // selected points
-POINT           BoxCoordinate = { 0, 0 }; // single select box point
-double          DistanceToClick;          // distance of closest point to a mouse click
-unsigned        ClosestPointIndexClone;   // copy of index of closest point
-unsigned        PrevGroupStartStitch;     // lower end of previous selection
-unsigned        PrevGroupEndStitch;       // higher end of previous selection
-unsigned int    BufferDigitCount;         // number of decimal digits in the number of stitches
-unsigned        LineIndex;                // line index for display routine
-double          StitchWindowAspectRatio;  // aspect ratio of the stitch window
-FORMSCLIP*      ClipFormsHeader;          // multiple form clipboard header
-FORMVERTEXCLIP* ClipFormVerticesData;     // form points clipboard header
-void*           ThrEdClipPointer;         // for memory allocation for thred format clipboard data
-POINT           ClipOrigin;               // origin of clipboard box in stitch coordinates
-SIZE            SelectBoxSize;            // size of the select box
-POINT           SelectBoxOffset;          // offset of the spot the user selected from the lower left of the select box
-double          RotationHandleAngle;      // angle of the rotation handle
-unsigned        BitmapColor  = BITCOL;    // bitmap color
-double          ThreadSize30 = TSIZ30;    //#30 thread size
-double          ThreadSize40 = TSIZ40;    //#40 thread size
-double          ThreadSize60 = TSIZ60;    //#40 thread size
-unsigned        RunPoint;                 // point for animating stitchout
-unsigned        StitchesPerFrame;         // number of stitches to draw in each frame
-int             MovieTimeStep;            // time delay for stitchout
+int             ArgCount;                   // command line argument count
+RECT            ThredWindowRect;            // main window size
+RECT            ColorBarRect;               // color bar rectangle
+RECT            MinLenRect;                 // minimum length rectangle
+RECT            MaxLenRect;                 // maximum length rectangle
+unsigned        SmallestStitchIndex;        // pointer to the smallest stitch in the selected range
+unsigned        LargestStitchIndex;         // pointer to the largest stitch in the selected range
+unsigned        CurrentStitchIndex;         // pointer to the current selection for length search
+HDC             ThredDC;                    // main device context handle
+HDC             ColorBarDC;                 // color bar device context
+HBITMAP         StitchWindowBmp;            // bitmap for the memory stitch device context
+SIZE            TextSize;                   // used for measuring sizes of text items
+SIZE            ScreenSizePixels;           // screen size in pixels
+SIZE            ScreenSizeMM;               // screen size in millimeters
+RECT            StitchWindowAbsRect;        // stitch window size,absolute
+POINT           NearestPixel[NearestCount]; // selected points
+POINT           BoxCoordinate = { 0, 0 };   // single select box point
+double          DistanceToClick;            // distance of closest point to a mouse click
+unsigned        ClosestPointIndexClone;     // copy of index of closest point
+unsigned        PrevGroupStartStitch;       // lower end of previous selection
+unsigned        PrevGroupEndStitch;         // higher end of previous selection
+unsigned int    BufferDigitCount;           // number of decimal digits in the number of stitches
+unsigned        LineIndex;                  // line index for display routine
+double          StitchWindowAspectRatio;    // aspect ratio of the stitch window
+FORMSCLIP*      ClipFormsHeader;            // multiple form clipboard header
+FORMVERTEXCLIP* ClipFormVerticesData;       // form points clipboard header
+void*           ThrEdClipPointer;           // for memory allocation for thred format clipboard data
+POINT           ClipOrigin;                 // origin of clipboard box in stitch coordinates
+SIZE            SelectBoxSize;              // size of the select box
+POINT           SelectBoxOffset;            // offset of the spot the user selected from the lower left of the select box
+double          RotationHandleAngle;        // angle of the rotation handle
+unsigned        BitmapColor  = BITCOL;      // bitmap color
+double          ThreadSize30 = TSIZ30;      //#30 thread size
+double          ThreadSize40 = TSIZ40;      //#40 thread size
+double          ThreadSize60 = TSIZ60;      //#40 thread size
+unsigned        RunPoint;                   // point for animating stitchout
+unsigned        StitchesPerFrame;           // number of stitches to draw in each frame
+int             MovieTimeStep;              // time delay for stitchout
 
 // WARNING the size of the following array must be changed if the maximum movie speed is changed
 POINT MovieLine[100]; // line for movie stitch draw
@@ -191,9 +191,9 @@ COLORREF        BackgroundColor; // stitch window background
 COLORREF        BoxColor[] = { 0x404040, 0x408040, 0x804040, 0x404080 };
 int             ThreadWidthPixels[3];                  // thread sizes in pixels
 std::bitset<32> DisplayedColorBitmap(0);               // Map of color numbers in design that are actually displayed
-double          GapToNearest[NERCNT];                  // distances of the closest points
+double          GapToNearest[NearestCount];            // distances of the closest points
                                                        // to a mouse click
-long       NearestPoint[NERCNT];                       // indices of the closest points
+long       NearestPoint[NearestCount];                 // indices of the closest points
 POINT      SearchLine[MAXITEMS];                       // stitch select line
 fPOINT     StitchRangeSize;                            // form check ranges
 unsigned   MoveAnchor;                                 // for resequencing stitches
@@ -351,8 +351,8 @@ struct _dstdat {
 
 using DSTDAT = struct _dstdat;
 
-#define XCOR 0
-#define YCOR 1
+constexpr auto XCOR = 0;
+constexpr auto YCOR = 1;
 
 DSTDAT DSTValues[] = {
 	{ XCOR, 1 }, { XCOR, -1 }, { XCOR, 9 },  { XCOR, -9 },  { YCOR, -9 },  { YCOR, 9 },  { YCOR, -1 }, { YCOR, 1 },
@@ -3461,12 +3461,12 @@ bool thred::internal::savcmp() noexcept {
 }
 
 void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, unsigned destination, unsigned source, unsigned code) {
-#define BALRAT 1.6666666666667
+	constexpr auto BalaradRatio = 10.0f / 6.0f;
 
 	balaradStitch[destination].flag = 0;
 	balaradStitch[destination].code = gsl::narrow<unsigned char>(code);
-	balaradStitch[destination].x    = (StitchBuffer[source].x - BalaradOffset.x) * BALRAT;
-	balaradStitch[destination].y    = (StitchBuffer[source].y - BalaradOffset.y) * BALRAT;
+	balaradStitch[destination].x    = (StitchBuffer[source].x - BalaradOffset.x) * BalaradRatio;
+	balaradStitch[destination].y    = (StitchBuffer[source].y - BalaradOffset.y) * BalaradRatio;
 }
 
 constexpr DWORD thred::internal::coldis(COLORREF colorA, COLORREF colorB) {
@@ -3575,9 +3575,10 @@ void thred::internal::redbal() {
 }
 
 void thred::internal::ritbal() {
-	BALHED   balaradHeader = {};
-	HANDLE   balaradFile   = {};
-	fs::path outputName;
+	BALHED         balaradHeader = {};
+	HANDLE         balaradFile   = {};
+	fs::path       outputName;
+	constexpr auto BalaradRatio = 10.0f / 6.0f;
 
 	if (!BalaradName0->empty() && !BalaradName1->empty() && PCSHeader.stitchCount) {
 		if (WorkingFileName->empty()) {
@@ -3605,8 +3606,8 @@ void thred::internal::ritbal() {
 		}
 		balaradHeader.signature       = 'drbm';
 		balaradHeader.backgroundColor = BackgroundColor;
-		balaradHeader.hoopSizeX       = IniFile.hoopSizeX * BALRAT;
-		balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BALRAT;
+		balaradHeader.hoopSizeX       = IniFile.hoopSizeX * BalaradRatio;
+		balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BalaradRatio;
 		DWORD bytesWritten            = 0u;
 		WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
 		BalaradOffset.x = IniFile.hoopSizeX / 2.0f;
@@ -3925,7 +3926,7 @@ bool thred::internal::colfil() {
 void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
                              std::vector<DSTREC>&           DSTRecords,
                              const std::vector<fPOINTATTR>& stitches) {
-#define DSTMAX 121
+	constexpr auto          DSTMax = 121;
 	std::vector<fPOINTATTR> dstStitchBuffer(PCSHeader.stitchCount);
 	std::vector<unsigned>   colorData;
 
@@ -3974,10 +3975,10 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 		POINT absoluteLengths = { abs(lengths.x), abs(lengths.y) };
 		auto  count           = 0u;
 		if (absoluteLengths.x > absoluteLengths.y) {
-			count = absoluteLengths.x / DSTMAX + 1;
+			count = absoluteLengths.x / DSTMax + 1;
 		}
 		else {
-			count = absoluteLengths.y / DSTMAX + 1;
+			count = absoluteLengths.y / DSTMax + 1;
 		}
 		POINT stepSize   = { gsl::narrow<LONG>(absoluteLengths.x / count + 1), gsl::narrow<LONG>(absoluteLengths.y / count + 1) };
 		POINT difference = {};
@@ -6192,7 +6193,7 @@ void thred::internal::duClos(unsigned startStitch, unsigned stitchCount) noexcep
                                                                      : (SelectedPoint.y - StitchBuffer[iStitch].y));
 		auto       sum   = hypot(cx, cy);
 		auto       tind0 = iStitch;
-		for (auto iNear = 0; iNear < NERCNT; iNear++) {
+		for (auto iNear = 0; iNear < NearestCount; iNear++) {
 			if (sum < GapToNearest[iNear]) {
 				const auto lowestSum = GapToNearest[iNear];
 				const auto tind1     = NearestPoint[iNear];
@@ -6497,7 +6498,7 @@ unsigned thred::internal::closlin() {
 	double sum          = 1e99;
 	dPOINT checkedPoint = {};
 
-#define TOL 20
+	constexpr auto Tolerance = 20.0f;
 	thi::unboxs();
 	auto offset = (static_cast<float>(Msg.pt.x) - StitchWindowAbsRect.left)
 	              / (static_cast<float>(StitchWindowAbsRect.right) - StitchWindowAbsRect.left);
@@ -6506,7 +6507,7 @@ unsigned thred::internal::closlin() {
 	         / (static_cast<float>(StitchWindowAbsRect.bottom) - StitchWindowAbsRect.top);
 	checkedPoint.y       = (offset * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom);
 	offset               = (ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
-	const auto tolerance = offset * TOL;
+	const auto tolerance = offset * Tolerance;
 	for (auto iChange = 0u; iChange < ColorChanges; iChange++) {
 		auto stitchCount = gsl::narrow<unsigned short>(
 		    std::abs(ColorChangeTable[iChange + 1].stitchIndex - ColorChangeTable[iChange].stitchIndex));
@@ -8547,14 +8548,14 @@ void thred::internal::insfil() {
 					displayText::tabmsg(IDS_NOTHR);
 				}
 				else {
-					auto       homscor     = 0u;
-					STREX      thredHeader = {};
-					const auto version     = (fileHeader.headerType & 0xff000000) >> 24;
+					constexpr auto FRMW        = 5;
+					constexpr auto HANDW       = 4;
+					constexpr auto FRMPW       = 2;
+					constexpr auto STCHW       = 1;
+					auto           homscor     = 0u;
+					STREX          thredHeader = {};
+					const auto     version     = (fileHeader.headerType & 0xff000000) >> 24;
 					if (version) {
-#define FRMW 5
-#define HANDW 4
-#define FRMPW 2
-#define STCHW 1
 						gethand(StitchBuffer, PCSHeader.stitchCount);
 						// ToDo - replace constants with sizes of data structures?
 						homscor = (FormIndex)*FRMW + gethand(StitchBuffer, PCSHeader.stitchCount) * HANDW
@@ -15151,7 +15152,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								}
 								if (clip::iseclpx(FormIndex + iForm)) {
 									SelectedForm->borderClipData = thred::adclp(SelectedForm->clipEntries);
-									auto* offsetStart      = &ClipPoints[SelectedForm->borderClipData];
+									auto* offsetStart            = &ClipPoints[SelectedForm->borderClipData];
 									for (auto iClip = 0u; iClip < SelectedForm->clipEntries; iClip++) {
 										offsetStart[iClip] = clipData[currentClip++];
 									}
@@ -17143,7 +17144,7 @@ void thred::internal::init() {
 	ButtonWidthX3             = ButtonWidth * 3;
 	ButtonHeight              = TextSize.cy + 4;
 	const auto offsetStepSize = thred::txtWid(L"0");
-	for (auto iOffset = 0; iOffset < NERCNT; iOffset++) {
+	for (auto iOffset = 0; iOffset < NearestCount; iOffset++) {
 		BoxOffset[iOffset] = offsetStepSize * (iOffset + 1);
 	}
 	GetClientRect(ThrEdWindow, &ThredWindowRect);
@@ -17431,12 +17432,12 @@ inline void thred::internal::stCor2px(const fPOINTATTR& stitch, POINT& point) {
 }
 
 void thred::internal::drwknot() {
-#define KSIZ 5   // offset of the knot box sides
-#define KLSIZ 10 // length of the knot line
+	constexpr auto KnotBoxSize  = 5;  // offset of the knot box sides;
+	constexpr auto KnotLineSize = 10; // length of the knot line;
 
 	if (!UserFlagMap.test(UserFlag::KNOTOF) && KnotCount && PCSHeader.stitchCount) {
-		const auto kOffset = gsl::narrow<LONG>(MulDiv(KSIZ, *screenDPI, 96));
-		const auto kLine   = gsl::narrow<LONG>(MulDiv(KLSIZ, *screenDPI, 96));
+		const auto kOffset = gsl::narrow<LONG>(MulDiv(KnotBoxSize, *screenDPI, 96));
+		const auto kLine   = gsl::narrow<LONG>(MulDiv(KnotLineSize, *screenDPI, 96));
 
 		POINT point   = {};
 		POINT tlin[5] = {};

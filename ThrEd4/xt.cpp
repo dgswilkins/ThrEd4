@@ -502,7 +502,7 @@ bool xt::internal::chkp2cnam(const wchar_t* fileName) noexcept {
 }
 
 void xt::pes2crd() {
-#define P2CBUFSIZ 256
+	constexpr auto P2CBUFSIZ = 256;
 
 	HKEY          registryKey            = {};
 	wchar_t       programName[_MAX_PATH] = { 0 };
