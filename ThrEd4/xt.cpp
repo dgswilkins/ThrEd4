@@ -132,9 +132,9 @@ void xt::internal::durats(unsigned int iSequence, fPOINT& point, FEATHER& feathe
 		point.y = BSequence[iSequence].y;
 	}
 	else {
-		feather.ratioLocal         = feather.minStitch / stitchLength;
-		const fPOINT adjustedPoint = { duxrat(BSequence[iSequence + 1].x, BSequence[iSequence].x, feather.ratioLocal),
-			                           duxrat(BSequence[iSequence + 1].y, BSequence[iSequence].y, feather.ratioLocal) };
+		feather.ratioLocal       = feather.minStitch / stitchLength;
+		const auto adjustedPoint = fPOINT{ duxrat(BSequence[iSequence + 1].x, BSequence[iSequence].x, feather.ratioLocal),
+			                               duxrat(BSequence[iSequence + 1].y, BSequence[iSequence].y, feather.ratioLocal) };
 
 		point.x = durat(adjustedPoint.x, BSequence[iSequence].x, feather.ratio);
 		point.y = durat(adjustedPoint.y, BSequence[iSequence].y, feather.ratio);
@@ -252,11 +252,11 @@ void xt::internal::xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOIN
 }
 
 void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence) {
-	fPOINT currentPoint = {};
-	fPOINT nextPoint    = {};
-	fPOINT midPoint     = {};
+	auto currentPoint = fPOINT{};
+	auto nextPoint    = fPOINT{};
+	auto midPoint     = fPOINT{};
 
-	const double length
+	const auto length
 	    = hypot(BSequence[iSequence + 1].y - BSequence[iSequence].y, BSequence[iSequence + 1].x - BSequence[iSequence].x);
 
 	nurat(feather);
@@ -266,11 +266,11 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 		ratpnt(iSequence + 3, iSequence + 2, nextPoint, feather.ratio);
 	}
 	else {
-		fPOINT currentHighPoint = {};
-		fPOINT currentLowPoint  = {};
-		fPOINT nextHighPoint    = {};
-		fPOINT nextLowPoint     = {};
-		feather.ratioLocal      = feather.minStitch / length;
+		auto currentHighPoint = fPOINT{};
+		auto currentLowPoint  = fPOINT{};
+		auto nextHighPoint    = fPOINT{};
+		auto nextLowPoint     = fPOINT{};
+		feather.ratioLocal    = feather.minStitch / length;
 		duxrats(iSequence, iSequence + 1, currentLowPoint, feather.ratioLocal);
 		duxrats(iSequence + 3, iSequence + 2, nextLowPoint, feather.ratioLocal);
 		feather.ratioLocal = 1 - feather.ratioLocal;
@@ -295,10 +295,10 @@ void xt::internal::fthdfn(unsigned int iSequence, FEATHER& feather) {
 	OSequence[iSequence]     = BSequence[iSequence];
 	OSequence[iSequence + 1] = BSequence[iSequence + 1];
 	if (length > feather.minStitch) {
-		fPOINT adjustedPoint = {};
-		fPOINT currentPoint  = {};
-		fPOINT nextPoint     = {};
-		feather.ratioLocal   = 0.5;
+		auto adjustedPoint = fPOINT{};
+		auto currentPoint  = fPOINT{};
+		auto nextPoint     = fPOINT{};
+		feather.ratioLocal = 0.5;
 		duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
 		feather.ratioLocal = feather.minStitch / length / 2;
 		xratf(adjustedPoint, OSequence[iSequence], currentPoint, feather.ratioLocal);
@@ -339,9 +339,9 @@ void xt::internal::fritfil(std::vector<fPOINT>& featherSequence, unsigned& inter
 
 void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 	const auto savedSpacing = LineSpacing;
-	FEATHER    feather      = {};
+	auto       feather      = FEATHER{};
 
-	std::vector<fPOINT> featherSequence;
+	auto featherSequence = std::vector<fPOINT>{};
 
 	// ToDo - what does this function do
 	PseudoRandomValue = FSED;
@@ -458,7 +458,7 @@ void xt::fethr() {
 }
 
 constexpr ULARGE_INTEGER xt::internal::tim2int(FILETIME time) noexcept {
-	ULARGE_INTEGER op = { { 0, 0 } };
+	auto op = ULARGE_INTEGER{ { 0, 0 } };
 
 	op.LowPart  = time.dwLowDateTime;
 	op.HighPart = time.dwHighDateTime;
@@ -466,10 +466,10 @@ constexpr ULARGE_INTEGER xt::internal::tim2int(FILETIME time) noexcept {
 }
 
 int xt::internal::fil2crd(const fs::path& fileName) {
-	STARTUPINFO         startupInfo = {};
-	PROCESS_INFORMATION processInfo = {};
-	auto                errorCode   = 0;
-	wchar_t             command[_MAX_PATH * 2 + 1 + 4];
+	auto    startupInfo = STARTUPINFO{};
+	auto    processInfo = PROCESS_INFORMATION{};
+	auto    errorCode   = 0;
+	wchar_t command[_MAX_PATH * 2 + 1 + 4];
 
 	wcscpy_s(command, L"\"");
 	wcscpy_s(command, utf::Utf8ToUtf16(std::string(IniFile.p2cName)).c_str());
@@ -504,13 +504,13 @@ bool xt::internal::chkp2cnam(const wchar_t* fileName) noexcept {
 void xt::pes2crd() {
 	constexpr auto P2CBUFSIZ = 256;
 
-	HKEY          registryKey            = {};
+	auto          registryKey            = HKEY{};
 	wchar_t       programName[_MAX_PATH] = { 0 };
 	const wchar_t filter[]               = L"ComputerService (Lind2PC.exe)\0LinkP2C.exe\0\0";
 	wchar_t       message[P2CBUFSIZ]     = { 0 };
 	wchar_t       caption[P2CBUFSIZ]     = { 0 };
-	OPENFILENAME  openFileName           = {
-        sizeof(openFileName), // lStructsize
+	auto          openFileName           = OPENFILENAME{
+        sizeof(OPENFILENAME), // lStructsize
         ThrEdWindow,          // hwndOwner
         ThrEdInstance,        // hInstance
         filter,               // lpstrFilter
@@ -546,8 +546,8 @@ void xt::pes2crd() {
 	*IniFile.p2cName = 0;
 	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion", 0, KEY_READ, &registryKey)
 	    == ERROR_SUCCESS) {
-		DWORD size    = _MAX_PATH;
-		DWORD keyType = REG_SZ;
+		auto size    = DWORD{ _MAX_PATH };
+		auto keyType = DWORD{ REG_SZ };
 		if (RegQueryValueEx(
 		        registryKey, L"ProgramFilesDir", nullptr, &keyType, reinterpret_cast<unsigned char*>(programName), &size)
 		    == ERROR_SUCCESS) {
@@ -595,7 +595,7 @@ std::vector<fPOINT>& xt::insid() {
 
 void xt::internal::delwlk(unsigned int code) {
 	if (PCSHeader.stitchCount) {
-		std::vector<fPOINTATTR> highStitchBuffer;
+		auto highStitchBuffer = std::vector<fPOINTATTR>{};
 		highStitchBuffer.reserve(PCSHeader.stitchCount);
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if ((StitchBuffer[iStitch].attribute & WLKFMSK) != code) {
@@ -631,13 +631,13 @@ void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) {
 		}
 		const auto underlayStitchLength = SelectedForm->underlayStitchLen;
 		for (auto iSequence = 0u; iSequence < OutputIndex - 1; iSequence++) {
-			const fPOINT delta
-			    = { OSequence[iSequence + 1].x - OSequence[iSequence].x, OSequence[iSequence + 1].y - OSequence[iSequence].y };
+			const auto delta       = fPOINT{ OSequence[iSequence + 1].x - OSequence[iSequence].x,
+                                       OSequence[iSequence + 1].y - OSequence[iSequence].y };
 			const auto length      = hypot(delta.x, delta.y);
 			const auto stitchCount = dToUI(length / underlayStitchLength);
 			if (stitchCount) {
-				const fPOINT step  = { delta.x / stitchCount, delta.y / stitchCount };
-				auto         point = OSequence[iSequence];
+				const auto step  = fPOINT{ delta.x / stitchCount, delta.y / stitchCount };
+				auto       point = OSequence[iSequence];
 				for (auto index = 0u; index < stitchCount; index++) {
 					InterleaveSequence[InterleaveSequenceIndex] = point;
 					InterleaveSequenceIndex++;
@@ -689,7 +689,7 @@ unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned
 	if (startVertex == endVertex) {
 		return 0;
 	}
-	const std::vector<fPOINT>& indentedPoint = xt::insid();
+	const auto& indentedPoint = xt::insid();
 	up = down = startVertex;
 	do {
 		if (up == endVertex) {
@@ -724,14 +724,14 @@ unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned
 		else {
 			intermediateVertex = form::nxt(startVertex);
 		}
-		const fPOINT delta = { indentedPoint[intermediateVertex].x - indentedPoint[startVertex].x,
-			                   indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y };
-		length             = hypot(delta.x, delta.y);
+		const auto delta = fPOINT{ indentedPoint[intermediateVertex].x - indentedPoint[startVertex].x,
+			                       indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y };
+		length           = hypot(delta.x, delta.y);
 
 		const auto stitchCount = dToUI(length / UserStitchLength);
 		if (stitchCount > 1) {
-			const fPOINT step       = { delta.x / stitchCount, delta.y / stitchCount };
-			fPOINT       localPoint = { indentedPoint[startVertex].x + step.x, indentedPoint[startVertex].y + step.y };
+			const auto step       = fPOINT{ delta.x / stitchCount, delta.y / stitchCount };
+			auto       localPoint = fPOINT{ indentedPoint[startVertex].x + step.x, indentedPoint[startVertex].y + step.y };
 			for (auto iStep = 0u; iStep < stitchCount - 1; iStep++) {
 				StitchBuffer[iStitch] = { localPoint.x, localPoint.y, code };
 				iStitch++;
@@ -764,8 +764,8 @@ void xt::internal::fnwlk(unsigned int find, unsigned& interleaveSequenceIndex2) 
 	if (SelectedForm->type != FRMLINE) {
 		count++;
 	}
-	const std::vector<fPOINT>& walkPoints = xt::insid();
-	OutputIndex                           = 0;
+	const auto& walkPoints = xt::insid();
+	OutputIndex            = 0;
 	while (count) {
 		OSequence[OutputIndex] = walkPoints[start];
 		start                  = form::nxt(start);
@@ -801,7 +801,7 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 			OSequence[OutputIndex].y = form::midl(CurrentFormVertices[iVertex].y, CurrentFormVertices[iVertex + 1].y);
 			OutputIndex++;
 		}
-		const SATCON* guide = SelectedForm->satinOrAngle.guide;
+		const auto* guide = SelectedForm->satinOrAngle.guide;
 		if (guide) {
 			for (auto iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--) {
 				OSequence[OutputIndex].x
@@ -842,9 +842,9 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 }
 
 void xt::srtcol() {
-	const int             colorSize = 16;
-	std::vector<unsigned> histogram(colorSize);
-	std::vector<unsigned> colorStartStitch(colorSize);
+	const auto colorSize        = 16;
+	auto       histogram        = std::vector<unsigned>(colorSize);
+	auto       colorStartStitch = std::vector<unsigned>(colorSize);
 
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		histogram[StitchBuffer[iStitch].attribute & COLMSK]++;
@@ -856,7 +856,7 @@ void xt::srtcol() {
 		startStitch += *it;
 		const auto _ = it++;
 	}
-	std::vector<fPOINTATTR> highStitchBuffer(PCSHeader.stitchCount);
+	auto highStitchBuffer = std::vector<fPOINTATTR>(PCSHeader.stitchCount);
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		highStitchBuffer[colorStartStitch[StitchBuffer[iStitch].attribute & COLMSK]++] = StitchBuffer[iStitch];
 	}
@@ -969,9 +969,9 @@ void xt::selalfrm() {
 }
 
 unsigned xt::internal::dutyp(unsigned attribute) noexcept {
-	char           result          = 0;
-	DWORD          bit             = 0;
-	const unsigned maskedAttribute = attribute & SRTYPMSK;
+	auto       result          = char{ 0 };
+	auto       bit             = DWORD{ 0 };
+	const auto maskedAttribute = attribute & SRTYPMSK;
 
 	// ToDo - replace
 	_BitScanReverse(&bit, maskedAttribute);
@@ -1035,12 +1035,13 @@ bool xt::internal::chkrdun(const std::vector<unsigned>& formFillCounter,
 
 double
 xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord) {
-	unsigned    currentRegion = sortRecord.currentRegion;
-	fPOINTATTR* currentStitch = nullptr;
-	bool        direction     = sortRecord.direction;
+	auto currentRegion = sortRecord.currentRegion;
+	auto currentStitch = static_cast<fPOINTATTR*>(nullptr);
+	auto direction     = sortRecord.direction;
 
-	std::vector<unsigned> formFillCounter(gsl::narrow<unsigned int>((gsl::narrow_cast<unsigned long>(FormIndex) + 2u) << 2u));
-	unsigned              totalJumps = 0;
+	auto formFillCounter
+	    = std::vector<unsigned>(gsl::narrow<unsigned int>((gsl::narrow_cast<unsigned long>(FormIndex) + 2u) << 2u));
+	auto totalJumps = 0u;
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
 		double minimumLength = 1e9;
 		if (direction) {
@@ -1051,7 +1052,7 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 		}
 		for (auto iRegion = sortRecord.start; iRegion < sortRecord.finish; iRegion++) {
 			if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
-				double length
+				auto length
 				    = hypot(pRecs[iRegion]->startStitch->x - currentStitch->x, pRecs[iRegion]->startStitch->y - currentStitch->y);
 				if (length < minimumLength) {
 					minimumLength = length;
@@ -1157,7 +1158,7 @@ void xt::fsort() {
 
 	// There cannot be more records than stitches
 	// ToDo - convert this to a reserve/pushback
-	std::vector<OREC> stitchRegion(PCSHeader.stitchCount);
+	auto stitchRegion = std::vector<OREC>(PCSHeader.stitchCount);
 
 	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors
 	//        in a single form are not in ascending order already.
@@ -1184,9 +1185,9 @@ void xt::fsort() {
 	stitchRegion[index].endStitch = &StitchBuffer[PCSHeader.stitchCount - 1];
 	stitchRegion[index].finish    = PCSHeader.stitchCount;
 	index++;
-	const auto         lastRegion = index;
-	std::vector<OREC*> pRecs(lastRegion);
-	std::vector<OREC*> pFRecs(lastRegion);
+	const auto lastRegion = index;
+	auto       pRecs      = std::vector<OREC*>(lastRegion);
+	auto       pFRecs     = std::vector<OREC*>(lastRegion);
 	for (auto iRegion = 0u; iRegion < lastRegion; iRegion++) {
 		xi::durec(stitchRegion[iRegion]);
 		pRecs[iRegion]  = &stitchRegion[iRegion];
@@ -1199,14 +1200,14 @@ void xt::fsort() {
 #endif
 	auto badForm = 0u;
 	if (xi::srtchk(pFRecs, lastRegion, badForm)) {
-		std::vector<RANGE> stitchRange(lastRegion);
+		auto stitchRange     = std::vector<RANGE>(lastRegion);
 		stitchRange[0].start = 0;
 		attribute            = pRecs[0]->color;
 		auto currentForm     = 0xffffffffu;
 		auto typeCount       = 0u;
 		auto iRange          = 0u;
 		for (auto iRegion = 0u; iRegion < lastRegion; iRegion++) {
-			bool srtskp = true;
+			auto srtskp = true;
 			if (attribute != pRecs[iRegion]->color) {
 				stitchRange[iRange++].finish = iRegion;
 				stitchRange[iRange].start    = iRegion;
@@ -1226,19 +1227,19 @@ void xt::fsort() {
 			}
 			pRecs[iRegion]->otyp = typeCount;
 		}
-		stitchRange[iRange].finish        = lastRegion;
-		const auto              lastRange = ++iRange;
-		std::vector<fPOINTATTR> tempStitchBuffer(PCSHeader.stitchCount);
-		OutputIndex = 0;
+		stitchRange[iRange].finish  = lastRegion;
+		const auto lastRange        = ++iRange;
+		auto       tempStitchBuffer = std::vector<fPOINTATTR>(PCSHeader.stitchCount);
+		OutputIndex                 = 0;
 		for (iRange = 0; iRange < lastRange; iRange++) {
 			StateMap.reset(StateFlag::DUSRT);
-			SRTREC sortRecord = {};
+			auto sortRecord   = SRTREC{};
 			sortRecord.start  = stitchRange[iRange].start;
 			sortRecord.finish = stitchRange[iRange].finish;
 			sortRecord.count  = sortRecord.finish - sortRecord.start;
 			auto minimumJumps = 0xffffffffu;
 			// timeout used to put an upper bound on the number of sorting permutations checked
-			FILETIME fileTime = {};
+			auto fileTime = FILETIME{};
 			GetSystemTimeAsFileTime(&fileTime);
 			const auto startTime        = xi::tim2int(fileTime);
 			auto       minimumIndex     = 0u;
@@ -1270,7 +1271,7 @@ void xt::fsort() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-		std::wstring str;
+		auto str = std::wstring{};
 		displayText::loadString(str, IDS_SRTER);
 		displayText::shoMsg(fmt::format(str, pFRecs[badForm]->form));
 	}
@@ -1289,11 +1290,11 @@ typedef struct _atfld {
 void xt::internal::duatf(unsigned ind) {
 	const auto attribute = StitchBuffer[ind].attribute;
 
-	ATFLD attributeFields = { (attribute & COLMSK),
-		                      ((attribute & FRMSK) >> FRMSHFT),
-		                      gsl::narrow<unsigned>(StitchTypes[dutyp(attribute)]),
-		                      ((attribute >> LAYSHFT) & 7),
-		                      0 };
+	auto attributeFields = ATFLD{ (attribute & COLMSK),
+		                          ((attribute & FRMSK) >> FRMSHFT),
+		                          gsl::narrow<unsigned>(StitchTypes[dutyp(attribute)]),
+		                          ((attribute >> LAYSHFT) & 7),
+		                          0 };
 
 	if (attribute & 0x80000000) {
 		attributeFields.user = 1;
@@ -1326,7 +1327,8 @@ void xt::dmpat() {
 #endif
 
 void xt::fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
-	unsigned iDestinationStitch = 0, tmap = 0;
+	auto iDestinationStitch = 0u;
+	auto tmap               = 0u;
 	// ToDo - Still not sure what this function does?
 	//        I suspect the fillStartsData members are not correctly named
 	const auto codedFormIndex = (ClosestFormToCursor << FRMSHFT);
@@ -1507,7 +1509,7 @@ void xt::internal::duint(unsigned offset, unsigned code, INTINF& ilData) {
 			                       code);
 		}
 	}
-	fPOINT point = {};
+	auto point = fPOINT{};
 	if (lastcol(ilData.pins, point)) {
 		ilData.output
 		    += gucon(point, InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index], ilData.output + MAXITEMS, code);
@@ -1551,7 +1553,7 @@ void xt::internal::chkend(unsigned offset, unsigned code, INTINF& ilData) {
 }
 
 void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsigned interleaveSequenceIndex2) {
-	INTINF ilData = {};
+	auto ilData = INTINF{};
 
 	StateMap.reset(StateFlag::ISEND);
 	form::fvars(ClosestFormToCursor);
@@ -1640,7 +1642,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 					                           code);
 				}
 			}
-			fPOINT colpnt = {};
+			auto colpnt = fPOINT{};
 			if (xi::lastcol(iSequence, colpnt)) {
 				ilData.output
 				    += xi::gucon(colpnt, InterleaveSequence[InterleaveSequenceIndices[iSequence].index], ilData.output, code);
@@ -2488,7 +2490,7 @@ BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 		}
 		case IDC_DUASP: {
 			const auto designAspectRatio = DesignSize.y / DesignSize.x;
-			fPOINT     designSize        = {};
+			auto       designSize        = fPOINT{};
 			if (!chkasp(designSize, designAspectRatio, designSizeDialog)) {
 				if (StateMap.test(StateFlag::DESCHG)) {
 					setstxt(IDC_DESWID, designSize.y / designAspectRatio, designSizeDialog);
@@ -2516,8 +2518,8 @@ void xt::internal::sadj(fPOINT& point, const dPOINT& designSizeRatio, const fREC
 }
 
 void xt::internal::nudfn(const fRECTANGLE& designSizeRect) noexcept {
-	const fPOINT newSize         = { (designSizeRect.right - designSizeRect.left), (designSizeRect.top - designSizeRect.bottom) };
-	const dPOINT designSizeRatio = { (DesignSize.x / newSize.x), (DesignSize.y / newSize.y) };
+	const auto newSize = fPOINT{ (designSizeRect.right - designSizeRect.left), (designSizeRect.top - designSizeRect.bottom) };
+	const auto designSizeRatio = dPOINT{ (DesignSize.x / newSize.x), (DesignSize.y / newSize.y) };
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		sadj(StitchBuffer[iStitch], designSizeRatio, designSizeRect);
 	}
@@ -2528,8 +2530,8 @@ void xt::internal::nudfn(const fRECTANGLE& designSizeRect) noexcept {
 }
 
 void xt::nudsiz() {
-	auto       flag           = 0;
-	fRECTANGLE designSizeRect = {}; // design size rectangle
+	auto flag           = 0;
+	auto designSizeRect = fRECTANGLE{}; // design size rectangle
 
 	thred::savdo();
 	flag = 0;
