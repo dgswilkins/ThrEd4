@@ -1091,7 +1091,7 @@ float form::internal::findDistanceToSide(const fPOINT& lineStart,
 
 bool form::closfrm() {
 	if (FormIndex) {
-		auto screenCoordinate = POINT{ Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
+		const auto screenCoordinate = POINT{ Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 		fi::rats();
 		auto closestForm   = 0u;
 		auto closestVertex = 0u;
@@ -4427,7 +4427,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 void form::internal::bakseq() {
 constexpr auto RITSIZ = 6;
 
-	unsigned seqtab[] = {
+	const unsigned seqtab[] = {
 		12, 7, 15, 11, 13, 17,
 	};
 

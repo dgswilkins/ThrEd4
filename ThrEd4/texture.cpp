@@ -546,13 +546,13 @@ void texture::internal::setxmov() {
 }
 
 void texture::internal::ritxrct() noexcept {
-	auto  offset    = POINT{ (TextureCursorLocation.x - SelectTexturePointsOrigin.x),
-                         (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
-	auto  rectangle = RECT{ (TexturePixelRect.left + offset.x),
-                           (TexturePixelRect.top + offset.y),
-                           (TexturePixelRect.right + offset.x),
-                           (TexturePixelRect.bottom + offset.y) };
-	POINT line[5]   = {};
+	const auto offset    = POINT{ (TextureCursorLocation.x - SelectTexturePointsOrigin.x),
+                               (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
+	const auto rectangle = RECT{ (TexturePixelRect.left + offset.x),
+		                         (TexturePixelRect.top + offset.y),
+		                         (TexturePixelRect.right + offset.x),
+		                         (TexturePixelRect.bottom + offset.y) };
+	POINT      line[5]   = {};
 
 	line[0].x = line[1].x = line[4].x = rectangle.left;
 	line[2].x = line[3].x = rectangle.right;

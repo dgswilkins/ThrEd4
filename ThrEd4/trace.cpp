@@ -1102,8 +1102,8 @@ void trace::tracpar() {
 				}
 				const auto ratio         = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
 				const auto position      = dToUI(std::floor(ratio * 255.0));
-				auto       traceColor    = static_cast<COLORREF>(UpPixelColor & TraceRGB[2 - ColumnColor]);
-				const auto tracePosition = static_cast<COLORREF>(position << TraceShift[ColumnColor]);
+				auto       traceColor    = gsl::narrow_cast<COLORREF>( UpPixelColor & TraceRGB[2 - ColumnColor] );
+				const auto tracePosition = gsl::narrow_cast<COLORREF>( position << TraceShift[ColumnColor] );
 				if (tracePosition < traceColor) {
 					UpPixelColor &= TraceRGBMask[ColumnColor];
 					UpPixelColor |= tracePosition;
