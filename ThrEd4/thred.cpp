@@ -3602,11 +3602,11 @@ void thred::internal::ritbal() {
 		balaradHeader.backgroundColor = BackgroundColor;
 		balaradHeader.hoopSizeX       = IniFile.hoopSizeX * BalaradRatio;
 		balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BalaradRatio;
-		DWORD bytesWritten            = 0u;
+		auto bytesWritten             = DWORD{ 0 };
 		WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
 		BalaradOffset.x = IniFile.hoopSizeX / 2.0f;
 		BalaradOffset.y = IniFile.hoopSizeY / 2.0f;
-		std::vector<BALSTCH> balaradStitch(gsl::narrow<size_t>(PCSHeader.stitchCount) + 2u);
+		auto balaradStitch = std::vector<BALSTCH>(gsl::narrow<size_t>(PCSHeader.stitchCount) + 2u);
 		color = StitchBuffer[0].attribute & COLMSK;
 		// ToDo - does this loop make sense? iOutput is > 2 after one iteration
 		auto iOutput = 0u;
@@ -4384,7 +4384,7 @@ void thred::internal::sav() {
 			GroupEndStitch               = PCSHeader.stitchCount - 1;
 			pesHeader.xsiz               = 10000;
 			pesHeader.ysiz               = 10000;
-			DWORD bytesWritten           = 0;
+			auto bytesWritten            = DWORD{ 0 };
 			WriteFile(PCSFileHandle, convert_ptr<PESHED*>(&pesHeader), sizeof(pesHeader), &bytesWritten, nullptr);
 			WriteFile(PCSFileHandle, PESstitches, OutputIndex * sizeof(PESstitches[0]), &bytesWritten, nullptr);
 			delete[] PESstitches;

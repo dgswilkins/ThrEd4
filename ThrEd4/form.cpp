@@ -3058,7 +3058,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 			CurrentFormVertices[iVertex].y += formNegativeOffset;
 		}
 	}
-	auto regionCrossingData = std::vector<VCLPX>(); // region crossing data for vertical clipboard fills
+	auto regionCrossingData = std::vector<VCLPX>{}; // region crossing data for vertical clipboard fills
 	regionCrossingData.reserve(MAXFRMLINS);
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 		auto start  = gsl::narrow<unsigned int>(std::floor(CurrentFormVertices[iVertex].x / clipWidth));
@@ -3411,7 +3411,7 @@ void form::angclpfn(const std::vector<RNGCNT>& textureSegments) {
 	if (StateMap.test(StateFlag::ISUND)) {
 		rotationAngle = PI / 2 - SelectedForm->underlayStitchAngle;
 
-		const std::vector<fPOINT>& vertexList = xt::insid();
+		const auto& vertexList = xt::insid();
 		for (auto iVertex = 0u; iVertex < AngledForm.vertexCount; iVertex++) {
 			AngledFormVertices[iVertex] = vertexList[iVertex];
 			thred::rotflt(AngledFormVertices[iVertex], rotationAngle, rotationCenter);
@@ -3934,7 +3934,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 					else {
 						if (savedTopLine != sortedLines[iLineDec][1].line) {
 							if (iLineDec) {
-								duseq2(sortedLines[iLineDec + 1]);
+								duseq2(sortedLines[static_cast<size_t>(iLineDec) + 1]);
 							}
 							flag = true;
 							duseq2(sortedLines[iLineDec]);
@@ -3944,7 +3944,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 				}
 				else {
 					if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-						duseq2(sortedLines[iLineDec + 1]);
+						duseq2(sortedLines[static_cast<size_t>(iLineDec) + 1]);
 					}
 					flag          = true;
 					sequenceLines = sortedLines[iLineDec];
@@ -4278,8 +4278,8 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 
 		auto mapIndexSequence = std::vector<unsigned>();
 		mapIndexSequence.reserve(gsl::narrow_cast<size_t>(regionCount) + 1);
-		std::vector<RCON> pathMap;
-		std::vector<FSEQ> sequencePath;
+		auto pathMap      = std::vector<RCON>{};
+		auto sequencePath = std::vector<FSEQ>{};
 
 		if (regionCount > 1) {
 			auto pathMapIndex = 0u;
@@ -4425,7 +4425,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 }
 
 void form::internal::bakseq() {
-constexpr auto RITSIZ = 6;
+	constexpr auto RITSIZ = 6;
 
 	const unsigned seqtab[] = {
 		12, 7, 15, 11, 13, 17,
@@ -5306,7 +5306,7 @@ void form::rotfrm(unsigned int newStartVertex) {
 		if (iRotatedGuide) {
 			SelectedForm->satinGuideCount = iRotatedGuide;
 			// ToDo - Can we do the sort in place?
-			std::vector<SATCON> rotatedGuides(iRotatedGuide);
+			auto rotatedGuides = std::vector<SATCON>(iRotatedGuide);
 			for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
 				rotatedGuides[iGuide] = CurrentFormGuides[iGuide];
 			}

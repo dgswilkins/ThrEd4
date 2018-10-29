@@ -71,7 +71,7 @@ void texture::txdun() {
 	if (!TextureHistory[0].texturePoints.empty()) {
 		wchar_t name[_MAX_PATH] = { 0 };
 		if (txi::txnam(name, sizeof(name) / sizeof(name[0]))) {
-			DWORD bytesWritten = 0u;
+			auto bytesWritten = DWORD{ 0 };
 			auto  handle       = CreateFile(name, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 			if (handle != INVALID_HANDLE_VALUE) {
 				WriteFile(handle, &signature, sizeof(signature), &bytesWritten, nullptr);
@@ -133,12 +133,12 @@ void texture::redtx() {
 	if (txi::txnam(name, sizeof(name) / sizeof(name[0]))) {
 		auto handle = CreateFile(name, GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 		if (handle != INVALID_HANDLE_VALUE) {
-			DWORD bytesRead = 0;
+			auto bytesRead = DWORD{ 0 };
 			char  sig[4]    = { 0 };
 			if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, nullptr)) {
 				if (!strcmp(sig, "txh")) {
 					if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr)) {
-						DWORD historyBytesRead = 0;
+						auto historyBytesRead = DWORD{ 0 };
 						if (ReadFileInt(handle,
 						                textureHistoryBuffer.data(),
 						                gsl::narrow<unsigned int>(textureHistoryBuffer.size() * ITXBUFLEN),
