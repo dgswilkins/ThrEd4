@@ -48,7 +48,7 @@ bool         cisin(float xCoordinate, float yCoordinate) noexcept;
 unsigned int closflt(float xCoordinate, float yCoordinate) noexcept;
 bool         closfrm();
 void         clpfil();
-void         clpspac(const unsigned insertPoint, unsigned int count) noexcept;
+void         clpspac(unsigned insertPoint, unsigned int count) noexcept;
 void         clrfills() noexcept;
 void         cntrx();
 void         col2frm();
@@ -222,7 +222,7 @@ namespace internal {
 	                unsigned int                  finish,
 	                boost::dynamic_bitset<>&      sequenceMap,
 	                unsigned&                     lastGroup,
-	                SMALPNTL*                     SequenceLines);
+	                SMALPNTL*                     sequenceLines);
 	bool     chk2of();
 	void     chkbrd(unsigned& interleaveSequenceIndex2);
 	void     chksid(unsigned int vertexIndex, unsigned clipIntersectSide) noexcept;
@@ -253,8 +253,8 @@ namespace internal {
 	             std::vector<fPOINT>& destinationFormVertices,
 	             std::vector<FRMHED>& destinationFormList,
 	             unsigned int         formIndex,
-	             unsigned int&        FormRelocationIndex);
-	void  duflt(float& FormOffset);
+	             unsigned int&        formRelocationIndex);
+	void  duflt(float& formOffset);
 	void  dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish, unsigned& lastGroup);
 	void  dupfn(double rotationAngle);
 	void  duprotfs(double rotationAngle);
@@ -265,17 +265,17 @@ namespace internal {
 	            unsigned                      pthi,
 	            unsigned int                  lineCount,
 	            std::vector<REGION>&          regionsList,
-	            unsigned&                     LastGroup,
+	            unsigned&                     lastGroup,
 	            unsigned                      sequencePathIndex);
 	void  duromb(const dPOINT& start0, const dPOINT& finish0, const dPOINT& start1, const dPOINT& finish1);
 	void  duseq(const std::vector<SMALPNTL*>& sortedLines,
 	            unsigned int                  start,
 	            unsigned int                  finish,
 	            boost::dynamic_bitset<>&      sequenceMap,
-	            unsigned&                     LastGroup,
+	            unsigned&                     lastGroup,
 	            SMALPNTL*                     sequenceLines);
-	void  duseq1(const SMALPNTL* SequenceLines) noexcept;
-	void  duseq2(const SMALPNTL* SequenceLines) noexcept;
+	void  duseq1(const SMALPNTL* sequenceLines) noexcept;
+	void  duseq2(const SMALPNTL* sequenceLines) noexcept;
 	void  duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 	             const std::vector<VRCT2>& fillVerticalRect,
 	             unsigned int              start,
@@ -369,7 +369,7 @@ namespace internal {
 	              unsigned&                     doneRegion,
 	              unsigned                      pathMapIndex,
 	              unsigned&                     sequencePathIndex,
-	              unsigned                      VisitedIndex);
+	              unsigned                      visitedIndex);
 	void   nxtseq(std::vector<FSEQ>&           sequencePath,
 	              const std::vector<RCON>&     pathMap,
 	              const std::vector<unsigned>& mapIndexSequence,
@@ -401,7 +401,7 @@ namespace internal {
 	             unsigned                      iRegion1,
 	             const std::vector<REGION>&    regionsList,
 	             double                        gapToClosestRegion,
-	             unsigned&                     NextGroup);
+	             unsigned&                     nextGroup);
 	double reglen(const std::vector<SMALPNTL*>& sortedLines,
 	              unsigned                      iRegion,
 	              const std::vector<fPOINT>&    lastRegionCorners,
@@ -409,7 +409,7 @@ namespace internal {
 	void   ritapbrd(unsigned& interleaveSequenceIndex2);
 	void   ritbrd(unsigned& interleaveSequenceIndex2);
 	void   ritfil(unsigned& interleaveSequenceIndex2);
-	bool   ritlin(const fPOINT& start, const fPOINT& finish, float UserStitchLen);
+	bool   ritlin(const fPOINT& start, const fPOINT& finish, float userStitchLen);
 	void   ritseg(const std::vector<CLIPNT>& clipStitchPoints,
 	              std::vector<CLPSEG>&       clipSegments,
 	              unsigned                   currentSegmentIndex,
@@ -433,7 +433,7 @@ namespace internal {
 	void setstar();
 	void setzig();
 
-	constexpr float shreg(float highValue, float reference, double EggRatio) noexcept;
+	constexpr float shreg(float highValue, float reference, double eggRatio) noexcept;
 
 	void shrnks();
 	void snp(unsigned start, unsigned finish);
@@ -456,7 +456,7 @@ namespace internal {
 
 	unsigned leftsid() noexcept;
 
-	bool unvis(const boost::dynamic_bitset<>& visitedRegions, unsigned& VisitedIndex);
+	bool unvis(const boost::dynamic_bitset<>& visitedRegions, unsigned& visitedIndex);
 	bool vscmp(unsigned index1, unsigned index2) noexcept;
 } // namespace internal
 } // namespace form
