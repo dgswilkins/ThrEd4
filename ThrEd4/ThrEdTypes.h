@@ -854,9 +854,9 @@ inline fPOINT::fPOINT(float rhsX, float rhsY) noexcept
 
 #pragma warning(push)
 #pragma warning(disable : 4244)
-inline fPOINT::fPOINT(double rhsX, double rhsY) noexcept
-    : x(rhsX)
-    , y(rhsY) {
+inline fPOINT::fPOINT(double rhsX, double rhsY) noexcept {
+	x = gsl::narrow_cast<float>(rhsX);
+	y = gsl::narrow_cast<float>(rhsY);
 }
 
 inline fPOINT::fPOINT(const dPOINT& rhs) noexcept {
