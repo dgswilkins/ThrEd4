@@ -438,15 +438,15 @@ void form::internal::frmsqr(unsigned iVertex) {
 	const auto delta  = dPOINT{ CurrentFormVertices[iVertex - 1].x - CurrentFormVertices[iVertex].x,
                                CurrentFormVertices[iVertex - 1].y - CurrentFormVertices[iVertex].y };
 	auto       angle  = atan2(delta.y, delta.x);
-	auto       offset = fPOINT{ length * cos(angle), length * sin(angle) };
+	auto       offset = dPOINT{ length * cos(angle), length * sin(angle) };
 	const auto point  = fPOINT{ CurrentFormVertices[iVertex].x + offset.x, CurrentFormVertices[iVertex].y + offset.y };
 	angle             = atan2(-delta.x, delta.y);
 	length /= 2.0;
-	offset             = { length * cos(angle), length * sin(angle) };
+	offset             = dPOINT{ length * cos(angle), length * sin(angle) };
 	auto adjustedPoint = fPOINT{ point.x + offset.x, point.y + offset.y };
 	thred::stch2pxr(adjustedPoint);
 	line[0] = line[3] = StitchCoordinatesPixels;
-	adjustedPoint     = { point.x - offset.x, point.y - offset.y };
+	adjustedPoint     = fPOINT{ point.x - offset.x, point.y - offset.y };
 	thred::stch2pxr(adjustedPoint);
 	line[2] = StitchCoordinatesPixels;
 	Polyline(StitchWindowMemDC, line, 4);
@@ -1139,9 +1139,8 @@ bool form::closfrm() {
 		}
 		return false;
 	}
-	else {
-		return false;
-	}
+
+	return false;
 }
 
 void form::frmovlin() {
@@ -4536,7 +4535,7 @@ void form::internal::bakseq() {
 			break;
 		}
 		case 0: {
-			delta = { static_cast<double>(BSequence[iSequence].x) - BSequence[iSequence + 1].x,
+			delta = dPOINT{ static_cast<double>(BSequence[iSequence].x) - BSequence[iSequence + 1].x,
 				      static_cast<double>(BSequence[iSequence].y) - BSequence[iSequence + 1].y };
 			StateMap.reset(StateFlag::FILDIR);
 			const auto length = hypot(delta.x, delta.y);
