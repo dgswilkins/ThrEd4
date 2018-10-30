@@ -1101,7 +1101,7 @@ void thred::internal::fnamtabs() {
 		auto destination = form::psg() & 0x7f;
 		std::swap(NameEncoder[destination], NameEncoder[source]);
 	}
-	const auto fillval = unsigned char{};
+	const auto fillval = gsl::narrow_cast<unsigned char>(0);
 	std::fill_n(NameDecoder, sizeof(NameDecoder), fillval);
 	for (auto iName = 32u; iName < 127; iName++) {
 		NameDecoder[NameEncoder[iName]] = gsl::narrow<unsigned char>(iName);
@@ -7238,7 +7238,7 @@ unsigned thred::internal::frmcnt(unsigned int iForm, unsigned formFirstStitchInd
 	const auto codedAttribute = iForm << FRMSHFT;
 	auto       iStitch        = 0u;
 
-	LowerLeftStitch = { 1e20f, 1e20f };
+	LowerLeftStitch = fPOINT{ 1e20f, 1e20f };
 	auto flag       = true;
 	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute & FRMSK) == codedAttribute && StitchBuffer[iStitch].attribute & TYPMSK) {
@@ -7768,7 +7768,7 @@ void thred::internal::endknt(unsigned finish) {
 
 	KnotAttribute = StitchBuffer[iStart].attribute | KNOTMSK;
 	do {
-		delta = { static_cast<double>(StitchBuffer[finish].x) - StitchBuffer[iStart].x,
+		delta = dPOINT{ static_cast<double>(StitchBuffer[finish].x) - StitchBuffer[iStart].x,
 			      static_cast<double>(StitchBuffer[finish].y) - StitchBuffer[iStart].y };
 
 		length = hypot(delta.x, delta.y);
@@ -7800,7 +7800,7 @@ void thred::internal::strtknt(unsigned start) noexcept {
 	auto finish = start + 1;
 
 	do {
-		delta = { static_cast<double>(StitchBuffer[finish].x) - StitchBuffer[start].x,
+		delta = dPOINT{ static_cast<double>(StitchBuffer[finish].x) - StitchBuffer[start].x,
 			      static_cast<double>(StitchBuffer[finish].y) - StitchBuffer[start].y };
 
 		length = hypot(delta.x, delta.y);
@@ -14788,11 +14788,14 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			}
 			else {
 #ifdef _DEBUG
-				if (GetKeyState(VK_SHIFT) & 0X8000)
+				if (GetKeyState(VK_SHIFT) & 0X8000) {
 					xt::dmpat();
-				else
+				} else {
 #endif
 					dun();
+#ifdef _DEBUG
+				}
+#endif
 			}
 			break;
 		}
