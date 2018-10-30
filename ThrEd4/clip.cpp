@@ -278,7 +278,7 @@ void clip::internal::lincrnr(const std::vector<fPOINT>& clipReversedData,
 	auto delta = dPOINT{};
 
 	if (ci::nupnt(clipAngle, moveToCoords, currentSide)) {
-		delta = { moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y };
+		delta = dPOINT{ moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y };
 
 		const auto rotationAngle = atan2(delta.y, delta.x);
 		thred::rotangf(BorderClipReference, ClipReference, rotationAngle, rotationCenter);
@@ -680,11 +680,11 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 	auto       delta      = dPOINT{};
 
 	if (StateMap.test(StateFlag::INDIR)) {
-		delta = { (*OutsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
+		delta = fPOINT{ (*OutsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
 			      (*OutsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y };
 	}
 	else {
-		delta = { (*InsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
+		delta = fPOINT{ (*InsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
 			      (*InsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y };
 	}
 	const auto rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
