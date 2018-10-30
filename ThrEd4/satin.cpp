@@ -1237,7 +1237,7 @@ void satin::satpnt1() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void si::filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point, unsigned& satinBackupIndex) {
+void satin::internal::filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point, unsigned& satinBackupIndex) {
 	satinBackup[satinBackupIndex++] = point;
 	satinBackupIndex &= (satinBackup.size() - 1);
 	form::filinsb(point);
