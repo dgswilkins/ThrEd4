@@ -1009,9 +1009,7 @@ bool xt::internal::recmp(const OREC* record1, const OREC* record2) noexcept {
 
 		return (record1->form < record2->form);
 	}
-	else {
-		return (ColorOrder[record1->color] < ColorOrder[record2->color]);
-	}
+	return (ColorOrder[record1->color] < ColorOrder[record2->color]);
 }
 
 bool xt::internal::refcmp(const OREC* record1, const OREC* record2) noexcept {
@@ -1285,7 +1283,9 @@ typedef struct _atfld {
 	unsigned type;
 	unsigned layer;
 	unsigned user;
-} ATFLD;
+} ;
+
+using ATFLD = struct _atfld;
 
 void xt::internal::duatf(unsigned ind) {
 	const auto attribute = StitchBuffer[ind].attribute;
