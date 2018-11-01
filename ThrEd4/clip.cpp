@@ -88,9 +88,9 @@ void clip::delmclp(unsigned int iForm) {
 		if (clip::isclp(iForm)) {
 			auto destination = ci::findclp(iForm);
 			auto source      = destination + FormList[iForm].lengthOrCount.clipCount;
-			std::copy(ClipPoints + source,
-			          ClipPoints + ClipPointIndex,
-			          stdext::make_checked_array_iterator((ClipPoints + destination), (MAXITEMS - destination)));
+			std::copy(&ClipPoints[source],
+			          &ClipPoints[ClipPointIndex],
+			          stdext::make_checked_array_iterator((&ClipPoints[destination]), (MAXITEMS - destination)));
 			if (clip::iseclp(iForm)) {
 				FormList[iForm].borderClipData -= FormList[iForm].lengthOrCount.clipCount;
 			}
