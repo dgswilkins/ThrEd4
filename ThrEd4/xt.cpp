@@ -1277,13 +1277,13 @@ void xt::fsort() {
 
 #ifdef _DEBUG
 
-typedef struct _atfld {
+struct _atfld {
 	unsigned color;
 	unsigned form;
 	unsigned type;
 	unsigned layer;
 	unsigned user;
-} ;
+};
 
 using ATFLD = struct _atfld;
 
