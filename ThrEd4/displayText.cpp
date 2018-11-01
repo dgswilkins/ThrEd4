@@ -227,7 +227,7 @@ void displayText::ritnum(unsigned code, unsigned int value) {
 }
 
 void displayText::msgstr(unsigned code) noexcept {
-	LoadString(ThrEdInstance, code, MsgBuffer, MSGSIZ);
+	LoadString(ThrEdInstance, code, &MsgBuffer[0], MSGSIZ);
 }
 
 void displayText::riter() {
@@ -388,9 +388,9 @@ void displayText::savdisc() {
 
 	GetClientRect(MsgWindow, &MsgRect);
 
-	LoadString(ThrEdInstance, IDS_SAV, buffer, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_SAV, &buffer[0], HBUFSIZ);
 	OKButton = CreateWindow(L"STATIC",
-	                        buffer,
+	                        &buffer[0],
 	                        SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                        5,
 	                        MsgRect.bottom + 15,
@@ -401,9 +401,9 @@ void displayText::savdisc() {
 	                        ThrEdInstance,
 	                        nullptr);
 
-	LoadString(ThrEdInstance, IDS_DISC, buffer, HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_DISC, &buffer[0], HBUFSIZ);
 	DiscardButton = CreateWindow(L"STATIC",
-	                             buffer,
+	                             &buffer[0],
 	                             SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                             ButtonWidthX3 + 15,
 	                             MsgRect.bottom + 15,
