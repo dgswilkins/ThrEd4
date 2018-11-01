@@ -114,7 +114,7 @@
 #define KNOTLEN 54                // set knots for stitches longer than this
 #define MAXSAC 10000              // maximum number of satin guidelines
 #define MAXKNOTS 16384            // maximum nuber of knots
-#define IBFCLEN 4 * PFGRAN        // initial buttonhole fill corner length
+#define IBFCLEN (4 * PFGRAN)      // initial buttonhole fill corner length
 #define IPICSPAC 6                // initial picot border space
 #define PRFLINS 28                // number of lines on the preference menu
 #define EDGETYPS 12               // number of border fill types
@@ -164,9 +164,9 @@
 #define FDEFFLR 9                 // default feather floor
 #define FDEFNUM 10                // default feather number
 #define FDEFTYP FTHPSG            // default feather type
-#define ITXHI 9 * PFGRAN          // default texture editor height
-#define ITXWID 9 * PFGRAN         // default texture editor width
-#define ITXSPAC 0.40 * PFGRAN     // default texture editor spacing
+#define ITXHI (9 * PFGRAN)        // default texture editor height
+#define ITXWID (9 * PFGRAN)       // default texture editor width
+#define ITXSPAC (0.40 * PFGRAN)   // default texture editor spacing
 #define ITXPIX 5                  // default texture editor cross pixels
 #define ITXBUFLEN 16              // texture buffer depth
 
@@ -1110,7 +1110,7 @@ public:
 union FANGCLPOUT {
 public:
 	float     angle;
-	DWORD     clip; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+	DWORD     clip{}; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
 	SATCONOUT guide;
 
 	FANGCLPOUT() noexcept;
@@ -1119,7 +1119,7 @@ public:
 	// FANGCLPOUT& operator=(FANGCLPOUT&&) = default;
 	//~FANGCLPOUT() = default;
 
-	FANGCLPOUT(const FANGCLP& rhs) noexcept;
+	explicit FANGCLPOUT(const FANGCLP& rhs) noexcept;
 	inline FANGCLPOUT& operator=(const FANGCLP& rhs) noexcept;
 };
 
@@ -1153,7 +1153,7 @@ public:
 
 union FLENCNTOUT {
 public:
-	float    stitchLength;
+	float    stitchLength{};
 	unsigned clipCount;
 
 	FLENCNTOUT() noexcept;
@@ -1162,7 +1162,7 @@ public:
 	// FLENCNTOUT& operator=(FLENCNTOUT&&) = default;
 	//~FLENCNTOUT() = default;
 
-	FLENCNTOUT(const FLENCNT& rhs) noexcept;
+	explicit FLENCNTOUT(const FLENCNT& rhs) noexcept;
 	inline FLENCNTOUT& operator=(const FLENCNT& rhs) noexcept;
 };
 
@@ -1198,7 +1198,7 @@ public:
 
 union SATINANGLEOUT {
 public:
-	DWORD guide;
+	DWORD guide{};
 	float angle;
 
 	SATINANGLEOUT() noexcept;
@@ -1207,7 +1207,7 @@ public:
 	// SATINANGLEOUT& operator=(SATINANGLEOUT&&) = default;
 	//~SATINANGLEOUT() = default;
 
-	SATINANGLEOUT(const SATINANGLE& rhs) noexcept;
+	explicit SATINANGLEOUT(const SATINANGLE& rhs) noexcept;
 	inline SATINANGLEOUT& operator=(const SATINANGLE& rhs) noexcept;
 };
 
@@ -1256,18 +1256,18 @@ EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
 #define BEMIN 512
 #define CHNPOS 1024
 
-#define MEGLIN BELEN | BEMAX | BEMIN
-#define MEGBLD BELEN | BEMAX | BEMIN
-#define MEGCLP BNCLP | BEMAX | BEMIN
-#define MEGSAT BESPAC | BESIZ | BRDEND | BEMAX | BEMIN
-#define MEGAP BESPAC | BESIZ | BRDEND | BEMAX | BEMIN
-#define MEGPRP BESPAC | BESIZ | BRDEND | BEMAX | BEMIN
-#define MEGHOL BELEN | BESPAC | BESIZ | BCNRSIZ | BEMAX | BEMIN
-#define MEGPIC BELEN | BESIZ | BNCLP | BPICSPAC | BCNRSIZ | BEMAX | BEMIN
-#define MEGDUB BELEN | BEMAX | BEMIN
-#define MEGCHNL BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS
-#define MEGCHNH BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS
-#define MEGCLPX BNCLP | BEMAX | BEMIN
+#define MEGLIN (BELEN | BEMAX | BEMIN)
+#define MEGBLD (BELEN | BEMAX | BEMIN)
+#define MEGCLP (BNCLP | BEMAX | BEMIN)
+#define MEGSAT (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN)
+#define MEGAP (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN)
+#define MEGPRP (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN)
+#define MEGHOL (BELEN | BESPAC | BESIZ | BCNRSIZ | BEMAX | BEMIN)
+#define MEGPIC (BELEN | BESIZ | BNCLP | BPICSPAC | BCNRSIZ | BEMAX | BEMIN)
+#define MEGDUB (BELEN | BEMAX | BEMIN)
+#define MEGCHNL (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS)
+#define MEGCHNH (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS)
+#define MEGCLPX (BNCLP | BEMAX | BEMIN)
 
 #define EGLIN_LINS 4
 #define EGBLD_LINS 4
@@ -1420,7 +1420,7 @@ public:
 	DWORD borderClipData; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
 	unsigned short satinGuideCount; // number of satin guidelines
 	unsigned short wordParam;       // clipboard/textured fill phase or satin end guide
-	fRECTANGLE     rectangle;       // rectangle
+	fRECTANGLE     rectangle{};     // rectangle
 	unsigned char  fillType;        // fill type
 	unsigned char  edgeType;        // edge type
 	float          fillSpacing;     // fill spacing
@@ -1436,7 +1436,7 @@ public:
 	float          minFillStitchLen;    // minimum fill stitch length
 	float          maxBorderStitchLen;  // maximum border stitch length
 	float          minBorderStitchLen;  // minimum border stitch length
-	TFINFO         fillInfo;            // feather/texture info
+	TFINFO         fillInfo{};          // feather/texture info
 	unsigned short fillStart;           // fill start point
 	unsigned short fillEnd;             // fill end point
 	float          underlaySpacing;     // underlay spacing
@@ -1471,7 +1471,7 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
 	borderClipData  = 0;
 	satinGuideCount = 0;
 	wordParam       = 0;
-	rectangle       = {};
+	rectangle       = {0.0f, 0.0f, 0.0f, 0.0f};
 	fillType        = 0;
 	edgeType        = 0;
 	fillSpacing     = 0;
