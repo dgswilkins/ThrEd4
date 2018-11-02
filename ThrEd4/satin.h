@@ -36,7 +36,7 @@ void         delcon(unsigned GuideIndex);
 void         delsac(unsigned int formIndex) noexcept;
 void         delspnt();
 void         drwsat();
-void         dusat() noexcept;
+void         dusat();
 unsigned int getGuideSize() noexcept;
 void         ribon();
 void         satadj();

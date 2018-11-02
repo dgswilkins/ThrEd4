@@ -92,12 +92,12 @@ HMENU           FillMenu;               // fill submenu
 std::vector<double>* FormAngles;        // angles of a form for satin border fills
 std::vector<POINT>*  FormControlPoints; // form control rectangle in pixel coordinates
 
-HWND         FormDataSheet = nullptr; // form data sheet
-unsigned int FormIndex     = 0u;      // index into the list of forms
-POINT        FormLines[MAXFRMLINS];   // used in the form drawing routines
-FRMHED       FormList[MAXFORMS];      // a list of form headers
-unsigned int FormMenuChoice = 0u;     // data type for form data form numerical entry
-fPOINT       FormMoveDelta;           // offset for moving forms
+HWND                FormDataSheet = nullptr; // form data sheet
+unsigned int        FormIndex     = 0u;      // index into the list of forms
+std::vector<POINT>* FormLines;               // used in the form drawing routines
+FRMHED              FormList[MAXFORMS];      // a list of form headers
+unsigned int        FormMenuChoice = 0u;     // data type for form data form numerical entry
+fPOINT              FormMoveDelta;           // offset for moving forms
 
 std::wstring* FormOnOff;
 

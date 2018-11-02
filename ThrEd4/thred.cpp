@@ -3604,10 +3604,10 @@ void thred::internal::ritbal() {
 		balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BalaradRatio;
 		auto bytesWritten             = DWORD{ 0 };
 		WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
-		BalaradOffset.x = IniFile.hoopSizeX / 2.0f;
-		BalaradOffset.y = IniFile.hoopSizeY / 2.0f;
+		BalaradOffset.x    = IniFile.hoopSizeX / 2.0f;
+		BalaradOffset.y    = IniFile.hoopSizeY / 2.0f;
 		auto balaradStitch = std::vector<BALSTCH>(gsl::narrow<size_t>(PCSHeader.stitchCount) + 2u);
-		color = StitchBuffer[0].attribute & COLMSK;
+		color              = StitchBuffer[0].attribute & COLMSK;
 		// ToDo - does this loop make sense? iOutput is > 2 after one iteration
 		auto iOutput = 0u;
 		thr2bal(balaradStitch, iOutput++, 0, BALJUMP);
@@ -7769,7 +7769,7 @@ void thred::internal::endknt(unsigned finish) {
 	KnotAttribute = StitchBuffer[iStart].attribute | KNOTMSK;
 	do {
 		delta = dPOINT{ static_cast<double>(StitchBuffer[finish].x) - StitchBuffer[iStart].x,
-			      static_cast<double>(StitchBuffer[finish].y) - StitchBuffer[iStart].y };
+			            static_cast<double>(StitchBuffer[finish].y) - StitchBuffer[iStart].y };
 
 		length = hypot(delta.x, delta.y);
 		iStart--;
@@ -7801,7 +7801,7 @@ void thred::internal::strtknt(unsigned start) noexcept {
 
 	do {
 		delta = dPOINT{ static_cast<double>(StitchBuffer[finish].x) - StitchBuffer[start].x,
-			      static_cast<double>(StitchBuffer[finish].y) - StitchBuffer[start].y };
+			            static_cast<double>(StitchBuffer[finish].y) - StitchBuffer[start].y };
 
 		length = hypot(delta.x, delta.y);
 		finish++;
@@ -8482,13 +8482,14 @@ void thred::internal::vubak() {
 	}
 }
 
-void thred::internal::insflin(POINT insertPoint) noexcept {
+void thred::internal::insflin(POINT insertPoint) {
 	const auto offset = POINT{ InsertSize.x >> 1, InsertSize.y >> 1 };
-
-	FormLines[0].x = FormLines[3].x = FormLines[4].x = insertPoint.x - offset.x;
-	FormLines[1].x = FormLines[2].x = insertPoint.x + offset.x;
-	FormLines[0].y = FormLines[1].y = FormLines[4].y = insertPoint.y - offset.y;
-	FormLines[2].y = FormLines[3].y = insertPoint.y + offset.y;
+	auto& formLines = *FormLines;
+	formLines.resize(5);
+	formLines[0].x = formLines[3].x = formLines[4].x = insertPoint.x - offset.x;
+	formLines[1].x = formLines[2].x = insertPoint.x + offset.x;
+	formLines[0].y = formLines[1].y = formLines[4].y = insertPoint.y - offset.y;
+	formLines[2].y = formLines[3].y = insertPoint.y + offset.y;
 }
 
 bool thred::internal::isthr(const wchar_t* const filename) {
@@ -9150,7 +9151,7 @@ void thred::ritmov() {
 		}
 	}
 	else {
-		(*RubberBandLine)[2] = FormLines[1];
+		(*RubberBandLine)[2] = (*FormLines)[1];
 		if (SelectedForm->type == FRMLINE) {
 			Polyline(StitchWindowDC, &(*RubberBandLine)[1], 2);
 		}
@@ -9332,10 +9333,12 @@ bool thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, double& xyRatio
 			SelectedFormControlVertex = iControlPoint;
 		}
 	}
+	auto& formLines = *FormLines;
+	formLines.resize(5);
 	for (auto iCorner = 0u; iCorner < 4; iCorner++) {
-		FormLines[iCorner] = (*SelectedFormsLine)[gsl::narrow<size_t>(iCorner) << 1];
+		formLines[iCorner] = (*SelectedFormsLine)[gsl::narrow<size_t>(iCorner) << 1];
 	}
-	FormLines[4] = FormLines[0];
+	formLines[4] = formLines[0];
 	if (minimumLength < CLOSENUF) {
 		for (auto iCorner = 0u; iCorner < 4; iCorner++) {
 			stretchBoxLine[iCorner] = (*SelectedFormsLine)[gsl::narrow<size_t>(iCorner) << 1];
@@ -14790,7 +14793,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 #ifdef _DEBUG
 				if (GetKeyState(VK_SHIFT) & 0X8000) {
 					xt::dmpat();
-				} else {
+				}
+				else {
 #endif
 					dun();
 #ifdef _DEBUG
@@ -15194,10 +15198,12 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							SelectedFormsSize.x = gsl::narrow<float>(SelectedFormsRect.right - SelectedFormsRect.left);
 							SelectedFormsSize.y = gsl::narrow<float>(SelectedFormsRect.bottom - SelectedFormsRect.top);
 							StateMap.set(StateFlag::INIT);
-							FormLines[0].x = FormLines[3].x = FormLines[4].x = SelectedFormsRect.left;
-							FormLines[1].x = FormLines[2].x = SelectedFormsRect.right;
-							FormLines[0].y = FormLines[1].y = FormLines[4].y = SelectedFormsRect.top;
-							FormLines[2].y = FormLines[3].y = SelectedFormsRect.bottom;
+							auto& formLines = *FormLines;
+							formLines.resize(5);
+							formLines[0].x = formLines[3].x = formLines[4].x = SelectedFormsRect.left;
+							formLines[1].x = formLines[2].x = SelectedFormsRect.right;
+							formLines[0].y = formLines[1].y = formLines[4].y = SelectedFormsRect.top;
+							formLines[2].y = formLines[3].y = SelectedFormsRect.bottom;
 							StateMap.set(StateFlag::SHOSTRTCH);
 							thred::strtchbox(stretchBoxLine);
 							FormMoveDelta.x = gsl::narrow<float>((SelectedFormsRect.right - SelectedFormsRect.left) >> 1);
@@ -18651,6 +18657,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		SelectedFormList                 = &private_SelectedFormList;
 		auto private_FormControlPoints   = std::vector<POINT>(10);
 		FormControlPoints                = &private_FormControlPoints;
+		auto private_FormLines            = std::vector<POINT>{};
+		FormLines                        = &private_FormLines;
 		auto private_RubberBandLine      = std::vector<POINT>(3);
 		RubberBandLine                   = &private_RubberBandLine;
 		auto private_SelectedFormsLine   = std::vector<POINT>(9);

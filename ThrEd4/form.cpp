@@ -314,13 +314,16 @@ void form::internal::px2stchf(const POINT& screen, fPOINT& stitchPoint) noexcept
 void form::frmlin(const fPOINT* const vertices, unsigned int vertexCount) {
 	if (vertices) {
 		if (VertexCount) {
+			auto& formLines = *FormLines;
+			formLines.clear();
 			for (auto iVertex = 0u; iVertex < vertexCount; iVertex++) {
-				FormLines[iVertex].x = dToL((vertices[iVertex].x - ZoomRect.left) * ZoomRatio.x);
-				FormLines[iVertex].y
-				    = dToL(StitchWindowClientRect.bottom - (vertices[iVertex].y - ZoomRect.bottom) * ZoomRatio.y);
+				formLines.emplace_back(
+				    POINT{ dToL((vertices[iVertex].x - ZoomRect.left) * ZoomRatio.x),
+				           dToL(StitchWindowClientRect.bottom - (vertices[iVertex].y - ZoomRect.bottom) * ZoomRatio.y) });
 			}
-			FormLines[vertexCount].x = dToL((vertices[0].x - ZoomRect.left) * ZoomRatio.x);
-			FormLines[vertexCount].y = dToL(StitchWindowClientRect.bottom - (vertices[0].y - ZoomRect.bottom) * ZoomRatio.y);
+			formLines.emplace_back(
+			    POINT{ dToL((vertices[0].x - ZoomRect.left) * ZoomRatio.x),
+			           dToL(StitchWindowClientRect.bottom - (vertices[0].y - ZoomRect.bottom) * ZoomRatio.y) });
 		}
 	}
 }
@@ -329,19 +332,22 @@ void form::frmlin(const std::vector<fPOINT>& vertices) {
 	const auto vertexMax = vertices.size();
 
 	if (vertexMax) {
+		auto& formLines = *FormLines;
+		formLines.clear();
 		for (auto iVertex = 0u; iVertex < vertexMax; iVertex++) {
-			FormLines[iVertex].x = dToL((vertices[iVertex].x - ZoomRect.left) * ZoomRatio.x);
-			FormLines[iVertex].y = dToL(StitchWindowClientRect.bottom - (vertices[iVertex].y - ZoomRect.bottom) * ZoomRatio.y);
+			formLines.emplace_back(
+			    POINT{ dToL((vertices[iVertex].x - ZoomRect.left) * ZoomRatio.x),
+			           dToL(StitchWindowClientRect.bottom - (vertices[iVertex].y - ZoomRect.bottom) * ZoomRatio.y) });
 		}
-		FormLines[vertexMax].x = dToL((vertices[0].x - ZoomRect.left) * ZoomRatio.x);
-		FormLines[vertexMax].y = dToL(StitchWindowClientRect.bottom - (vertices[0].y - ZoomRect.bottom) * ZoomRatio.y);
+		formLines.emplace_back(POINT{ dToL((vertices[0].x - ZoomRect.left) * ZoomRatio.x),
+		                              dToL(StitchWindowClientRect.bottom - (vertices[0].y - ZoomRect.bottom) * ZoomRatio.y) });
 	}
 }
 
 void form::dufrm() {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
-	PolylineInt(StitchWindowDC, FormLines, NewFormVertexCount);
+	PolylineInt(StitchWindowDC, FormLines->data(), NewFormVertexCount);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -355,10 +361,10 @@ void form::mdufrm() {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
 	if (FormList[ClosestFormToCursor].type == FRMLINE) {
-		PolylineInt(StitchWindowDC, FormLines, NewFormVertexCount - 1);
+		PolylineInt(StitchWindowDC, FormLines->data(), NewFormVertexCount - 1);
 	}
 	else {
-		PolylineInt(StitchWindowDC, FormLines, NewFormVertexCount);
+		PolylineInt(StitchWindowDC, FormLines->data(), NewFormVertexCount);
 	}
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
 }
@@ -395,7 +401,7 @@ void form::setfrm() {
 	fi::rats();
 	ClosestFormToCursor = FormIndex;
 	form::fvars(ClosestFormToCursor);
-	fi::px2stchf(FormLines[0], point);
+	fi::px2stchf((*FormLines)[0], point);
 	const auto delta             = fPOINT{ point.x - CurrentFormVertices[0].x, point.y - CurrentFormVertices[0].y };
 	SelectedForm->rectangle.left = SelectedForm->rectangle.bottom = static_cast<float>(1e30);
 	SelectedForm->rectangle.right = SelectedForm->rectangle.top = 0;
@@ -660,14 +666,14 @@ void form::drwfrm() {
 			if (SelectedForm->type == SAT) {
 				if (SelectedForm->attribute & FRMEND) {
 					SelectObject(StitchWindowMemDC, FormPen3px);
-					Polyline(StitchWindowMemDC, FormLines, 2);
+					Polyline(StitchWindowMemDC, FormLines->data(), 2);
 					lastPoint = 1;
 				}
 				if (SelectedForm->wordParam) {
 					SelectObject(StitchWindowMemDC, FormPen);
-					fi::frmpoly(&FormLines[1], SelectedForm->wordParam);
+					fi::frmpoly(&((*FormLines)[1]), SelectedForm->wordParam);
 					SelectObject(StitchWindowMemDC, FormPen3px);
-					Polyline(StitchWindowMemDC, &FormLines[SelectedForm->wordParam], 2);
+					Polyline(StitchWindowMemDC, &((*FormLines)[SelectedForm->wordParam]), 2);
 					SelectObject(StitchWindowMemDC, LayerPen[layer]);
 					lastPoint = SelectedForm->wordParam + 1;
 				}
@@ -680,7 +686,7 @@ void form::drwfrm() {
 			}
 			SelectObject(StitchWindowMemDC, LayerPen[layer]);
 			if (SelectedForm->type == FRMLINE) {
-				fi::frmpoly(FormLines, VertexCount);
+				fi::frmpoly(FormLines->data(), VertexCount);
 				if (SelectedForm->fillType == CONTF) {
 					dPOINT point(CurrentFormVertices[SelectedForm->angleOrClipData.guide.start]);
 					thred::sCor2px(point, line[0]);
@@ -690,31 +696,33 @@ void form::drwfrm() {
 				}
 			}
 			else {
-				fi::frmpoly(&FormLines[lastPoint], VertexCount + 1 - lastPoint);
+				fi::frmpoly(&((*FormLines)[lastPoint]), VertexCount + 1 - lastPoint);
 			}
 			if (ClosestFormToCursor == iForm && StateMap.test(StateFlag::FRMPSEL)) {
+				auto& formLines = *FormLines;
 				for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
 					if (iVertex == ClosestVertexToCursor) {
-						fi::frmx(FormLines[iVertex], StitchWindowMemDC);
+						fi::frmx(formLines[iVertex], StitchWindowMemDC);
 					}
 					else {
 						fi::frmsqr(iVertex);
 					}
 				}
 				if (ClosestVertexToCursor) {
-					fi::frmsqr0(FormLines[0]);
+					fi::frmsqr0(formLines[0]);
 				}
 				else {
-					fi::frmx(FormLines[0], StitchWindowMemDC);
+					fi::frmx(formLines[0], StitchWindowMemDC);
 				}
 				displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
 			}
 			else {
+				auto& formLines = *FormLines;
 				for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
 					fi::frmsqr(iVertex);
 				}
 				SelectObject(StitchWindowMemDC, FormSelectedPen);
-				fi::frmsqr0(FormLines[0]);
+				fi::frmsqr0(formLines[0]);
 			}
 			if (StateMap.test(StateFlag::FPSEL) && ClosestFormToCursor == iForm) {
 				form::sRct2px(SelectedVerticesRect, SelectedPixelsRect);
@@ -829,14 +837,16 @@ void form::setmfrm() {
 	auto point = POINT{};
 
 	form::sfCor2px(FormList[ClosestFormToCursor].vertices[0], point);
-	const auto offset = POINT{ Msg.pt.x - StitchWindowOrigin.x - point.x + dToL(FormMoveDelta.x),
-		                       Msg.pt.y - StitchWindowOrigin.y - point.y + dToL(FormMoveDelta.y) };
+	const auto offset    = POINT{ Msg.pt.x - StitchWindowOrigin.x - point.x + dToL(FormMoveDelta.x),
+                               Msg.pt.y - StitchWindowOrigin.y - point.y + dToL(FormMoveDelta.y) };
+	auto&      formLines = *FormLines;
+	formLines.resize(gsl::narrow_cast<size_t>(FormList[ClosestFormToCursor].vertexCount) + 1);
 	for (auto iForm = 0u; iForm < FormList[ClosestFormToCursor].vertexCount; iForm++) {
 		form::sfCor2px(FormList[ClosestFormToCursor].vertices[iForm], point);
-		FormLines[iForm].x = point.x + offset.x;
-		FormLines[iForm].y = point.y + offset.y;
+		formLines[iForm].x = point.x + offset.x;
+		formLines[iForm].y = point.y + offset.y;
 	}
-	FormLines[FormList[ClosestFormToCursor].vertexCount] = FormLines[0];
+	formLines[FormList[ClosestFormToCursor].vertexCount] = formLines[0];
 }
 
 void form::durpoli(unsigned vertexCount) {
@@ -1153,10 +1163,11 @@ void form::frmovlin() {
 		NewFormVertexCount = SelectedForm->vertexCount + 1;
 	}
 	form::frmlin(SelectedForm->vertices, SelectedForm->vertexCount);
-	auto previousPoint = form::prv(ClosestVertexToCursor);
+	auto  previousPoint = form::prv(ClosestVertexToCursor);
+	auto& formLines     = *FormLines;
 	for (auto iPoint = 0; iPoint < 3; iPoint++) {
-		(*RubberBandLine)[iPoint] = FormLines[previousPoint];
-		previousPoint++;
+		(*RubberBandLine)[iPoint] = formLines[previousPoint];
+		previousPoint             = form::nxt(previousPoint);
 	}
 	thred::ritmov();
 }
@@ -4536,7 +4547,7 @@ void form::internal::bakseq() {
 		}
 		case 0: {
 			delta = dPOINT{ static_cast<double>(BSequence[iSequence].x) - BSequence[iSequence + 1].x,
-				      static_cast<double>(BSequence[iSequence].y) - BSequence[iSequence + 1].y };
+				            static_cast<double>(BSequence[iSequence].y) - BSequence[iSequence + 1].y };
 			StateMap.reset(StateFlag::FILDIR);
 			const auto length = hypot(delta.x, delta.y);
 			if (length) {
@@ -5227,7 +5238,7 @@ void form::clrfills() noexcept {
 void form::internal::ducon() noexcept {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
-	Polyline(StitchWindowDC, FormLines, 2);
+	Polyline(StitchWindowDC, FormLines->data(), 2);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -5239,8 +5250,9 @@ void form::internal::uncon() {
 
 void form::drwcon() {
 	fi::uncon();
-	FormLines[1].x = Msg.pt.x - StitchWindowOrigin.x;
-	FormLines[1].y = Msg.pt.y - StitchWindowOrigin.y;
+	auto& formLines = *FormLines;
+	formLines[1].x  = Msg.pt.x - StitchWindowOrigin.x;
+	formLines[1].y  = Msg.pt.y - StitchWindowOrigin.y;
 	StateMap.set(StateFlag::SHOCON);
 	fi::ducon();
 }
@@ -5564,10 +5576,11 @@ void form::rinfrm() {
 	form::frmlin(FormForInsert->vertices, FormForInsert->vertexCount);
 	SelectObject(StitchWindowMemDC, FormPen);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
+	auto& formLines = *FormLines;
 	if (FormVertexNext || FormForInsert->type != FRMLINE) {
-		Polyline(StitchWindowMemDC, &FormLines[FormVertexPrev], 2);
+		Polyline(StitchWindowMemDC, &formLines[FormVertexPrev], 2);
 	}
-	InsertLine[0]   = FormLines[FormVertexPrev];
+	InsertLine[0]   = formLines[FormVertexPrev];
 	InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 	InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 	StateMap.set(StateFlag::SHOINSF);
@@ -5616,7 +5629,7 @@ void form::setins() {
 		FormVertexNext = form::nxt(FormVertexPrev);
 	}
 	form::frmlin(FormForInsert->vertices, FormForInsert->vertexCount);
-	InsertLine[0]   = FormLines[FormVertexPrev];
+	InsertLine[0]   = (*FormLines)[FormVertexPrev];
 	InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 	InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 	StateMap.set(StateFlag::INSFRM);
@@ -6978,18 +6991,19 @@ void form::internal::doTimeWindow(float rangeX, const std::vector<unsigned>& xPo
 	auto       timeDC       = GetDC(timeWindow);
 	const auto timeStep     = static_cast<double>(StitchWindowSize.x) / rangeX;
 	auto       timePosition = 0.0;
-	FormLines[0].y          = 0;
-	FormLines[1].y          = ButtonHeight;
-	FormLines[0].x = FormLines[1].x = 0;
+	auto&      formLines    = *FormLines;
+	formLines.clear();
+	formLines.emplace_back(POINT{ 0, 0 });
+	formLines.emplace_back(POINT{ 0, gsl::narrow<LONG>(ButtonHeight) });
 	SelectObject(timeDC, UserPen[0]);
 	for (auto iColumn = 1u; iColumn < rangeX - checkLength - 1; iColumn++) {
 		snpfn(xPoints,
 		      xHistogram[iColumn],
 		      xHistogram[static_cast<size_t>(iColumn) + 1],
 		      xHistogram[static_cast<size_t>(iColumn) + checkLength]);
-		Polyline(timeDC, FormLines, 2);
+		Polyline(timeDC, formLines.data(), 2);
 		timePosition += timeStep;
-		FormLines[0].x = FormLines[1].x = dToL(timePosition);
+		formLines[0].x = formLines[1].x = dToL(timePosition);
 	}
 	DestroyWindow(timeWindow);
 }

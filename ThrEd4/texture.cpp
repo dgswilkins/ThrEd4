@@ -664,7 +664,7 @@ void texture::internal::stxlin() {
 	StateMap.reset(StateFlag::TXTMOV);
 	txi::deorg(offset);
 	txi::px2ed(offset, point1);
-	txi::px2ed(FormLines[0], point0);
+	txi::px2ed((*FormLines)[0], point0);
 	txi::dutxlin(point0, point1);
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -773,18 +773,20 @@ void texture::internal::ritxfrm() {
 
 	offset.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
 	offset.y = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
+	auto& formLines = *FormLines;
+	formLines.resize(gsl::narrow_cast<size_t>(AngledForm.vertexCount) + 1);
 	for (auto iVertex = 0u; iVertex < AngledForm.vertexCount; iVertex++) {
-		txi::ed2px(AngledFormVertices[iVertex], FormLines[iVertex]);
-		FormLines[iVertex].x += offset.x;
-		FormLines[iVertex].y += offset.y;
+		txi::ed2px(AngledFormVertices[iVertex], formLines[iVertex]);
+		formLines[iVertex].x += offset.x;
+		formLines[iVertex].y += offset.y;
 	}
-	FormLines[AngledForm.vertexCount] = FormLines[0];
+	formLines[AngledForm.vertexCount] = formLines[0];
 	auto vertexCount                  = AngledForm.vertexCount;
 	if (AngledForm.type != FRMLINE) {
 		vertexCount++;
 	}
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	PolylineInt(StitchWindowDC, FormLines, vertexCount);
+	PolylineInt(StitchWindowDC, formLines.data(), vertexCount);
 }
 
 void texture::internal::setxfrm() {
@@ -839,13 +841,13 @@ void texture::internal::txtclp() {
 
 void texture::internal::dutxtlin() noexcept {
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	Polyline(StitchWindowDC, FormLines, 2);
+	Polyline(StitchWindowDC, FormLines->data(), 2);
 }
 
 void texture::txtrmov() {
 	if (StateMap.test(StateFlag::TXTLIN)) {
 		txi::dutxtlin();
-		txi::deorg(FormLines[1]);
+		txi::deorg((*FormLines)[1]);
 		txi::dutxtlin();
 		return;
 	}
@@ -866,8 +868,11 @@ void texture::txtrmov() {
 }
 
 void texture::internal::txtlin() {
-	txi::deorg(FormLines[0]);
-	txi::deorg(FormLines[1]);
+	auto& formLines = *FormLines;
+	formLines.clear();
+	formLines.resize(2);
+	txi::deorg(formLines[0]);
+	txi::deorg(formLines[1]);
 	StateMap.reset(StateFlag::TXTCLP);
 	StateMap.set(StateFlag::TXTLIN);
 	StateMap.set(StateFlag::TXTMOV);

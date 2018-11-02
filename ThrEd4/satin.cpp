@@ -307,7 +307,7 @@ void satin::satsel() {
 		form::fvars(ClosestFormToCursor);
 		thred::duzrat();
 		StartPoint = ClosestVertexToCursor;
-		form::sfCor2px(SelectedForm->vertices[ClosestVertexToCursor], FormLines[0]);
+		form::sfCor2px(SelectedForm->vertices[ClosestVertexToCursor], (*FormLines)[0]);
 		StateMap.reset(StateFlag::SHOCON);
 		StateMap.set(StateFlag::SATCNKT);
 		if (SelectedForm->type == FRMFPOLY) {
@@ -1192,9 +1192,10 @@ void satin::satfix() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void satin::dusat() noexcept {
+void satin::dusat() {
 	const auto  vertexCount = TempPolygon->size();
-	const auto* line        = &FormLines[vertexCount - 1];
+	auto&       formLines   = *FormLines;
+	const auto* line        = &formLines[vertexCount - 1];
 
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
@@ -1211,17 +1212,20 @@ void satin::internal::unsat() {
 void satin::drwsat() {
 	si::unsat();
 	thred::px2stch();
-	auto vertexCount         = TempPolygon->size();
-	FormLines[vertexCount].x = Msg.pt.x - StitchWindowOrigin.x;
-	FormLines[vertexCount].y = Msg.pt.y - StitchWindowOrigin.y;
+	const auto  vertexCount        = TempPolygon->size();
+	auto& formLines          = *FormLines;
+	formLines.resize(vertexCount + 1);
+	formLines[vertexCount].x = Msg.pt.x - StitchWindowOrigin.x;
+	formLines[vertexCount].y = Msg.pt.y - StitchWindowOrigin.y;
 	StateMap.set(StateFlag::SHOSAT);
 	satin::dusat();
 }
 
 void satin::satpnt0() {
 	thred::px2stch();
-	FormLines[0].x = Msg.pt.x - StitchWindowOrigin.x;
-	FormLines[0].y = Msg.pt.y - StitchWindowOrigin.y;
+	auto& formLines = *FormLines;
+	formLines.clear();
+	formLines.emplace_back(POINT{ Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y });
 	TempPolygon->push_back(SelectedPoint);
 	StateMap.set(StateFlag::SATPNT);
 }
@@ -1229,9 +1233,10 @@ void satin::satpnt0() {
 void satin::satpnt1() {
 	si::unsat();
 	thred::px2stch();
-	auto vertexCount         = TempPolygon->size();
-	FormLines[vertexCount].x = Msg.pt.x - StitchWindowOrigin.x;
-	FormLines[vertexCount].y = Msg.pt.y - StitchWindowOrigin.y;
+	const auto  vertexCount        = TempPolygon->size();
+	auto& formLines          = *FormLines;
+	formLines[vertexCount].x = Msg.pt.x - StitchWindowOrigin.x;
+	formLines[vertexCount].y = Msg.pt.y - StitchWindowOrigin.y;
 	satin::dusat();
 	TempPolygon->push_back(SelectedPoint);
 	StateMap.set(StateFlag::RESTCH);
@@ -1361,7 +1366,7 @@ void satin::satzum() {
 	form::frmlin(*TempPolygon);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	SelectObject(StitchWindowMemDC, FormPen);
-	PolylineInt(StitchWindowMemDC, FormLines, vertexCount);
+	PolylineInt(StitchWindowMemDC, FormLines->data(), vertexCount);
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	satin::drwsat();
 }

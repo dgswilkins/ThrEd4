@@ -259,7 +259,7 @@ namespace internal {
 	void     insadj();
 	void     inscol();
 	void     insfil();
-	void     insflin(POINT insertPoint) noexcept;
+	void     insflin(POINT insertPoint);
 	bool     iselpnt();
 	bool     isfclp() noexcept;
 	bool     isknots() noexcept;
