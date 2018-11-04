@@ -853,6 +853,7 @@ void form::durpoli(unsigned vertexCount) {
 	if (vertexCount < 3) {
 		vertexCount = 3;
 	}
+	// ToDo - do we need to limit the number of vertices?
 	if (vertexCount > 100) {
 		vertexCount = 100;
 	}
@@ -865,7 +866,7 @@ void form::durpoli(unsigned vertexCount) {
 	frmclr(SelectedForm);
 	SelectedForm->vertices    = thred::adflt(vertexCount);
 	SelectedForm->vertexCount = vertexCount;
-	SelectedForm->attribute   = gsl::narrow<decltype(FormList[FormIndex].attribute)>(ActiveLayer << 1);
+	SelectedForm->attribute   = gsl::narrow<decltype(SelectedForm->attribute)>(ActiveLayer << 1);
 	form::fvars(FormIndex);
 	thred::px2stch();
 	auto point = dPOINT{ SelectedPoint.x, SelectedPoint.y };
