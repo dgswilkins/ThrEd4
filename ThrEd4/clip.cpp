@@ -44,41 +44,47 @@ fPOINT       BorderClipReference; // reference for clipboard line border
 double       AdjustedSpace;       // adjusted space
 unsigned int NextStart;           // index of the endpoint of the line segment being processed
 
-bool clip::iseclp(unsigned int iForm) noexcept {
-	return FormList[iForm].edgeType == EDGECLIP || FormList[iForm].edgeType == EDGEPICOT || FormList[iForm].edgeType == EDGECLIPX;
+bool clip::iseclp(unsigned int iForm) {
+	auto& form = (*FormList)[iForm];
+	return form.edgeType == EDGECLIP || form.edgeType == EDGEPICOT || form.edgeType == EDGECLIPX;
 }
 
-bool clip::isclp(unsigned int iForm) noexcept {
-	return ((1 << FormList[iForm].fillType) & ClipTypeMap) != 0;
+bool clip::isclp(unsigned int iForm) {
+	auto& form = (*FormList)[iForm];
+	return ((1 << form.fillType) & ClipTypeMap) != 0;
 }
 
-bool clip::isclpx(unsigned int iForm) noexcept {
-	return clip::isclp(iForm) && FormList[iForm].lengthOrCount.clipCount;
+bool clip::isclpx(unsigned int iForm) {
+	auto& form = (*FormList)[iForm];
+	return clip::isclp(iForm) && form.lengthOrCount.clipCount;
 }
 
-bool clip::iseclpx(unsigned int iForm) noexcept {
-	return clip::iseclp(iForm) && FormList[iForm].clipEntries;
+bool clip::iseclpx(unsigned int iForm) {
+	auto& form = (*FormList)[iForm];
+	return clip::iseclp(iForm) && form.clipEntries;
 }
 
-unsigned int clip::internal::findclp(unsigned int formIndex) noexcept {
+unsigned int clip::internal::findclp(unsigned int formIndex) {
+	auto& formList = *FormList;
 	for (auto iForm = formIndex; iForm != 0; iForm--) {
 		if (clip::iseclp(iForm - 1)) {
-			return FormList[iForm - 1].borderClipData + FormList[iForm - 1].clipEntries;
+			return formList[iForm - 1].borderClipData + formList[iForm - 1].clipEntries;
 		}
 		if (clip::isclp(iForm - 1)) {
-			return FormList[iForm - 1].angleOrClipData.clip + FormList[iForm - 1].lengthOrCount.clipCount;
+			return formList[iForm - 1].angleOrClipData.clip + formList[iForm - 1].lengthOrCount.clipCount;
 		}
 	}
 	return 0;
 }
 
-void clip::internal::clpsub(unsigned int fpnt, unsigned int cnt) noexcept {
+void clip::internal::clpsub(unsigned int fpnt, unsigned int cnt) {
+	auto& formList = *FormList;
 	for (auto iForm = fpnt + 1; iForm < FormIndex; iForm++) {
 		if (clip::isclpx(iForm)) {
-			FormList[iForm].angleOrClipData.clip -= cnt;
+			formList[iForm].angleOrClipData.clip -= cnt;
 		}
 		if (clip::iseclpx(fpnt)) {
-			FormList[iForm].borderClipData -= cnt;
+			formList[iForm].borderClipData -= cnt;
 		}
 	}
 }
@@ -86,42 +92,44 @@ void clip::internal::clpsub(unsigned int fpnt, unsigned int cnt) noexcept {
 void clip::delmclp(unsigned int iForm) {
 	if (ClipPointIndex) {
 		if (clip::isclp(iForm)) {
+			auto& form = (*FormList)[iForm];
 			auto destination = ci::findclp(iForm);
-			auto source      = destination + FormList[iForm].lengthOrCount.clipCount;
+			auto source      = destination + form.lengthOrCount.clipCount;
 			std::copy(&ClipPoints[source],
 			          &ClipPoints[ClipPointIndex],
 			          stdext::make_checked_array_iterator((&ClipPoints[destination]), (MAXITEMS - destination)));
 			if (clip::iseclp(iForm)) {
-				FormList[iForm].borderClipData -= FormList[iForm].lengthOrCount.clipCount;
+				form.borderClipData -= form.lengthOrCount.clipCount;
 			}
-			ci::clpsub(iForm, FormList[iForm].lengthOrCount.clipCount);
-			if (ClipPointIndex > FormList[iForm].lengthOrCount.clipCount) {
-				ClipPointIndex -= FormList[iForm].lengthOrCount.clipCount;
+			ci::clpsub(iForm, form.lengthOrCount.clipCount);
+			if (ClipPointIndex > form.lengthOrCount.clipCount) {
+				ClipPointIndex -= form.lengthOrCount.clipCount;
 			}
 			else {
 				ClipPointIndex = 0;
 			}
-			FormList[iForm].lengthOrCount.clipCount = 0;
+			form.lengthOrCount.clipCount = 0;
 		}
 	}
 }
 
-void clip::deleclp(unsigned int iForm) noexcept {
+void clip::deleclp(unsigned int iForm) {
 	if (ClipPointIndex != 0u) {
 		if (clip::iseclpx(iForm)) {
+			auto& form = (*FormList)[iForm];
 			auto destination = ci::findclp(iForm);
-			auto source      = destination + FormList[iForm].clipEntries;
+			auto source      = destination + form.clipEntries;
 			while (source < ClipPointIndex) {
 				ClipPoints[destination++] = ClipPoints[source++];
 			}
-			ci::clpsub(iForm, FormList[iForm].clipEntries);
-			if (ClipPointIndex > FormList[iForm].clipEntries) {
-				ClipPointIndex -= FormList[iForm].clipEntries;
+			ci::clpsub(iForm, form.clipEntries);
+			if (ClipPointIndex > form.clipEntries) {
+				ClipPointIndex -= form.clipEntries;
 			}
 			else {
 				ClipPointIndex = 0;
 			}
-			FormList[iForm].clipEntries = 0;
+			form.clipEntries = 0;
 		}
 	}
 }
@@ -131,12 +139,13 @@ void clip::delclps(unsigned int iForm) {
 	clip::delmclp(iForm);
 }
 
-unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) noexcept {
+unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) {
 	auto find        = ci::findclp(ClosestFormToCursor);
 	auto destination = ClipPointIndex + count - 1u;
+	auto& formList = *FormList;
 
 	if (clip::isclp(ClosestFormToCursor)) {
-		find += FormList[ClosestFormToCursor].lengthOrCount.clipCount;
+		find += formList[ClosestFormToCursor].lengthOrCount.clipCount;
 	}
 	if (ClipPointIndex) {
 		auto source = ClipPointIndex - 1;
@@ -146,36 +155,37 @@ unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) noexcept
 	}
 	for (auto iform = currentForm; iform < FormIndex; iform++) {
 		if (clip::iseclpx(iform)) {
-			FormList[iform].borderClipData += count;
+			formList[iform].borderClipData += count;
 		}
 	}
 	for (auto iform = currentForm + 1; iform < FormIndex; iform++) {
 		if (clip::isclp(iform)) {
-			FormList[iform].angleOrClipData.clip += count;
+			formList[iform].angleOrClipData.clip += count;
 		}
 	}
 	ClipPointIndex += count;
 	return find;
 }
 
-unsigned int clip::numclp() noexcept {
+unsigned int clip::numclp() {
 	const auto find        = ci::findclp(ClosestFormToCursor);
 	auto       source      = ClipPointIndex - 1;
 	auto       destination = ClipPointIndex + ClipStitchCount - 1;
+	auto& formList = *FormList;
 
 	while ((source + 1) > find) {
 		ClipPoints[destination--] = ClipPoints[source--];
 	}
-	FormList[ClosestFormToCursor].angleOrClipData.clip = find;
+	formList[ClosestFormToCursor].angleOrClipData.clip = find;
 	if (clip::iseclpx(ClosestFormToCursor)) {
-		FormList[ClosestFormToCursor].borderClipData += ClipStitchCount;
+		formList[ClosestFormToCursor].borderClipData += ClipStitchCount;
 	}
 	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 		if (clip::isclpx(iForm)) {
-			FormList[iForm].angleOrClipData.clip += ClipStitchCount;
+			formList[iForm].angleOrClipData.clip += ClipStitchCount;
 		}
 		if (clip::iseclpx(iForm)) {
-			FormList[iForm].borderClipData += ClipStitchCount;
+			formList[iForm].borderClipData += ClipStitchCount;
 		}
 	}
 	ClipPointIndex += ClipStitchCount;

@@ -72,7 +72,7 @@ void texture::txdun() {
 		wchar_t name[_MAX_PATH] = { 0 };
 		if (txi::txnam(name, sizeof(name) / sizeof(name[0]))) {
 			auto bytesWritten = DWORD{ 0 };
-			auto  handle       = CreateFile(name, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+			auto handle       = CreateFile(name, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 			if (handle != INVALID_HANDLE_VALUE) {
 				WriteFile(handle, &signature, sizeof(signature), &bytesWritten, nullptr);
 				WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
@@ -134,7 +134,7 @@ void texture::redtx() {
 		auto handle = CreateFile(name, GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 		if (handle != INVALID_HANDLE_VALUE) {
 			auto bytesRead = DWORD{ 0 };
-			char  sig[4]    = { 0 };
+			char sig[4]    = { 0 };
 			if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, nullptr)) {
 				if (!strcmp(sig, "txh")) {
 					if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr)) {
@@ -172,8 +172,8 @@ void texture::redtx() {
 	txi::redtbak();
 }
 
-bool texture::istx(unsigned int iForm) noexcept {
-	const auto& pfrm = FormList[iForm];
+bool texture::istx(unsigned int iForm) {
+	const auto& pfrm = (*FormList)[iForm];
 	if (pfrm.fillType == TXVRTF) {
 		return true;
 	}
@@ -771,8 +771,8 @@ void texture::internal::ritxfrm() {
 	auto offset = POINT{ (TextureCursorLocation.x - SelectTexturePointsOrigin.x),
 		                 (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
 
-	offset.x = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
-	offset.y = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
+	offset.x        = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
+	offset.y        = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
 	auto& formLines = *FormLines;
 	formLines.resize(gsl::narrow_cast<size_t>(AngledForm.vertexCount) + 1);
 	for (auto iVertex = 0u; iVertex < AngledForm.vertexCount; iVertex++) {
@@ -991,20 +991,22 @@ void texture::internal::txang() {
 void texture::deltx() {
 	auto flag = false;
 
-	const auto currentIndex = FormList[ClosestFormToCursor].fillInfo.texture.index;
+	const auto currentIndex = (*FormList)[ClosestFormToCursor].fillInfo.texture.index;
 
 	if (TextureIndex && texture::istx(ClosestFormToCursor) && SelectedForm->fillInfo.texture.count) {
 		// First check to see if the texture is shared between forms
 		for (auto iForm = 0u; iForm < ClosestFormToCursor; iForm++) {
 			if (texture::istx(iForm)) {
-				if (FormList[iForm].fillInfo.texture.index == currentIndex) {
+				auto& formIter = (*FormList)[iForm];
+				if (formIter.fillInfo.texture.index == currentIndex) {
 					flag = true;
 				}
 			}
 		}
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			if (texture::istx(iForm)) {
-				if (FormList[iForm].fillInfo.texture.index == currentIndex) {
+				auto& formIter = (*FormList)[iForm];
+				if (formIter.fillInfo.texture.index == currentIndex) {
 					flag = true;
 				}
 			}
@@ -1016,30 +1018,32 @@ void texture::deltx() {
 			auto iBuffer = 0u;
 			for (auto iForm = 0u; iForm < ClosestFormToCursor; iForm++) {
 				if (texture::istx(iForm)) {
-					auto startSource = TexturePointsBuffer->cbegin() + FormList[iForm].fillInfo.texture.index;
-					auto endSource   = startSource + FormList[iForm].fillInfo.texture.count;
-					textureBuffer.resize(textureBuffer.size() + FormList[iForm].fillInfo.texture.count);
-					auto destination                       = textureBuffer.begin() + iBuffer;
-					auto _                                 = std::copy(startSource, endSource, destination);
-					FormList[iForm].fillInfo.texture.index = iBuffer;
-					iBuffer += FormList[iForm].fillInfo.texture.count;
+					auto& fillInfo    = (*FormList)[iForm].fillInfo;
+					auto  startSource = TexturePointsBuffer->cbegin() + fillInfo.texture.index;
+					auto  endSource   = startSource + fillInfo.texture.count;
+					textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
+					auto destination       = textureBuffer.begin() + iBuffer;
+					auto _                 = std::copy(startSource, endSource, destination);
+					fillInfo.texture.index = iBuffer;
+					iBuffer += fillInfo.texture.count;
 				}
 			}
 			for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 				if (texture::istx(iForm)) {
-					auto startSource = TexturePointsBuffer->cbegin() + FormList[iForm].fillInfo.texture.index;
-					auto endSource   = startSource + FormList[iForm].fillInfo.texture.count;
-					textureBuffer.resize(textureBuffer.size() + FormList[iForm].fillInfo.texture.count);
-					auto destination                       = textureBuffer.begin() + iBuffer;
-					auto _                                 = std::copy(startSource, endSource, destination);
-					FormList[iForm].fillInfo.texture.index = iBuffer;
-					iBuffer += FormList[iForm].fillInfo.texture.count;
+					auto& fillInfo    = (*FormList)[iForm].fillInfo;
+					auto  startSource = TexturePointsBuffer->cbegin() + fillInfo.texture.index;
+					auto  endSource   = startSource + fillInfo.texture.count;
+					textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
+					auto destination       = textureBuffer.begin() + iBuffer;
+					auto _                 = std::copy(startSource, endSource, destination);
+					fillInfo.texture.index = iBuffer;
+					iBuffer += fillInfo.texture.count;
 				}
 			}
 			TextureIndex         = iBuffer;
 			*TexturePointsBuffer = textureBuffer;
 		}
-		FormList[ClosestFormToCursor].fillType = 0;
+		(*FormList)[ClosestFormToCursor].fillType = 0;
 	}
 }
 
@@ -1049,14 +1053,15 @@ void texture::internal::nutx() {
 	std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::txcmp);
 	if (FormIndex) {
 		if (texture::istx(ClosestFormToCursor)) {
-			index = FormList[ClosestFormToCursor].fillInfo.texture.index;
+			const auto& texture = (*FormList)[ClosestFormToCursor].fillInfo.texture;
+			index          = texture.index;
 			texture::deltx();
 		}
 		else {
 			for (auto iForm = ClosestFormToCursor; iForm-- > 0;) {
 				if (texture::istx(iForm)) {
-					const auto& formHeader = FormList[iForm];
-					index                  = formHeader.fillInfo.texture.index + formHeader.fillInfo.texture.count;
+					const auto& texture = (*FormList)[iForm].fillInfo.texture;
+					index                = texture.index + texture.count;
 					break;
 				}
 			}
@@ -1075,7 +1080,7 @@ void texture::internal::nutx() {
 		}
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			if (texture::istx(iForm)) {
-				FormList[iForm].fillInfo.texture.index += gsl::narrow<unsigned short>(tempPointCount);
+				(*FormList)[iForm].fillInfo.texture.index += gsl::narrow<unsigned short>(tempPointCount);
 			}
 		}
 		auto _ = std::copy(TempTexturePoints->cbegin(), TempTexturePoints->cend(), startSource);
@@ -1555,7 +1560,7 @@ void texture::txtkey(unsigned keyCode) {
 	}
 	case 'D':
 	case VK_DELETE: {
-		if (GetKeyState(VK_SHIFT) & GetKeyState(VK_CONTROL) & 0X8000) {
+		if (GetKeyState(VK_SHIFT) & GetKeyState(VK_CONTROL) & 0x8000) {
 			txi::txdelal();
 		}
 		else {

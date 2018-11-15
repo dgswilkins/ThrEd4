@@ -1126,15 +1126,15 @@ void xt::internal::dmprec(const std::vector<OREC*>& stitchRegion, unsigned count
 #endif
 
 bool xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, unsigned count, unsigned& badForm) {
-	auto form  = stitchRegion[0]->form;
+	auto formIndex  = stitchRegion[0]->form;
 	auto color = stitchRegion[0]->color;
 
 	for (auto iRegion = 1u; iRegion < count; iRegion++) {
-		if (stitchRegion[iRegion]->form == form) {
+		if (stitchRegion[iRegion]->form == formIndex) {
 			if (ColorOrder[stitchRegion[iRegion]->color] < ColorOrder[color]) {
-				const auto& formHeader = FormList[form];
-				if (formHeader.fillType == FTHF && formHeader.extendedAttribute & AT_FTHBLND
-				    && stitchRegion[iRegion]->color == formHeader.fillColor) {
+				auto& form = (*FormList)[formIndex];
+				if (form.fillType == FTHF && form.extendedAttribute & AT_FTHBLND
+				    && stitchRegion[iRegion]->color == form.fillColor) {
 					continue;
 				}
 				badForm = iRegion;
@@ -1145,7 +1145,7 @@ bool xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, unsigned count
 		}
 		else {
 			color = stitchRegion[iRegion]->color;
-			form  = stitchRegion[iRegion]->form;
+			formIndex  = stitchRegion[iRegion]->form;
 		}
 	}
 	return true;
@@ -2336,8 +2336,9 @@ void xt::setfhi() {
 
 void xt::setfilstrt() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
-		FormList[ClosestFormToCursor].fillStart = gsl::narrow<unsigned short>(ClosestVertexToCursor);
-		FormList[ClosestFormToCursor].extendedAttribute |= AT_STRT;
+		auto& form = (*FormList)[ClosestFormToCursor];
+		form.fillStart = gsl::narrow<unsigned short>(ClosestVertexToCursor);
+		form.extendedAttribute |= AT_STRT;
 		form::refil();
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
@@ -2349,8 +2350,9 @@ void xt::setfilstrt() {
 
 void xt::setfilend() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
-		FormList[ClosestFormToCursor].fillEnd = gsl::narrow<unsigned short>(ClosestVertexToCursor);
-		FormList[ClosestFormToCursor].extendedAttribute |= AT_END;
+		auto& form = (*FormList)[ClosestFormToCursor];
+		form.fillEnd = gsl::narrow<unsigned short>(ClosestVertexToCursor);
+		form.extendedAttribute |= AT_END;
 		form::refil();
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
@@ -2517,7 +2519,7 @@ void xt::internal::sadj(fPOINT& point, const dPOINT& designSizeRatio, const fREC
 	point.y = (point.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
 }
 
-void xt::internal::nudfn(const fRECTANGLE& designSizeRect) noexcept {
+void xt::internal::nudfn(const fRECTANGLE& designSizeRect) {
 	const auto newSize = fPOINT{ (designSizeRect.right - designSizeRect.left), (designSizeRect.top - designSizeRect.bottom) };
 	const auto designSizeRatio = dPOINT{ (DesignSize.x / newSize.x), (DesignSize.y / newSize.y) };
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {

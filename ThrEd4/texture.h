@@ -23,7 +23,7 @@ void deltx();
 void drwtxtr();
 void dutxtfil();
 void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<unsigned int>* ptrTexturePointsList) noexcept;
-bool istx(unsigned int iForm) noexcept;
+bool istx(unsigned int iForm);
 void redtx();
 void rstxt();
 void rtrtx();

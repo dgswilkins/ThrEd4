@@ -33,7 +33,7 @@ void         cpySat(const FRMHED& formHeader);
 void         cpyTmpGuides(const std::vector<SATCONOUT>& inSatinGuides);
 void         cpyUndoGuides(const BAKHED& undoData);
 void         delcon(unsigned GuideIndex);
-void         delsac(unsigned int formIndex) noexcept;
+void         delsac(unsigned int formIndex);
 void         delspnt();
 void         drwsat();
 void         dusat();
@@ -58,9 +58,9 @@ namespace internal {
 
 	bool     chkbak(const std::vector<dPOINT>& satinBackup, const dPOINT& pnt);
 	void     filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point, unsigned& satinBackupIndex);
-	SATCON*  nusac(unsigned int formIndex, unsigned guideCount) noexcept;
+	SATCON*  nusac(unsigned int formIndex, unsigned guideCount);
 	void     outfn(unsigned start, unsigned finish, double satinWidth);
-	void     sacspac(const SATCON* startGuide, unsigned guideCount) noexcept;
+	void     sacspac(const SATCON* startGuide, unsigned guideCount);
 	void     satclos();
 	void     satcpy(SATCON* destination, std::vector<SATCON> source, unsigned int size);
 	void     satends(unsigned isBlunt);
@@ -72,7 +72,7 @@ namespace internal {
 	unsigned satind(const SATCON* guide) noexcept;
 	void     satmf(const std::vector<double>& lengths);
 	void     satsbrd();
-	bool     satselfn() noexcept;
+	bool     satselfn();
 	void     sbfn(const std::vector<fPOINT>& insidePoints, unsigned int start, unsigned int finish);
 	void     sfn(unsigned int startVertex);
 	void     unsat();

@@ -49,14 +49,14 @@ unsigned int closflt(float xCoordinate, float yCoordinate) noexcept;
 bool         closfrm();
 void         clpfil();
 void         clpspac(unsigned insertPoint, unsigned int count) noexcept;
-void         clrfills() noexcept;
+void         clrfills();
 void         cntrx();
 void         col2frm();
 void         contfil();
 void         cpylayr(unsigned codedLayer);
 void         crop();
 void         debean();
-void         delflt(unsigned int formIndex) noexcept;
+void         delflt(unsigned int formIndex);
 void         delfrms();
 void         delmfil();
 void         drwcon();
@@ -73,7 +73,7 @@ void         dufrm();
 void         duhart(unsigned sideCount);
 void         dulens(unsigned sides);
 void         duinsf() noexcept;
-void         duprot(double rotationAngle, const dPOINT& rotationCenter);
+void         duprot(double rotationAngle);
 void         dupsel(HDC dc);
 void         durpoli(unsigned vertexCount);
 void         duspir(unsigned stepCount);
@@ -95,24 +95,24 @@ void         fliph();
 void         flipv();
 void         flpord();
 unsigned     fltind(const fPOINT* point) noexcept;
-void         fltspac(const fPOINT* start, unsigned int count) noexcept;
+void         fltspac(const fPOINT* start, unsigned int count);
 void         form();
 void         frm0();
-void         frmadj(unsigned int formIndex) noexcept;
-void         frmclr(FRMHED* destination) noexcept;
+void         frmadj(unsigned int formIndex);
+void         frmclr(FRMHED& destination) noexcept;
 void         frmlin(const fPOINT* vertices, unsigned int vertexCount);
 void         frmlin(const std::vector<fPOINT>& vertices);
 void         frmnumfn(unsigned newFormIndex);
 void         frmon();
-void         frmout(unsigned int formIndex) noexcept;
+void         frmout(unsigned int formIndex);
 void         frmovlin();
-bool         frmrng(unsigned int iForm, RANGE& range) noexcept;
+bool         frmrng(unsigned int iForm, RANGE& range);
 void         frmsadj();
 void         fselrct(unsigned int iForm);
 void         fsizpar() noexcept;
-void         fvars(unsigned int iForm) noexcept;
+void         fvars(unsigned int iForm);
 
-float getblen() noexcept;
+float getblen();
 
 unsigned int getlast() noexcept;
 
@@ -163,9 +163,10 @@ void     rinfrm();
 void     ritfrct(unsigned int iForm, HDC dc);
 void     ritseq1(unsigned int ind) noexcept;
 void     rotagain();
-void     rotcmd(dPOINT& rotationCenter);
+void     rotcmd();
 void     rotdup();
 void     rotfrm(unsigned int newStartVertex);
+dPOINT   rotpar();
 void     rstfrm();
 void     sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect);
 void     savblen(float fLength);
@@ -226,7 +227,7 @@ namespace internal {
 	bool     chk2of();
 	void     chkbrd(unsigned& interleaveSequenceIndex2);
 	void     chksid(unsigned int vertexIndex, unsigned clipIntersectSide) noexcept;
-	bool     closat(intersectionStyles& inOutFlag) noexcept;
+	bool     closat(intersectionStyles& inOutFlag);
 	bool     clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept;
 	void     clpcon(const std::vector<RNGCNT>& textureSegments);
 	void     clpfm();
@@ -306,7 +307,7 @@ namespace internal {
 	void  fshor();
 	void  fspic();
 	void  fsvrt();
-	void  getbig() noexcept;
+	void  getbig();
 	float getlen(std::vector<CLIPNT>& clipStitchPoints, const std::vector<double>& lengths, unsigned iPoint);
 	void  horclpfn(const std::vector<RNGCNT>& textureSegments);
 
@@ -345,7 +346,7 @@ namespace internal {
 	            unsigned               group1,
 	            unsigned               line1,
 	            double                 gapToClosestRegion);
-	void makpoli() noexcept;
+	void makpoli();
 	void movseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int ind);
 	void mvpclp(std::vector<CLIPSORT*>& arrayOfClipIntersectData, unsigned destination, unsigned source);
 	bool notdun(std::vector<RGSEQ>&            tempPath,
@@ -416,7 +417,6 @@ namespace internal {
 	              unsigned&                  clipIntersectSide);
 	void   rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept;
 	void   rotentr(double rotationAngle);
-	void   rotpar(dPOINT& rotationCenter);
 	void   rspnt(float xCoordinate, float yCoordinate) noexcept;
 	void   sapliq();
 

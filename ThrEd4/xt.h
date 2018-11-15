@@ -168,7 +168,7 @@ namespace internal {
 	bool   lastcol(unsigned index, fPOINT& point) noexcept;
 	fPOINT midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept;
 	void   notundfn(unsigned code);
-	void   nudfn(const fRECTANGLE& designSizeRect) noexcept;
+	void   nudfn(const fRECTANGLE& designSizeRect);
 	void   nurat(FEATHER& feather);
 
 	double precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord);

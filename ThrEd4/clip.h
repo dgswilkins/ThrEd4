@@ -31,15 +31,15 @@ void    clpbrd(unsigned int startVertex);
 void    clpic();
 void    clpout();
 void    delclps(unsigned int iForm);
-void    deleclp(unsigned int iForm) noexcept;
+void    deleclp(unsigned int iForm);
 void    delmclp(unsigned int iForm);
 void    duxclp();
-bool    isclp(unsigned int iForm) noexcept;
-bool    isclpx(unsigned int iForm) noexcept;
-bool    iseclp(unsigned int iForm) noexcept;
-bool    iseclpx(unsigned int iForm) noexcept;
-unsigned int nueclp(unsigned int currentForm, unsigned int count) noexcept;
-unsigned int numclp() noexcept;
+bool    isclp(unsigned int iForm);
+bool    isclpx(unsigned int iForm);
+bool    iseclp(unsigned int iForm);
+bool    iseclpx(unsigned int iForm);
+unsigned int nueclp(unsigned int currentForm, unsigned int count);
+unsigned int numclp();
 void    oclp(unsigned int clipIndex, unsigned int clipEntries);
 
 namespace internal {
@@ -50,7 +50,7 @@ namespace internal {
 	            unsigned int               start,
 	            unsigned int               finish,
 	            const dPOINT&              rotationCenter);
-	void clpsub(unsigned int fpnt, unsigned int cnt) noexcept;
+	void clpsub(unsigned int fpnt, unsigned int cnt);
 	void clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints);
 	void duch(std::vector<fPOINT>& chainEndPoints);
 	void duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned int start, unsigned int finish);
@@ -58,7 +58,7 @@ namespace internal {
 	void dulast(std::vector<fPOINT>& chainEndPoints);
 	void durev(std::vector<fPOINT>& clipReversedData);
 
-	unsigned int findclp(unsigned int formIndex) noexcept;
+	unsigned int findclp(unsigned int formIndex);
 	void fxlen(std::vector<fPOINT>& chainEndPoints, const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs);
 	void fxlin(std::vector<fPOINT>&       chainEndPoints,
 	           const std::vector<double>& ListSINEs,

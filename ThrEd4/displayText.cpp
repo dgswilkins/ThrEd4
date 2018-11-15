@@ -277,7 +277,7 @@ bool displayText::filmsgs(unsigned code) {
 	if (FormIndex != 0) {
 		displayText::frm1pnt();
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			SelectedForm = &FormList[ClosestFormToCursor];
+			SelectedForm = &((*FormList)[ClosestFormToCursor]);
 			if (SelectedForm->vertexCount == 2) {
 				if (code < FML_LIN) {
 					displayText::tabmsg(IDS_FRM3X);

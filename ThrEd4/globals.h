@@ -126,9 +126,9 @@ extern std::vector<POINT>*  FormControlPoints;
 extern HWND         FormDataSheet;
 extern unsigned int FormIndex;
 
-extern std::vector<POINT>* FormLines;
+extern std::vector<POINT>*  FormLines;
+extern std::vector<FRMHED>* FormList;
 
-extern FRMHED       FormList[MAXFORMS];
 extern unsigned int FormMenuChoice;
 extern fPOINT       FormMoveDelta;
 

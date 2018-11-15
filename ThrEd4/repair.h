@@ -15,9 +15,9 @@ void repar();
 namespace internal {
 
 	void     adbad(std::wstring& repairMessage, unsigned code, unsigned int count);
-	void     bcup(unsigned int find, BADCNTS& badData) noexcept;
-	void     chkclp(const FRMHED* formHeader, BADCNTS& badData) noexcept;
-	void     chkeclp(const FRMHED* formHeader, BADCNTS& badData) noexcept;
+	void     bcup(unsigned int find, BADCNTS& badData);
+	void     chkclp(const FRMHED& formHeader, BADCNTS& badData) noexcept;
+	void     chkeclp(const FRMHED& formHeader, BADCNTS& badData) noexcept;
 	void     chkfstch() noexcept;
 	unsigned frmchkfn();
 	void     repclp(std::wstring& repairMessage);

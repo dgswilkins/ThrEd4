@@ -785,8 +785,8 @@ void trace::internal::dutrac() {
 		for (auto iCurrent = iNext + 1; iCurrent < decimatedLine.size(); iCurrent++) {
 			tracedPoints.push_back(decimatedLine[iCurrent]);
 		}
-		SelectedForm = &FormList[FormIndex];
-		form::frmclr(SelectedForm);
+		SelectedForm = &((*FormList)[FormIndex]);
+		form::frmclr(*SelectedForm);
 		CurrentFormVertices      = &FormVertices[FormVertexIndex];
 		CurrentFormVertices[0].x = tracedPoints[0].x * StitchBmpRatio.x;
 		CurrentFormVertices[0].y = tracedPoints[0].y * StitchBmpRatio.y;
@@ -820,7 +820,7 @@ void trace::internal::dutrac() {
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
 		form::frmout(FormIndex);
-		FormList[FormIndex].satinGuideCount = 0;
+		(*FormList)[FormIndex].satinGuideCount = 0;
 		FormIndex++;
 		StateMap.set(StateFlag::RESTCH);
 		StateMap.set(StateFlag::FRMOF);
@@ -1095,7 +1095,7 @@ void trace::tracpar() {
 		ColumnColor = ti::ducolm();
 		if (TraceMsgPoint.y < gsl::narrow<int>(ButtonHeight) * 15) {
 			do {
-				if (GetKeyState(VK_SHIFT) & 0X8000) {
+				if (GetKeyState(VK_SHIFT) & 0x8000) {
 					UpPixelColor &= TraceRGBMask[ColumnColor];
 					DownPixelColor |= TraceRGB[2 - ColumnColor];
 					break;

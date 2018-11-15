@@ -473,7 +473,7 @@ void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
 }
 
 void formForms::refrm() {
-	SelectedForm = &FormList[ClosestFormToCursor];
+	SelectedForm = &((*FormList)[ClosestFormToCursor]);
 	if (StateMap.testAndReset(StateFlag::PRFACT)) {
 		DestroyWindow(PreferencesWindow);
 		StateMap.reset(StateFlag::WASRT);
@@ -820,12 +820,12 @@ void formForms::dasyfrm() {
 		return;
 	}
 	const auto referencePoint = fPOINT{ form::midl(ZoomRect.right, ZoomRect.left), form::midl(ZoomRect.top, ZoomRect.bottom) };
-	SelectedForm              = &FormList[FormIndex];
-	ClosestFormToCursor       = FormIndex;
-	form::frmclr(SelectedForm);
+	(*FormList).emplace_back(FRMHED{});
+	SelectedForm = &(*FormList).back();
+	ClosestFormToCursor       = (*FormList).size() - 1;
 	SelectedForm->vertices  = &FormVertices[FormVertexIndex];
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
-	form::fvars(FormIndex);
+	form::fvars(ClosestFormToCursor);
 	auto       maximumXsize = ZoomRect.right - ZoomRect.left;
 	const auto maximumYsize = ZoomRect.top - ZoomRect.bottom;
 	if (maximumYsize > maximumXsize) {
@@ -946,7 +946,7 @@ void formForms::dasyfrm() {
 	}
 	FormVertexIndex += iVertex;
 	StateMap.set(StateFlag::INIT);
-	form::frmout(FormIndex);
+	form::frmout((*FormList).size() - 1);
 	for (auto iMacroPetal = 0u; iMacroPetal < iVertex; iMacroPetal++) {
 		CurrentFormVertices[iMacroPetal].x -= SelectedForm->rectangle.left;
 		CurrentFormVertices[iMacroPetal].y -= SelectedForm->rectangle.bottom;
