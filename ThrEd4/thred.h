@@ -227,7 +227,7 @@ namespace internal {
 	void     fndknt() noexcept;
 	void     fop();
 	void     frmcalc();
-	unsigned frmcnt(unsigned int iForm, unsigned formFirstStitchIndex) noexcept;
+	unsigned frmcnt(unsigned int iForm, unsigned& formFirstStitchIndex) noexcept;
 	void     frmcurmen();
 	void     frmcursel(unsigned cursorType);
 	void     frmpos(float deltaX, float deltaY) noexcept;
@@ -424,7 +424,7 @@ namespace internal {
 	void     sidhup();
 	void     sidmsg(HWND window, std::wstring* strings, unsigned entries);
 
-	unsigned int sizclp(unsigned formFirstStitchIndex);
+	unsigned int sizclp(unsigned& formFirstStitchIndex, unsigned& formStitchCount);
 	unsigned int sizfclp();
 	void         sizstch(fRECTANGLE& rectangle, const fPOINTATTR* stitches) noexcept;
 	void         srchk();
