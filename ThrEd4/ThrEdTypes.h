@@ -1391,83 +1391,83 @@ public:
 };
 
 inline FRMHED::FRMHED() noexcept
-	: satinOrAngle()
-	, lengthOrCount()
-	, angleOrClipData() {
-	attribute = 0;
-	vertexCount = 0;
-	type = 0;
-	fillColor = 0;
-	borderColor = 0;
-	clipEntries = 0;
-	vertices = nullptr;
-	borderClipData = 0;
+    : satinOrAngle()
+    , lengthOrCount()
+    , angleOrClipData() {
+	attribute       = 0;
+	vertexCount     = 0;
+	type            = 0;
+	fillColor       = 0;
+	borderColor     = 0;
+	clipEntries     = 0;
+	vertices        = nullptr;
+	borderClipData  = 0;
 	satinGuideCount = 0;
-	wordParam = 0;
-	rectangle = { 0.0f, 0.0f, 0.0f, 0.0f };
-	fillType = 0;
-	edgeType = 0;
-	fillSpacing = 0;
-	borderSize = 0;
-	edgeSpacing = 0;
-	edgeStitchLen = 0;
-	picoLength = 0;
+	wordParam       = 0;
+	rectangle       = { 0.0f, 0.0f, 0.0f, 0.0f };
+	fillType        = 0;
+	edgeType        = 0;
+	fillSpacing     = 0;
+	borderSize      = 0;
+	edgeSpacing     = 0;
+	edgeStitchLen   = 0;
+	picoLength      = 0;
 
-	maxFillStitchLen = 0;
-	minFillStitchLen = 0;
-	extendedAttribute = 0;
-	maxBorderStitchLen = 0;
-	minBorderStitchLen = 0;
-	fillInfo = {};
-	fillStart = 0;
-	fillEnd = 0;
-	underlaySpacing = 0;
-	underlayStitchLen = 0;
+	maxFillStitchLen    = 0;
+	minFillStitchLen    = 0;
+	extendedAttribute   = 0;
+	maxBorderStitchLen  = 0;
+	minBorderStitchLen  = 0;
+	fillInfo            = {};
+	fillStart           = 0;
+	fillEnd             = 0;
+	underlaySpacing     = 0;
+	underlayStitchLen   = 0;
 	underlayStitchAngle = 0;
-	underlayIndent = 0;
-	txof = 0;
-	underlayColor = 0;
-	cres = 0;
+	underlayIndent      = 0;
+	txof                = 0;
+	underlayColor       = 0;
+	cres                = 0;
 }
 
 inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
-	attribute = rhs.attribute;
-	vertexCount = rhs.vertexCount;
-	type = rhs.type;
-	fillColor = rhs.fillColor;
-	borderColor = rhs.borderColor;
-	clipEntries = rhs.clipEntries;
-	vertices = rhs.vertices; // Todo - Should we be copying this value?
-	satinOrAngle = rhs.satinOrAngle;
-	borderClipData = rhs.borderClipData; // Todo - Should we be copying this value?
+	attribute       = rhs.attribute;
+	vertexCount     = rhs.vertexCount;
+	type            = rhs.type;
+	fillColor       = rhs.fillColor;
+	borderColor     = rhs.borderColor;
+	clipEntries     = rhs.clipEntries;
+	vertices        = rhs.vertices; // Todo - Should we be copying this value?
+	satinOrAngle    = rhs.satinOrAngle;
+	borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
 	satinGuideCount = rhs.satinGuideCount;
-	wordParam = rhs.wordParam;
-	rectangle = rhs.rectangle;
-	fillType = rhs.fillType;
-	edgeType = rhs.edgeType;
-	fillSpacing = rhs.fillSpacing;
-	lengthOrCount = rhs.lengthOrCount;
+	wordParam       = rhs.wordParam;
+	rectangle       = rhs.rectangle;
+	fillType        = rhs.fillType;
+	edgeType        = rhs.edgeType;
+	fillSpacing     = rhs.fillSpacing;
+	lengthOrCount   = rhs.lengthOrCount;
 	angleOrClipData = rhs.angleOrClipData;
-	borderSize = rhs.borderSize;
-	edgeSpacing = rhs.edgeSpacing;
-	edgeStitchLen = rhs.edgeStitchLen;
-	picoLength = rhs.res;
+	borderSize      = rhs.borderSize;
+	edgeSpacing     = rhs.edgeSpacing;
+	edgeStitchLen   = rhs.edgeStitchLen;
+	picoLength      = rhs.res;
 
-	extendedAttribute = 0;
-	maxFillStitchLen = 0;
-	minFillStitchLen = 0;
-	maxBorderStitchLen = 0;
-	minBorderStitchLen = 0;
-	fillInfo = {};
-	fillStart = 0;
-	fillEnd = 0;
-	underlaySpacing = 0;
-	underlayStitchLen = 0;
+	extendedAttribute   = 0;
+	maxFillStitchLen    = 0;
+	minFillStitchLen    = 0;
+	maxBorderStitchLen  = 0;
+	minBorderStitchLen  = 0;
+	fillInfo            = {};
+	fillStart           = 0;
+	fillEnd             = 0;
+	underlaySpacing     = 0;
+	underlayStitchLen   = 0;
 	underlayStitchAngle = 0;
-	underlayIndent = 0;
-	txof = 0;
-	underlayColor = 0;
-	cres = 0;
+	underlayIndent      = 0;
+	txof                = 0;
+	underlayColor       = 0;
+	cres                = 0;
 }
 
 inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
@@ -1560,7 +1560,7 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
 	borderClipData  = 0;
 	satinGuideCount = 0;
 	wordParam       = 0;
-	rectangle       = {0.0f, 0.0f, 0.0f, 0.0f};
+	rectangle       = { 0.0f, 0.0f, 0.0f, 0.0f };
 	fillType        = 0;
 	edgeType        = 0;
 	fillSpacing     = 0;
@@ -1669,43 +1669,43 @@ inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
 }
 
 inline FRMHED::FRMHED(const FRMHEDOUT& rhs) noexcept {
-	attribute = rhs.attribute;
-	vertexCount = rhs.vertexCount;
-	type = rhs.type;
-	fillColor = rhs.fillColor;
-	borderColor = rhs.borderColor;
-	clipEntries = rhs.clipEntries;
-	vertices = nullptr; // do not read the pointer from file
-	satinOrAngle = rhs.satinOrAngle;
-	borderClipData = 0u; // do not read the index from file
+	attribute       = rhs.attribute;
+	vertexCount     = rhs.vertexCount;
+	type            = rhs.type;
+	fillColor       = rhs.fillColor;
+	borderColor     = rhs.borderColor;
+	clipEntries     = rhs.clipEntries;
+	vertices        = nullptr; // do not read the pointer from file
+	satinOrAngle    = rhs.satinOrAngle;
+	borderClipData  = 0u; // do not read the index from file
 	satinGuideCount = rhs.satinGuideCount;
-	wordParam = rhs.wordParam;
-	rectangle = rhs.rectangle;
-	fillType = rhs.fillType;
-	edgeType = rhs.edgeType;
-	fillSpacing = rhs.fillSpacing;
-	lengthOrCount = rhs.lengthOrCount;
+	wordParam       = rhs.wordParam;
+	rectangle       = rhs.rectangle;
+	fillType        = rhs.fillType;
+	edgeType        = rhs.edgeType;
+	fillSpacing     = rhs.fillSpacing;
+	lengthOrCount   = rhs.lengthOrCount;
 	angleOrClipData = rhs.angleOrClipData;
-	borderSize = rhs.borderSize;
-	edgeSpacing = rhs.edgeSpacing;
-	edgeStitchLen = rhs.edgeStitchLen;
-	picoLength = rhs.picoLength;
+	borderSize      = rhs.borderSize;
+	edgeSpacing     = rhs.edgeSpacing;
+	edgeStitchLen   = rhs.edgeStitchLen;
+	picoLength      = rhs.picoLength;
 
-	extendedAttribute = rhs.extendedAttribute;
-	maxFillStitchLen = rhs.maxFillStitchLen;
-	minFillStitchLen = rhs.minFillStitchLen;
-	maxBorderStitchLen = rhs.maxBorderStitchLen;
-	minBorderStitchLen = rhs.minBorderStitchLen;
-	fillInfo = rhs.fillInfo;
-	fillStart = rhs.fillStart;
-	fillEnd = rhs.fillEnd;
-	underlaySpacing = rhs.underlaySpacing;
-	underlayStitchLen = rhs.underlayStitchLen;
+	extendedAttribute   = rhs.extendedAttribute;
+	maxFillStitchLen    = rhs.maxFillStitchLen;
+	minFillStitchLen    = rhs.minFillStitchLen;
+	maxBorderStitchLen  = rhs.maxBorderStitchLen;
+	minBorderStitchLen  = rhs.minBorderStitchLen;
+	fillInfo            = rhs.fillInfo;
+	fillStart           = rhs.fillStart;
+	fillEnd             = rhs.fillEnd;
+	underlaySpacing     = rhs.underlaySpacing;
+	underlayStitchLen   = rhs.underlayStitchLen;
 	underlayStitchAngle = rhs.underlayStitchAngle;
-	underlayIndent = rhs.underlayIndent;
-	txof = rhs.txof;
-	underlayColor = rhs.underlayColor;
-	cres = rhs.cres;
+	underlayIndent      = rhs.underlayIndent;
+	txof                = rhs.txof;
+	underlayColor       = rhs.underlayColor;
+	cres                = rhs.cres;
 }
 
 inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
