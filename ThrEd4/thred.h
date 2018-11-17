@@ -269,7 +269,6 @@ namespace internal {
 	void     knotmen();
 	void     ladj();
 	void     lenCalc();
-	unsigned lenclp();
 	void     lenfn(unsigned start, unsigned end);
 	void     lensadj();
 	void     linbmen();

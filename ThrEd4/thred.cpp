@@ -7304,17 +7304,6 @@ unsigned int thred::internal::sizclp(unsigned formFirstStitchIndex) {
 	return length;
 }
 
-unsigned thred::internal::lenclp() {
-	auto stitchCount    = 0u;
-	auto codedAttribute = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if ((StitchBuffer[iStitch].attribute & (FRMSK | NOTFRM)) == codedAttribute) {
-			stitchCount++;
-		}
-	}
-	return stitchCount;
-}
-
 void thred::internal::duclip() {
 	if (StateMap.test(StateFlag::FPSEL)) {
 		if (OpenClipboard(ThrEdWindow)) {
@@ -7484,7 +7473,6 @@ void thred::internal::duclip() {
 					const auto firstStitch = 0u; // points to the first stitch in a form
 					auto       length      = sizclp(firstStitch);
 					form::fvars(ClosestFormToCursor);
-					auto codedAttribute = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 					FileSize += sizeof(*ClipFormHeader);
 					ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize);
 					GSL_SUPPRESS(26429) {
@@ -7529,12 +7517,31 @@ void thred::internal::duclip() {
 							SetClipboardData(ThrEdClip, ThrEdClipPointer);
 						}
 						if ((SelectedForm->fillType || SelectedForm->edgeType)) {
-							length      = lenclp();
+							LowerLeftStitch.x = LowerLeftStitch.y = 1e30f;
+							length                                = 0u;
+							auto codedAttribute                   = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
+							for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
+								if ((StitchBuffer[iStitch].attribute & (FRMSK | NOTFRM)) == codedAttribute) {
+									if (StitchBuffer[iStitch].x < LowerLeftStitch.x) {
+										LowerLeftStitch.x = StitchBuffer[iStitch].x;
+									}
+									if (StitchBuffer[iStitch].y < LowerLeftStitch.y) {
+										LowerLeftStitch.y = StitchBuffer[iStitch].y;
+									}
+									length++;
+								}
+							}
 							Clip        = RegisterClipboardFormat(PcdClipFormat);
 							ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length * sizeof(CLPSTCH) + 2);
 							if (ClipPointer) {
 								ClipStitchData = *(static_cast<CLPSTCH**>(ClipPointer));
 								auto iTexture  = 0u;
+								while (iTexture < PCSHeader.stitchCount) {
+									if ((StitchBuffer[iTexture].attribute & FRMSK) == codedAttribute) {
+										break;
+									}
+									iTexture++;
+								}
 								savclp(0, iTexture);
 								ClipStitchData[0].led = length;
 								iTexture++;
@@ -13896,7 +13903,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					thred::px2stch();
 					StateMap.set(StateFlag::MOVCNTR);
 					unrot();
-					ritrot(rotationAngle, dPOINT{SelectedPoint});
+					ritrot(rotationAngle, dPOINT{ SelectedPoint });
 				}
 				else {
 					if (adjustedPoint.x) {
@@ -15114,7 +15121,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								ClosestFormToCursor = FormIndex;
 								SelectedForm        = &((*FormList)[FormIndex]);
 								// ToDo - This is now dangerous. Need to define clear in FRMHED
-								FillMemory(SelectedForm, sizeof((*SelectedForm)), 0);
+								// FillMemory(SelectedForm, sizeof((*SelectedForm)), 0);
 								SelectedForm->type        = FRMLINE;
 								SelectedForm->vertexCount = ClipFormVerticesData->vertexCount + 1;
 								SelectedForm->vertices    = thred::adflt(SelectedForm->vertexCount);
@@ -15229,49 +15236,49 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								FormMoveDelta.x = 0.0f;
 								FormMoveDelta.y = 0.0f;
 								StateMap.set(StateFlag::FUNCLP);
-								ClosestFormToCursor = FormIndex;
-								form::fvars(FormIndex);
-								auto& formIter = (*FormList)[FormIndex];
-								formIter       = ClipFormHeader->form;
+								(*FormList).push_back(ClipFormHeader->form);
+								ClosestFormToCursor = (*FormList).size() - 1;
+								form::fvars(ClosestFormToCursor);
+								auto& formIter = (*FormList).back();
 								formIter.attribute
 								    = gsl::narrow<unsigned char>((formIter.attribute & NFRMLMSK) | (ActiveLayer << 1));
-								SelectedForm->vertices = thred::adflt(formIter.vertexCount);
+								formIter.vertices = thred::adflt(formIter.vertexCount);
 								CurrentFormVertices    = convert_ptr<fPOINT*>(&ClipFormHeader[1]);
 								std::copy(CurrentFormVertices,
-								          CurrentFormVertices + SelectedForm->vertexCount,
-								          stdext::make_checked_array_iterator(SelectedForm->vertices, SelectedForm->vertexCount));
-								auto guides = convert_ptr<SATCON*>(&CurrentFormVertices[SelectedForm->vertexCount]);
-								if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
-									SelectedForm->satinOrAngle.guide = satin::adsatk(SelectedForm->satinGuideCount);
+								          CurrentFormVertices + formIter.vertexCount,
+								          stdext::make_checked_array_iterator(formIter.vertices, formIter.vertexCount));
+								auto guides = convert_ptr<SATCON*>(&CurrentFormVertices[formIter.vertexCount]);
+								if (formIter.type == SAT && formIter.satinGuideCount) {
+									formIter.satinOrAngle.guide = satin::adsatk(formIter.satinGuideCount);
 									std::copy(guides,
-									          guides + SelectedForm->satinGuideCount,
-									          stdext::make_checked_array_iterator(SelectedForm->satinOrAngle.guide,
-									                                              SelectedForm->satinGuideCount));
+									          guides + formIter.satinGuideCount,
+									          stdext::make_checked_array_iterator(formIter.satinOrAngle.guide,
+												  formIter.satinGuideCount));
 								}
 								auto clipData  = convert_ptr<fPOINT*>(&guides[0]);
 								auto clipCount = 0u;
 								if (clip::isclpx(FormIndex)) {
-									SelectedForm->angleOrClipData.clip = thred::adclp(SelectedForm->lengthOrCount.clipCount);
+									formIter.angleOrClipData.clip = thred::adclp(formIter.lengthOrCount.clipCount);
 									std::copy(clipData,
-									          clipData + SelectedForm->lengthOrCount.clipCount,
-									          stdext::make_checked_array_iterator(&ClipPoints[SelectedForm->angleOrClipData.clip],
-									                                              SelectedForm->lengthOrCount.clipCount));
-									clipCount += SelectedForm->lengthOrCount.clipCount;
+									          clipData + formIter.lengthOrCount.clipCount,
+									          stdext::make_checked_array_iterator(&ClipPoints[formIter.angleOrClipData.clip],
+												  formIter.lengthOrCount.clipCount));
+									clipCount += formIter.lengthOrCount.clipCount;
 								}
 								if (clip::iseclpx(FormIndex)) {
 									clipData                     = convert_ptr<fPOINT*>(&clipData[clipCount]);
-									SelectedForm->borderClipData = thred::adclp(SelectedForm->clipEntries);
+									formIter.borderClipData = thred::adclp(formIter.clipEntries);
 									std::copy(clipData,
-									          clipData + SelectedForm->clipEntries,
-									          stdext::make_checked_array_iterator(&ClipPoints[SelectedForm->borderClipData],
-									                                              SelectedForm->clipEntries));
-									clipCount += SelectedForm->clipEntries;
+									          clipData + formIter.clipEntries,
+									          stdext::make_checked_array_iterator(&ClipPoints[formIter.borderClipData],
+												  formIter.clipEntries));
+									clipCount += formIter.clipEntries;
 								}
 								auto textureSource = convert_ptr<TXPNT*>(&clipData[clipCount]);
 								if (texture::istx(FormIndex)) {
-									SelectedForm->fillInfo.texture.index = gsl::narrow<unsigned short>(TextureIndex);
+									formIter.fillInfo.texture.index = gsl::narrow<unsigned short>(TextureIndex);
 
-									auto currentCount = SelectedForm->fillInfo.texture.count;
+									auto currentCount = formIter.fillInfo.texture.count;
 									TexturePointsBuffer->resize(TexturePointsBuffer->size() + currentCount);
 									auto iter = TexturePointsBuffer->begin() + TextureIndex;
 									TextureIndex += currentCount;
