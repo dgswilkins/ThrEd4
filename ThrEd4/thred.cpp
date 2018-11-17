@@ -18068,23 +18068,23 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 						break;
 					}
 					auto iVertex = 0u;
-					for (auto iStitch = 0; iStitch < stitchHeader.formCount; iStitch++) {
+					for (auto iForm = 0; iForm < stitchHeader.formCount; iForm++) {
 						const auto iLine = iVertex;
 						for (auto iVertexInForm = 0u;
-						     (iVertexInForm < formList[iStitch].vertexCount) && (iVertex < stitchHeader.vertexCount);
+						     (iVertexInForm < formList[iForm].vertexCount) && (iVertex < stitchHeader.vertexCount);
 						     iVertexInForm++) {
 							lines[iVertexInForm] = { dToL(vertexList[iVertex].x * ratio),
 								                     dToL(drawingDestinationSize.y - vertexList[iVertex++].y * ratio) };
 						}
-						lines[formList[iStitch].vertexCount]
+						lines[formList[iForm].vertexCount]
 						    = { dToL(vertexList[iLine].x * ratio), dToL(drawingDestinationSize.y - vertexList[iLine].y * ratio) };
 						SelectObject(drawItem->hDC, FormPen);
 						SetROP2(drawItem->hDC, R2_XORPEN);
-						if ((*FormList)[iStitch].type == FRMLINE) {
-							PolylineInt(drawItem->hDC, lines.data(), formList[iStitch].vertexCount);
+						if ((*FormList)[iForm].type == FRMLINE) {
+							PolylineInt(drawItem->hDC, lines.data(), formList[iForm].vertexCount);
 						}
 						else {
-							PolylineInt(drawItem->hDC, lines.data(), formList[iStitch].vertexCount + 1);
+							PolylineInt(drawItem->hDC, lines.data(), formList[iForm].vertexCount + 1);
 						}
 						SetROP2(StitchWindowMemDC, R2_COPYPEN);
 					}
