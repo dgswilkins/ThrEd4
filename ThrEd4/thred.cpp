@@ -18080,7 +18080,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 						    = { dToL(vertexList[iLine].x * ratio), dToL(drawingDestinationSize.y - vertexList[iLine].y * ratio) };
 						SelectObject(drawItem->hDC, FormPen);
 						SetROP2(drawItem->hDC, R2_XORPEN);
-						if ((*FormList)[iForm].type == FRMLINE) {
+						if (formList[iForm].type == FRMLINE) {
 							PolylineInt(drawItem->hDC, lines.data(), formList[iForm].vertexCount);
 						}
 						else {
