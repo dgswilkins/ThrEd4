@@ -785,7 +785,8 @@ void trace::internal::dutrac() {
 		for (auto iCurrent = iNext + 1; iCurrent < decimatedLine.size(); iCurrent++) {
 			tracedPoints.push_back(decimatedLine[iCurrent]);
 		}
-		SelectedForm = &((*FormList)[FormIndex]);
+		(*FormList).emplace_back(FRMHED{});
+		SelectedForm = &((*FormList).back());
 		form::frmclr(*SelectedForm);
 		CurrentFormVertices      = &FormVertices[FormVertexIndex];
 		CurrentFormVertices[0].x = tracedPoints[0].x * StitchBmpRatio.x;
@@ -819,8 +820,8 @@ void trace::internal::dutrac() {
 		SelectedForm->vertexCount = gsl::narrow<unsigned short>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
-		form::frmout(FormIndex);
-		(*FormList)[FormIndex].satinGuideCount = 0;
+		form::frmout((*FormList).size() - 1);
+		SelectedForm->satinGuideCount = 0;
 		FormIndex++;
 		StateMap.set(StateFlag::RESTCH);
 		StateMap.set(StateFlag::FRMOF);
@@ -1102,8 +1103,8 @@ void trace::tracpar() {
 				}
 				const auto ratio         = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
 				const auto position      = dToUI(std::floor(ratio * 255.0));
-				auto       traceColor    = gsl::narrow_cast<COLORREF>( UpPixelColor & TraceRGB[2 - ColumnColor] );
-				const auto tracePosition = gsl::narrow_cast<COLORREF>( position << TraceShift[ColumnColor] );
+				auto       traceColor    = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB[2 - ColumnColor]);
+				const auto tracePosition = gsl::narrow_cast<COLORREF>(position << TraceShift[ColumnColor]);
 				if (tracePosition < traceColor) {
 					UpPixelColor &= TraceRGBMask[ColumnColor];
 					UpPixelColor |= tracePosition;
