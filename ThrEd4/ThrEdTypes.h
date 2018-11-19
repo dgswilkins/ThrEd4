@@ -1317,17 +1317,17 @@ public:
 	unsigned char  fillColor;       // fill color
 	unsigned char  borderColor;     // border color
 	unsigned short clipEntries;     // number of border clipboard entries
-	fPOINT*        vertices;        // points
-	SATINANGLE     satinOrAngle;    // satin guidelines or angle clipboard fill angle
-	unsigned int   borderClipData;  // border clipboard data
+	DWORD          vertices;        // points
+	SATINANGLEOUT  satinOrAngle;    // satin guidelines or angle clipboard fill angle
+	DWORD          borderClipData;  // border clipboard data
 	unsigned short satinGuideCount; // number of satin guidelines
 	unsigned short wordParam;       // word parameter
 	fRECTANGLE     rectangle;       // rectangle
 	unsigned char  fillType;        // fill type
 	unsigned char  edgeType;        // edge type
 	float          fillSpacing;     // fill spacing
-	FLENCNT        lengthOrCount;   // fill stitch length or clipboard count
-	FANGCLP        angleOrClipData; // fill angle or clipboard data pointer
+	FLENCNTOUT     lengthOrCount;   // fill stitch length or clipboard count
+	FANGCLPOUT     angleOrClipData; // fill angle or clipboard data pointer
 	float          borderSize;      // border size
 	float          edgeSpacing;     // edge spacing
 	float          edgeStitchLen;   // edge stitch length
@@ -1437,7 +1437,7 @@ inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertices        = rhs.vertices; // Todo - Should we be copying this value?
+	vertices        = nullptr; 
 	satinOrAngle    = rhs.satinOrAngle;
 	borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
 	satinGuideCount = rhs.satinGuideCount;
@@ -1477,7 +1477,7 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertices        = rhs.vertices; // Todo - Should we be copying this value?
+	vertices        = nullptr; 
 	satinOrAngle    = rhs.satinOrAngle;
 	borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
 	satinGuideCount = rhs.satinGuideCount;
