@@ -1060,7 +1060,7 @@ void trace::blak() {
 		return;
 	}
 	ti::tracwnd();
-	if (FormIndex) {
+	if (!(*FormList).empty()) {
 		BlackPen = CreatePenInt(PS_SOLID, 1, 0);
 		SelectObject(BitmapDC, BlackPen);
 		SelectObject(TraceDC, BlackPen);

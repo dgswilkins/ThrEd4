@@ -675,7 +675,7 @@ void formForms::frmnum() {
 	auto fmtStr = std::wstring{};
 
 	displayText::loadString(fmtStr, IDS_FRML);
-	if (FormIndex && StateMap.test(StateFlag::FORMSEL)) {
+	if (!(*FormList).empty() && StateMap.test(StateFlag::FORMSEL)) {
 		displayText::shoMsg(fmt::format(fmtStr, FormIndex));
 		StateMap.set(StateFlag::NUMIN);
 		StateMap.set(StateFlag::ENTRFNUM);

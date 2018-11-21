@@ -7473,7 +7473,7 @@ bool form::internal::notsel() noexcept {
 }
 
 void form::nufsel() {
-	if (FormIndex) {
+	if (!(*FormList).empty()) {
 		StateMap.reset(StateFlag::FORMSEL);
 		if (StateMap.testAndReset(StateFlag::WASEL)) {
 			SelectedFormList->push_back(PreviousFormIndex);
@@ -8022,7 +8022,7 @@ void form::srtbyfrm() {
 	auto colorHistogram = std::vector<unsigned>(16);
 	auto color          = std::vector<unsigned>(16);
 
-	if (FormIndex) {
+	if (!(*FormList).empty()) {
 		thred::savdo();
 		color[AppliqueColor] = 0u;
 		for (auto iColor = 0u; iColor < 16; iColor++) {
@@ -8683,7 +8683,7 @@ void form::dubfil() {
 void form::col2frm() {
 	auto colorChangedCount = 0u;
 
-	if (FormIndex) {
+	if (!(*FormList).empty()) {
 		const auto formColorPermutations  = FormIndex << 4; // total number of form and color combinations
 		auto       fillColorHistogram     = std::vector<unsigned>(formColorPermutations);
 		auto       borderColorHistogram   = std::vector<unsigned>(formColorPermutations);

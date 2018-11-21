@@ -128,7 +128,7 @@ void repair::internal::chkeclp(const FRMHED& formHeader, BADCNTS& badData) noexc
 unsigned repair::internal::frmchkfn() {
 	auto badData = BADCNTS{};
 
-	if (FormIndex) {
+	if (!(*FormList).empty()) {
 		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 			const auto& form = (*FormList)[iForm];
 			if (!(badData.attribute & BADFLT)) {

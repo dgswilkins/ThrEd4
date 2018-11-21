@@ -274,7 +274,7 @@ bool displayText::filmsgs(unsigned code) {
 	if (!SelectedFormList->empty()) {
 		return displayText::clpmsgs(code);
 	}
-	if (FormIndex != 0) {
+	if (!(*FormList).empty()) {
 		displayText::frm1pnt();
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			SelectedForm = &((*FormList)[ClosestFormToCursor]);
