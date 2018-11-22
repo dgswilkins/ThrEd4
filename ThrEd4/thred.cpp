@@ -1344,10 +1344,10 @@ void thred::internal::dudat() {
 	auto& undoBuffer = *UndoBuffer;
 
 	undoBuffer[UndoBufferWriteIndex].reset(nullptr);
-	const auto&    formList = *FormList;
-	const auto formCount = formList.size();
-	constexpr auto formSize = sizeof(decltype(formList.back()));
-	const auto     size     = sizeof(BAKHED) + formSize * formList.size() + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
+	const auto&    formList  = *FormList;
+	const auto     formCount = formList.size();
+	constexpr auto formSize  = sizeof(decltype(formList.back()));
+	const auto     size      = sizeof(BAKHED) + formSize * formList.size() + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
 	                  + sizeof(FormVertices[0]) * FormVertexIndex + sizeof(ClipPoints[0]) * ClipPointIndex
 	                  + sizeof(SatinGuides[0]) * satin::getGuideSize() + sizeof(UserColor)
 	                  + sizeof((*TexturePointsBuffer)[0]) * TextureIndex;
@@ -5626,7 +5626,7 @@ void thred::internal::nuFil() {
 					}
 					FormIndex = thredHeader.formCount;
 					if (thredHeader.formCount > MAXFORMS) {
-						FormIndex = MAXFORMS;
+						FormIndex             = MAXFORMS;
 						thredHeader.formCount = MAXFORMS;
 					}
 					if (thredHeader.formCount != 0) {

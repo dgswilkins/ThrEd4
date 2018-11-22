@@ -108,9 +108,9 @@ void clip::internal::clpsub(unsigned int fpnt, unsigned int cnt) {
 void clip::delmclp(unsigned int iForm) {
 	if (ClipPointIndex) {
 		if (clip::isclp(iForm)) {
-			auto& form = (*FormList)[iForm];
-			auto destination = ci::findclp(iForm);
-			auto source      = destination + form.lengthOrCount.clipCount;
+			auto& form        = (*FormList)[iForm];
+			auto  destination = ci::findclp(iForm);
+			auto  source      = destination + form.lengthOrCount.clipCount;
 			std::copy(&ClipPoints[source],
 			          &ClipPoints[ClipPointIndex],
 			          stdext::make_checked_array_iterator((&ClipPoints[destination]), (MAXITEMS - destination)));
@@ -132,9 +132,9 @@ void clip::delmclp(unsigned int iForm) {
 void clip::deleclp(unsigned int iForm) {
 	if (ClipPointIndex != 0u) {
 		if (clip::iseclpx(iForm)) {
-			auto& form = (*FormList)[iForm];
-			auto destination = ci::findclp(iForm);
-			auto source      = destination + form.clipEntries;
+			auto& form        = (*FormList)[iForm];
+			auto  destination = ci::findclp(iForm);
+			auto  source      = destination + form.clipEntries;
 			while (source < ClipPointIndex) {
 				ClipPoints[destination++] = ClipPoints[source++];
 			}
@@ -156,9 +156,9 @@ void clip::delclps(unsigned int iForm) {
 }
 
 unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) {
-	auto find        = ci::findclp(ClosestFormToCursor);
-	auto destination = ClipPointIndex + count - 1u;
-	auto& formList = *FormList;
+	auto  find        = ci::findclp(ClosestFormToCursor);
+	auto  destination = ClipPointIndex + count - 1u;
+	auto& formList    = *FormList;
 
 	if (clip::isclp(ClosestFormToCursor)) {
 		find += formList[ClosestFormToCursor].lengthOrCount.clipCount;
@@ -187,7 +187,7 @@ unsigned int clip::numclp() {
 	const auto find        = ci::findclp(ClosestFormToCursor);
 	auto       source      = ClipPointIndex - 1;
 	auto       destination = ClipPointIndex + ClipStitchCount - 1;
-	auto& formList = *FormList;
+	auto&      formList    = *FormList;
 
 	while ((source + 1) > find) {
 		ClipPoints[destination--] = ClipPoints[source--];
@@ -707,11 +707,11 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 
 	if (StateMap.test(StateFlag::INDIR)) {
 		delta = fPOINT{ (*OutsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
-			      (*OutsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y };
+			            (*OutsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y };
 	}
 	else {
 		delta = fPOINT{ (*InsidePoints)[nextVertex].x - CurrentFormVertices[nextVertex].x,
-			      (*InsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y };
+			            (*InsidePoints)[nextVertex].y - CurrentFormVertices[nextVertex].y };
 	}
 	const auto rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
 	const auto referencePoint = fPOINTATTR{ ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };

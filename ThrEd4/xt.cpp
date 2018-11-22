@@ -1126,8 +1126,8 @@ void xt::internal::dmprec(const std::vector<OREC*>& stitchRegion, unsigned count
 #endif
 
 bool xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, unsigned count, unsigned& badForm) {
-	auto formIndex  = stitchRegion[0]->form;
-	auto color = stitchRegion[0]->color;
+	auto formIndex = stitchRegion[0]->form;
+	auto color     = stitchRegion[0]->color;
 
 	for (auto iRegion = 1u; iRegion < count; iRegion++) {
 		if (stitchRegion[iRegion]->form == formIndex) {
@@ -1144,8 +1144,8 @@ bool xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, unsigned count
 			color = stitchRegion[iRegion]->color;
 		}
 		else {
-			color = stitchRegion[iRegion]->color;
-			formIndex  = stitchRegion[iRegion]->form;
+			color     = stitchRegion[iRegion]->color;
+			formIndex = stitchRegion[iRegion]->form;
 		}
 	}
 	return true;
@@ -2336,7 +2336,7 @@ void xt::setfhi() {
 
 void xt::setfilstrt() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
-		auto& form = (*FormList)[ClosestFormToCursor];
+		auto& form     = (*FormList)[ClosestFormToCursor];
 		form.fillStart = gsl::narrow<unsigned short>(ClosestVertexToCursor);
 		form.extendedAttribute |= AT_STRT;
 		form::refil();
@@ -2350,7 +2350,7 @@ void xt::setfilstrt() {
 
 void xt::setfilend() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
-		auto& form = (*FormList)[ClosestFormToCursor];
+		auto& form   = (*FormList)[ClosestFormToCursor];
 		form.fillEnd = gsl::narrow<unsigned short>(ClosestVertexToCursor);
 		form.extendedAttribute |= AT_END;
 		form::refil();

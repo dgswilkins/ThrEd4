@@ -32,9 +32,9 @@ void wasTrace1();
 
 namespace internal {
 
-	void     bfrm();
-	void     blanklin(std::vector<unsigned>& differenceBitmap, unsigned lineStart);
-	void     difbits(unsigned shift, unsigned* point) noexcept;
+	void bfrm();
+	void blanklin(std::vector<unsigned>& differenceBitmap, unsigned lineStart);
+	void difbits(unsigned shift, unsigned* point) noexcept;
 
 	static inline void difsub(unsigned source, unsigned shift, unsigned& destination) noexcept;
 

@@ -217,10 +217,10 @@ void repair::internal::chkfstch() noexcept {
 }
 
 void repair::internal::repflt(std::wstring& repairMessage) {
-	auto iDestination = 0u;
-	auto vertexCount  = 0u;
-	auto badData      = BADCNTS{};
-	auto& formList = *FormList;
+	auto  iDestination = 0u;
+	auto  vertexCount  = 0u;
+	auto  badData      = BADCNTS{};
+	auto& formList     = *FormList;
 
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		if (formList[iForm].vertexCount) {
@@ -242,7 +242,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			auto       sourceEnd   = sourceStart + form.vertexCount;
 			auto       destination = vertexPoint.begin() + iVertex;
 			const auto _           = std::copy(sourceStart, sourceEnd, destination);
-			form.vertices   = &FormVertices[iVertex];
+			form.vertices          = &FormVertices[iVertex];
 			iVertex += form.vertexCount;
 			ri::bcup(iForm, badData);
 		}
@@ -282,8 +282,8 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 
 	auto clipPoint = std::vector<fPOINT>();
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-		auto& form     = (*FormList)[iForm];
-		auto       clipDifference = 0u;
+		auto& form           = (*FormList)[iForm];
+		auto  clipDifference = 0u;
 		if (clip::isclp(iForm)) {
 			// ToDo - pointer arithmetic to be fixed
 			clipDifference = form.angleOrClipData.clip;
@@ -373,15 +373,15 @@ void repair::internal::repsat() {
 			}
 			else {
 				if (guideDifference < satin::getGuideSize()) {
-					form.satinGuideCount = gsl::narrow<unsigned short>(satin::getGuideSize() - guideDifference);
-					auto       sourceStart      = form.satinOrAngle.guide;
-					auto       sourceEnd        = sourceStart + form.satinGuideCount;
+					form.satinGuideCount   = gsl::narrow<unsigned short>(satin::getGuideSize() - guideDifference);
+					auto       sourceStart = form.satinOrAngle.guide;
+					auto       sourceEnd   = sourceStart + form.satinGuideCount;
 					const auto destination = stdext::make_checked_array_iterator(&SatinGuides[guideCount], 10000 - guideCount);
 					std::copy(sourceStart, sourceEnd, destination);
 					ri::bcup(iForm, badData);
 				}
 				else {
-					guideCount                  = badData.guideCount;
+					guideCount           = badData.guideCount;
 					form.satinGuideCount = 0;
 				}
 			}
@@ -397,8 +397,7 @@ void repair::internal::reptx() {
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		if (texture::istx(iForm)) {
 			auto& form = (*FormList)[iForm];
-			if (gsl::narrow<unsigned short>(TextureIndex)
-			    > form.fillInfo.texture.index + form.fillInfo.texture.count) {
+			if (gsl::narrow<unsigned short>(TextureIndex) > form.fillInfo.texture.index + form.fillInfo.texture.count) {
 				auto       sourceStart = &SatinGuides[form.fillInfo.texture.index];
 				auto       sourceEnd   = sourceStart + form.fillInfo.texture.count;
 				const auto destination = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
@@ -409,10 +408,9 @@ void repair::internal::reptx() {
 			}
 			else {
 				if (TextureIndex > form.fillInfo.texture.index) {
-					form.fillInfo.texture.count
-					    = gsl::narrow<unsigned short>(TextureIndex) - form.fillInfo.texture.index;
-					auto       sourceStart = &SatinGuides[form.fillInfo.texture.index];
-					auto       sourceEnd   = sourceStart + form.fillInfo.texture.count;
+					form.fillInfo.texture.count = gsl::narrow<unsigned short>(TextureIndex) - form.fillInfo.texture.index;
+					auto       sourceStart      = &SatinGuides[form.fillInfo.texture.index];
+					auto       sourceEnd        = sourceStart + form.fillInfo.texture.count;
 					const auto destination
 					    = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
 					std::copy(sourceStart, sourceEnd, destination);

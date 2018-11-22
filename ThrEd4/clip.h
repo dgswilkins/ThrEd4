@@ -26,25 +26,27 @@
 
 namespace clip {
 
-void    chnfn();
-void    clpbrd(unsigned int startVertex);
-void    clpic();
-void    clpout();
-void    delclps(unsigned int iForm);
-void    deleclp(unsigned int iForm);
-void    delmclp(unsigned int iForm);
-void    duxclp();
-bool    isclp(unsigned int iForm);
-bool    isclp(FRMHED& form);
-bool    isclpx(unsigned int iForm);
-bool    isclpx(FRMHED& form);
-bool    iseclp(unsigned int iForm);
-bool    iseclp(FRMHED& form);
-bool    iseclpx(unsigned int iForm);
-bool    iseclpx(FRMHED& form);
+void chnfn();
+void clpbrd(unsigned int startVertex);
+void clpic();
+void clpout();
+void delclps(unsigned int iForm);
+void deleclp(unsigned int iForm);
+void delmclp(unsigned int iForm);
+void duxclp();
+bool isclp(unsigned int iForm);
+bool isclp(FRMHED& form);
+bool isclpx(unsigned int iForm);
+bool isclpx(FRMHED& form);
+bool iseclp(unsigned int iForm);
+bool iseclp(FRMHED& form);
+bool iseclpx(unsigned int iForm);
+bool iseclpx(FRMHED& form);
+
 unsigned int nueclp(unsigned int currentForm, unsigned int count);
 unsigned int numclp();
-void    oclp(unsigned int clipIndex, unsigned int clipEntries);
+
+void oclp(unsigned int clipIndex, unsigned int clipEntries);
 
 namespace internal {
 

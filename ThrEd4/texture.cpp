@@ -1054,14 +1054,14 @@ void texture::internal::nutx() {
 	if (!(*FormList).empty()) {
 		if (texture::istx(ClosestFormToCursor)) {
 			const auto& texture = (*FormList)[ClosestFormToCursor].fillInfo.texture;
-			index          = texture.index;
+			index               = texture.index;
 			texture::deltx();
 		}
 		else {
 			for (auto iForm = ClosestFormToCursor; iForm-- > 0;) {
 				if (texture::istx(iForm)) {
 					const auto& texture = (*FormList)[iForm].fillInfo.texture;
-					index                = texture.index + texture.count;
+					index               = texture.index + texture.count;
 					break;
 				}
 			}

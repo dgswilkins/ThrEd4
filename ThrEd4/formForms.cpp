@@ -821,8 +821,8 @@ void formForms::dasyfrm() {
 	}
 	const auto referencePoint = fPOINT{ form::midl(ZoomRect.right, ZoomRect.left), form::midl(ZoomRect.top, ZoomRect.bottom) };
 	(*FormList).emplace_back(FRMHED{});
-	SelectedForm = &(*FormList).back();
-	ClosestFormToCursor       = (*FormList).size() - 1;
+	SelectedForm            = &(*FormList).back();
+	ClosestFormToCursor     = (*FormList).size() - 1;
 	SelectedForm->vertices  = &FormVertices[FormVertexIndex];
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	form::fvars(ClosestFormToCursor);
@@ -1176,7 +1176,7 @@ void formForms::wavfrm() {
 			const unsigned short iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
 
 			points[iPoint] = fPOINT{ -CurrentFormVertices[iNextVertex].x + CurrentFormVertices[waveIndex].x,
-				               -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[waveIndex].y };
+				                     -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[waveIndex].y };
 			iPoint++;
 			waveIndex = iNextVertex;
 		}

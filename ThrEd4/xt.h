@@ -197,5 +197,5 @@ namespace internal {
 	void undclp() noexcept;
 	void uspacfn(unsigned int find, float spacing);
 	void xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point, float featherRatioLocal) noexcept;
-}  // namespace internal
-}  // namespace xt
+} // namespace internal
+} // namespace xt
