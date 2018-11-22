@@ -35,13 +35,13 @@ void deleclp(unsigned int iForm);
 void delmclp(unsigned int iForm);
 void duxclp();
 bool isclp(unsigned int iForm);
-bool isclp(FRMHED& form);
+bool isclp(const FRMHED& form) noexcept;
 bool isclpx(unsigned int iForm);
-bool isclpx(FRMHED& form);
+bool isclpx(const FRMHED& form) noexcept;
 bool iseclp(unsigned int iForm);
-bool iseclp(FRMHED& form);
+bool iseclp(const FRMHED& form) noexcept;
 bool iseclpx(unsigned int iForm);
-bool iseclpx(FRMHED& form);
+bool iseclpx(const FRMHED& form) noexcept;
 
 unsigned int nueclp(unsigned int currentForm, unsigned int count);
 unsigned int numclp();

@@ -1332,7 +1332,33 @@ public:
 	float          edgeSpacing;     // edge spacing
 	float          edgeStitchLen;   // edge stitch length
 	unsigned short res;             // pico length
+
+	FRMHEDO() noexcept;
 };
+
+inline FRMHEDO::FRMHEDO() noexcept
+	: satinOrAngle()
+	, lengthOrCount()
+	, angleOrClipData() {
+	attribute = 0;
+	vertexCount = 0;
+	type = 0;
+	fillColor = 0;
+	borderColor = 0;
+	clipEntries = 0;
+	vertices = 0;
+	borderClipData = 0;
+	satinGuideCount = 0;
+	wordParam = 0;
+	rectangle = { 0.0f, 0.0f, 0.0f, 0.0f };
+	fillType = 0;
+	edgeType = 0;
+	fillSpacing = 0;
+	borderSize = 0;
+	edgeSpacing = 0;
+	edgeStitchLen = 0;
+	res = 0;
+}
 
 class FRMHEDOUT;
 
@@ -1378,10 +1404,10 @@ public:
 	unsigned char cres;                // reserved
 
 	FRMHED() noexcept;
-	// FRMHEDOUT(FRMHEDOUT&&) = default;
-	// FRMHEDOUT& operator=(const FRMHEDOUT& rhs) = default;
-	// FRMHEDOUT& operator=(FRMHEDOUT&&) = default;
-	//~FRMHEDOUT() = default;
+	// FRMHED(FRMHED&&) = default;
+	// FRMHED& operator=(const FRMHED& rhs) = default;
+	// FRMHED& operator=(FRMHED&&) = default;
+	//~FRMHED() = default;
 
 	explicit inline FRMHED(const FRMHEDO& rhs) noexcept;
 	explicit inline FRMHED(const FRMHEDOUT& rhs) noexcept;

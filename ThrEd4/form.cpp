@@ -7191,7 +7191,7 @@ void form::rotcmd() {
 void form::internal::fnagain(double rotationAngle) {
 	if (StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::GRPSEL) || !SelectedFormList->empty()
 	    || StateMap.test(StateFlag::BIGBOX) || StateMap.test(StateFlag::FPSEL)) {
-		auto rotationCenter = form::rotpar();
+		const auto rotationCenter = form::rotpar();
 		thred::rotfn(rotationAngle, rotationCenter);
 	}
 	else {
@@ -7255,7 +7255,7 @@ void form::internal::adfrm(unsigned int iForm) {
 
 void form::duprot(double rotationAngle) {
 	fi::adfrm(ClosestFormToCursor);
-	auto rotationCenter = form::rotpar();
+	const auto rotationCenter = form::rotpar();
 	thred::rotfn(rotationAngle, rotationCenter);
 	form::refil();
 	StateMap.set(StateFlag::FORMSEL);
@@ -7299,7 +7299,7 @@ void form::internal::cplayfn(unsigned int iForm, unsigned play) {
 	const auto& srcForm = (*FormList)[iForm];
 
 	(*FormList).push_back(srcForm);
-	auto lastForm = (*FormList).size() - 1;
+	const auto lastForm = (*FormList).size() - 1;
 	form::fvars(lastForm);
 	SelectedForm->vertices = thred::adflt(SelectedForm->vertexCount);
 	std::copy(srcForm.vertices,
@@ -7804,7 +7804,7 @@ void form::contfil() {
 
 void form::internal::dupfn(double rotationAngle) {
 	thred::savdo();
-	auto rotationCenter = form::rotpar();
+	const auto rotationCenter = form::rotpar();
 	if (IniFile.rotationAngle) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			form::duprot(rotationAngle);
@@ -8359,7 +8359,7 @@ bool form::internal::spltlin() {
 	form::frmout(ClosestFormToCursor + 1);
 	if (clip::iseclp(ClosestFormToCursor)) {
 		form::clpspac(srcForm.borderClipData, srcForm.clipEntries);
-		auto maxForm = (*FormList).size();
+		const auto maxForm = (*FormList).size();
 		for (auto iForm = ClosestFormToCursor + 1; iForm < maxForm; iForm++) {
 			(*FormList)[iForm].borderClipData += SelectedForm->clipEntries;
 		}

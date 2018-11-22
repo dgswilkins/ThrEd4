@@ -49,7 +49,7 @@ bool clip::iseclp(unsigned int iForm) {
 	return form.edgeType == EDGECLIP || form.edgeType == EDGEPICOT || form.edgeType == EDGECLIPX;
 }
 
-bool clip::iseclp(FRMHED& form) {
+bool clip::iseclp(const FRMHED& form) noexcept {
 	return form.edgeType == EDGECLIP || form.edgeType == EDGEPICOT || form.edgeType == EDGECLIPX;
 }
 
@@ -58,7 +58,7 @@ bool clip::isclp(unsigned int iForm) {
 	return ((1 << form.fillType) & ClipTypeMap) != 0;
 }
 
-bool clip::isclp(FRMHED& form) {
+bool clip::isclp(const FRMHED& form) noexcept {
 	return ((1 << form.fillType) & ClipTypeMap) != 0;
 }
 
@@ -67,7 +67,7 @@ bool clip::isclpx(unsigned int iForm) {
 	return clip::isclp(iForm) && form.lengthOrCount.clipCount;
 }
 
-bool clip::isclpx(FRMHED& form) {
+bool clip::isclpx(const FRMHED& form) noexcept {
 	return clip::isclp(form) && form.lengthOrCount.clipCount;
 }
 
@@ -76,7 +76,7 @@ bool clip::iseclpx(unsigned int iForm) {
 	return clip::iseclp(iForm) && form.clipEntries;
 }
 
-bool clip::iseclpx(FRMHED& form) {
+bool clip::iseclpx(const FRMHED& form) noexcept {
 	return clip::iseclp(form) && form.clipEntries;
 }
 

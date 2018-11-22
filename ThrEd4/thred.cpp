@@ -7468,9 +7468,9 @@ void thred::internal::duclip() {
 			}
 			else {
 				if (StateMap.test(StateFlag::FORMSEL)) {
-					auto firstStitch = 0u; // points to the first stitch in a form
-					auto stitchCount = 0u;
-					auto length      = sizclp(firstStitch, stitchCount);
+					auto       firstStitch = 0u; // points to the first stitch in a form
+					auto       stitchCount = 0u;
+					const auto length      = sizclp(firstStitch, stitchCount);
 					form::fvars(ClosestFormToCursor);
 					FileSize += sizeof(*ClipFormHeader);
 					ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize);
@@ -9258,7 +9258,7 @@ void thred::rotfn(double rotationAngle, const dPOINT& rotationCenter) {
 
 void thred::internal::rotfns(double rotationAngle) {
 	thred::savdo();
-	auto rotationCenter = form::rotpar();
+	const auto rotationCenter = form::rotpar();
 	thred::rotfn(rotationAngle, rotationCenter);
 }
 
