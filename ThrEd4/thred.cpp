@@ -11751,10 +11751,11 @@ void thred::internal::dufdef() noexcept {
 bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
                              double&             xyRatio,
                              double&             rotationAngle,
-                             dPOINT&             rotationCenter) { // NOLINT
+                             dPOINT&             rotationCenter,
+                             FRMHED&             textureForm) { // NOLINT
 	if (Msg.message == WM_MOUSEMOVE) {
 		if (StateMap.test(StateFlag::TXTMOV)) {
-			texture::txtrmov();
+			texture::txtrmov(textureForm);
 			return true;
 		}
 		movchk();
@@ -12658,7 +12659,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			return true;
 		}
 		if (StateMap.test(StateFlag::TXTRED) && !StateMap.test(StateFlag::FORMIN)) {
-			texture::txtlbut();
+			texture::txtlbut(textureForm);
 			return true;
 		}
 		if (StateMap.testAndReset(StateFlag::FSETFCOL)) {
@@ -14261,7 +14262,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	case WM_KEYDOWN: {
 		const auto code = gsl::narrow<unsigned int>(Msg.wParam & 0xffff);
 		if (StateMap.test(StateFlag::TXTRED)) {
-			texture::txtkey(code);
+			texture::txtkey(code, textureForm);
 			return true;
 		}
 		form::fvars(ClosestFormToCursor);
@@ -18782,12 +18783,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto xyRatio        = 0.0; // expand form aspect ratio
 		auto rotationAngle  = 0.0;
 		auto rotationCenter = dPOINT{};
+		auto textureForm = FRMHED{};
 
 		auto stretchBoxLine = std::vector<POINT>(5); // stretch and expand
 
 		while (GetMessage(&Msg, nullptr, 0, 0)) {
 			StateMap.set(StateFlag::SAVACT);
-			if (!thi::chkMsg(stretchBoxLine, xyRatio, rotationAngle, rotationCenter)) {
+			if (!thi::chkMsg(stretchBoxLine, xyRatio, rotationAngle, rotationCenter, textureForm)) {
 				DispatchMessage(&Msg);
 			}
 			if (StateMap.testAndReset(StateFlag::FCHK)) {

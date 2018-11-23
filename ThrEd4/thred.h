@@ -107,7 +107,11 @@ namespace internal {
 
 	void     centr();
 	void     chk1col();
-	bool     chkMsg(std::vector<POINT>& stretchBoxLine, double& xyRatio, double& rotationAngle, dPOINT& rotationCenter);
+	bool     chkMsg(std::vector<POINT>& stretchBoxLine,
+	                double&             xyRatio,
+	                double&             rotationAngle,
+	                dPOINT&             rotationCenter,
+	                FRMHED&             textureForm);
 	bool     chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept;
 	bool     chkattr(const fs::path& filename);
 	bool     chkbig(std::vector<POINT>& stretchBoxLine, double& xyRatio);

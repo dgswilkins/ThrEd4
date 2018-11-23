@@ -264,7 +264,6 @@ void texture::dutxtfil() {
 	if (!IniFile.textureEditorSize) {
 		IniFile.textureEditorSize = ITXPIX;
 	}
-	AngledForm.vertexCount = 0;
 	StateMap.set(StateFlag::TXTRED);
 	StateMap.set(StateFlag::ZUMED);
 	StateMap.reset(StateFlag::WASPAT);
@@ -627,7 +626,7 @@ void texture::internal::dutxlin(const fPOINT& point0in, const fPOINT& point1in) 
 	}
 }
 
-void texture::internal::setxclp() {
+void texture::internal::setxclp(const FRMHED& textureForm) {
 	auto screenOffset = POINT{};
 	auto editorOffset = fPOINT{};
 
@@ -641,15 +640,15 @@ void texture::internal::setxclp() {
 		editorOffset.x -= TextureScreen.formCenter.x;
 	}
 	editorOffset.y -= TextureScreen.formCenter.y;
-	for (auto iVertex = 0u; iVertex < AngledForm.vertexCount; iVertex++) {
+	for (auto iVertex = 0u; iVertex < textureForm.vertexCount; iVertex++) {
 		AngledFormVertices[iVertex].x += editorOffset.x;
 		AngledFormVertices[iVertex].y += editorOffset.y;
 	}
-	auto lineCount = AngledForm.vertexCount - 1;
-	if (AngledForm.type != FRMLINE) {
+	auto lineCount = textureForm.vertexCount - 1;
+	if (textureForm.type != FRMLINE) {
 		lineCount++;
 	}
-	VertexCount = AngledForm.vertexCount;
+	VertexCount = textureForm.vertexCount;
 	for (auto iLine = 0u; iLine < lineCount; iLine++) {
 		const auto iNextVertex = form::nxt(iLine);
 		txi::dutxlin(AngledFormVertices[iLine], AngledFormVertices[iNextVertex]);
@@ -748,10 +747,10 @@ void texture::txtrup() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void texture::internal::angrct(fRECTANGLE& rectangle) noexcept {
+void texture::internal::angrct(fRECTANGLE& rectangle, const FRMHED& textureForm) noexcept {
 	rectangle.left = rectangle.right = AngledFormVertices[0].x;
 	rectangle.bottom = rectangle.top = AngledFormVertices[0].y;
-	for (auto iVertex = 1u; iVertex < AngledForm.vertexCount; iVertex++) {
+	for (auto iVertex = 1u; iVertex < textureForm.vertexCount; iVertex++) {
 		if (AngledFormVertices[iVertex].x < rectangle.left) {
 			rectangle.left = AngledFormVertices[iVertex].x;
 		}
@@ -767,52 +766,52 @@ void texture::internal::angrct(fRECTANGLE& rectangle) noexcept {
 	}
 }
 
-void texture::internal::ritxfrm() {
+void texture::internal::ritxfrm(FRMHED& textureForm) {
 	auto offset = POINT{ (TextureCursorLocation.x - SelectTexturePointsOrigin.x),
 		                 (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
 
 	offset.x        = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
 	offset.y        = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
 	auto& formLines = *FormLines;
-	formLines.resize(gsl::narrow_cast<size_t>(AngledForm.vertexCount) + 1);
-	for (auto iVertex = 0u; iVertex < AngledForm.vertexCount; iVertex++) {
+	formLines.resize(gsl::narrow_cast<size_t>(textureForm.vertexCount) + 1);
+	for (auto iVertex = 0u; iVertex < textureForm.vertexCount; iVertex++) {
 		txi::ed2px(AngledFormVertices[iVertex], formLines[iVertex]);
 		formLines[iVertex].x += offset.x;
 		formLines[iVertex].y += offset.y;
 	}
-	formLines[AngledForm.vertexCount] = formLines[0];
-	auto vertexCount                  = AngledForm.vertexCount;
-	if (AngledForm.type != FRMLINE) {
+	formLines[textureForm.vertexCount] = formLines[0];
+	auto vertexCount                  = textureForm.vertexCount;
+	if (textureForm.type != FRMLINE) {
 		vertexCount++;
 	}
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	PolylineInt(StitchWindowDC, formLines.data(), vertexCount);
 }
 
-void texture::internal::setxfrm() {
+void texture::internal::setxfrm(const FRMHED& textureForm) {
 	auto angleRect = fRECTANGLE{};
 
-	txi::angrct(angleRect);
-	for (auto iVertex = 0u; iVertex < AngledForm.vertexCount; iVertex++) {
+	txi::angrct(angleRect, textureForm);
+	for (auto iVertex = 0u; iVertex < textureForm.vertexCount; iVertex++) {
 		AngledFormVertices[iVertex].x -= angleRect.left;
 		AngledFormVertices[iVertex].y -= angleRect.bottom;
 	}
-	txi::angrct(angleRect);
+	txi::angrct(angleRect, textureForm);
 	const auto height = angleRect.top - angleRect.bottom;
 	if (height > TextureScreen.areaHeight) {
 		const auto ratio = TextureScreen.areaHeight / height * 0.95;
-		for (auto iVertex = 0u; iVertex < AngledForm.vertexCount; iVertex++) {
+		for (auto iVertex = 0u; iVertex < textureForm.vertexCount; iVertex++) {
 			AngledFormVertices[iVertex].x *= ratio;
 			AngledFormVertices[iVertex].y *= ratio;
 		}
-		txi::angrct(angleRect);
+		txi::angrct(angleRect, textureForm);
 	}
 	TextureScreen.formCenter.x = form::midl(angleRect.right, angleRect.left);
 	TextureScreen.formCenter.y = form::midl(angleRect.top, angleRect.bottom);
 	txi::ed2px(TextureScreen.formCenter, SelectTexturePointsOrigin);
 }
 
-void texture::internal::txtclp() {
+void texture::internal::txtclp(FRMHED& textureForm) {
 	ThrEdClip  = RegisterClipboardFormat(ThrEdClipFormat);
 	ClipMemory = GetClipboardData(ThrEdClip);
 	if (ClipMemory) {
@@ -821,15 +820,15 @@ void texture::internal::txtclp() {
 			if (ClipFormHeader->clipType == CLP_FRM) {
 				SelectedForm     = &ClipFormHeader->form;
 				auto vertices    = convert_ptr<fPOINT*>(&SelectedForm[1]);
-				AngledForm       = *SelectedForm;
+				textureForm       = *SelectedForm;
 				auto sourceStart = vertices;
 				auto sourceEnd   = sourceStart + SelectedForm->vertexCount;
 				std::copy(sourceStart, sourceEnd, AngledFormVertices);
-				AngledForm.vertices = AngledFormVertices;
+				textureForm.vertices = AngledFormVertices;
 				StateMap.reset(StateFlag::TXTLIN);
 				StateMap.set(StateFlag::TXTCLP);
 				StateMap.set(StateFlag::TXTMOV);
-				txi::setxfrm();
+				txi::setxfrm(textureForm);
 				TextureCursorLocation = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 			}
 			GlobalUnlock(ClipMemory);
@@ -844,7 +843,7 @@ void texture::internal::dutxtlin() noexcept {
 	Polyline(StitchWindowDC, FormLines->data(), 2);
 }
 
-void texture::txtrmov() {
+void texture::txtrmov(FRMHED& textureForm) {
 	if (StateMap.test(StateFlag::TXTLIN)) {
 		txi::dutxtlin();
 		txi::deorg((*FormLines)[1]);
@@ -853,10 +852,10 @@ void texture::txtrmov() {
 	}
 	if (StateMap.test(StateFlag::TXTCLP)) {
 		if (StateMap.testAndSet(StateFlag::WASWROT)) {
-			txi::ritxfrm();
+			txi::ritxfrm(textureForm);
 		}
 		TextureCursorLocation = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
-		txi::ritxfrm();
+		txi::ritxfrm(textureForm);
 	}
 	else {
 		if (!SelectedTexturePointsList->empty()) {
@@ -1241,14 +1240,14 @@ bool texture::internal::chkbut() {
 	return false;
 }
 
-void texture::txtlbut() {
+void texture::txtlbut(const FRMHED& textureForm) {
 	form::fvars(ClosestFormToCursor);
 	if (txi::chkbut()) {
 		return;
 	}
 	if (StateMap.testAndReset(StateFlag::TXTCLP)) {
 		texture::savtxt();
-		txi::setxclp();
+		txi::setxclp(textureForm);
 		return;
 	}
 	if (StateMap.testAndReset(StateFlag::TXTLIN)) {
@@ -1347,35 +1346,35 @@ void texture::internal::txtdel() {
 	}
 }
 
-void texture::internal::txcntrv() {
+void texture::internal::txcntrv(const FRMHED& textureForm) {
 	if (StateMap.testAndReset(StateFlag::TXTCLP)) {
 		StateMap.set(StateFlag::TXHCNTR);
 		texture::savtxt();
-		txi::setxclp();
+		txi::setxclp(textureForm);
 		StateMap.set(StateFlag::RESTCH);
 	}
 }
 
-void texture::internal::txsiz(double ratio) {
-	txi::ritxfrm();
-	for (auto iVertex = 0u; iVertex < AngledForm.vertexCount; iVertex++) {
+void texture::internal::txsiz(double ratio, FRMHED& textureForm) {
+	txi::ritxfrm(textureForm);
+	for (auto iVertex = 0u; iVertex < textureForm.vertexCount; iVertex++) {
 		AngledFormVertices[iVertex].x *= ratio;
 		AngledFormVertices[iVertex].y *= ratio;
 	}
 	auto angleRect = fRECTANGLE{};
-	txi::angrct(angleRect);
+	txi::angrct(angleRect, textureForm);
 	TextureScreen.formCenter.x = form::midl(angleRect.right, angleRect.left);
 	TextureScreen.formCenter.y = form::midl(angleRect.top, angleRect.bottom);
 	txi::ed2px(TextureScreen.formCenter, SelectTexturePointsOrigin);
-	txi::ritxfrm();
+	txi::ritxfrm(textureForm);
 }
 
-void texture::internal::txshrnk() {
-	txi::txsiz(TXTRAT);
+void texture::internal::txshrnk(FRMHED& textureForm) {
+	txi::txsiz(TXTRAT, textureForm);
 }
 
-void texture::internal::txgro() {
-	txi::txsiz(1 / TXTRAT);
+void texture::internal::txgro(FRMHED& textureForm) {
+	txi::txsiz(1 / TXTRAT, textureForm);
 }
 
 bool texture::internal::txdig(unsigned keyCode, char& character) {
@@ -1454,7 +1453,7 @@ void texture::txsnap() {
 	}
 }
 
-void texture::txtkey(unsigned keyCode) {
+void texture::txtkey(unsigned keyCode, FRMHED& textureForm) {
 	char character = {};
 
 	if (SideWindowButton) {
@@ -1503,11 +1502,11 @@ void texture::txtkey(unsigned keyCode) {
 		break;
 	}
 	case 0xdb: { //[
-		txi::txshrnk();
+		txi::txshrnk(textureForm);
 		break;
 	}
 	case 0xdd: { //]
-		txi::txgro();
+		txi::txgro(textureForm);
 		break;
 	}
 	case 192: { //`
@@ -1546,7 +1545,7 @@ void texture::txtkey(unsigned keyCode) {
 	}
 	case 'V': {
 		if (OpenClipboard(ThrEdWindow)) {
-			txi::txtclp();
+			txi::txtclp(textureForm);
 		}
 		break;
 	}
@@ -1569,7 +1568,7 @@ void texture::txtkey(unsigned keyCode) {
 		break;
 	}
 	case 0xbd: { //-
-		txi::txcntrv();
+		txi::txcntrv(textureForm);
 		break;
 	}
 	case VK_LEFT: {
