@@ -4747,6 +4747,7 @@ void form::internal::fmclp() {
 
 void form::refilfn() {
 	const auto savedStitchLength = UserStitchLength;
+	auto angledForm = FRMHED{};
 
 	StateMap.reset(StateFlag::TXFIL);
 	form::fvars(ClosestFormToCursor);
@@ -4808,7 +4809,7 @@ void form::refilfn() {
 		case EDGEPROPSAT: {
 			if (SelectedForm->vertexCount > 2) {
 				StateMap.reset(StateFlag::SAT1);
-				fi::plbrd(SelectedForm->edgeSpacing, AngledForm);
+				fi::plbrd(SelectedForm->edgeSpacing, angledForm);
 				fi::ritbrd(interleaveSequenceIndex2);
 			}
 			break;
@@ -4892,14 +4893,14 @@ void form::refilfn() {
 			}
 			case HORF: {
 				rotationAngle = PI / 2;
-				fi::fnhor(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, AngledForm);
-				WorkingFormVertices = AngledForm.vertices;
+				fi::fnhor(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm);
+				WorkingFormVertices = angledForm.vertices;
 				break;
 			}
 			case ANGF: {
 				rotationAngle = PI / 2 - SelectedForm->angleOrClipData.angle;
-				fi::fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, AngledForm);
-				WorkingFormVertices = AngledForm.vertices;
+				fi::fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm);
+				WorkingFormVertices = angledForm.vertices;
 				break;
 			}
 			case VCLPF: {
@@ -4911,7 +4912,7 @@ void form::refilfn() {
 			}
 			case HCLPF: {
 				clip::oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
-				fi::horclpfn(textureSegments, AngledForm);
+				fi::horclpfn(textureSegments, angledForm);
 				doFill = false;
 				break;
 			}
@@ -4930,7 +4931,7 @@ void form::refilfn() {
 			}
 			case TXHORF: {
 				texture::setxt(textureSegments);
-				fi::horclpfn(textureSegments, AngledForm);
+				fi::horclpfn(textureSegments, angledForm);
 				doFill = false;
 				break;
 			}

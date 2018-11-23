@@ -65,7 +65,6 @@ extern unsigned   ActiveColor;
 extern unsigned   ActiveLayer;
 extern unsigned   ActivePointIndex;
 extern fRECTANGLE AllItemsRect;
-extern FRMHED     AngledForm;
 extern fPOINT     AngledFormVertices[MAXFRMLINS];
 extern unsigned   AppliqueColor;
 extern LPWSTR*    ArgList; // command line argument array
