@@ -1643,9 +1643,9 @@ void thred::internal::nuRct() {
 }
 
 void thred::movStch() {
-	auto clientSize         = POINT{ (ThredWindowRect.right - gsl::narrow<LONG>(ButtonWidthX3) - (*ScrollSize + *ColorBarSize)),
+	auto clientSize     = POINT{ (ThredWindowRect.right - gsl::narrow<LONG>(ButtonWidthX3) - (*ScrollSize + *ColorBarSize)),
                              (ThredWindowRect.bottom) };
-	auto verticalOffset     = 0;
+	auto verticalOffset = 0;
 
 	thi::unboxs();
 	if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
@@ -1666,7 +1666,7 @@ void thred::movStch() {
 	}
 	else {
 		thi::stchPars();
-		auto actualWindowHeight = StitchWindowSize.y + *ScrollSize;
+		const auto actualWindowHeight = StitchWindowSize.y + *ScrollSize;
 		MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, StitchWindowSize.x, actualWindowHeight, TRUE);
 		ShowWindow(VerticalScrollBar, FALSE);
 		ShowWindow(HorizontalScrollBar, FALSE);
@@ -7506,16 +7506,16 @@ void thred::internal::duclip() {
 							SetClipboardData(ThrEdClip, ThrEdClipPointer);
 						}
 						if ((SelectedForm->fillType || SelectedForm->edgeType)) {
-							Clip                = RegisterClipboardFormat(PcdClipFormat);
-							ClipPointer         = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2);
+							Clip        = RegisterClipboardFormat(PcdClipFormat);
+							ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2);
 							if (ClipPointer) {
 								ClipStitchData = *(static_cast<CLPSTCH**>(ClipPointer));
 								auto iTexture  = firstStitch;
 								savclp(0, iTexture);
 								ClipStitchData[0].led = length;
 								iTexture++;
-								auto iDestination = 1u;
-								auto codedAttribute    = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
+								auto iDestination   = 1u;
+								auto codedAttribute = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 								while (iTexture < PCSHeader.stitchCount) {
 									if ((StitchBuffer[iTexture].attribute & FRMSK) == codedAttribute
 									    && !(StitchBuffer[iTexture].attribute & NOTFRM)) {
@@ -17235,9 +17235,7 @@ void thred::internal::init() {
 			buttonTxt   = &(*StringTable)[STR_PIKOL];
 			break;
 		}
-		default: {
-			windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-		}
+		default: { windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER; }
 		}
 		if (buttonTxt) {
 			(*ButtonWin)[iButton] = CreateWindow(L"STATIC",

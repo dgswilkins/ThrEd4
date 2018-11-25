@@ -2238,12 +2238,12 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 		}
 	}
 
-	auto lineOffset          = gsl::narrow<int>(std::floor(lowX / LineSpacing));
-	lowX                     = LineSpacing * lineOffset;
-	auto       fillLineCount = gsl::narrow<unsigned int>(std::floor((static_cast<double>(highX) - lowX) / LineSpacing + 1));
-	const auto step          = (highX - lowX) / fillLineCount;
-	auto       currentX      = lowX;
-	auto projectedPoints = std::vector<dPOINTLINE>();
+	auto lineOffset            = gsl::narrow<int>(std::floor(lowX / LineSpacing));
+	lowX                       = LineSpacing * lineOffset;
+	auto       fillLineCount   = gsl::narrow<unsigned int>(std::floor((static_cast<double>(highX) - lowX) / LineSpacing + 1));
+	const auto step            = (highX - lowX) / fillLineCount;
+	auto       currentX        = lowX;
+	auto       projectedPoints = std::vector<dPOINTLINE>();
 	projectedPoints.reserve(gsl::narrow_cast<size_t>(VertexCount) + 2);
 	for (auto iLine = 0u; iLine < fillLineCount; iLine++) {
 		auto iLineCounter = 0u;
@@ -2591,7 +2591,7 @@ void form::internal::contf() {
 					OSequence[SequenceIndex].y = lowPoint.y;
 					SequenceIndex++;
 					for (auto iVertex = 0u; iVertex < (selectedVertexCount - 1); iVertex++) {
-						auto       length          = pols[iVertex].length * poldif.length;
+						const auto length          = pols[iVertex].length * poldif.length;
 						const auto angle           = pols[iVertex].angle + poldif.angle;
 						OSequence[SequenceIndex].x = lowPoint.x + cos(angle) * length;
 						OSequence[SequenceIndex].y = lowPoint.y + sin(angle) * length;
@@ -2603,7 +2603,7 @@ void form::internal::contf() {
 					OSequence[SequenceIndex].y = highPoint.y;
 					SequenceIndex++;
 					for (auto iVertex = selectedVertexCount - 1; iVertex != 0; iVertex--) {
-						auto       length          = pols[iVertex - 1].length * poldif.length;
+						const auto length          = pols[iVertex - 1].length * poldif.length;
 						const auto angle           = pols[iVertex - 1].angle + poldif.angle;
 						OSequence[SequenceIndex].x = lowPoint.x + cos(angle) * length;
 						OSequence[SequenceIndex].y = lowPoint.y + sin(angle) * length;
@@ -5311,13 +5311,13 @@ void form::rotfrm(unsigned int newStartVertex) {
 				for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 					if (CurrentFormGuides[iGuide].start != newStartVertex && CurrentFormGuides[iGuide].finish != newStartVertex) {
 						CurrentFormGuides[iRotatedGuide].start
-							= (CurrentFormGuides[iGuide].start + VertexCount - newStartVertex) % VertexCount;
+						    = (CurrentFormGuides[iGuide].start + VertexCount - newStartVertex) % VertexCount;
 						CurrentFormGuides[iRotatedGuide].finish
-							= (CurrentFormGuides[iGuide].finish + VertexCount - newStartVertex) % VertexCount;
+						    = (CurrentFormGuides[iGuide].finish + VertexCount - newStartVertex) % VertexCount;
 						if (CurrentFormGuides[iRotatedGuide].start > CurrentFormGuides[iRotatedGuide].finish) {
-							tlin = CurrentFormGuides[iRotatedGuide].start;
+							tlin                                   = CurrentFormGuides[iRotatedGuide].start;
 							CurrentFormGuides[iRotatedGuide].start = CurrentFormGuides[iRotatedGuide].finish;
-							CurrentFormGuides[iGuide].finish = tlin;
+							CurrentFormGuides[iGuide].finish       = tlin;
 						}
 						iRotatedGuide++;
 					}
@@ -5343,7 +5343,7 @@ void form::rotfrm(unsigned int newStartVertex) {
 			if (SelectedForm->extendedAttribute & AT_END) {
 				SelectedForm->fillEnd = (SelectedForm->fillEnd + VertexCount - newStartVertex) % VertexCount;
 			}
-		} 
+		}
 	}
 }
 

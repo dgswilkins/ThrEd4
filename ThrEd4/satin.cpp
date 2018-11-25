@@ -1278,12 +1278,12 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 	auto  satinBackup   = std::vector<dPOINT>(8); // backup stitches in satin fills
 	auto  innerDelta
 	    = dPOINT{ (insidePoints[finish].x - insidePoints[start].x), (insidePoints[finish].y - insidePoints[start].y) };
-	auto innerLength = hypot(innerDelta.x, innerDelta.y);
-	auto outerDelta
+	const auto innerLength = hypot(innerDelta.x, innerDelta.y);
+	auto       outerDelta
 	    = dPOINT{ (outsidePoints[finish].x - outsidePoints[start].x), (outsidePoints[finish].y - outsidePoints[start].y) };
-	auto outerLength = hypot(outerDelta.x, outerDelta.y);
-	auto innerPoint  = dPOINT{ insidePoints[start].x, insidePoints[start].y };
-	auto outerPoint  = dPOINT{ outsidePoints[start].x, outsidePoints[start].y };
+	const auto outerLength = hypot(outerDelta.x, outerDelta.y);
+	auto       innerPoint  = dPOINT{ insidePoints[start].x, insidePoints[start].y };
+	auto       outerPoint  = dPOINT{ outsidePoints[start].x, outsidePoints[start].y };
 
 	auto innerFlag = false;
 	auto outerFlag = false;
