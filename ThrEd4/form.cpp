@@ -112,7 +112,6 @@ unsigned form::fltind(const fPOINT* const point) noexcept {
 void form::fltspac(const fPOINT* const start, unsigned int count) {
 	const auto startIndex  = form::fltind(start);
 	auto       destination = FormVertexIndex + count - 1;
-	auto       iForm       = ClosestFormToCursor + 1;
 
 	if (FormVertexIndex) {
 		auto source = FormVertexIndex - 1;
@@ -120,7 +119,7 @@ void form::fltspac(const fPOINT* const start, unsigned int count) {
 			FormVertices[destination--] = FormVertices[source--];
 		}
 	}
-	for (iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 		auto& form = (*FormList)[iForm];
 		form.vertices += count;
 	}
@@ -2239,13 +2238,12 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 		}
 	}
 
-	auto lineOffset            = gsl::narrow<int>(std::floor(lowX / LineSpacing));
-	lowX                       = LineSpacing * lineOffset;
-	auto       fillLineCount   = gsl::narrow<unsigned int>(std::floor((static_cast<double>(highX) - lowX) / LineSpacing + 1));
-	const auto step            = (highX - lowX) / fillLineCount;
-	auto       currentX        = lowX;
-	auto       maximumLines    = 0u; // maximum angle fill lines for any adjusted y cordinate
-	auto       projectedPoints = std::vector<dPOINTLINE>();
+	auto lineOffset          = gsl::narrow<int>(std::floor(lowX / LineSpacing));
+	lowX                     = LineSpacing * lineOffset;
+	auto       fillLineCount = gsl::narrow<unsigned int>(std::floor((static_cast<double>(highX) - lowX) / LineSpacing + 1));
+	const auto step          = (highX - lowX) / fillLineCount;
+	auto       currentX      = lowX;
+	auto projectedPoints = std::vector<dPOINTLINE>();
 	projectedPoints.reserve(gsl::narrow_cast<size_t>(VertexCount) + 2);
 	for (auto iLine = 0u; iLine < fillLineCount; iLine++) {
 		auto iLineCounter = 0u;
@@ -2258,11 +2256,7 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 			}
 		}
 		fillLineCount += iLineCounter;
-		if (iLineCounter > maximumLines) {
-			maximumLines = iLineCounter;
-		}
 	}
-	maximumLines = (maximumLines >> 1);
 	lineEndpoints.reserve(gsl::narrow_cast<size_t>(fillLineCount) + 1);
 	auto lineGroupIndex = 0u;
 	// groupIndex cannot be more than fillLineCount so reserve that amount of memory to reduce re-allocations
@@ -2538,10 +2532,6 @@ void form::internal::contf() {
 			highLength += highLengths[highIndex];
 			highIndex++;
 		}
-		auto length = highLength;
-		if (highLength > lowLength) {
-			length = lowLength;
-		}
 		auto highSpacing = SelectedForm->fillSpacing;
 		auto lowSpacing  = SelectedForm->fillSpacing * lowLength / highLength;
 		if (highLength < lowLength) {
@@ -2601,7 +2591,7 @@ void form::internal::contf() {
 					OSequence[SequenceIndex].y = lowPoint.y;
 					SequenceIndex++;
 					for (auto iVertex = 0u; iVertex < (selectedVertexCount - 1); iVertex++) {
-						length                     = pols[iVertex].length * poldif.length;
+						auto       length          = pols[iVertex].length * poldif.length;
 						const auto angle           = pols[iVertex].angle + poldif.angle;
 						OSequence[SequenceIndex].x = lowPoint.x + cos(angle) * length;
 						OSequence[SequenceIndex].y = lowPoint.y + sin(angle) * length;
@@ -2613,7 +2603,7 @@ void form::internal::contf() {
 					OSequence[SequenceIndex].y = highPoint.y;
 					SequenceIndex++;
 					for (auto iVertex = selectedVertexCount - 1; iVertex != 0; iVertex--) {
-						length                     = pols[iVertex - 1].length * poldif.length;
+						auto       length          = pols[iVertex - 1].length * poldif.length;
 						const auto angle           = pols[iVertex - 1].angle + poldif.angle;
 						OSequence[SequenceIndex].x = lowPoint.x + cos(angle) * length;
 						OSequence[SequenceIndex].y = lowPoint.y + sin(angle) * length;
@@ -3302,13 +3292,6 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 #endif
 
 	if (!clipSegments.empty()) {
-		auto clplim = clipSegments.size() >> 1;
-		if (!clplim) {
-			clplim = 1;
-		}
-		if (clplim > 12) {
-			clplim = 12;
-		}
 		auto sortedLengths = std::vector<LENINFO>();
 		sortedLengths.reserve(clipSegments.size() * 2);
 		for (auto iSegment = 0u; iSegment < clipSegments.size(); iSegment++) {
@@ -3433,7 +3416,7 @@ void form::internal::horclpfn(const std::vector<RNGCNT>& textureSegments, FRMHED
 void form::angclpfn(const std::vector<RNGCNT>& textureSegments) {
 	auto rotationAngle = 0.0;
 
-	auto angledForm                = (*FormList)[ClosestFormToCursor];
+	auto       angledForm     = (*FormList)[ClosestFormToCursor];
 	const auto rotationCenter = dPOINT{
 		((static_cast<double>(angledForm.rectangle.right) - angledForm.rectangle.left) / 2.0 + angledForm.rectangle.left),
 		((static_cast<double>(angledForm.rectangle.top) - angledForm.rectangle.bottom) / 2.0 + angledForm.rectangle.bottom)
@@ -3955,7 +3938,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 		if (start > finish) {
 			auto iLine = start + 1;
 			// This odd construction for iLine is used to ensure loop terminates when finish = 0
-			for (iLine = start + 1; iLine != finish; iLine--) {
+			for (; iLine != finish; iLine--) {
 				const auto iLineDec = iLine - 1;
 				if (sequenceMap.test_set(iLineDec)) {
 					if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
@@ -4065,23 +4048,25 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 		if (minimumLength) {
 			rspnt(WorkingFormVertices[mindif].x, WorkingFormVertices[mindif].y);
 		}
-		const auto fdif = (VertexCount + firstLine - mindif) % VertexCount;
-		const auto bdif = (VertexCount - firstLine + mindif) % VertexCount;
-		if (fdif < bdif) {
-			auto ind = form::nxt(mindif);
-			while (ind != firstLine) {
+		if (VertexCount) {
+			const auto fdif = (VertexCount + firstLine - mindif) % VertexCount;
+			const auto bdif = (VertexCount - firstLine + mindif) % VertexCount;
+			if (fdif < bdif) {
+				auto ind = form::nxt(mindif);
+				while (ind != firstLine) {
+					rspnt(WorkingFormVertices[ind].x, WorkingFormVertices[ind].y);
+					ind = form::nxt(ind);
+				}
 				rspnt(WorkingFormVertices[ind].x, WorkingFormVertices[ind].y);
-				ind = form::nxt(ind);
 			}
-			rspnt(WorkingFormVertices[ind].x, WorkingFormVertices[ind].y);
-		}
-		else {
-			auto ind = form::prv(mindif);
-			while (ind != firstLine) {
+			else {
+				auto ind = form::prv(mindif);
+				while (ind != firstLine) {
+					rspnt(WorkingFormVertices[ind].x, WorkingFormVertices[ind].y);
+					ind = form::prv(ind);
+				}
 				rspnt(WorkingFormVertices[ind].x, WorkingFormVertices[ind].y);
-				ind = form::prv(ind);
 			}
-			rspnt(WorkingFormVertices[ind].x, WorkingFormVertices[ind].y);
 		}
 	}
 	auto dun = true;
@@ -4747,7 +4732,7 @@ void form::internal::fmclp() {
 
 void form::refilfn() {
 	const auto savedStitchLength = UserStitchLength;
-	auto angledForm = FRMHED{};
+	auto       angledForm        = FRMHED{};
 
 	StateMap.reset(StateFlag::TXFIL);
 	form::fvars(ClosestFormToCursor);
@@ -5322,18 +5307,20 @@ void form::rotfrm(unsigned int newStartVertex) {
 				SelectedForm->wordParam
 				    = (SelectedForm->wordParam + SelectedForm->vertexCount - newStartVertex) % SelectedForm->vertexCount;
 			}
-			for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-				if (CurrentFormGuides[iGuide].start != newStartVertex && CurrentFormGuides[iGuide].finish != newStartVertex) {
-					CurrentFormGuides[iRotatedGuide].start
-					    = (CurrentFormGuides[iGuide].start + VertexCount - newStartVertex) % VertexCount;
-					CurrentFormGuides[iRotatedGuide].finish
-					    = (CurrentFormGuides[iGuide].finish + VertexCount - newStartVertex) % VertexCount;
-					if (CurrentFormGuides[iRotatedGuide].start > CurrentFormGuides[iRotatedGuide].finish) {
-						tlin                                   = CurrentFormGuides[iRotatedGuide].start;
-						CurrentFormGuides[iRotatedGuide].start = CurrentFormGuides[iRotatedGuide].finish;
-						CurrentFormGuides[iGuide].finish       = tlin;
+			if (VertexCount) {
+				for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+					if (CurrentFormGuides[iGuide].start != newStartVertex && CurrentFormGuides[iGuide].finish != newStartVertex) {
+						CurrentFormGuides[iRotatedGuide].start
+							= (CurrentFormGuides[iGuide].start + VertexCount - newStartVertex) % VertexCount;
+						CurrentFormGuides[iRotatedGuide].finish
+							= (CurrentFormGuides[iGuide].finish + VertexCount - newStartVertex) % VertexCount;
+						if (CurrentFormGuides[iRotatedGuide].start > CurrentFormGuides[iRotatedGuide].finish) {
+							tlin = CurrentFormGuides[iRotatedGuide].start;
+							CurrentFormGuides[iRotatedGuide].start = CurrentFormGuides[iRotatedGuide].finish;
+							CurrentFormGuides[iGuide].finish = tlin;
+						}
+						iRotatedGuide++;
 					}
-					iRotatedGuide++;
 				}
 			}
 		}
@@ -5349,12 +5336,14 @@ void form::rotfrm(unsigned int newStartVertex) {
 				CurrentFormGuides[iGuide] = rotatedGuides[iGuide];
 			}
 		}
-		if (SelectedForm->extendedAttribute & AT_STRT) {
-			SelectedForm->fillStart = (SelectedForm->fillStart + VertexCount - newStartVertex) % VertexCount;
-		}
-		if (SelectedForm->extendedAttribute & AT_END) {
-			SelectedForm->fillEnd = (SelectedForm->fillEnd + VertexCount - newStartVertex) % VertexCount;
-		}
+		if (VertexCount) {
+			if (SelectedForm->extendedAttribute & AT_STRT) {
+				SelectedForm->fillStart = (SelectedForm->fillStart + VertexCount - newStartVertex) % VertexCount;
+			}
+			if (SelectedForm->extendedAttribute & AT_END) {
+				SelectedForm->fillEnd = (SelectedForm->fillEnd + VertexCount - newStartVertex) % VertexCount;
+			}
+		} 
 	}
 }
 
@@ -6435,7 +6424,7 @@ void form::dustar(unsigned starCount, double length) {
 		CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - center.y) * StarRatio + center.y;
 	}
 	form::frmout((*FormList).size() - 1);
-	FormMoveDelta      = { 0.0f, 0.0f };
+	FormMoveDelta      = fPOINT{ 0.0f, 0.0f };
 	NewFormVertexCount = vertexCount + 1;
 	StateMap.set(StateFlag::POLIMOV);
 	form::setmfrm();

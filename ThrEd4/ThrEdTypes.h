@@ -1322,7 +1322,7 @@ public:
 	DWORD          borderClipData;  // border clipboard data
 	unsigned short satinGuideCount; // number of satin guidelines
 	unsigned short wordParam;       // word parameter
-	fRECTANGLE     rectangle;       // rectangle
+	fRECTANGLE     rectangle{};     // rectangle
 	unsigned char  fillType;        // fill type
 	unsigned char  edgeType;        // edge type
 	float          fillSpacing;     // fill spacing
@@ -1337,27 +1337,27 @@ public:
 };
 
 inline FRMHEDO::FRMHEDO() noexcept
-	: satinOrAngle()
-	, lengthOrCount()
-	, angleOrClipData() {
-	attribute = 0;
-	vertexCount = 0;
-	type = 0;
-	fillColor = 0;
-	borderColor = 0;
-	clipEntries = 0;
-	vertices = 0;
-	borderClipData = 0;
+    : satinOrAngle()
+    , lengthOrCount()
+    , angleOrClipData() {
+	attribute       = 0;
+	vertexCount     = 0;
+	type            = 0;
+	fillColor       = 0;
+	borderColor     = 0;
+	clipEntries     = 0;
+	vertices        = 0;
+	borderClipData  = 0;
 	satinGuideCount = 0;
-	wordParam = 0;
-	rectangle = { 0.0f, 0.0f, 0.0f, 0.0f };
-	fillType = 0;
-	edgeType = 0;
-	fillSpacing = 0;
-	borderSize = 0;
-	edgeSpacing = 0;
-	edgeStitchLen = 0;
-	res = 0;
+	wordParam       = 0;
+	rectangle       = { 0.0f, 0.0f, 0.0f, 0.0f };
+	fillType        = 0;
+	edgeType        = 0;
+	fillSpacing     = 0;
+	borderSize      = 0;
+	edgeSpacing     = 0;
+	edgeStitchLen   = 0;
+	res             = 0;
 }
 
 class FRMHEDOUT;
@@ -1365,34 +1365,34 @@ class FRMHEDOUT;
 class FRMHED
 {
 public:
-	unsigned char  attribute;       // attribute
-	unsigned int   vertexCount;     // number of sides
-	unsigned char  type;            // type
-	unsigned char  fillColor;       // fill color
-	unsigned char  borderColor;     // border color
-	unsigned int   clipEntries;     // number of border clipboard entries
-	fPOINT*        vertices;        // points
-	SATINANGLE     satinOrAngle;    // satin guidelines or angle clipboard fill angle
-	unsigned int   borderClipData;  // border clipboard data
-	unsigned int   satinGuideCount; // number of satin guidelines
-	unsigned int   wordParam;       // clipboard/textured fill phase or satin end guide
-	fRECTANGLE     rectangle;       // rectangle
-	unsigned char  fillType;        // fill type
-	unsigned char  edgeType;        // edge type
-	float          fillSpacing;     // fill spacing
-	FLENCNT        lengthOrCount;   // fill stitch length or clipboard count
-	FANGCLP        angleOrClipData; // fill angle or clipboard data pointer
-	float          borderSize;      // border size
-	float          edgeSpacing;     // edge spacing
-	float          edgeStitchLen;   // edge stitch length
-	unsigned short picoLength;      // pico length
+	unsigned char  attribute;         // attribute
+	unsigned int   vertexCount;       // number of sides
+	unsigned char  type;              // type
+	unsigned char  fillColor;         // fill color
+	unsigned char  borderColor;       // border color
+	unsigned int   clipEntries;       // number of border clipboard entries
+	fPOINT*        vertices;          // points
+	SATINANGLE     satinOrAngle{};    // satin guidelines or angle clipboard fill angle
+	unsigned int   borderClipData;    // border clipboard data
+	unsigned int   satinGuideCount;   // number of satin guidelines
+	unsigned int   wordParam;         // clipboard/textured fill phase or satin end guide
+	fRECTANGLE     rectangle{};       // rectangle
+	unsigned char  fillType;          // fill type
+	unsigned char  edgeType;          // edge type
+	float          fillSpacing;       // fill spacing
+	FLENCNT        lengthOrCount{};   // fill stitch length or clipboard count
+	FANGCLP        angleOrClipData{}; // fill angle or clipboard data pointer
+	float          borderSize;        // border size
+	float          edgeSpacing;       // edge spacing
+	float          edgeStitchLen;     // edge stitch length
+	unsigned short picoLength;        // pico length
 
 	unsigned      extendedAttribute;   // attribute extension
 	float         maxFillStitchLen;    // maximum fill stitch length
 	float         minFillStitchLen;    // minimum fill stitch length
 	float         maxBorderStitchLen;  // maximum border stitch length
 	float         minBorderStitchLen;  // minimum border stitch length
-	TFINFO        fillInfo;            // feather/texture info
+	TFINFO        fillInfo{};          // feather/texture info
 	unsigned int  fillStart;           // fill start point
 	unsigned int  fillEnd;             // fill end point
 	float         underlaySpacing;     // underlay spacing
@@ -1463,7 +1463,7 @@ inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertices        = nullptr; 
+	vertices        = nullptr;
 	satinOrAngle    = rhs.satinOrAngle;
 	borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
 	satinGuideCount = rhs.satinGuideCount;
@@ -1503,7 +1503,7 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertices        = nullptr; 
+	vertices        = nullptr;
 	satinOrAngle    = rhs.satinOrAngle;
 	borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
 	satinGuideCount = rhs.satinGuideCount;
@@ -1813,8 +1813,8 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 #define NFRECONT 0x7f
 
 struct _frmclp {
-	unsigned clipType;
-	unsigned reserved;
+	unsigned clipType{};
+	unsigned reserved{};
 	FRMHED   form;
 };
 

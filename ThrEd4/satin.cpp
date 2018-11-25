@@ -327,7 +327,7 @@ void satin::satsel() {
 	}
 }
 
-void satin::internal::satcpy(SATCON* const destination, const std::vector<SATCON> source, unsigned int size) {
+void satin::internal::satcpy(SATCON* const destination, const std::vector<SATCON>& source, unsigned int size) {
 	if (destination) {
 		for (unsigned int iSource = 0; iSource < size; iSource++) {
 			destination[iSource] = source[iSource];
@@ -876,8 +876,10 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 			}
 			else {
 				if (StateMap.test(StateFlag::BARSAT)) {
-					form::ritseq1(line1Start % VertexCount);
-					form::ritseq1(line2Start % VertexCount);
+					if (VertexCount) {
+						form::ritseq1(line1Start % VertexCount);
+						form::ritseq1(line2Start % VertexCount);
+					}
 				}
 				else {
 					SelectedPoint              = CurrentFormVertices[line1Start];
@@ -1302,7 +1304,6 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 		if (form::linx(insidePoints, start, finish, intersection)) {
 			innerDelta.x = 0.0;
 			innerDelta.y = 0.0;
-			innerLength  = 0;
 			innerPoint   = intersection;
 		}
 	}
@@ -1314,7 +1315,6 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 		if (form::linx(insidePoints, start, finish, intersection)) {
 			outerDelta.x = 0.0;
 			outerDelta.y = 0.0;
-			outerLength  = 0;
 			outerPoint   = intersection;
 		}
 	}

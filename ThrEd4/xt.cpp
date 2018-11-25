@@ -1411,7 +1411,6 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
 	fillStartsData.fillNamed.appliqueColor++;
 	fillStartsMap         = tmap;
 	PCSHeader.stitchCount = gsl::narrow<unsigned short>(iDestinationStitch);
-	iDestinationStitch    = 0;
 	if (!(tmap & M_ECOL)) {
 		fillStartsData.fillNamed.borderColor = PCSHeader.stitchCount;
 	}

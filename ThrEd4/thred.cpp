@@ -1646,13 +1646,11 @@ void thred::movStch() {
 	auto clientSize         = POINT{ (ThredWindowRect.right - gsl::narrow<LONG>(ButtonWidthX3) - (*ScrollSize + *ColorBarSize)),
                              (ThredWindowRect.bottom) };
 	auto verticalOffset     = 0;
-	auto actualWindowHeight = StitchWindowSize.y;
 
 	thi::unboxs();
 	if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
 		verticalOffset = *ScrollSize;
 		clientSize.y -= *ScrollSize;
-		actualWindowHeight -= *ScrollSize;
 	}
 	if (StateMap.test(StateFlag::ZUMED)) {
 		clientSize.y -= *ScrollSize;
@@ -1668,7 +1666,7 @@ void thred::movStch() {
 	}
 	else {
 		thi::stchPars();
-		actualWindowHeight = StitchWindowSize.y + *ScrollSize;
+		auto actualWindowHeight = StitchWindowSize.y + *ScrollSize;
 		MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, StitchWindowSize.x, actualWindowHeight, TRUE);
 		ShowWindow(VerticalScrollBar, FALSE);
 		ShowWindow(HorizontalScrollBar, FALSE);
@@ -3896,7 +3894,7 @@ void thred::internal::savdst(std::vector<DSTREC>& DSTRecords, unsigned data) {
 	union {
 		unsigned data;
 		DSTREC   dstRecord;
-	} x;
+	} x{};
 
 	x.data = data;
 
@@ -5584,14 +5582,12 @@ void thred::internal::nuFil() {
 						return;
 					}
 					ReadFile(FileHandle, PCSBMPFileName, sizeof(PCSBMPFileName), &BytesRead, nullptr);
-					auto totalBytesRead = BytesRead;
 					if (BytesRead != sizeof(PCSBMPFileName)) {
 						PCSBMPFileName[0] = 0;
 						prtred();
 						return;
 					}
 					ReadFile(FileHandle, &BackgroundColor, sizeof(BackgroundColor), &BytesRead, nullptr);
-					totalBytesRead += BytesRead;
 					if (BytesRead != sizeof(BackgroundColor)) {
 						BackgroundColor = IniFile.backgroundColor;
 						prtred();
@@ -5599,13 +5595,11 @@ void thred::internal::nuFil() {
 					}
 					BackgroundBrush = CreateSolidBrush(BackgroundColor);
 					ReadFile(FileHandle, UserColor, sizeof(UserColor), &BytesRead, nullptr);
-					totalBytesRead += BytesRead;
 					if (BytesRead != sizeof(UserColor)) {
 						prtred();
 						return;
 					}
 					ReadFile(FileHandle, CustomColor, sizeof(CustomColor), &BytesRead, nullptr);
-					totalBytesRead += BytesRead;
 					if (BytesRead != sizeof(CustomColor)) {
 						prtred();
 						return;
@@ -5614,7 +5608,6 @@ void thred::internal::nuFil() {
 					                              / 2; // ThreadSize is defined as a 16 entry array of 2 characters
 					char msgBuffer[threadLength];
 					ReadFile(FileHandle, msgBuffer, threadLength, &BytesRead, nullptr);
-					totalBytesRead += BytesRead;
 					if (BytesRead != threadLength) {
 						prtred();
 						return;
@@ -6555,8 +6548,6 @@ unsigned thred::internal::closlin() {
 									// stitch is horizontal
 									intersection.x = checkedPoint.x;
 									intersection.y = static_cast<double>(stitches[iStitch].y);
-									tsum = ((stitches[iStitch].y > checkedPoint.y) ? (stitches[iStitch].y - checkedPoint.y)
-									                                               : (checkedPoint.y - stitches[iStitch].y));
 								}
 								else {
 									if (xba == 0) {
@@ -6584,7 +6575,6 @@ unsigned thred::internal::closlin() {
 									intersection.y   = slope * (offset - poff) / (slope * slope + 1);
 									dx               = intersection.x - checkedPoint.x;
 									dy               = intersection.y - checkedPoint.y;
-									tsum             = hypot(dx, dy);
 								}
 								boundingRect.top -= tolerance;
 								boundingRect.bottom += tolerance;
@@ -7516,7 +7506,6 @@ void thred::internal::duclip() {
 							SetClipboardData(ThrEdClip, ThrEdClipPointer);
 						}
 						if ((SelectedForm->fillType || SelectedForm->edgeType)) {
-							auto codedAttribute = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 							Clip                = RegisterClipboardFormat(PcdClipFormat);
 							ClipPointer         = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2);
 							if (ClipPointer) {
@@ -7526,7 +7515,7 @@ void thred::internal::duclip() {
 								ClipStitchData[0].led = length;
 								iTexture++;
 								auto iDestination = 1u;
-								codedAttribute    = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
+								auto codedAttribute    = gsl::narrow<unsigned int>(ClosestFormToCursor << FRMSHFT);
 								while (iTexture < PCSHeader.stitchCount) {
 									if ((StitchBuffer[iTexture].attribute & FRMSK) == codedAttribute
 									    && !(StitchBuffer[iTexture].attribute & NOTFRM)) {
@@ -17116,7 +17105,6 @@ void thred::internal::init() {
 	auto       deviceContext   = GetDC(nullptr);
 	const auto screenHalfWidth = (GetDeviceCaps(deviceContext, HORZRES)) >> 1;
 	auto       blank           = std::wstring{};
-	auto       buttonTxt       = &blank;
 
 	ReleaseDC(nullptr, deviceContext);
 	TextureIndex = 0;
@@ -17230,6 +17218,7 @@ void thred::internal::init() {
 	ButtonWin->resize(9);
 	for (auto iButton = 0u; iButton < 9; iButton++) {
 		auto windowFlags = 0u;
+		auto buttonTxt   = &blank;
 		switch (iButton) {
 		case HBOXSEL: {
 			windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
@@ -17248,7 +17237,6 @@ void thred::internal::init() {
 		}
 		default: {
 			windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-			buttonTxt   = &blank;
 		}
 		}
 		if (buttonTxt) {
@@ -18724,7 +18712,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		thi::redini();
 
-		CreateParams createParams;
+		CreateParams createParams{};
 		createParams.bEnableNonClientDpiScaling = true;
 
 		auto private_ScrollSize   = SCROLSIZ;
@@ -18783,7 +18771,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto xyRatio        = 0.0; // expand form aspect ratio
 		auto rotationAngle  = 0.0;
 		auto rotationCenter = dPOINT{};
-		auto textureForm = FRMHED{};
+		auto textureForm    = FRMHED{};
 
 		auto stretchBoxLine = std::vector<POINT>(5); // stretch and expand
 

@@ -62,7 +62,7 @@ namespace internal {
 	void     outfn(unsigned start, unsigned finish, double satinWidth);
 	void     sacspac(const SATCON* startGuide, unsigned guideCount);
 	void     satclos();
-	void     satcpy(SATCON* destination, std::vector<SATCON> source, unsigned int size);
+	void     satcpy(SATCON* destination, const std::vector<SATCON>& source, unsigned int size);
 	void     satends(unsigned isBlunt);
 	void     satfn(const std::vector<double>& lengths,
 	               unsigned int               line1Start,
