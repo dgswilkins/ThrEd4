@@ -641,9 +641,9 @@ void texture::internal::setxclp(const FRMHED& textureForm) {
 	}
 	editorOffset.y -= TextureScreen.formCenter.y;
 	auto& angledFormVertices = *AngledFormVertices;
-	for (auto iVertex = 0u; iVertex < textureForm.vertexCount; iVertex++) {
-		angledFormVertices[iVertex].x += editorOffset.x;
-		angledFormVertices[iVertex].y += editorOffset.y;
+	for (auto vertex : angledFormVertices) {
+		vertex.x += editorOffset.x;
+		vertex.y += editorOffset.y;
 	}
 	auto lineCount = textureForm.vertexCount - 1;
 	if (textureForm.type != FRMLINE) {
@@ -748,22 +748,24 @@ void texture::txtrup() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void texture::internal::angrct(fRECTANGLE& rectangle, const FRMHED& textureForm) {
+void texture::internal::angrct(fRECTANGLE& rectangle) {
 	auto& angledFormVertices = *AngledFormVertices;
-	rectangle.left = rectangle.right = angledFormVertices[0].x;
-	rectangle.bottom = rectangle.top = angledFormVertices[0].y;
-	for (auto iVertex = 1u; iVertex < textureForm.vertexCount; iVertex++) {
-		if (angledFormVertices[iVertex].x < rectangle.left) {
-			rectangle.left = angledFormVertices[iVertex].x;
+	rectangle.left = angledFormVertices[0].x;
+	rectangle.right = angledFormVertices[0].x;
+	rectangle.bottom = angledFormVertices[0].y;
+	rectangle.top = angledFormVertices[0].y;
+	for (auto vertex : angledFormVertices) {
+		if (vertex.x < rectangle.left) {
+			rectangle.left = vertex.x;
 		}
-		if (angledFormVertices[iVertex].x > rectangle.right) {
-			rectangle.right = angledFormVertices[iVertex].x;
+		if (vertex.x > rectangle.right) {
+			rectangle.right = vertex.x;
 		}
-		if (angledFormVertices[iVertex].y > rectangle.top) {
-			rectangle.top = angledFormVertices[iVertex].y;
+		if (vertex.y > rectangle.top) {
+			rectangle.top = vertex.y;
 		}
-		if (angledFormVertices[iVertex].y < rectangle.bottom) {
-			rectangle.bottom = angledFormVertices[iVertex].y;
+		if (vertex.y < rectangle.bottom) {
+			rectangle.bottom = vertex.y;
 		}
 	}
 }
@@ -777,13 +779,14 @@ void texture::internal::ritxfrm(FRMHED& textureForm) {
 	auto& formLines = *FormLines;
 	formLines.resize(gsl::narrow_cast<size_t>(textureForm.vertexCount) + 1);
 	auto& angledFormVertices = *AngledFormVertices;
-	for (auto iVertex = 0u; iVertex < textureForm.vertexCount; iVertex++) {
+	auto maxVertex = angledFormVertices.size();
+	for (auto iVertex = 0u; iVertex < maxVertex; iVertex++) {
 		txi::ed2px(angledFormVertices[iVertex], formLines[iVertex]);
 		formLines[iVertex].x += offset.x;
 		formLines[iVertex].y += offset.y;
 	}
-	formLines[textureForm.vertexCount] = formLines[0];
-	auto vertexCount                   = textureForm.vertexCount;
+	formLines[maxVertex] = formLines[0];
+	auto vertexCount                   = maxVertex;
 	if (textureForm.type != FRMLINE) {
 		vertexCount++;
 	}
@@ -791,24 +794,24 @@ void texture::internal::ritxfrm(FRMHED& textureForm) {
 	PolylineInt(StitchWindowDC, formLines.data(), vertexCount);
 }
 
-void texture::internal::setxfrm(const FRMHED& textureForm) {
+void texture::internal::setxfrm() {
 	auto angleRect = fRECTANGLE{};
 
-	txi::angrct(angleRect, textureForm);
+	txi::angrct(angleRect);
 	auto& angledFormVertices = *AngledFormVertices;
-	for (auto iVertex = 0u; iVertex < textureForm.vertexCount; iVertex++) {
-		angledFormVertices[iVertex].x -= angleRect.left;
-		angledFormVertices[iVertex].y -= angleRect.bottom;
+	for (auto vertex : angledFormVertices) {
+		vertex.x -= angleRect.left;
+		vertex.y -= angleRect.bottom;
 	}
-	txi::angrct(angleRect, textureForm);
+	txi::angrct(angleRect);
 	const auto height = angleRect.top - angleRect.bottom;
 	if (height > TextureScreen.areaHeight) {
 		const auto ratio = TextureScreen.areaHeight / height * 0.95;
-		for (auto iVertex = 0u; iVertex < textureForm.vertexCount; iVertex++) {
-			angledFormVertices[iVertex].x *= ratio;
-			angledFormVertices[iVertex].y *= ratio;
+		for (auto vertex : angledFormVertices) {
+			vertex.x *= ratio;
+			vertex.y *= ratio;
 		}
-		txi::angrct(angleRect, textureForm);
+		txi::angrct(angleRect);
 	}
 	TextureScreen.formCenter.x = form::midl(angleRect.right, angleRect.left);
 	TextureScreen.formCenter.y = form::midl(angleRect.top, angleRect.bottom);
@@ -835,7 +838,7 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 				StateMap.reset(StateFlag::TXTLIN);
 				StateMap.set(StateFlag::TXTCLP);
 				StateMap.set(StateFlag::TXTMOV);
-				txi::setxfrm(textureForm);
+				txi::setxfrm();
 				TextureCursorLocation = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 			}
 			GlobalUnlock(ClipMemory);
@@ -1365,12 +1368,12 @@ void texture::internal::txcntrv(const FRMHED& textureForm) {
 void texture::internal::txsiz(double ratio, FRMHED& textureForm) {
 	txi::ritxfrm(textureForm);
 	auto& angledFormVertices = *AngledFormVertices;
-	for (auto iVertex = 0u; iVertex < textureForm.vertexCount; iVertex++) {
-		angledFormVertices[iVertex].x *= ratio;
-		angledFormVertices[iVertex].y *= ratio;
+	for (auto vertex : angledFormVertices) {
+		vertex.x *= ratio;
+		vertex.y *= ratio;
 	}
 	auto angleRect = fRECTANGLE{};
-	txi::angrct(angleRect, textureForm);
+	txi::angrct(angleRect);
 	TextureScreen.formCenter.x = form::midl(angleRect.right, angleRect.left);
 	TextureScreen.formCenter.y = form::midl(angleRect.top, angleRect.bottom);
 	txi::ed2px(TextureScreen.formCenter, SelectTexturePointsOrigin);

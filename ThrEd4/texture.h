@@ -43,7 +43,7 @@ void writeScreenWidth(unsigned position);
 namespace internal {
 
 	void   altx();
-	void   angrct(fRECTANGLE& rectangle, const FRMHED& textureForm);
+	void   angrct(fRECTANGLE& rectangle);
 	void   butsid(unsigned windowId);
 	bool   chkbut();
 	void   chktx();
@@ -68,7 +68,7 @@ namespace internal {
 	void   ritxfrm(FRMHED& textureForm);
 	void   ritxrct() noexcept;
 	void   setxclp(const FRMHED& textureForm);
-	void   setxfrm(const FRMHED& textureForm);
+	void   setxfrm();
 	void   setxmov();
 	void   stxlin();
 	void   txang();
