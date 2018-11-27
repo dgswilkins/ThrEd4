@@ -748,7 +748,7 @@ void texture::txtrup() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void texture::internal::angrct(fRECTANGLE& rectangle, const FRMHED& textureForm) noexcept {
+void texture::internal::angrct(fRECTANGLE& rectangle, const FRMHED& textureForm) {
 	auto& angledFormVertices = *AngledFormVertices;
 	rectangle.left = rectangle.right = angledFormVertices[0].x;
 	rectangle.bottom = rectangle.top = angledFormVertices[0].y;
