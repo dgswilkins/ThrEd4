@@ -667,77 +667,79 @@ void form::drwfrm() {
 	for (auto iForm = 0u; iForm < maxForm; iForm++) {
 		form::fvars(iForm);
 		form::frmlin(SelectedForm->vertices, VertexCount);
-		auto layer = ((SelectedForm->attribute & FRMLMSK) >> 1);
-		if (!ActiveLayer || !layer || layer == ActiveLayer) {
-			POINT line[2]   = {};
-			auto  lastPoint = 0u;
-			if (SelectedForm->type == SAT) {
-				if (SelectedForm->attribute & FRMEND) {
-					SelectObject(StitchWindowMemDC, FormPen3px);
-					Polyline(StitchWindowMemDC, FormLines->data(), 2);
-					lastPoint = 1;
-				}
-				if (SelectedForm->wordParam) {
-					SelectObject(StitchWindowMemDC, FormPen);
-					fi::frmpoly(&((*FormLines)[1]), SelectedForm->wordParam);
-					SelectObject(StitchWindowMemDC, FormPen3px);
-					Polyline(StitchWindowMemDC, &((*FormLines)[SelectedForm->wordParam]), 2);
-					SelectObject(StitchWindowMemDC, LayerPen[layer]);
-					lastPoint = SelectedForm->wordParam + 1;
-				}
-				const auto maxGuide = (*FormList)[iForm].satinGuideCount;
-				for (auto iGuide = 0u; iGuide < maxGuide; iGuide++) {
-					form::sfCor2px(CurrentFormVertices[CurrentFormGuides[iGuide].start], line[0]);
-					form::sfCor2px(CurrentFormVertices[CurrentFormGuides[iGuide].finish], line[1]);
-					SelectObject(StitchWindowMemDC, FormPen);
-					Polyline(StitchWindowMemDC, line, 2);
-				}
-			}
-			SelectObject(StitchWindowMemDC, LayerPen[layer]);
-			if (SelectedForm->type == FRMLINE) {
-				fi::frmpoly(FormLines->data(), VertexCount);
-				if (SelectedForm->fillType == CONTF) {
-					dPOINT point(CurrentFormVertices[SelectedForm->angleOrClipData.guide.start]);
-					thred::sCor2px(point, line[0]);
-					point = CurrentFormVertices[SelectedForm->angleOrClipData.guide.finish];
-					thred::sCor2px(point, line[1]);
-					Polyline(StitchWindowMemDC, line, 2);
-				}
-			}
-			else {
-				fi::frmpoly(&((*FormLines)[lastPoint]), VertexCount + 1 - lastPoint);
-			}
-			if (ClosestFormToCursor == iForm && StateMap.test(StateFlag::FRMPSEL)) {
-				auto& formLines = *FormLines;
-				for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
-					if (iVertex == ClosestVertexToCursor) {
-						fi::frmx(formLines[iVertex], StitchWindowMemDC);
+		if (!FormLines->empty()) {
+			auto layer = ((SelectedForm->attribute & FRMLMSK) >> 1);
+			if (!ActiveLayer || !layer || layer == ActiveLayer) {
+				POINT line[2] = {};
+				auto  lastPoint = 0u;
+				if (SelectedForm->type == SAT) {
+					if (SelectedForm->attribute & FRMEND) {
+						SelectObject(StitchWindowMemDC, FormPen3px);
+						Polyline(StitchWindowMemDC, FormLines->data(), 2);
+						lastPoint = 1;
 					}
-					else {
-						fi::frmsqr(iVertex);
+					if (SelectedForm->wordParam) {
+						SelectObject(StitchWindowMemDC, FormPen);
+						fi::frmpoly(&((*FormLines)[1]), SelectedForm->wordParam);
+						SelectObject(StitchWindowMemDC, FormPen3px);
+						Polyline(StitchWindowMemDC, &((*FormLines)[SelectedForm->wordParam]), 2);
+						SelectObject(StitchWindowMemDC, LayerPen[layer]);
+						lastPoint = SelectedForm->wordParam + 1;
+					}
+					const auto maxGuide = (*FormList)[iForm].satinGuideCount;
+					for (auto iGuide = 0u; iGuide < maxGuide; iGuide++) {
+						form::sfCor2px(CurrentFormVertices[CurrentFormGuides[iGuide].start], line[0]);
+						form::sfCor2px(CurrentFormVertices[CurrentFormGuides[iGuide].finish], line[1]);
+						SelectObject(StitchWindowMemDC, FormPen);
+						Polyline(StitchWindowMemDC, line, 2);
 					}
 				}
-				if (ClosestVertexToCursor) {
-					fi::frmsqr0(formLines[0]);
+				SelectObject(StitchWindowMemDC, LayerPen[layer]);
+				if (SelectedForm->type == FRMLINE) {
+					fi::frmpoly(FormLines->data(), VertexCount);
+					if (SelectedForm->fillType == CONTF) {
+						dPOINT point(CurrentFormVertices[SelectedForm->angleOrClipData.guide.start]);
+						thred::sCor2px(point, line[0]);
+						point = CurrentFormVertices[SelectedForm->angleOrClipData.guide.finish];
+						thred::sCor2px(point, line[1]);
+						Polyline(StitchWindowMemDC, line, 2);
+					}
 				}
 				else {
-					fi::frmx(formLines[0], StitchWindowMemDC);
+					fi::frmpoly(&((*FormLines)[lastPoint]), VertexCount + 1 - lastPoint);
 				}
-				displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
-			}
-			else {
-				auto& formLines = *FormLines;
-				for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
-					fi::frmsqr(iVertex);
+				if (ClosestFormToCursor == iForm && StateMap.test(StateFlag::FRMPSEL)) {
+					auto& formLines = *FormLines;
+					for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
+						if (iVertex == ClosestVertexToCursor) {
+							fi::frmx(formLines[iVertex], StitchWindowMemDC);
+						}
+						else {
+							fi::frmsqr(iVertex);
+						}
+					}
+					if (ClosestVertexToCursor) {
+						fi::frmsqr0(formLines[0]);
+					}
+					else {
+						fi::frmx(formLines[0], StitchWindowMemDC);
+					}
+					displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
 				}
-				SelectObject(StitchWindowMemDC, FormSelectedPen);
-				fi::frmsqr0(formLines[0]);
-			}
-			if (StateMap.test(StateFlag::FPSEL) && ClosestFormToCursor == iForm) {
-				form::sRct2px(SelectedVerticesRect, SelectedPixelsRect);
-				form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
-				StateMap.set(StateFlag::SHOPSEL);
-				form::dupsel(StitchWindowMemDC);
+				else {
+					auto& formLines = *FormLines;
+					for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
+						fi::frmsqr(iVertex);
+					}
+					SelectObject(StitchWindowMemDC, FormSelectedPen);
+					fi::frmsqr0(formLines[0]);
+				}
+				if (StateMap.test(StateFlag::FPSEL) && ClosestFormToCursor == iForm) {
+					form::sRct2px(SelectedVerticesRect, SelectedPixelsRect);
+					form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
+					StateMap.set(StateFlag::SHOPSEL);
+					form::dupsel(StitchWindowMemDC);
+				}
 			}
 		}
 	}
