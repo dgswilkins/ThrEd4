@@ -68,25 +68,25 @@ extern fRECTANGLE AllItemsRect;
 
 extern std::vector<fPOINT>* AngledFormVertices;
 
-extern unsigned   AppliqueColor;
-extern LPWSTR*    ArgList; // command line argument array
-extern HCURSOR    ArrowCursor;
-extern fs::path*  AuxName;
-extern BSEQPNT    BSequence[BSEQLEN];
-extern HBRUSH     BackgroundBrush;
-extern unsigned   BeanCount; // number of stitches added by convert to bean
-extern HDC        BitmapDC;
-extern RECT       BitmapDstRect;
-extern unsigned   BitmapHeight;
-extern POINT      BitmapPoint;
-extern dPOINT     BitmapSizeinStitches;
-extern RECT       BitmapSrcRect;
-extern dPOINT     BmpStitchRatio;
-extern unsigned   BitmapWidth;
-extern double     BorderWidth;
-extern unsigned   ButtonHeight;
-extern unsigned   ButtonWidth;
-extern unsigned   ButtonWidthX3;
+extern unsigned  AppliqueColor;
+extern LPWSTR*   ArgList; // command line argument array
+extern HCURSOR   ArrowCursor;
+extern fs::path* AuxName;
+extern BSEQPNT   BSequence[BSEQLEN];
+extern HBRUSH    BackgroundBrush;
+extern unsigned  BeanCount; // number of stitches added by convert to bean
+extern HDC       BitmapDC;
+extern RECT      BitmapDstRect;
+extern unsigned  BitmapHeight;
+extern POINT     BitmapPoint;
+extern dPOINT    BitmapSizeinStitches;
+extern RECT      BitmapSrcRect;
+extern dPOINT    BmpStitchRatio;
+extern unsigned  BitmapWidth;
+extern double    BorderWidth;
+extern unsigned  ButtonHeight;
+extern unsigned  ButtonWidth;
+extern unsigned  ButtonWidthX3;
 
 extern std::vector<HWND>* ButtonWin;
 

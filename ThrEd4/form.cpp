@@ -670,7 +670,7 @@ void form::drwfrm() {
 		if (!FormLines->empty()) {
 			auto layer = ((SelectedForm->attribute & FRMLMSK) >> 1);
 			if (!ActiveLayer || !layer || layer == ActiveLayer) {
-				POINT line[2] = {};
+				POINT line[2]   = {};
 				auto  lastPoint = 0u;
 				if (SelectedForm->type == SAT) {
 					if (SelectedForm->attribute & FRMEND) {
@@ -2346,7 +2346,7 @@ void form::internal::fnhor(std::vector<unsigned>& groupIndexSequence,
 void form::internal::prebrd(FRMHED& angledForm) {
 	auto delta
 	    = fPOINT{ (CurrentFormVertices[1].x - CurrentFormVertices[0].x), (CurrentFormVertices[1].y - CurrentFormVertices[0].y) };
-	auto ratio              = 0.0;
+	auto  ratio              = 0.0;
 	auto& angledFormVertices = *AngledFormVertices;
 	angledFormVertices.resize(VertexCount + 3);
 	auto output = angledFormVertices.begin();

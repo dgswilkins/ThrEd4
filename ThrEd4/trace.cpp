@@ -719,7 +719,7 @@ void trace::internal::dutrac() {
 			if (findRectangle.top < gsl::narrow<long>(BitmapHeight)) {
 				const auto edgeDistance = findRectangle.top - CurrentTracePoint.y;
 				if (edgeDistance < minimumEdgeDistance) {
-					flag                = TRCU;
+					flag = TRCU;
 				}
 			}
 			switch (flag) {

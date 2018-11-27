@@ -783,7 +783,7 @@ void texture::internal::ritxfrm(FRMHED& textureForm) {
 		formLines[iVertex].y += offset.y;
 	}
 	formLines[textureForm.vertexCount] = formLines[0];
-	auto vertexCount                  = textureForm.vertexCount;
+	auto vertexCount                   = textureForm.vertexCount;
 	if (textureForm.type != FRMLINE) {
 		vertexCount++;
 	}
@@ -824,12 +824,12 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 			if (ClipFormHeader->clipType == CLP_FRM) {
 				SelectedForm     = &ClipFormHeader->form;
 				auto vertices    = convert_ptr<fPOINT*>(&SelectedForm[1]);
-				textureForm       = *SelectedForm;
+				textureForm      = *SelectedForm;
 				auto sourceStart = vertices;
 				auto sourceEnd   = sourceStart + SelectedForm->vertexCount;
 				AngledFormVertices->clear();
 				AngledFormVertices->resize(SelectedForm->vertexCount);
-				auto destination  = AngledFormVertices->begin();
+				auto destination = AngledFormVertices->begin();
 				std::copy(sourceStart, sourceEnd, destination);
 				textureForm.vertices = AngledFormVertices->data();
 				StateMap.reset(StateFlag::TXTLIN);

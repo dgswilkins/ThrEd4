@@ -29,30 +29,32 @@
 
 namespace fs = std::experimental::filesystem;
 
-unsigned   ActiveColor = 0;                // active color selector
-unsigned   ActiveLayer = 0;                // active layer
-unsigned   ActivePointIndex;               // pointer to the active form in the sequencing algorithm
-fRECTANGLE AllItemsRect;                   // rectangle enclosing all forms and stitches
-std::vector<fPOINT>* AngledFormVertices;   // form formOrigin data for angle fills
-unsigned   AppliqueColor = 15;             // underlay color
-LPWSTR*    ArgList;                        // command line argument array
-HCURSOR    ArrowCursor;                    // arrow
-fs::path*  AuxName;                        //
-BSEQPNT    BSequence[BSEQLEN];             //
-HBRUSH     BackgroundBrush;                // background color brush
-unsigned   BeanCount;                      // number of stitches added by convert to bean
-HDC        BitmapDC;                       // bitmap device context
-RECT       BitmapDstRect;                  // stitch window destination rectangle for zooomed view
-unsigned   BitmapHeight;                   // bitmap height
-POINT      BitmapPoint;                    // a point on the bitmap
-dPOINT     BitmapSizeinStitches;           // bitmap end points in stitch points
-RECT       BitmapSrcRect;                  // bitmap source rectangle for zoomed view
-dPOINT     BmpStitchRatio;                 // bitmap to stitch hoop ratios
-unsigned   BitmapWidth;                    // bitmap width
-double     BorderWidth = BRDWID;           // border width for satin borders
-unsigned   ButtonHeight;                   // button height
-unsigned   ButtonWidth;                    // button width
-unsigned   ButtonWidthX3;                  // button width times 3
+unsigned   ActiveColor = 0;  // active color selector
+unsigned   ActiveLayer = 0;  // active layer
+unsigned   ActivePointIndex; // pointer to the active form in the sequencing algorithm
+fRECTANGLE AllItemsRect;     // rectangle enclosing all forms and stitches
+
+std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills
+
+unsigned  AppliqueColor = 15;   // underlay color
+LPWSTR*   ArgList;              // command line argument array
+HCURSOR   ArrowCursor;          // arrow
+fs::path* AuxName;              //
+BSEQPNT   BSequence[BSEQLEN];   //
+HBRUSH    BackgroundBrush;      // background color brush
+unsigned  BeanCount;            // number of stitches added by convert to bean
+HDC       BitmapDC;             // bitmap device context
+RECT      BitmapDstRect;        // stitch window destination rectangle for zooomed view
+unsigned  BitmapHeight;         // bitmap height
+POINT     BitmapPoint;          // a point on the bitmap
+dPOINT    BitmapSizeinStitches; // bitmap end points in stitch points
+RECT      BitmapSrcRect;        // bitmap source rectangle for zoomed view
+dPOINT    BmpStitchRatio;       // bitmap to stitch hoop ratios
+unsigned  BitmapWidth;          // bitmap width
+double    BorderWidth = BRDWID; // border width for satin borders
+unsigned  ButtonHeight;         // button height
+unsigned  ButtonWidth;          // button width
+unsigned  ButtonWidthX3;        // button width times 3
 
 std::vector<HWND>* ButtonWin; // button windows
 
