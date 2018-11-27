@@ -2308,12 +2308,14 @@ void form::internal::fnang(std::vector<unsigned>& groupIndexSequence,
 	const auto& angRect = angledForm.rectangle;
 	rotationCenter.x    = ((static_cast<double>(angRect.right) - angRect.left) / 2.0 + angRect.left);
 	rotationCenter.y    = ((static_cast<double>(angRect.top) - angRect.bottom) / 2.0 + angRect.bottom);
-	angledForm.vertices = AngledFormVertices;
+	AngledFormVertices->clear();
+	AngledFormVertices->reserve(angledForm.vertexCount);
 	for (auto iVertex = 0u; iVertex < angledForm.vertexCount; iVertex++) {
-		angledForm.vertices[iVertex] = SelectedForm->vertices[iVertex];
-		thred::rotflt(angledForm.vertices[iVertex], rotationAngle, rotationCenter);
+		AngledFormVertices->push_back(SelectedForm->vertices[iVertex]);
+		thred::rotflt(AngledFormVertices->back(), rotationAngle, rotationCenter);
 	}
-	SelectedForm = &angledForm;
+	angledForm.vertices = AngledFormVertices->data();
+	SelectedForm        = &angledForm;
 	fi::fnvrt(groupIndexSequence, lineEndpoints);
 	SelectedForm = &((*FormList)[ClosestFormToCursor]);
 }
@@ -2327,12 +2329,14 @@ void form::internal::fnhor(std::vector<unsigned>& groupIndexSequence,
 	const auto& angRect = angledForm.rectangle;
 	rotationCenter.x    = ((static_cast<double>(angRect.right) - angRect.left) / 2.0 + angRect.left);
 	rotationCenter.y    = ((static_cast<double>(angRect.top) - angRect.bottom) / 2.0 + angRect.bottom);
-	angledForm.vertices = AngledFormVertices;
+	AngledFormVertices->clear();
+	AngledFormVertices->reserve(angledForm.vertexCount);
 	for (auto iVertex = 0u; iVertex < angledForm.vertexCount; iVertex++) {
-		angledForm.vertices[iVertex] = SelectedForm->vertices[iVertex];
-		thred::rotflt(angledForm.vertices[iVertex], rotationAngle, rotationCenter);
+		AngledFormVertices->push_back(SelectedForm->vertices[iVertex]);
+		thred::rotflt(AngledFormVertices->back(), rotationAngle, rotationCenter);
 	}
-	SelectedForm = &angledForm;
+	angledForm.vertices = AngledFormVertices->data();
+	SelectedForm        = &angledForm;
 	fi::fnvrt(groupIndexSequence, lineEndpoints);
 	SelectedForm = &((*FormList)[ClosestFormToCursor]);
 }
@@ -2340,21 +2344,22 @@ void form::internal::fnhor(std::vector<unsigned>& groupIndexSequence,
 void form::internal::prebrd(FRMHED& angledForm) {
 	auto delta
 	    = fPOINT{ (CurrentFormVertices[1].x - CurrentFormVertices[0].x), (CurrentFormVertices[1].y - CurrentFormVertices[0].y) };
-	auto ratio = 0.0;
-
-	std::copy(CurrentFormVertices,
-	          CurrentFormVertices + VertexCount,
-	          stdext::make_checked_array_iterator((AngledFormVertices + 1), (20000 - 1)));
+	auto ratio              = 0.0;
+	auto& angledFormVertices = *AngledFormVertices;
+	angledFormVertices.resize(VertexCount + 3);
+	auto output = angledFormVertices.begin();
+	output++;
+	std::copy(CurrentFormVertices, CurrentFormVertices + VertexCount, output);
 	if (fabs(delta.x) > fabs(delta.y)) {
 		ratio = fabs(0.1 / delta.x);
 	}
 	else {
 		ratio = fabs(0.1 / delta.y);
 	}
-	AngledFormVertices[0].x = CurrentFormVertices[0].x - delta.x * ratio;
-	AngledFormVertices[0].y = CurrentFormVertices[0].y - delta.y * ratio;
+	angledFormVertices[0].x = CurrentFormVertices[0].x - delta.x * ratio;
+	angledFormVertices[0].y = CurrentFormVertices[0].y - delta.y * ratio;
 	angledForm              = *SelectedForm;
-	angledForm.vertices     = AngledFormVertices;
+	angledForm.vertices     = angledFormVertices.data();
 	angledForm.vertexCount += 3;
 	delta.x = CurrentFormVertices[VertexCount - 1].x - CurrentFormVertices[VertexCount - 2].x;
 	delta.y = CurrentFormVertices[VertexCount - 1].y - CurrentFormVertices[VertexCount - 2].y;
@@ -2364,8 +2369,8 @@ void form::internal::prebrd(FRMHED& angledForm) {
 	else {
 		ratio = fabs(0.1 / delta.y);
 	}
-	AngledFormVertices[angledForm.vertexCount - 1].x = CurrentFormVertices[VertexCount - 1].x + delta.x * ratio;
-	AngledFormVertices[angledForm.vertexCount - 1].y = CurrentFormVertices[VertexCount - 1].y + delta.y * ratio;
+	angledFormVertices[angledForm.vertexCount - 1].x = CurrentFormVertices[VertexCount - 1].x + delta.x * ratio;
+	angledFormVertices[angledForm.vertexCount - 1].y = CurrentFormVertices[VertexCount - 1].y + delta.y * ratio;
 	SelectedForm                                     = &angledForm;
 	VertexCount                                      = angledForm.vertexCount;
 	CurrentFormVertices                              = angledForm.vertices;
@@ -3400,11 +3405,13 @@ void form::internal::horclpfn(const std::vector<RNGCNT>& textureSegments, FRMHED
 		((static_cast<double>(angledForm.rectangle.right) - angledForm.rectangle.left) / 2.0 + angledForm.rectangle.left),
 		((static_cast<double>(angledForm.rectangle.top) - angledForm.rectangle.bottom) / 2.0 + angledForm.rectangle.bottom)
 	};
-	angledForm.vertices = AngledFormVertices;
+	AngledFormVertices->clear();
+	AngledFormVertices->reserve(angledForm.vertexCount);
 	for (auto iVertex = 0u; iVertex < angledForm.vertexCount; iVertex++) {
-		angledForm.vertices[iVertex] = SelectedForm->vertices[iVertex];
-		thred::rotflt(angledForm.vertices[iVertex], (PI / 2), rotationCenter);
+		AngledFormVertices->push_back(SelectedForm->vertices[iVertex]);
+		thred::rotflt(AngledFormVertices->back(), (PI / 2), rotationCenter);
 	}
+	angledForm.vertices = AngledFormVertices->data();
 	angout(angledForm);
 	SelectedForm        = &angledForm;
 	CurrentFormVertices = angledForm.vertices;
@@ -3421,14 +3428,15 @@ void form::angclpfn(const std::vector<RNGCNT>& textureSegments) {
 		((static_cast<double>(angledForm.rectangle.right) - angledForm.rectangle.left) / 2.0 + angledForm.rectangle.left),
 		((static_cast<double>(angledForm.rectangle.top) - angledForm.rectangle.bottom) / 2.0 + angledForm.rectangle.bottom)
 	};
-	angledForm.vertices = AngledFormVertices;
+	AngledFormVertices->clear();
+	AngledFormVertices->reserve(angledForm.vertexCount);
 	if (StateMap.test(StateFlag::ISUND)) {
 		rotationAngle = PI / 2 - SelectedForm->underlayStitchAngle;
 
 		const auto& vertexList = xt::insid();
 		for (auto iVertex = 0u; iVertex < angledForm.vertexCount; iVertex++) {
-			AngledFormVertices[iVertex] = vertexList[iVertex];
-			thred::rotflt(AngledFormVertices[iVertex], rotationAngle, rotationCenter);
+			AngledFormVertices->push_back(vertexList[iVertex]);
+			thred::rotflt(AngledFormVertices->back(), rotationAngle, rotationCenter);
 		}
 	}
 	else {
@@ -3439,13 +3447,14 @@ void form::angclpfn(const std::vector<RNGCNT>& textureSegments) {
 			rotationAngle = PI / 2 - SelectedForm->satinOrAngle.angle;
 		}
 		for (auto iVertex = 0u; iVertex < angledForm.vertexCount; iVertex++) {
-			AngledFormVertices[iVertex] = SelectedForm->vertices[iVertex];
-			thred::rotflt(AngledFormVertices[iVertex], rotationAngle, rotationCenter);
+			AngledFormVertices->push_back(SelectedForm->vertices[iVertex]);
+			thred::rotflt(AngledFormVertices->back(), rotationAngle, rotationCenter);
 		}
 	}
+	angledForm.vertices = AngledFormVertices->data();
 	fi::angout(angledForm);
 	SelectedForm        = &angledForm;
-	CurrentFormVertices = AngledFormVertices;
+	CurrentFormVertices = AngledFormVertices->data();
 	fi::clpcon(textureSegments);
 	fi::rotbak(-rotationAngle, rotationCenter);
 	form::fvars(ClosestFormToCursor);

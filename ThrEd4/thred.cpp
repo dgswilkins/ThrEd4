@@ -18665,6 +18665,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		SelectedPointsLine               = &private_SelectedPointsLine;
 		auto private_FormAngles          = std::vector<double>{};
 		FormAngles                       = &private_FormAngles;
+		auto private_AngledFormVertices  = std::vector<fPOINT>{};
+		AngledFormVertices               = &private_AngledFormVertices;
 		auto private_textureInputBuffer  = std::wstring{};
 		TextureInputBuffer               = &private_textureInputBuffer;
 		auto private_TexturePointsBuffer = std::vector<TXPNT>{};

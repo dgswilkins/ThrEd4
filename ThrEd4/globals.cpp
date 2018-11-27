@@ -33,7 +33,7 @@ unsigned   ActiveColor = 0;                // active color selector
 unsigned   ActiveLayer = 0;                // active layer
 unsigned   ActivePointIndex;               // pointer to the active form in the sequencing algorithm
 fRECTANGLE AllItemsRect;                   // rectangle enclosing all forms and stitches
-fPOINT     AngledFormVertices[MAXFRMLINS]; // form formOrigin data for angle fills
+std::vector<fPOINT>* AngledFormVertices;   // form formOrigin data for angle fills
 unsigned   AppliqueColor = 15;             // underlay color
 LPWSTR*    ArgList;                        // command line argument array
 HCURSOR    ArrowCursor;                    // arrow

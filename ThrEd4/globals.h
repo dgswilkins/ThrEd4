@@ -65,7 +65,9 @@ extern unsigned   ActiveColor;
 extern unsigned   ActiveLayer;
 extern unsigned   ActivePointIndex;
 extern fRECTANGLE AllItemsRect;
-extern fPOINT     AngledFormVertices[MAXFRMLINS];
+
+extern std::vector<fPOINT>* AngledFormVertices;
+
 extern unsigned   AppliqueColor;
 extern LPWSTR*    ArgList; // command line argument array
 extern HCURSOR    ArrowCursor;
