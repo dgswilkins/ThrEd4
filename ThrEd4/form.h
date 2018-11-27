@@ -278,7 +278,7 @@ namespace internal {
 	            unsigned&                     lastGroup,
 	            SMALPNTL*                     sequenceLines);
 	void  duseq1(const SMALPNTL* sequenceLines) noexcept;
-	void  duseq2(const SMALPNTL* sequenceLines) noexcept;
+	SMALPNTL*  duseq2(SMALPNTL* sequenceLines) noexcept;
 	void  duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 	             const std::vector<VRCT2>& fillVerticalRect,
 	             unsigned int              start,
