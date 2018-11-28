@@ -3845,62 +3845,63 @@ void form::internal::brkseq(const std::vector<SMALPNTL*>& sortedLines,
                             boost::dynamic_bitset<>&      sequenceMap,
                             unsigned&                     lastGroup,
                             SMALPNTL*                     sequenceLines) {
-	if (sequenceLines != nullptr) {
-		StateMap.reset(StateFlag::SEQDUN);
-		if (start > finish) {
-			auto savedGroup = sortedLines[start]->group + 1;
-			// This odd construction for iLine is used to ensure
-			// loop terminates when finish = 0
-			for (auto iLine = start + 1; iLine != finish; iLine--) {
-				const auto iLineDec = iLine - 1;
-				savedGroup--;
-				if (sortedLines[iLineDec]->group != savedGroup) {
-					rspnt(sequenceLines[0].x, sequenceLines[0].y);
-					sequenceLines = sortedLines[iLineDec];
-					rspnt(sequenceLines[0].x, sequenceLines[0].y);
-					savedGroup = sequenceLines[0].group;
-				}
-				else {
-					sequenceLines = sortedLines[iLineDec];
-				}
-				if (sequenceMap.test_set(iLineDec)) {
-					if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
-						duseq1(sequenceLines);
-					}
-				}
-				else {
-					movseq(sortedLines, iLineDec);
+	StateMap.reset(StateFlag::SEQDUN);
+	if (sequenceLines == nullptr) {
+		sequenceLines = sortedLines[start];
+	}
+	if (start > finish) {
+		auto savedGroup = sortedLines[start]->group + 1;
+		// This odd construction for iLine is used to ensure
+		// loop terminates when finish = 0
+		for (auto iLine = start + 1; iLine != finish; iLine--) {
+			const auto iLineDec = iLine - 1;
+			savedGroup--;
+			if (sortedLines[iLineDec]->group != savedGroup) {
+				rspnt(sequenceLines[0].x, sequenceLines[0].y);
+				sequenceLines = sortedLines[iLineDec];
+				rspnt(sequenceLines[0].x, sequenceLines[0].y);
+				savedGroup = sequenceLines[0].group;
+			}
+			else {
+				sequenceLines = sortedLines[iLineDec];
+			}
+			if (sequenceMap.test_set(iLineDec)) {
+				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
+					duseq1(sequenceLines);
 				}
 			}
-			lastGroup = sequenceLines->group;
+			else {
+				movseq(sortedLines, iLineDec);
+			}
 		}
-		else {
-			auto savedGroup = sortedLines[start]->group - 1;
-			for (auto iLine = start; iLine <= finish; iLine++) {
-				savedGroup++;
-				if (sortedLines[iLine]->group != savedGroup) {
-					rspnt(sequenceLines[0].x, sequenceLines[0].y);
-					sequenceLines = sortedLines[iLine];
-					rspnt(sequenceLines[0].x, sequenceLines[0].y);
-					savedGroup = sequenceLines[0].group;
-				}
-				else {
-					sequenceLines = sortedLines[iLine];
-				}
-				if (sequenceMap.test_set(iLine)) {
-					if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
-						duseq1(sequenceLines);
-					}
-				}
-				else {
-					movseq(sortedLines, iLine);
+		lastGroup = sequenceLines->group;
+	}
+	else {
+		auto savedGroup = sortedLines[start]->group - 1;
+		for (auto iLine = start; iLine <= finish; iLine++) {
+			savedGroup++;
+			if (sortedLines[iLine]->group != savedGroup) {
+				rspnt(sequenceLines[0].x, sequenceLines[0].y);
+				sequenceLines = sortedLines[iLine];
+				rspnt(sequenceLines[0].x, sequenceLines[0].y);
+				savedGroup = sequenceLines[0].group;
+			}
+			else {
+				sequenceLines = sortedLines[iLine];
+			}
+			if (sequenceMap.test_set(iLine)) {
+				if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
+					duseq1(sequenceLines);
 				}
 			}
-			lastGroup = sequenceLines->group;
+			else {
+				movseq(sortedLines, iLine);
+			}
 		}
-		if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-			duseq1(sequenceLines);
-		}
+		lastGroup = sequenceLines->group;
+	}
+	if (StateMap.testAndReset(StateFlag::SEQDUN)) {
+		duseq1(sequenceLines);
 	}
 }
 
@@ -3931,8 +3932,8 @@ SMALPNTL* form::internal::duseq2(SMALPNTL* sequenceLines) noexcept {
 	if (sequenceLines != nullptr) {
 		rspnt((sequenceLines[1].x - sequenceLines[0].x) / 2 + sequenceLines[0].x,
 		      (sequenceLines[1].y - sequenceLines[0].y) / 2 + sequenceLines[0].y);
-		return sequenceLines;
 	}
+	return sequenceLines;
 }
 
 void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
@@ -3954,7 +3955,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 				const auto iLineDec = iLine - 1;
 				if (sequenceMap.test_set(iLineDec)) {
 					if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
-						flag = true;
+						flag          = true;
 						sequenceLines = duseq2(sortedLines[iLineDec]);
 					}
 					else {
@@ -3962,9 +3963,9 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 							if (iLineDec) {
 								sequenceLines = duseq2(sortedLines[static_cast<size_t>(iLineDec) + 1]);
 							}
-							flag = true;
+							flag          = true;
 							sequenceLines = duseq2(sortedLines[iLineDec]);
-							savedTopLine = sequenceLines[1].line;
+							savedTopLine  = sequenceLines[1].line;
 						}
 					}
 				}
@@ -3978,7 +3979,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 				}
 			}
 			if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-				flag = true;
+				flag          = true;
 				sequenceLines = duseq2(sortedLines[iLine]);
 			}
 			if (flag) {
@@ -3990,7 +3991,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 			for (iLine = start; iLine <= finish; iLine++) {
 				if (sequenceMap.test_set(iLine)) {
 					if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
-						flag = true;
+						flag          = true;
 						sequenceLines = duseq2(sortedLines[iLine]);
 					}
 					else {
@@ -3998,9 +3999,9 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 							if (iLine) {
 								sequenceLines = duseq2(sortedLines[iLine - 1]);
 							}
-							flag = true;
+							flag          = true;
 							sequenceLines = duseq2(sortedLines[iLine]);
-							savedTopLine = sequenceLines[1].line;
+							savedTopLine  = sequenceLines[1].line;
 						}
 					}
 				}
@@ -4017,7 +4018,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 			}
 			if (StateMap.testAndReset(StateFlag::SEQDUN)) {
 				if (iLine) {
-					flag = true;
+					flag          = true;
 					sequenceLines = duseq2(sortedLines[iLine - 1]);
 				}
 			}

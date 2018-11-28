@@ -779,7 +779,7 @@ void texture::internal::ritxfrm(FRMHED& textureForm) {
 	auto& formLines = *FormLines;
 	formLines.resize(gsl::narrow_cast<size_t>(textureForm.vertexCount) + 1);
 	auto& angledFormVertices = *AngledFormVertices;
-	auto maxVertex = angledFormVertices.size();
+	const auto maxVertex = angledFormVertices.size();
 	for (auto iVertex = 0u; iVertex < maxVertex; iVertex++) {
 		txi::ed2px(angledFormVertices[iVertex], formLines[iVertex]);
 		formLines[iVertex].x += offset.x;
