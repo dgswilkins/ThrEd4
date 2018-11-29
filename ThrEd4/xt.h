@@ -194,7 +194,7 @@ namespace internal {
 	void uangfn(unsigned int find, float angle);
 	void ucolfn(unsigned int find, unsigned color);
 	void ulenfn(unsigned int find, float length);
-	void undclp() noexcept;
+	void undclp();
 	void uspacfn(unsigned int find, float spacing);
 	void xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point, float featherRatioLocal) noexcept;
 } // namespace internal

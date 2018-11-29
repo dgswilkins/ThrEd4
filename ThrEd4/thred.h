@@ -55,7 +55,7 @@ void mvstchs(unsigned destination, unsigned source, unsigned count);
 bool px2stch() noexcept;
 
 void pxCor2stch(const POINT& point) noexcept;
-void redclp() noexcept;
+void redclp();
 void redraw(HWND window) noexcept;
 void ritfcor(const fPOINT& point);
 void ritmov();

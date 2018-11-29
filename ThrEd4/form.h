@@ -456,7 +456,7 @@ namespace internal {
 	void trfrm(const dPOINT& bottomLeftPoint,
 	           const dPOINT& topLeftPoint,
 	           const dPOINT& bottomRightPoint,
-	           const dPOINT& topRightPoint) noexcept;
+	           const dPOINT& topRightPoint);
 	void unbean(unsigned start, unsigned finish);
 	void uncon();
 

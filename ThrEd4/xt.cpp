@@ -785,11 +785,16 @@ void xt::internal::ritund(unsigned& interleaveSequenceIndex2) {
 	}
 }
 
-void xt::internal::undclp() noexcept {
+void xt::internal::undclp() {
 	// ToDo - Is it better to initialize individually?
-	ClipRectSize.cx = ClipRect.bottom = ClipRect.left = ClipRect.right = ClipBuffer[0].x = ClipBuffer[1].x = ClipBuffer[0].y = 0;
-	ClipRectSize.cy = ClipRect.top = ClipBuffer[1].y = SelectedForm->underlayStitchLen;
-	ClipStitchCount                                  = 2;
+	auto& clipBuffer = *ClipBuffer;
+	clipBuffer.clear();
+	clipBuffer.reserve(2);
+	ClipRectSize = FLSIZ{ 0, SelectedForm->underlayStitchLen };
+	ClipRect     = fRECTANGLE{ SelectedForm->underlayStitchLen, 0, 0, 0 };
+	clipBuffer.emplace_back(fPOINTATTR{ 0, 0, 0 });
+	clipBuffer.emplace_back(fPOINTATTR{ 0, SelectedForm->underlayStitchLen, 0 });
+	ClipStitchCount = 2;
 }
 
 void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {

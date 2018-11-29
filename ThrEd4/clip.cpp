@@ -210,26 +210,27 @@ unsigned int clip::numclp() {
 
 void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
 	const auto* clip = &ClipPoints[clipIndex];
+	auto& clipBuffer = *ClipBuffer;
 	if (!StateMap.test(StateFlag::NOCLP)) {
-		// ToDo - use local vector for buffer
+		clipBuffer.clear();
+		clipBuffer.reserve(clipEntries);
 		for (auto iClip = 0u; iClip < clipEntries; iClip++) {
-			ClipBuffer[iClip].x = clip[iClip].x;
-			ClipBuffer[iClip].y = clip[iClip].y;
+			clipBuffer.emplace_back(fPOINTATTR{ clip[iClip].x, clip[iClip].y, 0 });
 		}
-		ClipRect.left = ClipRect.right = ClipBuffer[0].x;
-		ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
+		ClipRect.left = ClipRect.right = clipBuffer[0].x;
+		ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
 		for (auto iClip = 1u; iClip < clipEntries; iClip++) {
-			if (ClipBuffer[iClip].x < ClipRect.left) {
-				ClipRect.left = ClipBuffer[iClip].x;
+			if (clipBuffer[iClip].x < ClipRect.left) {
+				ClipRect.left = clipBuffer[iClip].x;
 			}
-			if (ClipBuffer[iClip].x > ClipRect.right) {
-				ClipRect.right = ClipBuffer[iClip].x;
+			if (clipBuffer[iClip].x > ClipRect.right) {
+				ClipRect.right = clipBuffer[iClip].x;
 			}
-			if (ClipBuffer[iClip].y < ClipRect.bottom) {
-				ClipRect.bottom = ClipBuffer[iClip].y;
+			if (clipBuffer[iClip].y < ClipRect.bottom) {
+				ClipRect.bottom = clipBuffer[iClip].y;
 			}
-			if (ClipBuffer[iClip].y > ClipRect.top) {
-				ClipRect.top = ClipBuffer[iClip].y;
+			if (clipBuffer[iClip].y > ClipRect.top) {
+				ClipRect.top = clipBuffer[iClip].y;
 			}
 		}
 		ClipRectSize.cx = ClipRect.right - ClipRect.left;
@@ -240,16 +241,17 @@ void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
 
 void clip::internal::durev(std::vector<fPOINT>& clipReversedData) {
 	const auto midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
+	auto& clipBuffer = *ClipBuffer;
 
-	if (ClipBuffer[0].x > midpoint) {
+	if (clipBuffer[0].x > midpoint) {
 		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
-			clipReversedData[iStitch].x = ClipRect.right - ClipBuffer[iStitch].x;
-			clipReversedData[iStitch].y = ClipBuffer[iStitch].y;
+			clipReversedData[iStitch].x = ClipRect.right - clipBuffer[iStitch].x;
+			clipReversedData[iStitch].y = clipBuffer[iStitch].y;
 		}
 	}
 	else {
 		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
-			clipReversedData[iStitch] = ClipBuffer[iStitch];
+			clipReversedData[iStitch] = clipBuffer[iStitch];
 		}
 	}
 }
@@ -651,15 +653,16 @@ void clip::internal::dulast(std::vector<fPOINT>& chainEndPoints) {
 
 void clip::internal::clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints) {
 	ci::dulast(chainEndPoints);
+	auto& clipBuffer = *ClipBuffer;
 	if (SelectedForm->type == FRMLINE) {
 		const auto pivot = ClipRectSize.cy / 2;
 		for (auto iPoint = 0u; iPoint < ClipStitchCount; iPoint++) {
-			tempClipPoints.emplace_back(ClipBuffer[iPoint].x, (-ClipBuffer[iPoint].y + pivot));
+			tempClipPoints.emplace_back(clipBuffer[iPoint].x, (-clipBuffer[iPoint].y + pivot));
 		}
 	}
 	else {
 		for (auto iPoint = 0u; iPoint < ClipStitchCount; iPoint++) {
-			tempClipPoints.emplace_back(ClipBuffer[iPoint].x, (-ClipBuffer[iPoint].y));
+			tempClipPoints.emplace_back(clipBuffer[iPoint].x, (-clipBuffer[iPoint].y));
 		}
 	}
 }
@@ -716,8 +719,9 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 	const auto rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
 	const auto referencePoint = fPOINTATTR{ ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
 	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
+	auto& clipBuffer = *ClipBuffer;
 	for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
-		thred::rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
+		thred::rotang1(clipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
 	}
 	const auto length = hypot(delta.x, delta.y);
 	const auto ratio  = form::getplen() / length;
@@ -757,8 +761,9 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 			const auto val  = dPOINT{ delta.x * tdub, delta.y * tdub };
 			step            = val;
 		}
+		auto& clipBuffer = *ClipBuffer;
 		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
-			thred::rotang1(ClipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
+			thred::rotang1(clipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
 		}
 		auto flag       = true;
 		auto innerPoint = fPOINT{ CurrentFormVertices[start].x, CurrentFormVertices[start].y };

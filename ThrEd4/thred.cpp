@@ -6869,10 +6869,11 @@ void thred::internal::lodclp(unsigned iStitch) {
 		}
 	}
 	ClosestPointIndex = iStitch;
+	auto& clipBuffer  = *ClipBuffer;
 	for (source = 0; source < ClipStitchCount; source++) {
-		StitchBuffer[iStitch++] = { ClipBuffer[source].x + adjustment.x,
-			                        ClipBuffer[source].y + adjustment.y,
-			                        ClipBuffer[source].attribute & COLMSK | LayerIndex | NOTFRM };
+		StitchBuffer[iStitch++] = { clipBuffer[source].x + adjustment.x,
+			                        clipBuffer[source].y + adjustment.y,
+			                        clipBuffer[source].attribute & COLMSK | LayerIndex | NOTFRM };
 	}
 	GroupStitchIndex = iStitch - 1;
 	StateMap.set(StateFlag::GRPSEL);
@@ -7202,14 +7203,15 @@ void thred::internal::savclp(unsigned int destination, unsigned int source) {
 }
 
 void thred::rtclpfn(unsigned int destination, unsigned int source) {
-	auto integer = 0.0;
+	auto  integer    = 0.0;
+	auto& clipBuffer = *ClipBuffer;
 
 	ClipStitchData[destination].led  = 0;
-	auto fractional                  = modf(static_cast<double>(ClipBuffer[source].x) - LowerLeftStitch.x, &integer);
+	auto fractional                  = modf(static_cast<double>(clipBuffer[source].x) - LowerLeftStitch.x, &integer);
 	ClipStitchData[destination].fx   = gsl::narrow<unsigned char>(std::floor(fractional * 256.0));
 	ClipStitchData[destination].x    = gsl::narrow<unsigned short>(integer);
 	ClipStitchData[destination].spcx = 0;
-	fractional                       = modf(static_cast<double>(ClipBuffer[source].y) - LowerLeftStitch.y, &integer);
+	fractional                       = modf(static_cast<double>(clipBuffer[source].y) - LowerLeftStitch.y, &integer);
 	ClipStitchData[destination].fy   = gsl::narrow<unsigned char>(std::floor(fractional * 256.0));
 	ClipStitchData[destination].y    = gsl::narrow<unsigned short>(integer);
 	ClipStitchData[destination].spcy = 0;
@@ -8365,53 +8367,57 @@ void thred::internal::movi() {
 
 #define CLPBUG 0
 
-void thred::redclp() noexcept {
+void thred::redclp() {
 	const auto codedLayer = ActiveLayer << LAYSHFT;
 
 	ClipPointer = GlobalLock(ClipMemory);
 	if (ClipPointer) {
-		ClipStitchData  = static_cast<CLPSTCH*>(ClipPointer);
-		ClipStitchCount = ClipStitchData[0].led;
+		ClipStitchData   = static_cast<CLPSTCH*>(ClipPointer);
+		auto& clipBuffer = *ClipBuffer;
+		clipBuffer.clear();
+		clipBuffer.reserve(ClipStitchCount);
 
-		ClipBuffer[0] = { ClipStitchData[0].x + static_cast<float>(ClipStitchData[0].fx) / 256.0f,
-			              ClipStitchData[0].y + static_cast<float>(ClipStitchData[0].fy) / 256.0f,
-			              0u };
+		ClipStitchCount = ClipStitchData[0].led;
+		clipBuffer.emplace_back(fPOINTATTR{ ClipStitchData[0].x + static_cast<float>(ClipStitchData[0].fx) / 256.0f,
+		                                    ClipStitchData[0].y + static_cast<float>(ClipStitchData[0].fy) / 256.0f,
+		                                    0u });
 
 #if CLPBUG
 		OutputDebugString(fmt::format("interator: 0 x: {:6.2f},y: {:6.2f}\n", ClipBuffer[0].x, ClipBuffer[0].y).c_str());
 #endif
-		ClipRect.left = ClipRect.right = ClipBuffer[0].x;
-		ClipRect.bottom = ClipRect.top = ClipBuffer[0].y;
+		ClipRect.left = ClipRect.right = clipBuffer[0].x;
+		ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
 		for (auto iStitch = 1u; iStitch < ClipStitchCount; iStitch++) {
-			ClipBuffer[iStitch] = { ClipStitchData[iStitch].x + static_cast<float>(ClipStitchData[iStitch].fx) / 256.0f,
-				                    ClipStitchData[iStitch].y + static_cast<float>(ClipStitchData[iStitch].fy) / 256.0f,
-				                    (ClipStitchData[iStitch].led & 0xf) | codedLayer };
+			clipBuffer.emplace_back(
+			    fPOINTATTR{ ClipStitchData[iStitch].x + static_cast<float>(ClipStitchData[iStitch].fx) / 256.0f,
+			                ClipStitchData[iStitch].y + static_cast<float>(ClipStitchData[iStitch].fy) / 256.0f,
+			                (ClipStitchData[iStitch].led & 0xf) | codedLayer });
 
 #if CLPBUG
 			OutputDebugString(
 			    fmt::format("interator: {} x: {:6.2f},y: {:6.2f}\n", iStitch, ClipBuffer[iStitch].x, ClipBuffer[iStitch].y)
 			        .c_str());
 #endif
-			if (ClipBuffer[iStitch].x < ClipRect.left) {
-				ClipRect.left = ClipBuffer[iStitch].x;
+			if (clipBuffer[iStitch].x < ClipRect.left) {
+				ClipRect.left = clipBuffer[iStitch].x;
 			}
-			if (ClipBuffer[iStitch].x > ClipRect.right) {
-				ClipRect.right = ClipBuffer[iStitch].x;
+			if (clipBuffer[iStitch].x > ClipRect.right) {
+				ClipRect.right = clipBuffer[iStitch].x;
 			}
-			if (ClipBuffer[iStitch].y < ClipRect.bottom) {
-				ClipRect.bottom = ClipBuffer[iStitch].y;
+			if (clipBuffer[iStitch].y < ClipRect.bottom) {
+				ClipRect.bottom = clipBuffer[iStitch].y;
 			}
-			if (ClipBuffer[iStitch].y > ClipRect.top) {
-				ClipRect.top = ClipBuffer[iStitch].y;
+			if (clipBuffer[iStitch].y > ClipRect.top) {
+				ClipRect.top = clipBuffer[iStitch].y;
 			}
 		}
-		ClipBuffer[0].attribute = ActiveColor | codedLayer;
+		clipBuffer[0].attribute = ActiveColor | codedLayer;
 		ClipRectSize            = { ClipRect.right - ClipRect.left, ClipRect.top - ClipRect.bottom };
 		GlobalUnlock(ClipMemory);
 		if (ClipRect.left || ClipRect.bottom) {
 			for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
-				ClipBuffer[iStitch].x -= ClipRect.left;
-				ClipBuffer[iStitch].y -= ClipRect.bottom;
+				clipBuffer[iStitch].x -= ClipRect.left;
+				clipBuffer[iStitch].y -= ClipRect.bottom;
 			}
 			ClipRect.top -= ClipRect.bottom;
 			ClipRect.right -= ClipRect.left;
@@ -18641,6 +18647,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		MenuInfo                         = &private_MenuInfo;
 		auto private_TempPolygon         = std::vector<fPOINT>{};
 		TempPolygon                      = &private_TempPolygon;
+		auto private_ClipBuffer          = std::vector<fPOINTATTR>{};
+		ClipBuffer                       = &private_ClipBuffer;
 		auto private_OutsidePointList    = std::vector<fPOINT>{};
 		OutsidePointList                 = &private_OutsidePointList;
 		auto private_InsidePointList     = std::vector<fPOINT>{};

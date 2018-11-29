@@ -93,7 +93,9 @@ extern std::vector<HWND>* ButtonWin;
 extern float        ButtonholeCornerLength;
 extern HWND         CancelButton;
 extern unsigned     Clip;
-extern fPOINTATTR   ClipBuffer[MAXITEMS];
+
+extern std::vector<fPOINTATTR>*   ClipBuffer;
+
 extern FORMCLIP*    ClipFormHeader;
 extern HGLOBAL      ClipMemory;
 extern unsigned int ClipPointIndex;
