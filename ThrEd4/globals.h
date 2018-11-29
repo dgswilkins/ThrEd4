@@ -90,11 +90,11 @@ extern unsigned  ButtonWidthX3;
 
 extern std::vector<HWND>* ButtonWin;
 
-extern float        ButtonholeCornerLength;
-extern HWND         CancelButton;
-extern unsigned     Clip;
+extern float    ButtonholeCornerLength;
+extern HWND     CancelButton;
+extern unsigned Clip;
 
-extern std::vector<fPOINTATTR>*   ClipBuffer;
+extern std::vector<fPOINTATTR>* ClipBuffer;
 
 extern FORMCLIP*    ClipFormHeader;
 extern HGLOBAL      ClipMemory;

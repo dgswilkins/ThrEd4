@@ -58,21 +58,21 @@ unsigned  ButtonWidthX3;        // button width times 3
 
 std::vector<HWND>* ButtonWin; // button windows
 
-float        ButtonholeCornerLength = IBFCLEN; // buttonhole corner length
-HWND         CancelButton;                     // cancel button
-unsigned     Clip = 0;                         // pcs format clipboard handle
+float    ButtonholeCornerLength = IBFCLEN; // buttonhole corner length
+HWND     CancelButton;                     // cancel button
+unsigned Clip = 0;                         // pcs format clipboard handle
 
-std::vector<fPOINTATTR>*   ClipBuffer;             //
+std::vector<fPOINTATTR>* ClipBuffer; //
 
-FORMCLIP*    ClipFormHeader;                   // for thred form clipboard data
-HGLOBAL      ClipMemory;                       // handle to the clipboard memory
-unsigned int ClipPointIndex;                   // next index to append main clipboard points
-void*        ClipPointer;                      // for memory allocation for clipboard data
-fPOINT       ClipPoints[MAXITEMS];             // main clipboard fill points for forms
-fRECTANGLE   ClipRect;                         // clipboard rectangle
-FLSIZ        ClipRectSize;                     // clipboard rectangle size
-unsigned int ClipStitchCount;                  // number of stitchs extracted from clipboard
-CLPSTCH*     ClipStitchData;                   // for pcs clipboard data
+FORMCLIP*    ClipFormHeader;       // for thred form clipboard data
+HGLOBAL      ClipMemory;           // handle to the clipboard memory
+unsigned int ClipPointIndex;       // next index to append main clipboard points
+void*        ClipPointer;          // for memory allocation for clipboard data
+fPOINT       ClipPoints[MAXITEMS]; // main clipboard fill points for forms
+fRECTANGLE   ClipRect;             // clipboard rectangle
+FLSIZ        ClipRectSize;         // clipboard rectangle size
+unsigned int ClipStitchCount;      // number of stitchs extracted from clipboard
+CLPSTCH*     ClipStitchData;       // for pcs clipboard data
 
 unsigned ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
 

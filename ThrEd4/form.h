@@ -247,38 +247,40 @@ namespace internal {
 
 	constexpr unsigned duat(unsigned attribute);
 
-	void  dubfn();
-	void  ducon() noexcept;
-	void  dudif(const dPOINT& start, const dPOINT& finish, dPOINT& delta) noexcept;
-	void  dufcntr(dPOINT& center);
-	void  dufdat(std::vector<fPOINT>& tempClipPoints,
-	             std::vector<SATCON>& tempGuides,
-	             std::vector<fPOINT>& destinationFormVertices,
-	             std::vector<FRMHED>& destinationFormList,
-	             unsigned int         formIndex,
-	             unsigned int&        formRelocationIndex);
-	void  duflt(float& formOffset);
-	void  dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish, unsigned& lastGroup);
-	void  dupfn(double rotationAngle);
-	void  duprotfs(double rotationAngle);
-	void  duprots(double rotationAngle, const dPOINT& rotationCenter);
-	void  durgn(const std::vector<FSEQ>&      sequencePath,
-	            boost::dynamic_bitset<>&      visitedRegions,
-	            const std::vector<SMALPNTL*>& sortedLines,
-	            unsigned                      pthi,
-	            unsigned int                  lineCount,
-	            std::vector<REGION>&          regionsList,
-	            unsigned&                     lastGroup,
-	            unsigned                      sequencePathIndex);
-	void  duromb(const dPOINT& start0, const dPOINT& finish0, const dPOINT& start1, const dPOINT& finish1);
-	void  duseq(const std::vector<SMALPNTL*>& sortedLines,
-	            unsigned int                  start,
-	            unsigned int                  finish,
-	            boost::dynamic_bitset<>&      sequenceMap,
-	            unsigned&                     lastGroup,
-	            SMALPNTL*                     sequenceLines);
-	void  duseq1(const SMALPNTL* sequenceLines) noexcept;
-	SMALPNTL*  duseq2(SMALPNTL* sequenceLines) noexcept;
+	void dubfn();
+	void ducon() noexcept;
+	void dudif(const dPOINT& start, const dPOINT& finish, dPOINT& delta) noexcept;
+	void dufcntr(dPOINT& center);
+	void dufdat(std::vector<fPOINT>& tempClipPoints,
+	            std::vector<SATCON>& tempGuides,
+	            std::vector<fPOINT>& destinationFormVertices,
+	            std::vector<FRMHED>& destinationFormList,
+	            unsigned int         formIndex,
+	            unsigned int&        formRelocationIndex);
+	void duflt(float& formOffset);
+	void dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish, unsigned& lastGroup);
+	void dupfn(double rotationAngle);
+	void duprotfs(double rotationAngle);
+	void duprots(double rotationAngle, const dPOINT& rotationCenter);
+	void durgn(const std::vector<FSEQ>&      sequencePath,
+	           boost::dynamic_bitset<>&      visitedRegions,
+	           const std::vector<SMALPNTL*>& sortedLines,
+	           unsigned                      pthi,
+	           unsigned int                  lineCount,
+	           std::vector<REGION>&          regionsList,
+	           unsigned&                     lastGroup,
+	           unsigned                      sequencePathIndex);
+	void duromb(const dPOINT& start0, const dPOINT& finish0, const dPOINT& start1, const dPOINT& finish1);
+	void duseq(const std::vector<SMALPNTL*>& sortedLines,
+	           unsigned int                  start,
+	           unsigned int                  finish,
+	           boost::dynamic_bitset<>&      sequenceMap,
+	           unsigned&                     lastGroup,
+	           SMALPNTL*                     sequenceLines);
+	void duseq1(const SMALPNTL* sequenceLines) noexcept;
+
+	SMALPNTL* duseq2(SMALPNTL* sequenceLines) noexcept;
+
 	void  duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 	             const std::vector<VRCT2>& fillVerticalRect,
 	             unsigned int              start,
@@ -453,10 +455,8 @@ namespace internal {
 	bool sqcomp(const SMALPNTL* arg1, const SMALPNTL* arg2) noexcept;
 	void srtf(const std::vector<fPOINTATTR>& tempStitchBuffer, unsigned start, unsigned finish);
 	void stchfrm(unsigned formIndex, unsigned* attribute) noexcept;
-	void trfrm(const dPOINT& bottomLeftPoint,
-	           const dPOINT& topLeftPoint,
-	           const dPOINT& bottomRightPoint,
-	           const dPOINT& topRightPoint);
+	void
+	     trfrm(const dPOINT& bottomLeftPoint, const dPOINT& topLeftPoint, const dPOINT& bottomRightPoint, const dPOINT& topRightPoint);
 	void unbean(unsigned start, unsigned finish);
 	void uncon();
 

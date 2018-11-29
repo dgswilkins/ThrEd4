@@ -750,10 +750,10 @@ void texture::txtrup() {
 
 void texture::internal::angrct(fRECTANGLE& rectangle) {
 	auto& angledFormVertices = *AngledFormVertices;
-	rectangle.left = angledFormVertices[0].x;
-	rectangle.right = angledFormVertices[0].x;
-	rectangle.bottom = angledFormVertices[0].y;
-	rectangle.top = angledFormVertices[0].y;
+	rectangle.left           = angledFormVertices[0].x;
+	rectangle.right          = angledFormVertices[0].x;
+	rectangle.bottom         = angledFormVertices[0].y;
+	rectangle.top            = angledFormVertices[0].y;
 	for (auto vertex : angledFormVertices) {
 		if (vertex.x < rectangle.left) {
 			rectangle.left = vertex.x;
@@ -778,15 +778,15 @@ void texture::internal::ritxfrm(FRMHED& textureForm) {
 	offset.y        = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
 	auto& formLines = *FormLines;
 	formLines.resize(gsl::narrow_cast<size_t>(textureForm.vertexCount) + 1);
-	auto& angledFormVertices = *AngledFormVertices;
-	const auto maxVertex = angledFormVertices.size();
+	auto&      angledFormVertices = *AngledFormVertices;
+	const auto maxVertex          = angledFormVertices.size();
 	for (auto iVertex = 0u; iVertex < maxVertex; iVertex++) {
 		txi::ed2px(angledFormVertices[iVertex], formLines[iVertex]);
 		formLines[iVertex].x += offset.x;
 		formLines[iVertex].y += offset.y;
 	}
 	formLines[maxVertex] = formLines[0];
-	auto vertexCount                   = maxVertex;
+	auto vertexCount     = maxVertex;
 	if (textureForm.type != FRMLINE) {
 		vertexCount++;
 	}

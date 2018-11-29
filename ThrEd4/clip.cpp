@@ -209,8 +209,8 @@ unsigned int clip::numclp() {
 }
 
 void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
-	const auto* clip = &ClipPoints[clipIndex];
-	auto& clipBuffer = *ClipBuffer;
+	const auto* clip       = &ClipPoints[clipIndex];
+	auto&       clipBuffer = *ClipBuffer;
 	if (!StateMap.test(StateFlag::NOCLP)) {
 		clipBuffer.clear();
 		clipBuffer.reserve(clipEntries);
@@ -240,8 +240,8 @@ void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
 }
 
 void clip::internal::durev(std::vector<fPOINT>& clipReversedData) {
-	const auto midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
-	auto& clipBuffer = *ClipBuffer;
+	const auto midpoint   = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
+	auto&      clipBuffer = *ClipBuffer;
 
 	if (clipBuffer[0].x > midpoint) {
 		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
