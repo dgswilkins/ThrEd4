@@ -283,7 +283,7 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 	midPoint                 = midpnt(currentPoint, nextPoint);
 	OSequence[OutputIndex++] = BSequence[iSequence];
 	OSequence[OutputIndex++] = midPoint;
-	featherSequence.emplace_back(BSequence[iSequence + 1].x, BSequence[iSequence + 1].y);
+	featherSequence.emplace_back(fPOINT{ BSequence[iSequence + 1].x, BSequence[iSequence + 1].y });
 	featherSequence.push_back(midPoint);
 }
 

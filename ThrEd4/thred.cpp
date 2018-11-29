@@ -3775,14 +3775,14 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 		auto points = std::vector<fPOINT>{};
 		points.reserve(clipDataCount);
 		for (auto& srcForm : (*FormList)) {
-			outForms.emplace_back(FRMHEDOUT(srcForm));
+			outForms.emplace_back(FRMHEDOUT{ srcForm });
 			for (auto iVertex = 0u; iVertex < srcForm.vertexCount; iVertex++) {
 				vertices.push_back(srcForm.vertices[iVertex]);
 			}
 			if (srcForm.type == SAT) {
 				outForms.back().satinGuideCount = gsl::narrow<unsigned short>(srcForm.satinGuideCount);
 				for (auto iGuide = 0u; iGuide < srcForm.satinGuideCount; iGuide++) {
-					guides.emplace_back(SATCONOUT(srcForm.satinOrAngle.guide[iGuide]));
+					guides.emplace_back(SATCONOUT{ srcForm.satinOrAngle.guide[iGuide] });
 				}
 			}
 			if (clip::isclp(srcForm)) {
@@ -5637,7 +5637,7 @@ void thred::internal::nuFil() {
 								StateMap.set(StateFlag::BADFIL);
 							}
 							for (auto form : formListOriginal) {
-								(*FormList).emplace_back(FRMHED(form));
+								(*FormList).emplace_back(FRMHED{ form });
 							}
 						}
 						else {
@@ -5649,7 +5649,7 @@ void thred::internal::nuFil() {
 								StateMap.set(StateFlag::BADFIL);
 							}
 							for (auto form : inFormList) {
-								(*FormList).emplace_back(FRMHED(form));
+								(*FormList).emplace_back(FRMHED{ form });
 							}
 						}
 						if (thredHeader.vertexCount) {

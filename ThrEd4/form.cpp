@@ -3149,10 +3149,10 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 			auto regionCrossingStart = iclpx[iRegion];
 			auto regionCrossingEnd   = iclpx[static_cast<size_t>(iRegion) + 1];
 			pasteLocation.x          = clipWidth * (iRegion + clipGrid.left);
-			auto clipVerticalOffset  = 0.0f;
-			auto lineSegmentStart    = fPOINT{}; // vertical clipboard line segment start
-			auto lineSegmentEnd      = fPOINT{}; // vertical clipboard line segment end
-			auto& clipBuffer = *ClipBuffer;
+			auto  clipVerticalOffset = 0.0f;
+			auto  lineSegmentStart   = fPOINT{}; // vertical clipboard line segment start
+			auto  lineSegmentEnd     = fPOINT{}; // vertical clipboard line segment end
+			auto& clipBuffer         = *ClipBuffer;
 			if (StateMap.test(StateFlag::TXFIL)) {
 				const auto textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
 				ClipStitchCount        = textureSegments[textureLine].stitchCount;
@@ -4248,12 +4248,12 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 		std::sort(sortedLines.begin(), sortedLines.end(), sqcomp);
 		const auto lineCount = gsl::narrow<unsigned int>(sortedLines.size());
 		auto       regions   = std::vector<REGION>();
-		regions.emplace_back(0u, 0u, 0u, 0u);
+		regions.emplace_back(REGION{ 0u, 0u, 0u, 0u });
 		auto breakLine = sortedLines[0]->line;
 		for (auto iLine = 0u; iLine < lineCount; iLine++) {
 			if (breakLine != sortedLines[iLine]->line) {
 				regions.back().end = iLine - 1;
-				regions.emplace_back(iLine, 0u, 0u, 0u);
+				regions.emplace_back(REGION{ iLine, 0u, 0u, 0u });
 				breakLine = sortedLines[iLine]->line;
 			}
 		}
@@ -5714,7 +5714,7 @@ void form::internal::fsclp() {
 	SelectedForm->borderColor    = gsl::narrow<unsigned char>(ActiveColor);
 	form::bsizpar();
 	auto* offsetStart = &ClipPoints[SelectedForm->borderClipData];
-	auto& clipBuffer = *ClipBuffer;
+	auto& clipBuffer  = *ClipBuffer;
 	for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 		offsetStart[iStitch] = clipBuffer[iStitch];
 	}
@@ -6943,7 +6943,7 @@ void form::internal::filsclp() {
 	SelectedForm->angleOrClipData.clip    = clip::numclp();
 	SelectedForm->lengthOrCount.clipCount = ClipStitchCount;
 	auto* offsetStart                     = &ClipPoints[SelectedForm->angleOrClipData.clip];
-	auto& clipBuffer = *ClipBuffer;
+	auto& clipBuffer                      = *ClipBuffer;
 	for (auto iClip = 0u; iClip < ClipStitchCount; iClip++) {
 		offsetStart[iClip] = clipBuffer[iClip];
 	}
@@ -7717,7 +7717,7 @@ void form::internal::fspic() {
 	form::bsizpar();
 	form::savplen(ButtonholeCornerLength);
 	auto* offsetStart = &ClipPoints[SelectedForm->borderClipData];
-	auto& clipBuffer = *ClipBuffer;
+	auto& clipBuffer  = *ClipBuffer;
 	for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 		offsetStart[iStitch].x = clipBuffer[iStitch].x;
 		offsetStart[iStitch].y = clipBuffer[iStitch].y;
@@ -8467,7 +8467,7 @@ void form::vrtsclp() {
 	fi::makpoli();
 	SelectedForm->fillSpacing = IniFile.clipOffset;
 	auto* offsetStart         = &ClipPoints[SelectedForm->angleOrClipData.clip];
-	auto& clipBuffer = *ClipBuffer;
+	auto& clipBuffer          = *ClipBuffer;
 	for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 		offsetStart[iStitch].x = clipBuffer[iStitch].x;
 		offsetStart[iStitch].y = clipBuffer[iStitch].y;
@@ -8534,7 +8534,7 @@ void form::horsclp() {
 	fi::makpoli();
 	SelectedForm->fillSpacing = IniFile.clipOffset;
 	auto* offsetStart         = &ClipPoints[SelectedForm->angleOrClipData.clip];
-	auto& clipBuffer = *ClipBuffer;
+	auto& clipBuffer          = *ClipBuffer;
 	for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 		offsetStart[iStitch].x = clipBuffer[iStitch].x;
 		offsetStart[iStitch].y = clipBuffer[iStitch].y;
@@ -8602,7 +8602,7 @@ void form::angsclp() {
 	SelectedForm->satinOrAngle.angle = IniFile.fillAngle;
 	SelectedForm->fillSpacing        = IniFile.clipOffset;
 	auto* offsetStart                = &ClipPoints[SelectedForm->angleOrClipData.clip];
-	auto& clipBuffer = *ClipBuffer;
+	auto& clipBuffer                 = *ClipBuffer;
 	for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
 		offsetStart[iStitch].x = clipBuffer[iStitch].x;
 		offsetStart[iStitch].y = clipBuffer[iStitch].y;
@@ -8870,7 +8870,7 @@ void form::internal::fsclpx() {
 	SelectedForm->borderColor    = gsl::narrow<unsigned char>(ActiveColor);
 	form::bsizpar();
 	auto* offsetStart = &ClipPoints[SelectedForm->borderClipData];
-	auto& clipBuffer = *ClipBuffer;
+	auto& clipBuffer  = *ClipBuffer;
 	for (auto iPoint = 0u; iPoint < ClipStitchCount; iPoint++) {
 		offsetStart[iPoint].x = clipBuffer[iPoint].x;
 		offsetStart[iPoint].y = clipBuffer[iPoint].y;

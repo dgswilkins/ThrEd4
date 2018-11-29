@@ -614,7 +614,6 @@ void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 	listSINEs.reserve(gsl::narrow<size_t>(VertexCount) + 1);
 	auto listCOSINEs = std::vector<double>();
 	listCOSINEs.reserve(VertexCount);
-	// Todo - would emplace_back be better here?
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 		listSINEs.push_back(sin((*FormAngles)[iVertex]));
 		listCOSINEs.push_back(cos((*FormAngles)[iVertex]));
@@ -639,7 +638,6 @@ void clip::internal::dulast(std::vector<fPOINT>& chainEndPoints) {
 			}
 		}
 		if (minimumIndex) {
-			// Todo - would emplace_back be better here?
 			for (auto iPoint = minimumIndex; iPoint < chainEndPoints.size() - 2; iPoint++) {
 				tempClipPoints.push_back(chainEndPoints[iPoint]);
 			}
@@ -657,12 +655,12 @@ void clip::internal::clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fP
 	if (SelectedForm->type == FRMLINE) {
 		const auto pivot = ClipRectSize.cy / 2;
 		for (auto iPoint = 0u; iPoint < ClipStitchCount; iPoint++) {
-			tempClipPoints.emplace_back(clipBuffer[iPoint].x, (-clipBuffer[iPoint].y + pivot));
+			tempClipPoints.emplace_back(fPOINT{ clipBuffer[iPoint].x, (-clipBuffer[iPoint].y + pivot) });
 		}
 	}
 	else {
 		for (auto iPoint = 0u; iPoint < ClipStitchCount; iPoint++) {
-			tempClipPoints.emplace_back(clipBuffer[iPoint].x, (-clipBuffer[iPoint].y));
+			tempClipPoints.emplace_back(fPOINT{ clipBuffer[iPoint].x, (-clipBuffer[iPoint].y) });
 		}
 	}
 }
