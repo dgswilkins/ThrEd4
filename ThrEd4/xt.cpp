@@ -786,6 +786,7 @@ void xt::internal::ritund(unsigned& interleaveSequenceIndex2) {
 }
 
 void xt::internal::undclp() noexcept {
+	// ToDo - Is it better to initialize individually?
 	ClipRectSize.cx = ClipRect.bottom = ClipRect.left = ClipRect.right = ClipBuffer[0].x = ClipBuffer[1].x = ClipBuffer[0].y = 0;
 	ClipRectSize.cy = ClipRect.top = ClipBuffer[1].y = SelectedForm->underlayStitchLen;
 	ClipStitchCount                                  = 2;
