@@ -97,7 +97,7 @@ namespace internal {
 	           unsigned int         finish,
 	           double               spacing,
 	           const dPOINT&        rotationCenter);
-	bool ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point);
+	bool ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) noexcept;
 	void setvct(unsigned int start, unsigned int finish, double& clipAngle, dPOINT& vector0) noexcept;
 	void xclpfn(const std::vector<fPOINT>& tempClipPoints,
 	            const std::vector<fPOINT>& chainEndPoints,

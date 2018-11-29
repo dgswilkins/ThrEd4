@@ -244,14 +244,17 @@ void clip::internal::durev(std::vector<fPOINT>& clipReversedData) {
 	auto&      clipBuffer = *ClipBuffer;
 
 	if (clipBuffer[0].x > midpoint) {
-		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
-			clipReversedData[iStitch].x = ClipRect.right - clipBuffer[iStitch].x;
-			clipReversedData[iStitch].y = clipBuffer[iStitch].y;
+		auto iBuffer = clipBuffer.begin();
+		for (auto& reversed : clipReversedData) {
+			reversed = fPOINT{ ClipRect.right - iBuffer->x, iBuffer->y };
+			iBuffer++;
 		}
 	}
 	else {
-		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
-			clipReversedData[iStitch] = clipBuffer[iStitch];
+		auto iBuffer = clipBuffer.begin();
+		for (auto& reversed : clipReversedData) {
+			reversed = *iBuffer;
+			iBuffer++;
 		}
 	}
 }
@@ -284,15 +287,14 @@ bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int 
 	return false;
 }
 
-bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) {
+bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) noexcept {
 	const auto adjustedPoint = fPOINT{ (point.x - ClipReference.x), (point.y - ClipReference.y) };
 
 	if (form::chkmax(ClipStitchCount, SequenceIndex)) {
 		return true;
 	}
-	for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
-		OSequence[SequenceIndex].x   = clipFillData[iStitch].x + adjustedPoint.x;
-		OSequence[SequenceIndex++].y = clipFillData[iStitch].y + adjustedPoint.y;
+	for (auto& data : clipFillData) {
+		OSequence[SequenceIndex++] = fPOINT{ data.x + adjustedPoint.x, data.y + adjustedPoint.y };
 	}
 	return false;
 }
@@ -310,8 +312,10 @@ void clip::internal::lincrnr(const std::vector<fPOINT>& clipReversedData,
 
 		const auto rotationAngle = atan2(delta.y, delta.x);
 		thred::rotangf(BorderClipReference, ClipReference, rotationAngle, rotationCenter);
-		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
-			thred::rotangf(clipReversedData[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
+		auto reversedData = clipReversedData.begin();
+		for (auto& data : clipFillData) {
+			thred::rotangf(*reversedData, data, rotationAngle, rotationCenter);
+			reversedData++;
 		}
 		ci::ritclp(clipFillData, SelectedPoint);
 		SelectedPoint = moveToCoords;
@@ -331,8 +335,10 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
 
 	if (clipCount) {
 		thred::rotangf(BorderClipReference, ClipReference, clipAngle, rotationCenter);
-		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
-			thred::rotangf(clipReversedData[iStitch], clipFillData[iStitch], clipAngle, rotationCenter);
+		auto reversedData = clipReversedData.begin();
+		for (auto& data : clipFillData) {
+			thred::rotangf(*reversedData, data, clipAngle, rotationCenter);
+			reversedData++;
 		}
 		for (auto iClip = 0u; iClip < clipCount; iClip++) {
 			ci::ritclp(clipFillData, SelectedPoint);
@@ -379,10 +385,12 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 		else {
 			remainder = (length - ClipRectSize.cx) / 2;
 		}
-		const auto step        = fPOINT{ delta.x * remainder, delta.y * remainder };
-		auto       insertPoint = begin;
-		for (auto index = 0u; index < ClipStitchCount; index++) {
-			thred::rotangf(clipReversedData[index], clipFillData[index], rotationAngle, rotationCenter);
+		const auto step         = fPOINT{ delta.x * remainder, delta.y * remainder };
+		auto       insertPoint  = begin;
+		auto       reversedData = clipReversedData.begin();
+		for (auto& data : clipFillData) {
+			thred::rotangf(*reversedData, data, rotationAngle, rotationCenter);
+			reversedData++;
 		}
 		for (auto stepCount = 0u; stepCount < clipCount; stepCount++) {
 			if (ci::ritclp(clipFillData, insertPoint)) {
@@ -403,8 +411,9 @@ void clip::clpbrd(unsigned int startVertex) {
 	StateMap.reset(StateFlag::CLPBAK);
 	HorizontalLength2           = ClipRectSize.cx / 2;
 	HorizontalLength            = ClipRectSize.cx;
-	auto       clipFillData     = std::vector<fPOINT>(ClipStitchCount);
-	auto       clipReversedData = std::vector<fPOINT>(ClipStitchCount);
+	const auto clipStitchCount  = ClipBuffer->size();
+	auto       clipFillData     = std::vector<fPOINT>(clipStitchCount);
+	auto       clipReversedData = std::vector<fPOINT>(clipStitchCount);
 	const auto rotationCenter
 	    = dPOINT{ (ClipRect.right - ClipRect.left) / 2 + ClipRect.left, (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom };
 	ClipReference.x = ClipRect.left;
@@ -654,13 +663,13 @@ void clip::internal::clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fP
 	auto& clipBuffer = *ClipBuffer;
 	if (SelectedForm->type == FRMLINE) {
 		const auto pivot = ClipRectSize.cy / 2;
-		for (auto iPoint = 0u; iPoint < ClipStitchCount; iPoint++) {
-			tempClipPoints.emplace_back(fPOINT{ clipBuffer[iPoint].x, (-clipBuffer[iPoint].y + pivot) });
+		for (auto& clip : clipBuffer) {
+			tempClipPoints.emplace_back(fPOINT{ clip.x, (-clip.y + pivot) });
 		}
 	}
 	else {
-		for (auto iPoint = 0u; iPoint < ClipStitchCount; iPoint++) {
-			tempClipPoints.emplace_back(fPOINT{ clipBuffer[iPoint].x, (-clipBuffer[iPoint].y) });
+		for (auto& clip : clipBuffer) {
+			tempClipPoints.emplace_back(fPOINT{ clip.x, (-clip.y) });
 		}
 	}
 }
@@ -670,16 +679,14 @@ void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
                             unsigned                   start,
                             unsigned                   finish,
                             const dPOINT&              rotationCenter) {
-	auto points = std::vector<fPOINT>(ClipStitchCount);
-
 	const auto delta
 	    = dPOINT{ (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
 	const auto rotationAngle = atan2(delta.y, delta.x);
-	for (auto iPoint = 0u; iPoint < ClipStitchCount; iPoint++) {
-		points[iPoint] = tempClipPoints[iPoint];
-		thred::rotflt(points[iPoint], rotationAngle, rotationCenter);
-		OSequence[SequenceIndex].x   = chainEndPoints[start].x + points[iPoint].x;
-		OSequence[SequenceIndex++].y = chainEndPoints[start].y + points[iPoint].y;
+	auto       chainEndPoint = chainEndPoints[start];
+	for (auto clip : tempClipPoints) {
+		auto point = clip;
+		thred::rotflt(point, rotationAngle, rotationCenter);
+		OSequence[SequenceIndex++] = fPOINT{ chainEndPoint.x + point.x, chainEndPoint.y + point.y };
 	}
 }
 
