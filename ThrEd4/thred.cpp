@@ -6852,8 +6852,9 @@ void thred::internal::lodclp(unsigned iStitch) {
 	if (PCSHeader.stitchCount) {
 		source--;
 	}
-	auto destination = PCSHeader.stitchCount + ClipStitchCount;
-	if (PCSHeader.stitchCount || ClipStitchCount) {
+	const auto clipSize = ClipBuffer->size();
+	auto destination = PCSHeader.stitchCount + gsl::narrow<unsigned int>(clipSize);
+	if (PCSHeader.stitchCount || clipSize) {
 		destination--;
 	}
 
@@ -6869,15 +6870,14 @@ void thred::internal::lodclp(unsigned iStitch) {
 		}
 	}
 	ClosestPointIndex = iStitch;
-	auto& clipBuffer  = *ClipBuffer;
-	for (source = 0; source < ClipStitchCount; source++) {
-		StitchBuffer[iStitch++] = { clipBuffer[source].x + adjustment.x,
-			                        clipBuffer[source].y + adjustment.y,
-			                        clipBuffer[source].attribute & COLMSK | LayerIndex | NOTFRM };
+	for (auto& clip : *ClipBuffer) {
+		StitchBuffer[iStitch++] = { clip.x + adjustment.x,
+			                        clip.y + adjustment.y,
+			                        clip.attribute & COLMSK | LayerIndex | NOTFRM };
 	}
 	GroupStitchIndex = iStitch - 1;
 	StateMap.set(StateFlag::GRPSEL);
-	PCSHeader.stitchCount += gsl::narrow<unsigned short>(ClipStitchCount);
+	PCSHeader.stitchCount += gsl::narrow<unsigned short>(ClipBuffer->size());
 	if (PCSHeader.stitchCount) {
 		StateMap.set(StateFlag::INIT);
 	}
@@ -8373,11 +8373,11 @@ void thred::redclp() {
 	ClipPointer = GlobalLock(ClipMemory);
 	if (ClipPointer) {
 		ClipStitchData   = static_cast<CLPSTCH*>(ClipPointer);
+		const auto clipSize = ClipStitchData[0].led;
 		auto& clipBuffer = *ClipBuffer;
 		clipBuffer.clear();
-		clipBuffer.reserve(ClipStitchCount);
+		clipBuffer.reserve(clipSize);
 
-		ClipStitchCount = ClipStitchData[0].led;
 		clipBuffer.emplace_back(fPOINTATTR{ ClipStitchData[0].x + static_cast<float>(ClipStitchData[0].fx) / 256.0f,
 		                                    ClipStitchData[0].y + static_cast<float>(ClipStitchData[0].fy) / 256.0f,
 		                                    0u });
@@ -8387,7 +8387,7 @@ void thred::redclp() {
 #endif
 		ClipRect.left = ClipRect.right = clipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
-		for (auto iStitch = 1u; iStitch < ClipStitchCount; iStitch++) {
+		for (auto iStitch = 1u; iStitch < clipSize; iStitch++) {
 			clipBuffer.emplace_back(
 			    fPOINTATTR{ ClipStitchData[iStitch].x + static_cast<float>(ClipStitchData[iStitch].fx) / 256.0f,
 			                ClipStitchData[iStitch].y + static_cast<float>(ClipStitchData[iStitch].fy) / 256.0f,
@@ -8415,9 +8415,9 @@ void thred::redclp() {
 		ClipRectSize            = { ClipRect.right - ClipRect.left, ClipRect.top - ClipRect.bottom };
 		GlobalUnlock(ClipMemory);
 		if (ClipRect.left || ClipRect.bottom) {
-			for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
-				clipBuffer[iStitch].x -= ClipRect.left;
-				clipBuffer[iStitch].y -= ClipRect.bottom;
+			for (auto& clip : *ClipBuffer) {
+				clip.x -= ClipRect.left;
+				clip.y -= ClipRect.bottom;
 			}
 			ClipRect.top -= ClipRect.bottom;
 			ClipRect.right -= ClipRect.left;
@@ -8582,10 +8582,10 @@ void thred::internal::insfil() {
 						if (version < 2) {
 							auto formHeader = std::vector<FRMHEDO>(fileHeader.formCount);
 							ReadFile(InsertedFileHandle,
-							         formHeader.data(),
-							         fileHeader.formCount * sizeof(formHeader[0]),
-							         &BytesRead,
-							         nullptr);
+								formHeader.data(),
+								fileHeader.formCount * sizeof(formHeader[0]),
+								&BytesRead,
+								nullptr);
 							if (BytesRead != fileHeader.formCount * sizeof(formHeader[0])) {
 								formHeader.resize(BytesRead / sizeof(formHeader[0]));
 								StateMap.set(StateFlag::BADFIL);
@@ -8598,7 +8598,7 @@ void thred::internal::insfil() {
 							FormIndex += gsl::narrow<unsigned int>(formHeader.size());
 						}
 						else {
-							auto inFormList  = std::vector<FRMHEDOUT>(fileHeader.formCount);
+							auto inFormList = std::vector<FRMHEDOUT>(fileHeader.formCount);
 							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.formCount * sizeof(inFormList[0]));
 							ReadFileInt(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {

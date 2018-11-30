@@ -103,7 +103,6 @@ extern void*        ClipPointer;
 extern fPOINT       ClipPoints[MAXITEMS];
 extern fRECTANGLE   ClipRect;
 extern FLSIZ        ClipRectSize;
-extern unsigned int ClipStitchCount;
 extern CLPSTCH*     ClipStitchData;
 extern unsigned     ClipTypeMap;
 extern unsigned int ClosestFormToCursor;

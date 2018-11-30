@@ -455,8 +455,10 @@ namespace internal {
 	bool sqcomp(const SMALPNTL* arg1, const SMALPNTL* arg2) noexcept;
 	void srtf(const std::vector<fPOINTATTR>& tempStitchBuffer, unsigned start, unsigned finish);
 	void stchfrm(unsigned formIndex, unsigned* attribute) noexcept;
-	void
-	     trfrm(const dPOINT& bottomLeftPoint, const dPOINT& topLeftPoint, const dPOINT& bottomRightPoint, const dPOINT& topRightPoint);
+	void trfrm(const dPOINT& bottomLeftPoint,
+	           const dPOINT& topLeftPoint,
+	           const dPOINT& bottomRightPoint,
+	           const dPOINT& topRightPoint) noexcept;
 	void unbean(unsigned start, unsigned finish);
 	void uncon();
 

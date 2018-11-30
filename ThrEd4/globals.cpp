@@ -71,7 +71,6 @@ void*        ClipPointer;          // for memory allocation for clipboard data
 fPOINT       ClipPoints[MAXITEMS]; // main clipboard fill points for forms
 fRECTANGLE   ClipRect;             // clipboard rectangle
 FLSIZ        ClipRectSize;         // clipboard rectangle size
-unsigned int ClipStitchCount;      // number of stitchs extracted from clipboard
 CLPSTCH*     ClipStitchData;       // for pcs clipboard data
 
 unsigned ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill

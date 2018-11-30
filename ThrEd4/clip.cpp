@@ -184,9 +184,10 @@ unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) {
 }
 
 unsigned int clip::numclp() {
+	auto clipSize = gsl::narrow<unsigned int>(ClipBuffer->size());
 	const auto find        = ci::findclp(ClosestFormToCursor);
 	auto       source      = ClipPointIndex - 1;
-	auto       destination = ClipPointIndex + ClipStitchCount - 1;
+	auto       destination = ClipPointIndex + clipSize - 1;
 	auto&      formList    = *FormList;
 
 	while ((source + 1) > find) {
@@ -194,17 +195,17 @@ unsigned int clip::numclp() {
 	}
 	formList[ClosestFormToCursor].angleOrClipData.clip = find;
 	if (clip::iseclpx(ClosestFormToCursor)) {
-		formList[ClosestFormToCursor].borderClipData += ClipStitchCount;
+		formList[ClosestFormToCursor].borderClipData += clipSize;
 	}
 	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 		if (clip::isclpx(iForm)) {
-			formList[iForm].angleOrClipData.clip += ClipStitchCount;
+			formList[iForm].angleOrClipData.clip += clipSize;
 		}
 		if (clip::iseclpx(iForm)) {
-			formList[iForm].borderClipData += ClipStitchCount;
+			formList[iForm].borderClipData += clipSize;
 		}
 	}
-	ClipPointIndex += ClipStitchCount;
+	ClipPointIndex += clipSize;
 	return find;
 }
 
@@ -235,7 +236,6 @@ void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
 		}
 		ClipRectSize.cx = ClipRect.right - ClipRect.left;
 		ClipRectSize.cy = ClipRect.top - ClipRect.bottom;
-		ClipStitchCount = clipEntries;
 	}
 }
 
@@ -290,7 +290,7 @@ bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int 
 bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) noexcept {
 	const auto adjustedPoint = fPOINT{ (point.x - ClipReference.x), (point.y - ClipReference.y) };
 
-	if (form::chkmax(ClipStitchCount, SequenceIndex)) {
+	if (form::chkmax(clipFillData.size(), SequenceIndex)) {
 		return true;
 	}
 	for (auto& data : clipFillData) {
@@ -696,7 +696,7 @@ void clip::duxclp() {
 	chainEndPoints.reserve(50);
 	ci::dufxlen(chainEndPoints);
 	auto tempClipPoints = std::vector<fPOINT>{};
-	tempClipPoints.reserve(ClipStitchCount);
+	tempClipPoints.reserve(ClipBuffer->size());
 	ci::clpxadj(tempClipPoints, chainEndPoints);
 	SequenceIndex = 0;
 	// ToDo - does this make sense?
@@ -724,9 +724,10 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 	const auto rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
 	const auto referencePoint = fPOINTATTR{ ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
 	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
-	auto& clipBuffer = *ClipBuffer;
-	for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
-		thred::rotang1(clipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
+	auto iClip = clipFillData.begin();
+	for (auto& clip : *ClipBuffer) {
+		thred::rotang1(clip, *iClip, rotationAngle, rotationCenter);
+		iClip++;
 	}
 	const auto length = hypot(delta.x, delta.y);
 	const auto ratio  = form::getplen() / length;
@@ -766,9 +767,10 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 			const auto val  = dPOINT{ delta.x * tdub, delta.y * tdub };
 			step            = val;
 		}
-		auto& clipBuffer = *ClipBuffer;
-		for (auto iStitch = 0u; iStitch < ClipStitchCount; iStitch++) {
-			thred::rotang1(clipBuffer[iStitch], clipFillData[iStitch], rotationAngle, rotationCenter);
+		auto iClip = clipFillData.begin();
+		for (auto& clip : *ClipBuffer) {
+			thred::rotang1(clip, *iClip, rotationAngle, rotationCenter);
+			iClip++;
 		}
 		auto flag       = true;
 		auto innerPoint = fPOINT{ CurrentFormVertices[start].x, CurrentFormVertices[start].y };
@@ -798,7 +800,7 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 }
 
 void clip::clpic() {
-	auto clipFillData = std::vector<fPOINT>(ClipStitchCount);
+	auto clipFillData = std::vector<fPOINT>(ClipBuffer->size());
 
 	const auto rotationCenter = dPOINT{ ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left),
 		                                ((ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom) };
