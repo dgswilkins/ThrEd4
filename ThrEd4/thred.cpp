@@ -2419,8 +2419,11 @@ void thred::internal::chknum() {
 			}
 			else {
 				if (wcslen(MsgBuffer)) {
-					value        = bufToDouble(MsgBuffer);
-					MsgBuffer[0] = 0;
+					value = bufToDouble(MsgBuffer);
+					// ToDo - figure out why MsgBuffer gets large value and crashes gsl::narrow below
+					for (auto i = 0u; i < 64; i++) {
+						MsgBuffer[i] = 0x0;
+					}
 					do {
 						if (StateMap.testAndReset(StateFlag::ENTRFNUM)) {
 							if (value < FormIndex) {
