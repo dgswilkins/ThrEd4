@@ -110,10 +110,9 @@ void clip::delmclp(unsigned int iForm) {
 		if (clip::isclp(iForm)) {
 			auto&      form        = (*FormList)[iForm];
 			const auto destIndex   = ci::findclp(iForm);
-			auto       sourceStart = ClipPoints->begin() + destIndex + form.lengthOrCount.clipCount;
-			auto       sourceEnd   = sourceStart + ClipPointIndex;
-			auto       destination = ClipPoints->begin() + destIndex;
-			std::copy(sourceStart, sourceEnd, destination);
+			auto       eraseStart = ClipPoints->begin() + destIndex ;
+			auto       eraseEnd   = eraseStart + form.lengthOrCount.clipCount;
+			ClipPoints->erase(eraseStart, eraseEnd);
 			if (clip::iseclp(iForm)) {
 				form.borderClipData -= form.lengthOrCount.clipCount;
 			}
