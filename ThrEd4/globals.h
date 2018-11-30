@@ -100,7 +100,9 @@ extern FORMCLIP*    ClipFormHeader;
 extern HGLOBAL      ClipMemory;
 extern unsigned int ClipPointIndex;
 extern void*        ClipPointer;
-extern fPOINT       ClipPoints[MAXITEMS];
+
+extern std::vector<fPOINT>* ClipPoints;
+
 extern fRECTANGLE   ClipRect;
 extern FLSIZ        ClipRectSize;
 extern CLPSTCH*     ClipStitchData;

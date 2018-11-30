@@ -64,14 +64,16 @@ unsigned Clip = 0;                         // pcs format clipboard handle
 
 std::vector<fPOINTATTR>* ClipBuffer; //
 
-FORMCLIP*    ClipFormHeader;       // for thred form clipboard data
-HGLOBAL      ClipMemory;           // handle to the clipboard memory
-unsigned int ClipPointIndex;       // next index to append main clipboard points
-void*        ClipPointer;          // for memory allocation for clipboard data
-fPOINT       ClipPoints[MAXITEMS]; // main clipboard fill points for forms
-fRECTANGLE   ClipRect;             // clipboard rectangle
-FLSIZ        ClipRectSize;         // clipboard rectangle size
-CLPSTCH*     ClipStitchData;       // for pcs clipboard data
+FORMCLIP*    ClipFormHeader; // for thred form clipboard data
+HGLOBAL      ClipMemory;     // handle to the clipboard memory
+unsigned int ClipPointIndex; // next index to append main clipboard points
+void*        ClipPointer;    // for memory allocation for clipboard data
+
+std::vector<fPOINT>* ClipPoints; // main clipboard fill points for forms
+
+fRECTANGLE ClipRect;       // clipboard rectangle
+FLSIZ      ClipRectSize;   // clipboard rectangle size
+CLPSTCH*   ClipStitchData; // for pcs clipboard data
 
 unsigned ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
 

@@ -1348,7 +1348,7 @@ void thred::internal::dudat() {
 	const auto     formCount = formList.size();
 	constexpr auto formSize  = sizeof(decltype(formList.back()));
 	const auto     size      = sizeof(BAKHED) + formSize * formList.size() + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
-	                  + sizeof(FormVertices[0]) * FormVertexIndex + sizeof(ClipPoints[0]) * ClipPointIndex
+	                  + sizeof(FormVertices[0]) * FormVertexIndex + sizeof((*ClipPoints)[0]) * ClipPointIndex
 	                  + sizeof(SatinGuides[0]) * satin::getGuideSize() + sizeof(UserColor)
 	                  + sizeof((*TexturePointsBuffer)[0]) * TextureIndex;
 	undoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);
@@ -1385,8 +1385,8 @@ void thred::internal::dudat() {
 			if (ClipPointIndex > MAXITEMS) {
 				ClipPointIndex = MAXITEMS;
 			}
-			std::copy(ClipPoints,
-			          ClipPoints + ClipPointIndex,
+			std::copy(ClipPoints->begin(),
+			          ClipPoints->end(),
 			          stdext::make_checked_array_iterator(backupData->clipPoints, backupData->clipPointCount));
 		}
 		backupData->colors = convert_ptr<COLORREF*>(&backupData->clipPoints[ClipPointIndex]);
@@ -3743,7 +3743,7 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 	}
 	stitchHeader.vertexLen   = gsl::narrow<unsigned short>(vtxLen);
 	stitchHeader.dlineLen    = gsl::narrow<unsigned short>(sizeof(FormVertices[0]) * vertexCount);
-	stitchHeader.clipDataLen = gsl::narrow<unsigned short>(sizeof(ClipPoints[0]) * clipDataCount);
+	stitchHeader.clipDataLen = gsl::narrow<unsigned short>(sizeof((*ClipPoints)[0]) * clipDataCount);
 	durit(&output, &stitchHeader, sizeof(stitchHeader));
 	ExtendedHeader.auxFormat         = IniFile.auxFileType;
 	ExtendedHeader.hoopSizeX         = IniFile.hoopSizeX;
@@ -3786,16 +3786,18 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 				}
 			}
 			if (clip::isclp(srcForm)) {
-				const auto* offsetStart = &ClipPoints[srcForm.angleOrClipData.clip];
+				auto offsetStart = ClipPoints->begin() + srcForm.angleOrClipData.clip;
 				for (auto iClip = 0u; iClip < srcForm.lengthOrCount.clipCount; iClip++) {
-					points.push_back(offsetStart[iClip]);
+					points.push_back(*offsetStart);
+					offsetStart++;
 				}
 			}
 			if (clip::iseclpx(srcForm)) {
-				const auto* offsetStart = &ClipPoints[srcForm.borderClipData];
-				const auto  clipCount   = srcForm.clipEntries;
+				auto       offsetStart = ClipPoints->begin() + srcForm.borderClipData;
+				const auto clipCount   = srcForm.clipEntries;
 				for (auto iClip = 0u; iClip < clipCount; iClip++) {
-					points.push_back(offsetStart[iClip]);
+					points.push_back(*offsetStart);
+					offsetStart++;
 				}
 			}
 		}
@@ -4903,7 +4905,7 @@ void thred::internal::redbak() {
 		FormVertexIndex = undoData->vertexCount;
 		satin::cpyUndoGuides(*undoData);
 		if (undoData->clipPointCount) {
-			std::copy(undoData->clipPoints, undoData->clipPoints + undoData->clipPointCount, ClipPoints);
+			std::copy(undoData->clipPoints, undoData->clipPoints + undoData->clipPointCount, ClipPoints->begin());
 		}
 		ClipPointIndex  = undoData->clipPointCount;
 		auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
@@ -5678,10 +5680,10 @@ void thred::internal::nuFil() {
 							std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), SatinGuides);
 						}
 						if (thredHeader.clipDataCount) {
-							bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(ClipPoints[0]));
-							ReadFile(FileHandle, ClipPoints, bytesToRead, &BytesRead, nullptr);
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof((*ClipPoints)[0]));
+							ReadFile(FileHandle, ClipPoints->data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								ClipPointIndex = BytesRead / sizeof(ClipPoints[0]);
+								ClipPointIndex = BytesRead / sizeof((*ClipPoints)[0]);
 								StateMap.set(StateFlag::BADFIL);
 							}
 						}
@@ -7224,10 +7226,10 @@ unsigned int thred::internal::sizfclp() {
 		clipSize += SelectedForm->satinGuideCount * sizeof(SatinGuides[0]);
 	}
 	if (clip::iseclp(ClosestFormToCursor)) {
-		clipSize += SelectedForm->clipEntries * sizeof(ClipPoints[0]);
+		clipSize += SelectedForm->clipEntries * sizeof((*ClipPoints)[0]);
 	}
 	if (clip::isclpx(ClosestFormToCursor)) {
-		clipSize += SelectedForm->lengthOrCount.clipCount * sizeof(ClipPoints[0]);
+		clipSize += SelectedForm->lengthOrCount.clipCount * sizeof((*ClipPoints)[0]);
 	}
 	if (texture::istx(ClosestFormToCursor)) {
 		clipSize += SelectedForm->fillInfo.texture.count * sizeof(TexturePointsBuffer[0]);
@@ -7280,10 +7282,10 @@ unsigned int thred::internal::sizclp(unsigned& formFirstStitchIndex, unsigned& f
 		FileSize += length * sizeof(StitchBuffer[0]);
 	}
 	if (clip::iseclp(ClosestFormToCursor)) {
-		FileSize += SelectedForm->clipEntries * sizeof(ClipPoints[0]);
+		FileSize += SelectedForm->clipEntries * sizeof((*ClipPoints)[0]);
 	}
 	if (clip::isclpx(ClosestFormToCursor)) {
-		FileSize += SelectedForm->lengthOrCount.clipCount * sizeof(ClipPoints[0]);
+		FileSize += SelectedForm->lengthOrCount.clipCount * sizeof((*ClipPoints)[0]);
 	}
 	if (texture::istx(ClosestFormToCursor)) {
 		FileSize += SelectedForm->fillInfo.texture.count * sizeof(TexturePointsBuffer[0]);
@@ -7384,15 +7386,17 @@ void thred::internal::duclip() {
 						for (auto selectedForm : (*SelectedFormList)) {
 							SelectedForm = &((*FormList)[selectedForm]);
 							if (clip::isclpx(selectedForm)) {
-								const auto* offsetStart = &ClipPoints[SelectedForm->angleOrClipData.clip];
+								auto offsetStart = ClipPoints->begin() + SelectedForm->angleOrClipData.clip;
 								for (auto iClip = 0u; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
-									points[pointCount++] = offsetStart[iClip];
+									points[pointCount++] = *offsetStart;
+									offsetStart++;
 								}
 							}
 							if (clip::iseclp(selectedForm)) {
-								const auto* offsetStart = &ClipPoints[SelectedForm->borderClipData];
+								auto offsetStart = ClipPoints->begin() + SelectedForm->borderClipData;
 								for (auto iClip = 0u; iClip < SelectedForm->clipEntries; iClip++) {
-									points[pointCount++] = offsetStart[iClip];
+									points[pointCount++] = *offsetStart;
+									offsetStart++;
 								}
 							}
 						}
@@ -7483,16 +7487,18 @@ void thred::internal::duclip() {
 							auto mclp  = convert_ptr<fPOINT*>(&guides[iGuide]);
 							auto iClip = 0u;
 							if (clip::isclpx(ClosestFormToCursor)) {
-								const auto* offsetStart = &ClipPoints[SelectedForm->angleOrClipData.clip];
+								auto offsetStart = ClipPoints->begin() + SelectedForm->angleOrClipData.clip;
 								for (iClip = 0; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
-									mclp[iClip] = offsetStart[iClip];
+									mclp[iClip] = *offsetStart;
+									offsetStart++;
 								}
 							}
 							auto points = convert_ptr<fPOINT*>(&mclp[iClip]);
 							if (clip::iseclpx(ClosestFormToCursor)) {
-								const auto* offsetStart = &ClipPoints[SelectedForm->borderClipData];
+								auto offsetStart = ClipPoints->begin() + SelectedForm->borderClipData;
 								for (iClip = 0; iClip < SelectedForm->clipEntries; iClip++) {
-									points[iClip] = offsetStart[iClip];
+									points[iClip] = *offsetStart;
+									offsetStart++;
 								}
 							}
 							auto textures = convert_ptr<TXPNT*>(&points[iClip]);
@@ -8636,12 +8642,12 @@ void thred::internal::insfil() {
 							newSatinGuideIndex += gsl::narrow<unsigned int>(inSatinGuides.size());
 						}
 						if (fileHeader.clipDataCount) {
-							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.clipDataCount * sizeof(ClipPoints[0]));
+							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.clipDataCount * sizeof((*ClipPoints)[0]));
 							ReadFile(InsertedFileHandle, &ClipPoints[ClipPointIndex], bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								StateMap.set(StateFlag::BADFIL);
 							}
-							newClipPointIndex += BytesRead / sizeof(ClipPoints[0]);
+							newClipPointIndex += BytesRead / sizeof((*ClipPoints)[0]);
 						}
 						if (ExtendedHeader.texturePointCount) {
 							TexturePointsBuffer->resize(TexturePointsBuffer->size() + ExtendedHeader.texturePointCount);
@@ -15164,16 +15170,18 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								SelectedForm = &((*FormList)[FormIndex + iForm]);
 								if (clip::isclpx(FormIndex + iForm)) {
 									SelectedForm->angleOrClipData.clip = thred::adclp(SelectedForm->lengthOrCount.clipCount);
-									auto* offsetStart                  = &ClipPoints[SelectedForm->angleOrClipData.clip];
+									auto offsetStart                   = ClipPoints->begin() + SelectedForm->angleOrClipData.clip;
 									for (auto iClip = 0u; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
-										offsetStart[iClip] = clipData[currentClip++];
+										*offsetStart = clipData[currentClip++];
+										offsetStart++;
 									}
 								}
 								if (clip::iseclpx(FormIndex + iForm)) {
 									SelectedForm->borderClipData = thred::adclp(SelectedForm->clipEntries);
-									auto* offsetStart            = &ClipPoints[SelectedForm->borderClipData];
+									auto offsetStart             = ClipPoints->begin() + SelectedForm->borderClipData;
 									for (auto iClip = 0u; iClip < SelectedForm->clipEntries; iClip++) {
-										offsetStart[iClip] = clipData[currentClip++];
+										*offsetStart = clipData[currentClip++];
+										offsetStart++;
 									}
 								}
 							}
@@ -15244,19 +15252,15 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								auto clipCount = 0u;
 								if (clip::isclpx(FormIndex)) {
 									formIter.angleOrClipData.clip = thred::adclp(formIter.lengthOrCount.clipCount);
-									std::copy(clipData,
-									          clipData + formIter.lengthOrCount.clipCount,
-									          stdext::make_checked_array_iterator(&ClipPoints[formIter.angleOrClipData.clip],
-									                                              formIter.lengthOrCount.clipCount));
+									auto destination              = ClipPoints->begin() + formIter.angleOrClipData.clip;
+									std::copy(clipData, clipData + formIter.lengthOrCount.clipCount, destination);
 									clipCount += formIter.lengthOrCount.clipCount;
 								}
 								if (clip::iseclpx(FormIndex)) {
 									clipData                = convert_ptr<fPOINT*>(&clipData[clipCount]);
 									formIter.borderClipData = thred::adclp(formIter.clipEntries);
-									std::copy(clipData,
-									          clipData + formIter.clipEntries,
-									          stdext::make_checked_array_iterator(&ClipPoints[formIter.borderClipData],
-									                                              formIter.clipEntries));
+									auto destination        = ClipPoints->begin() + formIter.borderClipData;
+									std::copy(clipData, clipData + formIter.clipEntries, destination);
 									clipCount += formIter.clipEntries;
 								}
 								auto textureSource = convert_ptr<TXPNT*>(&clipData[clipCount]);
@@ -18651,6 +18655,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		TempPolygon                      = &private_TempPolygon;
 		auto private_ClipBuffer          = std::vector<fPOINTATTR>{};
 		ClipBuffer                       = &private_ClipBuffer;
+		auto private_ClipPoints          = std::vector<fPOINT>{};
+		ClipPoints                       = &private_ClipPoints;
 		auto private_OutsidePointList    = std::vector<fPOINT>{};
 		OutsidePointList                 = &private_OutsidePointList;
 		auto private_InsidePointList     = std::vector<fPOINT>{};
