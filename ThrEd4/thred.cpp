@@ -6872,8 +6872,8 @@ void thred::internal::lodclp(unsigned iStitch) {
 	ClosestPointIndex = iStitch;
 	for (auto& clip : *ClipBuffer) {
 		StitchBuffer[iStitch++] = { clip.x + adjustment.x,
-			                        clip.y + adjustment.y,
-			                        clip.attribute & COLMSK | LayerIndex | NOTFRM };
+									clip.y + adjustment.y,
+									clip.attribute & COLMSK | LayerIndex | NOTFRM };
 	}
 	GroupStitchIndex = iStitch - 1;
 	StateMap.set(StateFlag::GRPSEL);
@@ -8580,22 +8580,22 @@ void thred::internal::insfil() {
 						auto newClipPointIndex  = ClipPointIndex;
 						auto newTextureIndex    = TextureIndex;
 						if (version < 2) {
-							auto formHeader = std::vector<FRMHEDO>(fileHeader.formCount);
+							auto inFormList = std::vector<FRMHEDO>(fileHeader.formCount);
 							ReadFile(InsertedFileHandle,
-								formHeader.data(),
-								fileHeader.formCount * sizeof(formHeader[0]),
-								&BytesRead,
-								nullptr);
-							if (BytesRead != fileHeader.formCount * sizeof(formHeader[0])) {
-								formHeader.resize(BytesRead / sizeof(formHeader[0]));
+							         inFormList.data(),
+							         fileHeader.formCount * sizeof(inFormList[0]),
+							         &BytesRead,
+							         nullptr);
+							if (BytesRead != fileHeader.formCount * sizeof(inFormList[0])) {
+								inFormList.resize(BytesRead / sizeof(inFormList[0]));
 								StateMap.set(StateFlag::BADFIL);
 							}
 							if (FormIndex + fileHeader.formCount < MAXFORMS) {
-								for (auto form : formHeader) {
+								for (auto form : inFormList) {
 									(*FormList).emplace_back(FRMHED{ form });
 								}
 							}
-							FormIndex += gsl::narrow<unsigned int>(formHeader.size());
+							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
 						}
 						else {
 							auto inFormList = std::vector<FRMHEDOUT>(fileHeader.formCount);
@@ -8605,7 +8605,11 @@ void thred::internal::insfil() {
 								inFormList.resize(BytesRead / sizeof(inFormList[0]));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							std::copy(inFormList.cbegin(), inFormList.cend(), (*FormList).begin());
+							if (FormIndex + fileHeader.formCount < MAXFORMS) {
+								for (auto form : inFormList) {
+									(*FormList).emplace_back(FRMHED{ form });
+								}
+							}
 							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
 						}
 						if (fileHeader.vertexCount) {
