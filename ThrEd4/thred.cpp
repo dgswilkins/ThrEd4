@@ -6852,8 +6852,8 @@ void thred::internal::lodclp(unsigned iStitch) {
 	if (PCSHeader.stitchCount) {
 		source--;
 	}
-	const auto clipSize = ClipBuffer->size();
-	auto destination = PCSHeader.stitchCount + gsl::narrow<unsigned int>(clipSize);
+	const auto clipSize    = ClipBuffer->size();
+	auto       destination = PCSHeader.stitchCount + gsl::narrow<unsigned int>(clipSize);
 	if (PCSHeader.stitchCount || clipSize) {
 		destination--;
 	}
@@ -6871,9 +6871,7 @@ void thred::internal::lodclp(unsigned iStitch) {
 	}
 	ClosestPointIndex = iStitch;
 	for (auto& clip : *ClipBuffer) {
-		StitchBuffer[iStitch++] = { clip.x + adjustment.x,
-									clip.y + adjustment.y,
-									clip.attribute & COLMSK | LayerIndex | NOTFRM };
+		StitchBuffer[iStitch++] = { clip.x + adjustment.x, clip.y + adjustment.y, clip.attribute & COLMSK | LayerIndex | NOTFRM };
 	}
 	GroupStitchIndex = iStitch - 1;
 	StateMap.set(StateFlag::GRPSEL);
@@ -8372,9 +8370,9 @@ void thred::redclp() {
 
 	ClipPointer = GlobalLock(ClipMemory);
 	if (ClipPointer) {
-		ClipStitchData   = static_cast<CLPSTCH*>(ClipPointer);
-		const auto clipSize = ClipStitchData[0].led;
-		auto& clipBuffer = *ClipBuffer;
+		ClipStitchData        = static_cast<CLPSTCH*>(ClipPointer);
+		const auto clipSize   = ClipStitchData[0].led;
+		auto&      clipBuffer = *ClipBuffer;
 		clipBuffer.clear();
 		clipBuffer.reserve(clipSize);
 
@@ -8598,7 +8596,7 @@ void thred::internal::insfil() {
 							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
 						}
 						else {
-							auto inFormList = std::vector<FRMHEDOUT>(fileHeader.formCount);
+							auto inFormList  = std::vector<FRMHEDOUT>(fileHeader.formCount);
 							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.formCount * sizeof(inFormList[0]));
 							ReadFileInt(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {

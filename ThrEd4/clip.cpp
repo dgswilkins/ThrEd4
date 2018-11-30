@@ -184,7 +184,7 @@ unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) {
 }
 
 unsigned int clip::numclp() {
-	auto clipSize = gsl::narrow<unsigned int>(ClipBuffer->size());
+	auto       clipSize    = gsl::narrow<unsigned int>(ClipBuffer->size());
 	const auto find        = ci::findclp(ClosestFormToCursor);
 	auto       source      = ClipPointIndex - 1;
 	auto       destination = ClipPointIndex + clipSize - 1;

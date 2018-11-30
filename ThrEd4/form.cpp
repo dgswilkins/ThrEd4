@@ -5704,7 +5704,7 @@ void form::bord() {
 
 void form::internal::fsclp() {
 	clip::deleclp(ClosestFormToCursor);
-	const auto clipSize = ClipBuffer->size();
+	const auto clipSize          = ClipBuffer->size();
 	SelectedForm->edgeType       = EDGECLIP;
 	SelectedForm->clipEntries    = clipSize;
 	SelectedForm->borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
@@ -7707,7 +7707,7 @@ void form::boxsel() {
 
 void form::internal::fspic() {
 	clip::deleclp(ClosestFormToCursor);
-	const auto clipSize = ClipBuffer->size();
+	const auto clipSize          = ClipBuffer->size();
 	SelectedForm->edgeType       = EDGEPICOT;
 	SelectedForm->clipEntries    = clipSize;
 	SelectedForm->borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
@@ -8525,7 +8525,7 @@ void form::horsclp() {
 	form::fvars(ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
 	texture::deltx();
-	const auto clipSize = ClipBuffer->size();
+	const auto clipSize                   = ClipBuffer->size();
 	SelectedForm->lengthOrCount.clipCount = clipSize;
 	SelectedForm->angleOrClipData.clip    = clip::numclp();
 	SelectedForm->lengthOrCount.clipCount = clipSize;
@@ -8859,7 +8859,7 @@ void form::crop() {
 
 void form::internal::fsclpx() {
 	clip::deleclp(ClosestFormToCursor);
-	const auto clipSize = ClipBuffer->size();
+	const auto clipSize          = ClipBuffer->size();
 	SelectedForm->edgeType       = EDGECLIPX;
 	SelectedForm->clipEntries    = clipSize;
 	SelectedForm->borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
