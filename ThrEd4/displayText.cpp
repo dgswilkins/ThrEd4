@@ -68,7 +68,7 @@ inline void displayText::loadString(std::wstring& sDest, unsigned stringID) {
 
 void displayText::shoMsg(const std::wstring& message) {
 	if (!message.empty()) {
-		auto strings = std::vector<std::wstring>();
+		auto strings = std::vector<std::wstring>{};
 
 		auto       iString              = 0u;
 		auto       previousStringLength = 0u;

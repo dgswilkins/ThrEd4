@@ -355,7 +355,7 @@ void texture::internal::px2ed(const POINT& point, fPOINT& editPoint) noexcept {
 }
 
 void texture::internal::chktx() {
-	auto tmpTexture = std::vector<TXPNT>();
+	auto tmpTexture = std::vector<TXPNT>{};
 	for (auto& p : *TempTexturePoints) {
 		if (p.line <= TextureScreen.lines && p.y <= TextureScreen.areaHeight) {
 			tmpTexture.push_back(p);
@@ -1022,7 +1022,7 @@ void texture::deltx() {
 		}
 		// Only if it is not shared, should the texture be deleted
 		if (!flag) {
-			auto textureBuffer = std::vector<TXPNT>();
+			auto textureBuffer = std::vector<TXPNT>{};
 			textureBuffer.reserve(TextureIndex);
 			auto iBuffer = 0u;
 			for (auto iForm = 0u; iForm < ClosestFormToCursor; iForm++) {
@@ -1335,7 +1335,7 @@ void texture::internal::txtdel() {
 		}
 		// Another potential pattern for this:
 		// myVector.erase(remove_if(myVector.begin(), myVector.end(), testFunction), myVector.end());
-		auto tmpTexture = std::vector<TXPNT>();
+		auto tmpTexture = std::vector<TXPNT>{};
 		tmpTexture.reserve(TempTexturePoints->size() - SelectedTexturePointsList->size());
 		for (auto iSourcePoint = 0u; iSourcePoint < TempTexturePoints->size(); iSourcePoint++) {
 			if (!texturePointsMap.test(iSourcePoint)) {

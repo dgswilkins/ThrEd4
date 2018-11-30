@@ -2245,7 +2245,7 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 	auto       fillLineCount   = gsl::narrow<unsigned int>(std::floor((static_cast<double>(highX) - lowX) / LineSpacing + 1));
 	const auto step            = (highX - lowX) / fillLineCount;
 	auto       currentX        = lowX;
-	auto       projectedPoints = std::vector<dPOINTLINE>();
+	auto       projectedPoints = std::vector<dPOINTLINE>{};
 	projectedPoints.reserve(gsl::narrow_cast<size_t>(VertexCount) + 2);
 	for (auto iLine = 0u; iLine < fillLineCount; iLine++) {
 		auto iLineCounter = 0u;
@@ -3043,7 +3043,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 	auto lengths                  = std::vector<double>(VertexCount);
 	auto clipSideLengths          = std::vector<double>(VertexCount);   // lengths of form sides for clipboard fill
 	auto clipIntersectData        = std::vector<CLIPSORT>(VertexCount); // intersect points for clipboard fill
-	auto arrayOfClipIntersectData = std::vector<CLIPSORT*>();
+	auto arrayOfClipIntersectData = std::vector<CLIPSORT*>{};
 	arrayOfClipIntersectData.reserve(VertexCount);
 	auto vertex      = leftsid();
 	auto totalLength = 0.0;
@@ -3108,7 +3108,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 		}
 	}
 	std::sort(regionCrossingData.begin(), regionCrossingData.end(), clpcmp);
-	auto iclpx = std::vector<unsigned>();
+	auto iclpx = std::vector<unsigned>{};
 	iclpx.reserve(regionCrossingData.size());
 	auto regionSegment = regionCrossingData[0].segment;
 	iclpx.push_back(0);
@@ -3136,7 +3136,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 		}
 	}
 	ActivePointIndex      = 0;
-	auto clipStitchPoints = std::vector<CLIPNT>();
+	auto clipStitchPoints = std::vector<CLIPNT>{};
 	// Reserve some memory, but probably not enough
 	clipStitchPoints.reserve(1000);
 	auto pasteLocation = fPOINT{};
@@ -3268,7 +3268,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 #if CLPVU == 0
 	StateMap.reset(StateFlag::FILDIR);
 	auto previousPoint = 0u;
-	auto clipSegments  = std::vector<CLPSEG>();
+	auto clipSegments  = std::vector<CLPSEG>{};
 	auto endPoint      = clipStitchPoints.size();
 	if (endPoint) {
 		endPoint--;
@@ -3300,7 +3300,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 #endif
 
 	if (!clipSegments.empty()) {
-		auto sortedLengths = std::vector<LENINFO>();
+		auto sortedLengths = std::vector<LENINFO>{};
 		sortedLengths.reserve(clipSegments.size() * 2);
 		for (auto iSegment = 0u; iSegment < clipSegments.size(); iSegment++) {
 			sortedLengths.push_back({ iSegment, false, clipSegments[iSegment].beginLength });
@@ -4239,7 +4239,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 #endif
 
 	if (!lineEndpoints.empty()) {
-		auto       sortedLines     = std::vector<SMALPNTL*>();
+		auto       sortedLines     = std::vector<SMALPNTL*>{};
 		const auto stitchLineCount = lineEndpoints.size();
 		sortedLines.reserve(stitchLineCount >> 1);
 		for (auto iLine = 0u; iLine < stitchLineCount; iLine += 2) {
@@ -4247,7 +4247,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 		}
 		std::sort(sortedLines.begin(), sortedLines.end(), sqcomp);
 		const auto lineCount = gsl::narrow<unsigned int>(sortedLines.size());
-		auto       regions   = std::vector<REGION>();
+		auto       regions   = std::vector<REGION>{};
 		regions.emplace_back(REGION{ 0u, 0u, 0u, 0u });
 		auto breakLine = sortedLines[0]->line;
 		for (auto iLine = 0u; iLine < lineCount; iLine++) {
@@ -4306,7 +4306,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 #else
 		OutputIndex = 0;
 
-		auto mapIndexSequence = std::vector<unsigned>();
+		auto mapIndexSequence = std::vector<unsigned>{};
 		mapIndexSequence.reserve(gsl::narrow_cast<size_t>(regionCount) + 1);
 		auto pathMap      = std::vector<RCON>{};
 		auto sequencePath = std::vector<FSEQ>{};
@@ -4880,8 +4880,8 @@ void form::refilfn() {
 		if (SelectedForm->fillType) {
 			const auto spacing      = LineSpacing;
 			LineSpacing             = SelectedForm->fillSpacing;
-			auto lineEndpoints      = std::vector<SMALPNTL>();
-			auto groupIndexSequence = std::vector<unsigned>();
+			auto lineEndpoints      = std::vector<SMALPNTL>{};
+			auto groupIndexSequence = std::vector<unsigned>{};
 			auto rotationCenter     = dPOINT{};
 			auto doFill             = true;
 			auto rotationAngle      = 0.0;

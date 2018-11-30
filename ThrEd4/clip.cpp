@@ -619,9 +619,9 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 
 void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 	form::duangs();
-	auto listSINEs = std::vector<double>();
+	auto listSINEs = std::vector<double>{};
 	listSINEs.reserve(gsl::narrow<size_t>(VertexCount) + 1);
-	auto listCOSINEs = std::vector<double>();
+	auto listCOSINEs = std::vector<double>{};
 	listCOSINEs.reserve(VertexCount);
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 		listSINEs.push_back(sin((*FormAngles)[iVertex]));
@@ -634,7 +634,7 @@ void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 }
 
 void clip::internal::dulast(std::vector<fPOINT>& chainEndPoints) {
-	auto tempClipPoints = std::vector<fPOINT>();
+	auto tempClipPoints = std::vector<fPOINT>{};
 	tempClipPoints.reserve(chainEndPoints.size());
 	if (form::lastch()) {
 		auto minimumLength = 1e99;
@@ -691,11 +691,11 @@ void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
 }
 
 void clip::duxclp() {
-	auto chainEndPoints = std::vector<fPOINT>();
+	auto chainEndPoints = std::vector<fPOINT>{};
 	// reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
 	chainEndPoints.reserve(50);
 	ci::dufxlen(chainEndPoints);
-	auto tempClipPoints = std::vector<fPOINT>();
+	auto tempClipPoints = std::vector<fPOINT>{};
 	tempClipPoints.reserve(ClipStitchCount);
 	ci::clpxadj(tempClipPoints, chainEndPoints);
 	SequenceIndex = 0;
@@ -900,7 +900,7 @@ void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 }
 
 void clip::chnfn() {
-	auto chainEndPoints = std::vector<fPOINT>();
+	auto chainEndPoints = std::vector<fPOINT>{};
 	// reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
 	chainEndPoints.reserve(50);
 	form::fvars(ClosestFormToCursor);

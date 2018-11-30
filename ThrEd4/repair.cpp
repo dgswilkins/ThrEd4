@@ -280,7 +280,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 	auto badClipCount = 0u;
 	auto clipCount    = 0u;
 
-	auto clipPoint = std::vector<fPOINT>();
+	auto clipPoint = std::vector<fPOINT>{};
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		auto& form           = (*FormList)[iForm];
 		auto  clipDifference = 0u;

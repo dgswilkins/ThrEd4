@@ -898,9 +898,9 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		}
 		const auto line1Segments     = ((line1End > line1Start) ? (line1End - line1Start) : (line1Start - line1End));
 		const auto line2Segments     = ((line2Start > line2End) ? (line2Start - line2End) : (line2End - line2Start));
-		auto       line1StitchCounts = std::vector<unsigned>();
+		auto       line1StitchCounts = std::vector<unsigned>{};
 		line1StitchCounts.reserve(line1Segments);
-		auto line2StitchCounts = std::vector<unsigned>();
+		auto line2StitchCounts = std::vector<unsigned>{};
 		line2StitchCounts.reserve(line2Segments);
 		auto iVertex            = line1Start;
 		auto segmentStitchCount = 0u;
@@ -1113,7 +1113,7 @@ void satin::satfil() {
 	StateMap.reset(StateFlag::SAT1);
 	StateMap.reset(StateFlag::FILDIR);
 	SelectedForm->fillType = SATF;
-	auto lengths           = std::vector<double>();
+	auto lengths           = std::vector<double>{};
 	lengths.reserve(gsl::narrow<size_t>(VertexCount) + 1);
 	auto length = 0.0;
 	lengths.push_back(length);
