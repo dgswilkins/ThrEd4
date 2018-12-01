@@ -8467,11 +8467,10 @@ void form::vrtsclp() {
 	SelectedForm->wordParam               = IniFile.fillPhase;
 	fi::makpoli();
 	SelectedForm->fillSpacing = IniFile.clipOffset;
-	//auto offsetStart          = ClipPoints->begin() + SelectedForm->angleOrClipData.clip;
+	auto offsetStart          = ClipPoints->begin() + SelectedForm->angleOrClipData.clip;
 	for (auto& clip : *ClipBuffer) {
-		//*offsetStart = clip;
-		//offsetStart++;
-		ClipPoints->emplace_back(fPOINT{ clip.x, clip.y });
+		*offsetStart = clip;
+		offsetStart++;
 	}
 	SelectedForm->fillType  = VCLPF;
 	SelectedForm->fillColor = gsl::narrow<unsigned char>(ActiveColor);

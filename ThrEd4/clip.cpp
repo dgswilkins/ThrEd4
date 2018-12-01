@@ -184,13 +184,11 @@ unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) {
 unsigned int clip::numclp() {
 	auto       clipSize    = gsl::narrow<unsigned int>(ClipBuffer->size());
 	const auto find        = ci::findclp(ClosestFormToCursor);
-	auto       source      = ClipPointIndex - 1;
-	auto       destination = ClipPointIndex + clipSize - 1;
+	const auto it = ClipPoints->begin() + find;
+	const auto val = fPOINT{};
+	ClipPoints->insert(it, clipSize, val);
 	auto&      formList    = *FormList;
 
-	while ((source + 1) > find) {
-		(*ClipPoints)[destination--] = (*ClipPoints)[source--];
-	}
 	formList[ClosestFormToCursor].angleOrClipData.clip = find;
 	if (clip::iseclpx(ClosestFormToCursor)) {
 		formList[ClosestFormToCursor].borderClipData += clipSize;
