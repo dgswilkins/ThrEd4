@@ -108,9 +108,9 @@ void clip::internal::clpsub(unsigned int fpnt, unsigned int cnt) {
 void clip::delmclp(unsigned int iForm) {
 	if (ClipPointIndex) {
 		if (clip::isclp(iForm)) {
-			auto&      form        = (*FormList)[iForm];
-			const auto destIndex   = ci::findclp(iForm);
-			auto       eraseStart = ClipPoints->begin() + destIndex ;
+			auto&      form       = (*FormList)[iForm];
+			const auto destIndex  = ci::findclp(iForm);
+			auto       eraseStart = ClipPoints->begin() + destIndex;
 			auto       eraseEnd   = eraseStart + form.lengthOrCount.clipCount;
 			ClipPoints->erase(eraseStart, eraseEnd);
 			if (clip::iseclp(iForm)) {
@@ -131,15 +131,13 @@ void clip::delmclp(unsigned int iForm) {
 void clip::deleclp(unsigned int iForm) {
 	if (ClipPointIndex != 0u) {
 		if (clip::iseclpx(iForm)) {
-			auto& form        = (*FormList)[iForm];
-			//auto  destination = ci::findclp(iForm);
-			//auto  source      = destination + form.clipEntries;
-			//while (source < ClipPointIndex) {
-			//	(*ClipPoints)[destination++] = (*ClipPoints)[source++];
-			//}
-			const auto destIndex = ci::findclp(iForm);
-			auto       eraseStart = ClipPoints->begin() + destIndex;
-			auto       eraseEnd = eraseStart + form.clipEntries;
+			auto& form = (*FormList)[iForm];
+			auto destIndex = ci::findclp(iForm);
+			if (clip::isclpx(iForm)) {
+				destIndex += form.lengthOrCount.clipCount;
+			}
+			auto eraseStart = ClipPoints->begin() + destIndex;
+			auto eraseEnd   = eraseStart + form.clipEntries;
 			ClipPoints->erase(eraseStart, eraseEnd);
 			ci::clpsub(iForm, form.clipEntries);
 			if (ClipPointIndex > form.clipEntries) {
@@ -159,12 +157,12 @@ void clip::delclps(unsigned int iForm) {
 }
 
 unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) {
-	auto  find        = ci::findclp(currentForm);
-	auto& formList    = *FormList;
+	auto  find     = ci::findclp(currentForm);
+	auto& formList = *FormList;
 	if (clip::isclp(currentForm)) {
 		find += formList[currentForm].lengthOrCount.clipCount;
 	}
-	const auto it = ClipPoints->begin() + find;
+	const auto it  = ClipPoints->begin() + find;
 	const auto val = fPOINT{};
 	ClipPoints->insert(it, count, val);
 	for (auto iform = currentForm; iform < FormIndex; iform++) {
@@ -182,12 +180,12 @@ unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) {
 }
 
 unsigned int clip::numclp() {
-	auto       clipSize    = gsl::narrow<unsigned int>(ClipBuffer->size());
-	const auto find        = ci::findclp(ClosestFormToCursor);
-	const auto it = ClipPoints->begin() + find;
-	const auto val = fPOINT{};
+	auto       clipSize = gsl::narrow<unsigned int>(ClipBuffer->size());
+	const auto find     = ci::findclp(ClosestFormToCursor);
+	const auto it       = ClipPoints->begin() + find;
+	const auto val      = fPOINT{};
 	ClipPoints->insert(it, clipSize, val);
-	auto&      formList    = *FormList;
+	auto& formList = *FormList;
 
 	formList[ClosestFormToCursor].angleOrClipData.clip = find;
 	if (clip::iseclpx(ClosestFormToCursor)) {
