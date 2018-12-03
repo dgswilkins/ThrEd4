@@ -132,11 +132,15 @@ void clip::deleclp(unsigned int iForm) {
 	if (ClipPointIndex != 0u) {
 		if (clip::iseclpx(iForm)) {
 			auto& form        = (*FormList)[iForm];
-			auto  destination = ci::findclp(iForm);
-			auto  source      = destination + form.clipEntries;
-			while (source < ClipPointIndex) {
-				(*ClipPoints)[destination++] = (*ClipPoints)[source++];
-			}
+			//auto  destination = ci::findclp(iForm);
+			//auto  source      = destination + form.clipEntries;
+			//while (source < ClipPointIndex) {
+			//	(*ClipPoints)[destination++] = (*ClipPoints)[source++];
+			//}
+			const auto destIndex = ci::findclp(iForm);
+			auto       eraseStart = ClipPoints->begin() + destIndex;
+			auto       eraseEnd = eraseStart + form.clipEntries;
+			ClipPoints->erase(eraseStart, eraseEnd);
 			ci::clpsub(iForm, form.clipEntries);
 			if (ClipPointIndex > form.clipEntries) {
 				ClipPointIndex -= form.clipEntries;
@@ -155,18 +159,14 @@ void clip::delclps(unsigned int iForm) {
 }
 
 unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) {
-	auto  find        = ci::findclp(ClosestFormToCursor);
-	auto  destination = ClipPointIndex + count - 1u;
+	auto  find        = ci::findclp(currentForm);
 	auto& formList    = *FormList;
-	if (clip::isclp(ClosestFormToCursor)) {
-		find += formList[ClosestFormToCursor].lengthOrCount.clipCount;
+	if (clip::isclp(currentForm)) {
+		find += formList[currentForm].lengthOrCount.clipCount;
 	}
-	if (ClipPointIndex) {
-		auto source = ClipPointIndex - 1;
-		while (source + 1 >= find + 1) {
-			(*ClipPoints)[destination--] = (*ClipPoints)[source--];
-		}
-	}
+	const auto it = ClipPoints->begin() + find;
+	const auto val = fPOINT{};
+	ClipPoints->insert(it, count, val);
 	for (auto iform = currentForm; iform < FormIndex; iform++) {
 		if (clip::iseclpx(iform)) {
 			formList[iform].borderClipData += count;
