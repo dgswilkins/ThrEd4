@@ -8324,11 +8324,10 @@ void form::mvfltsb(fPOINT* const destination, const fPOINT* const source, unsign
 }
 
 void form::clpspac(const unsigned insertPoint, unsigned int count) {
-	// form::mvfltsb(&ClipPoints[ClipPointIndex + count - 1], &ClipPoints[ClipPointIndex - 1], ClipPointIndex - insertPoint);
-	auto sourceStart = ClipPoints->begin() + ClipPointIndex - 1;
-	auto sourceEnd   = sourceStart + ClipPointIndex - insertPoint;
-	auto destination = sourceStart + count;
-	std::copy(sourceStart, sourceEnd, destination);
+	auto sourceStart = ClipPoints->begin() + insertPoint;
+	auto sourceEnd   = sourceStart + count;
+	ClipPoints->insert(sourceStart, sourceStart, sourceEnd);
+	ClipPointIndex += count;
 }
 
 void form::stchadj() {
