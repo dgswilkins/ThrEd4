@@ -4910,6 +4910,7 @@ void thred::internal::redbak() {
 		FormVertexIndex = undoData->vertexCount;
 		satin::cpyUndoGuides(*undoData);
 		if (undoData->clipPointCount) {
+			ClipPoints->resize(undoData->clipPointCount);
  			std::copy(undoData->clipPoints, undoData->clipPoints + undoData->clipPointCount, ClipPoints->begin());
 		}
 		ClipPointIndex  = undoData->clipPointCount;
