@@ -1196,8 +1196,10 @@ fPOINT* thred::adflt(unsigned int count) {
 }
 
 unsigned int thred::adclp(unsigned int count) noexcept {
-	const auto iClipPoint = ClipPointIndex;
-
+	const auto iClipPoint = ClipPoints->size();
+	const auto it = ClipPoints->end();
+	const auto val = fPOINT{};
+	ClipPoints->insert(it, count, val);
 	ClipPointIndex += count;
 	return iClipPoint;
 }

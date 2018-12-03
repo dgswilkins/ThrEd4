@@ -7247,8 +7247,8 @@ void form::internal::adfrm(unsigned int iForm) {
 	if (clip::iseclpx(ClosestFormToCursor)) {
 		formHeader.borderClipData = thred::adclp(formHeader.clipEntries);
 		auto offsetStart          = ClipPoints->begin() + SelectedForm->borderClipData;
-		// ToDo - Does this make sense?
-		std::copy(offsetStart, offsetStart + SelectedForm->clipEntries, offsetStart);
+		auto destination = ClipPoints->begin() + formHeader.borderClipData;
+		std::copy(offsetStart, offsetStart + SelectedForm->clipEntries, destination);
 	}
 	if (clip::isclpx(ClosestFormToCursor)) {
 		formHeader.angleOrClipData.clip = thred::adclp(formHeader.lengthOrCount.clipCount);
