@@ -4907,7 +4907,7 @@ void thred::internal::redbak() {
 		satin::cpyUndoGuides(*undoData);
 		if (undoData->clipPointCount) {
 			ClipPoints->resize(undoData->clipPointCount);
- 			std::copy(undoData->clipPoints, undoData->clipPoints + undoData->clipPointCount, ClipPoints->begin());
+			std::copy(undoData->clipPoints, undoData->clipPoints + undoData->clipPointCount, ClipPoints->begin());
 		}
 		auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
 		std::copy(undoData->colors, undoData->colors + sizeColors, UserColor);
@@ -8583,7 +8583,7 @@ void thred::internal::insfil() {
 						auto newFormVertexIndex = FormVertexIndex;
 						auto newSatinGuideIndex = satin::getGuideSize();
 						auto clipOffset  = ClipPoints->size();
-						auto newTextureIndex    = TextureIndex;
+						auto textureOffset    = TexturePointsBuffer->size();
 						if (version < 2) {
 							auto inFormList = std::vector<FRMHEDO>(fileHeader.formCount);
 							ReadFile(InsertedFileHandle,
@@ -8654,13 +8654,15 @@ void thred::internal::insfil() {
 							ClipPoints->insert(ClipPoints->end(), tempClipPoints.begin(), tempClipPoints.end());
 							//clipOffset += BytesRead / sizeof((*ClipPoints)[0]);
 						}
-						if (ExtendedHeader.texturePointCount) {
-							TexturePointsBuffer->resize(TexturePointsBuffer->size() + ExtendedHeader.texturePointCount);
+						if (thredHeader.texturePointCount) {
+							auto tempTextureBuffer = std::vector<TXPNT>{};
+							tempTextureBuffer.resize(thredHeader.texturePointCount);
 							ReadFile(InsertedFileHandle,
-							         &TexturePointsBuffer[TextureIndex],
-							         ExtendedHeader.texturePointCount * sizeof(TexturePointsBuffer[0]),
+							         tempTextureBuffer.data(),
+							         thredHeader.texturePointCount * sizeof(tempTextureBuffer[0]),
 							         &BytesRead,
 							         nullptr);
+							TexturePointsBuffer->insert(TexturePointsBuffer->end(), tempTextureBuffer.begin(), tempTextureBuffer.end());
 						}
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = nullptr;
@@ -8682,8 +8684,8 @@ void thred::internal::insfil() {
 								clipOffset += formIter.clipEntries;
 							}
 							if (texture::istx(iFormList)) {
-								formIter.fillInfo.texture.index += gsl::narrow<unsigned short>(TextureIndex);
-								newTextureIndex += formIter.fillInfo.texture.count;
+								formIter.fillInfo.texture.index = gsl::narrow<decltype(formIter.fillInfo.texture.index)>(textureOffset);
+								textureOffset += formIter.fillInfo.texture.count;
 							}
 						}
 						if (newFormVertexIndex != FormVertexIndex) {
@@ -8696,7 +8698,7 @@ void thred::internal::insfil() {
 							StateMap.set(StateFlag::BADFIL);
 						}
 
-						TextureIndex = newTextureIndex;
+						TextureIndex = textureOffset;
 						if (fileHeader.formCount) {
 							insertedRectangle.left = insertedRectangle.right = FormVertices[InsertedVertexIndex].x;
 							insertedRectangle.bottom = insertedRectangle.top = FormVertices[InsertedVertexIndex].y;
