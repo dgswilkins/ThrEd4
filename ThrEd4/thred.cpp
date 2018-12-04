@@ -8672,9 +8672,6 @@ void thred::internal::insfil() {
 								if (formIter.satinGuideCount) {
 									formIter.satinOrAngle.guide = satin::adsatk(formIter.satinGuideCount);
 								}
-								if (clip::isclpx(iFormList)) {
-									formIter.angleOrClipData.clip = thred::adclp(formIter.lengthOrCount.clipCount);
-								}
 							}
 							if (clip::isclp(iFormList)) {
 								formIter.angleOrClipData.clip = clipOffset;
