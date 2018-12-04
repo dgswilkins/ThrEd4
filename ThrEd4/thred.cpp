@@ -1195,7 +1195,7 @@ fPOINT* thred::adflt(unsigned int count) {
 	return &FormVertices[iFormVertex];
 }
 
-unsigned int thred::adclp(unsigned int count) noexcept {
+unsigned int thred::adclp(unsigned int count) {
 	const auto iClipPoint = ClipPoints->size();
 	const auto it = ClipPoints->end();
 	const auto val = fPOINT{};
