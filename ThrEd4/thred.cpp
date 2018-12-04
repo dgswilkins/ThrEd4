@@ -3814,7 +3814,7 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 		if (!points.empty()) {
 			durit(&output, points.data(), gsl::narrow<unsigned int>(points.size() * sizeof(points[0])));
 		}
-		if (TextureIndex) {
+		if (!TexturePointsBuffer->empty()) {
 			durit(&output,
 			      TexturePointsBuffer->data(),
 			      gsl::narrow<unsigned int>(TextureIndex * sizeof((*TexturePointsBuffer)[0])));
@@ -8638,12 +8638,12 @@ void thred::internal::insfil() {
 						if (fileHeader.dlineCount) {
 							auto inSatinGuides = std::vector<SATCONOUT>(fileHeader.dlineCount);
 							auto bytesToRead   = gsl::narrow<DWORD>(fileHeader.dlineCount * sizeof(inSatinGuides[0]));
-							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
+							ReadFile(InsertedFileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								inSatinGuides.resize(BytesRead / sizeof(inSatinGuides[0]));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							satin::cpyTmpGuides(inSatinGuides);
+							std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), SatinGuides);
 							newSatinGuideIndex += gsl::narrow<unsigned int>(inSatinGuides.size());
 						}
 						if (fileHeader.clipDataCount) {
