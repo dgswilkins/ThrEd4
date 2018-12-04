@@ -554,8 +554,9 @@ void form::ritfrct(unsigned int iForm, HDC dc) {
 
 void form::delfrms() {
 	thred::savdo();
-	FormIndex = FormVertexIndex = ClipPointIndex = 0;
-	(*FormList).clear();
+	FormIndex = FormVertexIndex = 0;
+	ClipPoints->clear();
+	FormList->clear();
 	satin::clearGuideSize();
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		StitchBuffer[iStitch].attribute &= NFRM_NTYP;
@@ -5253,7 +5254,7 @@ void form::clrfills() {
 		formIter.attribute &= NFRECONT;
 		formIter.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
 	}
-	ClipPointIndex = 0;
+	ClipPoints->clear();
 }
 
 void form::internal::ducon() noexcept {
@@ -7915,18 +7916,16 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
 	}
 	if (clip::iseclpx(formIndex)) {
 		const auto offsetStart = ClipPoints->begin() + destination.borderClipData;
-		const auto _ = std::copy(offsetStart, offsetStart + destination.clipEntries, tempClipPoints.begin() + ClipPointIndex);
+		const auto _ = std::copy(offsetStart, offsetStart + destination.clipEntries, tempClipPoints.begin() + ClipPoints->size());
 
-		destination.borderClipData = ClipPointIndex;
-		ClipPointIndex += destination.clipEntries;
+		destination.borderClipData = ClipPoints->size();
 	}
 	if (clip::isclpx(formIndex)) {
 		auto       sourceStart = ClipPoints->begin() + destination.angleOrClipData.clip;
 		auto       sourceEnd   = sourceStart + destination.lengthOrCount.clipCount;
-		const auto _           = std::copy(sourceStart, sourceEnd, tempClipPoints.begin() + ClipPointIndex);
+		const auto _           = std::copy(sourceStart, sourceEnd, tempClipPoints.begin() + ClipPoints->size());
 
-		destination.angleOrClipData.clip = ClipPointIndex;
-		ClipPointIndex += destination.lengthOrCount.clipCount;
+		destination.angleOrClipData.clip = ClipPoints->size();
 	}
 }
 
@@ -7957,9 +7956,9 @@ void form::frmnumfn(unsigned newFormIndex) {
 		auto tempFormList     = std::vector<FRMHED>(FormIndex);
 		auto tempFormVertices = std::vector<fPOINT>(FormVertexIndex);
 		auto tempGuides       = std::vector<SATCON>(satin::getGuideSize());
-		auto tempClipPoints   = std::vector<fPOINT>(ClipPointIndex);
+		auto tempClipPoints   = std::vector<fPOINT>(ClipPoints->size());
 
-		FormVertexIndex = ClipPointIndex = 0;
+		FormVertexIndex  = 0;
 		satin::clearGuideSize();
 		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 			if (iForm == newFormIndex) {
@@ -8327,7 +8326,6 @@ void form::clpspac(const unsigned insertPoint, unsigned int count) {
 	auto sourceStart = ClipPoints->begin() + insertPoint;
 	auto sourceEnd   = sourceStart + count;
 	ClipPoints->insert(sourceStart, sourceStart, sourceEnd);
-	ClipPointIndex += count;
 }
 
 void form::stchadj() {

@@ -177,7 +177,7 @@ unsigned repair::internal::frmchkfn() {
 		if (badData.flt != FormVertexIndex) {
 			badData.attribute |= BADFLT;
 		}
-		if (badData.clip != ClipPointIndex) {
+		if (badData.clip != ClipPoints->size()) {
 			badData.attribute |= BADCLP;
 		}
 		if (badData.guideCount != satin::getGuideSize()) {
@@ -287,7 +287,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		if (clip::isclp(iForm)) {
 			// ToDo - pointer arithmetic to be fixed
 			clipDifference = form.angleOrClipData.clip;
-			if (clipDifference + form.lengthOrCount.clipCount < ClipPointIndex) {
+			if (clipDifference + form.lengthOrCount.clipCount < ClipPoints->size()) {
 				clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
 				auto sourceStart = ClipPoints->begin() + form.angleOrClipData.clip;
 				auto sourceEnd   = sourceStart + form.lengthOrCount.clipCount;
@@ -298,7 +298,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 				clipCount += form.lengthOrCount.clipCount;
 			}
 			else {
-				if (clipDifference < ClipPointIndex) {
+				if (clipDifference < ClipPoints->size()) {
 					form.lengthOrCount.clipCount = gsl::narrow<unsigned int>(FormVertexIndex - clipDifference);
 					clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
 					auto sourceStart = ClipPoints->begin() + form.angleOrClipData.clip;
@@ -317,7 +317,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		}
 		if (clip::iseclp(iForm)) {
 			clipDifference = form.borderClipData;
-			if (clipDifference + form.clipEntries < ClipPointIndex) {
+			if (clipDifference + form.clipEntries < ClipPoints->size()) {
 				clipPoint.resize(clipPoint.size() + form.clipEntries);
 				auto sourceStart = ClipPoints->begin() + form.borderClipData;
 				auto sourceEnd   = sourceStart + form.clipEntries;
@@ -328,7 +328,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 				clipCount += form.clipEntries;
 			}
 			else {
-				if (clipDifference < ClipPointIndex) {
+				if (clipDifference < ClipPoints->size()) {
 					form.clipEntries = gsl::narrow<unsigned short>(FormVertexIndex - clipDifference);
 					clipPoint.resize(clipPoint.size() + form.clipEntries);
 					auto sourceStart = ClipPoints->begin() + form.borderClipData;
@@ -347,7 +347,6 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		}
 	}
 	std::copy(clipPoint.cbegin(), clipPoint.cend(), ClipPoints->begin());
-	ClipPointIndex = clipCount;
 	if (badClipCount) {
 		ri::adbad(repairMessage, IDS_CLPDAT, badClipCount);
 	}
