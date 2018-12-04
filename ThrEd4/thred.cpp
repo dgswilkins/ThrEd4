@@ -5703,6 +5703,7 @@ void thred::internal::nuFil() {
 						}
 						else {
 							TextureIndex = 0;
+							TexturePointsBuffer->clear();
 						}
 						if (StateMap.testAndReset(StateFlag::BADFIL)) {
 							displayText::bfilmsg();
@@ -6752,8 +6753,11 @@ void thred::internal::newFil() {
 	PCSBMPFileName[0]     = 0;
 	PCSHeader.stitchCount = 0;
 	FormVertexIndex       = 0;
+	TexturePointsBuffer->clear();
 	TextureIndex          = 0;
+	ClipPoints->clear();
 	satin::clearGuideSize();
+	FormList->clear();
 	FormIndex    = 0;
 	ColorChanges = 0;
 	KnotCount    = 0;
@@ -8657,11 +8661,16 @@ void thred::internal::insfil() {
 						if (thredHeader.texturePointCount) {
 							auto tempTextureBuffer = std::vector<TXPNT>{};
 							tempTextureBuffer.resize(thredHeader.texturePointCount);
+							auto bytesToRead = gsl::narrow<DWORD>(thredHeader.texturePointCount * sizeof(tempTextureBuffer[0]));
 							ReadFile(InsertedFileHandle,
 							         tempTextureBuffer.data(),
-							         thredHeader.texturePointCount * sizeof(tempTextureBuffer[0]),
+									 bytesToRead,
 							         &BytesRead,
 							         nullptr);
+							if (BytesRead != bytesToRead) {
+								tempTextureBuffer.resize(BytesRead / sizeof(tempTextureBuffer[0]));
+								StateMap.set(StateFlag::BADFIL);
+							}
 							TexturePointsBuffer->insert(TexturePointsBuffer->end(), tempTextureBuffer.begin(), tempTextureBuffer.end());
 						}
 						CloseHandle(InsertedFileHandle);
