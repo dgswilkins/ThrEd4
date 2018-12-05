@@ -3154,8 +3154,10 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 			auto  lineSegmentStart   = fPOINT{}; // vertical clipboard line segment start
 			auto  lineSegmentEnd     = fPOINT{}; // vertical clipboard line segment end
 			auto& clipBuffer         = *ClipBuffer;
+			auto  clipStitchCount    = ClipBuffer->size();
 			if (StateMap.test(StateFlag::TXFIL)) {
 				const auto textureLine = (iRegion + clipGrid.left) % SelectedForm->fillInfo.texture.lines;
+				clipStitchCount        = textureSegments[textureLine].stitchCount;
 				texture                = &TexturePointsBuffer->at(gsl::narrow_cast<size_t>(SelectedForm->fillInfo.texture.index)
                                                    + textureSegments[textureLine].line);
 				lineSegmentStart.x     = pasteLocation.x;
@@ -3186,16 +3188,14 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 				if (clipStitchPoints.empty()) {
 					lineSegmentStart = lineSegmentEnd;
 				}
-				auto tempTexture = texture;
-				for (auto& clip : clipBuffer) {
+				for (auto iStitch = 0u; iStitch < clipStitchCount; iStitch++) {
 					if (StateMap.test(StateFlag::TXFIL)) {
 						if (texture != nullptr) {
-							lineSegmentEnd = fPOINT{ pasteLocation.x, pasteLocation.y + tempTexture->y };
-							tempTexture++;
+							lineSegmentEnd = fPOINT{ pasteLocation.x, pasteLocation.y + texture[iStitch].y };
 						}
 					}
 					else {
-						lineSegmentEnd = fPOINT{ pasteLocation.x + clip.x, pasteLocation.y + clip.y };
+						lineSegmentEnd = fPOINT{ pasteLocation.x + clipBuffer[iStitch].x, pasteLocation.y + clipBuffer[iStitch].y };
 					}
 
 					clipStitchPoints.push_back({ lineSegmentStart.x, lineSegmentStart.y, 0, 0 });
