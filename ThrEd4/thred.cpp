@@ -5711,6 +5711,7 @@ void thred::internal::nuFil() {
 						// now re-create all the pointers in the form data
 						satin::clearGuideSize();
 						FormVertexIndex = 0;
+						auto clipOffset = 0u;
 						for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 							auto& formIter    = (*FormList)[iForm];
 							formIter.vertices = thred::adflt(formIter.vertexCount);
@@ -5719,11 +5720,14 @@ void thred::internal::nuFil() {
 									formIter.satinOrAngle.guide = satin::adsatk(formIter.satinGuideCount);
 								}
 							}
+							// ToDo - do we still need to do this in v3? (we can store the offset safely in v3 where we could not store the pointer in v2)
 							if (clip::isclp(iForm)) {
-								formIter.angleOrClipData.clip = thred::adclp(formIter.lengthOrCount.clipCount);
+								formIter.angleOrClipData.clip = clipOffset;
+								clipOffset += formIter.lengthOrCount.clipCount;
 							}
 							if (clip::iseclpx(iForm)) {
-								formIter.borderClipData = thred::adclp(formIter.clipEntries);
+								formIter.borderClipData = clipOffset;
+								clipOffset += formIter.clipEntries;
 							}
 						}
 						xt::setfchk();
