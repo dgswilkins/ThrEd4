@@ -4768,7 +4768,9 @@ void form::refilfn() {
 	if (SelectedForm->edgeSpacing < 0.5) {
 		SelectedForm->edgeSpacing = 0.5;
 	}
-	UserStitchLength = SelectedForm->lengthOrCount.stitchLength;
+	if (!clip::isclp(ClosestFormToCursor)) {
+		UserStitchLength = SelectedForm->lengthOrCount.stitchLength;
+	}
 	if (!StateMap.test(StateFlag::WASDO)) {
 		thred::savdo();
 	}
