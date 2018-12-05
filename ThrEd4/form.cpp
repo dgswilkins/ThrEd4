@@ -3176,11 +3176,15 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 			}
 			for (auto iVerticalGrid = clipGrid.bottom; iVerticalGrid < clipGrid.top; iVerticalGrid++) {
 				pasteLocation.y  = iVerticalGrid * ClipRectSize.cy - clipVerticalOffset;
-				lineSegmentEnd.x = pasteLocation.x + clipBuffer[0].x;
-				lineSegmentEnd.y = pasteLocation.y + clipBuffer[0].y;
+				if (!clipBuffer.empty()) {
+					lineSegmentEnd.x = pasteLocation.x + clipBuffer[0].x;
+					lineSegmentEnd.y = pasteLocation.y + clipBuffer[0].y;
+				}
+				else {
+					lineSegmentEnd = pasteLocation;
+				}
 				if (clipStitchPoints.empty()) {
-					lineSegmentStart.x = lineSegmentEnd.x;
-					lineSegmentStart.y = lineSegmentEnd.y;
+					lineSegmentStart = lineSegmentEnd;
 				}
 				auto tempTexture = texture;
 				for (auto& clip : clipBuffer) {
