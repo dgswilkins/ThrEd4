@@ -3183,7 +3183,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 					lineSegmentStart.y = lineSegmentEnd.y;
 				}
 				auto tempTexture = texture;
-				for (auto& clip : *ClipBuffer) {
+				for (auto& clip : clipBuffer) {
 					if (StateMap.test(StateFlag::TXFIL)) {
 						if (texture != nullptr) {
 							lineSegmentEnd = fPOINT{ pasteLocation.x, pasteLocation.y + tempTexture->y };
@@ -7915,17 +7915,18 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
 		satin::setGuideSize(satin::getGuideSize() + destination.satinGuideCount);
 	}
 	if (clip::iseclpx(formIndex)) {
-		const auto offsetStart = ClipPoints->begin() + destination.borderClipData;
-		const auto _ = std::copy(offsetStart, offsetStart + destination.clipEntries, tempClipPoints.begin() + ClipPoints->size());
+		const auto sourceStart = ClipPoints->begin() + destination.borderClipData;
+		auto       sourceEnd = sourceStart + destination.clipEntries;
+		tempClipPoints.insert(tempClipPoints.end(), sourceStart, sourceEnd);
 
-		destination.borderClipData = ClipPoints->size();
+		destination.borderClipData = tempClipPoints.size() - destination.clipEntries;
 	}
 	if (clip::isclpx(formIndex)) {
 		auto       sourceStart = ClipPoints->begin() + destination.angleOrClipData.clip;
 		auto       sourceEnd   = sourceStart + destination.lengthOrCount.clipCount;
-		const auto _           = std::copy(sourceStart, sourceEnd, tempClipPoints.begin() + ClipPoints->size());
+		tempClipPoints.insert(tempClipPoints.end(), sourceStart, sourceEnd);
 
-		destination.angleOrClipData.clip = ClipPoints->size();
+		destination.angleOrClipData.clip = tempClipPoints.size() - destination.lengthOrCount.clipCount;
 	}
 }
 
@@ -7956,7 +7957,8 @@ void form::frmnumfn(unsigned newFormIndex) {
 		auto tempFormList     = std::vector<FRMHED>(FormIndex);
 		auto tempFormVertices = std::vector<fPOINT>(FormVertexIndex);
 		auto tempGuides       = std::vector<SATCON>(satin::getGuideSize());
-		auto tempClipPoints   = std::vector<fPOINT>(ClipPoints->size());
+		auto tempClipPoints = std::vector<fPOINT>{};
+		tempClipPoints.reserve(ClipPoints->size());
 
 		FormVertexIndex  = 0;
 		satin::clearGuideSize();
