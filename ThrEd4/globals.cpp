@@ -66,7 +66,6 @@ std::vector<fPOINTATTR>* ClipBuffer; //
 
 FORMCLIP*    ClipFormHeader; // for thred form clipboard data
 HGLOBAL      ClipMemory;     // handle to the clipboard memory
-unsigned int ClipPointIndex; // next index to append main clipboard points
 void*        ClipPointer;    // for memory allocation for clipboard data
 
 std::vector<fPOINT>* ClipPoints; // main clipboard fill points for forms
