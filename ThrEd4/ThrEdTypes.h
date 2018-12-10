@@ -1101,7 +1101,7 @@ union FANGCLPOUT;
 union FANGCLP {
 public:
 	float        angle;
-	unsigned int clip;  // pointer to start of fill clipboard data
+	unsigned int clip; // pointer to start of fill clipboard data
 	SATCON       guide;
 
 	inline FANGCLP& operator=(const FANGCLPOUT& rhs) noexcept;

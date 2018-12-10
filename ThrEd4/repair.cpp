@@ -259,7 +259,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 				ri::bcup(iForm, badData);
 			}
 			else {
-				FormIndex      = iForm;
+				FormIndex = iForm;
 				ClipPoints->resize(badData.clip);
 				satin::setGuideSize(badData.guideCount);
 				TextureIndex = badData.tx;

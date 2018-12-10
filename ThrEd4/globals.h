@@ -96,9 +96,9 @@ extern unsigned Clip;
 
 extern std::vector<fPOINTATTR>* ClipBuffer;
 
-extern FORMCLIP*    ClipFormHeader;
-extern HGLOBAL      ClipMemory;
-extern void*        ClipPointer;
+extern FORMCLIP* ClipFormHeader;
+extern HGLOBAL   ClipMemory;
+extern void*     ClipPointer;
 
 extern std::vector<fPOINT>* ClipPoints;
 

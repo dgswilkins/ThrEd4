@@ -1197,8 +1197,8 @@ fPOINT* thred::adflt(unsigned int count) {
 
 unsigned int thred::adclp(unsigned int count) {
 	const auto iClipPoint = ClipPoints->size();
-	const auto it = ClipPoints->end();
-	const auto val = fPOINT{};
+	const auto it         = ClipPoints->end();
+	const auto val        = fPOINT{};
 	ClipPoints->insert(it, count, val);
 	return iClipPoint;
 }
@@ -5720,7 +5720,8 @@ void thred::internal::nuFil() {
 									formIter.satinOrAngle.guide = satin::adsatk(formIter.satinGuideCount);
 								}
 							}
-							// ToDo - do we still need to do this in v3? (we can store the offset safely in v3 where we could not store the pointer in v2)
+							// ToDo - do we still need to do this in v3? (we can store the offset safely in v3 where we could not
+							// store the pointer in v2)
 							if (clip::isclp(iForm)) {
 								formIter.angleOrClipData.clip = clipOffset;
 								clipOffset += formIter.lengthOrCount.clipCount;
@@ -6758,7 +6759,7 @@ void thred::internal::newFil() {
 	PCSHeader.stitchCount = 0;
 	FormVertexIndex       = 0;
 	TexturePointsBuffer->clear();
-	TextureIndex          = 0;
+	TextureIndex = 0;
 	ClipPoints->clear();
 	satin::clearGuideSize();
 	FormList->clear();
@@ -8590,8 +8591,8 @@ void thred::internal::insfil() {
 					if (fileHeader.formCount) {
 						auto newFormVertexIndex = FormVertexIndex;
 						auto newSatinGuideIndex = satin::getGuideSize();
-						auto clipOffset  = ClipPoints->size();
-						auto textureOffset    = TexturePointsBuffer->size();
+						auto clipOffset         = ClipPoints->size();
+						auto textureOffset      = TexturePointsBuffer->size();
 						if (version < 2) {
 							auto inFormList = std::vector<FRMHEDO>(fileHeader.formCount);
 							ReadFile(InsertedFileHandle,
@@ -8660,22 +8661,18 @@ void thred::internal::insfil() {
 								StateMap.set(StateFlag::BADFIL);
 							}
 							ClipPoints->insert(ClipPoints->end(), tempClipPoints.begin(), tempClipPoints.end());
-							//clipOffset += BytesRead / sizeof((*ClipPoints)[0]);
 						}
 						if (thredHeader.texturePointCount) {
 							auto tempTextureBuffer = std::vector<TXPNT>{};
 							tempTextureBuffer.resize(thredHeader.texturePointCount);
 							auto bytesToRead = gsl::narrow<DWORD>(thredHeader.texturePointCount * sizeof(tempTextureBuffer[0]));
-							ReadFile(InsertedFileHandle,
-							         tempTextureBuffer.data(),
-									 bytesToRead,
-							         &BytesRead,
-							         nullptr);
+							ReadFile(InsertedFileHandle, tempTextureBuffer.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								tempTextureBuffer.resize(BytesRead / sizeof(tempTextureBuffer[0]));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							TexturePointsBuffer->insert(TexturePointsBuffer->end(), tempTextureBuffer.begin(), tempTextureBuffer.end());
+							TexturePointsBuffer->insert(
+							    TexturePointsBuffer->end(), tempTextureBuffer.begin(), tempTextureBuffer.end());
 						}
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = nullptr;
@@ -8697,7 +8694,8 @@ void thred::internal::insfil() {
 								clipOffset += formIter.clipEntries;
 							}
 							if (texture::istx(iFormList)) {
-								formIter.fillInfo.texture.index = gsl::narrow<decltype(formIter.fillInfo.texture.index)>(textureOffset);
+								formIter.fillInfo.texture.index
+								    = gsl::narrow<decltype(formIter.fillInfo.texture.index)>(textureOffset);
 								textureOffset += formIter.fillInfo.texture.count;
 							}
 						}

@@ -125,8 +125,8 @@ void clip::delmclp(unsigned int iForm) {
 void clip::deleclp(unsigned int iForm) {
 	if (!ClipPoints->empty()) {
 		if (clip::iseclp(iForm)) {
-			auto& form = (*FormList)[iForm];
-			auto destIndex = ci::findclp(iForm);
+			auto& form      = (*FormList)[iForm];
+			auto  destIndex = ci::findclp(iForm);
 			if (clip::isclpx(iForm)) {
 				destIndex += form.lengthOrCount.clipCount;
 			}

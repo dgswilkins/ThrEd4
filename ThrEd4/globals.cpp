@@ -64,9 +64,9 @@ unsigned Clip = 0;                         // pcs format clipboard handle
 
 std::vector<fPOINTATTR>* ClipBuffer; //
 
-FORMCLIP*    ClipFormHeader; // for thred form clipboard data
-HGLOBAL      ClipMemory;     // handle to the clipboard memory
-void*        ClipPointer;    // for memory allocation for clipboard data
+FORMCLIP* ClipFormHeader; // for thred form clipboard data
+HGLOBAL   ClipMemory;     // handle to the clipboard memory
+void*     ClipPointer;    // for memory allocation for clipboard data
 
 std::vector<fPOINT>* ClipPoints; // main clipboard fill points for forms
 
