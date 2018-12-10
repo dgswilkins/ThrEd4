@@ -200,7 +200,7 @@ void trace::internal::hidwnd(HWND hwnd) noexcept {
 
 void trace::internal::tracwnd() {
 	for (auto iColor = 0u; iColor < 16; iColor++) {
-		ti::hidwnd(DefaultColorWin[iColor]);
+		ti::hidwnd((*DefaultColorWin)[iColor]);
 		ti::hidwnd(UserColorWin[iColor]);
 		ti::hidwnd(ThreadSizeWin[iColor]);
 	}
@@ -284,7 +284,7 @@ void trace::untrace() {
 		}
 		StateMap.reset(StateFlag::WASEDG);
 		for (auto iColor = 0u; iColor < 16u; iColor++) {
-			ti::shownd(DefaultColorWin[iColor]);
+			ti::shownd((*DefaultColorWin)[iColor]);
 			ti::shownd(UserColorWin[iColor]);
 			ti::shownd(ThreadSizeWin[iColor]);
 		}

@@ -1588,7 +1588,7 @@ void thred::internal::stchPars() {
 void thred::redraw(HWND window) noexcept {
 	RedrawWindow(window, nullptr, nullptr, RDW_INVALIDATE);
 	if (window == MainStitchWin) {
-		for (auto& iWindow : DefaultColorWin) {
+		for (auto& iWindow : *DefaultColorWin) {
 			if (iWindow) {
 				RedrawWindow(iWindow, nullptr, nullptr, RDW_INVALIDATE);
 			}
@@ -2650,7 +2650,7 @@ void thred::unmsg() {
 
 GSL_SUPPRESS(26461) bool thred::internal::oldwnd(HWND window) {
 	for (auto iColor = 0u; iColor < 16; iColor++) {
-		if (DefaultColorWin[iColor] == window || UserColorWin[iColor] == window || ThreadSizeWin[iColor] == window) {
+		if ((*DefaultColorWin)[iColor] == window || UserColorWin[iColor] == window || ThreadSizeWin[iColor] == window) {
 			return false;
 		}
 	}
@@ -6768,7 +6768,7 @@ void thred::internal::newFil() {
 	KnotCount    = 0;
 	WorkingFileName->clear();
 	for (auto iColor = 0u; iColor < 16; iColor++) {
-		thred::redraw(DefaultColorWin[iColor]);
+		thred::redraw((*DefaultColorWin)[iColor]);
 		thred::redraw(UserColorWin[iColor]);
 		thred::redraw(ThreadSizeWin[iColor]);
 	}
@@ -11255,9 +11255,10 @@ void thred::internal::nuscol(unsigned iColor) noexcept {
 }
 
 void thred::internal::movchk() {
+	auto& defaultColorWin = *DefaultColorWin;
 	if (Msg.wParam & MK_LBUTTON) {
 		if (!StateMap.testAndSet(StateFlag::WASMOV)) {
-			if (thi::chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
+			if (thi::chkMsgs(Msg.pt, defaultColorWin[0], defaultColorWin[15])) {
 				DraggedColor = VerticalIndex & 0xf;
 				StateMap.set(StateFlag::WASCOL);
 			}
@@ -11265,7 +11266,7 @@ void thred::internal::movchk() {
 	}
 	else {
 		if (StateMap.testAndReset(StateFlag::WASMOV) && StateMap.testAndReset(StateFlag::WASCOL)) {
-			if (thi::chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
+			if (thi::chkMsgs(Msg.pt, defaultColorWin[0], defaultColorWin[15])) {
 				const auto key          = GetKeyState(VK_SHIFT) & 0x8000;
 				const auto switchColors = GetKeyState(VK_CONTROL) & 0x8000;
 				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -11330,7 +11331,7 @@ void thred::internal::movchk() {
 
 void thred::internal::inscol() {
 	auto colorMap = boost::dynamic_bitset<>(16);
-	if (thi::chkMsgs(Msg.pt, DefaultColorWin[0], UserColorWin[15])) {
+	if (thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], UserColorWin[15])) {
 		VerticalIndex &= COLMSK;
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			colorMap.set(StitchBuffer[iStitch].attribute & COLMSK);
@@ -11388,7 +11389,7 @@ bool thred::internal::usedcol() noexcept {
 }
 
 void thred::internal::delcol() {
-	if (thi::chkMsgs(Msg.pt, DefaultColorWin[0], UserColorWin[15])) {
+	if (thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], UserColorWin[15])) {
 		VerticalIndex &= 0xf;
 		if (usedcol()) {
 			displayText::tabmsg(IDS_COLU);
@@ -12684,7 +12685,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		if (StateMap.testAndReset(StateFlag::FSETFCOL)) {
 			thred::unsid();
 			thred::unmsg();
-			if (thi::chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
+			if (thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], (*DefaultColorWin)[15])) {
 				xt::dufcol(VerticalIndex + 1);
 				return true;
 			}
@@ -12692,7 +12693,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		if (StateMap.testAndReset(StateFlag::FSETBCOL)) {
 			thred::unsid();
 			thred::unmsg();
-			if (thi::chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
+			if (thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], (*DefaultColorWin)[15])) {
 				xt::dubcol(VerticalIndex + 1);
 				return true;
 			}
@@ -12822,7 +12823,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		if (!SelectedFormList->empty() && !StateMap.test(StateFlag::ROTAT) && chkbig(stretchBoxLine, xyRatio)) {
 			return true;
 		}
-		if (StateMap.test(StateFlag::SIDCOL) && thi::chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
+		if (StateMap.test(StateFlag::SIDCOL) && thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], (*DefaultColorWin)[15])) {
 			do {
 				thred::savdo();
 				if (StateMap.testAndReset(StateFlag::FSETFCOL)) {
@@ -13154,7 +13155,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			thred::unmsg();
 			return true;
 		}
-		if (PreferenceIndex == PAP + 1 && thi::chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
+		if (PreferenceIndex == PAP + 1 && thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], (*DefaultColorWin)[15])) {
 			AppliqueColor = VerticalIndex;
 			SetWindowText((*ValueWindow)[PAP], fmt::format(L"{}", VerticalIndex).c_str());
 			thred::unsid();
@@ -14151,7 +14152,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			toglHid();
 			return true;
 		}
-		if (thi::chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
+		if (thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], (*DefaultColorWin)[15])) {
 			if (Msg.message == WM_LBUTTONDOWN) {
 				thred::savdo();
 				auto code   = ActiveColor;
@@ -15686,7 +15687,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			break;
 		}
 		case VK_DELETE: {
-			if (thi::chkMsgs(Msg.pt, DefaultColorWin[0], DefaultColorWin[15])) {
+			if (thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], (*DefaultColorWin)[15])) {
 				delcol();
 			}
 			else {
@@ -16764,7 +16765,7 @@ void thred::internal::makCol() noexcept {
 	auto hFont = displayText::getThrEdFont(400);
 
 	for (auto iColor = 0u; iColor < 16; iColor++) {
-		DefaultColorWin[iColor] = CreateWindow(L"STATIC",
+		(*DefaultColorWin)[iColor] = CreateWindow(L"STATIC",
 		                                       nullptr,
 		                                       SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                                       0,
@@ -16775,7 +16776,7 @@ void thred::internal::makCol() noexcept {
 		                                       nullptr,
 		                                       ThrEdInstance,
 		                                       nullptr);
-		displayText::setWindowFont(DefaultColorWin[iColor], hFont);
+		displayText::setWindowFont((*DefaultColorWin)[iColor], hFont);
 		UserColorWin[iColor]  = CreateWindow(L"STATIC",
                                             nullptr,
                                             SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -18384,7 +18385,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 		}
 
 		for (auto iColor = 0u; iColor < 16; iColor++) {
-			if (DrawItem->hwndItem == DefaultColorWin[iColor]) {
+			if (DrawItem->hwndItem == (*DefaultColorWin)[iColor]) {
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, DefaultColorBrush[iColor]);
 				if (DisplayedColorBitmap.test(iColor)) {
 					SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
@@ -18741,6 +18742,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		HomeDirectory       = &private_HomeDirectory;
 		UserBMPFileName     = &private_UserBMPFileName;
 		IniFileName         = &private_IniFileName;
+
+		auto private_DefaultColorWin = std::vector<HWND>{};
+		private_DefaultColorWin.resize(16);
+		DefaultColorWin = &private_DefaultColorWin;
 
 		thi::redini();
 

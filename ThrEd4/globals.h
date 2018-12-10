@@ -114,8 +114,10 @@ extern HCURSOR      CrossCursor;
 extern SATCON*      CurrentFormGuides;
 extern unsigned int CurrentFormGuidesCount;
 extern fPOINT*      CurrentFormVertices;
-extern HWND         DefaultColorWin[16];
-extern HWND         DeleteStitchesDialog;
+
+extern std::vector<HWND>* DefaultColorWin;
+
+extern HWND DeleteStitchesDialog;
 
 extern std::wstring*   DesignerName;
 extern HWND            DiscardButton;

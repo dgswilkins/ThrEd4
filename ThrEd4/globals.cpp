@@ -84,7 +84,9 @@ HCURSOR         CrossCursor;            // cross
 SATCON*         CurrentFormGuides;      // connections in the currently selecteed form
 unsigned int    CurrentFormGuidesCount; // number of connections in the currently selected form
 fPOINT*         CurrentFormVertices;    // points in the currently selected form
-HWND            DefaultColorWin[16];    // default color windows
+
+std::vector<HWND>*            DefaultColorWin;    // default color windows
+
 HWND            DeleteStitchesDialog;   // asking user if they want to delete the sitches associated with a form
 std::wstring*   DesignerName;           // designer name in clear
 HWND            DiscardButton;          // discard button
