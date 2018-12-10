@@ -52,7 +52,7 @@ void         satzum();
 void         sbrd();
 void         setGuideSize(unsigned int newGuideSize) noexcept;
 void         slbrd();
-void         spltsat(const SATCON& currentGuide);
+void         spltsat(SATCON currentGuide);
 
 namespace internal {
 
