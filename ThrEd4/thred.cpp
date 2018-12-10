@@ -10231,7 +10231,7 @@ void thred::frmrct(fRECTANGLE& rectangle) noexcept {
 void thred::internal::desiz() {
 	auto rectangle   = fRECTANGLE{};
 	auto info        = std::wstring{};
-	auto stringTable = *StringTable;
+	auto& stringTable = *StringTable;
 
 	if (PCSHeader.stitchCount) {
 		thred::stchrct(rectangle);
@@ -10471,7 +10471,7 @@ void thred::internal::dumrk(double xCoord, double yCoord) {
 }
 
 void thred::internal::gselrng() {
-	auto selectedFormList = *SelectedFormList;
+	auto& selectedFormList = *SelectedFormList;
 
 	SelectedFormsRange.start = SelectedFormsRange.finish = selectedFormList[0];
 	for (auto selectedForm : selectedFormList) {
@@ -12946,7 +12946,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			return true;
 		}
 		if (!StateMap.test(StateFlag::ROTAT) && StateMap.test(StateFlag::GRPSEL)) {
-			auto controlPoint = *FormControlPoints;
+			auto& controlPoint = *FormControlPoints;
 			if (iselpnt()) {
 				for (auto iSide = 0u; iSide < 4; iSide++) {
 					stretchBoxLine[iSide] = controlPoint[gsl::narrow<size_t>(iSide) << 1];

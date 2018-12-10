@@ -3470,8 +3470,8 @@ void form::angclpfn(const std::vector<RNGCNT>& textureSegments) {
 
 bool form::internal::sqcomp(const SMALPNTL* arg1, const SMALPNTL* arg2) noexcept {
 	if (arg1 && arg2) {
-		const auto lineEnd1 = *arg1;
-		const auto lineEnd2 = *arg2;
+		const auto& lineEnd1 = *arg1;
+		const auto& lineEnd2 = *arg2;
 
 		if (lineEnd1.line == lineEnd2.line) {
 			if (lineEnd1.group == lineEnd2.group) {
