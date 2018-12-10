@@ -1101,7 +1101,7 @@ union FANGCLPOUT;
 union FANGCLP {
 public:
 	float        angle;
-	unsigned int clip;
+	unsigned int clip; // pointer to start of fill clipboard data
 	SATCON       guide;
 
 	inline FANGCLP& operator=(const FANGCLPOUT& rhs) noexcept;
@@ -1146,7 +1146,7 @@ union FLENCNTOUT;
 union FLENCNT {
 public:
 	float        stitchLength;
-	unsigned int clipCount;
+	unsigned int clipCount; // number of points in fill clipboard data
 
 	inline FLENCNT& operator=(const FLENCNTOUT& rhs) noexcept;
 };
@@ -1373,7 +1373,7 @@ public:
 	unsigned int   clipEntries;       // number of border clipboard entries
 	fPOINT*        vertices;          // points
 	SATINANGLE     satinOrAngle{};    // satin guidelines or angle clipboard fill angle
-	unsigned int   borderClipData;    // border clipboard data
+	unsigned int   borderClipData;    // pointer to start of border clipboard data
 	unsigned int   satinGuideCount;   // number of satin guidelines
 	unsigned int   wordParam;         // clipboard/textured fill phase or satin end guide
 	fRECTANGLE     rectangle{};       // rectangle

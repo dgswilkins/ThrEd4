@@ -29,7 +29,7 @@ namespace fs = std::experimental::filesystem;
 
 namespace thred {
 
-unsigned int adclp(unsigned int count) noexcept;
+unsigned int adclp(unsigned int count);
 
 fPOINT*  adflt(unsigned int count);
 void     bBox() noexcept;

@@ -64,14 +64,15 @@ unsigned Clip = 0;                         // pcs format clipboard handle
 
 std::vector<fPOINTATTR>* ClipBuffer; //
 
-FORMCLIP*    ClipFormHeader;       // for thred form clipboard data
-HGLOBAL      ClipMemory;           // handle to the clipboard memory
-unsigned int ClipPointIndex;       // next index to append main clipboard points
-void*        ClipPointer;          // for memory allocation for clipboard data
-fPOINT       ClipPoints[MAXITEMS]; // main clipboard fill points for forms
-fRECTANGLE   ClipRect;             // clipboard rectangle
-FLSIZ        ClipRectSize;         // clipboard rectangle size
-CLPSTCH*     ClipStitchData;       // for pcs clipboard data
+FORMCLIP* ClipFormHeader; // for thred form clipboard data
+HGLOBAL   ClipMemory;     // handle to the clipboard memory
+void*     ClipPointer;    // for memory allocation for clipboard data
+
+std::vector<fPOINT>* ClipPoints; // main clipboard fill points for forms
+
+fRECTANGLE ClipRect;       // clipboard rectangle
+FLSIZ      ClipRectSize;   // clipboard rectangle size
+CLPSTCH*   ClipStitchData; // for pcs clipboard data
 
 unsigned ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
 
@@ -83,7 +84,9 @@ HCURSOR         CrossCursor;            // cross
 SATCON*         CurrentFormGuides;      // connections in the currently selecteed form
 unsigned int    CurrentFormGuidesCount; // number of connections in the currently selected form
 fPOINT*         CurrentFormVertices;    // points in the currently selected form
-HWND            DefaultColorWin[16];    // default color windows
+
+std::vector<HWND>*            DefaultColorWin;    // default color windows
+
 HWND            DeleteStitchesDialog;   // asking user if they want to delete the sitches associated with a form
 std::wstring*   DesignerName;           // designer name in clear
 HWND            DiscardButton;          // discard button

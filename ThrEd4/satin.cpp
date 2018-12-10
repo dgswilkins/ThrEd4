@@ -99,7 +99,7 @@ SATCON* satin::internal::nusac(unsigned int formIndex, unsigned guideCount) {
 	return &SatinGuides[guideIndex];
 }
 
-void satin::spltsat(const SATCON& currentGuide) {
+void satin::spltsat(SATCON currentGuide) {
 	// We are adding two additional vertices when splitting the form
 	auto  vertexBuffer = std::vector<fPOINT>(gsl::narrow<size_t>(VertexCount) + 2);
 	auto& formList     = *FormList;
@@ -107,6 +107,7 @@ void satin::spltsat(const SATCON& currentGuide) {
 	auto& srcForm = formList[ClosestFormToCursor];
 	auto  it      = formList.begin() + ClosestFormToCursor;
 	it            = formList.insert(it, srcForm);
+	form::fvars(ClosestFormToCursor);
 	FormIndex++;
 	const auto maxForm = formList.size();
 	if (ClosestFormToCursor < maxForm - 2) {
@@ -154,16 +155,16 @@ void satin::spltsat(const SATCON& currentGuide) {
 	nextForm.vertices         = &CurrentFormVertices[iOldVertex];
 	form::frmout(ClosestFormToCursor);
 	form::frmout(ClosestFormToCursor + 1);
-	auto iGuideVertex = 1;
-	iGuideVertex += currentGuide.start - currentGuide.finish;
+	auto iNewGuide = 1;
+	iNewGuide += currentGuide.start - currentGuide.finish;
 	auto iGuide = 0u;
 	for (iGuide = 0u; iGuide < ActivePointIndex; iGuide++) {
-		SelectedForm->satinOrAngle.guide[iGuide].finish += iGuideVertex;
+		SelectedForm->satinOrAngle.guide[iGuide].finish += iNewGuide;
 	}
 	if (SelectedForm->wordParam) {
 		SelectedForm->wordParam = currentGuide.start;
 	}
-	iGuideVertex = iGuide + 1;
+	iNewGuide = iGuide + 1;
 	while (iGuide < (SelectedForm->satinGuideCount)) {
 		SelectedForm->satinOrAngle.guide[iGuide].start -= (currentGuide.start - 1);
 		SelectedForm->satinOrAngle.guide[iGuide].finish -= (currentGuide.start - 1);
@@ -172,8 +173,8 @@ void satin::spltsat(const SATCON& currentGuide) {
 	if (nextForm.wordParam) {
 		nextForm.wordParam -= (currentGuide.start - 1);
 	}
-	auto       sourceStart = SelectedForm->satinOrAngle.guide + iGuideVertex;
-	auto       sourceRange = SatinGuideIndex - si::satind(&SelectedForm->satinOrAngle.guide[iGuideVertex]);
+	auto       sourceStart = SelectedForm->satinOrAngle.guide + iNewGuide;
+	auto       sourceRange = SatinGuideIndex - si::satind(&SelectedForm->satinOrAngle.guide[iNewGuide]);
 	auto       sourceEnd   = sourceStart + sourceRange;
 	const auto destination = stdext::make_checked_array_iterator((sourceStart - 1), sourceRange);
 	std::copy(sourceStart, sourceEnd, destination);

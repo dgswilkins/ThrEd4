@@ -48,7 +48,7 @@ bool         cisin(float xCoordinate, float yCoordinate) noexcept;
 unsigned int closflt(float xCoordinate, float yCoordinate) noexcept;
 bool         closfrm();
 void         clpfil();
-void         clpspac(unsigned insertPoint, unsigned int count) noexcept;
+void         clpspac(unsigned insertPoint, unsigned int count);
 void         clrfills();
 void         cntrx();
 void         col2frm();

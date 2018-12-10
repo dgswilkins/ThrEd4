@@ -96,11 +96,12 @@ extern unsigned Clip;
 
 extern std::vector<fPOINTATTR>* ClipBuffer;
 
-extern FORMCLIP*    ClipFormHeader;
-extern HGLOBAL      ClipMemory;
-extern unsigned int ClipPointIndex;
-extern void*        ClipPointer;
-extern fPOINT       ClipPoints[MAXITEMS];
+extern FORMCLIP* ClipFormHeader;
+extern HGLOBAL   ClipMemory;
+extern void*     ClipPointer;
+
+extern std::vector<fPOINT>* ClipPoints;
+
 extern fRECTANGLE   ClipRect;
 extern FLSIZ        ClipRectSize;
 extern CLPSTCH*     ClipStitchData;
@@ -113,8 +114,10 @@ extern HCURSOR      CrossCursor;
 extern SATCON*      CurrentFormGuides;
 extern unsigned int CurrentFormGuidesCount;
 extern fPOINT*      CurrentFormVertices;
-extern HWND         DefaultColorWin[16];
-extern HWND         DeleteStitchesDialog;
+
+extern std::vector<HWND>* DefaultColorWin;
+
+extern HWND DeleteStitchesDialog;
 
 extern std::wstring*   DesignerName;
 extern HWND            DiscardButton;
