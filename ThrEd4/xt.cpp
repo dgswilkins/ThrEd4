@@ -2530,7 +2530,7 @@ void xt::internal::nudfn(const fRECTANGLE& designSizeRect) {
 		sadj(StitchBuffer[iStitch], designSizeRatio, designSizeRect);
 	}
 	for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
-		sadj(FormVertices[iVertex], designSizeRatio, designSizeRect);
+		sadj((*FormVertices)[iVertex], designSizeRatio, designSizeRect);
 	}
 	form::frmout(ClosestFormToCursor);
 }

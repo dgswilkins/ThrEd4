@@ -106,7 +106,7 @@ bool form::chkmax(unsigned int arg0, unsigned int arg1) noexcept {
 
 unsigned form::fltind(const fPOINT* const point) noexcept {
 	// ToDo - find a better way than pointer arithmetic
-	return point - FormVertices;
+	return point - FormVertices->data();
 }
 
 void form::fltspac(const fPOINT* const start, unsigned int count) {
@@ -116,7 +116,7 @@ void form::fltspac(const fPOINT* const start, unsigned int count) {
 	if (FormVertexIndex) {
 		auto source = FormVertexIndex - 1;
 		while (source >= startIndex) {
-			FormVertices[destination--] = FormVertices[source--];
+			(*FormVertices)[destination--] = (*FormVertices)[source--];
 		}
 	}
 	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
@@ -132,7 +132,7 @@ void form::delflt(unsigned int formIndex) {
 		auto destination = form::fltind(form.vertices);
 		auto source      = destination + form.vertexCount;
 		while (source < FormVertexIndex) {
-			FormVertices[destination++] = FormVertices[source++];
+			(*FormVertices)[destination++] = (*FormVertices)[source++];
 		}
 		for (auto iForm = formIndex + 1; iForm < FormIndex; iForm++) {
 			auto& formAfter = (*FormList)[iForm];
@@ -961,7 +961,7 @@ void form::flipv() {
 		thred::savdo();
 		const auto midpoint = (AllItemsRect.top - AllItemsRect.bottom) / 2.0f + AllItemsRect.bottom;
 		for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
-			FormVertices[iVertex].y = midpoint + midpoint - FormVertices[iVertex].y;
+			(*FormVertices)[iVertex].y = midpoint + midpoint - (*FormVertices)[iVertex].y;
 		}
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
@@ -6519,7 +6519,7 @@ void form::duhart(unsigned sideCount) {
 	FormList->emplace_back(FRMHED{});
 	SelectedForm            = &(FormList->back());
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
-	CurrentFormVertices     = &FormVertices[FormVertexIndex];
+	CurrentFormVertices     = &(*FormVertices)[FormVertexIndex];
 	thred::px2stch();
 	auto       point     = dPOINT{ SelectedPoint };
 	auto       stepAngle = PI * 2.0 / sideCount;
@@ -6593,7 +6593,7 @@ void form::dulens(unsigned sides) {
 	FormList->emplace_back(FRMHED{});
 	SelectedForm            = &(FormList->back());
 	ClosestFormToCursor     = FormList->size() - 1;
-	SelectedForm->vertices  = &FormVertices[FormVertexIndex];
+	SelectedForm->vertices  = &(*FormVertices)[FormVertexIndex];
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	form::fvars(FormIndex);
 	thred::px2stch();
@@ -6712,7 +6712,7 @@ void form::fliph() {
 	if (StateMap.test(StateFlag::BIGBOX)) {
 		const auto midpoint = (AllItemsRect.right - AllItemsRect.left) / 2 + AllItemsRect.left;
 		for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
-			FormVertices[iVertex].x = midpoint + midpoint - FormVertices[iVertex].x;
+			(*FormVertices)[iVertex].x = midpoint + midpoint - (*FormVertices)[iVertex].x;
 		}
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
@@ -7911,7 +7911,7 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
 
 	const auto res = std::copy(
 	    destination.vertices, destination.vertices + destination.vertexCount, destinationFormVertices.begin() + FormVertexIndex);
-	destination.vertices = &FormVertices[FormVertexIndex];
+	destination.vertices = &(*FormVertices)[FormVertexIndex];
 	FormVertexIndex += destination.vertexCount;
 	if (destination.satinGuideCount) {
 		const auto _ = std::copy(destination.satinOrAngle.guide,
@@ -7982,7 +7982,7 @@ void form::frmnumfn(unsigned newFormIndex) {
 		}
 		auto& formList = *FormList;
 		std::copy(tempFormList.cbegin(), tempFormList.cend(), formList.begin());
-		std::copy(tempFormVertices.cbegin(), tempFormVertices.cend(), FormVertices);
+		std::copy(tempFormVertices.cbegin(), tempFormVertices.cend(), FormVertices->begin());
 		std::copy(tempGuides.cbegin(), tempGuides.cend(), SatinGuides);
 		std::copy(tempClipPoints.cbegin(), tempClipPoints.cend(), ClipPoints->begin());
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -8185,8 +8185,8 @@ void form::centir() {
 		StitchBuffer[iStitch].y += delta.y;
 	}
 	for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
-		FormVertices[iVertex].x += delta.x;
-		FormVertices[iVertex].y += delta.y;
+		(*FormVertices)[iVertex].x += delta.x;
+		(*FormVertices)[iVertex].y += delta.y;
 	}
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		form::frmout(iForm);

@@ -139,11 +139,13 @@ extern fPOINT       FormMoveDelta;
 
 extern std::wstring* FormOnOff;
 
-extern HPEN      FormPen3px;
-extern HPEN      FormPen;
-extern HPEN      FormSelectedPen;
-extern unsigned  FormVertexIndex;
-extern fPOINT    FormVertices[MAXITEMS];
+extern HPEN     FormPen3px;
+extern HPEN     FormPen;
+extern HPEN     FormSelectedPen;
+extern unsigned FormVertexIndex;
+
+extern std::vector<fPOINT>* FormVertices;
+
 extern HWND      GeneralNumberInputBox;
 extern HPEN      GridPen;
 extern unsigned  GroupEndStitch;

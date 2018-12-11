@@ -787,7 +787,7 @@ void trace::internal::dutrac() {
 		FormList->emplace_back(FRMHED{});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
-		CurrentFormVertices      = &FormVertices[FormVertexIndex];
+		CurrentFormVertices      = &(*FormVertices)[FormVertexIndex];
 		CurrentFormVertices[0].x = tracedPoints[0].x * StitchBmpRatio.x;
 		CurrentFormVertices[0].y = tracedPoints[0].y * StitchBmpRatio.y;
 		iNext                    = 0;
