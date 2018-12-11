@@ -1897,7 +1897,7 @@ void thred::zumhom() {
 void thred::internal::hupfn() {
 	StateMap.reset(StateFlag::HUPCHNG);
 	sizstch(CheckHoopRect, StitchBuffer);
-	if (!(*FormList).empty()) {
+	if (!FormList->empty()) {
 		if (!PCSHeader.stitchCount) {
 			CheckHoopRect.bottom = CheckHoopRect.top = CurrentFormVertices[0].y;
 			CheckHoopRect.left = CheckHoopRect.right = CurrentFormVertices[0].x;
@@ -3715,7 +3715,7 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 	stitchHeader.hoopType    = IniFile.hoopType;
 	auto designer            = utf::Utf16ToUtf8(*DesignerName);
 	std::copy(designer.begin(), designer.end(), ExtendedHeader.modifierName);
-	if (!(*FormList).empty()) {
+	if (!FormList->empty()) {
 		for (auto& form : (*FormList)) {
 			vertexCount += form.vertexCount;
 			if (form.type == SAT) {
@@ -3729,7 +3729,7 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 			}
 		}
 	}
-	stitchHeader.formCount     = gsl::narrow<unsigned short>((*FormList).size());
+	stitchHeader.formCount     = gsl::narrow<unsigned short>(FormList->size());
 	stitchHeader.vertexCount   = gsl::narrow<unsigned short>(vertexCount);
 	stitchHeader.dlineCount    = gsl::narrow<unsigned short>(guideCount);
 	stitchHeader.clipDataCount = gsl::narrow<unsigned short>(clipDataCount);
@@ -3766,9 +3766,9 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 	auto threadSizeBufW     = std::wstring(MsgBuffer);
 	auto threadSizeBuf      = utf::Utf16ToUtf8(threadSizeBufW);
 	durit(&output, threadSizeBuf.c_str(), gsl::narrow<unsigned int>(threadSizeBuf.size() * sizeof(threadSizeBuf[0])));
-	if (!(*FormList).empty()) {
+	if (!FormList->empty()) {
 		auto outForms = std::vector<FRMHEDOUT>{};
-		outForms.reserve((*FormList).size());
+		outForms.reserve(FormList->size());
 		auto vertices = std::vector<fPOINT>{};
 		vertices.reserve(vertexCount);
 		auto guides = std::vector<SATCONOUT>{};
@@ -4893,10 +4893,10 @@ void thred::internal::redbak() {
 		PCSHeader.stitchCount = gsl::narrow<unsigned short>(undoData->stitchCount);
 		UnzoomedRect          = undoData->zoomRect;
 		if (undoData->formCount) {
-			(*FormList).clear();
+			FormList->clear();
 			for (auto iForm = 0u; iForm < undoData->formCount; iForm++) {
 				const auto& form = undoData->forms[iForm];
-				(*FormList).push_back(form);
+				FormList->push_back(form);
 			}
 		}
 		FormIndex = undoData->formCount;
@@ -5450,7 +5450,7 @@ void thred::internal::nuFil() {
 		WorkingFileName->assign(szFileName);
 		fnamtabs();
 		trace::untrace();
-		if (!(*FormList).empty()) {
+		if (!FormList->empty()) {
 			form::delfrms();
 		}
 		StateMap.reset(StateFlag::ZUMED);
@@ -5641,7 +5641,7 @@ void thred::internal::nuFil() {
 								StateMap.set(StateFlag::BADFIL);
 							}
 							for (auto form : formListOriginal) {
-								(*FormList).emplace_back(FRMHED{ form });
+								FormList->emplace_back(FRMHED{ form });
 							}
 						}
 						else {
@@ -5653,7 +5653,7 @@ void thred::internal::nuFil() {
 								StateMap.set(StateFlag::BADFIL);
 							}
 							for (auto form : inFormList) {
-								(*FormList).emplace_back(FRMHED{ form });
+								FormList->emplace_back(FRMHED{ form });
 							}
 						}
 						if (thredHeader.vertexCount) {
@@ -7619,8 +7619,8 @@ void thred::internal::f1del() {
 void thred::frmdel() {
 	form::fvars(ClosestFormToCursor);
 	thi::f1del();
-	auto firstForm = (*FormList).begin();
-	(*FormList).erase(firstForm + ClosestFormToCursor);
+	auto firstForm = FormList->begin();
+	FormList->erase(firstForm + ClosestFormToCursor);
 	if (StateMap.testAndReset(StateFlag::DELTO)) {
 		for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (!(StitchBuffer[iStitch].attribute & NOTFRM)) {
@@ -7654,7 +7654,7 @@ void thred::frmdel() {
 
 void thred::internal::delsfrms(unsigned code) {
 	if (code) {
-		if (!(*FormList).empty()) {
+		if (!FormList->empty()) {
 			auto formIndices = std::vector<unsigned>(FormIndex);
 			auto formMap     = boost::dynamic_bitset<>(FormIndex);
 			for (auto selectedForm : (*SelectedFormList)) {
@@ -7664,18 +7664,18 @@ void thred::internal::delsfrms(unsigned code) {
 				f1del();
 			}
 			auto deletedFormCount = 0u;
-			auto firstForm        = (*FormList).begin();
+			auto firstForm        = FormList->begin();
 			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 				if (!formMap.test(iForm)) {
 					formIndices[iForm] = (iForm - deletedFormCount) << FRMSHFT;
 				}
 				else {
-					(*FormList).erase(firstForm + iForm - deletedFormCount);
-					firstForm = (*FormList).begin(); // the erase invalidates firstForm
+					FormList->erase(firstForm + iForm - deletedFormCount);
+					firstForm = FormList->begin(); // the erase invalidates firstForm
 					deletedFormCount++;
 				}
 			}
-			FormIndex = (*FormList).size();
+			FormIndex = FormList->size();
 			if (StateMap.test(StateFlag::DELTO)) {
 				auto validStitchCount = 0u;
 				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -8197,7 +8197,7 @@ void thred::internal::delet() {
 				displayText::tomsg();
 			}
 			else {
-				if (!(*FormList).empty()) {
+				if (!FormList->empty()) {
 					StateMap.reset(StateFlag::DELTO);
 					thred::frmdel();
 					StateMap.set(StateFlag::RESTCH);
@@ -8293,7 +8293,7 @@ void thred::internal::delet() {
 			if (ClosestFormToCursor > FormIndex - 1) {
 				ClosestFormToCursor = FormIndex - 1;
 			}
-			if (!(*FormList).empty()) {
+			if (!FormList->empty()) {
 				form::frmout(ClosestFormToCursor);
 				form::fvars(ClosestFormToCursor);
 				form::refil();
@@ -8606,7 +8606,7 @@ void thred::internal::insfil() {
 							}
 							if (FormIndex + fileHeader.formCount < MAXFORMS) {
 								for (auto form : inFormList) {
-									(*FormList).emplace_back(FRMHED{ form });
+									FormList->emplace_back(FRMHED{ form });
 								}
 							}
 							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
@@ -8621,7 +8621,7 @@ void thred::internal::insfil() {
 							}
 							if (FormIndex + fileHeader.formCount < MAXFORMS) {
 								for (auto form : inFormList) {
-									(*FormList).emplace_back(FRMHED{ form });
+									FormList->emplace_back(FRMHED{ form });
 								}
 							}
 							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
@@ -9110,7 +9110,7 @@ void thred::chkrng(fPOINT& range) {
 	thred::delinf();
 	range.x = gsl::narrow<double>(UnzoomedRect.x);
 	range.y = gsl::narrow<double>(UnzoomedRect.y);
-	if (!(*FormList).empty()) {
+	if (!FormList->empty()) {
 		auto stitchCount = 0u;
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (StitchBuffer[iStitch].attribute & NOTFRM
@@ -9465,7 +9465,7 @@ void thred::internal::selup() {
 			dubox();
 		}
 		else {
-			if (!(*FormList).empty()) {
+			if (!FormList->empty()) {
 				if (StateMap.testAndSet(StateFlag::FORMSEL)) {
 					if (ClosestFormToCursor < gsl::narrow<unsigned>(FormIndex) - 1) {
 						ClosestFormToCursor++;
@@ -9518,7 +9518,7 @@ void thred::internal::seldwn() {
 			dubox();
 		}
 		else {
-			if (!(*FormList).empty()) {
+			if (!FormList->empty()) {
 				if (StateMap.testAndSet(StateFlag::FORMSEL)) {
 					if (ClosestFormToCursor) {
 						ClosestFormToCursor--;
@@ -10243,7 +10243,7 @@ void thred::internal::desiz() {
 		}
 		info += fmt::format(stringTable[STR_STCHS], PCSHeader.stitchCount, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
 	}
-	if (!(*FormList).empty()) {
+	if (!FormList->empty()) {
 		thred::frmrct(rectangle);
 		const auto xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		const auto ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
@@ -10309,7 +10309,7 @@ void thred::internal::setdst() {
 
 void thred::internal::fop() {
 	trace::untrace();
-	if (!(*FormList).empty() || PCSHeader.stitchCount) {
+	if (!FormList->empty() || PCSHeader.stitchCount) {
 		if (savcmp()) {
 			nuFil();
 			nulayr(0);
@@ -11583,19 +11583,19 @@ void thred::internal::qcode() {
 	}
 	// ToDo - do we need to erase vertices and textures when aborting?
 	if (StateMap.testAndReset(StateFlag::POLIMOV)) { // aborting form add
-		(*FormList).pop_back();
-		ClosestFormToCursor = (*FormList).size() - 1;
+		FormList->pop_back();
+		ClosestFormToCursor = FormList->size() - 1;
 	};
 	if (StateMap.testAndReset(StateFlag::FUNCLP)) { // aborting form paste
-		(*FormList).pop_back();
-		ClosestFormToCursor = (*FormList).size() - 1;
+		FormList->pop_back();
+		ClosestFormToCursor = FormList->size() - 1;
 	}
 	if (StateMap.testAndReset(StateFlag::FUNSCLP)) { // aborting forms paste
 		for (auto iForm = 0u; iForm < ClipFormsCount; iForm++) {
-			(*FormList).pop_back();
+			FormList->pop_back();
 		}
 		SelectedFormList->clear();
-		ClosestFormToCursor = (*FormList).size() - 1;
+		ClosestFormToCursor = FormList->size() - 1;
 	}
 	if (!UserFlagMap.test(UserFlag::MARQ)) {
 		StateMap.reset(StateFlag::GMRK);
@@ -12514,7 +12514,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		}
 		if (thred::px2stch()
 		    && !(StateMap.test(StateFlag::SIZSEL) && thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2]))) {
-			if (!(*FormList).empty() && !StateMap.test(StateFlag::FRMOF)) {
+			if (!FormList->empty() && !StateMap.test(StateFlag::FRMOF)) {
 				if (Msg.wParam & MK_SHIFT) {
 					TmpFormIndex = ClosestFormToCursor;
 					if (form::closfrm()) {
@@ -13965,7 +13965,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				StateMap.set(StateFlag::VCAPT);
 				return true;
 			}
-			if (!(*FormList).empty() && !StateMap.test(StateFlag::FRMOF)) {
+			if (!FormList->empty() && !StateMap.test(StateFlag::FRMOF)) {
 				if (!StateMap.test(StateFlag::INSRT)) {
 					if (StateMap.testAndReset(StateFlag::FORMSEL)) {
 						form::ritfrct(ClosestFormToCursor, StitchWindowDC);
@@ -15127,9 +15127,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								FormMoveDelta.x = 0.0f;
 								FormMoveDelta.y = 0.0f;
 								StateMap.set(StateFlag::FUNCLP);
-								(*FormList).emplace_back(FRMHED{});
-								ClosestFormToCursor  = (*FormList).size() - 1;
-								auto& formIter       = (*FormList).back();
+								FormList->emplace_back(FRMHED{});
+								ClosestFormToCursor  = FormList->size() - 1;
+								auto& formIter       = FormList->back();
 								formIter.type        = FRMLINE;
 								formIter.vertexCount = ClipFormVerticesData->vertexCount + 1;
 								formIter.vertices    = thred::adflt(SelectedForm->vertexCount);
@@ -15154,8 +15154,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							ClipFormsCount = ClipFormsHeader->formCount;
 							auto forms     = convert_ptr<FRMHED*>(&ClipFormsHeader[1]);
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-								(*FormList).emplace_back(FRMHED{});
-								auto& formIter = (*FormList).back();
+								FormList->emplace_back(FRMHED{});
+								auto& formIter = FormList->back();
 								formIter       = forms[iForm];
 								formIter.attribute
 								    = gsl::narrow<unsigned char>((formIter.attribute & NFRMLMSK) | (ActiveLayer << 1));
@@ -15246,10 +15246,10 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								FormMoveDelta.x = 0.0f;
 								FormMoveDelta.y = 0.0f;
 								StateMap.set(StateFlag::FUNCLP);
-								(*FormList).push_back(ClipFormHeader->form);
-								ClosestFormToCursor = (*FormList).size() - 1;
+								FormList->push_back(ClipFormHeader->form);
+								ClosestFormToCursor = FormList->size() - 1;
 								form::fvars(ClosestFormToCursor);
-								auto& formIter = (*FormList).back();
+								auto& formIter = FormList->back();
 								formIter.attribute
 								    = gsl::narrow<unsigned char>((formIter.attribute & NFRMLMSK) | (ActiveLayer << 1));
 								formIter.vertices   = thred::adflt(formIter.vertexCount);
@@ -17891,7 +17891,7 @@ void thred::internal::drwStch() {
 			duclp();
 		}
 	}
-	if (!(*FormList).empty() && !StateMap.test(StateFlag::FRMOF)) {
+	if (!FormList->empty() && !StateMap.test(StateFlag::FRMOF)) {
 		form::drwfrm();
 	}
 	if (StateMap.test(StateFlag::INSFRM)) {
@@ -18295,7 +18295,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			}
 			if (!StateMap.test(StateFlag::RUNPAT)) {
 				if (!StateMap.test(StateFlag::HIDSTCH)
-				    && (FileHandle || StateMap.test(StateFlag::INIT) || !(*FormList).empty() || StateMap.test(StateFlag::SATPNT))
+				    && (FileHandle || StateMap.test(StateFlag::INIT) || !FormList->empty() || StateMap.test(StateFlag::SATPNT))
 				    && !StateMap.test(StateFlag::BAKSHO)) {
 					drwStch();
 				}

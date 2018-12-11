@@ -675,7 +675,7 @@ void formForms::frmnum() {
 	auto fmtStr = std::wstring{};
 
 	displayText::loadString(fmtStr, IDS_FRML);
-	if (!(*FormList).empty() && StateMap.test(StateFlag::FORMSEL)) {
+	if (!FormList->empty() && StateMap.test(StateFlag::FORMSEL)) {
 		displayText::shoMsg(fmt::format(fmtStr, FormIndex));
 		StateMap.set(StateFlag::NUMIN);
 		StateMap.set(StateFlag::ENTRFNUM);
@@ -820,9 +820,9 @@ void formForms::dasyfrm() {
 		return;
 	}
 	const auto referencePoint = fPOINT{ form::midl(ZoomRect.right, ZoomRect.left), form::midl(ZoomRect.top, ZoomRect.bottom) };
-	(*FormList).emplace_back(FRMHED{});
-	SelectedForm            = &(*FormList).back();
-	ClosestFormToCursor     = (*FormList).size() - 1;
+	FormList->emplace_back(FRMHED{});
+	SelectedForm            = &FormList->back();
+	ClosestFormToCursor     = FormList->size() - 1;
 	SelectedForm->vertices  = &FormVertices[FormVertexIndex];
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	form::fvars(ClosestFormToCursor);
@@ -946,7 +946,7 @@ void formForms::dasyfrm() {
 	}
 	FormVertexIndex += iVertex;
 	StateMap.set(StateFlag::INIT);
-	form::frmout((*FormList).size() - 1);
+	form::frmout(FormList->size() - 1);
 	for (auto iMacroPetal = 0u; iMacroPetal < iVertex; iMacroPetal++) {
 		CurrentFormVertices[iMacroPetal].x -= SelectedForm->rectangle.left;
 		CurrentFormVertices[iMacroPetal].y -= SelectedForm->rectangle.bottom;

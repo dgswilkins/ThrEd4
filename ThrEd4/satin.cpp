@@ -739,9 +739,9 @@ void satin::ribon() {
 			satin::satout(BorderWidth);
 			form::fvars(ClosestFormToCursor);
 			HorizontalLength2 = BorderWidth / 2;
-			if (!(*FormList).empty()) {
-				(*FormList).emplace_back(FRMHED{});
-				auto& form = (*FormList).back();
+			if (!FormList->empty()) {
+				FormList->emplace_back(FRMHED{});
+				auto& form = FormList->back();
 				// reset vars as emplace may invalidate pointers
 				form::fvars(ClosestFormToCursor);
 				auto iNewVertex       = 0u;
@@ -811,13 +811,13 @@ void satin::ribon() {
 					form.satinOrAngle.guide[iGuide].finish = form.vertexCount - iGuide - 1;
 				}
 				FormIndex++;
-				ClosestFormToCursor = (*FormList).size() - 1;
+				ClosestFormToCursor = FormList->size() - 1;
 				form::frmout(ClosestFormToCursor);
 				form::refilfn();
 				ClosestFormToCursor = savedFormIndex;
 				StateMap.set(StateFlag::DELTO);
 				thred::frmdel();
-				ClosestFormToCursor = (*FormList).size() - 1;
+				ClosestFormToCursor = FormList->size() - 1;
 				StateMap.set(StateFlag::FORMSEL);
 				StateMap.set(StateFlag::INIT);
 				StateMap.set(StateFlag::RESTCH);
@@ -1194,7 +1194,7 @@ void satin::satfil() {
 
 void satin::satfix() {
 	const auto vertexCount = gsl::narrow<unsigned int>(TempPolygon->size());
-	auto&      form        = (*FormList).back();
+	auto&      form        = FormList->back();
 	auto       minSize     = 1u;
 	if (form.type == FRMFPOLY) {
 		minSize = 2u;
@@ -1206,14 +1206,14 @@ void satin::satfix() {
 		}
 		TempPolygon->clear();
 		form.vertexCount = vertexCount;
-		form::frmout((*FormList).size() - 1);
+		form::frmout(FormList->size() - 1);
 		form.satinGuideCount = 0;
 		FormIndex++;
 		StateMap.set(StateFlag::INIT);
 	}
 	else {
 		TempPolygon->clear();
-		(*FormList).pop_back();
+		FormList->pop_back();
 	}
 	StateMap.reset(StateFlag::SHOSAT);
 	StateMap.set(StateFlag::RESTCH);

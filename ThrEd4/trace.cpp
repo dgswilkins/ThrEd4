@@ -784,8 +784,8 @@ void trace::internal::dutrac() {
 		for (auto iCurrent = iNext + 1; iCurrent < decimatedLine.size(); iCurrent++) {
 			tracedPoints.push_back(decimatedLine[iCurrent]);
 		}
-		(*FormList).emplace_back(FRMHED{});
-		SelectedForm = &((*FormList).back());
+		FormList->emplace_back(FRMHED{});
+		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
 		CurrentFormVertices      = &FormVertices[FormVertexIndex];
 		CurrentFormVertices[0].x = tracedPoints[0].x * StitchBmpRatio.x;
@@ -819,7 +819,7 @@ void trace::internal::dutrac() {
 		SelectedForm->vertexCount = gsl::narrow<unsigned short>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
-		form::frmout((*FormList).size() - 1);
+		form::frmout(FormList->size() - 1);
 		SelectedForm->satinGuideCount = 0;
 		FormIndex++;
 		StateMap.set(StateFlag::RESTCH);
@@ -1059,7 +1059,7 @@ void trace::blak() {
 		return;
 	}
 	ti::tracwnd();
-	if (!(*FormList).empty()) {
+	if (!FormList->empty()) {
 		BlackPen = CreatePenInt(PS_SOLID, 1, 0);
 		SelectObject(BitmapDC, BlackPen);
 		SelectObject(TraceDC, BlackPen);

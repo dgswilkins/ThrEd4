@@ -416,7 +416,7 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 }
 
 void xt::fethrf() {
-	if (!(*FormList).empty()) {
+	if (!FormList->empty()) {
 		form::fvars(ClosestFormToCursor);
 		clip::delclps(ClosestFormToCursor);
 		texture::deltx();
@@ -2546,7 +2546,7 @@ void xt::nudsiz() {
 		flag = 1;
 	}
 	else {
-		if (!(*FormList).empty()) {
+		if (!FormList->empty()) {
 			thred::frmrct(designSizeRect);
 			flag = 2;
 		}
