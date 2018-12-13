@@ -834,7 +834,7 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 				AngledFormVertices->resize(SelectedForm->vertexCount);
 				auto destination = AngledFormVertices->begin();
 				std::copy(sourceStart, sourceEnd, destination);
-				textureForm.vertices = AngledFormVertices->data();
+				textureForm.vertexIndex = 0;
 				StateMap.reset(StateFlag::TXTLIN);
 				StateMap.set(StateFlag::TXTCLP);
 				StateMap.set(StateFlag::TXTMOV);

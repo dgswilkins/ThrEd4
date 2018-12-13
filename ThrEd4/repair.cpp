@@ -135,7 +135,7 @@ unsigned repair::internal::frmchkfn() {
 				if (!form.vertexCount) {
 					badData.attribute |= BADFLT;
 				}
-				if (badData.flt == gsl::narrow<unsigned int>(form.vertices - FormVertices->data())) {
+				if (badData.flt == form.vertexIndex) {
 					badData.flt += form.vertexCount;
 				}
 				else {
@@ -234,25 +234,23 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	auto flag        = true;
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		auto& form = formList[iForm];
-		// ToDo - find a better way than pointer arithmetic
-		const auto vertexDifference = gsl::narrow<unsigned int>(form.vertices - FormVertices->data());
-		if (FormVertexIndex >= vertexDifference + form.vertexCount) {
+		if (FormVertexIndex >= form.vertexIndex + form.vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + form.vertexCount);
-			auto       sourceStart = form.vertices;
+			auto       sourceStart = FormVertices->begin() + form.vertexIndex;
 			auto       sourceEnd   = sourceStart + form.vertexCount;
 			auto       destination = vertexPoint.begin() + iVertex;
 			const auto _           = std::copy(sourceStart, sourceEnd, destination);
-			form.vertices          = &(*FormVertices)[iVertex];
+			form.vertexIndex          = iVertex;
 			iVertex += form.vertexCount;
 			ri::bcup(iForm, badData);
 		}
 		else {
-			if (vertexDifference < FormVertexIndex) {
-				form.vertexCount = gsl::narrow<unsigned short>(FormVertexIndex - vertexDifference);
+			if (form.vertexIndex < FormVertexIndex) {
+				form.vertexCount = gsl::narrow<unsigned short>(FormVertexIndex - form.vertexIndex);
 				satin::delsac(iForm);
 				// ToDo - do we need to increase the size of vertexPoint?
 				// vertexPoint.resize(vertexPoint.size + form.vertexCount);
-				auto sourceStart = form.vertices;
+				auto sourceStart = FormVertices->begin() + form.vertexIndex;
 				auto sourceEnd   = sourceStart + form.vertexCount;
 				auto destination = vertexPoint.begin() + iVertex;
 				auto _           = std::copy(sourceStart, sourceEnd, destination);
