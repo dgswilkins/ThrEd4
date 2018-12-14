@@ -1243,7 +1243,7 @@ bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float use
 	return true;
 }
 
-unsigned int form::closflt(float xCoordinate, float yCoordinate) noexcept {
+unsigned int form::closflt(float xCoordinate, float yCoordinate) {
 	auto closestVertex = 0u;
 
 	auto minimumLength = 1e99;
@@ -1368,7 +1368,7 @@ bool form::lastch() noexcept {
 	{ return false; }
 }
 
-unsigned int form::getlast() noexcept {
+unsigned int form::getlast() {
 	if (SelectedForm->fillType) {
 		form::lastch();
 		auto minimumLength = 1e99;
@@ -1617,7 +1617,7 @@ bool form::internal::projv(double        xCoordinate,
 	return false;
 }
 
-bool form::cisin(float xCoordinate, float yCoordinate) noexcept {
+bool form::cisin(float xCoordinate, float yCoordinate) {
 	const auto* rectangle = &SelectedForm->rectangle;
 
 	if (xCoordinate >= rectangle->right) {
@@ -2713,7 +2713,7 @@ void form::internal::duflt(float& formOffset) {
 	}
 }
 
-unsigned form::internal::leftsid() noexcept {
+unsigned form::internal::leftsid() {
 	auto iVertex    = 0u;
 	auto leftVertex = 0u;
 	auto minimumX   = 1e9f;
@@ -2795,7 +2795,7 @@ bool form::internal::isect(unsigned int  vertex0,
                            fPOINT&       intersection,
                            float&        length,
                            const fPOINT& lineSegmentStart,
-                           const fPOINT& lineSegmentEnd) noexcept {
+                           const fPOINT& lineSegmentEnd) {
 	const auto delta            = dPOINT{ (lineSegmentEnd.x - lineSegmentStart.x), (lineSegmentEnd.y - lineSegmentStart.y) };
 	const auto point            = dPOINT{ (lineSegmentStart.x), (lineSegmentStart.y) };
 	auto       tempIntersection = dPOINT{};
@@ -2959,7 +2959,7 @@ bool form::internal::lencmp(const LENINFO& arg1, const LENINFO& arg2) noexcept {
 	return (arg1.length < arg2.length);
 }
 
-void form::internal::chksid(unsigned int vertexIndex, unsigned clipIntersectSide) noexcept {
+void form::internal::chksid(unsigned int vertexIndex, unsigned clipIntersectSide) {
 	if (clipIntersectSide != vertexIndex) {
 		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 		if ((vertexIndex - clipIntersectSide + VertexCount) % VertexCount < (VertexCount >> 1)) {
@@ -3448,7 +3448,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 	}
 }
 
-void form::internal::angout(FRMHED& angledForm) noexcept {
+void form::internal::angout(FRMHED& angledForm) {
 	if (angledForm.vertexCount) {
 		auto rectangle      = &angledForm.rectangle;
 		CurrentFormVertices = angledForm.vertexIndex;
@@ -4668,7 +4668,7 @@ void form::internal::bakseq() {
 #endif
 }
 
-void form::ritseq1(unsigned int ind) noexcept {
+void form::ritseq1(unsigned int ind) {
 	auto vertexIt              = FormVertices->begin() + CurrentFormVertices;
 	BSequence[SequenceIndex].x = vertexIt[ind].x;
 	BSequence[SequenceIndex].y = vertexIt[ind].y;

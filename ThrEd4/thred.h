@@ -234,8 +234,8 @@ namespace internal {
 	unsigned frmcnt(unsigned int iForm, unsigned& formFirstStitchIndex) noexcept;
 	void     frmcurmen();
 	void     frmcursel(unsigned cursorType);
-	void     frmpos(float deltaX, float deltaY) noexcept;
-	void     frmsnap(unsigned int start, unsigned int count) noexcept;
+	void     frmpos(float deltaX, float deltaY);
+	void     frmsnap(unsigned int start, unsigned int count);
 	bool     frmstch();
 	COLORREF fswap(COLORREF color) noexcept;
 

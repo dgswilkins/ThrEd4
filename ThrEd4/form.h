@@ -44,8 +44,8 @@ bool         chkdel() noexcept;
 unsigned     chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
 bool         chkmax(unsigned int arg0, unsigned int arg1) noexcept;
 void         chkseq(bool border);
-bool         cisin(float xCoordinate, float yCoordinate) noexcept;
-unsigned int closflt(float xCoordinate, float yCoordinate) noexcept;
+bool         cisin(float xCoordinate, float yCoordinate);
+unsigned int closflt(float xCoordinate, float yCoordinate);
 bool         closfrm();
 void         clpfil();
 void         clpspac(unsigned insertPoint, unsigned int count);
@@ -113,7 +113,7 @@ void         fvars(unsigned int iForm);
 
 float getblen();
 
-unsigned int getlast() noexcept;
+unsigned int getlast();
 
 float getplen() noexcept;
 
@@ -160,7 +160,7 @@ void     refilal();
 void     refilfn();
 void     rinfrm();
 void     ritfrct(unsigned int iForm, HDC dc);
-void     ritseq1(unsigned int ind) noexcept;
+void     ritseq1(unsigned int ind);
 void     rotagain();
 void     rotcmd();
 void     rotdup();
@@ -203,7 +203,7 @@ void     vrtsclp();
 namespace internal {
 
 	void adfrm(unsigned int iForm);
-	void angout(FRMHED& angledForm) noexcept;
+	void angout(FRMHED& angledForm);
 	void apbrd();
 	void bakseq();
 	void bdrlin(unsigned int start, unsigned int finish, double stitchSize);
@@ -225,7 +225,7 @@ namespace internal {
 	            SMALPNTL*                     sequenceLines);
 	bool chk2of();
 	void chkbrd(unsigned& interleaveSequenceIndex2);
-	void chksid(unsigned int vertexIndex, unsigned clipIntersectSide) noexcept;
+	void chksid(unsigned int vertexIndex, unsigned clipIntersectSide);
 	bool closat(intersectionStyles& inOutFlag);
 	bool clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept;
 	void clpcon(const std::vector<RNGCNT>& textureSegments);
@@ -332,7 +332,7 @@ namespace internal {
 	           fPOINT&       intersection,
 	           float&        length,
 	           const fPOINT& lineSegmentStart,
-	           const fPOINT& lineSegmentEnd) noexcept;
+	           const fPOINT& lineSegmentEnd);
 	bool isin(std::vector<VCLPX>& regionCrossingData,
 	          float               xCoordinate,
 	          float               yCoordinate,
@@ -461,7 +461,7 @@ namespace internal {
 	void unbean(unsigned start, unsigned finish);
 	void uncon();
 
-	unsigned leftsid() noexcept;
+	unsigned leftsid();
 
 	bool unvis(const boost::dynamic_bitset<>& visitedRegions, unsigned& visitedIndex);
 	bool vscmp(unsigned index1, unsigned index2) noexcept;

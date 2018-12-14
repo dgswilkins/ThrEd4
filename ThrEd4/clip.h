@@ -91,14 +91,14 @@ namespace internal {
 	            const dPOINT&              vector0,
 	            const dPOINT&              rotationCenter,
 	            unsigned int               currentSide);
-	bool nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int currentSide) noexcept;
+	bool nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int currentSide);
 	void picfn(std::vector<fPOINT>& clipFillData,
 	           unsigned int         start,
 	           unsigned int         finish,
 	           double               spacing,
 	           const dPOINT&        rotationCenter);
 	bool ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) noexcept;
-	void setvct(unsigned int start, unsigned int finish, double& clipAngle, dPOINT& vector0) noexcept;
+	void setvct(unsigned int start, unsigned int finish, double& clipAngle, dPOINT& vector0);
 	void xclpfn(const std::vector<fPOINT>& tempClipPoints,
 	            const std::vector<fPOINT>& chainEndPoints,
 	            unsigned                   start,

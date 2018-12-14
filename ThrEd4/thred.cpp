@@ -10890,7 +10890,7 @@ void thred::internal::stchsnap(unsigned start, unsigned finish) noexcept {
 	}
 }
 
-void thred::internal::frmsnap(unsigned int start, unsigned int count) noexcept {
+void thred::internal::frmsnap(unsigned int start, unsigned int count) {
 	auto vertexIt = FormVertices->begin() + start;
 
 	for (auto i = 0u; i < count; i++) {
@@ -11117,7 +11117,7 @@ void thred::internal::filclos() {
 	}
 }
 
-void thred::internal::frmpos(float deltaX, float deltaY) noexcept {
+void thred::internal::frmpos(float deltaX, float deltaY) {
 	auto vertexIt = FormVertices->begin() + SelectedForm->vertexIndex;
 	for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
 		auto& vertex = vertexIt[iVertex];

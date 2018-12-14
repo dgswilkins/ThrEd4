@@ -240,14 +240,14 @@ void clip::internal::durev(std::vector<fPOINT>& clipReversedData) {
 	}
 }
 
-void clip::internal::setvct(unsigned int start, unsigned int finish, double& clipAngle, dPOINT& vector0) noexcept {
+void clip::internal::setvct(unsigned int start, unsigned int finish, double& clipAngle, dPOINT& vector0) {
 	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	clipAngle     = atan2(vertexIt[finish].y - vertexIt[start].y, vertexIt[finish].x - vertexIt[start].x);
 	vector0.x     = ClipRectSize.cx * cos(clipAngle);
 	vector0.y     = ClipRectSize.cx * sin(clipAngle);
 }
 
-bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int currentSide) noexcept {
+bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int currentSide) {
 	const auto sinAngle = sin(clipAngle);
 	const auto cosAngle = cos(clipAngle);
 
