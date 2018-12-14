@@ -770,10 +770,12 @@ void trace::internal::dutrac() {
 				decimatedLine.push_back(tracedPoints[iPoint]);
 			}
 		}
+		auto maxPoints = decimatedLine.size();
 		tracedPoints.clear();
+		tracedPoints.reserve(maxPoints);
 		tracedPoints.push_back(decimatedLine[0]);
 		auto iNext = 0u;
-		for (auto iCurrent = 1u; iCurrent < decimatedLine.size(); iCurrent++) {
+		for (auto iCurrent = 1u; iCurrent < maxPoints; iCurrent++) {
 			const auto traceLength
 			    = hypot(decimatedLine[iCurrent].x - decimatedLine[iNext].x, decimatedLine[iCurrent].y - decimatedLine[iNext].y);
 			if (traceLength > IniFile.traceLength) {

@@ -311,6 +311,7 @@ void form::frmlin(unsigned int vertices, unsigned int vertexCount) {
 	if (VertexCount) {
 		auto& formLines = *FormLines;
 		formLines.clear();
+		formLines.reserve(vertexCount);
 		auto vertexIt = FormVertices->begin() + vertices;
 		for (auto iVertex = 0u; iVertex < vertexCount; iVertex++) {
 			auto& vertex = vertexIt[iVertex];
@@ -329,6 +330,7 @@ void form::frmlin(const std::vector<fPOINT>& vertices) {
 	if (vertexMax) {
 		auto& formLines = *FormLines;
 		formLines.clear();
+		formLines.reserve(vertexMax);
 		for (auto iVertex = 0u; iVertex < vertexMax; iVertex++) {
 			formLines.emplace_back(
 			    POINT{ dToL((vertices[iVertex].x - ZoomRect.left) * ZoomRatio.x),
@@ -2308,6 +2310,7 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 	currentX = lowX;
 	for (auto iLine = 0u; iLine < fillLineCount; iLine++) {
 		projectedPoints.clear();
+		projectedPoints.reserve(VertexCount);
 		currentX += step;
 		auto iPoint = 0u;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
