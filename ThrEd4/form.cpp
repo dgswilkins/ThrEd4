@@ -105,16 +105,10 @@ bool form::chkmax(unsigned int arg0, unsigned int arg1) noexcept {
 }
 
 void form::fltspac(unsigned int start, unsigned int count) {
-	auto vertexIt    = FormVertices->begin() + start;
-	auto destination = FormVertexIndex + count - 1;
+	auto sourceStart = FormVertices->begin() + start;
+	auto sourceEnd = sourceStart + count;
+	FormVertices->insert(sourceStart, sourceStart, sourceEnd);
 
-	// ToDo - This is broken. Use insert instead
-	if (FormVertexIndex) {
-		auto source = FormVertexIndex - 1;
-		while (source >= start) {
-			(*FormVertices)[destination--] = (*FormVertices)[source--];
-		}
-	}
 	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 		auto& form = (*FormList)[iForm];
 		form.vertexIndex += count;
@@ -5550,8 +5544,8 @@ bool form::internal::closat(intersectionStyles& inOutFlag) {
 
 void form::internal::nufpnt(unsigned int vertex, FRMHED* formForInsert) {
 	if (formForInsert != nullptr) {
-		auto vertexIt = FormVertices->begin() + formForInsert->vertexIndex;
 		form::fltspac(vertex + 1, 1);
+		auto vertexIt = FormVertices->begin() + formForInsert->vertexIndex;
 		vertexIt[vertex + 1] = SelectedPoint;
 		formForInsert->vertexCount++;
 		for (auto ind = 0u; ind < formForInsert->satinGuideCount; ind++) {

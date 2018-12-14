@@ -1186,11 +1186,11 @@ void thred::internal::dstin(unsigned number, POINT& pout) noexcept {
 }
 
 unsigned int thred::adflt(unsigned int count) {
-	const auto iFormVertex = FormVertexIndex;
-
-	if (FormVertexIndex + count > MAXITEMS) {
-		displayText::tabmsg(IDS_FRMOVR);
-	}
+	const auto iFormVertex1 = FormVertexIndex;
+	const auto iFormVertex = FormVertices->size();
+	const auto it = FormVertices->end();
+	const auto val = fPOINT{};
+	FormVertices->insert(it, count, val);
 	FormVertexIndex += count;
 	return iFormVertex;
 }
@@ -5659,8 +5659,9 @@ void thred::internal::nuFil() {
 							}
 						}
 						if (thredHeader.vertexCount) {
+							FormVertices->resize(thredHeader.vertexCount);
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof((*FormVertices)[0]));
-							ReadFile(FileHandle, FormVertices, bytesToRead, &BytesRead, nullptr);
+							ReadFile(FileHandle, FormVertices->data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								FormVertexIndex = BytesRead / sizeof((*FormVertices)[0]);
 								for (auto iVertex = FormVertexIndex; iVertex < thredHeader.vertexCount; iVertex++) {
@@ -5714,9 +5715,11 @@ void thred::internal::nuFil() {
 						satin::clearGuideSize();
 						FormVertexIndex = 0;
 						auto clipOffset = 0u;
+						auto formOffset = 0u;
 						for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 							auto& formIter       = (*FormList)[iForm];
-							formIter.vertexIndex = thred::adflt(formIter.vertexCount);
+							formIter.vertexIndex = formOffset;
+							formOffset += formIter.vertexCount;
 							if (formIter.type == SAT) {
 								if (formIter.satinGuideCount) {
 									formIter.satinOrAngle.guide = satin::adsatk(formIter.satinGuideCount);
@@ -11531,8 +11534,8 @@ void thred::internal::fixpclp() {
 	const auto offset = fPOINT{ SelectedPoint.x - InterleaveSequence[1].x, SelectedPoint.y - InterleaveSequence[1].y };
 	auto       iNext  = form::nxt(ClosestVertexToCursor);
 	const auto count  = OutputIndex - 2;
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	form::fltspac(iNext, count);
+	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	for (auto iOutput = 1u; iOutput < OutputIndex - 1; iOutput++) {
 		auto& vertex = vertexIt[iNext];
 		vertex.x = InterleaveSequence[iOutput].x + offset.x;
