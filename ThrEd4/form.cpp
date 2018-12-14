@@ -261,7 +261,7 @@ void form::ispcdclp() {
 
 void form::frmout(unsigned int formIndex) {
 	auto& form     = (*FormList)[formIndex];
-	auto  vertexIt = FormVertices->begin() + CurrentFormVertices;
+	auto  vertexIt = FormVertices->begin() + form.vertexIndex;
 	if (form.vertexCount) {
 		auto& rectangle     = form.rectangle;
 		CurrentFormVertices = form.vertexIndex;
@@ -1163,10 +1163,8 @@ bool form::closfrm() {
 				}
 			}
 		}
-		if ((*FormList)[closestForm].vertexIndex) {
-			auto& vertex = (*FormVertices)[(*FormList)[closestForm].vertexIndex + closestVertex];
-			thred::stch2pxr(vertex);
-		}
+		auto& vertex = (*FormVertices)[(*FormList)[closestForm].vertexIndex + closestVertex];
+		thred::stch2pxr(vertex);
 		minimumLength = hypot(StitchCoordinatesPixels.x - screenCoordinate.x, StitchCoordinatesPixels.y - screenCoordinate.y);
 		if (minimumLength < CLOSENUF) {
 			ClosestFormToCursor   = closestForm;
