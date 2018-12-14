@@ -789,14 +789,14 @@ void trace::internal::dutrac() {
 		FormList->emplace_back(FRMHED{});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
-		CurrentFormVertices      = FormVertexIndex;
-		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
-		vertexIt[0].x = tracedPoints[0].x * StitchBmpRatio.x;
-		vertexIt[0].y = tracedPoints[0].y * StitchBmpRatio.y;
-		iNext                    = 0;
-		OutputIndex              = 0;
-		auto traceLengthSum      = 0.0;
-		auto landscapeOffset     = 0.0;
+		CurrentFormVertices  = FormVertexIndex;
+		auto vertexIt        = FormVertices->begin() + CurrentFormVertices;
+		vertexIt[0].x        = tracedPoints[0].x * StitchBmpRatio.x;
+		vertexIt[0].y        = tracedPoints[0].y * StitchBmpRatio.y;
+		iNext                = 0;
+		OutputIndex          = 0;
+		auto traceLengthSum  = 0.0;
+		auto landscapeOffset = 0.0;
 		if (StateMap.test(StateFlag::LANDSCAP)) {
 			landscapeOffset = UnzoomedRect.y - BitmapSizeinStitches.y;
 		}
@@ -807,8 +807,8 @@ void trace::internal::dutrac() {
 			    = hypot(tracedPoints[iCurrent].x - tracedPoints[iNext].x, tracedPoints[iCurrent].y - tracedPoints[iNext].y);
 			if (traceLengthSum > traceLength * IniFile.traceRatio) {
 				auto& outVertex = vertexIt[OutputIndex];
-				outVertex.x = tracedPoints[iCurrent - 1].x * StitchBmpRatio.x;
-				outVertex.y = tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset;
+				outVertex.x     = tracedPoints[iCurrent - 1].x * StitchBmpRatio.x;
+				outVertex.y     = tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset;
 				OutputIndex++;
 				iCurrent--;
 				iNext          = iCurrent;
@@ -819,7 +819,7 @@ void trace::internal::dutrac() {
 			displayText::tabmsg(IDS_FRMOVR);
 			return;
 		}
-		SelectedForm->vertexIndex    = thred::adflt(OutputIndex);
+		SelectedForm->vertexIndex = thred::adflt(OutputIndex);
 		SelectedForm->vertexCount = gsl::narrow<unsigned short>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);

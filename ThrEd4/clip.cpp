@@ -599,7 +599,7 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 		ci::fxlin(chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide);
 	}
 	auto& nextVertex = vertexIt[NextStart];
-	interval = hypot(nextVertex.x - SelectedPoint.x, nextVertex.y - SelectedPoint.y);
+	interval         = hypot(nextVertex.x - SelectedPoint.x, nextVertex.y - SelectedPoint.y);
 	if (interval > halfSpacing) {
 		chainEndPoints.push_back(nextVertex);
 	}
@@ -702,16 +702,14 @@ void clip::duxclp() {
 
 void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int vertex, const dPOINT& rotationCenter) {
 	const auto iNextVertex = form::nxt(vertex);
-	auto       delta      = dPOINT{};
-	auto  vertexIt = FormVertices->begin() + CurrentFormVertices;
-	auto& nextVertex = vertexIt[iNextVertex];
+	auto       delta       = dPOINT{};
+	auto       vertexIt    = FormVertices->begin() + CurrentFormVertices;
+	auto&      nextVertex  = vertexIt[iNextVertex];
 	if (StateMap.test(StateFlag::INDIR)) {
-		delta = fPOINT{ (*OutsidePoints)[iNextVertex].x - nextVertex.x,
-			            (*OutsidePoints)[iNextVertex].y - nextVertex.y };
+		delta = fPOINT{ (*OutsidePoints)[iNextVertex].x - nextVertex.x, (*OutsidePoints)[iNextVertex].y - nextVertex.y };
 	}
 	else {
-		delta = fPOINT{ (*InsidePoints)[iNextVertex].x - nextVertex.x,
-			            (*InsidePoints)[iNextVertex].y - nextVertex.y };
+		delta = fPOINT{ (*InsidePoints)[iNextVertex].x - nextVertex.x, (*InsidePoints)[iNextVertex].y - nextVertex.y };
 	}
 	const auto rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
 	const auto referencePoint = fPOINTATTR{ ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
@@ -725,7 +723,7 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 	const auto ratio  = form::getplen() / length;
 	delta.x *= ratio;
 	delta.y *= ratio;
-	const auto point = fPOINT{ nextVertex.x + delta.x, nextVertex.y + delta.y };
+	const auto point           = fPOINT{ nextVertex.x + delta.x, nextVertex.y + delta.y };
 	OSequence[SequenceIndex++] = nextVertex;
 	OSequence[SequenceIndex++] = point;
 	OSequence[SequenceIndex++] = nextVertex;
@@ -741,11 +739,10 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
                            unsigned int         finish,
                            double               spacing,
                            const dPOINT&        rotationCenter) {
-	auto  vertexIt = FormVertices->begin() + CurrentFormVertices;
-	auto& startVertex = vertexIt[start];
-	auto& endVertex = vertexIt[finish];
-	const auto       delta          = dPOINT{ (endVertex.x - startVertex.x),
-                               (endVertex.y - startVertex.y) };
+	auto             vertexIt       = FormVertices->begin() + CurrentFormVertices;
+	auto&            startVertex    = vertexIt[start];
+	auto&            endVertex      = vertexIt[finish];
+	const auto       delta          = dPOINT{ (endVertex.x - startVertex.x), (endVertex.y - startVertex.y) };
 	const auto       length         = hypot(delta.x, delta.y);
 	const fPOINTATTR referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
 
@@ -815,7 +812,7 @@ void clip::clpic() {
 		ci::picfn(clipFillData, VertexCount - 2, VertexCount - 1, SelectedForm->edgeSpacing, rotationCenter);
 	}
 	else {
-		auto  vertexIt = FormVertices->begin() + CurrentFormVertices;
+		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 		if (!SelectedForm->fillType) {
 			OSequence[SequenceIndex++] = vertexIt[0];
 		}

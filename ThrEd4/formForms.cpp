@@ -1211,10 +1211,9 @@ void formForms::wavfrm() {
 				}
 			}
 		}
-		vertexIt[iVertex]      = currentPosition;
-		const auto vertexCount = iVertex + 1;
-		const auto rotationAngle
-		    = -atan2(vertexIt[iVertex].y - vertexIt[0].y, vertexIt[iVertex].x - vertexIt[0].x);
+		vertexIt[iVertex]        = currentPosition;
+		const auto vertexCount   = iVertex + 1;
+		const auto rotationAngle = -atan2(vertexIt[iVertex].y - vertexIt[0].y, vertexIt[iVertex].x - vertexIt[0].x);
 		for (auto index = 0u; index < vertexCount; index++) {
 			thred::rotflt(vertexIt[index], rotationAngle, { 0.0, 0.0 });
 		}

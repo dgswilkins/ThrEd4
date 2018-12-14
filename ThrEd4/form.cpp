@@ -106,7 +106,7 @@ bool form::chkmax(unsigned int arg0, unsigned int arg1) noexcept {
 
 void form::fltspac(unsigned int start, unsigned int count) {
 	auto sourceStart = FormVertices->begin() + start;
-	auto sourceEnd = sourceStart + count;
+	auto sourceEnd   = sourceStart + count;
 	FormVertices->insert(sourceStart, sourceStart, sourceEnd);
 
 	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
@@ -5546,7 +5546,7 @@ bool form::internal::closat(intersectionStyles& inOutFlag) {
 void form::internal::nufpnt(unsigned int vertex, FRMHED* formForInsert) {
 	if (formForInsert != nullptr) {
 		form::fltspac(vertex + 1, 1);
-		auto vertexIt = FormVertices->begin() + formForInsert->vertexIndex;
+		auto vertexIt        = FormVertices->begin() + formForInsert->vertexIndex;
 		vertexIt[vertex + 1] = SelectedPoint;
 		formForInsert->vertexCount++;
 		for (auto ind = 0u; ind < formForInsert->satinGuideCount; ind++) {

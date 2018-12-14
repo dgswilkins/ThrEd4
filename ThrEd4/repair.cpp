@@ -240,7 +240,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			auto       sourceEnd   = sourceStart + form.vertexCount;
 			auto       destination = vertexPoint.begin() + iVertex;
 			const auto _           = std::copy(sourceStart, sourceEnd, destination);
-			form.vertexIndex          = iVertex;
+			form.vertexIndex       = iVertex;
 			iVertex += form.vertexCount;
 			ri::bcup(iForm, badData);
 		}

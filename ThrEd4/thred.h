@@ -32,21 +32,21 @@ namespace thred {
 unsigned int adclp(unsigned int count);
 
 unsigned int adflt(unsigned int count);
-void     bBox() noexcept;
-void     chkmen() noexcept;
-void     chkrng(fPOINT& range);
-void     coltab();
-void     delfstchs();
-void     delinf();
-void     delstchm();
-unsigned duthrsh(double threshold) noexcept;
-void     duzrat() noexcept;
-void     frmdel();
-void     frmrct(fRECTANGLE& rectangle);
-HBITMAP  getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ unsigned int** ppvBits);
-void     grpAdj();
-void     hidbit();
-void     movStch();
+void         bBox() noexcept;
+void         chkmen() noexcept;
+void         chkrng(fPOINT& range);
+void         coltab();
+void         delfstchs();
+void         delinf();
+void         delstchm();
+unsigned     duthrsh(double threshold) noexcept;
+void         duzrat() noexcept;
+void         frmdel();
+void         frmrct(fRECTANGLE& rectangle);
+HBITMAP      getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ unsigned int** ppvBits);
+void         grpAdj();
+void         hidbit();
+void         movStch();
 
 void inline mvstch(unsigned int destination, unsigned int source) noexcept;
 
