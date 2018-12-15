@@ -1137,6 +1137,7 @@ bool form::closfrm() {
 		fi::px2stchf(screenCoordinate, point);
 		const auto layerCoded = ActiveLayer << 1;
 		const auto maxForm    = FormList->size();
+		const auto savedVertex = VertexCount;
 		for (auto iForm = 0u; iForm < maxForm; iForm++) {
 			if (StateMap.test(StateFlag::FRMSAM) && iForm == ClosestFormToCursor) {
 				continue;
@@ -1165,6 +1166,7 @@ bool form::closfrm() {
 				}
 			}
 		}
+		VertexCount = savedVertex;
 		auto& vertex = (*FormVertices)[(*FormList)[closestForm].vertexIndex + closestVertex];
 		thred::stch2pxr(vertex);
 		minimumLength = hypot(StitchCoordinatesPixels.x - screenCoordinate.x, StitchCoordinatesPixels.y - screenCoordinate.y);
