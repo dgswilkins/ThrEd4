@@ -562,22 +562,22 @@ void texture::internal::ritxrct() noexcept {
 
 void texture::internal::dutxrct(TXTRCT& textureRect) {
 	if (!SelectedTexturePointsList->empty()) {
-		auto texturePoint = &(*TempTexturePoints)[(*SelectedTexturePointsList)[0]];
-		textureRect.left = textureRect.right = texturePoint->line;
-		textureRect.top = textureRect.bottom = texturePoint->y;
+		auto& texturePointZero = (*TempTexturePoints)[(*SelectedTexturePointsList)[0]];
+		textureRect.left = textureRect.right = texturePointZero.line;
+		textureRect.top = textureRect.bottom = texturePointZero.y;
 		for (auto iPoint = 1u; iPoint < SelectedTexturePointsList->size(); iPoint++) {
-			texturePoint = &(*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]];
-			if (texturePoint->y > textureRect.top) {
-				textureRect.top = texturePoint->y;
+			auto& texturePoint = (*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]];
+			if (texturePoint.y > textureRect.top) {
+				textureRect.top = texturePoint.y;
 			}
-			if (texturePoint->y < textureRect.bottom) {
-				textureRect.bottom = texturePoint->y;
+			if (texturePoint.y < textureRect.bottom) {
+				textureRect.bottom = texturePoint.y;
 			}
-			if (texturePoint->line < textureRect.left) {
-				textureRect.left = texturePoint->line;
+			if (texturePoint.line < textureRect.left) {
+				textureRect.left = texturePoint.line;
 			}
-			if (texturePoint->line > textureRect.right) {
-				textureRect.right = texturePoint->line;
+			if (texturePoint.line > textureRect.right) {
+				textureRect.right = texturePoint.line;
 			}
 		}
 	}
@@ -1448,16 +1448,16 @@ void texture::txsnap() {
 		const auto halfGrid = IniFile.gridSize / 2;
 		if (!SelectedTexturePointsList->empty()) {
 			for (auto iPoint = 0u; iPoint < txpntSize; iPoint++) {
-				auto       texturePoint = &(*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]];
-				const auto yStep        = (texturePoint->y + halfGrid) / IniFile.gridSize;
-				texturePoint->y         = yStep * IniFile.gridSize;
+				auto&       texturePoint = (*TempTexturePoints)[(*SelectedTexturePointsList)[iPoint]];
+				const auto yStep        = (texturePoint.y + halfGrid) / IniFile.gridSize;
+				texturePoint.y         = yStep * IniFile.gridSize;
 			}
 		}
 		else {
 			for (auto iPoint = 0u; iPoint < txpntSize; iPoint++) {
-				auto       texturePoint = &(*TempTexturePoints)[iPoint];
-				const auto yStep        = (texturePoint->y + halfGrid) / IniFile.gridSize;
-				texturePoint->y         = yStep * IniFile.gridSize;
+				auto&       texturePoint = (*TempTexturePoints)[iPoint];
+				const auto yStep        = (texturePoint.y + halfGrid) / IniFile.gridSize;
+				texturePoint.y         = yStep * IniFile.gridSize;
 			}
 		}
 		StateMap.set(StateFlag::RESTCH);
