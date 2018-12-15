@@ -1141,14 +1141,14 @@ bool form::closfrm() {
 			if (StateMap.test(StateFlag::FRMSAM) && iForm == ClosestFormToCursor) {
 				continue;
 			}
-			auto&      formIter  = (*FormList)[iForm];
-			const auto formLayer = formIter.attribute & FRMLMSK;
+			auto&      currentForm  = (*FormList)[iForm];
+			VertexCount = currentForm.vertexCount;
+			const auto formLayer = currentForm.attribute & FRMLMSK;
 			if (!ActiveLayer || !formLayer || formLayer == layerCoded) {
-				auto vertexIt = FormVertices->begin() + formIter.vertexIndex;
+				auto vertexIt = FormVertices->begin() + currentForm.vertexIndex;
 				// find the closest line first and then find the closest vertex on that line
 				auto       length    = 0.0;
-				const auto sideCount = formIter.vertexCount;
-				for (auto iVertex = 0u; iVertex < sideCount; iVertex++) {
+				for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 					auto&      vertex     = vertexIt[iVertex];
 					auto&      nextVertex = vertexIt[form::nxt(iVertex)];
 					const auto param      = fi::findDistanceToSide(vertex, nextVertex, point, length);
