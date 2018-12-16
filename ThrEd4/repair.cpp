@@ -222,10 +222,10 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	auto  badData      = BADCNTS{};
 	auto& formList     = *FormList;
 
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-		if (formList[iForm].vertexCount) {
-			formList[iDestination++] = formList[iForm];
-			vertexCount += formList[iForm].vertexCount;
+	for (auto& form : *FormList) {
+		if (form.vertexCount) {
+			formList[iDestination++] = form;
+			vertexCount += form.vertexCount;
 		}
 	}
 	FormIndex        = iDestination;

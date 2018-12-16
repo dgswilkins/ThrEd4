@@ -960,16 +960,15 @@ void form::flipv() {
 	if (StateMap.test(StateFlag::BIGBOX)) {
 		thred::savdo();
 		const auto midpoint = (AllItemsRect.top - AllItemsRect.bottom) / 2.0f + AllItemsRect.bottom;
-		for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
-			(*FormVertices)[iVertex].y = midpoint + midpoint - (*FormVertices)[iVertex].y;
+		for (auto& vertex : *FormVertices) {
+			vertex.y = midpoint + midpoint - vertex.y;
 		}
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
 		}
-		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-			auto& formIter            = (*FormList)[iForm];
-			formIter.rectangle.bottom = midpoint + midpoint - formIter.rectangle.bottom;
-			formIter.rectangle.top    = midpoint + midpoint - formIter.rectangle.top;
+		for (auto& form : *FormList) {
+			form.rectangle.bottom = midpoint + midpoint - form.rectangle.bottom;
+			form.rectangle.top    = midpoint + midpoint - form.rectangle.top;
 		}
 		StateMap.set(StateFlag::RESTCH);
 		return;
@@ -5332,14 +5331,13 @@ void form::rstfrm() {
 }
 
 void form::clrfills() {
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-		auto& formIter                   = (*FormList)[iForm];
-		formIter.clipEntries             = 0;
-		formIter.lengthOrCount.clipCount = 0;
-		formIter.edgeType                = 0;
-		formIter.fillType                = 0;
-		formIter.attribute &= NFRECONT;
-		formIter.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
+	for (auto& form : *FormList) {
+		form.clipEntries             = 0;
+		form.lengthOrCount.clipCount = 0;
+		form.edgeType                = 0;
+		form.fillType                = 0;
+		form.attribute &= NFRECONT;
+		form.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
 	}
 	ClipPoints->clear();
 }
@@ -5491,13 +5489,13 @@ bool form::internal::closat(intersectionStyles& inOutFlag) {
 
 	thred::px2stch();
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-		auto& formIter = (*FormList)[iForm];
-		if (!ActiveLayer || ((formIter.attribute & FRMLMSK) >> 1) == ActiveLayer || !(formIter.attribute & FRMLMSK)) {
-			CurrentFormVertices    = formIter.vertexIndex;
+		auto& form = (*FormList)[iForm];
+		if (!ActiveLayer || ((form.attribute & FRMLMSK) >> 1) == ActiveLayer || !(form.attribute & FRMLMSK)) {
+			CurrentFormVertices    = form.vertexIndex;
 			const auto savedVertex = VertexCount;
-			VertexCount            = formIter.vertexCount;
+			VertexCount            = form.vertexCount;
 			auto lastVertex        = 0u;
-			if (formIter.type == FRMLINE) {
+			if (form.type == FRMLINE) {
 				lastVertex = VertexCount - 1;
 			}
 			else {
@@ -5919,8 +5917,8 @@ void form::setap() {
 void form::internal::getbig() {
 	AllItemsRect.bottom = AllItemsRect.left = 1e9;
 	AllItemsRect.top = AllItemsRect.right = 0;
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-		const auto& trct = (*FormList)[iForm].rectangle;
+	for (auto& form : *FormList) {
+		const auto& trct = form.rectangle;
 		if (trct.bottom < AllItemsRect.bottom) {
 			AllItemsRect.bottom = trct.bottom;
 		}
@@ -6111,10 +6109,10 @@ void form::setstrtch() {
 		}
 		if (StateMap.test(StateFlag::BIGBOX)) {
 			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-				auto& formIter      = (*FormList)[iForm];
-				CurrentFormVertices = formIter.vertexIndex;
+				auto& form      = (*FormList)[iForm];
+				CurrentFormVertices = form.vertexIndex;
 				auto vertexIt       = FormVertices->begin() + CurrentFormVertices;
-				for (auto iVertex = 0u; iVertex < formIter.vertexCount; iVertex++) {
+				for (auto iVertex = 0u; iVertex < form.vertexCount; iVertex++) {
 					vertexIt[iVertex].x = (vertexIt[iVertex].x - reference) * ratio + reference;
 				}
 				form::frmout(iForm);
@@ -6167,10 +6165,10 @@ void form::setstrtch() {
 		}
 		if (StateMap.test(StateFlag::BIGBOX)) {
 			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-				auto& formIter      = (*FormList)[iForm];
-				CurrentFormVertices = formIter.vertexIndex;
+				auto& form      = (*FormList)[iForm];
+				CurrentFormVertices = form.vertexIndex;
 				auto vertexIt       = FormVertices->begin() + CurrentFormVertices;
-				for (auto iVertex = 0u; iVertex < formIter.vertexCount; iVertex++) {
+				for (auto iVertex = 0u; iVertex < form.vertexCount; iVertex++) {
 					vertexIt[iVertex].y = (vertexIt[iVertex].y - reference) * ratio + reference;
 				}
 				form::frmout(iForm);
@@ -6820,8 +6818,8 @@ void form::fliph() {
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
 		const auto midpoint = (AllItemsRect.right - AllItemsRect.left) / 2 + AllItemsRect.left;
-		for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
-			(*FormVertices)[iVertex].x = midpoint + midpoint - (*FormVertices)[iVertex].x;
+		for (auto& vertex : *FormVertices) {
+			vertex.x = midpoint + midpoint - vertex.x;
 		}
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
@@ -8309,9 +8307,9 @@ void form::centir() {
 		StitchBuffer[iStitch].x += delta.x;
 		StitchBuffer[iStitch].y += delta.y;
 	}
-	for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
-		(*FormVertices)[iVertex].x += delta.x;
-		(*FormVertices)[iVertex].y += delta.y;
+	for (auto& vertex : *FormVertices) {
+		vertex.x += delta.x;
+		vertex.y += delta.y;
 	}
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		form::frmout(iForm);
@@ -8860,9 +8858,8 @@ void form::col2frm() {
 		}
 		auto startColorOffset = 0u;
 		auto endColorOffset   = 16u;
-		for (auto iForm = 0ul; iForm < FormIndex; iForm++) {
-			auto& formIter = (*FormList)[iForm];
-			if (formIter.fillType) {
+		for (auto& form : *FormList) {
+			if (form.fillType) {
 				auto count         = 0u;
 				auto majorityColor = 0u;
 				for (auto iColor = startColorOffset; iColor < endColorOffset; iColor++) {
@@ -8872,11 +8869,11 @@ void form::col2frm() {
 					}
 				}
 				majorityColor &= 0xf;
-				if (formIter.fillColor != majorityColor) {
+				if (form.fillColor != majorityColor) {
 					colorChangedCount++;
-					formIter.fillColor = gsl::narrow<unsigned char>(majorityColor);
+					form.fillColor = gsl::narrow<unsigned char>(majorityColor);
 				}
-				if (formIter.fillType == FTHF && formIter.extendedAttribute & AT_FTHBLND) {
+				if (form.fillType == FTHF && form.extendedAttribute & AT_FTHBLND) {
 					count = majorityColor = 0;
 					for (auto iColor = startColorOffset; iColor < endColorOffset; iColor++) {
 						if (featherColorHistogram[iColor] > count) {
@@ -8885,13 +8882,13 @@ void form::col2frm() {
 						}
 					}
 					majorityColor &= 0xf;
-					if (formIter.fillInfo.feather.color != majorityColor) {
+					if (form.fillInfo.feather.color != majorityColor) {
 						colorChangedCount++;
-						formIter.fillInfo.feather.color = gsl::narrow<unsigned char>(majorityColor);
+						form.fillInfo.feather.color = gsl::narrow<unsigned char>(majorityColor);
 					}
 				}
 			}
-			if (formIter.edgeType) {
+			if (form.edgeType) {
 				auto count         = 0u;
 				auto majorityColor = 0u;
 				for (auto iColor = startColorOffset; iColor < endColorOffset; iColor++) {
@@ -8901,12 +8898,12 @@ void form::col2frm() {
 					}
 				}
 				majorityColor &= 0xf;
-				if (formIter.borderColor != majorityColor) {
+				if (form.borderColor != majorityColor) {
 					colorChangedCount++;
-					formIter.borderColor = gsl::narrow<unsigned char>(majorityColor);
+					form.borderColor = gsl::narrow<unsigned char>(majorityColor);
 				}
 			}
-			if (formIter.extendedAttribute & (AT_WALK | AT_CWLK | AT_UND)) {
+			if (form.extendedAttribute & (AT_WALK | AT_CWLK | AT_UND)) {
 				auto count         = 0u;
 				auto majorityColor = 0u;
 				for (auto iColor = startColorOffset; iColor < endColorOffset; iColor++) {
@@ -8916,9 +8913,9 @@ void form::col2frm() {
 					}
 				}
 				majorityColor &= 0xf;
-				if (formIter.underlayColor != majorityColor) {
+				if (form.underlayColor != majorityColor) {
 					colorChangedCount++;
-					formIter.underlayColor = gsl::narrow<unsigned char>(majorityColor);
+					form.underlayColor = gsl::narrow<unsigned char>(majorityColor);
 				}
 			}
 			startColorOffset += 16;

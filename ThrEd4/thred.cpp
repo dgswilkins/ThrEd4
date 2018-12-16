@@ -1902,18 +1902,18 @@ void thred::internal::hupfn() {
 			CheckHoopRect.bottom = CheckHoopRect.top = vertexIt[0].y;
 			CheckHoopRect.left = CheckHoopRect.right = vertexIt[0].x;
 		}
-		for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
-			if ((*FormVertices)[iVertex].x < CheckHoopRect.left) {
-				CheckHoopRect.left = (*FormVertices)[iVertex].x;
+		for (auto& vertex : *FormVertices) {
+			if (vertex.x < CheckHoopRect.left) {
+				CheckHoopRect.left = vertex.x;
 			}
-			if ((*FormVertices)[iVertex].x > CheckHoopRect.right) {
-				CheckHoopRect.right = (*FormVertices)[iVertex].x;
+			if (vertex.x > CheckHoopRect.right) {
+				CheckHoopRect.right = vertex.x;
 			}
-			if ((*FormVertices)[iVertex].y < CheckHoopRect.bottom) {
-				CheckHoopRect.bottom = (*FormVertices)[iVertex].y;
+			if (vertex.y < CheckHoopRect.bottom) {
+				CheckHoopRect.bottom = vertex.y;
 			}
-			if ((*FormVertices)[iVertex].y > CheckHoopRect.top) {
-				CheckHoopRect.top = (*FormVertices)[iVertex].y;
+			if (vertex.y > CheckHoopRect.top) {
+				CheckHoopRect.top = vertex.y;
 			}
 		}
 	}
@@ -5715,23 +5715,23 @@ void thred::internal::nuFil() {
 						auto clipOffset = 0u;
 						auto formOffset = 0u;
 						for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-							auto& formIter       = (*FormList)[iForm];
-							formIter.vertexIndex = formOffset;
-							formOffset += formIter.vertexCount;
-							if (formIter.type == SAT) {
-								if (formIter.satinGuideCount) {
-									formIter.satinOrAngle.guide = satin::adsatk(formIter.satinGuideCount);
+							auto& form       = (*FormList)[iForm];
+							form.vertexIndex = formOffset;
+							formOffset += form.vertexCount;
+							if (form.type == SAT) {
+								if (form.satinGuideCount) {
+									form.satinOrAngle.guide = satin::adsatk(form.satinGuideCount);
 								}
 							}
 							// ToDo - do we still need to do this in v3? (we can store the offset safely in v3 where we could not
 							// store the pointer in v2)
 							if (clip::isclp(iForm)) {
-								formIter.angleOrClipData.clip = clipOffset;
-								clipOffset += formIter.lengthOrCount.clipCount;
+								form.angleOrClipData.clip = clipOffset;
+								clipOffset += form.lengthOrCount.clipCount;
 							}
 							if (clip::iseclpx(iForm)) {
-								formIter.borderClipData = clipOffset;
-								clipOffset += formIter.clipEntries;
+								form.borderClipData = clipOffset;
+								clipOffset += form.clipEntries;
 							}
 						}
 						FormVertexIndex = formOffset;
@@ -9239,8 +9239,8 @@ void thred::rotfn(double rotationAngle, const dPOINT& rotationCenter) {
 		return;
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-		for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
-			thred::rotflt((*FormVertices)[iVertex], rotationAngle, rotationCenter);
+		for (auto& vertex : *FormVertices) {
+			thred::rotflt(vertex, rotationAngle, rotationCenter);
 		}
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			thi::rotstch(&StitchBuffer[iStitch], rotationAngle, rotationCenter);
@@ -11132,8 +11132,8 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 		thred::savdo();
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-			SelectedForm = &((*FormList)[iForm]);
+		for (auto& form : *FormList) {
+			SelectedForm = &(form);
 			frmpos(deltaX, deltaY);
 		}
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -11301,33 +11301,32 @@ void thred::internal::movchk() {
 						}
 					}
 				}
-				for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-					auto& formIter = (*FormList)[iForm];
-					if (formIter.fillType) {
-						if (formIter.fillColor == VerticalIndex) {
-							formIter.fillColor = gsl::narrow<unsigned char>(DraggedColor);
+				for (auto& form : *FormList) {
+					if (form.fillType) {
+						if (form.fillColor == VerticalIndex) {
+							form.fillColor = gsl::narrow<unsigned char>(DraggedColor);
 						}
 						else {
-							if (!key && formIter.fillColor == DraggedColor) {
-								formIter.fillColor = gsl::narrow<unsigned char>(VerticalIndex);
+							if (!key && form.fillColor == DraggedColor) {
+								form.fillColor = gsl::narrow<unsigned char>(VerticalIndex);
 							}
 						}
-						if (formIter.fillInfo.feather.color == VerticalIndex) {
-							formIter.fillInfo.feather.color = gsl::narrow<unsigned char>(DraggedColor);
+						if (form.fillInfo.feather.color == VerticalIndex) {
+							form.fillInfo.feather.color = gsl::narrow<unsigned char>(DraggedColor);
 						}
 						else {
-							if (!key && formIter.fillInfo.feather.color == DraggedColor) {
-								formIter.fillInfo.feather.color = gsl::narrow<unsigned char>(VerticalIndex);
+							if (!key && form.fillInfo.feather.color == DraggedColor) {
+								form.fillInfo.feather.color = gsl::narrow<unsigned char>(VerticalIndex);
 							}
 						}
 					}
-					if (formIter.edgeType) {
-						if (formIter.borderColor == VerticalIndex) {
-							formIter.borderColor = gsl::narrow<unsigned char>(DraggedColor);
+					if (form.edgeType) {
+						if (form.borderColor == VerticalIndex) {
+							form.borderColor = gsl::narrow<unsigned char>(DraggedColor);
 						}
 						else {
-							if (!key && formIter.borderColor == DraggedColor) {
-								formIter.borderColor = gsl::narrow<unsigned char>(VerticalIndex);
+							if (!key && form.borderColor == DraggedColor) {
+								form.borderColor = gsl::narrow<unsigned char>(VerticalIndex);
 							}
 						}
 					}
@@ -11370,19 +11369,18 @@ void thred::internal::inscol() {
 					StitchBuffer[iStitch].attribute |= color + 1;
 				}
 			}
-			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-				auto& formIter = (*FormList)[iForm];
-				if (formIter.fillType) {
-					if (formIter.fillColor >= VerticalIndex && formIter.fillColor < nextColor) {
-						formIter.fillColor++;
+			for (auto& form : *FormList) {
+				if (form.fillType) {
+					if (form.fillColor >= VerticalIndex && form.fillColor < nextColor) {
+						form.fillColor++;
 					}
-					if (formIter.fillInfo.feather.color >= VerticalIndex && formIter.fillInfo.feather.color < nextColor) {
-						formIter.fillInfo.feather.color++;
+					if (form.fillInfo.feather.color >= VerticalIndex && form.fillInfo.feather.color < nextColor) {
+						form.fillInfo.feather.color++;
 					}
 				}
-				if (formIter.edgeType) {
-					if (formIter.borderColor >= VerticalIndex && formIter.borderColor < nextColor) {
-						formIter.borderColor++;
+				if (form.edgeType) {
+					if (form.borderColor >= VerticalIndex && form.borderColor < nextColor) {
+						form.borderColor++;
 					}
 				}
 			}
@@ -11421,19 +11419,18 @@ void thred::internal::delcol() {
 					StitchBuffer[iStitch].attribute |= color - 1;
 				}
 			}
-			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-				auto formIter = (*FormList)[iForm];
-				if (formIter.fillType) {
-					if (formIter.fillColor > VerticalIndex) {
-						formIter.fillColor--;
+			for (auto& form : *FormList) {
+				if (form.fillType) {
+					if (form.fillColor > VerticalIndex) {
+						form.fillColor--;
 					}
-					if (formIter.fillInfo.feather.color > VerticalIndex) {
-						formIter.fillInfo.feather.color--;
+					if (form.fillInfo.feather.color > VerticalIndex) {
+						form.fillInfo.feather.color--;
 					}
 				}
-				if (formIter.edgeType) {
-					if (formIter.borderColor > VerticalIndex) {
-						formIter.borderColor--;
+				if (form.edgeType) {
+					if (form.borderColor > VerticalIndex) {
+						form.borderColor--;
 					}
 				}
 			}
@@ -18586,17 +18583,15 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 }
 
 void thred::internal::sachk() {
-	for (auto iForm = 0ul; iForm < FormIndex; iForm++) {
-		const auto& form = (*FormList)[iForm];
+	auto iForm = 0u;
+	for (auto& form : *FormList) {
 		if (form.type == SAT && form.satinGuideCount) {
 			const auto* guide = form.satinOrAngle.guide;
 			if (guide) {
 				for (auto iGuide = 0u; iGuide < form.satinGuideCount; iGuide++) {
 					if (guide[iGuide].start > form.vertexCount || guide[iGuide].finish > form.vertexCount) {
 						const auto bakclo   = ClosestFormToCursor;
-						ClosestFormToCursor = iForm;
-						satin::delsac(iForm);
-						ClosestFormToCursor = bakclo;
+						satin::delsac(iForm++);
 					}
 				}
 			}
