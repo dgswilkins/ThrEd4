@@ -201,7 +201,7 @@ void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
 		}
 		ClipRect.left = ClipRect.right = clipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
-		for (auto clip : *ClipBuffer) {
+		for (auto& clip : *ClipBuffer) {
 			if (clip.x < ClipRect.left) {
 				ClipRect.left = clip.x;
 			}
@@ -674,7 +674,7 @@ void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
 	    = dPOINT{ (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
 	const auto rotationAngle = atan2(delta.y, delta.x);
 	auto       chainEndPoint = chainEndPoints[start];
-	for (auto clip : tempClipPoints) {
+	for (auto& clip : tempClipPoints) {
 		auto point = clip;
 		thred::rotflt(point, rotationAngle, rotationCenter);
 		OSequence[SequenceIndex++] = fPOINT{ chainEndPoint.x + point.x, chainEndPoint.y + point.y };

@@ -117,7 +117,7 @@ void texture::internal::redtbak() {
 		if (!textureHistoryItem->texturePoints.empty()) {
 			TempTexturePoints->clear();
 			TempTexturePoints->reserve(textureHistoryItem->texturePoints.size());
-			for (auto texturePoint : textureHistoryItem->texturePoints) {
+			for (auto& texturePoint : textureHistoryItem->texturePoints) {
 				TempTexturePoints->push_back(texturePoint);
 			}
 		}
@@ -235,7 +235,7 @@ void texture::savtxt() {
 			currentHistoryItem->spacing = TextureScreen.spacing;
 			currentHistoryItem->texturePoints.clear();
 			currentHistoryItem->texturePoints.reserve(TempTexturePoints->size());
-			for (auto texturePoint : *TempTexturePoints) {
+			for (auto& texturePoint : *TempTexturePoints) {
 				currentHistoryItem->texturePoints.push_back(texturePoint);
 			}
 		}
@@ -445,7 +445,7 @@ void texture::drwtxtr() {
 		line[1] = { TexturePixelRect.right, TexturePixelRect.top };
 		Polyline(StitchWindowMemDC, line, 2);
 	}
-	for (auto selectedPoint : *SelectedTexturePointsList) {
+	for (auto& selectedPoint : *SelectedTexturePointsList) {
 		txi::dutxtx(selectedPoint, IniFile.textureEditorSize);
 		txi::dutxtx(selectedPoint, IniFile.textureEditorSize << 1);
 	}
@@ -641,7 +641,7 @@ void texture::internal::setxclp(const FRMHED& textureForm) {
 	}
 	editorOffset.y -= TextureScreen.formCenter.y;
 	auto& angledFormVertices = *AngledFormVertices;
-	for (auto vertex : angledFormVertices) {
+	for (auto& vertex : angledFormVertices) {
 		vertex.x += editorOffset.x;
 		vertex.y += editorOffset.y;
 	}
@@ -713,7 +713,7 @@ void texture::txtrup() {
 		if (xCoord > 0) {
 			textureOffset.line -= xCoord;
 		}
-		for (auto point : *SelectedTexturePointsList) {
+		for (auto& point : *SelectedTexturePointsList) {
 			auto& texturePoint = (*TempTexturePoints)[point];
 			texturePoint.line += textureOffset.line;
 			texturePoint.y += textureOffset.y;
@@ -754,7 +754,7 @@ void texture::internal::angrct(fRECTANGLE& rectangle) {
 	rectangle.right          = angledFormVertices[0].x;
 	rectangle.bottom         = angledFormVertices[0].y;
 	rectangle.top            = angledFormVertices[0].y;
-	for (auto vertex : angledFormVertices) {
+	for (auto& vertex : angledFormVertices) {
 		if (vertex.x < rectangle.left) {
 			rectangle.left = vertex.x;
 		}
@@ -799,7 +799,7 @@ void texture::internal::setxfrm() {
 
 	txi::angrct(angleRect);
 	auto& angledFormVertices = *AngledFormVertices;
-	for (auto vertex : angledFormVertices) {
+	for (auto& vertex : angledFormVertices) {
 		vertex.x -= angleRect.left;
 		vertex.y -= angleRect.bottom;
 	}
@@ -807,7 +807,7 @@ void texture::internal::setxfrm() {
 	const auto height = angleRect.top - angleRect.bottom;
 	if (height > TextureScreen.areaHeight) {
 		const auto ratio = TextureScreen.areaHeight / height * 0.95;
-		for (auto vertex : angledFormVertices) {
+		for (auto& vertex : angledFormVertices) {
 			vertex.x *= ratio;
 			vertex.y *= ratio;
 		}
@@ -1368,7 +1368,7 @@ void texture::internal::txcntrv(const FRMHED& textureForm) {
 void texture::internal::txsiz(double ratio, FRMHED& textureForm) {
 	txi::ritxfrm(textureForm);
 	auto& angledFormVertices = *AngledFormVertices;
-	for (auto vertex : angledFormVertices) {
+	for (auto& vertex : angledFormVertices) {
 		vertex.x *= ratio;
 		vertex.y *= ratio;
 	}
@@ -1408,7 +1408,7 @@ void texture::internal::txnudg(int deltaX, float deltaY) {
 	if (!SelectedTexturePointsList->empty()) {
 		if (deltaY) {
 			const auto screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
-			for (auto point : *SelectedTexturePointsList) {
+			for (auto& point : *SelectedTexturePointsList) {
 				const auto yCoord = (*TempTexturePoints)[point].y + screenDeltaY;
 				if (yCoord < 0.0) {
 					return;
@@ -1417,12 +1417,12 @@ void texture::internal::txnudg(int deltaX, float deltaY) {
 					return;
 				}
 			}
-			for (auto point : *SelectedTexturePointsList) {
+			for (auto& point : *SelectedTexturePointsList) {
 				(*TempTexturePoints)[point].y += screenDeltaY;
 			}
 		}
 		else {
-			for (auto point : *SelectedTexturePointsList) {
+			for (auto& point : *SelectedTexturePointsList) {
 				const auto textureLine = (*TempTexturePoints)[point].line + deltaX;
 				if (textureLine < 1) {
 					return;
@@ -1431,7 +1431,7 @@ void texture::internal::txnudg(int deltaX, float deltaY) {
 					return;
 				}
 			}
-			for (const auto point : *SelectedTexturePointsList) {
+			for (auto& point : *SelectedTexturePointsList) {
 				(*TempTexturePoints)[point].line += gsl::narrow<unsigned short>(deltaX);
 			}
 		}

@@ -745,7 +745,7 @@ void form::drwfrm() {
 		ratsr();
 		SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
 		SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			fselrct(selectedForm);
 		}
 		SelectedFormsSize.x = gsl::narrow<decltype(SelectedFormsSize.x)>(SelectedFormsRect.right - SelectedFormsRect.left);
@@ -980,7 +980,7 @@ void form::flipv() {
 		auto rectangle = fRECTANGLE{};
 		form::pxrct2stch(SelectedFormsRect, rectangle);
 		const auto midpoint = (rectangle.top - rectangle.bottom) / 2.0f + rectangle.bottom;
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			formMap.set(ClosestFormToCursor);
 			form::fvars(ClosestFormToCursor);
@@ -5145,7 +5145,7 @@ void form::filvrt() {
 	}
 	if (!SelectedFormList->empty()) {
 		thred::savdo();
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
 			if (SelectedForm->type != FRMLINE) {
@@ -5186,7 +5186,7 @@ void form::filhor() {
 		return;
 	}
 	if (!SelectedFormList->empty()) {
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
 			if (SelectedForm->type != FRMLINE) {
@@ -5227,7 +5227,7 @@ void form::filangl() {
 	}
 	if (!SelectedFormList->empty()) {
 		thred::savdo();
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
 			if (SelectedForm->type != FRMLINE) {
@@ -5462,7 +5462,7 @@ void form::filsat() {
 	}
 	if (!SelectedFormList->empty()) {
 		thred::savdo();
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
 			if (SelectedForm->type != FRMLINE) {
@@ -5616,7 +5616,7 @@ void form::unfil() {
 	}
 	if (!SelectedFormList->empty()) {
 		auto formMap = boost::dynamic_bitset<>(FormIndex);
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			SelectedForm = &((*FormList)[selectedForm]);
 			if (SelectedForm->fillType || SelectedForm->edgeType) {
 				clip::delclps(selectedForm);
@@ -5766,7 +5766,7 @@ void form::bord() {
 		return;
 	}
 	if (!SelectedFormList->empty()) {
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
 			SelectedForm->borderColor = gsl::narrow<unsigned char>(ActiveColor);
@@ -5821,7 +5821,7 @@ void form::fclp() {
 			CloseClipboard();
 			if (ClipRectSize.cx > CLPMIN) {
 				if (!SelectedFormList->empty()) {
-					for (auto selectedForm : (*SelectedFormList)) {
+					for (auto& selectedForm : (*SelectedFormList)) {
 						ClosestFormToCursor = selectedForm;
 						form::fvars(ClosestFormToCursor);
 						fi::fsclp();
@@ -5875,7 +5875,7 @@ void form::apliq() {
 		return;
 	}
 	if (!SelectedFormList->empty()) {
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
 			if (UserFlagMap.test(UserFlag::BLUNT)) {
@@ -6125,7 +6125,7 @@ void form::setstrtch() {
 		}
 
 		if (!SelectedFormList->empty()) {
-			for (auto selectedForm : (*SelectedFormList)) {
+			for (auto& selectedForm : (*SelectedFormList)) {
 				auto& formIter      = (*FormList)[selectedForm];
 				CurrentFormVertices = formIter.vertexIndex;
 				auto vertexIt       = FormVertices->begin() + CurrentFormVertices;
@@ -6181,7 +6181,7 @@ void form::setstrtch() {
 		}
 
 		if (!SelectedFormList->empty()) {
-			for (auto selectedForm : (*SelectedFormList)) {
+			for (auto& selectedForm : (*SelectedFormList)) {
 				auto& formIter      = (*FormList)[selectedForm];
 				CurrentFormVertices = formIter.vertexIndex;
 				auto vertexIt       = FormVertices->begin() + CurrentFormVertices;
@@ -6205,7 +6205,7 @@ void form::setstrtch() {
 		}
 	}
 	if (!SelectedFormList->empty()) {
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			form::frmout(selectedForm);
 			ClosestFormToCursor = selectedForm;
 			refil();
@@ -6365,7 +6365,7 @@ void form::setexpand(double xyRatio) {
 	}
 
 	if (!SelectedFormList->empty()) {
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			form::fvars(selectedForm);
 			auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 			for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
@@ -6463,7 +6463,7 @@ void form::dubold() {
 		return;
 	}
 	if (!SelectedFormList->empty()) {
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
 			fi::sbold();
@@ -6839,7 +6839,7 @@ void form::fliph() {
 		auto rectangle = fRECTANGLE{};
 		form::pxrct2stch(SelectedFormsRect, rectangle);
 		const auto midpoint = (rectangle.right - rectangle.left) / 2 + rectangle.left;
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			formMap.set(ClosestFormToCursor);
 			form::fvars(ClosestFormToCursor);
@@ -6914,7 +6914,7 @@ void form::prpbrd(double borderStitchSpacing) {
 	}
 	LineSpacing = borderStitchSpacing;
 	if (!SelectedFormList->empty()) {
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
 			SelectedForm->borderSize = LineSpacing;
@@ -7019,7 +7019,7 @@ void form::flpord() {
 	}
 	if (!SelectedFormList->empty()) {
 		thred::savdo();
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			fi::fnord();
 		}
@@ -7080,7 +7080,7 @@ void form::clpfil() {
 			CloseClipboard();
 			if (ClipRectSize.cx > CLPMIN && ClipRectSize.cy > CLPMIN) {
 				if (!SelectedFormList->empty()) {
-					for (auto selectedForm : (*SelectedFormList)) {
+					for (auto& selectedForm : (*SelectedFormList)) {
 						ClosestFormToCursor = selectedForm;
 						form::fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE) {
@@ -7224,7 +7224,7 @@ void form::snap() {
 
 void form::internal::dufcntr(dPOINT& center) {
 	auto bigRect = (*FormList)[SelectedFormList->front()].rectangle;
-	for (auto selectedForm : (*SelectedFormList)) {
+	for (auto& selectedForm : (*SelectedFormList)) {
 		const auto formRect = (*FormList)[selectedForm].rectangle;
 		if (formRect.left < bigRect.left) {
 			bigRect.left = formRect.left;
@@ -7391,7 +7391,7 @@ void form::duprot(double rotationAngle) {
 void form::internal::duprotfs(double rotationAngle) {
 	const auto savedFormIndex = FormIndex;
 
-	for (auto selectedForm : (*SelectedFormList)) {
+	for (auto& selectedForm : (*SelectedFormList)) {
 		adfrm(selectedForm);
 	}
 	FormIndex = savedFormIndex;
@@ -7448,7 +7448,7 @@ void form::internal::cplayfn(unsigned int iForm, unsigned play) {
 void form::cpylayr(unsigned codedLayer) {
 	if (!SelectedFormList->empty()) {
 		thred::savdo();
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			fi::cplayfn(selectedForm, codedLayer);
 		}
 	}
@@ -7482,7 +7482,7 @@ void form::movlayr(unsigned codedLayer) {
 	if (!SelectedFormList->empty()) {
 		thred::savdo();
 		auto formMap = boost::dynamic_bitset<>(FormIndex);
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			auto& formAttr = (*FormList)[selectedForm].attribute;
 			formAttr       = gsl::narrow<unsigned char>((formAttr & NFRMLMSK) | codedLayer);
 			formMap.set(selectedForm);
@@ -7594,7 +7594,7 @@ void form::refilal() {
 }
 
 bool form::internal::notsel() noexcept {
-	for (auto selectedForm : (*SelectedFormList)) {
+	for (auto& selectedForm : (*SelectedFormList)) {
 		if (selectedForm == ClosestFormToCursor) {
 			return false;
 		}
@@ -7628,7 +7628,7 @@ void form::frmadj(unsigned int formIndex) {
 
 void form::frmsadj() {
 	auto formMap = boost::dynamic_bitset<>(FormIndex);
-	for (auto selectedForm : (*SelectedFormList)) {
+	for (auto& selectedForm : (*SelectedFormList)) {
 		formMap.set(selectedForm);
 	}
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -7763,7 +7763,7 @@ void form::bhol() {
 	}
 	LineSpacing = savedSpacing;
 	if (!SelectedFormList->empty()) {
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
 			fi::bholbrd();
@@ -7792,7 +7792,7 @@ void form::fcntr() {
 		const auto& firstRect     = (*FormList)[firstForm].rectangle;
 		const auto  initialCenter = dPOINT{ (static_cast<double>(firstRect.right) - firstRect.left) / 2.0 + firstRect.left,
                                            (static_cast<double>(firstRect.top) - firstRect.bottom) / 2.0 + firstRect.bottom };
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			const auto& formRect      = (*FormList)[selectedForm].rectangle;
 			const auto  currentCenter = dPOINT{ (static_cast<double>(formRect.right) - formRect.left) / 2.0 + formRect.left,
                                                (static_cast<double>(formRect.top) - formRect.bottom) / 2.0 + formRect.bottom };
@@ -7865,7 +7865,7 @@ void form::picot() {
 			CloseClipboard();
 			if (ClipRectSize.cx > CLPMIN) {
 				if (!SelectedFormList->empty()) {
-					for (auto selectedForm : (*SelectedFormList)) {
+					for (auto& selectedForm : (*SelectedFormList)) {
 						ClosestFormToCursor = selectedForm;
 						form::fvars(ClosestFormToCursor);
 						fi::fspic();
@@ -7916,7 +7916,7 @@ void form::contfil() {
 	}
 	if (!SelectedFormList->empty()) {
 		thred::savdo();
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			fi::contsf(selectedForm);
 		}
 		StateMap.set(StateFlag::INIT);
@@ -8217,7 +8217,7 @@ void form::cntrx() {
 		if (StateMap.test(StateFlag::CNTRH)) {
 			FormMoveDelta.x = 0;
 		}
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			frmadj(selectedForm);
 		}
 		frmsadj();
@@ -8623,7 +8623,7 @@ void form::vrtclp() {
 			if (ClipRectSize.cy > CLPMIN) {
 				if (!SelectedFormList->empty()) {
 					StateMap.set(StateFlag::NOCLP);
-					for (auto selectedForm : (*SelectedFormList)) {
+					for (auto& selectedForm : (*SelectedFormList)) {
 						ClosestFormToCursor = selectedForm;
 						form::fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE) {
@@ -8691,7 +8691,7 @@ void form::horclp() {
 			if (ClipRectSize.cy > CLPMIN) {
 				if (!SelectedFormList->empty()) {
 					StateMap.set(StateFlag::NOCLP);
-					for (auto selectedForm : (*SelectedFormList)) {
+					for (auto& selectedForm : (*SelectedFormList)) {
 						ClosestFormToCursor = selectedForm;
 						form::fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE) {
@@ -8757,7 +8757,7 @@ void form::angclp() {
 			if (ClipRectSize.cy > CLPMIN) {
 				if (!SelectedFormList->empty()) {
 					StateMap.set(StateFlag::NOCLP);
-					for (auto selectedForm : (*SelectedFormList)) {
+					for (auto& selectedForm : (*SelectedFormList)) {
 						ClosestFormToCursor = selectedForm;
 						form::fvars(ClosestFormToCursor);
 						if (SelectedForm->type != FRMLINE) {
@@ -8805,7 +8805,7 @@ void form::dubfil() {
 		return;
 	}
 	if (!SelectedFormList->empty()) {
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
 			dubsfil();
@@ -8949,7 +8949,7 @@ void form::chain() {
 	}
 	thred::savdo();
 	if (!SelectedFormList->empty()) {
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
 			chan();
@@ -9023,7 +9023,7 @@ void form::filclpx() {
 			CloseClipboard();
 			if (ClipRectSize.cx > CLPMIN) {
 				if (!SelectedFormList->empty()) {
-					for (auto selectedForm : (*SelectedFormList)) {
+					for (auto& selectedForm : (*SelectedFormList)) {
 						ClosestFormToCursor = selectedForm;
 						form::fvars(ClosestFormToCursor);
 						fi::fsclpx();
