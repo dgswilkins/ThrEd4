@@ -8150,23 +8150,19 @@ void thred::internal::delet() {
 	if (StateMap.testAndReset(StateFlag::FPSEL)) {
 		thred::savdo();
 		form::fvars(ClosestFormToCursor);
-		auto vertexMap          = boost::dynamic_bitset<>(VertexCount);
+		auto newVertices = std::vector<fPOINT>{};
+		newVertices.reserve(SelectedFormVertices.vertexCount);
 		auto iCurrentFormVertex = SelectedFormVertices.start;
+		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
-			vertexMap.set(iCurrentFormVertex);
+			newVertices.push_back(vertexIt[iCurrentFormVertex]);
 			iCurrentFormVertex = form::pdir(iCurrentFormVertex);
 		}
-		iCurrentFormVertex = 0;
-		auto vertexIt      = FormVertices->begin() + CurrentFormVertices;
-		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
-			if (!vertexMap.test(iVertex)) {
-				vertexIt[iCurrentFormVertex++] = vertexIt[iVertex];
-			}
-		}
-		auto iVertex = VertexCount;
-		while (iVertex < FormVertexIndex) {
-			(*FormVertices)[iCurrentFormVertex++] = (*FormVertices)[iVertex++];
-		}
+		auto eraseStart = FormVertices->begin() + CurrentFormVertices;
+		auto eraseEnd = eraseStart + VertexCount;
+		FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
+		auto destination = FormVertices->begin() + CurrentFormVertices;
+		FormVertices->insert(destination, newVertices.begin(), newVertices.end());
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			(*FormList)[iForm].vertexIndex -= (gsl::narrow<size_t>(SelectedFormVertices.vertexCount) + 1);
 		}
