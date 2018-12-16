@@ -1366,7 +1366,7 @@ void thred::internal::dudat() {
 			          StitchBuffer + PCSHeader.stitchCount,
 			          stdext::make_checked_array_iterator(backupData->stitches, PCSHeader.stitchCount));
 		}
-		backupData->vertexCount = FormVertexIndex;
+		backupData->vertexCount = FormVertices->size();
 		backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[PCSHeader.stitchCount]);
 		if (FormVertexIndex) {
 			std::copy(FormVertices->cbegin(),
@@ -1918,7 +1918,7 @@ void thred::internal::hupfn() {
 			}
 		}
 	}
-	if (PCSHeader.stitchCount || FormVertexIndex || StateMap.test(StateFlag::HUPEX)) {
+	if (PCSHeader.stitchCount || !FormVertices->empty() || StateMap.test(StateFlag::HUPEX)) {
 		if (CheckHoopRect.left < 0 || CheckHoopRect.right > IniFile.hoopSizeX || CheckHoopRect.bottom < 0
 		    || CheckHoopRect.top > IniFile.hoopSizeY) {
 			StateMap.set(StateFlag::HUPEX);
@@ -1940,7 +1940,7 @@ void thred::internal::hupfn() {
 				StitchBuffer[iStitch].x += delta.x;
 				StitchBuffer[iStitch].y += delta.y;
 			}
-			for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
+			for (auto iVertex = 0u; iVertex < FormVertices->size(); iVertex++) {
 				(*FormVertices)[iVertex].x += delta.x;
 				(*FormVertices)[iVertex].y += delta.y;
 			}
@@ -4895,14 +4895,12 @@ void thred::internal::redbak() {
 		PCSHeader.stitchCount = gsl::narrow<unsigned short>(undoData->stitchCount);
 		UnzoomedRect          = undoData->zoomRect;
 		if (undoData->formCount) {
-			FormList->clear();
-			for (auto iForm = 0u; iForm < undoData->formCount; iForm++) {
-				const auto& form = undoData->forms[iForm];
-				FormList->push_back(form);
-			}
+			FormList->resize(undoData->formCount);
+			std::copy(undoData->forms, undoData->forms + undoData->formCount, FormList->begin());
 		}
 		FormIndex = undoData->formCount;
 		if (undoData->vertexCount) {
+			FormVertices->resize(undoData->vertexCount);
 			std::copy(undoData->vertices, undoData->vertices + undoData->vertexCount, FormVertices->begin());
 		}
 		FormVertexIndex = undoData->vertexCount;
@@ -5631,6 +5629,7 @@ void thred::internal::nuFil() {
 						StateMap.reset(StateFlag::BADFIL);
 						ClipPoints->clear();
 						FormVertexIndex = 0;
+						FormVertices->clear();
 						satin::clearGuideSize();
 						MsgBuffer[0]     = 0;
 						auto bytesToRead = DWORD{ 0 };
@@ -5736,6 +5735,7 @@ void thred::internal::nuFil() {
 								clipOffset += formIter.clipEntries;
 							}
 						}
+						FormVertexIndex = formOffset;
 						xt::setfchk();
 					}
 				}
@@ -9111,7 +9111,7 @@ void thred::delinf() {
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		thi::infadj(&StitchBuffer[iStitch].x, &StitchBuffer[iStitch].y);
 	}
-	for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
+	for (auto iVertex = 0u; iVertex < FormVertices->size(); iVertex++) {
 		thi::infadj(&(*FormVertices)[iVertex].x, &(*FormVertices)[iVertex].y);
 	}
 }

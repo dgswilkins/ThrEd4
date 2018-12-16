@@ -119,12 +119,9 @@ void form::fltspac(unsigned int start, unsigned int count) {
 void form::delflt(unsigned int formIndex) {
 	auto& form = (*FormList)[formIndex];
 	if (form.vertexCount) {
-		auto destination = form.vertexIndex;
-		auto source      = destination + form.vertexCount;
-		// ToDo - use vector erase
-		while (source < FormVertexIndex) {
-			(*FormVertices)[destination++] = (*FormVertices)[source++];
-		}
+		auto eraseStart = FormVertices->begin() + form.vertexIndex;
+		auto eraseEnd      = eraseStart + form.vertexCount;
+		FormVertices->erase(eraseStart, eraseEnd);
 		for (auto iForm = formIndex + 1; iForm < FormIndex; iForm++) {
 			auto& formAfter = (*FormList)[iForm];
 			formAfter.vertexIndex -= form.vertexCount;
