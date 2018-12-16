@@ -127,9 +127,6 @@ void form::delflt(unsigned int formIndex) {
 			formAfter.vertexIndex -= form.vertexCount;
 		}
 		FormVertexIndex -= form.vertexCount;
-		if (FormVertexIndex & 0x8000000) {
-			FormVertexIndex = 0;
-		}
 	}
 }
 
