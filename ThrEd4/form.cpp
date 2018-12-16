@@ -5330,7 +5330,7 @@ void form::rstfrm() {
 	}
 }
 
-void form::clrfills() {
+void form::clrfills() noexcept {
 	for (auto& form : *FormList) {
 		form.clipEntries             = 0;
 		form.lengthOrCount.clipCount = 0;
@@ -5914,7 +5914,7 @@ void form::setap() {
 	displayText::shoMsg(fmt::format(fmtStr, (AppliqueColor + 1)));
 }
 
-void form::internal::getbig() {
+void form::internal::getbig() noexcept {
 	AllItemsRect.bottom = AllItemsRect.left = 1e9;
 	AllItemsRect.top = AllItemsRect.right = 0;
 	for (auto& form : *FormList) {

@@ -1156,7 +1156,7 @@ void thred::internal::redfnam(std::wstring& designerName) {
 		}
 	}
 	designer.reserve(50);
-	for (auto& character : tmpName) {
+	for (const auto& character : tmpName) {
 		if (NameDecoder[character]) {
 			designer.push_back(NameDecoder[character]);
 		}
@@ -1422,7 +1422,7 @@ void thred::savdo() {
 void thred::internal::redfils() {
 	auto findData = WIN32_FIND_DATA{};
 
-	for (auto& iLRU : LRUMenuId) {
+	for (const auto& iLRU : LRUMenuId) {
 		if (GetMenuState(FileMenu, iLRU, MF_BYCOMMAND) != -1) {
 			DeleteMenu(FileMenu, iLRU, MF_BYCOMMAND);
 		}
@@ -6244,7 +6244,7 @@ void thred::internal::closPnt() {
 		}
 	}
 	GetClientRect(MainStitchWin, &StitchWindowClientRect);
-	for (auto& iNear : NearestPoint) {
+	for (const auto& iNear : NearestPoint) {
 		if (stch2px(iNear)) {
 			NearestPoint[NearestCount]   = iNear;
 			NearestPixel[NearestCount++] = StitchCoordinatesPixels;
@@ -15732,7 +15732,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		{
 			const auto& previousNames = *PreviousNames;
 			auto        iVersion      = 0u;
-			for (auto& iLRU : LRUMenuId) {
+			for (const auto& iLRU : LRUMenuId) {
 				if (Msg.wParam == iLRU) {
 					*WorkingFileName = previousNames[iVersion];
 					StateMap.set(StateFlag::REDOLD);

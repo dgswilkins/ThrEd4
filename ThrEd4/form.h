@@ -49,7 +49,7 @@ unsigned int closflt(float xCoordinate, float yCoordinate);
 bool         closfrm();
 void         clpfil();
 void         clpspac(unsigned insertPoint, unsigned int count);
-void         clrfills();
+void         clrfills() noexcept;
 void         cntrx();
 void         col2frm();
 void         contfil();
@@ -312,7 +312,7 @@ namespace internal {
 	void  fshor();
 	void  fspic();
 	void  fsvrt();
-	void  getbig();
+	void  getbig() noexcept;
 	float getlen(std::vector<CLIPNT>& clipStitchPoints, const std::vector<double>& lengths, unsigned iPoint);
 	void  horclpfn(const std::vector<RNGCNT>& textureSegments, FRMHED& angledForm);
 

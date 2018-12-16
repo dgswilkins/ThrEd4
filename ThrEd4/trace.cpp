@@ -770,7 +770,7 @@ void trace::internal::dutrac() {
 				decimatedLine.push_back(tracedPoints[iPoint]);
 			}
 		}
-		auto maxPoints = decimatedLine.size();
+		const auto maxPoints = decimatedLine.size();
 		tracedPoints.clear();
 		tracedPoints.reserve(maxPoints);
 		tracedPoints.push_back(decimatedLine[0]);
