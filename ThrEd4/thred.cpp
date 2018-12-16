@@ -5481,6 +5481,7 @@ void thred::internal::nuFil() {
 			StateMap.reset(StateFlag::BAKING);
 			StateMap.reset(StateFlag::REDUSHO);
 			TextureIndex = 0;
+			TexturePointsBuffer->clear();
 			EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
 			deldu();
 			DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
@@ -5661,10 +5662,9 @@ void thred::internal::nuFil() {
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(decltype(FormVertices->back())));
 							ReadFile(FileHandle, FormVertices->data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								FormVertexIndex = BytesRead / sizeof(decltype(FormVertices->back()));
-								for (auto iVertex = FormVertexIndex; iVertex < thredHeader.vertexCount; iVertex++) {
-									(*FormVertices)[iVertex].x = (*FormVertices)[iVertex].y = 0;
-								}
+								auto newSize = BytesRead / sizeof(decltype(FormVertices->back()));
+								FormVertices->resize(newSize);
+								FormVertexIndex = newSize;
 								StateMap.set(StateFlag::BADFIL);
 							}
 						}
@@ -5678,6 +5678,7 @@ void thred::internal::nuFil() {
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(decltype(inSatinGuides.back())));
 							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
+								inSatinGuides.resize(BytesRead / sizeof(decltype(inSatinGuides.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
 							std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), SatinGuides);
@@ -6764,8 +6765,9 @@ void thred::internal::newFil() {
 	PCSBMPFileName[0]     = 0;
 	PCSHeader.stitchCount = 0;
 	FormVertexIndex       = 0;
-	TexturePointsBuffer->clear();
+	FormVertices->clear();
 	TextureIndex = 0;
+	TexturePointsBuffer->clear();
 	ClipPoints->clear();
 	satin::clearGuideSize();
 	FormList->clear();
@@ -8112,7 +8114,10 @@ void thred::internal::setsped() {
 void thred::internal::deltot() {
 	DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
 	TextureIndex = FormIndex = FormVertexIndex = PCSHeader.stitchCount = 0;
+	FormList->clear();
+	FormVertices->clear();
 	satin::clearGuideSize();
+	TexturePointsBuffer->clear();
 	StateMap.reset(StateFlag::GMRK);
 	rstAll();
 	thred::coltab();
@@ -11072,6 +11077,7 @@ void thred::internal::delstch() {
 	thred::savdo();
 	PCSHeader.stitchCount = 0;
 	TextureIndex          = 0;
+	TexturePointsBuffer->clear();
 	rstAll();
 	form::clrfills();
 	ColorChanges     = 0;

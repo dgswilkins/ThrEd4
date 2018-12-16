@@ -550,6 +550,7 @@ void form::delfrms() {
 	FormIndex = FormVertexIndex = 0;
 	ClipPoints->clear();
 	FormList->clear();
+	FormVertices->clear();
 	satin::clearGuideSize();
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		StitchBuffer[iStitch].attribute &= NFRM_NTYP;
@@ -6610,7 +6611,8 @@ void form::duhart(unsigned sideCount) {
 	FormList->emplace_back(FRMHED{});
 	SelectedForm            = &(FormList->back());
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
-	CurrentFormVertices     = FormVertexIndex;
+	CurrentFormVertices     = FormVertices->size();
+	FormVertices->reserve(CurrentFormVertices + sideCount);
 	thred::px2stch();
 	auto       point     = dPOINT{ SelectedPoint };
 	auto       stepAngle = PI * 2.0 / sideCount;

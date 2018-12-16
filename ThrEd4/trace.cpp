@@ -789,7 +789,7 @@ void trace::internal::dutrac() {
 		FormList->emplace_back(FRMHED{});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
-		CurrentFormVertices  = FormVertexIndex;
+		CurrentFormVertices  = FormVertices->size();
 		auto vertexIt        = FormVertices->begin() + CurrentFormVertices;
 		vertexIt[0].x        = tracedPoints[0].x * StitchBmpRatio.x;
 		vertexIt[0].y        = tracedPoints[0].y * StitchBmpRatio.y;
@@ -815,7 +815,7 @@ void trace::internal::dutrac() {
 				traceLengthSum = 0.0;
 			}
 		}
-		if (FormVertexIndex + OutputIndex > MAXITEMS) {
+		if (FormVertices->size() + OutputIndex > MAXITEMS) {
 			displayText::tabmsg(IDS_FRMOVR);
 			return;
 		}
