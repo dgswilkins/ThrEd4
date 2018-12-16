@@ -120,7 +120,7 @@ void form::delflt(unsigned int formIndex) {
 	auto& form = (*FormList)[formIndex];
 	if (form.vertexCount) {
 		auto eraseStart = FormVertices->begin() + form.vertexIndex;
-		auto eraseEnd      = eraseStart + form.vertexCount;
+		auto eraseEnd   = eraseStart + form.vertexCount;
 		FormVertices->erase(eraseStart, eraseEnd);
 		for (auto iForm = formIndex + 1; iForm < FormIndex; iForm++) {
 			auto& formAfter = (*FormList)[iForm];
@@ -1128,20 +1128,20 @@ bool form::closfrm() {
 		auto point         = fPOINT{};
 		auto minimumLength = 1e99;
 		fi::px2stchf(screenCoordinate, point);
-		const auto layerCoded = ActiveLayer << 1;
-		const auto maxForm    = FormList->size();
+		const auto layerCoded  = ActiveLayer << 1;
+		const auto maxForm     = FormList->size();
 		const auto savedVertex = VertexCount;
 		for (auto iForm = 0u; iForm < maxForm; iForm++) {
 			if (StateMap.test(StateFlag::FRMSAM) && iForm == ClosestFormToCursor) {
 				continue;
 			}
-			auto&      currentForm  = (*FormList)[iForm];
-			VertexCount = currentForm.vertexCount;
+			auto& currentForm    = (*FormList)[iForm];
+			VertexCount          = currentForm.vertexCount;
 			const auto formLayer = currentForm.attribute & FRMLMSK;
 			if (!ActiveLayer || !formLayer || formLayer == layerCoded) {
 				auto vertexIt = FormVertices->begin() + currentForm.vertexIndex;
 				// find the closest line first and then find the closest vertex on that line
-				auto       length    = 0.0;
+				auto length = 0.0;
 				for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 					auto&      vertex     = vertexIt[iVertex];
 					auto&      nextVertex = vertexIt[form::nxt(iVertex)];
@@ -1159,7 +1159,7 @@ bool form::closfrm() {
 				}
 			}
 		}
-		VertexCount = savedVertex;
+		VertexCount  = savedVertex;
 		auto& vertex = (*FormVertices)[(*FormList)[closestForm].vertexIndex + closestVertex];
 		thred::stch2pxr(vertex);
 		minimumLength = hypot(StitchCoordinatesPixels.x - screenCoordinate.x, StitchCoordinatesPixels.y - screenCoordinate.y);
@@ -6109,7 +6109,7 @@ void form::setstrtch() {
 		}
 		if (StateMap.test(StateFlag::BIGBOX)) {
 			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-				auto& form      = (*FormList)[iForm];
+				auto& form          = (*FormList)[iForm];
 				CurrentFormVertices = form.vertexIndex;
 				auto vertexIt       = FormVertices->begin() + CurrentFormVertices;
 				for (auto iVertex = 0u; iVertex < form.vertexCount; iVertex++) {
@@ -6165,7 +6165,7 @@ void form::setstrtch() {
 		}
 		if (StateMap.test(StateFlag::BIGBOX)) {
 			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-				auto& form      = (*FormList)[iForm];
+				auto& form          = (*FormList)[iForm];
 				CurrentFormVertices = form.vertexIndex;
 				auto vertexIt       = FormVertices->begin() + CurrentFormVertices;
 				for (auto iVertex = 0u; iVertex < form.vertexCount; iVertex++) {

@@ -2543,7 +2543,7 @@ void xt::internal::nudfn(const fRECTANGLE& designSizeRect) {
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		sadj(StitchBuffer[iStitch], designSizeRatio, designSizeRect);
 	}
-	for (auto form: *FormVertices) {
+	for (auto form : *FormVertices) {
 		sadj(form, designSizeRatio, designSizeRect);
 	}
 	form::frmout(ClosestFormToCursor);

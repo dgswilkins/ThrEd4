@@ -1186,9 +1186,9 @@ void thred::internal::dstin(unsigned number, POINT& pout) noexcept {
 }
 
 unsigned int thred::adflt(unsigned int count) {
-	const auto iFormVertex  = FormVertices->size();
-	const auto it           = FormVertices->end();
-	const auto val          = fPOINT{};
+	const auto iFormVertex = FormVertices->size();
+	const auto it          = FormVertices->end();
+	const auto val         = fPOINT{};
 	FormVertices->insert(it, count, val);
 	FormVertexIndex += count;
 	return iFormVertex;
@@ -1348,9 +1348,9 @@ void thred::internal::dudat() {
 	const auto     formCount = formList.size();
 	constexpr auto formSize  = sizeof(decltype(formList.back()));
 	const auto     size      = sizeof(BAKHED) + formSize * formList.size() + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
-		+ sizeof(decltype(FormVertices->back())) * FormVertices->size() + sizeof(decltype(ClipPoints->back())) * ClipPoints->size()
-		+ sizeof(SatinGuides[0]) * satin::getGuideSize() + sizeof(UserColor)
-		+ sizeof(decltype(TexturePointsBuffer->back())) * TextureIndex;
+	                  + sizeof(decltype(FormVertices->back())) * FormVertices->size()
+	                  + sizeof(decltype(ClipPoints->back())) * ClipPoints->size() + sizeof(SatinGuides[0]) * satin::getGuideSize()
+	                  + sizeof(UserColor) + sizeof(decltype(TexturePointsBuffer->back())) * TextureIndex;
 	undoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);
 	auto backupData                  = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
 	if (backupData) {
@@ -5675,7 +5675,7 @@ void thred::internal::nuFil() {
 						}
 						if (thredHeader.dlineCount) {
 							auto inSatinGuides = std::vector<SATCONOUT>(thredHeader.dlineCount);
-							bytesToRead        = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(decltype(inSatinGuides.back())));
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(decltype(inSatinGuides.back())));
 							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								StateMap.set(StateFlag::BADFIL);
@@ -5693,8 +5693,8 @@ void thred::internal::nuFil() {
 						}
 						if (ExtendedHeader.texturePointCount) {
 							TexturePointsBuffer->resize(ExtendedHeader.texturePointCount);
-							bytesToRead
-								= gsl::narrow<DWORD>(ExtendedHeader.texturePointCount * sizeof(decltype(TexturePointsBuffer->back())));
+							bytesToRead = gsl::narrow<DWORD>(ExtendedHeader.texturePointCount
+							                                 * sizeof(decltype(TexturePointsBuffer->back())));
 							ReadFile(FileHandle, TexturePointsBuffer->data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								TexturePointsBuffer->resize(BytesRead / sizeof(decltype(TexturePointsBuffer->back())));
@@ -8152,13 +8152,13 @@ void thred::internal::delet() {
 		auto newVertices = std::vector<fPOINT>{};
 		newVertices.reserve(SelectedFormVertices.vertexCount);
 		auto iCurrentFormVertex = SelectedFormVertices.start;
-		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+		auto vertexIt           = FormVertices->begin() + CurrentFormVertices;
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 			newVertices.push_back(vertexIt[iCurrentFormVertex]);
 			iCurrentFormVertex = form::pdir(iCurrentFormVertex);
 		}
 		auto eraseStart = FormVertices->begin() + CurrentFormVertices;
-		auto eraseEnd = eraseStart + VertexCount;
+		auto eraseEnd   = eraseStart + VertexCount;
 		FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
 		auto destination = FormVertices->begin() + CurrentFormVertices;
 		FormVertices->insert(destination, newVertices.begin(), newVertices.end());
@@ -8655,7 +8655,8 @@ void thred::internal::insfil() {
 						if (fileHeader.clipDataCount) {
 							auto tempClipPoints = std::vector<fPOINT>{};
 							tempClipPoints.resize(fileHeader.clipDataCount);
-							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.clipDataCount * sizeof(decltype(ClipPoints->back())));
+							auto bytesToRead
+							    = gsl::narrow<DWORD>(fileHeader.clipDataCount * sizeof(decltype(ClipPoints->back())));
 							ReadFile(InsertedFileHandle, tempClipPoints.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								tempClipPoints.resize(BytesRead / sizeof(tempClipPoints[0]));
@@ -8678,8 +8679,8 @@ void thred::internal::insfil() {
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = nullptr;
 						// update the form variables
-						auto vertexOffset = FormVertices->size();
-						auto clipOffset = ClipPoints->size();
+						auto vertexOffset  = FormVertices->size();
+						auto clipOffset    = ClipPoints->size();
 						auto textureOffset = TexturePointsBuffer->size();
 						for (auto iFormList = InsertedFormIndex; iFormList < FormIndex; iFormList++) {
 							auto& formIter       = (*FormList)[iFormList];
@@ -15118,9 +15119,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 						ClipFormVerticesData = static_cast<FORMVERTEXCLIP*>(ClipPointer);
 						if (ClipFormVerticesData->clipType == CLP_FRMPS) {
 							thred::duzrat();
-							auto byteCount
-								= sizeof(*ClipFormVerticesData)
-								+ (gsl::narrow<size_t>(ClipFormVerticesData->vertexCount) + 1) * sizeof(decltype(FormVertices->back()));
+							auto byteCount = sizeof(*ClipFormVerticesData)
+							                 + (gsl::narrow<size_t>(ClipFormVerticesData->vertexCount) + 1)
+							                       * sizeof(decltype(FormVertices->back()));
 							auto clipCopyBuffer = std::vector<unsigned char>(byteCount);
 							auto clipPointer    = static_cast<unsigned char*>(ClipPointer);
 							auto _              = std::copy(clipPointer, clipPointer + byteCount, clipCopyBuffer.begin());
@@ -18590,7 +18591,7 @@ void thred::internal::sachk() {
 			if (guide) {
 				for (auto iGuide = 0u; iGuide < form.satinGuideCount; iGuide++) {
 					if (guide[iGuide].start > form.vertexCount || guide[iGuide].finish > form.vertexCount) {
-						const auto bakclo   = ClosestFormToCursor;
+						const auto bakclo = ClosestFormToCursor;
 						satin::delsac(iForm++);
 					}
 				}
