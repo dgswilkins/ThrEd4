@@ -6621,13 +6621,11 @@ void form::duhart(unsigned sideCount) {
 	auto angle    = PI * 0.28;
 	auto iVertex  = 0u;
 	auto maximumX = 0.0f;
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	while (angle > -PI * 0.7) {
 		if (point.x > maximumX) {
 			maximumX = point.x;
 		}
-		auto& vertex = vertexIt[iVertex];
-		vertex       = point;
+		FormVertices->push_back(fPOINT{ point });
 		iVertex++;
 		point.x += length * cos(angle);
 		point.y += length * sin(angle);
@@ -6635,14 +6633,14 @@ void form::duhart(unsigned sideCount) {
 	}
 	stepAngle /= 4.5;
 	auto iLastVertex = iVertex;
-	while (point.x > vertexIt[0].x && iVertex < 200) {
-		auto& vertex = vertexIt[iVertex];
-		vertex       = point;
+	while (iVertex < sideCount) {
+		FormVertices->push_back(fPOINT{ point });
 		iVertex++;
 		point.x += length * cos(angle);
 		point.y += length * sin(angle);
 		angle -= stepAngle;
 	}
+	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	const auto iFirstVertex = iVertex;
 	auto&      lastVertex   = vertexIt[iLastVertex - 1];
 	auto&      initVertex   = vertexIt[0];
