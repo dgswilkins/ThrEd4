@@ -8087,7 +8087,7 @@ void form::frmnumfn(unsigned newFormIndex) {
 		auto sourceForm          = 0u;
 
 		auto tempFormList     = std::vector<FRMHED>(FormIndex);
-		auto tempFormVertices = std::vector<fPOINT>(FormVertexIndex);
+		auto tempFormVertices = std::vector<fPOINT>(FormVertices->size());
 		auto tempGuides       = std::vector<SATCON>(satin::getGuideSize());
 		auto tempClipPoints   = std::vector<fPOINT>{};
 		tempClipPoints.reserve(ClipPoints->size());

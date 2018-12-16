@@ -1186,7 +1186,6 @@ void thred::internal::dstin(unsigned number, POINT& pout) noexcept {
 }
 
 unsigned int thred::adflt(unsigned int count) {
-	const auto iFormVertex1 = FormVertexIndex;
 	const auto iFormVertex  = FormVertices->size();
 	const auto it           = FormVertices->end();
 	const auto val          = fPOINT{};
@@ -1349,7 +1348,7 @@ void thred::internal::dudat() {
 	const auto     formCount = formList.size();
 	constexpr auto formSize  = sizeof(decltype(formList.back()));
 	const auto     size      = sizeof(BAKHED) + formSize * formList.size() + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
-		+ sizeof(decltype(FormVertices->back())) * FormVertexIndex + sizeof(decltype(ClipPoints->back())) * ClipPoints->size()
+		+ sizeof(decltype(FormVertices->back())) * FormVertices->size() + sizeof(decltype(ClipPoints->back())) * ClipPoints->size()
 		+ sizeof(SatinGuides[0]) * satin::getGuideSize() + sizeof(UserColor)
 		+ sizeof(decltype(TexturePointsBuffer->back())) * TextureIndex;
 	undoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);
@@ -1368,13 +1367,13 @@ void thred::internal::dudat() {
 		}
 		backupData->vertexCount = FormVertices->size();
 		backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[PCSHeader.stitchCount]);
-		if (FormVertexIndex) {
+		if (FormVertices->size()) {
 			std::copy(FormVertices->cbegin(),
-			          FormVertices->cbegin() + FormVertexIndex,
+			          FormVertices->cend(),
 			          stdext::make_checked_array_iterator(backupData->vertices, backupData->vertexCount));
 		}
 		backupData->guideCount = satin::getGuideSize();
-		backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertexIndex]);
+		backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertices->size()]);
 		if (satin::getGuideSize()) {
 			std::copy(SatinGuides,
 			          SatinGuides + satin::getGuideSize(),
@@ -10091,7 +10090,7 @@ void thred::internal::duinsfil() {
 		formRectangle.left += offset.x;
 		formRectangle.right += offset.x;
 	}
-	for (auto iVertex = InsertedVertexIndex; iVertex < FormVertexIndex; iVertex++) {
+	for (auto iVertex = InsertedVertexIndex; iVertex < FormVertices->size(); iVertex++) {
 		(*FormVertices)[iVertex].x += offset.x;
 		(*FormVertices)[iVertex].y += offset.y;
 	}
