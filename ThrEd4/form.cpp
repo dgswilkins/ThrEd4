@@ -6612,7 +6612,7 @@ void form::duhart(unsigned sideCount) {
 	SelectedForm            = &(FormList->back());
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	CurrentFormVertices     = FormVertices->size();
-	FormVertices->reserve(CurrentFormVertices + sideCount);
+	FormVertices->reserve(CurrentFormVertices + 2 * sideCount - 2);
 	thred::px2stch();
 	auto       point     = dPOINT{ SelectedPoint };
 	auto       stepAngle = PI * 2.0 / sideCount;
@@ -6640,7 +6640,7 @@ void form::duhart(unsigned sideCount) {
 		point.y += length * sin(angle);
 		angle -= stepAngle;
 	}
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+	auto       vertexIt     = FormVertices->begin() + CurrentFormVertices;
 	const auto iFirstVertex = iVertex;
 	auto&      lastVertex   = vertexIt[iLastVertex - 1];
 	auto&      initVertex   = vertexIt[0];
@@ -6654,13 +6654,11 @@ void form::duhart(unsigned sideCount) {
 	iLastVertex       = iVertex;
 	for (iVertex = iLastVertex - 2; iVertex != 0; iVertex--) {
 		auto& current     = vertexIt[iVertex];
-		auto& destination = vertexIt[iDestination];
-		destination.y     = current.y;
-		destination.x     = maximumX + maximumX - current.x - 2 * (maximumX - initVertex.x);
+		FormVertices->push_back(fPOINT{ maximumX + maximumX - current.x - 2 * (maximumX - initVertex.x), current.y });
 		iDestination++;
 	}
 	NewFormVertexCount        = iDestination + 1;
-	SelectedForm->vertexIndex = thred::adflt(iDestination);
+	SelectedForm->vertexIndex = CurrentFormVertices;
 	SelectedForm->vertexCount = iDestination;
 	SelectedForm->type        = FRMFPOLY;
 	ClosestFormToCursor       = FormList->size() - 1;
