@@ -6610,6 +6610,7 @@ void form::duhart(unsigned sideCount) {
 	}
 	FormList->emplace_back(FRMHED{});
 	SelectedForm            = &(FormList->back());
+	SelectedForm->vertexIndex = FormVertices->size();
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	CurrentFormVertices     = FormVertices->size();
 	FormVertices->reserve(CurrentFormVertices + 2 * sideCount - 2);
@@ -6658,7 +6659,6 @@ void form::duhart(unsigned sideCount) {
 		iDestination++;
 	}
 	NewFormVertexCount        = iDestination + 1;
-	SelectedForm->vertexIndex = CurrentFormVertices;
 	SelectedForm->vertexCount = iDestination;
 	SelectedForm->type        = FRMFPOLY;
 	ClosestFormToCursor       = FormList->size() - 1;
