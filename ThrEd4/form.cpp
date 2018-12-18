@@ -6635,7 +6635,7 @@ void form::duhart(unsigned sideCount) {
 	stepAngle /= 4.5;
 	auto iLastVertex = iVertex;
 	while (iVertex < sideCount) {
-		FormVertices->push_back(fPOINT{ point });
+		FormVertices->emplace_back(fPOINT{ point });
 		iVertex++;
 		point.x += length * cos(angle);
 		point.y += length * sin(angle);
@@ -6651,15 +6651,13 @@ void form::duhart(unsigned sideCount) {
 		auto& current = vertexIt[iVertex];
 		current.x     = (current.x - lastVertex.x) * ratio + lastVertex.x;
 	}
-	auto iDestination = iVertex;
 	iLastVertex       = iVertex;
 	for (iVertex = iLastVertex - 2; iVertex != 0; iVertex--) {
 		auto& current     = vertexIt[iVertex];
-		FormVertices->push_back(fPOINT{ maximumX + maximumX - current.x - 2 * (maximumX - initVertex.x), current.y });
-		iDestination++;
+		FormVertices->emplace_back(fPOINT{ maximumX + maximumX - current.x - 2 * (maximumX - initVertex.x), current.y });
 	}
-	NewFormVertexCount        = iDestination + 1;
-	SelectedForm->vertexCount = iDestination;
+	SelectedForm->vertexCount = FormVertices->size() - SelectedForm->vertexIndex;
+	NewFormVertexCount = SelectedForm->vertexCount + 1;
 	SelectedForm->type        = FRMFPOLY;
 	ClosestFormToCursor       = FormList->size() - 1;
 	form::frmout(ClosestFormToCursor);
@@ -6679,48 +6677,43 @@ void form::dulens(unsigned sides) {
 	if (sides > 48) {
 		sides = 48;
 	}
-	sides <<= 1;
-	const auto stepAngle = PI * 2.0 / sides;
-	auto       count     = gsl::narrow<unsigned int>(std::round(sides / 2.0 * 0.3));
+	auto steps = sides << 1;
+	const auto stepAngle = PI * 2.0 / steps;
+	auto       count     = gsl::narrow<unsigned int>(std::round(steps / 2.0 * 0.3));
 	auto       angle     = count * stepAngle;
-	const auto length    = 500 / sides * ZoomFactor * (static_cast<double>(UnzoomedRect.x) + UnzoomedRect.y)
+	const auto length    = 500 / steps * ZoomFactor * (static_cast<double>(UnzoomedRect.x) + UnzoomedRect.y)
 	                    / (static_cast<double>(LHUPX) + LHUPY);
 	FormList->emplace_back(FRMHED{});
 	SelectedForm              = &(FormList->back());
 	ClosestFormToCursor       = FormList->size() - 1;
-	SelectedForm->vertexIndex = FormVertexIndex;
+	SelectedForm->vertexIndex = FormVertices->size();
+	FormVertices->reserve(FormVertices->size() + sides);
 	SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	form::fvars(FormIndex);
 	thred::px2stch();
 	auto point   = dPOINT{ SelectedPoint };
 	auto iVertex = 0u;
 	SelectedPoint.x -= 0.0001f;
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	while (point.x >= SelectedPoint.x) {
-		vertexIt[iVertex++] = point;
+		FormVertices->emplace_back(fPOINT{ point });
 		point.x += length * cos(angle);
 		point.y += length * sin(angle);
 		angle += stepAngle;
+		iVertex++;
 	}
 	auto lastVertex = iVertex;
 	if (lastVertex) {
 		lastVertex--;
 	}
-	auto       iDestination = iVertex;
+	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	const auto av           = vertexIt[0].x;
-	for (iVertex = lastVertex; iVertex != 0; iVertex--) {
+	for (iVertex = lastVertex; iVertex != 1; iVertex--) {
 		auto& previous    = vertexIt[iVertex - 1];
-		auto& destination = vertexIt[iDestination];
-		destination.y     = previous.y;
-		destination.x     = av + av - previous.x;
-		iDestination++;
+		FormVertices->emplace_back(fPOINT{ av + av - previous.x ,previous.y });
 	}
-	NewFormVertexCount        = iDestination;
-	SelectedForm->vertexIndex = thred::adflt(iDestination - 1);
-	SelectedForm->vertexCount = iDestination - 1;
+	SelectedForm->vertexCount = FormVertices->size() - SelectedForm->vertexIndex;
+	NewFormVertexCount        = SelectedForm->vertexCount + 1;
 	SelectedForm->type        = FRMFPOLY;
-	// ToDo do I need to assign again?
-	ClosestFormToCursor = FormList->size() - 1;
 	form::frmout(ClosestFormToCursor);
 	FormMoveDelta.x = FormMoveDelta.y = 0;
 	StateMap.set(StateFlag::POLIMOV);
