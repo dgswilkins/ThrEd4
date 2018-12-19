@@ -1172,7 +1172,9 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 void formForms::wavfrm() {
 	thred::unmsg();
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, (DLGPROC)ffi::wavprc)) {
-		auto       points    = std::vector<fPOINT>(IniFile.wavePoints);
+		auto       points = std::vector<fPOINT>{};
+		points.reserve(IniFile.wavePoints);
+		// reuse regular polygon code to build the template for points
 		const auto saveIndex = FormVertexIndex;
 		form::durpoli(IniFile.wavePoints);
 		form::mdufrm();
@@ -1183,14 +1185,17 @@ void formForms::wavfrm() {
 		while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 			const unsigned short iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
 
-			points[iPoint]
-			    = fPOINT{ -vertexIt[iNextVertex].x + vertexIt[waveIndex].x, -vertexIt[iNextVertex].y + vertexIt[waveIndex].y };
+			points.emplace_back(fPOINT{ -vertexIt[iNextVertex].x + vertexIt[waveIndex].x, -vertexIt[iNextVertex].y + vertexIt[waveIndex].y });
 			iPoint++;
 			waveIndex = iNextVertex;
 		}
+
 		const auto count           = iPoint;
 		auto       iVertex         = 0u;
 		auto       currentPosition = fPOINT{};
+		auto formVerticesSize = (IniFile.waveLobes * count) + 1 - IniFile.wavePoints; // account for vertices already allocated by durpoli above
+		FormVertices->resize(FormVertices->size() + formVerticesSize);
+		vertexIt = FormVertices->begin() + CurrentFormVertices; // resize may invalidate iterator
 		for (auto iLobe = 0u; iLobe < IniFile.waveLobes; iLobe++) {
 			if (iLobe & 1) {
 				for (auto index = 0u; index < count; index++) {
@@ -1246,7 +1251,7 @@ void formForms::wavfrm() {
 			vertex.x -= SelectedForm->rectangle.left;
 			vertex.y -= SelectedForm->rectangle.bottom;
 		}
-		FormMoveDelta.x = FormMoveDelta.y = 0;
+		FormMoveDelta = fPOINT{};
 		NewFormVertexCount                = vertexCount + 1;
 		form::setmfrm();
 		form::mdufrm();
