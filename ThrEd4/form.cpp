@@ -862,6 +862,7 @@ void form::setmfrm() {
 }
 
 void form::durpoli(unsigned vertexCount) {
+	thred::savdo();
 	if (vertexCount < 3) {
 		vertexCount = 3;
 	}
@@ -6501,6 +6502,7 @@ void form::sethup() noexcept {
 }
 
 void form::dustar(unsigned starCount, double length) {
+	thred::savdo();
 	if (starCount < 3) {
 		starCount = 3;
 	}
@@ -6546,6 +6548,7 @@ void form::dustar(unsigned starCount, double length) {
 }
 
 void form::duspir(unsigned stepCount) {
+	thred::savdo();
 	if (stepCount < 3) {
 		stepCount = 3;
 	}
@@ -6602,6 +6605,7 @@ void form::duspir(unsigned stepCount) {
 }
 
 void form::duhart(unsigned sideCount) {
+	thred::savdo();
 	if (sideCount > 100) {
 		sideCount = 100;
 	}
@@ -6669,6 +6673,7 @@ void form::duhart(unsigned sideCount) {
 }
 
 void form::dulens(unsigned sides) {
+	thred::savdo();
 	// ToDo - this does not produce a consistent size of lens
 	//        or the correct number of sides
 	if (sides < 6) {
@@ -6752,6 +6757,7 @@ void form::dueg(unsigned sides) {
 }
 
 void form::duzig(unsigned vertices) {
+	thred::savdo();
 	if (vertices < 3) {
 		vertices = 3;
 	}

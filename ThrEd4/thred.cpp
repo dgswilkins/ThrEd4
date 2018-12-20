@@ -1357,8 +1357,9 @@ void thred::internal::dudat() {
 		backupData->zoomRect  = UnzoomedRect;
 		backupData->formCount = formCount;
 		backupData->forms     = convert_ptr<FRMHED*>(&backupData[1]);
-		std::copy(formList.cbegin(), formList.cend(), stdext::make_checked_array_iterator(backupData->forms, formList.size()));
-		backupData->stitchCount = PCSHeader.stitchCount;
+		if (!formList.empty()) {
+			std::copy(formList.cbegin(), formList.cend(), stdext::make_checked_array_iterator(backupData->forms, formList.size()));
+		}backupData->stitchCount = PCSHeader.stitchCount;
 		backupData->stitches    = convert_ptr<fPOINTATTR*>(&backupData->forms[formCount]);
 		if (PCSHeader.stitchCount) {
 			std::copy(StitchBuffer,
@@ -1367,7 +1368,7 @@ void thred::internal::dudat() {
 		}
 		backupData->vertexCount = FormVertices->size();
 		backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[PCSHeader.stitchCount]);
-		if (FormVertices->size()) {
+		if (!FormVertices->empty()) {
 			std::copy(FormVertices->cbegin(),
 			          FormVertices->cend(),
 			          stdext::make_checked_array_iterator(backupData->vertices, backupData->vertexCount));
@@ -1391,7 +1392,7 @@ void thred::internal::dudat() {
 		std::copy(UserColor, UserColor + sizeColors, stdext::make_checked_array_iterator(backupData->colors, sizeColors));
 		backupData->texturePoints     = convert_ptr<TXPNT*>(&backupData->colors[16]);
 		backupData->texturePointCount = TextureIndex;
-		if (TextureIndex) {
+		if (!TexturePointsBuffer->empty()) {
 			std::copy(TexturePointsBuffer->cbegin(),
 			          TexturePointsBuffer->cend(),
 			          stdext::make_checked_array_iterator(backupData->texturePoints, backupData->texturePointCount));
@@ -4897,16 +4898,25 @@ void thred::internal::redbak() {
 			FormList->resize(undoData->formCount);
 			std::copy(undoData->forms, undoData->forms + undoData->formCount, FormList->begin());
 		}
+		else { 
+			FormList->clear();
+		}
 		FormIndex = undoData->formCount;
 		if (undoData->vertexCount) {
 			FormVertices->resize(undoData->vertexCount);
 			std::copy(undoData->vertices, undoData->vertices + undoData->vertexCount, FormVertices->begin());
+		}
+		else {
+			FormVertices->clear();
 		}
 		FormVertexIndex = undoData->vertexCount;
 		satin::cpyUndoGuides(*undoData);
 		if (undoData->clipPointCount) {
 			ClipPoints->resize(undoData->clipPointCount);
 			std::copy(undoData->clipPoints, undoData->clipPoints + undoData->clipPointCount, ClipPoints->begin());
+		}
+		else {
+			ClipPoints->clear();
 		}
 		auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
 		std::copy(undoData->colors, undoData->colors + sizeColors, UserColor);
@@ -4917,10 +4927,13 @@ void thred::internal::redbak() {
 		for (auto iColor = 0u; iColor < sizeColors; iColor++) {
 			thred::redraw(UserColorWin[iColor]);
 		}
-		TexturePointsBuffer->resize(undoData->texturePointCount);
 		if (undoData->texturePointCount) {
+			TexturePointsBuffer->resize(undoData->texturePointCount);
 			const auto _ = std::copy(
 			    undoData->texturePoints, undoData->texturePoints + undoData->texturePointCount, TexturePointsBuffer->begin());
+		}
+		else {
+			TexturePointsBuffer->clear();
 		}
 		TextureIndex = undoData->texturePointCount;
 		thred::coltab();

@@ -815,6 +815,7 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 
 void formForms::dasyfrm() {
 	thred::unmsg();
+	thred::savdo();
 	if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, (DLGPROC)ffi::dasyproc)) {
 		StateMap.reset(StateFlag::FORMIN);
 		return;
