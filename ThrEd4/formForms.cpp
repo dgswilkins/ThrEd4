@@ -1063,11 +1063,13 @@ void formForms::setear() {
 			iRightVertices--;
 			iLeftVertices++;
 		}
-		vertexZero.y = vertexOne.y = verticalPosition;
+		vertexZero.y = verticalPosition; 
+		vertexOne.y = verticalPosition;
 		vertexZero.x += twistStep;
 		vertexOne.x += twistStep;
 		verticalPosition -= step / 2.0;
-		vertexIt[VertexCount] = vertexZero;
+		FormVertices->push_back(vertexZero);
+		vertexIt = FormVertices->begin() + CurrentFormVertices; // iterator possibly invalidated by push_back
 		if (twistStep) {
 			vertexZero.x = vertexOne.x + twistStep / 4.0;
 		}
