@@ -8644,6 +8644,7 @@ void thred::internal::insfil() {
 							}
 							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
 						}
+						auto vertexOffset = FormVertices->size();
 						if (fileHeader.vertexCount) {
 							auto inFormVertices = std::vector<fPOINT>{};
 							inFormVertices.resize(fileHeader.vertexCount);
@@ -8670,6 +8671,7 @@ void thred::internal::insfil() {
 							std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), SatinGuides);
 							newSatinGuideIndex += gsl::narrow<unsigned int>(inSatinGuides.size());
 						}
+						auto clipOffset = ClipPoints->size();
 						if (fileHeader.clipDataCount) {
 							auto tempClipPoints = std::vector<fPOINT>{};
 							tempClipPoints.resize(fileHeader.clipDataCount);
@@ -8682,6 +8684,7 @@ void thred::internal::insfil() {
 							}
 							ClipPoints->insert(ClipPoints->end(), tempClipPoints.begin(), tempClipPoints.end());
 						}
+						auto textureOffset = TexturePointsBuffer->size();
 						if (thredHeader.texturePointCount) {
 							auto tempTextureBuffer = std::vector<TXPNT>{};
 							tempTextureBuffer.resize(thredHeader.texturePointCount);
@@ -8696,10 +8699,6 @@ void thred::internal::insfil() {
 						}
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = nullptr;
-						// update the form variables
-						auto vertexOffset  = FormVertices->size();
-						auto clipOffset    = ClipPoints->size();
-						auto textureOffset = TexturePointsBuffer->size();
 						for (auto iFormList = InsertedFormIndex; iFormList < FormIndex; iFormList++) {
 							auto& formIter       = (*FormList)[iFormList];
 							formIter.vertexIndex = gsl::narrow<decltype(formIter.vertexIndex)>(vertexOffset);
