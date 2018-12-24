@@ -269,7 +269,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 		}
 	}
 	if (flag) {
-		FormVertexIndex = iVertex;
+		FormVertices->resize(iVertex);
 	}
 	std::copy(vertexPoint.cbegin(), vertexPoint.cend(), FormVertices->begin());
 }

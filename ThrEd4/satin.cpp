@@ -112,7 +112,6 @@ void satin::spltsat(SATCON currentGuide) {
 	form::fvars(ClosestFormToCursor);
 	auto position = std::next(FormVertices->begin(), CurrentFormVertices + VertexCount);
 	FormVertices->insert(position, 2, fPOINT{});
-	FormVertexIndex += 2;
 	for (auto iForm = std::next(formList.begin(), ClosestFormToCursor + 2); iForm < formList.end(); iForm++) {
 		iForm->vertexIndex += 2;
 	}
@@ -623,7 +622,6 @@ void satin::delspnt() {
 	auto closestVertexIt = FormVertices->begin() + SelectedForm->vertexIndex + ClosestVertexToCursor;
 	FormVertices->erase(closestVertexIt);
 	SelectedForm->vertexCount--;
-	FormVertexIndex--;
 	form::fvars(ClosestFormToCursor);
 	auto vertexIt = FormVertices->begin() + SelectedForm->vertexIndex;
 	if (ClosestVertexToCursor > (SelectedForm->vertexCount) - 1) {

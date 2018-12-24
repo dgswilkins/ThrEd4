@@ -113,7 +113,6 @@ void form::fltspac(unsigned int start, unsigned int count) {
 		auto& form = (*FormList)[iForm];
 		form.vertexIndex += count;
 	}
-	FormVertexIndex += count;
 }
 
 void form::delflt(unsigned int formIndex) {
@@ -126,7 +125,6 @@ void form::delflt(unsigned int formIndex) {
 			auto& formAfter = (*FormList)[iForm];
 			formAfter.vertexIndex -= form.vertexCount;
 		}
-		FormVertexIndex -= form.vertexCount;
 	}
 }
 
@@ -548,7 +546,6 @@ void form::ritfrct(unsigned int iForm, HDC dc) {
 void form::delfrms() {
 	thred::savdo();
 	FormIndex       = 0;
-	FormVertexIndex = 0;
 	ClipPoints->clear();
 	FormList->clear();
 	FormVertices->clear();
@@ -8023,7 +8020,8 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
                             std::vector<fPOINT>& destinationFormVertices,
                             std::vector<FRMHED>& destinationFormList,
                             unsigned int         formIndex,
-                            unsigned int&        formRelocationIndex) {
+                            unsigned int&        formRelocationIndex,
+                            unsigned int&        formSourceIndex) {
 	auto& destination = destinationFormList[formRelocationIndex];
 
 	destinationFormList[formRelocationIndex++] = (*FormList)[formIndex];
@@ -8031,9 +8029,9 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
 	auto srcStart                              = FormVertices->begin() + destination.vertexIndex;
 	auto srcEnd                                = srcStart + destination.vertexCount;
 
-	const auto res          = std::copy(srcStart, srcEnd, destinationFormVertices.begin() + FormVertexIndex);
-	destination.vertexIndex = FormVertexIndex;
-	FormVertexIndex += destination.vertexCount;
+	const auto res          = std::copy(srcStart, srcEnd, destinationFormVertices.begin() + formSourceIndex);
+	destination.vertexIndex = formSourceIndex;
+	formSourceIndex += destination.vertexCount;
 	if (destination.satinGuideCount) {
 		const auto _ = std::copy(destination.satinOrAngle.guide,
 		                         destination.satinOrAngle.guide + destination.satinGuideCount,
@@ -8088,17 +8086,17 @@ void form::frmnumfn(unsigned newFormIndex) {
 		auto tempClipPoints   = std::vector<fPOINT>{};
 		tempClipPoints.reserve(ClipPoints->size());
 
-		FormVertexIndex = 0;
+		auto formSourceIndex = 0u;
 		satin::clearGuideSize();
 		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 			if (iForm == newFormIndex) {
-				fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, ClosestFormToCursor, formRelocationIndex);
+				fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, ClosestFormToCursor, formRelocationIndex, formSourceIndex);
 			}
 			else {
 				if (sourceForm == ClosestFormToCursor) {
 					sourceForm++;
 				}
-				fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, sourceForm++, formRelocationIndex);
+				fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, sourceForm++, formRelocationIndex, formSourceIndex);
 			}
 		}
 		auto& formList = *FormList;

@@ -1190,7 +1190,6 @@ unsigned int thred::adflt(unsigned int count) {
 	const auto it          = FormVertices->end();
 	const auto val         = fPOINT{};
 	FormVertices->insert(it, count, val);
-	FormVertexIndex += count;
 	return iFormVertex;
 }
 
@@ -4911,7 +4910,6 @@ void thred::internal::redbak() {
 		else {
 			FormVertices->clear();
 		}
-		FormVertexIndex = undoData->vertexCount;
 		satin::cpyUndoGuides(*undoData);
 		if (undoData->clipPointCount) {
 			ClipPoints->resize(undoData->clipPointCount);
@@ -5643,7 +5641,6 @@ void thred::internal::nuFil() {
 					if (thredHeader.formCount != 0) {
 						StateMap.reset(StateFlag::BADFIL);
 						ClipPoints->clear();
-						FormVertexIndex = 0;
 						FormVertices->clear();
 						satin::clearGuideSize();
 						MsgBuffer[0]     = 0;
@@ -5679,7 +5676,6 @@ void thred::internal::nuFil() {
 							if (BytesRead != bytesToRead) {
 								const auto newSize = BytesRead / sizeof(decltype(FormVertices->back()));
 								FormVertices->resize(newSize);
-								FormVertexIndex = newSize;
 								StateMap.set(StateFlag::BADFIL);
 							}
 						}
@@ -5727,7 +5723,6 @@ void thred::internal::nuFil() {
 						}
 						// now re-create all the pointers in the form data
 						satin::clearGuideSize();
-						FormVertexIndex = 0;
 						auto clipOffset = 0u;
 						auto formOffset = 0u;
 						for (auto iForm = 0u; iForm < FormIndex; iForm++) {
@@ -5750,7 +5745,6 @@ void thred::internal::nuFil() {
 								clipOffset += form.clipEntries;
 							}
 						}
-						FormVertexIndex = formOffset;
 						xt::setfchk();
 					}
 				}
@@ -6779,7 +6773,6 @@ void thred::internal::newFil() {
 	DisplayedColorBitmap.reset();
 	PCSBMPFileName[0]     = 0;
 	PCSHeader.stitchCount = 0;
-	FormVertexIndex       = 0;
 	FormVertices->clear();
 	TextureIndex = 0;
 	TexturePointsBuffer->clear();
@@ -8128,7 +8121,7 @@ void thred::internal::setsped() {
 
 void thred::internal::deltot() {
 	DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
-	TextureIndex = FormIndex = FormVertexIndex = PCSHeader.stitchCount = 0;
+	TextureIndex = FormIndex = PCSHeader.stitchCount = 0;
 	// ToDo - Should ClipPoints be cleared here too?
 	FormList->clear();
 	FormVertices->clear();
@@ -8186,7 +8179,6 @@ void thred::internal::delet() {
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			(*FormList)[iForm].vertexIndex -= (gsl::narrow<size_t>(SelectedFormVertices.vertexCount) + 1);
 		}
-		FormVertexIndex -= (SelectedFormVertices.vertexCount + 1);
 		SelectedForm->vertexCount -= (SelectedFormVertices.vertexCount + 1);
 		form::frmout(ClosestFormToCursor);
 		if (SelectedForm->type == SAT) {
