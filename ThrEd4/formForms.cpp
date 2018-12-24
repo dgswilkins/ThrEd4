@@ -850,7 +850,8 @@ void formForms::dasyfrm() {
 		FormVertices->emplace_back(fPOINT{ referencePoint.x + diameter * cos(angle), referencePoint.y + diameter * sin(angle) });
 		iVertex++;
 		for (auto iSegment = 0u; iSegment < holeVertexCount + 1; iSegment++) {
-			FormVertices->emplace_back(fPOINT{ referencePoint.x + holeDiameter * cos(angle), referencePoint.y + holeDiameter * sin(angle) });
+			FormVertices->emplace_back(
+			    fPOINT{ referencePoint.x + holeDiameter * cos(angle), referencePoint.y + holeDiameter * sin(angle) });
 			iVertex++;
 			angle -= holeSegmentAngle;
 		}
@@ -923,7 +924,8 @@ void formForms::dasyfrm() {
 				break;
 			}
 			}
-			FormVertices->emplace_back(fPOINT{ referencePoint.x + cos(angle) * distanceFromDaisyCenter, referencePoint.y + sin(angle) * distanceFromDaisyCenter });
+			FormVertices->emplace_back(fPOINT{ referencePoint.x + cos(angle) * distanceFromDaisyCenter,
+			                                   referencePoint.y + sin(angle) * distanceFromDaisyCenter });
 			iVertex++;
 			angle += petalSegmentAngle;
 			if (UserFlagMap.test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
@@ -1059,8 +1061,8 @@ void formForms::setear() {
 			iRightVertices--;
 			iLeftVertices++;
 		}
-		vertexZero.y = verticalPosition; 
-		vertexOne.y = verticalPosition;
+		vertexZero.y = verticalPosition;
+		vertexOne.y  = verticalPosition;
 		vertexZero.x += twistStep;
 		vertexOne.x += twistStep;
 		verticalPosition -= step / 2.0;
@@ -1171,7 +1173,7 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 void formForms::wavfrm() {
 	thred::unmsg();
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, (DLGPROC)ffi::wavprc)) {
-		auto       points = std::vector<fPOINT>{};
+		auto points = std::vector<fPOINT>{};
 		points.reserve(IniFile.wavePoints);
 		// reuse regular polygon code to build the template for points
 		const auto saveIndex = FormVertexIndex;
@@ -1184,7 +1186,8 @@ void formForms::wavfrm() {
 		while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 			const unsigned short iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
 
-			points.emplace_back(fPOINT{ -vertexIt[iNextVertex].x + vertexIt[waveIndex].x, -vertexIt[iNextVertex].y + vertexIt[waveIndex].y });
+			points.emplace_back(
+			    fPOINT{ -vertexIt[iNextVertex].x + vertexIt[waveIndex].x, -vertexIt[iNextVertex].y + vertexIt[waveIndex].y });
 			iPoint++;
 			waveIndex = iNextVertex;
 		}
@@ -1192,7 +1195,8 @@ void formForms::wavfrm() {
 		const auto count           = iPoint;
 		auto       iVertex         = 0u;
 		auto       currentPosition = fPOINT{};
-		auto formVerticesSize = (IniFile.waveLobes * count) + 1 - IniFile.wavePoints; // account for vertices already allocated by durpoli above
+		auto       formVerticesSize
+		    = (IniFile.waveLobes * count) + 1 - IniFile.wavePoints; // account for vertices already allocated by durpoli above
 		FormVertices->resize(FormVertices->size() + formVerticesSize);
 		vertexIt = FormVertices->begin() + CurrentFormVertices; // resize may invalidate iterator
 		for (auto iLobe = 0u; iLobe < IniFile.waveLobes; iLobe++) {
@@ -1250,8 +1254,8 @@ void formForms::wavfrm() {
 			vertex.x -= SelectedForm->rectangle.left;
 			vertex.y -= SelectedForm->rectangle.bottom;
 		}
-		FormMoveDelta = fPOINT{};
-		NewFormVertexCount                = vertexCount + 1;
+		FormMoveDelta      = fPOINT{};
+		NewFormVertexCount = vertexCount + 1;
 		form::setmfrm();
 		form::mdufrm();
 	}

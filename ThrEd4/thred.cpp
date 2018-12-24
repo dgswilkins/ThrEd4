@@ -1358,8 +1358,10 @@ void thred::internal::dudat() {
 		backupData->formCount = formCount;
 		backupData->forms     = convert_ptr<FRMHED*>(&backupData[1]);
 		if (!formList.empty()) {
-			std::copy(formList.cbegin(), formList.cend(), stdext::make_checked_array_iterator(backupData->forms, formList.size()));
-		}backupData->stitchCount = PCSHeader.stitchCount;
+			std::copy(
+			    formList.cbegin(), formList.cend(), stdext::make_checked_array_iterator(backupData->forms, formList.size()));
+		}
+		backupData->stitchCount = PCSHeader.stitchCount;
 		backupData->stitches    = convert_ptr<fPOINTATTR*>(&backupData->forms[formCount]);
 		if (PCSHeader.stitchCount) {
 			std::copy(StitchBuffer,
@@ -4898,7 +4900,7 @@ void thred::internal::redbak() {
 			FormList->resize(undoData->formCount);
 			std::copy(undoData->forms, undoData->forms + undoData->formCount, FormList->begin());
 		}
-		else { 
+		else {
 			FormList->clear();
 		}
 		FormIndex = undoData->formCount;

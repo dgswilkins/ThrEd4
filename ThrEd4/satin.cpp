@@ -101,12 +101,12 @@ SATCON* satin::internal::nusac(unsigned int formIndex, unsigned guideCount) {
 
 void satin::spltsat(SATCON currentGuide) {
 	// We are adding two additional vertices when splitting the form
-	auto  vertexBuffer = std::vector<fPOINT>{};
+	auto vertexBuffer = std::vector<fPOINT>{};
 	vertexBuffer.resize(gsl::narrow<size_t>(VertexCount) + 2);
-	auto& formList     = *FormList;
+	auto& formList = *FormList;
 
 	auto& srcForm = formList[ClosestFormToCursor];
-	auto  dest = std::next(formList.begin(), ClosestFormToCursor);
+	auto  dest    = std::next(formList.begin(), ClosestFormToCursor);
 	formList.insert(dest, srcForm);
 	FormIndex++;
 	form::fvars(ClosestFormToCursor);
@@ -119,7 +119,7 @@ void satin::spltsat(SATCON currentGuide) {
 	auto       iOldVertex    = 0u;
 	const auto oldLastVertex = currentGuide.start + (VertexCount - currentGuide.finish) + 1;
 	auto       iNewVertex    = oldLastVertex + 1;
-	auto vertexIt      = std::next(FormVertices->begin(), CurrentFormVertices);
+	auto       vertexIt      = std::next(FormVertices->begin(), CurrentFormVertices);
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 		auto& vertex = vertexIt[iVertex];
 		if (iVertex == currentGuide.start || iVertex == currentGuide.finish) {

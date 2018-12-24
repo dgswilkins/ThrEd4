@@ -789,7 +789,7 @@ void trace::internal::dutrac() {
 		FormList->emplace_back(FRMHED{});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
-		CurrentFormVertices  = FormVertices->size();
+		CurrentFormVertices = FormVertices->size();
 		FormVertices->emplace_back(fPOINT{ tracedPoints[0].x * StitchBmpRatio.x, tracedPoints[0].y * StitchBmpRatio.y });
 		iNext                = 0;
 		OutputIndex          = 0;
@@ -804,7 +804,8 @@ void trace::internal::dutrac() {
 			const auto traceLength
 			    = hypot(tracedPoints[iCurrent].x - tracedPoints[iNext].x, tracedPoints[iCurrent].y - tracedPoints[iNext].y);
 			if (traceLengthSum > traceLength * IniFile.traceRatio) {
-				FormVertices->emplace_back(fPOINT{ tracedPoints[iCurrent - 1].x * StitchBmpRatio.x, tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset });
+				FormVertices->emplace_back(fPOINT{ tracedPoints[iCurrent - 1].x * StitchBmpRatio.x,
+				                                   tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset });
 				OutputIndex++;
 				iCurrent--;
 				iNext          = iCurrent;

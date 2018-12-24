@@ -547,7 +547,7 @@ void form::ritfrct(unsigned int iForm, HDC dc) {
 
 void form::delfrms() {
 	thred::savdo();
-	FormIndex = 0;
+	FormIndex       = 0;
 	FormVertexIndex = 0;
 	ClipPoints->clear();
 	FormList->clear();
@@ -6614,10 +6614,10 @@ void form::duhart(unsigned sideCount) {
 		sideCount = 6;
 	}
 	FormList->emplace_back(FRMHED{});
-	SelectedForm            = &(FormList->back());
+	SelectedForm              = &(FormList->back());
 	SelectedForm->vertexIndex = FormVertices->size();
-	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
-	CurrentFormVertices     = FormVertices->size();
+	SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
+	CurrentFormVertices       = FormVertices->size();
 	FormVertices->reserve(CurrentFormVertices + 2 * sideCount - 2);
 	thred::px2stch();
 	auto       point     = dPOINT{ SelectedPoint };
@@ -6656,13 +6656,13 @@ void form::duhart(unsigned sideCount) {
 		auto& current = vertexIt[iVertex];
 		current.x     = (current.x - lastVertex.x) * ratio + lastVertex.x;
 	}
-	iLastVertex       = iVertex;
+	iLastVertex = iVertex;
 	for (iVertex = iLastVertex - 2; iVertex != 0; iVertex--) {
-		auto& current     = vertexIt[iVertex];
+		auto& current = vertexIt[iVertex];
 		FormVertices->emplace_back(fPOINT{ maximumX + maximumX - current.x - 2 * (maximumX - initVertex.x), current.y });
 	}
 	SelectedForm->vertexCount = FormVertices->size() - SelectedForm->vertexIndex;
-	NewFormVertexCount = SelectedForm->vertexCount + 1;
+	NewFormVertexCount        = SelectedForm->vertexCount + 1;
 	SelectedForm->type        = FRMFPOLY;
 	ClosestFormToCursor       = FormList->size() - 1;
 	form::frmout(ClosestFormToCursor);
@@ -6683,7 +6683,7 @@ void form::dulens(unsigned sides) {
 	if (sides > 48) {
 		sides = 48;
 	}
-	auto steps = sides << 1;
+	auto       steps     = sides << 1;
 	const auto stepAngle = PI * 2.0 / steps;
 	auto       count     = gsl::narrow<unsigned int>(std::round(steps / 2.0 * 0.3));
 	auto       angle     = count * stepAngle;
@@ -6694,7 +6694,7 @@ void form::dulens(unsigned sides) {
 	ClosestFormToCursor       = FormList->size() - 1;
 	SelectedForm->vertexIndex = FormVertices->size();
 	FormVertices->reserve(FormVertices->size() + sides);
-	SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
+	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	form::fvars(FormIndex);
 	thred::px2stch();
 	auto point   = dPOINT{ SelectedPoint };
@@ -6711,11 +6711,11 @@ void form::dulens(unsigned sides) {
 	if (lastVertex) {
 		lastVertex--;
 	}
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
-	const auto av           = vertexIt[0].x;
+	auto       vertexIt = FormVertices->begin() + CurrentFormVertices;
+	const auto av       = vertexIt[0].x;
 	for (iVertex = lastVertex; iVertex != 1; iVertex--) {
-		auto& previous    = vertexIt[iVertex - 1];
-		FormVertices->emplace_back(fPOINT{ av + av - previous.x ,previous.y });
+		auto& previous = vertexIt[iVertex - 1];
+		FormVertices->emplace_back(fPOINT{ av + av - previous.x, previous.y });
 	}
 	SelectedForm->vertexCount = FormVertices->size() - SelectedForm->vertexIndex;
 	NewFormVertexCount        = SelectedForm->vertexCount + 1;
