@@ -8127,6 +8127,7 @@ void thred::internal::setsped() {
 void thred::internal::deltot() {
 	DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
 	TextureIndex = FormIndex = FormVertexIndex = PCSHeader.stitchCount = 0;
+	// ToDo - Should ClipPoints be cleared here too?
 	FormList->clear();
 	FormVertices->clear();
 	satin::clearGuideSize();
