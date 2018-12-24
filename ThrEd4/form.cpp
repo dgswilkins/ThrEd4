@@ -547,7 +547,8 @@ void form::ritfrct(unsigned int iForm, HDC dc) {
 
 void form::delfrms() {
 	thred::savdo();
-	FormIndex = FormVertexIndex = 0;
+	FormIndex = 0;
+	FormVertexIndex = 0;
 	ClipPoints->clear();
 	FormList->clear();
 	FormVertices->clear();
