@@ -627,8 +627,7 @@ void satin::delspnt() {
 			}
 		}
 	}
-	// ToDo - convert to vector and use erase()
-	auto closestVertexIt = FormVertices->begin() + ClosestVertexToCursor;
+	auto closestVertexIt = FormVertices->begin() + SelectedForm->vertexIndex + ClosestVertexToCursor;
 	FormVertices->erase(closestVertexIt);
 	SelectedForm->vertexCount--;
 	FormVertexIndex--;
@@ -638,9 +637,8 @@ void satin::delspnt() {
 		ClosestVertexToCursor = SelectedForm->vertexCount - 1;
 	}
 	StateMap.set(StateFlag::FRMPSEL);
-	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-		auto& form = (*FormList)[iForm];
-		form.vertexIndex--;
+	for (auto iForm = std::next(FormList->begin(), ClosestFormToCursor + 1); iForm < FormList->end(); iForm++) {
+		iForm->vertexIndex--;
 	}
 	thred::ritfcor(vertexIt[ClosestVertexToCursor]);
 	displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
