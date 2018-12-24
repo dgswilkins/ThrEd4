@@ -1195,7 +1195,7 @@ void formForms::wavfrm() {
 		const auto count           = iPoint;
 		auto       iVertex         = 0u;
 		auto       currentPosition = fPOINT{};
-		auto       formVerticesSize
+		const auto formVerticesSize
 		    = (IniFile.waveLobes * count) + 1 - IniFile.wavePoints; // account for vertices already allocated by durpoli above
 		FormVertices->resize(FormVertices->size() + formVerticesSize);
 		vertexIt = FormVertices->begin() + CurrentFormVertices; // resize may invalidate iterator

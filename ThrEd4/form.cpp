@@ -6683,7 +6683,7 @@ void form::dulens(unsigned sides) {
 	if (sides > 48) {
 		sides = 48;
 	}
-	auto       steps     = sides << 1;
+	const auto steps     = sides << 1;
 	const auto stepAngle = PI * 2.0 / steps;
 	auto       count     = gsl::narrow<unsigned int>(std::round(steps / 2.0 * 0.3));
 	auto       angle     = count * stepAngle;

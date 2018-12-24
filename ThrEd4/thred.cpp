@@ -5677,7 +5677,7 @@ void thred::internal::nuFil() {
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(decltype(FormVertices->back())));
 							ReadFile(FileHandle, FormVertices->data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								auto newSize = BytesRead / sizeof(decltype(FormVertices->back()));
+								const auto newSize = BytesRead / sizeof(decltype(FormVertices->back()));
 								FormVertices->resize(newSize);
 								FormVertexIndex = newSize;
 								StateMap.set(StateFlag::BADFIL);
