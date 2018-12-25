@@ -8163,22 +8163,27 @@ void thred::internal::delet() {
 	if (StateMap.testAndReset(StateFlag::FPSEL)) {
 		thred::savdo();
 		form::fvars(ClosestFormToCursor);
-		auto newVertices = std::vector<fPOINT>{};
-		newVertices.reserve(SelectedFormVertices.vertexCount);
-		auto iCurrentFormVertex = SelectedFormVertices.start;
-		auto vertexIt           = FormVertices->begin() + CurrentFormVertices;
+		auto vertexMap = boost::dynamic_bitset<>(VertexCount);
+		auto currentFormVertex = SelectedFormVertices.start;
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
-			newVertices.push_back(vertexIt[iCurrentFormVertex]);
-			iCurrentFormVertex = form::pdir(iCurrentFormVertex);
+			vertexMap.set(currentFormVertex);
+			currentFormVertex = form::pdir(currentFormVertex);
 		}
-		auto eraseStart = FormVertices->begin() + CurrentFormVertices;
-		auto eraseEnd   = eraseStart + VertexCount;
-		FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
-		auto destination = FormVertices->begin() + CurrentFormVertices;
-		FormVertices->insert(destination, newVertices.begin(), newVertices.end());
+		currentFormVertex = 0;
+		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
+			if (!vertexMap.test(iVertex)) {
+				CurrentFormVertices[currentFormVertex++] = CurrentFormVertices[iVertex];
+			}
+		}
+		currentFormVertex = form::fltind(&CurrentFormVertices[currentFormVertex]);
+		auto iVertex = form::fltind(&CurrentFormVertices[VertexCount]);
+		while (iVertex < FormVertexIndex) {
+			FormVertices[currentFormVertex++] = FormVertices[iVertex++];
+		}
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-			(*FormList)[iForm].vertexIndex -= (gsl::narrow<size_t>(SelectedFormVertices.vertexCount) + 1);
+			(*FormList)[iForm].vertices -= (gsl::narrow<size_t>(SelectedFormVertices.vertexCount) + 1);
 		}
+		FormVertexIndex -= (SelectedFormVertices.vertexCount + 1);
 		SelectedForm->vertexCount -= (SelectedFormVertices.vertexCount + 1);
 		form::frmout(ClosestFormToCursor);
 		if (SelectedForm->type == SAT) {
@@ -8215,7 +8220,7 @@ void thred::internal::delet() {
 				displayText::tomsg();
 			}
 			else {
-				if (!FormList->empty()) {
+				if (!(*FormList).empty()) {
 					StateMap.reset(StateFlag::DELTO);
 					thred::frmdel();
 					StateMap.set(StateFlag::RESTCH);
@@ -8256,7 +8261,7 @@ void thred::internal::delet() {
 			case FRMLINE: {
 				if (SelectedForm->fillType == CONTF) {
 					if (ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.start
-					    || ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.finish) {
+						|| ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.finish) {
 						form::delmfil();
 						SelectedForm->fillType = 0;
 						thred::coltab();
@@ -8288,15 +8293,15 @@ void thred::internal::delet() {
 					}
 					if (SatinEndGuide) {
 						if (ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide)
-						    || ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) + 1) {
+							|| ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) + 1) {
 							SelectedForm->wordParam = 0;
-							satinFlag               = true;
+							satinFlag = true;
 							break;
 						}
 					}
 					for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 						if (SelectedForm->satinOrAngle.guide[iGuide].start == ClosestVertexToCursor
-						    || SelectedForm->satinOrAngle.guide[iGuide].finish == ClosestVertexToCursor) {
+							|| SelectedForm->satinOrAngle.guide[iGuide].finish == ClosestVertexToCursor) {
 							satin::delcon(iGuide);
 							satinFlag = true;
 							break;
@@ -8311,7 +8316,7 @@ void thred::internal::delet() {
 			if (ClosestFormToCursor > FormIndex - 1) {
 				ClosestFormToCursor = FormIndex - 1;
 			}
-			if (!FormList->empty()) {
+			if (!(*FormList).empty()) {
 				form::frmout(ClosestFormToCursor);
 				form::fvars(ClosestFormToCursor);
 				form::refil();
