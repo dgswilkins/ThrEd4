@@ -8163,6 +8163,7 @@ void thred::internal::delet() {
 	if (StateMap.testAndReset(StateFlag::FPSEL)) {
 		thred::savdo();
 		form::fvars(ClosestFormToCursor);
+		// dynamic bitset allows non-contiguous ranges of points to be deleted in later versions
 		auto vertexMap = boost::dynamic_bitset<>(VertexCount);
 		auto currentFormVertex = SelectedFormVertices.start;
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
@@ -8170,20 +8171,18 @@ void thred::internal::delet() {
 			currentFormVertex = form::pdir(currentFormVertex);
 		}
 		currentFormVertex = 0;
+		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			if (!vertexMap.test(iVertex)) {
-				CurrentFormVertices[currentFormVertex++] = CurrentFormVertices[iVertex];
+				vertexIt[currentFormVertex++] = vertexIt[iVertex];
 			}
 		}
-		currentFormVertex = form::fltind(&CurrentFormVertices[currentFormVertex]);
-		auto iVertex = form::fltind(&CurrentFormVertices[VertexCount]);
-		while (iVertex < FormVertexIndex) {
-			FormVertices[currentFormVertex++] = FormVertices[iVertex++];
+		auto eraseStart = FormVertices->begin() + CurrentFormVertices + currentFormVertex;
+		auto eraseEnd = eraseStart + (VertexCount - currentFormVertex);
+		FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
+		for (auto iForm = std::next(FormList->begin(), ClosestFormToCursor + 1); iForm < FormList->end(); iForm++) {
+			iForm->vertexIndex -= SelectedFormVertices.vertexCount + 1;
 		}
-		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-			(*FormList)[iForm].vertices -= (gsl::narrow<size_t>(SelectedFormVertices.vertexCount) + 1);
-		}
-		FormVertexIndex -= (SelectedFormVertices.vertexCount + 1);
 		SelectedForm->vertexCount -= (SelectedFormVertices.vertexCount + 1);
 		form::frmout(ClosestFormToCursor);
 		if (SelectedForm->type == SAT) {
@@ -8220,7 +8219,7 @@ void thred::internal::delet() {
 				displayText::tomsg();
 			}
 			else {
-				if (!(*FormList).empty()) {
+				if (!FormList->empty()) {
 					StateMap.reset(StateFlag::DELTO);
 					thred::frmdel();
 					StateMap.set(StateFlag::RESTCH);
@@ -8316,7 +8315,7 @@ void thred::internal::delet() {
 			if (ClosestFormToCursor > FormIndex - 1) {
 				ClosestFormToCursor = FormIndex - 1;
 			}
-			if (!(*FormList).empty()) {
+			if (!FormList->empty()) {
 				form::frmout(ClosestFormToCursor);
 				form::fvars(ClosestFormToCursor);
 				form::refil();
