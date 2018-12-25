@@ -2420,7 +2420,10 @@ void thred::internal::chknum() {
 			else {
 				if (wcslen(MsgBuffer)) {
 					value = bufToDouble(MsgBuffer);
-					// ToDo - figure out why MsgBuffer gets large value and crashes gsl::narrow below
+					// ToDo - figure out why MsgBuffer gets large value and requires this clamp
+					if (value > MAXINT) {
+						value = MAXINT - 1;
+					}
 					for (auto i = 0u; i < 64; i++) {
 						MsgBuffer[i] = 0x0;
 					}
