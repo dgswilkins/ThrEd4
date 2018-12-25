@@ -9206,11 +9206,11 @@ void thred::internal::unmov() {
 void thred::internal::duprct() {
 	auto  iCurrentVertex = SelectedFormVertices.start;
 	auto  vertexIt       = FormVertices->begin() + CurrentFormVertices;
-	auto& vertex         = vertexIt[iCurrentVertex];
-	SelectedVerticesRect = fRECTANGLE{ vertex.y, vertex.x, vertex.x, vertex.y };
+	auto& firstVertex         = vertexIt[iCurrentVertex];
+	SelectedVerticesRect = fRECTANGLE{ firstVertex.y, firstVertex.x, firstVertex.x, firstVertex.y };
 	iCurrentVertex       = form::pdir(iCurrentVertex);
 	for (auto iVertex = 0u; iVertex < SelectedFormVertices.vertexCount; iVertex++) {
-		vertex = vertexIt[iCurrentVertex];
+		auto& vertex = vertexIt[iCurrentVertex];
 		if (vertex.x < SelectedVerticesRect.left) {
 			SelectedVerticesRect.left = vertex.x;
 		}
