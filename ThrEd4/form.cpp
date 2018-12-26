@@ -3438,26 +3438,22 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments) {
 	}
 }
 
-void form::internal::angout(FRMHED& angledForm) {
-	if (angledForm.vertexCount) {
-		auto rectangle      = &angledForm.rectangle;
-		CurrentFormVertices = angledForm.vertexIndex;
-		auto vertexIt       = FormVertices->begin() + CurrentFormVertices;
-		rectangle->left = rectangle->right = vertexIt[0].x;
-		rectangle->bottom = rectangle->top = vertexIt[0].y;
-		for (auto iVertex = 1u; iVertex < angledForm.vertexCount; iVertex++) {
-			auto& vertex = vertexIt[iVertex];
-			if (vertex.x > rectangle->right) {
-				rectangle->right = vertex.x;
+void form::internal::angout(fRECTANGLE& rectangle, std::vector<fPOINT>& currentFillVertices) {
+	if (currentFillVertices.size()) {
+		rectangle.left = rectangle.right = currentFillVertices[0].x;
+		rectangle.bottom = rectangle.top = currentFillVertices[0].y;
+		for (auto vertex = std::next(currentFillVertices.begin(), 1); vertex < currentFillVertices.end(); vertex++) {
+			if (vertex->x > rectangle.right) {
+				rectangle.right = vertex->x;
 			}
-			if (vertex.x < rectangle->left) {
-				rectangle->left = vertex.x;
+			if (vertex->x < rectangle.left) {
+				rectangle.left = vertex->x;
 			}
-			if (vertex.y < rectangle->bottom) {
-				rectangle->bottom = vertex.y;
+			if (vertex->y < rectangle.bottom) {
+				rectangle.bottom = vertex->y;
 			}
-			if (vertex.y > rectangle->top) {
-				rectangle->top = vertex.y;
+			if (vertex->y > rectangle.top) {
+				rectangle.top = vertex->y;
 			}
 		}
 	}
@@ -3477,7 +3473,7 @@ void form::internal::horclpfn(const std::vector<RNGCNT>& textureSegments, FRMHED
 		thred::rotflt(AngledFormVertices->back(), (PI / 2), rotationCenter);
 	}
 	angledForm.vertexIndex = 0;
-	angout(angledForm);
+	angout(angledForm.rectangle, *AngledFormVertices);
 	SelectedForm        = &angledForm;
 	CurrentFormVertices = angledForm.vertexIndex;
 	clpcon(textureSegments);
@@ -3518,7 +3514,7 @@ void form::angclpfn(const std::vector<RNGCNT>& textureSegments) {
 		}
 	}
 	angledForm.vertexIndex = 0;
-	fi::angout(angledForm);
+	fi::angout(angledForm.rectangle, *AngledFormVertices);
 	SelectedForm        = &angledForm;
 	CurrentFormVertices = 0;
 	fi::clpcon(textureSegments);

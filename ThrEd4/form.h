@@ -203,7 +203,7 @@ void     vrtsclp();
 namespace internal {
 
 	void adfrm(unsigned int iForm);
-	void angout(FRMHED& angledForm);
+	void angout(fRECTANGLE& rectangle, std::vector<fPOINT>& currentFillVertices);
 	void apbrd();
 	void bakseq();
 	void bdrlin(unsigned int start, unsigned int finish, double stitchSize);
