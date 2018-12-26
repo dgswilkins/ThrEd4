@@ -301,7 +301,7 @@ namespace internal {
 	            dPOINT&                rotationCenter,
 	            FRMHED&                angledForm);
 	void  fnord();
-	void  fnvrt(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
+	void  fnvrt(std::vector<fPOINT>& currentFillVertices, std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
 	void  frmpnts(unsigned type) noexcept;
 	void  frmpoly(const POINT* line, unsigned int count) noexcept;
 	void  frmsqr(unsigned iVertex);
