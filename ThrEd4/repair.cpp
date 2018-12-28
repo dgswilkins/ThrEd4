@@ -236,9 +236,9 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 		auto& form = formList[iForm];
 		if (FormVertices->size() >= form.vertexIndex + form.vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + form.vertexCount);
-			auto       sourceStart = FormVertices->begin() + form.vertexIndex;
+			auto       sourceStart = std::next(FormVertices->begin(), form.vertexIndex);
 			auto       sourceEnd   = sourceStart + form.vertexCount;
-			auto       destination = vertexPoint.begin() + iVertex;
+			auto       destination = std::next(vertexPoint.begin(), iVertex);
 			const auto _           = std::copy(sourceStart, sourceEnd, destination);
 			form.vertexIndex       = iVertex;
 			iVertex += form.vertexCount;
@@ -250,9 +250,9 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 				satin::delsac(iForm);
 				// ToDo - do we need to increase the size of vertexPoint?
 				// vertexPoint.resize(vertexPoint.size + form.vertexCount);
-				auto sourceStart = FormVertices->begin() + form.vertexIndex;
+				auto sourceStart = std::next(FormVertices->begin(), form.vertexIndex);
 				auto sourceEnd   = sourceStart + form.vertexCount;
-				auto destination = vertexPoint.begin() + iVertex;
+				auto destination = std::next(vertexPoint.begin(), iVertex);
 				auto _           = std::copy(sourceStart, sourceEnd, destination);
 				ri::bcup(iForm, badData);
 			}
@@ -287,9 +287,9 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 			clipDifference = form.angleOrClipData.clip;
 			if (clipDifference + form.lengthOrCount.clipCount < ClipPoints->size()) {
 				clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
-				auto sourceStart = ClipPoints->begin() + form.angleOrClipData.clip;
+				auto sourceStart = std::next(ClipPoints->begin(), form.angleOrClipData.clip);
 				auto sourceEnd   = sourceStart + form.lengthOrCount.clipCount;
-				auto destination = clipPoint.begin() + clipCount;
+				auto destination = std::next(clipPoint.begin(), clipCount);
 				auto _           = std::copy(sourceStart, sourceEnd, destination);
 
 				form.angleOrClipData.clip = clipCount;
@@ -299,9 +299,9 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 				if (clipDifference < ClipPoints->size()) {
 					form.lengthOrCount.clipCount = gsl::narrow<unsigned int>(FormVertices->size() - clipDifference);
 					clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
-					auto sourceStart = ClipPoints->begin() + form.angleOrClipData.clip;
+					auto sourceStart = std::next(ClipPoints->begin(), form.angleOrClipData.clip);
 					auto sourceEnd   = sourceStart + form.lengthOrCount.clipCount;
-					auto destination = clipPoint.begin() + clipCount;
+					auto destination = std::next(clipPoint.begin(), clipCount);
 					auto _           = std::copy(sourceStart, sourceEnd, destination);
 
 					form.angleOrClipData.clip = clipCount;
@@ -317,9 +317,9 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 			clipDifference = form.borderClipData;
 			if (clipDifference + form.clipEntries < ClipPoints->size()) {
 				clipPoint.resize(clipPoint.size() + form.clipEntries);
-				auto sourceStart = ClipPoints->begin() + form.borderClipData;
+				auto sourceStart = std::next(ClipPoints->begin(), form.borderClipData);
 				auto sourceEnd   = sourceStart + form.clipEntries;
-				auto destination = clipPoint.begin() + clipCount;
+				auto destination = std::next(clipPoint.begin(), clipCount);
 				auto _           = std::copy(sourceStart, sourceEnd, destination);
 
 				form.borderClipData = clipCount;
@@ -329,9 +329,9 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 				if (clipDifference < ClipPoints->size()) {
 					form.clipEntries = gsl::narrow<unsigned short>(FormVertices->size() - clipDifference);
 					clipPoint.resize(clipPoint.size() + form.clipEntries);
-					auto sourceStart = ClipPoints->begin() + form.borderClipData;
+					auto sourceStart = std::next(ClipPoints->begin(), form.borderClipData);
 					auto sourceEnd   = sourceStart + form.clipEntries;
-					auto destination = clipPoint.begin() + clipCount;
+					auto destination = std::next(clipPoint.begin(), clipCount);
 					auto _           = std::copy(sourceStart, sourceEnd, destination);
 
 					form.borderClipData = clipCount;

@@ -1035,7 +1035,7 @@ void trace::internal::stch2bit(fPOINT& point) {
 void trace::internal::pxlin(unsigned int start, unsigned int finish) {
 	POINT line[2];
 
-	auto vertexIt = FormVertices->begin() + FormVertexIndex;
+	auto vertexIt = std::next(FormVertices->begin(), FormVertexIndex);
 	ti::stch2bit(vertexIt[start]);
 	line[0] = BitmapPoint;
 	ti::stch2bit(vertexIt[finish]);

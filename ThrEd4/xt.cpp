@@ -582,7 +582,7 @@ void xt::pes2crd() {
 std::vector<fPOINT>& xt::insid() {
 	satin::satout(fabs(SelectedForm->underlayIndent));
 	if (SelectedForm->underlayIndent > 0) {
-		auto vertexIt = FormVertices->begin() + FormVertexIndex;
+		auto vertexIt = std::next(FormVertices->begin(), FormVertexIndex);
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			if (!form::cisin((*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y)) {
 				(*InsidePoints)[iVertex] = vertexIt[iVertex];
@@ -800,7 +800,7 @@ void xt::internal::undclp() {
 void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 	OutputIndex = 0;
 	SelectedForm->extendedAttribute |= AT_CWLK;
-	auto vertexIt = FormVertices->begin() + FormVertexIndex;
+	auto vertexIt = std::next(FormVertices->begin(), FormVertexIndex);
 	if (SelectedForm->satinGuideCount) {
 		if (SelectedForm->wordParam) {
 			const auto iVertex       = SelectedForm->wordParam;
@@ -1277,7 +1277,7 @@ void xt::fsort() {
 			sortRecord.direction     = minimumDirection;
 			xi::precjmps(tempStitchBuffer, pRecs, sortRecord);
 		}
-		std::copy(tempStitchBuffer.cbegin(), tempStitchBuffer.cbegin() + OutputIndex, StitchBuffer);
+		std::copy(tempStitchBuffer.cbegin(), std::next(tempStitchBuffer.cbegin(), OutputIndex), StitchBuffer);
 		PCSHeader.stitchCount = gsl::narrow<unsigned short>(OutputIndex);
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
@@ -1516,7 +1516,7 @@ void xt::internal::duint(unsigned offset, unsigned code, INTINF& ilData) {
 	}
 	if (SelectedForm->extendedAttribute & AT_STRT) {
 		if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
-			auto vertexIt = FormVertices->begin() + FormVertexIndex;
+			auto vertexIt = std::next(FormVertices->begin(), FormVertexIndex);
 			ilData.output += gucon(vertexIt[SelectedForm->fillStart],
 			                       InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index],
 			                       ilData.output + offset,
@@ -1558,7 +1558,7 @@ void xt::internal::chkend(unsigned offset, unsigned code, INTINF& ilData) {
 	if (isfil()) {
 		StateMap.set(StateFlag::ISEND);
 		if (SelectedForm->extendedAttribute & AT_END) {
-			auto vertexIt = FormVertices->begin() + FormVertexIndex;
+			auto vertexIt = std::next(FormVertices->begin(), FormVertexIndex);
 			ilData.output += gucon(
 			    InterleaveSequence[InterleaveSequenceIndex - 1], vertexIt[SelectedForm->fillEnd], ilData.output + offset, code);
 		}
@@ -1649,7 +1649,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 			                                 | InterleaveSequenceIndices[iSequence].color);
 			if (SelectedForm->extendedAttribute & AT_STRT) {
 				if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
-					auto vertexIt = FormVertices->begin() + FormVertexIndex;
+					auto vertexIt = std::next(FormVertices->begin(), FormVertexIndex);
 					ilData.output += xi::gucon(vertexIt[SelectedForm->fillStart],
 					                           InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index],
 					                           ilData.output + offset,
@@ -2280,7 +2280,7 @@ void xt::internal::fwidfn(unsigned int find, float length) {
 	form::fvars(ClosestFormToCursor);
 	const auto reference = SelectedForm->rectangle.left;
 	const auto ratio     = length / (SelectedForm->rectangle.right - reference);
-	auto       vertexIt  = FormVertices->begin() + FormVertexIndex;
+	auto       vertexIt  = std::next(FormVertices->begin(), FormVertexIndex);
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 		auto& vertex = vertexIt[iVertex];
 		vertex.x     = (vertex.x - reference) * ratio + reference;
@@ -2322,7 +2322,7 @@ void xt::internal::fhifn(unsigned int find, float length) {
 	form::fvars(ClosestFormToCursor);
 	const auto reference = SelectedForm->rectangle.bottom;
 	const auto ratio     = length / (SelectedForm->rectangle.top - reference);
-	auto       vertexIt  = FormVertices->begin() + FormVertexIndex;
+	auto       vertexIt  = std::next(FormVertices->begin(), FormVertexIndex);
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 		auto& vertex = vertexIt[iVertex];
 		vertex.y     = (vertex.y - reference) * ratio + reference;
