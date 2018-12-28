@@ -1899,7 +1899,7 @@ void thred::internal::hupfn() {
 	StateMap.reset(StateFlag::HUPCHNG);
 	sizstch(CheckHoopRect, StitchBuffer);
 	if (!FormList->empty()) {
-		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+		auto vertexIt = FormVertices->begin() + FormVertexIndex;
 		if (!PCSHeader.stitchCount) {
 			CheckHoopRect.bottom = CheckHoopRect.top = vertexIt[0].y;
 			CheckHoopRect.left = CheckHoopRect.right = vertexIt[0].x;
@@ -7346,7 +7346,7 @@ void thred::internal::duclip() {
 					auto* vertices = convert_ptr<fPOINT*>(&clipHeader[1]);
 					form::fvars(ClosestFormToCursor);
 					auto iSource  = SelectedFormVertices.start;
-					auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+					auto vertexIt = FormVertices->begin() + FormVertexIndex;
 					for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 						vertices[iVertex] = vertexIt[iSource];
 						iSource           = form::pdir(iSource);
@@ -8174,13 +8174,13 @@ void thred::internal::delet() {
 			currentFormVertex = form::pdir(currentFormVertex);
 		}
 		currentFormVertex = 0;
-		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+		auto vertexIt = FormVertices->begin() + FormVertexIndex;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			if (!vertexMap.test(iVertex)) {
 				vertexIt[currentFormVertex++] = vertexIt[iVertex];
 			}
 		}
-		auto eraseStart = FormVertices->begin() + CurrentFormVertices + currentFormVertex;
+		auto eraseStart = FormVertices->begin() + FormVertexIndex + currentFormVertex;
 		auto eraseEnd = eraseStart + (VertexCount - currentFormVertex);
 		FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
 		for (auto iForm = std::next(FormList->begin(), ClosestFormToCursor + 1); iForm < FormList->end(); iForm++) {
@@ -9208,7 +9208,7 @@ void thred::internal::unmov() {
 
 void thred::internal::duprct() {
 	auto  iCurrentVertex = SelectedFormVertices.start;
-	auto  vertexIt       = FormVertices->begin() + CurrentFormVertices;
+	auto  vertexIt       = FormVertices->begin() + FormVertexIndex;
 	auto& firstVertex         = vertexIt[iCurrentVertex];
 	SelectedVerticesRect = fRECTANGLE{ firstVertex.y, firstVertex.x, firstVertex.x, firstVertex.y };
 	iCurrentVertex       = form::pdir(iCurrentVertex);
@@ -9235,7 +9235,7 @@ void thred::setpsel() {
 	thi::duprct();
 	form::sRct2px(SelectedVerticesRect, SelectedPixelsRect);
 	form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+	auto vertexIt = FormVertices->begin() + FormVertexIndex;
 	form::sfCor2px(vertexIt[SelectedFormVertices.finish], EndPointCross);
 	StateMap.set(StateFlag::SHOPSEL);
 	form::dupsel(StitchWindowDC);
@@ -9246,7 +9246,7 @@ void thred::rotfn(double rotationAngle, const dPOINT& rotationCenter) {
 	thred::savdo();
 	if (StateMap.test(StateFlag::FPSEL)) {
 		form::fvars(ClosestFormToCursor);
-		auto vertexIt       = FormVertices->begin() + CurrentFormVertices;
+		auto vertexIt       = FormVertices->begin() + FormVertexIndex;
 		auto iCurrentVertex = SelectedFormVertices.start;
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 			thred::rotflt(vertexIt[iCurrentVertex], rotationAngle, rotationCenter);
@@ -9275,7 +9275,7 @@ void thred::rotfn(double rotationAngle, const dPOINT& rotationCenter) {
 		for (auto& selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
-			auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+			auto vertexIt = FormVertices->begin() + FormVertexIndex;
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				thred::rotflt(vertexIt[iVertex], rotationAngle, rotationCenter);
 			}
@@ -9287,7 +9287,7 @@ void thred::rotfn(double rotationAngle, const dPOINT& rotationCenter) {
 	else {
 		if (StateMap.testAndReset(StateFlag::FRMROT)) {
 			form::fvars(ClosestFormToCursor);
-			auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+			auto vertexIt = FormVertices->begin() + FormVertexIndex;
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				thred::rotflt(vertexIt[iVertex], rotationAngle, rotationCenter);
 			}
@@ -10545,7 +10545,7 @@ void thred::internal::rotmrk() {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			const auto codedFormIndex = ClosestFormToCursor << FRMSHFT;
 			form::fvars(ClosestFormToCursor);
-			auto vertexIt    = FormVertices->begin() + CurrentFormVertices;
+			auto vertexIt    = FormVertices->begin() + FormVertexIndex;
 			LowestAngle      = 0;
 			HighestAngle     = 0;
 			auto& vertexZero = vertexIt[0];
@@ -11549,7 +11549,7 @@ void thred::internal::fixpclp() {
 	auto       iNext  = form::nxt(ClosestVertexToCursor);
 	const auto count  = OutputIndex - 2;
 	form::fltspac(iNext, count);
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+	auto vertexIt = FormVertices->begin() + FormVertexIndex;
 	for (auto iOutput = 1u; iOutput < OutputIndex - 1; iOutput++) {
 		auto& vertex = vertexIt[iNext];
 		vertex.x     = InterleaveSequence[iOutput].x + offset.x;
@@ -12154,7 +12154,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			if (StateMap.test(StateFlag::FPSEL)) {
 				form::fvars(ClosestFormToCursor);
 				auto iSelectedVertex = SelectedFormVertices.start;
-				auto vertexIt        = FormVertices->begin() + CurrentFormVertices;
+				auto vertexIt        = FormVertices->begin() + FormVertexIndex;
 				for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 					auto& vertex = vertexIt[iSelectedVertex];
 					vertex.x += FormMoveDelta.x;
@@ -15155,7 +15155,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP*>(clipCopyBuffer.data());
 							if (StateMap.test(StateFlag::FRMPSEL)) {
 								form::fvars(ClosestFormToCursor);
-								auto vertexIt         = FormVertices->begin() + CurrentFormVertices;
+								auto vertexIt         = FormVertices->begin() + FormVertexIndex;
 								InterleaveSequence[0] = vertexIt[ClosestVertexToCursor];
 								auto clipData         = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 								// Todo - localize iVertex into the loop
@@ -15209,7 +15209,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								formIter.attribute
 								    = gsl::narrow<unsigned char>((formIter.attribute & NFRMLMSK) | (ActiveLayer << 1));
 							}
-							// ToDo - use local variable for CurrentFormVertices
+							// ToDo - use local variable for FormVertexIndex
 							auto formVertices  = convert_ptr<fPOINT*>(&forms[iForm]);
 							auto currentVertex = 0u;
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {

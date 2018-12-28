@@ -789,7 +789,7 @@ void trace::internal::dutrac() {
 		FormList->emplace_back(FRMHED{});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
-		CurrentFormVertices = FormVertices->size();
+		FormVertexIndex = FormVertices->size();
 		FormVertices->emplace_back(fPOINT{ tracedPoints[0].x * StitchBmpRatio.x, tracedPoints[0].y * StitchBmpRatio.y });
 		iNext                = 0;
 		OutputIndex          = 0;
@@ -816,7 +816,7 @@ void trace::internal::dutrac() {
 			displayText::tabmsg(IDS_FRMOVR);
 			return;
 		}
-		SelectedForm->vertexIndex = CurrentFormVertices;
+		SelectedForm->vertexIndex = FormVertexIndex;
 		SelectedForm->vertexCount = gsl::narrow<unsigned short>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
@@ -1035,7 +1035,7 @@ void trace::internal::stch2bit(fPOINT& point) {
 void trace::internal::pxlin(unsigned int start, unsigned int finish) {
 	POINT line[2];
 
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+	auto vertexIt = FormVertices->begin() + FormVertexIndex;
 	ti::stch2bit(vertexIt[start]);
 	line[0] = BitmapPoint;
 	ti::stch2bit(vertexIt[finish]);

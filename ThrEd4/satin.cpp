@@ -110,7 +110,7 @@ void satin::spltsat(SATCON currentGuide) {
 	formList.insert(dest, srcForm);
 	FormIndex++;
 	form::fvars(ClosestFormToCursor);
-	auto position = std::next(FormVertices->begin(), CurrentFormVertices + VertexCount);
+	auto position = std::next(FormVertices->begin(), FormVertexIndex + VertexCount);
 	FormVertices->insert(position, 2, fPOINT{});
 	for (auto iForm = std::next(formList.begin(), ClosestFormToCursor + 2); iForm < formList.end(); iForm++) {
 		iForm->vertexIndex += 2;
@@ -118,7 +118,7 @@ void satin::spltsat(SATCON currentGuide) {
 	auto       iOldVertex    = 0u;
 	const auto oldLastVertex = currentGuide.start + (VertexCount - currentGuide.finish) + 1;
 	auto       iNewVertex    = oldLastVertex + 1;
-	auto       vertexIt      = std::next(FormVertices->begin(), CurrentFormVertices);
+	auto       vertexIt      = std::next(FormVertices->begin(), FormVertexIndex);
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 		auto& vertex = vertexIt[iVertex];
 		if (iVertex == currentGuide.start || iVertex == currentGuide.finish) {
@@ -148,7 +148,7 @@ void satin::spltsat(SATCON currentGuide) {
 	SelectedForm->vertexCount = iOldVertex;
 	auto& nextForm            = formList[ClosestFormToCursor + 1];
 	nextForm.vertexCount      = iNewVertex - iOldVertex;
-	nextForm.vertexIndex      = CurrentFormVertices + iOldVertex;
+	nextForm.vertexIndex      = FormVertexIndex + iOldVertex;
 	form::frmout(ClosestFormToCursor);
 	form::frmout(ClosestFormToCursor + 1);
 	auto iNewGuide = 1;
@@ -871,7 +871,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
                             unsigned int               line2Start,
                             unsigned int               line2End) {
 	if (line1Start != line1End && line2Start != line2End) {
-		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+		auto vertexIt = FormVertices->begin() + FormVertexIndex;
 		if (!StateMap.testAndSet(StateFlag::SAT1)) {
 			if (StateMap.test(StateFlag::FTHR)) {
 				BSequence[SequenceIndex].attribute = 0;
@@ -1118,7 +1118,7 @@ void satin::satfil() {
 	lengths.reserve(gsl::narrow<size_t>(VertexCount) + 1);
 	auto length = 0.0;
 	lengths.push_back(length);
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+	auto vertexIt = FormVertices->begin() + FormVertexIndex;
 	for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
 		auto&      prevVertex = vertexIt[iVertex - 1];
 		auto&      vertex     = vertexIt[iVertex];
@@ -1471,7 +1471,7 @@ void satin::internal::outfn(unsigned start, unsigned finish, double satinWidth) 
 		xOffset = length * cos(angle);
 		yOffset = length * sin(angle);
 	}
-	auto  vertexIt             = FormVertices->begin() + CurrentFormVertices;
+	auto  vertexIt             = FormVertices->begin() + FormVertexIndex;
 	auto& finishVertex         = vertexIt[finish];
 	(*InsidePoints)[finish].x  = finishVertex.x - xOffset;
 	(*InsidePoints)[finish].y  = finishVertex.y - yOffset;
