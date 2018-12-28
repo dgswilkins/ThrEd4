@@ -135,6 +135,8 @@ void clip::deleclp(unsigned int iForm) {
 			ClipPoints->erase(eraseStart, eraseEnd);
 			ci::clpsub(iForm, form.clipEntries);
 			form.clipEntries = 0;
+			form.borderClipData = 0;
+			form.edgeType = 0;
 		}
 	}
 }
@@ -194,26 +196,31 @@ void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
 	auto& clipBuffer = *ClipBuffer;
 	if (!StateMap.test(StateFlag::NOCLP)) {
 		clipBuffer.clear();
-		clipBuffer.reserve(clipEntries);
-		for (auto iClip = 0u; iClip < clipEntries; iClip++) {
-			clipBuffer.emplace_back(fPOINTATTR{ (*clipIt).x, (*clipIt).y, 0 });
-			clipIt++;
+		if (clipEntries) {
+			clipBuffer.reserve(clipEntries);
+			for (auto iClip = 0u; iClip < clipEntries; iClip++) {
+				clipBuffer.emplace_back(fPOINTATTR{ (*clipIt).x, (*clipIt).y, 0 });
+				clipIt++;
+			}
+			ClipRect.left = ClipRect.right = clipBuffer[0].x;
+			ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
+			for (auto& clip : *ClipBuffer) {
+				if (clip.x < ClipRect.left) {
+					ClipRect.left = clip.x;
+				}
+				if (clip.x > ClipRect.right) {
+					ClipRect.right = clip.x;
+				}
+				if (clip.y < ClipRect.bottom) {
+					ClipRect.bottom = clip.y;
+				}
+				if (clip.y > ClipRect.top) {
+					ClipRect.top = clip.y;
+				}
+			}
 		}
-		ClipRect.left = ClipRect.right = clipBuffer[0].x;
-		ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
-		for (auto& clip : *ClipBuffer) {
-			if (clip.x < ClipRect.left) {
-				ClipRect.left = clip.x;
-			}
-			if (clip.x > ClipRect.right) {
-				ClipRect.right = clip.x;
-			}
-			if (clip.y < ClipRect.bottom) {
-				ClipRect.bottom = clip.y;
-			}
-			if (clip.y > ClipRect.top) {
-				ClipRect.top = clip.y;
-			}
+		else { 
+			ClipRect = fRECTANGLE{};
 		}
 		ClipRectSize.cx = ClipRect.right - ClipRect.left;
 		ClipRectSize.cy = ClipRect.top - ClipRect.bottom;
@@ -221,21 +228,23 @@ void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
 }
 
 void clip::internal::durev(std::vector<fPOINT>& clipReversedData) {
-	const auto midpoint   = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
-	auto&      clipBuffer = *ClipBuffer;
+	if (!ClipBuffer->empty()) {
+		const auto midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
+		auto&      clipBuffer = *ClipBuffer;
 
-	if (clipBuffer[0].x > midpoint) {
-		auto iBuffer = clipBuffer.begin();
-		for (auto& reversed : clipReversedData) {
-			reversed = fPOINT{ ClipRect.right - iBuffer->x, iBuffer->y };
-			iBuffer++;
+		if (clipBuffer[0].x > midpoint) {
+			auto iBuffer = clipBuffer.begin();
+			for (auto& reversed : clipReversedData) {
+				reversed = fPOINT{ ClipRect.right - iBuffer->x, iBuffer->y };
+				iBuffer++;
+			}
 		}
-	}
-	else {
-		auto iBuffer = clipBuffer.begin();
-		for (auto& reversed : clipReversedData) {
-			reversed = *iBuffer;
-			iBuffer++;
+		else {
+			auto iBuffer = clipBuffer.begin();
+			for (auto& reversed : clipReversedData) {
+				reversed = *iBuffer;
+				iBuffer++;
+			}
 		}
 	}
 }
@@ -361,6 +370,9 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 	const auto rotationAngle      = atan2(delta.y, delta.x);
 
 	thred::rotang1(clipReferencePoint, ClipReference, rotationAngle, rotationCenter);
+	if (ClipRectSize.cx == 0.0f) { 
+		return false; 
+	}
 	const auto clipCount = gsl::narrow<unsigned int>(std::floor(length / ClipRectSize.cx));
 	if (clipCount) {
 		auto remainder = 0.0f;
