@@ -418,7 +418,7 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 void xt::fethrf() {
 	if (!FormList->empty()) {
 		form::fvars(ClosestFormToCursor);
-		clip::delclps(ClosestFormToCursor);
+		clip::delmclp(ClosestFormToCursor);
 		texture::deltx();
 		SelectedForm->type                           = SAT;
 		SelectedForm->fillInfo.feather.ratio         = IniFile.featherRatio;

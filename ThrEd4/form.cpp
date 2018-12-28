@@ -193,8 +193,6 @@ void form::fsizpar() noexcept {
 }
 
 void form::chkcont() {
-	clip::delmclp(ClosestFormToCursor);
-	clip::deleclp(ClosestFormToCursor);
 	fsizpar();
 	if (SelectedForm->fillType != CONTF) {
 		if (CurrentFormGuidesCount) {
