@@ -139,9 +139,9 @@ extern fPOINT       FormMoveDelta;
 
 extern std::wstring* FormOnOff;
 
-extern HPEN     FormPen3px;
-extern HPEN     FormPen;
-extern HPEN     FormSelectedPen;
+extern HPEN FormPen3px;
+extern HPEN FormPen;
+extern HPEN FormSelectedPen;
 
 extern std::vector<fPOINT>* FormVertices;
 

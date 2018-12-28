@@ -83,7 +83,7 @@ int*         ColorBarSize;           // Color bar width scaled for DPI
 HCURSOR      CrossCursor;            // cross
 SATCON*      CurrentFormGuides;      // connections in the currently selecteed form
 unsigned int CurrentFormGuidesCount; // number of connections in the currently selected form
-unsigned int FormVertexIndex;    // points in the currently selected form
+unsigned int FormVertexIndex;        // points in the currently selected form
 
 std::vector<HWND>* DefaultColorWin; // default color windows
 
@@ -106,9 +106,9 @@ fPOINT               FormMoveDelta;           // offset for moving forms
 
 std::wstring* FormOnOff;
 
-HPEN     FormPen;         // form pen
-HPEN     FormPen3px;      // three-pixel form pen
-HPEN     FormSelectedPen; // form select pen
+HPEN FormPen;         // form pen
+HPEN FormPen3px;      // three-pixel form pen
+HPEN FormSelectedPen; // form select pen
 
 std::vector<fPOINT>* FormVertices; // form points
 

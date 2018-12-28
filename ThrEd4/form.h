@@ -301,7 +301,9 @@ namespace internal {
 	            dPOINT&                rotationCenter,
 	            FRMHED&                angledForm);
 	void  fnord();
-	void  fnvrt(std::vector<fPOINT>& currentFillVertices, std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
+	void  fnvrt(std::vector<fPOINT>&   currentFillVertices,
+	            std::vector<unsigned>& groupIndexSequence,
+	            std::vector<SMALPNTL>& lineEndpoints);
 	void  frmpnts(unsigned type) noexcept;
 	void  frmpoly(const POINT* line, unsigned int count) noexcept;
 	void  frmsqr(unsigned iVertex);
@@ -329,18 +331,18 @@ namespace internal {
 	void inspnt(std::vector<CLIPNT>& clipStitchPoints);
 	bool isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoint1, double gapToClosestRegion) noexcept;
 
-	bool isect(unsigned int  vertex0,
-	           unsigned int  vertex1,
-	           fPOINT&       intersection,
-	           float&        length,
-	           const fPOINT& lineSegmentStart,
+	bool isect(unsigned int         vertex0,
+	           unsigned int         vertex1,
+	           fPOINT&              intersection,
+	           float&               length,
+	           const fPOINT&        lineSegmentStart,
 	           const fPOINT&        lineSegmentEnd,
 	           std::vector<fPOINT>& currentFillVertices);
-	bool isin(std::vector<VCLPX>& regionCrossingData,
-	          float               xCoordinate,
-	          float               yCoordinate,
-	          unsigned            regionCrossingStart,
-	          unsigned            regionCrossingEnd,
+	bool isin(std::vector<VCLPX>&  regionCrossingData,
+	          float                xCoordinate,
+	          float                yCoordinate,
+	          unsigned             regionCrossingStart,
+	          unsigned             regionCrossingEnd,
 	          const fRECTANGLE&    boundingRect,
 	          std::vector<fPOINT>& currentFillVertices);
 	void lapbrd();
@@ -425,7 +427,8 @@ namespace internal {
 	void   ritseg(const std::vector<CLIPNT>& clipStitchPoints,
 	              std::vector<CLPSEG>&       clipSegments,
 	              unsigned                   currentSegmentIndex,
-	              unsigned&                  clipIntersectSide, std::vector<fPOINT>& currentFillVertices);
+	              unsigned&                  clipIntersectSide,
+	              std::vector<fPOINT>&       currentFillVertices);
 	void   rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept;
 	void   rotentr(double rotationAngle);
 	void   rspnt(float xCoordinate, float yCoordinate) noexcept;

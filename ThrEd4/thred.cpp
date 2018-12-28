@@ -8167,21 +8167,21 @@ void thred::internal::delet() {
 		thred::savdo();
 		form::fvars(ClosestFormToCursor);
 		// dynamic bitset allows non-contiguous ranges of points to be deleted in later versions
-		auto vertexMap = boost::dynamic_bitset<>(VertexCount);
+		auto vertexMap         = boost::dynamic_bitset<>(VertexCount);
 		auto currentFormVertex = SelectedFormVertices.start;
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 			vertexMap.set(currentFormVertex);
 			currentFormVertex = form::pdir(currentFormVertex);
 		}
 		currentFormVertex = 0;
-		auto vertexIt = std::next(FormVertices->begin(), FormVertexIndex);
+		auto vertexIt     = std::next(FormVertices->begin(), FormVertexIndex);
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			if (!vertexMap.test(iVertex)) {
 				vertexIt[currentFormVertex++] = vertexIt[iVertex];
 			}
 		}
 		auto eraseStart = std::next(FormVertices->begin(), FormVertexIndex + currentFormVertex);
-		auto eraseEnd = eraseStart + (VertexCount - currentFormVertex);
+		auto eraseEnd   = eraseStart + (VertexCount - currentFormVertex);
 		FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
 		for (auto iForm = std::next(FormList->begin(), ClosestFormToCursor + 1); iForm < FormList->end(); iForm++) {
 			iForm->vertexIndex -= SelectedFormVertices.vertexCount + 1;
@@ -8263,7 +8263,7 @@ void thred::internal::delet() {
 			case FRMLINE: {
 				if (SelectedForm->fillType == CONTF) {
 					if (ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.start
-						|| ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.finish) {
+					    || ClosestVertexToCursor == SelectedForm->angleOrClipData.guide.finish) {
 						form::delmfil();
 						SelectedForm->fillType = 0;
 						thred::coltab();
@@ -8295,15 +8295,15 @@ void thred::internal::delet() {
 					}
 					if (SatinEndGuide) {
 						if (ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide)
-							|| ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) + 1) {
+						    || ClosestVertexToCursor == gsl::narrow<unsigned>(SatinEndGuide) + 1) {
 							SelectedForm->wordParam = 0;
-							satinFlag = true;
+							satinFlag               = true;
 							break;
 						}
 					}
 					for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 						if (SelectedForm->satinOrAngle.guide[iGuide].start == ClosestVertexToCursor
-							|| SelectedForm->satinOrAngle.guide[iGuide].finish == ClosestVertexToCursor) {
+						    || SelectedForm->satinOrAngle.guide[iGuide].finish == ClosestVertexToCursor) {
 							satin::delcon(iGuide);
 							satinFlag = true;
 							break;
@@ -9209,7 +9209,7 @@ void thred::internal::unmov() {
 void thred::internal::duprct() {
 	auto  iCurrentVertex = SelectedFormVertices.start;
 	auto  vertexIt       = std::next(FormVertices->begin(), FormVertexIndex);
-	auto& firstVertex         = vertexIt[iCurrentVertex];
+	auto& firstVertex    = vertexIt[iCurrentVertex];
 	SelectedVerticesRect = fRECTANGLE{ firstVertex.y, firstVertex.x, firstVertex.x, firstVertex.y };
 	iCurrentVertex       = form::pdir(iCurrentVertex);
 	for (auto iVertex = 0u; iVertex < SelectedFormVertices.vertexCount; iVertex++) {
@@ -15237,7 +15237,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								SelectedForm = &((*FormList)[FormIndex + iForm]);
 								if (clip::isclpx(FormIndex + iForm)) {
 									SelectedForm->angleOrClipData.clip = thred::adclp(SelectedForm->lengthOrCount.clipCount);
-									auto offsetStart                   = std::next(ClipPoints->begin(), SelectedForm->angleOrClipData.clip);
+									auto offsetStart = std::next(ClipPoints->begin(), SelectedForm->angleOrClipData.clip);
 									for (auto iClip = 0u; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
 										*offsetStart = clipData[currentClip++];
 										offsetStart++;

@@ -134,9 +134,9 @@ void clip::deleclp(unsigned int iForm) {
 			auto eraseEnd   = eraseStart + form.clipEntries;
 			ClipPoints->erase(eraseStart, eraseEnd);
 			ci::clpsub(iForm, form.clipEntries);
-			form.clipEntries = 0;
+			form.clipEntries    = 0;
 			form.borderClipData = 0;
-			form.edgeType = 0;
+			form.edgeType       = 0;
 		}
 	}
 }
@@ -219,7 +219,7 @@ void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
 				}
 			}
 		}
-		else { 
+		else {
 			ClipRect = fRECTANGLE{};
 		}
 		ClipRectSize.cx = ClipRect.right - ClipRect.left;
@@ -229,7 +229,7 @@ void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
 
 void clip::internal::durev(std::vector<fPOINT>& clipReversedData) {
 	if (!ClipBuffer->empty()) {
-		const auto midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
+		const auto midpoint   = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
 		auto&      clipBuffer = *ClipBuffer;
 
 		if (clipBuffer[0].x > midpoint) {
@@ -370,8 +370,8 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 	const auto rotationAngle      = atan2(delta.y, delta.x);
 
 	thred::rotang1(clipReferencePoint, ClipReference, rotationAngle, rotationCenter);
-	if (ClipRectSize.cx == 0.0f) { 
-		return false; 
+	if (ClipRectSize.cx == 0.0f) {
+		return false;
 	}
 	const auto clipCount = gsl::narrow<unsigned int>(std::floor(length / ClipRectSize.cx));
 	if (clipCount) {
