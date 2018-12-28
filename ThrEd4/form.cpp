@@ -2742,7 +2742,7 @@ bool form::internal::isin(std::vector<VCLPX>&  regionCrossingData,
 	if (yCoordinate > boundingRect.top) {
 		return false;
 	}
-	auto vertexIt = currentFillVertices.begin() + CurrentFormVertices;
+	auto vertexIt = currentFillVertices.begin();
 	for (auto iRegion = regionCrossingStart; iRegion < regionCrossingEnd; iRegion++) {
 		const auto iStartVertex = regionCrossingData[iRegion].vertex;
 		const auto iEndVertex   = form::nxt(iStartVertex);
