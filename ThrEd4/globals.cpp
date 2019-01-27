@@ -110,7 +110,9 @@ HPEN      FormPen;                // form pen
 HPEN      FormPen3px;             // three-pixel form pen
 HPEN      FormSelectedPen;        // form select pen
 unsigned  FormVertexIndex;        // next index to append form points
-fPOINT    FormVertices[MAXITEMS]; // form points
+
+std::vector<fPOINT>* FormVertices; // form points
+
 HWND      GeneralNumberInputBox;  // general number input box
 HPEN      GridPen;                // pen for stitch grid
 unsigned  GroupEndStitch;         // higher end of selected stitches

@@ -135,7 +135,7 @@ unsigned repair::internal::frmchkfn() {
 				if (!form.vertexCount) {
 					badData.attribute |= BADFLT;
 				}
-				if (badData.flt == gsl::narrow<unsigned int>(form.vertices - FormVertices)) {
+				if (badData.flt == gsl::narrow<unsigned int>(form.vertices - FormVertices->data())) {
 					badData.flt += form.vertexCount;
 				}
 				else {
@@ -235,14 +235,14 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		auto& form = formList[iForm];
 		// ToDo - find a better way than pointer arithmetic
-		const auto vertexDifference = gsl::narrow<unsigned int>(form.vertices - FormVertices);
+		const auto vertexDifference = gsl::narrow<unsigned int>(form.vertices - FormVertices->data());
 		if (FormVertexIndex >= vertexDifference + form.vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + form.vertexCount);
 			auto       sourceStart = form.vertices;
 			auto       sourceEnd   = sourceStart + form.vertexCount;
 			auto       destination = vertexPoint.begin() + iVertex;
 			const auto _           = std::copy(sourceStart, sourceEnd, destination);
-			form.vertices          = &FormVertices[iVertex];
+			form.vertices          = &(*FormVertices)[iVertex];
 			iVertex += form.vertexCount;
 			ri::bcup(iForm, badData);
 		}
@@ -273,7 +273,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	if (flag) {
 		FormVertexIndex = iVertex;
 	}
-	std::copy(vertexPoint.cbegin(), vertexPoint.cend(), FormVertices);
+	std::copy(vertexPoint.cbegin(), vertexPoint.cend(), FormVertices->begin());
 }
 
 void repair::internal::repclp(std::wstring& repairMessage) {

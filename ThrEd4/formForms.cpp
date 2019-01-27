@@ -823,7 +823,7 @@ void formForms::dasyfrm() {
 	FormList->emplace_back(FRMHED{});
 	SelectedForm            = &FormList->back();
 	ClosestFormToCursor     = FormList->size() - 1;
-	SelectedForm->vertices  = &FormVertices[FormVertexIndex];
+	SelectedForm->vertices  = &(*FormVertices)[FormVertexIndex];
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	form::fvars(ClosestFormToCursor);
 	auto       maximumXsize = ZoomRect.right - ZoomRect.left;
