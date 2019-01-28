@@ -1186,13 +1186,11 @@ void thred::internal::dstin(unsigned number, POINT& pout) noexcept {
 }
 
 unsigned int thred::adflt(unsigned int count) {
-	auto iFormVertex = FormVertexIndex;
-
-	if (FormVertexIndex + count > MAXITEMS) {
-		displayText::tabmsg(IDS_FRMOVR);
-	}
-	FormVertexIndex += count;
-	return iFormVertex;
+	const auto startVertex = gsl::narrow<unsigned int>(FormVertices->size());
+	const auto it = FormVertices->end();
+	const auto val = fPOINT{};
+	FormVertices->insert(it, count, val);
+	return startVertex;
 }
 
 unsigned int thred::adclp(unsigned int count) {
