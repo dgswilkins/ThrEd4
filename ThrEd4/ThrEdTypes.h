@@ -1371,7 +1371,7 @@ public:
 	unsigned char  fillColor;         // fill color
 	unsigned char  borderColor;       // border color
 	unsigned int   clipEntries;       // number of border clipboard entries
-	fPOINT*        vertices;          // points
+	unsigned int   vertexIndex;       // index into FormVertices
 	SATINANGLE     satinOrAngle{};    // satin guidelines or angle clipboard fill angle
 	unsigned int   borderClipData;    // pointer to start of border clipboard data
 	unsigned int   satinGuideCount;   // number of satin guidelines
@@ -1426,7 +1426,7 @@ inline FRMHED::FRMHED() noexcept
 	fillColor       = 0;
 	borderColor     = 0;
 	clipEntries     = 0;
-	vertices        = nullptr;
+	vertexIndex     = 0;
 	borderClipData  = 0;
 	satinGuideCount = 0;
 	wordParam       = 0;
@@ -1463,7 +1463,7 @@ inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertices        = nullptr;
+	vertexIndex     = 0;
 	satinOrAngle    = rhs.satinOrAngle;
 	borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
 	satinGuideCount = rhs.satinGuideCount;
@@ -1503,7 +1503,7 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertices        = nullptr;
+	vertexIndex     = 0;
 	satinOrAngle    = rhs.satinOrAngle;
 	borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
 	satinGuideCount = rhs.satinGuideCount;
@@ -1530,7 +1530,7 @@ public:
 	unsigned char  fillColor;    // fill color
 	unsigned char  borderColor;  // border color
 	unsigned short clipEntries;  // number of border clipboard entries
-	DWORD          vertices;     // vertices pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+	DWORD          vertexIndex;  // vertex index not saved in v1 or v2. size is to keep compatibility with v1 & v2 ThrEd files
 	SATINANGLEOUT  satinOrAngle; // satin guidelines or angle clipboard fill angle
 	DWORD borderClipData; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
 	unsigned short satinGuideCount; // number of satin guidelines
@@ -1582,7 +1582,7 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
 	fillColor       = 0;
 	borderColor     = 0;
 	clipEntries     = 0;
-	vertices        = 0;
+	vertexIndex     = 0;
 	borderClipData  = 0;
 	satinGuideCount = 0;
 	wordParam       = 0;
@@ -1619,7 +1619,7 @@ inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = gsl::narrow<unsigned short>(rhs.clipEntries);
-	vertices        = 0; // do not write the pointer value to file
+	vertexIndex     = 0; // do not write the pointer value to file
 	satinOrAngle    = rhs.satinOrAngle;
 	borderClipData  = 0; // do not write the pointer value to file
 	satinGuideCount = gsl::narrow<unsigned short>(rhs.satinGuideCount);
@@ -1659,7 +1659,7 @@ inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = gsl::narrow<unsigned short>(rhs.clipEntries);
-	vertices        = 0; // do not write the pointer value to file
+	vertexIndex     = 0; // do not write the pointer value to file
 	satinOrAngle    = rhs.satinOrAngle;
 	borderClipData  = 0; // do not write the pointer value to file
 	satinGuideCount = gsl::narrow<unsigned short>(rhs.satinGuideCount);
@@ -1701,9 +1701,9 @@ inline FRMHED::FRMHED(const FRMHEDOUT& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertices        = nullptr; // do not read the pointer from file
+	vertexIndex     = 0u; // do not read the index from a v2 file
 	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = 0u; // do not read the index from file
+	borderClipData  = 0u; // do not read the index from a v2 file
 	satinGuideCount = rhs.satinGuideCount;
 	wordParam       = rhs.wordParam;
 	rectangle       = rhs.rectangle;
@@ -1741,9 +1741,9 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertices        = nullptr; // do not read the pointer from file
+	vertexIndex     = 0u; // do not read the index from a v2 file
 	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = 0u; // do not read the index from file
+	borderClipData  = 0u; // do not read the index from a v2 file
 	satinGuideCount = rhs.satinGuideCount;
 	wordParam       = rhs.wordParam;
 	rectangle       = rhs.rectangle;

@@ -135,7 +135,7 @@ unsigned repair::internal::frmchkfn() {
 				if (!form.vertexCount) {
 					badData.attribute |= BADFLT;
 				}
-				if (badData.flt == gsl::narrow<unsigned int>(form.vertices - FormVertices->data())) {
+				if (badData.flt == form.vertexIndex) {
 					badData.flt += form.vertexCount;
 				}
 				else {
@@ -235,14 +235,14 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 		auto& form = formList[iForm];
 		// ToDo - find a better way than pointer arithmetic
-		const auto vertexDifference = gsl::narrow<unsigned int>(form.vertices - FormVertices->data());
+		const auto vertexDifference = form.vertexIndex;
 		if (FormVertexIndex >= vertexDifference + form.vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + form.vertexCount);
-			auto       sourceStart = form.vertices;
+			auto       sourceStart = FormVertices->begin() + form.vertexIndex;
 			auto       sourceEnd   = sourceStart + form.vertexCount;
 			auto       destination = vertexPoint.begin() + iVertex;
 			const auto _           = std::copy(sourceStart, sourceEnd, destination);
-			form.vertices          = &(*FormVertices)[iVertex];
+			form.vertexIndex          = iVertex;
 			iVertex += form.vertexCount;
 			ri::bcup(iForm, badData);
 		}
@@ -252,7 +252,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 				satin::delsac(iForm);
 				// ToDo - do we need to increase the size of vertexPoint?
 				// vertexPoint.resize(vertexPoint.size + form.vertexCount);
-				auto sourceStart = form.vertices;
+				auto sourceStart = FormVertices->begin() + form.vertexIndex;
 				auto sourceEnd   = sourceStart + form.vertexCount;
 				auto destination = vertexPoint.begin() + iVertex;
 				auto _           = std::copy(sourceStart, sourceEnd, destination);

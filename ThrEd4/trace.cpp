@@ -787,9 +787,10 @@ void trace::internal::dutrac() {
 		FormList->emplace_back(FRMHED{});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
-		CurrentFormVertices      = &(*FormVertices)[FormVertexIndex];
-		CurrentFormVertices[0].x = tracedPoints[0].x * StitchBmpRatio.x;
-		CurrentFormVertices[0].y = tracedPoints[0].y * StitchBmpRatio.y;
+		CurrentFormVertices      = FormVertexIndex;
+		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+		vertexIt[0].x = tracedPoints[0].x * StitchBmpRatio.x;
+		vertexIt[0].y = tracedPoints[0].y * StitchBmpRatio.y;
 		iNext                    = 0;
 		OutputIndex              = 0;
 		auto traceLengthSum      = 0.0;
@@ -803,8 +804,8 @@ void trace::internal::dutrac() {
 			const auto traceLength
 			    = hypot(tracedPoints[iCurrent].x - tracedPoints[iNext].x, tracedPoints[iCurrent].y - tracedPoints[iNext].y);
 			if (traceLengthSum > traceLength * IniFile.traceRatio) {
-				CurrentFormVertices[OutputIndex].x = tracedPoints[iCurrent - 1].x * StitchBmpRatio.x;
-				CurrentFormVertices[OutputIndex].y = tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset;
+				vertexIt[OutputIndex].x = tracedPoints[iCurrent - 1].x * StitchBmpRatio.x;
+				vertexIt[OutputIndex].y = tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset;
 				OutputIndex++;
 				iCurrent--;
 				iNext          = iCurrent;
@@ -815,7 +816,7 @@ void trace::internal::dutrac() {
 			displayText::tabmsg(IDS_FRMOVR);
 			return;
 		}
-		SelectedForm->vertices    = thred::adflt(OutputIndex);
+		SelectedForm->vertexIndex = thred::adflt(OutputIndex);
 		SelectedForm->vertexCount = gsl::narrow<unsigned short>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
@@ -1034,9 +1035,10 @@ void trace::internal::stch2bit(fPOINT& point) {
 void trace::internal::pxlin(unsigned int start, unsigned int finish) {
 	POINT line[2];
 
-	ti::stch2bit(CurrentFormVertices[start]);
+	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+	ti::stch2bit(vertexIt[start]);
 	line[0] = BitmapPoint;
-	ti::stch2bit(CurrentFormVertices[finish]);
+	ti::stch2bit(vertexIt[finish]);
 	line[1] = BitmapPoint;
 	Polyline(BitmapDC, line, 2);
 	Polyline(TraceDC, line, 2);

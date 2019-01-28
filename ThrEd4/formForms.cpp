@@ -823,7 +823,7 @@ void formForms::dasyfrm() {
 	FormList->emplace_back(FRMHED{});
 	SelectedForm            = &FormList->back();
 	ClosestFormToCursor     = FormList->size() - 1;
-	SelectedForm->vertices  = &(*FormVertices)[FormVertexIndex];
+	SelectedForm->vertexIndex  = FormVertexIndex;
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	form::fvars(ClosestFormToCursor);
 	auto       maximumXsize = ZoomRect.right - ZoomRect.left;
@@ -842,16 +842,17 @@ void formForms::dasyfrm() {
 	SelectedForm->type = FRMFPOLY;
 	auto iVertex       = 0u;
 	auto fref          = 0u;
+	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
 		auto       angle               = PI2;
 		const auto holeVertexCount     = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
 		const auto holeSegmentAngle    = PI2 / holeVertexCount;
-		CurrentFormVertices[iVertex].x = referencePoint.x + diameter * cos(angle);
-		CurrentFormVertices[iVertex].y = referencePoint.y + diameter * sin(angle);
+		vertexIt[iVertex].x = referencePoint.x + diameter * cos(angle);
+		vertexIt[iVertex].y = referencePoint.y + diameter * sin(angle);
 		iVertex++;
 		for (auto iSegment = 0u; iSegment < holeVertexCount + 1; iSegment++) {
-			CurrentFormVertices[iVertex].x = referencePoint.x + holeDiameter * cos(angle);
-			CurrentFormVertices[iVertex].y = referencePoint.y + holeDiameter * sin(angle);
+			vertexIt[iVertex].x = referencePoint.x + holeDiameter * cos(angle);
+			vertexIt[iVertex].y = referencePoint.y + holeDiameter * sin(angle);
 			iVertex++;
 			angle -= holeSegmentAngle;
 		}
@@ -924,8 +925,8 @@ void formForms::dasyfrm() {
 				break;
 			}
 			}
-			CurrentFormVertices[iVertex].x = referencePoint.x + cos(angle) * distanceFromDaisyCenter;
-			CurrentFormVertices[iVertex].y = referencePoint.y + sin(angle) * distanceFromDaisyCenter;
+			vertexIt[iVertex].x = referencePoint.x + cos(angle) * distanceFromDaisyCenter;
+			vertexIt[iVertex].y = referencePoint.y + sin(angle) * distanceFromDaisyCenter;
 			iVertex++;
 			angle += petalSegmentAngle;
 			if (UserFlagMap.test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
@@ -936,8 +937,8 @@ void formForms::dasyfrm() {
 		}
 	}
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
-		CurrentFormVertices[fref - 1].y += 0.01f;
-		CurrentFormVertices[fref].y += 0.01f;
+		vertexIt[fref - 1].y += 0.01f;
+		vertexIt[fref].y += 0.01f;
 	}
 	SelectedForm->vertexCount = iVertex;
 	if (UserFlagMap.test(UserFlag::DAZD)) {
@@ -948,8 +949,8 @@ void formForms::dasyfrm() {
 	StateMap.set(StateFlag::INIT);
 	form::frmout(FormList->size() - 1);
 	for (auto iMacroPetal = 0u; iMacroPetal < iVertex; iMacroPetal++) {
-		CurrentFormVertices[iMacroPetal].x -= SelectedForm->rectangle.left;
-		CurrentFormVertices[iMacroPetal].y -= SelectedForm->rectangle.bottom;
+		vertexIt[iMacroPetal].x -= SelectedForm->rectangle.left;
+		vertexIt[iMacroPetal].y -= SelectedForm->rectangle.bottom;
 	}
 	FormMoveDelta.x = FormMoveDelta.y = 0;
 	NewFormVertexCount                = iVertex + 1;
@@ -1039,34 +1040,36 @@ void formForms::setear() {
 		auto twistStep = IniFile.tearTwistStep;
 		form::durpoli(IniFile.formSides);
 		form::fvars(FormIndex);
+		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 		const auto count            = VertexCount / 4;
-		const auto middle           = (CurrentFormVertices[1].x - CurrentFormVertices[0].x) / 2.0f + CurrentFormVertices[0].x;
-		auto       step             = CurrentFormVertices[count + 1].y - CurrentFormVertices[count].y;
-		auto       verticalPosition = CurrentFormVertices[count + 1].y;
+		const auto middle           = (vertexIt[1].x - vertexIt[0].x) / 2.0f + vertexIt[0].x;
+		auto       step             = vertexIt[count + 1].y - vertexIt[count].y;
+		auto       verticalPosition = vertexIt[count + 1].y;
 		auto       iLeftVertices    = VertexCount - count;
 		auto       iRightVertices   = count + 1;
 		for (auto iStep = 0u; iStep < count; iStep++) {
-			CurrentFormVertices[iRightVertices].y = CurrentFormVertices[iLeftVertices].y = verticalPosition;
-			CurrentFormVertices[iRightVertices].x += twistStep;
-			CurrentFormVertices[iLeftVertices].x += twistStep;
+			vertexIt[iLeftVertices].y = verticalPosition;
+			vertexIt[iRightVertices].y = vertexIt[iLeftVertices].y;
+			vertexIt[iRightVertices].x += twistStep;
+			vertexIt[iLeftVertices].x += twistStep;
 			twistStep *= IniFile.tearTwistRatio;
 			verticalPosition -= step;
 			step *= IniFile.tearTailLength;
 			iRightVertices--;
 			iLeftVertices++;
 		}
-		CurrentFormVertices[0].y = CurrentFormVertices[1].y = verticalPosition;
-		CurrentFormVertices[0].x += twistStep;
-		CurrentFormVertices[1].x += twistStep;
+		vertexIt[0].y = vertexIt[1].y = verticalPosition;
+		vertexIt[0].x += twistStep;
+		vertexIt[1].x += twistStep;
 		verticalPosition -= step / 2.0;
-		CurrentFormVertices[VertexCount] = CurrentFormVertices[0];
+		vertexIt[VertexCount] = vertexIt[0];
 		if (twistStep) {
-			CurrentFormVertices[0].x = CurrentFormVertices[1].x + twistStep / 4.0;
+			vertexIt[0].x = vertexIt[1].x + twistStep / 4.0;
 		}
 		else {
-			CurrentFormVertices[0].x = middle;
+			vertexIt[0].x = middle;
 		}
-		CurrentFormVertices[0].y = verticalPosition;
+		vertexIt[0].y = verticalPosition;
 		SelectedForm->vertexCount++;
 		NewFormVertexCount++;
 		FormVertexIndex++;
@@ -1088,16 +1091,14 @@ void formForms::setear() {
 		}
 		if (horizontalRatio < 1.0) {
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
-				CurrentFormVertices[iVertex].x
-				    = (CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x) * horizontalRatio + CurrentFormVertices[0].x;
-				CurrentFormVertices[iVertex].y
-				    = (CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y) * horizontalRatio + CurrentFormVertices[0].y;
+				vertexIt[iVertex].x = (vertexIt[iVertex].x - vertexIt[0].x) * horizontalRatio + vertexIt[0].x;
+				vertexIt[iVertex].y = (vertexIt[iVertex].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
 			}
 		}
 		form::frmout(FormIndex);
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
-			CurrentFormVertices[iVertex].x -= SelectedForm->rectangle.left;
-			CurrentFormVertices[iVertex].y -= SelectedForm->rectangle.bottom;
+			vertexIt[iVertex].x -= SelectedForm->rectangle.left;
+			vertexIt[iVertex].y -= SelectedForm->rectangle.bottom;
 		}
 	}
 }
@@ -1172,11 +1173,12 @@ void formForms::wavfrm() {
 		FormVertexIndex = saveIndex;
 		auto iPoint     = 0u;
 		auto waveIndex  = IniFile.waveStart;
+		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 		while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 			const unsigned short iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
 
-			points[iPoint] = fPOINT{ -CurrentFormVertices[iNextVertex].x + CurrentFormVertices[waveIndex].x,
-				                     -CurrentFormVertices[iNextVertex].y + CurrentFormVertices[waveIndex].y };
+			points[iPoint] = fPOINT{ -vertexIt[iNextVertex].x + vertexIt[waveIndex].x,
+				                     -vertexIt[iNextVertex].y + vertexIt[waveIndex].y };
 			iPoint++;
 			waveIndex = iNextVertex;
 		}
@@ -1186,7 +1188,7 @@ void formForms::wavfrm() {
 		for (auto iLobe = 0u; iLobe < IniFile.waveLobes; iLobe++) {
 			if (iLobe & 1) {
 				for (auto index = 0u; index < count; index++) {
-					CurrentFormVertices[iVertex] = currentPosition;
+					vertexIt[iVertex] = currentPosition;
 					iVertex++;
 					currentPosition.x += points[index].x;
 					currentPosition.y += points[index].y;
@@ -1194,19 +1196,19 @@ void formForms::wavfrm() {
 			}
 			else {
 				for (auto index = count; index != 0; index--) {
-					CurrentFormVertices[iVertex] = currentPosition;
+					vertexIt[iVertex] = currentPosition;
 					iVertex++;
 					currentPosition.x += points[index - 1].x;
 					currentPosition.y += points[index - 1].y;
 				}
 			}
 		}
-		CurrentFormVertices[iVertex] = currentPosition;
+		vertexIt[iVertex] = currentPosition;
 		const auto vertexCount       = iVertex + 1;
-		const auto rotationAngle     = -atan2(CurrentFormVertices[iVertex].y - CurrentFormVertices[0].y,
-                                          CurrentFormVertices[iVertex].x - CurrentFormVertices[0].x);
+		const auto rotationAngle     = -atan2(vertexIt[iVertex].y - vertexIt[0].y,
+			vertexIt[iVertex].x - vertexIt[0].x);
 		for (auto index = 0u; index < vertexCount; index++) {
-			thred::rotflt(CurrentFormVertices[index], rotationAngle, { 0.0, 0.0 });
+			thred::rotflt(vertexIt[index], rotationAngle, { 0.0, 0.0 });
 		}
 		SelectedForm->type        = FRMLINE;
 		SelectedForm->vertexCount = vertexCount;
@@ -1225,16 +1227,16 @@ void formForms::wavfrm() {
 		}
 		if (horizontalRatio < 1.0) {
 			for (auto index = 0u; index < vertexCount; index++) {
-				CurrentFormVertices[index].x
-				    = (CurrentFormVertices[index].x - CurrentFormVertices[0].x) * horizontalRatio + CurrentFormVertices[0].x;
-				CurrentFormVertices[index].y
-				    = (CurrentFormVertices[index].y - CurrentFormVertices[0].y) * horizontalRatio + CurrentFormVertices[0].y;
+				vertexIt[index].x
+				    = (vertexIt[index].x - vertexIt[0].x) * horizontalRatio + vertexIt[0].x;
+				vertexIt[index].y
+				    = (vertexIt[index].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
 			}
 		}
 		form::frmout(FormIndex);
 		for (auto index = 0u; index < vertexCount; index++) {
-			CurrentFormVertices[index].x -= SelectedForm->rectangle.left;
-			CurrentFormVertices[index].y -= SelectedForm->rectangle.bottom;
+			vertexIt[index].x -= SelectedForm->rectangle.left;
+			vertexIt[index].y -= SelectedForm->rectangle.bottom;
 		}
 		FormMoveDelta.x = FormMoveDelta.y = 0;
 		NewFormVertexCount                = vertexCount + 1;

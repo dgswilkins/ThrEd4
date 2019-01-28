@@ -582,9 +582,10 @@ void xt::pes2crd() {
 std::vector<fPOINT>& xt::insid() {
 	satin::satout(fabs(SelectedForm->underlayIndent));
 	if (SelectedForm->underlayIndent > 0) {
+		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			if (!form::cisin((*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y)) {
-				(*InsidePoints)[iVertex] = CurrentFormVertices[iVertex];
+				(*InsidePoints)[iVertex] = vertexIt[iVertex];
 			}
 		}
 		return *InsidePoints;
@@ -800,25 +801,26 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 	OutputIndex = 0;
 	SelectedForm->extendedAttribute |= AT_CWLK;
 	if (SelectedForm->satinGuideCount) {
+		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 		if (SelectedForm->wordParam) {
 			const auto iVertex       = SelectedForm->wordParam;
-			OSequence[OutputIndex].x = form::midl(CurrentFormVertices[iVertex].x, CurrentFormVertices[iVertex + 1].x);
-			OSequence[OutputIndex].y = form::midl(CurrentFormVertices[iVertex].y, CurrentFormVertices[iVertex + 1].y);
+			OSequence[OutputIndex].x = form::midl(vertexIt[iVertex].x, vertexIt[iVertex + 1].x);
+			OSequence[OutputIndex].y = form::midl(vertexIt[iVertex].y, vertexIt[iVertex + 1].y);
 			OutputIndex++;
 		}
 		const auto* guide = SelectedForm->satinOrAngle.guide;
 		if (guide) {
 			for (auto iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--) {
 				OSequence[OutputIndex].x
-				    = form::midl(CurrentFormVertices[guide[iGuide - 1].finish].x, CurrentFormVertices[guide[iGuide - 1].start].x);
+				    = form::midl(vertexIt[guide[iGuide - 1].finish].x, vertexIt[guide[iGuide - 1].start].x);
 				OSequence[OutputIndex].y
-				    = form::midl(CurrentFormVertices[guide[iGuide - 1].finish].y, CurrentFormVertices[guide[iGuide - 1].start].y);
+				    = form::midl(vertexIt[guide[iGuide - 1].finish].y, vertexIt[guide[iGuide - 1].start].y);
 				OutputIndex++;
 			}
 		}
 		if (SelectedForm->attribute & FRMEND) {
-			OSequence[OutputIndex].x = form::midl(CurrentFormVertices[0].x, CurrentFormVertices[1].x);
-			OSequence[OutputIndex].y = form::midl(CurrentFormVertices[0].y, CurrentFormVertices[1].y);
+			OSequence[OutputIndex].x = form::midl(vertexIt[0].x, vertexIt[1].x);
+			OSequence[OutputIndex].y = form::midl(vertexIt[0].y, vertexIt[1].y);
 			OutputIndex++;
 		}
 	}
@@ -827,20 +829,21 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 		if (SelectedForm->extendedAttribute & AT_STRT) {
 			start = SelectedForm->fillStart;
 		}
-		OSequence[OutputIndex] = CurrentFormVertices[start];
+		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+		OSequence[OutputIndex] = vertexIt[start];
 		OutputIndex++;
 		auto finish = form::prv(start);
 		start       = form::nxt(start);
 		for (auto iGuide = 1u; iGuide<VertexCount>> 1; iGuide++) {
-			OSequence[OutputIndex].x = form::midl(CurrentFormVertices[finish].x, CurrentFormVertices[start].x);
-			OSequence[OutputIndex].y = form::midl(CurrentFormVertices[finish].y, CurrentFormVertices[start].y);
+			OSequence[OutputIndex].x = form::midl(vertexIt[finish].x, vertexIt[start].x);
+			OSequence[OutputIndex].y = form::midl(vertexIt[finish].y, vertexIt[start].y);
 			if (form::cisin(OSequence[OutputIndex].x, OSequence[OutputIndex].y)) {
 				OutputIndex++;
 			}
 			start  = form::nxt(start);
 			finish = form::prv(finish);
 		}
-		OSequence[OutputIndex] = CurrentFormVertices[start];
+		OSequence[OutputIndex] = vertexIt[start];
 		OutputIndex++;
 	}
 	ritcwlk(interleaveSequenceIndex2);
@@ -1507,7 +1510,8 @@ void xt::internal::duint(unsigned offset, unsigned code, INTINF& ilData) {
 	}
 	if (SelectedForm->extendedAttribute & AT_STRT) {
 		if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
-			ilData.output += gucon(CurrentFormVertices[SelectedForm->fillStart],
+			auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+			ilData.output += gucon(vertexIt[SelectedForm->fillStart],
 			                       InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index],
 			                       ilData.output + offset,
 			                       code);
@@ -1548,8 +1552,9 @@ void xt::internal::chkend(unsigned offset, unsigned code, INTINF& ilData) {
 	if (isfil()) {
 		StateMap.set(StateFlag::ISEND);
 		if (SelectedForm->extendedAttribute & AT_END) {
+			auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 			ilData.output += gucon(InterleaveSequence[InterleaveSequenceIndex - 1],
-			                       CurrentFormVertices[SelectedForm->fillEnd],
+				vertexIt[SelectedForm->fillEnd],
 			                       ilData.output + offset,
 			                       code);
 		}
@@ -1635,12 +1640,13 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 	else {
 		const auto offset = 0;
 		auto       code   = 0u;
+		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 		for (auto iSequence = 0u; iSequence < interleaveSequenceIndex2; iSequence++) {
 			code = gsl::narrow<unsigned int>(ilData.layerIndex | InterleaveSequenceIndices[iSequence].code
 			                                 | InterleaveSequenceIndices[iSequence].color);
 			if (SelectedForm->extendedAttribute & AT_STRT) {
 				if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
-					ilData.output += xi::gucon(CurrentFormVertices[SelectedForm->fillStart],
+					ilData.output += xi::gucon(vertexIt[SelectedForm->fillStart],
 					                           InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index],
 					                           ilData.output + offset,
 					                           code);
@@ -2270,8 +2276,9 @@ void xt::internal::fwidfn(unsigned int find, float length) {
 	form::fvars(ClosestFormToCursor);
 	const auto reference = SelectedForm->rectangle.left;
 	const auto ratio     = length / (SelectedForm->rectangle.right - reference);
+	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
-		CurrentFormVertices[iVertex].x = (CurrentFormVertices[iVertex].x - reference) * ratio + reference;
+		vertexIt[iVertex].x = (vertexIt[iVertex].x - reference) * ratio + reference;
 	}
 	form::frmout(ClosestFormToCursor);
 	form::refilfn();
@@ -2310,8 +2317,9 @@ void xt::internal::fhifn(unsigned int find, float length) {
 	form::fvars(ClosestFormToCursor);
 	const auto reference = SelectedForm->rectangle.bottom;
 	const auto ratio     = length / (SelectedForm->rectangle.top - reference);
+	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
-		CurrentFormVertices[iVertex].y = (CurrentFormVertices[iVertex].y - reference) * ratio + reference;
+		vertexIt[iVertex].y = (vertexIt[iVertex].y - reference) * ratio + reference;
 	}
 	form::frmout(ClosestFormToCursor);
 	form::refilfn();

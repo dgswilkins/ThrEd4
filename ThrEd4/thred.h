@@ -30,8 +30,8 @@ namespace fs = std::experimental::filesystem;
 namespace thred {
 
 unsigned int adclp(unsigned int count);
+unsigned int adflt(unsigned int count);
 
-fPOINT*  adflt(unsigned int count);
 void     bBox() noexcept;
 void     chkmen() noexcept;
 void     chkrng(fPOINT& range);
@@ -235,7 +235,7 @@ namespace internal {
 	void     frmcurmen();
 	void     frmcursel(unsigned cursorType);
 	void     frmpos(float deltaX, float deltaY) noexcept;
-	void     frmsnap(fPOINT* start, unsigned int count) noexcept;
+	void     frmsnap(unsigned int start, unsigned int count) noexcept;
 	bool     frmstch();
 	COLORREF fswap(COLORREF color) noexcept;
 
