@@ -1162,9 +1162,7 @@ bool form::closfrm() {
 				}
 			}
 		}
-		if ((*FormList)[closestForm].vertexIndex) {
-			thred::stch2pxr((*FormVertices)[(*FormList)[closestForm].vertexIndex + closestVertex]);
-		}
+		thred::stch2pxr((*FormVertices)[(*FormList)[closestForm].vertexIndex + closestVertex]);
 		minimumLength = hypot(StitchCoordinatesPixels.x - screenCoordinate.x, StitchCoordinatesPixels.y - screenCoordinate.y);
 		if (minimumLength < CLOSENUF) {
 			ClosestFormToCursor   = closestForm;
