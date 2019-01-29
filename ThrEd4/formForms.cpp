@@ -1039,7 +1039,7 @@ void formForms::setear() {
 	if (nResult > 0) {
 		auto twistStep = IniFile.tearTwistStep;
 		form::durpoli(IniFile.formSides);
-		form::fvars(FormIndex);
+		form::fvars(FormList->size() - 1u);
 		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 		const auto count            = VertexCount / 4;
 		const auto middle           = (vertexIt[1].x - vertexIt[0].x) / 2.0f + vertexIt[0].x;
@@ -1062,7 +1062,8 @@ void formForms::setear() {
 		vertexIt[0].x += twistStep;
 		vertexIt[1].x += twistStep;
 		verticalPosition -= step / 2.0;
-		vertexIt[VertexCount] = vertexIt[0];
+		FormVertices->push_back(vertexIt[0]);
+		vertexIt = FormVertices->begin() + CurrentFormVertices; // iterator invalidated by push_back
 		if (twistStep) {
 			vertexIt[0].x = vertexIt[1].x + twistStep / 4.0;
 		}
@@ -1074,8 +1075,8 @@ void formForms::setear() {
 		NewFormVertexCount++;
 		FormVertexIndex++;
 		StateMap.set(StateFlag::FORMSEL);
-		form::fvars(FormIndex);
-		form::frmout(FormIndex);
+		form::fvars(FormList->size() - 1u);
+		form::frmout(FormList->size() - 1u);
 		form::flipv();
 		StateMap.reset(StateFlag::FORMSEL);
 		const auto size = fPOINT{ SelectedForm->rectangle.right - SelectedForm->rectangle.left,
