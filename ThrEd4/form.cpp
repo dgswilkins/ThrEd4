@@ -106,15 +106,11 @@ bool form::chkmax(unsigned int arg0, unsigned int arg1) noexcept {
 }
 
 void form::fltspac(unsigned int start, unsigned int count) {
-	auto       destination = FormVertexIndex + count - 1;
+	auto sourceStart = std::next(FormVertices->cbegin(), start);
+	auto val = fPOINT{};
+	FormVertices->insert(sourceStart, count, val);
 
-	if (FormVertexIndex) {
-		auto source = FormVertexIndex - 1;
-		while (source >= start) {
-			(*FormVertices)[destination--] = (*FormVertices)[source--];
-		}
-	}
-	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+	for (auto iForm = ClosestFormToCursor + 1; iForm < FormList->size(); iForm++) {
 		auto& form = (*FormList)[iForm];
 		form.vertexIndex += count;
 	}
