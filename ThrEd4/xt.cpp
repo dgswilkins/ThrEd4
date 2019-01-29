@@ -283,7 +283,7 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 	midPoint                 = midpnt(currentPoint, nextPoint);
 	OSequence[OutputIndex++] = BSequence[iSequence];
 	OSequence[OutputIndex++] = midPoint;
-	featherSequence.emplace_back(fPOINT{ BSequence[iSequence + 1].x, BSequence[iSequence + 1].y });
+	featherSequence.push_back(fPOINT{ BSequence[iSequence + 1].x, BSequence[iSequence + 1].y });
 	featherSequence.push_back(midPoint);
 }
 
@@ -793,8 +793,8 @@ void xt::internal::undclp() {
 	clipBuffer.reserve(2);
 	ClipRectSize = FLSIZ{ 0, SelectedForm->underlayStitchLen };
 	ClipRect     = fRECTANGLE{ SelectedForm->underlayStitchLen, 0, 0, 0 };
-	clipBuffer.emplace_back(fPOINTATTR{ 0, 0, 0 });
-	clipBuffer.emplace_back(fPOINTATTR{ 0, SelectedForm->underlayStitchLen, 0 });
+	clipBuffer.push_back(fPOINTATTR{ 0, 0, 0 });
+	clipBuffer.push_back(fPOINTATTR{ 0, SelectedForm->underlayStitchLen, 0 });
 }
 
 void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {

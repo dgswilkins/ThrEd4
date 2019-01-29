@@ -820,7 +820,7 @@ void formForms::dasyfrm() {
 		return;
 	}
 	const auto referencePoint = fPOINT{ form::midl(ZoomRect.right, ZoomRect.left), form::midl(ZoomRect.top, ZoomRect.bottom) };
-	FormList->emplace_back(FRMHED{});
+	FormList->push_back(FRMHED{});
 	SelectedForm            = &FormList->back();
 	ClosestFormToCursor     = FormList->size() - 1;
 	SelectedForm->vertexIndex  = FormVertices->size();

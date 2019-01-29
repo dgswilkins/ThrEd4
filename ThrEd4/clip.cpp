@@ -196,7 +196,7 @@ void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
 		clipBuffer.clear();
 		clipBuffer.reserve(clipEntries);
 		for (auto iClip = 0u; iClip < clipEntries; iClip++) {
-			clipBuffer.emplace_back(fPOINTATTR{ (*clipIt).x, (*clipIt).y, 0 });
+			clipBuffer.push_back(fPOINTATTR{ (*clipIt).x, (*clipIt).y, 0 });
 			clipIt++;
 		}
 		ClipRect.left = ClipRect.right = clipBuffer[0].x;
@@ -652,12 +652,12 @@ void clip::internal::clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fP
 	if (SelectedForm->type == FRMLINE) {
 		const auto pivot = ClipRectSize.cy / 2;
 		for (auto& clip : clipBuffer) {
-			tempClipPoints.emplace_back(fPOINT{ clip.x, (-clip.y + pivot) });
+			tempClipPoints.push_back(fPOINT{ clip.x, (-clip.y + pivot) });
 		}
 	}
 	else {
 		for (auto& clip : clipBuffer) {
-			tempClipPoints.emplace_back(fPOINT{ clip.x, (-clip.y) });
+			tempClipPoints.push_back(fPOINT{ clip.x, (-clip.y) });
 		}
 	}
 }

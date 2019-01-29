@@ -746,7 +746,7 @@ void satin::ribon() {
 			form::fvars(ClosestFormToCursor);
 			HorizontalLength2 = BorderWidth / 2;
 			if (!FormList->empty()) {
-				FormList->emplace_back(FRMHED{});
+				FormList->push_back(FRMHED{});
 				auto& form = FormList->back();
 				// reset vars as emplace may invalidate pointers
 				form::fvars(ClosestFormToCursor);
@@ -1260,7 +1260,7 @@ void satin::satpnt0() {
 	thred::px2stch();
 	auto& formLines = *FormLines;
 	formLines.clear();
-	formLines.emplace_back(POINT{ Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y });
+	formLines.push_back(POINT{ Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y });
 	TempPolygon->push_back(SelectedPoint);
 	StateMap.set(StateFlag::SATPNT);
 }

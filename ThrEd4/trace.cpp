@@ -784,7 +784,7 @@ void trace::internal::dutrac() {
 		for (auto iCurrent = iNext + 1; iCurrent < decimatedLine.size(); iCurrent++) {
 			tracedPoints.push_back(decimatedLine[iCurrent]);
 		}
-		FormList->emplace_back(FRMHED{});
+		FormList->push_back(FRMHED{});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
 		CurrentFormVertices      = FormVertexIndex;

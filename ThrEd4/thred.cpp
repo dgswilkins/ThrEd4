@@ -3777,7 +3777,7 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 		auto points = std::vector<fPOINT>{};
 		points.reserve(clipDataCount);
 		for (auto& srcForm : (*FormList)) {
-			outForms.emplace_back(FRMHEDOUT{ srcForm });
+			outForms.push_back(FRMHEDOUT{ srcForm });
 			auto vertexIt = FormVertices->begin() + srcForm.vertexIndex;
 			for (auto iVertex = 0u; iVertex < srcForm.vertexCount; iVertex++) {
 				vertices.push_back(vertexIt[iVertex]);
@@ -3785,7 +3785,7 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 			if (srcForm.type == SAT) {
 				outForms.back().satinGuideCount = gsl::narrow<unsigned short>(srcForm.satinGuideCount);
 				for (auto iGuide = 0u; iGuide < srcForm.satinGuideCount; iGuide++) {
-					guides.emplace_back(SATCONOUT{ srcForm.satinOrAngle.guide[iGuide] });
+					guides.push_back(SATCONOUT{ srcForm.satinOrAngle.guide[iGuide] });
 				}
 			}
 			if (clip::isclp(srcForm)) {
@@ -5643,7 +5643,7 @@ void thred::internal::nuFil() {
 								StateMap.set(StateFlag::BADFIL);
 							}
 							for (auto form : formListOriginal) {
-								FormList->emplace_back(FRMHED{ form });
+								FormList->push_back(FRMHED{ form });
 							}
 						}
 						else {
@@ -5655,7 +5655,7 @@ void thred::internal::nuFil() {
 								StateMap.set(StateFlag::BADFIL);
 							}
 							for (auto form : inFormList) {
-								FormList->emplace_back(FRMHED{ form });
+								FormList->push_back(FRMHED{ form });
 							}
 						}
 						if (thredHeader.vertexCount) {
@@ -8400,7 +8400,7 @@ void thred::redclp() {
 		clipBuffer.clear();
 		clipBuffer.reserve(clipSize);
 
-		clipBuffer.emplace_back(fPOINTATTR{ ClipStitchData[0].x + static_cast<float>(ClipStitchData[0].fx) / 256.0f,
+		clipBuffer.push_back(fPOINTATTR{ ClipStitchData[0].x + static_cast<float>(ClipStitchData[0].fx) / 256.0f,
 		                                    ClipStitchData[0].y + static_cast<float>(ClipStitchData[0].fy) / 256.0f,
 		                                    0u });
 
@@ -8410,7 +8410,7 @@ void thred::redclp() {
 		ClipRect.left = ClipRect.right = clipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
 		for (auto iStitch = 1u; iStitch < clipSize; iStitch++) {
-			clipBuffer.emplace_back(
+			clipBuffer.push_back(
 			    fPOINTATTR{ ClipStitchData[iStitch].x + static_cast<float>(ClipStitchData[iStitch].fx) / 256.0f,
 			                ClipStitchData[iStitch].y + static_cast<float>(ClipStitchData[iStitch].fy) / 256.0f,
 			                (ClipStitchData[iStitch].led & 0xf) | codedLayer });
@@ -8614,7 +8614,7 @@ void thred::internal::insfil() {
 							}
 							if (FormIndex + fileHeader.formCount < MAXFORMS) {
 								for (auto form : inFormList) {
-									FormList->emplace_back(FRMHED{ form });
+									FormList->push_back(FRMHED{ form });
 								}
 							}
 							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
@@ -8629,7 +8629,7 @@ void thred::internal::insfil() {
 							}
 							if (FormIndex + fileHeader.formCount < MAXFORMS) {
 								for (auto form : inFormList) {
-									FormList->emplace_back(FRMHED{ form });
+									FormList->push_back(FRMHED{ form });
 								}
 							}
 							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
@@ -15146,7 +15146,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								FormMoveDelta.x = 0.0f;
 								FormMoveDelta.y = 0.0f;
 								StateMap.set(StateFlag::FUNCLP);
-								FormList->emplace_back(FRMHED{});
+								FormList->push_back(FRMHED{});
 								ClosestFormToCursor  = FormList->size() - 1;
 								auto& formIter       = FormList->back();
 								formIter.type        = FRMLINE;
@@ -15174,7 +15174,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							ClipFormsCount = ClipFormsHeader->formCount;
 							auto forms     = convert_ptr<FRMHED*>(&ClipFormsHeader[1]);
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-								FormList->emplace_back(FRMHED{});
+								FormList->push_back(FRMHED{});
 								auto& formIter = FormList->back();
 								formIter       = forms[iForm];
 								formIter.attribute
@@ -18733,7 +18733,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		TexturePointsBuffer              = &private_TexturePointsBuffer;
 		auto private_PreviousNames       = std::vector<fs::path>{};
 		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
-			private_PreviousNames.emplace_back(L"");
+			private_PreviousNames.push_back(L"");
 		}
 		PreviousNames                    = &private_PreviousNames;
 		auto private_DesignerName        = std::wstring{};
