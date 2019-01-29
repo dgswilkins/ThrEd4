@@ -6576,7 +6576,10 @@ void form::duhart(unsigned sideCount) {
 	}
 	FormList->emplace_back(FRMHED{});
 	SelectedForm            = &(FormList->back());
+	SelectedForm->vertexIndex = gsl::narrow<decltype(SelectedForm->vertexIndex)>(FormVertices->size());
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
+	FormVertexIndex = gsl::narrow<decltype(FormVertexIndex)>(FormVertices->size());
+	FormVertices->reserve(gsl::narrow_cast<size_t>(FormVertexIndex) + gsl::narrow_cast<size_t>(sideCount) * 2u - 2u);
 	CurrentFormVertices = FormVertexIndex;
 	thred::px2stch();
 	auto       point     = dPOINT{ SelectedPoint };
@@ -6586,22 +6589,22 @@ void form::duhart(unsigned sideCount) {
 	auto angle    = PI * 0.28;
 	auto iVertex  = 0u;
 	auto maximumX = 0.0f;
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	while (angle > -PI * 0.7) {
 		if (point.x > maximumX) {
 			maximumX = point.x;
 		}
-		vertexIt[iVertex].x   = point.x;
-		vertexIt[iVertex++].y = point.y;
+		FormVertices->push_back(fPOINT{ point.x, point.y });
+		iVertex++;
 		point.x += length * cos(angle);
 		point.y += length * sin(angle);
 		angle -= stepAngle;
 	}
 	stepAngle /= 4.5;
 	auto lastVertex = iVertex;
+	auto vertexIt = std::next(FormVertices->begin(), CurrentFormVertices);
 	while (point.x > vertexIt[0].x && iVertex < 200) {
-		vertexIt[iVertex].x   = point.x;
-		vertexIt[iVertex++].y = point.y;
+		FormVertices->push_back(fPOINT{ point.x, point.y });
+		iVertex++;
 		point.x += length * cos(angle);
 		point.y += length * sin(angle);
 		angle -= stepAngle;
@@ -6616,13 +6619,10 @@ void form::duhart(unsigned sideCount) {
 	auto iDestination = iVertex;
 	lastVertex        = iVertex;
 	for (iVertex = lastVertex - 2; iVertex != 0; iVertex--) {
-		vertexIt[iDestination].y = vertexIt[iVertex].y;
-		vertexIt[iDestination].x
-		    = maximumX + maximumX - vertexIt[iVertex].x - 2 * (maximumX - vertexIt[0].x);
+		FormVertices->emplace_back(fPOINT{ maximumX + maximumX - vertexIt[iVertex].x - 2 * (maximumX - vertexIt[0].x), vertexIt[iVertex].y });
 		iDestination++;
 	}
 	NewFormVertexCount        = iDestination + 1;
-	SelectedForm->vertexIndex = thred::adflt(iDestination);
 	SelectedForm->vertexCount = iDestination;
 	SelectedForm->type        = FRMFPOLY;
 	ClosestFormToCursor       = FormList->size() - 1;
