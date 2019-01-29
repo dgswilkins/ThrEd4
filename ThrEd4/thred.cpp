@@ -5658,8 +5658,9 @@ void thred::internal::nuFil() {
 							}
 						}
 						else {
-							auto inFormList = std::vector<FRMHEDOUT>(FormIndex);
-							bytesToRead     = gsl::narrow<DWORD>(FormIndex * sizeof(inFormList[0]));
+							auto inFormList = std::vector<FRMHEDOUT>{};
+							inFormList.resize(FormIndex);
+							bytesToRead     = gsl::narrow<DWORD>(FormIndex * sizeof(inFormList.back()));
 							ReadFileInt(FileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								FormIndex = BytesRead / sizeof(inFormList[0]);
@@ -5722,27 +5723,29 @@ void thred::internal::nuFil() {
 						if (StateMap.testAndReset(StateFlag::BADFIL)) {
 							displayText::bfilmsg();
 						}
-						// now re-create all the pointers in the form data
+						// now re-create all the pointers/indexes in the form data
 						satin::clearGuideSize();
 						FormVertexIndex = 0;
 						auto clipOffset = 0u;
+						auto vertexOffset = 0u;
 						for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-							auto& formIter    = (*FormList)[iForm];
-							formIter.vertexIndex = thred::adflt(formIter.vertexCount);
-							if (formIter.type == SAT) {
-								if (formIter.satinGuideCount) {
-									formIter.satinOrAngle.guide = satin::adsatk(formIter.satinGuideCount);
+							auto& form    = (*FormList)[iForm];
+							form.vertexIndex = vertexOffset;
+							vertexOffset += form.vertexCount;
+							if (form.type == SAT) {
+								if (form.satinGuideCount) {
+									form.satinOrAngle.guide = satin::adsatk(form.satinGuideCount);
 								}
 							}
 							// ToDo - do we still need to do this in v3? (we can store the offset safely in v3 where we could not
 							// store the pointer in v2)
 							if (clip::isclp(iForm)) {
-								formIter.angleOrClipData.clip = clipOffset;
-								clipOffset += formIter.lengthOrCount.clipCount;
+								form.angleOrClipData.clip = clipOffset;
+								clipOffset += form.lengthOrCount.clipCount;
 							}
 							if (clip::iseclpx(iForm)) {
-								formIter.borderClipData = clipOffset;
-								clipOffset += formIter.clipEntries;
+								form.borderClipData = clipOffset;
+								clipOffset += form.clipEntries;
 							}
 						}
 						xt::setfchk();
