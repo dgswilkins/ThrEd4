@@ -397,8 +397,10 @@ void clip::clpbrd(unsigned int startVertex) {
 	HorizontalLength2           = ClipRectSize.cx / 2;
 	HorizontalLength            = ClipRectSize.cx;
 	const auto clipStitchCount  = ClipBuffer->size();
-	auto       clipFillData     = std::vector<fPOINT>(clipStitchCount);
-	auto       clipReversedData = std::vector<fPOINT>(clipStitchCount);
+	auto       clipFillData = std::vector<fPOINT>{}; 
+	clipFillData.resize(clipStitchCount);
+	auto       clipReversedData = std::vector<fPOINT>{}; 
+	clipReversedData.resize(clipStitchCount);
 	const auto rotationCenter
 	    = dPOINT{ (ClipRect.right - ClipRect.left) / 2 + ClipRect.left, (ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom };
 	ClipReference.x = ClipRect.left;
@@ -789,7 +791,8 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 }
 
 void clip::clpic() {
-	auto clipFillData = std::vector<fPOINT>(ClipBuffer->size());
+	auto clipFillData = std::vector<fPOINT>{};
+	clipFillData.resize(ClipBuffer->size());
 
 	const auto rotationCenter = dPOINT{ ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left),
 		                                ((ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom) };
@@ -827,7 +830,8 @@ void clip::clpic() {
 void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned int start, unsigned int finish) {
 	const auto chainSequence = std::vector<unsigned>{ 0, 1, 2, 3, 0, 1, 4, 3, 0, 3 }; // chain stitch sequence
 
-	auto chainPoint = std::vector<fPOINT>(5);
+	auto chainPoint = std::vector<fPOINT>{};
+	chainPoint.resize(5);
 	auto delta
 	    = dPOINT{ (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
 	const auto lengthDelta  = dPOINT{ (delta.x * SelectedForm->edgeStitchLen), (delta.y * SelectedForm->edgeStitchLen) };

@@ -66,7 +66,8 @@ bool texture::internal::txnam(wchar_t* name, int sizeName) {
 
 void texture::txdun() {
 	const char signature[4]         = "txh";
-	auto       textureHistoryBuffer = std::vector<TXHSTBUF>(ITXBUFLEN);
+	auto       textureHistoryBuffer = std::vector<TXHSTBUF>{};
+	textureHistoryBuffer.resize(ITXBUFLEN);
 
 	if (!TextureHistory[0].texturePoints.empty()) {
 		wchar_t name[_MAX_PATH] = { 0 };
@@ -127,7 +128,8 @@ void texture::internal::redtbak() {
 
 void texture::redtx() {
 	wchar_t name[_MAX_PATH]      = { 0 };
-	auto    textureHistoryBuffer = std::vector<TXHSTBUF>(ITXBUFLEN);
+	auto    textureHistoryBuffer = std::vector<TXHSTBUF>{};
+	textureHistoryBuffer.resize(ITXBUFLEN);
 
 	TextureHistoryIndex = ITXBUFLEN - 1;
 	if (txi::txnam(name, sizeof(name) / sizeof(name[0]))) {

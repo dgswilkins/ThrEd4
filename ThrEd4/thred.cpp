@@ -3534,7 +3534,8 @@ void thred::internal::redbal() {
 		auto bytesRead = DWORD{ 0u };
 		ReadFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, nullptr);
 		if (bytesRead == sizeof(balaradHeader)) {
-			auto balaradStitch = std::vector<BALSTCH>(MAXITEMS);
+			auto balaradStitch = std::vector<BALSTCH>{};
+			balaradStitch.resize(MAXITEMS);
 			ReadFile(balaradFile, balaradStitch.data(), MAXITEMS * sizeof(balaradStitch[0]), &bytesRead, nullptr);
 			const auto stitchCount  = bytesRead / sizeof(balaradStitch[0]);
 			BackgroundColor         = balaradHeader.backgroundColor;
@@ -3620,7 +3621,8 @@ void thred::internal::ritbal() {
 		WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
 		BalaradOffset.x    = IniFile.hoopSizeX / 2.0f;
 		BalaradOffset.y    = IniFile.hoopSizeY / 2.0f;
-		auto balaradStitch = std::vector<BALSTCH>(gsl::narrow<size_t>(PCSHeader.stitchCount) + 2u);
+		auto balaradStitch = std::vector<BALSTCH>{};
+		balaradStitch.resize(gsl::narrow<size_t>(PCSHeader.stitchCount) + 2u);
 		color              = StitchBuffer[0].attribute & COLMSK;
 		// ToDo - does this loop make sense? iOutput is > 2 after one iteration
 		auto iOutput = 0u;
@@ -3871,7 +3873,8 @@ void thred::internal::thrsav() {
 	}
 	else {
 		// ToDo - MAXITEMS * 8 is not the best option here. Need something better
-		auto output = std::vector<char>(MAXITEMS * 8);
+		auto output = std::vector<char>{};
+		output.resize(MAXITEMS * 8);
 		auto count  = 0u;
 		dubuf(output.data(), count);
 		auto bytesWritten = DWORD{ 0 };
@@ -3935,7 +3938,8 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
                              std::vector<DSTREC>&           DSTRecords,
                              const std::vector<fPOINTATTR>& stitches) {
 	constexpr auto DSTMax          = 121;
-	auto           dstStitchBuffer = std::vector<fPOINTATTR>(PCSHeader.stitchCount);
+	auto           dstStitchBuffer = std::vector<fPOINTATTR>{};
+	dstStitchBuffer.resize(PCSHeader.stitchCount);
 	auto           colorData       = std::vector<unsigned>{};
 
 	// there could be as many colors as there are stitches
@@ -4259,7 +4263,8 @@ void thred::internal::sav() {
 	}
 	chk1col();
 	thred::coltab();
-	auto saveStitches = std::vector<fPOINTATTR>(PCSHeader.stitchCount);
+	auto saveStitches = std::vector<fPOINTATTR>{};
+	saveStitches.resize(PCSHeader.stitchCount);
 	if (UserFlagMap.test(UserFlag::ROTAUX)) {
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			saveStitches[iStitch] = StitchBuffer[iStitch];
@@ -5126,7 +5131,8 @@ void thred::internal::savmap() {
 			auto bytesWritten = DWORD{ 0 };
 			WriteFile(BitmapFileHandle, &BitmapFileHeader, 14, &bytesWritten, nullptr);
 			WriteFile(BitmapFileHandle, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14, &bytesWritten, nullptr);
-			auto buffer = std::vector<unsigned char>((gsl::narrow<size_t>(BitmapWidth) * BitmapHeight * 3) + 1);
+			auto buffer = std::vector<unsigned char>{};
+			buffer.resize((gsl::narrow<size_t>(BitmapWidth) * BitmapHeight * 3) + 1);
 			movmap(BitmapWidth * BitmapHeight, buffer.data());
 			WriteFile(BitmapFileHandle, buffer.data(), BitmapWidth * BitmapHeight * 3, &bytesWritten, nullptr);
 			CloseHandle(BitmapFileHandle);
@@ -5198,7 +5204,8 @@ void thred::internal::bfil() {
 				bitmapWidthBytes += 4;
 			}
 			const auto bitmapSizeBytes = bitmapWidthBytes * BitmapHeight;
-			auto       monoBitmapData  = std::vector<unsigned char>(bitmapSizeBytes);
+			auto       monoBitmapData = std::vector<unsigned char>{};
+			monoBitmapData.resize(bitmapSizeBytes);
 			ReadFile(BitmapFileHandle, monoBitmapData.data(), bitmapSizeBytes, &BytesRead, nullptr);
 			CloseHandle(BitmapFileHandle);
 			auto foreground = COLORREF{};
@@ -5646,7 +5653,8 @@ void thred::internal::nuFil() {
 						MsgBuffer[0]     = 0;
 						auto bytesToRead = DWORD{ 0 };
 						if (version < 2) {
-							auto formListOriginal = std::vector<FRMHEDO>(FormIndex);
+							auto formListOriginal = std::vector<FRMHEDO>{};
+							formListOriginal.resize(FormIndex);
 							bytesToRead           = gsl::narrow<DWORD>(FormIndex * sizeof(formListOriginal[0]));
 							ReadFileInt(FileHandle, formListOriginal.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != FormIndex * sizeof(formListOriginal[0])) {
@@ -5688,7 +5696,8 @@ void thred::internal::nuFil() {
 							return;
 						}
 						if (thredHeader.dlineCount) {
-							auto inSatinGuides = std::vector<SATCONOUT>(thredHeader.dlineCount);
+							auto inSatinGuides = std::vector<SATCONOUT>{};
+							inSatinGuides.resize(thredHeader.dlineCount);
 							bytesToRead        = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(inSatinGuides[0]));
 							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
@@ -5770,7 +5779,8 @@ void thred::internal::nuFil() {
 							}
 							fileSize -= sizeof(PCSHeader);
 							const auto pcsStitchCount = fileSize / sizeof(PCSTCH) + 2;
-							auto       PCSDataBuffer  = std::vector<PCSTCH>(pcsStitchCount);
+							auto       PCSDataBuffer = std::vector<PCSTCH>{};
+							PCSDataBuffer.resize(pcsStitchCount);
 							ReadFile(FileHandle, PCSDataBuffer.data(), fileSize, &BytesRead, nullptr);
 							auto iStitch      = 0u;
 							auto iColorChange = 0u;
@@ -5911,7 +5921,8 @@ void thred::internal::nuFil() {
 						if (chkdst(&dstHeader)) {
 							PCSBMPFileName[0] = 0;
 							fileSize          = GetFileSize(FileHandle, &BytesRead) - sizeof(dstHeader);
-							auto DSTData      = std::vector<DSTREC>(fileSize / sizeof(DSTREC));
+							auto DSTData = std::vector<DSTREC>{};
+							DSTData.resize(fileSize / sizeof(DSTREC));
 							ReadFileInt(FileHandle, DSTData.data(), fileSize, &BytesRead, nullptr);
 							dstran(DSTData);
 							IniFile.auxFileType = AUXDST;
@@ -7677,7 +7688,8 @@ void thred::frmdel() {
 void thred::internal::delsfrms(unsigned code) {
 	if (code) {
 		if (!FormList->empty()) {
-			auto formIndices = std::vector<unsigned>(FormIndex);
+			auto formIndices = std::vector<unsigned>{};
+			formIndices.resize(FormIndex);
 			auto formMap     = boost::dynamic_bitset<>(FormIndex);
 			for (auto selectedForm : (*SelectedFormList)) {
 				ClosestFormToCursor = selectedForm;
@@ -8616,7 +8628,8 @@ void thred::internal::insfil() {
 						auto clipOffset         = ClipPoints->size();
 						auto textureOffset      = TexturePointsBuffer->size();
 						if (version < 2) {
-							auto inFormList = std::vector<FRMHEDO>(fileHeader.formCount);
+							auto inFormList = std::vector<FRMHEDO>{};
+							inFormList.resize(fileHeader.formCount);
 							ReadFile(InsertedFileHandle,
 							         inFormList.data(),
 							         fileHeader.formCount * sizeof(inFormList[0]),
@@ -8634,7 +8647,8 @@ void thred::internal::insfil() {
 							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
 						}
 						else {
-							auto inFormList  = std::vector<FRMHEDOUT>(fileHeader.formCount);
+							auto inFormList = std::vector<FRMHEDOUT>{};
+							inFormList.resize(fileHeader.formCount);
 							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.formCount * sizeof(inFormList[0]));
 							ReadFileInt(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
@@ -8663,7 +8677,8 @@ void thred::internal::insfil() {
 							StateMap.set(StateFlag::BADFIL);
 						}
 						if (fileHeader.dlineCount) {
-							auto inSatinGuides = std::vector<SATCONOUT>(fileHeader.dlineCount);
+							auto inSatinGuides = std::vector<SATCONOUT>{};
+							inSatinGuides.resize(fileHeader.dlineCount);
 							auto bytesToRead   = gsl::narrow<DWORD>(fileHeader.dlineCount * sizeof(inSatinGuides[0]));
 							ReadFile(InsertedFileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
@@ -8812,7 +8827,8 @@ void thred::internal::insfil() {
 				ReadFile(InsertedFileHandle, &pcsFileHeader, 0x46, &BytesRead, nullptr);
 				if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16) {
 					thred::savdo();
-					auto pcsStitchBuffer = std::vector<PCSTCH>(pcsFileHeader.stitchCount);
+					auto pcsStitchBuffer = std::vector<PCSTCH>{};
+					pcsStitchBuffer.resize(pcsFileHeader.stitchCount);
 					ReadFile(InsertedFileHandle,
 					         pcsStitchBuffer.data(),
 					         pcsFileHeader.stitchCount * sizeof(pcsStitchBuffer[0]),
@@ -10130,7 +10146,8 @@ void thred::internal::rngal() {
 	if (!StateMap.testAndReset(StateFlag::WASFPNT)) {
 		StateMap.reset(StateFlag::GRPSEL);
 		// ToDo - use .reserve instead with .push_back
-		auto prng = std::vector<RANGE>(MAXITEMS);
+		auto prng = std::vector<RANGE>{};
+		prng.resize(MAXITEMS);
 		StateMap.reset(StateFlag::GRPSEL);
 		auto iStitch     = 0u;
 		auto iRange      = 0u;
@@ -14078,7 +14095,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					unbox();
 					unboxs();
 					setbak(ThreadSizePixels[StitchBuffer[ClosestPointIndex].attribute & 0xf] + 3);
-					auto linePoints = std::vector<POINT>(3);
+					auto linePoints = std::vector<POINT>{};
+					linePoints.resize(3);
 					LineIndex       = 0;
 					SetROP2(StitchWindowDC, R2_NOTXORPEN);
 					if (ClosestPointIndex == 0) {
@@ -15130,7 +15148,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							auto byteCount
 							    = sizeof(*ClipFormVerticesData)
 							      + (gsl::narrow<size_t>(ClipFormVerticesData->vertexCount) + 1) * sizeof((*FormVertices)[0]);
-							auto clipCopyBuffer = std::vector<unsigned char>(byteCount);
+							auto clipCopyBuffer = std::vector<unsigned char>{};
+							clipCopyBuffer.resize(byteCount);
 							auto clipPointer    = static_cast<unsigned char*>(ClipPointer);
 							auto _              = std::copy(clipPointer, clipPointer + byteCount, clipCopyBuffer.begin());
 							GlobalUnlock(ClipMemory);
@@ -17600,7 +17619,8 @@ void thred::internal::drwStch() {
 			stitchCount = LineIndex;
 		}
 	}
-	auto linePoints = std::vector<POINT>(gsl::narrow<size_t>(stitchCount) + 2);
+	auto linePoints = std::vector<POINT>{};
+	linePoints.resize(gsl::narrow<size_t>(stitchCount) + 2);
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	thred::duzrat();
 	if (PCSBMPFileName[0] && !StateMap.test(StateFlag::HIDMAP) && !StateMap.test(StateFlag::UPTO)) {
@@ -18041,15 +18061,18 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 				ratio = yRatio;
 			}
 			if (stitchHeader.stitchCount) {
-				auto       stitchesToDraw = std::vector<fPOINTATTR>(stitchHeader.stitchCount);
-				auto       lines          = std::vector<POINT>(stitchHeader.stitchCount);
+				auto       stitchesToDraw = std::vector<fPOINTATTR>{};
+				stitchesToDraw.resize(stitchHeader.stitchCount);
+				auto       lines = std::vector<POINT>{};
+				lines.resize(stitchHeader.stitchCount);
 				const auto bytesToRead    = gsl::narrow_cast<DWORD>(stitchHeader.stitchCount * sizeof(StitchBuffer[0]));
 				ReadFile(thrEdFile, stitchesToDraw.data(), bytesToRead, &BytesRead, nullptr);
 				if (bytesToRead == BytesRead) {
 					SetFilePointer(thrEdFile, 16, nullptr, FILE_CURRENT);
 					auto brushColor = COLORREF{};
 					ReadFile(thrEdFile, &brushColor, sizeof(brushColor), &BytesRead, nullptr);
-					auto colors = std::vector<COLORREF>(16);
+					auto colors = std::vector<COLORREF>{};
+					colors.resize(16);
 					ReadFileInt(thrEdFile,
 					            colors.data(),
 					            gsl::narrow<unsigned int>(colors.size() * sizeof(colors[0])),
@@ -18093,12 +18116,16 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 			if (stitchHeader.formCount) {
 				do {
 					// Todo - find a better value than MAXFRMLINS
-					auto lines = std::vector<POINT>(MAXFRMLINS);
+					auto lines = std::vector<POINT>{};
+					lines.resize(MAXFRMLINS);
 					SetFilePointer(thrEdFile, 80, nullptr, FILE_CURRENT);
-					auto formList   = std::vector<FRMHED>(stitchHeader.formCount);
-					auto vertexList = std::vector<fPOINT>(stitchHeader.vertexCount);
+					auto formList = std::vector<FRMHED>{};
+					formList.resize(stitchHeader.formCount);
+					auto vertexList = std::vector<fPOINT>{};
+					vertexList.resize(stitchHeader.vertexCount);
 					if (fileTypeVersion < 2) {
-						auto       formListOriginal = std::vector<FRMHEDO>(stitchHeader.formCount);
+						auto       formListOriginal = std::vector<FRMHEDO>{};
+						formListOriginal.resize(stitchHeader.formCount);
 						const auto bytesToRead = stitchHeader.formCount * gsl::narrow<unsigned int>(sizeof(formListOriginal[0]));
 						ReadFile(thrEdFile, formListOriginal.data(), bytesToRead, &BytesRead, nullptr);
 						if (BytesRead != bytesToRead) {
@@ -18107,7 +18134,8 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 						const auto _ = std::copy(formListOriginal.cbegin(), formListOriginal.cend(), formList.begin());
 					}
 					else {
-						auto       inFormList  = std::vector<FRMHEDOUT>(stitchHeader.formCount);
+						auto       inFormList = std::vector<FRMHEDOUT>{};
+						inFormList.resize(stitchHeader.formCount);
 						const auto bytesToRead = gsl::narrow<unsigned int>(stitchHeader.formCount * sizeof(inFormList[0]));
 						ReadFileInt(thrEdFile, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 						if (BytesRead != bytesToRead) {
@@ -18679,7 +18707,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_TempTexturePoints         = std::vector<TXPNT>{};
 		auto private_SelectedTexturePointsList = std::vector<unsigned int>{};
 		texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
-		auto private_StringTable = std::vector<std::wstring>(STR_LEN);
+		auto private_StringTable = std::vector<std::wstring>{};
+		private_StringTable.resize(STR_LEN);
 		StringTable              = &private_StringTable;
 		auto private_ButtonWin   = std::vector<HWND>{};
 		ButtonWin                = &private_ButtonWin;
@@ -18717,13 +18746,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		OutsidePointList                 = &private_OutsidePointList;
 		auto private_InsidePointList     = std::vector<fPOINT>{};
 		InsidePointList                  = &private_InsidePointList;
-		auto private_ValueWindow         = std::vector<HWND>(LASTLIN);
+		auto private_ValueWindow = std::vector<HWND>{};
+		private_ValueWindow.resize(LASTLIN);
 		ValueWindow                      = &private_ValueWindow;
-		auto private_LabelWindow         = std::vector<HWND>(LASTLIN);
+		auto private_LabelWindow = std::vector<HWND>{};
+		private_LabelWindow.resize(LASTLIN);
 		LabelWindow                      = &private_LabelWindow;
 		auto private_SelectedFormList    = std::vector<unsigned int>{};
 		SelectedFormList                 = &private_SelectedFormList;
-		auto private_FormControlPoints   = std::vector<POINT>(10);
+		auto private_FormControlPoints = std::vector<POINT>{};
+		private_FormControlPoints.resize(10);
 		FormControlPoints                = &private_FormControlPoints;
 		auto private_FormLines           = std::vector<POINT>{};
 		FormLines                        = &private_FormLines;
@@ -18732,11 +18764,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_FormVertices        = std::vector<fPOINT>{};
 		private_FormVertices.reserve(MAXITEMS);
 		FormVertices                     = &private_FormVertices;
-		auto private_RubberBandLine      = std::vector<POINT>(3);
+		auto private_RubberBandLine = std::vector<POINT>{};
+		private_RubberBandLine.resize(3);
 		RubberBandLine                   = &private_RubberBandLine;
-		auto private_SelectedFormsLine   = std::vector<POINT>(9);
+		auto private_SelectedFormsLine = std::vector<POINT>{};
+		private_SelectedFormsLine.resize(9);
 		SelectedFormsLine                = &private_SelectedFormsLine;
-		auto private_SelectedPointsLine  = std::vector<POINT>(9);
+		auto private_SelectedPointsLine = std::vector<POINT>{};
+		private_SelectedPointsLine.resize(9);
 		SelectedPointsLine               = &private_SelectedPointsLine;
 		auto private_FormAngles          = std::vector<double>{};
 		FormAngles                       = &private_FormAngles;
@@ -18852,7 +18887,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto rotationCenter = dPOINT{};
 		auto textureForm    = FRMHED{};
 
-		auto stretchBoxLine = std::vector<POINT>(5); // stretch and expand
+		auto stretchBoxLine = std::vector<POINT>{};
+		stretchBoxLine.reserve(5); // stretch and expand
 
 		while (GetMessage(&Msg, nullptr, 0, 0)) {
 			StateMap.set(StateFlag::SAVACT);

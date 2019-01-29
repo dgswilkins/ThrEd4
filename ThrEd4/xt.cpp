@@ -851,8 +851,10 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 
 void xt::srtcol() {
 	const auto colorSize        = 16;
-	auto       histogram        = std::vector<unsigned>(colorSize);
-	auto       colorStartStitch = std::vector<unsigned>(colorSize);
+	auto       histogram = std::vector<unsigned>{}; 
+	histogram.resize(colorSize);
+	auto       colorStartStitch = std::vector<unsigned>{}; 
+	colorStartStitch.resize(colorSize);
 
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		histogram[StitchBuffer[iStitch].attribute & COLMSK]++;
@@ -864,7 +866,8 @@ void xt::srtcol() {
 		startStitch += *it;
 		const auto _ = it++;
 	}
-	auto highStitchBuffer = std::vector<fPOINTATTR>(PCSHeader.stitchCount);
+	auto highStitchBuffer = std::vector<fPOINTATTR>{};
+	highStitchBuffer.resize(PCSHeader.stitchCount);
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		highStitchBuffer[colorStartStitch[StitchBuffer[iStitch].attribute & COLMSK]++] = StitchBuffer[iStitch];
 	}
@@ -1046,7 +1049,8 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 	auto direction     = sortRecord.direction;
 
 	auto formFillCounter
-	    = std::vector<unsigned>(gsl::narrow<unsigned int>((gsl::narrow_cast<unsigned long>(FormIndex) + 2u) << 2u));
+		= std::vector<unsigned>{};
+	formFillCounter.resize(gsl::narrow<unsigned int>((gsl::narrow_cast<unsigned long>(FormIndex) + 2u) << 2u));
 	auto totalJumps = 0u;
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
 		double minimumLength = 1e9;
@@ -1164,7 +1168,8 @@ void xt::fsort() {
 
 	// There cannot be more records than stitches
 	// ToDo - convert this to a reserve/pushback
-	auto stitchRegion = std::vector<OREC>(PCSHeader.stitchCount);
+	auto stitchRegion = std::vector<OREC>{};
+	stitchRegion.resize(PCSHeader.stitchCount);
 
 	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors
 	//        in a single form are not in ascending order already.
@@ -1192,8 +1197,10 @@ void xt::fsort() {
 	stitchRegion[index].finish    = PCSHeader.stitchCount;
 	index++;
 	const auto lastRegion = index;
-	auto       pRecs      = std::vector<OREC*>(lastRegion);
-	auto       pFRecs     = std::vector<OREC*>(lastRegion);
+	auto       pRecs = std::vector<OREC*>{};
+	pRecs.resize(lastRegion);
+	auto       pFRecs = std::vector<OREC*>{};
+	pFRecs.resize(lastRegion);
 	for (auto iRegion = 0u; iRegion < lastRegion; iRegion++) {
 		xi::durec(stitchRegion[iRegion]);
 		pRecs[iRegion]  = &stitchRegion[iRegion];
@@ -1206,7 +1213,8 @@ void xt::fsort() {
 #endif
 	auto badForm = 0u;
 	if (xi::srtchk(pFRecs, lastRegion, badForm)) {
-		auto stitchRange     = std::vector<RANGE>(lastRegion);
+		auto stitchRange = std::vector<RANGE>{};
+		stitchRange.resize(lastRegion);
 		stitchRange[0].start = 0;
 		attribute            = pRecs[0]->color;
 		auto currentForm     = 0xffffffffu;
@@ -1235,7 +1243,8 @@ void xt::fsort() {
 		}
 		stitchRange[iRange].finish  = lastRegion;
 		const auto lastRange        = ++iRange;
-		auto       tempStitchBuffer = std::vector<fPOINTATTR>(PCSHeader.stitchCount);
+		auto       tempStitchBuffer = std::vector<fPOINTATTR>{};
+		tempStitchBuffer.resize(PCSHeader.stitchCount);
 		OutputIndex                 = 0;
 		for (iRange = 0; iRange < lastRange; iRange++) {
 			StateMap.reset(StateFlag::DUSRT);

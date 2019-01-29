@@ -318,7 +318,8 @@ void trace::trdif() {
 	StateMap.reset(StateFlag::HIDMAP);
 	trace::untrace();
 	if (BitmapHeight * BitmapWidth) {
-		auto differenceBitmap = std::vector<unsigned>(gsl::narrow<size_t>(BitmapHeight) * BitmapWidth);
+		auto differenceBitmap = std::vector<unsigned>{};
+		differenceBitmap.resize(gsl::narrow<size_t>(BitmapHeight) * BitmapWidth);
 
 		auto colorSumMaximum = 0u;
 		auto colorSumMinimum = 0xffffffffu;

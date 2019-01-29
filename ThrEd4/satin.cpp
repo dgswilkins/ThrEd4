@@ -101,7 +101,8 @@ SATCON* satin::internal::nusac(unsigned int formIndex, unsigned guideCount) {
 
 void satin::spltsat(SATCON currentGuide) {
 	// We are adding two additional vertices when splitting the form
-	auto  vertexBuffer = std::vector<fPOINT>(gsl::narrow<size_t>(VertexCount) + 2);
+	auto  vertexBuffer = std::vector<fPOINT>{};
+	vertexBuffer.resize(gsl::narrow<size_t>(VertexCount) + 2);
 	auto& formList     = *FormList;
 
 	auto& srcForm = formList[ClosestFormToCursor];
@@ -344,7 +345,8 @@ void satin::internal::satcpy(SATCON* const destination, const std::vector<SATCON
 void satin::satadj() {
 	form::fvars(ClosestFormToCursor);
 
-	auto interiorGuides  = std::vector<SATCON>(CurrentFormGuidesCount);
+	auto interiorGuides = std::vector<SATCON>{};
+	interiorGuides.resize(CurrentFormGuidesCount);
 	auto savedGuideCount = SelectedForm->satinGuideCount;
 	auto satinMap        = ExtendedBitSet<>(VertexCount);
 
@@ -1285,7 +1287,8 @@ void satin::internal::filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& p
 
 void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int start, unsigned int finish) {
 	auto& outsidePoints = *OutsidePoints;
-	auto  satinBackup   = std::vector<dPOINT>(8); // backup stitches in satin fills
+	auto  satinBackup = std::vector<dPOINT>{}; // backup stitches in satin fills
+	satinBackup.resize(8);
 	auto  innerDelta
 	    = dPOINT{ (insidePoints[finish].x - insidePoints[start].x), (insidePoints[finish].y - insidePoints[start].y) };
 	const auto innerLength = hypot(innerDelta.x, innerDelta.y);
