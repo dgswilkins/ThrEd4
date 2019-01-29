@@ -4302,31 +4302,31 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 		}
 		regions.back().end  = lineCount - 1;
 		auto regionCount    = regions.size();
-		auto RegionsList = std::vector<REGION>{};
-		RegionsList.resize(regionCount);
+		auto regionsList = std::vector<REGION>{};
+		regionsList.resize(regionCount);
 		auto visitedRegions = boost::dynamic_bitset<>(regionCount);
 		for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
-			RegionsList[iRegion].start      = regions[iRegion].start;
-			RegionsList[iRegion].end        = regions[iRegion].end;
-			RegionsList[iRegion].breakCount = 0;
+			regionsList[iRegion].start      = regions[iRegion].start;
+			regionsList[iRegion].end        = regions[iRegion].end;
+			regionsList[iRegion].breakCount = 0;
 		}
 		const auto iStartLine = 0u;
 		for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
 			auto count = 0u;
-			if ((RegionsList[iRegion].end - RegionsList[iRegion].start) > 1) {
-				auto startGroup = sortedLines[RegionsList[iRegion].start]->group;
-				for (auto iLine = RegionsList[iRegion].start + 1; iLine <= RegionsList[iRegion].end; iLine++) {
+			if ((regionsList[iRegion].end - regionsList[iRegion].start) > 1) {
+				auto startGroup = sortedLines[regionsList[iRegion].start]->group;
+				for (auto iLine = regionsList[iRegion].start + 1; iLine <= regionsList[iRegion].end; iLine++) {
 					startGroup++;
 					if (sortedLines[iLine]->group != startGroup) {
 						if (!count) {
-							RegionsList[iRegion].regionBreak = iStartLine;
+							regionsList[iRegion].regionBreak = iStartLine;
 						}
 						count++;
 						startGroup = sortedLines[iLine]->group;
 					}
 				}
 			}
-			RegionsList[iRegion].breakCount = count;
+			regionsList[iRegion].breakCount = count;
 		}
 
 #if BUGSEQ
@@ -4334,7 +4334,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 		auto bugColor = 0u;
 		auto index    = 0u;
 		for (auto iRegion = 0u; iRegion < RegionCount; iRegion++) {
-			for (auto iLine = RegionsList[iRegion].start; iLine <= RegionsList[iRegion].end; iLine++) {
+			for (auto iLine = regionsList[iRegion].start; iLine <= regionsList[iRegion].end; iLine++) {
 				auto lineGroupPoint           = &*sortedLines[iLine];
 				StitchBuffer[index].attribute = bugColor;
 				StitchBuffer[index].x         = lineGroupPoint[0].x;
@@ -4371,7 +4371,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 						                                 sortedLines,
 						                                 iSequence,
 						                                 iNode,
-						                                 RegionsList,
+						                                 regionsList,
 						                                 gapToClosestRegion,
 						                                 nextGroup);
 						if (isConnected) {
@@ -4392,7 +4392,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 							                                 sortedLines,
 							                                 iSequence,
 							                                 iNode,
-							                                 RegionsList,
+							                                 regionsList,
 							                                 gapToClosestRegion,
 							                                 nextGroup);
 							if (isConnected) {
@@ -4409,7 +4409,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			auto startGroup = 0xffffffffu;
 			auto leftRegion = 0u;
 			for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
-				auto lineGroupPoint = sortedLines[RegionsList[iRegion].start];
+				auto lineGroupPoint = sortedLines[regionsList[iRegion].start];
 				if (lineGroupPoint->group < startGroup) {
 					startGroup = lineGroupPoint->group;
 					leftRegion = iRegion;
@@ -4447,7 +4447,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				       mapIndexSequence,
 				       visitedRegions,
 				       sortedLines,
-				       RegionsList,
+				       regionsList,
 				       doneRegion,
 				       pathMapIndex,
 				       sequencePathIndex,
@@ -4482,7 +4482,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				if (!unvis(visitedRegions, visitedIndex)) {
 					break;
 				}
-				durgn(sequencePath, visitedRegions, sortedLines, iPath, lineCount, RegionsList, lastGroup, sequencePathIndex);
+				durgn(sequencePath, visitedRegions, sortedLines, iPath, lineCount, regionsList, lastGroup, sequencePathIndex);
 			}
 		}
 		else {
@@ -4490,9 +4490,9 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			sequencePath.resize(sequencePathIndex);
 			auto lastGroup            = 0u;
 			sequencePath[0].node      = 0;
-			sequencePath[0].nextGroup = gsl::narrow<unsigned short>(sortedLines[RegionsList[0].end]->group);
+			sequencePath[0].nextGroup = gsl::narrow<unsigned short>(sortedLines[regionsList[0].end]->group);
 			sequencePath[0].skp       = false;
-			durgn(sequencePath, visitedRegions, sortedLines, 0, lineCount, RegionsList, lastGroup, sequencePathIndex);
+			durgn(sequencePath, visitedRegions, sortedLines, 0, lineCount, regionsList, lastGroup, sequencePathIndex);
 		}
 
 #endif
