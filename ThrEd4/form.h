@@ -94,7 +94,6 @@ unsigned     find1st();
 void         fliph();
 void         flipv();
 void         flpord();
-unsigned     fltind(const fPOINT* point) noexcept;
 void         fltspac(unsigned int start, unsigned int count);
 void         form();
 void         frm0();

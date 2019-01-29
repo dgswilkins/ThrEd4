@@ -105,11 +105,6 @@ bool form::chkmax(unsigned int arg0, unsigned int arg1) noexcept {
 	return false;
 }
 
-unsigned form::fltind(const fPOINT* const point) noexcept {
-	// ToDo - find a better way than pointer arithmetic
-	return point - FormVertices->data();
-}
-
 void form::fltspac(unsigned int start, unsigned int count) {
 	auto       destination = FormVertexIndex + count - 1;
 
