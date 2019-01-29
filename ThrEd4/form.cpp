@@ -938,7 +938,6 @@ void form::pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) noexcept {
 void form::flipv() {
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
-		thred::savdo();
 		const auto midpoint      = (SelectedVerticesRect.top - SelectedVerticesRect.bottom) * 0.5f + SelectedVerticesRect.bottom;
 		auto       currentVertex = SelectedFormVertices.start;
 		auto       vertexIt = FormVertices->begin() + CurrentFormVertices;
@@ -950,7 +949,6 @@ void form::flipv() {
 		return;
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-		thred::savdo();
 		const auto midpoint = (AllItemsRect.top - AllItemsRect.bottom) / 2.0f + AllItemsRect.bottom;
 		for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
 		 (*FormVertices)[iVertex].y = midpoint + midpoint - (*FormVertices)[iVertex].y;
@@ -967,7 +965,6 @@ void form::flipv() {
 		return;
 	}
 	if (!SelectedFormList->empty()) {
-		thred::savdo();
 		auto formMap = boost::dynamic_bitset<>{ FormIndex };
 
 		auto rectangle = fRECTANGLE{};
@@ -993,7 +990,6 @@ void form::flipv() {
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			thred::savdo();
 			const auto midpoint
 			    = (SelectedForm->rectangle.top - SelectedForm->rectangle.bottom) / 2.0f + SelectedForm->rectangle.bottom;
 			auto vertexIt = FormVertices->begin() + CurrentFormVertices;
@@ -1028,9 +1024,11 @@ void form::flipv() {
 void form::duform(unsigned formType) {
 	switch (formType + 1) {
 	case FRMLINE:
+		thred::savdo();
 		fi::setlin();
 		break;
 	case FRMFPOLY:
+		thred::savdo();
 		fi::setpoli();
 		break;
 	case FRMRPOLY:
@@ -6620,7 +6618,6 @@ void form::duhart(unsigned sideCount) {
 }
 
 void form::dulens(unsigned sides) {
-	thred::savdo();
 	// ToDo - this does not produce a consistent size of lens
 	//        or the correct number of sides
 	if (sides < 6) {

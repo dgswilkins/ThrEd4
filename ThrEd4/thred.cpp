@@ -1355,8 +1355,10 @@ void thred::internal::dudat() {
 	if (backupData) {
 		backupData->zoomRect  = UnzoomedRect;
 		backupData->formCount = formCount;
-		backupData->forms     = convert_ptr<FRMHED*>(&backupData[1]);
-		std::copy(formList.cbegin(), formList.cend(), stdext::make_checked_array_iterator(backupData->forms, formList.size()));
+		backupData->forms = convert_ptr<FRMHED*>(&backupData[1]);
+		if (formCount != 0) {
+			std::copy(formList.cbegin(), formList.cend(), stdext::make_checked_array_iterator(backupData->forms, formList.size()));
+		}
 		backupData->stitchCount = PCSHeader.stitchCount;
 		backupData->stitches    = convert_ptr<fPOINTATTR*>(&backupData->forms[formCount]);
 		if (PCSHeader.stitchCount) {
@@ -1364,15 +1366,15 @@ void thred::internal::dudat() {
 			          StitchBuffer + PCSHeader.stitchCount,
 			          stdext::make_checked_array_iterator(backupData->stitches, PCSHeader.stitchCount));
 		}
-		backupData->vertexCount = FormVertexIndex;
+		backupData->vertexCount = FormVertices->size();
 		backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[PCSHeader.stitchCount]);
-		if (FormVertexIndex) {
+		if (!FormVertices->empty()) {
 			std::copy(FormVertices->cbegin(),
-				FormVertices->cbegin() + FormVertexIndex,
-				stdext::make_checked_array_iterator(backupData->vertices, backupData->vertexCount));
+				FormVertices->cend(),
+				stdext::make_checked_array_iterator(backupData->vertices, FormVertices->size()));
 		}
 		backupData->guideCount = satin::getGuideSize();
-		backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertexIndex]);
+		backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertices->size()]);
 		if (satin::getGuideSize()) {
 			std::copy(SatinGuides,
 			          SatinGuides + satin::getGuideSize(),
@@ -2435,32 +2437,39 @@ void thred::internal::chknum() {
 						}
 						auto uintValue = gsl::narrow<unsigned int>(std::floor(value));
 						if (StateMap.testAndReset(StateFlag::ENTRPOL)) {
+							thred::savdo();
 							form::durpoli(uintValue);
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::ENTRSTAR)) {
+							thred::savdo();
 							form::dustar(uintValue,
 							             250.0 / value * ZoomFactor * (static_cast<double>(UnzoomedRect.x) + UnzoomedRect.y)
 							                 / (static_cast<double>(LHUPX) + LHUPY));
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::ENTRSPIR)) {
+							thred::savdo();
 							form::duspir(uintValue);
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::ENTRHART)) {
+							thred::savdo();
 							form::duhart(uintValue);
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::ENTRLENS)) {
+							thred::savdo();
 							form::dulens(uintValue);
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::ENTREG)) {
+							thred::savdo();
 							form::dueg(uintValue);
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::ENTRZIG)) {
+							thred::savdo();
 							form::duzig(uintValue);
 							break;
 						}
@@ -4894,16 +4903,18 @@ void thred::internal::redbak() {
 		}
 		PCSHeader.stitchCount = gsl::narrow<unsigned short>(undoData->stitchCount);
 		UnzoomedRect          = undoData->zoomRect;
-		if (undoData->formCount) {
-			FormList->clear();
-			for (auto iForm = 0u; iForm < undoData->formCount; iForm++) {
-				const auto& form = undoData->forms[iForm];
-				FormList->push_back(form);
-			}
+		FormList->clear();
+		FormList->reserve(undoData->formCount);
+		for (auto iForm = 0u; iForm < undoData->formCount; iForm++) {
+			const auto& form = undoData->forms[iForm];
+			FormList->push_back(form);
 		}
 		FormIndex = undoData->formCount;
-		if (undoData->vertexCount) {
-			std::copy(undoData->vertices, undoData->vertices + undoData->vertexCount, FormVertices->begin());
+		FormVertices->clear();
+		FormVertices->reserve(undoData->vertexCount);
+		for (auto iVertex = 0u; iVertex < undoData->vertexCount; iVertex++) {
+			const auto& vertex = undoData->vertices[iVertex];
+			FormVertices->push_back(vertex);
 		}
 		FormVertexIndex = undoData->vertexCount;
 		satin::cpyUndoGuides(*undoData);
@@ -16501,6 +16512,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			break;
 		}
 		case ID_FLIPV: { // edit / Flip / Vertical
+			thred::savdo();
 			form::flipv();
 			break;
 		}

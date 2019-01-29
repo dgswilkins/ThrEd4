@@ -1036,6 +1036,7 @@ void formForms::setear() {
 	thred::unmsg();
 	const auto nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, (DLGPROC)ffi::tearprc);
 	if (nResult > 0) {
+		thred::savdo();
 		auto twistStep = IniFile.tearTwistStep;
 		form::durpoli(IniFile.formSides);
 		form::fvars(FormList->size() - 1u);
@@ -1166,6 +1167,7 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 void formForms::wavfrm() {
 	thred::unmsg();
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, (DLGPROC)ffi::wavprc)) {
+		thred::savdo();
 		auto       points = std::vector<fPOINT>{};
 		points.reserve(IniFile.wavePoints);
 		const auto saveIndex = FormVertexIndex;
