@@ -788,14 +788,14 @@ void trace::internal::dutrac() {
 		FormList->push_back(FRMHED{});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
-		CurrentFormVertices      = FormVertexIndex;
-		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
-		vertexIt[0].x = tracedPoints[0].x * StitchBmpRatio.x;
-		vertexIt[0].y = tracedPoints[0].y * StitchBmpRatio.y;
-		iNext                    = 0;
-		OutputIndex              = 0;
-		auto traceLengthSum      = 0.0;
-		auto landscapeOffset     = 0.0;
+		CurrentFormVertices  = FormVertexIndex;
+		auto vertexIt        = FormVertices->begin() + CurrentFormVertices;
+		vertexIt[0].x        = tracedPoints[0].x * StitchBmpRatio.x;
+		vertexIt[0].y        = tracedPoints[0].y * StitchBmpRatio.y;
+		iNext                = 0;
+		OutputIndex          = 0;
+		auto traceLengthSum  = 0.0;
+		auto landscapeOffset = 0.0;
 		if (StateMap.test(StateFlag::LANDSCAP)) {
 			landscapeOffset = UnzoomedRect.y - BitmapSizeinStitches.y;
 		}

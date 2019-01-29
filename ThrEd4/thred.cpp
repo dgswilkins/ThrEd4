@@ -1187,8 +1187,8 @@ void thred::internal::dstin(unsigned number, POINT& pout) noexcept {
 
 unsigned int thred::adflt(unsigned int count) {
 	const auto startVertex = gsl::narrow<unsigned int>(FormVertices->size());
-	const auto it = FormVertices->end();
-	const auto val = fPOINT{};
+	const auto it          = FormVertices->end();
+	const auto val         = fPOINT{};
 	FormVertices->insert(it, count, val);
 	return startVertex;
 }
@@ -1355,9 +1355,10 @@ void thred::internal::dudat() {
 	if (backupData) {
 		backupData->zoomRect  = UnzoomedRect;
 		backupData->formCount = formCount;
-		backupData->forms = convert_ptr<FRMHED*>(&backupData[1]);
+		backupData->forms     = convert_ptr<FRMHED*>(&backupData[1]);
 		if (formCount != 0) {
-			std::copy(formList.cbegin(), formList.cend(), stdext::make_checked_array_iterator(backupData->forms, formList.size()));
+			std::copy(
+			    formList.cbegin(), formList.cend(), stdext::make_checked_array_iterator(backupData->forms, formList.size()));
 		}
 		backupData->stitchCount = PCSHeader.stitchCount;
 		backupData->stitches    = convert_ptr<fPOINTATTR*>(&backupData->forms[formCount]);
@@ -1370,8 +1371,8 @@ void thred::internal::dudat() {
 		backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[PCSHeader.stitchCount]);
 		if (!FormVertices->empty()) {
 			std::copy(FormVertices->cbegin(),
-				FormVertices->cend(),
-				stdext::make_checked_array_iterator(backupData->vertices, FormVertices->size()));
+			          FormVertices->cend(),
+			          stdext::make_checked_array_iterator(backupData->vertices, FormVertices->size()));
 		}
 		backupData->guideCount = satin::getGuideSize();
 		backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertices->size()]);
@@ -1899,11 +1900,11 @@ void thred::internal::hupfn() {
 	sizstch(CheckHoopRect, StitchBuffer);
 	if (!FormList->empty()) {
 		if (!PCSHeader.stitchCount) {
-			auto vertexIt = FormVertices->begin() + CurrentFormVertices;
-			CheckHoopRect.top = vertexIt[0].y;
+			auto vertexIt        = FormVertices->begin() + CurrentFormVertices;
+			CheckHoopRect.top    = vertexIt[0].y;
 			CheckHoopRect.bottom = vertexIt[0].y;
-			CheckHoopRect.right = vertexIt[0].x;
-			CheckHoopRect.left = vertexIt[0].x;
+			CheckHoopRect.right  = vertexIt[0].x;
+			CheckHoopRect.left   = vertexIt[0].x;
 		}
 		for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
 			if ((*FormVertices)[iVertex].x < CheckHoopRect.left) {
@@ -1943,8 +1944,8 @@ void thred::internal::hupfn() {
 				StitchBuffer[iStitch].y += delta.y;
 			}
 			for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
-			 (*FormVertices)[iVertex].x += delta.x;
-			 (*FormVertices)[iVertex].y += delta.y;
+				(*FormVertices)[iVertex].x += delta.x;
+				(*FormVertices)[iVertex].y += delta.y;
 			}
 			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 				auto& form = (*FormList)[iForm];
@@ -3623,7 +3624,7 @@ void thred::internal::ritbal() {
 		BalaradOffset.y    = IniFile.hoopSizeY / 2.0f;
 		auto balaradStitch = std::vector<BALSTCH>{};
 		balaradStitch.resize(gsl::narrow<size_t>(PCSHeader.stitchCount) + 2u);
-		color              = StitchBuffer[0].attribute & COLMSK;
+		color = StitchBuffer[0].attribute & COLMSK;
 		// ToDo - does this loop make sense? iOutput is > 2 after one iteration
 		auto iOutput = 0u;
 		thr2bal(balaradStitch, iOutput++, 0, BALJUMP);
@@ -3875,7 +3876,7 @@ void thred::internal::thrsav() {
 		// ToDo - MAXITEMS * 8 is not the best option here. Need something better
 		auto output = std::vector<char>{};
 		output.resize(MAXITEMS * 8);
-		auto count  = 0u;
+		auto count = 0u;
 		dubuf(output.data(), count);
 		auto bytesWritten = DWORD{ 0 };
 		WriteFile(FileHandle, output.data(), count, &bytesWritten, nullptr);
@@ -3940,7 +3941,7 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 	constexpr auto DSTMax          = 121;
 	auto           dstStitchBuffer = std::vector<fPOINTATTR>{};
 	dstStitchBuffer.resize(PCSHeader.stitchCount);
-	auto           colorData       = std::vector<unsigned>{};
+	auto colorData = std::vector<unsigned>{};
 
 	// there could be as many colors as there are stitches
 	// but we only need to reserve a reasonable number
@@ -5204,7 +5205,7 @@ void thred::internal::bfil() {
 				bitmapWidthBytes += 4;
 			}
 			const auto bitmapSizeBytes = bitmapWidthBytes * BitmapHeight;
-			auto       monoBitmapData = std::vector<unsigned char>{};
+			auto       monoBitmapData  = std::vector<unsigned char>{};
 			monoBitmapData.resize(bitmapSizeBytes);
 			ReadFile(BitmapFileHandle, monoBitmapData.data(), bitmapSizeBytes, &BytesRead, nullptr);
 			CloseHandle(BitmapFileHandle);
@@ -5655,7 +5656,7 @@ void thred::internal::nuFil() {
 						if (version < 2) {
 							auto formListOriginal = std::vector<FRMHEDO>{};
 							formListOriginal.resize(FormIndex);
-							bytesToRead           = gsl::narrow<DWORD>(FormIndex * sizeof(formListOriginal[0]));
+							bytesToRead = gsl::narrow<DWORD>(FormIndex * sizeof(formListOriginal[0]));
 							ReadFileInt(FileHandle, formListOriginal.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != FormIndex * sizeof(formListOriginal[0])) {
 								FormIndex = BytesRead / sizeof(formListOriginal[0]);
@@ -5668,7 +5669,7 @@ void thred::internal::nuFil() {
 						else {
 							auto inFormList = std::vector<FRMHEDOUT>{};
 							inFormList.resize(FormIndex);
-							bytesToRead     = gsl::narrow<DWORD>(FormIndex * sizeof(inFormList.back()));
+							bytesToRead = gsl::narrow<DWORD>(FormIndex * sizeof(inFormList.back()));
 							ReadFileInt(FileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								FormIndex = BytesRead / sizeof(inFormList[0]);
@@ -5685,7 +5686,7 @@ void thred::internal::nuFil() {
 							if (BytesRead != bytesToRead) {
 								FormVertexIndex = BytesRead / sizeof((*FormVertices)[0]);
 								for (auto iVertex = FormVertexIndex; iVertex < thredHeader.vertexCount; iVertex++) {
-								 (*FormVertices)[iVertex].x = (*FormVertices)[iVertex].y = 0;
+									(*FormVertices)[iVertex].x = (*FormVertices)[iVertex].y = 0;
 								}
 								StateMap.set(StateFlag::BADFIL);
 							}
@@ -5698,7 +5699,7 @@ void thred::internal::nuFil() {
 						if (thredHeader.dlineCount) {
 							auto inSatinGuides = std::vector<SATCONOUT>{};
 							inSatinGuides.resize(thredHeader.dlineCount);
-							bytesToRead        = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(inSatinGuides[0]));
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(inSatinGuides[0]));
 							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								StateMap.set(StateFlag::BADFIL);
@@ -5734,11 +5735,11 @@ void thred::internal::nuFil() {
 						}
 						// now re-create all the pointers/indexes in the form data
 						satin::clearGuideSize();
-						FormVertexIndex = 0;
-						auto clipOffset = 0u;
+						FormVertexIndex   = 0;
+						auto clipOffset   = 0u;
 						auto vertexOffset = 0u;
 						for (auto iForm = 0u; iForm < FormIndex; iForm++) {
-							auto& form    = (*FormList)[iForm];
+							auto& form       = (*FormList)[iForm];
 							form.vertexIndex = vertexOffset;
 							vertexOffset += form.vertexCount;
 							if (form.type == SAT) {
@@ -5779,7 +5780,7 @@ void thred::internal::nuFil() {
 							}
 							fileSize -= sizeof(PCSHeader);
 							const auto pcsStitchCount = fileSize / sizeof(PCSTCH) + 2;
-							auto       PCSDataBuffer = std::vector<PCSTCH>{};
+							auto       PCSDataBuffer  = std::vector<PCSTCH>{};
 							PCSDataBuffer.resize(pcsStitchCount);
 							ReadFile(FileHandle, PCSDataBuffer.data(), fileSize, &BytesRead, nullptr);
 							auto iStitch      = 0u;
@@ -5921,7 +5922,7 @@ void thred::internal::nuFil() {
 						if (chkdst(&dstHeader)) {
 							PCSBMPFileName[0] = 0;
 							fileSize          = GetFileSize(FileHandle, &BytesRead) - sizeof(dstHeader);
-							auto DSTData = std::vector<DSTREC>{};
+							auto DSTData      = std::vector<DSTREC>{};
 							DSTData.resize(fileSize / sizeof(DSTREC));
 							ReadFileInt(FileHandle, DSTData.data(), fileSize, &BytesRead, nullptr);
 							dstran(DSTData);
@@ -7357,7 +7358,7 @@ void thred::internal::duclip() {
 					auto* vertices = convert_ptr<fPOINT*>(&clipHeader[1]);
 					form::fvars(ClosestFormToCursor);
 					auto vertexIt = FormVertices->begin() + CurrentFormVertices;
-					auto iSource = SelectedFormVertices.start;
+					auto iSource  = SelectedFormVertices.start;
 					for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 						vertices[iVertex] = vertexIt[iSource];
 						iSource           = form::pdir(iSource);
@@ -7403,9 +7404,9 @@ void thred::internal::duclip() {
 						}
 						// skip past the forms
 						auto formVertices = convert_ptr<fPOINT*>(&forms[iForm]);
-						auto iVertex        = 0u;
+						auto iVertex      = 0u;
 						for (auto selectedForm : (*SelectedFormList)) {
-							SelectedForm = &((*FormList)[selectedForm]);
+							SelectedForm  = &((*FormList)[selectedForm]);
 							auto vertexIt = FormVertices->begin() + SelectedForm->vertexIndex;
 							for (auto iSide = 0u; iSide < SelectedForm->vertexCount; iSide++) {
 								formVertices[iVertex++] = vertexIt[iSide];
@@ -7515,8 +7516,8 @@ void thred::internal::duclip() {
 							ClipFormHeader           = *(static_cast<FORMCLIP**>(ThrEdClipPointer));
 							ClipFormHeader->clipType = CLP_FRM;
 							ClipFormHeader->form     = (*FormList)[ClosestFormToCursor];
-							auto formVertices = convert_ptr<fPOINT*>(&ClipFormHeader[1]);
-							auto vertexIt = FormVertices->begin() + SelectedForm->vertexIndex;
+							auto formVertices        = convert_ptr<fPOINT*>(&ClipFormHeader[1]);
+							auto vertexIt            = FormVertices->begin() + SelectedForm->vertexIndex;
 							for (auto iSide = 0u; iSide < SelectedForm->vertexCount; iSide++) {
 								formVertices[iSide] = vertexIt[iSide];
 							}
@@ -7690,7 +7691,7 @@ void thred::internal::delsfrms(unsigned code) {
 		if (!FormList->empty()) {
 			auto formIndices = std::vector<unsigned>{};
 			formIndices.resize(FormIndex);
-			auto formMap     = boost::dynamic_bitset<>(FormIndex);
+			auto formMap = boost::dynamic_bitset<>(FormIndex);
 			for (auto selectedForm : (*SelectedFormList)) {
 				ClosestFormToCursor = selectedForm;
 				formMap.set(ClosestFormToCursor);
@@ -8181,15 +8182,15 @@ void thred::internal::delet() {
 			currentFormVertex = form::pdir(currentFormVertex);
 		}
 		currentFormVertex = 0;
-		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+		auto vertexIt     = FormVertices->begin() + CurrentFormVertices;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			if (!vertexMap.test(iVertex)) {
 				vertexIt[currentFormVertex++] = vertexIt[iVertex];
 			}
 		}
-		auto iVertex      = VertexCount;
+		auto iVertex = VertexCount;
 		while (iVertex < FormVertexIndex) {
-		 (*FormVertices)[currentFormVertex++] = (*FormVertices)[iVertex++];
+			(*FormVertices)[currentFormVertex++] = (*FormVertices)[iVertex++];
 		}
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			(*FormList)[iForm].vertexIndex -= (gsl::narrow<size_t>(SelectedFormVertices.vertexCount) + 1);
@@ -8427,8 +8428,8 @@ void thred::redclp() {
 		clipBuffer.reserve(clipSize);
 
 		clipBuffer.push_back(fPOINTATTR{ ClipStitchData[0].x + static_cast<float>(ClipStitchData[0].fx) / 256.0f,
-		                                    ClipStitchData[0].y + static_cast<float>(ClipStitchData[0].fy) / 256.0f,
-		                                    0u });
+		                                 ClipStitchData[0].y + static_cast<float>(ClipStitchData[0].fy) / 256.0f,
+		                                 0u });
 
 #if CLPBUG
 		OutputDebugString(fmt::format("interator: 0 x: {:6.2f},y: {:6.2f}\n", ClipBuffer[0].x, ClipBuffer[0].y).c_str());
@@ -8436,10 +8437,9 @@ void thred::redclp() {
 		ClipRect.left = ClipRect.right = clipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
 		for (auto iStitch = 1u; iStitch < clipSize; iStitch++) {
-			clipBuffer.push_back(
-			    fPOINTATTR{ ClipStitchData[iStitch].x + static_cast<float>(ClipStitchData[iStitch].fx) / 256.0f,
-			                ClipStitchData[iStitch].y + static_cast<float>(ClipStitchData[iStitch].fy) / 256.0f,
-			                (ClipStitchData[iStitch].led & 0xf) | codedLayer });
+			clipBuffer.push_back(fPOINTATTR{ ClipStitchData[iStitch].x + static_cast<float>(ClipStitchData[iStitch].fx) / 256.0f,
+			                                 ClipStitchData[iStitch].y + static_cast<float>(ClipStitchData[iStitch].fy) / 256.0f,
+			                                 (ClipStitchData[iStitch].led & 0xf) | codedLayer });
 
 #if CLPBUG
 			OutputDebugString(
@@ -8679,7 +8679,7 @@ void thred::internal::insfil() {
 						if (fileHeader.dlineCount) {
 							auto inSatinGuides = std::vector<SATCONOUT>{};
 							inSatinGuides.resize(fileHeader.dlineCount);
-							auto bytesToRead   = gsl::narrow<DWORD>(fileHeader.dlineCount * sizeof(inSatinGuides[0]));
+							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.dlineCount * sizeof(inSatinGuides[0]));
 							ReadFile(InsertedFileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								inSatinGuides.resize(BytesRead / sizeof(inSatinGuides[0]));
@@ -8715,7 +8715,7 @@ void thred::internal::insfil() {
 						InsertedFileHandle = nullptr;
 						// update the form pointer variables
 						for (auto iFormList = InsertedFormIndex; iFormList < FormIndex; iFormList++) {
-							auto& formIter    = (*FormList)[iFormList];
+							auto& formIter       = (*FormList)[iFormList];
 							formIter.vertexIndex = thred::adflt(formIter.vertexCount);
 							if (formIter.type == SAT) {
 								if (formIter.satinGuideCount) {
@@ -9220,8 +9220,8 @@ void thred::internal::unmov() {
 }
 
 void thred::internal::duprct() {
-	auto currentVertex = SelectedFormVertices.start;
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+	auto currentVertex        = SelectedFormVertices.start;
+	auto vertexIt             = FormVertices->begin() + CurrentFormVertices;
 	SelectedVerticesRect.left = SelectedVerticesRect.right = vertexIt[currentVertex].x;
 	SelectedVerticesRect.top = SelectedVerticesRect.bottom = vertexIt[currentVertex].y;
 	currentVertex                                          = form::pdir(currentVertex);
@@ -9259,7 +9259,7 @@ void thred::rotfn(double rotationAngle, const dPOINT& rotationCenter) {
 	if (StateMap.test(StateFlag::FPSEL)) {
 		form::fvars(ClosestFormToCursor);
 		auto currentVertex = SelectedFormVertices.start;
-		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+		auto vertexIt      = FormVertices->begin() + CurrentFormVertices;
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 			thred::rotflt(vertexIt[currentVertex], rotationAngle, rotationCenter);
 			currentVertex = form::pdir(currentVertex);
@@ -10122,8 +10122,8 @@ void thred::internal::duinsfil() {
 		formRectangle.right += offset.x;
 	}
 	for (auto iVertex = InsertedVertexIndex; iVertex < FormVertexIndex; iVertex++) {
-	 (*FormVertices)[iVertex].x += offset.x;
-	 (*FormVertices)[iVertex].y += offset.y;
+		(*FormVertices)[iVertex].x += offset.x;
+		(*FormVertices)[iVertex].y += offset.y;
 	}
 	for (auto iStitch = InsertedStitchCount; iStitch < PCSHeader.stitchCount; iStitch++) {
 		StitchBuffer[iStitch].x += offset.x;
@@ -10271,8 +10271,8 @@ void thred::frmrct(fRECTANGLE& rectangle) noexcept {
 }
 
 void thred::internal::desiz() {
-	auto rectangle   = fRECTANGLE{};
-	auto info        = std::wstring{};
+	auto  rectangle   = fRECTANGLE{};
+	auto  info        = std::wstring{};
 	auto& stringTable = *StringTable;
 
 	if (PCSHeader.stitchCount) {
@@ -10557,8 +10557,8 @@ void thred::internal::rotmrk() {
 			const auto codedFormIndex = ClosestFormToCursor << FRMSHFT;
 			form::fvars(ClosestFormToCursor);
 			LowestAngle = HighestAngle = 0;
-			auto vertexIt = FormVertices->begin() + CurrentFormVertices;
-			OriginalAngle = atan2(vertexIt[0].y - ZoomMarkPoint.y, vertexIt[0].x - ZoomMarkPoint.x);
+			auto vertexIt              = FormVertices->begin() + CurrentFormVertices;
+			OriginalAngle              = atan2(vertexIt[0].y - ZoomMarkPoint.y, vertexIt[0].x - ZoomMarkPoint.x);
 			for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
 				angdif(nuang(vertexIt[iVertex].y - ZoomMarkPoint.y, vertexIt[iVertex].x - ZoomMarkPoint.x));
 			}
@@ -10611,8 +10611,8 @@ void thred::internal::pntmrk() {
 			break;
 		}
 		if (StateMap.test(StateFlag::FRMPSEL)) {
-			auto  vertexIt = FormVertices->begin() + (*FormList)[ClosestFormToCursor].vertexIndex;
-			const auto& vertex = vertexIt[ClosestVertexToCursor];
+			auto        vertexIt = FormVertices->begin() + (*FormList)[ClosestFormToCursor].vertexIndex;
+			const auto& vertex   = vertexIt[ClosestVertexToCursor];
 			dumrk(vertex.x, vertex.y);
 			break;
 		}
@@ -11591,7 +11591,7 @@ void thred::internal::selfpnt() {
 	StateMap.reset(StateFlag::SELBOX);
 	SelectedFormVertices.start = ClosestVertexToCursor;
 	SelectedFormVertices.form  = ClosestFormToCursor;
-	auto vertexIt = FormVertices->begin() + (*FormList)[ClosestFormToCursor].vertexIndex;
+	auto vertexIt              = FormVertices->begin() + (*FormList)[ClosestFormToCursor].vertexIndex;
 	thred::ritfcor(vertexIt[ClosestVertexToCursor]);
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -12161,7 +12161,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			if (StateMap.test(StateFlag::FPSEL)) {
 				form::fvars(ClosestFormToCursor);
 				auto iSelectedVertex = SelectedFormVertices.start;
-				auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+				auto vertexIt        = FormVertices->begin() + CurrentFormVertices;
 				for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 					vertexIt[iSelectedVertex].x += FormMoveDelta.x;
 					vertexIt[iSelectedVertex].y -= FormMoveDelta.y;
@@ -14097,7 +14097,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					setbak(ThreadSizePixels[StitchBuffer[ClosestPointIndex].attribute & 0xf] + 3);
 					auto linePoints = std::vector<POINT>{};
 					linePoints.resize(3);
-					LineIndex       = 0;
+					LineIndex = 0;
 					SetROP2(StitchWindowDC, R2_NOTXORPEN);
 					if (ClosestPointIndex == 0) {
 						if (ZoomFactor < STCHBOX) {
@@ -15150,14 +15150,14 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							      + (gsl::narrow<size_t>(ClipFormVerticesData->vertexCount) + 1) * sizeof((*FormVertices)[0]);
 							auto clipCopyBuffer = std::vector<unsigned char>{};
 							clipCopyBuffer.resize(byteCount);
-							auto clipPointer    = static_cast<unsigned char*>(ClipPointer);
-							auto _              = std::copy(clipPointer, clipPointer + byteCount, clipCopyBuffer.begin());
+							auto clipPointer = static_cast<unsigned char*>(ClipPointer);
+							auto _           = std::copy(clipPointer, clipPointer + byteCount, clipCopyBuffer.begin());
 							GlobalUnlock(ClipMemory);
 							CloseClipboard();
 							ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP*>(clipCopyBuffer.data());
 							if (StateMap.test(StateFlag::FRMPSEL)) {
 								form::fvars(ClosestFormToCursor);
-								auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+								auto vertexIt         = FormVertices->begin() + CurrentFormVertices;
 								InterleaveSequence[0] = vertexIt[ClosestVertexToCursor];
 								auto clipData         = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 								// Todo - localize iVertex into the loop
@@ -15186,11 +15186,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								formIter.vertexCount = ClipFormVerticesData->vertexCount + 1;
 								formIter.vertexIndex = thred::adflt(SelectedForm->vertexCount);
 								form::fvars(ClosestFormToCursor);
-								auto vertices = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
+								auto vertices    = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 								auto destination = FormVertices->begin() + formIter.vertexIndex;
-								std::copy(vertices,
-								          vertices + formIter.vertexCount,
-								          destination);
+								std::copy(vertices, vertices + formIter.vertexCount, destination);
 								StateMap.set(StateFlag::INIT);
 								NewFormVertexCount = formIter.vertexCount;
 								form::unfrm();
@@ -15213,12 +15211,12 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								formIter.attribute
 								    = gsl::narrow<unsigned char>((formIter.attribute & NFRMLMSK) | (ActiveLayer << 1));
 							}
-							auto formVertices = convert_ptr<fPOINT*>(&forms[iForm]);
-							auto currentVertex  = 0u;
+							auto formVertices  = convert_ptr<fPOINT*>(&forms[iForm]);
+							auto currentVertex = 0u;
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-								SelectedForm           = &((*FormList)[FormIndex + iForm]);
+								SelectedForm              = &((*FormList)[FormIndex + iForm]);
 								SelectedForm->vertexIndex = thred::adflt(SelectedForm->vertexCount);
-								auto vertexIt = FormVertices->begin() + SelectedForm->vertexIndex;
+								auto vertexIt             = FormVertices->begin() + SelectedForm->vertexIndex;
 								for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
 									vertexIt[iVertex] = formVertices[currentVertex++];
 								}
@@ -15306,11 +15304,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								formIter.attribute
 								    = gsl::narrow<unsigned char>((formIter.attribute & NFRMLMSK) | (ActiveLayer << 1));
 								formIter.vertexIndex = thred::adflt(formIter.vertexCount);
-								auto formVertices = convert_ptr<fPOINT*>(&ClipFormHeader[1]);
-								auto destIt = FormVertices->begin() + formIter.vertexIndex;
-								std::copy(formVertices,
-								          formVertices + formIter.vertexCount,
-								          destIt);
+								auto formVertices    = convert_ptr<fPOINT*>(&ClipFormHeader[1]);
+								auto destIt          = FormVertices->begin() + formIter.vertexIndex;
+								std::copy(formVertices, formVertices + formIter.vertexCount, destIt);
 								auto guides = convert_ptr<SATCON*>(&formVertices[formIter.vertexCount]);
 								if (formIter.type == SAT && formIter.satinGuideCount) {
 									formIter.satinOrAngle.guide = satin::adsatk(formIter.satinGuideCount);
@@ -15598,8 +15594,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							form::fvars(ClosestFormToCursor);
 							ClosestVertexToCursor = form::nxt(ClosestVertexToCursor);
 							displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
-							auto vertexIt = FormVertices->begin() + (*FormList)[ClosestFormToCursor].vertexIndex;
-							const auto& vertex = vertexIt[ClosestVertexToCursor];
+							auto        vertexIt = FormVertices->begin() + (*FormList)[ClosestFormToCursor].vertexIndex;
+							const auto& vertex   = vertexIt[ClosestVertexToCursor];
 							thred::ritfcor(vertex);
 							shftflt(vertex);
 							StateMap.set(StateFlag::RESTCH);
@@ -15685,8 +15681,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							form::fvars(ClosestFormToCursor);
 							ClosestVertexToCursor = form::prv(ClosestVertexToCursor);
 							displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
-							auto vertexIt = FormVertices->begin() + (*FormList)[ClosestFormToCursor].vertexIndex;
-							const auto& vertex = vertexIt[ClosestVertexToCursor];
+							auto        vertexIt = FormVertices->begin() + (*FormList)[ClosestFormToCursor].vertexIndex;
+							const auto& vertex   = vertexIt[ClosestVertexToCursor];
 							thred::ritfcor(vertex);
 							shftflt(vertex);
 							StateMap.set(StateFlag::RESTCH);
@@ -16823,16 +16819,16 @@ void thred::internal::makCol() noexcept {
 
 	for (auto iColor = 0u; iColor < 16; iColor++) {
 		(*DefaultColorWin)[iColor] = CreateWindow(L"STATIC",
-		                                       nullptr,
-		                                       SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		                                       0,
-		                                       ButtonHeight * iColor,
-		                                       ButtonWidth,
-		                                       ButtonHeight,
-		                                       ThrEdWindow,
-		                                       nullptr,
-		                                       ThrEdInstance,
-		                                       nullptr);
+		                                          nullptr,
+		                                          SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
+		                                          0,
+		                                          ButtonHeight * iColor,
+		                                          ButtonWidth,
+		                                          ButtonHeight,
+		                                          ThrEdWindow,
+		                                          nullptr,
+		                                          ThrEdInstance,
+		                                          nullptr);
 		displayText::setWindowFont((*DefaultColorWin)[iColor], hFont);
 		UserColorWin[iColor]  = CreateWindow(L"STATIC",
                                             nullptr,
@@ -18061,11 +18057,11 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 				ratio = yRatio;
 			}
 			if (stitchHeader.stitchCount) {
-				auto       stitchesToDraw = std::vector<fPOINTATTR>{};
+				auto stitchesToDraw = std::vector<fPOINTATTR>{};
 				stitchesToDraw.resize(stitchHeader.stitchCount);
-				auto       lines = std::vector<POINT>{};
+				auto lines = std::vector<POINT>{};
 				lines.resize(stitchHeader.stitchCount);
-				const auto bytesToRead    = gsl::narrow_cast<DWORD>(stitchHeader.stitchCount * sizeof(StitchBuffer[0]));
+				const auto bytesToRead = gsl::narrow_cast<DWORD>(stitchHeader.stitchCount * sizeof(StitchBuffer[0]));
 				ReadFile(thrEdFile, stitchesToDraw.data(), bytesToRead, &BytesRead, nullptr);
 				if (bytesToRead == BytesRead) {
 					SetFilePointer(thrEdFile, 16, nullptr, FILE_CURRENT);
@@ -18124,7 +18120,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					auto vertexList = std::vector<fPOINT>{};
 					vertexList.resize(stitchHeader.vertexCount);
 					if (fileTypeVersion < 2) {
-						auto       formListOriginal = std::vector<FRMHEDO>{};
+						auto formListOriginal = std::vector<FRMHEDO>{};
 						formListOriginal.resize(stitchHeader.formCount);
 						const auto bytesToRead = stitchHeader.formCount * gsl::narrow<unsigned int>(sizeof(formListOriginal[0]));
 						ReadFile(thrEdFile, formListOriginal.data(), bytesToRead, &BytesRead, nullptr);
@@ -18134,7 +18130,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 						const auto _ = std::copy(formListOriginal.cbegin(), formListOriginal.cend(), formList.begin());
 					}
 					else {
-						auto       inFormList = std::vector<FRMHEDOUT>{};
+						auto inFormList = std::vector<FRMHEDOUT>{};
 						inFormList.resize(stitchHeader.formCount);
 						const auto bytesToRead = gsl::narrow<unsigned int>(stitchHeader.formCount * sizeof(inFormList[0]));
 						ReadFileInt(thrEdFile, inFormList.data(), bytesToRead, &BytesRead, nullptr);
@@ -18709,11 +18705,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
 		auto private_StringTable = std::vector<std::wstring>{};
 		private_StringTable.resize(STR_LEN);
-		StringTable              = &private_StringTable;
-		auto private_ButtonWin   = std::vector<HWND>{};
-		ButtonWin                = &private_ButtonWin;
-		auto private_FormOnOff   = std::wstring{};
-		FormOnOff                = &private_FormOnOff;
+		StringTable            = &private_StringTable;
+		auto private_ButtonWin = std::vector<HWND>{};
+		ButtonWin              = &private_ButtonWin;
+		auto private_FormOnOff = std::wstring{};
+		FormOnOff              = &private_FormOnOff;
 #pragma warning(push)
 #pragma warning(disable : 26465) // supress warning for casting away the const
 		auto formOnOff = const_cast<LPWSTR>(private_FormOnOff.data());
@@ -18735,41 +18731,41 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			    nullptr // bmpItem
 #endif                  /* WINVER >= 0x0500 */
 		};
-		MenuInfo                         = &private_MenuInfo;
-		auto private_TempPolygon         = std::vector<fPOINT>{};
-		TempPolygon                      = &private_TempPolygon;
-		auto private_ClipBuffer          = std::vector<fPOINTATTR>{};
-		ClipBuffer                       = &private_ClipBuffer;
-		auto private_ClipPoints          = std::vector<fPOINT>{};
-		ClipPoints                       = &private_ClipPoints;
-		auto private_OutsidePointList    = std::vector<fPOINT>{};
-		OutsidePointList                 = &private_OutsidePointList;
-		auto private_InsidePointList     = std::vector<fPOINT>{};
-		InsidePointList                  = &private_InsidePointList;
-		auto private_ValueWindow = std::vector<HWND>{};
+		MenuInfo                      = &private_MenuInfo;
+		auto private_TempPolygon      = std::vector<fPOINT>{};
+		TempPolygon                   = &private_TempPolygon;
+		auto private_ClipBuffer       = std::vector<fPOINTATTR>{};
+		ClipBuffer                    = &private_ClipBuffer;
+		auto private_ClipPoints       = std::vector<fPOINT>{};
+		ClipPoints                    = &private_ClipPoints;
+		auto private_OutsidePointList = std::vector<fPOINT>{};
+		OutsidePointList              = &private_OutsidePointList;
+		auto private_InsidePointList  = std::vector<fPOINT>{};
+		InsidePointList               = &private_InsidePointList;
+		auto private_ValueWindow      = std::vector<HWND>{};
 		private_ValueWindow.resize(LASTLIN);
-		ValueWindow                      = &private_ValueWindow;
+		ValueWindow              = &private_ValueWindow;
 		auto private_LabelWindow = std::vector<HWND>{};
 		private_LabelWindow.resize(LASTLIN);
-		LabelWindow                      = &private_LabelWindow;
-		auto private_SelectedFormList    = std::vector<unsigned int>{};
-		SelectedFormList                 = &private_SelectedFormList;
+		LabelWindow                    = &private_LabelWindow;
+		auto private_SelectedFormList  = std::vector<unsigned int>{};
+		SelectedFormList               = &private_SelectedFormList;
 		auto private_FormControlPoints = std::vector<POINT>{};
 		private_FormControlPoints.resize(10);
-		FormControlPoints                = &private_FormControlPoints;
-		auto private_FormLines           = std::vector<POINT>{};
-		FormLines                        = &private_FormLines;
-		auto private_FormList            = std::vector<FRMHED>{};
-		FormList                         = &private_FormList;
-		auto private_FormVertices        = std::vector<fPOINT>{};
+		FormControlPoints         = &private_FormControlPoints;
+		auto private_FormLines    = std::vector<POINT>{};
+		FormLines                 = &private_FormLines;
+		auto private_FormList     = std::vector<FRMHED>{};
+		FormList                  = &private_FormList;
+		auto private_FormVertices = std::vector<fPOINT>{};
 		private_FormVertices.reserve(MAXITEMS);
-		FormVertices                     = &private_FormVertices;
+		FormVertices                = &private_FormVertices;
 		auto private_RubberBandLine = std::vector<POINT>{};
 		private_RubberBandLine.resize(3);
-		RubberBandLine                   = &private_RubberBandLine;
+		RubberBandLine                 = &private_RubberBandLine;
 		auto private_SelectedFormsLine = std::vector<POINT>{};
 		private_SelectedFormsLine.resize(9);
-		SelectedFormsLine                = &private_SelectedFormsLine;
+		SelectedFormsLine               = &private_SelectedFormsLine;
 		auto private_SelectedPointsLine = std::vector<POINT>{};
 		private_SelectedPointsLine.resize(9);
 		SelectedPointsLine               = &private_SelectedPointsLine;

@@ -811,10 +811,8 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 		const auto* guide = SelectedForm->satinOrAngle.guide;
 		if (guide) {
 			for (auto iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--) {
-				OSequence[OutputIndex].x
-				    = form::midl(vertexIt[guide[iGuide - 1].finish].x, vertexIt[guide[iGuide - 1].start].x);
-				OSequence[OutputIndex].y
-				    = form::midl(vertexIt[guide[iGuide - 1].finish].y, vertexIt[guide[iGuide - 1].start].y);
+				OSequence[OutputIndex].x = form::midl(vertexIt[guide[iGuide - 1].finish].x, vertexIt[guide[iGuide - 1].start].x);
+				OSequence[OutputIndex].y = form::midl(vertexIt[guide[iGuide - 1].finish].y, vertexIt[guide[iGuide - 1].start].y);
 				OutputIndex++;
 			}
 		}
@@ -829,7 +827,7 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 		if (SelectedForm->extendedAttribute & AT_STRT) {
 			start = SelectedForm->fillStart;
 		}
-		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+		auto vertexIt          = FormVertices->begin() + CurrentFormVertices;
 		OSequence[OutputIndex] = vertexIt[start];
 		OutputIndex++;
 		auto finish = form::prv(start);
@@ -850,10 +848,10 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 }
 
 void xt::srtcol() {
-	const auto colorSize        = 16;
-	auto       histogram = std::vector<unsigned>{}; 
+	const auto colorSize = 16;
+	auto       histogram = std::vector<unsigned>{};
 	histogram.resize(colorSize);
-	auto       colorStartStitch = std::vector<unsigned>{}; 
+	auto colorStartStitch = std::vector<unsigned>{};
 	colorStartStitch.resize(colorSize);
 
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -1048,8 +1046,7 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 	auto currentStitch = static_cast<fPOINTATTR*>(nullptr);
 	auto direction     = sortRecord.direction;
 
-	auto formFillCounter
-		= std::vector<unsigned>{};
+	auto formFillCounter = std::vector<unsigned>{};
 	formFillCounter.resize(gsl::narrow<unsigned int>((gsl::narrow_cast<unsigned long>(FormIndex) + 2u) << 2u));
 	auto totalJumps = 0u;
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
@@ -1197,9 +1194,9 @@ void xt::fsort() {
 	stitchRegion[index].finish    = PCSHeader.stitchCount;
 	index++;
 	const auto lastRegion = index;
-	auto       pRecs = std::vector<OREC*>{};
+	auto       pRecs      = std::vector<OREC*>{};
 	pRecs.resize(lastRegion);
-	auto       pFRecs = std::vector<OREC*>{};
+	auto pFRecs = std::vector<OREC*>{};
 	pFRecs.resize(lastRegion);
 	for (auto iRegion = 0u; iRegion < lastRegion; iRegion++) {
 		xi::durec(stitchRegion[iRegion]);
@@ -1245,7 +1242,7 @@ void xt::fsort() {
 		const auto lastRange        = ++iRange;
 		auto       tempStitchBuffer = std::vector<fPOINTATTR>{};
 		tempStitchBuffer.resize(PCSHeader.stitchCount);
-		OutputIndex                 = 0;
+		OutputIndex = 0;
 		for (iRange = 0; iRange < lastRange; iRange++) {
 			StateMap.reset(StateFlag::DUSRT);
 			auto sortRecord   = SRTREC{};
@@ -1562,10 +1559,8 @@ void xt::internal::chkend(unsigned offset, unsigned code, INTINF& ilData) {
 		StateMap.set(StateFlag::ISEND);
 		if (SelectedForm->extendedAttribute & AT_END) {
 			auto vertexIt = FormVertices->begin() + CurrentFormVertices;
-			ilData.output += gucon(InterleaveSequence[InterleaveSequenceIndex - 1],
-				vertexIt[SelectedForm->fillEnd],
-			                       ilData.output + offset,
-			                       code);
+			ilData.output += gucon(
+			    InterleaveSequence[InterleaveSequenceIndex - 1], vertexIt[SelectedForm->fillEnd], ilData.output + offset, code);
 		}
 	}
 }
@@ -1647,9 +1642,9 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 		std::copy(sourceStart, sourceEnd, StitchBuffer);
 	}
 	else {
-		const auto offset = 0;
-		auto       code   = 0u;
-		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+		const auto offset   = 0;
+		auto       code     = 0u;
+		auto       vertexIt = FormVertices->begin() + CurrentFormVertices;
 		for (auto iSequence = 0u; iSequence < interleaveSequenceIndex2; iSequence++) {
 			code = gsl::narrow<unsigned int>(ilData.layerIndex | InterleaveSequenceIndices[iSequence].code
 			                                 | InterleaveSequenceIndices[iSequence].color);
@@ -2285,7 +2280,7 @@ void xt::internal::fwidfn(unsigned int find, float length) {
 	form::fvars(ClosestFormToCursor);
 	const auto reference = SelectedForm->rectangle.left;
 	const auto ratio     = length / (SelectedForm->rectangle.right - reference);
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+	auto       vertexIt  = FormVertices->begin() + CurrentFormVertices;
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 		vertexIt[iVertex].x = (vertexIt[iVertex].x - reference) * ratio + reference;
 	}
@@ -2326,7 +2321,7 @@ void xt::internal::fhifn(unsigned int find, float length) {
 	form::fvars(ClosestFormToCursor);
 	const auto reference = SelectedForm->rectangle.bottom;
 	const auto ratio     = length / (SelectedForm->rectangle.top - reference);
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+	auto       vertexIt  = FormVertices->begin() + CurrentFormVertices;
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 		vertexIt[iVertex].y = (vertexIt[iVertex].y - reference) * ratio + reference;
 	}
