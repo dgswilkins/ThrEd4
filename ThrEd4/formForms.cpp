@@ -823,7 +823,7 @@ void formForms::dasyfrm() {
 	FormList->emplace_back(FRMHED{});
 	SelectedForm            = &FormList->back();
 	ClosestFormToCursor     = FormList->size() - 1;
-	SelectedForm->vertexIndex  = FormVertexIndex;
+	SelectedForm->vertexIndex  = FormVertices->size();
 	SelectedForm->attribute = gsl::narrow<unsigned char>(ActiveLayer << 1);
 	form::fvars(ClosestFormToCursor);
 	auto       maximumXsize = ZoomRect.right - ZoomRect.left;
@@ -835,24 +835,22 @@ void formForms::dasyfrm() {
 	auto       diameter     = IniFile.daisyDiameter;
 	auto       petalLength  = IniFile.daisyPetalLen;
 	auto       holeDiameter = IniFile.daisyHoleDiameter;
-	const auto ratio        = maximumXsize / (static_cast<double>(diameter) + petalLength);
+	const auto ratio        = maximumXsize / (gsl::narrow_cast<double>(diameter) + petalLength);
 	diameter *= ratio;
 	petalLength *= ratio;
 	holeDiameter *= ratio;
 	SelectedForm->type = FRMFPOLY;
 	auto iVertex       = 0u;
 	auto fref          = 0u;
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
 		auto       angle               = PI2;
 		const auto holeVertexCount     = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
 		const auto holeSegmentAngle    = PI2 / holeVertexCount;
-		vertexIt[iVertex].x = referencePoint.x + diameter * cos(angle);
-		vertexIt[iVertex].y = referencePoint.y + diameter * sin(angle);
+		FormVertices->push_back(fPOINT{ referencePoint.x + diameter * cos(angle), referencePoint.y + diameter * sin(angle) });
 		iVertex++;
 		for (auto iSegment = 0u; iSegment < holeVertexCount + 1; iSegment++) {
-			vertexIt[iVertex].x = referencePoint.x + holeDiameter * cos(angle);
-			vertexIt[iVertex].y = referencePoint.y + holeDiameter * sin(angle);
+			FormVertices->push_back(
+				fPOINT{ referencePoint.x + holeDiameter * cos(angle), referencePoint.y + holeDiameter * sin(angle) });
 			iVertex++;
 			angle -= holeSegmentAngle;
 		}
@@ -925,8 +923,8 @@ void formForms::dasyfrm() {
 				break;
 			}
 			}
-			vertexIt[iVertex].x = referencePoint.x + cos(angle) * distanceFromDaisyCenter;
-			vertexIt[iVertex].y = referencePoint.y + sin(angle) * distanceFromDaisyCenter;
+			FormVertices->push_back(fPOINT{ referencePoint.x + cos(angle) * distanceFromDaisyCenter,
+											   referencePoint.y + sin(angle) * distanceFromDaisyCenter });
 			iVertex++;
 			angle += petalSegmentAngle;
 			if (UserFlagMap.test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
@@ -936,6 +934,7 @@ void formForms::dasyfrm() {
 			}
 		}
 	}
+	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
 		vertexIt[fref - 1].y += 0.01f;
 		vertexIt[fref].y += 0.01f;
@@ -952,7 +951,7 @@ void formForms::dasyfrm() {
 		vertexIt[iMacroPetal].x -= SelectedForm->rectangle.left;
 		vertexIt[iMacroPetal].y -= SelectedForm->rectangle.bottom;
 	}
-	FormMoveDelta.x = FormMoveDelta.y = 0;
+	FormMoveDelta = fPOINT{};
 	NewFormVertexCount                = iVertex + 1;
 	StateMap.set(StateFlag::POLIMOV);
 	form::setmfrm();
