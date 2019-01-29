@@ -8630,11 +8630,8 @@ void thred::internal::insfil() {
 						if (version < 2) {
 							auto inFormList = std::vector<FRMHEDO>{};
 							inFormList.resize(fileHeader.formCount);
-							ReadFile(InsertedFileHandle,
-							         inFormList.data(),
-							         fileHeader.formCount * sizeof(inFormList[0]),
-							         &BytesRead,
-							         nullptr);
+							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.formCount * sizeof(decltype(inFormList.back())));
+							ReadFile(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != fileHeader.formCount * sizeof(inFormList[0])) {
 								inFormList.resize(BytesRead / sizeof(inFormList[0]));
 								StateMap.set(StateFlag::BADFIL);
@@ -8649,29 +8646,29 @@ void thred::internal::insfil() {
 						else {
 							auto inFormList = std::vector<FRMHEDOUT>{};
 							inFormList.resize(fileHeader.formCount);
-							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.formCount * sizeof(inFormList[0]));
+							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.formCount * sizeof(decltype(inFormList.back())));
 							ReadFileInt(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								inFormList.resize(BytesRead / sizeof(inFormList[0]));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							if (FormIndex + fileHeader.formCount < MAXFORMS) {
-								for (auto form : inFormList) {
-									FormList->push_back(FRMHED{ form });
-								}
+							for (auto form : inFormList) {
+								FormList->push_back(FRMHED{ form });
 							}
 							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
 						}
-						if (fileHeader.vertexCount) {
-							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.vertexCount * sizeof((*FormVertices)[0]));
-							ReadFile(InsertedFileHandle, &(*FormVertices)[FormVertexIndex], bytesToRead, &BytesRead, nullptr);
+						auto vertexOffset = FormVertices->size();
+						if (fileHeader.vertexCount != 0u) {
+							auto inFormVertices = std::vector<fPOINT>{};
+							inFormVertices.resize(fileHeader.vertexCount);
+							auto bytesToRead
+								= gsl::narrow<DWORD>(fileHeader.vertexCount * sizeof(decltype(inFormVertices.back())));
+							ReadFile(InsertedFileHandle, inFormVertices.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								newFormVertexIndex += BytesRead / sizeof((*FormVertices)[0]);
+								inFormVertices.resize(BytesRead / sizeof(decltype(inFormVertices.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							else {
-								newFormVertexIndex += fileHeader.vertexCount;
-							}
+							FormVertices->insert(FormVertices->end(), inFormVertices.begin(), inFormVertices.end());
 						}
 						else {
 							StateMap.set(StateFlag::BADFIL);
@@ -8716,7 +8713,8 @@ void thred::internal::insfil() {
 						// update the form pointer variables
 						for (auto iFormList = InsertedFormIndex; iFormList < FormIndex; iFormList++) {
 							auto& formIter       = (*FormList)[iFormList];
-							formIter.vertexIndex = thred::adflt(formIter.vertexCount);
+							formIter.vertexIndex = vertexOffset;
+							vertexOffset += formIter.vertexCount;
 							if (formIter.type == SAT) {
 								if (formIter.satinGuideCount) {
 									formIter.satinOrAngle.guide = satin::adsatk(formIter.satinGuideCount);
@@ -8748,8 +8746,10 @@ void thred::internal::insfil() {
 
 						TextureIndex = textureOffset;
 						if (fileHeader.formCount) {
-							insertedRectangle.left = insertedRectangle.right = (*FormVertices)[InsertedVertexIndex].x;
-							insertedRectangle.bottom = insertedRectangle.top = (*FormVertices)[InsertedVertexIndex].y;
+							insertedRectangle.left = (*FormVertices)[InsertedVertexIndex].x;
+							insertedRectangle.right = (*FormVertices)[InsertedVertexIndex].x;
+							insertedRectangle.bottom = (*FormVertices)[InsertedVertexIndex].y;
+							insertedRectangle.top = (*FormVertices)[InsertedVertexIndex].y;
 							for (auto iVertex = InsertedVertexIndex + 1; iVertex < FormVertexIndex; iVertex++) {
 								if ((*FormVertices)[iVertex].x < insertedRectangle.left) {
 									insertedRectangle.left = (*FormVertices)[iVertex].x;
@@ -10121,7 +10121,7 @@ void thred::internal::duinsfil() {
 		formRectangle.left += offset.x;
 		formRectangle.right += offset.x;
 	}
-	for (auto iVertex = InsertedVertexIndex; iVertex < FormVertexIndex; iVertex++) {
+	for (auto iVertex = InsertedVertexIndex; iVertex < FormVertices->size(); iVertex++) {
 		(*FormVertices)[iVertex].x += offset.x;
 		(*FormVertices)[iVertex].y += offset.y;
 	}
