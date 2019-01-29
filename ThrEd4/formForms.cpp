@@ -1167,8 +1167,10 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 void formForms::wavfrm() {
 	thred::unmsg();
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, (DLGPROC)ffi::wavprc)) {
-		auto       points    = std::vector<fPOINT>(IniFile.wavePoints);
+		auto       points = std::vector<fPOINT>{};
+		points.reserve(IniFile.wavePoints);
 		const auto saveIndex = FormVertexIndex;
+		// reuse regular polygon code to build the template for points
 		form::durpoli(IniFile.wavePoints);
 		form::mdufrm();
 		FormVertexIndex = saveIndex;
@@ -1178,16 +1180,20 @@ void formForms::wavfrm() {
 		while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 			const unsigned short iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
 
-			points[iPoint] = fPOINT{ -vertexIt[iNextVertex].x + vertexIt[waveIndex].x,
-				                     -vertexIt[iNextVertex].y + vertexIt[waveIndex].y };
+			points.push_back(
+				fPOINT{ -vertexIt[iNextVertex].x + vertexIt[waveIndex].x, -vertexIt[iNextVertex].y + vertexIt[waveIndex].y });
 			iPoint++;
 			waveIndex = iNextVertex;
 		}
 		const auto count           = iPoint;
 		auto       iVertex         = 0u;
 		auto       currentPosition = fPOINT{};
+		const auto formVerticesSize
+			= (IniFile.waveLobes * count) + 1 - IniFile.wavePoints; // account for vertices already allocated by durpoli above
+		FormVertices->resize(FormVertices->size() + formVerticesSize);
+		vertexIt = FormVertices->begin() + CurrentFormVertices; // resize may invalidate iterator
 		for (auto iLobe = 0u; iLobe < IniFile.waveLobes; iLobe++) {
-			if (iLobe & 1) {
+			if ((iLobe & 1) != 0u) {
 				for (auto index = 0u; index < count; index++) {
 					vertexIt[iVertex] = currentPosition;
 					iVertex++;
@@ -1214,7 +1220,7 @@ void formForms::wavfrm() {
 		SelectedForm->type        = FRMLINE;
 		SelectedForm->vertexCount = vertexCount;
 		FormVertexIndex += vertexCount;
-		form::frmout(FormIndex);
+		form::frmout(FormList->size() - 1u);
 		StateMap.reset(StateFlag::FORMSEL);
 		const auto selectedSize    = fPOINT{ SelectedForm->rectangle.right - SelectedForm->rectangle.left,
                                           SelectedForm->rectangle.top - SelectedForm->rectangle.bottom };
@@ -1234,7 +1240,7 @@ void formForms::wavfrm() {
 				    = (vertexIt[index].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
 			}
 		}
-		form::frmout(FormIndex);
+		form::frmout(FormList->size() - 1u);
 		for (auto index = 0u; index < vertexCount; index++) {
 			vertexIt[index].x -= SelectedForm->rectangle.left;
 			vertexIt[index].y -= SelectedForm->rectangle.bottom;
