@@ -2232,17 +2232,16 @@ void form::internal::chkbrd(unsigned& interleaveSequenceIndex2) {
 	}
 }
 
-void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints) {
-	auto vertexIt = FormVertices->begin() + SelectedForm->vertexIndex;
-	auto highX    = vertexIt[0].x;
-	auto lowX     = vertexIt[0].x;
-	VertexCount   = SelectedForm->vertexCount;
-	for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
-		if (vertexIt[iVertex].x > highX) {
-			highX = vertexIt[iVertex].x;
+void form::internal::fnvrt(std::vector<fPOINT>& currentFillVertices, std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints) {
+	auto highX = currentFillVertices[0].x;
+	auto lowX = currentFillVertices[0].x;
+	VertexCount = currentFillVertices.size();
+	for (auto fillVertex = std::next(currentFillVertices.begin(), 1); fillVertex < currentFillVertices.end(); fillVertex++) {
+		if (fillVertex->x > highX) {
+			highX = fillVertex->x;
 		}
-		if (vertexIt[iVertex].x < lowX) {
-			lowX = vertexIt[iVertex].x;
+		if (fillVertex->x < lowX) {
+			lowX = fillVertex->x;
 		}
 	}
 
@@ -2258,8 +2257,8 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 		currentX += step;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			const auto iNextVertex = (iVertex + 1) % VertexCount;
-			auto       point       = dPOINT{};
-			if (projv(currentX, vertexIt[iVertex], vertexIt[iNextVertex], point)) {
+			auto       point = dPOINT{};
+			if (projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
 				iLineCounter++;
 			}
 		}
@@ -2277,8 +2276,8 @@ void form::internal::fnvrt(std::vector<unsigned>& groupIndexSequence, std::vecto
 		auto iPoint = 0u;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			const auto iNextVertex = (iVertex + 1) % VertexCount;
-			auto       point       = dPOINT{};
-			if (projv(currentX, vertexIt[iVertex], vertexIt[iNextVertex], point)) {
+			auto       point = dPOINT{};
+			if (projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
 				const auto a = dPOINTLINE{ point.x, point.y, gsl::narrow<unsigned short>(iVertex) };
 				projectedPoints.push_back(a);
 				iPoint++;
@@ -2326,7 +2325,7 @@ void form::internal::fnang(std::vector<unsigned>& groupIndexSequence,
 	}
 	angledForm.vertexIndex = 0;
 	SelectedForm           = &angledForm;
-	fi::fnvrt(groupIndexSequence, lineEndpoints);
+	fi::fnvrt(*AngledFormVertices, groupIndexSequence, lineEndpoints);
 	SelectedForm = &((*FormList)[ClosestFormToCursor]);
 }
 
@@ -2348,7 +2347,7 @@ void form::internal::fnhor(std::vector<unsigned>& groupIndexSequence,
 	}
 	angledForm.vertexIndex = 0;
 	SelectedForm           = &angledForm;
-	fi::fnvrt(groupIndexSequence, lineEndpoints);
+	fi::fnvrt(*AngledFormVertices, groupIndexSequence, lineEndpoints);
 	SelectedForm = &((*FormList)[ClosestFormToCursor]);
 }
 
@@ -4936,7 +4935,7 @@ void form::refilfn() {
 			auto rotationAngle      = 0.0;
 			switch (SelectedForm->fillType) {
 			case VRTF: {
-				fi::fnvrt(groupIndexSequence, lineEndpoints);
+				fi::fnvrt(*WorkingFormVertices, groupIndexSequence, lineEndpoints);
 				WorkingFormVertices->clear();
 				WorkingFormVertices->reserve(SelectedForm->vertexCount);
 				auto startVertex = FormVertices->begin() + SelectedForm->vertexIndex;
