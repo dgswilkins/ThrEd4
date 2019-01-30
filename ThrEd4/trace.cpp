@@ -772,6 +772,7 @@ void trace::internal::dutrac() {
 			}
 		}
 		tracedPoints.clear();
+		tracedPoints.reserve(decimatedLine.size());
 		tracedPoints.push_back(decimatedLine[0]);
 		auto iNext = 0u;
 		for (auto iCurrent = 1u; iCurrent < decimatedLine.size(); iCurrent++) {
