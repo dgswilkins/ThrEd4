@@ -8173,30 +8173,65 @@ void thred::internal::delet() {
 	if (StateMap.testAndReset(StateFlag::FPSEL)) {
 		thred::savdo();
 		form::fvars(ClosestFormToCursor);
-		auto vertexMap         = boost::dynamic_bitset<>(VertexCount);
+		// dynamic bitset allows non-contiguous ranges of points to be deleted in later versions
+		auto vertexMap = boost::dynamic_bitset<>(VertexCount);
 		auto currentFormVertex = SelectedFormVertices.start;
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 			vertexMap.set(currentFormVertex);
 			currentFormVertex = form::pdir(currentFormVertex);
 		}
 		currentFormVertex = 0;
-		auto vertexIt     = FormVertices->begin() + CurrentFormVertices;
+		auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			if (!vertexMap.test(iVertex)) {
 				vertexIt[currentFormVertex++] = vertexIt[iVertex];
 			}
 		}
-		// ToDo - fix this to use erase
-		auto iVertex = VertexCount;
-		while (iVertex < FormVertices->size()) {
-			(*FormVertices)[currentFormVertex++] = (*FormVertices)[iVertex++];
-		}
-		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
-			(*FormList)[iForm].vertexIndex -= (gsl::narrow<size_t>(SelectedFormVertices.vertexCount) + 1);
+		auto eraseStart = std::next(FormVertices->cbegin(), gsl::narrow_cast<size_t>(CurrentFormVertices) + currentFormVertex);
+		auto eraseEnd = eraseStart + (VertexCount - currentFormVertex);
+		FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
+		const auto nextForm = gsl::narrow_cast<size_t>(ClosestFormToCursor) + 1;
+		for (auto iForm = std::next(FormList->begin(), nextForm); iForm < FormList->end(); iForm++) {
+			iForm->vertexIndex -= SelectedFormVertices.vertexCount + 1;
 		}
 		SelectedForm->vertexCount -= (SelectedFormVertices.vertexCount + 1);
 		form::frmout(ClosestFormToCursor);
 		if (SelectedForm->type == SAT) {
+			// Make sure the end guides are still valid
+			if (vertexMap.test(0) || vertexMap.test(1)) {
+				SelectedForm->wordParam = 0;
+				SatinEndGuide = 0;
+				SelectedForm->attribute &= 0xfe;
+			}
+			const auto iNext = SelectedForm->wordParam + 1;
+			if (vertexMap.test(SelectedForm->wordParam) || vertexMap.test(iNext)) {
+				SelectedForm->wordParam = 0;
+				SatinEndGuide = 0;
+			}
+
+			// ToDo - Is there a better way to do this than iterating through?
+			for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+				auto newGuideVal = 0u;
+				for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
+					if (vertexMap.test(iVertex)) {
+						if (CurrentFormGuides[iGuide].finish == iVertex) {
+							CurrentFormGuides[iGuide].finish = CurrentFormGuides[iGuide].start;
+						}
+						if (CurrentFormGuides[iGuide].start == iVertex) {
+							CurrentFormGuides[iGuide].start = CurrentFormGuides[iGuide].finish;
+						}
+					}
+					else {
+						if (CurrentFormGuides[iGuide].finish == iVertex) {
+							CurrentFormGuides[iGuide].finish = newGuideVal;
+						}
+						if (CurrentFormGuides[iGuide].start == iVertex) {
+							CurrentFormGuides[iGuide].start = newGuideVal;
+						}
+						newGuideVal++;
+					}
+				}
+			}
 			satin::satadj();
 		}
 		form::refil();
