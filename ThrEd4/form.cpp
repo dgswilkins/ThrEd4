@@ -1120,17 +1120,19 @@ bool form::closfrm() {
 		fi::px2stchf(screenCoordinate, point);
 		const auto layerCoded = ActiveLayer << 1;
 		const auto maxForm    = FormList->size();
+		const auto savedVertex = VertexCount;
 		for (auto iForm = 0u; iForm < maxForm; iForm++) {
 			if (StateMap.test(StateFlag::FRMSAM) && iForm == ClosestFormToCursor) {
 				continue;
 			}
-			auto&      formIter  = (*FormList)[iForm];
-			const auto formLayer = formIter.attribute & FRMLMSK;
+			auto&      currentForm  = (*FormList)[iForm];
+			VertexCount = currentForm.vertexCount;
+			const auto formLayer = currentForm.attribute & FRMLMSK;
 			if (!ActiveLayer || !formLayer || formLayer == layerCoded) {
-				auto vertexIt = FormVertices->begin() + formIter.vertexIndex;
+				auto vertexIt = FormVertices->begin() + currentForm.vertexIndex;
 				// find the closest line first and then find the closest vertex on that line
 				auto       length    = 0.0;
-				const auto sideCount = formIter.vertexCount;
+				const auto sideCount = currentForm.vertexCount;
 				for (auto iVertex = 0u; iVertex < sideCount; iVertex++) {
 					const auto param = fi::findDistanceToSide(vertexIt[iVertex], vertexIt[form::nxt(iVertex)], point, length);
 					if ((length < minimumLength) & (length >= 0)) {
@@ -1146,6 +1148,7 @@ bool form::closfrm() {
 				}
 			}
 		}
+		VertexCount = savedVertex;
 		thred::stch2pxr((*FormVertices)[(*FormList)[closestForm].vertexIndex + closestVertex]);
 		minimumLength = hypot(StitchCoordinatesPixels.x - screenCoordinate.x, StitchCoordinatesPixels.y - screenCoordinate.y);
 		if (minimumLength < CLOSENUF) {
