@@ -112,11 +112,10 @@ void satin::spltsat(SATCON currentGuide) {
 	FormIndex++;
 	const auto maxForm = formList.size();
 	if (ClosestFormToCursor < maxForm - 2) {
-		form::mvfltsb(&(*FormVertices)[FormVertexIndex + 1],
-		              &(*FormVertices)[FormVertexIndex - 1],
-		              FormVertexIndex - formList[ClosestFormToCursor + 2].vertexIndex);
+		form::mvfltsb(&(*FormVertices)[FormVertices->size() + 1],
+		              &(*FormVertices)[FormVertices->size() - 1],
+			FormVertices->size() - formList[ClosestFormToCursor + 2].vertexIndex);
 	}
-	FormVertexIndex += 2;
 	for (auto iForm = ClosestFormToCursor + 2; iForm < maxForm; iForm++) {
 		formList[iForm].vertexIndex += 2;
 	}
@@ -629,7 +628,6 @@ void satin::delspnt() {
 	auto closestVertexIt = FormVertices->begin() + ClosestVertexToCursor;
 	FormVertices->erase(closestVertexIt);
 	SelectedForm->vertexCount--;
-	FormVertexIndex--;
 	form::fvars(ClosestFormToCursor);
 	if (ClosestVertexToCursor > (SelectedForm->vertexCount) - 1) {
 		ClosestVertexToCursor = SelectedForm->vertexCount - 1;

@@ -255,7 +255,8 @@ namespace internal {
 	            std::vector<fPOINT>& destinationFormVertices,
 	            std::vector<FRMHED>& destinationFormList,
 	            unsigned int         formIndex,
-	            unsigned int&        formRelocationIndex);
+	            unsigned int&        formRelocationIndex, 
+		        unsigned int&        formSourceIndex);
 	void duflt(float& formOffset);
 	void dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish, unsigned& lastGroup);
 	void dupfn(double rotationAngle);

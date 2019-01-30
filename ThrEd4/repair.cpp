@@ -174,7 +174,7 @@ unsigned repair::internal::frmchkfn() {
 				break;
 			}
 		}
-		if (badData.flt != FormVertexIndex) {
+		if (badData.flt != FormVertices->size()) {
 			badData.attribute |= BADFLT;
 		}
 		if (badData.clip != ClipPoints->size()) {
@@ -236,7 +236,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 		auto& form = formList[iForm];
 		// ToDo - find a better way than pointer arithmetic
 		const auto vertexDifference = form.vertexIndex;
-		if (FormVertexIndex >= vertexDifference + form.vertexCount) {
+		if (FormVertices->size() >= vertexDifference + form.vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + form.vertexCount);
 			auto       sourceStart = FormVertices->begin() + form.vertexIndex;
 			auto       sourceEnd   = sourceStart + form.vertexCount;
@@ -247,8 +247,8 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			ri::bcup(iForm, badData);
 		}
 		else {
-			if (vertexDifference < FormVertexIndex) {
-				form.vertexCount = gsl::narrow<unsigned short>(FormVertexIndex - vertexDifference);
+			if (vertexDifference < FormVertices->size()) {
+				form.vertexCount = gsl::narrow<unsigned short>(FormVertices->size() - vertexDifference);
 				satin::delsac(iForm);
 				// ToDo - do we need to increase the size of vertexPoint?
 				// vertexPoint.resize(vertexPoint.size + form.vertexCount);
@@ -270,8 +270,9 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			}
 		}
 	}
+	//ToDo - is this needed?
 	if (flag) {
-		FormVertexIndex = iVertex;
+		FormVertices->resize(iVertex);
 	}
 	std::copy(vertexPoint.cbegin(), vertexPoint.cend(), FormVertices->begin());
 }
@@ -299,7 +300,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 			}
 			else {
 				if (clipDifference < ClipPoints->size()) {
-					form.lengthOrCount.clipCount = gsl::narrow<unsigned int>(FormVertexIndex - clipDifference);
+					form.lengthOrCount.clipCount = gsl::narrow<unsigned int>(FormVertices->size() - clipDifference);
 					clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
 					auto sourceStart = ClipPoints->begin() + form.angleOrClipData.clip;
 					auto sourceEnd   = sourceStart + form.lengthOrCount.clipCount;
@@ -329,7 +330,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 			}
 			else {
 				if (clipDifference < ClipPoints->size()) {
-					form.clipEntries = gsl::narrow<unsigned short>(FormVertexIndex - clipDifference);
+					form.clipEntries = gsl::narrow<unsigned short>(FormVertices->size() - clipDifference);
 					clipPoint.resize(clipPoint.size() + form.clipEntries);
 					auto sourceStart = ClipPoints->begin() + form.borderClipData;
 					auto sourceEnd   = sourceStart + form.clipEntries;
@@ -361,7 +362,7 @@ void repair::internal::repsat() {
 		if (form.type == SAT) {
 			// ToDo - pointer arithmetic to be fixed
 			const auto guideDifference = gsl::narrow<unsigned int>(form.satinOrAngle.guide - SatinGuides);
-			if (FormVertexIndex > guideDifference + form.vertexCount) {
+			if (FormVertices->size() > guideDifference + form.vertexCount) {
 				auto       sourceStart = form.satinOrAngle.guide;
 				auto       sourceEnd   = sourceStart + form.satinGuideCount;
 				const auto destination = stdext::make_checked_array_iterator(&SatinGuides[guideCount], 10000 - guideCount);

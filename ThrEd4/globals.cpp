@@ -109,7 +109,6 @@ std::wstring* FormOnOff;
 HPEN      FormPen;                // form pen
 HPEN      FormPen3px;             // three-pixel form pen
 HPEN      FormSelectedPen;        // form select pen
-unsigned  FormVertexIndex;        // next index to append form points
 
 std::vector<fPOINT>* FormVertices; // form points
 

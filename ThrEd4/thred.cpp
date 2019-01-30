@@ -1347,7 +1347,7 @@ void thred::internal::dudat() {
 	const auto     formCount = formList.size();
 	constexpr auto formSize  = sizeof(decltype(formList.back()));
 	const auto     size      = sizeof(BAKHED) + formSize * formList.size() + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
-	                  + sizeof((*FormVertices)[0]) * FormVertexIndex + sizeof((*ClipPoints)[0]) * ClipPoints->size()
+	                  + sizeof((*FormVertices)[0]) * FormVertices->size() + sizeof((*ClipPoints)[0]) * ClipPoints->size()
 	                  + sizeof(SatinGuides[0]) * satin::getGuideSize() + sizeof(UserColor)
 	                  + sizeof((*TexturePointsBuffer)[0]) * TextureIndex;
 	undoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);
@@ -1906,7 +1906,7 @@ void thred::internal::hupfn() {
 			CheckHoopRect.right  = vertexIt[0].x;
 			CheckHoopRect.left   = vertexIt[0].x;
 		}
-		for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
+		for (auto iVertex = 0u; iVertex < FormVertices->size(); iVertex++) {
 			if ((*FormVertices)[iVertex].x < CheckHoopRect.left) {
 				CheckHoopRect.left = (*FormVertices)[iVertex].x;
 			}
@@ -1921,7 +1921,7 @@ void thred::internal::hupfn() {
 			}
 		}
 	}
-	if (PCSHeader.stitchCount || FormVertexIndex || StateMap.test(StateFlag::HUPEX)) {
+	if (PCSHeader.stitchCount || FormVertices->size() || StateMap.test(StateFlag::HUPEX)) {
 		if (CheckHoopRect.left < 0 || CheckHoopRect.right > IniFile.hoopSizeX || CheckHoopRect.bottom < 0
 		    || CheckHoopRect.top > IniFile.hoopSizeY) {
 			StateMap.set(StateFlag::HUPEX);
@@ -1943,7 +1943,7 @@ void thred::internal::hupfn() {
 				StitchBuffer[iStitch].x += delta.x;
 				StitchBuffer[iStitch].y += delta.y;
 			}
-			for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
+			for (auto iVertex = 0u; iVertex < FormVertices->size(); iVertex++) {
 				(*FormVertices)[iVertex].x += delta.x;
 				(*FormVertices)[iVertex].y += delta.y;
 			}
@@ -4922,7 +4922,6 @@ void thred::internal::redbak() {
 			const auto& vertex = undoData->vertices[iVertex];
 			FormVertices->push_back(vertex);
 		}
-		FormVertexIndex = undoData->vertexCount;
 		satin::cpyUndoGuides(*undoData);
 		if (undoData->clipPointCount) {
 			ClipPoints->resize(undoData->clipPointCount);
@@ -5649,7 +5648,7 @@ void thred::internal::nuFil() {
 					if (thredHeader.formCount != 0) {
 						StateMap.reset(StateFlag::BADFIL);
 						ClipPoints->clear();
-						FormVertexIndex = 0;
+						FormVertices->clear();
 						satin::clearGuideSize();
 						MsgBuffer[0]     = 0;
 						auto bytesToRead = DWORD{ 0 };
@@ -5684,10 +5683,7 @@ void thred::internal::nuFil() {
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(FormVertices->back()));
 							ReadFile(FileHandle, FormVertices->data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								FormVertexIndex = BytesRead / sizeof((*FormVertices)[0]);
-								for (auto iVertex = FormVertexIndex; iVertex < thredHeader.vertexCount; iVertex++) {
-									(*FormVertices)[iVertex].x = (*FormVertices)[iVertex].y = 0;
-								}
+								FormVertices->resize(BytesRead / sizeof((*FormVertices)[0]));
 								StateMap.set(StateFlag::BADFIL);
 							}
 						}
@@ -5735,7 +5731,6 @@ void thred::internal::nuFil() {
 						}
 						// now re-create all the pointers/indexes in the form data
 						satin::clearGuideSize();
-						FormVertexIndex   = 0;
 						auto clipOffset   = 0u;
 						auto vertexOffset = 0u;
 						for (auto iForm = 0u; iForm < FormIndex; iForm++) {
@@ -6788,7 +6783,7 @@ void thred::internal::newFil() {
 	DisplayedColorBitmap.reset();
 	PCSBMPFileName[0]     = 0;
 	PCSHeader.stitchCount = 0;
-	FormVertexIndex       = 0;
+	FormVertices->clear();
 	TexturePointsBuffer->clear();
 	TextureIndex = 0;
 	ClipPoints->clear();
@@ -8137,7 +8132,10 @@ void thred::internal::setsped() {
 
 void thred::internal::deltot() {
 	DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
-	TextureIndex = FormIndex = FormVertexIndex = PCSHeader.stitchCount = 0;
+	TextureIndex = 0;
+	FormIndex = 0;
+	PCSHeader.stitchCount = 0;
+	FormVertices->clear();
 	satin::clearGuideSize();
 	StateMap.reset(StateFlag::GMRK);
 	rstAll();
@@ -8188,14 +8186,14 @@ void thred::internal::delet() {
 				vertexIt[currentFormVertex++] = vertexIt[iVertex];
 			}
 		}
+		// ToDo - fix this to use erase
 		auto iVertex = VertexCount;
-		while (iVertex < FormVertexIndex) {
+		while (iVertex < FormVertices->size()) {
 			(*FormVertices)[currentFormVertex++] = (*FormVertices)[iVertex++];
 		}
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
 			(*FormList)[iForm].vertexIndex -= (gsl::narrow<size_t>(SelectedFormVertices.vertexCount) + 1);
 		}
-		FormVertexIndex -= (SelectedFormVertices.vertexCount + 1);
 		SelectedForm->vertexCount -= (SelectedFormVertices.vertexCount + 1);
 		form::frmout(ClosestFormToCursor);
 		if (SelectedForm->type == SAT) {
@@ -8603,7 +8601,7 @@ void thred::internal::insfil() {
 						gethand(StitchBuffer, PCSHeader.stitchCount);
 						// ToDo - replace constants with sizes of data structures?
 						homscor = (FormIndex)*FRMW + gethand(StitchBuffer, PCSHeader.stitchCount) * HANDW
-						          + FormVertexIndex * FRMPW + PCSHeader.stitchCount * STCHW;
+						          + FormVertices->size() * FRMPW + PCSHeader.stitchCount * STCHW;
 						ReadFile(InsertedFileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, nullptr);
 					}
 					thred::savdo();
@@ -8620,10 +8618,10 @@ void thred::internal::insfil() {
 					                            + sizeof(CustomColor) + threadLength;
 					SetFilePointer(InsertedFileHandle, formDataOffset, nullptr, FILE_CURRENT);
 					auto insertedRectangle = fRECTANGLE{ 1e-9f, 1e9f, 1e-9f, 1e9f };
-					InsertedVertexIndex    = FormVertexIndex;
+					InsertedVertexIndex    = FormVertices->size();
 					InsertedFormIndex      = FormIndex;
 					if (fileHeader.formCount) {
-						auto newFormVertexIndex = FormVertexIndex;
+						auto newFormVertexIndex = FormVertices->size();
 						auto newSatinGuideIndex = satin::getGuideSize();
 						auto clipOffset         = ClipPoints->size();
 						auto textureOffset      = TexturePointsBuffer->size();
@@ -8734,7 +8732,7 @@ void thred::internal::insfil() {
 								textureOffset += formIter.fillInfo.texture.count;
 							}
 						}
-						if (newFormVertexIndex != FormVertexIndex) {
+						if (newFormVertexIndex != FormVertices->size()) {
 							StateMap.set(StateFlag::BADFIL);
 						}
 						if (newSatinGuideIndex != satin::getGuideSize()) {
@@ -8750,7 +8748,7 @@ void thred::internal::insfil() {
 							insertedRectangle.right = (*FormVertices)[InsertedVertexIndex].x;
 							insertedRectangle.bottom = (*FormVertices)[InsertedVertexIndex].y;
 							insertedRectangle.top = (*FormVertices)[InsertedVertexIndex].y;
-							for (auto iVertex = InsertedVertexIndex + 1; iVertex < FormVertexIndex; iVertex++) {
+							for (auto iVertex = InsertedVertexIndex + 1; iVertex < FormVertices->size(); iVertex++) {
 								if ((*FormVertices)[iVertex].x < insertedRectangle.left) {
 									insertedRectangle.left = (*FormVertices)[iVertex].x;
 								}
@@ -9139,7 +9137,7 @@ void thred::delinf() noexcept {
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		thi::infadj(&StitchBuffer[iStitch].x, &StitchBuffer[iStitch].y);
 	}
-	for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
+	for (auto iVertex = 0u; iVertex < FormVertices->size(); iVertex++) {
 		thi::infadj(&(*FormVertices)[iVertex].x, &(*FormVertices)[iVertex].y);
 	}
 }
@@ -9271,7 +9269,7 @@ void thred::rotfn(double rotationAngle, const dPOINT& rotationCenter) {
 		return;
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-		for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
+		for (auto iVertex = 0u; iVertex < FormVertices->size(); iVertex++) {
 			thred::rotflt((*FormVertices)[iVertex], rotationAngle, rotationCenter);
 		}
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -10254,7 +10252,7 @@ void thred::stchrct(fRECTANGLE& rectangle) noexcept {
 void thred::frmrct(fRECTANGLE& rectangle) noexcept {
 	rectangle.left = rectangle.right = (*FormVertices)[0].x;
 	rectangle.top = rectangle.bottom = (*FormVertices)[0].y;
-	for (auto iVertex = 0u; iVertex < FormVertexIndex; iVertex++) {
+	for (auto iVertex = 0u; iVertex < FormVertices->size(); iVertex++) {
 		if ((*FormVertices)[iVertex].x < rectangle.left) {
 			rectangle.left = (*FormVertices)[iVertex].x;
 		}
@@ -11557,13 +11555,13 @@ void thred::internal::fixpclp() {
 	auto       iNext  = form::nxt(ClosestVertexToCursor);
 	const auto count  = OutputIndex - 2;
 	form::fltspac(iNext, count);
+	SelectedForm->vertexCount += gsl::narrow<unsigned short>(count);
 	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
 	for (auto iOutput = 1u; iOutput < OutputIndex - 1; iOutput++) {
 		vertexIt[iNext].x = InterleaveSequence[iOutput].x + offset.x;
 		vertexIt[iNext].y = InterleaveSequence[iOutput].y + offset.y;
 		iNext++;
 	}
-	SelectedForm->vertexCount += gsl::narrow<unsigned short>(count);
 	form::refil();
 	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
@@ -18884,7 +18882,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto textureForm    = FRMHED{};
 
 		auto stretchBoxLine = std::vector<POINT>{};
-		stretchBoxLine.reserve(5); // stretch and expand
+		stretchBoxLine.resize(5); // stretch and expand
 
 		while (GetMessage(&Msg, nullptr, 0, 0)) {
 			StateMap.set(StateFlag::SAVACT);

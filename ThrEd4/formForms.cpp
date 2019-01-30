@@ -944,7 +944,6 @@ void formForms::dasyfrm() {
 		SelectedForm->type      = SAT;
 		SelectedForm->attribute = 1;
 	}
-	FormVertexIndex += iVertex;
 	StateMap.set(StateFlag::INIT);
 	form::frmout(FormList->size() - 1);
 	for (auto iMacroPetal = 0u; iMacroPetal < iVertex; iMacroPetal++) {
@@ -1073,7 +1072,6 @@ void formForms::setear() {
 		vertexIt[0].y = verticalPosition;
 		SelectedForm->vertexCount++;
 		NewFormVertexCount++;
-		FormVertexIndex++;
 		StateMap.set(StateFlag::FORMSEL);
 		form::fvars(FormList->size() - 1u);
 		form::frmout(FormList->size() - 1u);
@@ -1170,11 +1168,9 @@ void formForms::wavfrm() {
 		thred::savdo();
 		auto points = std::vector<fPOINT>{};
 		points.reserve(IniFile.wavePoints);
-		const auto saveIndex = FormVertexIndex;
 		// reuse regular polygon code to build the template for points
 		form::durpoli(IniFile.wavePoints);
 		form::mdufrm();
-		FormVertexIndex = saveIndex;
 		auto iPoint     = 0u;
 		auto waveIndex  = IniFile.waveStart;
 		auto vertexIt   = FormVertices->begin() + CurrentFormVertices;
@@ -1219,7 +1215,6 @@ void formForms::wavfrm() {
 		}
 		SelectedForm->type        = FRMLINE;
 		SelectedForm->vertexCount = vertexCount;
-		FormVertexIndex += vertexCount;
 		form::frmout(FormList->size() - 1u);
 		StateMap.reset(StateFlag::FORMSEL);
 		const auto selectedSize    = fPOINT{ SelectedForm->rectangle.right - SelectedForm->rectangle.left,
