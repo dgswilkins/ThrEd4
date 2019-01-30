@@ -8470,9 +8470,12 @@ void form::spltfrm() {
 		form::fvars(ClosestFormToCursor);
 		if (SelectedForm->type == SAT) {
 			if (SelectedForm->satinGuideCount) {
+				/*
+				// ToDo - Not sure why the fill, border and stitches are being deleted. Commented out of now
 				thred::delfstchs();
 				SelectedForm->fillType = 0;
 				SelectedForm->edgeType = 0;
+				*/
 				for (ActivePointIndex = 0; ActivePointIndex < SelectedForm->satinGuideCount; ActivePointIndex++) {
 					if (SelectedForm->satinOrAngle.guide[ActivePointIndex].start == ClosestVertexToCursor
 					    || SelectedForm->satinOrAngle.guide[ActivePointIndex].finish == ClosestVertexToCursor) {
