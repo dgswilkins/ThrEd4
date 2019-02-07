@@ -4935,12 +4935,12 @@ void form::refilfn() {
 			auto rotationAngle      = 0.0;
 			switch (SelectedForm->fillType) {
 			case VRTF: {
-				fi::fnvrt(*WorkingFormVertices, groupIndexSequence, lineEndpoints);
 				WorkingFormVertices->clear();
 				WorkingFormVertices->reserve(SelectedForm->vertexCount);
 				auto startVertex = FormVertices->begin() + SelectedForm->vertexIndex;
 				auto endVertex   = startVertex + SelectedForm->vertexCount;
 				WorkingFormVertices->insert(WorkingFormVertices->end(), startVertex, endVertex);
+				fi::fnvrt(*WorkingFormVertices, groupIndexSequence, lineEndpoints);
 				break;
 			}
 			case HORF: {
