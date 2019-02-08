@@ -856,10 +856,6 @@ void form::durpoli(unsigned vertexCount) {
 	if (vertexCount < 3) {
 		vertexCount = 3;
 	}
-	// ToDo - do we need to limit the number of vertices?
-	if (vertexCount > 100) {
-		vertexCount = 100;
-	}
 	const auto stepAngle = PI * 2 / vertexCount;
 	// ToDo - why 500?
 	const auto length = 500u / vertexCount * ZoomFactor * (static_cast<double>(UnzoomedRect.x) + UnzoomedRect.y)
