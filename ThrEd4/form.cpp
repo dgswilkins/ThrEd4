@@ -3092,10 +3092,25 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 		totalLength += clipSideLengths[vertex];
 		vertex = nextVertex;
 	}
-	auto clipGrid = RECT{ gsl::narrow<LONG>(std::floor(SelectedForm->rectangle.left / clipWidth)),
-		                  gsl::narrow<LONG>(std::ceil(SelectedForm->rectangle.top / ClipRectSize.cy + 1) + 2),
-		                  gsl::narrow<LONG>(std::ceil(SelectedForm->rectangle.right / clipWidth)),
-		                  gsl::narrow<LONG>(std::floor(SelectedForm->rectangle.bottom / ClipRectSize.cy - 1)) };
+	auto boundingRect = fRECTANGLE{ vertexIt[0].y, vertexIt[0].x, vertexIt[0].x, vertexIt[0].y };
+	for (auto iVertex = 1u; iVertex < currentVertexCount; iVertex++) {
+		if (vertexIt[iVertex].x > boundingRect.right) {
+			boundingRect.right = vertexIt[iVertex].x;
+		}
+		if (vertexIt[iVertex].x < boundingRect.left) {
+			boundingRect.left = vertexIt[iVertex].x;
+		}
+		if (vertexIt[iVertex].y > boundingRect.top) {
+			boundingRect.top = vertexIt[iVertex].y;
+		}
+		if (vertexIt[iVertex].y < boundingRect.bottom) {
+			boundingRect.bottom = vertexIt[iVertex].y;
+		}
+	}
+	auto clipGrid = RECT{ gsl::narrow<LONG>(std::floor(boundingRect.left / clipWidth)),
+		                  gsl::narrow<LONG>(std::ceil(boundingRect.top / ClipRectSize.cy + 1) + 2),
+		                  gsl::narrow<LONG>(std::ceil(boundingRect.right / clipWidth)),
+		                  gsl::narrow<LONG>(std::floor(boundingRect.bottom / ClipRectSize.cy - 1)) };
 
 	auto negativeOffset = 0l;
 	auto clipGridOffset = 0u;
@@ -3155,21 +3170,6 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 		}
 	}
 	iclpx.push_back(gsl::narrow<unsigned int>(regionCrossingData.size()));
-	auto boundingRect = fRECTANGLE{ vertexIt[0].y, vertexIt[0].x, vertexIt[0].x, vertexIt[0].y };
-	for (auto iVertex = 1u; iVertex < currentVertexCount; iVertex++) {
-		if (vertexIt[iVertex].x > boundingRect.right) {
-			boundingRect.right = vertexIt[iVertex].x;
-		}
-		if (vertexIt[iVertex].x < boundingRect.left) {
-			boundingRect.left = vertexIt[iVertex].x;
-		}
-		if (vertexIt[iVertex].y > boundingRect.top) {
-			boundingRect.top = vertexIt[iVertex].y;
-		}
-		if (vertexIt[iVertex].y < boundingRect.bottom) {
-			boundingRect.bottom = vertexIt[iVertex].y;
-		}
-	}
 	ActivePointIndex      = 0;
 	auto clipStitchPoints = std::vector<CLIPNT>{};
 	// Reserve some memory, but probably not enough
