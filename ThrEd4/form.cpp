@@ -1129,7 +1129,7 @@ bool form::closfrm() {
 				const auto sideCount = currentForm.vertexCount;
 				for (auto iVertex = 0u; iVertex < sideCount; iVertex++) {
 					const auto param = fi::findDistanceToSide(vertexIt[iVertex], vertexIt[form::nxt(iVertex)], point, length);
-					if ((length < minimumLength) & (length >= 0)) {
+					if ((length < minimumLength) && (length >= 0.0)) {
 						minimumLength = length;
 						closestForm   = iForm;
 						if (param < 0.5f) {
@@ -7080,7 +7080,7 @@ void form::clpfil() {
 }
 
 void form::internal::snpfn(const std::vector<unsigned>& xPoints, unsigned start, unsigned end, unsigned finish) {
-	if (finish - start) {
+	if (finish != start) {
 		for (auto current = start; current < end; current++) {
 			auto reference = xPoints[current];
 			for (auto iPoint = current + 1; iPoint < finish; iPoint++) {
