@@ -13487,6 +13487,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 						respac();
 						SelectedForm->fillType = VRTF;
 						SelectedForm->type     = FRMFPOLY;
+						clip::delmclp(ClosestFormToCursor);
 						break;
 					}
 
@@ -13498,6 +13499,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					if (SelectedForm->fillType) {
 						respac();
 						SelectedForm->fillType = HORF;
+						clip::delmclp(ClosestFormToCursor);
 						break;
 					}
 
@@ -13511,6 +13513,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 						// ToDo - should we be using the angle information already present
 						SelectedForm->fillType              = ANGF;
 						SelectedForm->angleOrClipData.angle = IniFile.fillAngle;
+						clip::delmclp(ClosestFormToCursor);
 						break;
 					}
 
@@ -13522,6 +13525,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					if (SelectedForm->fillType) {
 						respac();
 						SelectedForm->fillType = SATF;
+						clip::delmclp(ClosestFormToCursor);
 						break;
 					}
 
@@ -13540,6 +13544,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							SelectedForm->fillSpacing = LineSpacing;
 						}
 						form::chkcont();
+						clip::delclps(ClosestFormToCursor);
 						break;
 					}
 
