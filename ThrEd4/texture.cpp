@@ -1175,31 +1175,18 @@ void texture::internal::dutxfn(unsigned textureType) {
 void texture::internal::dutxmir() {
 	if (!TempTexturePoints->empty()) {
 		const auto centerLine = (TextureScreen.lines + 1u) >> 1;
-
+		auto       evenOffset = 1u - (TextureScreen.lines & 1);
 		texture::savtxt();
 		std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::txcmp);
-
 		auto iPoint = TempTexturePoints->size() - 1;
 		while ((*TempTexturePoints)[iPoint].line > centerLine && iPoint >= 0) {
 			iPoint--;
 		}
-		const auto iMirrorPoint = iPoint + 1;
-		// ToDo - What does this do? iPoint is not used beyond here
-		if (TextureScreen.lines & 1) {
-			while (iPoint >= 0) {
-				if ((*TempTexturePoints)[iPoint].line == centerLine) {
-					iPoint--;
-				}
-				else {
-					break;
-				}
-			}
-		}
-		TempTexturePoints->resize(iMirrorPoint);
+		TempTexturePoints->resize(iPoint + 1);
+		const auto iMirrorPoint = iPoint + evenOffset;
 		for (auto index = 0u; index < iMirrorPoint; index++) {
-			TempTexturePoints->push_back(
-			    { (*TempTexturePoints)[index].y,
-			      gsl::narrow<unsigned short>(TextureScreen.lines - (*TempTexturePoints)[index].line + 1) });
+			auto newLine = gsl::narrow<unsigned short>(TextureScreen.lines - (*TempTexturePoints)[index].line + 1);
+			TempTexturePoints->emplace_back(TXPNT{ (*TempTexturePoints)[index].y, newLine });
 		}
 		StateMap.set(StateFlag::RESTCH);
 	}
