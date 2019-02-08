@@ -789,8 +789,8 @@ void trace::internal::dutrac() {
 		FormList->push_back(FRMHED{});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
-		CurrentFormVertices  = FormVertices->size();
-		auto vertexIt        = FormVertices->begin() + CurrentFormVertices;
+		CurrentVertexIndex  = FormVertices->size();
+		auto vertexIt        = FormVertices->begin() + CurrentVertexIndex;
 		vertexIt[0].x        = tracedPoints[0].x * StitchBmpRatio.x;
 		vertexIt[0].y        = tracedPoints[0].y * StitchBmpRatio.y;
 		iNext                = 0;
@@ -1033,7 +1033,7 @@ void trace::internal::stch2bit(fPOINT& point) {
 void trace::internal::pxlin(unsigned int start, unsigned int finish) {
 	POINT line[2];
 
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+	auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
 	ti::stch2bit(vertexIt[start]);
 	line[0] = BitmapPoint;
 	ti::stch2bit(vertexIt[finish]);

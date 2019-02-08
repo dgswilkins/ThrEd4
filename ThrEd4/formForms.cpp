@@ -934,7 +934,7 @@ void formForms::dasyfrm() {
 			}
 		}
 	}
-	auto vertexIt = FormVertices->begin() + CurrentFormVertices;
+	auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
 		vertexIt[fref - 1].y += 0.01f;
 		vertexIt[fref].y += 0.01f;
@@ -1039,7 +1039,7 @@ void formForms::setear() {
 		auto twistStep = IniFile.tearTwistStep;
 		form::durpoli(IniFile.formSides);
 		form::fvars(FormList->size() - 1u);
-		auto       vertexIt         = FormVertices->begin() + CurrentFormVertices;
+		auto       vertexIt         = FormVertices->begin() + CurrentVertexIndex;
 		const auto count            = VertexCount / 4;
 		const auto middle           = (vertexIt[1].x - vertexIt[0].x) / 2.0f + vertexIt[0].x;
 		auto       step             = vertexIt[count + 1].y - vertexIt[count].y;
@@ -1062,7 +1062,7 @@ void formForms::setear() {
 		vertexIt[1].x += twistStep;
 		verticalPosition -= step / 2.0;
 		FormVertices->push_back(vertexIt[0]);
-		vertexIt = FormVertices->begin() + CurrentFormVertices; // iterator invalidated by push_back
+		vertexIt = FormVertices->begin() + CurrentVertexIndex; // iterator invalidated by push_back
 		if (twistStep) {
 			vertexIt[0].x = vertexIt[1].x + twistStep / 4.0;
 		}
@@ -1173,7 +1173,7 @@ void formForms::wavfrm() {
 		form::mdufrm();
 		auto iPoint     = 0u;
 		auto waveIndex  = IniFile.waveStart;
-		auto vertexIt   = FormVertices->begin() + CurrentFormVertices;
+		auto vertexIt   = FormVertices->begin() + CurrentVertexIndex;
 		while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 			const unsigned short iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
 
@@ -1188,7 +1188,7 @@ void formForms::wavfrm() {
 		const auto formVerticesSize
 		    = (IniFile.waveLobes * count) + 1 - IniFile.wavePoints; // account for vertices already allocated by durpoli above
 		FormVertices->resize(FormVertices->size() + formVerticesSize);
-		vertexIt = FormVertices->begin() + CurrentFormVertices; // resize may invalidate iterator
+		vertexIt = FormVertices->begin() + CurrentVertexIndex; // resize may invalidate iterator
 		for (auto iLobe = 0u; iLobe < IniFile.waveLobes; iLobe++) {
 			if ((iLobe & 1) != 0u) {
 				for (auto index = 0u; index < count; index++) {

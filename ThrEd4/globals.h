@@ -113,7 +113,7 @@ extern int*         ColorBarSize;
 extern HCURSOR      CrossCursor;
 extern SATCON*      CurrentFormGuides;
 extern unsigned int CurrentFormGuidesCount;
-extern unsigned int CurrentFormVertices;
+extern unsigned int CurrentVertexIndex;
 
 extern std::vector<HWND>* DefaultColorWin;
 
