@@ -152,7 +152,7 @@ unsigned repair::internal::frmchkfn() {
 			}
 			if (form.type == SAT && form.satinGuideCount) {
 				if (!(badData.attribute & BADSAT)) {
-					if (badData.guideCount == gsl::narrow<unsigned int>(form.satinOrAngle.guide - SatinGuides)) {
+					if (badData.guideCount == form.satinOrAngle.guide) {
 						badData.guideCount += form.satinGuideCount;
 					}
 					else {
@@ -361,22 +361,22 @@ void repair::internal::repsat() {
 		auto& form = (*FormList)[iForm];
 		if (form.type == SAT) {
 			// ToDo - pointer arithmetic to be fixed
-			const auto guideDifference = gsl::narrow<unsigned int>(form.satinOrAngle.guide - SatinGuides);
+			const auto guideDifference = form.satinOrAngle.guide;
 			if (FormVertices->size() > guideDifference + form.vertexCount) {
-				auto       sourceStart = form.satinOrAngle.guide;
-				auto       sourceEnd   = sourceStart + form.satinGuideCount;
-				const auto destination = stdext::make_checked_array_iterator(&SatinGuides[guideCount], 10000 - guideCount);
+				auto       sourceStart = SatinGuides->begin() + form.satinOrAngle.guide;
+				auto       sourceEnd = sourceStart + form.satinGuideCount;
+				const auto destination = SatinGuides->begin() + guideCount;
 				std::copy(sourceStart, sourceEnd, destination);
-				form.satinOrAngle.guide = &SatinGuides[guideCount];
+				form.satinOrAngle.guide = guideCount;
 				guideCount += form.satinGuideCount;
 				ri::bcup(iForm, badData);
 			}
 			else {
-				if (guideDifference < satin::getGuideSize()) {
-					form.satinGuideCount   = gsl::narrow<unsigned short>(satin::getGuideSize() - guideDifference);
-					auto       sourceStart = form.satinOrAngle.guide;
-					auto       sourceEnd   = sourceStart + form.satinGuideCount;
-					const auto destination = stdext::make_checked_array_iterator(&SatinGuides[guideCount], 10000 - guideCount);
+				if (guideDifference < SatinGuides->size()) {
+					form.satinGuideCount = gsl::narrow<unsigned short>(SatinGuides->size() - guideDifference);
+					auto       sourceStart = SatinGuides->begin() + form.satinOrAngle.guide;
+					auto       sourceEnd = sourceStart + form.satinGuideCount;
+					const auto destination = SatinGuides->begin() + guideCount;
 					std::copy(sourceStart, sourceEnd, destination);
 					ri::bcup(iForm, badData);
 				}

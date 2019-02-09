@@ -808,13 +808,11 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 			OSequence[OutputIndex].y = form::midl(vertexIt[iVertex].y, vertexIt[iVertex + 1].y);
 			OutputIndex++;
 		}
-		const auto* guide = SelectedForm->satinOrAngle.guide;
-		if (guide) {
-			for (auto iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--) {
-				OSequence[OutputIndex].x = form::midl(vertexIt[guide[iGuide - 1].finish].x, vertexIt[guide[iGuide - 1].start].x);
-				OSequence[OutputIndex].y = form::midl(vertexIt[guide[iGuide - 1].finish].y, vertexIt[guide[iGuide - 1].start].y);
-				OutputIndex++;
-			}
+		auto guideIt = SatinGuides->cbegin() + SelectedForm->satinOrAngle.guide;
+		for (auto iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--) {
+			OSequence[OutputIndex].x = form::midl(vertexIt[guideIt[iGuide - 1].finish].x, vertexIt[guideIt[iGuide - 1].start].x);
+			OSequence[OutputIndex].y = form::midl(vertexIt[guideIt[iGuide - 1].finish].y, vertexIt[guideIt[iGuide - 1].start].y);
+			OutputIndex++;
 		}
 		if (SelectedForm->attribute & FRMEND) {
 			OSequence[OutputIndex].x = form::midl(vertexIt[0].x, vertexIt[1].x);

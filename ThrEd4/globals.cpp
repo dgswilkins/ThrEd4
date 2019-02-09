@@ -81,9 +81,9 @@ unsigned        ClosestPointIndex;      // index of closest point
 unsigned int    ClosestVertexToCursor;  // formOrigin closest to the cursor
 int*            ColorBarSize;           // Color bar width scaled for DPI
 HCURSOR         CrossCursor;            // cross
-SATCON*         CurrentFormGuides;      // connections in the currently selecteed form
-unsigned int    CurrentFormGuidesCount; // number of connections in the currently selected form
-unsigned int    CurrentVertexIndex;    // points in the currently selected form
+unsigned int    CurrentFormGuides;      // guide index in the currently selected form
+unsigned int    CurrentFormGuidesCount; // number of guides in the currently selected form
+unsigned int    CurrentVertexIndex;     // points in the currently selected form
 
 std::vector<HWND>*            DefaultColorWin;    // default color windows
 
@@ -175,7 +175,9 @@ std::vector<POINT>* RubberBandLine; // points to form points to be moved
 
 unsigned int SatinEndGuide;             // satin end guide for the currently selected form
 unsigned int SatinGuideIndex;           // next index to append satin connect points
-SATCON       SatinGuides[MAXSAC];       // satin form connects
+
+std::vector<SATCON>*       SatinGuides;       // satin form connects
+
 RECT         scRct;                     //
 unsigned*    screenDPI;                 // screen DPI
 int*         ScrollSize;                // Scroll bar width scaled for DPI

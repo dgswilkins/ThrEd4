@@ -927,10 +927,10 @@ void formForms::dasyfrm() {
 			                                referencePoint.y + sin(angle) * distanceFromDaisyCenter });
 			iVertex++;
 			angle += petalSegmentAngle;
+			auto guideIt = SatinGuides->begin() + SelectedForm->satinOrAngle.guide;
 			if (UserFlagMap.test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
-				SelectedForm->satinOrAngle.guide[iMacroPetal].start
-				    = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1;
-				SelectedForm->satinOrAngle.guide[iMacroPetal].finish = iVertex;
+				guideIt[iMacroPetal].start  = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1;
+				guideIt[iMacroPetal].finish = iVertex;
 			}
 		}
 	}

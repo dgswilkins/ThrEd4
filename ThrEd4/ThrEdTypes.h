@@ -1053,8 +1053,26 @@ public:
 	unsigned int start;
 	unsigned int finish;
 
+	SATCON() noexcept;
+	// SATCON(SATCON&&) = default;
+	// SATCON& operator=(const SATCON& rhs) = default;
+	// SATCON& operator=(SATCON&&) = default;
+	//~SATCON() = default;
+
+	explicit SATCON(const SATCONOUT& rhs) noexcept;
+	inline SATCON(unsigned int rStart, unsigned int rFinish) noexcept;
 	inline SATCON& operator=(const SATCONOUT& rhs) noexcept;
 };
+
+inline SATCON::SATCON() noexcept {
+	start = 0u;
+	finish = 0u;
+}
+
+inline SATCON::SATCON(unsigned int rStart, unsigned int rFinish) noexcept
+	: start(rStart)
+	, finish(rFinish) {
+}
 
 class SATCONOUT
 {
@@ -1089,8 +1107,13 @@ inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) {
 	return *this;
 }
 
+inline SATCON::SATCON(const SATCONOUT& rhs) noexcept {
+	start = rhs.start;
+	finish = rhs.finish;
+}
+
 inline SATCON& SATCON::operator=(const SATCONOUT& rhs) noexcept {
-	start  = rhs.start;
+	start = rhs.start;
 	finish = rhs.finish;
 
 	return *this;
@@ -1104,8 +1127,18 @@ public:
 	unsigned int clip; // pointer to start of fill clipboard data
 	SATCON       guide;
 
+	FANGCLP() noexcept;
+	// FANGCLP(FANGCLP&&) = default;
+	// FANGCLP& operator=(const FANGCLP& rhs) = default;
+	// FANGCLP& operator=(FANGCLP&&) = default;
+	//~FANGCLP() = default;
+
 	inline FANGCLP& operator=(const FANGCLPOUT& rhs) noexcept;
 };
+
+inline FANGCLP::FANGCLP() noexcept {
+	clip = 0;
+}
 
 union FANGCLPOUT {
 public:
@@ -1190,7 +1223,7 @@ union SATINANGLEOUT;
 
 union SATINANGLE {
 public:
-	SATCON* guide;
+	unsigned int guide;
 	float   angle;
 
 	inline SATINANGLE& operator=(const SATINANGLEOUT& rhs) noexcept;

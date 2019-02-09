@@ -111,7 +111,7 @@ extern unsigned     ClosestPointIndex;
 extern unsigned int ClosestVertexToCursor;
 extern int*         ColorBarSize;
 extern HCURSOR      CrossCursor;
-extern SATCON*      CurrentFormGuides;
+extern unsigned int CurrentFormGuides;
 extern unsigned int CurrentFormGuidesCount;
 extern unsigned int CurrentVertexIndex;
 
@@ -208,7 +208,9 @@ extern std::vector<POINT>* RubberBandLine;
 
 extern unsigned int SatinEndGuide;
 extern unsigned int SatinGuideIndex;
-extern SATCON       SatinGuides[MAXSAC];
+
+extern std::vector<SATCON>*       SatinGuides;
+
 extern RECT         scRct;
 extern unsigned*    screenDPI;
 extern int*         ScrollSize;

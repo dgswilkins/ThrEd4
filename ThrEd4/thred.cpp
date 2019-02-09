@@ -1374,18 +1374,18 @@ void thred::internal::dudat() {
 			          FormVertices->cend(),
 			          stdext::make_checked_array_iterator(backupData->vertices, FormVertices->size()));
 		}
-		backupData->guideCount = satin::getGuideSize();
+		backupData->guideCount = SatinGuides->size();
 		backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertices->size()]);
-		if (satin::getGuideSize()) {
-			std::copy(SatinGuides,
-			          SatinGuides + satin::getGuideSize(),
+		if (!SatinGuides->empty()) {
+			std::copy(SatinGuides->cbegin(),
+			          SatinGuides->cend(),
 			          stdext::make_checked_array_iterator(backupData->guide, backupData->guideCount));
 		}
 		backupData->clipPointCount = ClipPoints->size();
 		backupData->clipPoints     = convert_ptr<fPOINT*>(&backupData->guide[satin::getGuideSize()]);
 		if (!ClipPoints->empty()) {
-			std::copy(ClipPoints->begin(),
-			          ClipPoints->end(),
+			std::copy(ClipPoints->cbegin(),
+			          ClipPoints->cend(),
 			          stdext::make_checked_array_iterator(backupData->clipPoints, backupData->clipPointCount));
 		}
 		backupData->colors = convert_ptr<COLORREF*>(&backupData->clipPoints[ClipPoints->size()]);
@@ -3796,8 +3796,9 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 			}
 			if (srcForm.type == SAT) {
 				outForms.back().satinGuideCount = gsl::narrow<unsigned short>(srcForm.satinGuideCount);
+				auto guideIt = SatinGuides->cbegin() + srcForm.satinOrAngle.guide;
 				for (auto iGuide = 0u; iGuide < srcForm.satinGuideCount; iGuide++) {
-					guides.push_back(SATCONOUT{ srcForm.satinOrAngle.guide[iGuide] });
+					guides.push_back(SATCONOUT{ guideIt[iGuide] });
 				}
 			}
 			if (clip::isclp(srcForm)) {
@@ -4909,19 +4910,33 @@ void thred::internal::redbak() {
 		}
 		PCSHeader.stitchCount = gsl::narrow<unsigned short>(undoData->stitchCount);
 		UnzoomedRect          = undoData->zoomRect;
-		FormList->resize(undoData->formCount);
-		if (undoData->formCount) {
+		if (undoData->formCount != 0u) {
+			FormList->resize(undoData->formCount);
 			std::copy(undoData->forms, undoData->forms + undoData->formCount, FormList->begin());
 		}
-		FormIndex = undoData->formCount;
-		FormVertices->resize(undoData->vertexCount);
-		if (undoData->vertexCount) {
+		else {
+			FormList->clear();
+		}
+		if (undoData->vertexCount != 0u) {
+			FormVertices->resize(undoData->vertexCount);
 			std::copy(undoData->vertices, undoData->vertices + undoData->vertexCount, FormVertices->begin());
 		}
-		satin::cpyUndoGuides(*undoData);
-		ClipPoints->resize(undoData->clipPointCount);
-		if (undoData->clipPointCount) {
+		else {
+			FormVertices->clear();
+		}
+		if (undoData->guideCount != 0u) {
+			SatinGuides->resize(undoData->guideCount);
+			std::copy(undoData->guide, undoData->guide + undoData->guideCount, SatinGuides->begin());
+		}
+		else {
+			SatinGuides->clear();
+		}
+		if (undoData->clipPointCount != 0u) {
+			ClipPoints->resize(undoData->clipPointCount);
 			std::copy(undoData->clipPoints, undoData->clipPoints + undoData->clipPointCount, ClipPoints->begin());
+		}
+		else {
+			ClipPoints->clear();
 		}
 		auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
 		std::copy(undoData->colors, undoData->colors + sizeColors, UserColor);
@@ -5688,15 +5703,18 @@ void thred::internal::nuFil() {
 							prtred();
 							return;
 						}
-						if (thredHeader.dlineCount) {
-							auto inSatinGuides = std::vector<SATCONOUT>{};
-							inSatinGuides.resize(thredHeader.dlineCount);
-							bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(inSatinGuides[0]));
+						if (thredHeader.dlineCount != 0u) {
+							auto inSatinGuides = std::vector<SATCONOUT>(thredHeader.dlineCount);
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(decltype(inSatinGuides.back())));
 							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
+								inSatinGuides.resize(BytesRead / sizeof(decltype(inSatinGuides.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), SatinGuides);
+							SatinGuides->reserve(inSatinGuides.size());
+							for (auto& guide : inSatinGuides) {
+								SatinGuides->push_back(SATCON{ guide });
+							}
 						}
 						if (thredHeader.clipDataCount) {
 							ClipPoints->resize(thredHeader.clipDataCount);
@@ -5726,16 +5744,17 @@ void thred::internal::nuFil() {
 							displayText::bfilmsg();
 						}
 						// now re-create all the pointers/indexes in the form data
-						satin::clearGuideSize();
 						auto clipOffset   = 0u;
 						auto vertexOffset = 0u;
+						auto guideOffset = 0u;
 						for (auto iForm = 0u; iForm < FormIndex; iForm++) {
 							auto& form       = (*FormList)[iForm];
 							form.vertexIndex = vertexOffset;
 							vertexOffset += form.vertexCount;
 							if (form.type == SAT) {
-								if (form.satinGuideCount) {
-									form.satinOrAngle.guide = satin::adsatk(form.satinGuideCount);
+								if (form.satinGuideCount != 0u) {
+									form.satinOrAngle.guide = guideOffset;
+									guideOffset += form.satinGuideCount;
 								}
 							}
 							// ToDo - do we still need to do this in v3? (we can store the offset safely in v3 where we could not
@@ -7374,7 +7393,7 @@ void thred::internal::duclip() {
 			if (!SelectedFormList->empty()) {
 				auto msiz   = 0u;
 				auto length = 0u;
-				for (auto selectedForm : (*SelectedFormList)) {
+				for (auto& selectedForm : (*SelectedFormList)) {
 					ClosestFormToCursor = selectedForm;
 					form::fvars(ClosestFormToCursor);
 					length += sizfclp();
@@ -7383,20 +7402,20 @@ void thred::internal::duclip() {
 				ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, gsl::narrow<size_t>(msiz) + length);
 				GSL_SUPPRESS(26429) {
 					if (ThrEdClipPointer) {
-						ClipFormsHeader            = *(static_cast<FORMSCLIP**>(ThrEdClipPointer));
+						ClipFormsHeader            = *(gsl::narrow_cast<FORMSCLIP**>(ThrEdClipPointer));
 						ClipFormsHeader->clipType  = CLP_FRMS;
 						ClipFormsHeader->formCount = gsl::narrow<unsigned short>(SelectedFormList->size());
 						// Skip past the header
 						auto forms = convert_ptr<FRMHED*>(&ClipFormsHeader[1]);
 						auto iForm = 0u;
-						for (auto selectedForm : (*SelectedFormList)) {
+						for (auto& selectedForm : (*SelectedFormList)) {
 							SelectedForm   = &((*FormList)[selectedForm]);
 							forms[iForm++] = (*FormList)[selectedForm];
 						}
 						// skip past the forms
 						auto formVertices = convert_ptr<fPOINT*>(&forms[iForm]);
 						auto iVertex      = 0u;
-						for (auto selectedForm : (*SelectedFormList)) {
+						for (auto& selectedForm : (*SelectedFormList)) {
 							SelectedForm  = &((*FormList)[selectedForm]);
 							auto vertexIt = FormVertices->begin() + SelectedForm->vertexIndex;
 							for (auto iSide = 0u; iSide < SelectedForm->vertexCount; iSide++) {
@@ -7406,18 +7425,19 @@ void thred::internal::duclip() {
 						// skip past the vertex list
 						auto guides     = convert_ptr<SATCON*>(&formVertices[iVertex]);
 						auto guideCount = 0u;
-						for (auto selectedForm : (*SelectedFormList)) {
+						for (auto& selectedForm : (*SelectedFormList)) {
 							SelectedForm = &((*FormList)[selectedForm]);
 							if (SelectedForm->type == SAT) {
+								auto guideIt = SatinGuides->cbegin() + SelectedForm->satinOrAngle.guide;
 								for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-									guides[guideCount++] = SelectedForm->satinOrAngle.guide[iGuide];
+									guides[guideCount++] = guideIt[iGuide];
 								}
 							}
 						}
 						// skip past the guides
 						auto points     = convert_ptr<fPOINT*>(&guides[guideCount]);
 						auto pointCount = 0;
-						for (auto selectedForm : (*SelectedFormList)) {
+						for (auto& selectedForm : (*SelectedFormList)) {
 							SelectedForm = &((*FormList)[selectedForm]);
 							if (clip::isclpx(selectedForm)) {
 								auto offsetStart = ClipPoints->begin() + SelectedForm->angleOrClipData.clip;
@@ -7438,7 +7458,7 @@ void thred::internal::duclip() {
 						auto textures     = convert_ptr<TXPNT*>(&points[pointCount]);
 						auto textureCount = 0;
 						iForm             = 0;
-						for (auto selectedForm : (*SelectedFormList)) {
+						for (auto& selectedForm : (*SelectedFormList)) {
 							SelectedForm = &((*FormList)[selectedForm]);
 							if (texture::istx(selectedForm)) {
 								auto startPoint = TexturePointsBuffer->cbegin() + SelectedForm->fillInfo.texture.index;
@@ -7456,7 +7476,7 @@ void thred::internal::duclip() {
 				}
 				CloseClipboard();
 				auto formMap = boost::dynamic_bitset<>(FormIndex);
-				for (auto selectedForm : (*SelectedFormList)) {
+				for (auto& selectedForm : (*SelectedFormList)) {
 					formMap.set(selectedForm);
 				}
 				// ToDo - what is astch used for?
@@ -7479,7 +7499,7 @@ void thred::internal::duclip() {
 					Clip        = RegisterClipboardFormat(PcdClipFormat);
 					ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2);
 					if (ClipPointer) {
-						ClipStitchData    = *(static_cast<CLPSTCH**>(ClipPointer));
+						ClipStitchData    = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
 						auto iStitch      = MAXITEMS;
 						auto iDestination = 0u;
 						savclp(0, iStitch);
@@ -7515,8 +7535,9 @@ void thred::internal::duclip() {
 							auto guides = convert_ptr<SATCON*>(&formVertices[VertexCount]);
 							auto iGuide = 0u;
 							if (SelectedForm->type == SAT) {
+								auto guideIt = SatinGuides->cbegin() + SelectedForm->satinOrAngle.guide;
 								for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-									guides[iGuide] = SelectedForm->satinOrAngle.guide[iGuide];
+									guides[iGuide] = guideIt[iGuide];
 								}
 							}
 							auto mclp  = convert_ptr<fPOINT*>(&guides[iGuide]);
@@ -8206,23 +8227,24 @@ void thred::internal::delet() {
 			}
 
 			// ToDo - Is there a better way to do this than iterating through?
+			auto guideIt = SatinGuides->begin() + CurrentFormGuides;
 			for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 				auto newGuideVal = 0u;
 				for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 					if (vertexMap.test(iVertex)) {
-						if (CurrentFormGuides[iGuide].finish == iVertex) {
-							CurrentFormGuides[iGuide].finish = CurrentFormGuides[iGuide].start;
+						if (guideIt[iGuide].finish == iVertex) {
+							guideIt[iGuide].finish = guideIt[iGuide].start;
 						}
-						if (CurrentFormGuides[iGuide].start == iVertex) {
-							CurrentFormGuides[iGuide].start = CurrentFormGuides[iGuide].finish;
+						if (guideIt[iGuide].start == iVertex) {
+							guideIt[iGuide].start = guideIt[iGuide].finish;
 						}
 					}
 					else {
-						if (CurrentFormGuides[iGuide].finish == iVertex) {
-							CurrentFormGuides[iGuide].finish = newGuideVal;
+						if (guideIt[iGuide].finish == iVertex) {
+							guideIt[iGuide].finish = newGuideVal;
 						}
-						if (CurrentFormGuides[iGuide].start == iVertex) {
-							CurrentFormGuides[iGuide].start = newGuideVal;
+						if (guideIt[iGuide].start == iVertex) {
+							guideIt[iGuide].start = newGuideVal;
 						}
 						newGuideVal++;
 					}
@@ -8340,9 +8362,9 @@ void thred::internal::delet() {
 							break;
 						}
 					}
+					auto guideIt = SatinGuides->cbegin() + SelectedForm->satinOrAngle.guide;
 					for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-						if (SelectedForm->satinOrAngle.guide[iGuide].start == ClosestVertexToCursor
-						    || SelectedForm->satinOrAngle.guide[iGuide].finish == ClosestVertexToCursor) {
+						if (guideIt[iGuide].start == ClosestVertexToCursor || guideIt[iGuide].finish == ClosestVertexToCursor) {
 							satin::delcon(iGuide);
 							satinFlag = true;
 							break;
@@ -8711,7 +8733,7 @@ void thred::internal::insfil() {
 								inSatinGuides.resize(BytesRead / sizeof(inSatinGuides[0]));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), SatinGuides);
+							std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), SatinGuides->begin());
 							newSatinGuideIndex += gsl::narrow<unsigned int>(inSatinGuides.size());
 						}
 						if (fileHeader.clipDataCount) {
@@ -9312,11 +9334,11 @@ void thred::rotfn(double rotationAngle, const dPOINT& rotationCenter) {
 		form::selal();
 		return;
 	}
-	auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
 	if (StateMap.testAndReset(StateFlag::FRMSROT)) {
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
+			auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				thred::rotflt(vertexIt[iVertex], rotationAngle, rotationCenter);
 			}
@@ -9328,6 +9350,7 @@ void thred::rotfn(double rotationAngle, const dPOINT& rotationCenter) {
 	else {
 		if (StateMap.testAndReset(StateFlag::FRMROT)) {
 			form::fvars(ClosestFormToCursor);
+			auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				thred::rotflt(vertexIt[iVertex], rotationAngle, rotationCenter);
 			}
@@ -15233,7 +15256,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							return true;
 						}
 						// ToDo - Add more information to the clipboard so that memory can be allocated
-						ClipFormsHeader = static_cast<FORMSCLIP*>(ClipPointer);
+						ClipFormsHeader = gsl::narrow_cast<FORMSCLIP*>(ClipPointer);
 						if (ClipFormsHeader->clipType == CLP_FRMS) {
 							auto iForm     = 0u;
 							ClipFormsCount = ClipFormsHeader->formCount;
@@ -15261,8 +15284,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								SelectedForm = &((*FormList)[FormIndex + iForm]);
 								if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
 									SelectedForm->satinOrAngle.guide = satin::adsatk(SelectedForm->satinGuideCount);
+									auto guideIt = SatinGuides->begin() + SelectedForm->satinOrAngle.guide;
 									for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-										SelectedForm->satinOrAngle.guide[iGuide] = guides[currentGuide++];
+										guideIt[iGuide] = guides[currentGuide++];
 									}
 								}
 							}
@@ -15326,7 +15350,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							StateMap.set(StateFlag::FUNSCLP);
 						}
 						else {
-							ClipFormHeader = static_cast<FORMCLIP*>(ClipPointer);
+							ClipFormHeader = gsl::narrow_cast<FORMCLIP*>(ClipPointer);
 							if (ClipFormHeader->clipType == CLP_FRM) {
 								FormMoveDelta.x = 0.0f;
 								FormMoveDelta.y = 0.0f;
@@ -15346,8 +15370,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 									formIter.satinOrAngle.guide = satin::adsatk(formIter.satinGuideCount);
 									std::copy(guides,
 									          guides + formIter.satinGuideCount,
-									          stdext::make_checked_array_iterator(formIter.satinOrAngle.guide,
-									                                              formIter.satinGuideCount));
+									          SatinGuides->begin() + formIter.satinOrAngle.guide);
 								}
 								auto clipData  = convert_ptr<fPOINT*>(&guides[0]);
 								auto clipCount = 0u;
@@ -18657,15 +18680,13 @@ void thred::internal::sachk() {
 	for (auto iForm = 0ul; iForm < FormIndex; iForm++) {
 		const auto& form = (*FormList)[iForm];
 		if (form.type == SAT && form.satinGuideCount) {
-			const auto* guide = form.satinOrAngle.guide;
-			if (guide) {
-				for (auto iGuide = 0u; iGuide < form.satinGuideCount; iGuide++) {
-					if (guide[iGuide].start > form.vertexCount || guide[iGuide].finish > form.vertexCount) {
-						const auto bakclo   = ClosestFormToCursor;
-						ClosestFormToCursor = iForm;
-						satin::delsac(iForm);
-						ClosestFormToCursor = bakclo;
-					}
+			auto guideIt = SatinGuides->cbegin() + form.satinOrAngle.guide;
+			for (auto iGuide = 0u; iGuide < form.satinGuideCount; iGuide++) {
+				if (guideIt[iGuide].start > form.vertexCount || guideIt[iGuide].finish > form.vertexCount) {
+					const auto bakclo   = ClosestFormToCursor;
+					ClosestFormToCursor = iForm;
+					satin::delsac(iForm);
+					ClosestFormToCursor = bakclo;
 				}
 			}
 		}
@@ -18818,6 +18839,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		PreviousNames                    = &private_PreviousNames;
 		auto private_DesignerName        = std::wstring{};
 		DesignerName                     = &private_DesignerName;
+		auto private_SatinGuides = std::vector<SATCON>{};
+		SatinGuides = &private_SatinGuides;
+
 		auto private_AuxName             = fs::path{};
 		auto private_ThrName             = fs::path{};
 		auto private_WorkingFileName     = fs::path{};

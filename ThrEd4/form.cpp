@@ -197,19 +197,20 @@ void form::fsizpar() noexcept {
 void form::chkcont() {
 	fsizpar();
 	if (SelectedForm->fillType != CONTF) {
+		auto guideIt = SatinGuides->begin() + SelectedForm->satinOrAngle.guide;
 		if (CurrentFormGuidesCount) {
 			auto shortestGuideIndex = 0u;
 			auto minimumLength      = 10000u;
 			for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 				const auto length
-				    = SelectedForm->satinOrAngle.guide[iGuide].finish - SelectedForm->satinOrAngle.guide[iGuide].start;
+				    = guideIt[iGuide].finish - guideIt[iGuide].start;
 				if (length < minimumLength) {
 					minimumLength      = length;
 					shortestGuideIndex = iGuide;
 				}
 			}
-			SelectedForm->angleOrClipData.guide.start  = SelectedForm->satinOrAngle.guide[shortestGuideIndex].start;
-			SelectedForm->angleOrClipData.guide.finish = SelectedForm->satinOrAngle.guide[shortestGuideIndex].finish;
+			SelectedForm->angleOrClipData.guide.start  = guideIt[shortestGuideIndex].start;
+			SelectedForm->angleOrClipData.guide.finish = guideIt[shortestGuideIndex].finish;
 			satin::delsac(ClosestFormToCursor);
 		}
 		else {
@@ -676,9 +677,10 @@ void form::drwfrm() {
 						lastPoint = SelectedForm->wordParam + 1;
 					}
 					const auto maxGuide = (*FormList)[iForm].satinGuideCount;
+					auto guideIt = SatinGuides->begin() + CurrentFormGuides;
 					for (auto iGuide = 0u; iGuide < maxGuide; iGuide++) {
-						form::sfCor2px(vertexIt[CurrentFormGuides[iGuide].start], line[0]);
-						form::sfCor2px(vertexIt[CurrentFormGuides[iGuide].finish], line[1]);
+						form::sfCor2px(vertexIt[guideIt[iGuide].start], line[0]);
+						form::sfCor2px(vertexIt[guideIt[iGuide].finish], line[1]);
 						SelectObject(StitchWindowMemDC, FormPen);
 						Polyline(StitchWindowMemDC, line, 2);
 					}
@@ -5390,6 +5392,7 @@ void form::rotfrm(unsigned int newStartVertex) {
 		iRotated          = form::nxt(iRotated);
 	}
 	iRotatedGuide = 0;
+	auto guideIt = SatinGuides->begin() + CurrentFormGuides;
 	if (SelectedForm->type == SAT) {
 		if (SelectedForm->wordParam) {
 			SelectedForm->wordParam
@@ -5397,15 +5400,13 @@ void form::rotfrm(unsigned int newStartVertex) {
 		}
 		if (VertexCount) {
 			for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
-				if (CurrentFormGuides[iGuide].start != newStartVertex && CurrentFormGuides[iGuide].finish != newStartVertex) {
-					CurrentFormGuides[iRotatedGuide].start
-					    = (CurrentFormGuides[iGuide].start + VertexCount - newStartVertex) % VertexCount;
-					CurrentFormGuides[iRotatedGuide].finish
-					    = (CurrentFormGuides[iGuide].finish + VertexCount - newStartVertex) % VertexCount;
-					if (CurrentFormGuides[iRotatedGuide].start > CurrentFormGuides[iRotatedGuide].finish) {
-						tlin                                   = CurrentFormGuides[iRotatedGuide].start;
-						CurrentFormGuides[iRotatedGuide].start = CurrentFormGuides[iRotatedGuide].finish;
-						CurrentFormGuides[iGuide].finish       = tlin;
+				if (guideIt[iGuide].start != newStartVertex && guideIt[iGuide].finish != newStartVertex) {
+					guideIt[iRotatedGuide].start  = (guideIt[iGuide].start + VertexCount - newStartVertex) % VertexCount;
+					guideIt[iRotatedGuide].finish = (guideIt[iGuide].finish + VertexCount - newStartVertex) % VertexCount;
+					if (guideIt[iRotatedGuide].start > guideIt[iRotatedGuide].finish) {
+						tlin                         = guideIt[iRotatedGuide].start;
+						guideIt[iRotatedGuide].start = guideIt[iRotatedGuide].finish;
+						guideIt[iGuide].finish       = tlin;
 					}
 					iRotatedGuide++;
 				}
@@ -5418,11 +5419,11 @@ void form::rotfrm(unsigned int newStartVertex) {
 		auto rotatedGuides = std::vector<SATCON>{};
 		rotatedGuides.resize(iRotatedGuide);
 		for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
-			rotatedGuides[iGuide] = CurrentFormGuides[iGuide];
+			rotatedGuides[iGuide] = guideIt[iGuide];
 		}
 		std::sort(rotatedGuides.begin(), rotatedGuides.end(), fi::scomp);
 		for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
-			CurrentFormGuides[iGuide] = rotatedGuides[iGuide];
+			guideIt[iGuide] = rotatedGuides[iGuide];
 		}
 	}
 	if (VertexCount) {
@@ -5534,12 +5535,13 @@ void form::internal::nufpnt(unsigned int vertex, FRMHED* formForInsert) {
 		formForInsert->vertexCount++;
 		auto vertexIt        = FormVertices->begin() + formForInsert->vertexIndex;
 		vertexIt[vertex + 1] = SelectedPoint;
+		auto guideIt = SatinGuides->begin() + formForInsert->satinOrAngle.guide;
 		for (auto ind = 0u; ind < formForInsert->satinGuideCount; ind++) {
-			if (formForInsert->satinOrAngle.guide[ind].start > vertex) {
-				formForInsert->satinOrAngle.guide[ind].start++;
+			if (guideIt[ind].start > vertex) {
+				guideIt[ind].start++;
 			}
-			if (formForInsert->satinOrAngle.guide[ind].finish > vertex) {
-				formForInsert->satinOrAngle.guide[ind].finish++;
+			if (guideIt[ind].finish > vertex) {
+				guideIt[ind].finish++;
 			}
 		}
 		if (formForInsert->wordParam >= vertex + 1) {
@@ -7998,12 +8000,11 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
 	destination.vertexIndex = formSourceIndex;
 	formSourceIndex += destination.vertexCount;
 	if (destination.satinGuideCount) {
-		const auto _ = std::copy(destination.satinOrAngle.guide,
-		                         destination.satinOrAngle.guide + destination.satinGuideCount,
-		                         tempGuides.begin() + satin::getGuideSize());
-
-		destination.satinOrAngle.guide = &SatinGuides[satin::getGuideSize()];
-		satin::setGuideSize(satin::getGuideSize() + destination.satinGuideCount);
+		auto guideStart = std::next(SatinGuides->begin(), destination.satinOrAngle.guide);
+		auto guideEnd = std::next(guideStart, destination.satinGuideCount);
+		std::copy(guideStart, guideEnd, std::next(tempGuides.begin(), SatinGuides->size()));
+		destination.satinOrAngle.guide = SatinGuides->size();
+		satin::setGuideSize(SatinGuides->size() + destination.satinGuideCount);
 	}
 	if (clip::iseclpx(formIndex)) {
 		const auto sourceStart = ClipPoints->begin() + destination.borderClipData;
@@ -8070,7 +8071,7 @@ void form::frmnumfn(unsigned newFormIndex) {
 		auto& formList = *FormList;
 		std::copy(tempFormList.cbegin(), tempFormList.cend(), formList.begin());
 		std::copy(tempFormVertices.cbegin(), tempFormVertices.cend(), FormVertices->begin());
-		std::copy(tempGuides.cbegin(), tempGuides.cend(), SatinGuides);
+		std::copy(tempGuides.cbegin(), tempGuides.cend(), SatinGuides->begin());
 		std::copy(tempClipPoints.cbegin(), tempClipPoints.cend(), ClipPoints->begin());
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (StitchBuffer[iStitch].attribute & SRTYPMSK) {
@@ -8488,10 +8489,11 @@ void form::spltfrm() {
 				SelectedForm->fillType = 0;
 				SelectedForm->edgeType = 0;
 				*/
+				auto guideIt = SatinGuides->begin() + SelectedForm->satinOrAngle.guide;
 				for (ActivePointIndex = 0; ActivePointIndex < SelectedForm->satinGuideCount; ActivePointIndex++) {
-					if (SelectedForm->satinOrAngle.guide[ActivePointIndex].start == ClosestVertexToCursor
-					    || SelectedForm->satinOrAngle.guide[ActivePointIndex].finish == ClosestVertexToCursor) {
-						satin::spltsat(SelectedForm->satinOrAngle.guide[ActivePointIndex]);
+					if (guideIt[ActivePointIndex].start == ClosestVertexToCursor
+					    || guideIt[ActivePointIndex].finish == ClosestVertexToCursor) {
+						satin::spltsat(guideIt[ActivePointIndex]);
 						return;
 					}
 				}
