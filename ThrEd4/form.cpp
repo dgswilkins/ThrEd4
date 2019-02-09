@@ -7318,31 +7318,32 @@ void form::rotdup() {
 }
 
 void form::internal::adfrm(unsigned int iForm) {
-	FormList->push_back(FRMHED{});
+	FormList->push_back((*FormList)[iForm]);
 	FormIndex++;
 
 	auto& formHeader = FormList->back();
 
 	SelectedForm           = &((*FormList)[iForm]);
-	formHeader             = *SelectedForm;
 	ClosestFormToCursor    = FormList->size() - 1;
 	formHeader.vertexIndex = thred::adflt(SelectedForm->vertexCount);
 	auto vertexIt          = FormVertices->begin() + SelectedForm->vertexIndex;
 	std::copy(vertexIt, vertexIt + SelectedForm->vertexCount, FormVertices->begin() + formHeader.vertexIndex);
-	if (formHeader.type == SAT && formHeader.satinGuideCount) {
-		formHeader.satinOrAngle.guide = satin::adsatk(formHeader.satinGuideCount);
-		std::copy(SelectedForm->satinOrAngle.guide,
-		          SelectedForm->satinOrAngle.guide + SelectedForm->satinGuideCount,
-		          stdext::make_checked_array_iterator(formHeader.satinOrAngle.guide, SelectedForm->satinGuideCount));
+	formHeader.vertexCount = SelectedForm->vertexCount;
+	if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
+		formHeader.satinOrAngle.guide = satin::adsatk(SelectedForm->satinGuideCount);
+		auto guideStart               = SatinGuides->begin() + SelectedForm->satinOrAngle.guide;
+		auto guideEnd                 = guideStart + SelectedForm->satinGuideCount;
+		auto guideDest                = SatinGuides->begin() + formHeader.satinOrAngle.guide;
+		std::copy(guideStart, guideEnd, guideDest);
 	}
-	if (clip::iseclpx(ClosestFormToCursor)) {
-		formHeader.borderClipData = thred::adclp(formHeader.clipEntries);
+	if (clip::iseclpx(iForm)) {
+		formHeader.borderClipData = thred::adclp(SelectedForm->clipEntries);
 		auto offsetStart          = ClipPoints->begin() + SelectedForm->borderClipData;
 		auto destination          = ClipPoints->begin() + formHeader.borderClipData;
 		std::copy(offsetStart, offsetStart + SelectedForm->clipEntries, destination);
 	}
-	if (clip::isclpx(ClosestFormToCursor)) {
-		formHeader.angleOrClipData.clip = thred::adclp(formHeader.lengthOrCount.clipCount);
+	if (clip::isclpx(iForm)) {
+		formHeader.angleOrClipData.clip = thred::adclp(SelectedForm->lengthOrCount.clipCount);
 		auto       sourceStart          = ClipPoints->begin() + SelectedForm->angleOrClipData.clip;
 		auto       sourceEnd            = sourceStart + SelectedForm->lengthOrCount.clipCount;
 		const auto destination          = ClipPoints->begin() + formHeader.angleOrClipData.clip;
@@ -7351,6 +7352,7 @@ void form::internal::adfrm(unsigned int iForm) {
 }
 
 void form::duprot(double rotationAngle) {
+	thred::savdo();
 	fi::adfrm(ClosestFormToCursor);
 	const auto rotationCenter = form::rotpar();
 	thred::rotfn(rotationAngle, rotationCenter);
