@@ -54,7 +54,6 @@ void satin::delsac(unsigned int formIndex) {
 					formList[iForm].satinOrAngle.guide -= formList[formIndex].satinGuideCount;
 				}
 			}
-			SatinGuideIndex -= formList[formIndex].satinGuideCount;
 		}
 	}
 	formList[formIndex].satinGuideCount = 0;
@@ -162,7 +161,6 @@ void satin::spltsat(SATCON currentGuide) {
 	const auto offset = SelectedForm->satinOrAngle.guide + iNewGuide - 1;
 	auto       pos = std::next(SatinGuides->begin(), offset);
 	SatinGuides->erase(pos);
-	SatinGuideIndex--;
 	nextForm.satinOrAngle.guide = SelectedForm->satinOrAngle.guide + ActivePointIndex;
 	nextForm.satinGuideCount = SelectedForm->satinGuideCount - ActivePointIndex - 1;
 	SelectedForm->satinGuideCount = ActivePointIndex;
@@ -583,7 +581,6 @@ void satin::delspnt() {
 					iGuide++;
 				}
 				SelectedForm->satinGuideCount--;
-				SatinGuideIndex--;
 				for (auto iForm = ClosestFormToCursor + 1; iForm < FormList->size(); iForm++) {
 					auto& form = (*FormList)[iForm];
 					if (form.type == SAT && form.satinGuideCount) {
@@ -1476,7 +1473,6 @@ unsigned int satin::adsatk(unsigned int count) noexcept {
 	const auto val = SATCON{};
 	SatinGuides->insert(it, count, val);
 
-	SatinGuideIndex += count;
 	return iSatinConnect;
 }
 
