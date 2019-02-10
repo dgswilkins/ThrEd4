@@ -44,15 +44,13 @@ unsigned int StartPoint; // starting formOrigin for a satin stitch guide-line
 
 void satin::delsac(unsigned int formIndex) {
 	auto& formList = *FormList;
-	if (SatinGuideIndex) {
-		if (formList[formIndex].type == SAT && formList[formIndex].satinGuideCount) {
-			auto destination = formList[formIndex].satinOrAngle.guide;
-			auto source      = destination + formList[formIndex].satinGuideCount;
-			while (source < SatinGuideIndex) {
-				SatinGuides[destination++] = SatinGuides[source++];
-			}
+	if (!SatinGuides->empty()) {
+		if (formList[formIndex].type == SAT && (formList[formIndex].satinGuideCount != 0u)) {
+			auto eraseStart = SatinGuides->cbegin() + formList[formIndex].satinOrAngle.guide;
+			auto eraseEnd = eraseStart + formList[formIndex].satinGuideCount;
+			SatinGuides->erase(eraseStart, eraseEnd);
 			for (auto iForm = formIndex + 1; iForm < FormList->size(); iForm++) {
-				if (formList[iForm].type == SAT && formList[iForm].satinGuideCount) {
+				if (formList[iForm].type == SAT && (formList[iForm].satinGuideCount != 0u)) {
 					formList[iForm].satinOrAngle.guide -= formList[formIndex].satinGuideCount;
 				}
 			}
