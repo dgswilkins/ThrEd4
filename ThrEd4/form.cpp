@@ -7362,16 +7362,12 @@ void form::duprot(double rotationAngle) {
 }
 
 void form::internal::duprotfs(double rotationAngle) {
-	const auto savedFormIndex = FormIndex;
-
+	const auto rotationCenter = form::rotpar();
 	for (auto selectedForm : (*SelectedFormList)) {
 		adfrm(selectedForm);
+		thred::rotfn(rotationAngle, rotationCenter);
 	}
-	FormIndex = savedFormIndex;
-	for (auto& selectedForm : (*SelectedFormList)) {
-		selectedForm = FormIndex++;
-	}
-	fnagain(rotationAngle);
+	FormIndex = FormList->size();
 }
 
 void form::internal::duprots(double rotationAngle, const dPOINT& rotationCenter) {
@@ -7395,15 +7391,14 @@ void form::internal::duprots(double rotationAngle, const dPOINT& rotationCenter)
 }
 
 void form::internal::cplayfn(unsigned int iForm, unsigned play) {
-	const auto& srcForm = (*FormList)[iForm];
 
-	FormList->push_back(srcForm);
+	FormList->push_back((*FormList)[iForm]);
 	const auto lastForm = FormList->size() - 1;
 	form::fvars(lastForm);
 	SelectedForm->vertexIndex = thred::adflt(SelectedForm->vertexCount);
-	auto vertexIt             = FormVertices->begin() + srcForm.vertexIndex;
+	auto vertexIt             = FormVertices->begin() + (*FormList)[iForm].vertexIndex;
 	std::copy(vertexIt, vertexIt + VertexCount, FormVertices->begin() + SelectedForm->vertexIndex);
-	satin::cpySat(srcForm);
+	satin::cpySat((*FormList)[iForm]);
 	SelectedForm->clipEntries             = 0;
 	SelectedForm->fillType                = 0;
 	SelectedForm->lengthOrCount.clipCount = 0;
